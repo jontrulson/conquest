@@ -37,6 +37,7 @@ CONTENTS:
 	    ## CLOAKING
 	    ## TRACTORS
 	    ## STRENGTH
+	    ## REFITTING
 	    ## LEAVING THE GAME
 	    ## TEAMS
 	    ## COMBAT
@@ -154,6 +155,9 @@ described in INSTALL.
 
 ## PLANETS
 
+	You need at least one kill before you will be able to
+transport armies to, or from, a planet.
+
 	You cannot change the owner team for 'core' planets via
 conqoper.  Core planets are those that need to be conquered in order
 to take the universe.  The (?)planet list option in conqoper/conquest
@@ -201,18 +205,52 @@ thought, there *are* a few other interesting uses for them as well ;-)
 
 	Different teams have different strengths.  Romulans have the
 best weapons, but the worst engines.  Orions have the best engines and
-the worst weapons.  The feds/klings are in-between.  The number of
-kills your ship has, will determine how much more efficient your
-weapons and engines are than the base efficiency you started out with.
-When your kills count reaches DOUBLE_E_KILLS (currently 40), your
-efficiency will be double what you started out with.  It's very nice
-to be in a ship with alot of kills.  The problem is, at least in our
-games, we tend to attack whoever has the most kills - it's a wise move
-for self preservation if the ship in question isn't on your team ;-)
-Even if you have high kills, it's difficult to survive against the
-continuous onslaught of a couple of determined foes, unless you run
-and cloak alot.
+the worst weapons.  The feds/klings are in-between.  
 
+[In V7.1, you can change your ship type, regardless of which team you
+are on]
+
+	The number of kills your ship has will determine how much
+more efficient your weapons and engines are than the base efficiency
+you started out with.  When your kills count reaches DOUBLE_E_KILLS
+(currently 40), your efficiency will be double what you started out
+with.  It's very nice to be in a ship with alot of kills.  The problem
+is, at least in our games, we tend to attack whoever has the most
+kills - it's a wise move for self preservation if the ship in question
+isn't on your team ;-) Even if you have high kills, it's difficult to
+survive against the continuous onslaught of a couple of determined
+foes, unless you run and cloak alot.
+
+
+## REFITTING
+
+	New with version 7.1, a ship refit capability has been added,
+and enabled by default.  Basically, when you enter the game, and join
+a team, your ship is the same type of ship (in terms of weapons and
+engine performance) that is the default for your team - like all
+previous versions of Conquest.  With 7.1, once you have at least one
+kill, and are orbitting a team owned planet, you can use the 'r',
+refit option to select a different ship type.  The current ship types,
+and their equivalence with the traditional types assigned to a team
+are listed below:
+
+
+  Ship Type (V7.1)  Traditional ship type assigned to team (pre V7.1)
+  ---------         -------------------------------------------------
+
+  Scout             Orion - strong engines, weak weapons
+  Destroyer         Federation/Klingon - good engines, good
+                    weapons
+  Cruiser           Romulan - weak engines, strong weapons
+
+
+	The type of a given ship can be determined by doing an (i)nfo
+on it, or by using '/' Player List to look at the list of currently
+active ships, and note the character ('S', 'D', 'C) following their
+ship number.
+
+	The ability to refit can be controlled by the operator using
+the system-wide 'allow_refits' option.
 
 ## LEAVING THE GAME
 
@@ -235,7 +273,8 @@ operator allows this in the sys-wide configuration file).  Remember,
 different teams have different strengths and weaknesses.  Federation
 and Klingon teams are pretty middle-of-the-road as far as
 engine/weapons efficiency goes, while Orions have better engines, and
-Romulans have stronger weapons.  
+Romulans have stronger weapons. [With V7.1, you can change your ship
+type regardless of what team you are on].  
 
 
 ## COMBAT
@@ -573,7 +612,7 @@ using the (O)ptions Menu from within conquest.
 	More information, a command list/description and some
 specifics of the game can be found in conquest.doc.  
 
-	See conqnews.doc for the lastest information on Conquest.
+	See conqnews.doc for the latest information on Conquest.
 
 	See TODO for a list of things being planned or thought about.
 
