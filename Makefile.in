@@ -1038,8 +1038,8 @@ install-exec-hook:
 		$(DESTDIR)$(CONQIMGDIR)
 	chmod 775 $(DESTDIR)$(CONQLOCALSTATEDIR) 
 	chgrp $(CONQGROUP) $(DESTDIR)$(CONQLOCALSTATEDIR)
-	cp -f $(IMAGES) $(CONQIMGDIR)/
-	chmod 644 $(CONQIMGDIR)/*.bmp $(CONQIMGDIR)/*.txf
+	cp -f $(IMAGES) $(DESTDIR)$(CONQIMGDIR)/
+	chmod 644 $(DESTDIR)$(CONQIMGDIR)/*.bmp $(DESTDIR)$(CONQIMGDIR)/*.txf
 	chmod 755 $(prefix) $(DESTDIR)$(datadir)
 	chgrp $(CONQGROUP) $(DESTDIR)$(bindir)/conqoper$(EXEEXT) \
 		$(DESTDIR)$(libexecdir)/conqdriv$(EXEEXT) \

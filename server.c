@@ -700,7 +700,7 @@ void procDistress(cpCommand_t *cmd)
   if (cmd->cmd != CPCMD_DISTRESS)
     return;
 
-  tofriendly = (int)htons(cmd->detail);
+  tofriendly = (int)ntohs(cmd->detail);
 
 #if defined(DEBUG_SERVERPROC)
   clog("PROC DISTRESS: tofriendly = %d", tofriendly);
@@ -792,14 +792,16 @@ void procFirePhaser(cpCommand_t *cmd)
     return;
 
   dir = (real)ntohs(cmd->detail) / 100.0;
-
+#warning "clean me"
+  clog("PROC FIREPHASER: PRE dir = %f", dir);
   if (dir < 0)
     dir = 0.0;
 
   if (dir > 359.9)
     dir = 359.9;
 
-#if defined(DEBUG_SERVERPROC)
+#warning "clean me"
+#if 1 /*defined(DEBUG_SERVERPROC)*/
   clog("PROC FIREPHASER: dir = %f", dir);
 #endif
 

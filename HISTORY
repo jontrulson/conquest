@@ -9,7 +9,13 @@
 
                               Conquest HISTORY
 
-Version 8.0.1e 7/4/2004 (devel)
+Version 8.0.1e 7/7/2004 (devel)
+
+        - patch from Clint Adams correcting a strange typedef bug in
+          datatyps.h that niether of my compilers detected.
+
+          Also, add $(DESTDIR) to the image copy routines in
+          Makefile.am. 
 
         - cleaned up some logic in the server so that uneccessary
           computations are not performed on each iter - improving

@@ -21,7 +21,7 @@ typedef int32_t Sgn32;
 typedef uint32_t Unsgn32;
 
 typedef int16_t Sgn16;
-typedef uint16_t short Unsgn16;
+typedef uint16_t Unsgn16;
 
 typedef int8_t Sgn8;
 typedef uint8_t Unsgn8;
