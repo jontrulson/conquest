@@ -1,0 +1,15 @@
+
+- add local server time to hello/srvrstat
+
+- local ship computation?
+
+- add pads to those structures not having them?
+
+- for packets with strings, standardize string len (align 32b) - same
+  for meta proto?  increase MOTD, etc...?
+
+- versioning improvment... use major == incompat, minor == compat...
+
+- support for more teams
+
+

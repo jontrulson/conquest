@@ -2518,7 +2518,7 @@ static int nCPIdle(void)
   /* send a ping if it's time */
   if (!pingPending && ((iternow - pingtime) > pingwait))
     {                           /* send a ping request */
-      /* only send this if we are doing things that this packet would end
+      /* only send this if we aren't doing things that this packet would end
          up cancelling... */
       if (state != S_REFITING && state != S_BOMBING && 
           state != S_BEAMING  && state != S_DESTRUCTING &&

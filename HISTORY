@@ -11,6 +11,14 @@
 
 Version 8.0.1p 11/21/2004 (devel)
 
+        - another 8.1 release candidate
+
+        - added ping capability.  The GL client (conquestgl) will now
+          ping the server every 2 seconds.  This measures the average
+          TCP round-trip time (in ms) to the server and back.  To see
+          the ping time, enable the status line in the cockpit by
+          typing 'ALT-S' when playing.
+
         - update meta protocol to add 'contact' - (server operator
           contact), and 'walltime' (local server time) to the meta
           protocol.  The Meta protocol version is now at 2.  The meta
@@ -18,18 +26,13 @@ Version 8.0.1p 11/21/2004 (devel)
           clients so there should be no compatibility problems.
 
           With servers and clients that support the version 2 meta
-          protocol, a check is now done in the Server Select page
-          to ensure that you will only be allowed to connect to
-          servers that are compatible with your client.  Incompatible
-          servers will be highlighted in blue on the meta select
-          page.  This is more for the future since no current
-          incompatible server supports the v2 meta protocol anyway.
-
-        - added ping capability.  The GL client (conquestgl) will now
-          ping the server every 2 seconds.  This measures the average
-          TCP round-trip time (in ms) to the server and back.  To see
-          the ping time, enable the status line in the cockpit by
-          typing 'ALT-S' when playing.
+          protocol, a check is now also done in the client's Server
+          Select page to ensure that you will only be allowed to
+          connect to servers that are protocol compatible with your
+          client.  Incompatible servers will be highlighted in blue on
+          the meta select page.  This is more for the future since no
+          current incompatible server supports the v2 meta protocol
+          anyway.
 
         - now disabling the SlingShot flag works in all cases like
           it's supposed to :)
