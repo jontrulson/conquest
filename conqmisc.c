@@ -2307,6 +2307,8 @@ int usefuel( int snum, real fuel, int weapon )
 	}
     }
 
+  sfuel[snum] = sfuel[snum] - fuel;
+
   if ( sfuel[snum] < 0.0 )
     {
       /* When you're out of gas, you're out of fun... */
