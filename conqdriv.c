@@ -101,9 +101,12 @@ main(int argc, char *argv[])
 	   CONQDRIV_PRI,
 	   sys_errlist[errno]);
     }
+#if defined(DEBUG_FLOW)
   else
     clog("conqdriv: main(): nice(CONQDRIV_PRI (%d)): succeeded.",
 	 CONQDRIV_PRI);
+#endif
+
 #endif
   
   initstats( &ctime, &etime );
@@ -113,7 +116,6 @@ main(int argc, char *argv[])
   PVLOCK(&ConqInfo->lockword);
   gsecs( &Driver->drivtime );		/* prevent driver timeouts */
   gsecs( &Driver->playtime );
-  cpid = getpid();
   
   /* Look for the force flag. */
   
@@ -124,7 +126,7 @@ main(int argc, char *argv[])
       switch (arg)
 	{
 	case 'f':
-	  force = isagod(NULL);
+	  force = isagod(-1);
 	  break;
 	}
     }

@@ -1,5 +1,3 @@
-/* Global variables  - Jon Trulson */
-
 /************************************************************************
  *
  * $Id$
@@ -47,6 +45,12 @@ CEXTERN int sysconf_AllowFastUpdate;
 CEXTERN int sysconf_DoRandomRobotKills;
 				/* allow non gods to SIGQUIT out */
 CEXTERN int sysconf_AllowSigquit;
+				/* allow users to (s)witchteams from main
+				   menu */
+CEXTERN int sysconf_AllowSwitchteams;
+				/* number of days of inactivity before
+				   expiring a user */
+CEXTERN int sysconf_UserExpiredays;
 
 				/* User options */
 				/* Whether to beep on an incoming message */
@@ -75,7 +79,7 @@ CEXTERN char conf_MacrosF[MAX_MACROS][MAX_MACRO_LEN];
 				/* for the semaphores */
 
 #define LOCKMSG      (0)	/* lock the message portion  */
-#define LOCKCMN      (1)	/* lock the everything else  */
+#define LOCKCMN      (1)	/* lock everything else  */
 
 				/* attribute initialization.
 				   initialized in cdinit() */

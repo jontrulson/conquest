@@ -223,11 +223,11 @@ void clearships(void)
 int cvtcoords( real cenx, real ceny, real x, real y, real scale, 
 	      int *lin, int *col )
 {
-  *col = round( (cmaxcol-STAT_COLS)/2 + (x-cenx) / scale * WIDTH_FAC ) +
+  *col = round( (CqContext.maxcol-STAT_COLS)/2 + (x-cenx) / scale * WIDTH_FAC ) +
     STAT_COLS;
   
   *lin = round( (DISPLAY_LINS/2+1) - (y-ceny) / scale );
-  if ( *lin < 0 || *lin > DISPLAY_LINS || *col <= STAT_COLS || *col > cmaxcol )
+  if ( *lin < 0 || *lin > DISPLAY_LINS || *col <= STAT_COLS || *col > CqContext.maxcol )
     return ( FALSE );
   
   return ( TRUE );
@@ -656,10 +656,12 @@ int gunum( int *unum, char *lname, int ltype )
 /*    histlist( godlike ) */
 void histlist( int godlike )
 {
-  int i, j, unum, lin, col, fline, lline, thistptr;
+  int i, j, unum, lin, col, fline, lline, thistptr = 0;
   int ch;
   char *hd0="C O N Q U E S T   U S E R   H I S T O R Y";
   char puname[SIZEUSERNAME + 2]; /* for '\0' and '@' */
+  char connecttm[BUFFER_SIZE];
+  char histentrytm[DATESIZE + 1];
 
 				/* Do some screen setup. */
   cdclear();
@@ -672,40 +674,53 @@ void histlist( int godlike )
   while (TRUE) /* repeat */
     {
       if ( ! godlike )
-	if ( ! stillalive( csnum ) )
+	if ( ! stillalive( CqContext.snum ) )
 	  break;
-      if ( thistptr != ConqInfo->histptr )
+      
+      thistptr = ConqInfo->histptr;
+      lin = fline;
+      col = 1;
+      cdclrl( fline, lline - fline + 1 );
+      
+      i = thistptr + 1;
+      for ( j = 0; j < MAXHISTLOG; j++ )
 	{
-	  /* Need to update the display */
-	  thistptr = ConqInfo->histptr;
-	  lin = fline;
-	  col = 8;
-	  cdclrl( fline, lline - fline + 1 );
+	  i = modp1( i - 1, MAXHISTLOG );
+	  unum = History[i].histunum;
 	  
-	  i = thistptr + 1;
-	  for ( j = 0; j < MAXHISTLOG; j++ )
+	  if ( unum < 0 || unum >= MAXUSERS )
+	    continue; 
+	  if ( ! Users[unum].live )
+	    continue; 
+	  if (Users[unum].type == UT_REMOTE)
+	    sprintf(puname, "@%s", Users[unum].username);
+	  else
+	    strcpy(puname, Users[unum].username);
+	  
+				/* entry time */
+	  getdandt( histentrytm, History[i].histlog);
+	  
+	  
+				/* now elapsed time */
+	  fmtseconds((int) History[i].elapsed, connecttm);
+	  /* strip off seconds, or for long times, anything after 7 bytes */
+	  connecttm[7] = '\0';
+	  
+	  cprintf( lin, col, ALIGN_NONE, 
+		   "#%d#%-10.10s #%d#%16s#%d#-#%d#%7s", 
+		   YellowLevelColor,
+		   puname, 
+		   GreenLevelColor,
+		   histentrytm,
+		   NoColor,
+		   RedLevelColor,
+		   connecttm);
+	  
+	  lin++;
+	  if ( lin > lline )
 	    {
-	      i = modp1( i - 1, MAXHISTLOG );
-	      unum = History[i].histunum;
-	      
-	      if ( unum < 0 || unum >= MAXUSERS )
-		continue; 
-	      if ( ! Users[unum].live )
-		continue; 
-	      if (Users[unum].type == UT_REMOTE)
-		sprintf(puname, "@%s", Users[unum].username);
-	      else
-		strcpy(puname, Users[unum].username);
-
-	      cprintf( lin, col, ALIGN_NONE, "#%d#%-12.12s %17s", 
-		       YellowLevelColor,
-		       puname, History[i].histlog );
-	      lin++;
-	      if ( lin > lline )
-		{
-		  col = 43;
-		  lin = fline;
-		}
+	      col = 40;
+	      lin = fline;
 	    }
 	}
       
@@ -1599,7 +1614,7 @@ void inituniverse(void)
   for ( i = 0; i < MAXHISTLOG; i = i + 1 )
     {
       History[i].histunum = -1;
-      History[i].histlog[0] = EOS;
+      History[i].histlog = 0;
     }
   
   /* Un-twiddle the lockword. */
@@ -1656,16 +1671,20 @@ void intrude( int snum, int pnum )
 /*  SYNOPSIS */
 /*    int unum */
 /*    loghist( unum ) */
-void loghist( int unum )
+int loghist( int unum )
 {
+  int hnum;
+
   PVLOCK(&ConqInfo->lockword);
   ConqInfo->histptr = modp1( ConqInfo->histptr + 1, MAXHISTLOG );
 				/* time stamp for this entry */
-  getdandt( History[ConqInfo->histptr].histlog, 0 );	
-  
+  History[ConqInfo->histptr].histlog = getnow(NULL, 0 );	
+  History[ConqInfo->histptr].elapsed = (time_t)0;
   History[ConqInfo->histptr].histunum = unum;
+  hnum = ConqInfo->histptr;
+
   PVUNLOCK(&ConqInfo->lockword);
-  return;
+  return(hnum);
 }
 
 
@@ -1824,7 +1843,7 @@ void puthing( int what, int lin, int col )
 	  {
 	    tcol = col + i - 1;
 	    /*	      tcol = col + i - 3;*/
-	    if ( tcol > STAT_COLS && tcol <= cmaxcol - 1 )
+	    if ( tcol > STAT_COLS && tcol <= CqContext.maxcol - 1 )
 	      if (buf[j][i] != '\0')
 		cdput( buf[j][i], tlin, tcol );
 	  }

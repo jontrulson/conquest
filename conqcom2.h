@@ -31,21 +31,28 @@
 #define C2EXTERN extern
 #endif
 
-C2EXTERN    int cunum;			/* user number */
-C2EXTERN    int csnum;			/* ship number */
-C2EXTERN    int cpid;			/* pid of our owner process */
-C2EXTERN    int childpid;			/* pid of driver we spawned */
-C2EXTERN    int cmaxlin;			/* number of lines */
-C2EXTERN    int cmaxcol;			/* number of columns */
-C2EXTERN    int cmsgrand;			/* hundreths timestamp since last message */
-C2EXTERN    int clastime;			/* last time drcheck was called */
-C2EXTERN    int csubdcl;			/* says if we can spawn to DCL */
-C2EXTERN    int cnewsfile;			/* says if a news file is available */
-C2EXTERN    int cleave;			/* just a flag */
-C2EXTERN    int cdisplay;			/* should do anything in astservice() */
-C2EXTERN    int credraw;			/* should redraw in display() */
-C2EXTERN    int cmsgok;			/* allow new messages */
-C2EXTERN    char cbuf[MSGMAXLINE];		/* general purpose buffer */
-C2EXTERN    char clastinfostr[MSGMAXLINE];	/* last string used in doinfo() */
+				/* a 'Conquest Context' for the current
+				   player/operator */
 
+typedef struct {
+  int unum;			/* user number */
+  int snum;			/* ship number */
+  int histslot;			/* history slot number */
+  int pid;			/* pid of our owner process */
+  int childpid;			/* pid of driver we spawned */
+  int maxlin;			/* number of lines */
+  int maxcol;			/* number of columns */
+  int msgrand;			/* hundreths timestamp since last message */
+  int drchklastime;		/* last time drcheck was called */
+  int hasnewsfile;		/* says if a news file is available */
+  int leave;			/* just a flag */
+  int display;			/* should do anything in astservice() */
+  int redraw;			/* should redraw in display() */
+  int msgok;			/* allow new messages */
+  char lastinfostr[MSGMAXLINE]; /* last string used in doinfo() */
+} CqContext_t;
+
+C2EXTERN CqContext_t CqContext;
+
+#undef C2EXTERN
 #endif

@@ -133,7 +133,7 @@
 
 /* DEBUG* - debug some things */
 
-#define DEBUG_FLOW		/* trace init flow */
+/*#define DEBUG_FLOW		/* trace init flow */
 /*#define DEBUGGING		/* general debugging */
 /*#define DEBUG_LOCKING		/* debugging common block locking */
 /*#define DEBUG_CONFIG		/* debug configuration file processing */
@@ -146,5 +146,5 @@
 /*#define DEBUG_RANDOM		/* debug the random number library */
 /*#define DEBUG_COLOR		/* debug color processing */
 /*#define DEBUG_IOGTIMED        /* debug timed input */
-/*#define DEBUG_SERVER        /* debug server operation */
+/*#define DEBUG_SERVER          /* debug server operation */
 

@@ -212,7 +212,7 @@ void docoup( int snum );
 void docourse( int snum );
 void dodet( int snum );
 void dodistress( int snum );
-void dohelp( int subdcl );
+void dohelp( void );
 void doinfo( int snum );
 void dolastphase( int snum );
 void domydet( int snum );
@@ -338,7 +338,7 @@ void initrobots(void);
 void initship( int snum, int unum );
 void inituniverse(void);
 void intrude( int snum, int pnum );
-void loghist( int unum );
+int loghist( int unum );
 real newarp( int snum, real dwarp );
 int phoon( int pnum );
 void puthing( int what, int lin, int col );
@@ -458,7 +458,7 @@ void drstart(void);
 void gcputime( int *cpu );
 void helplesson(void);
 void initstats( int *ctemp, int *etemp );
-int isagod( char *name );
+int isagod( int unum );
 void news(void);
 int mailimps( char *subject, char *msg);
 int CheckPid(int pidnum);
@@ -541,5 +541,6 @@ void do_border(void);
 int alertcolor(int alert);
 void draw_alertborder(int alert);
 
-/* logon.c */
+/* users.c */
 int Logon(char *username, char *password);
+

@@ -1,5 +1,5 @@
 /* 
- * users.c - user stuff
+ * userauth.c - user stuff
  *
  * $Id$
  *
@@ -16,12 +16,12 @@
 #define MAX_USERLEN 10		/* only 10 chars for users */
 
 static int checkuname(char *username);
-
+static void expire_users(void);
 
 int Logon(char *username, char *password)
 {
-  int i, col, lin, slin, lenc1, unum;
-  char ch;
+  int col, lin, slin, lenc1, unum;
+  int ch;
   char nm[SIZEUSERNAME], pw[SIZEUSERNAME], pwr[SIZEUSERNAME];
   string c1=" CCC    OOO   N   N   QQQ   U   U  EEEEE   SSSS  TTTTT";
   string c2="C   C  O   O  NN  N  Q   Q  U   U  E      S        T";
@@ -29,10 +29,13 @@ int Logon(char *username, char *password)
   string c4="C   C  O   O  N  NN  Q  Q   U   U  E          S    T";
   string c5=" CCC    OOO   N   N   QQ Q   UUU   EEEEE  SSSS     T";
 
+  expire_users();		/* now is a good time to expire users */
+
   if (!IsRemoteUser())
     {				/* if local, just get uname */
       glname(username);
       password[0] = EOS;	/* locals don't have passwords */
+      clog("Logon(): Local user '%s' logged in", username);
       return(UT_LOCAL);
     }
 				/* if we're here it means we're remote,
@@ -45,7 +48,7 @@ int Logon(char *username, char *password)
 
   /* Display the logo. */
   lenc1 = strlen( c1 );
-  col = (cmaxcol-lenc1) / 2;
+  col = (CqContext.maxcol - lenc1) / 2;
   lin = 2;
   cprintf( lin,col,ALIGN_NONE,"#%d#%s", RedColor | A_BOLD, c1);
   lin++;
@@ -60,7 +63,7 @@ int Logon(char *username, char *password)
   /* Draw a box around the logo. */
   lin++;
   attrset(A_BOLD);
-  cdbox( 1, col-2, lin, col+lenc1+1 );
+  cdbox( 1, col - 2, lin, col + lenc1 + 1 );
   attrset(0);
 
   lin += 4;
@@ -68,10 +71,12 @@ int Logon(char *username, char *password)
 
   nm[0] = EOS;
 
+  cdrefresh();
+
   while (TRUE)			/* login loop */
     {
       slin = lin;
-      cdclrl( slin, cmaxlin - slin - 1 );
+      cdclrl( slin, CqContext.maxlin - slin - 1 );
       cprintf( slin, col, ALIGN_CENTER, 
 	       "#%dWelome to Conquest, Please login...",
 	       SpecialColor);
@@ -125,6 +130,8 @@ int Logon(char *username, char *password)
 				   and password (new user) - time
 				   to rock. */
 				/* ideally we should encryt it here */
+	      clog("Logon(): New remote user '%s' logged in", nm);
+
 	      break;
 	    }
 	  else
@@ -147,23 +154,25 @@ int Logon(char *username, char *password)
 		  cdclrl( MSG_LIN2, 1  );
 		  cdputs("Invalid Password.", MSG_LIN2, 1);
 		  cdrefresh();
+		  clog("Logon(): Invalid password for user '%s'", nm);
 		  sleep(2);
 		  continue;
 	    }
 	  
 				/* good pw - go for the gusto */
+	  clog("Logon(): Remote user '%s' logged in", nm);
 	  break;
 	}
     }
 
 				/* if we're here, we're legal */
-  strcpy(username, nm);
-  strcpy(password, pw);
+  strncpy(username, nm, MAXUSERNAME);
+  strncpy(password, pw, MAXUSERNAME);
 
   return(UT_REMOTE);
 }
 
-  
+/* check the validity of a supplied username */  
 static int checkuname(char *username)
 {
   char *s = username;
@@ -180,3 +189,101 @@ static int checkuname(char *username)
   return(TRUE);
 }
 	
+/* expire any old users (unless they have active ships running...) */
+/*  (DOES LOCKING) */
+void expire_users(void)
+{
+  register int i, j;
+  time_t difftime = 0;
+  int hasship = FALSE;
+  unsigned int expire_secs;
+
+#if defined(DEBUG_SERVER)
+  clog("expire_users(): Expiring users...");
+#endif
+
+  if (sysconf_UserExpiredays == 0)
+    {				/* expiration has been disabled */
+#if defined(DEBUG_SERVER)
+      clog("expire_users(): sysconf_UserExpiredays == 0, expiration disabled");
+#endif
+
+      return;
+    }
+
+  expire_secs = (sysconf_UserExpiredays * SECS_PER_DAY);
+  PVLOCK(&ConqInfo->lockword);
+
+  for (i=0; i < MAXUSERS; i++)
+    {
+      if (Users[i].live == FALSE || Users[i].type != UT_REMOTE)
+	continue;		/* only living remote users are subject to
+				   expiration.  */
+
+      difftime = getnow(NULL, 0) - Users[i].lastentry;
+
+#if defined(DEBUG_SERVER)
+          clog("expire_users(): getnow(NULL, 0) = %d, Users[%d].lastentry = %d",
+	       getnow(NULL, 0),
+	       i, Users[i].lastentry);
+#endif
+
+      if ((unsigned int)Users[i].lastentry != 0 && 
+	  (unsigned int) difftime > expire_secs)
+	{			/* we have a candidate... */
+				/* loop thru the ships, making sure he
+				   doesn't have one active */
+
+#if defined(DEBUG_SERVER)
+	  clog("expire_users(): have a candidate: user '%s' (%d), difftime = %d > expire_secs = %d, Users[i].lastentry = %d",
+	       Users[i].username,
+	       i,
+	       difftime,
+	       expire_secs,
+	       Users[i].lastentry);
+#endif
+
+	  hasship = FALSE;
+	  for (j=1; j <= MAXSHIPS; j++)
+	    {
+	      if (Ships[j].unum == i && Ships[j].status == SS_LIVE)
+		{
+		  hasship = TRUE;
+		  break;
+		}
+	    }
+
+	  if (hasship)
+	    {			/* we can't waste him */
+	      clog("expire_users(): Couldn't expire remote user '%s' due to active ship(s)",
+		   Users[i].username);
+	    }
+	  else
+	    {			/* waste him */
+				/* have to play some trickery here
+				   since resign locks the commonblock */
+	      PVUNLOCK(&ConqInfo->lockword);
+
+#if defined(DEBUG_SERVER)
+	      clog("expire_users(): calling resign(%d, %d)", i, TRUE);
+#endif
+
+	      resign(i, TRUE);
+	      clog("expire_users(): Expired remote user '%s' after %d days of inactivity",
+		   Users[i].username,
+		   difftime / SECS_PER_DAY);
+				/* re-aquire the lock */
+	      PVLOCK(&ConqInfo->lockword);
+	    }
+	}
+    }
+
+				/* done */
+  PVUNLOCK(&ConqInfo->lockword);
+
+#if defined(DEBUG_SERVER)
+    clog("expire_users(): ...Done");
+#endif
+
+  return;
+}

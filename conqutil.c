@@ -458,7 +458,7 @@ void cerror(char *fmt, ...)
 void clog(char *fmt, ...)
 {
   va_list ap;
-  char buf[MSGMAXLINE];
+  static char buf[BIG_BUFFER_SIZE];
   static char errfile[BUFFER_SIZE];
   static FILE *errfd = NULL;
   int tmp;
@@ -703,7 +703,7 @@ void fmtminutes( int itime, char *buf )
 void fmtseconds( int itime, char *buf )
 {
   int i, days, hours, minutes, seconds;
-  char junk[32];
+  char junk[BUFFER_SIZE];
   int minus;
   
   if ( itime < 0 )

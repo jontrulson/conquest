@@ -109,7 +109,7 @@ void EnableConquestSignalHandler(void)
   signal(SIGTERM, (void (*)(int))DoConquestSig);  
   signal(SIGINT, SIG_IGN);
 
-  if (isagod(NULL) || sysconf_AllowSigquit == TRUE)
+  if (isagod(-1) || sysconf_AllowSigquit == TRUE)
     {
       signal(SIGQUIT, (void (*)(int))DoConquestSig);
     }
@@ -150,13 +150,13 @@ void DoConquestSig(int sig)
       drpexit();
       cdclear();
       cdrefresh();
-      conqstats(csnum);		/* update stats */
+      conqstats(CqContext.snum);		/* update stats */
 				/* now we clear ship's elapsed/cpu seconds
 				   so that there won't be a huge addition to
 				   the Teams/Users/Ships timing stats when
 				   a VACANT ships re-enters Conquest */
-      Ships[csnum].ctime = 0;
-      Ships[csnum].etime = 0;
+      Ships[CqContext.snum].ctime = 0;
+      Ships[CqContext.snum].etime = 0;
       conqend();
       cdend();
       
@@ -215,33 +215,33 @@ void astservice(int sig)
   int readone;
   
   /* Don't do anything if we're not supposed to. */
-  if ( ! cdisplay )
+  if ( ! CqContext.display )
     return;
   
   /* Don't do anything if we're dead. */
-  if ( ! stillalive( csnum ) )
+  if ( ! stillalive( CqContext.snum ) )
     return;
   stoptimer();
   drcheck();				/* handle driver logic */
   
   /* See if we can display a new message. */
   readone = FALSE;
-  if ( cmsgok )
-    if ( dgrand( cmsgrand, &now ) >= NEWMSG_GRAND )
-      if ( getamsg( csnum, &Ships[csnum].lastmsg ) )
+  if ( CqContext.msgok )
+    if ( dgrand( CqContext.msgrand, &now ) >= NEWMSG_GRAND )
+      if ( getamsg( CqContext.snum, &Ships[CqContext.snum].lastmsg ) )
 	{
-	  if (readmsg( csnum, Ships[csnum].lastmsg, RMsg_Line ) == TRUE)
+	  if (readmsg( CqContext.snum, Ships[CqContext.snum].lastmsg, RMsg_Line ) == TRUE)
 	    {
-	      if (Msgs[Ships[csnum].lastmsg].msgfrom != csnum)
+	      if (Msgs[Ships[CqContext.snum].lastmsg].msgfrom != CqContext.snum)
 		if (conf_MessageBell == TRUE)
 		  cdbeep();
-	      cmsgrand = now;
+	      CqContext.msgrand = now;
 	      readone = TRUE;
 	    }
 	}
   
   /* Perform one ship display update. */
-  display( csnum, FALSE );
+  display( CqContext.snum, FALSE );
   
   
   /* Un-read the message if there's a chance it got garbaged. */
@@ -249,7 +249,7 @@ void astservice(int sig)
   if ( readone )
     if (RMsg_Line != MSG_LIN1)	/* we have an extra msg line */
       if ( iochav() )
-	Ships[csnum].lastmsg = modp1( Ships[csnum].lastmsg - 1, MAXMESSAGES );
+	Ships[CqContext.snum].lastmsg = modp1( Ships[CqContext.snum].lastmsg - 1, MAXMESSAGES );
   
   /* Schedule for next time. */
   settimer();
@@ -266,13 +266,13 @@ void astservice(int sig)
 void astoperservice(int sig)
 {
   /* Don't do anything if we're not supposed to. */
-  if ( ! cdisplay )
+  if ( ! CqContext.display )
     return;
   
   stoptimer();
   
   /* Perform one ship display update. */
-  display( csnum, headerflag );
+  display( CqContext.snum, headerflag );
   
   /* Schedule for next time. */
   setopertimer();
@@ -333,9 +333,12 @@ void conqinit(void)
 	   CONQUEST_PRI,
 	   sys_errlist[errno]);
     }
-  else
+
+#if defined(DEBUG_FLOW)
     clog("conqinit(): nice(CONQUEST_PRI (%d)): succeeded.",
 	 CONQUEST_PRI);
+#endif
+
 #endif
   
   /* Set up game environment. */
@@ -343,17 +346,17 @@ void conqinit(void)
   /* Figure out which gamcron file to use (and if we're gonna use one). */
   
   /* Other house keeping. */
-  cpid = getpid();		
-  cnewsfile = ( strcmp( C_CONQ_NEWSFILE, "" ) != 0 );
+  CqContext.pid = getpid();		
+  CqContext.hasnewsfile = ( strcmp( C_CONQ_NEWSFILE, "" ) != 0 );
   
   /* Zero process id of our child (since we don't have one yet). */
-  childpid = 0;
+  CqContext.childpid = 0;
   
   /* Zero last time drcheck() was called. */
-  clastime = 0;
+  CqContext.drchklastime = 0;
   
   /* Haven't scanned anything yet. */
-  clastinfostr[0] = EOS;
+  CqContext.lastinfostr[0] = EOS;
   
   return;
   
@@ -367,12 +370,13 @@ void conqinit(void)
 void conqstats( int snum )
 {
   int unum, team, cadd, eadd;
-  
+  time_t difftime;
   cadd = 0;
   eadd = 0;
   
-  upstats( &Ships[snum].ctime, &Ships[snum].etime, &Ships[snum].cacc, &Ships[snum].eacc,
-	  &cadd, &eadd );
+  upstats( &Ships[snum].ctime, &Ships[snum].etime, 
+	   &Ships[snum].cacc, &Ships[snum].eacc,
+	   &cadd, &eadd );
   
   /* Add in the new amounts. */
   PVLOCK(&ConqInfo->lockword);
@@ -380,13 +384,29 @@ void conqstats( int snum )
     {
       /* Update stats for a humanoid ship. */
       unum = Ships[snum].unum;
+
       Users[unum].stats[USTAT_CPUSECONDS] += cadd;
       Users[unum].stats[USTAT_SECONDS] += eadd;
+
+				/* update elapsed time in History[] 
+				   for this user */
+
+      if (CqContext.histslot != ERR && History[CqContext.histslot].histunum == unum)
+	{
+	  difftime = getnow(NULL, 0) - History[CqContext.histslot].histlog;
+	  if (difftime < (time_t)0)
+	    difftime = (time_t)0;
+	  History[CqContext.histslot].elapsed = difftime;
+	}
+
       team = Users[unum].team;
       Teams[team].stats[TSTAT_CPUSECONDS] += cadd;
       Teams[team].stats[TSTAT_SECONDS] += eadd;
+
       ConqInfo->ccpuseconds += cadd;
       ConqInfo->celapsedseconds += eadd;
+
+
     }
   PVUNLOCK(&ConqInfo->lockword);
   
@@ -404,16 +424,16 @@ void drcheck(void)
   
   /* If we haven't been getting cpu time in recent history, do no-thing. */
   /*  gsecs(playtime);*/
-  if ( dsecs( clastime, &clastime ) > TIMEOUT_DRCHECK )
+  if ( dsecs( CqContext.drchklastime, &CqContext.drchklastime ) > TIMEOUT_DRCHECK )
     return;
   
   if ( dsecs( Driver->drivtime, &(Driver->playtime) ) > TIMEOUT_DRIVER )
     {
-      if ( childpid != 0 )
+      if ( CqContext.childpid != 0 )
 	{
 	  /* We own the driver. See if it's still there. */
-	  ppid = childpid;
-	  if ( kill(childpid, 0) != -1 )
+	  ppid = CqContext.childpid;
+	  if ( kill(CqContext.childpid, 0) != -1 )
 	    {
 	      /* He's still alive and belongs to us. */
 	      gsecs( &(Driver->drivtime) );
@@ -423,7 +443,7 @@ void drcheck(void)
 	    clog( "drcheck(): Wrong ppid %d.", ppid );
 	  
 	  /* If we got here, something was wrong; disown the child. */
-	  childpid = 0;
+	  CqContext.childpid = 0;
 	}
       
       PVLOCK(&ConqInfo->lockword);
@@ -475,7 +495,7 @@ void drcreate(void)
     }
   else
     {				/* We're the parent, store pid */
-      childpid = pid;	
+      CqContext.childpid = pid;	
     }
   
   return;
@@ -488,11 +508,11 @@ void drcreate(void)
 /*    drkill */
 void drkill(void)
 {
-  if ( childpid != 0 )
-    if ( childpid == Driver->drivpid && Driver->drivstat == DRS_RUNNING )
+  if ( CqContext.childpid != 0 )
+    if ( CqContext.childpid == Driver->drivpid && Driver->drivstat == DRS_RUNNING )
       {
 	PVLOCK(&ConqInfo->lockword);
-	if ( childpid == Driver->drivpid && Driver->drivstat == DRS_RUNNING )
+	if ( CqContext.childpid == Driver->drivpid && Driver->drivstat == DRS_RUNNING )
 	  Driver->drivstat = DRS_KAMIKAZE;
 	PVUNLOCK(&ConqInfo->lockword);
       }
@@ -510,14 +530,14 @@ void drpexit(void)
   
   int i;
   
-  if ( childpid != 0 )
+  if ( CqContext.childpid != 0 )
     {
       /* We may well have started the driver. */
       drkill();
-      for ( i = 1; childpid == Driver->drivpid && i <= 50; i = i + 1 )
+      for ( i = 1; CqContext.childpid == Driver->drivpid && i <= 50; i = i + 1 )
 	c_sleep( 0.1 );
-      if ( childpid == Driver->drivpid )
-	clog("drpexit(): Driver didn't exit; pid = %08x", childpid );
+      if ( CqContext.childpid == Driver->drivpid )
+	clog("drpexit(): Driver didn't exit; pid = %08x", CqContext.childpid );
     }
   
   return;
@@ -603,22 +623,25 @@ void initstats( int *ctemp, int *etemp )
 /*  SYNOPSIS */
 /*    int flag, isagod */
 /*    flag = isagod() */
-int isagod( char *name )
+int isagod( int unum )
 {
   static struct group *grp = NULL;
   static int god = FALSE;
-  static char myname[128];
+  static char myname[BUFFER_SIZE];
   int i;
   
   god = FALSE;
   
-  if (name == NULL)		/* get god status for current user */
+  if (unum == -1)		/* get god status for current user */
     {				/* now find out whether we're in it */
       strcpy(myname, cuserid(NULL));
     }
   else
-    {
-      strcpy(myname, name);
+    {				/* else a user number passed in */
+				/* only locals can be godlike */
+      if (Users[unum].type != UT_LOCAL)
+	return(FALSE);
+      strcpy(myname, Users[unum].username);
     }
   
   if (grp == NULL)
@@ -797,7 +820,7 @@ void stoptimer(void)
   struct itimerval itimer;
 #endif
   
-  cdisplay = FALSE;
+  CqContext.display = FALSE;
   
   signal(SIGALRM, SIG_IGN);
   
@@ -810,7 +833,7 @@ void stoptimer(void)
   alarm(0);
 #endif
   
-  cdisplay = TRUE;
+  CqContext.display = TRUE;
   
   return;
   

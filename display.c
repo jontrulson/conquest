@@ -40,7 +40,7 @@ void do_bottomborder(void)
 
   lin = DISPLAY_LINS + 1;
 
-  cdline( lin, 1, lin, cmaxcol );
+  cdline( lin, 1, lin, CqContext.maxcol );
   mvaddch(lin - 1, STAT_COLS - 1, ACS_BTEE);
 }
 
@@ -124,7 +124,7 @@ void display( int snum, int display_info )
   static char zbuf[MSGMAXLINE];
   static char *dstatstr;
 
-  if ( credraw )
+  if ( CqContext.redraw )
     {
       cdclear();
       lin = DISPLAY_LINS + 1;
@@ -132,7 +132,7 @@ void display( int snum, int display_info )
     }
   else
     {
-      cdclra( 1, STAT_COLS  + 1, DISPLAY_LINS, cmaxcol + 1 );
+      cdclra( 1, STAT_COLS  + 1, DISPLAY_LINS, CqContext.maxcol + 1 );
     }
 
   dobeep = FALSE;
@@ -539,7 +539,7 @@ void display( int snum, int display_info )
 
 			attrset(InfoColor);
 			if ( j >= 0 && j < DISPLAY_LINS && 
-			    k > STAT_COLS && k < cmaxcol )
+			    k > STAT_COLS && k < CqContext.maxcol )
 			  cdput( dirch[idx], j, k );
 			attrset(0);
 		      }
@@ -554,7 +554,7 @@ void display( int snum, int display_info )
 		    if ( col < STAT_COLS + 1 )
 		      col = STAT_COLS + 1;
 		    else
-		      col = min( col, cmaxcol );
+		      col = min( col, CqContext.maxcol );
 		    cdmove( lin, col );
 		  }
 	      }
@@ -562,7 +562,7 @@ void display( int snum, int display_info )
       } /* for each ship */
   
   /* Construct alert status line. */
-  if ( credraw )
+  if ( CqContext.redraw )
     zzbuf[0] = EOS;
   buf[0] = EOS;
 
@@ -645,7 +645,7 @@ void display( int snum, int display_info )
 
       if ( buf[0] != EOS )
 	{
-	  col = (int) (cmaxcol - STAT_COLS - strlen(buf)) / (int)2 + STAT_COLS + 1;
+	  col = (int) (CqContext.maxcol - STAT_COLS - strlen(buf)) / (int)2 + STAT_COLS + 1;
 	  if (HasColors)
 	    {
 	      attrset(outattr);
@@ -675,7 +675,7 @@ void display( int snum, int display_info )
       dobeep = TRUE;
     prevsh = Ships[snum].shields;
     
-    if ( credraw )
+    if ( CqContext.redraw )
       {
 	zzsshields = -9;
 	zzcshields = ' ';
@@ -732,7 +732,7 @@ void display( int snum, int display_info )
     
     /* Kills. */
     lin = lin + 2;
-    if ( credraw )
+    if ( CqContext.redraw )
       {
 	attrset(LabelColor);
 	cdputs( "kills =", lin, col );
@@ -754,7 +754,7 @@ void display( int snum, int display_info )
     
     /* Warp. */
     lin = lin + 2;
-    if ( credraw )
+    if ( CqContext.redraw )
       {
 	attrset(LabelColor);
 	cdputs( "warp =", lin, col );
@@ -781,7 +781,7 @@ void display( int snum, int display_info )
     
     /* Heading. */
     lin = lin + 2;
-    if ( credraw )
+    if ( CqContext.redraw )
       {
 	attrset(LabelColor);
 	cdputs( "heading =", lin, col );
@@ -807,7 +807,7 @@ void display( int snum, int display_info )
     
     /* Fuel. */
     lin = lin + 2;
-    if ( credraw )
+    if ( CqContext.redraw )
       {
 	zzsfuel = -99;
 	zzcfuel = ' ';
@@ -850,7 +850,7 @@ void display( int snum, int display_info )
     
     /* Allocation. */
     lin = lin + 2;
-    if ( credraw )
+    if ( CqContext.redraw )
       {
 	attrset(LabelColor);
 	cdputs( "w/e =", lin, col );
@@ -885,7 +885,7 @@ void display( int snum, int display_info )
     
     /* Temperature. */
     lin = lin + 2;
-    if ( credraw )
+    if ( CqContext.redraw )
       {
 	zzswtemp = 0;
 	zzsetemp = 0;
@@ -981,7 +981,7 @@ void display( int snum, int display_info )
     prevdam = Ships[snum].damage;
     
     lin = lin + 2;
-    if ( credraw )
+    if ( CqContext.redraw )
       {
 	zzsdamage = -9;
 	zzcdamage = ' ';
@@ -1040,7 +1040,7 @@ void display( int snum, int display_info )
   
     /* Armies. */
     lin = lin + 2;
-    if ( credraw )
+    if ( CqContext.redraw )
       zzsarmies = -666;
     i = Ships[snum].armies;
     if ( i == 0 )
@@ -1069,7 +1069,7 @@ void display( int snum, int display_info )
   
     /* Tractor beams. */
     lin = lin + 2;
-    if ( credraw )
+    if ( CqContext.redraw )
       zzstowedby = 0;
     i = Ships[snum].towedby;
     if ( i == 0 )
@@ -1097,7 +1097,7 @@ void display( int snum, int display_info )
   
     /* Self destruct fuse. */
     lin = lin + 2;
-    if ( credraw )
+    if ( CqContext.redraw )
       zzssdfuse = -9;
     if ( Ships[snum].cloaked )
       i = -1;
@@ -1151,7 +1151,7 @@ void display( int snum, int display_info )
 	  else
 	    appstr( "  (unknown)", buf);
 	  cdputs( buf, 1, STAT_COLS + 
-		  (int)(cmaxcol - STAT_COLS - (strlen(buf))) / (int)2 + 1);
+		  (int)(CqContext.maxcol - STAT_COLS - (strlen(buf))) / (int)2 + 1);
       
 	  lin = lin + 2;
 	  dcol = col + 11;
@@ -1262,7 +1262,7 @@ void display( int snum, int display_info )
       display_headers(snum);
 
   cdrefresh();
-  credraw = FALSE;
+  CqContext.redraw = FALSE;
   
   return;
   
@@ -1293,7 +1293,7 @@ void display_headers(int snum)
 	      Ships[snum].alias, ssbuf); 
       attrset(A_BOLD);
       cdputs( hbuf, 1, STAT_COLS + 
-	      (int)(cmaxcol - STAT_COLS - (strlen(hbuf))) / (int)2 + 1);
+	      (int)(CqContext.maxcol - STAT_COLS - (strlen(hbuf))) / (int)2 + 1);
       attrset(0);
     }
   else if ( Ships[snum].robot )
@@ -1305,7 +1305,7 @@ void display_headers(int snum)
 		  Ships[snum].alias, ssbuf); 
 	  attrset(A_BOLD);
 	  cdputs( hbuf, 1, STAT_COLS + 
-		  (int)(cmaxcol - STAT_COLS - (strlen(hbuf))) / (int)2 + 1);
+		  (int)(CqContext.maxcol - STAT_COLS - (strlen(hbuf))) / (int)2 + 1);
 	  attrset(0);
 	}
       else 
@@ -1315,7 +1315,7 @@ void display_headers(int snum)
 		  Ships[snum].alias, ssbuf);
 	  attrset(A_BOLD);
 	  cdputs( hbuf, 1, STAT_COLS + 
-		  (int)(cmaxcol - STAT_COLS - (strlen(hbuf))) / (int)2 + 1);
+		  (int)(CqContext.maxcol - STAT_COLS - (strlen(hbuf))) / (int)2 + 1);
 	  attrset(0);
 	}
     }
@@ -1326,7 +1326,7 @@ void display_headers(int snum)
 	      Ships[snum].alias, ssbuf);
       attrset(A_BOLD);
       cdputs( hbuf, 1, STAT_COLS + 
-	      (int)(cmaxcol - STAT_COLS - (strlen(hbuf))) / (int)2 + 1);
+	      (int)(CqContext.maxcol - STAT_COLS - (strlen(hbuf))) / (int)2 + 1);
       attrset(0);
     }
   

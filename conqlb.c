@@ -32,12 +32,14 @@
 
 				/* shared with display.c */
 real LastPhasDist = PHASER_DIST;
+static char cbuf[MID_BUFFER_SIZE]; /* general purpose buffer */
 
 /*  chalkup - perform kills accoutinng */
 /*  SYNOPSIS */
 /*    int snum */
 /*    chalkup( snum ) */
-/*  Note: This routines ASSUMES you have the common locked before you it. */
+/*  Note: This routines ASSUMES you have the common locked before you */
+/*        use it. */
 void chalkup( int snum )
 {
   int i, unum, team;
@@ -71,7 +73,6 @@ void chalkup( int snum )
   return;
   
 }
-
 
 /*  cloak - attempt to engage the cloaking device */
 /*  SYNOPSIS */
@@ -1179,15 +1180,15 @@ void planlist( int team, int snum )
 		    }
 		  else
 		    {			/* via menu() */
-		      if ( Planets[pnum].team == Users[cunum].team && 
-			   !(Users[cunum].war[Users[cunum].team]))
+		      if ( Planets[pnum].team == Users[CqContext.unum].team && 
+			   !(Users[CqContext.unum].war[Users[CqContext.unum].team]))
 			{
 			  outattr = GreenLevelColor;
 			}
 		      else if ( Planets[pnum].type == PLANET_SUN ||
 				(Planets[pnum].team < NUMPLAYERTEAMS && 
-				 Users[cunum].war[Planets[pnum].team] &&
-				 Planets[pnum].scanned[Users[cunum].team]) )
+				 Users[CqContext.unum].war[Planets[pnum].team] &&
+				 Planets[pnum].scanned[Users[CqContext.unum].team]) )
 			{
 			  outattr = RedLevelColor;
 			}
@@ -1367,7 +1368,7 @@ void playlist( int godlike, int doall, int snum )
   while(TRUE) /* repeat- while */
     {
       if ( ! godlike )
-	if ( ! stillalive( csnum ) )
+	if ( ! stillalive( CqContext.snum ) )
 	  break;
       i = fship;
       cdclrl( fline, lline - fline + 1 );
@@ -1429,10 +1430,10 @@ void playlist( int godlike, int doall, int snum )
 		  }
 		else
 		  { /* not conqoper, and not a valid ship (main menu) */
-		    if (Users[cunum].war[Ships[i].team])  /* we're at war with ships's
+		    if (Users[CqContext.unum].war[Ships[i].team])  /* we're at war with ships's
 						   team */
 		      attrset(RedLevelColor);
-		    else if (Users[cunum].team == Ships[i].team)
+		    else if (Users[CqContext.unum].team == Ships[i].team)
 		      attrset(GreenLevelColor); /* it's a team ship */
 		    else
 		      attrset(YellowLevelColor);
@@ -1567,7 +1568,13 @@ int c_register( char *lname, char *rname, int team, int *unum )
 	for ( j = 0; j < MAXOOPTIONS; j = j + 1 )
 	  Users[i].ooptions[j] = FALSE;
 	
-	Users[i].ooptions[OOPT_SWITCHTEAMS] = TRUE; /* allow users to switchteams when dead */
+	if (sysconf_AllowSwitchteams == TRUE)
+	  {
+				/* allow users to switchteams when dead */
+	    Users[i].ooptions[OOPT_SWITCHTEAMS] = TRUE; 
+	  }
+	else
+	  Users[i].ooptions[OOPT_SWITCHTEAMS] = FALSE;
 
 	Users[i].lastentry = 0;	/* never */
 	stcpn( lname, Users[i].username, MAXUSERNAME );
@@ -1592,15 +1599,18 @@ void resign( int unum, int isoper )
   int i, haderror = FALSE;
   char *home = NULL;
   char filenm[MID_BUFFER_SIZE];
-  struct passwd *pwp = NULL;
-  
+  static struct passwd *pwp = NULL;
+
   if (isoper == TRUE)
     {				/* from conqoper, need to get homedir
 				   of CONQUEST_USER */
-      if ((pwp = getpwnam(CONQUEST_USER)) == NULL)
+      if (pwp == NULL)
 	{
-	  clog("resign(unum = %d): getpwnam(%s) failed.",
-	       unum, CONQUEST_USER);
+	  if ((pwp = getpwnam(CONQUEST_USER)) == NULL)
+	    {
+	      clog("resign(unum = %d): getpwnam(%s) failed.",
+		   unum, CONQUEST_USER);
+	    }
 	}
     }
 
@@ -1612,7 +1622,7 @@ void resign( int unum, int isoper )
 	if ( unum == History[i].histunum )
 	  {
 	    History[i].histunum = -1;
-	    History[i].histlog[0] = EOS;
+	    History[i].histlog = 0;
 	  }
     }
 
@@ -2071,16 +2081,16 @@ void userline( int unum, int snum, char *buf, int showgods, int showteam )
       for ( i = 2; i < MAXOOPTIONS; i++)
 	if ( Users[unum].ooptions[i] )
 	  {
-	    if (i != OOPT_SWITCHTEAMS) /* don't want false positive on
-					  switchteams option */
-	      {
+	    if (i != OOPT_SWITCHTEAMS || (i == OOPT_SWITCHTEAMS && 
+					  sysconf_AllowSwitchteams != TRUE)) 
+	      {			/* don't want false positive on
+				   switchteams option - when enabled */
 		ch2 = '+';
 		break;
 	      }
 	  }
-      if ( ch2 != '+' )
-	if ( isagod(Users[unum].username) )
-	  ch2 = '+';
+      if ( ch2 != '+' && isagod(unum))
+	ch2 = '+';		
     }
   
   /* If we were given a valid ship number, use it's information. */
@@ -2169,7 +2179,7 @@ void userlist( int godlike, int snum )
     {
 
       if ( ! godlike )
-	if ( ! stillalive( csnum ) )
+	if ( ! stillalive( CqContext.snum ) )
 	  break;
 
 				/* sort the (living) user list */
@@ -2207,12 +2217,12 @@ void userlist( int godlike, int snum )
 	  else			/* we don't have a ship yet */
 	    {
 	      if ( strcmp(Users[uvec[i]].username,
-			  Users[cunum].username) == 0 &&
-		   Users[uvec[i]].type == Users[cunum].type)
+			  Users[CqContext.unum].username) == 0 &&
+		   Users[uvec[i]].type == Users[CqContext.unum].type)
 		attrset(A_BOLD);    /* it's ours */
-	      else if (Users[cunum].war[Users[uvec[i]].team]) /* we're war with them */
+	      else if (Users[CqContext.unum].war[Users[uvec[i]].team]) /* we're war with them */
 		attrset(RedLevelColor);	            /* (might be selfwar) */
-	      else if (Users[cunum].team == Users[uvec[i]].team) /* team ship */
+	      else if (Users[CqContext.unum].team == Users[uvec[i]].team) /* team ship */
 		attrset(GreenLevelColor);
 	      else
 		attrset(YellowLevelColor);
@@ -2298,7 +2308,7 @@ void userstats( int godlike , int snum )
   while (TRUE) /* repeat-while */
     {
       if ( ! godlike )
-	if ( ! stillalive( csnum ) )
+	if ( ! stillalive( CqContext.snum ) )
 	  break;
 
 				/* sort the (living) user list */
@@ -2338,12 +2348,12 @@ void userstats( int godlike , int snum )
 	  else
 	    {
 	      if ( strcmp(Users[uvec[i]].username,
-			  Users[cunum].username) == 0  &&
-		   Users[uvec[i]].type == Users[cunum].type )
+			  Users[CqContext.unum].username) == 0  &&
+		   Users[uvec[i]].type == Users[CqContext.unum].type )
 		attrset(A_BOLD);	/* it's ours */
-	      else if (Users[cunum].war[Users[uvec[i]].team]) 
+	      else if (Users[CqContext.unum].war[Users[uvec[i]].team]) 
 		attrset(RedLevelColor);  /* we're war with them (poss selfwar) */
-	      else if (Users[cunum].team == Users[uvec[i]].team) 
+	      else if (Users[CqContext.unum].team == Users[uvec[i]].team) 
 		attrset(GreenLevelColor);	/* team ship */
 	      else
 		attrset(YellowLevelColor);
@@ -2451,7 +2461,7 @@ void statline( int unum, char *buf )
 	    buf[i] = '-';
       ch = buf[i];
     }
-  
+
   if (Users[unum].lastentry == 0) /* never */
     {
       sprintf(junk, " %13.13s", "never");

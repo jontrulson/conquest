@@ -47,6 +47,8 @@ int GetSysConf(int checkonly)
   sysconf_NoDoomsday = FALSE;
   sysconf_DoRandomRobotKills = FALSE;
   sysconf_AllowSigquit = FALSE;
+  sysconf_AllowSwitchteams = TRUE;
+  sysconf_UserExpiredays = DEFAULT_USEREXPIRE;
 
 				/* start building the filename */
   sprintf(conf_name, "%s/%s", CONQHOME, SYSCONFIG_FILE);
@@ -152,7 +154,15 @@ int GetSysConf(int checkonly)
 			SysConfData[j].Found = TRUE;
 			FoundOne = TRUE;
 			break;
-		      
+
+		      case CTYPE_NUMERIC:
+			if (alldig(bufptr))
+			  {
+			    *((int *) SysConfData[j].ConfValue) = atoi(bufptr);
+			    SysConfData[j].Found = TRUE;
+			    FoundOne = TRUE;
+			  }
+			break;
 		      
 		      } /* switch */
 		  } /* if */
@@ -201,7 +211,7 @@ int GetSysConf(int checkonly)
 	    if (SysConfData[i].Found != TRUE)
 	      {
 #ifdef DEBUG_CONFIG
-		clog("GetSysConf(): option '%s' not found - Update neededy.",
+		clog("GetSysConf(): option '%s' not found - Update needed.",
 		   SysConfData[i].ConfName);
 #endif
 		if (checkonly != TRUE)
@@ -365,7 +375,15 @@ int GetConf(int isremote, int usernum)
 			ConfData[j].Found = TRUE;
 			FoundOne = TRUE;
 			break;
-			
+
+		      case CTYPE_NUMERIC:
+			if (alldig(bufptr))
+			  {
+			    *((int *) ConfData[j].ConfValue) = atoi(bufptr);
+			    ConfData[j].Found = TRUE;
+			    FoundOne = TRUE;
+			  }
+			break;
 			
 		      } /* switch */
 		  } /* if */
@@ -608,6 +626,13 @@ static int MakeConf(char *filename)
 		    ConfData[j].ConfName,
 		    (*((int *)ConfData[j].ConfValue) == TRUE) ? "true" : "false");
 	    break;
+
+	  case CTYPE_NUMERIC:
+	    fprintf(conf_fd, "%s%d\n",
+                    ConfData[j].ConfName,
+		    *((int *)ConfData[j].ConfValue));
+            break;
+
 	  }
 				/* output a blank line */
       fprintf(conf_fd, "\n");
@@ -682,6 +707,12 @@ int MakeSysConf()
 		    SysConfData[j].ConfName,
 		    (*((int *)SysConfData[j].ConfValue) == TRUE) ? "true" : "false");
 	    break;
+
+	  case CTYPE_NUMERIC:
+	    fprintf(sysconf_fd, "%s%d\n",
+                    SysConfData[j].ConfName,
+		    *((int *)SysConfData[j].ConfValue));
+            break;
 	  }
 				/* output a blank line */
       fprintf(sysconf_fd, "\n");

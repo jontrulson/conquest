@@ -28,12 +28,7 @@
 #define CTYPE_BOOL (1)
 #define CTYPE_STRING (2)
 #define CTYPE_MACRO (3)	
-
-				/* Config ID's can be used as offset into */
-                                /* ConfData. The ConfData array MUST be */
-				/* initialized in the same order as these */
-                                /* #define's */
-
+#define CTYPE_NUMERIC (4)
 
 				/* These *must* be 0 and 1 */
 #define CF_VERSION        (0)	/* Not really a config option but... */
@@ -200,6 +195,30 @@ static struct Conf SysConfData[] =
       "#  Default: false",
       NULL
     }
+  },
+  {
+    FALSE,
+    CTYPE_BOOL,
+    "allow_switchteams=",
+    &sysconf_AllowSwitchteams,
+    {
+      "# define this as 'false' if you want to prevent users from being",
+      "#  able to (s)witchteams from the main menu.",
+      "#  Default: true",
+      NULL
+    }
+  },
+  {
+    FALSE,
+    CTYPE_NUMERIC,
+    "user_expiredays=",
+    &sysconf_UserExpiredays,
+    {
+      "# number of days of inactivity, after which a user is expired.",
+      "#  Set this equal to 0 to disable expiration of inactive users.",
+      "#  Default: 120   ",
+      NULL
+    }
   }
 };
 				/* Initialize the user configurables */
@@ -239,7 +258,7 @@ static struct Conf ConfData[] =
       "#  An example - make f1 a 'red alert' key:",
       "#  macro_f1=A60\\r+",
       "#  Where <A60\\r> = set weapons to 60% power allocation, and",
-      "#        <+>      = raise shields",
+      "#        <+>     = raise shields",
       "#  The conquest commands defined in an FKey, will be fed to",
       "#  conquest just as if they were typed from the keyboard.",
       "#",

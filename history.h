@@ -13,8 +13,8 @@
 
 typedef struct {
   int histunum;			/* user number */
-  char histlog[DATESIZE];	/* date string of entry */
-  int elapsed;			/* elapsed time of last entry (not used yet) */
+  time_t histlog;		/* date of entry */
+  time_t elapsed;		/* elapsed time of this entry */
 } History_t;
 
 #endif /* HISTORY_H_INCLUDED */

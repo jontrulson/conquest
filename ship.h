@@ -46,10 +46,10 @@ typedef struct {
   int rmode;			/* in repair mode or not */
   int cloaked;			/* cloaking device on or not */
   int options[MAXOPTIONS];	/* user options - copy of options */
-  int war[NUMPLAYERTEAMS];		/* teams s/he is at war with - copy */
+  int war[NUMPLAYERTEAMS];	/* teams s/he is at war with - copy */
 				/*  of war */
-  int rwar[NUMPLAYERTEAMS];		/* teams s/he is at WAR with */
-  int srpwar[NUMPLANETS];	/* self-ruled planets s/he is at war */
+  int rwar[NUMPLAYERTEAMS];	/* teams s/he is at WAR with */
+  int srpwar[NUMPLANETS + 1];	/* self-ruled planets s/he is at war */
   int sdfuse;			/* self-destruct fuse, 0 normally */
   int lastmsg;			/* last message seen */
   int alastmsg;			/* last message allowed to be seen */

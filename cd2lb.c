@@ -820,7 +820,7 @@ void cdputs ( char str[], int lin, int col )
   
   strcpy(tmpstr, str);
   
-  len = cmaxcol - col; /* - 1; /* max str that will fit on screen */
+  len = CqContext.maxcol - col; /* - 1; /* max str that will fit on screen */
   slen = strlen(tmpstr);
   
   len = (len >= 0) ? len : 0;

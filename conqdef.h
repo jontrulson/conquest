@@ -56,7 +56,7 @@
 /*#define COMMONSTAMP 961019 		 stardate? */
 /*#define COMMONSTAMP 971207 		 stardate? */
 /*#define COMMONSTAMP 980628 		 stardate? */
-#define COMMONSTAMP 980823 		 /* stardate? */
+#define COMMONSTAMP 981008 		 /* stardate? */
 
 /* Copyright notice string. */
 #define COPYRIGHT "(C) 1983-1986 by Jef Poskanzer and Craig Leres"
@@ -555,6 +555,8 @@
 #define EXPLODESHIP_TORP_SPREAD   15.0	
 
 #define NOWSIZE 8		/* size of now[] arrays */
+#define DEFAULT_USEREXPIRE 120	/* days after which to expire a user */
+#define SECS_PER_DAY (24 * 3600)
 
 #define MTXT_MORE "--- press [SPACE] to continue, any other key to quit ---"
 #define MTXT_DONE "--- press any key when done ---"

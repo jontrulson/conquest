@@ -132,19 +132,19 @@ void PVLOCK(int *lockptr)
     }
 
   if (tenths < Timeout)
-    *lockptr = cpid;
+    *lockptr = pid;
   else
     {
       t = *lockptr;
       PVUNLOCK(lockptr);
-      *lockptr = cpid;
+      *lockptr = pid;
       clog("conqcm: PVLOCK(%d): timed out - pid: %d was holding the lock",
-	     cpid, t);
+	     pid, t);
     }
 
-  if (*lockptr != cpid)
+  if (*lockptr != pid)
     clog("conqcm: PVLOCK(%d): Lost the lock to: %d!", 
-	 cpid,
+	 pid,
 	 *lockptr);
 
   return;

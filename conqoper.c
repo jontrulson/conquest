@@ -31,13 +31,14 @@
 #include "color.h"
 
 static char *conqoperId = "$Id$";
+static char cbuf[MID_BUFFER_SIZE]; /* general purpose buffer */
 
 				/* option masks */
-#define A_NONE (unsigned int)(0x00000000)
-#define A_REGENSYSCONF (unsigned int)(0x00000001)
-#define A_INITSTUFF (unsigned int)(0x00000002)
-#define A_DISABLEGAME (unsigned int)(0x00000004)
-#define A_ENABLEGAME (unsigned int)(0x00000008)
+#define OP_NONE (unsigned int)(0x00000000)
+#define OP_REGENSYSCONF (unsigned int)(0x00000001)
+#define OP_INITSTUFF (unsigned int)(0x00000002)
+#define OP_DISABLEGAME (unsigned int)(0x00000004)
+#define OP_ENABLEGAME (unsigned int)(0x00000008)
 
 /*  conqoper - main program */
 main(int argc, char *argv[])
@@ -52,11 +53,11 @@ main(int argc, char *argv[])
   extern char *optarg;
   extern int optind;
 
-  OptionAction = A_NONE;
+  OptionAction = OP_NONE;
 
   glname( name );
 
-  if ( ! isagod(NULL) )
+  if ( ! isagod(-1) )
     {
       printf( "Poor cretins such as yourself lack the");
       error( " skills necessary to use this program.\n" );
@@ -66,19 +67,19 @@ main(int argc, char *argv[])
     switch (i)
       {
       case 'C': 
-	OptionAction |= A_REGENSYSCONF;
+	OptionAction |= OP_REGENSYSCONF;
         break;
 
       case 'D': 
-	OptionAction |= A_DISABLEGAME;
+	OptionAction |= OP_DISABLEGAME;
         break;
 
       case 'E': 
-	OptionAction |= A_ENABLEGAME;
+	OptionAction |= OP_ENABLEGAME;
         break;
 	
       case 'I':
-	OptionAction |= A_INITSTUFF;
+	OptionAction |= OP_INITSTUFF;
 	InitStuffChar = *optarg; /* first character */
 	break;
 
@@ -116,7 +117,7 @@ main(int argc, char *argv[])
     }
   
 
-  if (OptionAction != A_NONE)
+  if (OptionAction != OP_NONE)
     {
       /* need to be conq grp for these */
       if (setgid(ConquestGID) == -1)
@@ -140,7 +141,7 @@ main(int argc, char *argv[])
       map_common();		/* Map the conquest universe common block */
   
 				/* regen sysconf file? */
-      if ((OptionAction & A_REGENSYSCONF) != 0)
+      if ((OptionAction & OP_REGENSYSCONF) != 0)
 	{
 	  if (MakeSysConf() == ERR)
 	    exit(1);
@@ -148,7 +149,7 @@ main(int argc, char *argv[])
 	}
 
 				/* initialize something? */
-      if ((OptionAction & A_INITSTUFF) != 0)
+      if ((OptionAction & OP_INITSTUFF) != 0)
 	{
 	  int rv;
 
@@ -159,7 +160,7 @@ main(int argc, char *argv[])
 	}
 
 				/* turn the game on */
-      if ((OptionAction & A_ENABLEGAME) != 0)
+      if ((OptionAction & OP_ENABLEGAME) != 0)
 	{
 	  ConqInfo->closed = FALSE;
 	  /* Unlock the lockwords (just in case...) */
@@ -172,7 +173,7 @@ main(int argc, char *argv[])
 	}
 
 				/* turn the game on */
-      if ((OptionAction & A_DISABLEGAME) != 0)
+      if ((OptionAction & OP_DISABLEGAME) != 0)
 	{
 	  ConqInfo->closed = TRUE;
 	  fprintf(stdout, "Game disabled.\n");
@@ -229,22 +230,26 @@ main(int argc, char *argv[])
 	   CONQUEST_PRI,
 	   sys_errlist[errno]);
     }
+#if defined(DEBUG_FLOW)
   else
     clog("conqoper: main(): nice(CONQUEST_PRI (%d)): succeeded.",
 	 CONQUEST_PRI);
+#endif 
+
 #endif
   
   
-  map_common();		/* Map the conquest universe common block */
-  rndini( 0, 0 );				/* initialize random numbers */
-  cdinit();					/* initialize display environment */
+  map_common();			/* Map the conquest universe common block */
+  rndini( 0, 0 );		/* initialize random numbers */
+  cdinit();			/* initialize display environment */
   
-  cunum = MSG_GOD;				/* stow user number */
-  csnum = ERR;		/* don't display in cdgetp - JET */
-  cdisplay = TRUE;
-  cmaxlin = cdlins();			/* number of lines */
+  CqContext.unum = MSG_GOD;		/* stow user number */
+  CqContext.snum = ERR;			/* don't display in cdgetp - JET */
+  CqContext.histslot = ERR;			/* useless as an op */
+  CqContext.display = TRUE;
+  CqContext.maxlin = cdlins();		/* number of lines */
   
-  cmaxcol = cdcols();			/* number of columns */
+  CqContext.maxcol = cdcols();		/* number of columns */
 
 				/* send a message telling people
 				   that a user has entered conqoper */
@@ -548,7 +553,7 @@ void debugdisplay( int snum )
 	  cprintf(lin,dcol,ALIGN_NONE,"#%d#%s",InfoColor, buf);
     }
   
-  lin = (cmaxlin - (cmaxlin - MSG_LIN1)) - (MAXTORPS+1);  /* dwp */
+  lin = (CqContext.maxlin - (CqContext.maxlin - MSG_LIN1)) - (MAXTORPS+1);  /* dwp */
   cprintf(lin,3,ALIGN_NONE,"#%d#%s",LabelColor,
 	 "tstatus    tfuse    tmult       tx       ty      tdx      tdy     twar");
   for ( i = 0; i < MAXTORPS; i = i + 1 )
@@ -2853,20 +2858,20 @@ void watch(void)
   else
     {
 	  old_snum = tmp_snum = snum;
-	  credraw = TRUE;
+	  CqContext.redraw = TRUE;
 	  cdclear();
 	  cdredo();
 	  grand( &msgrand );
 
-	  csnum = snum;		/* so display knows what to display */
+	  CqContext.snum = snum;		/* so display knows what to display */
 	  setopertimer();
 
 	  while (TRUE)	/* repeat */
 	    {
 	      if (!normal)
-		cdisplay = FALSE; /* can't use it to display debugging */
+		CqContext.display = FALSE; /* can't use it to display debugging */
 	      else
-		cdisplay = TRUE;
+		CqContext.display = TRUE;
 
 		/* set up toggle line display */
 		/* cdclrl( MSG_LIN1, 1 ); */
@@ -2925,14 +2930,14 @@ void watch(void)
 		case 'h':
 		  stoptimer();
 		  dowatchhelp();
-		  credraw = TRUE;
+		  CqContext.redraw = TRUE;
 		  setopertimer();
 		  break;
 		case 'i':
 		  opinfo( MSG_GOD );
 		  break;
 		case 'k':
-		  kiss(csnum, TRUE);
+		  kiss(CqContext.snum, TRUE);
 		  break;
 		case 'm':
 		  sendmsg( MSG_GOD, TRUE );
@@ -2946,7 +2951,7 @@ void watch(void)
 		case 0x0c:
 		  stoptimer();
 		  cdredo();
-		  credraw = TRUE;
+		  CqContext.redraw = TRUE;
 		  setopertimer();
 		  break;
 		case 'q':
@@ -2962,13 +2967,13 @@ void watch(void)
 			{
 			  old_snum = tmp_snum;
 			  tmp_snum = snum;
-			  credraw = TRUE;
+			  CqContext.redraw = TRUE;
 			}
-		      csnum = snum;
+		      CqContext.snum = snum;
 		      if (normal)
 			{
 			  stoptimer();
-			  display( csnum, headerflag );
+			  display( CqContext.snum, headerflag );
 			  setopertimer();
 			}
 		    }
@@ -2988,12 +2993,12 @@ void watch(void)
 			  snum = old_snum;
 			  old_snum = tmp_snum;
 			  
-			  csnum = snum;
-			  credraw = TRUE;
+			  CqContext.snum = snum;
+			  CqContext.redraw = TRUE;
 			  if (normal)
 			    {
 			      stoptimer();
-			      display( csnum, headerflag );
+			      display( CqContext.snum, headerflag );
 			      setopertimer();
 			    }
 			}
@@ -3002,13 +3007,13 @@ void watch(void)
 		    cdbeep();
 		  break;
 		case '~':                 /* toggle debug display */
-		  if (csnum > 0) 
+		  if (CqContext.snum > 0) 
 		    {
 		      if (normal)
 			normal = FALSE;
 		      else
 			normal = TRUE;
-		      credraw = TRUE;
+		      CqContext.redraw = TRUE;
 		      cdclear();
 		    }
 		  else
@@ -3017,13 +3022,13 @@ void watch(void)
 		case '/':                /* ship list - dwp */
 		  stoptimer();
 		  playlist( TRUE, FALSE, 0 );
-		  credraw = TRUE;
+		  CqContext.redraw = TRUE;
 		  setopertimer();
 		  break;
 		case '\\':               /* big ship list - dwp */
 		  stoptimer();
 		  playlist( TRUE, TRUE, 0 );
-		  credraw = TRUE;
+		  CqContext.redraw = TRUE;
 		  setopertimer();
 		  break;
 		case '!':
@@ -3085,27 +3090,27 @@ void watch(void)
 		      
 		      snum = i;
 			
-		      credraw = TRUE;
+		      CqContext.redraw = TRUE;
 		      
 		      if (live_ships)
 			if ((snum > 0 && stillalive(snum)) || 
 			    (snum == DISPLAY_DOOMSDAY && Doomsday->status == DS_LIVE))
 			  {
-			    csnum = snum;
+			    CqContext.snum = snum;
 			    break;
 			  }
 			else
 			  continue;
 		      else
 			{
-			  csnum = snum;
+			  CqContext.snum = snum;
 			  break;
 			}
 		    }
 		  if (normal)
 		    {
 		      stoptimer();
-		      display( csnum, headerflag );
+		      display( CqContext.snum, headerflag );
 		      setopertimer();
 		    }
 		  break;
@@ -3163,27 +3168,27 @@ void watch(void)
 		      
 		      snum = i;
 			
-		      credraw = TRUE;
+		      CqContext.redraw = TRUE;
 		      
 		      if (live_ships)
 			if ((snum > 0 && stillalive(snum)) || 
 			    (snum == DISPLAY_DOOMSDAY && Doomsday->status == DS_LIVE))
 			  {
-			    csnum = snum;
+			    CqContext.snum = snum;
 			    break;
 			  }
 			else
 			  continue;
 		      else
 			{
-			  csnum = snum;
+			  CqContext.snum = snum;
 			  break;
 			}
 		    }
 		  if (normal)
 		    {
 		      stoptimer();
-		      display( csnum, headerflag );
+		      display( CqContext.snum, headerflag );
 		      setopertimer();
 		    }
 
@@ -3352,7 +3357,7 @@ void toggle_line(int snum, int old_snum)
   build_toggle_str(old_snum_str,old_snum);
   
   sprintf(buf,frmt_str,snum_str, old_snum_str);
-  cdputs( buf, MSG_LIN1, (cmaxcol-(strlen(buf))));  /* at end of line */
+  cdputs( buf, MSG_LIN1, (CqContext.maxcol-(strlen(buf))));  /* at end of line */
   
   return;
 

@@ -34,12 +34,12 @@ CURDIR=.
 CONQC = ratfor.c cd2lb.c display.c iolb.c  \
 	conqlb.c rndlb.c conqmisc.c conqutil.c conqcm.c \
 	conqsvr42.c global.c ibuf.c version.c conf.c sem.c color.c \
-	users.c
+	userauth.c
 
 CONQOBJS = ratfor.o cd2lb.o display.o iolb.o  \
 	conqlb.o rndlb.o conqmisc.o conqutil.o conqcm.o \
 	conqsvr42.o global.o ibuf.o version.o conf.o sem.o color.o \
-	users.o
+	userauth.o
 
 # For installation
 BCONQUEST = $(CONQHOME)/bin/conquest
