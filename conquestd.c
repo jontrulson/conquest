@@ -32,6 +32,7 @@
 
 #include "servauth.h"
 #include "servercmd.h"
+#include "meta.h"
 
 #define LISTEN_BACKLOG 5 /* # of requests we're willing to to queue */
 
@@ -41,6 +42,9 @@ static char cbuf[MID_BUFFER_SIZE]; /* general purpose buffer */
 static char *progName;
 
 static int localOnly = FALSE;   /* whether to only listen on loopback */
+static char *metaServer = META_DFLT_SERVER; /* meta server hostname */
+static int updateMeta = FALSE;  /* whether to notify meta server */
+static char *myServerName = NULL; /* to meta */
 
 cpHello_t chello;		/* client hello info we want to keep */
 ServerInfo_t sInfo;
@@ -58,10 +62,15 @@ void conqend(void);
 void printUsage()
 {
   printf("Usage: conquestd [ -d ] [ -l ] [ -p port ] [ -u user ]\n");
+  printf("                 [ -m ] [ -M metaserver ] [ -N myname ]\n");
+  printf("\n");
   printf("   -d            daemon mode\n");
   printf("   -l            listen for local connections only\n");
-  printf("   -p port       specify port to listen on.\n");
+  printf("   -p port       specify port to listen on\n");
   printf("                 default is %d\n", CN_DFLT_PORT);
+  printf("   -m            notify the metaserver (%s)\n", META_DFLT_SERVER);
+  printf("   -M metaserver specify an alternate metaserver to contact\n");
+  printf("   -N myname     explicitly specify server name 'myname' to metaserver\n");
   printf("   -u user       run as user 'user'.\n");
   return;
 }
@@ -98,13 +107,16 @@ int getHostname(int sock, char *buf, int buflen)
 }
     
 
-/* we only return if we are a client driver, else we listen for requests */
+/* we only return if we are a client driver, else we listen for requests,
+   updating the meta server if requested */
 void checkMaster(void)
 {
   int s,t;			/* socket descriptor */
-  int i;			/* general purpose integer */
+  int i,rv;			/* general purpose integer */
   struct sockaddr_in sa, isa;	/* internet socket addr. structure */
   struct hostent *hp;		/* result of host name lookup */
+  struct timeval tv;
+  fd_set readfds;
 
   signal(SIGCLD, SIG_IGN);	/* allow children to die */
 
@@ -160,27 +172,46 @@ void checkMaster(void)
   /* go into infinite loop waiting for new connections */
   while (TRUE) 
     {
-      i = sizeof (isa);
-      
-      /* hang in accept() while waiting for new connections */
-      if ((t = accept(s, &isa, &i )) < 0) 
-	{
-	  perror ( "accept" );
-	  exit (1);
-	}
-      
-      if ( fork() == 0 ) 
-	{			/* child - client driver */
-	  sInfo.sock = t;
-	  memset(sInfo.remotehost, 0, MAXHOSTNAME);
-	  getHostname(sInfo.sock, sInfo.remotehost, MAXHOSTNAME - 1);
+      if (updateMeta)
+        metaUpdateServer(metaServer, myServerName, listenPort);
 
-	  clog("NET: forked client driver, pid = %d", getpid());
-	  return;
-	}
+      tv.tv_sec = 120;           /* update meta server every 120 secs */
+      tv.tv_usec = 0;
+      FD_ZERO(&readfds);
+      FD_SET(s, &readfds);
 
-      /* parent */
-      close(t);	/* make socket go away */
+      if ((rv = select(s+1, &readfds, NULL, NULL, &tv)) < 0)
+        {
+          clog("checkMaster: select failed: %s", strerror(errno));
+          exit(1);
+        }
+
+      if (FD_ISSET(s, &readfds))
+        {        
+
+          i = sizeof (isa);
+      
+          /* hang in accept() while waiting for new connections */
+          if ((t = accept(s, &isa, &i )) < 0) 
+            {
+              perror ( "accept" );
+              exit (1);
+            }
+      
+          if ( fork() == 0 ) 
+            {			/* child - client driver */
+              sInfo.sock = t;
+              memset(sInfo.remotehost, 0, MAXHOSTNAME);
+              getHostname(sInfo.sock, sInfo.remotehost, MAXHOSTNAME - 1);
+              
+              clog("NET: forked client driver, pid = %d", getpid());
+              return;
+            }
+          
+          /* parent */
+          close(t);	/* make socket go away */
+        }
+
     }
 
   return;			/* NOTREACHED */
@@ -201,7 +232,7 @@ int main(int argc, char *argv[])
   sInfo.isMaster = FALSE;
   sInfo.isLoggedIn = FALSE;
 
-  while ((i = getopt(argc, argv, "dlp:u:")) != EOF)    /* get command args */
+  while ((i = getopt(argc, argv, "dlp:u:mM:N:")) != EOF)    /* get command args */
     switch (i)
       {
       case 'd':
@@ -219,6 +250,19 @@ int main(int argc, char *argv[])
       case 'u':
         myuidname = optarg;
         break;
+
+      case 'm':
+        updateMeta = TRUE;
+        break;
+
+      case 'M':
+        metaServer = optarg;
+        break;
+
+      case 'N':
+        myServerName = optarg;
+        break;
+
       default:
 	printUsage();
 	exit(1);
@@ -1386,6 +1430,7 @@ int newship( int unum, int *snum )
 int play()
 {
   int laststat, now;
+  int didsomething;             /* update immediately if we did anything */
   int rv;
   char msgbuf[128];
   int pkttype;
@@ -1441,6 +1486,7 @@ int play()
       if ( Ships[Context.snum].pid != Context.pid )
 	break;
 
+      didsomething = 0;
       if ((pkttype = waitForPacket(PKT_FROMCLIENT, sInfo.sock, PKT_ANYPKT,
 				   buf, PKT_MAXSIZE, 1, NULL)) < 0)
 	{
@@ -1455,26 +1501,32 @@ int play()
 	{
 	case CP_SETCOURSE:
 	  procSetCourse(buf);
+          didsomething++;
 	  break;
 	  
 	case CP_FIRETORPS:
 	  procFireTorps(buf);
+          didsomething++;
 	  break;
 
 	case CP_AUTHENTICATE:
 	  procChangePassword(buf);
+          didsomething++;
 	  break;
 
 	case CP_SETNAME:
 	  procSetName(buf);
+          didsomething++;
 	  break;
 
 	case CP_MESSAGE:
 	  procMessage(buf);
+          didsomething++;
 	  break;
 
 	case CP_COMMAND:
 	  handleSimpleCmdPkt((cpCommand_t *)buf);
+          didsomething++;
 	  break;
 
 	default:
@@ -1482,6 +1534,13 @@ int play()
 	    clog("conquestd: play: got unexpected packet type %d", pkttype);
 	  break;
 	}
+
+      if (didsomething)         /* update immediately if we did something */
+        {
+          stopUpdate();
+          updateClient();
+          startUpdate();
+        }
 
       grand( &Context.msgrand );
       Context.msgok = TRUE;

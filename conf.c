@@ -20,9 +20,14 @@
 #include "global.h"
 #include "conqcom.h"
 #include "color.h"
-#define NOEXTERN
+#include "datatypes.h"
+#include "conqnet.h"
+
+#define CONF_NOEXTERN
 #include "conf.h"
-#undef NOEXTERN
+#undef CONF_NOEXTERN
+
+#include "protocol.h"
 
 #define HOME_BUFSZ 1024
 
@@ -125,7 +130,7 @@ int GetSysConf(int checkonly)
 
       FoundOne = FALSE;
 
-      for (j = 0; (j < SYSCF_END) && (FoundOne == FALSE); j++)
+      for (j = 0; (j < SysCfEnd) && (FoundOne == FALSE); j++)
 	{
 	  if (SysConfData[j].ConfName != NULL)
 	    if (strncmp(SysConfData[j].ConfName, 
@@ -228,7 +233,7 @@ int GetSysConf(int checkonly)
     }
   else
     {				/* version found. check everything else */
-      for (i=0; i<SYSCF_END; i++)
+      for (i=0; i<SysCfEnd; i++)
 	{
 	  if (SysConfData[i].ConfType != CTYPE_NULL)
 	    if (SysConfData[i].Found != TRUE)
@@ -363,7 +368,7 @@ int GetConf(int usernum)
 
       FoundOne = FALSE;
 
-      for (j = 0; (j < CF_END) && (FoundOne == FALSE); j++)
+      for (j = 0; (j < CfEnd) && (FoundOne == FALSE); j++)
 	{
 	  if (ConfData[j].ConfName != NULL)
 	    if(strncmp(ConfData[j].ConfName, 
@@ -474,7 +479,7 @@ int GetConf(int usernum)
     }
   else
     {				/* version found. check everything else */
-      for (i=0; i<CF_END; i++)
+      for (i=0; i<CfEnd; i++)
 	{
 	  if (ConfData[i].ConfType != CTYPE_NULL && 
 	      ConfData[i].ConfType != CTYPE_MACRO )
@@ -704,7 +709,7 @@ int MakeConf(char *filename)
     }
 
 
-  for (j=0; j<CF_END; j++)
+  for (j=0; j<CfEnd; j++)
     {
 				/* option header first */
       i = 0;
@@ -797,7 +802,7 @@ int MakeSysConf()
   clog("OPER: Updating %s file...", conf_name);
   fprintf(stderr, "Updating %s file...", conf_name);
 
-  for (j=0; j<SYSCF_END; j++)
+  for (j=0; j<SysCfEnd; j++)
     {
 				/* option header first */
       i = 0;
@@ -866,3 +871,30 @@ int MakeSysConf()
   return(TRUE);
 }
 
+Unsgn32 getServerFlags(void)
+{
+  Unsgn32 f;
+
+  /* get the current flags */
+  f = SPSSTAT_FLAGS_NONE;
+
+  if (SysConf.AllowRefits)
+    f |= SPSSTAT_FLAGS_REFIT;
+
+  if (SysConf.AllowSigquit)
+    f |= SPSSTAT_FLAGS_VACANT;
+
+  if (SysConf.AllowSlingShot)
+    f |= SPSSTAT_FLAGS_SLINGSHOT;
+
+  if (SysConf.NoDoomsday)
+    f |= SPSSTAT_FLAGS_NODOOMSDAY;
+
+  if (SysConf.DoRandomRobotKills)
+    f |= SPSSTAT_FLAGS_KILLBOTS;
+
+  if (SysConf.AllowSwitchteams)
+    f |= SPSSTAT_FLAGS_SWITCHTEAM;
+
+  return f;
+}

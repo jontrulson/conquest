@@ -160,7 +160,7 @@ libconquest_la_SOURCES = conqai.c ratfor.c cd2lb.c display.c iolb.c  \
 	userauth.c record.c color.h user.h shiptype.h \
 	ship.h planet.h team.h msg.h doomsday.h driver.h conqinfo.h \
 	history.h robot.h global.h torp.h ibuf.h conf.h  display.h \
-	protocol.h packet.h packet.c userauth.h
+	protocol.h packet.h packet.c userauth.h meta.c meta.h
 
 
 libconquest_la_LDFLAGS = -version-info 1:0:0
@@ -176,7 +176,7 @@ libconqserv_la_SOURCES = servauth.c server.c servauth.h server.h serverpkt.c \
 libconqserv_la_LDFLAGS = -version-info 1:0:0
 
 bin_PROGRAMS = conquest conqai conqoper conqstrat conqreplay conquestd \
-	conquestsh
+	conquestsh conqmetad
 
 
 libexec_PROGRAMS = conqdriv
@@ -209,6 +209,9 @@ conqreplay_LDADD = libconqclnt.la libconquest.la $(XLIBS)
 
 conquestsh_SOURCES = conquestsh.c
 
+conqmetad_SOURCES = conqmetad.c meta.h
+conqmetad_LDADD = libconquest.la
+
 data_DATA = conquest.doc conqnews.doc README conqrule 
 
 #sysconf_DATA = conquestrc
@@ -231,11 +234,11 @@ libconquest_la_LIBADD =
 am_libconquest_la_OBJECTS = conqai.lo ratfor.lo cd2lb.lo display.lo \
 	iolb.lo conqlb.lo rndlb.lo conqmisc.lo conqutil.lo conqcm.lo \
 	conqsvr42.lo global.lo ibuf.lo version.lo conf.lo sem.lo \
-	color.lo userauth.lo record.lo packet.lo
+	color.lo userauth.lo record.lo packet.lo meta.lo
 libconquest_la_OBJECTS = $(am_libconquest_la_OBJECTS)
 bin_PROGRAMS = conquest$(EXEEXT) conqai$(EXEEXT) conqoper$(EXEEXT) \
 	conqstrat$(EXEEXT) conqreplay$(EXEEXT) conquestd$(EXEEXT) \
-	conquestsh$(EXEEXT)
+	conquestsh$(EXEEXT) conqmetad$(EXEEXT)
 libexec_PROGRAMS = conqdriv$(EXEEXT)
 PROGRAMS = $(bin_PROGRAMS) $(libexec_PROGRAMS)
 
@@ -247,6 +250,10 @@ am_conqdriv_OBJECTS = conqdriv.$(OBJEXT)
 conqdriv_OBJECTS = $(am_conqdriv_OBJECTS)
 conqdriv_DEPENDENCIES = libconquest.la
 conqdriv_LDFLAGS =
+am_conqmetad_OBJECTS = conqmetad.$(OBJEXT)
+conqmetad_OBJECTS = $(am_conqmetad_OBJECTS)
+conqmetad_DEPENDENCIES = libconquest.la
+conqmetad_LDFLAGS =
 am_conqoper_OBJECTS = conqoper.$(OBJEXT)
 conqoper_OBJECTS = $(am_conqoper_OBJECTS)
 conqoper_DEPENDENCIES = libconqclnt.la libconquest.la
@@ -281,21 +288,22 @@ am__depfiles_maybe = depfiles
 @AMDEP_TRUE@	./$(DEPDIR)/color.Plo ./$(DEPDIR)/conf.Plo \
 @AMDEP_TRUE@	./$(DEPDIR)/conqai.Plo ./$(DEPDIR)/conqai_main.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/conqcm.Plo ./$(DEPDIR)/conqdriv.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/conqlb.Plo ./$(DEPDIR)/conqmisc.Plo \
-@AMDEP_TRUE@	./$(DEPDIR)/conqoper.Po ./$(DEPDIR)/conqreplay.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/conqlb.Plo ./$(DEPDIR)/conqmetad.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/conqmisc.Plo ./$(DEPDIR)/conqoper.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/conqreplay.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/conqstrat-lex.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/conqstrat-yacc.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/conqsvr42.Plo ./$(DEPDIR)/conquest.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/conquestd.Po ./$(DEPDIR)/conquestsh.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/conqutil.Plo ./$(DEPDIR)/display.Plo \
 @AMDEP_TRUE@	./$(DEPDIR)/global.Plo ./$(DEPDIR)/ibuf.Plo \
-@AMDEP_TRUE@	./$(DEPDIR)/iolb.Plo ./$(DEPDIR)/options.Plo \
-@AMDEP_TRUE@	./$(DEPDIR)/packet.Plo ./$(DEPDIR)/ratfor.Plo \
-@AMDEP_TRUE@	./$(DEPDIR)/record.Plo ./$(DEPDIR)/rndlb.Plo \
-@AMDEP_TRUE@	./$(DEPDIR)/sem.Plo ./$(DEPDIR)/servauth.Plo \
-@AMDEP_TRUE@	./$(DEPDIR)/server.Plo ./$(DEPDIR)/servercmd.Plo \
-@AMDEP_TRUE@	./$(DEPDIR)/serverpkt.Plo ./$(DEPDIR)/userauth.Plo \
-@AMDEP_TRUE@	./$(DEPDIR)/version.Plo
+@AMDEP_TRUE@	./$(DEPDIR)/iolb.Plo ./$(DEPDIR)/meta.Plo \
+@AMDEP_TRUE@	./$(DEPDIR)/options.Plo ./$(DEPDIR)/packet.Plo \
+@AMDEP_TRUE@	./$(DEPDIR)/ratfor.Plo ./$(DEPDIR)/record.Plo \
+@AMDEP_TRUE@	./$(DEPDIR)/rndlb.Plo ./$(DEPDIR)/sem.Plo \
+@AMDEP_TRUE@	./$(DEPDIR)/servauth.Plo ./$(DEPDIR)/server.Plo \
+@AMDEP_TRUE@	./$(DEPDIR)/servercmd.Plo ./$(DEPDIR)/serverpkt.Plo \
+@AMDEP_TRUE@	./$(DEPDIR)/userauth.Plo ./$(DEPDIR)/version.Plo
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 LTCOMPILE = $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) \
@@ -309,15 +317,16 @@ YACCCOMPILE = $(YACC) $(YFLAGS) $(AM_YFLAGS)
 LTYACCCOMPILE = $(LIBTOOL) --mode=compile $(YACC) $(YFLAGS) $(AM_YFLAGS)
 DIST_SOURCES = $(libconqclnt_la_SOURCES) $(libconqserv_la_SOURCES) \
 	$(libconquest_la_SOURCES) $(conqai_SOURCES) $(conqdriv_SOURCES) \
-	$(conqoper_SOURCES) $(conqreplay_SOURCES) $(conqstrat_SOURCES) \
-	$(conquest_SOURCES) $(conquestd_SOURCES) $(conquestsh_SOURCES)
+	$(conqmetad_SOURCES) $(conqoper_SOURCES) $(conqreplay_SOURCES) \
+	$(conqstrat_SOURCES) $(conquest_SOURCES) $(conquestd_SOURCES) \
+	$(conquestsh_SOURCES)
 DATA = $(data_DATA)
 
 DIST_COMMON = README INSTALL Makefile.am Makefile.in TODO aclocal.m4 \
 	config.guess config.h.in config.sub configure configure.ac \
 	conqstrat-lex.c conqstrat-yacc.c conqstrat-yacc.h depcomp \
 	install-sh ltmain.sh missing mkinstalldirs
-SOURCES = $(libconqclnt_la_SOURCES) $(libconqserv_la_SOURCES) $(libconquest_la_SOURCES) $(conqai_SOURCES) $(conqdriv_SOURCES) $(conqoper_SOURCES) $(conqreplay_SOURCES) $(conqstrat_SOURCES) $(conquest_SOURCES) $(conquestd_SOURCES) $(conquestsh_SOURCES)
+SOURCES = $(libconqclnt_la_SOURCES) $(libconqserv_la_SOURCES) $(libconquest_la_SOURCES) $(conqai_SOURCES) $(conqdriv_SOURCES) $(conqmetad_SOURCES) $(conqoper_SOURCES) $(conqreplay_SOURCES) $(conqstrat_SOURCES) $(conquest_SOURCES) $(conquestd_SOURCES) $(conquestsh_SOURCES)
 
 all: config.h
 	$(MAKE) $(AM_MAKEFLAGS) all-am
@@ -455,6 +464,9 @@ conqai$(EXEEXT): $(conqai_OBJECTS) $(conqai_DEPENDENCIES)
 conqdriv$(EXEEXT): $(conqdriv_OBJECTS) $(conqdriv_DEPENDENCIES) 
 	@rm -f conqdriv$(EXEEXT)
 	$(LINK) $(conqdriv_LDFLAGS) $(conqdriv_OBJECTS) $(conqdriv_LDADD) $(LIBS)
+conqmetad$(EXEEXT): $(conqmetad_OBJECTS) $(conqmetad_DEPENDENCIES) 
+	@rm -f conqmetad$(EXEEXT)
+	$(LINK) $(conqmetad_LDFLAGS) $(conqmetad_OBJECTS) $(conqmetad_LDADD) $(LIBS)
 conqoper$(EXEEXT): $(conqoper_OBJECTS) $(conqoper_DEPENDENCIES) 
 	@rm -f conqoper$(EXEEXT)
 	$(LINK) $(conqoper_LDFLAGS) $(conqoper_OBJECTS) $(conqoper_LDADD) $(LIBS)
@@ -496,6 +508,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/conqcm.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/conqdriv.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/conqlb.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/conqmetad.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/conqmisc.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/conqoper.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/conqreplay.Po@am__quote@
@@ -510,6 +523,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/global.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ibuf.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/iolb.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/meta.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/options.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/packet.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ratfor.Plo@am__quote@

@@ -34,7 +34,7 @@ libconquest_la_SOURCES = conqai.c ratfor.c cd2lb.c display.c iolb.c  \
 	userauth.c record.c color.h user.h shiptype.h \
 	ship.h planet.h team.h msg.h doomsday.h driver.h conqinfo.h \
 	history.h robot.h global.h torp.h ibuf.h conf.h  display.h \
-	protocol.h packet.h packet.c userauth.h
+	protocol.h packet.h packet.c userauth.h meta.c meta.h
 
 libconquest_la_LDFLAGS = -version-info 1:0:0
 
@@ -48,7 +48,7 @@ libconqserv_la_SOURCES = servauth.c server.c servauth.h server.h serverpkt.c \
 libconqserv_la_LDFLAGS = -version-info 1:0:0
 
 bin_PROGRAMS = conquest conqai conqoper conqstrat conqreplay conquestd \
-	conquestsh
+	conquestsh conqmetad
 
 libexec_PROGRAMS = conqdriv
           
@@ -77,6 +77,9 @@ conqreplay_SOURCES = conqreplay.c c_defs.h defs.h conqdef.h conqcom.h context.h 
 conqreplay_LDADD = libconqclnt.la libconquest.la $(XLIBS)
 
 conquestsh_SOURCES = conquestsh.c
+
+conqmetad_SOURCES = conqmetad.c meta.h
+conqmetad_LDADD = libconquest.la
 
 data_DATA = conquest.doc conqnews.doc README conqrule 
 #sysconf_DATA = conquestrc

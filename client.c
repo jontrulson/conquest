@@ -9,13 +9,13 @@
  * Copyright 2003 Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
  ***********************************************************************/
 
+#include "conf.h"
 #include "conqnet.h"
 #include "protocol.h"
 #include "packet.h"
 #include "client.h"
 #include "clientlb.h"
 #include "conqcom.h"
-#include "conf.h"
 #include "context.h"
 #include "msg.h"
 #include "record.h"

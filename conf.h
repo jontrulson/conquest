@@ -18,7 +18,9 @@
 #ifndef CONF_H
 #define CONF_H
 
-#ifdef NOEXTERN
+#include "datatypes.h"
+
+#ifdef CONF_NOEXTERN
 # define CEXTERN
 #else
 # define CEXTERN extern
@@ -142,12 +144,12 @@ typedef struct _sysConf {
 				/* Revision on .conquestrc file */
 				/* - for updating .conquestrc   */
 				/*   when something changes */
-#ifndef NOEXTERN
+#ifndef CONF_NOEXTERN
 CEXTERN char ConfigVersion[];
 
 #else
 char ConfigVersion[] = "$Revision$";
-#endif /* NOEXTERN */
+#endif /* CONF_NOEXTERN */
 
 /* Config's */
 CEXTERN UserConf_t UserConf;
@@ -165,11 +167,10 @@ CEXTERN char *Macro2Str(char *str);
 CEXTERN char *process_macrostr(char *str);
 CEXTERN int process_bool(char *bufptr);
 CEXTERN int MakeConf(char *filename);
-
-
+CEXTERN Unsgn32 getServerFlags(void);
 
 				/* Initialize the system configurables */
-#ifndef NOEXTERN
+#ifndef CONF_NOEXTERN
 CEXTERN struct Conf SysConfData[];
 #else
 struct Conf SysConfData[] =
@@ -355,9 +356,9 @@ struct Conf SysConfData[] =
     }
   }
 };
-#endif /* NOEXTERN */
+#endif /* CONF_NOEXTERN */
 				/* Initialize the user configurables */
-#ifndef NOEXTERN
+#ifndef CONF_NOEXTERN
 CEXTERN struct Conf ConfData[];
 #else
 struct Conf ConfData[] =
@@ -669,19 +670,19 @@ struct Conf ConfData[] =
     }
   }
 };
-#endif /* NOEXTERN */
+#endif /* CONF_NOEXTERN */
 
-#ifndef NOEXTERN
+#ifndef CONF_NOEXTERN
 CEXTERN int CfEnd;
 #else
 int CfEnd = CF_END;
-#endif /* NOEXTERN */
+#endif /* CONF_NOEXTERN */
 
-#ifndef NOEXTERN
+#ifndef CONF_NOEXTERN
 CEXTERN int SysCfEnd;
 #else
 int SysCfEnd = SYSCF_END;
-#endif /* NOEXTERN */
+#endif /* CONF_NOEXTERN */
 
 #undef CEXTERN			/* cleanup */
 

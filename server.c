@@ -11,11 +11,11 @@
 
 #include "conqdef.h"
 #include "conqcom.h"
+#include "conf.h"
 #include "server.h"
 #include "serverpkt.h"
 #include "context.h"
 #include "record.h"
-#include "conf.h"
 
 int sendClientStat(int sock, Unsgn8 flags, Unsgn8 snum, Unsgn8 team, 
 		   Unsgn16 unum, Unsgn8 esystem)
@@ -211,25 +211,7 @@ int sendServerStat(int sock)
   sStat.numusers = htons(numusers);
 
   /* send out the current flags */
-  sStat.flags = SPSSTAT_FLAGS_NONE;
-
-  if (SysConf.AllowRefits)
-    sStat.flags |= SPSSTAT_FLAGS_REFIT;
-
-  if (SysConf.AllowSigquit)
-    sStat.flags |= SPSSTAT_FLAGS_VACANT;
-
-  if (SysConf.AllowSlingShot)
-    sStat.flags |= SPSSTAT_FLAGS_SLINGSHOT;
-
-  if (SysConf.NoDoomsday)
-    sStat.flags |= SPSSTAT_FLAGS_NODOOMSDAY;
-
-  if (SysConf.DoRandomRobotKills)
-    sStat.flags |= SPSSTAT_FLAGS_KILLBOTS;
-
-  if (SysConf.AllowSwitchteams)
-    sStat.flags |= SPSSTAT_FLAGS_SWITCHTEAM;
+  sStat.flags = getServerFlags();
 
   sStat.flags = (Unsgn32)htonl(sStat.flags);
 

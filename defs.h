@@ -130,10 +130,11 @@
 #undef DEBUG_SERVERAUTH         /* debug server auth operation */
 #undef DEBUG_OPTIONS            /* debug option screens/handling */
 #undef DEBUG_REC                /* debug recording */
-#undef DEBUG_SERVERPROC         /* server proc*() routines */
+#define DEBUG_SERVERPROC         /* server proc*() routines */
 #undef DEBUG_SERVERCLNTSTAT     /* server sendClientStat() */
 #undef DEBUG_SERVERSEND         /* server send*() routines */
 #undef DEBUG_CLIENTPROC         /* client proc* routines */
-#undef DEBUG_CLIENTSEND         /* client send* routines */
+#define DEBUG_CLIENTSEND         /* client send* routines */
+#undef DEBUG_META               /* meta server debugging */
 
 #endif /* _DEFS_H */

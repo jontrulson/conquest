@@ -11,11 +11,11 @@
 
 #include "conqdef.h"
 #include "conqcom.h"
+#include "conf.h"
 #include "server.h"
 #include "serverpkt.h"
 #include "context.h"
 #include "record.h"
-#include "conf.h"
 #include "servercmd.h"
 
 void startRecord(void)

@@ -10,6 +10,7 @@
  ***********************************************************************/
 
 #include "datatypes.h"
+#include "conf.h"
 #include "protocol.h"
 #define NOEXTERN
 #include "packet.h"

@@ -1,3 +1,54 @@
+11/20/2003
+7.2d
+
+        - merge of CS-12 into main branch (7.2d)
+
+        - removed '-p <port>' option from conquest.  To specify a port
+          other than the default, add it to the server name seperated
+          by a colon.  For example, to connect to a server at
+          conquest.radscan.com, port 1702, use:
+
+          conquest -s conquest.radscan.com:1702
+
+        - added meta server (conqmetad) and functionality to conquestd.
+
+          - meta server listens on TCP and UDP port 1700.  The UDP
+            port is incoming only, and is used to recieve updates from
+            conquestd's.  TCP is outbound only, and will dump the
+            current server list and their stats ('|' delimited) upon
+            connect.
+
+            Try 'telnet conquest.radscan.com 1700' . :)
+
+          - new options added to conquestd:
+
+            '-m' update the meta server (default: conquest.radscan.com)
+
+            '-M <metaserver>' use metaserver <metaserver>
+
+            '-N <myname>' tell the metaserver to use <myname> as the
+            server address.  Otherwise conqmetad will use the src
+            address on the incoming packet to determine the conquestd
+            server address.
+
+        - still need to add ability in conquest to get server list
+          from meta server and allow the user to select one.
+
+        - fixed conquestd and conquest to improve responsivness.
+          conquest will now process packets as soon as they are
+          received regardless of the update rate, instead of wating
+          for a timer cycle.  
+
+          conquestd updates the client whenever the client does
+          something (raise shields, etc).  
+
+          These changes made a huge diff in responsiveness to
+          commands, especially at lower update rates. Sorry about that
+          oversight :)
+
+        - client now processes incoming packets while in help, userlist,
+          etc, rather than only when at the battle screen.
+
 
 10/25/2003
 7.2c-cs-12

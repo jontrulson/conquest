@@ -62,14 +62,14 @@ void processPacket(Unsgn8 *buf);
 
 void printUsage()
 {
-  printf("Usage: conquest [-s server] [-p port ] [-r recfile] [ -t ]\n");
-  printf("    -s server      connect to <server>\n");
-  printf("    -p port        specify port\n");
-  printf("    -r recfile     Record game to <recfile>\n");
-  printf("                      recfile will be in conpressed format\n");
-  printf("                      if conquest was compiled with zlib\n");
+  printf("Usage: conquest [-s server[:port]] [-r recfile] [ -t ]\n");
+  printf("    -s server[:port] connect to <server> at <port>\n");
+  printf("                      default: localhost:1701\n");
+  printf("    -r recfile       Record game to <recfile>\n");
+  printf("                      recfile will be in compressed format\n");
+  printf("                      if conquest was compiled with libz\n");
   printf("                      support\n\n");
-  printf("    -t             telnet mode (no user conf load/save)\n");
+  printf("    -t              telnet mode (no user conf load/save)\n");
   return;
 }
 
@@ -137,7 +137,7 @@ int connectServer(char *remotehost, Unsgn16 remoteport)
 int main(int argc, char *argv[]) 
 {
   int i;
-
+  char *ch;
   Context.entship = FALSE;
   Context.recmode = RECMODE_OFF;
   Context.updsec = 2;		/* dflt - 2/sec */
@@ -156,14 +156,31 @@ int main(int argc, char *argv[])
 
 
   /* check options */
-  while ((i = getopt(argc, argv, "s:p:r:t")) != EOF)    /* get command args */
+  while ((i = getopt(argc, argv, "s:r:t")) != EOF)    /* get command args */
     switch (i)
       {
-      case 's':
-	cInfo.remotehost = optarg;
-	break;
-      case 'p':
-	cInfo.remoteport = (Unsgn16)atoi(optarg);
+      case 's':                 /* [host[:port]] */
+	cInfo.remotehost = (Unsgn8 *)strdup(optarg);
+        if (!cInfo.remotehost)
+          {
+            printf("strdup failed\n");
+            exit(1);
+          }
+        if ((ch = strchr(cInfo.remotehost, ':')) != NULL)
+          {
+            *ch = 0;
+            ch++;
+            if ((cInfo.remoteport = atoi(ch)) == 0)
+              cInfo.remoteport = CN_DFLT_PORT;
+
+            /* if no host was specified (only the :port), then set to
+               localhost */
+            if (strlen(cInfo.remotehost) == 0)
+              cInfo.remotehost = "localhost";
+          }
+        else
+          cInfo.remoteport = CN_DFLT_PORT;
+        
 	break;
       case 'r': 
 	if (recordOpenOutput(optarg, FALSE))
@@ -398,10 +415,6 @@ void command( int ch )
       break;
     case 'A':				/* change allocation */
       doalloc( Context.snum );
-      stopTimer();
-      if ( stillalive( Context.snum ) )
-	display( Context.snum, FALSE );
-      startTimer();
       break;
     case 'b':				/* beam armies */
       dobeam( Context.snum );
@@ -430,19 +443,27 @@ void command( int ch )
       break;
     case 'h':
       Context.redraw = TRUE;
-      stopTimer();
+      Context.display = FALSE;
       dohelp();
+      Context.display = TRUE;
       if ( stillalive( Context.snum ) )
-	display( Context.snum, FALSE );
-      startTimer();
+        {
+          stopTimer();
+          display( Context.snum, FALSE );
+          startTimer();
+        }
       break;
     case 'H':
       Context.redraw = TRUE;
-      stopTimer();
+      Context.display = FALSE;
       histlist( FALSE );
+      Context.display = TRUE;
       if ( stillalive( Context.snum ) )
-	display( Context.snum, FALSE );
-      startTimer();
+        {
+          stopTimer();
+          display( Context.snum, FALSE );
+          startTimer();
+        }
       break;
     case 'i':				/* information */
       doinfo( Context.snum );
@@ -474,12 +495,16 @@ void command( int ch )
       break;
 
     case 'O':
-      stopTimer();
       Context.redraw = TRUE;
+      Context.display = FALSE;
       UserOptsMenu(Context.unum);
+      Context.display = TRUE;
       if ( stillalive( Context.snum ) )
-	display( Context.snum, FALSE );
-      startTimer();
+        {
+          stopTimer();
+          display( Context.snum, FALSE );
+          startTimer();
+        }
       break;
     case 'o':				/* orbit nearby planet */
       doorbit( Context.snum );
@@ -518,34 +543,44 @@ void command( int ch )
       break;
     case 'S':				/* more user stats */
       Context.redraw = TRUE;
-      stopTimer();
+      Context.display = FALSE;
       userstats( FALSE, Context.snum ); 
+      Context.display = TRUE;
       if ( stillalive( Context.snum ) )
-	display( Context.snum, FALSE );
-      startTimer();
+        {
+          stopTimer();
+          display( Context.snum, FALSE );
+          startTimer();
+        }
       break;
     case 'T':				/* team list */
       Context.redraw = TRUE;
-      stopTimer();
+      Context.display = FALSE;
       doteamlist( Ships[Context.snum].team );
+      Context.display = TRUE;
       if ( stillalive( Context.snum ) )
-	display( Context.snum, FALSE );
-      startTimer();
+        {
+          stopTimer();
+          display( Context.snum, FALSE );
+          startTimer();
+        }
       break;
     case 'u':				/* un-tractor */
-      /*      dountow( Context.snum );*/
       sendCommand(CPCMD_UNTOW, 0);
       break;
     case 'U':				/* user stats */
       Context.redraw = TRUE;
-      stopTimer();
+      Context.display = FALSE;
       userlist( FALSE, Context.snum );
+      Context.display = TRUE;
       if ( stillalive( Context.snum ) )
-	display( Context.snum, FALSE );
-      startTimer();
+        {
+          stopTimer();
+          display( Context.snum, FALSE );
+          startTimer();
+        }
       break;
     case 'W':				/* war and peace */
-      /*      dowar( Context.snum );*/
       clntDoWar( Context.snum );
       break;
     case '-':				/* shields down */
@@ -562,19 +597,28 @@ void command( int ch )
       break;
     case '/':				/* player list */
       Context.redraw = TRUE;
-      stopTimer();
+      Context.display = FALSE;
       playlist( FALSE, FALSE, Context.snum );
+      Context.display = TRUE;
       if ( stillalive( Context.snum ) )
-	display( Context.snum, FALSE );
-      startTimer();
+        {
+          stopTimer();
+          display( Context.snum, FALSE );
+          startTimer();
+        }
       break;
     case '?':				/* planet list */
       Context.redraw = TRUE;
-      stopTimer();
+      Context.display = FALSE;
       doplanlist( Context.snum );
+      Context.display = TRUE;
       if ( stillalive( Context.snum ) )
+        {
+          stopTimer();
+          display( Context.snum, FALSE );
+          startTimer();
+        }
 	display( Context.snum, FALSE );
-      startTimer();
       break;
     case TERM_REDRAW:			/* clear and redisplay */
       stopTimer();
@@ -594,7 +638,7 @@ void command( int ch )
       iBufPut("i\t");		/* (get next last info) */
       break;
       
-    case -1:			/* really nothing */
+    case -1:			/* really nothing, move along */
 #ifdef DEBUG_IO
       clog("command(): got -1 - ESC?");
 #endif
@@ -603,7 +647,6 @@ void command( int ch )
       /* nothing. */
     default:
     label1:
-      /*	    ioeat();*/
       cdbeep();
 #ifdef DEBUG_IO
       clog("command(): got 0%o, KEY_A1 =0%o", ch, KEY_A1);
@@ -2562,7 +2605,10 @@ void menu(void)
   int ch;
   int lose, oclosed, switchteams, multiple, redraw;
   int playrv;
+  int rv;
   int pkttype;
+  struct timeval timeout;
+  fd_set readfds;
   Unsgn8 buf[PKT_MAXSIZE];
   spAck_t *sack;
   char *if1="Suddenly  a  sinister,  wraithlike  figure appears before you";
@@ -2620,7 +2666,7 @@ void menu(void)
 
       while ((pkttype = waitForPacket(PKT_FROMSERVER, cInfo.sock, PKT_ANYPKT,
 				      buf, PKT_MAXSIZE, 0, NULL)) > 0)
-	{			/* pwoc packets while we get them */
+	{			/* proc packets while we get them */
 	  switch (pkttype)
 	    {
 	    case SP_ACK:
@@ -2716,146 +2762,173 @@ void menu(void)
       if ( countdown > 0 )
 	countdown--;
       
-      /* Get a char with timeout. */
-      if ( ! iogtimed( &ch, 1.0 ) )
-	{
-	  /* We get here if a char hasn't been typed. */
-	  sleepy = sleepy + 1;
-	  if ( sleepy > 300 )
-	    break;
-	  continue; /* next */
-	}
+      /* wait up to a second for something to happen */
+      timeout.tv_sec = 1;
+      timeout.tv_usec = 0;
       
-      /* Got a character, zero timeout. */
-      sleepy = 0;
-      switch ( ch )
-	{
-	case 'e':
-	  if (!sendCommand(CPCMD_ENTER, 0))
-	    playrv = FALSE;
-	  else
-	    {
-	      playrv = play();
-	      countdown = 15;
-	      redraw = TRUE;
-	    }
-	  Context.display = FALSE;
-	  break;
-	case 'h':
-	  helplesson();
-	  redraw = TRUE;
-	  break;
-	case 'H':
-	  histlist( FALSE );
-	  redraw = TRUE;
-	  break;
-	case 'L':
-	  doreview( Context.snum );
-	  break;
-	case 'n':
-	  if ( ! Context.hasnewsfile )
-	    cdbeep();
-	  else
-	    {
-	      news();
-	      redraw = TRUE;
-	    }
-	  break;
-	case 'N':
-	  /*	  pseudo( Context.unum, Context.snum );*/
-	  clntPseudo( Context.unum, Context.snum );
-	  break;
-	case 'O':
-          UserOptsMenu(Context.unum);
-          redraw = TRUE;
-          break;
-	case 'r':
-	  if ( multiple )
-	    cdbeep();
-	  else
-	    {
-	      for ( i = 1; i <= MAXSHIPS; i = i + 1 )
-		if ( Ships[i].status == SS_LIVE ||
-		    Ships[i].status == SS_ENTERING )
-		  if ( Ships[i].unum == Context.unum )
-		    break;
-	      if ( i <= MAXSHIPS )
-		cdbeep();
-	      else
-		{
-		  cdclrl( MSG_LIN1, 2 );
-		  cdrefresh();
-		  if ( confirm() )
-		    {
-				/* should exit here */
-		      sendCommand(CPCMD_RESIGN, 0);
-		      cdend();
-		      exit(0);
-		      break;
-		    }
-		}
-	    }
-	  break;
-	case 's':
-	  if ( ! multiple && ! switchteams )
-	    cdbeep();
-	  else
-	    {
-	      /* we'll update local data here anyway, even though it will be
-		 overwritten on the next ship update.  Improves perceived
-		 response time. */
-	      Ships[Context.snum].team = 
-		modp1( Ships[Context.snum].team+1, NUMPLAYERTEAMS );
-              Ships[Context.snum].shiptype = 
-                Teams[Ships[Context.snum].team].shiptype;
-              Users[Context.unum].team = Ships[Context.snum].team;
-              Ships[Context.snum].war[Ships[Context.snum].team] = FALSE;
-              Users[Context.unum].war[Users[Context.unum].team] = FALSE;
-	      
-	      sendCommand(CPCMD_SWITCHTEAM, (Unsgn16)Ships[Context.snum].team);
-	    }
-	  break;
-	case 'S':
-	  userstats( FALSE, 0 ); /* we're never really neutral ;-) - dwp */
-	  redraw = TRUE;
-	  break;
-	case 'T':
-	  doteamlist( Ships[Context.snum].team );
-	  redraw = TRUE;
-	  break;
-	case 'U':
-	  userlist( FALSE, 0 );
-	  redraw = TRUE;
-	  break;
-	case 'W':
-	  /*	  dowar( Context.snum );*/
-	  clntDoWar( Context.snum );
-	  redraw = TRUE;
-	  break;
-	case 'q':
-	case 'Q':
-	  Context.leave = TRUE;	
-	  break;
-	case '/':
-	  playlist( FALSE, FALSE, 0 );
-	  redraw = TRUE;
-	  break;
-	case '?':
-	  doplanlist( 0 );
-	  redraw = TRUE;
-	  break;
-	case TERM_REDRAW:	/* ^L */
-	  cdredo();
-	  redraw = TRUE;
-	  break;
-	case ' ':
-	case TERM_NORMAL:           
-	  /* Do nothing. */
-	  break;
-	default:
-	  cdbeep();
-	  break;
-	}
+      FD_ZERO(&readfds);
+      FD_SET(cInfo.sock, &readfds);
+      FD_SET(PollInputfd, &readfds);
+
+      if ((rv=select((max(cInfo.sock, PollInputfd) + 1), &readfds, NULL, 
+                     NULL, &timeout)) > 0)
+        {                           /* we have activity */
+          if (FD_ISSET(cInfo.sock, &readfds))
+            {                   /* we have a packet */
+              continue;            /* go process them at the top */
+            }
+
+          if (FD_ISSET(PollInputfd, &readfds))
+            {          /* got a char */
+              ch = iogchar();
+
+              /* Got a character, zero timeout. */
+              sleepy = 0;
+              switch ( ch )
+                {
+                case 'e':
+                  if (!sendCommand(CPCMD_ENTER, 0))
+                    playrv = FALSE;
+                  else
+                    {
+                      playrv = play();
+                      countdown = 15;
+                      redraw = TRUE;
+                    }
+                  if (playrv == FALSE)
+                    Context.leave = TRUE; /* something didn't work right */
+                  
+                  Context.display = FALSE;
+                  break;
+                case 'h':
+                  helplesson();
+                  redraw = TRUE;
+                  break;
+                case 'H':
+                  histlist( FALSE );
+                  redraw = TRUE;
+                  break;
+                case 'L':
+                  doreview( Context.snum );
+                  break;
+                case 'n':
+                  if ( ! Context.hasnewsfile )
+                    cdbeep();
+                  else
+                    {
+                      news();
+                      redraw = TRUE;
+                    }
+                  break;
+                case 'N':
+                  /*	  pseudo( Context.unum, Context.snum );*/
+                  clntPseudo( Context.unum, Context.snum );
+                  break;
+                case 'O':
+                  UserOptsMenu(Context.unum);
+                  redraw = TRUE;
+                  break;
+                case 'r':
+                  if ( multiple )
+                    cdbeep();
+                  else
+                    {
+                      for ( i = 1; i <= MAXSHIPS; i = i + 1 )
+                        if ( Ships[i].status == SS_LIVE ||
+                             Ships[i].status == SS_ENTERING )
+                          if ( Ships[i].unum == Context.unum )
+                            break;
+                      if ( i <= MAXSHIPS )
+                        cdbeep();
+                      else
+                        {
+                          cdclrl( MSG_LIN1, 2 );
+                          cdrefresh();
+                          if ( confirm() )
+                            {
+                              /* should exit here */
+                              sendCommand(CPCMD_RESIGN, 0);
+                              cdend();
+                              exit(0);
+                              break;
+                            }
+                        }
+                    }
+                  break;
+                case 's':
+                  if ( ! multiple && ! switchteams )
+                    cdbeep();
+                  else
+                    {
+                      /* we'll update local data here anyway, even though it will be
+                         overwritten on the next ship update.  Improves perceived
+                         response time. */
+                      Ships[Context.snum].team = 
+                        modp1( Ships[Context.snum].team+1, NUMPLAYERTEAMS );
+                      Ships[Context.snum].shiptype = 
+                        Teams[Ships[Context.snum].team].shiptype;
+                      Users[Context.unum].team = Ships[Context.snum].team;
+                      Ships[Context.snum].war[Ships[Context.snum].team] = FALSE;
+                      Users[Context.unum].war[Users[Context.unum].team] = FALSE;
+                      
+                      sendCommand(CPCMD_SWITCHTEAM, (Unsgn16)Ships[Context.snum].team);
+                    }
+                  break;
+                case 'S':
+                  userstats( FALSE, 0 ); /* we're never really neutral ;-) - dwp */
+                  redraw = TRUE;
+                  break;
+                case 'T':
+                  doteamlist( Ships[Context.snum].team );
+                  redraw = TRUE;
+                  break;
+                case 'U':
+                  userlist( FALSE, 0 );
+                  redraw = TRUE;
+                  break;
+                case 'W':
+                  /*	  dowar( Context.snum );*/
+                  clntDoWar( Context.snum );
+                  redraw = TRUE;
+                  break;
+                case 'q':
+                case 'Q':
+                  Context.leave = TRUE;	
+                  break;
+                case '/':
+                  playlist( FALSE, FALSE, 0 );
+                  redraw = TRUE;
+                  break;
+                case '?':
+                  doplanlist( 0 );
+                  redraw = TRUE;
+                  break;
+                case TERM_REDRAW:	/* ^L */
+                  cdredo();
+                  redraw = TRUE;
+                  break;
+                case ' ':
+                case TERM_NORMAL:           
+                  /* Do nothing. */
+                  break;
+                default:
+                  cdbeep();
+                  break;
+                }
+            }
+        }
+
+      if (rv < 0 && errno != EINTR)
+        {
+          clog("conquest:menu: select returned %d, %s\n",
+               rv, strerror(errno));
+          Context.leave = TRUE;
+        }
+
+      /* We get here if a char hasn't been typed. */
+      sleepy++;
+      if ( sleepy > 300 )
+        break;
     }
   while ( stillalive( Context.snum ) &&  !Context.leave );
   
@@ -3087,6 +3160,8 @@ void processPacket(Unsgn8 *buf)
 int play()
 {
   int ch, rv;
+  struct timeval timeout;
+  fd_set readfds;
   
   /* Can't carry on without a vessel. */
 
@@ -3132,36 +3207,69 @@ int play()
   while ( !(clientFlags & SPCLNTSTAT_FLAG_KILLED) )
     {
 
-      /* Get a char with one second timeout. */
-      if ( iogtimed( &ch, 1.0 ) )
-        {
-          /* only process commands if we are live (the server will ignore
-             them anyway) */
-          if (Ships[Context.snum].status == SS_LIVE)
-            {
-              if (RMsg_Line == MSG_LIN1)
-                Context.msgok = FALSE;      /* off if we  have no msg line */
-              if (DoMacro(ch) == TRUE)
-                {
-                  while (iBufCount())
-                    {
-                      ch = iBufGetCh();
-                      command( ch );
-                    }
-                }
-              else
-                {
-                  do 
-                    {
-                      command( ch );
-                    } while (iBufCount() && (ch = iBufGetCh()));
-                }
+      /* Get a packet or char with one second timeout. */
+      timeout.tv_sec = 1;
+      timeout.tv_usec = 0;
+
+      FD_ZERO(&readfds);
+      FD_SET(cInfo.sock, &readfds);
+      FD_SET(PollInputfd, &readfds);
+
+      if ((rv=select((max(cInfo.sock, PollInputfd) + 1), &readfds, NULL, 
+                     NULL, &timeout)) > 0)
+        {                           /* we have activity */
+          if (FD_ISSET(cInfo.sock,&readfds))
+            {                   /* we have a packet */
+              /* call astservice.  it will get any packets,
+                 and update the display */
+              stopTimer();      /* to be sure */
+              astservice(0);    /* will restart the timer */
             }
 
+      /* Get a char with one second timeout. */
+
+          if (FD_ISSET(PollInputfd, &readfds))
+            {
+              ch = iogchar();
+              /* only process commands if we are live (the server will ignore
+                 them anyway) */
+              if (Ships[Context.snum].status == SS_LIVE)
+                {
+                  if (RMsg_Line == MSG_LIN1)
+                    Context.msgok = FALSE;      /* off if we  have no msg line */
+                  if (DoMacro(ch) == TRUE)
+                    {
+                      while (iBufCount())
+                        {
+                          ch = iBufGetCh();
+                          command( ch );
+                        }
+                    }
+                  else
+                    {
+                      do 
+                        {
+                          command( ch );
+                        } while (iBufCount() && (ch = iBufGetCh()));
+                    }
+                }
+            }
+        }
+
+
+      if (rv < 0 && errno != EINTR)
+        {
+          clog("conquest:play: select returned %d, %s\n",
+               rv, strerror(errno));
+          Context.display = FALSE;
+          return FALSE;
+        }
+      else
+        {
           grand( &Context.msgrand );
           Context.msgok = TRUE;
 	  cdrefresh();
-	}
+        }
 
     } /* while stillalive */
 	  
@@ -3528,10 +3636,11 @@ void astservice(int sig)
   int difftime;
   Unsgn8 buf[PKT_MAXSIZE];
 
+#if 0
   /* Don't do anything if we're not supposed to. */
   if ( ! Context.display )
     return;
-  
+#endif
   stopTimer();
 
   /* good time to look for packets... We do this here so the display
@@ -3541,6 +3650,13 @@ void astservice(int sig)
   while (readPacket(PKT_FROMSERVER, cInfo.sock,
 		    buf, PKT_MAXSIZE, 0) > 0)
     processPacket(buf); /* process them */
+
+  /* Don't do anything if we're not supposed to. */
+  if ( ! Context.display )
+    {
+      startTimer();
+      return;
+    }
 
   /* See if we can display a new message. */
 
@@ -3607,11 +3723,17 @@ void astservice(int sig)
 /*    stopTimer */
 void stopTimer(void)
 {
+  int old_disp;                 /* whether we should re-enable
+                                   Context.display */
 #ifdef HAS_SETITIMER
   struct itimerval itimer;
 #endif
   
-  Context.display = FALSE;
+  /* we need to turn off display while doing this.  Preserve the previous
+     value on return */
+  old_disp = Context.display;
+  if (Context.display)
+    Context.display = FALSE;
   
 
   signal(SIGALRM, SIG_IGN);
@@ -3625,8 +3747,7 @@ void stopTimer(void)
   alarm(0);
 #endif
 
-
-  Context.display = TRUE;
+  Context.display = old_disp;
   
   return;
   

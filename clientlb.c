@@ -10,6 +10,7 @@
  ***********************************************************************/
 
 #include "global.h"
+#include "conf.h"
 #include "conqnet.h"
 #include "protocol.h"
 #include "packet.h"
@@ -17,7 +18,6 @@
 #include "clientlb.h"
 #include "conqcom.h"
 #include "context.h"
-#include "conf.h"
 #include "record.h"
 
 void clntPseudo( int unum, int snum )

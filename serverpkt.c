@@ -11,9 +11,9 @@
 
 #include "conqdef.h"
 #include "conqcom.h"
+#include "conf.h"
 #include "server.h"
 #include "context.h"
-#include "conf.h"
 #include "serverpkt.h"
 
 /* Here, we maintain 2 copies of potential packets, privileged and

@@ -40,7 +40,8 @@ FILELIST="ratfor.c cd2lb.c iolb.c conqlb.c
         clientlb.c server.h server.c packet.h packet.c protocol.h
         conqnet.h datatypes.h userauth.h servauth.h clntauth.h 
         clntauth.c servauth.c conquestd.c serverpkt.c serverpkt.h 
-        servercmd.h servercmd.c conquestsh.c README-DEV-RELEASE.txt"
+        servercmd.h servercmd.c conquestsh.c README-DEV-RELEASE.txt
+        conqmetad.c meta.c meta.h"
 
 #IMAGES="img/*.bmp"
 

@@ -11,7 +11,6 @@
 
 #include "conqdef.h"
 #include "datatypes.h"
-#include "conf.h"
 
 #define PROTOCOL_VERMAJ 0
 #define PROTOCOL_VERMIN 5
