@@ -12,24 +12,11 @@ put in, you have the source - code away...
 	These are items being considered for implementation and/or
 fixing in a future release of Conquest.
 
-Jon Trulson <jon@radscan.com> 3/28/97
-
-- Handling of multiple ships really needs to be revamped.  One option
-under consideration is allowing those users that have multiple ships
-defined (via (e)edit user in conqoper) to have the ability to switch
-between them at will while playing.  Might be interesting to be able
-to control a couple of ships at the same time...
-
-- Additional color coding of planets, messages, ships, other screens,
-etc.  There are really two approaches I can take to coloring the main
-screen: Alert based and Team based.  Alert based coloring would color
-code objects according to the threat they posed, ie: enemy
-ships/planets in red, nuetral ships/planets in yellow, team
-ships/planets in green, etc.  Team based would simply assign a color
-to a team, and ships/planets would be displayed this way (ala
-netrek).  I lean toward Alert based coloring...
-
 - the ability to customize colors in your ~/.conquestrc file.
+
+- enhance conqoper watch to allow watching of planets.  Perhaps
+players might be allowed to watch their own planets as well...
+Perhaps not...
 
 - The ability to define initial planetary attributes (like orbital
 velocity, orbit angle, orbit radius, etc) in the global conquestrc
@@ -52,9 +39,8 @@ turn over control of their ship to the user's robot strategy with
 control of the standard robot strategy table.  Might be nice to be
 able to use your own, ala the ancient crobots game...
 
-- The addition of a telnet'able deamon interface, so that internet
-games could be run (ala netrek) without requiring every player to have
-an account on the local machine.
+- code that would support public conquest servers via a generic
+'conquest' user. 
 
 - The ability for a user to generate a robot for target practice at
 will (providing there are no other human players playing).  This can
@@ -67,5 +53,4 @@ a Conquest game (such as on a University computer, where privileged
 access isn't possible).
 
 
-
-
+Jon Trulson <jon@radscan.com> 12/24/97

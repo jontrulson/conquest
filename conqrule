@@ -100,7 +100,7 @@ dne < 3 & numtorps < 3 & wtemp < 8 ; ROB_MYDETONATE
 
 # JET
 # raise shields if damage, and the threat can't be an enemy. 
-#  this should reduce the number of sun-deaths for robots a bit ;-)
+#  this should reduce the number of sun-deaths for robots a bit 
 dne > 3 & incoming == 0 & ! shup & damage > 0 & etemp < 4 & 
 	! repairing ; ROB_SHIELD
 
@@ -124,9 +124,21 @@ dne > 3 & walloc ; ROB_ALLOCATE
 
 # Course rules.
 dne < 9 & fuel >= 5 & damage < 2 ; ROB_TRACK
+# 12/21/97
+# this rule added to mitigate a logic 'hole' with fuel ranges between
+#  150-350 that caused NOOP's at inoppertune times. This flaw became
+#  apparent when the fuel scaling bug in buildai() was fixed, as robots 
+#  no longer think they always have maximum fuel.
+dne <= 5 & fuel >= 3 & fuel < 5 & damage < 3; ROB_TRACK
+
 ! orbiting & dne <= 3 & damage <= 6 & fuel >= 4 & enemydamage >= 8 ; ROB_TRACK
 ! orbiting & dne <= 3 & damage >= 5 & damage < 9 & fuel > 0 ; ROB_RUNAWAY
-fuel < 2 & warp != 0 & damage < 4 ; ROB_GOFUEL
+
+# 12/21/97
+# relating to the fuel scaling bug above, the fuel comparison was changed
+#  to be a bit more conservative.  (was fuel < 2)
+fuel <= 2 & warp != 0 & damage < 4 ; ROB_GOFUEL
+
 ! orbiting & warp != 0 & damage >= 4 ; ROB_GOREPAIR
 
 # Repair rules. If we're damaged and in orbit, repair. If we're damaged and

@@ -8,6 +8,149 @@
          +--------------------------------------------------------+
 
                               Conquest News
+
+Version 6.6    Thu Dec 24 16:03:31 1997  Jon Trulson  <jon@radscan.com>
+
+        - added 20 new 'extra' play planets for use by enterprising
+          universe developers.  The various planet listers modified 
+          to support more than one page of planets.
+
+        - switched to the use of 'double' as the floating point type
+          instead of 'float'
+
+        - New common block due to the float -> double change, and the
+          new play planets.
+
+        - full coloring of LR/SR displays.  The color scheme used is
+          alert based.. ie: dangerous things (like enemy ships or 
+          planets) are red, team things are green etc.
+
+	- all other text in the game (and conqoper) was colored by 
+          David Payne <davep@radscan.com> using a new cprintf()
+          function that can handle embedded attribute codes.
+
+        - color in conqoper is different, as an operator doesn't
+          (supposedly) take sides.  The goal in conqoper was to use 
+          coloring for enhancement only (except when watching a ship).
+
+        - exploding ships. Ouch.  Implemented by 'faking' a special
+          type of torp launch.  The only thing an exploding ship 
+          will not damage, is a team ship.  Any others (including
+          peaceful ships) can take damage if they are too close
+          to an exploding ship.
+
+        - The messages sent regarding entering/dying in conquest
+          now use per ship information, rather than per user 
+          information.  This make things consistent, and also
+          works properly for users with multiple ships.
+
+        - watch display in conqoper is now interupt driven, like 
+          conquest.
+
+        - watch display in conqoper modified to use '<>' or arrow
+          keys to switch from ship to ship.  Dave Payne provided
+          this patch.
+
+        - debug doomsday screen removed, watch display in conqoper
+          now lets you watch from the doomsday's perspective.
+          Patch by Dave Payne.
+
+        - most frequently used commands (like (r)obot, (k)ill,
+          (/)player list, etc) are available from watch in 
+          conqoper.  Patch by Dave Payne.
+
+	- (e)dit user in conqoper now removes the '+' current 
+          field indicator as you move around between the various
+          options.
+
+        - Destroying a warlike ship, no longer causes 'invisible'
+          sticky war with that team if you weren't officially at war 
+          with that team when you killed it (but it was at war with you).
+
+        - beaming armies down to a self-ruled planet without bombing
+          it no longer works.  You could take planets this way without 
+          suffering any damage, but it would take a long time, and alot
+          of armies.  Now when you beam armies down to a self-ruled 
+          planet, it is considered an act of war, just like bombing is.
+
+        - playlist now lists the PID of the controlling ship, or
+          "VACANT" if the ship has no controlling process, or "ROBOT" 
+          if the ship is a robot.
+
+        - You can type long messages now.  While typing a mesage, when 
+          you reach the end of the line, what you've typed is sent, 
+          followed by a '-', and then you are prompted for more text.  
+          Much easier to type long messages.  Thanks to Dave Payne
+          for this patch.
+
+        - Conquest has been ported to Solaris 2.6 using gcc 2.7.2.1
+
+        - the display will now operate properly when changing your
+          name while flying. Yes. I got killed by changing my name, 
+          and forgetting no screen updates were taking place. I had 
+          24 kills too. ;-)
+
+        - an bug in the driver that caused ship headings to briefly 
+          go negative or invalid during a slow turn has been fixed.
+
+        - bug in towing that miscalculated relative velocities between
+          two ships has been fixed.  This bug was in the original RATFOR 
+          code.
+
+        - fixed bug in untow that caused incorrect warp factors to be
+          set for the towed ship when it was untractored, and the 
+          tower was in orbit.  Can you say "hyperdimensional 
+          shifting"?   This bug was in the original RATFOR code.
+
+        - handling of multiple ships, and entering while already
+          playing are much improved.  Now you get the option of 
+          re-incarnating to other ships (if you are allowed multiple 
+          ships), and/or creating a new one. Players who are not 
+          allowed multiple ships will no longer be blown out of the 
+          game if the same user tries to enter conquest (from another
+          terminal for instance).
+
+        - lots of lint based cleanup... found and fixed several 
+          'minor' bugs that way.  *Lots* of unused variables and code 
+          removed.
+
+        - gamlb module removed - no longer needed
+
+        - most transition (Ratfor to C) macros removed.
+
+        - combined ioxlb.c, ionlb.c, and ioplb.c into one module:
+          iolb.c
+
+        - removed conqfig.c module - relevant defs are in defs.h
+
+        - Reviewing messages lets you scroll back and forth using
+          the arrow keys.
+
+        - display code moved into new display.c module
+
+        - several rounding problems related to using abs() when should
+          have been using fabs() fixed.
+
+        - bug in buildai() that scaled fuel incorrectly causing 
+          robots to do dumb things when fuel was low (they always 
+          thought they had plenty of fuel).  This fix has resulted 
+          in smarter robots.  Two rules in conqrule had to be modified 
+          to cover up a logic 'hole' that became apparent when this bug 
+          was fixed.  This bug was in the original RATFOR code.
+
+        - some terminfo enties that work good with conquest are now
+          supplied with the source distribution.
+
+        - a new 'realclean' target is provided in the Makefile.  This
+          target is the same as a 'make clean', but additionally 
+          removes files generated by configure.  You will need to 
+          re-run configure after a 'make realclean'.
+
+        - some commenting spiffed up.
+
+
+
+
 Version 6.4    Fri Mar 28 15:09:02 1997  Jon Trulson  <jon@radscan.com>
 
         - changed phaser graphics to stop when it hits a ship.  Can be
@@ -33,6 +176,8 @@ Version 6.4    Fri Mar 28 15:09:02 1997  Jon Trulson  <jon@radscan.com>
 
         - configure.in modified so that libl.a/libfl.a (flex/lex) libs 
           are looked for if the other can't be found.  
+
+
         
 Version 6.3    Tue Dec 24 16:59:20 1996  Jon Trulson  <jon@radscan.com>
 

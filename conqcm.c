@@ -20,7 +20,7 @@
 /* by Jon Trulson <jon@radscan.com> under the same terms and          */
 /* conditions of the original copyright by Jef Poskanzer and Craig    */
 /* Leres.                                                             */
-/* Have Phun!                                                         */
+/*                                                                    */
 /**********************************************************************/
 
 #include "global.h"
@@ -74,7 +74,6 @@ static int coff = 0;		/* offset into common block */
 # if defined(USE_SEMS)		/* use semaphores for locking (BEST) */
 				/* when using sems, we use lockword
 				   and lockmesg as counters */
-/* let's try sems.. */
 
 /* we'll use a hack to translate the lock[mesg|word] pointers into
    a semaphore selector */
@@ -109,7 +108,7 @@ void PVUNLOCK(int *lockptr)
   return;
 }
     
-# else /* don't USE_SEMS */  
+# else /* don't USE_SEMS - Bad idea... */  
 
 void PVLOCK(int *lockptr)
 {
@@ -179,6 +178,8 @@ void flush_common(void)
   return;
 }
 
+				/* my malloc wrapper. used only when mapping
+				   the commonblock */
 char *mymalloc(int size) 
   { 
     char *ptr;
@@ -194,14 +195,16 @@ char *mymalloc(int size)
 #if defined(USE_COMMONMLOCK)
 void lock_common(void)
 {
-				/* Lock it in memory */
+				/* Lock it in memory.  this requires the
+				   PLOCK privilege on Unixware. if we
+				   fail, we'll complain to the logfile
+				   and continue... */
 
   if (memcntl((caddr_t)cBasePtr, SIZEOF_COMMONBLOCK,
 	     MC_LOCK, (caddr_t)0, 0, 0) == -1)
     {
       clog("map_common(): couldn't lock the common block: %s, continuing...",
 	   sys_errlist[errno]);
-/*      exit(2);*/
     }
 }
 #endif
@@ -209,14 +212,13 @@ void lock_common(void)
 void map_common(void)
 {
   int cmn_fd;
-  char cmnfile[BUFFER_SIZE];
-  extern char *c_conq_commonblk;
+  static char cmnfile[MID_BUFFER_SIZE];
 
   coff = 0;
   
   umask(0);			/* clear umask, just in case... */
 
-  sprintf(cmnfile, "%s/%s", CONQHOME, c_conq_commonblk);
+  sprintf(cmnfile, "%s/%s", CONQHOME, C_CONQ_COMMONBLK);
 
   if ((cmn_fd = open(cmnfile, O_RDONLY)) == -1)
     {				/* Error or not there...  */
@@ -257,7 +259,7 @@ void map_common(void)
       exit(1);
     }
   
-  /* Now lets mmap() it! */
+  /* Now lets map it */
 
   if ((cBasePtr = mmap((caddr_t) 0, (size_t) SIZEOF_COMMONBLOCK, 
 #if !defined(LINUX)
@@ -268,11 +270,10 @@ void map_common(void)
 		       cmn_fd, 0)) == (caddr_t) -1)
     {
       perror("map_common():mmap()");
-      printf("map_common():mmap(): %s\n", sys_errlist[errno]);
       exit(1);
     }
 
-				/* now map the variables into the common block */
+			/* now map the variables into the common block */
   map1d(commonrev, int, 1);
   map1d(closed, int, 1);
   map1d(lockword, int, 1);
@@ -430,7 +431,7 @@ void map_common(void)
 
 				/* This is used for robots to 'randomize'
 				   their efficiency.  This value will be
-				   set to 0 for normal palyers, but robots
+				   set to 0 for normal players, but robots
 				   will have it set to a random value which
 				   will represent kills.  These 'phantom'
 				   kills will be used in addition to the ship's
@@ -466,4 +467,14 @@ void map_common(void)
 
   return;
 }
+
+void zero_common(void)
+{				/* zero the common block, called from
+				   init everything */
+  cdfill('\0', cBasePtr, SIZEOF_COMMONBLOCK);
+  upchuck();			/* flush the commonblock */
+
+  return;
+}
+
 

@@ -4,17 +4,9 @@
 #
 # $Id$
 #
-# $Log$
-# Revision 1.1  1996/12/27 20:45:41  jon
-# Initial revision
-#
-# Revision 1.1  1996/05/20  01:40:07  jon
-# Initial revision
-#
-#
 ############################################################################
 
-if /bin/grep -q "^conquest:" /etc/group
+if /bin/grep "^conquest:" /etc/group >/dev/null 2>&1 
 then
 	:	# it's there
 else

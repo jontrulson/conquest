@@ -20,7 +20,7 @@
 /* by Jon Trulson <jon@radscan.com> under the same terms and          */
 /* conditions of the original copyright by Jef Poskanzer and Craig    */
 /* Leres.                                                             */
-/* Have Phun!                                                         */
+/*                                                                    */
 /**********************************************************************/
 
 #define NOEXTERN
@@ -28,17 +28,17 @@
 #include "conqcom.h"
 #include "conqcom2.h"
 #include "global.h"
+#include "color.h"
 
 static char *conqoperId = "$Id$";
 
-/*##  conqoper - main program */
+/*  conqoper - main program */
 main(int argc, char *argv[])
 {
   int i;
-  int l;
   char name[MAXUSERNAME];
-  string cpr=COPYRIGHT;
   char msgbuf[128];
+  static int RegenSysConf = FALSE;
 
   extern char *optarg;
   extern int optind;
@@ -54,12 +54,7 @@ main(int argc, char *argv[])
     switch (i)
       {
       case 'C': 
-	GetSysConf(TRUE);		/* init defaults... */
-	if (MakeSysConf() == ERR)
-	  exit(1);
-	else
-	  exit(0);
-	
+	RegenSysConf = TRUE;
         break;
 	
       case '?':
@@ -82,12 +77,50 @@ main(int argc, char *argv[])
       exit(1);
     }
   
+
+  if (RegenSysConf == TRUE)
+    {
+				/* need to be conq grp for this */
+      if (setgid(ConquestGID) == -1)
+	{
+	  clog("conqoper: setgid(%d): %s",
+	       ConquestGID,
+	       sys_errlist[errno]);
+	  fprintf(stderr, "conqoper: setgid(): failed\n");
+	  exit(1);
+	}
+      
+      
+      GetSysConf(TRUE);		/* init defaults... */
+
+      if (MakeSysConf() == ERR)
+	exit(1);
+      else
+	exit(0);
+
+      /* the process must exit in this block. */
+
+    }
+  
+
   if (GetSysConf(FALSE) == ERR)
     {
 #ifdef DEBUG_CONFIG
       clog("%s@%d: main(): GetSysConf() returned ERR.", __FILE__, __LINE__);
 #endif
       /* */
+      ;
+    }
+
+  if (GetConf() == ERR)	/* use one if there, else defaults
+				   A missing or out-of-date conquestrc file
+				   will be ignored */
+    {
+#ifdef DEBUG_CONFIG
+      clog("%s@%d: main(): GetSysConf() returned ERR.", __FILE__, __LINE__);
+#endif
+      /* */
+      ;
     }
   
   if (setgid(ConquestGID) == -1)
@@ -129,9 +162,10 @@ main(int argc, char *argv[])
   
   cunum = MSG_GOD;				/* stow user number */
   csnum = ERR;		/* don't display in cdgetp - JET */
-  cmaxlin = cdlins( 0 );			/* number of lines */
+  cdisplay = TRUE;
+  cmaxlin = cdlins();			/* number of lines */
   
-  cmaxcol = cdcols( 0 );			/* number of columns */
+  cmaxcol = cdcols();			/* number of columns */
 
 				/* send a message telling people
 				   that a user has entered conqoper */
@@ -150,7 +184,7 @@ main(int argc, char *argv[])
 }
 
 
-/*##  bigbang - fire a torp from every ship */
+/*  bigbang - fire a torp from every ship */
 /*  SYNOPSIS */
 /*    bigbang */
 void bigbang(void)
@@ -163,21 +197,23 @@ void bigbang(void)
   for ( snum = 1; snum <= MAXSHIPS; snum = snum + 1 )
     if ( sstatus[snum] == SS_LIVE )
       for ( i = 0; i < MAXTORPS; i = i + 1 )
-	if ( ! launch( snum, dir, 1 ) )
+	if ( ! launch( snum, dir, 1, LAUNCH_NORMAL ) )
 	  break;
 	else
 	  {
 	    dir = mod360( dir + 40.0 );
 	    cnt = cnt + 1;
 	  }
-  cerror("bigbang: Fired %d torpedos, hoo hah won't they be surprised!", cnt );
+  cprintf(MSG_LIN1,0,ALIGN_CENTER, 
+  "#%d#bigbang: Fired #%d#%d #%d#torpedos, hoo hah won't they be surprised!", 
+	InfoColor,SpecialColor,cnt,InfoColor );
   
   return;
   
 }
 
 
-/*##  debugdisplay - verbose and ugly version of display */
+/*  debugdisplay - verbose and ugly version of display */
 /*  SYNOPSIS */
 /*    int snum */
 /*    debugdisplay( snum ) */
@@ -197,7 +233,7 @@ void debugdisplay( int snum )
   /* int scacc(snum)			# accumulated cpu time */
   /* int seacc(snum)			# accumulated elapsed time */
   
-  int i, j, unum, lin, col, tcol, dcol;
+  int i, j, unum, lin, tcol, dcol;
   real x;
   char buf[MSGMAXLINE];
   char *torpstr;
@@ -209,63 +245,64 @@ void debugdisplay( int snum )
 #define TFIREBALL "EXPLODING"
   
   
-  cdclrl( 1, MSG_LIN1 - 1 );		/* don't clear the message lines */
+  cdclrl( 1, MSG_LIN1 - 1 ); 	/* don't clear the message lines */
   unum = suser[snum];
   
   lin = 1;
   tcol = 1;
   dcol = tcol + 10;
-  cdputs( "    ship:", lin, tcol );
+  cprintf(lin,tcol,ALIGN_NONE,"#%d#%s",LabelColor, "    ship:");
   buf[0] = EOS;
   appship( snum, buf );
   if ( srobot[snum] )
     appstr( " (ROBOT)", buf );
-  cdputs( buf, lin, dcol );
-  lin = lin + 1;
-  cdputs( "      sx:", lin, tcol );
-  cdputr( oneplace(sx[snum]), 0, lin, dcol );
-  lin = lin + 1;
-  cdputs( "      sy:", lin, tcol );
-  cdputr( oneplace(sy[snum]), 0, lin, dcol );
-  lin = lin + 1;
-  cdputs( "     sdx:", lin, tcol );
-  cdputr( oneplace(sdx[snum]), 0, lin, dcol );
-  lin = lin + 1;
-  cdputs( "     sdy:", lin, tcol );
-  cdputr( oneplace(sdy[snum]), 0, lin, dcol );
-  lin = lin + 1;
-  cdputs( "  skills:", lin, tcol );
-  cdputr( oneplace(skills[snum] + sstrkills[snum]), 0, lin, dcol );
-  lin = lin + 1;
-  cdputs( "   swarp:", lin, tcol );
+  cprintf( lin, dcol,ALIGN_NONE,"#%d#%s",InfoColor,buf );
+  lin++;
+  cprintf(lin,tcol,ALIGN_NONE,"#%d#%s",LabelColor, "      sx:");
+  cprintf(lin,dcol,ALIGN_NONE,"#%d#%0g",InfoColor, oneplace(sx[snum]));
+  lin++;
+  cprintf(lin,tcol,ALIGN_NONE,"#%d#%s",LabelColor, "      sy:");
+  cprintf(lin,dcol,ALIGN_NONE,"#%d#%0g",InfoColor, oneplace(sy[snum]));
+  lin++;
+  cprintf(lin,tcol,ALIGN_NONE,"#%d#%s",LabelColor, "     sdx:");
+  cprintf(lin,dcol,ALIGN_NONE,"#%d#%0g",InfoColor, oneplace(sdx[snum]));
+  lin++;
+  cprintf(lin,tcol,ALIGN_NONE,"#%d#%s",LabelColor, "     sdy:");
+  cprintf(lin,dcol,ALIGN_NONE,"#%d#%0g",InfoColor, oneplace(sdy[snum]));
+  lin++;
+  cprintf(lin,tcol,ALIGN_NONE,"#%d#%s",LabelColor, "  skills:");
+  cprintf(lin,dcol,ALIGN_NONE,"#%d#%0g",InfoColor, 
+	(oneplace(skills[snum] + sstrkills[snum])));
+  lin++;
+  cprintf(lin,tcol,ALIGN_NONE,"#%d#%s",LabelColor, "   swarp:");
   x = oneplace(swarp[snum]);
   if ( x == ORBIT_CW )
-    cdputs( "ORBIT_CW", lin, dcol );
+    cprintf(lin,dcol,ALIGN_NONE,"#%d#%s",InfoColor, "ORBIT_CW");
   else if ( x == ORBIT_CCW )
-    cdputs( "ORBIT_CCW", lin, dcol );
+    cprintf(lin,dcol,ALIGN_NONE,"#%d#%s",InfoColor, "ORBIT_CCW");
   else
-    cdputr( x, 0, lin, dcol );
-  lin = lin + 1;
-  cdputs( "  sdwarp:", lin, tcol );
-  cdputr( oneplace(sdwarp[snum]), 0, lin, dcol );
-  lin = lin + 1;
-  cdputs( "   shead:", lin, tcol );
-  cdputn( round(shead[snum]), 0, lin, dcol );
-  lin = lin + 1;
-  cdputs( "  sdhead:", lin, tcol );
-  cdputn( round(sdhead[snum]), 0, lin, dcol );
-  lin = lin + 1;
-  cdputs( " sarmies:", lin, tcol );
-  cdputn( sarmies[snum], 0, lin, dcol );
+  	cprintf(lin,dcol,ALIGN_NONE,"#%d#%0g",InfoColor, x);
+  lin++;
+  cprintf(lin,tcol,ALIGN_NONE,"#%d#%s",LabelColor, "  sdwarp:");
+  cprintf(lin,dcol,ALIGN_NONE,"#%d#%0g",InfoColor, oneplace(sdwarp[snum]));
+  lin++;
+  cprintf(lin,tcol,ALIGN_NONE,"#%d#%s",LabelColor, "   shead:");
+  cprintf(lin,dcol,ALIGN_NONE,"#%d#%0d",InfoColor, round(shead[snum]));
+  lin++;
+  cprintf(lin,tcol,ALIGN_NONE,"#%d#%s",LabelColor, "  sdhead:");
+  cprintf(lin,dcol,ALIGN_NONE,"#%d#%0d",InfoColor, round(sdhead[snum]));
+  lin++;
+  cprintf(lin,tcol,ALIGN_NONE,"#%d#%s",LabelColor, " sarmies:");
+  cprintf(lin,dcol,ALIGN_NONE,"#%d#%0d",InfoColor, round(sarmies[snum]));
   
   lin = 1;
   tcol = 23;
   dcol = tcol + 12;
-  cdputs( "      name:", lin, tcol );
+  cprintf(lin,tcol,ALIGN_NONE,"#%d#%s",LabelColor, "      name:");
   if ( spname[snum] != EOS )
-    cdputs( spname[snum], lin, dcol ); /* -[] */
-  lin = lin + 1;
-  cdputs( "  username:", lin, tcol );
+  	cprintf(lin,dcol,ALIGN_NONE,"#%d#%s",InfoColor, spname[snum]);
+  lin++;
+  cprintf(lin,tcol,ALIGN_NONE,"#%d#%s",LabelColor, "  username:");
   buf[0] = EOS;
   if ( unum >= 0 && unum < MAXUSERS )
     {
@@ -276,24 +313,24 @@ void debugdisplay( int snum )
   appchr( '(', buf );
   appint( unum, buf );
   appchr( ')', buf );
-  cdputs( buf, lin, dcol );
-  lin = lin + 1;
-  cdputs( "     slock:", lin, tcol );
-  cdputs( "       dtt:", lin + 1, tcol );
+  cprintf(lin,dcol,ALIGN_NONE,"#%d#%s",InfoColor, buf);
+  lin++;
+  cprintf(lin,tcol,ALIGN_NONE,"#%d#%s",LabelColor, "     slock:");
+  cprintf(lin+1,tcol,ALIGN_NONE,"#%d#%s",LabelColor, "       dtt:");
   i = slock[snum];
   if ( -i >= 1 && -i <= NUMPLANETS )
     {
-      cdputs( pname[-i], lin, dcol );	/* -[] */
-      cdputn( round( dist( sx[snum], sy[snum], px[-i], py[-i] ) ),
-	     0, lin + 1, dcol );
+  	  cprintf(lin,dcol,ALIGN_NONE,"#%d#%s",InfoColor, pname[-i]);
+	  cprintf(lin+1,dcol,ALIGN_NONE,"#%d#%0d",InfoColor,
+		  round( dist( sx[snum], sy[snum], px[-i], py[-i] ) ));
     }
   else if ( i != 0 )
-    cdputn( i, 0, lin, dcol );
-  lin = lin + 2;
-  cdputs( "     sfuel:", lin, tcol );
-  cdputn( round(sfuel[snum]), 0, lin, dcol );
-  lin = lin + 1;
-  cdputs( "       w/e:", lin, tcol );
+  	cprintf(lin,dcol,ALIGN_NONE,"#%d#%0d",InfoColor, i);
+  lin+=2;
+  cprintf(lin,tcol,ALIGN_NONE,"#%d#%s",LabelColor, "     sfuel:");
+  cprintf(lin,dcol,ALIGN_NONE,"#%d#%0d",InfoColor, round(sfuel[snum]));
+  lin++;
+  cprintf(lin,tcol,ALIGN_NONE,"#%d#%s",LabelColor, "       w/e:");
   sprintf( buf, "%d/%d", sweapons[snum], sengines[snum] );
   if ( swfuse[snum] > 0 || sefuse[snum] > 0 )
     {
@@ -303,13 +340,13 @@ void debugdisplay( int snum )
       appint( sefuse[snum], buf );
       appchr( ')', buf );
     }
-  cdputs( buf, lin, dcol );
-  lin = lin + 1;
-  cdputs( "      temp:", lin, tcol );
+  cprintf(lin,dcol,ALIGN_NONE,"#%d#%s",InfoColor, buf);
+  lin++;
+  cprintf(lin,tcol,ALIGN_NONE,"#%d#%s",LabelColor, "      temp:");
   sprintf( buf, "%d/%d", round(swtemp[snum]), round(setemp[snum]) );
-  cdputs( buf, lin, dcol );
-  lin = lin + 1;
-  cdputs( "   ssdfuse:", lin, tcol );
+  cprintf(lin,dcol,ALIGN_NONE,"#%d#%s",InfoColor, buf);
+  lin++;
+  cprintf(lin,tcol,ALIGN_NONE,"#%d#%s",LabelColor, "   ssdfuse:");
   i = ssdfuse[snum];
   buf[0] = EOS;
   if ( i != 0 )
@@ -318,68 +355,70 @@ void debugdisplay( int snum )
     }
   if ( scloaked[snum] )
     appstr( "(CLOAKED)", buf );
-  cdputs( buf, lin, dcol );
-  lin = lin + 1;
-  cdputs( "      spid:", lin, tcol );
+  cprintf(lin,dcol,ALIGN_NONE,"#%d#%s",LabelColor, buf);
+  lin++;
+  cprintf(lin,tcol,ALIGN_NONE,"#%d#%s",LabelColor, "      spid:");
   i = spid[snum];
   if ( i != 0 )
     {
-      sprintf( buf, "%d", i );
-      cdputs( buf, lin, dcol );
+/*      sprintf( buf, "%d", i ); */
+  	  cprintf(lin,dcol,ALIGN_NONE,"#%d#%d",InfoColor, i);
     }
-  lin = lin + 1;
-  cdputs( "slastblast:", lin, tcol );
-  cdputr( oneplace(slastblast[snum]), 0, lin, dcol );
-  lin = lin + 1;
-  cdputs( "slastphase:", lin, tcol );
-  cdputr( oneplace(slastphase[snum]), 0, lin, dcol );
+  lin++;
+  cprintf(lin,tcol,ALIGN_NONE,"#%d#%s",LabelColor, "slastblast:");
+  cprintf(lin,dcol,ALIGN_NONE,"#%d#%0g",InfoColor, oneplace(slastblast[snum]));
+  lin++;
+  cprintf(lin,tcol,ALIGN_NONE,"#%d#%s",LabelColor, "slastphase:");
+  cprintf(lin,dcol,ALIGN_NONE,"#%d#%0g",InfoColor, oneplace(slastphase[snum]));
   
   lin = 1;
   tcol = 57;
   dcol = tcol + 12;
-  cdputs( "   sstatus:", lin, tcol );
+  cprintf(lin,tcol,ALIGN_NONE,"#%d#%s",LabelColor, "   sstatus:");
   buf[0] = EOS;
   appsstatus( sstatus[snum], buf );
-  cdputs( buf, lin, dcol );
-  lin = lin + 1;
-  cdputs( " skilledby:", lin, tcol );
+  cprintf(lin,dcol,ALIGN_NONE,"#%d#%s",InfoColor, buf);
+  lin++;
+  cprintf(lin,tcol,ALIGN_NONE,"#%d#%s",LabelColor, " skilledby:");
   i = skilledby[snum];
   if ( i != 0 )
     {
       buf[0] = EOS;
       appkb( skilledby[snum], buf );
-      cdputs( buf, lin, dcol );
+	  cprintf(lin,dcol,ALIGN_NONE,"#%d#%s",InfoColor, buf);
     }
-  lin = lin + 1;
-  cdputs( "   shields:", lin, tcol );
-  cdputn( round(sshields[snum]), 0, lin, dcol );
+  lin++;
+  cprintf(lin,tcol,ALIGN_NONE,"#%d#%s",LabelColor, "   shields:");
+  cprintf(lin,dcol,ALIGN_NONE,"#%d#%0d",InfoColor, round(sshields[snum]));
   if ( ! sshup[snum] )
-    cdput( 'D', lin, dcol+5 );
-  lin = lin + 1;
-  cdputs( "   sdamage:", lin, tcol );
-  cdputn( round(sdamage[snum]), 0, lin, dcol );
+  	cprintf(lin,dcol+5,ALIGN_NONE,"#%d#%c",InfoColor, 'D');
+  else
+  	cprintf(lin,dcol+5,ALIGN_NONE,"#%d#%c",InfoColor, 'U');
+  lin++;
+  cprintf(lin,tcol,ALIGN_NONE,"#%d#%s",LabelColor, "   sdamage:");
+  cprintf(lin,dcol,ALIGN_NONE,"#%d#%0d",InfoColor, round(sdamage[snum]));
   if ( srmode[snum] )
-    cdput( 'R', lin, dcol+5 );
-  lin = lin + 1;
-  cdputs( "  stowedby:", lin, tcol );
+  	cprintf(lin,dcol+5,ALIGN_NONE,"#%d#%c",InfoColor, 'R');
+  lin++;
+  cprintf(lin,tcol,ALIGN_NONE,"#%d#%s",LabelColor, "  stowedby:");
   i = stowedby[snum];
   if ( i != 0 )
     {
       buf[0] = EOS;
       appship( i, buf );
-      cdputs( buf, lin, dcol );
+  	  cprintf(lin,dcol,ALIGN_NONE,"#%d#%s",InfoColor, buf);
     }
-  lin = lin + 1;
-  cdputs( "   stowing:", lin, tcol );
+  lin++;
+  cprintf(lin,tcol,ALIGN_NONE,"#%d#%s",LabelColor, "   stowing:");
   i = stowing[snum];
   if ( i != 0 )
     {
       buf[0] = EOS;
       appship( i, buf );
-      cdputs( buf, lin, dcol );
+  	  cprintf(lin,dcol,ALIGN_NONE,"#%d#%s",InfoColor, buf);
     }
-  lin = lin + 1;
-  cdputs( "      swar:", lin, tcol );
+  lin++;
+  cprintf(lin,tcol,ALIGN_NONE,"#%d#%s",LabelColor, "      swar:");
   buf[0] = '(';
   for ( i = 0; i < NUMTEAMS; i = i + 1 )
     if ( swar[snum][i] )
@@ -389,10 +428,10 @@ void debugdisplay( int snum )
   buf[NUMTEAMS+1] = ')';
   buf[NUMTEAMS+2] = EOS;
   fold( buf );
-  cdputs( buf, lin, dcol );
+  cprintf(lin,dcol,ALIGN_NONE,"#%d#%s",InfoColor, buf);
   
-  lin = lin + 1;
-  cdputs( "     srwar:", lin, tcol );
+  lin++;
+  cprintf(lin,tcol,ALIGN_NONE,"#%d#%s",LabelColor, "     srwar:");
   buf[0] = '(';
   for ( i = 0; i < NUMTEAMS; i = i + 1 )
     if ( srwar[snum][i] )
@@ -401,43 +440,42 @@ void debugdisplay( int snum )
       buf[i+1] = '-';
   buf[NUMTEAMS+1] = ')';
   buf[NUMTEAMS+2] = EOS;
-  cdputs( buf, lin, dcol );
+  cprintf(lin,dcol,ALIGN_NONE,"#%d#%s",InfoColor, buf);
   
-  lin = lin + 1;
-  cdputs( "   soption:", lin, tcol );
+  lin++;
+  cprintf(lin,tcol,ALIGN_NONE,"#%d#%s",LabelColor, "   soption:");
   c_strcpy( "(gpainte)", buf );
   for ( i = 0; i < MAXOPTIONS; i = i + 1 )
     if ( soption[snum][i] )
-      buf[i+1] = cupper(buf[i+1]);
-  cdputs( buf, lin, dcol );
+      buf[i+1] = (char)toupper(buf[i+1]);
+  cprintf(lin,dcol,ALIGN_NONE,"#%d#%s",InfoColor, buf);
   
-  lin = lin + 1;
-  cdputs( "   uoption:", lin, tcol );
+  lin++;
+  cprintf(lin,tcol,ALIGN_NONE,"#%d#%s",LabelColor, "   uoption:");
   if ( unum >= 0 && unum < MAXUSERS )
     {
       c_strcpy( "(gpainte)", buf );
       for ( i = 0; i < MAXOPTIONS; i = i + 1 )
-	if ( uoption[unum,i] )
-	  buf[i+1] = cupper(buf[i+1]);
-      cdputs( buf, lin, dcol );
+	if ( uoption[unum][i] )
+	  buf[i + 1] = (char)toupper(buf[i + 1]);
+      cprintf(lin,dcol,ALIGN_NONE,"#%d#%s",InfoColor, buf);
     }
   
-  lin = lin + 1;
-  cdputs( "   saction:", lin, tcol );
+  lin++;
+  cprintf(lin,tcol,ALIGN_NONE,"#%d#%s",LabelColor, "   saction:");
   i = saction[snum];
   if ( i != 0 )
     {
       robstr( i, buf );
-      cdputs( buf, lin, dcol );
+	  cprintf(lin,dcol,ALIGN_NONE,"#%d#%s",InfoColor, buf);
     }
   
-  lin = cmaxlin - MAXTORPS - 2;
-  cdputs(
-	 "tstatus    tfuse    tmult       tx       ty      tdx      tdy     twar",
-	 lin, 3 );
+  lin = (cmaxlin - (cmaxlin - MSG_LIN1)) - (MAXTORPS+1);  /* dwp */
+  cprintf(lin,3,ALIGN_NONE,"#%d#%s",LabelColor,
+	 "tstatus    tfuse    tmult       tx       ty      tdx      tdy     twar");
   for ( i = 0; i < MAXTORPS; i = i + 1 )
     {
-      lin = lin + 1;
+      lin++;
       switch(tstatus[snum][i])
 	{
 	case TS_OFF:
@@ -456,16 +494,15 @@ void debugdisplay( int snum )
 	  torpstr = TFIREBALL;
 	  break;
 	}
-      
-      cdputs(torpstr, lin, 3);
+	  cprintf(lin,3,ALIGN_NONE,"#%d#%s",InfoColor, torpstr);
       if ( tstatus[snum][i] != TS_OFF )
 	{
-	  cdputn( tfuse[snum][i], 6, lin, 13 );
-	  cdputr( oneplace(tmult[snum][i]), 9, lin, 19 );
-	  cdputr( oneplace(tx[snum][i]), 9, lin, 28 );
-	  cdputr( oneplace(ty[snum][i]), 9, lin, 37 );
-	  cdputr( oneplace(tdx[snum][i]), 9, lin, 46 );
-	  cdputr( oneplace(tdy[snum][i]), 9, lin, 55 );
+	  cprintf(lin,13,ALIGN_NONE,"#%d#%6d",InfoColor, tfuse[snum][i]);
+	  cprintf(lin,19,ALIGN_NONE,"#%d#%9g",InfoColor, oneplace(tmult[snum][i]));
+	  cprintf(lin,28,ALIGN_NONE,"#%d#%9g",InfoColor, oneplace(tx[snum][i]));
+	  cprintf(lin,37,ALIGN_NONE,"#%d#%9g",InfoColor, oneplace(ty[snum][i]));
+	  cprintf(lin,46,ALIGN_NONE,"#%d#%9g",InfoColor, oneplace(tdx[snum][i]));
+	  cprintf(lin,55,ALIGN_NONE,"#%d#%9g",InfoColor, oneplace(tdy[snum][i]));
 	  buf[0] = '(';
 	  for ( j = 0; j < NUMTEAMS; j++ )
 	    if ( twar[snum][i][j] )
@@ -474,162 +511,185 @@ void debugdisplay( int snum )
 	      buf[j+1] = '-';
 	  buf[NUMTEAMS+1] = ')';
 	  buf[NUMTEAMS+2] = EOS;
-	  cdputs( buf, lin, 67 );
+	  cprintf(lin,67,ALIGN_NONE,"#%d#%s",InfoColor, buf);
 	}
     }
   
   cdmove( 1, 1 );
-  cdrefresh( TRUE );
+  cdrefresh();
   
   return;
   
 }
 
 
-/*##  debugplan - debugging planet list */
+/*  debugplan - debugging planet list */
 /*  SYNOPSIS */
 /*    debugplan */
 void debugplan(void)
 {
   
-  int i, j, k, lin, col, olin;
-  int l;
-  static int init = FALSE, sv[NUMPLANETS + 1];
+  int i, j, k, cmd, lin, col, olin;
+  int outattr;
+  static int sv[NUMPLANETS + 1];
   char buf[MSGMAXLINE], junk[10], uninhab[20];
-  
-  string hd="planet        C T arm uih scan        planet        C T arm uih scan";
-  
-  if ( init == FALSE )
+  char hd0[MSGMAXLINE*4];
+  char *hd1="D E B U G G I N G  P L A N E T   L I S T";
+  string hd2="planet        C T arm uih scan        planet        C T arm uih scan";
+  char hd3[BUFFER_SIZE];
+  int FirstTime = TRUE;
+  int PlanetOffset;             /* offset into NUMPLANETS for this page */
+  int PlanetIdx = 0;
+  int Done;
+
+
+  if (FirstTime == TRUE)
     {
+      FirstTime = FALSE;
+      sprintf(hd0,
+	      "#%d#%s#%d#%s#%d#%s#%d#%s",
+	      LabelColor,
+		  hd1,
+	      InfoColor,
+		  "  ('",
+	      SpecialColor,
+		  "-", 
+	      InfoColor,
+		  "' = hidden)");
+
       for ( i = 1; i <= NUMPLANETS; i = i + 1 )
 	sv[i] = i;
-      init = TRUE;
       sortplanets( sv );
     }
   
+  strcpy( hd3, hd2 );
+  for ( i = 0; hd3[i] != EOS; i++ )
+    if ( hd3[i] != ' ' )
+      hd3[i] = '-';
+
+  PlanetIdx = 0;
+
+  PlanetOffset = 1;
   cdclear();
-  c_strcpy( hd, buf );
-  lin = 1;
-  cdputc( buf, lin );
-  for ( i = 0; buf[i] != EOS; i = i + 1 )
-    if ( buf[i] != ' ' )
-      buf[i] = '-';
-  lin = lin + 1;
-  cdputc( buf, lin );
-  lin = lin + 1;
-  olin = lin;
-  col = 6;
-  for ( i = 1; i <= NUMPLANETS; i = i + 1 )
+  Done = FALSE;
+  
+  cdclear();
+  
+  Done = FALSE;
+  do
     {
-      k = sv[i];
+      cdclra(0, 0, MSG_LIN1 + 2, cdcols() - 1);
+      PlanetIdx = 0;
       
-      for ( j = 0; j < NUMTEAMS; j = j + 1 )
-	if ( pscanned[k][j] && (j >= 0 && j < NUMTEAMS) )
-	  junk[j] = chrteams[j];
-	else
-	  junk[j] = '-';
-      junk[j] = EOS;
-      j = puninhabtime[k];
-      if ( j != 0 )
-	sprintf( uninhab, "%d", j );
+      lin = 1;
+      
+      cprintf(lin,0,ALIGN_CENTER,"%s", hd0 );
+      
+      lin++;
+      cprintf( lin,0,ALIGN_CENTER,"#%d#%s", LabelColor, hd2 );
+      lin++;
+      cprintf( lin,0,ALIGN_CENTER,"#%d#%s", LabelColor, hd3 );
+      lin++;
+      olin = lin;
+      col = 6;
+      
+      PlanetIdx = 0;
+      
+      if (PlanetOffset <= NUMPLANETS)
+        {
+          while ((PlanetOffset + PlanetIdx) <= NUMPLANETS)
+            {
+              i = PlanetOffset + PlanetIdx;
+              PlanetIdx++;
+              k = sv[i];
+	      
+	      for ( j = 0; j < NUMTEAMS; j++ )
+		if ( pscanned[k][j] && (j >= 0 && j < NUMTEAMS) )
+		  junk[j] = chrteams[j];
+		else
+		  junk[j] = '-';
+	      junk[j] = EOS;
+	      j = puninhabtime[k];
+	      if ( j != 0 )
+		sprintf( uninhab, "%d", j );
+	      else
+		uninhab[0] = EOS;
+	      
+	      switch(ptype[k])
+		{
+		case PLANET_SUN:
+		  outattr = RedLevelColor;
+		  break;
+		case PLANET_CLASSM:
+		  outattr = GreenLevelColor;
+		  break;
+		case PLANET_DEAD:
+		  outattr = YellowLevelColor;
+		  break;
+		case PLANET_CLASSA:
+		case PLANET_CLASSO:
+		case PLANET_CLASSZ:
+		  outattr = A_BOLD;
+		  break;
+		case PLANET_GHOST:
+		  outattr = NoColor;
+		  break;
+		default:
+		  outattr = SpecialColor;
+		  break;
+		}
+		  
+	      cprintf(lin,col,ALIGN_NONE,"#%d#%-13s %c %c %3d %3s %4s",
+		      outattr,pname[k], chrplanets[ptype[k]], chrteams[pteam[k]],
+		      parmies[k], uninhab, junk );
+	      
+	      if ( ! preal[k] )
+		cprintf(lin,col-2,ALIGN_NONE, "#%d#%c", SpecialColor, '-');
+	      
+	      lin++;
+	      if ( lin == MSG_LIN2 )
+		{
+		  if (col == 44)
+		    break;	/* out of while */
+		  lin = olin;
+		  col = 44;
+		}
+	      attrset(0);
+	    } /* while */
+	  
+	  putpmt( "--- press [SPACE] to continue, q to quit ---", MSG_LIN2 );
+          cdrefresh();
+	  
+          if (iogtimed( &cmd, 1 ))
+            {                   /* got a char */
+              if (cmd == 'q' || cmd == 'Q' || cmd == TERM_ABORT)
+                {               /* quit */
+                  Done = TRUE;
+                }
+              else
+                {               /* some other key... */
+		  /* setup for new page */
+                  PlanetOffset += PlanetIdx;
+                  if (PlanetOffset > NUMPLANETS)
+                    {           /* pointless to continue */
+                      Done = TRUE;
+                    }
+                }
+            }
+	  
+	  /* didn't get a char, update */
+        } /* if PlanetOffset <= NUMPLANETS */
       else
-	uninhab[0] = EOS;
-      sprintf( buf, "%-13s %c %c %3d %3s %4s",
-	     pname[k], chrplanets[ptype[k]], chrteams[pteam[k]],
-	     parmies[k], uninhab, junk );
+	Done = TRUE;            /* else PlanetOffset > NUMPLANETS */
       
-      cdputs( buf, lin, col );
-      if ( ! preal[k] )
-	cdput( '-', lin, col - 1 );
-      
-      lin = lin + 1;
-      if ( lin == MSG_LIN1 )
-	{
-	  lin = olin;
-	  col = 44;
-	}
-    }
-  
-  while (!more( "-- press SPACE to continue --" ))
-    ;
+    } while(Done != TRUE); /* do */
   
   return;
   
 }
 
 
-/*##  doomdisplay - watch the doomsday machine */
-/*  SYNOPSIS */
-/*    doomdisplay */
-void doomdisplay(void)
-{
-  
-  int i, lin, col, dcol;
-  char buf[MSGMAXLINE];
-  
-  cdclear();
-  
-  lin = 1;
-  col = 1;
-  c_strcpy( dname, buf );
-  if ( *dtype != 0 )
-    {
-      appchr( '(', buf );
-      appint( *dtype, buf );
-      appchr( ')', buf );
-    }
-  cdputc( buf, 1 );
-  
-  lin = lin + 2;
-  dcol = col + 11;
-  cdputs( "  dstatus:", lin, col );
-  cdputn( *dstatus, 0, lin, dcol );
-  lin = lin + 1;
-  cdputs( "       dx:", lin, col );
-  cdputr( oneplace(*dx), 0, lin, dcol );
-  lin = lin + 1;
-  cdputs( "       dy:", lin, col );
-  cdputr( oneplace(*dy), 0, lin, dcol );
-  lin = lin + 1;
-  cdputs( "      ddx:", lin, col );
-  cdputr( oneplace(*ddx), 0, lin, dcol );
-  lin = lin + 1;
-  cdputs( "      ddy:", lin, col );
-  cdputr( oneplace(*ddy), 0, lin, dcol );
-  lin = lin + 1;
-  cdputs( "    dhead:", lin, col );
-  cdputn( round(*dhead), 0, lin, dcol );
-  lin = lin + 1;
-  cdputs( "    dlock:", lin, col );
-  cdputs( "      ddt:", lin+1, col );
-  i = *dlock;
-  if ( -i > 0 && -i <= NUMPLANETS )
-    {
-      cdputs( pname[-i], lin, dcol );	/* -[] */
-      cdputn( round( dist( *dx, *dy, px[-i], py[-i] ) ),
-	     0, lin + 1, dcol );
-    }
-  else if ( i > 0 && i <= MAXSHIPS )
-    {
-      buf[0] = EOS;
-      appship( i, buf );
-      cdputs( buf, lin, dcol );
-      cdputn( round( dist( *dx, *dy, sx[i], sy[i] ) ),
-	     0, lin + 1, dcol );
-    }
-  else
-    cdputn( i, 0, lin + 1, dcol );
-  
-  lin = lin + 2;
-  
-  cdmove( 1, 1 );
-  
-  return;
-  
-}
-
-
-/*##  gplanmatch - GOD's check if a string matches a planet name */
+/*  gplanmatch - GOD's check if a string matches a planet name */
 /*  SYNOPSIS */
 /*    int gplanmatch, pnum */
 /*    char str() */
@@ -639,7 +699,7 @@ int gplanmatch( char str[], int *pnum )
 {
   int i;
   
-  if ( alldig( str ) == YES )
+  if ( alldig( str ) == TRUE )
     {
       i = 0;
       if ( ! safectoi( pnum, str, i ) )
@@ -655,32 +715,58 @@ int gplanmatch( char str[], int *pnum )
 }
 
 
-/*##  kiss - give the kiss of death */
+/*  kiss - give the kiss of death */
 /*  SYNOPSIS */
 /*    kiss */
-void kiss(void)
+void kiss(int snum, int prompt_flg)
 {
   
-  int i, snum, unum;
-  char ch, buf[MSGMAXLINE];
-  int l, didany;
-  
+  int i, unum;
+  char ch, buf[MSGMAXLINE], mbuf[MSGMAXLINE], ssbuf[MSGMAXLINE];
+  int didany;
+  char *prompt_str = "Kill what (<cr> for driver)? ";
+  char *kill_driver_str = "Killing the driver."; 
+  char *cant_kill_ship_str = "You can't kill ship %c%d (%s) status (%s).";
+  char *kill_ship_str1 = "Killing ship %c%d (%s).";
+  char *kill_ship_str2 = "Killing ship %c%d (%s) user (%s).";
+  char *nobody_str = "Nobody here but us GODs.";
+  char *no_user_str = "No such user.";
+  char *no_ship_str = "No such ship.";
+  char *not_flying_str = "User %s (%s) isn't flying right now.";
+
   /* Find out what to kill. */
-  cdclrl( MSG_LIN1, 2 );
-  ch = cdgetx( "Kill what (<cr> for driver)? ", MSG_LIN1, 1,
-	      TERMS, buf, MSGMAXLINE );
-  if ( ch == TERM_ABORT )
+  if (prompt_flg)
     {
-      cdclrl( MSG_LIN1, 1 );
-      cdmove( 1, 1 );
-      return;
+      cdclrl( MSG_LIN1, 2 );
+      if (snum == 0)
+	buf[0] = EOS;
+      else
+	sprintf(buf, "%d", snum);
+
+      ch = (char)cdgetx( prompt_str, MSG_LIN1, 1, TERMS, buf, MSGMAXLINE );
+      if ( ch == TERM_ABORT )
+	{
+	  cdclrl( MSG_LIN1, 1 );
+	  cdmove( 1, 1 );
+	  return;
+	}
+      delblanks( buf );
     }
-  delblanks( buf );
+  else 
+    {
+      if (snum == 0)
+	return;
+      else
+	sprintf(buf,"%d",snum);
+    }
   
   /* Kill the driver? */
   if ( buf[0] == EOS )
     {
-      if ( confirm( 0 ) )
+      cdclrl( MSG_LIN1, 1 ); 
+      sprintf(mbuf,"%s", kill_driver_str);
+      cdputs( mbuf, MSG_LIN1, 1 );
+      if ( confirm() )
 	if ( *drivstat == DRS_RUNNING )
 	  *drivstat = DRS_KAMIKAZE;
       cdclrl( MSG_LIN1, 2 );
@@ -689,18 +775,31 @@ void kiss(void)
     }
   
   /* Kill a ship? */
-  if ( alldig( buf ) == YES )
+  if ( alldig( buf ) == TRUE )
     {
       i = 0;
-      l = safectoi( &snum, buf, i );		/* ignore status */
+      safectoi( &snum, buf, i );		/* ignore status */
       if ( snum < 1 || snum > MAXSHIPS )
-	cdputs( "No such ship.", MSG_LIN2, 1 );
-      else if ( sstatus[snum] != SS_LIVE )
-	cdputs( "You can't kill that ship.", MSG_LIN2, 1 );
-      else if ( confirm( 0 ) )
-	{
-	  killship( snum, KB_GOD );
-	  cdclrl( MSG_LIN1, 2 );
+		cdputs( no_ship_str, MSG_LIN2, 1 );
+      else if ( sstatus[snum] != SS_LIVE ) {
+		cdclrl( MSG_LIN1, 1 );
+	    ssbuf[0] = EOS; 
+	    appsstatus( sstatus[snum], ssbuf);
+		sprintf(mbuf, cant_kill_ship_str,
+			chrteams[steam[snum]], snum, spname[snum], ssbuf);
+	    cdputs( mbuf, MSG_LIN1, 1 );
+	  }
+      else {
+		  cdclrl( MSG_LIN1, 1 );
+		  sprintf(mbuf, kill_ship_str1,
+			chrteams[steam[snum]], snum, spname[snum]);
+	      cdputs( mbuf, MSG_LIN1, 1 );
+		  if ( confirm() )
+		  {
+			  killship( snum, KB_GOD );
+			  cdclrl( MSG_LIN2, 1 );
+		  }
+		  cdclrl( MSG_LIN1, 1 );
 	}
       cdmove( 1, 1 );
       return;
@@ -710,21 +809,21 @@ void kiss(void)
   if ( stmatch( buf, "all", FALSE ) )
     {
       didany = FALSE;
-      for ( snum = 1; snum <= MAXSHIPS; snum = snum + 1 )
+      for ( snum = 1; snum <= MAXSHIPS; snum++ )
 	if ( sstatus[snum] == SS_LIVE )
 	  {
 	    didany = TRUE;
 	    cdclrl( MSG_LIN1, 1 );
-	    c_strcpy( "Kill ship ", buf );
-	    appship( snum, buf );
+		sprintf(buf, kill_ship_str1,
+			chrteams[steam[snum]], snum, spname[snum]);
 	    cdputs( buf, MSG_LIN1, 1 );
-	    if ( confirm( 0 ) )
+	    if ( confirm() )
 	      killship( snum, KB_GOD );
 	  }
       if ( didany )
 	cdclrl( MSG_LIN1, 2 );
       else
-	cdputs( "Nobody here but us GODs.", MSG_LIN2, 1 );
+	cdputs( nobody_str, MSG_LIN2, 1 );
       cdmove( 1, 1 );
       return;
     }
@@ -732,27 +831,30 @@ void kiss(void)
   /* Kill a user? */
   if ( ! gunum( &unum, buf ) )
     {
-      cdputs( "No such user.", MSG_LIN2, 1 );
+      cdputs( no_user_str, MSG_LIN2, 1 );
       cdmove( 0, 0 );
       return;
     }
   
   /* Yes. */
   didany = FALSE;
-  for ( snum = 1; snum <= MAXSHIPS; snum = snum + 1 )
+  for ( snum = 1; snum <= MAXSHIPS; snum++ )
     if ( sstatus[snum] == SS_LIVE )
       if ( suser[snum] == unum )
 	{
 	  didany = TRUE;
 	  cdclrl( MSG_LIN1, 1 );
-	  c_strcpy( "Kill ship ", buf );
-	  appship( snum, buf );
-	  cdputs( buf, MSG_LIN1, 1 );
-	  if ( confirm( 0 ) )
+	  sprintf(mbuf, kill_ship_str2,
+		chrteams[steam[snum]], snum, spname[snum], buf);
+	  cdputs( mbuf, MSG_LIN1, 1 );
+	  if ( confirm() )
 	    killship( snum, KB_GOD );
 	}
-  if ( ! didany )
-    cdputs( "That user isn't flying right now.", MSG_LIN2, 1 );
+  if ( ! didany ) {
+	cdclrl( MSG_LIN1, 1 );
+	sprintf(mbuf, not_flying_str, cuname[unum], upname[unum]);
+	cdputs( mbuf, MSG_LIN1, 1 );
+  }
   else
     cdclrl( MSG_LIN1, 2 );
   
@@ -761,112 +863,137 @@ void kiss(void)
 }
 
 
-/*##  opback - put up the background for the operator program */
+/*  opback - put up the background for the operator program */
 /*  SYNOPSIS */
 /*    int lastrev, savelin */
 /*    opback( lastrev, savelin ) */
 void opback( int lastrev, int *savelin )
 {
   int i, lin, col;
-#include "conqcom2.h"
+  char cbuf[MSGMAXLINE];
+  extern char *ConquestVersion;
+  extern char *ConquestDate;
   
+  int FirstTime = TRUE;
+  static char sfmt[MSGMAXLINE * 2];
+
+  if (FirstTime == TRUE)
+    {
+      FirstTime = FALSE;
+      sprintf(sfmt,
+	      "#%d#(#%d#%%c#%d#) - %%s",
+	      LabelColor,
+	      InfoColor,
+	      LabelColor);
+	}
+
   cdclear();
   
-  lin = 2;
-  if ( lastrev == COMMONSTAMP )
+  lin = 1;
+  if ( lastrev == COMMONSTAMP ) {
+    attrset(NoColor|A_BOLD);
     cdputc( "CONQUEST OPERATOR PROGRAM", lin );
+    attrset(YellowLevelColor);
+    sprintf( cbuf, "%s (%s)",
+	   ConquestVersion, ConquestDate);
+    cdputc( cbuf, lin+1 );
+  }
   else
     {
+      attrset(RedLevelColor);
       sprintf( cbuf, "CONQUEST COMMON BLOCK MISMATCH %d != %d",
-	     lastrev, COMMONSTAMP );
+	       lastrev, COMMONSTAMP );
       cdputc( cbuf, lin );
+      attrset(0);
     }
+
+  EnableSignalHandler();	/* enable trapping of interesting signals */
+
+  lin++;
   
-  lin = lin + 2;
+  lin+=2;
   *savelin = lin;
-  lin = lin + 3;
+  lin+=3;
   
-  cdputc( "Options:", lin );
-  lin = lin + 2;
+  cprintf(lin,0,ALIGN_CENTER,"#%d#%s",LabelColor, "Options:");
+  lin+=2;
   i = lin;
   
   col = 5;
-  cdputs( "(f) - flip the open/closed flag", lin, col );
-  lin = lin + 1;
-  cdputs( "(d) - flip the doomsday machine!", lin, col );
-  lin = lin + 1;
-  cdputs( "(h) - hold the driver", lin, col );
-  lin = lin + 1;
-  cdputs( "(I) - initialize", lin, col );
-  lin = lin + 1;
-  cdputs( "(b) - big bang", lin, col );
-  lin = lin + 1;
-  cdputs( "(H) - user history", lin, col );
-  lin = lin + 1;
-  cdputs( "(/) - player list", lin, col );
-  lin = lin + 1;
-  cdputs( "(\\) - full player list", lin, col );
-  lin = lin + 1;
-  cdputs( "(?) - planet list", lin, col );
-  lin = lin + 1;
-  cdputs( "($) - debugging planet list", lin, col );
-  lin = lin + 1;
-  cdputs( "(p) - edit a planet", lin, col );
-  lin = lin + 1;
-  cdputs( "(w) - watch a ship", lin, col );
-  lin = lin + 1;
-  cdputs( "(i) - info", lin, col );
+  cprintf(lin,col,ALIGN_NONE,sfmt, 'f', "flip the open/closed flag");
+  lin++;
+  cprintf(lin,col,ALIGN_NONE,sfmt, 'd', "flip the doomsday machine!");
+  lin++;
+  cprintf(lin,col,ALIGN_NONE,sfmt, 'h', "hold the driver");
+  lin++;
+  cprintf(lin,col,ALIGN_NONE,sfmt, 'I', "initialize");
+  lin++;
+  cprintf(lin,col,ALIGN_NONE,sfmt, 'b', "big bang");
+  lin++;
+  cprintf(lin,col,ALIGN_NONE,sfmt, 'H', "user history");
+  lin++;
+  cprintf(lin,col,ALIGN_NONE,sfmt, '/', "player list");
+  lin++;
+  cprintf(lin,col,ALIGN_NONE,sfmt, '\\', "full player list");
+  lin++;
+  cprintf(lin,col,ALIGN_NONE,sfmt, '?', "planet list");
+  lin++;
+  cprintf(lin,col,ALIGN_NONE,sfmt, '$', "debugging planet list");
+  lin++;
+  cprintf(lin,col,ALIGN_NONE,sfmt, 'p', "edit a planet");
+  lin++;
+  cprintf(lin,col,ALIGN_NONE,sfmt, 'w', "watch a ship");
+  lin++;
+  cprintf(lin,col,ALIGN_NONE,sfmt, 'i', "info");
   
   lin = i;
   col = 45;
-  cdputs( "(r) - create a robot ship", lin, col );
-  lin = lin + 1;
-  cdputs( "(L) - review messages", lin, col );
-  lin = lin + 1;
-  cdputs( "(m) - message from GOD", lin, col );
-  lin = lin + 1;
-  cdputs( "(T) - team stats", lin, col );
-  lin = lin + 1;
-  cdputs( "(U) - user stats", lin, col );
-  lin = lin + 1;
-  cdputs( "(S) - more user stats", lin, col );
-  lin = lin + 1;
-  cdputs( "(s) - special stats page", lin, col );
-  lin = lin + 1;
-  cdputs( "(a) - add a user", lin, col );
-  lin = lin + 1;
-  cdputs( "(e) - edit a user", lin, col );
-  lin = lin + 1;
-  cdputs( "(R) - resign a user", lin, col );
-  lin = lin + 1;
-  cdputs( "(k) - kiss of death", lin, col );
-  lin = lin + 1;
-  cdputs( "(q) - exit", lin, col );
+  cprintf(lin,col,ALIGN_NONE,sfmt, 'r', "create a robot ship");
+  lin++;
+  cprintf(lin,col,ALIGN_NONE,sfmt, 'L', "review messages");
+  lin++;
+  cprintf(lin,col,ALIGN_NONE,sfmt, 'm', "message from GOD");
+  lin++;
+  cprintf(lin,col,ALIGN_NONE,sfmt, 'T', "team stats");
+  lin++;
+  cprintf(lin,col,ALIGN_NONE,sfmt, 'U', "user stats");
+  lin++;
+  cprintf(lin,col,ALIGN_NONE,sfmt, 'S', "more user stats");
+  lin++;
+  cprintf(lin,col,ALIGN_NONE,sfmt, 's', "special stats page");
+  lin++;
+  cprintf(lin,col,ALIGN_NONE,sfmt, 'a', "add a user");
+  lin++;
+  cprintf(lin,col,ALIGN_NONE,sfmt, 'e', "edit a user");
+  lin++;
+  cprintf(lin,col,ALIGN_NONE,sfmt, 'R', "resign a user");
+  lin++;
+  cprintf(lin,col,ALIGN_NONE,sfmt, 'k', "kiss of death");
+  lin++;
+  cprintf(lin,col,ALIGN_NONE,sfmt, 'q', "exit");
   
   return;
   
 }
 
-
-/*##  operate - main part of the conquest operator program */
+/*  operate - main part of the conquest operator program */
 /*  SYNOPSIS */
 /*    operate */
 void operate(void)
 {
   
-  int i, lin, savelin, cntlockword, cntlockmesg;
+  int i, lin, savelin;
   int redraw, now, readone;
   int lastrev, msgrand;
   char buf[MSGMAXLINE], junk[MSGMAXLINE];
+  char xbuf[MSGMAXLINE];
   int ch;
-  int l;
   
   *glastmsg = *lastmsg;
   glname( buf );
   if ( gunum( &i, buf ) )
     uooption[i][MAXOOPTIONS] = TRUE;
-  cntlockword = 0;
-  cntlockmesg = 0;
+
   lastrev = *commonrev;
   grand( &msgrand );
   
@@ -880,106 +1007,130 @@ void operate(void)
 	  redraw = FALSE;
 	}
       /* Line 1. */
-      c_strcpy( "game ", buf );
-      if ( *closed )
-	appstr( "CLOSED", buf );
-      else
-	appstr( "open", buf );
-      appstr( ", driver ", buf );
-      switch ( *drivstat )
-	{
-	case DRS_OFF:
-	  appstr( "OFF", buf );
-	  break;
-	case DRS_RESTART:
-	  appstr( "RESTART", buf );
-	  break;
-	case DRS_STARTING:
-	  appstr( "STARTING", buf );
-	  break;
-	case DRS_HOLDING:
-	  appstr( "HOLDING", buf );
-	  break;
-	case DRS_RUNNING:
-	  appstr( "on", buf );
-	  break;
-	case DRS_KAMIKAZE:
-	  appstr( "KAMIKAZE", buf );
-	  break;
-	default:
-	  appstr( "???", buf );
-	}
-      appstr( ", eater ", buf );
-      i = *dstatus;
-      if ( i == DS_OFF )
-	appstr( "off", buf );
-      else if ( i == DS_LIVE )
-	{
-	  appstr( "ON (", buf );
-	  i = *dlock;
-	  if ( -i > 0 && -i <= NUMPLANETS )
-	    appstr( pname[-i], buf );
-	  else
-	    appship( i, buf );		/* this will handle funny numbers */
-	  appchr( ')', buf );
-	}
-      else
-	appstr( "???", buf );
-      lin = savelin;
-      cdclrl( lin, 1 );
-      cdputc( buf, lin );
-      
-      /* Line 2. */
-#ifdef USE_SEMS
-      strcpy(buf, GetSemVal(0));
-#else
-      c_strcpy( "lockword", buf );
-      if ( *lockword == 0 )
-	cntlockword = 0;
-      else if ( cntlockword < 5 )
-	cntlockword = cntlockword + 1;
-      else
-	upper( buf );
-      c_strcpy( buf, junk );
-      appstr( " = %d, ", junk );
-      
-      c_strcpy( "lockmesg", buf );
-      if ( *lockmesg == 0 )
-	cntlockmesg = 0;
-      else if ( cntlockmesg < 5 )
-	cntlockmesg = cntlockmesg + 1;
-      else
-	upper( buf );
-      appstr( buf, junk );
-      appstr( " = %d", junk );
-      sprintf( buf, junk, *lockword, *lockmesg );
-#endif
-      
-      lin = lin + 1;
-      cdclrl( lin, 1 );
-      cdputc( buf, lin );
-      
-      /* Display a new message, if any. */
-      readone = FALSE;
-      if ( dgrand( msgrand, &now ) >= NEWMSG_GRAND )
-	if ( getamsg( MSG_GOD, glastmsg ) )
-	  {
-	    readmsg( MSG_GOD, *glastmsg, RMsg_Line );
 
-#if defined(OPER_MSG_BEEP)
-	    if (msgfrom[slastmsg[MSG_GOD]] != MSG_GOD)
-	      cdbeep();
-#endif
-	    readone = TRUE;
-	    msgrand = now;
-	  }
-      cdmove( 1, 1 );
-      cdrefresh( TRUE );
-      /* Un-read message, if there's a chance it got garbaged. */
-      if ( readone )
-	if ( iochav( 0 ) )
-	  *glastmsg = modp1( *glastmsg - 1, MAXMESSAGES );
+      if (*commonrev == COMMONSTAMP)
+	{
+	  /* game status */
+	  if ( *closed )
+	    c_strcpy( "CLOSED", junk );
+	  else
+	    c_strcpy( "open", junk );
+	  
+	  /* driver status */
+	  
+	  switch ( *drivstat )
+	    {
+	    case DRS_OFF:
+	      c_strcpy( "OFF", xbuf );
+	      break;
+	    case DRS_RESTART:
+	      c_strcpy( "RESTART", xbuf );
+	      break;
+	    case DRS_STARTING:
+	      c_strcpy( "STARTING", xbuf );
+	      break;
+	    case DRS_HOLDING:
+	      c_strcpy( "HOLDING", xbuf );
+	      break;
+	    case DRS_RUNNING:
+	      c_strcpy( "on", xbuf );
+	      break;
+	    case DRS_KAMIKAZE:
+	      c_strcpy( "KAMIKAZE", xbuf );
+	      break;
+	    default:
+	      c_strcpy( "???", xbuf );
+	    }
+	  
+	  /* eater status */
+	  i = *dstatus;
+	  if ( i == DS_OFF )
+	    c_strcpy( "off", buf );
+	  else if ( i == DS_LIVE )
+	    {
+	      c_strcpy( "ON (", buf );
+	      i = *dlock;
+	      if ( -i > 0 && -i <= NUMPLANETS )
+		appstr( pname[-i], buf );
+	      else
+		appship( i, buf );		/* this will handle funny numbers */
+	      appchr( ')', buf );
+	    }
+	  else
+	    appstr( "???", buf );
+	  
+	  lin = savelin;
+	  cdclrl( lin, 1 );
+	  cprintf(lin,0,ALIGN_CENTER,"#%d#%s#%d#%s#%d#%s#%d#%s#%d#%s#%d#%s",
+		  LabelColor,"game ",InfoColor,junk,LabelColor,", driver ",InfoColor,
+		  xbuf,LabelColor,", eater ",InfoColor,buf);
+	  
+	  /* Line 2. */
+#ifdef USE_SEMS
+	  strcpy(buf, GetSemVal(0));
+#else
+	  c_strcpy( "lockword", buf );
+	  if ( *lockword == 0 )
+	    cntlockword = 0;
+	  else if ( cntlockword < 5 )
+	    cntlockword = cntlockword + 1;
+	  else
+	    upper( buf );
+	  c_strcpy( buf, junk );
+	  appstr( " = %d, ", junk );
       
+	  c_strcpy( "lockmesg", buf );
+	  if ( *lockmesg == 0 )
+	    cntlockmesg = 0;
+	  else if ( cntlockmesg < 5 )
+	    cntlockmesg = cntlockmesg + 1;
+	  else
+	    upper( buf );
+	  appstr( buf, junk );
+	  appstr( " = %d", junk );
+	  sprintf( buf, junk, *lockword, *lockmesg );
+#endif
+      
+	  lin++;
+	  cdclrl( lin, 1 );
+	  attrset(SpecialColor);
+	  cdputc( buf, lin );
+	  attrset(0);
+      
+
+	  /* Display a new message, if any. */
+	  readone = FALSE;
+	  if ( dgrand( msgrand, &now ) >= NEWMSG_GRAND )
+	    if ( getamsg( MSG_GOD, glastmsg ) )
+	      {
+		readmsg( MSG_GOD, *glastmsg, RMsg_Line );
+		
+#if defined(OPER_MSG_BEEP)
+		if (msgfrom[slastmsg[MSG_GOD]] != MSG_GOD)
+		  cdbeep();
+#endif
+		readone = TRUE;
+		msgrand = now;
+	      }
+	  cdmove( 1, 1 );
+	  cdrefresh();
+	  /* Un-read message, if there's a chance it got garbaged. */
+	  if ( readone )
+	    if ( iochav() )
+	      *glastmsg = modp1( *glastmsg - 1, MAXMESSAGES );
+
+	} /* *commonrev != COMMONSTAMP */
+      else 
+	{ /* COMMONBLOCK MISMATCH */
+
+	  cprintf(4, 0, ALIGN_CENTER, "#%d#You must (I)nitialize (E)verything.",
+		  RedLevelColor);
+	  cdmove( 1, 1 );
+	  cdrefresh();
+
+	}
+
+
       /* Get a char with timeout. */
       if ( ! iogtimed( &ch, 1 ) )
 	continue;		/* next */
@@ -990,7 +1141,7 @@ void operate(void)
 	  redraw = TRUE;
 	  break;
 	case 'b':
-	  if ( confirm( 0 ) )
+	  if ( confirm() )
 	    bigbang();
 	  break;
 	case 'd':
@@ -1014,7 +1165,7 @@ void operate(void)
 	      *drivpid = 0;
 	      drivowner[0] = EOS;
 	    }
-	  else if ( confirm( 0 ) )
+	  else if ( confirm() )
 	    *closed = TRUE;
 	  break;
 	case 'h':
@@ -1035,10 +1186,10 @@ void operate(void)
 	  redraw = TRUE;
 	  break;
 	case 'k':
-	  kiss();
+	  kiss(0,TRUE);
 	  break;
 	case 'L':
-	  l = review( MSG_GOD, *glastmsg );
+	  review( MSG_GOD, *glastmsg );
 	  break;
 	case 'm':
 	  sendmsg( MSG_GOD, TRUE );
@@ -1063,7 +1214,7 @@ void operate(void)
 	  redraw = TRUE;
 	  break;
 	case 'S':
-	  userstats( TRUE );
+	  userstats( TRUE , 0 ); /* we're always neutral ;-) - dwp */
 	  redraw = TRUE;
 	  break;
 	case 'T':
@@ -1071,19 +1222,20 @@ void operate(void)
 	  redraw = TRUE;
 	  break;
 	case 'U':
-	  userlist( TRUE );
+	  userlist( TRUE, 0 );
 	  redraw = TRUE;
 	  break;
 	case 'w':
 	  watch();
+	  stoptimer();		/* to be sure */
 	  redraw = TRUE;
 	  break;
 	case '/':
-	  playlist( TRUE, FALSE );
+	  playlist( TRUE, FALSE, 0 );
 	  redraw = TRUE;
 	  break;
 	case '\\':
-	  playlist( TRUE, TRUE );
+	  playlist( TRUE, TRUE, 0 );
 	  redraw = TRUE;
 	  break;
 	case '?':
@@ -1114,7 +1266,7 @@ void operate(void)
 }
 
 
-/*##  opinfo - do an operator info command */
+/*  opinfo - do an operator info command */
 /*  SYNOPSIS */
 /*    int snum */
 /*    opinfo( snum ) */
@@ -1122,20 +1274,18 @@ void opinfo( int snum )
 {
   int i, j, now[8];
   char ch;
-  int l, extra;
   string pmt="Information on: ";
   string huh="I don't understand.";
-  string nf="Not found.";
   
   cdclrl( MSG_LIN1, 2 );
   
-  ch = cdgetx( pmt, MSG_LIN1, 1, TERMS, cbuf, MSGMAXLINE );
+  cbuf[0] = EOS;
+  ch = (char)cdgetx( pmt, MSG_LIN1, 1, TERMS, cbuf, MSGMAXLINE );
   if ( ch == TERM_ABORT )
     {
       cdclrl( MSG_LIN1, 1 );
       return;
     }
-  extra = ( ch == TERM_EXTRA );
   
   delblanks( cbuf );
   fold( cbuf );
@@ -1145,16 +1295,16 @@ void opinfo( int snum )
       return;
     }
   
-  if ( cbuf[0] == 's' && alldig( &cbuf[1] ) == YES )
+  if ( cbuf[0] == 's' && alldig( &cbuf[1] ) == TRUE )
     {
       i = 0;
-      l = safectoi( &j, &cbuf[1], i );		/* ignore status */
+      safectoi( &j, &cbuf[1], i );		/* ignore status */
       infoship( j, snum );
     }
-  else if ( alldig( cbuf ) == YES )
+  else if ( alldig( cbuf ) == TRUE )
     {
       i = 0;
-      l = safectoi( &j, cbuf, i );		/* ignore status */
+      safectoi( &j, cbuf, i );		/* ignore status */
       infoship( j, snum );
     }
   else if ( gplanmatch( cbuf, &j ) )
@@ -1179,7 +1329,7 @@ void opinfo( int snum )
 }
 
 
-/*##  opinit - handle the various kinds of initialization */
+/*  opinit - handle the various kinds of initialization */
 /*  SYNOPSIS */
 /*    opinit */
 void opinit(void)
@@ -1195,79 +1345,105 @@ void opinit(void)
   
   lin = 2;
   icol = 11;
+  attrset(LabelColor);
   cdputc( "Conquest Initialization", lin );
   
-  lin = lin + 3;
+  lin+=3;
   col = icol - 2;
   c_strcpy( "(r)obots", buf );
   i = strlen( buf );
+  attrset(InfoColor);
   cdputs( buf, lin, col+1 );
+  attrset(A_BOLD);
   cdbox( lin-1, col, lin+1, col+i+1 );
   col = col + i + 4;
+  attrset(LabelColor);
   cdputs( "<-", lin, col );
   col = col + 4;
   c_strcpy( "(e)verything", buf );
   i = strlen( buf );
+  attrset(InfoColor);
   cdputs( buf, lin, col+1 );
+  attrset(A_BOLD);
   cdbox( lin-1, col, lin+1, col+i+1 );
   col = col + i + 4;
+  attrset(LabelColor);
   cdputs( "->", lin, col );
   col = col + 4;
   c_strcpy( "(z)ero everything", buf );
   i = strlen( buf );
+  attrset(InfoColor);
   cdputs( buf, lin, col+1 );
+  attrset(A_BOLD);
   cdbox( lin-1, col, lin+1, col+i+1 );
   
   col = icol + 20;
-  lin = lin + 3;
+  lin+=3;
+  attrset(LabelColor);
   cdput( '|', lin, col );
-  lin = lin + 1;
+  lin++;
   cdput( 'v', lin, col );
-  lin = lin + 3;
+  lin+=3;
   
   col = icol;
   c_strcpy( "(s)hips", buf );
   i = strlen( buf );
+  attrset(InfoColor);
   cdputs( buf, lin, col+1 );
+  attrset(A_BOLD);
   cdbox( lin-1, col, lin+1, col+i+1 );
   col = col + i + 4;
+  attrset(LabelColor);
   cdputs( "<-", lin, col );
   col = col + 4;
   c_strcpy( "(u)niverse", buf );
   i = strlen( buf );
+  attrset(InfoColor);
   cdputs( buf, lin, col+1 );
+  attrset(A_BOLD);
   cdbox( lin-1, col, lin+1, col+i+1 );
   col = col + i + 4;
+  attrset(LabelColor);
   cdputs( "->", lin, col );
   col = col + 4;
   c_strcpy( "(g)ame", buf );
   i = strlen( buf );
+  attrset(InfoColor);
   cdputs( buf, lin, col+1 );
+  attrset(A_BOLD);
   cdbox( lin-1, col, lin+1, col+i+1 );
   col = col + i + 4;
+  attrset(LabelColor);
   cdputs( "->", lin, col );
   col = col + 4;
   c_strcpy( "(p)lanets", buf );
   i = strlen( buf );
+  attrset(InfoColor);
   cdputs( buf, lin, col+1 );
+  attrset(A_BOLD);
   cdbox( lin-1, col, lin+1, col+i+1 );
   
   col = icol + 20;
-  lin = lin + 3;
+  lin+=3;
+  attrset(LabelColor);
   cdput( '|', lin, col );
-  lin = lin + 1;
+  lin++;
   cdput( 'v', lin, col );
-  lin = lin + 3;
+  lin+=3;
   
   col = icol + 15;
   c_strcpy( "(m)essages", buf );
   i = strlen( buf );
+  attrset(InfoColor);
   cdputs( buf, lin, col+1 );
+  attrset(A_BOLD);
   cdbox( lin-1, col, lin+1, col+i+1 );
   col = col + i + 8;
   c_strcpy( "(l)ockwords", buf );
   i = strlen( buf );
+  attrset(InfoColor);
   cdputs( buf, lin, col+1 );
+  attrset(A_BOLD);
   cdbox( lin-1, col, lin+1, col+i+1 );
   
   while (TRUE)  /*repeat */
@@ -1275,9 +1451,12 @@ void opinit(void)
       lin = MSG_LIN1;
       col = 30;
       cdclrl( lin, 1 );
-      ch = cdgetx( pmt, lin, col, TERMS, buf, MSGMAXLINE );
+      attrset(InfoColor);
+      buf[0] = EOS;
+      ch = (char)cdgetx( pmt, lin, col, TERMS, buf, MSGMAXLINE );
       cdclrl( lin, 1 );
       cdputs( pmt, lin, col );
+  	  attrset(0);
       col = col + strlen( pmt );
       if ( ch == TERM_ABORT || buf[0] == EOS )
 	break;
@@ -1285,7 +1464,7 @@ void opinit(void)
 	{
 	case 'e':
 	  cdputs( "everything", lin, col );
-	  if ( confirm( 0 ) )
+	  if ( confirm() )
 	    {
 	      initeverything();
 	      *commonrev = COMMONSTAMP;
@@ -1293,12 +1472,12 @@ void opinit(void)
 	  break;
 	case 'z':
 	  cdputs( "zero everything", lin, col );
-	  if ( confirm( 0 ) )
+	  if ( confirm() )
 	    zeroeverything();
 	  break;
 	case 'u':
 	  cdputs( "universe", lin, col );
-	  if ( confirm( 0 ) )
+	  if ( confirm() )
 	    {
 	      inituniverse();
 	      *commonrev = COMMONSTAMP;
@@ -1306,7 +1485,7 @@ void opinit(void)
 	  break;
 	case 'g':
 	  cdputs( "game", lin, col );
-	  if ( confirm( 0 ) )
+	  if ( confirm() )
 	    {
 	      initgame();
 	      *commonrev = COMMONSTAMP;
@@ -1314,7 +1493,7 @@ void opinit(void)
 	  break;
 	case 'p':
 	  cdputs( "planets", lin, col );
-	  if ( confirm( 0 ) )
+	  if ( confirm() )
 	    {
 	      initplanets();
 	      *commonrev = COMMONSTAMP;
@@ -1322,7 +1501,7 @@ void opinit(void)
 	  break;
 	case 's':
 	  cdputs( "ships", lin, col );
-	  if ( confirm( 0 ) )
+	  if ( confirm() )
 	    {
 	      clearships();
 	      *commonrev = COMMONSTAMP;
@@ -1330,7 +1509,7 @@ void opinit(void)
 	  break;
 	case 'm':
 	  cdputs( "messages", lin, col );
-	  if ( confirm( 0 ) )
+	  if ( confirm() )
 	    {
 	      initmsgs();
 	      *commonrev = COMMONSTAMP;
@@ -1338,7 +1517,7 @@ void opinit(void)
 	  break;
 	case 'l':
 	  cdputs( "lockwords", lin, col );
-	  if ( confirm( 0 ) )
+	  if ( confirm() )
 	    {
 	      PVUNLOCK(lockword);
 	      PVUNLOCK(lockmesg);
@@ -1347,7 +1526,7 @@ void opinit(void)
 	  break;
 	case 'r':
 	  cdputs( "robots", lin, col );
-	  if ( confirm( 0 ) )
+	  if ( confirm() )
 	    {
 	      initrobots();
 	      *commonrev = COMMONSTAMP;
@@ -1363,19 +1542,32 @@ void opinit(void)
 }
 
 
-/*##  oppedit - edit a planet's characteristics */
+/*  oppedit - edit a planet's characteristics */
 /*  SYNOPSIS */
 /*    oppedit */
 void oppedit(void)
 {
   
   int i, j, lin, col, datacol;
-  static int pnum = PNUM_JANUS;
+  static int pnum = PNUM_EARTH;
   real x;
   int ch;
   char buf[MSGMAXLINE];
-  /*    data pnum / PNUM_JANUS /;
-	common / conqopp / pnum;*/
+  int attrib;
+
+  int FirstTime = TRUE;
+  static char sfmt[MSGMAXLINE * 2];
+
+  if (FirstTime == TRUE)
+    {
+      FirstTime = FALSE;
+      sprintf(sfmt,
+	      "#%d#(#%d#%%s#%d#)   %%s",
+	      LabelColor,
+	      InfoColor,
+	      LabelColor);
+	}
+
   
   col = 4;
   datacol = col + 28;
@@ -1388,114 +1580,146 @@ void oppedit(void)
       /* Display the planet. */
       i = 20;			/* i = 10 */
       j = 57;
+
+
+	  /* colorize planet name according to type */
+      if ( ptype[pnum] == PLANET_SUN )
+	attrib = RedLevelColor;
+      else if ( ptype[pnum] == PLANET_CLASSM )
+	attrib = GreenLevelColor;
+      else if ( ptype[pnum] == PLANET_DEAD )
+	attrib = YellowLevelColor;
+      else if ( ptype[pnum] == PLANET_CLASSA ||
+		ptype[pnum] == PLANET_CLASSO ||
+		ptype[pnum] == PLANET_CLASSZ ||
+		ptype[pnum] == PLANET_GHOST )   /* white as a ghost ;-) */
+	attrib = A_BOLD;
+      else 
+	attrib = SpecialColor;
+      
+				/* if we're doing a sun, use yellow
+				   else use attrib set above */
+      if (ptype[pnum] == PLANET_SUN)
+	attrset(YellowLevelColor);
+      else
+	attrset(attrib);
       puthing(ptype[pnum], i, j );
+      attrset(0);
+
+	  /* suns have red cores, others are cyan. */
+      if (ptype[pnum] == PLANET_SUN)
+	attrset(RedLevelColor);
+      else
+	attrset(InfoColor);
       cdput( chrplanets[ptype[pnum]], i, j + 1);
+      attrset(0);
+
       sprintf(buf, "%s\n", pname[pnum]);
+      attrset(attrib);
       cdputs( buf, i + 1, j + 2 ); /* -[] */
+      attrset(0);
       
       /* Display info about the planet. */
       lin = 4;
       i = pnum;
-      cdputs( "(p) - Planet:\n", lin, col );
-      sprintf( buf, "%s (%d)", pname[pnum], pnum );
-      cdputs( buf, lin, datacol );
+      cprintf(lin,col,ALIGN_NONE,sfmt, "p", "  Planet:\n");
+      cprintf( lin,datacol,ALIGN_NONE,"#%d#%s (%d)", 
+		attrib, pname[pnum], pnum );
       
-      lin = lin + 1;
+      lin++;
       i = pprimary[pnum];
       if ( i == 0 )
 	{
-	  lin = lin + 1;
+      lin++;
 	  
 	  x = porbvel[pnum];
 	  if ( x == 0.0 )
-	    cdputs( "(v) - Stationary\n", lin, col );
+	    cprintf(lin,col,ALIGN_NONE,sfmt, "v", "  Stationary\n");
 	  else
 	    {
-	      cdputs( "(v) - Velocity:\n", lin, col );
-	      sprintf( buf, "Warp %f", oneplace(x) );
-	      cdputs( buf, lin, datacol );
+	      cprintf(lin,col,ALIGN_NONE,sfmt, "v", "Velocity:\n");
+	      cprintf( lin,datacol,ALIGN_NONE,"#%d#Warp %f", 
+			InfoColor, oneplace(x) );
 	    }
 	}
       else
 	{
-	  cdputs( "(o) - Orbiting:\n", lin, col );
-	  sprintf( buf, "%s (%d)", pname[i], i );
-	  cdputs( buf, lin, datacol );
+	  cprintf(lin,col,ALIGN_NONE,sfmt, "o", "  Orbiting:\n");
+	  cprintf( lin,datacol,ALIGN_NONE,"#%d#%s (%d)", 
+		InfoColor, pname[i], i );
 	  
-	  lin = lin + 1;
-	  cdputs( "(v) - Orbit velocity:\n", lin, col );
-	  sprintf( buf, "%.1f degrees/minute", porbvel[pnum] );
-	  cdputs( buf, lin, datacol );
+      lin++;
+	  cprintf(lin,col,ALIGN_NONE,sfmt, "v", "  Orbit velocity:\n");
+	  cprintf( lin,datacol,ALIGN_NONE,"#%d#%.1f degrees/minute", 
+		InfoColor, porbvel[pnum] );
 	}
       
-      lin = lin + 1;
-      cdputs( "(r) - Radius:\n", lin, col );
-      sprintf( buf, "%.1f", porbrad[pnum] );
-      cdputs( buf, lin, datacol );
+      lin++;
+      cprintf(lin,col,ALIGN_NONE,sfmt, "r", "  Radius:\n");
+      cprintf( lin,datacol,ALIGN_NONE, "#%d#%.1f", InfoColor, porbrad[pnum] );
       
-      lin = lin + 1;
-      cdputs( "(a) - Angle:\n", lin, col );
-      sprintf( buf, "%.1f", porbang[pnum] );
-      cdputs( buf, lin, datacol );
+      lin++;
+      cprintf(lin,col,ALIGN_NONE,sfmt, "a", "  Angle:\n");
+      cprintf( lin,datacol,ALIGN_NONE, "#%d#%.1f", InfoColor, porbang[pnum] );
       
-      lin = lin + 1;
+      lin++;
       i = ptype[pnum];
-      cdputs( "(t) - Type:\n", lin, col );
-      sprintf( buf, "%s (%d)", ptname[i], i );
-      cdputs( buf, lin, datacol );
+      cprintf(lin,col,ALIGN_NONE,sfmt, "t", "  Type:\n");
+      cprintf( lin,datacol,ALIGN_NONE, "#%d#%s (%d)", InfoColor, ptname[i], i );
       
-      lin = lin + 1;
+      lin++;
       i = pteam[pnum];
       if ( pnum <= NUMCONPLANETS )
-	cdputs( "      Owner team:\n", lin, col );
+	  {
+		cprintf(lin,col,ALIGN_NONE,"#%d#%s",LabelColor,"        Owner team:\n");
+	  }
       else
-	cdputs( "(T) - Owner team:\n", lin, col );
-      sprintf( buf, "%s (%d)", tname[i], i );
-      cdputs( buf, lin, datacol );
+		cprintf(lin,col,ALIGN_NONE,sfmt, "T", "  Owner team:\n");
+      cprintf( lin,datacol,ALIGN_NONE, "#%d#%s (%d)", InfoColor,tname[i], i );
       
-      lin = lin + 1;
-      cdputs( "(x,y) Position:\n", lin, col );
-      sprintf( buf, "%.1f, %.1f",px[pnum], py[pnum] );
-      cdputs( buf, lin, datacol );
+      lin++;
+      cprintf(lin,col,ALIGN_NONE,sfmt, "x,y", "Position:\n");
+      cprintf( lin,datacol,ALIGN_NONE, "#%d#%.1f, %.1f",
+		InfoColor, px[pnum], py[pnum] );
       
-      lin = lin + 1;
-      cdputs( "(A)   Armies:\n", lin, col );
-      sprintf( buf, "%d", parmies[pnum] );
-      cdputs( buf, lin, datacol );
+      lin++;
+      cprintf(lin,col,ALIGN_NONE,sfmt, "A", "  Armies:\n");
+      cprintf( lin,datacol,ALIGN_NONE, "#%d#%d", InfoColor, parmies[pnum] );
       
-      lin = lin + 1;
-      cdputs( "(s)   Scanned by:\n", lin, col );
+      lin++;
+      cprintf(lin,col,ALIGN_NONE,sfmt, "s", "  Scanned by:\n");
       buf[0] = '(';
       for ( i = 1; i <= NUMTEAMS; i = i + 1 )
-	if ( pscanned[pnum][i - 1] )
-	  buf[i] = chrteams[i - 1];
-	else
-	  buf[i] = '-';
+		if ( pscanned[pnum][i - 1] )
+		  buf[i] = chrteams[i - 1];
+		else
+		  buf[i] = '-';
       buf[NUMTEAMS+1] = ')';
       buf[NUMTEAMS+2] = '\0';
-      cdputs( buf, lin, datacol );
+      cprintf( lin, datacol,ALIGN_NONE, "#%d#%s",InfoColor, buf);
       
-      lin = lin + 1;
-      cdputs( "(u)   Uninhabitable time:\n", lin, col );
-      sprintf( buf, "%d", puninhabtime[pnum] );
-      cdputs( buf, lin, datacol );
+      lin++;
+      cprintf(lin,col,ALIGN_NONE,sfmt, "u", "  Uninhabitable time:\n");
+      cprintf( lin,datacol,ALIGN_NONE, "#%d#%d", 
+		InfoColor, puninhabtime[pnum] );
       
-      lin = lin + 1;
+      lin++;
       if ( preal[pnum] )
-	cdputs( "(-) - Visible\n", lin, col );
+		  cprintf(lin,col,ALIGN_NONE,sfmt, "-", "  Visible\n");
       else
-	cdputs( "(+) - Hidden\n", lin, col );
+		  cprintf(lin,col,ALIGN_NONE,sfmt, "+", "  Hidden\n");
       
-      lin = lin + 1;
-      cdputs( "(n) - Change planet name\n", lin, col );
+      lin++;
+      cprintf(lin,col,ALIGN_NONE,sfmt, "n", "  Change planet name\n");
       
-      lin = lin + 1;
-      cdputs( "<TAB> increment planet number\n", lin, col );
+      lin++;
+      cprintf(lin,col,ALIGN_NONE,sfmt, "<>", 
+		" decrement/increment planet number\n");
       
-      cdclra(MSG_LIN1, 0, MSG_LIN1 + 2, cdcols(0) - 1);
+      cdclra(MSG_LIN1, 0, MSG_LIN1 + 2, cdcols() - 1);
       
       cdmove( 0, 0 );
-      cdrefresh( TRUE );
+      cdrefresh();
       
       if ( ! iogtimed( &ch, 1 ) )
 	continue;		/* next */
@@ -1521,7 +1745,7 @@ void oppedit(void)
 	  /* Armies. */
 	  ch = getcx( "New number of armies? ",
 		     MSG_LIN1, 0, TERMS, buf, MSGMAXLINE );
-	  if ( ch == TERM_ABORT | buf[0] == EOS )
+	  if ( ch == TERM_ABORT || buf[0] == EOS )
 	    continue;
 	  delblanks( buf );
 	  i = 0;
@@ -1581,6 +1805,7 @@ void oppedit(void)
 	    continue;	/* next */
 	  delblanks( buf );
 	  i = 0;
+
 	  if ( ! safectoi( &j, buf, i ) )
 	    continue;	/* next */
 
@@ -1603,8 +1828,8 @@ void oppedit(void)
 	  /* Scanned. */
 	  cdputs( "Toggle which team? ", MSG_LIN1, 1 );
 	  cdmove( MSG_LIN1, 20 );
-	  cdrefresh( TRUE );
-	  ch = cupper( iogchar( ch ) );
+	  cdrefresh();
+	  ch = (char)toupper( iogchar() );
 	  for ( i = 0; i < NUMTEAMS; i = i + 1 )
 	    if ( ch == chrteams[i] )
 	      {
@@ -1616,7 +1841,7 @@ void oppedit(void)
 	case 'u':
 	  ch = getcx( "New uninhabitable minutes? ",
 		     MSG_LIN1, 0, TERMS, buf, MSGMAXLINE );
-	  if ( ch == TERM_ABORT | buf[0] == EOS )
+	  if ( ch == TERM_ABORT || buf[0] == EOS )
 	    continue;
 	  delblanks( buf );
 	  i = 0;
@@ -1653,23 +1878,23 @@ void oppedit(void)
 	  /* Now you don't */
 	  preal[pnum] = FALSE;
 	  break;
-	case TERM_EXTRA:
-	  /* Rotate planet number. */
-	  
-	  /*		pnum++;
-			i = mod( pnum , NUMPLANETS );
-			pnum = i;
-			*/
-	  
-	  /*		pnum = mod( pnum + 1, NUMPLANETS );*/
-	  
+	case '>': /* forward rotate planet number - dwp */
+	case KEY_RIGHT:
+	case KEY_UP:
 	  pnum = mod( pnum + 1, NUMPLANETS );
+	  pnum = (pnum == 0) ? NUMPLANETS : pnum;
+	  break;
+	case '<':  /* reverse rotate planet number - dwp */
+	case KEY_LEFT:
+	case KEY_DOWN:
+	  pnum = (pnum >= 0) ? -pnum : pnum; 
+	  pnum = mod( (NUMPLANETS + 1) - (pnum + 1), NUMPLANETS + 1 );
 	  pnum = (pnum == 0) ? NUMPLANETS : pnum;
 	  break;
 	case ' ':
 	  /* do no-thing */
 	  break;
-	case '\x0c':
+	case 0x0c:
 	  cdredo();
 	  break;
 	case TERM_NORMAL:
@@ -1688,25 +1913,16 @@ void oppedit(void)
 }
 
 
-/*##  opplanlist - display the planet list for an operator */
+/*  opplanlist - display the planet list for an operator */
 /*  SYNOPSIS */
 /*    opplanlist */
 void opplanlist(void)
 {
-  
-  int ch;
-  
-  cdclear();
-  do
-    {
-      planlist( TEAM_NOTEAM );		/* we get extra info */
-      putpmt( "--- press space when done ---", MSG_LIN2 );
-      cdrefresh( TRUE );
-    } while (!iogtimed(&ch, 1));
+  planlist( TEAM_NOTEAM, 0 );		/* we get extra info */
 }
 
 
-/*##  opresign - resign a user */
+/*  opresign - resign a user */
 /*  SYNOPSIS */
 /*    opresign */
 void opresign(void)
@@ -1716,7 +1932,8 @@ void opresign(void)
   char ch, buf[MSGMAXLINE];
   
   cdclrl( MSG_LIN1, 2 );
-  ch = cdgetx( "Resign user: ", MSG_LIN1, 1, TERMS, buf, MSGMAXLINE );
+  buf[0] = EOS;
+  ch = (char)cdgetx( "Resign user: ", MSG_LIN1, 1, TERMS, buf, MSGMAXLINE );
   if ( ch == TERM_ABORT )
     {
       cdclrl( MSG_LIN1, 1 );
@@ -1727,10 +1944,10 @@ void opresign(void)
     {
       cdputs( "No such user.", MSG_LIN2, 1 );
       cdmove( 1, 1 );
-      cdrefresh( FALSE );
+      cdrefresh();
       c_sleep( 1.0 );
     }
-  else if ( confirm( 0 ) )
+  else if ( confirm() )
     resign( unum );
   cdclrl( MSG_LIN1, 2 );
   
@@ -1739,7 +1956,7 @@ void opresign(void)
 }
 
 
-/*##  oprobot - handle gratuitous robot creation */
+/*  oprobot - handle gratuitous robot creation */
 /*  SYNOPSIS */
 /*    oprobot */
 void oprobot(void)
@@ -1747,21 +1964,36 @@ void oprobot(void)
   
   int i, j, snum, unum, num, anum;
   char ch, buf[MSGMAXLINE];
-  int l, warlike;
+  int warlike;
+  char xbuf[MSGMAXLINE];
   
   cdclrl( MSG_LIN1, 2 );
-  ch = cdgetx( "Enter username for new robot (Orion, Federation, etc): ",
+  buf[0] = EOS;
+  ch = (char)cdgetx( "Enter username for new robot (Orion, Federation, etc): ",
 	      MSG_LIN1, 1, TERMS, buf, MAXUSERNAME );
   if ( ch == TERM_ABORT || buf[0] == EOS )
     {
       cdclrl( MSG_LIN1, 1 );
       return;
     }
+  /* catch lowercase, uppercase typos - dwp */
+  strcpy(xbuf,buf);
+  j = strlen(xbuf);
+  buf[0] = (char)toupper(xbuf[0]);
+  if (j>1)
+  	for (i=1;i<j && xbuf[i] != EOS;i++)
+		buf[i] = (char)tolower(xbuf[i]);
   delblanks( buf );
   if ( ! gunum( &unum, buf ) )
     {
-      cdputs( "No such user.", MSG_LIN2, 1 );
-      return;
+				/* un-upper case first char and
+				   try again */
+      buf[0] = (char)tolower(buf[0]);
+      if ( ! gunum( &unum, buf ) )
+	{
+	  cdputs( "No such user.", MSG_LIN2, 1 );
+	  return;
+	}
     }
   
   /* Defaults. */
@@ -1770,7 +2002,8 @@ void oprobot(void)
   
   if ( ch == TERM_EXTRA )
     {
-      ch = cdgetx( "Enter number desired (TAB for warlike): ",
+      buf[0] = EOS;
+      ch = (char)cdgetx( "Enter number desired (TAB for warlike): ",
 		  MSG_LIN2, 1, TERMS, buf, MAXUSERNAME );
       if ( ch == TERM_ABORT )
 	{
@@ -1780,7 +2013,7 @@ void oprobot(void)
       warlike = ( ch == TERM_EXTRA );
       delblanks( buf );
       i = 0;
-      l = safectoi( &num, buf, i );
+      safectoi( &num, buf, i );
       if ( num <= 0 )
 	num = 1;
     }
@@ -1826,7 +2059,7 @@ void oprobot(void)
 }
 
 
-/*##  opstats - display operator statistics */
+/*  opstats - display operator statistics */
 /*  SYNOPSIS */
 /*    opstats */
 void opstats(void)
@@ -1834,12 +2067,12 @@ void opstats(void)
   
   int i, lin, col;
   unsigned long size;
-  char buf[MSGMAXLINE], junk[MSGMAXLINE], timbuf[32];
+  char buf[MSGMAXLINE], junk[MSGMAXLINE*2], timbuf[32];
   int ch;
   real x;
-  string sfmt="%32s %12s\n";
-  string tfmt="%32s %20s\n";
-  string pfmt="%32s %11.1f%%\n";
+  string sfmt="#%d#%32s #%d#%12s\n";
+  string tfmt="#%d#%32s #%d#%20s\n";
+  string pfmt="#%d#%32s #%d#%11.1f%%\n";
   
   col = 8;
   cdclear();
@@ -1847,116 +2080,128 @@ void opstats(void)
     {
       lin = 2;
       fmtseconds( *ccpuseconds, timbuf );
-      sprintf( buf, sfmt, "Conquest cpu time:", timbuf );
-      cdputs( buf, lin, col );
+      cprintf( lin,col,ALIGN_NONE,sfmt, 
+		LabelColor,"Conquest cpu time:", InfoColor,timbuf );
       
-      lin = lin + 1;
+      lin++;
       i = *celapsedseconds;
       fmtseconds( i, timbuf );
-      sprintf( buf, sfmt, "Conquest elapsed time:", timbuf );
-      cdputs( buf, lin, col );
+      cprintf( lin,col,ALIGN_NONE,sfmt, 
+		LabelColor,"Conquest elapsed time:", InfoColor,timbuf );
       
-      lin = lin + 1;
+      lin++;
       if ( i == 0 )
 	x = 0.0;
       else
-	x = oneplace( 100.0 * float(*ccpuseconds) / float(i) );
-      sprintf( buf, pfmt, "Conquest cpu usage:", x );
-      cdputs( buf, lin, col );
+	x = oneplace( 100.0 * creal(*ccpuseconds) / creal(i) );
+      cprintf( lin,col,ALIGN_NONE,pfmt, 
+		LabelColor,"Conquest cpu usage:", InfoColor,x);
       
-      lin = lin + 2;
+      lin+=2;
       fmtseconds( *dcpuseconds, timbuf );
-      sprintf( buf, sfmt, "Conqdriv cpu time:", timbuf );
-      cdputs( buf, lin, col );
+      cprintf( lin,col,ALIGN_NONE,sfmt, 
+		LabelColor,"Conqdriv cpu time:", InfoColor,timbuf );
       
-      lin = lin + 1;
+      lin++;
       i = *delapsedseconds;
       fmtseconds( i, timbuf );
-      sprintf( buf, sfmt, "Conqdriv elapsed time:", timbuf );
-      cdputs( buf, lin, col );
+      cprintf( lin,col,ALIGN_NONE,sfmt, 
+		LabelColor,"Conqdriv elapsed time:", InfoColor,timbuf );
       
-      lin = lin + 1;
+      lin++;
       if ( i == 0 )
 	x = 0.0;
       else
-	x = oneplace( 100.0 * float(*dcpuseconds) / float(i) );
-      sprintf( buf, pfmt, "Conqdriv cpu usage:", x );
-      cdputs( buf, lin, col );
+	x = oneplace( 100.0 * creal(*dcpuseconds) / creal(i) );
+      cprintf( lin,col,ALIGN_NONE,pfmt, 
+		LabelColor,"Conqdriv cpu usage:", InfoColor,x);
       
-      lin = lin + 2;
+      lin+=2;
       fmtseconds( *rcpuseconds, timbuf );
-      sprintf( buf, sfmt, "Robot cpu time:", timbuf );
-      cdputs( buf, lin, col );
+      cprintf( lin,col,ALIGN_NONE,sfmt, 
+		LabelColor,"Robot cpu time:", InfoColor,timbuf );
       
-      lin = lin + 1;
+	  lin++;
       i = *relapsedseconds;
       fmtseconds( i, timbuf );
-      sprintf( buf, sfmt, "Robot elapsed time:", timbuf );
-      cdputs( buf, lin, col );
+      cprintf( lin,col,ALIGN_NONE,sfmt, 
+		LabelColor,"Robot elapsed time:", InfoColor,timbuf );
       
-      lin = lin + 1;
+      lin++;
       if ( i == 0 )
 	x = 0.0;
       else
-	x = ( 100.0 * float(*rcpuseconds) / float(i) );
-      sprintf( buf, pfmt, "Robot cpu usage:", x );
-      cdputs( buf, lin, col );
+	x = ( 100.0 * creal(*rcpuseconds) / creal(i) );
+      cprintf( lin,col,ALIGN_NONE,pfmt, 
+		LabelColor,"Robot cpu usage:", InfoColor,x);
       
-      lin = lin + 2;
-      sprintf( buf, tfmt, "Last initialize:", inittime );
-      cdputs( buf, lin, col );
+      lin+=2;
+      cprintf( lin,col,ALIGN_NONE,tfmt, 
+		LabelColor,"Last initialize:", InfoColor,inittime);
       
-      lin = lin + 1;
-      sprintf( buf, tfmt, "Last conquer:", conqtime );
-      cdputs( buf, lin, col );
+      lin++;
+      cprintf( lin,col,ALIGN_NONE,tfmt, 
+		LabelColor,"Last conquer:", InfoColor,conqtime);
       
-      lin = lin + 1;
+      lin++;
       fmtseconds( *playtime, timbuf );
-      sprintf( buf, sfmt, "Driver time:", timbuf );
-      cdputs( buf, lin, col );
+      cprintf( lin,col,ALIGN_NONE,sfmt, 
+		LabelColor,"Driver time:", InfoColor,timbuf);
       
-      lin = lin + 1;
+      lin++;
       fmtseconds( *drivtime, timbuf );
-      sprintf( buf, sfmt, "Play time:", timbuf );
-      cdputs( buf, lin, col );
+      cprintf( lin,col,ALIGN_NONE,sfmt, 
+		LabelColor,"Play time:", InfoColor,timbuf);
       
-      lin = lin + 1;
-      sprintf( buf, tfmt, "Last upchuck:", lastupchuck );
-      cdputs( buf, lin, col );
+      lin++;
+      cprintf( lin,col,ALIGN_NONE,tfmt, 
+		LabelColor,"Last upchuck:", InfoColor,lastupchuck);
       
-      lin = lin + 1;
+      lin++;
       getdandt( timbuf );
-      sprintf( buf, tfmt, "Current time:", timbuf );
-      cdputs( buf, lin, col );
+      cprintf( lin,col,ALIGN_NONE,tfmt, 
+		LabelColor,"Current time:", InfoColor,timbuf);
       
-      lin = lin + 2;
+      lin+=2;
       if ( drivowner[0] != EOS )
-	sprintf( junk, "%d (%s), ", *drivpid, drivowner );
+	sprintf( junk, "%d #%d#(#%d#%s#%d#)", 
+		 *drivpid,LabelColor,SpecialColor, drivowner,LabelColor );
       else if ( *drivpid != 0 )
-	sprintf( junk, "%d, ", *drivpid );
+	sprintf( junk, "%d", *drivpid );
       else
 	junk[0] = EOS;
-      sprintf( buf, "%sdrivsecs = %03d, drivcnt = %d\n",
-	     junk, *drivsecs, *drivcnt);
-      cdputs( buf, lin, col );
+
+      if (junk[0] == EOS)
+	cprintf( lin,col,ALIGN_NONE, 
+		 "#%d#drivsecs = #%d#%03d#%d#, drivcnt = #%d#%d\n",
+		 LabelColor, InfoColor, 
+		 *drivsecs,LabelColor,InfoColor,*drivcnt);
+      else
+	cprintf( lin,col,ALIGN_NONE, 
+                 "#%d#%s#%d#, drivsecs = #%d#%03d#%d#, drivcnt = #%d#%d\n",
+		 InfoColor,junk,LabelColor,InfoColor, 
+                 *drivsecs,LabelColor,InfoColor,*drivcnt);
       
-      lin = lin + 1;
+      lin++;
       comsize( &size );
-      sprintf( buf, "%u bytes (out of %d) in the common block.\n",
-	     size, SIZEOF_COMMONBLOCK );
-      cdputs( buf, lin, col );
+      cprintf( lin,col,ALIGN_NONE, 
+	       "#%d#%u #%d#bytes (out of #%d#%d#%d#) in the common block.\n",
+	       InfoColor,size,LabelColor,InfoColor, SIZEOF_COMMONBLOCK,LabelColor );
       
-      lin = lin + 1;
-      sprintf( buf, "Common ident is %d", *commonrev );
+      lin++;
+      sprintf( buf, "#%d#Common ident is #%d#%d", 
+	       LabelColor,InfoColor,*commonrev);
       if ( *commonrev != COMMONSTAMP )
 	{
-	  sprintf( junk, " (binary ident is %d)\n", COMMONSTAMP );
+	  sprintf( junk, " #%d#(binary ident is #%d#%d#%d#)\n", 
+		   LabelColor,InfoColor,COMMONSTAMP,LabelColor );
 	  appstr( junk, buf );
 	}
-      cdputs( buf, lin, col );
+      cprintf( lin,col,ALIGN_NONE, "%s",buf);
       
       cdmove( 1, 1 );
-      cdrefresh( TRUE );
+      attrset(0);
+      cdrefresh();
     }
   while ( !iogtimed( &ch, 1 ) ); /* until */
   
@@ -1965,7 +2210,7 @@ void opstats(void)
 }
 
 
-/*##  opteamlist - display the team list for an operator */
+/*  opteamlist - display the team list for an operator */
 /*  SYNOPSIS */
 /*    opteamlist */
 void opteamlist(void)
@@ -1978,14 +2223,14 @@ void opteamlist(void)
     {
       teamlist( -1 );
       putpmt( "--- press space when done ---", MSG_LIN2 );
-      cdrefresh( TRUE );
+      cdrefresh();
     }
   while ( !iogtimed( &ch, 1 ) ); /* until */
   
 }
 
 
-/*##  opuadd - add a user */
+/*  opuadd - add a user */
 /*  SYNOPSIS */
 /*    opuadd */
 void opuadd(void)
@@ -1996,7 +2241,8 @@ void opuadd(void)
   char buf[MSGMAXLINE], junk[MSGMAXLINE], name[MSGMAXLINE];
   
   cdclrl( MSG_LIN1, 2 );
-  ch = cdgetx( "Add user: ", MSG_LIN1, 1, TERMS, name, MAXUSERNAME );
+  name[0] = EOS;
+  ch = (char)cdgetx( "Add user: ", MSG_LIN1, 1, TERMS, name, MAXUSERNAME );
   delblanks( name );
   if ( ch == TERM_ABORT || name[0] == EOS )
     {
@@ -2007,7 +2253,7 @@ void opuadd(void)
     {
       cdputs( "That user is already enrolled.", MSG_LIN2, 1 );
       cdmove( 1, 1 );
-      cdrefresh( FALSE );
+      cdrefresh();
       c_sleep( 1.0 );
       cdclrl( MSG_LIN1, 2 );
       return;
@@ -2021,7 +2267,8 @@ void opuadd(void)
 	     chrteams[TEAM_ORION]);
       
       cdclrl( MSG_LIN1, 1 );
-      ch = cdgetx( junk, MSG_LIN1, 1, TERMS, buf, MSGMAXLINE );
+      buf[0] = EOS;
+      ch = (char)cdgetx( junk, MSG_LIN1, 1, TERMS, buf, MSGMAXLINE );
       if ( ch == TERM_ABORT )
 	{
 	  cdclrl( MSG_LIN1, 1 );
@@ -2031,7 +2278,7 @@ void opuadd(void)
 	team = rndint( 0, NUMTEAMS - 1);
       else
 	{
-	  ch = cupper( buf[0] );
+	  ch = (char)toupper( buf[0] );
 	  for ( i = 0; i < NUMTEAMS; i = i + 1 )
 	    if ( chrteams[i] == ch )
 	      {
@@ -2047,13 +2294,13 @@ void opuadd(void)
   appchr( ' ', buf );
   i = strlen( buf );
   appstr( name, buf );
-  buf[i] = cupper( buf[i] );
+  buf[i] = (char)toupper( buf[i] );
   buf[MAXUSERPNAME] = EOS;
   if ( ! c_register( name, buf, team, &unum ) )
     {
       cdputs( "Error adding new user.", MSG_LIN2, 1 );
       cdmove( 0, 0 );
-      cdrefresh( FALSE );
+      cdrefresh();
       c_sleep( 1.0 );
     }
   cdclrl( MSG_LIN1, 2 );
@@ -2063,22 +2310,24 @@ void opuadd(void)
 }
 
 
-/*##  opuedit - edit a user */
+/*  opuedit - edit a user */
 /*  SYNOPSIS */
 /*    opuedit */
 void opuedit(void)
 {
   
 #define MAXUEDITROWS (MAXOPTIONS+2) 
-  int i, unum, row = 1, lin, col, olin, tcol, dcol, lcol, rcol;
+  int i, unum, row = 1, lin, olin, tcol, dcol, lcol, rcol;
   char buf[MSGMAXLINE];
-  int l, ch, left = TRUE;
+  int ch, left = TRUE;
   
   cdclrl( MSG_LIN1, 2 );
+  attrset(InfoColor);
   ch = getcx( "Edit which user: ", MSG_LIN1, 0, TERMS, buf, MAXUSERNAME );
   if ( ch == TERM_ABORT )
     {
       cdclrl( MSG_LIN1, 2 );
+	  attrset(0);
       return;
     }
   delblanks( buf );
@@ -2086,8 +2335,9 @@ void opuedit(void)
     {
       cdclrl( MSG_LIN1, 2 );
       cdputs( "Unknown user.", MSG_LIN1, 1 );
+	  attrset(0);
       cdmove( 1, 1 );
-      cdrefresh( FALSE );
+      cdrefresh();
       c_sleep( 1.0 );
       return;
     }
@@ -2097,42 +2347,50 @@ void opuedit(void)
   while (TRUE) /* repeat */
     {
       /* Do the right side first. */
+      cdclrl( 1, MSG_LIN1 -1 );
+
       lin = 1;
       tcol = 43;
       dcol = 62;
       rcol = dcol - 1;
       
-      cdputs( "         Username:", lin, tcol );
-      cdputs( cuname[unum], lin, dcol ); /* -[] */
+      cprintf(lin,tcol,ALIGN_NONE,"#%d#%s", LabelColor,"         Username:");
+      cprintf(lin,dcol,ALIGN_NONE,"#%d#%s", InfoColor, cuname[unum]);
       
-      lin = lin + 1;
-      cdputs( "   Multiple count:", lin, tcol );
-      cdputn( umultiple[unum], 0, lin, dcol );
+      lin++;
+      cprintf(lin,tcol,ALIGN_NONE,"#%d#%s", LabelColor,"   Multiple count:");
+      cprintf(lin,dcol,ALIGN_NONE,"#%d#%0d", InfoColor, umultiple[unum]);
       
-      lin = lin + 1;
-      for ( i = 0; i < MAXOPTIONS; i = i + 1 )
+      lin++;
+      for ( i = 0; i < MAXOPTIONS; i++ )
 	{
-	  sprintf( buf, "%17d:", i );
-	  cdputs( buf, lin+i, tcol );
+      cprintf(lin+i,tcol,ALIGN_NONE,"#%d#%17d:", LabelColor,i);
 	  if ( uoption[unum][i] )
-	    cdput( 'T', lin+i, dcol );
+      	cprintf(lin+i,dcol,ALIGN_NONE,"#%d#%c", GreenLevelColor,'T');
 	  else
-	    cdput( 'F', lin+i, dcol );
+      	cprintf(lin+i,dcol,ALIGN_NONE,"#%d#%c", RedLevelColor,'F');
 	}
-      cdputs( "  Phaser graphics:", lin+OPT_PHASERGRAPHICS, tcol );
-      cdputs( "     Planet names:", lin+OPT_PLANETNAMES, tcol );
-      cdputs( "       Alarm bell:", lin+OPT_ALARMBELL, tcol );
-      cdputs( "  Intruder alerts:", lin+OPT_INTRUDERALERT, tcol );
-      cdputs( "      Numeric map:", lin+OPT_NUMERICMAP, tcol );
-      cdputs( "            Terse:", lin+OPT_TERSE, tcol );
-      cdputs( "       Explosions:", lin+OPT_EXPLOSIONS, tcol );
+      cprintf(lin+OPT_PHASERGRAPHICS,tcol,ALIGN_NONE,"#%d#%s", 
+		LabelColor,"  Phaser graphics:");
+      cprintf(lin+OPT_PLANETNAMES,tcol,ALIGN_NONE,"#%d#%s", 
+		LabelColor,"     Planet names:");
+      cprintf(lin+OPT_ALARMBELL,tcol,ALIGN_NONE,"#%d#%s", 
+		LabelColor,"       Alarm bell:");
+      cprintf(lin+OPT_INTRUDERALERT,tcol,ALIGN_NONE,"#%d#%s", 
+		LabelColor,"  Intruder alerts:");
+      cprintf(lin+OPT_NUMERICMAP,tcol,ALIGN_NONE,"#%d#%s", 
+		LabelColor,"      Numeric map:");
+      cprintf(lin+OPT_TERSE,tcol,ALIGN_NONE,"#%d#%s", 
+		LabelColor,"            Terse:");
+      cprintf(lin+OPT_EXPLOSIONS,tcol,ALIGN_NONE,"#%d#%s", 
+		LabelColor,"       Explosions:");
       
-      lin = lin + MAXOPTIONS + 1;
-      cdputs( "          Urating:", lin, tcol );
-      cdputr( oneplace(urating[unum]), 0, lin, dcol );
+      lin+=(MAXOPTIONS + 1);
+      cprintf(lin,tcol,ALIGN_NONE,"#%d#%s", LabelColor,"          Urating:");
+      cprintf(lin,dcol,ALIGN_NONE,"#%d#%0g",InfoColor, oneplace(urating[unum]));
       
-      lin = lin + 1;
-      cdputs( "             Uwar:", lin, tcol );
+      lin++;
+      cprintf(lin,tcol,ALIGN_NONE,"#%d#%s", LabelColor,"             Uwar:");
       buf[0] = '(';
       for ( i = 0; i < NUMTEAMS; i = i + 1 )
 	if ( uwar[unum][i] )
@@ -2141,14 +2399,14 @@ void opuedit(void)
 	  buf[i+1] = '-';
       buf[NUMTEAMS+1] = ')';
       buf[NUMTEAMS+2] = EOS;
-      cdputs( buf, lin, dcol );
+      cprintf(lin,dcol,ALIGN_NONE,"#%d#%s",InfoColor, buf);
       
-      lin = lin + 1;
-      cdputs( "           Urobot:", lin, tcol );
+      lin++;
+      cprintf(lin,tcol,ALIGN_NONE,"#%d#%s", LabelColor,"           Urobot:");
       if ( urobot[unum] )
-	cdput( 'T', lin, dcol );
+      	cprintf(lin,dcol,ALIGN_NONE,"#%d#%c",GreenLevelColor, 'T');
       else
-	cdput( 'F', lin, dcol );
+      	cprintf(lin,dcol,ALIGN_NONE,"#%d#%c",RedLevelColor, 'F');
       
       /* Now the left side. */
       lin = 1;
@@ -2156,122 +2414,141 @@ void opuedit(void)
       dcol = 22;
       lcol = dcol - 1;
       
-      cdputs( "             Name:", lin, tcol );
-      cdputs( upname[unum], lin, dcol ); /* -[] */
+      cprintf(lin,tcol,ALIGN_NONE,"#%d#%s", LabelColor,"             Name:");
+      cprintf(lin,dcol,ALIGN_NONE,"#%d#%s",InfoColor, upname[unum]);
       
-      lin = lin + 1;
-      cdputs( "             Team:", lin, tcol );
+      lin++;
+      cprintf(lin,tcol,ALIGN_NONE,"#%d#%s", LabelColor,"             Team:");
       i = uteam[unum];
       if ( i < 0 || i >= NUMTEAMS )
-	cdputn( i, 0, lin, dcol );
+		  cprintf(lin,dcol,ALIGN_NONE,"#%d#%0d",InfoColor, i);
       else
-	cdputs( tname[i], lin, dcol ); /* -[] */
+		  cprintf(lin,dcol,ALIGN_NONE,"#%d#%s",InfoColor, tname[i]);
       
-      lin = lin + 1;
-      for ( i = 0; i < MAXOOPTIONS; i = i + 1 )
+      lin++;
+      for ( i = 0; i < MAXOOPTIONS; i++ )
 	{
-	  sprintf( buf, "%17d:", i );
-	  cdputs( buf, lin+i, tcol );
+      cprintf(lin+i,tcol,ALIGN_NONE,"#%d#%17d:", LabelColor,i);
 	  if ( uooption[unum][i] )
-	    cdput( 'T', lin+i, dcol );
+      	cprintf(lin+i,dcol,ALIGN_NONE,"#%d#%c", GreenLevelColor,'T');
 	  else
-	    cdput( 'F', lin+i, dcol );
+      	cprintf(lin+i,dcol,ALIGN_NONE,"#%d#%c", RedLevelColor,'F');
 	}
-      cdputs( "         Multiple:", lin+OOPT_MULTIPLE, tcol );
-      cdputs( "     Switch teams:", lin+OOPT_SWITCHTEAMS, tcol );
-      cdputs( " Play when closed:", lin+OOPT_PLAYWHENCLOSED, tcol );
-      cdputs( "          Disable:", lin+OOPT_SHITLIST, tcol );
-      cdputs( "     GOD messages:", lin+OOPT_GODMSG, tcol );
-      cdputs( "             Lose:", lin+OOPT_LOSE, tcol );
-      cdputs( "        Autopilot:", lin+OOPT_AUTOPILOT, tcol );
+      cprintf(lin+OOPT_MULTIPLE,tcol,ALIGN_NONE,"#%d#%s", 
+		LabelColor,"         Multiple:");
+      cprintf(lin+OOPT_SWITCHTEAMS,tcol,ALIGN_NONE,"#%d#%s", 
+		LabelColor,"     Switch teams:");
+      cprintf(lin+OOPT_PLAYWHENCLOSED,tcol,ALIGN_NONE,"#%d#%s", 
+		LabelColor," Play when closed:");
+      cprintf(lin+OOPT_SHITLIST,tcol,ALIGN_NONE,"#%d#%s", 
+		LabelColor,"          Disable:");
+      cprintf(lin+OOPT_GODMSG,tcol,ALIGN_NONE,"#%d#%s", 
+		LabelColor,"     GOD messages:");
+      cprintf(lin+OOPT_LOSE,tcol,ALIGN_NONE,"#%d#%s", 
+		LabelColor,"             Lose:");
+      cprintf(lin+OOPT_AUTOPILOT,tcol,ALIGN_NONE,"#%d#%s", 
+		LabelColor,"        Autopilot:");
       
-      lin = lin + MAXOOPTIONS + 1;
-      cdputs( "       Last entry:", lin, tcol );
-      cdputs( ulastentry[unum], lin, dcol ); /* -[] */
+      lin+=(MAXOOPTIONS + 1);
+      cprintf(lin,tcol,ALIGN_NONE,"#%d#%s", LabelColor,"       Last entry:");
+      cprintf(lin,dcol,ALIGN_NONE,"#%d#%s",InfoColor, ulastentry[unum]);
       
-      lin = lin + 1;
-      cdputs( "  Elapsed seconds:", lin, tcol );
+      lin++;
+      cprintf(lin,tcol,ALIGN_NONE,"#%d#%s", LabelColor,"  Elapsed seconds:");
       fmtseconds( ustats[unum][TSTAT_SECONDS], buf );
       i = dcol + 11 - strlen( buf );
-      cdputs( buf, lin, i );
+      cprintf(lin,i,ALIGN_NONE,"#%d#%s",InfoColor, buf);
       
-      lin = lin + 1;
-      cdputs( "      Cpu seconds:", lin, tcol );
+      lin++;
+      cprintf(lin,tcol,ALIGN_NONE,"#%d#%s", LabelColor,"      Cpu seconds:");
       fmtseconds( ustats[unum][TSTAT_CPUSECONDS], buf );
       i = dcol + 11 - strlen ( buf );
-      cdputs( buf, lin, i );
+      cprintf(lin,i,ALIGN_NONE,"#%d#%s",InfoColor, buf);
       
-      lin = lin + 1;
+      lin++;
       
       /* Do column 4 of the bottom stuff. */
       olin = lin;
       tcol = 62;
       dcol = 72;
-      cdputs( "Maxkills:", lin, tcol );
-      cdputn( ustats[unum][USTAT_MAXKILLS], 0, lin, dcol );
+      cprintf(lin,tcol,ALIGN_NONE,"#%d#%s", LabelColor, "Maxkills:");
+      cprintf(lin,dcol,ALIGN_NONE,"#%d#%0d",InfoColor, 
+      	ustats[unum][USTAT_MAXKILLS]);
       
-      lin = lin + 1;
-      cdputs( "Torpedos:", lin, tcol );
-      cdputn( ustats[unum][USTAT_TORPS], 0, lin, dcol );
+      lin++;
+      cprintf(lin,tcol,ALIGN_NONE,"#%d#%s", LabelColor, "Torpedos:");
+      cprintf(lin,dcol,ALIGN_NONE,"#%d#%0d",InfoColor,
+      	ustats[unum][USTAT_TORPS]);
       
-      lin = lin + 1;
-      cdputs( " Phasers:", lin, tcol );
-      cdputn( ustats[unum][USTAT_PHASERS], 0, lin, dcol );
+      lin++;
+      cprintf(lin,tcol,ALIGN_NONE,"#%d#%s", LabelColor, " Phasers:");
+      cprintf(lin,dcol,ALIGN_NONE,"#%d#%0d",InfoColor, 
+      	ustats[unum][USTAT_PHASERS]);
       
       /* Do column 3 of the bottom stuff. */
       lin = olin;
       tcol = 35;
       dcol = 51;
-      cdputs( " Planets taken:", lin, tcol );
-      cdputn( ustats[unum][USTAT_CONQPLANETS], 0, lin, dcol );
+      cprintf(lin,tcol,ALIGN_NONE,"#%d#%s", LabelColor, " Planets taken:");
+      cprintf(lin,dcol,ALIGN_NONE,"#%d#%0d",InfoColor,
+      	ustats[unum][USTAT_CONQPLANETS]);
       
-      lin = lin + 1;
-      cdputs( " Armies bombed:", lin, tcol );
-      cdputn( ustats[unum][USTAT_ARMBOMB], 0, lin, dcol );
+      lin++;
+      cprintf(lin,tcol,ALIGN_NONE,"#%d#%s", LabelColor, " Armies bombed:");
+      cprintf(lin,dcol,ALIGN_NONE,"#%d#%0d",InfoColor, 
+      	ustats[unum][USTAT_ARMBOMB]);
       
-      lin = lin + 1;
-      cdputs( "   Ship armies:", lin, tcol );
-      cdputn( ustats[unum][USTAT_ARMSHIP], 0, lin, dcol );
+      lin++;
+      cprintf(lin,tcol,ALIGN_NONE,"#%d#%s", LabelColor, "   Ship armies:");
+      cprintf(lin,dcol,ALIGN_NONE,"#%d#%0d",InfoColor,
+      	ustats[unum][USTAT_ARMSHIP]);
       
       /* Do column 2 of the bottom stuff. */
       lin = olin;
       tcol = 18;
       dcol = 29;
-      cdputs( " Conquers:", lin, tcol );
-      cdputn( ustats[unum][USTAT_CONQUERS], 0, lin, dcol );
+      cprintf(lin,tcol,ALIGN_NONE,"#%d#%s", LabelColor, " Conquers:");
+      cprintf(lin,dcol,ALIGN_NONE,"#%d#%0d",InfoColor,
+      	ustats[unum][USTAT_CONQUERS]);
       
-      lin = lin + 1;
-      cdputs( "    Coups:", lin, tcol );
-      cdputn( ustats[unum][USTAT_COUPS], 0, lin, dcol );
+      lin++;
+      cprintf(lin,tcol,ALIGN_NONE,"#%d#%s", LabelColor,"    Coups:");
+      cprintf(lin,dcol,ALIGN_NONE,"#%d#%0d",InfoColor,
+      	ustats[unum][USTAT_COUPS]);
       
-      lin = lin + 1;
-      cdputs( "Genocides:", lin, tcol );
-      cdputn( ustats[unum][USTAT_GENOCIDE], 0, lin, dcol );
+      lin++;
+      cprintf(lin,tcol,ALIGN_NONE,"#%d#%s", LabelColor, "Genocides:");
+      cprintf(lin,dcol,ALIGN_NONE,"#%d#%0d",InfoColor, 
+      	ustats[unum][USTAT_GENOCIDE]);
       
       /* Do column 1 of the bottom stuff. */
       lin = olin;
       tcol = 1;
       dcol = 10;
-      cdputs( "   Wins:", lin, tcol );
-      cdputn( ustats[unum][USTAT_WINS], 0, lin, dcol );
+      cprintf(lin,tcol,ALIGN_NONE,"#%d#%s", LabelColor, "   Wins:");
+      cprintf(lin,dcol,ALIGN_NONE,"#%d#%0d",InfoColor, 
+      	ustats[unum][USTAT_WINS]);
       
-      lin = lin + 1;
-      cdputs( " Losses:", lin, tcol );
-      cdputn( ustats[unum][USTAT_LOSSES], 0, lin, dcol );
+      lin++;
+      cprintf(lin,tcol,ALIGN_NONE,"#%d#%s", LabelColor, " Losses:");
+      cprintf(lin,dcol,ALIGN_NONE,"#%d#%0d",InfoColor, 
+      	ustats[unum][USTAT_LOSSES]);
       
-      lin = lin + 1;
-      cdputs( "Entries:", lin, tcol );
-      cdputn( ustats[unum][USTAT_ENTRIES], 0, lin, dcol );
+      lin++;
+      cprintf(lin,tcol,ALIGN_NONE,"#%d#%s", LabelColor, "Entries:");
+      cprintf(lin,dcol,ALIGN_NONE,"#%d#%0d",InfoColor, 
+      	ustats[unum][USTAT_ENTRIES]);
       
       /* Display the stuff */
-      cdputc( "Use arrow keys to position, SPACE to modify, q to quit.", MSG_LIN2 );
+      cprintf(MSG_LIN2,0,ALIGN_CENTER,"#%d#%s", InfoColor,
+		"Use arrow keys to position, SPACE to modify, q to quit. ");
       if ( left )
 	i = lcol;
       else
 	i = rcol;
       cdput( '+', row, i );
       cdmove( row, i );
-      cdrefresh( TRUE );
+      cdrefresh();
       
       /* Now, get a char and process it. */
       if ( ! iogtimed( &ch, 1 ) )
@@ -2370,19 +2647,18 @@ void opuedit(void)
 	      cdclrl( MSG_LIN2, 1 );
 	      ch = getcx( "Enter a new username: ",
 			 MSG_LIN2, 0, TERMS, buf, MAXUSERNAME );
-	      if ( ch != TERM_ABORT &&
-		  ( buf[0] != EOS || ch == TERM_EXTRA ) );
+	      if ( ch != TERM_ABORT && buf[0] != EOS)
 	      {
 		delblanks( buf );
 		if ( ! gunum( &i, buf ) )
-		  stcpn( buf, cuname[unum], MAXUSERNAME ); /* -[] */
+		  stcpn( buf, cuname[unum], MAXUSERNAME );
 		else
 		  {
 		    cdclrl( MSG_LIN1, 2 );
 		    cdputc( "That username is already in use.",
 			   MSG_LIN2 );
 		    cdmove( 1, 1 );
-		    cdrefresh( FALSE );
+		    cdrefresh();
 		    c_sleep( 1.0 );
 		  }
 	      }
@@ -2402,7 +2678,7 @@ void opuedit(void)
 		{
 		  delblanks( buf );
 		  i = 0;
-		  l = safectoi( &umultiple[unum], buf, i );
+		  safectoi( &umultiple[unum], buf, i );
 		}
 	    }
 	  else
@@ -2424,7 +2700,7 @@ void opuedit(void)
 	case TERM_EXTRA:
 	case TERM_ABORT:
 	  break;
-	case '\x0c':
+	case 0x0c:
 	  cdredo();
 	  break;
 	default:
@@ -2437,73 +2713,49 @@ void opuedit(void)
 }
 
 
-/*##  watch - peer over someone's shoulder */
+/*  watch - peer over someone's shoulder */
 /*  SYNOPSIS */
 /*    watch */
 void watch(void)
 {
   
-  int i, snum;
-  int ch, tch, l, normal;
+  int snum, tmp_snum, old_snum;
+  int ch, normal;
   int msgrand, readone, now;
   char buf[MSGMAXLINE];
-  string pmt="Watch which ship (<cr> for doomsday)? ";
-  string nss="No such ship.";
-  string nf="Not found.";
-  string help1="M - message from GOD, L - review messages,";
-  string help2="K - kill this ship, H - this message";
-  
-  cdclrl( MSG_LIN1, 2 );
-  tch = cdgetx( pmt, MSG_LIN1, 1, TERMS, buf, MSGMAXLINE );
-  if ( tch == TERM_ABORT )
-    {
-      cdclrl( MSG_LIN1, 1 );
-      return;
-    }
-  if ( strlen( buf ) == 0 )
-    {
-      /* Doomsday. */
-      cdclear();
-      cdredo();
-      do			/* repeat */
-	{
-	  doomdisplay();
-	  cdrefresh( TRUE );
-	}
-      while ( !iogtimed( &ch, 1 ) ); /* until */
-    }
+  int live_ships = TRUE;
+  int toggle_flg = FALSE;   /* jon no like the toggle line ... :-) */
+
+  normal = TRUE;
+
+  if (!prompt_ship(buf, &snum, &normal))
+    return;
   else
     {
-      normal = ( tch != TERM_EXTRA );		/* line feed means debugging */
-      delblanks( buf );
-      if ( alldig( buf ) != YES )
-	{
-	  cdputs( nss, MSG_LIN2, 1 );
-	  cdmove( 1, 1 );
-	  cdrefresh( FALSE );
-	  c_sleep( 1.0 );
-	  return;
-	}
-      i = 0;
-      l = safectoi( &snum, buf, i );		/* ignore status */
-      if ( snum < 1 || snum > MAXSHIPS )
-	{
-	  cdputs( nss, MSG_LIN2, 1 );
-	  cdmove( 1, 1 );
-	  cdrefresh( FALSE );
-	  c_sleep( 1.0 );
-	}
-      else
-	{
+	  old_snum = tmp_snum = snum;
 	  credraw = TRUE;
 	  cdclear();
 	  cdredo();
 	  grand( &msgrand );
+
+	  csnum = snum;		/* so display knows what to display */
+	  setopertimer();
+
 	  while (TRUE)	/* repeat */
 	    {
-	      /* Try to display a new message. */
-	      readone = FALSE;
-	      if ( dgrand( msgrand, &now ) >= NEWMSG_GRAND )
+	      if (!normal)
+		cdisplay = FALSE; /* can't use it to display debugging */
+	      else
+		cdisplay = TRUE;
+
+		/* set up toggle line display */
+		/* cdclrl( MSG_LIN1, 1 ); */
+		if (toggle_flg)
+			toggle_line(snum,old_snum);
+
+	    /* Try to display a new message. */
+	    readone = FALSE;
+	    if ( dgrand( msgrand, &now ) >= NEWMSG_GRAND )
 		if ( getamsg( MSG_GOD, glastmsg ) )
 		  {
 		    readmsg( MSG_GOD, *glastmsg, RMsg_Line );
@@ -2512,16 +2764,23 @@ void watch(void)
 		    msgrand = now;
 		    readone = TRUE;
 		  }
+
+	      setdheader( TRUE ); /* always true for watching ships and
+				     doomsday.  We may want to turn it off
+				     if we ever add an option for watching
+				     planets though, so we'll keep this
+				     in for now */
 	      
-	      /* Drive the display. */
-	      if ( normal )
-		display( snum );
-	      else
-		debugdisplay( snum );
+	      if ( !normal )
+		{
+		  debugdisplay( snum );
+		}
+	      
+	      /* doomdisplay(); */
 	      
 	      /* Un-read message, if there's a chance it got garbaged. */
 	      if ( readone )
-		if ( iochav( 0 ) )
+		if ( iochav() )
 		  *glastmsg = modp1( *glastmsg - 1, MAXMESSAGES );
 	      
 	      /* Get a char with timeout. */
@@ -2530,43 +2789,479 @@ void watch(void)
 	      cdclrl( MSG_LIN1, 2 );
 	      switch ( ch )
 		{
+		case 'd':    /* flip the doomsday machine (only from doomsday window) */
+		  if (snum == DISPLAY_DOOMSDAY)
+		    {
+		      if ( *dstatus == DS_LIVE )
+			*dstatus = DS_OFF;
+		      else
+			doomsday();
+		    }
+		  else
+		    cdbeep();
+		  break;
 		case 'h':
-		case 'H':
-		  cdputc( help1, MSG_LIN1 );
-		  cdputc( help2, MSG_LIN2 );
+		  stoptimer();
+		  dowatchhelp();
+		  credraw = TRUE;
+		  setopertimer();
 		  break;
 		case 'i':
 		  opinfo( MSG_GOD );
 		  break;
 		case 'k':
-		  if ( confirm( 0 ) )
-		    killship( snum, KB_GOD );
+		  kiss(csnum, TRUE);
 		  break;
 		case 'm':
 		  sendmsg( MSG_GOD, TRUE );
 		  break;
-		case 'L':
-		  l = review( MSG_GOD, *glastmsg );
+		case 'r':  /* just for fun - dwp */
+		  oprobot();
 		  break;
-		case '\x0c':
+		case 'L':
+		  review( MSG_GOD, *glastmsg );
+		  break;
+		case 0x0c:
+		  stoptimer();
 		  cdredo();
 		  credraw = TRUE;
+		  setopertimer();
 		  break;
 		case 'q':
 		case 'Q':
+		  stoptimer();
 		  return;
+		  break;
+		case 'w': /* look at any ship (live or not) if specifically asked for */
+		  tmp_snum = snum;
+		  if (prompt_ship(buf, &snum, &normal)) 
+		    {
+		      if (tmp_snum != snum) 
+			{
+			  old_snum = tmp_snum;
+			  tmp_snum = snum;
+			  credraw = TRUE;
+			}
+		      csnum = snum;
+		      if (normal)
+			{
+			  stoptimer();
+			  display( csnum, headerflag );
+			  setopertimer();
+			}
+		    }
+		  break;
+		case 'W': /* toggle live_ships flag */
+		  if (live_ships)
+		    live_ships = FALSE;
+		  else
+		    live_ships = TRUE;
+		  break;
+		case '`':                 /* toggle between two ships */
+		  if (normal || (!normal && old_snum > 0))
+		    {
+		      if (old_snum != snum) 
+			{
+			  tmp_snum = snum;
+			  snum = old_snum;
+			  old_snum = tmp_snum;
+			  
+			  csnum = snum;
+			  credraw = TRUE;
+			  if (normal)
+			    {
+			      stoptimer();
+			      display( csnum, headerflag );
+			      setopertimer();
+			    }
+			}
+		    }
+		  else
+		    cdbeep();
+		  break;
+		case '~':                 /* toggle debug display */
+		  if (csnum > 0) 
+		    {
+		      if (normal)
+			normal = FALSE;
+		      else
+			normal = TRUE;
+		      credraw = TRUE;
+		      cdclear();
+		    }
+		  else
+		    cdbeep();
+		  break;
+		case '/':                /* ship list - dwp */
+		  stoptimer();
+		  playlist( TRUE, FALSE, 0 );
+		  credraw = TRUE;
+		  setopertimer();
+		  break;
+		case '\\':               /* big ship list - dwp */
+		  stoptimer();
+		  playlist( TRUE, TRUE, 0 );
+		  credraw = TRUE;
+		  setopertimer();
+		  break;
+		case '!':
+		  if (toggle_flg)
+			toggle_flg = FALSE;
+		  else
+			toggle_flg = TRUE;
+		  break;
+		case '>':  /* forward rotate ship numbers (including doomsday) - dwp */
+		case KEY_RIGHT:
+		case KEY_UP:
+		  while (TRUE)
+		    {
+		      int i;
+
+		      if (live_ships)
+			{	/* we need to make sure that there is
+				   actually something alive or an
+				   infinite loop will result... */
+			  int foundone = FALSE;
+
+			  for (i=1; i <= MAXSHIPS; i++)
+			    {
+			      if (stillalive(i))
+				{
+				  foundone = TRUE;
+				}
+			    }
+			  if (foundone == FALSE)
+			    {	/* check the doomsday machine */
+			      if (*dstatus == DS_LIVE)
+				foundone = TRUE;
+			    }
+
+			  if (foundone == FALSE)
+			    {
+			      cdbeep();
+			      break; /* didn't find one, beep, leave everything
+				      alone*/
+			    }
+			}
+
+		      if (snum == DISPLAY_DOOMSDAY)
+			{	  /* doomsday - wrap around to first ship */
+			  i = 1;
+			}
+		      else	
+			i = snum + 1;
+
+		      if (i > MAXSHIPS)
+			{	/* if we're going past
+				   now loop thu specials (only doomsday for
+				   now... ) */
+			  if (normal)
+			    i = DISPLAY_DOOMSDAY;
+			  else
+			    i = 1;
+			}
+		      
+		      snum = i;
+			
+		      credraw = TRUE;
+		      
+		      if (live_ships)
+			if ((snum > 0 && stillalive(snum)) || 
+			    (snum == DISPLAY_DOOMSDAY && *dstatus == DS_LIVE))
+			  {
+			    csnum = snum;
+			    break;
+			  }
+			else
+			  continue;
+		      else
+			{
+			  csnum = snum;
+			  break;
+			}
+		    }
+		  if (normal)
+		    {
+		      stoptimer();
+		      display( csnum, headerflag );
+		      setopertimer();
+		    }
+		  break;
+		case '<':  /* reverse rotate ship numbers (including doomsday)  - dwp */
+		case KEY_LEFT:
+		case KEY_DOWN:
+		  while (TRUE)
+		    {
+		      int i;
+
+		      if (live_ships)
+			{	/* we need to make sure that there is
+				   actually something alive or an
+				   infinite loop will result... */
+			  int foundone = FALSE;
+
+			  for (i=1; i <= MAXSHIPS; i++)
+			    {
+			      if (stillalive(i))
+				{
+				  foundone = TRUE;
+				}
+			    }
+			  if (foundone == FALSE)
+			    {	/* check the doomsday machine */
+			      if (*dstatus == DS_LIVE)
+				foundone = TRUE;
+			    }
+
+			  if (foundone == FALSE)
+			    {
+			      cdbeep();
+			      break; /* didn't find one, beep, leave everything
+				      alone*/
+			    }
+			}
+
+
+		      if (snum == DISPLAY_DOOMSDAY)
+			{	  /* doomsday - wrap around to last ship */
+			  i = MAXSHIPS;
+			}
+		      else	
+			i = snum - 1;
+
+		      if (i <= 0)
+			{	/* if we're going past
+				   now loop thu specials (only doomsday for
+				   now... )*/
+			  if (normal)
+			    i = DISPLAY_DOOMSDAY;
+			  else
+			    i = MAXSHIPS;
+			}
+		      
+		      snum = i;
+			
+		      credraw = TRUE;
+		      
+		      if (live_ships)
+			if ((snum > 0 && stillalive(snum)) || 
+			    (snum == DISPLAY_DOOMSDAY && *dstatus == DS_LIVE))
+			  {
+			    csnum = snum;
+			    break;
+			  }
+			else
+			  continue;
+		      else
+			{
+			  csnum = snum;
+			  break;
+			}
+		    }
+		  if (normal)
+		    {
+		      stoptimer();
+		      display( csnum, headerflag );
+		      setopertimer();
+		    }
+
+		  break;
+		case TERM_ABORT:
+		  return;
+		  break;
 		default:
+		  cdbeep();
 		  break;
 		}
 	      /* Disable messages for awhile. */
 	      grand( &msgrand );
 	    }
-	  
-	}
+	} /* end else */
+
+  /* NOTREACHED */
+  
     }
+
+void setdheader(int show_header)
+{
+
+  headerflag = show_header;
+  return;
+}
+
+int prompt_ship(char buf[], int *snum, int *normal)
+{
+  int tch;
+  int tmpsnum = 0;
+  string pmt="Watch which ship (<cr> for doomsday)? ";
+  string nss="No such ship.";
+
+  tmpsnum = *snum;
+
+  cdclrl( MSG_LIN1, 2 );
+  buf[0] = EOS;
+  tch = cdgetx( pmt, MSG_LIN1, 1, TERMS, buf, MSGMAXLINE );
+  cdclrl( MSG_LIN1, 1 );
+
+  if ( tch == TERM_ABORT )
+    {
+      return(FALSE); /* dwp */
+    }
+  
+  /* 
+   * DWP - Removed old code to watch doomsday machine.
+   * Watch it with conqlb.c display() now.
+   */
+  
+  *normal = ( tch != TERM_EXTRA );		/* line feed means debugging */
+
+  delblanks( buf );
+
+  if ( strlen( buf ) == 0 ) 
+    {              /* watch doomsday machine */
+      tmpsnum = DISPLAY_DOOMSDAY;
+      *normal = TRUE;		/* doomsday doesn't have a debugging view */
+    }
+  else
+    {
+      if ( alldig( buf ) != TRUE )
+	{
+	  cdputs( nss, MSG_LIN2, 1 );
+	  cdmove( 1, 1 );
+	  cdrefresh();
+	  c_sleep( 1.0 );
+	  return(FALSE); /* dwp */
+	}
+      safectoi( &tmpsnum, buf, 0 );	/* ignore return status */
+    }
+
+  if ( (tmpsnum < 1 || tmpsnum > MAXSHIPS) && tmpsnum != DISPLAY_DOOMSDAY )
+    {
+      cdputs( nss, MSG_LIN2, 1 );
+      cdmove( 1, 1 );
+      cdrefresh();
+      c_sleep( 1.0 );
+      return(FALSE); /* dwp */
+    }
+
+  *snum = tmpsnum;
+  return(TRUE);
+
+} /* end prompt_ship() */
+
+
+/*  dowatchhelp - display a list of commands while watching a ship */
+/*  SYNOPSIS */
+/*    dowatchhelp( void ) */
+void dowatchhelp(void)
+{
+  int lin, col, tlin;
+  int ch;
+  int FirstTime = TRUE;
+  static char sfmt[MSGMAXLINE * 2];
+
+  if (FirstTime == TRUE)
+    {
+      FirstTime = FALSE;
+      sprintf(sfmt,
+	      "#%d#%%-9s#%d#%%s",
+	      InfoColor,
+	      LabelColor);
+	}
+
+  cdclear();
+  cprintf(1,0,ALIGN_CENTER,"#%d#%s", LabelColor, "WATCH WINDOW COMMANDS");
+  
+  lin = 4;
+  
+  /* Display the left side. */
+  tlin = lin;
+  col = 4;
+  tlin++;
+  cprintf(tlin,col,ALIGN_NONE,sfmt, 
+	"d", "flip the doomsday machine - doomsday window only");
+  tlin++;
+  cprintf(tlin,col,ALIGN_NONE,sfmt, "m", "message from GOD");
+  tlin++;
+  cprintf(tlin,col,ALIGN_NONE,sfmt, "L", "review messages");
+  tlin++;
+  cprintf(tlin,col,ALIGN_NONE,sfmt, "k", "kill this ship");
+  tlin++;
+  cprintf(tlin,col,ALIGN_NONE,sfmt, "h", "this message");
+  tlin++;
+  cprintf(tlin,col,ALIGN_NONE,sfmt, "w", "watch a ship");
+  tlin++;
+  cprintf(tlin,col,ALIGN_NONE,sfmt, 
+  	"W", "toggle between (live status) and (any status) ships");
+  tlin++;
+  cprintf(tlin,col,ALIGN_NONE,sfmt, 
+  	"<>", "decrement/increment ship number\n");
+  tlin++;
+  cprintf(tlin,col,ALIGN_NONE,sfmt, "`", "toggle between two ships");
+  tlin++;
+  cprintf(tlin,col,ALIGN_NONE,sfmt, 
+  	"~", "toggle between window and debug ship screen");
+  tlin++;
+  cprintf(tlin,col,ALIGN_NONE,sfmt, "!", "display toggle line");
+  tlin++;
+  cprintf(tlin,col,ALIGN_NONE,sfmt, "/", "player list");
+
+  putpmt( "--- press space when done ---", MSG_LIN2 );
+  cdrefresh();
+  while ( ! iogtimed( &ch, 1 ) )
+    ;
+  cdclrl( MSG_LIN2, 1 );
   
   return;
   
 }
 
+
+void toggle_line(int snum, int old_snum)
+{
+
+  char *frmt_str = "(') = Toggle %s:%s";
+  char snum_str[MSGMAXLINE];
+  char old_snum_str[MSGMAXLINE];
+  char buf[MSGMAXLINE];
+  
+  build_toggle_str(snum_str,snum);
+  build_toggle_str(old_snum_str,old_snum);
+  
+  sprintf(buf,frmt_str,snum_str, old_snum_str);
+  cdputs( buf, MSG_LIN1, (cmaxcol-(strlen(buf))));  /* at end of line */
+  
+  return;
+
+}
+
+char *build_toggle_str(char *snum_str, int snum)
+{
+  
+  char buf[MSGMAXLINE];
+  static char *doomsday_str = "DM";
+  static char *deathstar_str = "DS";
+  static char *unknown_str = "n/a";
+  
+  buf[0] = EOS;
+  if (snum > 0 && snum <= MAXSHIPS)
+    {          /* ship */
+      sprintf(snum_str,"%c%d", chrteams[steam[snum]], snum);
+    }
+  else if (snum < 0 && -snum <= NUMPLANETS) 
+    {  /* planet */
+
+      sprintf(snum_str, "%c%c%c", 
+	      pname[-snum][0], pname[-snum][1], pname[-snum][2]);
+    }
+  else if (snum == DISPLAY_DOOMSDAY)          /* specials */
+    strcpy(snum_str,doomsday_str);
+  else if (snum == DISPLAY_DEATHSTAR)
+    strcpy(snum_str,deathstar_str);
+  else                                        /* should not get here */
+    strcpy(snum_str,unknown_str);
+  
+  return(snum_str);
+
+}
 

@@ -13,7 +13,7 @@
 /* by Jon Trulson <jon@radscan.com> under the same terms and          */
 /* conditions of the original copyright by Jef Poskanzer and Craig    */
 /* Leres.                                                             */
-/* Have Phun!                                                         */
+/*                                                                    */
 /**********************************************************************/
 
 #include <sys/ipc.h>
@@ -30,8 +30,8 @@ static char *semId = "$Id$";
 #define CONQSEMPERMS (00664)
 #define CONQNUMSEMS  (2)
 
-static int ConquestSemID;
-static struct sembuf semops[CONQNUMSEMS], *sops;
+static key_t ConquestSemID;
+static struct sembuf semops[CONQNUMSEMS];
 
 char *getsemtxt(int what)
 {
@@ -46,9 +46,7 @@ char *getsemtxt(int what)
 
 int GetSem(void)
 {
-  key_t semkey;
   int semflags;
-  int retval;
 
 				/* try to create first */
   semflags = CONQSEMPERMS | IPC_CREAT;
@@ -99,12 +97,12 @@ void Lock(int what)
 
   Done = FALSE;
 				/* Wait for sem to be zero, then inc */
-  semops[0].sem_num = what;
+  semops[0].sem_num = (short)what;
   semops[0].sem_op = 0;		/* test for 0, if so... */
   semops[0].sem_flg = 0;
 
 				/* then increment it. */
-  semops[1].sem_num = what;
+  semops[1].sem_num = (short)what;
   semops[1].sem_op = 1;
   semops[1].sem_flg = SEM_UNDO;	/* undo if we die unexpectedly */
   
@@ -136,7 +134,6 @@ void Lock(int what)
 	Done = TRUE;
     }
 
-				/* hopefully we got a lock */
 #ifdef DEBUG_SEM
   clog("Lock(%s): semop(): succeeded, got a lock",
        getsemtxt(what));
@@ -148,8 +145,7 @@ void Lock(int what)
 /* Unlock() - unlock part of the common block (dec a semaphore to 0) */
 void Unlock(int what)
 {
-  int err = 0;
-  int retval;
+  int err, retval;
   ushort semvals[16];
 
 				/* get the values of the semaphores */
@@ -162,7 +158,7 @@ void Unlock(int what)
 	   sys_errlist[errno]);
     }
   else
-    {				/* got semvals.. check it */
+    {				/* got semvals... */
 				/* check to see if already unlocked */
       if (semvals[what] == 0)	/* sem already unlocked - report and continue */
 	{
@@ -175,7 +171,7 @@ void Unlock(int what)
 
 
 				/* Decrement to 0 */
-  semops[0].sem_num = what;
+  semops[0].sem_num = (short)what;
   semops[0].sem_op = -1;
   semops[0].sem_flg = 0;
 
@@ -211,7 +207,6 @@ void Unlock(int what)
 char *GetSemVal(int thesem)
 {
   struct semid_ds SemDS;
-  struct sem *Sem;
   ushort semvals[16];
   static char buf[80];
   static char tmbuf[80];
@@ -246,8 +241,6 @@ char *GetSemVal(int thesem)
 	   thesem,
 	   sys_errlist[errno]);
     }
-
-  Sem = SemDS.sem_base;
 
   if (semvals[LOCKMSG] != 0)	/* currently locked */
     sprintf(mesgtxt, "*MesgCnt = %d(%d:%d)", *lockmesg, lastmsgpid, msgzcnt);

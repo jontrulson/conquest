@@ -10,7 +10,7 @@
 /* by Jon Trulson <jon@radscan.com> under the same terms and          */
 /* conditions of the original copyright by Jef Poskanzer and Craig    */
 /* Leres.                                                             */
-/* Have Phun!                                                         */
+/*                                                                    */
 /**********************************************************************/
 
 
@@ -25,11 +25,11 @@ int alldig(char *buf)
   while (*s)
     {
       if (!isdigit(*s))
-	return(NO);
+	return(FALSE);
       s++;
     }
   
-  return(YES);
+  return(TRUE);
 }
 
 /* c_type(char) - returns LETTER or DIGIT if letter or digit, returns ERR 
@@ -82,7 +82,7 @@ void lower(char *buf)
 
   while(*s)
     {
-      *s = tolower(*s);
+      *s = (char)tolower(*s);
       s++;
     }
 }
@@ -96,7 +96,7 @@ void upper(char *buf)
 
   while(*s)
     {
-      *s = toupper(*s);
+      *s = (char)toupper(*s);
       s++;
     }
 }
@@ -120,7 +120,7 @@ void getnow (int now[8])
 }
 
 /* wkday(int, int, int) - all args ignored - returns day num */
-int wkday (int a, int b, int c)
+int wkday (void)
 {
   struct tm *thetm;
   time_t thetimet;
@@ -131,31 +131,6 @@ int wkday (int a, int b, int c)
   return(thetm->tm_wday + 1);
 }
     
-/* char c_getch(char ch, int fd) - get a char from a file */
-char c_getch(char c, int fd)
-{
-  static int bufcnt = 1;	/* force read first time */
-  static char inbuff[BUFSIZ];
-  static int cnt = 0;
-
-  if (bufcnt > cnt)		/* buffer empty, get a new one */
-    {
-      cnt = read(fd, inbuff, BUFSIZ);		/* get a char */
-
-      if (cnt == 0)
-	{
-	  cnt = 0;
-	  bufcnt = 1;		/* force a read next call */
-	  return(EOF);
-	}
-
-      bufcnt = 0;
-    }
-
-  c = inbuff[bufcnt++];
-  return(c);
-}
-
 /* Find first bit that is set and return bit number */
 int lib_ffs(int start, int len, int bits, int *rule)
 {
@@ -253,19 +228,14 @@ void error(char str[])
   exit(1);
 }
 
-int ctoi(char *buf)
-{
-  static int i;
-
-  i = atoi(buf);
-  return(i);
-}
-
 real ctor(char *buf)
 {
   static real r;
+  float f;
 
-  sscanf(buf, "%f", &r);
+  sscanf(buf, "%f", &f);
+
+  r = (real) f;
   return(r);
 }
 

@@ -14,7 +14,7 @@
 /* by Jon Trulson <jon@radscan.com> under the same terms and          */
 /* conditions of the original copyright by Jef Poskanzer and Craig    */
 /* Leres.                                                             */
-/* Have Phun!                                                         */
+/*                                                                    */
 /**********************************************************************/
 
 #include "global.h"
@@ -33,7 +33,7 @@ void iBufInit(void)
 }
 
 
-/* iBufEmpty - return TRUE of FALSE depending on whether the buffer is 
+/* iBufEmpty - return TRUE or FALSE depending on whether the buffer is 
  * empty 
  */
 
@@ -68,6 +68,23 @@ void iBufPut(char *thestr)
 
   return;
 }
+
+/* iBufPutc - put a char into the buffer */
+
+void iBufPutc(char thechar)
+{
+  int i;
+
+  i = iBufOffset + 1;
+
+  if (i < IBUFMAX)
+    iBuffer[i] = thechar;
+
+  iBufOffset++;
+
+  return;
+}
+
 
 /* iBufGetCh - return next char from the input buffer */
 

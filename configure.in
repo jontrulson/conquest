@@ -17,6 +17,8 @@ dnl get the system type and set accordingly.  first init some defaults.
 AC_MSG_CHECKING(system type)
 
 uname=`uname -s`
+urev=`uname -r`
+
 case "$uname" in
   Linux*)
 	AC_DEFINE(LINUX)    
@@ -62,9 +64,32 @@ case "$uname" in
 
 	AC_MSG_RESULT(FreeBSD)
 	;;
+  SunOS*)
+	AC_DEFINE(SOLARIS)
+
+	CC="gcc"
+	CFLAGS="$CFLAGS -O2 -fPIC -fno-builtin"
+
+	FILEPRIV="@-echo filepriv"
+	AC_SUBST(FILEPRIV)
+
+	CONQLB="libconquest.so"
+	AC_SUBST(CONQLB)
+
+	LBFLAGS="$LBFLAGS \$(CFLAGS) --shared -o \$(CONQLB)"
+	AC_SUBST(LBFLAGS)
+
+	LBBUILD="\$(CC)"
+	AC_SUBST(LBBUILD)
+
+	RANLIB="echo"
+	AC_SUBST(RANLIB)
+
+	AC_MSG_RESULT(Solaris)
+	;;
   UNIX_SV*)
 	AC_DEFINE(UNIXWARE)
-	CFLAGS="$CFLAGS -O -Xa"
+	CFLAGS="$CFLAGS -O -KPIC -Xa"
 
 	FILEPRIV="/sbin/filepriv"
 	AC_SUBST(FILEPRIV)
@@ -88,7 +113,7 @@ case "$uname" in
   *)	
 	# assume Unixware
 	AC_DEFINE(UNIXWARE)     # this enables some things too
-	CFLAGS="$CFLAGS -O -Xa"
+	CFLAGS="$CFLAGS -O -KPIC -Xa"
 
 	FILEPRIV="/sbin/filepriv"
 	AC_SUBST(FILEPRIV)
@@ -152,7 +177,7 @@ dnl Checks for header files.
 AC_HEADER_STDC
 AC_CHECK_HEADERS(fcntl.h limits.h sys/ioctl.h sys/times.h termio.h unistd.h)
 AC_CHECK_HEADERS(ncurses.h term.h sys/time.h sys/select.h stropts.h poll.h)
-AC_CHECK_HEADERS(curses.h time.h)
+AC_CHECK_HEADERS(curses.h time.h string.h strings.h)
 
 dnl Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST

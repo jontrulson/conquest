@@ -6,27 +6,6 @@
 #
 # $Id$
 #
-# $Log$
-# Revision 1.2  1997/06/28 23:40:35  jon
-# fixing dist scipts
-#
-# Revision 1.1.1.1  1997/05/24 19:39:23  jon
-# Conquest 6.4 distribution
-#
-# Revision 1.4  1996/11/30  20:44:08  jon
-# *** empty log message ***
-#
-# Revision 1.3  1996/07/03  02:14:47  jon
-# - added README's
-#
-# Revision 1.2  1996/07/02  20:30:06  jon
-# *** empty log message ***
-#
-# Revision 1.1  1996/06/01  21:45:06  jon
-# Initial revision
-#
-#
-#
 ##############################################################################
 # set -x
 
@@ -38,14 +17,14 @@ CONQVER="conquest-$VERSION"
 ARCFILE="${CONQVER}.src.tar"
 
 rm -f ${ARCFILE}.gz
-
+rm -rf $CONQVER
 echo Arcive name: $ARCFILE
 
-FILELIST="conqfig.c ratfor.c cd2lb.c ionlb.c ioxlb.c conqlb.c gamlb.c 
-	ioplb.c rndlb.c conqmisc.c conqutil.c conqcm.c conqsvr42.c global.c 
+FILELIST="ratfor.c cd2lb.c display.c iolb.c conqlb.c
+	rndlb.c conqmisc.c conqutil.c conqcm.c conqsvr42.c global.c 
 	ibuf.c ibuf.h version.c conf.c sem.c conquest.c conqoper.c conqdriv.c
 	conqai.c c_defs.h color.h conqcom.h conqdata.h defs.h 
-	cdcom.h conf.h conqcom2.h conqdef.h global.h
+	conf.h conqcom2.h conqdef.h global.h color.c
 	conquest.doc conqnews.doc configure.in configure
 	config.h.in config.guess config.sub Makefile.in README 
 	acconfig.h conqstrat.h conqstrat.c.l conqstrat.c.y conqrule
@@ -58,13 +37,25 @@ cp -p $FILELIST $CONQVER/
 cp -p conquest.txt $CONQVER/$CONQVER.txt
 cp -p conquest.lsm $CONQVER/$CONQVER.lsm
 
+# now the terminfo files
+mkdir $CONQVER/ti
+chmod 755 $CONQVER/ti
+cp -p ti/*.ti $CONQVER/ti/
+
+chmod 644 $CONQVER/ti/*
+
 chmod 640 $CONQVER/*
+chmod 755 $CONQVER/ti
 chmod 750 $CONQVER/configure $CONQVER/config.guess $CONQVER/config.sub
 
 
 tar cvf ${ARCFILE} $CONQVER
 gzip -v $ARCFILE
 rm -rf $CONQVER
+
+set -x 
+cp -f ${ARCFILE}.gz ~/tx/conquest/
+chmod 644 ~/tx/conquest/${ARCFILE}.gz
 
 exit
 	

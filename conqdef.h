@@ -20,7 +20,7 @@
 /* by Jon Trulson <jon@radscan.com> under the same terms and          */
 /* conditions of the original copyright by Jef Poskanzer and Craig    */
 /* Leres.                                                             */
-/* Have Phun!                                                         */
+/*                                                                    */
 /**********************************************************************/
 
 
@@ -52,12 +52,11 @@
 /* This define should be changed every time the common block changes. */
 /*#define COMMONSTAMP 861104 		/* stardate? */
 /*#define COMMONSTAMP 940910 		/* stardate? */
-#define COMMONSTAMP 961019 		/* stardate? */
+/*#define COMMONSTAMP 961019 		/* stardate? */
+#define COMMONSTAMP 971207 		/* stardate? */
 
 /* Copyright notice string. */
 #define COPYRIGHT "(C) 1983-1986 by Jef Poskanzer and Craig Leres"
-
-/* Undefine silly things from "incl/ratdef". */
 
 #ifndef PI
 # define PI 3.141592654
@@ -118,7 +117,30 @@
 #define PLANET_CLASSO 7 
 #define PLANET_CLASSZ 0 
 
-#define NUMPLANETS 40 		/* number of planets */
+				/* Number of planets with specific
+				   identities within conquest.  This
+				   will always be 40 for posterity */
+#define NUM_BASEPLANETS 40
+
+                                /* This is the number of 'extra' planets
+				   to be used for whatever.  None of these
+				   can be core planets, and will be
+				   initialized to invisible, unreal,
+				   with unimaginative names like Extra 1
+				   etc... Eventually, these planets
+				   will be initializable in the sys-wide
+				   config file.  REMEMBER: If you change
+				   this number, change the common block id
+				   (COMMONSTAMP) to reflect the change. Also
+				   make sure you don't choose a number large
+				   enough to overflow the common block
+				   (SIZEOF_COMMONBLOCK) */
+
+#define NUM_EXTRAPLANETS 20
+
+				/* number of planets */
+#define NUMPLANETS (NUM_BASEPLANETS + NUM_EXTRAPLANETS)
+
   /* Planet numbers. */
 #define PNUM_EARTH 1
 #define PNUM_ROMULUS 2 
@@ -166,9 +188,9 @@
 #define PNUM_GHOST2 37 
 #define PNUM_GHOST3 38 
 #define PNUM_GHOST4 39 
+#define PNUM_GHOST5 40		/* LAST 'base' planet, any after this number
+				   are extra */
 
-  /* Spares. */
-#define PNUM_SPARE1 40 
 
 #define MAXUSERS 40 		/* maximum number of registered users */
 #define MAXUSERNAME 30 		/* maximum size of a user's login name */
@@ -462,6 +484,15 @@
 #define MIN_UNINHAB_MINUTES 45 	/* minimum time till inhabitable */
 #define MAX_UNINHAB_MINUTES 120 	/* maximum time till inhabitable */
 
+				/* these are used to assign special
+				   ship numbers to represent non
+				   ships like the doomsday machine,
+				   deathstar, and any other watchable
+				   non-ship/planet items */
+#define SPECIAL_BASE (MAXSHIPS + NUMPLANETS + 1)   
+#define DISPLAY_DOOMSDAY ((SPECIAL_BASE + 1) * -1)   /* doomsday machine num */
+#define DISPLAY_DEATHSTAR ((SPECIAL_BASE + 2) * -1)
+
 /* JET - these were a bit high, 120 and 240 respectively. */
 #define MIN_COUP_MINUTES 10 	/* minimum time till coup in minutes */
 #define MAX_COUP_MINUTES 90 	/* maximum time till coup in minutes */
@@ -486,6 +517,7 @@
 #define MSG_LIN1 (DISPLAY_LINS + 2) 
 /*#define MSG_LIN2 incr(MSG_LIN1 )			/* line for messages */
 #define MSG_LIN2 (MSG_LIN1 + 1)			/* line for messages */
+#define MSG_LIN3 (MSG_LIN1 + 2)			/* line for messages */
 
 
 #define TIMEOUT_DRIVER 10 	/* seconds of timeout for the driver */
@@ -510,28 +542,29 @@
 /* Actual size of common block */
 #define SIZEOF_COMMONBLOCK 65536 
 
-/*#define MAXINTEGER_VALUE 2147483647  /* biggest 32 bit signed quantity */
-/*#define MAXINTEGER_LENGTH 13 	/* size of biggest int string */
-/*#define MAILADDR "leres,jef,marshall,jon"  /* address of the implementors */
 #define MAILADDR ""
+
+				/* for launch() */
+#define LAUNCH_NORMAL   (0)
+#define LAUNCH_EXPLODE  (1)
 
 /* Macros, here order is important. */
 
 /*#define round(x) jnint(x )				/* int round */
-#define round(x) ((int)rint((double)(x)))		/* int round */
+#define round(x) ((int)rint((real)(x)))		/* int round */
 
 /* #define around(x) anint(x) 	/* real round */
-#define around(x) ((real) rint((double)(x)))  	/* real round */
+#define around(x) ((real) rint((real)(x)))  	/* real round */
 
 #define oneplace(x) (real)(around((x) * 10.0)/10.0)	/* nearest tenth */
 #define dtor(x) (((real)(x) / 180.0) * PI)	/* degrees to radians */
 #define rtod(x) (((real)(x) / PI) * 180.0)	/* radians to degrees */
-#define cosd(x) (real)cosf((real)dtor((x) ))	/* cosine of angle in degrees */
-#define sind(x) (real)sinf((real)dtor((x) ))	/* sine of angle in degrees */
+#define cosd(x) (real)cos((real)dtor((x) ))	/* cosine of angle in degrees */
+#define sind(x) (real)sin((real)dtor((x) ))	/* sine of angle in degrees */
+#define dist(w,x,y,z) (real) sqrt(pow((real)((y)-(w)), (real) 2.0) + pow((real)((z)-(x)), (real) 2.0))
 
-#define dist(w,x,y,z) (real) sqrt(powf((real)((y)-(w)), (real) 2) + powf((real)((z)-(x)), (real) 2))	
-
-#define distf(w,x,y,z) (abs((y)-(w)) + abs((z)-(x)))		/* fast distance */
+				/* fast distance */
+#define distf(w,x,y,z) (real)(fabs((real)(y)-(real)(w)) + fabs((real)(z)-(real)(x)))
 #define vowel(x) (x=='a' || x=='e' || x=='i' || x=='o' || x=='u' )
 #define satwar(x,y) (swar[x][steam[y]] || swar[y][steam[x]])
 #define selfwar(x) swar[x][steam[x ]]

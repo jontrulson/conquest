@@ -10,7 +10,7 @@
 /* by Jon Trulson <jon@radscan.com> under the same terms and          */
 /* conditions of the original copyright by Jef Poskanzer and Craig    */
 /* Leres.                                                             */
-/* Have Phun!                                                         */
+/*                                                                    */
 /**********************************************************************/
 
 #include "c_defs.h"
@@ -36,13 +36,12 @@ static char *conqdrivId = "$Id$";
 #define FIVEMINUTE_SECONDS 300 
 
 
-/*##  conqdriv - main program (DOES LOCKING) */
+/*  conqdriv - main program (DOES LOCKING) */
 main(int argc, char *argv[])
 {
   int s, i, j, pid, drivtenths, ship[MAXSHIPS + 1];
   int ctime, etime, cacc, eacc;
   int force;
-  char buf[ARGBUFSIZE];
   int arg;
   
   /* First things first. */
@@ -66,6 +65,8 @@ main(int argc, char *argv[])
       clog("%s@%d: main(): GetSysConf() returned ERR.", __FILE__, __LINE__);
 #endif
 /*      exit(1);*/
+
+      ;
     }
   
   
@@ -264,18 +265,19 @@ main(int argc, char *argv[])
   
   /* Make last minute driver stats update. */
   upstats( &ctime, &etime, &cacc, &eacc, dcpuseconds, delapsedseconds );
-  
+
+  exit(0);
 }
 
 
-/*##  iterdrive - drive the universe one iteration */
+/*  iterdrive - drive the universe one iteration */
 /*  SYNOPSIS */
 /*    int ship(MAXSHIPS) */
 /*    iterdrive( ship ) */
-void iterdrive( int ship[] )
+void iterdrive( int *ship )
 {
   int s, t, i, j, k;
-  real h, ad, x, dis, ht;
+  real h, ad, x, dis, ht, z;
   char buf[MSGMAXLINE];
   
   /* Drive the ships. */
@@ -293,13 +295,24 @@ void iterdrive( int ship[] )
 	    {
 	      h = shead[i];
 	      ad = subang( h, sdhead[i] );
-	      x = (real)max( 210.0 - ((swarp[i]*20.0)/engeff( i )), 2.0 ) * ITER_SECONDS;
-	      if ( abs( ad ) <= x )
+	      x = (real)max( 210.0 - ((swarp[i]*20.0)/engeff( i )), 2.0 ) * (real)ITER_SECONDS;
+	      if ( fabs( ad ) <= x )
 		shead[i] = sdhead[i];
 	      else if ( ad < 0.0 )
-		shead[i] = h + x;
+		{
+		  z = h + x;
+
+		  if (z > 360.0)
+		    z = fabs(z) - 360.0;
+		  shead[i] = (real) z;
+		}
 	      else
-		shead[i] = h - x;
+		{
+		  z = h - x;
+		  if (z < 0.0)
+		    z = 360.0 - fabs(z);
+		  shead[i] = (real) z;
+		}
 	      
 	      fixdeltas( i );
 	    }
@@ -395,30 +408,35 @@ void iterdrive( int ship[] )
       if ( sstatus[i] != SS_OFF )
 	{
 	  for ( j = 0; j < MAXTORPS; j = j + 1 )
-	    if ( tstatus[i][j] == TS_LIVE )
-	      {
-		/* Movement. */
-		tx[i][j] = tx[i][j] + tdx[i][j];
-		ty[i][j] = ty[i][j] + tdy[i][j];
-	      }
-	    else if ( tstatus[i][j] == TS_DETONATE )
-	      {
-		/* Detonate. */
-		tfuse[i][j] = FIREBALL_FUSE;
-		tstatus[i][j] = TS_FIREBALL;
-		for ( t = 1; t <= MAXSHIPS; t = t + 1 )
-		  {
-		    k = ship[t];
-		    if ( sstatus[k] == SS_LIVE && k != i )
-		      if ( twar[i][j][steam[k]] || swar[k][steam[i]] )
-			{
-			  ht = explosion( TORPEDO_HIT * tmult[i][j],
-					 dist( tx[i][j], ty[i][j], sx[k], sy[k] ) );
-			  if ( ht > 0.0 )
-			    hit( k, ht, i );
-			}
-		  }
-	      }
+	    {
+/*JET	      clog("cdriv - in MAXTORPS loop: i = %d j = %d", i, j);
+*/
+	      if ( tstatus[i][j] == TS_LIVE )
+		{
+		  /* Movement. */
+		  tx[i][j] = tx[i][j] + tdx[i][j];
+		  ty[i][j] = ty[i][j] + tdy[i][j];
+		}
+	      else if ( tstatus[i][j] == TS_DETONATE )
+		{
+		  /* Detonate. */
+		  tfuse[i][j] = FIREBALL_FUSE;
+		  tstatus[i][j] = TS_FIREBALL;
+		  for ( t = 1; t <= MAXSHIPS; t = t + 1 )
+		    {
+		      k = ship[t];
+		      
+		      if ( sstatus[k] == SS_LIVE && k != i )
+			if ( twar[i][j][steam[k]] || swar[k][steam[i]] )
+			  {
+			    ht = explosion( (real)(TORPEDO_HIT * tmult[i][j]),
+					    dist( tx[i][j], ty[i][j], sx[k], sy[k] ) );
+			    if ( ht > 0.0 )
+			      hit( k, ht, i );
+			  }
+		    }
+		}
+	    }
 	}
     }
   
@@ -434,17 +452,16 @@ void iterdrive( int ship[] )
 }
 
 
-/*##  secdrive - drive the one-second interval items (DOES LOCKING) */
+/*  secdrive - drive the one-second interval items (DOES LOCKING) */
 /*  SYNOPSIS */
 /*    int ship(MAXSHIPS) */
 /*    secdrive( ship ) */
-void secdrive( int ship[] )
+void secdrive( int *ship )
 {
-  int s, t, i, j, k, pnum, ctemp;
+  int s, t, i, j, k, pnum;
   real dis, repair, inc, dec;
   real x, warp;
-  int talert[MAXSHIPS + 1], l;
-  char buf[MSGMAXLINE];
+  int talert[MAXSHIPS + 1];
   
   for ( s = 1; s <= MAXSHIPS; s = s + 1 )
     {
@@ -505,19 +522,21 @@ void secdrive( int ship[] )
 		shead[i] = mod360( shead[i] - ORBIT_FAC );
 		
 		sx[i] = (real)(px[pnum] + (ORBIT_DIST * 
-					   cosd(shead[i]+90.0)));
+					   cosd(shead[i] + 90.0)));
 		
 		sy[i] = (real)(py[pnum] + (ORBIT_DIST * 
-					   sind(shead[i]+90.0)));
+					   sind(shead[i] + 90.0)));
 	      }
 	    else if ( warp == ORBIT_CCW )
 	      {
 		/* Orbiting counter-clockwise. */
 		shead[i] = mod360( shead[i] + ORBIT_FAC );
-		sx[i] = (real)(px[pnum] + ORBIT_DIST * 
-			       cosd(shead[i]-90.0));
-		sy[i] = (real)(py[pnum] + ORBIT_DIST * 
-			       sind(shead[i]-90.0));
+
+		sx[i] = (real)(px[pnum] + (ORBIT_DIST * 
+					   cosd(shead[i] - 90.0)));
+
+		sy[i] = (real)(py[pnum] + (ORBIT_DIST * 
+					   sind(shead[i] - 90.0)));
 	      }
 	  }
 	else
@@ -567,9 +586,9 @@ void secdrive( int ship[] )
 	  hit( i, rndnor( DOOMSDAY_HIT, 1.0 ), KB_DOOMSDAY );
       
       /* Negative energy barrier. */
-      if ( abs( sx[i] ) >= NEGENB_DIST || abs(sy[i]) >= NEGENB_DIST )
-	if ( abs( sx[i] ) <= NEGENBEND_DIST &&
-	    abs( sy[i] ) <= NEGENBEND_DIST )
+      if ( fabs( sx[i] ) >= NEGENB_DIST || fabs(sy[i]) >= NEGENB_DIST )
+	if ( fabs( sx[i] ) <= NEGENBEND_DIST &&
+	    fabs( sy[i] ) <= NEGENBEND_DIST )
 	  hit( i, NEGENB_HIT, KB_NEGENB );
       
       /* Shields. */
@@ -668,7 +687,7 @@ void secdrive( int ship[] )
 	}
       sfuel[i] = min( 999.0, sfuel[i] + inc );
       if ( dec > 0.0 )
-	l = usefuel( i, dec, FALSE );
+	usefuel( i, dec, FALSE );
       
       /* Cool-down. */
       if ( swarp[i] < 0.0 && ! spwar( i,-slock[i]) &&  parmies[-slock[i]] > 0)	
@@ -755,7 +774,7 @@ void secdrive( int ship[] )
 	  if ( distf( *dx, *dy, px[-*dlock], py[-*dlock] ) <= DOOMSDAY_DIST )
 	    {
 	      /* Decrement armies. */
-	      if ( rnd( 0 ) <= 0.1 )
+	      if ( rnd() <= 0.1 )
 		intrude( MSG_DOOM, -*dlock );
 	      PVLOCK(lockword);
 	      parmies[-*dlock] = parmies[-*dlock] - 1;
@@ -792,7 +811,7 @@ void secdrive( int ship[] )
 }
 
 
-/*##  submindrive - drive the sub-minute interval items */
+/*  submindrive - drive the sub-minute interval items */
 /*  SYNOPSIS */
 /*    submindrive */
 void submindrive(void)
@@ -826,7 +845,7 @@ void submindrive(void)
 }
 
 
-/*##  mindrive - drive the one-minute interval items */
+/*  mindrive - drive the one-minute interval items */
 /*  SYNOPSIS */
 /*    mindrive */
 void mindrive(void)
@@ -851,7 +870,7 @@ void mindrive(void)
   
   if ( *dstatus == DS_LIVE )
     doomfind();
-  else if ( rnd( 0 ) < DOOMSDAY_PROB )
+  else if ( rnd() < DOOMSDAY_PROB )
     {
       if (sysconf_NoDoomsday == FALSE)
 	doomsday();
@@ -862,7 +881,7 @@ void mindrive(void)
 }
 
 
-/*##  fivemindrive - drive the five-minute interval items (DOES LOCKING) */
+/*  fivemindrive - drive the five-minute interval items (DOES LOCKING) */
 /*  SYNOPSIS */
 /*    fivemindrive */
 void fivemindrive(void)
@@ -877,7 +896,7 @@ void fivemindrive(void)
       if ( parmies[i] > 0 && pteam[i] != TEAM_GOD )
 	if ( parmies[i] < SPARSE_THRESH )
 	  {
-	    if ( rnd( 0 ) <= SPARSE_REPOP_PROB )
+	    if ( rnd() <= SPARSE_REPOP_PROB )
 	      parmies[i] = parmies[i] + 1;
 	  }
 	else
@@ -887,9 +906,9 @@ void fivemindrive(void)
 	    else
 	      thresh = MALTHUS_D_THRESH;
 	    
-	    if ( parmies[i] >= thresh && rnd( 0 ) <= MALTHUS_PROB )
+	    if ( parmies[i] >= thresh && rnd() <= MALTHUS_PROB )
 	      {
-		r = rnd(0);	/* save to avoid the unfortunate side effects of
+		r = rnd();	/* save to avoid the unfortunate side effects of
 				   max() bieng a macro (rnd() actually got exc'd
 				   twice, resluting in an occasional 0 return val) */
 		

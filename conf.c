@@ -13,7 +13,7 @@
 /* by Jon Trulson <jon@radscan.com> under the same terms and          */
 /* conditions of the original copyright by Jef Poskanzer and Craig    */
 /* Leres.                                                             */
-/* Have Phun!                                                         */
+/*                                                                    */
 /**********************************************************************/
 
 #include "global.h"
@@ -32,14 +32,12 @@ static char *confId = "$Id$";
 int GetSysConf(int checkonly)
 {
   FILE *conf_fd;
-  int i, j, k;
+  int i, j;
   char conf_name[256];
   char buffer[BUFFER_SIZE];
-  char tmp[BUFFER_SIZE];
   int FoundOne = FALSE;
   int buflen;
   char *bufptr;
-  char *Cname;
 
 				/* init some defaults */
   sysconf_DoLRTorpScan = TRUE;
@@ -229,14 +227,12 @@ int GetSysConf(int checkonly)
 int GetConf(void)
 {
   FILE *conf_fd;
-  int i, j, k;
+  int i, j;
   char conf_name[256];
   char *homevar;
   char buffer[BUFFER_SIZE];
-  char tmp[BUFFER_SIZE];
   int buflen;
   char *bufptr;
-  char *Cname;
   int FoundOne = FALSE;
 
 				/* init some defaults */

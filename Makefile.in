@@ -10,7 +10,7 @@
 # User defineable options
 CONQBIN = @prefix@/bin
 CONQHOME = @prefix@/conquest
-
+MAKE = make
 
 # Unixware: try -Ki486 or -Kpentium -
 #  might improve performance depending on processor type.
@@ -31,13 +31,13 @@ CONQHELP = conquest.doc
 CONQNEWS = conqnews.doc
 
 CURDIR=.
-CONQC = conqfig.c ratfor.c cd2lb.c ionlb.c ioxlb.c \
-	conqlb.c gamlb.c ioplb.c rndlb.c conqmisc.c conqutil.c conqcm.c \
-	conqsvr42.c global.c ibuf.c version.c conf.c sem.c
+CONQC = ratfor.c cd2lb.c display.c iolb.c  \
+	conqlb.c rndlb.c conqmisc.c conqutil.c conqcm.c \
+	conqsvr42.c global.c ibuf.c version.c conf.c sem.c color.c
 
-CONQOBJS = conqfig.o ratfor.o cd2lb.o ionlb.o ioxlb.o \
-	conqlb.o gamlb.o ioplb.o rndlb.o conqmisc.o conqutil.o conqcm.o \
-	conqsvr42.o global.o ibuf.o version.o conf.o sem.o
+CONQOBJS = ratfor.o cd2lb.o display.o iolb.o  \
+	conqlb.o rndlb.o conqmisc.o conqutil.o conqcm.o \
+	conqsvr42.o global.o ibuf.o version.o conf.o sem.o color.o
 
 # For installation
 BCONQUEST = $(CONQHOME)/bin/conquest
@@ -62,12 +62,13 @@ LBFLAGS = @LBFLAGS@
 default:
 	@echo "type gmake <target>, where <target> is:"
 	@echo ""
-	@echo "all	- make all the binaries"
-	@echo "install	- to install the binaries (must be root)"
-	@echo "clean	- to remove all .o's, libs, and binaries"
-	@echo "depend	- to make a dependancy list for your makefile."
-	@echo "           Use 'gmake clean' before building if you are"
-	@echo "           lacking a 'makedepend' command."
+	@echo "all        - make all the binaries"
+	@echo "install    - to install the binaries (must be root)"
+	@echo "clean      - to remove all .o's, libs, and binaries"
+	@echo "realclean  - like clean, but removes configure genned files too"
+	@echo "depend     - to make a dependancy list for your makefile."
+	@echo "             Use 'gmake clean' before building if you are"
+	@echo "             lacking a 'makedepend' command."
 
 all: $(CONQLB) $(CONQUEST) $(CONQOPER) $(CONQAI) $(CONQDRIV) $(CONQSTRAT)
 
@@ -143,34 +144,10 @@ $(CONQLB): conqai_nomain.o $(CONQOBJS)
 install: all $(CONQHOME) $(CONQHOME)/etc $(CONQHOME)/bin $(CONQHOME)/lib \
 	$(CONQHOME)/lib/$(CONQLB) $(BCONQUEST) $(BCONQOPER) $(BCONQDRIV)  \
 	$(HCONQHELP) $(HCONQNEWS) $(CONQHOME)/lib/$(CONQLB) @prefix@ \
-	$(CONQBIN) $(CONQHOME)/etc/conqrule $(BCONQSTRAT) \
-	$(CONQHOME)/etc/conquestrc 
+	$(CONQBIN) $(CONQHOME)/etc/conqrule $(BCONQSTRAT) $(BCONQAI) \
+	$(CONQHOME)/etc/conquestrc $(CONQBIN)/conquest $(CONQBIN)/conqoper \
+	$(CONQBIN)/conqstrat $(CONQBIN)/conqdriv $(CONQBIN)/conqai
 
-$(CONQHOME)/lib/$(CONQLB): $(CONQLB)
-	cp $(CONQLB) $(CONQHOME)/lib/$(CONQLB)
-	chgrp conquest $(CONQHOME)/lib/$(CONQLB)
-	chmod 644 $(CONQHOME)/lib/$(CONQLB)
-
-$(CONQHOME):
-	mkdir -p $(CONQHOME)
-	chmod 775 $(CONQHOME)
-	chgrp conquest $(CONQHOME)
-	
-$(CONQHOME)/etc:
-	mkdir -p $(CONQHOME)/etc
-	chmod 775 $(CONQHOME)/etc
-	chgrp conquest $(CONQHOME)/etc
-	
-$(CONQHOME)/bin:
-	mkdir -p $(CONQHOME)/bin
-	chmod 775 $(CONQHOME)/bin
-	chgrp conquest $(CONQHOME)/bin
-	
-$(CONQHOME)/lib:
-	mkdir -p $(CONQHOME)/lib
-	chmod 775 $(CONQHOME)/lib
-	chgrp conquest $(CONQHOME)/lib
-	
 @prefix@:
 	mkdir -p @prefix@
 	chmod 775 @prefix@
@@ -179,7 +156,51 @@ $(CONQHOME)/lib:
 $(CONQBIN):
 	mkdir -p $(CONQBIN)
 	chmod 775 $(CONQBIN)
-	chgrp conquest $(CONQBIN)
+
+$(CONQBIN)/conquest: $(BCONQUEST)
+	@-rm -f $(CONQBIN)/conquest
+	@-ln -s $(BCONQUEST) $(CONQBIN)/conquest
+
+$(CONQBIN)/conqoper: $(BCONQOPER)
+	@-rm -f $(CONQBIN)/conqoper
+	@-ln -s $(BCONQOPER) $(CONQBIN)/conqoper
+
+$(CONQBIN)/conqdriv: $(BCONQDRIV)
+	@-rm -f $(CONQBIN)/conqdriv
+	@-ln -s $(BCONQDRIV) $(CONQBIN)/conqdriv
+
+$(CONQBIN)/conqstrat: $(BCONQSTRAT)
+	@-rm -f $(CONQBIN)/conqstrat
+	@-ln -s $(BCONQSTRAT) $(CONQBIN)/conqstrat
+
+$(CONQBIN)/conqai: $(BCONQAI)
+	@-rm -f $(CONQBIN)/conqai
+	@-ln -s $(BCONQAI) $(CONQBIN)/conqai
+
+$(CONQHOME):
+	mkdir -p $(CONQHOME)
+	chmod 775 $(CONQHOME)
+	chgrp conquest $(CONQHOME)
+
+$(CONQHOME)/lib/$(CONQLB): $(CONQLB)
+	cp $(CONQLB) $(CONQHOME)/lib/$(CONQLB)
+	chgrp conquest $(CONQHOME)/lib/$(CONQLB)
+	chmod 644 $(CONQHOME)/lib/$(CONQLB)
+
+$(CONQHOME)/etc:
+	mkdir -p $(CONQHOME)/etc
+	chmod 775 $(CONQHOME)/etc
+	chgrp conquest $(CONQHOME)/etc
+
+$(CONQHOME)/bin:
+	mkdir -p $(CONQHOME)/bin
+	chmod 775 $(CONQHOME)/bin
+	chgrp conquest $(CONQHOME)/bin
+
+$(CONQHOME)/lib:
+	mkdir -p $(CONQHOME)/lib
+	chmod 775 $(CONQHOME)/lib
+	chgrp conquest $(CONQHOME)/lib
 
 $(CONQHOME)/etc/conquestrc: $(BCONQOPER)
 	$(BCONQOPER) -C
@@ -193,7 +214,6 @@ $(BCONQUEST): conquest
 	chgrp conquest $(BCONQUEST)
 	chmod 2771 $(BCONQUEST)
 	@FILEPRIV@ -f plock,tshar,core $(BCONQUEST)
-	@-ln -s $(BCONQUEST) $(CONQBIN)/conquest
 
 $(BCONQOPER): conqoper
 	@-rm -f $(BCONQOPER)
@@ -202,8 +222,7 @@ $(BCONQOPER): conqoper
 	chgrp conquest $(BCONQOPER)
 	chmod 2771 $(BCONQOPER)
 	@FILEPRIV@ -f plock,tshar,core $(BCONQOPER)
-	@-ln -s $(BCONQOPER) $(CONQBIN)/conqoper
-	
+
 $(BCONQDRIV): conqdriv
 	@-rm -f $(BCONQDRIV)
 	$(CC) -o conqdriv $(CFLAGS) conqdriv.o $(CONQHOME)/lib/$(CONQLB) $(EXTLBS)
@@ -211,24 +230,21 @@ $(BCONQDRIV): conqdriv
 	chgrp conquest $(BCONQDRIV)
 	chmod 2771 $(BCONQDRIV)
 	@FILEPRIV@ -f plock,tshar,core $(BCONQDRIV)
-	@-ln -s $(BCONQDRIV) $(CONQBIN)/conqdriv
-	
+
 $(BCONQAI): conqai
 	@-rm -f $(BCONQAI)
 	$(CC) -o conqai $(CFLAGS) conqai.o $(CONQHOME)/lib/$(CONQLB) $(EXTLBS)
 	cp conqai $(BCONQAI)
 	chgrp conquest $(BCONQAI)
-	chmod 2771 $(BCONQAI)
+	chmod 2770 $(BCONQAI)
 	@FILEPRIV@ -f plock,tshar,core $(BCONQAI)	
-	@-ln -s $(BCONQAI) $(CONQBIN)/conqai
 
 $(BCONQSTRAT): conqstrat
 	@-rm -f $(BCONQSTRAT)
 	-$(CC) -o conqstrat $(CFLAGS) lex.yy.o y.tab.o $(LIBS) $(CONQHOME)/lib/$(CONQLB) $(EXTLBS)
 	cp conqstrat $(BCONQSTRAT)
 	chgrp conquest $(BCONQSTRAT)
-	chmod 755 $(BCONQSTRAT)
-	@-ln -s $(BCONQSTRAT) $(CONQBIN)/conqstrat
+	chmod 751 $(BCONQSTRAT)
 
 $(CONQHOME)/etc/conqrule: conqrule
 	cp conqrule $(CONQHOME)/etc/conqrule
@@ -248,6 +264,10 @@ $(HCONQNEWS): $(CONQNEWS)
 clean:
 	rm -f *.o $(CONQUEST) $(CONQOPER) $(CONQAI) $(CONQDRIV) \
 		$(CONQLB) $(CONQSTRAT) y.tab.[ch] lex.yy.[c]
+
+realclean:
+	$(MAKE) clean
+	rm -f config.status config.cache Makefile config.h
 
 depend: 
 	makedepend -s "# DO NOT DELETE - MAKEDEPEND" -- *.h -- *.c >/dev/null 2>&1

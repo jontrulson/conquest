@@ -20,7 +20,7 @@
 /* by Jon Trulson <jon@radscan.com> under the same terms and          */
 /* conditions of the original copyright by Jef Poskanzer and Craig    */
 /* Leres.                                                             */
-/* Have Phun!                                                         */
+/*                                                                    */
 /**********************************************************************/
 
 #include "conqdef.h"
@@ -33,7 +33,7 @@
 #include "global.h"
 #include "color.h"
 
-/*##  appkb - append killed by string */
+/*  appkb - append killed by string */
 /*  SYNOPSIS */
 /*    int kb */
 /*    char buf() */
@@ -85,7 +85,7 @@ void appkb( int kb, char *buf )
 }
 
 
-/*##  appship - append a ship number to a string */
+/*  appship - append a ship number to a string */
 /*  SYNOPSIS */
 /*    int snum */
 /*    char str() */
@@ -110,7 +110,7 @@ void appship( int snum, char *str )
 }
 
 
-/*##  canread - determine if a message is readable */
+/*  canread - determine if a message is readable */
 /*  SYNOPSIS */
 /*    int ok, canread */
 /*    int snum, msgnum */
@@ -123,6 +123,11 @@ int canread( int snum, int msgnum )
   from = msgfrom[msgnum];
   to = msgto[msgnum];
   
+  if (from == 0 && to == 0)
+    {				/* uninitialized msgs */
+      return(FALSE);		/* no point in reading it */
+    }
+
   /* If we're GOD, we can read it. unless it's a COMP MSG*/
   if ( snum == MSG_GOD && from != MSG_COMP)
     return ( TRUE );
@@ -191,7 +196,7 @@ int canread( int snum, int msgnum )
 }
 
 
-/*##  clearships - reset ships and torpedoes */
+/*  clearships - reset ships and torpedoes */
 /*  SYNOPSIS */
 /*    clearships */
 void clearships(void)
@@ -207,7 +212,7 @@ void clearships(void)
 }
 
 
-/*##  cvtcoords - convert from internal coords to screen coords */
+/*  cvtcoords - convert from internal coords to screen coords */
 /*  SYNOPSIS */
 /*    int inbounds, cvtcoords */
 /*    real cenx, ceny, x, y, scale */
@@ -228,7 +233,7 @@ int cvtcoords( real cenx, real ceny, real x, real y, real scale,
 }
 
 
-/*##  doomfind - find a planet or ship for the doomsday machine to head for */
+/*  doomfind - find a planet or ship for the doomsday machine to head for */
 /*  SYNOPSIS */
 /*    doomfind */
 void doomfind(void)
@@ -275,7 +280,7 @@ void doomfind(void)
 }
 
 
-/*##  doomsday - start the doomsday device */
+/*  doomsday - start the doomsday device */
 /*  SYNOPSIS */
 /*    doomsday */
 void doomsday(void)
@@ -292,7 +297,7 @@ void doomsday(void)
 }
 
 
-/*##  findorbit - find a planet for a ship to orbit */
+/*  findorbit - find a planet for a ship to orbit */
 /*  SYNOPSIS */
 /*    int snum, pnum */
 /*    int flag, findorbit */
@@ -315,7 +320,7 @@ int findorbit( int snum, int *pnum )
 }
 
 
-/*##  findship - find a free ship and reserve it (DOES LOCKING) */
+/*  findship - find a free ship and reserve it (DOES LOCKING) */
 /*  SYNOPSIS */
 /*    int snum */
 /*    int truth, findship */
@@ -347,7 +352,7 @@ int findship( int *snum )
 }
 
 
-/*##  findspecial - search for nearest some-thing */
+/*  findspecial - search for nearest some-thing */
 /*  SYNOPSIS */
 /*    int flag, findspecial */
 /*    int snum, token, count, sorpnum, xsorpnum */
@@ -444,26 +449,15 @@ int findspecial( int snum, int token, int count, int *sorpnum, int *xsorpnum )
 	    continue; /* jet next;*/
 	  /* Ignore suns and moons. */
 	  if ( ptype[i] == PLANET_SUN || ptype[i] == PLANET_MOON )
-	    continue; /* jet next;*/
-	  switch ( token )
-	    {
-	    case SPECIAL_WEAKPLANET:
-	      valid = ( pscanned[i][steam[snum]] &&
-		       pteam[i] != steam[snum] );
-	      break;
-	    default:
-	      return ( FALSE );	/* this can't happen */
-	    }
+	    continue; 
+
+	  valid = ( pscanned[i][steam[snum]] &&
+		    pteam[i] != steam[snum] );
+
 	  /* Handle army threshold logic. */
 	  if ( valid )
-	    switch ( token )
-	      {
-	      case SPECIAL_WEAKPLANET:
-		valid = ( parmies[i] >= count );
-		break;
-	      default:
-		return ( FALSE );	/* this can't happen */
-	      }
+	    valid = ( parmies[i] >= count );
+
 	  if ( valid )
 	    {
 	      ta = parmies[i];
@@ -518,10 +512,10 @@ int findspecial( int snum, int token, int count, int *sorpnum, int *xsorpnum )
 	{
 	  /* Only can look for "real" planets. */
 	  if ( ! preal[i] )
-	    continue; /* jet next;*/
+	    continue; 
 	  /* Ignore suns and moons. */
 	  if ( ptype[i] == PLANET_SUN || ptype[i] == PLANET_MOON )
-	    continue; /* jet next;*/
+	    continue; 
 	  switch ( token )
 	    {
 	    case SPECIAL_ARMYPLANET:
@@ -602,7 +596,7 @@ int findspecial( int snum, int token, int count, int *sorpnum, int *xsorpnum )
 }
 
 
-/*##  fixdeltas - update sdx and sdy */
+/*  fixdeltas - update sdx and sdy */
 /*  SYNOPSIS */
 /*    int snum */
 /*    fixdeltas( snum ) */
@@ -619,7 +613,7 @@ void fixdeltas( int snum )
 }
 
 
-/*##  gunum - get the user number of the specified user */
+/*  gunum - get the user number of the specified user */
 /*  SYNOPSIS */
 /*    int truth, gunum */
 /*    int unum */
@@ -643,7 +637,7 @@ int gunum( int *unum, char *lname )
 }
 
 
-/*##  histlist - display the last usage list */
+/*  histlist - display the last usage list */
 /*  SYNOPSIS */
 /*    int godlike */
 /*    histlist( godlike ) */
@@ -651,12 +645,13 @@ void histlist( int godlike )
 {
   int i, j, unum, lin, col, fline, lline, thistptr;
   int ch;
+  char *hd0="C O N Q U E S T   U S E R   H I S T O R Y";
   
   /* Do some screen setup. */
   cdclear();
   fline = 1;
   lline = MSG_LIN1 - 1;
-  cdputc( "C O N Q U E S T   U S E R   H I S T O R Y", fline );
+  cprintf(fline,0,ALIGN_CENTER,"#%d#%s",LabelColor, hd0);
   fline = fline + 2;
   
   thistptr = -1;			/* force an update the first time */
@@ -677,7 +672,7 @@ void histlist( int godlike )
 	  /*	    i = MAXHISTLOG - 1;	                        /* gag... */
 	  
 	  i = thistptr + 1;
-	  for ( j = 0; j < MAXHISTLOG; j = j + 1 )
+	  for ( j = 0; j < MAXHISTLOG; j++ )
 	    {
 	      i = modp1( i - 1, MAXHISTLOG );
 	      unum = histunum[i];
@@ -686,9 +681,9 @@ void histlist( int godlike )
 		continue; /* jet next;*/
 	      if ( ! ulive[unum] )
 		continue; /* jet next */
-	      sprintf( cbuf, "%-12s %17s", cuname[unum], histlog[i] );
-	      cdputs( cbuf, lin, col );
-	      lin = lin + 1;
+	      cprintf( lin,col,ALIGN_NONE, "#%d#%-12s %17s", YellowLevelColor,
+			cuname[unum], histlog[i] );
+	      lin++;
 	      if ( lin > lline )
 		{
 		  col = 43;
@@ -698,7 +693,7 @@ void histlist( int godlike )
 	}
       
       putpmt( "--- press space when done ---", MSG_LIN2 );
-      cdrefresh( TRUE );
+      cdrefresh();
       if ( iogtimed( &ch, 1 ) )
 	break;				/* exit loop if we got one */
     }
@@ -708,7 +703,7 @@ void histlist( int godlike )
 }
 
 
-/*##  initeverything - initialize (with extra cheese and tomato) (DOES LOCKING) */
+/*  initeverything - initialize (with extra cheese and tomato) (DOES LOCKING) */
 /*  SYNOPSIS */
 /*    initeverything */
 void initeverything(void)
@@ -717,7 +712,7 @@ void initeverything(void)
   int i, j;
   
   /* Zero EVERYTHING. */
-  /*    zeroeverything();*/
+  zeroeverything();
   
   /* Twiddle the lockword. */
   PVUNLOCK(lockword);
@@ -768,7 +763,7 @@ void initeverything(void)
 }
 
 
-/*##  initgame - initialize the game-permanent variables */
+/*  initgame - initialize the game-permanent variables */
 /*  SYNOPSIS */
 /*    initgame */
 void initgame(void)
@@ -839,8 +834,6 @@ void initgame(void)
   pteam[PNUM_GHOST3] = TEAM_NOTEAM;
   pteam[PNUM_GHOST4] = TEAM_NOTEAM;
   
-  pteam[PNUM_SPARE1] = TEAM_NOTEAM;
-  
   parmies[PNUM_SOL] = rndint(80, 180);
   parmies[PNUM_EARTH] = 50;
   parmies[PNUM_TELOS] = 50;
@@ -884,8 +877,6 @@ void initgame(void)
   parmies[PNUM_GHOST3] = 0;
   parmies[PNUM_GHOST4] = 0;
   
-  parmies[PNUM_SPARE1] = 0;
-  
   /* Set up the pscanned array so that each team has scanned its own planets. */
   for ( i = 1 ; i <= NUMPLANETS; i = i + 1 )
     {
@@ -915,7 +906,7 @@ void initgame(void)
 }
 
 
-/*##  initmsgs - initialize the message data structures */
+/*  initmsgs - initialize the message data structures */
 /*  SYNOPSIS */
 /*    initmsgs */
 void initmsgs(void)
@@ -938,7 +929,7 @@ void initmsgs(void)
 }
 
 
-/*##  initplanets - initialize the planets */
+/*  initplanets - initialize the planets */
 /*  SYNOPSIS */
 /*    initplanets */
 void initplanets(void)
@@ -994,7 +985,7 @@ void initplanets(void)
   SETPLANET( "Ghost 2", PNUM_GHOST2 );
   SETPLANET( "Ghost 3", PNUM_GHOST3 );
   SETPLANET( "Ghost 4", PNUM_GHOST4 );
-  SETPLANET( "Spare 1", PNUM_SPARE1 );
+  SETPLANET( "Ghost 5", PNUM_GHOST5 );
   
   ptype[PNUM_SOL] = PLANET_SUN;
   ptype[PNUM_EARTH] = PLANET_CLASSM;
@@ -1030,13 +1021,13 @@ void initplanets(void)
   ptype[PNUM_GHOST2] = PLANET_GHOST;
   ptype[PNUM_GHOST3] = PLANET_GHOST;
   ptype[PNUM_GHOST4] = PLANET_GHOST;
+  ptype[PNUM_GHOST5] = PLANET_GHOST;
   
   ptype[PNUM_SYRINX] = PLANET_SUN;
   ptype[PNUM_LUNA] = PLANET_MOON;
   ptype[PNUM_ALTAIR] = PLANET_CLASSM;
   ptype[PNUM_HELL] = PLANET_DEAD;
   ptype[PNUM_JINX] = PLANET_CLASSM;
-  ptype[PNUM_SPARE1] = PLANET_GHOST;
   
   stcpn( "class M planet", ptname[PLANET_CLASSM], MAXPTYPENAME );
   stcpn( "dead planet", ptname[PLANET_DEAD], MAXPTYPENAME );
@@ -1060,17 +1051,7 @@ void initplanets(void)
   preal[PNUM_GHOST2] = FALSE;
   preal[PNUM_GHOST3] = FALSE;
   preal[PNUM_GHOST4] = FALSE;
-  
-  /* Can't see the play planets either. */
-  /*  preal[PNUM_SYRINX] = FALSE;
-   */
-/*  preal[PNUM_ALTAIR] = FALSE;
-*/
-  
-  /*  preal[PNUM_HELL] = FALSE;
-      preal[PNUM_JINX] = FALSE;
-      */
-  preal[PNUM_SPARE1] = FALSE;
+  preal[PNUM_GHOST5] = FALSE;
   
   /* Set up the X-Y coordinates of the suns.  Start with Murisak. */
   /* at the center, then place the other eight suns relative to it, */
@@ -1121,6 +1102,11 @@ void initplanets(void)
   porbrad[PNUM_GHOST4] = 12000.0;
   porbang[PNUM_GHOST4] = 270.0;
   porbvel[PNUM_GHOST4] = 0.0;
+  
+  pprimary[PNUM_GHOST5] = PNUM_MURISAK;
+  porbrad[PNUM_GHOST5] = 12000.0;
+  porbang[PNUM_GHOST5] = 0.0;
+  porbvel[PNUM_GHOST5] = 0.0;
   
   /* Murisak's planets. */
   pprimary[PNUM_JANUS] = PNUM_MURISAK;
@@ -1193,8 +1179,6 @@ void initplanets(void)
   pprimary[PNUM_JINX] = PNUM_SYRINX;
   porbrad[PNUM_JINX] = 2600.0;
   
-  pprimary[PNUM_SPARE1] = PNUM_MURISAK;
-  porbrad[PNUM_SPARE1] = 5000.0;
   
   /* Set orbital angles and velocities for planets, and place them. */
   /* Murisak's planets. */
@@ -1289,15 +1273,8 @@ void initplanets(void)
   porbvel[PNUM_HELL] = orbvel;
 
   porbang[PNUM_JINX] = mod360( orbang + 1.0/3.0*360.0 );
-  /*    porbvel[PNUM_JINX] = orbvel;*/
   porbvel[PNUM_JINX] = 7.5;
 
-  /* Spare planets. */
-  orbang = rnduni( 0.0, 360.0 );
-  orbvel = rndnor( PLANET_ORBIT_FAC, 2.0 ) * ( rndint( 0, 1 ) * 2 - 1 );
-  porbang[PNUM_SPARE1] = orbang;
-  porbvel[PNUM_SPARE1] = orbvel;
-  
   /* Place the planets in their proper orbits. */
   for ( i = NUMPLANETS; i > 0; i = i - 1 )
     if ( pprimary[i] != 0 )
@@ -1306,6 +1283,31 @@ void initplanets(void)
 	py[i] = py[pprimary[i]] + porbrad[i] * sind(porbang[i]);
       }
   
+				/* Now we init the 'extra' planets with
+				   defaults */
+  if (NUM_EXTRAPLANETS > 0)
+    {				/* there are extra planets
+				   they are numbered starting at
+				   1 (+ NUM_BASEPLANETS) */
+      for (i=1; i<= NUM_EXTRAPLANETS; i++) 
+	{
+	  char buf[64];
+	  int t;
+
+	  t = NUM_BASEPLANETS + i;
+	  sprintf(buf, "Extra %d", i);
+	  strcpy(pname[t], buf);
+	  ptype[t] = PLANET_GHOST;
+	  preal[t] = FALSE;
+	  px[t] = 0.0;
+	  py[t] = 0.0;
+	  pprimary[t] = PNUM_MURISAK;
+	  porbrad[t] = rnduni(30000.0, 70000.0);
+	  porbvel[t] = rnduni(-5.0, +5.0);
+	  porbang[t] = rnduni(0.0, 360.0);
+	}
+    }
+
   /* Un-twiddle the lockword. */
   PVUNLOCK(lockword);
   
@@ -1317,7 +1319,7 @@ void initplanets(void)
 }
 
 
-/*##  initrobots - initialize robots */
+/*  initrobots - initialize robots */
 /*  SYNOPSIS */
 /*    initrobots */
 void initrobots(void)
@@ -1359,7 +1361,7 @@ void initrobots(void)
 }
 
 
-/*##  initship - initialize a ship for use (DOES MESSAGE LOCKING) */
+/*  initship - initialize a ship for use (DOES MESSAGE LOCKING) */
 /*  SYNOPSIS */
 /*    int snum, unum */
 /*    initship( snum, unum ) */
@@ -1453,7 +1455,7 @@ void initship( int snum, int unum )
 }
 
 
-/*##  inituniverse - initialize (without cheese and tomato) (DOES LOCKING) */
+/*  inituniverse - initialize (without cheese and tomato) (DOES LOCKING) */
 /*  SYNOPSIS */
 /*    inituniverse */
 void inituniverse(void)
@@ -1599,7 +1601,7 @@ void inituniverse(void)
 }
 
 
-/*##  intrude - possibly send an intruder alert */
+/*  intrude - possibly send an intruder alert */
 /*  SYNOPSIS */
 /*    int snum, pnum */
 /*    intrude( snum, pnum ) */
@@ -1637,7 +1639,7 @@ void intrude( int snum, int pnum )
 }
 
 
-/*##  loghist - log this entry into the Game (DOES LOCKING) */
+/*  loghist - log this entry into the Game (DOES LOCKING) */
 /*  SYNOPSIS */
 /*    int unum */
 /*    loghist( unum ) */
@@ -1659,7 +1661,7 @@ void loghist( int unum )
 }
 
 
-/*##  newarp - handle ship acceleration. */
+/*  newarp - handle ship acceleration. */
 /*  SYNOPSIS */
 /*    real warp, newarp, dwarp */
 /*    int snum */
@@ -1670,9 +1672,9 @@ real newarp( int snum, real dwarp )
   
   x = dwarp - swarp[snum];
   acc = (real) accelfac[steam[snum]] * (real) engeff( snum ) * ITER_SECONDS;
-  if ( acc >= abs( x ) )
+  if ( acc >= fabs( x ) )
     return ( dwarp );			/* close enough (or equal) */
-  else if ( x < 0 )
+  else if ( x < 0.0 )
     return ( swarp[snum] - acc );
   
   return ( swarp[snum] + acc );
@@ -1680,7 +1682,7 @@ real newarp( int snum, real dwarp )
 }
 
 
-/*##  phoon - calculate the phase of a moon */
+/*  phoon - calculate the phase of a moon */
 /*  SYNOPSIS */
 /*    int phase, phoon, pnum */
 /*    phase = phoon( pnum ) */
@@ -1729,7 +1731,7 @@ int phoon( int pnum )
 }
 
 
-/*##  planmatch - check if a string matches a planet name */
+/*  planmatch - check if a string matches a planet name */
 /*  SYNOPSIS */
 /*    int planmatch, pnum, godlike */
 /*    char str() */
@@ -1756,7 +1758,7 @@ int planmatch( char *str, int *pnum, int godlike )
 }
 
 
-/*##  puthing - put an object on the display */
+/*  puthing - put an object on the display */
 /*  SYNOPSIS */
 /*    int what, lin, col */
 /*    puthing( what, lin, col ) */
@@ -1824,7 +1826,7 @@ void puthing( int what, int lin, int col )
 }
 
 
-/*##  putship - place a ship in the universe */
+/*  putship - place a ship in the universe */
 /*  SYNOPSIS */
 /*    int snum */
 /*    real basex, basey */
@@ -1866,7 +1868,7 @@ void putship( int snum, real basex, real basey )
 }
 
 
-/*##  readmsg - display a message */
+/*  readmsg - display a message */
 /*  SYNOPSIS */
 /*    int snum, msgnum */
 /*    readmsg( snum, msgnum ) */
@@ -1879,7 +1881,7 @@ int readmsg( int snum, int msgnum, int dsplin )
   
   buf[0] = '\0';
   
-  if (HAS_COLORS)
+  if (HasColors)
     {				/* set up the attrib so msg's are cyan */
       attrib = COLOR_PAIR(COL_CYANBLACK);
     }
@@ -1967,24 +1969,28 @@ int readmsg( int snum, int msgnum, int dsplin )
 }
 
 
-/*##  sendmsg - prompt the user for a message and send it */
+/*  sendmsg - prompt the user for a message and send it */
 /*  SYNOPSIS */
 /*    int from */
 /*    sendmsg( from, terse ) */
 void sendmsg( int from, int terse )
 {
   int i, j; 
-  char buf[MSGMAXLINE], msg[MESSAGE_SIZE] = "";
+  char buf[MSGMAXLINE] = "", msg[MESSAGE_SIZE] = "";
   int ch;
-  int l, editing; 
+  int editing; 
   string mto="Message to: ";
   string nf="Not found.";
   string huh="I don't understand.";
+
+  int append_flg;  /* when user types to the limit. */
+  int do_append_flg;
   
   static int to = MSG_NOONE;
   
   /* First, find out who we're sending to. */
   cdclrl( MSG_LIN1, 2 );
+  buf[0] = EOS;
   ch = cdgetx( mto, MSG_LIN1, 1, TERMS, buf, MSGMAXLINE );
   if ( ch == TERM_ABORT )
     {
@@ -2017,24 +2023,16 @@ void sendmsg( int from, int terse )
 	  break;
 	}
       
-      /* Prompt for the target again with the default. */
-      /*JET	if ( cdgetp( mto, MSG_LIN1, 1, TERMS, buf, MSGMAXLINE ) == TERM_ABORT )
-	{
-	cdclrl( MSG_LIN1, 1 );
-	return;
-	}
-	*/
-      
     }
   
   /* Got a target, parse it. */
   delblanks( buf );
   upper( buf );
-  if ( alldig( buf ) == YES )
+  if ( alldig( buf ) == TRUE )
     {
       /* All digits means a ship number. */
       i = 0;
-      l = safectoi( &j, buf, i );		/* ignore status */
+      safectoi( &j, buf, i );		/* ignore status */
       if ( j < 1 || j > MAXSHIPS )
 	{
 	  c_putmsg( "No such ship.", MSG_LIN2 );
@@ -2064,7 +2062,7 @@ void sendmsg( int from, int terse )
     default:
       /* Check for a team character. */
       for ( i = 0; i < NUMTEAMS; i = i + 1 )
-	if ( buf[0] == chrteams[i] || buf[0] == clower(chrteams[i]) )
+	if ( buf[0] == chrteams[i] || buf[0] == (char)tolower(chrteams[i]) )
 	  break;
       if ( i >= NUMTEAMS )
 	{
@@ -2123,7 +2121,12 @@ void sendmsg( int from, int terse )
   else
     i = MESSAGE_SIZE;
   
-  if ( cdgetp( ">", MSG_LIN2, 1, TERMS, msg, i ) != TERM_ABORT )
+  append_flg = TRUE;
+  while (append_flg == TRUE) {
+  append_flg = FALSE;
+  do_append_flg = TRUE;
+  msg[0] = EOS;
+  if ( cdgetp( ">", MSG_LIN2, 1, TERMS, msg, i, &append_flg, do_append_flg ) != TERM_ABORT )
     if ( to != MSG_IMPLEMENTORS )
       stormsg( from, to, msg );
     else
@@ -2144,11 +2147,11 @@ void sendmsg( int from, int terse )
 	    appint( from, buf );
 	    appchr( ')', buf );
 	  }
-	stormsg( from, MSG_IMPLEMENTORS, msg ); /* let GOD read it also */
-	if ( ! mailimps( buf, msg ) )
-	  stormsg( MSG_OUTSIDE, from, msg );	/* store error message */
+	stormsg( from, MSG_IMPLEMENTORS, msg ); /* GOD == IMP */
+	/* log it to the logfile too */
+	clog("MESSAGE TO IMPLEMENTORS: %s: %s", buf, msg);
       }
-  
+    } /* end while loop */ 
   cdclrl( MSG_LIN1, 2 );
   
   return;
@@ -2166,7 +2169,7 @@ int cmpplanet(void *cmp1, void *cmp2)
   return(strcmp(pname[*icmp1], pname[*icmp2]));
 }
 
-/*##  sortplanets - sort planets by name */
+/*  sortplanets - sort planets by name */
 /*  SYNOPSIS */
 /*    int sv(NUMPLANETS) */
 /*    sortplanets( sv ) */
@@ -2182,7 +2185,7 @@ void sortplanets( int sv[] )
   
 }
 
-/*##  spwar - test whether a ship is at war with a planet */
+/*  spwar - test whether a ship is at war with a planet */
 /*  SYNOPSIS */
 /*    int atwar, spwar */
 /*    int snum, pnum */
@@ -2219,14 +2222,17 @@ int spwar( int snum, int pnum )
 }
 
 
-/*##  stillalive - determine if a ship is still alive */
+/*  stillalive - determine if a ship is still alive */
 /*  SYNOPSIS */
 /*    int flag, stillalive */
 /*    int snum */
 /*    flag = stillalive( snum ) */
 int stillalive( int snum )
 {
-  
+
+  if (snum < 0 || snum > MAXSHIPS)
+    return(TRUE);
+
   /* Look for religious trouble or the "closed" sign in the window. */
   if ( uooption[suser[snum]][OOPT_SHITLIST] )
     {
@@ -2249,7 +2255,7 @@ int stillalive( int snum )
 }
 
 
-/*##  stormsg - store a message in the message buffer (DOES LOCKING) */
+/*  stormsg - store a message in the message buffer (DOES LOCKING) */
 /*  SYNOPSIS */
 /*    int from, to */
 /*    char msg() */
@@ -2277,7 +2283,7 @@ void stormsg( int from, int to, char *msg )
 }
 
 
-/*##  usefuel - consume a quantity of matter-antimatter devices */
+/*  usefuel - consume a quantity of matter-antimatter devices */
 /*  SYNOPSIS */
 /*    int snum */
 /*    real fuel */
@@ -2300,7 +2306,7 @@ int usefuel( int snum, real fuel, int weapon )
 	  return ( FALSE );
 	}
     }
-  sfuel[snum] = sfuel[snum] - fuel;
+
   if ( sfuel[snum] < 0.0 )
     {
       /* When you're out of gas, you're out of fun... */
@@ -2319,7 +2325,7 @@ int usefuel( int snum, real fuel, int weapon )
       if ( swtemp[snum] < 0.0 )
 	swtemp[snum] = 0.0;
       else if ( swtemp[snum] >= 100.0 )
-	if ( rnd( 0 ) < WEAPON_DOWN_PROB )
+	if ( rnd() < WEAPON_DOWN_PROB )
 	  {
 	    swfuse[snum] = rndint( MIN_DOWN_FUSE, MAX_DOWN_FUSE );
 	    if ( ! soption[snum][OPT_TERSE] )
@@ -2332,7 +2338,7 @@ int usefuel( int snum, real fuel, int weapon )
       if ( setemp[snum] < 0.0 )
 	setemp[snum] = 0.0;
       else if ( setemp[snum] >= 100.0 )
-	if ( rnd( 0 ) < ENGINE_DOWN_PROB )
+	if ( rnd() < ENGINE_DOWN_PROB )
 	  {
 	    sefuse[snum] = rndint( MIN_DOWN_FUSE, MAX_DOWN_FUSE );
 	    if ( ! soption[snum][OPT_TERSE] )
@@ -2345,20 +2351,20 @@ int usefuel( int snum, real fuel, int weapon )
 }
 
 
-/*##  zeroeverything - initialize the common block to zeros */
+/*  zeroeverything - initialize the common block to zeros */
 /*  SYNOPSIS */
 /*    zeroeverything */
 void zeroeverything(void)
 {
   
-  cdfill( '\0', (char *) commonrev, SIZEOF_COMMONBLOCK );
+  zero_common();
   
   return;
   
 }
 
 
-/*##  zeroship - turn OFF a ship and its torpedos */
+/*  zeroship - turn OFF a ship and its torpedos */
 /*  SYNOPSIS */
 /*    int snum */
 /*    zeroship( snum ) */
@@ -2489,4 +2495,3 @@ int KPAngle(int ch, real *angle)
   
   return(rv);
 }
-

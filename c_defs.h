@@ -13,7 +13,7 @@
 /* by Jon Trulson <jon@radscan.com> under the same terms and          */
 /* conditions of the original copyright by Jef Poskanzer and Craig    */
 /* Leres.                                                             */
-/* Have Phun!                                                         */
+/*                                                                    */
 /**********************************************************************/
 
 /* Get some valuable info... */
@@ -38,13 +38,19 @@
 # include <stdarg.h>
 #endif 
 
+#if defined(HAVE_STRING_H)
+# include <string.h>
+#endif 
 
+#if defined(HAVE_STRINGS_H)
+# include <strings.h>
+#endif 
 
-#if TIME_WITH_SYS_TIME
+#if defined(TIME_WITH_SYS_TIME)
 # include <sys/time.h>
 # include <time.h>
 #else
-# if HAVE_SYS_TIME_H
+# if defined(HAVE_SYS_TIME_H)
 #  include <sys/time.h>
 # else
 #  include <time.h>
@@ -131,11 +137,6 @@ extern char *sys_errlist[];
 # define TRUE    (1)
 #endif
 
-
-#define YES     TRUE
-#define NO      FALSE
-#define yes     YES
-#define no      NO
 #ifndef ERR
 # define ERR     (-1)
 #endif
@@ -148,30 +149,20 @@ extern char *sys_errlist[];
 #define FILENAMESIZE 512
 #define MAXLINE 78
 #define ARGBUFSIZE 512
+#define BIG_BIFFER_SIZE 4096
+#define MID_BUFFER_SIZE 2048
 #define BUFFER_SIZE 256
 
 /* Type Fakes */
-/*
-#define string char *
-#define real float
-*/
 
 typedef char * string;
-typedef float real;
+typedef double real;
 
 /* Function Fakes */
 
-#if defined(LINUX)
-#define powf(x, y)  (real)(pow((double) (x),(double) (y)))
-#define sinf(x)     (real)(sin((double) (x)))
-#define cosf(x)     (real)(cos((double) (x)))
-#define fmodf(x, y)  (real)(fmod((double) (x),(double) (y)))
-#define fabsf(x)     (real)(fabs((double) (x)))
-#endif
-
-#define float(x) ((real) (x))
+#define creal(x) ((real) (x))
 #define mod(x, y) ((x) % (y))
-#define equal(x, y)  ((strcmp(x, y) == 0) ? YES : NO)
+#define equal(x, y)  ((strcmp(x, y) == 0) ? TRUE : FALSE)
 #define c_strcpy(x, y) strcpy(y, x)
 #define appstr(x, y) strcat(y, x)
 #define appchr(x, y)     {\
@@ -180,20 +171,13 @@ typedef float real;
 			    y[yyzi++] = x; \
 			    y[yyzi] = '\0'; \
 			 }
-#define chcopy(from, to, off) to[off] = from; to[(off) + 1] = EOS
-#define clower(x) (char)tolower((int)(x))
-#define cupper(x) (char)toupper((int)(x))
-#define itoc(i, buf, len) sprintf(buf, "%d", (i)) /* hope buf is big enough */
 #define min(x, y) (((x) < (y)) ? (x) : (y))
 #define min0(x, y) min((x), (y))
 #define max(x, y) (((x) > (y)) ? (x) : (y))
 #define max0(x, y) max((x), (y))
-#define alog(x) ((real)log((double)(x)))
 #define fold(x) /* Who knows what this does... */
 #define glname(x) (void) cuserid(x)
-#define iand(x, y) ((x) & (y))
 #define ifix(x) ((int) (x))
-#define termin(x) strcpy(x, ttyname(0))	/* assume stdin */
 
 /* Function prototypes for ratfor.c */
 
@@ -204,18 +188,19 @@ int c_index(char *buf, char ch);
 void lower(char *buf);
 void upper(char *buf);
 void getnow (int now[8]);
-int wkday (int a, int b, int c);
-char c_getch(char c, int fd);
+int wkday (void);
 int lib_ffs(int start, int len, int bits, int *rule);
 void c_sleep(real sleeptime);
-int ctoi(char *buf);
 real ctor(char *buf);
+void error(char *str);
+
 
 /* Function prototypes for everything else */
 
 /* conquest.c */
 
 void command(int ch);
+int welcome( int *unum );
 void doalloc( int snum);
 void doautopilot( int snum );
 void dobeam( int snum );
@@ -268,7 +253,7 @@ void apptitle( int team, char *buf );
 int arrows( char *str, real *dir );
 void cerror(char *fmt, ...);
 void clog(char *fmt, ...);
-int confirm( int dummy );
+int confirm(void);
 void delblanks( char *str );
 int dsecs( int s, int *n );
 real explosion( real basehits, real dis );
@@ -284,13 +269,12 @@ void gsecs( int *s );
 real mod360( real r );
 int modp1( int i, int modulus );
 int more( char *pmt );
-void pagefile( char *file, char *errmsg, int ignorecontroll, int eatblanklines );
+void pagefile( char *file, char *errmsg );
 void c_putmsg( char *msg, int line );
 void putpmt( char *pmt, int line );
 int special( char *str, int *what, int *token, int *count );
 void stcpn( char *from, char *to, int tosize );
 int stmatch( char *str1, char *str2, int casesensitive );
-
 
 /* conqlb.c */
 
@@ -299,7 +283,6 @@ void chalkup( int snum );
 int cloak( int snum );
 void damage( int snum, real dam, int kb );
 void detonate( int snum, int tnum );
-void display( int snum );
 int enemydet( int snum );
 void hit( int snum, real ht, int kb );
 void ikill( int snum, int kb );
@@ -307,31 +290,28 @@ void infoplanet( char *str, int pnum, int snum );
 char *ETAstr(real warp, real distance);
 void infoship( int snum, int scanner );
 void killship( int snum, int kb );
-int launch( int snum, real dir, int number );
+int launch( int snum, real dir, int number, int ltype );
 void orbit( int snum, int pnum );
 int phaser( int snum, real dir );
 real phaserhit( int snum, real dis );
 void pseudo( int unum, int snum );
-void planlist( int team );
-void playlist( int godlike, int doall );
+void planlist( int team, int snum );
+void playlist( int godlike, int doall, int snum );
 void resign( int unum );
 int review( int snum, int slm );
 void takeplanet( int pnum, int snum );
 void teamlist( int team );
 void userline( int unum, int snum, char *buf, int showgods, int showteam );
-void userlist( int godlike );
-void userstats( int godlike );
+void userlist( int godlike, int snum );   /* dwp */
+void userstats( int godlike , int snum ); /* dwp */
 void statline( int unum, char *buf );
 void zeroplanet( int pnum, int snum );
-void do_bottomborder(void);
-void do_border(void);
-int alertcolor(int alert);
-void draw_alertborder(int alert);
 
 /** conqmisc.c */
 
 int cmpplanet(void *cmp1, void *cmp2);
 void sortplanets(int sv[]);
+int spwar( int snum, int pnum );
 void appkb( int kb, char *buf );
 void appship( int snum, char *str );
 int canread( int snum, int msgnum );
@@ -373,11 +353,11 @@ int KPAngle(int ch, real *angle);
 
 void cdbeep(void);
 void cdbox ( int lin1, int col1, int lin2, int col2 );
-void cdcput ( char ch, char f );
+void cdcput ( char ch );
 void cdclear(void);
 void cdclra ( int l1, int c1, int l2, int c2 );
 void cdclrl ( int f, int n );
-int cdcols ( int dummy );
+int cdcols (void);
 void cdend(void);
 void cdfill ( char ch, char buf[], int count );
 int cdgetn ( char pmt[], int lin, int col, int *num );
@@ -385,14 +365,13 @@ int cdgets ( char pmt[], int lin, int col, char str[], int maxlen );
 int cdgetx ( char pmt[], int lin, int col, char terms[], char str[], 
 	     int maxlen );
 int cdgetp ( char pmt[], int lin, int col, char terms[], char str[], 
-	     int maxlen );
-void cdgoto ( int lin, int col );
+	     int maxlen, int *append_flg, int do_append_flg );
 void cdinit(void);
 void cdline ( int lin1, int col1, int lin2, int col2 );
-int cdlins ( int dummy );
+int cdlins ( void );
 void cdmove ( int lin, int col );
 void cdmovtc ( char ibuf[], char obuf[], char trntbl[], int count );
-void cdrefresh ( int stoponinput );
+void cdrefresh ( void );
 void cdput ( char ch, int lin, int col );
 void cdputc ( char str[], int lin );
 void cdputn ( int iint, int wid, int lin, int col );
@@ -404,9 +383,8 @@ void cdredo(void);
 void bigbang(void);
 void debugdisplay( int snum );
 void debugplan(void);
-void doomdisplay(void);
 int gplanmatch( char str[], int *pnum );
-void kiss(void);
+void kiss(int snum, int prompt_flg);
 void opback( int lastrev, int *savelin );
 void operate(void);
 void opinfo( int snum );
@@ -420,6 +398,13 @@ void opuadd(void);
 void oppedit(void);
 void opuedit(void);
 void watch(void);
+int prompt_ship(char buf[], int *snum, int *normal);
+void dowatchhelp(void);
+void setdheader(int show_header);
+void setopertimer(void);
+void toggle_line(int snum, int old_snum);
+char *build_toggle_str(char snum_str[], int snum);
+void menu_item( char *option, char *msg_line, int lin, int col );
 
 /* conqai.c */
 void buildai( int snum, int vars[], int *bnenum, real *bdne, real *bane );
@@ -437,8 +422,8 @@ int tableai( int vars[] );
 
 /* conqdriv.c */
 
-void iterdrive( int ship[] );
-void secdrive( int ship[] );
+void iterdrive( int *ship );
+void secdrive( int *ship );
 void submindrive(void);
 void mindrive(void);
 void fivemindrive(void);
@@ -466,8 +451,9 @@ void gcputime( int *cpu );
 void helplesson(void);
 void initstats( int *ctemp, int *etemp );
 int isagod( char *name );
-int mail( char names[], char subject[], char msg[] );
 void news(void);
+int mailimps( char *subject, char *msg);
+int CheckPid(int pidnum);
 
 void settimer(void);
 void stoptimer(void);
@@ -475,24 +461,11 @@ void stoptimer(void);
 void upchuck(void);
 void upstats( int *ctemp, int *etemp, int *caccum, int *eaccum, int *ctime, int *etime );
 
-/* gamlb.c */
-
-int gamcheck( int dummy );
-int gamcmp( int num, char buf[] );
-void gamcronfile( char file[] );
-int gamdialup( int dummy );
-void gamend(void);
-void gaminit( char truename[] );
-void gamlinit( int fdial, int fprio, int fcron, int despri, char *badlist, 
-	      char *badttylist, char *truename, char *cronfile );
-void gamimage( char image[] );
-int gamtname( char name[], char list[], int leadingmatch );
-
 /* rndlb.c */
 
 void rndini ( int seed1, int seed2 );
 void rndseq ( int value, int multiplier, int increment, int modulus );
-real rnd ( int dummy );
+real rnd ( void );
 real rnduni ( real rlow, real rhigh );
 int rndint ( int ilow, int ihigh );
 real rndnor ( real mean, real stddev );
@@ -506,17 +479,16 @@ int rndpoi ( real mean );
 
 /* ioxlb.c */
 
-int iogchar ( int ch );
+int iogchar ( void );
 int iogtimed ( int *ch, int seconds );
 
 /* ioplb.c */
 
-int iogquick( char ch );
 void ioeat(void);
 
 /* ionlb.c */
 
-int iochav( int dummy );
+int iochav( void );
 
 /* conqcm.c */
 char *mymalloc(int size);
@@ -530,6 +502,7 @@ void flush_common(void);
  void PVLOCK(int *);
  void PVUNLOCK(int *);
 #endif
+void zero_common(void);
 
 
 /* ibuf.c */
@@ -537,6 +510,7 @@ void flush_common(void);
 void iBufInit(void);
 int iBufEmpty(void);
 void iBufPut(char *thestr);
+void iBufPutc(char thechar);
 char iBufGetCh(void);
 int DoMacro(int ch);
 
@@ -553,4 +527,13 @@ int GetSem(void);
 void Lock(int what);
 void Unlock(int what);
 char *GetSemVal(int thesem);
+
+/* display.c */
+
+void display( int snum, int display_info );
+void display_headers(int snum);
+void do_bottomborder(void);
+void do_border(void);
+int alertcolor(int alert);
+void draw_alertborder(int alert);
 

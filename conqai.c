@@ -19,7 +19,7 @@
 /* by Jon Trulson <jon@radscan.com> under the same terms and          */
 /* conditions of the original copyright by Jef Poskanzer and Craig    */
 /* Leres.                                                             */
-/* Have Phun!                                                         */
+/*                                                                    */
 /**********************************************************************/
 
 #ifdef CONQAIMAIN
@@ -35,12 +35,10 @@ static int nenum;
 static int debug; 
 static real dne, ane;
 
-/*##  conqai - robot AI test program */
+/*  conqai - robot AI test program */
 #ifdef CONQAIMAIN
+
 main(int argc, char *argv[])
-#else
-     CONQAImain()
-#endif
 {
   int i;
   string usage="usage: conqai [-vd]";
@@ -95,8 +93,6 @@ main(int argc, char *argv[])
   
   debug = FALSE;
   
-#ifdef CONQAIMAIN
-  
   while ((arg = getopt(argc, argv, "d")) != EOF)
     {
       switch (arg)
@@ -114,15 +110,15 @@ main(int argc, char *argv[])
 	  exit(1);
 	}
     }
-#endif    
   robotloop();
   
   exit(0);
   
 }
 
+#endif /* CONQAIMAIN */
 
-/*##  buildai - construct the robot data base */
+/*  buildai - construct the robot data base */
 /*  SYNOPSIS */
 /*    int snum, vars(MAX_VAR), nenum */
 /*    real dne, ane */
@@ -133,28 +129,28 @@ void buildai( int snum, int vars[], int *bnenum, real *bdne, real *bane )
 {
   
   /* i = AIRANGE( j ) */
-#define AIRANGE(x) min(max((x), 0), 9)
+#define AIRANGE(a) min(max((a), 0), 9)
   
   /* AISCALE( var, value, scale ) */
-#define AISCALE(x, y, z)  x = AIRANGE( round( (real)(y) / (real)(z)  ))
+#define AISCALE(a, b, c)  a = (int)AIRANGE( around( (real)(b) / (real)(c)  ))
   
   /* AIDIST( var, dist ) */
-#define AIDIST(x, y)              \
+#define AIDIST(a, b)              \
   {                                 \
-				      zzzx = min( (y), 10000.0 );   \
-				      x = AIRANGE( (int) (0.99026 + zzzx * (1.58428e-3 + zzzx * -59.2572e-9))); \
-				  }
+	zzzx = min( (b), 10000.0 );   \
+	a = (int)AIRANGE((0.99026 + zzzx * (1.58428e-3 + zzzx * -59.2572e-9))); \
+  }
     
     /* AIBOOLEAN( var, expr ) */
-#define AIBOOLEAN(x, y) \
+#define AIBOOLEAN(a, b) \
     {            \
-		   if ( (y) ) \
-		   x = 1; \
+		   if ( (b) ) \
+		   a = 1; \
 		   else     \
-		   x = 0; \
+		   a = 0; \
 	       }
       
-      int i, j, xnenum;
+  int i, j, xnenum;
   real dam, x, y, zzzx;
   
   /* Initialize to zeros. */
@@ -213,8 +209,8 @@ void buildai( int snum, int vars[], int *bnenum, real *bdne, real *bane )
     }
   
   /* Ship fuel (10) */
-  AISCALE( vars[VAR_FUEL], sfuel[snum], 10.0 );
-  
+  AISCALE( vars[VAR_FUEL], sfuel[snum], 100.0 );
+
   /* Number of torps available to fire (1) */
   j = 0;
   for ( i = 0; i < MAXTORPS; i = i + 1 )
@@ -224,7 +220,7 @@ void buildai( int snum, int vars[], int *bnenum, real *bdne, real *bane )
   
   /* Ship shields (10) */
   AISCALE( vars[VAR_SHIELDS], sshields[snum], 10.0 );
-  
+
   /* Ship engine temperature (10) */
   AISCALE( vars[VAR_ETEMP], setemp[snum], 10.0 );
   
@@ -264,14 +260,13 @@ void buildai( int snum, int vars[], int *bnenum, real *bdne, real *bane )
 }
 
 
-/*##  defend - create a robot ship to defend the home system */
+/*  defend - create a robot ship to defend the home system */
 /*  SYNOPSIS */
 /*    int snum, pnum */
 /*    defend( attacker, pnum ) */
 void defend( int attacker, int pnum )
 {
   int i, j, k, team, snum, unum;
-  int l;
   char buf[MSGMAXLINE];
   
   team = pteam[pnum];
@@ -281,8 +276,8 @@ void defend( int attacker, int pnum )
   
   /* Must be for a home system planet. */
   if ( pnum != teamplanets[team][0] &&
-      pnum != teamplanets[team][1] &&
-      pnum != teamplanets[team][2] )
+       pnum != teamplanets[team][1] &&
+       pnum != teamplanets[team][2] )
     return;
   
   /* See if there are any team ships to defend. */
@@ -336,7 +331,7 @@ void defend( int attacker, int pnum )
 }
 
 
-/*##  displayai - display the selected robot action on STDOUT */
+/*  displayai - display the selected robot action on STDOUT */
 /*  SYNOPSIS */
 /*    int snum, token, vars() */
 /*    displayai( snum, token, vars ) */
@@ -359,7 +354,7 @@ void displayai( int snum, int token, int vars[] )
 }
 
 
-/*##  executeai - execute the selected robot action (DOES LOCKING) */
+/*  executeai - execute the selected robot action (DOES LOCKING) */
 /*  SYNOPSIS */
 /*    int snum, token */
 /*    executeai( snum, token ) */
@@ -370,18 +365,18 @@ void executeai( int snum, int token )
   
   /* SETWARP( warp ) */
 #define SETWARP(x)                 \
-  {                                  \
-				       if ( swarp[snum] < 0.0 )\
-				       {                       \
-								 /* Break orbit. */     \
-								 swarp[snum] = 0.0;     \
-								 slock[snum] = 0;       \
-								 sdhead[snum] = shead[snum]; \
-							     }                      \
-				       if ( (x) > 0.0 )             \
-				       srmode[snum] = FALSE;  \
-				       sdwarp[snum] = (x);          \
-				   }
+  {                                \
+	if ( swarp[snum] < 0.0 )\
+	{                       \
+	 /* Break orbit. */     \
+		 swarp[snum] = 0.0;     \
+		 slock[snum] = 0;       \
+		 sdhead[snum] = shead[snum]; \
+	}                      \
+	if ( (x) > 0.0 )             \
+		 srmode[snum] = FALSE;  \
+	sdwarp[snum] = (x);          \
+  }
     
     /* SETCOURSE( course ) */
 #define SETCOURSE(x)             \
@@ -405,11 +400,7 @@ void executeai( int snum, int token )
       }
 
   int i, j;
-  real x;
-  int l;
   char buf[MAXLINE];
-  
-  /*    CONQAICOMMON;*/
   
   /* Update ship action. */
   saction[snum] = token;
@@ -444,13 +435,13 @@ void executeai( int snum, int token )
       sengines[snum] = i;
       break;
     case ROB_PHASER:
-      l = phaser( snum, ane );
+      phaser( snum, ane );
       break;
     case ROB_TORPEDO:
-      l = launch( snum, ane, 1 );
+      launch( snum, ane, 1, LAUNCH_NORMAL );
       break;
     case ROB_BURST:
-      l = launch( snum, ane, 3 );
+      launch( snum, ane, 3, LAUNCH_NORMAL );
       break;
     case ROB_SHIELD:
       sshup[snum] = (sshup[snum]) ? FALSE : TRUE;
@@ -492,11 +483,11 @@ void executeai( int snum, int token )
 	    {
 	      j = msgfrom[i];
 	      if ( -j > 0 && -j <= NUMPLANETS )
-		continue; /* next*/			/* don't talk back to planets */
+		continue; 	/* don't talk back to planets */
 
 	      if ( j > 0 && j <= MAXSHIPS )
 		if ( srobot[j] )
-		  continue; /*next*/		/* don't talk back to robots */
+		  continue; 	/* don't talk back to robots */
 
 	      if (j == MSG_GOD)
 		continue;	/* don't talk back to GOD */
@@ -517,7 +508,7 @@ void executeai( int snum, int token )
       stormsg( snum, MSG_ALL, "I'm on drugs." );
       break;
     case ROB_DETONATE:
-      l = enemydet( snum );
+      enemydet( snum );
       break;
     case ROB_MYDETONATE:
       for ( i = 0; i < MAXTORPS; i = i + 1 )
@@ -545,7 +536,7 @@ void executeai( int snum, int token )
 }
 
 
-/*##  exitai - exit handler */
+/*  exitai - exit handler */
 /*  SYNOPSIS */
 /*    extern exitai */
 void exitai(void)
@@ -558,7 +549,7 @@ void exitai(void)
 }
 
 
-/*##  newrob - create a robot ship (DOES LOCKING) */
+/*  newrob - create a robot ship (DOES LOCKING) */
 /*  SYNOPSIS */
 /*    int ok, newrob */
 /*    int snum, unum */
@@ -615,7 +606,7 @@ int newrob( int *snum, int unum )
 
 				/* see if we should randomize it's strength
 				   otherwise do nothing since sstrkills
-				   was intialized to 0.0 in initship */
+				   was initialized to 0.0 in initship */
   if (sysconf_DoRandomRobotKills == TRUE)
     {
 				/* randomize the robot's 'strength' */
@@ -629,9 +620,9 @@ int newrob( int *snum, int unum )
   ssdfuse[*snum] = 0;
   spid[*snum] = 0;
 
-				/* robot know they can use 30/70
+				/* robots now can use 30/70
 				   instead of the default 40/60 set in
-				   initship(). ;-) */
+				   initship(). */
   sweapons[*snum] = 30;
   sengines[*snum] = 100 - sweapons[*snum];
 
@@ -667,7 +658,7 @@ int newrob( int *snum, int unum )
 }
 
 
-/*##  robotai - AI automation rstrategy */
+/*  robotai - AI automation strategy */
 /*  SYNOPSIS */
 /*    int snum */
 /*    robotai( snum ) */
@@ -707,7 +698,7 @@ void robotai( int snum )
 }
 
 
-/*##  trobotai - AI automation robot strategy (TEST VERSION) */
+/*  trobotai - AI automation robot strategy (TEST VERSION) */
 /*  SYNOPSIS */
 /*    int snum */
 /*    trobotai( snum ) */
@@ -734,23 +725,14 @@ void trobotai( int snum )
 }
 
 
-/*##  robotloop - robot AI test loop */
+/*  robotloop - robot AI test loop */
 /*  SYNOPSIS */
 /*    robotloop */
 void robotloop(void)
 {
   
-  int s, j, status, estatus, desblk[4];
+  int s, j;
   
-  /* Set up an exit handler to disable the extern robot stategy. */
-  /*    desblk[1] = 0				/* forward link */
-    /*    desblk[2] = %loc(exitai)			/* address of exit handler */
-      /*    desblk[3] = 1				/* number of arguments */
-	/*    desblk[4] = %loc(estatus)			/* address of exit status */
-	  /*    status = sys$dclexh( desblk );
-		if ( status != %loc(ss$_normal) )
-		error( "conqai: sys$dclexh(), %s", status );
-		
 		/* Disable the robot code in conqdriv. */
   *externrobots = TRUE;
   
@@ -780,7 +762,7 @@ void robotloop(void)
 }
 
 
-/*##  robreply - generate a random message */
+/*  robreply - generate a random message */
 /*  SYNOPSIS */
 /*    char buf() */
 /*    robreply( buf ) */
@@ -873,7 +855,7 @@ void robreply( char buf[] )
 }
 
 
-/*##  robstr - convert a robot token to a string */
+/*  robstr - convert a robot token to a string */
 /*  SYNOPSIS */
 /*    int token */
 /*    char buf() */
@@ -899,7 +881,7 @@ void robstr( int token, char buf[] )
       c_strcpy( "DETONATE", buf );
       break;
     case ROB_MYDETONATE:
-      c_strcpy( "MYDETONATE", buf );
+      c_strcpy( "MYDETONAT", buf );
       break;
     case ROB_PHASER:
       c_strcpy( "PHASER", buf );
@@ -964,28 +946,23 @@ void robstr( int token, char buf[] )
 }
 
 
-/*##  tableai - consult the table to execute a strategy */
+/*  tableai - consult the table to execute a strategy */
 /*  SYNOPSIS */
 /*    int token, vars(MAX_VAR), tableai */
 /*    token = tableai( vars ) */
 int tableai( int vars[] )
 {
-  int status, token, rule, i, j;
+  int status, token, rule, i;
   int rbits;
   
   /* Set all bits. */
   rbits = -1;
-  
-  /*    rbits = 0xFFFFFFFF;		/* JET */
   
   /* Loop through the variables and turn off bits for rules that */
   /*  are disabled because of a particular vars() value. */
   
   for ( i = 0; i < MAX_VAR; i = i + 1 )
     rbits &= rstrat[i][vars[i]];
-  
-  /*	rbits = iand( rbits, rstrat[i][vars[i]+1] );*/
-  
   
   /* Find first set rule bit and translate into rule number. */
   status = lib_ffs( 0, 32, rbits, &rule );

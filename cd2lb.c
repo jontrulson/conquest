@@ -11,7 +11,7 @@
 /* by Jon Trulson <jon@radscan.com> under the same terms and          */
 /* conditions of the original copyright by Jef Poskanzer and Craig    */
 /* Leres.                                                             */
-/* Have Phun!                                                         */
+/*                                                                    */
 /**********************************************************************/
 
 /*                              C D 2 L B */
@@ -52,7 +52,6 @@
 /* 03a 29May83 cal .Rewritten to go like hell */
 
 #include "conqdef.h"
-#include "cdcom.h"
 
 #include "conqcom2.h"
 #include "global.h"
@@ -60,7 +59,13 @@
 
 #define MSGMAXLINE 90 			/* used for screen formatting */
 
-/*## cdbox - draw a box */
+/* Maximum screen dimensions. */
+static int maxlin;                              /* maximum line */
+static int maxcol;                              /* maximum column */
+
+
+
+/* cdbox - draw a box */
 /* synopsis */
 /*    int lin1, col1, lin2, col2 */
 /*    cdbox ( lin1, col1, lin2, col2 ) */
@@ -90,12 +95,12 @@ void cdbox ( int lin1, int col1, int lin2, int col2 )
 }
 
 
-/*## cdcput - output a char (internal) */
+/* cdcput - output a char (internal) */
 /* synopsis */
 /*    char ch, f */
 /*    cdcput ( ch, f ) */
 /*       f - font for character */
-void cdcput ( char ch, char f )
+void cdcput ( char ch )
 {
   
   addch(ch);
@@ -105,7 +110,7 @@ void cdcput ( char ch, char f )
 }
 
 
-/*## cdclear - clear the desired image */
+/* cdclear - clear the desired image */
 /* synopsis */
 /*    cdclear */
 void cdclear(void)
@@ -116,7 +121,7 @@ void cdclear(void)
 }
 
 
-/*## cdclra - clear rectangular area in desired image */
+/* cdclra - clear rectangular area in desired image */
 /* synopsis */
 /*    int l1, c1, l2, c2 */
 /*    cdclra ( l1, c1, l2, c2 ) */
@@ -147,7 +152,8 @@ void cdclra ( int l1, int c1, int l2, int c2 )
   cdfill(' ', tmpstr, j);
   tmpstr[j] = '\0';
 
-/*  clog("cdclra(): rlc = %d, maxcol = %d", rlc, maxcol);*/
+  /*  clog("cdclra(): rfl = %d rll = %d rfc = %d rlc = %d, maxcol = %d", rfl, rll, rfc, rlc, maxcol);
+   */
 
 
   for ( i = rfl ; i <= rll ; i = i + 1 )
@@ -166,7 +172,7 @@ void cdclra ( int l1, int c1, int l2, int c2 )
 }
 
 
-/*## cdclrl - clear lines in desired image */
+/* cdclrl - clear lines in desired image */
 /* synopsis */
 /*    int f, n */
 /*    cdclrl ( f, n ) */
@@ -183,17 +189,17 @@ void cdclrl ( int f, int n )
 }
 
 
-/*## cdcols - return the number of columns for this terminal */
+/* cdcols - return the number of columns for this terminal */
 /* synopsis */
 /*    int cols, cdcols */
 /*    cols = cdcols ( 0 ) */
-int cdcols ( int dummy )
+int cdcols ( void )
 {
   return ( maxcol );
   
 }
 
-/*## cdend - end display environment */
+/* cdend - end display environment */
 /* synopsis */
 /*    cdend */
 /* description */
@@ -207,7 +213,7 @@ void cdend(void)
 }
 
 
-/*## cdfill - fill buffer (portable version) */
+/* cdfill - fill buffer (portable version) */
 /* synopsis */
 /*    char ch, buf() */
 /*    int count */
@@ -223,7 +229,7 @@ void cdfill ( char ch, char *buf, int count )
   
 }
 
-/*## cdgetn - read a number from the terminal */
+/* cdgetn - read a number from the terminal */
 /* synopsis */
 /*    char pmt() */
 /*    int status, cdgetn, num, lin, col */
@@ -233,18 +239,17 @@ void cdfill ( char ch, char *buf, int count )
 int cdgetn ( char pmt[], int lin, int col, int *num )
 {
   char buf[MSGMAXLINE];
-  int i;
   
   if ( cdgets ( pmt, lin, col, buf, MSGMAXLINE ) == ERR )
     return ( ERR );
   
-  *num = ctoi ( buf );
+  *num = atoi ( buf );
   return ( OK );
   
 }
 
 
-/*## cdgets - read a line from the terminal */
+/* cdgets - read a line from the terminal */
 /* synopsis */
 /*    char pmt(), str() */
 /*    int status, cdgets, maxlen, lin, col */
@@ -260,11 +265,8 @@ int cdgetn ( char pmt[], int lin, int col, int *num )
 /*    control-l. */
 int cdgets ( char pmt[], int lin, int col, char str[], int maxlen )
 {
-  int length;
-  int termch;
-  string terms="\r\n";
-  
-  termch = cdgetx ( pmt, lin, col, terms, str, maxlen );
+
+  cdgetx ( pmt, lin, col, "\r\n", str, maxlen );
   
   if ( strlen ( str ) == 0 )
     return(ERR);
@@ -275,7 +277,7 @@ int cdgets ( char pmt[], int lin, int col, char str[], int maxlen )
 }
 
 
-/*## cdgetx - read a line from the terminal with special terminators */
+/* cdgetx - read a line from the terminal with special terminators */
 /* synopsis */
 /*    char pmt(), terms(), str() */
 /*    int maxlen, lin, col */
@@ -298,13 +300,14 @@ int cdgets ( char pmt[], int lin, int col, char str[], int maxlen )
 int cdgetx ( char pmt[], int lin, int col, char terms[], char str[], 
 	    int maxlen )
 {
-  str[0] = EOS;
-  return ( cdgetp ( pmt, lin, col, terms, str, maxlen ) );
+  int append_flg = FALSE;
+  int do_append_flg = FALSE;
+  return ( cdgetp ( pmt, lin, col, terms, str, maxlen, &append_flg, do_append_flg ) );
   
 }
 
 
-/*## cdgetp - read a line from the terminal with special terminators */
+/* cdgetp - read a line from the terminal with special terminators */
 /* synopsis */
 /*    char pmt(), terms(), str() */
 /*    int maxlen, lin, col */
@@ -312,20 +315,43 @@ int cdgetx ( char pmt[], int lin, int col, char terms[], char str[],
 /*    termch = cdgetp ( pmt, lin, col, terms, str, maxlen ) */
 /*       terms - string of acceptable line terminators */
 /*       maxlen - size of str */
+/*       append_flg - return for more input flag */
+/*       do_append_flg - append operation acceptable flag */
 /* description */
 /*    This routine prompts for input from the terminal. The prompt ``pmt'' */
 /*    and initial contents of ``str'' and displayed and then input is read */
 /*    and the result is returned in ``str''. This means that a default value */
 /*    of str can be provided. This routine is otherwise similar to cdgetx(). */
 int cdgetp ( char pmt[], int lin, int col, char terms[], char str[], 
-	    int maxlen )
+	    int maxlen, int *append_flg, int do_append_flg )
 {
   int i, len, icol, scol, imaxlen;
-  int ch;
-  
+  int ch = 0;
+  int StrInit;
+
+  char mbuf[MSGMAXLINE];
+  char sbuf[MSGMAXLINE];
+
+  char *append_fmt1 = "%s%s%c";
+  char *append_fmt2 = "%s%c";
+  char *append_str = "- ";
+  int max_size, diff;
+
+  if (str[0] != EOS)
+    {				/* theres a value there */
+      StrInit = TRUE;
+    }
+  else
+    {
+      StrInit = FALSE;
+    }
+
+  attrset(InfoColor);           /* colorize prompt string */
   cdputs ( pmt, lin, col );
   scol = col + strlen ( pmt );
+  attrset(SpecialColor);        /* colorize secondary string */
   cdputs ( str, lin, scol );
+  attrset(NoColor);
   len = strlen ( str );
   icol = scol + len;
   
@@ -335,16 +361,31 @@ int cdgetp ( char pmt[], int lin, int col, char terms[], char str[],
     {
       str[ min0 ( len+1, imaxlen ) ] = EOS;
       cdmove ( lin, icol );
-      cdrefresh ( TRUE );
-      
-      ch = iogchar(ch);
-      
+      cdrefresh ();
+	  
+      ch = iogchar();
+
       if ( terms[0] != EOS )
 	if ( c_index ( terms, ch ) != ERR )
 	  break;
 	else if ( ch == TERM_NORMAL )
 	  break;
-      if ( ch == '\b' || ch == '\x7f' || ch == KEY_BACKSPACE )
+
+      if (ch != TERM_NORMAL && ch != TERM_EXTRA && StrInit == TRUE &&
+	  isprint(ch))
+	{			/* clear out the preload */
+	  str[0] = ch;
+	  str[1] = EOS;
+	  len = 1;
+	  icol = scol + len;
+	  cdclra ( lin, icol, lin, cdcols() );
+	  cdputs ( str, lin, scol );
+
+	  StrInit = FALSE;
+	  continue;
+	}
+
+      if ( ch == '\b' || ch == 0x7f || ch == KEY_BACKSPACE )
 	{
 	  /* Delete one character. */
 	  if ( len > 0 )
@@ -355,7 +396,7 @@ int cdgetp ( char pmt[], int lin, int col, char terms[], char str[],
 	      cdclra ( lin, icol, lin, icol );
 	    }
 	}
-      else if ( ch == '\x17' )
+      else if ( ch == 0x17 )
 	{
 	  /* Delete the last word. */
 	  if ( len > 0 )
@@ -386,7 +427,7 @@ int cdgetp ( char pmt[], int lin, int col, char terms[], char str[],
 		cdclra ( lin, icol, lin, i - 1 );
 	    }
 	}
-      else if ( ch == '\x15' || ch == '\x18' )
+      else if ( ch == 0x15 || ch == 0x18 )
 	{
 	  if ( len > 0 )
 	    {
@@ -395,7 +436,7 @@ int cdgetp ( char pmt[], int lin, int col, char terms[], char str[],
 	      len = 0;
 	    }
 	}
-      else if ( ch == '\x0c' )
+      else if ( ch == 0x0c )
 	cdredo();
       else if ( ! isprint ( ch ) )
 	{
@@ -412,7 +453,7 @@ int cdgetp ( char pmt[], int lin, int col, char terms[], char str[],
 	  /*str[len] = ch;*/
 	  /*	    cdput ( ch, lin, icol );*/
 	  cdput ( ch, lin, icol );
-	  cdrefresh(FALSE);
+	  cdrefresh();
 	  icol = icol + 1;
 	}
       else
@@ -420,39 +461,63 @@ int cdgetp ( char pmt[], int lin, int col, char terms[], char str[],
 #ifdef DEBUG_IO
 	  clog("cdgetp2:Got a strange char: '%c' = ascii %d", ch, ch);
 #endif
-	  cdbeep();
+	  cdbeep(); /* exceeded max. allowable characters. */
+	  if (do_append_flg == TRUE) {
+	    /*
+	     * Push (if char != ' ') last word back into buffer which will be 
+	     * inserted back into the msg buffer when cdgetp() is called again.  
+	     * Replace pushed back chars with "append" symbol and blanks.  
+	     * Set the flag to come on back and then return from whence we came.
+	     */
+	    cdclra ( lin, scol, lin, maxlen+1);
+	    mbuf[0] = EOS;
+	    sbuf[0] = EOS;
+	    str[len] = EOS;
+	    for (i=len; i>=0 && str[i] != ' '; i--)
+	      ;
+	    i++;
+	    if (i < 0)
+	      i=0;
+	    max_size = strlen(&str[i]) + strlen(append_str);
+	    diff = max_size - (maxlen - 2);
+	    
+	    /* 
+	     * Assume the word is too big to reinsert (just repeating the line). 
+	     * Save last char entered and go on.
+	     */
+	    if (diff > 0) {
+	      strcpy(sbuf, &str[max_size - diff]);
+	      str[max_size - diff] = (int)'-';
+	      sprintf(mbuf, append_fmt1, append_str, sbuf, ch);
+	    }
+	    else {
+	      if (str[maxlen-2] != ' ') { /* Save last word plus last char entered */
+		strcpy(sbuf,&str[i]); 
+		str[i] = (int)'-';
+		sprintf(mbuf, append_fmt1, append_str, sbuf, ch);
+		for (i=i+1;i<len;i++)
+		  str[i] = ' ';
+	      }
+	      else { /* Have a space so save last char entered */
+		str[maxlen-2] = (int)'-';
+		sprintf(mbuf, append_fmt2, append_str, ch);
+		for (i=i+1;i<len;i++)
+		  str[i] = ' ';
+	      }
+	    } 
+	    iBufPut(mbuf);
+	    *append_flg = TRUE;
+	    break;
+	  } /* end if do_append_flg */
 	}
     }
   
   str[ min0 ( len+1, imaxlen ) ] = EOS;
   
+  attrset(0);
   return ( ch );
   
 }
-
-/*## cdgoto - move the cursor optimally (internal) */
-/* synopsis */
-/*    int lin, col */
-/*    cdgoto ( lin, col ) */
-/* description */
-/*    This routine chooses a cursor movement strategy by comparing */
-/*    char costs. Currently, it uses the following strategies: */
-/*    Special note: relative cursor movement to the right usually */
-/*    costs only one char per position moved, even on terminals */
-/*    whose cursor-right commands are more than one char long. */
-/*    This is because movement to the right is accomplished by re-typing */
-/*    the characters that are already in the positions being moved over. */
-/*    The exception to this is when the char has attributes other */
-/*    than the current ones set. */
-void cdgoto ( int lin, int col )
-{
-  
-  cdmove(lin, col);
-  
-  return;
-}
-
-
 
 void cdbeep(void)
 {
@@ -476,18 +541,13 @@ void cdbeep(void)
 }
 
 
-/*## cdinit - initialize cdlb */
+/* cdinit - initialize cdlb */
 /* synopsis */
 /*    cdinit */
 /* description */
 /*    This routine must be called before all others in cdlb. */
 void cdinit(void)
 {
-  
-  int i;
-  int ich;
-  char ch;
-  
   /* Initialize screen library (this MUST be done first). */
   
 #ifdef ENABLE_MACROS
@@ -501,57 +561,9 @@ void cdinit(void)
   start_color();
   
   if (has_colors() && conf_NoColor == FALSE)
-    {
-#ifdef DEBUG_COLOR
-      clog("Terminal has colors, COLORS = %d, COLOR_PAIRS = %d",
-	   COLORS,
-	   COLOR_PAIRS);
-#endif
-      init_pair(COL_BACKGROUND, COLOR_WHITE, COLOR_BLACK);
-      init_pair(COL_REDBLACK, COLOR_RED, COLOR_BLACK);
-      init_pair(COL_GREENBLACK, COLOR_GREEN, COLOR_BLACK);
-      init_pair(COL_YELLOWBLACK, COLOR_YELLOW, COLOR_BLACK);
-      init_pair(COL_BLUEBLACK, COLOR_BLUE, COLOR_BLACK);
-      init_pair(COL_MAGENTABLACK, COLOR_MAGENTA, COLOR_BLACK);
-      init_pair(COL_CYANBLACK, COLOR_CYAN, COLOR_BLACK);
-
-		/* now init the backgound */
-		/* ncurses seems to toast the colors if you do this */
-		/*  so no background init is done with ncurses. */
-		/* This means that if your using ncurses, run conquest */
-		/*  on a display with a black background for best results */
-#if !defined(HAVE_NCURSES_H) && !defined(NCURSES_VERSION)
-      bkgdset(COLOR_PAIR(COL_BACKGROUND) | ' ');
-#endif
-
-      HAS_COLORS = TRUE;
-
-				/* init default attributes */
-      LabelColor = COLOR_PAIR(COL_BLUEBLACK) | A_BOLD;
-      InfoColor = COLOR_PAIR(COL_CYANBLACK) | A_BOLD;
-      RedLevelColor = COLOR_PAIR(COL_REDBLACK) | A_BOLD;
-      YellowLevelColor = COLOR_PAIR(COL_YELLOWBLACK) | A_BOLD;
-      GreenLevelColor = COLOR_PAIR(COL_GREENBLACK) | A_BOLD;
-    }
+    InitColors(TRUE);
   else
-    {
-
-#ifdef DEBUG_COLOR
-      clog("Terminal DOES NOT have colors, COLORS = %d, COLOR_PAIRS = %d",
-	   COLORS,
-	   COLOR_PAIRS);
-#endif
-
-      HAS_COLORS = FALSE;
-      
-				/* init default attributes */
-      LabelColor = 0;
-      InfoColor = 0;
-      RedLevelColor = (A_BOLD | A_REVERSE);
-      YellowLevelColor = A_BOLD;
-      GreenLevelColor = 0;
-
-    }
+    InitColors(FALSE);
   
   nonl(); 
   typeahead(-1);		/* no typeahead checking */
@@ -599,7 +611,7 @@ void cdinit(void)
 }
 
 
-/*## cdline - draw horizontal or vertical line */
+/* cdline - draw horizontal or vertical line */
 /* synopsis */
 /*    int lin1, col1, lin2, col2 */
 /*    cdline ( lin1, col1, lin2, col2 ) */
@@ -608,8 +620,6 @@ void cdinit(void)
 /*    between the two screen positions. Bad parameters are ignored. */
 void cdline ( int lin1, int col1, int lin2, int col2 )
 {
-  int i;
-  
   if ( lin1 == lin2 )
     {
       /* A horizontal line. */
@@ -648,17 +658,17 @@ void cdline ( int lin1, int col1, int lin2, int col2 )
 }
 
 
-/*## cdlins - return the number of lines for this terminal */
+/* cdlins - return the number of lines for this terminal */
 /* synopsis */
 /*    int lin, cdlins */
 /*    lin = cdlins ( 0 ) */
-int cdlins ( int dummy )
+int cdlins ( void )
 {
   return ( maxlin );
   
 }
 
-/*## cdmove - move position of cursor in desired image */
+/* cdmove - move position of cursor in desired image */
 /* synopsis */
 /*    int lin, col */
 /*    cdmove ( lin, col ) */
@@ -686,7 +696,7 @@ void cdmove ( int lin, int col )
 }
 
 
-/*## cdrefresh - make screen image look like desired image */
+/* cdrefresh - make screen image look like desired image */
 /* synopsis */
 /*     int stoponinput */
 /*     cdrefresh ( stoponinput ) */
@@ -695,14 +705,14 @@ void cdmove ( int lin, int col )
 /*   If stoponinput is set, cdrefresh checks periodically to see if there */
 /*   is a char of input ready; if so, cdrefresh() returns when called */
 /*   again, it will resume where it left off. */
-void cdrefresh ( int stoponinput )
+void cdrefresh ( void )
 {
   refresh();
   return;
 }
 
 
-/*## cdput - put char in desired image */
+/* cdput - put char in desired image */
 /* synopsis */
 /*    char ch */
 /*    int lin, col */
@@ -721,20 +731,20 @@ void cdput ( char ch, int lin, int col )
 }
 
 
-/*## cdputc - put a string into the display buffer, centered */
+/* cdputc - put a string into the display buffer, centered */
 /* synopsis */
 /*    char str() */
 /*    int lin */
 /*    cdputc ( str, lin ) */
 void cdputc ( char str[], int lin )
 {
-  cdputs ( str, lin, (maxcol-strlen(str))/2 );
+  cdputs ( str, lin, (int)(cdcols() - strlen(str)) / (int)2 );
   
   return;
 }
 
 
-/*## cdputn - put a number into the display buffer */
+/* cdputn - put a number into the display buffer */
 /* synopsis */
 /*    int int, wid, lin, col */
 /*    cdputn ( int, wid, lin, col ) */
@@ -750,7 +760,7 @@ void cdputn ( int iint, int wid, int lin, int col )
 }
 
 
-/*## cdputr - put a real number into the display buffer */
+/* cdputr - put a real number into the display buffer */
 /* synopsis */
 /*    real x */
 /*    int wid, lin, col */
@@ -768,7 +778,7 @@ void cdputr ( real x, int wid, int lin, int col )
 }
 
 
-/*## cdputs - put a string into the display buffer */
+/* cdputs - put a string into the display buffer */
 /* synopsis */
 /*    char str() */
 /*    int lin, col */
@@ -799,7 +809,7 @@ void cdputs ( char str[], int lin, int col )
 }
 
 
-/*## cdredo - force a complete refresh on next display */
+/* cdredo - force a complete refresh on next display */
 /* synopsis */
 /*    cdredo */
 /* description */

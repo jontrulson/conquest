@@ -14,7 +14,6 @@ SysConqfigVersion=$Revision$
 #
 
 
-
 # define this as 'true' if you want to be able to see friendly
 #  torps (including yours) on a long-range scan.  Default: true
 do_lr_torpscan=true

@@ -20,7 +20,7 @@
 /* by Jon Trulson <jon@radscan.com> under the same terms and          */
 /* conditions of the original copyright by Jef Poskanzer and Craig    */
 /* Leres.                                                             */
-/* Have Phun!                                                         */
+/*                                                                    */
 /**********************************************************************/
 
 #include "conqdef.h"
@@ -73,7 +73,7 @@ int GetConquestGID(void)
 
 
 
-/*##  astoff - disable asts */
+/*  astoff - disable asts */
 /*  SYNOPSIS */
 /*    astoff */
 void astoff(void)
@@ -86,7 +86,7 @@ void astoff(void)
 }
 
 
-/*##  aston - enable asts */
+/*  aston - enable asts */
 /*  SYNOPSIS */
 /*    aston */
 void aston(void)
@@ -100,8 +100,6 @@ void aston(void)
 
 void EnableSignalHandler(void)
 {
-  int i;
-
 #ifdef DEBUG_SIG
   clog("EnableSignalHandler() ENABLED");
 #endif
@@ -140,7 +138,7 @@ void DoSig(int sig)
       stoptimer();
       drpexit();
       cdclear();
-      cdrefresh(FALSE);
+      cdrefresh();
       conqstats(csnum);
       conqend();
       cdend();
@@ -162,14 +160,14 @@ void DoSig(int sig)
 }
 
 
-/*##  astservice - ast service routine for conquest */
+/*  astservice - ast service routine for conquest */
 /*  SYNOPSIS */
 /*    astservice */
 /* This routine gets called from a sys$setimr ast. Normally, it outputs */
 /* one screen update and then sets up another timer request. */
 void astservice(int sig)
 {
-  int now, msg;
+  int now;
   int readone;
   
   /* Don't do anything if we're not supposed to. */
@@ -199,14 +197,14 @@ void astservice(int sig)
 	}
   
   /* Perform one ship display update. */
-  display( csnum );
+  display( csnum, FALSE );
   
   
   /* Un-read the message if there's a chance it got garbaged. */
   /* JET 3/24/96 - another try with curses timer disabled */
   if ( readone )
     if (RMsg_Line != MSG_LIN1)	/* we have an extra msg line */
-      if ( iochav( 0 ) )
+      if ( iochav() )
 	slastmsg[csnum] = modp1( slastmsg[csnum] - 1, MAXMESSAGES );
   
   /* Schedule for next time. */
@@ -216,64 +214,71 @@ void astservice(int sig)
   
 }
 
+/*  astoperservice - ast service routine for conqoper */
+/*  SYNOPSIS */
+/*    astservice */
+/* This routine gets called from a sys$setimr ast. Normally, it outputs */
+/* one screen update and then sets up another timer request. */
+void astoperservice(int sig)
+{
+  /* Don't do anything if we're not supposed to. */
+  if ( ! cdisplay )
+    return;
+  
+  stoptimer();
+  
+  /* Perform one ship display update. */
+  display( csnum, headerflag );
+  
+  /* Schedule for next time. */
+  setopertimer();
+  
+  return;
+  
+}
 
-/*##  comsize - return size of the common block (in bytes) */
+
+/*  comsize - return size of the common block (in bytes) */
 /*  SYNOPSIS */
 /*    int size */
 /*    comsize( size ) */
 void comsize( unsigned long *size )
 {
-  long val;
-  
-  val = ((char *)glastmsg - (char *)commonrev); 
-  *size = (val < 0) ? (val * -1) + sizeof(int) : val + sizeof(int); 
-  
+  unsigned long int val;
+
+  if ((int)glastmsg > (int)commonrev) 
+    val = (int)glastmsg - (int)commonrev; 
+  else
+    val = (int)commonrev - (int)glastmsg;
+  *size = val + sizeof(int); 
+
+  /*clog("sizeof(real) = %d, val = %d", sizeof(real), val); */
   
   return;
   
 }
 
 
-/*##  conqend - machine dependent clean-up */
+/*  conqend - machine dependent clean-up */
 /*  SYNOPSIS */
 /*    conqend */
 void conqend(void)
 {
   
-  gamend();					/* clean up game environment */
-  
   return;
   
 }
 
 
-/*##  conqinit - machine dependent initialization */
+/*  conqinit - machine dependent initialization */
 /*  SYNOPSIS */
 /*    conqinit */
 void conqinit(void)
 {
-  
-  int i;
-  int gdial, gcron, gprio, gdespri;
-  extern int c_conq_fdial, c_conq_fprio, c_conq_despri;
-  extern char *c_conq_badttys, *c_conq_antigods, *c_conq_conquest;
-  extern char *c_conq_newsfile; 
-  extern int c_conq_fsubdcl;
-  char gamcron[FILENAMESIZE];
-  
   /* First things first. */
   if ( *commonrev != COMMONSTAMP )
     error( "conquest: Common block ident mismatch.  \nInitialize the Universe via conqoper." );
   
-  
-  /* Get priority for use when spawning. */
-  /*    if ( t_getbpri( cpriority ) != OK )
-	error( "conqinit: Failed to get base priority" );
-	*/
-  /* Get an event flag for the ast timer. */
-  /*    if ( lib__get_ef( ctimflag ) != OK )
-	error( "conqinit: Failed to allocate event flag" );
-	*/
   
 #ifdef SET_PRIORITY
   /* Increase our priority a bit */
@@ -290,20 +295,12 @@ void conqinit(void)
 #endif
   
   /* Set up game environment. */
-  gdial = ( c_conq_fdial == YES );
-  gprio = ( c_conq_fprio == YES );
-  gdespri = (c_conq_despri);
   
   /* Figure out which gamcron file to use (and if we're gonna use one). */
-  gcron = FALSE;
-  
-  gamlinit( gdial, gprio, gcron, gdespri, c_conq_antigods,
-	   c_conq_badttys, c_conq_conquest, gamcron );
   
   /* Other house keeping. */
   cpid = getpid();		
-  csubdcl = ( c_conq_fsubdcl == YES );
-  cnewsfile = ( strcmp( c_conq_newsfile, "" ) != 0 );
+  cnewsfile = ( strcmp( C_CONQ_NEWSFILE, "" ) != 0 );
   
   /* Zero process id of our child (since we don't have one yet). */
   childpid = 0;
@@ -319,7 +316,7 @@ void conqinit(void)
 }
 
 
-/*##  conqstats - handle cpu and elapsed statistics (DOES LOCKING) */
+/*  conqstats - handle cpu and elapsed statistics (DOES LOCKING) */
 /*  SYNOPSIS */
 /*    int snum */
 /*    conqstats( snum ) */
@@ -354,7 +351,7 @@ void conqstats( int snum )
 }
 
 
-/*##  drcheck - make sure the driver is still around (DOES LOCKING) */
+/*  drcheck - make sure the driver is still around (DOES LOCKING) */
 /*  SYNOPSIS */
 /*    drcheck */
 void drcheck(void)
@@ -401,14 +398,14 @@ void drcheck(void)
 }
 
 
-/*##  drcreate - create a new driver process */
+/*  drcreate - create a new driver process */
 /*  SYNOPSIS */
 /*    drcreate */
 void drcreate(void)
 {
   int pid;
   char drivcmd[BUFFER_SIZE];
-  extern char c_conq_conqdriv[];
+
   
   gsecs( drivtime );			/* prevent driver timeout */
   *drivpid = 0;			/* zero current driver pid */
@@ -425,7 +422,7 @@ void drcreate(void)
   
   if (pid == 0)
     {				/* The child: aka "The Driver" */
-      sprintf(drivcmd, "%s/%s", CONQHOME, c_conq_conqdriv);
+      sprintf(drivcmd, "%s/%s", CONQHOME, C_CONQ_CONQDRIV);
       execl(drivcmd, drivcmd, NULL);
       clog("drcreate(): exec(): %s", sys_errlist[errno]);
       perror("exec");		/* shouldn't be reached */
@@ -442,14 +439,11 @@ void drcreate(void)
 }
 
 
-/*##  drkill - make the driver go away if we started it (DOES LOCKING) */
+/*  drkill - make the driver go away if we started it (DOES LOCKING) */
 /*  SYNOPSIS */
 /*    drkill */
 void drkill(void)
 {
-  
-  int i;
-  
   if ( childpid != 0 )
     if ( childpid == *drivpid && *drivstat == DRS_RUNNING )
       {
@@ -464,7 +458,7 @@ void drkill(void)
 }
 
 
-/*##  drpexit - make the driver go away if we started it */
+/*  drpexit - make the driver go away if we started it */
 /*  SYNOPSIS */
 /*    drpexit */
 void drpexit(void)
@@ -487,7 +481,7 @@ void drpexit(void)
 }
 
 
-/*##  drstart - Start a new driver if necessary (DOES LOCKING) */
+/*  drstart - Start a new driver if necessary (DOES LOCKING) */
 /*  SYNOPSIS */
 /*    drstart */
 void drstart(void)
@@ -505,7 +499,7 @@ void drstart(void)
 }
 
 
-/*##  gcputime - get cpu time */
+/*  gcputime - get cpu time */
 /*  SYNOPSIS */
 /*    int cpu */
 /*    gcputime( cpu ) */
@@ -528,7 +522,7 @@ void gcputime( int *cpu )
 }
 
 
-/*##  helplesson - verbose help */
+/*  helplesson - verbose help */
 /*  SYNOPSIS */
 /*    helplesson */
 void helplesson(void)
@@ -536,18 +530,17 @@ void helplesson(void)
   
   char buf[MSGMAXLINE];
   char helpfile[BUFFER_SIZE];
-  extern char *c_conq_helpfile;
   
-  sprintf(helpfile, "%s/%s", CONQHOME, c_conq_helpfile);
+  sprintf(helpfile, "%s/%s", CONQHOME, C_CONQ_HELPFILE);
   sprintf( buf, "%s: Can't open.", helpfile );
-  pagefile( helpfile, buf, TRUE, TRUE );
+  pagefile( helpfile, buf);
   
   return;
   
 }
 
 
-/*##  initstats - statistics setup */
+/*  initstats - statistics setup */
 /*  SYNOPSIS */
 /*    int ctemp, etemp */
 /*    initstats( ctemp, etemp ) */
@@ -562,7 +555,7 @@ void initstats( int *ctemp, int *etemp )
 }
 
 
-/*##  isagod - determine if a user is a god or not - NULL means current user */
+/*  isagod - determine if a user is a god or not - NULL means current user */
 /*  SYNOPSIS */
 /*    int flag, isagod */
 /*    flag = isagod() */
@@ -627,47 +620,7 @@ int isagod( char *name )
 }
 
 
-/*##  mail - send a one liner mail message (TOOLS mail version) */
-/*  SYNOPSIS */
-/*    int sendok, mail */
-/*    char names(), subject(), msg() */
-/*    sendok = mail( names, subject, msg ) */
-/* Note: The buffer msg() will contain an error message if FALSE is */
-/* returned by this routine. */
-int mail( char names[], char subject[], char msg[] )
-{
-  c_strcpy( "Mail not available", msg );
-  
-  return ( FALSE );
-  
-}
-
-
-/*##  mailimps - send a one liner mail message to the Implementors */
-/*  SYNOPSIS */
-/*    int sendok, mailimps */
-/*    char subject(), msg() */
-/*    sendok = mailimps( subject, msg ) */
-/* Note: The buffer msg() will contain an error message if FALSE is */
-/* returned by this routine. */
-int mailimps( char subject[], char msg[] )
-{
-  
-  string mailaddr=MAILADDR;
-  
-  /*    if ( mailaddr[0] == EOS )
-	{
-	c_strcpy( "It is not possible to contact the Implementors.", msg );
-	return ( FALSE );
-	}
-	return ( mail( MAILADDR, subject, msg ) );
-	*/
-  
-  return(FALSE);
-}
-
-
-/*##  news - list current happenings */
+/*  news - list current happenings */
 /*  SYNOPSIS */
 /*    news */
 void news(void)
@@ -675,22 +628,21 @@ void news(void)
   char newsfile[BUFFER_SIZE];
   extern char *c_conq_newsfile;
   
-  sprintf(newsfile, "%s/%s", CONQHOME, c_conq_newsfile);
+  sprintf(newsfile, "%s/%s", CONQHOME, C_CONQ_NEWSFILE);
   
-  pagefile( newsfile, "No news is good news.", TRUE, TRUE );
+  pagefile( newsfile, "No news is good news.");
   
   return;
   
 }
 
 
-/*##  settimer - set timer to display() */
+/*  settimer - set timer to display() */
 /*  SYNOPSIS */
 /*    csetimer */
 void settimer(void)
 {
   static struct sigaction Sig;
-  static char errstr[128];
   
 #ifdef HAS_SETITIMER
   struct itimerval itimer;
@@ -740,7 +692,59 @@ void settimer(void)
 }
 
 
-/*##  stoptimer - cancel timer */
+/*  setopertimer - set timer to display() for conqoper...*/
+/*  SYNOPSIS */
+void setopertimer(void)
+{
+  static struct sigaction Sig;
+  
+#ifdef HAS_SETITIMER
+  struct itimerval itimer;
+#endif
+  
+  Sig.sa_handler = (void (*)(int))astoperservice;
+  
+  Sig.sa_flags = 0;
+
+  if (sigaction(SIGALRM, &Sig, NULL) == -1)
+    {
+      clog("settimer():sigaction(): %s\n", sys_errlist[errno]);
+      exit(errno);
+    }
+  
+#ifdef HAS_SETITIMER
+
+  if (sysconf_AllowFastUpdate == TRUE && conf_DoFastUpdate == TRUE)
+    {
+      
+      /* 2 updates per sec */
+      itimer.it_value.tv_sec = 0;
+      itimer.it_value.tv_usec = 500000;
+      
+      itimer.it_interval.tv_sec = 0;
+      itimer.it_interval.tv_usec = 500000;
+    }
+  else
+    {
+
+      /* 1 update per second */
+      itimer.it_value.tv_sec = 1;
+      itimer.it_value.tv_usec = 0;
+      
+      itimer.it_interval.tv_sec = 1;
+      itimer.it_interval.tv_usec = 0;
+    }
+
+  setitimer(ITIMER_REAL, &itimer, NULL);
+#else
+  alarm(1);			/* set alarm() */
+#endif  
+  return;
+  
+}
+
+
+/*  stoptimer - cancel timer */
 /*  SYNOPSIS */
 /*    stoptimer */
 void stoptimer(void)
@@ -769,7 +773,7 @@ void stoptimer(void)
 }
 
 
-/*##  upchuck - update the common block to disk. */
+/*  upchuck - update the common block to disk. */
 /*  SYNOPSIS */
 /*    upchuck */
 void upchuck(void)
@@ -787,14 +791,14 @@ void upchuck(void)
 }
 
 
-/*##  upstats - update statistics */
+/*  upstats - update statistics */
 /*  SYNOPSIS */
 /*    int ctemp, etemp, caccum, eaccum, ctime, etime */
 /*    upstats( ctemp, etemp, caccum, eaccum, ctime, etime ) */
 void upstats( int *ctemp, int *etemp, int *caccum, int *eaccum, int *ctime, int *etime )
 {
   
-  int i, j, now;
+  int i, now;
   
   /* Update cpu time. */
   gcputime( &i );
@@ -826,3 +830,25 @@ void upstats( int *ctemp, int *etemp, int *caccum, int *eaccum, int *ctime, int 
   
 }
 
+/* return true if a process is alive, else false... */
+int CheckPid(int pidnum)
+{
+  int rv;
+
+  rv = kill(pidnum, 0);
+
+  if (rv == -1)
+    {
+      switch (errno)
+	{
+	case ESRCH:
+	  return(FALSE);
+	  break;
+	default:
+	  return(TRUE);
+	  break;
+	}
+    }
+  else 
+    return(TRUE);
+}

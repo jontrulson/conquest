@@ -12,7 +12,7 @@
 /* by Jon Trulson <jon@radscan.com> under the same terms and          */
 /* conditions of the original copyright by Jef Poskanzer and Craig    */
 /* Leres.                                                             */
-/* Have Phun!                                                         */
+/*                                                                    */
 /**********************************************************************/
 
 /*                               R N D L B */
@@ -43,7 +43,7 @@
 int value1, value2, mult1, mult2, inc1, inc2, modu1, modu2, table[TABLESIZE];
 
 
-/*##  rndseq - internal routine to compute the next value in a linear */
+/*  rndseq - internal routine to compute the next value in a linear */
 /*             congruential sequence */
 /*  SYNOPSIS */
 /*    integer*4 value, multiplier, increment, modulus */
@@ -57,7 +57,7 @@ void rndseq ( int value, int multiplier, int increment, int modulus )
 }
 
 
-/*##  rndini - initialize the random number package */
+/*  rndini - initialize the random number package */
 /*  SYNOPSIS */
 /*    int seed1, seed2 */
 /*    rndini ( seed1, seed2 ) */
@@ -114,27 +114,27 @@ void rndini ( int seed1, int seed2 )
 }
 
 
-/*##  rnd - random real number in the range [0..1) */
+/*  rnd - random real number in the range [0..1) */
 /*  SYNOPSIS */
 /*    real r, rnd */
 /*    r = rnd(0) */
 #ifdef ALT_RND
-real rnd ( int dummy )
+real rnd ( void )
 {
   
   int idx;
   real RET;
   
   rndseq ( value1, mult1, inc1, modu1 );
-  idx = ifix ( float(value1) / float(modu1) * TABLESIZE ) + 1;
-  RET = float(table[idx]) / float(modu2);
+  idx = ifix ( creal(value1) / creal(modu1) * TABLESIZE ) + 1;
+  RET = creal(table[idx]) / creal(modu2);
   rndseq ( value2, mult2, inc2, modu2 );
   table[idx] = value2;
   
   return(RET);
 }
 #else
-real rnd ( int dummy )		/* use 48bit linear congruential */
+real rnd ( void )		/* use 48bit linear congruential */
 {
   real rc;
   
@@ -146,18 +146,18 @@ real rnd ( int dummy )		/* use 48bit linear congruential */
 }
 #endif
 
-/*##  rnduni - random real number in the specified range */
+/*  rnduni - random real number in the specified range */
 /*  SYNOPSIS */
 /*    real rlow, rhigh, r, rnduni */
 /*    r = rnduni ( rlow, rhigh ) */
 real rnduni ( real rlow, real rhigh )
 {
-  return(rnd(0) * (rhigh-rlow) + rlow);
+  return(rnd() * (rhigh-rlow) + rlow);
   
 }
 
 
-/*##  rndint - random int in the specified range */
+/*  rndint - random int in the specified range */
 /*  SYNOPSIS */
 /*    int ilow, ihigh, i, rndint */
 /*    i = rndint ( ilow, ihigh ) */
@@ -165,7 +165,7 @@ int rndint ( int ilow, int ihigh )
 {
   int rc;
 
-  rc = ifix ( rnd(0) * float(ihigh-ilow+1) ) + ilow;
+  rc = ifix ( rnd() * creal(ihigh-ilow+1.0) ) + ilow;
   
 #ifdef DEBUG_RANDOM
   clog("rndint(): rc = %d", rc);
@@ -176,7 +176,7 @@ int rndint ( int ilow, int ihigh )
 }
 
 
-/*##  rndnor - normally distributed random real number */
+/*  rndnor - normally distributed random real number */
 /*  SYNOPSIS */
 /*    real mean, stddev, r, rndnor */
 /*    r = rndnor ( mean, stddev ) */
@@ -186,12 +186,12 @@ real rndnor ( real mean, real stddev )
   
   do            /* repeat*/
     {
-      v1 = -alog(1.0-rnd(0));
-      v2 = -alog(1.0-rnd(0));
+      v1 = ((real) -log((real) 1.0 - rnd()) );
+      v2 = ((real) -log((real) 1.0 - rnd()) );
     }
-  while ( 2.0 * v1 < powf((real)(v2-1.0), (real)2) );  
+  while ( 2.0 * v1 < pow((real)(v2-1.0), (real)2) );  
   
-  if ( rnd(0) > 0.5 )
+  if ( rnd() > 0.5 )
     z = 1.0;
   else
     z = -1.0;
@@ -201,18 +201,18 @@ real rndnor ( real mean, real stddev )
 }
 
 
-/*##  rndexp - exponentially distributed random real number */
+/*  rndexp - exponentially distributed random real number */
 /*  SYNOPSIS */
 /*    real mean, r, rndexp */
 /*    r = rndexp ( mean ) */
 real rndexp ( real mean )
 {
   
-  return(- alog ( 1.0 - rnd(0) ) * mean);
+  return(- (real)log( (real) 1.0 - rnd() ) * mean);
 }
 
 
-/*##  rndchi - random real number with the chi-square distribution */
+/*  rndchi - random real number with the chi-square distribution */
 /*  SYNOPSIS */
 /*    int v */
 /*    real r, rndchi */
@@ -232,13 +232,13 @@ real rndchi ( int v )
   RETVAL = RETVAL * 2.0;
   
   if ( (k * 2 + 1) == v )
-    RETVAL = RETVAL + powf((real)rndnor(0.0,1.0), (real) 2);
+    RETVAL = RETVAL + pow((real)rndnor(0.0,1.0), (real) 2);
   
   return(RETVAL);
 }
 
 
-/*##  rndbta - random real number with the beta distribution */
+/*  rndbta - random real number with the beta distribution */
 /*  SYNOPSIS */
 /*    int v1, v2 */
 /*    real r, rndbta */
@@ -256,7 +256,7 @@ real rndbta ( int v1, int v2 )
 }
 
 
-/*##  rndF - random real number with the F-distribtion */
+/*  rndF - random real number with the F-distribtion */
 /*  SYNOPSIS */
 /*    int v1, v2 */
 /*    real r, rndF */
@@ -274,7 +274,7 @@ real rndF ( int v1, int v2 )
 }
 
 
-/*##  rndt - random real number with the t-distribution */
+/*  rndt - random real number with the t-distribution */
 /*  SYNOPSIS */
 /*    int v */
 /*    real r, rndt */
@@ -289,7 +289,7 @@ real rndt ( int v )
   
 }
 
-/*##  rndbin - random int with the binomial distribution */
+/*  rndbin - random int with the binomial distribution */
 /*  SYNOPSIS */
 /*    int trials, i, rndbin */
 /*    real prob */
@@ -308,14 +308,14 @@ int rndbin ( int trials, real prob )
   
   RET = 0;
   for ( i=1; i <= trials; i=i+1 )
-    if ( rnd(0) <= prob )
+    if ( rnd() <= prob )
       RET = RET + 1;
   
   return(RET);
 }
 
 
-/*##  rndpoi - random int with the Poisson distribution */
+/*  rndpoi - random int with the Poisson distribution */
 /*  SYNOPSIS */
 /*    real mean */
 /*    int i, rndpoi */
@@ -341,7 +341,7 @@ int rndpoi ( real mean )
   
   while (TRUE) /*repeat forever */
     {
-      q = q * rnd(0);
+      q = q * rnd();
       
       if ( q < p )
 	break;

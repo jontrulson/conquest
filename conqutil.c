@@ -20,15 +20,16 @@
 /* by Jon Trulson <jon@radscan.com> under the same terms and          */
 /* conditions of the original copyright by Jef Poskanzer and Craig    */
 /* Leres.                                                             */
-/* Have Phun!                                                         */
+/*                                                                    */
 /**********************************************************************/
 
 #include "conqdef.h"
 #include "conqcom.h"
 #include "global.h"
+#include "color.h"
 
 
-/*##  acdist - figure distance traveled while changing velocities */
+/*  acdist - figure distance traveled while changing velocities */
 /*  SYNOPSIS */
 /*    real dis, curvel, newvel, acc */
 /*    dis = acdist( curvel, newvel, acc ) */
@@ -50,7 +51,7 @@ real acdist( real curvel, real newvel, real acc )
 }
 
 
-/*##  angle - compute the angle between two points */
+/*  angle - compute the angle between two points */
 /*  SYNOPSIS */
 /*    real ang, angle, fromx, fromy, tox, toy */
 /*    ang = angle( fromx, fromy, tox, toy ) */
@@ -64,16 +65,17 @@ real angle( real fromx, real fromy, real tox, real toy )
 }
 
 
-/*##  appint - append an int to a string */
+/*  appint - append an int to a string */
 /*  SYNOPSIS */
 /*    int int */
 /*    char str() */
 /*    appint( i, str ) */
 void appint( int i, char *str )
 {
-  char buf[20];
+  char buf[BUFFER_SIZE];
   
-  itoc( i, buf, 20 );
+  buf[0] = EOS;
+  sprintf(buf, "%d", i);
   appstr( buf, str );
   
   return;
@@ -81,7 +83,7 @@ void appint( int i, char *str )
 }
 
 
-/*##  appnum - append a number in English */
+/*  appnum - append a number in English */
 /*  SYNOPSIS */
 /*    int num */
 /*    char buf() */
@@ -205,7 +207,7 @@ void appnum( int num, char *buf )
 }
 
 
-/*##  appnumtim - append English formated time and date */
+/*  appnumtim - append English formated time and date */
 /*  SYNOPSIS */
 /*   appnumtim( now, buf ) */
 void appnumtim( int now[], char *buf )
@@ -224,7 +226,7 @@ void appnumtim( int now[], char *buf )
       hour = hour - 12;
       am = FALSE;			/* afternoon */
     }
-  switch ( wkday( now[2], now[3], now[1] ) )
+  switch ( wkday() )
     {
     case 1:
       appstr( "Sunday", buf );
@@ -319,7 +321,7 @@ void appnumtim( int now[], char *buf )
 }
 
 
-/*##  appsstatus - append ship status string */
+/*  appsstatus - append ship status string */
 /*  SYNOPSIS */
 /*    int status */
 /*    char buf() */
@@ -355,7 +357,7 @@ void appsstatus( int status, char *buf )
 }
 
 
-/*##  apptitle - append a team oriented title */
+/*  apptitle - append a team oriented title */
 /*  SYNOPSIS */
 /*    int team */
 /*    char buf() */
@@ -383,7 +385,7 @@ void apptitle( int team, char *buf )
 }
 
 
-/*##  arrows - interpret arrow keys */
+/*  arrows - interpret arrow keys */
 /*  SYNOPSIS */
 /*    int flag, arrows */
 /*    char str() */
@@ -391,15 +393,15 @@ void apptitle( int team, char *buf )
 /*    flag = arrows( str, dir ) */
 int arrows( char *str, real *dir )
 {
-  int i, n, idx, num; 
+  int i, n, idx; 
   real thedir, ndir, ndir1, ndir2;
   string arrs="*dewqazxc";	/* the '*' is to fill arrs[0] - JET */
   
   /* Special hack preventing "ea" and "da" from being recognized as arrows. */
   /* "ea" is reserved for Earth and "da" for Dakel. */
-  if ( tolower(str[0]) == 'e' && tolower(str[1]) == 'a' )
+  if ( (char)tolower(str[0]) == 'e' && (char)tolower(str[1]) == 'a' )
     return ( FALSE );
-  if ( tolower(str[0]) == 'd' && tolower(str[1]) == 'a' )
+  if ( (char)tolower(str[0]) == 'd' && (char)tolower(str[1]) == 'a' )
     return ( FALSE );
   
   thedir = 0.0;
@@ -407,14 +409,14 @@ int arrows( char *str, real *dir )
   for ( i = 0; str[i] != EOS; i = i + 1 )
     {
       n = i + 1;
-      idx = c_index( arrs, tolower(str[i]) );
+      idx = c_index( arrs, (char)tolower(str[i]) );
       if ( idx == ERR || idx == 0)
 	return ( FALSE );
       
       ndir1 = ((real)idx - 1.0) * 45.0;
       ndir2 = (real)ndir1 - 360.0;
       
-      if ( (real)fabsf( thedir - ndir1 ) < (real)fabsf( thedir - ndir2 ) )
+      if ( (real)fabs( thedir - ndir1 ) < (real)fabs( thedir - ndir2 ) )
 	ndir = ndir1;
       else
 	ndir = ndir2;
@@ -431,7 +433,7 @@ int arrows( char *str, real *dir )
 }
 
 
-/*##  cerror - conquest error message */
+/*  cerror - conquest error message */
 /*  SYNOPSIS */
 /*    int to, status */
 /*    char fmt() */
@@ -441,9 +443,6 @@ void cerror(char *fmt, ...)
 {
   va_list ap;
   char buf[MSGMAXLINE];
-  char ebuf[128];
-  static FILE *errfd = NULL;
-  int tmp;
   
   va_start(ap, fmt);
   (void)vsprintf(buf, fmt, ap);
@@ -460,10 +459,8 @@ void clog(char *fmt, ...)
 {
   va_list ap;
   char buf[MSGMAXLINE];
-  char ebuf[128];
   static char errfile[BUFFER_SIZE];
   static FILE *errfd = NULL;
-  extern char *c_conq_errlog;
   int tmp;
   
   va_start(ap, fmt);
@@ -474,7 +471,7 @@ void clog(char *fmt, ...)
   if (errfd == NULL)
     {
       umask(007);
-      sprintf(errfile, "%s/%s", CONQHOME, c_conq_errlog);
+      sprintf(errfile, "%s/%s", CONQHOME, C_CONQ_ERRLOG);
       if (ConquestGID == ERR)
 	{
 	  fprintf(stderr, "conqutil: clog():  ConquestUID == ERR!\n");
@@ -518,7 +515,7 @@ void clog(char *fmt, ...)
   
   if (errfd != NULL)
     {
-      fprintf(errfd, "%ld:%d:%s\n", time(0), getpid(), buf);
+      fprintf(errfd, "%ld:%d:%s\n", time(0), (int)getpid(), buf);
       fflush(errfd);
     }
   
@@ -528,18 +525,20 @@ void clog(char *fmt, ...)
 
 
 
-/*##  confirm - ask the user to confirm a dangerous action */
+/*  confirm - ask the user to confirm a dangerous action */
 /*  SYNOPSIS */
 /*    int ok, confirm */
-/*    ok = confirm( 0 ) */
-int confirm( int dummy )
+/*    ok = confirm() */
+int confirm(void)
 {
   char ch, buf[MSGMAXLINE];
   
   cdclrl( MSG_LIN2, 1 );
+  attrset(InfoColor);
   ch = getcx( "Are you sure? ", MSG_LIN2, 0, TERMS, buf, MSGMAXLINE );
+  attrset(0);
   cdclrl( MSG_LIN2, 1 );
-  cdrefresh(TRUE);
+  cdrefresh();
   if ( ch == TERM_ABORT )
     return ( FALSE );
   if ( buf[0] == 'y' || buf[0] == 'Y' )
@@ -550,7 +549,7 @@ int confirm( int dummy )
 }
 
 
-/*##  delblanks - remove all blanks from a string */
+/*  delblanks - remove all blanks from a string */
 /*  SYNOPSIS */
 /*    char str() */
 /*    delblanks( str ) */
@@ -570,7 +569,7 @@ void delblanks( char *str )
 }
 
 
-/*##  dgrand - delta time for thousands */
+/*  dgrand - delta time for thousands */
 /*  SYNOPSIS */
 /*    int i, dgrand, s, n */
 /*    i = dgrand( s, n ) */
@@ -594,7 +593,7 @@ int dgrand( int s, int *n )
 }
 
 
-/*##  dsecs - delta time for seconds */
+/*  dsecs - delta time for seconds */
 /*  SYNOPSIS */
 /*    int i, dsecs, s, n */
 /*    i = dsecs( s, n ) */
@@ -619,7 +618,7 @@ int dsecs( int s, int *n )
 }
 
 
-/*##  explosion - hits based on distance */
+/*  explosion - hits based on distance */
 /*  SYNOPSIS */
 /*    real newhits, explosion, basehits, dis */
 /*    newhits = explosion( basehits, dis ) */
@@ -628,13 +627,14 @@ real explosion( real basehits, real dis )
   if ( dis > PHASER_DIST )
     return ( 0.0 );
   return ( basehits / ( ( EXPLOSION_FALLOFF - 1.0 ) *
-		       max( dis - EXPLOSION_RADIUS, 0.0 ) / PHASER_DIST + 1.0 ) -
-	  basehits / EXPLOSION_FALLOFF * dis / PHASER_DIST );
+			max( dis - EXPLOSION_RADIUS, 
+			     0.0 ) / PHASER_DIST + 1.0 ) -
+	   basehits / EXPLOSION_FALLOFF * dis / PHASER_DIST );
   
 }
 
 
-/*##  fmtminutes - format a minutes string */
+/*  fmtminutes - format a minutes string */
 /*  SYNOPSIS */
 /*   fmtminutes( itime, buf ) */
 void fmtminutes( int itime, char *buf )
@@ -683,7 +683,7 @@ void fmtminutes( int itime, char *buf )
 }
 
 
-/*##  fmtseconds - format a seconds string */
+/*  fmtseconds - format a seconds string */
 /*  SYNOPSIS */
 /*   fmtseconds( itime, buf ) */
 void fmtseconds( int itime, char *buf )
@@ -730,7 +730,7 @@ void fmtseconds( int itime, char *buf )
 }
 
 
-/*##  getamsg - find the next readable message */
+/*  getamsg - find the next readable message */
 /*  SYNOPSIS */
 /*    int gotone, getamsg */
 /*    int snum, msg */
@@ -755,7 +755,7 @@ int getamsg( int snum, int *msg )
 }
 
 
-/*##  getcx - prompt for a string, centered */
+/*  getcx - prompt for a string, centered */
 /*  SYNOPSIS */
 /*    char pmt(), */
 /*    int lin, offset */
@@ -766,17 +766,18 @@ char getcx( char *pmt, int lin, int offset, char *terms, char *buf, int len )
 {
   int i;
   
-  i = ( cdcols(0) - strlen( pmt ) ) / 2 + offset;
+  i = (int)( cdcols() - strlen( pmt ) ) / (int)2 + offset;
   if ( i <= 0 )
     i = 1;
   move(lin, 0);
   clrtoeol();
+  buf[0] = EOS;
   return ( cdgetx( pmt, lin, i, terms, buf, len ) );
   
 }
 
 
-/*##  getdandt - get the date and time into a string */
+/*  getdandt - get the date and time into a string */
 /*  SYNOPSIS */
 /*    char buf() */
 /*    getdandt( buf ) */
@@ -836,7 +837,7 @@ void getdandt( char *buf )
 }
 
 
-/*##  gettarget - get a target angle from the user */
+/*  gettarget - get a target angle from the user */
 /*  SYNOPSIS */
 /*    char pmt() */
 /*    int lin, col */
@@ -849,7 +850,8 @@ int gettarget( char *pmt, int lin, int col, real *dir, real cdefault )
   char ch, buf[MSGMAXLINE];
   
   cdclrl( lin, 1 );
-  ch = cdgetx( pmt, lin, col, TERMS, buf, MSGMAXLINE );
+  buf[0] = EOS;
+  ch = (char)cdgetx( pmt, lin, col, TERMS, buf, MSGMAXLINE );
   if ( ch == TERM_ABORT )
     return ( FALSE );
   
@@ -861,7 +863,7 @@ int gettarget( char *pmt, int lin, int col, real *dir, real cdefault )
       *dir = cdefault;
       return ( TRUE );
     }
-  if ( alldig( buf ) == YES )
+  if ( alldig( buf ) == TRUE )
     {
       i = 0;
       if ( ! safectoi( &j, buf, i ) )
@@ -877,7 +879,7 @@ int gettarget( char *pmt, int lin, int col, real *dir, real cdefault )
 }
 
 
-/*##  grand - thousands since midnight */
+/*  grand - thousands since midnight */
 /*  SYNOPSIS */
 /*    int h */
 /*    grand( h ) */
@@ -893,7 +895,7 @@ void grand( int *h )
 }
 
 
-/*##  gsecs - seconds since midnight */
+/*  gsecs - seconds since midnight */
 /*  SYNOPSIS */
 /*    int s */
 /*    gsecs( s ) */
@@ -909,7 +911,7 @@ void gsecs( int *s )
 }
 
 
-/*##  mod360 - modularize a real number to 0.0 <= r < 360.0 */
+/*  mod360 - modularize a real number to 0.0 <= r < 360.0 */
 /*  SYNOPSIS */
 /*    real mr, mod360, r */
 /*    mr = mod360( r ) */
@@ -922,12 +924,12 @@ real mod360( real r )
   while ( mr < 0.0 )
     mr += 360.0;
   
-  return((real) fmodf(mr, 360.0));
+  return((real) fmod(mr, 360.0));
   
 }
 
 
-/*##  modp1 - modulus plus one */
+/*  modp1 - modulus plus one */
 /*  SYNOPSIS */
 /*    int mi, modp1, i, modulus */
 /*    mi = modp1( i, modulus ) */
@@ -952,14 +954,14 @@ int modp1( int i, int modulus )
 	*/
 }
 
-/*##  more - wait for the user to type a space */
+/*  more - wait for the user to type a space */
 /*  SYNOPSIS */
 /*    char pmt() */
 /*    int spacetyped, more */
 /*    spacetyped = more( pmt ) */
 int more( char *pmt )
 {
-  int ch; 
+  int ch = 0; 
   string pml="--- press space for more ---";
   
   if ( pmt[0] != EOS )
@@ -967,19 +969,19 @@ int more( char *pmt )
   else
     putpmt( pml, MSG_LIN2 );
   
-  cdrefresh( TRUE );
-  ch = iogchar( ch );
+  cdrefresh();
+  ch = iogchar();
   return ( ch == ' ' );
   
 }
 
 
-/*##  pagefile - page through a file */
+/*  pagefile - page through a file */
 /*  SYNOPSIS */
 /*    char file(), errmsg() */
 /*    int ignorecontroll, eatblanklines */
 /*    pagefile( file, errmsg, ignorecontroll, eatblanklines ) */
-void pagefile( char *file, char *errmsg, int ignorecontroll, int eatblanklines )
+void pagefile( char *file, char *errmsg )
 {
   
   int plins = 1;
@@ -1003,7 +1005,7 @@ void pagefile( char *file, char *errmsg, int ignorecontroll, int eatblanklines )
     }
   
   cdclear();
-  cdrefresh(TRUE);
+  cdrefresh();
   cdmove(0, 0);
   
   plins = 0;
@@ -1045,7 +1047,7 @@ void pagefile( char *file, char *errmsg, int ignorecontroll, int eatblanklines )
 }
 
 
-/*##  putmsg - display a message on the bottom of the user's screen */
+/*  putmsg - display a message on the bottom of the user's screen */
 /*  SYNOPSIS */
 /*    char msg() */
 /*    int line */
@@ -1060,7 +1062,7 @@ void c_putmsg( char *msg, int line )
 }
 
 
-/*##  putpmt - display a prompt */
+/*  putpmt - display a prompt */
 /*  SYNOPSIS */
 /*    char pmt() */
 /*    int line */
@@ -1070,10 +1072,10 @@ void putpmt( char *pmt, int line )
   int i, dcol, pcol;
   
   i = strlen( pmt );
-  dcol = ( cdcols(0) - i ) / 2;
+  dcol = ( cdcols() - i ) / 2;
   pcol = dcol + i;
   cdclrl( line, 1 );
-  cdputs( pmt, line, dcol );
+  cprintf( line, dcol,ALIGN_NONE,"#%d#%s", InfoColor, pmt);
   cdmove( line, pcol );
   
   return;
@@ -1081,7 +1083,7 @@ void putpmt( char *pmt, int line )
 }
 
 
-/*##  safectoi - char to int conversion with overflow protection */
+/*  safectoi - char to int conversion with overflow protection */
 /*  SYNOPSIS */
 /*    int flag, safectoi */
 /*    int num, ptr */
@@ -1092,17 +1094,17 @@ int safectoi( int *num, char *buf, int ptr )
   int retval;
 
   retval = FALSE;
-  /* If the number is the same size as the biggest integer, */
-  /*  assume that it is too big. */
-
   if (buf[ptr] == EOS)
     {		
       *num = 0;
       retval = FALSE;
     }
 
-  *num = ctoi( &buf[ptr]);
+  *num = atoi( &buf[ptr]);
   retval = TRUE;
+
+  /* If the number is the same size as the biggest integer, */
+  /*  assume that it is too big. */
   
   if ( *num >= INT_MAX )
     {
@@ -1115,7 +1117,7 @@ int safectoi( int *num, char *buf, int ptr )
 }
 
 
-/*##  special - check if a string is a valid "special" specifier */
+/*  special - check if a string is a valid "special" specifier */
 /*  SYNOPSIS */
 /*    char str() */
 /*    int what, token, count */
@@ -1124,7 +1126,6 @@ int safectoi( int *num, char *buf, int ptr )
 int special( char *str, int *what, int *token, int *count )
 {
   int i; 
-  int l; 
   char buf[20];
   
   *what = NEAR_ERROR;
@@ -1141,7 +1142,7 @@ int special( char *str, int *what, int *token, int *count )
   for ( i = 0; buf[i] != EOS && c_type( buf[i] ) != DIGIT; i = i + 1 )
     ;
   buf[i] = EOS;				/* ditch numeric part */
-  l =  safectoi( count, str, i );		/* ignore status */
+  safectoi( count, str, i );		/* ignore status */
   
   if ( stmatch( buf, "nes", FALSE ) )	/* this one must be first */
     {
@@ -1208,7 +1209,7 @@ int special( char *str, int *what, int *token, int *count )
 }
 
 
-/*##  stcpn - copy a string with a size limit */
+/*  stcpn - copy a string with a size limit */
 /*  SYNOPSIS */
 /*    char from(), to() */
 /*    int tosize */
@@ -1221,7 +1222,7 @@ void stcpn( char *from, char *to, int tosize )
 }
 
 
-/*##  stmatch - check whether two strings match or not */
+/*  stmatch - check whether two strings match or not */
 /*  SYNOPSIS */
 /*    int matched, stmatch, casesensitive */
 /*    char str1(), str2() */
@@ -1235,7 +1236,7 @@ int stmatch( char *str1, char *str2, int casesensitive )
       ;
   else
     for ( i = 0;
-	 clower(str1[i]) == clower(str2[i]) && str1[i] != EOS;
+	 (char)tolower(str1[i]) == (char)tolower(str2[i]) && str1[i] != EOS;
 	 i = i + 1 )
       ;
   
@@ -1254,7 +1255,7 @@ int stmatch( char *str1, char *str2, int casesensitive )
 }
 
 
-/*##  subang - find smallest difference between angles. */
+/*  subang - find smallest difference between angles. */
 /*  SYNOPSIS */
 /*    real h, subang, a1, a2 */
 /*    h = subang( a1, a2 ) */

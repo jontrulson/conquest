@@ -20,7 +20,7 @@
 /* by Jon Trulson <jon@radscan.com> under the same terms and          */
 /* conditions of the original copyright by Jef Poskanzer and Craig    */
 /* Leres.                                                             */
-/* Have Phun!                                                         */
+/*                                                                    */
 /**********************************************************************/
 
 #define NOEXTERN
@@ -28,16 +28,13 @@
 #include "conqcom.h"
 #include "conqcom2.h"
 #include "global.h"
+#include "color.h"
 
 static char *conquestId = "$Id$";
 
-/*##  conquest - main program */
-main(int argc, char *argv[], char *env[]) 
+/*  conquest - main program */
+main(int argc, char *argv[]) 
 {
-  /*    int cdcols, cdlins;*/
-  int l; 
-  string cpr = COPYRIGHT;
-  string arr = "All rights reserved!";
   
   if ((ConquestUID = GetConquestUID()) == ERR)
     {
@@ -60,7 +57,6 @@ main(int argc, char *argv[], char *env[])
 #ifdef DEBUG_CONFIG
       clog("%s@%d: main(): GetSysConf() returned ERR.", __FILE__, __LINE__);
 #endif
-/*      exit(1);*/
     }
   
   if (GetConf() == ERR)		/* do this BEFORE setgid() call! */
@@ -120,9 +116,9 @@ main(int argc, char *argv[], char *env[])
   
   cdinit();				/* set up display environment */
   
-  cmaxlin = cdlins( 0 );
+  cmaxlin = cdlins();
   
-  cmaxcol = cdcols( 0 );
+  cmaxcol = cdcols();
   
   
   
@@ -143,13 +139,12 @@ main(int argc, char *argv[], char *env[])
   clog("%s@%d: main() *EXITING*", __FILE__, __LINE__);
 #endif
   
-  
   exit(0);
   
 }
 
 
-/*##  capentry - captured system entry for a new ship */
+/*  capentry - captured system entry for a new ship */
 /*  SYNOPSIS */
 /*    int flag, capentry */
 /*    int capentry, snum, system */
@@ -205,7 +200,7 @@ int capentry( int snum, int *system )
   cdclrl( MSG_LIN1, 2 );
   cdputc( cbuf, MSG_LIN1 );
   cdmove( 1, 1 );
-  cdrefresh( TRUE );
+  cdrefresh();
   
   while ( stillalive( csnum ) )
     {
@@ -224,7 +219,7 @@ int capentry( int snum, int *system )
 	  break;
 	default:
 	  for ( i = 0; i < NUMTEAMS; i = i + 1 )
-	    if ( chrteams[i] == cupper( ch ) && owned[i] )
+	    if ( chrteams[i] == (char)toupper( ch ) && owned[i] )
 	      {
 		/* Found a good one. */
 		*system = i;
@@ -232,7 +227,7 @@ int capentry( int snum, int *system )
 	      }
 	  /* Didn't get a good one; complain and try again. */
 	  cdbeep();
-	  cdrefresh( TRUE );
+	  cdrefresh();
 	  break;
 	}
     }
@@ -242,7 +237,7 @@ int capentry( int snum, int *system )
 }
 
 
-/*##  command - execute a user's command */
+/*  command - execute a user's command */
 /*  SYNOPSIS */
 /*    char ch */
 /*    command( ch ) */
@@ -300,7 +295,7 @@ void command( int ch )
       doalloc( csnum );
       stoptimer();
       if ( stillalive( csnum ) )
-	display( csnum );
+	display( csnum, FALSE );
       settimer();
       break;
     case 'b':				/* beam armies */
@@ -333,7 +328,7 @@ void command( int ch )
       stoptimer();
       dohelp( csubdcl );
       if ( stillalive( csnum ) )
-	display( csnum );
+	display( csnum, FALSE );
       settimer();
       break;
     case 'H':
@@ -341,7 +336,7 @@ void command( int ch )
       stoptimer();
       histlist( FALSE );
       if ( stillalive( csnum ) )
-	display( csnum );
+	display( csnum, FALSE );
       settimer();
       break;
     case 'i':				/* information */
@@ -365,7 +360,7 @@ void command( int ch )
     case 'M':				/* strategic/tactical map */
       smap[csnum] = ! smap[csnum];	
       stoptimer();
-      display( csnum );
+      display( csnum, FALSE );
       settimer();
       break;
     case 'N':				/* change pseudonym */
@@ -404,9 +399,9 @@ void command( int ch )
     case 'S':				/* more user stats */
       credraw = TRUE;
       stoptimer();
-      userstats( FALSE );
+      userstats( FALSE, csnum ); 
       if ( stillalive( csnum ) )
-	display( csnum );
+	display( csnum, FALSE );
       settimer();
       break;
     case 'T':				/* team list */
@@ -414,7 +409,7 @@ void command( int ch )
       stoptimer();
       doteamlist( steam[csnum] );
       if ( stillalive( csnum ) )
-	display( csnum );
+	display( csnum, FALSE );
       settimer();
       break;
     case 'u':				/* un-tractor */
@@ -423,9 +418,9 @@ void command( int ch )
     case 'U':				/* user stats */
       credraw = TRUE;
       stoptimer();
-      userlist( FALSE );
+      userlist( FALSE, csnum );
       if ( stillalive( csnum ) )
-	display( csnum );
+	display( csnum, FALSE );
       settimer();
       break;
     case 'W':				/* war and peace */
@@ -434,21 +429,21 @@ void command( int ch )
     case '-':				/* shields down */
       doshields( csnum, FALSE );
       stoptimer();
-      display( csnum );
+      display( csnum, FALSE );
       settimer();
       break;
     case '+':				/* shields up */
       doshields( csnum, TRUE );
       stoptimer();
-      display( csnum );
+      display( csnum, FALSE );
       settimer();
       break;
     case '/':				/* player list */
       credraw = TRUE;
       stoptimer();
-      playlist( FALSE, FALSE );
+      playlist( FALSE, FALSE, csnum );
       if ( stillalive( csnum ) )
-	display( csnum );
+	display( csnum, FALSE );
       settimer();
       break;
     case '?':				/* planet list */
@@ -456,7 +451,7 @@ void command( int ch )
       stoptimer();
       doplanlist( csnum );
       if ( stillalive( csnum ) )
-	display( csnum );
+	display( csnum, FALSE );
       settimer();
       break;
 #ifdef NOTUSED
@@ -475,7 +470,7 @@ void command( int ch )
       stoptimer();
       cdredo();
       credraw = TRUE;
-      display( csnum );
+      display( csnum, FALSE );
       settimer();
       break;
       
@@ -484,7 +479,7 @@ void command( int ch )
     case '\n':
       iBufPut("i\r");		/* (get last info) */
       break;
-      
+
     case TERM_EXTRA:		/* Have [TAB] act like 'i\t' */
       iBufPut("i\t");		/* (get next last info) */
       break;
@@ -511,13 +506,13 @@ void command( int ch )
 }
 
 
-/*##  conqds - display background for Conquest */
+/*  conqds - display background for Conquest */
 /*  SYNOPSIS */
 /*    int multiple, switchteams */
 /*    conqds( multiple, switchteams ) */
 void conqds( int multiple, int switchteams )
 {
-  int i, length, col, lin, lenc1;
+  int i, col, lin, lenc1;
   string c1=" CCC    OOO   N   N   QQQ   U   U  EEEEE   SSSS  TTTTT";
   string c2="C   C  O   O  NN  N  Q   Q  U   U  E      S        T";
   string c3="C      O   O  N N N  Q   Q  U   U  EEE     SSS     T";
@@ -526,6 +521,18 @@ void conqds( int multiple, int switchteams )
   
   extern char *ConquestVersion;
   extern char *ConquestDate;
+  int FirstTime = TRUE;
+  static char sfmt[MSGMAXLINE * 2];
+
+  if (FirstTime == TRUE)
+    {
+      FirstTime = FALSE;
+      sprintf(sfmt,
+	      "#%d#(#%d#%%c#%d#) - %%s",
+	      LabelColor,
+	      InfoColor,
+	      LabelColor);
+	}
   
   /* First clear the display. */
   cdclear();
@@ -534,100 +541,99 @@ void conqds( int multiple, int switchteams )
   lenc1 = strlen( c1 );
   col = (cmaxcol-lenc1) / 2;
   lin = 2;
-  cdputs( c1, lin, col );
-  lin = lin + 1;
-  cdputs( c2, lin, col );
-  lin = lin + 1;
-  cdputs( c3, lin, col );
-  lin = lin + 1;
-  cdputs( c4, lin, col );
-  lin = lin + 1;
-  cdputs( c5, lin, col );
+  cprintf( lin,col,ALIGN_NONE,"#%d#%s", RedColor | A_BOLD, c1);
+  lin++;
+  cprintf( lin,col,ALIGN_NONE,"#%d#%s", RedColor | A_BOLD, c2);
+  lin++;
+  cprintf( lin,col,ALIGN_NONE,"#%d#%s", RedColor | A_BOLD, c3);
+  lin++;
+  cprintf( lin,col,ALIGN_NONE,"#%d#%s", RedColor | A_BOLD, c4);
+  lin++;
+  cprintf( lin,col,ALIGN_NONE,"#%d#%s", RedColor | A_BOLD, c5);
   
   /* Draw a box around the logo. */
-  lin = lin + 1;
+  lin++;
+  attrset(A_BOLD);
   cdbox( 1, col-2, lin, col+lenc1+1 );
+  attrset(0);
   
-  lin = lin + 1;
+  lin++;
   if ( *closed )
-    cdputc( "The game is closed.", lin );
+    cprintf(lin,0,ALIGN_CENTER,"#%d#%s",RedLevelColor,"The game is closed.");
   else
-    {
-      sprintf( cbuf, "%s (%s)",
-	     ConquestVersion, ConquestDate);
-      cdputc( cbuf, lin );
-    }
+    cprintf( lin,col,ALIGN_CENTER,"#%d#%s (%s)",YellowLevelColor,
+	   ConquestVersion, ConquestDate);
   
-  lin = lin + 1;
-  cdputc( "Options:", lin );
+  lin++;
+  cprintf(lin,0,ALIGN_CENTER,"#%d#%s",NoColor, "Options:");
   
   col = 13;
-  lin = lin + 2;
+  lin+=2;
   i = lin;
-  cdputs( "(e) - enter the game", lin, col );
+  cprintf(lin,col,ALIGN_NONE,sfmt, 'e', "enter the game");
   if ( cnewsfile )
     {
-      lin = lin + 1;
-      cdputs( "(n) - read the news", lin, col );
+      lin++;
+      cprintf(lin,col,ALIGN_NONE,sfmt, 'n', "read the news");
     }
-  lin = lin + 1;
-  cdputs( "(h) - read the help lesson", lin, col );
-  lin = lin + 1;
-  cdputs( "(S) - more user statistics", lin, col );
-  lin = lin + 1;
-  cdputs( "(T) - team statistics", lin, col );
-  lin = lin + 1;
-  cdputs( "(U) - user statistics", lin, col );
-  lin = lin + 1;
-  cdputs( "(L) - review messages", lin, col );
-  lin = lin + 1;
-  cdputs( "(W) - set war or peace", lin, col );
-  lin = lin + 1;
-  cdputs( "(I) - change user options", lin, col );
+  lin++;
+  cprintf(lin,col,ALIGN_NONE,sfmt, 'h', "read the help lesson");
+  lin++;
+  cprintf(lin,col,ALIGN_NONE,sfmt, 'S', "more user statistics");
+  lin++;
+  cprintf(lin,col,ALIGN_NONE,sfmt, 'T', "team statistics");
+  lin++;
+  cprintf(lin,col,ALIGN_NONE,sfmt, 'U', "user statistics");
+  lin++;
+  cprintf(lin,col,ALIGN_NONE,sfmt, 'L', "review messages");
+  lin++;
+  cprintf(lin,col,ALIGN_NONE,sfmt, 'W', "set war or peace");
+  lin++;
+  cprintf(lin,col,ALIGN_NONE,sfmt, 'I', "change user options");
   
   col = 48;
   lin = i;
-  cdputs( "(N) - change your name", lin, col );
+  cprintf(lin,col,ALIGN_NONE,sfmt, 'N', "change your name");
   if ( ! multiple )
     {
-      lin = lin + 1;
-      cdputs( "(r) - resign your commission", lin, col );
+      lin++;
+      cprintf(lin,col,ALIGN_NONE,sfmt, 'r', "resign your commission");
     }
   if ( multiple || switchteams )
     {
-      lin = lin + 1;
-      cdputs( "(s) - switch teams", lin, col );
+      lin++;
+      cprintf(lin,col,ALIGN_NONE,sfmt, 's', "switch teams");
     }
-  lin = lin + 1;
-  cdputs( "(H) - user history", lin, col );
-  lin = lin + 1;
-  cdputs( "(/) - player list", lin, col );
-  lin = lin + 1;
-  cdputs( "(?) - planet list", lin, col );
-  lin = lin + 1;
-  cdputs( "(q) - exit the program", lin, col );
+  lin++;
+  cprintf(lin,col,ALIGN_NONE,sfmt, 'H', "user history");
+  lin++;
+  cprintf(lin,col,ALIGN_NONE,sfmt, '/', "player list");
+  lin++;
+  cprintf(lin,col,ALIGN_NONE,sfmt, '?', "planet list");
+  lin++;
+  cprintf(lin,col,ALIGN_NONE,sfmt, 'q', "exit the program");
   
   return;
   
 }
 
 
-/*##  dead - announce to a user that s/he is dead (DOES LOCKING) */
+/*  dead - announce to a user that s/he is dead (DOES LOCKING) */
 /*  SYNOPSIS */
 /*    int snum */
 /*    int leave */
 /*    dead( snum, leave ) */
 void dead( int snum, int leave )
 {
-  int i, j, k, lin, col, kb, now, entertime; 
+  int i, j, kb, now, entertime; 
   int ch; 
   string ywkb="You were killed by ";
-  char buf[128];
+  char buf[128], junk[128];
   
   /* (Quickly) clear the screen. */
   cdclear();
   cdredo();
-  cdrefresh( FALSE );
+  cdrefresh();
 
   /* If something is wrong, don't do anything. */
   if ( snum < 1 || snum > MAXSHIPS )
@@ -667,139 +673,156 @@ void dead( int snum, int leave )
   switch ( kb )
     {
     case KB_SELF:
-      c_strcpy( "You scuttled yourself.", cbuf );
+      cprintf(8,0,ALIGN_CENTER,"#%d#%s", RedLevelColor, 
+		"You scuttled yourself.");
 
       break;
     case KB_NEGENB:
-      c_strcpy( "You were destroyed by the negative energy barrier.",
-	       cbuf );
+      cprintf(8,0,ALIGN_CENTER,"#%d#%s", RedLevelColor, 
+		"You were destroyed by the negative energy barrier.");
 
       break;
     case KB_CONQUER:
-      c_strcpy(
-	       "Y O U   C O N Q U E R E D   T H E   U N I V E R S E ! ! !",
-	       cbuf );
+      cprintf(8,0,ALIGN_CENTER,"#%d#%s", RedLevelColor, 
+	       "Y O U   C O N Q U E R E D   T H E   U N I V E R S E ! ! !");
       break;
     case KB_NEWGAME:
-      c_strcpy( "N E W   G A M E !", cbuf );
+      cprintf(8,0,ALIGN_CENTER,"#%d#%s", RedLevelColor, 
+      	"N E W   G A M E !");
       break;
     case KB_EVICT:
-      c_strcpy( "Closed for repairs.", cbuf );
+      cprintf(8,0,ALIGN_CENTER,"#%d#%s", RedLevelColor, 
+      	"Closed for repairs.");
       break;
     case KB_SHIT:
-      c_strcpy( "You are no longer allowed to play.", cbuf );
+      cprintf(8,0,ALIGN_CENTER,"#%d#%s", RedLevelColor, 
+      	"You are no longer allowed to play.");
       break;
     case KB_GOD:
-      c_strcpy( "You were killed by an act of GOD.", cbuf );
+      cprintf(8,0,ALIGN_CENTER,"#%d#%s", RedLevelColor, 
+      	"You were killed by an act of GOD.");
 
       break;
     case KB_DOOMSDAY:
-      c_strcpy( "You were eaten by the doomsday machine.", cbuf );
+      cprintf(8,0,ALIGN_CENTER,"#%d#%s", RedLevelColor, 
+      	"You were eaten by the doomsday machine.");
 
       break;
     case KB_GOTDOOMSDAY:
-      c_strcpy( "You destroyed the doomsday machine!", cbuf );
+      cprintf(8,0,ALIGN_CENTER,"#%d#%s", RedLevelColor, 
+      	"You destroyed the doomsday machine!");
       break;
     case KB_DEATHSTAR:
-      c_strcpy( "You were vaporized by the Death Star.", cbuf );
+      cprintf(8,0,ALIGN_CENTER,"#%d#%s", RedLevelColor, 
+      	"You were vaporized by the Death Star.");
 
       break;
     case KB_LIGHTNING:
-      c_strcpy( "You were destroyed by a lightning bolt.", cbuf );
+      cprintf(8,0,ALIGN_CENTER,"#%d#%s", RedLevelColor, 
+      	"You were destroyed by a lightning bolt.");
 
       break;
     default:
       
+	  cbuf[0] = EOS;
+	  buf[0] = EOS;
+	  junk[0] = EOS;
       if ( kb > 0 && kb <= MAXSHIPS )
 	{
-	  sprintf( cbuf, "You were kill number %.1f for %s (",
-		 skills[kb], spname[kb] );
 	  appship( kb, cbuf );
-	  appchr( ')', cbuf );
 	  if ( sstatus[kb] != SS_LIVE )
-	    appstr( ", who also died.", cbuf );
+	    appstr( ", who also died.", buf );
 	  else
-	    appchr( '.', cbuf );
-
+	    appchr( '.', buf );
+	  cprintf( 8,0,ALIGN_CENTER, 
+		   "#%d#You were kill number #%d#%.1f #%d#for #%d#%s #%d#(#%d#%s#%d#)%s",
+		   InfoColor, A_BOLD, skills[kb], 
+		   InfoColor, A_BOLD, spname[kb], 
+		   InfoColor, A_BOLD, cbuf, 
+		   InfoColor, buf );
 	}
       else if ( -kb > 0 && -kb <= NUMPLANETS )
 	{
-	  sprintf(cbuf, "%s%s", ywkb, pname[-kb]);
-
 	  if ( ptype[-kb] == PLANET_SUN )
-	    {
-	      appstr( "'s solar radiation.", cbuf );
-	    }
+	      strcpy(cbuf, "solar radiation.");
 	  else
-	    {
-	      appstr( "'s planetary defenses.", cbuf );
-	    }
+	      strcpy(cbuf, "planetary defenses.");
+	  cprintf(8,0,ALIGN_CENTER,"#%d#%s#%d#%s%s#%d#%s", 
+		InfoColor, ywkb, A_BOLD, pname[-kb], "'s ",
+		InfoColor, cbuf);
+
 	}
       else
 	{
 	  /* We were unable to determine the cause of death. */
-	  buf[0] = '\0';
+	  buf[0] = EOS;
 	  appship( snum, buf );
 	  sprintf(cbuf, "dead: %s was killed by %d.", buf, kb);
 	  cerror( cbuf );
 	  clog(cbuf);
 	  
-	  strcpy(cbuf, ywkb);
-	  strcat(cbuf, "nothing in particular.  (How strange...)");
+	  cprintf(8,0,ALIGN_CENTER,"#%d#%s%s", 
+	  	RedLevelColor, ywkb, "nothing in particular.  (How strange...)");
 	}
     }
   
-  cdputc( cbuf, 8 );
-  
   if ( kb == KB_NEWGAME )
     {
-      sprintf( cbuf, "Universe conquered by %s for the %s team.",
-	     conqueror, conqteam );
-      cdputc( cbuf, 10 );
+      cprintf( 10,0,ALIGN_CENTER,
+		"#%d#Universe conquered by #%d#%s #%d#for the #%d#%s #%d#team.",
+		 InfoColor, A_BOLD, conqueror, 
+		 InfoColor, A_BOLD, conqteam, LabelColor );
     }
   else if ( kb == KB_SELF )
     {
       i = sarmies[snum];
       if ( i > 0 )
 	{
-	  c_strcpy( "The ", cbuf );
+	  junk[0] = EOS; 
 	  if ( i == 1 )
-	    appstr( "army", cbuf );
+	    strcpy( cbuf, "army" );
 	  else
 	    {
 	      if ( i < 100 )
-		appnum( i, cbuf );
+			appnum( i, junk );
 	      else
-		appint( i, cbuf );
-	      appstr( " armies", cbuf );
+			appint( i, junk );
+	      strcpy( cbuf, "armies" );
 	    }
-	  appstr( " you were carrying ", cbuf );
 	  if ( i == 1 )
-	    appstr( "was", cbuf );
+	    strcpy( buf, "was" );
 	  else
-	    appstr( "were", cbuf );
-	  appstr( " not amused.", cbuf );
-	  cdputc( cbuf, 10 );
+	    strcpy( buf, "were");
+	  if ( i == 1 )
+		cprintf(10,0,ALIGN_CENTER,
+		"#%d#The #%d#%s #%d#you were carrying %s not amused.",
+			LabelColor, A_BOLD, cbuf, LabelColor, buf);
+	  else
+		cprintf(10,0,ALIGN_CENTER,
+		"#%d#The #%d#%s %s #%d#you were carrying %s not amused.",
+			LabelColor, A_BOLD, junk, cbuf, LabelColor, buf);
 	}
     }
   else if ( kb >= 0 )
     {
       if ( sstatus[kb] == SS_LIVE )
 	{
-	  sprintf( cbuf, "He had %d%% shields and %d%% damage.",
-		 round(sshields[kb]), round(sdamage[kb]) );
-	  cdputc( cbuf, 10 );
+	  cprintf( 10,0,ALIGN_CENTER,
+		"#%d#He had #%d#%d%% #%d#shields and #%d#%d%% #%d#damage.",
+		InfoColor, A_BOLD, round(sshields[kb]), 
+		InfoColor, A_BOLD, round(sdamage[kb]),InfoColor );
 	}
     }
-  sprintf( cbuf, "You got %.1f this time.", oneplace(skills[snum]) );
-  cdputc( cbuf, 12 );
+  cprintf(12,0,ALIGN_CENTER,
+	"#%d#You got #%d#%.1f #%d#this time.", 
+	InfoColor, A_BOLD, oneplace(skills[snum]), InfoColor );
   cdmove( 1, 1 );
-  cdrefresh( FALSE );
+  cdrefresh();
 
   if ( ! ( leave && kb == KB_SELF ) && kb != KB_SHIT && kb != KB_EVICT )
     c_sleep( 4.0 );
   
-  for ( i = 1; i <= 10 && sstatus[snum] == SS_DYING; i = i + 1 )
+  for ( i = 1; i <= 10 && sstatus[snum] == SS_DYING; i++ )
     c_sleep( 1.0 );
   sstatus[snum] = SS_RESERVED;
   ssdfuse[snum] = -TIMEOUT_PLAYER;
@@ -812,19 +835,21 @@ void dead( int snum, int leave )
 	{
 	  cdclear();
 	  cdredo();
+	  lastwords[0] = EOS;
 	  ch = cdgetx( "Any last words? ",
-		      14, 1, TERMS, lastwords, MAXLASTWORDS );
+		       14, 1, TERMS, lastwords, MAXLASTWORDS );
 	  cdclear();
 	  cdredo();
 	  if ( lastwords[0] != EOS )
 	    {
-	      cdputc( "You last words are entered as:", 13 );
-	      sprintf( cbuf, "%c%s%c", '"', lastwords, '"' );
-	      cdputc( cbuf, 14 );
+	      cprintf( 13,0,ALIGN_CENTER, "#%d#%s", 
+			InfoColor, "You last words are entered as:");
+	      cprintf( 14,0,ALIGN_CENTER, "#%d#%c%s%c", 
+			YellowLevelColor, '"', lastwords, '"' );
 	    }
 	  else
-	    cdputc(
-		   "You have chosen to NOT leave any last words:", 14 );
+	    cprintf( 14,0,ALIGN_CENTER,"#%d#%s", InfoColor,
+		   "You have chosen to NOT leave any last words:" );
 	  ch = getcx( "Press TAB to confirm:", 16, 0,
 		     TERMS, cbuf, 10 );
 	}
@@ -838,7 +863,7 @@ void dead( int snum, int leave )
     default:
       ioeat();
       putpmt( "--- press space when done ---", MSG_LIN2 );
-      cdrefresh( TRUE );
+      cdrefresh();
       while ( ! iogtimed( &ch, 1 ) && stillalive( csnum ) )
 	;
       break;
@@ -846,7 +871,7 @@ void dead( int snum, int leave )
   cdmove( 1, 1 );
   
   /* Turn off sticky war so we can change war settings from menu(). */
-  for ( i = 0; i < NUMTEAMS; i = i + 1 )
+  for ( i = 0; i < NUMTEAMS; i++ )
     srwar[snum][i] = FALSE;
   
   return;
@@ -854,7 +879,7 @@ void dead( int snum, int leave )
 }
 
 
-/*##  dispoption - display options */
+/*  dispoption - display options */
 /*  SYNOPSIS */
 /*    int op(MAXOPTIONS) */
 /*    dispoption( op ) */
@@ -907,7 +932,7 @@ void dispoption( int op[] )
 }
 
 
-/*##  doalloc - change weapon/engine allocations */
+/*  doalloc - change weapon/engine allocations */
 /*  SYNOPSIS */
 /*    int snum */
 /*    doalloc( snum ) */
@@ -915,18 +940,18 @@ void doalloc( int snum )
 {
   char ch;
   int i, alloc;
-  int l; 
   
   string pmt="New weapons allocation: (30-70) ";
   
   cdclrl( MSG_LIN1, 2 );
-  ch = cdgetx( pmt, MSG_LIN1, 1, TERMS, cbuf, MSGMAXLINE );
+  cbuf[0] = EOS;
+  ch = (char)cdgetx( pmt, MSG_LIN1, 1, TERMS, cbuf, MSGMAXLINE );
   if ( ch == TERM_EXTRA )
     sweapons[snum] = sengines[snum];
   else if ( ch == TERM_NORMAL )
     {
       i = 0;
-      l = safectoi( &alloc, cbuf, i );			/* ignore status */
+      safectoi( &alloc, cbuf, i );			/* ignore status */
       if ( alloc != 0 )
 	{
 	  if ( alloc < 30 )
@@ -945,7 +970,7 @@ void doalloc( int snum )
 }
 
 
-/*##  doautopilot - handle the autopilot */
+/*  doautopilot - handle the autopilot */
 /*  SYNOPSIS */
 /*    int snum */
 /*    doautopilot( snum ) */
@@ -956,6 +981,7 @@ void doautopilot( int snum )
   string conf="Press TAB to engage autopilot:";
   
   cdclrl( MSG_LIN1, 2 );
+  cbuf[0] = EOS;
   if ( cdgetx( conf, MSG_LIN1, 1, TERMS, cbuf, MSGMAXLINE ) != TERM_EXTRA )
     {
       cdclrl( MSG_LIN1, 1 );
@@ -993,7 +1019,7 @@ void doautopilot( int snum )
 	default:
 	  c_putmsg( "Press ESCAPE to abort autopilot.", MSG_LIN1 );
 	  cdbeep();
-	  cdrefresh( TRUE );
+	  cdrefresh();
 	}
       cmsgok = TRUE;
       if (ch == TERM_ABORT)
@@ -1009,7 +1035,7 @@ void doautopilot( int snum )
 }
 
 
-/*##  dobeam - beam armies up or down (DOES LOCKING) */
+/*  dobeam - beam armies up or down (DOES LOCKING) */
 /*  SYNOPSIS */
 /*    int snum */
 /*    dobeam( snum ) */
@@ -1017,7 +1043,7 @@ void dobeam( int snum )
 {
   int pnum, total, num, upmax, downmax, capacity, beamax, i;
   int ototal, entertime, now;
-  int l, oldsshup, dirup, zeroed, conqed;
+  int oldsshup, dirup, zeroed, conqed;
   int ch; 
   char buf[MSGMAXLINE];
   real rkills;
@@ -1146,7 +1172,7 @@ void dobeam( int snum )
   else
     {
       c_putmsg( "Beam [up or down] ", MSG_LIN1 );
-      cdrefresh( TRUE );
+      cdrefresh();
       done = FALSE;
       while ( stillalive( csnum ) && done == FALSE)
 	{
@@ -1154,7 +1180,7 @@ void dobeam( int snum )
 	    {
 	      continue;	/* next */
 	    }
-	  switch ( clower( ch ) )
+	  switch ( (char)tolower( ch ) )
 	    {
 	    case 'u':
 	    case 'U':
@@ -1186,6 +1212,7 @@ void dobeam( int snum )
     c_strcpy( "down", buf );
   sprintf( cbuf, "Beam %s [1-%d] ", buf, beamax );
   cdclrl( MSG_LIN1, 1 );
+  buf[0] = EOS;
   ch = cdgetx( cbuf, MSG_LIN1, 1, TERMS, buf, MSGMAXLINE );
   if ( ch == TERM_ABORT )
     {
@@ -1197,24 +1224,25 @@ void dobeam( int snum )
   else
     {
       delblanks( buf );
-      if ( alldig( buf ) != YES )
+      if ( alldig( buf ) != TRUE )
 	{
 	  c_putmsg( abt, MSG_LIN1 );
 	  return;
 	}
       i = 0;
-      l = safectoi( &num, buf, i );			/* ignore status */
+      safectoi( &num, buf, i );			/* ignore status */
       if ( num < 1 || num > beamax )
 	{
 	  c_putmsg( abt, MSG_LIN1 );
 	  return;
 	}
     }
-  
   /* Now we are ready! */
-  if ( pteam[pnum] > NUMTEAMS )
-    /* If the planet is not race owned, make it war with us. */
-    ssrpwar[snum][pnum] = TRUE;
+  if ( pteam[pnum] >= NUMTEAMS )
+    {
+      /* If the planet is not race owned, make it war with us. */
+      ssrpwar[snum][pnum] = TRUE;
+    }
   else if ( pteam[pnum] != steam[snum] )
     {
       /* For a team planet make the war sticky and send an intruder alert. */
@@ -1239,7 +1267,7 @@ void dobeam( int snum )
     {
       if ( ! stillalive( csnum ) )
 	return;
-      if ( iochav( 0 ) )
+      if ( iochav() )
 	{
 	  c_putmsg( abt, MSG_LIN1 );
 	  break;
@@ -1322,7 +1350,7 @@ void dobeam( int snum )
 	  appstr( " to go.", cbuf );
 	  c_putmsg( cbuf, MSG_LIN1 );
 	  if ( ototal == -1 )
-	    cdrefresh( TRUE );		/* display the first time */
+	    cdrefresh();		/* display the first time */
 	  ototal = total;
 	}
       
@@ -1342,7 +1370,7 @@ void dobeam( int snum )
   sshup[snum] = oldsshup;
   
   /* Try to display the last bombing message. */
-  cdrefresh( TRUE );
+  cdrefresh();
   
   if ( conqed )
     {
@@ -1358,13 +1386,13 @@ void dobeam( int snum )
 }
 
 
-/*##  dobomb - bombard a planet (DOES LOCKING) */
+/*  dobomb - bombard a planet (DOES LOCKING) */
 /*  SYNOPSIS */
 /*    int snum */
 /*    dobomb( snum ) */
 void dobomb( int snum )
 {
-  int pnum, i, now, entertime, total, ototal, oparmies;
+  int pnum, now, entertime, total, ototal, oparmies;
   real x, killprob;
   int oldsshup; 
   char  buf[MSGMAXLINE];
@@ -1407,6 +1435,7 @@ void dobomb( int snum )
 	 pname[pnum], parmies[pnum] );
   cdclrl( MSG_LIN1, 1 );
   cdclrl( MSG_LIN2, 1 );
+  buf[0] = EOS;
   if ( cdgetx( cbuf, MSG_LIN1, 1, TERMS, buf, MSGMAXLINE ) != TERM_EXTRA )
     {
       cdclrl( MSG_LIN1, 1 );
@@ -1444,16 +1473,16 @@ void dobomb( int snum )
     {
       if ( ! stillalive( csnum ) )
 	return;
-      if ( iochav( 0 ) )
+      if ( iochav() )
 	{
 	  c_putmsg( abt, MSG_LIN1 );
 	  break;
 	}
       
-      cdrefresh(FALSE);
+      cdrefresh();
       
       /* See if it's time to bomb yet. */
-      while ( abs (dgrand( entertime, &now )) >= BOMBARD_GRAND )
+      while ((int) fabs (dgrand( (int)entertime, (int *)&now )) >= BOMBARD_GRAND )
 	{
 	  if ( swfuse[snum] > 0 )
 	    {
@@ -1472,7 +1501,7 @@ void dobomb( int snum )
 			     ((real) weaeff( snum ) *
 			      (real)((real)parmies[pnum]/100.0))) + 0.5 );
 	  /*	    cerror(MSG_GOD, "DEBUG: killprob = %d\n", (int) (killprob *10));*/
-	  if ( rnd( 0 ) < killprob )
+	  if ( rnd() < killprob )
 	    {
 	      /*	    cerror(MSG_GOD, "DEBUG: we're in: killprob = %d\n", (int)(killprob * 10));*/
 	      PVLOCK(lockword);
@@ -1494,7 +1523,7 @@ void dobomb( int snum )
 	      total = total + 1;
 	    }
 	  /*	    astservice(0);
-		    cdrefresh(FALSE);
+		    cdrefresh();
 		    c_sleep(ITER_SECONDS);
 		    */
 	}
@@ -1517,10 +1546,10 @@ void dobomb( int snum )
 	  sprintf( cbuf, "Bombing %s, %d arm%s killed, %d left.",
 		 pname[pnum], total, buf, oparmies );
 	  c_putmsg( cbuf, MSG_LIN1 );
-	  cdrefresh(FALSE);
+	  cdrefresh();
 	  if ( ototal == -1 )
 	    {
-	      cdrefresh( TRUE );		/* display the first time */
+	      cdrefresh();		/* display the first time */
 	    }
 	  
 	  ototal = total;
@@ -1537,21 +1566,20 @@ void dobomb( int snum )
   sshup[snum] = oldsshup;
   
   /* Try to display the last bombing message. */
-  cdrefresh( TRUE );
+  cdrefresh();
   
   return;
   
 }
 
 
-/*##  doburst - launch a burst of three torpedoes */
+/*  doburst - launch a burst of three torpedoes */
 /*  SYNOPSIS */
 /*    int snum */
 /*    doburst( snum ) */
 void doburst( int snum )
 {
   real dir;
-  int l; 
   
   cdclrl( MSG_LIN2, 1 );
   
@@ -1574,7 +1602,7 @@ void doburst( int snum )
   
   if ( gettarget( "Torpedo burst: ", MSG_LIN1, 1, &dir, slastblast[snum] ) )
     {
-      if ( ! launch( snum, dir, 3 ) )
+      if ( ! launch( snum, dir, 3, LAUNCH_NORMAL ) )
 	c_putmsg( ">TUBES EMPTY<", MSG_LIN2 );
       else
 	cdclrl( MSG_LIN1, 1 );
@@ -1590,7 +1618,7 @@ void doburst( int snum )
 }
 
 
-/*##  docloak - cloaking device control */
+/*  docloak - cloaking device control */
 /*  SYNOPSIS */
 /*    int snum */
 /*    docloak( snum ) */
@@ -1620,6 +1648,7 @@ void docloak( int snum )
     }
   
   cdclrl( MSG_LIN1, 1 );
+  cbuf[0] = EOS;
   if ( cdgetx( pmt, MSG_LIN1, 1, TERMS, cbuf, MSGMAXLINE ) == TERM_EXTRA )
     {
       if ( cloak( snum ) )
@@ -1634,7 +1663,7 @@ void docloak( int snum )
 }
 
 
-/*##  docoup - attempt to rise from the ashes (DOES LOCKING) */
+/*  docoup - attempt to rise from the ashes (DOES LOCKING) */
 /*  SYNOPSIS */
 /*    int snum */
 /*    docoup( snum ) */
@@ -1701,6 +1730,7 @@ void docoup( int snum )
   
   /* Confirm. */
   cdclrl( MSG_LIN1, 1 );
+  cbuf[0] = EOS;
   if ( cdgetx( conf, MSG_LIN1, 1, TERMS, cbuf, MSGMAXLINE ) != TERM_EXTRA )
     {
       c_putmsg( "...aborted...", MSG_LIN1 );
@@ -1709,7 +1739,7 @@ void docoup( int snum )
   
   /* Now wait it out... */
   c_putmsg( "Attempting coup...", MSG_LIN1 );
-  cdrefresh( TRUE );
+  cdrefresh();
   grand( &entertime );
   while ( dgrand( entertime, &now ) < COUP_GRAND )
     {
@@ -1734,7 +1764,7 @@ void docoup( int snum )
     }
   
   failprob = parmies[pnum] / MAX_COUP_ENEMY_ARMIES * 0.5 + 0.5;
-  if ( rnd( 0 ) < failprob )
+  if ( rnd() < failprob )
     {
       /* Failed; setup new reorganization time. */
       couptime[steam[snum]] = rndint( 5, 10 );
@@ -1755,7 +1785,7 @@ void docoup( int snum )
 }
 
 
-/*##  docourse - set course */
+/*  docourse - set course */
 /*  SYNOPSIS */
 /*    int snum */
 /*    docourse( snum ) */
@@ -1767,6 +1797,7 @@ void docourse( int snum )
   
   cdclrl( MSG_LIN1, 2 );
 
+  cbuf[0] = EOS;
   ch = cdgetx( "Come to course: ", MSG_LIN1, 1, TERMS, cbuf, MSGMAXLINE );
   delblanks( cbuf );
   if ( ch == TERM_ABORT || cbuf[0] == EOS )
@@ -1779,7 +1810,7 @@ void docourse( int snum )
   fold( cbuf );
   
   what = NEAR_ERROR;
-  if ( alldig( cbuf ) == YES )
+  if ( alldig( cbuf ) == TRUE )
     {
       /* Raw angle. */
       cdclrl( MSG_LIN1, 1 );
@@ -1790,7 +1821,7 @@ void docourse( int snum )
 	  dir = (real)mod360( (real)( j ) );
 	}
     }
-  else if ( cbuf[0] == 's' && alldig( &cbuf[1] ) == YES )
+  else if ( cbuf[0] == 's' && alldig( &cbuf[1] ) == TRUE )
     {
       /* Ship. */
 
@@ -1883,7 +1914,7 @@ void docourse( int snum )
 }
 
 
-/*##  dodet - detonate enemy torps */
+/*  dodet - detonate enemy torps */
 /*  SYNOPSIS */
 /*    int snum */
 /*    dodet( snum ) */
@@ -1903,7 +1934,7 @@ void dodet( int snum )
 }
 
 
-/*##  dodistress - send an emergency distress call */
+/*  dodistress - send an emergency distress call */
 /*  SYNOPSIS */
 /*    int snum */
 /*    dodistress( snum ) */
@@ -1913,7 +1944,8 @@ void dodistress( int snum )
   string pmt="Press TAB to send an emergency distress call: ";
   
   cdclrl( MSG_LIN1, 2 );
-  
+
+  cbuf[0] = EOS;
   if ( cdgetx( pmt, MSG_LIN1, 1, TERMS, cbuf, MSGMAXLINE ) == TERM_EXTRA )
     {
       sprintf( cbuf,
@@ -1953,7 +1985,7 @@ void dodistress( int snum )
 }
 
 
-/*##  dohelp - display a list of commands */
+/*  dohelp - display a list of commands */
 /*  SYNOPSIS */
 /*    int subdcl */
 /*    dohelp( subdcl ) */
@@ -1961,101 +1993,118 @@ void dohelp( int subdcl )
 {
   int lin, col, tlin;
   int ch;
+  int FirstTime = TRUE;
+  static char sfmt[MSGMAXLINE * 2];
+
+  if (FirstTime == TRUE)
+    {
+      FirstTime = FALSE;
+      sprintf(sfmt,
+	      "#%d#%%-9s#%d#%%s",
+	      InfoColor,
+	      LabelColor);
+	}
+
+  cdclear();
   
   cdclear();
-  cdputc( "CONQUEST COMMANDS", 1 );
+  cprintf(1,0,ALIGN_CENTER, "#%d#%s", LabelColor, "CONQUEST COMMANDS");
   
   lin = 4;
   
   /* Display the left side. */
   tlin = lin;
   col = 4;
-  cdputs( "0-9,=  set warp factor (= is 10)", tlin, col );
-  tlin = tlin + 1;
-  cdputs( "A      change w/e allocations", tlin, col );
-  tlin = tlin + 1;
-  cdputs( "b      beam armies", tlin, col );
-  tlin = tlin + 1;
-  cdputs( "B      bombard a planet", tlin, col );
-  tlin = tlin + 1;
-  cdputs( "C      cloaking device", tlin, col );
-  tlin = tlin + 1;
-  cdputs( "d,*    detonate enemy torpedoes", tlin, col );
-  tlin = tlin + 1;
-  cdputs( "D      detonate your own torpedoes", tlin, col );
-  tlin = tlin + 1;
-  cdputs( "E      send emergency distress call", tlin, col );
-  tlin = tlin + 1;
-  cdputs( "f      fire phasers", tlin, col );
-  tlin = tlin + 1;
-  cdputs( "F      fire phasers, same direction", tlin, col );
-  tlin = tlin + 1;
-  cdputs( "h      this", tlin, col );
-  tlin = tlin + 1;
-  cdputs( "H      user history", tlin, col );
-  tlin = tlin + 1;
-  cdputs( "i      information", tlin, col );
-  tlin = tlin + 1;
-  cdputs( "I      set user options", tlin, col );
-  tlin = tlin + 1;
-  cdputs( "k      set course", tlin, col );
-  tlin = tlin + 1;
-  cdputs( "K      try a coup", tlin, col );
-  tlin = tlin + 1;
-  cdputs( "L      review old messages", tlin, col );
-  tlin = tlin + 1;
-  cdputs( "m      send a message", tlin, col );
-  tlin = tlin + 1;
-  cdputs( "M      short/long range sensor toggle", tlin, col );
+  cprintf(tlin,col,ALIGN_NONE,sfmt, "0-9,=", "set warp factor (= is 10)");
+  tlin++;
+  cprintf(tlin,col,ALIGN_NONE,sfmt, "A", "change w/e allocations");
+  tlin++;
+  cprintf(tlin,col,ALIGN_NONE,sfmt, "b", "beam armies");
+  tlin++;
+  cprintf(tlin,col,ALIGN_NONE,sfmt, "B", "bombard a planet");
+  tlin++;
+  cprintf(tlin,col,ALIGN_NONE,sfmt, "C", "cloaking device");
+  tlin++;
+  cprintf(tlin,col,ALIGN_NONE,sfmt, "d,*", "detonate enemy torpedoes");
+  tlin++;
+  cprintf(tlin,col,ALIGN_NONE,sfmt, "D", "detonate your own torpedoes");
+  tlin++;
+  cprintf(tlin,col,ALIGN_NONE,sfmt, "E", "send emergency distress call");
+  tlin++;
+  cprintf(tlin,col,ALIGN_NONE,sfmt, "f", "fire phasers");
+  tlin++;
+  cprintf(tlin,col,ALIGN_NONE,sfmt, "F", "fire phasers, same direction");
+  tlin++;
+  cprintf(tlin,col,ALIGN_NONE,sfmt, "h", "this");
+  tlin++;
+  cprintf(tlin,col,ALIGN_NONE,sfmt, 
+  "H", "user history");
+  tlin++;
+  cprintf(tlin,col,ALIGN_NONE,sfmt, "i", "information");
+  tlin++;
+  cprintf(tlin,col,ALIGN_NONE,sfmt, "I", "set user options");
+  tlin++;
+  cprintf(tlin,col,ALIGN_NONE,sfmt, "k", "set course");
+  tlin++;
+  cprintf(tlin,col,ALIGN_NONE,sfmt, "K", "try a coup");
+  tlin++;
+  cprintf(tlin,col,ALIGN_NONE,sfmt, "L", "review old messages");
+  tlin++;
+  cprintf(tlin,col,ALIGN_NONE,sfmt, "m", "send a message");
+  tlin++;
+  cprintf(tlin,col,ALIGN_NONE,sfmt, "M", "short/long range sensor toggle");
   
   /* Now do the right side. */
   tlin = lin;
   col = 44;
-  cdputs( "N      change your name", tlin, col );
-  tlin = tlin + 1;
-  cdputs( "o      come into orbit", tlin, col );
-  tlin = tlin + 1;
-  cdputs( "p      launch photon torpedoes", tlin, col );
-  tlin = tlin + 1;
-  cdputs( "P      launch photon torpedo burst", tlin, col );
-  tlin = tlin + 1;
-  cdputs( "Q      initiate self-destruct", tlin, col );
-  tlin = tlin + 1;
-  cdputs( "R      enter repair mode", tlin, col );
-  tlin = tlin + 1;
-  cdputs( "S      more user statistics", tlin, col );
-  tlin = tlin + 1;
-  cdputs( "t      engage tractor beams", tlin, col );
-  tlin = tlin + 1;
-  cdputs( "T      team list", tlin, col );
-  tlin = tlin + 1;
-  cdputs( "u      un-engage tractor beams", tlin, col );
-  tlin = tlin + 1;
-  cdputs( "U      user statistics", tlin, col );
-  tlin = tlin + 1;
-  cdputs( "W      set war or peace", tlin, col );
-  tlin = tlin + 1;
-  cdputs( "-      lower shields", tlin, col );
-  tlin = tlin + 1;
-  cdputs( "+      raise shields", tlin, col );
-  tlin = tlin + 1;
-  cdputs( "/      player list", tlin, col );
-  tlin = tlin + 1;
-  cdputs( "?      planet list", tlin, col );
+  cprintf(tlin,col,ALIGN_NONE,sfmt, "N", "change your name");
+  tlin++;
+  cprintf(tlin,col,ALIGN_NONE,sfmt, "o", "come into orbit");
+  tlin++;
+  cprintf(tlin,col,ALIGN_NONE,sfmt, "p", "launch photon torpedoes");
+  tlin++;
+  cprintf(tlin,col,ALIGN_NONE,sfmt, "P", "launch photon torpedo burst");
+  tlin++;
+  cprintf(tlin,col,ALIGN_NONE,sfmt, "Q", "initiate self-destruct");
+  tlin++;
+  cprintf(tlin,col,ALIGN_NONE,sfmt, "R", "enter repair mode");
+  tlin++;
+  cprintf(tlin,col,ALIGN_NONE,sfmt, "S", "more user statistics");
+  tlin++;
+  cprintf(tlin,col,ALIGN_NONE,sfmt, "t", "engage tractor beams");
+  tlin++;
+  cprintf(tlin,col,ALIGN_NONE,sfmt, "T", "team list");
+  tlin++;
+  cprintf(tlin,col,ALIGN_NONE,sfmt, "u", "un-engage tractor beams");
+  tlin++;
+  cprintf(tlin,col,ALIGN_NONE,sfmt, "U", "user statistics");
+  tlin++;
+  cprintf(tlin,col,ALIGN_NONE,sfmt, "W", "set war or peace");
+  tlin++;
+  cprintf(tlin,col,ALIGN_NONE,sfmt, "-", "lower shields");
+  tlin++;
+  cprintf(tlin,col,ALIGN_NONE,sfmt, "+", "raise shields");
+  tlin++;
+  cprintf(tlin,col,ALIGN_NONE,sfmt, 
+  "/", "player list");
+  tlin++;
+  cprintf(tlin,col,ALIGN_NONE,sfmt, "?", "planet list");
   if ( subdcl )
     {
-      tlin = tlin + 1;
-      cdputs( "$      spawn to DCL", tlin, col );
+      tlin++;
+	  cprintf(tlin,col,ALIGN_NONE,sfmt, "$", "spawn to DCL");
     }
-  tlin = tlin + 1;
-  cdputs( "^L     refresh the screen", tlin, col );
-  tlin = tlin + 1;
-  cdputs( "[RETURN] get last info", tlin, col);
-  tlin = tlin + 1;
-  cdputs( "[TAB] get next last info", tlin, col);
+  tlin++;
+  cprintf(tlin,col,ALIGN_NONE,sfmt, 
+  "^L", "refresh the screen");
+  tlin++;
+  cprintf(tlin,col,ALIGN_NONE,sfmt, 
+  "[RETURN]", "get last info");
+  tlin++;
+  cprintf(tlin,col,ALIGN_NONE,sfmt, "[TAB]", "get next last info");
   
   putpmt( "--- press space when done ---", MSG_LIN2 );
-  cdrefresh( TRUE );
+  cdrefresh();
   while ( ! iogtimed( &ch, 1 ) && stillalive( csnum ) )
     ;
   
@@ -2064,7 +2113,7 @@ void dohelp( int subdcl )
 }
 
 
-/*##  doinfo - do an info command */
+/*  doinfo - do an info command */
 /*  SYNOPSIS */
 /*    int snum */
 /*    doinfo( snum ) */
@@ -2072,12 +2121,12 @@ void doinfo( int snum )
 {
   char ch; 
   int i, j, what, sorpnum, xsorpnum, count, token, now[8]; 
-  int l, extra; 
+  int extra; 
   
   cdclrl( MSG_LIN1, 2 );
   
-  
-  ch = cdgetx( "Information on: ", MSG_LIN1, 1, TERMS, cbuf, MSGMAXLINE );
+  cbuf[0] = EOS;
+  ch = (char)cdgetx( "Information on: ", MSG_LIN1, 1, TERMS, cbuf, MSGMAXLINE );
   if ( ch == TERM_ABORT )
     {
       cdclrl( MSG_LIN1, 1 );
@@ -2117,16 +2166,16 @@ void doinfo( int snum )
       else
 	c_putmsg( "Not found.", MSG_LIN2 );
     }
-  else if ( cbuf[0] == 's' && alldig( &cbuf[1] ) == YES )
+  else if ( cbuf[0] == 's' && alldig( &cbuf[1] ) == TRUE )
     {
       i = 1;
-      l = safectoi( &j, cbuf, i );		/* ignore status */
+      safectoi( &j, cbuf, i );		/* ignore status */
       infoship( j, snum );
     }
-  else if ( alldig( cbuf ) == YES )
+  else if ( alldig( cbuf ) == TRUE )
     {
       i = 0;
-      l = safectoi( &j, cbuf, i );		/* ignore status */
+      safectoi( &j, cbuf, i );		/* ignore status */
       infoship( j, snum );
     }
   else if ( planmatch( cbuf, &j, FALSE ) )
@@ -2151,7 +2200,7 @@ void doinfo( int snum )
 }
 
 
-/*##  dolastphase - do a fire phasers same direction command */
+/*  dolastphase - do a fire phasers same direction command */
 /*  SYNOPSIS */
 /*    int snum */
 /*    dolastphase( snum ) */
@@ -2186,7 +2235,7 @@ void dolastphase( int snum )
 }
 
 
-/*##  domydet - detonate your own torps */
+/*  domydet - detonate your own torps */
 /*  SYNOPSIS */
 /*    int snum */
 /*    domydet( snum ) */
@@ -2206,7 +2255,7 @@ void domydet( int snum )
 }
 
 
-/*##  dooption - set user options */
+/*  dooption - set user options */
 /*  SYNOPSIS */
 /*    int snum */
 /*    int dodisplay */
@@ -2230,7 +2279,7 @@ void dooption( int snum, int dodisplay )
     {
       /* Display the current options. */
       dispoption( top );
-      cdrefresh( TRUE );
+      cdrefresh();
       
       /* Get a character. */
       if ( ! iogtimed( &ch, 1 ) )
@@ -2251,7 +2300,7 @@ void dooption( int snum, int dodisplay )
 	    {
 	      /* Force an update. */
 	      stoptimer();
-	      display( snum );		/* update the display */
+	      display( snum, FALSE );		/* update the display */
 	      settimer();
 	    }
 	  
@@ -2270,7 +2319,7 @@ void dooption( int snum, int dodisplay )
 		{
 		  /* Force an update. */
 		  stoptimer();
-		  display( snum );
+		  display( snum, FALSE );
 		  settimer();
 		}
 	    }
@@ -2286,7 +2335,7 @@ void dooption( int snum, int dodisplay )
 }
 
 
-/*##  doorbit - orbit the ship and print a message */
+/*  doorbit - orbit the ship and print a message */
 /*  SYNOPSIS */
 /*    int snum */
 /*    doorbit( snum ) */
@@ -2323,7 +2372,7 @@ void doorbit( int snum )
 }
 
 
-/*##  dophase - do a fire phasers command */
+/*  dophase - do a fire phasers command */
 /*  SYNOPSIS */
 /*    int snum */
 /*    dophase( snum ) */
@@ -2368,29 +2417,24 @@ void dophase( int snum )
 }
 
 
-/*##  doplanlist - display the planet list for a ship */
+/*  doplanlist - display the planet list for a ship */
 /*  SYNOPSIS */
 /*    int snum */
 /*    doplanlist( snum ) */
 void doplanlist( int snum )
 {
-  int ch;
+
+  if (snum > 0 && snum <= MAXSHIPS)
+    planlist( steam[snum], snum );
+  else		/* then use user team if user doen't have a ship yet */
+    planlist( uteam[cunum], snum );
   
-  cdclear();
-  while ( stillalive( csnum ) )
-    {
-      planlist( steam[snum] );
-      putpmt( "--- press space when done ---", MSG_LIN2 );
-      cdrefresh( TRUE );
-      if ( iogtimed( &ch, 1 ) )
-	break;
-    }
   return;
   
 }
 
 
-/*##  doreview - review messages for a ship */
+/*  doreview - review messages for a ship */
 /*  SYNOPSIS */
 /*    int snum */
 /*    doreview( snum ) */
@@ -2414,7 +2458,7 @@ void doreview( int snum )
     {
       c_putmsg( "There are no old messages.", MSG_LIN1 );
       putpmt( "--- press space for more ---", MSG_LIN2 );
-      cdrefresh( TRUE );
+      cdrefresh();
       while ( ! iogtimed( &ch, 1 ) && stillalive( csnum ) )
 	;
       cdclrl( MSG_LIN1, 2 );
@@ -2430,14 +2474,13 @@ void doreview( int snum )
 }
 
 
-/*##  doselfdest - execute a self-destruct command */
+/*  doselfdest - execute a self-destruct command */
 /*  SYNOPSIS */
 /*    doselfdest */
 void doselfdest(int snum)
 {
   
-  int i, j, entertime, now; 
-  int ch; 
+  int entertime, now; 
   string pmt="Press TAB to initiate self-destruct sequence: ";
   
   cdclrl( MSG_LIN1, 2 );
@@ -2448,7 +2491,8 @@ void doselfdest(int snum)
                MSG_LIN1 );
       return;
     }
-  
+
+  cbuf[0] = EOS;
   if ( cdgetx( pmt, MSG_LIN1, 1, TERMS, cbuf, MSGMAXLINE ) != TERM_EXTRA )
     {
       /* Chickened out. */
@@ -2467,7 +2511,7 @@ void doselfdest(int snum)
   
   /* Force a screen update. */
   stoptimer();
-  display( csnum );
+  display( csnum, FALSE );
   settimer();
   cmsgok = TRUE;			/* messages are ok in the beginning */
   while ( ssdfuse[csnum] > 0 )
@@ -2484,12 +2528,12 @@ void doselfdest(int snum)
 	  return;
 	}
       
-      if ( iochav( 0 ) )
+      if ( iochav() )
 	{
 	  /* Got a new character. */
 	  grand( &cmsgrand );
 	  cdclrl( MSG_LIN1, 2 );
-	  if ( iogchar( ch ) == TERM_ABORT )
+	  if ( iogchar() == TERM_ABORT )
 	    {
 	      ssdfuse[csnum] = 0;
 	      c_putmsg( "Self destruct has been canceled.", MSG_LIN1 );
@@ -2499,7 +2543,7 @@ void doselfdest(int snum)
 	    {
 	      c_putmsg( "Press ESCAPE to abort self destruct.", MSG_LIN1 );
 	      cdbeep();
-	      cdrefresh( TRUE );
+	      cdrefresh();
 	    }
 	}
       aston();			/* enable asts so the display will work */
@@ -2509,14 +2553,16 @@ void doselfdest(int snum)
   cmsgok = FALSE;			/* turn off messages */
   
   if ( *dstatus == DS_LIVE )
-    if ( dist(sx[csnum], sy[csnum], *dx, *dy) <= DOOMSDAY_KILL_DIST )
-      {
-	*dstatus = DS_OFF;
-	stormsg( MSG_DOOM, MSG_ALL, "AIEEEEEEEE!" );
-	killship( csnum, KB_GOTDOOMSDAY );
-      }
-    else
-      killship( csnum, KB_SELF );
+    {
+      if ( dist(sx[csnum], sy[csnum], *dx, *dy) <= DOOMSDAY_KILL_DIST )
+	{
+	  *dstatus = DS_OFF;
+	  stormsg( MSG_DOOM, MSG_ALL, "AIEEEEEEEE!" );
+	  killship( csnum, KB_GOTDOOMSDAY );
+	}
+      else
+	killship( csnum, KB_SELF );
+    }
   else
     killship( csnum, KB_SELF );
   
@@ -2525,7 +2571,7 @@ void doselfdest(int snum)
 }
 
 
-/*##  doshields - raise or lower shields */
+/*  doshields - raise or lower shields */
 /*  SYNOPSIS */
 /*    int snum */
 /*    int up */
@@ -2548,7 +2594,7 @@ void doshields( int snum, int up )
 }
 
 
-/*##  doteamlist - display the team list for a ship */
+/*  doteamlist - display the team list for a ship */
 /*  SYNOPSIS */
 /*    int team */
 /*    doteamlist( team ) */
@@ -2561,7 +2607,7 @@ void doteamlist( int team )
     {
       teamlist( team );
       putpmt( "--- press space when done ---", MSG_LIN2 );
-      cdrefresh( TRUE );
+      cdrefresh();
       if ( iogtimed( &ch, 1 ) )
 	break;
     }
@@ -2570,7 +2616,7 @@ void doteamlist( int team )
 }
 
 
-/*##  dotorp - launch single torpedoes */
+/*  dotorp - launch single torpedoes */
 /*  SYNOPSIS */
 /*    int snum */
 /*    dotorp( snum ) */
@@ -2598,7 +2644,7 @@ void dotorp( int snum )
     }
   if ( gettarget( "Launch torpedo: ", MSG_LIN1, 1, &dir, slastblast[snum] ) )
     {
-      if ( ! launch( snum, dir, 1 ) )
+      if ( ! launch( snum, dir, 1, LAUNCH_NORMAL ) )
 	c_putmsg( ">TUBES EMPTY<", MSG_LIN2 );
       else
 	cdclrl( MSG_LIN1, 1 );
@@ -2613,7 +2659,7 @@ void dotorp( int snum )
 }
 
 
-/*##  dotow - attempt to tow another ship (DOES LOCKING) */
+/*  dotow - attempt to tow another ship (DOES LOCKING) */
 /*  SYNOPSIS */
 /*    int snum */
 /*    dotow( snum ) */
@@ -2621,7 +2667,6 @@ void dotow( int snum )
 {
   char ch;
   int i, other;
-  int l, warsome;
   
   cdclrl( MSG_LIN1, 2 );
   if ( stowedby[snum] != 0 )
@@ -2638,13 +2683,14 @@ void dotow( int snum )
       appchr( '.', cbuf );
       return;
     }
-  ch = cdgetx( "Tow which ship? ", MSG_LIN1, 1, TERMS, cbuf, MSGMAXLINE );
+  cbuf[0] = EOS;
+  ch = (char)cdgetx( "Tow which ship? ", MSG_LIN1, 1, TERMS, cbuf, MSGMAXLINE );
   cdclrl( MSG_LIN1, 1 );
   if ( ch == TERM_ABORT )
     return;
   
   i = 0;
-  l = safectoi( &other, cbuf, i );		/* ignore status */
+  safectoi( &other, cbuf, i );		/* ignore status */
   cbuf[0] = EOS;
   
   PVLOCK(lockword);
@@ -2658,12 +2704,11 @@ void dotow( int snum )
     c_strcpy( "That ship is out of tractor range.", cbuf );
   else if ( swarp[other] < 0.0 )
     c_strcpy( "You can't tow a ship out of orbit.", cbuf );
-  else if ( sqrt( powf(( (real) (sdx[snum] - sdx[other]) ), (real) 2) +
-		 powf( (real) ( sdx[snum] - sdx[other] ), 
-		      (real) 2 ) / ( MM_PER_SEC_PER_WARP *
-				     ITER_SECONDS )) > MAX_TRACTOR_WARP ) 
-    sprintf( cbuf, "That ships relative velocity is higher than %f.",
-	   MAX_TRACTOR_WARP );
+  else if ( sqrt( pow(( (real) (sdx[snum] - sdx[other]) ), (real) 2.0) +
+		  pow( (real) ( sdy[snum] - sdy[other] ), (real) 2.0 ) ) / 
+	    ( MM_PER_SEC_PER_WARP * ITER_SECONDS ) > MAX_TRACTOR_WARP ) 
+    sprintf( cbuf, "That ships relative velocity is higher than %2.1f.",
+	     MAX_TRACTOR_WARP );
   else if ( stowing[other] != 0 || stowedby[other] != 0 )
     c_strcpy(
 	     "There seems to be some interference with the tractor beams...",
@@ -2682,7 +2727,7 @@ void dotow( int snum )
 }
 
 
-/*##  dountow - release a tow (DOES LOCKING) */
+/*  dountow - release a tow (DOES LOCKING) */
 /*  SYNOPSIS */
 /*    int snum */
 /*    dountow( snum ) */
@@ -2709,7 +2754,7 @@ void dountow( int snum )
 	      astoff();
 	    }
 	}
-      if ( warsome && ( rnd( 0 ) > BREAKAWAY_PROB ) )
+      if ( warsome && ( rnd() > BREAKAWAY_PROB ) )
 	c_putmsg( "Attempt to break free failed.", MSG_LIN1 );
       else
 	{
@@ -2741,7 +2786,9 @@ void dountow( int snum )
 	{
 	  /* Set other ship coasting. */
 	  shead[stowing[snum]] = shead[snum];
-	  swarp[stowing[snum]] = swarp[snum];
+				/* only set warp if valid JET - 9/15/97 */
+	  if (swarp[snum] >= 0.0)
+	    swarp[stowing[snum]] = swarp[snum];
 	  
 	  /* Release the tow. */
 	  if ( stowedby[stowing[snum]] != 0 )
@@ -2760,7 +2807,7 @@ void dountow( int snum )
 }
 
 
-/*##  dowar - declare war or peace */
+/*  dowar - declare war or peace */
 /*  SYNOPSIS */
 /*    int snum */
 /*    dowar( snum ) */
@@ -2789,21 +2836,21 @@ void dowar( int snum )
 	    if ( srwar[snum][i] )
 	      ch = chrteams[i];
 	    else
-	      ch = clower(chrteams[i]);
+	      ch = (char)tolower(chrteams[i]);
 	    cdput( ch, MSG_LIN1, WOffset + (i*2) );
 	  }
 	else
 	  {
-	    cdput( clower(chrteams[i]), MSG_LIN1, POffset + (i*2) );
+	    cdput( (char)tolower(chrteams[i]), MSG_LIN1, POffset + (i*2) );
 	    cdput( ' ', MSG_LIN1, WOffset+(i*2) );
 	  }
-      cdrefresh( TRUE );
+      cdrefresh();
       if ( iogtimed( &ch, 1 ) == FALSE )
 	{
 	  continue; /* next; */
 	}
       
-      ch = clower( ch );
+      ch = (char)tolower( ch );
       if ( ch == TERM_ABORT )
 	break;
       if ( ch == TERM_EXTRA )
@@ -2825,7 +2872,7 @@ void dowar( int snum )
 	      c_putmsg(
 		       "Reprogramming the battle computer, please stand by...",
 		       MSG_LIN2 );
-	      cdrefresh( TRUE );
+	      cdrefresh();
 	      grand( &entertime );
 	      while ( dgrand( entertime, &now ) < REARM_GRAND )
 		{
@@ -2835,7 +2882,7 @@ void dowar( int snum )
 		  
 		  /* Sleep (and enable asts so the display will work). */
 		  aston();
-		  c_sleep( ITER_SECONDS );
+ 		  c_sleep( ITER_SECONDS );
 		  astoff();
 		}
 	    }
@@ -2843,7 +2890,7 @@ void dowar( int snum )
 	}
       
       for ( i = 0; i < NUMTEAMS; i = i + 1 )
-	if ( ch == clower( chrteams[i] ) )
+	if ( ch == (char)tolower( chrteams[i] ) )
 	  {
 	    if ( ! tuwar[i] || ! srwar[snum][i] )
 	      {
@@ -2865,7 +2912,7 @@ void dowar( int snum )
 }
 
 
-/*##  dowarp - set warp factor */
+/*  dowarp - set warp factor */
 /*  SYNOPSIS */
 /*    int snum */
 /*    real warp */
@@ -2924,7 +2971,7 @@ void dowarp( int snum, real warp )
 }
 
 
-/*##  getoption - decode char into option */
+/*  getoption - decode char into option */
 /*  SYNOPSIS */
 /*    int flag, getoption */
 /*    char ch */
@@ -2964,32 +3011,37 @@ int getoption( char ch, int *tok )
 }
 
 
-/*##  gretds - block letter "greetings..." */
+/*  gretds - block letter "greetings..." */
 /*  SYNOPSIS */
 /*    gretds */
 void gretds()
 {
   
-  int col;
+  int col,lin;
   string g1=" GGG   RRRR   EEEEE  EEEEE  TTTTT   III   N   N   GGG    SSSS";
   string g2="G   G  R   R  E      E        T      I    NN  N  G   G  S";
   string g3="G      RRRR   EEE    EEE      T      I    N N N  G       SSS";
   string g4="G  GG  R  R   E      E        T      I    N  NN  G  GG      S  ..  ..  ..";
   string g5=" GGG   R   R  EEEEE  EEEEE    T     III   N   N   GGG   SSSS   ..  ..  ..";
   
-  col = (cmaxcol-strlen(g5)) / 2;
-  cdputs( g1, 1, col );
-  cdputs( g2, 2, col );
-  cdputs( g3, 3, col );
-  cdputs( g4, 4, col );
-  cdputs( g5, 5, col );
+  col = (int)(cmaxcol-strlen(g5)) / (int)2;
+  lin = 1;
+  cprintf( lin,col,ALIGN_NONE,"#%d#%s", InfoColor, g1);
+  lin++;
+  cprintf( lin,col,ALIGN_NONE,"#%d#%s", InfoColor, g2);
+  lin++;
+  cprintf( lin,col,ALIGN_NONE,"#%d#%s", InfoColor, g3);
+  lin++;
+  cprintf( lin,col,ALIGN_NONE,"#%d#%s", InfoColor, g4);
+  lin++;
+  cprintf( lin,col,ALIGN_NONE,"#%d#%s", InfoColor, g5);
   
   return;
   
 }
 
 
-/*##  menu - main user menu (DOES LOCKING) */
+/*  menu - main user menu (DOES LOCKING) */
 /*  SYNOPSIS */
 /*    menu */
 void menu(void)
@@ -2999,6 +3051,15 @@ void menu(void)
   int ch;
   int lose, oclosed, switchteams, multiple, redraw;
   int playrv;
+  char *if1="Suddenly  a  sinister,  wraithlike  figure appears before you";
+  char *if2="seeming to float in the air.  In a low,  sorrowful  voice  he";
+  char *if3="says, \"Alas, the very nature of the universe has changed, and";
+  char *if4="your ship cannot be found.  All must now pass away.\"  Raising";
+  char *if5="his  oaken  staff  in  farewell,  he fades into the spreading";
+  char *if6="darkness.  In his place appears a  tastefully  lettered  sign";
+  char *if7="reading:";
+  char *if8="INITIALIZATION FAILURE";
+  char *if9="The darkness becomes all encompassing, and your vision fails.";
   
   EnableSignalHandler();	/* enable trapping of interesting signals */
   
@@ -3058,40 +3119,26 @@ void menu(void)
 	  col = 11;
 	  cdclear();;
 	  cdredo();;
-	  cdputs(
-		 "Suddenly  a  sinister,  wraithlike  figure appears before you",
-		 lin, col );
-	  lin = lin + 1;
-	  cdputs(
-		 "seeming to float in the air.  In a low,  sorrowful  voice  he",
-		 lin, col );
-	  lin = lin + 1;
-	  cdputs(
-		 "says, \"Alas, the very nature of the universe has changed, and",
-		 lin, col );
-	  lin = lin + 1;
-	  cdputs(
-		 "your ship cannot be found.  All must now pass away.\"  Raising",
-		 lin, col );
-	  lin = lin + 1;
-	  cdputs(
-		 "his  oaken  staff  in  farewell,  he fades into the spreading",
-		 lin, col );
-	  lin = lin + 1;
-	  cdputs(
-		 "darkness.  In his place appears a  tastefully  lettered  sign",
-		 lin, col );
-	  lin = lin + 1;
-	  cdputs( "reading:", lin, col );
-	  lin = lin + 2;
-	  cdputc( "INITIALIZATION FAILURE", lin );
-	  lin = lin + 2;
-	  cdputs(
-		 "The darkness becomes all encompassing, and your vision fails.",
-		 lin, col );
+	  cprintf( lin,col,ALIGN_NONE,"#%d#%s", RedLevelColor, if1);
+	  lin++;
+	  cprintf( lin,col,ALIGN_NONE,"#%d#%s", RedLevelColor, if2);
+	  lin++;
+	  cprintf( lin,col,ALIGN_NONE,"#%d#%s", RedLevelColor, if3);
+	  lin++;
+	  cprintf( lin,col,ALIGN_NONE,"#%d#%s", RedLevelColor, if4);
+	  lin++;
+	  cprintf( lin,col,ALIGN_NONE,"#%d#%s", RedLevelColor, if5);
+	  lin++;
+	  cprintf( lin,col,ALIGN_NONE,"#%d#%s", RedLevelColor, if6);
+	  lin++;
+	  cprintf( lin,col,ALIGN_NONE,"#%d#%s", RedLevelColor, if7);
+	  lin+=2;
+	  cprintf( lin,col,ALIGN_NONE,"#%d#%s", RedLevelColor | A_BLINK, if8);
+	  lin+=2;
+	  cprintf( lin,col,ALIGN_NONE,"#%d#%s", RedLevelColor, if9);
 	  ioeat();
 	  cdmove( 1, 1 );
-	  cdrefresh( FALSE );
+	  cdrefresh();
 	  return;
 	}
       
@@ -3101,14 +3148,6 @@ void menu(void)
 	  multiple = ! multiple;
 	  redraw = TRUE;
 	}
-      
-      /*JET - 	if ( switchteams != ( uooption[cunum][OOPT_SWITCHTEAMS] ||
-	ustats[cunum][USTAT_ENTRIES] <= 0 ) )
-	{
-	switchteams = ! switchteams;
-	redraw = TRUE;
-	}
-	*/
       
       if ( switchteams != uooption[cunum][OOPT_SWITCHTEAMS])
 	{
@@ -3129,12 +3168,15 @@ void menu(void)
 	cdclrl( MSG_LIN1, 2 );
       
       userline( -1, -1, cbuf, FALSE, TRUE );
+      attrset(LabelColor);
       cdputs( cbuf, MSG_LIN1, 1 );
-      userline( cunum, csnum, cbuf, FALSE, TRUE );
+      userline( cunum, 0, cbuf, FALSE, TRUE );
+      attrset(A_BOLD);
       cdputs( cbuf, MSG_LIN2, 1 );
+      attrset(0);
       
       cdmove( 1, 1 );
-      cdrefresh( TRUE );
+      cdrefresh();
       
       /* Try to kill the driver if we started one the last time */
       /*  we played and we've been in the menu long enough. */
@@ -3211,8 +3253,8 @@ void menu(void)
 	      else
 		{
 		  cdclrl( MSG_LIN1, 2 );
-		  cdrefresh( FALSE );
-		  if ( confirm( 0 ) )
+		  cdrefresh();
+		  if ( confirm() )
 		    {
 		      resign( cunum );
 		      break;
@@ -3232,7 +3274,7 @@ void menu(void)
 	    }
 	  break;
 	case 'S':
-	  userstats( FALSE );
+	  userstats( FALSE, 0 ); /* we're never really neutral ;-) - dwp */
 	  redraw = TRUE;
 	  break;
 	case 'T':
@@ -3240,7 +3282,7 @@ void menu(void)
 	  redraw = TRUE;
 	  break;
 	case 'U':
-	  userlist( FALSE );
+	  userlist( FALSE, 0 );
 	  redraw = TRUE;
 	  break;
 	case 'W':
@@ -3252,11 +3294,11 @@ void menu(void)
 	  cleave = TRUE;	
 	  break;
 	case '/':
-	  playlist( FALSE, FALSE );
+	  playlist( FALSE, FALSE, 0 );
 	  redraw = TRUE;
 	  break;
 	case '?':
-	  doplanlist( csnum );
+	  doplanlist( 0 );
 	  redraw = TRUE;
 	  break;
 	case '\014':	/* ^L */
@@ -3289,18 +3331,23 @@ void menu(void)
 }
 
 
-/*##  newship - create a new ship for a user (DOES LOCKING) */
+/*  newship - create a new ship for a user (DOES LOCKING) */
 /*  SYNOPSIS */
 /*    int status, newship, unum, snum */
 /*    int flag, newship */
 /*    flag = newship( unum, snum ) */
 int newship( int unum, int *snum )
 {
-  int i, j, system; 
+  int i, j, k, l, system; 
   int fresh;
+  int selectnum;
   int vec[MAXSHIPS];
   char cbuf[MSGMAXLINE];
+  char cbuf2[MSGMAXLINE];
+  char selectship[MSGMAXLINE];
+  int availlist[MAXSHIPS], numavail;
   int numvec = 0;
+  int ch;
 
   PVLOCK(lockword);
   
@@ -3333,28 +3380,31 @@ int newship( int unum, int *snum )
 	  i = MSG_LIN2/2;
 	  j = 9;
 
-	  if (kill(spid[vec[0]], 0) == -1)
-	    {
+	  if (CheckPid(spid[vec[0]]) == FALSE)
+	    {			/* it's available */
+	      attrset(InfoColor);
 	      cdputs( "You're already playing on another ship." , i, j );
+	      cbuf[0] = EOS;
 	      if ( cdgetx( "Press TAB to reincarnate to this ship: ",
 			   i + 1, j, TERMS, cbuf, MSGMAXLINE ) != TERM_EXTRA )
 		{
 		  sstatus[*snum] = SS_RESERVED;
-		  
+		  attrset(0);
 		  return ( FALSE );
 		}
+		  attrset(0);
 	    }
 	  else
 	    {
 	      sprintf(cbuf, "You're already playing on another ship (pid=%d).",
 		      spid[vec[0]]);
-	      cdputs( cbuf , i, j );
+	      cprintf(i,j,ALIGN_NONE,"#%d#%s",InfoColor, cbuf);
 	      
 	      sstatus[*snum] = SS_RESERVED;
 	      putpmt( "--- press any key ---", MSG_LIN2 );
 
-	      cdrefresh(TRUE);
-	      iogchar(0);
+	      cdrefresh();
+	      iogchar();
 	      return ( FALSE );
 	    }
 
@@ -3375,30 +3425,181 @@ int newship( int unum, int *snum )
 	}
     }
   else
-    {
-      /* Is a multiple. */
-      if ( j >= umultiple[unum] )
+    {				/* a multiple, so see what's available */
+      cdclear();
+      cdrefresh();
+
+      while (TRUE)
 	{
-	  /* Flying too many ships */
-	  sstatus[*snum] = SS_RESERVED;
-	  cdclear();
-	  cdredo();
-	  i = MSG_LIN2/2;
-	  cdputc(
-		 "I'm sorry, but your playing on too many ships right now.", i );
-	  i = i + 1;
-	  c_strcpy( "You are only allowed to fly ", cbuf );
-	  j = umultiple[unum];
-	  appint( j, cbuf );
-	  appstr( " ship", cbuf );
-	  if ( j != 1 )
-	    appchr( 's', cbuf );
-	  appstr( " at one time.", cbuf );
-	  cdputc( cbuf, i );
-	  cdrefresh( FALSE );
-	  c_sleep( 2.0 );
-	  return ( FALSE );
-	}
+
+	  cdclra(0, 0, MSG_LIN1 + 2, cdcols() - 1);
+
+	  PVLOCK(lockword);
+	  
+	  /* Count number of his ships flying. */
+	  j = 0;
+	  numvec = 0;
+	  for ( i = 1; i <= MAXSHIPS; i = i + 1 )
+	    if ( sstatus[i] == SS_LIVE || sstatus[i] == SS_ENTERING )
+	      if ( suser[i] == unum && *snum != i )
+		{
+		  j++;
+		  vec[numvec++] = i;
+		}
+	  
+	  PVUNLOCK(lockword);
+
+	  numavail = 0;
+	  for (k=0; k < numvec; k++)
+	    {
+	      if (CheckPid(spid[vec[k]]) == FALSE)
+		{
+		  /* no pid, so available */
+		  availlist[numavail++] = k;
+		}
+	    }
+
+	  /* Is a multiple, max ships already in and no ships to
+	     reincarnate too */
+	  if ( j >= umultiple[unum] && numavail == 0)
+	    {
+	      sstatus[*snum] = SS_RESERVED;
+	      cdclear();
+	      cdredo();
+	      i = MSG_LIN2/2;
+	      cdputc(
+		     "I'm sorry, but your playing on too many ships right now.", i );
+	      i = i + 1;
+	      c_strcpy( "You are only allowed to fly ", cbuf );
+	      j = umultiple[unum];
+	      appint( j, cbuf );
+	      appstr( " ship", cbuf );
+	      if ( j != 1 )
+		appchr( 's', cbuf );
+	      appstr( " at one time.", cbuf );
+	      cdputc( cbuf, i );
+	      cdrefresh();
+	      c_sleep( 2.0 );
+	      sstatus[*snum] = SS_RESERVED;
+
+	      return ( FALSE );
+	    }
+	  
+	  
+	  if (numavail > 0)
+	    {
+	      /* we need to display a menu allowing the user to reincarnate
+		 to an existing (but vacant) ship, or if he/she has slots
+		 left, enter a new ship.
+		 */
+	      
+	      
+	      i = 3;
+	      
+	      cprintf(i++, 0, ALIGN_CENTER, 
+		      "#%d#The following ship(s) are available for you to reincarnate to.", 
+		      InfoColor);
+	      
+	      cbuf[0] = '\0';
+	      for (k=0; k < numavail; k++)
+		{
+		  sprintf(cbuf2, "%d ", vec[availlist[k]]);
+		  strcat(cbuf, cbuf2);
+		}
+
+	      if (j < umultiple[unum])
+		{
+		  cprintf(MSG_LIN1, 0, ALIGN_LEFT, 
+			  "#%d#Enter a ship number, or press [TAB] to create a new one.",
+			  NoColor);
+
+                  cprintf(MSG_LIN2, 0, ALIGN_LEFT,
+                          "#%d#[RETURN] to quit.",
+                          NoColor);
+		}
+	      else
+		cprintf(MSG_LIN1, 0, ALIGN_LEFT,
+			"#%d#Enter a ship number to reincarnate to.",
+			NoColor);
+
+	      /* Now list the ships */
+
+	      i++; i++;
+	      cprintf(i++, 0, ALIGN_CENTER,
+		      "#%d#Ship Number: #%d#%s",
+		      NoColor | A_BOLD,
+		      GreenLevelColor,
+		      cbuf);
+
+	      cdmove(0, 0);
+	      cdrefresh();
+
+	      if (iogtimed(&ch, 1))
+		{
+		  iBufPutc(ch);	/* stuff the char back in */
+		  selectship[0] = EOS;
+		  l = cdgetx("Ship Number: ", i, 1, TERMS, selectship, MSGMAXLINE / 2);
+
+		  if (l == TERM_EXTRA || l == TERM_NORMAL)
+		    {
+		      if (strlen(selectship))
+			{
+			  selectnum = atoi(selectship);
+			  if (selectnum != 0 && selectnum <= MAXSHIPS)
+			    { /* See if it's valid */
+			      int found = FALSE;
+			      
+			      for (k=0; k < numavail && found == FALSE ; k++)
+				{
+				  if (vec[availlist[k]] == selectnum)
+				    found = TRUE;
+				}
+			      if (found  == TRUE)
+				{
+				  PVLOCK(lockword);
+				  sstatus[*snum] = SS_OFF;
+				  *snum = selectnum;
+				  fresh = FALSE;
+				  spid[*snum] = cpid;
+				  sstatus[*snum] = SS_ENTERING;
+				  PVUNLOCK(lockword);
+				  break;
+				}
+			    }
+			}
+		      else  /* if strlen(selectship) */ 
+			{ 
+				/* if selectship was empty and term =
+				   TERM_NORMAL, quit */
+			  if (l == TERM_NORMAL)
+			    {
+			      sstatus[*snum] = SS_RESERVED;
+			      
+			      return(FALSE);
+			    }
+			  
+			  
+			  if ( j < umultiple[unum])
+			    {
+			      fresh = TRUE;
+			      break;
+			    }
+			  else
+			    {
+			      cdbeep();
+			    }
+			}
+		    }
+		}
+	    }
+	  else
+	    {			/* nothing available */
+	      fresh = TRUE;
+	      break;
+	    }
+
+	} /* back to the top... */
+	      
     }
   
   /* Figure out which system to enter. */
@@ -3460,13 +3661,13 @@ int newship( int unum, int *snum )
 }
 
 
-/*##  play - play the game */
+/*  play - play the game */
 /*  SYNOPSIS */
 /*    play */
 int play()
 {
   int laststat, now;
-  int ch, i, rv;
+  int ch, rv;
   char msgbuf[128];
   
   /* Can't carry on without a vessel. */
@@ -3483,7 +3684,7 @@ int play()
   cdclear();				/* clear the display */
   cdredo();					/*  (quickly) */
   stoptimer();
-  display( csnum );			/* update the screen manually */
+  display( csnum, FALSE );			/* update the screen manually */
   gsecs( &laststat );			/* initialize stat timer */
   astoff();					/* disable before setting timer */
   settimer();				/* setup for next second */
@@ -3492,9 +3693,9 @@ int play()
   /* Tell everybody, we're here */
 
   sprintf(msgbuf, "%c%d (%s) has entered the game.",
-	  chrteams[uteam[suser[csnum]]],
+	  chrteams[steam[csnum]],
 	  csnum,
-	  upname[suser[csnum]]);
+	  spname[csnum]);
   
   stormsg(MSG_COMP, MSG_ALL, msgbuf);
   
@@ -3512,7 +3713,7 @@ int play()
 	    cmsgok = FALSE;	/* off if we  have no msg line */
 	  
 #ifdef ENABLE_MACROS
-	  if ((i = DoMacro(ch)) == TRUE)
+	  if (DoMacro(ch) == TRUE)
 	    {
 	      while (iBufEmpty() == FALSE)
 		{
@@ -3528,7 +3729,7 @@ int play()
 	  
 	  grand( &cmsgrand );
 	  cmsgok = TRUE;
-	  cdrefresh( TRUE );
+	  cdrefresh();
 	}
       
       /* See if it's time to update the statistics. */
@@ -3549,26 +3750,30 @@ int play()
   
   dead( csnum, cleave );
   
-  return;
+  return(TRUE);
   
 }
 
 
-/*##  welcome - entry routine */
+/*  welcome - entry routine */
 /*  SYNOPSIS */
 /*    int flag, welcome */
 /*    int unum */
 /*    flag = welcome( unum ) */
 int welcome( int *unum )
 {
-  int i, team; 
+  int i, team, col; 
   char name[MAXUSERNAME];
   
   string sorry1="I'm sorry, but the game is closed for repairs right now.";
   string sorry2="I'm sorry, but there is no room for a new player right now.";
   string sorry3="I'm sorry, but you are not allowed to play right now.";
   string sorryn="Please try again some other time.  Thank you.";
+  char * selected_str="You have been selected to command a";
+  char * starship_str=" starship.";
+  char * prepare_str="Prepare to be beamed aboard...";
   
+  col=0;
   glname( name );
   if ( ! gunum( unum, name ) )
     {
@@ -3578,10 +3783,10 @@ int welcome( int *unum )
       if ( *closed )
 	{
 	  /* Can't enroll if the game is closed. */
-	  cdputc( sorry1, MSG_LIN2/2 );
-	  cdputc( sorryn, MSG_LIN2/2+1 );
+      cprintf(MSG_LIN2/2,col,ALIGN_CENTER,"#%d#%s", InfoColor, sorry1 );
+      cprintf(MSG_LIN2/2+1,col,ALIGN_CENTER,"#%d#%s", InfoColor, sorryn );
 	  cdmove( 1, 1 );
-	  cdrefresh( FALSE );
+	  cdrefresh();
 	  c_sleep( 2.0 );
 	  return ( FALSE );
 	}
@@ -3591,27 +3796,29 @@ int welcome( int *unum )
       appchr( ' ', cbuf );
       i = strlen( cbuf );
       appstr( name, cbuf );
-      cbuf[i] = cupper( cbuf[i] );
+      cbuf[i] = (char)toupper( cbuf[i] );
       if ( ! c_register( name, cbuf, team, unum ) )
 	{
-	  cdputc( sorry2, MSG_LIN2/2 );
-	  cdputc( sorryn, MSG_LIN2/2+1 );
+      cprintf(MSG_LIN2/2,col,ALIGN_CENTER,"#%d#%s", InfoColor, sorry2 );
+      cprintf(MSG_LIN2/2+1,col,ALIGN_CENTER,"#%d#%s", InfoColor, sorryn );
 	  cdmove( 1, 1 );
-	  cdrefresh( FALSE );
+	  cdrefresh();
 	  c_sleep( 2.0 );
 	  return ( FALSE );
 	}
       gretds();
-      c_strcpy( "You have been selected to command a", cbuf );
       if ( vowel( tname[team][0] ) )
-	appchr( 'n', cbuf );
-      appchr( ' ', cbuf );
-      appstr( tname[team], cbuf );
-      appstr( " starship.", cbuf );
-      cdputc( cbuf, MSG_LIN2/2 );
-      cdputc( "Prepare to be beamed aboard...", MSG_LIN2/2+1 );
+      	cprintf(MSG_LIN2/2,0,ALIGN_CENTER,"#%d#%s%c #%d#%s #%d#%s",
+			InfoColor,selected_str,'n',A_BOLD,tname[team],
+			InfoColor,starship_str);
+	  else
+      	cprintf(MSG_LIN2/2,0,ALIGN_CENTER,"#%d#%s #%d#%s #%d#%s",
+			InfoColor,selected_str,A_BOLD,tname[team],
+			InfoColor,starship_str);
+      cprintf(MSG_LIN2/2+1,0,ALIGN_CENTER,"#%d#%s",
+		InfoColor, prepare_str );
       cdmove( 1, 1 );
-      cdrefresh( FALSE );
+      cdrefresh();
       c_sleep( 3.0 );
     }
   
@@ -3620,10 +3827,10 @@ int welcome( int *unum )
     {
       cdclear();
       cdredo();
-      cdputc( sorry1, MSG_LIN2/2 );
-      cdputc( sorryn, MSG_LIN2/2+1 );
+      cprintf(MSG_LIN2/2,col,ALIGN_CENTER,"#%d#%s", InfoColor, sorry1 );
+      cprintf(MSG_LIN2/2+1,col,ALIGN_CENTER,"#%d#%s", InfoColor, sorryn );
       cdmove( 1, 1 );
-      cdrefresh( FALSE );
+      cdrefresh();
       c_sleep( 2.0 );
       return ( FALSE );
     }
@@ -3636,7 +3843,7 @@ int welcome( int *unum )
       cdputc( sorry3, MSG_LIN2/2 );
       cdputc( sorryn, MSG_LIN2/2+1 );
       cdmove( 1, 1 );
-      cdrefresh( FALSE );
+      cdrefresh();
       c_sleep( 2.0 );
       return ( FALSE );
     }
@@ -3650,7 +3857,7 @@ int welcome( int *unum )
 	     MSG_LIN2/2 );
       cdputc( sorryn, MSG_LIN2/2+1 );
       cdmove( 1, 1 );
-      cdrefresh( FALSE );
+      cdrefresh();
       c_sleep( 2.0 );
       return ( FALSE );
     }

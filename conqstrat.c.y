@@ -96,7 +96,7 @@ expr		:	TOK_VARIABLE TOK_OPERATOR TOK_NUMBER
 
 %%
 
-/*## conqstrat - main program */
+/* conqstrat - main program */
 main(int argc, char **argv)
 {
   int i;
@@ -153,7 +153,7 @@ main(int argc, char **argv)
 	  
   initrun();
 
-  if ( yyparse( i ) == ERR )
+  if ( yyparse() == ERR )
     fprintf(stderr, "conqstrat: yyparse() error.\n" );
   if ( goterror )
     {
@@ -174,7 +174,7 @@ main(int argc, char **argv)
 }
 
 
-/*## initrun - initalize for the run */
+/* initrun - initalize for the run */
 void initrun(void)
 {
 
@@ -199,7 +199,7 @@ void initrun(void)
 }
 
 
-/*## dumprun - dump the run into the common block */
+/* dumprun - dump the run into the common block */
 void dumprun(void)
 {
 
@@ -224,15 +224,15 @@ void dumprun(void)
   for ( i = 0; i < 32; i = i + 1 )
     rvec[i] = trvec[i];
 
-  fprintf(stderr, "dumprun(): parsed %d rules.\n", rulenum);
-  fprintf(stderr, "dumprun(): copied generated strategy tables into the common block.\n");
+  fprintf(stderr, "conqstrat: parsed %d rules.\n", rulenum);
+  fprintf(stderr, "conqstrat: common block updated.\n");
 
   return;
 
 }
 
 
-/*## displayrun - dump the run to filefd */
+/* displayrun - dump the run to filefd */
 void displayrun(FILE *filefd)
 {
     int i, j;
@@ -280,13 +280,15 @@ void displayrun(FILE *filefd)
 	  fprintf(filefd,  "\n\t" );
       }
     fprintf(filefd, "};\n\n#undef CDHEXTERN /* cleanup */\n\n#endif\n\n");
+
+    fprintf(stderr, "conqstrat: parsed %d rules.\n", rulenum);
     
     return;
 
 }
 
 
-/*## dumprule - dump the current rule */
+/* dumprule - dump the current rule */
 void dumprule( int action )
 {
   int i, j, tbits;
@@ -328,7 +330,7 @@ void dumprule( int action )
 }
 
 
-/*## addrule - add info to the current rule */
+/* addrule - add info to the current rule */
 void addrule( int var, int op, int num )
 {
   int i, rulebits;
@@ -407,7 +409,7 @@ void addrule( int var, int op, int num )
 }
 
 
-/*## invertop - invert an operator */
+/* invertop - invert an operator */
 int invertop( int op )
 {
   int iop;
@@ -435,7 +437,7 @@ int invertop( int op )
 }
 
 
-/*## valstr - convert a var/op value to a string */
+/* valstr - convert a var/op value to a string */
 void valstr( int value, char *buf )
 {
   switch ( value )
@@ -526,7 +528,7 @@ void valstr( int value, char *buf )
 
 }
 
-/*## tokstr - convert a token to a string */
+/* tokstr - convert a token to a string */
 void tokstr( int token, char *buf )
 {
   switch ( token )

@@ -11,7 +11,7 @@
 /* by Jon Trulson <jon@radscan.com> under the same terms and          */
 /* conditions of the original copyright by Jef Poskanzer and Craig    */
 /* Leres.                                                             */
-/* Have Phun!                                                         */
+/*                                                                    */
 /**********************************************************************/
 
 #include "defs.h"
@@ -25,7 +25,6 @@
 #define CEXTERN extern 
 #endif
 
-CEXTERN    int HAS_COLORS;	/* TRUE or FALSE if term has color cap. */
 CEXTERN	   int PollInputfd;	/* a copy of stdin's fd for poll()/select() */
 CEXTERN    int ConquestGID;	/* Conquest's GID */
 CEXTERN    int ConquestUID;     /* Conquest's UID */
@@ -81,9 +80,15 @@ CEXTERN char conf_MacrosF[MAX_MACROS][MAX_MACRO_LEN];
 				/* attribute initialization.
 				   initialized in cdinit() */
 CEXTERN int RedLevelColor, YellowLevelColor, GreenLevelColor;
-CEXTERN int LabelColor, InfoColor;
+CEXTERN int LabelColor, InfoColor, SpecialColor;
 
+/* cprintf align values */
+#define ALIGN_CENTER 3
+#define ALIGN_LEFT   2
+#define ALIGN_RIGHT  1
+#define ALIGN_NONE   0
 
+CEXTERN int headerflag;         /* whether to show header flag */
 
 #undef CEXTERN			/* cleanup */
 #endif

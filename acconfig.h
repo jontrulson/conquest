@@ -45,6 +45,9 @@
 /* Define if you have <dirent.h>.  */
 #undef DIRENT
 
+/* Define if this is FreeBSD */
+#undef FREEBSD
+
 /* Define to the type of elements in the array set by `getgroups'.
    Usually this is either `int' or `gid_t'.  */
 #undef GETGROUPS_T
@@ -101,6 +104,12 @@
 /* Define if you have the strftime function.  */
 #undef HAVE_STRFTIME
 
+/* Define if you have <string.h> */
+undef HAVE_STRING_H
+
+/* Define if you have <strings.h> */
+undef HAVE_STRINGS_H
+
 /* Define if you have <sys/wait.h> that is POSIX.1 compatible.  */
 #undef HAVE_SYS_WAIT_H
 
@@ -134,6 +143,9 @@
 
 /* Define if int is 16 bits instead of 32.  */
 #undef INT_16_BITS
+
+/* Define if running on Linux */
+#undef LINUX
 
 /* Define if long int is 64 bits.  */
 #undef LONG_64_BITS
@@ -199,6 +211,9 @@
  */
 #undef STACK_DIRECTION
 
+/* Define if this is a SOLARIS system */
+#undef SOLARIS
+
 /* Define if the `S_IS*' macros in <sys/stat.h> do not work properly.  */
 #undef STAT_MACROS_BROKEN
 
@@ -210,6 +225,9 @@
 
 /* Define if you don't have <dirent.h>, but have <sys/dir.h>.  */
 #undef SYSDIR
+
+/* Define if sys_errlist[] is defined somewhere */
+#undef SYS_ERRLIST_DECLARED
 
 /* Define if you don't have <dirent.h>, but have <sys/ndir.h>.  */
 #undef SYSNDIR
@@ -249,17 +267,8 @@
 /* Define if lex declares yytext as a char * by default, not a char[].  */
 #undef YYTEXT_POINTER
 
-/* Define if sys_errlist[] is defined somewhere */
-#undef SYS_ERRLIST_DECLARED
-
-/* Define if running on Linux */
-#undef LINUX
-
 /* Define if running on UnixWare (SVR4.2[MP]) */
 #undef UNIXWARE
-
-/* Define if this is FreeBSD */
-#undef FREEBSD
 
 
 /* Leave that blank line there!!  Autoheader needs it.

@@ -1,5 +1,7 @@
-
+#include "c_defs.h"
 /************************************************************************
+ *
+ * I/O library routines
  *
  * $Id$
  *
@@ -10,31 +12,163 @@
 /* by Jon Trulson <jon@radscan.com> under the same terms and          */
 /* conditions of the original copyright by Jef Poskanzer and Craig    */
 /* Leres.                                                             */
-/* Have Phun!                                                         */
+/*                                                                    */
 /**********************************************************************/
 
-#include "c_defs.h"
 #include "global.h"
 
-/*                                I O N L B */
-/* Version Date Initials Remarks */
-/* ------- ---- -------- ------------------------------------------------------- */
-/*   08c  17Sep84  cal   Modified to not include "tslb". Renamed include from */
-/*                       "ionlb.c" to "ioncom". */
+/* iochav - test whether a char is available to be read or not */
+/* synopsis */
+/*    int avail, iochav */
+/*    avail = iochav() */
+/* note */
+/*    This routine does \not/ iopeek() because of speed considerations. */
+/*    The two routines are meant to virtually be copies of one another and */
+/*    should be modified in parallel. */
+int iochav( void )
+{
+#if defined(USE_SELECT)
+  static struct timeval timeout;
+  static struct fd_set readfds;
+#else  /* poll */
+  static struct pollfd Stdin_pfd;
+  static struct strbuf CtlMsg;
+  static struct strbuf DataMsg;
+  int flagsp;
+#endif
+  
+  int retval;
+  
+#ifdef ENABLE_MACROS
+  if (iBufEmpty() == FALSE)
+    {
+      return(TRUE);
+    }
+#endif
+  
+#if defined(USE_SELECT)	
+  
+  /* here, we'll just use select */
+  FD_ZERO(&readfds);
+  FD_SET(PollInputfd, &readfds);
+  
+  timeout.tv_sec = 0;		/* setting to zero should ret immediately */
+  timeout.tv_usec = 0;
+  
+  if ((retval = select(PollInputfd+1, &readfds, NULL, NULL, &timeout)) == -1)
+    {
+      clog("iochav(): select(): %s", sys_errlist[errno]);
+      return(FALSE);
+    }
+  
+  if (retval == 0)		/* nothing there */
+    {
+      return(FALSE);
+    }
+  else
+    {				/* something avail */
+      return(TRUE);
+    }
+  
+#else  /* use poll() */
+  
+  CtlMsg.maxlen = 0;
+  CtlMsg.buf = NULL;
+  DataMsg.maxlen = 0;
+  DataMsg.buf = NULL;
+  
+  flagsp = 0;
+  
+  Stdin_pfd.fd = PollInputfd;		/* stdin */
+  Stdin_pfd.events = (POLLIN | POLLRDNORM);
+  
+  if (poll(&Stdin_pfd, 1, 0) > 0) /* return immediately if a char avail */
+    {
+#ifdef DEBUG_IO
+      clog("ALTiochav(): had a char via poll");
+#endif
+      
+      if ((retval = getmsg(PollInputfd, &CtlMsg, &DataMsg, 
+			   &flagsp)) == -1)
+	{
+	  clog("iochav(): getmsg(): failed: %s", sys_errlist[errno]);
+	}
+      else
+	{
+#ifdef DEBUG_IO
+	  clog("iochav(): getmsg() = %d: DataMsg.len = %d CtlMsg.len = %d",
+	       retval,
+	       DataMsg.len,
+	       CtlMsg.len);
+#endif
+	  
+	  if (DataMsg.len <= 0 && retval > 0)
+	    {
+#ifdef DEBUG_IO
+              clog("iochav(): getmsg(): DataMsg.len <= 0 retval = %d - TRUE",
+		   DataMsg.len,
+		   retval);
+#endif
+	      
+	      return(TRUE);
+	    }
+	  
+	  if (DataMsg.len <= 0 && CtlMsg.len <= 0)
+	    {
+#ifdef DEBUG_IO
+	      clog("iochav(): getmsg(): DataMsg.len & CtlMsg.len <= 0 ret FALSE");
+#endif
+	      return(FALSE);
+	    }
+	  else
+	    {
+#ifdef DEBUG_IO
+	      clog("iochav(): getmsg(): DataMsg.len | CtlMsg.len > 0 ret TRUE");
+#endif
+	      return(TRUE);
+	    }
+	}
+    }
+  else 
+    {
+#ifdef DEBUG_IO
+      clog("ALTiochav(): NO char via poll");
+#endif
+      return(FALSE);
+    }
+  
+#endif /* !USE_SELECT */
 
-/*##  iogchar - get a character */
+}
+  
+/*  ioeat - swallow any input that has come so far */
+/* synopsis */
+/*    ioeat */
+/* description */
+/*    This routines flushes the type ahead buffer. That is, it reads any */
+/*    characters that are available, but no more. */
+void ioeat(void)
+{
+  while ( iochav() )
+    iogchar();
+  
+  return;
+  
+}
+
+/*  iogchar - get a character */
 /*  SYNOPSIS */
 /*    char ch, iogchar */
 /*    ch = iogchar ( ch ) */
 
-int iogchar ( int dummy )
+int iogchar ( void )
 {
   static unsigned int thechar;
   
   /* This is a good place to flush the output buffer and to */
   /*  check for terminal broadcasts. */
   
-  cdrefresh(TRUE);
+  cdrefresh();
   
   timeout(-1);			/* wait for a while */
   
@@ -62,7 +196,7 @@ int iogchar ( int dummy )
 }
 
 
-/*##  iogtimed - get a char with timeout */
+/*  iogtimed - get a char with timeout */
 /*  SYNOPSIS */
 /*    int *ch */
 /*    int seconds */
@@ -80,7 +214,7 @@ int iogtimed ( int *ch, int seconds )
   
   /* This is a good place to flush the output buffer. */
   
-  cdrefresh(TRUE);
+  cdrefresh();
   
 #ifdef ENABLE_MACROS
   if (iBufEmpty() == FALSE)
@@ -145,7 +279,7 @@ int iogtimed ( int *ch, int seconds )
 	    {
 	      *ch = 0;
 	      clog("iogtimed(): select() failed: %s", sys_errlist[errno]);
-	      cdrefresh(FALSE);
+	      cdrefresh();
 	      return(FALSE);
 	    }
 
@@ -204,7 +338,7 @@ int iogtimed ( int *ch, int seconds )
 	  clog("iogtimed(): retval = %d, PollInputfd = %d, *ch = %d",
 	       retval,PollInputfd,*ch);
 # endif
-	  cdrefresh(FALSE);
+	  cdrefresh();
 	  return(FALSE);
 	}
       
@@ -217,7 +351,7 @@ int iogtimed ( int *ch, int seconds )
 	    {
 	      *ch = 0;
 	      
-	      cdrefresh(FALSE);
+	      cdrefresh();
 	      return(FALSE);
 	    }
 	}
@@ -234,5 +368,7 @@ int iogtimed ( int *ch, int seconds )
     } /* while */
   
 }
+
+
 
 

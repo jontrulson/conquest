@@ -13,7 +13,7 @@
 /* by Jon Trulson <jon@radscan.com> under the same terms and          */
 /* conditions of the original copyright by Jef Poskanzer and Craig    */
 /* Leres.                                                             */
-/* Have Phun!                                                         */
+/*                                                                    */
 /**********************************************************************/
 
 /* Basic information */
@@ -25,6 +25,17 @@
 # define CONQHOME "/opt/conquest"
 #endif
 
+/* Some variables that used to be in conqfig.c - relative to conquest
+ *  installation directory (CONQHOME)
+ */
+
+#define C_CONQ_CONQDRIV  "bin/conqdriv"
+#define C_CONQ_COMMONBLK "etc/conquest_common.img"
+#define C_CONQ_ERRLOG    "etc/conquest.log"
+#define C_CONQ_NEWSFILE  "etc/conqnews.doc"
+#define C_CONQ_HELPFILE  "etc/conquest.doc"
+
+
 /* HAS_SETITIMER - Define if your system supports setitimer/getitimer().
  *  Otherwise alarm() is used.  With setitimer() it's possible to get a
  *  faster refresh rate (say 2 updates per second) rather than 1 update
@@ -35,7 +46,7 @@
 #endif
 
 /* USE_COMMONMLOCK - Lock the common block into memory via memctl(). 
- *  Requires the plock privilege (unixware).
+ *  Requires the PLOCK privilege (unixware).
  */
 
 #if defined(UNIXWARE)
@@ -48,7 +59,7 @@
  *  conquest will) which will prevent them altogether.
  *  
  * USE_SEMS
- *  Well.. now conquest supports semaphores! Yaay!  #define USE_SEMS to
+ *  Well.. now conquest supports semaphores!  #define USE_SEMS to
  *  use them.   If USE_SEMS is undefined, the old locking mechanism will
  *  be used, though you *may* experience random SEGV's...
  */
@@ -67,8 +78,15 @@
  */
 #define WARP0CLOAK 
 
+/* DO_EXPLODING_SHIPS - In this mode, ships explode when they die, with
+ *  a force equal to the number of torpedos the ship has available, and
+ *  only if the ship had the fuel to 'fire' them, were it alive to do
+ *  so. 
+ */
+#define DO_EXPLODING_SHIPS
+
 /* SET_PRIORITY - increase our priority a bit, increase the driver's a bit 
- * more.  Requires the tshar privilege (unixware).
+ * more.  Requires the TSHAR privilege (unixware).
  */
 
 #if defined(UNIXWARE)
@@ -108,6 +126,5 @@
 /*#define DEBUG_MISC		/* debug other misc stuff */
 /*#define DEBUG_RANDOM		/* debug the random number library */
 /*#define DEBUG_COLOR		/* debug color processing */
-
-/*#define DEBUG_IOGTIMED   /* debug timed input */
+/*#define DEBUG_IOGTIMED        /* debug timed input */
 

@@ -120,7 +120,7 @@ ROB_RUNAWAY		{yylval = ROB_RUNAWAY; return( TOK_ACTION );}
 
 [0-9]			{
 /*                        printf("**=- buf = %s yytext = %s -=**\n", buf, yytext); */
-			yylval = ctoi( yytext );
+			yylval = atoi( yytext );
 			return( TOK_NUMBER );
 			}
 
@@ -146,4 +146,3 @@ void yyerror(char *s)
 }
 
 
-/* goodies === */

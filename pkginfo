@@ -6,5 +6,5 @@ PKG=conquest
 VENDOR=Jon Trulson (jon@radscan.com)
 PREDEPEND=conquest
 EMAIL=jon@radscan.com
-IDENT=6.5a
-VERSION=6.5a
+IDENT=6.6
+VERSION=6.6

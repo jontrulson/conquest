@@ -19,7 +19,7 @@
 /* by Jon Trulson <jon@radscan.com> under the same terms and          */
 /* conditions of the original copyright by Jef Poskanzer and Craig    */
 /* Leres.                                                             */
-/* Have Phun!                                                         */
+/*                                                                    */
 /**********************************************************************/
 
 #ifndef CONQCOM2_H
@@ -37,10 +37,7 @@ C2EXTERN    int cpid;			/* pid of our owner process */
 C2EXTERN    int childpid;			/* pid of driver we spawned */
 C2EXTERN    int cmaxlin;			/* number of lines */
 C2EXTERN    int cmaxcol;			/* number of columns */
-C2EXTERN    int ctimflag;			/* event flag for sys$setimr */
-C2EXTERN    int ctimid;			/* request id for sys$setimr */
 C2EXTERN    int cmsgrand;			/* hundreths timestamp since last message */
-C2EXTERN    int cpriority;			/* normal base priority */
 C2EXTERN    int clastime;			/* last time drcheck was called */
 C2EXTERN    int csubdcl;			/* says if we can spawn to DCL */
 C2EXTERN    int cnewsfile;			/* says if a news file is available */
