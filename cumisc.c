@@ -685,7 +685,7 @@ void mcuInfoShip( int snum, int scanner )
   
   mcuPutMsg( cbuf, MSG_LIN1 );
   
-  if ( ! SCLOAKED(snum) || Ships[snum].warp > 0.0 )
+  if ( ! SCLOAKED(snum) || Ships[snum].warp != 0.0 )
     {
       Context.lasttdist = round( dis ); /* save these puppies for alt hud */
       Context.lasttang = round( angle( x, y, appx, appy ) );

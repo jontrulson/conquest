@@ -23,6 +23,19 @@ Version 8.0.1q 12/11/2004 (devel)
           This avoids some potential races that could cause a lock to
           be held too long, or to be improperly interrupted.
 
+        - fixed a couple of problems with counting geno's.  Reported
+          by Cat.  Fed geno's were almost never counted properly.
+
+        - when couping, re-couped planets should not be marked
+          scannable by anything other than the coup'ing team.
+
+        - when cloaked and in orbit, approximate location data was not
+          available to other ships as it should be for any cloaked
+          ship that is moving.
+
+        - When a team is geno'd, all armies of that team still
+          residing on live ships are also destroyed.
+
         - semaphore interface cleaned up
 
         - fixed potential core in GL.c when padding message lines.

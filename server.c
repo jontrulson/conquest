@@ -953,7 +953,8 @@ void procCoup(cpCommand_t *cmd)
       return;
     }
   for ( i = 1; i <= NUMPLANETS; i = i + 1 )
-    if ( Planets[i].team == Ships[snum].team && Planets[i].armies > 0 )
+    if ( Planets[i].real && (Planets[i].team == Ships[snum].team) && 
+         (Planets[i].armies > 0) )
       {
 	 sendFeedback("We don't need to coup, we still have armies left!");
 	return;
@@ -1029,10 +1030,19 @@ void procCoup(cpCommand_t *cmd)
     }
   
   clbTakePlanet( pnum, snum );
+
+  /* Make the planet not scanned. */
+  for ( i = 0; i < NUMPLAYERTEAMS; i = i + 1 )
+    Planets[pnum].scanned[i] = FALSE;
+
+  /* ...except by us */
+  Planets[pnum].scanned[Ships[snum].team] = TRUE;
+  
   Planets[pnum].armies = rndint( 10, 20 );	/* create token coup force */
   Users[Ships[snum].unum].stats[USTAT_COUPS] += 1;
   Teams[Ships[snum].team].stats[TSTAT_COUPS] += 1;
   PVUNLOCK(&ConqInfo->lockword);
+
   sendFeedback("Coup successful!");
 
   /* force a team update for this ship */

@@ -847,6 +847,19 @@ void clbTakePlanet( int pnum, int snum )
         {
           Users[Ships[snum].unum].stats[USTAT_GENOCIDE] += 1;
           Teams[Ships[snum].team].stats[TSTAT_GENOCIDE] += 1;
+
+          for (i=1; i <= MAXSHIPS; i++)
+            {                   /* eliminate any geno'd armies from ships */
+              if (Ships[i].status == SS_LIVE && Ships[i].team == oteam &&
+                  Ships[i].armies > 0)
+                {
+                  clog("INFO: summarily executed %d geno'd armies on ship %d",
+                       Ships[i].armies, i);
+                  Ships[i].armies = 0;
+
+                }
+            }
+
 	  clog("INFO: %s (%s) genocided the %s team!",
 	       Users[Ships[snum].unum].username,
 	       Ships[snum].alias,
@@ -1101,10 +1114,26 @@ void clbZeroPlanet( int pnum, int snum )
         {
           Teams[oteam].couptime = rndint( MIN_COUP_MINUTES, MAX_COUP_MINUTES );
           Teams[oteam].coupinfo = FALSE;		/* lost coup info */
+
+
           if ( snum > 0 && snum <= MAXSHIPS )
             {
               Users[Ships[snum].unum].stats[USTAT_GENOCIDE] += 1;
               Teams[Ships[snum].team].stats[TSTAT_GENOCIDE] += 1;
+
+              for (i=1; i <= MAXSHIPS; i++)
+                { /* eliminate any geno'd armies from ships */
+                  if (Ships[i].status == SS_LIVE && Ships[i].team == oteam &&
+                      Ships[i].armies > 0)
+                    {
+                      clog("INFO: summarily executed %d geno'd armies on ship %d",
+                           Ships[i].armies, i);
+                      Ships[i].armies = 0;
+                      
+                    }
+                }
+
+
               clog("INFO: %s (%s) genocided the %s team!",
                    Users[Ships[snum].unum].username,
                    Ships[snum].alias,
