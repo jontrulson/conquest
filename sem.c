@@ -32,8 +32,6 @@
 static key_t ConquestSemID = -1; 
 static struct sembuf semops[CONQNUMSEMS];
 
-sigset_t newmask;
-
 char *semGetName(int what)
 {
   static char *LMSGTXT = "LOCKCOMN";
@@ -117,9 +115,7 @@ void Lock(int what)
   semops[1].sem_flg = SEM_UNDO;	/* undo if we die unexpectedly */
   
                                 /* block ALRM signals */
-  sigemptyset(&newmask);
-  sigaddset(&newmask, SIGALRM);
-  sigprocmask(SIG_BLOCK, &newmask, NULL);
+  clbBlockAlarm();
 
   while (Done == FALSE)
     {
@@ -170,9 +166,6 @@ void Unlock(int what)
   if (ConquestSemID == -1)
     return;			/* clients don't use sems... */
 
-  sigemptyset(&newmask);
-  sigaddset(&newmask, SIGALRM);
-
   arg.array = semvals;
 
 #ifdef DEBUG_SEM
@@ -202,7 +195,7 @@ void Unlock(int what)
 	       semGetName(what));
 	  
           /* allow alarms again */
-          sigprocmask(SIG_UNBLOCK, &newmask, NULL);
+          clbUnblockAlarm();
 	  return;
 	}
     }
@@ -240,7 +233,7 @@ void Unlock(int what)
 #endif
 
   /* allow alarms again */
-  sigprocmask(SIG_UNBLOCK, &newmask, NULL);
+  clbUnblockAlarm();
 
   return;
 }

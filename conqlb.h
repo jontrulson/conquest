@@ -74,5 +74,8 @@ char *clbGetUserLogname(void);
 void clbPlanetDrive(real itersec);
 void clbTorpDrive(real itersec);
 Unsgn32 clbGetMillis(void);
+void clbBlockAlarm(void);
+void clbUnblockAlarm(void);
+
 
 #endif /* _CONQLB_H */

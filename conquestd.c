@@ -1096,7 +1096,9 @@ void handleSimpleCmdPkt(cpCommand_t *ccmd)
 
     case CPCMD_RELOAD:
       procReload(ccmd);
+      clbBlockAlarm();
       updateClient(TRUE);
+      clbUnblockAlarm();
 
       break;
 
@@ -1108,7 +1110,9 @@ void handleSimpleCmdPkt(cpCommand_t *ccmd)
       break;
 
     case CPCMD_PING:
+      clbBlockAlarm();
       sendAck(sInfo.sock, PKT_TOCLIENT, PSEV_INFO, PERR_PINGRESP, NULL);
+      clbUnblockAlarm();
       break;
 
     default:
@@ -1613,9 +1617,9 @@ int play(void)
 
       if (didsomething)         /* update immediately if we did something */
         {
-          stopUpdate();
+          clbBlockAlarm();
           updateClient(FALSE);
-          startUpdate();
+          clbUnblockAlarm();
         }
 
       grand( &Context.msgrand );
@@ -1631,7 +1635,7 @@ int play(void)
       if (didsomething)         
         continue;               /* see if there is another pkt */
 
-      c_sleep(ITER_SECONDS);
+      c_sleep(0.05);
     }
   
   conqstats( Context.snum );

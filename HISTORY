@@ -9,6 +9,28 @@
 
                               Conquest HISTORY
 
+Version 8.?
+
+        - fixed bad bug that could prevent a ship from seeing
+          enemy torps that were fired at it from >ACCINFO_DIST away.
+          Ouch. 
+
+        - block updates when a RELOAD is occuring to prevent
+          possbility of sending a corrupt packet stream.  This could
+          also happen when starting a client recording.
+
+        - fixed problem with around() and round() which depend on
+          rint().  rint() seems to screw up rounding when the
+          fractional part is exactly .5 - rounding down on even
+          numbers, rounding up on odd.  How odd.  Now use our own
+          rounding function that always does the right thing.
+
+        - the wrong team was logged as the geno'd team to the logfile. 
+
+        - remove code that killed armies on ships belonging to a
+          geno'd team.  I did not expect that code would cause a war
+          in itself :) 
+
 Version 8.0.1q 12/11/2004 (devel)
 
         - another in a long line of 8.1 release candidates

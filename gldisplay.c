@@ -677,7 +677,7 @@ void display( int snum, int display_info )
 	else if ( i < 0 )
 	  {
 	    robstr( -i, buf );
-	    setArmies("Action = ", buf);
+	    setArmies("AI: ", buf);
 	  }
 	else
 	  setArmies("", "");

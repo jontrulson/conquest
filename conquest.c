@@ -2383,18 +2383,12 @@ void dolastphase( int snum )
 /*    domydet( snum ) */
 void domydet( int snum )
 {
-  int i;
   cdclrl( MSG_LIN2, 1 );
   
   sendCommand(CPCMD_DETSELF, 0);
 
   mcuPutMsg( "Detonating...", MSG_LIN1 );
 
-  /* clear out any reserved torps we might have set in clbCheckLaunch() */
-  for (i=0; i < MAXTORPS; i++)
-    if (Ships[snum].torps[i].status == TS_RESERVED)
-      Ships[snum].torps[i].status = TS_OFF;
-  
   return;
   
 }

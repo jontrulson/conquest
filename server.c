@@ -22,7 +22,10 @@
 #define MAXUDPERRS    (15)
 static int sudperrs = 0;        /* keep track of udp write errors */
 
+#if 0
 static string guilt="Team genocided.  Any armies you were carrying died of guilt.";
+#endif
+static string guilt="Your team was genocided.";
 
 
 /* called when a write to a UDP socket fails. If the error threshold
@@ -2085,7 +2088,7 @@ void procAutoPilot(cpCommand_t *cmd)
     }
 
  sendFeedback("Autopilot activated.");
-  SFSET(snum, SHIP_F_ROBOT);
+ SFSET(snum, SHIP_F_ROBOT);
 
   gsecs( &laststat );			/* initialize stat timer */
   while ( clbStillAlive( Context.snum ) )

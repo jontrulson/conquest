@@ -591,9 +591,9 @@
 
 /* Macros, here order is important. */
 
-#define round(x) ((int)rint((real)(x)))	/* int round */
-
-#define around(x) ((real) rint((real)(x))) /* real round */
+#define my_rint(x) ((real)floor((x) + 0.5)) /* standard round. */
+#define round(x) ((int)my_rint((real)(x)))	/* int round */
+#define around(x) ((real)my_rint((real)(x))) /* real round */
 
 #define oneplace(x) (real)(around((x) * 10.0)/10.0) /* nearest tenth */
 #define dtor(x) (((real)(x) / 180.0) * PI) /* degrees to radians */
@@ -618,7 +618,7 @@
 
 /* some help with da bits */
 #define bitIsSet(x, b) ((x) & (b))
-#define bitSet(x, b) ((x) |= (b))
+#define bitSet(x, b)   ((x) |= (b))
 #define bitClear(x, b) ((x) &= ~(b))
 
 

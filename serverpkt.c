@@ -787,7 +787,6 @@ spTorpEvent_t *spktTorpEvent(Unsgn8 tsnum, Unsgn8 tnum, int rec)
   int snum = Context.snum;
   int team = Ships[snum].team;
   static spTorpEvent_t storpev;
-  real dis;
   real x, y, dx, dy;
 
   memset((void *)&storpev, 0, sizeof(spTorpEvent_t));
@@ -806,22 +805,6 @@ spTorpEvent_t *spktTorpEvent(Unsgn8 tsnum, Unsgn8 tnum, int rec)
   y = Ships[tsnum].torps[tnum].y;
   dx = Ships[tsnum].torps[tnum].dx;
   dy = Ships[tsnum].torps[tnum].dy;
-
-  if (Ships[tsnum].torps[tnum].war[team] && !rec)
-    {				/* it's at war with us. bastards. */
-      /* see if it's close enough to scan */
-      dis = (real) dist(Ships[snum].x, Ships[snum].y, 
-			Ships[tsnum].torps[tnum].x, 
-			Ships[tsnum].torps[tnum].y );
-
-      if (dis > ACCINFO_DIST)
-        {                       /* in the bermuda triangle */
-          x = 1e7;
-          y = 1e7;
-          dx = 0.0;
-          dy = 0.0;
-        }
-    }
 
   storpev.x = (Sgn32)htonl((Sgn32)(x * 1000.0));
   storpev.y = (Sgn32)htonl((Sgn32)(y * 1000.0));

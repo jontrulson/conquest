@@ -922,11 +922,6 @@ static void _domydet(void)
 
   cp_putmsg( "Detonating...", MSG_LIN1 );
 
-  /* clear out any reserved torps we might have set in clbCheckLaunch() */
-  for (i=0; i < MAXTORPS; i++)
-    if (Ships[Context.snum].torps[i].status == TS_RESERVED)
-      Ships[Context.snum].torps[i].status = TS_OFF;
-  
   return;
   
 }
@@ -2522,7 +2517,7 @@ static int nCPIdle(void)
          up cancelling... */
       if (state != S_REFITING && state != S_BOMBING && 
           state != S_BEAMING  && state != S_DESTRUCTING &&
-          state != S_WARRING)
+          state != S_WARRING && state != S_AUTOPILOT)
         {
 
           pingtime = iternow;

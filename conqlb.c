@@ -444,31 +444,16 @@ void clbKillShip( int snum, int kb )
 /* does NO LOCKING, so only use from the client */
 int clbCheckLaunch(int snum, int number)
 {
-  register int i, j;
+  register int i;
 
   if (number == 0)
     return TRUE;
 
-  j = 0;
-  for ( i = 0; i < MAXTORPS && number != 0; i++ )
+  for ( i = 0; i < MAXTORPS; i++ )
     if ( Ships[snum].torps[i].status == TS_OFF )
-      {
-	/* Found one. */
-	j++;
-	number--;
-        /* see if this can save some wasted bandwidth by marking the
-           torp as reserved.  Since this is client side only, the next
-           ship update will set the true count anyway if it actually
-           fired.  These are cleaned out with domydet().  The end
-           result is not making the server refuse the request anyway,
-           wasting valuable time. */
-        Ships[snum].torps[i].status = TS_RESERVED;
-      }
+      return TRUE;
 
-  if (j == 0)
-    return FALSE;
-  else
-    return TRUE;
+  return FALSE;
 }
 
 
@@ -853,6 +838,7 @@ int clbTakePlanet( int pnum, int snum )
           Users[Ships[snum].unum].stats[USTAT_GENOCIDE] += 1;
           Teams[Ships[snum].team].stats[TSTAT_GENOCIDE] += 1;
 
+#if 0
           for (i=1; i <= MAXSHIPS; i++)
             {                   /* eliminate any geno'd armies from ships */
               if (Ships[i].status == SS_LIVE && Ships[i].team == oteam &&
@@ -863,11 +849,11 @@ int clbTakePlanet( int pnum, int snum )
                   Ships[i].armies = 0;
                 }
             }
-
+#endif
 	  clog("INFO: %s (%s) genocided the %s team!",
 	       Users[Ships[snum].unum].username,
 	       Ships[snum].alias,
-	       Teams[Ships[snum].team].name);
+	       Teams[oteam].name);
         }
 
     }
@@ -1129,6 +1115,7 @@ int clbZeroPlanet( int pnum, int snum )
               Users[Ships[snum].unum].stats[USTAT_GENOCIDE] += 1;
               Teams[Ships[snum].team].stats[TSTAT_GENOCIDE] += 1;
 
+#if 0
               for (i=1; i <= MAXSHIPS; i++)
                 { /* eliminate any geno'd armies from ships */
                   if (Ships[i].status == SS_LIVE && Ships[i].team == oteam &&
@@ -1139,11 +1126,12 @@ int clbZeroPlanet( int pnum, int snum )
                       Ships[i].armies = 0;
                     }
                 }
+#endif
 
               clog("INFO: %s (%s) genocided the %s team!",
                    Users[Ships[snum].unum].username,
                    Ships[snum].alias,
-                   Teams[Ships[snum].team].name);
+                   Teams[oteam].name);
             }
         }
     }
@@ -3415,3 +3403,25 @@ Unsgn32 clbGetMillis(void)
 }
 
   
+
+void clbBlockAlarm(void)
+{
+  sigset_t newmask;
+
+  sigemptyset(&newmask);
+  sigaddset(&newmask, SIGALRM);
+  sigprocmask(SIG_BLOCK, &newmask, NULL);
+
+  return;
+}
+
+void clbUnblockAlarm(void)
+{
+  sigset_t newmask;
+
+  sigemptyset(&newmask);
+  sigaddset(&newmask, SIGALRM);
+  sigprocmask(SIG_UNBLOCK, &newmask, NULL);
+
+  return;
+}

@@ -4,16 +4,40 @@
   NONE
 
 
-- add local server time to hello/srvrstat
+- IP restrictions
 
-- local ship computation?
+  - how to handle telnet servers?
 
-- add pads to those structures not having them?
+  - need new 'client driver' common block, NUMSHIPS structures with
+    IP, PID, broadcast flags, etc.
 
-- for packets with strings, standardize string len (align 32b) - same
-  for meta proto?  increase MOTD, etc...?
+  - IP config file, listing IP's and their limits
 
-- versioning improvment... use major == incompat, minor == compat...
+  - default server restriction of two ships (conquestrc configurable)
+    per IP.
+
+    - consider enabling/re-implementing the multiple ships per user stuff?
+
+- GENERAL
+
+  - local ship movement computation?
+
+    - how to handle orbiting, tow, etc...
+
+  - observer support?
+
+- PROTOCOL
+
+  - add local server time to hello/srvrstat
+
+  - add pads to those structures not having them?
+
+  - for packets with strings, standardize string len (align 32b) -
+    same for meta proto?  increase MOTD, etc...?
+
+  - versioning improvment... use major == incompat, minor == compat...
+
+
 
 - support for more teams
 
