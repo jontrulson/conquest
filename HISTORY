@@ -9,31 +9,127 @@
 
                               Conquest HISTORY
 
-Version 8.?
+Version 8.1 (stable)
 
-        - fixed bad bug that could prevent a ship from seeing
-          enemy torps that were fired at it from >ACCINFO_DIST away.
-          Ouch. 
+        - changes since the last development release (8.0.1q)
 
-        - block updates when a RELOAD is occuring to prevent
-          possbility of sending a corrupt packet stream.  This could
-          also happen when starting a client recording.
+          - fixed bad bug that could prevent a ship from seeing enemy
+            torps that were fired at it from >ACCINFO_DIST away,
+            depending on the firing ship's war settings.
+            Ouch.
 
-        - fixed problem with around() and round() which depend on
-          rint().  rint() seems to screw up rounding when the
-          fractional part is exactly .5 - rounding down on even
-          numbers, rounding up on odd.  How odd.  Now use our own
-          rounding function that always does the right thing.
+          - block updates when a RELOAD is occuring to prevent
+            possbility of sending a corrupt packet stream.  This could
+            also happen when starting a client recording.
 
-        - the wrong team was logged as the geno'd team to the logfile. 
+          - fixed problem with around() and round() which depend on
+            BSD rint().  rint() seems to screw up rounding when the
+            fractional part is exactly .5 - rounding down on even
+            numbers, rounding up on odd.  How odd.  Now use our own
+            rounding function that always does the right thing.
 
-        - remove code that killed armies on ships belonging to a
-          geno'd team.  I did not expect that code would cause a war
-          in itself :) 
+          - the wrong team was logged as the geno'd team to the logfile. 
 
-Version 8.0.1q 12/11/2004 (devel)
+          - remove code that killed armies on ships belonging to a
+            geno'd team.  I did not expect that code would cause a war
+            in itself :)
 
-        - another in a long line of 8.1 release candidates
+         - here is a brief overview of major features/changes since
+           last stable release (8.0.1)
+
+           - GLUT based OpenGL client, conquestgl.
+
+           - the conqreplay program is gone, as the clients, conquest
+             (curses) and conquestgl (OpenGL) are now used to replay
+             .cqr files via the '-P <cqrfile>' cmdline option.
+
+           - The game protocol changed (in devel version 8.01j).  This
+             protocol corrects some shortcomings in the 8.0.1 protocol
+             (like doomsday, planet realness, etc), and now provides
+             for client-side computation of torpedo and planet
+             movement.  This makes the game smoother, particularly in
+             conquestgl, and significantly cuts down on the network
+             bandwidth required.
+
+           - a variety of game related bugs fixed, including, but not
+             limited to:
+
+             - doomsday protocol was 'missing'.
+
+             - planet 'realness' was never propagated to a client.
+
+             - geno's against the feds were rarely counted.
+
+             - Slingshot flag could be bypassed.
+
+             - a planet's army count is sent immediately to a newly
+               scanning ship.
+
+             - a bug in system entry selection could cause you
+               to get stuck in Murisak when entering the game.
+
+             - several lock contention, and signal interrupt
+               issues/races fixed.
+
+             - FEEDBACK messages are now sent directly to the client
+               without making a round trip through the common block.
+
+             - UDP support (auto-negotiated, but still perhaps a bit
+               weak) for ship motion data.
+
+               - UDP support can be disabled by specifying the '-u'
+                 option to the client.
+
+             - Improve TCP performance via TCP_NODELAY.
+
+             - use CTL-R in the cockpit to force a complete packet
+               refresh from the server.
+
+           - new user options (~/.conquestrc)
+
+             - 'do_enemyshipbox' - when set to 'true', will draw a 1
+                pixel red square around enemy ships in the LR/SR views.
+                (GL client only).
+
+             - 'do_draw_viewerbg' - define this as 'true' if you want
+               to see the rather attractive background image (Hubble
+               Ultra Deep Field) displayed in the viewer.  (GL client
+               only). 
+
+           - conqdriv
+
+             - conqdriv now updates planet positions every 10th/sec.
+               Previously these were only updated every 5 seconds.
+               This provides much smoother planet movement, especially
+               in the GL client.
+
+             - conqdriv now updates a ship's orbital position every
+               10th/sec rather than 1/sec.  This makes orbiting
+               planets much smoother.
+
+           - meta server/protocol changes
+
+             - The meta protocol has been updated to support new
+               'server_contact' and 'localtime' fields.  
+
+             - the meta server now sorts the server list by the number
+               of currently active players, rather than the server
+               registration order.
+
+             - meta selection code in client can now differentiate
+               between incompatible servers.
+
+             - fixed a bug where the meta server could not distinguish
+               between multiple servers that were running on the same
+               host, but listening on different ports.
+          
+           - much code restructuring, new libraries, removal of dead code.
+
+        - The rest of this section are the devel release notes leading
+          up to this stable release.  Probably uninteresting unless
+          you want some more details :)
+
+        # 8.0.1q 12/11/2004 (devel)
 
         - FEEDBACK messages (beaming/bombing, etc) are now sent
           directly from the server rather than being enqueued into the
@@ -70,15 +166,14 @@ Version 8.0.1q 12/11/2004 (devel)
         - recording/playback of planet 'realness' was broken.  Now it
           isn't.  
 
-Version 8.0.1p 11/21/2004 (devel)
-
-        - another 8.1 release candidate
+        # 8.0.1p 11/21/2004 (devel)
 
         - added ping capability.  The GL client (conquestgl) will now
           ping the server every 2 seconds.  This measures the average
           TCP round-trip time (in ms) to the server and back.  To see
           the ping time, enable the status line in the cockpit by
-          typing 'ALT-S' when playing.
+          typing 'ALT-S' when playing.  Note, this is total round-trip
+          time.
 
         - update meta protocol to add 'contact' - (server operator
           contact), and 'walltime' (local server time) to the meta
@@ -103,7 +198,7 @@ Version 8.0.1p 11/21/2004 (devel)
         - fixed bogus towedby reports when you attempt to tow a ship,
           but you are already being towed. 
 
-Version 8.0.1o 11/21/2004 (devel)
+        # 8.0.1o 11/21/2004 (devel)
 
         - incorporates 8.0.1n patch that fixes protocol problem with
           letting the client know the true 'realness' of a planet.
@@ -131,7 +226,7 @@ Version 8.0.1o 11/21/2004 (devel)
         - In meta list, [ENTER] can be used as well as [TAB] to
           select a server to connect to.
 
-Version 8.0.1m 11/14/2004 (devel)
+        # 8.0.1m 11/14/2004 (devel)
 
         - builds under cygwin (11/11/2004) again.  Both the server and
           clients (including the OpenGL client, conquestgl) seem to
@@ -167,12 +262,7 @@ Version 8.0.1m 11/14/2004 (devel)
         - use CTL-R in the cockpit to force a complete packet refresh
           from the server.
 
-        - yep, another 8.1 release candidate.
-
-
-Version 8.0.1l 10/22/2004 (devel)
-
-        - 8.1 release candidate.  Oh yes.
+        # 8.0.1l 10/22/2004 (devel)
 
         - finshed implementation of variable encapsulated packet
           handling.  Should make it easier to add packet types in the
@@ -195,8 +285,7 @@ Version 8.0.1l 10/22/2004 (devel)
           release now.  Of course there are tons of things that could
           be done to pretty it up more, but it's good enough for now.
 
-
-Version 8.0.1k 9/25/2004 (devel)
+        # 8.0.1k 9/25/2004 (devel)
 
         - when entering a game, pointer troubles could cause a
           client to get stuck sitting on top of Murisak, or offered
@@ -209,8 +298,7 @@ Version 8.0.1k 9/25/2004 (devel)
         - modifiers (shift, ctl, etc) were improperly discarded when
           decoding the macro FKeys. (conquestgl)
 
-
-Version 8.0.1j 9/11/2004 (devel)
+        # 8.0.1j 9/11/2004 (devel)
 
         - conquestgl
 
@@ -256,7 +344,7 @@ Version 8.0.1j 9/11/2004 (devel)
             will be sent to the client informing it of that fact.  
 
 
-Version 8.0.1i 9/03/2004 (devel)
+        # 8.0.1i 9/03/2004 (devel)
 
 
         - conquestgl
@@ -293,8 +381,7 @@ Version 8.0.1i 9/03/2004 (devel)
 
           - more GL related cleanups and re-organization.
 
-
-Version 8.0.1h 8/10/2004 (devel)
+        # 8.0.1h 8/10/2004 (devel)
 
         - conquestgl
 
@@ -306,7 +393,7 @@ Version 8.0.1h 8/10/2004 (devel)
           - cleaned up GL.c a lot.  No longer use a seperate window (and
             associated GL context) for the viewer.
 
-Version 8.0.1g 8/08/2004 (devel)
+        # 8.0.1g 8/08/2004 (devel)
 
         - Planet and torpedo trajectories are now computed in the
           client for smoother motion and a significant reduction in
@@ -336,7 +423,7 @@ Version 8.0.1g 8/08/2004 (devel)
           tolerate misaligned pointers).  Reported by Clint Adams
           (Debian).
 
-Version 8.0.1f 7/11/2004 (devel)
+        # 8.0.1f 7/11/2004 (devel)
 
         - conquestgl 
 
@@ -356,7 +443,7 @@ Version 8.0.1f 7/11/2004 (devel)
           default map display is whatever you set for the
           'do_local_lrscan=' option in your ~/.conquestrc file.
 
-Version 8.0.1e 7/7/2004 (devel)
+        # 8.0.1e 7/7/2004 (devel)
 
         - patch from Clint Adams correcting a strange typedef bug in
           datatypes.h that niether of my compilers detected.
@@ -377,7 +464,7 @@ Version 8.0.1e 7/7/2004 (devel)
         - moved duplicate GL/curses client hello() functions into
           single clientHello() function in client.c.
 
-Version 8.0.1c 7/2/2004 (devel)
+        # 8.0.1c 7/2/2004 (devel)
 
         - UDP support for torp, ship, and planet 'location' packets.
           UDP is auto-negotiated, and appears to be NAT firewall safe.
@@ -401,7 +488,7 @@ Version 8.0.1c 7/2/2004 (devel)
         - bugs in nWelcome node that prevented server error conditions
           from being displayed to the user were fixed. (conquestgl)
 
-Version 8.0.1b 5/31/2004 (devel)
+        # 8.0.1b 5/31/2004 (devel)
 
         - use TCP_NODELAY to send packets immediately rather than save
           them up before sending.
@@ -409,7 +496,7 @@ Version 8.0.1b 5/31/2004 (devel)
         - add check for stdint.h, and use those defines if available
           in datatypes.h
 
-Version 8.0.1a 5/08/2004 (devel)
+        # 8.0.1a 5/08/2004 (devel)
 
         - Adds a GLUT/OpenGL client, conquestgl.  Oh yes.
 
@@ -561,7 +648,8 @@ Version 8.0.1a 5/08/2004 (devel)
           (netrek for the original pixmaps that formed the basis of
           the ship textures in conquestgl, etc)
 
-Version 8.0.1 1/17/2004
+
+Version 8.0.1 (stable) 1/17/2004
 
         - fixed rather serious problem with dead() handling.  When you
           were killed by an external (ship, sun, etc), you could get
@@ -625,7 +713,7 @@ Version 8.0.1 1/17/2004
 
 
 
-Version 8.0 12/13/2003
+Version 8.0 (stable) 12/13/2003
 
     - the official v8.0 release
 

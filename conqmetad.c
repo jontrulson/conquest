@@ -32,7 +32,6 @@ const int expireSeconds = (60 * 5); /* 5 minutes */
 void catchSignals(void);
 void handleSignal(int sig);
 
-/* cmpuser - compare users based on skill */
 static int cmpmeta(void *cmp1, void *cmp2)
 {
   register int *icmp1, *icmp2;

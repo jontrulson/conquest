@@ -247,10 +247,9 @@
                  UDP.  The server will also send UDP motion data to
                  the client(s) from this port.
 
-                 UDP is only used for motion data (ship, planet, and
-                 torpedo location) from the server to the client.  The
-                 client only sends data to the server on this port
-                 during UDP negotiation.
+                 UDP is only used for ship motion data from the server
+                 to the client.  The client only sends data to the
+                 server on this port during UDP negotiation.
 
 
    You can use the '-p <portnum>' option to conquestd to have the game
@@ -448,12 +447,12 @@
    Server:
 
        Server recordings are complete (like the old recordings made in
-        previous versions of conquest), since the server has full
-       access to the common block (unlike clients).
+       previous versions of conquest), since the server has full
+       access to the common block.
              
        All active ship/planet/etc data is stored in server recordings.
-       You can watch any ship in conqreply with a server recording and
-       get all info on the ship (heading, fuel, temps, etc).
+       You can watch any ship during playack with a server recording
+       and get all info on the ship (heading, fuel, temps, etc).
 
    To replay a recording:
 
@@ -487,21 +486,9 @@
    as giving you the ability to jump forward and backward in a
    recording.  Not as nice as a VCR but close enough.
 
-   To playback a game, you use the '-P' option to 
+   To playback a game, you use the '-P' option to the conquest client.
 
-   conqreplay currently supports the following options:
-
-     usage: conqreplay [ -d <dly> ] -f <cqr file>
-        -f <cqr>         specify the file to replay
-        -d <dly>         specify the frame delay
-
-
-   For example, to play back a files called dethfun.cqr:
-
-     conqreplay -f dethfun.cqr
-
-   If you want to replay the game using the OpenGL client instead, use
-   the '-P' option to conquestgl:
+   For example, to play back a file called dethfun.cqr:
 
      conquestgl -P dethfun.cqr
 
@@ -557,8 +544,9 @@
 
   When you are just flying around, set your allocation so your engines
   get most of the power.  This can be done with (A30\r).  This way
-  your engines will be as efficient as possible - using less fuel and
-  generating less heat.
+  your engines will be as efficient as possible - using less fuel,
+  generating less heat, and making your ship more manuverable at high
+  speeds.
 
   When bombing, do the opposite.  Having your weapons have the maximum
   power allocation increases your army kill rate.  This can be done
@@ -661,8 +649,7 @@
   will exhaust your fuel or overload fairly quickly.  How fast this
   happens depends on your ship type, and how fast you are moving.  If
   you put your shields up, you will overload even faster.  Overloading
-  your engines is really bad in battle as you are a sitting duck
-  afterwards.
+  your engines is really bad in battle for obvious reasons.
 
   If you are moving when you are cloaked, you are detectable - but only to
   an approximate location.

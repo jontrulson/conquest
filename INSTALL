@@ -112,7 +112,7 @@ CONTENTS:
     systems.  See README.cygwin for further info on these systems.
 
     NOTE: You *must* create a conquest group, or '[make |make install]'
-    will fail!
+    will fail.
 
     Then cd into the src directory.
 
@@ -130,9 +130,18 @@ CONTENTS:
 	$ su
 	# make install
 
-    By default, conquest will be installed in /opt.  To install it
-    somewhere else, supply the '--prefix=/other/dir' option to
-    configure.
+    Options to configure:
+
+    --prefix=
+
+      By default, conquest will be installed in /opt.  To install it
+      somewhere else, supply the '--prefix=/other/dir' option to
+      configure.
+
+    --disable-gl
+
+      If you do not want to build the GLUT/OpenGL bits, pass
+      '--disable-gl' the the configure cmdline.
 
     You may also want to peek at the defs.h file, though the defaults
     should be fine.  If your porting this to something else, good

@@ -24,6 +24,7 @@
 #include "defs.h"
 #include "global.h"
 #include "conqcom.h"
+#include "conqlb.h"
 
 #define CONQSEMKEY   (0xff001701) /* hope that's unique! */
 #define CONQSEMPERMS (00664)

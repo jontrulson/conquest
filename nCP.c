@@ -914,8 +914,6 @@ static void rmesg(int snum, int msgnum, int lin)
 
 static void _domydet(void)
 {
-  int i;
-
   clrPrompt(MSG_LIN2);
   
   sendCommand(CPCMD_DETSELF, 0);
