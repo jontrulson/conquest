@@ -2841,7 +2841,7 @@ void menu(void)
   /* now look for our ship packet before we get started.  It should be a
      full SP_SHIP packet for this first time */
   if (waitForPacket(PKT_FROMSERVER, sockl, SP_SHIP, buf, PKT_MAXSIZE,
-		    15, NULL) <= 0)
+		    60, NULL) <= 0)
     {
       clog("conquest:menu: didn't get initial SP_SHIP");
       return;
@@ -3153,7 +3153,7 @@ int newship( int unum, int *snum )
   while (TRUE)
     {
       if ((pkttype = waitForPacket(PKT_FROMSERVER, sockl, PKT_ANYPKT,
-				   buf, PKT_MAXSIZE, 30, NULL)) < 0)
+				   buf, PKT_MAXSIZE, 60, NULL)) < 0)
 	{
 	  clog("conquest:newship: waitforpacket returned %d", pkttype);
 	  return FALSE;
@@ -3231,23 +3231,10 @@ int newship( int unum, int *snum )
 	  
 	  break;
 	  
-	  /* we might get these packets too */
-	case SP_PLANET:
-	case SP_PLANETSML:
-	case SP_PLANETLOC:
-	case SP_SHIP:
-	case SP_SHIPSML:
-	case SP_SHIPLOC:
-	case SP_MESSAGE:
-	case SP_USER:
-	case SP_TEAM:
-	case SP_HISTORY:
+	  /* we might get other packets too */
+	default:
 	  processPacket(buf);
 
-	  break;
-
-	default:
-	  clog("conquest:newship: unexpected packet type %d", pkttype);
 	  break;
 	}
     }
@@ -3419,9 +3406,9 @@ int welcome( int *unum )
 
   /* now look for SP_CLIENTSTAT or SP_ACK */
   if ((pkttype = 
-       readPacket(PKT_FROMSERVER, sockl, buf, PKT_MAXSIZE, 10)) <= 0)
+       readPacket(PKT_FROMSERVER, sockl, buf, PKT_MAXSIZE, 60)) <= 0)
     {
-      clog("welcome: read failed\n");
+      clog("welcome: read SP_CLIENTSTAT or SP_ACK failed: %d\n", pkttype);
       return FALSE;
     }
 
@@ -3539,7 +3526,7 @@ int welcome( int *unum )
       
 
   if (waitForPacket(PKT_FROMSERVER, sockl, SP_USER, buf, PKT_MAXSIZE,
-		    15, NULL) <= 0)
+		    60, NULL) <= 0)
     {
       clog("conquest:welcome: waitforpacket SP_USER returned error");
       return FALSE;
@@ -3850,7 +3837,7 @@ int selectServer(metaSRec_t *metaServerList, int nums)
   static char *header2fmt = "(Page %d of %d)";
   static char headerbuf[BUFFER_SIZE];
   static char header2buf[BUFFER_SIZE];
-  static char *eprompt = "Arrow keys to select, [TAB] to accept, any other key to quit.";
+  static char *eprompt = "Arrow keys to select, [TAB] or [ENTER] to accept, any other key to quit.";
   int Done = FALSE;
   int ch;
   char *dispmac;
@@ -4012,7 +3999,8 @@ int selectServer(metaSRec_t *metaServerList, int nums)
 
 	  break;
 
-	case TERM_EXTRA:	/* change something */
+	case TERM_EXTRA:        /* selected one */
+        case TERM_NORMAL: 
           return ((curpage * servers_per_page) + clin);
 	  break;
 

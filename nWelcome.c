@@ -86,9 +86,10 @@ void nWelcomeInit(void)
 
   /* now look for SP_CLIENTSTAT or SP_ACK */
   if ((pkttype = 
-       readPacket(PKT_FROMSERVER, sockl, buf, PKT_MAXSIZE, 10)) <= 0)
+       readPacket(PKT_FROMSERVER, sockl, buf, PKT_MAXSIZE, 60)) <= 0)
     {
-      clog("nWelcomeInit: read failed\n");
+      clog("nWelcomeInit: read SP_CLIENTSTAT or SP_ACK failed: %d\n",
+           pkttype);
       fatal = TRUE;
       return;
     }
@@ -233,7 +234,7 @@ static int nWelcomeDisplay(dspConfig_t *dsp)
 
     case S_DONE:
       if (waitForPacket(PKT_FROMSERVER, sockl, SP_USER, buf, PKT_MAXSIZE,
-                        15, NULL) <= 0)
+                        60, NULL) <= 0)
         {
           clog("nWelcomeDisplay: waitforpacket SP_USER returned error");
           return NODE_EXIT;

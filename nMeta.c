@@ -27,7 +27,7 @@ static char *header = "Server List";
 static char *header2fmt = "(Page %d of %d)";
 static char headerbuf[BUFFER_SIZE];
 static char header2buf[BUFFER_SIZE];
-static char *eprompt = "Arrow keys to select, [TAB] to accept, any other key to quit.";
+static char *eprompt = "Arrow keys to select, [TAB] or [ENTER] to accept, any other key to quit.";
 
 static const int servers_per_page = 10;
 static int flin, llin, clin, pages, curpage;
@@ -297,7 +297,8 @@ static int nMetaInput(int ch)
       
       break;
       
-    case TERM_EXTRA:	/* selected one */
+    case TERM_NORMAL:	/* selected one */
+    case TERM_EXTRA:
 
       if (cInfo.remotehost)
         free(cInfo.remotehost);

@@ -102,7 +102,7 @@ static int _newship( int unum, int *snum )
   while (TRUE)
     {
       if ((pkttype = waitForPacket(PKT_FROMSERVER, sockl, PKT_ANYPKT,
-				   buf, PKT_MAXSIZE, 30, NULL)) < 0)
+				   buf, PKT_MAXSIZE, 60, NULL)) < 0)
 	{
 	  clog("nPlay: _newship: waitforpacket returned %d", pkttype);
           fatal = TRUE;

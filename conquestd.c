@@ -798,7 +798,7 @@ void dead( int snum, int leave )
     {
       if (waitForPacket(PKT_FROMCLIENT, sockl, CP_MESSAGE, 
 			buf, PKT_MAXSIZE,
-			(60 * 2), NULL) <= 0)
+			(60 * 5), NULL) <= 0)
 	{			/* error or timeout.  gen lastwords */
 	  robreply(buf);
 	  strncpy(ConqInfo->lastwords, buf, MAXLASTWORDS);
@@ -1784,13 +1784,17 @@ static int hello(void)
   if (sInfo.tryUDP)
     {
       /* wait a few seconds to see if client sends a udp */
-      tv.tv_sec = 4;
+      tv.tv_sec = 5;
       tv.tv_usec = 0;
       FD_ZERO(&readfds);
       FD_SET(sInfo.usock, &readfds);
       if ((rv = select(sInfo.usock+1, &readfds, NULL, NULL, &tv)) <= 0)
         {
-          clog("NET: SERVER: hello: udp select failed: %s", strerror(errno));
+          if (rv == 0)
+            clog("NET: SERVER: hello: udp select timed out. No UDP");
+          else
+            clog("NET: SERVER: hello: udp select failed: %s", strerror(errno));
+
           sInfo.tryUDP = FALSE;
         }
       else
@@ -1812,7 +1816,7 @@ static int hello(void)
     }
 
   /* now we want a client hello in response */
-  if ((pkttype = readPacket(PKT_FROMCLIENT, sockl, buf, PKT_MAXSIZE, 10)) < 0)
+  if ((pkttype = readPacket(PKT_FROMCLIENT, sockl, buf, PKT_MAXSIZE, 60)) < 0)
   {
     clog("NET: SERVER: hello: read client hello failed, pkttype = %d",
          pkttype);
@@ -1883,7 +1887,7 @@ static int hello(void)
     }
 
   /* now we want an ack.  If we get it, we're done! */
-  if ((pkttype = readPacket(PKT_FROMCLIENT, sockl, buf, PKT_MAXSIZE, 5)) < 0)
+  if ((pkttype = readPacket(PKT_FROMCLIENT, sockl, buf, PKT_MAXSIZE, 60)) < 0)
     {
       clog("NET: SERVER: hello: read client Ack failed");
       return FALSE;

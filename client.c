@@ -62,7 +62,7 @@ int sendAuth(int sock, Unsgn8 flag, Unsgn8 *login, Unsgn8 *pw)
     return PERR_OK;
 
   rv = waitForPacket(PKT_FROMSERVER, sockl, SP_ACK, buf, PKT_MAXSIZE, 
-		     15, NULL);
+		     60, NULL);
 
   if (rv <= 0)			/* error or timeout (0) */
     {
@@ -389,6 +389,20 @@ int procPlanetInfo(Unsgn8 *buf)
   /* we will record them if we get them */
   if (Context.recmode == RECMODE_ON)
     recordWriteEvent(buf);
+
+  /* in protocol 6, we 'forgot' planet realness.  To avoid breaking
+     protocol again, and allow unpatched clients and/or servers to
+     work we check to see if SPPLANETINFO_FLAGS_FVALID is set.  If so,
+     _then_ we pay attn to any other flags present. Else we ignore
+     them. */
+  if (splaninfo->flags & SPPLANETINFO_FLAGS_FVALID)
+    {                           /* we have valid flags */
+
+      if (splaninfo->flags & SPPLANETINFO_FLAGS_REAL)
+        Planets[pnum].real = TRUE;
+      else
+        Planets[pnum].real = FALSE;
+    }
 
   Planets[pnum].primary = primary;
   Planets[pnum].orbrad = (real)((real)((Unsgn32)ntohl(splaninfo->orbrad)) / 10.0);
@@ -725,7 +739,7 @@ int clientHello(char *clientname)
 
   /* there should be a server hello waiting for us */
   if ((pkttype = readPacket(PKT_FROMSERVER, sockl, 
-			    buf, PKT_MAXSIZE, 10)) < 0)
+			    buf, PKT_MAXSIZE, 60)) < 0)
   {
     clog("clientHello: read server hello failed\n");
     return FALSE;
@@ -809,7 +823,7 @@ int clientHello(char *clientname)
       tv.tv_usec = 0;
       FD_ZERO(&readfds);
       FD_SET(cInfo.usock, &readfds);
-      if ((rv = select(cInfo.usock+1, &readfds, NULL, NULL, &tv)) < 0)
+      if ((rv = select(cInfo.usock+1, &readfds, NULL, NULL, &tv)) <= 0)
         {
           clog("CLIENT: hello: select udp failed: %s", strerror(errno));
           cInfo.tryUDP = FALSE;
@@ -829,7 +843,7 @@ int clientHello(char *clientname)
   /* now we need a server stat or a Nak */
 
   if ((pkttype = readPacket(PKT_FROMSERVER, sockl, 
-			    buf, PKT_MAXSIZE, 15)) < 0)
+			    buf, PKT_MAXSIZE, 60)) < 0)
   {
     clog("clientHello: read of SP_ACK or SP_SERVERSTAT failed\n");
     return FALSE;

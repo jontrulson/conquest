@@ -278,11 +278,16 @@ typedef struct _sp_planetloc2 {
 
 } spPlanetLoc2_t;
 
+
+#define SPPLANETINFO_FLAGS_NONE       0x00
+#define SPPLANETINFO_FLAGS_FVALID     0x01 /* flags are valid */
+#define SPPLANETINFO_FLAGS_REAL       0x02 /* planet is real (visible) */
+
 typedef struct _sp_planetinfo {
   Unsgn8 type;			/* SP_PLANETINFO */
   Unsgn8 pnum;			/* planet number */
   Unsgn8 primary;
-  Unsgn8 pad1;
+  Unsgn8 flags;
 
   Unsgn32 orbrad;               /* x10 */
 

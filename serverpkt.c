@@ -615,11 +615,16 @@ spPlanetLoc2_t *spktPlanetLoc2(Unsgn8 pnum, int rec, int force)
   Unsgn32 iternow = clbGetMillis(); /* we send the loc2 packets only every 5 secs */
   const Unsgn32 iterwait = 5000.0; /* ms */
   static Unsgn32 tstart[NUMPLANETS] = {}; /* saved time deltas */
+  int tooearly = FALSE;
   
+  /* 
+   * We have to handle the case where a planet has just been freshly
+   * scanned (and therefore a real army count is available).  We want
+   * the client to see the true army count as soon as possible.
+   */
+
   if (!force && (tstart[pnum] != 0 && ((iternow - tstart[pnum]) < iterwait)))
-    return NULL; 
-  
-  tstart[pnum] = iternow; 
+    tooearly = TRUE;
   
   memset((void *)&splanloc2, 0, sizeof(spPlanetLoc2_t));
 
@@ -629,6 +634,11 @@ spPlanetLoc2_t *spktPlanetLoc2(Unsgn8 pnum, int rec, int force)
   /* RESTRICT */
   if (Planets[pnum].scanned[team] || rec)
     splanloc2.armies = htons(Planets[pnum].armies);
+
+  if (splanloc2.armies == pktPlanetLoc2[pnum].armies && tooearly)
+    return NULL;
+
+  tstart[pnum] = iternow; 
 
   splanloc2.x = (Sgn32)htonl((Sgn32)(Planets[pnum].x * 1000.0));
   splanloc2.y = (Sgn32)htonl((Sgn32)(Planets[pnum].y * 1000.0));
@@ -994,8 +1004,14 @@ spPlanetInfo_t *spktPlanetInfo(Unsgn8 pnum, int rec)
 
   memset((void *)&splaninfo, 0, sizeof(spPlanetInfo_t));
 
+  splaninfo.flags = SPPLANETINFO_FLAGS_FVALID;
+
   splaninfo.type = SP_PLANETINFO;
   splaninfo.pnum = pnum;
+
+  if (Planets[pnum].real)
+    splaninfo.flags |= SPPLANETINFO_FLAGS_REAL;
+
   splaninfo.primary = (Unsgn8)Planets[pnum].primary;
 
   splaninfo.orbrad = (Unsgn32)htonl((Unsgn32)(Planets[pnum].orbrad * 10.0));

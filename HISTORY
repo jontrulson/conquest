@@ -9,6 +9,34 @@
 
                               Conquest HISTORY
 
+Version 8.0.1o 11/21/2004 (devel)
+
+        - incorporates 8.0.1n patch that fixes protocol problem with
+          letting the client know the true 'realness' of a planet.
+
+        - fixed planet sending logic to account for newly scanned
+          planets.  Previously, it could take up to 5 seconds for the
+          client to be told the true army count of a planet that was
+          just scanned for the first time.  
+
+          You should now get the real army count almost immediately
+          after scanning a planet for the first time.
+
+        - increased packet timeout waits for the initial server/client
+          negotiation sequence that could cause problems connecting to
+          a server with a high lag.  Where it used to only wait about
+          10 seconds for the initial hello packets from the server, it
+          now waits 60 seconds for example.  On a really laggy server
+          it may take a minute or more to fully connect, by which time
+          you will problably not want to play on that server anyway :)
+
+        - small bug in curses client (conquest) that could cause
+          problems if other than expected packets came in during
+          welcome phase
+
+        - In meta list, [ENTER] can be used as well as [TAB] to
+          select a server to connect to.
+
 Version 8.0.1m 11/14/2004 (devel)
 
         - builds under cygwin (11/11/2004) again.  Both the server and
