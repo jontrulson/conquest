@@ -429,7 +429,7 @@ static void ChangeMacro(int macronum)
   cdputs(prmpt2, MSG_LIN2, 1);
   sprintf(prmpt, "f%2d = ", macronum);
 
-  strcpy(buf, Macro2Str(conf_MacrosF[macronum - 1]));
+  strcpy(buf, Macro2Str(UserConf.MacrosF[macronum - 1]));
   ch = cdgetx(prmpt, lin, 1, TERMS, buf, MAX_MACRO_LEN - 1, TRUE);
 
   if (ch == TERM_ABORT)
@@ -437,8 +437,8 @@ static void ChangeMacro(int macronum)
       return;			/* if abort, cancel */
     }
       
-  strncpy(conf_MacrosF[macronum - 1], Str2Macro(buf), MAX_MACRO_LEN);
-  conf_MacrosF[macronum - 1][MAX_MACRO_LEN - 1] = EOS;
+  strncpy(UserConf.MacrosF[macronum - 1], Str2Macro(buf), MAX_MACRO_LEN);
+  UserConf.MacrosF[macronum - 1][MAX_MACRO_LEN - 1] = EOS;
   
   ChangedSomething = TRUE;
 

@@ -26,9 +26,11 @@
 
 #include "conqdef.h"
 #include "conqcom.h"
-#include "conqcom2.h"
-#include "user.h"
+#include "context.h"
+
+#include "conf.h"
 #include "global.h"
+#include "user.h"
 #include "color.h"
 
 				/* shared with display.c */
@@ -367,7 +369,10 @@ void infoplanet( char *str, int pnum, int snum )
       y = Ships[snum].y;
     }
   
-  if (sysconf_DoETAStats)
+  Context.lasttdist = round(dist( x, y, Planets[pnum].x, Planets[pnum].y));
+  Context.lasttang = round(angle( x, y, Planets[pnum].x, Planets[pnum].y ));
+
+  if (SysConf.DoETAStats)
     {
       static char tmpstr[64];
       
@@ -375,19 +380,21 @@ void infoplanet( char *str, int pnum, int snum )
 	{
 	  sprintf(tmpstr, ", ETA %s",
 		  ETAstr(Ships[snum].warp, 	
-			 round( dist( x, y, Planets[pnum].x, Planets[pnum].y)) ));
+			 Context.lasttdist));
 	}
       else
 	tmpstr[0] = '\0';
-      
+
       sprintf( buf, "%s%s, a %s%s, range %d, direction %d%s",
-	     str,
+	       str,
 	     Planets[pnum].name,
 	     ConqInfo->ptname[Planets[pnum].type],
 	     junk,
-	     round( dist( x, y, Planets[pnum].x, Planets[pnum].y ) ),
-	     round( angle( x, y, Planets[pnum].x, Planets[pnum].y ) ),
+	     Context.lasttdist,
+	     Context.lasttang,
 	     tmpstr);
+
+
     }
   else
     sprintf( buf, "%s%s, a %s%s, range %d, direction %d",
@@ -395,9 +402,13 @@ void infoplanet( char *str, int pnum, int snum )
 	   Planets[pnum].name,
 	   ConqInfo->ptname[Planets[pnum].type],
 	   junk,
-	   round( dist( x, y, Planets[pnum].x, Planets[pnum].y ) ),
-	   round( angle( x, y, Planets[pnum].x, Planets[pnum].y ) ));
+	   Context.lasttdist,
+	   Context.lasttang);
   
+  /* save for the alt hud */
+  strncpy(Context.lasttarg, Planets[pnum].name, 3);
+  Context.lasttarg[3] = EOS;
+
   if ( godlike )
     canscan = TRUE;
   else
@@ -561,8 +572,11 @@ void infoship( int snum, int scanner )
       cdmove( MSG_LIN1, 1 );
       return;
     }
-  cbuf[0] = EOS;
+
+  cbuf[0] = Context.lasttarg[0] = EOS;
   appship( snum, cbuf );
+  strcpy(Context.lasttarg, cbuf); /* save for alt hud */
+
   if ( snum == scanner )
     {
       /* Silly Captain... */
@@ -628,7 +642,7 @@ void infoship( int snum, int scanner )
   else
     appstr( ", ", cbuf );
 
-  if (sysconf_AllowRefits)
+  if (SysConf.AllowRefits)
     {
       appstr("a ", cbuf);
       appstr(ShipTypes[Ships[snum].shiptype].name, cbuf);
@@ -652,11 +666,14 @@ void infoship( int snum, int scanner )
   
   if ( ! Ships[snum].cloaked || Ships[snum].warp > 0.0 )
     {
+      Context.lasttdist = round( dis ); /* save these puppies for alt hud */
+      Context.lasttang = round( angle( x, y, appx, appy ) );
       sprintf( cbuf, "Range %d, direction %d",
-	     round( dis ), round( angle( x, y, appx, appy ) ) );
+	     Context.lasttdist, Context.lasttang );
+
 
 #if defined(BETTER_ETA)
-      if (sysconf_DoETAStats)
+      if (SysConf.DoETAStats)
 	{
 	  if (Ships[scanner].warp > 0.0 || Ships[snum].warp > 0.0)
 	    {
@@ -749,7 +766,7 @@ clog("infoship:\tdis(%.1f) pwarp(%.1f) = (close_rate(%.1f) / MM_PER_SEC_PER_WARP
 	} /* if do ETA stats */
 #else /* not a BETTER_ETA */
 
-      if (sysconf_DoETAStats)
+      if (SysConf.DoETAStats)
 	{
 	  if (Ships[scanner].warp > 0.0 || Ships[snum].warp > 0.0)
 	    {
@@ -766,8 +783,11 @@ clog("infoship:\tdis(%.1f) pwarp(%.1f) = (close_rate(%.1f) / MM_PER_SEC_PER_WARP
 #endif /* !BETTER_ETA */
 
     }
-  else
-    cbuf[0] = EOS;
+  else				/* else cloaked and at w0 */
+    {
+      Context.lasttdist = Context.lasttang = 0;
+      cbuf[0] = EOS;
+    }
   
   if ( canscan )
     {
@@ -1304,15 +1324,15 @@ void planlist( int team, int snum )
 		    }
 		  else
 		    {			/* via menu() */
-		      if ( Planets[pnum].team == Users[CqContext.unum].team && 
-			   !(Users[CqContext.unum].war[Users[CqContext.unum].team]))
+		      if ( Planets[pnum].team == Users[Context.unum].team && 
+			   !(Users[Context.unum].war[Users[Context.unum].team]))
 			{
 			  outattr = GreenLevelColor;
 			}
 		      else if ( Planets[pnum].type == PLANET_SUN ||
 				(Planets[pnum].team < NUMPLAYERTEAMS && 
-				 Users[CqContext.unum].war[Planets[pnum].team] &&
-				 Planets[pnum].scanned[Users[CqContext.unum].team]) )
+				 Users[Context.unum].war[Planets[pnum].team] &&
+				 Planets[pnum].scanned[Users[Context.unum].team]) )
 			{
 			  outattr = RedLevelColor;
 			}
@@ -1492,7 +1512,7 @@ void playlist( int godlike, int doall, int snum )
   while(TRUE) /* repeat- while */
     {
       if ( ! godlike )
-	if ( ! stillalive( CqContext.snum ) )
+	if ( ! stillalive( Context.snum ) )
 	  break;
       i = fship;
       cdclrl( fline, lline - fline + 1 );
@@ -1507,7 +1527,7 @@ void playlist( int godlike, int doall, int snum )
 	    {
 	      sbuf[0] = EOS;
 	      appship( i, sbuf );
-	      if (sysconf_AllowRefits)
+	      if (SysConf.AllowRefits)
 		{
 		  appstr(" ", sbuf);
 		  appchr(ShipTypes[Ships[i].shiptype].name[0], sbuf);
@@ -1559,10 +1579,10 @@ void playlist( int godlike, int doall, int snum )
 		  }
 		else
 		  { /* not conqoper, and not a valid ship (main menu) */
-		    if (Users[CqContext.unum].war[Ships[i].team])  /* we're at war with ships's
+		    if (Users[Context.unum].war[Ships[i].team])  /* we're at war with ships's
 						   team */
 		      attrset(RedLevelColor);
-		    else if (Users[CqContext.unum].team == Ships[i].team)
+		    else if (Users[Context.unum].team == Ships[i].team)
 		      attrset(GreenLevelColor); /* it's a team ship */
 		    else
 		      attrset(YellowLevelColor);
@@ -1697,7 +1717,7 @@ int c_register( char *lname, char *rname, int team, int *unum )
 	for ( j = 0; j < MAXOOPTIONS; j = j + 1 )
 	  Users[i].ooptions[j] = FALSE;
 	
-	if (sysconf_AllowSwitchteams == TRUE)
+	if (SysConf.AllowSwitchteams == TRUE)
 	  {
 				/* allow users to switchteams when dead */
 	    Users[i].ooptions[OOPT_SWITCHTEAMS] = TRUE; 
@@ -2256,7 +2276,7 @@ void userline( int unum, int snum, char *buf, int showgods, int showteam )
 	if ( Users[unum].ooptions[i] )
 	  {
 	    if (i != OOPT_SWITCHTEAMS || (i == OOPT_SWITCHTEAMS && 
-					  sysconf_AllowSwitchteams != TRUE)) 
+					  SysConf.AllowSwitchteams != TRUE)) 
 	      {			/* don't want false positive on
 				   switchteams option - when enabled */
 		ch2 = '+';
@@ -2359,7 +2379,7 @@ void userlist( int godlike, int snum )
     {
 
       if ( ! godlike )
-	if ( ! stillalive( CqContext.snum ) )
+	if ( ! stillalive( Context.snum ) )
 	  break;
 
 				/* sort the (living) user list */
@@ -2397,12 +2417,12 @@ void userlist( int godlike, int snum )
 	  else			/* we don't have a ship yet */
 	    {
 	      if ( strcmp(Users[uvec[i]].username,
-			  Users[CqContext.unum].username) == 0 &&
-		   Users[uvec[i]].type == Users[CqContext.unum].type)
+			  Users[Context.unum].username) == 0 &&
+		   Users[uvec[i]].type == Users[Context.unum].type)
 		attrset(A_BOLD);    /* it's ours */
-	      else if (Users[CqContext.unum].war[Users[uvec[i]].team]) /* we're war with them */
+	      else if (Users[Context.unum].war[Users[uvec[i]].team]) /* we're war with them */
 		attrset(RedLevelColor);	            /* (might be selfwar) */
-	      else if (Users[CqContext.unum].team == Users[uvec[i]].team) /* team ship */
+	      else if (Users[Context.unum].team == Users[uvec[i]].team) /* team ship */
 		attrset(GreenLevelColor);
 	      else
 		attrset(YellowLevelColor);
@@ -2488,7 +2508,7 @@ void userstats( int godlike , int snum )
   while (TRUE) /* repeat-while */
     {
       if ( ! godlike )
-	if ( ! stillalive( CqContext.snum ) )
+	if ( ! stillalive( Context.snum ) )
 	  break;
 
 				/* sort the (living) user list */
@@ -2528,12 +2548,12 @@ void userstats( int godlike , int snum )
 	  else
 	    {
 	      if ( strcmp(Users[uvec[i]].username,
-			  Users[CqContext.unum].username) == 0  &&
-		   Users[uvec[i]].type == Users[CqContext.unum].type )
+			  Users[Context.unum].username) == 0  &&
+		   Users[uvec[i]].type == Users[Context.unum].type )
 		attrset(A_BOLD);	/* it's ours */
-	      else if (Users[CqContext.unum].war[Users[uvec[i]].team]) 
+	      else if (Users[Context.unum].war[Users[uvec[i]].team]) 
 		attrset(RedLevelColor);  /* we're war with them (poss selfwar) */
-	      else if (Users[CqContext.unum].team == Users[uvec[i]].team) 
+	      else if (Users[Context.unum].team == Users[uvec[i]].team) 
 		attrset(GreenLevelColor);	/* team ship */
 	      else
 		attrset(YellowLevelColor);

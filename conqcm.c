@@ -30,7 +30,7 @@
 
 #define NOCOMEXTERN
 #include "conqcom.h"		/* common block vars defined here */
-#include "conqcom2.h"		/* some extra stuff */
+#include "context.h"		/* some extra stuff */
 #include "user.h"
 static char *conqcmId = "$Id$";
 

@@ -54,7 +54,8 @@
 
 #include "conqdef.h"
 
-#include "conqcom2.h"
+#include "context.h"
+#include "conf.h"
 #include "global.h"
 #include "color.h"
 
@@ -215,7 +216,7 @@ void cdend(void)
 
 #if defined (HAVE_TERMIOS_H)
   tcgetattr(PollInputfd, &term);
-  term.c_cc[VINTR] = CqContext.intrchar; /* restore INTR */
+  term.c_cc[VINTR] = Context.intrchar; /* restore INTR */
   tcsetattr(PollInputfd, TCSANOW, &term);
 #endif
   
@@ -573,7 +574,7 @@ void cdbeep(void)
   int i;
   static int old = 0;
   
-  if (conf_DoLimitBell == TRUE)	/* limit beeps to no more than 1 per sec */
+  if (UserConf.DoLimitBell == TRUE)	/* limit beeps to no more than 1 per sec */
     {
       i = time(0);
       
@@ -656,11 +657,11 @@ void cdinit(void)
 				   DEL to be used for deleting text
 				   for example */
 
-  CqContext.intrchar = 0;	/* default - nothing */
+  Context.intrchar = 0;	/* default - nothing */
 
 #if defined (HAVE_TERMIOS_H)
   tcgetattr(PollInputfd, &term);
-  CqContext.intrchar = term.c_cc[VINTR]; /* save it */
+  Context.intrchar = term.c_cc[VINTR]; /* save it */
   term.c_cc[VINTR] = 0x03;	/* ^C - harmless */
   tcsetattr(PollInputfd, TCSANOW, &term);
 #endif
@@ -854,7 +855,7 @@ void cdputs ( char str[], int lin, int col )
   
   strcpy(tmpstr, str);
   
-  len = CqContext.maxcol - col; /* - 1; /* max str that will fit on screen */
+  len = Context.maxcol - col; /* - 1; /* max str that will fit on screen */
   slen = strlen(tmpstr);
   
   len = (len >= 0) ? len : 0;

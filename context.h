@@ -23,8 +23,8 @@
 /*                                                                    */
 /**********************************************************************/
 
-#ifndef CONQCOM2_H
-#define CONQCOM2_H
+#ifndef CONTEXT_H
+#define CONTEXT_H
 
 #ifdef NOEXTERN
 #define C2EXTERN
@@ -52,11 +52,15 @@ typedef struct {
   int msgok;			/* allow new messages */
   int entship;			/* entered a ship? */
   int recmode;			/* recording mode: one of RECMODE_* */
+  int lasttang;			/* last target angle */
+  int lasttdist;		/* last target distance */
+  int hascolor;			/* do we have color support? */
+  char lasttarg[BUFFER_SIZE];   /* string of last ship/planet (I)nfo'd */
   char lastinfostr[MSGMAXLINE]; /* last string used in doinfo() */
   char intrchar;		/* users interrupt char */
-} CqContext_t;
+} Context_t;
 
-C2EXTERN CqContext_t CqContext;
+C2EXTERN Context_t Context;
 
 #undef C2EXTERN
 #endif

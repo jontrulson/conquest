@@ -25,8 +25,9 @@
 
 #include "conqdef.h"
 #include "conqcom.h"
-#include "conqcom2.h"
+#include "context.h"
 #include "global.h"
+#include "conf.h"
 #include "user.h"
 
 static int nenum; 
@@ -527,7 +528,7 @@ int newrob( int *snum, int unum )
 				/* see if we should randomize it's strength
 				   otherwise do nothing since sstrkills
 				   was initialized to 0.0 in initship */
-  if (sysconf_DoRandomRobotKills == TRUE)
+  if (SysConf.DoRandomRobotKills == TRUE)
     {
 				/* randomize the robot's 'strength' */
       Ships[*snum].strkills = 
@@ -539,7 +540,7 @@ int newrob( int *snum, int unum )
   Ships[*snum].unum = unum;
   Ships[*snum].team = Users[unum].team;
 
-  if (sysconf_AllowRefits)
+  if (SysConf.AllowRefits)
     Ships[*snum].shiptype = rndint( 0, MAXNUMSHIPTYPES - 1 );
   else
     Ships[*snum].shiptype = Teams[Ships[*snum].team].shiptype;

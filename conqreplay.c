@@ -12,7 +12,7 @@
 #define NOEXTERN
 #include "conqdef.h"
 #include "conqcom.h"
-#include "conqcom2.h"
+#include "context.h"
 #include "global.h"
 #include "color.h"
 
@@ -191,7 +191,7 @@ void displayReplayData(void)
   cdputs( buf, DISPLAY_LINS + 1, 15);
 
   /* paused status */
-  if (CqContext.recmode == RECMODE_PAUSED)
+  if (Context.recmode == RECMODE_PAUSED)
     cdputs( "PAUSED: Press [SPACE] to resume", DISPLAY_LINS + 2, 0);
 
   cdrefresh();
@@ -207,12 +207,12 @@ void displayMsg(Msg_t *themsg)
   char buf[MSGMAXLINE];
   unsigned int attrib = 0;
 
-  if (CqContext.display == FALSE || CqContext.recmode != RECMODE_PLAYING)
+  if (Context.display == FALSE || Context.recmode != RECMODE_PLAYING)
     return;			/* don't display anything */
 
   buf[0] = '\0';
 
-  if (HasColors)
+  if (Context.hascolor)
     {                           /* set up the attrib so msg's are cyan */
       attrib = COLOR_PAIR(COL_CYANBLACK);
     }
@@ -324,13 +324,13 @@ void fileSeek(time_t newtime)
 
   /* just read packets until 1. currTime exceeds newtime, or 2. no
      data is left */
-  CqContext.display = FALSE; /* don't display things while looking */
+  Context.display = FALSE; /* don't display things while looking */
   
   while (currTime < newtime)
     if (processPacket() == RDATA_NONE)
       break;		/* no more data */
   
-  CqContext.display = TRUE;
+  Context.display = TRUE;
 
   return;
 }
@@ -391,16 +391,19 @@ main(int argc, char *argv[])
 
   cdinit();			/* initialize display environment */
   
-  CqContext.unum = MSG_GOD;	/* stow user number */
-  CqContext.snum = ERR;		/* don't display in cdgetp - JET */
-  CqContext.entship = FALSE;	/* never entered a ship */
-  CqContext.histslot = ERR;	/* useless as an op */
-  CqContext.display = TRUE;
+  Context.unum = MSG_GOD;	/* stow user number */
+  Context.snum = ERR;		/* don't display in cdgetp - JET */
+  Context.entship = FALSE;	/* never entered a ship */
+  Context.histslot = ERR;	/* useless as an op */
+  Context.lasttdist = Context.lasttang = 0;
+  Context.lasttarg[0] = EOS;
 
-  CqContext.maxlin = cdlins();	/* number of lines */
-  CqContext.maxcol = cdcols();	/* number of columns */
+  Context.display = TRUE;
 
-  CqContext.recmode = RECMODE_PLAYING;
+  Context.maxlin = cdlins();	/* number of lines */
+  Context.maxcol = cdcols();	/* number of columns */
+
+  Context.recmode = RECMODE_PLAYING;
 
   /* if framedelay wasn't overridden, setup based on samplerate */
   if (framedelay == -1.0)
@@ -572,18 +575,18 @@ void watch(void)
   else
     {
       old_snum = tmp_snum = snum;
-      CqContext.redraw = TRUE;
+      Context.redraw = TRUE;
       cdclear();
       cdredo();
       grand( &msgrand );
       
-      CqContext.snum = snum;		/* so display knows what to display */
+      Context.snum = snum;		/* so display knows what to display */
       /*	  setopertimer();*/
       
       
       while (TRUE)
 	{
-	  if (CqContext.recmode == RECMODE_PLAYING)
+	  if (Context.recmode == RECMODE_PLAYING)
 	    if ((ptype = processIter()) == RDATA_NONE)
 	      return;
 
@@ -592,7 +595,7 @@ void watch(void)
 		  ptype);
 #endif
 
-	  CqContext.display = TRUE;
+	  Context.display = TRUE;
 	  
 	  if (toggle_flg)
 	    toggle_line(snum,old_snum);
@@ -604,9 +607,9 @@ void watch(void)
 				 planets though, so we'll keep this
 				 in for now */
 	  
-	  if (CqContext.recmode == RECMODE_PLAYING || upddsp)
+	  if (Context.recmode == RECMODE_PLAYING || upddsp)
 	    {
-	      display(CqContext.snum, headerflag);
+	      display(Context.snum, headerflag);
 	      displayReplayData();
 	      upddsp = FALSE;	/* use this for one-shots */
 	    }
@@ -623,7 +626,7 @@ void watch(void)
 	      break;
 	    case 'h':
 	      dowatchhelp();
-	      CqContext.redraw = TRUE;
+	      Context.redraw = TRUE;
 	      upddsp = TRUE;
 	      break;
 	      
@@ -666,13 +669,13 @@ void watch(void)
 	      break;
 
 	    case ' ':	/* pause/resume playback */
-	      if (CqContext.recmode == RECMODE_PLAYING)
+	      if (Context.recmode == RECMODE_PLAYING)
 		{		/* pause */
-		  CqContext.recmode = RECMODE_PAUSED;
+		  Context.recmode = RECMODE_PAUSED;
 		}
 	      else 
 		{		/* resume */
-		  CqContext.recmode = RECMODE_PLAYING;
+		  Context.recmode = RECMODE_PLAYING;
 		}
 
 	      upddsp = TRUE;
@@ -711,7 +714,7 @@ void watch(void)
 
 	    case TERM_REDRAW:	/* ^L */
 	      cdclear();
-	      CqContext.redraw = TRUE;
+	      Context.redraw = TRUE;
 	      upddsp = TRUE;
 	      break;
 
@@ -725,9 +728,9 @@ void watch(void)
 		    {
 		      old_snum = tmp_snum;
 		      tmp_snum = snum;
-		      CqContext.redraw = TRUE;
+		      Context.redraw = TRUE;
 		    }
-		  CqContext.snum = snum;
+		  Context.snum = snum;
 		}
 	      upddsp = TRUE;
 	      break;
@@ -741,8 +744,8 @@ void watch(void)
 		      snum = old_snum;
 		      old_snum = tmp_snum;
 			  
-		      CqContext.snum = snum;
-		      CqContext.redraw = TRUE;
+		      Context.snum = snum;
+		      Context.redraw = TRUE;
 		      upddsp = TRUE;
 		    }
 		}
@@ -752,7 +755,7 @@ void watch(void)
 
 	    case '/':                /* ship list - dwp */
 	      playlist( TRUE, FALSE, 0 );
-	      CqContext.redraw = TRUE;
+	      Context.redraw = TRUE;
 	      upddsp = TRUE;
 	      break;
 	    case '!':
@@ -814,20 +817,20 @@ void watch(void)
 		      
 		  snum = i;
 			
-		  CqContext.redraw = TRUE;
+		  Context.redraw = TRUE;
 		      
 		  if (live_ships)
 		    if ((snum > 0 && stillalive(snum)) || 
 			(snum == DISPLAY_DOOMSDAY && Doomsday->status == DS_LIVE))
 		      {
-			CqContext.snum = snum;
+			Context.snum = snum;
 			break;
 		      }
 		    else
 		      continue;
 		  else
 		    {
-		      CqContext.snum = snum;
+		      Context.snum = snum;
 		      break;
 		    }
 		}
@@ -889,20 +892,20 @@ void watch(void)
 		      
 		  snum = i;
 			
-		  CqContext.redraw = TRUE;
+		  Context.redraw = TRUE;
 		      
 		  if (live_ships)
 		    if ((snum > 0 && stillalive(snum)) || 
 			(snum == DISPLAY_DOOMSDAY && Doomsday->status == DS_LIVE))
 		      {
-			CqContext.snum = snum;
+			Context.snum = snum;
 			break;
 		      }
 		    else
 		      continue;
 		  else
 		    {
-		      CqContext.snum = snum;
+		      Context.snum = snum;
 		      break;
 		    }
 		}
@@ -1075,7 +1078,7 @@ void toggle_line(int snum, int old_snum)
   build_toggle_str(old_snum_str,old_snum);
   
   sprintf(buf,frmt_str,snum_str, old_snum_str);
-  cdputs( buf, MSG_LIN1, (CqContext.maxcol-(strlen(buf))));  /* at end of line */
+  cdputs( buf, MSG_LIN1, (Context.maxcol-(strlen(buf))));  /* at end of line */
   
   return;
 

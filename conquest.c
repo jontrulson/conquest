@@ -27,7 +27,8 @@
 #define NOEXTERN
 #include "conqdef.h"
 #include "conqcom.h"
-#include "conqcom2.h"
+#include "context.h"
+#include "conf.h"
 #include "global.h"
 #include "color.h"
 #include "record.h"
@@ -50,8 +51,8 @@ main(int argc, char *argv[])
 {
   int i;
 
-  CqContext.entship = FALSE;
-  CqContext.recmode = RECMODE_OFF;
+  Context.entship = FALSE;
+  Context.recmode = RECMODE_OFF;
 
   /* check options */
   while ((i = getopt(argc, argv, "r:")) != EOF)    /* get command args */
@@ -60,12 +61,12 @@ main(int argc, char *argv[])
       case 'r': 
 	if (recordOpenOutput(optarg))
 	  {			/* we are almost ready... */
-	    CqContext.recmode = RECMODE_STARTING;
+	    Context.recmode = RECMODE_STARTING;
 	    printf("Recording game to %s...\n", optarg);
 	  }
 	else
 	  {
-	    CqContext.recmode = RECMODE_OFF;
+	    Context.recmode = RECMODE_OFF;
             printf("Cannot record game to %s... terminating\n", optarg);
 	    exit(1);
 	  }
@@ -157,27 +158,29 @@ main(int argc, char *argv[])
   
   cdinit();			/* set up display environment */
   
-  CqContext.maxlin = cdlins();
+  Context.maxlin = cdlins();
   
-  CqContext.maxcol = cdcols();
+  Context.maxcol = cdcols();
   
   
   
-  CqContext.snum = 0;		/* force menu to get a new ship */
-  CqContext.histslot = ERR;
+  Context.snum = 0;		/* force menu to get a new ship */
+  Context.histslot = ERR;
+  Context.lasttang = Context.lasttdist = 0;
+  Context.lasttarg[0] = EOS;
 
 #ifdef DEBUG_FLOW
   clog("%s@%d: main() welcoming player.", __FILE__, __LINE__);
 #endif
   
-  if ( welcome( &CqContext.unum ) )
+  if ( welcome( &Context.unum ) )
     {
-      if (CqContext.recmode == RECMODE_STARTING)
+      if (Context.recmode == RECMODE_STARTING)
 	{
-	  if (recordInit(CqContext.unum, getnow(NULL, 0)))
-	    CqContext.recmode = RECMODE_ON;
+	  if (recordInit(Context.unum, getnow(NULL, 0)))
+	    Context.recmode = RECMODE_ON;
 	  else
-	    CqContext.recmode = RECMODE_OFF;
+	    Context.recmode = RECMODE_OFF;
 	}
 
       menu();
@@ -254,7 +257,7 @@ int capentry( int snum, int *system )
   cdmove( 1, 1 );
   cdrefresh();
   
-  while ( stillalive( CqContext.snum ) )
+  while ( stillalive( Context.snum ) )
     {
       if ( ! iogtimed( &ch, 1.0 ) )
 	continue; /* next */
@@ -303,10 +306,10 @@ void command( int ch )
       cdclrl( MSG_LIN1, 1 );
       cdclrl( MSG_LIN2, 1 );
       
-      if ( Ships[CqContext.snum].warp < 0.0 ) 
-	Ships[CqContext.snum].warp = 0.0; 
-      Ships[CqContext.snum].dhead = (real)(x); 
-      Ships[CqContext.snum].lock = 0; 
+      if ( Ships[Context.snum].warp < 0.0 ) 
+	Ships[Context.snum].warp = 0.0; 
+      Ships[Context.snum].dhead = (real)(x); 
+      Ships[Context.snum].lock = 0; 
       
       return;
     }
@@ -331,12 +334,12 @@ void command( int ch )
 	  i = ch - '0';
 	  x = (real) (i); 
 	}
-      dowarp( CqContext.snum, x );
+      dowarp( Context.snum, x );
       break;
     case 'a':				/* autopilot */
-      if ( Users[Ships[CqContext.snum].unum].ooptions[ OOPT_AUTOPILOT] )
+      if ( Users[Ships[Context.snum].unum].ooptions[ OOPT_AUTOPILOT] )
 	{
-	  doautopilot( CqContext.snum );
+	  doautopilot( Context.snum );
 	}
       else
 	{
@@ -344,113 +347,113 @@ void command( int ch )
 	}
       break;
     case 'A':				/* change allocation */
-      doalloc( CqContext.snum );
+      doalloc( Context.snum );
       stoptimer();
-      if ( stillalive( CqContext.snum ) )
-	display( CqContext.snum, FALSE );
+      if ( stillalive( Context.snum ) )
+	display( Context.snum, FALSE );
       settimer();
       break;
     case 'b':				/* beam armies */
-      dobeam( CqContext.snum );
+      dobeam( Context.snum );
       break;
     case 'B':				/* bombard a planet */
-      dobomb( CqContext.snum );
+      dobomb( Context.snum );
       break;
     case 'C':				/* cloak control */
-      docloak( CqContext.snum );
+      docloak( Context.snum );
       break;
     case 'd':				/* detonate enemy torps */
     case '*':
-      dodet( CqContext.snum );
+      dodet( Context.snum );
       break;
     case 'D':				/* detonate own torps */
-      domydet( CqContext.snum );
+      domydet( Context.snum );
       break;
     case 'E':				/* emergency distress call */
-      dodistress( CqContext.snum );
+      dodistress( Context.snum );
       break;
     case 'f':				/* phasers */
-      dophase( CqContext.snum );
+      dophase( Context.snum );
       break;
     case 'F':				/* phasers, same direction */
-      dolastphase( CqContext.snum );
+      dolastphase( Context.snum );
       break;
     case 'h':
-      CqContext.redraw = TRUE;
+      Context.redraw = TRUE;
       stoptimer();
       dohelp();
-      if ( stillalive( CqContext.snum ) )
-	display( CqContext.snum, FALSE );
+      if ( stillalive( Context.snum ) )
+	display( Context.snum, FALSE );
       settimer();
       break;
     case 'H':
-      CqContext.redraw = TRUE;
+      Context.redraw = TRUE;
       stoptimer();
       histlist( FALSE );
-      if ( stillalive( CqContext.snum ) )
-	display( CqContext.snum, FALSE );
+      if ( stillalive( Context.snum ) )
+	display( Context.snum, FALSE );
       settimer();
       break;
     case 'i':				/* information */
-      doinfo( CqContext.snum );
+      doinfo( Context.snum );
       break;
     case 'I':				/* set user options */
-      dooption( CqContext.snum, TRUE );
+      dooption( Context.snum, TRUE );
       break;
     case 'k':				/* set course */
-      docourse( CqContext.snum );
+      docourse( Context.snum );
       break;
     case 'K':				/* coup */
-      docoup( CqContext.snum );
+      docoup( Context.snum );
       break;
     case 'L':				/* review old messages */
-      doreview( CqContext.snum );
+      doreview( Context.snum );
       break;
     case 'm':				/* send a message */
-      sendmsg( CqContext.snum, Ships[CqContext.snum].options[OPT_TERSE] );
+      sendmsg( Context.snum, Ships[Context.snum].options[OPT_TERSE] );
       break;
     case 'M':				/* strategic/tactical map */
-      Ships[CqContext.snum].map = ! Ships[CqContext.snum].map;	
+      Ships[Context.snum].map = ! Ships[Context.snum].map;	
       stoptimer();
-      display( CqContext.snum, FALSE );
+      display( Context.snum, FALSE );
       settimer();
       break;
     case 'N':				/* change pseudonym */
-      pseudo( CqContext.unum, CqContext.snum );
+      pseudo( Context.unum, Context.snum );
       break;
 
     case 'O':
       stoptimer();
-      CqContext.redraw = TRUE;
-      UserOptsMenu(CqContext.unum);
-      if ( stillalive( CqContext.snum ) )
-	display( CqContext.snum, FALSE );
+      Context.redraw = TRUE;
+      UserOptsMenu(Context.unum);
+      if ( stillalive( Context.snum ) )
+	display( Context.snum, FALSE );
       settimer();
       break;
     case 'o':				/* orbit nearby planet */
-      doorbit( CqContext.snum );
+      doorbit( Context.snum );
       break;
     case 'P':				/* photon torpedo burst */
-      doburst( CqContext.snum );
+      doburst( Context.snum );
       break;
     case 'p':				/* photon torpedoes */
-      dotorp( CqContext.snum );
+      dotorp( Context.snum );
       break;
     case 'Q':				/* self destruct */
-      doselfdest( CqContext.snum );
+      doselfdest( Context.snum );
       break;
     case 'r':				/* refit */
-      if (sysconf_AllowRefits)
-	dorefit( CqContext.snum, TRUE );
+      if (SysConf.AllowRefits)
+	dorefit( Context.snum, TRUE );
       else
 	cdbeep();
       break;
     case 'R':				/* repair mode */
-      if ( ! Ships[CqContext.snum].cloaked )
+      if ( ! Ships[Context.snum].cloaked )
 	{
 	  cdclrl( MSG_LIN1, 2 );
-	  Ships[CqContext.snum].rmode = TRUE;
-	  Ships[CqContext.snum].dwarp = 0.0;
+	  Ships[Context.snum].rmode = TRUE;
+	  Ships[Context.snum].dwarp = 0.0;
 	}
       else
 	{
@@ -461,71 +464,71 @@ void command( int ch )
 	}
       break;
     case 't':				/* tow */
-      dotow( CqContext.snum );
+      dotow( Context.snum );
       break;
     case 'S':				/* more user stats */
-      CqContext.redraw = TRUE;
+      Context.redraw = TRUE;
       stoptimer();
-      userstats( FALSE, CqContext.snum ); 
-      if ( stillalive( CqContext.snum ) )
-	display( CqContext.snum, FALSE );
+      userstats( FALSE, Context.snum ); 
+      if ( stillalive( Context.snum ) )
+	display( Context.snum, FALSE );
       settimer();
       break;
     case 'T':				/* team list */
-      CqContext.redraw = TRUE;
+      Context.redraw = TRUE;
       stoptimer();
-      doteamlist( Ships[CqContext.snum].team );
-      if ( stillalive( CqContext.snum ) )
-	display( CqContext.snum, FALSE );
+      doteamlist( Ships[Context.snum].team );
+      if ( stillalive( Context.snum ) )
+	display( Context.snum, FALSE );
       settimer();
       break;
     case 'u':				/* un-tractor */
-      dountow( CqContext.snum );
+      dountow( Context.snum );
       break;
     case 'U':				/* user stats */
-      CqContext.redraw = TRUE;
+      Context.redraw = TRUE;
       stoptimer();
-      userlist( FALSE, CqContext.snum );
-      if ( stillalive( CqContext.snum ) )
-	display( CqContext.snum, FALSE );
+      userlist( FALSE, Context.snum );
+      if ( stillalive( Context.snum ) )
+	display( Context.snum, FALSE );
       settimer();
       break;
     case 'W':				/* war and peace */
-      dowar( CqContext.snum );
+      dowar( Context.snum );
       break;
     case '-':				/* shields down */
-      doshields( CqContext.snum, FALSE );
+      doshields( Context.snum, FALSE );
       stoptimer();
-      display( CqContext.snum, FALSE );
+      display( Context.snum, FALSE );
       settimer();
       break;
     case '+':				/* shields up */
-      doshields( CqContext.snum, TRUE );
+      doshields( Context.snum, TRUE );
       stoptimer();
-      display( CqContext.snum, FALSE );
+      display( Context.snum, FALSE );
       settimer();
       break;
     case '/':				/* player list */
-      CqContext.redraw = TRUE;
+      Context.redraw = TRUE;
       stoptimer();
-      playlist( FALSE, FALSE, CqContext.snum );
-      if ( stillalive( CqContext.snum ) )
-	display( CqContext.snum, FALSE );
+      playlist( FALSE, FALSE, Context.snum );
+      if ( stillalive( Context.snum ) )
+	display( Context.snum, FALSE );
       settimer();
       break;
     case '?':				/* planet list */
-      CqContext.redraw = TRUE;
+      Context.redraw = TRUE;
       stoptimer();
-      doplanlist( CqContext.snum );
-      if ( stillalive( CqContext.snum ) )
-	display( CqContext.snum, FALSE );
+      doplanlist( Context.snum );
+      if ( stillalive( Context.snum ) )
+	display( Context.snum, FALSE );
       settimer();
       break;
     case TERM_REDRAW:			/* clear and redisplay */
       stoptimer();
       cdredo();
-      CqContext.redraw = TRUE;
-      display( CqContext.snum, FALSE );
+      Context.redraw = TRUE;
+      display( Context.snum, FALSE );
       settimer();
       break;
       
@@ -594,7 +597,7 @@ void conqds( int multiple, int switchteams )
   
   /* Display the logo. */
   lenc1 = strlen( c1 );
-  col = (CqContext.maxcol-lenc1) / 2;
+  col = (Context.maxcol-lenc1) / 2;
   lin = 2;
   cprintf( lin,col,ALIGN_NONE,"#%d#%s", RedColor | A_BOLD, c1);
   lin++;
@@ -626,7 +629,7 @@ void conqds( int multiple, int switchteams )
   lin+=2;
   i = lin;
   cprintf(lin,col,ALIGN_NONE,sfmt, 'e', "enter the game");
-  if ( CqContext.hasnewsfile )
+  if ( Context.hasnewsfile )
     {
       lin++;
       cprintf(lin,col,ALIGN_NONE,sfmt, 'n', "read the news");
@@ -698,7 +701,7 @@ void dead( int snum, int leave )
     return;
   
   /* If our ships pid is wrong, we are indeed lost. */
-  if ( Ships[snum].pid != CqContext.pid )
+  if ( Ships[snum].pid != Context.pid )
     return;
   
   kb = Ships[snum].killedby;
@@ -924,7 +927,7 @@ void dead( int snum, int leave )
       ioeat();
       putpmt( MTXT_DONE, MSG_LIN2 );
       cdrefresh();
-      while ( ! iogtimed( &ch, 1.0 ) && stillalive( CqContext.snum ) )
+      while ( ! iogtimed( &ch, 1.0 ) && stillalive( Context.snum ) )
 	;
       break;
     }
@@ -1052,24 +1055,24 @@ void doautopilot( int snum )
   c_putmsg( "Autopilot activated.", MSG_LIN1 );
   Ships[snum].robot = TRUE;
   gsecs( &laststat );			/* initialize stat timer */
-  while ( stillalive( CqContext.snum ) )
+  while ( stillalive( Context.snum ) )
     {
       /* Make sure we still control our ship. */
-      if ( Ships[snum].pid != CqContext.pid )
+      if ( Ships[snum].pid != Context.pid )
 	break;
       
       /* See if it's time to update the statistics. */
       if ( dsecs( laststat, &now ) >= 15 )
 	{
-	  conqstats( CqContext.snum );
+	  conqstats( Context.snum );
 	  laststat = now;
 	}
       
       /* Get a character. */
       if ( ! iogtimed( &ch, 1.0 ) )
 	continue;		/* next . echo */
-      CqContext.msgok = FALSE;
-      grand( &CqContext.msgrand );
+      Context.msgok = FALSE;
+      grand( &Context.msgrand );
       switch ( ch )
 	{
 	case TERM_ABORT:
@@ -1082,7 +1085,7 @@ void doautopilot( int snum )
 	  cdbeep();
 	  cdrefresh();
 	}
-      CqContext.msgok = TRUE;
+      Context.msgok = TRUE;
       if (ch == TERM_ABORT)
 	break;
     }
@@ -1236,7 +1239,7 @@ void dobeam( int snum )
       c_putmsg( "Beam [up or down] ", MSG_LIN1 );
       cdrefresh();
       done = FALSE;
-      while ( stillalive( CqContext.snum ) && done == FALSE)
+      while ( stillalive( Context.snum ) && done == FALSE)
 	{
 	  if ( ! iogtimed( &ch, 1.0 ) )
 	    {
@@ -1327,7 +1330,7 @@ void dobeam( int snum )
   grand( &entertime );
   while(TRUE)			/* repeat infloop */
     {
-      if ( ! stillalive( CqContext.snum ) )
+      if ( ! stillalive( Context.snum ) )
 	return;
       if ( iochav() )
 	{
@@ -1534,7 +1537,7 @@ void dobomb( int snum )
   grand( &entertime )			/* get start time */;
   while(TRUE)       /*repeat infloop */
     {
-      if ( ! stillalive( CqContext.snum ) )
+      if ( ! stillalive( Context.snum ) )
 	return;
       if ( iochav() )
 	{
@@ -1942,7 +1945,7 @@ void docoup( int snum )
   while ( dgrand( entertime, &now ) < COUP_GRAND )
     {
       /* See if we're still alive. */
-      if ( ! stillalive( CqContext.snum ) )
+      if ( ! stillalive( Context.snum ) )
 	return;
       
       /* Sleep (and enable asts so the display will work). */
@@ -2211,7 +2214,7 @@ void dodistress( int snum )
 	  appstr(buf, cbuf);
 	}
 	  
-      if (conf_DistressToFriendly)
+      if (UserConf.DistressToFriendly)
 	stormsg( snum, MSG_FRIENDLY, cbuf );
       else
 	stormsg( snum, -Ships[snum].team, cbuf );
@@ -2308,7 +2311,7 @@ void dohelp( void )
   tlin++;
   cprintf(tlin,col,ALIGN_NONE,sfmt, "Q", "initiate self-destruct");
   tlin++;
-  if (sysconf_AllowRefits)
+  if (SysConf.AllowRefits)
     {
       cprintf(tlin,col,ALIGN_NONE,sfmt, "r", "refit ship to new type");
       tlin++;
@@ -2346,7 +2349,7 @@ void dohelp( void )
   
   putpmt( MTXT_DONE, MSG_LIN2 );
   cdrefresh();
-  while ( ! iogtimed( &ch, 1.0 ) && stillalive( CqContext.snum ) )
+  while ( ! iogtimed( &ch, 1.0 ) && stillalive( Context.snum ) )
     ;
   
   return;
@@ -2381,7 +2384,7 @@ void doinfo( int snum )
   fold( cbuf );
   if ( cbuf[0] == EOS )
     {
-      c_strcpy( CqContext.lastinfostr, cbuf );
+      c_strcpy( Context.lastinfostr, cbuf );
       if ( cbuf[0] == EOS )
 	{
 	  cdclrl( MSG_LIN1, 1 );
@@ -2389,7 +2392,7 @@ void doinfo( int snum )
 	}
     }
   else
-    c_strcpy( cbuf, CqContext.lastinfostr );
+    c_strcpy( cbuf, Context.lastinfostr );
   
   if ( special( cbuf, &what, &token, &count ) )
     {
@@ -2517,7 +2520,7 @@ void dooption( int snum, int dodisplay )
       top[i] = Ships[snum].options[i];			/* used for dispoption() */
     }
   
-  while ( stillalive( CqContext.snum ) && leave == FALSE)
+  while ( stillalive( Context.snum ) && leave == FALSE)
     {
       /* Display the current options. */
       dispoption( top );
@@ -2669,7 +2672,7 @@ void doplanlist( int snum )
   if (snum > 0 && snum <= MAXSHIPS)
     planlist( Ships[snum].team, snum );
   else		/* then use user team if user doen't have a ship yet */
-    planlist( Users[CqContext.unum].team, snum );
+    planlist( Users[Context.unum].team, snum );
   
   return;
   
@@ -2690,7 +2693,7 @@ void doreview( int snum )
 				   then make sure new msgs don't come
 				   in while reviewing */
       
-      CqContext.msgok = FALSE;		/* don't want to get msgs when reading
+      Context.msgok = FALSE;		/* don't want to get msgs when reading
 				   old ones.  */
     }
 
@@ -2701,14 +2704,14 @@ void doreview( int snum )
       c_putmsg( "There are no old messages.", MSG_LIN1 );
       putpmt( MTXT_MORE, MSG_LIN2 );
       cdrefresh();
-      while ( ! iogtimed( &ch, 1.0 ) && stillalive( CqContext.snum ) )
+      while ( ! iogtimed( &ch, 1.0 ) && stillalive( Context.snum ) )
 	;
       cdclrl( MSG_LIN1, 2 );
     }
 
   if (RMsg_Line == MSG_LIN1)
     {
-      CqContext.msgok = TRUE;		
+      Context.msgok = TRUE;		
     }
 
   return;
@@ -2748,39 +2751,39 @@ void doselfdest(int snum)
   cdclrl( MSG_LIN1, 1 );
   
   /* Set up the destruct fuse. */
-  Ships[CqContext.snum].sdfuse = SELFDESTRUCT_FUSE;
+  Ships[Context.snum].sdfuse = SELFDESTRUCT_FUSE;
   
   gsecs( &entertime );
   
   /* Force a screen update. */
   stoptimer();
-  display( CqContext.snum, FALSE );
+  display( Context.snum, FALSE );
   settimer();
-  CqContext.msgok = TRUE;			/* messages are ok in the beginning */
-  while ( Ships[CqContext.snum].sdfuse > 0 )
+  Context.msgok = TRUE;			/* messages are ok in the beginning */
+  while ( Ships[Context.snum].sdfuse > 0 )
     {
-      Ships[CqContext.snum].sdfuse = SELFDESTRUCT_FUSE - dsecs ( entertime, &now );
+      Ships[Context.snum].sdfuse = SELFDESTRUCT_FUSE - dsecs ( entertime, &now );
 
       /* Display new messages until T-minus 3 seconds. */
 
-      if ( Ships[CqContext.snum].sdfuse < 3 )
-	CqContext.msgok = FALSE;
+      if ( Ships[Context.snum].sdfuse < 3 )
+	Context.msgok = FALSE;
 
-      if ( ! stillalive( CqContext.snum ) )
+      if ( ! stillalive( Context.snum ) )
 	{
 	  /* Died in the process. */
-	  Ships[CqContext.snum].sdfuse = 0;
+	  Ships[Context.snum].sdfuse = 0;
 	  return;
 	}
       
       if ( iochav() )
 	{
 	  /* Got a new character. */
-	  grand( &CqContext.msgrand );
+	  grand( &Context.msgrand );
 	  cdclrl( MSG_LIN1, 2 );
 	  if ( iogchar() == TERM_ABORT )
 	    {
-	      Ships[CqContext.snum].sdfuse = 0;
+	      Ships[Context.snum].sdfuse = 0;
 	      c_putmsg( "Self destruct has been canceled.", MSG_LIN1 );
 	      return;
 	    }
@@ -2795,24 +2798,24 @@ void doselfdest(int snum)
       c_sleep( ITER_SECONDS );
       astoff();
     } /* end while */
-  CqContext.msgok = FALSE;			/* turn off messages */
+  Context.msgok = FALSE;			/* turn off messages */
   
   if ( Doomsday->status == DS_LIVE )
     {
-      if ( dist(Ships[CqContext.snum].x, Ships[CqContext.snum].y, Doomsday->x, Doomsday->y) <= DOOMSDAY_KILL_DIST )
+      if ( dist(Ships[Context.snum].x, Ships[Context.snum].y, Doomsday->x, Doomsday->y) <= DOOMSDAY_KILL_DIST )
 	{
 	  Doomsday->status = DS_OFF;
 	  stormsg( MSG_DOOM, MSG_ALL, "AIEEEEEEEE!" );
-	  killship( CqContext.snum, KB_GOTDOOMSDAY );
+	  killship( Context.snum, KB_GOTDOOMSDAY );
 	}
       else
-	if (stillalive(CqContext.snum))	/* if we're not dead yet... */
-	  killship( CqContext.snum, KB_SELF );
+	if (stillalive(Context.snum))	/* if we're not dead yet... */
+	  killship( Context.snum, KB_SELF );
     }
   else
     {
-	if (stillalive(CqContext.snum))	/* if we're not dead yet... */
-	  killship( CqContext.snum, KB_SELF );
+	if (stillalive(Context.snum))	/* if we're not dead yet... */
+	  killship( Context.snum, KB_SELF );
     }
   
   return;
@@ -2852,7 +2855,7 @@ void doteamlist( int team )
   int ch;
   
   cdclear();
-  while ( stillalive( CqContext.snum ) )
+  while ( stillalive( Context.snum ) )
     {
       teamlist( team );
       putpmt( MTXT_DONE, MSG_LIN2 );
@@ -2997,7 +3000,7 @@ void dountow( int snum )
 	  grand( &entertime );
 	  while ( dgrand( entertime, &now ) < BREAKAWAY_GRAND )
 	    {
-	      if ( ! stillalive( CqContext.snum ) )
+	      if ( ! stillalive( Context.snum ) )
 		return;
 	      aston();
 	      c_sleep( ITER_SECONDS );
@@ -3077,7 +3080,7 @@ void dowar( int snum )
 	 "Press TAB when done, ESCAPE to abort:  Peace: # # # #  War: # # # #", 
 	 MSG_LIN1, 1 );
   
-  while ( stillalive( CqContext.snum ) )
+  while ( stillalive( Context.snum ) )
     {
       for ( i = 0; i < NUMPLAYERTEAMS; i = i + 1 )
 	if ( twar[i] )
@@ -3127,7 +3130,7 @@ void dowar( int snum )
 	      while ( dgrand( entertime, &now ) < REARM_GRAND )
 		{
 		  /* See if we're still alive. */
-		  if ( ! stillalive( CqContext.snum ) )
+		  if ( ! stillalive( Context.snum ) )
 		    return;
 		  
 		  /* Sleep (and enable asts so the display will work). */
@@ -3274,7 +3277,7 @@ void gretds()
   string g4="G  GG  R  R   E      E        T      I    N  NN  G  GG      S  ..  ..  ..";
   string g5=" GGG   R   R  EEEEE  EEEEE    T     III   N   N   GGG   SSSS   ..  ..  ..";
   
-  col = (int)(CqContext.maxcol - strlen(g5)) / (int)2;
+  col = (int)(Context.maxcol - strlen(g5)) / (int)2;
   lin = 1;
   cprintf( lin,col,ALIGN_NONE,"#%d#%s", InfoColor, g1);
   lin++;
@@ -3314,32 +3317,32 @@ void menu(void)
   EnableConquestSignalHandler();	/* enable trapping of interesting signals */
   
   /* Initialize statistics. */
-  initstats( &Ships[CqContext.snum].ctime, &Ships[CqContext.snum].etime );
+  initstats( &Ships[Context.snum].ctime, &Ships[Context.snum].etime );
   
   /* Log this entry into the Game. */
-  CqContext.histslot = loghist( CqContext.unum );
+  Context.histslot = loghist( Context.unum );
   
   /* Set up a few ship characteristics here rather than in initship(). */
-  Ships[CqContext.snum].unum = CqContext.unum;
-  Ships[CqContext.snum].team = Users[CqContext.unum].team;
-  Ships[CqContext.snum].shiptype = Teams[Ships[CqContext.snum].team].shiptype;
+  Ships[Context.snum].unum = Context.unum;
+  Ships[Context.snum].team = Users[Context.unum].team;
+  Ships[Context.snum].shiptype = Teams[Ships[Context.snum].team].shiptype;
 
-  Ships[CqContext.snum].pid = CqContext.pid;
+  Ships[Context.snum].pid = Context.pid;
 
   for ( i = 0; i < MAXOPTIONS; i = i + 1 )
-    Ships[CqContext.snum].options[i] = Users[CqContext.unum].options[i];
+    Ships[Context.snum].options[i] = Users[Context.unum].options[i];
   for ( i = 0; i < NUMPLAYERTEAMS; i = i + 1 )
     {
-      Ships[CqContext.snum].rwar[i] = FALSE;
-      Ships[CqContext.snum].war[i] = Users[CqContext.unum].war[i];
+      Ships[Context.snum].rwar[i] = FALSE;
+      Ships[Context.snum].war[i] = Users[Context.unum].war[i];
     }
-  stcpn( Users[CqContext.unum].alias, Ships[CqContext.snum].alias, MAXUSERPNAME );
+  stcpn( Users[Context.unum].alias, Ships[Context.snum].alias, MAXUSERPNAME );
   
   /* Set up some things for the menu display. */
-  switchteams = Users[CqContext.unum].ooptions[OOPT_SWITCHTEAMS];
-  multiple = Users[CqContext.unum].ooptions[OOPT_MULTIPLE];
+  switchteams = Users[Context.unum].ooptions[OOPT_SWITCHTEAMS];
+  multiple = Users[Context.unum].ooptions[OOPT_MULTIPLE];
   oclosed = ConqInfo->closed;
-  CqContext.leave = FALSE;
+  Context.leave = FALSE;
   redraw = TRUE;
   sleepy = 0;
   countdown = 0;
@@ -3350,13 +3353,13 @@ void menu(void)
       /* Make sure things are proper. */
       if (playrv == ERR) 
 	{
-	  if ( CqContext.snum < 1 || CqContext.snum > MAXSHIPS )
+	  if ( Context.snum < 1 || Context.snum > MAXSHIPS )
 	    lose = TRUE;
-	  else if ( Ships[CqContext.snum].pid != CqContext.pid )
+	  else if ( Ships[Context.snum].pid != Context.pid )
 	    lose = TRUE;
-	  else if ( Ships[CqContext.snum].status != SS_RESERVED )
+	  else if ( Ships[Context.snum].status != SS_RESERVED )
 	    {
-	      clog( "menu(): Ship %d no longer reserved.", CqContext.snum );
+	      clog( "menu(): Ship %d no longer reserved.", Context.snum );
 	      lose = TRUE;
 	    }
 	  else
@@ -3396,15 +3399,15 @@ void menu(void)
 	}
       
       /* Some simple housekeeping. */
-      if ( multiple != Users[CqContext.unum].ooptions[OOPT_MULTIPLE] )
+      if ( multiple != Users[Context.unum].ooptions[OOPT_MULTIPLE] )
 	{
 	  multiple = ! multiple;
 	  redraw = TRUE;
 	}
       
-      if ( switchteams != Users[CqContext.unum].ooptions[OOPT_SWITCHTEAMS])
+      if ( switchteams != Users[Context.unum].ooptions[OOPT_SWITCHTEAMS])
 	{
-	  switchteams = Users[CqContext.unum].ooptions[OOPT_SWITCHTEAMS];
+	  switchteams = Users[Context.unum].ooptions[OOPT_SWITCHTEAMS];
 	  redraw = TRUE;
 	}
       if ( oclosed != ConqInfo->closed )
@@ -3423,7 +3426,7 @@ void menu(void)
       userline( -1, -1, cbuf, FALSE, TRUE );
       attrset(LabelColor);
       cdputs( cbuf, MSG_LIN1, 1 );
-      userline( CqContext.unum, 0, cbuf, FALSE, TRUE );
+      userline( Context.unum, 0, cbuf, FALSE, TRUE );
       attrset(A_BOLD);
       cdputs( cbuf, MSG_LIN2, 1 );
       attrset(0);
@@ -3441,7 +3444,7 @@ void menu(void)
 	}
       
       /* Reset up the destruct fuse. */
-      Ships[CqContext.snum].sdfuse = -TIMEOUT_PLAYER;
+      Ships[Context.snum].sdfuse = -TIMEOUT_PLAYER;
       
       /* Get a char with timeout. */
       if ( ! iogtimed( &ch, 1.0 ) )
@@ -3459,7 +3462,7 @@ void menu(void)
 	{
 	case 'e':
 	  playrv = play();
-	  if ( CqContext.childpid != 0 )
+	  if ( Context.childpid != 0 )
 	    countdown = 15;
 	  else
 	    countdown = 0;
@@ -3474,13 +3477,13 @@ void menu(void)
 	  redraw = TRUE;
 	  break;
 	case 'I':
-	  dooption( CqContext.snum, FALSE );
+	  dooption( Context.snum, FALSE );
 	  break;
 	case 'L':
-	  doreview( CqContext.snum );
+	  doreview( Context.snum );
 	  break;
 	case 'n':
-	  if ( ! CqContext.hasnewsfile )
+	  if ( ! Context.hasnewsfile )
 	    cdbeep();
 	  else
 	    {
@@ -3489,10 +3492,10 @@ void menu(void)
 	    }
 	  break;
 	case 'N':
-	  pseudo( CqContext.unum, CqContext.snum );
+	  pseudo( Context.unum, Context.snum );
 	  break;
 	case 'O':
-          UserOptsMenu(CqContext.unum);
+          UserOptsMenu(Context.unum);
           redraw = TRUE;
           break;
 	case 'r':
@@ -3503,7 +3506,7 @@ void menu(void)
 	      for ( i = 1; i <= MAXSHIPS; i = i + 1 )
 		if ( Ships[i].status == SS_LIVE ||
 		    Ships[i].status == SS_ENTERING )
-		  if ( Ships[i].unum == CqContext.unum )
+		  if ( Ships[i].unum == Context.unum )
 		    break;
 	      if ( i <= MAXSHIPS )
 		cdbeep();
@@ -3514,8 +3517,8 @@ void menu(void)
 		  if ( confirm() )
 		    {
 				/* should exit here */
-		      resign( CqContext.unum, FALSE );
-		      Ships[CqContext.snum].status = SS_OFF;
+		      resign( Context.unum, FALSE );
+		      Ships[Context.snum].status = SS_OFF;
 		      cdend();
 		      exit(0);
 		      break;
@@ -3528,13 +3531,13 @@ void menu(void)
 	    cdbeep();
 	  else
 	    {
-	      Ships[CqContext.snum].team = 
-		modp1( Ships[CqContext.snum].team+1, NUMPLAYERTEAMS );
-	      Ships[CqContext.snum].shiptype = 
-		Teams[Ships[CqContext.snum].team].shiptype;
-	      Users[CqContext.unum].team = Ships[CqContext.snum].team;
-	      Ships[CqContext.snum].war[Ships[CqContext.snum].team] = FALSE;
-	      Users[CqContext.unum].war[Users[CqContext.unum].team] = FALSE;
+	      Ships[Context.snum].team = 
+		modp1( Ships[Context.snum].team+1, NUMPLAYERTEAMS );
+	      Ships[Context.snum].shiptype = 
+		Teams[Ships[Context.snum].team].shiptype;
+	      Users[Context.unum].team = Ships[Context.snum].team;
+	      Ships[Context.snum].war[Ships[Context.snum].team] = FALSE;
+	      Users[Context.unum].war[Users[Context.unum].team] = FALSE;
 	    }
 	  break;
 	case 'S':
@@ -3542,7 +3545,7 @@ void menu(void)
 	  redraw = TRUE;
 	  break;
 	case 'T':
-	  doteamlist( Ships[CqContext.snum].team );
+	  doteamlist( Ships[Context.snum].team );
 	  redraw = TRUE;
 	  break;
 	case 'U':
@@ -3550,12 +3553,12 @@ void menu(void)
 	  redraw = TRUE;
 	  break;
 	case 'W':
-	  dowar( CqContext.snum );
+	  dowar( Context.snum );
 	  redraw = TRUE;
 	  break;
 	case 'q':
 	case 'Q':
-	  CqContext.leave = TRUE;	
+	  Context.leave = TRUE;	
 	  break;
 	case '/':
 	  playlist( FALSE, FALSE, 0 );
@@ -3578,15 +3581,15 @@ void menu(void)
 	  break;
 	}
     }
-  while ( stillalive( CqContext.snum ) &&  !CqContext.leave );
+  while ( stillalive( Context.snum ) &&  !Context.leave );
   
   /* Make our ship available for others to use. */
-  if ( Ships[CqContext.snum].status == SS_RESERVED )
+  if ( Ships[Context.snum].status == SS_RESERVED )
     {
-      conqstats( CqContext.snum );
+      conqstats( Context.snum );
       PVLOCK(&ConqInfo->lockword);
-      Ships[CqContext.snum].sdfuse = 0;
-      Ships[CqContext.snum].status = SS_OFF;
+      Ships[Context.snum].sdfuse = 0;
+      Ships[Context.snum].status = SS_OFF;
       PVUNLOCK(&ConqInfo->lockword);
     }
   
@@ -3682,7 +3685,7 @@ int newship( int unum, int *snum )
 		fresh = FALSE;
 		Ships[*snum].status = SS_OFF;
 		*snum = i;
-		Ships[*snum].pid = CqContext.pid;
+		Ships[*snum].pid = Context.pid;
 		Ships[*snum].status = SS_ENTERING;
 		break;
 	      }
@@ -3826,7 +3829,7 @@ int newship( int unum, int *snum )
 				  Ships[*snum].status = SS_OFF;
 				  *snum = selectnum;
 				  fresh = FALSE;
-				  Ships[*snum].pid = CqContext.pid;
+				  Ships[*snum].pid = Context.pid;
 				  Ships[*snum].status = SS_ENTERING;
 				  PVUNLOCK(&ConqInfo->lockword);
 				  break;
@@ -3872,7 +3875,7 @@ int newship( int unum, int *snum )
   if ( fresh )
     {
 				/* (re)init the ship's team! (bug 1/10/98) */
-      Ships[*snum].team = Users[CqContext.unum].team;
+      Ships[*snum].team = Users[Context.unum].team;
       Ships[*snum].shiptype = Teams[Ships[*snum].team].shiptype; 
       system = Ships[*snum].team;
       if ( ! capentry( *snum, &system ) )
@@ -3916,7 +3919,7 @@ int newship( int unum, int *snum )
     {				/* if we're reincarnating, skip any
 				   messages that might have been sent
 				   while we were gone, if enabled */
-      if (conf_ClearOldMsgs == TRUE)
+      if (UserConf.ClearOldMsgs == TRUE)
 	{
 	  PVLOCK(&ConqInfo->lockmesg);
 	  Ships[*snum].lastmsg = ConqInfo->lastmsg;
@@ -3938,7 +3941,7 @@ int newship( int unum, int *snum )
   Ships[*snum].status = SS_LIVE;
   
   PVUNLOCK(&ConqInfo->lockword);
-  CqContext.entship = TRUE;
+  Context.entship = TRUE;
   
   return ( TRUE );
   
@@ -3955,20 +3958,20 @@ int play()
   char msgbuf[128];
   
   /* Can't carry on without a vessel. */
-  if ( (rv = newship( CqContext.unum, &CqContext.snum )) != TRUE)
+  if ( (rv = newship( Context.unum, &Context.snum )) != TRUE)
     return(rv);
   
   drstart();			/* start a driver, if necessary */
-  Ships[CqContext.snum].sdfuse = 0;	/* zero self destruct fuse */
-  grand( &CqContext.msgrand );		/* initialize message timer */
-  CqContext.leave = FALSE;		/* assume we won't want to bail */
-  CqContext.redraw = TRUE;		/* want redraw first time */
-  CqContext.display = TRUE;		/* ok to display */
-  CqContext.msgok = TRUE;		/* ok to get messages */
+  Ships[Context.snum].sdfuse = 0;	/* zero self destruct fuse */
+  grand( &Context.msgrand );		/* initialize message timer */
+  Context.leave = FALSE;		/* assume we won't want to bail */
+  Context.redraw = TRUE;		/* want redraw first time */
+  Context.display = TRUE;		/* ok to display */
+  Context.msgok = TRUE;		/* ok to get messages */
   cdclear();			/* clear the display */
   cdredo();			/*  (quickly) */
   stoptimer();			/* stop the display interrupt */
-  display( CqContext.snum, FALSE );	/* update the screen manually */
+  display( Context.snum, FALSE );	/* update the screen manually */
   gsecs( &laststat );		/* initialize stat timer */
   astoff();			/* disable before setting timer */
   settimer();			/* setup for next second */
@@ -3977,24 +3980,24 @@ int play()
   /* Tell everybody, we're here */
 
   sprintf(msgbuf, "%c%d (%s) has entered the game.",
-	  Teams[Ships[CqContext.snum].team].teamchar,
-	  CqContext.snum,
-	  Ships[CqContext.snum].alias);
+	  Teams[Ships[Context.snum].team].teamchar,
+	  Context.snum,
+	  Ships[Context.snum].alias);
   
   stormsg(MSG_COMP, MSG_ALL, msgbuf);
   
   /* While we're alive, field commands and process them. */
-  while ( stillalive( CqContext.snum ) )
+  while ( stillalive( Context.snum ) )
     {
       /* Make sure we still control our ship. */
-      if ( Ships[CqContext.snum].pid != CqContext.pid )
+      if ( Ships[Context.snum].pid != Context.pid )
 	break;
       
       /* Get a char with one second timeout. */
       if ( iogtimed( &ch, 1.0 ) )
 	{
 	  if (RMsg_Line == MSG_LIN1)
-	    CqContext.msgok = FALSE;	/* off if we  have no msg line */
+	    Context.msgok = FALSE;	/* off if we  have no msg line */
 	  
 #ifdef ENABLE_MACROS
 	  if (DoMacro(ch) == TRUE)
@@ -4011,28 +4014,28 @@ int play()
 	  command( ch );
 #endif
 	  
-	  grand( &CqContext.msgrand );
-	  CqContext.msgok = TRUE;
+	  grand( &Context.msgrand );
+	  Context.msgok = TRUE;
 	  cdrefresh();
 	}
       
       /* See if it's time to update the statistics. */
       if ( dsecs( laststat, &now ) >= 15 )
 	{
-	  conqstats( CqContext.snum );
+	  conqstats( Context.snum );
 	  laststat = now;
 	}
     }
   
-  CqContext.display = FALSE;
-  conqstats( CqContext.snum );
+  Context.display = FALSE;
+  conqstats( Context.snum );
   upchuck();
   
   /* Asts are still enabled, simply cancel the next screen update. */
   stoptimer();
   /*    aston();					/* enable asts again */
   
-  dead( CqContext.snum, CqContext.leave );
+  dead( Context.snum, Context.leave );
   
   return(TRUE);
   
@@ -4160,7 +4163,7 @@ int welcome( int *unum )
     }
   
   /* Can't play without a ship. */
-  if ( ! findship( &CqContext.snum ) )
+  if ( ! findship( &Context.snum ) )
     {
       cdclear();
       cdredo();

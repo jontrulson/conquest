@@ -10,7 +10,7 @@
 #include "global.h"
 #include "conqdef.h"
 #include "conqcom.h"
-#include "conqcom2.h"
+#include "context.h"
 #include "conf.h"
 
 #include "record.h"
@@ -262,7 +262,7 @@ int recordInit(int unum, time_t thetime)
   /* now make a file header and write it */
   memset(&fhdr, 0, sizeof(fhdr));
   fhdr.vers = RECVERSION;
-  if (sysconf_AllowFastUpdate == TRUE && conf_DoFastUpdate == TRUE)
+  if (SysConf.AllowFastUpdate == TRUE && UserConf.DoFastUpdate == TRUE)
     fhdr.samplerate = 2;
   else
     fhdr.samplerate = 1;
@@ -286,7 +286,7 @@ int recordInit(int unum, time_t thetime)
 
 int recordAddMsg(Msg_t *themsg)
 {
-  if (CqContext.recmode != RECMODE_ON)
+  if (Context.recmode != RECMODE_ON)
     return(FALSE);              /* bail */
 
   rdata.index = 0;
@@ -301,7 +301,7 @@ int recordAddMsg(Msg_t *themsg)
 int recordUpdateState(void)
 {
 
-  if (CqContext.recmode != RECMODE_ON)
+  if (Context.recmode != RECMODE_ON)
     return(FALSE);		/* bail */
   
   /* write a TS packet */

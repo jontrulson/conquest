@@ -27,7 +27,8 @@
 #define NOEXTERN
 #include "conqdef.h"
 #include "conqcom.h"
-#include "conqcom2.h"
+#include "context.h"
+#include "conf.h"
 #include "global.h"
 
 static char *conqdrivId = "$Id$";
@@ -888,7 +889,7 @@ void mindrive(void)
     doomfind();
   else if ( rnd() < DOOMSDAY_PROB )
     {
-      if (sysconf_NoDoomsday == FALSE)
+      if (SysConf.NoDoomsday == FALSE)
 	doomsday();
     }
   

@@ -7,10 +7,11 @@
  */
 
 #include "c_defs.h"
+#include "conf.h"
 #include "global.h"
 #include "conqdef.h"
 #include "conqcom.h"
-#include "conqcom2.h"
+#include "context.h"
 #include "color.h"
 
 #define MAX_USERLEN 10		/* only 10 chars for users */
@@ -107,7 +108,7 @@ int Logon(char *username, char *password)
 
       /* Display the logo. */
       lenc1 = strlen( c1 );
-      col = (CqContext.maxcol - lenc1) / 2;
+      col = (Context.maxcol - lenc1) / 2;
       lin = 2;
       cprintf( lin,col,ALIGN_NONE,"#%d#%s", RedColor | A_BOLD, c1);
       lin++;
@@ -155,7 +156,7 @@ int Logon(char *username, char *password)
       while (TRUE)			/* login loop */
 	{
 	  slin = lin;
-	  cdclrl( slin, CqContext.maxlin - slin - 1 );
+	  cdclrl( slin, Context.maxlin - slin - 1 );
 	  slin += 3;
 	  cdputs("You can use A-Z, a-z, 0-9, '_', or '-'.", MSG_LIN1, 1);
 	  cprintf( slin - 1, 1, ALIGN_LEFT,
@@ -409,16 +410,16 @@ void expire_users(void)
   clog("INFO: expire_users(): Expiring users...");
 #endif
 
-  if (sysconf_UserExpiredays == 0)
+  if (SysConf.UserExpiredays == 0)
     {				/* expiration has been disabled */
 #if defined(DEBUG_SERVER)
-      clog("INFO: expire_users(): sysconf_UserExpiredays == 0, expiration disabled");
+      clog("INFO: expire_users(): SysConf.UserExpiredays == 0, expiration disabled");
 #endif
 
       return;
     }
 
-  expire_secs = (sysconf_UserExpiredays * SECS_PER_DAY);
+  expire_secs = (SysConf.UserExpiredays * SECS_PER_DAY);
   PVLOCK(&ConqInfo->lockword);
 
   for (i=0; i < MAXUSERS; i++)

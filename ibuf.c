@@ -18,6 +18,7 @@
 /*                                                                    */
 /**********************************************************************/
 
+#include "conf.h"
 #include "global.h"
 #include "defs.h"
 #include "ibuf.h"
@@ -124,7 +125,7 @@ int DoMacro(int ch)
     return(FALSE);
   }
 
-  iBufPut(conf_MacrosF[fkey]);	
+  iBufPut(UserConf.MacrosF[fkey]);	
 
 #ifdef DEBUG_MACROS
   clog("DoMacro(): got an FKey: %d", ch);

@@ -45,17 +45,18 @@ int GetSysConf(int checkonly)
   char *bufptr, *cptr;
 
 				/* init some defaults */
-  sysconf_DoLRTorpScan = TRUE;
-  sysconf_DoLocalLRScan = TRUE;
-  sysconf_DoETAStats = TRUE;
-  sysconf_AllowFastUpdate = TRUE;
-  sysconf_NoDoomsday = FALSE;
-  sysconf_DoRandomRobotKills = FALSE;
-  sysconf_AllowSigquit = FALSE;
-  sysconf_AllowSwitchteams = TRUE;
-  sysconf_UserExpiredays = DEFAULT_USEREXPIRE;
-  sysconf_LogMessages = FALSE;
-  sysconf_AllowRefits = TRUE;
+  SysConf.DoLRTorpScan = TRUE;
+  SysConf.DoLocalLRScan = TRUE;
+  SysConf.DoETAStats = TRUE;
+  SysConf.AllowFastUpdate = TRUE;
+  SysConf.NoDoomsday = FALSE;
+  SysConf.DoRandomRobotKills = FALSE;
+  SysConf.AllowSigquit = FALSE;
+  SysConf.AllowSwitchteams = TRUE;
+  SysConf.UserExpiredays = DEFAULT_USEREXPIRE;
+  SysConf.LogMessages = FALSE;
+  SysConf.AllowRefits = TRUE;
+  SysConf.AllowAltHUD = FALSE;
 
 				/* start building the filename */
   sprintf(conf_name, "%s/%s", CONQETC, SYSCONFIG_FILE);
@@ -246,18 +247,19 @@ int GetConf(int isremote, int usernum)
   int FoundOne = FALSE;
 
 				/* init some defaults */
-  conf_MessageBell = TRUE;
-  conf_NoColor = FALSE;
-  conf_NoRobotMsgs = FALSE;
-  conf_RecPlayerMsgs = TRUE;
-  conf_DoFastUpdate = TRUE;
-  conf_DoLimitBell = TRUE;
-  conf_ClearOldMsgs = TRUE;
-  conf_DistressToFriendly = FALSE;
+  UserConf.MessageBell = TRUE;
+  UserConf.NoColor = FALSE;
+  UserConf.NoRobotMsgs = FALSE;
+  UserConf.RecPlayerMsgs = TRUE;
+  UserConf.DoFastUpdate = TRUE;
+  UserConf.DoLimitBell = TRUE;
+  UserConf.ClearOldMsgs = TRUE;
+  UserConf.DistressToFriendly = FALSE;
+  UserConf.AltHUD = FALSE;
 
   for (i=0; i<MAX_MACROS; i++)
     {
-      conf_MacrosF[i][0] = EOS;
+      UserConf.MacrosF[i][0] = EOS;
     }
 
 				/* start building the filename */

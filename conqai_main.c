@@ -27,7 +27,7 @@
 
 #include "conqdef.h"
 #include "conqcom.h"
-#include "conqcom2.h"
+#include "context.h"
 #include "global.h"
 #include "user.h"
 

@@ -37,8 +37,6 @@
 #define COL_CYANBLACK 6
 #define COL_BLUEBLACK 7
 
-CEXTERN int HasColors;      /* TRUE or FALSE if term has color cap. */
-
 				/* general purpose 'colors' 
                                    initialized in InitColors() */
 CEXTERN int RedLevelColor, YellowLevelColor, GreenLevelColor;

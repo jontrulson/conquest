@@ -27,7 +27,7 @@
 #define NOEXTERN
 #include "conqdef.h"
 #include "conqcom.h"
-#include "conqcom2.h"
+#include "context.h"
 #include "global.h"
 #include "color.h"
 #include "record.h"
@@ -243,15 +243,17 @@ main(int argc, char *argv[])
   rndini( 0, 0 );		/* initialize random numbers */
   cdinit();			/* initialize display environment */
   
-  CqContext.unum = MSG_GOD;	/* stow user number */
-  CqContext.snum = ERR;		/* don't display in cdgetp - JET */
-  CqContext.entship = FALSE;	/* never entered a ship */
-  CqContext.histslot = ERR;	/* useless as an op */
-  CqContext.display = TRUE;
-  CqContext.maxlin = cdlins();	/* number of lines */
+  Context.unum = MSG_GOD;	/* stow user number */
+  Context.snum = ERR;		/* don't display in cdgetp - JET */
+  Context.entship = FALSE;	/* never entered a ship */
+  Context.histslot = ERR;	/* useless as an op */
+  Context.lasttang = Context.lasttdist = 0;
+  Context.lasttarg[0] = EOS;
+  Context.display = TRUE;
+  Context.maxlin = cdlins();	/* number of lines */
   
-  CqContext.maxcol = cdcols();	/* number of columns */
-  CqContext.recmode = RECMODE_OFF;
+  Context.maxcol = cdcols();	/* number of columns */
+  Context.recmode = RECMODE_OFF;
 
   sprintf(msgbuf, "OPER: User %s has entered conqoper.",
           operName);
@@ -555,7 +557,7 @@ void debugdisplay( int snum )
 	  cprintf(lin,dcol,ALIGN_NONE,"#%d#%s",InfoColor, buf);
     }
   
-  lin = (CqContext.maxlin - (CqContext.maxlin - MSG_LIN1)) - (MAXTORPS+1);  /* dwp */
+  lin = (Context.maxlin - (Context.maxlin - MSG_LIN1)) - (MAXTORPS+1);  /* dwp */
   cprintf(lin,3,ALIGN_NONE,"#%d#%s",LabelColor,
 	 "tstatus    tfuse    tmult       tx       ty      tdx      tdy     twar");
   for ( i = 0; i < MAXTORPS; i = i + 1 )
@@ -2936,20 +2938,20 @@ void watch(void)
   else
     {
 	  old_snum = tmp_snum = snum;
-	  CqContext.redraw = TRUE;
+	  Context.redraw = TRUE;
 	  cdclear();
 	  cdredo();
 	  grand( &msgrand );
 
-	  CqContext.snum = snum;		/* so display knows what to display */
+	  Context.snum = snum;		/* so display knows what to display */
 	  setopertimer();
 
 	  while (TRUE)	/* repeat */
 	    {
 	      if (!normal)
-		CqContext.display = FALSE; /* can't use it to display debugging */
+		Context.display = FALSE; /* can't use it to display debugging */
 	      else
-		CqContext.display = TRUE;
+		Context.display = TRUE;
 
 		/* set up toggle line display */
 		/* cdclrl( MSG_LIN1, 1 ); */
@@ -3008,14 +3010,14 @@ void watch(void)
 		case 'h':
 		  stoptimer();
 		  dowatchhelp();
-		  CqContext.redraw = TRUE;
+		  Context.redraw = TRUE;
 		  setopertimer();
 		  break;
 		case 'i':
 		  opinfo( MSG_GOD );
 		  break;
 		case 'k':
-		  kiss(CqContext.snum, TRUE);
+		  kiss(Context.snum, TRUE);
 		  break;
 		case 'm':
 		  sendmsg( MSG_GOD, TRUE );
@@ -3029,7 +3031,7 @@ void watch(void)
 		case 0x0c:
 		  stoptimer();
 		  cdredo();
-		  CqContext.redraw = TRUE;
+		  Context.redraw = TRUE;
 		  setopertimer();
 		  break;
 		case 'q':
@@ -3045,13 +3047,13 @@ void watch(void)
 			{
 			  old_snum = tmp_snum;
 			  tmp_snum = snum;
-			  CqContext.redraw = TRUE;
+			  Context.redraw = TRUE;
 			}
-		      CqContext.snum = snum;
+		      Context.snum = snum;
 		      if (normal)
 			{
 			  stoptimer();
-			  display( CqContext.snum, headerflag );
+			  display( Context.snum, headerflag );
 			  setopertimer();
 			}
 		    }
@@ -3071,12 +3073,12 @@ void watch(void)
 			  snum = old_snum;
 			  old_snum = tmp_snum;
 			  
-			  CqContext.snum = snum;
-			  CqContext.redraw = TRUE;
+			  Context.snum = snum;
+			  Context.redraw = TRUE;
 			  if (normal)
 			    {
 			      stoptimer();
-			      display( CqContext.snum, headerflag );
+			      display( Context.snum, headerflag );
 			      setopertimer();
 			    }
 			}
@@ -3085,13 +3087,13 @@ void watch(void)
 		    cdbeep();
 		  break;
 		case '~':                 /* toggle debug display */
-		  if (CqContext.snum > 0) 
+		  if (Context.snum > 0) 
 		    {
 		      if (normal)
 			normal = FALSE;
 		      else
 			normal = TRUE;
-		      CqContext.redraw = TRUE;
+		      Context.redraw = TRUE;
 		      cdclear();
 		    }
 		  else
@@ -3100,13 +3102,13 @@ void watch(void)
 		case '/':                /* ship list - dwp */
 		  stoptimer();
 		  playlist( TRUE, FALSE, 0 );
-		  CqContext.redraw = TRUE;
+		  Context.redraw = TRUE;
 		  setopertimer();
 		  break;
 		case '\\':               /* big ship list - dwp */
 		  stoptimer();
 		  playlist( TRUE, TRUE, 0 );
-		  CqContext.redraw = TRUE;
+		  Context.redraw = TRUE;
 		  setopertimer();
 		  break;
 		case '!':
@@ -3168,27 +3170,27 @@ void watch(void)
 		      
 		      snum = i;
 			
-		      CqContext.redraw = TRUE;
+		      Context.redraw = TRUE;
 		      
 		      if (live_ships)
 			if ((snum > 0 && stillalive(snum)) || 
 			    (snum == DISPLAY_DOOMSDAY && Doomsday->status == DS_LIVE))
 			  {
-			    CqContext.snum = snum;
+			    Context.snum = snum;
 			    break;
 			  }
 			else
 			  continue;
 		      else
 			{
-			  CqContext.snum = snum;
+			  Context.snum = snum;
 			  break;
 			}
 		    }
 		  if (normal)
 		    {
 		      stoptimer();
-		      display( CqContext.snum, headerflag );
+		      display( Context.snum, headerflag );
 		      setopertimer();
 		    }
 		  break;
@@ -3246,27 +3248,27 @@ void watch(void)
 		      
 		      snum = i;
 			
-		      CqContext.redraw = TRUE;
+		      Context.redraw = TRUE;
 		      
 		      if (live_ships)
 			if ((snum > 0 && stillalive(snum)) || 
 			    (snum == DISPLAY_DOOMSDAY && Doomsday->status == DS_LIVE))
 			  {
-			    CqContext.snum = snum;
+			    Context.snum = snum;
 			    break;
 			  }
 			else
 			  continue;
 		      else
 			{
-			  CqContext.snum = snum;
+			  Context.snum = snum;
 			  break;
 			}
 		    }
 		  if (normal)
 		    {
 		      stoptimer();
-		      display( CqContext.snum, headerflag );
+		      display( Context.snum, headerflag );
 		      setopertimer();
 		    }
 
@@ -3435,7 +3437,7 @@ void toggle_line(int snum, int old_snum)
   build_toggle_str(old_snum_str,old_snum);
   
   sprintf(buf,frmt_str,snum_str, old_snum_str);
-  cdputs( buf, MSG_LIN1, (CqContext.maxcol-(strlen(buf))));  /* at end of line */
+  cdputs( buf, MSG_LIN1, (Context.maxcol-(strlen(buf))));  /* at end of line */
   
   return;
 

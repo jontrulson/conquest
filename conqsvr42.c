@@ -26,7 +26,8 @@
 
 #include "conqdef.h"
 #include "conqcom.h"
-#include "conqcom2.h"
+#include "context.h"
+#include "conf.h"
 #include "global.h"
 
 
@@ -110,7 +111,7 @@ void EnableConquestSignalHandler(void)
   signal(SIGTERM, (void (*)(int))DoConquestSig);  
   signal(SIGINT, SIG_IGN);
 
-  if (isagod(-1) || sysconf_AllowSigquit == TRUE)
+  if (isagod(-1) || SysConf.AllowSigquit == TRUE)
     {
       signal(SIGQUIT, (void (*)(int))DoConquestSig);
     }
@@ -151,13 +152,13 @@ void DoConquestSig(int sig)
       drpexit();
       cdclear();
       cdrefresh();
-      conqstats(CqContext.snum);		/* update stats */
+      conqstats(Context.snum);		/* update stats */
 				/* now we clear ship's elapsed/cpu seconds
 				   so that there won't be a huge addition to
 				   the Teams/Users/Ships timing stats when
 				   a VACANT ships re-enters Conquest */
-      Ships[CqContext.snum].ctime = 0;
-      Ships[CqContext.snum].etime = 0;
+      Ships[Context.snum].ctime = 0;
+      Ships[Context.snum].etime = 0;
       conqend();
       cdend();
       
@@ -219,11 +220,11 @@ void astservice(int sig)
   int difftime;
 
   /* Don't do anything if we're not supposed to. */
-  if ( ! CqContext.display )
+  if ( ! Context.display )
     return;
   
   /* Don't do anything if we're dead. */
-  if ( ! stillalive( CqContext.snum ) )
+  if ( ! stillalive( Context.snum ) )
     return;
   stoptimer();
   drcheck();				/* handle driver logic */
@@ -234,16 +235,16 @@ void astservice(int sig)
 				   use a different timer so that
 				   NEWMSG_GRAND intervals will determine
 				   whether it's time to display a new
-				   message... Otherwise, CqContext.msgrand
+				   message... Otherwise, Context.msgrand
 				   is used - which means that NEWMSG_GRAND
 				   interval will have to pass after issuing
 				   any command before a new msg will disp
 				   12/28/98 */
   readone = FALSE;
-  if ( CqContext.msgok )
+  if ( Context.msgok )
     {
       /*
-      clog("### RMsggrand = %d, CqContext.msgrand = %d", RMsggrand, CqContext.msgrand);
+      clog("### RMsggrand = %d, Context.msgrand = %d", RMsggrand, Context.msgrand);
       */
 
       if (RMsg_Line != MSG_LIN1)
@@ -252,7 +253,7 @@ void astservice(int sig)
 	}
       else
 	{
-	  difftime = dgrand( CqContext.msgrand, &now );
+	  difftime = dgrand( Context.msgrand, &now );
 	}
 
       /*
@@ -260,27 +261,27 @@ void astservice(int sig)
        */
 
       if ( difftime >= NEWMSG_GRAND )
-	if ( getamsg( CqContext.snum, &Ships[CqContext.snum].lastmsg ) )
+	if ( getamsg( Context.snum, &Ships[Context.snum].lastmsg ) )
 	  {
-	    if (readmsg( CqContext.snum, Ships[CqContext.snum].lastmsg, 
+	    if (readmsg( Context.snum, Ships[Context.snum].lastmsg, 
 			 RMsg_Line ) == TRUE)
 	      {
-		if (Msgs[Ships[CqContext.snum].lastmsg].msgfrom != 
-		    CqContext.snum)
-		  if (conf_MessageBell == TRUE)
+		if (Msgs[Ships[Context.snum].lastmsg].msgfrom != 
+		    Context.snum)
+		  if (UserConf.MessageBell == TRUE)
 		    cdbeep();
 				/* set both timers, regardless of which
 				   one we're actally concerned with */
-		CqContext.msgrand = now;
+		Context.msgrand = now;
 		RMsggrand = now;
 		readone = TRUE;
-		recordAddMsg(&Msgs[Ships[CqContext.snum].lastmsg]);
+		recordAddMsg(&Msgs[Ships[Context.snum].lastmsg]);
 	      }
 	  }
     }
 
   /* Perform one ship display update. */
-  display( CqContext.snum, FALSE );
+  display( Context.snum, FALSE );
   
   
   /* Un-read the message if there's a chance it got garbaged. */
@@ -288,7 +289,7 @@ void astservice(int sig)
   if ( readone )
     if (RMsg_Line == MSG_LIN1)	/* we don't have an extra msg line */
       if ( iochav() )
-	Ships[CqContext.snum].lastmsg = modp1( Ships[CqContext.snum].lastmsg - 1, MAXMESSAGES );
+	Ships[Context.snum].lastmsg = modp1( Ships[Context.snum].lastmsg - 1, MAXMESSAGES );
   
   /* Schedule for next time. */
   settimer();
@@ -305,13 +306,13 @@ void astservice(int sig)
 void astoperservice(int sig)
 {
   /* Don't do anything if we're not supposed to. */
-  if ( ! CqContext.display )
+  if ( ! Context.display )
     return;
   
   stoptimer();
   
   /* Perform one ship display update. */
-  display( CqContext.snum, headerflag );
+  display( Context.snum, headerflag );
   
   /* Schedule for next time. */
   setopertimer();
@@ -350,10 +351,10 @@ void conqend(void)
 
   char msgbuf[128];
 
-  if (CqContext.entship == TRUE)
+  if (Context.entship == TRUE)
     {				/* let everyone know we're leaving */
       sprintf(msgbuf, "%s has left the game.",
-	      Users[CqContext.unum].alias);
+	      Users[Context.unum].alias);
       stormsg(MSG_COMP, MSG_ALL, msgbuf);
     }
   
@@ -396,17 +397,17 @@ void conqinit(void)
   /* Figure out which gamcron file to use (and if we're gonna use one). */
   
   /* Other house keeping. */
-  CqContext.pid = getpid();		
-  CqContext.hasnewsfile = ( strcmp( C_CONQ_NEWSFILE, "" ) != 0 );
+  Context.pid = getpid();		
+  Context.hasnewsfile = ( strcmp( C_CONQ_NEWSFILE, "" ) != 0 );
   
   /* Zero process id of our child (since we don't have one yet). */
-  CqContext.childpid = 0;
+  Context.childpid = 0;
   
   /* Zero last time drcheck() was called. */
-  CqContext.drchklastime = 0;
+  Context.drchklastime = 0;
   
   /* Haven't scanned anything yet. */
-  CqContext.lastinfostr[0] = EOS;
+  Context.lastinfostr[0] = EOS;
 
   
   return;
@@ -442,12 +443,12 @@ void conqstats( int snum )
 				/* update elapsed time in History[] 
 				   for this user */
 
-      if (CqContext.histslot != ERR && History[CqContext.histslot].histunum == unum)
+      if (Context.histslot != ERR && History[Context.histslot].histunum == unum)
 	{
-	  difftime = getnow(NULL, 0) - History[CqContext.histslot].histlog;
+	  difftime = getnow(NULL, 0) - History[Context.histslot].histlog;
 	  if (difftime < (time_t)0)
 	    difftime = (time_t)0;
-	  History[CqContext.histslot].elapsed = difftime;
+	  History[Context.histslot].elapsed = difftime;
 	}
 
       team = Users[unum].team;
@@ -475,16 +476,16 @@ void drcheck(void)
   
   /* If we haven't been getting cpu time in recent history, do no-thing. */
   /*  gsecs(playtime);*/
-  if ( dsecs( CqContext.drchklastime, &CqContext.drchklastime ) > TIMEOUT_DRCHECK )
+  if ( dsecs( Context.drchklastime, &Context.drchklastime ) > TIMEOUT_DRCHECK )
     return;
   
   if ( dsecs( Driver->drivtime, &(Driver->playtime) ) > TIMEOUT_DRIVER )
     {
-      if ( CqContext.childpid != 0 )
+      if ( Context.childpid != 0 )
 	{
 	  /* We own the driver. See if it's still there. */
-	  ppid = CqContext.childpid;
-	  if ( kill(CqContext.childpid, 0) != -1 )
+	  ppid = Context.childpid;
+	  if ( kill(Context.childpid, 0) != -1 )
 	    {
 	      /* He's still alive and belongs to us. */
 	      gsecs( &(Driver->drivtime) );
@@ -494,7 +495,7 @@ void drcheck(void)
 	    clog( "drcheck(): Wrong ppid %d.", ppid );
 	  
 	  /* If we got here, something was wrong; disown the child. */
-	  CqContext.childpid = 0;
+	  Context.childpid = 0;
 	}
       
       PVLOCK(&ConqInfo->lockword);
@@ -546,7 +547,7 @@ void drcreate(void)
     }
   else
     {				/* We're the parent, store pid */
-      CqContext.childpid = pid;	
+      Context.childpid = pid;	
     }
   
   return;
@@ -559,11 +560,11 @@ void drcreate(void)
 /*    drkill */
 void drkill(void)
 {
-  if ( CqContext.childpid != 0 )
-    if ( CqContext.childpid == Driver->drivpid && Driver->drivstat == DRS_RUNNING )
+  if ( Context.childpid != 0 )
+    if ( Context.childpid == Driver->drivpid && Driver->drivstat == DRS_RUNNING )
       {
 	PVLOCK(&ConqInfo->lockword);
-	if ( CqContext.childpid == Driver->drivpid && Driver->drivstat == DRS_RUNNING )
+	if ( Context.childpid == Driver->drivpid && Driver->drivstat == DRS_RUNNING )
 	  Driver->drivstat = DRS_KAMIKAZE;
 	PVUNLOCK(&ConqInfo->lockword);
       }
@@ -581,14 +582,14 @@ void drpexit(void)
   
   int i;
   
-  if ( CqContext.childpid != 0 )
+  if ( Context.childpid != 0 )
     {
       /* We may well have started the driver. */
       drkill();
-      for ( i = 1; CqContext.childpid == Driver->drivpid && i <= 50; i = i + 1 )
+      for ( i = 1; Context.childpid == Driver->drivpid && i <= 50; i = i + 1 )
 	c_sleep( 0.1 );
-      if ( CqContext.childpid == Driver->drivpid )
-	clog("drpexit(): Driver didn't exit; pid = %08x", CqContext.childpid );
+      if ( Context.childpid == Driver->drivpid )
+	clog("drpexit(): Driver didn't exit; pid = %08x", Context.childpid );
     }
   
   return;
@@ -781,7 +782,7 @@ void settimer(void)
   
 #ifdef HAS_SETITIMER
 
-  if (sysconf_AllowFastUpdate == TRUE && conf_DoFastUpdate == TRUE)
+  if (SysConf.AllowFastUpdate == TRUE && UserConf.DoFastUpdate == TRUE)
     {
       
       /* 2 updates per sec */
@@ -833,7 +834,7 @@ void setopertimer(void)
   
 #ifdef HAS_SETITIMER
 
-  if (sysconf_AllowFastUpdate == TRUE && conf_DoFastUpdate == TRUE)
+  if (SysConf.AllowFastUpdate == TRUE && UserConf.DoFastUpdate == TRUE)
     {
       
       /* 2 updates per sec */
@@ -872,7 +873,7 @@ void stoptimer(void)
   struct itimerval itimer;
 #endif
   
-  CqContext.display = FALSE;
+  Context.display = FALSE;
   
   signal(SIGALRM, SIG_IGN);
   
@@ -885,7 +886,7 @@ void stoptimer(void)
   alarm(0);
 #endif
   
-  CqContext.display = TRUE;
+  Context.display = TRUE;
   
   return;
   

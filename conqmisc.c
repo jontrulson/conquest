@@ -26,11 +26,12 @@
 
 #include "conqdef.h"
 #include "conqcom.h"
-#include "conqcom2.h"
+#include "context.h"
 
 #define NOCDHEXTERN
 #include "conqdata.h"				/* robot strategy data */
 
+#include "conf.h"
 #include "global.h"
 #include "color.h"
 
@@ -137,7 +138,7 @@ int canread( int snum, int msgnum )
   if ( to == snum )
     {				/* extra check to see if is from a robot
 				   and it is a valid ship */
-      if (conf_NoRobotMsgs == TRUE && from > 0 &&
+      if (UserConf.NoRobotMsgs == TRUE && from > 0 &&
 	  Ships[from].robot == TRUE && 
 	  (snum > 0 && snum <= MAXSHIPS))
 	{                       /* see if it's a robot, if so ignore */
@@ -158,7 +159,7 @@ int canread( int snum, int msgnum )
     {				/* extra check for player enter/leave msg */
       if (from == MSG_COMP && snum != MSG_GOD)
 	{				/* a player enter/exit/info message */
-	  if (conf_RecPlayerMsgs == FALSE)
+	  if (UserConf.RecPlayerMsgs == FALSE)
 	    return(FALSE);
 	  else
 	    return(TRUE);
@@ -172,7 +173,7 @@ int canread( int snum, int msgnum )
     {
 				/* if user doesn't want robot msgs
 				   don't show any */
-      if (conf_NoRobotMsgs == TRUE && from > 0 && 
+      if (UserConf.NoRobotMsgs == TRUE && from > 0 && 
 	  Ships[from].robot == TRUE)
 	{			/* see if it's a robot, if so ignore */
 	  return(FALSE);
@@ -233,11 +234,11 @@ void clearships(void)
 int cvtcoords( real cenx, real ceny, real x, real y, real scale, 
 	      int *lin, int *col )
 {
-  *col = round( (CqContext.maxcol-STAT_COLS)/2 + (x-cenx) / scale * WIDTH_FAC ) +
+  *col = round( (Context.maxcol-STAT_COLS)/2 + (x-cenx) / scale * WIDTH_FAC ) +
     STAT_COLS;
   
   *lin = round( (DISPLAY_LINS/2+1) - (y-ceny) / scale );
-  if ( *lin < 0 || *lin > DISPLAY_LINS || *col <= STAT_COLS || *col > CqContext.maxcol )
+  if ( *lin < 0 || *lin > DISPLAY_LINS || *col <= STAT_COLS || *col > Context.maxcol )
     return ( FALSE );
   
   return ( TRUE );
@@ -684,7 +685,7 @@ void histlist( int godlike )
   while (TRUE) /* repeat */
     {
       if ( ! godlike )
-	if ( ! stillalive( CqContext.snum ) )
+	if ( ! stillalive( Context.snum ) )
 	  break;
       
       thistptr = ConqInfo->histptr;
@@ -1853,7 +1854,7 @@ void puthing( int what, int lin, int col )
 	  {
 	    tcol = col + i - 1;
 	    /*	      tcol = col + i - 3;*/
-	    if ( tcol > STAT_COLS && tcol <= CqContext.maxcol - 1 )
+	    if ( tcol > STAT_COLS && tcol <= Context.maxcol - 1 )
 	      if (buf[j][i] != '\0')
 		cdput( buf[j][i], tlin, tcol );
 	  }
@@ -1992,7 +1993,7 @@ int readmsg( int snum, int msgnum, int dsplin )
   
   buf[0] = '\0';
   
-  if (HasColors)
+  if (Context.hascolor)
     {				/* set up the attrib so msg's are cyan */
       attrib = COLOR_PAIR(COL_CYANBLACK);
     }
@@ -2372,7 +2373,7 @@ void stormsg( int from, int to, char *msg )
       Ships[i].alastmsg = LMSG_READALL;
   PVUNLOCK(&ConqInfo->lockmesg);
 
-  if (sysconf_LogMessages == TRUE)
+  if (SysConf.LogMessages == TRUE)
     {
       fmtmsg(to, from, buf);
       clog("MSG: %s: %s",

@@ -16,7 +16,8 @@
 /**********************************************************************/
 
 #include "conqdef.h"
-#include "conqcom2.h"
+#include "context.h"
+#include "conf.h"
 #include "global.h"
 #define NOEXPORT_COLORS
 #include "color.h"		/* instantiate externs here */
@@ -24,16 +25,14 @@
 /* initialize color variables.  assumes curses has been initialized. */
 void InitColors(void)
 {
-  int has_colorcap;
-
-  if (has_colors() && conf_NoColor == FALSE)
-    has_colorcap = TRUE;
+  if (has_colors() && UserConf.NoColor == FALSE)
+    Context.hascolor = TRUE;
   else
-    has_colorcap = FALSE;
+    Context.hascolor = FALSE;
 
   NoColor = 0;			/* default color (white usually) */
 
-  if (has_colorcap == TRUE)
+  if (Context.hascolor)
     {
 #ifdef DEBUG_COLOR
       clog("Terminal has colors, COLORS = %d, COLOR_PAIRS = %d",
@@ -57,8 +56,6 @@ void InitColors(void)
 #if !defined(HAVE_NCURSES_H) && !defined(NCURSES_VERSION)
       bkgdset(COLOR_PAIR(COL_BACKGROUND) | ' ');
 #endif
-
-      HasColors = TRUE;
 
 				/* init colors */
       RedColor = COLOR_PAIR(COL_REDBLACK);
@@ -84,9 +81,6 @@ void InitColors(void)
            COLORS,
            COLOR_PAIRS);
 #endif
-
-      HasColors = FALSE;
-      
 				/* init colors to NoColor */
       RedColor = NoColor;
       GreenColor = NoColor;

@@ -552,10 +552,10 @@ char *GetSemVal(int thesem);
 
 void display( int snum, int display_info );
 void display_headers(int snum);
-void do_bottomborder(void);
-void do_border(void);
+void do_bottomborder(int snum, char *buf, int attrib, int bufattrib);
+void do_border(int snum, int attr);
 int alertcolor(int alert);
-void draw_alertborder(int alert);
+void draw_alertborder(int snum, int alert);
 
 /* userauth.c */
 int Logon(char *username, char *password);

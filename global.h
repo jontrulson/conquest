@@ -29,65 +29,6 @@ CEXTERN    int ConquestGID;	/* Conquest's GID */
 CEXTERN    int ConquestUID;     /* Conquest's UID */
 CEXTERN    int RMsg_Line;
 
-/* Configuration values from init file(s) */
-
-				/* System-wide options */
-				/* can see friendly torps on LR scan? */
-CEXTERN int sysconf_DoLRTorpScan;
-				/* (M)ap is actually LongeRange scan? */
-CEXTERN int sysconf_DoLocalLRScan;
-				/* (I)nfo cmds return ETA data? */
-CEXTERN int sysconf_DoETAStats;
-				/* randomly gen a doomsday machine? */
-CEXTERN int sysconf_NoDoomsday;
-				/* allow users to use do_fastupdate */
-CEXTERN int sysconf_AllowFastUpdate;
-				/* allow randomized robot strengths */
-CEXTERN int sysconf_DoRandomRobotKills;
-				/* allow non gods to SIGQUIT out */
-CEXTERN int sysconf_AllowSigquit;
-				/* allow users to (s)witchteams from main
-				   menu */
-CEXTERN int sysconf_AllowSwitchteams;
-				/* number of days of inactivity before
-				   expiring a user */
-CEXTERN int sysconf_UserExpiredays;
-
-				/* whether to log all messages into
-				   the logfile */
-CEXTERN int sysconf_LogMessages;
-
-				/* whether to allow refitting */
-CEXTERN int sysconf_AllowRefits;
-
-				/* User options */
-				/* Whether to beep on an incoming message */
-CEXTERN int conf_MessageBell;
-				/* Whether or not to disable color */
-CEXTERN int conf_NoColor;
-				/* whether or not you want to see robot msgs */
-CEXTERN int conf_NoRobotMsgs;
-				/* whether or not to send announcements on */
-				/* player entries/deaths to you. */
-CEXTERN int conf_RecPlayerMsgs;
-				/* whether to update the screen twice per */
-				/* second instead of once per second. */
-CEXTERN int conf_DoFastUpdate;
-				/* whether to restrict bells to no more than */
-				/* one per second.  Handy when do_fastupdate */
-				/* is set. */
-CEXTERN int conf_DoLimitBell;
-				/* whether or not to clear out old msgs after
-				   a reincarnate */
-CEXTERN int conf_ClearOldMsgs;
-				/* whether to send emergency distress calls
-				   to all friendly ships, rather than just
-				   your team mates */
-CEXTERN int conf_DistressToFriendly;
-
-				/* Macro keys - F1-F<MAX_MACROS> */
-CEXTERN char conf_MacrosF[MAX_MACROS][MAX_MACRO_LEN];
-
 				/* for the semaphores */
 
 #define LOCKMSG      (0)	/* lock the message portion  */
