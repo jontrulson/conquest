@@ -143,7 +143,7 @@ IMAGES = img/classd.tga img/classm.tga img/doomsday.tga img/explode.tga \
 	img/shipkde.tga img/shipksc.tga img/shipocr.tga img/shipode.tga \
 	img/shiposc.tga img/shiprcr.tga img/shiprde.tga img/shiprsc.tga \
 	img/star.tga img/fixed.txf img/msg.txf img/large.txf img/vbg.tga \
-	img/torp.tga
+	img/torp.tga img/luna.tga
 
 
 XLIBS = @X_LIBS@ @X_EXTRA_LIBS@ -lglut -lGL -lGLU -lXt @X_PRE_LIBS@ -lXext -lXi -lX11 -lXmu  
@@ -408,7 +408,7 @@ DIST_SOURCES = $(libUi_la_SOURCES) $(libUiCU_la_SOURCES) \
 	$(conquestsh_SOURCES)
 DATA = $(data_DATA)
 
-DIST_COMMON = README INSTALL Makefile.am Makefile.in acinclude.m4 \
+DIST_COMMON = README INSTALL Makefile.am Makefile.in TODO acinclude.m4 \
 	aclocal.m4 config.guess config.h.in config.sub configure \
 	configure.ac conqstrat-lex.c conqstrat-yacc.c conqstrat-yacc.h \
 	depcomp install-sh ltmain.sh missing mkinstalldirs snprintf.c

@@ -382,7 +382,7 @@ int main(int argc, char *argv[])
   Context.histslot = ERR;
   Context.lasttang = Context.lasttdist = 0;
   Context.lasttarg[0] = EOS;
-  Context.updsec = 2;		/* two per second default update rate */
+  Context.updsec = 10;		/* 10 per second default update rate */
 
 
   /* if daemon mode requested, fork off and detach */
@@ -1563,7 +1563,7 @@ int play(void)
 
       didsomething = 0;
       if ((pkttype = waitForPacket(PKT_FROMCLIENT, sockl, PKT_ANYPKT,
-				   buf, PKT_MAXSIZE, 0, NULL)) < 0)
+				   buf, PKT_MAXSIZE, 1, NULL)) < 0)
 	{
 	  if (errno != EINTR)
 	    {
@@ -1629,7 +1629,7 @@ int play(void)
 	  laststat = now;
 	}
 
-      c_sleep(ITER_SECONDS);
+      /*      c_sleep(ITER_SECONDS); JET */
     }
   
   conqstats( Context.snum );

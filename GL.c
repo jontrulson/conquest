@@ -87,8 +87,9 @@ struct _texinfo {
 #define TEX_VBG      17
 
 #define TEX_TORP     18
+#define TEX_LUNA     19
 
-#define NUM_TEX 19
+#define NUM_TEX 20
 
 struct _texinfo TexInfo[NUM_TEX] = { /* need to correlate with defines above */
   { "img/star.tga",      255 },
@@ -119,6 +120,8 @@ struct _texinfo TexInfo[NUM_TEX] = { /* need to correlate with defines above */
   { "img/vbg.tga",   255 },
 
   { "img/torp.tga",  255 },
+
+  { "img/luna.tga",  255 },
 };
 
 GLuint  textures[NUM_TEX];       /* texture storage */
@@ -366,12 +369,18 @@ void uiDrawPlanet( GLfloat x, GLfloat y, int pnum, int scale,
       glEnable(GL_TEXTURE_2D);
       glBindTexture(GL_TEXTURE_2D, textures[TEX_CLASSM]);
     }
-  else if (what == PLANET_DEAD || what == PLANET_MOON)
+  else if (what == PLANET_DEAD)
     {
       glEnable(GL_TEXTURE_2D);
       glBindTexture(GL_TEXTURE_2D, textures[TEX_CLASSD]);
     }
-  
+  else if (what == PLANET_MOON)
+    {
+      glEnable(GL_TEXTURE_2D);
+      glBindTexture(GL_TEXTURE_2D, textures[TEX_LUNA]);
+    }
+
+
   glTranslatef(0.0, 0.0, TRANZ);
   
   GLError();
@@ -423,7 +432,7 @@ void uiDrawPlanet( GLfloat x, GLfloat y, int pnum, int scale,
       size = 10.0;
       break;
     case PLANET_MOON:
-      glColor3f(0.5, 0.5, 0.5);	/* grey */
+      glColor3f(0.7, 0.7, 0.7);	/* grey */
       size = 5.0;
       break;
     default:

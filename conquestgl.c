@@ -103,7 +103,7 @@ int main(int argc, char *argv[])
 
   Context.entship = FALSE;
   Context.recmode = RECMODE_OFF;
-  Context.updsec = 5;		/* dflt - 5/sec */
+  Context.updsec = 10;		/* dflt - 10/sec */
   Context.msgrand = getnow(NULL, 0);
 
   cInfo.sock = -1;

@@ -9,7 +9,7 @@
  ***********************************************************************/
 
 const char *ConquestId = "$Id$";
-const char *ConquestVersion = "Version 8.0.1g";
-const char *ConquestDate = "7/13/2004";
+const char *ConquestVersion = "Version 8.0.1h";
+const char *ConquestDate = "8/14/2004";
 
 /* That's it! */

@@ -69,12 +69,12 @@
 
 #pragma pack(1)                 /* show me a better way... */
 
-/* a variable lenght packet for future use, and to help
+/* a variable length packet for future use, and to help
    with protocol compatibility in the future. Both server and 
    client use the same format */
 
 struct _generic_var {
-  Unsgn8 type;                  /* SP_VARABLE | CP_VARIABLE */
+  Unsgn8 type;                  /* SP_VARIABLE | CP_VARIABLE */
   Unsgn8 len;
   Unsgn16 pad1;
 

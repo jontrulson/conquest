@@ -278,26 +278,6 @@ int sendTorp(int sock, Unsgn8 tsnum, Unsgn8 tnum)
   clog("sendTorp: %d %d", tsnum, tnum);
 #endif
 
-  /* SP_TORP */
-
-  if (Context.recmode == RECMODE_ON)
-    {
-      if ((storp = spktTorp(tsnum, tnum, TRUE)))
-        recordWriteEvent((Unsgn8 *)storp);
-    }
-
-  if ((storp = spktTorp(tsnum, tnum, FALSE)))
-    if (writePacket(PKT_TOCLIENT, sock, (Unsgn8 *)storp) <= 0)
-      return FALSE;
-  
-  /* SP_TORPLOC */
-
-  /* we only record these */
-  if (Context.recmode == RECMODE_ON)
-    {
-      if ((storploc = spktTorpLoc(tsnum, tnum, TRUE)))
-        recordWriteEvent((Unsgn8 *)storploc);
-    }
 
   /* SP_TORPEVENT */
   /* we only send these */
@@ -305,6 +285,23 @@ int sendTorp(int sock, Unsgn8 tsnum, Unsgn8 tnum)
     {
       if (writePacket(PKT_TOCLIENT, sock, (Unsgn8 *)storpev) <= 0)
         return FALSE;
+    }
+
+  /* SP_TORP */
+  /* we only record these */
+  if (Context.recmode == RECMODE_ON)
+    {
+      if ((storp = spktTorp(tsnum, tnum, TRUE)))
+        recordWriteEvent((Unsgn8 *)storp);
+    }
+
+  /* SP_TORPLOC */
+
+  /* we only record these */
+  if (Context.recmode == RECMODE_ON)
+    {
+      if ((storploc = spktTorpLoc(tsnum, tnum, TRUE)))
+        recordWriteEvent((Unsgn8 *)storploc);
     }
 
   return TRUE;
@@ -664,7 +661,7 @@ void procDetSelf(cpCommand_t *cmd)
 
   if (cmd->cmd != CPCMD_DETSELF)
     return;
-
+#warning "Clean me"
 #if defined(DEBUG_SERVERPROC)
   clog("PROC DETSELF");
 #endif
