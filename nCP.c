@@ -2568,6 +2568,7 @@ static int nCPIdle(void)
 
 static int nCPInput(int ch)
 {
+  int cf = ch;                      /* backup of ch for domacros() */
   char c;
   int irv, tmsg, i;
   real tdir;
@@ -2636,7 +2637,7 @@ static int nCPInput(int ch)
         }
     }
 
-  c = CQ_CHAR(ch);
+  c = CQ_CHAR(ch);              /* strip off everything but the character */
 
   if (prompting)
     {
@@ -3103,9 +3104,9 @@ static int nCPInput(int ch)
           clrPrompt(MSG_LIN1);
           clrPrompt(MSG_LIN2);
 
-          if (CQ_FKEY(ch) && !_KPAngle(ch, &x))
+          if (CQ_FKEY(cf) && !_KPAngle(cf, &x))
             {                           /* handle macros */
-              if (DoMacro(_xlateFKey(ch)))
+              if (DoMacro(_xlateFKey(cf)))
                 {
                   while (iBufCount())
                     nCPInput(0); /* recursion warning */

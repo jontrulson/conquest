@@ -9,6 +9,22 @@
 
                               Conquest HISTORY
 
+Version 8.0.1k 9/25/2004 (devel)
+
+        - Some bug fixes:
+
+          - when entering a game, pointer troubles could cause a
+            client to get stuck sitting on top of Murisak, or offered
+            the wrong list of systems to enter from, if their team
+            owned more than one system.
+
+          - user config viewer background preference was not honored
+            during replay of a previously recorded game.
+
+          - modifiers (shift, ctl, etc) were improperly discarded when
+            decoding the macro FKeys.
+
+
 Version 8.0.1j 9/11/2004 (devel)
 
         - implemented background image (Hubble Ultra Deep Field) to

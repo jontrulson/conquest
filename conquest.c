@@ -3402,7 +3402,7 @@ int welcome( int *unum )
   char * selected_str="You have been selected to command a";
   char * starship_str=" starship.";
   char * prepare_str="Prepare to be beamed aboard...";
-  spClientStat_t *scstat = NULL;
+  spClientStat_t scstat = {};
   spAck_t *sack = NULL;
   int pkttype;
   Unsgn8 buf[PKT_MAXSIZE];
@@ -3427,11 +3427,11 @@ int welcome( int *unum )
   switch (pkttype)
     {
     case SP_CLIENTSTAT:
-      scstat = (spClientStat_t *)buf;
+      scstat = *(spClientStat_t *)buf;
 
-      *unum = (int)ntohs(scstat->unum);
-      Context.snum = scstat->snum;
-      Ships[Context.snum].team = scstat->team;
+      *unum = (int)ntohs(scstat.unum);
+      Context.snum = scstat.snum;
+      Ships[Context.snum].team = scstat.team;
 
       break;
     case SP_ACK:
@@ -3443,7 +3443,7 @@ int welcome( int *unum )
       break;
     }
 
-  if ( pkttype == SP_CLIENTSTAT && (scstat->flags & SPCLNTSTAT_FLAG_NEW) )
+  if ( pkttype == SP_CLIENTSTAT && (scstat.flags & SPCLNTSTAT_FLAG_NEW) )
     {				
       /* Must be a new player. */
       cdclear();
@@ -3458,7 +3458,7 @@ int welcome( int *unum )
 	  c_sleep( 2.0 );
 	  return ( FALSE );
 	}
-      team = scstat->team;
+      team = scstat.team;
       cbuf[0] = EOS;
       apptitle( team, cbuf );
       appchr( ' ', cbuf );

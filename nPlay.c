@@ -34,7 +34,7 @@ extern void processPacket(Unsgn8 *buf);
 static int state;
 static int fatal = FALSE;
 static spAck_t *sack = NULL;
-static spClientStat_t *scstat = NULL;
+static spClientStat_t scstat = {};
 static int shipinited = FALSE;   /* whether we've done _newship() yet */
 static int owned[NUMPLAYERTEAMS]; 
 
@@ -123,12 +123,11 @@ static int _newship( int unum, int *snum )
 	  break;
 	  
 	case SP_CLIENTSTAT:
-	  scstat = (spClientStat_t *)buf;
-	  
+	  scstat = *(spClientStat_t *)buf; /* make a copy... */
 	  /* first things first */
-	  Context.unum = (int)ntohs(scstat->unum);
-	  Context.snum = scstat->snum;
-	  Ships[Context.snum].team = scstat->team;
+	  Context.unum = (int)ntohs(scstat.unum);
+	  Context.snum = scstat.snum;
+	  Ships[Context.snum].team = scstat.team;
 	  
           return TRUE;
 	  break;
@@ -194,14 +193,14 @@ static int nPlayDisplay(dspConfig_t *dsp)
             }
         }
           
-      if (!scstat->esystem)
+      if (!scstat.esystem)
         {                       /* we are ready  */
           state = S_DONE;
           return NODE_OK;
         }
       else
         {                       /* need to display/get a selection */
-          selectentry(scstat->esystem);
+          selectentry(scstat.esystem);
         }
     }
   else if (state == S_NSERR)
@@ -245,7 +244,6 @@ static int nPlayDisplay(dspConfig_t *dsp)
   
 static int nPlayIdle(void)
 {
-
   if (state == S_DONE)
     {
       Context.entship = TRUE;
