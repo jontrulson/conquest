@@ -2518,10 +2518,18 @@ static int nCPIdle(void)
   /* send a ping if it's time */
   if (!pingPending && ((iternow - pingtime) > pingwait))
     {                           /* send a ping request */
-      pingtime = iternow;
-      pingStart = iternow;
-      pingPending = TRUE;
-      sendCommand(CPCMD_PING, 0);
+      /* only send this if we are doing things that this packet would end
+         up cancelling... */
+      if (state != S_REFITING && state != S_BOMBING && 
+          state != S_BEAMING  && state != S_DESTRUCTING &&
+          state != S_WARRING)
+        {
+
+          pingtime = iternow;
+          pingStart = iternow;
+          pingPending = TRUE;
+          sendCommand(CPCMD_PING, 0);
+        }
     }
 
   /* drive the local universe */
