@@ -1,0 +1,110 @@
+
+         +--------------------------------------------------------+
+         |  CCC    OOO   N   N   QQQ   U   U  EEEEE   SSSS  TTTTT |
+         | C   C  O   O  NN  N  Q   Q  U   U  E      S        T   |
+         | C      O   O  N N N  Q   Q  U   U  EEE     SSS     T   |
+         | C   C  O   O  N  NN  Q  Q   U   U  E          S    T   |
+         |  CCC    OOO   N   N   QQ Q   UUU   EEEEE  SSSS     T   |
+         +--------------------------------------------------------+
+
+DISTRIBUTION
+
+	You should have recieved one (or both) of the following files:
+	(where x.y is the current revision)
+
+	conquest-x.y.pkg.tar.gz   - gziped Unixware binary package (in 
+                                  stream format) for use with pkgadd(1).
+
+		Use the following commands to unpack and install on
+		Unixware:
+
+		$ gunzip conquest-x.y.pkg.tar.gz
+		$ tar xvf conquest-x.y.pkg.tar
+		(as root)
+		# pkgadd -d /full/path/to/conquest-x.y.pkg
+
+
+	conquest-x.y.src.tar.gz	- gziped tar archive of the source
+                                  distribution.
+
+		Unzip/untar this in a nice, quiet, peaceful place.  I
+                use 'gzcat conquest-x.y.src.tar.gz |tar -xvf -'.
+
+	See the file README for build instructions and other useful
+information.  See the file COPYRIGHT for copyright information.
+
+	Currently, it's been built on:
+
+	Unixware 2.03 (though any Unixware should do)
+	FreeBSD 2.2 100696-SNAP 
+	Linux 2.0.0 or greater
+
+LOCATION
+	
+	Conquest can be obtained (hopefully) via ftp from
+ftp.freebird.org and sunsite.unc.edu.  More up-to-date info
+may be found at http://home.rmi.net/~jon/index.html
+
+
+CONQUEST SYNOPSIS
+
+	Here's an extract from the conquest.doc file:
+
+          NAME
+               Conquest  -  a multi-player real-time screen-oriented space
+               war game
+
+          SYNOPSIS
+               conquest
+
+          DESCRIPTION
+
+
+               1. OBJECT OF THE GAME.
+
+               The object of the game is twofold. The  short-range  goal
+               is  to accumulate "kills" by shooting down enemy players.
+               You get one kill point for each  enemy  ship  shot  down,
+               plus  some  extra  if  the enemy had kills too. The major
+               weapon used to shoot down ships is the photon torpedo.
+
+               The long-range goal is to conquer the universe  for  your
+               team  by taking every planet. You take planets by killing
+               off the enemy's armies via bombardment, and then  beaming
+               your  team's  armies down. When all the planets have been
+               taken, the game ends, a new game begins, and  the  player
+               who  actually  took  the last planet gets his/her name up
+               in lights.
+
+               ...
+
+	See INSTALL for instructions on building and installing Conquest.
+
+	See README for more information.
+
+	See conquest.doc ((h)elp lesson from within Conquest) and
+conqnews.doc ((n)ews from within conquest) for instructions on how to
+play and what's changed.
+
+
+Jon Trulson <jon@radscan.com> 7/11/96
+
+
+COPYRIGHT
+
+                 C O N Q U E S T   (VAX/VMS Ratfor)
+
+      Copyright (C)1983-1986 by Jef Poskanzer and Craig Leres 
+ Permission to use, copy, modify, and distribute this software and 
+ its documentation for any purpose and without fee is hereby granted, 
+ provided that this copyright notice appear in all copies and in all 
+ supporting documentation. Jef Poskanzer and Craig Leres make no 
+ representations about the suitability of this software for any 
+ purpose. It is provided "as is" without express or implied warranty. 
+
+
+ Unix/C specific porting and supporting code Copyright (C)1994-1996 
+ by Jon Trulson <jon@radscan.com> under the same terms and          
+ conditions of the original copyright by Jef Poskanzer and Craig    
+ Leres.                                                             
+

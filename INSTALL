@@ -1,0 +1,118 @@
+
+         +--------------------------------------------------------+
+         |  CCC    OOO   N   N   QQQ   U   U  EEEEE   SSSS  TTTTT |
+         | C   C  O   O  NN  N  Q   Q  U   U  E      S        T   |
+         | C      O   O  N N N  Q   Q  U   U  EEE     SSS     T   |
+         | C   C  O   O  N  NN  Q  Q   U   U  E          S    T   |
+         |  CCC    OOO   N   N   QQ Q   UUU   EEEEE  SSSS     T   |
+         +--------------------------------------------------------+
+
+
+DISTRIBUTION
+
+	You should have recieved one (or both) of the following files:
+	(where x.y is the current revision)
+
+	conquest-x.y.pkg.gz	- gziped Unixware binary package (in 
+                                  stream format) for use with pkgadd(1).
+
+		Use the following commands to unpack and install on
+		Unixware:
+
+		$ gunzip conquest-x.y.pkg.tar.gz
+                $ tar xvf conquest-x.y.pkg.tar
+		(as root)
+		# pkgadd -d /full/path/to/conquest-x.y.pkg
+
+
+	conquest-x.y.src.tar.gz	- gziped tar archive of the source
+                                  distribution.
+
+		Unzip/untar this in a nice, quiet, peaceful place.  I
+                use 'gzcat conquest-x.y.src.tar.gz |tar -xvf -'.
+
+		cd into the the source directory and type
+'./configure'.  Configure will try to determine some characteristics
+about your system and build a Makefile and config.h for you.  The
+default is to install Conquest into /opt.  You can use the '--prefix='
+option to confiure a different location, as in './configure
+--prefix=/usr/local'.
+
+
+	Currently, only the following OS's have been tried:
+
+		Unixware 2.03 (1.x/2.x should be fine too)
+		Linux 2.0.0, with ncurses-1.9.9e (old ncurses *may* work)
+		FreeBSD 2.2-100696-SNAP (stock curses works, but
+			without color apparently...)
+
+
+	ncurses-1.9.9e is certain to work on both fbsd and Linux.  If
+the curses implementation on your machine has problems, you might try
+ncurses... It's free and doess a reasonable job at emulating svr4
+curses.  
+
+	TERMINAL NOTE: Conquest depends on a properly configured
+terminfo entry for your terminal in order to make use of Fkey's, the
+arrow keys, the keypad, and color.  The standard at386 terminfo entry
+on Unixware for example, does not define the SHIFT-Fkeys, nor the
+keypad (upperright, lowerleft, etc).  Some modification to your
+terminfo entry may be required to use these extended features.
+
+
+BUILDING
+
+	To build conquest, unpack the src archive.  
+
+	Create the 'conquest' group.  In Unixware this can be done
+with (as root) 'groupadd conquest'.
+
+	NOTE:  You *must* create a conquest group, or 'make install
+will fail!
+
+	Then cd into the src directory.
+
+	Conquest now makes use of the GNU Autoconf system for
+maintaining source code able to compile on many different machines.
+
+	Theoretically ;-) all you will need to do is:
+
+	$ ./configure
+	$ make depend (or make clean if you lack makedepend)
+	$ make all
+	(note: you will not be able to execute any of the binaries
+               until you do a make install, then run the installed
+               binary)
+	$ su
+	# make install
+
+	By default, conquest will be installed in /opt.  To install it
+somewhere else, supply the '--prefix=/other/dir' option to configure.
+
+	You may also want to peek at the defs.h file, though the
+defaults should be fine.  If your porting this to something else, good
+luck...But if you do succeed in a port to a new platform, please let
+me know so I can incorporate it into the distribution.  The autoconf
+src file 'configure.in' is supplied for this purpose ;-)
+
+	As root, intialize the system-wide conquestrc file
+(/opt/conquest/etc/conquestrc by default) by typing:
+
+	/opt/bin/conqoper -C
+
+	Edit /opt/conquest/etc/conquestrc and see if everything there
+is ok for your site.
+
+	Then run the conqoper program and (i)nitialize->(e)verything,
+open the game, and you should now be ready to rock-n-roll.
+
+	See the README file for more information.
+
+	Read the conquest.doc and the conqnews.doc files to get info
+on what conquest is and how to play it.
+
+
+Jon Trulson <jon@radscan.com>
+11/30/96
+
+
