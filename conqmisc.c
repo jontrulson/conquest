@@ -1897,35 +1897,20 @@ void putship( int snum, real basex, real basey )
 }
 
 
-/*  readmsg - display a message */
-/*  SYNOPSIS */
-/*    int snum, msgnum */
-/*    readmsg( snum, msgnum ) */
-int readmsg( int snum, int msgnum, int dsplin )
+/* fmtmsg - format a message string -JET */
+int fmtmsg(int to, int from, char *buf)
 {
-  int i;
-  char buf[MSGMAXLINE];
-  unsigned int attrib = 0;
-  
-  
+
   buf[0] = '\0';
-  
-  if (HasColors)
-    {				/* set up the attrib so msg's are cyan */
-      attrib = COLOR_PAIR(COL_CYANBLACK);
-    }
 
-  /* Format who the message is from. */
-  i = Msgs[msgnum].msgfrom;
-
-  if ( i > 0 && i <= MAXSHIPS )
+				/* Format who the message is from. */
+  if ( from > 0 && from <= MAXSHIPS )
     {
-      buf[0] = EOS;
-      appship( i, buf );
+      appship( from, buf );
     }
-  else if ( -i > 0 && -i <= NUMPLANETS )
-    c_strcpy( Planets[-i].name, buf );
-  else switch ( i )
+  else if ( -from > 0 && -from <= NUMPLANETS )
+    c_strcpy( Planets[-from].name, buf );
+  else switch ( from )
     {
     case MSG_NOONE:
       c_strcpy( "nobody", buf );
@@ -1950,18 +1935,15 @@ int readmsg( int snum, int msgnum, int dsplin )
   appstr( "->", buf );
   
   /* Format who the message is to. */
-  i = Msgs[msgnum].msgto;
-  if ( i == snum )
-    appstr( "you", buf );
-  else if ( i > 0 && i <= MAXSHIPS )
-    appship( i, buf );
-  else if ( -i >= 0 && -i < NUMPLAYERTEAMS )
+  if ( to > 0 && to <= MAXSHIPS )
+    appship( to, buf );
+  else if ( -to >= 0 && -to < NUMPLAYERTEAMS )
     {
-      appchr( Teams[-i].teamchar, buf );
+      appchr( Teams[-to].teamchar, buf );
     }
   else 
     {
-      switch ( i )
+      switch ( to )
 	{
 	case MSG_NOONE:
 	  appstr( "nobody", buf );
@@ -1980,7 +1962,31 @@ int readmsg( int snum, int msgnum, int dsplin )
 	  break;
 	}
     }
+
+  return(TRUE);
+}
+
+
+/*  readmsg - display a message */
+/*  SYNOPSIS */
+/*    int snum, msgnum */
+/*    readmsg( snum, msgnum ) */
+int readmsg( int snum, int msgnum, int dsplin )
+{
+  int i;
+  char buf[MSGMAXLINE];
+  unsigned int attrib = 0;
   
+  
+  buf[0] = '\0';
+  
+  if (HasColors)
+    {				/* set up the attrib so msg's are cyan */
+      attrib = COLOR_PAIR(COL_CYANBLACK);
+    }
+
+  fmtmsg(Msgs[msgnum].msgto, Msgs[msgnum].msgfrom, buf);
+
   appstr( ": ", buf );
   appstr( Msgs[msgnum].msgbuf, buf );
 
@@ -2321,6 +2327,7 @@ int stillalive( int snum )
 void stormsg( int from, int to, char *msg )
 {
   int nlastmsg, i;
+  char buf[128];
   
 				/* don't do this if invalid common block */
   if (*CBlockRevision != COMMONSTAMP)
@@ -2338,6 +2345,14 @@ void stormsg( int from, int to, char *msg )
     if ( nlastmsg == Ships[i].alastmsg )
       Ships[i].alastmsg = LMSG_READALL;
   PVUNLOCK(&ConqInfo->lockmesg);
+
+  if (sysconf_LogMessages == TRUE)
+    {
+      fmtmsg(to, from, buf);
+      clog("MSG: %s: %s",
+	   buf, msg);
+    }
+
   
   return;
   

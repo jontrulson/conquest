@@ -349,6 +349,15 @@ void expire_users(void)
 
       difftime = getnow(NULL, 0) - Users[i].lastentry;
 
+      if (difftime < 0)
+	{			/* screen out negative expirations -
+				   only happens when system clock goes
+				   way back */
+	  clog("expire_users(): difftime (%d) is less than 0, skipping user %s\n",
+	       difftime, Users[i].username);
+	  continue;
+	}
+
 #if defined(DEBUG_SERVER)
           clog("expire_users(): getnow(NULL, 0) = %d, Users[%d].lastentry = %d",
 	       getnow(NULL, 0),

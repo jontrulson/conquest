@@ -7,8 +7,8 @@ Keywords:       multiuser game conquest space warfare die curses fun unix
 Author:         Original VMS/Ratfor (1985): Craig Leres, Jef Poskanzer
 Author:         Unix/C translation/port (1996-1999): Jon Trulson
 Author:         Linux porting work: Dave Payne
-Maintained-by:  Jon Trulson <jon@radscan.com>, http://home.rmi.net/~jon
-Primary-site:   http://home.rmi.net/~jon,  
+Maintained-by:  Jon Trulson <jon@radscan.com>
+Primary-site:   http://radscan.com/conquest.html
 Primary-site:   ftp://ftp.freebird.org/unixware/freebird/games/conquest/ 
 Alternate-site: ftp://sunsite.unc.edu/pub/Linux/games/multiplayer/
 Copying-policy: Artistic License (see the LICENSE file in the distribution)

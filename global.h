@@ -53,6 +53,10 @@ CEXTERN int sysconf_AllowSwitchteams;
 				   expiring a user */
 CEXTERN int sysconf_UserExpiredays;
 
+				/* whether to log all messages into
+				   the logfile */
+CEXTERN int sysconf_LogMessages;
+
 				/* User options */
 				/* Whether to beep on an incoming message */
 CEXTERN int conf_MessageBell;
