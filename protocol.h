@@ -45,6 +45,10 @@
 
 #define SP_PLANETLOC2     22    /* new planloc packet */
 
+#define SP_TORPEVENT      23    /* torp launch/status */
+
+#define SP_VARIABLE       24    /* variable length packet */
+
 /* client -> server packet types */
 
 #define CP_NULL           0	/* never used */
@@ -59,10 +63,26 @@
 #define CP_SETCOURSE      9
 #define CP_MESSAGE        10
 
+#define CP_VARIABLE       11    /* variable length packet */
 #define PKT_ANYPKT        ~0
 
 
 #pragma pack(1)                 /* show me a better way... */
+
+/* a variable lenght packet for future use, and to help
+   with protocol compatibility in the future. Both server and 
+   client use the same format */
+
+struct _generic_var {
+  Unsgn8 type;                  /* SP_VARABLE | CP_VARIABLE */
+  Unsgn8 len;
+  Unsgn16 pad1;
+
+  void *payload;                /* the actual data */
+};
+
+typedef struct _generic_var spVariable_t;
+typedef struct _generic_var cpVariable_t;
 
 /* server -> client packets */
 typedef struct _sp_null {
@@ -321,6 +341,28 @@ typedef struct _sp_torploc {
 
   Sgn32 y;			/* x1000 */
 } spTorpLoc_t;
+
+typedef struct _sp_torpevent {
+  Unsgn8 type;                  /* SP_TORPEVENT */
+  Unsgn8 snum;                  /* ship num */
+  Unsgn8 tnum;                  /* torp num */
+  Unsgn8 war;                   /* war. what is it good for. */
+
+  Sgn32 x;			/* x1000 */
+
+  Sgn32 y;			/* x1000 */
+
+  Sgn32 dx;			/* x1000 */
+
+  Sgn32 dy;			/* x1000 */
+
+  
+  Unsgn8 status;		/* one of the TS_* values */
+  Unsgn8 pad1;
+  Unsgn8 pad2;
+  Unsgn8 pad3;
+
+} spTorpEvent_t;
 
 #define SPTEAM_FLAGS_NONE         0x00
 #define SPTEAM_FLAGS_COUPINFO     0x01

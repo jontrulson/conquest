@@ -68,7 +68,8 @@ static int nMenuInput(int ch);
 static scrNode_t nMenuNode = {
   nMenuDisplay,               /* display */
   nMenuIdle,                  /* idle */
-  nMenuInput                  /* input */
+  nMenuInput,                  /* input */
+  NULL
 };
 
 static void _conqds(dspConfig_t *dsp)

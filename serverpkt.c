@@ -37,6 +37,7 @@ static spPlanetLoc2_t pktPlanetLoc2[NUMPLANETS + 1];
 static spUser_t pktUser[MAXUSERS];
 static spTorp_t pktTorp[MAXSHIPS + 1][MAXTORPS];
 static spTorpLoc_t pktTorpLoc[MAXSHIPS + 1][MAXTORPS];
+static spTorpEvent_t pktTorpEvent[MAXSHIPS + 1][MAXTORPS];
 static spTeam_t pktTeam[NUMALLTEAMS];
 static spConqInfo_t pktConqInfo;
 static spHistory_t pktHistory[MAXHISTLOG];
@@ -53,6 +54,7 @@ static spPlanetLoc_t recPlanetLoc[NUMPLANETS + 1];
 static spPlanetLoc2_t recPlanetLoc2[NUMPLANETS + 1];
 static spTorp_t recTorp[MAXSHIPS + 1][MAXTORPS];
 static spTorpLoc_t recTorpLoc[MAXSHIPS + 1][MAXTORPS];
+static spTorpEvent_t recTorpEvent[MAXSHIPS + 1][MAXTORPS];
 static spTeam_t recTeam[NUMALLTEAMS];
 static spDoomsday_t recDoomsday;
 static spPlanetInfo_t recPlanetInfo[NUMPLANETS + 1];
@@ -80,6 +82,8 @@ void spktInitPkt(void)
   memset((void *)pktTorp, 0,  sizeof(spTorp_t) * (MAXSHIPS + 1) * MAXTORPS);
   memset((void *)pktTorpLoc, 0,  
          sizeof(spTorpLoc_t) * (MAXSHIPS + 1) * MAXTORPS);
+  memset((void *)pktTorpEvent, 0,  
+         sizeof(spTorpEvent_t) * (MAXSHIPS + 1) * MAXTORPS);
   memset((void *)pktTeam, 0,  sizeof(spTeam_t) * NUMALLTEAMS);
   memset((void *)&pktConqInfo, 0,  sizeof(spConqInfo_t));
   memset((void *)pktHistory, 0,  sizeof(spHistory_t) * MAXHISTLOG);
@@ -102,6 +106,8 @@ void spktInitRec(void)
          sizeof(spTorp_t) * (MAXSHIPS + 1) * MAXTORPS);
   memset((void *)recTorpLoc, 0,  
          sizeof(spTorpLoc_t) * (MAXSHIPS + 1) * MAXTORPS);
+  memset((void *)recTorpEvent, 0,  
+         sizeof(spTorpEvent_t) * (MAXSHIPS + 1) * MAXTORPS);
   memset((void *)recTeam, 0,  sizeof(spTeam_t) * NUMALLTEAMS);
   memset((void *)&recDoomsday, 0, sizeof(spDoomsday_t));
   memset((void *)recPlanetInfo, 0, sizeof(spPlanetInfo_t) * (NUMPLANETS + 1));
@@ -521,7 +527,7 @@ spPlanetSml_t *spktPlanetSml(Unsgn8 pnum, int rec)
   return NULL;
 }
 
-spPlanetLoc_t *spktPlanetLoc(Unsgn8 pnum, int rec)
+spPlanetLoc_t *spktPlanetLoc(Unsgn8 pnum, int rec, int force)
 {
   int snum = Context.snum;
   int team = Ships[snum].team;
@@ -560,7 +566,7 @@ spPlanetLoc_t *spktPlanetLoc(Unsgn8 pnum, int rec)
            ((dx + dy) / 2.0));
 #endif
       
-      if (!rec)
+      if (!rec && !force)
         return NULL;
     }
 
@@ -601,7 +607,7 @@ spPlanetLoc_t *spktPlanetLoc(Unsgn8 pnum, int rec)
   return NULL;
 }
 
-spPlanetLoc2_t *spktPlanetLoc2(Unsgn8 pnum, int rec)
+spPlanetLoc2_t *spktPlanetLoc2(Unsgn8 pnum, int rec, int force)
 {
   int snum = Context.snum;
   int team = Ships[snum].team;
@@ -610,7 +616,7 @@ spPlanetLoc2_t *spktPlanetLoc2(Unsgn8 pnum, int rec)
   const Unsgn32 iterwait = 5000.0; /* ms */
   static Unsgn32 tstart[NUMPLANETS] = {}; /* saved time deltas */
   
-  if (tstart[pnum] != 0 && ((iternow - tstart[pnum]) < iterwait))
+  if (!force && (tstart[pnum] != 0 && ((iternow - tstart[pnum]) < iterwait)))
     return NULL; 
   
   tstart[pnum] = iternow; 
@@ -757,6 +763,89 @@ spTorpLoc_t *spktTorpLoc(Unsgn8 tsnum, Unsgn8 tnum, int rec)
         {
           pktTorpLoc[tsnum][tnum] = storploc;
           return &storploc;
+        }
+    }
+
+  return NULL;
+}
+
+/* PRIV */
+spTorpEvent_t *spktTorpEvent(Unsgn8 tsnum, Unsgn8 tnum, int rec)
+{
+  int i;
+  int snum = Context.snum;
+  int team = Ships[snum].team;
+  static spTorpEvent_t storpev;
+  real dis;
+  real x, y, dx, dy;
+
+  memset((void *)&storpev, 0, sizeof(spTorpEvent_t));
+
+  storpev.type = SP_TORPEVENT;
+  storpev.snum = tsnum;
+  storpev.tnum = tnum;
+  storpev.status = (Unsgn8)Ships[tsnum].torps[tnum].status;
+
+  /* RESTRICT */
+  /* we can always see friendly torps.  enemy torps can only be seen if 
+     within ACCINFO_DIST of your ship.  torp war stat only applies to
+     your ship. */
+
+  x = Ships[tsnum].torps[tnum].x;
+  y = Ships[tsnum].torps[tnum].y;
+  dx = Ships[tsnum].torps[tnum].dx;
+  dy = Ships[tsnum].torps[tnum].dy;
+
+  if (Ships[tsnum].torps[tnum].war[team] && !rec)
+    {				/* it's at war with us. bastards. */
+      /* see if it's close enough to scan */
+      dis = (real) dist(Ships[snum].x, Ships[snum].y, 
+			Ships[tsnum].torps[tnum].x, 
+			Ships[tsnum].torps[tnum].y );
+
+      if (dis > ACCINFO_DIST)
+        {                       /* in the bermuda triangle */
+          x = 1e7;
+          y = 1e7;
+          dx = 0.0;
+          dy = 0.0;
+        }
+    }
+
+  storpev.x = (Sgn32)htonl((Sgn32)(x * 1000.0));
+  storpev.y = (Sgn32)htonl((Sgn32)(y * 1000.0));
+  storpev.dx = (Sgn32)htonl((Sgn32)(dx * 1000.0));
+  storpev.dy = (Sgn32)htonl((Sgn32)(dy * 1000.0));
+
+  if (rec)
+    {
+      for (i=0; i < NUMPLAYERTEAMS; i++)
+        if (Ships[tsnum].torps[tnum].war[i])
+          storpev.war |= (1 << i);
+    }
+  else
+    {
+      /* RESTRICT */
+      /* only send 'war' status as it relates to our team */
+      if (Ships[tsnum].torps[tnum].war[team])
+        storpev.war |= (1 << team);
+    }
+
+  /* we only do these if the torp status changed */
+  if (rec)
+    {
+      if (storpev.status != recTorpEvent[tsnum][tnum].status)
+        {
+          recTorpEvent[tsnum][tnum] = storpev;
+          return &storpev;
+        }
+    }
+  else
+    {
+      if (storpev.status != pktTorpEvent[tsnum][tnum].status)
+        {
+          pktTorpEvent[tsnum][tnum] = storpev;
+          return &storpev;
         }
     }
 

@@ -69,7 +69,8 @@ static int nPlayBInput(int ch);
 static scrNode_t nPlayBNode = {
   nPlayBDisplay,               /* display */
   nPlayBIdle,                  /* idle */
-  nPlayBInput                  /* input */
+  nPlayBInput,                  /* input */
+  NULL                          /* next */
 };
 
 

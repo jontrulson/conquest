@@ -39,7 +39,8 @@ static int nConsvrInput(int ch);
 static scrNode_t nConsvrNode = {
   nConsvrDisplay,               /* display */
   nConsvrIdle,                  /* idle */
-  nConsvrInput                  /* input */
+  nConsvrInput,                  /* input */
+  NULL
 };
 
 

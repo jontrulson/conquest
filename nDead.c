@@ -45,7 +45,8 @@ static int nDeadInput(int ch);
 static scrNode_t nDeadNode = {
   nDeadDisplay,               /* display */
   nDeadIdle,                  /* idle */
-  nDeadInput                  /* input */
+  nDeadInput,                  /* input */
+  NULL
 };
 
 

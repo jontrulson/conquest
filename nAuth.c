@@ -63,8 +63,9 @@ static int nAuthIdle(void);
 
 static scrNode_t nAuthNode = {
   nAuthDisplay,                 /* display */
-  nAuthIdle,                         /* idle */
-  nAuthInput                    /* input */
+  nAuthIdle,                    /* idle */
+  nAuthInput,                    /* input */
+  NULL
 };
 
 
@@ -86,6 +87,7 @@ static void dispServerInfo(int tlin)
   static int inited = FALSE;
   static const int hcol = 1, icol = 11;
   static char timebuf[BUFFER_SIZE];
+  time_t servtm;
 
   if (!inited)
     {
@@ -116,7 +118,8 @@ static void dispServerInfo(int tlin)
       sprintf(pbuf5, "#%d#MOTD: ", MagentaColor);
       sprintf(buf5, "#%d#%%s", NoColor);
 
-      strncpy(timebuf, ctime((time_t *)&sStat.servertime), BUFFER_SIZE - 1);
+      servtm = sStat.servertime; /* fix alignment */
+      strncpy(timebuf, ctime(&servtm), BUFFER_SIZE - 1);
       timebuf[strlen(timebuf) - 1] = 0; /* remove the NL */
 
     }

@@ -42,7 +42,8 @@ static int nums;
 static scrNode_t nMetaNode = {
   nMetaDisplay,                 /* display */
   NULL,                         /* idle */
-  nMetaInput                    /* input */
+  nMetaInput,                   /* input */
+  NULL                          /* next */
 };
 
 

@@ -31,7 +31,6 @@
 extern Unsgn8 clientFlags; 
 extern int lastServerError;
 
-extern void processPacket(char *);
 static char *hd2="ship  name          pseudonym              kills     type";
 static int fship;
 
@@ -42,7 +41,8 @@ static int nShiplInput(int ch);
 static scrNode_t nShiplNode = {
   nShiplDisplay,               /* display */
   nShiplIdle,                  /* idle */
-  nShiplInput                  /* input */
+  nShiplInput,                  /* input */
+  NULL                          /* next */
 };
 
 static int retnode;             /* the node to return to */

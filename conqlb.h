@@ -72,6 +72,7 @@ void clbZeroEverything(void);
 void clbZeroShip( int snum );
 char *clbGetUserLogname(void);
 void clbPlanetDrive(real itersec);
+void clbTorpDrive(real itersec);
 Unsgn32 clbGetMillis(void);
 
 #endif /* _CONQLB_H */

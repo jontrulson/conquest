@@ -125,7 +125,7 @@ int sendShip(int sock, Unsgn8 snum)
 }
 
 /* we have the potential to send 3 packets here. */
-int sendPlanet(int sock, Unsgn8 pnum)
+int sendPlanet(int sock, Unsgn8 pnum, int force)
 {
   spPlanet_t *splan;
   spPlanetSml_t *splansml;
@@ -181,12 +181,12 @@ int sendPlanet(int sock, Unsgn8 pnum)
   /* SP_PLANETLOC */
   if (Context.recmode == RECMODE_ON)
     {
-      if ((splanloc = spktPlanetLoc(pnum, TRUE)))
+      if ((splanloc = spktPlanetLoc(pnum, TRUE, force)))
         recordWriteEvent((Unsgn8 *)splanloc);
     }
 
   /* SP_PLANETLOC2 */
-  if ((splanloc2 = spktPlanetLoc2(pnum, FALSE)))
+  if ((splanloc2 = spktPlanetLoc2(pnum, FALSE, force)))
     if (writePacket(PKT_TOCLIENT, sock, (Unsgn8 *)splanloc2) <= 0)
       return FALSE;
 
@@ -262,6 +262,7 @@ int sendTorp(int sock, Unsgn8 tsnum, Unsgn8 tnum)
 {
   spTorp_t *storp;
   spTorpLoc_t *storploc;
+  spTorpEvent_t *storpev;
 
   /* no point in sending torp data if we're not playing */
   if (sInfo.state != SVR_STATE_PLAY)
@@ -291,24 +292,19 @@ int sendTorp(int sock, Unsgn8 tsnum, Unsgn8 tnum)
   
   /* SP_TORPLOC */
 
+  /* we only record these */
   if (Context.recmode == RECMODE_ON)
     {
       if ((storploc = spktTorpLoc(tsnum, tnum, TRUE)))
         recordWriteEvent((Unsgn8 *)storploc);
     }
 
-  if ((storploc = spktTorpLoc(tsnum, tnum, FALSE)))
+  /* SP_TORPEVENT */
+  /* we only send these */
+  if ((storpev = spktTorpEvent(tsnum, tnum, FALSE)))
     {
-      if (sInfo.doUDP)
-        {
-          if (writePacket(PKT_TOCLIENT, sInfo.usock, (Unsgn8 *)storploc) <= 0)
-            return FALSE;
-        }
-      else
-        {
-          if (writePacket(PKT_TOCLIENT, sock, (Unsgn8 *)storploc) <= 0)
-            return FALSE;
-        }
+      if (writePacket(PKT_TOCLIENT, sock, (Unsgn8 *)storpev) <= 0)
+        return FALSE;
     }
 
   return TRUE;

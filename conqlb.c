@@ -3258,6 +3258,54 @@ void clbPlanetDrive(real itersec)
   
 }
 
+/*  torpdrive - move the torps based on interval */
+void clbTorpDrive(real itersec)
+{
+  int s, i, j;
+  static int ship[MAXSHIPS + 1];
+  static int FirstTime = TRUE;
+    
+  if (FirstTime)
+    {
+      FirstTime = FALSE;
+      /* Randomize ship ordering. */
+
+      for ( s = 1; s <= MAXSHIPS; s = s + 1 )
+        ship[s] = s;
+
+      for ( s = 1; s <= MAXSHIPS; s = s + 1 )
+        {
+          i = rndint( 1, MAXSHIPS );
+          j = ship[i];
+          ship[i] = ship[s];
+          ship[s] = j;
+          
+        }
+    }
+
+  for ( s = 1; s <= MAXSHIPS; s = s + 1 )
+    {
+      i = ship[s];
+      if ( Ships[i].status != SS_OFF )
+	{
+	  for ( j = 0; j < MAXTORPS; j = j + 1 )
+	    {
+	      if ( Ships[i].torps[j].status == TS_LIVE )
+		{
+		  /* Movement. */
+		  Ships[i].torps[j].x = Ships[i].torps[j].x + 
+                    (Ships[i].torps[j].dx * (itersec / ITER_SECONDS));
+		  Ships[i].torps[j].y = Ships[i].torps[j].y + 
+                    (Ships[i].torps[j].dy * (itersec / ITER_SECONDS));
+
+		}
+            }
+        }
+    }
+
+  return;
+}
+
 /* borrowed from glut */
 #if defined(SVR4) && !defined(sun)  /* Sun claims SVR4, but
                                        wants 2 args. */

@@ -116,7 +116,6 @@ static char pbuf[MID_BUFFER_SIZE];
 static char *abt = "...aborted...";
 
 extern dspData_t dData;
-extern void processPacket(char *);
 
 #define cp_putmsg(str, lin)  setPrompt(lin, NULL, NoColor, str, NoColor)
 
@@ -127,7 +126,8 @@ static int nCPInput(int ch);
 static scrNode_t nCPNode = {
   nCPDisplay,               /* display */
   nCPIdle,                  /* idle */
-  nCPInput                  /* input */
+  nCPInput,                  /* input */
+  NULL
 };
 
 /* convert a KP key into an angle */
@@ -2462,7 +2462,7 @@ static int nCPIdle(void)
   int sockl[2] = {cInfo.sock, cInfo.usock};
   static Unsgn32 iterstart = 0;
   Unsgn32 iternow = clbGetMillis();
-  const Unsgn32 iterwait = 100.0; /* ms */
+  const Unsgn32 iterwait = 50.0; /* ms */
   real tdelta = (real)iternow - (real)iterstart;
 
 
@@ -2483,11 +2483,13 @@ static int nCPIdle(void)
       return NODE_EXIT;
     }
 
-  /* drive the planets */
+  /* drive the local universe */
   if (tdelta > iterwait) 
     {
       clbPlanetDrive(tdelta / 1000.0);
+      clbTorpDrive(tdelta / 1000.0);
       iterstart = iternow;
+      recordGenTorpLoc();
     }
 
   if (clientFlags & SPCLNTSTAT_FLAG_KILLED)

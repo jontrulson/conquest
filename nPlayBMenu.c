@@ -50,7 +50,8 @@ static char *nss = NULL;        /* no such ship */
 static scrNode_t nPlayBMenuNode = {
   nPlayBMenuDisplay,               /* display */
   NULL,                         /* idle */
-  nPlayBMenuInput                  /* input */
+  nPlayBMenuInput,                  /* input */
+  NULL                          /* next */
 };
 
 void nPlayBMenuInit(void)

@@ -28,10 +28,12 @@ spShipLoc_t *spktShipLoc(Unsgn8 snum, int rec);
 
 spPlanet_t *spktPlanet(Unsgn8 pnum, int rec);
 spPlanetSml_t *spktPlanetSml(Unsgn8 pnum, int rec);
-spPlanetLoc_t *spktPlanetLoc(Unsgn8 pnum, int rec);
+spPlanetLoc_t *spktPlanetLoc(Unsgn8 pnum, int rec, int force);
+spPlanetLoc2_t *spktPlanetLoc2(Unsgn8 pnum, int rec, int force);
 
 spTorp_t *spktTorp(Unsgn8 tsnum, Unsgn8 tnum, int rec);
 spTorpLoc_t *spktTorpLoc(Unsgn8 tsnum, Unsgn8 tnum, int rec);
+spTorpEvent_t *spktTorpEvent(Unsgn8 tsnum, Unsgn8 tnum, int rec);
 
 spTeam_t *spktTeam(Unsgn8 team, int force, int rec);
 spConqInfo_t *spktConqInfo(int force);
@@ -40,6 +42,5 @@ spHistory_t *spktHistory(int hnum);
 spDoomsday_t *spktDoomsday(int rec);
 
 spPlanetInfo_t *spktPlanetInfo(Unsgn8 pnum, int rec);
-spPlanetLoc2_t *spktPlanetLoc2(Unsgn8 pnum, int rec);
 
 #endif /* _SERVERPKT_H */

@@ -32,6 +32,7 @@ static void PrintStatus(int lin)
   static char buf5[MID_BUFFER_SIZE];
   static char buf6[MID_BUFFER_SIZE];
   static int inited = FALSE;
+  time_t servtm;
 
   if (!inited)
     {
@@ -56,7 +57,8 @@ static void PrintStatus(int lin)
 
   cprintf(lin++, 0, ALIGN_NONE, buf2, sHello.serverver);
 
-  cprintf(lin++, 0, ALIGN_NONE, buf3, ctime((time_t *)&sStat.servertime));
+  servtm = sStat.servertime; /* fix alignment */
+  cprintf(lin++, 0, ALIGN_NONE, buf3, ctime(&servtm));
 
   cprintf(lin++, 0, ALIGN_NONE, buf4,
 	  sStat.numusers, sStat.numtotal, MAXSHIPS, sStat.numactive, 

@@ -29,8 +29,6 @@ static int team;
 extern Unsgn8 clientFlags; 
 extern int lastServerError;
 
-extern void processPacket(char *);
-
 static int nTeamlDisplay(dspConfig_t *);
 static int nTeamlIdle(void);
 static int nTeamlInput(int ch);
@@ -38,7 +36,8 @@ static int nTeamlInput(int ch);
 static scrNode_t nTeamlNode = {
   nTeamlDisplay,               /* display */
   nTeamlIdle,                  /* idle */
-  nTeamlInput                  /* input */
+  nTeamlInput,                  /* input */
+  NULL                          /* next */
 };
 
 static int retnode;             /* the node to return to */

@@ -10,6 +10,7 @@
 #include "global.h"
 #include "conqdef.h"
 #include "conqcom.h"
+#include "conqlb.h"
 #include "context.h"
 #include "conf.h"
 #include "global.h"
@@ -477,3 +478,79 @@ int initReplay(char *fname, time_t *elapsed)
 }
 
 
+/* generate torploc packets for client recording purposes 
+   no more than once every ITER_SECONDS */
+void recordGenTorpLoc(void)
+{
+  int i, j;
+  int snum = Context.snum;
+  int team = Ships[snum].team;
+  spTorpLoc_t storploc;
+  static spTorpLoc_t pktTorpLoc[MAXSHIPS + 1][MAXTORPS] = {};
+  real dis;
+  real x, y;
+  static Unsgn32 iterstart = 0;
+  Unsgn32 iternow = clbGetMillis();
+  const Unsgn32 iterwait = 100.0; /* ms */
+  real tdelta = (real)iternow - (real)iterstart;
+
+  if (Context.recmode != RECMODE_ON)
+    return;                     /* not recording, no point */
+
+  if (tdelta < iterwait) 
+    return;                     /* not yet time */
+
+  iterstart = iternow;
+
+  for (i=1; i<=MAXSHIPS; i++)
+    {
+      if ( Ships[i].status != SS_OFF )
+        {
+          for ( j = 0; j < MAXTORPS; j = j + 1 )
+            {
+              if ( Ships[i].torps[j].status == TS_LIVE )
+                {
+                  memset((void *)&storploc, 0, sizeof(spTorpLoc_t));
+                  storploc.type = SP_TORPLOC;
+                  storploc.snum = i;
+                  storploc.tnum = j;
+                  
+                  x = Ships[i].torps[j].x;
+                  y = Ships[i].torps[j].y;
+                  
+                  if (Ships[i].torps[j].war[team])
+                    { /* it's at war with us. bastards. */
+                      /* see if it's close enough to scan */
+                      dis = (real) dist(Ships[snum].x, Ships[snum].y, 
+                                        Ships[i].torps[j].x, 
+                                        Ships[i].torps[j].y );
+                      
+                      if (dis > ACCINFO_DIST)
+                        {                       /* in the bermuda triangle */
+                          x = 1e7;
+                          y = 1e7;
+                        }
+                    }
+
+                    storploc.x = (Sgn32)htonl((Sgn32)(x * 1000.0));
+                    storploc.y = (Sgn32)htonl((Sgn32)(y * 1000.0));
+
+                    /* only send 'war' status as it relates to our team */
+                    if (Ships[i].torps[j].war[team])
+                      storploc.war |= (1 << team);
+
+
+                    if (memcmp((void *)&storploc, 
+                               (void *)&(pktTorpLoc[i][j]),
+                               sizeof(spTorpLoc_t)))
+                      {
+                        pktTorpLoc[i][j] = storploc;
+                        recordWriteEvent((Unsgn8 *)&storploc);
+                      }
+                }
+            }
+        }
+    }
+
+  return;
+}

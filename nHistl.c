@@ -25,8 +25,6 @@
 extern Unsgn8 clientFlags; 
 extern int lastServerError;
 
-extern void processPacket(char *);
-
 static int nHistlDisplay(dspConfig_t *);
 static int nHistlIdle(void);
 static int nHistlInput(int ch);
@@ -34,7 +32,8 @@ static int nHistlInput(int ch);
 static scrNode_t nHistlNode = {
   nHistlDisplay,               /* display */
   nHistlIdle,                  /* idle */
-  nHistlInput                  /* input */
+  nHistlInput,                  /* input */
+  NULL
 };
 
 static int retnode;             /* the node to return to */

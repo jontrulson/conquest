@@ -11,9 +11,17 @@
 
 Version 8.0.1g 8/04/2004 (devel)
 
-        - moved planet orbital computation into the client so that
-          server no longer needs to send butt-loads of packets to the
-          client to get smooth planet motion.
+        - corrected pointer alignment issue with ctime() on Sparc
+          architectures (or any architecture that will not tolerate
+          misaligned pointers).  Reported by Clint Adams.
+
+        - Planet trajectories are now computed in the client so that
+          the server no longer needs to send a butt-load of packets to
+          the client to get smooth planet motion.
+
+          Did the same for torpedo motion.  Torpedo trajectories are
+          now computed client-side for smoother motion and a
+          significant reduction in the packet count.
 
           The network protocol version changed as a result so only new
           clients can play with new servers.

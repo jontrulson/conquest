@@ -51,7 +51,7 @@ cpHello_t chello;		/* client hello info we want to keep */
 ServerInfo_t sInfo;
 
 static int hello(void);		/* meet and greet the client */
-int updateClient(void);
+int updateClient(int force);
 void updateProc(void);
 void startUpdate(void);
 void stopUpdate(void);
@@ -507,7 +507,7 @@ void updateProc(void)
   drcheck();			/* check the driver */  
 
   /* update client view of the universe */
-  updateClient();
+  updateClient(FALSE);
 
   recordUpdateFrame();
 
@@ -731,7 +731,7 @@ void dead( int snum, int leave )
   i = 0;
   while ( dgrand( entertime, &now ) < TORPEDOWAIT_GRAND )
     {
-      updateClient();
+      updateClient(FALSE);
       i = 0;
       for ( j = 0; j < MAXTORPS; j = j + 1 )
 	if ( Ships[snum].torps[j].status == TS_DETONATE )
@@ -754,11 +754,11 @@ void dead( int snum, int leave )
   appship( snum, buf );
   clog("INFO: dead: %s was killed by %d.", buf, kb);
   
-  updateClient();
+  updateClient(FALSE);
   for ( i=0; i<10 && Ships[snum].status == SS_DYING; i++ )
     {
       c_sleep( (1.0 / (real)Context.updsec) );
-      updateClient();
+      updateClient(FALSE);
     }
 
   /* if you conquered the universe, let the client know, and wait for
@@ -797,7 +797,7 @@ void dead( int snum, int leave )
   /*  Ships[snum].killedby = 0;*/
 
   /* let the client know. */
-  updateClient();
+  updateClient(FALSE);
 
   /* if conquered, wait for the cpMessage_t */
   if (kb == KB_CONQUER)
@@ -831,7 +831,7 @@ void dead( int snum, int leave )
 }
 
 /* send all pertinent data, and any users attached to them. */
-int updateClient(void)
+int updateClient(int force)
 {
   int i,j;
   static int sentallusers = FALSE; /* we will send all user data once. */
@@ -845,6 +845,15 @@ int updateClient(void)
   int doinfo = FALSE;
   int doteam = FALSE;
 
+  if (force)
+    {                           /* we need to reload everything */
+      oldtime = 0;
+      histtime = 0;   
+      infotime = 0;
+      teamtime = 0;
+      sentallusers = FALSE;
+    }
+     
   
   /* some things really should not be checked every update iter */
   if (oldtime != newtime)
@@ -910,10 +919,7 @@ int updateClient(void)
     }
 
   for (i=1; i<=NUMPLANETS; i++)
-    {
-      if (Planets[i].real)
-	sendPlanet(sInfo.sock, i);
-    }
+    sendPlanet(sInfo.sock, i, force);
 
   if (doteam)
     for (i=0; i<NUMALLTEAMS; i++)
@@ -1095,7 +1101,7 @@ void handleSimpleCmdPkt(cpCommand_t *ccmd)
 
     case CPCMD_RELOAD:
       procReload(ccmd);
-      updateClient();
+      updateClient(TRUE);
 
       break;
 
@@ -1188,7 +1194,7 @@ void menu(void)
   
   do                 
     {
-      if (!updateClient())	/* sends packets */
+      if (!updateClient(FALSE))	/* sends packets */
 	{
 	  freeship();
 	  return;
@@ -1609,7 +1615,7 @@ int play(void)
       if (didsomething)         /* update immediately if we did something */
         {
           stopUpdate();
-          updateClient();
+          updateClient(FALSE);
           startUpdate();
         }
 
@@ -1633,7 +1639,7 @@ int play(void)
 
 
   stopUpdate();
-  updateClient();	/* one last, to be sure. */
+  updateClient(FALSE);	/* one last, to be sure. */
   sendConqInfo(sInfo.sock, TRUE);
   c_sleep( 2.0 );
   clog("INFO: ship %d died, calling dead()", Context.snum);

@@ -29,8 +29,6 @@
 extern Unsgn8 clientFlags;
 extern int lastServerError;
 
-extern void processPacket(char *);
-
 static int retnode;             /* node to return to */
 static int uopts = FALSE;       /* are we doing user opts? */
 
@@ -94,7 +92,8 @@ static int nOptionsInput(int ch);
 static scrNode_t nOptionsNode = {
   nOptionsDisplay,               /* display */
   nOptionsIdle,                  /* idle */
-  nOptionsInput                  /* input */
+  nOptionsInput,                  /* input */
+  NULL                          /* next */
 };
 
 /* return to the correct node */

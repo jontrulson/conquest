@@ -126,7 +126,7 @@ GLuint  textures[NUM_TEX];       /* texture storage */
 static void resize(int w, int h);
 static void charInput(unsigned char key, int x, int y);
 static void input(int key, int x, int y);
-static Bool LoadGLTextures(void);
+static int LoadGLTextures(void);
 static void renderFrame(void);
 static int renderNode(void);
 
@@ -502,8 +502,6 @@ void uiDrawPlanet( GLfloat x, GLfloat y, int pnum, int scale,
 /*    cumPutThing( what, lin, col ) */
 void glPutThing( int what, GLfloat x, GLfloat y, int id)
 {
-  GLfloat size = 10.0;
-  int texon = FALSE;
 #ifdef DEBUG
   clog("glputthing: what = %d, lin = %.1f, col = %.1f\n",
        what, x, y);
@@ -522,104 +520,6 @@ void glPutThing( int what, GLfloat x, GLfloat y, int id)
       /* nothing here yet. */
       return;
     }
-
-  
-  
-
-  glPushMatrix();
-  glLoadIdentity();
-
-
-  if (what == PLANET_SUN)
-    {				/* lets enable texture mapping for suns */
-      glEnable(GL_TEXTURE_2D); 
-      glBindTexture(GL_TEXTURE_2D, textures[TEX_SUN]);
-      texon = TRUE;
-    }
-  else if (what == PLANET_CLASSM)
-    {
-      glEnable(GL_TEXTURE_2D);
-      glBindTexture(GL_TEXTURE_2D, textures[TEX_CLASSM]);
-      texon = TRUE;
-    }
-  else if (what == PLANET_DEAD || what == PLANET_MOON)
-    {
-      glEnable(GL_TEXTURE_2D);
-      glBindTexture(GL_TEXTURE_2D, textures[TEX_CLASSD]);
-      texon = TRUE;
-    }
-
-  glTranslatef(0.0, 0.0, TRANZ);
-
-  GLError();
-
-  glBegin(GL_POLYGON);
-
-  switch ( what )
-    {
-    case PLANET_SUN:
-      /* choose a good color for the main suns */
-      switch(id)
-	{
-	case PNUM_SOL:		/* yellow */
-	case PNUM_KEJELA:
-	  glColor3f(1.0, 1.0, 0.0);	
-	  break;
-	case PNUM_SIRIUS:	/* red */
-	case PNUM_SYRINX:
-	  glColor3f(1.0, 0.0, 0.0);
-	  break;
-	case PNUM_BETELGEUSE:	/* blue */
-	case PNUM_MURISAK:
-	  glColor3f(0.0, 0.0, 1.0);
-	  break;
-	  
-	default:		/* red */
-	  glColor3f(1.0, 0.0, 0.0);
-	  break;
-	}
-	  
-      size = 40.0;		/* 'magnify' the texture */
-      break;
-    case PLANET_CLASSM:
-      glColor3f(0.5, 1.0, 0.5); /* ? */
-      size = 10.0;
-      break;
-    case PLANET_CLASSA:
-    case PLANET_CLASSO:
-    case PLANET_CLASSZ:
-    case PLANET_DEAD:
-      glColor3f(0.8, 0.5, 0.5);	/* ? */
-      size = 10.0;
-      break;
-    case PLANET_GHOST:
-      glColor3f(0.0, 1.0, 0.0);	/* green */
-      size = 10.0;
-      break;
-    case PLANET_MOON:
-      glColor3f(0.5, 0.5, 0.5);	/* grey */
-      size = 5.0;
-      break;
-    case THING_DEATHSTAR:
-      break;
-    default:
-      break;
-    }
-  
-  if (texon)
-    drawTexBox(x, y, size);
-  else
-    drawBox(x, y, size);
-  
-  glEnd();
-
-  if (texon)
-    {				
-      glDisable(GL_TEXTURE_2D); 
-      glDisable(GL_BLEND); 
-    }
-
-  glPopMatrix();
 
   return;
   
@@ -1131,7 +1031,7 @@ resize(int w, int h)
 
 static int renderNode(void)
 {
-  scrNode_t *node = getNode();
+  scrNode_t *node = getTopNode();
   int rv;
 
   if (node)
@@ -1182,7 +1082,7 @@ static void renderFrame(void)
       frame = 0;
     }
 
-  if (getNode())
+  if (getTopNode())
     {
       glutSetWindow(dConf.mainw);
       rv = renderNode();
@@ -1257,7 +1157,6 @@ void drawTorp(GLfloat x, GLfloat y, char torpchar, int torpcolor,
   glTexCoord2f(0.0f, 0.0f);
   glVertex3f(-sizeh, sizeh, z); /* ul */
 
-
   glEnd();
 
   glDisable(GL_TEXTURE_2D); 
@@ -1316,7 +1215,7 @@ drawShip(GLfloat x, GLfloat y, GLfloat angle, char ch, int i, int color,
 
   /* set a lower alpha if we are cloaked. */
   if (ch == '~')
-    alpha = 0.4;		/* transparent */
+    alpha = 0.4;		/* semi-transparent */
 
   GLError();
   
@@ -1550,7 +1449,7 @@ void drawViewerBG()
 static void procInput(int key, int x, int y)
 {
   int rv;
-  scrNode_t *node = getNode();
+  scrNode_t *node = getTopNode();
 
 #if 0
   clog("GL: procInput: key = %d, x = %d y = %d",
@@ -1669,7 +1568,7 @@ static int LoadTGA(char *filename, textureImage *texture)
   return TRUE;	
 }
 
-static Bool LoadGLTextures()   /* Load Bitmaps And Convert To Textures */
+static int LoadGLTextures()   
 {
     Bool status;
     int rv;
@@ -1679,16 +1578,21 @@ static Bool LoadGLTextures()   /* Load Bitmaps And Convert To Textures */
     int type;
     int components;         /* for RGBA */
 
-    status = False;
+    status = FALSE;
 
     for (i=0; i < NUM_TEX; i++)
       {
 	texti = malloc(sizeof(textureImage));
-	sprintf(filenm, "%s/%s", 
+        if (!texti)
+          {
+            clog("LoadGLTextures(): memory allocation failed for %d bytes\n");
+            return FALSE;
+          }
+	snprintf(filenm, MID_BUFFER_SIZE - 1, "%s/%s", 
 		CONQSHARE, TexInfo[i].filename);
 	if ((rv = LoadTGA(filenm, texti)) == TRUE)
 	  {
-	    status = True;
+	    status = TRUE;
 	    glGenTextures(1, &textures[i]);   /* create the texture */
 	    glBindTexture(GL_TEXTURE_2D, textures[i]);
 	    /* actually generate the texture */

@@ -26,8 +26,6 @@
 extern Unsgn8 clientFlags;
 extern int lastServerError;
 
-extern void processPacket(char *);
-
 static int nCPHelpDisplay(dspConfig_t *);
 static int nCPHelpIdle(void);
 static int nCPHelpInput(int ch);
@@ -35,7 +33,8 @@ static int nCPHelpInput(int ch);
 static scrNode_t nCPHelpNode = {
   nCPHelpDisplay,               /* display */
   nCPHelpIdle,                  /* idle */
-  nCPHelpInput                  /* input */
+  nCPHelpInput,                  /* input */
+  NULL
 };
 
 

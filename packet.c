@@ -74,6 +74,11 @@ static struct _packetent clientPackets[] = {
     sizeof(cpMessage_t),
     "CP_MESSAGE",
     pktNotImpl 
+  },
+  { CP_VARIABLE,
+    0,                          /* these are special */
+    "CP_VARIABLE",
+    pktNotImpl 
   }
 };
 
@@ -189,6 +194,16 @@ static struct _packetent serverPackets[] = {
   { SP_PLANETLOC2, 
     sizeof(spPlanetLoc2_t), 
     "SP_PLANETLOC2", 
+    pktNotImpl 
+  },
+  { SP_TORPEVENT, 
+    sizeof(spTorpEvent_t), 
+    "SP_TORPEVENT", 
+    pktNotImpl 
+  },
+  { SP_VARIABLE, 
+    0,                          /* these are special */
+    "SP_VARIABLE", 
     pktNotImpl 
   }
 };
@@ -683,3 +698,4 @@ void pktSetNodelay(int sock)
   
   return;
 }
+

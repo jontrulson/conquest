@@ -19,6 +19,7 @@ typedef struct _scr_node {
   int (*display)(dspConfig_t *); /* display routine */
   int (*idle)(void);            /* idle routine */
   int (*input)(int ch);         /* input routine */
+  struct _scr_node *next;       /* sub-nodes */
 } scrNode_t;
 
 /* some nodes are called from other, multiple nodes, so we need
@@ -29,6 +30,6 @@ typedef struct _scr_node {
 #define DSP_NODE_PLAYB     4    /* watching during playback */
 
 void setNode(scrNode_t *node);
-scrNode_t *getNode(void);
+scrNode_t *getTopNode(void);
 
 #endif /* _NODE_H */

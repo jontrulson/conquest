@@ -11,18 +11,25 @@
 #include "gldisplay.h"
 #include "node.h"
 
-static scrNode_t *nodePtr = NULL;      /* the currently running node */
+static scrNode_t *topNodePtr = NULL;      /* the currently running top node */
+static scrNode_t *currentNodePtr = NULL;      /* the currently running node */
 
+/* can only set the top node */
 void setNode(scrNode_t *node)
 {
-  nodePtr = node;
+  topNodePtr = node;
 
   return;
 }
 
-scrNode_t *getNode(void)
+scrNode_t *getTopNode(void)
 {
-  return nodePtr;
+  return topNodePtr;
+}
+
+scrNode_t *getCurrentNode(void)
+{
+  return currentNodePtr;
 }
 
 

@@ -213,11 +213,16 @@ void display( int snum, int display_info )
 		if (snum > 0 && Ships[snum].war[Ships[i].team] == FALSE &&
 		    Ships[i].war[Ships[snum].team] == FALSE)
 		  {
-		    if (i == snum) /* if it's your torps - */
-		      color = CQC_A_BOLD;
-		    else
-		      color = YellowLevelColor;
-
+                    
+                    if (i == snum) /* if it's your torps you're a ship */
+                      color = 0;
+                    else if (i != snum && satwar(i, snum))
+                      color = RedLevelColor;
+                    else if (Ships[i].team == Ships[snum].team)
+                      color = GreenLevelColor;
+                    else
+                      color = YellowLevelColor;
+                    
 		    for ( j = 0; j < MAXTORPS; j = j + 1 )
 		      if ( Ships[i].torps[j].status == TS_LIVE 
 			  || Ships[i].torps[j].status == TS_DETONATE )
@@ -355,12 +360,15 @@ void display( int snum, int display_info )
 	  
 	  if (snum > 0)
 	    {			/* a ship */
-	      if (i == snum) /* if it's your torps and you're a ship */
-		color = 0;
-	      else if (i != snum && satwar(i, snum))
-		color = RedLevelColor;
-	      else
-		color = GreenLevelColor;
+
+              if (i == snum) /* if it's your torps you're a ship */
+                color = 0;
+              else if (i != snum && satwar(i, snum))
+                color = RedLevelColor;
+              else if (Ships[i].team == Ships[snum].team)
+                color = GreenLevelColor;
+              else
+                color = YellowLevelColor;
 	    }
 	  else		/* a special */
 	    color = YellowLevelColor;

@@ -27,8 +27,6 @@
 extern Unsgn8 clientFlags; 
 extern int lastServerError;
 
-extern void processPacket(char *);
-
 static int snum, godlike;
 static int uvec[MAXUSERS];
 static int nu;
@@ -44,7 +42,8 @@ static int nUserlInput(int ch);
 static scrNode_t nUserlNode = {
   nUserlDisplay,               /* display */
   nUserlIdle,                  /* idle */
-  nUserlInput                  /* input */
+  nUserlInput,                  /* input */
+  NULL                          /* next */
 };
 
 static int retnode;             /* the node to return to */

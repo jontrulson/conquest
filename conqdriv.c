@@ -453,6 +453,7 @@ void iterdrive( int *ship )
     }
   
   /* Drive the torps. */
+  clbTorpDrive(ITER_SECONDS);
   for ( s = 1; s <= MAXSHIPS; s = s + 1 )
     {
       i = ship[s];
@@ -460,15 +461,7 @@ void iterdrive( int *ship )
 	{
 	  for ( j = 0; j < MAXTORPS; j = j + 1 )
 	    {
-/*JET	      clog("cdriv - in MAXTORPS loop: i = %d j = %d", i, j);
-*/
-	      if ( Ships[i].torps[j].status == TS_LIVE )
-		{
-		  /* Movement. */
-		  Ships[i].torps[j].x = Ships[i].torps[j].x + Ships[i].torps[j].dx;
-		  Ships[i].torps[j].y = Ships[i].torps[j].y + Ships[i].torps[j].dy;
-		}
-	      else if ( Ships[i].torps[j].status == TS_DETONATE )
+              if ( Ships[i].torps[j].status == TS_DETONATE )
 		{
 		  /* Detonate. */
 		  Ships[i].torps[j].fuse = FIREBALL_FUSE;

@@ -30,7 +30,8 @@ static int nPlayBHelpInput(int ch);
 static scrNode_t nPlayBHelpNode = {
   nPlayBHelpDisplay,            /* display */
   NULL,                         /* idle */
-  nPlayBHelpInput               /* input */
+  nPlayBHelpInput,               /* input */
+  NULL                          /* next */
 };
 
 

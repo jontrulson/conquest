@@ -54,7 +54,7 @@ int sendClientStat(int sock, Unsgn8 flags, Unsgn8 snum, Unsgn8 team,
 		   Unsgn16 unum, Unsgn8 esystem);
 int sendUser(int sock, Unsgn16 unum);
 int sendShip(int sock, Unsgn8 snum);
-int sendPlanet(int sock, Unsgn8 pnum);
+int sendPlanet(int sock, Unsgn8 pnum, int force);
 int sendServerStat(int sock);
 int sendTorp(int sock, Unsgn8 snum, Unsgn8 tnum);
 int sendMessage(int sock, Msg_t *msg);

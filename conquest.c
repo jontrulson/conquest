@@ -43,10 +43,7 @@
 #include "conqnet.h"
 #include "packet.h"
 #include "display.h"
-
-#define CLIENT_NOEXTERN
 #include "client.h"
-#undef CLIENT_NOEXTERN
 #include "clientlb.h"
 #include "clntauth.h"
 #include "cuclient.h"
@@ -57,9 +54,6 @@
 
 static char cbuf[MID_BUFFER_SIZE]; /* general purpose buffer */
 
-static int lastServerError = 0;	/* set by an ACK from server */
-static Unsgn8 clientFlags = 0;  /* set according to CLIENTSTAT packets */
-
 void catchSignals(void);
 void handleSignal(int sig);
 
@@ -67,8 +61,10 @@ void astservice(int sig);
 void stopTimer(void);
 void startTimer(void);
 void conqend(void);
-void processPacket(Unsgn8 *buf);
 int selectServer(metaSRec_t *metaServerList, int nums);
+
+/* conqreplay.c */
+extern void conquestReplay(void);
 
 /* conquest.c */
 
@@ -3261,102 +3257,6 @@ int newship( int unum, int *snum )
   
 }
 
-void processPacket(Unsgn8 *buf)
-{
-  int pkttype;
-  spClientStat_t *scstat;
-  spAck_t *sack;
-  spAckMsg_t *sackm;
-
-  if (!buf)
-    return;
-
-  pkttype = (int)buf[0];
-
-  switch (pkttype)
-    {
-    case SP_ACK:
-      sack = (spAck_t *)buf;
-      lastServerError = sack->code;
-      break;
-    case SP_ACKMSG:
-      sackm = (spAckMsg_t *)buf;
-      sackm->txt[MESSAGE_SIZE - 1] = 0;
-      lastServerError = sackm->code;
-      break;
-    case SP_SHIP:
-      procShip(buf);
-      break;
-    case SP_SHIPSML:
-      procShipSml(buf);
-      break;
-    case SP_SHIPLOC:
-      procShipLoc(buf);
-      break;
-    case SP_USER:
-      procUser(buf);
-      break;
-    case SP_PLANET:
-      procPlanet(buf);
-      break;
-    case SP_PLANETSML:
-      procPlanetSml(buf);
-      break;
-    case SP_PLANETLOC:
-      procPlanetLoc(buf);
-      break;
-    case SP_PLANETLOC2:
-      procPlanetLoc2(buf);
-      break;
-    case SP_PLANETINFO:
-      procPlanetInfo(buf);
-      break;
-    case SP_TORP:
-      procTorp(buf);
-      break;
-    case SP_TORPLOC:
-      procTorpLoc(buf);
-      break;
-    case SP_TEAM:
-      procTeam(buf);
-      break;
-    case SP_CLIENTSTAT:
-      scstat = (spClientStat_t *)buf;
-      Context.snum = scstat->snum;
-      Context.unum = (int)ntohs(scstat->unum);
-      Ships[Context.snum].team = scstat->team;
-      clientFlags = scstat->flags;
-      break;
-
-    case SP_MESSAGE:
-      procMessage(buf);
-      break;
-      
-    case SP_SERVERSTAT:
-      procServerStat(buf);
-      break;
-
-    case SP_CONQINFO:
-      procConqInfo(buf);
-      break;
-
-    case SP_HISTORY:
-      procHistory(buf);
-      break;
-
-    case SP_DOOMSDAY:
-      procDoomsday(buf);
-      break;
-
-    default:
-      clog("conquest:processPacket: got unexpected packet type %d",
-	   pkttype);
-      break;
-    }
-
-  return;
-}
-
 
 /*  play - play the game  ( PLAY ) */
 /*  SYNOPSIS */
@@ -3418,7 +3318,7 @@ int play()
 
       if ((rv=select((max(cInfo.sock, PollInputfd) + 1), &readfds, NULL, 
                      NULL, &timeout)) > 0)
-        {                           /* we have activity */
+        {                       /* we have activity */
           if (FD_ISSET(cInfo.sock,&readfds))
             {                   /* we have a packet */
               /* call astservice.  it will get any packets,
@@ -3427,7 +3327,7 @@ int play()
               astservice(0);    /* will restart the timer */
             }
 
-      /* Get a char with one second timeout. */
+          /* Get a char */
 
           if (FD_ISSET(PollInputfd, &readfds))
             {
@@ -3711,6 +3611,10 @@ void astservice(int sig)
   int difftime;
   Unsgn8 buf[PKT_MAXSIZE];
   int sockl[2] = {cInfo.sock, cInfo.usock};
+  static Unsgn32 iterstart = 0;
+  Unsgn32 iternow = clbGetMillis();
+  const Unsgn32 iterwait = 50.0; /* ms */
+  real tdelta = (real)iternow - (real)iterstart;
 
   stopTimer();
 
@@ -3721,6 +3625,15 @@ void astservice(int sig)
   while (readPacket(PKT_FROMSERVER, sockl,
 		    buf, PKT_MAXSIZE, 0) > 0)
     processPacket(buf); /* process them */
+
+  /* drive the local universe */
+  if (tdelta > iterwait) 
+    {
+      clbPlanetDrive(tdelta / 1000.0);
+      clbTorpDrive(tdelta / 1000.0);
+      iterstart = iternow;
+      recordGenTorpLoc();
+    }
 
   /* Don't do anything if we're not supposed to. */
   if ( ! Context.display )

@@ -80,5 +80,7 @@ void recordUpdateFrame(void);
 void recordWriteEvent(Unsgn8 *buf);
 
 int initReplay(char *fname, time_t *elapsed);
+void recordGenTorpLoc(void);
+
 
 #endif /* RECORD_H_INCLUDED */

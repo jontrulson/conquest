@@ -28,8 +28,6 @@
 extern Unsgn8 clientFlags; 
 extern int lastServerError;
 
-extern void processPacket(char *);
-
 static int team, snum;
 
 static int PlanetOffset;    /* offset into NUMPLANETS for this page */
@@ -46,7 +44,8 @@ static int nPlanetlInput(int ch);
 static scrNode_t nPlanetlNode = {
   nPlanetlDisplay,               /* display */
   nPlanetlIdle,                  /* idle */
-  nPlanetlInput                  /* input */
+  nPlanetlInput,                  /* input */
+  NULL                          /* next */
 };
 
 static int retnode;             /* the node to return to */

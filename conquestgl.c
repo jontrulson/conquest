@@ -36,10 +36,7 @@
 #include "gldisplay.h"
 #include "conqnet.h"
 #include "packet.h"
-
-#define CLIENT_NOEXTERN
 #include "client.h"
-#undef CLIENT_NOEXTERN
 #include "clientlb.h"
 #include "clntauth.h"
 
@@ -49,14 +46,9 @@
 #include "nConsvr.h"
 #include "nMeta.h"
 
-int lastServerError = 0;	/* set by an ACK from server */
-Unsgn8 clientFlags = 0;  /* set according to CLIENTSTAT packets */
-
-
 void catchSignals(void);
 void handleSignal(int sig);
 void conqend(void);
-void processPacket(Unsgn8 *buf);
 
 void printUsage()
 {
@@ -317,120 +309,6 @@ int main(int argc, char *argv[])
   exit(0);
   
 }
-
-
-void processPacket(Unsgn8 *buf)
-{
-  int pkttype;
-  spClientStat_t *scstat;
-  spAck_t *sack;
-  spAckMsg_t *sackm;
-  spFrame_t *frame;
-
-  if (!buf)
-    return;
-
-  pkttype = (int)buf[0];
-
-  switch (pkttype)
-    {
-    case SP_ACK:
-      sack = (spAck_t *)buf;
-      lastServerError = sack->code;
-      break;
-    case SP_ACKMSG:
-      sackm = (spAckMsg_t *)buf;
-      sackm->txt[MESSAGE_SIZE - 1] = 0;
-      lastServerError = sackm->code;
-      break;
-    case SP_SHIP:
-      procShip(buf);
-      break;
-    case SP_SHIPSML:
-      procShipSml(buf);
-      break;
-    case SP_SHIPLOC:
-      procShipLoc(buf);
-      break;
-    case SP_USER:
-      procUser(buf);
-      break;
-    case SP_PLANET:
-      procPlanet(buf);
-      break;
-    case SP_PLANETSML:
-      procPlanetSml(buf);
-      break;
-    case SP_PLANETLOC:
-      procPlanetLoc(buf);
-      break;
-    case SP_PLANETLOC2:
-      procPlanetLoc2(buf);
-      break;
-    case SP_PLANETINFO:
-      procPlanetInfo(buf);
-      break;
-    case SP_TORP:
-      procTorp(buf);
-      break;
-    case SP_TORPLOC:
-      procTorpLoc(buf);
-      break;
-    case SP_TEAM:
-      procTeam(buf);
-      break;
-    case SP_CLIENTSTAT:
-      scstat = (spClientStat_t *)buf;
-      Context.snum = scstat->snum;
-      Context.unum = (int)ntohs(scstat->unum);
-      Ships[Context.snum].team = scstat->team;
-      clientFlags = scstat->flags;
-      break;
-
-    case SP_MESSAGE:
-      procMessage(buf);
-      break;
-      
-    case SP_SERVERSTAT:
-      procServerStat(buf);
-      break;
-
-    case SP_CONQINFO:
-      procConqInfo(buf);
-      break;
-
-    case SP_HISTORY:
-      procHistory(buf);
-      break;
-
-    case SP_DOOMSDAY:
-      procDoomsday(buf);
-      break;
-
-    case SP_FRAME:              /* playback */
-      frame = (spFrame_t *)buf;
-      /* endian correction*/
-      frame->time = (Unsgn32)ntohl(frame->time);
-      frame->frame = (Unsgn32)ntohl(frame->frame);
-
-      if (startTime == (time_t)0)
-        startTime = (time_t)frame->time;
-      currTime = (time_t)frame->time;
-
-      frameCount = (Unsgn32)frame->frame;
-
-      break;
-
-    default:
-      clog("conquest:processPacket: got unexpected packet type %d",
-	   pkttype);
-      break;
-    }
-
-  return;
-}
-
-
 
 void catchSignals(void)
 {

@@ -44,7 +44,8 @@ static int nPlayInput(int ch);
 static scrNode_t nPlayNode = {
   nPlayDisplay,               /* display */
   nPlayIdle,                  /* idle */
-  nPlayInput                  /* input */
+  nPlayInput,                  /* input */
+  NULL                          /* next */
 };
 
 /* select a system to enter */

@@ -16,9 +16,9 @@
 #include "packet.h"
 
 #ifdef CLIENT_NOEXTERN
-# define EXTERNAL extern
+# define EXTERNAL 
 #else
-# define EXTERNAL
+# define EXTERNAL extern
 #endif
 
 #define CLT_STATE_NONE      0x00000000	
@@ -47,6 +47,13 @@ typedef struct {
 EXTERNAL ClientInfo_t cInfo;
 EXTERNAL spHello_t sHello;		/* some server info we want to keep */
 EXTERNAL spServerStat_t sStat;		/* server status info */
+#ifdef CLIENT_NOEXTERN
+int lastServerError = 0;	/* set by an ACK from server */
+Unsgn8 clientFlags = 0;         /* set according to CLIENTSTAT packets */
+#else
+EXTERNAL int lastServerError;
+EXTERNAL Unsgn8 clientFlags;    
+#endif
 
 #undef EXTERNAL
 
@@ -65,6 +72,7 @@ int procPlanetLoc2(Unsgn8 *buf);
 int procPlanetInfo(Unsgn8 *buf);
 int procTorp(Unsgn8 *buf);
 int procTorpLoc(Unsgn8 *buf);
+int procTorpEvent(Unsgn8 *buf);
 int procTeam(Unsgn8 *buf);
 int procMessage(Unsgn8 *buf);
 int procServerStat(Unsgn8 *buf);
@@ -78,5 +86,8 @@ int sendFireTorps(int num, real dir);
 int sendMessage(int to, char *msg);
 
 int clientHello(char *clientname);
+
+void processPacket(Unsgn8 *buf);
+
 
 #endif /* CLIENT_H_INCLUDED */
