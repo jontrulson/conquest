@@ -55,7 +55,7 @@ for more information and available commands.
 
 	Conquest was originally written in Ratfor for the VAX/VMS
 platform in 1983 by Jef Poskanzer and Craig Leres.  I wasted
-incredible amounts of time playing this game with my geek friends in
+incredible amounts of time playing this game with my friends in
 the terminal labs at college, and when I actually had a multi-user
 system running at home (Unixware) I decided to try and translate/port
 the code to C in Unix.  While doing the port, I added several new

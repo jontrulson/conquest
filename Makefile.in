@@ -47,6 +47,7 @@ BCONQAI = $(CONQHOME)/bin/conqai
 BCONQSTRAT = $(CONQHOME)/bin/conqstrat
 HCONQHELP = $(CONQHOME)/etc/$(CONQHELP)
 HCONQNEWS = $(CONQHOME)/etc/$(CONQNEWS)
+HCONQREADME = $(CONQHOME)/etc/README
 
 CONQLB = @CONQLB@
 
@@ -146,7 +147,8 @@ install: all $(CONQHOME) $(CONQHOME)/etc $(CONQHOME)/bin $(CONQHOME)/lib \
 	$(HCONQHELP) $(HCONQNEWS) $(CONQHOME)/lib/$(CONQLB) @prefix@ \
 	$(CONQBIN) $(CONQHOME)/etc/conqrule $(BCONQSTRAT) $(BCONQAI) \
 	$(CONQHOME)/etc/conquestrc $(CONQBIN)/conquest $(CONQBIN)/conqoper \
-	$(CONQBIN)/conqstrat $(CONQBIN)/conqdriv $(CONQBIN)/conqai
+	$(CONQBIN)/conqstrat $(CONQBIN)/conqdriv $(CONQBIN)/conqai \
+	$(HCONQREADME)
 
 @prefix@:
 	mkdir -p @prefix@
@@ -250,6 +252,11 @@ $(CONQHOME)/etc/conqrule: conqrule
 	cp conqrule $(CONQHOME)/etc/conqrule
 	chgrp conquest $(CONQHOME)/etc/conqrule
 	chmod 644 $(CONQHOME)/etc/conqrule
+
+$(HCONQREADME): README
+	cp README $(HCONQREADME)
+	chgrp conquest $(HCONQREADME)
+	chmod 644 $(HCONQREADME)
 
 $(HCONQHELP): $(CONQHELP)
 	cp $(CONQHELP) $(HCONQHELP)
