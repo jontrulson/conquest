@@ -191,10 +191,12 @@ int str2srec(metaSRec_t *srec, char *buf)
 
   free(tbuf);
 
+
+  clog("version = %d, fielno = %d\n", srec->version, fieldno);
   switch (srec->version)
     {
     case 1:
-      if (fieldno != 11)
+      if (fieldno < 11)
         return FALSE;             /* something went wrong */
       break;
 
