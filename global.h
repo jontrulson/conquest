@@ -66,7 +66,9 @@ CEXTERN int conf_DoFastUpdate;
 				/* one per second.  Handy when do_fastupdate */
 				/* is set. */
 CEXTERN int conf_DoLimitBell;
-
+				/* whether or not to clear out old msgs after
+				   a reincarnate */
+CEXTERN int conf_ClearOldMsgs;
 
 				/* Macro keys - F1-F12 */
 CEXTERN char conf_MacrosF[MAX_MACROS][MAX_MACRO_LEN];
@@ -75,6 +77,12 @@ CEXTERN char conf_MacrosF[MAX_MACROS][MAX_MACRO_LEN];
 
 #define LOCKMSG      (0)	/* lock the message portion  */
 #define LOCKCMN      (1)	/* lock the everything else  */
+
+				/* attribute initialization.
+				   initialized in cdinit() */
+CEXTERN int RedLevelColor, YellowLevelColor, GreenLevelColor;
+CEXTERN int LabelColor, InfoColor;
+
 
 
 #undef CEXTERN			/* cleanup */

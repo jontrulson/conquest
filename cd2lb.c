@@ -515,16 +515,23 @@ void cdinit(void)
       init_pair(COL_MAGENTABLACK, COLOR_MAGENTA, COLOR_BLACK);
       init_pair(COL_CYANBLACK, COLOR_CYAN, COLOR_BLACK);
 
-				/* now init the backgound */
-				/* ncurses seems to toast the colors if you do this */
-				/*  so no background init is done with ncurses. */
-				/* This means that if your using ncurses, run conquest */
-				/*  on a display with a black background for best results */
+		/* now init the backgound */
+		/* ncurses seems to toast the colors if you do this */
+		/*  so no background init is done with ncurses. */
+		/* This means that if your using ncurses, run conquest */
+		/*  on a display with a black background for best results */
 #if !defined(HAVE_NCURSES_H) && !defined(NCURSES_VERSION)
       bkgdset(COLOR_PAIR(COL_BACKGROUND) | ' ');
 #endif
 
       HAS_COLORS = TRUE;
+
+				/* init default attributes */
+      LabelColor = COLOR_PAIR(COL_BLUEBLACK) | A_BOLD;
+      InfoColor = COLOR_PAIR(COL_CYANBLACK) | A_BOLD;
+      RedLevelColor = COLOR_PAIR(COL_REDBLACK) | A_BOLD;
+      YellowLevelColor = COLOR_PAIR(COL_YELLOWBLACK) | A_BOLD;
+      GreenLevelColor = COLOR_PAIR(COL_GREENBLACK) | A_BOLD;
     }
   else
     {
@@ -535,7 +542,15 @@ void cdinit(void)
 	   COLOR_PAIRS);
 #endif
 
-    HAS_COLORS = FALSE;
+      HAS_COLORS = FALSE;
+      
+				/* init default attributes */
+      LabelColor = 0;
+      InfoColor = 0;
+      RedLevelColor = (A_BOLD | A_REVERSE);
+      YellowLevelColor = A_BOLD;
+      GreenLevelColor = 0;
+
     }
   
   nonl(); 

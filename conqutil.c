@@ -71,10 +71,9 @@ real angle( real fromx, real fromy, real tox, real toy )
 /*    appint( i, str ) */
 void appint( int i, char *str )
 {
-  int j; 
   char buf[20];
   
-  j = itoc( i, buf, 20 );
+  itoc( i, buf, 20 );
   appstr( buf, str );
   
   return;
@@ -746,10 +745,9 @@ int getamsg( int snum, int *msg )
       /* If we can read it, only do so if it's not from us to GOD. */
       
       if ( canread( snum, *msg ) )
-	return ( snum != msgfrom[*msg] || MSG_GOD != msgto[*msg] );
-      
-      /*	    return(MSG_GOD != msgto[*msg]);*/
-      
+	return(MSG_GOD != msgto[*msg]);
+	
+      /*      	return ( snum != msgfrom[*msg] || MSG_GOD != msgto[*msg] );*/
     }
   
   return ( FALSE );

@@ -205,8 +205,9 @@ void astservice(int sig)
   /* Un-read the message if there's a chance it got garbaged. */
   /* JET 3/24/96 - another try with curses timer disabled */
   if ( readone )
-    if ( iochav( 0 ) )
-      slastmsg[csnum] = modp1( slastmsg[csnum] - 1, MAXMESSAGES );
+    if (RMsg_Line != MSG_LIN1)	/* we have an extra msg line */
+      if ( iochav( 0 ) )
+	slastmsg[csnum] = modp1( slastmsg[csnum] - 1, MAXMESSAGES );
   
   /* Schedule for next time. */
   settimer();

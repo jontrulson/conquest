@@ -2998,6 +2998,7 @@ void menu(void)
   int i, lin, col, sleepy, countdown;
   int ch;
   int lose, oclosed, switchteams, multiple, redraw;
+  int playrv;
   
   EnableSignalHandler();	/* enable trapping of interesting signals */
   
@@ -3028,21 +3029,28 @@ void menu(void)
   redraw = TRUE;
   sleepy = 0;
   countdown = 0;
+  playrv = FALSE;
   
   do                 
     {
       /* Make sure things are proper. */
-      if ( csnum < 1 || csnum > MAXSHIPS )
-	lose = TRUE;
-      else if ( spid[csnum] != cpid )
-	lose = TRUE;
-      else if ( sstatus[csnum] != SS_RESERVED )
+      if (playrv == ERR) 
 	{
-	  clog( "menu(): Ship %d no longer reserved.", csnum );
-	  lose = TRUE;
+	  if ( csnum < 1 || csnum > MAXSHIPS )
+	    lose = TRUE;
+	  else if ( spid[csnum] != cpid )
+	    lose = TRUE;
+	  else if ( sstatus[csnum] != SS_RESERVED )
+	    {
+	      clog( "menu(): Ship %d no longer reserved.", csnum );
+	      lose = TRUE;
+	    }
+	  else
+	    lose = FALSE;
 	}
       else
 	lose = FALSE;
+
       if ( lose )				/* again, Jorge? */
 	{
 	  /* We reincarnated or else something bad happened. */
@@ -3155,7 +3163,7 @@ void menu(void)
       switch ( ch )
 	{
 	case 'e':
-	  play();
+	  playrv = play();
 	  if ( childpid != 0 )
 	    countdown = 15;
 	  else
@@ -3290,46 +3298,67 @@ int newship( int unum, int *snum )
 {
   int i, j, system; 
   int fresh;
-  
+  int vec[MAXSHIPS];
+  char cbuf[MSGMAXLINE];
+  int numvec = 0;
+
   PVLOCK(lockword);
   
   sstatus[*snum] = SS_ENTERING;		/* show intent to fly */
+
   fresh = TRUE;				/* assume we want a fresh ship*/
   
   /* Count number of his ships flying. */
   j = 0;
+  numvec = 0;
   for ( i = 1; i <= MAXSHIPS; i = i + 1 )
     if ( sstatus[i] == SS_LIVE || sstatus[i] == SS_ENTERING )
       if ( suser[i] == unum && *snum != i )
-	j = j + 1;
+	{
+	  j++;
+	  vec[numvec++] = i;
+	}
+
   PVUNLOCK(lockword);
-  
+
   if ( ! uooption[unum][OOPT_MULTIPLE] )
     {
       /* Isn't a multiple; see if we need to reincarnate. */
       if ( j > 0 )
 	{
-	  int savcsnum;
-	  
-	  savcsnum = csnum;
-	  csnum = ERR;	/* keep cdgetp from display()'ing */
-	  
 	  /* Need to reincarnate. */
 	  cdclear();
 	  cdredo();
-	  
+
 	  i = MSG_LIN2/2;
-	  j = 15;
-	  cdputs( "You're already playing on another ship." , i, j );
-	  if ( cdgetx( "Press TAB to reincarnate to this ship: ",
-		      i + 1, j, TERMS, cbuf, MSGMAXLINE ) != TERM_EXTRA )
+	  j = 9;
+
+	  if (kill(spid[vec[0]], 0) == -1)
 	    {
+	      cdputs( "You're already playing on another ship." , i, j );
+	      if ( cdgetx( "Press TAB to reincarnate to this ship: ",
+			   i + 1, j, TERMS, cbuf, MSGMAXLINE ) != TERM_EXTRA )
+		{
+		  sstatus[*snum] = SS_RESERVED;
+		  
+		  return ( FALSE );
+		}
+	    }
+	  else
+	    {
+	      sprintf(cbuf, "You're already playing on another ship (pid=%d).",
+		      spid[vec[0]]);
+	      cdputs( cbuf , i, j );
+	      
 	      sstatus[*snum] = SS_RESERVED;
+	      putpmt( "--- press any key ---", MSG_LIN2 );
+
+	      cdrefresh(TRUE);
+	      iogchar(0);
 	      return ( FALSE );
 	    }
-	  
-	  csnum = savcsnum;
-	  
+
+
 	  /* Look for a live ship for us to take. */
 	  PVLOCK(lockword);
 	  for ( i = 1; i <= MAXSHIPS; i = i + 1)
@@ -3379,7 +3408,7 @@ int newship( int unum, int *snum )
       if ( ! capentry( *snum, &system ) )
 	{
 	  sstatus[*snum] = SS_RESERVED;
-	  return ( FALSE );
+	  return ( ERR );
 	}
     }
   
@@ -3401,8 +3430,19 @@ int newship( int unum, int *snum )
       sdwarp[*snum] = (real) rndint( 2, 5 ) ;/* #~~~ this is a kludge*/
       slock[*snum] = -homeplanet[system];
     }
-  
-  
+  else
+    {				/* if we're reincarnating, skip any
+				   messages that might have been sent
+				   while we were gone, if enabled */
+      if (conf_ClearOldMsgs == TRUE)
+	{
+	  PVLOCK(lockmesg);
+	  slastmsg[*snum] = *lastmsg;
+	  salastmsg[*snum] = slastmsg[*snum];
+	  PVUNLOCK(lockmesg);
+	}
+    }
+      
   srobot[*snum] = FALSE;
   saction[*snum] = 0;
   
@@ -3423,15 +3463,15 @@ int newship( int unum, int *snum )
 /*##  play - play the game */
 /*  SYNOPSIS */
 /*    play */
-void play()
+int play()
 {
   int laststat, now;
-  int ch, i;
+  int ch, i, rv;
   char msgbuf[128];
   
   /* Can't carry on without a vessel. */
-  if ( newship( cunum, &csnum ) == FALSE)
-    return;
+  if ( (rv = newship( cunum, &csnum )) != TRUE)
+    return(rv);
   
   drstart();				/* start a driver, if necessary */
   ssdfuse[csnum] = 0;				/* zero self destruct fuse */

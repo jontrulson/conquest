@@ -245,7 +245,7 @@ void dowar( int snum );
 void dowarp( int snum, real warp );
 int getoption( char ch, int *tok );
 void menu(void);
-void play(void);
+int play(void);
 real phaserhit( int snum, real dis );
 void statline( int unum, char *buf );
 int capentry( int snum, int *system );
@@ -323,7 +323,9 @@ void userlist( int godlike );
 void userstats( int godlike );
 void statline( int unum, char *buf );
 void zeroplanet( int pnum, int snum );
+void do_bottomborder(void);
 void do_border(void);
+int alertcolor(int alert);
 void draw_alertborder(int alert);
 
 /** conqmisc.c */

@@ -38,6 +38,7 @@ main(int argc, char *argv[])
   int l;
   char name[MAXUSERNAME];
   string cpr=COPYRIGHT;
+  char msgbuf[128];
 
   extern char *optarg;
   extern int optind;
@@ -131,6 +132,14 @@ main(int argc, char *argv[])
   cmaxlin = cdlins( 0 );			/* number of lines */
   
   cmaxcol = cdcols( 0 );			/* number of columns */
+
+				/* send a message telling people
+				   that a user has entered conqoper */
+  sprintf(msgbuf, "User %s has entered conqoper.",
+          name);
+
+  stormsg(MSG_COMP, MSG_ALL, msgbuf);
+
   
   operate();
   

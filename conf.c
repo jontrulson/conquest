@@ -246,6 +246,7 @@ int GetConf(void)
   conf_RecPlayerMsgs = TRUE;
   conf_DoFastUpdate = TRUE;
   conf_DoLimitBell = TRUE;
+  conf_ClearOldMsgs = TRUE;
 
   for (i=0; i<MAX_MACROS; i++)
     conf_MacrosF[i][0] = EOS;

@@ -123,25 +123,53 @@ int canread( int snum, int msgnum )
   from = msgfrom[msgnum];
   to = msgto[msgnum];
   
-  /* If we're GOD, we can read it. */
-  if ( snum == MSG_GOD )
+  /* If we're GOD, we can read it. unless it's a COMP MSG*/
+  if ( snum == MSG_GOD && from != MSG_COMP)
     return ( TRUE );
   
   /* It's to us. */
   if ( to == snum )
-    return ( TRUE );
-  
+    {				/* extra check to see if from is a robot
+				   and to is a valid ship */
+      if (conf_NoRobotMsgs == TRUE && srobot[from] == TRUE && 
+	  (snum > 0 && snum <= MAXSHIPS))
+	{                       /* see if it's a robot, if so ignore */
+          return(FALSE);
+	}
+      else
+	{
+	  return ( TRUE );
+	}
+    }
+
   /* It's from us */
   if (from == snum)
     return(TRUE);
   
   /* It's to everybody. */
   if ( to == MSG_ALL )
-    return ( TRUE );
+    {				/* extra check for player enter/leave msg */
+      if (from == MSG_COMP && snum != MSG_GOD)
+	{				/* a player enter/exit/info message */
+	  if (conf_RecPlayerMsgs == FALSE)
+	    return(FALSE);
+	  else
+	    return(TRUE);
+	}
+				/* else, we can read it */
+      return(TRUE);
+    }
   
   /* Only check these if we're a ship. */
   if ( snum > 0 && snum <= MAXSHIPS )
     {
+				/* if user doesn't want robot msgs
+				   don't show any */
+      if (conf_NoRobotMsgs == TRUE && srobot[from] == TRUE)
+	{			/* see if it's a robot, if so ignore */
+	  return(FALSE);
+	}
+      
       /* We can only read team messages if we're not self-war. */
       if ( ( -to == steam[snum] ) && ! selfwar(snum) )
 	{
@@ -1859,24 +1887,8 @@ int readmsg( int snum, int msgnum, int dsplin )
   /* Format who the message is from. */
   i = msgfrom[msgnum];
 
-  if (i == MSG_COMP && msgto[msgnum] == MSG_ALL && snum != MSG_GOD)
-    {				/* a player enter/exit/info message */
-      if (conf_RecPlayerMsgs == FALSE)
-	return(FALSE);
-    }
-
   if ( i > 0 && i <= MAXSHIPS )
     {
-      if (conf_NoRobotMsgs == TRUE)
-	{			/* see if it's a friendly robot, if so ignore */
-	  
-	  if (srobot[i] == TRUE && swar[snum][steam[i]] == FALSE &&
-	      swar[i][steam[snum]] == FALSE)
-	    {
-	      return(FALSE);
-	    }
-	}
-      
       buf[0] = EOS;
       appship( i, buf );
     }
@@ -1980,7 +1992,7 @@ void sendmsg( int from, int terse )
       return;
     }
   
-  /* TAB or RETURN means use the target and text from the last message. */
+  /* TAB or RETURN means use the target from the last message. */
   editing = ( (ch == TERM_EXTRA || ch == TERM_NORMAL) && buf[0] == EOS );
   if ( editing )
     {

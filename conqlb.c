@@ -116,6 +116,16 @@ void damage( int snum, real dam, int kb )
   
 }
 
+void do_bottomborder(void)
+{
+  int lin;
+
+  lin = DISPLAY_LINS + 1;
+
+  cdline( lin, 1, lin, cmaxcol );
+  mvaddch(lin - 1, STAT_COLS - 1, ACS_BTEE);
+}
+
 void do_border(void)
 {
   int lin;
@@ -124,13 +134,15 @@ void do_border(void)
   
   
   cdline( 1, STAT_COLS, lin, STAT_COLS );
-  cdline( lin, 1, lin, cmaxcol );
+  /*  cdline( lin, 1, lin, cmaxcol );
   mvaddch(lin - 1, STAT_COLS - 1, ACS_BTEE);
+  */
+  do_bottomborder();
   
   return;
 }
 
-void draw_alertborder(int alert)
+int alertcolor(int alert)
 {
   int theattrib;
   
@@ -155,11 +167,17 @@ void draw_alertborder(int alert)
 	theattrib = A_REVERSE;
       break;
     default:
-      clog("draw_border(): invalid alert level: %d", alert);
+      clog("alertcolor(): invalid alert level: %d", alert);
       break;
     }
+
+  return(theattrib);
+}
+
+void draw_alertborder(int alert)
+{
   
-  attrset(theattrib);
+  attrset(alertcolor(alert));
   do_border();
   attrset(0);
   
@@ -193,15 +211,17 @@ void detonate( int snum, int tnum )
 /*    display( snum ) */
 void display( int snum )
 {
-  int i, j, k, idx, lin, col, datacol, minenemy, minsenemy;
+  int i, j, k, l, m, idx, lin, col, datacol, minenemy, minsenemy;
   int linofs[8] = {0, -1, -1, -1, 0, 1, 1, 1};
   int colofs[8] = {1, 1, 0, -1, -1, -1, 0, 1};
   int outattr;
   static int OldAlert = 0;
   string dirch="-/|\\-/|\\";
   char ch, buf[MSGMAXLINE];
+  int godlike;
   int dobeep, lsmap;
   int doalertb = FALSE;
+  int palertcol;
   real x, scale, cenx, ceny, dis, mindis, minsdis, fl, cd, sd;
   static real zzskills, zzswarp;
   static char zzbuf[MSGMAXLINE];
@@ -210,7 +230,6 @@ void display( int snum )
   static int zzsetemp, zzswtemp, zzctemp, zzstowedby, zzssdfuse;
   static real prevsh = 0.0 , prevdam = 100.0 ;
   
-  static int FirstTime = TRUE;
   static int ShieldAttrib = 0;
   static int ShieldLAttrib = 0;
   static int FuelAttrib = 0;
@@ -218,40 +237,13 @@ void display( int snum )
   static int EngAttrib = 0;
   static int DamageAttrib = 0;
   
-  static int RedLevel, YellowLevel, GreenLevel;
-  static int LabelColor;
-  static int InfoColor;
   static time_t savtime = 0;
   time_t thetime;
-  
-  if (FirstTime == TRUE)
-    {
-      FirstTime = FALSE;
-      
-      if (HAS_COLORS)
-	{
-	  LabelColor = COLOR_PAIR(COL_BLUEBLACK) | A_BOLD;
-
-	  InfoColor = COLOR_PAIR(COL_CYANBLACK) | A_BOLD;
-	  RedLevel = COLOR_PAIR(COL_REDBLACK) | A_BOLD;
-	  YellowLevel = COLOR_PAIR(COL_YELLOWBLACK) | A_BOLD;
-	  GreenLevel = COLOR_PAIR(COL_GREENBLACK) | A_BOLD;
-	}
-      else
-	{
-	  LabelColor = 0;
-	  InfoColor = 0;
-	  RedLevel = (A_BOLD | A_REVERSE);
-	  YellowLevel = A_BOLD;
-	  GreenLevel = 0;
-	}
-    }
   
   if ( credraw )
     {
       cdclear();
       lin = DISPLAY_LINS + 1;
-/*      doalertb = TRUE;*/
       draw_alertborder(AlertLevel);
     }
   else
@@ -264,6 +256,7 @@ void display( int snum )
   minsenemy = 0;
   lsmap = smap[snum];
   
+  godlike = ( snum < 1 || snum > MAXSHIPS );
   
   if ( lsmap )
     {
@@ -304,6 +297,24 @@ void display( int snum )
 	continue; /*next;*/
       if ( ! cvtcoords( cenx, ceny, px[i], py[i], scale, &lin, &col ) )
 	continue; /* next;*/
+
+      palertcol = 0;
+				/* determine alertlevel for object */
+      if (spwar( snum, i ) && pscanned[i][steam[snum]])
+	{
+	  palertcol = RedLevelColor;
+	}
+      else if (pteam[i] == steam[snum] && !selfwar(snum))
+	{
+	  palertcol = GreenLevelColor;
+	}
+      else
+	palertcol = YellowLevelColor;
+
+				/* suns are always yellow level material */
+      if (ptype[i] == PLANET_SUN)
+	palertcol = YellowLevelColor;
+
       if ( lsmap )
 	{
 	  /* Strategic map. */
@@ -312,7 +323,11 @@ void display( int snum )
 	    continue; /* next;*/
 	  /* If it's a sun or we any planet we haven't scanned... */
 	  if ( ptype[i] == PLANET_SUN || ! pscanned[i][steam[snum]] )
-	    cdput( chrplanets[ptype[i]], lin, col );
+	    {
+	      attrset(palertcol);
+	      cdput( chrplanets[ptype[i]], lin, col );
+	      attrset(0);
+	    }
 	  else
 	    {
 	      /* Pick a planet owner character. */
@@ -324,15 +339,47 @@ void display( int snum )
 	      /* Display the planet; either it's numeric or it's not. */
 	      if ( soption[snum][OPT_NUMERICMAP] )
 		{
-		  sprintf( buf, "%c%d%c", ch, parmies[i], ch );
-		  if ((col + 2 - strlen(buf)) > STAT_COLS)
-		    cdputs( buf, lin, col+2-strlen( buf ) );
+		  sprintf( buf, "%d", parmies[i]);
+		  l = strlen(buf);
+		  
+		  m = (col + 2 - (l + 2));
+
+		  if (m > STAT_COLS)
+		    {
+		      attrset(palertcol);
+		      cdput( ch, lin, m++);
+		      attrset(0);
+
+		      attrset(InfoColor);
+		      cdputs( buf, lin, m);
+		      m += l;
+		      attrset(0);
+
+		      attrset(palertcol);
+                      cdput( ch, lin, m);
+		      attrset(0);
+		    }
+
 		}
 	      else if ( pscanned[i][steam[snum]] )
 		{
-		  sprintf(buf, "%c%c%c", ch, chrplanets[ptype[i]], ch);
-		  if ((col + 2 - strlen(buf)) > STAT_COLS)
-		    cdputs( buf, lin, col+2-strlen( buf ) );
+		  l = 3;		/* strlen */
+		  m = (col + 2 - l);
+
+		  if (m > STAT_COLS)
+		    {
+                      attrset(palertcol);
+                      cdput( ch, lin, m++);
+                      attrset(0);
+
+                      attrset(InfoColor);
+                      cdput( chrplanets[ptype[i]], lin, m++);
+                      attrset(0);
+
+                      attrset(palertcol);
+                      cdput( ch, lin, m++);
+		      attrset(0);
+		    }
 		}
 	    }
 	  
@@ -340,20 +387,37 @@ void display( int snum )
 	  if ( soption[snum][OPT_PLANETNAMES] )
 	    {
 	      sprintf(buf, "%c%c%c", pname[i][0], pname[i][1], pname[i][2]);
+	      attrset(palertcol);
 	      cdputs( buf, lin, col+2 );
+	      attrset(0);
 	    }
 	}
       else
 	{
 	  /* Tactical map. */
+	  attrset(palertcol);
 	  puthing( ptype[i], lin, col );
+	  attrset(0);
+
 	  if (col - 3 >= STAT_COLS - 1)
 	    {
-	      if (lin < DISPLAY_LINS && lin >= 0 )
-		cdput( chrplanets[ptype[i]], lin, col + 1);
+	      if (lin <= DISPLAY_LINS && lin > 0 )
+		{
+		  if (! pscanned[i][steam[snum]] || ptype[i] == PLANET_SUN)
+		    attrset(palertcol);
+		  else 
+		    attrset(InfoColor);
+
+		  cdput( chrplanets[ptype[i]], lin, col + 1);
+		  attrset(0);
+		}
 	      if ( soption[snum][OPT_PLANETNAMES] )
 		if ( (lin + 1 <= DISPLAY_LINS) && col + 1< cdcols(0) )
-		  cdputs( pname[i], lin + 1, col + 2 );
+		  {
+		    attrset(palertcol);
+		    cdputs( pname[i], lin + 1, col + 2 );
+		    attrset(0);
+		  }
 	    }
 	}
     }
@@ -367,16 +431,22 @@ void display( int snum )
 	  sd = sind(*dhead);
 	  cd = cosd(*dhead);
 	  /* Draw the body. */
+	  attrset(COLOR_PAIR(COL_BLUEBLACK));
 	  for ( fl = -DOOMSDAY_LENGTH/2.0;
 	       fl < DOOMSDAY_LENGTH/2.0;
 	       fl = fl + 50.0 )
 	    if ( cvtcoords( cenx, ceny, *dx+fl*cd, *dy+fl*sd, scale, &lin, &col ) )
 	      cdput( '#', lin, col );
+	  attrset(0);
 	  /* Draw the head. */
 	  if ( cvtcoords( cenx, ceny, *dx+DOOMSDAY_LENGTH/2.0*cd,
 			 *dy+DOOMSDAY_LENGTH/2.0*sd,
 			 scale, &lin, &col ) )
-	    cdput( '*', lin, col );
+	    {
+	      attrset(RedLevelColor);
+	      cdput( '*', lin, col );
+	      attrset(0);
+	    }
 	}
   
   /* Display phaser graphics. */
@@ -386,18 +456,19 @@ void display( int snum )
 	sd = sind(slastphase[snum]);
 	cd = cosd(slastphase[snum]);
 	ch = dirch[mod( (round( slastphase[snum] + 22.5 ) / 45), 7 )];
+	attrset(InfoColor);
 	for ( fl = 0; fl <= LastPhasDist; fl = fl + 50.0 )
 	  if ( cvtcoords( cenx, ceny,
 			 sx[snum]+fl*cd, sy[snum]+fl*sd,
 			 scale, &lin, &col ) )
 	    cdput( ch, lin, col );
+	attrset(0);
       }
   
   /* Display the ships. */
   for ( i = 1; i <= MAXSHIPS; i = i + 1 )
     if ( sstatus[i] != SS_OFF )
       {
-	
 	if (sysconf_DoLRTorpScan)
 	  {
 	    /* Display the torps on a LR scan if it's a friend. */
@@ -406,12 +477,18 @@ void display( int snum )
 		if (swar[snum][steam[i]] == FALSE &&
 		    swar[i][steam[snum]] == FALSE)
 		  {
+		    if (i == snum) /* if it's your torps - */
+		      attrset(A_BOLD);
+		    else
+		      attrset(YellowLevelColor);
+
 		    for ( j = 0; j < MAXTORPS; j = j + 1 )
 		      if ( tstatus[i][j] == TS_LIVE 
 			  || tstatus[i][j] == TS_DETONATE )
 			if ( cvtcoords( cenx, ceny, tx[i][j], ty[i][j],
 				       scale, &lin, &col ) )
 			  cdput( chrtorps[steam[i]], lin, col );
+		    attrset(0);
 		  }
 	      }
 	  }
@@ -426,11 +503,20 @@ void display( int snum )
 				 scale, &lin, &col) )
 		    puthing( THING_EXPLOSION, lin, col );
 	    /* Now display the live torps. */
+
+	    if (i == snum) /* if it's your torps - */
+	      attrset(0);
+	    else if (i != snum && satwar(i, snum))
+	      attrset(RedLevelColor);
+	    else
+	      attrset(GreenLevelColor);
+	    
 	    for ( j = 0; j < MAXTORPS; j = j + 1 )
 	      if ( tstatus[i][j] == TS_LIVE || tstatus[i][j] == TS_DETONATE )
 		if ( cvtcoords( cenx, ceny, tx[i][j], ty[i][j],
 			       scale, &lin, &col ) )
 		  cdput( chrtorps[steam[i]], lin, col );
+	    attrset(0);
 	  }
 	/* Display the ships. */
 	if ( sstatus[i] == SS_LIVE )
@@ -501,8 +587,23 @@ void display( int snum )
 			  ch = CHAR_CLOAKED;
 			else
 			  ch = chrteams[steam[i]];
+			
+				/* determine color */
+			if (i == snum)    /* it's ours */
+			  attrset(A_BOLD);
+			else if (satwar(i, snum)) /* we're at war with it */
+			  attrset(RedLevelColor);
+			else if (steam[i] == steam[snum] && !selfwar(snum))
+			  attrset(GreenLevelColor); /* it's a team ship */
+			else
+			  attrset(YellowLevelColor);
+			    
+				 
 			cdput( ch, lin, col );
+			attrset(0); attrset(A_BOLD);
 			cdputn( i, 0, lin, col + 2 );
+			attrset(0);
+
 			/*			    idx = modp1( round( shead[i] + 22.5 ) / 45 + 1, 8 );
 			 */
 			/*			    idx = mod( round( (shead[i] + 22.5) / 45), 7 );*/
@@ -518,9 +619,12 @@ void display( int snum )
 			
 			j = lin+linofs[idx];
 			k = col+colofs[idx];
+
+			attrset(InfoColor);
 			if ( j >= 0 && j < DISPLAY_LINS && 
 			    k > STAT_COLS && k < cmaxcol )
 			  cdput( dirch[idx], j, k );
+			attrset(0);
 		      }
 		  }
 		if ( snum == i )
@@ -614,8 +718,10 @@ void display( int snum )
   if ( strcmp( buf, zzbuf ) != 0 )
     {
       lin = DISPLAY_LINS + 1;
-/*      doalertb = TRUE;*/
-      draw_alertborder(AlertLevel);
+      attrset(alertcolor(AlertLevel));
+      do_bottomborder();
+      attrset(0);
+
       if ( buf[0] != EOS )
 	{
 	  col = (cmaxcol-STAT_COLS-strlen(buf))/2+STAT_COLS+1;
@@ -660,11 +766,11 @@ void display( int snum )
       if ( i == -1 )
 	{
 	  if (AlertLevel == YELLOW_ALERT) 
-	    attrset(YellowLevel);
+	    attrset(YellowLevelColor);
 	  else if (AlertLevel == RED_ALERT)
-	    attrset(RedLevel | A_BLINK);
+	    attrset(RedLevelColor | A_BLINK);
 	  else
-	    attrset(GreenLevel);
+	    attrset(GreenLevelColor);
 	  
 	  cdputs( "DOWN", lin, datacol );
 	  attrset(0);
@@ -673,11 +779,11 @@ void display( int snum )
       else
 	{
 	  if (i >= 0 && i <= 50)
-	    ShieldAttrib = RedLevel;
+	    ShieldAttrib = RedLevelColor;
 	  else if (i >=51 && i <=80)
-	    ShieldAttrib = YellowLevel;
+	    ShieldAttrib = YellowLevelColor;
 	  else if (i >= 81)
-	    ShieldAttrib = GreenLevel;
+	    ShieldAttrib = GreenLevelColor;
 	  
 	  sprintf( buf, "%d", i );
 	  attrset(ShieldAttrib);
@@ -788,11 +894,11 @@ void display( int snum )
   if ( i != zzsfuel )
     {
       if (i >= 0 && i <= 200)
-	FuelAttrib = RedLevel;
+	FuelAttrib = RedLevelColor;
       else if (i >=201 && i <=500)
-	FuelAttrib = YellowLevel;
+	FuelAttrib = YellowLevelColor;
       else if (i >= 501)
-	FuelAttrib = GreenLevel;
+	FuelAttrib = GreenLevelColor;
       
       cdclra( lin, datacol, lin, STAT_COLS-1 );
       sprintf( buf, "%d", i );
@@ -893,11 +999,11 @@ void display( int snum )
 	    sprintf(etbuf, "%02d", j);
 	  
 	  if (i >= 0 && i <= 50)
-	    WeapAttrib = GreenLevel;
+	    WeapAttrib = GreenLevelColor;
 	  else if (i >=51 && i <=75)
-	    WeapAttrib = YellowLevel;
+	    WeapAttrib = YellowLevelColor;
 	  else if (i >= 76)
-	    WeapAttrib = RedLevel;
+	    WeapAttrib = RedLevelColor;
 	  
 	  attrset(WeapAttrib);
 	  cdputs(wtbuf, lin, datacol);
@@ -908,11 +1014,11 @@ void display( int snum )
 	  attrset(0);
 	  
 	  if (j >= 0 && j <= 50)
-	    EngAttrib = GreenLevel;
+	    EngAttrib = GreenLevelColor;
 	  else if (j >=51 && j <=80)
-	    EngAttrib = YellowLevel;
+	    EngAttrib = YellowLevelColor;
 	  else if (j >= 81)
-	    EngAttrib = RedLevel;
+	    EngAttrib = RedLevelColor;
 	  
 	  attrset(EngAttrib);
 	  cdputs(etbuf, lin, datacol + 3);
@@ -966,11 +1072,11 @@ void display( int snum )
 	{
 	  sprintf( buf, "%d", i );
 	  if (i >= 0 && i <= 10)
-	    DamageAttrib = GreenLevel;
+	    DamageAttrib = GreenLevelColor;
 	  else if (i >=11 && i <=65)
-	    DamageAttrib = YellowLevel;
+	    DamageAttrib = YellowLevelColor;
 	  else if (i >= 66)
-	    DamageAttrib = RedLevel;
+	    DamageAttrib = RedLevelColor;
 	  
 	  attrset(DamageAttrib);
 	  cdputs( buf, lin, datacol );
@@ -993,17 +1099,17 @@ void display( int snum )
       
       if ( j == 'r' )
 	{
-	  attrset(GreenLevel);
+	  attrset(GreenLevelColor);
 	  cdputs( "REPAIR, dmg =", lin, col );
 	}
       else if ( j == 'd' )
 	{
-	  attrset(YellowLevel);
+	  attrset(YellowLevelColor);
 	  cdputs( "damage =", lin, col );
 	}
       else if ( j == 'D' )
 	{
-	  attrset(RedLevel);
+	  attrset(RedLevelColor);
 	  cdputs( "DAMAGE =", lin, col );
 	}
       attrset(0);
@@ -1081,13 +1187,13 @@ void display( int snum )
       if ( i > 0 )
 	{
 	  sprintf( buf, "DESTRUCT MINUS %-3d", i );
-	  attrset(RedLevel);
+	  attrset(RedLevelColor);
 	  cdputs( buf, lin, col );
 	  attrset(0);
 	}
       else if ( i == -1 )
 	{
-	  attrset(RedLevel);
+	  attrset(RedLevelColor);
 	  cdputs( "CLOAKED", lin, col );
 	  attrset(0);
 	}
@@ -2124,12 +2230,15 @@ void playlist( int godlike, int doall )
 {
   int i, unum, status, kb, lin, col;
   int fline, lline, fship;
-  char sbuf[6];
+  char sbuf[20];
+  char kbuf[20];
   int ch;
   
   /* Do some screen setup. */
   cdclear();
-  c_strcpy( "ship name          pseudonym              kills", cbuf );
+  c_strcpy( "ship name          pseudonym              kills      pid", cbuf );
+
+
   col = ( cdcols(0) - strlen( cbuf ) ) / 2;
   lin = 2;
   cdputs( cbuf, lin, col );
@@ -2155,6 +2264,7 @@ void playlist( int godlike, int doall )
       while ( i <= MAXSHIPS && lin <= lline )
 	{
 	  status = sstatus[i];
+
 	  kb = skilledby[i];
 	  if ( status == SS_LIVE ||
 	      ( doall && ( status != SS_OFF || kb != 0 ) ) )
@@ -2163,12 +2273,15 @@ void playlist( int godlike, int doall )
 	      appship( i, sbuf );
 	      unum = suser[i];
 	      if ( unum >= 0 && unum < MAXUSERS )
-		sprintf( cbuf, "%-4s %-13.13s %-21.21s %6.1f",
-			sbuf, cuname[unum], spname[i], 
-			(skills[i] + sstrkills[i]) );
+		{
+		  sprintf(kbuf, "%6.1f", (skills[i] + sstrkills[i]));
+		  sprintf( cbuf, "%-4s %-13.13s %-21.21s %-8s %6d",
+			   sbuf, cuname[unum], spname[i], 
+			   kbuf, spid[i] );
+		}
 	      else
-		sprintf( cbuf, "%-4s %13s %21s %6s", sbuf,
-		       " ", " ", " " );
+		sprintf( cbuf, "%-4s %13s %21s %8s %6s", sbuf,
+		       " ", " ", " ", " " );
 	      if ( doall && kb != 0 )
 		{
 		  appstr( "  ", cbuf);
@@ -2179,6 +2292,11 @@ void playlist( int godlike, int doall )
 		{
 		  cbuf[0] = EOS;
 		  appsstatus( status, cbuf );
+		  /*		  appstr("(", cbuf);
+		  appint(spid[i], cbuf);
+		  appstr(")", cbuf);
+		  */
+		  
 		  cdputs( cbuf, lin, col - 2 - strlen( cbuf ) );
 		}
 	    }

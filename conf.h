@@ -102,7 +102,6 @@ static struct Conf SysConfData[] =
       "#",
       "#",
       "",
-      "",
       NULL
     }
   },
@@ -245,7 +244,6 @@ static struct Conf ConfData[] =
       "#  conquest just as if they were typed from the keyboard.",
       "#",
       "",
-      "",
       NULL
     }
   },
@@ -278,9 +276,10 @@ static struct Conf ConfData[] =
     &conf_NoRobotMsgs,
     {
       "# define this as 'true' if you don't want to recieve messages",
-      "#  from friendly robots.  This can be handy when sending messages",
-      "#  to All, and you don't want alot of replies from robots you",
-      "#  don't care about.",
+      "#  from any robots.  This can be handy when sending messages",
+      "#  to All, and you don't want alot of replies from robots. NOTE:",
+      "#  Obviously if you set this to true, don't expect replies from",
+      "#  robots.",
       "#  Default: false",
       NULL
     }
@@ -325,6 +324,20 @@ static struct Conf ConfData[] =
       "#  miss beeps, but is real nice when do_fastupdate is enabled.",
       "#  Default: true",
       NULL
+    }
+  },
+  {
+    FALSE,
+    CTYPE_BOOL,
+    "clear_old_msgs=",
+    &conf_ClearOldMsgs,
+    {
+      "# define this as true if you want old msgs cleared out when you",
+      "#  reincarnate to another ship.  If this is defined as false, then",
+      "#  any messages sent to you while you were gone from your ship",
+      "#  are displayed as usual when you enter the game.",
+      "#  Default: true",
+      NULL,
     }
   },
   {
