@@ -88,7 +88,7 @@ int Logon(char *username)
 
       /* Display the logo. */
 
-      lin = cumConqLogo();
+      lin = mcuConqLogo();
 
       if ( sHello.flags & SPHELLO_FLAGS_CLOSED )
 	{
@@ -156,7 +156,7 @@ int Logon(char *username)
 	  if (rv == PERR_NOUSER)
 	    {			/* nope... */
 	      slin++;
-	      if (cumAskYN("User doesn't exist. Is this a new user? ", slin, 1))
+	      if (mcuAskYN("User doesn't exist. Is this a new user? ", slin, 1))
 		{			/* yep */
 		  pw[0] = EOS;
 		  cdclrl( MSG_LIN1, 2  );

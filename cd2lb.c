@@ -396,7 +396,7 @@ int cdgetp ( char pmt[], int lin, int col, char terms[], char str[],
 
 				/* translate KP keys (if any)
 				   into 'direction' keys. */
-      (void)cumKP2DirKey(&ch);
+      (void)mcuKP2DirKey(&ch);
 
       if (ch != TERM_NORMAL && ch != TERM_EXTRA && StrInit == TRUE &&
 	  isprint(ch & 0xff))

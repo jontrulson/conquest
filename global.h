@@ -27,7 +27,6 @@
 
 CEXTERN	   int PollInputfd;	/* a copy of stdin's fd for poll()/select() */
 CEXTERN    int ConquestGID;	/* Conquest's GID */
-CEXTERN    int ConquestUID;     /* Conquest's UID */
 CEXTERN    int RMsg_Line;
 
 				/* for the semaphores */

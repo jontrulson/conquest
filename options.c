@@ -58,12 +58,12 @@ static void DisplayCompileOptions(void)
 
   static struct compile_options CompileOptions[] = 
   {
-    {"HAS_SETITIMER", "can do fastupdates (2 per sec)", CTYPE_BOOL, 
-#ifdef HAS_SETITIMER
+    {"HAVE_SETITIMER", "can do fastupdates (2 per sec)", CTYPE_BOOL, 
+#ifdef HAVE_SETITIMER
      (void *)TRUE
 #else
      (void *)FALSE
-#endif /* HAS_SETITIMER */
+#endif /* HAVE_SETITIMER */
     },
 
     {"USE_COMMONMLOCK", "can lock common block in memory", CTYPE_BOOL, 
@@ -98,13 +98,6 @@ static void DisplayCompileOptions(void)
 #endif /* DO_EXPLODING_SHIPS */
     },
 
-    {"ENABLE_MACROS", "can use macro keys", CTYPE_BOOL,
-#ifdef ENABLE_MACROS
-     (void *)TRUE
-#else
-     (void *)FALSE
-#endif /* ENABLE_MACROS */
-    },
 				/* last (NULL) entry */
     {NULL, NULL, CTYPE_NULL, (void *)NULL}
   };

@@ -4,7 +4,7 @@ dnl
 dnl $Id$
 dnl
 
-AC_INIT([conquest],[8.0.1-gl],[jon@radscan.com])
+AC_INIT([conquest],[8.1],[jon@radscan.com])
 AC_CONFIG_HEADER(config.h)
 AM_INIT_AUTOMAKE
 AC_PROG_LIBTOOL

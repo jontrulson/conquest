@@ -9,14 +9,32 @@
 
                               Conquest HISTORY
 
-Version 8.1 10/24/2004 (stable)
+Version 8.0.1m 11/14/2004 (stable)
+
+        - builds under cygwin again.  The latest cygwin curses
+          (11/14/2004) seems to be broken however.  All the curses
+          programs (conqoper, conquest) core in basic curses functions
+          for me.  Worked fine with previous cygwin.  Everything else,
+          including the GL client conquestgl, seem to work ok though.
+          Strange.
+
+          Good enough to run the GL client to a remote server though
+          :) 
 
         - removed last traces of glut bitmap font usage
 
         - cleanup in asle 4 (render.c)
 
+        - remove old, unused code (CONQUEST_USER, ALT_RND, etc)
+
+        - move rndini() calls to be before lcommon creation to prevent
+          infinite loop in rndlb on cygwin systems.
+
         - Use ALT-S to toggle display of FPS and Kb/s stats in
           cockpit.
+
+        - use CTL-R in the cockpit to force a complete refresh from
+          the server.  
 
 Version 8.0.1l 10/22/2004 (devel)
 

@@ -342,7 +342,7 @@ void display( int snum, int display_info )
 	{
 	  /* Tactical map. */
 	  uiPutColor(palertcol);
-	  cumPutThing( Planets[i].type, lin, col );
+	  mcuPutThing( Planets[i].type, lin, col );
 	  uiPutColor(0);
 
 	  if (col - 3 >= STAT_COLS - 1)
@@ -460,7 +460,7 @@ void display( int snum, int display_info )
 		      uiPutColor(GreenLevelColor);
 		    else
 		      uiPutColor(0);
-		    cumPutThing( THING_EXPLOSION, lin, col );
+		    mcuPutThing( THING_EXPLOSION, lin, col );
 		    uiPutColor(0);
 		  }
 	    /* Now display the live torps. */
@@ -1373,7 +1373,7 @@ void displayFeedback(char *msg, int lin)
   if (!msg)
     return;
 
-  cumPutMsg(msg, MSG_LIN1);
+  mcuPutMsg(msg, MSG_LIN1);
 
   return;
 }

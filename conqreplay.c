@@ -73,7 +73,7 @@ void displayReplayData(void)
 }
 
 
-/* display a message - mostly ripped from cumReadMsg() */
+/* display a message - mostly ripped from mcuReadMsg() */
 void displayMsg(Msg_t *themsg)
 {
   char buf[MSGMAXLINE];
@@ -97,7 +97,7 @@ void displayMsg(Msg_t *themsg)
       appstr( themsg->msgbuf, buf );
       
       uiPutColor(attrib);
-      cumPutMsg( buf, RMsg_Line );
+      mcuPutMsg( buf, RMsg_Line );
       uiPutColor(0);
       /* clear second line if sending to MSG_LIN1 */
       if (RMsg_Line == MSG_LIN1)
@@ -187,7 +187,7 @@ static void replay(void)
 	  break;
 
         case '/':
-	  cumPlayList(TRUE, TRUE, 0);
+	  mcuPlayList(TRUE, TRUE, 0);
 	  cdclear();
 	  break;
 	}
@@ -404,7 +404,7 @@ static void watch(void)
 	      break;
 
 	    case '/':                /* ship list - dwp */
-	      cumPlayList( TRUE, FALSE, 0 );
+	      mcuPlayList( TRUE, FALSE, 0 );
 	      Context.redraw = TRUE;
 	      upddsp = TRUE;
 	      break;
@@ -568,7 +568,7 @@ static void watch(void)
 	      break;
 	    default:
 	      cdbeep();
-	      cumPutMsg( "Type h for help.", MSG_LIN2 );
+	      mcuPutMsg( "Type h for help.", MSG_LIN2 );
 	      break;
 	    }
 	} /* end while */
@@ -662,7 +662,7 @@ static void dowatchhelp(void)
 
   dspReplayHelp();
 
-  cumPutPrompt( MTXT_DONE, MSG_LIN2 );
+  mcuPutPrompt( MTXT_DONE, MSG_LIN2 );
   cdrefresh();
   while ( ! iogtimed( &ch, 1.0 ) )
     ;

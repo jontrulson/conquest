@@ -13,7 +13,6 @@
 #include "conqlb.h"
 #include "context.h"
 #include "conf.h"
-#include "userauth.h"
 #include "color.h"
 
 #include <pwd.h>

@@ -38,7 +38,7 @@ void cucPseudo( int unum, int snum )
   else
     appstr( Users[unum].alias, buf );
   cdputc( buf, MSG_LIN1 );
-  ch = cumGetCX( "Enter a new pseudonym: ",
+  ch = mcuGetCX( "Enter a new pseudonym: ",
 	     MSG_LIN2, -4, TERMS, buf, MAXUSERPNAME );
   if ( ch == TERM_ABORT || buf[0] == EOS)
     {
@@ -107,7 +107,7 @@ void cucDoWar( int snum )
 	  if ( Ships[snum].status != SS_RESERVED && dowait )
 	    {
 	      /* We've set war with at least one team, stall a little. */
-	      cumPutMsg(
+	      mcuPutMsg(
 		       "Reprogramming the battle computer, please stand by...",
 		       MSG_LIN2 );
 	      cdrefresh();
@@ -215,12 +215,12 @@ void cucSendMsg( int from, int terse, int remote )
       safectoi( &j, buf, i );		/* ignore status */
       if ( j < 1 || j > MAXSHIPS )
 	{
-	  cumPutMsg( "No such ship.", MSG_LIN2 );
+	  mcuPutMsg( "No such ship.", MSG_LIN2 );
 	  return;
 	}
       if ( Ships[j].status != SS_LIVE )
 	{
-	  cumPutMsg( nf, MSG_LIN2 );
+	  mcuPutMsg( nf, MSG_LIN2 );
 	  return;
 	}
       to = j;
@@ -253,7 +253,7 @@ void cucSendMsg( int from, int terse, int remote )
 	      break;
 	  if ( i >= NUMPLAYERTEAMS )
 	    {
-	      cumPutMsg( huh, MSG_LIN2 );
+	      mcuPutMsg( huh, MSG_LIN2 );
 	      return;
 	    }
 	  to = -i;
@@ -267,7 +267,7 @@ void cucSendMsg( int from, int terse, int remote )
     {
       if ( Ships[to].status != SS_LIVE )
 	{
-	  cumPutMsg( nf, MSG_LIN2 );
+	  mcuPutMsg( nf, MSG_LIN2 );
 	  return;
 	}
       appship( to, buf );
@@ -293,7 +293,7 @@ void cucSendMsg( int from, int terse, int remote )
       appstr( "Friend:", buf );
       break;
     default:
-      cumPutMsg( huh, MSG_LIN2 );
+      mcuPutMsg( huh, MSG_LIN2 );
       return;
       break;
     }
@@ -301,7 +301,7 @@ void cucSendMsg( int from, int terse, int remote )
   if ( ! terse )
     appstr( " (ESCAPE to abort)", buf );
   
-  cumPutMsg( buf, MSG_LIN1 );
+  mcuPutMsg( buf, MSG_LIN1 );
   cdclrl( MSG_LIN2, 1 );
   
   if ( ! editing )

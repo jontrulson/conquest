@@ -153,12 +153,6 @@ int main(int argc, char *argv[])
 	break;
       }
 
-  if ((ConquestUID = getUID(ROOT_USER)) == ERR)
-    {
-      fprintf(stderr, "conqoper: getUID() failed\n");
-      exit(1);
-    }
-  
   if ((ConquestGID = getConquestGID()) == ERR)
     {
       fprintf(stderr, "conqoper: getConquestGID() failed\n");
@@ -283,8 +277,8 @@ int main(int argc, char *argv[])
 #endif
   
   
-  map_common();			/* Map the conquest universe common block */
   rndini( 0, 0 );		/* initialize random numbers */
+  map_common();			/* Map the conquest universe common block */
   cdinit();			/* initialize display environment */
   
   Context.unum = MSG_GOD;	/* stow user number */
@@ -785,9 +779,9 @@ void debugplan(void)
 	    } /* while */
 	  
 	  if ((PlanetOffset + PlanetIdx) > NUMPLANETS)
-	    cumPutPrompt( MTXT_DONE, MSG_LIN2 ); /* last page? */
+	    mcuPutPrompt( MTXT_DONE, MSG_LIN2 ); /* last page? */
 	  else
-	    cumPutPrompt( MTXT_MORE, MSG_LIN2 );
+	    mcuPutPrompt( MTXT_MORE, MSG_LIN2 );
 
           cdrefresh();
 	  
@@ -898,7 +892,7 @@ void kiss(int snum, int prompt_flg)
       cdclrl( MSG_LIN1, 1 ); 
       sprintf(mbuf,"%s", kill_driver_str);
       cdputs( mbuf, MSG_LIN1, 1 );
-      if ( cumConfirm() )
+      if ( mcuConfirm() )
 	if ( Driver->drivstat == DRS_RUNNING )
 	  Driver->drivstat = DRS_KAMIKAZE;
       cdclrl( MSG_LIN1, 2 );
@@ -930,7 +924,7 @@ void kiss(int snum, int prompt_flg)
 	sprintf(mbuf, kill_ship_str1,
 		Teams[Ships[snum].team].teamchar, snum, Ships[snum].alias);
 	cdputs( mbuf, MSG_LIN1, 1 );
-	if ( cumConfirm() )
+	if ( mcuConfirm() )
 	  {
 	    clbKillShip( snum, KB_GOD );
 	    cdclrl( MSG_LIN2, 1 );
@@ -957,7 +951,7 @@ void kiss(int snum, int prompt_flg)
 		    snum, 
 		    Ships[snum].alias);
 	    cdputs( buf, MSG_LIN1, 1 );
-	    if ( cumConfirm() )
+	    if ( mcuConfirm() )
 	      {
 		clog("OPER: %s killed ship %d",
 		     operName, snum);
@@ -994,7 +988,7 @@ void kiss(int snum, int prompt_flg)
 		  Ships[snum].alias, 
 		  buf);
 	  cdputs( mbuf, MSG_LIN1, 1 );
-	  if ( cumConfirm() )
+	  if ( mcuConfirm() )
 		  {
 	    clbKillShip( snum, KB_GOD );
 	    cdclrl( MSG_LIN2, 1 );
@@ -1233,7 +1227,7 @@ void operate(void)
 	  if ( dgrand( msgrand, &now ) >= NEWMSG_GRAND )
 	    if ( getamsg( MSG_GOD, &ConqInfo->glastmsg ) )
 	      {
-		cumReadMsg( MSG_GOD, ConqInfo->glastmsg, RMsg_Line );
+		mcuReadMsg( MSG_GOD, ConqInfo->glastmsg, RMsg_Line );
 		
 #if defined(OPER_MSG_BEEP)
 		if (Msgs[ConqInfo->glastmsg].msgfrom != MSG_GOD)
@@ -1271,7 +1265,7 @@ void operate(void)
 	  redraw = TRUE;
 	  break;
 	case 'b':
-	  if ( cumConfirm() )
+	  if ( mcuConfirm() )
 	    bigbang();
 	  break;
 	case 'd':
@@ -1306,7 +1300,7 @@ void operate(void)
 	      clog("OPER: %s has enabled the game",
 		   operName);
 	    }
-	  else if ( cumConfirm() )
+	  else if ( mcuConfirm() )
 	    {
 	      ConqInfo->closed = TRUE;
 	      clog("OPER: %s has disabled the game",
@@ -1320,7 +1314,7 @@ void operate(void)
 	    Driver->drivstat = DRS_HOLDING;
 	  break;
 	case 'H':
-	  cumHistList( TRUE );
+	  mcuHistList( TRUE );
 	  redraw = TRUE;
 	  break;
 	case 'i':
@@ -1334,7 +1328,7 @@ void operate(void)
 	  kiss(0,TRUE);
 	  break;
 	case 'L':
-	  cumReviewMsgs( MSG_GOD, ConqInfo->glastmsg );
+	  mcuReviewMsgs( MSG_GOD, ConqInfo->glastmsg );
 	  break;
 	case 'm':
 	  cucSendMsg( MSG_GOD, TRUE, FALSE );
@@ -1363,7 +1357,7 @@ void operate(void)
 	  redraw = TRUE;
 	  break;
 	case 'S':
-	  cumUserStats( TRUE , 0 ); /* we're always neutral ;-) - dwp */
+	  mcuUserStats( TRUE , 0 ); /* we're always neutral ;-) - dwp */
 	  redraw = TRUE;
 	  break;
 	case 'T':
@@ -1371,7 +1365,7 @@ void operate(void)
 	  redraw = TRUE;
 	  break;
 	case 'U':
-	  cumUserList( TRUE, 0 );
+	  mcuUserList( TRUE, 0 );
 	  redraw = TRUE;
 	  break;
 	case 'w':
@@ -1380,11 +1374,11 @@ void operate(void)
 	  redraw = TRUE;
 	  break;
 	case '/':
-	  cumPlayList( TRUE, FALSE, 0 );
+	  mcuPlayList( TRUE, FALSE, 0 );
 	  redraw = TRUE;
 	  break;
 	case '\\':
-	  cumPlayList( TRUE, TRUE, 0 );
+	  mcuPlayList( TRUE, TRUE, 0 );
 	  redraw = TRUE;
 	  break;
 	case '?':
@@ -1448,29 +1442,29 @@ void opinfo( int snum )
     {
       i = 0;
       safectoi( &j, &cbuf[1], i );		/* ignore status */
-      cumInfoShip( j, snum );
+      mcuInfoShip( j, snum );
     }
   else if ( alldig( cbuf ) == TRUE )
     {
       i = 0;
       safectoi( &j, cbuf, i );		/* ignore status */
-      cumInfoShip( j, snum );
+      mcuInfoShip( j, snum );
     }
   else if ( opPlanetMatch( cbuf, &j ) )
-    cumInfoPlanet( "", j, snum );
+    mcuInfoPlanet( "", j, snum );
   else if ( stmatch( cbuf, "time", FALSE ) )
     {
       getnow( now, 0 );
       c_strcpy( "It's ", cbuf );
       appnumtim( now, cbuf );
       appchr( '.', cbuf );
-      cumPutMsg( cbuf, MSG_LIN1 );
+      mcuPutMsg( cbuf, MSG_LIN1 );
       cdmove( MSG_LIN1, 1 );
     }
   else
     {
       cdmove( MSG_LIN2, 1 );
-      cumPutMsg( huh, MSG_LIN2 );
+      mcuPutMsg( huh, MSG_LIN2 );
     }
   
   return;
@@ -1613,61 +1607,61 @@ void opinit(void)
 	{
 	case 'e':
 	  cdputs( "everything", lin, col );
-	  if ( cumConfirm() )
+	  if ( mcuConfirm() )
 	    {
 	      DoInit('e', FALSE);
 	    }
 	  break;
 	case 'z':
 	  cdputs( "zero everything", lin, col );
-	  if ( cumConfirm() )
+	  if ( mcuConfirm() )
 	    DoInit('z', FALSE);
 	  break;
 	case 'u':
 	  cdputs( "universe", lin, col );
-	  if ( cumConfirm() )
+	  if ( mcuConfirm() )
 	    {
 	      DoInit('u', FALSE);
 	    }
 	  break;
 	case 'g':
 	  cdputs( "game", lin, col );
-	  if ( cumConfirm() )
+	  if ( mcuConfirm() )
 	    {
 	      DoInit('g', FALSE);
 	    }
 	  break;
 	case 'p':
 	  cdputs( "planets", lin, col );
-	  if ( cumConfirm() )
+	  if ( mcuConfirm() )
 	    {
 	      DoInit('p', FALSE);
 	    }
 	  break;
 	case 's':
 	  cdputs( "ships", lin, col );
-	  if ( cumConfirm() )
+	  if ( mcuConfirm() )
 	    {
 	      DoInit('s', FALSE);
 	    }
 	  break;
 	case 'm':
 	  cdputs( "messages", lin, col );
-	  if ( cumConfirm() )
+	  if ( mcuConfirm() )
 	    {
 	      DoInit('m', FALSE);
 	    }
 	  break;
 	case 'l':
 	  cdputs( "lockwords", lin, col );
-	  if ( cumConfirm() )
+	  if ( mcuConfirm() )
 	    {
 	      DoInit('l', FALSE);
 	    }
 	  break;
 	case 'r':
 	  cdputs( "robots", lin, col );
-	  if ( cumConfirm() )
+	  if ( mcuConfirm() )
 	    {
 	      DoInit('r', FALSE);
 	    }
@@ -1743,7 +1737,7 @@ void oppedit(void)
 	uiPutColor(YellowLevelColor);
       else
 	uiPutColor(attrib);
-      cumPutThing(Planets[pnum].type, i, j );
+      mcuPutThing(Planets[pnum].type, i, j );
       uiPutColor(0);
 
 	  /* suns have red cores, others are cyan. */
@@ -1868,7 +1862,7 @@ void oppedit(void)
 	{
 	case 'a':
 	  /* Angle. */
-	  ch = cumGetCX( "New angle? ", MSG_LIN1, 0,
+	  ch = mcuGetCX( "New angle? ", MSG_LIN1, 0,
 		     TERMS, buf, MSGMAXLINE );
 	  if ( ch == TERM_ABORT || buf[0] == EOS )
 	    continue;	/* next */
@@ -1884,7 +1878,7 @@ void oppedit(void)
 	  break;
 	case 'A':
 	  /* Armies. */
-	  ch = cumGetCX( "New number of armies? ",
+	  ch = mcuGetCX( "New number of armies? ",
 		     MSG_LIN1, 0, TERMS, buf, MSGMAXLINE );
 	  if ( ch == TERM_ABORT || buf[0] == EOS )
 	    continue;
@@ -1896,14 +1890,14 @@ void oppedit(void)
 	  break;
 	case 'n':
 	  /* New planet name. */
-	  ch = cumGetCX( "New name for this planet? ",
+	  ch = mcuGetCX( "New name for this planet? ",
 		     MSG_LIN1, 0, TERMS, buf, MAXPLANETNAME );
 	  if ( ch != TERM_ABORT && ( ch == TERM_EXTRA || buf[0] != EOS ) )
 	    stcpn( buf, Planets[pnum].name, MAXPLANETNAME );
 	  break;
 	case 'o':
 	  /* New primary. */
-	  ch = cumGetCX( "New planet to orbit? ",
+	  ch = mcuGetCX( "New planet to orbit? ",
 		     MSG_LIN1, 0, TERMS, buf, MAXPLANETNAME );
 	  if ( ch == TERM_ABORT || buf[0] == EOS )
 	    continue;	/* next */
@@ -1914,7 +1908,7 @@ void oppedit(void)
 	  break;
 	case 'v':
 	  /* Velocity. */
-	  ch = cumGetCX( "New velocity? ",
+	  ch = mcuGetCX( "New velocity? ",
 		     MSG_LIN1, 0, TERMS, buf, MSGMAXLINE );
 	  if ( ch == TERM_ABORT || buf[0] == EOS )
 	    continue;	/* next */
@@ -1940,7 +1934,7 @@ void oppedit(void)
 	  break;
 	case 'x':
 	  /* X coordinate. */
-	  ch = cumGetCX( "New X coordinate? ",
+	  ch = mcuGetCX( "New X coordinate? ",
 		     MSG_LIN1, 0, TERMS, buf, MSGMAXLINE );
 	  if ( ch == TERM_ABORT || buf[0] == EOS )
 	    continue;	/* next */
@@ -1954,7 +1948,7 @@ void oppedit(void)
 	  break;
 	case 'y':
 	  /* Y coordinate. */
-	  ch = cumGetCX( "New Y coordinate? ",
+	  ch = mcuGetCX( "New Y coordinate? ",
 		     MSG_LIN1, 0, TERMS, buf, MSGMAXLINE );
 	  if ( ch == TERM_ABORT || buf[0] == EOS )
 	    continue;	/* next */
@@ -1980,7 +1974,7 @@ void oppedit(void)
 	  break;
 	  /* Uninhabitable minutes */
 	case 'u':
-	  ch = cumGetCX( "New uninhabitable minutes? ",
+	  ch = mcuGetCX( "New uninhabitable minutes? ",
 		     MSG_LIN1, 0, TERMS, buf, MSGMAXLINE );
 	  if ( ch == TERM_ABORT || buf[0] == EOS )
 	    continue;
@@ -1991,7 +1985,7 @@ void oppedit(void)
 	  Planets[pnum].uninhabtime = j;
 	  break;
 	case 'p':
-	  ch = cumGetCX( "New planet to edit? ",
+	  ch = mcuGetCX( "New planet to edit? ",
 		     MSG_LIN1, 0, TERMS, buf, MAXPLANETNAME );
 	  if ( ch == TERM_ABORT || buf[0] == EOS )
 	    continue;	/* next */
@@ -2000,7 +1994,7 @@ void oppedit(void)
 	  break;
 	case 'r':
 	  /* Radius. */
-	  ch = cumGetCX( "New radius? ",
+	  ch = mcuGetCX( "New radius? ",
 		     MSG_LIN1, 0, TERMS, buf, MSGMAXLINE );
 	  if ( ch == TERM_ABORT || buf[0] == EOS )
 	    continue;	/* next */
@@ -2059,7 +2053,7 @@ void oppedit(void)
 /*    opplanlist */
 void opPlanetList(void)
 {
-  cumPlanetList( TEAM_NOTEAM, 0 );		/* we get extra info */
+  mcuPlanetList( TEAM_NOTEAM, 0 );		/* we get extra info */
 }
 
 
@@ -2089,7 +2083,7 @@ void opresign(void)
       cdrefresh();
       c_sleep( 1.0 );
     }
-  else if ( cumConfirm() )
+  else if ( mcuConfirm() )
     {
       clog("OPER: %s has resigned %s (%s)",
 	   operName,
@@ -2175,7 +2169,7 @@ void oprobot(void)
     {
       if ( ! newrob( &snum, unum ) )
 	{
-	  cumPutMsg( "Failed to create robot ship.", MSG_LIN1 );
+	  mcuPutMsg( "Failed to create robot ship.", MSG_LIN1 );
 	  break;
 	}
       
@@ -2211,7 +2205,7 @@ void oprobot(void)
   i = MSG_LIN1;
   if ( anum != num )
     i = i + 1;
-  cumPutMsg( buf, i );
+  mcuPutMsg( buf, i );
   
   return;
   
@@ -2381,8 +2375,8 @@ void opTeamList(void)
   cdclear();
   do /* repeat*/
     {
-      cumTeamList( -1 );
-      cumPutPrompt( MTXT_DONE, MSG_LIN2 );
+      mcuTeamList( -1 );
+      mcuPutPrompt( MTXT_DONE, MSG_LIN2 );
       cdrefresh();
     }
   while ( !iogtimed( &ch, 1.0 ) ); /* until */
@@ -2505,7 +2499,7 @@ void opuedit(void)
 
   cdclrl( MSG_LIN1, 2 );
   uiPutColor(InfoColor);
-  ch = cumGetCX( "Edit which user: ", MSG_LIN1, 0, TERMS, buf, MAXUSERNAME );
+  ch = mcuGetCX( "Edit which user: ", MSG_LIN1, 0, TERMS, buf, MAXUSERNAME );
   if ( ch == TERM_ABORT )
     {
       cdclrl( MSG_LIN1, 2 );
@@ -2815,7 +2809,7 @@ void opuedit(void)
 	    {
 	      /* Pseudonym. */
 	      cdclrl( MSG_LIN2, 1 );
-	      ch = cumGetCX( "Enter a new pseudonym: ",
+	      ch = mcuGetCX( "Enter a new pseudonym: ",
 			 MSG_LIN2, 0, TERMS, buf, MAXUSERPNAME );
 	      if ( ch != TERM_ABORT &&
 		  ( buf[0] != EOS || ch == TERM_EXTRA ) )
@@ -2825,7 +2819,7 @@ void opuedit(void)
 	    {
 	      /* Username. */
 	      cdclrl( MSG_LIN2, 1 );
-	      ch = cumGetCX( "Enter a new username: ",
+	      ch = mcuGetCX( "Enter a new username: ",
 			 MSG_LIN2, 0, TERMS, buf, MAXUSERNAME );
 	      if ( ch != TERM_ABORT && buf[0] != EOS)
 	      {
@@ -2852,7 +2846,7 @@ void opuedit(void)
 	    {
 	      /* Multiple count. */
 	      cdclrl( MSG_LIN2, 1 );
-	      ch = cumGetCX( "Enter new multiple count: ",
+	      ch = mcuGetCX( "Enter new multiple count: ",
 			 MSG_LIN2, 0, TERMS, buf, MSGMAXLINE );
 	      if ( ch != TERM_ABORT && buf[0] != EOS )
 		{
@@ -2940,7 +2934,7 @@ void watch(void)
 	    if ( dgrand( msgrand, &now ) >= NEWMSG_GRAND )
 		if ( getamsg( MSG_GOD, &ConqInfo->glastmsg ) )
 		  {
-		    cumReadMsg( MSG_GOD, ConqInfo->glastmsg, RMsg_Line );
+		    mcuReadMsg( MSG_GOD, ConqInfo->glastmsg, RMsg_Line );
 #if defined(OPER_MSG_BEEP)
 		    if (Msgs[ConqInfo->glastmsg].msgfrom != MSG_GOD)
 		      cdbeep();
@@ -3003,7 +2997,7 @@ void watch(void)
 		  oprobot();
 		  break;
 		case 'L':
-		  cumReviewMsgs( MSG_GOD, ConqInfo->glastmsg );
+		  mcuReviewMsgs( MSG_GOD, ConqInfo->glastmsg );
 		  break;
 		case 0x0c:
 		  operStopTimer();
@@ -3078,13 +3072,13 @@ void watch(void)
 		  break;
 		case '/':                /* ship list - dwp */
 		  operStopTimer();
-		  cumPlayList( TRUE, FALSE, 0 );
+		  mcuPlayList( TRUE, FALSE, 0 );
 		  Context.redraw = TRUE;
 		  operSetTimer();
 		  break;
 		case '\\':               /* big ship list - dwp */
 		  operStopTimer();
-		  cumPlayList( TRUE, TRUE, 0 );
+		  mcuPlayList( TRUE, TRUE, 0 );
 		  Context.redraw = TRUE;
 		  operSetTimer();
 		  break;
@@ -3255,7 +3249,7 @@ void watch(void)
 		  break;
 		default:
 		  cdbeep();
-		  cumPutMsg( "Type h for help.", MSG_LIN2 );
+		  mcuPutMsg( "Type h for help.", MSG_LIN2 );
 		  break;
 		}
 	      /* Disable messages for awhile. */
@@ -3391,7 +3385,7 @@ void dowatchhelp(void)
   tlin++;
   cprintf(tlin,col,ALIGN_NONE,sfmt, "/", "player list");
 
-  cumPutPrompt( MTXT_DONE, MSG_LIN2 );
+  mcuPutPrompt( MTXT_DONE, MSG_LIN2 );
   cdrefresh();
   while ( ! iogtimed( &ch, 1.0 ) )
     ;
@@ -3662,7 +3656,7 @@ void operSetTimer(void)
 {
   static struct sigaction Sig;
   
-#ifdef HAS_SETITIMER
+#ifdef HAVE_SETITIMER
   struct itimerval itimer;
 #endif
   
@@ -3676,7 +3670,7 @@ void operSetTimer(void)
       exit(errno);
     }
   
-#ifdef HAS_SETITIMER
+#ifdef HAVE_SETITIMER
 
   if (Context.updsec >= 1 && Context.updsec <= 10)
     {
@@ -3715,7 +3709,7 @@ void operSetTimer(void)
 /*    operStopTimer */
 void operStopTimer(void)
 {
-#ifdef HAS_SETITIMER
+#ifdef HAVE_SETITIMER
   struct itimerval itimer;
 #endif
   
@@ -3724,7 +3718,7 @@ void operStopTimer(void)
 
   signal(SIGALRM, SIG_IGN);
   
-#ifdef HAS_SETITIMER
+#ifdef HAVE_SETITIMER
   itimer.it_value.tv_sec = itimer.it_interval.tv_sec = 0;
   itimer.it_value.tv_usec = itimer.it_interval.tv_usec = 0;
   

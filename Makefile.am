@@ -92,10 +92,10 @@ libexec_PROGRAMS = conqdriv
 conquest_SOURCES = conquest.c c_defs.h defs.h conqdef.h conqcom.h context.h \
 	conqreplay.c
 
-conquest_LDADD = libconqclnt.la libconquest.la libUi.la libUiCU.la 
+conquest_LDADD = libUiCU.la libUi.la libconqclnt.la libconquest.la
 
 conquestgl_SOURCES = conquestgl.c c_defs.h defs.h conqdef.h conqcom.h context.h
-conquestgl_LDADD = libconqclnt.la libconquest.la libUi.la libUiGL.la $(XLIBS)
+conquestgl_LDADD = libUiGL.la libUi.la libconqclnt.la libconquest.la $(XLIBS)
 
 conquestd_SOURCES = conquestd.c c_defs.h defs.h conqdef.h conqcom.h \
 	context.h conqnet.h
@@ -108,6 +108,7 @@ conqai_LDADD = libconquest.la
 
 conqoper_SOURCES = conqoper.c c_defs.h defs.h conqdef.h conqcom.h context.h
 conqoper_LDADD = libconqclnt.la libconquest.la libUi.la libUiCU.la 
+conqoper_LDADD = libUiCU.la libUi.la libconqclnt.la libconquest.la
 
 conqdriv_SOURCES = conqdriv.c c_defs.h defs.h conqdef.h conqcom.h context.h
 conqdriv_LDADD = libconquest.la 

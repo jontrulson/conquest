@@ -2403,6 +2403,11 @@ static void command( int ch )
       cbuf[0] = EOS;
       _doinfo(cbuf, TERM_EXTRA);
       break;
+
+    case TERM_RELOAD:		/* have server resend current universe */
+      sendCommand(CPCMD_RELOAD, 0);
+      clog("client: sent CPCMD_RELOAD");
+      break;
       
     case -1:			/* really nothing, move along */
       break;

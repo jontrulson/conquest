@@ -43,12 +43,6 @@ int main(int argc, char *argv[])
   
   /* First things first. */
   
-  if ((ConquestUID = getUID(ROOT_USER)) == ERR)
-    {
-      fprintf(stderr, "conqai: getUID() failed\n");
-      exit(1);
-    }
-  
   if ((ConquestGID = getConquestGID()) == ERR)
     {
       fprintf(stderr, "conqai: getConquestGID() failed\n");

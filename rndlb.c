@@ -120,22 +120,6 @@ void rndini ( int seed1, int seed2 )
 /*  SYNOPSIS */
 /*    real r, rnd */
 /*    r = rnd(0) */
-#ifdef ALT_RND
-real rnd ( void )
-{
-  
-  int idx;
-  real RET;
-  
-  rndseq ( &value1, mult1, inc1, modu1 );
-  idx = ifix ( rfix(value1) / rfix(modu1) * TABLESIZE ) + 1;
-  RET = rfix(table[idx]) / rfix(modu2);
-  rndseq ( &value2, mult2, inc2, modu2 );
-  table[idx] = value2;
-  
-  return(RET);
-}
-#else
 real rnd ( void )		/* use 48bit linear congruential */
 {
   real rc;
@@ -146,7 +130,6 @@ real rnd ( void )		/* use 48bit linear congruential */
 #endif
   return(rc);
 }
-#endif
 
 /*  rnduni - random real number in the specified range */
 /*  SYNOPSIS */

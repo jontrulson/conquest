@@ -286,12 +286,6 @@ int main(int argc, char *argv[])
   /* clear out our stored packets */
   spktInit();
 
-  if ((ConquestUID = getUID(ROOT_USER)) == ERR)
-    {
-      fprintf(stderr, "%s: getUID() failed\n", progName);
-      exit(1);
-    }
-  
   if ((ConquestGID = getConquestGID()) == ERR)
     {
       fprintf(stderr, "%s: getConquestGID() failed\n", progName);
@@ -526,7 +520,7 @@ void startUpdate(void)
 {
   static struct sigaction Sig;
 
-#ifdef HAS_SETITIMER
+#ifdef HAVE_SETITIMER
   struct itimerval itimer;
 #endif
 
@@ -540,7 +534,7 @@ void startUpdate(void)
       exit(errno);
     }
   
-#ifdef HAS_SETITIMER
+#ifdef HAVE_SETITIMER
   if (Context.updsec >= 1 && Context.updsec <= 10)
     {
       if (Context.updsec == 1)
@@ -573,13 +567,13 @@ void startUpdate(void)
 
 void stopUpdate(void)
 {
-#ifdef HAS_SETITIMER
+#ifdef HAVE_SETITIMER
   struct itimerval itimer;
 #endif
   
   signal(SIGALRM, SIG_IGN);
   
-#ifdef HAS_SETITIMER
+#ifdef HAVE_SETITIMER
   itimer.it_value.tv_sec = itimer.it_interval.tv_sec = 0;
   itimer.it_value.tv_usec = itimer.it_interval.tv_usec = 0;
   

@@ -7,29 +7,29 @@
 #ifndef _CUMISC_H
 #define _CUMISC_H
 
-void cumHistList( int godlike );
-void cumPutThing( int what, int lin, int col );
-int cumReadMsg( int snum, int msgnum, int dsplin );
-int cumKPAngle(int ch, real *angle);
-int cumKP2DirKey(int *ch);
-int cumConqLogo(void);
-void cumInfoPlanet( char *str, int pnum, int snum );
-void cumInfoShip( int snum, int scanner );
-void cumPlanetList( int team, int snum );
-void cumPlayList( int godlike, int doall, int snum );
-int cumReviewMsgs( int snum, int slm );
-void cumTeamList( int team );
-void cumUserList( int godlike, int snum );
-void cumUserStats( int godlike , int snum );
-int cumConfirm(void);
-int cumAskYN(char *question, int lin, int col);
-char cumGetCX( char *pmt, int lin, int offset, char *terms, char *buf, int len );
-int cumGetTarget( char *pmt, int lin, int col, real *dir, real cdefault );
-int cumMore( char *pmt );
-void cumPageFile( char *file, char *errmsg );
-void cumPutMsg( char *msg, int line );
-void cumPutPrompt( char *pmt, int line );
-void cumHelpLesson(void);
-void cumNews(void);
+void mcuHistList( int godlike );
+void mcuPutThing( int what, int lin, int col );
+int mcuReadMsg( int snum, int msgnum, int dsplin );
+int mcuKPAngle(int ch, real *angle);
+int mcuKP2DirKey(int *ch);
+int mcuConqLogo(void);
+void mcuInfoPlanet( char *str, int pnum, int snum );
+void mcuInfoShip( int snum, int scanner );
+void mcuPlanetList( int team, int snum );
+void mcuPlayList( int godlike, int doall, int snum );
+int mcuReviewMsgs( int snum, int slm );
+void mcuTeamList( int team );
+void mcuUserList( int godlike, int snum );
+void mcuUserStats( int godlike , int snum );
+int mcuConfirm(void);
+int mcuAskYN(char *question, int lin, int col);
+char mcuGetCX( char *pmt, int lin, int offset, char *terms, char *buf, int len );
+int mcuGetTarget( char *pmt, int lin, int col, real *dir, real cdefault );
+int mcuMore( char *pmt );
+void mcuPageFile( char *file, char *errmsg );
+void mcuPutMsg( char *msg, int line );
+void mcuPutPrompt( char *pmt, int line );
+void mcuHelpLesson(void);
+void mcuNews(void);
 
 #endif /* _CUMISC_H */

@@ -21,22 +21,8 @@
 #define _DEFS_H
 /* Basic information */
 
-/* ROOT_USER - username that game related files created by conquest
- *  are chown()'d to.  Default: root
- */
-#define ROOT_USER "root"
-
-/* CONQUEST_USER - When this username runs conquest, server mode is active.
- *   - the user is prompted for their username, and their password,
- *   - user is automatically added to conquest userdb if a new user
- *   - .conquestrc file for such users are created in ~CONQUEST_USER/ 
- *     directory as .conquestrc.UNUM (UNUM = user number)
- *   Default: conquest
- */
-#define CONQUEST_USER "conquest"
-
-
-/* CONQUEST_GROUP - this is the group that all conquest files are chgrp'd
+/* 
+ * CONQUEST_GROUP - this is the group that all conquest files are chgrp'd
  *   to... This is also the group that the conquest executables setgid()
  *   to as well.  You should leave it as is... Default: conquest.  
  */
@@ -44,7 +30,8 @@
 # define CONQUEST_GROUP "conquest"
 #endif
 
-/* Some variables that used to be in conqfig.c - relative to conquest
+/* 
+ * Some variables that used to be in conqfig.c - relative to conquest
  *  installation directories
  */
 
@@ -54,17 +41,8 @@
 #define C_CONQ_NEWSFILE  "HISTORY"
 #define C_CONQ_HELPFILE  "conquest.doc"
 
-
-/* HAS_SETITIMER - Define if your system supports setitimer/getitimer().
- *  Otherwise alarm() is used.  With setitimer() it's possible to get a
- *  faster refresh rate (say 2 updates per second) rather than 1 update
- *  per second as is the case with alarm().
- */
-#if defined(HAVE_SETITIMER)
-# define HAS_SETITIMER
-#endif
-
-/* USE_COMMONMLOCK - Lock the common block into memory via memctl(). 
+/* 
+ * USE_COMMONMLOCK - Lock the common block into memory via memctl(). 
  *  Requires the PLOCK privilege (unixware).
  */
 
@@ -72,7 +50,8 @@
 # define USE_COMMONMLOCK 
 #endif
 
-/* WARP0CLOAK - Although the code made it difficult to scan a ship that was
+/* 
+ * WARP0CLOAK - Although the code made it difficult to scan a ship that was
  *  cloaked at warp 0, it was still possible to scan such a ship if it was
  *  within alert range.  Defining this means you CANNOT be detected (even by 
  *  robots) if you are cloaked and at warp 0.0.  An enemy can fly right over
@@ -80,14 +59,16 @@
  */
 #define WARP0CLOAK 
 
-/* DO_EXPLODING_SHIPS - In this mode, ships explode when they die, with
+/* 
+ * DO_EXPLODING_SHIPS - In this mode, ships explode when they die, with
  *  a force equal to the number of torpedos the ship has available, and
  *  only if the ship had the fuel to 'fire' them, were it alive to do
  *  so. 
  */
 #define DO_EXPLODING_SHIPS
 
-/* SET_PRIORITY - increase our priority a bit, increase the driver's a bit 
+/* 
+ * SET_PRIORITY - increase our priority a bit, increase the driver's a bit 
  * more.  Requires the TSHAR privilege (unixware).
  */
 
@@ -100,14 +81,14 @@
 # define CONQDRIV_PRI (-7)
 #endif
 
-/* ENABLE_MACROS - enable use of the macro F keys 
+/*
+ * Macro defines
  */
-#define ENABLE_MACROS
-
 #define MAX_MACROS 64		/* max number of macros supported */
 #define MAX_MACRO_LEN 70	/* max length of a macro */
 
-/* OPER_MSG_BEEP - if defined, beep when a message arrives in conqoper.
+/* 
+ * OPER_MSG_BEEP - if defined, beep when a message arrives in conqoper.
  */
 #undef OPER_MSG_BEEP
 
@@ -121,6 +102,7 @@
 #undef DEBUG_SEM		/* semaphore debugging */
 #undef DEBUG_MACROS		/* MACRO debugging */
 #undef DEBUG_IO                 /* IO debugging */
+#undef DEBUG_ETA                /* Estimated Time of Arrival debugging */
 #undef DEBUG_SIG		/* debug signal handling */
 #undef DEBUG_AI                 /* debug the robots */
 #undef DEBUG_MISC		/* debug other misc stuff */

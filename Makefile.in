@@ -226,10 +226,10 @@ conquest_SOURCES = conquest.c c_defs.h defs.h conqdef.h conqcom.h context.h \
 	conqreplay.c
 
 
-conquest_LDADD = libconqclnt.la libconquest.la libUi.la libUiCU.la 
+conquest_LDADD = libUiCU.la libUi.la libconqclnt.la libconquest.la
 
 conquestgl_SOURCES = conquestgl.c c_defs.h defs.h conqdef.h conqcom.h context.h
-conquestgl_LDADD = libconqclnt.la libconquest.la libUi.la libUiGL.la $(XLIBS)
+conquestgl_LDADD = libUiGL.la libUi.la libconqclnt.la libconquest.la $(XLIBS)
 
 conquestd_SOURCES = conquestd.c c_defs.h defs.h conqdef.h conqcom.h \
 	context.h conqnet.h
@@ -243,7 +243,7 @@ conqai_SOURCES = conqai_main.c c_defs.h defs.h conqdef.h conqcom.h \
 conqai_LDADD = libconquest.la 
 
 conqoper_SOURCES = conqoper.c c_defs.h defs.h conqdef.h conqcom.h context.h
-conqoper_LDADD = libconqclnt.la libconquest.la libUi.la libUiCU.la 
+conqoper_LDADD = libUiCU.la libUi.la libconqclnt.la libconquest.la
 
 conqdriv_SOURCES = conqdriv.c c_defs.h defs.h conqdef.h conqcom.h context.h
 conqdriv_LDADD = libconquest.la 
@@ -319,8 +319,8 @@ conqmetad_DEPENDENCIES = libconquest.la
 conqmetad_LDFLAGS =
 am_conqoper_OBJECTS = conqoper.$(OBJEXT)
 conqoper_OBJECTS = $(am_conqoper_OBJECTS)
-conqoper_DEPENDENCIES = libconqclnt.la libconquest.la libUi.la \
-	libUiCU.la
+conqoper_DEPENDENCIES = libUiCU.la libUi.la libconqclnt.la \
+	libconquest.la
 conqoper_LDFLAGS =
 am_conqstrat_OBJECTS = conqstrat-yacc.$(OBJEXT) conqstrat-lex.$(OBJEXT)
 conqstrat_OBJECTS = $(am_conqstrat_OBJECTS)
@@ -328,8 +328,8 @@ conqstrat_DEPENDENCIES = libconquest.la
 conqstrat_LDFLAGS =
 am_conquest_OBJECTS = conquest.$(OBJEXT) conqreplay.$(OBJEXT)
 conquest_OBJECTS = $(am_conquest_OBJECTS)
-conquest_DEPENDENCIES = libconqclnt.la libconquest.la libUi.la \
-	libUiCU.la
+conquest_DEPENDENCIES = libUiCU.la libUi.la libconqclnt.la \
+	libconquest.la
 conquest_LDFLAGS =
 am_conquestd_OBJECTS = conquestd.$(OBJEXT)
 conquestd_OBJECTS = $(am_conquestd_OBJECTS)
@@ -337,8 +337,8 @@ conquestd_DEPENDENCIES = libconqserv.la libconquest.la
 conquestd_LDFLAGS =
 am_conquestgl_OBJECTS = conquestgl.$(OBJEXT)
 conquestgl_OBJECTS = $(am_conquestgl_OBJECTS)
-conquestgl_DEPENDENCIES = libconqclnt.la libconquest.la libUi.la \
-	libUiGL.la
+conquestgl_DEPENDENCIES = libUiGL.la libUi.la libconqclnt.la \
+	libconquest.la
 conquestgl_LDFLAGS =
 am_conquestsh_OBJECTS = conquestsh.$(OBJEXT)
 conquestsh_OBJECTS = $(am_conquestsh_OBJECTS)
@@ -950,8 +950,8 @@ maintainer-clean-generic:
 	@echo "This command is intended for maintainers to use"
 	@echo "it deletes files that may require special tools to rebuild."
 	-rm -f conqstrat-yacc.h
-	-rm -f conqstrat-yacc.c
 	-rm -f conqstrat-lex.c
+	-rm -f conqstrat-yacc.c
 clean: clean-am
 
 clean-am: clean-binPROGRAMS clean-generic clean-libLTLIBRARIES \

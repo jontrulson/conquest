@@ -405,12 +405,6 @@ int main(int argc, char *argv[])
 	exit(1);
       }
 
-  if ((ConquestUID = getUID(ROOT_USER)) == ERR)
-    {
-      fprintf(stderr, "%s: getUID() failed\n", progName);
-      exit(1);
-    }
-  
   if ((ConquestGID = getConquestGID()) == ERR)
     {
       fprintf(stderr, "%s: getConquestGID() failed\n", progName);

@@ -29,7 +29,7 @@
 
 /* 4.22 05Sep86 CAL .*(): Removed tutorial feature. Made tuning constants */
 /*                   constants again. Increased username sizes. */
-/*                  .cumUserStats(): Tweak heading. */
+/*                  .mcuUserStats(): Tweak heading. */
 /*                  .dowarp(): Don't need to clbFixDeltas(). */
 /*                  .executeai(): Stop repair mode when setting warp. */
 /*                  .clbChalkup(): New routine to help with kills accounting. */
@@ -305,7 +305,7 @@
 #define PHOON_FIRST 2 		/* first quarter */
 #define PHOON_FULL 3 		/* full */
 
-/* Tokens for cumPutThing(), must be negative */
+/* Tokens for mcuPutThing(), must be negative */
 #define THING_EXPLOSION -1 	/* a torpedo explosion */
 #define THING_DEATHSTAR -2 	/* the Empire's new toy */
 
@@ -552,7 +552,8 @@
 #define TERM_ABORT  '\033' 	/* escape - like BACK */
 #define TERMS "\r\t\033" 	/* must agree with above characters! */
 
-#define TERM_REDRAW '\014'	/* Redraw/Refresh */
+#define TERM_REDRAW '\014'	/* ^L Redraw/Refresh */
+#define TERM_RELOAD '\022'	/* ^R reload data from server */
 
 /* Magic characters */
 #define CHAR_CLOAKED '~' 	/* used to display self-cloaked ship */

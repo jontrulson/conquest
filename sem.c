@@ -176,9 +176,11 @@ void Unlock(int what)
   
   if (retval != 0)
     {				/* couldn't get semvals */
+#if !defined(CYGWIN)
       clog("Unlock(%s): semctl(GETALL) failed: %s",
 	   getsemtxt(what),
 	   strerror(errno));
+#endif
     }
   else
     {				/* got semvals... */

@@ -263,6 +263,8 @@ int main(int argc, char *argv[])
     }
 
 
+  rndini( 0, 0 );		/* initialize random numbers */
+  
   /* a parallel universe, it is */
   map_lcommon();
   
@@ -272,8 +274,6 @@ int main(int argc, char *argv[])
   
   conqinit();			/* machine dependent initialization */
   iBufInit();
-  
-  rndini( 0, 0 );		/* initialize random numbers */
   
 #ifdef DEBUG_FLOW
   clog("%s@%d: main() starting cdinit().", __FILE__, __LINE__);

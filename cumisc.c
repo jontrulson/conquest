@@ -27,8 +27,8 @@ static char cbuf[MID_BUFFER_SIZE]; /* general purpose buffer */
 /*  histlist - display the last usage list */
 /*  SYNOPSIS */
 /*    int godlike */
-/*    cumHistList( godlike ) */
-void cumHistList( int godlike )
+/*    mcuHistList( godlike ) */
+void mcuHistList( int godlike )
 {
   int i, j, unum, lin, col, fline, lline, thistptr = 0;
   int ch;
@@ -96,7 +96,7 @@ void cumHistList( int godlike )
 	    }
 	}
       
-      cumPutPrompt( MTXT_DONE, MSG_LIN2 );
+      mcuPutPrompt( MTXT_DONE, MSG_LIN2 );
       cdrefresh();
       if ( iogtimed( &ch, 1.0 ) )
 	break;				/* exit loop if we got one */
@@ -111,8 +111,8 @@ void cumHistList( int godlike )
 /*  puthing - put an object on the display */
 /*  SYNOPSIS */
 /*    int what, lin, col */
-/*    cumPutThing( what, lin, col ) */
-void cumPutThing( int what, int lin, int col )
+/*    mcuPutThing( what, lin, col ) */
+void mcuPutThing( int what, int lin, int col )
 {
   int i, j, tlin, tcol;
   char buf[3][7];
@@ -179,8 +179,8 @@ void cumPutThing( int what, int lin, int col )
 /*  readmsg - display a message */
 /*  SYNOPSIS */
 /*    int snum, msgnum */
-/*    cumReadMsg( snum, msgnum ) */
-int cumReadMsg( int snum, int msgnum, int dsplin )
+/*    mcuReadMsg( snum, msgnum ) */
+int mcuReadMsg( int snum, int msgnum, int dsplin )
 {
   char buf[MSGMAXLINE];
   unsigned int attrib = 0;
@@ -198,7 +198,7 @@ int cumReadMsg( int snum, int msgnum, int dsplin )
   appstr( Msgs[msgnum].msgbuf, buf );
 
   uiPutColor(attrib);
-  cumPutMsg( buf, dsplin );
+  mcuPutMsg( buf, dsplin );
   uiPutColor(0);
 				/* clear second line if sending to MSG_LIN1 */
   if (dsplin == MSG_LIN1)
@@ -211,7 +211,7 @@ int cumReadMsg( int snum, int msgnum, int dsplin )
 }
 
 				/* convert a KP key into an angle */
-int cumKPAngle(int ch, real *angle)
+int mcuKPAngle(int ch, real *angle)
 {
   int rv;
   
@@ -262,7 +262,7 @@ int cumKPAngle(int ch, real *angle)
 }
 
 				/* convert a KP key into a 'dir' key */
-int cumKP2DirKey(int *ch)
+int mcuKP2DirKey(int *ch)
 {
   int rv;
   char cch;
@@ -319,7 +319,7 @@ int cumKP2DirKey(int *ch)
 
 
 /* display the conquest logo. returns last line number following */
-int cumConqLogo(void)
+int mcuConqLogo(void)
 {
   int col, lin, lenc1;
   string c1=" CCC    OOO   N   N   QQQ   U   U  EEEEE   SSSS  TTTTT";
@@ -361,8 +361,8 @@ int cumConqLogo(void)
 /*  SYNOPSIS */
 /*    char str() */
 /*    int pnum, snum */
-/*    cumInfoPlanet( str, pnum, snum ) */
-void cumInfoPlanet( char *str, int pnum, int snum )
+/*    mcuInfoPlanet( str, pnum, snum ) */
+void mcuInfoPlanet( char *str, int pnum, int snum )
 {
   int i, j; 
   int godlike, canscan; 
@@ -372,7 +372,7 @@ void cumInfoPlanet( char *str, int pnum, int snum )
   /* Check range of the passed planet number. */
   if ( pnum <= 0 || pnum > NUMPLANETS )
     {
-      cumPutMsg( "No such planet.", MSG_LIN1 );
+      mcuPutMsg( "No such planet.", MSG_LIN1 );
       cdclrl( MSG_LIN2, 1 );
       cdmove( MSG_LIN1, 1 );
       cerror("infoplanet: Called with invalid pnum (%d).",
@@ -533,9 +533,9 @@ void cumInfoPlanet( char *str, int pnum, int snum )
   if ( i <= j )
     {
       /* The first part is small enough. */
-      cumPutMsg( buf, MSG_LIN1 );
+      mcuPutMsg( buf, MSG_LIN1 );
       if ( junk[0] != EOS )
-	cumPutMsg( junk, MSG_LIN2 );
+	mcuPutMsg( junk, MSG_LIN2 );
       else
 	cdclrl( MSG_LIN2, 1 );
     }
@@ -548,8 +548,8 @@ void cumInfoPlanet( char *str, int pnum, int snum )
       appchr( ' ', buf );
       appstr( junk, buf );
       buf[i] = EOS;				/* terminate at blank */
-      cumPutMsg( buf, MSG_LIN1 );
-      cumPutMsg( &buf[i+1], MSG_LIN2 );
+      mcuPutMsg( buf, MSG_LIN1 );
+      mcuPutMsg( &buf[i+1], MSG_LIN2 );
     }
   
   cdmove( MSG_LIN1, 1 );
@@ -560,39 +560,33 @@ void cumInfoPlanet( char *str, int pnum, int snum )
 /*  infoship - write out information about a ship */
 /*  SYNOPSIS */
 /*    int snum, scanner */
-/*    cumInfoShip( snum, scanner ) */
-void cumInfoShip( int snum, int scanner )
+/*    mcuInfoShip( snum, scanner ) */
+void mcuInfoShip( int snum, int scanner )
 {
   int i, status;
   char junk[MSGMAXLINE];
   real x, y, dis, kills, appx, appy;
   int godlike, canscan;
   static char tmpstr[BUFFER_SIZE];
-
-#define BETTER_ETA		/* we'll try this out for a release */
-#undef DEBUG_ETA		/* define for debugging */
-
-#if defined(BETTER_ETA)
   real pwarp, diffdis, close_rate;
   time_t difftime, curtime;
   static time_t oldtime = 0;
   static real avgclose_rate, olddis = 0.0, oldclose_rate = 0.0;
   static int oldsnum = 0;
-#endif /* BETTER_ETA */
 
   godlike = ( scanner < 1 || scanner > MAXSHIPS );
   
   cdclrl( MSG_LIN1, 2 );
   if ( snum < 1 || snum > MAXSHIPS )
     {
-      cumPutMsg( "No such ship.", MSG_LIN1 );
+      mcuPutMsg( "No such ship.", MSG_LIN1 );
       cdmove( MSG_LIN1, 1 );
       return;
     }
   status = Ships[snum].status;
   if ( ! godlike && status != SS_LIVE )
     {
-      cumPutMsg( "Not found.", MSG_LIN1 );
+      mcuPutMsg( "Not found.", MSG_LIN1 );
       cdmove( MSG_LIN1, 1 );
       return;
     }
@@ -605,7 +599,7 @@ void cumInfoShip( int snum, int scanner )
     {
       /* Silly Captain... */
       appstr( ": That's us, silly!", cbuf );
-      cumPutMsg( cbuf, MSG_LIN1 );
+      mcuPutMsg( cbuf, MSG_LIN1 );
       cdmove( MSG_LIN1, 1 );
       return;
     }
@@ -689,7 +683,7 @@ void cumInfoShip( int snum, int scanner )
 	appstr( "at peace.", cbuf );
     }
   
-  cumPutMsg( cbuf, MSG_LIN1 );
+  mcuPutMsg( cbuf, MSG_LIN1 );
   
   if ( ! SCLOAKED(snum) || Ships[snum].warp > 0.0 )
     {
@@ -699,7 +693,6 @@ void cumInfoShip( int snum, int scanner )
 	     Context.lasttdist, Context.lasttang );
 
 
-#if defined(BETTER_ETA)
       if (UserConf.DoETAStats)
 	{
 	  if (Ships[scanner].warp > 0.0 || Ships[snum].warp > 0.0)
@@ -791,24 +784,6 @@ clog("infoship:\tdis(%.1f) pwarp(%.1f) = (close_rate(%.1f) / MM_PER_SEC_PER_WARP
 		}
 	    }
 	} /* if do ETA stats */
-#else /* not a BETTER_ETA */
-
-      if (UserConf.DoETAStats)
-	{
-	  if (Ships[scanner].warp > 0.0 || Ships[snum].warp > 0.0)
-	    {
-				/* take other ships velocity into account */
-	      cumwarp = 
-		(((Ships[scanner].warp > 0.0) ? Ships[scanner].warp : 0.0) + 
-		((Ships[snum].warp > 0.0) ? Ships[snum].warp : 0.0));
-
-	      sprintf(tmpstr, ", ETA %s",
-		      clbETAStr(cumwarp, dis));
-	      appstr(tmpstr, cbuf);
-	    }
-	} /* if do ETA stats */
-#endif /* !BETTER_ETA */
-
     }
   else				/* else cloaked and at w0 */
     {
@@ -850,7 +825,7 @@ clog("infoship:\tdis(%.1f) pwarp(%.1f) = (close_rate(%.1f) / MM_PER_SEC_PER_WARP
     {
       cbuf[0] = (char)toupper( cbuf[0] );
       appchr( '.', cbuf );
-      cumPutMsg( cbuf, MSG_LIN2 );
+      mcuPutMsg( cbuf, MSG_LIN2 );
     }
   
   cdmove( MSG_LIN1, 1 );
@@ -861,8 +836,8 @@ clog("infoship:\tdis(%.1f) pwarp(%.1f) = (close_rate(%.1f) / MM_PER_SEC_PER_WARP
 /*  planlist - list planets */
 /*  SYNOPSIS */
 /*    int team */
-/*    cumPlanetList( team ) */
-void cumPlanetList( int team, int snum )
+/*    mcuPlanetList( team ) */
+void mcuPlanetList( int team, int snum )
 {
   int i, lin, col, olin, pnum;
   static int sv[NUMPLANETS + 1];
@@ -1102,9 +1077,9 @@ void cumPlanetList( int team, int snum )
 	    } /* while */
 
 	  if ((PlanetOffset + PlanetIdx) > NUMPLANETS)
-	    cumPutPrompt( MTXT_DONE, MSG_LIN2 );
+	    mcuPutPrompt( MTXT_DONE, MSG_LIN2 );
 	  else
-	    cumPutPrompt( MTXT_MORE, MSG_LIN2 );
+	    mcuPutPrompt( MTXT_MORE, MSG_LIN2 );
 
 	  cdrefresh();
 
@@ -1145,8 +1120,8 @@ void cumPlanetList( int team, int snum )
 /*  playlist - list ships */
 /*  SYNOPSIS */
 /*    int godlike, doall */
-/*    cumPlayList( godlike, doall ) */
-void cumPlayList( int godlike, int doall, int snum )
+/*    mcuPlayList( godlike, doall ) */
+void mcuPlayList( int godlike, int doall, int snum )
 {
   int i, unum, status, kb, lin, col;
   int fline, lline, fship;
@@ -1278,7 +1253,7 @@ void cumPlayList( int godlike, int doall, int snum )
       if ( i > MAXSHIPS )
 	{
 	  /* We're displaying the last page. */
-	  cumPutPrompt( MTXT_DONE, MSG_LIN2 );
+	  mcuPutPrompt( MTXT_DONE, MSG_LIN2 );
 	  cdrefresh();
 	  if ( iogtimed( &ch, 1.0 ) )
 	    {
@@ -1291,7 +1266,7 @@ void cumPlayList( int godlike, int doall, int snum )
       else
 	{
 	  /* There are ships left to display. */
-	  cumPutPrompt( MTXT_MORE, MSG_LIN2 );
+	  mcuPutPrompt( MTXT_MORE, MSG_LIN2 );
 	  cdrefresh();
 	  if ( iogtimed( &ch, 1.0 ) )
 	    {
@@ -1313,8 +1288,8 @@ void cumPlayList( int godlike, int doall, int snum )
 /*  SYNOPSIS */
 /*    int flag, review */
 /*    int snum, slm */
-/*    flag = cumReviewMsgs( snum, slm ) */
-int cumReviewMsgs( int snum, int slm )
+/*    flag = mcuReviewMsgs( snum, slm ) */
+int mcuReviewMsgs( int snum, int slm )
 {
   int ch, Done, i, msg, tmsg, lastone; 
   int didany;
@@ -1342,9 +1317,9 @@ int cumReviewMsgs( int snum, int slm )
     {
       if ( clbCanRead( snum, msg ))
 	{
-	  cumReadMsg( snum, msg, MSG_LIN1 );
+	  mcuReadMsg( snum, msg, MSG_LIN1 );
 	  didany = TRUE;
-	  cumPutPrompt( "--- [SPACE] for more, arrows to scroll, any key to quit ---", 
+	  mcuPutPrompt( "--- [SPACE] for more, arrows to scroll, any key to quit ---", 
 		  MSG_LIN2 );
 	  cdrefresh();
 	  ch = iogchar();
@@ -1407,8 +1382,8 @@ int cumReviewMsgs( int snum, int slm )
 /*  teamlist - list team statistics */
 /*  SYNOPSIS */
 /*    int team */
-/*    cumTeamList( team ) */
-void cumTeamList( int team )
+/*    mcuTeamList( team ) */
+void mcuTeamList( int team )
 {
   int i, j, lin, col, ctime, etime;
   int godlike;
@@ -1654,8 +1629,8 @@ void cumTeamList( int team )
 
 /*  userlist - display the user list */
 /*  SYNOPSIS */
-/*    cumUserList( godlike ) */
-void cumUserList( int godlike, int snum )
+/*    mcuUserList( godlike ) */
+void mcuUserList( int godlike, int snum )
 {
   int i, j, unum, nu, fuser, fline, lline, lin;
   static int uvec[MAXUSERS];
@@ -1749,7 +1724,7 @@ void cumUserList( int godlike, int snum )
       if ( i >= nu )
 	{
 	  /* We're displaying the last page. */
-	  cumPutPrompt( MTXT_DONE, MSG_LIN2 );
+	  mcuPutPrompt( MTXT_DONE, MSG_LIN2 );
 	  cdrefresh();
 	  if ( iogtimed( &ch, 1.0 ) )
 	    {
@@ -1762,7 +1737,7 @@ void cumUserList( int godlike, int snum )
       else
 	{
 	  /* There are users left to display. */
-	  cumPutPrompt( MTXT_MORE, MSG_LIN2 );
+	  mcuPutPrompt( MTXT_MORE, MSG_LIN2 );
 	  cdrefresh();
 	  if ( iogtimed( &ch, 1.0 ) )
 	    {
@@ -1783,8 +1758,8 @@ void cumUserList( int godlike, int snum )
 
 /*  userstats - display the user list */
 /*  SYNOPSIS */
-/*    cumUserStats( godlike, snum ) */
-void cumUserStats( int godlike , int snum )
+/*    mcuUserStats( godlike, snum ) */
+void mcuUserStats( int godlike , int snum )
 {
   int i, j, unum, nu, fuser, fline, lline, lin;
   static int uvec[MAXUSERS];
@@ -1882,7 +1857,7 @@ void cumUserStats( int godlike , int snum )
       if ( i >= nu )
 	{
 	  /* We're displaying the last page. */
-	  cumPutPrompt( MTXT_DONE, MSG_LIN2 );
+	  mcuPutPrompt( MTXT_DONE, MSG_LIN2 );
 	  cdrefresh();
 	  if ( iogtimed( &ch, 1.0 ) )
 	    {
@@ -1895,7 +1870,7 @@ void cumUserStats( int godlike , int snum )
       else
 	{
 	  /* There are users left to display. */
-	  cumPutPrompt( MTXT_MORE, MSG_LIN2 );
+	  mcuPutPrompt( MTXT_MORE, MSG_LIN2 );
 	  cdrefresh();
 	  if ( iogtimed( &ch, 1.0 ) )
 	    {
@@ -1916,13 +1891,13 @@ void cumUserStats( int godlike , int snum )
 /*  confirm - ask the user to confirm a dangerous action */
 /*  SYNOPSIS */
 /*    int ok, confirm */
-/*    ok = cumConfirm() */
-int cumConfirm(void)
+/*    ok = mcuConfirm() */
+int mcuConfirm(void)
 {
   static char *cprompt = "Are you sure? ";
   int scol = ((Context.maxcol - strlen(cprompt)) / 2);
 
-  if (cumAskYN("Are you sure? ", MSG_LIN2, scol))
+  if (mcuAskYN("Are you sure? ", MSG_LIN2, scol))
     return(TRUE);
   else
     return (FALSE);
@@ -1930,7 +1905,7 @@ int cumConfirm(void)
 }
 
 /*  askyn - ask the user a yes/no question - return TRUE if yes */
-int cumAskYN(char *question, int lin, int col)
+int mcuAskYN(char *question, int lin, int col)
 {
   char ch, buf[MSGMAXLINE];
   
@@ -1956,8 +1931,8 @@ int cumAskYN(char *question, int lin, int col)
 /*    int lin, offset */
 /*    char terms(), buf() */
 /*    int len */
-/*    tch = cumGetCX( pmt, lin, offset, terms, buf, len ) */
-char cumGetCX( char *pmt, int lin, int offset, char *terms, char *buf, int len )
+/*    tch = mcuGetCX( pmt, lin, offset, terms, buf, len ) */
+char mcuGetCX( char *pmt, int lin, int offset, char *terms, char *buf, int len )
 {
   int i;
   
@@ -1979,8 +1954,8 @@ char cumGetCX( char *pmt, int lin, int offset, char *terms, char *buf, int len )
 /*    int lin, col */
 /*    real dir */
 /*    int flag, gettarget */
-/*    flag = cumGetTarget( pmt, lin, col, dir ) */
-int cumGetTarget( char *pmt, int lin, int col, real *dir, real cdefault )
+/*    flag = mcuGetTarget( pmt, lin, col, dir ) */
+int mcuGetTarget( char *pmt, int lin, int col, real *dir, real cdefault )
 {
   int i, j; 
   char ch, buf[MSGMAXLINE];
@@ -2018,16 +1993,16 @@ int cumGetTarget( char *pmt, int lin, int col, real *dir, real cdefault )
 /*  SYNOPSIS */
 /*    char pmt() */
 /*    int spacetyped, more */
-/*    spacetyped = cumMore( pmt ) */
-int cumMore( char *pmt )
+/*    spacetyped = mcuMore( pmt ) */
+int mcuMore( char *pmt )
 {
   int ch = 0; 
   string pml=MTXT_MORE;
   
   if ( pmt[0] != EOS )
-    cumPutPrompt( pmt, MSG_LIN2 );
+    mcuPutPrompt( pmt, MSG_LIN2 );
   else
-    cumPutPrompt( pml, MSG_LIN2 );
+    mcuPutPrompt( pml, MSG_LIN2 );
   
   cdrefresh();
   ch = iogchar();
@@ -2040,8 +2015,8 @@ int cumMore( char *pmt )
 /*  SYNOPSIS */
 /*    char file(), errmsg() */
 /*    int ignorecontroll, eatblanklines */
-/*    cumPageFile( file, errmsg, ignorecontroll, eatblanklines ) */
-void cumPageFile( char *file, char *errmsg )
+/*    mcuPageFile( file, errmsg, ignorecontroll, eatblanklines ) */
+void mcuPageFile( char *file, char *errmsg )
 {
   
   int plins = 1;
@@ -2052,14 +2027,14 @@ void cumPageFile( char *file, char *errmsg )
   
   if ((pfd = fopen(file, "r")) == NULL)
     {
-      clog("cumPageFile(): fopen(%s) failed: %s",
+      clog("mcuPageFile(): fopen(%s) failed: %s",
 	   file,
 	   strerror(errno));
       
       cdclear();
       cdredo();
       cdputc( errmsg, MSG_LIN2/2 );
-      cumMore( sdone );
+      mcuMore( sdone );
       
       return;
     }
@@ -2090,7 +2065,7 @@ void cumPageFile( char *file, char *errmsg )
       
       if (plins >= DISPLAY_LINS)
 	{
-	  if (!cumMore(MTXT_MORE))
+	  if (!mcuMore(MTXT_MORE))
 	    break;		/* bail if space not hit */
 	  
 	  cdclear();
@@ -2100,7 +2075,7 @@ void cumPageFile( char *file, char *errmsg )
   
   fclose(pfd);
   
-  cumMore(sdone);
+  mcuMore(sdone);
   
   return;
   
@@ -2111,8 +2086,8 @@ void cumPageFile( char *file, char *errmsg )
 /*  SYNOPSIS */
 /*    char msg() */
 /*    int line */
-/*    cumPutMsg( msg, line ) */
-void cumPutMsg( char *msg, int line )
+/*    mcuPutMsg( msg, line ) */
+void mcuPutMsg( char *msg, int line )
 {
   cdclrl( line, 1 );
   cdputs( msg, line, 1 );
@@ -2126,8 +2101,8 @@ void cumPutMsg( char *msg, int line )
 /*  SYNOPSIS */
 /*    char pmt() */
 /*    int line */
-/*    cumPutPrompt( pmt, line ) */
-void cumPutPrompt( char *pmt, int line )
+/*    mcuPutPrompt( pmt, line ) */
+void mcuPutPrompt( char *pmt, int line )
 {
   int i, dcol, pcol;
   
@@ -2145,7 +2120,7 @@ void cumPutPrompt( char *pmt, int line )
 /*  helplesson - verbose help */
 /*  SYNOPSIS */
 /*    helplesson */
-void cumHelpLesson(void)
+void mcuHelpLesson(void)
 {
   
   char buf[MSGMAXLINE];
@@ -2153,7 +2128,7 @@ void cumHelpLesson(void)
   
   sprintf(helpfile, "%s/%s", CONQSHARE, C_CONQ_HELPFILE);
   sprintf( buf, "%s: Can't open.", helpfile );
-  cumPageFile( helpfile, buf);
+  mcuPageFile( helpfile, buf);
   
   return;
   
@@ -2162,13 +2137,13 @@ void cumHelpLesson(void)
 /*  news - list current happenings */
 /*  SYNOPSIS */
 /*    news */
-void cumNews(void)
+void mcuNews(void)
 {
   char newsfile[BUFFER_SIZE];
   
   sprintf(newsfile, "%s/%s", CONQSHARE, C_CONQ_NEWSFILE);
   
-  cumPageFile( newsfile, "No news is good news.");
+  mcuPageFile( newsfile, "No news is good news.");
   
   return;
   
