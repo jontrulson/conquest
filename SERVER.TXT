@@ -24,6 +24,7 @@ CONTENTS:
     ### Setting up a server
          ## running a normal server
          ## notifying the metaserver
+         ## firewall considerations
          ## providing telnet access to your server (optional)
 	 ## Expiring users
 	    # Disabling expiration of users
@@ -143,6 +144,29 @@ CONTENTS:
    Of course, please make sure that your server is actually reachable
    from the Internet before notifying the Meta server.
 
+## firewall considerations
+
+   Most people that will run a server will also be using a firewall of
+   some sort to protect their networks. 
+
+   See the README file for the ports that conquest typically uses.  
+
+   Inbound access:
+
+     Tf you wish to allow internet access to your server, you will
+     need to allow inbound TCP _and_ UDP access to the game port (1701
+     by default).
+
+   Outbound access:
+
+     If you restrict outbound internet connections, you might want to
+     allow the following outgoing ports:
+
+      1700/tcp - if you want clients to be able to query the
+      metaserver for active servers.
+
+      1700/udp - if you want your own server to be able to announce
+      it's availability to the metaserver at conquest.radscan.com.
 
 ## providing telnet access to your server (optional)
 
