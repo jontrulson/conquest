@@ -57,13 +57,7 @@ FILELIST="ratfor.c cd2lb.h cd2lb.c iolb.h iolb.c conqlb.c
         nOptions.h nOptions.c colorGL.c colorCU.c cuclient.c ui.h uimisc.c
         cuclient.h conqlb.h udp.h udp.c"  
 
-IMAGES="img/*.bmp img/*.txf"
-
-if [ -e CHANGES ]
-then
-    FILELIST="$FILELIST CHANGES"
-    echo "### CHANGES file added."
-fi
+IMAGES="img/*.tga img/*.txf"
 
 mkdir $CONQVER 2>/dev/null
 mkdir $CONQVER/img

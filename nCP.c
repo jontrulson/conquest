@@ -2308,7 +2308,6 @@ static void command( int ch )
     case 'R':				/* repair mode */
       if ( ! SCLOAKED(Context.snum) )
 	{
-          clog("REPAIR");
           clrPrompt(MSG_LIN1);
 	  sendCommand(CPCMD_REPAIR, 0);
 	}
@@ -2390,6 +2389,10 @@ static void command( int ch )
     case '\n':
       cbuf[0] = EOS;
       _doinfo(cbuf, TERM_NORMAL);
+      break;
+
+    case ' ':
+      UserConf.DoLocalLRScan = !UserConf.DoLocalLRScan;
       break;
 
     case TERM_EXTRA:		/* Have [TAB] act like 'i\t' */

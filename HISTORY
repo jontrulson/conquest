@@ -8,11 +8,24 @@
          +--------------------------------------------------------+
 
                               Conquest HISTORY
+Version 8.0.1f 7/10/2004 (devel)
+
+        - switch to TARGA (.tga) format textures rather than BMP.
+          That alpha channel comes in handy.
+
+        - replaced lousy classd texture with a Mars texture.  Maybe
+          someone wants to create individual textures for each
+          planet someday? :)
+          
+        - hitting [SPACE] while looking at long-range map will toggle
+          between a Murisak centered, or ship centered map.  The
+          default map display is whatever you set for the
+          'do_local_lrscan=' option in your ~/.conquestrc file.
 
 Version 8.0.1e 7/7/2004 (devel)
 
         - patch from Clint Adams correcting a strange typedef bug in
-          datatyps.h that niether of my compilers detected.
+          datatypes.h that niether of my compilers detected.
 
           Also, add $(DESTDIR) to the image copy routines in
           Makefile.am. 

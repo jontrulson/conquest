@@ -47,11 +47,14 @@ static float FPS = 0.0;
 Bool drawing = True;
 
 /* textures... */
-typedef struct {
-    int width;
-    int height;
-    unsigned char *data;
-} textureImage;
+typedef struct              
+{
+  GLubyte	*imageData; 
+  GLuint	bpp;        
+  GLuint	width;      
+  GLuint	height;     
+  GLuint	texID;      
+} textureImage;             
 
 struct _texinfo {
   char *filename;
@@ -86,32 +89,32 @@ struct _texinfo {
 #define NUM_TEX 18
 
 struct _texinfo TexInfo[NUM_TEX] = { /* need to correlate with defines above */
-  { "img/star.bmp",      255 },
+  { "img/star.tga",      255 },
 
-  { "img/classm.bmp",    255 },
-  { "img/classd.bmp",    255 },
+  { "img/classm.tga",    255 },
+  { "img/classd.tga",    255 },
 
-  { "img/explode.bmp",   255 },
+  { "img/explode.tga",   255 },
 
-  { "img/shipfsc.bmp",   255 },
-  { "img/shipfde.bmp",   255 },
-  { "img/shipfcr.bmp",   255 },
+  { "img/shipfsc.tga",   255 },
+  { "img/shipfde.tga",   255 },
+  { "img/shipfcr.tga",   255 },
 
-  { "img/shipksc.bmp",   255 },
-  { "img/shipkde.bmp",   255 },
-  { "img/shipkcr.bmp",   255 },
+  { "img/shipksc.tga",   255 },
+  { "img/shipkde.tga",   255 },
+  { "img/shipkcr.tga",   255 },
 
-  { "img/shiprsc.bmp",   255 },
-  { "img/shiprde.bmp",   255 },
-  { "img/shiprcr.bmp",   255 },
+  { "img/shiprsc.tga",   255 },
+  { "img/shiprde.tga",   255 },
+  { "img/shiprcr.tga",   255 },
 
-  { "img/shiposc.bmp",   255 },
-  { "img/shipode.bmp",   255 },
-  { "img/shipocr.bmp",   255 },
+  { "img/shiposc.tga",   255 },
+  { "img/shipode.tga",   255 },
+  { "img/shipocr.tga",   255 },
 
-  { "img/doomsday.bmp",  255 },
+  { "img/doomsday.tga",  255 },
 
-  { "img/vbg.bmp",   255 },
+  { "img/vbg.tga",   255 },
 
 };
 
@@ -232,7 +235,7 @@ void drawBox(GLfloat x, GLfloat y, GLfloat size)
   const GLfloat z = 0.0;
   GLfloat rx, ry;
 
-#ifdef DEBUG
+#if 0
   clog("%s: x = %f, y = %f\n", __FUNCTION__, x, y);
 #endif
 
@@ -248,8 +251,7 @@ void drawBox(GLfloat x, GLfloat y, GLfloat size)
 }
 
 void drawQuad(GLfloat x, GLfloat y, GLfloat w, GLfloat h)
-{				/* draw a square centered on x,y
-				   USE BETWEEN glBegin/End pair! */
+{
   glBegin(GL_POLYGON);
   glVertex3f(x, y, 0.0); /* ll */
   glVertex3f(x + w, y, 0.0); /* lr */
@@ -327,7 +329,6 @@ void uiDrawPlanet( GLfloat x, GLfloat y, int pnum, int scale,
 {
   int what;
   GLfloat size = 10.0;
-  int texon = FALSE;
   char buf32[32];
   char torpchar;
   char planame[BUFFER_SIZE];
@@ -353,29 +354,27 @@ void uiDrawPlanet( GLfloat x, GLfloat y, int pnum, int scale,
   
   
   if (what == PLANET_SUN)
-    {				/* lets enable texture mapping for suns */
+    {
       glEnable(GL_TEXTURE_2D); 
       glBindTexture(GL_TEXTURE_2D, textures[TEX_SUN]);
-      texon = TRUE;
     }
   else if (what == PLANET_CLASSM)
     {
       glEnable(GL_TEXTURE_2D);
       glBindTexture(GL_TEXTURE_2D, textures[TEX_CLASSM]);
-      texon = TRUE;
     }
   else if (what == PLANET_DEAD || what == PLANET_MOON)
     {
       glEnable(GL_TEXTURE_2D);
       glBindTexture(GL_TEXTURE_2D, textures[TEX_CLASSD]);
-      texon = TRUE;
     }
   
   glTranslatef(0.0, 0.0, TRANZ);
   
   GLError();
-  glAlphaFunc(GL_GREATER, 0.000);
-  glEnable(GL_ALPHA_TEST);
+
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+  glEnable(GL_BLEND);
   
   glBegin(GL_POLYGON);
   
@@ -403,7 +402,7 @@ void uiDrawPlanet( GLfloat x, GLfloat y, int pnum, int scale,
           break;
         }
       
-      size = 40.0;		/* 'magnify' the texture */
+      size = 50.0;		/* 'magnify' the texture */
       break;
     case PLANET_CLASSM:
       glColor3f(0.9, 0.9, 0.9);
@@ -413,7 +412,7 @@ void uiDrawPlanet( GLfloat x, GLfloat y, int pnum, int scale,
     case PLANET_CLASSO:
     case PLANET_CLASSZ:
     case PLANET_DEAD:
-      glColor3f(0.8, 0.5, 0.5);	/* ? */
+      glColor3f(0.7, 0.7, 0.7);	/* ? */
       size = 10.0;
       break;
     case PLANET_GHOST:
@@ -431,20 +430,12 @@ void uiDrawPlanet( GLfloat x, GLfloat y, int pnum, int scale,
   if (scale == MAP_FAC)
     size /= 4.0;
   
-  if (texon)
-    drawTexBox(x, y, size);
-  else
-    drawBox(x, y, size);
+  drawTexBox(x, y, size);
   
   glEnd();
-  glDisable(GL_ALPHA_TEST);
   
-  if (texon)
-    {				
-      glDisable(GL_TEXTURE_2D); 
-      glDisable(GL_BLEND); 
-    }
-  
+  glDisable(GL_TEXTURE_2D); 
+  glDisable(GL_BLEND); 
 
   /*  text data... */
   if (scale == SCALE_FAC)
@@ -1271,6 +1262,9 @@ drawShip(GLfloat x, GLfloat y, GLfloat angle, char ch, int i, int color,
 
   sizeh = size / 2.0;
 
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+  glEnable(GL_BLEND);
+
   /* we draw this before the ship */
   if (((scale == SCALE_FAC) && Ships[i].pfuse > 0)) /* phaser action */
     {
@@ -1282,8 +1276,6 @@ drawShip(GLfloat x, GLfloat y, GLfloat angle, char ch, int i, int color,
       glRotatef(Ships[i].lastphase, 0.0, 0.0, z);
 
       glLineWidth(2.0);
-      glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-      glEnable(GL_BLEND);
 
       glBegin(GL_LINES);
       glColor4f(1.0, 1.0, 1.0, .9);
@@ -1292,7 +1284,6 @@ drawShip(GLfloat x, GLfloat y, GLfloat angle, char ch, int i, int color,
       glVertex3f(phaseradius, 0.0, z + 1.0);
       glEnd();
       
-      glDisable(GL_BLEND);
       glPopMatrix();
     }
 
@@ -1300,19 +1291,10 @@ drawShip(GLfloat x, GLfloat y, GLfloat angle, char ch, int i, int color,
 
   /* set a lower alpha if we are cloaked. */
   if (ch == '~')
-    {
-      alpha = 0.4;		/* transparent */
-      glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-      glEnable(GL_BLEND);
-    }
-  else
-    {
-      glAlphaFunc(GL_GREATER, 0.000);
-      glEnable(GL_ALPHA_TEST);
-    }
+    alpha = 0.4;		/* transparent */
 
   GLError();
-    
+  
 #ifdef DEBUG
   clog("DRAWSHIP(%s) x = %.1f, y = %.1f, ang = %.1f\n", buf, x, y, angle);
 #endif
@@ -1421,11 +1403,7 @@ drawShip(GLfloat x, GLfloat y, GLfloat angle, char ch, int i, int color,
 
   glPopMatrix();
 
-  if (ch == '~')
-    glDisable(GL_BLEND);
-  else
-    glDisable(GL_ALPHA_TEST);
-
+  glDisable(GL_BLEND);
 
   drawString(x, ((scale == SCALE_FAC) ? y - 5.0 : y - 4.0), z, buf, 
              vFontDL, color);
@@ -1597,111 +1575,76 @@ static void charInput(unsigned char key, int x, int y)
 }
   
 
-/* simple loader for 24bit bitmaps (data is in rgb-format) */
-static int LoadBMP(char *filename, textureImage *texture, unsigned char alpha)
-{
-    FILE *file;
-    unsigned short int bfType;
-    long int bfOffBits;
-    short int biPlanes;
-    short int biBitCount;
-    long int biSizeImage;
-    long int biSizeImageA;
-    unsigned char *readdata;
-    int i,j;
+static int LoadTGA(char *filename, textureImage *texture)
+{    
+  GLubyte TGAheader[12]={0,0,2,0,0,0,0,0,0,0,0,0}; /* Uncompressed TGA Header */
+  GLubyte TGAcompare[12]; /* Used To Compare TGA Header */
+  GLubyte header[6]; /* First 6 Useful Bytes From The Header */
+  GLuint bytesPerPixel; 
+  GLuint imageSize; 
+  GLuint temp;   
+  FILE *file = fopen(filename, "rb"); 
+  int i;
 
-    if ((file = fopen(filename, "rb")) == NULL)
+  if (!file)
     {
-        clog("File not found : %s:%s\n", filename, strerror(errno));
-        return FALSE;
-    }
-    if(!fread(&bfType, sizeof(short int), 1, file))
-    {
-        clog("Error reading file!\n");
-        return FALSE;
-    }
-    /* check if file is a bitmap */
-    if (bfType != 19778)
-    {
-        clog("Not a bitmap (*.bmp) file.\n");
-        return FALSE;
-    }        
-    /* get the file size */
-    /* skip file size and reserved fields of bitmap file header */
-    fseek(file, 8, SEEK_CUR);
-    /* get the position of the actual bitmap data */
-    if (!fread(&bfOffBits, sizeof(long int), 1, file))
-    {
-        clog("Error reading file!\n");
-        return FALSE;
-    }
-
-    /* skip size of bitmap info header */
-    fseek(file, 4, SEEK_CUR);
-    /* get the width of the bitmap */
-    fread(&texture->width, sizeof(int), 1, file);
-
-    /* get the height of the bitmap */
-    fread(&texture->height, sizeof(int), 1, file);
-
-    /* get the number of planes (must be set to 1) */
-    fread(&biPlanes, sizeof(short int), 1, file);
-    if (biPlanes != 1)
-    {
-        clog("Error: number of Planes not 1!\n");
-        return FALSE;
-    }
-    /* get the number of bits per pixel */
-    if (!fread(&biBitCount, sizeof(short int), 1, file))
-    {
-        clog("Error reading file: %s\n", strerror(errno));
-        return FALSE;
-    }
-    if (biBitCount != 24)
-    {
-        clog("Bits per Pixel not 24\n");
-        return FALSE;
-    }
-
-    biSizeImage = texture->width * texture->height * 3;
-    biSizeImageA = texture->width * texture->height * 4;	/* + alpha */
-
-    if ((readdata = malloc(biSizeImage)) == NULL)
-    {
-      clog("%s: malloc(%d) failed: %s\n", __FUNCTION__, biSizeImage, 
-	   strerror(errno));
+      clog("Error reading file: %s\n", strerror(errno));
       return FALSE;
     }
-    if ((texture->data = malloc(biSizeImageA)) == NULL)
+
+  if (fread(TGAcompare, 1, sizeof(TGAcompare), file) != sizeof(TGAcompare) || 
+      memcmp(TGAheader,TGAcompare,sizeof(TGAheader)) !=0 || 
+      fread(header,1,sizeof(header),file) != sizeof(header))
     {
-      clog("%s: malloc(%d) failed: %s\n", __FUNCTION__, biSizeImageA, 
-	   strerror(errno));
+      clog("Invalid file: %s\n", filename);
+      fclose(file);
       return FALSE;
     }
-    /* seek to the actual data */
-    fseek(file, bfOffBits, SEEK_SET);
-    if (!fread(readdata, biSizeImage, 1, file))
+  
+  texture->width = header[1] * 256 + header[0]; 
+  texture->height = header[3] * 256 + header[2];
+  
+  if (texture->width <= 0 || texture->height <= 0 ||
+     (header[4] !=24 && header[4] != 32))
     {
-        clog("Error reading file: %s\n", strerror(errno));
-        return FALSE;
+      clog("Invalid file format: %s\n", filename);
+      fclose(file);
+      return FALSE;
     }
-    /* swap red and blue (bgr -> rgb), add alpha channel */
-    for (i=0, j=0; i < biSizeImage; i+=3, j+=4)
+  
+  texture->bpp	= header[4];
+  bytesPerPixel	= texture->bpp / 8;
+  imageSize = texture->width * texture->height * bytesPerPixel;
+  texture->imageData = (GLubyte *)malloc(imageSize);
+  
+  if (!texture->imageData)
     {
-      texture->data[j] = readdata[i+2];
-      texture->data[j+1] = readdata[i+1];
-      texture->data[j+2] = readdata[i];
-
-      if (texture->data[j] == 0 && texture->data[j+1] == 0 &&
-	  texture->data[j+2] == 0)
-	texture->data[j+3] = 0;	/* set alpha 0 if black pixel */
-      else
-	texture->data[j+3] = alpha; 
+      clog("Texture alloc failed for %s\n", filename);
+      fclose(file);
+      return FALSE;
     }
-    if (readdata)
-      free(readdata);
 
-    return TRUE;
+  if (fread(texture->imageData, 1, imageSize, file) != imageSize)
+    {
+      if (texture->imageData)
+        free(texture->imageData);
+      
+      clog("Image data read failed for %s\n", filename);
+      fclose(file);
+      return FALSE;
+    }
+
+                                /* swap B and R */
+  for(i=0; i<imageSize; i+=bytesPerPixel)
+    {
+      temp=texture->imageData[i];
+      texture->imageData[i] = texture->imageData[i + 2];
+      texture->imageData[i + 2] = temp;
+    }
+  
+  fclose (file);
+  
+  return TRUE;	
 }
 
 static Bool LoadGLTextures()   /* Load Bitmaps And Convert To Textures */
@@ -1710,7 +1653,9 @@ static Bool LoadGLTextures()   /* Load Bitmaps And Convert To Textures */
     int rv;
     textureImage *texti;
     int i;
-    char filenm[512];
+    char filenm[MID_BUFFER_SIZE];
+    int type;
+    int components;         /* for RGBA */
 
     status = False;
 
@@ -1719,18 +1664,30 @@ static Bool LoadGLTextures()   /* Load Bitmaps And Convert To Textures */
 	texti = malloc(sizeof(textureImage));
 	sprintf(filenm, "%s/%s", 
 		CONQSHARE, TexInfo[i].filename);
-	if ((rv = LoadBMP(filenm, texti, 
-			  TexInfo[i].alpha)) == TRUE)
+	if ((rv = LoadTGA(filenm, texti)) == TRUE)
 	  {
 	    status = True;
 	    glGenTextures(1, &textures[i]);   /* create the texture */
 	    glBindTexture(GL_TEXTURE_2D, textures[i]);
 	    /* actually generate the texture */
-	    glTexImage2D(GL_TEXTURE_2D, 0, 4, texti->width, texti->height, 0,
-			 GL_RGBA, GL_UNSIGNED_BYTE, texti->data);
 	    /* use linear filtering */
 	    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+            if (texti->bpp == 32)
+              {
+                type = GL_RGBA;
+                components = 4;
+              }
+            else
+              {
+                type = GL_RGB;
+                components = 3;
+              }
+
+	    glTexImage2D(GL_TEXTURE_2D, 0, components, 
+                         texti->width, texti->height, 0,
+			 type, GL_UNSIGNED_BYTE, texti->imageData);
 	  }
 	
 	GLError();
@@ -1738,8 +1695,8 @@ static Bool LoadGLTextures()   /* Load Bitmaps And Convert To Textures */
 	/* free the ram we used in our texture generation process */
 	if (texti)
 	  {
-	    if (texti->data && rv == TRUE)
-	      free(texti->data);
+	    if (texti->imageData && rv == TRUE)
+	      free(texti->imageData);
 	    free(texti);
 	  }    
       }

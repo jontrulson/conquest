@@ -117,6 +117,8 @@ static int nCPHelpDisplay(dspConfig_t *dsp)
   cprintf(tlin,col,ALIGN_NONE,sfmt, "M", "short/long range sensor toggle");
   tlin++;
   cprintf(tlin,col,ALIGN_NONE,sfmt, "N", "change your name");
+  tlin++;
+  cprintf(tlin,col,ALIGN_NONE,sfmt, "[SPACE]", "toggle map/lrscan");
   
   /* Now do the right side. */
   tlin = lin;

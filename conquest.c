@@ -809,6 +809,10 @@ void command( int ch )
       iBufPut("i\r");		/* (get last info) */
       break;
 
+    case ' ':
+      UserConf.DoLocalLRScan = !UserConf.DoLocalLRScan;
+      break;
+
     case TERM_EXTRA:		/* Have [TAB] act like 'i\t' */
       iBufPut("i\t");		/* (get next last info) */
       break;
@@ -2145,6 +2149,8 @@ void dohelp( void )
   cprintf(tlin,col,ALIGN_NONE,sfmt, "M", "short/long range sensor toggle");
   tlin++;
   cprintf(tlin,col,ALIGN_NONE,sfmt, "N", "change your name");
+  tlin++;
+  cprintf(tlin,col,ALIGN_NONE,sfmt, "[SPACE]", "toggle map/lrscan");
   
   /* Now do the right side. */
   tlin = lin;

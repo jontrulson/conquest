@@ -1,15 +1,13 @@
 Credit where credit is due.  
 
 - original ship pixmaps, netrek 
-- BMP loader, NeHe
-- dead (classd) planet texture,
-  http://www.alterlinks.fr/downloads/textures/showplanete.php,
-- Earth (classm) pic, JPL.
+- TGA loader, NeHe
+- Earth, Mars (classm/classd) pics, JPL/NASA.
 - glut, Mark Kilgard
 - texfont, Mark Kilgard
 - OpenGL, The OpenGL dudes
 - Doomsday Machine, Star Trek (TOS): The Doomsday Machine
 - viewer backgound (not yet used), Hubble Ultra Deep Field
 - Xserver, Summit Platinum from Xi Graphics (www.xig.com). There is no
-  substitute. 
+  substitute.  :)
 

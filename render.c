@@ -270,7 +270,7 @@ void renderViewer(void)
    /* TEST */
   glBegin(GL_POLYGON);
   glColor3f(0.2, 0.2, 0.2);
-  drawRect(0.0, 0.0, (GLfloat)dConf.vW, (GLfloat)dConf.vH);
+  drawQuad(0.0, 0.0, (GLfloat)dConf.vW, (GLfloat)dConf.vH);
   glEnd();
 #endif
 
