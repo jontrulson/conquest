@@ -89,7 +89,7 @@ main(int argc, char *argv[])
   
   map_common();
   
-  if ( *commonrev != COMMONSTAMP )
+  if ( *CBlockRevision != COMMONSTAMP )
     error("common block mismatch");
   
 #ifdef SET_PRIORITY
@@ -110,9 +110,9 @@ main(int argc, char *argv[])
   cacc = 0;
   eacc = 0;
   
-  PVLOCK(lockword);
-  gsecs( drivtime );		/* prevent driver timeouts */
-  gsecs( playtime );
+  PVLOCK(&ConqInfo->lockword);
+  gsecs( &Driver->drivtime );		/* prevent driver timeouts */
+  gsecs( &Driver->playtime );
   cpid = getpid();
   
   /* Look for the force flag. */
@@ -132,28 +132,28 @@ main(int argc, char *argv[])
   if ( ! force )
     {
       /* Make sure we're supposed to be starting. */
-      if ( *drivstat != DRS_RESTART )
+      if ( Driver->drivstat != DRS_RESTART )
 	{
-	  PVUNLOCK(lockword);
-	  clog("conqdriv: we shouldn't be starting: drivstat = %d\n", *drivstat);
+	  PVUNLOCK(&ConqInfo->lockword);
+	  clog("conqdriv: we shouldn't be starting: drivstat = %d\n", Driver->drivstat);
 	  error("conqdriv: We shouldn't be starting...");
 	}
       
-      if ( *drivpid != 0 )
+      if ( Driver->drivpid != 0 )
 	{
-	  PVUNLOCK(lockword);
-	  clog("conqdriv: *drivpid != 0, drivpid = %d", *drivpid);
+	  PVUNLOCK(&ConqInfo->lockword);
+	  clog("conqdriv: Driver->drivpid != 0, drivpid = %d", Driver->drivpid);
 	  error("conqdriv: drivpid != 0");
 	}
     }
   else
     {
       /* Kill the other driver. */
-      if ( *drivstat == DRS_RUNNING )
+      if ( Driver->drivstat == DRS_RUNNING )
 	{
-	  *drivstat = DRS_KAMIKAZE;
+	  Driver->drivstat = DRS_KAMIKAZE;
 	  i = TIMEOUT_DRIVER * ITER_TENTHS;
-	  while ( *drivstat != DRS_OFF && i > 0 )
+	  while ( Driver->drivstat != DRS_OFF && i > 0 )
 	    {
 	      c_sleep( ITER_SECONDS );
 	      i = i - ITER_TENTHS;
@@ -161,21 +161,21 @@ main(int argc, char *argv[])
 	}
     }
   
-  *drivstat = DRS_STARTING;		/* show intent of becoming "the" driver */
+  Driver->drivstat = DRS_STARTING;		/* show intent of becoming "the" driver */
   rndini( 0, 0 );			/* init random numbers */
   pid = getpid(); /* store our pid */
-  *drivpid = pid;
-  glname( drivowner );		/* store our username */
+  Driver->drivpid = pid;
+  glname( Driver->drivowner );		/* store our username */
   
   /* Start within bounds. */
-  *drivsecs = modp1( *drivsecs, FIVEMINUTE_SECONDS );
+  Driver->drivsecs = modp1( Driver->drivsecs, FIVEMINUTE_SECONDS );
   
   /* Special hack to cause the one second fuse to expire upon entry. */
   drivtenths = 10;
   
-  *drivstat = DRS_RUNNING;
+  Driver->drivstat = DRS_RUNNING;
   
-  PVUNLOCK(lockword);
+  PVUNLOCK(&ConqInfo->lockword);
   
   if ( force )
     {
@@ -200,7 +200,7 @@ main(int argc, char *argv[])
   for ( s = 1; s <= MAXSHIPS; s = s + 1 )
     ship[s] = s;
   
-  while ( pid == *drivpid && *drivstat != DRS_KAMIKAZE )
+  while ( pid == Driver->drivpid && Driver->drivstat != DRS_KAMIKAZE )
     {
       if ( drivtenths >= 10 )
 	{
@@ -208,17 +208,18 @@ main(int argc, char *argv[])
 	  drivtenths = 0;
 	  
 	  /* Check for player timeout. */
-	  if ( dsecs( *playtime, drivtime ) >= TIMEOUT_PLAYER )
+	  if ( dsecs( Driver->playtime, &(Driver->drivtime) ) >= 
+	       TIMEOUT_PLAYER )
 	    {
-	      *drivpid = 0;
-	      *drivstat = DRS_OFF;
-	      drivowner[0] = EOS;
+	      Driver->drivpid = 0;
+	      Driver->drivstat = DRS_OFF;
+	      Driver->drivowner[0] = EOS;
 	      upchuck();
-	      clog("conqdriv:player timeout: dsecs(*playtime, drivtime) = %d\n", dsecs(*playtime, drivtime));
+	      clog("conqdriv:player timeout: dsecs(Driver->playtime, &(Driver->drivtime)) = %d\n", dsecs(Driver->playtime, &(Driver->drivtime)));
 	      break;
 	    }
 	  
-	  if ( *drivstat == DRS_RUNNING )
+	  if ( Driver->drivstat == DRS_RUNNING )
 	    {
 	      /* Randomize ship ordering. */
 	      for ( s = 1; s <= MAXSHIPS; s = s + 1 )
@@ -230,41 +231,42 @@ main(int argc, char *argv[])
 		}
 	      
 	      /* Do the big things first to sync the small things. */
-	      *drivsecs = modp1( *drivsecs + 1, FIVEMINUTE_SECONDS );
-	      if ( mod( *drivsecs, FIVEMINUTE_SECONDS ) == 0 )
+	      Driver->drivsecs = modp1( Driver->drivsecs + 1, FIVEMINUTE_SECONDS );
+	      if ( mod( Driver->drivsecs, FIVEMINUTE_SECONDS ) == 0 )
 		fivemindrive(); 
-	      if ( mod( *drivsecs, MINUTE_SECONDS ) == 0 )
+	      if ( mod( Driver->drivsecs, MINUTE_SECONDS ) == 0 )
 		mindrive();	
-	      if ( mod( *drivsecs, SUBMIN_SECONDS ) == 0 )
+	      if ( mod( Driver->drivsecs, SUBMIN_SECONDS ) == 0 )
 		{
 		  submindrive();
 		  upstats( &ctime, &etime, &cacc, &eacc,
-			  dcpuseconds, delapsedseconds );
+			  &ConqInfo->dcpuseconds, &ConqInfo->delapsedseconds );
 		}
 	      secdrive( ship );
 	      
 	      /* Update the common block every minute. */
-	      if ( mod( *drivsecs, MINUTE_SECONDS ) == 0 )
+	      if ( mod( Driver->drivsecs, MINUTE_SECONDS ) == 0 )
 		upchuck();
 	    }
 	}
-      if ( *drivstat == DRS_RUNNING )
+      if ( Driver->drivstat == DRS_RUNNING )
 	iterdrive( ship );
       c_sleep( ITER_SECONDS );
       drivtenths = drivtenths + ITER_TENTHS;
     }
   
   /* See if we should turn off. */
-  if ( *drivstat == DRS_KAMIKAZE )
+  if ( Driver->drivstat == DRS_KAMIKAZE )
     {
-      *drivpid = 0;
-      *drivstat = DRS_OFF;
-      drivowner[0] = EOS;
-      clog( "conqdriv:DRS_KAMIKAZE: *drivstat = %d\n", *drivstat);
+      Driver->drivpid = 0;
+      Driver->drivstat = DRS_OFF;
+      Driver->drivowner[0] = EOS;
+      clog( "conqdriv:DRS_KAMIKAZE: Driver->drivstat = %d\n", Driver->drivstat);
     }
   
   /* Make last minute driver stats update. */
-  upstats( &ctime, &etime, &cacc, &eacc, dcpuseconds, delapsedseconds );
+  upstats( &ctime, &etime, &cacc, &eacc, &ConqInfo->dcpuseconds, 
+	   &ConqInfo->delapsedseconds );
 
   exit(0);
 }
@@ -480,7 +482,7 @@ void secdrive( int *ship )
 	  if ( Ships[i].sdfuse < 0 )
 	    {
 	      /* This code may be too safe... */
-	      PVLOCK(lockword);
+	      PVLOCK(&ConqInfo->lockword);
 	      if ( Ships[i].status != SS_LIVE && Ships[i].sdfuse < 0 )
 		{
 		  Ships[i].sdfuse = Ships[i].sdfuse + 1;
@@ -491,7 +493,7 @@ void secdrive( int *ship )
 		      Ships[i].status = SS_OFF;
 		    }
 		}
-	      PVUNLOCK(lockword);
+	      PVUNLOCK(&ConqInfo->lockword);
 	      continue; /* next;*/
 	    }
 	}
@@ -502,7 +504,7 @@ void secdrive( int *ship )
 	  killship( i, KB_SHIT );
 	  continue; /* next;*/
 	}
-      if ( *closed )
+      if ( ConqInfo->closed )
 	if ( ! Users[Ships[i].unum].ooptions[OOPT_PLAYWHENCLOSED] )
 	  {
 	    killship( i, KB_EVICT );
@@ -511,7 +513,7 @@ void secdrive( int *ship )
       
       /* The ship is still alive. */
       if ( Ships[i].robot )
-	if ( ! *externrobots )
+	if ( ! ConqInfo->externrobots )
 	  robotai( i );
       
       /* Ship movement again. */
@@ -783,7 +785,7 @@ void secdrive( int *ship )
 	      /* Decrement armies. */
 	      if ( rnd() <= 0.1 )
 		intrude( MSG_DOOM, -Doomsday->lock );
-	      PVLOCK(lockword);
+	      PVLOCK(&ConqInfo->lockword);
 	      Planets[-Doomsday->lock].armies = Planets[-Doomsday->lock].armies - 1;
 	      if ( Planets[-Doomsday->lock].armies <= 0 )
 		{
@@ -792,7 +794,7 @@ void secdrive( int *ship )
 		  zeroplanet( -Doomsday->lock, 0 );
 		  doomfind();
 		}
-	      PVUNLOCK(lockword);
+	      PVUNLOCK(&ConqInfo->lockword);
 	    }
 	}
       else if ( Doomsday->lock > 0 )
@@ -900,7 +902,7 @@ void fivemindrive(void)
   real r;
   
   /* Drive the planets. */
-  PVLOCK(lockword);
+  PVLOCK(&ConqInfo->lockword);
   for ( i = 1; i <= NUMPLANETS; i = i + 1 )
     if (Planets[i].type != PLANET_SUN)
       if ( Planets[i].armies > 0 && Planets[i].team != TEAM_GOD )
@@ -930,7 +932,7 @@ void fivemindrive(void)
 		  rndint( REPOP_LOWER_BOUND, REPOP_UPPER_BOUND );
 	      }
 	  }
-  PVUNLOCK(lockword);
+  PVUNLOCK(&ConqInfo->lockword);
   
   return;
   
@@ -938,7 +940,7 @@ void fivemindrive(void)
 
 void SigTerminate(int sig)
 {
-  *drivstat = DRS_KAMIKAZE;
+  Driver->drivstat = DRS_KAMIKAZE;
   
   clog("conqdriv: Terminating on signal %d", sig);
   

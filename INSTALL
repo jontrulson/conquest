@@ -155,7 +155,7 @@ source file 'configure.in' is supplied for this purpose ;-)
 
 	As root, intialize the system-wide conquestrc file
 (/opt/conquest/etc/conquestrc by default) by typing ('make install'
-will do this for but if you want to be sure....):
+will do this for you, but if you want to be sure....):
 
 	/opt/bin/conqoper -C
 

@@ -40,7 +40,8 @@
 
 #define TABLESIZE 200 
 
-int value1, value2, mult1, mult2, inc1, inc2, modu1, modu2, table[TABLESIZE];
+static int value1, value2, mult1, mult2, inc1, inc2, modu1, modu2, 
+  table[TABLESIZE];
 
 
 /*  rndseq - internal routine to compute the next value in a linear */
@@ -49,9 +50,9 @@ int value1, value2, mult1, mult2, inc1, inc2, modu1, modu2, table[TABLESIZE];
 /*    integer*4 value, multiplier, increment, modulus */
 /*    rndseq ( value, multiplier, increment, modulus ) */
 /*  DESCRIPTION */
-void rndseq ( int value, int multiplier, int increment, int modulus )
+void rndseq ( int *value, int multiplier, int increment, int modulus )
 {
-  value = mod ( value * multiplier + increment, modulus );
+  *value = mod ( *value * multiplier + increment, modulus );
   
   return;
 }
@@ -72,7 +73,7 @@ void rndini ( int seed1, int seed2 )
 {
   
   int idx;
-  int now[8];
+  int now[NOWSIZE];
   
   /* Here are the multipliers, increments, and moduli for the two sequences. */
   /* Do not change these frivously!  They have been very carefully selected, */
@@ -82,7 +83,7 @@ void rndini ( int seed1, int seed2 )
   mult1 = 1541;	inc1 = 3501;	modu1 = 16384;
   mult2 = 5146;	inc2 = 4100;	modu2 = 19683;
   
-  getnow ( now );
+  getnow ( now, 0 );
   
   if ( seed1 != 0 )
     value1 = seed1;
@@ -98,7 +99,7 @@ void rndini ( int seed1, int seed2 )
   
   for ( idx=0; idx < TABLESIZE; idx=idx+1 )
     {
-      rndseq ( value2, mult2, inc2, modu2 );
+      rndseq ( &value2, mult2, inc2, modu2 );
       table[idx] = value2;
     }
   
@@ -108,7 +109,7 @@ void rndini ( int seed1, int seed2 )
 #endif
   
   
-  /*    srand48((long)(value1 * value2)); */
+  /*  srand48((long)(value1 * value2)); */
   srand48((long) time(0));
   return;
 }
@@ -125,10 +126,10 @@ real rnd ( void )
   int idx;
   real RET;
   
-  rndseq ( value1, mult1, inc1, modu1 );
+  rndseq ( &value1, mult1, inc1, modu1 );
   idx = ifix ( creal(value1) / creal(modu1) * TABLESIZE ) + 1;
   RET = creal(table[idx]) / creal(modu2);
-  rndseq ( value2, mult2, inc2, modu2 );
+  rndseq ( &value2, mult2, inc2, modu2 );
   table[idx] = value2;
   
   return(RET);

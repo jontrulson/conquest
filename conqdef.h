@@ -51,11 +51,12 @@
 
 /* Common block time stamp. */
 /* This define should be changed every time the common block changes. */
-/*#define COMMONSTAMP 861104 		/* stardate? */
-/*#define COMMONSTAMP 940910 		/* stardate? */
-/*#define COMMONSTAMP 961019 		/* stardate? */
-/*#define COMMONSTAMP 971207 		/* stardate? */
-#define COMMONSTAMP 980628 		/* stardate? */
+/*#define COMMONSTAMP 861104 		 stardate? */
+/*#define COMMONSTAMP 940910 		 stardate? */
+/*#define COMMONSTAMP 961019 		 stardate? */
+/*#define COMMONSTAMP 971207 		 stardate? */
+/*#define COMMONSTAMP 980628 		 stardate? */
+#define COMMONSTAMP 980823 		 /* stardate? */
 
 /* Copyright notice string. */
 #define COPYRIGHT "(C) 1983-1986 by Jef Poskanzer and Craig Leres"
@@ -194,7 +195,7 @@
 				   are extra */
 
 
-#define MAXUSERS 40 		/* maximum number of registered users */
+#define MAXUSERS 500 		/* maximum number of registered users */
 #define MAXUSERNAME 30 		/* maximum size of a user's login name */
 #define SIZEUSERNAME 32 		/* actual size (for alignment purposes) */
 #define MAXUSERPNAME 22 		/* maximum size of a user's pseudonym */
@@ -206,7 +207,7 @@
 #define TSTAT_SECONDS 1 	/* elapsed seconds for each team */
 #define TSTAT_CPUSECONDS 2 	/* cpu seconds used per team */
 #define TSTAT_WINS 3 		/* wins for each team */
-#define TSTAT_LOSSES 4 	/* losses for each team */
+#define TSTAT_LOSSES 4		/* losses for each team */
 #define TSTAT_ENTRIES 5 	/* number of entries for each team */
 #define TSTAT_CONQUERS 6 	/* number of conquers for each team */
 #define TSTAT_COUPS 7 		/* number of coups completed */
@@ -221,7 +222,7 @@
 #define USTAT_SECONDS 1 	/* elapsed seconds for each user */
 #define USTAT_CPUSECONDS 2 	/* cpu seconds used per user */
 #define USTAT_WINS 3 		/* total kills for each user */
-#define USTAT_LOSSES 4 	/* total losses for each user */
+#define USTAT_LOSSES 4		/* total losses for each user */
 #define USTAT_MAXKILLS 5 	/* maximum kills for each user */
 #define USTAT_ENTRIES 6 	/* number of entries for each user */
 #define USTAT_CONQUERS 7 	/* number conquers for each player */
@@ -253,10 +254,10 @@
 
 #define DATESIZE 20 		/* hh:mm:ss ddmmmyy */
 #define MAXMESSAGES 60 		/* maximum number of messages */
-#define MESSAGE_SIZE 70 		/* maximum size of messages */
+#define MESSAGE_SIZE 70		/* maximum size of messages */
 #define MSGMAXLINE 90 		/* maximum size for formatting messages */
 #define MSG_ALL -100 		/* message to everyone */
-#define MSG_NOONE -101 	/* message from/to no one */
+#define MSG_NOONE -101		/* message from/to no one */
 #define MSG_GOD -102 		/* message from/to GOD */
 #define MSG_DOOM -103 		/* message from the planet eater */
 #define MSG_OUTSIDE -104 	/* message from the outside world */
@@ -265,7 +266,7 @@
 
 /* Tokens for slastmsg(), must be negative. */
 #define LMSG_NEEDINIT -1 	/* need to initialize slastmsg */
-#define LMSG_READALL -2 		/* can read all messages */
+#define LMSG_READALL -2		/* can read all messages */
 
 /* Driver states. */
 #define DRS_OFF 0 		/* normal off mode */
@@ -333,7 +334,7 @@
 #define VAR_TORPDAM 18 
 #define VAR_INCOMING 19 
 #define MAX_VAR 20 
-#define REAL_MAX_VAR 32 		/* common block max (leaves room for expansion) */
+#define REAL_MAX_VAR 32		/* common block max (leaves room for expansion) */
 
 /* Robot action tokens. */
 #define ROB_NOOP 1 		/* do no-thing */
@@ -365,7 +366,7 @@
 /* Constants. */
 #define BOMBARD_KILLS 0.05 	/* kills per army bombarded */
 #define KILLS_KILLS 0.10 	/* extra kills per enemy kill */
-#define ARMY_KILLS 0.10 		/* extra kills per carried army killed */
+#define ARMY_KILLS 0.10		/* extra kills per carried army killed */
 #define PLANET_KILLS 0.25 	/* kills per planet taken */
 #define CONQUER_KILLS 3.0 	/* kills per universe conquered */
 #define DOOMSDAY_KILLS 5.0 	/* kills per planet eater eaten */
@@ -381,7 +382,7 @@
 #define SCANNED_FUSE 5 		/* seconds of timeout for sscanned(,) */
 
 #define PLANET_ORBIT_FAC 5.0 	/* planet orbit speed in degrees per minute */
-#define ENTRY_SMEAR_DIST 2500.0 	/* standard deviation for rndnor for entry */
+#define ENTRY_SMEAR_DIST 2500.0	/* standard deviation for rndnor for entry */
 #define ENTRY_ENEMY_DIST ACCINFO_DIST 
 				/* closest entry to an enemy ship */
 
@@ -427,7 +428,7 @@
 
 #define REPOP_LOWER_BOUND 1 	/* minimum births per repop */
 #define REPOP_UPPER_BOUND 3 	/* maximum births per repop */
-#define SPARSE_THRESH 3 		/* less than this has trouble repopping */
+#define SPARSE_THRESH 3		/* less than this has trouble repopping */
 #define SPARSE_REPOP_PROB 0.5 	/* probability of repop on sparse planets */
 #define MALTHUS_M_THRESH 90 	/* threshold for a class M Malthusian crisis */
 #define MALTHUS_D_THRESH 70 	/* threshold for a dead planet Malthusian crisis */
@@ -437,13 +438,12 @@
 
 #define WEAPON_DOWN_PROB 0.5 	/* probability weapons breaking when overheated */
 #define ENGINE_DOWN_PROB 0.5 	/* probability engines breaking when overheated */
-#define MIN_DOWN_FUSE 9 		/* minimum weapon/engine down time */
+#define MIN_DOWN_FUSE 9		/* minimum weapon/engine down time */
 #define MAX_DOWN_FUSE 36 	/* minimum weapon/engine down time */
 
 /* Various weapons constants. */
 #define PHASER_DIST 1000.0 	/* maximum range of phasers */
-/*#define PHASER_HIT 90.0 		/* blast from phasers at zero range */
-#define PHASER_HIT 80.0 		/* blast from phasers at zero range */
+#define PHASER_HIT 80.0		/* blast from phasers at zero range */
 #define PHASER_SPREAD 10.0 	/* half-angle of phaser beam in degrees */
 #define PHASER_FUEL 20.0 	/* fuel required to fire phasers */
 #define PHASER_TENTHS 10 	/* tenths for phasers to re-charge */
@@ -453,38 +453,37 @@
 #define EXPLOSION_FALLOFF 28.0 	/* explosions divided by this at PHASER_DIST */
 #define EXPLOSION_RADIUS 50.0 	/* things within this radius get maximum hits */
 
-/*#define TORPEDO_FUSE 30 		/* seconds a torp flies */
-#define TORPEDO_FUSE 50 		/* seconds a torp flies */
+#define TORPEDO_FUSE 50		/* seconds a torp flies */
 
-#define FIREBALL_FUSE 3 		/* seconds a torp explodes */
+#define FIREBALL_FUSE 3		/* seconds a torp explodes */
 #define TORPEDO_PROX 250.0 	/* proximity fuse distance */
 #define TORPEDO_HIT 72.0 	/* blast from a torp at zero range */
 #define TORPEDO_FUEL 10.0 	/* fuel required to launch a torp */
 #define TORPEDOWAIT_GRAND 5000 	/* hundreths to wait for live torps in dead() */
 
-#define DETONATE_DIST PHASER_DIST  /* maximum range of detonators */
+#define DETONATE_DIST PHASER_DIST /* maximum range of detonators */
 #define DETONATE_FUEL 5.0 	/* fuel required to fire detonators */
 
 #define BOMBARD_FUEL 10.0 	/* fuel required to bombard per second */
-#define BOMBARD_PROB 0.60 /*was .30*/	/* base probability of killing an army per try */
+#define BOMBARD_PROB 0.60	/*was .30 - base probability of killing an army per try */
 #define BOMBARD_GRAND 333 	/* hundreths to get one chance to bomb */
 
-#define BEAM_GRAND 2000 		/* hundreths to beam one army */
+#define BEAM_GRAND 2000		/* hundreths to beam one army */
 
 #define TRACTOR_DIST 560.0 	/* maximum range of tractor beams */
 #define TOW_DIST 500.0 		/* distance a towed ship trails by */
 #define BREAKAWAY_PROB 0.3 	/* chance to break free of a hostile tower */
 #define BREAKAWAY_GRAND 1000 	/* hundreths to break free from a hostile tower */
 
-#define DOOMSDAY_START_DIST 20000.0  /* distance from the center that it starts at */
+#define DOOMSDAY_START_DIST 20000.0 /* distance from the center that it starts at */
 #define DOOMSDAY_LENGTH 800.0 	/* length for display purposes */
 #define DOOMSDAY_WARP 2.0 	/* warp factor of the planet eater */
 #define DOOMSDAY_DIST 1500.0 	/* distance it starts shooting */
-#define DOOMSDAY_KILL_DIST 300.0  /* minimum distance for killing it */
+#define DOOMSDAY_KILL_DIST 300.0 /* minimum distance for killing it */
 #define DOOMSDAY_HIT 7.0 	/* blast per second */
 #define DOOMSDAY_PROB 0.0001 	/* probability per minute that it appears */
 #define MIN_UNINHAB_MINUTES 45 	/* minimum time till inhabitable */
-#define MAX_UNINHAB_MINUTES 120 	/* maximum time till inhabitable */
+#define MAX_UNINHAB_MINUTES 120	/* maximum time till inhabitable */
 
 				/* these are used to assign special
 				   ship numbers to represent non
@@ -502,10 +501,10 @@
 #define MIN_COUP_KILLS 3.0 	/* minimum kills required before a coup */
 #define MAX_COUP_ENEMY_ARMIES 20 /* maximum enemies allowable for coup to work */
 
-#define SCALE_FAC 170.0 		/* units per line in normal display */
+#define SCALE_FAC 170.0		/* units per line in normal display */
 #define MAP_FAC 1400.0 		/* units per line in map display */
 #define WIDTH_FAC 2.32 		/* columns to make one line */
-#define DISPLAY_LINS 21 		/* maximum lines used in display */
+#define DISPLAY_LINS 21		/* maximum lines used in display */
 #define STAT_COLS 24 		/* maximum columns used in stats */
 
 #define ITER_SECONDS 0.1 	/* seconds per minor iteration */
@@ -517,9 +516,8 @@
 #define COUP_GRAND 10000 	/* hunderths to attempt a coup */
 
 #define MSG_LIN1 (DISPLAY_LINS + 2) 
-/*#define MSG_LIN2 incr(MSG_LIN1 )			/* line for messages */
-#define MSG_LIN2 (MSG_LIN1 + 1)			/* line for messages */
-#define MSG_LIN3 (MSG_LIN1 + 2)			/* line for messages */
+#define MSG_LIN2 (MSG_LIN1 + 1)	/* line for messages */
+#define MSG_LIN3 (MSG_LIN1 + 2)	/* line for messages */
 
 
 #define TIMEOUT_DRIVER 10 	/* seconds of timeout for the driver */
@@ -528,11 +526,6 @@
 #define NEWMSG_GRAND 1900 	/* hundreths before displaying a new message */
 
 /* Terminators for dsgetx. */
-/*#define TERM_NORMAL '@^M' 	/* like NEXT */
-/*#define TERM_EXTRA '@^J' 	/* like shift-NEXT or shift-HELP */
-/*#define TERM_ABORT '@^[' 	/* escape - like BACK */
-/*#define TERMS "@^M@^J@^[" 	/* must agree with above characters! */
-
 #define TERM_NORMAL '\r' 	/* like NEXT */
 #define TERM_EXTRA '\t' 	/* like shift-NEXT or shift-HELP */
 #define TERM_ABORT '\033' 	/* escape - like BACK */
@@ -542,7 +535,7 @@
 #define CHAR_CLOAKED '~' 	/* used to display self-cloaked ship */
 
 /* Actual size of common block */
-#define SIZEOF_COMMONBLOCK 65536 
+#define SIZEOF_COMMONBLOCK 262144 /* New and Improved! */
 
 #define MAILADDR ""
 
@@ -561,19 +554,26 @@
 				   for an exploding ship */
 #define EXPLODESHIP_TORP_SPREAD   15.0	
 
+#define NOWSIZE 8		/* size of now[] arrays */
+
+#define MTXT_MORE "--- press [SPACE] to continue, any other key to quit ---"
+#define MTXT_DONE "--- press any key when done ---"
+
+				/* validuser types */
+#define UT_LOCAL (0)
+#define UT_REMOTE (1)
+
 /* Macros, here order is important. */
 
-/*#define round(x) jnint(x )				/* int round */
-#define round(x) ((int)rint((real)(x)))		/* int round */
+#define round(x) ((int)rint((real)(x)))	/* int round */
 
-/* #define around(x) anint(x) 	/* real round */
-#define around(x) ((real) rint((real)(x)))  	/* real round */
+#define around(x) ((real) rint((real)(x))) /* real round */
 
-#define oneplace(x) (real)(around((x) * 10.0)/10.0)	/* nearest tenth */
-#define dtor(x) (((real)(x) / 180.0) * PI)	/* degrees to radians */
-#define rtod(x) (((real)(x) / PI) * 180.0)	/* radians to degrees */
-#define cosd(x) (real)cos((real)dtor((x) ))	/* cosine of angle in degrees */
-#define sind(x) (real)sin((real)dtor((x) ))	/* sine of angle in degrees */
+#define oneplace(x) (real)(around((x) * 10.0)/10.0) /* nearest tenth */
+#define dtor(x) (((real)(x) / 180.0) * PI) /* degrees to radians */
+#define rtod(x) (((real)(x) / PI) * 180.0) /* radians to degrees */
+#define cosd(x) (real)cos((real)dtor((x) )) /* cosine of angle in degrees */
+#define sind(x) (real)sin((real)dtor((x) )) /* sine of angle in degrees */
 #define dist(w,x,y,z) (real) sqrt(pow((real)((y)-(w)), (real) 2.0) + pow((real)((z)-(x)), (real) 2.0))
 
 				/* fast distance */

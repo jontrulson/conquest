@@ -146,4 +146,5 @@
 /*#define DEBUG_RANDOM		/* debug the random number library */
 /*#define DEBUG_COLOR		/* debug color processing */
 /*#define DEBUG_IOGTIMED        /* debug timed input */
+/*#define DEBUG_SERVER        /* debug server operation */
 

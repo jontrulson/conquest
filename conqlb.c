@@ -118,10 +118,10 @@ void damage( int snum, real dam, int kb )
 void detonate( int snum, int tnum )
 {
   
-  PVLOCK(lockword);
+  PVLOCK(&ConqInfo->lockword);
   if ( Ships[snum].torps[tnum].status == TS_LIVE )
     Ships[snum].torps[tnum].status = TS_DETONATE;
-  PVUNLOCK(lockword);
+  PVUNLOCK(&ConqInfo->lockword);
   
   return;
   
@@ -381,7 +381,7 @@ void infoplanet( char *str, int pnum, int snum )
       sprintf( buf, "%s%s, a %s%s, range %d, direction %d%s",
 	     str,
 	     Planets[pnum].name,
-	     ptname[Planets[pnum].type],
+	     ConqInfo->ptname[Planets[pnum].type],
 	     junk,
 	     round( dist( x, y, Planets[pnum].x, Planets[pnum].y ) ),
 	     round( angle( x, y, Planets[pnum].x, Planets[pnum].y ) ),
@@ -391,7 +391,7 @@ void infoplanet( char *str, int pnum, int snum )
     sprintf( buf, "%s%s, a %s%s, range %d, direction %d",
 	   str,
 	   Planets[pnum].name,
-	   ptname[Planets[pnum].type],
+	   ConqInfo->ptname[Planets[pnum].type],
 	   junk,
 	   round( dist( x, y, Planets[pnum].x, Planets[pnum].y ) ),
 	   round( angle( x, y, Planets[pnum].x, Planets[pnum].y ) ));
@@ -702,9 +702,9 @@ void killship( int snum, int kb )
 #endif
   
 				/* internal routine. */
-  PVLOCK(lockword);
+  PVLOCK(&ConqInfo->lockword);
   ikill( snum, kb );
-  PVUNLOCK(lockword);
+  PVUNLOCK(&ConqInfo->lockword);
 
 				/* send a msg to all... */
   sendmsg = FALSE;
@@ -829,7 +829,7 @@ int launch( int snum, real dir, int number, int ltype )
   tnum = number;
   
   /* Find free torp(s). */
-  PVLOCK(lockword);
+  PVLOCK(&ConqInfo->lockword);
   for ( i = 0; i < MAXTORPS && tnum != 0; i++ )
     if ( Ships[snum].torps[i].status == TS_OFF )
       {
@@ -838,7 +838,7 @@ int launch( int snum, real dir, int number, int ltype )
 	tslot[numslots++] = i;
 	tnum--;
       }
-  PVUNLOCK(lockword);
+  PVUNLOCK(&ConqInfo->lockword);
   
   if (numslots == 0)
     {				/* couldn't find even one */
@@ -918,10 +918,10 @@ int launch( int snum, real dir, int number, int ltype )
   else
     {				/* torps away! */
       /* Update stats. */
-      PVLOCK(lockword);
+      PVLOCK(&ConqInfo->lockword);
       Users[Ships[snum].unum].stats[USTAT_TORPS] += numfired;
       Teams[Ships[snum].team].stats[TSTAT_TORPS] += numfired;
-      PVUNLOCK(lockword);
+      PVUNLOCK(&ConqInfo->lockword);
       
       if (numfired == number)
 	{			/* fired all requested */
@@ -996,10 +996,10 @@ int phaser( int snum, real dir )
     return ( FALSE );
   
   /* Update stats. */
-  PVLOCK(lockword);
+  PVLOCK(&ConqInfo->lockword);
   Users[Ships[snum].unum].stats[USTAT_PHASERS] += 1;
   Teams[Ships[snum].team].stats[TSTAT_PHASERS] += 1;
-  PVUNLOCK(lockword);
+  PVUNLOCK(&ConqInfo->lockword);
   
   /* Set up last fired direction. */
   Ships[snum].lastphase = dir;
@@ -1067,7 +1067,7 @@ void planlist( int team, int snum )
   int column_1 = 5;
   int column_2 = 43;
   char xbuf[BUFFER_SIZE];
-  char pd0[MID_BUFFER_SIZE];
+  static char pd0[MID_BUFFER_SIZE];
   static int FirstTime = TRUE;
   int PlanetOffset;		/* offset into NUMPLANETS for this page */
   int PlanetIdx = 0;
@@ -1254,7 +1254,8 @@ void planlist( int team, int snum )
 	      cdputs( xbuf, lin, col );
 	      
 	      col+=(strlen(xbuf));
-	      sprintf( xbuf, "%-4c %-3c  ", chrplanets[Planets[pnum].type], ch);
+	      sprintf( xbuf, "%-4c %-3c  ", 
+		       ConqInfo->chrplanets[Planets[pnum].type], ch);
 	      cdputs( xbuf, lin, col );
 	      
 	      col+=(strlen(xbuf));
@@ -1262,7 +1263,7 @@ void planlist( int team, int snum )
 	      if (junk[0] == '?')
 		attrset(YellowLevelColor);
 	      else
-		attrset(InfoColor);
+		attrset(outattr);
 	      cdputs( xbuf, lin, col );
 	      attrset(0); 
 
@@ -1287,8 +1288,11 @@ void planlist( int team, int snum )
 	      
 	    } /* while */
 
+	  if ((PlanetOffset + PlanetIdx) > NUMPLANETS)
+	    putpmt( MTXT_DONE, MSG_LIN2 );
+	  else
+	    putpmt( MTXT_MORE, MSG_LIN2 );
 
-	  putpmt( "--- press [SPACE] to continue, q to quit ---", MSG_LIN2 );
 	  cdrefresh();
 
 	  if (iogtimed( &cmd, 1 ))
@@ -1336,6 +1340,7 @@ void playlist( int godlike, int doall, int snum )
   char sbuf[20];
   char kbuf[20];
   char pidbuf[20];
+  char ubuf[SIZEUSERNAME + 2];
   int ch;
   char *hd1="ship name          pseudonym              kills      pid";
   
@@ -1386,10 +1391,16 @@ void playlist( int godlike, int doall, int snum )
 		    strcpy(pidbuf, "VACANT");
 		  else
 		    sprintf(pidbuf, "%6d", Ships[i].pid);
+		
+		  if (Users[unum].type == UT_REMOTE)
+		    strcpy(ubuf, "@");
+		  else
+		    strcpy(ubuf, "");
+		  strcat(ubuf, Users[unum].username);
 
 		  sprintf(kbuf, "%6.1f", (Ships[i].kills + Ships[i].strkills));
 		  sprintf( cbuf, "%-4s %-13.13s %-21.21s %-8s %6s",
-			   sbuf, Users[unum].username, Ships[i].alias, 
+			   sbuf, ubuf, Ships[i].alias, 
 			   kbuf, pidbuf );
 		}
 	      else
@@ -1433,14 +1444,10 @@ void playlist( int godlike, int doall, int snum )
 		{
 		  cbuf[0] = EOS;
 		  appsstatus( status, cbuf );
-		  /*		  appstr("(", cbuf);
-		  appint(Ships[i].pid, cbuf);
-		  appstr(")", cbuf);
-		  */
 		  
-		  attrset(YellowLevelColor);  /* dwp */
+		  attrset(YellowLevelColor);  
 		  cdputs( cbuf, lin, col - 2 - strlen( cbuf ) );
-		  attrset(0);          /* dwp */
+		  attrset(0); 
 		}
 	    }
 	  i = i + 1;
@@ -1449,7 +1456,7 @@ void playlist( int godlike, int doall, int snum )
       if ( i > MAXSHIPS )
 	{
 	  /* We're displaying the last page. */
-	  putpmt( "--- press space when done ---", MSG_LIN2 );
+	  putpmt( MTXT_DONE, MSG_LIN2 );
 	  cdrefresh();
 	  if ( iogtimed( &ch, 1 ) )
 	    {
@@ -1462,7 +1469,7 @@ void playlist( int godlike, int doall, int snum )
       else
 	{
 	  /* There are ships left to display. */
-	  putpmt( "--- press space for more ---", MSG_LIN2 );
+	  putpmt( MTXT_MORE, MSG_LIN2 );
 	  cdrefresh();
 	  if ( iogtimed( &ch, 1 ) )
 	    {
@@ -1527,16 +1534,20 @@ int c_register( char *lname, char *rname, int team, int *unum )
 {
   int i, j;
   
-  PVLOCK(lockword);
+  PVLOCK(&ConqInfo->lockword);
   for ( i = 0; i < MAXUSERS; i = i + 1 )
     if ( ! Users[i].live )
       {
 	Users[i].live = TRUE;
-	PVUNLOCK(lockword);
+	PVUNLOCK(&ConqInfo->lockword);
 	Users[i].rating = 0.0;
 	Users[i].team = team;
 	Users[i].robot = FALSE;
 	Users[i].multiple = 2;		/* but the option bit is off */
+	if (IsRemoteUser())
+	  Users[i].type = UT_REMOTE;
+	else
+	  Users[i].type = UT_LOCAL;
 	
 	for ( j = 0; j < MAXUSTATS; j = j + 1 )
 	  Users[i].stats[j] = 0;
@@ -1558,14 +1569,14 @@ int c_register( char *lname, char *rname, int team, int *unum )
 	
 	Users[i].ooptions[OOPT_SWITCHTEAMS] = TRUE; /* allow users to switchteams when dead */
 
-	stcpn( "never", Users[i].lastentry, DATESIZE );
+	Users[i].lastentry = 0;	/* never */
 	stcpn( lname, Users[i].username, MAXUSERNAME );
 	stcpn( rname, Users[i].alias, MAXUSERPNAME );
 	*unum = i;
 	return ( TRUE );
       }
   
-  PVUNLOCK(lockword);
+  PVUNLOCK(&ConqInfo->lockword);
   
   return ( FALSE );
   
@@ -1576,25 +1587,60 @@ int c_register( char *lname, char *rname, int team, int *unum )
 /*  SYNOPSIS */
 /*    int unum */
 /*    resign( unum ) */
-void resign( int unum )
+void resign( int unum, int isoper )
 {
-  int i;
+  int i, haderror = FALSE;
+  char *home = NULL;
+  char filenm[MID_BUFFER_SIZE];
+  struct passwd *pwp = NULL;
   
-  PVLOCK(lockword);
+  if (isoper == TRUE)
+    {				/* from conqoper, need to get homedir
+				   of CONQUEST_USER */
+      if ((pwp = getpwnam(CONQUEST_USER)) == NULL)
+	{
+	  clog("resign(unum = %d): getpwnam(%s) failed.",
+	       unum, CONQUEST_USER);
+	}
+    }
+
+  PVLOCK(&ConqInfo->lockword);
   if ( unum >= 0 && unum < MAXUSERS )
     {
       Users[unum].live = FALSE;
       for ( i = 0; i < MAXHISTLOG; i = i + 1 )
-	if ( unum == histunum[i] )
+	if ( unum == History[i].histunum )
 	  {
-	    histunum[i] = -1;
-	    histlog[i][0] = EOS;
+	    History[i].histunum = -1;
+	    History[i].histlog[0] = EOS;
 	  }
     }
-  PVUNLOCK(lockword);
-  
+
+  if (Users[unum].type == UT_REMOTE)
+    {				/* remove .conquestrc.unum file if
+				   remote user */
+      if (isoper == TRUE)	/* from conqoper */
+	home = (pwp != NULL) ? pwp->pw_dir : NULL;
+      else
+	home = getenv("HOME");
+      
+      if (home == NULL)
+	{
+	  clog("resign(unum = %d, isoper = %d): could not get homedir", 
+	       unum, isoper);
+	}
+      else
+	{
+      	  sprintf(filenm, "%s/.conquestrc.%d", home, unum);
+	  if (unlink(filenm) == -1)
+	    clog("resign(unum = %d): unlink('%s') failed: %s",
+		 unum, filenm, sys_errlist[errno]);
+	}
+    }
+
+  PVUNLOCK(&ConqInfo->lockword);
+	      
   return;
-  
 }
 
 
@@ -1611,7 +1657,7 @@ int review( int snum, int slm )
   didany = FALSE;
   Done = FALSE;
 
-  lastone = modp1( *lastmsg+1, MAXMESSAGES );
+  lastone = modp1( ConqInfo->lastmsg+1, MAXMESSAGES );
   if ( snum > 0 && snum <= MAXSHIPS )
     {
       if ( Ships[snum].lastmsg == LMSG_NEEDINIT )
@@ -1714,7 +1760,7 @@ void takeplanet( int pnum, int snum )
   appchr( '!', buf );
   
   /* Check whether the universe has been conquered. */
-  for ( i = 0; i < NUMCONPLANETS; i = i + 1 )
+  for ( i = 1; i <= NUMCONPLANETS; i = i + 1 )
     if ( Planets[i].type == PLANET_CLASSM || Planets[i].type == PLANET_DEAD )
       if ( Planets[i].team != Ships[snum].team || ! Planets[i].real )
 	{
@@ -1723,20 +1769,20 @@ void takeplanet( int pnum, int snum )
 	  return;
 	}
   /* Yes! */
-  getdandt( conqtime );
-  stcpn( Ships[snum].alias, conqueror, MAXUSERPNAME );
-  lastwords[0] = EOS;
+  getdandt( ConqInfo->conqtime, 0 );
+  stcpn( Ships[snum].alias, ConqInfo->conqueror, MAXUSERPNAME );
+  ConqInfo->lastwords[0] = EOS;
   Users[Ships[snum].unum].stats[USTAT_CONQUERS] += 1;
   Teams[Ships[snum].team].stats[TSTAT_CONQUERS] += 1;
-  stcpn( Teams[Ships[snum].team].name, conqteam, MAXTEAMNAME );
+  stcpn( Teams[Ships[snum].team].name, ConqInfo->conqteam, MAXTEAMNAME );
   ikill( snum, KB_CONQUER );
   for ( i = 1; i <= MAXSHIPS; i = i + 1 )
     if ( Ships[i].status == SS_LIVE )
       ikill( i, KB_NEWGAME );
   
-  PVUNLOCK(lockword);
+  PVUNLOCK(&ConqInfo->lockword);
   initgame();
-  PVLOCK(lockword);
+  PVLOCK(&ConqInfo->lockword);
   
   return;
   
@@ -1813,25 +1859,27 @@ void teamlist( int team )
   lin = 1;
   /* team stats and last date conquered */
   sprintf(tmpfmt,"#%d#%%s#%d#%%s",LabelColor,InfoColor);
-  cprintf(lin,0,ALIGN_CENTER,tmpfmt,stats,inittime);
+  cprintf(lin,0,ALIGN_CENTER, tmpfmt, stats, ConqInfo->inittime);
   lin++;
 
   /* last conquered */
-  cprintf(lin,0,ALIGN_CENTER,tmpfmt,last_conquered,conqtime);
+  cprintf(lin, 0, ALIGN_CENTER, tmpfmt, last_conquered, 
+	  ConqInfo->conqtime);
   lin++;
 
   /* last conqueror and conqteam */
   sprintf(tmpfmt,"#%d#by #%d#%%s #%d#for the #%d#%%s #%d#team",
 		LabelColor,(int)A_BOLD,LabelColor,(int)A_BOLD,LabelColor);
-  cprintf(lin,0,ALIGN_CENTER,tmpfmt,conqueror,conqteam);
+  cprintf(lin,0,ALIGN_CENTER, tmpfmt, ConqInfo->conqueror, 
+	  ConqInfo->conqteam);
   
   col=0;  /* put col back to 0 for rest of display */
   lin = lin + 1;
   cdclrl( lin, 1 );
-  if ( lastwords[0] != EOS )
+  if ( ConqInfo->lastwords[0] != EOS )
     {
-	  sprintf(tmpfmt,"#%d#%%c%%s%%c",YellowLevelColor);
-      cprintf(lin,0,ALIGN_CENTER, tmpfmt, '"', lastwords, '"' );
+      sprintf(tmpfmt, "#%d#%%c%%s%%c", YellowLevelColor);
+      cprintf(lin, 0, ALIGN_CENTER, tmpfmt, '"', ConqInfo->lastwords, '"' );
     }
   
   lin+=2;
@@ -2002,6 +2050,8 @@ void userline( int unum, int snum, char *buf, int showgods, int showteam )
   char ch, ch2, junk[MSGMAXLINE], timstr[20], name[MAXUSERPNAME];
   
   char *hd1="name          pseudonym           team skill  wins  loss mxkls  ships     time";
+  char *rch;		/* remote user flag */
+  char tname[SIZEUSERNAME + 2];	/* posss '@' and NULL */
   
   
   if ( unum < 0 || unum >= MAXUSERS )
@@ -2021,8 +2071,12 @@ void userline( int unum, int snum, char *buf, int showgods, int showteam )
       for ( i = 2; i < MAXOOPTIONS; i++)
 	if ( Users[unum].ooptions[i] )
 	  {
-	    ch2 = '+';
-	    break;
+	    if (i != OOPT_SWITCHTEAMS) /* don't want false positive on
+					  switchteams option */
+	      {
+		ch2 = '+';
+		break;
+	      }
 	  }
       if ( ch2 != '+' )
 	if ( isagod(Users[unum].username) )
@@ -2046,13 +2100,19 @@ void userline( int unum, int snum, char *buf, int showgods, int showteam )
     ch = 'M';
   else
     ch = Teams[team].teamchar;
-  
-  sprintf( junk, "%-12s %c%-21.21s %c %6.1f",
-	 Users[unum].username,
-	 ch2,
-	 name,
-	 ch,
-	 Users[unum].rating );
+
+  if (Users[unum].type == UT_REMOTE)
+    strcpy(tname, "@");			/* flags a remote user */
+  else
+    strcpy(tname, "");
+  strcat(tname, Users[unum].username);
+
+  sprintf( junk, "%-12.12s %c%-21.21s %c %6.1f",
+	   tname,
+	   ch2,
+	   name,
+	   ch,
+	   Users[unum].rating );
   
   fmtminutes( ( Users[unum].stats[USTAT_SECONDS] + 30 ) / 60, timstr );
   
@@ -2087,7 +2147,7 @@ void userlist( int godlike, int snum )
   /* Do some screen setup. */
   cdclear();
   lin = 0;
-  attrset(LabelColor);  /* dwp */
+  attrset(LabelColor); 
   cdputc( hd1, lin );
   
   lin = lin + 3;        /* FIXME - hardcoded??? - dwp */
@@ -2099,7 +2159,7 @@ void userlist( int godlike, int snum )
       cbuf[j] = '-';
   lin = lin + 1;
   cdputs( cbuf, lin, 1 );
-  attrset(0);          /* dwp */
+  attrset(0);          
   
   fline = lin + 1;				/* first line to use */
   lline = MSG_LIN1;				/* last line to use */
@@ -2132,8 +2192,9 @@ void userlist( int godlike, int snum )
 	  if ( snum > 0 && snum <= MAXSHIPS ) /* we're a valid ship */
 	    {
 		if ( strcmp(Users[uvec[i]].username,
-			    Users[Ships[snum].unum].username) == 0 )    /* it's ours */
-		  attrset(A_BOLD);
+			    Users[Ships[snum].unum].username) == 0 &&
+		     Users[uvec[i]].type == Users[Ships[snum].unum].type)
+		  attrset(A_BOLD);    /* it's ours */
 		else if (Ships[snum].war[Users[uvec[i]].team]) /* we're at war with it */
 		  attrset(RedLevelColor);
 		else if (Ships[snum].team == Users[uvec[i]].team && !selfwar(snum))
@@ -2146,8 +2207,9 @@ void userlist( int godlike, int snum )
 	  else			/* we don't have a ship yet */
 	    {
 	      if ( strcmp(Users[uvec[i]].username,
-			  Users[cunum].username) == 0 )    /* it's ours */
-		attrset(A_BOLD);
+			  Users[cunum].username) == 0 &&
+		   Users[uvec[i]].type == Users[cunum].type)
+		attrset(A_BOLD);    /* it's ours */
 	      else if (Users[cunum].war[Users[uvec[i]].team]) /* we're war with them */
 		attrset(RedLevelColor);	            /* (might be selfwar) */
 	      else if (Users[cunum].team == Users[uvec[i]].team) /* team ship */
@@ -2164,7 +2226,7 @@ void userlist( int godlike, int snum )
       if ( i >= nu )
 	{
 	  /* We're displaying the last page. */
-	  putpmt( "--- press space when done ---", MSG_LIN2 );
+	  putpmt( MTXT_DONE, MSG_LIN2 );
 	  cdrefresh();
 	  if ( iogtimed( &ch, 1 ) )
 	    {
@@ -2177,7 +2239,7 @@ void userlist( int godlike, int snum )
       else
 	{
 	  /* There are users left to display. */
-	  putpmt( "--- press space for more ---", MSG_LIN2 );
+	  putpmt( MTXT_MORE, MSG_LIN2 );
 	  cdrefresh();
 	  if ( iogtimed( &ch, 1 ) )
 	    if ( ch == TERM_EXTRA )
@@ -2209,22 +2271,6 @@ void userstats( int godlike , int snum )
   for (i=0; i<MAXUSERS; i++)
     uvec[i] = i;
   
-  nu = 0;
-  
-  for ( unum = 0; unum < MAXUSERS; unum++)
-    if ( Users[unum].live)
-      {
-	for ( i = 0; i < nu; i++ )
-	  if ( Users[uvec[i]].rating < Users[unum].rating )
-	    {
-	      for ( j = nu - 1; j >= i; j = j - 1 )
-		uvec[j+1] = uvec[j];
-	      break;
-	    }
-	uvec[i] = unum;
-	nu++;
-      }
-  
   /* Do some screen setup. */
   cdclear();
   lin = 1;
@@ -2254,43 +2300,55 @@ void userstats( int godlike , int snum )
       if ( ! godlike )
 	if ( ! stillalive( csnum ) )
 	  break;
+
+				/* sort the (living) user list */
+      nu = 0;
+      for ( unum = 0; unum < MAXUSERS; unum++)
+	if ( Users[unum].live)
+	  {
+	    uvec[nu++] = unum;
+	  }
+      sortusers(uvec, nu);
+
       i = fuser;
       cdclrl( fline, lline - fline + 1 );
       lin = fline;
       while ( i < nu && lin <= lline )
 	{
 	  statline( uvec[i], cbuf );
-
-	/* determine color */
-	if ( snum > 0 && snum <= MAXSHIPS ) /* we're a valid ship */
+	  
+	  /* determine color */
+	  if ( snum > 0 && snum <= MAXSHIPS ) /* we're a valid ship */
 	  {
 	    if ( strcmp(Users[uvec[i]].username, 
-			Users[Ships[snum].unum].username) == 0)    /* it's ours */
-	      attrset(A_BOLD);
-	    else if (Ships[snum].war[Users[uvec[i]].team]) /* we're at war with it */
-	      attrset(RedLevelColor);
+			Users[Ships[snum].unum].username) == 0 &&
+		 Users[uvec[i]].type == Users[Ships[snum].unum].type )
+	      attrset(A_BOLD);	        /* it's ours */
+	    else if (Ships[snum].war[Users[uvec[i]].team]) 
+	      attrset(RedLevelColor);   /* we're at war with it */
 	    else if (Ships[snum].team == Users[uvec[i]].team && !selfwar(snum))
 	      attrset(GreenLevelColor); /* it's a team ship */
 	    else
 	      attrset(YellowLevelColor);
 	  }
-	else if (godlike)/* we are running conqoper */ 
-	  { 
-	    attrset(YellowLevelColor); /* bland view */
-	  }
-	else
-	  {
-	    if ( strcmp(Users[uvec[i]].username,
-			Users[cunum].username) == 0 )    /* it's ours */
-	      attrset(A_BOLD);
-	    else if (Users[cunum].war[Users[uvec[i]].team]) /* we're war with them */
-	      attrset(RedLevelColor);             /* (might be selfwar) */
-	    else if (Users[cunum].team == Users[uvec[i]].team) /* team ship */
-	      attrset(GreenLevelColor);
-	    else
-	      attrset(YellowLevelColor);
-	  }
-
+	  else if (godlike)/* we are running conqoper */ 
+	    { 
+	      attrset(YellowLevelColor); /* bland view */
+	    }
+	  else
+	    {
+	      if ( strcmp(Users[uvec[i]].username,
+			  Users[cunum].username) == 0  &&
+		   Users[uvec[i]].type == Users[cunum].type )
+		attrset(A_BOLD);	/* it's ours */
+	      else if (Users[cunum].war[Users[uvec[i]].team]) 
+		attrset(RedLevelColor);  /* we're war with them (poss selfwar) */
+	      else if (Users[cunum].team == Users[uvec[i]].team) 
+		attrset(GreenLevelColor);	/* team ship */
+	      else
+		attrset(YellowLevelColor);
+	    }
+	  
 	  cdputs( cbuf, lin, 1 );
 	  attrset(0);
 	  i = i + 1;
@@ -2299,7 +2357,7 @@ void userstats( int godlike , int snum )
       if ( i >= nu )
 	{
 	  /* We're displaying the last page. */
-	  putpmt( "--- press space when done ---", MSG_LIN2 );
+	  putpmt( MTXT_DONE, MSG_LIN2 );
 	  cdrefresh();
 	  if ( iogtimed( &ch, 1 ) )
 	    {
@@ -2312,7 +2370,7 @@ void userstats( int godlike , int snum )
       else
 	{
 	  /* There are users left to display. */
-	  putpmt( "--- press space for more ---", MSG_LIN2 );
+	  putpmt( MTXT_MORE, MSG_LIN2 );
 	  cdrefresh();
 	  if ( iogtimed( &ch, 1 ) )
 	    {
@@ -2340,7 +2398,9 @@ void statline( int unum, char *buf )
 {
   int i, j;
   char ch, junk[MSGMAXLINE], percent[MSGMAXLINE], morejunk[MSGMAXLINE];
-  
+  char datestr[DATESIZE];
+  char tname[SIZEUSERNAME + 2];	/* posss '@' and NULL */
+
   if ( unum < 0 || unum >= MAXUSERS )
     {
       buf[0] = EOS;
@@ -2359,9 +2419,15 @@ void statline( int unum, char *buf )
       i = 1000 * Users[unum].stats[USTAT_CPUSECONDS] / Users[unum].stats[USTAT_SECONDS];
       sprintf( percent, "%3d%%", (i + 5) / 10 );
     }
-  
+ 
+  if (Users[unum].type == UT_REMOTE)
+    strcpy(tname, "@");			/* flags a remote user */
+  else
+    strcpy(tname, "");
+  strcat(tname, Users[unum].username);
+
   sprintf( junk, "%-12s %4s %4d %4d %4d",
-	 Users[unum].username,
+	 tname,
 	 percent,
 	 Users[unum].stats[USTAT_CONQUERS],
 	 Users[unum].stats[USTAT_COUPS],
@@ -2386,27 +2452,32 @@ void statline( int unum, char *buf )
       ch = buf[i];
     }
   
-  
-  
-  sprintf( junk, " %16.16s", Users[unum].lastentry );
-  
-  
-  j = 0;
-  for (i=0; i<6; i++)
+  if (Users[unum].lastentry == 0) /* never */
     {
-      morejunk[j++] = junk[i];
+      sprintf(junk, " %13.13s", "never");
+      appstr( junk, buf );
+    }      
+  else
+    {				/* format it properly */
+      getdandt(datestr, Users[unum].lastentry);
+    
+      sprintf( junk, " %16.16s", datestr );
+      j = 0;
+      for (i=0; i<6; i++)
+	{
+	  morejunk[j++] = junk[i];
+	}
+      /* remove the seconds - ugh*/
+      for (i=9; i < 17; i++)
+	{
+	  morejunk[j++] = junk[i];
+	}
+      morejunk[j] = EOS;
+      
+      appstr( morejunk, buf );
     }
-  /* remove the seconds - ugh*/
-  for (i=9; i < 17; i++)
-    {
-      morejunk[j++] = junk[i];
-    }
-  morejunk[j] = EOS;
-  
-  appstr( morejunk, buf );
-  
+      
   return;
-  
 }
 
 
@@ -2448,3 +2519,29 @@ void zeroplanet( int pnum, int snum )
   
 }
 
+
+/* IsRemoteUser(void)  - returns true if username == CONQUEST_USER */
+int IsRemoteUser()
+{
+  static char tmpuser[SIZEUSERNAME + 1] = "";
+
+  if (strlen(tmpuser) == 0)	/* first time */
+    glname(tmpuser);		/* get system username */
+
+  if (strncmp(tmpuser, CONQUEST_USER, SIZEUSERNAME) == 0)
+    {
+#ifdef DEBUG_SERVER
+      clog("IsRemoteUser(): glname = '%s', CONQUEST_USER = '%s', returning TRUE",
+	   tmpuser, CONQUEST_USER);
+#endif
+      return(TRUE);
+    }
+  else
+    {
+#ifdef DEBUG_SERVER
+      clog("IsRemoteUser(): glname = '%s', CONQUEST_USER = '%s', returning FLASE",
+	   tmpuser, CONQUEST_USER);
+#endif
+      return(FALSE);
+    }
+}

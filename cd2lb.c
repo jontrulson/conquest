@@ -266,7 +266,7 @@ int cdgetn ( char pmt[], int lin, int col, int *num )
 int cdgets ( char pmt[], int lin, int col, char str[], int maxlen )
 {
 
-  cdgetx ( pmt, lin, col, "\r\n", str, maxlen );
+  cdgetx ( pmt, lin, col, "\r\n", str, maxlen, TRUE );
   
   if ( strlen ( str ) == 0 )
     return(ERR);
@@ -298,32 +298,30 @@ int cdgets ( char pmt[], int lin, int col, char str[], int maxlen )
 /*    control-l. */
 /*    The terminating char is returned as value. */
 int cdgetx ( char pmt[], int lin, int col, char terms[], char str[], 
-	    int maxlen )
+	    int maxlen, int doecho )
 {
   int append_flg = FALSE;
   int do_append_flg = FALSE;
-  return ( cdgetp ( pmt, lin, col, terms, str, maxlen, &append_flg, do_append_flg ) );
+  return ( cdgetp ( pmt, lin, col, terms, str, maxlen, &append_flg, do_append_flg, doecho ) );
   
 }
 
 
 /* cdgetp - read a line from the terminal with special terminators */
 /* synopsis */
-/*    char pmt(), terms(), str() */
-/*    int maxlen, lin, col */
-/*    char termch, cdgetx */
-/*    termch = cdgetp ( pmt, lin, col, terms, str, maxlen ) */
+/*    termch = cdgetp ( pmt, lin, col, terms, str, maxlen, doecho ) */
 /*       terms - string of acceptable line terminators */
 /*       maxlen - size of str */
 /*       append_flg - return for more input flag */
 /*       do_append_flg - append operation acceptable flag */
+/*       doecho - whether or not to echo input 
 /* description */
 /*    This routine prompts for input from the terminal. The prompt ``pmt'' */
 /*    and initial contents of ``str'' and displayed and then input is read */
 /*    and the result is returned in ``str''. This means that a default value */
 /*    of str can be provided. This routine is otherwise similar to cdgetx(). */
 int cdgetp ( char pmt[], int lin, int col, char terms[], char str[], 
-	    int maxlen, int *append_flg, int do_append_flg )
+	    int maxlen, int *append_flg, int do_append_flg, int doecho )
 {
   int i, len, icol, scol, imaxlen;
   int ch = 0;
@@ -383,11 +381,24 @@ int cdgetp ( char pmt[], int lin, int col, char terms[], char str[],
 	  len = 1;
 	  icol = scol + len;
 	  cdclra ( lin, icol, lin, cdcols() );
-	  cdputs ( str, lin, scol );
+	  if (doecho)
+	    cdputs ( str, lin, scol );
 
 	  StrInit = FALSE;
 	  continue;
 	}
+      else
+	if (!isprint(ch))
+	  {			/* redraw init str in std input color */
+	    attrset(NoColor);
+	    cdclra ( lin, icol, lin, cdcols() );
+	    if (doecho)
+	      cdputs ( str, lin, scol );
+	    StrInit = FALSE;
+	    cdrefresh();
+	  }
+	    
+	    
 
       if ( ch == '\b' || ch == 0x7f || ch == KEY_BACKSPACE )
 	{
@@ -407,7 +418,7 @@ int cdgetp ( char pmt[], int lin, int col, char terms[], char str[],
 	    {
 	      /* Back up over blanks. */
 	      i = icol;				/* remember the end */
-	      while ( len > 0 )
+	      while ( len >= 0 )
 		if ( str[len] == ' ' )
 		  {
 		    icol = icol - 1;
@@ -417,7 +428,7 @@ int cdgetp ( char pmt[], int lin, int col, char terms[], char str[],
 		  break;
 	      
 	      /* Back up over non-blanks. */
-	      while ( len > 0 )
+	      while ( len >= 0 )
 		if ( str[len] == ' ' )
 		  break;
 		else
@@ -425,10 +436,23 @@ int cdgetp ( char pmt[], int lin, int col, char terms[], char str[],
 		    icol = icol - 1;
 		    len = len - 1;
 		  }
-	      
+
+	      if (len < 0 )
+		{
+		  len = 0;
+		}
+	      str[len] = EOS;
 	      /* Clear things in the actual image, if necessary. */
 	      if ( icol < i )
-		cdclra ( lin, icol, lin, i - 1 );
+		{
+		  if (icol <= scol)
+		    {
+		      cdclra ( lin, scol, lin, i - 1 );
+		      icol = scol;
+		    }
+		  else
+		    cdclra ( lin, icol, lin, i - 1 );
+		}
 	    }
 	}
       else if ( ch == 0x15 || ch == 0x18 )
@@ -438,6 +462,7 @@ int cdgetp ( char pmt[], int lin, int col, char terms[], char str[],
 	      cdclra ( lin, scol, lin, icol - 1 );
 	      icol = scol;
 	      len = 0;
+	      str[0] = EOS;
 	    }
 	}
       else if ( ch == 0x0c )
@@ -454,9 +479,9 @@ int cdgetp ( char pmt[], int lin, int col, char terms[], char str[],
 	  str[len] = (char)ch;
 	  len = len + 1;
 	  str[len] = '\0';
-	  /*str[len] = ch;*/
-	  /*	    cdput ( ch, lin, icol );*/
-	  cdput ( ch, lin, icol );
+
+	  if (doecho == TRUE)
+	    cdput ( ch, lin, icol );
 	  cdrefresh();
 	  icol = icol + 1;
 	}
@@ -602,7 +627,7 @@ void cdinit(void)
       RMsg_Line = MSG_LIN1;
     }
 
-#ifdef DEBUG_FLOW
+#if 0
   clog("cdinit(): RMsg_Line = %d", RMsg_Line);
 #endif
 

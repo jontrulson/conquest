@@ -35,8 +35,8 @@ static struct sembuf semops[CONQNUMSEMS];
 
 char *getsemtxt(int what)
 {
-  static char *LMSGTXT = "LOCKMESG";
-  static char *LCMNTXT = "LOCKWORD";
+  static char *LMSGTXT = "LOCKCOMN";
+  static char *LCMNTXT = "LOCKMESG";
 
   if (what == LOCKMSG)
     return(LMSGTXT);
@@ -95,6 +95,12 @@ void Lock(int what)
 {
   static int Done;
 
+#ifdef DEBUG_SEM
+  clog("Lock(%s): Attempting to aquire a lock.",
+       getsemtxt(what));
+  clog("Lock(%s): %s", getsemtxt(what), GetSemVal(0));
+#endif
+
   Done = FALSE;
 				/* Wait for sem to be zero, then inc */
   semops[0].sem_num = (short)what;
@@ -145,8 +151,15 @@ void Lock(int what)
 /* Unlock() - unlock part of the common block (dec a semaphore to 0) */
 void Unlock(int what)
 {
-  int err, retval;
+  int err = 0, retval;
   ushort semvals[16];
+
+#ifdef DEBUG_SEM
+  clog("Unlock(%s): Attempting to free a lock.",
+       getsemtxt(what));
+  clog("Unlock(%s): %s", getsemtxt(what), GetSemVal(0));
+#endif
+
 
 				/* get the values of the semaphores */
   retval = semctl(ConquestSemID, 0, GETALL, semvals);
@@ -182,8 +195,9 @@ void Unlock(int what)
 	  clog("Unlock(%s): semop(): failed: %s",
 	       getsemtxt(what),
 	       sys_errlist[errno]);
-	  
-	  cdend();
+	  fprintf(stderr,"Unlock(%s): semop(): failed: %s",
+	       getsemtxt(what),
+	       sys_errlist[errno]);
 	  exit(1);
 	}
       else
@@ -209,10 +223,11 @@ char *GetSemVal(int thesem)
   struct semid_ds SemDS;
   ushort semvals[16];
   static char buf[80];
-  static char tmbuf[80];
+  static char stimebuffer[80];
   static char wordtxt[80];
   static char mesgtxt[80];
   static char newtime[80];
+  time_t lastoptime;
   int retval;
   int lastcmnpid, cmnzcnt, lastmsgpid, msgzcnt;
 
@@ -232,30 +247,41 @@ char *GetSemVal(int thesem)
 	   sys_errlist[errno]);
     }
 
-				/* get last semop time  */
-  retval = semctl(ConquestSemID, thesem, IPC_STAT, &SemDS);
+				/* get latest semop time  */
+  retval = semctl(ConquestSemID, LOCKMSG, IPC_STAT, &SemDS);
 
   if (retval != 0)
     {
       clog("GetSemVal(%d): semctl(IPC_STAT) failed: %s",
-	   thesem,
+	   0,
 	   sys_errlist[errno]);
     }
 
+  lastoptime = SemDS.sem_otime;
+
+  retval = semctl(ConquestSemID, LOCKCMN, IPC_STAT, &SemDS);
+
+  if (retval != 0)
+    {
+      clog("GetSemVal(%d): semctl(IPC_STAT) failed: %s",
+	   1,
+	   sys_errlist[errno]);
+    }
+
+  lastoptime = max(lastoptime, SemDS.sem_otime);
+
   if (semvals[LOCKMSG] != 0)	/* currently locked */
-    sprintf(mesgtxt, "*MesgCnt = %d(%d:%d)", *lockmesg, lastmsgpid, msgzcnt);
+    sprintf(mesgtxt, "*MesgCnt = %d(%d:%d)", ConqInfo->lockmesg, lastmsgpid, msgzcnt);
   else
-    sprintf(mesgtxt, "MesgCnt = %d(%d:%d)", *lockmesg, lastmsgpid, msgzcnt);
+    sprintf(mesgtxt, "MesgCnt = %d(%d:%d)", ConqInfo->lockmesg, lastmsgpid, msgzcnt);
 
   if (semvals[LOCKCMN] != 0)
-    sprintf(wordtxt, "*CmnCnt = %d(%d:%d)", *lockword, lastcmnpid, cmnzcnt);
+    sprintf(wordtxt, "*CmnCnt = %d(%d:%d)", ConqInfo->lockword, lastcmnpid, cmnzcnt);
   else
-    sprintf(wordtxt, "CmnCnt = %d(%d:%d)", *lockword, lastcmnpid, cmnzcnt);
+    sprintf(wordtxt, "CmnCnt = %d(%d:%d)", ConqInfo->lockword, lastcmnpid, cmnzcnt);
 
-
-  strcpy(tmbuf, ctime(&SemDS.sem_otime));
-
-  strncpy(newtime, &tmbuf[4], 15); /* get the interesting part */
+  strcpy(stimebuffer, ctime(&lastoptime));
+  strncpy(newtime, &stimebuffer[4], 15); /* get the interesting part */
 
 				/* now build the string */
 

@@ -82,7 +82,7 @@ void PVLOCK(int *lockptr)
 {
   int semnum;
   
-  if (lockptr == lockmesg)
+  if (lockptr == &ConqInfo->lockmesg)
     semnum = LOCKMSG;
   else
     semnum = LOCKCMN;
@@ -98,7 +98,7 @@ void PVUNLOCK(int *lockptr)
 {
   int semnum;
   
-  if (lockptr == lockmesg)
+  if (lockptr == &ConqInfo->lockmesg)
     semnum = LOCKMSG;
   else
     semnum = LOCKCMN;
@@ -163,9 +163,9 @@ void PVUNLOCK(int *lockptr)
 
 #endif /* USE_PVLOCK */
 
+/* flush_common() - flush a common block */
 void flush_common(void)
 {
-
 				/* fbsd doesn't like MS_SYNC       */
 				/* which is prefered, but oh well */
 #if defined(FREEBSD)
@@ -178,8 +178,84 @@ void flush_common(void)
   return;
 }
 
+/* check_cblock() - open/verify a common block - init if necc, return TRUE
+    if successful */
+int check_cblock(char *fname, int fmode, int sizeofcb)
+{
+  int ffd;
+  struct stat sbuf;
+  int rv;
+
+				/* first stat the file, if it exists
+				   then verify the size.  unlink if size
+				   mismatch */
+  if (stat(fname, &sbuf) != -1)   /* ok if this fails */
+    {				/* file exists - verify size */
+      if (sbuf.st_size != sizeofcb)
+	{
+	  printf("%s: File size mismatch (expected %d, was %d), removing.\n", 
+		 fname,
+		 sizeofcb,
+		 sbuf.st_size);
+	  if (unlink(fname) == -1)
+	    {
+	      printf("check_cblock(): unlink(%s) failed: %s\n",
+		     fname,
+		     sys_errlist[errno]);
+	      return(FALSE);
+	    }
+	}
+    }
+
+
+				/* ok, either the file exists with the right
+				   size, or it doesn't exist at all -
+				   now open (and create) if necc */
+
+  umask(0);			/* clear umask, just in case... */
+
+  if ((ffd = open(fname, O_RDONLY)) == -1)
+    {				/* Error or not there...  */
+      if (errno == ENOENT)	/* Not There */
+	{			/* create it */
+	  if ((ffd = creat(fname, fmode)) == -1)
+	    {
+	      printf("check_cblock(): creat(%s) failed: %s\n",
+		     fname,
+		     sys_errlist[errno]);
+	      return(FALSE);
+	    }
+	  else
+	    {			/* Create it */
+	      printf("Initializing common block: %s\n", fname);
+	      cBasePtr = (char *) mymalloc(sizeofcb); /* this exits if malloc fails */
+	      cdfill('\0', cBasePtr, sizeofcb);
+
+	      write(ffd, cBasePtr, sizeofcb);
+	      close(ffd);
+	      free(cBasePtr);
+	      cBasePtr = NULL;
+	    }
+	}
+      else
+	{			/* some other error */
+	  printf("check_cblock(): open(%s, O_RDONLY) failed: %s\n",
+		 fname,
+		 sys_errlist[errno]);
+	  return(FALSE);
+	}
+    }
+  
+  close(ffd);			/* everything ok.. */
+
+				/* set ownership */
+  chown(fname, 0, -1);
+
+  return(TRUE);			/* everything there, and right size */
+}
+
 				/* my malloc wrapper. used only when mapping
-				   the commonblock */
+				   or initializing a commonblock */
 char *mymalloc(int size) 
   { 
     char *ptr;
@@ -216,41 +292,11 @@ void map_common(void)
 
   coff = 0;
   
-  umask(0);			/* clear umask, just in case... */
-
   sprintf(cmnfile, "%s/%s", CONQHOME, C_CONQ_COMMONBLK);
 
-  if ((cmn_fd = open(cmnfile, O_RDONLY)) == -1)
-    {				/* Error or not there...  */
-      if (errno == ENOENT)	/* Not There */
-	{			/* create it */
-	  if ((cmn_fd = creat(cmnfile, CMN_MODE)) == -1)
-	    {
-	      perror("map_common:creat(CMN_MODE)");
-	      exit(1);
-	    }
-	  else
-	    {			/* Create it */
-	      printf("Creating conquest common block: %s\n", cmnfile);
-	      cBasePtr = (char *) mymalloc(SIZEOF_COMMONBLOCK);
-	      cdfill('\0', cBasePtr, SIZEOF_COMMONBLOCK);
-
-	      write(cmn_fd, cBasePtr, SIZEOF_COMMONBLOCK);
-	      close(cmn_fd);
-	      free(cBasePtr);
-	    }
-	}
-      else
-	{			/* some other error */
-	  perror("map_common:open(O_RDONLY)");
-	  exit(1);
-	}
-    }
-  
-  close(cmn_fd);		/* everything ok.. */
-
-				/* set ownership */
-  chown(cmnfile, 0, -1);
+				/* verify it's validity */
+  if (check_cblock(cmnfile, CMN_MODE, SIZEOF_COMMONBLOCK) == FALSE)
+    exit(1);			/* an unrecoverable error */
 
 				/* reopen it... */
   if ((cmn_fd = open(cmnfile, O_RDWR)) == -1)
@@ -261,78 +307,43 @@ void map_common(void)
   
   /* Now lets map it */
 
-  if ((cBasePtr = mmap((caddr_t) 0, (size_t) SIZEOF_COMMONBLOCK, 
-#if !defined(LINUX)
-                       PROT_READ | PROT_WRITE, MAP_SHARED,
-#else
-                       PROT_READ | PROT_WRITE, MAP_SHARED | MAP_FILE, 
+#ifndef MAP_FILE
+# define MAP_FILE 0		/* some arch's don't def this */
 #endif
+
+  if ((cBasePtr = mmap((caddr_t) 0, (size_t) SIZEOF_COMMONBLOCK, 
+                       PROT_READ | PROT_WRITE, MAP_SHARED | MAP_FILE, 
 		       cmn_fd, 0)) == (caddr_t) -1)
     {
       perror("map_common():mmap()");
       exit(1);
     }
 
-			/* now map the variables into the common block */
-  map1d(commonrev, int, 1);
-  map1d(closed, int, 1);
-  map1d(lockword, int, 1);
-  map1d(lockmesg, int, 1);
+				        /* now map the variables into the
+					   common block */
 
-  map1d(conqueror, char, SIZEUSERPNAME);
-  map1d(conqteam, char, MAXTEAMNAME);
-  map1d(conqtime, char, DATESIZE);
-  map1d(lastwords, char, MAXLASTWORDS);
-  map1d(inittime, char, DATESIZE);
-
-  map1d(ccpuseconds, int, 1);
-  map1d(celapsedseconds, int, 1);
-  map1d(dcpuseconds, int, 1);		
-  map1d(delapsedseconds, int, 1);	
-  map1d(rcpuseconds, int, 1);		
-  map1d(relapsedseconds, int, 1);
-  map1d(raccum, int, 1);
-
-  map1d(lastupchuck, char, DATESIZE);	
+  map1d(CBlockRevision, int, 1);	/* this *must* be the first var */
+  map1d(ConqInfo, ConqInfo_t, 1)
 
   map1d(Users, User_t, MAXUSERS);
 
-  map2d(rstrat, int, REAL_MAX_VAR, 10);
-  map1d(rvec, int, 32);
-
-  map2d(ptname, char, MAXPLANETTYPES, MAXPTYPENAME);
+  map1d(Robot, Robot_t, 1);
 
   map1d(Planets, Planet_t, NUMPLANETS + 1);
 
   map1d(Teams, Team_t, NUMALLTEAMS);
 
-  map1d(chrplanets, char, MAXPLANETTYPES);
-
   map1d(Doomsday, Doomsday_t, 1);
 
-  map1d(histptr, int, 1);		
-  map1d(histunum, int, MAXHISTLOG);	
-  map2d(histlog, char, MAXHISTLOG, DATESIZE); 
+  map1d(History, History_t, MAXHISTLOG);
 
-  map1d(drivstat, int, 1);
-  map1d(drivpid, int, 1);	
-  map1d(drivcnt, int, 1);	
-  map1d(drivsecs, int, 1);	
-			
-  map1d(drivowner, char, SIZEUSERNAME);
-  map1d(drivtime, int, 1);
-  map1d(playtime, int, 1);
+  map1d(Driver, Driver_t, 1);
 
   map1d(Ships, Ship_t, MAXSHIPS + 1);
 
   map1d(Msgs, Msg_t, MAXMESSAGES);
-	
-  map1d(lastmsg, int, 1);		
 
-  map1d(externrobots, int, 1);		
-
-  map1d(glastmsg, int, 1);	
-
+  map1d(EndOfCBlock, int, 1);
 				/* now lets lock it */
 #if defined(USE_COMMONMLOCK)
   lock_common();

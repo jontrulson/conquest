@@ -290,10 +290,10 @@ void comsize( unsigned long *size )
 {
   unsigned long int val;
 
-  if ((int)glastmsg > (int)commonrev) 
-    val = (int)glastmsg - (int)commonrev; 
+  if ((int)EndOfCBlock > (int)CBlockRevision) 
+    val = (int)EndOfCBlock - (int)CBlockRevision; 
   else
-    val = (int)commonrev - (int)glastmsg;
+    val = (int)CBlockRevision - (int)EndOfCBlock;
   *size = val + sizeof(int); 
 
   /*clog("sizeof(real) = %d, val = %d", sizeof(real), val); */
@@ -320,7 +320,7 @@ void conqend(void)
 void conqinit(void)
 {
   /* First things first. */
-  if ( *commonrev != COMMONSTAMP )
+  if ( *CBlockRevision != COMMONSTAMP )
     error( "conquest: Common block ident mismatch.  \nInitialize the Universe via conqoper." );
   
   
@@ -375,7 +375,7 @@ void conqstats( int snum )
 	  &cadd, &eadd );
   
   /* Add in the new amounts. */
-  PVLOCK(lockword);
+  PVLOCK(&ConqInfo->lockword);
   if ( Ships[snum].pid != 0 )
     {
       /* Update stats for a humanoid ship. */
@@ -385,10 +385,10 @@ void conqstats( int snum )
       team = Users[unum].team;
       Teams[team].stats[TSTAT_CPUSECONDS] += cadd;
       Teams[team].stats[TSTAT_SECONDS] += eadd;
-      *ccpuseconds += cadd;
-      *celapsedseconds += eadd;
+      ConqInfo->ccpuseconds += cadd;
+      ConqInfo->celapsedseconds += eadd;
     }
-  PVUNLOCK(lockword);
+  PVUNLOCK(&ConqInfo->lockword);
   
   return;
   
@@ -407,7 +407,7 @@ void drcheck(void)
   if ( dsecs( clastime, &clastime ) > TIMEOUT_DRCHECK )
     return;
   
-  if ( dsecs( *drivtime, playtime ) > TIMEOUT_DRIVER )
+  if ( dsecs( Driver->drivtime, &(Driver->playtime) ) > TIMEOUT_DRIVER )
     {
       if ( childpid != 0 )
 	{
@@ -416,7 +416,7 @@ void drcheck(void)
 	  if ( kill(childpid, 0) != -1 )
 	    {
 	      /* He's still alive and belongs to us. */
-	      gsecs( drivtime );
+	      gsecs( &(Driver->drivtime) );
 	      return;
 	    }
 	  else
@@ -426,14 +426,14 @@ void drcheck(void)
 	  childpid = 0;
 	}
       
-      PVLOCK(lockword);
-      if ( dsecs( *drivtime, playtime ) > TIMEOUT_DRIVER )
+      PVLOCK(&ConqInfo->lockword);
+      if ( dsecs( Driver->drivtime, &(Driver->playtime) ) > TIMEOUT_DRIVER )
 	{
 	  drcreate();
-	  *drivcnt = modp1( *drivcnt + 1, 1000 );
-	  clog( "Driver timeout #%d.", *drivcnt );
+	  Driver->drivcnt = modp1( Driver->drivcnt + 1, 1000 );
+	  clog( "Driver timeout #%d.", Driver->drivcnt );
 	}
-      PVUNLOCK(lockword);
+      PVUNLOCK(&ConqInfo->lockword);
     }
   drstart();
   
@@ -451,15 +451,15 @@ void drcreate(void)
   char drivcmd[BUFFER_SIZE];
 
   
-  gsecs( drivtime );			/* prevent driver timeout */
-  *drivpid = 0;			/* zero current driver pid */
-  *drivstat = DRS_RESTART;		/* driver state to restart */
+  gsecs( &(Driver->drivtime) );			/* prevent driver timeout */
+  Driver->drivpid = 0;			/* zero current driver pid */
+  Driver->drivstat = DRS_RESTART;		/* driver state to restart */
   
   /* fork the child - mmap()'s should remain */
   /*  intact */
   if ((pid = fork()) == -1)
     {				/* error */
-      *drivstat = DRS_OFF;
+      Driver->drivstat = DRS_OFF;
       clog( "drcreate(): fork(): %s", sys_errlist[errno]);
       return;
     }
@@ -489,12 +489,12 @@ void drcreate(void)
 void drkill(void)
 {
   if ( childpid != 0 )
-    if ( childpid == *drivpid && *drivstat == DRS_RUNNING )
+    if ( childpid == Driver->drivpid && Driver->drivstat == DRS_RUNNING )
       {
-	PVLOCK(lockword);
-	if ( childpid == *drivpid && *drivstat == DRS_RUNNING )
-	  *drivstat = DRS_KAMIKAZE;
-	PVUNLOCK(lockword);
+	PVLOCK(&ConqInfo->lockword);
+	if ( childpid == Driver->drivpid && Driver->drivstat == DRS_RUNNING )
+	  Driver->drivstat = DRS_KAMIKAZE;
+	PVUNLOCK(&ConqInfo->lockword);
       }
   
   return;
@@ -514,9 +514,9 @@ void drpexit(void)
     {
       /* We may well have started the driver. */
       drkill();
-      for ( i = 1; childpid == *drivpid && i <= 50; i = i + 1 )
+      for ( i = 1; childpid == Driver->drivpid && i <= 50; i = i + 1 )
 	c_sleep( 0.1 );
-      if ( childpid == *drivpid )
+      if ( childpid == Driver->drivpid )
 	clog("drpexit(): Driver didn't exit; pid = %08x", childpid );
     }
   
@@ -531,12 +531,12 @@ void drpexit(void)
 void drstart(void)
 {
   
-  if ( *drivstat == DRS_OFF )
+  if ( Driver->drivstat == DRS_OFF )
     {
-      PVLOCK(lockword);
-      if ( *drivstat == DRS_OFF )
+      PVLOCK(&ConqInfo->lockword);
+      if ( Driver->drivstat == DRS_OFF )
 	drcreate();
-      PVUNLOCK(lockword);
+      PVUNLOCK(&ConqInfo->lockword);
     }
   return;
   
@@ -823,12 +823,12 @@ void stoptimer(void)
 void upchuck(void)
 {
   
-  PVLOCK(lockword);
+  PVLOCK(&ConqInfo->lockword);
   
   flush_common();
-  getdandt( lastupchuck );
+  getdandt( ConqInfo->lastupchuck, 0 );
   
-  PVUNLOCK(lockword);
+  PVUNLOCK(&ConqInfo->lockword);
   
   return;
   
@@ -883,6 +883,8 @@ int CheckPid(int pidnum)
 {
   int rv;
 
+  if (pidnum == 0)
+    return(FALSE);		/* can re-incarnate to robots */
   rv = kill(pidnum, 0);
 
   if (rv == -1)

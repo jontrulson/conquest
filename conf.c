@@ -224,11 +224,11 @@ int GetSysConf(int checkonly)
 }
 
 				/* get user's configuration */
-int GetConf(void)
+int GetConf(int isremote, int usernum)
 {
   FILE *conf_fd;
   int i, j;
-  char conf_name[256];
+  char conf_name[MID_BUFFER_SIZE];
   char *homevar;
   char buffer[BUFFER_SIZE];
   int buflen;
@@ -256,7 +256,14 @@ int GetConf(void)
       return(ERR);
     }
 
-  sprintf(conf_name, "%s/%s", homevar, CONFIG_FILE);
+  if (isremote == TRUE && usernum > 0)
+    {				/* build the remote user version */
+      umask(007);
+      sprintf(conf_name, "%s/%s.%d", homevar, CONFIG_FILE, usernum);
+    }
+  else
+      sprintf(conf_name, "%s/%s", homevar, CONFIG_FILE);
+
 
   if ((conf_fd = fopen(conf_name, "r")) == NULL)
     {

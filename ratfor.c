@@ -101,22 +101,35 @@ void upper(char *buf)
     }
 }
 
-/* load the now[7] array with the current time - make sure it's decl [8] */
-void getnow (int now[8])
+/* load the now[] array with the current time - make sure it's 
+/*   decl [NOWSIZE] */
+/*  always returns the current time in time_t format. */
+time_t getnow (int now[NOWSIZE], time_t thetime)
 {
   struct tm *thetm;
-  time_t thetimet;
+  time_t thetimet, curtime;
 
-  thetimet = time(0);
-  thetm = localtime(&thetimet);
+  curtime = time(0);
+  
+  if (thetime == 0)	
+    thetimet = curtime;		/* wants current time */
+  else		
+    thetimet = thetime;		/* wants supplied time conversion */
 
-  now[1] = thetm->tm_year + 1900; /* year */
-  now[2] = thetm->tm_mon +1;	/* month */
-  now[3] = thetm->tm_mday;	/* day */
-  now[4] = thetm->tm_hour;	/* hour */
-  now[5] = thetm->tm_min;	/* minutes */
-  now[6] = thetm->tm_sec;	/* seconds */
-  now[7] = 500;			/* thousandths of seconds - not here */
+  if (now != NULL)		/* want to actually fill now[] */
+    {
+      thetm = localtime(&thetimet);
+
+      now[1] = thetm->tm_year + 1900; /* year */
+      now[2] = thetm->tm_mon + 1; /* month */
+      now[3] = thetm->tm_mday;	/* day */
+      now[4] = thetm->tm_hour;	/* hour */
+      now[5] = thetm->tm_min;	/* minutes */
+      now[6] = thetm->tm_sec;	/* seconds */
+      now[7] = 500;		/* thousandths of seconds - not here */
+    }
+
+  return(curtime);
 }
 
 /* wkday(int, int, int) - all args ignored - returns day num */
@@ -143,7 +156,6 @@ int lib_ffs(int start, int len, int bits, int *rule)
 	{			/* bit is set */
 	  *rule = i;
 	  break;
-	/*  return(OK);*/
 	}
     }
 

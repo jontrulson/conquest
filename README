@@ -75,6 +75,13 @@ I've tried to keep the mechanics and balance of the game identical to
 the original.  More tweakage should be expected though, as well as the
 continuing removal of useless code.
 
+	To quote Michael Erskine: 
+
+	"We were playing xtrek before there was X...  It was 
+	known then as Conquest, was written in RATFOR and ran 
+	on a VAX... Personally,  I liked it better...  
+	but who can account for the tastes of old C programmers?"
+
 
 ### GENERAL INFORMATION AND TIPS ABOUT CONQUEST
 
@@ -207,7 +214,7 @@ players.
 
 	Conquest's log file.  All errors/warnings, and debug messages
 are written here.  For the source distribution, see the bottom of
-defs.h for a list of debugables.
+defs.h for a list of debuggables.
 
 
 # etc/conquestrc

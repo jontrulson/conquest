@@ -88,7 +88,7 @@ main(int argc, char *argv[])
   
   map_common();
   
-  if ( *commonrev != COMMONSTAMP )
+  if ( *CBlockRevision != COMMONSTAMP )
     error( "conqai: Common block ident mismatch.  \nInitialize the Universe via conqoper." );
   
   
@@ -254,7 +254,7 @@ void buildai( int snum, int vars[], int *bnenum, real *bdne, real *bane )
   AIBOOLEAN( vars[VAR_ORBITING], Ships[snum].warp < 0.0 );
   
   /* Can read a message (-) */
-  AIBOOLEAN( vars[VAR_CANREAD], Ships[snum].lastmsg != *lastmsg );
+  AIBOOLEAN( vars[VAR_CANREAD], Ships[snum].lastmsg != ConqInfo->lastmsg );
   
   return;
   
@@ -478,7 +478,7 @@ void executeai( int snum, int token )
       break;
     case ROB_READMSG:
       /* Try to read a message and reply to it */
-      while ( Ships[snum].lastmsg != *lastmsg )
+      while ( Ships[snum].lastmsg != ConqInfo->lastmsg )
 	{
 	  Ships[snum].lastmsg = modp1( Ships[snum].lastmsg + 1, MAXMESSAGES );
 	  i = Ships[snum].lastmsg;
@@ -545,7 +545,7 @@ void executeai( int snum, int token )
 void exitai(void)
 {
   
-  *externrobots = FALSE;
+  ConqInfo->externrobots = FALSE;
   
   return;
   
@@ -574,7 +574,7 @@ int newrob( int *snum, int unum )
     return ( FALSE );
   
   /* Show intent to fly. */
-  PVLOCK(lockword);
+  PVLOCK(&ConqInfo->lockword);
   Ships[*snum].status = SS_ENTERING;
   
   /* Count number of ships currently flying. */
@@ -597,13 +597,13 @@ int newrob( int *snum, int unum )
       if ( j > 0 )
 	Ships[*snum].status = SS_OFF;
     }
-  PVUNLOCK(lockword);
+  PVUNLOCK(&ConqInfo->lockword);
   
   if ( Ships[*snum].status == SS_OFF )
     return ( FALSE );
   
   /* Initialize the ship. */
-  PVLOCK(lockword);
+  PVLOCK(&ConqInfo->lockword);
   initship( *snum, unum );
   Ships[*snum].robot = TRUE;			/* we're a robot */
 
@@ -655,7 +655,7 @@ int newrob( int *snum, int unum )
   putship( *snum, Planets[i].x, Planets[i].y );
   fixdeltas( *snum );
   Ships[*snum].status = SS_LIVE;
-  PVUNLOCK(lockword);
+  PVUNLOCK(&ConqInfo->lockword);
   
   return ( TRUE );
   
@@ -688,14 +688,14 @@ void robotai( int snum )
   
   /* Get final cpu time and add things in. */
   gcputime( &j );
-  *raccum = *raccum + j - i;
-  if ( *raccum > 100 )
+  ConqInfo->raccum = ConqInfo->raccum + j - i;
+  if ( ConqInfo->raccum > 100 )
     {
       /* Accumulated a cpu second. */
-      *rcpuseconds = *rcpuseconds + (*raccum / 100);
-      *raccum = mod( *raccum, 100 );
+      ConqInfo->rcpuseconds = ConqInfo->rcpuseconds + (ConqInfo->raccum / 100);
+      ConqInfo->raccum = mod( ConqInfo->raccum, 100 );
     }
-  *relapsedseconds = *relapsedseconds + 1;	/* one more second */
+  ConqInfo->relapsedseconds = ConqInfo->relapsedseconds + 1;	/* one more second */
   
   return;
   
@@ -738,7 +738,7 @@ void robotloop(void)
   int s, j;
   
 		/* Disable the robot code in conqdriv. */
-  *externrobots = TRUE;
+  ConqInfo->externrobots = TRUE;
   
   /* Initialize random numbers */
   rndini( 0, 0 );
@@ -966,13 +966,13 @@ int tableai( int vars[] )
   /*  are disabled because of a particular vars() value. */
   
   for ( i = 0; i < MAX_VAR; i = i + 1 )
-    rbits &= rstrat[i][vars[i]];
+    rbits &= Robot->rstrat[i][vars[i]];
   
   /* Find first set rule bit and translate into rule number. */
   status = lib_ffs( 0, 32, rbits, &rule );
   if ( status == OK )
     {
-      token = rvec[rule];	/* translate rule into action token */
+      token = Robot->rvec[rule];	/* translate rule into action token */
     }
   else if ( status == ERR )
     token = ROB_NOOP;

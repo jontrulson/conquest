@@ -37,162 +37,38 @@
 #include "team.h"
 #include "msg.h"
 #include "doomsday.h"
+#include "driver.h"
+#include "conqinfo.h"
+#include "history.h"
+#include "robot.h"
+
+				/* The Common Block in all it's majesty */
 
 /* Special data items - these must be at the very beginning. */
-/* int commonrev;			/* common block rev number */
-CEXTERN int *commonrev;			/* common block rev number */
+				/* This must be the first var */
+CEXTERN int *CBlockRevision;	/* common block rev number */
 
-/* int closed;			/* the game is closed, everybody out */
-CEXTERN int *closed;			/* the game is closed, everybody out */
+CEXTERN ConqInfo_t *ConqInfo;	/* misc game info */
 
-/* int lockword;			/* exclusionary flag */
-CEXTERN int *lockword;			/* exclusionary flag */
+CEXTERN User_t *Users;		/* User statistics. */
 
-/* int lockmesg;			/* exclusive access to the message area */
-CEXTERN int *lockmesg;			/* exclusive access to the message area */
+CEXTERN Robot_t *Robot;		/* Robots. */
 
+CEXTERN Planet_t *Planets;	/* Planets. */
 
-/* Start of permanent data. */
+CEXTERN Team_t *Teams;		/* Teams. */
 
-    /* Global statistics. */
-/* char conqueror[SIZEUSERPNAME];	/* user who last conquered */
-CEXTERN char *conqueror;	/* user who last conquered */
+CEXTERN Doomsday_t *Doomsday;	/* Doomsday machine. */
 
-/* char conqteam[MAXTEAMNAME];	/* team s/he was on */
-CEXTERN char *conqteam;	/* team s/he was on */
+CEXTERN History_t *History;	/* History */
 
-/* char conqtime[DATESIZE];	/* time of last conquering */
-CEXTERN char *conqtime;	/* time of last conquering */
+CEXTERN Driver_t *Driver;	/* Driver. */
 
-/* char lastwords[MAXLASTWORDS];	/* remarks upon conquering */
-CEXTERN char *lastwords;	/* remarks upon conquering */
+CEXTERN Ship_t *Ships;		/* Ships. */
 
-/* char inittime[DATESIZE];	/* time the universe was initialized */
-CEXTERN char *inittime;	/* time the universe was initialized */
+CEXTERN Msg_t *Msgs;		/* Messages. */
 
-    /* Hidden global statistics. */
-/* int ccpuseconds;			/* cpu seconds used by conquest */
-CEXTERN int *ccpuseconds;			/* cpu seconds used by conquest */
-
-/* int celapsedseconds;		/* elapsed seconds for conquest */
-CEXTERN int *celapsedseconds;		/* elapsed seconds for conquest */
-
-/* int dcpuseconds;			/* cpu seconds used by conqdriv */
-CEXTERN int *dcpuseconds;			/* cpu seconds used by conqdriv */
-
-/* int delapsedseconds;		/* elapsed seconds for conqdriv */
-CEXTERN int *delapsedseconds;		/* elapsed seconds for conqdriv */
-
-/* int rcpuseconds;			/* cpu seconds used by robots */
-CEXTERN int *rcpuseconds;			/* cpu seconds used by robots */
-
-/* int relapsedseconds;		/* elapsed seconds for robots */
-CEXTERN int *relapsedseconds;		/* elapsed seconds for robots */
-
-/* int raccum;			/* accumulated cpu hundredths */
-CEXTERN int *raccum;			/* accumulated cpu hundredths */
-
-/* char lastupchuck[DATESIZE];	/* last time the common block was updated */
-CEXTERN char *lastupchuck;	/* last time the common block was updated */
-
-    /* User statistics. */
-
-				/* per user data */
-CEXTERN User_t *Users;		/* User structures */
-
-/* End of permanent data. */
-
-/* Start of static data. */
-
-    /* Robots. */
-/* int rstrat[REAL_MAX_VAR][10];	/* robot strategy table */
-CEXTERN int **rstrat;	/* robot strategy table */
-
-/* int rvec[32];			/* robot rule to action token */
-CEXTERN int *rvec;			/* robot rule to action token */
-
-
-    /* Planets. */
-
-CEXTERN Planet_t *Planets;	/* planet structures */
-
-/* char ptname[MAXPLANETTYPES][MAXPTYPENAME];*/
-CEXTERN char **ptname;
-
-    /* Teams. */
-
-CEXTERN Team_t *Teams;
-
-    /* Characters. */
-/* char chrplanets[MAXPLANETTYPES];/* class M = M, dead = D, sun = S */
-CEXTERN char *chrplanets;/* class M = M, dead = D, sun = S */
-
-    /* Doomsday machine. */
-
-CEXTERN Doomsday_t *Doomsday;
-
-/* End of semi-static data. */
-
-/* Start of semi-volatile data. */
-
-    /* Last usage stuff. */
-/* int histptr;			/* points to most recent usage */
-CEXTERN int *histptr;			/* points to most recent usage */
-
-/* int histunum[MAXHISTLOG];	/* user number */
-CEXTERN int *histunum;	/* user number */
-
-/* char histlog[MAXHISTLOG][DATESIZE]; /* date string of entry */
-CEXTERN char **histlog; /* date string of entry */
-
-/* End of semi-volatile data. */
-
-/* Start of volatile data. */
-
-    /* Driver. */
-/* int drivstat;			/* driver status; one of the DRS_ values */
-CEXTERN int *drivstat;			/* driver status; one of the DRS_ values */
-
-/* int drivpid;			/* pid of the driver process */
-CEXTERN int *drivpid;			/* pid of the driver process */
-
-/* int drivcnt;			/* number of driver timeouts (modp1 1000) */
-CEXTERN int *drivcnt;			/* number of driver timeouts (modp1 1000) */
-
-/* int drivsecs;			/* phase of the universe in seconds */
-CEXTERN int *drivsecs;			/* phase of the universe in seconds */
-
-					/*  (modp1 five minutes) */
-/* char drivowner[SIZEUSERNAME];	/* username of the driver's owner */
-CEXTERN char *drivowner; /* username of the driver's owner */
-
-    /* The following are seconds since midnight. */
-/* int drivtime;			/* last time the driver looped */
-CEXTERN int *drivtime;			/* last time the driver looped */
-
-/* int playtime;			/* last time a player looped */
-CEXTERN int *playtime;			/* last time a player looped */
-
-    /* Ships. */
-
-CEXTERN Ship_t *Ships;		/* ship structures */
-
-    /* Messages. */
-
-CEXTERN Msg_t *Msgs;
-
-/* int lastmsg;			/* the last message sent */
-CEXTERN int *lastmsg;			/* the last message sent */
-
-/* int externrobots;		/* used to disable internal robot code */
-CEXTERN int *externrobots;		/* used to disable internal robot code */
-
-    /* Note: glastmsg must be the last variable in the common block. */
-/* int glastmsg;		/* the last message read by God */
-CEXTERN int *glastmsg;		/* the last message read by God */
-
-/* End of volatile data. */
+CEXTERN int *EndOfCBlock;	/* end of the common block */
 
 #undef CEXTERN
-
 #endif /* CONQCOM_H */

@@ -100,6 +100,7 @@
 #include <grp.h>
 
 #include "defs.h"		/* conquest behavior modification */
+#include "conqdef.h"
 
 #if defined(TIME_WITH_SYS_TIME)
 # include <sys/time.h>
@@ -149,7 +150,7 @@ extern char *sys_errlist[];
 #define FILENAMESIZE 512
 #define MAXLINE 78
 #define ARGBUFSIZE 512
-#define BIG_BIFFER_SIZE 4096
+#define BIG_BUFFER_SIZE 4096
 #define MID_BUFFER_SIZE 2048
 #define BUFFER_SIZE 256
 
@@ -187,7 +188,7 @@ void concat(char str1[], char str2[], char buf[]);
 int c_index(char *buf, char ch);
 void lower(char *buf);
 void upper(char *buf);
-void getnow (int now[8]);
+time_t getnow (int now[NOWSIZE], time_t thetime);
 int wkday (void);
 int lib_ffs(int start, int len, int bits, int *rule);
 void c_sleep(real sleeptime);
@@ -254,13 +255,14 @@ int arrows( char *str, real *dir );
 void cerror(char *fmt, ...);
 void clog(char *fmt, ...);
 int confirm(void);
+int askyn(char *question, int lin, int col);
 void delblanks( char *str );
 int dsecs( int s, int *n );
 real explosion( real basehits, real dis );
 void fmtminutes( int itime, char *buf );
 void fmtseconds( int itime, char *buf );
 int getamsg( int snum, int *msg );
-void getdandt( char *buf );
+void getdandt( char *buf, time_t thetime );
 int gettarget( char *pmt, int lin, int col, real *dir, real cdefault );
 char getcx( char *pmt, int lin, int offset, char *terms, char *buf, int len );
 int dgrand(int s, int *n);
@@ -297,7 +299,7 @@ real phaserhit( int snum, real dis );
 void pseudo( int unum, int snum );
 void planlist( int team, int snum );
 void playlist( int godlike, int doall, int snum );
-void resign( int unum );
+void resign( int unum, int isoper );
 int review( int snum, int slm );
 void takeplanet( int pnum, int snum );
 void teamlist( int team );
@@ -306,6 +308,7 @@ void userlist( int godlike, int snum );   /* dwp */
 void userstats( int godlike , int snum ); /* dwp */
 void statline( int unum, char *buf );
 void zeroplanet( int pnum, int snum );
+int IsRemoteUser(void);
 
 /** conqmisc.c */
 
@@ -325,7 +328,7 @@ void doomsday(void);
 int findorbit( int snum, int *pnum );
 int findship( int *snum );
 void fixdeltas( int snum );
-int gunum( int *unum, char *lname );
+int gunum( int *unum, char *lname, int ltype );
 void histlist( int godlike );
 void initeverything(void);
 void initgame(void);
@@ -366,9 +369,9 @@ void cdfill ( char ch, char buf[], int count );
 int cdgetn ( char pmt[], int lin, int col, int *num );
 int cdgets ( char pmt[], int lin, int col, char str[], int maxlen );
 int cdgetx ( char pmt[], int lin, int col, char terms[], char str[], 
-	     int maxlen );
+	     int maxlen, int doecho );
 int cdgetp ( char pmt[], int lin, int col, char terms[], char str[], 
-	     int maxlen, int *append_flg, int do_append_flg );
+	     int maxlen, int *append_flg, int do_append_flg, int doecho );
 void cdinit(void);
 void cdline ( int lin1, int col1, int lin2, int col2 );
 int cdlins ( void );
@@ -470,7 +473,7 @@ void upstats( int *ctemp, int *etemp, int *caccum, int *eaccum, int *ctime, int 
 /* rndlb.c */
 
 void rndini ( int seed1, int seed2 );
-void rndseq ( int value, int multiplier, int increment, int modulus );
+void rndseq ( int *value, int multiplier, int increment, int modulus );
 real rnd ( void );
 real rnduni ( real rlow, real rhigh );
 int rndint ( int ilow, int ihigh );
@@ -495,6 +498,7 @@ char *mymalloc(int size);
 void map_common(void);
 void lock_common(void);
 void flush_common(void);
+int check_cblock(char *fname, int fmode, int sizeofcb);
 #ifndef USE_PVLOCK
 # define PVLOCK(x)
 # define PVUNLOCK(x)
@@ -517,7 +521,7 @@ int DoMacro(int ch);
 /* conf.c */
 
 int GetSysConf(int checkonly);
-int GetConf(void);
+int GetConf(int isremote, int usernum);
 int MakeSysConf(void);
 
 /* sem.c */
@@ -537,3 +541,5 @@ void do_border(void);
 int alertcolor(int alert);
 void draw_alertborder(int alert);
 
+/* logon.c */
+int Logon(char *username, char *password);

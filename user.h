@@ -13,6 +13,7 @@
 
 typedef struct {
   int live;			/* alive or not */
+  int type;			/* type of user: UT_LOCAL, UT_REMOTE */
   int team;			/* user's team */
   int multiple;			/* ship count def=1, shitlist=0?, >1 = mult? */
   int stats[MAXUSTATS];		/* user's stats */
@@ -24,7 +25,7 @@ typedef struct {
   char username[SIZEUSERNAME];	/* user's name (login name) */
   char pw[SIZEUSERNAME];	/* user's password if server login */
   char alias[SIZEUSERPNAME];	/* user's pseudonym */
-  char lastentry[DATESIZE];	/* last entry time */
+  time_t lastentry;		/* last entry time */
 } User_t;
 
 

@@ -58,8 +58,8 @@ main(int argc, char *argv[])
       clog("%s@%d: main(): GetSysConf() returned ERR.", __FILE__, __LINE__);
 #endif
     }
-  
-  if (GetConf() == ERR)		/* do this BEFORE setgid() call! */
+				/* do this BEFORE setgid() call! */
+  if (GetConf(FALSE, 0) == ERR)	/* always a UT_LOCAL user at this point */
     {
 #ifdef DEBUG_CONFIG
       clog("%s@%d: main(): GetConf() returned ERR.", __FILE__, __LINE__);
@@ -558,7 +558,7 @@ void conqds( int multiple, int switchteams )
   attrset(0);
   
   lin++;
-  if ( *closed )
+  if ( ConqInfo->closed )
     cprintf(lin,0,ALIGN_CENTER,"#%d#%s",RedLevelColor,"The game is closed.");
   else
     cprintf( lin,col,ALIGN_CENTER,"#%d#%s (%s)",YellowLevelColor,
@@ -772,8 +772,8 @@ void dead( int snum, int leave )
     {
       cprintf( 10,0,ALIGN_CENTER,
 		"#%d#Universe conquered by #%d#%s #%d#for the #%d#%s #%d#team.",
-		 InfoColor, A_BOLD, conqueror, 
-		 InfoColor, A_BOLD, conqteam, LabelColor );
+		 InfoColor, A_BOLD, ConqInfo->conqueror, 
+		 InfoColor, A_BOLD, ConqInfo->conqteam, LabelColor );
     }
   else if ( kb == KB_SELF )
     {
@@ -837,17 +837,17 @@ void dead( int snum, int leave )
 	{
 	  cdclear();
 	  cdredo();
-	  lastwords[0] = EOS;
+	  ConqInfo->lastwords[0] = EOS;
 	  ch = cdgetx( "Any last words? ",
-		       14, 1, TERMS, lastwords, MAXLASTWORDS );
+		       14, 1, TERMS, ConqInfo->lastwords, MAXLASTWORDS, TRUE );
 	  cdclear();
 	  cdredo();
-	  if ( lastwords[0] != EOS )
+	  if ( ConqInfo->lastwords[0] != EOS )
 	    {
 	      cprintf( 13,0,ALIGN_CENTER, "#%d#%s", 
 			InfoColor, "You last words are entered as:");
 	      cprintf( 14,0,ALIGN_CENTER, "#%d#%c%s%c", 
-			YellowLevelColor, '"', lastwords, '"' );
+			YellowLevelColor, '"', ConqInfo->lastwords, '"' );
 	    }
 	  else
 	    cprintf( 14,0,ALIGN_CENTER,"#%d#%s", InfoColor,
@@ -864,7 +864,7 @@ void dead( int snum, int leave )
       break;
     default:
       ioeat();
-      putpmt( "--- press space when done ---", MSG_LIN2 );
+      putpmt( MTXT_DONE, MSG_LIN2 );
       cdrefresh();
       while ( ! iogtimed( &ch, 1 ) && stillalive( csnum ) )
 	;
@@ -947,7 +947,7 @@ void doalloc( int snum )
   
   cdclrl( MSG_LIN1, 2 );
   cbuf[0] = EOS;
-  ch = (char)cdgetx( pmt, MSG_LIN1, 1, TERMS, cbuf, MSGMAXLINE );
+  ch = (char)cdgetx( pmt, MSG_LIN1, 1, TERMS, cbuf, MSGMAXLINE, TRUE );
   if ( ch == TERM_EXTRA )
     Ships[snum].weapalloc = Ships[snum].engalloc;
   else if ( ch == TERM_NORMAL )
@@ -984,7 +984,8 @@ void doautopilot( int snum )
   
   cdclrl( MSG_LIN1, 2 );
   cbuf[0] = EOS;
-  if ( cdgetx( conf, MSG_LIN1, 1, TERMS, cbuf, MSGMAXLINE ) != TERM_EXTRA )
+  if ( cdgetx( conf, MSG_LIN1, 1, TERMS, cbuf, MSGMAXLINE, 
+	       TRUE ) != TERM_EXTRA )
     {
       cdclrl( MSG_LIN1, 1 );
       return;
@@ -1216,7 +1217,7 @@ void dobeam( int snum )
   sprintf( cbuf, "Beam %s [1-%d] ", buf, beamax );
   cdclrl( MSG_LIN1, 1 );
   buf[0] = EOS;
-  ch = cdgetx( cbuf, MSG_LIN1, 1, TERMS, buf, MSGMAXLINE );
+  ch = cdgetx( cbuf, MSG_LIN1, 1, TERMS, buf, MSGMAXLINE, TRUE );
   if ( ch == TERM_ABORT )
     {
       c_putmsg( abt, MSG_LIN1 );
@@ -1281,13 +1282,13 @@ void dobeam( int snum )
 	{
 	  /*	      entertime = mod( entertime + BEAM_GRAND, 24*60*60*1000 );*/
 	  grand(&entertime);
-	  PVLOCK(lockword);
+	  PVLOCK(&ConqInfo->lockword);
 	  if ( dirup )
 	    {
 	      /* Beam up. */
 	      if ( Planets[pnum].armies <= MIN_BEAM_ARMIES )
 		{
-		  PVUNLOCK(lockword);
+		  PVUNLOCK(&ConqInfo->lockword);
 		  c_putmsg( lastfew, MSG_LIN1 );
 		  break;
 		}
@@ -1315,7 +1316,7 @@ void dobeam( int snum )
 	      else
 		Planets[pnum].armies = Planets[pnum].armies + 1;
 	    }
-	  PVUNLOCK(lockword);
+	  PVUNLOCK(&ConqInfo->lockword);
 	  total = total + 1;
 	  
 	  if ( total >= num )
@@ -1439,7 +1440,8 @@ void dobomb( int snum )
   cdclrl( MSG_LIN1, 1 );
   cdclrl( MSG_LIN2, 1 );
   buf[0] = EOS;
-  if ( cdgetx( cbuf, MSG_LIN1, 1, TERMS, buf, MSGMAXLINE ) != TERM_EXTRA )
+  if ( cdgetx( cbuf, MSG_LIN1, 1, TERMS, buf, MSGMAXLINE,
+	       TRUE) != TERM_EXTRA )
     {
       cdclrl( MSG_LIN1, 1 );
       cdclrl( MSG_LIN2, 1 );
@@ -1507,11 +1509,11 @@ void dobomb( int snum )
 	  if ( rnd() < killprob )
 	    {
 	      /*	    cerror(MSG_GOD, "DEBUG: we're in: killprob = %d\n", (int)(killprob * 10));*/
-	      PVLOCK(lockword);
+	      PVLOCK(&ConqInfo->lockword);
 	      if ( Planets[pnum].armies <= MIN_BOMB_ARMIES )
 		{
 		  /* No more armies left to bomb. */
-		  PVUNLOCK(lockword);
+		  PVUNLOCK(&ConqInfo->lockword);
 		  c_putmsg( lastfew, MSG_LIN1 );
 		  goto cbrk22; /* break 2;*/
 		}
@@ -1520,13 +1522,9 @@ void dobomb( int snum )
 	      Ships[snum].kills = Ships[snum].kills + BOMBARD_KILLS;
 	      Users[Ships[snum].unum].stats[USTAT_ARMBOMB] += 1;
 	      Teams[Ships[snum].team].stats[TSTAT_ARMBOMB] += 1;
-	      PVUNLOCK(lockword);
+	      PVUNLOCK(&ConqInfo->lockword);
 	      total = total + 1;
 	    }
-	  /*	    astservice(0);
-		    cdrefresh();
-		    c_sleep(ITER_SECONDS);
-		    */
 	}
       
       if ( Planets[pnum].armies <= MIN_BOMB_ARMIES )
@@ -1650,7 +1648,8 @@ void docloak( int snum )
   
   cdclrl( MSG_LIN1, 1 );
   cbuf[0] = EOS;
-  if ( cdgetx( pmt, MSG_LIN1, 1, TERMS, cbuf, MSGMAXLINE ) == TERM_EXTRA )
+  if ( cdgetx( pmt, MSG_LIN1, 1, TERMS, cbuf, MSGMAXLINE,
+	       TRUE) == TERM_EXTRA )
     {
       if ( cloak( snum ) )
 	c_putmsg( "Cloaking device engaged.", MSG_LIN2 );
@@ -1732,7 +1731,8 @@ void docoup( int snum )
   /* Confirm. */
   cdclrl( MSG_LIN1, 1 );
   cbuf[0] = EOS;
-  if ( cdgetx( conf, MSG_LIN1, 1, TERMS, cbuf, MSGMAXLINE ) != TERM_EXTRA )
+  if ( cdgetx( conf, MSG_LIN1, 1, TERMS, cbuf, MSGMAXLINE,
+	       TRUE) != TERM_EXTRA )
     {
       c_putmsg( "...aborted...", MSG_LIN1 );
       return;
@@ -1755,10 +1755,10 @@ void docoup( int snum )
     }
   
   cdclrl( MSG_LIN1, 1 );
-  PVLOCK(lockword);
+  PVLOCK(&ConqInfo->lockword);
   if ( Planets[pnum].team == Ships[snum].team )
     {
-      PVUNLOCK(lockword);
+      PVUNLOCK(&ConqInfo->lockword);
       c_putmsg( "Sensors show hostile forces eliminated from the planet.",
 	       MSG_LIN2 );
       return;
@@ -1769,7 +1769,7 @@ void docoup( int snum )
     {
       /* Failed; setup new reorganization time. */
       Teams[Ships[snum].team].couptime = rndint( 5, 10 );
-      PVUNLOCK(lockword);
+      PVUNLOCK(&ConqInfo->lockword);
       c_putmsg( "Coup unsuccessful.", MSG_LIN2 );
       return;
     }
@@ -1778,7 +1778,7 @@ void docoup( int snum )
   Planets[pnum].armies = rndint( 10, 20 );		/* create token coup force */
   Users[Ships[snum].unum].stats[USTAT_COUPS] += 1;
   Teams[Ships[snum].team].stats[TSTAT_COUPS] += 1;
-  PVUNLOCK(lockword);
+  PVUNLOCK(&ConqInfo->lockword);
   c_putmsg( "Coup successful!", MSG_LIN2 );
   
   return;
@@ -1799,7 +1799,7 @@ void docourse( int snum )
   cdclrl( MSG_LIN1, 2 );
 
   cbuf[0] = EOS;
-  ch = cdgetx( "Come to course: ", MSG_LIN1, 1, TERMS, cbuf, MSGMAXLINE );
+  ch = cdgetx( "Come to course: ", MSG_LIN1, 1, TERMS, cbuf, MSGMAXLINE, TRUE );
   delblanks( cbuf );
   if ( ch == TERM_ABORT || cbuf[0] == EOS )
     {
@@ -1947,7 +1947,8 @@ void dodistress( int snum )
   cdclrl( MSG_LIN1, 2 );
 
   cbuf[0] = EOS;
-  if ( cdgetx( pmt, MSG_LIN1, 1, TERMS, cbuf, MSGMAXLINE ) == TERM_EXTRA )
+  if ( cdgetx( pmt, MSG_LIN1, 1, TERMS, cbuf, MSGMAXLINE,
+	       TRUE) == TERM_EXTRA )
     {
       sprintf( cbuf,
 	     "sh=%d, dam=%d, fuel=%d, temp=",
@@ -2104,7 +2105,7 @@ void dohelp( int subdcl )
   tlin++;
   cprintf(tlin,col,ALIGN_NONE,sfmt, "[TAB]", "get next last info");
   
-  putpmt( "--- press space when done ---", MSG_LIN2 );
+  putpmt( MTXT_DONE, MSG_LIN2 );
   cdrefresh();
   while ( ! iogtimed( &ch, 1 ) && stillalive( csnum ) )
     ;
@@ -2121,13 +2122,14 @@ void dohelp( int subdcl )
 void doinfo( int snum )
 {
   char ch; 
-  int i, j, what, sorpnum, xsorpnum, count, token, now[8]; 
+  int i, j, what, sorpnum, xsorpnum, count, token, now[NOWSIZE]; 
   int extra; 
   
   cdclrl( MSG_LIN1, 2 );
   
   cbuf[0] = EOS;
-  ch = (char)cdgetx( "Information on: ", MSG_LIN1, 1, TERMS, cbuf, MSGMAXLINE );
+  ch = (char)cdgetx( "Information on: ", MSG_LIN1, 1, TERMS, cbuf, MSGMAXLINE,
+		     TRUE);
   if ( ch == TERM_ABORT )
     {
       cdclrl( MSG_LIN1, 1 );
@@ -2183,7 +2185,7 @@ void doinfo( int snum )
     infoplanet( "", j, snum );
   else if ( stmatch( cbuf, "time", FALSE ) )
     {
-      getnow( now );
+      getnow( now, 0 );
       c_strcpy( "It's ", cbuf );
       appnumtim( now, cbuf );
       appchr( '.', cbuf );
@@ -2458,7 +2460,7 @@ void doreview( int snum )
   if ( ! review( snum, lstmsg ) )
     {
       c_putmsg( "There are no old messages.", MSG_LIN1 );
-      putpmt( "--- press space for more ---", MSG_LIN2 );
+      putpmt( MTXT_MORE, MSG_LIN2 );
       cdrefresh();
       while ( ! iogtimed( &ch, 1 ) && stillalive( csnum ) )
 	;
@@ -2494,7 +2496,8 @@ void doselfdest(int snum)
     }
 
   cbuf[0] = EOS;
-  if ( cdgetx( pmt, MSG_LIN1, 1, TERMS, cbuf, MSGMAXLINE ) != TERM_EXTRA )
+  if ( cdgetx( pmt, MSG_LIN1, 1, TERMS, cbuf, MSGMAXLINE,
+	       TRUE) != TERM_EXTRA )
     {
       /* Chickened out. */
       cdclrl( MSG_LIN1, 1 );
@@ -2613,7 +2616,7 @@ void doteamlist( int team )
   while ( stillalive( csnum ) )
     {
       teamlist( team );
-      putpmt( "--- press space when done ---", MSG_LIN2 );
+      putpmt( MTXT_DONE, MSG_LIN2 );
       cdrefresh();
       if ( iogtimed( &ch, 1 ) )
 	break;
@@ -2691,7 +2694,8 @@ void dotow( int snum )
       return;
     }
   cbuf[0] = EOS;
-  ch = (char)cdgetx( "Tow which ship? ", MSG_LIN1, 1, TERMS, cbuf, MSGMAXLINE );
+  ch = (char)cdgetx( "Tow which ship? ", MSG_LIN1, 1, TERMS, cbuf, MSGMAXLINE,
+		     TRUE);
   cdclrl( MSG_LIN1, 1 );
   if ( ch == TERM_ABORT )
     return;
@@ -2700,7 +2704,7 @@ void dotow( int snum )
   safectoi( &other, cbuf, i );		/* ignore status */
   cbuf[0] = EOS;
   
-  PVLOCK(lockword);
+  PVLOCK(&ConqInfo->lockword);
   if ( other < 1 || other > MAXSHIPS )
     c_strcpy( "No such ship.", cbuf );
   else if ( Ships[other].status != SS_LIVE )
@@ -2726,7 +2730,7 @@ void dotow( int snum )
       Ships[snum].towing = other;
       c_strcpy( "Tractor beams engaged.", cbuf );
     }
-  PVUNLOCK(lockword);
+  PVUNLOCK(&ConqInfo->lockword);
   c_putmsg( cbuf, MSG_LIN2 );
   
   return;
@@ -2767,7 +2771,7 @@ void dountow( int snum )
 	{
 	  c_strcpy( "Breaking free from ship ", cbuf );
 	  appship( Ships[snum].towedby, cbuf );
-	  PVLOCK(lockword);
+	  PVLOCK(&ConqInfo->lockword);
 	  if ( Ships[snum].towedby != 0 )
 	    {
 	      /* Coast to a stop. */
@@ -2779,7 +2783,7 @@ void dountow( int snum )
 		Ships[Ships[snum].towedby].towing = 0;
 	      Ships[snum].towedby = 0;
 	    }
-	  PVUNLOCK(lockword);
+	  PVUNLOCK(&ConqInfo->lockword);
 	  appchr( '.', cbuf );
 	  c_putmsg( cbuf, MSG_LIN1 );
 	}
@@ -2788,7 +2792,7 @@ void dountow( int snum )
     {
       c_strcpy( "Tow released from ship ", cbuf );
       appship( Ships[snum].towing, cbuf );
-      PVLOCK(lockword);
+      PVLOCK(&ConqInfo->lockword);
       if ( Ships[snum].towing != 0 )
 	{
 	  /* Set other ship coasting. */
@@ -2802,7 +2806,7 @@ void dountow( int snum )
 	    Ships[Ships[snum].towing].towedby = 0;
 	  Ships[snum].towing = 0;
 	}
-      PVUNLOCK(lockword);
+      PVUNLOCK(&ConqInfo->lockword);
       appchr( '.', cbuf );
       c_putmsg( cbuf, MSG_LIN1 );
     }
@@ -3092,7 +3096,7 @@ void menu(void)
   /* Set up some things for the menu display. */
   switchteams = Users[cunum].ooptions[OOPT_SWITCHTEAMS];
   multiple = Users[cunum].ooptions[OOPT_MULTIPLE];
-  oclosed = *closed;
+  oclosed = ConqInfo->closed;
   cleave = FALSE;
   redraw = TRUE;
   sleepy = 0;
@@ -3161,7 +3165,7 @@ void menu(void)
 	  switchteams = Users[cunum].ooptions[OOPT_SWITCHTEAMS];
 	  redraw = TRUE;
 	}
-      if ( oclosed != *closed )
+      if ( oclosed != ConqInfo->closed )
 	{
 	  oclosed = ! oclosed;
 	  redraw = TRUE;
@@ -3264,7 +3268,8 @@ void menu(void)
 		  if ( confirm() )
 		    {
 				/* should exit here */
-		      resign( cunum );
+		      resign( cunum, FALSE );
+		      Ships[csnum].status = SS_OFF;
 		      cdend();
 		      exit(0);
 		      break;
@@ -3330,10 +3335,10 @@ void menu(void)
   if ( Ships[csnum].status == SS_RESERVED )
     {
       conqstats( csnum );
-      PVLOCK(lockword);
+      PVLOCK(&ConqInfo->lockword);
       Ships[csnum].sdfuse = 0;
       Ships[csnum].status = SS_OFF;
-      PVUNLOCK(lockword);
+      PVUNLOCK(&ConqInfo->lockword);
     }
   
   return;
@@ -3359,7 +3364,7 @@ int newship( int unum, int *snum )
   int numvec = 0;
   int ch;
 
-  PVLOCK(lockword);
+  PVLOCK(&ConqInfo->lockword);
   
   Ships[*snum].status = SS_ENTERING;		/* show intent to fly */
 
@@ -3376,7 +3381,7 @@ int newship( int unum, int *snum )
 	  vec[numvec++] = i;
 	}
 
-  PVUNLOCK(lockword);
+  PVUNLOCK(&ConqInfo->lockword);
 
   if ( ! Users[unum].ooptions[OOPT_MULTIPLE] )
     {
@@ -3396,7 +3401,8 @@ int newship( int unum, int *snum )
 	      cdputs( "You're already playing on another ship." , i, j );
 	      cbuf[0] = EOS;
 	      if ( cdgetx( "Press TAB to reincarnate to this ship: ",
-			   i + 1, j, TERMS, cbuf, MSGMAXLINE ) != TERM_EXTRA )
+			   i + 1, j, TERMS, cbuf, MSGMAXLINE,
+			   TRUE) != TERM_EXTRA )
 		{
 		  Ships[*snum].status = SS_RESERVED;
 		  attrset(0);
@@ -3420,7 +3426,7 @@ int newship( int unum, int *snum )
 
 
 	  /* Look for a live ship for us to take. */
-	  PVLOCK(lockword);
+	  PVLOCK(&ConqInfo->lockword);
 	  for ( i = 1; i <= MAXSHIPS; i = i + 1)
 	    if ( Ships[i].unum == unum && Ships[i].status == SS_LIVE )
 	      {
@@ -3431,7 +3437,7 @@ int newship( int unum, int *snum )
 		Ships[*snum].status = SS_ENTERING;
 		break;
 	      }
-	  PVUNLOCK(lockword);
+	  PVUNLOCK(&ConqInfo->lockword);
 	}
     }
   else
@@ -3444,7 +3450,7 @@ int newship( int unum, int *snum )
 
 	  cdclra(0, 0, MSG_LIN1 + 2, cdcols() - 1);
 
-	  PVLOCK(lockword);
+	  PVLOCK(&ConqInfo->lockword);
 	  
 	  /* Count number of his ships flying. */
 	  j = 0;
@@ -3457,7 +3463,7 @@ int newship( int unum, int *snum )
 		  vec[numvec++] = i;
 		}
 	  
-	  PVUNLOCK(lockword);
+	  PVUNLOCK(&ConqInfo->lockword);
 
 	  numavail = 0;
 	  for (k=0; k < numvec; k++)
@@ -3548,7 +3554,8 @@ int newship( int unum, int *snum )
 		{
 		  iBufPutc(ch);	/* stuff the char back in */
 		  selectship[0] = EOS;
-		  l = cdgetx("Ship Number: ", i, 1, TERMS, selectship, MSGMAXLINE / 2);
+		  l = cdgetx("Ship Number: ", i, 1, TERMS, selectship, 
+			     MSGMAXLINE / 2, TRUE);
 
 		  if (l == TERM_EXTRA || l == TERM_NORMAL)
 		    {
@@ -3566,13 +3573,13 @@ int newship( int unum, int *snum )
 				}
 			      if (found  == TRUE)
 				{
-				  PVLOCK(lockword);
+				  PVLOCK(&ConqInfo->lockword);
 				  Ships[*snum].status = SS_OFF;
 				  *snum = selectnum;
 				  fresh = FALSE;
 				  Ships[*snum].pid = cpid;
 				  Ships[*snum].status = SS_ENTERING;
-				  PVUNLOCK(lockword);
+				  PVUNLOCK(&ConqInfo->lockword);
 				  break;
 				}
 			    }
@@ -3623,7 +3630,7 @@ int newship( int unum, int *snum )
 	}
     }
   
-  PVLOCK(lockword);
+  PVLOCK(&ConqInfo->lockword);
   
   /* If necessary, initalize the ship */
   if ( fresh )
@@ -3647,11 +3654,13 @@ int newship( int unum, int *snum )
 				   while we were gone, if enabled */
       if (conf_ClearOldMsgs == TRUE)
 	{
-	  PVLOCK(lockmesg);
-	  Ships[*snum].lastmsg = *lastmsg;
+	  PVLOCK(&ConqInfo->lockmesg);
+	  Ships[*snum].lastmsg = ConqInfo->lastmsg;
 	  Ships[*snum].alastmsg = Ships[*snum].lastmsg;
-	  PVUNLOCK(lockmesg);
+	  PVUNLOCK(&ConqInfo->lockmesg);
 	}
+				/* init user's last entry time */
+      Users[Ships[*snum].unum].lastentry = getnow(NULL, 0);
     }
       
   Ships[*snum].robot = FALSE;
@@ -3664,7 +3673,7 @@ int newship( int unum, int *snum )
   /* Finally, turn the ship on. */
   Ships[*snum].status = SS_LIVE;
   
-  PVUNLOCK(lockword);
+  PVUNLOCK(&ConqInfo->lockword);
   
   return ( TRUE );
   
@@ -3774,7 +3783,8 @@ int welcome( int *unum )
 {
   int i, team, col; 
   char name[MAXUSERNAME];
-  
+  char password[MAXUSERNAME];	/* encrypted pw, "" if local */
+  int utype;			/* user type -local/remote */
   string sorry1="I'm sorry, but the game is closed for repairs right now.";
   string sorry2="I'm sorry, but there is no room for a new player right now.";
   string sorry3="I'm sorry, but you are not allowed to play right now.";
@@ -3784,17 +3794,19 @@ int welcome( int *unum )
   char * prepare_str="Prepare to be beamed aboard...";
   
   col=0;
-  glname( name );
-  if ( ! gunum( unum, name ) )
-    {
+
+  utype = Logon(name, password);
+
+  if ( ! gunum( unum, name, utype ) )
+    {				
       /* Must be a new player. */
       cdclear();
       cdredo();
-      if ( *closed )
+      if ( ConqInfo->closed )
 	{
 	  /* Can't enroll if the game is closed. */
-      cprintf(MSG_LIN2/2,col,ALIGN_CENTER,"#%d#%s", InfoColor, sorry1 );
-      cprintf(MSG_LIN2/2+1,col,ALIGN_CENTER,"#%d#%s", InfoColor, sorryn );
+	  cprintf(MSG_LIN2/2,col,ALIGN_CENTER,"#%d#%s", InfoColor, sorry1 );
+	  cprintf(MSG_LIN2/2+1,col,ALIGN_CENTER,"#%d#%s", InfoColor, sorryn );
 	  cdmove( 1, 1 );
 	  cdrefresh();
 	  c_sleep( 2.0 );
@@ -3809,31 +3821,59 @@ int welcome( int *unum )
       cbuf[i] = (char)toupper( cbuf[i] );
       if ( ! c_register( name, cbuf, team, unum ) )
 	{
-      cprintf(MSG_LIN2/2,col,ALIGN_CENTER,"#%d#%s", InfoColor, sorry2 );
-      cprintf(MSG_LIN2/2+1,col,ALIGN_CENTER,"#%d#%s", InfoColor, sorryn );
+	  cprintf(MSG_LIN2/2,col,ALIGN_CENTER,"#%d#%s", InfoColor, sorry2 );
+	  cprintf(MSG_LIN2/2+1,col,ALIGN_CENTER,"#%d#%s", InfoColor, sorryn );
 	  cdmove( 1, 1 );
 	  cdrefresh();
 	  c_sleep( 2.0 );
 	  return ( FALSE );
 	}
+				/* if a remote, then need to re-read/create
+				   config file, and re-init color */
+      if (utype == UT_REMOTE)
+	{
+	  if (GetConf(TRUE, *unum) == ERR)
+	    return(FALSE);
+	  if (has_colors() && conf_NoColor == FALSE)
+	    InitColors(TRUE);
+	  else
+	    InitColors(FALSE);
+	}
+
+				/* copy in the password */
+      strcpy(Users[*unum].pw, password);
       gretds();
+
       if ( vowel( Teams[team].name[0] ) )
       	cprintf(MSG_LIN2/2,0,ALIGN_CENTER,"#%d#%s%c #%d#%s #%d#%s",
-			InfoColor,selected_str,'n',A_BOLD,Teams[team].name,
-			InfoColor,starship_str);
-	  else
-      	cprintf(MSG_LIN2/2,0,ALIGN_CENTER,"#%d#%s #%d#%s #%d#%s",
-			InfoColor,selected_str,A_BOLD,Teams[team].name,
-			InfoColor,starship_str);
+		InfoColor,selected_str,'n',A_BOLD,Teams[team].name,
+		InfoColor,starship_str);
+      else
+	cprintf(MSG_LIN2/2,0,ALIGN_CENTER,"#%d#%s #%d#%s #%d#%s",
+		InfoColor,selected_str,A_BOLD,Teams[team].name,
+		InfoColor,starship_str);
       cprintf(MSG_LIN2/2+1,0,ALIGN_CENTER,"#%d#%s",
-		InfoColor, prepare_str );
+	      InfoColor, prepare_str );
       cdmove( 1, 1 );
       cdrefresh();
       c_sleep( 3.0 );
     }
+
+				/* if a remote, then need to re-read/create
+				   config file, and re-init color */
+  if (utype == UT_REMOTE)
+    {
+      if (GetConf(TRUE, *unum) == ERR)
+	return(FALSE);
+      if (has_colors() && conf_NoColor == FALSE)
+	InitColors(TRUE);
+      else
+	InitColors(FALSE);
+    }
+
   
   /* Must be special to play when closed. */
-  if ( *closed && ! Users[*unum].ooptions[OOPT_PLAYWHENCLOSED] )
+  if ( ConqInfo->closed && ! Users[*unum].ooptions[OOPT_PLAYWHENCLOSED] )
     {
       cdclear();
       cdredo();

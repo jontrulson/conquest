@@ -330,7 +330,7 @@ int findorbit( int snum, int *pnum )
 int findship( int *snum )
 {
   int i;
-  PVLOCK(lockword);
+  PVLOCK(&ConqInfo->lockword);
   *snum = -1;
   for ( i = 1; i <= MAXSHIPS; i = i + 1 )
     if ( Ships[i].status == SS_OFF )
@@ -346,7 +346,7 @@ int findship( int *snum )
 	Ships[*snum].eacc = 0;
 	break;
       }
-  PVUNLOCK(lockword);
+  PVUNLOCK(&ConqInfo->lockword);
   
   return ( *snum != -1 );
   
@@ -620,14 +620,26 @@ void fixdeltas( int snum )
 /*    int unum */
 /*    char lname() */
 /*    truth = gunum( unum, lname ) */
-int gunum( int *unum, char *lname )
+int gunum( int *unum, char *lname, int ltype )
 {
-  int i;
+  int i, chktype;
+  char *lptr = lname;
+
+  if (*lptr == '@')
+    {				/* a remote user only lookup  */
+      lptr++;
+      chktype = UT_REMOTE;
+    }
+  else
+    chktype = UT_LOCAL;
   
+  if (ltype != -1)
+    chktype = ltype;		/* provide override via option */
+
   *unum = -1;
   for ( i = 0; i < MAXUSERS; i = i + 1 )
-    if ( Users[i].live )
-      if ( strcmp( lname, Users[i].username ) == 0 )
+    if ( Users[i].live && Users[i].type == chktype)
+      if ( strcmp( lptr, Users[i].username ) == 0 )
 	{
 	  *unum = i;
 	  return ( TRUE );
@@ -647,43 +659,47 @@ void histlist( int godlike )
   int i, j, unum, lin, col, fline, lline, thistptr;
   int ch;
   char *hd0="C O N Q U E S T   U S E R   H I S T O R Y";
-  
-  /* Do some screen setup. */
+  char puname[SIZEUSERNAME + 2]; /* for '\0' and '@' */
+
+				/* Do some screen setup. */
   cdclear();
   fline = 1;
   lline = MSG_LIN1 - 1;
   cprintf(fline,0,ALIGN_CENTER,"#%d#%s",LabelColor, hd0);
   fline = fline + 2;
   
-  thistptr = -1;			/* force an update the first time */
+  thistptr = -1;		/* force an update the first time */
   while (TRUE) /* repeat */
     {
       if ( ! godlike )
 	if ( ! stillalive( csnum ) )
 	  break;
-      if ( thistptr != *histptr )
+      if ( thistptr != ConqInfo->histptr )
 	{
 	  /* Need to update the display */
-	  thistptr = *histptr;
+	  thistptr = ConqInfo->histptr;
 	  lin = fline;
 	  col = 8;
 	  cdclrl( fline, lline - fline + 1 );
-	  
-	  /*GAG	  i = modp1( thistptr + 1, MAXHISTLOG );	/* gag... */
-	  /*	    i = MAXHISTLOG - 1;	                        /* gag... */
 	  
 	  i = thistptr + 1;
 	  for ( j = 0; j < MAXHISTLOG; j++ )
 	    {
 	      i = modp1( i - 1, MAXHISTLOG );
-	      unum = histunum[i];
+	      unum = History[i].histunum;
 	      
 	      if ( unum < 0 || unum >= MAXUSERS )
-		continue; /* jet next;*/
+		continue; 
 	      if ( ! Users[unum].live )
-		continue; /* jet next */
-	      cprintf( lin,col,ALIGN_NONE, "#%d#%-12s %17s", YellowLevelColor,
-			Users[unum].username, histlog[i] );
+		continue; 
+	      if (Users[unum].type == UT_REMOTE)
+		sprintf(puname, "@%s", Users[unum].username);
+	      else
+		strcpy(puname, Users[unum].username);
+
+	      cprintf( lin, col, ALIGN_NONE, "#%d#%-12.12s %17s", 
+		       YellowLevelColor,
+		       puname, History[i].histlog );
 	      lin++;
 	      if ( lin > lline )
 		{
@@ -693,7 +709,7 @@ void histlist( int godlike )
 	    }
 	}
       
-      putpmt( "--- press space when done ---", MSG_LIN2 );
+      putpmt( MTXT_DONE, MSG_LIN2 );
       cdrefresh();
       if ( iogtimed( &ch, 1 ) )
 	break;				/* exit loop if we got one */
@@ -712,20 +728,22 @@ void initeverything(void)
   
   int i, j;
   
+  /* Twiddle the lockword. */
+  PVUNLOCK(&ConqInfo->lockword);
+  PVUNLOCK(&ConqInfo->lockmesg);
+
   /* Zero EVERYTHING. */
   zeroeverything();
-  
-  /* Twiddle the lockword. */
-  PVUNLOCK(lockword);
-  PVLOCK(lockword);
+
+  PVLOCK(&ConqInfo->lockword);
   
   /* Turn off the universe. */
-  *closed = TRUE;
+  ConqInfo->closed = TRUE;
   
   /* reset the lockwords if using semaphores */
 #if defined(USE_PVLOCK) && defined(USE_SEMS)
-  *lockword = 0;
-  *lockmesg = 0;
+  ConqInfo->lockword = 0;
+  ConqInfo->lockmesg = 0;
 #endif
 
   /* Zero team stats. */
@@ -735,26 +753,29 @@ void initeverything(void)
   
   /* De-register all users. */
   for ( i = 0; i < MAXUSERS; i = i + 1 )
-    Users[i].live = FALSE;
+    {
+      Users[i].live = FALSE;
+      Users[i].type = UT_LOCAL;
+    }
   
-  *celapsedseconds = 0;
-  *ccpuseconds = 0;
-  *delapsedseconds = 0;
-  *dcpuseconds = 0;
-  *relapsedseconds = 0;
-  *rcpuseconds = 0;
-  *raccum = 0;
+  ConqInfo->celapsedseconds = 0;
+  ConqInfo->ccpuseconds = 0;
+  ConqInfo->delapsedseconds = 0;
+  ConqInfo->dcpuseconds = 0;
+  ConqInfo->relapsedseconds = 0;
+  ConqInfo->rcpuseconds = 0;
+  ConqInfo->raccum = 0;
   
-  stcpn( "never", lastupchuck, DATESIZE );
-  getdandt( inittime );
-  getdandt( conqtime );
-  stcpn( "GOD", conqueror, MAXUSERPNAME );
-  stcpn( "self ruled", conqteam, MAXTEAMNAME );
-  stcpn( "Let there be light...", lastwords, MAXLASTWORDS );
+  stcpn( "never", ConqInfo->lastupchuck, DATESIZE );
+  getdandt( ConqInfo->inittime, 0 );
+  getdandt( ConqInfo->conqtime, 0 );
+  stcpn( "GOD", ConqInfo->conqueror, MAXUSERPNAME );
+  stcpn( "self ruled", ConqInfo->conqteam, MAXTEAMNAME );
+  stcpn( "Let there be light...", ConqInfo->lastwords, MAXLASTWORDS );
   
   /* Un-twiddle the lockwords. */
-  PVUNLOCK(lockword);
-  PVUNLOCK(lockmesg);
+  PVUNLOCK(&ConqInfo->lockword);
+  PVUNLOCK(&ConqInfo->lockmesg);
   
   initrobots();
   inituniverse();
@@ -774,12 +795,12 @@ void initgame(void)
   
   
   /* Twiddle the lockword. */
-  PVUNLOCK(lockword);
+  PVUNLOCK(&ConqInfo->lockword);
   
-  PVLOCK(lockword);
+  PVLOCK(&ConqInfo->lockword);
   
   /* Driver. */
-  *drivsecs = 0;
+  Driver->drivsecs = 0;
   
   /* Doomsday machine. */
   Doomsday->status = DS_OFF;
@@ -909,7 +930,7 @@ void initgame(void)
     }
   
   /* Un-twiddle the lockword. */
-  PVUNLOCK(lockword);
+  PVUNLOCK(&ConqInfo->lockword);
   
   /* Set up the physical universe. */
   initplanets();
@@ -934,8 +955,8 @@ void initmsgs(void)
       Msgs[i].msgfrom = 0;
       Msgs[i].msgto = 0;
     }
-  *lastmsg = 0;
-  *glastmsg = *lastmsg;
+  ConqInfo->lastmsg = 0;
+  ConqInfo->glastmsg = ConqInfo->lastmsg;
   
   return;
   
@@ -954,8 +975,8 @@ void initplanets(void)
   real orbang, orbvel;
   
   /* Twiddle the lockword. */
-  PVUNLOCK(lockword);
-  PVLOCK(lockword);
+  PVUNLOCK(&ConqInfo->lockword);
+  PVLOCK(&ConqInfo->lockword);
   
   SETPLANET( "Sol", PNUM_SOL );
   SETPLANET( "Earth", PNUM_EARTH );
@@ -1042,14 +1063,14 @@ void initplanets(void)
   Planets[PNUM_HELL].type = PLANET_DEAD;
   Planets[PNUM_JINX].type = PLANET_CLASSM;
   
-  stcpn( "class M planet", ptname[PLANET_CLASSM], MAXPTYPENAME );
-  stcpn( "dead planet", ptname[PLANET_DEAD], MAXPTYPENAME );
-  stcpn( "sun", ptname[PLANET_SUN], MAXPTYPENAME );
-  stcpn( "moon", ptname[PLANET_MOON], MAXPTYPENAME );
-  stcpn( "ghost planet", ptname[PLANET_GHOST], MAXPTYPENAME );
-  stcpn( "class A planet", ptname[PLANET_CLASSA], MAXPTYPENAME );
-  stcpn( "class O planet", ptname[PLANET_CLASSO], MAXPTYPENAME );
-  stcpn( "class Z planet", ptname[PLANET_CLASSZ], MAXPTYPENAME );
+  stcpn( "class M planet", ConqInfo->ptname[PLANET_CLASSM], MAXPTYPENAME );
+  stcpn( "dead planet", ConqInfo->ptname[PLANET_DEAD], MAXPTYPENAME );
+  stcpn( "sun", ConqInfo->ptname[PLANET_SUN], MAXPTYPENAME );
+  stcpn( "moon", ConqInfo->ptname[PLANET_MOON], MAXPTYPENAME );
+  stcpn( "ghost planet", ConqInfo->ptname[PLANET_GHOST], MAXPTYPENAME );
+  stcpn( "class A planet", ConqInfo->ptname[PLANET_CLASSA], MAXPTYPENAME );
+  stcpn( "class O planet", ConqInfo->ptname[PLANET_CLASSO], MAXPTYPENAME );
+  stcpn( "class Z planet", ConqInfo->ptname[PLANET_CLASSZ], MAXPTYPENAME );
   
   for ( i = 1; i <= NUMPLANETS; i = i + 1 )
     {
@@ -1324,7 +1345,7 @@ void initplanets(void)
     }
 
   /* Un-twiddle the lockword. */
-  PVUNLOCK(lockword);
+  PVUNLOCK(&ConqInfo->lockword);
   
   /* Protect against a system crash here! */
   upchuck();
@@ -1344,18 +1365,19 @@ void initrobots(void)
   /* SETROBOT( name, pname, team ) */
 #define SETROBOT(x, y, z) \
   { \
-      if ( gunum( &unum, x ) ) \
-      stcpn( y, Users[unum].alias, MAXUSERPNAME ); \
+      if ( gunum( &unum, x, UT_LOCAL ) ) \
+          stcpn( y, Users[unum].alias, MAXUSERPNAME ); \
       else if ( c_register( x, y, z, &unum ) ) \
       { \
 	  Users[unum].robot = TRUE; \
 	  Users[unum].ooptions[OOPT_MULTIPLE] = TRUE; \
 	  Users[unum].multiple = MAXSHIPS; \
+          Users[unum].type = UT_LOCAL; /* robots are always local */ \
       } \
   }
     
     /* Create robot guardians. */
-    SETROBOT( "Romulan", "Colossus", TEAM_ROMULAN );
+  SETROBOT( "Romulan", "Colossus", TEAM_ROMULAN );
   SETROBOT( "Orion", "HAL 9000", TEAM_ORION );
   SETROBOT( "Federation", "M-5", TEAM_FEDERATION );
   SETROBOT( "Klingon", "Guardian", TEAM_KLINGON );
@@ -1363,13 +1385,13 @@ void initrobots(void)
   /* Copy the strategy table. */
   for ( i = 0; i < MAX_VAR; i = i + 1 )
     for ( j = 0; j < 10; j = j + 1 )
-      rstrat[i][j] = trstrat[i][j];
+      Robot->rstrat[i][j] = trstrat[i][j];
   
   /* Copy the action vector. */
   for ( i = 0; i < 32; i = i + 1 )
-    rvec[i] = trvec[i];
+    Robot->rvec[i] = trvec[i];
   
-  *externrobots = FALSE;	/* XXX temporary */
+  ConqInfo->externrobots = FALSE;	/* XXX temporary */
   
   return;
   
@@ -1425,13 +1447,13 @@ void initship( int snum, int unum )
   for ( i = 1; i <= NUMPLANETS; i = i + 1 )
     Ships[snum].srpwar[i] = FALSE;
   /* ssdfuse(snum)				# setup in findship() */
-  PVLOCK(lockmesg);
+  PVLOCK(&ConqInfo->lockmesg);
   if ( Ships[snum].lastmsg == LMSG_NEEDINIT )
     {
-      Ships[snum].lastmsg = *lastmsg;
+      Ships[snum].lastmsg = ConqInfo->lastmsg;
       Ships[snum].alastmsg = Ships[snum].lastmsg;
     }
-  PVUNLOCK(lockmesg);
+  PVUNLOCK(&ConqInfo->lockmesg);
   Ships[snum].map = FALSE;
   Ships[snum].towing = 0;
   Ships[snum].towedby = 0;
@@ -1458,9 +1480,7 @@ void initship( int snum, int unum )
     }
   
   /* Update user some stats. */
-  getdandt( Users[unum].lastentry );		/* time stamp for this entry */
-  if ( Users[unum].lastentry[9] == ' ' )		/* remove seconds */
-    strcpy(&(Users[unum].lastentry[6]), &(Users[unum].lastentry[9]));
+  Users[unum].lastentry = getnow(NULL, 0);/* time stamp for this entry */
 
   Users[unum].stats[USTAT_ENTRIES] += 1;
   Teams[Ships[snum].team].stats[TSTAT_ENTRIES] += 1;
@@ -1479,11 +1499,11 @@ void inituniverse(void)
   int i;
   
   /* Twiddle the lockword. */
-  PVUNLOCK(lockword);
-  PVLOCK(lockword);
+  PVUNLOCK(&ConqInfo->lockword);
+  PVLOCK(&ConqInfo->lockword);
   
   /* Turn off the universe. */
-  *closed = TRUE;
+  ConqInfo->closed = TRUE;
   
   Teams[TEAM_FEDERATION].teamhplanets[0] = PNUM_EARTH;
   Teams[TEAM_FEDERATION].teamhplanets[1] = PNUM_TELOS;
@@ -1547,14 +1567,14 @@ void inituniverse(void)
   stcpn( "GOD", Teams[TEAM_GOD].name, MAXTEAMNAME );
   stcpn( "Empire", Teams[TEAM_EMPIRE].name, MAXTEAMNAME );
   
-  chrplanets[PLANET_CLASSM] = 'M';
-  chrplanets[PLANET_DEAD] = 'D';
-  chrplanets[PLANET_SUN] = 'S';
-  chrplanets[PLANET_MOON] = 'm';
-  chrplanets[PLANET_GHOST] = 'G';
-  chrplanets[PLANET_CLASSA] = 'A';
-  chrplanets[PLANET_CLASSO] = 'O';
-  chrplanets[PLANET_CLASSZ] = 'Z';
+  ConqInfo->chrplanets[PLANET_CLASSM] = 'M';
+  ConqInfo->chrplanets[PLANET_DEAD] = 'D';
+  ConqInfo->chrplanets[PLANET_SUN] = 'S';
+  ConqInfo->chrplanets[PLANET_MOON] = 'm';
+  ConqInfo->chrplanets[PLANET_GHOST] = 'G';
+  ConqInfo->chrplanets[PLANET_CLASSA] = 'A';
+  ConqInfo->chrplanets[PLANET_CLASSO] = 'O';
+  ConqInfo->chrplanets[PLANET_CLASSZ] = 'Z';
   
   Teams[TEAM_FEDERATION].teamchar = 'F';
   Teams[TEAM_ROMULAN].teamchar = 'R';
@@ -1571,19 +1591,19 @@ void inituniverse(void)
   Teams[TEAM_ORION].torpchar = '.';
   
   /* Initialize driver variables. */
-  *drivcnt = 0;
-  drivowner[0] = EOS;
+  Driver->drivcnt = 0;
+  Driver->drivowner[0] = EOS;
   
   /* Initialize user history stuff. */
-  *histptr = 0;
+  ConqInfo->histptr = 0;
   for ( i = 0; i < MAXHISTLOG; i = i + 1 )
     {
-      histunum[i] = -1;
-      histlog[i][0] = EOS;
+      History[i].histunum = -1;
+      History[i].histlog[0] = EOS;
     }
   
   /* Un-twiddle the lockword. */
-  PVUNLOCK(lockword);
+  PVUNLOCK(&ConqInfo->lockword);
   
   initgame();
   clearships();
@@ -1638,13 +1658,13 @@ void intrude( int snum, int pnum )
 /*    loghist( unum ) */
 void loghist( int unum )
 {
-  PVLOCK(lockword);
-  *histptr = modp1( *histptr + 1, MAXHISTLOG );
+  PVLOCK(&ConqInfo->lockword);
+  ConqInfo->histptr = modp1( ConqInfo->histptr + 1, MAXHISTLOG );
+				/* time stamp for this entry */
+  getdandt( History[ConqInfo->histptr].histlog, 0 );	
   
-  getdandt( histlog[*histptr] );	/* time stamp for this entry */
-  
-  histunum[*histptr] = unum;
-  PVUNLOCK(lockword);
+  History[ConqInfo->histptr].histunum = unum;
+  PVUNLOCK(&ConqInfo->lockword);
   return;
 }
 
@@ -1980,7 +2000,7 @@ void sendmsg( int from, int terse )
   /* First, find out who we're sending to. */
   cdclrl( MSG_LIN1, 2 );
   buf[0] = EOS;
-  ch = cdgetx( mto, MSG_LIN1, 1, TERMS, buf, MSGMAXLINE );
+  ch = cdgetx( mto, MSG_LIN1, 1, TERMS, buf, MSGMAXLINE, TRUE );
   if ( ch == TERM_ABORT )
     {
       cdclrl( MSG_LIN1, 1 );
@@ -2115,7 +2135,8 @@ void sendmsg( int from, int terse )
   append_flg = FALSE;
   do_append_flg = TRUE;
   msg[0] = EOS;
-  if ( cdgetp( ">", MSG_LIN2, 1, TERMS, msg, i, &append_flg, do_append_flg ) != TERM_ABORT )
+  if ( cdgetp( ">", MSG_LIN2, 1, TERMS, msg, i, 
+	       &append_flg, do_append_flg, TRUE ) != TERM_ABORT )
     if ( to != MSG_IMPLEMENTORS )
       stormsg( from, to, msg );
     else
@@ -2257,7 +2278,7 @@ int stillalive( int snum )
 	killship( snum, KB_SHIT );
       return ( FALSE );
     }
-  if ( *closed && ! Users[Ships[snum].unum].ooptions[OOPT_PLAYWHENCLOSED] )
+  if ( ConqInfo->closed && ! Users[Ships[snum].unum].ooptions[OOPT_PLAYWHENCLOSED] )
     {
       if ( Ships[snum].status == SS_LIVE )
 	killship( snum, KB_EVICT );
@@ -2282,21 +2303,21 @@ void stormsg( int from, int to, char *msg )
   int nlastmsg, i;
   
 				/* don't do this if invalid common block */
-  if (*commonrev != COMMONSTAMP)
+  if (*CBlockRevision != COMMONSTAMP)
     return;
 
-  PVLOCK(lockmesg);
-  nlastmsg = modp1( *lastmsg + 1, MAXMESSAGES );
+  PVLOCK(&ConqInfo->lockmesg);
+  nlastmsg = modp1( ConqInfo->lastmsg + 1, MAXMESSAGES );
   stcpn( msg, Msgs[nlastmsg].msgbuf, MESSAGE_SIZE );
   Msgs[nlastmsg].msgfrom = from;
   Msgs[nlastmsg].msgto = to;
-  *lastmsg = nlastmsg;
+  ConqInfo->lastmsg = nlastmsg;
   
   /* Remove allowable last message restrictions. */
   for ( i = 1; i <= MAXSHIPS; i = i + 1 )
     if ( nlastmsg == Ships[i].alastmsg )
       Ships[i].alastmsg = LMSG_READALL;
-  PVUNLOCK(lockmesg);
+  PVUNLOCK(&ConqInfo->lockmesg);
   
   return;
   

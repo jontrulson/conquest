@@ -531,13 +531,27 @@ void clog(char *fmt, ...)
 /*    ok = confirm() */
 int confirm(void)
 {
+  static char *cprompt = "Are you sure? ";
+  int scol = ((cdcols() - strlen(cprompt)) / 2);
+
+  if (askyn("Are you sure? ", MSG_LIN2, scol))
+    return(TRUE);
+  else
+    return (FALSE);
+  
+}
+
+/*  askyn - ask the user a yes/no question - return TRUE if yes */
+int askyn(char *question, int lin, int col)
+{
   char ch, buf[MSGMAXLINE];
   
   cdclrl( MSG_LIN2, 1 );
   attrset(InfoColor);
-  ch = getcx( "Are you sure? ", MSG_LIN2, 0, TERMS, buf, MSGMAXLINE );
+  buf[0] = EOS;
+  ch = cdgetx( question, lin, col, TERMS, buf, MSGMAXLINE - 1, TRUE);
   attrset(0);
-  cdclrl( MSG_LIN2, 1 );
+  cdclrl( lin, 1 );
   cdrefresh();
   if ( ch == TERM_ABORT )
     return ( FALSE );
@@ -738,7 +752,7 @@ void fmtseconds( int itime, char *buf )
 int getamsg( int snum, int *msg )
 {
   
-  while ( *msg != *lastmsg )
+  while ( *msg != ConqInfo->lastmsg )
     {
       *msg = modp1( *msg + 1, MAXMESSAGES );
       
@@ -772,7 +786,7 @@ char getcx( char *pmt, int lin, int offset, char *terms, char *buf, int len )
   move(lin, 0);
   clrtoeol();
   buf[0] = EOS;
-  return ( cdgetx( pmt, lin, i, terms, buf, len ) );
+  return ( cdgetx( pmt, lin, i, terms, buf, len, TRUE ) );
   
 }
 
@@ -781,12 +795,12 @@ char getcx( char *pmt, int lin, int offset, char *terms, char *buf, int len )
 /*  SYNOPSIS */
 /*    char buf() */
 /*    getdandt( buf ) */
-void getdandt( char *buf )
+void getdandt( char *buf, time_t thetime )
 {
-  int now[8];
+  int now[NOWSIZE];
   char junk[5];
   
-  getnow( now );
+  getnow( now, thetime );
   switch ( now[2] )
     {
     case 1:
@@ -851,7 +865,7 @@ int gettarget( char *pmt, int lin, int col, real *dir, real cdefault )
   
   cdclrl( lin, 1 );
   buf[0] = EOS;
-  ch = (char)cdgetx( pmt, lin, col, TERMS, buf, MSGMAXLINE );
+  ch = (char)cdgetx( pmt, lin, col, TERMS, buf, MSGMAXLINE, TRUE );
   if ( ch == TERM_ABORT )
     return ( FALSE );
   
@@ -885,9 +899,9 @@ int gettarget( char *pmt, int lin, int col, real *dir, real cdefault )
 /*    grand( h ) */
 void grand( int *h )
 {
-  int now[8];
+  int now[NOWSIZE];
   
-  getnow( now );
+  getnow( now, 0 );
   *h = ( ( ( now[4] * 60 ) + now[5] ) * 60 + now[6] ) * 1000 + now[7];
   
   return;
@@ -901,9 +915,9 @@ void grand( int *h )
 /*    gsecs( s ) */
 void gsecs( int *s )
 {
-  int now[8];
+  int now[NOWSIZE];
   
-  getnow( now );
+  getnow( now, 0 );
   *s = ( ( now[4] * 60 ) + now[5] ) * 60 + now[6];
   
   return;
@@ -962,7 +976,7 @@ int modp1( int i, int modulus )
 int more( char *pmt )
 {
   int ch = 0; 
-  string pml="--- press space for more ---";
+  string pml=MTXT_MORE;
   
   if ( pmt[0] != EOS )
     putpmt( pmt, MSG_LIN2 );
@@ -1030,7 +1044,7 @@ void pagefile( char *file, char *errmsg )
       
       if (plins >= DISPLAY_LINS)
 	{
-	  if (!more("--- press space for more ---"))
+	  if (!more(MTXT_MORE))
 	    break;		/* bail if space not hit */
 	  
 	  cdclear();

@@ -128,6 +128,14 @@ main(int argc, char *argv[])
 	  exit(1);
 	}
 
+#ifdef USE_SEMS
+      if (GetSem() == ERR)
+	{
+	  fprintf(stderr, "GetSem() failed to get semaphores. exiting.\n");
+	  exit(1);
+	}
+#endif
+
       GetSysConf(TRUE);		/* init defaults... */
       map_common();		/* Map the conquest universe common block */
   
@@ -153,20 +161,20 @@ main(int argc, char *argv[])
 				/* turn the game on */
       if ((OptionAction & A_ENABLEGAME) != 0)
 	{
-	  *closed = FALSE;
+	  ConqInfo->closed = FALSE;
 	  /* Unlock the lockwords (just in case...) */
-	  PVUNLOCK(lockword);
-	  PVUNLOCK(lockmesg);
-	  *drivstat = DRS_OFF;
-	  *drivpid = 0;
-	  drivowner[0] = EOS;
+	  PVUNLOCK(&ConqInfo->lockword);
+	  PVUNLOCK(&ConqInfo->lockmesg);
+	  Driver->drivstat = DRS_OFF;
+	  Driver->drivpid = 0;
+	  Driver->drivowner[0] = EOS;
 	  fprintf(stdout, "Game enabled.\n");
 	}
 
 				/* turn the game on */
       if ((OptionAction & A_DISABLEGAME) != 0)
 	{
-	  *closed = TRUE;
+	  ConqInfo->closed = TRUE;
 	  fprintf(stdout, "Game disabled.\n");
 	}
 
@@ -184,7 +192,7 @@ main(int argc, char *argv[])
       ;
     }
 
-  if (GetConf() == ERR)	/* use one if there, else defaults
+  if (GetConf(FALSE, 0) == ERR)	/* use one if there, else defaults
 				   A missing or out-of-date conquestrc file
 				   will be ignored */
     {
@@ -713,7 +721,7 @@ void debugplan(void)
 		      "#%d#%-13s %c %c %3d %3s %4s",
 		      outattr, 
 		      Planets[k].name, 
-		      chrplanets[Planets[k].type], 
+		      ConqInfo->chrplanets[Planets[k].type], 
 		      Teams[Planets[k].team].teamchar,
 		      Planets[k].armies, 
 		      uninhab, 
@@ -733,12 +741,16 @@ void debugplan(void)
 	      attrset(0);
 	    } /* while */
 	  
-	  putpmt( "--- press [SPACE] to continue, q to quit ---", MSG_LIN2 );
+	  if ((PlanetOffset + PlanetIdx) > NUMPLANETS)
+	    putpmt( MTXT_DONE, MSG_LIN2 ); /* last page? */
+	  else
+	    putpmt( MTXT_MORE, MSG_LIN2 );
+
           cdrefresh();
 	  
           if (iogtimed( &cmd, 1 ))
             {                   /* got a char */
-              if (cmd == 'q' || cmd == 'Q' || cmd == TERM_ABORT)
+              if (cmd != ' ')
                 {               /* quit */
                   Done = TRUE;
                 }
@@ -819,7 +831,8 @@ void kiss(int snum, int prompt_flg)
       else
 	sprintf(buf, "%d", snum);
 
-      ch = (char)cdgetx( prompt_str, MSG_LIN1, 1, TERMS, buf, MSGMAXLINE );
+      ch = (char)cdgetx( prompt_str, MSG_LIN1, 1, TERMS, buf, MSGMAXLINE,
+			 TRUE);
       if ( ch == TERM_ABORT )
 	{
 	  cdclrl( MSG_LIN1, 1 );
@@ -843,8 +856,8 @@ void kiss(int snum, int prompt_flg)
       sprintf(mbuf,"%s", kill_driver_str);
       cdputs( mbuf, MSG_LIN1, 1 );
       if ( confirm() )
-	if ( *drivstat == DRS_RUNNING )
-	  *drivstat = DRS_KAMIKAZE;
+	if ( Driver->drivstat == DRS_RUNNING )
+	  Driver->drivstat = DRS_KAMIKAZE;
       cdclrl( MSG_LIN1, 2 );
       cdmove( 1, 1 );
       return;
@@ -910,7 +923,7 @@ void kiss(int snum, int prompt_flg)
     }
   
   /* Kill a user? */
-  if ( ! gunum( &unum, buf ) )
+  if ( ! gunum( &unum, buf, -1 ) )
     {
       cdputs( no_user_str, MSG_LIN2, 1 );
       cdmove( 0, 0 );
@@ -1074,35 +1087,34 @@ void operate(void)
   char buf[MSGMAXLINE], junk[MSGMAXLINE];
   char xbuf[MSGMAXLINE];
   int ch;
-  
-  *glastmsg = *lastmsg;
-  glname( buf );
 
-  lastrev = *commonrev;
+  ConqInfo->glastmsg = ConqInfo->lastmsg;  
+
+  lastrev = *CBlockRevision;
   grand( &msgrand );
-  
+
   redraw = TRUE;
   while (TRUE)      /* repeat */
     {
-      if ( redraw || lastrev != *commonrev )
+      if ( redraw || lastrev != *CBlockRevision )
 	{
-	  lastrev = *commonrev;
+	  lastrev = *CBlockRevision;
 	  opback( lastrev, &savelin );
 	  redraw = FALSE;
 	}
       /* Line 1. */
 
-      if (*commonrev == COMMONSTAMP)
+      if (*CBlockRevision == COMMONSTAMP)
 	{
 	  /* game status */
-	  if ( *closed )
+	  if ( ConqInfo->closed )
 	    c_strcpy( "CLOSED", junk );
 	  else
 	    c_strcpy( "open", junk );
 	  
 	  /* driver status */
 	  
-	  switch ( *drivstat )
+	  switch ( Driver->drivstat )
 	    {
 	    case DRS_OFF:
 	      c_strcpy( "OFF", xbuf );
@@ -1154,7 +1166,7 @@ void operate(void)
 	  strcpy(buf, GetSemVal(0));
 #else
 	  c_strcpy( "lockword", buf );
-	  if ( *lockword == 0 )
+	  if ( ConqInfo->lockword == 0 )
 	    cntlockword = 0;
 	  else if ( cntlockword < 5 )
 	    cntlockword = cntlockword + 1;
@@ -1164,7 +1176,7 @@ void operate(void)
 	  appstr( " = %d, ", junk );
       
 	  c_strcpy( "lockmesg", buf );
-	  if ( *lockmesg == 0 )
+	  if ( ConqInfo->lockmesg == 0 )
 	    cntlockmesg = 0;
 	  else if ( cntlockmesg < 5 )
 	    cntlockmesg = cntlockmesg + 1;
@@ -1172,7 +1184,7 @@ void operate(void)
 	    upper( buf );
 	  appstr( buf, junk );
 	  appstr( " = %d", junk );
-	  sprintf( buf, junk, *lockword, *lockmesg );
+	  sprintf( buf, junk, ConqInfo->lockword, ConqInfo->lockmesg );
 #endif
       
 	  lin++;
@@ -1185,12 +1197,12 @@ void operate(void)
 	  /* Display a new message, if any. */
 	  readone = FALSE;
 	  if ( dgrand( msgrand, &now ) >= NEWMSG_GRAND )
-	    if ( getamsg( MSG_GOD, glastmsg ) )
+	    if ( getamsg( MSG_GOD, &ConqInfo->glastmsg ) )
 	      {
-		readmsg( MSG_GOD, *glastmsg, RMsg_Line );
+		readmsg( MSG_GOD, ConqInfo->glastmsg, RMsg_Line );
 		
 #if defined(OPER_MSG_BEEP)
-		if (Msgs[*glastmsg].msgfrom != MSG_GOD)
+		if (Msgs[ConqInfo->glastmsg].msgfrom != MSG_GOD)
 		  cdbeep();
 #endif
 		readone = TRUE;
@@ -1201,9 +1213,9 @@ void operate(void)
 	  /* Un-read message, if there's a chance it got garbaged. */
 	  if ( readone )
 	    if ( iochav() )
-	      *glastmsg = modp1( *glastmsg - 1, MAXMESSAGES );
+	      ConqInfo->glastmsg = modp1( ConqInfo->glastmsg - 1, MAXMESSAGES );
 
-	} /* *commonrev != COMMONSTAMP */
+	} /* *CBlockRevision != COMMONSTAMP */
       else 
 	{ /* COMMONBLOCK MISMATCH */
 
@@ -1239,24 +1251,24 @@ void operate(void)
 	  redraw = TRUE;
 	  break;
 	case 'f':
-	  if ( *closed )
+	  if ( ConqInfo->closed )
 	    {
-	      *closed = FALSE;
+	      ConqInfo->closed = FALSE;
 	      /* Unlock the lockwords (just in case...) */
-	      PVUNLOCK(lockword);
-	      PVUNLOCK(lockmesg);
-	      *drivstat = DRS_OFF;
-	      *drivpid = 0;
-	      drivowner[0] = EOS;
+	      PVUNLOCK(&ConqInfo->lockword);
+	      PVUNLOCK(&ConqInfo->lockmesg);
+	      Driver->drivstat = DRS_OFF;
+	      Driver->drivpid = 0;
+	      Driver->drivowner[0] = EOS;
 	    }
 	  else if ( confirm() )
-	    *closed = TRUE;
+	    ConqInfo->closed = TRUE;
 	  break;
 	case 'h':
-	  if ( *drivstat == DRS_HOLDING )
-	    *drivstat = DRS_RUNNING;
+	  if ( Driver->drivstat == DRS_HOLDING )
+	    Driver->drivstat = DRS_RUNNING;
 	  else
-	    *drivstat = DRS_HOLDING;
+	    Driver->drivstat = DRS_HOLDING;
 	  break;
 	case 'H':
 	  histlist( TRUE );
@@ -1273,7 +1285,7 @@ void operate(void)
 	  kiss(0,TRUE);
 	  break;
 	case 'L':
-	  review( MSG_GOD, *glastmsg );
+	  review( MSG_GOD, ConqInfo->glastmsg );
 	  break;
 	case 'm':
 	  sendmsg( MSG_GOD, TRUE );
@@ -1356,7 +1368,7 @@ void operate(void)
 /*    opinfo( snum ) */
 void opinfo( int snum )
 {
-  int i, j, now[8];
+  int i, j, now[NOWSIZE];
   char ch;
   string pmt="Information on: ";
   string huh="I don't understand.";
@@ -1364,7 +1376,7 @@ void opinfo( int snum )
   cdclrl( MSG_LIN1, 2 );
   
   cbuf[0] = EOS;
-  ch = (char)cdgetx( pmt, MSG_LIN1, 1, TERMS, cbuf, MSGMAXLINE );
+  ch = (char)cdgetx( pmt, MSG_LIN1, 1, TERMS, cbuf, MSGMAXLINE, TRUE );
   if ( ch == TERM_ABORT )
     {
       cdclrl( MSG_LIN1, 1 );
@@ -1395,7 +1407,7 @@ void opinfo( int snum )
     infoplanet( "", j, snum );
   else if ( stmatch( cbuf, "time", FALSE ) )
     {
-      getnow( now );
+      getnow( now, 0 );
       c_strcpy( "It's ", cbuf );
       appnumtim( now, cbuf );
       appchr( '.', cbuf );
@@ -1537,7 +1549,7 @@ void opinit(void)
       cdclrl( lin, 1 );
       attrset(InfoColor);
       buf[0] = EOS;
-      ch = (char)cdgetx( pmt, lin, col, TERMS, buf, MSGMAXLINE );
+      ch = (char)cdgetx( pmt, lin, col, TERMS, buf, MSGMAXLINE, TRUE );
       cdclrl( lin, 1 );
       cdputs( pmt, lin, col );
   	  attrset(0);
@@ -1686,7 +1698,7 @@ void oppedit(void)
 	attrset(RedLevelColor);
       else
 	attrset(InfoColor);
-      cdput( chrplanets[Planets[pnum].type], i, j + 1);
+      cdput( ConqInfo->chrplanets[Planets[pnum].type], i, j + 1);
       attrset(0);
 
       sprintf(buf, "%s\n", Planets[pnum].name);
@@ -1740,7 +1752,8 @@ void oppedit(void)
       lin++;
       i = Planets[pnum].type;
       cprintf(lin,col,ALIGN_NONE,sfmt, "t", "  Type:\n");
-      cprintf( lin,datacol,ALIGN_NONE, "#%d#%s (%d)", InfoColor, ptname[i], i );
+      cprintf( lin, datacol, ALIGN_NONE, 
+	       "#%d#%s (%d)", InfoColor, ConqInfo->ptname[i], i );
       
       lin++;
       i = Planets[pnum].team;
@@ -2008,14 +2021,15 @@ void opresign(void)
   
   cdclrl( MSG_LIN1, 2 );
   buf[0] = EOS;
-  ch = (char)cdgetx( "Resign user: ", MSG_LIN1, 1, TERMS, buf, MSGMAXLINE );
+  ch = (char)cdgetx( "Resign user: ", MSG_LIN1, 1, TERMS, buf, MSGMAXLINE,
+		     TRUE);
   if ( ch == TERM_ABORT )
     {
       cdclrl( MSG_LIN1, 1 );
       return;
     }
-  delblanks( buf );
-  if ( ! gunum( &unum, buf ) )
+
+  if ( ! gunum( &unum, buf, -1 ) )
     {
       cdputs( "No such user.", MSG_LIN2, 1 );
       cdmove( 1, 1 );
@@ -2023,7 +2037,7 @@ void opresign(void)
       c_sleep( 1.0 );
     }
   else if ( confirm() )
-    resign( unum );
+    resign( unum, TRUE );
   cdclrl( MSG_LIN1, 2 );
   
   return;
@@ -2045,7 +2059,7 @@ void oprobot(void)
   cdclrl( MSG_LIN1, 2 );
   buf[0] = EOS;
   ch = (char)cdgetx( "Enter username for new robot (Orion, Federation, etc): ",
-	      MSG_LIN1, 1, TERMS, buf, MAXUSERNAME );
+	      MSG_LIN1, 1, TERMS, buf, MAXUSERNAME, TRUE );
   if ( ch == TERM_ABORT || buf[0] == EOS )
     {
       cdclrl( MSG_LIN1, 1 );
@@ -2058,13 +2072,16 @@ void oprobot(void)
   if (j>1)
   	for (i=1;i<j && xbuf[i] != EOS;i++)
 		buf[i] = (char)tolower(xbuf[i]);
-  delblanks( buf );
-  if ( ! gunum( &unum, buf ) )
+
+  if ( ! gunum( &unum, buf, -1 ) )
     {
+      char *uptr = buf;
 				/* un-upper case first char and
 				   try again */
-      buf[0] = (char)tolower(buf[0]);
-      if ( ! gunum( &unum, buf ) )
+      if (*uptr == '@')
+	uptr++;
+      uptr[0] = (char)tolower(uptr[0]);
+      if ( ! gunum( &unum, buf, -1 ) )
 	{
 	  cdputs( "No such user.", MSG_LIN2, 1 );
 	  return;
@@ -2079,7 +2096,7 @@ void oprobot(void)
     {
       buf[0] = EOS;
       ch = (char)cdgetx( "Enter number desired (TAB for warlike): ",
-		  MSG_LIN2, 1, TERMS, buf, MAXUSERNAME );
+		  MSG_LIN2, 1, TERMS, buf, MAXUSERNAME, TRUE );
       if ( ch == TERM_ABORT )
 	{
 	  cdclrl( MSG_LIN1, 2 );
@@ -2154,12 +2171,12 @@ void opstats(void)
   do /*repeat*/
     {
       lin = 2;
-      fmtseconds( *ccpuseconds, timbuf );
+      fmtseconds( ConqInfo->ccpuseconds, timbuf );
       cprintf( lin,col,ALIGN_NONE,sfmt, 
 		LabelColor,"Conquest cpu time:", InfoColor,timbuf );
       
       lin++;
-      i = *celapsedseconds;
+      i = ConqInfo->celapsedseconds;
       fmtseconds( i, timbuf );
       cprintf( lin,col,ALIGN_NONE,sfmt, 
 		LabelColor,"Conquest elapsed time:", InfoColor,timbuf );
@@ -2168,17 +2185,17 @@ void opstats(void)
       if ( i == 0 )
 	x = 0.0;
       else
-	x = oneplace( 100.0 * creal(*ccpuseconds) / creal(i) );
+	x = oneplace( 100.0 * creal(ConqInfo->ccpuseconds) / creal(i) );
       cprintf( lin,col,ALIGN_NONE,pfmt, 
 		LabelColor,"Conquest cpu usage:", InfoColor,x);
       
       lin+=2;
-      fmtseconds( *dcpuseconds, timbuf );
+      fmtseconds( ConqInfo->dcpuseconds, timbuf );
       cprintf( lin,col,ALIGN_NONE,sfmt, 
 		LabelColor,"Conqdriv cpu time:", InfoColor,timbuf );
       
       lin++;
-      i = *delapsedseconds;
+      i = ConqInfo->delapsedseconds;
       fmtseconds( i, timbuf );
       cprintf( lin,col,ALIGN_NONE,sfmt, 
 		LabelColor,"Conqdriv elapsed time:", InfoColor,timbuf );
@@ -2187,17 +2204,17 @@ void opstats(void)
       if ( i == 0 )
 	x = 0.0;
       else
-	x = oneplace( 100.0 * creal(*dcpuseconds) / creal(i) );
+	x = oneplace( 100.0 * creal(ConqInfo->dcpuseconds) / creal(i) );
       cprintf( lin,col,ALIGN_NONE,pfmt, 
 		LabelColor,"Conqdriv cpu usage:", InfoColor,x);
       
       lin+=2;
-      fmtseconds( *rcpuseconds, timbuf );
+      fmtseconds( ConqInfo->rcpuseconds, timbuf );
       cprintf( lin,col,ALIGN_NONE,sfmt, 
 		LabelColor,"Robot cpu time:", InfoColor,timbuf );
       
 	  lin++;
-      i = *relapsedseconds;
+      i = ConqInfo->relapsedseconds;
       fmtseconds( i, timbuf );
       cprintf( lin,col,ALIGN_NONE,sfmt, 
 		LabelColor,"Robot elapsed time:", InfoColor,timbuf );
@@ -2206,43 +2223,44 @@ void opstats(void)
       if ( i == 0 )
 	x = 0.0;
       else
-	x = ( 100.0 * creal(*rcpuseconds) / creal(i) );
-      cprintf( lin,col,ALIGN_NONE,pfmt, 
-		LabelColor,"Robot cpu usage:", InfoColor,x);
+	x = ( 100.0 * creal(ConqInfo->rcpuseconds) / creal(i) );
+      cprintf( lin, col, ALIGN_NONE, pfmt, 
+		LabelColor, "Robot cpu usage:", InfoColor, x);
       
       lin+=2;
-      cprintf( lin,col,ALIGN_NONE,tfmt, 
-		LabelColor,"Last initialize:", InfoColor,inittime);
+      cprintf( lin, col, ALIGN_NONE, tfmt, 
+		LabelColor, "Last initialize:", InfoColor, ConqInfo->inittime);
       
       lin++;
-      cprintf( lin,col,ALIGN_NONE,tfmt, 
-		LabelColor,"Last conquer:", InfoColor,conqtime);
+      cprintf( lin, col, ALIGN_NONE, tfmt, 
+		LabelColor, "Last conquer:", InfoColor, ConqInfo->conqtime);
       
       lin++;
-      fmtseconds( *playtime, timbuf );
-      cprintf( lin,col,ALIGN_NONE,sfmt, 
-		LabelColor,"Driver time:", InfoColor,timbuf);
+      fmtseconds( Driver->playtime, timbuf );
+      cprintf( lin, col, ALIGN_NONE, sfmt, 
+		LabelColor, "Driver time:", InfoColor, timbuf);
       
       lin++;
-      fmtseconds( *drivtime, timbuf );
-      cprintf( lin,col,ALIGN_NONE,sfmt, 
-		LabelColor,"Play time:", InfoColor,timbuf);
+      fmtseconds( Driver->drivtime, timbuf );
+      cprintf( lin, col, ALIGN_NONE, sfmt, 
+		LabelColor, "Play time:", InfoColor, timbuf);
       
       lin++;
-      cprintf( lin,col,ALIGN_NONE,tfmt, 
-		LabelColor,"Last upchuck:", InfoColor,lastupchuck);
+      cprintf( lin, col, ALIGN_NONE, tfmt, 
+		LabelColor, "Last upchuck:", InfoColor, ConqInfo->lastupchuck);
       
       lin++;
-      getdandt( timbuf );
-      cprintf( lin,col,ALIGN_NONE,tfmt, 
-		LabelColor,"Current time:", InfoColor,timbuf);
+      getdandt( timbuf, 0 );
+      cprintf( lin, col, ALIGN_NONE, tfmt, 
+		LabelColor, "Current time:", InfoColor, timbuf);
       
       lin+=2;
-      if ( drivowner[0] != EOS )
+      if ( Driver->drivowner[0] != EOS )
 	sprintf( junk, "%d #%d#(#%d#%s#%d#)", 
-		 *drivpid,LabelColor,SpecialColor, drivowner,LabelColor );
-      else if ( *drivpid != 0 )
-	sprintf( junk, "%d", *drivpid );
+		 Driver->drivpid, LabelColor, SpecialColor, 
+		 Driver->drivowner, LabelColor );
+      else if ( Driver->drivpid != 0 )
+	sprintf( junk, "%d", Driver->drivpid );
       else
 	junk[0] = EOS;
 
@@ -2250,12 +2268,12 @@ void opstats(void)
 	cprintf( lin,col,ALIGN_NONE, 
 		 "#%d#drivsecs = #%d#%03d#%d#, drivcnt = #%d#%d\n",
 		 LabelColor, InfoColor, 
-		 *drivsecs,LabelColor,InfoColor,*drivcnt);
+		 Driver->drivsecs,LabelColor,InfoColor,Driver->drivcnt);
       else
 	cprintf( lin,col,ALIGN_NONE, 
                  "#%d#%s#%d#, drivsecs = #%d#%03d#%d#, drivcnt = #%d#%d\n",
 		 InfoColor,junk,LabelColor,InfoColor, 
-                 *drivsecs,LabelColor,InfoColor,*drivcnt);
+                 Driver->drivsecs,LabelColor,InfoColor,Driver->drivcnt);
       
       lin++;
       comsize( &size );
@@ -2265,8 +2283,8 @@ void opstats(void)
       
       lin++;
       sprintf( buf, "#%d#Common ident is #%d#%d", 
-	       LabelColor,InfoColor,*commonrev);
-      if ( *commonrev != COMMONSTAMP )
+	       LabelColor,InfoColor,*CBlockRevision);
+      if ( *CBlockRevision != COMMONSTAMP )
 	{
 	  sprintf( junk, " #%d#(binary ident is #%d#%d#%d#)\n", 
 		   LabelColor,InfoColor,COMMONSTAMP,LabelColor );
@@ -2297,7 +2315,7 @@ void opteamlist(void)
   do /* repeat*/
     {
       teamlist( -1 );
-      putpmt( "--- press space when done ---", MSG_LIN2 );
+      putpmt( MTXT_DONE, MSG_LIN2 );
       cdrefresh();
     }
   while ( !iogtimed( &ch, 1 ) ); /* until */
@@ -2314,17 +2332,24 @@ void opuadd(void)
   int i, unum, team;
   char ch;
   char buf[MSGMAXLINE], junk[MSGMAXLINE], name[MSGMAXLINE];
-  
+  char *nameptr;
+
   cdclrl( MSG_LIN1, 2 );
   name[0] = EOS;
-  ch = (char)cdgetx( "Add user: ", MSG_LIN1, 1, TERMS, name, MAXUSERNAME );
-  delblanks( name );
-  if ( ch == TERM_ABORT || name[0] == EOS )
+  ch = (char)cdgetx( "Add user: ", MSG_LIN1, 1, TERMS, name, MAXUSERNAME,
+		     TRUE);
+  /*  delblanks( name );*/
+
+  nameptr = name;
+  if (*nameptr == '@')
+    nameptr++;			/* in case we're adding a remote user */
+
+  if ( ch == TERM_ABORT || nameptr[0] == EOS )
     {
       cdclrl( MSG_LIN1, 1 );
       return;
     }
-  if ( gunum( &unum, name ) )
+  if ( gunum( &unum, name, -1 ) ) /* don't want to use ptr here */
     {
       cdputs( "That user is already enrolled.", MSG_LIN2, 1 );
       cdmove( 1, 1 );
@@ -2343,7 +2368,7 @@ void opuadd(void)
       
       cdclrl( MSG_LIN1, 1 );
       buf[0] = EOS;
-      ch = (char)cdgetx( junk, MSG_LIN1, 1, TERMS, buf, MSGMAXLINE );
+      ch = (char)cdgetx( junk, MSG_LIN1, 1, TERMS, buf, MSGMAXLINE, TRUE );
       if ( ch == TERM_ABORT )
 	{
 	  cdclrl( MSG_LIN1, 1 );
@@ -2368,15 +2393,23 @@ void opuadd(void)
   apptitle( team, buf );
   appchr( ' ', buf );
   i = strlen( buf );
-  appstr( name, buf );
+
+  appstr( nameptr, buf );
   buf[i] = (char)toupper( buf[i] );
   buf[MAXUSERPNAME] = EOS;
-  if ( ! c_register( name, buf, team, &unum ) )
+  if ( ! c_register( nameptr, buf, team, &unum ) )
     {
       cdputs( "Error adding new user.", MSG_LIN2, 1 );
       cdmove( 0, 0 );
       cdrefresh();
       c_sleep( 1.0 );
+    }
+  else				/* can't add remote users yet */
+    {
+      if (nameptr != name)
+	Users[unum].type = UT_REMOTE;
+      else
+	Users[unum].type = UT_LOCAL;
     }
   cdclrl( MSG_LIN1, 2 );
   
@@ -2390,12 +2423,13 @@ void opuadd(void)
 /*    opuedit */
 void opuedit(void)
 {
-  
+
 #define MAXUEDITROWS (MAXOPTIONS+2) 
+
   int i, unum, row = 1, lin, olin, tcol, dcol, lcol, rcol;
   char buf[MSGMAXLINE];
   int ch, left = TRUE;
-  
+  char datestr[DATESIZE];
   cdclrl( MSG_LIN1, 2 );
   attrset(InfoColor);
   ch = getcx( "Edit which user: ", MSG_LIN1, 0, TERMS, buf, MAXUSERNAME );
@@ -2405,8 +2439,9 @@ void opuedit(void)
 	  attrset(0);
       return;
     }
-  delblanks( buf );
-  if ( ! gunum( &unum, buf ) )
+  /*  delblanks( buf );*/
+
+  if ( ! gunum( &unum, buf, -1 ) )
     {
       cdclrl( MSG_LIN1, 2 );
       cdputs( "Unknown user.", MSG_LIN1, 1 );
@@ -2529,8 +2564,14 @@ void opuedit(void)
       
       lin+=(MAXOOPTIONS + 1);
       cprintf(lin,tcol,ALIGN_NONE,"#%d#%s", LabelColor,"       Last entry:");
+
+      if (Users[unum].lastentry == 0)
+	strcpy(datestr, "never");
+      else
+	getdandt(datestr, Users[unum].lastentry);
+
       cprintf(lin,dcol,ALIGN_NONE,"#%d#%s",InfoColor, 
-	      Users[unum].lastentry);
+	      datestr);
       
       lin++;
       cprintf(lin,tcol,ALIGN_NONE,"#%d#%s", LabelColor,"  Elapsed seconds:");
@@ -2729,7 +2770,7 @@ void opuedit(void)
 	      if ( ch != TERM_ABORT && buf[0] != EOS)
 	      {
 		delblanks( buf );
-		if ( ! gunum( &i, buf ) )
+		if ( ! gunum( &i, buf, -1 ) )
 		  stcpn( buf, Users[unum].username, MAXUSERNAME );
 		else
 		  {
@@ -2835,11 +2876,11 @@ void watch(void)
 	    /* Try to display a new message. */
 	    readone = FALSE;
 	    if ( dgrand( msgrand, &now ) >= NEWMSG_GRAND )
-		if ( getamsg( MSG_GOD, glastmsg ) )
+		if ( getamsg( MSG_GOD, &ConqInfo->glastmsg ) )
 		  {
-		    readmsg( MSG_GOD, *glastmsg, RMsg_Line );
+		    readmsg( MSG_GOD, ConqInfo->glastmsg, RMsg_Line );
 #if defined(OPER_MSG_BEEP)
-		    if (Msgs[*glastmsg].msgfrom != MSG_GOD)
+		    if (Msgs[ConqInfo->glastmsg].msgfrom != MSG_GOD)
 		      cdbeep();
 #endif		     
 		    msgrand = now;
@@ -2862,7 +2903,7 @@ void watch(void)
 	      /* Un-read message, if there's a chance it got garbaged. */
 	      if ( readone )
 		if ( iochav() )
-		  *glastmsg = modp1( *glastmsg - 1, MAXMESSAGES );
+		  ConqInfo->glastmsg = modp1( ConqInfo->glastmsg - 1, MAXMESSAGES );
 	      
 	      /* Get a char with timeout. */
 	      if ( ! iogtimed( &ch, 1 ) )
@@ -2900,7 +2941,7 @@ void watch(void)
 		  oprobot();
 		  break;
 		case 'L':
-		  review( MSG_GOD, *glastmsg );
+		  review( MSG_GOD, ConqInfo->glastmsg );
 		  break;
 		case 0x0c:
 		  stoptimer();
@@ -3182,7 +3223,7 @@ int prompt_ship(char buf[], int *snum, int *normal)
 
   cdclrl( MSG_LIN1, 2 );
   buf[0] = EOS;
-  tch = cdgetx( pmt, MSG_LIN1, 1, TERMS, buf, MSGMAXLINE );
+  tch = cdgetx( pmt, MSG_LIN1, 1, TERMS, buf, MSGMAXLINE, TRUE );
   cdclrl( MSG_LIN1, 1 );
 
   if ( tch == TERM_ABORT )
@@ -3288,7 +3329,7 @@ void dowatchhelp(void)
   tlin++;
   cprintf(tlin,col,ALIGN_NONE,sfmt, "/", "player list");
 
-  putpmt( "--- press space when done ---", MSG_LIN2 );
+  putpmt( MTXT_DONE, MSG_LIN2 );
   cdrefresh();
   while ( ! iogtimed( &ch, 1 ) )
     ;
@@ -3367,7 +3408,7 @@ int DoInit(char InitChar, int cmdline)
     {
     case 'e': 
       initeverything();
-      *commonrev = COMMONSTAMP;
+      *CBlockRevision = COMMONSTAMP;
 
       if (cmdline == TRUE)
 	{
@@ -3390,7 +3431,7 @@ int DoInit(char InitChar, int cmdline)
 
     case 'u': 
       inituniverse();
-      *commonrev = COMMONSTAMP;
+      *CBlockRevision = COMMONSTAMP;
 
       if (cmdline == TRUE)
 	{
@@ -3402,7 +3443,7 @@ int DoInit(char InitChar, int cmdline)
 
     case 'g': 
       initgame();
-      *commonrev = COMMONSTAMP;
+      *CBlockRevision = COMMONSTAMP;
 
       if (cmdline == TRUE)
 	{
@@ -3414,7 +3455,7 @@ int DoInit(char InitChar, int cmdline)
 
     case 'p': 
       initplanets();
-      *commonrev = COMMONSTAMP;
+      *CBlockRevision = COMMONSTAMP;
 
       if (cmdline == TRUE)
 	{
@@ -3426,7 +3467,7 @@ int DoInit(char InitChar, int cmdline)
 
     case 's': 
       clearships();
-      *commonrev = COMMONSTAMP;
+      *CBlockRevision = COMMONSTAMP;
 
       if (cmdline == TRUE)
 	{
@@ -3438,7 +3479,7 @@ int DoInit(char InitChar, int cmdline)
 
     case 'm': 
       initmsgs();
-      *commonrev = COMMONSTAMP;
+      *CBlockRevision = COMMONSTAMP;
 
       if (cmdline == TRUE)
 	{
@@ -3449,9 +3490,9 @@ int DoInit(char InitChar, int cmdline)
       break;
 
     case 'l': 
-      PVUNLOCK(lockword);
-      PVUNLOCK(lockmesg);
-      *commonrev = COMMONSTAMP;
+      PVUNLOCK(&ConqInfo->lockword);
+      PVUNLOCK(&ConqInfo->lockmesg);
+      *CBlockRevision = COMMONSTAMP;
 
       if (cmdline == TRUE)
 	{
@@ -3463,7 +3504,7 @@ int DoInit(char InitChar, int cmdline)
 
     case 'r': 
       initrobots();
-      *commonrev = COMMONSTAMP;
+      *CBlockRevision = COMMONSTAMP;
 
       if (cmdline == TRUE)
 	{

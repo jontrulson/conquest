@@ -213,7 +213,7 @@ void display( int snum, int display_info )
 	      else
 		attrset(palertcol);
 
-	      cdput( chrplanets[Planets[i].type], lin, col );
+	      cdput( ConqInfo->chrplanets[Planets[i].type], lin, col );
 	      attrset(0);
 	    }
 	  else
@@ -261,7 +261,7 @@ void display( int snum, int display_info )
                       attrset(0);
 
                       attrset(InfoColor);
-                      cdput( chrplanets[Planets[i].type], lin, m++);
+                      cdput( ConqInfo->chrplanets[Planets[i].type], lin, m++);
                       attrset(0);
 
                       attrset(palertcol);
@@ -300,7 +300,7 @@ void display( int snum, int display_info )
 		  if (Planets[i].type == PLANET_SUN)
 		    attrset(RedLevelColor); /* suns have a red core */
 
-		  cdput( chrplanets[Planets[i].type], lin, col + 1);
+		  cdput( ConqInfo->chrplanets[Planets[i].type], lin, col + 1);
 		  attrset(0);
 		}
 	      if ( snum < 0 || (snum > 0 && Ships[snum].options[OPT_PLANETNAMES]) ) /* dwp */
@@ -1285,7 +1285,7 @@ void display_headers(int snum)
   appstr( ", ", ssbuf );
   appsstatus( Ships[snum].status, ssbuf);
   
-  if ( *closed) 
+  if ( ConqInfo->closed) 
     {
       sprintf(hbuf, heading_fmt, closed_str1, 
 	      Teams[Ships[snum].team].teamchar, 
@@ -1298,7 +1298,7 @@ void display_headers(int snum)
     }
   else if ( Ships[snum].robot )
     {
-      if (*externrobots == TRUE) 
+      if (ConqInfo->externrobots == TRUE) 
 	{
 	  sprintf(hbuf, heading_fmt, robo_str1, 
 		  Teams[Ships[snum].team].teamchar, snum,
