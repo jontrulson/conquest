@@ -616,6 +616,7 @@ int newrob( int *snum, int unum )
 				/* randomize the robot's 'strength' */
       Ships[*snum].strkills = 
 	rnduni(0.0, (DOUBLE_E_KILLS - (DOUBLE_E_KILLS / 4.0)));
+
     }
   
   /* Initialize the things that aren't done by initship(). */

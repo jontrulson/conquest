@@ -529,7 +529,7 @@ case "$uname" in
 #define LINUX 1
 EOF
     
-	CFLAGS="$CFLAGS -O2 -fPIC -fno-builtin"
+	CFLAGS="$CFLAGS -D__NO_MATH_INLINES -O2 -fPIC -fno-builtin"
 
 	FILEPRIV="@-echo filepriv"
 	
@@ -553,7 +553,7 @@ EOF
 #define FREEBSD 1
 EOF
 
-	CFLAGS="$CFLAGS -O2 -fPIC -fno-builtin"
+	CFLAGS="$CFLAGS -D__NO_MATH_INLINES -O2 -fPIC -fno-builtin"
 
 	FILEPRIV="@-echo filepriv"
 	

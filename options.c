@@ -420,7 +420,7 @@ static void ChangeMacro(int macronum)
   static char *prmpt2 = "Enter Conquest commands.  ([RETURN] = \\r, [TAB] = \\t)";
   char buf[MAX_MACRO_LEN + 1];
   char prmpt[BUFFER_SIZE];
-  int ch, rv;
+  int ch;
   lin = MSG_LIN1;
   
   
@@ -430,7 +430,7 @@ static void ChangeMacro(int macronum)
   sprintf(prmpt, "f%2d = ", macronum);
 
   strcpy(buf, Macro2Str(conf_MacrosF[macronum - 1]));
-  rv = cdgetx(prmpt, lin, 1, TERMS, buf, MAX_MACRO_LEN - 1, TRUE);
+  ch = cdgetx(prmpt, lin, 1, TERMS, buf, MAX_MACRO_LEN - 1, TRUE);
 
   if (ch == TERM_ABORT)
     {

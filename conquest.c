@@ -1490,7 +1490,7 @@ void dobomb( int snum )
       cdrefresh();
       
       /* See if it's time to bomb yet. */
-      while ((int) fabs (dgrand( (int)entertime, (int *)&now )) >= BOMBARD_GRAND )
+      while ((int) fabs ((real)dgrand( (int)entertime, (int *)&now )) >= BOMBARD_GRAND )
 	{
 	  if ( Ships[snum].wfuse > 0 )
 	    {

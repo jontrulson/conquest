@@ -194,7 +194,7 @@ privileges to an executable, without requiring suid root programs.
 	By default, when installing the Unixware binary package or
 doing a 'gmake install' on a Unixware system, the Makefile will use
 the 'filepriv(1m)' command to give Conquest the ability to raise it's
-priority and lock the common block (64KB) into memory via the TSHAR
+priority and lock the common block (256KB) into memory via the TSHAR
 and the PLOCK privileges.  If you don't like this, either don't set
 the priveleges, OR comment out '#define USE_COMMONMLOCK' and '#define
 SET_PRIORITY' in defs.h and recompile.  
@@ -216,7 +216,7 @@ take no responsibiliy for anything regarding the use of this software
 
 ## SOLARIS NOTE
 
-There is a problem with the lexer (lex) on Solaris.  When it process
+There is a problem with the lexer (lex) on Solaris.  When it processes
 conqstrat.c.l into lex.yy.c, a syntax error is introduced.  If you
 compile the resulting code (make will try this) you'll get a syntax
 error.  Simply edit the file (should be lex.yy.c) delete the offending

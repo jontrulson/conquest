@@ -222,8 +222,9 @@ void c_sleep(real sleeptime)
     
   if (poll(NULL, 0, (int) (sleeptime * 1000)) == -1)
     {
-      clog("csleep(): poll() failed: %s",
-           sys_errlist[errno]);
+      if (errno != EINTR) /* Interrupted system call */
+	clog("csleep(): poll() failed: %s",
+	     sys_errlist[errno]);
     }
 
 #endif

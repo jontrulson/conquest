@@ -22,7 +22,7 @@ urev=`uname -r`
 case "$uname" in
   Linux*)
 	AC_DEFINE(LINUX)    
-	CFLAGS="$CFLAGS -O2 -fPIC -fno-builtin"
+	CFLAGS="$CFLAGS -D__NO_MATH_INLINES -O2 -fPIC -fno-builtin"
 
 	FILEPRIV="@-echo filepriv"
 	AC_SUBST(FILEPRIV)
@@ -43,7 +43,7 @@ case "$uname" in
 	;;
   FreeBSD*)
 	AC_DEFINE(FREEBSD)
-	CFLAGS="$CFLAGS -O2 -fPIC -fno-builtin"
+	CFLAGS="$CFLAGS -D__NO_MATH_INLINES -O2 -fPIC -fno-builtin"
 
 	FILEPRIV="@-echo filepriv"
 	AC_SUBST(FILEPRIV)
