@@ -42,7 +42,6 @@ void initTexFonts(void)
   if (!fontLargeTxf)
     {
       clog("initTexFonts: load %s failed", fbuf);
-      return;
     }
 
   sprintf(fbuf, "%s/img/%s", CONQSHARE, "fixed.txf");
@@ -51,7 +50,14 @@ void initTexFonts(void)
   if (!fontFixedTxf)
     {
       clog("initTexFonts: load %s failed", fbuf);
-      return;
+    }
+
+  sprintf(fbuf, "%s/img/%s", CONQSHARE, "tinyfixed.txf");
+  fontTinyFixedTxf = txfLoadFont(fbuf);
+
+  if (!fontTinyFixedTxf)
+    {
+      clog("initTexFonts: load %s failed", fbuf);
     }
 
   sprintf(fbuf, "%s/img/%s", CONQSHARE, "msg.txf");
@@ -60,7 +66,6 @@ void initTexFonts(void)
   if (!fontMsgTxf)
     {
       clog("initTexFonts: load %s failed", fbuf);
-      return;
     }
 
   txfEstablishTexture(fontLargeTxf, 0, GL_TRUE);
@@ -76,9 +81,6 @@ void initTexFonts(void)
 void initFonts(void)
 {
   int i;
-  int curw = glutGetWindow();
-
-  glutSetWindow(dConf.viewerw);
 
   /* viewer font */
   if (vFontDL == -1)
@@ -89,13 +91,14 @@ void initFonts(void)
           glNewList(vFontDL + i, GL_COMPILE);
           glutBitmapCharacter(GLUT_BITMAP_HELVETICA_12, i);
           glEndList();
+          GLError();
         }
       vFontW = glutBitmapWidth(GLUT_BITMAP_HELVETICA_12, 'H');
+      GLError();
     }
 
   
   /* FPS */
-  glutSetWindow(dConf.mainw);
   if (mFontTinyDL == -1)
     {    
       mFontTinyDL = glGenLists(128);
@@ -108,23 +111,20 @@ void initFonts(void)
       mFontTinyW = glutBitmapWidth(GLUT_BITMAP_TIMES_ROMAN_10, 'H');
     }
 
-  glutSetWindow(curw);          /* restore notion of current window */
-
   return;
 }
   
 
 void glfRender(GLfloat x, GLfloat y, GLfloat w, GLfloat h,
                        TexFont *font, char *str, int color, 
-                       int scalex, int dofancy)
+               int scalex, int dofancy, int ortho)
 {
-  GLfloat inverty = (((glutGetWindow() == dConf.mainw)) ? -1.0 : 1.0);
+#warning "fix inverty for viewer"
+  GLfloat inverty = ((ortho) ? -1.0 : 1.0);
   int width, ascent, descent;
   GLfloat xs = 1.0, ys = 1.0;
 
   int l;
-
-  assert(glutGetWindow() == 1);
 
   if (!font)
     return;
@@ -159,8 +159,11 @@ void glfRender(GLfloat x, GLfloat y, GLfloat w, GLfloat h,
   glPushMatrix();
   glLoadIdentity();
 
-  glTranslatef( x, y + h, 0.0f );
-  glScalef(xs, inverty * ys, 1.0);
+  if (ortho) 
+    {
+      glTranslatef( x, y + h, 0.0f );
+      glScalef(xs, inverty * ys, 1.0);
+    }
 
   uiPutColor(color);
   
@@ -178,9 +181,10 @@ void glfRender(GLfloat x, GLfloat y, GLfloat w, GLfloat h,
 }
 
 void drawString(GLfloat x, GLfloat y, GLfloat z, char *str, 
-                GLuint DL, int color)
+                GLuint DL, int color, int ortho)
 {
-  int ortho = (glutGetWindow() == dConf.mainw);
+#warning "FIXME get rid of me"
+  /*  int ortho = (glutGetWindow() == dConf.mainw);*/
 
   if (!str)
     return;

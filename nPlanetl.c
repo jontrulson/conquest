@@ -59,16 +59,6 @@ void nPlanetlInit(int nodeid, int sn, int tn)
   snum = sn;
   team = tn;
 
-  if (dConf.viewerwmapped)
-    {
-      /* unmap the viewer */
-      glutSetWindow(dConf.viewerw);
-      glutHideWindow();
-      dConf.viewerwmapped = FALSE;
-
-      glutSetWindow(dConf.mainw);
-    }
-
   setNode(&nPlanetlNode);
 
   return;

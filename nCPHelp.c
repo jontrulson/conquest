@@ -41,16 +41,6 @@ static scrNode_t nCPHelpNode = {
 void nCPHelpInit(void)
 {
 
-  if (dConf.viewerwmapped)
-    {
-      /* unmap the viewer */
-      glutSetWindow(dConf.viewerw);
-      glutHideWindow();
-      dConf.viewerwmapped = FALSE;
-
-      glutSetWindow(dConf.mainw);
-    }
-
   setNode(&nCPHelpNode);
 
   return;

@@ -50,8 +50,6 @@ void renderHud(void)
   static int oldrx = 0;
   static int rxdiff = 0;
 
-  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
   /* draw fps/bps... */
 
   if ((gnow - rxtime) > 1000)
@@ -76,7 +74,7 @@ void renderHud(void)
              0.0,
              buf1024, 
              mFontTinyDL,
-             -1);
+             -1, TRUE);
 
   GLError();
 
@@ -106,27 +104,27 @@ void renderHud(void)
   /* heading */
   glfRender(tx + 2.0, ty, ((xstatw / 6.0) * 3.0), 
              (dConf.vH / 15.0),
-             fontLargeTxf, dData.heading.heading, NoColor, TRUE, FALSE);
+             fontLargeTxf, dData.heading.heading, NoColor, TRUE, FALSE, TRUE);
   drawLineBox(tx, ty, ((xstatw / 6.0) * 3.0) + 4.0, 
               (dConf.vH / 15.0) + 4.0,
               NoColor, 1.0);
 
   glfRender(tx + 2.0, ty + (dConf.vH / 15.0), ((xstatw / 6.0) * 3.0),
             (dConf.vH / 20.0),
-            fontFixedTxf, "Heading", LabelColor, TRUE, FALSE);
+            fontFixedTxf, "Heading", LabelColor, TRUE, FALSE, TRUE);
   
   tx = tx + ((xstatw / 6.0) * 4.0);
   /* warp */
   glfRender(tx + 2.0, ty, xstatw - (tx - 2.0), 
              (dConf.vH / 15.0),
-             fontLargeTxf, dData.warp.warp, InfoColor, TRUE, FALSE);
+             fontLargeTxf, dData.warp.warp, InfoColor, TRUE, FALSE, TRUE);
   drawLineBox(tx, ty, xstatw - tx + 2.0/*((xstatw / 6.0) * 2.0) + 4.0*/, 
               (dConf.vH / 15.0) + 4.0,
               InfoColor, 1.0);
 
   glfRender(tx + 2.0, ty + (dConf.vH / 15.0), xstatw - (tx - 2.0), 
              (dConf.vH / 20.0),
-             fontFixedTxf, "Warp", LabelColor, TRUE, FALSE);
+            fontFixedTxf, "Warp", LabelColor, TRUE, FALSE, TRUE);
   /* shields */
   tx = dConf.borderW;
   ty = (dConf.vH / 15.0) * 2.5;
@@ -186,31 +184,31 @@ void renderHud(void)
   sprintf(buf1024, "#%d#%5s #%d#kills", InfoColor, dData.kills.kills,
           CyanColor);
   glfRender(tx + 2.0, ty, xstatw, sb_ih, fontFixedTxf, buf1024, NoColor,
-             TRUE, TRUE);
+             TRUE, TRUE, TRUE);
 
   /* towed/towing */
   if (strlen(dData.tow.str))
       glfRender(tx + 2.0, ty + sb_ih, xstatw, sb_ih, 
-                 fontFixedTxf, dData.tow.str, MagentaColor, TRUE, FALSE);
+                 fontFixedTxf, dData.tow.str, MagentaColor, TRUE, FALSE, TRUE);
 
   /* armies */
   if (strlen(dData.armies.str))
     glfRender(tx + 2.0, ty + (sb_ih * 2.0), xstatw, sb_ih,
-               fontFixedTxf, dData.armies.str, InfoColor, TRUE, FALSE);
+               fontFixedTxf, dData.armies.str, InfoColor, TRUE, FALSE, TRUE);
 
   /* cloak/Destruct */
   if (strlen(dData.cloakdest.str))
     glfRender(tx + 2.0, ty + (sb_ih * 3.0), xstatw, sb_ih,
               fontFixedTxf, dData.cloakdest.str, 
               (cloakbon) ? dData.cloakdest.color : dData.cloakdest.color | CQC_A_BOLD, 
-              TRUE, FALSE);
+              TRUE, FALSE, TRUE);
 
   /* alert stat */
   if (strlen(dData.aStat.alertStatus))
     glfRender(tx + 2.0, ty + (sb_ih * 4.0), xstatw, sb_ih,
                fontFixedTxf, dData.aStat.alertStatus, 
                (alertbon) ? dData.aStat.color & ~CQC_A_BOLD: dData.aStat.color | CQC_A_BOLD, 
-              TRUE, FALSE);
+              TRUE, FALSE, TRUE);
 
   /* END stat box */
 
@@ -224,18 +222,18 @@ void renderHud(void)
       /* althud */
       if (UserConf.AltHUD)
         glfRender(tx, ty + (sb_ih * 0.2), (dConf.vX + dConf.vW) - tx, sb_ih * 0.7,
-                  fontFixedTxf, dData.xtrainfo.str, InfoColor, TRUE, TRUE);
+                  fontFixedTxf, dData.xtrainfo.str, InfoColor, TRUE, TRUE, TRUE);
     }
   else
     {
       /* for playback, the ship/item we are watching */
       glfRender(tx, ty + (sb_ih * 0.2), (dConf.vX + dConf.vW) - tx, sb_ih * 0.7,
-                fontFixedTxf, dData.recId.str, MagentaColor | CQC_A_BOLD, TRUE, TRUE);
+                fontFixedTxf, dData.recId.str, MagentaColor | CQC_A_BOLD, TRUE, TRUE, TRUE);
 
       tx = dConf.borderW;
 
       glfRender(tx, ty + (sb_ih * 0.2), xstatw, sb_ih * 0.7,
-                fontFixedTxf, dData.recTime.str, NoColor, TRUE, TRUE);
+                fontFixedTxf, dData.recTime.str, NoColor, TRUE, TRUE, TRUE);
     }
 
 
@@ -246,17 +244,17 @@ void renderHud(void)
   /* MSG_LIN1 */
   if (strlen(dData.p1.str))
     glfRender(tx, ty + (sb_ih * 1.0), dConf.wW  - (dConf.borderW * 2.0), sb_ih,
-               fontFixedTxf, dData.p1.str, InfoColor, TRUE, TRUE);
+               fontFixedTxf, dData.p1.str, InfoColor, TRUE, TRUE, TRUE);
 
   /* MSG_LIN2 */
   if (strlen(dData.p2.str))
     glfRender(tx, ty + (sb_ih * 2.0), dConf.wW  - (dConf.borderW * 2.0), sb_ih,
-               fontFixedTxf, dData.p2.str, InfoColor, TRUE, TRUE);
+               fontFixedTxf, dData.p2.str, InfoColor, TRUE, TRUE, TRUE);
 
   /* MSG_MSG */
   if (strlen(dData.msg.str))
     glfRender(tx, ty + (sb_ih * 3.0), dConf.wW  - (dConf.borderW * 2.0), sb_ih,
-               fontMsgTxf, dData.msg.str, InfoColor, TRUE, TRUE);
+               fontMsgTxf, dData.msg.str, InfoColor, TRUE, TRUE, TRUE);
 
   return;
 
@@ -264,15 +262,23 @@ void renderHud(void)
 
 void renderViewer(void)
 {
-  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-#if 0
+  /* setup the proper viewport and projection matrix for the viewer */
+  glViewport(dConf.vX, 
+             dConf.vY + (dConf.wH - dConf.vH - (dConf.borderW * 2.0)), 
+             dConf.vW, 
+             dConf.vH);
+  glMatrixMode(GL_PROJECTION);
+  glLoadMatrixf(dConf.vmat);
+  glMatrixMode(GL_MODELVIEW);
+  
+#if 1
    /* TEST */
-  glBegin(GL_POLYGON);
   glColor3f(0.2, 0.2, 0.2);
-  drawQuad(0.0, 0.0, (GLfloat)dConf.vW, (GLfloat)dConf.vH);
-  glEnd();
+  drawQuad(-((GLfloat)dConf.vW / 2.0), 
+           -((GLfloat)dConf.vH / 2.0), 
+           (GLfloat)dConf.vW, (GLfloat)dConf.vH, TRANZ);
 #endif
+
 
   /* not yet */
 #if 0
@@ -280,6 +286,12 @@ void renderViewer(void)
 #endif
 
   display( Context.snum, FALSE );
+
+  /* reset for everything else */
+  glViewport(0, 0, dConf.wW, dConf.wH);
+  glMatrixMode(GL_PROJECTION);
+  glLoadMatrixf(dConf.hmat);
+  glMatrixMode(GL_MODELVIEW);
 
   return;
 }
@@ -303,17 +315,18 @@ void renderScale(GLfloat x, GLfloat y, GLfloat w, GLfloat h,
   uiPutColor(scalecolor);
   drawQuad(x, y, 
            scaleend * (GLfloat)((GLfloat)val / ((GLfloat)max - (GLfloat)min)),
-           scaleh);
+           scaleh, 0.0);
   drawLineBox(x, y, scaleend, scaleh, scalecolor, 1.0);
 
   /* label */
-  glfRender(x, y + scaleh, w/2.0, scaleh, vfont, label, lcolor, TRUE, FALSE);
+  glfRender(x, y + scaleh, w/2.0, scaleh, vfont, label, lcolor, TRUE, FALSE,
+            TRUE);
 
   /* value */
   glfRender(x + ((w / 10.0) * 7.5), 
              y, 
              (w / 10.0) * 2.5, 
-             h * 0.8, vfont, buf32, scalecolor, TRUE, FALSE);
+             h * 0.8, vfont, buf32, scalecolor, TRUE, FALSE, TRUE);
 
   drawLineBox(x + ((w / 10.0) * 7.5),
               y,
@@ -343,7 +356,7 @@ void renderAlloc(GLfloat x, GLfloat y, GLfloat w, GLfloat h,
   else
     uiPutColor(RedLevelColor);
 
-  drawQuad(x, y, scaleend, scaleh);
+  drawQuad(x, y, scaleend, scaleh, 0.0);
 
   /* fg */
   if (a->walloc > 0)
@@ -356,20 +369,20 @@ void renderAlloc(GLfloat x, GLfloat y, GLfloat w, GLfloat h,
 
   drawQuad(x, y, 
            scaleend * (GLfloat)((GLfloat)a->walloc / 100.0),
-           scaleh);
+           scaleh, 0.0);
 
   uiPutColor(NoColor);
   drawLineBox(x, y, scaleend, scaleh, BlueColor, 1.0);
 
   /* label */
   glfRender(x, y + scaleh, scaleend /*w/2.0*/, scaleh, vfont, a->label, 
-            NoColor, TRUE, FALSE);
+            NoColor, TRUE, FALSE, TRUE);
 
   /* value */
   glfRender(x + ((w / 10.0) * 7.5), 
              y, 
              (w / 10.0) * 2.5, 
-             h * 0.8, vfont, buf32, InfoColor, TRUE, FALSE);
+             h * 0.8, vfont, buf32, InfoColor, TRUE, FALSE, TRUE);
 
   drawLineBox(x + ((w / 10.0) * 7.5),
               y,

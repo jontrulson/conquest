@@ -47,16 +47,6 @@ void nTeamlInit(int nodeid, int tn)
   team = tn;
   retnode = nodeid;
 
-  if (dConf.viewerwmapped)
-    {
-      /* unmap the viewer */
-      glutSetWindow(dConf.viewerw);
-      glutHideWindow();
-      dConf.viewerwmapped = FALSE;
-
-      glutSetWindow(dConf.mainw);
-    }
-
   setNode(&nTeamlNode);
 
   return;

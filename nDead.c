@@ -52,16 +52,6 @@ static scrNode_t nDeadNode = {
 
 void nDeadInit(void)
 {
-  if (dConf.viewerwmapped)
-    {
-      /* unmap the viewer */
-      glutSetWindow(dConf.viewerw);
-      glutHideWindow();
-      dConf.viewerwmapped = FALSE;
-
-      glutSetWindow(dConf.mainw);
-    }
-
   state = S_PRESSANY;
   snum = Context.snum;
 

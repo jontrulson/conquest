@@ -59,15 +59,6 @@ void nPlayBMenuInit(void)
   state = S_NONE;
   prompting = FALSE;
 
-  if (dConf.viewerwmapped)
-    {
-      /* hide the viewer */
-      glutSetWindow(dConf.viewerw);
-      glutHideWindow();
-      dConf.viewerwmapped = FALSE;
-      glutSetWindow(dConf.mainw);
-    }
-
   /* if framedelay wasn't overridden, setup based on samplerate */
   if (framedelay == -1.0)
     framedelay = 1.0 / (real)fhdr.samplerate;

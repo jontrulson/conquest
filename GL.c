@@ -173,6 +173,8 @@ void drawLineBox(GLfloat x, GLfloat y,
 
   glLineWidth(lw);
 
+  GLError();
+
   glBegin(GL_LINE_LOOP);
   uiPutColor(color);
   glVertex3f(x, y, 0.0); /* ul */
@@ -181,6 +183,7 @@ void drawLineBox(GLfloat x, GLfloat y,
   glVertex3f(x, y + h, 0.0); /* ll */
   glEnd();
 
+  GLError();
   return;
 }
 
@@ -205,13 +208,13 @@ void drawBox(GLfloat x, GLfloat y, GLfloat size)
   return;
 }
 
-void drawQuad(GLfloat x, GLfloat y, GLfloat w, GLfloat h)
+void drawQuad(GLfloat x, GLfloat y, GLfloat w, GLfloat h, GLfloat z)
 {
   glBegin(GL_POLYGON);
-  glVertex3f(x, y, 0.0); /* ll */
-  glVertex3f(x + w, y, 0.0); /* lr */
-  glVertex3f(x + w, y + h, 0.0); /* ur */
-  glVertex3f(x, y + h, 0.0); /* ul */
+  glVertex3f(x, y, z); /* ll */
+  glVertex3f(x + w, y, z); /* lr */
+  glVertex3f(x + w, y + h, z); /* ur */
+  glVertex3f(x, y + h, z); /* ul */
   glEnd();
 
   return;
@@ -330,10 +333,10 @@ void uiDrawPlanet( GLfloat x, GLfloat y, int pnum, int scale,
     }
 
 
-  glTranslatef(0.0, 0.0, TRANZ);
-  
   GLError();
 
+  glTranslatef(0.0, 0.0, TRANZ);
+  
   glBlendFunc(GL_SRC_ALPHA, GL_ONE);
   glEnable(GL_BLEND);
   
@@ -404,7 +407,8 @@ void uiDrawPlanet( GLfloat x, GLfloat y, int pnum, int scale,
       if (showpnams)
         {
           snprintf(buf32, 32 - 1, "%s", Planets[pnum].name);
-          drawString(x, y - ((GLfloat)size / 2.0), -5.0, buf32, vFontDL, textcolor);
+          drawString(x, y - ((GLfloat)size / 2.0), -5.0, buf32, vFontDL, 
+                     textcolor, FALSE);
         }
     }
   else
@@ -443,7 +447,7 @@ void uiDrawPlanet( GLfloat x, GLfloat y, int pnum, int scale,
       
       drawString(x, 
                  y - ((GLfloat)size / 2.0),
-                 -5.0, buf32, vFontDL, textcolor);
+                 -5.0, buf32, vFontDL, textcolor, FALSE);
 
     }
 
@@ -462,8 +466,8 @@ void GLcvtcoords(real cenx, real ceny, real x, real y, real scale,
   /* 21 = lines in viewer in curses client. */
   rscale = (21.0 * (float)scale / (VIEWANGLE * 2));
 
-  *rx = (((VIEWANGLE * dConf.vAspect) - (x-cenx)) / rscale) * -1;
-  *ry = ((VIEWANGLE - (y-ceny)) / rscale) * -1;
+  *rx = (((VIEWANGLE * dConf.vAspect) - (x-cenx)) / rscale) * -1.0;
+  *ry = ((VIEWANGLE - (y-ceny)) / rscale) * -1.0;
 
 #ifdef DEBUG
   clog("GLCVTCOORDS: cx = %.2f, cy = %.2f, \n\tx = %.2f, y = %.2f, glx = %.2f,"
@@ -767,7 +771,6 @@ static void dspInitData(void)
   dConf.wX = dConf.wY = 0;
   dConf.wW = 800;
   dConf.wH = 600;
-  dConf.viewerwmapped = FALSE;
 
   memset((void *)&dData, 0, sizeof(dspData_t));
 
@@ -823,21 +826,6 @@ int uiGLInit(int *argc, char **argv)
   glutReshapeFunc        (resize);
   glutEntryFunc          (NULL);
 
-  /* will be resized/positioned later */
-  dConf.viewerw = glutCreateSubWindow(dConf.mainw, 0, 0, 4, 4);
-
-  glutKeyboardFunc       (charInput);
-  glutSpecialFunc        (input);
-  glutMouseFunc          (mouse);
-  glutPassiveMotionFunc  (NULL);
-  glutMotionFunc         (NULL);
-  glutDisplayFunc        (renderFrame);
-  glutIdleFunc           (renderFrame);
-  glutReshapeFunc        (resize);
-  glutEntryFunc          (NULL);
-
-  glutHideWindow();
-
   return 0;             
 }
 
@@ -849,11 +837,6 @@ void graphicsInit(void)
   glShadeModel(GL_SMOOTH);
   glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
   
-  glMatrixMode(GL_PROJECTION);
-  gluPerspective(VIEWANGLE, 1.0, 10.0, 200.0);
-  glMatrixMode(GL_MODELVIEW);
-  glTranslatef(0.0, 0.0, TRANZ);
-
   if (!LoadGLTextures())
     clog("ERROR: LoadTextures() failed\n");
 
@@ -862,22 +845,30 @@ void graphicsInit(void)
 void
 resize(int w, int h)
 {
-  static int vinit = FALSE;
   static int minit = FALSE;
 
-  if ((glutGetWindow() == dConf.viewerw) && !vinit)
-    {
-      vinit = TRUE;
-      graphicsInit();
-      initFonts();
-    }
-
-  if ((glutGetWindow() == dConf.mainw) && !minit)
+  if (!minit)
     {
       minit = TRUE;
+      graphicsInit();
       initTexFonts();
+      initFonts();
+      GLError();
     }
 
+  dConf.wW = (GLfloat)w;
+  dConf.wH = (GLfloat)h;
+  dConf.mAspect = (GLfloat)w/(GLfloat)h;
+  
+  /* calculate the border width */
+  dConf.borderW = ((dConf.wW * 0.01) + (dConf.wH * 0.01)) / 2.0;
+  
+  /* calculate viewer geometry */
+  dConf.vX = dConf.wX + (dConf.wW * 0.30); /* x + 30% */
+  dConf.vY = dConf.wY + dConf.borderW;
+  dConf.vW = (dConf.wW - dConf.vX) - dConf.borderW;
+  dConf.vH = (dConf.wH - (dConf.wH * 0.20)); /* y + 20% */
+  
 #ifdef DEBUG_GL
   clog("GL: RESIZE: WIN = %d w = %d h = %d, \n"
        "    vX = %f, vY = %f, vW = %f, vH = %f",
@@ -885,76 +876,48 @@ resize(int w, int h)
        dConf.vX, dConf.vY, dConf.vW, dConf.vH);
 #endif
 
-  if (glutGetWindow() == dConf.mainw)
-    {
-      dConf.wW = (GLfloat)w;
-      dConf.wH = (GLfloat)h;
-      dConf.mAspect = (GLfloat)w/(GLfloat)h;
+  /* we will pretend we have an 80x25 char display for
+     the 'text' nodes. we account for the border area too */
+  dConf.ppRow = (dConf.wH - (dConf.borderW * 2.0)) / 25.0;
+  dConf.ppCol = (dConf.wW - (dConf.borderW * 2.0)) / 80.0;
+  
+  glViewport(0, 0, w, h);
+  
+  glMatrixMode(GL_PROJECTION);
+  glLoadIdentity();
+  gluOrtho2D(0.0, (GLdouble)w, 0.0, (GLdouble)h);
+  
+  /* invert the y axis, down is positive */
+  glScalef(1.0, -1.0, 1.0);
+  
+  /*  move the origin from the bottom left corner */
+  /*  to the upper left corner */
+  glTranslatef(0.0, -dConf.wH, 0.0);
+  
+  /* save a copy of this matrix */
+  glGetFloatv(GL_PROJECTION_MATRIX, dConf.hmat);
 
-      /* calculate the border width */
-      dConf.borderW = ((dConf.wW * 0.01) + (dConf.wH * 0.01)) / 2.0;
-      
-      dConf.vX = dConf.wX + (dConf.wW * 0.30); /* x + 30% */
-      dConf.vY = dConf.wY + dConf.borderW;
-      dConf.vW = (dConf.wW - dConf.vX) - dConf.borderW;
-      dConf.vH = (dConf.wH - (dConf.wH * 0.20)); /* y + 20% */
+  /* viewer */
 
-      /* we will pretend we have an 80x25 char display for
-         the 'text' nodes. we account for the border area too */
-      dConf.ppRow = (dConf.wH - (dConf.borderW * 2.0)) / 25.0;
-      dConf.ppCol = (dConf.wW - (dConf.borderW * 2.0)) / 80.0;
+  /*  glViewport(0, 0, dConf.vW, dConf.vH);*/
+  
+  glMatrixMode(GL_PROJECTION);
+  glLoadIdentity();
+  gluPerspective(VIEWANGLE, dConf.vW / dConf.vH, 
+                 0.0, 1000.0);
 
-      glViewport(0, 0, w, h);
-      
-      glMatrixMode(GL_PROJECTION);
-      glLoadIdentity();
-      gluOrtho2D(0.0, (GLdouble)w, 0.0, (GLdouble)h);
+  /* save a copy of this matrix */
+  glGetFloatv(GL_PROJECTION_MATRIX, dConf.vmat);
 
-      /* invert the y axis, down is positive */
-      glScalef(1.0, -1.0, 1.0);
+  /* restore hmat */
+  glLoadMatrixf(dConf.hmat);
 
-      /*  move the origin from the bottom left corner */
-      /*  to the upper left corner */
-      glTranslatef(0.0, -dConf.wH, 0.0);
-
-      glMatrixMode(GL_MODELVIEW);
-      
-      glutPostRedisplay();
-
-      /* viewer */
-      glutSetWindow(dConf.viewerw);
-      glutPositionWindow((int)dConf.vX, (int)dConf.vY);
-      glutReshapeWindow((int)dConf.vW, (int)dConf.vH);
-
-      glViewport(0, 0, w, h);
-      
-      glMatrixMode(GL_PROJECTION);
-      glLoadIdentity();
-      gluPerspective(VIEWANGLE, dConf.vW / dConf.vH, 
-                     0.1, 1000.0);
-      glMatrixMode(GL_MODELVIEW);
-      glutPostRedisplay();
-    }
-  else                          /* viewer */
-    {
-      glutPositionWindow(dConf.vX, dConf.vY);
-      glutReshapeWindow(dConf.vW, dConf.vH);
-
-      glViewport(0, 0, w, h);
-      
-      glMatrixMode(GL_PROJECTION);
-      glLoadIdentity();
-      dConf.vAspect = (GLfloat)w/(GLfloat)h;
-      gluPerspective(VIEWANGLE, dConf.vAspect, 
-                     0.1, 1000.0);
-
-      glMatrixMode(GL_MODELVIEW);
-
-      glutPostRedisplay();
-    }
-
+  glMatrixMode(GL_MODELVIEW);
+  
   dConf.inited = True;
 
+  glutPostRedisplay();
+  
   return;
 }
 
@@ -973,12 +936,6 @@ static int renderNode(void)
 
           glutSwapBuffers();
 
-          if (dConf.viewerwmapped)
-            {
-              glutSetWindow(dConf.viewerw);
-              glutSwapBuffers();
-            }
-      
           if (rv == NODE_EXIT)
             return rv;
         }
@@ -995,7 +952,7 @@ static int renderNode(void)
 
 static void renderFrame(void)
 {				/* assumes context is current*/
-  int rv;
+  int rv = NODE_OK;
 
   /* don't render anything until we are ready */
   if (!dConf.inited)
@@ -1013,7 +970,6 @@ static void renderFrame(void)
 
   if (getTopNode())
     {
-      glutSetWindow(dConf.mainw);
       rv = renderNode();
 
       if (rv == NODE_EXIT)
@@ -1039,8 +995,8 @@ static void renderFrame(void)
 
 
 void uiPrintFixed(GLfloat x, GLfloat y, GLfloat w, GLfloat h, char *str)
-{                               /* this works for dConf.mainw only */
-  glfRender(x, y, w, h, fontFixedTxf, str, NoColor, TRUE, TRUE);
+{                               /* this works for non-viewer only */
+  glfRender(x, y, w, h, fontFixedTxf, str, NoColor, TRUE, TRUE, TRUE);
 
   return;
 }
@@ -1223,6 +1179,7 @@ drawShip(GLfloat x, GLfloat y, GLfloat angle, char ch, int i, int color,
   
   /* translate to correct position, */
   glTranslatef(x , y , TRANZ);
+
   /* THEN rotate ;-) */
   glRotatef(angle, 0.0, 0.0, z);
 
@@ -1246,6 +1203,15 @@ drawShip(GLfloat x, GLfloat y, GLfloat angle, char ch, int i, int color,
 
   glDisable(GL_TEXTURE_2D);   
   
+#warning "test"
+#if 0
+  glfRender(x - 30.0, 
+             y, 
+             70.0, 
+             10.0, fontFixedTxf, "Hi There!!!!!", RedLevelColor, 
+            TRUE, FALSE, FALSE);
+#endif
+
   /* highlight enemy ships... */
   if (UserConf.EnemyShipBox)
     if (color == RedLevelColor || color == RedColor)
@@ -1256,7 +1222,9 @@ drawShip(GLfloat x, GLfloat y, GLfloat angle, char ch, int i, int color,
   glDisable(GL_BLEND);
 
   drawString(x, ((scale == SCALE_FAC) ? y - 5.0 : y - 4.0), z, buf, 
-             vFontDL, color);
+             vFontDL, color, FALSE);
+
+
 
   return;
 }
@@ -1350,19 +1318,6 @@ void drawViewerBG()
   glTexCoord2f(0.25f, 0.25f);
   glVertex3f(-sizeh, sizeh, z); /* ul */
 
-#if 0
-  glTexCoord2f(1.0f, 0.0f);
-  glVertex3f(-sizeh, -sizeh, z); /* ll */
-
-  glTexCoord2f(1.0f, 1.0f);
-  glVertex3f(sizeh, -sizeh, z); /* lr */
-
-  glTexCoord2f(0.0f, 1.0f);
-  glVertex3f(sizeh, sizeh, z); /* ur */
-
-  glTexCoord2f(0.0f, 0.0f);
-  glVertex3f(-sizeh, sizeh, z); /* ul */
-#endif
   glEnd();
 
   glDisable(GL_TEXTURE_2D); 
@@ -1377,7 +1332,7 @@ void drawViewerBG()
 /* glut's a little.. lacking when it comes to keyboards... */
 static void procInput(int key, int x, int y)
 {
-  int rv;
+  int rv = NODE_OK;
   scrNode_t *node = getTopNode();
 
 #if 0
@@ -1519,11 +1474,18 @@ static int LoadGLTextures()
           }
 	snprintf(filenm, MID_BUFFER_SIZE - 1, "%s/%s", 
 		CONQSHARE, TexInfo[i].filename);
+
+#ifdef DEBUG_GL
+        clog("%s@%d: loading %s...\n", __FUNCTION__, __LINE__, 
+             filenm);
+#endif
+
 	if ((rv = LoadTGA(filenm, texti)) == TRUE)
 	  {
 	    status = TRUE;
 	    glGenTextures(1, &textures[i]);   /* create the texture */
 	    glBindTexture(GL_TEXTURE_2D, textures[i]);
+            GLError();
 	    /* actually generate the texture */
 	    /* use linear filtering */
 	    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);

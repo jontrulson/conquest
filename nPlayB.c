@@ -155,14 +155,6 @@ void nPlayBInit(void)
   prompting = FALSE;
   state = S_NONE;
 
-  if (!dConf.viewerwmapped)
-    {
-      /* map the viewer */
-      glutSetWindow(dConf.viewerw);
-      glutShowWindow();
-      dConf.viewerwmapped = TRUE;
-    }
-
   setNode(&nPlayBNode);
 
   return;
@@ -174,11 +166,9 @@ static int nPlayBDisplay(dspConfig_t *dsp)
   char buf[MSGMAXLINE];
       
   /* Viewer */
-  glutSetWindow(dConf.viewerw);
   renderViewer();
 
   /* Main/Hud */
-  glutSetWindow(dConf.mainw);
   set_header(Context.snum);
   set_rectime();
   renderHud();

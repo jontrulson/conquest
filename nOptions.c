@@ -579,16 +579,6 @@ void nOptionsInit(int what, int rnode)
   int i, k;
   struct Conf *ConfigData;
 
-  if (dConf.viewerwmapped)
-    {
-      /* unmap the viewer */
-      glutSetWindow(dConf.viewerw);
-      glutHideWindow();
-      dConf.viewerwmapped = FALSE;
-
-      glutSetWindow(dConf.mainw);
-    }
-
   uopts = (what == NOPT_USER) ? TRUE : FALSE;
   prompting = FALSE;
 

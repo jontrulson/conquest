@@ -49,7 +49,7 @@ void mglConqLogo(dspConfig_t *dsp)
   y = dsp->ppRow;
 
   glfRender(x, y, w, h, fontLargeTxf, Conquest, RedLevelColor, 
-            TRUE, FALSE);
+            TRUE, FALSE, TRUE);
 
   drawLineBox(x, y + (h / 20.0),
               w,

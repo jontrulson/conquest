@@ -2420,14 +2420,6 @@ void nCPInit(void)
   state = S_NONE;
   clientFlags = 0;
 
-  if (!dConf.viewerwmapped)
-    {
-      /* map the viewer */
-      glutSetWindow(dConf.viewerw);
-      glutShowWindow();
-      dConf.viewerwmapped = TRUE;
-    }
-
   /* init timers */
   rftime = glutGet(GLUT_ELAPSED_TIME);
   lastblast = Ships[Context.snum].lastblast;
@@ -2442,11 +2434,9 @@ void nCPInit(void)
 static int nCPDisplay(dspConfig_t *dsp)
 {
   /* Viewer */
-  glutSetWindow(dConf.viewerw);
   renderViewer();
 
   /* Main/Hud */
-  glutSetWindow(dConf.mainw);
   renderHud();
 
   return NODE_OK;

@@ -17,8 +17,6 @@ typedef struct _dspConfig {
   Bool inited;
   /* glut win ids */
   int mainw;                    /* main window */
-  int viewerw;                  /* viewer window */
-  int viewerwmapped;            /* is viewer mapped */
 
   /* main window */
   GLfloat wX, wY;               /* x/y origin */
@@ -33,6 +31,9 @@ typedef struct _dspConfig {
   GLfloat ppCol, ppRow;         /* pixels per [Row|Col] */
 
   GLfloat borderW;              /* width of outside mainw border */
+
+  GLfloat hmat[16];             /* hud proj matrix */
+  GLfloat vmat[16];             /* viewer proj matrix */
 
   unsigned int flags; 
 
@@ -230,7 +231,7 @@ float getFPS(void);
 void drawLineBox(GLfloat x, GLfloat y, 
                  GLfloat w, GLfloat h, int color, 
                  GLfloat lw);
-void drawQuad(GLfloat x, GLfloat y, GLfloat w, GLfloat h);
+void drawQuad(GLfloat x, GLfloat y, GLfloat w, GLfloat h, GLfloat z);
 void drawExplosion(GLfloat x, GLfloat y);
 
 

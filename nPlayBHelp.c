@@ -37,17 +37,6 @@ static scrNode_t nPlayBHelpNode = {
 
 void nPlayBHelpInit(void)
 {
-
-  if (dConf.viewerwmapped)
-    {
-      /* unmap the viewer */
-      glutSetWindow(dConf.viewerw);
-      glutHideWindow();
-      dConf.viewerwmapped = FALSE;
-
-      glutSetWindow(dConf.mainw);
-    }
-
   setNode(&nPlayBHelpNode);
 
   return;

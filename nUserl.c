@@ -57,16 +57,6 @@ void nUserlInit(int nodeid, int sn, int gl, int extra)
   godlike = gl;
   extrast = extra;
 
-  if (dConf.viewerwmapped)
-    {
-      /* unmap the viewer */
-      glutSetWindow(dConf.viewerw);
-      glutHideWindow();
-      dConf.viewerwmapped = FALSE;
-
-      glutSetWindow(dConf.mainw);
-    }
-
   /* init the user vector */
   
   for (i=0; i<MAXUSERS; i++)

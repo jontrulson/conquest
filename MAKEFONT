@@ -8,3 +8,6 @@ gentexfont -fn '-b&h-luxi sans-medium-r-normal--37-360-75-75-p-204-iso8859-15' -
 
 # fixed
 gentexfont -fn '-Adobe-Courier-Bold-R-Normal--20-140-100-100-M-110-ISO8859-9' -file fixed.txf -glist '`"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ01234567890 \!@#$$%^&*()-=+/,.<>;:~{}[]?_~|'''\' -w 256 -h 256 -gap 3
+
+#tinyfixed
+gentexfont -fn 'fixed' -file tinyfixed.txf -glist '`"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ01234567890 \!@#$$%^&*()-=+/,.<>;:~{}[]?_~|'''\' -w 256 -h 256 -gap 3
