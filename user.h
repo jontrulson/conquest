@@ -18,7 +18,7 @@ typedef struct {
   int stats[MAXUSTATS];		/* user's stats */
   real rating;			/* user's rating */
   int robot;			/* a robot? */
-  int war[NUMTEAMS];		/* teams you're at war with */
+  int war[NUMPLAYERTEAMS];	/* teams you're at war with */
   int options[MAXOPTIONS];	/* user's options */
   int ooptions[MAXOOPTIONS];	/* operator settable options */
   char username[SIZEUSERNAME];	/* user's name (login name) */

@@ -311,6 +311,8 @@ void zeroplanet( int pnum, int snum );
 
 int cmpplanet(void *cmp1, void *cmp2);
 void sortplanets(int sv[]);
+int cmpuser(void *cmp1, void *cmp2);
+void sortuserss(int sv[], int numentries);
 int spwar( int snum, int pnum );
 void appkb( int kb, char *buf );
 void appship( int snum, char *str );
@@ -348,6 +350,7 @@ int planmatch(char *str, int *pnum, int godlike);
 int usefuel( int snum, real fuel, int weapon );
 int findspecial( int snum, int token, int count, int *sorpnum, int *xsorpnum );
 int KPAngle(int ch, real *angle);
+int KP2DirKey(int *ch);
 
 /* cd2lb.c */
 
@@ -436,8 +439,10 @@ int GetConquestUID(void);
 int GetConquestGID(void);
 void astoff(void);
 void aston(void);
-void EnableSignalHandler(void);
-void DoSig(int sig);
+void EnableConquestSignalHandler(void);
+void EnableConqoperSignalHandler(void);
+void DoConquestSig(int sig);
+void DoConqoperSig(int sig);
 void astservice(int sig);	/* our SIGALARM handler */
 void comsize( unsigned long *size );
 void conqend(void);

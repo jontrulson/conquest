@@ -198,13 +198,13 @@ void buildai( int snum, int vars[], int *bnenum, real *bdne, real *bane )
       for ( i = 1; i <= MAXSHIPS; i = i + 1 )
 	if ( Ships[i].status != SS_OFF && i != snum )
 	  for ( j = 0; j < MAXTORPS; j = j + 1 )
-	    if ( tstatus[i][j] == TS_LIVE )
-	      if ( twar[i][j][Ships[snum].team] || Ships[snum].war[Ships[i].team] )
+	    if ( Ships[i].torps[j].status == TS_LIVE )
+	      if ( Ships[i].torps[j].war[Ships[snum].team] || Ships[snum].war[Ships[i].team] )
 		{
 		  /* Just guess at other ships efficiency. */
 		  dam = dam + explosion(
-					TORPEDO_HIT * 1.1 * weafac[Ships[i].team],
-					dist(Ships[snum].x,Ships[snum].y,tx[i][j],ty[i][j]) );
+					TORPEDO_HIT * 1.1 * Teams[Ships[i].team].weafac,
+					dist(Ships[snum].x,Ships[snum].y,Ships[i].torps[j].x,Ships[i].torps[j].y) );
 		}
       AISCALE( vars[VAR_INCOMING], dam, 10.0 );
     }
@@ -215,7 +215,7 @@ void buildai( int snum, int vars[], int *bnenum, real *bdne, real *bane )
   /* Number of torps available to fire (1) */
   j = 0;
   for ( i = 0; i < MAXTORPS; i = i + 1 )
-    if ( tstatus[snum][i] == TS_OFF )
+    if ( Ships[snum].torps[i].status == TS_OFF )
       j = j + 1;
   AISCALE( vars[VAR_NUMTORPS], j, 1.0 );
   
@@ -270,15 +270,15 @@ void defend( int attacker, int pnum )
   int i, j, k, team, snum, unum;
   char buf[MSGMAXLINE];
   
-  team = pteam[pnum];
+  team = Planets[pnum].team;
   /* Must be for a "fighting" team. */
-  if ( team < 0 || team >= NUMTEAMS )
+  if ( team < 0 || team >= NUMPLAYERTEAMS )
     return;
   
   /* Must be for a home system planet. */
-  if ( pnum != teamplanets[team][0] &&
-       pnum != teamplanets[team][1] &&
-       pnum != teamplanets[team][2] )
+  if ( pnum != Teams[team].teamhplanets[0] &&
+       pnum != Teams[team].teamhplanets[1] &&
+       pnum != Teams[team].teamhplanets[2] )
     return;
   
   /* See if there are any team ships to defend. */
@@ -325,7 +325,7 @@ void defend( int attacker, int pnum )
     {
       sprintf( buf,
 	     "WARNING: You have violated %s space; prepare to die.",
-	     tname[team] );
+	     Teams[team].name );
       stormsg( snum, attacker, buf );
     }
   
@@ -484,7 +484,7 @@ void executeai( int snum, int token )
 	  i = Ships[snum].lastmsg;
 	  if ( canread( snum, i ) )
 	    {
-	      j = msgfrom[i];
+	      j = Msgs[i].msgfrom;
 	      if ( -j > 0 && -j <= NUMPLANETS )
 		continue; 	/* don't talk back to planets */
 
@@ -638,7 +638,7 @@ int newrob( int *snum, int unum )
   Ships[*snum].options[OPT_ALARMBELL] = FALSE; /* don't want beeping during a
 					    watch */
 
-  for ( i = 0; i < NUMTEAMS; i = i + 1 )
+  for ( i = 0; i < NUMPLAYERTEAMS; i = i + 1 )
     {
       /* Robots are peace (and fun) loving. */
       Ships[*snum].rwar[i] = FALSE;
@@ -647,11 +647,12 @@ int newrob( int *snum, int unum )
   stcpn ( Users[unum].alias, Ships[*snum].alias, MAXUSERPNAME );	/* -[] -[] */
   
   /* Place the ship. */
-  if ( pprimary[homeplanet[Ships[*snum].team]] == homesun[Ships[*snum].team] )
-    i = homesun[Ships[*snum].team];
+  if ( Planets[Teams[Ships[*snum].team].homeplanet].primary == 
+       Teams[Ships[*snum].team].homesun )
+    i = Teams[Ships[*snum].team].homesun;
   else
-    i = homeplanet[Ships[*snum].team];
-  putship( *snum, px[i], py[i] );
+    i = Teams[Ships[*snum].team].homeplanet;
+  putship( *snum, Planets[i].x, Planets[i].y );
   fixdeltas( *snum );
   Ships[*snum].status = SS_LIVE;
   PVUNLOCK(lockword);

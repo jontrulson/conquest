@@ -228,7 +228,6 @@ main(int argc, char *argv[])
   
   
   map_common();		/* Map the conquest universe common block */
-  
   rndini( 0, 0 );				/* initialize random numbers */
   cdinit();					/* initialize display environment */
   
@@ -246,7 +245,6 @@ main(int argc, char *argv[])
 
   stormsg(MSG_COMP, MSG_ALL, msgbuf);
 
-  
   operate();
   
   cdend();
@@ -298,7 +296,7 @@ void debugdisplay( int snum )
   /* int salastmsg(snum)		# last message allowed to be seen */
   /* int smap(snum)			# strategic map or not */
   /* int spfuse(snum)			# tenths until phasers can be fired */
-  /* int sscanned(snum,NUMTEAMS)	# fuse for which ships have been */
+  /* int sscanned(snum,NUMPLAYERTEAMS)	# fuse for which ships have been */
   /* int stalert(snum)			# torp alert! */
   /* int sctime(snum)			# cpu hundreths at last check */
   /* int setime(snum)			# elapsed hundreths at last check */
@@ -392,9 +390,9 @@ void debugdisplay( int snum )
   i = Ships[snum].lock;
   if ( -i >= 1 && -i <= NUMPLANETS )
     {
-  	  cprintf(lin,dcol,ALIGN_NONE,"#%d#%s",InfoColor, pname[-i]);
+  	  cprintf(lin,dcol,ALIGN_NONE,"#%d#%s",InfoColor, Planets[-i].name);
 	  cprintf(lin+1,dcol,ALIGN_NONE,"#%d#%0d",InfoColor,
-		  round( dist( Ships[snum].x, Ships[snum].y, px[-i], py[-i] ) ));
+		  round( dist( Ships[snum].x, Ships[snum].y, Planets[-i].x, Planets[-i].y ) ));
     }
   else if ( i != 0 )
   	cprintf(lin,dcol,ALIGN_NONE,"#%d#%0d",InfoColor, i);
@@ -492,26 +490,26 @@ void debugdisplay( int snum )
   lin++;
   cprintf(lin,tcol,ALIGN_NONE,"#%d#%s",LabelColor, "      swar:");
   buf[0] = '(';
-  for ( i = 0; i < NUMTEAMS; i = i + 1 )
+  for ( i = 0; i < NUMPLAYERTEAMS; i = i + 1 )
     if ( Ships[snum].war[i] )
-      buf[i+1] = chrteams[i];
+      buf[i+1] = Teams[i].teamchar;
     else
       buf[i+1] = '-';
-  buf[NUMTEAMS+1] = ')';
-  buf[NUMTEAMS+2] = EOS;
+  buf[NUMPLAYERTEAMS+1] = ')';
+  buf[NUMPLAYERTEAMS+2] = EOS;
   fold( buf );
   cprintf(lin,dcol,ALIGN_NONE,"#%d#%s",InfoColor, buf);
   
   lin++;
   cprintf(lin,tcol,ALIGN_NONE,"#%d#%s",LabelColor, "     srwar:");
   buf[0] = '(';
-  for ( i = 0; i < NUMTEAMS; i = i + 1 )
+  for ( i = 0; i < NUMPLAYERTEAMS; i = i + 1 )
     if ( Ships[snum].rwar[i] )
-      buf[i+1] = chrteams[i];
+      buf[i+1] = Teams[i].teamchar;
     else
       buf[i+1] = '-';
-  buf[NUMTEAMS+1] = ')';
-  buf[NUMTEAMS+2] = EOS;
+  buf[NUMPLAYERTEAMS+1] = ')';
+  buf[NUMPLAYERTEAMS+2] = EOS;
   cprintf(lin,dcol,ALIGN_NONE,"#%d#%s",InfoColor, buf);
   
   lin++;
@@ -548,7 +546,7 @@ void debugdisplay( int snum )
   for ( i = 0; i < MAXTORPS; i = i + 1 )
     {
       lin++;
-      switch(tstatus[snum][i])
+      switch(Ships[snum].torps[i].status)
 	{
 	case TS_OFF:
 	  torpstr = TOFF;
@@ -567,22 +565,22 @@ void debugdisplay( int snum )
 	  break;
 	}
 	  cprintf(lin,3,ALIGN_NONE,"#%d#%s",InfoColor, torpstr);
-      if ( tstatus[snum][i] != TS_OFF )
+      if ( Ships[snum].torps[i].status != TS_OFF )
 	{
-	  cprintf(lin,13,ALIGN_NONE,"#%d#%6d",InfoColor, tfuse[snum][i]);
-	  cprintf(lin,19,ALIGN_NONE,"#%d#%9g",InfoColor, oneplace(tmult[snum][i]));
-	  cprintf(lin,28,ALIGN_NONE,"#%d#%9g",InfoColor, oneplace(tx[snum][i]));
-	  cprintf(lin,37,ALIGN_NONE,"#%d#%9g",InfoColor, oneplace(ty[snum][i]));
-	  cprintf(lin,46,ALIGN_NONE,"#%d#%9g",InfoColor, oneplace(tdx[snum][i]));
-	  cprintf(lin,55,ALIGN_NONE,"#%d#%9g",InfoColor, oneplace(tdy[snum][i]));
+	  cprintf(lin,13,ALIGN_NONE,"#%d#%6d",InfoColor, Ships[snum].torps[i].fuse);
+	  cprintf(lin,19,ALIGN_NONE,"#%d#%9g",InfoColor, oneplace(Ships[snum].torps[i].mult));
+	  cprintf(lin,28,ALIGN_NONE,"#%d#%9g",InfoColor, oneplace(Ships[snum].torps[i].x));
+	  cprintf(lin,37,ALIGN_NONE,"#%d#%9g",InfoColor, oneplace(Ships[snum].torps[i].y));
+	  cprintf(lin,46,ALIGN_NONE,"#%d#%9g",InfoColor, oneplace(Ships[snum].torps[i].dx));
+	  cprintf(lin,55,ALIGN_NONE,"#%d#%9g",InfoColor, oneplace(Ships[snum].torps[i].dy));
 	  buf[0] = '(';
-	  for ( j = 0; j < NUMTEAMS; j++ )
-	    if ( twar[snum][i][j] )
-	      buf[j+1] = chrteams[j];
+	  for ( j = 0; j < NUMPLAYERTEAMS; j++ )
+	    if ( Ships[snum].torps[i].war[j] )
+	      buf[j+1] = Teams[j].teamchar;
 	    else
 	      buf[j+1] = '-';
-	  buf[NUMTEAMS+1] = ')';
-	  buf[NUMTEAMS+2] = EOS;
+	  buf[NUMPLAYERTEAMS+1] = ')';
+	  buf[NUMPLAYERTEAMS+2] = EOS;
 	  cprintf(lin,67,ALIGN_NONE,"#%d#%s",InfoColor, buf);
 	}
     }
@@ -675,19 +673,19 @@ void debugplan(void)
               PlanetIdx++;
               k = sv[i];
 	      
-	      for ( j = 0; j < NUMTEAMS; j++ )
-		if ( pscanned[k][j] && (j >= 0 && j < NUMTEAMS) )
-		  junk[j] = chrteams[j];
+	      for ( j = 0; j < NUMPLAYERTEAMS; j++ )
+		if ( Planets[k].scanned[j] && (j >= 0 && j < NUMPLAYERTEAMS) )
+		  junk[j] = Teams[j].teamchar;
 		else
 		  junk[j] = '-';
 	      junk[j] = EOS;
-	      j = puninhabtime[k];
+	      j = Planets[k].uninhabtime;
 	      if ( j != 0 )
 		sprintf( uninhab, "%d", j );
 	      else
 		uninhab[0] = EOS;
 	      
-	      switch(ptype[k])
+	      switch(Planets[k].type)
 		{
 		case PLANET_SUN:
 		  outattr = RedLevelColor;
@@ -711,11 +709,17 @@ void debugplan(void)
 		  break;
 		}
 		  
-	      cprintf(lin,col,ALIGN_NONE,"#%d#%-13s %c %c %3d %3s %4s",
-		      outattr,pname[k], chrplanets[ptype[k]], chrteams[pteam[k]],
-		      parmies[k], uninhab, junk );
+	      cprintf(lin, col, ALIGN_NONE,
+		      "#%d#%-13s %c %c %3d %3s %4s",
+		      outattr, 
+		      Planets[k].name, 
+		      chrplanets[Planets[k].type], 
+		      Teams[Planets[k].team].teamchar,
+		      Planets[k].armies, 
+		      uninhab, 
+		      junk );
 	      
-	      if ( ! preal[k] )
+	      if ( ! Planets[k].real )
 		cprintf(lin,col-2,ALIGN_NONE, "#%d#%c", SpecialColor, '-');
 	      
 	      lin++;
@@ -852,27 +856,30 @@ void kiss(int snum, int prompt_flg)
       i = 0;
       safectoi( &snum, buf, i );		/* ignore status */
       if ( snum < 1 || snum > MAXSHIPS )
-		cdputs( no_ship_str, MSG_LIN2, 1 );
+	cdputs( no_ship_str, MSG_LIN2, 1 );
       else if ( Ships[snum].status != SS_LIVE ) {
-		cdclrl( MSG_LIN1, 1 );
-	    ssbuf[0] = EOS; 
-	    appsstatus( Ships[snum].status, ssbuf);
-		sprintf(mbuf, cant_kill_ship_str,
-			chrteams[Ships[snum].team], snum, Ships[snum].alias, ssbuf);
-	    cdputs( mbuf, MSG_LIN1, 1 );
-	  }
+	cdclrl( MSG_LIN1, 1 );
+	ssbuf[0] = EOS; 
+	appsstatus( Ships[snum].status, ssbuf);
+	sprintf(mbuf, cant_kill_ship_str,
+		Teams[Ships[snum].team].teamchar, 
+		snum, 
+		Ships[snum].alias, 
+		ssbuf);
+	cdputs( mbuf, MSG_LIN1, 1 );
+      }
       else {
-		  cdclrl( MSG_LIN1, 1 );
-		  sprintf(mbuf, kill_ship_str1,
-			chrteams[Ships[snum].team], snum, Ships[snum].alias);
-	      cdputs( mbuf, MSG_LIN1, 1 );
-		  if ( confirm() )
-		  {
-			  killship( snum, KB_GOD );
-			  cdclrl( MSG_LIN2, 1 );
-		  }
-		  cdclrl( MSG_LIN1, 1 );
-	}
+	cdclrl( MSG_LIN1, 1 );
+	sprintf(mbuf, kill_ship_str1,
+		Teams[Ships[snum].team].teamchar, snum, Ships[snum].alias);
+	cdputs( mbuf, MSG_LIN1, 1 );
+	if ( confirm() )
+	  {
+	    killship( snum, KB_GOD );
+	    cdclrl( MSG_LIN2, 1 );
+	  }
+	cdclrl( MSG_LIN1, 1 );
+      }
       cdmove( 1, 1 );
       return;
     }
@@ -886,8 +893,10 @@ void kiss(int snum, int prompt_flg)
 	  {
 	    didany = TRUE;
 	    cdclrl( MSG_LIN1, 1 );
-		sprintf(buf, kill_ship_str1,
-			chrteams[Ships[snum].team], snum, Ships[snum].alias);
+	    sprintf(buf, kill_ship_str1,
+		    Teams[Ships[snum].team].teamchar, 
+		    snum, 
+		    Ships[snum].alias);
 	    cdputs( buf, MSG_LIN1, 1 );
 	    if ( confirm() )
 	      killship( snum, KB_GOD );
@@ -917,7 +926,10 @@ void kiss(int snum, int prompt_flg)
 	  didany = TRUE;
 	  cdclrl( MSG_LIN1, 1 );
 	  sprintf(mbuf, kill_ship_str2,
-		chrteams[Ships[snum].team], snum, Ships[snum].alias, buf);
+		Teams[Ships[snum].team].teamchar, 
+		  snum, 
+		  Ships[snum].alias, 
+		  buf);
 	  cdputs( mbuf, MSG_LIN1, 1 );
 	  if ( confirm() )
 	    killship( snum, KB_GOD );
@@ -963,14 +975,15 @@ void opback( int lastrev, int *savelin )
   cdclear();
   
   lin = 1;
-  if ( lastrev == COMMONSTAMP ) {
-    attrset(NoColor|A_BOLD);
-    cdputc( "CONQUEST OPERATOR PROGRAM", lin );
-    attrset(YellowLevelColor);
-    sprintf( cbuf, "%s (%s)",
-	   ConquestVersion, ConquestDate);
-    cdputc( cbuf, lin+1 );
-  }
+  if ( lastrev == COMMONSTAMP ) 
+    {
+      attrset(NoColor|A_BOLD);
+      cdputc( "CONQUEST OPERATOR PROGRAM", lin );
+      attrset(YellowLevelColor);
+      sprintf( cbuf, "%s (%s)",
+	       ConquestVersion, ConquestDate);
+      cdputc( cbuf, lin+1 );
+    }
   else
     {
       attrset(RedLevelColor);
@@ -979,8 +992,8 @@ void opback( int lastrev, int *savelin )
       cdputc( cbuf, lin );
       attrset(0);
     }
-
-  EnableSignalHandler();	/* enable trapping of interesting signals */
+  
+  EnableConqoperSignalHandler(); /* enable trapping of interesting signals */
 
   lin++;
   
@@ -1064,8 +1077,6 @@ void operate(void)
   
   *glastmsg = *lastmsg;
   glname( buf );
-  if ( gunum( &i, buf ) )
-    Users[i].ooptions[MAXOOPTIONS] = TRUE;
 
   lastrev = *commonrev;
   grand( &msgrand );
@@ -1116,15 +1127,15 @@ void operate(void)
 	    }
 	  
 	  /* eater status */
-	  i = *dstatus;
+	  i = Doomsday->status;
 	  if ( i == DS_OFF )
 	    c_strcpy( "off", buf );
 	  else if ( i == DS_LIVE )
 	    {
 	      c_strcpy( "ON (", buf );
-	      i = *dlock;
+	      i = Doomsday->lock;
 	      if ( -i > 0 && -i <= NUMPLANETS )
-		appstr( pname[-i], buf );
+		appstr( Planets[-i].name, buf );
 	      else
 		appship( i, buf );		/* this will handle funny numbers */
 	      appchr( ')', buf );
@@ -1179,7 +1190,7 @@ void operate(void)
 		readmsg( MSG_GOD, *glastmsg, RMsg_Line );
 		
 #if defined(OPER_MSG_BEEP)
-		if (msgfrom[Ships[MSG_GOD].lastmsg] != MSG_GOD)
+		if (Msgs[*glastmsg].msgfrom != MSG_GOD)
 		  cdbeep();
 #endif
 		readone = TRUE;
@@ -1218,8 +1229,8 @@ void operate(void)
 	    bigbang();
 	  break;
 	case 'd':
-	  if ( *dstatus == DS_LIVE )
-	    *dstatus = DS_OFF;
+	  if ( Doomsday->status == DS_LIVE )
+	    Doomsday->status = DS_OFF;
 	  else
 	    doomsday();
 	  break;
@@ -1647,38 +1658,38 @@ void oppedit(void)
 
 
 	  /* colorize planet name according to type */
-      if ( ptype[pnum] == PLANET_SUN )
+      if ( Planets[pnum].type == PLANET_SUN )
 	attrib = RedLevelColor;
-      else if ( ptype[pnum] == PLANET_CLASSM )
+      else if ( Planets[pnum].type == PLANET_CLASSM )
 	attrib = GreenLevelColor;
-      else if ( ptype[pnum] == PLANET_DEAD )
+      else if ( Planets[pnum].type == PLANET_DEAD )
 	attrib = YellowLevelColor;
-      else if ( ptype[pnum] == PLANET_CLASSA ||
-		ptype[pnum] == PLANET_CLASSO ||
-		ptype[pnum] == PLANET_CLASSZ ||
-		ptype[pnum] == PLANET_GHOST )   /* white as a ghost ;-) */
+      else if ( Planets[pnum].type == PLANET_CLASSA ||
+		Planets[pnum].type == PLANET_CLASSO ||
+		Planets[pnum].type == PLANET_CLASSZ ||
+		Planets[pnum].type == PLANET_GHOST )   /* white as a ghost ;-) */
 	attrib = A_BOLD;
       else 
 	attrib = SpecialColor;
       
 				/* if we're doing a sun, use yellow
 				   else use attrib set above */
-      if (ptype[pnum] == PLANET_SUN)
+      if (Planets[pnum].type == PLANET_SUN)
 	attrset(YellowLevelColor);
       else
 	attrset(attrib);
-      puthing(ptype[pnum], i, j );
+      puthing(Planets[pnum].type, i, j );
       attrset(0);
 
 	  /* suns have red cores, others are cyan. */
-      if (ptype[pnum] == PLANET_SUN)
+      if (Planets[pnum].type == PLANET_SUN)
 	attrset(RedLevelColor);
       else
 	attrset(InfoColor);
-      cdput( chrplanets[ptype[pnum]], i, j + 1);
+      cdput( chrplanets[Planets[pnum].type], i, j + 1);
       attrset(0);
 
-      sprintf(buf, "%s\n", pname[pnum]);
+      sprintf(buf, "%s\n", Planets[pnum].name);
       attrset(attrib);
       cdputs( buf, i + 1, j + 2 ); /* -[] */
       attrset(0);
@@ -1688,15 +1699,15 @@ void oppedit(void)
       i = pnum;
       cprintf(lin,col,ALIGN_NONE,sfmt, "p", "  Planet:\n");
       cprintf( lin,datacol,ALIGN_NONE,"#%d#%s (%d)", 
-		attrib, pname[pnum], pnum );
+		attrib, Planets[pnum].name, pnum );
       
       lin++;
-      i = pprimary[pnum];
+      i = Planets[pnum].primary;
       if ( i == 0 )
 	{
       lin++;
 	  
-	  x = porbvel[pnum];
+	  x = Planets[pnum].orbvel;
 	  if ( x == 0.0 )
 	    cprintf(lin,col,ALIGN_NONE,sfmt, "v", "  Stationary\n");
 	  else
@@ -1710,65 +1721,65 @@ void oppedit(void)
 	{
 	  cprintf(lin,col,ALIGN_NONE,sfmt, "o", "  Orbiting:\n");
 	  cprintf( lin,datacol,ALIGN_NONE,"#%d#%s (%d)", 
-		InfoColor, pname[i], i );
+		InfoColor, Planets[i].name, i );
 	  
       lin++;
 	  cprintf(lin,col,ALIGN_NONE,sfmt, "v", "  Orbit velocity:\n");
 	  cprintf( lin,datacol,ALIGN_NONE,"#%d#%.1f degrees/minute", 
-		InfoColor, porbvel[pnum] );
+		InfoColor, Planets[pnum].orbvel );
 	}
       
       lin++;
       cprintf(lin,col,ALIGN_NONE,sfmt, "r", "  Radius:\n");
-      cprintf( lin,datacol,ALIGN_NONE, "#%d#%.1f", InfoColor, porbrad[pnum] );
+      cprintf( lin,datacol,ALIGN_NONE, "#%d#%.1f", InfoColor, Planets[pnum].orbrad );
       
       lin++;
       cprintf(lin,col,ALIGN_NONE,sfmt, "a", "  Angle:\n");
-      cprintf( lin,datacol,ALIGN_NONE, "#%d#%.1f", InfoColor, porbang[pnum] );
+      cprintf( lin,datacol,ALIGN_NONE, "#%d#%.1f", InfoColor, Planets[pnum].orbang );
       
       lin++;
-      i = ptype[pnum];
+      i = Planets[pnum].type;
       cprintf(lin,col,ALIGN_NONE,sfmt, "t", "  Type:\n");
       cprintf( lin,datacol,ALIGN_NONE, "#%d#%s (%d)", InfoColor, ptname[i], i );
       
       lin++;
-      i = pteam[pnum];
+      i = Planets[pnum].team;
       if ( pnum <= NUMCONPLANETS )
 	  {
 		cprintf(lin,col,ALIGN_NONE,"#%d#%s",LabelColor,"        Owner team:\n");
 	  }
       else
 		cprintf(lin,col,ALIGN_NONE,sfmt, "T", "  Owner team:\n");
-      cprintf( lin,datacol,ALIGN_NONE, "#%d#%s (%d)", InfoColor,tname[i], i );
+      cprintf( lin,datacol,ALIGN_NONE, "#%d#%s (%d)", InfoColor,Teams[i].name, i );
       
       lin++;
       cprintf(lin,col,ALIGN_NONE,sfmt, "x,y", "Position:\n");
       cprintf( lin,datacol,ALIGN_NONE, "#%d#%.1f, %.1f",
-		InfoColor, px[pnum], py[pnum] );
+		InfoColor, Planets[pnum].x, Planets[pnum].y );
       
       lin++;
       cprintf(lin,col,ALIGN_NONE,sfmt, "A", "  Armies:\n");
-      cprintf( lin,datacol,ALIGN_NONE, "#%d#%d", InfoColor, parmies[pnum] );
+      cprintf( lin,datacol,ALIGN_NONE, "#%d#%d", InfoColor, Planets[pnum].armies );
       
       lin++;
       cprintf(lin,col,ALIGN_NONE,sfmt, "s", "  Scanned by:\n");
       buf[0] = '(';
-      for ( i = 1; i <= NUMTEAMS; i = i + 1 )
-		if ( pscanned[pnum][i - 1] )
-		  buf[i] = chrteams[i - 1];
+      for ( i = 1; i <= NUMPLAYERTEAMS; i = i + 1 )
+		if ( Planets[pnum].scanned[i - 1] )
+		  buf[i] = Teams[i - 1].teamchar;
 		else
 		  buf[i] = '-';
-      buf[NUMTEAMS+1] = ')';
-      buf[NUMTEAMS+2] = '\0';
+      buf[NUMPLAYERTEAMS+1] = ')';
+      buf[NUMPLAYERTEAMS+2] = '\0';
       cprintf( lin, datacol,ALIGN_NONE, "#%d#%s",InfoColor, buf);
       
       lin++;
       cprintf(lin,col,ALIGN_NONE,sfmt, "u", "  Uninhabitable time:\n");
       cprintf( lin,datacol,ALIGN_NONE, "#%d#%d", 
-		InfoColor, puninhabtime[pnum] );
+		InfoColor, Planets[pnum].uninhabtime );
       
       lin++;
-      if ( preal[pnum] )
+      if ( Planets[pnum].real )
 		  cprintf(lin,col,ALIGN_NONE,sfmt, "-", "  Visible\n");
       else
 		  cprintf(lin,col,ALIGN_NONE,sfmt, "+", "  Hidden\n");
@@ -1803,7 +1814,7 @@ void oppedit(void)
 	  x = ctor( buf);
 	  if ( x < 0.0 || x > 360.0 )
 	    continue;	/* next */
-	  porbang[pnum] = x;
+	  Planets[pnum].orbang = x;
 	  break;
 	case 'A':
 	  /* Armies. */
@@ -1815,14 +1826,14 @@ void oppedit(void)
 	  i = 0;
 	  if ( ! safectoi( &j, buf, i ) )
 	    continue;
-	  parmies[pnum] = j;
+	  Planets[pnum].armies = j;
 	  break;
 	case 'n':
 	  /* New planet name. */
 	  ch = getcx( "New name for this planet? ",
 		     MSG_LIN1, 0, TERMS, buf, MAXPLANETNAME );
 	  if ( ch != TERM_ABORT && ( ch == TERM_EXTRA || buf[0] != EOS ) )
-	    stcpn( buf, pname[pnum], MAXPLANETNAME );
+	    stcpn( buf, Planets[pnum].name, MAXPLANETNAME );
 	  break;
 	case 'o':
 	  /* New primary. */
@@ -1831,9 +1842,9 @@ void oppedit(void)
 	  if ( ch == TERM_ABORT || buf[0] == EOS )
 	    continue;	/* next */
 	  if ( buf[1] == '0' && buf[2] == EOS )
-	    pprimary[pnum] = 0;
+	    Planets[pnum].primary = 0;
 	  else if ( gplanmatch( buf, &i ) )
-	    pprimary[pnum] = i;
+	    Planets[pnum].primary = i;
 	  break;
 	case 'v':
 	  /* Velocity. */
@@ -1846,20 +1857,20 @@ void oppedit(void)
 	  if ( ! safectoi( &j, buf, i ) )
 	    continue;	/* next */
 
-	  porbvel[pnum] = ctor( buf );
+	  Planets[pnum].orbvel = ctor( buf );
 	  break;
 	case 'T':
 	  /* Rotate owner team. */
 	  if ( pnum > NUMCONPLANETS )
 	    {
-	      pteam[pnum] = modp1( pteam[pnum] + 1, NUMALLTEAMS );
+	      Planets[pnum].team = modp1( Planets[pnum].team + 1, NUMALLTEAMS );
 	    }
 	  else
 	    cdbeep();
 	  break;
 	case 't':
 	  /* Rotate planet type. */
-	  ptype[pnum] = modp1( ptype[pnum] + 1, MAXPLANETTYPES );
+	  Planets[pnum].type = modp1( Planets[pnum].type + 1, MAXPLANETTYPES );
 	  break;
 	case 'x':
 	  /* X coordinate. */
@@ -1873,7 +1884,7 @@ void oppedit(void)
 	  if ( ! safectoi( &j, buf, i ) )
 	    continue;	/* next */
 
-	  px[pnum] = ctor( buf );
+	  Planets[pnum].x = ctor( buf );
 	  break;
 	case 'y':
 	  /* Y coordinate. */
@@ -1886,7 +1897,7 @@ void oppedit(void)
 	  if ( ! safectoi( &j, buf, i ) )
 	    continue;	/* next */
 
-	  py[pnum] = ctor( buf );
+	  Planets[pnum].y = ctor( buf );
 	  break;
 	case 's':
 	  /* Scanned. */
@@ -1894,10 +1905,10 @@ void oppedit(void)
 	  cdmove( MSG_LIN1, 20 );
 	  cdrefresh();
 	  ch = (char)toupper( iogchar() );
-	  for ( i = 0; i < NUMTEAMS; i = i + 1 )
-	    if ( ch == chrteams[i] )
+	  for ( i = 0; i < NUMPLAYERTEAMS; i = i + 1 )
+	    if ( ch == Teams[i].teamchar )
 	      {
-		pscanned[pnum][i] = ! pscanned[pnum][i];
+		Planets[pnum].scanned[i] = ! Planets[pnum].scanned[i];
 		break;
 	      }
 	  break;
@@ -1911,7 +1922,7 @@ void oppedit(void)
 	  i = 0;
 	  if ( ! safectoi( &j, buf, i ) )
 	    continue;
-	  puninhabtime[pnum] = j;
+	  Planets[pnum].uninhabtime = j;
 	  break;
 	case 'p':
 	  ch = getcx( "New planet to edit? ",
@@ -1932,15 +1943,15 @@ void oppedit(void)
 	  if ( ! safectoi( &j, buf, i ) )
 	    continue;	/* next */
 
-	  porbrad[pnum] = ctor( buf );
+	  Planets[pnum].orbrad = ctor( buf );
 	  break;
 	case '+':
 	  /* Now you see it... */
-	  preal[pnum] = TRUE;
+	  Planets[pnum].real = TRUE;
 	  break;
 	case '-':
 	  /* Now you don't */
-	  preal[pnum] = FALSE;
+	  Planets[pnum].real = FALSE;
 	  break;
 	case '>': /* forward rotate planet number - dwp */
 	case KEY_RIGHT:
@@ -2096,7 +2107,7 @@ void oprobot(void)
       /* If requested, make the robot war-like. */
       if ( warlike )
 	{
-	  for ( j = 0; j < NUMTEAMS; j = j + 1 )
+	  for ( j = 0; j < NUMPLAYERTEAMS; j = j + 1 )
 	    Ships[snum].war[j] = TRUE;
 	  Ships[snum].war[Ships[snum].team] = FALSE;
 	}
@@ -2325,10 +2336,10 @@ void opuadd(void)
   for ( team = -1; team == -1; )
     {
       sprintf(junk, "Select a team (%c%c%c%c): ",
-	     chrteams[TEAM_FEDERATION],
-	     chrteams[TEAM_ROMULAN],
-	     chrteams[TEAM_KLINGON],
-	     chrteams[TEAM_ORION]);
+	     Teams[TEAM_FEDERATION].teamchar,
+	     Teams[TEAM_ROMULAN].teamchar,
+	     Teams[TEAM_KLINGON].teamchar,
+	     Teams[TEAM_ORION].teamchar);
       
       cdclrl( MSG_LIN1, 1 );
       buf[0] = EOS;
@@ -2339,12 +2350,12 @@ void opuadd(void)
 	  return;
 	}
       else if ( ch == TERM_EXTRA && buf[0] == EOS )
-	team = rndint( 0, NUMTEAMS - 1);
+	team = rndint( 0, NUMPLAYERTEAMS - 1);
       else
 	{
 	  ch = (char)toupper( buf[0] );
-	  for ( i = 0; i < NUMTEAMS; i = i + 1 )
-	    if ( chrteams[i] == ch )
+	  for ( i = 0; i < NUMPLAYERTEAMS; i = i + 1 )
+	    if ( Teams[i].teamchar == ch )
 	      {
 		team = i;
 		break;
@@ -2458,13 +2469,13 @@ void opuedit(void)
       lin++;
       cprintf(lin,tcol,ALIGN_NONE,"#%d#%s", LabelColor,"             Uwar:");
       buf[0] = '(';
-      for ( i = 0; i < NUMTEAMS; i = i + 1 )
+      for ( i = 0; i < NUMPLAYERTEAMS; i = i + 1 )
 	if ( Users[unum].war[i] )
-	  buf[i+1] = chrteams[i];
+	  buf[i+1] = Teams[i].teamchar;
 	else
 	  buf[i+1] = '-';
-      buf[NUMTEAMS+1] = ')';
-      buf[NUMTEAMS+2] = EOS;
+      buf[NUMPLAYERTEAMS+1] = ')';
+      buf[NUMPLAYERTEAMS+2] = EOS;
       cprintf(lin,dcol,ALIGN_NONE,"#%d#%s",InfoColor, buf);
       
       lin++;
@@ -2487,10 +2498,10 @@ void opuedit(void)
       lin++;
       cprintf(lin,tcol,ALIGN_NONE,"#%d#%s", LabelColor,"             Team:");
       i = Users[unum].team;
-      if ( i < 0 || i >= NUMTEAMS )
+      if ( i < 0 || i >= NUMPLAYERTEAMS )
 		  cprintf(lin,dcol,ALIGN_NONE,"#%d#%0d",InfoColor, i);
       else
-		  cprintf(lin,dcol,ALIGN_NONE,"#%d#%s",InfoColor, tname[i]);
+		  cprintf(lin,dcol,ALIGN_NONE,"#%d#%s",InfoColor, Teams[i].name);
       
       lin++;
       for ( i = 0; i < MAXOOPTIONS; i++ )
@@ -2734,7 +2745,7 @@ void opuedit(void)
 	  else if ( left && row == 2 )
 	    {
 	      /* Team. */
-	      Users[unum].team = modp1( Users[unum].team + 1, NUMTEAMS );
+	      Users[unum].team = modp1( Users[unum].team + 1, NUMPLAYERTEAMS );
 	    }
 	  else if ( ! left && row == 2 )
 	    {
@@ -2827,8 +2838,10 @@ void watch(void)
 		if ( getamsg( MSG_GOD, glastmsg ) )
 		  {
 		    readmsg( MSG_GOD, *glastmsg, RMsg_Line );
-		    if (msgfrom[Ships[MSG_GOD].lastmsg] != MSG_GOD)
+#if defined(OPER_MSG_BEEP)
+		    if (Msgs[*glastmsg].msgfrom != MSG_GOD)
 		      cdbeep();
+#endif		     
 		    msgrand = now;
 		    readone = TRUE;
 		  }
@@ -2860,8 +2873,8 @@ void watch(void)
 		case 'd':    /* flip the doomsday machine (only from doomsday window) */
 		  if (snum == DISPLAY_DOOMSDAY)
 		    {
-		      if ( *dstatus == DS_LIVE )
-			*dstatus = DS_OFF;
+		      if ( Doomsday->status == DS_LIVE )
+			Doomsday->status = DS_OFF;
 		      else
 			doomsday();
 		    }
@@ -3000,7 +3013,7 @@ void watch(void)
 			    }
 			  if (foundone == FALSE)
 			    {	/* check the doomsday machine */
-			      if (*dstatus == DS_LIVE)
+			      if (Doomsday->status == DS_LIVE)
 				foundone = TRUE;
 			    }
 
@@ -3035,7 +3048,7 @@ void watch(void)
 		      
 		      if (live_ships)
 			if ((snum > 0 && stillalive(snum)) || 
-			    (snum == DISPLAY_DOOMSDAY && *dstatus == DS_LIVE))
+			    (snum == DISPLAY_DOOMSDAY && Doomsday->status == DS_LIVE))
 			  {
 			    csnum = snum;
 			    break;
@@ -3077,7 +3090,7 @@ void watch(void)
 			    }
 			  if (foundone == FALSE)
 			    {	/* check the doomsday machine */
-			      if (*dstatus == DS_LIVE)
+			      if (Doomsday->status == DS_LIVE)
 				foundone = TRUE;
 			    }
 
@@ -3113,7 +3126,7 @@ void watch(void)
 		      
 		      if (live_ships)
 			if ((snum > 0 && stillalive(snum)) || 
-			    (snum == DISPLAY_DOOMSDAY && *dstatus == DS_LIVE))
+			    (snum == DISPLAY_DOOMSDAY && Doomsday->status == DS_LIVE))
 			  {
 			    csnum = snum;
 			    break;
@@ -3139,6 +3152,7 @@ void watch(void)
 		  break;
 		default:
 		  cdbeep();
+		  c_putmsg( "Type h for help.", MSG_LIN2 );
 		  break;
 		}
 	      /* Disable messages for awhile. */
@@ -3314,13 +3328,15 @@ char *build_toggle_str(char *snum_str, int snum)
   buf[0] = EOS;
   if (snum > 0 && snum <= MAXSHIPS)
     {          /* ship */
-      sprintf(snum_str,"%c%d", chrteams[Ships[snum].team], snum);
+      sprintf(snum_str,"%c%d", Teams[Ships[snum].team].teamchar, snum);
     }
   else if (snum < 0 && -snum <= NUMPLANETS) 
     {  /* planet */
 
       sprintf(snum_str, "%c%c%c", 
-	      pname[-snum][0], pname[-snum][1], pname[-snum][2]);
+	      Planets[-snum].name[0], 
+	      Planets[-snum].name[1], 
+	      Planets[-snum].name[2]);
     }
   else if (snum == DISPLAY_DOOMSDAY)          /* specials */
     strcpy(snum_str,doomsday_str);

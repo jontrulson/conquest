@@ -465,10 +465,13 @@ conquest.doc for more info.
 
 	The Keypad keys/Arrow keys (if your terminal emulator and
 terminfo entry supports them) can be used for 1-key steering, which
-can be faster in battle.  They can't be used with any other command
-though (like aiming weapons)... This will be corrected in the future
-though.
+can be faster in battle.  They can also be used as input to the fire
+and course commands, as they are translated into the appropriate
+'direction' keys like so:
 
+	789	 qwe 
+	4 6 -->  a d 
+	123	 zxc
 
 ## DOOMSDAY
 
@@ -522,6 +525,11 @@ Freebird archives, where they may be found (currently) at
  by Jon Trulson <jon@radscan.com> under the same terms, conditions,  
  and restrictions of the original copyright by Jef Poskanzer and Craig
  Leres.
+
+ (5/1/98)
+ Due to a little prodding from Sunsite (;-), I've decided on the
+ ARTISTIC LICENSE (see the LICENSE file) Copyright statement for
+ Conquest. 
 
 Jon Trulson <jon@radscan.com> 12/24/97
 

@@ -371,6 +371,10 @@ int cdgetp ( char pmt[], int lin, int col, char terms[], char str[],
 	else if ( ch == TERM_NORMAL )
 	  break;
 
+				/* translate KP keys (if any)
+				   into 'direction' keys. */
+      (void)KP2DirKey(&ch);
+
       if (ch != TERM_NORMAL && ch != TERM_EXTRA && StrInit == TRUE &&
 	  isprint(ch))
 	{			/* clear out the preload */

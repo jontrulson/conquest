@@ -21,6 +21,7 @@ f none /opt/conquest/etc/conqrule=$SRCDIR/conqrule 0644 root conquest
 f none /opt/conquest/etc/README=$SRCDIR/README 0644 root conquest
 f none /opt/conquest/etc/conqnews.doc=$SRCDIR/conqnews.doc 0644 root conquest
 f none /opt/conquest/etc/conquest.doc=$SRCDIR/conquest.doc 0644 root conquest
+f none /opt/conquest/etc/LICENSE=$SRCDIR/LICENSE 0444 root conquest
 v none /opt/conquest/etc/conquestrc=$SRCDIR/clean.conquestrc 0664 root conquest
 v none /opt/conquest/etc/conquest_common.img=$SRCDIR/clean.conquest_common.img 0660 root conquest
 v none /opt/conquest/etc/conquest.log=$SRCDIR/clean.conquest.log 0660 root conquest

@@ -98,24 +98,20 @@ void aston(void)
   
 }
 
-void EnableSignalHandler(void)
+void EnableConquestSignalHandler(void)
 {
 #ifdef DEBUG_SIG
-  clog("EnableSignalHandler() ENABLED");
+  clog("EnableConquestSignalHandler() ENABLED");
 #endif
   
-  signal(SIGHUP, (void (*)(int))DoSig);
+  signal(SIGHUP, (void (*)(int))DoConquestSig);
   signal(SIGTSTP, SIG_IGN);
-  signal(SIGTERM, (void (*)(int))DoSig);  
+  signal(SIGTERM, (void (*)(int))DoConquestSig);  
   signal(SIGINT, SIG_IGN);
 
-  if (isagod(NULL))
+  if (isagod(NULL) || sysconf_AllowSigquit == TRUE)
     {
-      signal(SIGQUIT, (void (*)(int))DoSig);
-    }
-  else if (sysconf_AllowSigquit == TRUE)
-    {
-      signal(SIGQUIT, (void (*)(int))DoSig);
+      signal(SIGQUIT, (void (*)(int))DoConquestSig);
     }
   else
     {
@@ -125,11 +121,26 @@ void EnableSignalHandler(void)
   return;
 }
 
-void DoSig(int sig)
+void EnableConqoperSignalHandler(void)
+{
+#ifdef DEBUG_SIG
+  clog("EnableConquestSignalHandler() ENABLED");
+#endif
+  
+  signal(SIGHUP, (void (*)(int))DoConqoperSig);
+  signal(SIGTSTP, SIG_IGN);
+  signal(SIGTERM, (void (*)(int))DoConqoperSig);  
+  signal(SIGINT, (void (*)(int))DoConqoperSig);
+  signal(SIGQUIT, (void (*)(int))DoConqoperSig);
+
+  return;
+}
+
+void DoConquestSig(int sig)
 {
   
 #ifdef DEBUG_SIG
-  clog("DoSig() got SIG %d", sig);
+  clog("DoConquestSig() got SIG %d", sig);
 #endif
   
   switch(sig)
@@ -139,7 +150,13 @@ void DoSig(int sig)
       drpexit();
       cdclear();
       cdrefresh();
-      conqstats(csnum);
+      conqstats(csnum);		/* update stats */
+				/* now we clear ship's elapsed/cpu seconds
+				   so that there won't be a huge addition to
+				   the Teams/Users/Ships timing stats when
+				   a VACANT ships re-enters Conquest */
+      Ships[csnum].ctime = 0;
+      Ships[csnum].etime = 0;
       conqend();
       cdend();
       
@@ -155,7 +172,34 @@ void DoSig(int sig)
       break;
     }
 
-  EnableSignalHandler();	/* reset */
+  EnableConquestSignalHandler();	/* reset */
+  return;
+}
+
+void DoConqoperSig(int sig)
+{
+  
+#ifdef DEBUG_SIG
+  clog("DoSig() got SIG %d", sig);
+#endif
+  
+  switch(sig)
+    {
+    case SIGTERM:
+    case SIGINT:
+    case SIGHUP:
+    case SIGQUIT:
+      stoptimer();
+      cdrefresh();
+      conqend();
+      cdend();
+      exit(0);			/* WE EXIT HERE */
+      break;
+    default:
+      break;
+    }
+
+  EnableConqoperSignalHandler();	/* reset */
   return;
 }
 
@@ -188,7 +232,7 @@ void astservice(int sig)
 	{
 	  if (readmsg( csnum, Ships[csnum].lastmsg, RMsg_Line ) == TRUE)
 	    {
-	      if (msgfrom[Ships[csnum].lastmsg] != csnum)
+	      if (Msgs[Ships[csnum].lastmsg].msgfrom != csnum)
 		if (conf_MessageBell == TRUE)
 		  cdbeep();
 	      cmsgrand = now;
@@ -339,8 +383,8 @@ void conqstats( int snum )
       Users[unum].stats[USTAT_CPUSECONDS] += cadd;
       Users[unum].stats[USTAT_SECONDS] += eadd;
       team = Users[unum].team;
-      tstats[team][TSTAT_CPUSECONDS] += cadd;
-      tstats[team][TSTAT_SECONDS] += eadd;
+      Teams[team].stats[TSTAT_CPUSECONDS] += cadd;
+      Teams[team].stats[TSTAT_SECONDS] += eadd;
       *ccpuseconds += cadd;
       *celapsedseconds += eadd;
     }
@@ -817,7 +861,11 @@ void upstats( int *ctemp, int *etemp, int *caccum, int *eaccum, int *ctime, int 
     }
   
   /* Update elapsed time. */
+  if (*etemp == 0)		/* init etemp if 0 - for VACANT ships */
+    grand(etemp);
+  
   *eaccum = *eaccum + dgrand( *etemp, &now );
+
   if ( *eaccum > 1000 )
     {
       /* A second elapsed. */

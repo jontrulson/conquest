@@ -284,8 +284,6 @@ void map_common(void)
   map1d(conqtime, char, DATESIZE);
   map1d(lastwords, char, MAXLASTWORDS);
   map1d(inittime, char, DATESIZE);
-  map2d(tstats, int, NUMTEAMS, MAXTSTATS);
-  map1d(tcoupinfo, int, NUMTEAMS);
 
   map1d(ccpuseconds, int, 1);
   map1d(celapsedseconds, int, 1);
@@ -302,50 +300,15 @@ void map_common(void)
   map2d(rstrat, int, REAL_MAX_VAR, 10);
   map1d(rvec, int, 32);
 
-  map1d(pprimary, int, NUMPLANETS + 1);
-  map1d(porbrad, real, NUMPLANETS + 1);
-  map1d(porbvel, real, NUMPLANETS + 1);
-  map1d(ptype, int, NUMPLANETS + 1);	
-  map1d(preal, int, NUMPLANETS + 1);	
-  map2d(pname, char, NUMPLANETS + 1, MAXPLANETNAME);
   map2d(ptname, char, MAXPLANETTYPES, MAXPTYPENAME);
 
-  map1d(homeplanet, int, NUMTEAMS);	
-  map1d(homesun, int, NUMTEAMS);	
-  map2d(teamplanets, int, NUMTEAMS, 3);
-  map1d(armylim, int, NUMTEAMS);		
-  map1d(warplim, real, NUMTEAMS);
-  map1d(engfac, real, NUMTEAMS);	
-  map1d(accelfac, real, NUMTEAMS);	
-  map1d(weafac, real, NUMTEAMS);	
-  map1d(torpwarp, real, NUMTEAMS);	
-  map2d(tname, char, NUMALLTEAMS, MAXTEAMNAME);
+  map1d(Planets, Planet_t, NUMPLANETS + 1);
+
+  map1d(Teams, Team_t, NUMALLTEAMS);
 
   map1d(chrplanets, char, MAXPLANETTYPES);
-  map1d(chrtorps, char, NUMTEAMS);	
-  map1d(chrteams, char, NUMALLTEAMS);	
 
-  map1d(couptime, int, NUMTEAMS);	
-
-  map1d(puninhabtime, int, NUMPLANETS + 1);	
-
-  map1d(dstatus, int, 1);	
-  map1d(dtype, int, 1);		
-  map1d(dx, real, 1);		
-  map1d(dy, real, 1);
-  map1d(ddx, real, 1);		
-  map1d(ddy, real, 1);
-  map1d(dhead, real, 1);		
-  map1d(dlock, int, 1);		
-  map1d(dname, char, SIZEUSERPNAME);	
-
-  map1d(porbang, real, NUMPLANETS + 1);	
-  map1d(px, real, NUMPLANETS + 1);	
-  map1d(py, real, NUMPLANETS + 1);	
-  map1d(pteam, int, NUMPLANETS + 1);	
-  map1d(parmies, int, NUMPLANETS + 1);	
-  map2d(pscanned, int, NUMPLANETS + 1, NUMTEAMS); 
-					
+  map1d(Doomsday, Doomsday_t, 1);
 
   map1d(histptr, int, 1);		
   map1d(histunum, int, MAXHISTLOG);	
@@ -362,18 +325,8 @@ void map_common(void)
 
   map1d(Ships, Ship_t, MAXSHIPS + 1);
 
-  map2d(tstatus, int, MAXSHIPS + 1, MAXTORPS);	
-  map2d(tfuse, int, MAXSHIPS + 1, MAXTORPS);	
-  map2d(tx, real, MAXSHIPS + 1, MAXTORPS);	
-  map2d(ty, real, MAXSHIPS + 1, MAXTORPS);
-  map2d(tdx, real, MAXSHIPS + 1, MAXTORPS);	
-  map2d(tdy, real, MAXSHIPS + 1, MAXTORPS);	
-  map2d(tmult, real, MAXSHIPS + 1, MAXTORPS);
-  map3d(twar, int, MAXSHIPS + 1, MAXTORPS, NUMTEAMS); 
-
-  map2d(msgbuf, char, MAXMESSAGES, MESSAGE_SIZE);
-  map1d(msgfrom, int, MAXMESSAGES);	
-  map1d(msgto, int, MAXMESSAGES);	
+  map1d(Msgs, Msg_t, MAXMESSAGES);
+	
   map1d(lastmsg, int, 1);		
 
   map1d(externrobots, int, 1);		

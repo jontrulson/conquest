@@ -745,9 +745,9 @@ int getamsg( int snum, int *msg )
       /* If we can read it, only do so if it's not from us to GOD. */
       
       if ( canread( snum, *msg ) )
-	return(MSG_GOD != msgto[*msg]);
+	return(MSG_GOD != Msgs[*msg].msgto);
 	
-      /*      	return ( snum != msgfrom[*msg] || MSG_GOD != msgto[*msg] );*/
+      /*      	return ( snum != Msgs[*msg].msgfrom || MSG_GOD != Msgs[*msg].msgto );*/
     }
   
   return ( FALSE );

@@ -55,7 +55,7 @@
 /*#define COMMONSTAMP 940910 		/* stardate? */
 /*#define COMMONSTAMP 961019 		/* stardate? */
 /*#define COMMONSTAMP 971207 		/* stardate? */
-#define COMMONSTAMP 980614 		/* stardate? */
+#define COMMONSTAMP 980628 		/* stardate? */
 
 /* Copyright notice string. */
 #define COPYRIGHT "(C) 1983-1986 by Jef Poskanzer and Craig Leres"
@@ -101,7 +101,7 @@
 #define TEAM_ROMULAN 1 	/* Rom Dogs */
 #define TEAM_KLINGON 2 	/* Klings */
 #define TEAM_ORION 3 		/* Bugs */
-#define NUMTEAMS 4 		/* four "real" teams */
+#define NUMPLAYERTEAMS 4 		/* four "real" teams */
 #define TEAM_SELFRULED 4 
 #define TEAM_NOTEAM 5 
 #define TEAM_GOD 6 
@@ -580,14 +580,14 @@
 #define distf(w,x,y,z) (real)(fabs((real)(y)-(real)(w)) + fabs((real)(z)-(real)(x)))
 #define vowel(x) (x=='a' || x=='e' || x=='i' || x=='o' || x=='u' )
 #define satwar(x,y) (Ships[x].war[Ships[y].team] || Ships[y].war[Ships[x].team])
-#define selfwar(x) Ships[x].war[Ships[x ].team]
-#define maxwarp(x) (real)min(warplim[Ships[x ].team], \
+#define selfwar(x) Ships[x].war[Ships[x].team]
+#define maxwarp(x) (real)min(Teams[Ships[x].team].warplim, \
 			     max(0.0, around(((100.0-Ships[x].damage)/100.0)*12.0)))
 #define engeff(x) (real)(((Ships[x].engalloc +50.0)/100.0) * \
-			 engfac[Ships[x].team] * \
+			 Teams[Ships[x].team].engfac * \
 			 (((Ships[x].kills+Ships[x].strkills)+DOUBLE_E_KILLS)/DOUBLE_E_KILLS))
-#define weaeff(x) (real)(((Ships[x ].weapalloc+50.0)/100.0) * \
-			 weafac[Ships[x].team] * \
+#define weaeff(x) (real)(((Ships[x].weapalloc+50.0)/100.0) * \
+			 Teams[Ships[x].team].weafac * \
 			 (((Ships[x].kills+Ships[x].strkills)+DOUBLE_E_KILLS)/DOUBLE_E_KILLS))
 
 #endif /*  CONQDEF_H_INCLUDED */

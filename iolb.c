@@ -28,8 +28,20 @@
 int iochav( void )
 {
 #if defined(USE_SELECT)
-  static struct timeval timeout;
+				/* we do a test for linux/sys_select_h
+				   for glibc systems... for some reason
+				   glibc defined fd_set as a typedef, rather
+				   that as a struct like the rest of the
+				   planet...*/
+# if defined(LINUX) && defined(HAVE_SYS_SELECT_H)
+				/* a linux, glibc system */
+  static fd_set readfds;
+# else
   static struct fd_set readfds;
+# endif
+
+  static struct timeval timeout;
+
 #else  /* poll */
   static struct pollfd Stdin_pfd;
   static struct strbuf CtlMsg;
@@ -201,7 +213,14 @@ int iogtimed ( int *ch, int seconds )
   static int c;
 #if defined(USE_SELECT)
   static struct timeval timeout;
+
+# if defined(LINUX) && defined(HAVE_SYS_SELECT_H)
+				/* a linux, glibc system */
+  static fd_set readfds;
+# else
   static struct fd_set readfds;
+# endif
+
 #endif
   int retval;
   static int starttime = 0, curtime;
@@ -237,10 +256,10 @@ int iogtimed ( int *ch, int seconds )
 #endif
 
 #if !defined(LINUX)
-				/* Linux will return the amount of time left in a
-				   select() call if it is interupted, others won't,
-				   so we need to set a timer to make sure we leave
-				   when 'seconds' are up */
+			/* Linux will return the amount of time left in a
+			   select() call if it is interupted, others won't,
+			   so we need to set a timer to make sure we leave
+			   when 'seconds' are up */
 
       starttime = time(0);
 #endif

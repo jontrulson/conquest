@@ -10,6 +10,7 @@
 #define SHIP_H_INCLUDED
 
 #include "conqdef.h"
+#include "torp.h"
 
 typedef struct {
   int status;			/* one of the SS_ values */
@@ -45,9 +46,9 @@ typedef struct {
   int rmode;			/* in repair mode or not */
   int cloaked;			/* cloaking device on or not */
   int options[MAXOPTIONS];	/* user options - copy of options */
-  int war[NUMTEAMS];		/* teams s/he is at war with - copy */
+  int war[NUMPLAYERTEAMS];		/* teams s/he is at war with - copy */
 				/*  of war */
-  int rwar[NUMTEAMS];		/* teams s/he is at WAR with */
+  int rwar[NUMPLAYERTEAMS];		/* teams s/he is at WAR with */
   int srpwar[NUMPLANETS];	/* self-ruled planets s/he is at war */
   int sdfuse;			/* self-destruct fuse, 0 normally */
   int lastmsg;			/* last message seen */
@@ -58,17 +59,18 @@ typedef struct {
   real lastblast;		/* direction of last weapons usage */
   real lastphase;		/* phaser direction, needed by display(] */
   int pfuse;			/* tenths until can phaser again */
-  int scanned[NUMTEAMS];	/* fuse for which ships have been */
+  int scanned[NUMPLAYERTEAMS];	/* fuse for which ships have been */
 				/*  scanned by which teams */
   int talert;			/* torp alert! */
   int robot;			/* true if is a robot ship */
   int action;			/* current action token if a robot */
-  char alias[SIZEUSERPNAME];	/* user's pseudonym, copy of Users[].alias */
   int ctime;			/* cpu hundredths at last check */
   int etime;			/* elapsed thousands at last check */
   int cacc;			/* accumulated cpu time */
   int eacc;			/* accumulated elapsed time */
   real strkills;		/* 'extra' randomized kills used for robots */
+  Torp_t torps[MAXTORPS];	/* Torpedos */
+  char alias[SIZEUSERPNAME];	/* user's pseudonym, copy of Users[].alias */
 } Ship_t;
 
 #endif /* SHIP_H_INCLUDED */

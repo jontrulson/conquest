@@ -74,7 +74,7 @@ void appkb( int kb, char *buf )
       if ( kb > 0 && kb <= MAXSHIPS )
 	appship( kb, buf );
       else if ( -kb > 0 && -kb <= NUMPLANETS )
-	appstr( pname[-kb], buf );
+	appstr( Planets[-kb].name, buf );
       else
 	appint( kb, buf );
       break;
@@ -99,8 +99,8 @@ void appship( int snum, char *str )
   if ( snum > 0 && snum <= MAXSHIPS )
     {
       i = Ships[snum].team;
-      if ( i >= 0 && i < NUMTEAMS )
-	ch = chrteams[i];
+      if ( i >= 0 && i < NUMPLAYERTEAMS )
+	ch = Teams[i].teamchar;
     }
   
   appchr( ch, str );
@@ -120,8 +120,8 @@ int canread( int snum, int msgnum )
   int from, to;
   
   
-  from = msgfrom[msgnum];
-  to = msgto[msgnum];
+  from = Msgs[msgnum].msgfrom;
+  to = Msgs[msgnum].msgto;
   
   if (from == 0 && to == 0)
     {				/* uninitialized msgs */
@@ -245,17 +245,17 @@ void doomfind(void)
   real taste, tastiness;
   
   tastiness = 0.0;
-  *dlock = -PNUM_MURISAK;
+  Doomsday->lock = -PNUM_MURISAK;
   
   for ( i = 1; i <= NUMPLANETS; i = i + 1 )
-    if ( preal[i] )
-      if ( parmies[i] > 0 && pteam[i] != TEAM_NOTEAM )
+    if ( Planets[i].real )
+      if ( Planets[i].armies > 0 && Planets[i].team != TEAM_NOTEAM )
 	{
-	  taste = parmies[i] * BOMBARD_KILLS / dist(*dx, *dy, px[i], py[i]);
+	  taste = Planets[i].armies * BOMBARD_KILLS / dist(Doomsday->x, Doomsday->y, Planets[i].x, Planets[i].y);
 	  if ( taste > tastiness )
 	    {
 	      tastiness = taste;
-	      *dlock = -i;
+	      Doomsday->lock = -i;
 	    }
 	}
   
@@ -264,18 +264,18 @@ void doomfind(void)
       {
 	taste = ( 1.0 +
 		 Ships[i].kills * KILLS_KILLS +
-		 Ships[i].armies * ARMY_KILLS ) / dist(*dx, *dy, Ships[i].x, Ships[i].y);
+		 Ships[i].armies * ARMY_KILLS ) / dist(Doomsday->x, Doomsday->y, Ships[i].x, Ships[i].y);
 	if ( taste > tastiness )
 	  {
 	    tastiness = taste;
-	    *dlock = i;
+	    Doomsday->lock = i;
 	  }
       }
   
-  if ( *dlock < 0 )
-    *dhead = angle( *dx, *dy, px[-*dlock], py[-*dlock] );
-  else if ( *dlock > 0 )
-    *dhead = angle( *dx, *dy, Ships[*dlock].x, Ships[*dlock].y );
+  if ( Doomsday->lock < 0 )
+    Doomsday->heading = angle( Doomsday->x, Doomsday->y, Planets[-Doomsday->lock].x, Planets[-Doomsday->lock].y );
+  else if ( Doomsday->lock > 0 )
+    Doomsday->heading = angle( Doomsday->x, Doomsday->y, Ships[Doomsday->lock].x, Ships[Doomsday->lock].y );
   
   return;
   
@@ -288,11 +288,11 @@ void doomfind(void)
 void doomsday(void)
 {
   
-  *dhead = rnduni( 0.0, 360.0 );
-  *dx = DOOMSDAY_START_DIST * cosd(*dhead);
-  *dy = DOOMSDAY_START_DIST * sind(*dhead);
+  Doomsday->heading = rnduni( 0.0, 360.0 );
+  Doomsday->x = DOOMSDAY_START_DIST * cosd(Doomsday->heading);
+  Doomsday->y = DOOMSDAY_START_DIST * sind(Doomsday->heading);
   doomfind();
-  *dstatus = DS_LIVE;
+  Doomsday->status = DS_LIVE;
   
   return;
   
@@ -309,8 +309,8 @@ int findorbit( int snum, int *pnum )
   int i;
   
   for ( i = 1; i <= NUMPLANETS; i = i + 1 )
-    if ( preal[i] &&
-	( dist( Ships[snum].x, Ships[snum].y, px[i], py[i] ) <= ORBIT_DIST ) )
+    if ( Planets[i].real &&
+	( dist( Ships[snum].x, Ships[snum].y, Planets[i].x, Planets[i].y ) <= ORBIT_DIST ) )
       {
 	*pnum = i;
 	return ( TRUE );
@@ -330,7 +330,6 @@ int findorbit( int snum, int *pnum )
 int findship( int *snum )
 {
   int i;
-  
   PVLOCK(lockword);
   *snum = -1;
   for ( i = 1; i <= MAXSHIPS; i = i + 1 )
@@ -427,16 +426,16 @@ int findspecial( int snum, int token, int count, int *sorpnum, int *xsorpnum )
       switch ( Ships[snum].team )
 	{
 	case TEAM_FEDERATION:
-	  *sorpnum = homeplanet[TEAM_FEDERATION];
+	  *sorpnum = Teams[TEAM_FEDERATION].homeplanet;
 	  break;
 	case TEAM_ROMULAN:
-	  *sorpnum = homeplanet[TEAM_ROMULAN];
+	  *sorpnum = Teams[TEAM_ROMULAN].homeplanet;
 	  break;
 	case TEAM_KLINGON:
-	  *sorpnum = homeplanet[TEAM_KLINGON];
+	  *sorpnum = Teams[TEAM_KLINGON].homeplanet;
 	  break;
 	case TEAM_ORION:
-	  *sorpnum = homeplanet[TEAM_ORION];
+	  *sorpnum = Teams[TEAM_ORION].homeplanet;
 	  break;
 	default:
 	  return ( FALSE );
@@ -447,24 +446,24 @@ int findspecial( int snum, int token, int count, int *sorpnum, int *xsorpnum )
       for ( i = 1; i <= NUMPLANETS; i = i + 1 )
 	{
 	  /* Only can look for "real" planets. */
-	  if ( ! preal[i] )
+	  if ( ! Planets[i].real )
 	    continue; /* jet next;*/
 	  /* Ignore suns and moons. */
-	  if ( ptype[i] == PLANET_SUN || ptype[i] == PLANET_MOON )
+	  if ( Planets[i].type == PLANET_SUN || Planets[i].type == PLANET_MOON )
 	    continue; 
 
-	  valid = ( pscanned[i][Ships[snum].team] &&
-		    pteam[i] != Ships[snum].team );
+	  valid = ( Planets[i].scanned[Ships[snum].team] &&
+		    Planets[i].team != Ships[snum].team );
 
 	  /* Handle army threshold logic. */
 	  if ( valid )
-	    valid = ( parmies[i] >= count );
+	    valid = ( Planets[i].armies >= count );
 
 	  if ( valid )
 	    {
-	      ta = parmies[i];
-	      tu = puninhabtime[i];
-	      td = dist(Ships[snum].x, Ships[snum].y, px[i], py[i]);
+	      ta = Planets[i].armies;
+	      tu = Planets[i].uninhabtime;
+	      td = dist(Ships[snum].x, Ships[snum].y, Planets[i].x, Planets[i].y);
 	      
 	      /* Uninhabitable time is of next importance, */
 	      /*  number of armies is of first importantance, and */
@@ -502,7 +501,7 @@ int findspecial( int snum, int token, int count, int *sorpnum, int *xsorpnum )
       
       /* Determine if we at peace with all teams. */
       peaceful = TRUE;
-      for ( i = 0; i < NUMTEAMS; i = i + 1 )
+      for ( i = 0; i < NUMPLAYERTEAMS; i = i + 1 )
 	if ( Ships[snum].war[i] )
 	  {
 	    peaceful = FALSE;
@@ -513,39 +512,39 @@ int findspecial( int snum, int token, int count, int *sorpnum, int *xsorpnum )
       for ( i = 1; i <= NUMPLANETS; i = i + 1 )
 	{
 	  /* Only can look for "real" planets. */
-	  if ( ! preal[i] )
+	  if ( ! Planets[i].real )
 	    continue; 
 	  /* Ignore suns and moons. */
-	  if ( ptype[i] == PLANET_SUN || ptype[i] == PLANET_MOON )
+	  if ( Planets[i].type == PLANET_SUN || Planets[i].type == PLANET_MOON )
 	    continue; 
 	  switch ( token )
 	    {
 	    case SPECIAL_ARMYPLANET:
-	      valid = ( pteam[i] == Ships[snum].team );
+	      valid = ( Planets[i].team == Ships[snum].team );
 	      break;
 	    case SPECIAL_ENEMYPLANET:
-	      valid = ( ! pscanned[i][Ships[snum].team] ||
-		       ( parmies[i] > 0 &&
+	      valid = ( ! Planets[i].scanned[Ships[snum].team] ||
+		       ( Planets[i].armies > 0 &&
 			spwar( snum, i ) &&
-			ptype[i] != PLANET_MOON ) );
+			Planets[i].type != PLANET_MOON ) );
 	      break;
 	    case SPECIAL_FUELPLANET:
-	      valid = ( ( pscanned[i][Ships[snum].team] || peaceful ) &&
+	      valid = ( ( Planets[i].scanned[Ships[snum].team] || peaceful ) &&
 		       ! spwar( snum, i ) &&
-		       parmies[i] > 0 &&
-		       ptype[i] == PLANET_CLASSM );
+		       Planets[i].armies > 0 &&
+		       Planets[i].type == PLANET_CLASSM );
 	      break;
 	    case SPECIAL_PLANET:
 	      valid = TRUE;
 	      break;
 	    case SPECIAL_REPAIRPLANET:
-	      valid = ( ( pscanned[i][Ships[snum].team] || peaceful ) &&
+	      valid = ( ( Planets[i].scanned[Ships[snum].team] || peaceful ) &&
 		       ! spwar( snum, i ) &&
-		       parmies[i] > 0 &&
-		       ptype[i] != PLANET_MOON );
+		       Planets[i].armies > 0 &&
+		       Planets[i].type != PLANET_MOON );
 	      break;
 	    case SPECIAL_TEAMPLANET:
-	      valid = ( pteam[i] == Ships[snum].team );
+	      valid = ( Planets[i].team == Ships[snum].team );
 	      break;
 	    default:
 	      return ( FALSE );		/* this can't happen */
@@ -555,24 +554,24 @@ int findspecial( int snum, int token, int count, int *sorpnum, int *xsorpnum )
 	    switch ( token )
 	      {
 	      case SPECIAL_ARMYPLANET:
-		valid = ( ( parmies[i] - 3 ) >= count );
+		valid = ( ( Planets[i].armies - 3 ) >= count );
 		break;
 	      case SPECIAL_PLANET:
 	      case SPECIAL_ENEMYPLANET:
-		valid = ( ! pscanned[i][Ships[snum].team] ||
-			 parmies[i] >= count );
+		valid = ( ! Planets[i].scanned[Ships[snum].team] ||
+			 Planets[i].armies >= count );
 		break;
 	      case SPECIAL_FUELPLANET:
 	      case SPECIAL_REPAIRPLANET:
 	      case SPECIAL_TEAMPLANET:
-		valid = ( parmies[i] >= count );
+		valid = ( Planets[i].armies >= count );
 		break;
 	      default:
 		return ( FALSE );	/* this can't happen */
 	      }
 	  if ( valid )
 	    {
-	      td = dist(Ships[snum].x, Ships[snum].y, px[i], py[i]);
+	      td = dist(Ships[snum].x, Ships[snum].y, Planets[i].x, Planets[i].y);
 	      if ( td < nd )
 		if ( td < d )
 		  {
@@ -730,9 +729,9 @@ void initeverything(void)
 #endif
 
   /* Zero team stats. */
-  for ( i = 0; i < NUMTEAMS; i = i + 1 )
+  for ( i = 0; i < NUMPLAYERTEAMS; i = i + 1 )
     for ( j = 0; j < MAXTSTATS; j = j + 1 )
-      tstats[i][j] = 0;
+      Teams[i].stats[j] = 0;
   
   /* De-register all users. */
   for ( i = 0; i < MAXUSERS; i = i + 1 )
@@ -783,58 +782,57 @@ void initgame(void)
   *drivsecs = 0;
   
   /* Doomsday machine. */
-  *dstatus = DS_OFF;
-  *dtype = 0;				/* should have constants for this */
-  *dx = 0.0;
-  *dy = 0.0;
-  *ddx = 0.0;
-  *ddy = 0.0;
-  *dhead = 0.0;
-  *dlock = 0;
-  stcpn( "Doomsday Machine", dname, MAXUSERPNAME );
+  Doomsday->status = DS_OFF;
+  Doomsday->x = 0.0;
+  Doomsday->y = 0.0;
+  Doomsday->dx = 0.0;
+  Doomsday->dy = 0.0;
+  Doomsday->heading = 0.0;
+  Doomsday->lock = 0;
+  stcpn( "Doomsday Machine", Doomsday->name, MAXUSERPNAME );
   
   /* Set up initial armies on planets. */
-  pteam[PNUM_SOL] = TEAM_NOTEAM;
-  pteam[PNUM_EARTH] = TEAM_FEDERATION;
-  pteam[PNUM_TELOS] = TEAM_FEDERATION;
-  pteam[PNUM_OMEGA] = TEAM_FEDERATION;
-  pteam[PNUM_SIRIUS] = TEAM_NOTEAM;
-  pteam[PNUM_ROMULUS] = TEAM_ROMULAN;
-  pteam[PNUM_REMUS] = TEAM_ROMULAN;
-  pteam[PNUM_RHO] = TEAM_ROMULAN;
-  pteam[PNUM_KEJELA] = TEAM_NOTEAM;
-  pteam[PNUM_KLINGUS] = TEAM_KLINGON;
-  pteam[PNUM_LEUDUS] = TEAM_KLINGON;
-  pteam[PNUM_TARSUS] = TEAM_KLINGON;
-  pteam[PNUM_BETELGEUSE] = TEAM_NOTEAM;
-  pteam[PNUM_ORION] = TEAM_ORION;
-  pteam[PNUM_OBERON] = TEAM_ORION;
-  pteam[PNUM_UMBRIEL] = TEAM_ORION;
-  pteam[PNUM_MURISAK] = TEAM_NOTEAM;
-  pteam[PNUM_JANUS] = TEAM_SELFRULED;
-  pteam[PNUM_SERITIL] = TEAM_SELFRULED;
-  pteam[PNUM_ELAS] = TEAM_SELFRULED;
-  pteam[PNUM_SHERMAN] = TEAM_SELFRULED;
-  pteam[PNUM_CHERON] = TEAM_SELFRULED;
-  pteam[PNUM_DAKEL] = TEAM_SELFRULED;
-  pteam[PNUM_OLDAR] = TEAM_SELFRULED;
-  pteam[PNUM_SARAC] = TEAM_SELFRULED;
-  pteam[PNUM_EMINIAR] = TEAM_SELFRULED;
-  pteam[PNUM_VENAR] = TEAM_SELFRULED;
-  pteam[PNUM_DYNEB] = TEAM_SELFRULED;
-  pteam[PNUM_XIDEX] = TEAM_SELFRULED;
-  pteam[PNUM_RIGELB] = TEAM_SELFRULED;
+  Planets[PNUM_SOL].team = TEAM_NOTEAM;
+  Planets[PNUM_EARTH].team = TEAM_FEDERATION;
+  Planets[PNUM_TELOS].team = TEAM_FEDERATION;
+  Planets[PNUM_OMEGA].team = TEAM_FEDERATION;
+  Planets[PNUM_SIRIUS].team = TEAM_NOTEAM;
+  Planets[PNUM_ROMULUS].team = TEAM_ROMULAN;
+  Planets[PNUM_REMUS].team = TEAM_ROMULAN;
+  Planets[PNUM_RHO].team = TEAM_ROMULAN;
+  Planets[PNUM_KEJELA].team = TEAM_NOTEAM;
+  Planets[PNUM_KLINGUS].team = TEAM_KLINGON;
+  Planets[PNUM_LEUDUS].team = TEAM_KLINGON;
+  Planets[PNUM_TARSUS].team = TEAM_KLINGON;
+  Planets[PNUM_BETELGEUSE].team = TEAM_NOTEAM;
+  Planets[PNUM_ORION].team = TEAM_ORION;
+  Planets[PNUM_OBERON].team = TEAM_ORION;
+  Planets[PNUM_UMBRIEL].team = TEAM_ORION;
+  Planets[PNUM_MURISAK].team = TEAM_NOTEAM;
+  Planets[PNUM_JANUS].team = TEAM_SELFRULED;
+  Planets[PNUM_SERITIL].team = TEAM_SELFRULED;
+  Planets[PNUM_ELAS].team = TEAM_SELFRULED;
+  Planets[PNUM_SHERMAN].team = TEAM_SELFRULED;
+  Planets[PNUM_CHERON].team = TEAM_SELFRULED;
+  Planets[PNUM_DAKEL].team = TEAM_SELFRULED;
+  Planets[PNUM_OLDAR].team = TEAM_SELFRULED;
+  Planets[PNUM_SARAC].team = TEAM_SELFRULED;
+  Planets[PNUM_EMINIAR].team = TEAM_SELFRULED;
+  Planets[PNUM_VENAR].team = TEAM_SELFRULED;
+  Planets[PNUM_DYNEB].team = TEAM_SELFRULED;
+  Planets[PNUM_XIDEX].team = TEAM_SELFRULED;
+  Planets[PNUM_RIGELB].team = TEAM_SELFRULED;
   
-  pteam[PNUM_SYRINX] = TEAM_NOTEAM;
-  pteam[PNUM_ALTAIR] = TEAM_SELFRULED;
-  pteam[PNUM_HELL] = TEAM_SELFRULED;
-  pteam[PNUM_JINX] = TEAM_SELFRULED;
-  pteam[PNUM_LUNA] = TEAM_NOTEAM;
+  Planets[PNUM_SYRINX].team = TEAM_NOTEAM;
+  Planets[PNUM_ALTAIR].team = TEAM_SELFRULED;
+  Planets[PNUM_HELL].team = TEAM_SELFRULED;
+  Planets[PNUM_JINX].team = TEAM_SELFRULED;
+  Planets[PNUM_LUNA].team = TEAM_NOTEAM;
   
-  pteam[PNUM_GHOST1] = TEAM_NOTEAM;
-  pteam[PNUM_GHOST2] = TEAM_NOTEAM;
-  pteam[PNUM_GHOST3] = TEAM_NOTEAM;
-  pteam[PNUM_GHOST4] = TEAM_NOTEAM;
+  Planets[PNUM_GHOST1].team = TEAM_NOTEAM;
+  Planets[PNUM_GHOST2].team = TEAM_NOTEAM;
+  Planets[PNUM_GHOST3].team = TEAM_NOTEAM;
+  Planets[PNUM_GHOST4].team = TEAM_NOTEAM;
 
 				/* set up teams for extra planets */
   if (NUM_EXTRAPLANETS > 0)
@@ -843,70 +841,71 @@ void initgame(void)
 				   1 (+ NUM_BASEPLANETS) */
       for (i=1; i<= NUM_EXTRAPLANETS; i++) 
 	{
-	  pteam[NUM_BASEPLANETS + i] = TEAM_SELFRULED;
+	  Planets[NUM_BASEPLANETS + i].team = TEAM_SELFRULED;
 	}
     }
 
   
-  parmies[PNUM_SOL] = rndint(80, 180);
-  parmies[PNUM_EARTH] = 50;
-  parmies[PNUM_TELOS] = 50;
-  parmies[PNUM_OMEGA] = 50;
-  parmies[PNUM_SIRIUS] = rndint(80, 180);
-  parmies[PNUM_ROMULUS] = 50;
-  parmies[PNUM_REMUS] = 50;
-  parmies[PNUM_RHO] = 50;
-  parmies[PNUM_KEJELA] = rndint(80, 180);
-  parmies[PNUM_KLINGUS] = 50;
-  parmies[PNUM_LEUDUS] = 50;
-  parmies[PNUM_TARSUS] = 50;
-  parmies[PNUM_BETELGEUSE] = rndint(80, 180);
-  parmies[PNUM_ORION] = 50;
-  parmies[PNUM_OBERON] = 50;
-  parmies[PNUM_UMBRIEL] = 50;
-  parmies[PNUM_MURISAK] = rndint(80, 180);
-  parmies[PNUM_JANUS] = 25;
-  parmies[PNUM_SERITIL] = 25;
-  parmies[PNUM_ELAS] = 25;
-  parmies[PNUM_SHERMAN] = 25;
-  parmies[PNUM_CHERON] = 25;
-  parmies[PNUM_DAKEL] = 25;
-  parmies[PNUM_OLDAR] = 25;
-  parmies[PNUM_SARAC] = 25;
-  parmies[PNUM_EMINIAR] = 25;
-  parmies[PNUM_VENAR] = 25;
-  parmies[PNUM_DYNEB] = 25;
-  parmies[PNUM_XIDEX] = 25;
-  parmies[PNUM_RIGELB] = 25;
+  Planets[PNUM_SOL].armies = rndint(80, 180);
+  Planets[PNUM_EARTH].armies = 50;
+  Planets[PNUM_TELOS].armies = 50;
+  Planets[PNUM_OMEGA].armies = 50;
+  Planets[PNUM_SIRIUS].armies = rndint(80, 180);
+  Planets[PNUM_ROMULUS].armies = 50;
+  Planets[PNUM_REMUS].armies = 50;
+  Planets[PNUM_RHO].armies = 50;
+  Planets[PNUM_KEJELA].armies = rndint(80, 180);
+  Planets[PNUM_KLINGUS].armies = 50;
+  Planets[PNUM_LEUDUS].armies = 50;
+  Planets[PNUM_TARSUS].armies = 50;
+  Planets[PNUM_BETELGEUSE].armies = rndint(80, 180);
+  Planets[PNUM_ORION].armies = 50;
+  Planets[PNUM_OBERON].armies = 50;
+  Planets[PNUM_UMBRIEL].armies = 50;
+  Planets[PNUM_MURISAK].armies = rndint(80, 180);
+  Planets[PNUM_JANUS].armies = 25;
+  Planets[PNUM_SERITIL].armies = 25;
+  Planets[PNUM_ELAS].armies = 25;
+  Planets[PNUM_SHERMAN].armies = 25;
+  Planets[PNUM_CHERON].armies = 25;
+  Planets[PNUM_DAKEL].armies = 25;
+  Planets[PNUM_OLDAR].armies = 25;
+  Planets[PNUM_SARAC].armies = 25;
+  Planets[PNUM_EMINIAR].armies = 25;
+  Planets[PNUM_VENAR].armies = 25;
+  Planets[PNUM_DYNEB].armies = 25;
+  Planets[PNUM_XIDEX].armies = 25;
+  Planets[PNUM_RIGELB].armies = 25;
+  Planets[PNUM_SYRINX].armies = rndint(100, 200);
   
   /* The rest don't matter since you don't have to conquer them. */
-  parmies[PNUM_SYRINX] = rndint(100, 200);
-  parmies[PNUM_ALTAIR] = rndint(80, 120);
-  parmies[PNUM_HELL] = rndint(50, 100);
-  parmies[PNUM_JINX] = rndint(100, 200);
-  parmies[PNUM_LUNA] = 0;
+
+  Planets[PNUM_ALTAIR].armies = rndint(80, 120);
+  Planets[PNUM_HELL].armies = rndint(50, 100);
+  Planets[PNUM_JINX].armies = rndint(100, 200);
+  Planets[PNUM_LUNA].armies = 0;
   
-  parmies[PNUM_GHOST1] = 0;
-  parmies[PNUM_GHOST2] = 0;
-  parmies[PNUM_GHOST3] = 0;
-  parmies[PNUM_GHOST4] = 0;
+  Planets[PNUM_GHOST1].armies = 0;
+  Planets[PNUM_GHOST2].armies = 0;
+  Planets[PNUM_GHOST3].armies = 0;
+  Planets[PNUM_GHOST4].armies = 0;
   
   /* Set up the pscanned array so that each team has scanned its own planets. */
   for ( i = 1 ; i <= NUMPLANETS; i = i + 1 )
     {
-      puninhabtime[i] = 0;		/* planets start out inhabitable */
-      for ( j = 0; j < NUMTEAMS; j = j + 1 )
-	pscanned[i][j] = FALSE;
+      Planets[i].uninhabtime = 0;		/* planets start out inhabitable */
+      for ( j = 0; j < NUMPLAYERTEAMS; j = j + 1 )
+	Planets[i].scanned[j] = FALSE;
     }
   
-  for ( i = 0; i < NUMTEAMS; i = i + 1 )
+  for ( i = 0; i < NUMPLAYERTEAMS; i = i + 1 )
     {
       /* Each team has scanned its own planets. */
       for ( j = 0; j < 3; j = j + 1 )
-	pscanned[teamplanets[i][j]][i] = TRUE;
+	Planets[Teams[i].teamhplanets[j]].scanned[i] = TRUE;
       
-      couptime[i] = 0;		/* time left to coup starts at zero. */
-      tcoupinfo[i] = FALSE;		/* don't know coup time */
+      Teams[i].couptime = 0;		/* time left to coup starts at zero. */
+      Teams[i].coupinfo = FALSE;		/* don't know coup time */
     }
   
   /* Un-twiddle the lockword. */
@@ -931,9 +930,9 @@ void initmsgs(void)
   /* Zero the message buffer. */
   for ( i = 0; i < MAXMESSAGES; i = i + 1 )
     {
-      msgbuf[i][0] = EOS;
-      msgfrom[i] = 0;
-      msgto[i] = 0;
+      Msgs[i].msgbuf[0] = EOS;
+      Msgs[i].msgfrom = 0;
+      Msgs[i].msgto = 0;
     }
   *lastmsg = 0;
   *glastmsg = *lastmsg;
@@ -949,7 +948,7 @@ void initmsgs(void)
 void initplanets(void)
 {
   /* SETPLANET( name, pnum ) */
-#define SETPLANET(x, y)  stcpn( x, pname[y], MAXPLANETNAME ) 
+#define SETPLANET(x, y)  stcpn( x, Planets[y].name, MAXPLANETNAME ) 
   
   int i; 
   real orbang, orbvel;
@@ -1001,47 +1000,47 @@ void initplanets(void)
   SETPLANET( "Ghost 4", PNUM_GHOST4 );
   SETPLANET( "Ghost 5", PNUM_GHOST5 );
   
-  ptype[PNUM_SOL] = PLANET_SUN;
-  ptype[PNUM_EARTH] = PLANET_CLASSM;
-  ptype[PNUM_TELOS] = PLANET_DEAD;
-  ptype[PNUM_OMEGA] = PLANET_DEAD;
-  ptype[PNUM_SIRIUS] = PLANET_SUN;
-  ptype[PNUM_ROMULUS] = PLANET_CLASSM;
-  ptype[PNUM_REMUS] = PLANET_DEAD;
-  ptype[PNUM_RHO] = PLANET_DEAD;
-  ptype[PNUM_KEJELA] = PLANET_SUN;
-  ptype[PNUM_KLINGUS] = PLANET_CLASSM;
-  ptype[PNUM_LEUDUS] = PLANET_DEAD;
-  ptype[PNUM_TARSUS] = PLANET_DEAD;
-  ptype[PNUM_BETELGEUSE] = PLANET_SUN;
-  ptype[PNUM_ORION] = PLANET_CLASSM;
-  ptype[PNUM_OBERON] = PLANET_DEAD;
-  ptype[PNUM_UMBRIEL] = PLANET_DEAD;
-  ptype[PNUM_MURISAK] = PLANET_SUN;
-  ptype[PNUM_JANUS] = PLANET_CLASSM;
-  ptype[PNUM_SERITIL] = PLANET_DEAD;
-  ptype[PNUM_ELAS] = PLANET_CLASSM;
-  ptype[PNUM_SHERMAN] = PLANET_CLASSM;
-  ptype[PNUM_CHERON] = PLANET_DEAD;
-  ptype[PNUM_DAKEL] = PLANET_CLASSM;
-  ptype[PNUM_OLDAR] = PLANET_DEAD;
-  ptype[PNUM_SARAC] = PLANET_CLASSM;
-  ptype[PNUM_EMINIAR] = PLANET_DEAD;
-  ptype[PNUM_VENAR] = PLANET_CLASSM;
-  ptype[PNUM_DYNEB] = PLANET_DEAD;
-  ptype[PNUM_XIDEX] = PLANET_CLASSM;
-  ptype[PNUM_RIGELB] = PLANET_DEAD;
-  ptype[PNUM_GHOST1] = PLANET_GHOST;
-  ptype[PNUM_GHOST2] = PLANET_GHOST;
-  ptype[PNUM_GHOST3] = PLANET_GHOST;
-  ptype[PNUM_GHOST4] = PLANET_GHOST;
-  ptype[PNUM_GHOST5] = PLANET_GHOST;
+  Planets[PNUM_SOL].type = PLANET_SUN;
+  Planets[PNUM_EARTH].type = PLANET_CLASSM;
+  Planets[PNUM_TELOS].type = PLANET_DEAD;
+  Planets[PNUM_OMEGA].type = PLANET_DEAD;
+  Planets[PNUM_SIRIUS].type = PLANET_SUN;
+  Planets[PNUM_ROMULUS].type = PLANET_CLASSM;
+  Planets[PNUM_REMUS].type = PLANET_DEAD;
+  Planets[PNUM_RHO].type = PLANET_DEAD;
+  Planets[PNUM_KEJELA].type = PLANET_SUN;
+  Planets[PNUM_KLINGUS].type = PLANET_CLASSM;
+  Planets[PNUM_LEUDUS].type = PLANET_DEAD;
+  Planets[PNUM_TARSUS].type = PLANET_DEAD;
+  Planets[PNUM_BETELGEUSE].type = PLANET_SUN;
+  Planets[PNUM_ORION].type = PLANET_CLASSM;
+  Planets[PNUM_OBERON].type = PLANET_DEAD;
+  Planets[PNUM_UMBRIEL].type = PLANET_DEAD;
+  Planets[PNUM_MURISAK].type = PLANET_SUN;
+  Planets[PNUM_JANUS].type = PLANET_CLASSM;
+  Planets[PNUM_SERITIL].type = PLANET_DEAD;
+  Planets[PNUM_ELAS].type = PLANET_CLASSM;
+  Planets[PNUM_SHERMAN].type = PLANET_CLASSM;
+  Planets[PNUM_CHERON].type = PLANET_DEAD;
+  Planets[PNUM_DAKEL].type = PLANET_CLASSM;
+  Planets[PNUM_OLDAR].type = PLANET_DEAD;
+  Planets[PNUM_SARAC].type = PLANET_CLASSM;
+  Planets[PNUM_EMINIAR].type = PLANET_DEAD;
+  Planets[PNUM_VENAR].type = PLANET_CLASSM;
+  Planets[PNUM_DYNEB].type = PLANET_DEAD;
+  Planets[PNUM_XIDEX].type = PLANET_CLASSM;
+  Planets[PNUM_RIGELB].type = PLANET_DEAD;
+  Planets[PNUM_GHOST1].type = PLANET_GHOST;
+  Planets[PNUM_GHOST2].type = PLANET_GHOST;
+  Planets[PNUM_GHOST3].type = PLANET_GHOST;
+  Planets[PNUM_GHOST4].type = PLANET_GHOST;
+  Planets[PNUM_GHOST5].type = PLANET_GHOST;
   
-  ptype[PNUM_SYRINX] = PLANET_SUN;
-  ptype[PNUM_LUNA] = PLANET_MOON;
-  ptype[PNUM_ALTAIR] = PLANET_CLASSM;
-  ptype[PNUM_HELL] = PLANET_DEAD;
-  ptype[PNUM_JINX] = PLANET_CLASSM;
+  Planets[PNUM_SYRINX].type = PLANET_SUN;
+  Planets[PNUM_LUNA].type = PLANET_MOON;
+  Planets[PNUM_ALTAIR].type = PLANET_CLASSM;
+  Planets[PNUM_HELL].type = PLANET_DEAD;
+  Planets[PNUM_JINX].type = PLANET_CLASSM;
   
   stcpn( "class M planet", ptname[PLANET_CLASSM], MAXPTYPENAME );
   stcpn( "dead planet", ptname[PLANET_DEAD], MAXPTYPENAME );
@@ -1054,247 +1053,249 @@ void initplanets(void)
   
   for ( i = 1; i <= NUMPLANETS; i = i + 1 )
     {
-      preal[i] = TRUE;	/* by default, you can see most planets */
-      porbvel[i] = 0.0;
-      porbrad[i] = 0;
-      pprimary[i] = 0;
+      Planets[i].real = TRUE;	/* by default, you can see most planets */
+      Planets[i].orbvel = 0.0;
+      Planets[i].orbrad = 0;
+      Planets[i].primary = 0;
     }
   
   /* Can't see the ghost planets. */
-  preal[PNUM_GHOST1] = FALSE;
-  preal[PNUM_GHOST2] = FALSE;
-  preal[PNUM_GHOST3] = FALSE;
-  preal[PNUM_GHOST4] = FALSE;
-  preal[PNUM_GHOST5] = FALSE;
+  Planets[PNUM_GHOST1].real = FALSE;
+  Planets[PNUM_GHOST2].real = FALSE;
+  Planets[PNUM_GHOST3].real = FALSE;
+  Planets[PNUM_GHOST4].real = FALSE;
+  Planets[PNUM_GHOST5].real = FALSE;
   
   /* Set up the X-Y coordinates of the suns.  Start with Murisak. */
   /* at the center, then place the other eight suns relative to it, */
   /* then the radii of the planets. */
-  px[PNUM_MURISAK] = 0.0;
-  py[PNUM_MURISAK] = 0.0;
-  pprimary[PNUM_MURISAK] = 0;	/* the only "stationary" object */
-  porbrad[PNUM_MURISAK] = 0.0;
-  porbang[PNUM_MURISAK] = 0.0;
-  porbvel[PNUM_MURISAK] = 0.0;
+  Planets[PNUM_MURISAK].x = 0.0;
+  Planets[PNUM_MURISAK].y = 0.0;
+  Planets[PNUM_MURISAK].primary = 0;	/* the only "stationary" object */
+  Planets[PNUM_MURISAK].orbrad = 0.0;
+  Planets[PNUM_MURISAK].orbang = 0.0;
+  Planets[PNUM_MURISAK].orbvel = 0.0;
   
-  pprimary[PNUM_BETELGEUSE] = PNUM_MURISAK;
-  porbrad[PNUM_BETELGEUSE] = 11000.0;
-  porbang[PNUM_BETELGEUSE] = 45.0;
-  porbvel[PNUM_BETELGEUSE] = 0.0;
+  Planets[PNUM_BETELGEUSE].primary = PNUM_MURISAK;
+  Planets[PNUM_BETELGEUSE].orbrad = 11000.0;
+  Planets[PNUM_BETELGEUSE].orbang = 45.0;
+  Planets[PNUM_BETELGEUSE].orbvel = 0.0;
   
-  pprimary[PNUM_KEJELA] = PNUM_MURISAK;
-  porbrad[PNUM_KEJELA] = 11000.0;
-  porbang[PNUM_KEJELA] = 135.0;
-  porbvel[PNUM_KEJELA] = 0.0;
+  Planets[PNUM_KEJELA].primary = PNUM_MURISAK;
+  Planets[PNUM_KEJELA].orbrad = 11000.0;
+  Planets[PNUM_KEJELA].orbang = 135.0;
+  Planets[PNUM_KEJELA].orbvel = 0.0;
   
-  pprimary[PNUM_SIRIUS] = PNUM_MURISAK;
-  porbrad[PNUM_SIRIUS] = 11000.0;
-  porbang[PNUM_SIRIUS] = 225.0;
-  porbvel[PNUM_SIRIUS] = 0.0;
+  Planets[PNUM_SIRIUS].primary = PNUM_MURISAK;
+  Planets[PNUM_SIRIUS].orbrad = 11000.0;
+  Planets[PNUM_SIRIUS].orbang = 225.0;
+  Planets[PNUM_SIRIUS].orbvel = 0.0;
   
-  pprimary[PNUM_SOL] = PNUM_MURISAK;
-  porbrad[PNUM_SOL] = 11000.0;
-  porbang[PNUM_SOL] = 315.0;
-  porbvel[PNUM_SOL] = 0.0;
+  Planets[PNUM_SOL].primary = PNUM_MURISAK;
+  Planets[PNUM_SOL].orbrad = 11000.0;
+  Planets[PNUM_SOL].orbang = 315.0;
+  Planets[PNUM_SOL].orbvel = 0.0;
   
-  pprimary[PNUM_GHOST1] = PNUM_MURISAK;
-  porbrad[PNUM_GHOST1] = 12000.0;
-  porbang[PNUM_GHOST1] = 0.0;
-  porbvel[PNUM_GHOST1] = 0.0;
+  Planets[PNUM_GHOST1].primary = PNUM_MURISAK;
+  Planets[PNUM_GHOST1].orbrad = 12000.0;
+  Planets[PNUM_GHOST1].orbang = 0.0;
+  Planets[PNUM_GHOST1].orbvel = 0.0;
   
-  pprimary[PNUM_GHOST2] = PNUM_MURISAK;
-  porbrad[PNUM_GHOST2] = 12000.0;
-  porbang[PNUM_GHOST2] = 90.0;
-  porbvel[PNUM_GHOST2] = 0.0;
+  Planets[PNUM_GHOST2].primary = PNUM_MURISAK;
+  Planets[PNUM_GHOST2].orbrad = 12000.0;
+  Planets[PNUM_GHOST2].orbang = 90.0;
+  Planets[PNUM_GHOST2].orbvel = 0.0;
   
-  pprimary[PNUM_GHOST3] = PNUM_MURISAK;
-  porbrad[PNUM_GHOST3] = 12000.0;
-  porbang[PNUM_GHOST3] = 180.0;
-  porbvel[PNUM_GHOST3] = 0.0;
+  Planets[PNUM_GHOST3].primary = PNUM_MURISAK;
+  Planets[PNUM_GHOST3].orbrad = 12000.0;
+  Planets[PNUM_GHOST3].orbang = 180.0;
+  Planets[PNUM_GHOST3].orbvel = 0.0;
   
-  pprimary[PNUM_GHOST4] = PNUM_MURISAK;
-  porbrad[PNUM_GHOST4] = 12000.0;
-  porbang[PNUM_GHOST4] = 270.0;
-  porbvel[PNUM_GHOST4] = 0.0;
+  Planets[PNUM_GHOST4].primary = PNUM_MURISAK;
+  Planets[PNUM_GHOST4].orbrad = 12000.0;
+  Planets[PNUM_GHOST4].orbang = 270.0;
+  Planets[PNUM_GHOST4].orbvel = 0.0;
   
-  pprimary[PNUM_GHOST5] = PNUM_MURISAK;
-  porbrad[PNUM_GHOST5] = 12000.0;
-  porbang[PNUM_GHOST5] = 0.0;
-  porbvel[PNUM_GHOST5] = 0.0;
+  Planets[PNUM_GHOST5].primary = PNUM_MURISAK;
+  Planets[PNUM_GHOST5].orbrad = 12000.0;
+  Planets[PNUM_GHOST5].orbang = 0.0;
+  Planets[PNUM_GHOST5].orbvel = 0.0;
   
   /* Murisak's planets. */
-  pprimary[PNUM_JANUS] = PNUM_MURISAK;
-  porbrad[PNUM_JANUS] = 2600.0;
-  pprimary[PNUM_SERITIL] = PNUM_MURISAK;
-  porbrad[PNUM_SERITIL] = 2600.0;
-  pprimary[PNUM_ELAS] = PNUM_MURISAK;
-  porbrad[PNUM_ELAS] = 2600.0;
-  pprimary[PNUM_SHERMAN] = PNUM_MURISAK;
-  porbrad[PNUM_SHERMAN] = 2600.0;
-  pprimary[PNUM_CHERON] = PNUM_MURISAK;
-  porbrad[PNUM_CHERON] = 2600.0;
+  Planets[PNUM_JANUS].primary = PNUM_MURISAK;
+  Planets[PNUM_JANUS].orbrad = 2600.0;
+  Planets[PNUM_SERITIL].primary = PNUM_MURISAK;
+  Planets[PNUM_SERITIL].orbrad = 2600.0;
+  Planets[PNUM_ELAS].primary = PNUM_MURISAK;
+  Planets[PNUM_ELAS].orbrad = 2600.0;
+  Planets[PNUM_SHERMAN].primary = PNUM_MURISAK;
+  Planets[PNUM_SHERMAN].orbrad = 2600.0;
+  Planets[PNUM_CHERON].primary = PNUM_MURISAK;
+  Planets[PNUM_CHERON].orbrad = 2600.0;
   /* Sol's planets. */
-  pprimary[PNUM_EARTH] = PNUM_SOL;
-  porbrad[PNUM_EARTH] = 2600.0;
-  pprimary[PNUM_TELOS] = PNUM_SOL;
-  porbrad[PNUM_TELOS] = 2600.0;
-  pprimary[PNUM_OMEGA] = PNUM_SOL;
-  porbrad[PNUM_OMEGA] = 2600.0;
+  Planets[PNUM_EARTH].primary = PNUM_SOL;
+  Planets[PNUM_EARTH].orbrad = 2600.0;
+  Planets[PNUM_TELOS].primary = PNUM_SOL;
+  Planets[PNUM_TELOS].orbrad = 2600.0;
+  Planets[PNUM_OMEGA].primary = PNUM_SOL;
+  Planets[PNUM_OMEGA].orbrad = 2600.0;
   /* Sirius' planets. */
-  pprimary[PNUM_ROMULUS] = PNUM_SIRIUS;
-  porbrad[PNUM_ROMULUS] = 2600.0;
-  pprimary[PNUM_REMUS] = PNUM_SIRIUS;
-  porbrad[PNUM_REMUS] = 2600.0;
-  pprimary[PNUM_RHO] = PNUM_SIRIUS;
-  porbrad[PNUM_RHO] = 2600.0;
+  Planets[PNUM_ROMULUS].primary = PNUM_SIRIUS;
+  Planets[PNUM_ROMULUS].orbrad = 2600.0;
+  Planets[PNUM_REMUS].primary = PNUM_SIRIUS;
+  Planets[PNUM_REMUS].orbrad = 2600.0;
+  Planets[PNUM_RHO].primary = PNUM_SIRIUS;
+  Planets[PNUM_RHO].orbrad = 2600.0;
   /* Kejela's planets. */
-  pprimary[PNUM_KLINGUS] = PNUM_KEJELA;
-  porbrad[PNUM_KLINGUS] = 2600.0;
-  pprimary[PNUM_LEUDUS] = PNUM_KEJELA;
-  porbrad[PNUM_LEUDUS] = 2600.0;
-  pprimary[PNUM_TARSUS] = PNUM_KEJELA;
-  porbrad[PNUM_TARSUS] = 2600.0;
+  Planets[PNUM_KLINGUS].primary = PNUM_KEJELA;
+  Planets[PNUM_KLINGUS].orbrad = 2600.0;
+  Planets[PNUM_LEUDUS].primary = PNUM_KEJELA;
+  Planets[PNUM_LEUDUS].orbrad = 2600.0;
+  Planets[PNUM_TARSUS].primary = PNUM_KEJELA;
+  Planets[PNUM_TARSUS].orbrad = 2600.0;
   /* Betelgeuse's planets. */
-  pprimary[PNUM_ORION] = PNUM_BETELGEUSE;
-  porbrad[PNUM_ORION] = 2600.0;
-  pprimary[PNUM_OBERON] = PNUM_BETELGEUSE;
-  porbrad[PNUM_OBERON] = 2600.0;
-  pprimary[PNUM_UMBRIEL] = PNUM_BETELGEUSE;
-  porbrad[PNUM_UMBRIEL] = 2600.0;
+  Planets[PNUM_ORION].primary = PNUM_BETELGEUSE;
+  Planets[PNUM_ORION].orbrad = 2600.0;
+  Planets[PNUM_OBERON].primary = PNUM_BETELGEUSE;
+  Planets[PNUM_OBERON].orbrad = 2600.0;
+  Planets[PNUM_UMBRIEL].primary = PNUM_BETELGEUSE;
+  Planets[PNUM_UMBRIEL].orbrad = 2600.0;
   /* Side systems. */
-  pprimary[PNUM_XIDEX] = PNUM_GHOST1;
-  porbrad[PNUM_XIDEX] = 1150.0;
-  pprimary[PNUM_RIGELB] = PNUM_GHOST1;
-  porbrad[PNUM_RIGELB] = 1150.0;
-  pprimary[PNUM_VENAR] = PNUM_GHOST2;
-  porbrad[PNUM_VENAR] = 1150.0;
-  pprimary[PNUM_DYNEB] = PNUM_GHOST2;
-  porbrad[PNUM_DYNEB] = 1150.0;
-  pprimary[PNUM_SARAC] = PNUM_GHOST3;
-  porbrad[PNUM_SARAC] = 1150.0;
-  pprimary[PNUM_EMINIAR] = PNUM_GHOST3;
-  porbrad[PNUM_EMINIAR] = 1150.0;
-  pprimary[PNUM_DAKEL] = PNUM_GHOST4;
-  porbrad[PNUM_DAKEL] = 1150.0;
-  pprimary[PNUM_OLDAR] = PNUM_GHOST4;
-  porbrad[PNUM_OLDAR] = 1150.0;
+  Planets[PNUM_XIDEX].primary = PNUM_GHOST1;
+  Planets[PNUM_XIDEX].orbrad = 1150.0;
+  Planets[PNUM_RIGELB].primary = PNUM_GHOST1;
+  Planets[PNUM_RIGELB].orbrad = 1150.0;
+  Planets[PNUM_VENAR].primary = PNUM_GHOST2;
+  Planets[PNUM_VENAR].orbrad = 1150.0;
+  Planets[PNUM_DYNEB].primary = PNUM_GHOST2;
+  Planets[PNUM_DYNEB].orbrad = 1150.0;
+  Planets[PNUM_SARAC].primary = PNUM_GHOST3;
+  Planets[PNUM_SARAC].orbrad = 1150.0;
+  Planets[PNUM_EMINIAR].primary = PNUM_GHOST3;
+  Planets[PNUM_EMINIAR].orbrad = 1150.0;
+  Planets[PNUM_DAKEL].primary = PNUM_GHOST4;
+  Planets[PNUM_DAKEL].orbrad = 1150.0;
+  Planets[PNUM_OLDAR].primary = PNUM_GHOST4;
+  Planets[PNUM_OLDAR].orbrad = 1150.0;
   
-  pprimary[PNUM_SYRINX] = PNUM_MURISAK;
-  porbrad[PNUM_SYRINX] = 23000.0;
+  Planets[PNUM_SYRINX].primary = PNUM_MURISAK;
+  Planets[PNUM_SYRINX].orbrad = 23000.0;
   
-  pprimary[PNUM_LUNA] = PNUM_EARTH;
-  porbrad[PNUM_LUNA] = 1250.0;
+  Planets[PNUM_LUNA].primary = PNUM_EARTH;
+  Planets[PNUM_LUNA].orbrad = 1250.0;
   
-  pprimary[PNUM_ALTAIR] = PNUM_MURISAK;
-  porbrad[PNUM_ALTAIR] = 6125.0;
+  Planets[PNUM_ALTAIR].primary = PNUM_MURISAK;
+  Planets[PNUM_ALTAIR].orbrad = 6125.0;
 
-  pprimary[PNUM_HELL] = PNUM_SYRINX;
-  porbrad[PNUM_HELL] = 1900.0;
-  pprimary[PNUM_JINX] = PNUM_SYRINX;
-  porbrad[PNUM_JINX] = 2600.0;
+  Planets[PNUM_HELL].primary = PNUM_SYRINX;
+  Planets[PNUM_HELL].orbrad = 1900.0;
+  Planets[PNUM_JINX].primary = PNUM_SYRINX;
+  Planets[PNUM_JINX].orbrad = 2600.0;
   
   
   /* Set orbital angles and velocities for planets, and place them. */
   /* Murisak's planets. */
   orbang = rnduni( 0.0, 360.0 );
   orbvel = rndnor( PLANET_ORBIT_FAC, 2.0 ) * ( rndint( 0, 1 ) * 2 - 1 );
-  porbang[PNUM_JANUS] = orbang;
-  porbvel[PNUM_JANUS] = orbvel;
-  porbang[PNUM_CHERON] = mod360( orbang + 1.0/5.0*360.0 );
-  porbvel[PNUM_CHERON] = orbvel;
-  porbang[PNUM_SHERMAN] = mod360( orbang + 2.0/5.0*360.0 );
-  porbvel[PNUM_SHERMAN] = orbvel;
-  porbang[PNUM_ELAS] = mod360( orbang + 3.0/5.0*360.0 );
-  porbvel[PNUM_ELAS] = orbvel;
-  porbang[PNUM_SERITIL] = mod360( orbang + 4.0/5.0*360.0 );
-  porbvel[PNUM_SERITIL] = orbvel;
+  Planets[PNUM_JANUS].orbang = orbang;
+  Planets[PNUM_JANUS].orbvel = orbvel;
+  Planets[PNUM_CHERON].orbang = mod360( orbang + 1.0/5.0*360.0 );
+  Planets[PNUM_CHERON].orbvel = orbvel;
+  Planets[PNUM_SHERMAN].orbang = mod360( orbang + 2.0/5.0*360.0 );
+  Planets[PNUM_SHERMAN].orbvel = orbvel;
+  Planets[PNUM_ELAS].orbang = mod360( orbang + 3.0/5.0*360.0 );
+  Planets[PNUM_ELAS].orbvel = orbvel;
+  Planets[PNUM_SERITIL].orbang = mod360( orbang + 4.0/5.0*360.0 );
+  Planets[PNUM_SERITIL].orbvel = orbvel;
   /* Sol's planets. */
   orbang = rnduni( 0.0, 360.0 );
   orbvel = rndnor( PLANET_ORBIT_FAC, 2.0 ) * ( rndint( 0, 1 ) * 2 - 1 );
-  porbang[PNUM_EARTH] = orbang;
-  porbvel[PNUM_EARTH] = orbvel;
-  porbang[PNUM_TELOS] = mod360( orbang + 2.0/3.0*360.0 );
-  porbvel[PNUM_TELOS] = orbvel;
-  porbang[PNUM_OMEGA] = mod360( orbang + 1.0/3.0*360.0 );
-  porbvel[PNUM_OMEGA] = orbvel;
+  Planets[PNUM_EARTH].orbang = orbang;
+  Planets[PNUM_EARTH].orbvel = orbvel;
+  Planets[PNUM_TELOS].orbang = mod360( orbang + 2.0/3.0*360.0 );
+  Planets[PNUM_TELOS].orbvel = orbvel;
+  Planets[PNUM_OMEGA].orbang = mod360( orbang + 1.0/3.0*360.0 );
+  Planets[PNUM_OMEGA].orbvel = orbvel;
   /* Luna. */
-  porbvel[PNUM_LUNA] = 12.0 * orbvel;
-  porbang[PNUM_LUNA] = rnduni( 0.0, 360.0 );
+  Planets[PNUM_LUNA].orbvel = 12.0 * orbvel;
+  Planets[PNUM_LUNA].orbang = rnduni( 0.0, 360.0 );
   /* Sirius' planets. */
   orbang = rnduni( 0.0, 360.0 );
   orbvel = rndnor( PLANET_ORBIT_FAC, 2.0 ) * ( rndint( 0, 1 ) * 2 - 1 );
-  porbang[PNUM_ROMULUS] = orbang;
-  porbvel[PNUM_ROMULUS] = orbvel;
-  porbang[PNUM_REMUS] = mod360( orbang + 2.0/3.0*360.0 );
-  porbvel[PNUM_REMUS] = orbvel;
-  porbang[PNUM_RHO] = mod360( orbang + 1.0/3.0*360.0 );
-  porbvel[PNUM_RHO] = orbvel;
+  Planets[PNUM_ROMULUS].orbang = orbang;
+  Planets[PNUM_ROMULUS].orbvel = orbvel;
+  Planets[PNUM_REMUS].orbang = mod360( orbang + 2.0/3.0*360.0 );
+  Planets[PNUM_REMUS].orbvel = orbvel;
+  Planets[PNUM_RHO].orbang = mod360( orbang + 1.0/3.0*360.0 );
+  Planets[PNUM_RHO].orbvel = orbvel;
   /* Kejela's planets. */
   orbang = rnduni( 0.0, 360.0 );
   orbvel = rndnor( PLANET_ORBIT_FAC, 2.0 ) * ( rndint( 0, 1 ) * 2 - 1 );
-  porbang[PNUM_KLINGUS] = orbang;
-  porbvel[PNUM_KLINGUS] = orbvel;
-  porbang[PNUM_LEUDUS] = mod360( orbang + 2.0/3.0*360.0 );
-  porbvel[PNUM_LEUDUS] = orbvel;
-  porbang[PNUM_TARSUS] = mod360( orbang + 1.0/3.0*360.0 );
-  porbvel[PNUM_TARSUS] = orbvel;
+  Planets[PNUM_KLINGUS].orbang = orbang;
+  Planets[PNUM_KLINGUS].orbvel = orbvel;
+  Planets[PNUM_LEUDUS].orbang = mod360( orbang + 2.0/3.0*360.0 );
+  Planets[PNUM_LEUDUS].orbvel = orbvel;
+  Planets[PNUM_TARSUS].orbang = mod360( orbang + 1.0/3.0*360.0 );
+  Planets[PNUM_TARSUS].orbvel = orbvel;
   /* Betelgeuse's planets. */
   orbang = rnduni( 0.0, 360.0 );
   orbvel = rndnor( PLANET_ORBIT_FAC, 2.0 ) * ( rndint( 0, 1 ) * 2 - 1 );
-  porbang[PNUM_ORION] = orbang;
-  porbvel[PNUM_ORION] = orbvel;
-  porbang[PNUM_OBERON] = mod360( orbang + 2.0/3.0*360.0 );
-  porbvel[PNUM_OBERON] = orbvel;
-  porbang[PNUM_UMBRIEL] = mod360( orbang + 1.0/3.0*360.0 );
-  porbvel[PNUM_UMBRIEL] = orbvel;
+  Planets[PNUM_ORION].orbang = orbang;
+  Planets[PNUM_ORION].orbvel = orbvel;
+  Planets[PNUM_OBERON].orbang = mod360( orbang + 2.0/3.0*360.0 );
+  Planets[PNUM_OBERON].orbvel = orbvel;
+  Planets[PNUM_UMBRIEL].orbang = mod360( orbang + 1.0/3.0*360.0 );
+  Planets[PNUM_UMBRIEL].orbvel = orbvel;
   /* Side systems. */
   orbang = rnduni( 0.0, 360.0 );
   orbvel = rndnor( PLANET_ORBIT_FAC, 2.0 ) * ( rndint( 0, 1 ) * 2 - 1 );
-  porbang[PNUM_XIDEX] = orbang;
-  porbvel[PNUM_XIDEX] = orbvel;
-  porbang[PNUM_RIGELB] = mod360( orbang + 1.0/2.0*360.0 );
-  porbvel[PNUM_RIGELB] = orbvel;
+  Planets[PNUM_XIDEX].orbang = orbang;
+  Planets[PNUM_XIDEX].orbvel = orbvel;
+  Planets[PNUM_RIGELB].orbang = mod360( orbang + 1.0/2.0*360.0 );
+  Planets[PNUM_RIGELB].orbvel = orbvel;
   orbang = rnduni( 0.0, 360.0 );
   orbvel = rndnor( PLANET_ORBIT_FAC, 2.0 ) * ( rndint( 0, 1 ) * 2 - 1 );
-  porbang[PNUM_VENAR] = orbang;
-  porbvel[PNUM_VENAR] = orbvel;
-  porbang[PNUM_DYNEB] = mod360( orbang + 1.0/2.0*360.0 );
-  porbvel[PNUM_DYNEB] = orbvel;
+  Planets[PNUM_VENAR].orbang = orbang;
+  Planets[PNUM_VENAR].orbvel = orbvel;
+  Planets[PNUM_DYNEB].orbang = mod360( orbang + 1.0/2.0*360.0 );
+  Planets[PNUM_DYNEB].orbvel = orbvel;
   orbang = rnduni( 0.0, 360.0 );
   orbvel = rndnor( PLANET_ORBIT_FAC, 2.0 ) * ( rndint( 0, 1 ) * 2 - 1 );
-  porbang[PNUM_SARAC] = orbang;
-  porbvel[PNUM_SARAC] = orbvel;
-  porbang[PNUM_EMINIAR] = mod360( orbang + 1.0/2.0*360.0 );
-  porbvel[PNUM_EMINIAR] = orbvel;
+  Planets[PNUM_SARAC].orbang = orbang;
+  Planets[PNUM_SARAC].orbvel = orbvel;
+  Planets[PNUM_EMINIAR].orbang = mod360( orbang + 1.0/2.0*360.0 );
+  Planets[PNUM_EMINIAR].orbvel = orbvel;
   orbang = rnduni( 0.0, 360.0 );
   orbvel = rndnor( PLANET_ORBIT_FAC, 2.0 ) * ( rndint( 0, 1 ) * 2 - 1 );
-  porbang[PNUM_DAKEL] = orbang;
-  porbvel[PNUM_DAKEL] = orbvel;
-  porbang[PNUM_OLDAR] = mod360( orbang + 1.0/2.0*360.0 );
-  porbvel[PNUM_OLDAR] = orbvel;
+  Planets[PNUM_DAKEL].orbang = orbang;
+  Planets[PNUM_DAKEL].orbvel = orbvel;
+  Planets[PNUM_OLDAR].orbang = mod360( orbang + 1.0/2.0*360.0 );
+  Planets[PNUM_OLDAR].orbvel = orbvel;
   
-  porbvel[PNUM_SYRINX] = -6.314179;
-  porbang[PNUM_SYRINX] = rnduni(0.0, 360.0);
+  Planets[PNUM_SYRINX].orbvel = -6.314179;
+  Planets[PNUM_SYRINX].orbang = rnduni(0.0, 360.0);
   
   /* Syrinx's planets. */
   orbang = rnduni( 0.0, 360.0 );
   orbvel = rndnor( PLANET_ORBIT_FAC, 2.0 ) * ( rndint( 0, 1 ) * 2 - 1 );
 
-  porbang[PNUM_ALTAIR] = rnduni(0.0, 360.0);
-  porbvel[PNUM_ALTAIR] = -23.1;
+  Planets[PNUM_ALTAIR].orbang = rnduni(0.0, 360.0);
+  Planets[PNUM_ALTAIR].orbvel = -23.1;
 
-  porbang[PNUM_HELL] = mod360( orbang + 2.0/3.0*360.0 );
-  porbvel[PNUM_HELL] = orbvel;
+  Planets[PNUM_HELL].orbang = mod360( orbang + 2.0/3.0*360.0 );
+  Planets[PNUM_HELL].orbvel = orbvel;
 
-  porbang[PNUM_JINX] = mod360( orbang + 1.0/3.0*360.0 );
-  porbvel[PNUM_JINX] = 7.5;
+  Planets[PNUM_JINX].orbang = mod360( orbang + 1.0/3.0*360.0 );
+  Planets[PNUM_JINX].orbvel = 7.5;
 
   /* Place the planets in their proper orbits. */
   for ( i = NUMPLANETS; i > 0; i = i - 1 )
-    if ( pprimary[i] != 0 )
+    if ( Planets[i].primary != 0 )
       {
-	px[i] = px[pprimary[i]] + porbrad[i] * cosd(porbang[i]);
-	py[i] = py[pprimary[i]] + porbrad[i] * sind(porbang[i]);
+	Planets[i].x = Planets[Planets[i].primary].x + 
+	  Planets[i].orbrad * cosd(Planets[i].orbang);
+	Planets[i].y = Planets[Planets[i].primary].y + 
+	  Planets[i].orbrad * sind(Planets[i].orbang);
       }
   
 				/* Now we init the 'extra' planets with
@@ -1310,15 +1311,15 @@ void initplanets(void)
 
 	  t = NUM_BASEPLANETS + i;
 	  sprintf(buf, "Extra %d", i);
-	  strcpy(pname[t], buf);
-	  ptype[t] = PLANET_GHOST;
-	  preal[t] = FALSE;
-	  px[t] = 0.0;
-	  py[t] = 0.0;
-	  pprimary[t] = PNUM_MURISAK;
-	  porbrad[t] = rnduni(30000.0, 70000.0);
-	  porbvel[t] = rnduni(-5.0, +5.0);
-	  porbang[t] = rnduni(0.0, 360.0);
+	  strcpy(Planets[t].name, buf);
+	  Planets[t].type = PLANET_GHOST;
+	  Planets[t].real = FALSE;
+	  Planets[t].x = 0.0;
+	  Planets[t].y = 0.0;
+	  Planets[t].primary = PNUM_MURISAK;
+	  Planets[t].orbrad = rnduni(30000.0, 70000.0);
+	  Planets[t].orbvel = rnduni(-5.0, +5.0);
+	  Planets[t].orbang = rnduni(0.0, 360.0);
 	}
     }
 
@@ -1415,7 +1416,7 @@ void initship( int snum, int unum )
   Ships[snum].rmode = FALSE;
   Ships[snum].cloaked = FALSE;
   /* soption(snum,i)				# setup in menu() */
-  for ( i = 0; i < NUMTEAMS; i = i + 1 )
+  for ( i = 0; i < NUMPLAYERTEAMS; i = i + 1 )
     {
       /* srwar(snum,i)				# setup in menu() or newrob() */
       /* swar(snum,i)				# setup in menu() or newrob() */
@@ -1445,15 +1446,15 @@ void initship( int snum, int unum )
   /* Zero torpedos. */
   for ( i = 0; i < MAXTORPS; i = i + 1 )
     {
-      tstatus[snum][i] = TS_OFF;
-      tfuse[snum][i] = 0;
-      tx[snum][i] = 0.0;
-      ty[snum][i] = 0.0;
-      tdx[snum][i] = 0.0;
-      tdy[snum][i] = 0.0;
-      tmult[snum][i] = 0.0;
-      for ( j = 0; j < NUMTEAMS; j = j + 1 )
-	twar[snum][i][j] = FALSE;
+      Ships[snum].torps[i].status = TS_OFF;
+      Ships[snum].torps[i].fuse = 0;
+      Ships[snum].torps[i].x = 0.0;
+      Ships[snum].torps[i].y = 0.0;
+      Ships[snum].torps[i].dx = 0.0;
+      Ships[snum].torps[i].dy = 0.0;
+      Ships[snum].torps[i].mult = 0.0;
+      for ( j = 0; j < NUMPLAYERTEAMS; j = j + 1 )
+	Ships[snum].torps[i].war[j] = FALSE;
     }
   
   /* Update user some stats. */
@@ -1462,7 +1463,7 @@ void initship( int snum, int unum )
     strcpy(&(Users[unum].lastentry[6]), &(Users[unum].lastentry[9]));
 
   Users[unum].stats[USTAT_ENTRIES] += 1;
-  tstats[Ships[snum].team][TSTAT_ENTRIES] = tstats[Ships[snum].team][TSTAT_ENTRIES] + 1;
+  Teams[Ships[snum].team].stats[TSTAT_ENTRIES] += 1;
   
   return;
   
@@ -1484,89 +1485,67 @@ void inituniverse(void)
   /* Turn off the universe. */
   *closed = TRUE;
   
-  teamplanets[TEAM_FEDERATION][0] = PNUM_EARTH;
-  teamplanets[TEAM_FEDERATION][1] = PNUM_TELOS;
-  teamplanets[TEAM_FEDERATION][2] = PNUM_OMEGA;
-  teamplanets[TEAM_ROMULAN][0] = PNUM_ROMULUS;
-  teamplanets[TEAM_ROMULAN][1] = PNUM_REMUS;
-  teamplanets[TEAM_ROMULAN][2] = PNUM_RHO;
-  teamplanets[TEAM_KLINGON][0] = PNUM_KLINGUS;
-  teamplanets[TEAM_KLINGON][1] = PNUM_LEUDUS;
-  teamplanets[TEAM_KLINGON][2] = PNUM_TARSUS;
-  teamplanets[TEAM_ORION][0] = PNUM_ORION;
-  teamplanets[TEAM_ORION][1] = PNUM_OBERON;
-  teamplanets[TEAM_ORION][2] = PNUM_UMBRIEL;
+  Teams[TEAM_FEDERATION].teamhplanets[0] = PNUM_EARTH;
+  Teams[TEAM_FEDERATION].teamhplanets[1] = PNUM_TELOS;
+  Teams[TEAM_FEDERATION].teamhplanets[2] = PNUM_OMEGA;
+  Teams[TEAM_ROMULAN].teamhplanets[0] = PNUM_ROMULUS;
+  Teams[TEAM_ROMULAN].teamhplanets[1] = PNUM_REMUS;
+  Teams[TEAM_ROMULAN].teamhplanets[2] = PNUM_RHO;
+  Teams[TEAM_KLINGON].teamhplanets[0] = PNUM_KLINGUS;
+  Teams[TEAM_KLINGON].teamhplanets[1] = PNUM_LEUDUS;
+  Teams[TEAM_KLINGON].teamhplanets[2] = PNUM_TARSUS;
+  Teams[TEAM_ORION].teamhplanets[0] = PNUM_ORION;
+  Teams[TEAM_ORION].teamhplanets[1] = PNUM_OBERON;
+  Teams[TEAM_ORION].teamhplanets[2] = PNUM_UMBRIEL;
   
-  homeplanet[TEAM_FEDERATION] = PNUM_EARTH;
-  homeplanet[TEAM_ROMULAN] = PNUM_ROMULUS;
-  homeplanet[TEAM_KLINGON] = PNUM_KLINGUS;
-  homeplanet[TEAM_ORION] = PNUM_ORION;
+  Teams[TEAM_FEDERATION].homeplanet = PNUM_EARTH;
+  Teams[TEAM_ROMULAN].homeplanet = PNUM_ROMULUS;
+  Teams[TEAM_KLINGON].homeplanet = PNUM_KLINGUS;
+  Teams[TEAM_ORION].homeplanet = PNUM_ORION;
   
-  homesun[TEAM_FEDERATION] = PNUM_SOL;
-  homesun[TEAM_ROMULAN] = PNUM_SIRIUS;
-  homesun[TEAM_KLINGON] = PNUM_KEJELA;
-  homesun[TEAM_ORION] = PNUM_BETELGEUSE;
+  Teams[TEAM_FEDERATION].homesun = PNUM_SOL;
+  Teams[TEAM_ROMULAN].homesun = PNUM_SIRIUS;
+  Teams[TEAM_KLINGON].homesun = PNUM_KEJELA;
+  Teams[TEAM_ORION].homesun = PNUM_BETELGEUSE;
   
-  warplim[TEAM_FEDERATION] = 9.0;
-  warplim[TEAM_ROMULAN] = 8.0;
-  warplim[TEAM_KLINGON] = 9.0;
-  warplim[TEAM_ORION] = 10.0;
+  Teams[TEAM_FEDERATION].warplim = 9.0;
+  Teams[TEAM_ROMULAN].warplim = 8.0;
+  Teams[TEAM_KLINGON].warplim = 9.0;
+  Teams[TEAM_ORION].warplim = 10.0;
   
-  armylim[TEAM_FEDERATION] = 9;
-  armylim[TEAM_ROMULAN] = 11;
-  armylim[TEAM_KLINGON] = 9;
-  armylim[TEAM_ORION] = 7;
+  Teams[TEAM_FEDERATION].armylim = 9;
+  Teams[TEAM_ROMULAN].armylim = 11;
+  Teams[TEAM_KLINGON].armylim = 9;
+  Teams[TEAM_ORION].armylim = 7;
   
-  /* DOALT_UNIV has diff engfac[]'s */
-  /*#ifdef DOALT_UNIV
-    engfac[TEAM_FEDERATION] = 1.5;
-    engfac[TEAM_ROMULAN] = 1.5;
-    engfac[TEAM_KLINGON] = 1.5;
-    engfac[TEAM_ORION] = 1.5;
-    #else
-    */
+  Teams[TEAM_FEDERATION].engfac = 1.0;
+  Teams[TEAM_ROMULAN].engfac = 0.8;
+  Teams[TEAM_KLINGON].engfac = 1.0;
+  Teams[TEAM_ORION].engfac = 1.2;
   
-  engfac[TEAM_FEDERATION] = 1.0;
-  engfac[TEAM_ROMULAN] = 0.8;
-  engfac[TEAM_KLINGON] = 1.0;
-  engfac[TEAM_ORION] = 1.2;
+  Teams[TEAM_FEDERATION].accelfac = 1.0;
+  Teams[TEAM_ROMULAN].accelfac = 0.8;
+  Teams[TEAM_KLINGON].accelfac = 1.0;
+  Teams[TEAM_ORION].accelfac = 1.6;
   
-  /*#endif*/
+  Teams[TEAM_ROMULAN].weafac = 1.17;
+  Teams[TEAM_ORION].weafac = 0.83;
+  Teams[TEAM_FEDERATION].weafac = 1.0;
+  Teams[TEAM_KLINGON].weafac = 1.0;
   
-  accelfac[TEAM_FEDERATION] = 1.0;
-  accelfac[TEAM_ROMULAN] = 0.8;
-  accelfac[TEAM_KLINGON] = 1.0;
-  accelfac[TEAM_ORION] = 1.6;
+  Teams[TEAM_FEDERATION].torpwarp = 12.0;
+  Teams[TEAM_ROMULAN].torpwarp = 10.0;
+  Teams[TEAM_KLINGON].torpwarp = 12.0;
+  Teams[TEAM_ORION].torpwarp = 14.0;
   
-  /* DOALT_UNIV has diff weafac[]'s */
-  /*#ifdef DOALT_UNIV
-    weafac[TEAM_ROMULAN] = 1.1;
-    weafac[TEAM_ORION] = 0.90;
-    weafac[TEAM_FEDERATION] = rnduni(0.9, 1.1);
-    weafac[TEAM_KLINGON] = rnduni(0.9, 1.1);
-    #else
-    */
-  
-  weafac[TEAM_ROMULAN] = 1.17;
-  weafac[TEAM_ORION] = 0.83;
-  weafac[TEAM_FEDERATION] = 1.0;
-  weafac[TEAM_KLINGON] = 1.0;
-  
-  /*#endif*/
-  
-  torpwarp[TEAM_FEDERATION] = 12.0;
-  torpwarp[TEAM_ROMULAN] = 10.0;
-  torpwarp[TEAM_KLINGON] = 12.0;
-  torpwarp[TEAM_ORION] = 14.0;
-  
-  stcpn( "Federation", tname[TEAM_FEDERATION], MAXTEAMNAME );
-  stcpn( "Romulan", tname[TEAM_ROMULAN], MAXTEAMNAME );
-  stcpn( "Klingon", tname[TEAM_KLINGON], MAXTEAMNAME );
-  stcpn( "Orion", tname[TEAM_ORION], MAXTEAMNAME );
-  stcpn( "self ruled", tname[TEAM_SELFRULED], MAXTEAMNAME );
-  stcpn( "non", tname[TEAM_NOTEAM], MAXTEAMNAME );
-  stcpn( "GOD", tname[TEAM_GOD], MAXTEAMNAME );
-  stcpn( "Empire", tname[TEAM_EMPIRE], MAXTEAMNAME );
+  stcpn( "Federation", Teams[TEAM_FEDERATION].name, MAXTEAMNAME );
+  stcpn( "Romulan", Teams[TEAM_ROMULAN].name, MAXTEAMNAME );
+  stcpn( "Klingon", Teams[TEAM_KLINGON].name, MAXTEAMNAME );
+  stcpn( "Orion", Teams[TEAM_ORION].name, MAXTEAMNAME );
+  stcpn( "self ruled", Teams[TEAM_SELFRULED].name, MAXTEAMNAME );
+  stcpn( "non", Teams[TEAM_NOTEAM].name, MAXTEAMNAME );
+  stcpn( "GOD", Teams[TEAM_GOD].name, MAXTEAMNAME );
+  stcpn( "Empire", Teams[TEAM_EMPIRE].name, MAXTEAMNAME );
   
   chrplanets[PLANET_CLASSM] = 'M';
   chrplanets[PLANET_DEAD] = 'D';
@@ -1577,19 +1556,19 @@ void inituniverse(void)
   chrplanets[PLANET_CLASSO] = 'O';
   chrplanets[PLANET_CLASSZ] = 'Z';
   
-  chrteams[TEAM_FEDERATION] = 'F';
-  chrteams[TEAM_ROMULAN] = 'R';
-  chrteams[TEAM_KLINGON] = 'K';
-  chrteams[TEAM_ORION] = 'O';
-  chrteams[TEAM_SELFRULED] = '-';
-  chrteams[TEAM_NOTEAM] = ' ';
-  chrteams[TEAM_GOD] = 'G';
-  chrteams[TEAM_EMPIRE] = 'E';
+  Teams[TEAM_FEDERATION].teamchar = 'F';
+  Teams[TEAM_ROMULAN].teamchar = 'R';
+  Teams[TEAM_KLINGON].teamchar = 'K';
+  Teams[TEAM_ORION].teamchar = 'O';
+  Teams[TEAM_SELFRULED].teamchar = '-';
+  Teams[TEAM_NOTEAM].teamchar = ' ';
+  Teams[TEAM_GOD].teamchar = 'G';
+  Teams[TEAM_EMPIRE].teamchar = 'E';
   
-  chrtorps[TEAM_FEDERATION] = '*';
-  chrtorps[TEAM_ROMULAN] = '@';
-  chrtorps[TEAM_KLINGON] = '+';
-  chrtorps[TEAM_ORION] = '.';
+  Teams[TEAM_FEDERATION].torpchar = '*';
+  Teams[TEAM_ROMULAN].torpchar = '@';
+  Teams[TEAM_KLINGON].torpchar = '+';
+  Teams[TEAM_ORION].torpchar = '.';
   
   /* Initialize driver variables. */
   *drivcnt = 0;
@@ -1625,26 +1604,26 @@ void intrude( int snum, int pnum )
   string atta=" attacking";
   string armeq=", armies=";
   
-  if ( preal[pnum] &&
-      pteam[pnum] != TEAM_SELFRULED &&
-      pteam[pnum] != TEAM_NOTEAM )
+  if ( Planets[pnum].real &&
+      Planets[pnum].team != TEAM_SELFRULED &&
+      Planets[pnum].team != TEAM_NOTEAM )
     if ( snum == MSG_DOOM )
       {
-	c_strcpy( dname, buf );
-	upper( dname );
+	c_strcpy( Doomsday->name, buf );
+	upper( Doomsday->name );
 	appstr( atta, buf );
 	appstr( armeq, buf );
-	appint( parmies[pnum], buf );
-	stormsg( -pnum, -pteam[pnum], buf );
+	appint( Planets[pnum].armies, buf );
+	stormsg( -pnum, -Planets[pnum].team, buf );
       }
-    else if ( Ships[snum].war[pteam[pnum]] )
+    else if ( Ships[snum].war[Planets[pnum].team] )
       {
 	c_strcpy( "INTRUDER ALERT - ", buf );
 	appship( snum, buf );
 	appstr( atta, buf );
 	appstr( armeq, buf );
-	appint( parmies[pnum], buf );
-	stormsg( -pnum, -pteam[pnum], buf );
+	appint( Planets[pnum].armies, buf );
+	stormsg( -pnum, -Planets[pnum].team, buf );
 	defend( snum, pnum );
       }
   
@@ -1664,11 +1643,6 @@ void loghist( int unum )
   
   getdandt( histlog[*histptr] );	/* time stamp for this entry */
   
-  /* remove seconds */
-  /*    if ( histlog[*histptr][9] == ' ' )	
-	scopy( histlog[*histptr], 9, histlog[*histptr], 6 );
-	*/
-  
   histunum[*histptr] = unum;
   PVUNLOCK(lockword);
   return;
@@ -1685,7 +1659,8 @@ real newarp( int snum, real dwarp )
   real x, acc;
   
   x = dwarp - Ships[snum].warp;
-  acc = (real) accelfac[Ships[snum].team] * (real) engeff( snum ) * ITER_SECONDS;
+  acc = (real) Teams[Ships[snum].team].accelfac * 
+    (real) engeff( snum ) * ITER_SECONDS;
   if ( acc >= fabs( x ) )
     return ( dwarp );			/* close enough (or equal) */
   else if ( x < 0.0 )
@@ -1705,32 +1680,32 @@ int phoon( int pnum )
   int i, j, ph;
   
   /* Suns simply don't have phases. */
-  if ( ptype[pnum] == PLANET_SUN )
+  if ( Planets[pnum].type == PLANET_SUN )
     return ( PHOON_NO );
   
   /* You have to orbit some-thing to have a phase. */
-  i = pprimary[pnum];
+  i = Planets[pnum].primary;
   if ( i == 0 )
     return ( PHOON_NO );
   
   /* Your primary must be a non-sun that is real. */
-  if ( ptype[i] == PLANET_SUN || ! preal[i] )
+  if ( Planets[i].type == PLANET_SUN || ! Planets[i].real )
     return ( PHOON_NO );
   
   /* Your primary has to orbit a (real) sun to have a phase. */
-  j = pprimary[i];
+  j = Planets[i].primary;
   if ( j == 0 )
     return ( PHOON_NO );
-  if ( ptype[j] != PLANET_SUN || ! preal[j] )
+  if ( Planets[j].type != PLANET_SUN || ! Planets[j].real )
     return ( PHOON_NO );
   
   /* Things are cool, now calculate the phase. */
-  ph = (int) ( mod360( porbang[pnum] - porbang[i] - 45.0 ) / 90.0 );
+  ph = (int) ( mod360( Planets[pnum].orbang - Planets[i].orbang - 45.0 ) / 90.0 );
   
   /* The number calculated is in the range 0 to 3, and works fine */
   /* if the moon is orbiting counter clockwise. If it is orbiting */
   /* in the other direction, we must swap the first and last quarters. */
-  if ( porbvel[pnum] < 0.0 )
+  if ( Planets[pnum].orbvel < 0.0 )
     switch ( ph )
       {
       case PHOON_FIRST:
@@ -1756,14 +1731,14 @@ int planmatch( char *str, int *pnum, int godlike )
   if ( godlike )
     {
       for ( *pnum = 1; *pnum <= NUMPLANETS; *pnum = *pnum + 1 )
-	if ( stmatch( str, pname[*pnum], FALSE ) )
+	if ( stmatch( str, Planets[*pnum].name, FALSE ) )
 	  return ( TRUE );
     }
   else
     {
       for ( *pnum = 1; *pnum <= NUMPLANETS; *pnum = *pnum + 1 )
-	if ( preal[*pnum] )
-	  if ( stmatch( str, pname[*pnum], FALSE ) )
+	if ( Planets[*pnum].real )
+	  if ( stmatch( str, Planets[*pnum].name, FALSE ) )
 	    return ( TRUE );
     }
   
@@ -1901,7 +1876,7 @@ int readmsg( int snum, int msgnum, int dsplin )
     }
 
   /* Format who the message is from. */
-  i = msgfrom[msgnum];
+  i = Msgs[msgnum].msgfrom;
 
   if ( i > 0 && i <= MAXSHIPS )
     {
@@ -1909,7 +1884,7 @@ int readmsg( int snum, int msgnum, int dsplin )
       appship( i, buf );
     }
   else if ( -i > 0 && -i <= NUMPLANETS )
-    c_strcpy( pname[-i], buf );
+    c_strcpy( Planets[-i].name, buf );
   else switch ( i )
     {
     case MSG_NOONE:
@@ -1919,7 +1894,7 @@ int readmsg( int snum, int msgnum, int dsplin )
       c_strcpy( "GOD", buf );
       break;
     case MSG_DOOM:
-      concat( "The ", dname, buf );
+      concat( "The ", Doomsday->name, buf );
       break;
     case MSG_OUTSIDE:
       buf[0] = EOS;
@@ -1935,14 +1910,14 @@ int readmsg( int snum, int msgnum, int dsplin )
   appstr( "->", buf );
   
   /* Format who the message is to. */
-  i = msgto[msgnum];
+  i = Msgs[msgnum].msgto;
   if ( i == snum )
     appstr( "you", buf );
   else if ( i > 0 && i <= MAXSHIPS )
     appship( i, buf );
-  else if ( -i >= 0 && -i < NUMTEAMS )
+  else if ( -i >= 0 && -i < NUMPLAYERTEAMS )
     {
-      appchr( chrteams[-i], buf );
+      appchr( Teams[-i].teamchar, buf );
     }
   else 
     {
@@ -1967,7 +1942,7 @@ int readmsg( int snum, int msgnum, int dsplin )
     }
   
   appstr( ": ", buf );
-  appstr( msgbuf[msgnum], buf );
+  appstr( Msgs[msgnum].msgbuf, buf );
 
   attrset(attrib);
   c_putmsg( buf, dsplin );
@@ -2019,8 +1994,8 @@ void sendmsg( int from, int terse )
       /* Make up a default string using the last target. */
       if ( to > 0 && to <= MAXSHIPS )
 	sprintf( buf, "%d", to );
-      else if ( -to >= 0 && -to < NUMTEAMS )
-	c_strcpy( tname[-to], buf );
+      else if ( -to >= 0 && -to < NUMPLAYERTEAMS )
+	c_strcpy( Teams[-to].name, buf );
       else switch ( to )
 	{
 	case MSG_ALL:
@@ -2075,10 +2050,10 @@ void sendmsg( int from, int terse )
       break;
     default:
       /* Check for a team character. */
-      for ( i = 0; i < NUMTEAMS; i = i + 1 )
-	if ( buf[0] == chrteams[i] || buf[0] == (char)tolower(chrteams[i]) )
+      for ( i = 0; i < NUMPLAYERTEAMS; i = i + 1 )
+	if ( buf[0] == Teams[i].teamchar || buf[0] == (char)tolower(Teams[i].teamchar) )
 	  break;
-      if ( i >= NUMTEAMS )
+      if ( i >= NUMPLAYERTEAMS )
 	{
 	  c_putmsg( huh, MSG_LIN2 );
 	  return;
@@ -2099,12 +2074,12 @@ void sendmsg( int from, int terse )
       appship( to, buf );
       appchr( ':', buf );
     }
-  else if ( -to >= 0 && -to < NUMTEAMS )
+  else if ( -to >= 0 && -to < NUMPLAYERTEAMS )
     {
-      appstr( tname[-to], buf );
+      appstr( Teams[-to].name, buf );
       appstr( "s:", buf );
     }
-  else switch ( to ) /* jet added breaks */
+  else switch ( to ) 
     {
     case MSG_ALL:
       appstr( "everyone:", buf );
@@ -2180,7 +2155,7 @@ int cmpplanet(void *cmp1, void *cmp2)
   icmp1 = (int *) cmp1;
   icmp2 = (int *) cmp2;
   
-  return(strcmp(pname[*icmp1], pname[*icmp2]));
+  return(strcmp(Planets[*icmp1].name, Planets[*icmp2].name));
 }
 
 /*  sortplanets - sort planets by name */
@@ -2199,6 +2174,35 @@ void sortplanets( int sv[] )
   
 }
 
+/* cmpuser - compare users based on skill */
+int cmpuser(void *cmp1, void *cmp2)
+{
+  register int *icmp1, *icmp2;
+
+  icmp1 = (int *) cmp1;
+  icmp2 = (int *) cmp2;
+  
+  if (Users[*icmp1].rating > Users[*icmp2].rating)
+    return(-1);
+  else if (Users[*icmp1].rating < Users[*icmp2].rating)
+    return(1);
+  else
+    return(0);
+}
+
+/*  sortusers - sort users by skill */
+/* This routine ASSUMES that the sort vector is initialized, */
+/* for the reason that it is fastest to sort a list that is */
+/* already sorted. */
+void sortusers( int uv[], int numentries )
+{
+  qsort(uv, numentries, sizeof(int), 
+	(int (*)(const void *, const void *))cmpuser);
+  
+  return;
+  
+}
+
 /*  spwar - test whether a ship is at war with a planet */
 /*  SYNOPSIS */
 /*    int atwar, spwar */
@@ -2208,24 +2212,24 @@ int spwar( int snum, int pnum )
 {
   
   
-  if ( ! preal[pnum] )
+  if ( ! Planets[pnum].real )
     return ( FALSE );		/* can't be at war unless it's real */
-  else if ( ptype[pnum] == PLANET_SUN )
+  else if ( Planets[pnum].type == PLANET_SUN )
     return ( TRUE );		/* always at war with suns */
-  else if ( ptype[pnum] == PLANET_MOON )
+  else if ( Planets[pnum].type == PLANET_MOON )
     return ( FALSE );		/* never at war with moons */
-  else if ( parmies[pnum] <= 0 )
+  else if ( Planets[pnum].armies <= 0 )
     return ( FALSE );		/* can't have war without armies */
-  else switch ( pteam[pnum] )	/* jet added breaks */
+  else switch ( Planets[pnum].team )	/* jet added breaks */
     {
     case TEAM_FEDERATION:
     case TEAM_ROMULAN:
     case TEAM_KLINGON:
     case TEAM_ORION:
-      if ( pteam[pnum] == Ships[snum].team )
+      if ( Planets[pnum].team == Ships[snum].team )
 	return ( FALSE );
       else
-	return ( Ships[snum].war[pteam[pnum]] );
+	return ( Ships[snum].war[Planets[pnum].team] );
       break;
     default:
       return ( Ships[snum].srpwar[pnum] );
@@ -2243,7 +2247,6 @@ int spwar( int snum, int pnum )
 /*    flag = stillalive( snum ) */
 int stillalive( int snum )
 {
-
   if (snum < 0 || snum > MAXSHIPS)
     return(TRUE);
 
@@ -2278,12 +2281,15 @@ void stormsg( int from, int to, char *msg )
 {
   int nlastmsg, i;
   
-  
+				/* don't do this if invalid common block */
+  if (*commonrev != COMMONSTAMP)
+    return;
+
   PVLOCK(lockmesg);
   nlastmsg = modp1( *lastmsg + 1, MAXMESSAGES );
-  stcpn( msg, msgbuf[nlastmsg], MESSAGE_SIZE );
-  msgfrom[nlastmsg] = from;
-  msgto[nlastmsg] = to;
+  stcpn( msg, Msgs[nlastmsg].msgbuf, MESSAGE_SIZE );
+  Msgs[nlastmsg].msgfrom = from;
+  Msgs[nlastmsg].msgto = to;
   *lastmsg = nlastmsg;
   
   /* Remove allowable last message restrictions. */
@@ -2337,7 +2343,7 @@ int usefuel( int snum, real fuel, int weapon )
   /* Temperature. */
   if ( weapon )
     {
-      Ships[snum].wtemp = Ships[snum].wtemp + ((fuel * TEMPFUEL_FAC) / weaeff ( snum ));
+      Ships[snum].wtemp += ((fuel * TEMPFUEL_FAC) / weaeff ( snum ));
       if ( Ships[snum].wtemp < 0.0 )
 	Ships[snum].wtemp = 0.0;
       else if ( Ships[snum].wtemp >= 100.0 )
@@ -2418,7 +2424,7 @@ void zeroship( int snum )
   Ships[snum].cloaked = FALSE;
   for ( i = 0; i < MAXOPTIONS; i = i + 1 )
     Ships[snum].options[i] = FALSE;
-  for ( i = 0; i < NUMTEAMS; i = i + 1 )
+  for ( i = 0; i < NUMPLAYERTEAMS; i = i + 1 )
     {
       Ships[snum].rwar[i] = FALSE;
       Ships[snum].war[i] = FALSE;
@@ -2447,21 +2453,22 @@ void zeroship( int snum )
   
   for ( i = 0; i < MAXTORPS; i = i + 1 )
     {
-      tstatus[snum][i] = TS_OFF;
-      tfuse[snum][i] = 0;
-      tx[snum][i] = 0.0;
-      ty[snum][i] = 0.0;
-      tdx[snum][i] = 0.0;
-      tdy[snum][i] = 0.0;
-      tmult[snum][i] = 0.0;
-      for ( j = 0; j < NUMTEAMS; j = j + 1 )
-	twar[snum][i][j] = FALSE;
+      Ships[snum].torps[i].status = TS_OFF;
+      Ships[snum].torps[i].fuse = 0;
+      Ships[snum].torps[i].x = 0.0;
+      Ships[snum].torps[i].y = 0.0;
+      Ships[snum].torps[i].dx = 0.0;
+      Ships[snum].torps[i].dy = 0.0;
+      Ships[snum].torps[i].mult = 0.0;
+      for ( j = 0; j < NUMPLAYERTEAMS; j = j + 1 )
+	Ships[snum].torps[i].war[j] = FALSE;
     }
   
   return;
   
 }
 
+				/* convert a KP key into an angle */
 int KPAngle(int ch, real *angle)
 {
   int rv;
@@ -2511,3 +2518,60 @@ int KPAngle(int ch, real *angle)
   
   return(rv);
 }
+
+				/* convert a KP key into a 'dir' key */
+int KP2DirKey(int *ch)
+{
+  int rv;
+  char cch;
+  
+  switch (*ch)
+    {
+    case KEY_HOME:
+    case KEY_A1:		/* KP upper left */
+      cch = 'q';
+      rv = TRUE;
+      break;
+    case KEY_PPAGE:
+    case KEY_A3:		/* KP upper right */
+      cch = 'e';
+      rv = TRUE;
+      break;
+    case KEY_END:
+    case KEY_C1:		/* KP lower left */
+      cch = 'z';
+      rv = TRUE;
+      break;
+    case KEY_NPAGE:
+    case KEY_C3:		/* KP lower right */
+      cch = 'c';
+      rv = TRUE;
+      break;
+    case KEY_UP:		/* up arrow */
+      cch = 'w';
+      rv = TRUE;
+      break;
+    case KEY_DOWN:		/* down arrow */
+      cch = 'x';
+      rv = TRUE;
+      break;
+    case KEY_LEFT:		/* left arrow */
+      cch = 'a';
+      rv = TRUE;
+      break;
+    case KEY_RIGHT:		/* right arrow */
+      cch = 'd';
+      rv = TRUE;
+      break;
+    default:
+      cch = (char)0;
+      rv = FALSE;
+      break;
+    }
+  
+  if ((int)cch != 0)
+    *ch = (char)cch;
+
+  return(rv);
+}
+

@@ -153,16 +153,16 @@ int capentry( int snum, int *system )
 {
   int i, j; 
   int ch; 
-  int owned[NUMTEAMS]; 
+  int owned[NUMPLAYERTEAMS]; 
   
   /* First figure out which systems we can enter from. */
-  for ( i = 0; i < NUMTEAMS; i = i + 1 )
+  for ( i = 0; i < NUMPLAYERTEAMS; i = i + 1 )
     {
       owned[i] = FALSE;
       /* We must own all three planets in a system. */
       for ( j = 0; j < 3; j = j + 1 )
 	{
-	  if ( pteam[teamplanets[i][j]] != Ships[snum].team )
+	  if ( Planets[Teams[i].teamhplanets[j]].team != Ships[snum].team )
 	    goto cnext2_1; /* next 2; */
 	}
       owned[i] = TRUE;
@@ -173,7 +173,7 @@ int capentry( int snum, int *system )
   
   /* Now count how many systems we can enter from. */
   j = 0;
-  for ( i = 0; i < NUMTEAMS; i = i + 1 )
+  for ( i = 0; i < NUMPLAYERTEAMS; i = i + 1 )
     if ( owned[i] )
       j = j + 1;
   
@@ -186,11 +186,11 @@ int capentry( int snum, int *system )
   
   /* Prompt for a decision. */
   c_strcpy( "Enter which system", cbuf );
-  for ( i = 0; i < NUMTEAMS; i = i + 1 )
+  for ( i = 0; i < NUMPLAYERTEAMS; i = i + 1 )
     if ( owned[i] )
       {
 	appstr( ", ", cbuf );
-	appstr( tname[i], cbuf );
+	appstr( Teams[i].name, cbuf );
       }
   /* Change first comma to a colon. */
   i = c_index( cbuf, ',' );
@@ -218,8 +218,8 @@ int capentry( int snum, int *system )
 	  return ( TRUE );
 	  break;
 	default:
-	  for ( i = 0; i < NUMTEAMS; i = i + 1 )
-	    if ( chrteams[i] == (char)toupper( ch ) && owned[i] )
+	  for ( i = 0; i < NUMPLAYERTEAMS; i = i + 1 )
+	    if ( Teams[i].teamchar == (char)toupper( ch ) && owned[i] )
 	      {
 		/* Found a good one. */
 		*system = i;
@@ -652,7 +652,7 @@ void dead( int snum, int leave )
     {
       i = 0;
       for ( j = 0; j < MAXTORPS; j = j + 1 )
-	if ( tstatus[snum][j] == TS_DETONATE )
+	if ( Ships[snum].torps[j].status == TS_DETONATE )
 	  i = i + 1;
       if ( i <= 0 )
 	break;
@@ -743,12 +743,12 @@ void dead( int snum, int leave )
 	}
       else if ( -kb > 0 && -kb <= NUMPLANETS )
 	{
-	  if ( ptype[-kb] == PLANET_SUN )
+	  if ( Planets[-kb].type == PLANET_SUN )
 	      strcpy(cbuf, "solar radiation.");
 	  else
 	      strcpy(cbuf, "planetary defenses.");
 	  cprintf(8,0,ALIGN_CENTER,"#%d#%s#%d#%s%s#%d#%s", 
-		InfoColor, ywkb, A_BOLD, pname[-kb], "'s ",
+		InfoColor, ywkb, A_BOLD, Planets[-kb].name, "'s ",
 		InfoColor, cbuf);
 
 	}
@@ -765,6 +765,8 @@ void dead( int snum, int leave )
 	  	RedLevelColor, ywkb, "nothing in particular.  (How strange...)");
 	}
     }
+
+  
   
   if ( kb == KB_NEWGAME )
     {
@@ -871,7 +873,7 @@ void dead( int snum, int leave )
   cdmove( 1, 1 );
   
   /* Turn off sticky war so we can change war settings from menu(). */
-  for ( i = 0; i < NUMTEAMS; i++ )
+  for ( i = 0; i < NUMPLAYERTEAMS; i++ )
     Ships[snum].rwar[i] = FALSE;
   
   return;
@@ -1065,18 +1067,18 @@ void dobeam( int snum )
   pnum = -Ships[snum].lock;
   if ( Ships[snum].armies > 0 )
     {
-      if ( ptype[pnum] == PLANET_SUN )
+      if ( Planets[pnum].type == PLANET_SUN )
 	{
 	  c_putmsg( "Idiot!  Our armies will fry down there!", MSG_LIN1 );
 	  return;
 	}
-      else if ( ptype[pnum] == PLANET_MOON )
+      else if ( Planets[pnum].type == PLANET_MOON )
 	{
 	  c_putmsg( "Phoon!  Our armies will suffocate down there!",
 		   MSG_LIN1 );
 	  return;
 	}
-      else if ( pteam[pnum] == TEAM_GOD )
+      else if ( Planets[pnum].team == TEAM_GOD )
 	{
 	  c_putmsg(
 		   "GOD.you: YOUR ARMIES AREN'T GOOD ENOUGH FOR THIS PLANET.",
@@ -1085,7 +1087,7 @@ void dobeam( int snum )
 	}
     }
   
-  i = puninhabtime[pnum];
+  i = Planets[pnum].uninhabtime;
   if ( i > 0 )
     {
       sprintf( cbuf, "This planet is uninhabitable for %d more minute",
@@ -1097,17 +1099,17 @@ void dobeam( int snum )
       return;
     }
   
-  if ( pteam[pnum] != Ships[snum].team &&
-      pteam[pnum] != TEAM_SELFRULED &&
-      pteam[pnum] != TEAM_NOTEAM )
-    if ( ! Ships[snum].war[pteam[pnum]] && parmies[pnum] != 0) /* can take empty planets */
+  if ( Planets[pnum].team != Ships[snum].team &&
+      Planets[pnum].team != TEAM_SELFRULED &&
+      Planets[pnum].team != TEAM_NOTEAM )
+    if ( ! Ships[snum].war[Planets[pnum].team] && Planets[pnum].armies != 0) /* can take empty planets */
       {
 	c_putmsg( "But we are not at war with this planet!", MSG_LIN1 );
 	return;
       }
   
   if ( Ships[snum].armies == 0 &&
-      pteam[pnum] == Ships[snum].team && parmies[pnum] <= MIN_BEAM_ARMIES )
+      Planets[pnum].team == Ships[snum].team && Planets[pnum].armies <= MIN_BEAM_ARMIES )
     {
       c_putmsg( lastfew, MSG_LIN1 );
       return;
@@ -1129,21 +1131,22 @@ void dobeam( int snum )
   /* Figure out what can be beamed. */
   downmax = Ships[snum].armies;
   if ( spwar(snum,pnum) ||
-      pteam[pnum] == TEAM_SELFRULED ||
-      pteam[pnum] == TEAM_NOTEAM ||
-      pteam[pnum] == TEAM_GOD ||
-      parmies[pnum] == 0 )
+      Planets[pnum].team == TEAM_SELFRULED ||
+      Planets[pnum].team == TEAM_NOTEAM ||
+      Planets[pnum].team == TEAM_GOD ||
+      Planets[pnum].armies == 0 )
     {
       upmax = 0;
     }
   else
     {
-      capacity = min( ifix( rkills ) * 2, armylim[Ships[snum].team] );
-      upmax = min( parmies[pnum] - MIN_BEAM_ARMIES, capacity-Ships[snum].armies );
+      capacity = min( ifix( rkills ) * 2, Teams[Ships[snum].team].armylim );
+      upmax = min( Planets[pnum].armies - MIN_BEAM_ARMIES, 
+		   capacity - Ships[snum].armies );
     }
   
   /* If there are armies to beam but we're selfwar... */
-  if ( upmax > 0 && selfwar(snum) && Ships[snum].team == pteam[pnum] )
+  if ( upmax > 0 && selfwar(snum) && Ships[snum].team == Planets[pnum].team )
     {
       if ( downmax <= 0 )
 	{
@@ -1238,15 +1241,15 @@ void dobeam( int snum )
 	}
     }
   /* Now we are ready! */
-  if ( pteam[pnum] >= NUMTEAMS )
+  if ( Planets[pnum].team >= NUMPLAYERTEAMS )
     {
       /* If the planet is not race owned, make it war with us. */
       Ships[snum].srpwar[pnum] = TRUE;
     }
-  else if ( pteam[pnum] != Ships[snum].team )
+  else if ( Planets[pnum].team != Ships[snum].team )
     {
       /* For a team planet make the war sticky and send an intruder alert. */
-      Ships[snum].rwar[pteam[pnum]] = TRUE;
+      Ships[snum].rwar[Planets[pnum].team] = TRUE;
       
       /* Chance to create a robot here. */
       intrude( snum, pnum );
@@ -1282,35 +1285,35 @@ void dobeam( int snum )
 	  if ( dirup )
 	    {
 	      /* Beam up. */
-	      if ( parmies[pnum] <= MIN_BEAM_ARMIES )
+	      if ( Planets[pnum].armies <= MIN_BEAM_ARMIES )
 		{
 		  PVUNLOCK(lockword);
 		  c_putmsg( lastfew, MSG_LIN1 );
 		  break;
 		}
 	      Ships[snum].armies = Ships[snum].armies + 1;
-	      parmies[pnum] = parmies[pnum] - 1;
+	      Planets[pnum].armies = Planets[pnum].armies - 1;
 	    }
 	  else
 	    {
 	      /* Beam down. */
 	      Ships[snum].armies = Ships[snum].armies - 1;
-	      if ( pteam[pnum] == TEAM_NOTEAM || parmies[pnum] == 0 )
+	      if ( Planets[pnum].team == TEAM_NOTEAM || Planets[pnum].armies == 0 )
 		{
 		  takeplanet( pnum, snum );
 		  conqed = TRUE;
 		}
-	      else if ( pteam[pnum] != Ships[snum].team )
+	      else if ( Planets[pnum].team != Ships[snum].team )
 		{
-		  parmies[pnum] = parmies[pnum] - 1;
-		  if ( parmies[pnum] == 0 )
+		  Planets[pnum].armies = Planets[pnum].armies - 1;
+		  if ( Planets[pnum].armies == 0 )
 		    {
 		      zeroplanet( pnum, snum );
 		      zeroed = TRUE;
 		    }
 		}
 	      else
-		parmies[pnum] = parmies[pnum] + 1;
+		Planets[pnum].armies = Planets[pnum].armies + 1;
 	    }
 	  PVUNLOCK(lockword);
 	  total = total + 1;
@@ -1330,7 +1333,7 @@ void dobeam( int snum )
 	    appstr( "up from ", cbuf );
 	  else
 	    appstr( "down to ", cbuf );
-	  appstr( pname[pnum], cbuf );
+	  appstr( Planets[pnum].name, cbuf );
 	  appstr( ", ", cbuf );
 	  if ( total == 0 )
 	    appstr( "no", cbuf );
@@ -1354,7 +1357,7 @@ void dobeam( int snum )
 	  ototal = total;
 	}
       
-      if ( dirup && parmies[pnum] <= MIN_BEAM_ARMIES )
+      if ( dirup && Planets[pnum].armies <= MIN_BEAM_ARMIES )
 	{
 	  c_putmsg( lastfew, MSG_LIN1 );
 	  break;
@@ -1374,7 +1377,7 @@ void dobeam( int snum )
   
   if ( conqed )
     {
-      sprintf( cbuf, "You have conquered %s.", pname[pnum] );
+      sprintf( cbuf, "You have conquered %s.", Planets[pnum].name );
       c_putmsg( cbuf, MSG_LIN1 );
     }
   else if ( zeroed )
@@ -1412,19 +1415,19 @@ void dobomb( int snum )
       return;
     }
   pnum = -Ships[snum].lock;
-  if ( ptype[pnum] == PLANET_SUN || ptype[pnum] == PLANET_MOON ||
-      pteam[pnum] == TEAM_NOTEAM || parmies[pnum] == 0 )
+  if ( Planets[pnum].type == PLANET_SUN || Planets[pnum].type == PLANET_MOON ||
+      Planets[pnum].team == TEAM_NOTEAM || Planets[pnum].armies == 0 )
     {
       c_putmsg( "There is no one there to bombard.", MSG_LIN1 );
       return;
     }
-  if ( pteam[pnum] == Ships[snum].team )
+  if ( Planets[pnum].team == Ships[snum].team )
     {
       c_putmsg( "We can't bomb our own armies!", MSG_LIN1 );
       return;
     }
-  if ( pteam[pnum] != TEAM_SELFRULED && pteam[pnum] != TEAM_GOD )
-    if ( ! Ships[snum].war[pteam[pnum]] )
+  if ( Planets[pnum].team != TEAM_SELFRULED && Planets[pnum].team != TEAM_GOD )
+    if ( ! Ships[snum].war[Planets[pnum].team] )
       {
 	c_putmsg( "But we are not at war with this planet!", MSG_LIN1 );
 	return;
@@ -1432,7 +1435,7 @@ void dobomb( int snum )
   
   /* Confirm. */
   sprintf( cbuf, "Press TAB to bombard %s, %d armies:",
-	 pname[pnum], parmies[pnum] );
+	 Planets[pnum].name, Planets[pnum].armies );
   cdclrl( MSG_LIN1, 1 );
   cdclrl( MSG_LIN2, 1 );
   buf[0] = EOS;
@@ -1445,14 +1448,14 @@ void dobomb( int snum )
   
   /* Handle war logic. */
   Ships[snum].srpwar[pnum] = TRUE;
-  if ( pteam[pnum] >= 0 && pteam[pnum] < NUMTEAMS )
+  if ( Planets[pnum].team >= 0 && Planets[pnum].team < NUMPLAYERTEAMS )
     {
       /* For a team planet make the war sticky and send an intruder alert. */
-      Ships[snum].rwar[pteam[pnum]] = TRUE;
+      Ships[snum].rwar[Planets[pnum].team] = TRUE;
       intrude( snum, pnum );
     }
   /* Planets owned by GOD have a special defense system. */
-  if ( pteam[pnum] == TEAM_GOD )
+  if ( Planets[pnum].team == TEAM_GOD )
     {
       sprintf( cbuf, "That was a bad idea, %s...", Ships[snum].alias );
       c_putmsg( cbuf, MSG_LIN1 );
@@ -1499,25 +1502,24 @@ void dobomb( int snum )
 	  grand(&entertime);
 	  killprob = (real)((BOMBARD_PROB *
 			     ((real) weaeff( snum ) *
-			      (real)((real)parmies[pnum]/100.0))) + 0.5 );
+			      (real)((real)Planets[pnum].armies/100.0))) + 0.5 );
 	  /*	    cerror(MSG_GOD, "DEBUG: killprob = %d\n", (int) (killprob *10));*/
 	  if ( rnd() < killprob )
 	    {
 	      /*	    cerror(MSG_GOD, "DEBUG: we're in: killprob = %d\n", (int)(killprob * 10));*/
 	      PVLOCK(lockword);
-	      if ( parmies[pnum] <= MIN_BOMB_ARMIES )
+	      if ( Planets[pnum].armies <= MIN_BOMB_ARMIES )
 		{
 		  /* No more armies left to bomb. */
 		  PVUNLOCK(lockword);
 		  c_putmsg( lastfew, MSG_LIN1 );
 		  goto cbrk22; /* break 2;*/
 		}
-	      parmies[pnum] = parmies[pnum] - 1;
+	      Planets[pnum].armies = Planets[pnum].armies - 1;
 	      
 	      Ships[snum].kills = Ships[snum].kills + BOMBARD_KILLS;
 	      Users[Ships[snum].unum].stats[USTAT_ARMBOMB] += 1;
-	      tstats[Ships[snum].team][TSTAT_ARMBOMB] =
-		tstats[Ships[snum].team][TSTAT_ARMBOMB] + 1;
+	      Teams[Ships[snum].team].stats[TSTAT_ARMBOMB] += 1;
 	      PVUNLOCK(lockword);
 	      total = total + 1;
 	    }
@@ -1527,23 +1529,23 @@ void dobomb( int snum )
 		    */
 	}
       
-      if ( parmies[pnum] <= MIN_BOMB_ARMIES )
+      if ( Planets[pnum].armies <= MIN_BOMB_ARMIES )
 	{
 	  /* No more armies left to bomb. */
 	  c_putmsg( lastfew, MSG_LIN1 );
 	  break;
 	}
       
-      if ( parmies[pnum] != oparmies || ototal != total )
+      if ( Planets[pnum].armies != oparmies || ototal != total )
 	{
 	  /* Either our bomb run total or the population changed. */
-	  oparmies = parmies[pnum];
+	  oparmies = Planets[pnum].armies;
 	  if ( total == 1 )
 	    c_strcpy( "y", buf );
 	  else
 	    c_strcpy( "ies", buf );
 	  sprintf( cbuf, "Bombing %s, %d arm%s killed, %d left.",
-		 pname[pnum], total, buf, oparmies );
+		 Planets[pnum].name, total, buf, oparmies );
 	  c_putmsg( cbuf, MSG_LIN1 );
 	  cdrefresh();
 	  if ( ototal == -1 )
@@ -1684,7 +1686,7 @@ void docoup( int snum )
       return;
     }
   for ( i = 1; i <= NUMPLANETS; i = i + 1 )
-    if ( pteam[i] == Ships[snum].team && parmies[i] > 0 )
+    if ( Planets[i].team == Ships[snum].team && Planets[i].armies > 0 )
       {
 	c_putmsg( "We don't need to coup, we still have armies left!",
 		 MSG_LIN1 );
@@ -1696,18 +1698,18 @@ void docoup( int snum )
       return;
     }
   pnum = -Ships[snum].lock;
-  if ( pnum != homeplanet[Ships[snum].team] )
+  if ( pnum != Teams[Ships[snum].team].homeplanet )
     {
       c_putmsg( nhp, MSG_LIN1 );
       return;
     }
-  if ( parmies[pnum] > MAX_COUP_ENEMY_ARMIES )
+  if ( Planets[pnum].armies > MAX_COUP_ENEMY_ARMIES )
     {
       c_putmsg( "The enemy is still too strong to attempt a coup.",
 	       MSG_LIN1 );
       return;
     }
-  i = puninhabtime[pnum];
+  i = Planets[pnum].uninhabtime;
   if ( i > 0 )
     {
       sprintf( cbuf, "This planet is uninhabitable for %d more minutes.",
@@ -1717,9 +1719,9 @@ void docoup( int snum )
     }
   
   /* Now our team can tell coup time for free. */
-  tcoupinfo[Ships[snum].team] = TRUE;
+  Teams[Ships[snum].team].coupinfo = TRUE;
   
-  i = couptime[Ships[snum].team];
+  i = Teams[Ships[snum].team].couptime;
   if ( i > 0 )
     {
       sprintf( cbuf, "Our forces need %d more minutes to organize.", i );
@@ -1754,7 +1756,7 @@ void docoup( int snum )
   
   cdclrl( MSG_LIN1, 1 );
   PVLOCK(lockword);
-  if ( pteam[pnum] == Ships[snum].team )
+  if ( Planets[pnum].team == Ships[snum].team )
     {
       PVUNLOCK(lockword);
       c_putmsg( "Sensors show hostile forces eliminated from the planet.",
@@ -1762,20 +1764,20 @@ void docoup( int snum )
       return;
     }
   
-  failprob = parmies[pnum] / MAX_COUP_ENEMY_ARMIES * 0.5 + 0.5;
+  failprob = Planets[pnum].armies / MAX_COUP_ENEMY_ARMIES * 0.5 + 0.5;
   if ( rnd() < failprob )
     {
       /* Failed; setup new reorganization time. */
-      couptime[Ships[snum].team] = rndint( 5, 10 );
+      Teams[Ships[snum].team].couptime = rndint( 5, 10 );
       PVUNLOCK(lockword);
       c_putmsg( "Coup unsuccessful.", MSG_LIN2 );
       return;
     }
   
   takeplanet( pnum, snum );
-  parmies[pnum] = rndint( 10, 20 );		/* create token coup force */
+  Planets[pnum].armies = rndint( 10, 20 );		/* create token coup force */
   Users[Ships[snum].unum].stats[USTAT_COUPS] += 1;
-  tstats[Ships[snum].team][TSTAT_COUPS] = tstats[Ships[snum].team][TSTAT_COUPS] + 1;
+  Teams[Ships[snum].team].stats[TSTAT_COUPS] += 1;
   PVUNLOCK(lockword);
   c_putmsg( "Coup successful!", MSG_LIN2 );
   
@@ -1880,7 +1882,7 @@ void docourse( int snum )
 	cdclrl( MSG_LIN1, 1 );
       break;
     case NEAR_PLANET:
-      dir = angle( Ships[snum].x, Ships[snum].y, px[sorpnum], py[sorpnum] );
+      dir = angle( Ships[snum].x, Ships[snum].y, Planets[sorpnum].x, Planets[sorpnum].y );
       if ( ch == TERM_EXTRA )
 	{
 	  newlock = -sorpnum;
@@ -2516,10 +2518,12 @@ void doselfdest(int snum)
   while ( Ships[csnum].sdfuse > 0 )
     {
       Ships[csnum].sdfuse = SELFDESTRUCT_FUSE - dsecs ( entertime, &now );
+
       /* Display new messages until T-minus 3 seconds. */
+
       if ( Ships[csnum].sdfuse < 3 )
 	cmsgok = FALSE;
-      
+
       if ( ! stillalive( csnum ) )
 	{
 	  /* Died in the process. */
@@ -2548,22 +2552,26 @@ void doselfdest(int snum)
       aston();			/* enable asts so the display will work */
       c_sleep( ITER_SECONDS );
       astoff();
-    }
+    } /* end while */
   cmsgok = FALSE;			/* turn off messages */
   
-  if ( *dstatus == DS_LIVE )
+  if ( Doomsday->status == DS_LIVE )
     {
-      if ( dist(Ships[csnum].x, Ships[csnum].y, *dx, *dy) <= DOOMSDAY_KILL_DIST )
+      if ( dist(Ships[csnum].x, Ships[csnum].y, Doomsday->x, Doomsday->y) <= DOOMSDAY_KILL_DIST )
 	{
-	  *dstatus = DS_OFF;
+	  Doomsday->status = DS_OFF;
 	  stormsg( MSG_DOOM, MSG_ALL, "AIEEEEEEEE!" );
 	  killship( csnum, KB_GOTDOOMSDAY );
 	}
       else
-	killship( csnum, KB_SELF );
+	if (stillalive(csnum))	/* if we're not dead yet... */
+	  killship( csnum, KB_SELF );
     }
   else
-    killship( csnum, KB_SELF );
+    {
+	if (stillalive(csnum))	/* if we're not dead yet... */
+	  killship( csnum, KB_SELF );
+    }
   
   return;
   
@@ -2813,11 +2821,11 @@ void dountow( int snum )
 void dowar( int snum )
 {
   int i, entertime, now; 
-  int twar[NUMTEAMS], dowait;
+  int twar[NUMPLAYERTEAMS], dowait;
   int ch;
   const int POffset = 47, WOffset = 61;
   
-  for ( i = 0; i < NUMTEAMS; i = i + 1 )
+  for ( i = 0; i < NUMPLAYERTEAMS; i = i + 1 )
     twar[i] = Ships[snum].war[i];
   
   cdclrl( MSG_LIN1, 2 );
@@ -2828,19 +2836,19 @@ void dowar( int snum )
   
   while ( stillalive( csnum ) )
     {
-      for ( i = 0; i < NUMTEAMS; i = i + 1 )
+      for ( i = 0; i < NUMPLAYERTEAMS; i = i + 1 )
 	if ( twar[i] )
 	  {
 	    cdput( ' ', MSG_LIN1, POffset + (i*2) );
 	    if ( Ships[snum].rwar[i] )
-	      ch = chrteams[i];
+	      ch = Teams[i].teamchar;
 	    else
-	      ch = (char)tolower(chrteams[i]);
+	      ch = (char)tolower(Teams[i].teamchar);
 	    cdput( ch, MSG_LIN1, WOffset + (i*2) );
 	  }
 	else
 	  {
-	    cdput( (char)tolower(chrteams[i]), MSG_LIN1, POffset + (i*2) );
+	    cdput( (char)tolower(Teams[i].teamchar), MSG_LIN1, POffset + (i*2) );
 	    cdput( ' ', MSG_LIN1, WOffset+(i*2) );
 	  }
       cdrefresh();
@@ -2856,7 +2864,7 @@ void dowar( int snum )
 	{
 	  /* Now update the war settings. */
 	  dowait = FALSE;
-	  for ( i = 0; i < NUMTEAMS; i = i + 1 )
+	  for ( i = 0; i < NUMPLAYERTEAMS; i = i + 1 )
 	    {
 	      if ( twar[i] && ! Ships[snum].war[i] )
 		dowait = TRUE;
@@ -2888,8 +2896,8 @@ void dowar( int snum )
 	  break;
 	}
       
-      for ( i = 0; i < NUMTEAMS; i = i + 1 )
-	if ( ch == (char)tolower( chrteams[i] ) )
+      for ( i = 0; i < NUMPLAYERTEAMS; i = i + 1 )
+	if ( ch == (char)tolower( Teams[i].teamchar ) )
 	  {
 	    if ( ! twar[i] || ! Ships[snum].rwar[i] )
 	      {
@@ -2951,7 +2959,7 @@ void dowarp( int snum, real warp )
     }
   
   /* Handle ship limitations. */
-  Ships[snum].dwarp = min( warp, warplim[Ships[snum].team] );
+  Ships[snum].dwarp = min( warp, Teams[Ships[snum].team].warplim );
   
   sprintf( cbuf, "Warp %d.", (int) Ships[snum].dwarp );
   c_putmsg( cbuf, MSG_LIN1 );
@@ -3060,7 +3068,7 @@ void menu(void)
   char *if8="INITIALIZATION FAILURE";
   char *if9="The darkness becomes all encompassing, and your vision fails.";
   
-  EnableSignalHandler();	/* enable trapping of interesting signals */
+  EnableConquestSignalHandler();	/* enable trapping of interesting signals */
   
   /* Initialize statistics. */
   initstats( &Ships[csnum].ctime, &Ships[csnum].etime );
@@ -3074,7 +3082,7 @@ void menu(void)
   Ships[csnum].pid = cpid;
   for ( i = 0; i < MAXOPTIONS; i = i + 1 )
     Ships[csnum].options[i] = Users[cunum].options[i];
-  for ( i = 0; i < NUMTEAMS; i = i + 1 )
+  for ( i = 0; i < NUMPLAYERTEAMS; i = i + 1 )
     {
       Ships[csnum].rwar[i] = FALSE;
       Ships[csnum].war[i] = Users[cunum].war[i];
@@ -3255,7 +3263,10 @@ void menu(void)
 		  cdrefresh();
 		  if ( confirm() )
 		    {
+				/* should exit here */
 		      resign( cunum );
+		      cdend();
+		      exit(0);
 		      break;
 		    }
 		}
@@ -3266,7 +3277,7 @@ void menu(void)
 	    cdbeep();
 	  else
 	    {
-	      Ships[csnum].team = modp1( Ships[csnum].team+1, NUMTEAMS );
+	      Ships[csnum].team = modp1( Ships[csnum].team+1, NUMPLAYERTEAMS );
 	      Users[cunum].team = Ships[csnum].team;
 	      Ships[csnum].war[Ships[csnum].team] = FALSE;
 	      Users[cunum].war[Users[cunum].team] = FALSE;
@@ -3620,15 +3631,15 @@ int newship( int unum, int *snum )
       initship( *snum, unum );
       
       /* Randomly position the ship near the home sun (or planet). */
-      if ( pprimary[homeplanet[system]] == homesun[system] )
-	i = homesun[system];
+      if ( Planets[Teams[system].homeplanet].primary == Teams[system].homesun )
+	i = Teams[system].homesun;
       else
-	i = homeplanet[system];
-      putship( *snum, px[i], py[i] );
+	i = Teams[system].homeplanet;
+      putship( *snum, Planets[i].x, Planets[i].y );
       Ships[*snum].dhead = rnduni( 0.0, 359.9 );
       Ships[*snum].head = Ships[*snum].dhead;
       Ships[*snum].dwarp = (real) rndint( 2, 5 ) ;/* #~~~ this is a kludge*/
-      Ships[*snum].lock = -homeplanet[system];
+      Ships[*snum].lock = -Teams[system].homeplanet;
     }
   else
     {				/* if we're reincarnating, skip any
@@ -3692,7 +3703,7 @@ int play()
   /* Tell everybody, we're here */
 
   sprintf(msgbuf, "%c%d (%s) has entered the game.",
-	  chrteams[Ships[csnum].team],
+	  Teams[Ships[csnum].team].teamchar,
 	  csnum,
 	  Ships[csnum].alias);
   
@@ -3789,7 +3800,7 @@ int welcome( int *unum )
 	  c_sleep( 2.0 );
 	  return ( FALSE );
 	}
-      team = rndint( 0, NUMTEAMS - 1 );
+      team = rndint( 0, NUMPLAYERTEAMS - 1 );
       cbuf[0] = EOS;
       apptitle( team, cbuf );
       appchr( ' ', cbuf );
@@ -3806,13 +3817,13 @@ int welcome( int *unum )
 	  return ( FALSE );
 	}
       gretds();
-      if ( vowel( tname[team][0] ) )
+      if ( vowel( Teams[team].name[0] ) )
       	cprintf(MSG_LIN2/2,0,ALIGN_CENTER,"#%d#%s%c #%d#%s #%d#%s",
-			InfoColor,selected_str,'n',A_BOLD,tname[team],
+			InfoColor,selected_str,'n',A_BOLD,Teams[team].name,
 			InfoColor,starship_str);
 	  else
       	cprintf(MSG_LIN2/2,0,ALIGN_CENTER,"#%d#%s #%d#%s #%d#%s",
-			InfoColor,selected_str,A_BOLD,tname[team],
+			InfoColor,selected_str,A_BOLD,Teams[team].name,
 			InfoColor,starship_str);
       cprintf(MSG_LIN2/2+1,0,ALIGN_CENTER,"#%d#%s",
 		InfoColor, prepare_str );

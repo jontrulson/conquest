@@ -25,6 +25,9 @@
 #define YELLOW_ALERT 1
 #define RED_ALERT 2
 
+#define DS_LIVE_STR "DS_LIVE"
+#define DS_OFF_STR  "DS_OFF"
+
 /* Global to this module */
 
 static int AlertLevel = GREEN_ALERT;
@@ -119,6 +122,7 @@ void display( int snum, int display_info )
   static int DamageAttrib = 0;
   
   static char zbuf[MSGMAXLINE];
+  static char *dstatstr;
 
   if ( credraw )
     {
@@ -161,8 +165,8 @@ void display( int snum, int display_info )
     {
       scale = SCALE_FAC;
       if (snum == DISPLAY_DOOMSDAY) { /* dwp */
-	cenx = *dx;
-	ceny = *dy;
+	cenx = Doomsday->x;
+	ceny = Doomsday->y;
       }
       else {
 	cenx = Ships[snum].x;
@@ -173,18 +177,18 @@ void display( int snum, int display_info )
   /* Display the planets and suns. */
   for ( i = NUMPLANETS; i > 0; i = i - 1 )
     {
-      if ( ! preal[i] )
+      if ( ! Planets[i].real )
 	continue; /*next;*/
-      if ( ! cvtcoords( cenx, ceny, px[i], py[i], scale, &lin, &col ) )
+      if ( ! cvtcoords( cenx, ceny, Planets[i].x, Planets[i].y, scale, &lin, &col ) )
 	continue; /* next;*/
 
       palertcol = 0;
 				/* determine alertlevel for object */
-      if (snum > 0 && spwar( snum, i ) && pscanned[i][Ships[snum].team])
+      if (snum > 0 && spwar( snum, i ) && Planets[i].scanned[Ships[snum].team])
 	{
 	  palertcol = RedLevelColor;
 	}
-      else if (snum > 0 && pteam[i] == Ships[snum].team && !selfwar(snum))
+      else if (snum > 0 && Planets[i].team == Ships[snum].team && !selfwar(snum))
 	{
 	  palertcol = GreenLevelColor;
 	}
@@ -192,38 +196,38 @@ void display( int snum, int display_info )
 	palertcol = YellowLevelColor;
 
 				/* suns are always yellow level material */
-      if (ptype[i] == PLANET_SUN)
+      if (Planets[i].type == PLANET_SUN)
 	palertcol = YellowLevelColor;
 
       if ( lsmap )
 	{
 	  /* Strategic map. */
 	  /* Can't see moons. */
-	  if ( ptype[i] == PLANET_MOON )
+	  if ( Planets[i].type == PLANET_MOON )
 	    continue; /* next;*/
 	  /* If it's a sun or we any planet we haven't scanned... */
-	  if ( ptype[i] == PLANET_SUN || ! pscanned[i][Ships[snum].team] )
+	  if ( Planets[i].type == PLANET_SUN || ! Planets[i].scanned[Ships[snum].team] )
 	    {
-	      if (ptype[i] == PLANET_SUN)
+	      if (Planets[i].type == PLANET_SUN)
 		attrset(RedLevelColor); /* suns have a red core */
 	      else
 		attrset(palertcol);
 
-	      cdput( chrplanets[ptype[i]], lin, col );
+	      cdput( chrplanets[Planets[i].type], lin, col );
 	      attrset(0);
 	    }
 	  else
 	    {
 	      /* Pick a planet owner character. */
-	      if ( parmies[i] <= 0 || pteam[i] < 0 || pteam[i] >= NUMTEAMS )
+	      if ( Planets[i].armies <= 0 || Planets[i].team < 0 || Planets[i].team >= NUMPLAYERTEAMS )
 		ch = '-';
 	      else
-		ch = chrtorps[pteam[i]];
+		ch = Teams[Planets[i].team].torpchar;
 	      
 	      /* Display the planet; either it's numeric or it's not. */
 	      if ( Ships[snum].options[OPT_NUMERICMAP] )
 		{
-		  sprintf( buf, "%d", parmies[i]);
+		  sprintf( buf, "%d", Planets[i].armies);
 		  l = strlen(buf);
 		  
 		  m = (col + 2 - (l + 2));
@@ -245,7 +249,7 @@ void display( int snum, int display_info )
 		    }
 
 		}
-	      else if ( pscanned[i][Ships[snum].team] )
+	      else if ( Planets[i].scanned[Ships[snum].team] )
 		{
 		  l = 3;		/* strlen */
 		  m = (col + 2 - l);
@@ -257,7 +261,7 @@ void display( int snum, int display_info )
                       attrset(0);
 
                       attrset(InfoColor);
-                      cdput( chrplanets[ptype[i]], lin, m++);
+                      cdput( chrplanets[Planets[i].type], lin, m++);
                       attrset(0);
 
                       attrset(palertcol);
@@ -271,7 +275,7 @@ void display( int snum, int display_info )
 	  if ( snum < 0 || (snum > 0 && 
 			    Ships[snum].options[OPT_PLANETNAMES]) ) /* dwp */
 	    {
-	      sprintf(buf, "%c%c%c", pname[i][0], pname[i][1], pname[i][2]);
+	      sprintf(buf, "%c%c%c", Planets[i].name[0], Planets[i].name[1], Planets[i].name[2]);
 	      attrset(palertcol);
 	      cdputs( buf, lin, col+2 );
 	      attrset(0);
@@ -281,29 +285,29 @@ void display( int snum, int display_info )
 	{
 	  /* Tactical map. */
 	  attrset(palertcol);
-	  puthing( ptype[i], lin, col );
+	  puthing( Planets[i].type, lin, col );
 	  attrset(0);
 
 	  if (col - 3 >= STAT_COLS - 1)
 	    {
 	      if (lin <= DISPLAY_LINS && lin > 0 )
 		{
-		  if (snum > 0 && !pscanned[i][Ships[snum].team])
+		  if (snum > 0 && !Planets[i].scanned[Ships[snum].team])
 		    attrset(palertcol);	/* default to yellow for unscanned */
 		  else
 		    attrset(InfoColor);	/* scanned (known) value */
 
-		  if (ptype[i] == PLANET_SUN)
+		  if (Planets[i].type == PLANET_SUN)
 		    attrset(RedLevelColor); /* suns have a red core */
 
-		  cdput( chrplanets[ptype[i]], lin, col + 1);
+		  cdput( chrplanets[Planets[i].type], lin, col + 1);
 		  attrset(0);
 		}
 	      if ( snum < 0 || (snum > 0 && Ships[snum].options[OPT_PLANETNAMES]) ) /* dwp */
 		if ( (lin + 1 <= DISPLAY_LINS) && col + 1< cdcols() )
 		  {
 		    attrset(palertcol);
-		    cdputs( pname[i], lin + 1, col + 2 );
+		    cdputs( Planets[i].name, lin + 1, col + 2 );
 		    attrset(0);
 		  }
 	    }
@@ -311,24 +315,24 @@ void display( int snum, int display_info )
     }
   
   /* Display the planet eater. */
-  if ( *dstatus == DS_LIVE )
+  if ( Doomsday->status == DS_LIVE )
     if ( ! lsmap )
-      if ( cvtcoords( cenx, ceny, *dx, *dy, scale, &lin, &col ) )
+      if ( cvtcoords( cenx, ceny, Doomsday->x, Doomsday->y, scale, &lin, &col ) )
 	{
 	  dobeep = TRUE;
-	  sd = sind(*dhead);
-	  cd = cosd(*dhead);
+	  sd = sind(Doomsday->heading);
+	  cd = cosd(Doomsday->heading);
 	  /* Draw the body. */
 	  attrset(COLOR_PAIR(COL_BLUEBLACK));
 	  for ( fl = -DOOMSDAY_LENGTH/2.0;
 	       fl < DOOMSDAY_LENGTH/2.0;
 	       fl = fl + 50.0 )
-	    if ( cvtcoords( cenx, ceny, *dx+fl*cd, *dy+fl*sd, scale, &lin, &col ) )
+	    if ( cvtcoords( cenx, ceny, Doomsday->x+fl*cd, Doomsday->y+fl*sd, scale, &lin, &col ) )
 	      cdput( '#', lin, col );
 	  attrset(0);
 	  /* Draw the head. */
-	  if ( cvtcoords( cenx, ceny, *dx+DOOMSDAY_LENGTH/2.0*cd,
-			 *dy+DOOMSDAY_LENGTH/2.0*sd,
+	  if ( cvtcoords( cenx, ceny, Doomsday->x+DOOMSDAY_LENGTH/2.0*cd,
+			 Doomsday->y+DOOMSDAY_LENGTH/2.0*sd,
 			 scale, &lin, &col ) )
 	    {
 	      attrset(RedLevelColor);
@@ -373,11 +377,11 @@ void display( int snum, int display_info )
 		      attrset(YellowLevelColor);
 
 		    for ( j = 0; j < MAXTORPS; j = j + 1 )
-		      if ( tstatus[i][j] == TS_LIVE 
-			  || tstatus[i][j] == TS_DETONATE )
-			if ( cvtcoords( cenx, ceny, tx[i][j], ty[i][j],
+		      if ( Ships[i].torps[j].status == TS_LIVE 
+			  || Ships[i].torps[j].status == TS_DETONATE )
+			if ( cvtcoords( cenx, ceny, Ships[i].torps[j].x, Ships[i].torps[j].y,
 				       scale, &lin, &col ) )
-			  cdput( chrtorps[Ships[i].team], lin, col );
+			  cdput( Teams[Ships[i].team].torpchar, lin, col );
 		    attrset(0);
 		  }
 	      }
@@ -388,12 +392,12 @@ void display( int snum, int display_info )
 	    /* First display exploding torps. */
 	    if ( snum < 0 || (snum > 0 && Ships[snum].options[ OPT_EXPLOSIONS]) ) /* dwp */
 	      for ( j = 0; j < MAXTORPS; j = j + 1 )
-		if ( tstatus[i][j] == TS_FIREBALL )
-		  if ( cvtcoords( cenx, ceny, tx[i][j], ty[i][j],
+		if ( Ships[i].torps[j].status == TS_FIREBALL )
+		  if ( cvtcoords( cenx, ceny, Ships[i].torps[j].x, Ships[i].torps[j].y,
 				  scale, &lin, &col) )
 		  { /* colorize torp explosions */
 		    if (i != snum && 
-			(satwar(i, snum) || twar[i][j][Ships[snum].team]))
+			(satwar(i, snum) || Ships[i].torps[j].war[Ships[snum].team]))
 		      attrset(RedLevelColor);
 		    else if (i != snum )
 		      attrset(GreenLevelColor);
@@ -418,10 +422,10 @@ void display( int snum, int display_info )
 		
 	    for ( j = 0; j < MAXTORPS; j = j + 1 )
 	      if ( Ships[i].status != SS_DYING && Ships[i].status != SS_DEAD && 
-		   (tstatus[i][j] == TS_LIVE || tstatus[i][j] == TS_DETONATE) )
-		if ( cvtcoords( cenx, ceny, tx[i][j], ty[i][j],
+		   (Ships[i].torps[j].status == TS_LIVE || Ships[i].torps[j].status == TS_DETONATE) )
+		if ( cvtcoords( cenx, ceny, Ships[i].torps[j].x, Ships[i].torps[j].y,
 				scale, &lin, &col ) )
-		  cdput( chrtorps[Ships[i].team], lin, col );
+		  cdput( Teams[Ships[i].team].torpchar, lin, col );
 
 	    attrset(0);
 	  }
@@ -498,7 +502,7 @@ void display( int snum, int display_info )
 			if ( snum > 0 && ( i == snum ) && Ships[snum].cloaked )
 			  ch = CHAR_CLOAKED;
 			else
-			  ch = chrteams[Ships[i].team];
+			  ch = Teams[Ships[i].team].teamchar;
 			
 				/* determine color */
 			if (snum > 0)
@@ -793,7 +797,7 @@ void display( int snum, int display_info )
 	
 	attrset(InfoColor);
 	if ( -i > 0 && -i <= NUMPLANETS)
-	  sprintf( buf, "%.3s", pname[-i] );
+	  sprintf( buf, "%.3s", Planets[-i].name );
 	else
 	  sprintf( buf, "%d", i );
 	cdputs( buf, lin, datacol );
@@ -1135,11 +1139,14 @@ void display( int snum, int display_info )
 	{
 	  lin = 1;
 	  col = 1;
-	  c_strcpy( dname, buf );
+
+	  cdclra( lin, col, DISPLAY_LINS, STAT_COLS - 1 );
+
+	  c_strcpy( Doomsday->name, buf );
 	  /* put dtype in stats, dstatus next to name  - dwp */
-	  if ( *dstatus == DS_LIVE  )
+	  if ( Doomsday->status == DS_LIVE  )
 	    appstr( "  (live)", buf);
-	  else if ( *dstatus == DS_OFF )
+	  else if ( Doomsday->status == DS_OFF )
 	    appstr( "  (off)", buf);
 	  else
 	    appstr( "  (unknown)", buf);
@@ -1148,19 +1155,18 @@ void display( int snum, int display_info )
       
 	  lin = lin + 2;
 	  dcol = col + 11;
-	  attrset(LabelColor);
-	  cdputs( "    dtype:", lin, col );
-	  attrset(0);
-	  attrset(InfoColor);
-	  cdputn( *dtype, 0, lin, dcol );
-	  attrset(0);
       
-	  lin = lin + 1;
 	  attrset(LabelColor);
 	  cdputs( "  dstatus:", lin, col );
-	  attrset(0);
 	  attrset(InfoColor);
-	  cdputn( *dstatus, 0, lin, dcol );
+	  if ( Doomsday->status == DS_LIVE)
+	    dstatstr = DS_LIVE_STR;
+	  else if (Doomsday->status == DS_OFF)
+	    dstatstr = DS_OFF_STR;
+	  else
+	    dstatstr = "";
+	  sprintf(buf, "%d (%s)", Doomsday->status, dstatstr);
+	  cdputs(buf, lin, dcol);
 	  attrset(0);
       
 	  lin = lin + 1;
@@ -1168,7 +1174,7 @@ void display( int snum, int display_info )
 	  cdputs( "       dx:", lin, col );
 	  attrset(0);
 	  attrset(InfoColor);
-	  cdputr( oneplace(*dx), 0, lin, dcol );
+	  cdputr( oneplace(Doomsday->x), 0, lin, dcol );
 	  attrset(0);
       
 	  lin = lin + 1;
@@ -1176,7 +1182,7 @@ void display( int snum, int display_info )
 	  cdputs( "       dy:", lin, col );
 	  attrset(0);
 	  attrset(InfoColor);
-	  cdputr( oneplace(*dy), 0, lin, dcol );
+	  cdputr( oneplace(Doomsday->y), 0, lin, dcol );
 	  attrset(0);
       
 	  lin = lin + 1;
@@ -1184,7 +1190,7 @@ void display( int snum, int display_info )
 	  cdputs( "      ddx:", lin, col );
 	  attrset(0);
 	  attrset(InfoColor);
-	  cdputr( oneplace(*ddx), 0, lin, dcol );
+	  cdputr( oneplace(Doomsday->dx), 0, lin, dcol );
 	  attrset(0);
 
 	  lin = lin + 1;
@@ -1192,7 +1198,7 @@ void display( int snum, int display_info )
 	  cdputs( "      ddy:", lin, col );
 	  attrset(0);
 	  attrset(InfoColor);
-	  cdputr( oneplace(*ddy), 0, lin, dcol );
+	  cdputr( oneplace(Doomsday->dy), 0, lin, dcol );
 	  attrset(0);
       
 	  lin = lin + 1;
@@ -1200,7 +1206,7 @@ void display( int snum, int display_info )
 	  cdputs( "    dhead:", lin, col );
 	  attrset(0);
 	  attrset(InfoColor);
-	  cdputn( round(*dhead), 0, lin, dcol );
+	  cdputn( round(Doomsday->heading), 0, lin, dcol );
 	  attrset(0);
       
 	  lin = lin + 1;
@@ -1214,14 +1220,14 @@ void display( int snum, int display_info )
 	  zbuf[MAXPLANETNAME-1] = EOS;
 	  cdputs( zbuf, lin, dcol );	/* clean up status line */
       
-	  i = *dlock;
+	  i = Doomsday->lock;
 	  if ( -i > 0 && -i <= NUMPLANETS )
 	    {
 	      attrset(RedLevelColor);
-	      cdputs( pname[-i], lin, dcol );	/* -[] */
+	      cdputs( Planets[-i].name, lin, dcol );	/* -[] */
 	      attrset(0);
 	      attrset(InfoColor);
-	      cdputn( round( dist( *dx, *dy, px[-i], py[-i] ) ),
+	      cdputn( round( dist( Doomsday->x, Doomsday->y, Planets[-i].x, Planets[-i].y ) ),
 		      0, lin + 1, dcol );
 	      attrset(0);
 	    }
@@ -1233,7 +1239,7 @@ void display( int snum, int display_info )
 	      cdputs( buf, lin, dcol );
 	      attrset(0);
 	      attrset(InfoColor);
-	      cdputn( round( dist( *dx, *dy, Ships[i].x, Ships[i].y ) ),
+	      cdputn( round( dist( Doomsday->x, Doomsday->y, Ships[i].x, Ships[i].y ) ),
 		      0, lin + 1, dcol );
 	      attrset(0);
 	    }
@@ -1281,7 +1287,9 @@ void display_headers(int snum)
   
   if ( *closed) 
     {
-      sprintf(hbuf, heading_fmt, closed_str1, chrteams[Ships[snum].team], snum,
+      sprintf(hbuf, heading_fmt, closed_str1, 
+	      Teams[Ships[snum].team].teamchar, 
+	      snum,
 	      Ships[snum].alias, ssbuf); 
       attrset(A_BOLD);
       cdputs( hbuf, 1, STAT_COLS + 
@@ -1292,7 +1300,8 @@ void display_headers(int snum)
     {
       if (*externrobots == TRUE) 
 	{
-	  sprintf(hbuf, heading_fmt, robo_str1, chrteams[Ships[snum].team], snum,
+	  sprintf(hbuf, heading_fmt, robo_str1, 
+		  Teams[Ships[snum].team].teamchar, snum,
 		  Ships[snum].alias, ssbuf); 
 	  attrset(A_BOLD);
 	  cdputs( hbuf, 1, STAT_COLS + 
@@ -1301,7 +1310,8 @@ void display_headers(int snum)
 	}
       else 
 	{
-	  sprintf(hbuf, heading_fmt, robo_str2, chrteams[Ships[snum].team], snum,
+	  sprintf(hbuf, heading_fmt, robo_str2, 
+		  Teams[Ships[snum].team].teamchar, snum,
 		  Ships[snum].alias, ssbuf);
 	  attrset(A_BOLD);
 	  cdputs( hbuf, 1, STAT_COLS + 
@@ -1311,7 +1321,8 @@ void display_headers(int snum)
     }
   else 
     {
-      sprintf(hbuf, heading_fmt, ship_str1, chrteams[Ships[snum].team], snum,
+      sprintf(hbuf, heading_fmt, ship_str1, Teams[Ships[snum].team].teamchar,
+	      snum,
 	      Ships[snum].alias, ssbuf);
       attrset(A_BOLD);
       cdputs( hbuf, 1, STAT_COLS + 
