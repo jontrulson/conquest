@@ -223,18 +223,38 @@
    This is the list of default network ports Conquest uses:
 
    1700/udp    - metaserver update port 
-                 - conquestd sends updates to conqmetad on this port
-                   (when run with '-m')
+
+                 conquestd sends updates to conqmetad on this port
+                 (when run with '-m')
 
    1700/tcp    - metaserver query port 
-                 - when you (or a conquest client) connects to this
-                   port on the metaserver host (conquest.radscan.com),
-                   the metaserver dumps the current server list out on
-                   this port and disconnects.
+
+                 When you (or a conquest client) connects to this port
+                 on the metaserver host (default:
+                 conquest.radscan.com), the metaserver dumps the
+                 current server list out on this port and disconnects.
 
    1701/tcp    - default game server port
-                 - conquestd listens on this port for client
-                   connections.
+
+                 conquestd listens on this port for client 
+                 connections.
+
+   1701/udp    - default game server port for UDP location data
+                 (v8.0.1c or better).
+
+                 conquestd listens on this port for client connections
+                 to determine if the client and server can both do
+                 UDP.  The server will also send UDP motion data to
+                 the client(s) from this port.
+
+                 UDP is only used for motion data (ship, planet, and
+                 torpedo location) from the server to the client.  The
+                 client only sends data to the server on this port
+                 during UDP negotiation.
+
+
+   You can use the '-p <portnum>' option to conquestd to have the game
+   run on a different port other than the default of 1701. 
 
 ## Server game flags
 

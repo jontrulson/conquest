@@ -142,7 +142,7 @@ void nMetaInit(metaSRec_t *ServerList, int numserv)
 				/* init the servervec array */
   for (i=0; i < nums; i++)
   {
-    sprintf(servervec[i], "%s:%d", 
+    sprintf(servervec[i], "%s:%hu", 
             metaServerList[i].altaddr,
             metaServerList[i].port);
   }
