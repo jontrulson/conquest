@@ -133,7 +133,7 @@ void cprintf(int lin, int col, int align, char *fmt, ...)
   
   /* use vsprintf */
   va_start(ap, fmt);
-  (void)vsprintf(buf, fmt, ap);
+  (void)vsnprintf(buf, sizeof(buf) - 1, fmt, ap);
   va_end(ap);
   /* end of it */
   

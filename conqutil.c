@@ -459,7 +459,7 @@ void cerror(char *fmt, ...)
   char buf[BIG_BUFFER_SIZE];
   
   va_start(ap, fmt);
-  (void)vsprintf(buf, fmt, ap);
+  (void)vsnprintf(buf, sizeof(buf) - 1, fmt, ap);
   
   va_end(ap);
   
@@ -485,7 +485,7 @@ void clog(char *fmt, ...)
     return;
   
   va_start(ap, fmt);
-  (void)vsprintf(buf, fmt, ap);
+  (void)vsnprintf(buf, sizeof(buf) - 1, fmt, ap);
   
   va_end(ap);
 
