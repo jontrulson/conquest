@@ -1,4 +1,4 @@
-#!/bin/ksh
+#!/bin/bash
 #
 # makesrcpkg - make a src distribution
 #
@@ -31,6 +31,11 @@ FILELIST="ratfor.c cd2lb.c display.c iolb.c conqlb.c
 	acconfig.h conqstrat.h conqstrat.c.l conqstrat.c.y conqrule
 	LICENSE INSTALL TODO COPYRIGHT"
 
+
+if [ -e CHANGES ]
+then
+    FILELIST="$FILELIST CHANGES"
+fi
 
 mkdir $CONQVER 2>/dev/null
 

@@ -78,9 +78,10 @@ void iBufPutc(char thechar)
   i = iBufOffset + 1;
 
   if (i < IBUFMAX)
-    iBuffer[i] = thechar;
-
-  iBufOffset++;
+    {
+      iBuffer[i] = thechar;
+      iBufOffset++;
+    }
 
   return;
 }

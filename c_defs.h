@@ -312,7 +312,7 @@ void zeroplanet( int pnum, int snum );
 int cmpplanet(void *cmp1, void *cmp2);
 void sortplanets(int sv[]);
 int cmpuser(void *cmp1, void *cmp2);
-void sortuserss(int sv[], int numentries);
+void sortusers(int sv[], int numentries);
 int spwar( int snum, int pnum );
 void appkb( int kb, char *buf );
 void appship( int snum, char *str );
@@ -404,7 +404,6 @@ void watch(void);
 int prompt_ship(char buf[], int *snum, int *normal);
 void dowatchhelp(void);
 void setdheader(int show_header);
-void setopertimer(void);
 void toggle_line(int snum, int old_snum);
 char *build_toggle_str(char snum_str[], int snum);
 void menu_item( char *option, char *msg_line, int lin, int col );
@@ -462,6 +461,7 @@ int mailimps( char *subject, char *msg);
 int CheckPid(int pidnum);
 
 void settimer(void);
+void setopertimer(void);
 void stoptimer(void);
 
 void upchuck(void);
@@ -483,18 +483,12 @@ int rndgeo ( real prob );
 int rndbin ( int trials, real prob );
 int rndpoi ( real mean );
 
-/* ioxlb.c */
-
-int iogchar ( void );
-int iogtimed ( int *ch, int seconds );
-
-/* ioplb.c */
-
-void ioeat(void);
-
-/* ionlb.c */
+/* iolb.c */
 
 int iochav( void );
+int iogchar ( void );
+int iogtimed ( int *ch, int seconds );
+void ioeat(void);
 
 /* conqcm.c */
 char *mymalloc(int size);

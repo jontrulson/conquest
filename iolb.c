@@ -31,7 +31,7 @@ int iochav( void )
 				/* we do a test for linux/sys_select_h
 				   for glibc systems... for some reason
 				   glibc defined fd_set as a typedef, rather
-				   that as a struct like the rest of the
+				   than as a struct like the rest of the
 				   planet...*/
 # if defined(LINUX) && defined(HAVE_SYS_SELECT_H)
 				/* a linux, glibc system */

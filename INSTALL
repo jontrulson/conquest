@@ -154,7 +154,8 @@ me know so I can incorporate it into the distribution.  The autoconf
 source file 'configure.in' is supplied for this purpose ;-)
 
 	As root, intialize the system-wide conquestrc file
-(/opt/conquest/etc/conquestrc by default) by typing:
+(/opt/conquest/etc/conquestrc by default) by typing ('make install'
+will do this for but if you want to be sure....):
 
 	/opt/bin/conqoper -C
 
@@ -174,7 +175,7 @@ on what conquest is and how to play it.
 ## UNIXWARE NOTE
 
 	Unixware understands the notion of providing specific
-priveleges to an executable, without requiring suid root programs.
+privileges to an executable, without requiring suid root programs.
 
 	By default, when installing the Unixware binary package or
 doing a 'gmake install' on a Unixware system, the Makefile will use
@@ -276,6 +277,6 @@ lib/			  drwxr-xr-x    2 jon      conquest
 			  -rw-r--r--    1 jon      conquest
 
 Jon Trulson <jon@radscan.com>
-12/24/97
+07/12/1998
 
 

@@ -8,9 +8,13 @@
          +--------------------------------------------------------+
 
 
-	This file contains various misc stuff about Conquest.  See
-INSTALL for instructions on unpacking, compiling, and running
-counquest. See conqnews.doc for the lastest news and modification
+	This file contains various information about Conquest, such as
+a description of the files supplied, and various tips and hints on
+configuring and playing the game.
+
+	See INSTALL for instructions on unpacking, compiling, and
+running counquest, as well as information on terminfo requirements and
+configuration.  See conqnews.doc for the lastest news and modification
 history.  See conquest.doc for information on available commands, and
 how to play the game.
 
@@ -125,6 +129,29 @@ will need to add them to the conquest group in /etc/group.
 conquest::102:jon,davep,johnc
 
 	jon, davep, and johnc all have CG status on my machine.  
+
+	Conqoper currently supports the following options, (type
+conqoper -? to see the various options):
+
+ usage: conqoper [-C] [-D] [-E] [-I <what>]
+        -C               rebuild systemwide conquestrc file
+        -D               disable the game
+        -E               enable the game
+        -I <what>        Initialize <what>, where <what> is:
+           e - everything
+           g - game
+           l - lockwords
+           m - messages
+           p - planets
+           r - robots
+           s - ships
+           u - universe
+           z - zero common block
+
+	The init and enable/disable options are of primary interest to
+server operators... For example, if an operator wanted to ensure that
+the game is reset every week, s/he can setup a cron entry for conquest
+(or a GC) to run 'conqoper -Ig' every sunday at midnight.
 
 	Be careful who you give CG status to, a bad CG can cheat, or
 otherwise disrupt a game.  In addition, due to the fact that a CG is a
@@ -313,7 +340,8 @@ Hell.  Particularly Atlair.  Keep an eye on Altair ;-)
 slots that can be configured with the planet edit option in conqoper.
 By default, they are all 'turned off' so unless a CG goes into
 conqoper and 'enables' them, you won't see them.  They are named
-'Extra 1' through 'Extra 20'.
+'Extra 1' through 'Extra 20' (though, obviously, the names can be
+changed in the planet editor).
 
 	Use them together.  Use them in peace.
 
@@ -366,11 +394,9 @@ and cloak alot.
 killed.  CG's can use QUIT (^\) to exit cleanly, leaving their ship
 intact, if somewhat vacant.  If allow_sigquit=true is set in the
 system-wide conquestrc file, then any user can exit this way.  If you
-exit this way, I'd be careful where you leave your ship.  People who
-exit with QUIT and leave their ship running for awhile will still add
-to the the elapsed time statistics, even if no-one's playing.  You do
-not lose points for self-destructing, though if you do it often, and
-don't get any kills before doing so, your skill ranking will probably
+exit this way, I'd be careful where you leave your ship.  You do not
+lose points for self-destructing, though if you do it often, and don't
+get any kills before doing so, your skill ranking will probably
 suffer.
 
 
@@ -469,9 +495,9 @@ can be faster in battle.  They can also be used as input to the fire
 and course commands, as they are translated into the appropriate
 'direction' keys like so:
 
-	789	 qwe 
-	4 6 -->  a d 
-	123	 zxc
+	789     qwe 
+	4 6 --> a d 
+	123     zxc
 
 ## DOOMSDAY
 
