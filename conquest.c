@@ -50,7 +50,7 @@
 #include "clientlb.h"
 #include "clntauth.h"
 #include "cuclient.h"
-
+#include "udp.h"
 #include "meta.h"
 
 #define CLIENTNAME "Conquest"	/* our client name */
@@ -60,7 +60,6 @@ static char cbuf[MID_BUFFER_SIZE]; /* general purpose buffer */
 static int lastServerError = 0;	/* set by an ACK from server */
 static Unsgn8 clientFlags = 0;  /* set according to CLIENTSTAT packets */
 
-static int hello(void);		/* meet and greet the server */
 void catchSignals(void);
 void handleSignal(int sig);
 
@@ -112,7 +111,7 @@ void dead( int snum, int leave );
 void printUsage()
 {
   printf("Usage: conquest [-m ][-s server[:port]] [-r recfile] [ -t ]\n");
-  printf("                [ -M <metaserver> ]\n\n");
+  printf("                [ -M <metaserver> ] [ -u ]\n\n");
   printf("    -m               query the metaserver\n");
   printf("    -s server[:port] connect to <server> at <port>\n");
   printf("                      default: localhost:1701\n");
@@ -123,6 +122,7 @@ void printUsage()
   printf("    -t              telnet mode (no user conf load/save)\n");
   printf("    -M metaserver   specify alternate <metaserver> to contact.\n");
   printf("                     default: %s\n", META_DFLT_SERVER);
+  printf("    -u              do not attempt to use UDP from server.\n");
   return;
 }
 
@@ -183,6 +183,16 @@ int connectServer(char *remotehost, Unsgn16 remoteport)
       return FALSE;
     }
 
+  if (cInfo.tryUDP)
+    {
+      clog("NET: Opening UDP...");
+      if ((cInfo.usock = udpOpen(0, &cInfo.servaddr)) < 0) 
+        {
+          clog("NET: udpOpen: %s", strerror(errno));
+          cInfo.tryUDP = FALSE;
+        }
+    }
+
   clog("Connecting to host: %s, port %d\n",
        remotehost, remoteport);
 
@@ -213,6 +223,9 @@ int connectServer(char *remotehost, Unsgn16 remoteport)
 
   cInfo.serverDead = FALSE;
   cInfo.sock = s;
+  cInfo.servaddr = sa;
+  
+  pktSetNodelay(cInfo.sock);
 
   return TRUE;
 }
@@ -234,6 +247,10 @@ int main(int argc, char *argv[])
   Context.msgrand = getnow(NULL, 0);
 
   cInfo.sock = -1;
+  cInfo.usock = -1;
+  cInfo.doUDP = FALSE;
+  cInfo.tryUDP = TRUE;
+
   cInfo.state = CLT_STATE_PREINIT;
   cInfo.serverDead = TRUE;
   cInfo.isLoggedIn = FALSE;
@@ -246,7 +263,7 @@ int main(int argc, char *argv[])
   cInfo.remotehost = strdup("localhost"); /* default to your own server */
 
   /* check options */
-  while ((i = getopt(argc, argv, "mM:s:r:t")) != EOF)    /* get command args */
+  while ((i = getopt(argc, argv, "mM:s:r:tu")) != EOF)    /* get command args */
     switch (i)
       {
       case 'm':
@@ -296,6 +313,10 @@ int main(int argc, char *argv[])
 
       case 't':
         confSetTelnetClientMode(TRUE);
+        break;
+
+      case 'u':
+        cInfo.tryUDP = FALSE;
         break;
 
       default:
@@ -415,11 +436,11 @@ int main(int argc, char *argv[])
     }
   
   /* now we need to negotiate. */
-  if (!hello())
+  if (!clientHello(CLIENTNAME))
     {
       cdend();
-      clog("conquest: hello() failed\n");
-      printf("conquest: hello() failed, check log\n");
+      clog("conquest: clientHello() failed\n");
+      printf("conquest: clientHello() failed, check log\n");
       exit(1);
     }
 
@@ -2751,7 +2772,7 @@ void menu(void)
   char *if7="reading:";
   char *if8="INITIALIZATION FAILURE";
   char *if9="The darkness becomes all encompassing, and your vision fails.";
-  
+  int sockl[2] = {cInfo.sock, cInfo.usock};  
   catchSignals();	/* enable trapping of interesting signals */
   
 
@@ -2777,7 +2798,7 @@ void menu(void)
 
   /* now look for our ship packet before we get started.  It should be a
      full SP_SHIP packet for this first time */
-  if (waitForPacket(PKT_FROMSERVER, cInfo.sock, SP_SHIP, buf, PKT_MAXSIZE,
+  if (waitForPacket(PKT_FROMSERVER, sockl, SP_SHIP, buf, PKT_MAXSIZE,
 		    15, NULL) <= 0)
     {
       clog("conquest:menu: didn't get initial SP_SHIP");
@@ -2792,7 +2813,7 @@ void menu(void)
 
       lose = FALSE;
 
-      while ((pkttype = waitForPacket(PKT_FROMSERVER, cInfo.sock, PKT_ANYPKT,
+      while ((pkttype = waitForPacket(PKT_FROMSERVER, sockl, PKT_ANYPKT,
 				      buf, PKT_MAXSIZE, 0, NULL)) > 0)
 	{			/* proc packets while we get them */
 	  switch (pkttype)
@@ -3080,7 +3101,7 @@ int newship( int unum, int *snum )
   spClientStat_t *scstat;
   int pkttype;
   Unsgn8 buf[PKT_MAXSIZE];
-
+  int sockl[2] = {cInfo.sock, cInfo.usock};
   /* here we will wait for ack's or a clientstat pkt. Acks indicate an
      error.  If the clientstat pkt's esystem is !0, we need to prompt
      for the system to enter and send it in a CP_COMMAND:CPCMD_ENTER
@@ -3089,7 +3110,7 @@ int newship( int unum, int *snum )
 
   while (TRUE)
     {
-      if ((pkttype = waitForPacket(PKT_FROMSERVER, cInfo.sock, PKT_ANYPKT,
+      if ((pkttype = waitForPacket(PKT_FROMSERVER, sockl, PKT_ANYPKT,
 				   buf, PKT_MAXSIZE, 30, NULL)) < 0)
 	{
 	  clog("conquest:newship: waitforpacket returned %d", pkttype);
@@ -3434,7 +3455,7 @@ int welcome( int *unum )
   spAck_t *sack = NULL;
   int pkttype;
   Unsgn8 buf[PKT_MAXSIZE];
-  
+  int sockl[2] = {cInfo.sock, cInfo.usock};
   
   col=0;
 
@@ -3446,7 +3467,7 @@ int welcome( int *unum )
 
   /* now look for SP_CLIENTSTAT or SP_ACK */
   if ((pkttype = 
-       readPacket(PKT_FROMSERVER, cInfo.sock, buf, PKT_MAXSIZE, 10)) <= 0)
+       readPacket(PKT_FROMSERVER, sockl, buf, PKT_MAXSIZE, 10)) <= 0)
     {
       clog("welcome: read failed\n");
       return FALSE;
@@ -3565,7 +3586,7 @@ int welcome( int *unum )
      for a user packet for this user. */
       
 
-  if (waitForPacket(PKT_FROMSERVER, cInfo.sock, SP_USER, buf, PKT_MAXSIZE,
+  if (waitForPacket(PKT_FROMSERVER, sockl, SP_USER, buf, PKT_MAXSIZE,
 		    15, NULL) <= 0)
     {
       clog("conquest:welcome: waitforpacket SP_USER returned error");
@@ -3577,131 +3598,6 @@ int welcome( int *unum )
 
   /* ready to rock. */
   return ( TRUE );
-}
-
-
-static int hello(void)
-{
-  cpHello_t chello;
-  spAckMsg_t *sackmsg;
-  Unsgn8 buf[PKT_MAXSIZE];
-  int pkttype;
-  extern char *ConquestVersion, *ConquestDate;
-
-
-  /* there should be a server hello waiting for us */
-  if ((pkttype = readPacket(PKT_FROMSERVER, cInfo.sock, 
-			    buf, PKT_MAXSIZE, 10)) < 0)
-  {
-    clog("HELLO: read server hello failed\n");
-    return FALSE;
-  }
-
-  if (pkttype == 0)
-  {
-    clog("HELLO: read server hello: timeout.\n");
-    return FALSE;
-  }
-
-  if (pkttype != SP_HELLO)
-  {
-    clog("HELLO: read server hello: wrong packet type %d\n", pkttype);
-    return FALSE;
-  }
-
-  sHello = *(spHello_t *)buf;
-
-  /* fix up byte ordering */
-  sHello.protover = (Unsgn16)ntohs(sHello.protover);
-  sHello.cmnrev = (Unsgn32)ntohl(sHello.cmnrev);
-
-  sHello.servername[CONF_SERVER_NAME_SZ - 1] = 0;
-  sHello.serverver[CONF_SERVER_NAME_SZ - 1] = 0;
-  sHello.motd[CONF_SERVER_MOTD_SZ - 1] = 0;
-
-  clog("HELLO: CLNT: sname = '%s'\n"
-       "             sver = '%s'\n"
-       "             protv = 0x%04hx, cmnr = %d, flags: 0x%02x\n"
-       "             motd = '%s",
-       sHello.servername,
-       sHello.serverver,
-       sHello.protover,
-       sHello.cmnrev,
-       sHello.flags,
-       sHello.motd);
-
-  /* now send a client hello */
-  chello.type = CP_HELLO;
-  chello.updates = Context.updsec;
-  chello.protover = htons(PROTOCOL_VERSION);
-  chello.cmnrev = htonl(COMMONSTAMP);
-
-  strncpy(chello.clientname, CLIENTNAME, CONF_SERVER_NAME_SZ);
-  strncpy(chello.clientver, ConquestVersion, CONF_SERVER_NAME_SZ);
-
-  strcat(chello.clientver, " ");
-  strncat(chello.clientver, ConquestDate, 
-	  (CONF_SERVER_NAME_SZ - strlen(ConquestVersion)) - 2);
-
-  if (!writePacket(PKT_TOSERVER, cInfo.sock, (Unsgn8 *)&chello))
-    {
-      clog("HELLO: write client hello failed\n");
-      return FALSE;
-    }
-
-  clog("HELLO: sent client hello to server");
-
-  /* now we need a server stat or a Nak */
-
-  if ((pkttype = readPacket(PKT_FROMSERVER, cInfo.sock, 
-			    buf, PKT_MAXSIZE, 5)) < 0)
-  {
-    clog("HELLO: read server SP_ACKMSG or SP_ACK failed\n");
-    return FALSE;
-  }
-
-  if (pkttype == SP_ACKMSG || pkttype == SP_ACK)/* we only get this if problem */
-    {
-      if (pkttype == SP_ACKMSG)
-	{
-	  sackmsg = (spAckMsg_t *)buf;
-	  if (sackmsg->txt)
-	    {
-	      clog("conquest:hello:NAK:%s '%s'\n", 
-		   psev2String(sackmsg->severity), 
-		   sackmsg->txt);
-	      printf("conquest:hello:NAK:%s '%s'\n", 
-		   psev2String(sackmsg->severity), 
-		   sackmsg->txt);
-
-	    }
-	}
-      return FALSE;
-    }
-
-  if (pkttype == SP_SERVERSTAT)
-    {
-      procServerStat(buf);
-# if defined(DEBUG_CLIENTPROC)
-      clog("HELLO: recv SP_SERVERSTAT: ships = %d, na = %d, nv = %d, nr = %d\n"
-           " nu = %d flags = 0x%08x",
-	   sStat.numtotal,
-	   sStat.numactive,
-	   sStat.numvacant,
-	   sStat.numrobot,
-	   sStat.numusers,
-	   sStat.flags);
-#endif
-    }
-  else
-    {
-      clog("HELLO: pkttype = %d, was waiting for SP_SERVERSTAT", pkttype);
-      return FALSE;
-    }
-
-  sendAck(cInfo.sock, PKT_TOSERVER, PSEV_INFO, PERR_OK, NULL);
-
-  return TRUE;
 }
 
 void catchSignals(void)
@@ -3718,6 +3614,7 @@ void catchSignals(void)
   
   return;
 }
+
 
 void handleSignal(int sig)
 {
@@ -3762,6 +3659,7 @@ void astservice(int sig)
   static int RMsggrand = 0;
   int difftime;
   Unsgn8 buf[PKT_MAXSIZE];
+  int sockl[2] = {cInfo.sock, cInfo.usock};
 
   stopTimer();
 
@@ -3769,7 +3667,7 @@ void astservice(int sig)
      doesn't stop when executing various commands */
 
 
-  while (readPacket(PKT_FROMSERVER, cInfo.sock,
+  while (readPacket(PKT_FROMSERVER, sockl,
 		    buf, PKT_MAXSIZE, 0) > 0)
     processPacket(buf); /* process them */
 

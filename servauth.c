@@ -78,6 +78,7 @@ int Authenticate(char *username, char *password)
   int done, rv;
   char epw[MAXUSERNAME];
   int logcount = 3;
+  int sockl[2] = {sInfo.sock, sInfo.usock};
 
   expire_users();		/* now is a good time to expire users */
 
@@ -89,7 +90,7 @@ int Authenticate(char *username, char *password)
 
   while (!done)
     {
-      rv = waitForPacket(PKT_FROMCLIENT, sInfo.sock, CP_AUTHENTICATE, 
+      rv = waitForPacket(PKT_FROMCLIENT, sockl, CP_AUTHENTICATE, 
 			 buf, PKT_MAXSIZE, (60 * 10), "Waiting for Auth");
 
       if (rv <= 0)

@@ -289,6 +289,11 @@ void UserOptsMenu(int unum)
 
       lin++;
       lin++;
+      cprintf(lin, col, ALIGN_NONE, "#%d#UDP:  #%d# %s#%d#", LabelColor,
+              InfoColor, (cInfo.doUDP) ? "On" : "Off",
+              NoColor);
+
+      lin++;
       cprintf(lin, col, ALIGN_NONE, "#%d#Flags:#%d# %s#%d#", LabelColor,
               InfoColor, clntServerFlagsStr(sStat.flags),
               NoColor);

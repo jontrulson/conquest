@@ -26,6 +26,10 @@
 
 typedef struct {
   int sock;			/* socket to client */
+  int usock;			/* udp socket to client */
+  struct sockaddr_in clntaddr;  /* client's saddrin struct */
+  int doUDP;                    /* send udp? */
+  int tryUDP;                    /* try udp? */
   Unsgn32 state;		/* current state */
   Unsgn32 clientDead;		/* is the client dead/ */
   Unsgn32 isMaster;		/* is the Maseter server? */

@@ -57,6 +57,7 @@ struct _packetent {
 #define PERR_CANCELED    14	/* an operation (bombing, etc) was canceled
 				   for some reason. */
 #define PERR_DONE         15    /* finished something - like beaming */
+#define PERR_DOUDP        16	/* used in hello to tell server udp is ok */
 
 #ifdef NOPKT_EXTERN
 int pktRXBytes = 0;
@@ -67,10 +68,11 @@ extern int pktRXBytes;
 int sendAck(int sock, int dir, Unsgn8 severity, Unsgn8 code, Unsgn8 *msg);
 int isConnDead(void);
 void pktNotImpl(void *nothing);
+void pktSetNodelay(int sock);
 char *psev2String(int psev);
 int invertDir(int dir);
 
-int waitForPacket(int dir, int sock, int type, Unsgn8 *buf, int blen, 
+int waitForPacket(int dir, int sockl[], int type, Unsgn8 *buf, int blen, 
 		  int delay, char *nakmsg);
 
 int clientPktSize(int type);
@@ -78,7 +80,7 @@ int serverPktSize(int type);
 
 int isPacketWaiting(int sock);
 int writePacket(int direction, int sock, Unsgn8 *packet);
-int readPacket(int direction, int sock, Unsgn8 *buf, int len, 
+int readPacket(int direction, int sockl[], Unsgn8 *buf, int len, 
 	       unsigned int delay);
 int validPkt(int pkttype, void *pkt);
 

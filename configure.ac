@@ -147,6 +147,7 @@ AC_HEADER_STDC
 AC_CHECK_HEADERS(fcntl.h limits.h sys/ioctl.h sys/times.h termio.h unistd.h)
 AC_CHECK_HEADERS(ncurses.h term.h sys/time.h sys/select.h stropts.h poll.h)
 AC_CHECK_HEADERS(curses.h time.h string.h strings.h termios.h zlib.h)
+AC_CHECK_HEADERS(stdint.h)
 AC_CHECK_HEADERS(GL/glut.h GL/gl.h GL/glu.h)
 
 dnl Checks for typedefs, structures, and compiler characteristics.

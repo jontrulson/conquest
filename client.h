@@ -32,6 +32,10 @@
 
 typedef struct {
   int sock;			/* socket to client */
+  int usock;			/* UDP socket to client */
+  int doUDP;                    /* whether we should look for udp packets */
+  int tryUDP;                   /* should we try UDP? */
+  struct sockaddr_in  servaddr;
   Unsgn32 state;		/* current state */
   Unsgn32 serverDead;		/* is the client dead/ */
   Unsgn32 isLoggedIn;		/* is the client logged in? */
@@ -70,5 +74,7 @@ int sendSetName(Unsgn8 *name);
 int sendCommand(Unsgn8 cmd, Unsgn16 detail);
 int sendFireTorps(int num, real dir);
 int sendMessage(int to, char *msg);
+
+int clientHello(char *clientname);
 
 #endif /* CLIENT_H_INCLUDED */

@@ -308,7 +308,7 @@ int invertDir(int dir)
   return -1;			/* NOTREACHED */
 }
 
-int waitForPacket(int dir, int sock, int type, Unsgn8 *buf, int blen, 
+int waitForPacket(int dir, int sockl[], int type, Unsgn8 *buf, int blen, 
 		  int delay, char *nakmsg)
 {
   int pkttype;
@@ -316,13 +316,13 @@ int waitForPacket(int dir, int sock, int type, Unsgn8 *buf, int blen,
   while (TRUE)
     {
       errno = 0;		/* be afraid. */
-      if ((pkttype = readPacket(dir, sock, buf, blen, delay)) >= 0)
+      if ((pkttype = readPacket(dir, sockl, buf, blen, delay)) >= 0)
 	{
 	  if (pkttype == type || type == PKT_ANYPKT || pkttype == 0)
 	    return pkttype;
 
 	  if (pkttype != type && nakmsg) /* we need to use a msg nak */
-	    sendAck(sock, invertDir(dir), PSEV_ERROR, PERR_UNSPEC, nakmsg); 
+	    sendAck(sockl[0], invertDir(dir), PSEV_ERROR, PERR_UNSPEC, nakmsg); 
 	}
 
       if (pkttype < 0)
@@ -391,14 +391,17 @@ int isPacketWaiting(int sock)
 }
 
 
-int readPacket(int direction, int sock, Unsgn8 *buf, int blen, 
+/* sockl[0] is expected tcp socket, sockl[1] is for udp */
+int readPacket(int direction, int sockl[], Unsgn8 *buf, int blen, 
 	       unsigned int delay)
 {
   Unsgn8 type;
   int len, rlen, left, rv;
   struct timeval timeout;
   fd_set readfds;
-  
+  int maxfd;
+  int gotudp = FALSE;           
+
   if (connDead || direction == -1) 
     return -1;
 
@@ -406,24 +409,42 @@ int readPacket(int direction, int sock, Unsgn8 *buf, int blen,
   timeout.tv_usec = 0;
 
   FD_ZERO(&readfds);
-  FD_SET(sock, &readfds);
+  FD_SET(sockl[0], &readfds);
+  maxfd = sockl[0];
+  if (sockl[1] >= 0)
+    {
+      FD_SET(sockl[1], &readfds);
+      maxfd = max(sockl[0], sockl[1]);
+    }
 
-  if ((rv=select(sock+1, &readfds, NULL, NULL, &timeout)) > 0)
+  if ((rv=select(maxfd+1, &readfds, NULL, NULL, &timeout)) > 0)
     {				/* we have a byte */
-      if (FD_ISSET(sock, &readfds))
+      if (FD_ISSET(sockl[0], &readfds))
 	{
-	  if ((rv = read(sock, &type, 1)) <= 0)
+	  if ((rv = read(sockl[0], &type, 1)) <= 0)
 	    {
 	      *buf = 0;
 	      return -1;
 	    }
 	}
+      else if (sockl[1] >= 0 && FD_ISSET(sockl[1], &readfds))
+        {                     /* got a udp, read the whole thing */
+          if ((rv = read(sockl[1], buf, blen)) <= 0)
+            {
+              *buf = 0;
+              return -1;
+            }
+          else
+            {
+              gotudp = TRUE;
+              type = buf[0];
+            }
+        }
       else
-	{
-	  clog("readPacket: select returned >0, but !FD_ISSET");
-	  return 0;
-	}
-
+        {
+          clog("readPacket: select returned >0, but !FD_ISSET");
+          return 0;
+        }
     }
   else if (rv == 0)
     {				/* timed out */
@@ -452,6 +473,19 @@ int readPacket(int direction, int sock, Unsgn8 *buf, int blen,
 
   pktRXBytes += len;
 
+  if (gotudp)
+    {                           /* then we already got the whole packet */
+      if (rv != len)
+        {
+          clog("gotudp: rv != len: %d %d", rv, len);
+          *buf = 0;
+          type = 0;
+        }
+
+      return type;
+    }
+        
+
   if (len)
     {
       if (len >= blen)		/* buf too small */
@@ -468,11 +502,11 @@ int readPacket(int direction, int sock, Unsgn8 *buf, int blen,
 	  timeout.tv_usec = 0;
       
 	  FD_ZERO(&readfds);
-	  FD_SET(sock, &readfds);
+	  FD_SET(sockl[0], &readfds);
 	  
-	  if ((rv=select(sock+1, &readfds, NULL, NULL, &timeout)) > 0)
+	  if ((rv=select(sockl[0]+1, &readfds, NULL, NULL, &timeout)) > 0)
 	    {			/* some data avail */
-	      if ((rlen = read(sock, ((buf + 1) + (len - left)), left)) > 0)
+	      if ((rlen = read(sockl[0], ((buf + 1) + (len - left)), left)) > 0)
 		{
 		  /* do we have enough? */
 		  if ((left - rlen) > 0 /*len != rlen*/)
@@ -616,4 +650,26 @@ int validPkt(int pkttype, void *pkt)
     return FALSE;
 
   return TRUE;
+}
+
+void pktSetNodelay(int sock)
+{
+  /* turn off TCP delay. */
+  int on = 1;
+  struct protoent *p = getprotobyname("tcp");
+
+  if (!p)
+    {
+      clog("INFO: getprotobyname(tcp) == NULL");
+      return;
+    }
+
+  if (setsockopt(sock, 
+                 p->p_proto, TCP_NODELAY, (void *)&on, sizeof(on)) <  0) 
+    {
+      clog("INFO: setsockopt(TCP_NODELAY) failed: %s",
+           strerror(errno));
+    }
+  
+  return;
 }

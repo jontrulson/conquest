@@ -169,7 +169,7 @@ libconquest_la_SOURCES = conqai.c ratfor.c  \
 	userauth.c record.c color.h user.h shiptype.h \
 	ship.h planet.h team.h msg.h doomsday.h driver.h conqinfo.h \
 	history.h robot.h global.h torp.h ibuf.h conf.h  display.h \
-	protocol.h packet.h packet.c userauth.h meta.c meta.h 
+	protocol.h packet.h packet.c userauth.h meta.c meta.h udp.c udp.h
 
 
 libconquest_la_LIBADD = @LTLIBOBJS@
@@ -290,7 +290,8 @@ libconqserv_la_OBJECTS = $(am_libconqserv_la_OBJECTS)
 libconquest_la_DEPENDENCIES = @LTLIBOBJS@
 am_libconquest_la_OBJECTS = conqai.lo ratfor.lo conqlb.lo rndlb.lo \
 	conqutil.lo conqcm.lo conqsvr42.lo global.lo ibuf.lo version.lo \
-	conf.lo sem.lo color.lo userauth.lo record.lo packet.lo meta.lo
+	conf.lo sem.lo color.lo userauth.lo record.lo packet.lo meta.lo \
+	udp.lo
 libconquest_la_OBJECTS = $(am_libconquest_la_OBJECTS)
 @GLCLIENT_TRUE@bin_PROGRAMS = conquest$(EXEEXT) conquestgl$(EXEEXT) \
 @GLCLIENT_TRUE@	conqai$(EXEEXT) conqoper$(EXEEXT) \
@@ -390,8 +391,8 @@ am__depfiles_maybe = depfiles
 @AMDEP_TRUE@	./$(DEPDIR)/sem.Plo ./$(DEPDIR)/servauth.Plo \
 @AMDEP_TRUE@	./$(DEPDIR)/server.Plo ./$(DEPDIR)/servercmd.Plo \
 @AMDEP_TRUE@	./$(DEPDIR)/serverpkt.Plo ./$(DEPDIR)/texfont.Plo \
-@AMDEP_TRUE@	./$(DEPDIR)/uimisc.Plo ./$(DEPDIR)/userauth.Plo \
-@AMDEP_TRUE@	./$(DEPDIR)/version.Plo
+@AMDEP_TRUE@	./$(DEPDIR)/udp.Plo ./$(DEPDIR)/uimisc.Plo \
+@AMDEP_TRUE@	./$(DEPDIR)/userauth.Plo ./$(DEPDIR)/version.Plo
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 LTCOMPILE = $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) \
@@ -667,6 +668,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/servercmd.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/serverpkt.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/texfont.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/udp.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/uimisc.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/userauth.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/version.Plo@am__quote@

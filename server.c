@@ -108,9 +108,18 @@ int sendShip(int sock, Unsgn8 snum)
     }
   
   if ((sshiploc = spktShipLoc(snum, FALSE)))
-    if (writePacket(PKT_TOCLIENT, sock, (Unsgn8 *)sshiploc) <= 0)
-      return FALSE;
-
+    {
+      if (sInfo.doUDP)
+        {
+          if (writePacket(PKT_TOCLIENT, sInfo.usock, (Unsgn8 *)sshiploc) <= 0)
+            return FALSE;
+        }
+      else
+        {
+          if (writePacket(PKT_TOCLIENT, sock, (Unsgn8 *)sshiploc) <= 0)
+            return FALSE;
+        }
+    }
   return TRUE;
 }
 
@@ -156,9 +165,19 @@ int sendPlanet(int sock, Unsgn8 pnum)
     }
 
   if ((splanloc = spktPlanetLoc(pnum, FALSE)))
-    if (writePacket(PKT_TOCLIENT, sock, (Unsgn8 *)splanloc) <= 0)
-      return FALSE;
+    {
+      if (sInfo.doUDP)
+        {
+          if (writePacket(PKT_TOCLIENT, sInfo.usock, (Unsgn8 *)splanloc) <= 0)
+            return FALSE;
+        }
+      else
+        {
+          if (writePacket(PKT_TOCLIENT, sock, (Unsgn8 *)splanloc) <= 0)
+            return FALSE;
+        }
 
+    }
   return TRUE;
 }
 
@@ -267,9 +286,19 @@ int sendTorp(int sock, Unsgn8 tsnum, Unsgn8 tnum)
     }
 
   if ((storploc = spktTorpLoc(tsnum, tnum, FALSE)))
-    if (writePacket(PKT_TOCLIENT, sock, (Unsgn8 *)storploc) <= 0)
-      return FALSE;
-  
+    {
+      if (sInfo.doUDP)
+        {
+          if (writePacket(PKT_TOCLIENT, sInfo.usock, (Unsgn8 *)storploc) <= 0)
+            return FALSE;
+        }
+      else
+        {
+          if (writePacket(PKT_TOCLIENT, sock, (Unsgn8 *)storploc) <= 0)
+            return FALSE;
+        }
+    }
+
   return TRUE;
 }
 

@@ -302,8 +302,9 @@ static int nPlanetlIdle(void)
 {
   int pkttype;
   Unsgn8 buf[PKT_MAXSIZE];
+  int sockl[2] = {cInfo.sock, cInfo.usock};
 
-  while ((pkttype = waitForPacket(PKT_FROMSERVER, cInfo.sock, PKT_ANYPKT,
+  while ((pkttype = waitForPacket(PKT_FROMSERVER, sockl, PKT_ANYPKT,
                                   buf, PKT_MAXSIZE, 0, NULL)) > 0)
     processPacket(buf);
 

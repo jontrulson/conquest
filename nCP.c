@@ -2104,7 +2104,6 @@ static void command( int ch )
       _dodet();
       break;
     case 'D':				/* detonate own torps */
-/*             clog("JETDET: DET DET"); */
       _domydet();
       break;
     case 'E':				/* emergency distress call */
@@ -2457,6 +2456,7 @@ static int nCPIdle(void)
   int gnow = glutGet(GLUT_ELAPSED_TIME);
   Unsgn8 buf[PKT_MAXSIZE];
   int difftime = dgrand( Context.msgrand, &now );
+  int sockl[2] = {cInfo.sock, cInfo.usock};
 
   if (state == S_DEAD)
     {                           /* transfer to the dead node */
@@ -2464,7 +2464,7 @@ static int nCPIdle(void)
       return NODE_OK;
     }
 
-  while ((pkttype = waitForPacket(PKT_FROMSERVER, cInfo.sock, PKT_ANYPKT,
+  while ((pkttype = waitForPacket(PKT_FROMSERVER, sockl, PKT_ANYPKT,
                                   buf, PKT_MAXSIZE, 0, NULL)) > 0)
     processPacket(buf);
 

@@ -55,7 +55,7 @@ FILELIST="ratfor.c cd2lb.h cd2lb.c iolb.h iolb.c conqlb.c
         render.h render.c nPlayBMenu.h nPlayBMenu.c playback.h
         playback.c nPlayB.h nPlayB.c nPlayBHelp.h nPlayBHelp.c
         nOptions.h nOptions.c colorGL.c colorCU.c cuclient.c ui.h uimisc.c
-        cuclient.h conqlb.h"  
+        cuclient.h conqlb.h udp.h udp.c"  
 
 IMAGES="img/*.bmp img/*.txf"
 

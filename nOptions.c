@@ -312,7 +312,11 @@ static void _dispUserOptsMenu(void)
 	  lin++;
 	}
 
-      lin = 20;
+      lin = 19;
+      cprintf(lin, col, ALIGN_NONE, "#%d#UDP:  #%d# %s#%d#", LabelColor,
+              InfoColor, (cInfo.doUDP) ? "On" : "Off",
+              NoColor);
+      lin++;
       cprintf(lin, col, ALIGN_NONE, "#%d#Flags:#%d# %s#%d#", LabelColor,
               InfoColor, clntServerFlagsStr(sStat.flags),
               NoColor);
@@ -690,6 +694,7 @@ static int nOptionsIdle(void)
   static int old = 0;
   int pkttype;
   Unsgn8 buf[PKT_MAXSIZE];
+  int sockl[2] = {cInfo.sock, cInfo.usock};
 
   /* 'blink' the cursor */
   if ((gtime - old) > 250)
@@ -705,7 +710,7 @@ static int nOptionsIdle(void)
   if ((state == S_SYSMENU) || (state == S_SOPTS))
     return NODE_OK;             /* don't process packets is sys modes */
 
-  while ((pkttype = waitForPacket(PKT_FROMSERVER, cInfo.sock, PKT_ANYPKT,
+  while ((pkttype = waitForPacket(PKT_FROMSERVER, sockl, PKT_ANYPKT,
                                   buf, PKT_MAXSIZE, 0, NULL)) > 0)
     processPacket(buf);
 

@@ -24,6 +24,7 @@
 
 #include "conqnet.h"
 #include "packet.h"
+#include "udp.h"
 
 #define SERVER_NOEXTERN
 #include "server.h"
@@ -171,6 +172,7 @@ void checkMaster(void)
   
   /* set the maximum connections we will fall behind */
   listen( s, LISTEN_BACKLOG );
+
   
   /* go into infinite loop waiting for new connections */
   while (TRUE) 
@@ -209,6 +211,7 @@ void checkMaster(void)
           if ( fork() == 0 ) 
             {			/* child - client driver */
               sInfo.sock = t;
+              pktSetNodelay(sInfo.sock);
               memset(sInfo.remotehost, 0, MAXHOSTNAME);
               getHostname(sInfo.sock, sInfo.remotehost, MAXHOSTNAME - 1);
               
@@ -236,6 +239,9 @@ int main(int argc, char *argv[])
   progName = argv[0];
   sInfo.state = SVR_STATE_PREINIT;
   sInfo.sock = -1;
+  sInfo.usock = -1;
+  sInfo.doUDP = FALSE;
+  sInfo.tryUDP = TRUE;
   sInfo.clientDead = TRUE;
   sInfo.isMaster = FALSE;
   sInfo.isLoggedIn = FALSE;
@@ -592,6 +598,7 @@ int capentry( int snum, int *system )
   cpCommand_t *ccmd;
   Unsgn8 buf[PKT_MAXSIZE];
   Unsgn8 esystem = 0;
+  int sockl[2] = {sInfo.sock, sInfo.usock};
   
   /* First figure out which systems we can enter from. */
   for ( i = 0; i < NUMPLAYERTEAMS; i = i + 1 )
@@ -642,7 +649,7 @@ int capentry( int snum, int *system )
       /* now we wait for another ENTER command packet with it's detail member
 	 indicating the desired system. */
 
-      if ((pkttype = waitForPacket(PKT_FROMCLIENT, sInfo.sock, CP_COMMAND,
+      if ((pkttype = waitForPacket(PKT_FROMCLIENT, sockl, CP_COMMAND,
 				   buf, PKT_MAXSIZE, 1, NULL)) < 0)
         {
 	  clog("conquestd:capentry: waitforpacket returned %d", pkttype); 
@@ -698,6 +705,7 @@ void dead( int snum, int leave )
   int i, j, kb, now, entertime; 
   Unsgn8 flags = SPCLNTSTAT_FLAG_NONE; /* for clientstat msg */
   char buf[PKT_MAXSIZE];	/* gen purpose */
+  int sockl[2] = {sInfo.sock, sInfo.usock};
   
   /* If something is wrong, don't do anything. */
   if ( snum < 1 || snum > MAXSHIPS )
@@ -785,7 +793,7 @@ void dead( int snum, int leave )
   /* if conquered, wait for the cpMessage_t */
   if (kb == KB_CONQUER)
     {
-      if (waitForPacket(PKT_FROMCLIENT, sInfo.sock, CP_MESSAGE, 
+      if (waitForPacket(PKT_FROMCLIENT, sockl, CP_MESSAGE, 
 			buf, PKT_MAXSIZE,
 			(60 * 2), NULL) <= 0)
 	{			/* error or timeout.  gen lastwords */
@@ -1069,6 +1077,7 @@ void menu(void)
   int pkttype;
   Unsgn8 buf[PKT_MAXSIZE];
   cpCommand_t *ccmd;
+  int sockl[2] = {sInfo.sock, sInfo.usock};
 
   catchSignals();	/* enable trapping of interesting signals */
   
@@ -1161,7 +1170,7 @@ void menu(void)
       /* Reset up the destruct fuse. */
       Ships[Context.snum].sdfuse = -TIMEOUT_PLAYER;
       
-      if ((pkttype = waitForPacket(PKT_FROMCLIENT, sInfo.sock, PKT_ANYPKT,
+      if ((pkttype = waitForPacket(PKT_FROMCLIENT, sockl, PKT_ANYPKT,
 			buf, PKT_MAXSIZE, 1, NULL)) < 0)
 	{
 	  freeship();
@@ -1434,6 +1443,7 @@ int play(void)
   char msgbuf[128];
   int pkttype;
   Unsgn8 buf[PKT_MAXSIZE];
+  int sockl[2] = {sInfo.sock, sInfo.usock};
 
   /* Can't carry on without a vessel. */
   if ( (rv = newship( Context.unum, &Context.snum )) != TRUE)
@@ -1486,7 +1496,7 @@ int play(void)
 	break;
 
       didsomething = 0;
-      if ((pkttype = waitForPacket(PKT_FROMCLIENT, sInfo.sock, PKT_ANYPKT,
+      if ((pkttype = waitForPacket(PKT_FROMCLIENT, sockl, PKT_ANYPKT,
 				   buf, PKT_MAXSIZE, 0, NULL)) < 0)
 	{
 	  if (errno != EINTR)
@@ -1669,6 +1679,20 @@ static int hello(void)
   char cbuf[MESSAGE_SIZE * 2];
   int pkttype;
   extern char *ConquestVersion, *ConquestDate;
+  int rv;
+  struct timeval tv;
+  fd_set readfds;
+  struct sockaddr_in usa;	/* internet socket addr. structure - udp */
+  cpAck_t *cpack;
+  int sockl[2] = {sInfo.sock, sInfo.usock};
+
+  /* open a UDP socket and bind to it */
+  if ((sInfo.usock = udpOpen(listenPort, &usa)) < 0)
+    {
+      clog("NET: SERVER hello: udpOpen() failed: %s", strerror(errno));
+      sInfo.usock = -1;
+      sInfo.tryUDP = FALSE;
+    }
 
   /* first loadup and send a server hello */
   shello.type = SP_HELLO;
@@ -1688,28 +1712,59 @@ static int hello(void)
 
   if (!writePacket(PKT_TOCLIENT, sInfo.sock, (Unsgn8 *)&shello))
     {
-      clog("hello: write shello failed\n");
+      clog("NET: SERVER: hello: write shello failed\n");
       return FALSE;
     }
 
-  clog("HELLO: sent server hello to client");
+  clog("NET: SERVER: hello: sent server hello to client");
+
+  if (sInfo.tryUDP)
+    {
+      /* wait a few seconds to see if client sends a udp */
+      tv.tv_sec = 4;
+      tv.tv_usec = 0;
+      FD_ZERO(&readfds);
+      FD_SET(sInfo.usock, &readfds);
+      if ((rv = select(sInfo.usock+1, &readfds, NULL, NULL, &tv)) <= 0)
+        {
+          clog("NET: SERVER: hello: udp select failed: %s", strerror(errno));
+          sInfo.tryUDP = FALSE;
+        }
+      else
+        {
+          if (FD_ISSET(sInfo.usock, &readfds))
+            {                       /* get the packet, almost done negotiating udp */
+              rv = udpRecv(sInfo.usock, buf, PKT_MAXSIZE, &sInfo.clntaddr);
+              clog("NET: SERVER: hello: got %d UDP bytes from client port %d", rv, 
+                   (int)ntohs(sInfo.clntaddr.sin_port));
+              
+              if (connect(sInfo.usock, (const struct sockaddr *)&sInfo.clntaddr, 
+                          sizeof(sInfo.clntaddr)) < 0)
+                {
+                  clog("NET: SERVER: hello: udp connect() failed: %s", strerror(errno));
+                  sInfo.tryUDP = FALSE;
+                }
+            }
+        }
+    }
+
   /* now we want a client hello in response */
-  if ((pkttype = readPacket(PKT_FROMCLIENT, sInfo.sock, buf, PKT_MAXSIZE, 10)) < 0)
+  if ((pkttype = readPacket(PKT_FROMCLIENT, sockl, buf, PKT_MAXSIZE, 10)) < 0)
   {
-    clog("HELLO: read client hello failed, pkttype = %d",
+    clog("NET: SERVER: hello: read client hello failed, pkttype = %d",
          pkttype);
     return FALSE;
   }
 
   if (pkttype == 0)
   {
-    clog("HELLO: read client hello: timeout.\n");
+    clog("NET: SERVER: hello: read client hello: timeout.\n");
     return FALSE;
   }
 
   if (pkttype != CP_HELLO)
   {
-    clog("HELLO: read client hello: wrong packet type %d\n", pkttype);
+    clog("NET: SERVER: hello: read client hello: wrong packet type %d\n", pkttype);
     return FALSE;
   }
 
@@ -1748,19 +1803,36 @@ static int hello(void)
   if (chello.updates >= 1 && chello.updates <= 10)
     Context.updsec = chello.updates;
 
-  /* now send the server stats */
+  /* send a server stat to the udp client socket.  If the client gets
+     it, it will acknowlege it in it's ACK packet, which will tell us
+     we can do udp. woohoo! */
+  if (sInfo.tryUDP)
+    sendServerStat(sInfo.usock);
+
+  /* now send the server stats normally */
   if (!sendServerStat(sInfo.sock))
     return FALSE;
 
   /* now we want an ack.  If we get it, we're done! */
-  if ((pkttype = readPacket(PKT_FROMCLIENT, sInfo.sock, buf, PKT_MAXSIZE, 5)) < 0)
+  if ((pkttype = readPacket(PKT_FROMCLIENT, sockl, buf, PKT_MAXSIZE, 5)) < 0)
     {
-      clog("HELLO: read client Ack failed");
+      clog("NET: SERVER: hello: read client Ack failed");
       return FALSE;
     }
-  
+
   if (pkttype != CP_ACK)
     return FALSE;
+
+  if (sInfo.tryUDP)
+    {
+      /* see if the client could read our udp */
+      cpack = (cpAck_t *)buf;
+      if (cpack->code == PERR_DOUDP)
+        {
+          sInfo.doUDP = TRUE;
+          clog("NET: SERVER: hello: Client acknowleged UDP from server. Doing UDP.");
+        }
+    }
 
   return TRUE;
 }

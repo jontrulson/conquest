@@ -26,8 +26,9 @@
 static int state;
 
 static int fatal = FALSE;
+static int serror = FALSE;
 static int newuser = FALSE;
-static spAck_t *sack = NULL;
+static spAck_t sack;
 static time_t snooze = (time_t)0;          /* sleep time */
 
 static string sorry1="I'm sorry, but the game is closed for repairs right now.";
@@ -80,15 +81,18 @@ void nWelcomeInit(void)
   spClientStat_t *scstat = NULL;
   int pkttype;
   Unsgn8 buf[PKT_MAXSIZE];
+  int sockl[2] = {cInfo.sock, cInfo.usock};
 
   /* now look for SP_CLIENTSTAT or SP_ACK */
   if ((pkttype = 
-       readPacket(PKT_FROMSERVER, cInfo.sock, buf, PKT_MAXSIZE, 10)) <= 0)
+       readPacket(PKT_FROMSERVER, sockl, buf, PKT_MAXSIZE, 10)) <= 0)
     {
       clog("nWelcomeInit: read failed\n");
       fatal = TRUE;
       return;
     }
+
+  setNode(&nWelcomeNode);
 
   switch (pkttype)
     {
@@ -100,10 +104,9 @@ void nWelcomeInit(void)
       Ships[Context.snum].team = scstat->team;
       break;
     case SP_ACK:
-      sack = (spAck_t *)buf;
+      sack = *(spAck_t *)buf;
       state = S_ERROR;
-      snooze = (time(0) + 2);
-      return;
+      serror = TRUE;
 
       break;
     default:
@@ -124,10 +127,10 @@ void nWelcomeInit(void)
   else
     {
       newuser = FALSE;
-      state = S_DONE;           /* need to wait for user packet */
+      if (!serror)
+        state = S_DONE;           /* need to wait for user packet */
     }
 
-   setNode(&nWelcomeNode);
 
   return;
 }
@@ -138,16 +141,20 @@ static int nWelcomeDisplay(dspConfig_t *dsp)
   Unsgn8 buf[PKT_MAXSIZE];
   int team, col = 0;
   time_t t = time(0);
+  int sockl[2] = {cInfo.sock, cInfo.usock};
 
   if (fatal)
     return NODE_EXIT;           /* see ya! */
 
   if (snooze)
     {
-      if (sack)                 /* an error */
+      if (serror)                 /* an error */
         {
           if (t > snooze)     /* time to go */
-            return NODE_EXIT;
+            {
+              snooze = 0;
+              return NODE_EXIT;
+            }
         }
       else
         {                       /* new user */
@@ -159,6 +166,7 @@ static int nWelcomeDisplay(dspConfig_t *dsp)
             }
         }
     }
+
 
   switch (state)
     {
@@ -192,7 +200,7 @@ static int nWelcomeDisplay(dspConfig_t *dsp)
       break;
 
     case S_ERROR:
-      switch (sack->code)
+      switch (sack.code)
         {
         case PERR_CLOSED:
           cprintf(MSG_LIN2/2,col,ALIGN_CENTER,"#%d#%s", InfoColor, sorry1 );
@@ -212,7 +220,7 @@ static int nWelcomeDisplay(dspConfig_t *dsp)
           break;
 
         default:
-          clog("nWelcomeDisplay: unexpected ACK code %d\n", sack->code);
+          clog("nWelcomeDisplay: unexpected ACK code %d\n", sack.code);
           break;
         }
 
@@ -220,7 +228,7 @@ static int nWelcomeDisplay(dspConfig_t *dsp)
       break;
 
     case S_DONE:
-      if (waitForPacket(PKT_FROMSERVER, cInfo.sock, SP_USER, buf, PKT_MAXSIZE,
+      if (waitForPacket(PKT_FROMSERVER, sockl, SP_USER, buf, PKT_MAXSIZE,
                         15, NULL) <= 0)
         {
           clog("nWelcomeDisplay: waitforpacket SP_USER returned error");
@@ -233,6 +241,7 @@ static int nWelcomeDisplay(dspConfig_t *dsp)
       return NODE_OK;
       break;
 
+    default:
       clog("nWelcomeDisplay: unknown state %d", state);
       return NODE_EXIT;
       break;

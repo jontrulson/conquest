@@ -477,7 +477,6 @@ static int nAuthInput(int ch)
                   return NODE_EXIT;
                 }
 
-              clog("JET: calling nWelcomeInit(); - S_GETRPW:");
               nWelcomeInit();                                 
               return NODE_OK;
             }

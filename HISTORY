@@ -9,6 +9,23 @@
 
                               Conquest HISTORY
 
+Version 8.0.1c 7/2/2004 (devel)
+
+        - udp support for torp, ship, and planet 'loc' packets.
+          Auto-negotiated.   Use the '-u' option to conquestgl or
+          conquest to disable udp negotiation.
+
+        - bugs in nWelcome node that prevented server error conditions
+          from being displayed to the user.
+
+Version 8.0.1b 5/31/2004 (devel)
+
+        - use TCP_NODELAY to send packets immediately rather than save
+          them up before sending.
+
+        - add check for stdint.h, and use those defines if available
+          in datatypes.h
+
 Version 8.0.1a 5/08/2004 (devel)
 
         - Adds a GLUT/OpenGL client, conquestgl.  Yay!

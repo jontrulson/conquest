@@ -61,7 +61,7 @@ void processPacket(Unsgn8 *buf);
 void printUsage()
 {
   printf("Usage: conquestgl [-m ][-s server[:port]] [-r recfile] [ -t ]\n");
-  printf("                  [ -M <metaserver> ]\n\n");
+  printf("                  [ -M <metaserver> ] [ -u ]\n\n");
   printf("    -m               query the metaserver\n");
   printf("    -s server[:port] connect to <server> at <port>\n");
   printf("                      default: localhost:1701\n");
@@ -78,6 +78,8 @@ void printUsage()
   printf("    -P <cqr file>   Play back a Conquest recording (.cqr)\n");
   printf("    -d <dly>        specify default framedelay for CQR playback.\n");
   printf("                    (example -d .01, for 1/100sec frame delay\n");
+  printf("    -u              do not attempt to use UDP from server.\n");
+
                                  
   return;
 }
@@ -113,6 +115,9 @@ int main(int argc, char *argv[])
   Context.msgrand = getnow(NULL, 0);
 
   cInfo.sock = -1;
+  cInfo.usock = -1;
+  cInfo.doUDP = FALSE;
+  cInfo.tryUDP = TRUE;
   cInfo.state = CLT_STATE_PREINIT;
   cInfo.serverDead = TRUE;
   cInfo.isLoggedIn = FALSE;
@@ -125,7 +130,7 @@ int main(int argc, char *argv[])
   cInfo.remotehost = strdup("localhost"); /* default to your own server */
 
   /* check options */
-  while ((i = getopt(argc, argv, "mM:s:r:tP:d:")) != EOF)    /* get command args */
+  while ((i = getopt(argc, argv, "mM:s:r:tP:d:u")) != EOF)    /* get command args */
     switch (i)
       {
       case 'm':
@@ -184,6 +189,10 @@ int main(int argc, char *argv[])
 
       case 'd':                 /* framedelay */
         framedelay = ctor(optarg);
+        break;
+
+      case 'u':
+        cInfo.tryUDP = FALSE;
         break;
 
       default:
