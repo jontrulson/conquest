@@ -153,7 +153,14 @@ void Lock(int what)
 void Unlock(int what)
 {
   int err = 0, retval;
-  ushort semvals[16];
+  ushort semvals[25];
+  union semun {
+    int val;
+    struct semid_ds *buf;
+    ushort *array;
+  } arg;
+
+  arg.array = semvals;
 
 #ifdef DEBUG_SEM
   clog("Unlock(%s): Attempting to free a lock.",
@@ -163,7 +170,7 @@ void Unlock(int what)
 
 
 				/* get the values of the semaphores */
-  retval = semctl(ConquestSemID, 0, GETALL, semvals);
+  retval = semctl(ConquestSemID, 0, GETALL, arg);
   
   if (retval != 0)
     {				/* couldn't get semvals */
@@ -222,7 +229,7 @@ void Unlock(int what)
 char *GetSemVal(int thesem)
 {
   struct semid_ds SemDS;
-  ushort semvals[16];
+  ushort semvals[25];
   static char buf[80];
   static char stimebuffer[80];
   static char wordtxt[80];
@@ -231,9 +238,15 @@ char *GetSemVal(int thesem)
   time_t lastoptime;
   int retval;
   int lastcmnpid, cmnzcnt, lastmsgpid, msgzcnt;
+  union semun {
+    int val;
+    struct semid_ds *buf;
+    ushort *array;
+  } arg;
 
 				/* get the values of the semaphores */
-  retval = semctl(ConquestSemID, 0, GETALL, semvals);
+  arg.array = semvals;
+  retval = semctl(ConquestSemID, 0, GETALL, arg);
 
   lastcmnpid = semctl(ConquestSemID, LOCKCMN, GETPID, semvals);
   cmnzcnt = semctl(ConquestSemID, LOCKCMN, GETZCNT, semvals);
@@ -248,8 +261,11 @@ char *GetSemVal(int thesem)
 	   sys_errlist[errno]);
     }
 
+ 
+  arg.buf = &SemDS;
+
 				/* get latest semop time  */
-  retval = semctl(ConquestSemID, LOCKMSG, IPC_STAT, &SemDS);
+  retval = semctl(ConquestSemID, LOCKMSG, IPC_STAT, arg);
 
   if (retval != 0)
     {
@@ -260,7 +276,7 @@ char *GetSemVal(int thesem)
 
   lastoptime = SemDS.sem_otime;
 
-  retval = semctl(ConquestSemID, LOCKCMN, IPC_STAT, &SemDS);
+  retval = semctl(ConquestSemID, LOCKCMN, IPC_STAT, arg);
 
   if (retval != 0)
     {

@@ -256,7 +256,7 @@ main(int argc, char *argv[])
 				   that a user has entered conqoper */
   sprintf(msgbuf, "User %s has entered conqoper.",
           name);
-  stormsg(MSG_COMP, MSG_ALL, msgbuf);
+  /*stormsg(MSG_COMP, MSG_ALL, msgbuf);*/
   clog(msgbuf);			/* log it too... */
 
   operate();
