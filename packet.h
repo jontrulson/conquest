@@ -58,11 +58,14 @@ struct _packetent {
 				   for some reason. */
 #define PERR_DONE         15    /* finished something - like beaming */
 #define PERR_DOUDP        16	/* used in hello to tell server udp is ok */
+#define PERR_PINGRESP     17	/* a ping reponse for nCP */
 
 #ifdef NOPKT_EXTERN
 int pktRXBytes = 0;
+Unsgn32 pingAvgMS = 0;
 #else
 extern int pktRXBytes;
+extern Unsgn32 pingAvgMS;
 #endif
 
 int sendAck(int sock, int dir, Unsgn8 severity, Unsgn8 code, Unsgn8 *msg);

@@ -277,7 +277,9 @@ void renderHud(int dostats)
   else
     sprintf(fbuf, "FPS: %3.1f", FPS);
 
-  sprintf(sbuf1024, "%3.1fKB/s %s", ((float)rxdiff / 1000.0),
+  sprintf(sbuf1024, "%4dms %3.1fKB/s %s",  
+          pingAvgMS, 
+          ((float)rxdiff / 1000.0),
           fbuf);
 
   /* check the blinkers */

@@ -1106,6 +1106,10 @@ void handleSimpleCmdPkt(cpCommand_t *ccmd)
       /* NOTREACHED */
       break;
 
+    case CPCMD_PING:
+      sendAck(sInfo.sock, PKT_TOCLIENT, PSEV_INFO, PERR_PINGRESP, NULL);
+      break;
+
     default:
       clog("conquestd: handleSimpleCmdPkt(): unexpected command code %d",
 	   cmd);

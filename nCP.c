@@ -119,6 +119,10 @@ static int dostats = FALSE;     /* whether to display rendering stats */
 
 extern dspData_t dData;
 
+/* Ping status */
+static Unsgn32 pingStart = 0;
+static int pingPending = FALSE;
+
 #define cp_putmsg(str, lin)  setPrompt(lin, NULL, NoColor, str, NoColor)
 
 static int nCPDisplay(dspConfig_t *);
@@ -2433,6 +2437,8 @@ void nCPInit(void)
   rftime = glutGet(GLUT_ELAPSED_TIME);
   lastblast = Ships[Context.snum].lastblast;
   lastphase = Ships[Context.snum].lastphase;
+  pingPending = FALSE;
+  pingStart = 0;
 
   setNode(&nCPNode);
 
@@ -2456,6 +2462,7 @@ static int nCPDisplay(dspConfig_t *dsp)
   
 static int nCPIdle(void)
 {
+  spAck_t *sack;
   int pkttype;
   int now;
   int gnow = glutGet(GLUT_ELAPSED_TIME);
@@ -2463,8 +2470,10 @@ static int nCPIdle(void)
   int difftime = dgrand( Context.msgrand, &now );
   int sockl[2] = {cInfo.sock, cInfo.usock};
   static Unsgn32 iterstart = 0;
+  static Unsgn32 pingtime = 0;
   Unsgn32 iternow = clbGetMillis();
-  const Unsgn32 iterwait = 50.0; /* ms */
+  const Unsgn32 iterwait = 50; /* ms */
+  const Unsgn32 pingwait = 2000; /* ms (2 seconds) */
   real tdelta = (real)iternow - (real)iterstart;
 
 
@@ -2476,13 +2485,43 @@ static int nCPIdle(void)
 
   while ((pkttype = waitForPacket(PKT_FROMSERVER, sockl, PKT_ANYPKT,
                                   buf, PKT_MAXSIZE, 0, NULL)) > 0)
-    processPacket(buf);
+    {
+        switch (pkttype)
+          {
+            case SP_ACK: 
+              sack = (spAck_t *)buf;
+                                /* see if it's a ping resp */
+              if (sack->code == PERR_PINGRESP)
+                {
+                  pingPending = FALSE;
+                  pingAvgMS = (pingAvgMS + (iternow - pingStart)) / 2;
+                  pingStart = 0;
+                  continue;
+                }
+              else
+                processPacket(buf);
+
+              break;
+          default:
+            processPacket(buf);
+            break;
+          }
+    }
 
   if (pkttype < 0)          /* some error */
     {
       clog("nCPIdle: waitForPacket returned %d", pkttype);
       Ships[Context.snum].status = SS_OFF;
       return NODE_EXIT;
+    }
+
+  /* send a ping if it's time */
+  if (!pingPending && ((iternow - pingtime) > pingwait))
+    {                           /* send a ping request */
+      pingtime = iternow;
+      pingStart = iternow;
+      pingPending = TRUE;
+      sendCommand(CPCMD_PING, 0);
     }
 
   /* drive the local universe */

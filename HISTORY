@@ -25,8 +25,16 @@ Version 8.0.1p 11/21/2004 (devel)
           page.  This is more for the future since no current
           incompatible server supports the v2 meta protocol anyway.
 
-        - now disabling SlingShot works in all cases like it's supposed
-          to :)
+        - added ping capability.  The GL client (conquestgl) will now
+          ping the server every 2 seconds.  This measures the average
+          TCP round-trip time (in ms) to the server and back.  To see
+          the ping time, enable the status line in the cockpit by
+          typing 'ALT-S' when playing.
+
+        - now disabling the SlingShot flag works in all cases like
+          it's supposed to :)
+
+        - added "server_contact=" to the system-wide conquestrc file.
 
         - fixed bogus towedby reports when you attempt to tow a ship,
           but you are already being towed. 

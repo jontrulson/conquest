@@ -493,8 +493,9 @@ typedef struct _cp_ack {
 #define CPCMD_COUP         25
 #define CPCMD_AUTOPILOT    26
 #define CPCMD_RELOAD       27
+#define CPCMD_PING         28
 
-#define CPCMD_LAST         27
+#define CPCMD_LAST         28
 
 typedef struct _cp_command {
   Unsgn8 type;			/* CP_COMMAND */
