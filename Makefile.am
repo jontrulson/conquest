@@ -2,7 +2,7 @@ AUTOMAKE_OPTIONS = foreign
 
 # User defineable options
 
-CFLAGS = -Wall -D__NO_MATH_INLINES -fPIC -fno-builtin
+CFLAGS = @CONQ_CFLAGS@ 
 CONQGROUP = @CONQGROUP@
 CONQLOCALSTATEDIR = @localstatedir@/conquest
 CONQLIBEXECDIR = @libexecdir@

@@ -39,6 +39,7 @@ typedef struct _fheader {
   Unsgn8 snum;                  /* ship that made rec.  0 == server record */
   Unsgn8 pad[FHEADER_PAD];	/* padding */
 } fileHeader_t;
+#pragma pack()
 
 /* function protos */
 int recordOpenInput(char *fname);

@@ -762,8 +762,14 @@ void dead( int snum, int leave )
           ConqInfo->lastwords[MAXLASTWORDS - 1] = 0;
         }
 
+      clog("conquestd: dead(): sendClientStat failed, fl = 0x%0x\n",
+           flags);
+
       return;
     }
+
+  clog("INFO: dead(): sent sendClientStat, fl = 0x%0x",
+       flags);
 
   /* fix things up */
   Ships[snum].status = SS_RESERVED;
@@ -1265,7 +1271,7 @@ int newship( int unum, int *snum )
   int i, j, system; 
   int fresh;
   int vec[MAXSHIPS];
-  int numavail;
+  int numavail = 0;
   int numvec = 0;
 
   PVLOCK(&ConqInfo->lockword);
@@ -1493,7 +1499,7 @@ int play()
 
       didsomething = 0;
       if ((pkttype = waitForPacket(PKT_FROMCLIENT, sInfo.sock, PKT_ANYPKT,
-				   buf, PKT_MAXSIZE, 1, NULL)) < 0)
+				   buf, PKT_MAXSIZE, 0, NULL)) < 0)
 	{
 	  if (errno != EINTR)
 	    {
@@ -1556,6 +1562,8 @@ int play()
 	  conqstats( Context.snum );
 	  laststat = now;
 	}
+
+      c_sleep(ITER_SECONDS);
     }
   
   conqstats( Context.snum );
@@ -1568,6 +1576,7 @@ int play()
   updateClient();	/* one last, to be sure. */
   sendConqInfo(sInfo.sock, TRUE);
   c_sleep( 2.0 );
+  clog("INFO: ship %d died, calling dead()", Context.snum);
   dead( Context.snum, Context.leave );
   
   return(TRUE);
@@ -1585,7 +1594,6 @@ int welcome( int *unum )
   int i, team; 
   char name[MAXUSERNAME];
   char password[MAXUSERNAME];	/* encrypted pw, "" if local */
-  int utype;			/* user type -local/remote */
   Unsgn8 flags = SPCLNTSTAT_FLAG_NONE;
 
   if (!Authenticate(name, password))
@@ -1593,7 +1601,7 @@ int welcome( int *unum )
 
   sInfo.isLoggedIn = TRUE;
 
-  if ( ! gunum( unum, name, utype ) )
+  if ( ! gunum( unum, name, 0 ) )
     {				
       flags |= SPCLNTSTAT_FLAG_NEW;
       /* Must be a new player. */
@@ -1694,22 +1702,24 @@ int hello(void)
       return FALSE;
     }
 
+  clog("HELLO: sent server hello to client");
   /* now we want a client hello in response */
   if ((pkttype = readPacket(PKT_FROMCLIENT, sInfo.sock, buf, PKT_MAXSIZE, 10)) < 0)
   {
-    clog("hello: read chello failed\n");
+    clog("HELLO: read client hello failed, pkttype = %d",
+         pkttype);
     return FALSE;
   }
 
   if (pkttype == 0)
   {
-    clog("hello: read chello: timeout.\n");
+    clog("HELLO: read client hello: timeout.\n");
     return FALSE;
   }
 
   if (pkttype != CP_HELLO)
   {
-    clog("hello: read chello: wrong packet type %d\n", pkttype);
+    clog("HELLO: read client hello: wrong packet type %d\n", pkttype);
     return FALSE;
   }
 
@@ -1722,9 +1732,9 @@ int hello(void)
   chello.clientname[CONF_SERVER_NAME_SZ - 1] = 0;
   chello.clientver[CONF_SERVER_NAME_SZ - 1] = 0;
 
-  clog("CLNT HELO: cname = '%s'\n"
-       "           cver = '%s'\n"
-       "           upd: %d, protv = 0x%04hx, cmnr = %d",
+  clog("HELLO: CLIENT: cname = '%s'\n"
+       "               cver = '%s'\n"
+       "               upd: %d, protv = 0x%04hx, cmnr = %d",
        chello.clientname, 
        chello.clientver,
        chello.updates, 
@@ -1734,7 +1744,7 @@ int hello(void)
   /* do some checks - send a NAK and fail if things aren't cool */
   if (chello.protover != PROTOCOL_VERSION)
     {
-      sprintf(cbuf, "SVR: protocol mismatch, expect 0x%04x, got 0x%04x",
+      sprintf(cbuf, "HELLO: SVR: protocol mismatch, expect 0x%04x, got 0x%04x",
 	      PROTOCOL_VERSION, chello.protover);
       sendAck(sInfo.sock, PKT_TOCLIENT, PSEV_FATAL, PERR_BADPROTO, cbuf);
       return FALSE;
@@ -1742,7 +1752,7 @@ int hello(void)
 
   if (chello.cmnrev != COMMONSTAMP)
     {
-      sprintf(cbuf, "SVR: CMB mismatch, expect %d, got %d",
+      sprintf(cbuf, "HELLO: SVR: CMB mismatch, expect %d, got %d",
 	      COMMONSTAMP, chello.cmnrev);
       sendAck(sInfo.sock, PKT_TOCLIENT, PSEV_FATAL, PERR_BADCMN, cbuf);
     }
@@ -1757,7 +1767,7 @@ int hello(void)
   /* now we want an ack.  If we get it, we're done! */
   if ((pkttype = readPacket(PKT_FROMCLIENT, sInfo.sock, buf, PKT_MAXSIZE, 5)) < 0)
     {
-      clog("conquestd:hello: read cAck failed\n");
+      clog("HELLO: read client Ack failed");
       return FALSE;
     }
   
@@ -1773,6 +1783,7 @@ void catchSignals(void)
   signal(SIGTSTP, SIG_IGN);
   signal(SIGTERM, (void (*)(int))handleSignal);
   signal(SIGINT, SIG_IGN);
+  signal(SIGPIPE, (void (*)(int))handleSignal);
   signal(SIGQUIT, (void (*)(int))handleSignal);
 
   return;
@@ -1785,6 +1796,7 @@ void handleSignal(int sig)
     case SIGINT:
     case SIGTERM:
     case SIGHUP:
+    case SIGPIPE:
     case SIGQUIT:
       stopUpdate();
 

@@ -56,6 +56,9 @@
 
 #define PKT_ANYPKT        ~0
 
+
+#pragma pack(1)                 /* show me a better way... */
+
 /* server -> client packets */
 typedef struct _sp_null {
   Unsgn8 type;			/* SP_NULL */
@@ -466,5 +469,7 @@ typedef struct _cp_message {
   
   Unsgn8 msg[MESSAGE_SIZE];
 } cpMessage_t;
+
+#pragma pack()                  /* restore dflt struct alignment */
 
 #endif /* PROTOCOL_H_INCLUDED */

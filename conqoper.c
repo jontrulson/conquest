@@ -335,7 +335,7 @@ void debugdisplay( int snum )
   int i, j, unum, lin, tcol, dcol;
   real x;
   char buf[MSGMAXLINE];
-  char *torpstr;
+  char *torpstr = "???";
   
 #define TOFF "OFF"
 #define TLAUNCHING "LAUNCHING"
@@ -580,7 +580,7 @@ void debugdisplay( int snum )
 	  torpstr = TFIREBALL;
 	  break;
 	}
-	  cprintf(lin,3,ALIGN_NONE,"#%d#%s",InfoColor, torpstr);
+      cprintf(lin,3,ALIGN_NONE,"#%d#%s",InfoColor, torpstr);
       if ( Ships[snum].torps[i].status != TS_OFF )
 	{
 	  cprintf(lin,13,ALIGN_NONE,"#%d#%6d",InfoColor, Ships[snum].torps[i].fuse);

@@ -69,7 +69,7 @@ void ageServers(void)
 int findSlot(metaSRec_t *srec, int *isupdate)
 {
   int i, found;
-  int rv;
+  int rv = 0;
 
   *isupdate = FALSE;
 

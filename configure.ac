@@ -20,6 +20,7 @@ dnl AC_CANONICAL_TARGET([])
 dnl Checks for programs.
 dnl get the system type and set accordingly.  first init some defaults.
 
+CONQ_CFLAGS=""
 conquest_group=""
 AC_ARG_WITH(conquest-group,
   [  --with-conquest-group=groupname  The conquest group name (Default: conquest)],
@@ -104,11 +105,12 @@ fi
 CONQGROUP="$conquest_group"
 AC_SUBST(CONQGROUP)
 
-
 if test -n "$GCC"
 then
-	CFLAGS="$CFLAGS -D__NO_MATH_INLINES -O2 -fPIC -fno-builtin"
+	CONQ_CFLAGS="-D__NO_MATH_INLINES -Wall -fPIC -fno-builtin"
 fi
+
+AC_SUBST(CONQ_CFLAGS)
 
 AC_PROG_MAKE_SET
 

@@ -180,7 +180,7 @@ int main(int argc, char *argv[])
   char *ch;
   int wantMetaList = FALSE;     /* wants to see a list from metaserver */
   int serveropt = FALSE;        /* specified a server with '-s' */
-  int nums;                     /* num servers from metaGetServerList() */
+  int nums = 0;                     /* num servers from metaGetServerList() */
   char *metaServer = META_DFLT_SERVER; 
   metaSRec_t *metaServerList;   /* list of servers */
 
@@ -373,7 +373,9 @@ int main(int argc, char *argv[])
   /* now we need to negotiate. */
   if (!hello())
     {
+      cdend();
       clog("conquest: hello() failed\n");
+      printf("conquest: hello() failed, check log\n");
       exit(1);
     }
 
@@ -798,7 +800,7 @@ void conqds( int multiple, int switchteams )
   if ( ConqInfo->closed )
     cprintf(lin,0,ALIGN_CENTER,"#%d#%s",RedLevelColor,"The game is closed.");
   else
-    cprintf( lin,col,ALIGN_CENTER,"#%d#%s (%s)",YellowLevelColor,
+    cprintf( lin,0,ALIGN_CENTER,"#%d#%s (%s)",YellowLevelColor,
 	   ConquestVersion, ConquestDate);
   
   lin++;
@@ -882,9 +884,6 @@ void dead( int snum, int leave )
       return;
     }
   
-/* here we spin waiting for a clientstat from the server, processing any
-   other packets we get.*/
-
   kb = Ships[snum].killedby;
 
   /* Figure out why we died. */
@@ -1208,7 +1207,7 @@ void doautopilot( int snum )
 void dobeam( int snum )
 {
   int pnum, num, upmax, downmax, capacity, beamax, i;
-  int dirup;
+  int dirup = FALSE;
   int ch; 
   char buf[MSGMAXLINE];
   real rkills;
@@ -3361,6 +3360,7 @@ int play()
   stopTimer();
 
   c_sleep( 1.0 );
+  clog("INFO: Died, calling dead()");
   dead( Context.snum, Context.leave );
   
   return(TRUE);
@@ -3383,8 +3383,8 @@ int welcome( int *unum )
   char * selected_str="You have been selected to command a";
   char * starship_str=" starship.";
   char * prepare_str="Prepare to be beamed aboard...";
-  spClientStat_t *scstat;
-  spAck_t *sack;
+  spClientStat_t *scstat = NULL;
+  spAck_t *sack = NULL;
   int pkttype;
   Unsgn8 buf[PKT_MAXSIZE];
   
@@ -3546,19 +3546,19 @@ int hello(void)
   if ((pkttype = readPacket(PKT_FROMSERVER, cInfo.sock, 
 			    buf, PKT_MAXSIZE, 10)) < 0)
   {
-    clog("conquest:hello: read sHello failed\n");
+    clog("HELLO: read server hello failed\n");
     return FALSE;
   }
 
   if (pkttype == 0)
   {
-    clog("conquest:hello: read sHello: timeout.\n");
+    clog("HELLO: read server hello: timeout.\n");
     return FALSE;
   }
 
   if (pkttype != SP_HELLO)
   {
-    clog("conquest:hello: read sHello: wrong packet type %d\n", pkttype);
+    clog("HELLO: read server hello: wrong packet type %d\n", pkttype);
     return FALSE;
   }
 
@@ -3572,10 +3572,10 @@ int hello(void)
   sHello.serverver[CONF_SERVER_NAME_SZ - 1] = 0;
   sHello.motd[CONF_SERVER_MOTD_SZ - 1] = 0;
 
-  clog("SRVR HELO: sname = '%s'\n"
-       "           sver = '%s'\n"
-       "           protv = 0x%04hx, cmnr = %d, flags: 0x%02x\n"
-       "           motd = '%s",
+  clog("HELLO: CLNT: sname = '%s'\n"
+       "             sver = '%s'\n"
+       "             protv = 0x%04hx, cmnr = %d, flags: 0x%02x\n"
+       "             motd = '%s",
        sHello.servername,
        sHello.serverver,
        sHello.protover,
@@ -3598,16 +3598,18 @@ int hello(void)
 
   if (!writePacket(PKT_TOSERVER, cInfo.sock, (Unsgn8 *)&chello))
     {
-      clog("hello: write chello failed\n");
+      clog("HELLO: write client hello failed\n");
       return FALSE;
     }
+
+  clog("HELLO: sent client hello to server");
 
   /* now we need a server stat or a Nak */
 
   if ((pkttype = readPacket(PKT_FROMSERVER, cInfo.sock, 
 			    buf, PKT_MAXSIZE, 5)) < 0)
   {
-    clog("conquest:hello: read sHello failed\n");
+    clog("HELLO: read server SP_ACKMSG or SP_ACK failed\n");
     return FALSE;
   }
 
@@ -3634,8 +3636,8 @@ int hello(void)
     {
       procServerStat(buf);
 # if defined(DEBUG_CLIENTPROC)
-      clog("SERVERSTAT: ships = %d, na = %d, nv = %d, nr = %d\n"
-           "            nu = %d flags = 0x%08x",
+      clog("HELLO: recv SP_SERVERSTAT: ships = %d, na = %d, nv = %d, nr = %d\n"
+           " nu = %d flags = 0x%08x",
 	   sStat.numtotal,
 	   sStat.numactive,
 	   sStat.numvacant,
@@ -3646,7 +3648,7 @@ int hello(void)
     }
   else
     {
-      clog("hello: pkttype = %d, was waiting for SP_SERVERSTAT", pkttype);
+      clog("HELLO: pkttype = %d, was waiting for SP_SERVERSTAT", pkttype);
       return FALSE;
     }
 
