@@ -1856,17 +1856,20 @@ static int hello(void)
   /* do some checks - send a NAK and fail if things aren't cool */
   if (chello.protover != PROTOCOL_VERSION)
     {
-      sprintf(cbuf, "HELLO: SVR: protocol mismatch, expect 0x%04x, got 0x%04x",
+      sprintf(cbuf, "SERVER: Protocol mismatch, server 0x%x, client 0x%x",
 	      PROTOCOL_VERSION, chello.protover);
       sendAck(sInfo.sock, PKT_TOCLIENT, PSEV_FATAL, PERR_BADPROTO, cbuf);
+      clog("NET: %s", cbuf);
       return FALSE;
     }
 
   if (chello.cmnrev != COMMONSTAMP)
     {
-      sprintf(cbuf, "HELLO: SVR: CMB mismatch, expect %d, got %d",
+      sprintf(cbuf, "SERVER: commonblock mismatch, expected %d, got %d",
 	      COMMONSTAMP, chello.cmnrev);
       sendAck(sInfo.sock, PKT_TOCLIENT, PSEV_FATAL, PERR_BADCMN, cbuf);
+      clog("NET: %s", cbuf);
+      return FALSE;
     }
 
   if (chello.updates >= 1 && chello.updates <= 10)

@@ -724,19 +724,19 @@ int clientHello(char *clientname)
   if ((pkttype = readPacket(PKT_FROMSERVER, sockl, 
 			    buf, PKT_MAXSIZE, 10)) < 0)
   {
-    clog("HELLO: read server hello failed\n");
+    clog("clientHello: read server hello failed\n");
     return FALSE;
   }
 
   if (pkttype == 0)
   {
-    clog("HELLO: read server hello: timeout.\n");
+    clog("clientHello: read server hello: timeout.\n");
     return FALSE;
   }
 
   if (pkttype != SP_HELLO)
   {
-    clog("HELLO: read server hello: wrong packet type %d\n", pkttype);
+    clog("clientHello: read server hello: wrong packet type %d\n", pkttype);
     return FALSE;
   }
 
@@ -750,10 +750,7 @@ int clientHello(char *clientname)
   sHello.serverver[CONF_SERVER_NAME_SZ - 1] = 0;
   sHello.motd[CONF_SERVER_MOTD_SZ - 1] = 0;
 
-  clog("HELLO: CLNT: sname = '%s'\n"
-       "             sver = '%s'\n"
-       "             protv = 0x%04hx, cmnr = %d, flags: 0x%02x\n"
-       "             motd = '%s",
+  clog("SERVERID:%s:%s:0x%04hx:%d:0x%02x:%s",
        sHello.servername,
        sHello.serverver,
        sHello.protover,
@@ -766,14 +763,14 @@ int clientHello(char *clientname)
       if (connect(cInfo.usock, (const struct sockaddr *)&cInfo.servaddr, 
                   sizeof(cInfo.servaddr)) < 0)
         {
-          clog("NET: clntHello: udp connect() failed: %s", strerror(errno));
+          clog("NET: clientHello: udp connect() failed: %s", strerror(errno));
           cInfo.tryUDP = FALSE;
         }
       else
         {
           /* see if this will succeed in setting up a NAT tunnel
              to the server */
-          clog("NET: send udp to server.");
+          clog("NET: clientHello: send udp to server.");
           udpSend(cInfo.usock, "Open Me", 7, &cInfo.servaddr);
         }
     }
@@ -793,11 +790,11 @@ int clientHello(char *clientname)
 
   if (!writePacket(PKT_TOSERVER, cInfo.sock, (Unsgn8 *)&chello))
     {
-      clog("HELLO: write client hello failed\n");
+      clog("clientHello: write client hello failed\n");
       return FALSE;
     }
 
-  clog("HELLO: sent client hello to server");
+  clog("clientHello: sent hello to server");
 
   if (cInfo.tryUDP)
     {
@@ -831,7 +828,7 @@ int clientHello(char *clientname)
   if ((pkttype = readPacket(PKT_FROMSERVER, sockl, 
 			    buf, PKT_MAXSIZE, 15)) < 0)
   {
-    clog("NET: clntHello: read server SP_ACKMSG or SP_ACK failed\n");
+    clog("clientHello: read of SP_ACK or SP_SERVERSTAT failed\n");
     return FALSE;
   }
 
@@ -842,10 +839,10 @@ int clientHello(char *clientname)
 	  sackmsg = (spAckMsg_t *)buf;
 	  if (sackmsg->txt)
 	    {
-	      clog("conquest:hello:NAK:%s '%s'\n", 
+	      clog("clientHello: %s '%s'\n", 
 		   psev2String(sackmsg->severity), 
 		   sackmsg->txt);
-	      printf("conquest:hello:NAK:%s '%s'\n", 
+	      printf("clientHello: %s '%s'\n", 
 		   psev2String(sackmsg->severity), 
 		   sackmsg->txt);
 
@@ -858,7 +855,7 @@ int clientHello(char *clientname)
     {
       procServerStat(buf);
 # if defined(DEBUG_CLIENTPROC)
-      clog("HELLO: recv SP_SERVERSTAT: ships = %d, na = %d, nv = %d, nr = %d\n"
+      clog("clientHello: recv SP_SERVERSTAT: ships = %d, na = %d, nv = %d, nr = %d\n"
            " nu = %d flags = 0x%08x",
 	   sStat.numtotal,
 	   sStat.numactive,
@@ -870,7 +867,7 @@ int clientHello(char *clientname)
     }
   else
     {
-      clog("HELLO: pkttype = %d, was waiting for SP_SERVERSTAT", pkttype);
+      clog("clientHello: pkttype = %d, was waiting for SP_SERVERSTAT", pkttype);
       return FALSE;
     }
 

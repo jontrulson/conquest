@@ -354,7 +354,7 @@ void display( int snum, int display_info )
 		    GLcvtcoords( cenx, ceny, Ships[i].torps[j].x, 
 				 Ships[i].torps[j].y, scale, &glx, &gly );
 		    
-		    glPutThing( THING_EXPLOSION, glx, gly, 0 );
+		    drawExplosion(glx, gly);
 		  }
 	  /* Now display the live torps. */
 	  

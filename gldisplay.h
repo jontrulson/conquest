@@ -192,7 +192,6 @@ void uiDrawPlanet( GLfloat x, GLfloat y, int pnum, int scale,
                    int textcolor, int scanned );
 void setXtraInfo(void);
 
-void glPutThing(int, GLfloat, GLfloat, int);
 void GLcvtcoords(real cenx, real ceny, real x, real y, real scale,
 		 GLfloat *rx, GLfloat *ry );
 
@@ -232,6 +231,7 @@ void drawLineBox(GLfloat x, GLfloat y,
                  GLfloat w, GLfloat h, int color, 
                  GLfloat lw);
 void drawQuad(GLfloat x, GLfloat y, GLfloat w, GLfloat h);
+void drawExplosion(GLfloat x, GLfloat y);
 
 
 #endif /* _GLDISPLAY_H */

@@ -181,3 +181,33 @@ void dspReplayHelp(void)
 
   return;
 }
+
+/* get the 'real' strlen of a string, skipping past any embedded colors */
+int uiCStrlen(char *buf)
+{
+  register char *p;
+  register int l;
+
+  l = 0;
+  p = buf;
+  while (*p)
+    {
+      if (*p == '#')
+        {                       /* a color sequence */
+          p++;
+          while (*p && isdigit(*p))
+            p++;
+
+          if (*p == '#')
+            p++;
+        }
+      else
+        {
+          p++;
+          l++;
+        }
+    }
+
+  return l;
+}
+

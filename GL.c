@@ -138,35 +138,6 @@ float getFPS(void)
   return FPS;
 }
 
-/* get the 'real' strlen of a string, skipping past any embedded colors */
-int uiCStrlen(char *buf)
-{
-  register char *p;
-  register int l;
-
-  l = 0;
-  p = buf;
-  while (*p)
-    {
-      if (*p == '#')
-        {                       /* a color sequence */
-          p++;
-          while (*p && isdigit(*p))
-            p++;
-
-          if (*p == '#')
-            p++;
-        }
-      else
-        {
-          p++;
-          l++;
-        }
-    }
-
-  return l;
-}
-
 
 /* return a 'space' buffer for padding */
 char *padstr(int l)
@@ -209,28 +180,6 @@ void drawLineBox(GLfloat x, GLfloat y,
   glVertex3f(x + w, y + h, 0.0); /* lr */
   glVertex3f(x, y + h, 0.0); /* ll */
   glEnd();
-
-  return;
-}
-
-void drawRect(GLfloat x, GLfloat y, GLfloat w, GLfloat h)
-{				/* draw a square centered on x,y
-				   USE BETWEEN glBegin/End pair! */
-  const GLfloat z = TRANZ;
-  GLfloat rx, ry;
-
-#if 0
-  clog("%s: x = %f, y = %f, w = %f h = %f\n", __FUNCTION__, x, y,
-       w, h);
-#endif
-
-  rx = x - (w / 2.0);
-  ry = y - (h / 2.0);
-
-  glVertex3f(rx, ry, z); /* ll */
-  glVertex3f(rx + w, ry, z); /* lr */
-  glVertex3f(rx + w, ry + h, z); /* ur */
-  glVertex3f(rx, ry + h, z); /* ul */
 
   return;
 }
@@ -504,35 +453,6 @@ void uiDrawPlanet( GLfloat x, GLfloat y, int pnum, int scale,
   
 }
 
-
-/*  puthing - put an object on the display */
-/*  SYNOPSIS */
-/*    int what, lin, col */
-/*    cumPutThing( what, lin, col ) */
-void glPutThing( int what, GLfloat x, GLfloat y, int id)
-{
-#ifdef DEBUG
-  clog("glputthing: what = %d, lin = %.1f, col = %.1f\n",
-       what, x, y);
-#endif
-
-  /* first things first */
-  if (what == THING_EXPLOSION)
-    {
-      drawExplosion(x, y);
-      return;
-    }
-
-  /* first things first */
-  if (what == THING_DEATHSTAR)
-    {
-      /* nothing here yet. */
-      return;
-    }
-
-  return;
-  
-}
 
 void GLcvtcoords(real cenx, real ceny, real x, real y, real scale,
 		 GLfloat *rx, GLfloat *ry )

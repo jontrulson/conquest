@@ -17,4 +17,5 @@ void uiPutColor(cqColor col);
 void dspReplayMenu(void);
 void dspReplayHelp(void);
 
+int uiCStrlen(char *buf);
 #endif /* _UI_H */

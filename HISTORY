@@ -16,6 +16,8 @@ Version 8.0.1h 8/10/2004 (devel)
         - torp packets are no longer sent, only recorded.  TorpEvent
           packets are the only torp packets sent to the client now.
 
+        - cleaned up GL.c a bit.
+
 Version 8.0.1g 8/08/2004 (devel)
 
         - Planet and torpedo trajectories are now computed in the
