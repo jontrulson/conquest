@@ -11,6 +11,8 @@
 
 Version 8.0.1q 12/11/2004 (devel)
 
+        - another in a long line of 8.1 release candidates
+
         - FEEDBACK messages (beaming/bombing, etc) are now sent
           directly from the server rather than being enqueued into the
           common block's message ring for later delivery.  This avoids
@@ -34,7 +36,8 @@ Version 8.0.1q 12/11/2004 (devel)
           ship that is moving.
 
         - When a team is geno'd, all armies of that team still
-          residing on live ships are also destroyed.
+          residing on live ships are also destroyed.  A message is
+          sent to a team when it is genocided notifying them of this.
 
         - semaphore interface cleaned up
 
