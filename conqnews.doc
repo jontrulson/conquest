@@ -48,21 +48,22 @@
             cygipc
             bison
             flex
+            crypt
 
             I think that is all, let me know if there are others I
             forgot...
 
-          - You will need to be sure ipc_daemon2 (part of the cygipc
+          - You will need to be sure ipc-daemon2 (part of the cygipc
             package) is running before building/running conquest, or
             you will get semget() errors.
 
             Start it like so:
 
-            ipc_daemon2 &
+            ipc-daemon2 &
 
           - added better mmap() check for cygwin systems.  We don't
-            care about MAP_FIXED in Conquest anyways, so who cares if
-            it doesn't work.
+            use MAP_FIXED in Conquest anyways, so we don't care if it
+            doesn't work.
 
           - default to 'Users" conquest group for cygwin.
 
@@ -77,7 +78,7 @@
             linker seems to have 'issues' with external references to
             struct arrays.
 
-          - sem.c - some changes to deal with unimplemeted cygwin
+          - sem.c - some changes to deal with unimplemented cygwin
             semctl() operations.
 
           - rxvt's choice of colors seems to be off... non-bold white
