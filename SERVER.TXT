@@ -98,7 +98,7 @@ CONTENTS:
 
     Something like the following is a good idea:
 
-        # conquest -d -u nobody
+        # conquestd -d -u nobody
 
     This will have conquestd setuid() permanently to user 'nobody'
     before beginning operations.  On most unix systems, user 'nobody'
@@ -250,20 +250,20 @@ CONTENTS:
     Here are a few examples for starting the server (the '#' prompt
     implies you are running these as root):
 
-    # conquest -d -u nobody
+    # conquestd -d -u nobody
 
       Runs a server as user nobody.
 
-    # conquest -d -u nobody -l
+    # conquestd -d -u nobody -l
 
       Runs a server as user nobody.  Only local clients can connect.
 
-    # conquest -d -u nobody -m
+    # conquestd -d -u nobody -m
 
       Runs a server as user nobody.  Notifies the Conquest Meta server
       about your server.
 
-    # conquest -d -u nobody -m -N conquest.radscan.com
+    # conquestd -d -u nobody -m -N conquest.radscan.com
 
       Runs a server as user nobody, notifies the Conquest Meta server
       of the game, and tells the metaserver that the address
