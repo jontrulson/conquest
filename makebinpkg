@@ -1,0 +1,44 @@
+#!/bin/ksh
+#
+# makebinpkg - make a bin distribution
+#
+# Jon Trulson - 6/1/96
+#
+# $Id$
+#
+# $Log$
+# Revision 1.1  1997/05/24 19:40:45  jon
+# Initial revision
+#
+#
+##############################################################################
+# set -x
+
+VERSION=`grep ConquestVersion version.c`
+VERSION=`echo $VERSION |tr -d '$;"' |cut -d: -f2- |tr -d " "`
+
+CONQVER="conquest-$VERSION"
+
+ARCFILE="${CONQVER}.pkg"
+
+rm -f ${ARCFILE}.tar.gz
+
+echo Arcive name: $ARCFILE
+
+CURDIR=$(pwd)
+
+./UpdatePkginfo
+rm -f ChangeLog
+pkgmk -d $CURDIR/pkg -o SRCDIR="$CURDIR"
+pkgtrans -s $CURDIR/pkg $CURDIR/$ARCFILE conquest
+
+cp conquest.txt ${CONQVER}.txt
+
+tar -cvf ${CONQVER}.pkg.tar ${ARCFILE} ${CONQVER}.txt README INSTALL
+
+gzip -v ${CONQVER}.pkg.tar
+
+
+exit
+	
+
