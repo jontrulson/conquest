@@ -54,6 +54,7 @@ int GetSysConf(int checkonly)
   sysconf_AllowSigquit = FALSE;
   sysconf_AllowSwitchteams = TRUE;
   sysconf_UserExpiredays = DEFAULT_USEREXPIRE;
+  sysconf_LogMessages = FALSE;
 
 				/* start building the filename */
   sprintf(conf_name, "%s/%s", CONQHOME, SYSCONFIG_FILE);

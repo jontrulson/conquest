@@ -242,6 +242,18 @@ struct Conf SysConfData[] =
       "#  Default: 120   ",
       NULL
     }
+  },
+  {
+    FALSE,
+    CTYPE_BOOL,
+    "log_messages=",
+    &sysconf_LogMessages,
+    "Log all player messages into the log file.",
+    {
+      "# Whether or not to log all player messages into the logfile.",
+      "#  Default: false   ",
+      NULL
+    }
   }
 };
 #endif /* NOEXTERN */
