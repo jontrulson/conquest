@@ -107,7 +107,6 @@ conqai_SOURCES = conqai_main.c c_defs.h defs.h conqdef.h conqcom.h \
 conqai_LDADD = libconquest.la 
 
 conqoper_SOURCES = conqoper.c c_defs.h defs.h conqdef.h conqcom.h context.h
-conqoper_LDADD = libconqclnt.la libconquest.la libUi.la libUiCU.la 
 conqoper_LDADD = libUiCU.la libUi.la libconqclnt.la libconquest.la
 
 conqdriv_SOURCES = conqdriv.c c_defs.h defs.h conqdef.h conqcom.h context.h

@@ -11,15 +11,27 @@
 
 Version 8.0.1m 11/14/2004 (stable)
 
-        - builds under cygwin again.  The latest cygwin curses
-          (11/14/2004) seems to be broken however.  All the curses
-          programs (conqoper, conquest) core in basic curses functions
-          for me.  Worked fine with previous cygwin.  Everything else,
-          including the GL client conquestgl, seem to work ok though.
-          Strange.
+        - builds under cygwin (11/11/2004) again.  Both the server and
+          clients (including the OpenGL client, conquestgl) seem to
+          run fine again.
 
-          Good enough to run the GL client to a remote server though
-          :) 
+          SW OpenGL is a little slow, but playable (depending on your
+          processor speed).  You may want to turn off the viewer
+          background image in (O)ptions to gain more FPS.  I get about
+          20 FPS in SR view on a Pentium M 1.8 Ghz, fast enough for
+          conquest's needs :)  
+
+          Make sure to read README.cygwin for important info on
+          building under Cygwin.
+
+        - updated autotools/libtools to deal with some cygwin issues
+          with curses linking.
+
+        - move rndini() calls to be before rndlb usage to prevent
+          infinite loops in rndlb on cygwin systems.  
+
+        - doomsday protocol was not being recorded in client-side
+          game recordings.  Sorry.
 
         - removed last traces of glut bitmap font usage
 
@@ -27,14 +39,11 @@ Version 8.0.1m 11/14/2004 (stable)
 
         - remove old, unused code (CONQUEST_USER, ALT_RND, etc)
 
-        - move rndini() calls to be before lcommon creation to prevent
-          infinite loop in rndlb on cygwin systems.
-
         - Use ALT-S to toggle display of FPS and Kb/s stats in
-          cockpit.
+          cockpit (conquestgl).
 
-        - use CTL-R in the cockpit to force a complete refresh from
-          the server.  
+        - use CTL-R in the cockpit to force a complete packet refresh
+          from the server.
 
 Version 8.0.1l 10/22/2004 (devel)
 
@@ -59,8 +68,7 @@ Version 8.0.1l 10/22/2004 (devel)
 
         - I think the GL client is working well enough for a stable
           release now.  Of course there are tons of things that could
-          be done to pretty it up more, but I think it's good enough
-          for now.
+          be done to pretty it up more, but it's good enough for now.
 
 
 Version 8.0.1k 9/25/2004 (devel)

@@ -631,6 +631,9 @@ int procDoomsday(Unsgn8 *buf)
   if (!validPkt(SP_DOOMSDAY, buf))
     return FALSE;
 
+  if (Context.recmode == RECMODE_ON)
+    recordWriteEvent(buf);
+
   Doomsday->status = dd->status;
   Doomsday->heading =(real)((real)ntohs(dd->heading) / 10.0);
   Doomsday->x = (real)((real)((Sgn32)ntohl(dd->x)) / 1000.0);

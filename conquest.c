@@ -336,6 +336,7 @@ int main(int argc, char *argv[])
 	exit(1);
       }
 
+  rndini( 0, 0 );		/* initialize random numbers */
   
 #ifdef DEBUG_CONFIG
   clog("%s@%d: main() Reading Configuration files.", __FILE__, __LINE__);
@@ -404,8 +405,6 @@ int main(int argc, char *argv[])
     }
 
 
-  rndini( 0, 0 );		/* initialize random numbers */
-  
   /* a parallel universe, it is */
   map_lcommon();
 
