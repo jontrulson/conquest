@@ -5,13 +5,11 @@ Entered-date:   1997-12-24
 Description:    Multi-player, curses based, space warfare game.
 Keywords:       multiuser game conquest space warfare die curses fun unix
 Author:         Original VMS/Ratfor (1985): Craig Leres, Jef Poskanzer
-Author:         Unix/C (1996-1998):         Jon Trulson
-Author:         Linux port:                 Dave Payne
+Author:         Unix/C translation/port (1996-1998): Jon Trulson
+Author:         Linux porting work: Dave Payne
 Maintained-by:  Jon Trulson <jon@radscan.com>, http://home.rmi.net/~jon
 Primary-site:   http://home.rmi.net/~jon,  
 Primary-site:   ftp://ftp.freebird.org/unixware/freebird/games/conquest/ 
 Alternate-site: ftp://sunsite.unc.edu/pub/Linux/games/multiplayer/
-Copying-policy: Original policy spelled out by Craig Leres and
-Copying-policy: Jef Poskanzer - freely distributable with accompanying
-Copying-policy: copyright notices, attributions, and documentation.
+Copying-policy: Artistic License (see the LICENSE file in the distribution)
 End

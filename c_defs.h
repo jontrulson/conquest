@@ -405,6 +405,7 @@ void setopertimer(void);
 void toggle_line(int snum, int old_snum);
 char *build_toggle_str(char snum_str[], int snum);
 void menu_item( char *option, char *msg_line, int lin, int col );
+int DoInit(char InitChar, int cmdline);
 
 /* conqai.c */
 void buildai( int snum, int vars[], int *bnenum, real *bdne, real *bane );

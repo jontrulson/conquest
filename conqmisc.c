@@ -98,7 +98,7 @@ void appship( int snum, char *str )
   ch = 'S';
   if ( snum > 0 && snum <= MAXSHIPS )
     {
-      i = steam[snum];
+      i = Ships[snum].team;
       if ( i >= 0 && i < NUMTEAMS )
 	ch = chrteams[i];
     }
@@ -134,9 +134,10 @@ int canread( int snum, int msgnum )
   
   /* It's to us. */
   if ( to == snum )
-    {				/* extra check to see if from is a robot
+    {				/* extra check to see if is from a robot
 				   and to is a valid ship */
-      if (conf_NoRobotMsgs == TRUE && srobot[from] == TRUE && 
+      if (conf_NoRobotMsgs == TRUE && from > 0 &&
+	  Ships[from].robot == TRUE && 
 	  (snum > 0 && snum <= MAXSHIPS))
 	{                       /* see if it's a robot, if so ignore */
           return(FALSE);
@@ -170,24 +171,25 @@ int canread( int snum, int msgnum )
     {
 				/* if user doesn't want robot msgs
 				   don't show any */
-      if (conf_NoRobotMsgs == TRUE && srobot[from] == TRUE)
+      if (conf_NoRobotMsgs == TRUE && from > 0 && 
+	  Ships[from].robot == TRUE)
 	{			/* see if it's a robot, if so ignore */
 	  return(FALSE);
 	}
       
       /* We can only read team messages if we're not self-war. */
-      if ( ( -to == steam[snum] ) && ! selfwar(snum) )
+      if ( ( -to == Ships[snum].team ) && ! selfwar(snum) )
 	{
 	  /* Planet alert for our team. */
 	  if ( -from > 0 && -from <= NUMPLANETS )
-	    return ( soption[snum][OPT_INTRUDERALERT] );
+	    return ( Ships[snum].options[OPT_INTRUDERALERT] );
 	  else
 	    return ( TRUE );
 	}
       
       /* See if we are allowed to read GOD messages. */
       if ( to == MSG_GOD || from == MSG_GOD || to == MSG_IMPLEMENTORS )
-	return ( uooption[suser[snum]][OOPT_GODMSG] );
+	return ( Users[Ships[snum].unum].ooptions[OOPT_GODMSG] );
     }
   
   /* If we got here, we can't read it. */
@@ -258,11 +260,11 @@ void doomfind(void)
 	}
   
   for ( i = 1; i <= MAXSHIPS; i = i + 1 )
-    if ( sstatus[i] == SS_LIVE )
+    if ( Ships[i].status == SS_LIVE )
       {
 	taste = ( 1.0 +
-		 skills[i] * KILLS_KILLS +
-		 sarmies[i] * ARMY_KILLS ) / dist(*dx, *dy, sx[i], sy[i]);
+		 Ships[i].kills * KILLS_KILLS +
+		 Ships[i].armies * ARMY_KILLS ) / dist(*dx, *dy, Ships[i].x, Ships[i].y);
 	if ( taste > tastiness )
 	  {
 	    tastiness = taste;
@@ -273,7 +275,7 @@ void doomfind(void)
   if ( *dlock < 0 )
     *dhead = angle( *dx, *dy, px[-*dlock], py[-*dlock] );
   else if ( *dlock > 0 )
-    *dhead = angle( *dx, *dy, sx[*dlock], sy[*dlock] );
+    *dhead = angle( *dx, *dy, Ships[*dlock].x, Ships[*dlock].y );
   
   return;
   
@@ -308,7 +310,7 @@ int findorbit( int snum, int *pnum )
   
   for ( i = 1; i <= NUMPLANETS; i = i + 1 )
     if ( preal[i] &&
-	( dist( sx[snum], sy[snum], px[i], py[i] ) <= ORBIT_DIST ) )
+	( dist( Ships[snum].x, Ships[snum].y, px[i], py[i] ) <= ORBIT_DIST ) )
       {
 	*pnum = i;
 	return ( TRUE );
@@ -332,17 +334,17 @@ int findship( int *snum )
   PVLOCK(lockword);
   *snum = -1;
   for ( i = 1; i <= MAXSHIPS; i = i + 1 )
-    if ( sstatus[i] == SS_OFF )
+    if ( Ships[i].status == SS_OFF )
       {
 	*snum = i;
 	zeroship( *snum );
-	sstatus[*snum] = SS_RESERVED;
-	slastmsg[*snum] = LMSG_NEEDINIT;
-	ssdfuse[*snum] = -TIMEOUT_PLAYER;
-	sctime[*snum] = 0;
-	setime[*snum] = 0;
-	scacc[*snum] = 0;
-	seacc[*snum] = 0;
+	Ships[*snum].status = SS_RESERVED;
+	Ships[*snum].lastmsg = LMSG_NEEDINIT;
+	Ships[*snum].sdfuse = -TIMEOUT_PLAYER;
+	Ships[*snum].ctime = 0;
+	Ships[*snum].etime = 0;
+	Ships[*snum].cacc = 0;
+	Ships[*snum].eacc = 0;
 	break;
       }
   PVUNLOCK(lockword);
@@ -378,7 +380,7 @@ int findspecial( int snum, int token, int count, int *sorpnum, int *xsorpnum )
     case SPECIAL_TEAMSHIP:
       /* Nearest ship, nearest enemy ship, and nearest team ship. */
       for ( i = 1; i <= MAXSHIPS; i = i + 1 )
-	if ( i != snum && sstatus[i] == SS_LIVE )
+	if ( i != snum && Ships[i].status == SS_LIVE )
 	  {
 	    switch ( token )
 	      {
@@ -389,7 +391,7 @@ int findspecial( int snum, int token, int count, int *sorpnum, int *xsorpnum )
 		valid = TRUE;
 		break;
 	      case SPECIAL_TEAMSHIP:
-		valid = ( steam[i] == steam[snum] &&
+		valid = ( Ships[i].team == Ships[snum].team &&
 			 ! satwar(snum, i) );
 		break;
 	      default:
@@ -398,12 +400,12 @@ int findspecial( int snum, int token, int count, int *sorpnum, int *xsorpnum )
 	    if ( valid )
 	      {
 #ifdef WARP0CLOAK
-		if (scloaked[i] && swarp[i] == 0.0 && 
+		if (Ships[i].cloaked && Ships[i].warp == 0.0 && 
 		    satwar(snum, i) &&
-		    srobot[snum])
+		    Ships[snum].robot)
 		  continue; /* nobody here but us chickens... */
 #endif /* WARP0CLOAK */
-		td = dist(sx[snum], sy[snum], sx[i], sy[i]);
+		td = dist(Ships[snum].x, Ships[snum].y, Ships[i].x, Ships[i].y);
 		if ( td < nd )
 		  if ( td < d )
 		    {
@@ -422,7 +424,7 @@ int findspecial( int snum, int token, int count, int *sorpnum, int *xsorpnum )
       break;
     case SPECIAL_HOMEPLANET:
       /* Home planet. */
-      switch ( steam[snum] )
+      switch ( Ships[snum].team )
 	{
 	case TEAM_FEDERATION:
 	  *sorpnum = homeplanet[TEAM_FEDERATION];
@@ -451,8 +453,8 @@ int findspecial( int snum, int token, int count, int *sorpnum, int *xsorpnum )
 	  if ( ptype[i] == PLANET_SUN || ptype[i] == PLANET_MOON )
 	    continue; 
 
-	  valid = ( pscanned[i][steam[snum]] &&
-		    pteam[i] != steam[snum] );
+	  valid = ( pscanned[i][Ships[snum].team] &&
+		    pteam[i] != Ships[snum].team );
 
 	  /* Handle army threshold logic. */
 	  if ( valid )
@@ -462,7 +464,7 @@ int findspecial( int snum, int token, int count, int *sorpnum, int *xsorpnum )
 	    {
 	      ta = parmies[i];
 	      tu = puninhabtime[i];
-	      td = dist(sx[snum], sy[snum], px[i], py[i]);
+	      td = dist(Ships[snum].x, Ships[snum].y, px[i], py[i]);
 	      
 	      /* Uninhabitable time is of next importance, */
 	      /*  number of armies is of first importantance, and */
@@ -501,7 +503,7 @@ int findspecial( int snum, int token, int count, int *sorpnum, int *xsorpnum )
       /* Determine if we at peace with all teams. */
       peaceful = TRUE;
       for ( i = 0; i < NUMTEAMS; i = i + 1 )
-	if ( swar[snum][i] )
+	if ( Ships[snum].war[i] )
 	  {
 	    peaceful = FALSE;
 	    break;
@@ -519,16 +521,16 @@ int findspecial( int snum, int token, int count, int *sorpnum, int *xsorpnum )
 	  switch ( token )
 	    {
 	    case SPECIAL_ARMYPLANET:
-	      valid = ( pteam[i] == steam[snum] );
+	      valid = ( pteam[i] == Ships[snum].team );
 	      break;
 	    case SPECIAL_ENEMYPLANET:
-	      valid = ( ! pscanned[i][steam[snum]] ||
+	      valid = ( ! pscanned[i][Ships[snum].team] ||
 		       ( parmies[i] > 0 &&
 			spwar( snum, i ) &&
 			ptype[i] != PLANET_MOON ) );
 	      break;
 	    case SPECIAL_FUELPLANET:
-	      valid = ( ( pscanned[i][steam[snum]] || peaceful ) &&
+	      valid = ( ( pscanned[i][Ships[snum].team] || peaceful ) &&
 		       ! spwar( snum, i ) &&
 		       parmies[i] > 0 &&
 		       ptype[i] == PLANET_CLASSM );
@@ -537,13 +539,13 @@ int findspecial( int snum, int token, int count, int *sorpnum, int *xsorpnum )
 	      valid = TRUE;
 	      break;
 	    case SPECIAL_REPAIRPLANET:
-	      valid = ( ( pscanned[i][steam[snum]] || peaceful ) &&
+	      valid = ( ( pscanned[i][Ships[snum].team] || peaceful ) &&
 		       ! spwar( snum, i ) &&
 		       parmies[i] > 0 &&
 		       ptype[i] != PLANET_MOON );
 	      break;
 	    case SPECIAL_TEAMPLANET:
-	      valid = ( pteam[i] == steam[snum] );
+	      valid = ( pteam[i] == Ships[snum].team );
 	      break;
 	    default:
 	      return ( FALSE );		/* this can't happen */
@@ -557,7 +559,7 @@ int findspecial( int snum, int token, int count, int *sorpnum, int *xsorpnum )
 		break;
 	      case SPECIAL_PLANET:
 	      case SPECIAL_ENEMYPLANET:
-		valid = ( ! pscanned[i][steam[snum]] ||
+		valid = ( ! pscanned[i][Ships[snum].team] ||
 			 parmies[i] >= count );
 		break;
 	      case SPECIAL_FUELPLANET:
@@ -570,7 +572,7 @@ int findspecial( int snum, int token, int count, int *sorpnum, int *xsorpnum )
 	      }
 	  if ( valid )
 	    {
-	      td = dist(sx[snum], sy[snum], px[i], py[i]);
+	      td = dist(Ships[snum].x, Ships[snum].y, px[i], py[i]);
 	      if ( td < nd )
 		if ( td < d )
 		  {
@@ -604,9 +606,9 @@ void fixdeltas( int snum )
 {
   real speed;
   
-  speed = swarp[snum] * MM_PER_SEC_PER_WARP * ITER_SECONDS;
-  sdx[snum] = speed * cosd(shead[snum]);
-  sdy[snum] = speed * sind(shead[snum]);
+  speed = Ships[snum].warp * MM_PER_SEC_PER_WARP * ITER_SECONDS;
+  Ships[snum].dx = speed * cosd(Ships[snum].head);
+  Ships[snum].dy = speed * sind(Ships[snum].head);
   
   return;
   
@@ -625,8 +627,8 @@ int gunum( int *unum, char *lname )
   
   *unum = -1;
   for ( i = 0; i < MAXUSERS; i = i + 1 )
-    if ( ulive[i] )
-      if ( strcmp( lname, cuname[i] ) == 0 )
+    if ( Users[i].live )
+      if ( strcmp( lname, Users[i].username ) == 0 )
 	{
 	  *unum = i;
 	  return ( TRUE );
@@ -679,10 +681,10 @@ void histlist( int godlike )
 	      
 	      if ( unum < 0 || unum >= MAXUSERS )
 		continue; /* jet next;*/
-	      if ( ! ulive[unum] )
+	      if ( ! Users[unum].live )
 		continue; /* jet next */
 	      cprintf( lin,col,ALIGN_NONE, "#%d#%-12s %17s", YellowLevelColor,
-			cuname[unum], histlog[i] );
+			Users[unum].username, histlog[i] );
 	      lin++;
 	      if ( lin > lline )
 		{
@@ -734,7 +736,7 @@ void initeverything(void)
   
   /* De-register all users. */
   for ( i = 0; i < MAXUSERS; i = i + 1 )
-    ulive[i] = FALSE;
+    Users[i].live = FALSE;
   
   *celapsedseconds = 0;
   *ccpuseconds = 0;
@@ -1342,12 +1344,12 @@ void initrobots(void)
 #define SETROBOT(x, y, z) \
   { \
       if ( gunum( &unum, x ) ) \
-      stcpn( y, upname[unum], MAXUSERPNAME ); \
+      stcpn( y, Users[unum].alias, MAXUSERPNAME ); \
       else if ( c_register( x, y, z, &unum ) ) \
       { \
-	  urobot[unum] = TRUE; \
-	  uooption[unum][OOPT_MULTIPLE] = TRUE; \
-	  umultiple[unum] = MAXSHIPS; \
+	  Users[unum].robot = TRUE; \
+	  Users[unum].ooptions[OOPT_MULTIPLE] = TRUE; \
+	  Users[unum].multiple = MAXSHIPS; \
       } \
   }
     
@@ -1383,61 +1385,61 @@ void initship( int snum, int unum )
   int i, j;
   
   /* sstatus(snum)				# never modified here */
-  skilledby[snum] = 0;
+  Ships[snum].killedby = 0;
   /* suser(snum)				# setup in menu() or newrob() */
   /* steam(snum)				# setup in menu() or newrob() */
   /* spid(snum)				# setup in menu() or newrob() */
-  sstrkills[snum] = 0.0;	/* init to 0.0, newrob will init this
+  Ships[snum].strkills = 0.0;	/* init to 0.0, newrob will init this
 				   for robots to make them stronger, faster.. ;-) */
-  sx[snum] = 0.0;
-  sy[snum] = 0.0;
-  sdx[snum] = 0.0;
-  sdy[snum] = 0.0;
-  shead[snum] = 0.0;
-  sdhead[snum] = 0.0;
-  swarp[snum] = 0.0;
-  sdwarp[snum] = 0.0;
-  slock[snum] = 0;
-  sshup[snum] = TRUE;
-  sshields[snum] = 100.0;
-  skills[snum] = 0.0;
-  sdamage[snum] = 0.0;
-  sfuel[snum] = 999.0;
-  swtemp[snum] = 0.0;
-  setemp[snum] = 0.0;
-  swfuse[snum] = 0;
-  sefuse[snum] = 0;
-  sweapons[snum] = 40;
-  sengines[snum] = 100 - sweapons[snum];
-  sarmies[snum] = 0;
-  srmode[snum] = FALSE;
-  scloaked[snum] = FALSE;
+  Ships[snum].x = 0.0;
+  Ships[snum].y = 0.0;
+  Ships[snum].dx = 0.0;
+  Ships[snum].dy = 0.0;
+  Ships[snum].head = 0.0;
+  Ships[snum].dhead = 0.0;
+  Ships[snum].warp = 0.0;
+  Ships[snum].dwarp = 0.0;
+  Ships[snum].lock = 0;
+  Ships[snum].shup = TRUE;
+  Ships[snum].shields = 100.0;
+  Ships[snum].kills = 0.0;
+  Ships[snum].damage = 0.0;
+  Ships[snum].fuel = 999.0;
+  Ships[snum].wtemp = 0.0;
+  Ships[snum].etemp = 0.0;
+  Ships[snum].wfuse = 0;
+  Ships[snum].efuse = 0;
+  Ships[snum].weapalloc = 40;
+  Ships[snum].engalloc = 100 - Ships[snum].weapalloc;
+  Ships[snum].armies = 0;
+  Ships[snum].rmode = FALSE;
+  Ships[snum].cloaked = FALSE;
   /* soption(snum,i)				# setup in menu() */
   for ( i = 0; i < NUMTEAMS; i = i + 1 )
     {
       /* srwar(snum,i)				# setup in menu() or newrob() */
       /* swar(snum,i)				# setup in menu() or newrob() */
-      sscanned[snum][i] = 0;
+      Ships[snum].scanned[i] = 0;
     }
   for ( i = 1; i <= NUMPLANETS; i = i + 1 )
-    ssrpwar[snum][i] = FALSE;
+    Ships[snum].srpwar[i] = FALSE;
   /* ssdfuse(snum)				# setup in findship() */
   PVLOCK(lockmesg);
-  if ( slastmsg[snum] == LMSG_NEEDINIT )
+  if ( Ships[snum].lastmsg == LMSG_NEEDINIT )
     {
-      slastmsg[snum] = *lastmsg;
-      salastmsg[snum] = slastmsg[snum];
+      Ships[snum].lastmsg = *lastmsg;
+      Ships[snum].alastmsg = Ships[snum].lastmsg;
     }
   PVUNLOCK(lockmesg);
-  smap[snum] = FALSE;
-  stowing[snum] = 0;
-  stowedby[snum] = 0;
-  slastblast[snum] = 0.0;
-  slastphase[snum] = 0.0;
-  spfuse[snum] = 0;
-  stalert[snum] = FALSE;
-  srobot[snum] = FALSE;
-  saction[snum] = 0;
+  Ships[snum].map = FALSE;
+  Ships[snum].towing = 0;
+  Ships[snum].towedby = 0;
+  Ships[snum].lastblast = 0.0;
+  Ships[snum].lastphase = 0.0;
+  Ships[snum].pfuse = 0;
+  Ships[snum].talert = FALSE;
+  Ships[snum].robot = FALSE;
+  Ships[snum].action = 0;
   /* spname(1,snum)				# setup in menu() or newrob() */
   
   /* Zero torpedos. */
@@ -1455,12 +1457,12 @@ void initship( int snum, int unum )
     }
   
   /* Update user some stats. */
-  getdandt( ulastentry[unum] );		/* time stamp for this entry */
-  if ( ulastentry[unum][9] == ' ' )		/* remove seconds */
-    strcpy(&ulastentry[unum][6], &ulastentry[unum][9]);
-  /*    scopy( ulastentry[unum], 9, ulastentry[unum], 6 );*/
-  ustats[unum][USTAT_ENTRIES] = ustats[unum][USTAT_ENTRIES] + 1;
-  tstats[steam[snum]][TSTAT_ENTRIES] = tstats[steam[snum]][TSTAT_ENTRIES] + 1;
+  getdandt( Users[unum].lastentry );		/* time stamp for this entry */
+  if ( Users[unum].lastentry[9] == ' ' )		/* remove seconds */
+    strcpy(&(Users[unum].lastentry[6]), &(Users[unum].lastentry[9]));
+
+  Users[unum].stats[USTAT_ENTRIES] += 1;
+  tstats[Ships[snum].team][TSTAT_ENTRIES] = tstats[Ships[snum].team][TSTAT_ENTRIES] + 1;
   
   return;
   
@@ -1635,7 +1637,7 @@ void intrude( int snum, int pnum )
 	appint( parmies[pnum], buf );
 	stormsg( -pnum, -pteam[pnum], buf );
       }
-    else if ( swar[snum][pteam[pnum]] )
+    else if ( Ships[snum].war[pteam[pnum]] )
       {
 	c_strcpy( "INTRUDER ALERT - ", buf );
 	appship( snum, buf );
@@ -1682,14 +1684,14 @@ real newarp( int snum, real dwarp )
 {
   real x, acc;
   
-  x = dwarp - swarp[snum];
-  acc = (real) accelfac[steam[snum]] * (real) engeff( snum ) * ITER_SECONDS;
+  x = dwarp - Ships[snum].warp;
+  acc = (real) accelfac[Ships[snum].team] * (real) engeff( snum ) * ITER_SECONDS;
   if ( acc >= fabs( x ) )
     return ( dwarp );			/* close enough (or equal) */
   else if ( x < 0.0 )
-    return ( swarp[snum] - acc );
+    return ( Ships[snum].warp - acc );
   
-  return ( swarp[snum] + acc );
+  return ( Ships[snum].warp + acc );
   
 }
 
@@ -1855,13 +1857,13 @@ void putship( int snum, real basex, real basey )
       /* If we're doing poorly, expand the area of entry. */
       if ( mod( j, 16 ) == 0 )
 	smear = smear * 1.2;
-      sx[snum] = rndnor( basex, smear );
-      sy[snum] = rndnor( basey, smear );
+      Ships[snum].x = rndnor( basex, smear );
+      Ships[snum].y = rndnor( basey, smear );
       for ( i = 1; i <= MAXSHIPS; i = i + 1 )
-	if ( sstatus[i] == SS_LIVE )
+	if ( Ships[i].status == SS_LIVE )
 	  if ( satwar( i, snum ) &&
 	      i != snum &&
-	      dist( sx[snum], sy[snum], sx[i], sy[i] ) <= ENTRY_ENEMY_DIST )
+	      dist( Ships[snum].x, Ships[snum].y, Ships[i].x, Ships[i].y ) <= ENTRY_ENEMY_DIST )
 	    goto clbl1; /* jet next;  2; */
       /* If we got here, then the position isn't near an enemy ship. */
       return;
@@ -2050,7 +2052,7 @@ void sendmsg( int from, int terse )
 	  c_putmsg( "No such ship.", MSG_LIN2 );
 	  return;
 	}
-      if ( sstatus[j] != SS_LIVE )
+      if ( Ships[j].status != SS_LIVE )
 	{
 	  c_putmsg( nf, MSG_LIN2 );
 	  return;
@@ -2089,7 +2091,7 @@ void sendmsg( int from, int terse )
   c_strcpy( "Message to ", buf );
   if ( to > 0 && to <= MAXSHIPS )
     {
-      if ( sstatus[to] != SS_LIVE )
+      if ( Ships[to].status != SS_LIVE )
 	{
 	  c_putmsg( nf, MSG_LIN2 );
 	  return;
@@ -2147,7 +2149,7 @@ void sendmsg( int from, int terse )
 	c_strcpy( "Communique from ", buf );
 	if ( from > 0 && from <= MAXSHIPS )
 	  {
-	    appstr( spname[from], buf );
+	    appstr( Ships[from].alias, buf );
 	    appstr( " on board ", buf );
 	    appship( from, buf );
 	  }
@@ -2220,13 +2222,13 @@ int spwar( int snum, int pnum )
     case TEAM_ROMULAN:
     case TEAM_KLINGON:
     case TEAM_ORION:
-      if ( pteam[pnum] == steam[snum] )
+      if ( pteam[pnum] == Ships[snum].team )
 	return ( FALSE );
       else
-	return ( swar[snum][pteam[pnum]] );
+	return ( Ships[snum].war[pteam[pnum]] );
       break;
     default:
-      return ( ssrpwar[snum][pnum] );
+      return ( Ships[snum].srpwar[pnum] );
     }
   
   /*    return ( TRUE );			/* can't get here... */
@@ -2246,23 +2248,23 @@ int stillalive( int snum )
     return(TRUE);
 
   /* Look for religious trouble or the "closed" sign in the window. */
-  if ( uooption[suser[snum]][OOPT_SHITLIST] )
+  if ( Users[Ships[snum].unum].ooptions[OOPT_SHITLIST] )
     {
-      if ( sstatus[snum] == SS_LIVE )
+      if ( Ships[snum].status == SS_LIVE )
 	killship( snum, KB_SHIT );
       return ( FALSE );
     }
-  if ( *closed && ! uooption[suser[snum]][OOPT_PLAYWHENCLOSED] )
+  if ( *closed && ! Users[Ships[snum].unum].ooptions[OOPT_PLAYWHENCLOSED] )
     {
-      if ( sstatus[snum] == SS_LIVE )
+      if ( Ships[snum].status == SS_LIVE )
 	killship( snum, KB_EVICT );
       return ( FALSE );
     }
   
-  if ( sstatus[snum] == SS_RESERVED || sstatus[snum] == SS_ENTERING )
+  if ( Ships[snum].status == SS_RESERVED || Ships[snum].status == SS_ENTERING )
     return ( TRUE );
   
-  return ( sstatus[snum] == SS_LIVE );
+  return ( Ships[snum].status == SS_LIVE );
   
 }
 
@@ -2286,8 +2288,8 @@ void stormsg( int from, int to, char *msg )
   
   /* Remove allowable last message restrictions. */
   for ( i = 1; i <= MAXSHIPS; i = i + 1 )
-    if ( nlastmsg == salastmsg[i] )
-      salastmsg[i] = LMSG_READALL;
+    if ( nlastmsg == Ships[i].alastmsg )
+      Ships[i].alastmsg = LMSG_READALL;
   PVUNLOCK(lockmesg);
   
   return;
@@ -2307,55 +2309,55 @@ int usefuel( int snum, real fuel, int weapon )
     return ( FALSE );
   if ( weapon )
     {
-      if ( swfuse[snum] > 0 )
+      if ( Ships[snum].wfuse > 0 )
 	return ( FALSE );
     }
   else
     {
-      if ( sefuse[snum] > 0 )
+      if ( Ships[snum].efuse > 0 )
 	{
-	  sdwarp[snum] = 0.0;
+	  Ships[snum].dwarp = 0.0;
 	  return ( FALSE );
 	}
     }
 
-  sfuel[snum] = sfuel[snum] - fuel;
+  Ships[snum].fuel = Ships[snum].fuel - fuel;
 
-  if ( sfuel[snum] < 0.0 )
+  if ( Ships[snum].fuel < 0.0 )
     {
       /* When you're out of gas, you're out of fun... */
-      sfuel[snum] = 0.0;
-      scloaked[snum] = FALSE;
-      sdwarp[snum] = 0.0;
+      Ships[snum].fuel = 0.0;
+      Ships[snum].cloaked = FALSE;
+      Ships[snum].dwarp = 0.0;
       return ( FALSE );
     }
-  else if ( sfuel[snum] > 999.0 )
-    sfuel[snum] = 999.0;
+  else if ( Ships[snum].fuel > 999.0 )
+    Ships[snum].fuel = 999.0;
   
   /* Temperature. */
   if ( weapon )
     {
-      swtemp[snum] = swtemp[snum] + ((fuel * TEMPFUEL_FAC) / weaeff ( snum ));
-      if ( swtemp[snum] < 0.0 )
-	swtemp[snum] = 0.0;
-      else if ( swtemp[snum] >= 100.0 )
+      Ships[snum].wtemp = Ships[snum].wtemp + ((fuel * TEMPFUEL_FAC) / weaeff ( snum ));
+      if ( Ships[snum].wtemp < 0.0 )
+	Ships[snum].wtemp = 0.0;
+      else if ( Ships[snum].wtemp >= 100.0 )
 	if ( rnd() < WEAPON_DOWN_PROB )
 	  {
-	    swfuse[snum] = rndint( MIN_DOWN_FUSE, MAX_DOWN_FUSE );
-	    if ( ! soption[snum][OPT_TERSE] )
+	    Ships[snum].wfuse = rndint( MIN_DOWN_FUSE, MAX_DOWN_FUSE );
+	    if ( ! Ships[snum].options[OPT_TERSE] )
 	      stormsg( MSG_COMP, snum, "Weapons overload." );
 	  }
     }
   else
     {
-      setemp[snum] = setemp[snum] + fuel * TEMPFUEL_FAC / engeff( snum );
-      if ( setemp[snum] < 0.0 )
-	setemp[snum] = 0.0;
-      else if ( setemp[snum] >= 100.0 )
+      Ships[snum].etemp = Ships[snum].etemp + fuel * TEMPFUEL_FAC / engeff( snum );
+      if ( Ships[snum].etemp < 0.0 )
+	Ships[snum].etemp = 0.0;
+      else if ( Ships[snum].etemp >= 100.0 )
 	if ( rnd() < ENGINE_DOWN_PROB )
 	  {
-	    sefuse[snum] = rndint( MIN_DOWN_FUSE, MAX_DOWN_FUSE );
-	    if ( ! soption[snum][OPT_TERSE] )
+	    Ships[snum].efuse = rndint( MIN_DOWN_FUSE, MAX_DOWN_FUSE );
+	    if ( ! Ships[snum].options[OPT_TERSE] )
 	      stormsg( MSG_COMP, snum, "Engines super-heated." );
 	  }
     }
@@ -2386,62 +2388,62 @@ void zeroship( int snum )
 {
   int i, j;
   
-  sstatus[snum] = SS_OFF;
-  skilledby[snum] = 0;
-  suser[snum] = 0;
-  steam[snum] = 0;
-  spid[snum] = 0;
-  sx[snum] = 0.0;
-  sy[snum] = 0.0;
-  sdx[snum] = 0.0;
-  sdy[snum] = 0.0;
-  shead[snum] = 0.0;
-  sdhead[snum] = 0.0;
-  swarp[snum] = 0.0;
-  sdwarp[snum] = 0.0;
-  slock[snum] = 0;
-  sshup[snum] = FALSE;
-  sshields[snum] = 0.0;
-  skills[snum] = 0.0;
-  sdamage[snum] = 0.0;
-  sfuel[snum] = 0.0;
-  setemp[snum] = 0.0;
-  swtemp[snum] = 0.0;
-  swfuse[snum] = 0;
-  sefuse[snum] = 0;
-  sweapons[snum] = 0;
-  sengines[snum] = 0;
-  sarmies[snum] = 0;
-  srmode[snum] = FALSE;
-  scloaked[snum] = FALSE;
+  Ships[snum].status = SS_OFF;
+  Ships[snum].killedby = 0;
+  Ships[snum].unum = 0;
+  Ships[snum].team = 0;
+  Ships[snum].pid = 0;
+  Ships[snum].x = 0.0;
+  Ships[snum].y = 0.0;
+  Ships[snum].dx = 0.0;
+  Ships[snum].dy = 0.0;
+  Ships[snum].head = 0.0;
+  Ships[snum].dhead = 0.0;
+  Ships[snum].warp = 0.0;
+  Ships[snum].dwarp = 0.0;
+  Ships[snum].lock = 0;
+  Ships[snum].shup = FALSE;
+  Ships[snum].shields = 0.0;
+  Ships[snum].kills = 0.0;
+  Ships[snum].damage = 0.0;
+  Ships[snum].fuel = 0.0;
+  Ships[snum].etemp = 0.0;
+  Ships[snum].wtemp = 0.0;
+  Ships[snum].wfuse = 0;
+  Ships[snum].efuse = 0;
+  Ships[snum].weapalloc = 0;
+  Ships[snum].engalloc = 0;
+  Ships[snum].armies = 0;
+  Ships[snum].rmode = FALSE;
+  Ships[snum].cloaked = FALSE;
   for ( i = 0; i < MAXOPTIONS; i = i + 1 )
-    soption[snum][i] = FALSE;
+    Ships[snum].options[i] = FALSE;
   for ( i = 0; i < NUMTEAMS; i = i + 1 )
     {
-      srwar[snum][i] = FALSE;
-      swar[snum][i] = FALSE;
-      sscanned[snum][i] = 0;
+      Ships[snum].rwar[i] = FALSE;
+      Ships[snum].war[i] = FALSE;
+      Ships[snum].scanned[i] = 0;
     }
   for ( i = 1; i <= NUMPLANETS; i = i + 1 )
-    ssrpwar[snum][i] = FALSE;
-  ssdfuse[snum] = 0;
-  slastmsg[snum] = 0;
-  salastmsg[snum] = 0;
-  smap[snum] = FALSE;
-  stowing[snum] = 0;
-  stowedby[snum] = 0;
-  slastblast[snum] = 0.0;
-  slastphase[snum] = 0.0;
-  spfuse[snum] = 0;
-  stalert[snum] = FALSE;
-  srobot[snum] = FALSE;
-  saction[snum] = 0;
+    Ships[snum].srpwar[i] = FALSE;
+  Ships[snum].sdfuse = 0;
+  Ships[snum].lastmsg = 0;
+  Ships[snum].alastmsg = 0;
+  Ships[snum].map = FALSE;
+  Ships[snum].towing = 0;
+  Ships[snum].towedby = 0;
+  Ships[snum].lastblast = 0.0;
+  Ships[snum].lastphase = 0.0;
+  Ships[snum].pfuse = 0;
+  Ships[snum].talert = FALSE;
+  Ships[snum].robot = FALSE;
+  Ships[snum].action = 0;
   for ( i = 0; i < SIZEUSERPNAME; i = i + 1 )
-    spname[snum][i] = EOS;
-  sctime[snum] = 0;
-  setime[snum] = 0;
-  scacc[snum] = 0;
-  seacc[snum] = 0;
+    Ships[snum].alias[i] = EOS;
+  Ships[snum].ctime = 0;
+  Ships[snum].etime = 0;
+  Ships[snum].cacc = 0;
+  Ships[snum].eacc = 0;
   
   for ( i = 0; i < MAXTORPS; i = i + 1 )
     {

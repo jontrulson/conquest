@@ -162,14 +162,14 @@ int capentry( int snum, int *system )
       /* We must own all three planets in a system. */
       for ( j = 0; j < 3; j = j + 1 )
 	{
-	  if ( pteam[teamplanets[i][j]] != steam[snum] )
+	  if ( pteam[teamplanets[i][j]] != Ships[snum].team )
 	    goto cnext2_1; /* next 2; */
 	}
       owned[i] = TRUE;
     cnext2_1:
       ;
     }
-  owned[steam[snum]] = TRUE;		/* always can enter in our system */
+  owned[Ships[snum].team] = TRUE;		/* always can enter in our system */
   
   /* Now count how many systems we can enter from. */
   j = 0;
@@ -180,7 +180,7 @@ int capentry( int snum, int *system )
   /* If we can only enter from one, we're done. */
   if ( j <= 1 )
     {
-      *system = steam[snum];
+      *system = Ships[snum].team;
       return ( TRUE );
     }
   
@@ -214,7 +214,7 @@ int capentry( int snum, int *system )
 	  break;
 	case TERM_EXTRA:
 	  /* Enter the home system. */
-	  *system = steam[snum];
+	  *system = Ships[snum].team;
 	  return ( TRUE );
 	  break;
 	default:
@@ -251,10 +251,10 @@ void command( int ch )
       cdclrl( MSG_LIN1, 1 );
       cdclrl( MSG_LIN2, 1 );
       
-      if ( swarp[csnum] < 0.0 ) 
-	swarp[csnum] = 0.0; 
-      sdhead[csnum] = (real)(x); 
-      slock[csnum] = 0; 
+      if ( Ships[csnum].warp < 0.0 ) 
+	Ships[csnum].warp = 0.0; 
+      Ships[csnum].dhead = (real)(x); 
+      Ships[csnum].lock = 0; 
       
       return;
     }
@@ -282,7 +282,7 @@ void command( int ch )
       dowarp( csnum, x );
       break;
     case 'a':				/* autopilot */
-      if ( uooption[suser[csnum]][ OOPT_AUTOPILOT] )
+      if ( Users[Ships[csnum].unum].ooptions[ OOPT_AUTOPILOT] )
 	{
 	  doautopilot( csnum );
 	}
@@ -355,10 +355,10 @@ void command( int ch )
       doreview( csnum );
       break;
     case 'm':				/* send a message */
-      sendmsg( csnum, soption[csnum][OPT_TERSE] );
+      sendmsg( csnum, Ships[csnum].options[OPT_TERSE] );
       break;
     case 'M':				/* strategic/tactical map */
-      smap[csnum] = ! smap[csnum];	
+      Ships[csnum].map = ! Ships[csnum].map;	
       stoptimer();
       display( csnum, FALSE );
       settimer();
@@ -379,11 +379,11 @@ void command( int ch )
       doselfdest( csnum );
       break;
     case 'R':				/* repair mode */
-      if ( ! scloaked[csnum] )
+      if ( ! Ships[csnum].cloaked )
 	{
 	  cdclrl( MSG_LIN1, 2 );
-	  srmode[csnum] = TRUE;
-	  sdwarp[csnum] = 0.0;
+	  Ships[csnum].rmode = TRUE;
+	  Ships[csnum].dwarp = 0.0;
 	}
       else
 	{
@@ -407,7 +407,7 @@ void command( int ch )
     case 'T':				/* team list */
       credraw = TRUE;
       stoptimer();
-      doteamlist( steam[csnum] );
+      doteamlist( Ships[csnum].team );
       if ( stillalive( csnum ) )
 	display( csnum, FALSE );
       settimer();
@@ -550,7 +550,7 @@ void conqds( int multiple, int switchteams )
   cprintf( lin,col,ALIGN_NONE,"#%d#%s", RedColor | A_BOLD, c4);
   lin++;
   cprintf( lin,col,ALIGN_NONE,"#%d#%s", RedColor | A_BOLD, c5);
-  
+
   /* Draw a box around the logo. */
   lin++;
   attrset(A_BOLD);
@@ -640,10 +640,10 @@ void dead( int snum, int leave )
     return;
   
   /* If our ships pid is wrong, we are indeed lost. */
-  if ( spid[snum] != cpid )
+  if ( Ships[snum].pid != cpid )
     return;
   
-  kb = skilledby[snum];
+  kb = Ships[snum].killedby;
   
   /* Delay while our torps are exploding. */
   grand( &entertime );
@@ -730,14 +730,14 @@ void dead( int snum, int leave )
       if ( kb > 0 && kb <= MAXSHIPS )
 	{
 	  appship( kb, cbuf );
-	  if ( sstatus[kb] != SS_LIVE )
+	  if ( Ships[kb].status != SS_LIVE )
 	    appstr( ", who also died.", buf );
 	  else
 	    appchr( '.', buf );
 	  cprintf( 8,0,ALIGN_CENTER, 
 		   "#%d#You were kill number #%d#%.1f #%d#for #%d#%s #%d#(#%d#%s#%d#)%s",
-		   InfoColor, A_BOLD, skills[kb], 
-		   InfoColor, A_BOLD, spname[kb], 
+		   InfoColor, A_BOLD, Ships[kb].kills, 
+		   InfoColor, A_BOLD, Ships[kb].alias, 
 		   InfoColor, A_BOLD, cbuf, 
 		   InfoColor, buf );
 	}
@@ -775,7 +775,7 @@ void dead( int snum, int leave )
     }
   else if ( kb == KB_SELF )
     {
-      i = sarmies[snum];
+      i = Ships[snum].armies;
       if ( i > 0 )
 	{
 	  junk[0] = EOS; 
@@ -805,28 +805,28 @@ void dead( int snum, int leave )
     }
   else if ( kb >= 0 )
     {
-      if ( sstatus[kb] == SS_LIVE )
+      if ( Ships[kb].status == SS_LIVE )
 	{
 	  cprintf( 10,0,ALIGN_CENTER,
 		"#%d#He had #%d#%d%% #%d#shields and #%d#%d%% #%d#damage.",
-		InfoColor, A_BOLD, round(sshields[kb]), 
-		InfoColor, A_BOLD, round(sdamage[kb]),InfoColor );
+		InfoColor, A_BOLD, round(Ships[kb].shields), 
+		InfoColor, A_BOLD, round(Ships[kb].damage),InfoColor );
 	}
     }
   cprintf(12,0,ALIGN_CENTER,
 	"#%d#You got #%d#%.1f #%d#this time.", 
-	InfoColor, A_BOLD, oneplace(skills[snum]), InfoColor );
+	InfoColor, A_BOLD, oneplace(Ships[snum].kills), InfoColor );
   cdmove( 1, 1 );
   cdrefresh();
 
   if ( ! ( leave && kb == KB_SELF ) && kb != KB_SHIT && kb != KB_EVICT )
     c_sleep( 4.0 );
   
-  for ( i = 1; i <= 10 && sstatus[snum] == SS_DYING; i++ )
+  for ( i = 1; i <= 10 && Ships[snum].status == SS_DYING; i++ )
     c_sleep( 1.0 );
-  sstatus[snum] = SS_RESERVED;
-  ssdfuse[snum] = -TIMEOUT_PLAYER;
-  skilledby[snum] = 0;
+  Ships[snum].status = SS_RESERVED;
+  Ships[snum].sdfuse = -TIMEOUT_PLAYER;
+  Ships[snum].killedby = 0;
   
   switch ( kb )
     {
@@ -853,7 +853,7 @@ void dead( int snum, int leave )
 	  ch = getcx( "Press TAB to confirm:", 16, 0,
 		     TERMS, cbuf, 10 );
 	}
-      while ( ch != TERM_EXTRA ); /* until -> while */
+      while ( ch != TERM_EXTRA ); /* until . while */
       break;
     case KB_SELF:
     case KB_EVICT:
@@ -872,7 +872,7 @@ void dead( int snum, int leave )
   
   /* Turn off sticky war so we can change war settings from menu(). */
   for ( i = 0; i < NUMTEAMS; i++ )
-    srwar[snum][i] = FALSE;
+    Ships[snum].rwar[i] = FALSE;
   
   return;
   
@@ -947,7 +947,7 @@ void doalloc( int snum )
   cbuf[0] = EOS;
   ch = (char)cdgetx( pmt, MSG_LIN1, 1, TERMS, cbuf, MSGMAXLINE );
   if ( ch == TERM_EXTRA )
-    sweapons[snum] = sengines[snum];
+    Ships[snum].weapalloc = Ships[snum].engalloc;
   else if ( ch == TERM_NORMAL )
     {
       i = 0;
@@ -958,11 +958,11 @@ void doalloc( int snum )
 	    alloc = 30;
 	  else if ( alloc > 70 )
 	    alloc = 70;
-	  sweapons[snum] = alloc;
+	  Ships[snum].weapalloc = alloc;
 	}
     }
   
-  sengines[snum] = 100 - sweapons[snum];
+  Ships[snum].engalloc = 100 - Ships[snum].weapalloc;
   cdclrl( MSG_LIN1, 1 );
   
   return;
@@ -989,12 +989,12 @@ void doautopilot( int snum )
     }
   
   c_putmsg( "Autopilot activated.", MSG_LIN1 );
-  srobot[snum] = TRUE;
+  Ships[snum].robot = TRUE;
   gsecs( &laststat );			/* initialize stat timer */
   while ( stillalive( csnum ) )
     {
       /* Make sure we still control our ship. */
-      if ( spid[snum] != cpid )
+      if ( Ships[snum].pid != cpid )
 	break;
       
       /* See if it's time to update the statistics. */
@@ -1006,7 +1006,7 @@ void doautopilot( int snum )
       
       /* Get a character. */
       if ( ! iogtimed( &ch, 1 ) )
-	continue;		/* next -> echo */
+	continue;		/* next . echo */
       cmsgok = FALSE;
       grand( &cmsgrand );
       switch ( ch )
@@ -1025,8 +1025,8 @@ void doautopilot( int snum )
       if (ch == TERM_ABORT)
 	break;
     }
-  srobot[snum] = FALSE;
-  saction[snum] = 0;
+  Ships[snum].robot = FALSE;
+  Ships[snum].action = 0;
   
   cdclrl( MSG_LIN1, 2 );
   
@@ -1051,19 +1051,19 @@ void dobeam( int snum )
   string lastfew="Fleet orders prohibit removing the last three armies.";
   string abt="...aborted...";
   
-  srmode[snum] = FALSE;
+  Ships[snum].rmode = FALSE;
   
   cdclrl( MSG_LIN1, 2 );
   
   /* Check for allowability. */
-  if ( swarp[snum] >= 0.0 )
+  if ( Ships[snum].warp >= 0.0 )
     {
       c_putmsg( "We must be orbiting a planet to use the transporter.",
 	       MSG_LIN1 );
       return;
     }
-  pnum = -slock[snum];
-  if ( sarmies[snum] > 0 )
+  pnum = -Ships[snum].lock;
+  if ( Ships[snum].armies > 0 )
     {
       if ( ptype[pnum] == PLANET_SUN )
 	{
@@ -1079,7 +1079,7 @@ void dobeam( int snum )
       else if ( pteam[pnum] == TEAM_GOD )
 	{
 	  c_putmsg(
-		   "GOD->you: YOUR ARMIES AREN'T GOOD ENOUGH FOR THIS PLANET.",
+		   "GOD.you: YOUR ARMIES AREN'T GOOD ENOUGH FOR THIS PLANET.",
 		   MSG_LIN1 );
 	  return;
 	}
@@ -1097,26 +1097,26 @@ void dobeam( int snum )
       return;
     }
   
-  if ( pteam[pnum] != steam[snum] &&
+  if ( pteam[pnum] != Ships[snum].team &&
       pteam[pnum] != TEAM_SELFRULED &&
       pteam[pnum] != TEAM_NOTEAM )
-    if ( ! swar[snum][pteam[pnum]] && parmies[pnum] != 0) /* can take empty planets */
+    if ( ! Ships[snum].war[pteam[pnum]] && parmies[pnum] != 0) /* can take empty planets */
       {
 	c_putmsg( "But we are not at war with this planet!", MSG_LIN1 );
 	return;
       }
   
-  if ( sarmies[snum] == 0 &&
-      pteam[pnum] == steam[snum] && parmies[pnum] <= MIN_BEAM_ARMIES )
+  if ( Ships[snum].armies == 0 &&
+      pteam[pnum] == Ships[snum].team && parmies[pnum] <= MIN_BEAM_ARMIES )
     {
       c_putmsg( lastfew, MSG_LIN1 );
       return;
     }
   
-  rkills = skills[snum];
+  rkills = Ships[snum].kills;
 #ifdef DEBUG_MISC
-  clog("dobeam(): rkills=%f skills[%d]=%f",
-       rkills, snum, skills[snum]);
+  clog("dobeam(): rkills=%f Ships[%d].kills=%f",
+       rkills, snum, Ships[snum].kills);
 #endif
   if ( rkills < (real)1.0 )
     {
@@ -1127,7 +1127,7 @@ void dobeam( int snum )
     }
   
   /* Figure out what can be beamed. */
-  downmax = sarmies[snum];
+  downmax = Ships[snum].armies;
   if ( spwar(snum,pnum) ||
       pteam[pnum] == TEAM_SELFRULED ||
       pteam[pnum] == TEAM_NOTEAM ||
@@ -1138,12 +1138,12 @@ void dobeam( int snum )
     }
   else
     {
-      capacity = min( ifix( rkills ) * 2, armylim[steam[snum]] );
-      upmax = min( parmies[pnum] - MIN_BEAM_ARMIES, capacity-sarmies[snum] );
+      capacity = min( ifix( rkills ) * 2, armylim[Ships[snum].team] );
+      upmax = min( parmies[pnum] - MIN_BEAM_ARMIES, capacity-Ships[snum].armies );
     }
   
   /* If there are armies to beam but we're selfwar... */
-  if ( upmax > 0 && selfwar(snum) && steam[snum] == pteam[pnum] )
+  if ( upmax > 0 && selfwar(snum) && Ships[snum].team == pteam[pnum] )
     {
       if ( downmax <= 0 )
 	{
@@ -1241,20 +1241,20 @@ void dobeam( int snum )
   if ( pteam[pnum] >= NUMTEAMS )
     {
       /* If the planet is not race owned, make it war with us. */
-      ssrpwar[snum][pnum] = TRUE;
+      Ships[snum].srpwar[pnum] = TRUE;
     }
-  else if ( pteam[pnum] != steam[snum] )
+  else if ( pteam[pnum] != Ships[snum].team )
     {
       /* For a team planet make the war sticky and send an intruder alert. */
-      srwar[snum][pteam[pnum]] = TRUE;
+      Ships[snum].rwar[pteam[pnum]] = TRUE;
       
       /* Chance to create a robot here. */
       intrude( snum, pnum );
     }
   
   /* Lower shields. */
-  oldsshup = sshup[snum];
-  sshup[snum] = FALSE;
+  oldsshup = Ships[snum].shup;
+  Ships[snum].shup = FALSE;
   
   /* Beam. */
   total = 0;
@@ -1288,19 +1288,19 @@ void dobeam( int snum )
 		  c_putmsg( lastfew, MSG_LIN1 );
 		  break;
 		}
-	      sarmies[snum] = sarmies[snum] + 1;
+	      Ships[snum].armies = Ships[snum].armies + 1;
 	      parmies[pnum] = parmies[pnum] - 1;
 	    }
 	  else
 	    {
 	      /* Beam down. */
-	      sarmies[snum] = sarmies[snum] - 1;
+	      Ships[snum].armies = Ships[snum].armies - 1;
 	      if ( pteam[pnum] == TEAM_NOTEAM || parmies[pnum] == 0 )
 		{
 		  takeplanet( pnum, snum );
 		  conqed = TRUE;
 		}
-	      else if ( pteam[pnum] != steam[snum] )
+	      else if ( pteam[pnum] != Ships[snum].team )
 		{
 		  parmies[pnum] = parmies[pnum] - 1;
 		  if ( parmies[pnum] == 0 )
@@ -1367,7 +1367,7 @@ void dobeam( int snum )
  cbrk21:
   
   /* Restore shields. */
-  sshup[snum] = oldsshup;
+  Ships[snum].shup = oldsshup;
   
   /* Try to display the last bombing message. */
   cdrefresh();
@@ -1400,31 +1400,31 @@ void dobomb( int snum )
   string lastfew="The last few armies are eluding us.";
   string abt="...aborted...";
   
-  srmode[snum] = FALSE;
+  Ships[snum].rmode = FALSE;
   
   cdclrl( MSG_LIN2, 1 );
   cdclrl(MSG_LIN1, 1);
   
   /* Check for allowability. */
-  if ( swarp[snum] >= 0.0 )
+  if ( Ships[snum].warp >= 0.0 )
     {
       c_putmsg( "We must be orbiting a planet to bombard it.", MSG_LIN1 );
       return;
     }
-  pnum = -slock[snum];
+  pnum = -Ships[snum].lock;
   if ( ptype[pnum] == PLANET_SUN || ptype[pnum] == PLANET_MOON ||
       pteam[pnum] == TEAM_NOTEAM || parmies[pnum] == 0 )
     {
       c_putmsg( "There is no one there to bombard.", MSG_LIN1 );
       return;
     }
-  if ( pteam[pnum] == steam[snum] )
+  if ( pteam[pnum] == Ships[snum].team )
     {
       c_putmsg( "We can't bomb our own armies!", MSG_LIN1 );
       return;
     }
   if ( pteam[pnum] != TEAM_SELFRULED && pteam[pnum] != TEAM_GOD )
-    if ( ! swar[snum][pteam[pnum]] )
+    if ( ! Ships[snum].war[pteam[pnum]] )
       {
 	c_putmsg( "But we are not at war with this planet!", MSG_LIN1 );
 	return;
@@ -1444,25 +1444,25 @@ void dobomb( int snum )
     }
   
   /* Handle war logic. */
-  ssrpwar[snum][pnum] = TRUE;
+  Ships[snum].srpwar[pnum] = TRUE;
   if ( pteam[pnum] >= 0 && pteam[pnum] < NUMTEAMS )
     {
       /* For a team planet make the war sticky and send an intruder alert. */
-      srwar[snum][pteam[pnum]] = TRUE;
+      Ships[snum].rwar[pteam[pnum]] = TRUE;
       intrude( snum, pnum );
     }
   /* Planets owned by GOD have a special defense system. */
   if ( pteam[pnum] == TEAM_GOD )
     {
-      sprintf( cbuf, "That was a bad idea, %s...", spname[snum] );
+      sprintf( cbuf, "That was a bad idea, %s...", Ships[snum].alias );
       c_putmsg( cbuf, MSG_LIN1 );
       damage( snum,  rnduni( 50.0, 100.0 ), KB_LIGHTNING );
       return;
     }
   
   /* Lower shields. */
-  oldsshup = sshup[snum];
-  sshup[snum] = FALSE;
+  oldsshup = Ships[snum].shup;
+  Ships[snum].shup = FALSE;
   
   /* Bombard. */
   total = 0;
@@ -1484,7 +1484,7 @@ void dobomb( int snum )
       /* See if it's time to bomb yet. */
       while ((int) fabs (dgrand( (int)entertime, (int *)&now )) >= BOMBARD_GRAND )
 	{
-	  if ( swfuse[snum] > 0 )
+	  if ( Ships[snum].wfuse > 0 )
 	    {
 	      c_putmsg( "Weapons are currently overloaded.", MSG_LIN1 );
 	      goto cbrk22; /* break 2;*/
@@ -1514,11 +1514,10 @@ void dobomb( int snum )
 		}
 	      parmies[pnum] = parmies[pnum] - 1;
 	      
-	      skills[snum] = skills[snum] + BOMBARD_KILLS;
-	      ustats[suser[snum]][USTAT_ARMBOMB] =
-		ustats[suser[snum]][USTAT_ARMBOMB] + 1;
-	      tstats[steam[snum]][TSTAT_ARMBOMB] =
-		tstats[steam[snum]][TSTAT_ARMBOMB] + 1;
+	      Ships[snum].kills = Ships[snum].kills + BOMBARD_KILLS;
+	      Users[Ships[snum].unum].stats[USTAT_ARMBOMB] += 1;
+	      tstats[Ships[snum].team][TSTAT_ARMBOMB] =
+		tstats[Ships[snum].team][TSTAT_ARMBOMB] + 1;
 	      PVUNLOCK(lockword);
 	      total = total + 1;
 	    }
@@ -1563,7 +1562,7 @@ void dobomb( int snum )
   ;
   
   /* Restore shields. */
-  sshup[snum] = oldsshup;
+  Ships[snum].shup = oldsshup;
   
   /* Try to display the last bombing message. */
   cdrefresh();
@@ -1583,24 +1582,24 @@ void doburst( int snum )
   
   cdclrl( MSG_LIN2, 1 );
   
-  if ( scloaked[snum] )
+  if ( Ships[snum].cloaked )
     {
       c_putmsg( "The cloaking device is using all available power.",
 	       MSG_LIN1 );
       return;
     }
-  if ( swfuse[snum] > 0 )
+  if ( Ships[snum].wfuse > 0 )
     {
       c_putmsg( "Weapons are currently overloaded.", MSG_LIN1 );
       return;
     }
-  if ( sfuel[snum] < TORPEDO_FUEL )
+  if ( Ships[snum].fuel < TORPEDO_FUEL )
     {
       c_putmsg( "Not enough fuel to launch a torpedo.", MSG_LIN1 );
       return;
     }
   
-  if ( gettarget( "Torpedo burst: ", MSG_LIN1, 1, &dir, slastblast[snum] ) )
+  if ( gettarget( "Torpedo burst: ", MSG_LIN1, 1, &dir, Ships[snum].lastblast ) )
     {
       if ( ! launch( snum, dir, 3, LAUNCH_NORMAL ) )
 	c_putmsg( ">TUBES EMPTY<", MSG_LIN2 );
@@ -1630,18 +1629,18 @@ void docloak( int snum )
   cdclrl( MSG_LIN1, 1 );
   cdclrl( MSG_LIN2, 1 );
   
-  if ( scloaked[snum] )
+  if ( Ships[snum].cloaked )
     {
-      scloaked[snum] = FALSE;
+      Ships[snum].cloaked = FALSE;
       c_putmsg( "Cloaking device disengaged.", MSG_LIN1 );
       return;
     }
-  if ( sefuse[snum] > 0 )
+  if ( Ships[snum].efuse > 0 )
     {
       c_putmsg( "Engines are currently overloaded.", MSG_LIN1 );
       return;
     }
-  if ( sfuel[snum] < CLOAK_ON_FUEL )
+  if ( Ships[snum].fuel < CLOAK_ON_FUEL )
     {
       c_putmsg( nofuel, MSG_LIN1 );
       return;
@@ -1677,7 +1676,7 @@ void docoup( int snum )
   cdclrl( MSG_LIN2, 1 );
   
   /* Check for allowability. */
-  if ( oneplace( skills[snum] ) < MIN_COUP_KILLS )
+  if ( oneplace( Ships[snum].kills ) < MIN_COUP_KILLS )
     {
       c_putmsg(
 	       "Fleet orders require three kills before a coup can be attempted.",
@@ -1685,19 +1684,19 @@ void docoup( int snum )
       return;
     }
   for ( i = 1; i <= NUMPLANETS; i = i + 1 )
-    if ( pteam[i] == steam[snum] && parmies[i] > 0 )
+    if ( pteam[i] == Ships[snum].team && parmies[i] > 0 )
       {
 	c_putmsg( "We don't need to coup, we still have armies left!",
 		 MSG_LIN1 );
 	return;
       }
-  if ( swarp[snum] >= 0.0 )
+  if ( Ships[snum].warp >= 0.0 )
     {
       c_putmsg( nhp, MSG_LIN1 );
       return;
     }
-  pnum = -slock[snum];
-  if ( pnum != homeplanet[steam[snum]] )
+  pnum = -Ships[snum].lock;
+  if ( pnum != homeplanet[Ships[snum].team] )
     {
       c_putmsg( nhp, MSG_LIN1 );
       return;
@@ -1718,9 +1717,9 @@ void docoup( int snum )
     }
   
   /* Now our team can tell coup time for free. */
-  tcoupinfo[steam[snum]] = TRUE;
+  tcoupinfo[Ships[snum].team] = TRUE;
   
-  i = couptime[steam[snum]];
+  i = couptime[Ships[snum].team];
   if ( i > 0 )
     {
       sprintf( cbuf, "Our forces need %d more minutes to organize.", i );
@@ -1755,7 +1754,7 @@ void docoup( int snum )
   
   cdclrl( MSG_LIN1, 1 );
   PVLOCK(lockword);
-  if ( pteam[pnum] == steam[snum] )
+  if ( pteam[pnum] == Ships[snum].team )
     {
       PVUNLOCK(lockword);
       c_putmsg( "Sensors show hostile forces eliminated from the planet.",
@@ -1767,7 +1766,7 @@ void docoup( int snum )
   if ( rnd() < failprob )
     {
       /* Failed; setup new reorganization time. */
-      couptime[steam[snum]] = rndint( 5, 10 );
+      couptime[Ships[snum].team] = rndint( 5, 10 );
       PVUNLOCK(lockword);
       c_putmsg( "Coup unsuccessful.", MSG_LIN2 );
       return;
@@ -1775,8 +1774,8 @@ void docoup( int snum )
   
   takeplanet( pnum, snum );
   parmies[pnum] = rndint( 10, 20 );		/* create token coup force */
-  ustats[suser[snum]][USTAT_COUPS] = ustats[suser[snum]][USTAT_COUPS] + 1;
-  tstats[steam[snum]][TSTAT_COUPS] = tstats[steam[snum]][TSTAT_COUPS] + 1;
+  Users[Ships[snum].unum].stats[USTAT_COUPS] += 1;
+  tstats[Ships[snum].team][TSTAT_COUPS] = tstats[Ships[snum].team][TSTAT_COUPS] + 1;
   PVUNLOCK(lockword);
   c_putmsg( "Coup successful!", MSG_LIN2 );
   
@@ -1852,27 +1851,27 @@ void docourse( int snum )
 	  cdclrl( MSG_LIN1, 1 );
 	  return;
 	}
-      if ( sstatus[sorpnum] != SS_LIVE )
+      if ( Ships[sorpnum].status != SS_LIVE )
 	{
 	  c_putmsg( "Not found.", MSG_LIN2 );
 	  return;
 	}
-      if ( scloaked[sorpnum] )
+      if ( Ships[sorpnum].cloaked )
 	{
-	  if ( swarp[sorpnum] <= 0.0 )
+	  if ( Ships[sorpnum].warp <= 0.0 )
 	    {
 	      c_putmsg( "Sensors are unable to lock on.", MSG_LIN2 );
 	      return;
 	    }
-	  appx = rndnor(sx[sorpnum], CLOAK_SMEAR_DIST);
-	  appy = rndnor(sy[sorpnum], CLOAK_SMEAR_DIST);
+	  appx = rndnor(Ships[sorpnum].x, CLOAK_SMEAR_DIST);
+	  appy = rndnor(Ships[sorpnum].y, CLOAK_SMEAR_DIST);
 	}
       else
 	{
-	  appx = sx[sorpnum];
-	  appy = sy[sorpnum];
+	  appx = Ships[sorpnum].x;
+	  appy = Ships[sorpnum].y;
 	}
-      dir = (real)angle( sx[snum], sy[snum], appx, appy );
+      dir = (real)angle( Ships[snum].x, Ships[snum].y, appx, appy );
       
       /* Give info if he used TAB. */
       if ( ch == TERM_EXTRA )
@@ -1881,7 +1880,7 @@ void docourse( int snum )
 	cdclrl( MSG_LIN1, 1 );
       break;
     case NEAR_PLANET:
-      dir = angle( sx[snum], sy[snum], px[sorpnum], py[sorpnum] );
+      dir = angle( Ships[snum].x, Ships[snum].y, px[sorpnum], py[sorpnum] );
       if ( ch == TERM_EXTRA )
 	{
 	  newlock = -sorpnum;
@@ -1904,10 +1903,10 @@ void docourse( int snum )
       break;
     }
   
-  if ( swarp[snum] < 0.0 )		/* if orbitting */
-    swarp[snum] = 0.0;		/* break orbit */
-  sdhead[snum] = dir;			/* set direction first to avoid */
-  slock[snum] = newlock;		/*  a race in display() */
+  if ( Ships[snum].warp < 0.0 )		/* if orbitting */
+    Ships[snum].warp = 0.0;		/* break orbit */
+  Ships[snum].dhead = dir;			/* set direction first to avoid */
+  Ships[snum].lock = newlock;		/*  a race in display() */
   
   return;
   
@@ -1922,7 +1921,7 @@ void dodet( int snum )
 {
   cdclrl( MSG_LIN2, 1 );
   
-  if ( swfuse[snum] > 0 )
+  if ( Ships[snum].wfuse > 0 )
     c_putmsg( "Weapons are currently overloaded.", MSG_LIN1 );
   else if ( enemydet( snum ) )
     c_putmsg( "detonating...", MSG_LIN1 );
@@ -1950,32 +1949,32 @@ void dodistress( int snum )
     {
       sprintf( cbuf,
 	     "sh=%d, dam=%d, fuel=%d, temp=",
-	     round(sshields[snum]),
-	     round(sdamage[snum]),
-	     round(sfuel[snum]) );
-      i = round(swtemp[snum]);
+	     round(Ships[snum].shields),
+	     round(Ships[snum].damage),
+	     round(Ships[snum].fuel) );
+      i = round(Ships[snum].wtemp);
       if ( i < 100 )
 	appint( i, cbuf );
       else
 	appstr( "**", cbuf );
       appchr( '/', cbuf );
-      i = round(setemp[snum]);
+      i = round(Ships[snum].etemp);
       if ( i < 100 )
 	appint( i, cbuf );
       else
 	appstr( "**", cbuf );
-      i = sarmies[snum];
+      i = Ships[snum].armies;
       if ( i > 0 )
 	{
 	  appstr( ", armies=", cbuf );
 	  appint( i, cbuf );
 	}
-      if ( swfuse[snum] > 0 )
+      if ( Ships[snum].wfuse > 0 )
 	appstr( ", -weapons", cbuf );
-      if ( sefuse[snum] > 0 )
+      if ( Ships[snum].efuse > 0 )
 	appstr( ", -engines", cbuf );
       
-      stormsg( snum, -steam[snum], cbuf );
+      stormsg( snum, -Ships[snum].team, cbuf );
     }
   
   cdclrl( MSG_LIN1, 1 );
@@ -2208,24 +2207,24 @@ void dolastphase( int snum )
 {
   cdclrl( MSG_LIN1, 1 );
   
-  if ( scloaked[snum] )
+  if ( Ships[snum].cloaked )
     {
       c_putmsg( "The cloaking device is using all available power.",
 	       MSG_LIN2 );
       return;
     }
-  if ( swfuse[snum] > 0 )
+  if ( Ships[snum].wfuse > 0 )
     {
       c_putmsg( "Weapons are currently overloaded.", MSG_LIN1 );
       return;
     }
-  if ( sfuel[snum] < PHASER_FUEL )
+  if ( Ships[snum].fuel < PHASER_FUEL )
     {
       c_putmsg( "Not enough fuel to fire phasers.", MSG_LIN2 );
       return;
     }
   
-  if ( phaser( snum, slastphase[snum] ) )
+  if ( phaser( snum, Ships[snum].lastphase ) )
     cdclrl( MSG_LIN2, 1 );
   else
     c_putmsg( ">PHASERS DRAINED<", MSG_LIN2 );
@@ -2271,8 +2270,8 @@ void dooption( int snum, int dodisplay )
   /* Make some copies of the current ship options. */
   for ( i = 0; i < MAXOPTIONS; i = i + 1)
     {
-      sop[i] = soption[snum][i];			/* used in case we abort */
-      top[i] = soption[snum][i];			/* used for dispoption() */
+      sop[i] = Ships[snum].options[i];			/* used in case we abort */
+      top[i] = Ships[snum].options[i];			/* used for dispoption() */
     }
   
   while ( stillalive( csnum ) && leave == FALSE)
@@ -2289,13 +2288,13 @@ void dooption( int snum, int dodisplay )
 	case TERM_EXTRA:
 	  /* Done fooling around, update the user options. */
 	  for ( i = 0; i < MAXOPTIONS; i = i + 1)
-	    uoption[suser[snum]][i] = top[i];
+	    Users[Ships[snum].unum].options[i] = top[i];
 	  leave = TRUE;
 	  break;
 	case TERM_ABORT:
 	  /* Decided to abort; restore things. */
 	  for ( i = 0; i < MAXOPTIONS; i = i + 1)
-	    soption[snum][i] = sop[i];
+	    Ships[snum].options[i] = sop[i];
 	  if ( dodisplay )
 	    {
 	      /* Force an update. */
@@ -2313,7 +2312,7 @@ void dooption( int snum, int dodisplay )
 	      top[tok] = ! top[tok];
 	      
 	      /* Copy temporary into ship for display() to use. */
-	      soption[snum][tok] = top[tok];
+	      Ships[snum].options[tok] = top[tok];
 	      
 	      if ( dodisplay )
 		{
@@ -2343,19 +2342,19 @@ void doorbit( int snum )
 {
   int pnum;
   
-  if ( ( swarp[snum] == ORBIT_CW ) || ( swarp[snum] == ORBIT_CCW ) )
-    infoplanet( "But we are already orbiting ", -slock[snum], snum );
+  if ( ( Ships[snum].warp == ORBIT_CW ) || ( Ships[snum].warp == ORBIT_CCW ) )
+    infoplanet( "But we are already orbiting ", -Ships[snum].lock, snum );
   else if ( ! findorbit( snum, &pnum ) )
     {
       sprintf( cbuf, "We are not close enough to orbit, %s.",
-	     spname[snum] );
+	     Ships[snum].alias );
       c_putmsg( cbuf, MSG_LIN1 );
       cdclrl( MSG_LIN2, 1 );
     }
-  else if ( swarp[snum] > MAX_ORBIT_WARP )
+  else if ( Ships[snum].warp > MAX_ORBIT_WARP )
     {
       sprintf( cbuf, "We are going to fast to orbit, %s.",
-	     spname[snum] );
+	     Ships[snum].alias );
       c_putmsg( cbuf, MSG_LIN1 );
       sprintf( cbuf, "Maximum orbital insertion velocity is warp %.1f.",
 	     oneplace(MAX_ORBIT_WARP) );
@@ -2364,7 +2363,7 @@ void doorbit( int snum )
   else
     {
       orbit( snum, pnum );
-      infoplanet( "Coming into orbit around ", -slock[snum], snum );
+      infoplanet( "Coming into orbit around ", -Ships[snum].lock, snum );
     }
   
   return;
@@ -2381,24 +2380,24 @@ void dophase( int snum )
   real dir;
   
   cdclrl( MSG_LIN2, 1 );
-  if ( scloaked[snum] )
+  if ( Ships[snum].cloaked )
     {
       c_putmsg( "The cloaking device is using all available power.",
 	       MSG_LIN1 );
       return;
     }
-  if ( swfuse[snum] > 0 )
+  if ( Ships[snum].wfuse > 0 )
     {
       c_putmsg( "Weapons are currently overloaded.", MSG_LIN1 );
       return;
     }
-  if ( sfuel[snum] < PHASER_FUEL )
+  if ( Ships[snum].fuel < PHASER_FUEL )
     {
       c_putmsg( "Not enough fuel to fire phasers.", MSG_LIN1 );
       return;
     }
   
-  if ( gettarget( "Fire phasers: ", MSG_LIN1, 1, &dir, slastblast[snum] ) )
+  if ( gettarget( "Fire phasers: ", MSG_LIN1, 1, &dir, Ships[snum].lastblast ) )
     {
       if ( phaser( snum, dir ) )
 	c_putmsg( "Firing phasers...", MSG_LIN2 );
@@ -2425,9 +2424,9 @@ void doplanlist( int snum )
 {
 
   if (snum > 0 && snum <= MAXSHIPS)
-    planlist( steam[snum], snum );
+    planlist( Ships[snum].team, snum );
   else		/* then use user team if user doen't have a ship yet */
-    planlist( uteam[cunum], snum );
+    planlist( Users[cunum].team, snum );
   
   return;
   
@@ -2452,7 +2451,7 @@ void doreview( int snum )
 				   old ones.  */
     }
 
-  lstmsg = slastmsg[snum];	/* don't want lstmsg changing while reading old ones. */
+  lstmsg = Ships[snum].lastmsg;	/* don't want lstmsg changing while reading old ones. */
 
   if ( ! review( snum, lstmsg ) )
     {
@@ -2485,7 +2484,7 @@ void doselfdest(int snum)
   
   cdclrl( MSG_LIN1, 2 );
 
-  if ( scloaked[snum] )
+  if ( Ships[snum].cloaked )
     {
       c_putmsg( "The cloaking device is using all available power.",
                MSG_LIN1 );
@@ -2505,7 +2504,7 @@ void doselfdest(int snum)
   cdclrl( MSG_LIN1, 1 );
   
   /* Set up the destruct fuse. */
-  ssdfuse[csnum] = SELFDESTRUCT_FUSE;
+  Ships[csnum].sdfuse = SELFDESTRUCT_FUSE;
   
   gsecs( &entertime );
   
@@ -2514,17 +2513,17 @@ void doselfdest(int snum)
   display( csnum, FALSE );
   settimer();
   cmsgok = TRUE;			/* messages are ok in the beginning */
-  while ( ssdfuse[csnum] > 0 )
+  while ( Ships[csnum].sdfuse > 0 )
     {
-      ssdfuse[csnum] = SELFDESTRUCT_FUSE - dsecs ( entertime, &now );
+      Ships[csnum].sdfuse = SELFDESTRUCT_FUSE - dsecs ( entertime, &now );
       /* Display new messages until T-minus 3 seconds. */
-      if ( ssdfuse[csnum] < 3 )
+      if ( Ships[csnum].sdfuse < 3 )
 	cmsgok = FALSE;
       
       if ( ! stillalive( csnum ) )
 	{
 	  /* Died in the process. */
-	  ssdfuse[csnum] = 0;
+	  Ships[csnum].sdfuse = 0;
 	  return;
 	}
       
@@ -2535,7 +2534,7 @@ void doselfdest(int snum)
 	  cdclrl( MSG_LIN1, 2 );
 	  if ( iogchar() == TERM_ABORT )
 	    {
-	      ssdfuse[csnum] = 0;
+	      Ships[csnum].sdfuse = 0;
 	      c_putmsg( "Self destruct has been canceled.", MSG_LIN1 );
 	      return;
 	    }
@@ -2554,7 +2553,7 @@ void doselfdest(int snum)
   
   if ( *dstatus == DS_LIVE )
     {
-      if ( dist(sx[csnum], sy[csnum], *dx, *dy) <= DOOMSDAY_KILL_DIST )
+      if ( dist(Ships[csnum].x, Ships[csnum].y, *dx, *dy) <= DOOMSDAY_KILL_DIST )
 	{
 	  *dstatus = DS_OFF;
 	  stormsg( MSG_DOOM, MSG_ALL, "AIEEEEEEEE!" );
@@ -2579,10 +2578,10 @@ void doselfdest(int snum)
 void doshields( int snum, int up )
 {
   
-  sshup[snum] = up;
+  Ships[snum].shup = up;
   if ( up )
     {
-      srmode[snum] = FALSE;
+      Ships[snum].rmode = FALSE;
       c_putmsg( "Shields raised.", MSG_LIN1 );
     }
   else
@@ -2626,23 +2625,23 @@ void dotorp( int snum )
   
   cdclrl( MSG_LIN2, 1 );
   
-  if ( scloaked[snum] )
+  if ( Ships[snum].cloaked )
     {
       c_putmsg( "The cloaking device is using all available power.",
 	       MSG_LIN1 );
       return;
     }
-  if ( swfuse[snum] > 0 )
+  if ( Ships[snum].wfuse > 0 )
     {
       c_putmsg( "Weapons are currently overloaded.", MSG_LIN1 );
       return;
     }
-  if ( sfuel[snum] < TORPEDO_FUEL )
+  if ( Ships[snum].fuel < TORPEDO_FUEL )
     {
       c_putmsg( "Not enough fuel to launch a torpedo.", MSG_LIN1 );
       return;
     }
-  if ( gettarget( "Launch torpedo: ", MSG_LIN1, 1, &dir, slastblast[snum] ) )
+  if ( gettarget( "Launch torpedo: ", MSG_LIN1, 1, &dir, Ships[snum].lastblast ) )
     {
       if ( ! launch( snum, dir, 1, LAUNCH_NORMAL ) )
 	c_putmsg( ">TUBES EMPTY<", MSG_LIN2 );
@@ -2669,17 +2668,17 @@ void dotow( int snum )
   int i, other;
   
   cdclrl( MSG_LIN1, 2 );
-  if ( stowedby[snum] != 0 )
+  if ( Ships[snum].towedby != 0 )
     {
       c_strcpy( "But we are being towed by ", cbuf );
-      appship( stowing[snum], cbuf );
+      appship( Ships[snum].towing, cbuf );
       appchr( '!', cbuf );
       return;
     }
-  if ( stowing[snum] != 0 )
+  if ( Ships[snum].towing != 0 )
     {
       c_strcpy( "But we're already towing ", cbuf );
-      appship( stowing[snum], cbuf );
+      appship( Ships[snum].towing, cbuf );
       appchr( '.', cbuf );
       return;
     }
@@ -2696,27 +2695,27 @@ void dotow( int snum )
   PVLOCK(lockword);
   if ( other < 1 || other > MAXSHIPS )
     c_strcpy( "No such ship.", cbuf );
-  else if ( sstatus[other] != SS_LIVE )
+  else if ( Ships[other].status != SS_LIVE )
     c_strcpy( "Not found.", cbuf );
   else if ( other == snum )
     c_strcpy( "We can't tow ourselves!", cbuf );
-  else if ( dist( sx[snum], sy[snum], sx[other], sy[other] ) > TRACTOR_DIST )
+  else if ( dist( Ships[snum].x, Ships[snum].y, Ships[other].x, Ships[other].y ) > TRACTOR_DIST )
     c_strcpy( "That ship is out of tractor range.", cbuf );
-  else if ( swarp[other] < 0.0 )
+  else if ( Ships[other].warp < 0.0 )
     c_strcpy( "You can't tow a ship out of orbit.", cbuf );
-  else if ( sqrt( pow(( (real) (sdx[snum] - sdx[other]) ), (real) 2.0) +
-		  pow( (real) ( sdy[snum] - sdy[other] ), (real) 2.0 ) ) / 
+  else if ( sqrt( pow(( (real) (Ships[snum].dx - Ships[other].dx) ), (real) 2.0) +
+		  pow( (real) ( Ships[snum].dy - Ships[other].dy ), (real) 2.0 ) ) / 
 	    ( MM_PER_SEC_PER_WARP * ITER_SECONDS ) > MAX_TRACTOR_WARP ) 
     sprintf( cbuf, "That ships relative velocity is higher than %2.1f.",
 	     MAX_TRACTOR_WARP );
-  else if ( stowing[other] != 0 || stowedby[other] != 0 )
+  else if ( Ships[other].towing != 0 || Ships[other].towedby != 0 )
     c_strcpy(
 	     "There seems to be some interference with the tractor beams...",
 	     cbuf );
   else
     {
-      stowedby[other] = snum;
-      stowing[snum] = other;
+      Ships[other].towedby = snum;
+      Ships[snum].towing = other;
       c_strcpy( "Tractor beams engaged.", cbuf );
     }
   PVUNLOCK(lockword);
@@ -2737,11 +2736,11 @@ void dountow( int snum )
   int warsome; 
   
   cdclrl( MSG_LIN1, 2 );
-  if ( stowedby[snum] != 0 )
+  if ( Ships[snum].towedby != 0 )
     {
       /* If we're at war with him or he's at war with us, make it */
       /*  hard to break free. */
-      warsome = ( satwar( snum, stowedby[snum]) );
+      warsome = ( satwar( snum, Ships[snum].towedby) );
       if ( warsome )
 	{
 	  grand( &entertime );
@@ -2759,41 +2758,41 @@ void dountow( int snum )
       else
 	{
 	  c_strcpy( "Breaking free from ship ", cbuf );
-	  appship( stowedby[snum], cbuf );
+	  appship( Ships[snum].towedby, cbuf );
 	  PVLOCK(lockword);
-	  if ( stowedby[snum] != 0 )
+	  if ( Ships[snum].towedby != 0 )
 	    {
 	      /* Coast to a stop. */
-	      shead[snum] = shead[stowedby[snum]];
-	      swarp[snum] = swarp[stowedby[snum]];
+	      Ships[snum].head = Ships[Ships[snum].towedby].head;
+	      Ships[snum].warp = Ships[Ships[snum].towedby].warp;
 	      
 	      /* Release the tow. */
-	      if ( stowing[stowedby[snum]] != 0 )
-		stowing[stowedby[snum]] = 0;
-	      stowedby[snum] = 0;
+	      if ( Ships[Ships[snum].towedby].towing != 0 )
+		Ships[Ships[snum].towedby].towing = 0;
+	      Ships[snum].towedby = 0;
 	    }
 	  PVUNLOCK(lockword);
 	  appchr( '.', cbuf );
 	  c_putmsg( cbuf, MSG_LIN1 );
 	}
     }
-  else if ( stowing[snum] != 0 )
+  else if ( Ships[snum].towing != 0 )
     {
       c_strcpy( "Tow released from ship ", cbuf );
-      appship( stowing[snum], cbuf );
+      appship( Ships[snum].towing, cbuf );
       PVLOCK(lockword);
-      if ( stowing[snum] != 0 )
+      if ( Ships[snum].towing != 0 )
 	{
 	  /* Set other ship coasting. */
-	  shead[stowing[snum]] = shead[snum];
+	  Ships[Ships[snum].towing].head = Ships[snum].head;
 				/* only set warp if valid JET - 9/15/97 */
-	  if (swarp[snum] >= 0.0)
-	    swarp[stowing[snum]] = swarp[snum];
+	  if (Ships[snum].warp >= 0.0)
+	    Ships[Ships[snum].towing].warp = Ships[snum].warp;
 	  
 	  /* Release the tow. */
-	  if ( stowedby[stowing[snum]] != 0 )
-	    stowedby[stowing[snum]] = 0;
-	  stowing[snum] = 0;
+	  if ( Ships[Ships[snum].towing].towedby != 0 )
+	    Ships[Ships[snum].towing].towedby = 0;
+	  Ships[snum].towing = 0;
 	}
       PVUNLOCK(lockword);
       appchr( '.', cbuf );
@@ -2814,12 +2813,12 @@ void dountow( int snum )
 void dowar( int snum )
 {
   int i, entertime, now; 
-  int tuwar[NUMTEAMS], dowait;
+  int twar[NUMTEAMS], dowait;
   int ch;
   const int POffset = 47, WOffset = 61;
   
   for ( i = 0; i < NUMTEAMS; i = i + 1 )
-    tuwar[i] = swar[snum][i];
+    twar[i] = Ships[snum].war[i];
   
   cdclrl( MSG_LIN1, 2 );
   
@@ -2830,10 +2829,10 @@ void dowar( int snum )
   while ( stillalive( csnum ) )
     {
       for ( i = 0; i < NUMTEAMS; i = i + 1 )
-	if ( tuwar[i] )
+	if ( twar[i] )
 	  {
 	    cdput( ' ', MSG_LIN1, POffset + (i*2) );
-	    if ( srwar[snum][i] )
+	    if ( Ships[snum].rwar[i] )
 	      ch = chrteams[i];
 	    else
 	      ch = (char)tolower(chrteams[i]);
@@ -2859,14 +2858,14 @@ void dowar( int snum )
 	  dowait = FALSE;
 	  for ( i = 0; i < NUMTEAMS; i = i + 1 )
 	    {
-	      if ( tuwar[i] && ! swar[snum][i] )
+	      if ( twar[i] && ! Ships[snum].war[i] )
 		dowait = TRUE;
-	      uwar[suser[snum]][i] = tuwar[i];
-	      swar[snum][i] = tuwar[i];
+	      Users[Ships[snum].unum].war[i] = twar[i];
+	      Ships[snum].war[i] = twar[i];
 	    }
 	  
 	  /* Only check for computer delay when flying. */
-	  if ( sstatus[snum] != SS_RESERVED && dowait )
+	  if ( Ships[snum].status != SS_RESERVED && dowait )
 	    {
 	      /* We've set war with at least one team, stall a little. */
 	      c_putmsg(
@@ -2892,9 +2891,9 @@ void dowar( int snum )
       for ( i = 0; i < NUMTEAMS; i = i + 1 )
 	if ( ch == (char)tolower( chrteams[i] ) )
 	  {
-	    if ( ! tuwar[i] || ! srwar[snum][i] )
+	    if ( ! twar[i] || ! Ships[snum].rwar[i] )
 	      {
-		tuwar[i] = ! tuwar[i];
+		twar[i] = ! twar[i];
 		goto ccont1;	/* next 2  */
 	      }
 	    break;
@@ -2923,10 +2922,10 @@ void dowarp( int snum, real warp )
   
   cdclrl( MSG_LIN2, 1 );
   
-  if ( sdwarp[snum] == 0.0 && warp != 0.0 )
+  if ( Ships[snum].dwarp == 0.0 && warp != 0.0 )
     {
       /* See if engines are working. */
-      if ( sefuse[snum] > 0 )
+      if ( Ships[snum].efuse > 0 )
 	{
 	  c_putmsg( "Engines are currently overloaded.", MSG_LIN1 );
 	  return;
@@ -2940,26 +2939,26 @@ void dowarp( int snum, real warp )
 	}
       
       /* Don't stop repairing if changing to warp 0. */
-      srmode[snum] = FALSE;
+      Ships[snum].rmode = FALSE;
     }
   
   /* If orbitting, break orbit. */
-  if ( swarp[snum] < 0.0 )
+  if ( Ships[snum].warp < 0.0 )
     {
-      swarp[snum] = 0.0;
-      slock[snum] = 0;
-      sdhead[snum] = shead[snum];
+      Ships[snum].warp = 0.0;
+      Ships[snum].lock = 0;
+      Ships[snum].dhead = Ships[snum].head;
     }
   
   /* Handle ship limitations. */
-  sdwarp[snum] = min( warp, warplim[steam[snum]] );
+  Ships[snum].dwarp = min( warp, warplim[Ships[snum].team] );
   
-  sprintf( cbuf, "Warp %d.", (int) sdwarp[snum] );
+  sprintf( cbuf, "Warp %d.", (int) Ships[snum].dwarp );
   c_putmsg( cbuf, MSG_LIN1 );
   
   /* Warn about damage limitations. */
   mw = maxwarp( snum );
-  if ( around( sdwarp[snum] ) > mw )
+  if ( around( Ships[snum].dwarp ) > mw )
     {
       sprintf( cbuf, "(Due to damage, warp is currently limited to %.1f.)",
 	     mw );
@@ -3064,27 +3063,27 @@ void menu(void)
   EnableSignalHandler();	/* enable trapping of interesting signals */
   
   /* Initialize statistics. */
-  initstats( &sctime[csnum], &setime[csnum] );
+  initstats( &Ships[csnum].ctime, &Ships[csnum].etime );
   
   /* Log this entry into the Game. */
   loghist( cunum );
   
   /* Set up a few ship characteristics here rather than in initship(). */
-  suser[csnum] = cunum;
-  steam[csnum] = uteam[cunum];
-  spid[csnum] = cpid;
+  Ships[csnum].unum = cunum;
+  Ships[csnum].team = Users[cunum].team;
+  Ships[csnum].pid = cpid;
   for ( i = 0; i < MAXOPTIONS; i = i + 1 )
-    soption[csnum][i] = uoption[cunum][i];
+    Ships[csnum].options[i] = Users[cunum].options[i];
   for ( i = 0; i < NUMTEAMS; i = i + 1 )
     {
-      srwar[csnum][i] = FALSE;
-      swar[csnum][i] = uwar[cunum][i];
+      Ships[csnum].rwar[i] = FALSE;
+      Ships[csnum].war[i] = Users[cunum].war[i];
     }
-  stcpn( upname[cunum], spname[csnum], MAXUSERPNAME );
+  stcpn( Users[cunum].alias, Ships[csnum].alias, MAXUSERPNAME );
   
   /* Set up some things for the menu display. */
-  switchteams = uooption[cunum][OOPT_SWITCHTEAMS];
-  multiple = uooption[cunum][OOPT_MULTIPLE];
+  switchteams = Users[cunum].ooptions[OOPT_SWITCHTEAMS];
+  multiple = Users[cunum].ooptions[OOPT_MULTIPLE];
   oclosed = *closed;
   cleave = FALSE;
   redraw = TRUE;
@@ -3099,9 +3098,9 @@ void menu(void)
 	{
 	  if ( csnum < 1 || csnum > MAXSHIPS )
 	    lose = TRUE;
-	  else if ( spid[csnum] != cpid )
+	  else if ( Ships[csnum].pid != cpid )
 	    lose = TRUE;
-	  else if ( sstatus[csnum] != SS_RESERVED )
+	  else if ( Ships[csnum].status != SS_RESERVED )
 	    {
 	      clog( "menu(): Ship %d no longer reserved.", csnum );
 	      lose = TRUE;
@@ -3143,15 +3142,15 @@ void menu(void)
 	}
       
       /* Some simple housekeeping. */
-      if ( multiple != uooption[cunum][OOPT_MULTIPLE] )
+      if ( multiple != Users[cunum].ooptions[OOPT_MULTIPLE] )
 	{
 	  multiple = ! multiple;
 	  redraw = TRUE;
 	}
       
-      if ( switchteams != uooption[cunum][OOPT_SWITCHTEAMS])
+      if ( switchteams != Users[cunum].ooptions[OOPT_SWITCHTEAMS])
 	{
-	  switchteams = uooption[cunum][OOPT_SWITCHTEAMS];
+	  switchteams = Users[cunum].ooptions[OOPT_SWITCHTEAMS];
 	  redraw = TRUE;
 	}
       if ( oclosed != *closed )
@@ -3188,7 +3187,7 @@ void menu(void)
 	}
       
       /* Reset up the destruct fuse. */
-      ssdfuse[csnum] = -TIMEOUT_PLAYER;
+      Ships[csnum].sdfuse = -TIMEOUT_PLAYER;
       
       /* Get a char with timeout. */
       if ( ! iogtimed( &ch, 1 ) )
@@ -3244,9 +3243,9 @@ void menu(void)
 	  else
 	    {
 	      for ( i = 1; i <= MAXSHIPS; i = i + 1 )
-		if ( sstatus[i] == SS_LIVE ||
-		    sstatus[i] == SS_ENTERING )
-		  if ( suser[i] == cunum )
+		if ( Ships[i].status == SS_LIVE ||
+		    Ships[i].status == SS_ENTERING )
+		  if ( Ships[i].unum == cunum )
 		    break;
 	      if ( i <= MAXSHIPS )
 		cdbeep();
@@ -3267,10 +3266,10 @@ void menu(void)
 	    cdbeep();
 	  else
 	    {
-	      steam[csnum] = modp1( steam[csnum]+1, NUMTEAMS );
-	      uteam[cunum] = steam[csnum];
-	      swar[csnum][steam[csnum]] = FALSE;
-	      uwar[cunum][uteam[cunum]] = FALSE;
+	      Ships[csnum].team = modp1( Ships[csnum].team+1, NUMTEAMS );
+	      Users[cunum].team = Ships[csnum].team;
+	      Ships[csnum].war[Ships[csnum].team] = FALSE;
+	      Users[cunum].war[Users[cunum].team] = FALSE;
 	    }
 	  break;
 	case 'S':
@@ -3278,7 +3277,7 @@ void menu(void)
 	  redraw = TRUE;
 	  break;
 	case 'T':
-	  doteamlist( steam[csnum] );
+	  doteamlist( Ships[csnum].team );
 	  redraw = TRUE;
 	  break;
 	case 'U':
@@ -3317,12 +3316,12 @@ void menu(void)
   while ( stillalive( csnum ) &&  !cleave );
   
   /* Make our ship available for others to use. */
-  if ( sstatus[csnum] == SS_RESERVED )
+  if ( Ships[csnum].status == SS_RESERVED )
     {
       conqstats( csnum );
       PVLOCK(lockword);
-      ssdfuse[csnum] = 0;
-      sstatus[csnum] = SS_OFF;
+      Ships[csnum].sdfuse = 0;
+      Ships[csnum].status = SS_OFF;
       PVUNLOCK(lockword);
     }
   
@@ -3351,7 +3350,7 @@ int newship( int unum, int *snum )
 
   PVLOCK(lockword);
   
-  sstatus[*snum] = SS_ENTERING;		/* show intent to fly */
+  Ships[*snum].status = SS_ENTERING;		/* show intent to fly */
 
   fresh = TRUE;				/* assume we want a fresh ship*/
   
@@ -3359,8 +3358,8 @@ int newship( int unum, int *snum )
   j = 0;
   numvec = 0;
   for ( i = 1; i <= MAXSHIPS; i = i + 1 )
-    if ( sstatus[i] == SS_LIVE || sstatus[i] == SS_ENTERING )
-      if ( suser[i] == unum && *snum != i )
+    if ( Ships[i].status == SS_LIVE || Ships[i].status == SS_ENTERING )
+      if ( Ships[i].unum == unum && *snum != i )
 	{
 	  j++;
 	  vec[numvec++] = i;
@@ -3368,7 +3367,7 @@ int newship( int unum, int *snum )
 
   PVUNLOCK(lockword);
 
-  if ( ! uooption[unum][OOPT_MULTIPLE] )
+  if ( ! Users[unum].ooptions[OOPT_MULTIPLE] )
     {
       /* Isn't a multiple; see if we need to reincarnate. */
       if ( j > 0 )
@@ -3380,7 +3379,7 @@ int newship( int unum, int *snum )
 	  i = MSG_LIN2/2;
 	  j = 9;
 
-	  if (CheckPid(spid[vec[0]]) == FALSE)
+	  if (CheckPid(Ships[vec[0]].pid) == FALSE)
 	    {			/* it's available */
 	      attrset(InfoColor);
 	      cdputs( "You're already playing on another ship." , i, j );
@@ -3388,7 +3387,7 @@ int newship( int unum, int *snum )
 	      if ( cdgetx( "Press TAB to reincarnate to this ship: ",
 			   i + 1, j, TERMS, cbuf, MSGMAXLINE ) != TERM_EXTRA )
 		{
-		  sstatus[*snum] = SS_RESERVED;
+		  Ships[*snum].status = SS_RESERVED;
 		  attrset(0);
 		  return ( FALSE );
 		}
@@ -3397,10 +3396,10 @@ int newship( int unum, int *snum )
 	  else
 	    {
 	      sprintf(cbuf, "You're already playing on another ship (pid=%d).",
-		      spid[vec[0]]);
+		      Ships[vec[0]].pid);
 	      cprintf(i,j,ALIGN_NONE,"#%d#%s",InfoColor, cbuf);
 	      
-	      sstatus[*snum] = SS_RESERVED;
+	      Ships[*snum].status = SS_RESERVED;
 	      putpmt( "--- press any key ---", MSG_LIN2 );
 
 	      cdrefresh();
@@ -3412,13 +3411,13 @@ int newship( int unum, int *snum )
 	  /* Look for a live ship for us to take. */
 	  PVLOCK(lockword);
 	  for ( i = 1; i <= MAXSHIPS; i = i + 1)
-	    if ( suser[i] == unum && sstatus[i] == SS_LIVE )
+	    if ( Ships[i].unum == unum && Ships[i].status == SS_LIVE )
 	      {
 		fresh = FALSE;
-		sstatus[*snum] = SS_OFF;
+		Ships[*snum].status = SS_OFF;
 		*snum = i;
-		spid[*snum] = cpid;
-		sstatus[*snum] = SS_ENTERING;
+		Ships[*snum].pid = cpid;
+		Ships[*snum].status = SS_ENTERING;
 		break;
 	      }
 	  PVUNLOCK(lockword);
@@ -3440,8 +3439,8 @@ int newship( int unum, int *snum )
 	  j = 0;
 	  numvec = 0;
 	  for ( i = 1; i <= MAXSHIPS; i = i + 1 )
-	    if ( sstatus[i] == SS_LIVE || sstatus[i] == SS_ENTERING )
-	      if ( suser[i] == unum && *snum != i )
+	    if ( Ships[i].status == SS_LIVE || Ships[i].status == SS_ENTERING )
+	      if ( Ships[i].unum == unum && *snum != i )
 		{
 		  j++;
 		  vec[numvec++] = i;
@@ -3452,7 +3451,7 @@ int newship( int unum, int *snum )
 	  numavail = 0;
 	  for (k=0; k < numvec; k++)
 	    {
-	      if (CheckPid(spid[vec[k]]) == FALSE)
+	      if (CheckPid(Ships[vec[k]].pid) == FALSE)
 		{
 		  /* no pid, so available */
 		  availlist[numavail++] = k;
@@ -3461,9 +3460,9 @@ int newship( int unum, int *snum )
 
 	  /* Is a multiple, max ships already in and no ships to
 	     reincarnate too */
-	  if ( j >= umultiple[unum] && numavail == 0)
+	  if ( j >= Users[unum].multiple && numavail == 0)
 	    {
-	      sstatus[*snum] = SS_RESERVED;
+	      Ships[*snum].status = SS_RESERVED;
 	      cdclear();
 	      cdredo();
 	      i = MSG_LIN2/2;
@@ -3471,7 +3470,7 @@ int newship( int unum, int *snum )
 		     "I'm sorry, but your playing on too many ships right now.", i );
 	      i = i + 1;
 	      c_strcpy( "You are only allowed to fly ", cbuf );
-	      j = umultiple[unum];
+	      j = Users[unum].multiple;
 	      appint( j, cbuf );
 	      appstr( " ship", cbuf );
 	      if ( j != 1 )
@@ -3480,7 +3479,7 @@ int newship( int unum, int *snum )
 	      cdputc( cbuf, i );
 	      cdrefresh();
 	      c_sleep( 2.0 );
-	      sstatus[*snum] = SS_RESERVED;
+	      Ships[*snum].status = SS_RESERVED;
 
 	      return ( FALSE );
 	    }
@@ -3507,7 +3506,7 @@ int newship( int unum, int *snum )
 		  strcat(cbuf, cbuf2);
 		}
 
-	      if (j < umultiple[unum])
+	      if (j < Users[unum].multiple)
 		{
 		  cprintf(MSG_LIN1, 0, ALIGN_LEFT, 
 			  "#%d#Enter a ship number, or press [TAB] to create a new one.",
@@ -3557,11 +3556,11 @@ int newship( int unum, int *snum )
 			      if (found  == TRUE)
 				{
 				  PVLOCK(lockword);
-				  sstatus[*snum] = SS_OFF;
+				  Ships[*snum].status = SS_OFF;
 				  *snum = selectnum;
 				  fresh = FALSE;
-				  spid[*snum] = cpid;
-				  sstatus[*snum] = SS_ENTERING;
+				  Ships[*snum].pid = cpid;
+				  Ships[*snum].status = SS_ENTERING;
 				  PVUNLOCK(lockword);
 				  break;
 				}
@@ -3573,13 +3572,13 @@ int newship( int unum, int *snum )
 				   TERM_NORMAL, quit */
 			  if (l == TERM_NORMAL)
 			    {
-			      sstatus[*snum] = SS_RESERVED;
+			      Ships[*snum].status = SS_RESERVED;
 			      
 			      return(FALSE);
 			    }
 			  
 			  
-			  if ( j < umultiple[unum])
+			  if ( j < Users[unum].multiple)
 			    {
 			      fresh = TRUE;
 			      break;
@@ -3605,10 +3604,10 @@ int newship( int unum, int *snum )
   /* Figure out which system to enter. */
   if ( fresh )
     {
-      system = steam[*snum];
+      system = Ships[*snum].team;
       if ( ! capentry( *snum, &system ) )
 	{
-	  sstatus[*snum] = SS_RESERVED;
+	  Ships[*snum].status = SS_RESERVED;
 	  return ( ERR );
 	}
     }
@@ -3626,10 +3625,10 @@ int newship( int unum, int *snum )
       else
 	i = homeplanet[system];
       putship( *snum, px[i], py[i] );
-      sdhead[*snum] = rnduni( 0.0, 359.9 );
-      shead[*snum] = sdhead[*snum];
-      sdwarp[*snum] = (real) rndint( 2, 5 ) ;/* #~~~ this is a kludge*/
-      slock[*snum] = -homeplanet[system];
+      Ships[*snum].dhead = rnduni( 0.0, 359.9 );
+      Ships[*snum].head = Ships[*snum].dhead;
+      Ships[*snum].dwarp = (real) rndint( 2, 5 ) ;/* #~~~ this is a kludge*/
+      Ships[*snum].lock = -homeplanet[system];
     }
   else
     {				/* if we're reincarnating, skip any
@@ -3638,21 +3637,21 @@ int newship( int unum, int *snum )
       if (conf_ClearOldMsgs == TRUE)
 	{
 	  PVLOCK(lockmesg);
-	  slastmsg[*snum] = *lastmsg;
-	  salastmsg[*snum] = slastmsg[*snum];
+	  Ships[*snum].lastmsg = *lastmsg;
+	  Ships[*snum].alastmsg = Ships[*snum].lastmsg;
 	  PVUNLOCK(lockmesg);
 	}
     }
       
-  srobot[*snum] = FALSE;
-  saction[*snum] = 0;
+  Ships[*snum].robot = FALSE;
+  Ships[*snum].action = 0;
   
   
   /* Straighten out the ships deltas. */
   fixdeltas( *snum );
   
   /* Finally, turn the ship on. */
-  sstatus[*snum] = SS_LIVE;
+  Ships[*snum].status = SS_LIVE;
   
   PVUNLOCK(lockword);
   
@@ -3675,7 +3674,7 @@ int play()
     return(rv);
   
   drstart();				/* start a driver, if necessary */
-  ssdfuse[csnum] = 0;				/* zero self destruct fuse */
+  Ships[csnum].sdfuse = 0;				/* zero self destruct fuse */
   grand( &cmsgrand );			/* initialize message timer */
   cleave = FALSE;				/* assume we won't want to bail */
   credraw = TRUE;				/* want redraw first time */
@@ -3693,9 +3692,9 @@ int play()
   /* Tell everybody, we're here */
 
   sprintf(msgbuf, "%c%d (%s) has entered the game.",
-	  chrteams[steam[csnum]],
+	  chrteams[Ships[csnum].team],
 	  csnum,
-	  spname[csnum]);
+	  Ships[csnum].alias);
   
   stormsg(MSG_COMP, MSG_ALL, msgbuf);
   
@@ -3703,7 +3702,7 @@ int play()
   while ( stillalive( csnum ) )
     {
       /* Make sure we still control our ship. */
-      if ( spid[csnum] != cpid )
+      if ( Ships[csnum].pid != cpid )
 	break;
       
       /* Get a char with one second timeout. */
@@ -3823,7 +3822,7 @@ int welcome( int *unum )
     }
   
   /* Must be special to play when closed. */
-  if ( *closed && ! uooption[*unum][OOPT_PLAYWHENCLOSED] )
+  if ( *closed && ! Users[*unum].ooptions[OOPT_PLAYWHENCLOSED] )
     {
       cdclear();
       cdredo();
@@ -3836,7 +3835,7 @@ int welcome( int *unum )
     }
   
   /* Can't play if on the shit list. */
-  if ( uooption[*unum][OOPT_SHITLIST] )
+  if ( Users[*unum].ooptions[OOPT_SHITLIST] )
     {
       cdclear();
       cdredo();

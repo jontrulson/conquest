@@ -35,10 +35,10 @@ int GetConquestUID(void)
   struct passwd *conq_pwd;
   static int theuid;
   
-  if ((conq_pwd = getpwnam(CONQUEST_USER)) == NULL)
+  if ((conq_pwd = getpwnam(ROOT_USER)) == NULL)
     {
       fprintf(stderr, "conqsvr42: GetConquestUID(%s): can't get user: %s",
-	      CONQUEST_USER,
+	      ROOT_USER,
 	      sys_errlist[errno]);
       
       return(ERR);
@@ -184,11 +184,11 @@ void astservice(int sig)
   readone = FALSE;
   if ( cmsgok )
     if ( dgrand( cmsgrand, &now ) >= NEWMSG_GRAND )
-      if ( getamsg( csnum, &slastmsg[csnum] ) )
+      if ( getamsg( csnum, &Ships[csnum].lastmsg ) )
 	{
-	  if (readmsg( csnum, slastmsg[csnum], RMsg_Line ) == TRUE)
+	  if (readmsg( csnum, Ships[csnum].lastmsg, RMsg_Line ) == TRUE)
 	    {
-	      if (msgfrom[slastmsg[csnum]] != csnum)
+	      if (msgfrom[Ships[csnum].lastmsg] != csnum)
 		if (conf_MessageBell == TRUE)
 		  cdbeep();
 	      cmsgrand = now;
@@ -205,7 +205,7 @@ void astservice(int sig)
   if ( readone )
     if (RMsg_Line != MSG_LIN1)	/* we have an extra msg line */
       if ( iochav() )
-	slastmsg[csnum] = modp1( slastmsg[csnum] - 1, MAXMESSAGES );
+	Ships[csnum].lastmsg = modp1( Ships[csnum].lastmsg - 1, MAXMESSAGES );
   
   /* Schedule for next time. */
   settimer();
@@ -327,18 +327,18 @@ void conqstats( int snum )
   cadd = 0;
   eadd = 0;
   
-  upstats( &sctime[snum], &setime[snum], &scacc[snum], &seacc[snum],
+  upstats( &Ships[snum].ctime, &Ships[snum].etime, &Ships[snum].cacc, &Ships[snum].eacc,
 	  &cadd, &eadd );
   
   /* Add in the new amounts. */
   PVLOCK(lockword);
-  if ( spid[snum] != 0 )
+  if ( Ships[snum].pid != 0 )
     {
       /* Update stats for a humanoid ship. */
-      unum = suser[snum];
-      ustats[unum][USTAT_CPUSECONDS] += cadd;
-      ustats[unum][USTAT_SECONDS] += eadd;
-      team = uteam[unum];
+      unum = Ships[snum].unum;
+      Users[unum].stats[USTAT_CPUSECONDS] += cadd;
+      Users[unum].stats[USTAT_SECONDS] += eadd;
+      team = Users[unum].team;
       tstats[team][TSTAT_CPUSECONDS] += cadd;
       tstats[team][TSTAT_SECONDS] += eadd;
       *ccpuseconds += cadd;

@@ -266,7 +266,7 @@ with the (r)obot menu option.
 
 	The semaphore status line (line 2) in conqoper can give you
 useful information on the locks used by Conquest to prevent
-simultaneous writes the the common block.  The following is an example
+simultaneous writes to the common block.  The following is an example
 line, labeled by the letters 'A'-'I' above it.
 
   A         B   C     D  E        F    G     H  I
@@ -329,8 +329,8 @@ worry about suns, sometimes to their detriment.
 
 	Cloaking can be very useful in battle.  Unfortunately, it's
 expensive in terms of fuel and engine heating.  But at warp 0 however,
-it's can be very nice - sometimes.  There are ways of locating (at
-least approximately) cloaked ships.  Really.  Two pople who know what
+it can be very nice - sometimes.  There are ways of locating (at least
+approximately) cloaked ships.  Really.  Two pople who know what
 they're doing can get pretty damn good at triangulating cloaked
 ships... right Dave?  Robots can't detect cloaked ships at warp 0.
 
@@ -455,8 +455,8 @@ work.
 
 	You can set course and lock onto a planet by typing the planet
 name (or first 3 unique characters) followed by [TAB] as input to the
-(i)nfo command.  You will automatically enter orbit when you get close
-enough to your destination.
+(k)ourse command.  You will automatically enter orbit when you get
+close enough to your destination.
 
 	In addition, the (i)nfo command understands several special
 strings like 'ne' for info on nearest enemy.  Obviously you can't

@@ -31,6 +31,9 @@
 #define CEXTERN extern 
 #endif
 
+#include "user.h"
+#include "ship.h"
+
 /* Special data items - these must be at the very beginning. */
 /*CEXTERN    int commonrev;			/* common block rev number */
 CEXTERN    int *commonrev;			/* common block rev number */
@@ -95,41 +98,9 @@ CEXTERN    int *raccum;			/* accumulated cpu hundredths */
 CEXTERN    char *lastupchuck;	/* last time the common block was updated */
 
     /* User statistics. */
-/*CEXTERN    int ulive[MAXUSERS];		/* user exists or not */
-CEXTERN    int *ulive;		/* user exists or not */
 
-/*CEXTERN    int uteam[MAXUSERS];		/* team s/he is on */
-CEXTERN    int *uteam;		/* team s/he is on */
-
-/*CEXTERN    int umultiple[MAXUSERS];		/* number of ships a multiple can fly */
-CEXTERN    int *umultiple;		/* number of ships a multiple can fly */
-
-/*CEXTERN    int ustats[MAXUSERS][MAXUSTATS];	/* random team statistics */
-CEXTERN    int **ustats;	/* random team statistics */
-
-/*CEXTERN    real urating[MAXUSERS];		/* current rating for each user */
-CEXTERN    real *urating;		/* current rating for each user */
-
-/*CEXTERN    int urobot[MAXUSERS];		/* says if a user is a robot */
-CEXTERN    int *urobot;		/* says if a user is a robot */
-
-/*CEXTERN    int uwar[MAXUSERS][NUMTEAMS];	/* teams s/he is at war with */
-CEXTERN    int **uwar;	/* teams s/he is at war with */
-
-/*CEXTERN    int uoption[MAXUSERS][MAXOPTIONS]; /* user options */
-CEXTERN    int **uoption; /* user options */
-
-/*CEXTERN    int uooption[MAXUSERS][MAXOOPTIONS]; /* operator options */
-CEXTERN    int **uooption; /* operator options */
-
-/*CEXTERN    char cuname[MAXUSERS][SIZEUSERNAME]; /* user's login name */
-CEXTERN    char **cuname; /* user's login name */
-
-/*CEXTERN    char upname[MAXUSERS][SIZEUSERPNAME]; /* user's pseudonym */
-CEXTERN    char **upname; /* user's pseudonym */
-
-/*CEXTERN    char ulastentry[MAXUSERS][DATESIZE]; /* time stamp of last entry */
-CEXTERN    char **ulastentry; /* time stamp of last entry */
+				/* per user data */
+CEXTERN User_t *Users;		/* User structures */
 
 /* End of permanent data. */
 
@@ -311,163 +282,8 @@ CEXTERN    int *drivtime;			/* last time the driver looped */
 CEXTERN    int *playtime;			/* last time a player looped */
 
     /* Ships. */
-/*CEXTERN    int sstatus[MAXSHIPS];		/* one of the SS_ values */
-CEXTERN    int *sstatus;		/* one of the SS_ values */
 
-/*CEXTERN    int skilledby[MAXSHIPS];		/* one of the KB_ values, or: */
-CEXTERN    int *skilledby;		/* one of the KB_ values, or: */
-					/*   >0 means ship number */
-					/*   <0 means -(planet number) */
-/*CEXTERN    int suser[MAXSHIPS];		/* user number of the ship's captain */
-CEXTERN    int *suser;		/* user number of the ship's captain */
-
-/*CEXTERN    int steam[MAXSHIPS];		/* team of the ship */
-CEXTERN    int *steam;		/* team of the ship */
-
-/*CEXTERN    int spid[MAXSHIPS];		/* process id of ships owner process */
-CEXTERN    int *spid;		/* process id of ships owner process */
-
-/*CEXTERN    real sx[MAXSHIPS];			/* x and y coordinates of ship */
-CEXTERN    real *sx;			/* x and y coordinates of ship */
-
-/*CEXTERN    real sy[MAXSHIPS];*/
-CEXTERN    real *sy;
-
-/*CEXTERN    real sdx[MAXSHIPS];			/* x and y increments */
-CEXTERN    real *sdx;			/* x and y increments */
-
-/*CEXTERN    real sdy[MAXSHIPS];			/*  in mega-meters per iter seconds */
-CEXTERN    real *sdy;			/*  in mega-meters per iter seconds */
-
-/*CEXTERN    real shead[MAXSHIPS];		/* direction of motion - [0-359.9] */
-CEXTERN    real *shead;		/* direction of motion - [0-359.9] */
-
-/*CEXTERN    real sdhead[MAXSHIPS];		/* desired direction of motion */
-CEXTERN    real *sdhead;		/* desired direction of motion */
-
-/*CEXTERN    real swarp[MAXSHIPS];		/* warp factor: [0-variable] or */
-CEXTERN    real *swarp;		/* warp factor: [0-variable] or */
-
-					/*  <0 for orbiting */
-/*CEXTERN    real sdwarp[MAXSHIPS];		/* desired warp factor: [0-variable] */
-CEXTERN    real *sdwarp;		/* desired warp factor: [0-variable] */
-
-/*CEXTERN    int slock[MAXSHIPS];		/* 0 or -planet locked on to; */
-CEXTERN    int *slock;		/* 0 or -planet locked on to; */
-					/*   if swarp<0, orbiting */
-
-/*CEXTERN    int sshup[MAXSHIPS];		/* shields up or down */
-CEXTERN    int *sshup;		/* shields up or down */
-
-/*CEXTERN    real sshields[MAXSHIPS];		/* shield percentage - [0-100] */
-CEXTERN    real *sshields;		/* shield percentage - [0-100] */
-
-/*CEXTERN    real skills[MAXSHIPS];		/* kills - [0-inf] */
-CEXTERN    real *skills;		/* kills - [0-inf] */
-
-/*CEXTERN    real sdamage[MAXSHIPS];		/* damage percentage - [0-100] */
-CEXTERN    real *sdamage;		/* damage percentage - [0-100] */
-
-/*CEXTERN    real sfuel[MAXSHIPS];		/* fuel - [0-999] */
-CEXTERN    real *sfuel;		/* fuel - [0-999] */
-
-/*CEXTERN    real swtemp[MAXSHIPS];		/* weapons temperature */
-CEXTERN    real *swtemp;		/* weapons temperature */
-
-/*CEXTERN    real setemp[MAXSHIPS];		/* engine temperature */
-CEXTERN    real *setemp;		/* engine temperature */
-
-/*CEXTERN    int swfuse[MAXSHIPS];		/* seconds until weapons work again */
-CEXTERN    int *swfuse;		/* seconds until weapons work again */
-
-/*CEXTERN    int sefuse[MAXSHIPS];		/* seconds until engines work again */
-CEXTERN    int *sefuse;		/* seconds until engines work again */
-
-/*CEXTERN    int sweapons[MAXSHIPS];		/* weapons allocation - [30-70] */
-CEXTERN    int *sweapons;		/* weapons allocation - [30-70] */
-
-/*CEXTERN    int sengines[MAXSHIPS];		/* engines allocation is 100-sweapons */
-CEXTERN    int *sengines;		/* engines allocation is 100-sweapons */
-
-/*CEXTERN    int sarmies[MAXSHIPS];		/* armies being carried */
-CEXTERN    int *sarmies;		/* armies being carried */
-
-/*CEXTERN    int srmode[MAXSHIPS];		/* in repair mode or not */
-CEXTERN    int *srmode;		/* in repair mode or not */
-
-/*CEXTERN    int scloaked[MAXSHIPS];		/* cloaking device on or not */
-CEXTERN    int *scloaked;		/* cloaking device on or not */
-
-/*CEXTERN    int soption[MAXSHIPS][MAXOPTIONS]; /* user options - copy of uoption */
-CEXTERN    int **soption; /* user options - copy of uoption */
-
-/*CEXTERN    int swar[MAXSHIPS][NUMTEAMS];	/* teams s/he is at war with - copy */
-CEXTERN    int **swar;	/* teams s/he is at war with - copy */
-					/*  of uwar */
-/*CEXTERN    int srwar[MAXSHIPS][NUMTEAMS];	/* teams s/he is at WAR with */
-CEXTERN    int **srwar;	/* teams s/he is at WAR with */
-
-/*CEXTERN    int ssrpwar[MAXSHIPS][NUMPLANETS]; /* self-ruled planets s/he is at war */
-CEXTERN    int **ssrpwar; /* self-ruled planets s/he is at war */
-
-/*CEXTERN    int ssdfuse[MAXSHIPS];		/* self-destruct fuse, 0 normally */
-CEXTERN    int *ssdfuse;		/* self-destruct fuse, 0 normally */
-
-/*CEXTERN    int slastmsg[MAXSHIPS];		/* last message seen */
-CEXTERN    int *slastmsg;		/* last message seen */
-
-/*CEXTERN    int salastmsg[MAXSHIPS];		/* last message allowed to be seen */
-CEXTERN    int *salastmsg;		/* last message allowed to be seen */
-
-/*CEXTERN    int smap[MAXSHIPS];		/* strategic map or not */
-CEXTERN    int *smap;		/* strategic map or not */
-
-/*CEXTERN    int stowing[MAXSHIPS];		/* ship we are towing, or 0 */
-CEXTERN    int *stowing;		/* ship we are towing, or 0 */
-
-/*CEXTERN    int stowedby[MAXSHIPS];		/* ship towing us, or 0 */
-CEXTERN    int *stowedby;		/* ship towing us, or 0 */
-
-/*CEXTERN    real slastblast[MAXSHIPS];		/* direction of last weapons usage */
-CEXTERN    real *slastblast;		/* direction of last weapons usage */
-
-/*CEXTERN    real slastphase[MAXSHIPS];		/* phaser direction, needed by display(] */
-CEXTERN    real *slastphase;		/* phaser direction, needed by display(] */
-
-/*CEXTERN    int spfuse[MAXSHIPS];		/* tenths until can phaser again */
-CEXTERN    int *spfuse;		/* tenths until can phaser again */
-
-/*CEXTERN    int sscanned[MAXSHIPS][NUMTEAMS]; /* fuse for which ships have been */
-CEXTERN    int **sscanned; /* fuse for which ships have been */
-
-					/*  scanned by which teams */
-/*CEXTERN    int stalert[MAXSHIPS];		/* torp alert! */
-CEXTERN    int *stalert;		/* torp alert! */
-
-/*CEXTERN    int srobot[MAXSHIPS];		/* true if is a robot ship */
-CEXTERN    int *srobot;		/* true if is a robot ship */
-
-/*CEXTERN    int saction[MAXSHIPS];		/* current action token if a robot */
-CEXTERN    int *saction;		/* current action token if a robot */
-
-/*CEXTERN    char spname[MAXSHIPS][SIZEUSERPNAME];*/
-CEXTERN    char **spname;
-
-					/* user's pseudonym, copy of upname(] */
-/*CEXTERN    int sctime[MAXSHIPS];		/* cpu hundredths at last check */
-CEXTERN    int *sctime;		/* cpu hundredths at last check */
-
-/*CEXTERN    int setime[MAXSHIPS];		/* elapsed thousands at last check */
-CEXTERN    int *setime;		/* elapsed thousands at last check */
-
-/*CEXTERN    int scacc[MAXSHIPS];		/* accumulated cpu time */
-CEXTERN    int *scacc;		/* accumulated cpu time */
-
-/*CEXTERN    int seacc[MAXSHIPS];		/* accumulated elapsed time */
-CEXTERN    int *seacc;		/* accumulated elapsed time */
-
-/*CEXTERN    int sstrkills[MAXSHIPS];           /* 'extra' randomized kills used for robots */
-CEXTERN    real *sstrkills;	/* 'extra' randomized kills used for robots */
+CEXTERN Ship_t *Ships;		/* ship structures */
 
     /* Torpedoes. */
 /*CEXTERN    int tstatus[MAXSHIPS][MAXTORPS];	/* one of the TS_ values */
@@ -491,8 +307,8 @@ CEXTERN    real **tdy;		/*  in mega-meters per iter seconds */
 /*CEXTERN    real tmult[MAXSHIPS][MAXTORPS];	/* multiplier when detonated */
 CEXTERN    real **tmult;	/* multiplier when detonated */
 
-/*CEXTERN    int twar[MAXSHIPS][MAXTORPS][NUMTEAMS]; /* copy of uwar when fired */
-CEXTERN    int ***twar; /* copy of uwar when fired */
+/*CEXTERN    int twar[MAXSHIPS][MAXTORPS][NUMTEAMS]; /* copy of war when fired */
+CEXTERN    int ***twar; /* copy of war when fired */
 
     /* Messages. */
 /*CEXTERN    char msgbuf[MAXMESSAGES][MESSAGE_SIZE];	/* the messages */

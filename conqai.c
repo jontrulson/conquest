@@ -30,6 +30,7 @@
 #include "conqcom.h"
 #include "conqcom2.h"
 #include "global.h"
+#include "user.h"
 
 static int nenum; 
 static int debug; 
@@ -165,51 +166,51 @@ void buildai( int snum, int vars[], int *bnenum, real *bdne, real *bane )
   *bdne = 1e9;
   if ( findspecial( snum, SPECIAL_ENEMYSHIP, 0, bnenum, &xnenum ) )
     {
-      if ( scloaked[*bnenum] )
+      if ( Ships[*bnenum].cloaked )
 	{
-	  x = rndnor( sx[*bnenum], CLOAK_SMEAR_DIST );
-	  y = rndnor( sy[*bnenum], CLOAK_SMEAR_DIST );
+	  x = rndnor( Ships[*bnenum].x, CLOAK_SMEAR_DIST );
+	  y = rndnor( Ships[*bnenum].y, CLOAK_SMEAR_DIST );
 	}
       else
 	{
-	  x = sx[*bnenum];
-	  y = sy[*bnenum];
+	  x = Ships[*bnenum].x;
+	  y = Ships[*bnenum].y;
 	}
-      *bdne = dist( sx[snum], sy[snum], x, y );
-      *bane = angle( sx[snum], sy[snum], x, y );
+      *bdne = dist( Ships[snum].x, Ships[snum].y, x, y );
+      *bane = angle( Ships[snum].x, Ships[snum].y, x, y );
       
       /* Enemy is cloaked (-) */
       if ( *bdne < ACCINFO_DIST )
 	{
-	  AIBOOLEAN( vars[VAR_ENEMYCLOAKED], scloaked[*bnenum] == TRUE );
-	  AISCALE( vars[VAR_ENEMYDAMAGE], sdamage[*bnenum], 10.0 );
+	  AIBOOLEAN( vars[VAR_ENEMYCLOAKED], Ships[*bnenum].cloaked == TRUE );
+	  AISCALE( vars[VAR_ENEMYDAMAGE], Ships[*bnenum].damage, 10.0 );
 	} 
     }
   AIDIST( vars[VAR_DNE], *bdne );
   
   /* Ship damage (10) */
-  AISCALE( vars[VAR_DAMAGE], sdamage[snum], 10.0 );
+  AISCALE( vars[VAR_DAMAGE], Ships[snum].damage, 10.0 );
   
   /* Possible ship damage from enemy torps (10) */
-  if ( stalert[snum] )
+  if ( Ships[snum].talert )
     {
       dam = 0.0;
       for ( i = 1; i <= MAXSHIPS; i = i + 1 )
-	if ( sstatus[i] != SS_OFF && i != snum )
+	if ( Ships[i].status != SS_OFF && i != snum )
 	  for ( j = 0; j < MAXTORPS; j = j + 1 )
 	    if ( tstatus[i][j] == TS_LIVE )
-	      if ( twar[i][j][steam[snum]] || swar[snum][steam[i]] )
+	      if ( twar[i][j][Ships[snum].team] || Ships[snum].war[Ships[i].team] )
 		{
 		  /* Just guess at other ships efficiency. */
 		  dam = dam + explosion(
-					TORPEDO_HIT * 1.1 * weafac[steam[i]],
-					dist(sx[snum],sy[snum],tx[i][j],ty[i][j]) );
+					TORPEDO_HIT * 1.1 * weafac[Ships[i].team],
+					dist(Ships[snum].x,Ships[snum].y,tx[i][j],ty[i][j]) );
 		}
       AISCALE( vars[VAR_INCOMING], dam, 10.0 );
     }
   
   /* Ship fuel (10) */
-  AISCALE( vars[VAR_FUEL], sfuel[snum], 100.0 );
+  AISCALE( vars[VAR_FUEL], Ships[snum].fuel, 100.0 );
 
   /* Number of torps available to fire (1) */
   j = 0;
@@ -219,13 +220,13 @@ void buildai( int snum, int vars[], int *bnenum, real *bdne, real *bane )
   AISCALE( vars[VAR_NUMTORPS], j, 1.0 );
   
   /* Ship shields (10) */
-  AISCALE( vars[VAR_SHIELDS], sshields[snum], 10.0 );
+  AISCALE( vars[VAR_SHIELDS], Ships[snum].shields, 10.0 );
 
   /* Ship engine temperature (10) */
-  AISCALE( vars[VAR_ETEMP], setemp[snum], 10.0 );
+  AISCALE( vars[VAR_ETEMP], Ships[snum].etemp, 10.0 );
   
   /* Ship weapon temperature (10) */
-  AISCALE( vars[VAR_WTEMP], swtemp[snum], 10.0 );
+  AISCALE( vars[VAR_WTEMP], Ships[snum].wtemp, 10.0 );
   
   /* Possible phaser damage to nearest enemy (5) */
   AISCALE( vars[VAR_PHASERDAM], phaserhit( snum, *bdne ), 5.0 );
@@ -235,25 +236,25 @@ void buildai( int snum, int vars[], int *bnenum, real *bdne, real *bane )
 	  explosion( TORPEDO_HIT * weaeff( snum ), (*bdne)*0.66 ), 5.0 );
   
   /* Ship warp (1) */
-  AISCALE( vars[VAR_WARP], sdwarp[snum], 1.0 );
+  AISCALE( vars[VAR_WARP], Ships[snum].dwarp, 1.0 );
   
   /* Ship shields are up (-) */
-  AIBOOLEAN( vars[VAR_SHUP], sshup[snum] );
+  AIBOOLEAN( vars[VAR_SHUP], Ships[snum].shup );
   
   /* Are in repair mode (-) */
-  AIBOOLEAN( vars[VAR_REPAIRING], srmode[snum] );
+  AIBOOLEAN( vars[VAR_REPAIRING], Ships[snum].rmode );
   
   /* Are cloaked (-) */
-  AIBOOLEAN( vars[VAR_CLOAKED], scloaked[snum] );
+  AIBOOLEAN( vars[VAR_CLOAKED], Ships[snum].cloaked );
   
   /* Weapons are allocated (-) */
-  AIBOOLEAN( vars[VAR_WALLOC], sweapons[snum] > 50 );
+  AIBOOLEAN( vars[VAR_WALLOC], Ships[snum].weapalloc > 50 );
   
   /* Are in orbit (-) */
-  AIBOOLEAN( vars[VAR_ORBITING], swarp[snum] < 0.0 );
+  AIBOOLEAN( vars[VAR_ORBITING], Ships[snum].warp < 0.0 );
   
   /* Can read a message (-) */
-  AIBOOLEAN( vars[VAR_CANREAD], slastmsg[snum] != *lastmsg );
+  AIBOOLEAN( vars[VAR_CANREAD], Ships[snum].lastmsg != *lastmsg );
   
   return;
   
@@ -282,15 +283,16 @@ void defend( int attacker, int pnum )
   
   /* See if there are any team ships to defend. */
   for ( i = 1; i <= MAXSHIPS; i = i + 1 )
-    if ( sstatus[i] == SS_LIVE )
-      if ( steam[i] == team )
+    if ( Ships[i].status == SS_LIVE )
+      if ( Ships[i].team == team )
 	return;
   
   /* Count how many robot users are on the right team and can play. */
   j = 0;
   for ( i = 0; i < MAXUSERS; i = i + 1 )
-    if ( ulive[i] )
-      if ( urobot[i] && uteam[i] == team && ! uooption[i][OOPT_SHITLIST] )
+    if ( Users[i].live )
+      if ( Users[i].robot && Users[i].team == team && 
+	   ! Users[i].ooptions[OOPT_SHITLIST] )
 	j = j + 1;
   
   /* No one to defend. */
@@ -302,8 +304,9 @@ void defend( int attacker, int pnum )
   unum = -1;			/* off-by-one fixed - romulans now have defenders */
   j = 0;
   for ( i = 0; i < MAXUSERS; i = i + 1 )
-    if ( ulive[i] )
-      if ( urobot[i] && uteam[i] == team && ! uooption[i][OOPT_SHITLIST] )
+    if ( Users[i].live )
+      if ( Users[i].robot && Users[i].team == team && 
+	   ! Users[i].ooptions[OOPT_SHITLIST] )
 	{
 	  j = j + 1;
 	  if ( j == k )
@@ -366,36 +369,36 @@ void executeai( int snum, int token )
   /* SETWARP( warp ) */
 #define SETWARP(x)                 \
   {                                \
-	if ( swarp[snum] < 0.0 )\
+	if ( Ships[snum].warp < 0.0 )\
 	{                       \
 	 /* Break orbit. */     \
-		 swarp[snum] = 0.0;     \
-		 slock[snum] = 0;       \
-		 sdhead[snum] = shead[snum]; \
+		 Ships[snum].warp = 0.0;     \
+		 Ships[snum].lock = 0;       \
+		 Ships[snum].dhead = Ships[snum].head; \
 	}                      \
 	if ( (x) > 0.0 )             \
-		 srmode[snum] = FALSE;  \
-	sdwarp[snum] = (x);          \
+		 Ships[snum].rmode = FALSE;  \
+	Ships[snum].dwarp = (x);          \
   }
     
     /* SETCOURSE( course ) */
 #define SETCOURSE(x)             \
     { \
-	if ( swarp[snum] < 0.0 ) \
-	swarp[snum] = 0.0;			/* break orbit */ \
-	slock[snum] = 0; \
-	sdhead[snum] = (x); \
+	if ( Ships[snum].warp < 0.0 ) \
+	Ships[snum].warp = 0.0;			/* break orbit */ \
+	Ships[snum].lock = 0; \
+	Ships[snum].dhead = (x); \
     }
       
       /* SETLOCK( pnum ) */
 #define SETLOCK(x)  \
       { \
-	  if ( slock[snum] != -x ) \
+	  if ( Ships[snum].lock != -x ) \
 	  { \
 	      /* Don't break orbit to unless we're not there yet. */ \
-	      if ( swarp[snum] < 0.0 ) \
-	      swarp[snum] = 0.0; \
-	      slock[snum] = -(x); \
+	      if ( Ships[snum].warp < 0.0 ) \
+	      Ships[snum].warp = 0.0; \
+	      Ships[snum].lock = -(x); \
 	  } \
       }
 
@@ -403,7 +406,7 @@ void executeai( int snum, int token )
   char buf[MAXLINE];
   
   /* Update ship action. */
-  saction[snum] = token;
+  Ships[snum].action = token;
   
   /* Execute the action! */
   switch ( token )
@@ -430,9 +433,9 @@ void executeai( int snum, int token )
 	SETLOCK( i );
       break;
     case ROB_ALLOCATE:
-      i = sweapons[snum];
-      sweapons[snum] = sengines[snum];
-      sengines[snum] = i;
+      i = Ships[snum].weapalloc;
+      Ships[snum].weapalloc = Ships[snum].engalloc;
+      Ships[snum].engalloc = i;
       break;
     case ROB_PHASER:
       phaser( snum, ane );
@@ -444,7 +447,7 @@ void executeai( int snum, int token )
       launch( snum, ane, 3, LAUNCH_NORMAL );
       break;
     case ROB_SHIELD:
-      sshup[snum] = (sshup[snum]) ? FALSE : TRUE;
+      Ships[snum].shup = (Ships[snum].shup) ? FALSE : TRUE;
       break;
     case ROB_WARP_0:
       SETWARP( 0.0 );
@@ -465,9 +468,9 @@ void executeai( int snum, int token )
       SETCOURSE( mod360( ane + 180.0 + rnduni( -10.0, 10.0 ) ) );
       break;
     case ROB_SILENT:
-      if ( ! scloaked[snum] )
-	sdwarp[snum] = 0.0;
-      scloaked[snum] = ! scloaked[snum];
+      if ( ! Ships[snum].cloaked )
+	Ships[snum].dwarp = 0.0;
+      Ships[snum].cloaked = ! Ships[snum].cloaked;
       break;
     case ROB_INSULT:
       robreply( buf );
@@ -475,10 +478,10 @@ void executeai( int snum, int token )
       break;
     case ROB_READMSG:
       /* Try to read a message and reply to it */
-      while ( slastmsg[snum] != *lastmsg )
+      while ( Ships[snum].lastmsg != *lastmsg )
 	{
-	  slastmsg[snum] = modp1( slastmsg[snum] + 1, MAXMESSAGES );
-	  i = slastmsg[snum];
+	  Ships[snum].lastmsg = modp1( Ships[snum].lastmsg + 1, MAXMESSAGES );
+	  i = Ships[snum].lastmsg;
 	  if ( canread( snum, i ) )
 	    {
 	      j = msgfrom[i];
@@ -486,7 +489,7 @@ void executeai( int snum, int token )
 		continue; 	/* don't talk back to planets */
 
 	      if ( j > 0 && j <= MAXSHIPS )
-		if ( srobot[j] )
+		if ( Ships[j].robot )
 		  continue; 	/* don't talk back to robots */
 
 	      if (j == MSG_GOD)
@@ -516,15 +519,15 @@ void executeai( int snum, int token )
       break;
     case ROB_UNTRACTOR:
       /* Only attempt to untractor if we don't have to delay. */
-      if ( stowedby[snum] != 0 )
-	if ( ! satwar(snum, stowedby[snum]) )
+      if ( Ships[snum].towedby != 0 )
+	if ( ! satwar(snum, Ships[snum].towedby) )
 	  {
-	    stowing[stowedby[snum]] = 0;
-	    stowedby[snum] = 0;
+	    Ships[Ships[snum].towedby].towing = 0;
+	    Ships[snum].towedby = 0;
 	  }
       break;
     case ROB_REPAIR:
-      srmode[snum] = TRUE;
+      Ships[snum].rmode = TRUE;
       break;
     default:
       robstr( token, buf );
@@ -559,11 +562,11 @@ int newrob( int *snum, int unum )
   int i, j;
   
   /* Check the user number. */
-  if ( ! ulive[unum] )
+  if ( ! Users[unum].live )
     return ( FALSE );
   
   /* Check for religious trouble. */
-  if ( uooption[unum][OOPT_SHITLIST] )
+  if ( Users[unum].ooptions[OOPT_SHITLIST] )
     return ( FALSE );
   
   /* Can't do anything with out a ship. */
@@ -572,37 +575,37 @@ int newrob( int *snum, int unum )
   
   /* Show intent to fly. */
   PVLOCK(lockword);
-  sstatus[*snum] = SS_ENTERING;
+  Ships[*snum].status = SS_ENTERING;
   
   /* Count number of ships currently flying. */
   j = 0;
   for ( i = 1; i <= MAXSHIPS; i = i + 1 )
-    if ( sstatus[i] == SS_LIVE || sstatus[i] == SS_ENTERING )
-      if ( suser[i] == unum && *snum != i )
+    if ( Ships[i].status == SS_LIVE || Ships[i].status == SS_ENTERING )
+      if ( Ships[i].unum == unum && *snum != i )
 	j = j + 1;
   
   /* Check if multiple restrictions apply. */
-  if ( uooption[unum][OOPT_MULTIPLE] )
+  if ( Users[unum].ooptions[OOPT_MULTIPLE] )
     {
       /* If a multiple, he can only fly so many ships. */
-      if ( j >= umultiple[unum] )
-	sstatus[*snum] = SS_OFF;
+      if ( j >= Users[unum].multiple )
+	Ships[*snum].status = SS_OFF;
     }
   else
     {
       /* If not a multiple, he can't be flying anywhere else. */
       if ( j > 0 )
-	sstatus[*snum] = SS_OFF;
+	Ships[*snum].status = SS_OFF;
     }
   PVUNLOCK(lockword);
   
-  if ( sstatus[*snum] == SS_OFF )
+  if ( Ships[*snum].status == SS_OFF )
     return ( FALSE );
   
   /* Initialize the ship. */
   PVLOCK(lockword);
   initship( *snum, unum );
-  srobot[*snum] = TRUE;			/* we're a robot */
+  Ships[*snum].robot = TRUE;			/* we're a robot */
 
 				/* see if we should randomize it's strength
 				   otherwise do nothing since sstrkills
@@ -610,47 +613,47 @@ int newrob( int *snum, int unum )
   if (sysconf_DoRandomRobotKills == TRUE)
     {
 				/* randomize the robot's 'strength' */
-      sstrkills[*snum] = 
+      Ships[*snum].strkills = 
 	rnduni(0.0, (DOUBLE_E_KILLS - (DOUBLE_E_KILLS / 4.0)));
     }
   
   /* Initialize the things that aren't done by initship(). */
-  suser[*snum] = unum;
-  steam[*snum] = uteam[unum];
-  ssdfuse[*snum] = 0;
-  spid[*snum] = 0;
+  Ships[*snum].unum = unum;
+  Ships[*snum].team = Users[unum].team;
+  Ships[*snum].sdfuse = 0;
+  Ships[*snum].pid = 0;
 
 				/* robots now can use 30/70
 				   instead of the default 40/60 set in
 				   initship(). */
-  sweapons[*snum] = 30;
-  sengines[*snum] = 100 - sweapons[*snum];
+  Ships[*snum].weapalloc = 30;
+  Ships[*snum].engalloc = 100 - Ships[*snum].weapalloc;
 
   
   for ( i = 0; i < MAXOPTIONS; i = i + 1 )
-    soption[*snum][i] = uoption[unum][i];
-  soption[*snum][OPT_INTRUDERALERT] = TRUE;	/* want intruder alerts */
-  soption[*snum][OPT_TERSE] = TRUE;		/* don't want stupid
+    Ships[*snum].options[i] = Users[unum].options[i];
+  Ships[*snum].options[OPT_INTRUDERALERT] = TRUE;	/* want intruder alerts */
+  Ships[*snum].options[OPT_TERSE] = TRUE;		/* don't want stupid
 						   messages */
-  soption[*snum][OPT_ALARMBELL] = FALSE; /* don't want beeping during a
+  Ships[*snum].options[OPT_ALARMBELL] = FALSE; /* don't want beeping during a
 					    watch */
 
   for ( i = 0; i < NUMTEAMS; i = i + 1 )
     {
       /* Robots are peace (and fun) loving. */
-      srwar[*snum][i] = FALSE;
-      swar[*snum][i] = FALSE;
+      Ships[*snum].rwar[i] = FALSE;
+      Ships[*snum].war[i] = FALSE;
     }
-  stcpn ( upname[unum], spname[*snum], MAXUSERPNAME );	/* -[] -[] */
+  stcpn ( Users[unum].alias, Ships[*snum].alias, MAXUSERPNAME );	/* -[] -[] */
   
   /* Place the ship. */
-  if ( pprimary[homeplanet[steam[*snum]]] == homesun[steam[*snum]] )
-    i = homesun[steam[*snum]];
+  if ( pprimary[homeplanet[Ships[*snum].team]] == homesun[Ships[*snum].team] )
+    i = homesun[Ships[*snum].team];
   else
-    i = homeplanet[steam[*snum]];
+    i = homeplanet[Ships[*snum].team];
   putship( *snum, px[i], py[i] );
   fixdeltas( *snum );
-  sstatus[*snum] = SS_LIVE;
+  Ships[*snum].status = SS_LIVE;
   PVUNLOCK(lockword);
   
   return ( TRUE );
@@ -743,13 +746,13 @@ void robotloop(void)
   for (;;)
     {
       for ( s = 1; s <= MAXSHIPS; s = s + 1 )
-	if ( sstatus[s] == SS_LIVE )
-	  if ( srobot[s] )
+	if ( Ships[s].status == SS_LIVE )
+	  if ( Ships[s].robot )
 	    {
 	      /* This code taken from conqdriv. */
-	      initstats( &sctime[s], &j );
-	      if ( setime[s] == 0 )
-		setime[s] = j;
+	      initstats( &Ships[s].ctime, &j );
+	      if ( Ships[s].etime == 0 )
+		Ships[s].etime = j;
 	      trobotai( s );
 	      conqstats( s );
 	    }

@@ -32,35 +32,73 @@
 
 static char *conqoperId = "$Id$";
 
+				/* option masks */
+#define A_NONE (unsigned int)(0x00000000)
+#define A_REGENSYSCONF (unsigned int)(0x00000001)
+#define A_INITSTUFF (unsigned int)(0x00000002)
+#define A_DISABLEGAME (unsigned int)(0x00000004)
+#define A_ENABLEGAME (unsigned int)(0x00000008)
+
 /*  conqoper - main program */
 main(int argc, char *argv[])
 {
   int i;
   char name[MAXUSERNAME];
   char msgbuf[128];
-  static int RegenSysConf = FALSE;
+  unsigned int OptionAction;
+
+  char InitStuffChar = '\0';
 
   extern char *optarg;
   extern int optind;
 
+  OptionAction = A_NONE;
+
   glname( name );
+
   if ( ! isagod(NULL) )
     {
       printf( "Poor cretins such as yourself lack the");
       error( " skills necessary to use this program.\n" );
     }
   
-  while ((i = getopt(argc, argv, "C")) != EOF)    /* get command args */
+  while ((i = getopt(argc, argv, "CDEI:")) != EOF)    /* get command args */
     switch (i)
       {
       case 'C': 
-	RegenSysConf = TRUE;
+	OptionAction |= A_REGENSYSCONF;
+        break;
+
+      case 'D': 
+	OptionAction |= A_DISABLEGAME;
+        break;
+
+      case 'E': 
+	OptionAction |= A_ENABLEGAME;
         break;
 	
+      case 'I':
+	OptionAction |= A_INITSTUFF;
+	InitStuffChar = *optarg; /* first character */
+	break;
+
       case '?':
       default: 
-	fprintf(stderr, "usage: %s [-C]\n", argv[0]);
-	fprintf(stderr, "       -C\trebuild systemwide conquestrc file\n");
+	fprintf(stderr, "usage: %s [-C] [-D] [-E] [-I <what>]\n", argv[0]);
+	fprintf(stderr, "       -C \t\trebuild systemwide conquestrc file\n");
+	fprintf(stderr, "       -D \t\tdisable the game\n");
+	fprintf(stderr, "       -E \t\tenable the game\n");
+	fprintf(stderr, "       -I <what> \tInitialize <what>, where <what> is:\n");
+	fprintf(stderr, "          e - everything\n");
+	fprintf(stderr, "          g - game\n");
+	fprintf(stderr, "          l - lockwords\n");
+	fprintf(stderr, "          m - messages\n");
+	fprintf(stderr, "          p - planets\n");
+	fprintf(stderr, "          r - robots\n");
+	fprintf(stderr, "          s - ships\n");
+	fprintf(stderr, "          u - universe\n");
+	fprintf(stderr, "          z - zero common block\n");
+
 	exit(1);
 	break;
       }
@@ -78,9 +116,9 @@ main(int argc, char *argv[])
     }
   
 
-  if (RegenSysConf == TRUE)
+  if (OptionAction != A_NONE)
     {
-				/* need to be conq grp for this */
+      /* need to be conq grp for these */
       if (setgid(ConquestGID) == -1)
 	{
 	  clog("conqoper: setgid(%d): %s",
@@ -89,19 +127,53 @@ main(int argc, char *argv[])
 	  fprintf(stderr, "conqoper: setgid(): failed\n");
 	  exit(1);
 	}
-      
-      
+
       GetSysConf(TRUE);		/* init defaults... */
+      map_common();		/* Map the conquest universe common block */
+  
+				/* regen sysconf file? */
+      if ((OptionAction & A_REGENSYSCONF) != 0)
+	{
+	  if (MakeSysConf() == ERR)
+	    exit(1);
 
-      if (MakeSysConf() == ERR)
-	exit(1);
-      else
-	exit(0);
+	}
 
-      /* the process must exit in this block. */
+				/* initialize something? */
+      if ((OptionAction & A_INITSTUFF) != 0)
+	{
+	  int rv;
+
+	  rv = DoInit(InitStuffChar, TRUE);
+
+	  if (rv != 0)
+	    exit(1);
+	}
+
+				/* turn the game on */
+      if ((OptionAction & A_ENABLEGAME) != 0)
+	{
+	  *closed = FALSE;
+	  /* Unlock the lockwords (just in case...) */
+	  PVUNLOCK(lockword);
+	  PVUNLOCK(lockmesg);
+	  *drivstat = DRS_OFF;
+	  *drivpid = 0;
+	  drivowner[0] = EOS;
+	  fprintf(stdout, "Game enabled.\n");
+	}
+
+				/* turn the game on */
+      if ((OptionAction & A_DISABLEGAME) != 0)
+	{
+	  *closed = TRUE;
+	  fprintf(stdout, "Game disabled.\n");
+	}
+
+      /* the process *must* exit in this block. */
+      exit(0);
 
     }
-  
 
   if (GetSysConf(FALSE) == ERR)
     {
@@ -195,7 +267,7 @@ void bigbang(void)
   dir = 0.0;
   cnt = 0;
   for ( snum = 1; snum <= MAXSHIPS; snum = snum + 1 )
-    if ( sstatus[snum] == SS_LIVE )
+    if ( Ships[snum].status == SS_LIVE )
       for ( i = 0; i < MAXTORPS; i = i + 1 )
 	if ( ! launch( snum, dir, 1, LAUNCH_NORMAL ) )
 	  break;
@@ -246,7 +318,7 @@ void debugdisplay( int snum )
   
   
   cdclrl( 1, MSG_LIN1 - 1 ); 	/* don't clear the message lines */
-  unum = suser[snum];
+  unum = Ships[snum].unum;
   
   lin = 1;
   tcol = 1;
@@ -254,28 +326,28 @@ void debugdisplay( int snum )
   cprintf(lin,tcol,ALIGN_NONE,"#%d#%s",LabelColor, "    ship:");
   buf[0] = EOS;
   appship( snum, buf );
-  if ( srobot[snum] )
+  if ( Ships[snum].robot )
     appstr( " (ROBOT)", buf );
   cprintf( lin, dcol,ALIGN_NONE,"#%d#%s",InfoColor,buf );
   lin++;
   cprintf(lin,tcol,ALIGN_NONE,"#%d#%s",LabelColor, "      sx:");
-  cprintf(lin,dcol,ALIGN_NONE,"#%d#%0g",InfoColor, oneplace(sx[snum]));
+  cprintf(lin,dcol,ALIGN_NONE,"#%d#%0g",InfoColor, oneplace(Ships[snum].x));
   lin++;
   cprintf(lin,tcol,ALIGN_NONE,"#%d#%s",LabelColor, "      sy:");
-  cprintf(lin,dcol,ALIGN_NONE,"#%d#%0g",InfoColor, oneplace(sy[snum]));
+  cprintf(lin,dcol,ALIGN_NONE,"#%d#%0g",InfoColor, oneplace(Ships[snum].y));
   lin++;
   cprintf(lin,tcol,ALIGN_NONE,"#%d#%s",LabelColor, "     sdx:");
-  cprintf(lin,dcol,ALIGN_NONE,"#%d#%0g",InfoColor, oneplace(sdx[snum]));
+  cprintf(lin,dcol,ALIGN_NONE,"#%d#%0g",InfoColor, oneplace(Ships[snum].dx));
   lin++;
   cprintf(lin,tcol,ALIGN_NONE,"#%d#%s",LabelColor, "     sdy:");
-  cprintf(lin,dcol,ALIGN_NONE,"#%d#%0g",InfoColor, oneplace(sdy[snum]));
+  cprintf(lin,dcol,ALIGN_NONE,"#%d#%0g",InfoColor, oneplace(Ships[snum].dy));
   lin++;
   cprintf(lin,tcol,ALIGN_NONE,"#%d#%s",LabelColor, "  skills:");
   cprintf(lin,dcol,ALIGN_NONE,"#%d#%0g",InfoColor, 
-	(oneplace(skills[snum] + sstrkills[snum])));
+	(oneplace(Ships[snum].kills + Ships[snum].strkills)));
   lin++;
   cprintf(lin,tcol,ALIGN_NONE,"#%d#%s",LabelColor, "   swarp:");
-  x = oneplace(swarp[snum]);
+  x = oneplace(Ships[snum].warp);
   if ( x == ORBIT_CW )
     cprintf(lin,dcol,ALIGN_NONE,"#%d#%s",InfoColor, "ORBIT_CW");
   else if ( x == ORBIT_CCW )
@@ -284,29 +356,29 @@ void debugdisplay( int snum )
   	cprintf(lin,dcol,ALIGN_NONE,"#%d#%0g",InfoColor, x);
   lin++;
   cprintf(lin,tcol,ALIGN_NONE,"#%d#%s",LabelColor, "  sdwarp:");
-  cprintf(lin,dcol,ALIGN_NONE,"#%d#%0g",InfoColor, oneplace(sdwarp[snum]));
+  cprintf(lin,dcol,ALIGN_NONE,"#%d#%0g",InfoColor, oneplace(Ships[snum].dwarp));
   lin++;
   cprintf(lin,tcol,ALIGN_NONE,"#%d#%s",LabelColor, "   shead:");
-  cprintf(lin,dcol,ALIGN_NONE,"#%d#%0d",InfoColor, round(shead[snum]));
+  cprintf(lin,dcol,ALIGN_NONE,"#%d#%0d",InfoColor, round(Ships[snum].head));
   lin++;
   cprintf(lin,tcol,ALIGN_NONE,"#%d#%s",LabelColor, "  sdhead:");
-  cprintf(lin,dcol,ALIGN_NONE,"#%d#%0d",InfoColor, round(sdhead[snum]));
+  cprintf(lin,dcol,ALIGN_NONE,"#%d#%0d",InfoColor, round(Ships[snum].dhead));
   lin++;
   cprintf(lin,tcol,ALIGN_NONE,"#%d#%s",LabelColor, " sarmies:");
-  cprintf(lin,dcol,ALIGN_NONE,"#%d#%0d",InfoColor, round(sarmies[snum]));
+  cprintf(lin,dcol,ALIGN_NONE,"#%d#%0d",InfoColor, round(Ships[snum].armies));
   
   lin = 1;
   tcol = 23;
   dcol = tcol + 12;
   cprintf(lin,tcol,ALIGN_NONE,"#%d#%s",LabelColor, "      name:");
-  if ( spname[snum] != EOS )
-  	cprintf(lin,dcol,ALIGN_NONE,"#%d#%s",InfoColor, spname[snum]);
+  if ( Ships[snum].alias != EOS )
+  	cprintf(lin,dcol,ALIGN_NONE,"#%d#%s",InfoColor, Ships[snum].alias);
   lin++;
   cprintf(lin,tcol,ALIGN_NONE,"#%d#%s",LabelColor, "  username:");
   buf[0] = EOS;
   if ( unum >= 0 && unum < MAXUSERS )
     {
-      c_strcpy( cuname[unum], buf );
+      c_strcpy( Users[unum].username, buf );
       if ( buf[0] != EOS )
 	appchr( ' ', buf );
     }
@@ -317,48 +389,48 @@ void debugdisplay( int snum )
   lin++;
   cprintf(lin,tcol,ALIGN_NONE,"#%d#%s",LabelColor, "     slock:");
   cprintf(lin+1,tcol,ALIGN_NONE,"#%d#%s",LabelColor, "       dtt:");
-  i = slock[snum];
+  i = Ships[snum].lock;
   if ( -i >= 1 && -i <= NUMPLANETS )
     {
   	  cprintf(lin,dcol,ALIGN_NONE,"#%d#%s",InfoColor, pname[-i]);
 	  cprintf(lin+1,dcol,ALIGN_NONE,"#%d#%0d",InfoColor,
-		  round( dist( sx[snum], sy[snum], px[-i], py[-i] ) ));
+		  round( dist( Ships[snum].x, Ships[snum].y, px[-i], py[-i] ) ));
     }
   else if ( i != 0 )
   	cprintf(lin,dcol,ALIGN_NONE,"#%d#%0d",InfoColor, i);
   lin+=2;
   cprintf(lin,tcol,ALIGN_NONE,"#%d#%s",LabelColor, "     sfuel:");
-  cprintf(lin,dcol,ALIGN_NONE,"#%d#%0d",InfoColor, round(sfuel[snum]));
+  cprintf(lin,dcol,ALIGN_NONE,"#%d#%0d",InfoColor, round(Ships[snum].fuel));
   lin++;
   cprintf(lin,tcol,ALIGN_NONE,"#%d#%s",LabelColor, "       w/e:");
-  sprintf( buf, "%d/%d", sweapons[snum], sengines[snum] );
-  if ( swfuse[snum] > 0 || sefuse[snum] > 0 )
+  sprintf( buf, "%d/%d", Ships[snum].weapalloc, Ships[snum].engalloc );
+  if ( Ships[snum].wfuse > 0 || Ships[snum].efuse > 0 )
     {
       appstr( " (", buf );
-      appint( swfuse[snum], buf );
+      appint( Ships[snum].wfuse, buf );
       appchr( '/', buf );
-      appint( sefuse[snum], buf );
+      appint( Ships[snum].efuse, buf );
       appchr( ')', buf );
     }
   cprintf(lin,dcol,ALIGN_NONE,"#%d#%s",InfoColor, buf);
   lin++;
   cprintf(lin,tcol,ALIGN_NONE,"#%d#%s",LabelColor, "      temp:");
-  sprintf( buf, "%d/%d", round(swtemp[snum]), round(setemp[snum]) );
+  sprintf( buf, "%d/%d", round(Ships[snum].wtemp), round(Ships[snum].etemp) );
   cprintf(lin,dcol,ALIGN_NONE,"#%d#%s",InfoColor, buf);
   lin++;
   cprintf(lin,tcol,ALIGN_NONE,"#%d#%s",LabelColor, "   ssdfuse:");
-  i = ssdfuse[snum];
+  i = Ships[snum].sdfuse;
   buf[0] = EOS;
   if ( i != 0 )
     {
       sprintf( buf, "%d ", i );
     }
-  if ( scloaked[snum] )
+  if ( Ships[snum].cloaked )
     appstr( "(CLOAKED)", buf );
   cprintf(lin,dcol,ALIGN_NONE,"#%d#%s",LabelColor, buf);
   lin++;
   cprintf(lin,tcol,ALIGN_NONE,"#%d#%s",LabelColor, "      spid:");
-  i = spid[snum];
+  i = Ships[snum].pid;
   if ( i != 0 )
     {
 /*      sprintf( buf, "%d", i ); */
@@ -366,42 +438,42 @@ void debugdisplay( int snum )
     }
   lin++;
   cprintf(lin,tcol,ALIGN_NONE,"#%d#%s",LabelColor, "slastblast:");
-  cprintf(lin,dcol,ALIGN_NONE,"#%d#%0g",InfoColor, oneplace(slastblast[snum]));
+  cprintf(lin,dcol,ALIGN_NONE,"#%d#%0g",InfoColor, oneplace(Ships[snum].lastblast));
   lin++;
   cprintf(lin,tcol,ALIGN_NONE,"#%d#%s",LabelColor, "slastphase:");
-  cprintf(lin,dcol,ALIGN_NONE,"#%d#%0g",InfoColor, oneplace(slastphase[snum]));
+  cprintf(lin,dcol,ALIGN_NONE,"#%d#%0g",InfoColor, oneplace(Ships[snum].lastphase));
   
   lin = 1;
   tcol = 57;
   dcol = tcol + 12;
   cprintf(lin,tcol,ALIGN_NONE,"#%d#%s",LabelColor, "   sstatus:");
   buf[0] = EOS;
-  appsstatus( sstatus[snum], buf );
+  appsstatus( Ships[snum].status, buf );
   cprintf(lin,dcol,ALIGN_NONE,"#%d#%s",InfoColor, buf);
   lin++;
   cprintf(lin,tcol,ALIGN_NONE,"#%d#%s",LabelColor, " skilledby:");
-  i = skilledby[snum];
+  i = Ships[snum].killedby;
   if ( i != 0 )
     {
       buf[0] = EOS;
-      appkb( skilledby[snum], buf );
+      appkb( Ships[snum].killedby, buf );
 	  cprintf(lin,dcol,ALIGN_NONE,"#%d#%s",InfoColor, buf);
     }
   lin++;
   cprintf(lin,tcol,ALIGN_NONE,"#%d#%s",LabelColor, "   shields:");
-  cprintf(lin,dcol,ALIGN_NONE,"#%d#%0d",InfoColor, round(sshields[snum]));
-  if ( ! sshup[snum] )
+  cprintf(lin,dcol,ALIGN_NONE,"#%d#%0d",InfoColor, round(Ships[snum].shields));
+  if ( ! Ships[snum].shup )
   	cprintf(lin,dcol+5,ALIGN_NONE,"#%d#%c",InfoColor, 'D');
   else
   	cprintf(lin,dcol+5,ALIGN_NONE,"#%d#%c",InfoColor, 'U');
   lin++;
   cprintf(lin,tcol,ALIGN_NONE,"#%d#%s",LabelColor, "   sdamage:");
-  cprintf(lin,dcol,ALIGN_NONE,"#%d#%0d",InfoColor, round(sdamage[snum]));
-  if ( srmode[snum] )
+  cprintf(lin,dcol,ALIGN_NONE,"#%d#%0d",InfoColor, round(Ships[snum].damage));
+  if ( Ships[snum].rmode )
   	cprintf(lin,dcol+5,ALIGN_NONE,"#%d#%c",InfoColor, 'R');
   lin++;
   cprintf(lin,tcol,ALIGN_NONE,"#%d#%s",LabelColor, "  stowedby:");
-  i = stowedby[snum];
+  i = Ships[snum].towedby;
   if ( i != 0 )
     {
       buf[0] = EOS;
@@ -410,7 +482,7 @@ void debugdisplay( int snum )
     }
   lin++;
   cprintf(lin,tcol,ALIGN_NONE,"#%d#%s",LabelColor, "   stowing:");
-  i = stowing[snum];
+  i = Ships[snum].towing;
   if ( i != 0 )
     {
       buf[0] = EOS;
@@ -421,7 +493,7 @@ void debugdisplay( int snum )
   cprintf(lin,tcol,ALIGN_NONE,"#%d#%s",LabelColor, "      swar:");
   buf[0] = '(';
   for ( i = 0; i < NUMTEAMS; i = i + 1 )
-    if ( swar[snum][i] )
+    if ( Ships[snum].war[i] )
       buf[i+1] = chrteams[i];
     else
       buf[i+1] = '-';
@@ -434,7 +506,7 @@ void debugdisplay( int snum )
   cprintf(lin,tcol,ALIGN_NONE,"#%d#%s",LabelColor, "     srwar:");
   buf[0] = '(';
   for ( i = 0; i < NUMTEAMS; i = i + 1 )
-    if ( srwar[snum][i] )
+    if ( Ships[snum].rwar[i] )
       buf[i+1] = chrteams[i];
     else
       buf[i+1] = '-';
@@ -446,24 +518,24 @@ void debugdisplay( int snum )
   cprintf(lin,tcol,ALIGN_NONE,"#%d#%s",LabelColor, "   soption:");
   c_strcpy( "(gpainte)", buf );
   for ( i = 0; i < MAXOPTIONS; i = i + 1 )
-    if ( soption[snum][i] )
+    if ( Ships[snum].options[i] )
       buf[i+1] = (char)toupper(buf[i+1]);
   cprintf(lin,dcol,ALIGN_NONE,"#%d#%s",InfoColor, buf);
   
   lin++;
-  cprintf(lin,tcol,ALIGN_NONE,"#%d#%s",LabelColor, "   uoption:");
+  cprintf(lin,tcol,ALIGN_NONE,"#%d#%s",LabelColor, "   options:");
   if ( unum >= 0 && unum < MAXUSERS )
     {
       c_strcpy( "(gpainte)", buf );
       for ( i = 0; i < MAXOPTIONS; i = i + 1 )
-	if ( uoption[unum][i] )
+	if ( Users[unum].options[i] )
 	  buf[i + 1] = (char)toupper(buf[i + 1]);
       cprintf(lin,dcol,ALIGN_NONE,"#%d#%s",InfoColor, buf);
     }
   
   lin++;
   cprintf(lin,tcol,ALIGN_NONE,"#%d#%s",LabelColor, "   saction:");
-  i = saction[snum];
+  i = Ships[snum].action;
   if ( i != 0 )
     {
       robstr( i, buf );
@@ -781,18 +853,18 @@ void kiss(int snum, int prompt_flg)
       safectoi( &snum, buf, i );		/* ignore status */
       if ( snum < 1 || snum > MAXSHIPS )
 		cdputs( no_ship_str, MSG_LIN2, 1 );
-      else if ( sstatus[snum] != SS_LIVE ) {
+      else if ( Ships[snum].status != SS_LIVE ) {
 		cdclrl( MSG_LIN1, 1 );
 	    ssbuf[0] = EOS; 
-	    appsstatus( sstatus[snum], ssbuf);
+	    appsstatus( Ships[snum].status, ssbuf);
 		sprintf(mbuf, cant_kill_ship_str,
-			chrteams[steam[snum]], snum, spname[snum], ssbuf);
+			chrteams[Ships[snum].team], snum, Ships[snum].alias, ssbuf);
 	    cdputs( mbuf, MSG_LIN1, 1 );
 	  }
       else {
 		  cdclrl( MSG_LIN1, 1 );
 		  sprintf(mbuf, kill_ship_str1,
-			chrteams[steam[snum]], snum, spname[snum]);
+			chrteams[Ships[snum].team], snum, Ships[snum].alias);
 	      cdputs( mbuf, MSG_LIN1, 1 );
 		  if ( confirm() )
 		  {
@@ -810,12 +882,12 @@ void kiss(int snum, int prompt_flg)
     {
       didany = FALSE;
       for ( snum = 1; snum <= MAXSHIPS; snum++ )
-	if ( sstatus[snum] == SS_LIVE )
+	if ( Ships[snum].status == SS_LIVE )
 	  {
 	    didany = TRUE;
 	    cdclrl( MSG_LIN1, 1 );
 		sprintf(buf, kill_ship_str1,
-			chrteams[steam[snum]], snum, spname[snum]);
+			chrteams[Ships[snum].team], snum, Ships[snum].alias);
 	    cdputs( buf, MSG_LIN1, 1 );
 	    if ( confirm() )
 	      killship( snum, KB_GOD );
@@ -839,20 +911,21 @@ void kiss(int snum, int prompt_flg)
   /* Yes. */
   didany = FALSE;
   for ( snum = 1; snum <= MAXSHIPS; snum++ )
-    if ( sstatus[snum] == SS_LIVE )
-      if ( suser[snum] == unum )
+    if ( Ships[snum].status == SS_LIVE )
+      if ( Ships[snum].unum == unum )
 	{
 	  didany = TRUE;
 	  cdclrl( MSG_LIN1, 1 );
 	  sprintf(mbuf, kill_ship_str2,
-		chrteams[steam[snum]], snum, spname[snum], buf);
+		chrteams[Ships[snum].team], snum, Ships[snum].alias, buf);
 	  cdputs( mbuf, MSG_LIN1, 1 );
 	  if ( confirm() )
 	    killship( snum, KB_GOD );
 	}
   if ( ! didany ) {
 	cdclrl( MSG_LIN1, 1 );
-	sprintf(mbuf, not_flying_str, cuname[unum], upname[unum]);
+	sprintf(mbuf, not_flying_str, Users[unum].username, 
+		Users[unum].alias);
 	cdputs( mbuf, MSG_LIN1, 1 );
   }
   else
@@ -992,7 +1065,7 @@ void operate(void)
   *glastmsg = *lastmsg;
   glname( buf );
   if ( gunum( &i, buf ) )
-    uooption[i][MAXOOPTIONS] = TRUE;
+    Users[i].ooptions[MAXOOPTIONS] = TRUE;
 
   lastrev = *commonrev;
   grand( &msgrand );
@@ -1106,7 +1179,7 @@ void operate(void)
 		readmsg( MSG_GOD, *glastmsg, RMsg_Line );
 		
 #if defined(OPER_MSG_BEEP)
-		if (msgfrom[slastmsg[MSG_GOD]] != MSG_GOD)
+		if (msgfrom[Ships[MSG_GOD].lastmsg] != MSG_GOD)
 		  cdbeep();
 #endif
 		readone = TRUE;
@@ -1368,7 +1441,7 @@ void opinit(void)
   cdbox( lin-1, col, lin+1, col+i+1 );
   col = col + i + 4;
   attrset(LabelColor);
-  cdputs( "->", lin, col );
+  cdputs( ".", lin, col );
   col = col + 4;
   c_strcpy( "(z)ero everything", buf );
   i = strlen( buf );
@@ -1404,7 +1477,7 @@ void opinit(void)
   cdbox( lin-1, col, lin+1, col+i+1 );
   col = col + i + 4;
   attrset(LabelColor);
-  cdputs( "->", lin, col );
+  cdputs( ".", lin, col );
   col = col + 4;
   c_strcpy( "(g)ame", buf );
   i = strlen( buf );
@@ -1414,7 +1487,7 @@ void opinit(void)
   cdbox( lin-1, col, lin+1, col+i+1 );
   col = col + i + 4;
   attrset(LabelColor);
-  cdputs( "->", lin, col );
+  cdputs( ".", lin, col );
   col = col + 4;
   c_strcpy( "(p)lanets", buf );
   i = strlen( buf );
@@ -1466,70 +1539,61 @@ void opinit(void)
 	  cdputs( "everything", lin, col );
 	  if ( confirm() )
 	    {
-	      initeverything();
-	      *commonrev = COMMONSTAMP;
+	      DoInit('e', FALSE);
 	    }
 	  break;
 	case 'z':
 	  cdputs( "zero everything", lin, col );
 	  if ( confirm() )
-	    zeroeverything();
+	    DoInit('z', FALSE);
 	  break;
 	case 'u':
 	  cdputs( "universe", lin, col );
 	  if ( confirm() )
 	    {
-	      inituniverse();
-	      *commonrev = COMMONSTAMP;
+	      DoInit('u', FALSE);
 	    }
 	  break;
 	case 'g':
 	  cdputs( "game", lin, col );
 	  if ( confirm() )
 	    {
-	      initgame();
-	      *commonrev = COMMONSTAMP;
+	      DoInit('g', FALSE);
 	    }
 	  break;
 	case 'p':
 	  cdputs( "planets", lin, col );
 	  if ( confirm() )
 	    {
-	      initplanets();
-	      *commonrev = COMMONSTAMP;
+	      DoInit('p', FALSE);
 	    }
 	  break;
 	case 's':
 	  cdputs( "ships", lin, col );
 	  if ( confirm() )
 	    {
-	      clearships();
-	      *commonrev = COMMONSTAMP;
+	      DoInit('s', FALSE);
 	    }
 	  break;
 	case 'm':
 	  cdputs( "messages", lin, col );
 	  if ( confirm() )
 	    {
-	      initmsgs();
-	      *commonrev = COMMONSTAMP;
+	      DoInit('m', FALSE);
 	    }
 	  break;
 	case 'l':
 	  cdputs( "lockwords", lin, col );
 	  if ( confirm() )
 	    {
-	      PVUNLOCK(lockword);
-	      PVUNLOCK(lockmesg);
-	      *commonrev = COMMONSTAMP;
+	      DoInit('l', FALSE);
 	    }
 	  break;
 	case 'r':
 	  cdputs( "robots", lin, col );
 	  if ( confirm() )
 	    {
-	      initrobots();
-	      *commonrev = COMMONSTAMP;
+	      DoInit('r', FALSE);
 	    }
 	  break;
 	default:
@@ -2033,14 +2097,14 @@ void oprobot(void)
       if ( warlike )
 	{
 	  for ( j = 0; j < NUMTEAMS; j = j + 1 )
-	    swar[snum][j] = TRUE;
-	  swar[snum][steam[snum]] = FALSE;
+	    Ships[snum].war[j] = TRUE;
+	  Ships[snum].war[Ships[snum].team] = FALSE;
 	}
     }
   
   /* Report the good news. */
   sprintf( buf, "Automation %s (%s) is now flying ",
-	 upname[unum], cuname[unum] );
+	 Users[unum].alias, Users[unum].username );
   if ( anum == 1 )
     appship( snum, buf );
   else
@@ -2355,17 +2419,18 @@ void opuedit(void)
       rcol = dcol - 1;
       
       cprintf(lin,tcol,ALIGN_NONE,"#%d#%s", LabelColor,"         Username:");
-      cprintf(lin,dcol,ALIGN_NONE,"#%d#%s", InfoColor, cuname[unum]);
+      cprintf(lin,dcol,ALIGN_NONE,"#%d#%s", InfoColor, Users[unum].username);
       
       lin++;
       cprintf(lin,tcol,ALIGN_NONE,"#%d#%s", LabelColor,"   Multiple count:");
-      cprintf(lin,dcol,ALIGN_NONE,"#%d#%0d", InfoColor, umultiple[unum]);
+      cprintf(lin,dcol,ALIGN_NONE,"#%d#%0d", InfoColor, 
+	      Users[unum].multiple);
       
       lin++;
       for ( i = 0; i < MAXOPTIONS; i++ )
 	{
       cprintf(lin+i,tcol,ALIGN_NONE,"#%d#%17d:", LabelColor,i);
-	  if ( uoption[unum][i] )
+	  if ( Users[unum].options[i] )
       	cprintf(lin+i,dcol,ALIGN_NONE,"#%d#%c", GreenLevelColor,'T');
 	  else
       	cprintf(lin+i,dcol,ALIGN_NONE,"#%d#%c", RedLevelColor,'F');
@@ -2387,13 +2452,14 @@ void opuedit(void)
       
       lin+=(MAXOPTIONS + 1);
       cprintf(lin,tcol,ALIGN_NONE,"#%d#%s", LabelColor,"          Urating:");
-      cprintf(lin,dcol,ALIGN_NONE,"#%d#%0g",InfoColor, oneplace(urating[unum]));
+      cprintf(lin,dcol,ALIGN_NONE,"#%d#%0g",InfoColor, 
+	      oneplace(Users[unum].rating));
       
       lin++;
       cprintf(lin,tcol,ALIGN_NONE,"#%d#%s", LabelColor,"             Uwar:");
       buf[0] = '(';
       for ( i = 0; i < NUMTEAMS; i = i + 1 )
-	if ( uwar[unum][i] )
+	if ( Users[unum].war[i] )
 	  buf[i+1] = chrteams[i];
 	else
 	  buf[i+1] = '-';
@@ -2403,7 +2469,7 @@ void opuedit(void)
       
       lin++;
       cprintf(lin,tcol,ALIGN_NONE,"#%d#%s", LabelColor,"           Urobot:");
-      if ( urobot[unum] )
+      if ( Users[unum].robot )
       	cprintf(lin,dcol,ALIGN_NONE,"#%d#%c",GreenLevelColor, 'T');
       else
       	cprintf(lin,dcol,ALIGN_NONE,"#%d#%c",RedLevelColor, 'F');
@@ -2415,11 +2481,12 @@ void opuedit(void)
       lcol = dcol - 1;
       
       cprintf(lin,tcol,ALIGN_NONE,"#%d#%s", LabelColor,"             Name:");
-      cprintf(lin,dcol,ALIGN_NONE,"#%d#%s",InfoColor, upname[unum]);
+      cprintf(lin,dcol,ALIGN_NONE,"#%d#%s",InfoColor, 
+	      Users[unum].alias);
       
       lin++;
       cprintf(lin,tcol,ALIGN_NONE,"#%d#%s", LabelColor,"             Team:");
-      i = uteam[unum];
+      i = Users[unum].team;
       if ( i < 0 || i >= NUMTEAMS )
 		  cprintf(lin,dcol,ALIGN_NONE,"#%d#%0d",InfoColor, i);
       else
@@ -2429,7 +2496,7 @@ void opuedit(void)
       for ( i = 0; i < MAXOOPTIONS; i++ )
 	{
       cprintf(lin+i,tcol,ALIGN_NONE,"#%d#%17d:", LabelColor,i);
-	  if ( uooption[unum][i] )
+	  if ( Users[unum].ooptions[i] )
       	cprintf(lin+i,dcol,ALIGN_NONE,"#%d#%c", GreenLevelColor,'T');
 	  else
       	cprintf(lin+i,dcol,ALIGN_NONE,"#%d#%c", RedLevelColor,'F');
@@ -2451,17 +2518,18 @@ void opuedit(void)
       
       lin+=(MAXOOPTIONS + 1);
       cprintf(lin,tcol,ALIGN_NONE,"#%d#%s", LabelColor,"       Last entry:");
-      cprintf(lin,dcol,ALIGN_NONE,"#%d#%s",InfoColor, ulastentry[unum]);
+      cprintf(lin,dcol,ALIGN_NONE,"#%d#%s",InfoColor, 
+	      Users[unum].lastentry);
       
       lin++;
       cprintf(lin,tcol,ALIGN_NONE,"#%d#%s", LabelColor,"  Elapsed seconds:");
-      fmtseconds( ustats[unum][TSTAT_SECONDS], buf );
+      fmtseconds( Users[unum].stats[TSTAT_SECONDS], buf );
       i = dcol + 11 - strlen( buf );
       cprintf(lin,i,ALIGN_NONE,"#%d#%s",InfoColor, buf);
       
       lin++;
       cprintf(lin,tcol,ALIGN_NONE,"#%d#%s", LabelColor,"      Cpu seconds:");
-      fmtseconds( ustats[unum][TSTAT_CPUSECONDS], buf );
+      fmtseconds( Users[unum].stats[TSTAT_CPUSECONDS], buf );
       i = dcol + 11 - strlen ( buf );
       cprintf(lin,i,ALIGN_NONE,"#%d#%s",InfoColor, buf);
       
@@ -2473,17 +2541,17 @@ void opuedit(void)
       dcol = 72;
       cprintf(lin,tcol,ALIGN_NONE,"#%d#%s", LabelColor, "Maxkills:");
       cprintf(lin,dcol,ALIGN_NONE,"#%d#%0d",InfoColor, 
-      	ustats[unum][USTAT_MAXKILLS]);
+      	Users[unum].stats[USTAT_MAXKILLS]);
       
       lin++;
       cprintf(lin,tcol,ALIGN_NONE,"#%d#%s", LabelColor, "Torpedos:");
       cprintf(lin,dcol,ALIGN_NONE,"#%d#%0d",InfoColor,
-      	ustats[unum][USTAT_TORPS]);
+      	Users[unum].stats[USTAT_TORPS]);
       
       lin++;
       cprintf(lin,tcol,ALIGN_NONE,"#%d#%s", LabelColor, " Phasers:");
       cprintf(lin,dcol,ALIGN_NONE,"#%d#%0d",InfoColor, 
-      	ustats[unum][USTAT_PHASERS]);
+      	Users[unum].stats[USTAT_PHASERS]);
       
       /* Do column 3 of the bottom stuff. */
       lin = olin;
@@ -2491,17 +2559,17 @@ void opuedit(void)
       dcol = 51;
       cprintf(lin,tcol,ALIGN_NONE,"#%d#%s", LabelColor, " Planets taken:");
       cprintf(lin,dcol,ALIGN_NONE,"#%d#%0d",InfoColor,
-      	ustats[unum][USTAT_CONQPLANETS]);
+      	Users[unum].stats[USTAT_CONQPLANETS]);
       
       lin++;
       cprintf(lin,tcol,ALIGN_NONE,"#%d#%s", LabelColor, " Armies bombed:");
       cprintf(lin,dcol,ALIGN_NONE,"#%d#%0d",InfoColor, 
-      	ustats[unum][USTAT_ARMBOMB]);
+      	Users[unum].stats[USTAT_ARMBOMB]);
       
       lin++;
       cprintf(lin,tcol,ALIGN_NONE,"#%d#%s", LabelColor, "   Ship armies:");
       cprintf(lin,dcol,ALIGN_NONE,"#%d#%0d",InfoColor,
-      	ustats[unum][USTAT_ARMSHIP]);
+      	Users[unum].stats[USTAT_ARMSHIP]);
       
       /* Do column 2 of the bottom stuff. */
       lin = olin;
@@ -2509,17 +2577,17 @@ void opuedit(void)
       dcol = 29;
       cprintf(lin,tcol,ALIGN_NONE,"#%d#%s", LabelColor, " Conquers:");
       cprintf(lin,dcol,ALIGN_NONE,"#%d#%0d",InfoColor,
-      	ustats[unum][USTAT_CONQUERS]);
+      	 Users[unum].stats[USTAT_CONQUERS]);
       
       lin++;
       cprintf(lin,tcol,ALIGN_NONE,"#%d#%s", LabelColor,"    Coups:");
       cprintf(lin,dcol,ALIGN_NONE,"#%d#%0d",InfoColor,
-      	ustats[unum][USTAT_COUPS]);
+      	Users[unum].stats[USTAT_COUPS]);
       
       lin++;
       cprintf(lin,tcol,ALIGN_NONE,"#%d#%s", LabelColor, "Genocides:");
       cprintf(lin,dcol,ALIGN_NONE,"#%d#%0d",InfoColor, 
-      	ustats[unum][USTAT_GENOCIDE]);
+      	Users[unum].stats[USTAT_GENOCIDE]);
       
       /* Do column 1 of the bottom stuff. */
       lin = olin;
@@ -2527,17 +2595,17 @@ void opuedit(void)
       dcol = 10;
       cprintf(lin,tcol,ALIGN_NONE,"#%d#%s", LabelColor, "   Wins:");
       cprintf(lin,dcol,ALIGN_NONE,"#%d#%0d",InfoColor, 
-      	ustats[unum][USTAT_WINS]);
+      	Users[unum].stats[USTAT_WINS]);
       
       lin++;
       cprintf(lin,tcol,ALIGN_NONE,"#%d#%s", LabelColor, " Losses:");
       cprintf(lin,dcol,ALIGN_NONE,"#%d#%0d",InfoColor, 
-      	ustats[unum][USTAT_LOSSES]);
+      	Users[unum].stats[USTAT_LOSSES]);
       
       lin++;
       cprintf(lin,tcol,ALIGN_NONE,"#%d#%s", LabelColor, "Entries:");
       cprintf(lin,dcol,ALIGN_NONE,"#%d#%0d",InfoColor, 
-      	ustats[unum][USTAT_ENTRIES]);
+      	Users[unum].stats[USTAT_ENTRIES]);
       
       /* Display the stuff */
       cprintf(MSG_LIN2,0,ALIGN_CENTER,"#%d#%s", InfoColor,
@@ -2639,7 +2707,7 @@ void opuedit(void)
 			 MSG_LIN2, 0, TERMS, buf, MAXUSERPNAME );
 	      if ( ch != TERM_ABORT &&
 		  ( buf[0] != EOS || ch == TERM_EXTRA ) )
-		stcpn( buf, upname[unum], MAXUSERPNAME ); /* -[] */
+		stcpn( buf, Users[unum].alias, MAXUSERPNAME ); /* -[] */
 	    }
 	  else if ( ! left && row == 1 )
 	    {
@@ -2651,7 +2719,7 @@ void opuedit(void)
 	      {
 		delblanks( buf );
 		if ( ! gunum( &i, buf ) )
-		  stcpn( buf, cuname[unum], MAXUSERNAME );
+		  stcpn( buf, Users[unum].username, MAXUSERNAME );
 		else
 		  {
 		    cdclrl( MSG_LIN1, 2 );
@@ -2666,7 +2734,7 @@ void opuedit(void)
 	  else if ( left && row == 2 )
 	    {
 	      /* Team. */
-	      uteam[unum] = modp1( uteam[unum] + 1, NUMTEAMS );
+	      Users[unum].team = modp1( Users[unum].team + 1, NUMTEAMS );
 	    }
 	  else if ( ! left && row == 2 )
 	    {
@@ -2678,7 +2746,7 @@ void opuedit(void)
 		{
 		  delblanks( buf );
 		  i = 0;
-		  safectoi( &umultiple[unum], buf, i );
+		  safectoi( &(Users[unum].multiple), buf, i );
 		}
 	    }
 	  else
@@ -2686,12 +2754,12 @@ void opuedit(void)
 	      i = row - 3;
 	      if ( left )
 		if ( i >= 0 && i < MAXOOPTIONS )
-		  uooption[unum][i] = ! uooption[unum][i];
+		  Users[unum].ooptions[i] = ! Users[unum].ooptions[i];
 		else
 		  cdbeep();
 	      else
 		if ( i >= 0 && i < MAXOPTIONS )
-		  uoption[unum][i] = ! uoption[unum][i];
+		  Users[unum].options[i] = ! Users[unum].options[i];
 		else
 		  cdbeep();
 	    }
@@ -2759,7 +2827,7 @@ void watch(void)
 		if ( getamsg( MSG_GOD, glastmsg ) )
 		  {
 		    readmsg( MSG_GOD, *glastmsg, RMsg_Line );
-		    if (msgfrom[slastmsg[MSG_GOD]] != MSG_GOD)
+		    if (msgfrom[Ships[MSG_GOD].lastmsg] != MSG_GOD)
 		      cdbeep();
 		    msgrand = now;
 		    readone = TRUE;
@@ -3246,7 +3314,7 @@ char *build_toggle_str(char *snum_str, int snum)
   buf[0] = EOS;
   if (snum > 0 && snum <= MAXSHIPS)
     {          /* ship */
-      sprintf(snum_str,"%c%d", chrteams[steam[snum]], snum);
+      sprintf(snum_str,"%c%d", chrteams[Ships[snum].team], snum);
     }
   else if (snum < 0 && -snum <= NUMPLANETS) 
     {  /* planet */
@@ -3265,3 +3333,139 @@ char *build_toggle_str(char *snum_str, int snum)
 
 }
 
+/* DoInit(InitChar, cmdline) - Based on InitChar, init something (like in 
+ *   the (I)nitialize screen).  if cmdline is TRUE, output status on stdout.
+ */
+
+int DoInit(char InitChar, int cmdline)
+{
+
+  if (cmdline == TRUE)
+    {
+      fprintf(stdout, "Initialized ");
+      fflush(stdout);
+    }
+
+				/*  perform an init on something */
+  switch(InitChar)
+    {
+    case 'e': 
+      initeverything();
+      *commonrev = COMMONSTAMP;
+
+      if (cmdline == TRUE)
+	{
+	  fprintf(stdout, "everything.\n");
+	  fflush(stdout);
+	}
+
+      break;
+
+    case 'z': 
+      zeroeverything();
+
+      if (cmdline == TRUE)
+	{
+	  fprintf(stdout, "common block (zeroed).\n");
+	  fflush(stdout);
+	}
+
+      break;
+
+    case 'u': 
+      inituniverse();
+      *commonrev = COMMONSTAMP;
+
+      if (cmdline == TRUE)
+	{
+	  fprintf(stdout, "universe.\n");
+	  fflush(stdout);
+	}
+
+      break;
+
+    case 'g': 
+      initgame();
+      *commonrev = COMMONSTAMP;
+
+      if (cmdline == TRUE)
+	{
+	  fprintf(stdout, "game.\n");
+	  fflush(stdout);
+	}
+
+      break;
+
+    case 'p': 
+      initplanets();
+      *commonrev = COMMONSTAMP;
+
+      if (cmdline == TRUE)
+	{
+	  fprintf(stdout, "planets.\n");
+	  fflush(stdout);
+	}
+
+      break;
+
+    case 's': 
+      clearships();
+      *commonrev = COMMONSTAMP;
+
+      if (cmdline == TRUE)
+	{
+	  fprintf(stdout, "ships.\n");
+	  fflush(stdout);
+	}
+
+      break;
+
+    case 'm': 
+      initmsgs();
+      *commonrev = COMMONSTAMP;
+
+      if (cmdline == TRUE)
+	{
+	  fprintf(stdout, "messages.\n");
+	  fflush(stdout);
+	}
+
+      break;
+
+    case 'l': 
+      PVUNLOCK(lockword);
+      PVUNLOCK(lockmesg);
+      *commonrev = COMMONSTAMP;
+
+      if (cmdline == TRUE)
+	{
+	  fprintf(stdout, "lockwords.\n");
+	  fflush(stdout);
+	}
+
+      break;
+
+    case 'r': 
+      initrobots();
+      *commonrev = COMMONSTAMP;
+
+      if (cmdline == TRUE)
+	{
+	  fprintf(stdout, "robots.\n");
+	  fflush(stdout);
+	}
+
+      break;
+
+    default:
+      if (cmdline == TRUE)
+	{
+	  fprintf(stdout, "nothing. '%c' unrecognized.\n", InitChar);
+	  fflush(stdout);
+	}
+      break;
+    }
+      
+
+
+}

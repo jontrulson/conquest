@@ -30,7 +30,7 @@
 #define NOCOMEXTERN
 #include "conqcom.h"		/* common block vars defined here */
 #include "conqcom2.h"		/* some extra stuff */
-
+#include "user.h"
 static char *conqcmId = "$Id$";
 
 static char *cBasePtr = NULL;	/* common block ptr */
@@ -297,18 +297,7 @@ void map_common(void)
 
   map1d(lastupchuck, char, DATESIZE);	
 
-  map1d(ulive, int, MAXUSERS);
-  map1d(uteam, int, MAXUSERS);	
-  map1d(umultiple, int, MAXUSERS);	
-  map2d(ustats, int, MAXUSERS, MAXUSTATS);
-  map1d(urating, real, MAXUSERS);		
-  map1d(urobot, int, MAXUSERS);	
-  map2d(uwar, int, MAXUSERS, NUMTEAMS);	
-  map2d(uoption, int, MAXUSERS, MAXOPTIONS); 
-  map2d(uooption, int, MAXUSERS, MAXOOPTIONS);
-  map2d(cuname, char, MAXUSERS, SIZEUSERNAME);
-  map2d(upname, char, MAXUSERS, SIZEUSERPNAME);
-  map2d(ulastentry, char, MAXUSERS, DATESIZE); 
+  map1d(Users, User_t, MAXUSERS);
 
   map2d(rstrat, int, REAL_MAX_VAR, 10);
   map1d(rvec, int, 32);
@@ -371,76 +360,7 @@ void map_common(void)
   map1d(drivtime, int, 1);
   map1d(playtime, int, 1);
 
-  map1d(sstatus, int, MAXSHIPS + 1);	
-  map1d(skilledby, int, MAXSHIPS + 1);	
-				
-				
-  map1d(suser, int, MAXSHIPS + 1);	
-  map1d(steam, int, MAXSHIPS + 1);	
-  map1d(spid, int, MAXSHIPS + 1);		
-  map1d(sx, real, MAXSHIPS + 1);		
-  map1d(sy, real, MAXSHIPS + 1);
-  map1d(sdx, real, MAXSHIPS + 1);		
-  map1d(sdy, real, MAXSHIPS + 1);		
-  map1d(shead, real, MAXSHIPS + 1);	
-  map1d(sdhead, real, MAXSHIPS + 1);	
-  map1d(swarp, real, MAXSHIPS + 1);	
-				
-  map1d(sdwarp, real, MAXSHIPS + 1);	
-  map1d(slock, int, MAXSHIPS + 1);	
-				
-  map1d(sshup, int, MAXSHIPS + 1);	
-  map1d(sshields, real, MAXSHIPS + 1);	
-  map1d(skills, real, MAXSHIPS + 1);	
-  map1d(sdamage, real, MAXSHIPS + 1);	
-  map1d(sfuel, real, MAXSHIPS + 1);	
-  map1d(swtemp, real, MAXSHIPS + 1);	
-  map1d(setemp, real, MAXSHIPS + 1);	
-  map1d(swfuse, int, MAXSHIPS + 1);	
-  map1d(sefuse, int, MAXSHIPS + 1);	
-  map1d(sweapons, int, MAXSHIPS + 1);	
-  map1d(sengines, int, MAXSHIPS + 1);	
-  map1d(sarmies, int, MAXSHIPS + 1);	
-  map1d(srmode, int, MAXSHIPS + 1);	
-  map1d(scloaked, int, MAXSHIPS + 1);	
-  map2d(soption, int, MAXSHIPS + 1, MAXOPTIONS);
-  map2d(swar, int, MAXSHIPS + 1, NUMTEAMS);	
-					
-  map2d(srwar, int, MAXSHIPS + 1, NUMTEAMS);	
-  map2d(ssrpwar, int, MAXSHIPS + 1, NUMPLANETS + 1); 
-  map1d(ssdfuse, int, MAXSHIPS + 1);		
-  map1d(slastmsg, int, MAXSHIPS + 1);		
-  map1d(salastmsg, int, MAXSHIPS + 1);		
-  map1d(smap, int, MAXSHIPS + 1);		
-  map1d(stowing, int, MAXSHIPS + 1);	
-  map1d(stowedby, int, MAXSHIPS + 1);	
-  map1d(slastblast, real, MAXSHIPS + 1);	
-  map1d(slastphase, real, MAXSHIPS + 1);	
-  map1d(spfuse, int, MAXSHIPS + 1);	
-  map2d(sscanned, int, MAXSHIPS + 1, NUMTEAMS); 
-					
-  map1d(stalert, int, MAXSHIPS + 1);		
-  map1d(srobot, int, MAXSHIPS + 1);		
-  map1d(saction, int, MAXSHIPS + 1);		
-  map2d(spname, char, MAXSHIPS + 1, SIZEUSERPNAME);
-					
-  map1d(sctime, int, MAXSHIPS + 1);		
-  map1d(setime, int, MAXSHIPS + 1);		
-  map1d(scacc, int, MAXSHIPS + 1);		
-  map1d(seacc, int, MAXSHIPS + 1);		
-
-				/* This is used for robots to 'randomize'
-				   their efficiency.  This value will be
-				   set to 0 for normal players, but robots
-				   will have it set to a random value which
-				   will represent kills.  These 'phantom'
-				   kills will be used in addition to the ship's
-				   'real' kills in computing the efficiency
-				   of the robot's weapons and engines, though
-				   kept seperate in this array, so the
-				   statistics don't get screwed up. */
-
-  map1d(sstrkills, real, MAXSHIPS + 1);
+  map1d(Ships, Ship_t, MAXSHIPS + 1);
 
   map2d(tstatus, int, MAXSHIPS + 1, MAXTORPS);	
   map2d(tfuse, int, MAXSHIPS + 1, MAXTORPS);	

@@ -23,7 +23,8 @@
 /*                                                                    */
 /**********************************************************************/
 
-
+#ifndef CONQDEF_H_INCLUDED
+#define CONQDEF_H_INCLUDED
 
 /* 4.22 05Sep86 CAL .*(): Removed tutorial feature. Made tuning constants */
 /*                   constants again. Increased username sizes. */
@@ -53,7 +54,8 @@
 /*#define COMMONSTAMP 861104 		/* stardate? */
 /*#define COMMONSTAMP 940910 		/* stardate? */
 /*#define COMMONSTAMP 961019 		/* stardate? */
-#define COMMONSTAMP 971207 		/* stardate? */
+/*#define COMMONSTAMP 971207 		/* stardate? */
+#define COMMONSTAMP 980614 		/* stardate? */
 
 /* Copyright notice string. */
 #define COPYRIGHT "(C) 1983-1986 by Jef Poskanzer and Craig Leres"
@@ -577,14 +579,15 @@
 				/* fast distance */
 #define distf(w,x,y,z) (real)(fabs((real)(y)-(real)(w)) + fabs((real)(z)-(real)(x)))
 #define vowel(x) (x=='a' || x=='e' || x=='i' || x=='o' || x=='u' )
-#define satwar(x,y) (swar[x][steam[y]] || swar[y][steam[x]])
-#define selfwar(x) swar[x][steam[x ]]
-#define maxwarp(x) (real)min(warplim[steam[x ]], \
-			     max(0.0, around(((100.0-sdamage[x])/100.0)*12.0)))
-#define engeff(x) (real)(((sengines[x] +50.0)/100.0) * \
-			 engfac[steam[x]] * \
-			 (((skills[x]+sstrkills[x])+DOUBLE_E_KILLS)/DOUBLE_E_KILLS))
-#define weaeff(x) (real)(((sweapons[x ]+50.0)/100.0) * \
-			 weafac[steam[x]] * \
-			 (((skills[x]+sstrkills[x])+DOUBLE_E_KILLS)/DOUBLE_E_KILLS))
+#define satwar(x,y) (Ships[x].war[Ships[y].team] || Ships[y].war[Ships[x].team])
+#define selfwar(x) Ships[x].war[Ships[x ].team]
+#define maxwarp(x) (real)min(warplim[Ships[x ].team], \
+			     max(0.0, around(((100.0-Ships[x].damage)/100.0)*12.0)))
+#define engeff(x) (real)(((Ships[x].engalloc +50.0)/100.0) * \
+			 engfac[Ships[x].team] * \
+			 (((Ships[x].kills+Ships[x].strkills)+DOUBLE_E_KILLS)/DOUBLE_E_KILLS))
+#define weaeff(x) (real)(((Ships[x ].weapalloc+50.0)/100.0) * \
+			 weafac[Ships[x].team] * \
+			 (((Ships[x].kills+Ships[x].strkills)+DOUBLE_E_KILLS)/DOUBLE_E_KILLS))
 
+#endif /*  CONQDEF_H_INCLUDED */

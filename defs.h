@@ -18,7 +18,28 @@
 
 /* Basic information */
 
-#define CONQUEST_USER "root"
+				/* game related files created by conquest
+				   are chown()'d to this user.*/
+/* ROOT_USER - username that game related files created by conquest
+ *  are chown()'d to.  Default: root
+ */
+#define ROOT_USER "root"
+
+/* CONQUEST_USER - When this username runs conquest, server mode is active.
+ *   - the user is prompted for their username or user number, and their 
+ *     password,
+ *   - user is automatically added to conquest userdb if a new user
+ *   - .conquestrc file for such users are created in ~CONQUEST_USER/ 
+ *     directory as .conquestrc.UNUM (UNUM = user number)
+ *   Default: conquest
+ */
+#define CONQUEST_USER "conquest"
+
+
+/* CONQUEST_GROUP - this is the group that all conquest files a chgrp'd
+ *   to... This is also the group that the conquest executables setgid()
+ *   to as well.  You should leave it as is... Default: conquest.  
+ */
 #define CONQUEST_GROUP "conquest"
 
 #ifndef CONQHOME
