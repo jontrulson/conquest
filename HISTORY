@@ -9,6 +9,40 @@
 
                               Conquest HISTORY
 
+Version 8.0.1j 9/11/2004 (devel)
+
+        - implemented background image (Hubble Ultra Deep Field) to
+          viewer.  Added user option 'do_draw_viewerbg' to enable.  It
+          is enabled by default cause it just looks so darn good :)
+          ALT-B can be used to temporarily toggle it on/off while in
+          the CP if it proves too distracting.
+
+        - fixed viewer backgroud image to be displaced properly when
+          in Murisak centered LR view.
+
+        - Using [SPACE] to toggle between ship and Murisak centered LR
+          scans will only work when in LR mode.  No more inadvertant
+          switching. 
+
+        - more GL and render cleanups.
+
+        - corrected bug in modifier key handling.  Several other
+          potential key problems also fixed.
+
+        - texture handling cleanups
+
+        - planet and doomsday blend modes fixed so background image no
+          longer interferes
+
+        - fixed bug in options (GL) display where when the number of
+          options exactly matched the number that could be displayed
+          onscreen caused nothing to be displayed at all.
+
+        - got rid of drawBox() - no longer used anywhere.
+
+        - cleaned up the vbg.tga texture (reduced gamma).
+
+
 Version 8.0.1i 9/03/2004 (devel)
 
         - when in the cockpit, various screens that used to be
@@ -19,7 +53,7 @@ Version 8.0.1i 9/03/2004 (devel)
 
           This also works when playing back a recorded game.
 
-          This also can help you to prevent your ship dying while
+          This also can help you to prevent your from ship dying while
           looking at the userlist for example :)
 
         - redid the viewer fonts - now use a tex mapped font as well,
@@ -37,6 +71,15 @@ Version 8.0.1i 9/03/2004 (devel)
           part :) Planet and ship labels now are always positioned
           correctly regardless of your position relative to the
           object.
+
+        - an attempt at better handling of UDP write errors that
+          sometimes occurs when UDP was successfully negotiated, but
+          the server finds itself unable to send them.  If more than
+          15 write UDP errors are detected during the course of a
+          session, the server will switch to TCP only.  I was never
+          able to reliably duplicate this, so I hope this will
+          actually work at avoiding the 'get stuck in murisak when you
+          enter the game' problem.
 
         - recolorized army count in planet names on long range display.
 

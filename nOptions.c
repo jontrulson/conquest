@@ -438,7 +438,12 @@ static void _showOptScreen(void)
       prompt = eprompt;
       prompt2 = eprompt2;
       if (curpage == (pages - 1)) /* last page - might be less than full */
-        llin = (maxuopts % items_per_page); /* ..or more than empty? ;-) */
+        {
+          if (maxuopts == items_per_page)
+            llin = items_per_page;
+          else
+            llin = (maxuopts % items_per_page); /* ..or more than empty? ;-) */
+        }
       else
         llin = items_per_page;
       
@@ -505,7 +510,6 @@ static void _showOptScreen(void)
                k, 
                dispmac);
 #endif
-          
           cprintf(lin, col, ALIGN_NONE, "#%d#f%2d = #%d#%s#%d#",
                   (k == ((curpage * items_per_page) + clin)) ? RedColor : InfoColor, 
                   k + 1, vattrib, 
@@ -728,6 +732,8 @@ static int nOptionsInput(int ch)
 {
   int irv;
 
+  ch = CQ_CHAR(ch) | CQ_FKEY(ch);
+
   if (prompting)
     {
       irv = prmProcInput(&prm, ch);
@@ -828,7 +834,12 @@ static int nOptionsInput(int ch)
 		}
 				/* setup llin for current page */
 	      if (curpage == (pages - 1)) 
-		llin = (maxitms % items_per_page);
+                {
+                  if (maxitms == items_per_page)
+                    llin = items_per_page;
+                  else
+                    llin = (maxitms % items_per_page); 
+                }
 	      else
 		llin = items_per_page;
 	      clin = llin - 1; 

@@ -223,6 +223,8 @@ static int nMetaInput(int ch)
 {
   int i;
 
+  ch = CQ_CHAR(ch) | CQ_FKEY(ch);
+
   switch(ch)
     {
     case CQ_KEY_UP:		/* up */

@@ -290,6 +290,7 @@ int GetConf(int usernum)
   UserConf.DoLocalLRScan = TRUE;
   UserConf.DoETAStats = TRUE;
   UserConf.EnemyShipBox = TRUE;
+  UserConf.doVBG = TRUE;
 
   for (i=0; i<MAX_MACROS; i++)
     {

@@ -66,6 +66,8 @@ static int nPlayBDisplay(dspConfig_t *);
 static int nPlayBIdle(void);
 static int nPlayBInput(int ch);
 
+static int doVBG = FALSE;
+
 static scrNode_t nPlayBNode = {
   nPlayBDisplay,               /* display */
   nPlayBIdle,                  /* idle */
@@ -166,7 +168,7 @@ static int nPlayBDisplay(dspConfig_t *dsp)
   char buf[MSGMAXLINE];
       
   /* Viewer */
-  renderViewer();
+  renderViewer(doVBG);
 
   /* Main/Hud */
   set_header(Context.snum);
@@ -210,6 +212,15 @@ static int nPlayBInput(int ch)
   int irv;
   int snum = Context.snum;
   int tmp_snum = 1;
+
+  if ((CQ_CHAR(ch) == 'B' || CQ_CHAR(ch) == 'b') && 
+      CQ_MODIFIER(ch) & CQ_KEY_MOD_ALT)
+    {
+      doVBG = !doVBG;
+      return NODE_OK;
+    }
+
+  ch = CQ_CHAR(ch) | CQ_FKEY(ch);
 
   if (prompting)
     {

@@ -19,6 +19,28 @@
 #include "record.h"
 #include "conqlb.h"
 
+#define MAXUDPERRS    (15)
+static int sudperrs = 0;        /* keep track of udp write errors */
+
+/* called when a write to a UDP socket fails. If the error threshold
+   is exceeded, disable UDP to client and let them know */
+static void handleUDPErr(void)
+{
+  sudperrs++;
+
+  if (sudperrs > MAXUDPERRS)
+    {
+      sInfo.tryUDP = FALSE;
+      sInfo.doUDP = FALSE;
+      close(sInfo.usock);
+      sInfo.usock = -1;
+      clog("NET: too many UDP send errors to client, switching to TCP");
+      clbStoreMsg(MSG_COMP, Context.snum, 
+              "SERVER: too many UDP send errors. Switching to TCP");
+    }
+  return;
+}
+
 int sendClientStat(int sock, Unsgn8 flags, Unsgn8 snum, Unsgn8 team, 
 		   Unsgn16 unum, Unsgn8 esystem)
 {
@@ -113,7 +135,10 @@ int sendShip(int sock, Unsgn8 snum)
       if (sInfo.doUDP)
         {
           if (writePacket(PKT_TOCLIENT, sInfo.usock, (Unsgn8 *)sshiploc) <= 0)
-            return FALSE;
+            {
+              handleUDPErr();
+              return FALSE;
+            }
         }
       else
         {

@@ -108,6 +108,8 @@ typedef struct _userConf {
      /* for the GL client only - draws a red box around enemy ships */
   int EnemyShipBox;
 
+  int doVBG;                    /* draw the background in the viewer? */
+
   char MacrosF[MAX_MACROS][MAX_MACRO_LEN];
 
 } UserConf_t;
@@ -651,6 +653,21 @@ struct Conf ConfData[] =
     {
       "# define this as 'true' if you want a red box drawn around",
       "#  enemy ships on the viewer.  Valid for GL client only.",
+      "#  Default: true",
+      NULL
+    }
+  },
+  {
+    TRUE,
+    CTYPE_BOOL,
+    "do_draw_viewerbg=",
+    &UserConf.doVBG,
+    0, 0,			/* mix/max */
+    "Draw the background image in the viewer(GL client only)",
+    {
+      "# define this as 'true' if you want to see the rather attractive",
+      "#  background image displayed in the viewer.  ",
+      "#  Valid for GL client only.",
       "#  Default: true",
       NULL
     }

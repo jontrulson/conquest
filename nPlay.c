@@ -22,6 +22,7 @@
 #include "nMenu.h"
 #include "nCP.h"
 #include "nPlay.h"
+#include "cqkeys.h"
 
 #define S_DONE       0          /* ready to play */
 #define S_NSERR      1          /* _newship error */
@@ -281,7 +282,7 @@ static int nPlayIdle(void)
 static int nPlayInput(int ch)
 {
   int i;
-  unsigned char c = (ch & 0xff);
+  unsigned char c = CQ_CHAR(ch);
 
   switch (state)
     {

@@ -30,6 +30,7 @@
 #include "nHistl.h"
 #include "nPlay.h"
 #include "nTeaml.h"
+#include "cqkeys.h"
 
 extern void processPacket(Unsgn8 *buf);
 
@@ -87,6 +88,8 @@ static int nPlayBMenuDisplay(dspConfig_t *dsp)
 static int nPlayBMenuInput(int ch)
 {
   int irv;
+
+  ch = CQ_CHAR(ch);
 
   if (prompting)
     {

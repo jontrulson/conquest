@@ -343,7 +343,7 @@ void display( int snum, int display_info )
 	      if ( Ships[i].torps[j].status == TS_FIREBALL )
 		if ( GLcvtcoords( cenx, ceny, Ships[i].torps[j].x, 
                                   Ships[i].torps[j].y, scale, &glx, &gly ))
-		  { /* colorize torp explosions */
+		  { 
 		    drawExplosion(glx, gly);
 		  }
 	  /* Now display the live torps. */

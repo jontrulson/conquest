@@ -22,6 +22,7 @@
 #include "nMenu.h"
 #include "nDead.h"
 #include "nUserl.h"
+#include "cqkeys.h"
 
 /* from conquestgl */
 extern Unsgn8 clientFlags; 
@@ -204,6 +205,8 @@ static int nUserlIdle(void)
   
 static int nUserlInput(int ch)
 {
+  ch = CQ_CHAR(ch);
+
   if (ch == TERM_EXTRA)
     {
       fuser = 0;                /* move to first page */

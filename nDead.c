@@ -21,6 +21,7 @@
 #include "conqlb.h"
 #include "nDead.h"
 #include "nMenu.h"
+#include "cqkeys.h"
 
 extern Unsgn8 clientFlags;      /* conquestgl.c */
 
@@ -274,6 +275,8 @@ static int nDeadIdle(void)
 static int nDeadInput(int ch)
 {
   int irv;
+
+  ch = CQ_CHAR(ch);
 
   switch (state)
     {

@@ -28,6 +28,7 @@
 #include "nPlay.h"
 #include "nTeaml.h"
 #include "nOptions.h"
+#include "cqkeys.h"
 
 extern void processPacket(Unsgn8 *buf);
 
@@ -321,6 +322,8 @@ static int nMenuInput(int ch)
 {
   int i, irv;
   Unsgn16 cwar;
+
+  ch = CQ_CHAR(ch);
 
   if ((state == S_LOSE) && ch != 0)
     return NODE_EXIT;           /* you lose */

@@ -44,9 +44,8 @@ dspData_t dData;
 int frame=0, gtime, timebase=0;
 static float FPS = 0.0;
 
-#define TEXT_HEIGHT    ((GLfloat)1.75)   /* 7.0/4.0 - text font height */
-
-Bool drawing = True;
+#define TEXT_HEIGHT    ((GLfloat)1.75)   /* 7.0/4.0 - text font height
+                                            for viewer */
 
 /* textures... */
 typedef struct              
@@ -60,7 +59,6 @@ typedef struct
 
 struct _texinfo {
   char *filename;
-  unsigned char alpha;
 };
 
 #define TEX_SUN 0
@@ -94,36 +92,36 @@ struct _texinfo {
 #define NUM_TEX 20
 
 struct _texinfo TexInfo[NUM_TEX] = { /* need to correlate with defines above */
-  { "img/star.tga",      255 },
+  { "img/star.tga" },
 
-  { "img/classm.tga",    255 },
-  { "img/classd.tga",    255 },
+  { "img/classm.tga" },
+  { "img/classd.tga" },
 
-  { "img/explode.tga",   255 },
+  { "img/explode.tga" },
 
-  { "img/shipfsc.tga",   255 },
-  { "img/shipfde.tga",   255 },
-  { "img/shipfcr.tga",   255 },
+  { "img/shipfsc.tga" },
+  { "img/shipfde.tga" },
+  { "img/shipfcr.tga" },
 
-  { "img/shipksc.tga",   255 },
-  { "img/shipkde.tga",   255 },
-  { "img/shipkcr.tga",   255 },
+  { "img/shipksc.tga" },
+  { "img/shipkde.tga" },
+  { "img/shipkcr.tga" },
 
-  { "img/shiprsc.tga",   255 },
-  { "img/shiprde.tga",   255 },
-  { "img/shiprcr.tga",   255 },
+  { "img/shiprsc.tga" },
+  { "img/shiprde.tga" },
+  { "img/shiprcr.tga" },
 
-  { "img/shiposc.tga",   255 },
-  { "img/shipode.tga",   255 },
-  { "img/shipocr.tga",   255 },
+  { "img/shiposc.tga" },
+  { "img/shipode.tga" },
+  { "img/shipocr.tga" },
 
-  { "img/doomsday.tga",  255 },
+  { "img/doomsday.tga" },
 
-  { "img/vbg.tga",   255 },
+  { "img/vbg.tga" },
 
-  { "img/torp.tga",  255 },
+  { "img/torp.tga" },
 
-  { "img/luna.tga",  255 },
+  { "img/luna.tga" },
 };
 
 GLuint  textures[NUM_TEX];       /* texture storage */
@@ -186,27 +184,6 @@ void drawLineBox(GLfloat x, GLfloat y,
   glEnd();
 
   GLError();
-  return;
-}
-
-void drawBox(GLfloat x, GLfloat y, GLfloat size)
-{				/* draw a square centered on x,y
-				   USE BETWEEN glBegin/End pair! */
-  const GLfloat z = 0.0;
-  GLfloat rx, ry;
-
-#if 0
-  clog("%s: x = %f, y = %f\n", __FUNCTION__, x, y);
-#endif
-
-  rx = x - (size / 2);
-  ry = y - (size / 2);
-
-  glVertex3f(rx, ry, z); /* ll */
-  glVertex3f(rx + size, ry, z); /* lr */
-  glVertex3f(rx + size, ry + size, z); /* ur */
-  glVertex3f(rx, ry + size, z); /* ul */
-
   return;
 }
 
@@ -310,32 +287,31 @@ void uiDrawPlanet( GLfloat x, GLfloat y, int pnum, int scale,
   glPushMatrix();
   glLoadIdentity();
   
+  glEnable(GL_TEXTURE_2D); 
   
-  if (what == PLANET_SUN)
+  switch (what)
     {
-      glEnable(GL_TEXTURE_2D); 
+    case PLANET_SUN:
       glBindTexture(GL_TEXTURE_2D, textures[TEX_SUN]);
-    }
-  else if (what == PLANET_CLASSM)
-    {
-      glEnable(GL_TEXTURE_2D);
+      break;
+      
+    case PLANET_CLASSM:
       glBindTexture(GL_TEXTURE_2D, textures[TEX_CLASSM]);
-    }
-  else if (what == PLANET_DEAD)
-    {
-      glEnable(GL_TEXTURE_2D);
+      break;
+      
+    case PLANET_DEAD:
       glBindTexture(GL_TEXTURE_2D, textures[TEX_CLASSD]);
-    }
-  else if (what == PLANET_MOON)
-    {
-      glEnable(GL_TEXTURE_2D);
+      break;
+      
+    case PLANET_MOON:
+    default:
       glBindTexture(GL_TEXTURE_2D, textures[TEX_LUNA]);
+      break;
     }
-
 
   GLError();
 
-  glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
   glEnable(GL_BLEND);
   
   glBegin(GL_POLYGON);
@@ -364,7 +340,7 @@ void uiDrawPlanet( GLfloat x, GLfloat y, int pnum, int scale,
           break;
         }
       
-      size = 50.0;		/* 'magnify' the texture */
+      size = 50.0;		/* suns are big */
       break;
     case PLANET_CLASSM:
       glColor3f(0.9, 0.9, 0.9);
@@ -917,8 +893,6 @@ resize(int w, int h)
   glGetFloatv(GL_PROJECTION_MATRIX, dConf.hmat);
 
   /* viewer */
-
-  /*  glViewport(0, 0, dConf.vW, dConf.vH);*/
   
   glMatrixMode(GL_PROJECTION);
   glLoadIdentity();
@@ -1010,6 +984,7 @@ static void renderFrame(void)
           exit(1);
         }
     }
+
   /* if we are playing back a recording, we use the current
      frame delay, else the default throttle */
   if (Context.recmode == RECMODE_PLAYING)
@@ -1135,7 +1110,7 @@ drawShip(GLfloat x, GLfloat y, GLfloat angle, char ch, int i, int color,
 
   GLError();
   
-#ifdef DEBUG
+#ifdef DEBUG_GL
   clog("DRAWSHIP(%s) x = %.1f, y = %.1f, ang = %.1f\n", buf, x, y, angle);
 #endif
 
@@ -1268,7 +1243,7 @@ drawDoomsday(GLfloat x, GLfloat y, GLfloat angle, GLfloat scale)
 
   sizeh = size / 2.0;
 
-  glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
   glEnable(GL_BLEND);
 
   GLError();
@@ -1284,9 +1259,7 @@ drawDoomsday(GLfloat x, GLfloat y, GLfloat angle, GLfloat scale)
 
   glBindTexture(GL_TEXTURE_2D, textures[TEX_DOOMSDAY]);
   
-  /* translate to correct position, */
   glTranslatef(x , y , TRANZ);
-  /* THEN rotate ;-) */
   glRotatef(angle, 0.0, 0.0, z);
 
   glColor4f(1.0, 1.0, 1.0, alpha);	
@@ -1316,33 +1289,52 @@ drawDoomsday(GLfloat x, GLfloat y, GLfloat angle, GLfloat scale)
   return;
 }
 
-void drawViewerBG()
+void drawViewerBG(int snum)
 {
-  const GLfloat z = -5.0;
-  const GLfloat size = VIEWANGLE / 10.0;
+  GLfloat z = TRANZ * 3.0;
+  const GLfloat size = VIEWANGLE * 34.0; /* empirically determined */
   const GLfloat sizeh = size / 2.0;
+  GLfloat x, y;
+
+  if (snum < 1 || snum > MAXSHIPS)
+    GLcvtcoords(0.0, 0.0, 0.0, 0.0, SCALE_FAC, &x, &y);
+  else
+    {
+      if (SMAP(snum) && !UserConf.DoLocalLRScan)
+        GLcvtcoords(0.0, 0.0, 0.0, 0.0, 
+                    SCALE_FAC, &x, &y);
+      else
+        GLcvtcoords((GLfloat)Ships[snum].x, 
+                    (GLfloat)Ships[snum].y, 
+                    0.0, 0.0, 
+                    SCALE_FAC, &x, &y);
+    }
+
+  if (SMAP(snum))
+    z *= 3.0;
 
   glPushMatrix();
   glLoadIdentity();
+  glTranslatef(x , y , z);
 
   glEnable(GL_TEXTURE_2D);
   glBindTexture(GL_TEXTURE_2D, textures[TEX_VBG]);
   
-  glColor3f(1.0, 1.0, 1.0);	
+  glColor3f(0.8, 0.8, 0.8);	
 
   glBegin(GL_POLYGON);
 
-  glTexCoord2f(0.75f, 0.25f);
-  glVertex3f(-sizeh, -sizeh, z); /* ll */
+  glTexCoord2f(1.0f, 0.0f);
+  glVertex3f(-sizeh, -sizeh, 0.0); /* ll */
 
-  glTexCoord2f(0.75f, 0.75f);
-  glVertex3f(sizeh, -sizeh, z); /* lr */
+  glTexCoord2f(1.0f, 1.0f);
+  glVertex3f(sizeh, -sizeh, 0.0); /* lr */
 
-  glTexCoord2f(0.25f, 0.75f);
-  glVertex3f(sizeh, sizeh, z); /* ur */
+  glTexCoord2f(0.0f, 1.0f);
+  glVertex3f(sizeh, sizeh, 0.0); /* ur */
 
-  glTexCoord2f(0.25f, 0.25f);
-  glVertex3f(-sizeh, sizeh, z); /* ul */
+  glTexCoord2f(0.0f, 0.0f);
+  glVertex3f(-sizeh, sizeh, 0.0); /* ul */
 
   glEnd();
 
@@ -1413,16 +1405,27 @@ input(int key, int x, int y)
   return;
 }
 
+/* for 'normal' keys */
 static void charInput(unsigned char key, int x, int y)
 {
-  procInput((int)key, x, y);
+  Unsgn32 kmod = glutGetModifiers();
+  Unsgn32 jmod = 0;
+
+  if (kmod & GLUT_ACTIVE_SHIFT)
+    jmod |= CQ_KEY_MOD_SHIFT;
+  if (kmod & GLUT_ACTIVE_CTRL)
+    jmod |= CQ_KEY_MOD_CTRL;
+  if (kmod & GLUT_ACTIVE_ALT)
+    jmod |= CQ_KEY_MOD_ALT;
+
+  procInput((key & CQ_CHAR_MASK) | jmod, x, y);
   return;
 }
   
 
 static int LoadTGA(char *filename, textureImage *texture)
 {    
-  GLubyte TGAheader[12]={0,0,2,0,0,0,0,0,0,0,0,0}; /* Uncompressed TGA Header */
+  static GLubyte TGAheader[12]={0,0,2,0,0,0,0,0,0,0,0,0}; /* Uncompressed TGA Header */
   GLubyte TGAcompare[12]; /* Used To Compare TGA Header */
   GLubyte header[6]; /* First 6 Useful Bytes From The Header */
   GLuint bytesPerPixel; 
@@ -1526,7 +1529,6 @@ static int LoadGLTextures()
 	    glGenTextures(1, &textures[i]);   /* create the texture */
 	    glBindTexture(GL_TEXTURE_2D, textures[i]);
             GLError();
-	    /* actually generate the texture */
 	    /* use linear filtering */
 	    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -1542,6 +1544,7 @@ static int LoadGLTextures()
                 components = 3;
               }
 
+	    /* generate the texture */
 	    glTexImage2D(GL_TEXTURE_2D, 0, components, 
                          texti->width, texti->height, 0,
 			 type, GL_UNSIGNED_BYTE, texti->imageData);
@@ -1549,7 +1552,7 @@ static int LoadGLTextures()
 	
 	GLError();
 
-	/* free the ram we used in our texture generation process */
+	/* be free! */
 	if (texti)
 	  {
 	    if (texti->imageData && rv == TRUE)

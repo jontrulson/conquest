@@ -2014,6 +2014,7 @@ static void command( int ch )
 {
   int i;
   real x;
+  int snum = Context.snum;
 
   if (_KPAngle(ch, &x))         /* hit a keypad/arrow key */
     {				/* alter course Mr. Sulu. */
@@ -2392,7 +2393,8 @@ static void command( int ch )
       break;
 
     case ' ':
-      UserConf.DoLocalLRScan = !UserConf.DoLocalLRScan;
+      if (SMAP(snum))
+        UserConf.DoLocalLRScan = !UserConf.DoLocalLRScan;
       break;
 
     case TERM_EXTRA:		/* Have [TAB] act like 'i\t' */
@@ -2434,7 +2436,7 @@ void nCPInit(void)
 static int nCPDisplay(dspConfig_t *dsp)
 {
   /* Viewer */
-  renderViewer();
+  renderViewer(UserConf.doVBG);
 
   /* Main/Hud */
   renderHud();
@@ -2572,6 +2574,15 @@ static int nCPInput(int ch)
   real x;
   int snum = Context.snum;
 
+  if ((CQ_CHAR(ch) == 'B' || CQ_CHAR(ch) == 'b') && 
+      CQ_MODIFIER(ch) & CQ_KEY_MOD_ALT)
+    {
+      UserConf.doVBG = !UserConf.doVBG;
+      return NODE_OK;
+    }
+
+  ch = CQ_CHAR(ch) | CQ_FKEY(ch);
+
   if (ch == 0x1c)
     return NODE_EXIT;                  /* Control-/ (INSTA-QUIT (tm)) */
 
@@ -2612,10 +2623,7 @@ static int nCPInput(int ch)
   if (ch == 0)
     {                           /* check for queued chars */
       if (iBufCount())
-        {
-          ch = iBufGetCh();
-/*           clog("IBUF: ch == 0, now = %d", ch); */
-        }
+        ch = iBufGetCh();
       else
         return NODE_OK;
     }
@@ -2628,7 +2636,7 @@ static int nCPInput(int ch)
         }
     }
 
-  c = (ch & 0xff);
+  c = CQ_CHAR(ch);
 
   if (prompting)
     {

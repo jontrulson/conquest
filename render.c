@@ -32,7 +32,7 @@ extern dspData_t dData;
 static int cloakbon = FALSE;    /* blinking - high */
 static int alertbon = FALSE;
 
-static int cloakbtime = 0;           /* last clock blink */
+static int cloakbtime = 0;           /* last cloak blink */
 static int alertbtime = 0;           /* last alert blink */
 
 void renderHud(void)
@@ -120,7 +120,7 @@ void renderHud(void)
             xstatw - (tx - 2.0), 
              (dConf.vH / 15.0),
              fontLargeTxf, dData.warp.warp, InfoColor, TRUE, FALSE, TRUE);
-  drawLineBox(tx, ty, xstatw - tx + 2.0/*((xstatw / 6.0) * 2.0) + 4.0*/, 
+  drawLineBox(tx, ty, xstatw - tx + 2.0, 
               (dConf.vH / 15.0) + 4.0,
               InfoColor, 1.0);
 
@@ -130,6 +130,7 @@ void renderHud(void)
             xstatw - (tx - 2.0), 
             (dConf.vH / 20.0),
             fontFixedTxf, "Warp", LabelColor, TRUE, FALSE, TRUE);
+
   /* shields */
   tx = dConf.borderW;
   ty = (dConf.vH / 15.0) * 2.5;
@@ -183,13 +184,11 @@ void renderHud(void)
   ty = (dConf.vH / 15.0) * 11.5; /* top of stat box*/
   sb_ih = ((dConf.vY + dConf.vH) - ty) / 5.0; /* hwight per item */
 
-/*   drawLineBox(tx, ty, xstatw, sb_ih * 5.0, BlueColor, 1.0); */
-
   /* kills */
   sprintf(buf1024, "#%d#%5s #%d#kills", InfoColor, dData.kills.kills,
           CyanColor);
   glfRender(tx + 2.0, ty, 0.0, xstatw, sb_ih, fontFixedTxf, buf1024, NoColor,
-             TRUE, TRUE, TRUE);
+            TRUE, TRUE, TRUE);
 
   /* towed/towing */
   if (strlen(dData.tow.str))
@@ -211,8 +210,9 @@ void renderHud(void)
   /* alert stat */
   if (strlen(dData.aStat.alertStatus))
     glfRender(tx + 2.0, ty + (sb_ih * 4.0), 0.0, xstatw, sb_ih,
-               fontFixedTxf, dData.aStat.alertStatus, 
-               (alertbon) ? dData.aStat.color & ~CQC_A_BOLD: dData.aStat.color | CQC_A_BOLD, 
+              fontFixedTxf, dData.aStat.alertStatus, 
+              (alertbon) ? dData.aStat.color & ~CQC_A_BOLD : 
+              dData.aStat.color | CQC_A_BOLD, 
               TRUE, FALSE, TRUE);
 
   /* END stat box */
@@ -274,7 +274,7 @@ void renderHud(void)
 
 }
 
-void renderViewer(void)
+void renderViewer(int dovbg)
 {
   /* setup the proper viewport and projection matrix for the viewer */
   glViewport(dConf.vX, 
@@ -297,24 +297,10 @@ void renderViewer(void)
 #endif
 
 
-  /* not yet */
-#if 0
-  drawViewerBG();
-#endif
+  if (dovbg)
+    drawViewerBG(Context.snum);
 
   display( Context.snum, FALSE );
-
-#if 0
-   /* TEST */
-  glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
-  glEnable(GL_BLEND);
-  glColor4f(0.0, 0.0, 0.0, 0.3);
-  drawQuad(-((GLfloat)dConf.vW / 2.0), 
-           -((GLfloat)dConf.vH / 2.0), 
-           (GLfloat)dConf.vW, (GLfloat)dConf.vH, TRANZ/ 2.0);
-  glDisable(GL_BLEND);
-
-#endif
 
   /* reset for everything else */
   glViewport(0, 0, dConf.wW, dConf.wH);
@@ -341,6 +327,8 @@ void renderScale(GLfloat x, GLfloat y, GLfloat w, GLfloat h,
     val = max;
 
   sprintf(buf32, "%3d", val);
+
+  /* gauge */
   uiPutColor(scalecolor);
   drawQuad(x, y, 
            scaleend * (GLfloat)((GLfloat)val / ((GLfloat)max - (GLfloat)min)),
@@ -348,7 +336,8 @@ void renderScale(GLfloat x, GLfloat y, GLfloat w, GLfloat h,
   drawLineBox(x, y, scaleend, scaleh, scalecolor, 1.0);
 
   /* label */
-  glfRender(x, y + scaleh, 0.0, w/2.0, scaleh, vfont, label, lcolor, TRUE, FALSE,
+  glfRender(x, y + scaleh, 0.0, w/2.0, scaleh, vfont, label, lcolor, 
+            TRUE, FALSE,
             TRUE);
 
   /* value */

@@ -288,6 +288,7 @@ static int nAuthInput(int ch)
 {
   int rv, irv;
 
+  ch = CQ_CHAR(ch);
   irv = prmProcInput(&prm, ch);  
   switch (state)
     {

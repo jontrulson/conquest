@@ -23,6 +23,7 @@
 #include "nMenu.h"
 #include "nDead.h"
 #include "nPlanetl.h"
+#include "cqkeys.h"
 
 /* from conquestgl */
 extern Unsgn8 clientFlags; 
@@ -319,6 +320,7 @@ static int nPlanetlIdle(void)
   
 static int nPlanetlInput(int ch)
 {
+  ch = CQ_CHAR(ch);
 
   if (ch == ' ')
     {
