@@ -5,10 +5,12 @@
  * $Id$
  *
  *
+ * Copyright 1999 Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
  ***********************************************************************/
 
 const char *ConquestId = "$Id$";
-const char *ConquestVersion = "Version 6.7g";
-const char *ConquestDate = "1998/10/10 12:18:30";
+const char *ConquestVersion = "Version 7.0";
+const char *ConquestDate = "1999/02/06 12:42:05";
+
 
 /* That's it! */

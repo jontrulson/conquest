@@ -4,6 +4,7 @@
  *
  * $Id$
  *
+ * Copyright 1999 Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
  ***********************************************************************/
 
 /**********************************************************************/
@@ -20,10 +21,15 @@
 #define NOEXPORT_COLORS
 #include "color.h"		/* instantiate externs here */
 
-/* initialize color variables.  if has_colorcap == FALSE, fake it */
-void InitColors(int has_colorcap)
+/* initialize color variables.  assumes curses has been initialized. */
+void InitColors(void)
 {
+  int has_colorcap;
 
+  if (has_colors() && conf_NoColor == FALSE)
+    has_colorcap = TRUE;
+  else
+    has_colorcap = FALSE;
 
   NoColor = 0;			/* default color (white usually) */
 

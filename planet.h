@@ -3,7 +3,7 @@
  *
  * $Id$
  *
- * Copyright 1998 Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
+ * Copyright 1999 Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
  */
 
 #ifndef PLANET_H_INCLUDED

@@ -4,6 +4,7 @@
  *
  * $Id$
  *
+ * Copyright 1999 Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
  ***********************************************************************/
 
 /*                               C O N Q V M S */
@@ -213,7 +214,9 @@ void astservice(int sig)
 {
   int now;
   int readone;
-  
+  static int RMsggrand = 0;
+  int difftime;
+
   /* Don't do anything if we're not supposed to. */
   if ( ! CqContext.display )
     return;
@@ -225,21 +228,55 @@ void astservice(int sig)
   drcheck();				/* handle driver logic */
   
   /* See if we can display a new message. */
+
+				/* for people with 25 lines, we
+				   use a different timer so that
+				   NEWMSG_GRAND intervals will determine
+				   whether it's time to display a new
+				   message... Otherwise, CqContext.msgrand
+				   is used - which means that NEWMSG_GRAND
+				   interval will have to pass after issuing
+				   any command before a new msg will disp
+				   12/28/98 */
   readone = FALSE;
   if ( CqContext.msgok )
-    if ( dgrand( CqContext.msgrand, &now ) >= NEWMSG_GRAND )
-      if ( getamsg( CqContext.snum, &Ships[CqContext.snum].lastmsg ) )
-	{
-	  if (readmsg( CqContext.snum, Ships[CqContext.snum].lastmsg, RMsg_Line ) == TRUE)
-	    {
-	      if (Msgs[Ships[CqContext.snum].lastmsg].msgfrom != CqContext.snum)
-		if (conf_MessageBell == TRUE)
-		  cdbeep();
-	      CqContext.msgrand = now;
-	      readone = TRUE;
-	    }
+    {
+      /*
+      clog("### RMsggrand = %d, CqContext.msgrand = %d", RMsggrand, CqContext.msgrand);
+      */
+
+      if (RMsg_Line != MSG_LIN1)
+	{			/* we have line 25 for msgs */
+	  difftime = dgrand( RMsggrand, &now );
 	}
-  
+      else
+	{
+	  difftime = dgrand( CqContext.msgrand, &now );
+	}
+
+      /*
+	clog("difftime = %d, RMsg_Line = %d, MSG_LIN1 = %d\n\tNEWMSG_GRAND = %d, now = %d", difftime, RMsg_Line, MSG_LIN1, NEWMSG_GRAND, now);
+       */
+
+      if ( difftime >= NEWMSG_GRAND )
+	if ( getamsg( CqContext.snum, &Ships[CqContext.snum].lastmsg ) )
+	  {
+	    if (readmsg( CqContext.snum, Ships[CqContext.snum].lastmsg, 
+			 RMsg_Line ) == TRUE)
+	      {
+		if (Msgs[Ships[CqContext.snum].lastmsg].msgfrom != 
+		    CqContext.snum)
+		  if (conf_MessageBell == TRUE)
+		    cdbeep();
+				/* set both timers, regardless of which
+				   one we're actally concerned with */
+		CqContext.msgrand = now;
+		RMsggrand = now;
+		readone = TRUE;
+	      }
+	  }
+    }
+
   /* Perform one ship display update. */
   display( CqContext.snum, FALSE );
   
@@ -247,7 +284,7 @@ void astservice(int sig)
   /* Un-read the message if there's a chance it got garbaged. */
   /* JET 3/24/96 - another try with curses timer disabled */
   if ( readone )
-    if (RMsg_Line != MSG_LIN1)	/* we have an extra msg line */
+    if (RMsg_Line == MSG_LIN1)	/* we don't have an extra msg line */
       if ( iochav() )
 	Ships[CqContext.snum].lastmsg = modp1( Ships[CqContext.snum].lastmsg - 1, MAXMESSAGES );
   
@@ -634,7 +671,8 @@ int isagod( int unum )
   
   if (unum == -1)		/* get god status for current user */
     {				/* now find out whether we're in it */
-      strcpy(myname, cuserid(NULL));
+      strncpy(myname, cuserid(NULL), BUFFER_SIZE - 2);
+      myname[BUFFER_SIZE - 1] = EOS;
     }
   else
     {				/* else a user number passed in */

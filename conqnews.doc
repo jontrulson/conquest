@@ -9,6 +9,144 @@
 
                               Conquest News
 
+Version 7.0    Thu Jan 28 21:14:41 MST 1999 Jon Trulson  <jon@radscan.com>
+
+        - Remote User support, which should make things much nicer for
+          operators and internet players.  A 'remote' player's usernames
+          are always prefixed with an '@' character in all output that
+          shows usernames.  See the file SERVER.DOC for information on
+          how to setup and run a conquest server.
+
+        - A new (O)ptions menu is now available at the Conquest main
+          menu, as well as while playing the game.  This menu allows
+          users to view the options compiled into Conquest, view the
+          system-wide options set by the Conquest operator, View/Edit
+          the users ~/.conquestrc options, View/Edit macros, and for
+          remote users: change your password.  Operators can change a
+          remote user's password in the (e)dit User option in
+          conqoper.  The conqoper program now lets operators View/Edit
+          the system-wide configurables... Per-item help text for each
+          option is also available.  You should never need to manually
+          edit the conquestrc files again ;-)
+
+        - conoper now understands some command line options.  Try
+          'conqoper -?' to see which ones.  These make it rather
+          trivial to reset the game on a regular basis from crontab for
+          example.
+
+	- common block data has been completely restructured.
+          Actually, it is structured *now*, as opposed to the 70 or so
+          parallel arrays that used to be there ;-)  The code is much
+          easier to read and maintain, and several bugs were
+          identified and fixed as a result.
+
+        - new sys-wide options:
+           allow_switchteams - whether new users are allowed to 
+                               switch teams at the main menu
+           user_expiredays   - number of days of inactivity for a
+                               user before s/he is expired.
+
+        - approximate elapsed time (accurate to 1 minute) per player
+          is displayed for each entry in (H)istory now.
+
+        - the ETA algorithm used for ship-to-ship (only) scans has
+          been re-worked somewhat.  Now ship/ship ETA's are calculated
+          using an average closure rate.  This mean you need to scan a
+          ship at least twice in a row to get reasonable ETA's.  A
+          single scan will assume that both ships are heading directly
+          at each other, as no closure rate information is available.
+          It will also list the ETA as 'never' if there's no hope
+          you'll ever intercept the target ship.
+
+        - keypad keys are translated into direction keys - now you can
+          aim, and set course using the keypad the same way the
+          direction keys are used.
+
+        - new common block of 256KB - room for 500 users. (ha!)
+
+        - standardized 'more' and 'done' prompts.
+
+        - renamed at386 terminfo entry to at386-uwcq to avoid conflict
+          with linux's at386 entry.  This entry is used by UnixWare
+          users that play from the console.
+
+	## Now for the bug fixes ##
+
+        - fixed neg array reference in messaging code.
+
+        - fixed neg array ref and write in conqoper that corrupted the
+          message ring, user block, and anything else laying around.
+          But only on Tuesdays.
+
+        - fixed negative Users[] array ref in conqoper sighandler.
+
+        - fixed off by one in takeplanet() that allowed you to conquer
+          the universe without taking RigelB.
+
+        - fixed conqoper to not send entry msg when COMMONBLOCK is
+          invalid.  (can you say segv?)
+
+        - fixed invisible user bug (resign, then re-enter).  Now
+          Conquest exits when you resign.
+
+        - fixed evil self destruct bug that caused two killship()
+          calls to be executed when a user was killed while in the
+          process of self destructing.
+
+        - added extra checks for linux glibc problem, where for some
+          reason fd_set is declared as a typedef rather than a
+          struct. Wierd.
+
+        - elapsed time bugs fixed.  Again.  'VACANT' ships no longer
+          add to the elapsed/cpu times for teams and users.
+
+        - (U)ser Statistics, and (S) More User Statistics screens now
+          track arriving/departing users in real-time.
+
+        - fixed locking bug in initeverything().
+
+        - bug in listplan() ((?) Planet List) that corrupted page
+          header fixed.
+
+        - many bugs and oddities with cdgetp() (line based input
+          routine) fixed.  Perhaps I should give the 'readline'
+          library a try??
+
+        - the lastentry time for a user is now updated whenever a user
+          enters a ship, not just when the ship is first initialized.
+
+        - isagod() checks are more stringent and reliable.
+
+        - clog buffer increased.  Large logging events don't cause a
+          segv anymore.
+
+        - fixed bug in astservice relating to message display timing
+          for those with 25 line screens.  Those without 25 lines (on
+          which messages are displayed on the 23rd line), shouldn't
+          miss messages anymore when entering a command at the same
+          time a message is being displayed.  Those with 25 line
+          terminals will get messages asyncronously on the 25th line,
+          regardless of whether you're issuing other commands at the
+          time or not. 
+
+        - fixed bug where switching teams and then dying in a
+          reincarnated ship would 'do the wrong' thing regarding
+          ship's team selection when you re-entered the game.  This
+          rather esoteric bug was found by Dave Payne.  Of course. ;-)
+
+        - conqoper watch(): doomsday 'type' member and display code
+          removed - useless.  The doomsday's status is now displayed
+          symbolically in the doomsday watch() screen.
+
+        - DCL subshell code finally excorsized.  Don't need it, don't
+          want it. ;-)
+
+        - all debug related logging turned off.
+
+        - on planet list, number of armies is displayed in same color
+          as planet now.
+
+
 Version 6.6    Thu Dec 24 16:03:31 1997  Jon Trulson  <jon@radscan.com>
 
         - added 20 new 'extra' play planets for use by enterprising
@@ -255,7 +393,7 @@ Version 6.0     Sat Nov 30 22:50:25 1996  Jon Trulson  <jon@radscan.com>
         - if you don't have 25 lines, you will no longer get messages
           while reviewing old ones, causing strangness. 
 
-        - sighandler modified.  CG's need to use QUIT (^\) to exit 
+        - sighandler modified.  CO's need to use QUIT (^\) to exit 
           (without self-destructing) instead of INTR.
 
         - removed syscall RESTART dependancies. Too unreliable.

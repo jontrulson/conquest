@@ -3,6 +3,7 @@
  *
  * $Id$
  *
+ * Copyright 1999 Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
  ***********************************************************************/
 
 /*                              C O N Q D E F */
@@ -56,7 +57,7 @@
 /*#define COMMONSTAMP 961019 		 stardate? */
 /*#define COMMONSTAMP 971207 		 stardate? */
 /*#define COMMONSTAMP 980628 		 stardate? */
-#define COMMONSTAMP 981008 		 /* stardate? */
+#define COMMONSTAMP 990124 		 /* stardate? */
 
 /* Copyright notice string. */
 #define COPYRIGHT "(C) 1983-1986 by Jef Poskanzer and Craig Leres"
@@ -517,8 +518,6 @@
 
 #define MSG_LIN1 (DISPLAY_LINS + 2) 
 #define MSG_LIN2 (MSG_LIN1 + 1)	/* line for messages */
-#define MSG_LIN3 (MSG_LIN1 + 2)	/* line for messages */
-
 
 #define TIMEOUT_DRIVER 10 	/* seconds of timeout for the driver */
 #define TIMEOUT_DRCHECK 2 	/* don't do timeout checking after this */

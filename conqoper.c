@@ -4,6 +4,7 @@
  *
  * $Id$
  *
+ * Copyright 1999 Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
  ***********************************************************************/
 
 /*                               C O N Q O P E R */
@@ -55,7 +56,7 @@ main(int argc, char *argv[])
 
   OptionAction = OP_NONE;
 
-  glname( name );
+  glname( name, MAXUSERNAME );
 
   if ( ! isagod(-1) )
     {
@@ -243,20 +244,21 @@ main(int argc, char *argv[])
   rndini( 0, 0 );		/* initialize random numbers */
   cdinit();			/* initialize display environment */
   
-  CqContext.unum = MSG_GOD;		/* stow user number */
-  CqContext.snum = ERR;			/* don't display in cdgetp - JET */
-  CqContext.histslot = ERR;			/* useless as an op */
+  CqContext.unum = MSG_GOD;	/* stow user number */
+  CqContext.snum = ERR;		/* don't display in cdgetp - JET */
+  CqContext.histslot = ERR;	/* useless as an op */
   CqContext.display = TRUE;
-  CqContext.maxlin = cdlins();		/* number of lines */
+  CqContext.maxlin = cdlins();	/* number of lines */
   
-  CqContext.maxcol = cdcols();		/* number of columns */
+  CqContext.maxcol = cdcols();	/* number of columns */
 
 				/* send a message telling people
 				   that a user has entered conqoper */
   sprintf(msgbuf, "User %s has entered conqoper.",
           name);
-
+  
   stormsg(MSG_COMP, MSG_ALL, msgbuf);
+  clog(msgbuf);			/* log it too... */
 
   operate();
   
@@ -1019,7 +1021,7 @@ void opback( int lastrev, int *savelin )
   *savelin = lin;
   lin+=3;
   
-  cprintf(lin,0,ALIGN_CENTER,"#%d#%s",LabelColor, "Options:");
+  cprintf(lin,0,ALIGN_CENTER,"#%d#%s",NoColor, "Options:");
   lin+=2;
   i = lin;
   
@@ -1057,6 +1059,8 @@ void opback( int lastrev, int *savelin )
   cprintf(lin,col,ALIGN_NONE,sfmt, 'L', "review messages");
   lin++;
   cprintf(lin,col,ALIGN_NONE,sfmt, 'm', "message from GOD");
+  lin++;
+  cprintf(lin,col,ALIGN_NONE,sfmt, 'O', "options menu");
   lin++;
   cprintf(lin,col,ALIGN_NONE,sfmt, 'T', "team stats");
   lin++;
@@ -1294,6 +1298,10 @@ void operate(void)
 	  break;
 	case 'm':
 	  sendmsg( MSG_GOD, TRUE );
+	  break;
+	case 'O':
+	  SysOptsMenu();
+	  redraw = TRUE;
 	  break;
 	case 'p':
 	  oppedit();
@@ -2409,15 +2417,19 @@ void opuadd(void)
       cdrefresh();
       c_sleep( 1.0 );
     }
-  else				/* can't add remote users yet */
+  else		
     {
-      if (nameptr != name)
+      if (nameptr != name)	/* a remote user (@) */
 	Users[unum].type = UT_REMOTE;
       else
 	Users[unum].type = UT_LOCAL;
     }
   cdclrl( MSG_LIN1, 2 );
   
+				/* if a remote user, get a pw */
+  if (Users[unum].type == UT_REMOTE)
+    ChangePassword(unum, TRUE);
+
   return;
 
 }
@@ -2435,6 +2447,10 @@ void opuedit(void)
   char buf[MSGMAXLINE];
   int ch, left = TRUE;
   char datestr[DATESIZE];
+  static char *prompt = "Use arrow keys to position, [SPACE] to modify";
+  static char *prompt2 = "any other key to quit.";
+  static char *rprompt = "Use arrow keys to position, [SPACE] to modify, [TAB] to change password";
+  char *promptptr;
   cdclrl( MSG_LIN1, 2 );
   attrset(InfoColor);
   ch = getcx( "Edit which user: ", MSG_LIN1, 0, TERMS, buf, MAXUSERNAME );
@@ -2531,7 +2547,13 @@ void opuedit(void)
       dcol = 22;
       lcol = dcol - 1;
       
-      cprintf(lin,tcol,ALIGN_NONE,"#%d#%s", LabelColor,"             Name:");
+      if (Users[unum].type == UT_REMOTE)
+	cprintf(lin,tcol,ALIGN_NONE,"#%d#%s#%d#%s", RedLevelColor, 
+		"    (REMOTE) ", LabelColor,"Name:");
+      else
+	cprintf(lin,tcol,ALIGN_NONE,"#%d#%s", LabelColor,"             Name:");
+
+
       cprintf(lin,dcol,ALIGN_NONE,"#%d#%s",InfoColor, 
 	      Users[unum].alias);
       
@@ -2665,12 +2687,21 @@ void opuedit(void)
       	Users[unum].stats[USTAT_ENTRIES]);
       
       /* Display the stuff */
+      if (Users[unum].type == UT_REMOTE)
+	promptptr = rprompt;
+      else
+	promptptr = prompt;
+
+      cprintf(MSG_LIN1,0,ALIGN_CENTER,"#%d#%s", InfoColor,
+	      promptptr);
       cprintf(MSG_LIN2,0,ALIGN_CENTER,"#%d#%s", InfoColor,
-		"Use arrow keys to position, SPACE to modify, q to quit. ");
+	      prompt2);
+
       if ( left )
 	i = lcol;
       else
 	i = rcol;
+
       cdput( '+', row, i );
       cdmove( row, i );
       cdrefresh();
@@ -2711,10 +2742,6 @@ void opuedit(void)
 	case KEY_DOWN:
 	  /* Down. */
 	  row = min( row + 1, MAXUEDITROWS );
-	  break;
-	case 'q': 
-	case 'Q':
-	  return;
 	  break;
 	case 'y':
 	case 'Y':
@@ -2821,15 +2848,21 @@ void opuedit(void)
 		  cdbeep();
 	    }
 	  break;
-	case TERM_NORMAL:
-	case TERM_EXTRA:
-	case TERM_ABORT:
+
+	case TERM_EXTRA:	/* change passwd */
+	  if (Users[unum].type == UT_REMOTE)
+	    ChangePassword(unum, TRUE);
 	  break;
+	  
 	case 0x0c:
 	  cdredo();
 	  break;
+
+	case TERM_NORMAL:
+	case TERM_ABORT:
+
 	default:
-	  cdbeep();
+	  return;
 	}
     }
   

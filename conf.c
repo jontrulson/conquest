@@ -6,6 +6,7 @@
  *
  * $Id$
  *
+ * Copyright 1999 Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
  ***********************************************************************/
 
 /**********************************************************************/
@@ -17,7 +18,11 @@
 /**********************************************************************/
 
 #include "global.h"
+#include "conqcom.h"
+
+#define NOEXTERN
 #include "conf.h"
+#undef NOEXTERN
 
 		/* For id purposes... */
 static char *confId = "$Id$";
@@ -32,12 +37,12 @@ static char *confId = "$Id$";
 int GetSysConf(int checkonly)
 {
   FILE *conf_fd;
-  int i, j;
+  int i, j, n;
   char conf_name[256];
   char buffer[BUFFER_SIZE];
   int FoundOne = FALSE;
   int buflen;
-  char *bufptr;
+  char *bufptr, *cptr;
 
 				/* init some defaults */
   sysconf_DoLRTorpScan = TRUE;
@@ -148,13 +153,6 @@ int GetSysConf(int checkonly)
 			  }
 			break;
 			
-		      case CTYPE_MACRO:
-			strcpy((char *)SysConfData[j].ConfValue, 
-			       process_macrostr(bufptr));
-			SysConfData[j].Found = TRUE;
-			FoundOne = TRUE;
-			break;
-
 		      case CTYPE_NUMERIC:
 			if (alldig(bufptr))
 			  {
@@ -237,9 +235,9 @@ int GetSysConf(int checkonly)
 int GetConf(int isremote, int usernum)
 {
   FILE *conf_fd;
-  int i, j;
+  int i, j, n;
   char conf_name[MID_BUFFER_SIZE];
-  char *homevar;
+  char *homevar, *cptr;
   char buffer[BUFFER_SIZE];
   int buflen;
   char *bufptr;
@@ -255,7 +253,9 @@ int GetConf(int isremote, int usernum)
   conf_ClearOldMsgs = TRUE;
 
   for (i=0; i<MAX_MACROS; i++)
-    conf_MacrosF[i][0] = EOS;
+    {
+      conf_MacrosF[i][0] = EOS;
+    }
 
 				/* start building the filename */
   if ((homevar = getenv("HOME")) == NULL)
@@ -371,9 +371,32 @@ int GetConf(int isremote, int usernum)
 			break;
 			
 		      case CTYPE_MACRO:
-			strcpy((char *)ConfData[j].ConfValue, process_macrostr(bufptr));
-			ConfData[j].Found = TRUE;
-			FoundOne = TRUE;
+				/* need to parse out macro number. */
+			cptr = strchr(bufptr, '=');
+			if (cptr != NULL)
+			  {	/* valid entry */
+			    *cptr = '\0';
+			    n = atoi(bufptr);
+			    if (n > 0 && n <= MAX_MACROS)
+			      { /* valid macro number */
+#ifdef DEBUG_CONFIG
+				clog("GetConf(): Macro %d[%d], value '%s' read",
+				     n, n - 1, (char *)cptr + 1);
+#endif
+				/* clean it first... */
+				memset((char *)(((char *)ConfData[j].ConfValue)
+					 + ((n - 1) * MAX_MACRO_LEN)), 
+				       0,
+				       MAX_MACRO_LEN);
+				strncpy((char *)(((char *)ConfData[j].ConfValue)
+					+ ((n - 1) * MAX_MACRO_LEN)), 
+					Str2Macro((char *)cptr + 1), 
+					MAX_MACRO_LEN - 1);
+				ConfData[j].Found = TRUE;
+				FoundOne = TRUE;
+			      }
+			  }
+				
 			break;
 
 		      case CTYPE_NUMERIC:
@@ -420,7 +443,8 @@ int GetConf(int isremote, int usernum)
     {				/* version found. check everything else */
       for (i=0; i<CF_END; i++)
 	{
-	  if (ConfData[i].ConfType != CTYPE_NULL)
+	  if (ConfData[i].ConfType != CTYPE_NULL && 
+	      ConfData[i].ConfType != CTYPE_MACRO )
 	    if (ConfData[i].Found != TRUE)
 	      {
 #ifdef DEBUG_CONFIG
@@ -435,8 +459,51 @@ int GetConf(int isremote, int usernum)
   return(TRUE);
 }
 
-/* process a macro value - converts it into a string */
-static char *process_macrostr(char *str)
+/* SaveUserConfig(int unum) - do what the name implies ;-) */
+int SaveUserConfig(int unum)
+{
+  char conf_name[MID_BUFFER_SIZE];
+  char *homevar;
+
+				/* start building the filename */
+  if ((homevar = getenv("HOME")) == NULL)
+    {
+      clog("SaveAndReloadUserConfig(): getenv(HOME) failed");
+
+      fprintf(stderr, "SaveUserConfig(): Can't get HOME environment variable. Exiting\n");
+      return(ERR);
+    }
+
+  if (unum > 0 && Users[unum].type == UT_REMOTE)
+    {				/* build the remote user version */
+      umask(007);
+      sprintf(conf_name, "%s/%s.%d", homevar, CONFIG_FILE, unum);
+    }
+  else
+      sprintf(conf_name, "%s/%s", homevar, CONFIG_FILE);
+
+#ifdef DEBUG_OPTIONS
+  clog("SaveUserConfig(): saving user config: conf_name = '%s'", conf_name);
+#endif
+
+				/* re-init in case it was changed */
+  InitColors();
+
+  return(MakeConf(conf_name));
+}
+
+/* SaveSysConfig() - do what the name implies ;-) */
+int SaveSysConfig(void)
+{
+#ifdef DEBUG_OPTIONS
+  clog("SaveSysConfig(): saving system config");
+#endif
+
+  return(MakeSysConf());
+}
+
+/* process a string value - converts it into a macro string */
+char *Str2Macro(char *str)
 {
   static char retstr[BUFFER_SIZE];
   char *s;
@@ -490,7 +557,7 @@ static char *process_macrostr(char *str)
 }
 
 /* process a macro value - converts it back into a printable string */
-static char *string_to_macro(char *str)
+char *Macro2Str(char *str)
 {
   static char retstr[BUFFER_SIZE];
   char *s;
@@ -502,9 +569,9 @@ static char *string_to_macro(char *str)
 
 #if defined(DEBUG_CONFIG)
   if (str != NULL )
-    clog("string_to_macro('%s')", str);
+    clog("Macro2Str('%s')", str);
   else
-    clog("string_to_macro(NULL)");
+    clog("Macro2Str(NULL)");
 #endif
 
   while (*s && i < (BUFFER_SIZE - 1))
@@ -546,7 +613,7 @@ static char *string_to_macro(char *str)
 
 /* process a boolean value */  
 
-static int process_bool(char *bufptr)
+int process_bool(char *bufptr)
 {
   lower(bufptr);
   
@@ -573,10 +640,12 @@ static int process_bool(char *bufptr)
 
 /* MakeConf(filename) - make a fresh, spiffy new conquestrc file. */
 
-static int MakeConf(char *filename)
+int MakeConf(char *filename)
 {
   FILE *conf_fd;
-  int i, j;
+  int i, j, n;
+
+  unlink(filename);
 
   if ((conf_fd = fopen(filename, "w")) == NULL)
     {
@@ -611,14 +680,23 @@ static int MakeConf(char *filename)
 	fprintf(conf_fd, "%s\n", ConfData[j].ConfComment[i++]);
 
 				/* now write the variable and value if not a
-				   CTYPE_NULL*/
+				   CTYPE_NULL */
       if (ConfData[j].ConfType != CTYPE_NULL)
 	switch (ConfData[j].ConfType)
 	  {
 	  case CTYPE_MACRO:
-	    fprintf(conf_fd, "%s%s\n",
-		    ConfData[j].ConfName,
-		    string_to_macro((char *)ConfData[j].ConfValue));
+	    for (n=0; n < MAX_MACROS; n++)
+	      {
+		if (strlen((char *)(((char *)ConfData[j].ConfValue)
+					+ (n * MAX_MACRO_LEN))) != 0)
+		  {
+		    fprintf(conf_fd, "%s%d=%s\n",
+			    ConfData[j].ConfName,
+			    n + 1,
+			    Macro2Str((char *)(((char *)ConfData[j].ConfValue)
+					+ (n * MAX_MACRO_LEN))));
+		  }
+	      }
 	    break;
 
 	  case CTYPE_BOOL:
@@ -649,16 +727,18 @@ static int MakeConf(char *filename)
 }
 
 
-/* MakeSysConf(filename) - make a fresh, spiffy new sys-wide conquestrc file.*/
+/* MakeSysConf() - make a fresh, spiffy new sys-wide conquestrc file.*/
 
 int MakeSysConf()
 {
   FILE *sysconf_fd;
   char conf_name[BUFFER_SIZE];
-  int i, j;
+  int i, j, n;
 
   sprintf(conf_name, "%s/%s", CONQHOME, SYSCONFIG_FILE);
   umask(002);
+  unlink(conf_name);
+
   if ((sysconf_fd = fopen(conf_name, "w")) == NULL)
     {
       clog("MakeSysconf(): fopen(%s) failed: %s",
@@ -697,9 +777,16 @@ int MakeSysConf()
 	switch (SysConfData[j].ConfType)
 	  {
 	  case CTYPE_MACRO:
-	    fprintf(sysconf_fd, "%s%s\n",
-		    SysConfData[j].ConfName,
-		    string_to_macro((char *)SysConfData[j].ConfValue));
+	    for (n=0; n < MAX_MACROS; n++)
+	      {
+		if (strlen(((char **)SysConfData[j].ConfValue)[n]) != 0)
+		  {
+		    fprintf(sysconf_fd, "%s%d=%s\n",
+			    SysConfData[j].ConfName,
+			    n + 1,
+			    Macro2Str(((char **)SysConfData[j].ConfValue)[n]));
+		  }
+	      }
 	    break;
 
 	  case CTYPE_BOOL:

@@ -172,6 +172,13 @@ AC_CHECK_LIB(ncurses, initscr, LIBS="-lncurses $olibs",
   AC_CHECK_LIB(curses, initscr, LIBS="-lcurses $olibs",
     AC_MSG_WARN(I cannot find initscr.  you might need to help me)))
 
+# check for libcrypt
+olibs="$LIBS"
+AC_CHECK_LIB(crypt, crypt, LIBS="$olibs -lcrypt")
+
+# check for libgen
+olibs="$LIBS"
+AC_CHECK_LIB(gen, crypt, LIBS="$olibs -lgen")
 
 dnl Checks for header files.
 AC_HEADER_STDC

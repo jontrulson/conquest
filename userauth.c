@@ -3,7 +3,7 @@
  *
  * $Id$
  *
- * Copyright 1998 Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
+ * Copyright 1999 Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
  */
 
 #include "c_defs.h"
@@ -22,7 +22,9 @@ int Logon(char *username, char *password)
 {
   int col, lin, slin, lenc1, unum;
   int ch;
-  char nm[SIZEUSERNAME], pw[SIZEUSERNAME], pwr[SIZEUSERNAME];
+  char nm[SIZEUSERNAME], pw[SIZEUSERNAME], pwr[SIZEUSERNAME], 
+    epw[SIZEUSERNAME];
+  char salt[3];
   string c1=" CCC    OOO   N   N   QQQ   U   U  EEEEE   SSSS  TTTTT";
   string c2="C   C  O   O  NN  N  Q   Q  U   U  E      S        T";
   string c3="C      O   O  N N N  Q   Q  U   U  EEE     SSS     T";
@@ -33,7 +35,7 @@ int Logon(char *username, char *password)
 
   if (!IsRemoteUser())
     {				/* if local, just get uname */
-      glname(username);
+      glname(username, SIZEUSERNAME);
       password[0] = EOS;	/* locals don't have passwords */
       clog("Logon(): Local user '%s' logged in", username);
       return(UT_LOCAL);
@@ -94,7 +96,9 @@ int Logon(char *username, char *password)
       if (checkuname(nm) == FALSE)
 	{			/* invalid username */
 	  cdbeep();
+	  attrset(RedLevelColor);
 	  cdputs("Invalid character in username.", MSG_LIN2, 1);
+	  attrset(NoColor);
 	  nm[0] = EOS;
 	  continue;
 	}
@@ -121,7 +125,9 @@ int Logon(char *username, char *password)
 		{			/* pw's don't match, start over */
 		  cdbeep();
 		  cdclrl( MSG_LIN2, 1  );
+		  attrset(RedLevelColor);
 		  cdputs("Passwords don't match.", MSG_LIN2, 1);
+		  attrset(NoColor);
 		  cdrefresh();
 		  sleep(2);
 		  continue;
@@ -129,7 +135,15 @@ int Logon(char *username, char *password)
 				/* if we're here, we have a username
 				   and password (new user) - time
 				   to rock. */
-				/* ideally we should encryt it here */
+
+				/* ENCRYPT it here */
+	      salt[0] = (nm[0] != EOS) ? nm[0] : 'J';
+	      salt[1] = (nm[1] != EOS) ? nm[1] : 'T';
+	      salt[2] = EOS;
+
+	      strncpy(epw, (char *)crypt(pw, salt), SIZEUSERNAME - 2);
+	      epw[SIZEUSERNAME - 1] = EOS;
+
 	      clog("Logon(): New remote user '%s' logged in", nm);
 
 	      break;
@@ -148,11 +162,22 @@ int Logon(char *username, char *password)
 	  ch = cdgetx( "Password: ", slin, 1, 
 		       TERMS, pw, SIZEUSERNAME - 1, FALSE );
 
-	  if (strcmp(pw, Users[unum].pw) != 0)
+				/* ENCRYPT and compare here... */
+
+	  salt[0] = (nm[0] != EOS) ? nm[0] : 'J';
+	  salt[1] = (nm[1] != EOS) ? nm[1] : 'T';
+	  salt[2] = EOS;
+	  
+	  strncpy(epw, (char *)crypt(pw, salt), SIZEUSERNAME - 2);
+	  epw[SIZEUSERNAME - 1] = EOS;
+	  
+	  if (strcmp(epw, Users[unum].pw) != 0)
 	    {			/* invalid pw */
 		  cdbeep();
 		  cdclrl( MSG_LIN2, 1  );
+		  attrset(RedLevelColor);
 		  cdputs("Invalid Password.", MSG_LIN2, 1);
+		  attrset(NoColor);
 		  cdrefresh();
 		  clog("Logon(): Invalid password for user '%s'", nm);
 		  sleep(2);
@@ -166,12 +191,114 @@ int Logon(char *username, char *password)
     }
 
 				/* if we're here, we're legal */
-  strncpy(username, nm, MAXUSERNAME);
-  strncpy(password, pw, MAXUSERNAME);
+  strncpy(username, nm, SIZEUSERNAME);
+  strncpy(password, epw, SIZEUSERNAME);
 
   return(UT_REMOTE);
 }
 
+/* ChangePassword() - change a users password - called from UserOptsMenu() */
+void ChangePassword(int unum, int godlike)
+{
+  static char *header = "Change Password";
+  char pw[SIZEUSERNAME], pwr[SIZEUSERNAME], epw[SIZEUSERNAME];
+  char salt[3];
+  int ch;
+  int lin = 0, col = 0;
+
+  if (godlike == FALSE)
+    cdclear();
+  else
+    {
+      cdclrl(MSG_LIN1, 2);
+    }
+
+  if (godlike == FALSE)
+    {
+      lin = 1;
+      col = ((cdcols() / 2) - (strlen(header) / 2));
+      
+      cprintf(lin, col, ALIGN_NONE, "#%d#%s", NoColor, header);
+      
+      lin += 3;
+      col = 5;
+      /* verify old password */
+      pw[0] = EOS;
+      cdputs("Use any printable characters.", MSG_LIN1, 1);
+      ch = cdgetx( "Old Password: ", lin, 1, 
+		   TERMS, pw, SIZEUSERNAME - 1, FALSE );
+      
+      salt[0] = (Users[unum].username[0] != EOS) ? Users[unum].username[0] : 
+	'J';
+      salt[1] = (Users[unum].username[1] != EOS) ? Users[unum].username[1] : 
+	'T';
+      salt[2] = EOS;
+  
+      strncpy(epw, (char *)crypt(pw, salt), SIZEUSERNAME - 2);
+      epw[SIZEUSERNAME - 1] = EOS;
+
+      if (strcmp(epw, Users[unum].pw) != 0)
+	{			/* invalid pw */
+	  cdbeep();
+	  cdclrl( MSG_LIN2, 1  );
+	  attrset(RedLevelColor);
+	  cdputs("Invalid Password.", MSG_LIN2, 1);
+	  attrset(RedLevelColor);
+	  cdrefresh();
+	  clog("ChangePassword(): Invalid old password for user '%s'", 
+	       Users[unum].username);
+	  sleep(2);
+	  return;
+	}
+      
+      lin++;
+      
+    } /* ! godlike */
+				/* get and recheck new passwd */
+  pw[0] = EOS;
+  cdclrl( MSG_LIN1, 2  );
+  cdputs("Use any printable characters.", MSG_LIN2, 1);
+
+  ch = cdgetx( "New Password: ", MSG_LIN1, 1, 
+	       TERMS, pw, SIZEUSERNAME - 1, FALSE );
+
+  if (godlike == FALSE)
+    {
+      pwr[0] = EOS;
+      cdclrl( MSG_LIN1, 2  );
+      cdputs("Use any printable characters.", MSG_LIN2, 1);
+      ch = cdgetx( "Retype Password: ", MSG_LIN1, 1, 
+		   TERMS, pwr, SIZEUSERNAME - 1, FALSE );
+      
+      if (strcmp(pw, pwr) != 0)
+	{			/* pw's don't match, start over */
+	  cdbeep();
+	  cdclrl( MSG_LIN2, 1  );
+	  attrset(RedLevelColor);
+	  cdputs("Passwords don't match.", MSG_LIN2, 1);
+	  attrset(NoColor);
+	  cdrefresh();
+	  sleep(2);
+	  return;
+	}
+    } /* ! godlike */
+				/* ok, we have a new password -
+				   make it so */
+
+  salt[0] = (Users[unum].username[0] != EOS) ? Users[unum].username[0] : 'J';
+  salt[1] = (Users[unum].username[1] != EOS) ? Users[unum].username[1] : 'T';
+  salt[2] = EOS;
+  
+  strncpy(epw, (char *)crypt(pw, salt), SIZEUSERNAME - 2);
+  epw[SIZEUSERNAME - 1] = EOS;
+
+  strncpy(Users[unum].pw, epw, SIZEUSERNAME);
+
+  cdclrl(MSG_LIN1, 2);
+
+  return;
+}  
+  
 /* check the validity of a supplied username */  
 static int checkuname(char *username)
 {

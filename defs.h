@@ -6,6 +6,7 @@
  *
  * $Id$
  *
+ * Copyright 1999 Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
  ***********************************************************************/
 
 /**********************************************************************/
@@ -18,16 +19,13 @@
 
 /* Basic information */
 
-				/* game related files created by conquest
-				   are chown()'d to this user.*/
 /* ROOT_USER - username that game related files created by conquest
  *  are chown()'d to.  Default: root
  */
 #define ROOT_USER "root"
 
 /* CONQUEST_USER - When this username runs conquest, server mode is active.
- *   - the user is prompted for their username or user number, and their 
- *     password,
+ *   - the user is prompted for their username, and their password,
  *   - user is automatically added to conquest userdb if a new user
  *   - .conquestrc file for such users are created in ~CONQUEST_USER/ 
  *     directory as .conquestrc.UNUM (UNUM = user number)
@@ -36,7 +34,7 @@
 #define CONQUEST_USER "conquest"
 
 
-/* CONQUEST_GROUP - this is the group that all conquest files a chgrp'd
+/* CONQUEST_GROUP - this is the group that all conquest files are chgrp'd
  *   to... This is also the group that the conquest executables setgid()
  *   to as well.  You should leave it as is... Default: conquest.  
  */
@@ -123,8 +121,8 @@
  */
 #define ENABLE_MACROS
 
-#define MAX_MACROS 24		/* max number of macros supported */
-#define MAX_MACRO_LEN 81	/* max length of a macro */
+#define MAX_MACROS 64		/* max number of macros supported */
+#define MAX_MACRO_LEN 70	/* max length of a macro */
 
 /* OPER_MSG_BEEP - if defined, beep when a message arrives in conqoper.
  */
@@ -147,4 +145,5 @@
 /*#define DEBUG_COLOR		/* debug color processing */
 /*#define DEBUG_IOGTIMED        /* debug timed input */
 /*#define DEBUG_SERVER          /* debug server operation */
+/*#define DEBUG_OPTIONS         /* debug option screens/handling */
 

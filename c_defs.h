@@ -1,12 +1,12 @@
 /************************************************************************
-*
-* c_defs.h - C macro defines to ease ratfor to C conversion.  Included
-*               in all files.
-*
-* $Id$
-*
-* Author: Jon Trulson
-************************************************************************/
+ *
+ * c_defs.h - C macro defines to ease ratfor to C conversion.  Included
+ *               in all files.
+ *
+ * $Id$
+ *
+ * Copyright 1999 Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
+ ************************************************************************/
 
 /**********************************************************************/
 /* Unix/C specific porting and supporting code Copyright (C)1994-1996 */
@@ -177,7 +177,11 @@ typedef double real;
 #define max(x, y) (((x) > (y)) ? (x) : (y))
 #define max0(x, y) max((x), (y))
 #define fold(x) /* Who knows what this does... */
-#define glname(x) (void) cuserid(x)
+#define glname(x, y) {\
+                      strncpy(x, cuserid(NULL), y - 1); \
+                      x[y - 1] = EOS; \
+		     }
+      
 #define ifix(x) ((int) (x))
 
 /* Function prototypes for ratfor.c */
@@ -523,6 +527,10 @@ int DoMacro(int ch);
 int GetSysConf(int checkonly);
 int GetConf(int isremote, int usernum);
 int MakeSysConf(void);
+int SaveUserConfig(int unum);
+int SaveSysConfig(void);
+char *Str2Macro(char *str);
+char *Macro2Str(char *str);
 
 /* sem.c */
 
@@ -541,6 +549,12 @@ void do_border(void);
 int alertcolor(int alert);
 void draw_alertborder(int alert);
 
-/* users.c */
+/* userauth.c */
 int Logon(char *username, char *password);
+void ChangePassword(int unum, int godlike);
+
+/* options.c */
+void SysOptsMenu(void);
+void UserOptsMenu(int unum);
+
 

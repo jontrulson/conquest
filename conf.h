@@ -4,6 +4,7 @@
  *
  * $Id$
  *
+ * Copyright 1999 Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
  ***********************************************************************/
 
 /**********************************************************************/
@@ -17,11 +18,16 @@
 #ifndef CONF_H
 #define CONF_H
 
+#ifdef NOEXTERN
+# define CEXTERN
+#else
+# define CEXTERN extern
+#endif
 
 #define SYSCONFIG_FILE "etc/conquestrc"	/* relative to CONQHOME */
 #define CONFIG_FILE ".conquestrc"
 
-#define MAXCOMMENTS 50
+#define CONF_MAXCOMMENTS 50
 
 				/* config types */
 #define CTYPE_NULL (0)
@@ -43,18 +49,20 @@
 #define SYSCF_START       (SYSCF_HEADER + 1) /* First option (alias) */
 #define SYSCF_END (sizeof(SysConfData)/sizeof(struct Conf))
 
+
+
 				/* Revision on .conquestrc file */
 				/* - for updating .conquestrc   */
 				/*   when something changes */
-
-				/* to test against .conquestrc */
-static char ConfigVersion[] = "$Revision$";
-
+#ifndef NOEXTERN
+CEXTERN char ConfigVersion[];
+#else
+char ConfigVersion[] = "$Revision$";
+#endif /* NOEXTERN */
 				/* local function declarations */
-static char *process_macrostr(char *str);
-static char *string_to_macro(char *str);
-static int process_bool(char *bufptr);
-static int MakeConf(char *filename);
+CEXTERN char *process_macrostr(char *str);
+CEXTERN int process_bool(char *bufptr);
+CEXTERN int MakeConf(char *filename);
 
 
 struct Conf 
@@ -63,17 +71,22 @@ struct Conf
   int ConfType;
   char *ConfName;
   void *ConfValue;
-  char *ConfComment[MAXCOMMENTS];
+  char *OneLineDesc;
+  char *ConfComment[CONF_MAXCOMMENTS];
 };
 
 				/* Initialize the system configurables */
-static struct Conf SysConfData[] =
+#ifndef NOEXTERN
+CEXTERN struct Conf SysConfData[];
+#else
+struct Conf SysConfData[] =
 {
   {			/* The current conquestrc (conquest) version */
     FALSE,
     CTYPE_NULL,
     "SysConqfigVersion=",
     ConfigVersion,
+    "System Config Version",
     {
       NULL
     }
@@ -83,6 +96,7 @@ static struct Conf SysConfData[] =
     CTYPE_NULL,
     NULL,
     NULL,
+    "System Config File Header",
     {
       "###################################################################",
       "#",
@@ -105,6 +119,7 @@ static struct Conf SysConfData[] =
     CTYPE_BOOL,
     "do_lr_torpscan=",
     &sysconf_DoLRTorpScan,
+    "Show friendly torps on a long-range scan",
     {
       "# define this as 'true' if you want to be able to see friendly",
       "#  torps (including yours) on a long-range scan.  Default: true",
@@ -116,6 +131,7 @@ static struct Conf SysConfData[] =
     CTYPE_BOOL,
     "do_local_lrscan=",
     &sysconf_DoLocalLRScan,
+    "Long Range Scan is centered on ship, not Murisak",
     {
       "# define this as 'false' if you want the (M)ap command to have",
       "#  it's original meaning - a static map of the universe with",
@@ -131,6 +147,7 @@ static struct Conf SysConfData[] =
     CTYPE_BOOL,
     "do_etastats=",
     &sysconf_DoETAStats,
+    "Compute and display Estimated Time of Arrival (ETA) stats",
     {
       "# define this as 'true' if you want Estimated Time of Arrival (ETA)",
       "#  information to be computed and displayed when getting (I)nfo on",
@@ -143,6 +160,7 @@ static struct Conf SysConfData[] =
     CTYPE_BOOL,
     "no_doomsday=",
     &sysconf_NoDoomsday,
+    "Disable the Doomsday machine",
     {
       "# define this as 'true' if you never want the Doomsday Machine to",
       "#  randomly startup (except manually via conqoper).  Default: false",
@@ -154,6 +172,7 @@ static struct Conf SysConfData[] =
     CTYPE_BOOL,
     "allow_fastupdate=",
     &sysconf_AllowFastUpdate,
+    "Allow 2 screen updates per second rather than 1",
     {
       "# define this as 'true' if you want to allow users to enable the",
       "#  'do_fastupdate' option, which gives users 2 screen updates per",
@@ -170,6 +189,7 @@ static struct Conf SysConfData[] =
     CTYPE_BOOL,
     "do_random_robotkills=",
     &sysconf_DoRandomRobotKills,
+    "Robots have randomized kills when created",
     {
       "# define this as 'true' if you want robots to be created with a",
       "#  randomized kill point value.  A ship's kill points influences how ",
@@ -189,6 +209,7 @@ static struct Conf SysConfData[] =
     CTYPE_BOOL,
     "allow_sigquit=",
     &sysconf_AllowSigquit,
+    "Allow users to exit Conquest immediately with a QUIT signal",
     {
       "# define this as 'true' if you want to allow non Conquest Gods to",
       "#  be able to use SIGQUIT (normally ^\\) to leave conquest.",
@@ -201,9 +222,10 @@ static struct Conf SysConfData[] =
     CTYPE_BOOL,
     "allow_switchteams=",
     &sysconf_AllowSwitchteams,
+    "Allow users to (s)witch teams at the main menu",
     {
       "# define this as 'false' if you want to prevent users from being",
-      "#  able to (s)witchteams from the main menu.",
+      "#  able to (s)witch teams from the main menu.",
       "#  Default: true",
       NULL
     }
@@ -213,6 +235,7 @@ static struct Conf SysConfData[] =
     CTYPE_NUMERIC,
     "user_expiredays=",
     &sysconf_UserExpiredays,
+    "Number of days after which to expire inactive users",
     {
       "# number of days of inactivity, after which a user is expired.",
       "#  Set this equal to 0 to disable expiration of inactive users.",
@@ -221,14 +244,19 @@ static struct Conf SysConfData[] =
     }
   }
 };
+#endif /* NOEXTERN */
 				/* Initialize the user configurables */
-static struct Conf ConfData[] =
+#ifndef NOEXTERN
+CEXTERN struct Conf ConfData[];
+#else
+struct Conf ConfData[] =
 {
   {				/* The current .conquestrc (conf.h) version */
     FALSE,
     CTYPE_NULL,
     "ConqfigVersion=",
     ConfigVersion,
+    "User Config Version",
     {
       NULL
     }
@@ -238,6 +266,7 @@ static struct Conf ConfData[] =
     CTYPE_NULL,
     NULL,
     NULL,
+    "User Config File Header",
     {
       "###################################################################",
       "#",
@@ -271,6 +300,7 @@ static struct Conf ConfData[] =
     CTYPE_BOOL,
     "do_msg_alarm=",
     &conf_MessageBell,
+    "Beep when a message arrives",
     {
       "# define this as 'true' if you want beeps when a message is",
       "#  delivered to your ship.   Default: true",
@@ -282,6 +312,7 @@ static struct Conf ConfData[] =
     CTYPE_BOOL,
     "no_color=",
     &conf_NoColor,
+    "Disable color, even if your terminal/terminfo entry supports it",
     {
       "# define this as 'true' if you never want to see color,",
       "#  even if your terminal supports it.  Default: false",
@@ -293,12 +324,13 @@ static struct Conf ConfData[] =
     CTYPE_BOOL,
     "no_robot_msgs=",
     &conf_NoRobotMsgs,
+    "Disable messages from robots to your ship",
     {
       "# define this as 'true' if you don't want to recieve messages",
       "#  from any robots.  This can be handy when sending messages",
       "#  to All, and you don't want alot of replies from robots. NOTE:",
       "#  Obviously if you set this to true, don't expect replies from",
-      "#  robots.",
+      "#  the robots - some of which can be useful.",
       "#  Default: false",
       NULL
     }
@@ -308,6 +340,7 @@ static struct Conf ConfData[] =
     CTYPE_BOOL,
     "rcv_player_msgs=",
     &conf_RecPlayerMsgs,
+    "Recieve messages indicating when a player enters or dies",
     {
       "# define this as 'true' if you want to recieve a message",
       "#  whenever someone enters the game, or dies in it.",
@@ -320,6 +353,7 @@ static struct Conf ConfData[] =
     CTYPE_BOOL,
     "do_fastupdate=",
     &conf_DoFastUpdate,
+    "Update the display twice per second (if system allows it)",
     {
       "# define this as 'true' if you want 2 screen updates per second",
       "#  instead of the usual 1 per second.  This option has NO EFFECT",
@@ -336,6 +370,7 @@ static struct Conf ConfData[] =
     CTYPE_BOOL,
     "do_limitbell=",
     &conf_DoLimitBell,
+    "Limit beeping to no more than 1 per second",
     {
       "# define this as 'true' if you want no more than one 'beep'",
       "#  maximum per second.  Additional beeps that occur in the same",
@@ -350,6 +385,7 @@ static struct Conf ConfData[] =
     CTYPE_BOOL,
     "clear_old_msgs=",
     &conf_ClearOldMsgs,
+    "When re-incarnating to a ship, discard any old messages",
     {
       "# define this as true if you want old msgs cleared out when you",
       "#  reincarnate to another ship.  If this is defined as false, then",
@@ -359,246 +395,52 @@ static struct Conf ConfData[] =
       NULL,
     }
   },
-  {
+  {				/* Macros are special - these should be last */
     FALSE,
     CTYPE_MACRO,
-    "macro_f1=",
-    conf_MacrosF[0],
+    "macro_f",
+    conf_MacrosF,
+    "Macro Keys",
     {
-      "# F1 Key",
-      NULL
-    }
-  },
-  {
-    FALSE,
-    CTYPE_MACRO,
-    "macro_f2=",
-    conf_MacrosF[1],
-    {
-      "# F2 Key",
-      NULL
-    }
-  },
-  {
-    FALSE,
-    CTYPE_MACRO,
-    "macro_f3=",
-    conf_MacrosF[2],
-    {
-      "# F3 Key",
-      NULL
-    }
-  },
-  {
-    FALSE,
-    CTYPE_MACRO,
-    "macro_f4=",
-    conf_MacrosF[3],
-    {
-      "# F4 Key",
-      NULL
-    }
-  },
-  {
-    FALSE,
-    CTYPE_MACRO,
-    "macro_f5=",
-    conf_MacrosF[4],
-    {
-      "# F5 Key",
-      NULL
-    }
-  },
-  {
-    FALSE,
-    CTYPE_MACRO,
-    "macro_f6=",
-    conf_MacrosF[5],
-    {
-      "# F6 Key",
-      NULL
-    }
-  },
-  {
-    FALSE,
-    CTYPE_MACRO,
-    "macro_f7=",
-    conf_MacrosF[6],
-    {
-      "# F7 Key",
-      NULL
-    }
-  },
-  {
-    FALSE,
-    CTYPE_MACRO,
-    "macro_f8=",
-    conf_MacrosF[7],
-    {
-      "# F8 Key",
-      NULL
-    }
-  },
-  {
-    FALSE,
-    CTYPE_MACRO,
-    "macro_f9=",
-    conf_MacrosF[8],
-    {
-      "# F9 Key",
-      NULL
-    }
-  },
-  {
-    FALSE,
-    CTYPE_MACRO,
-    "macro_f10=",
-    conf_MacrosF[9],
-    {
-      "# F10 Key",
-      NULL
-    }
-  },
-  {
-    FALSE,
-    CTYPE_MACRO,
-    "macro_f11=",
-    conf_MacrosF[10],
-    {
-      "# F11 Key",
-      NULL
-    }
-  },
-  {
-    FALSE,
-    CTYPE_MACRO,
-    "macro_f12=",
-    conf_MacrosF[11],
-    {
-      "# F12 Key",
-      NULL
-    }
-  },
-  {
-    FALSE,
-    CTYPE_MACRO,
-    "macro_f13=",
-    conf_MacrosF[12],
-    {
-      "# F13 Key (SHIFT F1)",
-      NULL
-    }
-  },
-  {
-    FALSE,
-    CTYPE_MACRO,
-    "macro_f14=",
-    conf_MacrosF[13],
-    {
-      "# F14 Key (SHIFT F2)",
-      NULL
-    }
-  },
-  {
-    FALSE,
-    CTYPE_MACRO,
-    "macro_f15=",
-    conf_MacrosF[14],
-    {
-      "# F15 Key (SHIFT F3)",
-      NULL
-    }
-  },
-  {
-    FALSE,
-    CTYPE_MACRO,
-    "macro_f16=",
-    conf_MacrosF[15],
-    {
-      "# F16 Key (SHIFT F4)",
-      NULL
-    }
-  },
-  {
-    FALSE,
-    CTYPE_MACRO,
-    "macro_f17=",
-    conf_MacrosF[16],
-    {
-      "# F17 Key (SHIFT F5)",
-      NULL
-    }
-  },
-  {
-    FALSE,
-    CTYPE_MACRO,
-    "macro_f18=",
-    conf_MacrosF[17],
-    {
-      "# F18 Key (SHIFT F6)",
-      NULL
-    }
-  },
-  {
-    FALSE,
-    CTYPE_MACRO,
-    "macro_f19=",
-    conf_MacrosF[18],
-    {
-      "# F19 Key (SHIFT F7)",
-      NULL
-    }
-  },
-  {
-    FALSE,
-    CTYPE_MACRO,
-    "macro_f20=",
-    conf_MacrosF[19],
-    {
-      "# F20 Key (SHIFT F8)",
-      NULL
-    }
-  },
-  {
-    FALSE,
-    CTYPE_MACRO,
-    "macro_f21=",
-    conf_MacrosF[20],
-    {
-      "# F21 Key (SHIFT F9)",
-      NULL
-    }
-  },
-  {
-    FALSE,
-    CTYPE_MACRO,
-    "macro_f22=",
-    conf_MacrosF[21],
-    {
-      "# F22 Key (SHIFT F10)",
-      NULL
-    }
-  },
-  {
-    FALSE,
-    CTYPE_MACRO,
-    "macro_f23=",
-    conf_MacrosF[22],
-    {
-      "# F23 Key (SHIFT F11)",
-      NULL
-    }
-  },
-  {
-    FALSE,
-    CTYPE_MACRO,
-    "macro_f24=",
-    conf_MacrosF[23],
-    {
-      "# F24 Key (SHIFT F12)",
+      "# Macro definitions.  The format in the ~/.conquestrc file is",
+      "#  'macro_fN=<string>'",
+      "#  'N' is a number between 1 and MAX_MACROS, inclusive.",
+      "#  <string> is a sequence of Conquest commands to execute when",
+      "#  that particular Function Key is hit.",
+      "#",
+      "# The following special sequences are recognized:",
+      "#  \\r = [RETURN], \\t = [TAB]",
+      "#",
+      "# Here are some example entries as they might appear in the",
+      "#  ~/.conquestrc file:",
+      "#",
+      "#  # fires full spread of torps at last dir when F1 key is pressed:",
+      "#  macro_f1=P\\rP\\rP\\r",
+      "#  # raises shields and detonates enemy torps when F15 is pressed:",
+      "#  macro_f15=+d",
+      "#",
+      "#  Obviously if you are changing your macros via the ",
+      "#  (O)ptions Menu->View/Edit Macros screen from within Conquest, ",
+      "#  you won't need to type the 'macro_fN=' part ;-)",
+      "",
       NULL
     }
   }
 };
+#endif /* NOEXTERN */
+
+#ifndef NOEXTERN
+CEXTERN int CfEnd;
+#else
+int CfEnd = CF_END;
+#endif /* NOEXTERN */
+
+#ifndef NOEXTERN
+CEXTERN int SysCfEnd;
+#else
+int SysCfEnd = SYSCF_END;
+#endif /* NOEXTERN */
+
+#undef CEXTERN			/* cleanup */
 
 #endif /* CONF_H */

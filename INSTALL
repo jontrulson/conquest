@@ -47,77 +47,6 @@ curses.
 
 	The README file provides useful information about conquest.
 
-## CURSES/TERMINFO
-
-	On some machines (Linux), ncurses is supplied, but not
-installed properly... In one case, the ncurses.h header file was
-located in /usr/include/ncurses/ncurses.h when it should have been one
-directory higher... For that reason, configure couldn't find it, and
-an older, incompatible curses.h file was used instead, leading to
-build problems.  Make sure (if you wish to force ncurses use) that the
-ncurses.h, term.h and uncntl.h files are present in /usr/include.  
-
-	The *only* curses implementations that will work with conquest
-are System V Release 4+, *or* ncurses 1.9.9e+.  FreeBSD has an older
-implementation of ncurses that will work as far as compiling goes, but
-will not properly detect and use color.
-
-# LINUX NOTE: A friend who uses linux and frequently dials in to my
-conquest server was experiencing screen corruption on the console, but
-it only showed up during a dialup game (where he was dialed into my
-machine), or playing back a recording (made by using script to record
-a game.)  Another friend using Unixware did not have these problems.
-The solution was to modify the 'linux' terminfo entry and remove
-capabilities for Alternate Character Sets/line drawing characters
-(ACS), del/ins char, and del/ins line modes.  This cleared it up.  No
-idea why, though it smells like a timing issue with the linux console
-driver.  Playing it on the linux console looked fine, though playing
-back a typesript tended to corrupt again.  This appears to be linux
-specific, and not a conquest problem.  In all cases, hitting ^L redrew
-the screen properly.  If you run into this problem, try the 'linux-cq'
-terminfo entry supplied in the conquest source distribution.
-
-# GENERAL TERMINAL NOTE: Conquest depends on a properly configured
-terminfo entry for your terminal in order to make use of Fkey's, the
-arrow keys, the keypad, and color.  The standard at386 terminfo entry
-on Unixware for example, does not define the SHIFT-Fkeys, nor the
-Keypad keys (upperright, lowerleft, etc).  Some modification to your
-terminfo entry may be required to use these extended features.
-
-	I recieved permission from SCO to supply my modified terminfo
-entries for Unixware.  Thanks SCO!  The modified entries are located
-in the ti/ subdirectory of the source distribution along with some
-other entries I've used over the years, and are never installed by
-make.  If you wish to use these entries, you will have to compile them
-yourself as root like this:
-
-# tic filename
-
-Here are the ones supplied:
-
-	at386.ti - a replacement for the unixware at386 console
-entry.  This is completely compatible with the default version, but
-adds support for SHIFT-F1 thru F12, and proper entries for the
-keypad. 
-
-	xterm-acs - a replacement for the unixware xterm-acs entry
-that adds support for the keypad (No Shift-Fkeys are possible though).
-
-	linux-cq.ti - linux console replacement, fixing (actually
-working around) some problems described above.  This entry is the same
-as the original 'linux' entry, but ACS, ich/ich1, dch/dch1, il/il1,
-and dl/dl1 capabilities have been removed.
-
-	mskerm.ti - for DOS MS-Kermit
-
-	mskerm-c.ti - for DOS MS-Kermit, adds color
-
-	vt100-c - vt100 entry with color cap added, This will work
-with most PC based vt100 emulations (like telix), though the keypad
-and function keys may not work... There are just no real standard
-definitions for these, since the original vt100 didn't support
-function keys, or a keypad like the standard PC-AT keyboard.
-
 ### BUILDING
 
 	To build conquest, unpack the src archive.  
@@ -160,17 +89,102 @@ will do this for you, but if you want to be sure....):
 	/opt/bin/conqoper -C
 
 	Edit /opt/conquest/etc/conquestrc and see if everything there
-is ok for your site.
+is ok for your site.  New with version 7.0, you can edit all of the
+options using the (O)ption Menu in conqoper, without editing the
+conquestrc file directly.
 
 	Then run the conqoper program (without options) and
 (I)nitialize->(e)verything, open the game, and you should now be ready
 to rock-n-roll.
 
+	With version 7.0, you can do this on the command line by:
+
+	     conqoper -Ie -E
+
+	     - this Initializes Everything, then Enables the game.
+
 	See the README file for more information.
+
+	See the SERVER.DOC file if you want to setup a Conquest
+server. 
 
 	Read the conquest.doc and the conqnews.doc files to get info
 on what conquest is and how to play it.
 
+
+### OTHER USEFUL INFORMATION
+
+## CURSES/TERMINFO
+
+	On some machines (Linux), ncurses is supplied, but not
+installed properly... In one case, the ncurses.h header file was
+located in /usr/include/ncurses/ncurses.h when it should have been one
+directory higher... For that reason, configure couldn't find it, and
+an older, incompatible curses.h file was used instead, leading to
+build problems.  Make sure (if you wish to force ncurses use) that the
+ncurses.h, term.h and uncntl.h files are present in /usr/include.  
+
+	The *only* curses implementations that will work with conquest
+are System V Release 4+, *or* ncurses 1.9.9e+.  FreeBSD has an older
+implementation of ncurses that will work as far as compiling goes, but
+will not properly detect and use color.
+
+# LINUX NOTE: A friend who uses linux and frequently dials in to my
+conquest server was experiencing screen corruption on the console, but
+it only showed up during a dialup game (where he was dialed into my
+machine), or playing back a recording (made by using script to record
+a game.)  Another friend using Unixware did not have these problems.
+The solution was to modify the 'linux' terminfo entry and remove
+capabilities for Alternate Character Sets/line drawing characters
+(ACS), del/ins char, and del/ins line modes.  This cleared it up.  No
+idea why, though it smells like a timing issue with the linux console
+driver.  Playing it on the linux console looked fine, though playing
+back a typesript tended to corrupt again.  This appears to be linux
+specific, and not a conquest problem.  In all cases, hitting ^L redrew
+the screen properly.  If you run into this problem, try the 'linux-cq'
+terminfo entry supplied in the conquest source distribution.
+
+# GENERAL TERMINAL NOTE: Conquest depends on a properly configured
+terminfo entry for your terminal in order to make use of Fkey's, the
+arrow keys, the keypad, and color.  The standard at386 terminfo entry
+on Unixware for example, does not define the SHIFT-Fkeys, nor the
+Keypad keys (upperright, lowerleft, etc).  Some modification to your
+terminfo entry may be required to use these extended features.
+
+	I recieved permission from SCO to supply my modified terminfo
+entries for Unixware.  Thanks SCO!  The modified entries are located
+in the ti/ subdirectory of the source distribution along with some
+other entries I've used over the years, and are never installed by the
+install process.  If you wish to use these entries, you will have to
+compile them yourself as root like this:
+
+# tic filename
+
+Here are the ones supplied:
+
+	at386.ti - a replacement for the unixware at386 console
+entry.  This is completely compatible with the default version, but
+adds support for SHIFT-F1 thru F12, and proper entries for the
+keypad. 
+
+	xterm-acs - a replacement for the unixware xterm-acs entry
+that adds support for the keypad (No Shift-Fkeys are possible without
+xmodmap tweaking though).
+
+	linux-cq.ti - linux console replacement, fixing (actually
+working around) some problems described above.  This entry is the same
+as the original 'linux' entry, but ACS, ich/ich1, dch/dch1, il/il1,
+and dl/dl1 capabilities have been removed.
+
+	mskerm.ti - for DOS MS-Kermit
+
+	mskerm-c.ti - for DOS MS-Kermit, adds color
+
+	vt100-c - vt100 entry with color cap added, This will work
+with most PC based vt100 emulations (like telix), though the keypad
+and function keys may not work... There are just no real standard
+definitions for these, since the original vt100 didn't support
+function keys, or a keypad like the standard PC-AT keyboard.
 
 ## UNIXWARE NOTE
 
@@ -253,6 +267,9 @@ bin/			  drwxr-xr-x    2 jon      conquest
 	conqai		
 			  -rwxrws--x    1 jon      conquest
 
+	conqstrat		
+			  -rwxrwx--x    1 jon      conquest
+
 etc/			  drwxrwxr-x    2 jon      conquest
 
 	conquest_common.img 
@@ -277,6 +294,6 @@ lib/			  drwxr-xr-x    2 jon      conquest
 			  -rw-r--r--    1 jon      conquest
 
 Jon Trulson <jon@radscan.com>
-07/12/1998
+02/01/1999
 
 

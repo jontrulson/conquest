@@ -4,6 +4,7 @@
  *
  * $Id$
  *
+ * Copyright 1999 Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
  ***********************************************************************/
 
 /*                                 C O N Q L B */
@@ -530,10 +531,23 @@ void infoship( int snum, int scanner )
   char junk[MSGMAXLINE];
   real x, y, dis, kills, appx, appy;
   int godlike, canscan;
-  
+  real cumwarp;
+  static char tmpstr[BUFFER_SIZE];
+
+#define BETTER_ETA		/* we'll try this out for a release */
+#undef DEBUG_ETA		/* define for debugging */
+
+#if defined(BETTER_ETA)
+  real pwarp, diffdis, oldttime, close_rate;
+  time_t difftime, curtime;
+  static time_t oldtime = 0;
+  static real avgclose_rate, olddis = 0.0, oldclose_rate = 0.0;
+  static int oldsnum = 0;
+#endif /* BETTER_ETA */
+
   godlike = ( scanner < 1 || scanner > MAXSHIPS );
   
-  cdclrl( MSG_LIN2, 1 );
+  cdclrl( MSG_LIN1, 2 );
   if ( snum < 1 || snum > MAXSHIPS )
     {
       c_putmsg( "No such ship.", MSG_LIN1 );
@@ -629,18 +643,117 @@ void infoship( int snum, int scanner )
     {
       sprintf( cbuf, "Range %d, direction %d",
 	     round( dis ), round( angle( x, y, appx, appy ) ) );
-      
+
+#if defined(BETTER_ETA)
       if (sysconf_DoETAStats)
 	{
-	  if (Ships[scanner].warp > 0.0)
+	  if (Ships[scanner].warp > 0.0 || Ships[snum].warp > 0.0)
 	    {
-	      static char tmpstr[64];
-	      
+	      curtime = getnow(NULL, 0);
+
+	      if (snum == oldsnum)
+		{		/* then we can get better eta 
+				   by calculating closure rate and
+				   extrapolate from there the apparent warp
+				   giving a better estimate. */
+		  difftime = curtime - oldtime;
+
+				/* we still need to compute diffdis  */
+		  diffdis = olddis - dis;
+		  olddis = dis;
+
+		  if (difftime <= 0)
+		    {		/* not enough time passed for a guess
+				   use last closerate, and don't set
+				   oldtime so it will eventually work */
+		      close_rate = oldclose_rate;
+		    }
+		  else
+		    {		/* we can make an estimate of closure rate in
+				   MM's per second */
+		      oldtime = curtime;
+
+		      close_rate = diffdis / (real) difftime;
+		    }
+
+				/* give a 'smoother' est. by avg'ing with
+				   last close rate.*/
+		  avgclose_rate = (close_rate + oldclose_rate) / 2.0;
+		  oldclose_rate = close_rate;
+
+#ifdef DEBUG_ETA
+		  clog("infoship: close_rate(%.1f) = diffdis(%.1f) / difftime(%d), avgclose_rate = %.1f",
+		       close_rate,
+		       diffdis,
+		       difftime,
+		       avgclose_rate);
+#endif
+		  
+		  if (avgclose_rate <= 0.0)
+		    {		/* dist is increasing or no change,
+				   - can't ever catchup = ETA never */
+		      sprintf(tmpstr, ", ETA %s",
+			      ETAstr(0.0, dis));
+		      appstr(tmpstr, cbuf);
+		    }
+		  else
+		    {		/* we are indeed closing... */
+
+				/* calc psuedo-warp */
+		      /* pwarp = dis / (avgclose_rate (in MM/sec) / 
+			                MM_PER_SEC_PER_WARP(18)) */
+		      pwarp = (avgclose_rate / (real) MM_PER_SEC_PER_WARP);
+
+#ifdef DEBUG_ETA
+clog("infoship:\tdis(%.1f) pwarp(%.1f) = (close_rate(%.1f) / MM_PER_SEC_PER_WARP(%.1f)", dis, pwarp, close_rate, MM_PER_SEC_PER_WARP);
+#endif
+
+		      sprintf(tmpstr, ", ETA %s",
+			      ETAstr(pwarp, dis));
+		      appstr(tmpstr, cbuf);
+		    }
+		}
+	      else
+		{		/* scanning a new ship - assume ships
+				   heading directly at each other */
+
+				/* init old* vars */
+		  oldtime = curtime;
+		  oldsnum = snum;
+		  olddis = dis;
+
+		  pwarp = 
+		    (((Ships[scanner].warp > 0.0) ? 
+		      Ships[scanner].warp : 
+		      0.0) +
+		     ((Ships[snum].warp > 0.0) ? 
+		      Ships[snum].warp 
+		      : 0.0));
+
+		  sprintf(tmpstr, ", ETA %s",
+			  ETAstr(pwarp, dis));
+		  appstr(tmpstr, cbuf);
+		}
+	    }
+	} /* if do ETA stats */
+#else /* not a BETTER_ETA */
+
+      if (sysconf_DoETAStats)
+	{
+	  if (Ships[scanner].warp > 0.0 || Ships[snum].warp > 0.0)
+	    {
+				/* take other ships velocity into account */
+	      cumwarp = 
+		(((Ships[scanner].warp > 0.0) ? Ships[scanner].warp : 0.0) + 
+		((Ships[snum].warp > 0.0) ? Ships[snum].warp : 0.0));
+
 	      sprintf(tmpstr, ", ETA %s",
-		      ETAstr(Ships[scanner].warp, dis));
+		      ETAstr(cumwarp, dis));
 	      appstr(tmpstr, cbuf);
 	    }
-	}
+	} /* if do ETA stats */
+#endif /* !BETTER_ETA */
+
     }
   else
     cbuf[0] = EOS;
@@ -695,7 +808,7 @@ void infoship( int snum, int scanner )
 void killship( int snum, int kb )
 {
   int sendmsg = FALSE;
-  char msgbuf[128];
+  char msgbuf[BUFFER_SIZE];
 
 #if defined(DO_EXPLODING_SHIPS)
   /* launch all torps - sorta, we'll use 'explode' mode... */
@@ -1833,7 +1946,6 @@ void teamlist( int team )
 	      SpecialColor,
 	      InfoColor);
 
-	  /* FIXME - dwp for Time, Cpu time, Coup time */
       sprintf(sfmt3,
 	      "#%d#%%15s #%d#%%12s #%d#%%11s #%d#%%11s #%d#%%11s #%d#%%11s",
 	      LabelColor,
@@ -1861,7 +1973,7 @@ void teamlist( int team )
 	      SpecialColor,
 	      InfoColor);
 
-  } /* end FIRST_TIME */
+  } /* FIRST_TIME */
 
   godlike = ( team < 0 || team >= NUMPLAYERTEAMS );
   col = 0; /*1*/
@@ -2112,10 +2224,16 @@ void userline( int unum, int snum, char *buf, int showgods, int showteam )
     ch = Teams[team].teamchar;
 
   if (Users[unum].type == UT_REMOTE)
-    strcpy(tname, "@");			/* flags a remote user */
-  else
-    strcpy(tname, "");
-  strcat(tname, Users[unum].username);
+    {
+      tname[0] = '@';
+      strncpy(&tname[1], Users[unum].username, SIZEUSERNAME - 2);
+      tname[SIZEUSERNAME - 1] = EOS;
+    }
+   else
+     { 
+       strncpy(tname, Users[unum].username, SIZEUSERNAME - 1);
+       tname[SIZEUSERNAME - 1] = EOS;
+     }
 
   sprintf( junk, "%-12.12s %c%-21.21s %c %6.1f",
 	   tname,
@@ -2533,10 +2651,12 @@ void zeroplanet( int pnum, int snum )
 /* IsRemoteUser(void)  - returns true if username == CONQUEST_USER */
 int IsRemoteUser()
 {
-  static char tmpuser[SIZEUSERNAME + 1] = "";
+  static char tmpuser[SIZEUSERNAME] = "";
 
   if (strlen(tmpuser) == 0)	/* first time */
-    glname(tmpuser);		/* get system username */
+    {				/* get system username */
+      glname( tmpuser, SIZEUSERNAME);
+    }
 
   if (strncmp(tmpuser, CONQUEST_USER, SIZEUSERNAME) == 0)
     {

@@ -14,9 +14,58 @@ configuring and playing the game.
 
 	See INSTALL for instructions on unpacking, compiling, and
 running counquest, as well as information on terminfo requirements and
-configuration.  See conqnews.doc for the lastest news and modification
-history.  See conquest.doc for information on available commands, and
+system specific issues.  
+
+	See SERVER.DOC for information on how to setup and run a
+Conquest server.
+
+	See conqnews.doc for the lastest news and modification
+history.  
+
+	See conquest.doc for information on available commands, and
 how to play the game.
+
+CONTENTS:
+
+	### CONQUEST SYNOPSIS
+	### A LITTLE BACKGROUND
+	### GENERAL INFORMATION AND TIPS ABOUT CONQUEST
+	    ## ~/.conquestrc
+	    ## CURSES/TERMINFO
+	    ## PLANETS
+	    ## SUNS
+	    ## CLOAKING
+	    ## TRACTORS
+	    ## STRENGTH
+	    ## LEAVING THE GAME
+	    ## TEAMS
+	    ## COMBAT
+	    ## MACRO KEYS
+	    ## NAVIGATION
+	    ## THE ROBOTS
+	       # CONQSTRAT
+	       # COMBAT
+	       # CREATING ROBOTS
+	    ## DOOMSDAY MACHINE
+	    ## CONQOPER
+	       # SEMAPHORE STATUS LINE
+	       # LEAVING A SCREEN IN CONQOPER
+	    ## THE INSTALLED FILES
+	       # bin/conquest
+	       # bin/conqdriv
+	       # bin/conqoper
+	       # bin/conqai
+	       # etc/conquest_common.img
+	       # etc/conqnews.doc
+	       # etc/conquest.doc
+	       # etc/conquest.log
+	       # etc/conquestrc
+	       # lib/libconquest.so
+	       # ~/.conquestrc
+	### MORE INFO
+	### OBTAINING CONQUEST
+	### COPYRIGHT INFO
+
 
 
 ### CONQUEST SYNOPSIS
@@ -51,11 +100,16 @@ how to play the game.
 
                ...
 
-	See conquest.doc (or use the (h)elp lesson from within Conquest)
-for more information and available commands.
-
 
 ### A LITTLE BACKGROUND
+
+	A quote from Michael Erskine: 
+
+	"We were playing xtrek before there was X...  It was 
+	known then as Conquest, was written in RATFOR and ran 
+	on a VAX... Personally,  I liked it better...  
+	but who can account for the tastes of old C programmers?"
+
 
 	Conquest was originally written in Ratfor for the VAX/VMS
 platform in 1983 by Jef Poskanzer and Craig Leres.  I wasted
@@ -75,13 +129,6 @@ I've tried to keep the mechanics and balance of the game identical to
 the original.  More tweakage should be expected though, as well as the
 continuing removal of useless code.
 
-	To quote Michael Erskine: 
-
-	"We were playing xtrek before there was X...  It was 
-	known then as Conquest, was written in RATFOR and ran 
-	on a VAX... Personally,  I liked it better...  
-	but who can account for the tastes of old C programmers?"
-
 
 ### GENERAL INFORMATION AND TIPS ABOUT CONQUEST
 
@@ -89,9 +136,12 @@ continuing removal of useless code.
 
 	After running Conquest for the first time, a file called
 ~/.conquestrc should have been created.  Look at this file (it's
-self-explanatory) for various options you can set.  Conquest Gods (or
-CG's) should look at /opt/conquest/etc/conquestrc for a few system
-wide options you may or may not want.
+self-explanatory) for various options you can set.  Conquest Operators
+(or CO's) should look at /opt/conquest/etc/conquestrc for a few system
+wide options you may or may not want.  As of version 7.0, all options
+(user and system-wide) can be viewed and edited using the new
+(O)ptions Menu.  This menu is available at the conquest/conqoper main
+menus, as well as being accessable from within the game.
 
 
 ## CURSES/TERMINFO
@@ -102,137 +152,179 @@ ti/ subdirectory of the Conquest source distribution.  These are
 described in INSTALL.
 
 
-## THE INSTALLED FILES
+## PLANETS
 
-	Here are the files installed by Conquest, and a brief synopsis
-of what each does.  All paths are relative the the installation
-directory (/opt/conquest by default).
+	You cannot change the owner team for 'core' planets via
+conqoper.  Core planets are those that need to be conquered in order
+to take the universe.  The (?)planet list option in conqoper/conquest
+will identify core planets with a '+' sign.  Currently, there are only
+3 non-core planets, that while not necessary to conquer the universe,
+can provide some strategic advantage.  These are Altair, Jinx, and
+Hell.  Particularly Atlair.  Keep an eye on Altair ;-)
 
+	Additionally, Conquest (as of V6.5) contains 20 extra planet
+slots that can be configured with the planet edit option in conqoper.
+By default, they are all 'turned off' so unless a CO goes into
+conqoper and 'enables' them, you won't see them.  They are named
+'Extra 1' through 'Extra 20' (though, obviously, the names can be
+changed in the planet editor).
 
-# bin/conquest
-
-	The game itself. It currently accepts no arguments.
-
-
-# bin/conqdriv
-
-	The universe driver process.  A driver is kicked off whenever
-someone enters Conquest and a driver isn't already running.  You
-cannot start the driver manually.  (You should never have to.)  A CG
-can manually start the driver for debugging purposes by supplying the
-'-f' option.
-
-
-# bin/conqoper
-
-	This is the Conquest Operator program that allows suitably
-privileged individuals to control, monitor, and modify the behavior of
-the game.  The root user is always a CG and therefore can run the
-conqoper program.  If you want to allow other people to be CG's, you
-will need to add them to the conquest group in /etc/group.
-
-	My conquest entry in /etc/group looks like this:
-
-conquest::102:jon,davep,johnc
-
-	jon, davep, and johnc all have CG status on my machine.  
-
-	Conqoper currently supports the following options, (type
-conqoper -? to see the various options):
-
- usage: conqoper [-C] [-D] [-E] [-I <what>]
-        -C               rebuild systemwide conquestrc file
-        -D               disable the game
-        -E               enable the game
-        -I <what>        Initialize <what>, where <what> is:
-           e - everything
-           g - game
-           l - lockwords
-           m - messages
-           p - planets
-           r - robots
-           s - ships
-           u - universe
-           z - zero common block
-
-	The init and enable/disable options are of primary interest to
-server operators... For example, if an operator wanted to ensure that
-the game is reset every week, s/he can setup a cron entry for conquest
-(or a GC) to run 'conqoper -Ig' every sunday at midnight.
-
-	Be careful who you give CG status to, a bad CG can cheat, or
-otherwise disrupt a game.  In addition, due to the fact that a CG is a
-member of the conquest group, a bad CG will be able to trash the
-common block, as well as other undesirable things.
-
-	A CG with permission to overwrite the system-wide conquestrc
-file can call conqoper with the '-C' option to update the file with a
-newer version.  User-level ~/.conquestrc files are always updated
-automatically when conquest is run.  This is not done automatically
-for the system wide conquestrc file due to potential security
-problems. 
+	Use them together.  Use them in peace.
 
 
-# bin/conqai
+## SUNS
 
-	Supplied with the source dist only.  This program allows a CG
-to take over robot control from the Conquest driver for debugging
-purposes.  Don't run it if you don't know what it does.  It will
-disable robot AI control by the driver.  After running conqai for some
-purpose, be sure to re-run it with the '-r' option to return control
-of the robots to the Conquest driver when you're done.
+	Suns are hot.  Don't fly through them unless it absolutely,
+positively, has to be there overnight.  Hint: Robots don't seem to
+worry about suns, sometimes to their detriment.  
 
 
-# etc/conquest_common.img
+## CLOAKING
 
-	The Conquest (ex-Fortran) Common Block.  This file contains
-the 'state' of the universe.  It is mapped into the address space
-(using mmap(2)) of the Conquest executables.  Never manually edit this
-file.  Use conqoper to change the universe. ;-) This file *must* have
-perms of 660 with a group of conquest.  If read/write access is opened
-up to all, then all will be able to modify the common block, and
-hence, the universe.  Gives me the willies just thinking about it.
-
-
-# etc/conqnews.doc
-
-	Latest Conquest news.  View via (N)ews in the Conquest main
-menu.  Contains a chronological order of changes and modifications.
-Definitely worth viewing if you want to see what's changed since the
-previous releases.
+	Cloaking can be very useful in battle.  Unfortunately, it's
+expensive in terms of fuel and engine heating.  But at warp 0 however,
+it can be very nice.  There are ways of locating (at least
+approximately) cloaked ships.  Really.  Two pople who know what
+they're doing can get pretty damn good at triangulating cloaked
+ships... right Dave?  Robots can't detect cloaked ships at warp 0.
 
 
-# etc/conquest.doc
+## TRACTORS
 
-	Conquest instructions and commands. View via (H)elp lesson in
-the Conquest main menu.   You might also want to print this out.  The
-last page contains a command summary - a handy reference for new
-players. 
-
-
-# etc/conquest.log
-
-	Conquest's log file.  All errors/warnings, and debug messages
-are written here.  For the source distribution, see the bottom of
-defs.h for a list of debuggables.
+	These don't seem to be really useful in Conquest.  One use
+I've seen for them so far is to drag a helpless ship into the sun, so
+it's death can be as humiliating as possible.  Actually, on second
+thought, there *are* a few other interesting uses for them as well ;-)
 
 
-# etc/conquestrc
+## STRENGTH
 
-	System wide options.  Read it, it should be self explanitory.
+	Different teams have different strengths.  Romulans have the
+best weapons, but the worst engines.  Orions have the best engines and
+the worst weapons.  The feds/klings are in-between.  The number of
+kills your ship has, will determine how much more efficient your
+weapons and engines are than the base efficiency you started out with.
+When your kills count reaches DOUBLE_E_KILLS (currently 40), your
+efficiency will be double what you started out with.  It's very nice
+to be in a ship with alot of kills.  The problem is, at least in our
+games, we tend to attack whoever has the most kills - it's a wise move
+for self preservation if the ship in question isn't on your team ;-)
+Even if you have high kills, it's difficult to survive against the
+continuous onslaught of a couple of determined foes, unless you run
+and cloak alot.
 
-# lib/libconquest.so
 
-	Shared library used by Conquest executables (except FreeBSD).
+## LEAVING THE GAME
+
+	To exit Conquest, normally you must self-destruct, or be
+killed.  Conquest Operators (CO's) can use QUIT (^\) to exit cleanly,
+leaving their ship intact, if somewhat vacant.  If allow_sigquit=true
+is set in the system-wide conquestrc file, then any user can exit this
+way.  If you exit this way, I'd be careful where you leave your ship.
+You do not lose points for self-destructing, though if you do it
+often, and don't get any kills before doing so, your skill ranking
+will probably suffer.
 
 
-# ~/.conquestrc
+## TEAMS
 
-	User options and macro definitions.  
+	When you first enter Conquest, it will randomly select a team
+for you, before bringing you to the main menu.  At this point, you can
+switch teams with the (s)witch teams option if you wish (provided the
+operator allows this in the sys-wide configuration file).  Remember,
+different teams have different strengths and weaknesses.  Federation
+and Klingon teams are pretty middle-of-the-road as far as
+engine/weapons efficiency goes, while Orions have better engines, and
+Romulans have stronger weapons.  
+
+
+## COMBAT
+
+	Taking on a robot is quite a bit different from taking on a
+human player.  With a robot, in time you learn it's strategy, and
+compensate for it.  After you've done it a few hundred times, robots
+aren't too much of a challenge, ...if you don't do anything brave and
+stupid :-).  Humans on the other hand, tend to adapt to your
+strategies, forcing you to come up with new ones.  Surprisingly (or so
+it seemed), there are various strategies that can be employed
+effectively against your opponent.  A famous one we used to use, is
+the lame-duck maneuver.  If you take alot of damage, though you have
+plenty of fuel and your weapons are cool, sometimes you can trick a
+player into thinking your really hurting...by limping away at warp 2
+with your shields down for example.  He'll do an info on you and see
+your damaged, or he might think you're out of fuel, and therefore, an
+easy kill.  Sometimes you can surprise him ;-) It's simple, but often
+effective with a player determined to 'finish you off' carelessly
+(right John?).
+
+	Cloaking can be used to excellent effect on an unsuspecting
+opponent.  I leave it up to you to explore the possibilities.  
+
+
+## MACRO KEYS
+
+	The reason I added macros to Conquest, was that at the time I
+was starting to play, I used PC emulators like MS-KERMIT to play from
+home.  Kermit made it pretty easy to redefine keys, and when you can
+have one key that does the work of several keys (such as changing
+allocation, firing a spread, and resetting allocation) it was too
+useful an ability to ignore.  Secondly, since a player with macros can
+be rather formidable to a player without, I thought that Conquest
+itself should support a similair ability so that such a disadvantage
+wouldn't be an issue.
+
+	Macros are sequences of Conquest commands that are issued when
+a Function Key (Fkey) is hit.  On PC hardware, these are the F1-F12
+keys.  With certain emulators (like Unixware's at386 console) the
+Shifted F1-12 keys (F13-F24) are available too.
+
+	Fkey macros are defined in your ~/.conquestrc file.  As of
+version 7.0, users can edit their macro keys from within Conquest
+using the (O)ptions Menu.
+
+One handy macro I like is 
+
+macro_f1=dP\r
+
+	Which makes my F1 key detonate enemy torps (d), and fire a
+spread of 3 torps in the last direction I fired (P\r).  There are many
+other interesting and useful combinations that I won't detail... After
+all, choosing the right macros and using them well can be an important
+part of the strategy you employ against your opponents.
+
+
+## NAVIGATION
+
+	Using the direction keys ('qweadzxc') to the (k)ourse or
+weapons commands can be faster than specifying the direction in
+degrees.  If a ship is approaching from 90 degrees, it's easier (and
+faster) to type 'Pw\r' than 'P90\r' to fire the torps in the proper
+direction.  You're also less likely to screw up in the heat of battle.
+See conquest.doc for a description of the direction keys, and how they
+work.
+
+	You can set course and lock onto a planet by typing the planet
+name (or first 3 unique characters) followed by [TAB] as input to the
+(k)ourse command.  You will automatically enter orbit when you get
+close enough to your destination.
+
+	In addition, the (i)nfo command understands several special
+strings like 'ne' for info on nearest enemy.  Obviously you can't
+fire weapons like that though - that would be too easy.  See
+conquest.doc for more info.
+
+	The Keypad keys/Arrow keys (if your terminal emulator and
+terminfo entry supports them) can be used for 1-key steering, which
+can be faster in battle.  They (the keypad keys) can also be used as
+input to the fire and course commands, as they are translated into the
+appropriate 'direction' keys like so:
+
+	789     qwe 
+	4 6 --> a d 
+	123     zxc
 
 
 ## THE ROBOTS
-
 
 # CONQSTRAT
 
@@ -286,15 +378,27 @@ It was much more fun to figure it out via trial and error (death).
 	Robots are created one of two ways:
 
 	A.  You attack a home-system planet of an opposing team, and
-there are no players around to defend it.  Presto, one pissed robot
-headed your way.
+there are no team players around to defend it.  Presto, one pissed
+robot headed your way.
 
-	B.  A Conquest Operator (CG) fires up conqoper and creates some
+	B.  A Conquest Operator fires up conqoper and creates some
 with the (r)obot menu option.  
 
 
-## CONQOPER 
+## DOOMSDAY MACHINE
 
+	The Doomsday machine (if activated) *can* be killed.  It
+probably requires that you've seen the (old) Star Trek episode called
+'The Doomsday Machine' though.  Heh.  
+
+	It can also be rather annoying after a time or two though.  If
+you get tired of it, you can set the 'no_doomsday' variable in
+/opt/conquest/etc/conquestrc file to true, which will prevent it from
+randomly starting up and wasting the universe.  I'd recommend this for
+public access servers.
+
+
+## CONQOPER 
 
 # SEMAPHORE STATUS LINE
 
@@ -333,190 +437,135 @@ planet, use 'q' to quit.
 know... some consistency is needed.  
 
 
-## PLANETS
+## THE INSTALLED FILES
 
-	You cannot change the owner team for 'core' planets via
-conqoper.  Core planets are those that need to be conquered in order
-to take the universe.  The (?)planet list option in conqoper/conquest
-will identify core planets with a '+' sign.  Currently, there are only
-3 non-core planets, that while not necessary to conquer the universe,
-can provide some strategic advantage.  These are Altair, Jinx, and
-Hell.  Particularly Atlair.  Keep an eye on Altair ;-)
-
-	Additionally, Conquest (as of V6.5) contains 20 extra planet
-slots that can be configured with the planet edit option in conqoper.
-By default, they are all 'turned off' so unless a CG goes into
-conqoper and 'enables' them, you won't see them.  They are named
-'Extra 1' through 'Extra 20' (though, obviously, the names can be
-changed in the planet editor).
-
-	Use them together.  Use them in peace.
+	Here are the files installed by Conquest, and a brief synopsis
+of what each does.  All paths are relative the the installation
+directory (/opt/conquest by default).
 
 
-## SUNS
+# bin/conquest
 
-	Suns are hot.  Don't fly through them unless it absolutely,
-positively, has to be there overnight.  Hint: Robots don't seem to
-worry about suns, sometimes to their detriment.  
+	The game itself. It currently accepts no arguments.
 
 
-## CLOAKING
+# bin/conqdriv
 
-	Cloaking can be very useful in battle.  Unfortunately, it's
-expensive in terms of fuel and engine heating.  But at warp 0 however,
-it can be very nice - sometimes.  There are ways of locating (at least
-approximately) cloaked ships.  Really.  Two pople who know what
-they're doing can get pretty damn good at triangulating cloaked
-ships... right Dave?  Robots can't detect cloaked ships at warp 0.
-
-
-## TRACTORS
-
-	These don't seem to be really useful in Conquest.  One use
-I've seen for them so far is to drag a helpless ship into the sun, so
-it's death can be as humiliating as possible.  Actually, on second
-thought, there *are* a few other interesting uses for them as well ;-)
+	The universe driver process.  A driver is kicked off whenever
+someone enters Conquest and a driver isn't already running.  You
+cannot start the driver manually.  (You should never have to.)  A CO
+can manually start the driver for debugging purposes by supplying the
+'-f' option.
 
 
-## STRENGTH
+# bin/conqoper
 
-	Different teams have different strengths.  Romulans have the
-best weapons, but the worst engines.  Orions have the best engines and
-the worst weapons.  The feds/klings are in-between.  The number of
-kills your ship has determines how much more efficient your weapons
-and engines are than the base efficiency you started out with.  When
-your kills count reaches DOUBLE_E_KILLS (currently 40), your
-efficiency will be double what you started out with.  It's very nice
-to be in a ship with alot of kills.  The problem is, at least in our
-games, we tend to attack whoever has the most kills - it's a wise move
-for self preservation if the ship in question isn't on your team ;-)
-Even if you have high kills, it's difficult to survive against the
-continuous onslaught of a couple of determined foes, unless you run
-and cloak alot.
+	This is the Conquest Operator program that allows suitably
+privileged individuals to control, monitor, and modify the behavior of
+the game.  The root user is always a CO and therefore can run the
+conqoper program.  If you want to allow other people to be CO's, you
+will need to add them to the conquest group in /etc/group.
 
+	My conquest entry in /etc/group looks like this:
 
-## LEAVING THE GAME
+conquest::102:jon,davep,johnc
 
-	To exit Conquest, normally you must self-destruct, or be
-killed.  CG's can use QUIT (^\) to exit cleanly, leaving their ship
-intact, if somewhat vacant.  If allow_sigquit=true is set in the
-system-wide conquestrc file, then any user can exit this way.  If you
-exit this way, I'd be careful where you leave your ship.  You do not
-lose points for self-destructing, though if you do it often, and don't
-get any kills before doing so, your skill ranking will probably
-suffer.
+	jon, davep, and johnc all have CO status on my machine.  
 
+	Conqoper currently supports the following options, (type
+conqoper -? to see the various options):
 
-## TEAMS
+ usage: conqoper [-C] [-D] [-E] [-I <what>]
+        -C               rebuild systemwide conquestrc file
+        -D               disable the game
+        -E               enable the game
+        -I <what>        Initialize <what>, where <what> is:
+           e - everything
+           g - game
+           l - lockwords
+           m - messages
+           p - planets
+           r - robots
+           s - ships
+           u - universe
+           z - zero common block
 
-	When you first enter Conquest, it will randomly select a team
-for you, before bringing you to the main menu.  At this point, you can
-switch teams with the (s)witch teams option if you wish.  Remember,
-different teams have different strengths and weaknesses.  Federation
-and Klingon teams are pretty middle-of-the-road as far as
-engine/weapons efficiency goes, while Orions have better engines, and
-Romulans have stronger weapons.  I may add an option in the
-system-wide conqestrc file to allow CG's to prevent users from
-switching teams, if balance (or abuse) becomes an issue.
+	The init and enable/disable options are of primary interest to
+server operators... For example, if an operator wanted to ensure that
+the game is reset every week, s/he can setup a cron entry for conquest
+(or a CO) to run 'conqoper -Ig' every sunday at midnight.
 
+	Be careful who you give CO status to, a bad CO can cheat, or
+otherwise disrupt a game.  In addition, due to the fact that a CO is a
+member of the conquest group, a bad CO will be able to trash the
+common block, as well as other undesirable things.
 
-## COMBAT
-
-	Taking on a robot is quite a bit different from taking on a
-human player.  With a robot, in time you learn it's strategy, and
-compensate for it.  After you've done it a few hundred times, robots
-aren't too much of a challenge, ...if you don't do anything brave and
-stupid :-).  Humans on the other hand, tend to adapt to your
-strategies, forcing you to come up with new ones.  Surprisingly (or so
-it seemed), there are various strategies that can be employed
-effectively against your opponent.  A famous one we used to use, is
-the lame-duck maneuver.  If you take alot of damage, though you have
-plenty of fuel and your weapons are cool, sometimes you can trick a
-player into thinking your really hurting...by limping away at warp 2
-with your shields down for example.  He'll do an info on you and see
-your damaged, or he might think you're out of fuel, and therefore, an
-easy kill.  Sometimes you can surprise him ;-) It's simple, but often
-effective with a player determined to 'finish you off' carelessly
-(right John?).
-
-	Cloaking can be used to excellent effect on an unsuspecting
-opponent.  I leave it up to you to explore the possibilities.  
+	A CO with permission to overwrite the system-wide conquestrc
+file can call conqoper with the '-C' option to update the file with a
+newer version.  User-level ~/.conquestrc files are always updated
+automatically when conquest is run.  This is not done automatically
+for the system wide conquestrc file due to potential security
+problems. 
 
 
-## MACRO KEYS
+# bin/conqai
 
-	The reason I added macros to Conquest, was that at the time I
-was starting to play, I used PC emulators like MS-KERMIT to play from
-home.  Kermit made it pretty easy to redefine keys, and when you can
-have one key that does the work of several keys (such as changing
-allocation, firing a spread, and resetting allocation) it was too
-useful an ability to ignore.  Secondly, since a player with macros can
-be rather formidable to a player without, I thought that Conquest
-itself should support a similair ability so that such a disadvantage
-wouldn't be an issue.
-
-	Macros are sequences of Conquest commands that are issued when
-a Function Key (Fkey) is hit.  On PC hardware, these are the F1-F12
-keys.  With certain emulators (like Unixware's at386 console) the
-Shifted F1-12 keys (F13-F24) are available too.
-
-	Fkey macros are defined in your ~/.conquestrc file.
-Unfortunately, there is no way currently to define Fkeys from within
-Conquest.  This will obviously have to be changed eventually to more
-easily support public access Conquest servers.
-
-One handy macro I like is 
-
-macro_f1=dP\r
-
-	Which makes my F1 key detonate enemy torps (d), and fire a
-spread of 3 torps in the last direction I fired (P\r).  There are many
-other interesting and useful combinations that I won't detail... After
-all, choosing the right macros and using them well can be an important
-part of the strategy you employ against your opponents.
+	Supplied with the source dist only.  This program allows a CO
+to take over robot control from the Conquest driver for debugging
+purposes.  Don't run it if you don't know what it does.  It will
+disable robot AI control by the driver.  After running conqai for some
+purpose, be sure to re-run it with the '-r' option to return control
+of the robots to the Conquest driver when you're done.
 
 
-## NAVIGATION
+# etc/conquest_common.img
 
-	Using the direction keys ('qweadzxc') to the (k)ourse or
-weapons commands can be faster than specifying the direction in
-degrees.  If a ship is approaching from 90 degrees, it's easier (and
-faster) to type 'Pw\r' than 'P90\r' to fire the torps in the proper
-direction.  You're also less likely to screw up in the heat of battle.
-See conquest.doc for a description of the direction keys, and how they
-work.
+	The Conquest (ex-Fortran) Common Block.  This file contains
+the 'state' of the universe.  It is mapped into the address space
+(using mmap(2)) of the Conquest executables.  Never manually edit this
+file.  Use conqoper to change the universe. ;-) This file *must* have
+perms of 660 with a group of conquest.  If read/write access is opened
+up to all, then all will be able to modify the common block, and
+hence, the universe.  Gives me the willies just thinking about it.
 
-	You can set course and lock onto a planet by typing the planet
-name (or first 3 unique characters) followed by [TAB] as input to the
-(k)ourse command.  You will automatically enter orbit when you get
-close enough to your destination.
 
-	In addition, the (i)nfo command understands several special
-strings like 'ne' for info on nearest enemy.  Obviously you can't
-fire weapons like that though - that would be too easy.  See
-conquest.doc for more info.
+# etc/conqnews.doc
 
-	The Keypad keys/Arrow keys (if your terminal emulator and
-terminfo entry supports them) can be used for 1-key steering, which
-can be faster in battle.  They can also be used as input to the fire
-and course commands, as they are translated into the appropriate
-'direction' keys like so:
+	Latest Conquest news.  View via (N)ews in the Conquest main
+menu.  Contains a chronological order of changes and modifications.
+Definitely worth viewing if you want to see what's changed since the
+previous releases.
 
-	789     qwe 
-	4 6 --> a d 
-	123     zxc
 
-## DOOMSDAY
+# etc/conquest.doc
 
-	The Doomsday machine (if activated) *can* be killed.  It
-probably requires that you've seen the (old) Star Trek episode called
-'The Doomsday Machine' though.  Heh.  
+	Conquest instructions and commands. View via (H)elp lesson in
+the Conquest main menu.   You might also want to print this out.  The
+last page contains a command summary - a handy reference for new
+players. 
 
-	It can also be rather annoying after a time or two though.  If
-you get tired of it, you can set the 'no_doomsday' variable in
-/opt/conquest/etc/conquestrc file to true, which will prevent it from
-randomly starting up and wasting the universe.  I'd recommend this for
-public access servers.
+
+# etc/conquest.log
+
+	Conquest's log file.  All errors/warnings, and debug messages
+are written here.  For the source distribution, see the bottom of
+defs.h for a list of debuggables.
+
+
+# etc/conquestrc
+
+	System wide options.  Read it, it should be self explanitory.
+Can be edited directly or using the (O)ptions Menu from within conqoper.
+
+# lib/libconquest.so
+
+	Shared library used by Conquest executables (except FreeBSD).
+
+
+# ~/.conquestrc
+
+	User options and macro definitions.  Can be edited directly or
+using the (O)ptions Menu from within conquest.
 
 
 ### MORE INFO
@@ -554,16 +603,16 @@ Freebird archives, where they may be found (currently) at
  purpose. It is provided "as is" without express or implied warranty. 
 
 
- Unix/C specific porting and supporting code Copyright (C)1994-1998 
+ Unix/C specific porting and supporting code Copyright (C)1994-1999
  by Jon Trulson <jon@radscan.com> under the same terms, conditions,  
  and restrictions of the original copyright by Jef Poskanzer and Craig
  Leres.
 
- (5/1/98)
+ (1/28/99)
  Due to a little prodding from Sunsite (;-), I've decided on the
  ARTISTIC LICENSE (see the LICENSE file) Copyright statement for
  Conquest. 
 
-Jon Trulson <jon@radscan.com> 12/24/97
+Jon Trulson <jon@radscan.com> 1/28/99
 
 

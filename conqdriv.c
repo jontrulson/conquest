@@ -3,6 +3,7 @@
  *
  * $Id$
  *
+ * Copyright 1999 Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
  ***********************************************************************/
 
 /**********************************************************************/
@@ -167,7 +168,8 @@ main(int argc, char *argv[])
   rndini( 0, 0 );			/* init random numbers */
   pid = getpid(); /* store our pid */
   Driver->drivpid = pid;
-  glname( Driver->drivowner );		/* store our username */
+
+  glname(Driver->drivowner, SIZEUSERNAME);
   
   /* Start within bounds. */
   Driver->drivsecs = modp1( Driver->drivsecs, FIVEMINUTE_SECONDS );

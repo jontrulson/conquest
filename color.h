@@ -4,6 +4,7 @@
  *
  * $Id$
  *
+ * Copyright 1999 Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
  ***********************************************************************/
 
 
@@ -49,7 +50,7 @@ CEXTERN int RedColor, GreenColor, YellowColor, MagentaColor,
 
 				/* function prototypes for color.c */
 
-void InitColors(int has_colorcap);
+void InitColors(void);
 void cprintf(int lin, int col, int align, char *fmt, ...);
 
 #undef CEXTERN

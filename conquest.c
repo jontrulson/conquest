@@ -4,6 +4,7 @@
  *
  * $Id$
  *
+ * Copyright 1999 Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
  ***********************************************************************/
 
 /*                               C O N Q U E S T */
@@ -368,6 +369,15 @@ void command( int ch )
     case 'N':				/* change pseudonym */
       pseudo( CqContext.unum, CqContext.snum );
       break;
+
+    case 'O':
+      stoptimer();
+      CqContext.redraw = TRUE;
+      UserOptsMenu(CqContext.unum);
+      if ( stillalive( CqContext.snum ) )
+	display( CqContext.snum, FALSE );
+      settimer();
+      break;
     case 'o':				/* orbit nearby planet */
       doorbit( CqContext.snum );
       break;
@@ -584,6 +594,9 @@ void conqds( int multiple, int switchteams )
   col = 48;
   lin = i;
   cprintf(lin,col,ALIGN_NONE,sfmt, 'N', "change your name");
+  lin++;
+  cprintf(lin,col,ALIGN_NONE,sfmt, 'O', "options menu");
+
   if ( ! multiple )
     {
       lin++;
@@ -2002,7 +2015,7 @@ void dohelp( void )
   cdclear();
   cprintf(1,0,ALIGN_CENTER, "#%d#%s", LabelColor, "CONQUEST COMMANDS");
   
-  lin = 4;
+  lin = 3;
   
   /* Display the left side. */
   tlin = lin;
@@ -2045,11 +2058,13 @@ void dohelp( void )
   cprintf(tlin,col,ALIGN_NONE,sfmt, "m", "send a message");
   tlin++;
   cprintf(tlin,col,ALIGN_NONE,sfmt, "M", "short/long range sensor toggle");
+  tlin++;
+  cprintf(tlin,col,ALIGN_NONE,sfmt, "N", "change your name");
   
   /* Now do the right side. */
   tlin = lin;
   col = 44;
-  cprintf(tlin,col,ALIGN_NONE,sfmt, "N", "change your name");
+  cprintf(tlin,col,ALIGN_NONE,sfmt, "O", "options menu");
   tlin++;
   cprintf(tlin,col,ALIGN_NONE,sfmt, "o", "come into orbit");
   tlin++;
@@ -3068,6 +3083,7 @@ void menu(void)
   /* Set up a few ship characteristics here rather than in initship(). */
   Ships[CqContext.snum].unum = CqContext.unum;
   Ships[CqContext.snum].team = Users[CqContext.unum].team;
+
   Ships[CqContext.snum].pid = CqContext.pid;
   for ( i = 0; i < MAXOPTIONS; i = i + 1 )
     Ships[CqContext.snum].options[i] = Users[CqContext.unum].options[i];
@@ -3234,6 +3250,10 @@ void menu(void)
 	case 'N':
 	  pseudo( CqContext.unum, CqContext.snum );
 	  break;
+	case 'O':
+          UserOptsMenu(CqContext.unum);
+          redraw = TRUE;
+          break;
 	case 'r':
 	  if ( multiple )
 	    cdbeep();
@@ -3607,6 +3627,8 @@ int newship( int unum, int *snum )
   /* Figure out which system to enter. */
   if ( fresh )
     {
+				/* (re)init the ship's team! (bug 1/10/98) */
+      Ships[*snum].team = Users[CqContext.unum].team;
       system = Ships[*snum].team;
       if ( ! capentry( *snum, &system ) )
 	{
@@ -3831,10 +3853,7 @@ int welcome( int *unum )
 	{
 	  if (GetConf(TRUE, *unum) == ERR)
 	    return(FALSE);
-	  if (has_colors() && conf_NoColor == FALSE)
-	    InitColors(TRUE);
-	  else
-	    InitColors(FALSE);
+	  InitColors();
 	}
 
 				/* copy in the password */
@@ -3864,10 +3883,7 @@ int welcome( int *unum )
     {
       if (GetConf(TRUE, *unum) == ERR)
 	return(FALSE);
-      if (has_colors() && conf_NoColor == FALSE)
-	InitColors(TRUE);
-      else
-	InitColors(FALSE);
+	InitColors();
     }
 
   

@@ -106,5 +106,7 @@ COPYRIGHT
  conditions of the original copyright by Jef Poskanzer and Craig    
  Leres.                                                             
 
+	See the LICENSE file for current copyright info.
 
-Jon Trulson <jon@radscan.com> 12/24/97
+Jon Trulson <jon@radscan.com> 2/1/99
+

@@ -4,6 +4,7 @@
  *
  * $Id$
  *
+ * Copyright 1999 Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
  ***********************************************************************/
 
 /**********************************************************************/
@@ -239,10 +240,17 @@ void cdfill ( char ch, char *buf, int count )
 int cdgetn ( char pmt[], int lin, int col, int *num )
 {
   char buf[MSGMAXLINE];
-  
+
+  cdfill('\0', buf, MSGMAXLINE);
   if ( cdgets ( pmt, lin, col, buf, MSGMAXLINE ) == ERR )
     return ( ERR );
   
+  if (strlen(buf) == 0)
+    return(ERR);
+
+  if (!alldig(buf))
+    return(ERR);
+
   *num = atoi ( buf );
   return ( OK );
   
@@ -411,7 +419,7 @@ int cdgetp ( char pmt[], int lin, int col, char terms[], char str[],
 	      cdclra ( lin, icol, lin, icol );
 	    }
 	}
-      else if ( ch == 0x17 )
+      else if ( ch == 0x17 )	/* ^W */
 	{
 	  /* Delete the last word. */
 	  if ( len > 0 )
@@ -442,6 +450,7 @@ int cdgetp ( char pmt[], int lin, int col, char terms[], char str[],
 		  len = 0;
 		}
 	      str[len] = EOS;
+
 	      /* Clear things in the actual image, if necessary. */
 	      if ( icol < i )
 		{
@@ -455,7 +464,7 @@ int cdgetp ( char pmt[], int lin, int col, char terms[], char str[],
 		}
 	    }
 	}
-      else if ( ch == 0x15 || ch == 0x18 )
+      else if ( ch == 0x15 || ch == 0x18 ) /* ^U || ^X */
 	{
 	  if ( len > 0 )
 	    {
@@ -586,10 +595,7 @@ void cdinit(void)
   initscr();
   start_color();
   
-  if (has_colors() && conf_NoColor == FALSE)
-    InitColors(TRUE);
-  else
-    InitColors(FALSE);
+  InitColors();
   
   nonl(); 
   typeahead(-1);		/* no typeahead checking */

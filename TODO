@@ -12,8 +12,6 @@ put in, you have the source - code away...
 	These are items being considered for implementation and/or
 fixing in a future release of Conquest.
 
-- the ability to customize colors in your ~/.conquestrc file.
-
 - enhance conqoper watch to allow watching of planets.  Perhaps
 players might be allowed to watch their own planets as well...
 Perhaps not...
@@ -39,18 +37,6 @@ turn over control of their ship to the user's robot strategy with
 control of the standard robot strategy table.  Might be nice to be
 able to use your own, ala the ancient crobots game...
 
-- code that would support public conquest servers via a generic
-'conquest' user. 
 
-- The ability for a user to generate a robot for target practice at
-will (providing there are no other human players playing).  This can
-be done now by attacking a team planet that currently has no players
-(human or robot) to defend it.  Maybe it should stay that
-way... Comments?
+Jon Trulson <jon@radscan.com> 1/28/99
 
-- Modifications that might allow an unprivileged user to setup and run
-a Conquest game (such as on a University computer, where privileged
-access isn't possible).
-
-
-Jon Trulson <jon@radscan.com> 12/24/97

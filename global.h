@@ -2,6 +2,7 @@
  *
  * $Id$
  *
+ * Copyright 1999 Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
  ***********************************************************************/
 
 /**********************************************************************/
@@ -73,18 +74,13 @@ CEXTERN int conf_DoLimitBell;
 				   a reincarnate */
 CEXTERN int conf_ClearOldMsgs;
 
-				/* Macro keys - F1-F12 */
+				/* Macro keys - F1-F<MAX_MACROS> */
 CEXTERN char conf_MacrosF[MAX_MACROS][MAX_MACRO_LEN];
 
 				/* for the semaphores */
 
 #define LOCKMSG      (0)	/* lock the message portion  */
 #define LOCKCMN      (1)	/* lock everything else  */
-
-				/* attribute initialization.
-				   initialized in cdinit() */
-CEXTERN int RedLevelColor, YellowLevelColor, GreenLevelColor;
-CEXTERN int LabelColor, InfoColor, SpecialColor;
 
 /* cprintf align values */
 #define ALIGN_CENTER 3
