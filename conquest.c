@@ -187,6 +187,7 @@ int main(int argc, char *argv[])
   Context.entship = FALSE;
   Context.recmode = RECMODE_OFF;
   Context.updsec = 5;		/* dflt - 5/sec */
+  Context.msgrand = getnow(NULL, 0);
 
   cInfo.sock = -1;
   cInfo.state = CLT_STATE_PREINIT;
@@ -3348,7 +3349,6 @@ int play()
         }
       else
         {
-          grand( &Context.msgrand );
           Context.msgok = TRUE;
 	  cdrefresh();
         }

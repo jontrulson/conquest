@@ -802,11 +802,10 @@ int getamsg( int snum, int *msg )
   while ( *msg != ConqInfo->lastmsg )
     {
       *msg = modp1( *msg + 1, MAXMESSAGES );
-      
       if ( canread( snum, *msg ) )
         return(TRUE);
-    }
 
+    }
   return ( FALSE );
   
 }

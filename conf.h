@@ -560,7 +560,7 @@ struct Conf ConfData[] =
       "# define this as the number of updates per second in which to",
       "#  recieve packets and update the display. Number must be between",
       "#  1 and 10 inclusive.",
-      "#  Default: 2",
+      "#  Default: 5",
       NULL
     }
   },
