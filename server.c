@@ -661,7 +661,7 @@ void procDetSelf(cpCommand_t *cmd)
 
   if (cmd->cmd != CPCMD_DETSELF)
     return;
-#warning "Clean me"
+
 #if defined(DEBUG_SERVERPROC)
   clog("PROC DETSELF");
 #endif
