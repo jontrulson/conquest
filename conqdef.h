@@ -536,9 +536,11 @@
 
 /* Terminators for dsgetx. */
 #define TERM_NORMAL '\r' 	/* like NEXT */
-#define TERM_EXTRA '\t' 	/* like shift-NEXT or shift-HELP */
-#define TERM_ABORT '\033' 	/* escape - like BACK */
+#define TERM_EXTRA  '\t' 	/* like shift-NEXT or shift-HELP */
+#define TERM_ABORT  '\033' 	/* escape - like BACK */
 #define TERMS "\r\t\033" 	/* must agree with above characters! */
+
+#define TERM_REDRAW '\014'	/* Redraw/Refresh */
 
 /* Magic characters */
 #define CHAR_CLOAKED '~' 	/* used to display self-cloaked ship */

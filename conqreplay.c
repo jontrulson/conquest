@@ -709,7 +709,7 @@ void watch(void)
 	      upddsp = TRUE;
 	      break;
 
-	    case '\014':	/* ^L */
+	    case TERM_REDRAW:	/* ^L */
 	      cdclear();
 	      CqContext.redraw = TRUE;
 	      upddsp = TRUE;

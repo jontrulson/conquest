@@ -521,7 +521,7 @@ void command( int ch )
 	display( CqContext.snum, FALSE );
       settimer();
       break;
-    case '\014':			/* clear and redisplay */
+    case TERM_REDRAW:			/* clear and redisplay */
       stoptimer();
       cdredo();
       CqContext.redraw = TRUE;
@@ -1074,7 +1074,7 @@ void doautopilot( int snum )
 	{
 	case TERM_ABORT:
 	  break;
-	case '\014':	/* ^L */
+	case TERM_REDRAW:	/* ^L */
 	  cdredo();
 	  break;
 	default:
@@ -3562,7 +3562,7 @@ void menu(void)
 	  doplanlist( 0 );
 	  redraw = TRUE;
 	  break;
-	case '\014':	/* ^L */
+	case TERM_REDRAW:	/* ^L */
 	  cdredo();
 	  redraw = TRUE;
 	  break;

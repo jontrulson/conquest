@@ -483,8 +483,10 @@ int cdgetp ( char pmt[], int lin, int col, char terms[], char str[],
 	      str[0] = EOS;
 	    }
 	}
-      else if ( ch == 0x0c )
-	cdredo();
+      else if ( ch == TERM_REDRAW )
+	{
+	  cdredo();
+	}
       else if ( ! isprint ( ch ) )
 	{
 #ifdef DEBUG_IO
@@ -875,7 +877,8 @@ void cdputs ( char str[], int lin, int col )
 /*   refresh next time cdrefresh() is called. */
 void cdredo(void)
 {
-  cdclear();
+  wrefresh(curscr);
+
   return;
 }
 

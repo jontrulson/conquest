@@ -29,7 +29,7 @@ static void PrintStatus(int lin)
   int i;
 
   sprintf(buf, 
-	  "#%d#STATUS: #%d#Users #%d#%%d, #%d#Ships #%d#%%d #%d#"
+	  "#%d#STATUS: #%d#Users #%d#%%d, #%d#Ships #%d#%%d/%%d #%d#"
 	  "(#%d#%%d #%d#active, #%d#%%d #%d#vacant, "
 	  "#%d#%%d #%d#robot)",
 	  MagentaColor, NoColor, CyanColor, NoColor, CyanColor, NoColor,
@@ -61,7 +61,8 @@ static void PrintStatus(int lin)
     }
     
   cprintf(lin, 0, ALIGN_CENTER, buf,
-	  numusers, numships, numshipsactive, numshipsvacant, numshipsrobot);
+	  numusers, numships, MAXSHIPS, numshipsactive, 
+	  numshipsvacant, numshipsrobot);
 
   return;
 }
@@ -78,6 +79,7 @@ int Logon(char *username, char *password)
   string c3="C      O   O  N N N  Q   Q  U   U  EEE     SSS     T";
   string c4="C   C  O   O  N  NN  Q  Q   U   U  E          S    T";
   string c5=" CCC    OOO   N   N   QQ Q   UUU   EEEEE  SSSS     T";
+  int done;
   extern char *ConquestVersion;
   extern char *ConquestDate;
 
@@ -96,152 +98,160 @@ int Logon(char *username, char *password)
   clog("INFO: Detected a remote user\n");
 #endif
 
-  cdclear();
+  done = FALSE;
 
-  /* Display the logo. */
-  lenc1 = strlen( c1 );
-  col = (CqContext.maxcol - lenc1) / 2;
-  lin = 2;
-  cprintf( lin,col,ALIGN_NONE,"#%d#%s", RedColor | A_BOLD, c1);
-  lin++;
-  cprintf( lin,col,ALIGN_NONE,"#%d#%s", RedColor | A_BOLD, c2);
-  lin++;
-  cprintf( lin,col,ALIGN_NONE,"#%d#%s", RedColor | A_BOLD, c3);
-  lin++;
-  cprintf( lin,col,ALIGN_NONE,"#%d#%s", RedColor | A_BOLD, c4);
-  lin++;
-  cprintf( lin,col,ALIGN_NONE,"#%d#%s", RedColor | A_BOLD, c5);
-
-  /* Draw a box around the logo. */
-  lin++;
-  attrset(A_BOLD);
-  cdbox( 1, col - 2, lin, col + lenc1 + 1 );
-  attrset(0);
-
-  lin++;
-
-  if ( ConqInfo->closed )
+  while (!done)
     {
-      cprintf( lin, 0, ALIGN_CENTER, "#%d#%s", RedLevelColor,
-	       "The game is closed.");
-      cdend();
-      exit(2);
-    }
-  else
-    cprintf( lin, 1, ALIGN_CENTER, "#%d#Welcome to #%d#Conquest#%d# %s (%s)", 
-	     YellowLevelColor,
-	     RedLevelColor,
-	     YellowLevelColor,
-	     ConquestVersion, ConquestDate);
 
-  lin++;
-  statline = lin;
-  PrintStatus(statline);
+      cdclear();
 
-  lin += 4;
-  slin = lin;
+      /* Display the logo. */
+      lenc1 = strlen( c1 );
+      col = (CqContext.maxcol - lenc1) / 2;
+      lin = 2;
+      cprintf( lin,col,ALIGN_NONE,"#%d#%s", RedColor | A_BOLD, c1);
+      lin++;
+      cprintf( lin,col,ALIGN_NONE,"#%d#%s", RedColor | A_BOLD, c2);
+      lin++;
+      cprintf( lin,col,ALIGN_NONE,"#%d#%s", RedColor | A_BOLD, c3);
+      lin++;
+      cprintf( lin,col,ALIGN_NONE,"#%d#%s", RedColor | A_BOLD, c4);
+      lin++;
+      cprintf( lin,col,ALIGN_NONE,"#%d#%s", RedColor | A_BOLD, c5);
 
-  nm[0] = EOS;
+      /* Draw a box around the logo. */
+      lin++;
+      attrset(A_BOLD);
+      cdbox( 1, col - 2, lin, col + lenc1 + 1 );
+      attrset(0);
 
-  cdrefresh();
+      lin++;
 
-  while (TRUE)			/* login loop */
-    {
-      slin = lin;
-      cdclrl( slin, CqContext.maxlin - slin - 1 );
-      slin += 3;
-      cdputs("You can use A-Z, a-z, 0-9, '_', or '-'.", MSG_LIN1, 1);
-      cprintf( slin - 1, 1, ALIGN_LEFT,
-               "#%dPlease login. (RETURN to exit)",
-               SpecialColor);
-      ch = cdgetx( "Username: ", slin, 1, TERMS, nm, MAX_USERLEN, TRUE );
-
-      if (ch == TERM_ABORT || nm[0] == EOS)
-	{			/* if empty user, or abort char, leave */
+      if ( ConqInfo->closed )
+	{
+	  cprintf( lin, 0, ALIGN_CENTER, "#%d#%s", RedLevelColor,
+		   "The game is closed.");
 	  cdend();
 	  exit(2);
 	}
+      else
+	cprintf( lin, 1, ALIGN_CENTER, "#%d#Welcome to #%d#Conquest#%d# %s (%s)", 
+		 YellowLevelColor,
+		 RedLevelColor,
+		 YellowLevelColor,
+		 ConquestVersion, ConquestDate);
 
-      if (checkuname(nm) == FALSE)
-	{			/* invalid username */
-	  cdbeep();
-	  attrset(RedLevelColor);
-	  cdputs("Invalid character in username.", MSG_LIN2, 1);
-	  attrset(NoColor);
-	  nm[0] = EOS;
-	  continue;
-	}
-				/* see if remote user exists */
-      if (!gunum( &unum, nm, UT_REMOTE ) )
-	{			/* nope... */
-	  slin++;
-	  if (askyn("User doesn't exist. Is this a new user? ", slin, 1))
-	    {			/* yep */
+      lin++;
+      statline = lin;
+      PrintStatus(statline);
+
+      lin += 4;
+      slin = lin;
+
+      nm[0] = EOS;
+
+      cdrefresh();
+
+      while (TRUE)			/* login loop */
+	{
+	  slin = lin;
+	  cdclrl( slin, CqContext.maxlin - slin - 1 );
+	  slin += 3;
+	  cdputs("You can use A-Z, a-z, 0-9, '_', or '-'.", MSG_LIN1, 1);
+	  cprintf( slin - 1, 1, ALIGN_LEFT,
+		   "#%dPlease login. Press [RETURN] to exit, [TAB] to refresh status.",
+		   SpecialColor);
+	  ch = cdgetx( "Username: ", slin, 1, TERMS, nm, MAX_USERLEN, TRUE );
+
+	  if (ch == TERM_EXTRA )
+	    break;		/* redraw stats and things */
+
+	  if (nm[0] == EOS)
+	    {			/* if empty user, or abort char, leave */
+	      cdend();
+	      exit(2);
+	    }
+
+	  if (checkuname(nm) == FALSE)
+	    {			/* invalid username */
+	      cdbeep();
+	      attrset(RedLevelColor);
+	      cdputs("Invalid character in username.", MSG_LIN2, 1);
+	      attrset(NoColor);
+	      nm[0] = EOS;
+	      continue;
+	    }
+	  /* see if remote user exists */
+	  if (!gunum( &unum, nm, UT_REMOTE ) )
+	    {			/* nope... */
+	      slin++;
+	      if (askyn("User doesn't exist. Is this a new user? ", slin, 1))
+		{			/* yep */
+		  pw[0] = EOS;
+		  cdclrl( MSG_LIN1, 2  );
+		  cdputs("Use any printable characters.", MSG_LIN1, 1);
+		  ch = cdgetx( "Password: ", slin, 1, 
+			       TERMS, pw, SIZEUSERNAME - 1, FALSE );
+	      
+		  slin++;
+		  pwr[0] = EOS;
+		  cdclrl( MSG_LIN1, 2  );
+		  cdputs("Use any printable characters.", MSG_LIN1, 1);
+		  ch = cdgetx( "Retype Password: ", slin, 1, 
+			       TERMS, pwr, SIZEUSERNAME - 1, FALSE );
+	      
+		  if (strcmp(pw, pwr) != 0)
+		    {			/* pw's don't match, start over */
+		      cdbeep();
+		      cdclrl( MSG_LIN2, 1  );
+		      attrset(RedLevelColor);
+		      cdputs("Passwords don't match.", MSG_LIN2, 1);
+		      attrset(NoColor);
+		      cdrefresh();
+		      sleep(2);
+		      continue;
+		    }
+		  /* if we're here, we have a username
+		     and password (new user) - time
+		     to rock. */
+
+		  /* ENCRYPT it here */
+		  salt[0] = (nm[0] != EOS) ? nm[0] : 'J';
+		  salt[1] = (nm[1] != EOS) ? nm[1] : 'T';
+		  salt[2] = EOS;
+
+		  strncpy(epw, (char *)crypt(pw, salt), SIZEUSERNAME - 2);
+		  epw[SIZEUSERNAME - 1] = EOS;
+
+		  clog("INFO: New remote user '%s' logged in", nm);
+		  done = TRUE;
+		  break;
+		}
+	      else
+		{
+		  continue;		/* restart */
+		}
+	    }
+	  else
+	    {			/* exists, verify that the pw is valid */
+	      slin++;
 	      pw[0] = EOS;
 	      cdclrl( MSG_LIN1, 2  );
 	      cdputs("Use any printable characters.", MSG_LIN1, 1);
 	      ch = cdgetx( "Password: ", slin, 1, 
 			   TERMS, pw, SIZEUSERNAME - 1, FALSE );
-	      
-	      slin++;
-	      pwr[0] = EOS;
-	      cdclrl( MSG_LIN1, 2  );
-	      cdputs("Use any printable characters.", MSG_LIN1, 1);
-	      ch = cdgetx( "Retype Password: ", slin, 1, 
-			   TERMS, pwr, SIZEUSERNAME - 1, FALSE );
-	      
-	      if (strcmp(pw, pwr) != 0)
-		{			/* pw's don't match, start over */
-		  cdbeep();
-		  cdclrl( MSG_LIN2, 1  );
-		  attrset(RedLevelColor);
-		  cdputs("Passwords don't match.", MSG_LIN2, 1);
-		  attrset(NoColor);
-		  cdrefresh();
-		  sleep(2);
-		  continue;
-		}
-				/* if we're here, we have a username
-				   and password (new user) - time
-				   to rock. */
 
-				/* ENCRYPT it here */
+	      /* ENCRYPT and compare here... */
+
 	      salt[0] = (nm[0] != EOS) ? nm[0] : 'J';
 	      salt[1] = (nm[1] != EOS) ? nm[1] : 'T';
 	      salt[2] = EOS;
-
+	  
 	      strncpy(epw, (char *)crypt(pw, salt), SIZEUSERNAME - 2);
 	      epw[SIZEUSERNAME - 1] = EOS;
-
-	      clog("INFO: New remote user '%s' logged in", nm);
-
-	      break;
-	    }
-	  else
-	    {
-	      continue;		/* restart */
-	    }
-	}
-      else
-	{			/* exists, verify that the pw is valid */
-	  slin++;
-	  pw[0] = EOS;
-	  cdclrl( MSG_LIN1, 2  );
-	  cdputs("Use any printable characters.", MSG_LIN1, 1);
-	  ch = cdgetx( "Password: ", slin, 1, 
-		       TERMS, pw, SIZEUSERNAME - 1, FALSE );
-
-				/* ENCRYPT and compare here... */
-
-	  salt[0] = (nm[0] != EOS) ? nm[0] : 'J';
-	  salt[1] = (nm[1] != EOS) ? nm[1] : 'T';
-	  salt[2] = EOS;
 	  
-	  strncpy(epw, (char *)crypt(pw, salt), SIZEUSERNAME - 2);
-	  epw[SIZEUSERNAME - 1] = EOS;
-	  
-	  if (strcmp(epw, Users[unum].pw) != 0)
-	    {			/* invalid pw */
+	      if (strcmp(epw, Users[unum].pw) != 0)
+		{			/* invalid pw */
 		  cdbeep();
 		  cdclrl( MSG_LIN2, 1  );
 		  attrset(RedLevelColor);
@@ -251,14 +261,15 @@ int Logon(char *username, char *password)
 		  clog("INFO: Invalid password for user '%s'", nm);
 		  sleep(2);
 		  continue;
-	    }
+		}
 	  
-				/* good pw - go for the gusto */
-	  clog("INFO: Remote user '%s' logged in", nm);
-	  break;
-	}
+	      /* good pw - go for the gusto */
+	      done = TRUE;
+	      clog("INFO: Remote user '%s' logged in", nm);
+	      break;
+	    }
+	} /* end while */
     }
-
 				/* if we're here, we're legal */
   strncpy(username, nm, SIZEUSERNAME);
   strncpy(password, epw, SIZEUSERNAME);
