@@ -259,7 +259,7 @@ $(HCONQNEWS): $(CONQNEWS)
 
 clean:
 	rm -f *.o $(CONQUEST) $(CONQOPER) $(CONQAI) $(CONQDRIV) \
-		$(CONQLB) $(CONQSTRAT) y.tab.[ch] lex.yy.[c]
+		$(CONQLB) $(CONQSTRAT) $(CONQREPLAY) y.tab.[ch] lex.yy.[c]
 
 realclean:
 	$(MAKE) clean

@@ -9,17 +9,24 @@
 
                               Conquest News
 
-Version 7.1.2a Sat Nov  9 23:47:53 MST 2002 Jon Trulson  <jon@radscan.com>
+Version 7.2 Sun Dec  1 15:55:27 MST 2002 Jon Trulson  <jon@radscan.com>
 
 	- patch from Clint Adams for conqai.c changing 'char arg' to
           'int arg' for getopt.
 
 	- fix problem in conqai.c defend() that would allow multiple
-          robot defenders.
+          robot defenders.  This was fairly serious to poor newbies
+          ;-)  This bug was introduced in 7.1.2.  Sorry.
 	  
-	- fixup login screen a little, provide some stats...
+	- fixup remote login screen a little, provide a status line
+          (number of live users, ships, their status, etc)
 
-	- reworked cdredo() logic to redraw screen properly in cdget*().
+	  Next maybe we can add a MOTD and a QOTD...
+
+	- reworked cdredo() logic to redraw screen properly in
+          cdget*().  ^L should work properly during prompting now.
+
+	- bumped up to v7.2.  Let's be bold and daring.
 
 Version 7.1.2 Sun Jul  4 16:19:40 MST 2002 Jon Trulson  <jon@radscan.com>
 

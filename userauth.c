@@ -166,7 +166,7 @@ int Logon(char *username, char *password)
 	  if (ch == TERM_EXTRA )
 	    break;		/* redraw stats and things */
 
-	  if (nm[0] == EOS)
+	  if (ch == TERM_ABORT || nm[0] == EOS)
 	    {			/* if empty user, or abort char, leave */
 	      cdend();
 	      exit(2);
