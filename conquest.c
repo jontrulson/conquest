@@ -37,8 +37,11 @@ static char cbuf[MID_BUFFER_SIZE]; /* general purpose buffer */
 
 void printUsage()
 {
-  printf("\nUsage: conquest [-r rec file]\n");
-  printf("       -r recfile             Record game to <recfile>\n\n");
+  printf("Usage: conquest [-r recfile]\n");
+  printf("       -r recfile             Record game to <recfile>\n");
+  printf("                               recfile will be in conpressed format\n");
+  printf("                               if conquest was compiled with zlib\n");
+  printf("                               support\n\n");
   return;
 }
 
@@ -175,7 +178,6 @@ main(int argc, char *argv[])
 	    CqContext.recmode = RECMODE_ON;
 	  else
 	    CqContext.recmode = RECMODE_OFF;
-	  /* will probably need to prime the pump here too */
 	}
 
       menu();
@@ -183,7 +185,7 @@ main(int argc, char *argv[])
   
   drpexit();			/* make the driver go away */
   cdend();			/* clean up display environment */
-  conqend();	/* machine dependent clean-up */
+  conqend();			/* machine dependent clean-up */
   
 #ifdef DEBUG_FLOW
   clog("%s@%d: main() *EXITING*", __FILE__, __LINE__);

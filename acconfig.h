@@ -76,6 +76,9 @@
 /* Define if you have the getmntent function.  */
 #undef HAVE_GETMNTENT
 
+/* Define if you have the libz library.  */
+#undef HAVE_LIBZ
+
 /* Define if the `long double' type works.  */
 #undef HAVE_LONG_DOUBLE
 

@@ -210,25 +210,29 @@ dnl Replace `main' with a function in -lm:
 
 AC_CHECK_LIB(m, main)
 
-# check for ncurses
+dnl check for ncurses
 olibs="$LIBS"
 AC_CHECK_LIB(ncurses, initscr, LIBS="-lncurses $olibs",
   AC_CHECK_LIB(curses, initscr, LIBS="-lcurses $olibs",
     AC_MSG_WARN(I cannot find initscr.  you might need to help me)))
 
-# check for libcrypt
+dnl check for libcrypt
 olibs="$LIBS"
 AC_CHECK_LIB(crypt, crypt, LIBS="$olibs -lcrypt")
 
-# check for libgen
+dnl check for libgen
 olibs="$LIBS"
 AC_CHECK_LIB(gen, crypt, LIBS="$olibs -lgen")
+
+dnl check for libz
+olibs="$LIBS"
+AC_CHECK_LIB(z, gzread)
 
 dnl Checks for header files.
 AC_HEADER_STDC
 AC_CHECK_HEADERS(fcntl.h limits.h sys/ioctl.h sys/times.h termio.h unistd.h)
 AC_CHECK_HEADERS(ncurses.h term.h sys/time.h sys/select.h stropts.h poll.h)
-AC_CHECK_HEADERS(curses.h time.h string.h strings.h termios.h)
+AC_CHECK_HEADERS(curses.h time.h string.h strings.h termios.h zlib.h)
 
 dnl Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST

@@ -510,7 +510,7 @@ void clog(char *fmt, ...)
 
       if ((errfd = fopen(errfile, "a+")) == NULL)
 	{
-	  perror("cerror(): can't open logfile");
+	  perror("clog(): can't open logfile");
 	}
     }
   
