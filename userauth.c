@@ -109,8 +109,11 @@ int Logon(char *username, char *password)
   if ((pwent = getpwnam(CONQUEST_USER)) == NULL)
     clog("ERROR: Logon: getpwnam(%s) failed\n");
 
-  sprintf(homedir, "HOME=%s", pwent->pw_dir);
-  putenv(homedir);		/* for getconf, et. al */
+  if (pwent)
+    {
+      sprintf(homedir, "HOME=%s", pwent->pw_dir);
+      putenv(homedir);		/* for getconf, et. al */
+    }
 
   done = FALSE;
 
