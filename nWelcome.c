@@ -129,6 +129,9 @@ void nWelcomeInit(void)
       newuser = FALSE;
       if (!serror)
         state = S_DONE;           /* need to wait for user packet */
+      else
+        snooze = (time(0) + 4);
+
     }
 
 
