@@ -88,6 +88,7 @@ CONTENTS:
         OSF1/Digital Unix V4.0 for Alpha
            - Thanks to Jim Anderson (janderson@NOVALIS.COM)
              for this port!
+        MS Windows using the cygwin (www.cygwin.com) environment.
 
         Note, I no longer have access to these machines (only
         linux) so YMMV...
