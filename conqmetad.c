@@ -80,8 +80,9 @@ void ageServers(void)
       if (metaServerList[i].valid)
         if (abs(metaServerList[i].lasttime - now) > expireSeconds)
           {
-            clog("META: expiring %s(%s)\n",
+            clog("META: expiring %s:%u(%s)\n",
                  metaServerList[i].altaddr,
+                 metaServerList[i].port,
                  metaServerList[i].addr);
             metaServerList[i].valid = FALSE;
           }
@@ -208,8 +209,9 @@ void metaProcUpd(char *buf, int rlen, char *hostbuf)
   metaServerList[slot] = sRec;
 
   if (!wasfound)                /* new server */
-    clog("META: Added server %s(%s), slot %d",
+    clog("META: Added server %s:%u(%s), slot %d",
          metaServerList[slot].altaddr,
+         metaServerList[slot].port,
          metaServerList[slot].addr,
          slot);
   else
