@@ -1049,7 +1049,7 @@ void procCoup(cpCommand_t *cmd)
 
   sendFeedback("Coup successful!");
 
-  if (rv >= 0)          /* someone was geno'd, send team msg */
+  if (rv >= 0 && rv < NUMPLAYERTEAMS)  /* someone was geno'd, send team msg */
     clbStoreMsg( MSG_COMP, -rv, guilt );
 
   /* force a team update for this ship */
@@ -1895,8 +1895,9 @@ void procBeam(cpCommand_t *cmd)
 	    }
 	  PVUNLOCK(&ConqInfo->lockword);
 	  total = total + 1;
-	  
-          if (rv >= 0)          /* someone was geno'd, send team msg */
+
+	  /* someone was geno'd, send team msg */
+          if (rv >= 0 && rv < NUMPLAYERTEAMS)  
             clbStoreMsg( MSG_COMP, -rv, guilt );
 
 	  if ( total >= num )
