@@ -12,13 +12,174 @@
 #include "datatypes.h"
 #include "conf.h"
 #include "protocol.h"
-#define NOEXTERN
 #include "packet.h"
-#undef NOEXTERN
 
 #ifndef HAVE_SELECT
 #error "The select() system call is required"
 #endif
+
+static struct _packetent clientPackets[] = {
+  { CP_NULL, 
+    sizeof(cpNull_t), 
+    "CP_NULL", 
+    pktNotImpl 
+  },	/* never used */
+  { CP_HELLO, 
+    sizeof(cpHello_t), 
+    "CP_HELLO", 
+    pktNotImpl 
+  },
+  { CP_ACK, 
+    sizeof(cpAck_t), 
+    "CP_ACK", 
+    pktNotImpl 
+  },
+  { CP_COMMAND, 
+    sizeof(cpCommand_t), 
+    "CP_COMMAND", 
+    pktNotImpl 
+  },
+  { CP_FIRETORPS, 
+    sizeof(cpFireTorps_t), 
+    "CP_FIRETORPS", 
+    pktNotImpl 
+  },
+  { CP_GETSINFO, 
+    sizeof(cpGetSInfo_t), 
+    "CP_GETSINFO", 
+    pktNotImpl 
+  },
+  { CP_SENDMSG, 
+    sizeof(cpSendMsg_t), 
+    "CP_SENDMSG", 
+    pktNotImpl 
+  },
+  { CP_SETNAME, 
+    sizeof(cpSetName_t), 
+    "CP_SETNAME", 
+    pktNotImpl 
+  },
+  { CP_AUTHENTICATE, 
+    sizeof(cpAuthenticate_t), 
+    "CP_AUTHENTICATE", 
+    pktNotImpl 
+  },
+  { CP_SETCOURSE,
+    sizeof(cpSetCourse_t),
+    "CP_SETCOURSE",
+    pktNotImpl 
+  },
+  { CP_MESSAGE,
+    sizeof(cpMessage_t),
+    "CP_MESSAGE",
+    pktNotImpl 
+  }
+};
+
+static struct _packetent serverPackets[] = {
+  { SP_NULL, 
+    sizeof(spNull_t), 
+    "SP_NULL", 
+    pktNotImpl 
+  },	/* never used */
+  { SP_HELLO, 
+    sizeof(spHello_t), 
+    "SP_HELLO", 
+    pktNotImpl 
+  },
+  { SP_ACK, 
+    sizeof(spAck_t), 
+    "SP_ACK", 
+    pktNotImpl 
+  },
+  { SP_SERVERSTAT, 
+    sizeof(spServerStat_t), 
+    "SP_SERVERSTAT", 
+    pktNotImpl 
+  },
+  { SP_CLIENTSTAT, 
+    sizeof(spClientStat_t), 
+    "SP_CLIENTSTAT", 
+    pktNotImpl 
+  },
+  { SP_SHIP, 
+    sizeof(spShip_t), 
+    "SP_SHIP", 
+    pktNotImpl 
+  },
+  { SP_SHIPSML, 
+    sizeof(spShipSml_t), 
+    "SP_SHIPSML", 
+    pktNotImpl 
+  },
+  { SP_SHIPLOC, 
+    sizeof(spShipLoc_t), 
+    "SP_SHIPLOC", 
+    pktNotImpl 
+  },
+  { SP_PLANET, 
+    sizeof(spPlanet_t), 
+    "SP_PLANET", 
+    pktNotImpl },
+  { SP_PLANETSML, 
+    sizeof(spPlanetSml_t), 
+    "SP_PLANETSML", 
+    pktNotImpl },
+  { SP_PLANETLOC, 
+    sizeof(spPlanetLoc_t), 
+    "SP_PLANETLOC", 
+    pktNotImpl 
+  },
+  { SP_MESSAGE, 
+    sizeof(spMessage_t), 
+    "SP_MESSAGE", 
+    pktNotImpl 
+  },
+  { SP_USER, 
+    sizeof(spUser_t), 
+    "SP_USER", 
+    pktNotImpl 
+  },
+  { SP_TORP, 
+    sizeof(spTorp_t), 
+    "SP_TORP", 
+    pktNotImpl 
+  },
+  { SP_ACKMSG, 
+    sizeof(spAckMsg_t), 
+    "SP_ACKMSG", 
+    pktNotImpl 
+  },
+  { SP_TEAM, 
+    sizeof(spTeam_t), 
+    "SP_TEAM", 
+    pktNotImpl 
+  },
+  { SP_TORPLOC, 
+    sizeof(spTorpLoc_t), 
+    "SP_TORPLOC", 
+    pktNotImpl 
+  },
+  { SP_CONQINFO, 
+    sizeof(spConqInfo_t), 
+    "SP_CONQINFO", 
+    pktNotImpl 
+  },
+  { SP_FRAME, 
+    sizeof(spFrame_t), 
+    "SP_FRAME", 
+    pktNotImpl 
+  },
+  { SP_HISTORY, 
+    sizeof(spHistory_t), 
+    "SP_HISTORY", 
+    pktNotImpl 
+  }
+};
+
+#define CLIENTPKTMAX (sizeof(clientPackets) / sizeof(struct _packetent))
+#define SERVERPKTMAX (sizeof(serverPackets) / sizeof(struct _packetent))
+
 
 #define SOCK_TMOUT 15		/* 15 seconds to complete packet */
 

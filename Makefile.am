@@ -98,16 +98,16 @@ install-exec-hook:
 #	cp -f $(IMAGES) $(CONQIMGDIR)/
 #	chmod 644 $(CONQIMGDIR)/*.bmp
 	chmod 755 $(prefix) $(DESTDIR)$(datadir)
-	chgrp $(CONQGROUP) $(DESTDIR)$(bindir)/conqoper \
-		$(DESTDIR)$(libexecdir)/conqdriv \
-		$(DESTDIR)$(bindir)/conquestd
-	chmod g+s $(DESTDIR)$(bindir)/conqoper \
-		$(DESTDIR)$(libexecdir)/conqdriv \
-		$(DESTDIR)$(bindir)/conquestd
-	-$(bindir)/conqoper -C
+	chgrp $(CONQGROUP) $(DESTDIR)$(bindir)/conqoper$(EXEEXT) \
+		$(DESTDIR)$(libexecdir)/conqdriv$(EXEEXT) \
+		$(DESTDIR)$(bindir)/conquestd$(EXEEXT)
+	chmod g+s $(DESTDIR)$(bindir)/conqoper$(EXEEXT) \
+		$(DESTDIR)$(libexecdir)/conqdriv$(EXEEXT) \
+		$(DESTDIR)$(bindir)/conquestd$(EXEEXT)
+	-$(bindir)/conqoper$(EXEEXT) -C
 	chmod 775 $(DESTDIR)$(CONQLOCALSTATEDIR)
-	chown root:$(CONQGROUP) $(DESTDIR)$(CONQLOCALSTATEDIR)
-	$(FILEPRIV) $(DESTDIR)$(bindir)/conqoper \
-		$(DESTDIR)$(libexecdir)/conqdriv \
-		$(DESTDIR)$(bindir)/conquestd
+	-chown root:$(CONQGROUP) $(DESTDIR)$(CONQLOCALSTATEDIR)
+	$(FILEPRIV) $(DESTDIR)$(bindir)/conqoper$(EXEEXT) \
+		$(DESTDIR)$(libexecdir)/conqdriv$(EXEEXT) \
+		$(DESTDIR)$(bindir)/conquestd$(EXEEXT)
 

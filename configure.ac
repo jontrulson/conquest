@@ -20,12 +20,10 @@ dnl AC_CANONICAL_TARGET([])
 dnl Checks for programs.
 dnl get the system type and set accordingly.  first init some defaults.
 
+conquest_group=""
 AC_ARG_WITH(conquest-group,
   [  --with-conquest-group=groupname  The conquest group name (Default: conquest)],
-  conquest_group="$withval", conquest_group="conquest")
-
-CONQGROUP="$conquest_group"
-AC_SUBST(CONQGROUP)
+  conquest_group="$withval", conquest_group="")
 
 AC_MSG_CHECKING(system type)
 uname=`uname -s`
@@ -74,6 +72,19 @@ case "$uname" in
 
 	AC_MSG_RESULT(Digital Unix 4.x+)
 	;;
+
+  CYGWIN*)
+        AC_DEFINE(CYGWIN, 1, [Cygwin])
+
+        LIBS="$LIBS -lcygipc"
+        if test ! -n "$conquest_group"
+        then
+                conquest_group="Users"
+        fi
+        
+        AC_MSG_RESULT(Cygwin)
+        ;;
+
   *)	
 	# assume something safe...
 	AC_DEFINE(UNKNOWN, 1, [Unknown])     
@@ -84,6 +95,14 @@ esac
 
 AC_SUBST(FILEPRIV)
 AC_PROG_CC
+
+if test ! -n "$conquest_group"
+then
+        conquest_group="conquest"
+fi
+
+CONQGROUP="$conquest_group"
+AC_SUBST(CONQGROUP)
 
 
 if test -n "$GCC"
@@ -129,7 +148,7 @@ AC_HEADER_TIME
 AC_STRUCT_TM
 
 dnl Checks for library functions.
-AC_FUNC_MMAP
+CONQ_FUNC_MMAP
 AC_TYPE_SIGNAL
 AC_FUNC_VPRINTF
 AC_CHECK_FUNCS(select strstr fileno setpgrp daemon)

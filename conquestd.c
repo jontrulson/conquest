@@ -1037,10 +1037,9 @@ void handleSimpleCmdPkt(cpCommand_t *ccmd)
 	}
       else
         {                       /* not playing (main menu, etc) */
-          /* if the ship is reserved, turn it off */
+          /* if we aren't playing, then just turn it off */
           if (Context.snum >= 1 && Context.snum <= MAXSHIPS)
-            if (Ships[Context.snum].status == SS_RESERVED)
-              Ships[Context.snum].status = SS_OFF;
+            Ships[Context.snum].status = SS_OFF;
         }
       conqend();
       exit(0);
@@ -1295,7 +1294,7 @@ int newship( int unum, int *snum )
 	{
 	  /* Need to reincarnate. */
 
-	  if (CheckPid(Ships[vec[0]].pid))
+	  if (!SVACANT(vec[0]))
 	    {		   /* if it's available, we'll take it */
 			   /* ...if it's not already being flown... */
 	      sendAck(sInfo.sock, PKT_TOCLIENT, PSEV_ERROR, PERR_FLYING, NULL);

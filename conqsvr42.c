@@ -39,12 +39,17 @@ int GetUID(char *name)
   char *myusername = glname();
   char *chkname;
 
+#if defined(CYGWIN)
+  /* name root doesn't usually exist, so default to myusername */
+  name = NULL;
+#endif
+
   if (!name)
     chkname = myusername;
   else
     chkname = name;
 
-  if ((conq_pwd = getpwnam(name)) == NULL)
+  if ((conq_pwd = getpwnam(chkname)) == NULL)
     {
       fprintf(stderr, "conqsvr42: GetUID(%s): can't get user: %s\n",
 	      chkname,
@@ -412,6 +417,25 @@ void initstats( int *ctemp, int *etemp )
 /*  SYNOPSIS */
 /*    int flag, isagod */
 /*    flag = isagod() */
+
+/* For cygwin, everybody is a god for non-user num checks. */
+#if defined(CYGWIN)
+int isagod( int unum )
+{
+  if (unum == -1)               /* get god status for current user */
+    {
+      return TRUE;
+    }
+  else
+    {				/* else a user number passed in */
+				/* just check for OOPT_OPER */
+      if (Users[unum].ooptions[OOPT_OPER])
+	return TRUE;
+      else
+	return FALSE;
+    }
+}
+#else /* !CGYWIN */
 int isagod( int unum )
 {
   static struct group *grp = NULL;
@@ -477,6 +501,7 @@ int isagod( int unum )
   
 }
 
+#endif /* !CYGWIN */
 
 /*  news - list current happenings */
 /*  SYNOPSIS */

@@ -3680,6 +3680,9 @@ void handleSignal(int sig)
   switch(sig)
     {
     case SIGQUIT:
+    case SIGINT:
+    case SIGTERM:
+    case SIGHUP:
       stopTimer();
       cdclear();
       cdrefresh();
@@ -3689,12 +3692,6 @@ void handleSignal(int sig)
       exit(0);
       break;
 
-    case SIGINT:
-    case SIGTERM:
-    case SIGHUP:
-      cdend();
-      exit(0);
-      break;
     default:
       break;
     }
@@ -3717,11 +3714,6 @@ void astservice(int sig)
   int difftime;
   Unsgn8 buf[PKT_MAXSIZE];
 
-#if 0
-  /* Don't do anything if we're not supposed to. */
-  if ( ! Context.display )
-    return;
-#endif
   stopTimer();
 
   /* good time to look for packets... We do this here so the display
@@ -3893,7 +3885,6 @@ void startTimer(void)
 /*    conqend */
 void conqend(void)
 {
-
   sendCommand(CPCMD_DISCONNECT, 0); /* tell the server */
   recordCloseOutput();
 

@@ -2431,14 +2431,12 @@ input(Widget w, XtPointer clientData, XtPointer callData)
   switch (cd->event->type) 
     {
     case KeyPress:
-      if (numc = XLookupString((XKeyEvent *) cd->event, buffer, 1, &keysym, NULL) > 0) 
+      if ((numc = XLookupString((XKeyEvent *) cd->event, buffer, 1, &keysym, NULL)) > 0) 
 	{
 	  clog("Got KeyPress, sym = 0x%x\n", keysym);
-	  if (numc)
-	    {
-	      clog("Got key 0x%x '%c'\n", *buffer, *buffer);
-	      iBufPutc(buffer[0]);
-	    }
+          clog("Got key 0x%x '%c'\n", *buffer, *buffer);
+          iBufPutc(buffer[0]);
+
 	  switch (keysym) 
 	    {
 	    

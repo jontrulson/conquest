@@ -47,7 +47,7 @@ SHELL="/bin/sh"
 build_libtool_libs=yes
 
 # Whether or not to build static libraries.
-build_old_libs=no
+build_old_libs=yes
 
 # Whether or not to add -lc for building shared libraries.
 build_libtool_need_lc=no

@@ -251,10 +251,19 @@ char *GetSemVal(int thesem)
   arg.array = semvals;
   retval = semctl(ConquestSemID, 0, GETALL, arg);
 
+#if defined(CYGWIN)
+  /* apparently not implemented */
+  lastcmnpid = 0;
+  cmnzcnt = 0;
+  lastmsgpid = 0;
+  msgzcnt = 0;
+#else /* !CYGWIN */
+
   lastcmnpid = semctl(ConquestSemID, LOCKCMN, GETPID, semvals);
   cmnzcnt = semctl(ConquestSemID, LOCKCMN, GETZCNT, semvals);
   lastmsgpid = semctl(ConquestSemID, LOCKMSG, GETPID, semvals);
   msgzcnt = semctl(ConquestSemID, LOCKMSG, GETZCNT, semvals);
+#endif
   retval = semctl(ConquestSemID, 0, GETALL, semvals);
 
   if (retval != 0)
@@ -267,6 +276,10 @@ char *GetSemVal(int thesem)
  
   arg.buf = &SemDS;
 
+#if defined(CYGWIN)
+  /* these do not appear to be implemented in cygwin */
+  lastoptime = 0;
+#else /* !CYGWIN */    
 				/* get latest semop time  */
   retval = semctl(ConquestSemID, LOCKMSG, IPC_STAT, arg);
 
@@ -289,6 +302,7 @@ char *GetSemVal(int thesem)
     }
 
   lastoptime = max(lastoptime, SemDS.sem_otime);
+#endif
 
   if (semvals[LOCKMSG] != 0)	/* currently locked */
     sprintf(mesgtxt, "*MesgCnt = %d(%d:%d)", ConqInfo->lockmesg, lastmsgpid, msgzcnt);

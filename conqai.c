@@ -200,7 +200,7 @@ void defend( int attacker, int pnum )
   for ( i = 1; i <= MAXSHIPS; i = i + 1 )
     if ( Ships[i].status == SS_LIVE ) /* live */
       if ( Ships[i].team == team ) /* same team */
-	if (Users[Ships[i].unum].robot || CheckPid(Ships[i].pid)) 
+	if (Users[Ships[i].unum].robot || !SVACANT(i)) 
 	  {   /* robot or non-vacant human */
 	    return;
 	  }

@@ -267,6 +267,10 @@ int iogtimed ( int *ch, real seconds )
   static int c;
   unsigned int secs, usecs;
 
+#if !defined(LINUX)
+  time_t starttime, curtime;
+#endif
+
 #if defined(USE_SELECT)
   static struct timeval timeout;
 
