@@ -52,6 +52,14 @@
 
 #define CLIENTNAME "Conquest"	/* our client name */
 
+struct _srvvec {
+  Unsgn16 vers;
+  char hostname[MAXHOSTNAME + 10];
+};
+
+static struct _srvvec servervec[META_MAXSERVERS] = {};
+
+
 static char cbuf[MID_BUFFER_SIZE]; /* general purpose buffer */
 
 void catchSignals(void);
@@ -2707,7 +2715,7 @@ void dotow( int snum )
   if ( Ships[snum].towedby != 0 )
     {
       c_strcpy( "But we are being towed by ", cbuf );
-      appship( Ships[snum].towing, cbuf );
+      appship( Ships[snum].towedby, cbuf );
       appchr( '!', cbuf );
       mcuPutMsg( cbuf, MSG_LIN2 );
       return;
@@ -3825,6 +3833,13 @@ void dispServerInfo(int lin, metaSRec_t *metaServerList, int num)
 
   sprintf(buf, "#%d#MOTD: #%d#    %%s", MagentaColor, NoColor);
   cprintf(lin++, 0, ALIGN_NONE, buf, metaServerList[num].motd);
+
+  sprintf(buf, "#%d#Contact: #%d# %%s", MagentaColor, NoColor);
+  cprintf(lin++, 0, ALIGN_NONE, buf, metaServerList[num].contact);
+
+  sprintf(buf, "#%d#Time: #%d#    %%s", MagentaColor, NoColor);
+  cprintf(lin++, 0, ALIGN_NONE, buf, metaServerList[num].walltime);
+
   cdline ( lin, 0, lin, Context.maxcol );
   return;
 }
@@ -3842,8 +3857,7 @@ int selectServer(metaSRec_t *metaServerList, int nums)
   int ch;
   char *dispmac;
   int lin = 0, col = 0, flin, llin, clin, pages, curpage;
-  const int servers_per_page = 10;
-  char servervec[META_MAXSERVERS][MAXHOSTNAME + 10]; /* hostname + port */
+  const int servers_per_page = 8;
 
 				/* this is the number of required pages,
 				   though page accesses start at 0 */
@@ -3860,7 +3874,12 @@ int selectServer(metaSRec_t *metaServerList, int nums)
 				/* init the servervec array */
   for (i=0; i < nums; i++)
   {
-    sprintf(servervec[i], "%s:%hu", 
+    if (metaServerList[i].version >= 2) /* valid for newer meta protocols */
+      servervec[i].vers = metaServerList[i].protovers;
+    else
+      servervec[i].vers = PROTOCOL_VERSION; /* always 'compatible' */
+
+    snprintf(servervec[i].hostname, (MAXHOSTNAME + 10) - 1, "%s:%hu",
             metaServerList[i].altaddr,
             metaServerList[i].port);
   }
@@ -3869,7 +3888,7 @@ int selectServer(metaSRec_t *metaServerList, int nums)
 
   cdclear();			/* First clear the display. */
 
-  flin = 9;			/* first server line */
+  flin = 11;			/* first server line */
   llin = 0;			/* last server line on this page */
   clin = 0;			/* current server line */
 
@@ -3904,11 +3923,31 @@ int selectServer(metaSRec_t *metaServerList, int nums)
 				/* get the server number for this line */
 	  k = (curpage * servers_per_page) + i; 
 
-          dispmac = servervec[k];
+          dispmac = servervec[k].hostname;
 
-	  cprintf(lin, col, ALIGN_NONE, "#%d#%s#%d#",
-		  InfoColor, dispmac, NoColor);
-
+          /* highlight the currently selected line */
+          if (i == clin)
+            {
+              if (servervec[k].vers == PROTOCOL_VERSION)
+                cprintf(lin, col, ALIGN_NONE, "#%d#%s#%d#",
+                        RedLevelColor, dispmac, NoColor);
+              else
+                cprintf(lin, col, ALIGN_NONE, 
+                        "#%d#%s#%d# (unavailable - incompatible protocol)",
+                        BlueColor |CQC_A_BOLD, dispmac, NoColor);
+              
+            }
+          else
+            {
+              if (servervec[k].vers == PROTOCOL_VERSION)
+                cprintf(lin, col, ALIGN_NONE, "#%d#%s#%d#",
+                        InfoColor, dispmac, NoColor);
+              else
+                cprintf(lin, col, ALIGN_NONE, 
+                        "#%d#%s#%d# (unavailable - incompatible protocol)",
+                        BlueColor, dispmac, NoColor);
+            }
+          
 	  lin++;
 	  i++;
 	}
@@ -4001,7 +4040,17 @@ int selectServer(metaSRec_t *metaServerList, int nums)
 
 	case TERM_EXTRA:        /* selected one */
         case TERM_NORMAL: 
-          return ((curpage * servers_per_page) + clin);
+
+          i = ((curpage * servers_per_page) + clin);
+
+          if ((metaServerList[i].protovers == PROTOCOL_VERSION) ||
+              metaServerList[i].version < 2) /* too old to know for sure */
+            {
+              return i;
+            }
+          else
+            cdbeep();
+
 	  break;
 
 	default:		/* everything else */

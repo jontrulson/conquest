@@ -19,7 +19,6 @@
 #define CONF_H
 
 #include "datatypes.h"
-
 #ifdef CONF_NOEXTERN
 # define CEXTERN
 #else
@@ -41,6 +40,8 @@
 /* limits for some options */
 #define CONF_SERVER_NAME_SZ   70
 #define CONF_SERVER_MOTD_SZ   70
+
+#include "meta.h"
 
 struct Conf 
 {
@@ -141,6 +142,8 @@ typedef struct _sysConf {
   char ServerName[CONF_SERVER_NAME_SZ];
   /* server motd */
   char ServerMotd[CONF_SERVER_MOTD_SZ];
+  /* server owner contact info */
+  char ServerContact[META_GEN_STRSIZE];
 
 } SysConf_t;
 
@@ -358,6 +361,19 @@ struct Conf SysConfData[] =
     {
       "# Message of the day (MOTD) for your server",
       "#  Default: Keep your shields up in battle.",
+      NULL
+    }
+  },
+  {
+    FALSE,
+    CTYPE_STRING,
+    "server_contact=",
+    SysConf.ServerContact,
+    0, META_GEN_STRSIZE,	/* mix/max */
+    "Server Contact Info",
+    {
+      "# Email address or URL to use to contact the server owner.",
+      "#  Default: root@localhost",
       NULL
     }
   }

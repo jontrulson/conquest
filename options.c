@@ -344,7 +344,7 @@ void UserOptsMenu(int unum)
 
 static void ChangeOption(struct Conf *cdata, int lin)
 {
-#define CBUFLEN 128
+#define CBUFLEN 1024
   int j, rv;
   char buf[CBUFLEN];
 

@@ -251,7 +251,8 @@ spShipSml_t *spktShipSml(Unsgn8 snum, int rec)
 
   memset((void *)&sshipsml, 0, sizeof(spShipSml_t));
 
-  sflags = SHIP_F_NONE;		/* can't see anything by default */
+  sflags = SHIP_F_NONE;		/* can't see anything by default.  make sure
+                                   SHIP_F_MAP never sneaks in */
 
   sshipsml.type = SP_SHIPSML;
   sshipsml.snum = snum;

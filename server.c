@@ -1317,7 +1317,7 @@ void procTow(cpCommand_t *cmd)
   if ( Ships[snum].towedby != 0 )
     {
       c_strcpy( "But we are being towed by ", cbuf );
-      appship( Ships[snum].towing, cbuf );
+      appship( Ships[snum].towedby, cbuf );
       appchr( '!', cbuf );
       clbStoreMsgf( MSG_COMP, snum, cbuf, MSG_FLAGS_FEEDBACK );
       return;
@@ -1411,7 +1411,16 @@ void procUnTow(cpCommand_t *cmd)
 	    {
 	      /* Coast to a stop. */
 	      Ships[snum].head = Ships[Ships[snum].towedby].head;
-	      Ships[snum].warp = Ships[Ships[snum].towedby].warp;
+              
+              if (!SysConf.AllowSlingShot)
+                {               /* only set warp if valid JET - 9/15/97 */
+                  if (Ships[Ships[snum].towedby].warp >= 0.0)
+                    Ships[snum].warp = Ships[Ships[snum].towedby].warp;
+                  else
+                    Ships[snum].warp = 2.0;
+                }
+              else
+                Ships[snum].warp = Ships[Ships[snum].towedby].warp;
 	      
 	      /* Release the tow. */
 	      if ( Ships[Ships[snum].towedby].towing != 0 )
@@ -1439,7 +1448,7 @@ void procUnTow(cpCommand_t *cmd)
               if (Ships[snum].warp >= 0.0)
                 Ships[Ships[snum].towing].warp = Ships[snum].warp;
               else
-                Ships[Ships[snum].towing].warp = 2;
+                Ships[Ships[snum].towing].warp = 2.0;
             }
           else
             Ships[Ships[snum].towing].warp = Ships[snum].warp;

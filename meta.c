@@ -14,7 +14,7 @@
 #include "conf.h"
 #include "meta.h"
 #include "conqcom.h"
-
+#include "protocol.h"
 
 /* convert any pipe chars in a string to underlines */
 void pipe2ul(char *str)
@@ -34,12 +34,20 @@ void pipe2ul(char *str)
 }
 
 /* format: (recieved from a server)
+ *
+ * version 0x0001
  * vers|addr|port|name|srvrvers|motd|totsh|actsh|vacsh|robsh|flags|
  * 11 fields
+ *
+ * version 0x0002
+ * vers|addr|port|name|srvrvers|motd|totsh|actsh|vacsh|robsh|flags|
+ *     protovers|contact|walltime|
+ * 14 fields
+ *
  */
 int str2srec(metaSRec_t *srec, char *buf)
 {
-  const int numfields = 11;
+  const int numfields = 14;     /* ver 2 */
   char *tbuf;                   /* copy of buf */
   char *ch, *chs;
   int fieldno;
@@ -58,7 +66,9 @@ int str2srec(metaSRec_t *srec, char *buf)
   {
     switch (fieldno)
       {
-      case 0:                   /* version - ignored for now */
+      case 0:                   /* meta protocol version */
+        *ch = 0;
+        srec->version = atoi(chs);
         chs = ch + 1;
         fieldno++;
         break;
@@ -151,14 +161,52 @@ int str2srec(metaSRec_t *srec, char *buf)
 
         break;
 
+        /* meta version 0x0002+ */
+      case 11:                  /* server protocol version */
+        *ch = 0;
+        srec->protovers = (Unsgn16)atoi(chs);
+
+        chs = ch + 1;
+        fieldno++;
+
+        break;
+
+      case 12:                  /* contact (email/http/whatever) */
+        *ch = 0;
+        strncpy(srec->contact, chs, META_GEN_STRSIZE - 1);
+
+        chs = ch + 1;
+        fieldno++;
+        break;
+
+      case 13:                  /* contact (email/http/whatever) */
+        *ch = 0;
+        strncpy(srec->walltime, chs, META_GEN_STRSIZE - 1);
+
+        chs = ch + 1;
+        fieldno++;
+        break;
       }
   }
 
   free(tbuf);
 
-  if (fieldno != numfields)
-    return FALSE;             /* something went wrong */
+  switch (srec->version)
+    {
+    case 1:
+      if (fieldno != 11)
+        return FALSE;             /* something went wrong */
+      break;
+
+    case 2:
+      if (fieldno != 14)
+        return FALSE;             /* something went wrong */
+      break;
   
+    default:
+      return FALSE;
+    }
+
   return TRUE;
 }
 
@@ -166,8 +214,8 @@ int str2srec(metaSRec_t *srec, char *buf)
 void srec2str(char *buf, metaSRec_t *srec)
 {
 
-  sprintf(buf, "%u|%s|%d|%s|%s|%s|%d|%d|%d|%d|%u|\n",
-          META_VERSION, 
+  sprintf(buf, "%u|%s|%d|%s|%s|%s|%d|%d|%d|%d|%u|%u|%s|%s|\n",
+          srec->version, 
           srec->altaddr,
           srec->port,
           srec->servername,
@@ -177,7 +225,11 @@ void srec2str(char *buf, metaSRec_t *srec)
           srec->numactive,
           srec->numvacant,
           srec->numrobot,
-          srec->flags);
+          srec->flags,
+          /* meta vers 0x0002+ */
+          srec->protovers,
+          srec->contact,
+          srec->walltime);
 
   return;
 }
@@ -196,6 +248,9 @@ int metaUpdateServer(char *remotehost, char *name, int port)
   int numshipsactive = 0;
   int numshipsvacant = 0;
   int numshipsrobot = 0;
+  struct tm *thetm;
+  time_t thetimet = time(0);
+  char tmbuf[META_GEN_STRSIZE];
 
   if (!remotehost)
     return FALSE;
@@ -226,6 +281,7 @@ int metaUpdateServer(char *remotehost, char *name, int port)
         }
     }
 
+  sRec.version = META_VERSION;
   sRec.numactive = numshipsactive;
   sRec.numvacant = numshipsvacant;
   sRec.numrobot = numshipsrobot;
@@ -244,6 +300,19 @@ int metaUpdateServer(char *remotehost, char *name, int port)
   pipe2ul(sRec.serverver);
   strncpy(sRec.motd, SysConf.ServerMotd, CONF_SERVER_MOTD_SZ);
   pipe2ul(sRec.motd);
+
+  /* meta ver 0x0002+ */
+  sRec.protovers = PROTOCOL_VERSION;
+  
+  strncpy(sRec.contact, SysConf.ServerContact, META_GEN_STRSIZE - 1);
+  pipe2ul(sRec.altaddr);
+  
+  thetm = localtime(&thetimet);
+  snprintf(tmbuf, META_GEN_STRSIZE - 1, "%s", asctime(thetm));
+  i = strlen(tmbuf);
+  if (i > 0)
+    tmbuf[i - 1] = 0;
+  strncpy(sRec.walltime, tmbuf, META_GEN_STRSIZE - 1);
 
   /* all loaded up, convert it and send it off */
   srec2str(msg, &sRec);

@@ -1155,7 +1155,7 @@ static int _chktow(void)
   if ( Ships[snum].towedby != 0 )
     {
       c_strcpy( "But we are being towed by ", cbuf );
-      appship( Ships[snum].towing, cbuf );
+      appship( Ships[snum].towedby, cbuf );
       appchr( '!', cbuf );
       cp_putmsg( cbuf, MSG_LIN2 );
       return FALSE;

@@ -21,6 +21,7 @@
 #include "nMeta.h"
 #include "nConsvr.h"
 #include "gldisplay.h"
+#include "glmisc.h"
 #include "cqkeys.h"
 
 static char *header = "Server List";
@@ -29,9 +30,15 @@ static char headerbuf[BUFFER_SIZE];
 static char header2buf[BUFFER_SIZE];
 static char *eprompt = "Arrow keys to select, [TAB] or [ENTER] to accept, any other key to quit.";
 
-static const int servers_per_page = 10;
+static const int servers_per_page = 8;
 static int flin, llin, clin, pages, curpage;
-static char servervec[META_MAXSERVERS][MAXHOSTNAME + 10]; /* hostname + port */
+
+struct _srvvec {
+  Unsgn16 vers;
+  char hostname[MAXHOSTNAME + 10];
+};
+
+static struct _srvvec servervec[META_MAXSERVERS] = {};
 
 static int nMetaDisplay(dspConfig_t *);
 static int nMetaInput(int ch);
@@ -55,11 +62,15 @@ static void dispServerInfo(dspConfig_t *dsp, metaSRec_t *metaServerList,
   static char buf3[BUFFER_SIZE];
   static char buf4[BUFFER_SIZE];
   static char buf5[BUFFER_SIZE];
+  static char buf6[BUFFER_SIZE];
+  static char buf7[BUFFER_SIZE];
   static char pbuf1[BUFFER_SIZE];
   static char pbuf2[BUFFER_SIZE];
   static char pbuf3[BUFFER_SIZE];
   static char pbuf4[BUFFER_SIZE];
   static char pbuf5[BUFFER_SIZE];
+  static char pbuf6[BUFFER_SIZE];
+  static char pbuf7[BUFFER_SIZE];
   GLfloat x, y, w, h;
   static int inited = FALSE;
   static const int hcol = 2, icol = 11;
@@ -69,7 +80,7 @@ static void dispServerInfo(dspConfig_t *dsp, metaSRec_t *metaServerList,
   x = dsp->ppCol;
   y = (dsp->ppRow * tlin);
   w = (dsp->wW - (dsp->ppCol * 3.0));
-  h = (dsp->ppRow * 5.4);
+  h = (dsp->ppRow * 8.2);
 
   if (!inited)
     {
@@ -94,6 +105,12 @@ static void dispServerInfo(dspConfig_t *dsp, metaSRec_t *metaServerList,
 
       sprintf(pbuf5, "#%d#MOTD: ", MagentaColor);
       sprintf(buf5, "#%d#%%s", NoColor);
+
+      sprintf(pbuf6, "#%d#Contact: ", MagentaColor);
+      sprintf(buf6, "#%d#%%s", NoColor);
+
+      sprintf(pbuf7, "#%d#Time: ", MagentaColor);
+      sprintf(buf7, "#%d#%%s", NoColor);
     }
 
   cprintf(tlin, hcol, ALIGN_NONE, pbuf1);
@@ -116,6 +133,12 @@ static void dispServerInfo(dspConfig_t *dsp, metaSRec_t *metaServerList,
 
   cprintf(tlin, hcol, ALIGN_NONE, pbuf5);
   cprintf(tlin++, icol, ALIGN_NONE, buf5, metaServerList[num].motd);
+
+  cprintf(tlin, hcol, ALIGN_NONE, pbuf6);
+  cprintf(tlin++, icol, ALIGN_NONE, buf6, metaServerList[num].contact);
+
+  cprintf(tlin, hcol, ALIGN_NONE, pbuf7);
+  cprintf(tlin++, icol, ALIGN_NONE, buf7, metaServerList[num].walltime);
 
   drawLineBox(x, y, w, h, CyanColor, 2.0);
 
@@ -143,14 +166,19 @@ void nMetaInit(metaSRec_t *ServerList, int numserv)
 				/* init the servervec array */
   for (i=0; i < nums; i++)
   {
-    sprintf(servervec[i], "%s:%hu", 
+    if (metaServerList[i].version >= 2) /* valid for newer meta protocols */
+      servervec[i].vers = metaServerList[i].protovers;
+    else
+      servervec[i].vers = PROTOCOL_VERSION; /* always 'compatible' */
+
+    snprintf(servervec[i].hostname, (MAXHOSTNAME + 10) - 1, "%s:%hu",
             metaServerList[i].altaddr,
             metaServerList[i].port);
   }
 
   curpage = 0;
 
-  flin = 9;			/* first server line */
+  flin = 11;			/* first server line */
   llin = 0;			/* last server line on this page */
   clin = 0;			/* current server line */
 
@@ -192,15 +220,30 @@ static int nMetaDisplay(dspConfig_t *dsp)
       /* get the server number for this line */
       k = (curpage * servers_per_page) + i; 
       
-      dispmac = servervec[k];
+      dispmac = servervec[k].hostname;
 
       /* highlight the currently selected line */
       if (i == clin)
-        cprintf(lin, col, ALIGN_NONE, "#%d#%s#%d#",
-                RedLevelColor, dispmac, NoColor);
+        {
+          if (servervec[k].vers == PROTOCOL_VERSION)
+            cprintf(lin, col, ALIGN_NONE, "#%d#%s#%d#",
+                    RedLevelColor, dispmac, NoColor);
+          else
+            cprintf(lin, col, ALIGN_NONE, 
+                    "#%d#%s#%d# (unavailable - incompatible protocol)",
+                    BlueColor |CQC_A_BOLD, dispmac, NoColor);
+
+        }
       else
-        cprintf(lin, col, ALIGN_NONE, "#%d#%s#%d#",
-                InfoColor, dispmac, NoColor);
+        {
+          if (servervec[k].vers == PROTOCOL_VERSION)
+            cprintf(lin, col, ALIGN_NONE, "#%d#%s#%d#",
+                    InfoColor, dispmac, NoColor);
+          else
+            cprintf(lin, col, ALIGN_NONE, 
+                    "#%d#%s#%d# (unavailable - incompatible protocol)",
+                    BlueColor, dispmac, NoColor);
+        }
 
       
       lin++;
@@ -301,18 +344,29 @@ static int nMetaInput(int ch)
     case TERM_EXTRA:
 
       if (cInfo.remotehost)
-        free(cInfo.remotehost);
+        {
+          free(cInfo.remotehost);
+          cInfo.remotehost = NULL;
+        }
       
       i = (curpage * servers_per_page) + clin;
-      if ((cInfo.remotehost = strdup(metaServerList[i].altaddr)) == NULL)
-        {
-          clog("strdup(metaServerList[i]) failed");
-          return NODE_EXIT;
-        }
-      cInfo.remoteport = metaServerList[i].port;
 
-      /* transfer to the Consvr node */
-      nConsvrInit(cInfo.remotehost, cInfo.remoteport);
+      if ((metaServerList[i].protovers == PROTOCOL_VERSION) ||
+          metaServerList[i].version < 2) /* too old to know for sure */
+        {
+          if ((cInfo.remotehost = strdup(metaServerList[i].altaddr)) == NULL)
+            {
+              clog("strdup(metaServerList[i]) failed");
+              return NODE_EXIT;
+            }
+          cInfo.remoteport = metaServerList[i].port;
+          
+          /* transfer to the Consvr node */
+          nConsvrInit(cInfo.remotehost, cInfo.remoteport);
+        }
+      else
+        mglBeep();
+
       break;
       
     default:		/* everything else */

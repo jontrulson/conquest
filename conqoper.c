@@ -2990,6 +2990,13 @@ void watch(void)
 		case 'k':
 		  kiss(Context.snum, TRUE);
 		  break;
+                case 'M':		/* strategic/tactical map */
+                  if (SMAP(Context.snum))
+                    SFCLR(Context.snum, SHIP_F_MAP);
+                  else
+                    SFSET(Context.snum, SHIP_F_MAP);
+
+                  break;
 		case 'm':
 		  cucSendMsg( MSG_GOD, TRUE, FALSE );
 		  break;

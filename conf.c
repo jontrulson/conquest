@@ -73,6 +73,8 @@ int GetSysConf(int checkonly)
 	  CONF_SERVER_NAME_SZ);
   strncpy(SysConf.ServerMotd, "Keep your shields up in battle.",
 	  CONF_SERVER_MOTD_SZ);
+  strncpy(SysConf.ServerContact, "root@localhost",
+	  META_GEN_STRSIZE);
 
 				/* start building the filename */
   snprintf(conf_name, sizeof(conf_name)-1, "%s/%s", CONQETC, SYSCONFIG_FILE);
