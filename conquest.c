@@ -43,6 +43,8 @@
 #include "clientlb.h"
 #include "clntauth.h"
 
+#include "meta.h"
+
 #define CLIENTNAME "Conquest"	/* our client name */
 
 static char cbuf[MID_BUFFER_SIZE]; /* general purpose buffer */
@@ -59,17 +61,22 @@ void stopTimer(void);
 void startTimer(void);
 void conqend(void);
 void processPacket(Unsgn8 *buf);
+int selectServer(metaSRec_t *metaServerList, int nums);
 
 void printUsage()
 {
-  printf("Usage: conquest [-s server[:port]] [-r recfile] [ -t ]\n");
+  printf("Usage: conquest [-m ][-s server[:port]] [-r recfile] [ -t ]\n");
+  printf("                [ -M <metaserver> ]\n\n");
+  printf("    -m               query the metaserver\n");
   printf("    -s server[:port] connect to <server> at <port>\n");
   printf("                      default: localhost:1701\n");
   printf("    -r recfile       Record game to <recfile>\n");
   printf("                      recfile will be in compressed format\n");
   printf("                      if conquest was compiled with libz\n");
-  printf("                      support\n\n");
+  printf("                      support\n");
   printf("    -t              telnet mode (no user conf load/save)\n");
+  printf("    -M metaserver   specify alternate <metaserver> to contact.\n");
+  printf("                     default: %s\n", META_DFLT_SERVER);
   return;
 }
 
@@ -92,13 +99,25 @@ int connectServer(char *remotehost, Unsgn16 remoteport)
   int s;
   struct sockaddr_in sa;
   struct hostent *hp;
+  int lin;
 
   if (!remotehost)
     return FALSE;
 
+  /* display the logo */
+  lin = conqlogo();
+
+  lin += 5;
+
   if ((hp = gethostbyname(remotehost)) == NULL) 
     {
-      fprintf(stderr, "conquest: %s: no such host\n", remotehost);
+      clog("conquest: %s: no such host\n", remotehost);
+
+      cprintf(lin, 0, ALIGN_CENTER, "conquest: %s: no such host", 
+              remotehost);
+      putpmt(MTXT_DONE, MSG_LIN2 );
+      iogchar();
+
       return FALSE;
     }
 
@@ -110,22 +129,43 @@ int connectServer(char *remotehost, Unsgn16 remoteport)
 
   if ((s = socket(AF_INET, SOCK_STREAM, 0 )) < 0) 
     {
-      perror("socket");
+      clog("socket: %s", strerror(errno));
+      cprintf(lin, 0, ALIGN_CENTER, "socket: %s", 
+              remotehost);
+      putpmt(MTXT_DONE, MSG_LIN2 );
+      iogchar();
       return FALSE;
     }
 
-  printf("Connecting to host: %s, port %d ...\n",
-	 remotehost, remoteport);
+  clog("Connecting to host: %s, port %d\n",
+       remotehost, remoteport);
+
+  cprintf(lin++, 0, ALIGN_CENTER, "Connecting to host: %s, port %d\n",
+          remotehost, remoteport);
+  cdrefresh();
 
   /* connect to the remote server */
   if (connect(s, &sa, sizeof(sa)) < 0) 
     {
-      perror("connect");
-      printf("Cannot connect to host %s:%d\n", 
-	     remotehost, remoteport);
-      printf("Is there a conquestd server running there?\n");
+      clog("connect: %s", strerror(errno));
+      clog("Cannot connect to host %s:%d\n", 
+           remotehost, remoteport);
+
+      cprintf(lin++, 0, ALIGN_CENTER, "connect: %s", strerror(errno));
+      cprintf(lin++, 0, ALIGN_CENTER, "Cannot connect to host %s:%d\n",
+              remotehost, remoteport);
+      cprintf(lin++, 0, ALIGN_CENTER, 
+              "Is there a conquestd server running there?\n");
+      putpmt(MTXT_DONE, MSG_LIN2 );
+      iogchar();
+
       return FALSE;
-  }
+    }
+
+  cprintf(lin++, 0, ALIGN_CENTER, "Connected!");
+  cdrefresh();
+
+  c_sleep(2.0);
 
   cInfo.serverDead = FALSE;
   cInfo.sock = s;
@@ -138,9 +178,15 @@ int main(int argc, char *argv[])
 {
   int i;
   char *ch;
+  int wantMetaList = FALSE;     /* wants to see a list from metaserver */
+  int serveropt = FALSE;        /* specified a server with '-s' */
+  int nums;                     /* num servers from metaGetServerList() */
+  char *metaServer = META_DFLT_SERVER; 
+  metaSRec_t *metaServerList;   /* list of servers */
+
   Context.entship = FALSE;
   Context.recmode = RECMODE_OFF;
-  Context.updsec = 2;		/* dflt - 2/sec */
+  Context.updsec = 5;		/* dflt - 5/sec */
 
   cInfo.sock = -1;
   cInfo.state = CLT_STATE_PREINIT;
@@ -152,13 +198,18 @@ int main(int argc, char *argv[])
   if (!getLocalhost(cInfo.localhost, MAXHOSTNAME))
     return(1);
 
-  cInfo.remotehost = "localhost"; /* default to your own server */
-
+  cInfo.remotehost = strdup("localhost"); /* default to your own server */
 
   /* check options */
-  while ((i = getopt(argc, argv, "s:r:t")) != EOF)    /* get command args */
+  while ((i = getopt(argc, argv, "mM:s:r:t")) != EOF)    /* get command args */
     switch (i)
       {
+      case 'm':
+        wantMetaList = TRUE;
+        break;
+      case 'M':
+        metaServer = optarg;
+        break;
       case 's':                 /* [host[:port]] */
 	cInfo.remotehost = (Unsgn8 *)strdup(optarg);
         if (!cInfo.remotehost)
@@ -181,6 +232,8 @@ int main(int argc, char *argv[])
         else
           cInfo.remoteport = CN_DFLT_PORT;
         
+        serveropt = TRUE;
+
 	break;
       case 'r': 
 	if (recordOpenOutput(optarg, FALSE))
@@ -220,18 +273,33 @@ int main(int argc, char *argv[])
 
   Context.updsec = UserConf.UpdatesPerSecond;
   
-  /* connect to the host */
-  if (!connectServer(cInfo.remotehost, cInfo.remoteport))
-    return(1);
-  
-  printf("Connected!\n");
-
-  /* now we need to negotiate. */
-  if (!hello())
+  if (serveropt && wantMetaList)
     {
-      clog("conquest: hello() failed\n");
-      exit(1);
+      printf("-m ignored, since -s was specified\n");
+      wantMetaList = FALSE;
     }
+  else if (wantMetaList)
+    {                           /* get the metalist and display */
+      printf("Querying metaserver at %s\n",
+             metaServer);
+      nums = metaGetServerList(metaServer, &metaServerList);
+
+      if (nums < 0)
+        {
+          printf("metaGetServerList() failed\n");
+          return 1;
+        }
+
+      if (nums == 0)
+        {
+          printf("metaGetServerList() reported 0 servers online\n");
+          return 1;
+        }
+
+      printf("Found %d server(s)\n",
+             nums);
+    }
+
 
   /* a parallel universe, it is */
 
@@ -268,6 +336,45 @@ int main(int argc, char *argv[])
   Context.histslot = ERR;
   Context.lasttang = Context.lasttdist = 0;
   Context.lasttarg[0] = EOS;
+
+  if (wantMetaList)
+    {                           /* list the servers */
+      i = selectServer(metaServerList, nums);
+
+      if (i < 0)
+        {                       /* didn't pick one */
+          cdend();
+          return 1;
+        }
+
+      if (cInfo.remotehost)
+        free(cInfo.remotehost);
+
+      if ((cInfo.remotehost = strdup(metaServerList[i].altaddr)) == NULL)
+        {
+          clog("strdup(metaServerList[i]) failed");
+          cdend();
+          return 1;
+        }
+
+      cInfo.remoteport = metaServerList[i].port;
+
+    }
+
+
+  /* connect to the host */
+  if (!connectServer(cInfo.remotehost, cInfo.remoteport))
+    {
+      cdend();
+      return(1);
+    }
+  
+  /* now we need to negotiate. */
+  if (!hello())
+    {
+      clog("conquest: hello() failed\n");
+      exit(1);
+    }
 
 #ifdef DEBUG_FLOW
   clog("%s@%d: main() welcoming player.", __FILE__, __LINE__);
@@ -665,13 +772,7 @@ void command( int ch )
 /*    conqds( multiple, switchteams ) */
 void conqds( int multiple, int switchteams )
 {
-  int i, col, lin, lenc1;
-  string c1=" CCC    OOO   N   N   QQQ   U   U  EEEEE   SSSS  TTTTT";
-  string c2="C   C  O   O  NN  N  Q   Q  U   U  E      S        T";
-  string c3="C      O   O  N N N  Q   Q  U   U  EEE     SSS     T";
-  string c4="C   C  O   O  N  NN  Q  Q   U   U  E          S    T";
-  string c5=" CCC    OOO   N   N   QQ Q   UUU   EEEEE  SSSS     T";
-  
+  int i, col, lin;
   extern char *ConquestVersion;
   extern char *ConquestDate;
   int FirstTime = TRUE;
@@ -691,26 +792,8 @@ void conqds( int multiple, int switchteams )
   cdclear();
   
   /* Display the logo. */
-  lenc1 = strlen( c1 );
-  col = (Context.maxcol-lenc1) / 2;
-  lin = 2;
-  cprintf( lin,col,ALIGN_NONE,"#%d#%s", RedColor | A_BOLD, c1);
-  lin++;
-  cprintf( lin,col,ALIGN_NONE,"#%d#%s", RedColor | A_BOLD, c2);
-  lin++;
-  cprintf( lin,col,ALIGN_NONE,"#%d#%s", RedColor | A_BOLD, c3);
-  lin++;
-  cprintf( lin,col,ALIGN_NONE,"#%d#%s", RedColor | A_BOLD, c4);
-  lin++;
-  cprintf( lin,col,ALIGN_NONE,"#%d#%s", RedColor | A_BOLD, c5);
+  lin = conqlogo();
 
-  /* Draw a box around the logo. */
-  lin++;
-  attrset(A_BOLD);
-  cdbox( 1, col-2, lin, col+lenc1+1 );
-  attrset(0);
-  
-  lin++;
   if ( ConqInfo->closed )
     cprintf(lin,0,ALIGN_CENTER,"#%d#%s",RedLevelColor,"The game is closed.");
   else
@@ -3820,4 +3903,226 @@ void conqend(void)
 
   return;
   
+}
+
+void dispServerInfo(int lin, metaSRec_t *metaServerList, int num)
+{
+  char buf[MID_BUFFER_SIZE];
+
+  cdline ( lin, 0, lin, Context.maxcol );
+  lin++;
+
+  sprintf(buf, "#%d#Server: #%d#  %%s", MagentaColor, NoColor);
+  cprintf(lin++, 0, ALIGN_NONE, buf, metaServerList[num].servername);
+
+  sprintf(buf, "#%d#Version: #%d# %%s", MagentaColor, NoColor);
+  cprintf(lin++, 0, ALIGN_NONE, buf, metaServerList[num].serverver);
+
+  sprintf(buf, 
+	  "#%d#Status: #%d#  Ships #%d#%%d/%%d #%d#"
+	  "(#%d#%%d #%d#active, #%d#%%d #%d#vacant, "
+	  "#%d#%%d #%d#robot)",
+	  MagentaColor, NoColor, CyanColor, NoColor,
+	  CyanColor, NoColor, CyanColor, NoColor, 
+	  CyanColor, NoColor);
+
+  cprintf(lin++, 0, ALIGN_NONE, buf,
+          (metaServerList[num].numactive + metaServerList[num].numvacant +
+           metaServerList[num].numrobot),
+	  metaServerList[num].numtotal, 
+          metaServerList[num].numactive, 
+	  metaServerList[num].numvacant, metaServerList[num].numrobot);
+
+  sprintf(buf, "#%d#Flags: #%d#   %%s", MagentaColor, NoColor);
+  cprintf(lin++, 0, ALIGN_NONE, buf, 
+          clntServerFlagsStr(metaServerList[num].flags));
+
+  sprintf(buf, "#%d#MOTD: #%d#    %%s", MagentaColor, NoColor);
+  cprintf(lin++, 0, ALIGN_NONE, buf, metaServerList[num].motd);
+  cdline ( lin, 0, lin, Context.maxcol );
+  return;
+}
+
+
+int selectServer(metaSRec_t *metaServerList, int nums)
+{
+  int i, k;
+  static char *header = "Server List";
+  static char *header2fmt = "(Page %d of %d)";
+  static char headerbuf[BUFFER_SIZE];
+  static char header2buf[BUFFER_SIZE];
+  static char *eprompt = "Arrow keys to select, [TAB] to accept, any other key to quit.";
+  int Done = FALSE;
+  int ch;
+  char *dispmac;
+  int lin = 0, col = 0, flin, llin, clin, pages, curpage;
+  const int servers_per_page = 10;
+  char servervec[META_MAXSERVERS][MAXHOSTNAME + 10]; /* hostname + port */
+
+				/* this is the number of required pages,
+				   though page accesses start at 0 */
+  if (nums >= servers_per_page)
+    {
+      pages = nums / servers_per_page;
+      if ((nums % servers_per_page) != 0)
+	pages++;		/* for runoff */
+    }
+  else
+    pages = 1;
+
+
+				/* init the servervec array */
+  for (i=0; i < nums; i++)
+  {
+    sprintf(servervec[i], "%s:%d", 
+            metaServerList[i].altaddr,
+            metaServerList[i].port);
+  }
+
+  curpage = 0;
+
+  cdclear();			/* First clear the display. */
+
+  flin = 9;			/* first server line */
+  llin = 0;			/* last server line on this page */
+  clin = 0;			/* current server line */
+
+
+  while (Done == FALSE)
+    {
+      sprintf(header2buf, header2fmt, curpage + 1, pages);
+      sprintf(headerbuf, "%s %s", header, header2buf);
+
+      cdclrl( 1, MSG_LIN2);	/* clear screen area */
+      lin = 1;
+      col = ((int)(cdcols() - strlen(headerbuf)) / 2);
+
+      cprintf(lin, col, ALIGN_NONE, "#%d#%s", NoColor, headerbuf);
+      
+      lin = flin;
+      col = 1;
+      
+      i = 0;			/* start at index 0 */
+
+				/* figure out the last editable line on
+				   this page */
+
+      if (curpage == (pages - 1)) /* last page - might be less than full */
+	llin = (nums % servers_per_page);	/* ..or more than empty? ;-) */
+      else
+	llin = servers_per_page;
+
+      i = 0;
+      while (i < llin)
+	{			/* display this page */
+				/* get the server number for this line */
+	  k = (curpage * servers_per_page) + i; 
+
+          dispmac = servervec[k];
+
+	  cprintf(lin, col, ALIGN_NONE, "#%d#%s#%d#",
+		  InfoColor, dispmac, NoColor);
+
+	  lin++;
+	  i++;
+	}
+
+				/* now the editing phase */
+      cdclrl( MSG_LIN1, 2  );
+      cdputs(eprompt, MSG_LIN1, 1);
+
+      if (clin >= llin)
+	clin = llin - 1;
+
+      dispServerInfo(2, metaServerList, clin);
+      cdmove(flin + clin, 1); 
+      
+      /* Get a char */
+      ch = iogchar();
+      
+
+      switch(ch)
+	{
+	case KEY_UP:		/* up */
+	case KEY_LEFT:
+	case 'w':
+	case 'k':
+	  clin--;
+	  if (clin < 0)
+	    {
+	      if (pages != 1)
+		{
+		  curpage--;
+		  if (curpage < 0)
+		    {
+		      curpage = pages - 1;
+		    }
+		}
+
+				/* setup llin  for current page */
+	      if (curpage == (pages - 1)) 
+		llin = (nums % servers_per_page);
+	      else
+		llin = servers_per_page;
+
+	      clin = llin - 1; 
+	    }
+	  break;
+
+	case KEY_DOWN:		/* down */
+	case KEY_RIGHT:
+	case 'x':
+	case 'j':
+	  clin++;
+	  if (clin >= llin)
+	    {
+	      if (pages != 1)
+		{
+		  curpage++;
+		  if (curpage >= pages)
+		    {
+		      curpage = 0;
+		    }
+		}
+	      
+	      clin = 0; 
+	    }
+	  break;
+
+	case KEY_PPAGE:		/* prev page */
+	  if (pages != 1)
+	    {
+	      curpage--;
+	      if (curpage < 0)
+		{
+		  curpage = pages - 1;
+		}
+	    }
+
+	  break;
+
+	case KEY_NPAGE:		/* next page */
+	  if (pages != 1)
+	    {
+	      curpage++;
+	      if (curpage >= pages)
+		{
+		  curpage = 0;
+		}
+	    }
+
+	  break;
+
+	case TERM_EXTRA:	/* change something */
+          return ((curpage * servers_per_page) + clin);
+	  break;
+
+	default:		/* everything else */
+          return ERR;
+	  break;
+	}
+
+    }
+
+  return TRUE;
 }

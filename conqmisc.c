@@ -2484,6 +2484,41 @@ char *glname(void)
 
   return pwname;
 }
-      
 
+/* display the conquest logo. returns last line number following */
+int conqlogo(void)
+{
+  int col, lin, lenc1;
+  string c1=" CCC    OOO   N   N   QQQ   U   U  EEEEE   SSSS  TTTTT";
+  string c2="C   C  O   O  NN  N  Q   Q  U   U  E      S        T";
+  string c3="C      O   O  N N N  Q   Q  U   U  EEE     SSS     T";
+  string c4="C   C  O   O  N  NN  Q  Q   U   U  E          S    T";
+  string c5=" CCC    OOO   N   N   QQ Q   UUU   EEEEE  SSSS     T";
+  
+  /* First clear the display. */
+  cdclear();
+  
+  /* Display the logo. */
+  lenc1 = strlen( c1 );
+  col = (Context.maxcol-lenc1) / 2;
+  lin = 2;
+  cprintf( lin,col,ALIGN_NONE,"#%d#%s", RedColor | A_BOLD, c1);
+  lin++;
+  cprintf( lin,col,ALIGN_NONE,"#%d#%s", RedColor | A_BOLD, c2);
+  lin++;
+  cprintf( lin,col,ALIGN_NONE,"#%d#%s", RedColor | A_BOLD, c3);
+  lin++;
+  cprintf( lin,col,ALIGN_NONE,"#%d#%s", RedColor | A_BOLD, c4);
+  lin++;
+  cprintf( lin,col,ALIGN_NONE,"#%d#%s", RedColor | A_BOLD, c5);
 
+  /* Draw a box around the logo. */
+  lin++;
+  attrset(A_BOLD);
+  cdbox( 1, col-2, lin, col+lenc1+1 );
+  attrset(0);
+  
+  lin++;
+
+  return lin;
+  }

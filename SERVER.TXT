@@ -7,215 +7,258 @@
          |  CCC    OOO   N   N   QQ Q   UUU   EEEEE  SSSS     T   |
          +--------------------------------------------------------+
 
-         See README-DEV-RELEASE.txt for the latest info on this
-         development release.  The info below has not been updated yet
-         to reflect the new version.
+   So.  You want to run a Conquest Server over the internet, eh?  Then
+   this is the file to read.  
 
-	So.  You want to run a Conquest Server over the internet, eh?
-Then this is the file to read.  It gives you an overview of how to
-setup and manage one, as well as other differences (user naming for
-example) that you'll notice and need to know about.  Also some
-cautions to take to avoid potential security problems.  Conquest has
-been tested rather well, and no security issues are known if
-configured and installed properly.
+   It gives you an overview of how to setup and manage one, as well as
+   other things to keep in mind.  
 
-	Before reading this file, you may want to read the README,
-INSTALL, conqnews.doc, and conquest.doc files so that you have an idea
-of what Conquest is, and how to play.
+   Before reading this file, you may want to read the README, INSTALL,
+   conqnews.doc, and conquest.doc files so that you have an idea of
+   what Conquest is, and how to play.
+
 
 CONTENTS:
 
-        ### OVERVIEW
-	    ## SERVER MODE IN CONQUEST
-	    ## USERNAME DIFFERENCES BETWEEN LOCAL AND REMOTE USERS
-	### SETTING UP A SERVER
-	    ## EXPIRING USERS
-	       # DISABLING EXPIRATION OF USERS
-	    ## .CONQUESTRC FILES
+    ### Overview
+    ### Setting up a server
+         ## running a normal server
+         ## notifying the metaserver
+         ## providing telnet access to your server (optional)
+	 ## Expiring users
+	    # Disabling expiration of users
+         ## Examples
 
 ### OVERVIEW
 
-	As of Version 7.0 of Conquest, many enhancements were made to
-make it easier for Conquest operators to run games over the internet
-(via telnet).  In order to do this prior to 7.0, an operator would
-have to create an account on the server for the user to login to.  The
-operator would define the user's account shell to be the Conquest
-executable.  Then, when ever the user logged into the server, they
-would be put directly into Conquest.  
+    With version 8.0 of Conquest, a great deal of work has gone into
+    making Conquest a true client/server game playable over the
+    Internet (or just your local LAN).  
 
-	Although this worked quite well, it made it difficult for new
-users to get on, since a prospective player would have to specifically
-request an account and a password, and wait for the operator to create
-and setup the account before the user could play.  In addition, any
-user that wanted to change their options (in ~/.conquestrc) would have
-to send those changes to the operator via email for him to install,
-adding additional delay.
+    Conquest has two main parts, the server component (conquestd) and
+    the curses client (conquest).
 
-	Conquest version 7.0 addresses these problems by allowing the
-server operator to create a single user account ("conquest" by default
-- see defs.h), that all players can telnet to, identify themselves to
-Conquest, and play.  Also, there is a new (O)ptions Menu that is
-available in the conquest/conqoper main menus, as well as when playing
-the game.  The options menu allows users (and operators, in the case
-of conqoper) to change their ~/.conquestrc settings, edit macros, view
-compile time options and view system-wide conquestrc options.
+    To run a server, you must run the conquestd program.
 
+    Clients then connect to your server and the game is played.
 
-## SERVER MODE IN CONQUEST
+### Setting up a server
 
-	First some terminology and concepts.  I'll refer to the
-'conquest' account mentioned above as the "server account".  It
-doesn't have to actually be 'conquest', but I highly recommend it to
-avoid confusion and to make sure remote players know how to get into
-the Conquest server account once they actually telnet to your machine.
+## running a normal server
 
-	If you want to use an account other than 'conquest', you'll
-need to change the 'CONQUEST_USER' #define in defs.h and recompile.
-Oh, and be sure to tell your users the account (and password if any)
-to get in ;-)
+    conquestd is used to provide a Conquest game.  Even if all you
+    want to do is play by yourself on your own machine, you will need
+    to run conquestd in order to play.
 
-	A 'local' user is defined as a user with a shell account on
-the machine on which Conquest is installed.  Such users run Conquest
-by typing the 'conquest' command at their shell prompt.  In any user
-list produced by Conquest, their user name will always be the same as
-their account name.  In addition, such users are taken directly to the
-Conquest main menu, without any Conquest-specific authentication.
-This is the way Conquest has always worked (previous to 7.0, *all*
-users were considered 'local' users), so local users shouldn't notice
-anything different in getting into the game.
+    If all you want to do is use conquest to play on someones elses
+    server, then you do not need to be reading this document. :)
 
-	New with version 7.0, a 'remote' user is a user who accesses
-Conquest by logging into the machine's 'conquest' server account via
-telnet, modem, the console, or whatever.  When Conquest starts up, it
-checks to see which user it is running as.  If it determines that the
-user is the same as CONQUEST_USER (defined as 'conquest' by default in
-defs.h), it then assumes that the user is a 'remote' user.  
+    conquestd supports a variety of options outlined below:
 
-	When Conquest detects a remote user, it brings up a Conquest
-login screen asking the user to login.  This is sort of modeled after
-netrek's authentication mechanism.  If the user specifies a username
-that exists, it prompts for a password, and if correct, puts the
-player at the main menu.  If the username specified doesn't exist, the
-user is asked if this is a new user, and if so, prompts for the
-password that user wants to use to get into the game.  No reserved
-generic 'guest' account (ala netrek) is provided by Conquest, but it
-could be, if there is sufficient interest in providing this ability.
+        $ conquestd -?
+        Usage: conquestd [ -d ] [ -l ] [ -p port ] [ -u user ]
+                         [ -m ] [ -M metaserver ] [ -N myname ]
 
-	The usernames that remote users select and use to play has
-nothing to do with any real accounts on your system.  These users and
-their passwords and other information are stored in the common block.
+        -d            daemon mode
+        -l            listen for local connections only
+        -p port       specify port to listen on
+                      default is 1701
+        -m            notify the metaserver (conquest.radscan.com)
+        -M metaserver specify an alternate metaserver to contact
+        -N myname     explicitly specify server name 'myname' to metaserver
+        -u user       run as user 'user'.
 
+    In it's simplest (and insecure) form, you can simply run:
 
-## USERNAME DIFFERENCES BETWEEN LOCAL AND REMOTE USERS
+       $ conquest -d
 
-	To avoid confusion between local usernames and remote
-usernames, an '@' symbol is prefixed to the username for all remote
-users in any output produced by conquest or conqoper that mentions
-usernames.  This is for information purposes only, and the remote user
-never has to precede his username with '@' when logging in, for
-example.
+       This will start conquestd, which will fork itself into the
+       background and run as your user id.
 
-	This syntax also allows the operator to distinguish between
-adding, editing, or resigning local and remote users.  For example if
-the operator wants to modify the characteristics of a local user
-'jon', s/he simply types 'jon' when prompted for the username of the
-player to edit.  If there was a remote user who selected 'jon' as
-their username as well, and that's who the operator wanted to modify,
-s/he would enter '@jon' when prompted for the username to edit.  This
-also eliminates confusion between local and remote usernames that are
-the same, such as if a remote user selects 'root' as their username.
-It is easy to determine whether a user is local or remote by looking
-for the '@' in front of the username in the (U)ser List for example.
+       It will listen on the default port (1701) for client
+       connections, and spawn a new conquestd for each client
+       connection.  It will be available to anyone who can connect to
+       TCP port 1701 on your machine.
 
+    SECURITY NOTE: I would only run a server this way if no one else
+    from the Internet will be able to connect (if you are behind a
+    good firewall for example).  This is more INSECURE since conquestd
+    will be running as your uid.  Read further for a more secure way
+    to run the server.
 
-### SETTING UP A SERVER
+    For the secure case, I would start conquestd as root, and have it
+    run as user 'nobody' by passing the '-u user' option on the
+    command line.  Of course you can create and use some other
+    non-privileged, non-interactive user for this task as well.
 
-	Setting up a server is easy.  In a nutshell:
+    Something like the following is a good idea:
 
-	1. Compile and install Conquest as per the BUILDING section in
-the INSTALL file.  Make sure it runs normally by typing 'conquest' and
-goofing off for a little while.
+        # conquest -d -u nobody
 
-	2. Create the 'conquest' account on your system using whatever
-means are appropriate for your system.  On UnixWare and newer
-Linux's, I use something like 'useradd conquest'.
+    This will have conquestd setuid() permanently to user 'nobody'
+    before beginning operations.  On most unix systems, user 'nobody'
+    has no home directory, password, or priviliges, and therefore is a
+    safe user id to run under.
 
-	   NOTE: There is no requirement that the 'conquest' user has
-to be a member of the 'conquest' group (ie: a Conquest Operator).  It
-is OK to do this, but for maximum isolation, I recommend against it.
+    You must be the root user in order to use the '-u' option.
 
-	3. Set the 'conquest' user's shell to be the Conquest
-executable.  Doing this insures that when someone logs into 'conquest'
-they are sent directly into the game's login screen.  Also, if
-Conquest should ever crash (which has never happened to my knowlege
-;-), the user will be automatically logged out of the system.  There
-is no way I'm aware of that a Conquest player could ever get to a
-command shell if you set it up this way (since conquest *is* the
-user's shell).
+    DO NOT run conquestd as the root user itself.  Although the code
+    *should* be safe, don't take my word for it.
+    
+## notifying the metaserver
 
-	   On UnixWare I can do something like 'usermod -s
-/opt/bin/conquest conquest' to do this.
+   If you are going to run a server that will be available to the
+   public via the internet, you should pass the '-m' option to
+   conquestd when you start it.
+
+   When running with the '-m' option, conquestd will contact the
+   Conquest Meta Server running at conquest.radscan.com, and announce
+   your server, so that other people will know about it.
+
+   Every 2 minutes or so, it will update the meta server with various
+   particulars of your server (like how many players are currently
+   connected, what flags you support, what your server name and MOTD
+   are, etc).
+
+   This way, other people can find out about your server and connect
+   to it to play.
+
+   The list of currently active servers can be seen by running
+   'conquest -m', or by pointing your web browser to
+
+      http://radscan.com/cgi-bin/conqmeta.pl
+
+   If you want to be primitive, you can see the current list of
+   servers in raw format by:
+
+      telnet conquest.radscan.com 1700
+
+   Of course, make sure that your server is actually reachable from
+   the internet before notifying the Meta server.  
 
 
-	4. set the password for the 'conquest' account.  I recommend
-that you either: 
+## providing telnet access to your server (optional)
 
-		A) set no password (the user goes straight in after
-typing the username at the 'login:' prompt).  
+   In addition to the normal way of connecting to a Conquest server,
+   some server operators also like to provide a telnet'able interface.
+   I do this myself for those who do not want to download the client
+   and build Conquest, or for those who are on non-unix computers and
+   can't run the client even if they wanted to.
 
-		B) Set the password to empty (so a user enters
-[RETURN] at the 'password:' prompt), or 
+   NOTE: You still need to setup a normal server as described above in
+   addition to the instructions below.
 
-		C) set the password to 'conquest'
+   To run a telnet'able server, you need to create an account on your
+   machine that people will log into when they telnet to your machine.
 
-	   In that order... After all you want to make it easy for
-people to get into the game, right?
+   I use 'conquest' with a password of conquest.
 
-	5. Test it out.  Try 'telnet localhost', login as 'conquest',
-and enter whatever password you defined in step 4.  You should wind up
-at the Conquest login screen.  Here you choose a username (if you
-don't have one already), give a password, and you should be at the
-Conquest main menu.  Enter the game and blow up some things ;-)
+   In a nutshell:
+
+   1. Compile and install Conquest as per the BUILDING section in the
+      INSTALL file.  Make sure it runs normally by typing 'conquest'
+      and goofing off for a little while.
+
+   2. Create the 'conquest' account on your system using whatever
+      means are appropriate for your system.  On UnixWare and newer
+      Linux's, I use something like 'useradd conquest'.
+
+   3. Set the 'conquest' user's shell to be '/full/path/to/conquestsh'.
+      Doing this insures that when someone logs into 'conquest' they
+      are sent directly into the game's login screen.  Also, if
+      Conquest should ever crash (which has never happened to my
+      knowlege ;-), the user will be automatically logged out of the
+      system.  There is no way I'm aware of that a Conquest player
+      could ever get to a command shell if you set it up this way
+      (since conquest itself is the user's shell).
+
+      On UnixWare I can do something like 'usermod -s
+      /opt/bin/conquestsh conquest' to do this. 
+
+      NOTE: You can edit and recompile conquestsh.c on your system if
+      you wish to change the default options it will pass to conquest.
+      It's a very simple program.
+
+      By default, conquestsh will exec '/full/path/to/conquest -t -s
+      localhost'.
+
+   4. set the password for the 'conquest' account.  I recommend that
+      you either:
+
+          A) set no password (the user goes straight in after typing
+             the username at the 'login:' prompt).
+
+          B) Set the password to empty (so a user enters [RETURN] at
+             the 'password:' prompt), or
+
+          C) set the password to 'conquest'
+
+      In that order... After all you want to make it easy for people
+      to get into the game, right?
+
+    5. Test it out.  Try 'telnet localhost', login as 'conquest', and
+       enter whatever password you defined in step 4.  You should wind
+       up at the Conquest login screen.  Here you choose a username
+       (if you don't have one already), give a password, and you
+       should be at the Conquest main menu.  Enter the game and blow
+       up some things ;-)
 
 
-## EXPIRING USERS
-
-	By default, whenever a user enters Conquest (local or
-remote), an autoexpire is run to locate and 'resign' all inactive
-remote users.  
-
-	A user is expired: 
-
-		A) if the user is a remote user - no expiration is ever done on
-local users.
-
-		B) the user hasn't entered the game in
-'user_expiredays' days, which is set in the system-wide conquestrc
-file. 
-
-		C) the user isn't currently flying a ship.
-
-	If all of these conditions are met, the remote user is
-resigned from the game.
+   NOTE: although telnet users will be able to change their options
+   from the conquest Options menu, they will not be abe to save them.
+   Sorry.
 
 
-# DISABLING EXPIRATION OF USERS
+## Expiring users
 
-	If you wish to disable expiration altogether, set
-'user_expiredays' equal to 0 in the system-wide conquestrc file. 
+   By default, whenever a user logs into Conquest, an autoexpire is
+   run to locate and 'resign' all inactive remote users.
+
+   A user is expired: 
+
+     A) if the user is a non OPER or non robot user - no expiration is
+        ever done on these users.
+
+     B) the user hasn't entered the game in 'user_expiredays' days,
+        which is set in the system-wide conquestrc file.
+
+     C) the user isn't currently flying a ship.
+
+   If all of these conditions are met, the remote user is resigned
+   from the game.
 
 
-## .CONQUESTRC FILES
+# Disabling expiration of users
 
-	For remote users, .conquestrc files are stored in the
-'conquest' home directory.  They are named as follows: 
+  If you wish to disable expiration altogether, set 'user_expiredays'
+  equal to 0 in the system-wide conquestrc file, or via the Options
+  menu in conqoper.
 
-	.conquestrc.<unum>
+### Examples
 
-	where <unum> is the remote user's user number.
+    Here are a few examples for starting the server (the '#' prompt
+    implies you are running these as root):
 
-	For local users, it's always ~/.conquestrc
+    # conquest -d -u nobody
 
+      Runs a server as user nobody.
 
+    # conquest -d -u nobody -l
+
+      Runs a server as user nobody.  Only local clients can connect.
+
+    # conquest -d -u nobody -m
+
+      Runs a server as user nobody.  Notifies the Conquest Meta server
+      about your server.
+
+    # conquest -d -u nobody -m -N conquest.radscan.com
+
+      Runs a server as user nobody, notifies the Conquest Meta server
+      of the game, and tells the metaserver that the address
+      'conquest.radscan.com' is the address of your server, as seen from
+      the internet.
+
+$Id$
 	
 

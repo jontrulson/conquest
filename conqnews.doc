@@ -9,6 +9,416 @@
 
                               Conquest News
 
+Version 7.2h (devel - prerelease) 12/7/2003
+
+    7.2h
+
+    - The client/server release.  Much has changed.  Read the docs
+      (README, SERVER.TXT, etc) if you really must know all the
+      details. 
+
+    - added meta server browser into conquest.  To get a list of
+      servers registered with the meta server, and select one to play
+      use the '-m' option to conquest.
+
+        $ conquest -m
+
+    - updated documentation, for release.
+
+    7.2e, 7.2f, 7.2g,
+
+    - various bug fixes
+
+    7.2d
+
+    - merge of CS-12 (client/server branch) into main branch (7.2d)
+
+    - removed '-p <port>' option from conquest.  To specify a port
+      other than the default, add it to the server name seperated
+      by a colon.  For example, to connect to a server at
+      conquest.radscan.com, port 1702, use:
+
+        conquest -s conquest.radscan.com:1702
+
+    - added meta server (conqmetad) and functionality to conquestd,
+      based on a suggestion and some ideas from Josef Jahn.
+
+      - meta server listens on TCP and UDP port 1700.  The UDP port is
+        incoming only, and is used to recieve updates from
+        conquestd's.  TCP is outbound only, and will dump the current
+        server list and their stats ('|' delimited) upon connect.
+
+           Try the cgi script at
+           http://radscan.com/cgi-bin/conqmeta.pl, or run conquest
+           with the '-m' option.
+
+    - See README and SERVER.TXT for server configuration and options.
+
+    - fixed conquestd and conquest to improve responsivness.  conquest
+      will now process packets as soon as they are received regardless
+      of the update rate, instead of wating for a timer cycle.
+
+          conquestd updates the client whenever the client does
+          something (raise shields, etc).  
+
+          These changes made a huge diff in responsiveness to
+          commands, especially at lower update rates. Sorry about that
+          oversight :)
+
+    - client now processes incoming packets while in help, userlist,
+      etc, rather than only when at the battle screen.
+
+
+    7.2c-cs-12
+
+    - feedback messages are no longer recorded.  Tersables are only
+      recorded if the user has them enabled when the recording was
+      made.  Server recordings never contain Tersables.
+
+    - notify opers when someone enters conqoper
+
+    - opers get all messages sent to GOD
+
+    - fixed problem with reserved ship slots and no valid process
+      controlling them in newship().  Also, when disconnecting from
+      the main menu, turns off the ship before exiting.
+
+    - clean up of the conf stuff
+
+    - send relevant User packet *before* sending a Hist packet.
+
+    - new '-t' option for conquest.
+
+      When conquest is run with the '-t' flag, then no attempt will be
+      made to read or write a user config file.  This is useful for
+      people who still want to run telnetable servers, yet prevent
+      such users from stomping over each other's settings.
+
+      Such users always use the default options, which means they will
+      need to set them to their preferences whenever they enter the
+      game, since they are never saved.  If you (the user) find this
+      annoying, then download the src, and use the client to connect
+      to the server properly :).
+
+    - new 'conquestsh' program for telnetable servers.  When setting
+      up a telnetable server, use 'conquestsh' as the user's shell
+      program.  conquestsh exec's the conquest client bianary, passing
+      the '-t' flag, and the '-s localhost' flag.  Feel free to edit
+      this program for your site, for example if you want the
+      telnetable client to connect to a different server than
+      'localhost'.
+
+    - removed GL/X11 dependancies that snuck in.  We aren't ready for
+      that yet.
+
+    7.2c-cs-11
+
+    This is the first release of a development version of the
+    client/server conquest.  There have been quite a few changes from
+    v7.x!  Please read this document for the juicy details ;-)
+
+    The common block revision has changed, making this version
+    incompatible with previous versions.  
+
+    Of course the major change in this release is that conquest uses a
+    network based client server model.  There is now a seperate
+    conquestd program that listens to network requests from clients
+    (conquest).  If you want to run a game on your machine, you will
+    need to start conquestd like so:
+
+	/opt/conqnet/bin/conquestd &
+
+    Please read SERVER.TXT for intructions on how to run a secure
+    game, and the options available.
+
+    I would do this from a seperate non-privileged account of course,
+    if you intend to invite the unwashed internet masses onto your
+    server to play.
+
+    If you just type 'conquest', it will try to attach to the conquest
+    daemon on your local host.  To connect to a remote host, use the
+    '-s' switch.
+
+    This will take you to the login screen.  Choose a username,
+    password etc, login, and kick some ass.
+
+    I have setup a public server here for this release that you can
+    connect to like so:
+
+	conquest -s conquest.radscan.com
+
+    Once an official 'stable' release is made, the old telnet server
+    there (v7.2) will be pointed toward the new version, for those who
+    don't want to use the client.
+
+    There may eventually be multiple servers running (one for
+    experienced players, for example, running on a different port.)
+
+    - conquest is now client/server.  In the old days, the conquest
+      binary had to be run on the same machine as the common block
+      (universe).  In order to run a 'server', a telnet interface was
+      used so remote players could connect.
+
+      Now, conquest is a client that can connect over the network to
+      any conquest server (conquestd).  In the future, there will be a
+      graphical client, using OpenGL to render the main battle
+      screen.  It won't be a 6 DOF combat simulator, but it should
+      look alot nicer than the curses interface :)
+
+      The protocol is endian safe of course.
+
+    - The conquest login screen provides information about the server
+      you are attached to - number of active ships, server name,
+      enabled flags (see below), MOTD, etc.
+
+    - The daemon (conquestd) listens on TCP port 1701 by default.  You
+      can change this by supplying '-p <port>' to the conquestd
+      command line.
+
+      If you want to run your own public internet server, you need to
+      allow tcp/1701 into your firewall (or whatever port you
+      configured your server to use).  I would recomend running the
+      daemon as an unprivileged user.  Oh, and if it's going to be
+      available to the internet at large, run conquestd with the '-m'
+      option, so it will notify the metaserver so others can find your
+      game.
+
+      Please read SERVER.TXT for information on running a server.
+
+    - Client Updates.  From the options menu, a player can set the
+      update interval anywhere from 1 to 10 updates per second.  The
+      default is currently 5.  There is no AllowFastUpdates capability
+      anymore.  I would not recommend 10 per second on a modem. Try
+      different ones until you find one that works best for your
+      connection.  In the old conquest, 1 and 2 were the only options.
+
+    - Conquest operators are now defined as any user with the
+      OOPT_OPER option set in his or her user profile.  They will be
+      listed in the (U)ser list with a '+' to the left of their name.
+
+      Currently a user marked with OPER can only start and stop server
+      recordings from within the game using 'EXEC' messages sent to
+      GOD.  Other than that, there is no difference compared to a
+      normal user.
+
+      Of course, only someone with shell access on the server machine,
+      and who is a member of the conquest group can run the conqoper
+      program.  Root can always run conqoper.
+
+      In the future, more EXEC commands may be provided to conquest
+      operators so they can become the tin plated dictators with
+      delusions of godhood most of them secretly want to be. :)
+
+    - Previous versions of conquest (v7.0+) used to distinguish
+      between 'local' and 'remote' users.  Local users were users who
+      were playing conquest from a shell account on the machine where
+      conquest was installed.  Remote users were users playing from a
+      generic conquest account, usually setup by the system
+      administrator, that had the conquest executable as the shell.
+      In this way a 'server' could be run by providing telnet access
+      to this special account from the internet.
+
+      'Remote' users were denoted by a '@' next to their usernames in
+      conquest.
+
+      Since Conquest now uses a client server model, all users are
+      remote.  The '@' tag is gone.  Even playing on a local machine
+      is still accomplished by connecting to a local conquest server
+      via TCP, so there is no such thing as a 'local' user anymore.
+
+      Also for this reason, the conquest client is no longer
+      set-groupid conquest - no need, since no special privileges or
+      access is required.  If you can connect to a server, you can
+      play.
+
+    - user and system configuration (conquestrc) have changed
+      significantly.  Some options are gone now, others moved into
+      user config, etc.
+
+      Many of the Sysconf options have been moved into User options
+      (ETA stats, LR torpscan, etc).
+
+      Some user options like clear_old_msgs have been removed.
+
+      The 'compile options' are no longer viewable, since they don't
+      matter much from the player perspective, and are of no use to a
+      client anyway.
+
+      The server (conquestd) advertises certain game flags enabled by
+      the conquest operator (using conqoper) to the client.  These
+      flags are displayed on the client login screen, as well as from
+      within the client's (O)ptions Menu.  The flags are configured by
+      the operator using the Option menu in conqoper.
+
+      The current flags are:
+
+          Refit              - refits are allowed.  You can refit to
+                               one of the 3 types of conquest ships
+                               when you have at least one kill, and
+                               are orbiting a team owned planet.
+
+          Vacant             - vacant ships are allowed.  A ship goes
+                               vacant when a client exits the game
+                               without self destructing first, while
+                               flying a ship.
+
+                               When vacant ships are disabled by the
+                               oper, such ships are immediately killed
+                               by a 'lightning bolt'.
+
+                               NOTE: In previous versions of conquest,
+                               oper's would always go vacant in this
+                               case, regardless of the vacant option
+                               setting.  In this version, every user
+                               is subject to this option.
+
+
+          SlingShot          - the SlingShot bug is enabled.  This is
+                               a towing bug that existed in the
+                               original VMS/RatFor version of
+                               conquest.  It's a fun bug, and I
+                               recieved several emails about it when I
+                               inadvertantly fixed it in a later
+                               version without understanding it's
+                               significance. 
+
+                               If you don't know what it does,
+                               well... figure it out!  You'll need a
+                               buddy to make it work though ;-)
+
+          NoDoomsday         - when set, the doomsday machine is
+                               prevented from randomly starting up and
+                               trashing the universe. 
+
+          Killbots           - when this option is enabled, robots are
+                               created with a random kill point
+                               value.  The kill points a ship has
+                               affects the efficiency of it's engines,
+                               the strength of it's weapons, etc.
+
+                               Normally when a robot is created (by
+                               attacking an unguarded homeplanet, etc),
+                               it is initialized to 0 kills.  When
+                               this option is enabled, a kills value
+                               is randomly selected.  This means that
+                               a new robot might prove to be much more
+                               deadly than the default 0 kill robot.
+
+                               This may not be a good option to enable
+                               on a public server where newcomers play.
+                               Fighting a 25 kill robot takes some
+                               skill ;-)
+
+          SwitchTeam         - when enabled, users can switch teams at
+                               the conquest main menu.
+
+    - the 'I' command is no longer provided.  All of those options
+      have been added to the User options menu.
+
+    - Users can no longer have multiple ships.  If you have a vacant
+      ship, you will be automatically attached to it.  The game still
+      has most of this code present, so this feature could be added
+      back in the future if enough people whine.
+
+    - When using the (U)sers command in the client, only those users
+      attached to currently active ships, or attached to entries in
+      the History ring will be listed.  There is no point in checking
+      500 user slots on each client update ;-)
+
+      For this reason, only the conqoper program will be able to list
+      *all* users.
+
+    - the client creates it's logfile in your home directory
+      (~/.conquest.log).  The conquest server, driver, etc, will still
+      use the system log.  Check these for any errors or other
+      oddities.
+
+    - When you die, you now get to see your ship explode first before
+      being taken to the 'dead' screen.
+
+    - Recording.
+
+      - Recording has been completely reworked.  Unfortunately, any
+        previous CQR files are incompatible with this release.
+
+      - you can now select the long range or short range view of a
+        ship you are watching in conqreplay.
+
+      - The new format uses the same packet protocol that the clients
+        use.  This means recording files (cqr's) are *much* smaller
+        and much more efficient (cpu-wise) during the recording
+        process.
+
+        Another benefit is endian safety.  With the old format,
+        recordings could only be played back on the same machine
+        architecture the cqr was created on.  Since the recording data
+        is now based on the packet protocol, recordings are now
+        completely endian safe (network byte order is used).  So now,
+        some poor slob on his Sun SPARC can play back a recording I
+        make on a lintel machine.
+
+      - There are two types of recordings: client and server.
+
+        - see the README file, 'Recording' section for more information
+          on the differences between the two, and how to create and
+          play them back.
+
+    - Thanks to Clint Adams, the autoconf stuff has been significantly
+      updated.
+
+    - I looked upon my creation, and saw that it was good. :)
+
+   7.2b 1/6/2003
+
+    - some reorganization of a few data structures - sysconf,
+      userconf, HasColor, etc.. 
+
+    - Logon() now specifically looks up the CONQUEST_USER home dir in
+      /etc/passwd for cases where one is using a telnet daemon to
+      automatically start conquest.  The is needed since telnetd does
+      not changedir to the conquest homedir before execing the
+      conquest executable.
+
+    7.2a 12/9/2002
+
+    - big patch from Clint Adams adding automake/libtool support and
+      changing direct references from sys_errlist[] to strerror()
+
+    - added new 'Friend' target for messages.  You can send a message
+      to all friendly ships by specifying 'fr'as the destination for a
+      message.
+
+    - added 'distress_to_friendly' option.  If true, sends distress
+      calls to all friendly ships, not just your teammates.  The
+      default is off.
+
+    - added a new, experimental AltHUD option.  This is like the
+      regular HUD, but adds some of the information returned from
+      infoship and infoplanet calls to the lower alert line on the
+      main display.  This can be useful in battle when messages or
+      other commands remove the info after requesting it.
+
+      Current info presented is:
+
+      FA: (Firing Angle).  This lets you know the direction that any
+          further firing requests will use, unless a direction is
+          explicitly specified to the 'p' or 'f' commands.
+
+      TA/D: (Target Angle / Distance). This item displays the Target
+	    name, Target Angle and Target Distance obtained in the
+	    last infoship/infoplanet request, and is updated whenever
+	    you do an info command on any ship or planet.
+
+      There may be more items forthcoming, though space is limited.
+      The idea here is to present or preserve information that the
+      user can already request.  It isn't intended to provide a 'auto
+      targeting' or other type of advantage.  It's for information
+      purposes only ;-)
+
+      To use this, enable the 'Allow Alt HUD' option in in (O)ptions
+      from within conquest.  Set to 'false' by default.
+
+
 Version 7.2 Sun Dec  1 15:55:27 MST 2002 Jon Trulson  <jon@radscan.com>
 
 	- patch from Clint Adams for conqai.c changing 'char arg' to

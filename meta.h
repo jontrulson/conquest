@@ -40,5 +40,6 @@ void pipe2ul(char *str);
 int str2srec(metaSRec_t *srec, char *buf);
 void srec2str(char *buf, metaSRec_t *srec);
 int metaUpdateServer(char *remotehost, char *name, int port);
+int metaGetServerList(char *remotehost, metaSRec_t **srvlist);
 
 #endif /* META_H_INCLUDED */

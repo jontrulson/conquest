@@ -409,31 +409,31 @@ void clntDisplayFeedback(char *msg)
 }
 
 /* return a static string containing the server's stringified  flags */
-char *clntServerFlagsStr(spServerStat_t *sstat)
+char *clntServerFlagsStr(Unsgn32 flags)
 {
   static char serverflags[256];
 
-  if (sstat->flags == SPSSTAT_FLAGS_NONE)
+  if (flags == SPSSTAT_FLAGS_NONE)
     strcpy(serverflags, "None");
   else
     strcpy(serverflags, "");
 
-  if (sstat->flags & SPSSTAT_FLAGS_REFIT)
+  if (flags & SPSSTAT_FLAGS_REFIT)
     strcat(serverflags, "Refit ");
   
-  if (sstat->flags & SPSSTAT_FLAGS_VACANT)
+  if (flags & SPSSTAT_FLAGS_VACANT)
     strcat(serverflags, "Vacant ");
   
-  if (sstat->flags & SPSSTAT_FLAGS_SLINGSHOT)
+  if (flags & SPSSTAT_FLAGS_SLINGSHOT)
     strcat(serverflags, "SlingShot ");
   
-  if (sstat->flags & SPSSTAT_FLAGS_NODOOMSDAY)
+  if (flags & SPSSTAT_FLAGS_NODOOMSDAY)
     strcat(serverflags, "NoDoomsday ");
   
-  if (sstat->flags & SPSSTAT_FLAGS_KILLBOTS)
+  if (flags & SPSSTAT_FLAGS_KILLBOTS)
     strcat(serverflags, "Killbots ");
   
-  if (sstat->flags & SPSSTAT_FLAGS_SWITCHTEAM)
+  if (flags & SPSSTAT_FLAGS_SWITCHTEAM)
     strcat(serverflags, "SwitchTeam ");
 
   return serverflags;

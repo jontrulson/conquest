@@ -381,6 +381,7 @@ int KPAngle(int ch, real *angle);
 int KP2DirKey(int *ch);
 int fmtmsg(int to, int from, char *buf);
 char *glname(void);
+int conqlogo(void);
 
 /* cd2lb.c */
 

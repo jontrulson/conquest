@@ -12,154 +12,112 @@ CONTENTS:
 	### DISTRIBUTION
 	### BUILDING
 	### OTHER USEFUL INFORMATION
-	    ## CURSES/TERMINFO
-               # LINUX NOTE
-               # GENERAL TERMINAL NOTE
-	       # TERMINFO ENTRIES
-	    ## UNIXWARE NOTE
+            # GENERAL TERMINAL NOTE
+            # TERMINFO ENTRIES
+            ## UNIXWARE NOTE
             ## SOLARIS/DU NOTE
 	    ## CONQUEST GROUP
-	### INSTALLED FILES
 
 
 ### DISTRIBUTION
 
-	You should have recieved one (or both) of the following files:
-	(where x.y is the current revision)
-
-	conquest-x.y.pkg.gz	- gziped Unixware binary package (in 
-                                  stream format) for use with pkgadd(1).
-
-		Use the following commands to unpack and install on
-		Unixware:
-
-		$ gunzip conquest-x.y.pkg.tar.gz
-                $ tar xvf conquest-x.y.pkg.tar
-		(as root)
-		# pkgadd -d /full/path/to/conquest-x.y.pkg
-
-
-	conquest-x.y.src.tar.gz	- gziped tar archive of the source
+    conquest-x.y.src.tar.gz	- gziped tar archive of the source
                                   distribution.
 
-		Unzip/untar this in a nice, quiet, peaceful place.  I
-                use 'gzcat conquest-x.y.src.tar.gz |tar -xvf -'.
+    Unzip/untar this in a nice, quiet, peaceful place.  I use:
 
+       $ tar xzvf conquest-x.y.src.tar.gz
 
-	Currently, only the following OS's have ports:
+    Currently, only the following OS's have ports (these are the
+    minimum versions needed.  It should run on newer versions of these
+    OS's):
 	
-		Unixware 2.03 (1.x/2.x should be fine too)
-		Linux 2.0.0, with ncurses-1.9.9e+ (older ncurses *may* work)
-		Solaris 2.6 with gcc 2.7.2
-		FreeBSD 2.2-100696-SNAP (stock curses works, but
-			without color apparently...)
-		OSF1/Digital Unix V4.0 for Alpha
-			- Thanks to Jim Anderson (janderson@NOVALIS.COM)
-				for this port!
+        Unixware 2.03 (1.x/2.x/7.x should be fine too)
+        Linux 2.0.0, with ncurses-1.9.9e+ (older ncurses *may* work)
+        Solaris Intel/Sparc 2.6 with gcc 2.7.2
+        FreeBSD 2.2-100696-SNAP (stock curses works, but
+                without color apparently...)
+        OSF1/Digital Unix V4.0 for Alpha
+           - Thanks to Jim Anderson (janderson@NOVALIS.COM)
+             for this port!
 
-	ncurses-1.9.9e will work on both fbsd and Linux.  If the
-curses implementation on your machine has problems, you might try
-ncurses... It's free and does a reasonable job at emulating svr4
-curses.
+        Note, I no longer have access to these machines (only
+        linux) so YMMV...
 
-	The README file provides useful information about conquest.
+    At least ncurses-1.9.9e is required on both FreeBSD and Linux.  If
+    the curses implementation on your machine has problems, you might
+    try ncurses... It's free and does a reasonable job at emulating
+    svr4 curses.
+
+    The README file provides useful information about conquest, please
+    look it over.
 
 ### BUILDING
 
-	To build conquest, unpack the src archive.  
+    To build conquest, unpack the src archive.  
 
-	Create the 'conquest' group.  In Unixware this can be done
-with (as root) 'groupadd conquest'.
+    Create the 'conquest' group.  In Linux this can be done with
+    (as root) 'groupadd conquest'.
 
-	NOTE: You *must* create a conquest group, or 'make
-[all|install]' will fail!
+    NOTE: You *must* create a conquest group, or '[make |make install]'
+    will fail!
 
-	Then cd into the src directory.
+    Then cd into the src directory.
 
-	Conquest makes use of the GNU Autoconf system for maintaining
-source code able to compile on many different machines.
+    Conquest makes use of the GNU Autoconf system for maintaining
+    source code able to compile on many different machines.
 
 	Theoretically, all you will need to do is:
 
-	$ ./configure
-	$ make depend (or 'make clean' if you lack makedepend)
-	$ make all
-	(note: you will not be able to execute any of the binaries
+	$ ./configure 
+	$ make
+
+	(note: you will not be able to execute many of the binaries
                until you do a make install, then run the installed
                binary)
 	$ su
 	# make install
 
-	By default, conquest will be installed in /opt.  To install it
-somewhere else, supply the '--prefix=/other/dir' option to configure.
+    By default, conquest will be installed in /opt.  To install it
+    somewhere else, supply the '--prefix=/other/dir' option to
+    configure.
 
-	You may also want to peek at the defs.h file, though the
-defaults should be fine.  If your porting this to something else, good
-luck...But if you do succeed in a port to a new platform, please let
-me know so I can incorporate it into the distribution.  The autoconf
-source file 'configure.in' is supplied for this purpose ;-)
+    You may also want to peek at the defs.h file, though the defaults
+    should be fine.  If your porting this to something else, good
+    luck...But if you do succeed in a port to a new platform, please
+    let me know so I can incorporate it into the distribution.  The
+    autoconf source file 'configure.in' is supplied for this purpose
+    ;-)
 
-	As root, intialize the system-wide conquestrc file
-(/opt/conquest/etc/conquestrc by default) by typing ('make install'
-will do this for you, but if you want to be sure....):
+    As root, intialize the system-wide conquestrc file
+    (/opt/conquest/etc/conquestrc by default) by typing:
 
 	/opt/bin/conqoper -C
 
-	Edit /opt/conquest/etc/conquestrc and see if everything there
-is ok for your site.  New with version 7.0, you can edit all of the
-options using the (O)ption Menu in conqoper, without editing the
-conquestrc file directly.
+    'make install' will do this for you, but if you want to be sure...
 
-	Then run the conqoper program (without options) and
-(I)nitialize->(e)verything, open the game, and you should now be ready
-to rock-n-roll.
+    Then, you will want to Initialize the universe and enable the
+    game.  You can do this from the main menu in conqoper, or
+    non-interactively from the command line like so:
 
-	With version 7.0, you can do this on the command line by:
+        conqoper -Ie -E
 
-	     conqoper -Ie -E
+        - this Initializes everything, then Enables the game.
 
-	     - this Initializes Everything, then Enables the game.
+    Next, you may want to enter the Options menu and configure the
+    options you want enabled for your game.
 
-	See the README file for more information.
+    You should now be ready to run the server and try it out.
 
-	See the SERVER.DOC file if you want to setup a Conquest
-server. 
+    See the README file for more information.
 
-	Read the conquest.doc and the conqnews.doc files to get info
-on what conquest is and how to play it.
+    See the SERVER.DOC file for information on running a Conquest
+    server. 
 
+    Read the conquest.doc and the conqnews.doc files to get info on
+    what conquest is and how to play it.
 
 ### OTHER USEFUL INFORMATION
-
-## CURSES/TERMINFO
-
-	On some machines (Linux), ncurses is supplied, but not
-installed properly... In one case, the ncurses.h header file was
-located in /usr/include/ncurses/ncurses.h when it should have been one
-directory higher... For that reason, configure couldn't find it, and
-an older, incompatible curses.h file was used instead, leading to
-build problems.  Make sure (if you wish to force ncurses use) that the
-ncurses.h, term.h and uncntl.h files are present in /usr/include.  
-
-	The *only* curses implementations that will work with conquest
-are System V Release 4+, *or* ncurses 1.9.9e+.  FreeBSD has an older
-implementation of ncurses that will work as far as compiling goes, but
-will not properly detect and use color.
-
-# LINUX NOTE: A friend who uses linux and frequently dials in to my
-conquest server was experiencing screen corruption on the console, but
-it only showed up during a dialup game (where he was dialed into my
-machine), or playing back a recording (made by using script to record
-a game.)  Another friend using Unixware did not have these problems.
-The solution was to modify the 'linux' terminfo entry and remove
-capabilities for Alternate Character Sets/line drawing characters
-(ACS), del/ins char, and del/ins line modes.  This cleared it up.  No
-idea why, though it smells like a timing issue with the linux console
-driver.  Playing it on the linux console looked fine, though playing
-back a typesript tended to corrupt again.  This appears to be linux
-specific, and not a conquest problem.  In all cases, hitting ^L redrew
-the screen properly.  If you run into this problem, try the 'linux-cq'
-terminfo entry supplied in the conquest source distribution.
 
 # GENERAL TERMINAL NOTE: Conquest depends on a properly configured
 terminfo entry for your terminal in order to make use of Fkey's, the
@@ -255,64 +213,5 @@ binary package will add the Conquest group id to your system.
 create the conquest group before building.
 
 
-### INSTALLED FILES
-
-	Note, on my machine everything is owned by jon, this helps me
-in recompiling/updating without having to be root... You can make
-everything owned by root or whatever you want, but the group *has* to
-be conquest, with the perms specified below (the makefile and/or
-pkgadd will do this for you). 
-
-	See the README for a brief description of these files
-
-	The primary files and their perms are as follows:
-
-
-
-/opt/conquest/...         perms           owner    group
------------------         ----------      -----    -----
-
-bin/			  drwxr-xr-x    2 jon      conquest
-
-	conquest	
-			  -rwxrws--x    1 jon      conquest
-
-	conqdriv	
-			  -rwxrws--x    1 jon      conquest
-
-	conqoper	
-			  -rwxrws--x    1 jon      conquest
-
-	conqai		
-			  -rwxrws--x    1 jon      conquest
-
-	conqstrat		
-			  -rwxrwx--x    1 jon      conquest
-
-etc/			  drwxrwxr-x    2 jon      conquest
-
-	conquest_common.img 
-			  -rw-rw----    1 jon      conquest
-
-	conqnews.doc	
-			  -rw-rw-r--    1 jon      conquest
-
-	conquest.doc
-			  -rw-rw-r--    1 jon      conquest
-
-	conquest.log
-			  -rw-rw----    1 jon      conquest
-
-	conquestrc
-			  -rw-rw-r--    1 jon      conquest
-
-
-lib/			  drwxr-xr-x    2 jon      conquest
-
-	libconquest.so	(except FreeBSD)
-			  -rw-r--r--    1 jon      conquest
-
-Jon Trulson <jon@radscan.com>
-02/01/1999
-
+$Id$
 

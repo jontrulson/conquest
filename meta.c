@@ -258,7 +258,7 @@ int metaUpdateServer(char *remotehost, char *name, int port)
 
   sa.sin_family = hp->h_addrtype;
 
-  sa.sin_port = htons(1700);
+  sa.sin_port = htons(META_DFLT_PORT);
 
   if ((s = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP )) < 0) 
     {
@@ -276,3 +276,90 @@ int metaUpdateServer(char *remotehost, char *name, int port)
 
   return TRUE;
 }
+
+
+/* contact a meta server, and return a pointer to a static array of
+   metaSRec_t's coresponding to the server list.  returns number
+   of servers found, or ERR if error */
+int metaGetServerList(char *remotehost, metaSRec_t **srvlist)
+{
+  static metaSRec_t servers[META_MAXSERVERS];
+  struct sockaddr_in sa;
+  struct hostent *hp;
+  char buf[1024];               /* server buffer */
+  int off;
+  int firsttime = TRUE;
+  int s;                        /* socket */
+  int nums;                     /* number of servers found */
+  char c;
+
+  nums = 0;
+
+  if (!remotehost || !srvlist)
+    return ERR;
+
+  if (firsttime)
+    {
+      firsttime = FALSE;
+      memset((void *)&servers, 0, (sizeof(metaSRec_t) * META_MAXSERVERS));
+    }
+
+  if ((hp = gethostbyname(remotehost)) == NULL) 
+    {
+      clog("metaGetServerList: %s: no such host", remotehost);
+      return ERR;
+    }
+
+  /* put host's address and address type into socket structure */
+  memcpy((char *)&sa.sin_addr, (char *)hp->h_addr, hp->h_length);
+
+  sa.sin_family = hp->h_addrtype;
+
+  sa.sin_port = htons(META_DFLT_PORT);
+
+  if ((s = socket(AF_INET, SOCK_STREAM, 0 )) < 0) 
+    {
+      clog("metaGetServerList: socket failed: %s", strerror(errno));
+      return ERR;
+    }
+
+  /* connect to the remote server */
+  if ( connect ( s, &sa, sizeof ( sa ) ) < 0 ) 
+    {
+      clog("metaGetServerList: connect failed: %s", strerror(errno));
+      return ERR;
+  }
+
+
+  off = 0;
+  while (read(s, &c, 1) > 0)
+    {
+      if (c != '\n')
+        {
+          buf[off++] = c;
+        }
+      else
+        {                       /* we got one */
+          buf[off] = 0;
+
+          /* convert to a metaSRec_t */
+          if (str2srec(&servers[nums], buf))
+            nums++;
+          else
+            clog("metaGetServerList: str2srec(%s) failed, skipping", buf);
+          
+          off = 0;
+        }
+    }
+
+  /* done. */
+  close(s);                   
+
+  if (nums)
+    *srvlist = servers;
+  else
+    *srvlist = NULL;
+
+  return nums;
+}
+

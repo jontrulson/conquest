@@ -25,6 +25,6 @@ void clntStoreMessage(spMessage_t *msg);
 
 void clntSendMsg( int from, int terse, int remote );
 void clntDisplayFeedback(char *msg);
-char *clntServerFlagsStr(spServerStat_t *sstat);
+char *clntServerFlagsStr(Unsgn32 flags);
 
 #endif /* CLIENTLB_H_INCLUDED */

@@ -45,7 +45,7 @@ static void PrintStatus(int lin)
 	  sStat.numvacant, sStat.numrobot);
 
   sprintf(buf, "#%d#Flags: #%d#   %%s", MagentaColor, NoColor);
-  cprintf(lin++, 0, ALIGN_NONE, buf, clntServerFlagsStr(&sStat));
+  cprintf(lin++, 0, ALIGN_NONE, buf, clntServerFlagsStr(sStat.flags));
 
   sprintf(buf, "#%d#MOTD: #%d#    %%s", MagentaColor, NoColor);
   cprintf(lin++, 0, ALIGN_NONE, buf, sHello.motd);
@@ -55,14 +55,9 @@ static void PrintStatus(int lin)
 
 int Logon(char *username)
 {
-  int col, lin, slin, lenc1;
+  int lin, slin;
   int ch, statline;
   char nm[MAXUSERNAME], pw[MAXUSERNAME], pwr[MAXUSERNAME];
-  string c1=" CCC    OOO   N   N   QQQ   U   U  EEEEE   SSSS  TTTTT";
-  string c2="C   C  O   O  NN  N  Q   Q  U   U  E      S        T";
-  string c3="C      O   O  N N N  Q   Q  U   U  EEE     SSS     T";
-  string c4="C   C  O   O  N  NN  Q  Q   U   U  E          S    T";
-  string c5=" CCC    OOO   N   N   QQ Q   UUU   EEEEE  SSSS     T";
   int done, rv;
   extern char *ConquestVersion;
   extern char *ConquestDate;
@@ -74,26 +69,8 @@ int Logon(char *username)
       cdclear();
 
       /* Display the logo. */
-      lenc1 = strlen( c1 );
-      col = (Context.maxcol - lenc1) / 2;
-      lin = 2;
-      cprintf( lin,col,ALIGN_NONE,"#%d#%s", RedColor | A_BOLD, c1);
-      lin++;
-      cprintf( lin,col,ALIGN_NONE,"#%d#%s", RedColor | A_BOLD, c2);
-      lin++;
-      cprintf( lin,col,ALIGN_NONE,"#%d#%s", RedColor | A_BOLD, c3);
-      lin++;
-      cprintf( lin,col,ALIGN_NONE,"#%d#%s", RedColor | A_BOLD, c4);
-      lin++;
-      cprintf( lin,col,ALIGN_NONE,"#%d#%s", RedColor | A_BOLD, c5);
 
-      /* Draw a box around the logo. */
-      lin++;
-      attrset(A_BOLD);
-      cdbox( 1, col - 2, lin, col + lenc1 + 1 );
-      attrset(0);
-
-      lin++;
+      lin = conqlogo();
 
       if ( sHello.flags & SPHELLO_FLAGS_CLOSED )
 	{

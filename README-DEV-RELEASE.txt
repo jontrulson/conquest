@@ -500,33 +500,6 @@
               Of course, full information is always recorded for the
               ship that made the recording.
 
-            - Server recordings are complete (like the old recordings
-              made in previous versions of conquest), since the server
-              has full access to the common block (unlike clients).
-             
-              All active ship/planet/etc data is stored in server
-              recordings.  You can watch any ship in conqreply with a
-              server recording and get all info on the ship (heading,
-              fuel, temps, etc).
-
-              Server recordings are created in
-              PREFIX/var/conquest/conquest-rec-<timestamp>.cqr on the
-              server machine.
-
-              Server recordings are made when an oper (anyone who
-              has the ooption OOPT_OPER set in their user record)
-              sends a specially crafted message to GOD from within the
-              game. 
-
-              Currently understood messages are:
-
-               exec recon
-
-               - turns recording on.
-
-               exec recoff
-
-               - turns recording off
 
                Other oper options will probably be added in the future.
 
