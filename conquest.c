@@ -122,6 +122,9 @@ void printUsage()
   printf("    -t              telnet mode (no user conf load/save)\n");
   printf("    -M metaserver   specify alternate <metaserver> to contact.\n");
   printf("                     default: %s\n", META_DFLT_SERVER);
+  printf("    -P <cqr file>   Play back a Conquest recording (.cqr)\n");
+  printf("    -d <dly>        specify default framedelay for CQR playback.\n");
+  printf("                    (example -d .01, for 1/100sec frame delay\n");
   printf("    -u              do not attempt to use UDP from server.\n");
   return;
 }
@@ -263,7 +266,7 @@ int main(int argc, char *argv[])
   cInfo.remotehost = strdup("localhost"); /* default to your own server */
 
   /* check options */
-  while ((i = getopt(argc, argv, "mM:s:r:tu")) != EOF)    /* get command args */
+  while ((i = getopt(argc, argv, "mM:s:r:tP:d:u")) != EOF)    /* get command args */
     switch (i)
       {
       case 'm':
@@ -298,21 +301,34 @@ int main(int argc, char *argv[])
 
 	break;
       case 'r': 
-	if (recordOpenOutput(optarg, FALSE))
-	  {			/* we are almost ready... */
-	    Context.recmode = RECMODE_STARTING;
-	    printf("Recording game to %s...\n", optarg);
-	  }
-	else
-	  {
-	    Context.recmode = RECMODE_OFF;
-            printf("Cannot record game to %s... terminating\n", optarg);
-	    exit(1);
-	  }
+        /* don't want to do this if we've already seen -P */
+        if (Context.recmode != RECMODE_PLAYING)
+          {
+            if (recordOpenOutput(optarg, FALSE))
+              {			/* we are almost ready... */
+                Context.recmode = RECMODE_STARTING;
+                printf("Recording game to %s...\n", optarg);
+              }
+            else
+              {
+                Context.recmode = RECMODE_OFF;
+                printf("Cannot record game to %s... terminating\n", optarg);
+                exit(1);
+              }
+          }
         break;
 
       case 't':
         confSetTelnetClientMode(TRUE);
+        break;
+
+      case 'P':
+        rfname = optarg;
+        Context.recmode = RECMODE_PLAYING;
+        break;
+
+      case 'd':                 /* framedelay */
+        framedelay = ctor(optarg);
         break;
 
       case 'u':
@@ -338,6 +354,31 @@ int main(int argc, char *argv[])
       }
 
   Context.updsec = UserConf.UpdatesPerSecond;
+
+  if (Context.recmode == RECMODE_PLAYING) 
+    {
+      if (serveropt || wantMetaList)
+        printf("-P option specified.  All other options ignored.\n");
+
+      serveropt = wantMetaList = FALSE;
+      printf("Scanning file %s...\n", rfname);
+      if (!initReplay(rfname, &totElapsed))
+        exit(1);
+
+      /* now init for real */
+      if (!initReplay(rfname, NULL))
+        exit(1);
+
+      Context.unum = MSG_GOD;       /* stow user number */
+      Context.snum = ERR;           /* don't display in cdgetp - JET */
+      Context.entship = FALSE;      /* never entered a ship */
+      Context.histslot = ERR;       /* useless as an op */
+      Context.lasttdist = Context.lasttang = 0;
+      Context.lasttarg[0] = EOS;
+
+      /* turn off annoying beeps */
+      UserConf.DoAlarms = FALSE;
+    }
   
   if (serveropt && wantMetaList)
     {
@@ -368,23 +409,14 @@ int main(int argc, char *argv[])
 
 
   /* a parallel universe, it is */
-
-  fake_common();
-  clbInitEverything();		/* initialize the universe.  Wow. Such power */
-  clbInitMsgs();
-  *CBlockRevision = COMMONSTAMP;
-  ConqInfo->closed = FALSE;
-  Driver->drivstat = DRS_OFF;
-  Driver->drivpid = 0;
-  Driver->drivowner[0] = EOS;
-  
+  map_lcommon();
 
 #ifdef DEBUG_FLOW
   clog("%s@%d: main() starting conqinit().", __FILE__, __LINE__);
 #endif
   
   conqinit();			/* machine dependent initialization */
-  
+  iBufInit();
   
   rndini( 0, 0 );		/* initialize random numbers */
   
@@ -392,8 +424,6 @@ int main(int argc, char *argv[])
   clog("%s@%d: main() starting cdinit().", __FILE__, __LINE__);
 #endif
 
-  
-  
   cdinit();			/* set up display environment */
   
   Context.maxlin = cdlins();
@@ -402,6 +432,15 @@ int main(int argc, char *argv[])
   Context.histslot = ERR;
   Context.lasttang = Context.lasttdist = 0;
   Context.lasttarg[0] = EOS;
+
+  /* If we are playing back a recording (-P)... */
+  if (Context.recmode == RECMODE_PLAYING)
+    {                           /* here, we will just do the replay stuff
+                                   and exit */
+      conquestReplay();
+      cdend();
+      return 0;
+    }
 
   if (wantMetaList)
     {                           /* list the servers */
@@ -3266,6 +3305,12 @@ void processPacket(Unsgn8 *buf)
     case SP_PLANETLOC:
       procPlanetLoc(buf);
       break;
+    case SP_PLANETLOC2:
+      procPlanetLoc2(buf);
+      break;
+    case SP_PLANETINFO:
+      procPlanetInfo(buf);
+      break;
     case SP_TORP:
       procTorp(buf);
       break;
@@ -4066,3 +4111,7 @@ int selectServer(metaSRec_t *metaServerList, int nums)
 
   return TRUE;
 }
+
+
+
+  

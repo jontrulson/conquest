@@ -62,6 +62,9 @@ int pbProcessPackets(void)
         case SP_PLANETLOC:
           procPlanetLoc(buf);
           break;
+        case SP_PLANETLOC2:
+          procPlanetLoc2(buf);
+          break;
         case SP_TORP:
           procTorp(buf);
           break;

@@ -165,17 +165,21 @@ int main(int argc, char *argv[])
 
 	break;
       case 'r': 
-	if (recordOpenOutput(optarg, FALSE))
-	  {			/* we are almost ready... */
-	    Context.recmode = RECMODE_STARTING;
-	    printf("Recording game to %s...\n", optarg);
-	  }
-	else
-	  {
-	    Context.recmode = RECMODE_OFF;
-            printf("Cannot record game to %s... terminating\n", optarg);
-	    exit(1);
-	  }
+        /* don't want to do this if we've already seen -P */
+        if (Context.recmode != RECMODE_PLAYING)
+          {
+            if (recordOpenOutput(optarg, FALSE))
+              {			/* we are almost ready... */
+                Context.recmode = RECMODE_STARTING;
+                printf("Recording game to %s...\n", optarg);
+              }
+            else
+              {
+                Context.recmode = RECMODE_OFF;
+                printf("Cannot record game to %s... terminating\n", optarg);
+                exit(1);
+              }
+          }
         break;
 
       case 't':
@@ -359,6 +363,12 @@ void processPacket(Unsgn8 *buf)
       break;
     case SP_PLANETLOC:
       procPlanetLoc(buf);
+      break;
+    case SP_PLANETLOC2:
+      procPlanetLoc2(buf);
+      break;
+    case SP_PLANETINFO:
+      procPlanetInfo(buf);
       break;
     case SP_TORP:
       procTorp(buf);

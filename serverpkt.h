@@ -38,4 +38,8 @@ spConqInfo_t *spktConqInfo(int force);
 
 spHistory_t *spktHistory(int hnum);
 spDoomsday_t *spktDoomsday(int rec);
+
+spPlanetInfo_t *spktPlanetInfo(Unsgn8 pnum, int rec);
+spPlanetLoc2_t *spktPlanetLoc2(Unsgn8 pnum, int rec);
+
 #endif /* _SERVERPKT_H */

@@ -180,6 +180,16 @@ static struct _packetent serverPackets[] = {
     sizeof(spDoomsday_t), 
     "SP_DOOMSDAY", 
     pktNotImpl 
+  },
+  { SP_PLANETINFO, 
+    sizeof(spPlanetInfo_t), 
+    "SP_PLANETINFO", 
+    pktNotImpl 
+  },
+  { SP_PLANETLOC2, 
+    sizeof(spPlanetLoc2_t), 
+    "SP_PLANETLOC2", 
+    pktNotImpl 
   }
 };
 

@@ -15,6 +15,7 @@
 #include "server.h"
 #include "context.h"
 #include "serverpkt.h"
+#include "conqlb.h"
 
 /* Here, we maintain 2 copies of potential packets, privileged and
    unpriveleged.  We fill the packets, and then return a pointer to a static
@@ -32,6 +33,7 @@ static spShipLoc_t pktShipLoc[MAXSHIPS + 1];
 static spPlanet_t pktPlanet[NUMPLANETS + 1];
 static spPlanetSml_t pktPlanetSml[NUMPLANETS + 1];
 static spPlanetLoc_t pktPlanetLoc[NUMPLANETS + 1];
+static spPlanetLoc2_t pktPlanetLoc2[NUMPLANETS + 1];
 static spUser_t pktUser[MAXUSERS];
 static spTorp_t pktTorp[MAXSHIPS + 1][MAXTORPS];
 static spTorpLoc_t pktTorpLoc[MAXSHIPS + 1][MAXTORPS];
@@ -39,6 +41,7 @@ static spTeam_t pktTeam[NUMALLTEAMS];
 static spConqInfo_t pktConqInfo;
 static spHistory_t pktHistory[MAXHISTLOG];
 static spDoomsday_t pktDoomsday;
+static spPlanetInfo_t pktPlanetInfo[NUMPLANETS + 1];
 
 /* recording */
 static spShip_t recShip[MAXSHIPS + 1];
@@ -47,10 +50,12 @@ static spShipLoc_t recShipLoc[MAXSHIPS + 1];
 static spPlanet_t recPlanet[NUMPLANETS + 1];
 static spPlanetSml_t recPlanetSml[NUMPLANETS + 1];
 static spPlanetLoc_t recPlanetLoc[NUMPLANETS + 1];
+static spPlanetLoc2_t recPlanetLoc2[NUMPLANETS + 1];
 static spTorp_t recTorp[MAXSHIPS + 1][MAXTORPS];
 static spTorpLoc_t recTorpLoc[MAXSHIPS + 1][MAXTORPS];
 static spTeam_t recTeam[NUMALLTEAMS];
 static spDoomsday_t recDoomsday;
+static spPlanetInfo_t recPlanetInfo[NUMPLANETS + 1];
 
 /* memset everything to 0 */
 void spktInit(void)
@@ -70,6 +75,7 @@ void spktInitPkt(void)
   memset((void *)pktPlanet, 0, sizeof(spPlanet_t) * (NUMPLANETS + 1));
   memset((void *)pktPlanetSml, 0, sizeof(spPlanetSml_t) * (NUMPLANETS + 1));
   memset((void *)pktPlanetLoc, 0, sizeof(spPlanetLoc_t) * (NUMPLANETS + 1));
+  memset((void *)pktPlanetLoc2, 0, sizeof(spPlanetLoc2_t) * (NUMPLANETS + 1));
   memset((void *)pktUser, 0, sizeof(spUser_t) * MAXUSERS);
   memset((void *)pktTorp, 0,  sizeof(spTorp_t) * (MAXSHIPS + 1) * MAXTORPS);
   memset((void *)pktTorpLoc, 0,  
@@ -78,6 +84,7 @@ void spktInitPkt(void)
   memset((void *)&pktConqInfo, 0,  sizeof(spConqInfo_t));
   memset((void *)pktHistory, 0,  sizeof(spHistory_t) * MAXHISTLOG);
   memset((void *)&pktDoomsday, 0,  sizeof(spDoomsday_t));
+  memset((void *)pktPlanetInfo, 0, sizeof(spPlanetInfo_t) * (NUMPLANETS + 1));
   return;
 }
 
@@ -90,12 +97,15 @@ void spktInitRec(void)
   memset((void *)recPlanet, 0, sizeof(spPlanet_t) * (NUMPLANETS + 1));
   memset((void *)recPlanetSml, 0, sizeof(spPlanetSml_t) * (NUMPLANETS + 1));
   memset((void *)recPlanetLoc, 0, sizeof(spPlanetLoc_t) * (NUMPLANETS + 1));
+  memset((void *)recPlanetLoc2, 0, sizeof(spPlanetLoc2_t) * (NUMPLANETS + 1));
   memset((void *)recTorp, 0,  
          sizeof(spTorp_t) * (MAXSHIPS + 1) * MAXTORPS);
   memset((void *)recTorpLoc, 0,  
          sizeof(spTorpLoc_t) * (MAXSHIPS + 1) * MAXTORPS);
   memset((void *)recTeam, 0,  sizeof(spTeam_t) * NUMALLTEAMS);
   memset((void *)&recDoomsday, 0, sizeof(spDoomsday_t));
+  memset((void *)recPlanetInfo, 0, sizeof(spPlanetInfo_t) * (NUMPLANETS + 1));
+
   return;
 }
 
@@ -542,7 +552,7 @@ spPlanetLoc_t *spktPlanetLoc(Unsgn8 pnum, int rec)
      for the appearence of smoother movement to the user.
    */
   if ((splanloc.armies == pktPlanetLoc[pnum].armies) &&
-      ((dx + dy) / 2.0) < 2.0)
+      ((dx + dy) / 2.0) < 3.0)
     {
 #if 0
       clog("REJECT: %s dx = %f dy = %f [%f]", Planets[pnum].name,
@@ -590,6 +600,57 @@ spPlanetLoc_t *spktPlanetLoc(Unsgn8 pnum, int rec)
 
   return NULL;
 }
+
+spPlanetLoc2_t *spktPlanetLoc2(Unsgn8 pnum, int rec)
+{
+  int snum = Context.snum;
+  int team = Ships[snum].team;
+  static spPlanetLoc2_t splanloc2;
+  Unsgn32 iternow = clbGetMillis(); /* we send the loc2 packets only every 5 secs */
+  const Unsgn32 iterwait = 5000.0; /* ms */
+  static Unsgn32 tstart[NUMPLANETS] = {}; /* saved time deltas */
+  
+  if (tstart[pnum] != 0 && ((iternow - tstart[pnum]) < iterwait))
+    return NULL; 
+  
+  tstart[pnum] = iternow; 
+  
+  memset((void *)&splanloc2, 0, sizeof(spPlanetLoc2_t));
+
+  splanloc2.type = SP_PLANETLOC2;
+  splanloc2.pnum = pnum;
+
+  /* RESTRICT */
+  if (Planets[pnum].scanned[team] || rec)
+    splanloc2.armies = htons(Planets[pnum].armies);
+
+  splanloc2.x = (Sgn32)htonl((Sgn32)(Planets[pnum].x * 1000.0));
+  splanloc2.y = (Sgn32)htonl((Sgn32)(Planets[pnum].y * 1000.0));
+  splanloc2.orbang = (Unsgn16)htons((Unsgn16)(Planets[pnum].orbang * 100.0));
+
+  if (rec)
+    {
+      if (memcmp((void *)&splanloc2, (void *)&recPlanetLoc2[pnum],
+                 sizeof(spPlanetLoc2_t)))
+        {
+          recPlanetLoc2[pnum] = splanloc2;
+          return &splanloc2;
+        }
+    }
+  else
+    {
+      if (memcmp((void *)&splanloc2, (void *)&pktPlanetLoc2[pnum],
+                 sizeof(spPlanetLoc2_t)))
+        {
+          pktPlanetLoc2[pnum] = splanloc2;
+          return &splanloc2;
+        }
+    }
+
+  return NULL;
+}
+
+
 
 /* non priv */
 spTorp_t *spktTorp(Unsgn8 tsnum, Unsgn8 tnum, int rec)
@@ -837,3 +898,39 @@ spDoomsday_t *spktDoomsday(int rec)
 
   return NULL;
 }
+
+spPlanetInfo_t *spktPlanetInfo(Unsgn8 pnum, int rec)
+{
+  static spPlanetInfo_t splaninfo;
+
+  memset((void *)&splaninfo, 0, sizeof(spPlanetInfo_t));
+
+  splaninfo.type = SP_PLANETINFO;
+  splaninfo.pnum = pnum;
+  splaninfo.primary = (Unsgn8)Planets[pnum].primary;
+
+  splaninfo.orbrad = (Unsgn32)htonl((Unsgn32)(Planets[pnum].orbrad * 10.0));
+  splaninfo.orbvel = (Sgn32)htonl((Sgn32)(Planets[pnum].orbvel * 100.0)); 
+
+  if (rec)
+    {
+      if (memcmp((void *)&splaninfo, (void *)&recPlanetInfo[pnum],
+                 sizeof(spPlanetInfo_t)))
+        {
+          recPlanetInfo[pnum] = splaninfo;
+          return &splaninfo;
+        }
+    }
+  else
+    {
+      if (memcmp((void *)&splaninfo, (void *)&pktPlanetInfo[pnum],
+                 sizeof(spPlanetInfo_t)))
+        {
+          pktPlanetInfo[pnum] = splaninfo;
+          return &splaninfo;
+        }
+    }
+
+  return NULL;
+}
+

@@ -17,6 +17,7 @@
 #include "serverpkt.h"
 #include "context.h"
 #include "record.h"
+#include "conqlb.h"
 
 int sendClientStat(int sock, Unsgn8 flags, Unsgn8 snum, Unsgn8 team, 
 		   Unsgn16 unum, Unsgn8 esystem)
@@ -129,6 +130,8 @@ int sendPlanet(int sock, Unsgn8 pnum)
   spPlanet_t *splan;
   spPlanetSml_t *splansml;
   spPlanetLoc_t *splanloc;
+  spPlanetLoc2_t *splanloc2;
+  spPlanetInfo_t *splaninfo;
 
 #if defined(DEBUG_SERVERSEND)
   clog("sendPlanet: pnum = %d",
@@ -157,6 +160,24 @@ int sendPlanet(int sock, Unsgn8 pnum)
     if (writePacket(PKT_TOCLIENT, sock, (Unsgn8 *)splansml) <= 0)
       return FALSE;
 
+  /* SP_PLANETINFO */
+  /* we don't record these server-side, relying on loc packets instead */
+#if 0
+  if (Context.recmode == RECMODE_ON)
+    {
+      if ((splaninfo = spktPlanetInfo(pnum, TRUE)))
+        recordWriteEvent((Unsgn8 *)splaninfo);
+    }
+#endif
+
+  if ((splaninfo = spktPlanetInfo(pnum, FALSE)))
+    if (writePacket(PKT_TOCLIENT, sock, (Unsgn8 *)splaninfo) <= 0)
+      return FALSE;
+
+  /* we will do loc packets for recording purposes only.  loc2 is sent
+     to clients, but not recorded (server-side), since the clients
+     compute their own planetary movement based on them. */
+
   /* SP_PLANETLOC */
   if (Context.recmode == RECMODE_ON)
     {
@@ -164,20 +185,11 @@ int sendPlanet(int sock, Unsgn8 pnum)
         recordWriteEvent((Unsgn8 *)splanloc);
     }
 
-  if ((splanloc = spktPlanetLoc(pnum, FALSE)))
-    {
-      if (sInfo.doUDP)
-        {
-          if (writePacket(PKT_TOCLIENT, sInfo.usock, (Unsgn8 *)splanloc) <= 0)
-            return FALSE;
-        }
-      else
-        {
-          if (writePacket(PKT_TOCLIENT, sock, (Unsgn8 *)splanloc) <= 0)
-            return FALSE;
-        }
+  /* SP_PLANETLOC2 */
+  if ((splanloc2 = spktPlanetLoc2(pnum, FALSE)))
+    if (writePacket(PKT_TOCLIENT, sock, (Unsgn8 *)splanloc2) <= 0)
+      return FALSE;
 
-    }
   return TRUE;
 }
 

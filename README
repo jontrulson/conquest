@@ -47,6 +47,7 @@
        ## Meta Server
        ## ~/.conquestrc
        ## Recording Games
+       ## Replaying Games
        ## Hints for new players
           # Shields
           # Energy Allocation
@@ -86,7 +87,6 @@
        ## conquestsh
        ## conqdriv
        ## conqoper
-       ## conqreplay
        ## conqai
        ## conquest_common.img
        ## HISTORY
@@ -428,23 +428,27 @@
 
        For this reason, client recordings are identified by the ship
        that made the recording.  Although you can still try to watch
-       other ships in conqreplay than the one that made the recording,
+       other ships during replay, than the one that made the recording,
        the experience will probably not be too rewarding, since much
        data about the ship will never have been sent to the client to
        be recorded in the first place.
 
-       For client recordings, conqreplay will always use the
-       recorder's ship number as the default to the (w)atch command,
-       though you can certainly select other ones, keeping the
-       caveat's above in mind.
+       For client recordings, replay will always use the recorder's
+       ship number as the default to the (w)atch command, though you
+       can certainly select other ones, keeping the caveat's above in
+       mind.
 
        Of course, full information is always recorded for the ship
        that made the recording.
 
+       Planet motion is only updated once every 5 seconds in client
+       recordings, since the orbital trajectories computed by the
+       client are not recorded.
+
    Server:
 
        Server recordings are complete (like the old recordings made in
-       previous versions of conquest), since the server has full
+        previous versions of conquest), since the server has full
        access to the common block (unlike clients).
              
        All active ship/planet/etc data is stored in server recordings.
@@ -453,26 +457,69 @@
 
    To replay a recording:
 
-      $ conqreplay -f somefile.cqr
+      $ conquestgl -P somefile.cqr
 
    If libz and it's development header files are available on your
    system when building conquest, game data will be recorded using
-   gzip compression.  It's a good idea to use this.  conqreplay can
-   read either uncompressed or gzip compressed files, and can be
-   played back on any curses/terminfo terminal.
+   gzip compression.  It's a good idea to use this.  Replay can read
+   either uncompressed or gzip compressed files, and can be played
+   back using either the GLUT/OpenGL client or the curses client.
 
-   If your conqreplay was not compiled with libz support, then you
+   If your client was not compiled with libz support, then you
    will need to uncompress any compressed .cqr files you may have
    before you can replay them.  A simple way is:
 
    $ gunzip -f <somefile.cqr >somefile-nocompress.cqr
-   $ conqreplay -f somefile-nocompress.cqr
-
-   conqreplay also supports a few options - try 'conqreplay -?' for a
-   current list.
+   $ conquestgl -P somefile-nocompress.cqr
 
    If anyone creates some amusing recordings and sends them to me,
    I'll happily make them available on the website. ;-)
+
+## Replaying Games
+
+   The Conquest client (either curses or OpenGL version) is used to
+   replay previously recorded games.
+
+   This is a much nicer way to save and playback games than using
+   something like script, or Xterm logging.  
+
+   The replay allows you to speed up or slowdown the playback, as well
+   as giving you the ability to jump forward and backward in a
+   recording.  Not as nice as a VCR but close enough.
+
+   To playback a game, you use the '-P' option to 
+
+   conqreplay currently supports the following options:
+
+     usage: conqreplay [ -d <dly> ] -f <cqr file>
+        -f <cqr>         specify the file to replay
+        -d <dly>         specify the frame delay
+
+
+   For example, to play back a files called dethfun.cqr:
+
+     conqreplay -f dethfun.cqr
+
+   If you want to replay the game using the OpenGL client instead, use
+   the '-P' option to conquestgl:
+
+     conquestgl -P dethfun.cqr
+
+   There is a 'demonstration' CQR file up on the website if you want
+   to try one out.
+
+   See the section '## Recording Games' for more information.
+   
+   NOTES:
+
+   - Only the messages sent to the player that made the recording are
+     saved into the CQR file of a client recording.  You can't use a
+     recording to 'snoop' on other players conversations.
+
+   - there is no way at this time to manually start and stop client
+     recording from within the game.  You must start conquest with the
+     '-r' option to start client recording, and the entire session will be
+     recorded.
 
 
 ## Hints for new players
@@ -1108,7 +1155,11 @@
 
 ## bin/conquest
 
-   The Conquest curses client. type 'conquest -?' to see a list of options.
+   The Conquest curses client. type 'conquest -?' to see a list of
+   options.  
+
+   The curses client can also be used to replay conquest recording
+   (.cqr) files using the '-P' option to conquest.
 
 ## bin/conquestgl
 
@@ -1212,54 +1263,6 @@
     automatically when conquest is run.  This is not done
     automatically for the system wide conquestrc file due to potential
     security problems.
-
-
-## bin/conqreplay
-
-   A utility for playing back Conquest Recording (CQR) files made when
-   conquest is run with the '-r <filename>' flag.  
-
-   Note, this is a curses app only.  If you want to see the replay using
-   OpenGL, use the '-P' option to conquestgl (version >=8.0.1a).
-
-   This is a much nicer way to save and playback games than using
-   something like script, or Xterm logging.  
-
-   conqreplay allows you to speed up or slowdown the playback, as well
-   as giving you the ability to jump forward and backward in a
-   recording.  Not as nice as a VCR but close enough.
-
-   conqreplay currently supports the following options:
-
-     usage: conqreplay [ -d <dly> ] -f <cqr file>
-        -f <cqr>         specify the file to replay
-        -d <dly>         specify the frame delay
-
-
-   For example, to play back a files called dethfun.cqr:
-
-     conqreplay -f dethfun.cqr
-
-   If you want to replay the game using the OpenGL client instead, use
-   the '-P' option to conquestgl:
-
-     conquestgl -P dethfun.cqr
-
-   There is a 'demonstration' CQR file up on the website if you want
-   to try one out.
-
-   See the section '## Recording Games' for more information.
-   
-   NOTES:
-
-   - Only the messages sent to the player that made the recording are
-     saved into the CQR file of a client recording.  You can't use a
-     recording to 'snoop' on other players conversations.
-
-   - there is no way at this time to manually start and stop client
-     recording from within the game.  You must start conquest with the
-     '-r' option to start client recording, and the entire session will be
-     recorded.
 
 
 ## bin/conqai

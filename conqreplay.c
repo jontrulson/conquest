@@ -2,7 +2,7 @@
 
 /************************************************************************
  *
- * conqreplay - replay a cqr recording
+ * conqreplay - replay a cqr recording for curses interface
  *
  * $Id$
  *
@@ -31,21 +31,13 @@
 #include "display.h"
 
 static void replay(void);
-void watch(void);
-int prompt_ship(char buf[], int *snum, int *normal);
-void toggle_line(int snum, int old_snum);
-void setdheader(int show_header);
-void dowatchhelp(void);
-char *build_toggle_str(char *snum_str, int snum);
+static void watch(void);
+static int prompt_ship(char buf[], int *snum, int *normal);
+static void toggle_line(int snum, int old_snum);
+static void setdheader(int show_header);
+static void dowatchhelp(void);
+static char *build_toggle_str(char *snum_str, int snum);
 
-void printUsage(void)
-{
-  fprintf(stderr, "usage: conqreplay [ -d <dly> ] -f <cqr file>\n");
-  fprintf(stderr, "       -f <cqr>\t\tspecify the file to replay\n");
-  fprintf(stderr, "       -d <dly>\t\tspecify the frame delay\n");
-
-  return;
-}
 
 /* overlay the elapsed time, and current framedelay */
 void displayReplayData(void)
@@ -123,78 +115,9 @@ void displayMsg(Msg_t *themsg)
 }
 
 /* MAIN */
-int main(int argc, char *argv[])
+void conquestReplay(void)
 {
-  int i;
-  extern char *optarg;
-  extern int optind;
-  
-  if (argc <= 1)
-    {
-      printUsage();
-      exit(1);
-    }
-
-  rfname = NULL;
-
-  while ((i = getopt(argc, argv, "f:d:")) != EOF)    /* get command args */
-    switch (i)
-      {
-      case 'f': 
-	rfname = optarg;
-        break;
-
-      case 'd':
-	framedelay = ctor(optarg);
-	break;
-
-      case '?':
-      default: 
-	printUsage();
-	exit(1);
-	break;
-      }
-
-  if (rfname == NULL)
-    {
-      printUsage();
-      exit(1);
-    }
-
   setSystemLog(FALSE);	/* use $HOME for logfile */
-
-  GetSysConf(TRUE);             /* need this? */
-  GetConf(0);
-
-  /* turn off annoying beeps */
-  UserConf.DoAlarms = FALSE;
-
-  rndini( 0, 0 );		/* initialize random numbers */
-
-  /* first, let's get the elapsed time */
-  printf("Scanning file %s...\n", rfname);
-  if (!initReplay(rfname, &totElapsed))
-    exit(1);
-
-  /* now init for real */
-  if (!initReplay(rfname, NULL))
-    exit(1);
-
-  cdinit();			/* initialize display environment */
-  
-  Context.unum = MSG_GOD;	/* stow user number */
-  Context.snum = ERR;		/* don't display in cdgetp - JET */
-  Context.entship = FALSE;	/* never entered a ship */
-  Context.histslot = ERR;	/* useless as an op */
-  Context.lasttdist = Context.lasttang = 0;
-  Context.lasttarg[0] = EOS;
-
-  Context.display = TRUE;
-
-  Context.maxlin = cdlins();	/* number of lines */
-  Context.maxcol = cdcols();	/* number of columns */
-
-  Context.recmode = RECMODE_PLAYING;
 
   /* if framedelay wasn't overridden, setup based on samplerate */
   if (framedelay == -1.0)
@@ -202,9 +125,7 @@ int main(int argc, char *argv[])
 
   replay();
   
-  cdend();
-  
-  exit(0);
+  return;
   
 }
 
@@ -281,7 +202,7 @@ static void replay(void)
 /*  watch - peer over someone's shoulder */
 /*  SYNOPSIS */
 /*    watch */
-void watch(void)
+static void watch(void)
 {
   int ptype;
   int snum, tmp_snum, old_snum;
@@ -657,14 +578,14 @@ void watch(void)
   
 }
 
-void setdheader(int show_header)
+static void setdheader(int show_header)
 {
 
   headerflag = show_header;
   return;
 }
 
-int prompt_ship(char buf[], int *snum, int *normal)
+static int prompt_ship(char buf[], int *snum, int *normal)
 {
   int tch;
   int tmpsnum = 0;
@@ -733,63 +654,13 @@ int prompt_ship(char buf[], int *snum, int *normal)
 /*  dowatchhelp - display a list of commands while watching a ship */
 /*  SYNOPSIS */
 /*    dowatchhelp( void ) */
-void dowatchhelp(void)
+static void dowatchhelp(void)
 {
-  int lin, col, tlin;
   int ch;
-  static int FirstTime = TRUE;
-  static char sfmt[MSGMAXLINE * 2];
-
-  if (FirstTime == TRUE)
-    {
-      FirstTime = FALSE;
-      sprintf(sfmt,
-	      "#%d#%%-9s#%d#%%s",
-	      InfoColor,
-	      LabelColor);
-	}
 
   cdclear();
-  cprintf(1,0,ALIGN_CENTER,"#%d#%s", LabelColor, "WATCH WINDOW COMMANDS");
-  
-  lin = 4;
-  
-  /* Display the left side. */
-  tlin = lin;
-  col = 4;
-  tlin++;
-  cprintf(tlin,col,ALIGN_NONE,sfmt, "w", "watch a ship");
-  tlin++;
-  cprintf(tlin,col,ALIGN_NONE,sfmt, 
-  	"<>", "decrement/increment ship number\n");
-  tlin++;
-  cprintf(tlin,col,ALIGN_NONE,sfmt, "/", "player list");
-  tlin++;
-  cprintf(tlin,col,ALIGN_NONE,sfmt, "f", "forward 30 seconds");
-  tlin++;
-  cprintf(tlin,col,ALIGN_NONE,sfmt, "F", "forward 2 minutes");
-  tlin++;
-  cprintf(tlin,col,ALIGN_NONE,sfmt, "b", "backward 30 seconds");
-  tlin++;
-  cprintf(tlin,col,ALIGN_NONE,sfmt, "B", "backward 2 minutes");
-  tlin++;
-  cprintf(tlin,col,ALIGN_NONE,sfmt, "r", "reset to beginning");
-  tlin++;
-  cprintf(tlin,col,ALIGN_NONE,sfmt, "q", "quit");
-  tlin++;
-  cprintf(tlin,col,ALIGN_NONE,sfmt, "[SPACE]", "pause/resume playback");
-  tlin++;
-  cprintf(tlin,col,ALIGN_NONE,sfmt, "-", "slow down playback by doubling the frame delay");
-  tlin++;
-  cprintf(tlin,col,ALIGN_NONE,sfmt, "+", "speed up playback by halfing the frame delay");
-  tlin++;
-  cprintf(tlin,col,ALIGN_NONE,sfmt, "M", "short/long range sensor toggle");
-  tlin++;
-  cprintf(tlin,col,ALIGN_NONE,sfmt, "n", "reset to normal playback speed");
-  tlin++;
-  cprintf(tlin,col,ALIGN_NONE,sfmt, "`", "toggle between two ships");
-  tlin++;
-  cprintf(tlin,col,ALIGN_NONE,sfmt, "!", "display toggle line");
+
+  dspReplayHelp();
 
   cumPutPrompt( MTXT_DONE, MSG_LIN2 );
   cdrefresh();
@@ -802,7 +673,7 @@ void dowatchhelp(void)
 }
 
 
-void toggle_line(int snum, int old_snum)
+static void toggle_line(int snum, int old_snum)
 {
 
   char *frmt_str = "(') = Toggle %s:%s";
@@ -820,7 +691,7 @@ void toggle_line(int snum, int old_snum)
 
 }
 
-char *build_toggle_str(char *snum_str, int snum)
+static char *build_toggle_str(char *snum_str, int snum)
 {
   
   char buf[MSGMAXLINE];

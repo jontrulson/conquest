@@ -13,7 +13,7 @@
 #include "datatypes.h"
 
 #define PROTOCOL_VERMAJ 0
-#define PROTOCOL_VERMIN 5
+#define PROTOCOL_VERMIN 6
 #define PROTOCOL_VERSION  (Unsgn16)((PROTOCOL_VERMAJ << 8) | PROTOCOL_VERMIN)
 
 
@@ -40,6 +40,10 @@
 #define SP_FRAME          18    /* used in recording only */
 #define SP_HISTORY        19  
 #define SP_DOOMSDAY       20
+
+#define SP_PLANETINFO     21    /* planet's orbital characteristics */
+
+#define SP_PLANETLOC2     22    /* new planloc packet */
 
 /* client -> server packet types */
 
@@ -241,6 +245,30 @@ typedef struct _sp_planetloc {
 
   Sgn32 y;			/* x1000 */
 } spPlanetLoc_t;
+
+typedef struct _sp_planetloc2 {
+  Unsgn8 type;                  /* SP_PLANETLOC2 */
+  Unsgn8 pnum;
+  Sgn16 armies;
+
+  Sgn32 x;			/* x1000 */
+
+  Sgn32 y;			/* x1000 */
+
+  Unsgn16 orbang;               /* x100 */
+
+} spPlanetLoc2_t;
+
+typedef struct _sp_planetinfo {
+  Unsgn8 type;			/* SP_PLANETINFO */
+  Unsgn8 pnum;			/* planet number */
+  Unsgn8 primary;
+  Unsgn8 pad1;
+
+  Unsgn32 orbrad;               /* x10 */
+
+  Sgn32 orbvel;               /* x100 */
+} spPlanetInfo_t;
 
 typedef struct _sp_message {
   Unsgn8 type; 			/* SP_MESSAGE */

@@ -8,6 +8,28 @@
          +--------------------------------------------------------+
 
                               Conquest HISTORY
+
+Version 8.0.1g 8/04/2004 (devel)
+
+        - moved planet orbital computation into the client so that
+          server no longer needs to send butt-loads of packets to the
+          client to get smooth planet motion.
+
+          The network protocol version changed as a result so only new
+          clients can play with new servers.
+
+          Recording files (.cqr) are still compatible.  
+
+          The common block was not changed so your universe will
+          continue to work.
+
+        - got rid of conqreplay program.  The clients (conquest and
+          conquestgl) are now used to playback recordings using the -P
+          option.
+
+        - fixed CPCMD_RELOAD to properly send a full update to the
+          client when a client starts recording.        
+
 Version 8.0.1f 7/11/2004 (devel)
 
         - switch to TARGA (.tga) format textures rather than BMP.

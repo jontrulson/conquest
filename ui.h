@@ -8,10 +8,13 @@
 
 #ifndef _UI_H
 #define _UI_H
+
 /* ui specific */
 void uiInitColors(void);
 void uiPutColor(cqColor col);
+
 /* ui generic */
 void dspReplayMenu(void);
+void dspReplayHelp(void);
 
 #endif /* _UI_H */

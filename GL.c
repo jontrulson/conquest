@@ -1217,11 +1217,17 @@ void uiPrintFixed(GLfloat x, GLfloat y, GLfloat w, GLfloat h, char *str)
 }
 
 
-void drawTorp(GLfloat x, GLfloat y, char torpchar, int torpcolor)
+void drawTorp(GLfloat x, GLfloat y, char torpchar, int torpcolor, 
+              int scale)
 {
   const GLfloat z = -5.0;
-  const GLfloat size = 3.0;
-  GLfloat sizeh = (size / 2.0);
+  GLfloat size = 3.0;
+  GLfloat sizeh;
+
+  if (scale == MAP_FAC)
+    size = size / 2.0;
+
+  sizeh = (size / 2.0);
 
   glPushMatrix();
   glLoadIdentity();

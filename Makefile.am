@@ -75,21 +75,23 @@ libUiGL_la_LDFLAGS = -version-info 1:0:0
 
 libUiCU_la_SOURCES = display.c cprintf.h cprintf.c disputil.h colorCU.c \
 	cd2lb.h cd2lb.c iolb.h iolb.c cumisc.h cumisc.c cuclient.h \
-	cuclient.c options.h options.c clntauth.c ui.h display.h
+	cuclient.c options.h options.c clntauth.c ui.h display.h 
 
 libUiCU_la_LDFLAGS = -version-info 1:0:0
 
 if GLCLIENT
-bin_PROGRAMS = conquest conquestgl conqai conqoper conqstrat conqreplay \
+bin_PROGRAMS = conquest conquestgl conqai conqoper conqstrat \
 	conquestd conquestsh conqmetad
 else
-bin_PROGRAMS = conquest conqai conqoper conqstrat conqreplay \
+bin_PROGRAMS = conquest conqai conqoper conqstrat \
 	conquestd conquestsh conqmetad
 endif
 
 libexec_PROGRAMS = conqdriv
           
-conquest_SOURCES = conquest.c c_defs.h defs.h conqdef.h conqcom.h context.h
+conquest_SOURCES = conquest.c c_defs.h defs.h conqdef.h conqcom.h context.h \
+	conqreplay.c
+
 conquest_LDADD = libconqclnt.la libconquest.la libUi.la libUiCU.la 
 
 conquestgl_SOURCES = conquestgl.c c_defs.h defs.h conqdef.h conqcom.h context.h
@@ -112,9 +114,6 @@ conqdriv_LDADD = libconquest.la
 
 conqstrat_SOURCES = conqstrat-yacc.y conqstrat-lex.l conqstrat.h
 conqstrat_LDADD = libconquest.la $(LEXLIB) $(YACCLIB) 
-
-conqreplay_SOURCES = conqreplay.c c_defs.h defs.h conqdef.h conqcom.h context.h record.h
-conqreplay_LDADD = libconqclnt.la libconquest.la libUi.la libUiCU.la 
 
 conquestsh_SOURCES = conquestsh.c
 

@@ -61,6 +61,8 @@ int procShipLoc(Unsgn8 *buf);
 int procPlanet(Unsgn8 *buf);
 int procPlanetSml(Unsgn8 *buf);
 int procPlanetLoc(Unsgn8 *buf);
+int procPlanetLoc2(Unsgn8 *buf);
+int procPlanetInfo(Unsgn8 *buf);
 int procTorp(Unsgn8 *buf);
 int procTorpLoc(Unsgn8 *buf);
 int procTeam(Unsgn8 *buf);

@@ -1095,6 +1095,7 @@ void handleSimpleCmdPkt(cpCommand_t *ccmd)
 
     case CPCMD_RELOAD:
       procReload(ccmd);
+      updateClient();
 
       break;
 

@@ -228,7 +228,7 @@ void display( int snum, int display_info )
 					 Ships[i].torps[j].y, scale, 
 					 &glx, &gly );
 			    drawTorp(glx, gly, Teams[Ships[i].team].torpchar, 
-				     color);			    
+				     color, scale);			    
 			    
 			  }
 		  }
@@ -372,7 +372,8 @@ void display( int snum, int display_info )
 			      scale, &lin, &col ) )
 		{
 		  GLcvtcoords( cenx, ceny, Ships[i].torps[j].x, Ships[i].torps[j].y, scale, &glx, &gly);
-		  drawTorp(glx, gly, Teams[Ships[i].team].torpchar, color);
+		  drawTorp(glx, gly, Teams[Ships[i].team].torpchar, color,
+                           scale);
 		}
 	}
     }

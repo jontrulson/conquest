@@ -2460,6 +2460,11 @@ static int nCPIdle(void)
   Unsgn8 buf[PKT_MAXSIZE];
   int difftime = dgrand( Context.msgrand, &now );
   int sockl[2] = {cInfo.sock, cInfo.usock};
+  static Unsgn32 iterstart = 0;
+  Unsgn32 iternow = clbGetMillis();
+  const Unsgn32 iterwait = 100.0; /* ms */
+  real tdelta = (real)iternow - (real)iterstart;
+
 
   if (state == S_DEAD)
     {                           /* transfer to the dead node */
@@ -2476,6 +2481,13 @@ static int nCPIdle(void)
       clog("nCPIdle: waitForPacket returned %d", pkttype);
       Ships[Context.snum].status = SS_OFF;
       return NODE_EXIT;
+    }
+
+  /* drive the planets */
+  if (tdelta > iterwait) 
+    {
+      clbPlanetDrive(tdelta / 1000.0);
+      iterstart = iternow;
     }
 
   if (clientFlags & SPCLNTSTAT_FLAG_KILLED)

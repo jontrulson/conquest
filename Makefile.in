@@ -208,21 +208,24 @@ libUiGL_la_LDFLAGS = -version-info 1:0:0
 
 libUiCU_la_SOURCES = display.c cprintf.h cprintf.c disputil.h colorCU.c \
 	cd2lb.h cd2lb.c iolb.h iolb.c cumisc.h cumisc.c cuclient.h \
-	cuclient.c options.h options.c clntauth.c ui.h display.h
+	cuclient.c options.h options.c clntauth.c ui.h display.h 
 
 
 libUiCU_la_LDFLAGS = -version-info 1:0:0
-@GLCLIENT_FALSE@bin_PROGRAMS = conquest conqai conqoper conqstrat conqreplay \
+@GLCLIENT_FALSE@bin_PROGRAMS = conquest conqai conqoper conqstrat \
 @GLCLIENT_FALSE@	conquestd conquestsh conqmetad
 
 
-@GLCLIENT_TRUE@bin_PROGRAMS = conquest conquestgl conqai conqoper conqstrat conqreplay \
+@GLCLIENT_TRUE@bin_PROGRAMS = conquest conquestgl conqai conqoper conqstrat \
 @GLCLIENT_TRUE@	conquestd conquestsh conqmetad
 
 
 libexec_PROGRAMS = conqdriv
 
-conquest_SOURCES = conquest.c c_defs.h defs.h conqdef.h conqcom.h context.h
+conquest_SOURCES = conquest.c c_defs.h defs.h conqdef.h conqcom.h context.h \
+	conqreplay.c
+
+
 conquest_LDADD = libconqclnt.la libconquest.la libUi.la libUiCU.la 
 
 conquestgl_SOURCES = conquestgl.c c_defs.h defs.h conqdef.h conqcom.h context.h
@@ -247,9 +250,6 @@ conqdriv_LDADD = libconquest.la
 
 conqstrat_SOURCES = conqstrat-yacc.y conqstrat-lex.l conqstrat.h
 conqstrat_LDADD = libconquest.la $(LEXLIB) $(YACCLIB) 
-
-conqreplay_SOURCES = conqreplay.c c_defs.h defs.h conqdef.h conqcom.h context.h record.h
-conqreplay_LDADD = libconqclnt.la libconquest.la libUi.la libUiCU.la 
 
 conquestsh_SOURCES = conquestsh.c
 
@@ -296,13 +296,12 @@ am_libconquest_la_OBJECTS = conqai.lo ratfor.lo conqlb.lo rndlb.lo \
 libconquest_la_OBJECTS = $(am_libconquest_la_OBJECTS)
 @GLCLIENT_TRUE@bin_PROGRAMS = conquest$(EXEEXT) conquestgl$(EXEEXT) \
 @GLCLIENT_TRUE@	conqai$(EXEEXT) conqoper$(EXEEXT) \
-@GLCLIENT_TRUE@	conqstrat$(EXEEXT) conqreplay$(EXEEXT) \
-@GLCLIENT_TRUE@	conquestd$(EXEEXT) conquestsh$(EXEEXT) \
-@GLCLIENT_TRUE@	conqmetad$(EXEEXT)
+@GLCLIENT_TRUE@	conqstrat$(EXEEXT) conquestd$(EXEEXT) \
+@GLCLIENT_TRUE@	conquestsh$(EXEEXT) conqmetad$(EXEEXT)
 @GLCLIENT_FALSE@bin_PROGRAMS = conquest$(EXEEXT) conqai$(EXEEXT) \
 @GLCLIENT_FALSE@	conqoper$(EXEEXT) conqstrat$(EXEEXT) \
-@GLCLIENT_FALSE@	conqreplay$(EXEEXT) conquestd$(EXEEXT) \
-@GLCLIENT_FALSE@	conquestsh$(EXEEXT) conqmetad$(EXEEXT)
+@GLCLIENT_FALSE@	conquestd$(EXEEXT) conquestsh$(EXEEXT) \
+@GLCLIENT_FALSE@	conqmetad$(EXEEXT)
 libexec_PROGRAMS = conqdriv$(EXEEXT)
 PROGRAMS = $(bin_PROGRAMS) $(libexec_PROGRAMS)
 
@@ -323,16 +322,11 @@ conqoper_OBJECTS = $(am_conqoper_OBJECTS)
 conqoper_DEPENDENCIES = libconqclnt.la libconquest.la libUi.la \
 	libUiCU.la
 conqoper_LDFLAGS =
-am_conqreplay_OBJECTS = conqreplay.$(OBJEXT)
-conqreplay_OBJECTS = $(am_conqreplay_OBJECTS)
-conqreplay_DEPENDENCIES = libconqclnt.la libconquest.la libUi.la \
-	libUiCU.la
-conqreplay_LDFLAGS =
 am_conqstrat_OBJECTS = conqstrat-yacc.$(OBJEXT) conqstrat-lex.$(OBJEXT)
 conqstrat_OBJECTS = $(am_conqstrat_OBJECTS)
 conqstrat_DEPENDENCIES = libconquest.la
 conqstrat_LDFLAGS =
-am_conquest_OBJECTS = conquest.$(OBJEXT)
+am_conquest_OBJECTS = conquest.$(OBJEXT) conqreplay.$(OBJEXT)
 conquest_OBJECTS = $(am_conquest_OBJECTS)
 conquest_DEPENDENCIES = libconqclnt.la libconquest.la libUi.la \
 	libUiCU.la
@@ -409,8 +403,8 @@ DIST_SOURCES = $(libUi_la_SOURCES) $(libUiCU_la_SOURCES) \
 	$(libUiGL_la_SOURCES) $(libconqclnt_la_SOURCES) \
 	$(libconqserv_la_SOURCES) $(libconquest_la_SOURCES) \
 	$(conqai_SOURCES) $(conqdriv_SOURCES) $(conqmetad_SOURCES) \
-	$(conqoper_SOURCES) $(conqreplay_SOURCES) $(conqstrat_SOURCES) \
-	$(conquest_SOURCES) $(conquestd_SOURCES) $(conquestgl_SOURCES) \
+	$(conqoper_SOURCES) $(conqstrat_SOURCES) $(conquest_SOURCES) \
+	$(conquestd_SOURCES) $(conquestgl_SOURCES) \
 	$(conquestsh_SOURCES)
 DATA = $(data_DATA)
 
@@ -418,7 +412,7 @@ DIST_COMMON = README INSTALL Makefile.am Makefile.in acinclude.m4 \
 	aclocal.m4 config.guess config.h.in config.sub configure \
 	configure.ac conqstrat-lex.c conqstrat-yacc.c conqstrat-yacc.h \
 	depcomp install-sh ltmain.sh missing mkinstalldirs snprintf.c
-SOURCES = $(libUi_la_SOURCES) $(libUiCU_la_SOURCES) $(libUiGL_la_SOURCES) $(libconqclnt_la_SOURCES) $(libconqserv_la_SOURCES) $(libconquest_la_SOURCES) $(conqai_SOURCES) $(conqdriv_SOURCES) $(conqmetad_SOURCES) $(conqoper_SOURCES) $(conqreplay_SOURCES) $(conqstrat_SOURCES) $(conquest_SOURCES) $(conquestd_SOURCES) $(conquestgl_SOURCES) $(conquestsh_SOURCES)
+SOURCES = $(libUi_la_SOURCES) $(libUiCU_la_SOURCES) $(libUiGL_la_SOURCES) $(libconqclnt_la_SOURCES) $(libconqserv_la_SOURCES) $(libconquest_la_SOURCES) $(conqai_SOURCES) $(conqdriv_SOURCES) $(conqmetad_SOURCES) $(conqoper_SOURCES) $(conqstrat_SOURCES) $(conquest_SOURCES) $(conquestd_SOURCES) $(conquestgl_SOURCES) $(conquestsh_SOURCES)
 
 all: config.h
 	$(MAKE) $(AM_MAKEFLAGS) all-am
@@ -568,9 +562,6 @@ conqmetad$(EXEEXT): $(conqmetad_OBJECTS) $(conqmetad_DEPENDENCIES)
 conqoper$(EXEEXT): $(conqoper_OBJECTS) $(conqoper_DEPENDENCIES) 
 	@rm -f conqoper$(EXEEXT)
 	$(LINK) $(conqoper_LDFLAGS) $(conqoper_OBJECTS) $(conqoper_LDADD) $(LIBS)
-conqreplay$(EXEEXT): $(conqreplay_OBJECTS) $(conqreplay_DEPENDENCIES) 
-	@rm -f conqreplay$(EXEEXT)
-	$(LINK) $(conqreplay_LDFLAGS) $(conqreplay_OBJECTS) $(conqreplay_LDADD) $(LIBS)
 conqstrat-yacc.h: conqstrat-yacc.c
 	@if test ! -f $@; then \
 	  rm -f conqstrat-yacc.c; \

@@ -122,3 +122,62 @@ void dspReplayMenu(void)
   return;
 }
 
+/* display help for replaying */
+void dspReplayHelp(void)
+{
+  int lin, col, tlin;
+  static int FirstTime = TRUE;
+  static char sfmt[MSGMAXLINE * 2];
+
+  if (FirstTime == TRUE)
+    {
+      FirstTime = FALSE;
+      sprintf(sfmt,
+	      "#%d#%%-9s#%d#%%s",
+	      InfoColor,
+	      LabelColor);
+	}
+
+  cprintf(1,0,ALIGN_CENTER,"#%d#%s", LabelColor, "WATCH WINDOW COMMANDS");
+  
+  lin = 4;
+  
+  /* Display the left side. */
+  tlin = lin;
+  col = 4;
+  tlin++;
+  cprintf(tlin,col,ALIGN_NONE,sfmt, "w", "watch a ship");
+  tlin++;
+  cprintf(tlin,col,ALIGN_NONE,sfmt, 
+  	"<>", "decrement/increment ship number\n");
+  tlin++;
+  cprintf(tlin,col,ALIGN_NONE,sfmt, "/", "player list");
+  tlin++;
+  cprintf(tlin,col,ALIGN_NONE,sfmt, "f", "forward 30 seconds");
+  tlin++;
+  cprintf(tlin,col,ALIGN_NONE,sfmt, "F", "forward 2 minutes");
+  tlin++;
+  cprintf(tlin,col,ALIGN_NONE,sfmt, "b", "backward 30 seconds");
+  tlin++;
+  cprintf(tlin,col,ALIGN_NONE,sfmt, "B", "backward 2 minutes");
+  tlin++;
+  cprintf(tlin,col,ALIGN_NONE,sfmt, "r", "reset to beginning");
+  tlin++;
+  cprintf(tlin,col,ALIGN_NONE,sfmt, "q", "quit");
+  tlin++;
+  cprintf(tlin,col,ALIGN_NONE,sfmt, "[SPACE]", "pause/resume playback");
+  tlin++;
+  cprintf(tlin,col,ALIGN_NONE,sfmt, "-", "slow down playback by doubling the frame delay");
+  tlin++;
+  cprintf(tlin,col,ALIGN_NONE,sfmt, "+", "speed up playback by halfing the frame delay");
+  tlin++;
+  cprintf(tlin,col,ALIGN_NONE,sfmt, "M", "short/long range sensor toggle");
+  tlin++;
+  cprintf(tlin,col,ALIGN_NONE,sfmt, "n", "reset to normal playback speed");
+  tlin++;
+  cprintf(tlin,col,ALIGN_NONE,sfmt, "`", "toggle between two ships");
+  tlin++;
+  cprintf(tlin,col,ALIGN_NONE,sfmt, "!", "display toggle line");
+
+  return;
+}

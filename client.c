@@ -339,6 +339,61 @@ int procPlanetLoc(Unsgn8 *buf)
   return TRUE;
 }
 
+int procPlanetLoc2(Unsgn8 *buf)
+{
+  spPlanetLoc2_t *splanloc2 = (spPlanetLoc2_t *)buf;
+  int pnum;
+
+  if (!validPkt(SP_PLANETLOC2, buf))
+    return FALSE;
+
+  pnum = splanloc2->pnum;
+  
+  if (pnum <= 0 || pnum > NUMPLANETS)
+    return FALSE;
+
+  if (Context.recmode == RECMODE_ON)
+    recordWriteEvent(buf);
+
+  Planets[pnum].armies = (int)((Sgn16)ntohs(splanloc2->armies));
+  Planets[pnum].x = (real)((real)((Sgn32)ntohl(splanloc2->x)) / 1000.0);
+  Planets[pnum].y = (real)((real)((Sgn32)ntohl(splanloc2->y)) / 1000.0);
+  Planets[pnum].orbang = (real)((real)((Unsgn16)ntohs(splanloc2->orbang)) / 100.0);
+
+  return TRUE;
+}
+
+int procPlanetInfo(Unsgn8 *buf)
+{
+  spPlanetInfo_t *splaninfo = (spPlanetInfo_t *)buf;
+  int pnum;
+  int primary;
+
+  if (!validPkt(SP_PLANETINFO, buf))
+    return FALSE;
+
+  pnum = splaninfo->pnum;
+  
+  if (pnum <= 0 || pnum > NUMPLANETS)
+    return FALSE;
+
+  primary = splaninfo->primary;
+  
+  if (primary <= 0 || primary > NUMPLANETS)
+    return FALSE;
+
+  /* we will record them if we get them */
+  if (Context.recmode == RECMODE_ON)
+    recordWriteEvent(buf);
+
+  Planets[pnum].primary = primary;
+  Planets[pnum].orbrad = (real)((real)((Unsgn32)ntohl(splaninfo->orbrad)) / 10.0);
+  Planets[pnum].orbvel = (real)((real)((Sgn32)ntohl(splaninfo->orbvel)) / 100.0);
+
+  return TRUE;
+}
+
+
 int procTorp(Unsgn8 *buf)
 {
   int snum, tnum;
