@@ -78,7 +78,9 @@ int sendAck(int sock, int dir, Unsgn8 severity, Unsgn8 code, Unsgn8 *msg)
       break;
 
     default:
+#if defined(DEBUG_PKT)
       clog("sendAck: invalid dir = %d\n", dir);
+#endif
       return -1;
       break;
     }
@@ -159,8 +161,12 @@ int waitForPacket(int dir, int sock, int type, Unsgn8 *buf, int blen,
       if (pkttype < 0)
 	{
 	  if (errno != EINTR)
-	    clog("waitForPacket(dir=%d): read error %s\n", dir, strerror(errno));
-	  return -1;
+            {
+#if defined(DEBUG_PKT)
+              clog("waitForPacket(dir=%d): read error %s\n", dir, strerror(errno));
+#endif
+              return -1;
+            }
 	}
     }
 
@@ -176,7 +182,9 @@ int serverPktSize(int type)
     {
       clog("serverPktSize: invalid packet type %d\n",
 	   type);
-      /*      abort();*/
+
+      /* abort();*/
+
       return 0;
     }
 
@@ -268,7 +276,9 @@ int readPacket(int direction, int sock, Unsgn8 *buf, int blen,
       len = clientPktSize(type);
       break;
     default:
+#if defined(DEBUG_PKT)
       clog("readPacket: Invalid dir code %s\n", direction);
+#endif
       return -1;
       break;
     }
@@ -298,8 +308,11 @@ int readPacket(int direction, int sock, Unsgn8 *buf, int blen,
 		  /* do we have enough? */
 		  if ((left - rlen) > 0 /*len != rlen*/)
 		    {
-		      clog("readPacket: short packet: type(%d) len = %d, rlen = %d left = %d\n",
+#if defined(DEBUG_PKT)
+		      clog("readPacket: short packet: type(%d) len = %d, "
+                           "rlen = %d left = %d\n",
 			   type, len, rlen, left - rlen);
+#endif
 		      left -= rlen;
 		      continue;	/* get rest of packet */
 		    }
@@ -311,7 +324,9 @@ int readPacket(int direction, int sock, Unsgn8 *buf, int blen,
 		{
 		  if (rlen == 0)
 		    {
+#if defined(DEBUG_PKT)
 		      clog("readPacket: read returned 0");
+#endif
 		      return -1;
 		    }
 
@@ -367,7 +382,9 @@ int writePacket(int direction, int sock, Unsgn8 *packet)
       len = serverPktSize(type);
       break;
     default:
+#if defined(DEBUG_PKT)
       clog("writePacket: Invalid dir code %s\n", direction);
+#endif
       return -1;
       break;
     }
@@ -382,8 +399,11 @@ int writePacket(int direction, int sock, Unsgn8 *packet)
 	    {
 	      if ((left - wlen) > 0)
 		{
-		  clog("writePacket: wrote short packet: left = %d, wlen = %d, len = %d",
+#if defined(DEBUG_PKT)
+		  clog("writePacket: wrote short packet: left = %d, "
+                       "wlen = %d, len = %d",
 		       left, wlen, len);
+#endif
 		  left -= wlen;
 		  continue;
 		}
@@ -393,7 +413,7 @@ int writePacket(int direction, int sock, Unsgn8 *packet)
 	    {
 	      if (wlen < 0 && errno == EINTR)
 		{
-		  clog("writePacket: write: EINTR");
+		  clog("writePacket: write: Interrupted");
 		  continue;
 		}
 

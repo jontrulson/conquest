@@ -136,5 +136,6 @@
 #undef DEBUG_CLIENTPROC         /* client proc* routines */
 #undef DEBUG_CLIENTSEND         /* client send* routines */
 #undef DEBUG_META               /* meta server debugging */
+#undef DEBUG_PKT                /* debug packet handling */
 
 #endif /* _DEFS_H */
