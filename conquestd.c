@@ -489,6 +489,15 @@ int main(int argc, char *argv[])
 /* responsible for updating the client */
 void updateProc(void)
 {
+#if 0
+  static Unsgn32 lastms = 0;
+  Unsgn32 millis = clbGetMillis();
+
+  if ((millis - lastms) > 100)
+    clog("millisdiff = %u", (millis - lastms));
+  lastms = millis;
+#endif
+
   /* Don't do anything if we're not supposed to. */
   if (sInfo.state != SVR_STATE_PLAY)
     return;
@@ -826,6 +835,48 @@ int updateClient(void)
 {
   int i,j;
   static int sentallusers = FALSE; /* we will send all user data once. */
+  static time_t oldtime = 0;
+  time_t newtime = getnow(NULL, 0);
+  int seciter = FALSE;
+  static time_t histtime = 0;   /* timers that try to save some time() */
+  static time_t infotime = 0;
+  static time_t teamtime = 0;
+  int dohist = FALSE;
+  int doinfo = FALSE;
+  int doteam = FALSE;
+
+  
+  /* some things really should not be checked every update iter */
+  if (oldtime != newtime)
+    {
+      seciter = TRUE;
+      oldtime = newtime;
+    }
+
+  /* hist */
+  if ((abs((unsigned int)newtime - (unsigned int)histtime) >
+       HISTORY_UPDATE_INTERVAL))
+    {
+      dohist = TRUE;
+      histtime = newtime;
+    }
+
+  /* info */
+  if ((abs((unsigned int)newtime - (unsigned int)infotime) >
+       CONQINFO_UPDATE_INTERVAL))
+    {
+      doinfo = TRUE;
+      infotime = newtime;
+    }
+
+  /* team */
+  if ((abs((unsigned int)newtime - (unsigned int)teamtime) >
+       TEAM_UPDATE_INTERVAL))
+    {
+      doteam = TRUE;
+      teamtime = newtime;
+    }
+
 
   if (!sentallusers)
     {                           /* send all valid user data the first time */
@@ -848,11 +899,14 @@ int updateClient(void)
       /* we only send user data for active ships. */
       if (Ships[i].status != SS_OFF)
 	{
-	  if (!sendUser(sInfo.sock, Ships[i].unum))
-	    {
-	      return FALSE;
-	    }
-	}
+          if (seciter)
+            {
+              if (!sendUser(sInfo.sock, Ships[i].unum))
+                {
+                  return FALSE;
+                }
+            }
+        }
     }
 
   for (i=1; i<=NUMPLANETS; i++)
@@ -861,17 +915,22 @@ int updateClient(void)
 	sendPlanet(sInfo.sock, i);
     }
 
-  for (i=0; i<NUMALLTEAMS; i++)
-    sendTeam(sInfo.sock, i, FALSE);
+  if (doteam)
+    for (i=0; i<NUMALLTEAMS; i++)
+      sendTeam(sInfo.sock, i, FALSE);
 
-  sendConqInfo(sInfo.sock, FALSE);
+  if (doinfo)
+    sendConqInfo(sInfo.sock, FALSE);
 
-  for (i=0; i<MAXHISTLOG; i++)
+  if (dohist)
     {
-      if (History[i].histunum >= 0)
-        sendUser(sInfo.sock, History[i].histunum);
-
-      sendHistory(sInfo.sock, i);
+      for (i=0; i<MAXHISTLOG; i++)
+        {
+          if (History[i].histunum >= 0)
+            sendUser(sInfo.sock, History[i].histunum);
+          
+          sendHistory(sInfo.sock, i);
+        }
     }
 
   sendDoomsday(sInfo.sock);

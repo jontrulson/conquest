@@ -38,7 +38,6 @@
 
 void iterdrive( int *ship );
 void secdrive( int *ship );
-void planetdrive(void);
 void mindrive(void);
 void fivemindrive(void);
 void SigTerminate(int sig);
@@ -250,8 +249,10 @@ int main(int argc, char *argv[])
 	      if ( mod( Driver->drivsecs, MINUTE_SECONDS ) == 0 )
 		mindrive();	
 	      if ( mod( Driver->drivsecs, SUBMIN_SECONDS ) == 0 )
-                upstats( &ctime, &etime, &cacc, &eacc,
-                         &ConqInfo->dcpuseconds, &ConqInfo->delapsedseconds );
+                {
+                  upstats( &ctime, &etime, &cacc, &eacc,
+                           &ConqInfo->dcpuseconds, &ConqInfo->delapsedseconds );
+                }
 
 	      secdrive( ship );
 	      
@@ -262,7 +263,7 @@ int main(int argc, char *argv[])
 	}
       if ( Driver->drivstat == DRS_RUNNING )
         {
-          planetdrive();
+          clbPlanetDrive(0.1);
           iterdrive( ship );
         }
       c_sleep( ITER_SECONDS );
@@ -852,46 +853,6 @@ void secdrive( int *ship )
   return;
   
 }
-
-
-/*  planetdrive - move the planets */
-/*  SYNOPSIS */
-/*    planetdrive */
-void planetdrive(void)
-{
-  
-  int i;
-  real speed;
-  
-  for ( i = NUMPLANETS; i > 0; i = i - 1 )
-    {
-      /* Advance porbang(). */
-      if ( Planets[i].primary != 0 )
-	{
-
-	  Planets[i].orbang = mod360( Planets[i].orbang + 
-                                      Planets[i].orbvel *
-                                      0.1 / 60 );
-        
-	  Planets[i].x = Planets[Planets[i].primary].x + 
-	    Planets[i].orbrad * cosd(Planets[i].orbang);
-	  Planets[i].y = Planets[Planets[i].primary].y + 
-	    Planets[i].orbrad * sind(Planets[i].orbang);
-	  
-	}
-      else if ( Planets[i].orbvel != 0.0 )
-	{
-	  /* Special hack for planets to move in a straight line. */
-	  speed = Planets[i].orbvel * MM_PER_SEC_PER_WARP * SUBMIN_SECONDS;
-	  Planets[i].x = Planets[i].x + speed * cosd(Planets[i].orbang);
-	  Planets[i].y = Planets[i].y + speed * sind(Planets[i].orbang);
-	}
-    }
-  
-  return;
-  
-}
-
 
 /*  mindrive - drive the one-minute interval items */
 /*  SYNOPSIS */

@@ -3221,3 +3221,96 @@ char *clbGetUserLogname(void)
   return pwname;
 }
 
+/*  planetdrive - move the planets based on interval */
+/*  SYNOPSIS */
+/*    planetdrive */
+void clbPlanetDrive(real itersec)
+{
+  int i;
+  real speed;
+
+  for ( i = NUMPLANETS; i > 0; i = i - 1 )
+    {
+      /* Advance porbang(). */
+      if ( Planets[i].primary != 0 )
+	{
+
+	  Planets[i].orbang = mod360( Planets[i].orbang + 
+                                      Planets[i].orbvel *
+                                      itersec / 60.0 );
+        
+	  Planets[i].x = Planets[Planets[i].primary].x + 
+	    Planets[i].orbrad * cosd(Planets[i].orbang);
+	  Planets[i].y = Planets[Planets[i].primary].y + 
+	    Planets[i].orbrad * sind(Planets[i].orbang);
+	  
+	}
+      else if ( Planets[i].orbvel != 0.0 )
+	{
+	  /* Special hack for planets to move in a straight line. */
+	  speed = Planets[i].orbvel * MM_PER_SEC_PER_WARP * itersec;
+	  Planets[i].x = Planets[i].x + speed * cosd(Planets[i].orbang);
+	  Planets[i].y = Planets[i].y + speed * sind(Planets[i].orbang);
+	}
+    }
+  
+  return;
+  
+}
+
+/* borrowed from glut */
+#if defined(SVR4) && !defined(sun)  /* Sun claims SVR4, but
+                                       wants 2 args. */
+#define GETTIMEOFDAY(_x) gettimeofday(_x)
+#else
+#define GETTIMEOFDAY(_x) gettimeofday(_x, NULL)
+#endif
+#define ADD_TIME(dest, src1, src2) { \
+  if(((dest).tv_usec = \
+    (src1).tv_usec + (src2).tv_usec) >= 1000000) { \
+    (dest).tv_usec -= 1000000; \
+    (dest).tv_sec = (src1).tv_sec + (src2).tv_sec + 1; \
+  } else { \
+    (dest).tv_sec = (src1).tv_sec + (src2).tv_sec; \
+    if(((dest).tv_sec >= 1) && (((dest).tv_usec <0))) { \
+      (dest).tv_sec --;(dest).tv_usec += 1000000; \
+    } \
+  } \
+}
+#define TIMEDELTA(dest, src1, src2) { \
+  if(((dest).tv_usec = (src1).tv_usec - (src2).tv_usec) < 0) { \
+    (dest).tv_usec += 1000000; \
+    (dest).tv_sec = (src1).tv_sec - (src2).tv_sec - 1; \
+  } else { \
+     (dest).tv_sec = (src1).tv_sec - (src2).tv_sec; \
+  } \
+}
+
+/* return time in milliseconds */
+Unsgn32 clbGetMillis(void)
+{
+  static int firsttime = TRUE;
+  static struct timeval start;
+  struct timeval elapsed, now;
+  Unsgn32 elapse;
+
+  if (firsttime)
+    {
+      firsttime = FALSE;
+      
+      GETTIMEOFDAY(&start);
+    }
+
+  GETTIMEOFDAY(&now);
+  TIMEDELTA(elapsed, now, start);
+  /* Return elapsed milliseconds. */
+  elapse = (Unsgn32) ((elapsed.tv_sec * 1000) + (elapsed.tv_usec / 1000));
+
+  /* don't return 0 */
+  if (elapse == 0)
+    elapse = 1;
+
+  return elapse;
+}
+
+  

@@ -345,19 +345,6 @@ int sendMessage(int sock, Msg_t *msg)
 int sendTeam(int sock, Unsgn8 team, int force)
 {
   spTeam_t *steam;
-  static time_t oldtime[NUMALLTEAMS] = {0}; /* keep track of the time */
-  time_t now = getnow(NULL, 0);	/* for each team */
-
-  /* we want to just send these every TEAM_UPDATE_INTERVAL seconds
-     since they can change often (everytime someone fires a torp
-     for example). If the force flag is set, we reset everything so
-     new packets will be delivered. */
-
-  if ((abs((unsigned int)now - (unsigned int)oldtime[team]) < 
-       TEAM_UPDATE_INTERVAL) && !force)
-    return TRUE;
-  else
-    oldtime[team] = now;
 
 #if defined(DEBUG_SERVERSEND)
   clog("sendTeam: team = %d, f = %d", team, force);
@@ -379,16 +366,6 @@ int sendTeam(int sock, Unsgn8 team, int force)
 int sendConqInfo(int sock, int force)
 {
   spConqInfo_t *spci;
-  static time_t oldtime = 0; /* keep track of the time */
-  time_t now = getnow(NULL, 0);	
-
-  /* we want to just send these every CONQINFO_UPDATE_INTERVAL seconds */
-
-  if ((abs((unsigned int)now - (unsigned int)oldtime) < 
-       CONQINFO_UPDATE_INTERVAL) && !force)
-    return TRUE;
-  else
-    oldtime = now;
 
 #if defined(DEBUG_SERVERSEND)
   clog("sendConqInfo: f = %d", force);
@@ -404,19 +381,9 @@ int sendConqInfo(int sock, int force)
 int sendHistory(int sock, int hnum)
 {
   spHistory_t *shist;
-  static time_t oldtime[MAXHISTLOG] = {0}; /* keep track of the time */
-  time_t now = getnow(NULL, 0);	
-
-  /* we want to just send these every HISTORY_UPDATE_INTERVAL seconds */
 
   if (hnum < 0 || hnum > MAXHISTLOG)
     return FALSE;
-
-  if ((abs((unsigned int)now - (unsigned int)oldtime[hnum]) < 
-       HISTORY_UPDATE_INTERVAL))
-    return TRUE;
-  else
-    oldtime[hnum] = now;
 
 #if defined(DEBUG_SERVERSEND)
   clog("sendHistory: hnum = %d", hnum);

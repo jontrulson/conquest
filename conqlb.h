@@ -71,6 +71,7 @@ int clbUseFuel( int snum, real fuel, int weapon, int forreal );
 void clbZeroEverything(void);
 void clbZeroShip( int snum );
 char *clbGetUserLogname(void);
-
+void clbPlanetDrive(real itersec);
+Unsgn32 clbGetMillis(void);
 
 #endif /* _CONQLB_H */
