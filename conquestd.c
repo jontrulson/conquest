@@ -1563,7 +1563,7 @@ int play(void)
 
       didsomething = 0;
       if ((pkttype = waitForPacket(PKT_FROMCLIENT, sockl, PKT_ANYPKT,
-				   buf, PKT_MAXSIZE, 1, NULL)) < 0)
+				   buf, PKT_MAXSIZE, 0, NULL)) < 0)
 	{
 	  if (errno != EINTR)
 	    {
@@ -1629,7 +1629,10 @@ int play(void)
 	  laststat = now;
 	}
 
-      /*      c_sleep(ITER_SECONDS); JET */
+      if (didsomething)         
+        continue;               /* see if there is another pkt */
+
+      c_sleep(ITER_SECONDS);
     }
   
   conqstats( Context.snum );
