@@ -1028,8 +1028,6 @@ void handleSimpleCmdPkt(cpCommand_t *ccmd)
 	      Ships[Context.snum].etime = 0;
 
 	      SFSET(Context.snum, SHIP_F_VACANT); /* help the driver */
-	      clog("DISCONNECT (%d)= flags = 0x%04x", Context.snum,
-		   Ships[Context.snum].flags);
 	    }
 	  else
 	    {

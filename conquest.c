@@ -2741,10 +2741,7 @@ void menu(void)
       return;
     }
   else
-    {
-      clog("conquest: menu: got ship %d", Context.snum);
-      procShip(buf);
-    }
+    procShip(buf);
 
   do                 
     {
@@ -3272,9 +3269,6 @@ int play()
   startTimer();			/* setup for next second */
   
 
-  clog("conquest:play: got a ship(%d), entering main loop",
-       Context.snum);
-
   /* start recording if neccessary */
   if (Context.recmode == RECMODE_STARTING)
     {
@@ -3639,7 +3633,8 @@ int hello(void)
   if (pkttype == SP_SERVERSTAT)
     {
       procServerStat(buf);
-      clog("SERVERSTAT: ships = %d, na = %d, nv = %d, nr = %d "
+# if defined(DEBUG_CLIENTPROC)
+      clog("SERVERSTAT: ships = %d, na = %d, nv = %d, nr = %d\n"
            "            nu = %d flags = 0x%08x",
 	   sStat.numtotal,
 	   sStat.numactive,
@@ -3647,6 +3642,7 @@ int hello(void)
 	   sStat.numrobot,
 	   sStat.numusers,
 	   sStat.flags);
+#endif
     }
   else
     {
