@@ -9,6 +9,15 @@
 
                               Conquest HISTORY
 
+Version 8.1 10/24/2004 (stable)
+
+        - removed last traces of glut bitmap font usage
+
+        - cleanup in asle 4 (render.c)
+
+        - Use ALT-S to toggle display of FPS and Kb/s stats in
+          cockpit.
+
 Version 8.0.1l 10/22/2004 (devel)
 
         - 8.1 release candidate.  Oh yes.

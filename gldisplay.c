@@ -166,8 +166,12 @@ void display( int snum, int display_info )
                 Planets[i].scanned[Ships[snum].team])
         palertcol = CyanColor;
       else
-	palertcol = YellowLevelColor;
-
+        {
+          if (Planets[i].scanned[Ships[snum].team])
+            palertcol = YellowLevelColor;
+          else
+            palertcol = NoColor | CQC_A_DIM;
+        }
 				/* suns are always yellow level material */
       if (Planets[i].type == PLANET_SUN)
 	palertcol = YellowLevelColor;

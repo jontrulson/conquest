@@ -67,7 +67,6 @@ int getUID(char *name)
 int getConquestGID(void)
 {
   struct group *conq_grp;
-  static int thegid;
   
   if ((conq_grp = getgrnam(CONQUEST_GROUP)) == NULL)
     {
@@ -78,9 +77,7 @@ int getConquestGID(void)
       return(ERR);
     }
   
-  thegid = conq_grp->gr_gid;
-  
-  return(thegid);
+  return(conq_grp->gr_gid);
 }
 
 
@@ -93,16 +90,8 @@ int getConquestGID(void)
 /*    comsize( size ) */
 void comsize( unsigned long *size )
 {
-  unsigned long int val;
+  *size = labs((char *)EndOfCBlock - (char *)CBlockRevision) + sizeof(int);
 
-  if ((int)EndOfCBlock > (int)CBlockRevision) 
-    val = (int)EndOfCBlock - (int)CBlockRevision; 
-  else
-    val = (int)CBlockRevision - (int)EndOfCBlock;
-  *size = val + sizeof(int); 
-
-  /*clog("sizeof(real) = %d, val = %d", sizeof(real), val); */
-  
   return;
   
 }

@@ -338,7 +338,6 @@ void handleSignal(int sig)
     case SIGINT:
     case SIGTERM:
     case SIGHUP:
-      /*      stopTimer();*/
       conqend();		/* sends a disconnect packet */
       exit(0);
       break;

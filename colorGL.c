@@ -36,6 +36,9 @@ void uiPutColor(cqColor color)
   if (color & CQC_A_BOLD)
     base += 0.2;
 
+  if (color & CQC_A_DIM)
+    base -= 0.2;
+
   color &= CQC_FG_MASK;         /* strip everything but color info */
 
   if (color == NoColor)         /* white */

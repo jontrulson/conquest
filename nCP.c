@@ -115,6 +115,8 @@ static char pbuf[MID_BUFFER_SIZE];
 
 static char *abt = "...aborted...";
 
+static int dostats = FALSE;     /* whether to display rendering stats */
+
 extern dspData_t dData;
 
 #define cp_putmsg(str, lin)  setPrompt(lin, NULL, NoColor, str, NoColor)
@@ -2439,7 +2441,7 @@ static int nCPDisplay(dspConfig_t *dsp)
   renderViewer(UserConf.doVBG);
 
   /* Main/Hud */
-  renderHud();
+  renderHud(dostats);
 
   /* draw the overlay bg if active */
   mglOverlayQuad();
@@ -2579,6 +2581,14 @@ static int nCPInput(int ch)
       CQ_MODIFIER(ch) & CQ_KEY_MOD_ALT)
     {
       UserConf.doVBG = !UserConf.doVBG;
+      return NODE_OK;
+    }
+
+  /* display render/comm stats */
+  if ((CQ_CHAR(ch) == 'S' || CQ_CHAR(ch) == 's') && 
+      CQ_MODIFIER(ch) & CQ_KEY_MOD_ALT)
+    {
+      dostats = !dostats;
       return NODE_OK;
     }
 

@@ -847,7 +847,6 @@ resize(int w, int h)
       minit = TRUE;
       graphicsInit();
       initTexFonts();
-      initFonts();
       GLError();
     }
 

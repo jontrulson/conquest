@@ -83,44 +83,6 @@ void initTexFonts(void)
   return;
 }
 
-/* build font DL's for the 2 windows */
-void initFonts(void)
-{
-  int i;
-
-  /* viewer font */
-  if (vFontDL == -1)
-    {    
-      vFontDL = glGenLists(128);
-      for (i = 0; i < 128; i++)
-        {
-          glNewList(vFontDL + i, GL_COMPILE);
-          glutBitmapCharacter(GLUT_BITMAP_HELVETICA_12, i);
-          glEndList();
-          GLError();
-        }
-      vFontW = glutBitmapWidth(GLUT_BITMAP_HELVETICA_12, 'H');
-      GLError();
-    }
-
-  
-  /* FPS */
-  if (mFontTinyDL == -1)
-    {    
-      mFontTinyDL = glGenLists(128);
-      for (i = 0; i < 128; i++)
-        {
-          glNewList(mFontTinyDL + i, GL_COMPILE);
-          glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_10, i);
-          glEndList();
-        }
-      mFontTinyW = glutBitmapWidth(GLUT_BITMAP_TIMES_ROMAN_10, 'H');
-    }
-
-  return;
-}
-  
-
 void glfRender(GLfloat x, GLfloat y, GLfloat z, GLfloat w, GLfloat h,
                        TexFont *font, char *str, int color, 
                int scalex, int dofancy, int ortho)

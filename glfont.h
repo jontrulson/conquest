@@ -13,11 +13,6 @@
 
 /* font DL's  */
 #ifdef NOEXTERN_GLFONT
-GLuint vFontDL = -1;
-GLuint vFontW = -1;
-
-GLuint mFontTinyDL = -1;
-GLuint mFontTinyW = -1;
 
 /* Texture mapped fonts */
 TexFont *fontLargeTxf = NULL;
@@ -25,13 +20,6 @@ TexFont *fontFixedTxf = NULL;
 TexFont *fontTinyFixedTxf = NULL;
 TexFont *fontMsgTxf = NULL;
 #else
-
-extern GLuint vFontDL;
-extern GLuint vFontW;
-
-extern GLuint mFontTinyDL;
-extern GLuint mFontTinyW;
-
 
 extern TexFont *fontLargeTxf;
 extern TexFont *fontFixedTxf;
@@ -42,9 +30,6 @@ extern TexFont *fontMsgTxf;
 void glfRender(GLfloat x, GLfloat y, GLfloat z, GLfloat w, GLfloat h,
                        TexFont *font, char *str, int color, int scalex,
                int dofancy, int ortho);
-void drawString(GLfloat x, GLfloat y, GLfloat z, char *str,
-                GLuint DL, int color, int ortho);
-void initFonts(void);
 void initTexFonts(void);
 
 

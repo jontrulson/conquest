@@ -38,18 +38,13 @@ static char buf[MID_BUFFER_SIZE];
 void cprintf(int lin, int col, int align, char *fmt, ...)
 {
   va_list ap;
-  /* GL */
   int l;
   GLfloat x, y, w;
-  /* end GL */
   
-  /* use vsprintf */
   va_start(ap, fmt);
   (void)vsnprintf(buf, sizeof(buf) - 1, fmt, ap);
   va_end(ap);
-  /* end of it */
   
-  /* GL */
   if (dConf.inited)
     {
       l = uiCStrlen(buf);
@@ -62,7 +57,6 @@ void cprintf(int lin, int col, int align, char *fmt, ...)
       w = dConf.ppCol * (GLfloat)l;
       uiPrintFixed(x + dConf.borderW, y + dConf.borderW, w, dConf.ppRow, buf);
     }
-  /* end GL */
 
   return;
 }
