@@ -26,6 +26,7 @@
 #include "conqdef.h"
 #include "conqcom.h"
 #include "context.h"
+#include "conqlb.h"
 #include "global.h"
 #include "conf.h"
 #include "user.h"
@@ -34,6 +35,13 @@ static int nenum;
 static int debug; 
 static real dne, ane;
 
+static void buildai( int snum, int vars[], int *bnenum, 
+                     real *bdne, real *bane );
+static void displayai( int snum, int token, int vars[] );
+static void executeai( int snum, int token );
+static void trobotai( int snum );
+static int tableai( int vars[] );
+
 /*  buildai - construct the robot data base */
 /*  SYNOPSIS */
 /*    int snum, vars(MAX_VAR), nenum */
@@ -41,7 +49,7 @@ static real dne, ane;
 /*    buildai( snum, vars, nenum, dne, ane ) */
 /*  DESCRIPTION */
 /*    Fill up the passed array with robot info. */
-void buildai( int snum, int vars[], int *bnenum, real *bdne, real *bane )
+static void buildai( int snum, int vars[], int *bnenum, real *bdne, real *bane )
 {
   
   /* i = AIRANGE( j ) */
@@ -79,7 +87,7 @@ void buildai( int snum, int vars[], int *bnenum, real *bdne, real *bane )
   /* Distance to nearest enemy (dist) */
   *bane = 0.0;
   *bdne = 1e9;
-  if ( findspecial( snum, SPECIAL_ENEMYSHIP, 0, bnenum, &xnenum ) )
+  if ( clbFindSpecial( snum, SPECIAL_ENEMYSHIP, 0, bnenum, &xnenum ) )
     {
       if ( SCLOAKED(*bnenum) )
 	{
@@ -144,7 +152,7 @@ void buildai( int snum, int vars[], int *bnenum, real *bdne, real *bane )
   AISCALE( vars[VAR_WTEMP], Ships[snum].wtemp, 10.0 );
   
   /* Possible phaser damage to nearest enemy (5) */
-  AISCALE( vars[VAR_PHASERDAM], phaserhit( snum, *bdne ), 5.0 );
+  AISCALE( vars[VAR_PHASERDAM], clbPhaserHit( snum, *bdne ), 5.0 );
   
   /* Possible damage per torpedo to nearest enemy (5) */
   AISCALE( vars[VAR_TORPDAM],
@@ -244,7 +252,7 @@ void defend( int attacker, int pnum )
       sprintf( buf,
 	     "WARNING: You have violated %s space; prepare to die.",
 	     Teams[team].name );
-      stormsg( snum, attacker, buf );
+      clbStoreMsg( snum, attacker, buf );
     }
   
   return;
@@ -259,7 +267,7 @@ void defend( int attacker, int pnum )
 /*  DESCRIPTION */
 /*    Display the robot action on STDOUT so the implementors can */
 /*    see if this darn thing works. */
-void displayai( int snum, int token, int vars[] )
+static void displayai( int snum, int token, int vars[] )
 {
   int i;
   char buf[MAXLINE];
@@ -281,7 +289,7 @@ void displayai( int snum, int token, int vars[] )
 /*    executeai( snum, token ) */
 /*  DESCRIPTION */
 /*    Execute the robot action. */
-void executeai( int snum, int token )
+static void executeai( int snum, int token )
 {
   
   /* SETWARP( warp ) */
@@ -333,21 +341,21 @@ void executeai( int snum, int token )
       /* Null! */
       break;
     case ROB_GOHOME:
-      if ( findspecial( snum, SPECIAL_HOMEPLANET, 0, &i, &j ) )
+      if ( clbFindSpecial( snum, SPECIAL_HOMEPLANET, 0, &i, &j ) )
 	{
 	  SETLOCK( i );
 	}
-      else if ( findspecial( snum, SPECIAL_FUELPLANET, 0, &i, &j ) )
+      else if ( clbFindSpecial( snum, SPECIAL_FUELPLANET, 0, &i, &j ) )
 	{
 	  SETLOCK( i );
 	}
       break;
     case ROB_GOFUEL:
-      if ( findspecial( snum, SPECIAL_FUELPLANET, 0, &i, &j ) )
+      if ( clbFindSpecial( snum, SPECIAL_FUELPLANET, 0, &i, &j ) )
 	SETLOCK( i );
       break;
     case ROB_GOREPAIR:
-      if ( findspecial( snum, SPECIAL_REPAIRPLANET, 0, &i, &j ) )
+      if ( clbFindSpecial( snum, SPECIAL_REPAIRPLANET, 0, &i, &j ) )
 	SETLOCK( i );
       break;
     case ROB_ALLOCATE:
@@ -356,13 +364,13 @@ void executeai( int snum, int token )
       Ships[snum].engalloc = i;
       break;
     case ROB_PHASER:
-      phaser( snum, ane );
+      clbPhaser( snum, ane );
       break;
     case ROB_TORPEDO:
-      launch( snum, ane, 1, LAUNCH_NORMAL );
+      clbLaunch( snum, ane, 1, LAUNCH_NORMAL );
       break;
     case ROB_BURST:
-      launch( snum, ane, 3, LAUNCH_NORMAL );
+      clbLaunch( snum, ane, 3, LAUNCH_NORMAL );
       break;
     case ROB_SHIELD:
       if (SSHUP(snum))
@@ -398,7 +406,7 @@ void executeai( int snum, int token )
       break;
     case ROB_INSULT:
       robreply( buf );
-      stormsgf( snum, nenum, buf, MSG_FLAGS_ROBOT );
+      clbStoreMsgf( snum, nenum, buf, MSG_FLAGS_ROBOT );
       break;
     case ROB_READMSG:
       /* Try to read a message and reply to it */
@@ -406,7 +414,7 @@ void executeai( int snum, int token )
 	{
 	  Ships[snum].lastmsg = modp1( Ships[snum].lastmsg + 1, MAXMESSAGES );
 	  i = Ships[snum].lastmsg;
-	  if ( canread( snum, i ) )
+	  if ( clbCanRead( snum, i ) )
 	    {
 	      j = Msgs[i].msgfrom;
 	      if ( -j > 0 && -j <= NUMPLANETS )
@@ -423,23 +431,23 @@ void executeai( int snum, int token )
 		continue;	/* don't talk back to the computer */
    
 	      robreply( buf );
-	      stormsgf( snum, j, buf, MSG_FLAGS_ROBOT );
+	      clbStoreMsgf( snum, j, buf, MSG_FLAGS_ROBOT );
 	      break;
 	    }
 	}
       break;
     case ROB_MESSAGE:
-      stormsgf( snum, MSG_ALL, "Give me drugs.", MSG_FLAGS_ROBOT );
+      clbStoreMsgf( snum, MSG_ALL, "Give me drugs.", MSG_FLAGS_ROBOT );
       break;
     case ROB_TAKEDRUGS:
-      stormsgf( snum, MSG_ALL, "I'm on drugs.", MSG_FLAGS_ROBOT );
+      clbStoreMsgf( snum, MSG_ALL, "I'm on drugs.", MSG_FLAGS_ROBOT );
       break;
     case ROB_DETONATE:
-      enemydet( snum );
+      clbEnemyDet( snum );
       break;
     case ROB_MYDETONATE:
       for ( i = 0; i < MAXTORPS; i = i + 1 )
-	detonate( snum, i );
+	clbDetonate( snum, i );
       break;
     case ROB_UNTRACTOR:
       /* Only attempt to untractor if we don't have to delay. */
@@ -457,19 +465,6 @@ void executeai( int snum, int token )
       robstr( token, buf );
       clog( "conqai:executeai(): Unknown token '%s' (%d)\n", buf, token );
     }
-  
-  return;
-  
-}
-
-
-/*  exitai - exit handler */
-/*  SYNOPSIS */
-/*    extern exitai */
-void exitai(void)
-{
-  
-  ConqInfo->externrobots = FALSE;
   
   return;
   
@@ -494,7 +489,7 @@ int newrob( int *snum, int unum )
     return ( FALSE );
   
   /* Can't do anything with out a ship. */
-  if ( ! findship( snum ) )
+  if ( ! clbFindShip( snum ) )
     return ( FALSE );
   
   /* Show intent to fly. */
@@ -528,7 +523,7 @@ int newrob( int *snum, int unum )
   
   /* Initialize the ship. */
   PVLOCK(&ConqInfo->lockword);
-  initship( *snum, unum );
+  clbInitShip( *snum, unum );
   SFSET(*snum, SHIP_F_ROBOT);			/* we're a robot */
 
 				/* see if we should randomize it's strength
@@ -542,7 +537,7 @@ int newrob( int *snum, int unum )
 
     }
   
-  /* Initialize the things that aren't done by initship(). */
+  /* Initialize the things that aren't done by clbInitShip(). */
   Ships[*snum].unum = unum;
   Ships[*snum].team = Users[unum].team;
 
@@ -556,7 +551,7 @@ int newrob( int *snum, int unum )
 
 				/* robots now can use 30/70
 				   instead of the default 40/60 set in
-				   initship(). */
+				   clbInitShip(). */
   Ships[*snum].weapalloc = 30;
   Ships[*snum].engalloc = 100 - Ships[*snum].weapalloc;
 
@@ -574,8 +569,8 @@ int newrob( int *snum, int unum )
     i = Teams[Ships[*snum].team].homesun;
   else
     i = Teams[Ships[*snum].team].homeplanet;
-  putship( *snum, Planets[i].x, Planets[i].y );
-  fixdeltas( *snum );
+  clPutShip( *snum, Planets[i].x, Planets[i].y );
+  clbFixDeltas( *snum );
   Ships[*snum].status = SS_LIVE;
   PVUNLOCK(&ConqInfo->lockword);
   
@@ -628,7 +623,7 @@ void robotai( int snum )
 /*  SYNOPSIS */
 /*    int snum */
 /*    trobotai( snum ) */
-void trobotai( int snum )
+static void trobotai( int snum )
 {
   int value, vars[MAX_VAR];
   /*    CONQAICOMMON;*/
@@ -877,7 +872,7 @@ void robstr( int token, char buf[] )
 /*  SYNOPSIS */
 /*    int token, vars(MAX_VAR), tableai */
 /*    token = tableai( vars ) */
-int tableai( int vars[] )
+static int tableai( int vars[] )
 {
   int status, token = ERR, rule, i;
   int rbits;

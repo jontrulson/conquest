@@ -27,6 +27,7 @@
 #include "global.h"
 
 #include "conqdef.h"
+#include "conqlb.h"
 
 #define NOCOMEXTERN
 #include "conqcom.h"		/* common block vars defined here */
@@ -149,7 +150,7 @@ int check_cblock(char *fname, int fmode, int sizeofcb)
 	    {			/* Create it */
 	      printf("Initializing common block: %s\n", fname);
 	      cBasePtr = (char *) mymalloc(sizeofcb); /* this exits if malloc fails */
-	      cdfill('\0', cBasePtr, sizeofcb);
+              memset(cBasePtr, 0, sizeofcb);
 
 	      write(ffd, cBasePtr, sizeofcb);
 	      close(ffd);
@@ -301,10 +302,27 @@ void fake_common(void)
   fakeCommon = TRUE;
 
   /* this will exit if it fails */
-  cBasePtr = mymalloc(SIZEOF_COMMONBLOCK);
+  if (!cBasePtr)
+    cBasePtr = mymalloc(SIZEOF_COMMONBLOCK);
 
   map_vars();
 
   zero_common();
+  return;
+}
+
+/* short cut */
+void map_lcommon(void)
+{
+  /* a parallel universe, it is */
+  fake_common();
+  clbInitEverything();
+  clbInitMsgs();
+  *CBlockRevision = COMMONSTAMP;
+  ConqInfo->closed = FALSE;
+  Driver->drivstat = DRS_OFF;
+  Driver->drivpid = 0;
+  Driver->drivowner[0] = EOS;
+  
   return;
 }

@@ -128,8 +128,8 @@ real rnd ( void )
   real RET;
   
   rndseq ( &value1, mult1, inc1, modu1 );
-  idx = ifix ( creal(value1) / creal(modu1) * TABLESIZE ) + 1;
-  RET = creal(table[idx]) / creal(modu2);
+  idx = ifix ( rfix(value1) / rfix(modu1) * TABLESIZE ) + 1;
+  RET = rfix(table[idx]) / rfix(modu2);
   rndseq ( &value2, mult2, inc2, modu2 );
   table[idx] = value2;
   
@@ -167,7 +167,7 @@ int rndint ( int ilow, int ihigh )
 {
   int rc;
 
-  rc = ifix ( rnd() * creal(ihigh-ilow+1.0) ) + ilow;
+  rc = ifix ( rnd() * rfix(ihigh-ilow+1.0) ) + ilow;
 #ifdef DEBUG_RANDOM
   clog("rndint(): rc = %d", rc);
 #endif

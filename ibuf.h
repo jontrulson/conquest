@@ -23,6 +23,6 @@ int iBufCount(void);
 void iBufPut(char *thestr);
 void iBufPutc(unsigned int thechar);
 unsigned int iBufGetCh(void);
-int DoMacro(int ch);
+int DoMacro(int fkey);
 
 #endif

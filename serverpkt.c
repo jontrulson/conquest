@@ -38,6 +38,7 @@ static spTorpLoc_t pktTorpLoc[MAXSHIPS + 1][MAXTORPS];
 static spTeam_t pktTeam[NUMALLTEAMS];
 static spConqInfo_t pktConqInfo;
 static spHistory_t pktHistory[MAXHISTLOG];
+static spDoomsday_t pktDoomsday;
 
 /* recording */
 static spShip_t recShip[MAXSHIPS + 1];
@@ -49,6 +50,7 @@ static spPlanetLoc_t recPlanetLoc[NUMPLANETS + 1];
 static spTorp_t recTorp[MAXSHIPS + 1][MAXTORPS];
 static spTorpLoc_t recTorpLoc[MAXSHIPS + 1][MAXTORPS];
 static spTeam_t recTeam[NUMALLTEAMS];
+static spDoomsday_t recDoomsday;
 
 /* memset everything to 0 */
 void spktInit(void)
@@ -75,7 +77,7 @@ void spktInitPkt(void)
   memset((void *)pktTeam, 0,  sizeof(spTeam_t) * NUMALLTEAMS);
   memset((void *)&pktConqInfo, 0,  sizeof(spConqInfo_t));
   memset((void *)pktHistory, 0,  sizeof(spHistory_t) * MAXHISTLOG);
-
+  memset((void *)&pktDoomsday, 0,  sizeof(spDoomsday_t));
   return;
 }
 
@@ -93,7 +95,7 @@ void spktInitRec(void)
   memset((void *)recTorpLoc, 0,  
          sizeof(spTorpLoc_t) * (MAXSHIPS + 1) * MAXTORPS);
   memset((void *)recTeam, 0,  sizeof(spTeam_t) * NUMALLTEAMS);
-
+  memset((void *)&recDoomsday, 0, sizeof(spDoomsday_t));
   return;
 }
 
@@ -514,7 +516,10 @@ spPlanetLoc_t *spktPlanetLoc(Unsgn8 pnum, int rec)
   int snum = Context.snum;
   int team = Ships[snum].team;
   static spPlanetLoc_t splanloc;
-
+  real dx, dy;
+  static real px[NUMPLANETS] = {}; /* saved x/y */
+  static real py[NUMPLANETS] = {}; 
+  
   memset((void *)&splanloc, 0, sizeof(spPlanetLoc_t));
 
   splanloc.type = SP_PLANETLOC;
@@ -523,10 +528,47 @@ spPlanetLoc_t *spktPlanetLoc(Unsgn8 pnum, int rec)
   /* RESTRICT */
   if (Planets[pnum].scanned[team] || rec)
     splanloc.armies = htons(Planets[pnum].armies);
+
+  dx = (real)fabs(Planets[pnum].x - px[pnum]);
+  dy = (real)fabs(Planets[pnum].y - py[pnum]);
+
+
+  /* we try to be clever here by reducing the pkt count.  If armies are
+     the same, and an average delta of the planet's movement is below
+     an empirically determined value, don't bother sending the packet.
+     
+     The idea is that fast moving planets will be updated more frequently
+     than slower moving ones, hopefully reducing the packet count required
+     for the appearence of smoother movement to the user.
+   */
+  if ((splanloc.armies == pktPlanetLoc[pnum].armies) &&
+      ((dx + dy) / 2.0) < 2.0)
+    {
+#if 0
+      clog("REJECT: %s dx = %f dy = %f [%f]", Planets[pnum].name,
+           dx, dy,
+           ((dx + dy) / 2.0));
+#endif
+      
+      if (!rec)
+        return NULL;
+    }
+
+  if (!rec)
+    {
+      px[pnum] = Planets[pnum].x;
+      py[pnum] = Planets[pnum].y;
+    }
+  
+#if 0
+  clog("%s dx = %f dy = %f [%f]", Planets[pnum].name,
+       dx, dy,
+       ((dx + dy) / 2.0));
+#endif
   
   splanloc.x = (Sgn32)htonl((Sgn32)(Planets[pnum].x * 1000.0));
   splanloc.y = (Sgn32)htonl((Sgn32)(Planets[pnum].y * 1000.0));
-  
+
   if (rec)
     {
       if (memcmp((void *)&splanloc, (void *)&recPlanetLoc[pnum],
@@ -757,6 +799,40 @@ spHistory_t *spktHistory(int hnum)
     {
       pktHistory[hnum] = hist;
       return &hist;
+    }
+
+  return NULL;
+}
+
+spDoomsday_t *spktDoomsday(int rec)
+{
+  static spDoomsday_t dd;
+
+  memset((void *)&dd, 0, sizeof(spDoomsday_t));
+
+  dd.type = SP_DOOMSDAY;
+  dd.status = (Unsgn8)Doomsday->status;
+  dd.heading = htons((Unsgn16)(Doomsday->heading * 10.0));
+  dd.x = (Sgn32)htonl((Sgn32)(Doomsday->x * 1000.0));
+  dd.y = (Sgn32)htonl((Sgn32)(Doomsday->y * 1000.0));
+
+  if (rec)
+    {
+      if (memcmp((void *)&dd, (void *)&recDoomsday,
+                 sizeof(spDoomsday_t)))
+        {
+          recDoomsday = dd;
+          return &dd;
+        }
+    }
+  else
+    {
+      if (memcmp((void *)&dd, (void *)&pktDoomsday,
+                 sizeof(spDoomsday_t)))
+        {
+          pktDoomsday = dd;
+          return &dd;
+        }
     }
 
   return NULL;

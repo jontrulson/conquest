@@ -9,7 +9,6 @@
  * Copyright 2004 Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
  ***********************************************************************/
 
-
 #include "global.h"
 #include "conqcom.h"
 #define NOEXTERN
@@ -32,6 +31,34 @@ const int expireSeconds = (60 * 5); /* 5 minutes */
 
 void catchSignals(void);
 void handleSignal(int sig);
+
+/* cmpuser - compare users based on skill */
+static int cmpmeta(void *cmp1, void *cmp2)
+{
+  register int *icmp1, *icmp2;
+
+  icmp1 = (int *) cmp1;
+  icmp2 = (int *) cmp2;
+
+  /* we sort based on active ships */
+
+  if (metaServerList[*icmp1].numactive > metaServerList[*icmp2].numactive)
+    return(-1);
+  else if (metaServerList[*icmp1].numactive < metaServerList[*icmp2].numactive)
+    return(1);
+  else 
+    return(0);
+}
+
+
+static void sortmetas( int mv[], int numentries )
+{
+  qsort(mv, numentries, sizeof(int),
+        (int (*)(const void *, const void *))cmpmeta);
+
+  return;
+
+}
 
 void printUsage()
 {
@@ -79,7 +106,7 @@ int findSlot(metaSRec_t *srec, int *isupdate)
     {
       if ((!strcmp(metaServerList[i].addr, srec->addr)) &&
           (!strcmp(metaServerList[i].altaddr, srec->altaddr)) &&
-          metaServerList[i].valid)
+          metaServerList[i].valid && (metaServerList[i].port == srec->port))
         {
           rv = i;
           found = TRUE;
@@ -122,17 +149,24 @@ void initServerList()
 
 void metaProcList(int sock, char *hostbuf)
 {
+  static int mvec[META_MAXSERVERS];
+  int nm;
   char tbuf[BUFFERSZ];
   int i;
 
-  /* dump the server list */
-  for (i=0; i<maxSlot; i++)
+  /* init mvec */
+  nm = 0;
+  for (i=0; i < maxSlot; i++)
+    if (metaServerList[i].valid)
+      mvec[nm++] = i;
+
+  sortmetas(mvec, nm);
+
+  /* dump the sorted server list */
+  for (i=0; i<nm; i++)
     {
-      if (metaServerList[i].valid)
-        {
-          srec2str(tbuf, &metaServerList[i]);
-          write(sock, tbuf, strlen(tbuf));
-        }
+      srec2str(tbuf, &metaServerList[mvec[i]]);
+      write(sock, tbuf, strlen(tbuf));
     }
 
   clog("META: server query from %s", hostbuf);
@@ -371,15 +405,15 @@ int main(int argc, char *argv[])
 	exit(1);
       }
 
-  if ((ConquestUID = GetUID(ROOT_USER)) == ERR)
+  if ((ConquestUID = getUID(ROOT_USER)) == ERR)
     {
-      fprintf(stderr, "%s: GetUID() failed\n", progName);
+      fprintf(stderr, "%s: getUID() failed\n", progName);
       exit(1);
     }
   
-  if ((ConquestGID = GetConquestGID()) == ERR)
+  if ((ConquestGID = getConquestGID()) == ERR)
     {
-      fprintf(stderr, "%s: GetConquestGID() failed\n", progName);
+      fprintf(stderr, "%s: getConquestGID() failed\n", progName);
       exit(1);
     }
   
@@ -391,9 +425,9 @@ int main(int argc, char *argv[])
     {
       int myuid;
 
-      if ((myuid = GetUID(myuidname)) == ERR)
+      if ((myuid = getUID(myuidname)) == ERR)
         {
-          fprintf(stderr, "%s: GetUID(%s) failed\n", progName, myuidname);
+          fprintf(stderr, "%s: getUID(%s) failed\n", progName, myuidname);
           exit(1);
         }
 

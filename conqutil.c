@@ -27,8 +27,9 @@
 #include "conqdef.h"
 #include "conqcom.h"
 #include "global.h"
+#include "context.h"
 #include "color.h"
-#include "display.h"
+#include "conqlb.h"
 
 /* if set, clog uses the system log, else it is created in HOME */
 static int systemlog = TRUE;
@@ -324,6 +325,81 @@ void appnumtim( int now[], char *buf )
   
 }
 
+/*  appkb - append killed by string */
+/*  SYNOPSIS */
+/*    int kb */
+/*    char buf() */
+/*    appkb( kb, buf ) */
+void appkb( int kb, char *buf )
+{
+  
+  switch ( kb )
+    {
+    case KB_SELF:
+      appstr( "self", buf );
+      break;
+    case KB_NEGENB:
+      appstr( "negenb", buf );
+      break;
+    case KB_CONQUER:
+      appstr( "conquer", buf );
+      break;
+    case KB_NEWGAME:
+      appstr( "newgame", buf );
+      break;
+    case KB_EVICT:
+      appstr( "evict", buf );
+      break;
+    case KB_SHIT:
+      appstr( "shit", buf );
+      break;
+    case KB_DOOMSDAY:
+      appstr( "doomsday", buf );
+      break;
+    case KB_GOTDOOMSDAY:
+      appstr( "gotdoomsday", buf );
+      break;
+    case KB_GOD:
+      appstr( "GOD", buf );
+      break;
+    default:
+      if ( kb > 0 && kb <= MAXSHIPS )
+	appship( kb, buf );
+      else if ( -kb > 0 && -kb <= NUMPLANETS )
+	appstr( Planets[-kb].name, buf );
+      else
+	appint( kb, buf );
+      break;
+    }
+  
+  return;
+  
+}
+
+/*  appship - append a ship number to a string */
+/*  SYNOPSIS */
+/*    int snum */
+/*    char str() */
+/*    appship( snum, str ) */
+void appship( int snum, char *str )
+{
+  int i;
+  char ch;
+  
+  ch = 'S';
+  if ( snum > 0 && snum <= MAXSHIPS )
+    {
+      i = Ships[snum].team;
+      if ( i >= 0 && i < NUMPLAYERTEAMS )
+	ch = Teams[i].teamchar;
+    }
+  
+  appchr( ch, str );
+  appint( snum, str );
+  
+  return;
+}
+
 
 /*  appsstatus - append ship status string */
 /*  SYNOPSIS */
@@ -463,7 +539,7 @@ void cerror(char *fmt, ...)
   
   va_end(ap);
   
-  stormsg( MSG_OUTSIDE, MSG_GOD, buf );
+  clbStoreMsg( MSG_OUTSIDE, MSG_GOD, buf );
   
   return;
   
@@ -570,42 +646,6 @@ void clog(char *fmt, ...)
 
 
 
-/*  confirm - ask the user to confirm a dangerous action */
-/*  SYNOPSIS */
-/*    int ok, confirm */
-/*    ok = confirm() */
-int confirm(void)
-{
-  static char *cprompt = "Are you sure? ";
-  int scol = ((cdcols() - strlen(cprompt)) / 2);
-
-  if (askyn("Are you sure? ", MSG_LIN2, scol))
-    return(TRUE);
-  else
-    return (FALSE);
-  
-}
-
-/*  askyn - ask the user a yes/no question - return TRUE if yes */
-int askyn(char *question, int lin, int col)
-{
-  char ch, buf[MSGMAXLINE];
-  
-  cdclrl( MSG_LIN2, 1 );
-  attrset(InfoColor);
-  buf[0] = EOS;
-  ch = cdgetx( question, lin, col, TERMS, buf, MSGMAXLINE - 1, TRUE);
-  attrset(0);
-  cdclrl( lin, 1 );
-  cdrefresh();
-  if ( ch == TERM_ABORT )
-    return ( FALSE );
-  if ( buf[0] == 'y' || buf[0] == 'Y' )
-    return ( TRUE );
-  
-  return ( FALSE );
-  
-}
 
 
 /*  delblanks - remove all blanks from a string */
@@ -803,33 +843,11 @@ int getamsg( int snum, int *msg )
   while ( *msg != ConqInfo->lastmsg )
     {
       *msg = modp1( *msg + 1, MAXMESSAGES );
-      if ( canread( snum, *msg ) )
+      if ( clbCanRead( snum, *msg ) )
         return(TRUE);
 
     }
   return ( FALSE );
-  
-}
-
-
-/*  getcx - prompt for a string, centered */
-/*  SYNOPSIS */
-/*    char pmt(), */
-/*    int lin, offset */
-/*    char terms(), buf() */
-/*    int len */
-/*    tch = getcx( pmt, lin, offset, terms, buf, len ) */
-char getcx( char *pmt, int lin, int offset, char *terms, char *buf, int len )
-{
-  int i;
-  
-  i = (int)( cdcols() - strlen( pmt ) ) / (int)2 + offset;
-  if ( i <= 0 )
-    i = 1;
-  move(lin, 0);
-  clrtoeol();
-  buf[0] = EOS;
-  return ( cdgetx( pmt, lin, i, terms, buf, len, TRUE ) );
   
 }
 
@@ -890,48 +908,6 @@ void getdandt( char *buf, time_t thetime )
 	 now[4], now[5], now[6], now[3], junk, mod( now[1], 100 ) );
   
   return;
-  
-}
-
-
-/*  gettarget - get a target angle from the user */
-/*  SYNOPSIS */
-/*    char pmt() */
-/*    int lin, col */
-/*    real dir */
-/*    int flag, gettarget */
-/*    flag = gettarget( pmt, lin, col, dir ) */
-int gettarget( char *pmt, int lin, int col, real *dir, real cdefault )
-{
-  int i, j; 
-  char ch, buf[MSGMAXLINE];
-  
-  cdclrl( lin, 1 );
-  buf[0] = EOS;
-  ch = (char)cdgetx( pmt, lin, col, TERMS, buf, MSGMAXLINE, TRUE );
-  if ( ch == TERM_ABORT )
-    return ( FALSE );
-  
-  delblanks( buf );
-  fold( buf );
-  if ( buf[0] == EOS )
-    {
-      /* Default. */
-      *dir = cdefault;
-      return ( TRUE );
-    }
-  if ( alldig( buf ) == TRUE )
-    {
-      i = 0;
-      if ( ! safectoi( &j, buf, i ) )
-	return ( FALSE );
-      *dir = mod360( (real) j );
-      return ( TRUE );
-    }
-  if ( arrows( buf, dir ) )
-    return ( TRUE );
-  
-  return ( FALSE );
   
 }
 
@@ -1009,137 +985,6 @@ int modp1( int i, int modulus )
 	
 	return ( mod( m-1, modulus ) + 1 );
 	*/
-}
-
-/*  more - wait for the user to type a space */
-/*  SYNOPSIS */
-/*    char pmt() */
-/*    int spacetyped, more */
-/*    spacetyped = more( pmt ) */
-int more( char *pmt )
-{
-  int ch = 0; 
-  string pml=MTXT_MORE;
-  
-  if ( pmt[0] != EOS )
-    putpmt( pmt, MSG_LIN2 );
-  else
-    putpmt( pml, MSG_LIN2 );
-  
-  cdrefresh();
-  ch = iogchar();
-  return ( ch == ' ' );
-  
-}
-
-
-/*  pagefile - page through a file */
-/*  SYNOPSIS */
-/*    char file(), errmsg() */
-/*    int ignorecontroll, eatblanklines */
-/*    pagefile( file, errmsg, ignorecontroll, eatblanklines ) */
-void pagefile( char *file, char *errmsg )
-{
-  
-  int plins = 1;
-  FILE *pfd;
-  string sdone="--- press any key to return ---";
-  char buffer[BUFFER_SIZE];
-  int buflen;
-  
-  if ((pfd = fopen(file, "r")) == NULL)
-    {
-      clog("pagefile(): fopen(%s) failed: %s",
-	   file,
-	   strerror(errno));
-      
-      cdclear();
-      cdredo();
-      cdputc( errmsg, MSG_LIN2/2 );
-      more( sdone );
-      
-      return;
-    }
-  
-  cdclear();
-  cdrefresh();
-  cdmove(0, 0);
-  
-  plins = 0;
-  
-  while (fgets(buffer, BUFFER_SIZE - 1, pfd) != NULL)
-    { 
-      /* get one at a time */
-      buflen = strlen(buffer);
-      
-      buffer[buflen - 1] = EOS; /* remove trailing LF */
-      buflen--;
-      
-      if (buffer[0] == 0x0c)	/* formfeed */
-	{
-	  plins = DISPLAY_LINS + 1; /* force new page */
-	}
-      else
-	{
-    	  cdputs(buffer, plins, 0);
-	  plins++;
-	}
-      
-      if (plins >= DISPLAY_LINS)
-	{
-	  if (!more(MTXT_MORE))
-	    break;		/* bail if space not hit */
-	  
-	  cdclear();
-	  plins = 1;
-	}
-    }
-  
-  fclose(pfd);
-  
-  more(sdone);
-  
-  return;
-  
-}
-
-
-/*  putmsg - display a message on the bottom of the user's screen */
-/*  SYNOPSIS */
-/*    char msg() */
-/*    int line */
-/*    c_putmsg( msg, line ) */
-void c_putmsg( char *msg, int line )
-{
-  cdclrl( line, 1 );
-  cdputs( msg, line, 1 );
-#ifdef CONQGL
-  showMessage(line, msg);
-#endif
-
-  return;
-  
-}
-
-
-/*  putpmt - display a prompt */
-/*  SYNOPSIS */
-/*    char pmt() */
-/*    int line */
-/*    putpmt( pmt, line ) */
-void putpmt( char *pmt, int line )
-{
-  int i, dcol, pcol;
-  
-  i = strlen( pmt );
-  dcol = ( cdcols() - i ) / 2;
-  pcol = dcol + i;
-  cdclrl( line, 1 );
-  cprintf( line, dcol,ALIGN_NONE,"#%d#%s", InfoColor, pmt);
-  cdmove( line, pcol );
-  
-  return;
-  
 }
 
 

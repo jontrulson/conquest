@@ -12,8 +12,9 @@
 #include "datatypes.h"
 #include "conf.h"
 #include "protocol.h"
+#define NOPKT_EXTERN
 #include "packet.h"
-
+#undef NOPKT_EXTERN
 #ifndef HAVE_SELECT
 #error "The select() system call is required"
 #endif
@@ -173,6 +174,11 @@ static struct _packetent serverPackets[] = {
   { SP_HISTORY, 
     sizeof(spHistory_t), 
     "SP_HISTORY", 
+    pktNotImpl 
+  },
+  { SP_DOOMSDAY, 
+    sizeof(spDoomsday_t), 
+    "SP_DOOMSDAY", 
     pktNotImpl 
   }
 };
@@ -443,6 +449,8 @@ int readPacket(int direction, int sock, Unsgn8 *buf, int blen,
       return -1;
       break;
     }
+
+  pktRXBytes += len;
 
   if (len)
     {

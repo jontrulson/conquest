@@ -14,12 +14,16 @@
 #include "conqdef.h"
 #include "conqcom.h"
 #include "color.h"
+#include "ui.h"
 #include "conf.h"
 #include "clntauth.h"
+#include "cd2lb.h"
+#include "iolb.h"
 #include "client.h"
 #include "clientlb.h"
 
 #include "context.h"
+
 struct compile_options {
   char *name;
   char *oneliner;
@@ -106,7 +110,7 @@ static void DisplayCompileOptions(void)
   };
 
   lin = 1;
-  col = ((int)(cdcols() - strlen(header)) / 2);
+  col = ((int)(Context.maxcol - strlen(header)) / 2);
 
   cprintf(lin, col, ALIGN_NONE, "#%d#%s", NoColor, header);
   
@@ -190,7 +194,7 @@ void SysOptsMenu(void)
 				/* First clear the display. */
       cdclear();
       lin = 1;
-      col = ((int)(cdcols() - strlen(header))/ 2);
+      col = ((int)(Context.maxcol - strlen(header))/ 2);
       
       cprintf(lin, col, ALIGN_NONE, "#%d#%s", NoColor, header);
       
@@ -269,7 +273,7 @@ void UserOptsMenu(int unum)
 				/* First clear the display. */
       cdclear();
       lin = 1;
-      col = ((cdcols() / 2) - (strlen(header) / 2));
+      col = ((Context.maxcol / 2) - (strlen(header) / 2));
       
       cprintf(lin, col, ALIGN_NONE, "#%d#%s", NoColor, header);
       
@@ -303,7 +307,7 @@ void UserOptsMenu(int unum)
 				/* save and reload the config */
 	  if (ChangedSomething == TRUE)
 	    {
-	      SaveUserConfig(unum);
+	      SaveUserConfig();
 	      /* set new update rate */
 	      Context.updsec = UserConf.UpdatesPerSecond;
 	      sendCommand(CPCMD_SETRATE, Context.updsec);
@@ -316,7 +320,7 @@ void UserOptsMenu(int unum)
 	      ChangedSomething = FALSE; 
 	      ViewEditMacros(macroptr);
 	      if (ChangedSomething == TRUE)
-		SaveUserConfig(unum);
+		SaveUserConfig();
 	    }
 
 	  break;
@@ -491,7 +495,7 @@ static int ViewEditOptions(struct Conf ConfigData[], int ConfSize,
     {
       cdclrl( 1, MSG_LIN2);	/* clear screen area */
       lin = 1;
-      col = ((int)(cdcols() - strlen(header))/ 2);
+      col = ((int)(Context.maxcol - strlen(header))/ 2);
 
       cprintf(lin, col, ALIGN_NONE, "#%d#%s", NoColor, header);
       
@@ -688,7 +692,7 @@ static int ViewEditMacros(struct Conf *ConfigData)
 
       cdclrl( 1, MSG_LIN2);	/* clear screen area */
       lin = 1;
-      col = ((int)(cdcols() - strlen(headerbuf)) / 2);
+      col = ((int)(Context.maxcol - strlen(headerbuf)) / 2);
 
       cprintf(lin, col, ALIGN_NONE, "#%d#%s", NoColor, headerbuf);
       
@@ -848,7 +852,7 @@ static int ViewEditMacros(struct Conf *ConfigData)
 /* DisplayHelpScreen() - display a help (actually the conf item comment)
  *                       screen for a Configuration item.
  */
-void DisplayHelpScreen(struct Conf *confitem)
+static void DisplayHelpScreen(struct Conf *confitem)
 {
   int i, col, lin;
 
@@ -863,7 +867,7 @@ void DisplayHelpScreen(struct Conf *confitem)
   lin += 2;
 
   i = 0;
-  attrset(InfoColor);
+  uiPutColor(InfoColor);
 
   while (confitem->ConfComment[i] != NULL)
     {
@@ -875,7 +879,7 @@ void DisplayHelpScreen(struct Conf *confitem)
       i++;
     }
 
-  attrset(NoColor);
+  uiPutColor(NoColor);
   cdclrl( MSG_LIN1, 2  );
   cdputc(MTXT_DONE, MSG_LIN2);
 

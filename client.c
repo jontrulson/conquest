@@ -521,6 +521,21 @@ int procHistory(Unsgn8 *buf)
   return TRUE;
 }
 
+int procDoomsday(Unsgn8 *buf)
+{ 
+  spDoomsday_t *dd = (spDoomsday_t *)buf;
+
+  if (!validPkt(SP_DOOMSDAY, buf))
+    return FALSE;
+
+  Doomsday->status = dd->status;
+  Doomsday->heading =(real)((real)ntohs(dd->heading) / 10.0);
+  Doomsday->x = (real)((real)((Sgn32)ntohl(dd->x)) / 1000.0);
+  Doomsday->y = (real)((real)((Sgn32)ntohl(dd->y)) / 1000.0);
+
+  return TRUE;
+}
+
 /* send a command to server to change name */
 int sendSetName(Unsgn8 *name)
 {

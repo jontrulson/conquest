@@ -10,6 +10,7 @@
 #include "global.h"
 #include "conqdef.h"
 #include "conqcom.h"
+#include "conqlb.h"
 #include "context.h"
 #include "conf.h"
 #include "userauth.h"
@@ -31,7 +32,7 @@ static int doLogin(char *login, char *pw, char *epw)
   char salt[3];
   int unum;
 
-  if (gunum(&unum, login, 0))
+  if (clbGetUserNum(&unum, login, 0))
     {				/* user exists */
 				/* ENCRYPT and compare here... */
 
@@ -112,7 +113,7 @@ int Authenticate(char *username, char *password)
 	{
 	case CPAUTH_CHECKUSER:
 
-	  if (gunum( &unum, cauth->login, 0 ) == TRUE)
+	  if (clbGetUserNum( &unum, cauth->login, 0 ) == TRUE)
 	    {			/* user exits */
 	      sendAck(sInfo.sock, PKT_TOCLIENT, PSEV_INFO, PERR_OK,
 		      NULL);
@@ -252,10 +253,10 @@ void expire_users(void)
 	      PVUNLOCK(&ConqInfo->lockword);
 
 #if defined(DEBUG_SERVERAUTH)
-	      clog("expire_users(): calling resign(%d, %d)", i, TRUE);
+	      clog("expire_users(): calling clbResign(%d, %d)", i, TRUE);
 #endif
 
-	      resign(i, TRUE);
+	      clbResign(i, TRUE);
 	      clog("INFO: expire_users(): Expired remote user '%s' after %d days of inactivity",
 		   Users[i].username,
 		   difftime / SECS_PER_DAY);

@@ -58,6 +58,12 @@ struct _packetent {
 				   for some reason. */
 #define PERR_DONE         15    /* finished something - like beaming */
 
+#ifdef NOPKT_EXTERN
+int pktRXBytes = 0;
+#else
+extern int pktRXBytes;
+#endif
+
 int sendAck(int sock, int dir, Unsgn8 severity, Unsgn8 code, Unsgn8 *msg);
 int isConnDead(void);
 void pktNotImpl(void *nothing);

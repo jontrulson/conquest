@@ -14,13 +14,13 @@
 
 #include "conqdef.h"
 #include "conqcom.h"
+#include "conqlb.h"
 #include "context.h"
 #include "conf.h"
 #include "global.h"
 #include "color.h"
 #include "record.h"
 #include "ibuf.h"
-#include "display.h"
 
 #include "conqnet.h"
 #include "packet.h"
@@ -49,7 +49,7 @@ static char *myServerName = NULL; /* to meta */
 cpHello_t chello;		/* client hello info we want to keep */
 ServerInfo_t sInfo;
 
-int hello(void);		/* meet and greet the client */
+static int hello(void);		/* meet and greet the client */
 int updateClient(void);
 void updateProc(void);
 void startUpdate(void);
@@ -58,6 +58,9 @@ void stopUpdate(void);
 void catchSignals(void);
 void handleSignal(int sig);
 void conqend(void);
+int welcome( int *unum );
+void menu(void);
+int play(void);
 
 void printUsage()
 {
@@ -120,7 +123,7 @@ void checkMaster(void)
 
   signal(SIGCLD, SIG_IGN);	/* allow children to die */
 
-  if (!CheckPid(ConqInfo->conqservPID))
+  if (!checkPID(ConqInfo->conqservPID))
     {				/* see if one is really running */
       /* if we are here, we will be the listener */
       PVLOCK(&ConqInfo->lockword);
@@ -277,15 +280,15 @@ int main(int argc, char *argv[])
   /* clear out our stored packets */
   spktInit();
 
-  if ((ConquestUID = GetUID(ROOT_USER)) == ERR)
+  if ((ConquestUID = getUID(ROOT_USER)) == ERR)
     {
-      fprintf(stderr, "%s: GetUID() failed\n", progName);
+      fprintf(stderr, "%s: getUID() failed\n", progName);
       exit(1);
     }
   
-  if ((ConquestGID = GetConquestGID()) == ERR)
+  if ((ConquestGID = getConquestGID()) == ERR)
     {
-      fprintf(stderr, "%s: GetConquestGID() failed\n", progName);
+      fprintf(stderr, "%s: getConquestGID() failed\n", progName);
       exit(1);
     }
   
@@ -297,9 +300,9 @@ int main(int argc, char *argv[])
     {
       int myuid;
 
-      if ((myuid = GetUID(myuidname)) == ERR)
+      if ((myuid = getUID(myuidname)) == ERR)
         {
-          fprintf(stderr, "%s: GetUID(%s) failed\n", progName, myuidname);
+          fprintf(stderr, "%s: getUID(%s) failed\n", progName, myuidname);
           exit(1);
         }
 
@@ -633,7 +636,7 @@ int capentry( int snum, int *system )
 		     Context.unum, esystem))
     return FALSE;
 
-  while ( stillalive( Context.snum ) )
+  while ( clbStillAlive( Context.snum ) )
     {
 
       /* now we wait for another ENTER command packet with it's detail member
@@ -680,7 +683,7 @@ int capentry( int snum, int *system )
       return TRUE;
     }
 
-  return FALSE;	    /* can get here because of stillalive() */
+  return FALSE;	    /* can get here because of clbStillAlive() */
   
 }
 
@@ -814,6 +817,16 @@ void dead( int snum, int leave )
 int updateClient(void)
 {
   int i,j;
+  static int sentallusers = FALSE; /* we will send all user data once. */
+
+  if (!sentallusers)
+    {                           /* send all valid user data the first time */
+      sentallusers = TRUE;
+      for (i=0; i<MAXUSERS; i++)
+        if (Users[i].live)
+          if (!sendUser(sInfo.sock, i))
+            return FALSE;
+    }
 
   for (i=1; i<=MAXSHIPS; i++)
     {
@@ -852,6 +865,8 @@ int updateClient(void)
 
       sendHistory(sInfo.sock, i);
     }
+
+  sendDoomsday(sInfo.sock);
 
   return TRUE;
 }
@@ -1063,9 +1078,9 @@ void menu(void)
   initstats( &Ships[Context.snum].ctime, &Ships[Context.snum].etime );
   
   /* Log this entry into the Game. */
-  Context.histslot = loghist( Context.unum );
+  Context.histslot = clbLogHist( Context.unum );
   
-  /* Set up a few ship characteristics here rather than in initship(). */
+  /* Set up a few ship characteristics here rather than in clbInitShip(). */
   Ships[Context.snum].unum = Context.unum;
   Ships[Context.snum].team = Users[Context.unum].team;
   Ships[Context.snum].shiptype = Teams[Ships[Context.snum].team].shiptype;
@@ -1195,7 +1210,7 @@ void menu(void)
 		     Ships[i].status == SS_ENTERING) && 
 		     Ships[i].unum == Context.unum))
 		  {
-		    resign( Context.unum, FALSE );
+		    clbResign( Context.unum, FALSE );
 		    Ships[Context.snum].status = SS_OFF;
 		    exit(0);	/* exit here */
 		  }
@@ -1216,7 +1231,7 @@ void menu(void)
       
       sleepy = 0;
     }
-  while ( stillalive( Context.snum ) &&  !Context.leave );
+  while ( clbStillAlive( Context.snum ) &&  !Context.leave );
   
   /* Make our ship available for others to use. */
   if ( Ships[Context.snum].status == SS_RESERVED )
@@ -1365,14 +1380,14 @@ int newship( int unum, int *snum )
   /* If necessary, initalize the ship */
   if ( fresh )
     {
-      initship( *snum, unum );
+      clbInitShip( *snum, unum );
       
       /* Randomly position the ship near the home sun (or planet). */
       if ( Planets[Teams[system].homeplanet].primary == Teams[system].homesun )
 	i = Teams[system].homesun;
       else
 	i = Teams[system].homeplanet;
-      putship( *snum, Planets[i].x, Planets[i].y );
+      clPutShip( *snum, Planets[i].x, Planets[i].y );
       Ships[*snum].dhead = rnduni( 0.0, 359.9 );
       Ships[*snum].head = Ships[*snum].dhead;
       Ships[*snum].dwarp = (real) rndint( 2, 5 ) ;/* #~~~ this is a kludge*/
@@ -1395,7 +1410,7 @@ int newship( int unum, int *snum )
   
   
   /* Straighten out the ships deltas. */
-  fixdeltas( *snum );
+  clbFixDeltas( *snum );
   
   /* Finally, turn the ship on. */
   Ships[*snum].status = SS_LIVE;
@@ -1411,7 +1426,7 @@ int newship( int unum, int *snum )
 /*  play - play the game (PLAY) */
 /*  SYNOPSIS */
 /*    play */
-int play()
+int play(void)
 {
   int laststat, now;
   int didsomething;             /* update immediately if we did anything */
@@ -1459,12 +1474,12 @@ int play()
 	  Context.snum,
 	  Ships[Context.snum].alias);
   
-  stormsg(MSG_COMP, MSG_ALL, msgbuf);
+  clbStoreMsg(MSG_COMP, MSG_ALL, msgbuf);
   
 
   /* client updates will be handled by updateProc */
   /* While we're alive, field commands and process them. */
-  while ( stillalive( Context.snum ) )
+  while ( clbStillAlive( Context.snum ) )
     {
       /* Make sure we still control our ship. */
       if ( Ships[Context.snum].pid != Context.pid )
@@ -1576,7 +1591,7 @@ int welcome( int *unum )
 
   sInfo.isLoggedIn = TRUE;
 
-  if ( ! gunum( unum, name, 0 ) )
+  if ( ! clbGetUserNum( unum, name, 0 ) )
     {				
       flags |= SPCLNTSTAT_FLAG_NEW;
       /* Must be a new player. */
@@ -1596,14 +1611,14 @@ int welcome( int *unum )
       appstr( name, cbuf );
       cbuf[i] = (char)toupper( cbuf[i] );
 
-      if ( ! c_register( name, cbuf, team, unum ) )
+      if ( ! clbRegister( name, cbuf, team, unum ) )
 	{
 	  sendAck(sInfo.sock, PKT_TOCLIENT, PSEV_FATAL, PERR_REGISTER,
                   NULL);
 	  return ( FALSE );
 	}
 
-      clog("conquestd: c_register COMPLETE!!!! unum = %d, team = %d\n", 
+      clog("conquestd: clbRegister COMPLETE!!!! unum = %d, team = %d\n", 
 	   *unum, team);
 
 				/* copy in the password */
@@ -1624,7 +1639,7 @@ int welcome( int *unum )
     }
 
   /* Can't play without a ship. */
-  if ( ! findship( &Context.snum ) )
+  if ( ! clbFindShip( &Context.snum ) )
     {
       sendAck(sInfo.sock, PKT_TOCLIENT, PSEV_FATAL, PERR_NOSHIP,
 	      NULL);
@@ -1647,7 +1662,7 @@ int welcome( int *unum )
 }
 
 
-int hello(void)
+static int hello(void)
 {
   spHello_t shello;
   Unsgn8 buf[PKT_MAXSIZE];
@@ -1707,9 +1722,7 @@ int hello(void)
   chello.clientname[CONF_SERVER_NAME_SZ - 1] = 0;
   chello.clientver[CONF_SERVER_NAME_SZ - 1] = 0;
 
-  clog("HELLO: CLIENT: cname = '%s'\n"
-       "               cver = '%s'\n"
-       "               upd: %d, protv = 0x%04hx, cmnr = %d",
+  clog("CLIENTID:%s:%s:%d:0x%04hx:%d",
        chello.clientname, 
        chello.clientver,
        chello.updates, 
@@ -1766,10 +1779,10 @@ void catchSignals(void)
 
 void handleSignal(int sig)
 {
+  stopUpdate();
+
   if (sig)
     clog("conquestd: exiting on signal %d", sig);
-
-  stopUpdate();
   
   if (sInfo.state == SVR_STATE_PLAY)
     {
@@ -1789,7 +1802,7 @@ void handleSignal(int sig)
       else
         {
           /* so we can detect cowards */
-          killship( Context.snum, KB_LIGHTNING );
+          clbKillShip( Context.snum, KB_LIGHTNING );
           /* turn ship off */
           Ships[Context.snum].status = SS_OFF;
         }
@@ -1818,7 +1831,7 @@ void conqend(void)
     {				/* let everyone know we're leaving */
       sprintf(msgbuf, "%s has left the game.",
 	      Users[Context.unum].alias);
-      stormsg(MSG_COMP, MSG_ALL, msgbuf);
+      clbStoreMsg(MSG_COMP, MSG_ALL, msgbuf);
     }
   
   recordCloseOutput();

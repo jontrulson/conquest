@@ -27,21 +27,29 @@
 #define NOEXTERN
 #include "conqdef.h"
 #include "conqcom.h"
+#include "conqlb.h"
 #include "context.h"
 #include "conf.h"
 #include "global.h"
 #include "color.h"
+#include "ui.h"
+#include "options.h"
+#include "cd2lb.h"
+#include "iolb.h"
+#include "cumisc.h"
+#include "cuclient.h"
 #include "record.h"
 #include "ibuf.h"
-#include "display.h"
 #include "conqnet.h"
 #include "packet.h"
+#include "display.h"
 
 #define CLIENT_NOEXTERN
 #include "client.h"
 #undef CLIENT_NOEXTERN
 #include "clientlb.h"
 #include "clntauth.h"
+#include "cuclient.h"
 
 #include "meta.h"
 
@@ -52,7 +60,7 @@ static char cbuf[MID_BUFFER_SIZE]; /* general purpose buffer */
 static int lastServerError = 0;	/* set by an ACK from server */
 static Unsgn8 clientFlags = 0;  /* set according to CLIENTSTAT packets */
 
-int hello(void);		/* meet and greet the server */
+static int hello(void);		/* meet and greet the server */
 void catchSignals(void);
 void handleSignal(int sig);
 
@@ -62,6 +70,44 @@ void startTimer(void);
 void conqend(void);
 void processPacket(Unsgn8 *buf);
 int selectServer(metaSRec_t *metaServerList, int nums);
+
+/* conquest.c */
+
+int welcome( int *unum );
+void doalloc( int snum);
+void doautopilot( int snum );
+void dobeam( int snum );
+void dobomb( int snum );
+void doburst( int snum );
+void docloak( int snum );
+void dorefit( int snum, int dodisplay );
+void docoup( int snum );
+void docourse( int snum );
+void dodet( int snum );
+void dodistress( int snum );
+void dohelp( void );
+void doinfo( int snum );
+void dolastphase( int snum );
+void domydet( int snum );
+void dooption( int snum, int dodisplay );
+void doorbit( int snum );
+void dophase( int snum );
+void doPlanetList( int snum );
+void doReviewMsgs( int snum );
+void doselfdest(int snum);
+void doshields( int snum, int up );
+void doTeamList( int team );
+void dotorp( int snum );
+void dotow( int snum );
+void dountow( int snum );
+void dowar( int snum );
+void dowarp( int snum, real warp );
+int getoption( char ch, int *tok );
+void menu(void);
+int play(void);
+int capentry( int snum, int *system );
+int newship( int unum, int *snum );
+void dead( int snum, int leave );
 
 void printUsage()
 {
@@ -105,7 +151,7 @@ int connectServer(char *remotehost, Unsgn16 remoteport)
     return FALSE;
 
   /* display the logo */
-  lin = conqlogo();
+  lin = cumConqLogo();
 
   lin += 5;
 
@@ -115,7 +161,7 @@ int connectServer(char *remotehost, Unsgn16 remoteport)
 
       cprintf(lin, 0, ALIGN_CENTER, "conquest: %s: no such host", 
               remotehost);
-      putpmt(MTXT_DONE, MSG_LIN2 );
+      cumPutPrompt(MTXT_DONE, MSG_LIN2 );
       iogchar();
 
       return FALSE;
@@ -132,7 +178,7 @@ int connectServer(char *remotehost, Unsgn16 remoteport)
       clog("socket: %s", strerror(errno));
       cprintf(lin, 0, ALIGN_CENTER, "socket: %s", 
               remotehost);
-      putpmt(MTXT_DONE, MSG_LIN2 );
+      cumPutPrompt(MTXT_DONE, MSG_LIN2 );
       iogchar();
       return FALSE;
     }
@@ -156,7 +202,7 @@ int connectServer(char *remotehost, Unsgn16 remoteport)
               remotehost, remoteport);
       cprintf(lin++, 0, ALIGN_CENTER, 
               "Is there a conquestd server running there?\n");
-      putpmt(MTXT_DONE, MSG_LIN2 );
+      cumPutPrompt(MTXT_DONE, MSG_LIN2 );
       iogchar();
 
       return FALSE;
@@ -164,8 +210,6 @@ int connectServer(char *remotehost, Unsgn16 remoteport)
 
   cprintf(lin++, 0, ALIGN_CENTER, "Connected!");
   cdrefresh();
-
-  c_sleep(2.0);
 
   cInfo.serverDead = FALSE;
   cInfo.sock = s;
@@ -305,8 +349,8 @@ int main(int argc, char *argv[])
   /* a parallel universe, it is */
 
   fake_common();
-  initeverything();		/* initialize the universe.  Wow. Such power */
-  initmsgs();
+  clbInitEverything();		/* initialize the universe.  Wow. Such power */
+  clbInitMsgs();
   *CBlockRevision = COMMONSTAMP;
   ConqInfo->closed = FALSE;
   Driver->drivstat = DRS_OFF;
@@ -438,7 +482,7 @@ int selectentry( Unsgn8 esystem )
   cdmove( 1, 1 );
   cdrefresh();
   
-  while ( stillalive( Context.snum ) )
+  while ( clbStillAlive( Context.snum ) )
     {
       if ( ! iogtimed( &ch, 1.0 ) )
 	continue;
@@ -469,7 +513,7 @@ int selectentry( Unsgn8 esystem )
 	}
     }
   
-  return ( FALSE );	    /* can get here because of stillalive() */
+  return ( FALSE );	    /* can get here because of clbStillAlive() */
   
 }
 
@@ -482,7 +526,7 @@ void command( int ch )
 {
   int i;
   real x;
-  if (KPAngle(ch, &x) == TRUE)	/* hit a keypad key */
+  if (cumKPAngle(ch, &x) == TRUE)	/* hit a keypad key */
     {				/* change course */
       cdclrl( MSG_LIN1, 1 );
       cdclrl( MSG_LIN2, 1 );
@@ -556,7 +600,7 @@ void command( int ch )
       Context.display = FALSE;
       dohelp();
       Context.display = TRUE;
-      if ( stillalive( Context.snum ) )
+      if ( clbStillAlive( Context.snum ) )
         {
           stopTimer();
           display( Context.snum, FALSE );
@@ -566,9 +610,9 @@ void command( int ch )
     case 'H':
       Context.redraw = TRUE;
       Context.display = FALSE;
-      histlist( FALSE );
+      cumHistList( FALSE );
       Context.display = TRUE;
-      if ( stillalive( Context.snum ) )
+      if ( clbStillAlive( Context.snum ) )
         {
           stopTimer();
           display( Context.snum, FALSE );
@@ -585,10 +629,10 @@ void command( int ch )
       docoup( Context.snum );
       break;
     case 'L':				/* review old messages */
-      doreview( Context.snum );
+      doReviewMsgs( Context.snum );
       break;
     case 'm':				/* send a message */
-      clntSendMsg( Context.snum, UserConf.Terse,
+      cucSendMsg( Context.snum, UserConf.Terse,
 		   TRUE);
       break;
     case 'M':				/* strategic/tactical map */
@@ -601,7 +645,7 @@ void command( int ch )
       startTimer();
       break;
     case 'N':				/* change pseudonym */
-      clntPseudo( Context.unum, Context.snum );
+      cucPseudo( Context.unum, Context.snum );
       break;
 
     case 'O':
@@ -609,7 +653,7 @@ void command( int ch )
       Context.display = FALSE;
       UserOptsMenu(Context.unum);
       Context.display = TRUE;
-      if ( stillalive( Context.snum ) )
+      if ( clbStillAlive( Context.snum ) )
         {
           stopTimer();
           display( Context.snum, FALSE );
@@ -643,7 +687,7 @@ void command( int ch )
       else
 	{
 	  cdclrl( MSG_LIN2, 1 );
-	  c_putmsg(
+	  cumPutMsg(
 		   "You cannot repair while the cloaking device is engaged.",
 		   MSG_LIN1 );
 	}
@@ -654,9 +698,9 @@ void command( int ch )
     case 'S':				/* more user stats */
       Context.redraw = TRUE;
       Context.display = FALSE;
-      userstats( FALSE, Context.snum ); 
+      cumUserStats( FALSE, Context.snum ); 
       Context.display = TRUE;
-      if ( stillalive( Context.snum ) )
+      if ( clbStillAlive( Context.snum ) )
         {
           stopTimer();
           display( Context.snum, FALSE );
@@ -666,9 +710,9 @@ void command( int ch )
     case 'T':				/* team list */
       Context.redraw = TRUE;
       Context.display = FALSE;
-      doteamlist( Ships[Context.snum].team );
+      doTeamList( Ships[Context.snum].team );
       Context.display = TRUE;
-      if ( stillalive( Context.snum ) )
+      if ( clbStillAlive( Context.snum ) )
         {
           stopTimer();
           display( Context.snum, FALSE );
@@ -681,9 +725,9 @@ void command( int ch )
     case 'U':				/* user stats */
       Context.redraw = TRUE;
       Context.display = FALSE;
-      userlist( FALSE, Context.snum );
+      cumUserList( FALSE, Context.snum );
       Context.display = TRUE;
-      if ( stillalive( Context.snum ) )
+      if ( clbStillAlive( Context.snum ) )
         {
           stopTimer();
           display( Context.snum, FALSE );
@@ -691,7 +735,7 @@ void command( int ch )
         }
       break;
     case 'W':				/* war and peace */
-      clntDoWar( Context.snum );
+      cucDoWar( Context.snum );
       break;
     case '-':				/* shields down */
       doshields( Context.snum, FALSE );
@@ -708,9 +752,9 @@ void command( int ch )
     case '/':				/* player list */
       Context.redraw = TRUE;
       Context.display = FALSE;
-      playlist( FALSE, FALSE, Context.snum );
+      cumPlayList( FALSE, FALSE, Context.snum );
       Context.display = TRUE;
-      if ( stillalive( Context.snum ) )
+      if ( clbStillAlive( Context.snum ) )
         {
           stopTimer();
           display( Context.snum, FALSE );
@@ -720,9 +764,9 @@ void command( int ch )
     case '?':				/* planet list */
       Context.redraw = TRUE;
       Context.display = FALSE;
-      doplanlist( Context.snum );
+      doPlanetList( Context.snum );
       Context.display = TRUE;
-      if ( stillalive( Context.snum ) )
+      if ( clbStillAlive( Context.snum ) )
         {
           stopTimer();
           display( Context.snum, FALSE );
@@ -761,7 +805,7 @@ void command( int ch )
 #ifdef DEBUG_IO
       clog("command(): got 0%o, KEY_A1 =0%o", ch, KEY_A1);
 #endif
-      c_putmsg( "Type h for help.", MSG_LIN2 );
+      cumPutMsg( "Type h for help.", MSG_LIN2 );
     }
   
   return;
@@ -778,7 +822,7 @@ void conqds( int multiple, int switchteams )
   int i, col, lin;
   extern char *ConquestVersion;
   extern char *ConquestDate;
-  int FirstTime = TRUE;
+  static int FirstTime = TRUE;
   static char sfmt[MSGMAXLINE * 2];
 
   if (FirstTime == TRUE)
@@ -795,7 +839,7 @@ void conqds( int multiple, int switchteams )
   cdclear();
   
   /* Display the logo. */
-  lin = conqlogo();
+  lin = cumConqLogo();
 
   if ( ConqInfo->closed )
     cprintf(lin,0,ALIGN_CENTER,"#%d#%s",RedLevelColor,"The game is closed.");
@@ -827,8 +871,6 @@ void conqds( int multiple, int switchteams )
   cprintf(lin,col,ALIGN_NONE,sfmt, 'L', "review messages");
   lin++;
   cprintf(lin,col,ALIGN_NONE,sfmt, 'W', "set war or peace");
-  lin++;
-  cprintf(lin,col,ALIGN_NONE,sfmt, 'I', "change user options");
   
   col = 48;
   lin = i;
@@ -953,9 +995,9 @@ void dead( int snum, int leave )
 	    appchr( '.', buf );
 	  cprintf( 8,0,ALIGN_CENTER, 
 		   "#%d#You were kill number #%d#%.1f #%d#for #%d#%s #%d#(#%d#%s#%d#)%s",
-		   InfoColor, A_BOLD, Ships[kb].kills, 
-		   InfoColor, A_BOLD, Ships[kb].alias, 
-		   InfoColor, A_BOLD, cbuf, 
+		   InfoColor, CQC_A_BOLD, Ships[kb].kills, 
+		   InfoColor, CQC_A_BOLD, Ships[kb].alias, 
+		   InfoColor, CQC_A_BOLD, cbuf, 
 		   InfoColor, buf );
 	}
       else if ( -kb > 0 && -kb <= NUMPLANETS )
@@ -965,7 +1007,7 @@ void dead( int snum, int leave )
 	  else
 	      strcpy(cbuf, "planetary defenses.");
 	  cprintf(8,0,ALIGN_CENTER,"#%d#%s#%d#%s%s#%d#%s", 
-		InfoColor, ywkb, A_BOLD, Planets[-kb].name, "'s ",
+		InfoColor, ywkb, CQC_A_BOLD, Planets[-kb].name, "'s ",
 		InfoColor, cbuf);
 
 	}
@@ -989,8 +1031,8 @@ void dead( int snum, int leave )
     {
       cprintf( 10,0,ALIGN_CENTER,
 		"#%d#Universe conquered by #%d#%s #%d#for the #%d#%s #%d#team.",
-		 InfoColor, A_BOLD, ConqInfo->conqueror, 
-		 InfoColor, A_BOLD, ConqInfo->conqteam, LabelColor );
+		 InfoColor, CQC_A_BOLD, ConqInfo->conqueror, 
+		 InfoColor, CQC_A_BOLD, ConqInfo->conqteam, LabelColor );
     }
   else if ( kb == KB_SELF )
     {
@@ -1015,11 +1057,11 @@ void dead( int snum, int leave )
 	  if ( i == 1 )
 		cprintf(10,0,ALIGN_CENTER,
 		"#%d#The #%d#%s #%d#you were carrying %s not amused.",
-			LabelColor, A_BOLD, cbuf, LabelColor, buf);
+			LabelColor, CQC_A_BOLD, cbuf, LabelColor, buf);
 	  else
 		cprintf(10,0,ALIGN_CENTER,
 		"#%d#The #%d#%s %s #%d#you were carrying %s not amused.",
-			LabelColor, A_BOLD, junk, cbuf, LabelColor, buf);
+			LabelColor, CQC_A_BOLD, junk, cbuf, LabelColor, buf);
 	}
     }
   else if ( kb >= 0 )
@@ -1028,13 +1070,13 @@ void dead( int snum, int leave )
 	{
 	  cprintf( 10,0,ALIGN_CENTER,
 		"#%d#He had #%d#%d%% #%d#shields and #%d#%d%% #%d#damage.",
-		InfoColor, A_BOLD, round(Ships[kb].shields), 
-		InfoColor, A_BOLD, round(Ships[kb].damage),InfoColor );
+		InfoColor, CQC_A_BOLD, round(Ships[kb].shields), 
+		InfoColor, CQC_A_BOLD, round(Ships[kb].damage),InfoColor );
 	}
     }
   cprintf(12,0,ALIGN_CENTER,
 	"#%d#You got #%d#%.1f #%d#this time.", 
-	InfoColor, A_BOLD, oneplace(Ships[snum].kills), InfoColor );
+	InfoColor, CQC_A_BOLD, oneplace(Ships[snum].kills), InfoColor );
   cdmove( 1, 1 );
   cdrefresh();
 
@@ -1065,7 +1107,7 @@ void dead( int snum, int leave )
 	  else
 	    cprintf( 14,0,ALIGN_CENTER,"#%d#%s", InfoColor,
 		   "You have chosen to NOT leave any last words:" );
-	  ch = getcx( "Press TAB to confirm:", 16, 0,
+	  ch = cumGetCX( "Press TAB to confirm:", 16, 0,
 		     TERMS, cbuf, 10 );
 	}
       while ( ch != TERM_EXTRA ); /* until . while */
@@ -1080,7 +1122,7 @@ void dead( int snum, int leave )
   Ships[Context.snum].status = SS_RESERVED;
 
   ioeat();
-  putpmt( MTXT_DONE, MSG_LIN2 );
+  cumPutPrompt( MTXT_DONE, MSG_LIN2 );
   cdrefresh();
   while ( ! iogtimed( &ch, 1.0 ) )
     ;
@@ -1165,7 +1207,7 @@ void doautopilot( int snum )
   lastServerError = 0;  
   sendCommand(CPCMD_AUTOPILOT, 1); /* turn over command to a machine */
 
-  while ( stillalive( Context.snum ) )
+  while ( clbStillAlive( Context.snum ) )
     {
       if (lastServerError)
         break;
@@ -1183,7 +1225,7 @@ void doautopilot( int snum )
 	  cdredo();
 	  break;
 	default:
-	  c_putmsg( "Press ESCAPE to abort autopilot.", MSG_LIN1 );
+	  cumPutMsg( "Press ESCAPE to abort autopilot.", MSG_LIN1 );
 	  cdbeep();
 	  cdrefresh();
 	}
@@ -1227,7 +1269,7 @@ void dobeam( int snum )
   /* Check for allowability. */
   if ( Ships[snum].warp >= 0.0 )
     {
-      c_putmsg( "We must be orbiting a planet to use the transporter.",
+      cumPutMsg( "We must be orbiting a planet to use the transporter.",
 	       MSG_LIN1 );
       return;
     }
@@ -1236,18 +1278,18 @@ void dobeam( int snum )
     {
       if ( Planets[pnum].type == PLANET_SUN )
 	{
-	  c_putmsg( "Idiot!  Our armies will fry down there!", MSG_LIN1 );
+	  cumPutMsg( "Idiot!  Our armies will fry down there!", MSG_LIN1 );
 	  return;
 	}
       else if ( Planets[pnum].type == PLANET_MOON )
 	{
-	  c_putmsg( "Fool!  Our armies will suffocate down there!",
+	  cumPutMsg( "Fool!  Our armies will suffocate down there!",
 		   MSG_LIN1 );
 	  return;
 	}
       else if ( Planets[pnum].team == TEAM_GOD )
 	{
-	  c_putmsg(
+	  cumPutMsg(
 		   "GOD->you: YOUR ARMIES AREN'T GOOD ENOUGH FOR THIS PLANET.",
 		   MSG_LIN1 );
 	  return;
@@ -1262,7 +1304,7 @@ void dobeam( int snum )
       if ( i != 1 )
 	appchr( 's', cbuf );
       appchr( '.', cbuf );
-      c_putmsg( cbuf, MSG_LIN1 );
+      cumPutMsg( cbuf, MSG_LIN1 );
       return;
     }
   
@@ -1272,14 +1314,14 @@ void dobeam( int snum )
       Planets[pnum].team != TEAM_NOTEAM )
     if ( ! Ships[snum].war[Planets[pnum].team] && Planets[pnum].armies != 0) 
       {
-	c_putmsg( "But we are not at war with this planet!", MSG_LIN1 );
+	cumPutMsg( "But we are not at war with this planet!", MSG_LIN1 );
 	return;
       }
   
   if ( Ships[snum].armies == 0 &&
       Planets[pnum].team == Ships[snum].team && Planets[pnum].armies <= MIN_BEAM_ARMIES )
     {
-      c_putmsg( lastfew, MSG_LIN1 );
+      cumPutMsg( lastfew, MSG_LIN1 );
       return;
     }
   
@@ -1287,7 +1329,7 @@ void dobeam( int snum )
 
   if ( rkills < (real)1.0 )
     {
-      c_putmsg(
+      cumPutMsg(
 	       "Fleet orders prohibit beaming armies until you have a kill.",
 	       MSG_LIN1 );
       return;
@@ -1295,7 +1337,7 @@ void dobeam( int snum )
   
   /* Figure out what can be beamed. */
   downmax = Ships[snum].armies;
-  if ( spwar(snum,pnum) ||
+  if ( clbSPWar(snum,pnum) ||
       Planets[pnum].team == TEAM_SELFRULED ||
       Planets[pnum].team == TEAM_NOTEAM ||
       Planets[pnum].team == TEAM_GOD ||
@@ -1321,7 +1363,7 @@ void dobeam( int snum )
 	  else
 	    appstr( "ies are", cbuf );
 	  appstr( " reluctant to beam aboard a pirate vessel.", cbuf );
-	  c_putmsg( cbuf, MSG_LIN1 );
+	  cumPutMsg( cbuf, MSG_LIN1 );
 	  return;
 	}
       upmax = 0;
@@ -1330,7 +1372,7 @@ void dobeam( int snum )
   /* Figure out which direction to beam. */
   if ( upmax <= 0 && downmax <= 0 )
     {
-      c_putmsg( "There is no one to beam.", MSG_LIN1 );
+      cumPutMsg( "There is no one to beam.", MSG_LIN1 );
       return;
     }
   if ( upmax <= 0 )
@@ -1339,10 +1381,10 @@ void dobeam( int snum )
     dirup = TRUE;
   else
     {
-      c_putmsg( "Beam [up or down] ", MSG_LIN1 );
+      cumPutMsg( "Beam [up or down] ", MSG_LIN1 );
       cdrefresh();
       done = FALSE;
-      while ( stillalive( Context.snum ) && done == FALSE)
+      while ( clbStillAlive( Context.snum ) && done == FALSE)
 	{
 	  if ( ! iogtimed( &ch, 1.0 ) )
 	    {
@@ -1362,7 +1404,7 @@ void dobeam( int snum )
 	      done = TRUE;
 	      break;
 	    default:
-	      c_putmsg( abt, MSG_LIN1 );
+	      cumPutMsg( abt, MSG_LIN1 );
 	      return;
 	    }
 	}
@@ -1384,7 +1426,7 @@ void dobeam( int snum )
   ch = cdgetx( cbuf, MSG_LIN1, 1, TERMS, buf, MSGMAXLINE, TRUE );
   if ( ch == TERM_ABORT )
     {
-      c_putmsg( abt, MSG_LIN1 );
+      cumPutMsg( abt, MSG_LIN1 );
       return;
     }
   else if ( ch == TERM_EXTRA && buf[0] == EOS )
@@ -1394,14 +1436,14 @@ void dobeam( int snum )
       delblanks( buf );
       if ( alldig( buf ) != TRUE )
 	{
-	  c_putmsg( abt, MSG_LIN1 );
+	  cumPutMsg( abt, MSG_LIN1 );
 	  return;
 	}
       i = 0;
       safectoi( &num, buf, i );			/* ignore status */
       if ( num < 1 || num > beamax )
 	{
-	  c_putmsg( abt, MSG_LIN1 );
+	  cumPutMsg( abt, MSG_LIN1 );
 	  return;
 	}
     }
@@ -1418,12 +1460,12 @@ void dobeam( int snum )
 
   while(TRUE)			/* repeat infloop */
     {
-      if ( ! stillalive( Context.snum ) )
+      if ( ! clbStillAlive( Context.snum ) )
 	return;
 
       if ( iochav() )
 	{
-	  c_putmsg( abt, MSG_LIN1 );
+	  cumPutMsg( abt, MSG_LIN1 );
 	  sendCommand(CPCMD_BEAM, 0); /* stop! */
 	  break;
 	}
@@ -1464,25 +1506,25 @@ void dobomb( int snum )
   /* Check for allowability. */
   if ( Ships[snum].warp >= 0.0 )
     {
-      c_putmsg( "We must be orbiting a planet to bombard it.", MSG_LIN1 );
+      cumPutMsg( "We must be orbiting a planet to bombard it.", MSG_LIN1 );
       return;
     }
   pnum = -Ships[snum].lock;
   if ( Planets[pnum].type == PLANET_SUN || Planets[pnum].type == PLANET_MOON ||
       Planets[pnum].team == TEAM_NOTEAM || Planets[pnum].armies == 0 )
     {
-      c_putmsg( "There is no one there to bombard.", MSG_LIN1 );
+      cumPutMsg( "There is no one there to bombard.", MSG_LIN1 );
       return;
     }
   if ( Planets[pnum].team == Ships[snum].team )
     {
-      c_putmsg( "We can't bomb our own armies!", MSG_LIN1 );
+      cumPutMsg( "We can't bomb our own armies!", MSG_LIN1 );
       return;
     }
   if ( Planets[pnum].team != TEAM_SELFRULED && Planets[pnum].team != TEAM_GOD )
     if ( ! Ships[snum].war[Planets[pnum].team] )
       {
-	c_putmsg( "But we are not at war with this planet!", MSG_LIN1 );
+	cumPutMsg( "But we are not at war with this planet!", MSG_LIN1 );
 	return;
       }
   
@@ -1506,12 +1548,12 @@ void dobomb( int snum )
 
   while(TRUE)
     {
-      if ( ! stillalive( Context.snum ) )
+      if ( ! clbStillAlive( Context.snum ) )
 	break;
 
       if ( iochav() )
 	{
-	  c_putmsg( abt, MSG_LIN1 );
+	  cumPutMsg( abt, MSG_LIN1 );
 	  sendCommand(CPCMD_BOMB, 0);
 	  break;
 	}
@@ -1544,25 +1586,25 @@ void doburst( int snum )
   
   if ( SCLOAKED(snum) )
     {
-      c_putmsg( "The cloaking device is using all available power.",
+      cumPutMsg( "The cloaking device is using all available power.",
 	       MSG_LIN1 );
       return;
     }
   if ( Ships[snum].wfuse > 0 )
     {
-      c_putmsg( "Weapons are currently overloaded.", MSG_LIN1 );
+      cumPutMsg( "Weapons are currently overloaded.", MSG_LIN1 );
       return;
     }
   if ( Ships[snum].fuel < TORPEDO_FUEL )
     {
-      c_putmsg( "Not enough fuel to launch a torpedo.", MSG_LIN1 );
+      cumPutMsg( "Not enough fuel to launch a torpedo.", MSG_LIN1 );
       return;
     }
   
-  if ( gettarget( "Torpedo burst: ", MSG_LIN1, 1, &dir, Ships[snum].lastblast ) )
+  if ( cumGetTarget( "Torpedo burst: ", MSG_LIN1, 1, &dir, Ships[snum].lastblast ) )
     {
-      if ( ! checklaunch( snum, 3 ) )
-	c_putmsg( ">TUBES EMPTY<", MSG_LIN2 );
+      if ( ! clbCheckLaunch( snum, 3 ) )
+	cumPutMsg( ">TUBES EMPTY<", MSG_LIN2 );
       else
 	{			/* a local approx */
 	  sendFireTorps(3, dir);
@@ -1571,7 +1613,7 @@ void doburst( int snum )
     }
   else
     {
-      c_putmsg( "Invalid targeting information.", MSG_LIN1 );
+      cumPutMsg( "Invalid targeting information.", MSG_LIN1 );
     }
 
   
@@ -1595,18 +1637,18 @@ void docloak( int snum )
   if ( SCLOAKED(snum) )
     {
       sendCommand(CPCMD_CLOAK, 0);
-      c_putmsg( "Cloaking device disengaged.", MSG_LIN1 );
+      cumPutMsg( "Cloaking device disengaged.", MSG_LIN1 );
       SFCLR(snum, SHIP_F_CLOAKED); /* do it locally */
       return;
     }
   if ( Ships[snum].efuse > 0 )
     {
-      c_putmsg( "Engines are currently overloaded.", MSG_LIN1 );
+      cumPutMsg( "Engines are currently overloaded.", MSG_LIN1 );
       return;
     }
   if ( Ships[snum].fuel < CLOAK_ON_FUEL )
     {
-      c_putmsg( nofuel, MSG_LIN1 );
+      cumPutMsg( nofuel, MSG_LIN1 );
       return;
     }
   
@@ -1615,15 +1657,15 @@ void docloak( int snum )
   if ( cdgetx( pmt, MSG_LIN1, 1, TERMS, cbuf, MSGMAXLINE,
 	       TRUE) == TERM_EXTRA )
     {
-      if ( ! usefuel( snum, CLOAK_ON_FUEL, FALSE, TRUE ) )
+      if ( ! clbUseFuel( snum, CLOAK_ON_FUEL, FALSE, TRUE ) )
 	{			/* an approximation of course... */
-	  c_putmsg( nofuel, MSG_LIN2 );
+	  cumPutMsg( nofuel, MSG_LIN2 );
 	  return;
 	}
 
       sendCommand(CPCMD_CLOAK, 0);
       SFSET(snum, SHIP_F_CLOAKED); /* do it locally */
-      c_putmsg( "Cloaking device engaged.", MSG_LIN2 );
+      cumPutMsg( "Cloaking device engaged.", MSG_LIN2 );
     }
   cdclrl( MSG_LIN1, 1 );
   
@@ -1650,7 +1692,7 @@ void dorefit( int snum, int dodisplay )
   /* Check for allowability. */
   if ( oneplace( Ships[snum].kills ) < MIN_REFIT_KILLS )
     {
-      c_putmsg( nek, MSG_LIN1 );
+      cumPutMsg( nek, MSG_LIN1 );
       return;
     }
 
@@ -1658,13 +1700,13 @@ void dorefit( int snum, int dodisplay )
 
   if (Planets[pnum].team != Ships[snum].team || Ships[snum].warp >= 0.0)
     {
-      c_putmsg( ntp, MSG_LIN1 );
+      cumPutMsg( ntp, MSG_LIN1 );
       return;
     }
 
   if (Ships[snum].armies != 0)
     {
-      c_putmsg( cararm, MSG_LIN1 );
+      cumPutMsg( cararm, MSG_LIN1 );
       return;
     }
 
@@ -1674,7 +1716,7 @@ void dorefit( int snum, int dodisplay )
   stype = oldstype = Ships[snum].shiptype;
   leave = FALSE;
 
-  while ( stillalive( snum ) && !leave)
+  while ( clbStillAlive( snum ) && !leave)
   {
     /* Display the current options. */
     
@@ -1685,8 +1727,8 @@ void dorefit( int snum, int dodisplay )
     appstr("Refit ship type: ", buf1);
     appstr(ShipTypes[stype].name, buf1);
     
-    c_putmsg(buf1, MSG_LIN1);
-    c_putmsg(conf, MSG_LIN2);
+    cumPutMsg(buf1, MSG_LIN1);
+    cumPutMsg(conf, MSG_LIN2);
       
     cdrefresh();
       
@@ -1746,14 +1788,14 @@ void dorefit( int snum, int dodisplay )
   /* Now wait it out... */
   cdclrl( MSG_LIN1, 1 );
   cdclrl( MSG_LIN2, 1 );
-  c_putmsg( "Refitting ship...", MSG_LIN1 );
+  cumPutMsg( "Refitting ship...", MSG_LIN1 );
   sendCommand(CPCMD_REFIT, (Unsgn16)stype);
   cdrefresh();
   grand( &entertime );
   while ( dgrand( entertime, &now ) < REFIT_GRAND )
     {
       /* See if we're still alive. */
-      if ( ! stillalive( snum ) )
+      if ( ! clbStillAlive( snum ) )
 	return;
       
       /* Sleep */
@@ -1784,7 +1826,7 @@ void docoup( int snum )
   /* Check for allowability. */
   if ( oneplace( Ships[snum].kills ) < MIN_COUP_KILLS )
     {
-      c_putmsg(
+      cumPutMsg(
 	       "Fleet orders require three kills before a coup can be attempted.",
 	       MSG_LIN1 );
       return;
@@ -1792,24 +1834,24 @@ void docoup( int snum )
   for ( i = 1; i <= NUMPLANETS; i = i + 1 )
     if ( Planets[i].team == Ships[snum].team && Planets[i].armies > 0 )
       {
-	c_putmsg( "We don't need to coup, we still have armies left!",
+	cumPutMsg( "We don't need to coup, we still have armies left!",
 		 MSG_LIN1 );
 	return;
       }
   if ( Ships[snum].warp >= 0.0 )
     {
-      c_putmsg( nhp, MSG_LIN1 );
+      cumPutMsg( nhp, MSG_LIN1 );
       return;
     }
   pnum = -Ships[snum].lock;
   if ( pnum != Teams[Ships[snum].team].homeplanet )
     {
-      c_putmsg( nhp, MSG_LIN1 );
+      cumPutMsg( nhp, MSG_LIN1 );
       return;
     }
   if ( Planets[pnum].armies > MAX_COUP_ENEMY_ARMIES )
     {
-      c_putmsg( "The enemy is still too strong to attempt a coup.",
+      cumPutMsg( "The enemy is still too strong to attempt a coup.",
 	       MSG_LIN1 );
       return;
     }
@@ -1818,7 +1860,7 @@ void docoup( int snum )
     {
       sprintf( cbuf, "This planet is uninhabitable for %d more minutes.",
 	     i );
-      c_putmsg( cbuf, MSG_LIN1 );
+      cumPutMsg( cbuf, MSG_LIN1 );
       return;
     }
   
@@ -1832,11 +1874,11 @@ void docoup( int snum )
   if ( cdgetx( conf, MSG_LIN1, 1, TERMS, cbuf, MSGMAXLINE,
 	       TRUE) != TERM_EXTRA )
     {
-      c_putmsg( "...aborted...", MSG_LIN1 );
+      cumPutMsg( "...aborted...", MSG_LIN1 );
       return;
     }
 
-  c_putmsg( "Attempting coup...", MSG_LIN1 );
+  cumPutMsg( "Attempting coup...", MSG_LIN1 );
   sendCommand(CPCMD_COUP, 0);
   
   return;
@@ -1892,10 +1934,10 @@ void docourse( int snum )
     what = NEAR_DIRECTION;
   else if ( special( cbuf, &i, &token, &count ) )
     {
-      if ( findspecial( snum, token, count, &sorpnum, &xsorpnum ) )
+      if ( clbFindSpecial( snum, token, count, &sorpnum, &xsorpnum ) )
 	what = i;
     }
-  else if ( planmatch( cbuf, &sorpnum, FALSE ) )
+  else if ( clbPlanetMatch( cbuf, &sorpnum, FALSE ) )
     what = NEAR_PLANET;
   
   switch ( what )
@@ -1903,7 +1945,7 @@ void docourse( int snum )
     case NEAR_SHIP:
       if ( sorpnum < 1 || sorpnum > MAXSHIPS )
 	{
-	  c_putmsg( "No such ship.", MSG_LIN2 );
+	  cumPutMsg( "No such ship.", MSG_LIN2 );
 	  return;
 	}
       if ( sorpnum == snum )
@@ -1913,7 +1955,7 @@ void docourse( int snum )
 	}
       if ( Ships[sorpnum].status != SS_LIVE )
 	{
-	  c_putmsg( "Not found.", MSG_LIN2 );
+	  cumPutMsg( "Not found.", MSG_LIN2 );
 	  return;
 	}
 
@@ -1921,7 +1963,7 @@ void docourse( int snum )
 	{
 	  if ( Ships[sorpnum].warp <= 0.0 )
 	    {
-	      c_putmsg( "Sensors are unable to lock on.", MSG_LIN2 );
+	      cumPutMsg( "Sensors are unable to lock on.", MSG_LIN2 );
 	      return;
 	    }
 	}
@@ -1933,7 +1975,7 @@ void docourse( int snum )
       
       /* Give info if he used TAB. */
       if ( ch == TERM_EXTRA )
-	infoship( sorpnum, snum );
+	cumInfoShip( sorpnum, snum );
       else
 	cdclrl( MSG_LIN1, 1 );
       break;
@@ -1942,21 +1984,21 @@ void docourse( int snum )
       if ( ch == TERM_EXTRA )
 	{
 	  newlock = -sorpnum;
-	  infoplanet( "Now locked on to ", sorpnum, snum );
+	  cumInfoPlanet( "Now locked on to ", sorpnum, snum );
 	}
       else
-	infoplanet( "Setting course for ", sorpnum, snum );
+	cumInfoPlanet( "Setting course for ", sorpnum, snum );
       break;
     case NEAR_DIRECTION:
       cdclrl( MSG_LIN1, 1 );
       break;
     case NEAR_NONE:
-      c_putmsg( "Not found.", MSG_LIN2 );
+      cumPutMsg( "Not found.", MSG_LIN2 );
       return;
       break;
     default:
       /* This includes NEAR_ERROR. */
-      c_putmsg( "I don't understand.", MSG_LIN2 );
+      cumPutMsg( "I don't understand.", MSG_LIN2 );
       return;
       break;
     }
@@ -1977,15 +2019,15 @@ void dodet( int snum )
   cdclrl( MSG_LIN2, 1 );
   
   if ( Ships[snum].wfuse > 0 )
-    c_putmsg( "Weapons are currently overloaded.", MSG_LIN1 );
-  else if ( usefuel( snum, DETONATE_FUEL, TRUE, FALSE ) )
+    cumPutMsg( "Weapons are currently overloaded.", MSG_LIN1 );
+  else if ( clbUseFuel( snum, DETONATE_FUEL, TRUE, FALSE ) )
     {				/* we don't really use fuel here on the
 				   client*/
-      c_putmsg( "detonating...", MSG_LIN1 );
+      cumPutMsg( "detonating...", MSG_LIN1 );
       sendCommand(CPCMD_DETENEMY, 0);
     }
   else
-    c_putmsg( "Not enough fuel to fire detonators.", MSG_LIN1 );
+    cumPutMsg( "Not enough fuel to fire detonators.", MSG_LIN1 );
   
   return;
   
@@ -2022,7 +2064,7 @@ void dohelp( void )
 {
   int lin, col, tlin;
   int ch;
-  int FirstTime = TRUE;
+  static int FirstTime = TRUE;
   static char sfmt[MSGMAXLINE * 2];
 
   if (FirstTime == TRUE)
@@ -2132,9 +2174,9 @@ void dohelp( void )
   tlin++;
   cprintf(tlin,col,ALIGN_NONE,sfmt, "[TAB]", "get next last info");
   
-  putpmt( MTXT_DONE, MSG_LIN2 );
+  cumPutPrompt( MTXT_DONE, MSG_LIN2 );
   cdrefresh();
-  while ( ! iogtimed( &ch, 1.0 ) && stillalive( Context.snum ) )
+  while ( ! iogtimed( &ch, 1.0 ) && clbStillAlive( Context.snum ) )
     ;
   
   return;
@@ -2181,7 +2223,7 @@ void doinfo( int snum )
   
   if ( special( cbuf, &what, &token, &count ) )
     {
-      if ( ! findspecial( snum, token, count, &sorpnum, &xsorpnum ) )
+      if ( ! clbFindSpecial( snum, token, count, &sorpnum, &xsorpnum ) )
 	what = NEAR_NONE;
       else if ( extra )
 	{
@@ -2192,38 +2234,38 @@ void doinfo( int snum )
 	}
       
       if ( what == NEAR_SHIP )
-	infoship( sorpnum, snum );
+	cumInfoShip( sorpnum, snum );
       else if ( what == NEAR_PLANET )
-	infoplanet( "", sorpnum, snum );
+	cumInfoPlanet( "", sorpnum, snum );
       else
-	c_putmsg( "Not found.", MSG_LIN2 );
+	cumPutMsg( "Not found.", MSG_LIN2 );
     }
   else if ( cbuf[0] == 's' && alldig( &cbuf[1] ) == TRUE )
     {
       i = 1;
       safectoi( &j, cbuf, i );		/* ignore status */
-      infoship( j, snum );
+      cumInfoShip( j, snum );
     }
   else if ( alldig( cbuf ) == TRUE )
     {
       i = 0;
       safectoi( &j, cbuf, i );		/* ignore status */
-      infoship( j, snum );
+      cumInfoShip( j, snum );
     }
-  else if ( planmatch( cbuf, &j, FALSE ) )
-    infoplanet( "", j, snum );
+  else if ( clbPlanetMatch( cbuf, &j, FALSE ) )
+    cumInfoPlanet( "", j, snum );
   else if ( stmatch( cbuf, "time", FALSE ) )
     {
       getnow( now, 0 );
       c_strcpy( "It's ", cbuf );
       appnumtim( now, cbuf );
       appchr( '.', cbuf );
-      c_putmsg( cbuf, MSG_LIN1 );
+      cumPutMsg( cbuf, MSG_LIN1 );
       cdmove( MSG_LIN1, 1 );
     }
   else
     {
-      c_putmsg( "I don't understand.", MSG_LIN2 );
+      cumPutMsg( "I don't understand.", MSG_LIN2 );
       cdmove( MSG_LIN1, 1 );
     }
   
@@ -2242,28 +2284,23 @@ void dolastphase( int snum )
   
   if ( SCLOAKED(snum) )
     {
-      c_putmsg( "The cloaking device is using all available power.",
+      cumPutMsg( "The cloaking device is using all available power.",
 	       MSG_LIN2 );
       return;
     }
   if ( Ships[snum].wfuse > 0 )
     {
-      c_putmsg( "Weapons are currently overloaded.", MSG_LIN1 );
+      cumPutMsg( "Weapons are currently overloaded.", MSG_LIN1 );
       return;
     }
   if ( Ships[snum].fuel < PHASER_FUEL )
     {
-      c_putmsg( "Not enough fuel to fire phasers.", MSG_LIN2 );
+      cumPutMsg( "Not enough fuel to fire phasers.", MSG_LIN2 );
       return;
     }
   
-  if ( phaser( snum, Ships[snum].lastphase ) )
-    {				/* a local approximation of course */
-      sendCommand(CPCMD_FIREPHASER, (Unsgn16)(Ships[snum].lastphase * 100.0));
-      cdclrl( MSG_LIN2, 1 );
-    }
-  else
-    c_putmsg( ">PHASERS DRAINED<", MSG_LIN2 );
+  sendCommand(CPCMD_FIREPHASER, (Unsgn16)(Ships[snum].lastphase * 100.0));
+  cdclrl( MSG_LIN2, 1 );
   
   return;
   
@@ -2276,11 +2313,17 @@ void dolastphase( int snum )
 /*    domydet( snum ) */
 void domydet( int snum )
 {
+  int i;
   cdclrl( MSG_LIN2, 1 );
   
   sendCommand(CPCMD_DETSELF, 0);
 
-  c_putmsg( "Detonating...", MSG_LIN1 );
+  cumPutMsg( "Detonating...", MSG_LIN1 );
+
+  /* clear out any reserved torps we might have set in clbCheckLaunch() */
+  for (i=0; i < MAXTORPS; i++)
+    if (Ships[snum].torps[i].status == TS_RESERVED)
+      Ships[snum].torps[i].status = TS_OFF;
   
   return;
   
@@ -2295,27 +2338,27 @@ void doorbit( int snum )
   int pnum;
   
   if ( ( Ships[snum].warp == ORBIT_CW ) || ( Ships[snum].warp == ORBIT_CCW ) )
-    infoplanet( "But we are already orbiting ", -Ships[snum].lock, snum );
-  else if ( ! findorbit( snum, &pnum ) )
+    cumInfoPlanet( "But we are already orbiting ", -Ships[snum].lock, snum );
+  else if ( ! clbFindOrbit( snum, &pnum ) )
     {
       sprintf( cbuf, "We are not close enough to orbit, %s.",
 	     Ships[snum].alias );
-      c_putmsg( cbuf, MSG_LIN1 );
+      cumPutMsg( cbuf, MSG_LIN1 );
       cdclrl( MSG_LIN2, 1 );
     }
   else if ( Ships[snum].warp > MAX_ORBIT_WARP )
     {
-      sprintf( cbuf, "We are going to fast to orbit, %s.",
+      sprintf( cbuf, "We are going too fast to orbit, %s.",
 	     Ships[snum].alias );
-      c_putmsg( cbuf, MSG_LIN1 );
+      cumPutMsg( cbuf, MSG_LIN1 );
       sprintf( cbuf, "Maximum orbital insertion velocity is warp %.1f.",
 	     oneplace(MAX_ORBIT_WARP) );
-      c_putmsg( cbuf, MSG_LIN2 );
+      cumPutMsg( cbuf, MSG_LIN2 );
     }
   else
     {
       sendCommand(CPCMD_ORBIT, 0);
-      infoplanet( "Coming into orbit around ", pnum, snum );
+      cumInfoPlanet( "Coming into orbit around ", pnum, snum );
     }
   
   return;
@@ -2334,35 +2377,35 @@ void dophase( int snum )
   cdclrl( MSG_LIN2, 1 );
   if ( SCLOAKED(snum) )
     {
-      c_putmsg( "The cloaking device is using all available power.",
+      cumPutMsg( "The cloaking device is using all available power.",
 	       MSG_LIN1 );
       return;
     }
   if ( Ships[snum].wfuse > 0 )
     {
-      c_putmsg( "Weapons are currently overloaded.", MSG_LIN1 );
+      cumPutMsg( "Weapons are currently overloaded.", MSG_LIN1 );
       return;
     }
   if ( Ships[snum].fuel < PHASER_FUEL )
     {
-      c_putmsg( "Not enough fuel to fire phasers.", MSG_LIN1 );
+      cumPutMsg( "Not enough fuel to fire phasers.", MSG_LIN1 );
       return;
     }
   
-  if ( gettarget( "Fire phasers: ", MSG_LIN1, 1, &dir, Ships[snum].lastblast ) )
+  if ( cumGetTarget( "Fire phasers: ", MSG_LIN1, 1, &dir, Ships[snum].lastblast ) )
     {
-      if ( Ships[snum].pfuse <= 0 && usefuel( snum, PHASER_FUEL, 
+      if ( Ships[snum].pfuse <= 0 && clbUseFuel( snum, PHASER_FUEL, 
 					      TRUE, FALSE ) )
 	{			/* a local approximation of course */
-	  c_putmsg( "Firing phasers...", MSG_LIN2 );
+	  cumPutMsg( "Firing phasers...", MSG_LIN2 );
 	  sendCommand(CPCMD_FIREPHASER, (Unsgn16)(dir * 100.0));
 	}
       else
-	c_putmsg( ">PHASERS DRAINED<", MSG_LIN2 );
+	cumPutMsg( ">PHASERS DRAINED<", MSG_LIN2 );
     }
   else
     {
-      c_putmsg( "Invalid targeting information.", MSG_LIN1 );
+      cumPutMsg( "Invalid targeting information.", MSG_LIN1 );
     }
 
   return;
@@ -2373,14 +2416,14 @@ void dophase( int snum )
 /*  doplanlist - display the planet list for a ship */
 /*  SYNOPSIS */
 /*    int snum */
-/*    doplanlist( snum ) */
-void doplanlist( int snum )
+/*    doPlanetList( snum ) */
+void doPlanetList( int snum )
 {
 
   if (snum > 0 && snum <= MAXSHIPS)
-    planlist( Ships[snum].team, snum );
+    cumPlanetList( Ships[snum].team, snum );
   else		/* then use user team if user doen't have a ship yet */
-    planlist( Users[Context.unum].team, snum );
+    cumPlanetList( Users[Context.unum].team, snum );
   
   return;
   
@@ -2390,8 +2433,8 @@ void doplanlist( int snum )
 /*  doreview - review messages for a ship */
 /*  SYNOPSIS */
 /*    int snum */
-/*    doreview( snum ) */
-void doreview( int snum )
+/*    doReviewMsgs( snum ) */
+void doReviewMsgs( int snum )
 {
   int ch;
   int lstmsg;			/* saved last msg in case new ones come in */
@@ -2407,12 +2450,12 @@ void doreview( int snum )
 
   lstmsg = Ships[snum].lastmsg;	/* don't want lstmsg changing while reading old ones. */
 
-  if ( ! review( snum, lstmsg ) )
+  if ( ! cumReviewMsgs( snum, lstmsg ) )
     {
-      c_putmsg( "There are no old messages.", MSG_LIN1 );
-      putpmt( MTXT_MORE, MSG_LIN2 );
+      cumPutMsg( "There are no old messages.", MSG_LIN1 );
+      cumPutPrompt( MTXT_MORE, MSG_LIN2 );
       cdrefresh();
-      while ( ! iogtimed( &ch, 1.0 ) && stillalive( Context.snum ) )
+      while ( ! iogtimed( &ch, 1.0 ) && clbStillAlive( Context.snum ) )
 	;
       cdclrl( MSG_LIN1, 2 );
     }
@@ -2438,7 +2481,7 @@ void doselfdest(int snum)
 
   if ( SCLOAKED(snum) )
     {
-      c_putmsg( "The cloaking device is using all available power.",
+      cumPutMsg( "The cloaking device is using all available power.",
                MSG_LIN1 );
       return;
     }
@@ -2459,7 +2502,7 @@ void doselfdest(int snum)
 
   while ( TRUE )
     {
-      if ( ! stillalive( Context.snum ) )
+      if ( ! clbStillAlive( Context.snum ) )
 	return;			/* Died in the process. */
       
       if ( iochav() )
@@ -2469,12 +2512,12 @@ void doselfdest(int snum)
 	  if ( iogchar() == TERM_ABORT )
 	    {
 	      sendCommand(CPCMD_DESTRUCT, 0);
-	      c_putmsg( "Self destruct has been canceled.", MSG_LIN1 );
+	      cumPutMsg( "Self destruct has been canceled.", MSG_LIN1 );
 	      return;
 	    }
 	  else
 	    {
-	      c_putmsg( "Press ESCAPE to abort self destruct.", MSG_LIN1 );
+	      cumPutMsg( "Press ESCAPE to abort self destruct.", MSG_LIN1 );
 	      cdbeep();
 	      cdrefresh();
 	    }
@@ -2509,10 +2552,10 @@ void doshields( int snum, int up )
   if ( up )
     {
       SFCLR(snum, SHIP_F_REPAIR);
-      c_putmsg( "Shields raised.", MSG_LIN1 );
+      cumPutMsg( "Shields raised.", MSG_LIN1 );
     }
   else
-    c_putmsg( "Shields lowered.", MSG_LIN1 );
+    cumPutMsg( "Shields lowered.", MSG_LIN1 );
 
   cdclrl( MSG_LIN2, 1 );
   
@@ -2524,16 +2567,16 @@ void doshields( int snum, int up )
 /*  doteamlist - display the team list for a ship */
 /*  SYNOPSIS */
 /*    int team */
-/*    doteamlist( team ) */
-void doteamlist( int team )
+/*    doTeamList( team ) */
+void doTeamList( int team )
 {
   int ch;
   
   cdclear();
-  while ( stillalive( Context.snum ) )
+  while ( clbStillAlive( Context.snum ) )
     {
-      teamlist( team );
-      putpmt( MTXT_DONE, MSG_LIN2 );
+      cumTeamList( team );
+      cumPutPrompt( MTXT_DONE, MSG_LIN2 );
       cdrefresh();
       if ( iogtimed( &ch, 1.0 ) )
 	break;
@@ -2555,24 +2598,24 @@ void dotorp( int snum )
   
   if ( SCLOAKED(snum) )
     {
-      c_putmsg( "The cloaking device is using all available power.",
+      cumPutMsg( "The cloaking device is using all available power.",
 	       MSG_LIN1 );
       return;
     }
   if ( Ships[snum].wfuse > 0 )
     {
-      c_putmsg( "Weapons are currently overloaded.", MSG_LIN1 );
+      cumPutMsg( "Weapons are currently overloaded.", MSG_LIN1 );
       return;
     }
   if ( Ships[snum].fuel < TORPEDO_FUEL )
     {
-      c_putmsg( "Not enough fuel to launch a torpedo.", MSG_LIN1 );
+      cumPutMsg( "Not enough fuel to launch a torpedo.", MSG_LIN1 );
       return;
     }
-  if ( gettarget( "Launch torpedo: ", MSG_LIN1, 1, &dir, Ships[snum].lastblast ) )
+  if ( cumGetTarget( "Launch torpedo: ", MSG_LIN1, 1, &dir, Ships[snum].lastblast ) )
     {
-      if ( ! checklaunch( snum, 1 ) )
-	c_putmsg( ">TUBES EMPTY<", MSG_LIN2 );
+      if ( ! clbCheckLaunch( snum, 1 ) )
+	cumPutMsg( ">TUBES EMPTY<", MSG_LIN2 );
       else
 	{			/* a local approx */
 	  sendFireTorps(1, dir);
@@ -2581,7 +2624,7 @@ void dotorp( int snum )
     }
   else
     {
-      c_putmsg( "Invalid targeting information.", MSG_LIN1 );
+      cumPutMsg( "Invalid targeting information.", MSG_LIN1 );
     }
   
   return;
@@ -2603,7 +2646,7 @@ void dotow( int snum )
       c_strcpy( "But we are being towed by ", cbuf );
       appship( Ships[snum].towing, cbuf );
       appchr( '!', cbuf );
-      c_putmsg( cbuf, MSG_LIN2 );
+      cumPutMsg( cbuf, MSG_LIN2 );
       return;
     }
   if ( Ships[snum].towing != 0 )
@@ -2611,7 +2654,7 @@ void dotow( int snum )
       c_strcpy( "But we're already towing ", cbuf );
       appship( Ships[snum].towing, cbuf );
       appchr( '.', cbuf );
-      c_putmsg( cbuf, MSG_LIN2 );
+      cumPutMsg( cbuf, MSG_LIN2 );
       return;
     }
   cbuf[0] = EOS;
@@ -2647,7 +2690,7 @@ void dowarp( int snum, real warp )
     return;
   
   sprintf( cbuf, "Warp %d.", (int) warp );
-  c_putmsg( cbuf, MSG_LIN1 );
+  cumPutMsg( cbuf, MSG_LIN1 );
   
   return;
   
@@ -2719,7 +2762,7 @@ void menu(void)
   initstats( &Ships[Context.snum].ctime, &Ships[Context.snum].etime );
   
   /* Log this entry into the Game. */
-  Context.histslot = loghist( Context.unum );
+  Context.histslot = clbLogHist( Context.unum );
   
   /* Set up some things for the menu display. */
   switchteams = Users[Context.unum].ooptions[OOPT_SWITCHTEAMS];
@@ -2832,13 +2875,13 @@ void menu(void)
       else
 	cdclrl( MSG_LIN1, 2 );
       
-      userline( -1, -1, cbuf, FALSE, TRUE );
-      attrset(LabelColor);
+      clbUserline( -1, -1, cbuf, FALSE, TRUE );
+      uiPutColor(LabelColor);
       cdputs( cbuf, MSG_LIN1, 1 );
-      userline( Context.unum, 0, cbuf, FALSE, TRUE );
-      attrset(A_BOLD);
+      clbUserline( Context.unum, 0, cbuf, FALSE, TRUE );
+      uiPutColor(CQC_A_BOLD);
       cdputs( cbuf, MSG_LIN2, 1 );
-      attrset(0);
+      uiPutColor(0);
       
       cdmove( 1, 1 );
       cdrefresh();
@@ -2886,28 +2929,28 @@ void menu(void)
                   Context.display = FALSE;
                   break;
                 case 'h':
-                  helplesson();
+                  cumHelpLesson();
                   redraw = TRUE;
                   break;
                 case 'H':
-                  histlist( FALSE );
+                  cumHistList( FALSE );
                   redraw = TRUE;
                   break;
                 case 'L':
-                  doreview( Context.snum );
+                  doReviewMsgs( Context.snum );
                   break;
                 case 'n':
                   if ( ! Context.hasnewsfile )
                     cdbeep();
                   else
                     {
-                      news();
+                      cumNews();
                       redraw = TRUE;
                     }
                   break;
                 case 'N':
                   /*	  pseudo( Context.unum, Context.snum );*/
-                  clntPseudo( Context.unum, Context.snum );
+                  cucPseudo( Context.unum, Context.snum );
                   break;
                 case 'O':
                   UserOptsMenu(Context.unum);
@@ -2929,7 +2972,7 @@ void menu(void)
                         {
                           cdclrl( MSG_LIN1, 2 );
                           cdrefresh();
-                          if ( confirm() )
+                          if ( cumConfirm() )
                             {
                               /* should exit here */
                               sendCommand(CPCMD_RESIGN, 0);
@@ -2960,20 +3003,20 @@ void menu(void)
                     }
                   break;
                 case 'S':
-                  userstats( FALSE, 0 ); /* we're never really neutral ;-) - dwp */
+                  cumUserStats( FALSE, 0 ); /* we're never really neutral ;-) - dwp */
                   redraw = TRUE;
                   break;
                 case 'T':
-                  doteamlist( Ships[Context.snum].team );
+                  doTeamList( Ships[Context.snum].team );
                   redraw = TRUE;
                   break;
                 case 'U':
-                  userlist( FALSE, 0 );
+                  cumUserList( FALSE, 0 );
                   redraw = TRUE;
                   break;
                 case 'W':
                   /*	  dowar( Context.snum );*/
-                  clntDoWar( Context.snum );
+                  cucDoWar( Context.snum );
                   redraw = TRUE;
                   break;
                 case 'q':
@@ -2981,11 +3024,11 @@ void menu(void)
                   Context.leave = TRUE;	
                   break;
                 case '/':
-                  playlist( FALSE, FALSE, 0 );
+                  cumPlayList( FALSE, FALSE, 0 );
                   redraw = TRUE;
                   break;
                 case '?':
-                  doplanlist( 0 );
+                  doPlanetList( 0 );
                   redraw = TRUE;
                   break;
                 case TERM_REDRAW:	/* ^L */
@@ -3015,7 +3058,7 @@ void menu(void)
       if ( sleepy > 300 )
         break;
     }
-  while ( stillalive( Context.snum ) &&  !Context.leave );
+  while ( clbStillAlive( Context.snum ) &&  !Context.leave );
 
   return;
   
@@ -3069,7 +3112,7 @@ int newship( int unum, int *snum )
 	      sprintf(cbuf, "You're already playing on another ship.");
 	      cprintf(5,0,ALIGN_CENTER,"#%d#%s",InfoColor, cbuf);
 	      Ships[*snum].status = SS_RESERVED;
-	      putpmt( "--- press any key ---", MSG_LIN2 );
+	      cumPutPrompt( "--- press any key ---", MSG_LIN2 );
 	      cdrefresh();	      
 
 	      iogchar();
@@ -3229,6 +3272,10 @@ void processPacket(Unsgn8 *buf)
       procHistory(buf);
       break;
 
+    case SP_DOOMSDAY:
+      procDoomsday(buf);
+      break;
+
     default:
       clog("conquest:processPacket: got unexpected packet type %d",
 	   pkttype);
@@ -3319,7 +3366,7 @@ int play()
                 {
                   if (RMsg_Line == MSG_LIN1)
                     Context.msgok = FALSE;      /* off if we  have no msg line */
-                  if (DoMacro(ch) == TRUE)
+                  if (DoMacro(((ch - KEY_F(0)) - 1)) == TRUE)
                     {
                       while (iBufCount())
                         {
@@ -3451,11 +3498,11 @@ int welcome( int *unum )
 
       if ( vowel( Teams[team].name[0] ) )
       	cprintf(MSG_LIN2/2,0,ALIGN_CENTER,"#%d#%s%c #%d#%s #%d#%s",
-		InfoColor,selected_str,'n',A_BOLD,Teams[team].name,
+		InfoColor,selected_str,'n',CQC_A_BOLD,Teams[team].name,
 		InfoColor,starship_str);
       else
 	cprintf(MSG_LIN2/2,0,ALIGN_CENTER,"#%d#%s #%d#%s #%d#%s",
-		InfoColor,selected_str,A_BOLD,Teams[team].name,
+		InfoColor,selected_str,CQC_A_BOLD,Teams[team].name,
 		InfoColor,starship_str);
       cprintf(MSG_LIN2/2+1,0,ALIGN_CENTER,"#%d#%s",
 	      InfoColor, prepare_str );
@@ -3533,7 +3580,7 @@ int welcome( int *unum )
 }
 
 
-int hello(void)
+static int hello(void)
 {
   cpHello_t chello;
   spAckMsg_t *sackmsg;
@@ -3759,7 +3806,7 @@ void astservice(int sig)
       if ( difftime >= NEWMSG_GRAND )
 	if ( getamsg( Context.snum, &Ships[Context.snum].lastmsg ) )
 	  {
-	    if (readmsg( Context.snum, Ships[Context.snum].lastmsg, 
+	    if (cumReadMsg( Context.snum, Ships[Context.snum].lastmsg, 
 			 RMsg_Line ) == TRUE)
 	      {
 		if (Msgs[Ships[Context.snum].lastmsg].msgfrom != 
@@ -3984,7 +4031,7 @@ int selectServer(metaSRec_t *metaServerList, int nums)
 
       cdclrl( 1, MSG_LIN2);	/* clear screen area */
       lin = 1;
-      col = ((int)(cdcols() - strlen(headerbuf)) / 2);
+      col = ((int)(Context.maxcol - strlen(headerbuf)) / 2);
 
       cprintf(lin, col, ALIGN_NONE, "#%d#%s", NoColor, headerbuf);
       

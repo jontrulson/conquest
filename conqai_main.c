@@ -33,6 +33,7 @@
 #include "conf.h"
 
 static int debug; 
+static void exitai(void);
 
 /*  conqai - robot AI test program */
 
@@ -42,15 +43,15 @@ int main(int argc, char *argv[])
   
   /* First things first. */
   
-  if ((ConquestUID = GetUID(ROOT_USER)) == ERR)
+  if ((ConquestUID = getUID(ROOT_USER)) == ERR)
     {
-      fprintf(stderr, "conqai: GetUID() failed\n");
+      fprintf(stderr, "conqai: getUID() failed\n");
       exit(1);
     }
   
-  if ((ConquestGID = GetConquestGID()) == ERR)
+  if ((ConquestGID = getConquestGID()) == ERR)
     {
-      fprintf(stderr, "conqai: GetConquestGID() failed\n");
+      fprintf(stderr, "conqai: getConquestGID() failed\n");
       exit(1);
     }
   
@@ -108,3 +109,16 @@ int main(int argc, char *argv[])
   exit(0);
   
 }
+
+/*  exitai - exit handler */
+/*  SYNOPSIS */
+/*    extern exitai */
+static void exitai(void)
+{
+  
+  ConqInfo->externrobots = FALSE;
+  
+  return;
+  
+}
+

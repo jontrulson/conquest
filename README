@@ -545,8 +545,9 @@
 
   All other planets are self-ruled when a game is initialized, and
   will not create robot defenders when bombed (even if owned by
-  another, non self-ruled team).  These are the ones newcomers should
-  probably bomb first until they are ready to handle robot defenders.
+  another, non self-ruled team).  Newcomers should probably avoid
+  bombing home system planets until they are ready to handle robot
+  defenders.
 
   All planets, with the exception of Altair, Hell, and Jinx, must be
   taken in order to conquer the universe.
@@ -577,11 +578,11 @@
   will exhaust your fuel or overload fairly quickly.  How fast this
   happens depends on your ship type, and how fast you are moving.  If
   you put your shields up, you will overload even faster.  Overloading
-  your engines is really bad in battle as you are basically a sitting
-  duck afterwards.
+  your engines is really bad in battle as you are a sitting duck
+  afterwards.
 
-  If you are moving when you are cloaked, you are detectable (only to
-  an approximate location however).
+  If you are moving when you are cloaked, you are detectable - but only to
+  an approximate location.
 
   If you are at warp 0, and you cloak, you cannot be detected at all.
   This is a good trick to use when you want to ambush an enemy who is

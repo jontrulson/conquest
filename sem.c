@@ -129,7 +129,6 @@ void Lock(int what)
 		 getsemtxt(what),
 		 strerror(err));
 	    
-	    cdend();
 	    exit(1);
 	  }
 	else

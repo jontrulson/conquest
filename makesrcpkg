@@ -22,11 +22,12 @@ rm -f ${ARCFILE}.gz
 rm -rf $CONQVER
 echo Arcive name: $ARCFILE
 
-FILELIST="ratfor.c cd2lb.c iolb.c conqlb.c
-	rndlb.c conqmisc.c conqutil.c conqcm.c conqsvr42.c global.c 
+FILELIST="ratfor.c cd2lb.h cd2lb.c iolb.h iolb.c conqlb.c
+	rndlb.c cumisc.h cumisc.c conqutil.c conqcm.c conqsvr42.c global.c 
 	ibuf.c ibuf.h version.c conf.c sem.c conquest.c conqoper.c conqdriv.c
 	conqai.c c_defs.h color.h conqcom.h conqdata.h defs.h 
-	conf.h context.h conqdef.h global.h color.c userauth.c options.c
+	conf.h context.h conqdef.h global.h color.c userauth.c options.h
+        options.c
 	ship.h user.h planet.h team.h torp.h msg.h doomsday.h
 	driver.h conqinfo.h robot.h history.h shiptype.h
 	conquest.doc conqnews.doc configure.ac configure
@@ -35,16 +36,28 @@ FILELIST="ratfor.c cd2lb.c iolb.c conqlb.c
         conqrule Makefile.am aclocal.m4 depcomp install-sh ltmain.sh
         mkinstalldirs missing conqai_main.c
         record.h record.c conqreplay.c 
-	COPYRIGHT LICENSE INSTALL SERVER.TXT CREDITS
-        conquest.h display.c display.h client.h client.c clientlb.h 
+	COPYRIGHT LICENSE INSTALL SERVER.TXT CREDITS display.h
+        conquest.h display.c disputil.h client.h client.c clientlb.h 
         clientlb.c server.h server.c packet.h packet.c protocol.h
         conqnet.h datatypes.h userauth.h servauth.h clntauth.h 
         clntauth.c servauth.c conquestd.c serverpkt.c serverpkt.h 
         servercmd.h servercmd.c conquestsh.c
         conqmetad.c meta.c meta.h acinclude.m4 snprintf.h snprintf.c 
-        README.cygwin"
+        README.cygwin texfont.c TexFont.h 
+        cprintf.h cprintf.c nConsvr.c nConsvr.h glfont.h glfont.c
+        glmisc.h glmisc.c nMeta.c nMeta.h cqkeys.h 
+        prm.c prm.h nAuth.h nAuth.c GL.c
+        nCP.c nCP.h nConsvr.c nConsvr.h nMenu.c nMenu.h nPlay.c nPlay.h
+        nWelcome.c nWelcome.h nDead.h nDead.c nCPHelp.h nCPHelp.c 
+        nShipl.h nShipl.c node.c node.h nPlanetl.h nPlanetl.c 
+        nTeaml.h nTeaml.c nUserl.h nUserl.c nHistl.h nHistl.c
+        gldisplay.h gldisplay.c glcprintf.c conquestgl.c 
+        render.h render.c nPlayBMenu.h nPlayBMenu.c playback.h
+        playback.c nPlayB.h nPlayB.c nPlayBHelp.h nPlayBHelp.c
+        nOptions.h nOptions.c colorGL.c colorCU.c cuclient.c ui.h uimisc.c
+        cuclient.h conqlb.h"  
 
-#IMAGES="img/*.bmp"
+IMAGES="img/*.bmp img/*.txf"
 
 if [ -e CHANGES ]
 then
@@ -53,13 +66,13 @@ then
 fi
 
 mkdir $CONQVER 2>/dev/null
-#mkdir $CONQVER/img
+mkdir $CONQVER/img
 
 cp -p $FILELIST $CONQVER/
 cp -p conquest.txt $CONQVER/$CONQVER.txt
 cp -p conquest.lsm $CONQVER/$CONQVER.lsm
 
-#cp -p $IMAGES $CONQVER/img/
+cp -p $IMAGES $CONQVER/img/
 
 # now the terminfo files
 mkdir $CONQVER/ti
@@ -67,12 +80,12 @@ chmod 755 $CONQVER/ti
 cp -p ti/*.ti $CONQVER/ti/
 
 chmod 644 $CONQVER/ti/*
-#chmod 644 $CONQVER/img/*
+chmod 644 $CONQVER/img/*
 
 chmod 644 $CONQVER/*
 
 chmod 755 $CONQVER/ti
-#chmod 755 $CONQVER/img
+chmod 755 $CONQVER/img
 chmod 755 $CONQVER/configure $CONQVER/config.guess $CONQVER/config.sub
 
 

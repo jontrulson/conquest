@@ -20,6 +20,7 @@
 #include "global.h"
 #include "conqcom.h"
 #include "color.h"
+#include "ui.h"
 #include "datatypes.h"
 #include "conqnet.h"
 
@@ -288,6 +289,7 @@ int GetConf(int usernum)
   UserConf.DoLRTorpScan = TRUE;
   UserConf.DoLocalLRScan = TRUE;
   UserConf.DoETAStats = TRUE;
+  UserConf.EnemyShipBox = TRUE;
 
   for (i=0; i<MAX_MACROS; i++)
     {
@@ -498,18 +500,11 @@ int GetConf(int usernum)
 }
 
 /* SaveUserConfig(int unum) - do what the name implies ;-) */
-int SaveUserConfig(int unum)
+int SaveUserConfig(void)
 {
   char conf_name[MID_BUFFER_SIZE];
   char *homevar;
   char home[HOME_BUFSZ];
-
-  /* telnet shell clients can't save their configs :( */
-  if (telnetClient)
-    {
-      InitColors();
-      return TRUE;
-    }
 
 				/* start building the filename */
   if ((homevar = getenv("HOME")) == NULL)
@@ -528,9 +523,6 @@ int SaveUserConfig(int unum)
 #ifdef DEBUG_OPTIONS
   clog("SaveUserConfig(): saving user config: conf_name = '%s'", conf_name);
 #endif
-
-				/* re-init in case it was changed */
-  InitColors();
 
   return(MakeConf(conf_name));
 }

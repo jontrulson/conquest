@@ -19,17 +19,20 @@
 #include "conqcom.h"
 #include "context.h"
 #include "conf.h"
+#include "conqlb.h"
+#include "cd2lb.h"
+#include "cumisc.h"
 #include "global.h"
 #include "color.h"
+#include "ui.h"
+
+#include "display.h"
 
 #include "record.h"
 
 #define GREEN_ALERT 0
 #define YELLOW_ALERT 1
 #define RED_ALERT 2
-
-#define DS_LIVE_STR "DS_LIVE"
-#define DS_OFF_STR  "DS_OFF"
 
 /* Global to this module */
 
@@ -44,10 +47,10 @@ void do_bottomborder(int snum, char *buf, int attrib, int bufattr)
   lin = DISPLAY_LINS + 1;
 
   /* draw the line */
-  attrset(attrib);
+  uiPutColor(attrib);
   cdline( lin, 1, lin, Context.maxcol );
   mvaddch(lin - 1, STAT_COLS - 1, ACS_BTEE);
-  attrset(0);
+  uiPutColor(0);
 
   /* now the buffer, if there */
   if ( buf && buf[0] != EOS )
@@ -60,17 +63,17 @@ void do_bottomborder(int snum, char *buf, int attrib, int bufattr)
 
       if (Context.hascolor)
 	{
-	  attrset(bufattr);
+	  uiPutColor(bufattr);
 	}
       else
 	{
-	  if (bufattr == COLOR_PAIR(COL_REDBLACK))
-	    attrset(A_BOLD | A_BLINK);
-	  else if (bufattr == COLOR_PAIR(COL_YELLOWBLACK))
-	    attrset(A_BOLD);
+	  if (bufattr == RedColor)
+	    uiPutColor(CQC_A_BOLD | A_BLINK);
+	  else if (bufattr == YellowColor)
+	    uiPutColor(CQC_A_BOLD);
 	}
       cdputs( buf, DISPLAY_LINS+1, col );
-      attrset(0);
+      uiPutColor(0);
     }
 
   /* if alt hud and we are a ship... */
@@ -109,9 +112,9 @@ void do_border(int snum, int attr)
   
   lin = DISPLAY_LINS + 1;
   
-  attrset(attr);
+  uiPutColor(attr);
   cdline( 1, STAT_COLS, lin, STAT_COLS );
-  attrset(0);
+  uiPutColor(0);
   do_bottomborder(snum, NULL, attr, 0);
   
   return;
@@ -155,12 +158,12 @@ void display( int snum, int display_info )
   int i, j, k, l, m, idx, lin, col, dcol, datacol, minenemy, minsenemy;
   int linofs[8] = {0, -1, -1, -1, 0, 1, 1, 1};
   int colofs[8] = {1, 1, 0, -1, -1, -1, 0, 1};
-  int outattr;
+  cqColor outattr;
   static int OldAlert = 0;
   static string dirch="-/|\\-/|\\";
   char ch, buf[MSGMAXLINE];
   int dobeep, lsmap;
-  int palertcol;
+  cqColor palertcol;
   real x, scale, cenx, ceny, dis, mindis, minsdis, fl, cd, sd;
   static real zzskills, zzswarp;
   static char zzbuf[MSGMAXLINE];
@@ -169,11 +172,11 @@ void display( int snum, int display_info )
   static int zzsetemp, zzswtemp, zzctemp, zzstowedby, zzssdfuse;
   static real prevsh = 0.0 , prevdam = 100.0 ;
 
-  static int ShieldAttrib = 0;
-  static int FuelAttrib = 0;
-  static int WeapAttrib = 0;
-  static int EngAttrib = 0;
-  static int DamageAttrib = 0;
+  static cqColor ShieldAttrib = 0;
+  static cqColor FuelAttrib = 0;
+  static cqColor WeapAttrib = 0;
+  static cqColor EngAttrib = 0;
+  static cqColor DamageAttrib = 0;
   
   static char zbuf[MSGMAXLINE];
   static char *dstatstr;
@@ -233,12 +236,12 @@ void display( int snum, int display_info )
     {
       if ( ! Planets[i].real )
 	continue; /*next;*/
-      if ( ! cvtcoords( cenx, ceny, Planets[i].x, Planets[i].y, scale, &lin, &col ) )
+      if ( ! clbCVTCoords( cenx, ceny, Planets[i].x, Planets[i].y, scale, &lin, &col ) )
 	continue; /* next;*/
 
       palertcol = 0;
 				/* determine alertlevel for object */
-      if (snum > 0 && spwar( snum, i ) && Planets[i].scanned[Ships[snum].team])
+      if (snum > 0 && clbSPWar( snum, i ) && Planets[i].scanned[Ships[snum].team])
 	{
 	  palertcol = RedLevelColor;
 	}
@@ -263,12 +266,12 @@ void display( int snum, int display_info )
 	  if ( Planets[i].type == PLANET_SUN || ! Planets[i].scanned[Ships[snum].team] )
 	    {
 	      if (Planets[i].type == PLANET_SUN)
-		attrset(RedLevelColor); /* suns have a red core */
+		uiPutColor(RedLevelColor); /* suns have a red core */
 	      else
-		attrset(palertcol);
+		uiPutColor(palertcol);
 
 	      cdput( ConqInfo->chrplanets[Planets[i].type], lin, col );
-	      attrset(0);
+	      uiPutColor(0);
 	    }
 	  else
 	    {
@@ -288,18 +291,18 @@ void display( int snum, int display_info )
 
 		  if (m > STAT_COLS)
 		    {
-		      attrset(palertcol);
+		      uiPutColor(palertcol);
 		      cdput( ch, lin, m++);
-		      attrset(0);
+		      uiPutColor(0);
 
-		      attrset(InfoColor);
+		      uiPutColor(InfoColor);
 		      cdputs( buf, lin, m);
 		      m += l;
-		      attrset(0);
+		      uiPutColor(0);
 
-		      attrset(palertcol);
+		      uiPutColor(palertcol);
                       cdput( ch, lin, m);
-		      attrset(0);
+		      uiPutColor(0);
 		    }
 
 		}
@@ -310,17 +313,17 @@ void display( int snum, int display_info )
 
 		  if (m > STAT_COLS)
 		    {
-                      attrset(palertcol);
+                      uiPutColor(palertcol);
                       cdput( ch, lin, m++);
-                      attrset(0);
+                      uiPutColor(0);
 
-                      attrset(InfoColor);
+                      uiPutColor(InfoColor);
                       cdput( ConqInfo->chrplanets[Planets[i].type], lin, m++);
-                      attrset(0);
+                      uiPutColor(0);
 
-                      attrset(palertcol);
+                      uiPutColor(palertcol);
                       cdput( ch, lin, m++);
-		      attrset(0);
+		      uiPutColor(0);
 		    }
 		}
 	    }
@@ -330,39 +333,39 @@ void display( int snum, int display_info )
 			    UserConf.ShowPlanNames) ) /* dwp */
 	    {
 	      sprintf(buf, "%c%c%c", Planets[i].name[0], Planets[i].name[1], Planets[i].name[2]);
-	      attrset(palertcol);
+	      uiPutColor(palertcol);
 	      cdputs( buf, lin, col+2 );
-	      attrset(0);
+	      uiPutColor(0);
 	    }
 	}
       else
 	{
 	  /* Tactical map. */
-	  attrset(palertcol);
-	  puthing( Planets[i].type, lin, col );
-	  attrset(0);
+	  uiPutColor(palertcol);
+	  cumPutThing( Planets[i].type, lin, col );
+	  uiPutColor(0);
 
 	  if (col - 3 >= STAT_COLS - 1)
 	    {
 	      if (lin <= DISPLAY_LINS && lin > 0 )
 		{
 		  if (snum > 0 && !Planets[i].scanned[Ships[snum].team])
-		    attrset(palertcol);	/* default to yellow for unscanned */
+		    uiPutColor(palertcol);	/* default to yellow for unscanned */
 		  else
-		    attrset(InfoColor);	/* scanned (known) value */
+		    uiPutColor(InfoColor);	/* scanned (known) value */
 
 		  if (Planets[i].type == PLANET_SUN)
-		    attrset(RedLevelColor); /* suns have a red core */
+		    uiPutColor(RedLevelColor); /* suns have a red core */
 
 		  cdput( ConqInfo->chrplanets[Planets[i].type], lin, col + 1);
-		  attrset(0);
+		  uiPutColor(0);
 		}
 	      if ( snum < 0 || (snum > 0 && UserConf.ShowPlanNames) ) /* dwp */
-		if ( (lin + 1 <= DISPLAY_LINS) && col + 1< cdcols() )
+		if ( (lin + 1 <= DISPLAY_LINS) && col + 1< Context.maxcol )
 		  {
-		    attrset(palertcol);
+		    uiPutColor(palertcol);
 		    cdputs( Planets[i].name, lin + 1, col + 2 );
-		    attrset(0);
+		    uiPutColor(0);
 		  }
 	    }
 	}
@@ -371,27 +374,27 @@ void display( int snum, int display_info )
   /* Display the planet eater. */
   if ( Doomsday->status == DS_LIVE )
     if ( ! lsmap )
-      if ( cvtcoords( cenx, ceny, Doomsday->x, Doomsday->y, scale, &lin, &col ) )
+      if ( clbCVTCoords( cenx, ceny, Doomsday->x, Doomsday->y, scale, &lin, &col ) )
 	{
 	  dobeep = TRUE;
 	  sd = sind(Doomsday->heading);
 	  cd = cosd(Doomsday->heading);
 	  /* Draw the body. */
-	  attrset(COLOR_PAIR(COL_BLUEBLACK));
+	  uiPutColor(BlueColor);
 	  for ( fl = -DOOMSDAY_LENGTH/2.0;
 	       fl < DOOMSDAY_LENGTH/2.0;
 	       fl = fl + 50.0 )
-	    if ( cvtcoords( cenx, ceny, Doomsday->x+fl*cd, Doomsday->y+fl*sd, scale, &lin, &col ) )
+	    if ( clbCVTCoords( cenx, ceny, Doomsday->x+fl*cd, Doomsday->y+fl*sd, scale, &lin, &col ) )
 	      cdput( '#', lin, col );
-	  attrset(0);
+	  uiPutColor(0);
 	  /* Draw the head. */
-	  if ( cvtcoords( cenx, ceny, Doomsday->x+DOOMSDAY_LENGTH/2.0*cd,
+	  if ( clbCVTCoords( cenx, ceny, Doomsday->x+DOOMSDAY_LENGTH/2.0*cd,
 			 Doomsday->y+DOOMSDAY_LENGTH/2.0*sd,
 			 scale, &lin, &col ) )
 	    {
-	      attrset(RedLevelColor);
+	      uiPutColor(RedLevelColor);
 	      cdput( '*', lin, col );
-	      attrset(0);
+	      uiPutColor(0);
 	    }
 	}
   if ( snum > 0)
@@ -403,13 +406,13 @@ void display( int snum, int display_info )
 	    sd = sind(Ships[snum].lastphase);
 	    cd = cosd(Ships[snum].lastphase);
 	    ch = dirch[mod( (round( Ships[snum].lastphase + 22.5 ) / 45), 7 )];
-	    attrset(InfoColor);
+	    uiPutColor(InfoColor);
 	    for ( fl = 0; fl <= LastPhasDist; fl = fl + 50.0 )
-	      if ( cvtcoords( cenx, ceny,
+	      if ( clbCVTCoords( cenx, ceny,
 			      Ships[snum].x+fl*cd, Ships[snum].y+fl*sd,
 			      scale, &lin, &col ) )
 		cdput( ch, lin, col );
-	    attrset(0);
+	    uiPutColor(0);
 	  }
     }
   
@@ -426,17 +429,17 @@ void display( int snum, int display_info )
 		    Ships[i].war[Ships[snum].team] == FALSE)
 		  {
 		    if (i == snum) /* if it's your torps - */
-		      attrset(A_BOLD);
+		      uiPutColor(CQC_A_BOLD);
 		    else
-		      attrset(YellowLevelColor);
+		      uiPutColor(YellowLevelColor);
 
 		    for ( j = 0; j < MAXTORPS; j = j + 1 )
 		      if ( Ships[i].torps[j].status == TS_LIVE 
 			  || Ships[i].torps[j].status == TS_DETONATE )
-			if ( cvtcoords( cenx, ceny, Ships[i].torps[j].x, Ships[i].torps[j].y,
+			if ( clbCVTCoords( cenx, ceny, Ships[i].torps[j].x, Ships[i].torps[j].y,
 				       scale, &lin, &col ) )
 			  cdput( Teams[Ships[i].team].torpchar, lin, col );
-		    attrset(0);
+		    uiPutColor(0);
 		  }
 	      }
 	  }
@@ -447,41 +450,41 @@ void display( int snum, int display_info )
 	    if ( snum < 0 || (snum > 0 && UserConf.DoExplode) ) /* dwp */
 	      for ( j = 0; j < MAXTORPS; j = j + 1 )
 		if ( Ships[i].torps[j].status == TS_FIREBALL )
-		  if ( cvtcoords( cenx, ceny, Ships[i].torps[j].x, Ships[i].torps[j].y,
+		  if ( clbCVTCoords( cenx, ceny, Ships[i].torps[j].x, Ships[i].torps[j].y,
 				  scale, &lin, &col) )
 		  { /* colorize torp explosions */
 		    if (i != snum && 
 			(satwar(i, snum) || Ships[i].torps[j].war[Ships[snum].team]))
-		      attrset(RedLevelColor);
+		      uiPutColor(RedLevelColor);
 		    else if (i != snum )
-		      attrset(GreenLevelColor);
+		      uiPutColor(GreenLevelColor);
 		    else
-		      attrset(0);
-		    puthing( THING_EXPLOSION, lin, col );
-		    attrset(0);
+		      uiPutColor(0);
+		    cumPutThing( THING_EXPLOSION, lin, col );
+		    uiPutColor(0);
 		  }
 	    /* Now display the live torps. */
 
 	    if (snum > 0)
 	      {			/* a ship */
 		if (i == snum) /* if it's your torps and you're a ship */
-		  attrset(0);
+		  uiPutColor(0);
 		else if (i != snum && satwar(i, snum))
-		  attrset(RedLevelColor);
+		  uiPutColor(RedLevelColor);
 		else
-		  attrset(GreenLevelColor);
+		  uiPutColor(GreenLevelColor);
 	      }
 	    else		/* a special */
-	      attrset(YellowLevelColor);
+	      uiPutColor(YellowLevelColor);
 		
 	    for ( j = 0; j < MAXTORPS; j = j + 1 )
 	      if ( Ships[i].status != SS_DYING && Ships[i].status != SS_DEAD && 
 		   (Ships[i].torps[j].status == TS_LIVE || Ships[i].torps[j].status == TS_DETONATE) )
-		if ( cvtcoords( cenx, ceny, Ships[i].torps[j].x, Ships[i].torps[j].y,
+		if ( clbCVTCoords( cenx, ceny, Ships[i].torps[j].x, Ships[i].torps[j].y,
 				scale, &lin, &col ) )
 		  cdput( Teams[Ships[i].team].torpchar, lin, col );
 
-	    attrset(0);
+	    uiPutColor(0);
 	  }
 
 	/* Display the ships. */
@@ -533,7 +536,7 @@ void display( int snum, int display_info )
 	      {
 		/* ... especially if he's in the bounds of our current */
 		/*  display (either tactical or strategic map) */
-		if ( cvtcoords( cenx, ceny, Ships[i].x, Ships[i].y,
+		if ( clbCVTCoords( cenx, ceny, Ships[i].x, Ships[i].y,
 			       scale, &lin, &col ) )
 		  {
 		    /* He's on the screen. */
@@ -559,22 +562,22 @@ void display( int snum, int display_info )
 			if (snum > 0)
 			  {
 			    if (i == snum)    /* it's ours */
-			      attrset(A_BOLD);
+			      uiPutColor(CQC_A_BOLD);
 			    else if (satwar(i, snum)) /* we're at war with it */
-			      attrset(RedLevelColor);
+			      uiPutColor(RedLevelColor);
 			    else if (Ships[i].team == Ships[snum].team && !selfwar(snum))
-			      attrset(GreenLevelColor); /* it's a team ship */
+			      uiPutColor(GreenLevelColor); /* it's a team ship */
 			    else
-			      attrset(YellowLevelColor);
+			      uiPutColor(YellowLevelColor);
 			  }
 			else
-			  attrset(YellowLevelColor); /* special view */
+			  uiPutColor(YellowLevelColor); /* special view */
 			    
 				 
 			cdput( ch, lin, col );
-			attrset(0); attrset(A_BOLD);
+			uiPutColor(0); uiPutColor(CQC_A_BOLD);
 			cdputn( i, 0, lin, col + 2 );
-			attrset(0);
+			uiPutColor(0);
 
 			idx = (int)mod( round((((real)Ships[i].head + 22.5) / 45.0) + 0.5) - 1, 8);
 			/* JET 9/28/94 */
@@ -588,11 +591,11 @@ void display( int snum, int display_info )
 			j = lin+linofs[idx];
 			k = col+colofs[idx];
 
-			attrset(InfoColor);
+			uiPutColor(InfoColor);
 			if ( j >= 0 && j < DISPLAY_LINS && 
 			    k > STAT_COLS && k < Context.maxcol )
 			  cdput( dirch[idx], j, k );
-			attrset(0);
+			uiPutColor(0);
 		      }
 		  }
 		if ( snum > 0 && snum == i )
@@ -624,7 +627,7 @@ void display( int snum, int display_info )
 	  if ( mindis <= PHASER_DIST )
 	    {
 	      /* Nearest enemy is very close. */
-	      outattr = COLOR_PAIR(COL_REDBLACK);
+	      outattr = RedColor;
 	      AlertLevel = RED_ALERT;
 	      c_strcpy( "RED ALERT ", buf );
 	      dobeep = TRUE;
@@ -632,7 +635,7 @@ void display( int snum, int display_info )
 	  else if ( mindis < ALERT_DIST )
 	    {
 	      /* Nearest enemy is close. */
-	      outattr = COLOR_PAIR(COL_REDBLACK);
+	      outattr = RedColor;
 	      AlertLevel = RED_ALERT;
 	      c_strcpy( "Alert ", buf );
 	      dobeep = TRUE;
@@ -640,7 +643,7 @@ void display( int snum, int display_info )
 	  else if ( STALERT(snum) )
 	    {
 	      /* Nearby torpedos. */
-	      outattr = COLOR_PAIR(COL_YELLOWBLACK);
+	      outattr = YellowColor;
 	      AlertLevel = YELLOW_ALERT;
 	      c_strcpy( "Torp alert", buf );
 	      minenemy = 0;			/* disable nearby enemy code */
@@ -649,21 +652,21 @@ void display( int snum, int display_info )
 	  else if ( mindis < YELLOW_DIST )
 	    {
 	      /* Near an enemy. */
-	      outattr = COLOR_PAIR(COL_YELLOWBLACK);
+	      outattr = YellowColor;
 	      AlertLevel = YELLOW_ALERT;
 	      c_strcpy( "Yellow alert ", buf );
 	    }
 	  else if ( minsenemy != 0 )
 	    {
 	      /* An enemy near one of our ships or planets. */
-	      outattr = COLOR_PAIR(COL_YELLOWBLACK);
+	      outattr = YellowColor;
 	      minenemy = minsenemy;		/* for cloaking code below */
 	      AlertLevel = YELLOW_ALERT;
 	      c_strcpy( "Proximity Alert ", buf );
 	    }
 	  else
 	    {
-	      outattr = COLOR_PAIR(COL_GREENBLACK);
+	      outattr = GreenColor;
 	      AlertLevel = GREEN_ALERT;
 	      minenemy = 0;
 	    }
@@ -720,14 +723,14 @@ void display( int snum, int display_info )
 	if ( i == -1 )
 	  {
 	    if (AlertLevel == YELLOW_ALERT) 
-	      attrset(YellowLevelColor);
+	      uiPutColor(YellowLevelColor);
 	    else if (AlertLevel == RED_ALERT)
-	      attrset(RedLevelColor | A_BLINK);
+	      uiPutColor(RedLevelColor | A_BLINK);
 	    else
-	      attrset(GreenLevelColor);
+	      uiPutColor(GreenLevelColor);
 	    
 	    cdputs( "DOWN", lin, datacol );
-	    attrset(0);
+	    uiPutColor(0);
 	  }
 	else
 	  {
@@ -739,9 +742,9 @@ void display( int snum, int display_info )
 	      ShieldAttrib = GreenLevelColor;
 	    
 	    sprintf( buf, "%d", i );
-	    attrset(ShieldAttrib);
+	    uiPutColor(ShieldAttrib);
 	    cdputs( buf, lin, datacol );
-	  attrset(0);
+	  uiPutColor(0);
 	  }
 	zzsshields = i;
       }
@@ -752,12 +755,12 @@ void display( int snum, int display_info )
       j = 's';
     if ( j != zzcshields )
       {
-	attrset(LabelColor);
+	uiPutColor(LabelColor);
 	if ( j == 'S' )
 	  cdputs( "SHIELDS =", lin, col );
 	else
 	  cdputs( "shields =", lin, col );
-	attrset(0);
+	uiPutColor(0);
 	zzcshields = j;
       }
     
@@ -765,9 +768,9 @@ void display( int snum, int display_info )
     lin = lin + 2;
     if ( Context.redraw )
       {
-	attrset(LabelColor);
+	uiPutColor(LabelColor);
 	cdputs( "kills =", lin, col );
-	attrset(0);
+	uiPutColor(0);
 	zzskills = -20.0;
       }
     x = (Ships[snum].kills + Ships[snum].strkills);
@@ -776,9 +779,9 @@ void display( int snum, int display_info )
 	cdclra( lin, datacol, lin, STAT_COLS-1 );
 	sprintf( buf, "%0.1f", oneplace(x) );
 	
-	attrset(InfoColor);
+	uiPutColor(InfoColor);
 	cdputs( buf, lin, datacol );
-	attrset(0);
+	uiPutColor(0);
 	
 	zzskills = x;
       }
@@ -787,9 +790,9 @@ void display( int snum, int display_info )
     lin = lin + 2;
     if ( Context.redraw )
       {
-	attrset(LabelColor);
+	uiPutColor(LabelColor);
 	cdputs( "warp =", lin, col );
-	attrset(0);
+	uiPutColor(0);
 	zzswarp = 92.0;			/* "Warp 92 Mr. Sulu." */
       }
     x = Ships[snum].warp;
@@ -797,7 +800,7 @@ void display( int snum, int display_info )
       {
 	cdclra( lin, datacol, lin, STAT_COLS-1 );
 	
-	attrset(InfoColor);
+	uiPutColor(InfoColor);
 	if ( x >= 0.0 )
 	  {
 	    sprintf( buf, "%.1f", x );
@@ -805,7 +808,7 @@ void display( int snum, int display_info )
 	  }
 	else
 	  cdput( 'o', lin, datacol );
-	attrset(0);
+	uiPutColor(0);
 	
 	zzswarp = x;
       }
@@ -814,9 +817,9 @@ void display( int snum, int display_info )
     lin = lin + 2;
     if ( Context.redraw )
       {
-	attrset(LabelColor);
+	uiPutColor(LabelColor);
 	cdputs( "heading =", lin, col );
-	attrset(0);
+	uiPutColor(0);
 	zzshead = 999;
       }
     i = Ships[snum].lock;
@@ -826,13 +829,13 @@ void display( int snum, int display_info )
       {
 	cdclra( lin, datacol, lin, STAT_COLS-1 );
 	
-	attrset(InfoColor);
+	uiPutColor(InfoColor);
 	if ( -i > 0 && -i <= NUMPLANETS)
 	  sprintf( buf, "%.3s", Planets[-i].name );
 	else
 	  sprintf( buf, "%d", i );
 	cdputs( buf, lin, datacol );
-	attrset(0);
+	uiPutColor(0);
 	zzshead = i;
       }
     
@@ -856,9 +859,9 @@ void display( int snum, int display_info )
 	cdclra( lin, datacol, lin, STAT_COLS-1 );
 	sprintf( buf, "%d", i );
 	
-	attrset(FuelAttrib);
+	uiPutColor(FuelAttrib);
 	cdputs( buf, lin, datacol );
-	attrset(0);
+	uiPutColor(0);
 	
 	zzsfuel = i;
       }
@@ -869,12 +872,12 @@ void display( int snum, int display_info )
       j = 'f';
     if ( j != zzcfuel )
       {
-	attrset(LabelColor);
+	uiPutColor(LabelColor);
 	if ( j == 'F' )
 	  cdputs( "FUEL =", lin, col );
 	else if ( j == 'f' )
 	  cdputs( "fuel =", lin, col );
-	attrset(0);
+	uiPutColor(0);
 	
 	zzcfuel = j;
       }
@@ -883,9 +886,9 @@ void display( int snum, int display_info )
     lin = lin + 2;
     if ( Context.redraw )
       {
-	attrset(LabelColor);
+	uiPutColor(LabelColor);
 	cdputs( "w/e =", lin, col );
-	attrset(0);
+	uiPutColor(0);
 	zzsweapons = -9;
 	zzsengines = -9;
       }
@@ -908,9 +911,9 @@ void display( int snum, int display_info )
 	  appstr( "**", buf );
 	else
 	  appint( j, buf );
-	attrset(InfoColor);
+	uiPutColor(InfoColor);
 	cdputs( buf, lin, datacol );
-	attrset(0);
+	uiPutColor(0);
 	zzsweapons = i;
       }
     
@@ -958,13 +961,13 @@ void display( int snum, int display_info )
 	    else if (i >= 76)
 	      WeapAttrib = RedLevelColor;
 	    
-	    attrset(WeapAttrib);
+	    uiPutColor(WeapAttrib);
 	    cdputs(wtbuf, lin, datacol);
-	    attrset(0);
+	    uiPutColor(0);
 	  
-	    attrset(InfoColor);
+	    uiPutColor(InfoColor);
 	    cdputs("/", lin, datacol + 2);
-	    attrset(0);
+	    uiPutColor(0);
 	  
 	    if (j >= 0 && j <= 50)
 	      EngAttrib = GreenLevelColor;
@@ -973,9 +976,9 @@ void display( int snum, int display_info )
 	    else if (j >= 81)
 	      EngAttrib = RedLevelColor;
 	    
-	    attrset(EngAttrib);
+	    uiPutColor(EngAttrib);
 	    cdputs(etbuf, lin, datacol + 3);
-	    attrset(0);
+	    uiPutColor(0);
 	    
 	  }
 	zzswtemp = i;
@@ -993,15 +996,15 @@ void display( int snum, int display_info )
 	cdclra( lin, col, lin, datacol-1 );
 	if ( j == 't' )
 	  {
-	    attrset(LabelColor);
+	    uiPutColor(LabelColor);
 	    cdputs( "temp =", lin, col );
-	    attrset(0);
+	    uiPutColor(0);
 	  }
 	else if ( j == 'T' )
 	  {
-	    attrset(LabelColor);
+	    uiPutColor(LabelColor);
 	    cdputs( "TEMP =", lin, col );
-	    attrset(0);
+	    uiPutColor(0);
 	  }
 	zzctemp = j;
       }
@@ -1031,9 +1034,9 @@ void display( int snum, int display_info )
 	    else if (i >= 66)
 	      DamageAttrib = RedLevelColor;
 	  
-	    attrset(DamageAttrib);
+	    uiPutColor(DamageAttrib);
 	    cdputs( buf, lin, datacol );
-	    attrset(0);
+	    uiPutColor(0);
 	  }
 	zzsdamage = i;
       }
@@ -1052,20 +1055,20 @@ void display( int snum, int display_info )
       
 	if ( j == 'r' )
 	  {
-	    attrset(GreenLevelColor);
+	    uiPutColor(GreenLevelColor);
 	    cdputs( "REPAIR, dmg =", lin, col );
 	  }
 	else if ( j == 'd' )
 	  {
-	    attrset(YellowLevelColor);
+	    uiPutColor(YellowLevelColor);
 	    cdputs( "damage =", lin, col );
 	  }
 	else if ( j == 'D' )
 	  {
-	    attrset(RedLevelColor);
+	    uiPutColor(RedLevelColor);
 	    cdputs( "DAMAGE =", lin, col );
 	  }
-	attrset(0);
+	uiPutColor(0);
 	zzcdamage = j;
       }
   
@@ -1081,19 +1084,19 @@ void display( int snum, int display_info )
 	cdclra( lin, col, lin, STAT_COLS-1 );
 	if ( i > 0 )
 	  {
-	    attrset(InfoColor);
+	    uiPutColor(InfoColor);
 	    cdputs( "armies =", lin, col );
 	    sprintf( buf, "%d", i );
 	    cdputs( buf, lin, datacol );
-	    attrset(0);
+	    uiPutColor(0);
 	  }
 	else if ( i < 0 )
 	  {
-	    attrset(InfoColor);
+	    uiPutColor(InfoColor);
 	    cdputs( "action =", lin, col );
 	    robstr( -i, buf );
 	    cdputs( buf, lin, datacol );
-	    attrset(0);
+	    uiPutColor(0);
 	  }
 	zzsarmies = i;
       }
@@ -1120,9 +1123,9 @@ void display( int snum, int display_info )
 	    c_strcpy( "towed by ", buf );
 	    appship( i, buf );
 	  }
-	attrset(InfoColor);
+	uiPutColor(InfoColor);
 	cdputs( buf, lin, col );
-	attrset(0);
+	uiPutColor(0);
 	zzstowedby = i;
       }
   
@@ -1140,15 +1143,15 @@ void display( int snum, int display_info )
 	if ( i > 0 )
 	  {
 	    sprintf( buf, "DESTRUCT MINUS %-3d", i );
-	    attrset(RedLevelColor);
+	    uiPutColor(RedLevelColor);
 	    cdputs( buf, lin, col );
-	    attrset(0);
+	    uiPutColor(0);
 	  }
 	else if ( i == -1 )
 	  {
-	    attrset(RedLevelColor);
+	    uiPutColor(RedLevelColor);
 	    cdputs( "CLOAKED", lin, col );
-	    attrset(0);
+	    uiPutColor(0);
 	  }
 	else 
 	  cdputs( "       ", lin, col );
@@ -1187,9 +1190,9 @@ void display( int snum, int display_info )
 	  lin = lin + 2;
 	  dcol = col + 11;
       
-	  attrset(LabelColor);
+	  uiPutColor(LabelColor);
 	  cdputs( "  dstatus:", lin, col );
-	  attrset(InfoColor);
+	  uiPutColor(InfoColor);
 	  if ( Doomsday->status == DS_LIVE)
 	    dstatstr = DS_LIVE_STR;
 	  else if (Doomsday->status == DS_OFF)
@@ -1198,53 +1201,53 @@ void display( int snum, int display_info )
 	    dstatstr = "";
 	  sprintf(buf, "%d (%s)", Doomsday->status, dstatstr);
 	  cdputs(buf, lin, dcol);
-	  attrset(0);
+	  uiPutColor(0);
       
 	  lin = lin + 1;
-	  attrset(LabelColor);
+	  uiPutColor(LabelColor);
 	  cdputs( "       dx:", lin, col );
-	  attrset(0);
-	  attrset(InfoColor);
+	  uiPutColor(0);
+	  uiPutColor(InfoColor);
 	  cdputr( oneplace(Doomsday->x), 0, lin, dcol );
-	  attrset(0);
+	  uiPutColor(0);
       
 	  lin = lin + 1;
-	  attrset(LabelColor);
+	  uiPutColor(LabelColor);
 	  cdputs( "       dy:", lin, col );
-	  attrset(0);
-	  attrset(InfoColor);
+	  uiPutColor(0);
+	  uiPutColor(InfoColor);
 	  cdputr( oneplace(Doomsday->y), 0, lin, dcol );
-	  attrset(0);
+	  uiPutColor(0);
       
 	  lin = lin + 1;
-	  attrset(LabelColor);
+	  uiPutColor(LabelColor);
 	  cdputs( "      ddx:", lin, col );
-	  attrset(0);
-	  attrset(InfoColor);
+	  uiPutColor(0);
+	  uiPutColor(InfoColor);
 	  cdputr( oneplace(Doomsday->dx), 0, lin, dcol );
-	  attrset(0);
+	  uiPutColor(0);
 
 	  lin = lin + 1;
-	  attrset(LabelColor);
+	  uiPutColor(LabelColor);
 	  cdputs( "      ddy:", lin, col );
-	  attrset(0);
-	  attrset(InfoColor);
+	  uiPutColor(0);
+	  uiPutColor(InfoColor);
 	  cdputr( oneplace(Doomsday->dy), 0, lin, dcol );
-	  attrset(0);
+	  uiPutColor(0);
       
 	  lin = lin + 1;
-	  attrset(LabelColor);
+	  uiPutColor(LabelColor);
 	  cdputs( "    dhead:", lin, col );
-	  attrset(0);
-	  attrset(InfoColor);
+	  uiPutColor(0);
+	  uiPutColor(InfoColor);
 	  cdputn( round(Doomsday->heading), 0, lin, dcol );
-	  attrset(0);
+	  uiPutColor(0);
       
 	  lin = lin + 1;
-	  attrset(LabelColor);
+	  uiPutColor(LabelColor);
 	  cdputs( "    dlock:", lin, col );
 	  cdputs( "      ddt:", lin+1, col );
-	  attrset(0);
+	  uiPutColor(0);
       
 	  for (i=0;i<MAXPLANETNAME;i++)
 	    zbuf[i] = ' ';
@@ -1254,30 +1257,30 @@ void display( int snum, int display_info )
 	  i = Doomsday->lock;
 	  if ( -i > 0 && -i <= NUMPLANETS )
 	    {
-	      attrset(RedLevelColor);
+	      uiPutColor(RedLevelColor);
 	      cdputs( Planets[-i].name, lin, dcol );	/* -[] */
-	      attrset(0);
-	      attrset(InfoColor);
+	      uiPutColor(0);
+	      uiPutColor(InfoColor);
 	      cdputn( round( dist( Doomsday->x, Doomsday->y, Planets[-i].x, Planets[-i].y ) ),
 		      0, lin + 1, dcol );
-	      attrset(0);
+	      uiPutColor(0);
 	    }
 	  else if ( i > 0 && i <= MAXSHIPS )
 	    {
 	      buf[0] = EOS;
 	      appship( i, buf );
-	      attrset(RedLevelColor);
+	      uiPutColor(RedLevelColor);
 	      cdputs( buf, lin, dcol );
-	      attrset(0);
-	      attrset(InfoColor);
+	      uiPutColor(0);
+	      uiPutColor(InfoColor);
 	      cdputn( round( dist( Doomsday->x, Doomsday->y, Ships[i].x, Ships[i].y ) ),
 		      0, lin + 1, dcol );
-	      attrset(0);
+	      uiPutColor(0);
 	    }
 	  else
 	    cdputn( i, 0, lin + 1, dcol );
       
-	  attrset(0);
+	  uiPutColor(0);
       
 	  lin = lin + 2;
 	}
@@ -1322,10 +1325,10 @@ void display_headers(int snum)
 	      Teams[Ships[snum].team].teamchar, 
 	      snum,
 	      Ships[snum].alias, ssbuf); 
-      attrset(A_BOLD);
+      uiPutColor(CQC_A_BOLD);
       cdputs( hbuf, 1, STAT_COLS + 
 	      (int)(Context.maxcol - STAT_COLS - (strlen(hbuf))) / (int)2 + 1);
-      attrset(0);
+      uiPutColor(0);
     }
   else if ( SROBOT(snum) )
     {
@@ -1334,20 +1337,20 @@ void display_headers(int snum)
 	  sprintf(hbuf, heading_fmt, robo_str1, 
 		  Teams[Ships[snum].team].teamchar, snum,
 		  Ships[snum].alias, ssbuf); 
-	  attrset(A_BOLD);
+	  uiPutColor(CQC_A_BOLD);
 	  cdputs( hbuf, 1, STAT_COLS + 
 		  (int)(Context.maxcol - STAT_COLS - (strlen(hbuf))) / (int)2 + 1);
-	  attrset(0);
+	  uiPutColor(0);
 	}
       else 
 	{
 	  sprintf(hbuf, heading_fmt, robo_str2, 
 		  Teams[Ships[snum].team].teamchar, snum,
 		  Ships[snum].alias, ssbuf);
-	  attrset(A_BOLD);
+	  uiPutColor(CQC_A_BOLD);
 	  cdputs( hbuf, 1, STAT_COLS + 
 		  (int)(Context.maxcol - STAT_COLS - (strlen(hbuf))) / (int)2 + 1);
-	  attrset(0);
+	  uiPutColor(0);
 	}
     }
   else 
@@ -1355,13 +1358,22 @@ void display_headers(int snum)
       sprintf(hbuf, heading_fmt, ship_str1, Teams[Ships[snum].team].teamchar,
 	      snum,
 	      Ships[snum].alias, ssbuf);
-      attrset(A_BOLD);
+      uiPutColor(CQC_A_BOLD);
       cdputs( hbuf, 1, STAT_COLS + 
 	      (int)(Context.maxcol - STAT_COLS - (strlen(hbuf))) / (int)2 + 1);
-      attrset(0);
+      uiPutColor(0);
     }
   
   cdrefresh();
 
 }
 
+void displayFeedback(char *msg, int lin)
+{
+  if (!msg)
+    return;
+
+  cumPutMsg(msg, MSG_LIN1);
+
+  return;
+}

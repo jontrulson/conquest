@@ -58,8 +58,11 @@
 #include "conf.h"
 #include "global.h"
 #include "color.h"
+#include "cd2lb.h"
+#include "cumisc.h"
+#include "iolb.h"
+#include "ui.h"
 #include "ibuf.h"
-#include "display.h"
 
 #define MSGMAXLINE 90 			/* used for screen formatting */
 
@@ -138,20 +141,20 @@ void cdclra ( int l1, int c1, int l2, int c2 )
   int i, j, rfc, rlc, rfl, rll;
   static char tmpstr[256];
   
-  rfc = max0 ( 0, min0 ( c1, c2 ) );
+  rfc = max ( 0, min ( c1, c2 ) );
   
-  /*    rlc = min0 ( maxcol - 1, max0 ( c1, c2 ) );*/
+  /*    rlc = min ( maxcol - 1, max ( c1, c2 ) );*/
   
-  rlc = min0 ( maxcol, max0 ( c1, c2 ) );
+  rlc = min ( maxcol, max ( c1, c2 ) );
   
   /* Calculate length. */
   j = rlc - rfc + 1;
   
-  rfl = max0 ( 0, min0 ( l1, l2 ) );
+  rfl = max ( 0, min ( l1, l2 ) );
   
-  /*    rll = min0 ( maxlin - 1, max0 ( l1, l2 ) );*/
+  /*    rll = min ( maxlin - 1, max ( l1, l2 ) );*/
   
-  rll = min0 ( maxlin, max0 ( l1, l2 ) );
+  rll = min ( maxlin, max ( l1, l2 ) );
   
   cdfill(' ', tmpstr, j);
   tmpstr[j] = '\0';
@@ -364,20 +367,20 @@ int cdgetp ( char pmt[], int lin, int col, char terms[], char str[],
       StrInit = FALSE;
     }
 
-  attrset(InfoColor);           /* colorize prompt string */
+  uiPutColor(InfoColor);           /* colorize prompt string */
   cdputs ( pmt, lin, col );
   scol = col + strlen ( pmt );
-  attrset(SpecialColor);        /* colorize secondary string */
+  uiPutColor(SpecialColor);        /* colorize secondary string */
   cdputs ( str, lin, scol );
-  attrset(NoColor);
+  uiPutColor(NoColor);
   len = strlen ( str );
   icol = scol + len;
   
-  imaxlen = min0 ( maxlen, maxcol - scol + 1 );
+  imaxlen = min ( maxlen, maxcol - scol + 1 );
   
   while (TRUE)
     {
-      str[ min0 ( len+1, imaxlen ) ] = EOS;
+      str[ min ( len+1, imaxlen ) ] = EOS;
       cdmove ( lin, icol );
       cdrefresh ();
 	  
@@ -393,7 +396,7 @@ int cdgetp ( char pmt[], int lin, int col, char terms[], char str[],
 
 				/* translate KP keys (if any)
 				   into 'direction' keys. */
-      (void)KP2DirKey(&ch);
+      (void)cumKP2DirKey(&ch);
 
       if (ch != TERM_NORMAL && ch != TERM_EXTRA && StrInit == TRUE &&
 	  isprint(ch & 0xff))
@@ -412,7 +415,7 @@ int cdgetp ( char pmt[], int lin, int col, char terms[], char str[],
       else
 	if (!isprint(ch & 0xff))
 	  {			/* redraw init str in std input color */
-	    attrset(NoColor);
+	    uiPutColor(NoColor);
 	    cdclra ( lin, icol, lin, cdcols() );
 	    if (doecho)
 	      cdputs ( str, lin, scol );
@@ -566,9 +569,9 @@ int cdgetp ( char pmt[], int lin, int col, char terms[], char str[],
 	}
     }
   
-  str[ min0 ( len+1, imaxlen ) ] = EOS;
+  str[ min ( len+1, imaxlen ) ] = EOS;
   
-  attrset(0);
+  uiPutColor(0);
   return ( ch );
   
 }
@@ -611,7 +614,7 @@ void cdinit(void)
   initscr();
   start_color();
   
-  InitColors();
+  uiInitColors();
   
   nonl(); 
   typeahead(-1);		/* no typeahead checking */
@@ -667,15 +670,6 @@ void cdinit(void)
 #endif
 
   cdclear();
-
-#ifdef CONQGL
-  if (!GLinited)
-    {
-      InitGL(0, NULL);
-      GLinited = TRUE;
-      procEvents();
-    }
-#endif
 
   return;
   

@@ -150,7 +150,7 @@ unsigned int iBufGetCh(void)
 
   if (!iBufCount())
     {
-      clog("IBUF GETC EMPTY, returning 0\n");
+      /*      clog("IBUF GETC EMPTY, returning 0\n");*/
       return('\0');
     }
   getRing(&c, 1, TRUE);
@@ -160,12 +160,8 @@ unsigned int iBufGetCh(void)
   
 /* DoMacro - stuff the buffer if an fkey pressed */
 
-int DoMacro(int ch)
+int DoMacro(int fkey)
 {
-  int fkey;
-  
-  fkey = (ch - KEY_F(0)) - 1 ;
-
   if (fkey < 0 || fkey >= MAX_MACROS)
   {
 #ifdef DEBUG_MACROS

@@ -15,29 +15,28 @@
 #include "context.h"
 #include "global.h"
 #include "color.h"
-#include "display.h"
+#include "ui.h"
+#include "conqlb.h"
+#include "cd2lb.h"
+#include "iolb.h"
+#include "cumisc.h"
 #include "record.h"
+#include "playback.h"
 #include "conf.h"
 #include "datatypes.h"
 #include "protocol.h"
 #include "packet.h"
 #include "client.h"
 #include "clientlb.h"
-
-static fileHeader_t fhdr;
-
-static real framedelay = -1.0;	/* delaytime between frames */
-
-static Unsgn32 frameCount = 0;
-
-static char *rfname;		/* game file we are playing */
-
-static time_t startTime = 0;
-static time_t currTime = 0;
-
-static time_t totElapsed = 0;	/* total game time */
+#include "display.h"
 
 static void replay(void);
+void watch(void);
+int prompt_ship(char buf[], int *snum, int *normal);
+void toggle_line(int snum, int old_snum);
+void setdheader(int show_header);
+void dowatchhelp(void);
+char *build_toggle_str(char *snum_str, int snum);
 
 void printUsage(void)
 {
@@ -46,105 +45,6 @@ void printUsage(void)
   fprintf(stderr, "       -d <dly>\t\tspecify the frame delay\n");
 
   return;
-}
-
-/* create and map our own version of the common block */
-static int map_lcommon()
-{
-  /* a parallel universe, it is */
-  fake_common();
-  initeverything();
-  initmsgs();
-  *CBlockRevision = COMMONSTAMP;
-  ConqInfo->closed = FALSE;
-  Driver->drivstat = DRS_OFF;
-  Driver->drivpid = 0;
-  Driver->drivowner[0] = EOS;
-  
-  return(TRUE);
-}
-
-
-
-/* open, create/load our cmb, and get ready for action if elapsed == NULL
-   otherwise, we read the entire file to determine the elapsed time of
-   the game and return it */
-static int initReplay(char *fname, time_t *elapsed)
-{
-  int pkttype;
-  time_t starttm = 0;
-  time_t curTS = 0;
-  Unsgn8 buf[PKT_MAXSIZE];
-
-  if (!recordOpenInput(fname))
-    {
-      printf("initReplay: recordOpenInput(%s) failed\n", fname);
-      return(FALSE);
-    }
-
-  /* don't bother mapping for just a count */
-  if (!elapsed)
-    map_lcommon();
-
-  /* now lets read in the file header and check a few things. */
-
-  if (!recordReadHeader(&fhdr))
-    return(FALSE);
-      
-  if (fhdr.vers != RECVERSION)
-    {				/* wrong vers */
-      clog("initReplay: version mismatch.  got %d, need %d\n",
-           fhdr.vers,
-           RECVERSION);
-
-      printf("initReplay: version mismatch.  got %d, need %d\n",
-	     fhdr.vers,
-	     RECVERSION);
-      return(FALSE);
-    }
-
-  /* if we are looking for the elapsed time, scan the whole file
-     looking for timestamps. */
-  if (elapsed)			/* we want elapsed time */
-    {
-      int done = FALSE;
-
-      starttm = fhdr.rectime;
-
-      curTS = 0;
-      /* read through the entire file, looking for timestamps. */
-      
-#if defined(DEBUG_REC)
-      clog("conqreplay: initReplay: reading elapsed time");
-#endif
-
-      while (!done)
-	{
-          if ((pkttype = recordReadPkt(buf, PKT_MAXSIZE)) == SP_FRAME)
-            {
-              spFrame_t *frame = (spFrame_t *)buf;
-              
-              /* fix up the endianizational interface for the time */
-              curTS = (time_t)ntohl(frame->time);
-            }
-
-	  if (pkttype == SP_NULL)
-	    done = TRUE;	/* we're done */
-	}
-
-      if (curTS != 0)
-	*elapsed = (curTS - starttm);
-      else
-	*elapsed = 0;
-
-      /* now close the file so that the next call of initReplay can
-	 get a fresh start. */
-      recordCloseInput();
-    }
-
-  /* now we are ready to start running packets */
-  
-  return(TRUE);
 }
 
 /* overlay the elapsed time, and current framedelay */
@@ -181,7 +81,7 @@ void displayReplayData(void)
 }
 
 
-/* display a message - mostly ripped from readmsg() */
+/* display a message - mostly ripped from cumReadMsg() */
 void displayMsg(Msg_t *themsg)
 {
   char buf[MSGMAXLINE];
@@ -194,19 +94,19 @@ void displayMsg(Msg_t *themsg)
 
   if (Context.hascolor)
     {                           /* set up the attrib so msg's are cyan */
-      attrib = COLOR_PAIR(COL_CYANBLACK);
+      attrib = CyanColor;
     }
 
   if (themsg)
     {
-      fmtmsg(themsg->msgto, themsg->msgfrom, buf);
+      clbFmtMsg(themsg->msgto, themsg->msgfrom, buf);
       
       appstr( ": ", buf );
       appstr( themsg->msgbuf, buf );
       
-      attrset(attrib);
-      c_putmsg( buf, RMsg_Line );
-      attrset(0);
+      uiPutColor(attrib);
+      cumPutMsg( buf, RMsg_Line );
+      uiPutColor(0);
       /* clear second line if sending to MSG_LIN1 */
       if (RMsg_Line == MSG_LIN1)
 	{
@@ -216,149 +116,11 @@ void displayMsg(Msg_t *themsg)
   else
     {				/* just clear the message line */
       cdclrl( RMsg_Line, 1 );
-#ifdef CONQGL
-      showMessage(0, NULL);
-#endif
     }
 
   return;
 
 }
-
-/* read in a header/data packet pair, and add them to our cmb.  return
-   the packet type processed or RDATA_NONE if there is no more data or
-   other error. */
-
-int processPacket(void)
-{
-  Unsgn8 buf[PKT_MAXSIZE];
-  spFrame_t *frame;
-  int pkttype;
-  Msg_t Msg;
-  spMessage_t *smsg;
-
-#if defined(DEBUG_REC)
-  clog("conqreply: processPacket ENTER");
-#endif
-
-  if ((pkttype = recordReadPkt(buf, PKT_MAXSIZE)) != SP_NULL)
-    {
-      switch(pkttype)
-        {
-        case SP_SHIP:
-          procShip(buf);
-          break;
-        case SP_SHIPSML:
-          procShipSml(buf);
-          break;
-        case SP_SHIPLOC:
-          procShipLoc(buf);
-          break;
-        case SP_USER:
-          procUser(buf);
-          break;
-        case SP_PLANET:
-          procPlanet(buf);
-          break;
-        case SP_PLANETSML:
-          procPlanetSml(buf);
-          break;
-        case SP_PLANETLOC:
-          procPlanetLoc(buf);
-          break;
-        case SP_TORP:
-          procTorp(buf);
-          break;
-        case SP_TORPLOC:
-          procTorpLoc(buf);
-          break;
-        case SP_TEAM:
-          procTeam(buf);
-          break;
-        case SP_MESSAGE:
-          smsg = (spMessage_t *)buf;
-          memset((void *)&Msg, 0, sizeof(Msg_t));
-          strncpy(Msg.msgbuf, smsg->msg, MESSAGE_SIZE);
-          Msg.msgfrom = (int)((Sgn16)ntohs(smsg->from));
-          Msg.msgto = (int)((Sgn16)ntohs(smsg->to));
-          Msg.flags = smsg->flags;
-
-          if (Msg.flags & MSG_FLAGS_FEEDBACK)
-            clntDisplayFeedback(smsg->msg);
-          else
-            displayMsg(&Msg);
-
-          break;
-
-        case SP_FRAME:
-          frame = (spFrame_t *)buf;
-          /* endian correction*/
-          frame->time = (Unsgn32)ntohl(frame->time);
-          frame->frame = (Unsgn32)ntohl(frame->frame);
-
-          if (startTime == (time_t)0)
-            startTime = (time_t)frame->time;
-          currTime = (time_t)frame->time;
-
-          frameCount = (Unsgn32)frame->frame;
-
-          break;
-          
-        default:
-#ifdef DEBUG_REC
-          fprintf(stderr, "processPacket: Invalid rtype %d\n", pkttype);
-#endif
-          break;          
-        }
-    }
-
-  return pkttype;
-}
-
-/* read and process packets until a FRAME packet or EOD is found */
-int processIter(void)
-{
-  int rtype;
-
-  while(((rtype = processPacket()) != SP_NULL) && rtype != SP_FRAME)
-    ;
-
-  return(rtype);
-}
-
-/* seek around in a game.  backwards seeks will be slooow... */
-void fileSeek(time_t newtime)
-{
-  if (newtime == currTime)
-    return;			/* simple case */
-
-  if (newtime < currTime)
-    {				/* backward */
-      /* we have to reset everything and start from scratch. */
-
-      recordCloseInput();
-
-      if (!initReplay(rfname, NULL))
-	return;			/* bummer */
-      
-      currTime = startTime;
-    }
-
-  /* start searching */
-
-  /* just read packets until 1. currTime exceeds newtime, or 2. no
-     data is left */
-  Context.display = FALSE; /* don't display things while looking */
-  
-  while (currTime < newtime)
-    if ((processPacket() == SP_NULL))
-      break;		/* no more data */
-  
-  Context.display = TRUE;
-
-  return;
-}
-	  
 
 /* MAIN */
 int main(int argc, char *argv[])
@@ -450,16 +212,12 @@ int main(int argc, char *argv[])
 
 static void replay(void)
 {
-  int i, lin, col;
-  char cbuf[MSGMAXLINE];
-  extern char *ConquestVersion;
-  extern char *ConquestDate;
-  int FirstTime = TRUE;
+  int lin;
+  static int FirstTime = TRUE;
   static char sfmt[MSGMAXLINE * 2];
   static char cfmt[MSGMAXLINE * 2];
   int ch;
   int done = FALSE;
-  char *c;
 
   if (FirstTime == TRUE)
     {
@@ -481,95 +239,8 @@ static void replay(void)
   do 
     {
       lin = 1;
-      if ( fhdr.vers != RECVERSION ) 
-	{
-	  attrset(RedLevelColor);
-	  sprintf( cbuf, "CONQUEST CQR VERSION MISMATCH %d != %d",
-		   fhdr.vers, RECVERSION );
-	  cdputc( cbuf, lin );
-	  attrset(0);
-          c_sleep(3.0);
-          return;
-	}
-      
-      if ( fhdr.cmnrev != COMMONSTAMP ) 
-	{
-	  attrset(RedLevelColor);
-	  sprintf( cbuf, "CONQUEST COMMON BLOCK MISMATCH %d != %d",
-		   fhdr.cmnrev, COMMONSTAMP );
-	  cdputc( cbuf, lin );
-	  attrset(0);
-          c_sleep(3.0);
-          return;
-	}
-      
-      attrset(NoColor|A_BOLD);
-      cdputc( "CONQUEST REPLAY PROGRAM", lin );
-      attrset(YellowLevelColor);
-      sprintf( cbuf, "%s (%s)",
-               ConquestVersion, ConquestDate);
-      cdputc( cbuf, lin+1 );
 
-      lin+=3;
-      
-      cprintf(lin,0,ALIGN_CENTER,"#%d#%s",NoColor, "Recording info:");
-      lin+=2;
-      i = lin;
-      
-      col = 5;
-      
-      cprintf(lin,col,ALIGN_NONE,sfmt, "File               ", rfname);
-      lin++;
-
-      cprintf(lin,col,ALIGN_NONE,sfmt, "Recorded By        ", fhdr.user);
-      lin++;
-
-      if (fhdr.snum == 0)
-        cprintf(lin,col,ALIGN_NONE,sfmt, "Recording Type     ", "Server");
-      else
-        {
-          sprintf(cbuf, "Client (Ship %d)", fhdr.snum);
-          cprintf(lin,col,ALIGN_NONE,sfmt, "Recording Type     ", cbuf);
-        }
-      lin++;
-
-      cprintf(lin,col,ALIGN_NONE,sfmt, "Recorded On        ", 
-	      ctime((time_t *)&fhdr.rectime));
-      lin++;
-      sprintf(cbuf, "%d (delay: %0.3fs)", fhdr.samplerate, framedelay);
-      cprintf(lin,col,ALIGN_NONE,sfmt, "Updates per second ", cbuf);
-      lin++;
-      fmtseconds(totElapsed, cbuf);
-
-      if (cbuf[0] == '0')	/* see if we need the day count */
-	c = &cbuf[2];	
-      else
-	c = cbuf;
-
-      cprintf(lin,col,ALIGN_NONE,sfmt, "Total Game Time    ", c);
-      lin++;
-      fmtseconds((currTime - startTime), cbuf);
-
-      if (cbuf[0] == '0')
-	c = &cbuf[2];	
-      else
-	c = cbuf;
-      cprintf(lin,col,ALIGN_NONE,sfmt, "Current Time       ", c);
-      lin++;
-      lin++;
-      
-      cprintf(lin,0,ALIGN_CENTER,"#%d#%s",NoColor, "Commands:");
-      lin+=3;
-      
-      cprintf(lin,col,ALIGN_NONE,cfmt, 'w', "watch a ship");
-      lin++;
-      cprintf(lin,col,ALIGN_NONE,cfmt, '/', "list ships");
-      lin++;
-      cprintf(lin,col,ALIGN_NONE,cfmt, 'r', "reset to beginning");
-      lin++;
-      cprintf(lin,col,ALIGN_NONE,cfmt, 'q', "quit");
-      lin++;
-      
+      dspReplayMenu();      
       cdclrl( MSG_LIN1, 2 );
 
       if ( ! iogtimed( &ch, 1.0 ) )
@@ -591,11 +262,11 @@ static void replay(void)
 	case 'r':
 	  /* first close the input file, free the common block,
 	     then re-init */
-	  fileSeek(startTime);
+	  pbFileSeek(startTime);
 	  break;
 
         case '/':
-	  playlist(TRUE, TRUE, 0);
+	  cumPlayList(TRUE, TRUE, 0);
 	  cdclear();
 	  break;
 	}
@@ -640,7 +311,7 @@ void watch(void)
       while (TRUE)
 	{
 	  if (Context.recmode == RECMODE_PLAYING)
-	    if ((ptype = processIter()) == SP_NULL)
+	    if ((ptype = pbProcessIter()) == SP_NULL)
 	      return;
 
 	  Context.display = TRUE;
@@ -659,6 +330,8 @@ void watch(void)
 	    {
 	      display(Context.snum, headerflag);
 	      displayReplayData();
+              if (recMsg.msgbuf[0])
+                displayMsg(&recMsg);
 	      upddsp = FALSE;	/* use this for one-shots */
 	    }
 	  
@@ -680,13 +353,13 @@ void watch(void)
 	      
 	    case 'f':	/* move forward 30 seconds */
 	      displayMsg(NULL);
-	      fileSeek(currTime + 30);
+	      pbFileSeek(currTime + 30);
 	      upddsp = TRUE;
 	      break;
 	      
 	    case 'F':	/* move forward 2 minutes */
 	      displayMsg(NULL);
-	      fileSeek(currTime + (2 * 60));
+	      pbFileSeek(currTime + (2 * 60));
 	      upddsp = TRUE;
 	      break;
 	      
@@ -702,7 +375,7 @@ void watch(void)
 	      displayMsg(NULL);
 	      cdputs( "Rewinding...", MSG_LIN1, 0);
 	      cdrefresh();
-	      fileSeek(currTime - 30);
+	      pbFileSeek(currTime - 30);
 	      cdclrl( MSG_LIN1, 1 );
 	      upddsp = TRUE;
 	      break;
@@ -711,7 +384,7 @@ void watch(void)
 	      displayMsg(NULL);
 	      cdputs( "Rewinding...", MSG_LIN1, 0);
 	      cdrefresh();
-	      fileSeek(currTime - (2 * 60));
+	      pbFileSeek(currTime - (2 * 60));
 	      cdclrl( MSG_LIN1, 1 );
 	      upddsp = TRUE;
 	      break;
@@ -719,7 +392,7 @@ void watch(void)
 	    case 'r':	/* reset to beginning */
 	      cdputs( "Rewinding...", MSG_LIN1, 0);
 	      cdrefresh();
-	      fileSeek(startTime);
+	      pbFileSeek(startTime);
 	      cdclrl( MSG_LIN1, 1 );
 	      upddsp = TRUE;
 	      break;
@@ -810,7 +483,7 @@ void watch(void)
 	      break;
 
 	    case '/':                /* ship list - dwp */
-	      playlist( TRUE, FALSE, 0 );
+	      cumPlayList( TRUE, FALSE, 0 );
 	      Context.redraw = TRUE;
 	      upddsp = TRUE;
 	      break;
@@ -835,7 +508,7 @@ void watch(void)
 
 		      for (i=1; i <= MAXSHIPS; i++)
 			{
-			  if (stillalive(i))
+			  if (clbStillAlive(i))
 			    {
 			      foundone = TRUE;
 			    }
@@ -876,7 +549,7 @@ void watch(void)
 		  Context.redraw = TRUE;
 		      
 		  if (live_ships)
-		    if ((snum > 0 && stillalive(snum)) || 
+		    if ((snum > 0 && clbStillAlive(snum)) || 
 			(snum == DISPLAY_DOOMSDAY && Doomsday->status == DS_LIVE))
 		      {
 			Context.snum = snum;
@@ -909,7 +582,7 @@ void watch(void)
 
 		      for (i=1; i <= MAXSHIPS; i++)
 			{
-			  if (stillalive(i))
+			  if (clbStillAlive(i))
 			    {
 			      foundone = TRUE;
 			    }
@@ -951,7 +624,7 @@ void watch(void)
 		  Context.redraw = TRUE;
 		      
 		  if (live_ships)
-		    if ((snum > 0 && stillalive(snum)) || 
+		    if ((snum > 0 && clbStillAlive(snum)) || 
 			(snum == DISPLAY_DOOMSDAY && Doomsday->status == DS_LIVE))
 		      {
 			Context.snum = snum;
@@ -974,7 +647,7 @@ void watch(void)
 	      break;
 	    default:
 	      cdbeep();
-	      c_putmsg( "Type h for help.", MSG_LIN2 );
+	      cumPutMsg( "Type h for help.", MSG_LIN2 );
 	      break;
 	    }
 	} /* end while */
@@ -1064,7 +737,7 @@ void dowatchhelp(void)
 {
   int lin, col, tlin;
   int ch;
-  int FirstTime = TRUE;
+  static int FirstTime = TRUE;
   static char sfmt[MSGMAXLINE * 2];
 
   if (FirstTime == TRUE)
@@ -1118,7 +791,7 @@ void dowatchhelp(void)
   tlin++;
   cprintf(tlin,col,ALIGN_NONE,sfmt, "!", "display toggle line");
 
-  putpmt( MTXT_DONE, MSG_LIN2 );
+  cumPutPrompt( MTXT_DONE, MSG_LIN2 );
   cdrefresh();
   while ( ! iogtimed( &ch, 1.0 ) )
     ;

@@ -14,6 +14,7 @@
 /**********************************************************************/
 
 #include "defs.h"
+#include "cprintf.h"
 
 #ifndef GLOBAL_H
 #define GLOBAL_H
@@ -33,12 +34,6 @@ CEXTERN    int RMsg_Line;
 
 #define LOCKMSG      (0)	/* lock the message portion  */
 #define LOCKCMN      (1)	/* lock everything else  */
-
-/* cprintf align values */
-#define ALIGN_CENTER 3
-#define ALIGN_LEFT   2
-#define ALIGN_RIGHT  1
-#define ALIGN_NONE   0
 
 CEXTERN int headerflag;         /* whether to show header flag */
 

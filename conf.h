@@ -101,10 +101,12 @@ typedef struct _userConf {
 
 				/* can see friendly torps on LR scan? */
   int DoLRTorpScan;
-				/* (M)ap is actually LongeRange scan? */
+                              /* (M)ap is actually LongeRange scan? */
   int DoLocalLRScan;
-				/* (I)nfo cmds return ETA data? */
+                                /* (I)nfo cmds return ETA data? */
   int DoETAStats;
+     /* for the GL client only - draws a red box around enemy ships */
+  int EnemyShipBox;
 
   char MacrosF[MAX_MACROS][MAX_MACRO_LEN];
 
@@ -160,7 +162,7 @@ void confSetTelnetClientMode(int telnetc);
 CEXTERN int GetSysConf(int checkonly);
 CEXTERN int GetConf(int usernum);
 CEXTERN int MakeSysConf(void);
-CEXTERN int SaveUserConfig(int unum);
+CEXTERN int SaveUserConfig(void);
 CEXTERN int SaveSysConfig(void);
 CEXTERN char *Str2Macro(char *str);
 CEXTERN char *Macro2Str(char *str);
@@ -636,6 +638,20 @@ struct Conf ConfData[] =
       "# define this as 'true' if you want Estimated Time of Arrival (ETA)",
       "#  information to be computed and displayed when getting (I)nfo on",
       "#  another object.  Default: true",
+      NULL
+    }
+  },
+  {
+    TRUE,
+    CTYPE_BOOL,
+    "do_enemyshipbox=",
+    &UserConf.EnemyShipBox,
+    0, 0,			/* mix/max */
+    "Draw a red box around enemy ships (GL client only)",
+    {
+      "# define this as 'true' if you want a red box drawn around",
+      "#  enemy ships on the viewer.  Valid for GL client only.",
+      "#  Default: true",
       NULL
     }
   },

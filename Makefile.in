@@ -49,7 +49,7 @@ CCDEPMODE = @CCDEPMODE@
 
 
 # User defineable options
-CFLAGS = @CONQ_CFLAGS@ 
+CFLAGS = @CONQ_CFLAGS@ -g3 -DNDEBUG
 CONQGROUP = @CONQGROUP@
 CONQ_CFLAGS = @CONQ_CFLAGS@
 CPP = @CPP@
@@ -64,6 +64,8 @@ ECHO_T = @ECHO_T@
 EGREP = @EGREP@
 EXEEXT = @EXEEXT@
 FILEPRIV = @FILEPRIV@
+GLCLIENT_FALSE = @GLCLIENT_FALSE@
+GLCLIENT_TRUE = @GLCLIENT_TRUE@
 INSTALL_DATA = @INSTALL_DATA@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
 INSTALL_SCRIPT = @INSTALL_SCRIPT@
@@ -136,27 +138,33 @@ CONQLIBEXECDIR = @libexecdir@
 CONQDATADIR = @datadir@
 CONQSYSCONFDIR = @sysconfdir@
 CONQIMGDIR = $(CONQDATADIR)/img
+IMAGES = img/classd.bmp img/classm.bmp img/doomsday.bmp img/explode.bmp \
+	img/shipfcr.bmp img/shipfde.bmp img/shipfsc.bmp img/shipkcr.bmp \
+	img/shipkde.bmp img/shipksc.bmp img/shipocr.bmp img/shipode.bmp \
+	img/shiposc.bmp img/shiprcr.bmp img/shiprde.bmp img/shiprsc.bmp \
+	img/star.bmp img/fixed.txf img/msg.txf img/large.txf img/vbg.bmp
 
-#IMAGES = img/classd.bmp img/classm.bmp img/doomsday.bmp img/explode.bmp \
-#	img/shipfcr.bmp img/shipfde.bmp img/shipfsc.bmp img/shipkcr.bmp \
-#	img/shipkde.bmp img/shipksc.bmp img/shipocr.bmp img/shipode.bmp \
-#	img/shiposc.bmp img/shiprcr.bmp img/shiprde.bmp img/shiprsc.bmp \
-#	img/star.bmp
 
-#XLIBS = @X_LIBS@ @X_EXTRA_LIBS@ -lGLw -lGL -lGLU -lXm -lXp -lXt @X_PRE_LIBS@ -lX11 -lXmu  
+XLIBS = @X_LIBS@ @X_EXTRA_LIBS@ -lglut -lGL -lGLU -lXt @X_PRE_LIBS@ -lXext -lXi -lX11 -lXmu  
+
 INCLUDES = -DCONQUEST_GROUP=\"$(CONQGROUP)\" \
 	-DCONQSTATE=\"$(CONQLOCALSTATEDIR)\" -DCONQLIBEXEC=\"$(CONQLIBEXECDIR)\" \
 	-DCONQSHARE=\"$(CONQDATADIR)\" -DCONQETC=\"$(CONQSYSCONFDIR)\" \
-	-DCONQUESTSH_EXEC=\"$(DESTDIR)$(bindir)/conquest$(EXEEXT)\"
+	-DCONQUESTSH_EXEC=\"$(DESTDIR)$(bindir)/conquest$(EXEEXT)\" \
+	@X_CFLAGS@
 
 
-
-#@X_CFLAGS@
 AM_YFLAGS = -d
+@GLCLIENT_FALSE@lib_LTLIBRARIES = libconquest.la libconqclnt.la libconqserv.la \
+@GLCLIENT_FALSE@	libUi.la libUiCU.la
 
-lib_LTLIBRARIES = libconquest.la libconqclnt.la libconqserv.la
-libconquest_la_SOURCES = conqai.c ratfor.c cd2lb.c display.c iolb.c  \
-	conqlb.c rndlb.c conqmisc.c conqutil.c conqcm.c \
+
+@GLCLIENT_TRUE@lib_LTLIBRARIES = libconquest.la libconqclnt.la libconqserv.la \
+@GLCLIENT_TRUE@	libUi.la libUiGL.la libUiCU.la
+
+
+libconquest_la_SOURCES = conqai.c ratfor.c  \
+	conqlb.h conqlb.c rndlb.c conqutil.c conqcm.c \
 	conqsvr42.c global.c ibuf.c version.c conf.c sem.c color.c \
 	userauth.c record.c color.h user.h shiptype.h \
 	ship.h planet.h team.h msg.h doomsday.h driver.h conqinfo.h \
@@ -168,7 +176,9 @@ libconquest_la_LIBADD = @LTLIBOBJS@
 
 libconquest_la_LDFLAGS = -version-info 1:0:0
 
-libconqclnt_la_SOURCES = clntauth.c client.c client.h clientlb.c clientlb.h options.c 
+libconqclnt_la_SOURCES = client.c client.h clientlb.c clientlb.h \
+	playback.h playback.c
+
 
 libconqclnt_la_LDFLAGS = -version-info 1:0:0
 
@@ -178,42 +188,72 @@ libconqserv_la_SOURCES = servauth.c server.c servauth.h server.h serverpkt.c \
 
 libconqserv_la_LDFLAGS = -version-info 1:0:0
 
-bin_PROGRAMS = conquest conqai conqoper conqstrat conqreplay conquestd \
-	conquestsh conqmetad
+libUi_la_SOURCES = ui.h uimisc.c
+
+libUi_la_LDFLAGS = -version-info 1:0:0
+
+libUiGL_la_SOURCES = GL.c texfont.c glfont.c glfont.h \
+	glmisc.c glmisc.h nConsvr.c nConsvr.h nMeta.h nMeta.c cqkeys.h \
+        prm.h prm.c nAuth.h nAuth.c nWelcome.h nWelcome.c nMenu.h nMenu.c \
+	nPlay.h nPlay.c nCP.h nCP.c nDead.h nDead.c nCPHelp.h nCPHelp.c \
+	nShipl.h nShipl.c node.h node.c nPlanetl.h nPlanetl.c nTeaml.h \
+	nTeaml.c nUserl.h nUserl.c nHistl.h nHistl.c cprintf.h glcprintf.c \
+	gldisplay.h gldisplay.c disputil.h render.h render.c \
+	nPlayBMenu.h nPlayBMenu.c nPlayB.h nPlayB.c nPlayBHelp.h \
+	nPlayBHelp.c nOptions.h nOptions.c colorGL.c ui.h
+
+
+libUiGL_la_LDFLAGS = -version-info 1:0:0
+
+libUiCU_la_SOURCES = display.c cprintf.h cprintf.c disputil.h colorCU.c \
+	cd2lb.h cd2lb.c iolb.h iolb.c cumisc.h cumisc.c cuclient.h \
+	cuclient.c options.h options.c clntauth.c ui.h display.h
+
+
+libUiCU_la_LDFLAGS = -version-info 1:0:0
+@GLCLIENT_FALSE@bin_PROGRAMS = conquest conqai conqoper conqstrat conqreplay \
+@GLCLIENT_FALSE@	conquestd conquestsh conqmetad
+
+
+@GLCLIENT_TRUE@bin_PROGRAMS = conquest conquestgl conqai conqoper conqstrat conqreplay \
+@GLCLIENT_TRUE@	conquestd conquestsh conqmetad
 
 
 libexec_PROGRAMS = conqdriv
 
 conquest_SOURCES = conquest.c c_defs.h defs.h conqdef.h conqcom.h context.h
-conquest_LDADD = libconqclnt.la libconquest.la $(XLIBS)
+conquest_LDADD = libconqclnt.la libconquest.la libUi.la libUiCU.la 
+
+conquestgl_SOURCES = conquestgl.c c_defs.h defs.h conqdef.h conqcom.h context.h
+conquestgl_LDADD = libconqclnt.la libconquest.la libUi.la libUiGL.la $(XLIBS)
 
 conquestd_SOURCES = conquestd.c c_defs.h defs.h conqdef.h conqcom.h \
 	context.h conqnet.h
 
-conquestd_LDADD = libconqserv.la libconquest.la $(XLIBS)
+conquestd_LDADD = libconqserv.la libconquest.la 
 
 conqai_SOURCES = conqai_main.c c_defs.h defs.h conqdef.h conqcom.h \
                  context.h conqdata.h
 
 
-conqai_LDADD = libconquest.la $(XLIBS)
+conqai_LDADD = libconquest.la 
 
 conqoper_SOURCES = conqoper.c c_defs.h defs.h conqdef.h conqcom.h context.h
-conqoper_LDADD = libconqclnt.la libconquest.la $(XLIBS)
+conqoper_LDADD = libconqclnt.la libconquest.la libUi.la libUiCU.la 
 
 conqdriv_SOURCES = conqdriv.c c_defs.h defs.h conqdef.h conqcom.h context.h
-conqdriv_LDADD = libconquest.la $(XLIBS)
+conqdriv_LDADD = libconquest.la 
 
 conqstrat_SOURCES = conqstrat-yacc.y conqstrat-lex.l conqstrat.h
-conqstrat_LDADD = libconquest.la $(LEXLIB) $(YACCLIB) $(XLIBS)
+conqstrat_LDADD = libconquest.la $(LEXLIB) $(YACCLIB) 
 
 conqreplay_SOURCES = conqreplay.c c_defs.h defs.h conqdef.h conqcom.h context.h record.h
-conqreplay_LDADD = libconqclnt.la libconquest.la $(XLIBS)
+conqreplay_LDADD = libconqclnt.la libconquest.la libUi.la libUiCU.la 
 
 conquestsh_SOURCES = conquestsh.c
 
 conqmetad_SOURCES = conqmetad.c meta.h
-conqmetad_LDADD = libconquest.la
+conqmetad_LDADD = libconquest.la 
 
 data_DATA = conquest.doc conqnews.doc README conqrule 
 
@@ -226,22 +266,41 @@ CONFIG_HEADER = config.h
 CONFIG_CLEAN_FILES =
 LTLIBRARIES = $(lib_LTLIBRARIES)
 
+libUi_la_LIBADD =
+am_libUi_la_OBJECTS = uimisc.lo
+libUi_la_OBJECTS = $(am_libUi_la_OBJECTS)
+libUiCU_la_LIBADD =
+am_libUiCU_la_OBJECTS = display.lo cprintf.lo colorCU.lo cd2lb.lo \
+	iolb.lo cumisc.lo cuclient.lo options.lo clntauth.lo
+libUiCU_la_OBJECTS = $(am_libUiCU_la_OBJECTS)
+libUiGL_la_LIBADD =
+am_libUiGL_la_OBJECTS = GL.lo texfont.lo glfont.lo glmisc.lo nConsvr.lo \
+	nMeta.lo prm.lo nAuth.lo nWelcome.lo nMenu.lo nPlay.lo nCP.lo \
+	nDead.lo nCPHelp.lo nShipl.lo node.lo nPlanetl.lo nTeaml.lo \
+	nUserl.lo nHistl.lo glcprintf.lo gldisplay.lo render.lo \
+	nPlayBMenu.lo nPlayB.lo nPlayBHelp.lo nOptions.lo colorGL.lo
+libUiGL_la_OBJECTS = $(am_libUiGL_la_OBJECTS)
 libconqclnt_la_LIBADD =
-am_libconqclnt_la_OBJECTS = clntauth.lo client.lo clientlb.lo options.lo
+am_libconqclnt_la_OBJECTS = client.lo clientlb.lo playback.lo
 libconqclnt_la_OBJECTS = $(am_libconqclnt_la_OBJECTS)
 libconqserv_la_LIBADD =
 am_libconqserv_la_OBJECTS = servauth.lo server.lo serverpkt.lo \
 	servercmd.lo
 libconqserv_la_OBJECTS = $(am_libconqserv_la_OBJECTS)
 libconquest_la_DEPENDENCIES = @LTLIBOBJS@
-am_libconquest_la_OBJECTS = conqai.lo ratfor.lo cd2lb.lo display.lo \
-	iolb.lo conqlb.lo rndlb.lo conqmisc.lo conqutil.lo conqcm.lo \
-	conqsvr42.lo global.lo ibuf.lo version.lo conf.lo sem.lo \
-	color.lo userauth.lo record.lo packet.lo meta.lo
+am_libconquest_la_OBJECTS = conqai.lo ratfor.lo conqlb.lo rndlb.lo \
+	conqutil.lo conqcm.lo conqsvr42.lo global.lo ibuf.lo version.lo \
+	conf.lo sem.lo color.lo userauth.lo record.lo packet.lo meta.lo
 libconquest_la_OBJECTS = $(am_libconquest_la_OBJECTS)
-bin_PROGRAMS = conquest$(EXEEXT) conqai$(EXEEXT) conqoper$(EXEEXT) \
-	conqstrat$(EXEEXT) conqreplay$(EXEEXT) conquestd$(EXEEXT) \
-	conquestsh$(EXEEXT) conqmetad$(EXEEXT)
+@GLCLIENT_TRUE@bin_PROGRAMS = conquest$(EXEEXT) conquestgl$(EXEEXT) \
+@GLCLIENT_TRUE@	conqai$(EXEEXT) conqoper$(EXEEXT) \
+@GLCLIENT_TRUE@	conqstrat$(EXEEXT) conqreplay$(EXEEXT) \
+@GLCLIENT_TRUE@	conquestd$(EXEEXT) conquestsh$(EXEEXT) \
+@GLCLIENT_TRUE@	conqmetad$(EXEEXT)
+@GLCLIENT_FALSE@bin_PROGRAMS = conquest$(EXEEXT) conqai$(EXEEXT) \
+@GLCLIENT_FALSE@	conqoper$(EXEEXT) conqstrat$(EXEEXT) \
+@GLCLIENT_FALSE@	conqreplay$(EXEEXT) conquestd$(EXEEXT) \
+@GLCLIENT_FALSE@	conquestsh$(EXEEXT) conqmetad$(EXEEXT)
 libexec_PROGRAMS = conqdriv$(EXEEXT)
 PROGRAMS = $(bin_PROGRAMS) $(libexec_PROGRAMS)
 
@@ -259,11 +318,13 @@ conqmetad_DEPENDENCIES = libconquest.la
 conqmetad_LDFLAGS =
 am_conqoper_OBJECTS = conqoper.$(OBJEXT)
 conqoper_OBJECTS = $(am_conqoper_OBJECTS)
-conqoper_DEPENDENCIES = libconqclnt.la libconquest.la
+conqoper_DEPENDENCIES = libconqclnt.la libconquest.la libUi.la \
+	libUiCU.la
 conqoper_LDFLAGS =
 am_conqreplay_OBJECTS = conqreplay.$(OBJEXT)
 conqreplay_OBJECTS = $(am_conqreplay_OBJECTS)
-conqreplay_DEPENDENCIES = libconqclnt.la libconquest.la
+conqreplay_DEPENDENCIES = libconqclnt.la libconquest.la libUi.la \
+	libUiCU.la
 conqreplay_LDFLAGS =
 am_conqstrat_OBJECTS = conqstrat-yacc.$(OBJEXT) conqstrat-lex.$(OBJEXT)
 conqstrat_OBJECTS = $(am_conqstrat_OBJECTS)
@@ -271,12 +332,18 @@ conqstrat_DEPENDENCIES = libconquest.la
 conqstrat_LDFLAGS =
 am_conquest_OBJECTS = conquest.$(OBJEXT)
 conquest_OBJECTS = $(am_conquest_OBJECTS)
-conquest_DEPENDENCIES = libconqclnt.la libconquest.la
+conquest_DEPENDENCIES = libconqclnt.la libconquest.la libUi.la \
+	libUiCU.la
 conquest_LDFLAGS =
 am_conquestd_OBJECTS = conquestd.$(OBJEXT)
 conquestd_OBJECTS = $(am_conquestd_OBJECTS)
 conquestd_DEPENDENCIES = libconqserv.la libconquest.la
 conquestd_LDFLAGS =
+am_conquestgl_OBJECTS = conquestgl.$(OBJEXT)
+conquestgl_OBJECTS = $(am_conquestgl_OBJECTS)
+conquestgl_DEPENDENCIES = libconqclnt.la libconquest.la libUi.la \
+	libUiGL.la
+conquestgl_LDFLAGS =
 am_conquestsh_OBJECTS = conquestsh.$(OBJEXT)
 conquestsh_OBJECTS = $(am_conquestsh_OBJECTS)
 conquestsh_LDADD = $(LDADD)
@@ -286,27 +353,45 @@ conquestsh_LDFLAGS =
 DEFAULT_INCLUDES =  -I. -I$(srcdir) -I.
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
-@AMDEP_TRUE@DEP_FILES = $(DEPDIR)/snprintf.Plo ./$(DEPDIR)/cd2lb.Plo \
-@AMDEP_TRUE@	./$(DEPDIR)/client.Plo ./$(DEPDIR)/clientlb.Plo \
-@AMDEP_TRUE@	./$(DEPDIR)/clntauth.Plo ./$(DEPDIR)/color.Plo \
-@AMDEP_TRUE@	./$(DEPDIR)/conf.Plo ./$(DEPDIR)/conqai.Plo \
-@AMDEP_TRUE@	./$(DEPDIR)/conqai_main.Po ./$(DEPDIR)/conqcm.Plo \
-@AMDEP_TRUE@	./$(DEPDIR)/conqdriv.Po ./$(DEPDIR)/conqlb.Plo \
-@AMDEP_TRUE@	./$(DEPDIR)/conqmetad.Po ./$(DEPDIR)/conqmisc.Plo \
+@AMDEP_TRUE@DEP_FILES = $(DEPDIR)/snprintf.Plo ./$(DEPDIR)/GL.Plo \
+@AMDEP_TRUE@	./$(DEPDIR)/cd2lb.Plo ./$(DEPDIR)/client.Plo \
+@AMDEP_TRUE@	./$(DEPDIR)/clientlb.Plo ./$(DEPDIR)/clntauth.Plo \
+@AMDEP_TRUE@	./$(DEPDIR)/color.Plo ./$(DEPDIR)/colorCU.Plo \
+@AMDEP_TRUE@	./$(DEPDIR)/colorGL.Plo ./$(DEPDIR)/conf.Plo \
+@AMDEP_TRUE@	./$(DEPDIR)/conqai.Plo ./$(DEPDIR)/conqai_main.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/conqcm.Plo ./$(DEPDIR)/conqdriv.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/conqlb.Plo ./$(DEPDIR)/conqmetad.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/conqoper.Po ./$(DEPDIR)/conqreplay.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/conqstrat-lex.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/conqstrat-yacc.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/conqsvr42.Plo ./$(DEPDIR)/conquest.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/conquestd.Po ./$(DEPDIR)/conquestsh.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/conqutil.Plo ./$(DEPDIR)/display.Plo \
+@AMDEP_TRUE@	./$(DEPDIR)/conquestd.Po ./$(DEPDIR)/conquestgl.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/conquestsh.Po ./$(DEPDIR)/conqutil.Plo \
+@AMDEP_TRUE@	./$(DEPDIR)/cprintf.Plo ./$(DEPDIR)/cuclient.Plo \
+@AMDEP_TRUE@	./$(DEPDIR)/cumisc.Plo ./$(DEPDIR)/display.Plo \
+@AMDEP_TRUE@	./$(DEPDIR)/glcprintf.Plo ./$(DEPDIR)/gldisplay.Plo \
+@AMDEP_TRUE@	./$(DEPDIR)/glfont.Plo ./$(DEPDIR)/glmisc.Plo \
 @AMDEP_TRUE@	./$(DEPDIR)/global.Plo ./$(DEPDIR)/ibuf.Plo \
 @AMDEP_TRUE@	./$(DEPDIR)/iolb.Plo ./$(DEPDIR)/meta.Plo \
+@AMDEP_TRUE@	./$(DEPDIR)/nAuth.Plo ./$(DEPDIR)/nCP.Plo \
+@AMDEP_TRUE@	./$(DEPDIR)/nCPHelp.Plo ./$(DEPDIR)/nConsvr.Plo \
+@AMDEP_TRUE@	./$(DEPDIR)/nDead.Plo ./$(DEPDIR)/nHistl.Plo \
+@AMDEP_TRUE@	./$(DEPDIR)/nMenu.Plo ./$(DEPDIR)/nMeta.Plo \
+@AMDEP_TRUE@	./$(DEPDIR)/nOptions.Plo ./$(DEPDIR)/nPlanetl.Plo \
+@AMDEP_TRUE@	./$(DEPDIR)/nPlay.Plo ./$(DEPDIR)/nPlayB.Plo \
+@AMDEP_TRUE@	./$(DEPDIR)/nPlayBHelp.Plo \
+@AMDEP_TRUE@	./$(DEPDIR)/nPlayBMenu.Plo ./$(DEPDIR)/nShipl.Plo \
+@AMDEP_TRUE@	./$(DEPDIR)/nTeaml.Plo ./$(DEPDIR)/nUserl.Plo \
+@AMDEP_TRUE@	./$(DEPDIR)/nWelcome.Plo ./$(DEPDIR)/node.Plo \
 @AMDEP_TRUE@	./$(DEPDIR)/options.Plo ./$(DEPDIR)/packet.Plo \
+@AMDEP_TRUE@	./$(DEPDIR)/playback.Plo ./$(DEPDIR)/prm.Plo \
 @AMDEP_TRUE@	./$(DEPDIR)/ratfor.Plo ./$(DEPDIR)/record.Plo \
-@AMDEP_TRUE@	./$(DEPDIR)/rndlb.Plo ./$(DEPDIR)/sem.Plo \
-@AMDEP_TRUE@	./$(DEPDIR)/servauth.Plo ./$(DEPDIR)/server.Plo \
-@AMDEP_TRUE@	./$(DEPDIR)/servercmd.Plo ./$(DEPDIR)/serverpkt.Plo \
-@AMDEP_TRUE@	./$(DEPDIR)/userauth.Plo ./$(DEPDIR)/version.Plo
+@AMDEP_TRUE@	./$(DEPDIR)/render.Plo ./$(DEPDIR)/rndlb.Plo \
+@AMDEP_TRUE@	./$(DEPDIR)/sem.Plo ./$(DEPDIR)/servauth.Plo \
+@AMDEP_TRUE@	./$(DEPDIR)/server.Plo ./$(DEPDIR)/servercmd.Plo \
+@AMDEP_TRUE@	./$(DEPDIR)/serverpkt.Plo ./$(DEPDIR)/texfont.Plo \
+@AMDEP_TRUE@	./$(DEPDIR)/uimisc.Plo ./$(DEPDIR)/userauth.Plo \
+@AMDEP_TRUE@	./$(DEPDIR)/version.Plo
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 LTCOMPILE = $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) \
@@ -318,10 +403,12 @@ LEXCOMPILE = $(LEX) $(LFLAGS) $(AM_LFLAGS)
 LTLEXCOMPILE = $(LIBTOOL) --mode=compile $(LEX) $(LFLAGS) $(AM_LFLAGS)
 YACCCOMPILE = $(YACC) $(YFLAGS) $(AM_YFLAGS)
 LTYACCCOMPILE = $(LIBTOOL) --mode=compile $(YACC) $(YFLAGS) $(AM_YFLAGS)
-DIST_SOURCES = $(libconqclnt_la_SOURCES) $(libconqserv_la_SOURCES) \
-	$(libconquest_la_SOURCES) $(conqai_SOURCES) $(conqdriv_SOURCES) \
-	$(conqmetad_SOURCES) $(conqoper_SOURCES) $(conqreplay_SOURCES) \
-	$(conqstrat_SOURCES) $(conquest_SOURCES) $(conquestd_SOURCES) \
+DIST_SOURCES = $(libUi_la_SOURCES) $(libUiCU_la_SOURCES) \
+	$(libUiGL_la_SOURCES) $(libconqclnt_la_SOURCES) \
+	$(libconqserv_la_SOURCES) $(libconquest_la_SOURCES) \
+	$(conqai_SOURCES) $(conqdriv_SOURCES) $(conqmetad_SOURCES) \
+	$(conqoper_SOURCES) $(conqreplay_SOURCES) $(conqstrat_SOURCES) \
+	$(conquest_SOURCES) $(conquestd_SOURCES) $(conquestgl_SOURCES) \
 	$(conquestsh_SOURCES)
 DATA = $(data_DATA)
 
@@ -329,7 +416,7 @@ DIST_COMMON = README INSTALL Makefile.am Makefile.in acinclude.m4 \
 	aclocal.m4 config.guess config.h.in config.sub configure \
 	configure.ac conqstrat-lex.c conqstrat-yacc.c conqstrat-yacc.h \
 	depcomp install-sh ltmain.sh missing mkinstalldirs snprintf.c
-SOURCES = $(libconqclnt_la_SOURCES) $(libconqserv_la_SOURCES) $(libconquest_la_SOURCES) $(conqai_SOURCES) $(conqdriv_SOURCES) $(conqmetad_SOURCES) $(conqoper_SOURCES) $(conqreplay_SOURCES) $(conqstrat_SOURCES) $(conquest_SOURCES) $(conquestd_SOURCES) $(conquestsh_SOURCES)
+SOURCES = $(libUi_la_SOURCES) $(libUiCU_la_SOURCES) $(libUiGL_la_SOURCES) $(libconqclnt_la_SOURCES) $(libconqserv_la_SOURCES) $(libconquest_la_SOURCES) $(conqai_SOURCES) $(conqdriv_SOURCES) $(conqmetad_SOURCES) $(conqoper_SOURCES) $(conqreplay_SOURCES) $(conqstrat_SOURCES) $(conquest_SOURCES) $(conquestd_SOURCES) $(conquestgl_SOURCES) $(conquestsh_SOURCES)
 
 all: config.h
 	$(MAKE) $(AM_MAKEFLAGS) all-am
@@ -397,6 +484,12 @@ clean-libLTLIBRARIES:
 	  echo "rm -f \"$${dir}/so_locations\""; \
 	  rm -f "$${dir}/so_locations"; \
 	done
+libUi.la: $(libUi_la_OBJECTS) $(libUi_la_DEPENDENCIES) 
+	$(LINK) -rpath $(libdir) $(libUi_la_LDFLAGS) $(libUi_la_OBJECTS) $(libUi_la_LIBADD) $(LIBS)
+libUiCU.la: $(libUiCU_la_OBJECTS) $(libUiCU_la_DEPENDENCIES) 
+	$(LINK) -rpath $(libdir) $(libUiCU_la_LDFLAGS) $(libUiCU_la_OBJECTS) $(libUiCU_la_LIBADD) $(LIBS)
+libUiGL.la: $(libUiGL_la_OBJECTS) $(libUiGL_la_DEPENDENCIES) 
+	$(LINK) -rpath $(libdir) $(libUiGL_la_LDFLAGS) $(libUiGL_la_OBJECTS) $(libUiGL_la_LIBADD) $(LIBS)
 libconqclnt.la: $(libconqclnt_la_OBJECTS) $(libconqclnt_la_DEPENDENCIES) 
 	$(LINK) -rpath $(libdir) $(libconqclnt_la_LDFLAGS) $(libconqclnt_la_OBJECTS) $(libconqclnt_la_LIBADD) $(LIBS)
 libconqserv.la: $(libconqserv_la_OBJECTS) $(libconqserv_la_DEPENDENCIES) 
@@ -490,6 +583,9 @@ conquest$(EXEEXT): $(conquest_OBJECTS) $(conquest_DEPENDENCIES)
 conquestd$(EXEEXT): $(conquestd_OBJECTS) $(conquestd_DEPENDENCIES) 
 	@rm -f conquestd$(EXEEXT)
 	$(LINK) $(conquestd_LDFLAGS) $(conquestd_OBJECTS) $(conquestd_LDADD) $(LIBS)
+conquestgl$(EXEEXT): $(conquestgl_OBJECTS) $(conquestgl_DEPENDENCIES) 
+	@rm -f conquestgl$(EXEEXT)
+	$(LINK) $(conquestgl_LDFLAGS) $(conquestgl_OBJECTS) $(conquestgl_LDADD) $(LIBS)
 conquestsh$(EXEEXT): $(conquestsh_OBJECTS) $(conquestsh_DEPENDENCIES) 
 	@rm -f conquestsh$(EXEEXT)
 	$(LINK) $(conquestsh_LDFLAGS) $(conquestsh_OBJECTS) $(conquestsh_LDADD) $(LIBS)
@@ -501,11 +597,14 @@ distclean-compile:
 	-rm -f *.tab.c
 
 @AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/snprintf.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/GL.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cd2lb.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/client.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/clientlb.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/clntauth.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/color.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/colorCU.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/colorGL.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/conf.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/conqai.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/conqai_main.Po@am__quote@
@@ -513,7 +612,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/conqdriv.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/conqlb.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/conqmetad.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/conqmisc.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/conqoper.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/conqreplay.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/conqstrat-lex.Po@am__quote@
@@ -521,23 +619,55 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/conqsvr42.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/conquest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/conquestd.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/conquestgl.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/conquestsh.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/conqutil.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cprintf.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cuclient.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cumisc.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/display.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/glcprintf.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gldisplay.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/glfont.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/glmisc.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/global.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ibuf.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/iolb.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/meta.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/nAuth.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/nCP.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/nCPHelp.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/nConsvr.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/nDead.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/nHistl.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/nMenu.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/nMeta.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/nOptions.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/nPlanetl.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/nPlay.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/nPlayB.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/nPlayBHelp.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/nPlayBMenu.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/nShipl.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/nTeaml.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/nUserl.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/nWelcome.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/node.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/options.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/packet.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/playback.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/prm.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ratfor.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/record.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/render.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/rndlb.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sem.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/servauth.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/server.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/servercmd.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/serverpkt.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/texfont.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/uimisc.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/userauth.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/version.Plo@am__quote@
 
@@ -906,8 +1036,8 @@ install-exec-hook:
 		$(DESTDIR)$(CONQIMGDIR)
 	chmod 775 $(DESTDIR)$(CONQLOCALSTATEDIR) 
 	chgrp $(CONQGROUP) $(DESTDIR)$(CONQLOCALSTATEDIR)
-#	cp -f $(IMAGES) $(CONQIMGDIR)/
-#	chmod 644 $(CONQIMGDIR)/*.bmp
+	cp -f $(IMAGES) $(CONQIMGDIR)/
+	chmod 644 $(CONQIMGDIR)/*.bmp $(CONQIMGDIR)/*.txf
 	chmod 755 $(prefix) $(DESTDIR)$(datadir)
 	chgrp $(CONQGROUP) $(DESTDIR)$(bindir)/conqoper$(EXEEXT) \
 		$(DESTDIR)$(libexecdir)/conqdriv$(EXEEXT) \

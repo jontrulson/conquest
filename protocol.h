@@ -39,6 +39,7 @@
 #define SP_CONQINFO       17
 #define SP_FRAME          18    /* used in recording only */
 #define SP_HISTORY        19  
+#define SP_DOOMSDAY       20
 
 /* client -> server packet types */
 
@@ -351,6 +352,16 @@ typedef struct _sp_history {
  
   Unsgn32 histlog;
 } spHistory_t;
+
+typedef struct _sp_doomsday {
+  Unsgn8 type;			/* SP_DOOMSDAY */
+  Unsgn8 status;                /* DS_* */
+  Unsgn16 heading;              /* x10 */
+
+  Sgn32 x;			/* x1000 */
+  Sgn32 y;			/* x1000 */
+} spDoomsday_t;
+
 
 /* client -> server packets */
 typedef struct _cp_null {	/* never used */

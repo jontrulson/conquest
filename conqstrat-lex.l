@@ -41,7 +41,7 @@
 
 extern    int fd, rulenum;
 
-int goterror;
+int goterror = 0;
 int Lineno = 1; /* current line number of the scanner */
 
 

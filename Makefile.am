@@ -2,34 +2,40 @@ AUTOMAKE_OPTIONS = foreign
 
 # User defineable options
 
-CFLAGS = @CONQ_CFLAGS@ 
+CFLAGS = @CONQ_CFLAGS@ -g3 -DNDEBUG
 CONQGROUP = @CONQGROUP@
 CONQLOCALSTATEDIR = @localstatedir@/conquest
 CONQLIBEXECDIR = @libexecdir@
 CONQDATADIR = @datadir@
 CONQSYSCONFDIR = @sysconfdir@
 CONQIMGDIR = $(CONQDATADIR)/img
-#IMAGES = img/classd.bmp img/classm.bmp img/doomsday.bmp img/explode.bmp \
-#	img/shipfcr.bmp img/shipfde.bmp img/shipfsc.bmp img/shipkcr.bmp \
-#	img/shipkde.bmp img/shipksc.bmp img/shipocr.bmp img/shipode.bmp \
-#	img/shiposc.bmp img/shiprcr.bmp img/shiprde.bmp img/shiprsc.bmp \
-#	img/star.bmp
+IMAGES = img/classd.bmp img/classm.bmp img/doomsday.bmp img/explode.bmp \
+	img/shipfcr.bmp img/shipfde.bmp img/shipfsc.bmp img/shipkcr.bmp \
+	img/shipkde.bmp img/shipksc.bmp img/shipocr.bmp img/shipode.bmp \
+	img/shiposc.bmp img/shiprcr.bmp img/shiprde.bmp img/shiprsc.bmp \
+	img/star.bmp img/fixed.txf img/msg.txf img/large.txf img/vbg.bmp
 
 
-#XLIBS = @X_LIBS@ @X_EXTRA_LIBS@ -lGLw -lGL -lGLU -lXm -lXp -lXt @X_PRE_LIBS@ -lX11 -lXmu  
+XLIBS = @X_LIBS@ @X_EXTRA_LIBS@ -lglut -lGL -lGLU -lXt @X_PRE_LIBS@ -lXext -lXi -lX11 -lXmu  
 
 INCLUDES = -DCONQUEST_GROUP=\"$(CONQGROUP)\" \
 	-DCONQSTATE=\"$(CONQLOCALSTATEDIR)\" -DCONQLIBEXEC=\"$(CONQLIBEXECDIR)\" \
 	-DCONQSHARE=\"$(CONQDATADIR)\" -DCONQETC=\"$(CONQSYSCONFDIR)\" \
-	-DCONQUESTSH_EXEC=\"$(DESTDIR)$(bindir)/conquest$(EXEEXT)\"
-
-#@X_CFLAGS@
+	-DCONQUESTSH_EXEC=\"$(DESTDIR)$(bindir)/conquest$(EXEEXT)\" \
+	@X_CFLAGS@
 
 AM_YFLAGS = -d
 
-lib_LTLIBRARIES = libconquest.la libconqclnt.la libconqserv.la
-libconquest_la_SOURCES = conqai.c ratfor.c cd2lb.c display.c iolb.c  \
-	conqlb.c rndlb.c conqmisc.c conqutil.c conqcm.c \
+if GLCLIENT
+lib_LTLIBRARIES = libconquest.la libconqclnt.la libconqserv.la \
+	libUi.la libUiGL.la libUiCU.la
+else
+lib_LTLIBRARIES = libconquest.la libconqclnt.la libconqserv.la \
+	libUi.la libUiCU.la
+endif
+
+libconquest_la_SOURCES = conqai.c ratfor.c  \
+	conqlb.h conqlb.c rndlb.c conqutil.c conqcm.c \
 	conqsvr42.c global.c ibuf.c version.c conf.c sem.c color.c \
 	userauth.c record.c color.h user.h shiptype.h \
 	ship.h planet.h team.h msg.h doomsday.h driver.h conqinfo.h \
@@ -40,7 +46,8 @@ libconquest_la_LIBADD = @LTLIBOBJS@
 
 libconquest_la_LDFLAGS = -version-info 1:0:0
 
-libconqclnt_la_SOURCES = clntauth.c client.c client.h clientlb.c clientlb.h options.c 
+libconqclnt_la_SOURCES = client.c client.h clientlb.c clientlb.h \
+	playback.h playback.c
 
 libconqclnt_la_LDFLAGS = -version-info 1:0:0
 
@@ -49,39 +56,69 @@ libconqserv_la_SOURCES = servauth.c server.c servauth.h server.h serverpkt.c \
 
 libconqserv_la_LDFLAGS = -version-info 1:0:0
 
-bin_PROGRAMS = conquest conqai conqoper conqstrat conqreplay conquestd \
-	conquestsh conqmetad
+libUi_la_SOURCES = ui.h uimisc.c
+
+libUi_la_LDFLAGS = -version-info 1:0:0
+
+libUiGL_la_SOURCES = GL.c texfont.c glfont.c glfont.h \
+	glmisc.c glmisc.h nConsvr.c nConsvr.h nMeta.h nMeta.c cqkeys.h \
+        prm.h prm.c nAuth.h nAuth.c nWelcome.h nWelcome.c nMenu.h nMenu.c \
+	nPlay.h nPlay.c nCP.h nCP.c nDead.h nDead.c nCPHelp.h nCPHelp.c \
+	nShipl.h nShipl.c node.h node.c nPlanetl.h nPlanetl.c nTeaml.h \
+	nTeaml.c nUserl.h nUserl.c nHistl.h nHistl.c cprintf.h glcprintf.c \
+	gldisplay.h gldisplay.c disputil.h render.h render.c \
+	nPlayBMenu.h nPlayBMenu.c nPlayB.h nPlayB.c nPlayBHelp.h \
+	nPlayBHelp.c nOptions.h nOptions.c colorGL.c ui.h
+
+libUiGL_la_LDFLAGS = -version-info 1:0:0
+
+libUiCU_la_SOURCES = display.c cprintf.h cprintf.c disputil.h colorCU.c \
+	cd2lb.h cd2lb.c iolb.h iolb.c cumisc.h cumisc.c cuclient.h \
+	cuclient.c options.h options.c clntauth.c ui.h display.h
+
+libUiCU_la_LDFLAGS = -version-info 1:0:0
+
+if GLCLIENT
+bin_PROGRAMS = conquest conquestgl conqai conqoper conqstrat conqreplay \
+	conquestd conquestsh conqmetad
+else
+bin_PROGRAMS = conquest conqai conqoper conqstrat conqreplay \
+	conquestd conquestsh conqmetad
+endif
 
 libexec_PROGRAMS = conqdriv
           
 conquest_SOURCES = conquest.c c_defs.h defs.h conqdef.h conqcom.h context.h
-conquest_LDADD = libconqclnt.la libconquest.la $(XLIBS)
+conquest_LDADD = libconqclnt.la libconquest.la libUi.la libUiCU.la 
+
+conquestgl_SOURCES = conquestgl.c c_defs.h defs.h conqdef.h conqcom.h context.h
+conquestgl_LDADD = libconqclnt.la libconquest.la libUi.la libUiGL.la $(XLIBS)
 
 conquestd_SOURCES = conquestd.c c_defs.h defs.h conqdef.h conqcom.h \
 	context.h conqnet.h
-conquestd_LDADD = libconqserv.la libconquest.la $(XLIBS)
+conquestd_LDADD = libconqserv.la libconquest.la 
 
 conqai_SOURCES = conqai_main.c c_defs.h defs.h conqdef.h conqcom.h \
                  context.h conqdata.h
 
-conqai_LDADD = libconquest.la $(XLIBS)
+conqai_LDADD = libconquest.la 
 
 conqoper_SOURCES = conqoper.c c_defs.h defs.h conqdef.h conqcom.h context.h
-conqoper_LDADD = libconqclnt.la libconquest.la $(XLIBS)
+conqoper_LDADD = libconqclnt.la libconquest.la libUi.la libUiCU.la 
 
 conqdriv_SOURCES = conqdriv.c c_defs.h defs.h conqdef.h conqcom.h context.h
-conqdriv_LDADD = libconquest.la $(XLIBS)
+conqdriv_LDADD = libconquest.la 
 
 conqstrat_SOURCES = conqstrat-yacc.y conqstrat-lex.l conqstrat.h
-conqstrat_LDADD = libconquest.la $(LEXLIB) $(YACCLIB) $(XLIBS)
+conqstrat_LDADD = libconquest.la $(LEXLIB) $(YACCLIB) 
 
 conqreplay_SOURCES = conqreplay.c c_defs.h defs.h conqdef.h conqcom.h context.h record.h
-conqreplay_LDADD = libconqclnt.la libconquest.la $(XLIBS)
+conqreplay_LDADD = libconqclnt.la libconquest.la libUi.la libUiCU.la 
 
 conquestsh_SOURCES = conquestsh.c
 
 conqmetad_SOURCES = conqmetad.c meta.h
-conqmetad_LDADD = libconquest.la
+conqmetad_LDADD = libconquest.la 
 
 data_DATA = conquest.doc conqnews.doc README conqrule 
 #sysconf_DATA = conquestrc
@@ -95,8 +132,8 @@ install-exec-hook:
 		$(DESTDIR)$(CONQIMGDIR)
 	chmod 775 $(DESTDIR)$(CONQLOCALSTATEDIR) 
 	chgrp $(CONQGROUP) $(DESTDIR)$(CONQLOCALSTATEDIR)
-#	cp -f $(IMAGES) $(CONQIMGDIR)/
-#	chmod 644 $(CONQIMGDIR)/*.bmp
+	cp -f $(IMAGES) $(CONQIMGDIR)/
+	chmod 644 $(CONQIMGDIR)/*.bmp $(CONQIMGDIR)/*.txf
 	chmod 755 $(prefix) $(DESTDIR)$(datadir)
 	chgrp $(CONQGROUP) $(DESTDIR)$(bindir)/conqoper$(EXEEXT) \
 		$(DESTDIR)$(libexecdir)/conqdriv$(EXEEXT) \

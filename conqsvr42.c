@@ -29,14 +29,15 @@
 #include "context.h"
 #include "conf.h"
 #include "global.h"
+#include "conqlb.h"
 #include "record.h"
 
 #include "server.h"
-/* int GetUID(void) - return a User ID */
-int GetUID(char *name)
+/* int getUID(void) - return a User ID */
+int getUID(char *name)
 {
   struct passwd *conq_pwd;
-  char *myusername = glname();
+  char *myusername = clbGetUserLogname();
   char *chkname;
 
 #if defined(CYGWIN)
@@ -51,7 +52,7 @@ int GetUID(char *name)
 
   if ((conq_pwd = getpwnam(chkname)) == NULL)
     {
-      fprintf(stderr, "conqsvr42: GetUID(%s): can't get user: %s\n",
+      fprintf(stderr, "conqsvr42: getUID(%s): can't get user: %s\n",
 	      chkname,
 	      strerror(errno));
       
@@ -62,15 +63,15 @@ int GetUID(char *name)
 }
 
 
-/* int GetConquestGID(void) - return conquest's Group ID */
-int GetConquestGID(void)
+/* int getConquestGID(void) - return conquest's Group ID */
+int getConquestGID(void)
 {
   struct group *conq_grp;
   static int thegid;
   
   if ((conq_grp = getgrnam(CONQUEST_GROUP)) == NULL)
     {
-      fprintf(stderr, "conqsvr42: GetConquestGID(%s): can't get group: %s",
+      fprintf(stderr, "conqsvr42: getConquestGID(%s): can't get group: %s",
 	      CONQUEST_GROUP,
 	      strerror(errno));
       
@@ -377,23 +378,6 @@ void gcputime( int *cpu )
 }
 
 
-/*  helplesson - verbose help */
-/*  SYNOPSIS */
-/*    helplesson */
-void helplesson(void)
-{
-  
-  char buf[MSGMAXLINE];
-  char helpfile[BUFFER_SIZE];
-  
-  sprintf(helpfile, "%s/%s", CONQSHARE, C_CONQ_HELPFILE);
-  sprintf( buf, "%s: Can't open.", helpfile );
-  pagefile( helpfile, buf);
-  
-  return;
-  
-}
-
 
 /*  initstats - statistics setup */
 /*  SYNOPSIS */
@@ -447,7 +431,7 @@ int isagod( int unum )
   
   if (unum == -1)		/* get god status for current user */
     {
-      strncpy(myname, glname(), BUFFER_SIZE);
+      strncpy(myname, clbGetUserLogname(), BUFFER_SIZE);
       myname[BUFFER_SIZE - 1] = EOS;
     }
   else
@@ -502,21 +486,6 @@ int isagod( int unum )
 }
 
 #endif /* !CYGWIN */
-
-/*  news - list current happenings */
-/*  SYNOPSIS */
-/*    news */
-void news(void)
-{
-  char newsfile[BUFFER_SIZE];
-  
-  sprintf(newsfile, "%s/%s", CONQSHARE, C_CONQ_NEWSFILE);
-  
-  pagefile( newsfile, "No news is good news.");
-  
-  return;
-  
-}
 
 
 
@@ -584,7 +553,7 @@ void upstats( int *ctemp, int *etemp, int *caccum, int *eaccum, int *ctime, int 
 }
 
 /* return true if a process is alive, else false... */
-int CheckPid(int pidnum)
+int checkPID(int pidnum)
 {
   int rv;
 

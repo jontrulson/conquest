@@ -13,6 +13,9 @@
 #include "context.h"
 #include "conf.h"
 #include "color.h"
+#include "ui.h"
+#include "cd2lb.h"
+#include "cumisc.h"
 
 #include "conqnet.h"
 #include "packet.h"
@@ -22,36 +25,46 @@
 
 static void PrintStatus(int lin)
 {
-  char buf[MID_BUFFER_SIZE];
+  static char buf1[MID_BUFFER_SIZE];
+  static char buf2[MID_BUFFER_SIZE];
+  static char buf3[MID_BUFFER_SIZE];
+  static char buf4[MID_BUFFER_SIZE];
+  static char buf5[MID_BUFFER_SIZE];
+  static char buf6[MID_BUFFER_SIZE];
+  static int inited = FALSE;
+
+  if (!inited)
+    {
+      inited = TRUE;
+      sprintf(buf1, "#%d#Server: #%d#  %%s", MagentaColor, NoColor);
+      sprintf(buf2, "#%d#Version: #%d# %%s", MagentaColor, NoColor);
+      sprintf(buf3, "#%d#Time: #%d#    %%s", MagentaColor, NoColor);
+      sprintf(buf4, 
+              "#%d#Status: #%d#  Users #%d#%%d, #%d#Ships #%d#%%d/%%d #%d#"
+              "(#%d#%%d #%d#active, #%d#%%d #%d#vacant, "
+              "#%d#%%d #%d#robot)",
+              MagentaColor, NoColor, CyanColor, NoColor, CyanColor, NoColor,
+              CyanColor, NoColor, CyanColor, NoColor, 
+              CyanColor, NoColor);
+      sprintf(buf5, "#%d#Flags: #%d#   %%s", MagentaColor, NoColor);
+      sprintf(buf6, "#%d#MOTD: #%d#    %%s", MagentaColor, NoColor);
+    }
 
   lin++;
 
-  sprintf(buf, "#%d#Server: #%d#  %%s", MagentaColor, NoColor);
-  cprintf(lin++, 0, ALIGN_NONE, buf, sHello.servername);
+  cprintf(lin++, 0, ALIGN_NONE, buf1, sHello.servername);
 
-  sprintf(buf, "#%d#Version: #%d# %%s", MagentaColor, NoColor);
-  cprintf(lin++, 0, ALIGN_NONE, buf, sHello.serverver);
+  cprintf(lin++, 0, ALIGN_NONE, buf2, sHello.serverver);
 
-  sprintf(buf, "#%d#Time: #%d#    %%s", MagentaColor, NoColor);
-  cprintf(lin++, 0, ALIGN_NONE, buf, ctime((time_t *)&sStat.servertime));
+  cprintf(lin++, 0, ALIGN_NONE, buf3, ctime((time_t *)&sStat.servertime));
 
-  sprintf(buf, 
-	  "#%d#Status: #%d#  Users #%d#%%d, #%d#Ships #%d#%%d/%%d #%d#"
-	  "(#%d#%%d #%d#active, #%d#%%d #%d#vacant, "
-	  "#%d#%%d #%d#robot)",
-	  MagentaColor, NoColor, CyanColor, NoColor, CyanColor, NoColor,
-	  CyanColor, NoColor, CyanColor, NoColor, 
-	  CyanColor, NoColor);
-
-  cprintf(lin++, 0, ALIGN_NONE, buf,
+  cprintf(lin++, 0, ALIGN_NONE, buf4,
 	  sStat.numusers, sStat.numtotal, MAXSHIPS, sStat.numactive, 
 	  sStat.numvacant, sStat.numrobot);
 
-  sprintf(buf, "#%d#Flags: #%d#   %%s", MagentaColor, NoColor);
-  cprintf(lin++, 0, ALIGN_NONE, buf, clntServerFlagsStr(sStat.flags));
+  cprintf(lin++, 0, ALIGN_NONE, buf5, clntServerFlagsStr(sStat.flags));
 
-  sprintf(buf, "#%d#MOTD: #%d#    %%s", MagentaColor, NoColor);
-  cprintf(lin++, 0, ALIGN_NONE, buf, sHello.motd);
+  cprintf(lin++, 0, ALIGN_NONE, buf6, sHello.motd);
 
   return;
 }
@@ -73,7 +86,7 @@ int Logon(char *username)
 
       /* Display the logo. */
 
-      lin = conqlogo();
+      lin = cumConqLogo();
 
       if ( sHello.flags & SPHELLO_FLAGS_CLOSED )
 	{
@@ -128,9 +141,9 @@ int Logon(char *username)
 	  if (checkuname(nm) == FALSE)
 	    {			/* invalid username */
 	      cdbeep();
-	      attrset(RedLevelColor);
+	      uiPutColor(RedLevelColor);
 	      cdputs("Invalid character in username.", MSG_LIN2, 1);
-	      attrset(NoColor);
+	      uiPutColor(NoColor);
 	      nm[0] = EOS;
 	      continue;
 	    }
@@ -141,7 +154,7 @@ int Logon(char *username)
 	  if (rv == PERR_NOUSER)
 	    {			/* nope... */
 	      slin++;
-	      if (askyn("User doesn't exist. Is this a new user? ", slin, 1))
+	      if (cumAskYN("User doesn't exist. Is this a new user? ", slin, 1))
 		{			/* yep */
 		  pw[0] = EOS;
 		  cdclrl( MSG_LIN1, 2  );
@@ -160,9 +173,9 @@ int Logon(char *username)
 		    {			/* pw's don't match, start over */
 		      cdbeep();
 		      cdclrl( MSG_LIN2, 1  );
-		      attrset(RedLevelColor);
+		      uiPutColor(RedLevelColor);
 		      cdputs("Passwords don't match.", MSG_LIN2, 1);
-		      attrset(NoColor);
+		      uiPutColor(NoColor);
 		      cdrefresh();
 		      sleep(2);
 		      continue;
@@ -210,9 +223,9 @@ int Logon(char *username)
 		{			/* invalid pw */
 		  cdbeep();
 		  cdclrl( MSG_LIN2, 1  );
-		  attrset(RedLevelColor);
+		  uiPutColor(RedLevelColor);
 		  cdputs("Invalid Password.", MSG_LIN2, 1);
-		  attrset(NoColor);
+		  uiPutColor(NoColor);
 		  cdrefresh();
 		  clog("INFO: Invalid password for user '%s'", nm);
 		  sleep(2);
@@ -251,7 +264,7 @@ void ChangePassword(int unum, int isoper)
   if (isoper == FALSE)
     {
       lin = 1;
-      col = ((cdcols() / 2) - (strlen(header) / 2));
+      col = ((Context.maxcol / 2) - (strlen(header) / 2));
       
       cprintf(lin, col, ALIGN_NONE, "#%d#%s", NoColor, header);
     } /* ! isoper */
@@ -275,9 +288,9 @@ void ChangePassword(int unum, int isoper)
 	{			/* pw's don't match, start over */
 	  cdbeep();
 	  cdclrl( MSG_LIN2, 1  );
-	  attrset(RedLevelColor);
+	  uiPutColor(RedLevelColor);
 	  cdputs("Passwords don't match.", MSG_LIN2, 1);
-	  attrset(NoColor);
+	  uiPutColor(NoColor);
 	  cdrefresh();
 	  sleep(2);
 	  return;

@@ -4,7 +4,7 @@ dnl
 dnl $Id$
 dnl
 
-AC_INIT([conquest],[8.0],[jon@radscan.com])
+AC_INIT([conquest],[8.0.1-gl],[jon@radscan.com])
 AC_CONFIG_HEADER(config.h)
 AM_INIT_AUTOMAKE
 AC_PROG_LIBTOOL
@@ -20,11 +20,16 @@ dnl AC_CANONICAL_TARGET([])
 dnl Checks for programs.
 dnl get the system type and set accordingly.  first init some defaults.
 
+GLCLIENT=""
 CONQ_CFLAGS=""
 conquest_group=""
 AC_ARG_WITH(conquest-group,
   [  --with-conquest-group=groupname  The conquest group name (Default: conquest)],
   conquest_group="$withval", conquest_group="")
+
+AC_ARG_ENABLE(gl,
+  [  --disable-gl  Don't build the OpenGL bits.],
+  GLCLIENT="", GLCLIENT="yes")
 
 AC_MSG_CHECKING(system type)
 uname=`uname -s`
@@ -142,6 +147,7 @@ AC_HEADER_STDC
 AC_CHECK_HEADERS(fcntl.h limits.h sys/ioctl.h sys/times.h termio.h unistd.h)
 AC_CHECK_HEADERS(ncurses.h term.h sys/time.h sys/select.h stropts.h poll.h)
 AC_CHECK_HEADERS(curses.h time.h string.h strings.h termios.h zlib.h)
+AC_CHECK_HEADERS(GL/glut.h GL/gl.h GL/glu.h)
 
 dnl Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
@@ -175,6 +181,7 @@ main()
 ]])],[AC_MSG_RESULT(yes)
   AC_DEFINE(SYS_ERRLIST_DECLARED, 1, [sys_errlist declared])],[AC_MSG_RESULT(no)],[:])
 
+AM_CONDITIONAL(GLCLIENT, test $GLCLIENT)
 AC_CONFIG_FILES([Makefile])
 AC_OUTPUT
 

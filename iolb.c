@@ -18,7 +18,8 @@
 
 #include "global.h"
 #include "ibuf.h"
-#include "display.h"
+#include "iolb.h"
+#include "cd2lb.h"
 
 /* iochav - test whether a char is available to be read or not */
 /* synopsis */
@@ -58,10 +59,6 @@ int iochav( void )
     {
       return(TRUE);
     }
-#ifdef CONQGL
-  else
-    return FALSE;		/* JETGL */
-#endif
   
 #if defined(USE_SELECT)	
   
@@ -181,7 +178,6 @@ void ioeat(void)
 int iogchar ( void )
 {
   static unsigned int thechar = 0;
-  /*JETGL*/
 
   /* This is a good place to flush the output buffer and to */
   /*  check for terminal broadcasts. */
@@ -194,17 +190,8 @@ int iogchar ( void )
   
   if (!iBufCount())
     {
-#if CONQGL
-      procEvent();		/* proc events until one arrives */
-      //c_sleep(0.1);		/* JETGL */
-      usleep(100000);		/* better? JETGL */
-    /*thechar = wgetch(stdscr);*/
-      //      clog("AFTER procEvent()\n");
-      goto reloop;
-#else
       c_sleep(0.1);
       thechar = wgetch(stdscr);
-#endif
     }
   else
     thechar = iBufGetCh();
@@ -226,35 +213,6 @@ int iogchar ( void )
 /*    int *ch */
 /*    int seconds */
 /*    gotone = iogtimed ( &ch, seconds ) */
-
-#ifdef CONQGL
-int iogtimed ( int *ch, real seconds )
-{
-  real cumm;
-  const real incr = 0.1;
-
-  cumm = 0.0;
-  clog("IOGTIMED - STARTING\n");
-  do
-    {
-      procEvent();
-      
-      if (iochav())
-	{				/* char waiting */
-	  *ch = iBufGetCh();
-	  clog("IOGTIMED - TRUE\n");
-	  return TRUE;
-	}
-      else 
-	{
-	  c_sleep(incr);
-	  cumm += incr;
-	}
-    } while (cumm < seconds);
-  clog("IOGTIMED - FALSE\n");
-  return FALSE;
-}
-#else      
 
 /*  iogtimed - get a char with timeout */
 /*  SYNOPSIS */
@@ -432,6 +390,5 @@ int iogtimed ( int *ch, real seconds )
   
 }
 
-#endif 
 
 

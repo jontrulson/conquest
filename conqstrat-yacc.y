@@ -41,8 +41,8 @@ int debug_scanner, verbose;
 static int UpdateCmnBlock = FALSE;
 
 extern int Lineno;
-extern int goterror = 0;
-
+extern int goterror;
+extern void yyerror(char *s);
 %}
 
 

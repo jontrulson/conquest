@@ -49,7 +49,7 @@ void PVUNLOCK(int *);
 
 void zero_common(void);
 void fake_common(void);
-
+void map_lcommon(void);
 				/* The Common Block in all it's majesty */
 
 /* Special data items - these must be at the very beginning. */

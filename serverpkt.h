@@ -37,5 +37,5 @@ spTeam_t *spktTeam(Unsgn8 team, int force, int rec);
 spConqInfo_t *spktConqInfo(int force);
 
 spHistory_t *spktHistory(int hnum);
-
+spDoomsday_t *spktDoomsday(int rec);
 #endif /* _SERVERPKT_H */

@@ -17,6 +17,7 @@
 #include "context.h"
 #include "record.h"
 #include "servercmd.h"
+#include "conqlb.h"
 
 void startRecord(void)
 {
@@ -30,7 +31,7 @@ void startRecord(void)
   if (Context.recmode == RECMODE_ON)
     {
       clog("conquestd: startRecord: already recording.");
-      stormsg(MSG_GOD, Context.snum, "We are already recording.");
+      clbStoreMsg(MSG_GOD, Context.snum, "We are already recording.");
       return;
     }
 
@@ -55,7 +56,7 @@ void startRecord(void)
       Context.recmode = RECMODE_OFF;
       clog("conquestd: Cannot record to %s", fname);
       sprintf(cbuf, "Cannot record to %s", bname);
-      stormsg(MSG_GOD, Context.snum, cbuf);
+      clbStoreMsg(MSG_GOD, Context.snum, cbuf);
       return;
     }
 
@@ -67,13 +68,13 @@ void startRecord(void)
           Context.recmode = RECMODE_ON;
           clog("conquestd: Recording to %s", fname);
           sprintf(cbuf, "Recording to %s", bname);
-          stormsg(MSG_GOD, Context.snum, cbuf);
+          clbStoreMsg(MSG_GOD, Context.snum, cbuf);
         }
       else
         {
           Context.recmode = RECMODE_OFF;
           clog("conquestd: recordInitOutput failed");
-          stormsg(MSG_GOD, Context.snum, 
+          clbStoreMsg(MSG_GOD, Context.snum, 
                   "conquestd: recordInitOutput failed");
         }
     }
@@ -86,13 +87,13 @@ void stopRecord(void)
   if (Context.recmode != RECMODE_ON)
     {
       clog("conquestd: stopRecord: not recording.");
-      stormsg(MSG_GOD, Context.snum, "We aren't recording.");
+      clbStoreMsg(MSG_GOD, Context.snum, "We aren't recording.");
       return;
     }
 
 
   clog("conquestd: stopRecord: recording stopped");
-  stormsg(MSG_GOD, Context.snum, "Recording stopped");
+  clbStoreMsg(MSG_GOD, Context.snum, "Recording stopped");
   recordCloseOutput();
 
   return;
@@ -121,6 +122,7 @@ int checkOperExec(int from, int to, char *msg)
   /* it is for us, now check for allowability */
   if (!Users[Ships[from].unum].ooptions[OOPT_OPER])
     {                           /* nice try... */
+      clbStoreMsg(MSG_GOD, from, "You are not a Conquest Operator.");
       clog("conquestd: EXEC from unprivileged ship: %d, '%s'", from,
            tmsg);
       return FALSE;
@@ -131,7 +133,7 @@ int checkOperExec(int from, int to, char *msg)
 
   if (!*p)
     {
-      stormsg(MSG_GOD, from, oerror);
+      clbStoreMsg(MSG_GOD, from, oerror);
       return FALSE;
     }
 
@@ -150,6 +152,6 @@ int checkOperExec(int from, int to, char *msg)
 
   /* that's all we understand for now. */
 
-  stormsg(MSG_GOD, from, oerror);
+  clbStoreMsg(MSG_GOD, from, oerror);
   return FALSE;
 }

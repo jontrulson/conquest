@@ -57,6 +57,7 @@ int sendMessage(int sock, Msg_t *msg);
 int sendTeam(int sock, Unsgn8 team, int force);
 int sendConqInfo(int sock, int force);
 int sendHistory(int sock, int hnum);
+int sendDoomsday(int sock);
 
 void procSetName(Unsgn8 *buf);
 void procSetCourse(Unsgn8 *buf);

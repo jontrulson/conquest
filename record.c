@@ -12,11 +12,22 @@
 #include "conqcom.h"
 #include "context.h"
 #include "conf.h"
+#include "global.h"
+#include "color.h"
+#include "datatypes.h"
+#include "protocol.h"
+#include "packet.h"
 
 #include "protocol.h"
 #include "client.h"
 
+#define REC_NOEXTERN
 #include "record.h"
+#undef REC_NOEXTERN
+
+extern char *ConquestVersion;
+extern char *ConquestDate;
+
 
 #if defined(HAVE_LIBZ) && defined(HAVE_ZLIB_H)
 #include <zlib.h>		/* lets try compression. */
@@ -374,4 +385,95 @@ int recordReadPkt(Unsgn8 *buf, int blen)
 
   return(pkttype);
 }
+
+/* open, create/load our cmb, and get ready for action if elapsed == NULL
+   otherwise, we read the entire file to determine the elapsed time of
+   the game and return it */
+int initReplay(char *fname, time_t *elapsed)
+{
+  int pkttype;
+  time_t starttm = 0;
+  time_t curTS = 0;
+  Unsgn8 buf[PKT_MAXSIZE];
+
+  if (!recordOpenInput(fname))
+    {
+      printf("initReplay: recordOpenInput(%s) failed\n", fname);
+      return(FALSE);
+    }
+
+  /* don't bother mapping for just a count */
+  if (!elapsed)
+    map_lcommon();
+
+  /* now lets read in the file header and check a few things. */
+
+  if (!recordReadHeader(&fhdr))
+    return(FALSE);
+      
+  if (fhdr.vers != RECVERSION)
+    {				/* wrong vers */
+      clog("initReplay: version mismatch.  got %d, need %d\n",
+           fhdr.vers,
+           RECVERSION);
+      printf("initReplay: version mismatch.  got %d, need %d\n",
+	     fhdr.vers,
+	     RECVERSION);
+      return FALSE;
+    }
+
+
+  if ( fhdr.cmnrev != COMMONSTAMP )
+    {
+      clog("initReplay: CONQUEST COMMON BLOCK MISMATCH %d != %d",
+             fhdr.cmnrev, COMMONSTAMP );
+      printf("initReplay: CONQUEST COMMON BLOCK MISMATCH %d != %d",
+             fhdr.cmnrev, COMMONSTAMP );
+      return FALSE;
+    }
+
+  /* if we are looking for the elapsed time, scan the whole file
+     looking for timestamps. */
+  if (elapsed)			/* we want elapsed time */
+    {
+      int done = FALSE;
+
+      starttm = fhdr.rectime;
+
+      curTS = 0;
+      /* read through the entire file, looking for timestamps. */
+      
+#if defined(DEBUG_REC)
+      clog("conqreplay: initReplay: reading elapsed time");
+#endif
+
+      while (!done)
+	{
+          if ((pkttype = recordReadPkt(buf, PKT_MAXSIZE)) == SP_FRAME)
+            {
+              spFrame_t *frame = (spFrame_t *)buf;
+              
+              /* fix up the endianizational interface for the time */
+              curTS = (time_t)ntohl(frame->time);
+            }
+
+	  if (pkttype == SP_NULL)
+	    done = TRUE;	/* we're done */
+	}
+
+      if (curTS != 0)
+	*elapsed = (curTS - starttm);
+      else
+	*elapsed = 0;
+
+      /* now close the file so that the next call of initReplay can
+	 get a fresh start. */
+      recordCloseInput();
+    }
+
+  /* now we are ready to start running packets */
+  
+  return(TRUE);
+}
+
 

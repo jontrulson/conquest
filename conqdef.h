@@ -29,19 +29,19 @@
 
 /* 4.22 05Sep86 CAL .*(): Removed tutorial feature. Made tuning constants */
 /*                   constants again. Increased username sizes. */
-/*                  .userstats(): Tweak heading. */
-/*                  .dowarp(): Don't need to fixdeltas(). */
+/*                  .cumUserStats(): Tweak heading. */
+/*                  .dowarp(): Don't need to clbFixDeltas(). */
 /*                  .executeai(): Stop repair mode when setting warp. */
-/*                  .chalkup(): New routine to help with kills accounting. */
-/*                  .ikill(): Fixed longstanding mutual kill bug. */
+/*                  .clbChalkup(): New routine to help with kills accounting. */
+/*                  .clbIKill(): Fixed longstanding mutual kill bug. */
 /*                  .cloak(): Charge cloaking engage as engine energy use. */
 /* 4.21 13Aug86 CAL .Conqinit(): Use t_getbpri(). */
 /* 4.20 22Jun86 CAL .Getamsg(): Don't read messages from us to GOD. */
 /* 4.19 03Nov85 CAL .Statline(): Tweak cpu printout. */
-/* 4.18 30Oct85 CAL .Secdrive(): Added some death checks from stillalive(). */
+/* 4.18 30Oct85 CAL .Secdrive(): Added some death checks from clbStillAlive(). */
 /*                   Moved robot stats code to robotai(). */
-/* 4.17 29Oct85 CAL .*(): Add snum arguments to stillalive(), remove user check. */
-/*                  .Robotai(): Use stillalive(). */
+/* 4.17 29Oct85 CAL .*(): Add snum arguments to clbStillAlive(), remove user check. */
+/*                  .Robotai(): Use clbStillAlive(). */
 /*                  .Kiss(): Add "all" option. */
 /* 4.16 17Oct85 CAL .*(): Add seperate robot cpu and elapsed stats. */
 /* 4.15 09Oct85 CAL .Display(): Fixed weird yellow alert bug. */
@@ -98,6 +98,7 @@
 #define TS_LIVE 3 		/* armed and flying */
 #define TS_DETONATE 4 		/* detonate signal sent */
 #define TS_FIREBALL 5 		/* exploding, needed for display() */
+#define TS_RESERVED 6           /* client reserve slot flag */
 
 #define MAXSTNAME 32
 #define MAXNUMSHIPTYPES 3
@@ -304,7 +305,7 @@
 #define PHOON_FIRST 2 		/* first quarter */
 #define PHOON_FULL 3 		/* full */
 
-/* Tokens for puthing(), must be negative */
+/* Tokens for cumPutThing(), must be negative */
 #define THING_EXPLOSION -1 	/* a torpedo explosion */
 #define THING_DEATHSTAR -2 	/* the Empire's new toy */
 
@@ -315,7 +316,7 @@
 #define NEAR_DIRECTION 4 
 #define NEAR_ERROR 5 
 
-/* Tokens for special() and findspecial() */
+/* Tokens for special() and clbFindSpecial() */
 #define SPECIAL_NOTSPECIAL 1 
 #define SPECIAL_ENEMYSHIP 2 
 #define SPECIAL_FUELPLANET 3 
@@ -492,6 +493,9 @@
 #define BREAKAWAY_PROB 0.3 	/* chance to break free of a hostile tower */
 #define BREAKAWAY_GRAND 1000 	/* hundreths to break free from a hostile tower */
 
+#define DS_LIVE_STR "DS_LIVE"
+#define DS_OFF_STR  "DS_OFF"
+
 #define DOOMSDAY_START_DIST 20000.0 /* distance from the center that it starts at */
 #define DOOMSDAY_LENGTH 800.0 	/* length for display purposes */
 #define DOOMSDAY_WARP 2.0 	/* warp factor of the planet eater */
@@ -535,6 +539,7 @@
 
 #define MSG_LIN1 (DISPLAY_LINS + 2) 
 #define MSG_LIN2 (MSG_LIN1 + 1)	/* line for messages */
+#define MSG_MSG  (MSG_LIN1 + 2)
 
 #define TIMEOUT_DRIVER 10 	/* seconds of timeout for the driver */
 #define TIMEOUT_DRCHECK 2 	/* don't do timeout checking after this */
@@ -557,7 +562,7 @@
 
 #define MAILADDR ""
 
-				/* for launch() */
+				/* for clbLaunch() */
 #define LAUNCH_NORMAL   (0)
 #define LAUNCH_EXPLODE  (1)
 

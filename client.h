@@ -64,6 +64,7 @@ int procMessage(Unsgn8 *buf);
 int procServerStat(Unsgn8 *buf);
 int procConqInfo(Unsgn8 *buf);
 int procHistory(Unsgn8 *buf);
+int procDoomsday(Unsgn8 *buf);
 
 int sendSetName(Unsgn8 *name);
 int sendCommand(Unsgn8 cmd, Unsgn16 detail);

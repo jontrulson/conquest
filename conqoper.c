@@ -29,13 +29,21 @@
 #include "conf.h"
 #include "conqdef.h"
 #include "conqcom.h"
+#include "conqlb.h"
 #include "context.h"
 #include "global.h"
 #include "color.h"
+#include "ui.h"
+#include "options.h"
+#include "cd2lb.h"
+#include "iolb.h"
+#include "cumisc.h"
+#include "cuclient.h"
 #include "record.h"
-#include "display.h"
 #include "clientlb.h"
 #include "clntauth.h"
+#include "cuclient.h"
+#include "display.h"
 
 static char cbuf[MID_BUFFER_SIZE]; /* general purpose buffer */
 
@@ -54,6 +62,33 @@ void EnableConqoperSignalHandler(void);
 void operStopTimer(void);
 void operSetTimer(void);
 
+void bigbang(void);
+void debugdisplay( int snum );
+void debugplan(void);
+int opPlanetMatch( char str[], int *pnum );
+void kiss(int snum, int prompt_flg);
+void opback( int lastrev, int *savelin );
+void operate(void);
+void opinfo( int snum );
+void opinit(void);
+void opPlanetList(void);
+void opresign(void);
+void oprobot(void);
+void opstats(void);
+void opTeamList(void);
+void opuadd(void);
+void oppedit(void);
+void opuedit(void);
+void watch(void);
+int prompt_ship(char buf[], int *snum, int *normal);
+void dowatchhelp(void);
+void setdheader(int show_header);
+void toggle_line(int snum, int old_snum);
+char *build_toggle_str(char snum_str[], int snum);
+void menu_item( char *option, char *msg_line, int lin, int col );
+int DoInit(char InitChar, int cmdline);
+
+
 /*  conqoper - main program */
 int main(int argc, char *argv[])
 {
@@ -68,7 +103,7 @@ int main(int argc, char *argv[])
 
   OptionAction = OP_NONE;
 
-  strncpy(operName, glname(), MAXUSERNAME);
+  strncpy(operName, clbGetUserLogname(), MAXUSERNAME);
   operName[MAXUSERNAME - 1] = 0;
 
   if ( ! isagod(-1) )
@@ -118,15 +153,15 @@ int main(int argc, char *argv[])
 	break;
       }
 
-  if ((ConquestUID = GetUID(ROOT_USER)) == ERR)
+  if ((ConquestUID = getUID(ROOT_USER)) == ERR)
     {
-      fprintf(stderr, "conqoper: GetUID() failed\n");
+      fprintf(stderr, "conqoper: getUID() failed\n");
       exit(1);
     }
   
-  if ((ConquestGID = GetConquestGID()) == ERR)
+  if ((ConquestGID = getConquestGID()) == ERR)
     {
-      fprintf(stderr, "conqoper: GetConquestGID() failed\n");
+      fprintf(stderr, "conqoper: getConquestGID() failed\n");
       exit(1);
     }
   
@@ -267,7 +302,7 @@ int main(int argc, char *argv[])
   sprintf(msgbuf, "OPER: User %s has entered conqoper.",
           operName);
   clog(msgbuf);			/* log it too... */
-  stormsg( MSG_COMP, MSG_GOD, msgbuf );
+  clbStoreMsg( MSG_COMP, MSG_GOD, msgbuf );
 
   operate();
   
@@ -292,7 +327,7 @@ void bigbang(void)
     if ( Ships[snum].status == SS_LIVE )
       {
 	for ( i = 0; i < MAXTORPS; i = i + 1 )
-	  if ( ! launch( snum, dir, 1, LAUNCH_NORMAL ) )
+	  if ( ! clbLaunch( snum, dir, 1, LAUNCH_NORMAL ) )
 	    break;
 	  else
 	    {
@@ -645,7 +680,7 @@ void debugplan(void)
 
       for ( i = 1; i <= NUMPLANETS; i = i + 1 )
 	sv[i] = i;
-      sortplanets( sv );
+      clbSortPlanets( sv );
     }
   
   strcpy( hd3, hd2 );
@@ -664,7 +699,7 @@ void debugplan(void)
   Done = FALSE;
   do
     {
-      cdclra(0, 0, MSG_LIN1 + 2, cdcols() - 1);
+      cdclra(0, 0, MSG_LIN1 + 2, Context.maxcol - 1);
       PlanetIdx = 0;
       
       lin = 1;
@@ -715,7 +750,7 @@ void debugplan(void)
 		case PLANET_CLASSA:
 		case PLANET_CLASSO:
 		case PLANET_CLASSZ:
-		  outattr = A_BOLD;
+		  outattr = CQC_A_BOLD;
 		  break;
 		case PLANET_GHOST:
 		  outattr = NoColor;
@@ -746,13 +781,13 @@ void debugplan(void)
 		  lin = olin;
 		  col = 44;
 		}
-	      attrset(0);
+	      uiPutColor(0);
 	    } /* while */
 	  
 	  if ((PlanetOffset + PlanetIdx) > NUMPLANETS)
-	    putpmt( MTXT_DONE, MSG_LIN2 ); /* last page? */
+	    cumPutPrompt( MTXT_DONE, MSG_LIN2 ); /* last page? */
 	  else
-	    putpmt( MTXT_MORE, MSG_LIN2 );
+	    cumPutPrompt( MTXT_MORE, MSG_LIN2 );
 
           cdrefresh();
 	  
@@ -790,8 +825,8 @@ void debugplan(void)
 /*    int gplanmatch, pnum */
 /*    char str() */
 /*    int status */
-/*    status = gplanmatch( str, pnum ) */
-int gplanmatch( char str[], int *pnum )
+/*    status = opPlanetMatch( str, pnum ) */
+int opPlanetMatch( char str[], int *pnum )
 {
   int i;
   
@@ -804,7 +839,7 @@ int gplanmatch( char str[], int *pnum )
 	return ( FALSE );
     }
   else
-    return ( planmatch( str, pnum, TRUE ) );
+    return ( clbPlanetMatch( str, pnum, TRUE ) );
   
   return ( TRUE );
   
@@ -863,7 +898,7 @@ void kiss(int snum, int prompt_flg)
       cdclrl( MSG_LIN1, 1 ); 
       sprintf(mbuf,"%s", kill_driver_str);
       cdputs( mbuf, MSG_LIN1, 1 );
-      if ( confirm() )
+      if ( cumConfirm() )
 	if ( Driver->drivstat == DRS_RUNNING )
 	  Driver->drivstat = DRS_KAMIKAZE;
       cdclrl( MSG_LIN1, 2 );
@@ -895,9 +930,9 @@ void kiss(int snum, int prompt_flg)
 	sprintf(mbuf, kill_ship_str1,
 		Teams[Ships[snum].team].teamchar, snum, Ships[snum].alias);
 	cdputs( mbuf, MSG_LIN1, 1 );
-	if ( confirm() )
+	if ( cumConfirm() )
 	  {
-	    killship( snum, KB_GOD );
+	    clbKillShip( snum, KB_GOD );
 	    cdclrl( MSG_LIN2, 1 );
 	    clog("OPER: %s killed ship %d",
 		 operName, snum);
@@ -922,11 +957,11 @@ void kiss(int snum, int prompt_flg)
 		    snum, 
 		    Ships[snum].alias);
 	    cdputs( buf, MSG_LIN1, 1 );
-	    if ( confirm() )
+	    if ( cumConfirm() )
 	      {
 		clog("OPER: %s killed ship %d",
 		     operName, snum);
-		killship( snum, KB_GOD );
+		clbKillShip( snum, KB_GOD );
 	      }
 	  }
       if ( didany )
@@ -938,7 +973,7 @@ void kiss(int snum, int prompt_flg)
     }
   
   /* Kill a user? */
-  if ( ! gunum( &unum, buf, -1 ) )
+  if ( ! clbGetUserNum( &unum, buf, -1 ) )
     {
       cdputs( no_user_str, MSG_LIN2, 1 );
       cdmove( 0, 0 );
@@ -959,9 +994,9 @@ void kiss(int snum, int prompt_flg)
 		  Ships[snum].alias, 
 		  buf);
 	  cdputs( mbuf, MSG_LIN1, 1 );
-	  if ( confirm() )
+	  if ( cumConfirm() )
 		  {
-	    killship( snum, KB_GOD );
+	    clbKillShip( snum, KB_GOD );
 	    cdclrl( MSG_LIN2, 1 );
 	    clog("OPER: %s killed ship %d",
 		 operName, snum);
@@ -1010,20 +1045,20 @@ void opback( int lastrev, int *savelin )
   lin = 1;
   if ( lastrev == COMMONSTAMP ) 
     {
-      attrset(NoColor|A_BOLD);
+      uiPutColor(NoColor|CQC_A_BOLD);
       cdputc( "CONQUEST OPERATOR PROGRAM", lin );
-      attrset(YellowLevelColor);
+      uiPutColor(YellowLevelColor);
       sprintf( cbuf, "%s (%s)",
 	       ConquestVersion, ConquestDate);
       cdputc( cbuf, lin+1 );
     }
   else
     {
-      attrset(RedLevelColor);
+      uiPutColor(RedLevelColor);
       sprintf( cbuf, "CONQUEST COMMON BLOCK MISMATCH %d != %d",
 	       lastrev, COMMONSTAMP );
       cdputc( cbuf, lin );
-      attrset(0);
+      uiPutColor(0);
     }
   
   EnableConqoperSignalHandler(); /* enable trapping of interesting signals */
@@ -1188,9 +1223,9 @@ void operate(void)
 
 	  lin++;
 	  cdclrl( lin, 1 );
-	  attrset(SpecialColor);
+	  uiPutColor(SpecialColor);
 	  cdputc( buf, lin );
-	  attrset(0);
+	  uiPutColor(0);
       
 
 	  /* Display a new message, if any. */
@@ -1198,7 +1233,7 @@ void operate(void)
 	  if ( dgrand( msgrand, &now ) >= NEWMSG_GRAND )
 	    if ( getamsg( MSG_GOD, &ConqInfo->glastmsg ) )
 	      {
-		readmsg( MSG_GOD, ConqInfo->glastmsg, RMsg_Line );
+		cumReadMsg( MSG_GOD, ConqInfo->glastmsg, RMsg_Line );
 		
 #if defined(OPER_MSG_BEEP)
 		if (Msgs[ConqInfo->glastmsg].msgfrom != MSG_GOD)
@@ -1236,7 +1271,7 @@ void operate(void)
 	  redraw = TRUE;
 	  break;
 	case 'b':
-	  if ( confirm() )
+	  if ( cumConfirm() )
 	    bigbang();
 	  break;
 	case 'd':
@@ -1248,7 +1283,7 @@ void operate(void)
 	    }
 	  else
 	    {
-	      doomsday();
+	      clbDoomsday();
 	      clog("OPER: %s has ACTIVATED the Doomsday machine",
 		   operName);
 	    }
@@ -1271,7 +1306,7 @@ void operate(void)
 	      clog("OPER: %s has enabled the game",
 		   operName);
 	    }
-	  else if ( confirm() )
+	  else if ( cumConfirm() )
 	    {
 	      ConqInfo->closed = TRUE;
 	      clog("OPER: %s has disabled the game",
@@ -1285,7 +1320,7 @@ void operate(void)
 	    Driver->drivstat = DRS_HOLDING;
 	  break;
 	case 'H':
-	  histlist( TRUE );
+	  cumHistList( TRUE );
 	  redraw = TRUE;
 	  break;
 	case 'i':
@@ -1299,10 +1334,10 @@ void operate(void)
 	  kiss(0,TRUE);
 	  break;
 	case 'L':
-	  review( MSG_GOD, ConqInfo->glastmsg );
+	  cumReviewMsgs( MSG_GOD, ConqInfo->glastmsg );
 	  break;
 	case 'm':
-	  clntSendMsg( MSG_GOD, TRUE, FALSE );
+	  cucSendMsg( MSG_GOD, TRUE, FALSE );
 	  break;
 	case 'O':
 	  SysOptsMenu();
@@ -1328,15 +1363,15 @@ void operate(void)
 	  redraw = TRUE;
 	  break;
 	case 'S':
-	  userstats( TRUE , 0 ); /* we're always neutral ;-) - dwp */
+	  cumUserStats( TRUE , 0 ); /* we're always neutral ;-) - dwp */
 	  redraw = TRUE;
 	  break;
 	case 'T':
-	  opteamlist();
+	  opTeamList();
 	  redraw = TRUE;
 	  break;
 	case 'U':
-	  userlist( TRUE, 0 );
+	  cumUserList( TRUE, 0 );
 	  redraw = TRUE;
 	  break;
 	case 'w':
@@ -1345,15 +1380,15 @@ void operate(void)
 	  redraw = TRUE;
 	  break;
 	case '/':
-	  playlist( TRUE, FALSE, 0 );
+	  cumPlayList( TRUE, FALSE, 0 );
 	  redraw = TRUE;
 	  break;
 	case '\\':
-	  playlist( TRUE, TRUE, 0 );
+	  cumPlayList( TRUE, TRUE, 0 );
 	  redraw = TRUE;
 	  break;
 	case '?':
-	  opplanlist();
+	  opPlanetList();
 	  redraw = TRUE;
 	  break;
 	case '$':
@@ -1413,29 +1448,29 @@ void opinfo( int snum )
     {
       i = 0;
       safectoi( &j, &cbuf[1], i );		/* ignore status */
-      infoship( j, snum );
+      cumInfoShip( j, snum );
     }
   else if ( alldig( cbuf ) == TRUE )
     {
       i = 0;
       safectoi( &j, cbuf, i );		/* ignore status */
-      infoship( j, snum );
+      cumInfoShip( j, snum );
     }
-  else if ( gplanmatch( cbuf, &j ) )
-    infoplanet( "", j, snum );
+  else if ( opPlanetMatch( cbuf, &j ) )
+    cumInfoPlanet( "", j, snum );
   else if ( stmatch( cbuf, "time", FALSE ) )
     {
       getnow( now, 0 );
       c_strcpy( "It's ", cbuf );
       appnumtim( now, cbuf );
       appchr( '.', cbuf );
-      c_putmsg( cbuf, MSG_LIN1 );
+      cumPutMsg( cbuf, MSG_LIN1 );
       cdmove( MSG_LIN1, 1 );
     }
   else
     {
       cdmove( MSG_LIN2, 1 );
-      c_putmsg( huh, MSG_LIN2 );
+      cumPutMsg( huh, MSG_LIN2 );
     }
   
   return;
@@ -1459,41 +1494,41 @@ void opinit(void)
   
   lin = 2;
   icol = 11;
-  attrset(LabelColor);
+  uiPutColor(LabelColor);
   cdputc( "Conquest Initialization", lin );
   
   lin+=3;
   col = icol - 2;
   c_strcpy( "(r)obots", buf );
   i = strlen( buf );
-  attrset(InfoColor);
+  uiPutColor(InfoColor);
   cdputs( buf, lin, col+1 );
-  attrset(A_BOLD);
+  uiPutColor(CQC_A_BOLD);
   cdbox( lin-1, col, lin+1, col+i+1 );
   col = col + i + 4;
-  attrset(LabelColor);
+  uiPutColor(LabelColor);
   cdputs( "<-", lin, col );
   col = col + 4;
   c_strcpy( "(e)verything", buf );
   i = strlen( buf );
-  attrset(InfoColor);
+  uiPutColor(InfoColor);
   cdputs( buf, lin, col+1 );
-  attrset(A_BOLD);
+  uiPutColor(CQC_A_BOLD);
   cdbox( lin-1, col, lin+1, col+i+1 );
   col = col + i + 4;
-  attrset(LabelColor);
+  uiPutColor(LabelColor);
   cdputs( ".", lin, col );
   col = col + 4;
   c_strcpy( "(z)ero everything", buf );
   i = strlen( buf );
-  attrset(InfoColor);
+  uiPutColor(InfoColor);
   cdputs( buf, lin, col+1 );
-  attrset(A_BOLD);
+  uiPutColor(CQC_A_BOLD);
   cdbox( lin-1, col, lin+1, col+i+1 );
   
   col = icol + 20;
   lin+=3;
-  attrset(LabelColor);
+  uiPutColor(LabelColor);
   cdput( '|', lin, col );
   lin++;
   cdput( 'v', lin, col );
@@ -1502,44 +1537,44 @@ void opinit(void)
   col = icol;
   c_strcpy( "(s)hips", buf );
   i = strlen( buf );
-  attrset(InfoColor);
+  uiPutColor(InfoColor);
   cdputs( buf, lin, col+1 );
-  attrset(A_BOLD);
+  uiPutColor(CQC_A_BOLD);
   cdbox( lin-1, col, lin+1, col+i+1 );
   col = col + i + 4;
-  attrset(LabelColor);
+  uiPutColor(LabelColor);
   cdputs( "<-", lin, col );
   col = col + 4;
   c_strcpy( "(u)niverse", buf );
   i = strlen( buf );
-  attrset(InfoColor);
+  uiPutColor(InfoColor);
   cdputs( buf, lin, col+1 );
-  attrset(A_BOLD);
+  uiPutColor(CQC_A_BOLD);
   cdbox( lin-1, col, lin+1, col+i+1 );
   col = col + i + 4;
-  attrset(LabelColor);
+  uiPutColor(LabelColor);
   cdputs( ".", lin, col );
   col = col + 4;
   c_strcpy( "(g)ame", buf );
   i = strlen( buf );
-  attrset(InfoColor);
+  uiPutColor(InfoColor);
   cdputs( buf, lin, col+1 );
-  attrset(A_BOLD);
+  uiPutColor(CQC_A_BOLD);
   cdbox( lin-1, col, lin+1, col+i+1 );
   col = col + i + 4;
-  attrset(LabelColor);
+  uiPutColor(LabelColor);
   cdputs( ".", lin, col );
   col = col + 4;
   c_strcpy( "(p)lanets", buf );
   i = strlen( buf );
-  attrset(InfoColor);
+  uiPutColor(InfoColor);
   cdputs( buf, lin, col+1 );
-  attrset(A_BOLD);
+  uiPutColor(CQC_A_BOLD);
   cdbox( lin-1, col, lin+1, col+i+1 );
   
   col = icol + 20;
   lin+=3;
-  attrset(LabelColor);
+  uiPutColor(LabelColor);
   cdput( '|', lin, col );
   lin++;
   cdput( 'v', lin, col );
@@ -1548,16 +1583,16 @@ void opinit(void)
   col = icol + 15;
   c_strcpy( "(m)essages", buf );
   i = strlen( buf );
-  attrset(InfoColor);
+  uiPutColor(InfoColor);
   cdputs( buf, lin, col+1 );
-  attrset(A_BOLD);
+  uiPutColor(CQC_A_BOLD);
   cdbox( lin-1, col, lin+1, col+i+1 );
   col = col + i + 8;
   c_strcpy( "(l)ockwords", buf );
   i = strlen( buf );
-  attrset(InfoColor);
+  uiPutColor(InfoColor);
   cdputs( buf, lin, col+1 );
-  attrset(A_BOLD);
+  uiPutColor(CQC_A_BOLD);
   cdbox( lin-1, col, lin+1, col+i+1 );
   
   while (TRUE)  /*repeat */
@@ -1565,12 +1600,12 @@ void opinit(void)
       lin = MSG_LIN1;
       col = 30;
       cdclrl( lin, 1 );
-      attrset(InfoColor);
+      uiPutColor(InfoColor);
       buf[0] = EOS;
       ch = (char)cdgetx( pmt, lin, col, TERMS, buf, MSGMAXLINE, TRUE );
       cdclrl( lin, 1 );
       cdputs( pmt, lin, col );
-  	  attrset(0);
+  	  uiPutColor(0);
       col = col + strlen( pmt );
       if ( ch == TERM_ABORT || buf[0] == EOS )
 	break;
@@ -1578,61 +1613,61 @@ void opinit(void)
 	{
 	case 'e':
 	  cdputs( "everything", lin, col );
-	  if ( confirm() )
+	  if ( cumConfirm() )
 	    {
 	      DoInit('e', FALSE);
 	    }
 	  break;
 	case 'z':
 	  cdputs( "zero everything", lin, col );
-	  if ( confirm() )
+	  if ( cumConfirm() )
 	    DoInit('z', FALSE);
 	  break;
 	case 'u':
 	  cdputs( "universe", lin, col );
-	  if ( confirm() )
+	  if ( cumConfirm() )
 	    {
 	      DoInit('u', FALSE);
 	    }
 	  break;
 	case 'g':
 	  cdputs( "game", lin, col );
-	  if ( confirm() )
+	  if ( cumConfirm() )
 	    {
 	      DoInit('g', FALSE);
 	    }
 	  break;
 	case 'p':
 	  cdputs( "planets", lin, col );
-	  if ( confirm() )
+	  if ( cumConfirm() )
 	    {
 	      DoInit('p', FALSE);
 	    }
 	  break;
 	case 's':
 	  cdputs( "ships", lin, col );
-	  if ( confirm() )
+	  if ( cumConfirm() )
 	    {
 	      DoInit('s', FALSE);
 	    }
 	  break;
 	case 'm':
 	  cdputs( "messages", lin, col );
-	  if ( confirm() )
+	  if ( cumConfirm() )
 	    {
 	      DoInit('m', FALSE);
 	    }
 	  break;
 	case 'l':
 	  cdputs( "lockwords", lin, col );
-	  if ( confirm() )
+	  if ( cumConfirm() )
 	    {
 	      DoInit('l', FALSE);
 	    }
 	  break;
 	case 'r':
 	  cdputs( "robots", lin, col );
-	  if ( confirm() )
+	  if ( cumConfirm() )
 	    {
 	      DoInit('r', FALSE);
 	    }
@@ -1698,31 +1733,31 @@ void oppedit(void)
 		Planets[pnum].type == PLANET_CLASSO ||
 		Planets[pnum].type == PLANET_CLASSZ ||
 		Planets[pnum].type == PLANET_GHOST )   /* white as a ghost ;-) */
-	attrib = A_BOLD;
+	attrib = CQC_A_BOLD;
       else 
 	attrib = SpecialColor;
       
 				/* if we're doing a sun, use yellow
 				   else use attrib set above */
       if (Planets[pnum].type == PLANET_SUN)
-	attrset(YellowLevelColor);
+	uiPutColor(YellowLevelColor);
       else
-	attrset(attrib);
-      puthing(Planets[pnum].type, i, j );
-      attrset(0);
+	uiPutColor(attrib);
+      cumPutThing(Planets[pnum].type, i, j );
+      uiPutColor(0);
 
 	  /* suns have red cores, others are cyan. */
       if (Planets[pnum].type == PLANET_SUN)
-	attrset(RedLevelColor);
+	uiPutColor(RedLevelColor);
       else
-	attrset(InfoColor);
+	uiPutColor(InfoColor);
       cdput( ConqInfo->chrplanets[Planets[pnum].type], i, j + 1);
-      attrset(0);
+      uiPutColor(0);
 
       sprintf(buf, "%s\n", Planets[pnum].name);
-      attrset(attrib);
+      uiPutColor(attrib);
       cdputs( buf, i + 1, j + 2 ); /* -[] */
-      attrset(0);
+      uiPutColor(0);
       
       /* Display info about the planet. */
       lin = 4;
@@ -1822,7 +1857,7 @@ void oppedit(void)
       cprintf(lin,col,ALIGN_NONE,sfmt, "<>", 
 		" decrement/increment planet number\n");
       
-      cdclra(MSG_LIN1, 0, MSG_LIN1 + 2, cdcols() - 1);
+      cdclra(MSG_LIN1, 0, MSG_LIN1 + 2, Context.maxcol - 1);
       
       cdmove( 0, 0 );
       cdrefresh();
@@ -1833,7 +1868,7 @@ void oppedit(void)
 	{
 	case 'a':
 	  /* Angle. */
-	  ch = getcx( "New angle? ", MSG_LIN1, 0,
+	  ch = cumGetCX( "New angle? ", MSG_LIN1, 0,
 		     TERMS, buf, MSGMAXLINE );
 	  if ( ch == TERM_ABORT || buf[0] == EOS )
 	    continue;	/* next */
@@ -1849,7 +1884,7 @@ void oppedit(void)
 	  break;
 	case 'A':
 	  /* Armies. */
-	  ch = getcx( "New number of armies? ",
+	  ch = cumGetCX( "New number of armies? ",
 		     MSG_LIN1, 0, TERMS, buf, MSGMAXLINE );
 	  if ( ch == TERM_ABORT || buf[0] == EOS )
 	    continue;
@@ -1861,25 +1896,25 @@ void oppedit(void)
 	  break;
 	case 'n':
 	  /* New planet name. */
-	  ch = getcx( "New name for this planet? ",
+	  ch = cumGetCX( "New name for this planet? ",
 		     MSG_LIN1, 0, TERMS, buf, MAXPLANETNAME );
 	  if ( ch != TERM_ABORT && ( ch == TERM_EXTRA || buf[0] != EOS ) )
 	    stcpn( buf, Planets[pnum].name, MAXPLANETNAME );
 	  break;
 	case 'o':
 	  /* New primary. */
-	  ch = getcx( "New planet to orbit? ",
+	  ch = cumGetCX( "New planet to orbit? ",
 		     MSG_LIN1, 0, TERMS, buf, MAXPLANETNAME );
 	  if ( ch == TERM_ABORT || buf[0] == EOS )
 	    continue;	/* next */
 	  if ( buf[1] == '0' && buf[2] == EOS )
 	    Planets[pnum].primary = 0;
-	  else if ( gplanmatch( buf, &i ) )
+	  else if ( opPlanetMatch( buf, &i ) )
 	    Planets[pnum].primary = i;
 	  break;
 	case 'v':
 	  /* Velocity. */
-	  ch = getcx( "New velocity? ",
+	  ch = cumGetCX( "New velocity? ",
 		     MSG_LIN1, 0, TERMS, buf, MSGMAXLINE );
 	  if ( ch == TERM_ABORT || buf[0] == EOS )
 	    continue;	/* next */
@@ -1905,7 +1940,7 @@ void oppedit(void)
 	  break;
 	case 'x':
 	  /* X coordinate. */
-	  ch = getcx( "New X coordinate? ",
+	  ch = cumGetCX( "New X coordinate? ",
 		     MSG_LIN1, 0, TERMS, buf, MSGMAXLINE );
 	  if ( ch == TERM_ABORT || buf[0] == EOS )
 	    continue;	/* next */
@@ -1919,7 +1954,7 @@ void oppedit(void)
 	  break;
 	case 'y':
 	  /* Y coordinate. */
-	  ch = getcx( "New Y coordinate? ",
+	  ch = cumGetCX( "New Y coordinate? ",
 		     MSG_LIN1, 0, TERMS, buf, MSGMAXLINE );
 	  if ( ch == TERM_ABORT || buf[0] == EOS )
 	    continue;	/* next */
@@ -1945,7 +1980,7 @@ void oppedit(void)
 	  break;
 	  /* Uninhabitable minutes */
 	case 'u':
-	  ch = getcx( "New uninhabitable minutes? ",
+	  ch = cumGetCX( "New uninhabitable minutes? ",
 		     MSG_LIN1, 0, TERMS, buf, MSGMAXLINE );
 	  if ( ch == TERM_ABORT || buf[0] == EOS )
 	    continue;
@@ -1956,16 +1991,16 @@ void oppedit(void)
 	  Planets[pnum].uninhabtime = j;
 	  break;
 	case 'p':
-	  ch = getcx( "New planet to edit? ",
+	  ch = cumGetCX( "New planet to edit? ",
 		     MSG_LIN1, 0, TERMS, buf, MAXPLANETNAME );
 	  if ( ch == TERM_ABORT || buf[0] == EOS )
 	    continue;	/* next */
-	  if ( gplanmatch( buf, &i ) )
+	  if ( opPlanetMatch( buf, &i ) )
 	    pnum = i;
 	  break;
 	case 'r':
 	  /* Radius. */
-	  ch = getcx( "New radius? ",
+	  ch = cumGetCX( "New radius? ",
 		     MSG_LIN1, 0, TERMS, buf, MSGMAXLINE );
 	  if ( ch == TERM_ABORT || buf[0] == EOS )
 	    continue;	/* next */
@@ -2022,9 +2057,9 @@ void oppedit(void)
 /*  opplanlist - display the planet list for an operator */
 /*  SYNOPSIS */
 /*    opplanlist */
-void opplanlist(void)
+void opPlanetList(void)
 {
-  planlist( TEAM_NOTEAM, 0 );		/* we get extra info */
+  cumPlanetList( TEAM_NOTEAM, 0 );		/* we get extra info */
 }
 
 
@@ -2047,21 +2082,21 @@ void opresign(void)
       return;
     }
 
-  if ( ! gunum( &unum, buf, -1 ) )
+  if ( ! clbGetUserNum( &unum, buf, -1 ) )
     {
       cdputs( "No such user.", MSG_LIN2, 1 );
       cdmove( 1, 1 );
       cdrefresh();
       c_sleep( 1.0 );
     }
-  else if ( confirm() )
+  else if ( cumConfirm() )
     {
       clog("OPER: %s has resigned %s (%s)",
 	   operName,
 	   Users[unum].username,
 	   Users[unum].alias);
 
-      resign( unum, TRUE );
+      clbResign( unum, TRUE );
     }
   cdclrl( MSG_LIN1, 2 );
   
@@ -2098,7 +2133,7 @@ void oprobot(void)
   	for (i=1;i<j && xbuf[i] != EOS;i++)
 		buf[i] = (char)tolower(xbuf[i]);
 
-  if ( ! gunum( &unum, buf, -1 ) )
+  if ( ! clbGetUserNum( &unum, buf, -1 ) )
     {
       char *uptr = buf;
 				/* un-upper case first char and
@@ -2106,7 +2141,7 @@ void oprobot(void)
       if (*uptr == '@')
 	uptr++;
       uptr[0] = (char)tolower(uptr[0]);
-      if ( ! gunum( &unum, buf, -1 ) )
+      if ( ! clbGetUserNum( &unum, buf, -1 ) )
 	{
 	  cdputs( "No such user.", MSG_LIN2, 1 );
 	  return;
@@ -2140,7 +2175,7 @@ void oprobot(void)
     {
       if ( ! newrob( &snum, unum ) )
 	{
-	  c_putmsg( "Failed to create robot ship.", MSG_LIN1 );
+	  cumPutMsg( "Failed to create robot ship.", MSG_LIN1 );
 	  break;
 	}
       
@@ -2176,7 +2211,7 @@ void oprobot(void)
   i = MSG_LIN1;
   if ( anum != num )
     i = i + 1;
-  c_putmsg( buf, i );
+  cumPutMsg( buf, i );
   
   return;
   
@@ -2217,7 +2252,7 @@ void opstats(void)
       if ( i == 0 )
 	x = 0.0;
       else
-	x = oneplace( 100.0 * creal(ConqInfo->ccpuseconds) / creal(i) );
+	x = oneplace( 100.0 * rfix(ConqInfo->ccpuseconds) / rfix(i) );
       cprintf( lin,col,ALIGN_NONE,pfmt, 
 		LabelColor,"Conquest cpu usage:", InfoColor,x);
       
@@ -2236,7 +2271,7 @@ void opstats(void)
       if ( i == 0 )
 	x = 0.0;
       else
-	x = oneplace( 100.0 * creal(ConqInfo->dcpuseconds) / creal(i) );
+	x = oneplace( 100.0 * rfix(ConqInfo->dcpuseconds) / rfix(i) );
       cprintf( lin,col,ALIGN_NONE,pfmt, 
 		LabelColor,"Conqdriv cpu usage:", InfoColor,x);
       
@@ -2255,7 +2290,7 @@ void opstats(void)
       if ( i == 0 )
 	x = 0.0;
       else
-	x = ( 100.0 * creal(ConqInfo->rcpuseconds) / creal(i) );
+	x = ( 100.0 * rfix(ConqInfo->rcpuseconds) / rfix(i) );
       cprintf( lin, col, ALIGN_NONE, pfmt, 
 		LabelColor, "Robot cpu usage:", InfoColor, x);
       
@@ -2325,7 +2360,7 @@ void opstats(void)
       cprintf( lin,col,ALIGN_NONE, "%s",buf);
       
       cdmove( 1, 1 );
-      attrset(0);
+      uiPutColor(0);
       cdrefresh();
     }
   while ( !iogtimed( &ch, 1.0 ) ); /* until */
@@ -2338,7 +2373,7 @@ void opstats(void)
 /*  opteamlist - display the team list for an operator */
 /*  SYNOPSIS */
 /*    opteamlist */
-void opteamlist(void)
+void opTeamList(void)
 {
   
   int ch;
@@ -2346,8 +2381,8 @@ void opteamlist(void)
   cdclear();
   do /* repeat*/
     {
-      teamlist( -1 );
-      putpmt( MTXT_DONE, MSG_LIN2 );
+      cumTeamList( -1 );
+      cumPutPrompt( MTXT_DONE, MSG_LIN2 );
       cdrefresh();
     }
   while ( !iogtimed( &ch, 1.0 ) ); /* until */
@@ -2381,7 +2416,7 @@ void opuadd(void)
       cdclrl( MSG_LIN1, 1 );
       return;
     }
-  if ( gunum( &unum, name, -1 ) ) /* don't want to use ptr here */
+  if ( clbGetUserNum( &unum, name, -1 ) ) /* don't want to use ptr here */
     {
       cdputs( "That user is already enrolled.", MSG_LIN2, 1 );
       cdmove( 1, 1 );
@@ -2429,7 +2464,7 @@ void opuadd(void)
   appstr( nameptr, buf );
   buf[i] = (char)toupper( buf[i] );
   buf[MAXUSERPNAME] = EOS;
-  if ( ! c_register( nameptr, buf, team, &unum ) )
+  if ( ! clbRegister( nameptr, buf, team, &unum ) )
     {
       cdputs( "Error adding new user.", MSG_LIN2, 1 );
       cdmove( 0, 0 );
@@ -2469,21 +2504,21 @@ void opuedit(void)
   char *promptptr;
 
   cdclrl( MSG_LIN1, 2 );
-  attrset(InfoColor);
-  ch = getcx( "Edit which user: ", MSG_LIN1, 0, TERMS, buf, MAXUSERNAME );
+  uiPutColor(InfoColor);
+  ch = cumGetCX( "Edit which user: ", MSG_LIN1, 0, TERMS, buf, MAXUSERNAME );
   if ( ch == TERM_ABORT )
     {
       cdclrl( MSG_LIN1, 2 );
-	  attrset(0);
+	  uiPutColor(0);
       return;
     }
   /*  delblanks( buf );*/
 
-  if ( ! gunum( &unum, buf, -1 ) )
+  if ( ! clbGetUserNum( &unum, buf, -1 ) )
     {
       cdclrl( MSG_LIN1, 2 );
       cdputs( "Unknown user.", MSG_LIN1, 1 );
-	  attrset(0);
+	  uiPutColor(0);
       cdmove( 1, 1 );
       cdrefresh();
       c_sleep( 1.0 );
@@ -2565,6 +2600,7 @@ void opuedit(void)
       for ( i = 0; i < MAXOOPTIONS; i++ )
 	{
 	  cprintf(lin+i,tcol,ALIGN_NONE,"#%d#%17d:", LabelColor,i);
+
 	  if ( Users[unum].ooptions[i] )
 	    cprintf(lin+i,dcol,ALIGN_NONE,"#%d#%c", GreenLevelColor,'T');
 	  else
@@ -2779,7 +2815,7 @@ void opuedit(void)
 	    {
 	      /* Pseudonym. */
 	      cdclrl( MSG_LIN2, 1 );
-	      ch = getcx( "Enter a new pseudonym: ",
+	      ch = cumGetCX( "Enter a new pseudonym: ",
 			 MSG_LIN2, 0, TERMS, buf, MAXUSERPNAME );
 	      if ( ch != TERM_ABORT &&
 		  ( buf[0] != EOS || ch == TERM_EXTRA ) )
@@ -2789,12 +2825,12 @@ void opuedit(void)
 	    {
 	      /* Username. */
 	      cdclrl( MSG_LIN2, 1 );
-	      ch = getcx( "Enter a new username: ",
+	      ch = cumGetCX( "Enter a new username: ",
 			 MSG_LIN2, 0, TERMS, buf, MAXUSERNAME );
 	      if ( ch != TERM_ABORT && buf[0] != EOS)
 	      {
 		delblanks( buf );
-		if ( ! gunum( &i, buf, -1 ) )
+		if ( ! clbGetUserNum( &i, buf, -1 ) )
 		  stcpn( buf, Users[unum].username, MAXUSERNAME );
 		else
 		  {
@@ -2816,7 +2852,7 @@ void opuedit(void)
 	    {
 	      /* Multiple count. */
 	      cdclrl( MSG_LIN2, 1 );
-	      ch = getcx( "Enter new multiple count: ",
+	      ch = cumGetCX( "Enter new multiple count: ",
 			 MSG_LIN2, 0, TERMS, buf, MSGMAXLINE );
 	      if ( ch != TERM_ABORT && buf[0] != EOS )
 		{
@@ -2904,7 +2940,7 @@ void watch(void)
 	    if ( dgrand( msgrand, &now ) >= NEWMSG_GRAND )
 		if ( getamsg( MSG_GOD, &ConqInfo->glastmsg ) )
 		  {
-		    readmsg( MSG_GOD, ConqInfo->glastmsg, RMsg_Line );
+		    cumReadMsg( MSG_GOD, ConqInfo->glastmsg, RMsg_Line );
 #if defined(OPER_MSG_BEEP)
 		    if (Msgs[ConqInfo->glastmsg].msgfrom != MSG_GOD)
 		      cdbeep();
@@ -2943,7 +2979,7 @@ void watch(void)
 		      if ( Doomsday->status == DS_LIVE )
 			Doomsday->status = DS_OFF;
 		      else
-			doomsday();
+			clbDoomsday();
 		    }
 		  else
 		    cdbeep();
@@ -2961,13 +2997,13 @@ void watch(void)
 		  kiss(Context.snum, TRUE);
 		  break;
 		case 'm':
-		  clntSendMsg( MSG_GOD, TRUE, FALSE );
+		  cucSendMsg( MSG_GOD, TRUE, FALSE );
 		  break;
 		case 'r':  /* just for fun - dwp */
 		  oprobot();
 		  break;
 		case 'L':
-		  review( MSG_GOD, ConqInfo->glastmsg );
+		  cumReviewMsgs( MSG_GOD, ConqInfo->glastmsg );
 		  break;
 		case 0x0c:
 		  operStopTimer();
@@ -3042,13 +3078,13 @@ void watch(void)
 		  break;
 		case '/':                /* ship list - dwp */
 		  operStopTimer();
-		  playlist( TRUE, FALSE, 0 );
+		  cumPlayList( TRUE, FALSE, 0 );
 		  Context.redraw = TRUE;
 		  operSetTimer();
 		  break;
 		case '\\':               /* big ship list - dwp */
 		  operStopTimer();
-		  playlist( TRUE, TRUE, 0 );
+		  cumPlayList( TRUE, TRUE, 0 );
 		  Context.redraw = TRUE;
 		  operSetTimer();
 		  break;
@@ -3073,7 +3109,7 @@ void watch(void)
 
 			  for (i=1; i <= MAXSHIPS; i++)
 			    {
-			      if (stillalive(i))
+			      if (clbStillAlive(i))
 				{
 				  foundone = TRUE;
 				}
@@ -3114,7 +3150,7 @@ void watch(void)
 		      Context.redraw = TRUE;
 		      
 		      if (live_ships)
-			if ((snum > 0 && stillalive(snum)) || 
+			if ((snum > 0 && clbStillAlive(snum)) || 
 			    (snum == DISPLAY_DOOMSDAY && Doomsday->status == DS_LIVE))
 			  {
 			    Context.snum = snum;
@@ -3150,7 +3186,7 @@ void watch(void)
 
 			  for (i=1; i <= MAXSHIPS; i++)
 			    {
-			      if (stillalive(i))
+			      if (clbStillAlive(i))
 				{
 				  foundone = TRUE;
 				}
@@ -3192,7 +3228,7 @@ void watch(void)
 		      Context.redraw = TRUE;
 		      
 		      if (live_ships)
-			if ((snum > 0 && stillalive(snum)) || 
+			if ((snum > 0 && clbStillAlive(snum)) || 
 			    (snum == DISPLAY_DOOMSDAY && Doomsday->status == DS_LIVE))
 			  {
 			    Context.snum = snum;
@@ -3219,7 +3255,7 @@ void watch(void)
 		  break;
 		default:
 		  cdbeep();
-		  c_putmsg( "Type h for help.", MSG_LIN2 );
+		  cumPutMsg( "Type h for help.", MSG_LIN2 );
 		  break;
 		}
 	      /* Disable messages for awhile. */
@@ -3355,7 +3391,7 @@ void dowatchhelp(void)
   tlin++;
   cprintf(tlin,col,ALIGN_NONE,sfmt, "/", "player list");
 
-  putpmt( MTXT_DONE, MSG_LIN2 );
+  cumPutPrompt( MTXT_DONE, MSG_LIN2 );
   cdrefresh();
   while ( ! iogtimed( &ch, 1.0 ) )
     ;
@@ -3433,7 +3469,7 @@ int DoInit(char InitChar, int cmdline)
   switch(InitChar)
     {
     case 'e': 
-      initeverything();
+      clbInitEverything();
       *CBlockRevision = COMMONSTAMP;
 
       if (cmdline == TRUE)
@@ -3445,7 +3481,7 @@ int DoInit(char InitChar, int cmdline)
       break;
 
     case 'z': 
-      zeroeverything();
+      clbZeroEverything();
 
       if (cmdline == TRUE)
 	{
@@ -3456,7 +3492,7 @@ int DoInit(char InitChar, int cmdline)
       break;
 
     case 'u': 
-      inituniverse();
+      clbInitUniverse();
       *CBlockRevision = COMMONSTAMP;
 
       if (cmdline == TRUE)
@@ -3468,7 +3504,7 @@ int DoInit(char InitChar, int cmdline)
       break;
 
     case 'g': 
-      initgame();
+      clbInitGame();
       *CBlockRevision = COMMONSTAMP;
 
       if (cmdline == TRUE)
@@ -3480,7 +3516,7 @@ int DoInit(char InitChar, int cmdline)
       break;
 
     case 'p': 
-      initplanets();
+      clbInitPlanets();
       *CBlockRevision = COMMONSTAMP;
 
       if (cmdline == TRUE)
@@ -3492,7 +3528,7 @@ int DoInit(char InitChar, int cmdline)
       break;
 
     case 's': 
-      clearships();
+      clbClearShips();
       *CBlockRevision = COMMONSTAMP;
 
       if (cmdline == TRUE)
@@ -3504,7 +3540,7 @@ int DoInit(char InitChar, int cmdline)
       break;
 
     case 'm': 
-      initmsgs();
+      clbInitMsgs();
       *CBlockRevision = COMMONSTAMP;
 
       if (cmdline == TRUE)
@@ -3529,7 +3565,7 @@ int DoInit(char InitChar, int cmdline)
       break;
 
     case 'r': 
-      initrobots();
+      clbInitRobots();
       *CBlockRevision = COMMONSTAMP;
 
       if (cmdline == TRUE)
