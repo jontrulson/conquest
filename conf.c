@@ -61,7 +61,7 @@ int GetSysConf(int checkonly)
 				/* init some defaults */
   SysConf.NoDoomsday = FALSE;
   SysConf.DoRandomRobotKills = FALSE;
-  SysConf.AllowSigquit = FALSE;
+  SysConf.AllowVacant = FALSE;
   SysConf.AllowSwitchteams = TRUE;
   SysConf.UserExpiredays = DEFAULT_USEREXPIRE;
   SysConf.LogMessages = FALSE;
@@ -881,7 +881,7 @@ Unsgn32 getServerFlags(void)
   if (SysConf.AllowRefits)
     f |= SPSSTAT_FLAGS_REFIT;
 
-  if (SysConf.AllowSigquit)
+  if (SysConf.AllowVacant)
     f |= SPSSTAT_FLAGS_VACANT;
 
   if (SysConf.AllowSlingShot)

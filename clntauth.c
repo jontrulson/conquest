@@ -32,6 +32,9 @@ static void PrintStatus(int lin)
   sprintf(buf, "#%d#Version: #%d# %%s", MagentaColor, NoColor);
   cprintf(lin++, 0, ALIGN_NONE, buf, sHello.serverver);
 
+  sprintf(buf, "#%d#Time: #%d#    %%s", MagentaColor, NoColor);
+  cprintf(lin++, 0, ALIGN_NONE, buf, ctime((time_t *)&sStat.servertime));
+
   sprintf(buf, 
 	  "#%d#Status: #%d#  Users #%d#%%d, #%d#Ships #%d#%%d/%%d #%d#"
 	  "(#%d#%%d #%d#active, #%d#%%d #%d#vacant, "

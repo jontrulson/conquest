@@ -115,8 +115,8 @@ typedef struct _sysConf {
   int NoDoomsday;
 				/* allow randomized robot strengths */
   int DoRandomRobotKills;
-				/* allow non gods to SIGQUIT out */
-  int AllowSigquit;
+				/* allow vacant ships */
+  int AllowVacant;
 				/* allow users to (s)witchteams from main
 				   menu */
   int AllowSwitchteams;
@@ -247,13 +247,15 @@ struct Conf SysConfData[] =
   {
     FALSE,
     CTYPE_BOOL,
-    "allow_sigquit=",
-    &SysConf.AllowSigquit,
+    "allow_vacant=",
+    &SysConf.AllowVacant,
     0, 0,			/* mix/max */
-    "Allow users to exit Conquest immediately with a QUIT signal",
+    "Allow users to exit Conquest leaving their ship vacant",
     {
-      "# define this as 'true' if you want to allow non Conquest Gods to",
-      "#  be able to use SIGQUIT (normally ^\\) to leave conquest.",
+      "# define this as 'true' if you want to allow users to",
+      "#  be able to leave their ship vacant if they use SIGQUIT",
+      "#  (normally ^\\) to leave conquest without self-destructing first.",
+      "#  Otherwise their ship will be destroyed by a lightning bolt.",
       "#  Default: false",
       NULL
     }

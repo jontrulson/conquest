@@ -9,6 +9,22 @@
 
                               Conquest News
 
+Version 8.0 12/13/2003
+
+    - the official v8.0 release
+
+    - fixed bug in meta.c that counted active ships improperly.  Same
+      with PrintStatus in clntauth.c.
+
+    - conqdriv will kill VACANT ships if the Vacant flag is not
+      enabled for the server and it happens to find a vacant ship.
+
+    - PrintStatus in clntauth.c will now show the server's local
+      time as sent in the server's spServerStat_t packet. 
+
+    - changed AllowSigquit option to AllowVacant, to more properly
+      reflect it's purpose.
+
 Version 7.2h (devel - v8.0 prerelease) 12/7/2003
 
     7.2h

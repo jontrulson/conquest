@@ -190,14 +190,14 @@ int sendServerStat(int sock)
 	{
 	  numships++;
 	  
-	  if (Users[Ships[i].unum].robot)
+	  if (SROBOT(i))
 	    numshipsrobot++;
 	  else
 	    {
-	      if (CheckPid(Ships[i].pid))
-		numshipsactive++;
-	      else
+	      if (SVACANT(i))
 		numshipsvacant++;
+	      else
+		numshipsactive++;
 	    }
 	}
     }

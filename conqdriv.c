@@ -893,9 +893,15 @@ void mindrive(void)
 
   /* look for vacant ships that aren't marked vacant */
   for (i=1; i <= MAXSHIPS; i++)
-    if (Ships[i].status == SS_LIVE && !SVACANT(i))
-      if (Ships[i].pid > 0 && !CheckPid(Ships[i].pid))
-	SFSET(i, SHIP_F_VACANT);
+    {
+      if (Ships[i].status == SS_LIVE && !SVACANT(i))
+        if (Ships[i].pid > 0 && !CheckPid(Ships[i].pid))
+          SFSET(i, SHIP_F_VACANT);
+
+      /* if the ship is VACANT, and vacants aren't allowed, kill them. */
+      if (!SysConf.AllowVacant && SVACANT(i))
+        killship( i, KB_LIGHTNING );
+    }
 
   for ( i = 1; i <= NUMPLANETS; i = i + 1 )
     {

@@ -1014,7 +1014,7 @@ void handleSimpleCmdPkt(cpCommand_t *ccmd)
       clog("CPCMD_DISCONNECT");
       if (sInfo.state == SVR_STATE_PLAY)
 	{
-	  if (SysConf.AllowSigquit)
+	  if (SysConf.AllowVacant)
 	    {			/* this allows vacant ships */
 	      stopUpdate();
 	      

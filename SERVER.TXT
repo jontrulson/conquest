@@ -51,7 +51,7 @@ CONTENTS:
     want to do is play by yourself on your own machine, you will need
     to run conquestd in order to play.
 
-    If all you want to do is use conquest to play on someones elses
+    If all you want to do is use conquest to play on someone else's
     server, then you do not need to be reading this document. :)
 
     conquestd supports a variety of options outlined below:
@@ -98,7 +98,7 @@ CONTENTS:
 
     This will have conquestd setuid() permanently to user 'nobody'
     before beginning operations.  On most unix systems, user 'nobody'
-    has no home directory, password, or priviliges, and therefore is a
+    has no home directory, password, or privileges, and therefore is a
     safe user id to run under.
 
     You must be the root user in order to use the '-u' option.
@@ -109,7 +109,7 @@ CONTENTS:
 ## notifying the metaserver
 
    If you are going to run a server that will be available to the
-   public via the internet, you should pass the '-m' option to
+   public via the Internet, you should pass the '-m' option to
    conquestd when you start it.
 
    When running with the '-m' option, conquestd will contact the
@@ -135,7 +135,7 @@ CONTENTS:
       telnet conquest.radscan.com 1700
 
    Of course, make sure that your server is actually reachable from
-   the internet before notifying the Meta server.  
+   the Internet before notifying the Meta server.  
 
 
 ## providing telnet access to your server (optional)
@@ -168,7 +168,7 @@ CONTENTS:
       Doing this insures that when someone logs into 'conquest' they
       are sent directly into the game's login screen.  Also, if
       Conquest should ever crash (which has never happened to my
-      knowlege ;-), the user will be automatically logged out of the
+      knowledge ;-), the user will be automatically logged out of the
       system.  There is no way I'm aware of that a Conquest player
       could ever get to a command shell if you set it up this way
       (since conquest itself is the user's shell).
@@ -206,7 +206,7 @@ CONTENTS:
 
 
    NOTE: although telnet users will be able to change their options
-   from the conquest Options menu, they will not be abe to save them.
+   from the conquest Options menu, they will not be able to save them.
    Sorry.
 
    If you want others to know about your telnet'able server, let me
@@ -262,7 +262,7 @@ CONTENTS:
       Runs a server as user nobody, notifies the Conquest Meta server
       of the game, and tells the metaserver that the address
       'conquest.radscan.com' is the address of your server, as seen from
-      the internet.
+      the Internet.
 
 
 $Id$

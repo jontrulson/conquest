@@ -213,14 +213,15 @@ int metaUpdateServer(char *remotehost, char *name, int port)
     {
       if ( Ships[i].status == SS_LIVE )
         {
-          if (Users[Ships[i].unum].robot)
+          if (SROBOT(i))
             numshipsrobot++;
           else
             {
-              if (CheckPid(Ships[i].pid))
-                numshipsactive++;
-              else
+              if (SVACANT(i))
                 numshipsvacant++;
+              else
+                numshipsactive++;
+
             }
         }
     }
