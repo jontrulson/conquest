@@ -19,10 +19,28 @@ Version 8.0.1i 9/03/2004 (devel)
 
           This also works when playing back a recorded game.
 
+          This also can help you to prevent your ship dying while
+          looking at the userlist for example :)
+
         - redid the viewer fonts - now use a tex mapped font as well,
           instead of the glut bitmap fonts. 
 
+        - fixed up GL version of cvtcoords to remove artifacts in when
+          objects were considered to be 'in view'.  Previously the
+          cvtcoords function from the curses client was being used to
+          determine this... This could cause objects (planets, etc) to
+          'disappear' when close to the min/max X/Y coordinates.
+          Objects will now move properly into and out of view now in
+          the viewer.
+
+        - corrected perspective correction misunderstandings on my
+          part :) Planet and ship labels now are always positioned
+          correctly regardless of your position relative to the
+          object.
+
         - recolorized army count in planet names on long range display.
+
+        - more GL related cleanups and re-organization.
 
 Version 8.0.1h 8/10/2004 (devel)
 

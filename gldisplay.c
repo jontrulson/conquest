@@ -76,7 +76,7 @@ static int alertcolor(int alert)
 /*    display( snum, display_info ) */
 void display( int snum, int display_info )
 {
-  int i, j, lin, col, minenemy, minsenemy;
+  int i, j, minenemy, minsenemy;
   int outattr;
   static int OldAlert = 0;
   char ch, buf[MSGMAXLINE];
@@ -148,10 +148,10 @@ void display( int snum, int display_info )
     {
       if ( ! Planets[i].real )
 	continue; /*next;*/
-      if ( ! clbCVTCoords( cenx, ceny, Planets[i].x, Planets[i].y, scale, &lin, &col ) )
+      if ( !GLcvtcoords( cenx, ceny, Planets[i].x, Planets[i].y, scale, 
+                         &glx, &gly ))
 	continue; /* next;*/
 
-      GLcvtcoords( cenx, ceny, Planets[i].x, Planets[i].y, scale, &glx, &gly );
       palertcol = 0;
 				/* determine alertlevel for object */
       if (snum > 0 && clbSPWar( snum, i ) && Planets[i].scanned[Ships[snum].team])
@@ -193,10 +193,9 @@ void display( int snum, int display_info )
   /* Display the planet eater. */
   if ( Doomsday->status == DS_LIVE )
     {
-      if ( clbCVTCoords( cenx, ceny, Doomsday->x, Doomsday->y, scale, &lin, &col ) )
+      if (GLcvtcoords( cenx, ceny, Doomsday->x, Doomsday->y, scale, 
+		       &glx, &gly ))
 	{
-	  GLcvtcoords( cenx, ceny, Doomsday->x, Doomsday->y, scale, 
-		       &glx, &gly );
 	  drawDoomsday(glx, gly, (GLfloat)Doomsday->heading, scale);
 	}
     }
@@ -226,15 +225,12 @@ void display( int snum, int display_info )
 		    for ( j = 0; j < MAXTORPS; j = j + 1 )
 		      if ( Ships[i].torps[j].status == TS_LIVE 
 			  || Ships[i].torps[j].status == TS_DETONATE )
-			if ( clbCVTCoords( cenx, ceny, Ships[i].torps[j].x, Ships[i].torps[j].y,
-				       scale, &lin, &col ) )
-			  {
-			    GLcvtcoords( cenx, ceny, Ships[i].torps[j].x, 
+			if ( GLcvtcoords( cenx, ceny, Ships[i].torps[j].x, 
 					 Ships[i].torps[j].y, scale, 
-					 &glx, &gly );
+					 &glx, &gly ) )
+			  {
 			    drawTorp(glx, gly, Teams[Ships[i].team].torpchar, 
 				     color, scale);			    
-			    
 			  }
 		  }
 	      }
@@ -290,12 +286,9 @@ void display( int snum, int display_info )
 	      {
 		/* ... especially if he's in the bounds of our current */
 		/*  display (either tactical or strategic map) */
-		if ( clbCVTCoords( cenx, ceny, Ships[i].x, Ships[i].y,
-			       scale, &lin, &col ) )
+		if (GLcvtcoords( cenx, ceny, Ships[i].x, Ships[i].y, 
+				 scale, &glx, &gly ))
 		  {
-		    GLcvtcoords( cenx, ceny, Ships[i].x, Ships[i].y, 
-				 scale, &glx, &gly );
-
 		    /* He's on the screen. */
 		    /* We can see him if one of the following is true: */
 
@@ -348,12 +341,9 @@ void display( int snum, int display_info )
 	  if ( snum < 0 || (snum > 0 && UserConf.DoExplode) ) /* dwp */
 	    for ( j = 0; j < MAXTORPS; j = j + 1 )
 	      if ( Ships[i].torps[j].status == TS_FIREBALL )
-		if ( clbCVTCoords( cenx, ceny, Ships[i].torps[j].x, Ships[i].torps[j].y,
-				scale, &lin, &col) )
+		if ( GLcvtcoords( cenx, ceny, Ships[i].torps[j].x, 
+                                  Ships[i].torps[j].y, scale, &glx, &gly ))
 		  { /* colorize torp explosions */
-		    GLcvtcoords( cenx, ceny, Ships[i].torps[j].x, 
-				 Ships[i].torps[j].y, scale, &glx, &gly );
-		    
 		    drawExplosion(glx, gly);
 		  }
 	  /* Now display the live torps. */
@@ -376,10 +366,9 @@ void display( int snum, int display_info )
 	  for ( j = 0; j < MAXTORPS; j = j + 1 )
 	    if ( Ships[i].status != SS_DYING && Ships[i].status != SS_DEAD && 
 		 (Ships[i].torps[j].status == TS_LIVE || Ships[i].torps[j].status == TS_DETONATE) )
-	      if ( clbCVTCoords( cenx, ceny, Ships[i].torps[j].x, Ships[i].torps[j].y,
-			      scale, &lin, &col ) )
+	      if (GLcvtcoords( cenx, ceny, Ships[i].torps[j].x, 
+                               Ships[i].torps[j].y, scale, &glx, &gly))
 		{
-		  GLcvtcoords( cenx, ceny, Ships[i].torps[j].x, Ships[i].torps[j].y, scale, &glx, &gly);
 		  drawTorp(glx, gly, Teams[Ships[i].team].torpchar, color,
                            scale);
 		}
@@ -509,7 +498,6 @@ void display( int snum, int display_info )
       }
     
     /* Kills. */
-    lin = lin + 2;
     x = (Ships[snum].kills + Ships[snum].strkills);
     if ( x != zzskills )
       {
@@ -590,7 +578,6 @@ void display( int snum, int display_info )
       }
     
     /* Temperature. */
-    lin = lin + 2;
     i = round( Ships[snum].wtemp );
     j = round( Ships[snum].etemp );
     if ( i > 100 )

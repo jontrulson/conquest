@@ -455,7 +455,7 @@ void uiDrawPlanet( GLfloat x, GLfloat y, int pnum, int scale,
 
       glfRender(x, 
                 ((scale == SCALE_FAC) ? y - 2.0 : y - 1.0), 
-                TRANZ - 5.0,  
+                TRANZ,  
                 ((GLfloat)uiCStrlen(buf) * 2.0) / ((scale == SCALE_FAC) ? 1.0 : 2.0), 
                 TEXT_HEIGHT, fontTinyFixedTxf, buf, textcolor, 
                 TRUE, TRUE, FALSE);
@@ -471,24 +471,30 @@ void uiDrawPlanet( GLfloat x, GLfloat y, int pnum, int scale,
 }
 
 
-void GLcvtcoords(real cenx, real ceny, real x, real y, real scale,
+int GLcvtcoords(real cenx, real ceny, real x, real y, real scale,
 		 GLfloat *rx, GLfloat *ry )
 {
   GLfloat rscale;
+  static const GLfloat limit = (VIEWANGLE * 2.0); /* be generous */
 
   /* 21 = lines in viewer in curses client. */
-  rscale = (21.0 * (float)scale / (VIEWANGLE * 2));
+  rscale = ((GLfloat)DISPLAY_LINS * (float)scale / (VIEWANGLE * 2));
 
   *rx = (((VIEWANGLE * dConf.vAspect) - (x-cenx)) / rscale) * -1.0;
   *ry = ((VIEWANGLE - (y-ceny)) / rscale) * -1.0;
 
-#ifdef DEBUG
-  clog("GLCVTCOORDS: cx = %.2f, cy = %.2f, \n\tx = %.2f, y = %.2f, glx = %.2f,"
+#if 0
+  clog("GLCVTCOORDS: rscale = %f limit = %f cx = %.2f, cy = %.2f, \n\tx = %.2f, y = %.2f, glx = %.2f,"
        " gly = %.2f \n",
-       cenx, ceny, x, y, *rx, *ry);
+       rscale, limit, cenx, ceny, x, y, *rx, *ry);
 #endif
 
- return; 
+  if (*rx < -limit || *rx > limit)
+    return FALSE;
+  if (*ry < -limit || *ry > limit)
+    return FALSE;
+
+  return TRUE; 
 }
 
 /* ship currently being viewed during playback */

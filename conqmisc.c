@@ -196,27 +196,6 @@ void clearships(void)
 }
 
 
-/*  cvtcoords - convert from internal coords to screen coords */
-/*  SYNOPSIS */
-/*    int inbounds, cvtcoords */
-/*    real cenx, ceny, x, y, scale */
-/*    int lin, col */
-/*    inbounds = cvtcoords( ceny, ceny, x, y, scale, lin, col ) */
-int cvtcoords( real cenx, real ceny, real x, real y, real scale, 
-	      int *lin, int *col )
-{
-  *col = round( (Context.maxcol-STAT_COLS)/2 + (x-cenx) / scale * WIDTH_FAC ) +
-    STAT_COLS;
-  
-  *lin = round( (DISPLAY_LINS/2+1) - (y-ceny) / scale );
-  if ( *lin < 0 || *lin > DISPLAY_LINS || *col <= STAT_COLS || *col > Context.maxcol )
-    return ( FALSE );
-  
-  return ( TRUE );
-  
-}
-
-
 /*  doomfind - find a planet or ship for the doomsday machine to head for */
 /*  SYNOPSIS */
 /*    doomfind */

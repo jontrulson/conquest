@@ -193,7 +193,7 @@ void uiDrawPlanet( GLfloat x, GLfloat y, int pnum, int scale,
                    int textcolor, int scanned );
 void setXtraInfo(void);
 
-void GLcvtcoords(real cenx, real ceny, real x, real y, real scale,
+int GLcvtcoords(real cenx, real ceny, real x, real y, real scale,
 		 GLfloat *rx, GLfloat *ry );
 
 void drawTorp(GLfloat x, GLfloat y, char torpchar, int color, int scale);
