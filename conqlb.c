@@ -835,11 +835,13 @@ void clbTakePlanet( int pnum, int snum )
       didgeno = 1;
 
       for ( i = 1; i <= NUMPLANETS; i = i + 1 )
-        if ( Planets[i].team == oteam )
-	  {
-	    didgeno = 0;
-	    break;
-	  }
+        {
+          if ( Planets[i].real && (Planets[i].team == oteam) )
+            {
+              didgeno = 0;
+              break;
+            }
+        }
       /* Yes. */
       if ( didgeno && (snum > 0 && snum <= MAXSHIPS) )
         {
@@ -1069,7 +1071,8 @@ void clbStatline( int unum, char *buf )
 void clbZeroPlanet( int pnum, int snum )
 {
   int oteam, i; 
-  
+  int didgeno;
+
   oteam = Planets[pnum].team;
   Planets[pnum].team = TEAM_NOTEAM;
   Planets[pnum].armies = 0;
@@ -1078,24 +1081,36 @@ void clbZeroPlanet( int pnum, int snum )
   for ( i = 0; i < NUMPLAYERTEAMS; i = i + 1 )
     Planets[pnum].scanned[i] = FALSE;
   
+  /* check for genos here */
   if ( oteam != TEAM_SELFRULED && oteam != TEAM_NOTEAM )
     {
+      didgeno = 1;
+
       /* Check whether that was the last planet owned by the vanquished. */
       for ( i = 1; i <= NUMPLANETS; i = i + 1 )
-	if ( Planets[i].team == oteam )
-	  return;
+        {
+          if ( Planets[i].real && (Planets[i].team == oteam) )
+            {
+              didgeno = 0;
+              break;
+            }
+        }
+
       /* Yes. */
-      Teams[oteam].couptime = rndint( MIN_COUP_MINUTES, MAX_COUP_MINUTES );
-      Teams[oteam].coupinfo = FALSE;		/* lost coup info */
-      if ( snum > 0 && snum <= MAXSHIPS )
-	{
-	  Users[Ships[snum].unum].stats[USTAT_GENOCIDE] += 1;
-	  Teams[Ships[snum].team].stats[TSTAT_GENOCIDE] += 1;
-          clog("INFO: %s (%s) genocided the %s team!",
-               Users[Ships[snum].unum].username,
-               Ships[snum].alias,
-               Teams[Ships[snum].team].name);
-	}
+      if (didgeno && (snum > 0 && snum <= MAXSHIPS))
+        {
+          Teams[oteam].couptime = rndint( MIN_COUP_MINUTES, MAX_COUP_MINUTES );
+          Teams[oteam].coupinfo = FALSE;		/* lost coup info */
+          if ( snum > 0 && snum <= MAXSHIPS )
+            {
+              Users[Ships[snum].unum].stats[USTAT_GENOCIDE] += 1;
+              Teams[Ships[snum].team].stats[TSTAT_GENOCIDE] += 1;
+              clog("INFO: %s (%s) genocided the %s team!",
+                   Users[Ships[snum].unum].username,
+                   Ships[snum].alias,
+                   Teams[Ships[snum].team].name);
+            }
+        }
     }
   
   return;
