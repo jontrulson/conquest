@@ -1541,7 +1541,6 @@ void dobeam( int snum )
 
       if (lastServerError)
 	{
-	  cdclrl( MSG_LIN1, 1 );
 	  sendCommand(CPCMD_BEAM, 0); /* make sure */
 	  break;
 	}
