@@ -44,7 +44,7 @@ main(int argc, char *argv[])
 {
   int i;
   string usage="usage: conqai [-vd]";
-  char arg;
+  int arg;
   
   /* First things first. */
   
