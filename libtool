@@ -1,7 +1,7 @@
 #! /bin/sh
 
 # libtool - Provide generalized library-building support services.
-# Generated automatically by  (GNU conquest 7.2)
+# Generated automatically by  (GNU conquest 8.0)
 # NOTE: Changes made to this file will be lost: look at ltmain.sh.
 #
 # Copyright (C) 1996-2000 Free Software Foundation, Inc.
@@ -47,7 +47,7 @@ SHELL="/bin/sh"
 build_libtool_libs=yes
 
 # Whether or not to build static libraries.
-build_old_libs=no
+build_old_libs=yes
 
 # Whether or not to add -lc for building shared libraries.
 build_libtool_need_lc=no

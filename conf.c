@@ -74,7 +74,7 @@ int GetSysConf(int checkonly)
 	  CONF_SERVER_MOTD_SZ);
 
 				/* start building the filename */
-  sprintf(conf_name, "%s/%s", CONQETC, SYSCONFIG_FILE);
+  snprintf(conf_name, sizeof(conf_name)-1, "%s/%s", CONQETC, SYSCONFIG_FILE);
 
   if ((conf_fd = fopen(conf_name, "r")) == NULL)
     {
@@ -311,7 +311,7 @@ int GetConf(int usernum)
   memset(home, 0, HOME_BUFSZ);
   strncpy(home, homevar, HOME_BUFSZ - 1);
 
-  sprintf(conf_name, "%s/%s", home, CONFIG_FILE);
+  snprintf(conf_name, sizeof(conf_name)-1, "%s/%s", home, CONFIG_FILE);
 
   if ((conf_fd = fopen(conf_name, "r")) == NULL)
     {
@@ -523,7 +523,7 @@ int SaveUserConfig(int unum)
   memset(home, 0, HOME_BUFSZ);
   strncpy(home, homevar, HOME_BUFSZ - 1);
 
-  sprintf(conf_name, "%s/%s", home, CONFIG_FILE);
+  snprintf(conf_name, sizeof(conf_name)-1, "%s/%s", home, CONFIG_FILE);
 
 #ifdef DEBUG_OPTIONS
   clog("SaveUserConfig(): saving user config: conf_name = '%s'", conf_name);
@@ -783,7 +783,7 @@ int MakeSysConf()
   char conf_name[BUFFER_SIZE];
   int i, j, n;
 
-  sprintf(conf_name, "%s/%s", CONQETC, SYSCONFIG_FILE);
+  snprintf(conf_name, sizeof(conf_name)-1, "%s/%s", CONQETC, SYSCONFIG_FILE);
   umask(002);
   unlink(conf_name);
 

@@ -4,7 +4,7 @@ dnl
 dnl $Id$
 dnl
 
-AC_INIT([conquest],[7.2],[jon@radscan.com])
+AC_INIT([conquest],[8.0],[jon@radscan.com])
 AC_CONFIG_HEADER(config.h)
 AM_INIT_AUTOMAKE
 AC_PROG_LIBTOOL
@@ -84,7 +84,6 @@ esac
 
 AC_SUBST(FILEPRIV)
 AC_PROG_CC
-AC_PROG_RANLIB
 
 
 if test -n "$GCC"
@@ -137,6 +136,7 @@ AC_CHECK_FUNCS(select strstr fileno setpgrp daemon)
 AC_CHECK_FUNCS(getmsg poll setitimer strerror)
 
 AC_FUNC_SETPGRP
+AC_FUNC_SNPRINTF
 
 dnl check for sys_errlist decl
 

@@ -63,6 +63,9 @@
 /* Define to 1 if you have the `setpgrp' function. */
 #undef HAVE_SETPGRP
 
+/* Define to 1 if you have the `snprintf' function. */
+#undef HAVE_SNPRINTF
+
 /* Define to 1 if you have the <stdint.h> header file. */
 #undef HAVE_STDINT_H
 
@@ -120,6 +123,9 @@
 /* Define to 1 if you have the `vprintf' function. */
 #undef HAVE_VPRINTF
 
+/* Define to 1 if you have the `vsnprintf' function. */
+#undef HAVE_VSNPRINTF
+
 /* Define to 1 if you have the <zlib.h> header file. */
 #undef HAVE_ZLIB_H
 
@@ -146,6 +152,9 @@
 
 /* Define to the version of this package. */
 #undef PACKAGE_VERSION
+
+/* "enable replacement (v)snprintf if system (v)snprintf is broken" */
+#undef PREFER_PORTABLE_SNPRINTF
 
 /* Define as the return type of signal handlers (`int' or `void'). */
 #undef RETSIGTYPE

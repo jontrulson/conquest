@@ -34,7 +34,9 @@ libconquest_la_SOURCES = conqai.c ratfor.c cd2lb.c display.c iolb.c  \
 	userauth.c record.c color.h user.h shiptype.h \
 	ship.h planet.h team.h msg.h doomsday.h driver.h conqinfo.h \
 	history.h robot.h global.h torp.h ibuf.h conf.h  display.h \
-	protocol.h packet.h packet.c userauth.h meta.c meta.h
+	protocol.h packet.h packet.c userauth.h meta.c meta.h 
+
+libconquest_la_LIBADD = @LTLIBOBJS@
 
 libconquest_la_LDFLAGS = -version-info 1:0:0
 
@@ -87,21 +89,24 @@ data_DATA = conquest.doc conqnews.doc README conqrule
 EXTRA_DIST = conquest.doc conqnews.doc README conqrule # conquestrc
 
 install-exec-hook:
-	$(mkinstalldirs) -m 755 $(localstatedir) $(CONQSYSCONFDIR) $(CONQLOCALSTATEDIR) $(CONQIMGDIR)
-	chmod 775 $(CONQLOCALSTATEDIR) 
-	chgrp $(CONQGROUP) $(CONQLOCALSTATEDIR)
+	$(mkinstalldirs) -m 755 $(DESTDIR)$(localstatedir) \
+		$(DESTDIR)$(CONQSYSCONFDIR) \
+		$(DESTDIR)$(CONQLOCALSTATEDIR) \
+		$(DESTDIR)$(CONQIMGDIR)
+	chmod 775 $(DESTDIR)$(CONQLOCALSTATEDIR) 
+	chgrp $(CONQGROUP) $(DESTDIR)$(CONQLOCALSTATEDIR)
 #	cp -f $(IMAGES) $(CONQIMGDIR)/
 #	chmod 644 $(CONQIMGDIR)/*.bmp
-	chmod 755 $(prefix) $(datadir)
+	chmod 755 $(prefix) $(DESTDIR)$(datadir)
 	chgrp $(CONQGROUP) $(DESTDIR)$(bindir)/conqoper \
 		$(DESTDIR)$(libexecdir)/conqdriv \
 		$(DESTDIR)$(bindir)/conquestd
 	chmod g+s $(DESTDIR)$(bindir)/conqoper \
 		$(DESTDIR)$(libexecdir)/conqdriv \
 		$(DESTDIR)$(bindir)/conquestd
-	$(DESTDIR)$(bindir)/conqoper -C
-	chmod 775 $(CONQLOCALSTATEDIR)
-	chown root:$(CONQGROUP) $(CONQLOCALSTATEDIR)
+	-$(bindir)/conqoper -C
+	chmod 775 $(DESTDIR)$(CONQLOCALSTATEDIR)
+	chown root:$(CONQGROUP) $(DESTDIR)$(CONQLOCALSTATEDIR)
 	$(FILEPRIV) $(DESTDIR)$(bindir)/conqoper \
 		$(DESTDIR)$(libexecdir)/conqdriv \
 		$(DESTDIR)$(bindir)/conquestd

@@ -141,6 +141,10 @@
 # error "Must have select() or poll()"
 #endif
 
+#if !defined(HAVE_SPRINTF) || defined(PREFER_PORTABLE_SNPRINTF)
+# include "snprintf.h"
+#endif
+
 
 /* externs */
 extern int errno;

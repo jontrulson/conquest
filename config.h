@@ -64,6 +64,9 @@
 /* Define to 1 if you have the `setpgrp' function. */
 #define HAVE_SETPGRP 1
 
+/* Define to 1 if you have the `snprintf' function. */
+#define HAVE_SNPRINTF 1
+
 /* Define to 1 if you have the <stdint.h> header file. */
 #define HAVE_STDINT_H 1
 
@@ -121,6 +124,9 @@
 /* Define to 1 if you have the `vprintf' function. */
 #define HAVE_VPRINTF 1
 
+/* Define to 1 if you have the `vsnprintf' function. */
+#define HAVE_VSNPRINTF 1
+
 /* Define to 1 if you have the <zlib.h> header file. */
 #define HAVE_ZLIB_H 1
 
@@ -140,13 +146,16 @@
 #define PACKAGE_NAME "conquest"
 
 /* Define to the full name and version of this package. */
-#define PACKAGE_STRING "conquest 7.2"
+#define PACKAGE_STRING "conquest 8.0"
 
 /* Define to the one symbol short name of this package. */
 #define PACKAGE_TARNAME "conquest"
 
 /* Define to the version of this package. */
-#define PACKAGE_VERSION "7.2"
+#define PACKAGE_VERSION "8.0"
+
+/* "enable replacement (v)snprintf if system (v)snprintf is broken" */
+/* #undef PREFER_PORTABLE_SNPRINTF */
 
 /* Define as the return type of signal handlers (`int' or `void'). */
 #define RETSIGTYPE void
@@ -176,7 +185,7 @@
 /* #undef UNKNOWN */
 
 /* Version number of package */
-#define VERSION "7.2"
+#define VERSION "8.0"
 
 /* Define to 1 if the X Window System is missing or not being used. */
 /* #undef X_DISPLAY_MISSING */

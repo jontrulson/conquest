@@ -160,8 +160,10 @@ libconquest_la_SOURCES = conqai.c ratfor.c cd2lb.c display.c iolb.c  \
 	userauth.c record.c color.h user.h shiptype.h \
 	ship.h planet.h team.h msg.h doomsday.h driver.h conqinfo.h \
 	history.h robot.h global.h torp.h ibuf.h conf.h  display.h \
-	protocol.h packet.h packet.c userauth.h meta.c meta.h
+	protocol.h packet.h packet.c userauth.h meta.c meta.h 
 
+
+libconquest_la_LIBADD = @LTLIBOBJS@
 
 libconquest_la_LDFLAGS = -version-info 1:0:0
 
@@ -230,7 +232,7 @@ libconqserv_la_LIBADD =
 am_libconqserv_la_OBJECTS = servauth.lo server.lo serverpkt.lo \
 	servercmd.lo
 libconqserv_la_OBJECTS = $(am_libconqserv_la_OBJECTS)
-libconquest_la_LIBADD =
+libconquest_la_DEPENDENCIES = @LTLIBOBJS@
 am_libconquest_la_OBJECTS = conqai.lo ratfor.lo cd2lb.lo display.lo \
 	iolb.lo conqlb.lo rndlb.lo conqmisc.lo conqutil.lo conqcm.lo \
 	conqsvr42.lo global.lo ibuf.lo version.lo conf.lo sem.lo \
@@ -283,14 +285,14 @@ conquestsh_LDFLAGS =
 DEFAULT_INCLUDES =  -I. -I$(srcdir) -I.
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
-@AMDEP_TRUE@DEP_FILES = ./$(DEPDIR)/cd2lb.Plo ./$(DEPDIR)/client.Plo \
-@AMDEP_TRUE@	./$(DEPDIR)/clientlb.Plo ./$(DEPDIR)/clntauth.Plo \
-@AMDEP_TRUE@	./$(DEPDIR)/color.Plo ./$(DEPDIR)/conf.Plo \
-@AMDEP_TRUE@	./$(DEPDIR)/conqai.Plo ./$(DEPDIR)/conqai_main.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/conqcm.Plo ./$(DEPDIR)/conqdriv.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/conqlb.Plo ./$(DEPDIR)/conqmetad.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/conqmisc.Plo ./$(DEPDIR)/conqoper.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/conqreplay.Po \
+@AMDEP_TRUE@DEP_FILES = $(DEPDIR)/snprintf.Plo ./$(DEPDIR)/cd2lb.Plo \
+@AMDEP_TRUE@	./$(DEPDIR)/client.Plo ./$(DEPDIR)/clientlb.Plo \
+@AMDEP_TRUE@	./$(DEPDIR)/clntauth.Plo ./$(DEPDIR)/color.Plo \
+@AMDEP_TRUE@	./$(DEPDIR)/conf.Plo ./$(DEPDIR)/conqai.Plo \
+@AMDEP_TRUE@	./$(DEPDIR)/conqai_main.Po ./$(DEPDIR)/conqcm.Plo \
+@AMDEP_TRUE@	./$(DEPDIR)/conqdriv.Po ./$(DEPDIR)/conqlb.Plo \
+@AMDEP_TRUE@	./$(DEPDIR)/conqmetad.Po ./$(DEPDIR)/conqmisc.Plo \
+@AMDEP_TRUE@	./$(DEPDIR)/conqoper.Po ./$(DEPDIR)/conqreplay.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/conqstrat-lex.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/conqstrat-yacc.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/conqsvr42.Plo ./$(DEPDIR)/conquest.Po \
@@ -322,10 +324,10 @@ DIST_SOURCES = $(libconqclnt_la_SOURCES) $(libconqserv_la_SOURCES) \
 	$(conquestsh_SOURCES)
 DATA = $(data_DATA)
 
-DIST_COMMON = README INSTALL Makefile.am Makefile.in aclocal.m4 \
-	config.guess config.h.in config.sub configure configure.ac \
-	conqstrat-lex.c conqstrat-yacc.c conqstrat-yacc.h depcomp \
-	install-sh ltmain.sh missing mkinstalldirs
+DIST_COMMON = README INSTALL Makefile.am Makefile.in acinclude.m4 \
+	aclocal.m4 config.guess config.h.in config.sub configure \
+	configure.ac conqstrat-lex.c conqstrat-yacc.c conqstrat-yacc.h \
+	depcomp install-sh ltmain.sh missing mkinstalldirs snprintf.c
 SOURCES = $(libconqclnt_la_SOURCES) $(libconqserv_la_SOURCES) $(libconquest_la_SOURCES) $(conqai_SOURCES) $(conqdriv_SOURCES) $(conqmetad_SOURCES) $(conqoper_SOURCES) $(conqreplay_SOURCES) $(conqstrat_SOURCES) $(conquest_SOURCES) $(conquestd_SOURCES) $(conquestsh_SOURCES)
 
 all: config.h
@@ -347,7 +349,7 @@ $(top_builddir)/config.status: $(srcdir)/configure $(CONFIG_STATUS_DEPENDENCIES)
 $(srcdir)/configure:  $(srcdir)/configure.ac $(ACLOCAL_M4) $(CONFIGURE_DEPENDENCIES)
 	cd $(srcdir) && $(AUTOCONF)
 
-$(ACLOCAL_M4):  configure.ac 
+$(ACLOCAL_M4):  configure.ac acinclude.m4
 	cd $(srcdir) && $(ACLOCAL) $(ACLOCAL_AMFLAGS)
 
 config.h: stamp-h1
@@ -497,6 +499,7 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/snprintf.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cd2lb.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/client.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/clientlb.Plo@am__quote@
@@ -538,7 +541,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/version.Plo@am__quote@
 
 distclean-depend:
-	-rm -rf ./$(DEPDIR)
+	-rm -rf $(DEPDIR) ./$(DEPDIR)
 
 .c.o:
 @am__fastdepCC_TRUE@	if $(COMPILE) -MT $@ -MD -MP -MF "$(DEPDIR)/$*.Tpo" \
@@ -896,21 +899,24 @@ uninstall-am: uninstall-binPROGRAMS uninstall-dataDATA uninstall-info-am \
 
 
 install-exec-hook:
-	$(mkinstalldirs) -m 755 $(localstatedir) $(CONQSYSCONFDIR) $(CONQLOCALSTATEDIR) $(CONQIMGDIR)
-	chmod 775 $(CONQLOCALSTATEDIR) 
-	chgrp $(CONQGROUP) $(CONQLOCALSTATEDIR)
+	$(mkinstalldirs) -m 755 $(DESTDIR)$(localstatedir) \
+		$(DESTDIR)$(CONQSYSCONFDIR) \
+		$(DESTDIR)$(CONQLOCALSTATEDIR) \
+		$(DESTDIR)$(CONQIMGDIR)
+	chmod 775 $(DESTDIR)$(CONQLOCALSTATEDIR) 
+	chgrp $(CONQGROUP) $(DESTDIR)$(CONQLOCALSTATEDIR)
 #	cp -f $(IMAGES) $(CONQIMGDIR)/
 #	chmod 644 $(CONQIMGDIR)/*.bmp
-	chmod 755 $(prefix) $(datadir)
+	chmod 755 $(prefix) $(DESTDIR)$(datadir)
 	chgrp $(CONQGROUP) $(DESTDIR)$(bindir)/conqoper \
 		$(DESTDIR)$(libexecdir)/conqdriv \
 		$(DESTDIR)$(bindir)/conquestd
 	chmod g+s $(DESTDIR)$(bindir)/conqoper \
 		$(DESTDIR)$(libexecdir)/conqdriv \
 		$(DESTDIR)$(bindir)/conquestd
-	$(DESTDIR)$(bindir)/conqoper -C
-	chmod 775 $(CONQLOCALSTATEDIR)
-	chown root:$(CONQGROUP) $(CONQLOCALSTATEDIR)
+	-$(bindir)/conqoper -C
+	chmod 775 $(DESTDIR)$(CONQLOCALSTATEDIR)
+	chown root:$(CONQGROUP) $(DESTDIR)$(CONQLOCALSTATEDIR)
 	$(FILEPRIV) $(DESTDIR)$(bindir)/conqoper \
 		$(DESTDIR)$(libexecdir)/conqdriv \
 		$(DESTDIR)$(bindir)/conquestd
