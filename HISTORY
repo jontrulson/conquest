@@ -43,7 +43,7 @@ Version 8.1 (stable)
              (curses) and conquestgl (OpenGL) are now used to replay
              .cqr files via the '-P <cqrfile>' cmdline option.
 
-           - The game protocol changed (in devel version 8.01j).  This
+           - The game protocol changed (in devel version 8.0.1j).  This
              protocol corrects some shortcomings in the 8.0.1 protocol
              (like doomsday, planet realness, etc), and now provides
              for client-side computation of torpedo and planet
