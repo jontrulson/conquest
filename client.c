@@ -717,9 +717,11 @@ int clientHello(char *clientname)
         {
           if (rv > 0 && FD_ISSET(cInfo.usock, &readfds))
             {
-              rv = udpRecv(cInfo.usock, buf, PKT_MAXSIZE, &cInfo.servaddr);
-              clog("NET: got (%d) UDP bytes from server, will ACK for server UDP", rv);
-              cInfo.doUDP = TRUE;
+              if ((rv = udpRecv(cInfo.usock, buf, PKT_MAXSIZE, &cInfo.servaddr)) >= 0 )
+                {
+                  clog("NET: got (%d) UDP bytes from server, will ACK for server UDP", rv);
+                  cInfo.doUDP = TRUE;
+                }
             }
         }
     }
