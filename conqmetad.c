@@ -241,13 +241,13 @@ void metaListen(void)
   /* bind the socket to the service port so we hear incoming
    * connections 
    */
-  if ( bind( s, &sa, sizeof ( sa )) < 0 ) 
+  if ( bind( s, (struct sockaddr *)&sa, sizeof ( sa )) < 0 ) 
     {
       perror( "UDP bind" );
       exit(1);
     }
 
-  if ( bind( t, &tsa, sizeof ( tsa )) < 0 ) 
+  if ( bind( t, (struct sockaddr *)&tsa, sizeof ( tsa )) < 0 ) 
     {
       perror( "TCP bind" );
       exit(1);
@@ -279,7 +279,7 @@ void metaListen(void)
       if (FD_ISSET(t, &readfds))
         {
           i = sizeof (isa);
-          if ((tc = accept(t, &tisa, &i )) < 0) 
+          if ((tc = accept(t, (struct sockaddr *)&tisa, &i )) < 0) 
             {
               clog("META: accept failed: %s", strerror(errno) );
               continue;

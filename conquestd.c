@@ -160,7 +160,7 @@ void checkMaster(void)
   /* bind the socket to the service port so we hear incoming
    * connections 
    */
-  if ( bind( s, &sa, sizeof ( sa )) < 0 ) 
+  if ( bind( s, (struct sockaddr *)&sa, sizeof ( sa )) < 0 ) 
     {
       perror( "bind" );
       exit(1);
@@ -197,7 +197,7 @@ void checkMaster(void)
           i = sizeof (isa);
       
           /* hang in accept() while waiting for new connections */
-          if ((t = accept(s, &isa, &i )) < 0) 
+          if ((t = accept(s, (struct sockaddr *)&isa, &i )) < 0) 
             {
               perror ( "accept" );
               exit (1);

@@ -145,7 +145,7 @@ int connectServer(char *remotehost, Unsgn16 remoteport)
   cdrefresh();
 
   /* connect to the remote server */
-  if (connect(s, &sa, sizeof(sa)) < 0) 
+  if (connect(s, (const struct sockaddr *)&sa, sizeof(sa)) < 0) 
     {
       clog("connect: %s", strerror(errno));
       clog("Cannot connect to host %s:%d\n", 
