@@ -1778,7 +1778,7 @@ void resign( int unum, int isoper )
       	  sprintf(filenm, "%s/.conquestrc.%d", home, unum);
 	  if (unlink(filenm) == -1)
 	    clog("resign(unum = %d): unlink('%s') failed: %s",
-		 unum, filenm, sys_errlist[errno]);
+		 unum, filenm, strerror(errno));
 	}
     }
 

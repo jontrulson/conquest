@@ -68,7 +68,7 @@ int iochav( void )
   
   if ((retval = select(PollInputfd+1, &readfds, NULL, NULL, &timeout)) == -1)
     {
-      clog("iochav(): select(): %s", sys_errlist[errno]);
+      clog("iochav(): select(): %s", strerror(errno));
       return(FALSE);
     }
   
@@ -102,7 +102,7 @@ int iochav( void )
       if ((retval = getmsg(PollInputfd, &CtlMsg, &DataMsg, 
 			   &flagsp)) == -1)
 	{
-	  clog("iochav(): getmsg(): failed: %s", sys_errlist[errno]);
+	  clog("iochav(): getmsg(): failed: %s", strerror(errno));
 	}
       else
 	{
@@ -302,7 +302,7 @@ int iogtimed ( int *ch, real seconds )
 	  if (errno != EINTR)	/* some error */
 	    {
 	      *ch = 0;
-	      clog("iogtimed(): select() failed: %s", sys_errlist[errno]);
+	      clog("iogtimed(): select() failed: %s", strerror(errno));
 	      cdrefresh();
 	      return(FALSE);
 	    }
@@ -311,7 +311,7 @@ int iogtimed ( int *ch, real seconds )
 	    {
 # if defined(DEBUG_IOGTIMED)
 	      clog("iogtimed(): select(): interrupted: %s", 
-		   sys_errlist[errno]);
+		   strerror(errno));
 # endif
 
 # if !defined(LINUX)

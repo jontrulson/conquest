@@ -23,10 +23,6 @@
 /*                                                                    */
 /**********************************************************************/
 
-#ifdef CONQAIMAIN
-#define NOEXTERN
-#endif
-
 #include "conqdef.h"
 #include "conqcom.h"
 #include "conqcom2.h"
@@ -36,89 +32,6 @@
 static int nenum; 
 static int debug; 
 static real dne, ane;
-
-/*  conqai - robot AI test program */
-#ifdef CONQAIMAIN
-
-main(int argc, char *argv[])
-{
-  int i;
-  string usage="usage: conqai [-vd]";
-  int arg;
-  
-  /* First things first. */
-  
-  if ((ConquestUID = GetConquestUID()) == ERR)
-    {
-      fprintf(stderr, "conqai: GetConquestUID() failed\n");
-      exit(1);
-    }
-  
-  if ((ConquestGID = GetConquestGID()) == ERR)
-    {
-      fprintf(stderr, "conqai: GetConquestGID() failed\n");
-      exit(1);
-    }
-  
-  if (GetSysConf(FALSE) == ERR)
-    {
-#ifdef DEBUG_CONFIG
-      clog("%s@%d: main(): GetSysConf() returned ERR.", __FILE__, __LINE__);
-#endif
-/*      exit(1);*/
-    }
-  
-  if (setgid(ConquestGID) == -1)
-    {
-      clog("conqai: setgid(%d): %s",
-	   ConquestGID,
-	   sys_errlist[errno]);
-      fprintf(stderr, "conqai: setgid(): failed\n");
-      exit(1);
-    }
-  
-#ifdef USE_SEMS
-  if (GetSem() == ERR)
-    {
-      fprintf(stderr, "GetSem() failed to get semaphores. exiting.\n");
-      exit(1);
-    }
-#endif
-  
-  
-  
-  map_common();
-  
-  if ( *CBlockRevision != COMMONSTAMP )
-    error( "conqai: Common block ident mismatch.  \nInitialize the Universe via conqoper." );
-  
-  
-  debug = FALSE;
-  
-  while ((arg = getopt(argc, argv, "d")) != EOF)
-    {
-      switch (arg)
-	{
-	case 'r':
-	  exitai();		/* release robot control to driver */
-	  printf("The conquest driver now has control of the robots\n");
-	  exit(0);
-	  break;		/* NOTREACHED */
-	case 'd':
-	  debug = TRUE;
-	  break;
-	default:
-	  printf("Options: -d = debugging, -r = return robot control to driver\n");
-	  exit(1);
-	}
-    }
-  robotloop();
-  
-  exit(0);
-  
-}
-
-#endif /* CONQAIMAIN */
 
 /*  buildai - construct the robot data base */
 /*  SYNOPSIS */
@@ -968,7 +881,7 @@ void robstr( int token, char buf[] )
 /*    token = tableai( vars ) */
 int tableai( int vars[] )
 {
-  int status, token, rule, i;
+  int status, token = ERR, rule, i;
   int rbits;
   
   /* Set all bits. */

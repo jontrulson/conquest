@@ -68,13 +68,13 @@ int GetSysConf(int checkonly)
 
       clog("GetSysConf(): fopen(%s) failed: %s",
 	       conf_name,
-	       sys_errlist[err]);
+	       strerror(err));
 
       if (checkonly != TRUE)
 	{
 	  fprintf(stderr, "Error opening system-wide config file: %s: %s\n",
 		  conf_name,
-		  sys_errlist[err]);
+		  strerror(err));
 	  
 	  fprintf(stderr, "'conqoper -C' needs to be run. Using internal defaults.\n");
 	  sleep(4);
@@ -175,7 +175,7 @@ int GetSysConf(int checkonly)
     {
       fprintf(stderr, "GetSysConf(): Error reading %s: %s\n",
 	      conf_name,
-	      sys_errlist[errno]);
+	      strerror(errno));
       fclose(conf_fd);
       
       return(ERR);
@@ -253,6 +253,7 @@ int GetConf(int isremote, int usernum)
   conf_DoFastUpdate = TRUE;
   conf_DoLimitBell = TRUE;
   conf_ClearOldMsgs = TRUE;
+  conf_DistressToFriendly = FALSE;
 
   for (i=0; i<MAX_MACROS; i++)
     {
@@ -283,11 +284,11 @@ int GetConf(int isremote, int usernum)
 	{
 	  clog("GetConf(): fopen(%s) failed: %s",
 	       conf_name,
-	       sys_errlist[errno]);
+	       strerror(errno));
 	  
 	  fprintf(stderr, "Error opening config file: %s: %s\n",
 		  conf_name,
-		  sys_errlist[errno]);
+		  strerror(errno));
 
 	  return(ERR);
 	}
@@ -421,7 +422,7 @@ int GetConf(int isremote, int usernum)
     {
       fprintf(stderr, "GetConf(): Error reading %s: %s\n",
 	      conf_name,
-	      sys_errlist[errno]);
+	      strerror(errno));
       fclose(conf_fd);
       
       return(ERR);
@@ -653,11 +654,11 @@ int MakeConf(char *filename)
     {
       clog("Makeconf(): fopen(%s) failed: %s",
 	   filename,
-	   sys_errlist[errno]);
+	   strerror(errno));
 
       fprintf(stderr, "Error creating %s: %s\n",
 	      filename,
-	      sys_errlist[errno]);
+	      strerror(errno));
 
       return(ERR);
     }
@@ -745,11 +746,11 @@ int MakeSysConf()
     {
       clog("MakeSysconf(): fopen(%s) failed: %s",
 	   conf_name,
-	   sys_errlist[errno]);
+	   strerror(errno));
       
       fprintf(stderr, "Error creating %s: %s\n",
 	      conf_name,
-	      sys_errlist[errno]);
+	      strerror(errno));
       return(ERR);
     }
 

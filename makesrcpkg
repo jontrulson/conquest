@@ -27,9 +27,11 @@ FILELIST="ratfor.c cd2lb.c display.c iolb.c conqlb.c
 	conf.h conqcom2.h conqdef.h global.h color.c userauth.c options.c
 	ship.h user.h planet.h team.h torp.h msg.h doomsday.h
 	driver.h conqinfo.h robot.h history.h shiptype.h
-	conquest.doc conqnews.doc configure.in configure
+	conquest.doc conqnews.doc configure.ac configure
 	config.h.in config.guess config.sub Makefile.in README 
-	acconfig.h conqstrat.h conqstrat.c.l conqstrat.c.y conqrule
+	conqstrat.h conqstrat-lex.l conqstrat-yacc.y 
+        conqrule Makefile.am libtool aclocal.m4 depcomp install-sh ltmain.sh
+        mkinstalldirs missing conqai_main.c
         record.h record.c conqreplay.c
 	COPYRIGHT LICENSE INSTALL TODO SERVER.TXT"
 

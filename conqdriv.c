@@ -75,7 +75,7 @@ main(int argc, char *argv[])
     {
       clog("conqdriv: setgid(%d): %s", 
 	   ConquestGID,
-	   sys_errlist[errno]);
+	   strerror(errno));
       fprintf(stderr, "conqdriv: setgid(): failed\n");
       exit(1);
     }
@@ -100,7 +100,7 @@ main(int argc, char *argv[])
     {
       clog("conqdriv: main(): nice(CONQDRIV_PRI (%d)): failed: %s",
 	   CONQDRIV_PRI,
-	   sys_errlist[errno]);
+	   strerror(errno));
     }
 #if defined(DEBUG_FLOW)
   else

@@ -273,6 +273,7 @@
 #define MSG_OUTSIDE -104 	/* message from the outside world */
 #define MSG_IMPLEMENTORS -105 	/* message to the implementors */
 #define MSG_COMP -106 		/* message from the ship's computer */
+#define MSG_FRIENDLY -107	/* message to friendly ships */
 
 /* Tokens for slastmsg(), must be negative. */
 #define LMSG_NEEDINIT -1 	/* need to initialize slastmsg */
@@ -458,7 +459,7 @@
 #define PHASER_FUEL 20.0 	/* fuel required to fire phasers */
 #define PHASER_TENTHS 10 	/* tenths for phasers to re-charge */
 
-/*#define DOUBLE_E_KILLS 50.0 	/* kills required to double efficiency */
+/*#define DOUBLE_E_KILLS 50.0  */	/* kills required to double efficiency */
 #define DOUBLE_E_KILLS 40.0 	/* kills required to double efficiency -JET */
 #define EXPLOSION_FALLOFF 28.0 	/* explosions divided by this at PHASER_DIST */
 #define EXPLOSION_RADIUS 50.0 	/* things within this radius get maximum hits */

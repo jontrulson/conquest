@@ -40,7 +40,7 @@ int GetConquestUID(void)
     {
       fprintf(stderr, "conqsvr42: GetConquestUID(%s): can't get user: %s",
 	      ROOT_USER,
-	      sys_errlist[errno]);
+	      strerror(errno));
       
       return(ERR);
     }
@@ -61,7 +61,7 @@ int GetConquestGID(void)
     {
       fprintf(stderr, "conqsvr42: GetConquestGID(%s): can't get group: %s",
 	      CONQUEST_GROUP,
-	      sys_errlist[errno]);
+	      strerror(errno));
       
       return(ERR);
     }
@@ -381,7 +381,7 @@ void conqinit(void)
     {
       clog("conqinit(): nice(CONQUEST_PRI (%d)): failed: %s",
 	   CONQUEST_PRI,
-	   sys_errlist[errno]);
+	   strerror(errno));
     }
 
 #if defined(DEBUG_FLOW)
@@ -531,7 +531,7 @@ void drcreate(void)
   if ((pid = fork()) == -1)
     {				/* error */
       Driver->drivstat = DRS_OFF;
-      clog( "drcreate(): fork(): %s", sys_errlist[errno]);
+      clog( "drcreate(): fork(): %s", strerror(errno));
       return;
     }
   
@@ -539,7 +539,7 @@ void drcreate(void)
     {				/* The child: aka "The Driver" */
       sprintf(drivcmd, "%s/%s", CONQLIBEXEC, C_CONQ_CONQDRIV);
       execl(drivcmd, drivcmd, NULL);
-      clog("drcreate(): exec(): %s", sys_errlist[errno]);
+      clog("drcreate(): exec(): %s", strerror(errno));
       perror("exec");		/* shouldn't be reached */
       exit(1);
       /* NOTREACHED */
@@ -705,7 +705,7 @@ int isagod( int unum )
 	  clog("isagod(%s): getgrnam(%s) failed: %s",
 	       myname,
 	       CONQUEST_GROUP,
-	       sys_errlist[errno]);
+	       strerror(errno));
 	  
 	  god = FALSE;
 	  return(FALSE);
@@ -775,7 +775,7 @@ void settimer(void)
 
   if (sigaction(SIGALRM, &Sig, NULL) == -1)
     {
-      clog("settimer():sigaction(): %s\n", sys_errlist[errno]);
+      clog("settimer():sigaction(): %s\n", strerror(errno));
       exit(errno);
     }
   
@@ -827,7 +827,7 @@ void setopertimer(void)
 
   if (sigaction(SIGALRM, &Sig, NULL) == -1)
     {
-      clog("settimer():sigaction(): %s\n", sys_errlist[errno]);
+      clog("settimer():sigaction(): %s\n", strerror(errno));
       exit(errno);
     }
   

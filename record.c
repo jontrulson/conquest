@@ -127,7 +127,7 @@ int recordOpenOutput(char *fname)
     {
       printf("recordOpenOutput(): creat(%s) failed: %s\n",
 	     fname,
-	     sys_errlist[errno]);
+	     strerror(errno));
       return(FALSE);
     }
 

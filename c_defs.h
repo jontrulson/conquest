@@ -128,8 +128,11 @@
 /* externs */
 extern int errno;
 
-#if !defined(SYS_ERRLIST_DECLARED)
+#ifndef HAVE_STRERROR
+# if !defined(SYS_ERRLIST_DECLARED)
 extern char *sys_errlist[];
+# define strerror(X) sys_errlist[X]
+# endif
 #endif
 
 #define DIGIT   0

@@ -136,7 +136,7 @@ int canread( int snum, int msgnum )
   /* It's to us. */
   if ( to == snum )
     {				/* extra check to see if is from a robot
-				   and to is a valid ship */
+				   and it is a valid ship */
       if (conf_NoRobotMsgs == TRUE && from > 0 &&
 	  Ships[from].robot == TRUE && 
 	  (snum > 0 && snum <= MAXSHIPS))
@@ -188,6 +188,15 @@ int canread( int snum, int msgnum )
 	    return ( TRUE );
 	}
       
+      /* see if it's a message to friendly ships from another ship */
+
+      if (to == MSG_FRIENDLY && (from > 0 && from <= MAXSHIPS))
+	{
+	  if (Ships[snum].war[Ships[from].team] == FALSE && 
+	      Ships[from].war[Ships[snum].team] == FALSE)
+	    return TRUE;
+	}
+
       /* See if we are allowed to read GOD messages. */
       if ( to == MSG_GOD || from == MSG_GOD || to == MSG_IMPLEMENTORS )
 	return ( Users[Ships[snum].unum].ooptions[OOPT_GODMSG] );
@@ -1957,6 +1966,9 @@ int fmtmsg(int to, int from, char *buf)
 	case MSG_IMPLEMENTORS:
 	  appstr( "IMPs", buf );
 	  break;
+	case MSG_FRIENDLY:
+	  appstr( "FRIEND", buf );
+	  break;
 	default:
 	  appstr( "???", buf );
 	  break;
@@ -2053,6 +2065,9 @@ void sendmsg( int from, int terse )
 	case MSG_IMPLEMENTORS:
 	  c_strcpy( "Implementors", buf );
 	  break;
+	case MSG_FRIENDLY:
+	  c_strcpy( "Friend", buf );
+	  break;
 	default:
 	  buf[0] = EOS;
 	  break;
@@ -2095,16 +2110,24 @@ void sendmsg( int from, int terse )
       to = MSG_IMPLEMENTORS;
       break;
     default:
-      /* Check for a team character. */
-      for ( i = 0; i < NUMPLAYERTEAMS; i = i + 1 )
-	if ( buf[0] == Teams[i].teamchar || buf[0] == (char)tolower(Teams[i].teamchar) )
-	  break;
-      if ( i >= NUMPLAYERTEAMS )
-	{
-	  c_putmsg( huh, MSG_LIN2 );
-	  return;
+      /* check for 'Friend' */
+      if (buf[0] == 'F' && buf[1] == 'R')
+	{			/* to friendlies */
+	  to = MSG_FRIENDLY;
 	}
-      to = -i;
+      else
+	{
+	  /* Check for a team character. */
+	  for ( i = 0; i < NUMPLAYERTEAMS; i = i + 1 )
+	    if ( buf[0] == Teams[i].teamchar || buf[0] == (char)tolower(Teams[i].teamchar) )
+	      break;
+	  if ( i >= NUMPLAYERTEAMS )
+	    {
+	      c_putmsg( huh, MSG_LIN2 );
+	      return;
+	    }
+	  to = -i;
+	};
       break;
     }
   
@@ -2135,6 +2158,9 @@ void sendmsg( int from, int terse )
       break;
     case MSG_IMPLEMENTORS:
       appstr( "The Implementors:", buf );
+      break;
+    case MSG_FRIENDLY:
+      appstr( "Friend:", buf );
       break;
     default:
       c_putmsg( huh, MSG_LIN2 );

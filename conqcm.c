@@ -174,7 +174,7 @@ void flush_common(void)
 #else
   if (msync((caddr_t)cBasePtr, SIZEOF_COMMONBLOCK, MS_SYNC) == -1)
 #endif
-    clog("flush_common(): msync(): %s", sys_errlist[errno]);
+    clog("flush_common(): msync(): %s", strerror(errno));
 
   return;
 }
@@ -202,7 +202,7 @@ int check_cblock(char *fname, int fmode, int sizeofcb)
 	    {
 	      printf("check_cblock(): unlink(%s) failed: %s\n",
 		     fname,
-		     sys_errlist[errno]);
+		     strerror(errno));
 	      return(FALSE);
 	    }
 	}
@@ -223,7 +223,7 @@ int check_cblock(char *fname, int fmode, int sizeofcb)
 	    {
 	      printf("check_cblock(): creat(%s) failed: %s\n",
 		     fname,
-		     sys_errlist[errno]);
+		     strerror(errno));
 	      return(FALSE);
 	    }
 	  else
@@ -242,7 +242,7 @@ int check_cblock(char *fname, int fmode, int sizeofcb)
 	{			/* some other error */
 	  printf("check_cblock(): open(%s, O_RDONLY) failed: %s\n",
 		 fname,
-		 sys_errlist[errno]);
+		 strerror(errno));
 	  return(FALSE);
 	}
     }
@@ -281,7 +281,7 @@ void lock_common(void)
 	     MC_LOCK, (caddr_t)0, 0, 0) == -1)
     {
       clog("map_common(): couldn't lock the common block: %s, continuing...",
-	   sys_errlist[errno]);
+	   strerror(errno));
     }
 }
 #endif

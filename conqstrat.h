@@ -34,6 +34,3 @@ void valstr( int value, char *buf );
 void tokstr( int token, char *buf );
 unsigned int ibset(int start, int end);
 void print_usage(void);
-
-
-

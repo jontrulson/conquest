@@ -112,7 +112,7 @@ main(int argc, char *argv[])
     {
       clog("conquest: setgid(%d): %s",
            ConquestGID,
-           sys_errlist[errno]);
+           strerror(errno));
       fprintf(stderr, "conquest: setgid(): failed\n");
       exit(1);
     }
@@ -2211,7 +2211,10 @@ void dodistress( int snum )
 	  appstr(buf, cbuf);
 	}
 	  
-      stormsg( snum, -Ships[snum].team, cbuf );
+      if (conf_DistressToFriendly)
+	stormsg( snum, MSG_FRIENDLY, cbuf );
+      else
+	stormsg( snum, -Ships[snum].team, cbuf );
     }
   
   cdclrl( MSG_LIN1, 1 );

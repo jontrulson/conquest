@@ -421,6 +421,19 @@ struct Conf ConfData[] =
       NULL,
     }
   },
+  {
+    FALSE,
+    CTYPE_BOOL,
+    "distress_to_friendly=",
+    &conf_DistressToFriendly,
+    "Send emergency distress calls to friendly ships",
+    {
+      "# define this as true if you want emergency distress calls to be",
+      "#  sent to all friendly ships rather than just to your teammates.",
+      "#  Default: false",
+      NULL,
+    }
+  },
   {				/* Macros are special - these should be last */
     FALSE,
     CTYPE_MACRO,

@@ -485,7 +485,7 @@ void clog(char *fmt, ...)
 	    {
 	      fprintf(stderr, "clog(): creat(%s): %s\n",
 		      errfile,
-		      sys_errlist[errno]);
+		      strerror(errno));
 	      
 	      exit(1);
 	    }
@@ -1009,7 +1009,7 @@ void pagefile( char *file, char *errmsg )
     {
       clog("pagefile(): fopen(%s) failed: %s",
 	   file,
-	   sys_errlist[errno]);
+	   strerror(errno));
       
       cdclear();
       cdredo();

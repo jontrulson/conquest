@@ -206,7 +206,7 @@ void c_sleep(real sleeptime)
     {
       if (errno != EINTR) /* Interrupted system call */
            clog("c_sleep(): select() failed: errno = %d, %s",
-                errno,sys_errlist[errno]);
+                errno,strerror(errno));
     }
 
 # if defined(LINUX)
@@ -230,7 +230,7 @@ void c_sleep(real sleeptime)
     {
       if (errno != EINTR) /* Interrupted system call */
 	clog("csleep(): poll() failed: %s",
-	     sys_errlist[errno]);
+	     strerror(errno));
     }
 
 #endif

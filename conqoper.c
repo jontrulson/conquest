@@ -208,7 +208,7 @@ main(int argc, char *argv[])
     {
       clog("conqoper: setgid(%d): %s",
 	   ConquestGID,
-	   sys_errlist[errno]);
+	   strerror(errno));
       fprintf(stderr, "conqoper: setgid(): failed\n");
       exit(1);
     }
@@ -228,7 +228,7 @@ main(int argc, char *argv[])
     {
       clog("conqoper: main(): nice(CONQUEST_PRI (%d)): failed: %s",
 	   CONQUEST_PRI,
-	   sys_errlist[errno]);
+	   strerror(errno));
     }
 #if defined(DEBUG_FLOW)
   else

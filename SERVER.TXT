@@ -8,6 +8,7 @@
          +--------------------------------------------------------+
 
 
+
 	So.  You want to run a Conquest Server over the internet, eh?
 Then this is the file to read.  It gives you an overview of how to
 setup and manage one, as well as other differences (user naming for

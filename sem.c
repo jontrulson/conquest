@@ -58,7 +58,7 @@ int GetSem(void)
     {				/* already exists? */
 #ifdef DEBUG_SEM
       clog("GetSem(): semget(IPC_CREAT): failed: %s",
-	   sys_errlist[errno]);
+	   strerror(errno));
 #endif
 
       semflags = CONQSEMPERMS;
@@ -69,11 +69,11 @@ int GetSem(void)
 	{
 #ifdef DEBUG_SEM
 	  clog("GetSem(): semget(GET): failed: %s",
-	       sys_errlist[errno]);
+	       strerror(errno));
 #endif
 
 	  fprintf(stderr, "GetSem(): can't get semaphore: %s",
-		  sys_errlist[errno]);
+		  strerror(errno));
 
 	  return(ERR);
 	}
@@ -124,10 +124,10 @@ void Lock(int what)
 	    err = errno;
 	    clog("Lock(%s): semop(): failed: %s",
 		 getsemtxt(what),
-		 sys_errlist[err]);
+		 strerror(err));
 	    fprintf(stderr, "Lock(%s): semop(): failed: %s\n",
 		 getsemtxt(what),
-		 sys_errlist[err]);
+		 strerror(err));
 	    
 	    cdend();
 	    exit(1);
@@ -176,7 +176,7 @@ void Unlock(int what)
     {				/* couldn't get semvals */
       clog("Unlock(%s): semctl(GETALL) failed: %s",
 	   getsemtxt(what),
-	   sys_errlist[errno]);
+	   strerror(errno));
     }
   else
     {				/* got semvals... */
@@ -202,10 +202,10 @@ void Unlock(int what)
 	{
 	  clog("Unlock(%s): semop(): failed: %s",
 	       getsemtxt(what),
-	       sys_errlist[errno]);
+	       strerror(errno));
 	  fprintf(stderr,"Unlock(%s): semop(): failed: %s",
 	       getsemtxt(what),
-	       sys_errlist[errno]);
+	       strerror(errno));
 	  exit(1);
 	}
       else
@@ -258,7 +258,7 @@ char *GetSemVal(int thesem)
     {
       clog("GetSemVal(%d): semctl(GETALL) failed: %s",
 	   thesem,
-	   sys_errlist[errno]);
+	   strerror(errno));
     }
 
  
@@ -271,7 +271,7 @@ char *GetSemVal(int thesem)
     {
       clog("GetSemVal(%d): semctl(IPC_STAT) failed: %s",
 	   0,
-	   sys_errlist[errno]);
+	   strerror(errno));
     }
 
   lastoptime = SemDS.sem_otime;
@@ -282,7 +282,7 @@ char *GetSemVal(int thesem)
     {
       clog("GetSemVal(%d): semctl(IPC_STAT) failed: %s",
 	   1,
-	   sys_errlist[errno]);
+	   strerror(errno));
     }
 
   lastoptime = max(lastoptime, SemDS.sem_otime);

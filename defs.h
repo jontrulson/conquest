@@ -129,20 +129,20 @@
 
 /* DEBUG* - debug some things */
 
-/*#define DEBUG_FLOW		/* trace init flow */
-/*#define DEBUGGING		/* general debugging */
-/*#define DEBUG_LOCKING		/* debugging common block locking */
-/*#define DEBUG_CONFIG		/* debug configuration file processing */
-/*#define DEBUG_SEM		/* semaphore debugging */
-/*#define DEBUG_MACROS		/* MACRO debugging */
-/*#define DEBUG_IO		/* IO debugging */
-/*#define DEBUG_SIG		/* debug signal handling */
-/*#define DEBUG_AI		/* debug the robots */
-/*#define DEBUG_MISC		/* debug other misc stuff */
-/*#define DEBUG_RANDOM		/* debug the random number library */
-/*#define DEBUG_COLOR		/* debug color processing */
-/*#define DEBUG_IOGTIMED        /* debug timed input */
-/*#define DEBUG_SERVER          /* debug server operation */
-/*#define DEBUG_OPTIONS         /* debug option screens/handling */
-/*#define DEBUG_REC               /* debug recording */
+/*#define DEBUG_FLOW	*/	/* trace init flow */
+/*#define DEBUGGING	*/	/* general debugging */
+/*#define DEBUG_LOCKING	*/	/* debugging common block locking */
+/*#define DEBUG_CONFIG	*/	/* debug configuration file processing */
+/*#define DEBUG_SEM	*/	/* semaphore debugging */
+/*#define DEBUG_MACROS	*/	/* MACRO debugging */
+/*#define DEBUG_IO	*/	/* IO debugging */
+/*#define DEBUG_SIG	*/	/* debug signal handling */
+/*#define DEBUG_AI	*/	/* debug the robots */
+/*#define DEBUG_MISC	*/	/* debug other misc stuff */
+/*#define DEBUG_RANDOM	*/	/* debug the random number library */
+/*#define DEBUG_COLOR	*/	/* debug color processing */
+/*#define DEBUG_IOGTIMED */     /* debug timed input */
+/*#define DEBUG_SERVER  */      /* debug server operation */
+/*#define DEBUG_OPTIONS */      /* debug option screens/handling */
+/*#define DEBUG_REC     */      /* debug recording */
 

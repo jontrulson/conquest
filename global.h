@@ -80,6 +80,10 @@ CEXTERN int conf_DoLimitBell;
 				/* whether or not to clear out old msgs after
 				   a reincarnate */
 CEXTERN int conf_ClearOldMsgs;
+				/* whether to send emergency distress calls
+				   to all friendly ships, rather than just
+				   your team mates */
+CEXTERN int conf_DistressToFriendly;
 
 				/* Macro keys - F1-F<MAX_MACROS> */
 CEXTERN char conf_MacrosF[MAX_MACROS][MAX_MACRO_LEN];
