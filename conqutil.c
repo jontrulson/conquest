@@ -508,10 +508,11 @@ void clog(char *fmt, ...)
 	  if ((homevar = getenv("HOME")) != NULL)
             {
               strncpy(home, homevar, HOME_BUFSZ - 1);
-              sprintf(errfile, "%s/.%s", home, C_CONQ_ERRLOG);
+              snprintf(errfile, sizeof(errfile) - 1, "%s/.%s", 
+                       home, C_CONQ_ERRLOG);
             }
 	  else
-	    sprintf(errfile, "%s", C_CONQ_ERRLOG);
+	    snprintf(errfile, sizeof(errfile) - 1, "%s", C_CONQ_ERRLOG);
 	}
 
       if ((errfd = fopen(errfile, "a+")) == NULL)
