@@ -271,7 +271,7 @@ void renderViewer(void)
   glLoadMatrixf(dConf.vmat);
   glMatrixMode(GL_MODELVIEW);
   
-#if 1
+#if 0
    /* TEST */
   glColor3f(0.2, 0.2, 0.2);
   drawQuad(-((GLfloat)dConf.vW / 2.0), 
