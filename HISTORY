@@ -9,107 +9,142 @@
 
                               Conquest HISTORY
 
+Version 8.0.1l 10/22/2004 (devel)
+
+        - 8.1 release candidate.  Oh yes.
+
+        - finshed implementation of variable encapsulated packet
+          handling.  Should make it easier to add packet types in the
+          future without neccessarily breaking network compatiblity.
+          Of course, if the server/client does not understand the
+          enacpsulated packet type, it will just discard it.  This is
+          better than losing packet sync and ruining your whole day :)
+
+        - I am switching over the main public server (1701) to this
+          release so it can get more testing.  This means that after
+          this release, you will need a 8.0.1j or better client in
+          order to connect to any of the conquest.radscan.com servers.
+          I really hope to keep these network incompatibilities to a
+          minimum in future releases.
+
+          Of course for you die-hard retro telnet users, you shouldn't
+          notice any change :)
+
+        - I think the GL client is working well enough for a stable
+          release now.  Of course there are tons of things that could
+          be done to pretty it up more, but I think it's good enough
+          for now.
+
+
 Version 8.0.1k 9/25/2004 (devel)
 
-        - Some bug fixes:
+        - when entering a game, pointer troubles could cause a
+          client to get stuck sitting on top of Murisak, or offered
+          the wrong list of systems to enter from, if their team
+          owned more than one system.
 
-          - when entering a game, pointer troubles could cause a
-            client to get stuck sitting on top of Murisak, or offered
-            the wrong list of systems to enter from, if their team
-            owned more than one system.
+        - user config viewer background preference was not honored
+          during replay of a previously recorded game. (conquestgl)
 
-          - user config viewer background preference was not honored
-            during replay of a previously recorded game.
-
-          - modifiers (shift, ctl, etc) were improperly discarded when
-            decoding the macro FKeys.
+        - modifiers (shift, ctl, etc) were improperly discarded when
+          decoding the macro FKeys. (conquestgl)
 
 
 Version 8.0.1j 9/11/2004 (devel)
 
-        - implemented background image (Hubble Ultra Deep Field) to
-          viewer.  Added user option 'do_draw_viewerbg' to enable.  It
-          is enabled by default cause it just looks so darn good :)
-          ALT-B can be used to temporarily toggle it on/off while in
-          the CP if it proves too distracting.
+        - conquestgl
 
-        - fixed viewer backgroud image to be displaced properly when
-          in Murisak centered LR view.
+          - implemented background image (Hubble Ultra Deep Field) to
+            viewer.  Added user option 'do_draw_viewerbg' to enable.  It
+            is enabled by default cause it just looks so darn good :)
+            ALT-B can be used to temporarily toggle it on/off while in
+            the CP if it proves too distracting.
 
-        - Using [SPACE] to toggle between ship and Murisak centered LR
-          scans will only work when in LR mode.  No more inadvertant
-          switching. 
+          - fixed viewer backgroud image to be displaced properly when
+            in Murisak centered LR view.
 
-        - more GL and render cleanups.
+          - Using [SPACE] to toggle between ship and Murisak centered LR
+            scans will only work when in LR mode.  No more inadvertant
+            switching. 
 
-        - corrected bug in modifier key handling.  Several other
-          potential key problems also fixed.
+          - more GL and render cleanups.
 
-        - texture handling cleanups
+          - corrected bug in modifier key handling.  Several other
+            potential key problems also fixed.
 
-        - planet and doomsday blend modes fixed so background image no
-          longer interferes
+          - texture handling cleanups
 
-        - fixed bug in options (GL) display where when the number of
-          options exactly matched the number that could be displayed
-          onscreen caused nothing to be displayed at all.
+          - planet and doomsday blend modes fixed so background image no
+            longer interferes
 
-        - an attempt at better handling of UDP write errors that
-          sometimes occurs when UDP was successfully negotiated, but
-          the server finds itself unable to send them.  If more than
-          15 write UDP errors are detected during the course of a
-          session, the server will switch to TCP only.  I was never
-          able to reliably duplicate this, so I hope this will
-          actually work at avoiding the 'get stuck in murisak when you
-          enter the game' problem.
+          - fixed bug in options (GL) display where when the number of
+            options exactly matched the number that could be displayed
+            onscreen caused nothing to be displayed at all.
 
-        - got rid of drawBox() - no longer used anywhere.
+          - got rid of drawBox() - no longer used anywhere.
 
-        - cleaned up the vbg.tga texture (reduced gamma).
+          - cleaned up the viewer background (vbg.tga) texture (reduced
+            gamma).
+
+        - conquestd
+
+          - an attempt at better handling of UDP write errors that
+            sometimes occurs when UDP was successfully negotiated, but
+            the server finds itself unable to send them.  If more than
+            15 write UDP errors are detected during the course of a
+            session, the server will switch to TCP only, and a message
+            will be sent to the client informing it of that fact.  
 
 
 Version 8.0.1i 9/03/2004 (devel)
 
-        - when in the cockpit, various screens that used to be
-          seperate such as help, userlist, planetlist, etc, are now
-          displayed on top of the cockpit display, which is then made
-          transparent.  This allows you to still see what is going on
-          with your ship while reading the info.  
 
-          This also works when playing back a recorded game.
+        - conquestgl
 
-          This also can help you to prevent your from ship dying while
-          looking at the userlist for example :)
+          - when in the cockpit, various screens that used to be
+            seperate such as help, userlist, planetlist, etc, are now
+            displayed on top of the cockpit display, which is then made
+            transparent.  This allows you to still see what is going on
+            with your ship while reading the info.  
 
-        - redid the viewer fonts - now use a tex mapped font as well,
-          instead of the glut bitmap fonts. 
+            This also works when playing back a recorded game.
 
-        - fixed up GL version of cvtcoords to remove artifacts in when
-          objects were considered to be 'in view'.  Previously the
-          cvtcoords function from the curses client was being used to
-          determine this... This could cause objects (planets, etc) to
-          'disappear' when close to the min/max X/Y coordinates.
-          Objects will now move properly into and out of view now in
-          the viewer.
+            Now you can see your ship explode while looking at the
+            userlist for example :) 
 
-        - corrected perspective correction misunderstandings on my
-          part :) Planet and ship labels now are always positioned
-          correctly regardless of your position relative to the
-          object.
+          - redid the viewer fonts - now use a tex mapped font as well,
+            instead of the glut bitmap fonts. 
 
-        - recolorized army count in planet names on long range display.
+          - fixed up GL version of cvtcoords to remove artifacts in when
+            objects were considered to be 'in view'.  Previously the
+            cvtcoords function from the curses client was being used to
+            determine this... This could cause objects (planets, etc) to
+            'disappear' when close to the min/max X/Y coordinates.
+            Objects will now move properly into and out of view now in
+            the viewer.
 
-        - more GL related cleanups and re-organization.
+          - corrected perspective correction misunderstandings on my
+            part :) Planet and ship labels now are always positioned
+            correctly regardless of your position relative to the
+            object.  Planets and ships are likewise positioned
+            properly in relation to each other.
+
+          - recolorized army count in planet names on long range display.
+
+          - more GL related cleanups and re-organization.
+
 
 Version 8.0.1h 8/10/2004 (devel)
 
-        - added proper moon texture for Luna.
+        - conquestgl
 
-        - torp packets are no longer sent, only recorded.  TorpEvent
-          packets are the only torp packets sent to the client now.
+          - added proper moon texture for Luna.
 
-        - cleaned up GL.c a lot.  No longer use a seperate window (and
-          associated GL context) for the viewer.
+          - torp packets are no longer sent, only recorded.  TorpEvent
+            packets are the only torp packets sent to the client now.
+
+          - cleaned up GL.c a lot.  No longer use a seperate window (and
+            associated GL context) for the viewer.
 
 Version 8.0.1g 8/08/2004 (devel)
 
@@ -143,16 +178,18 @@ Version 8.0.1g 8/08/2004 (devel)
 
 Version 8.0.1f 7/11/2004 (devel)
 
-        - switch to TARGA (.tga) format textures rather than BMP.
-          That alpha channel comes in handy.
+        - conquestgl 
 
-        - replaced lousy classd texture with a Mars texture.  Maybe
-          someone wants to create individual textures for each
-          planet someday? :)
+          - switch to TARGA (.tga) format textures rather than BMP.
+            That alpha channel comes in handy.
+
+          - replaced lousy classd texture with a Mars texture.  Maybe
+            someone wants to create individual textures for each
+            planet someday? :)
           
-        - added new torp texture rather than re-using the star texture.
+          - added new torp texture rather than re-using the star texture.
 
-          redid torp rendering somewhat.
+          - redid torp rendering somewhat.
 
         - hitting [SPACE] while looking at long-range map will toggle
           between a Murisak centered, or ship centered map.  The
@@ -202,7 +239,7 @@ Version 8.0.1c 7/2/2004 (devel)
           especially in the OpenGL client, conquestgl.
 
         - bugs in nWelcome node that prevented server error conditions
-          from being displayed to the user were fixed.
+          from being displayed to the user were fixed. (conquestgl)
 
 Version 8.0.1b 5/31/2004 (devel)
 
@@ -214,7 +251,7 @@ Version 8.0.1b 5/31/2004 (devel)
 
 Version 8.0.1a 5/08/2004 (devel)
 
-        - Adds a GLUT/OpenGL client, conquestgl.  Yay!
+        - Adds a GLUT/OpenGL client, conquestgl.  Oh yes.
 
           - See http://radscan.com/conquest/index.html for a couple of
             screen shots.
@@ -289,16 +326,7 @@ Version 8.0.1a 5/08/2004 (devel)
           - there are many enhancements that could be made to the
             various displays still:
 
-            - a star/galaxy texture in the background of the viewer
-              (partially implemented but not yet enabled).
-
-            - spiffing up the text only screens in Conquest (user list,
-              planet list, etc)
-
             - a better conquest logo display
-
-            - non-destructive (alpha blended) information viewing
-              (ship list, etc ) while in the middle of a fight.
 
             - phasers should probably be drawn using an alpha blended
               texture rather than a blended line.
@@ -452,8 +480,6 @@ Version 8.0 12/13/2003
 
     - changed AllowSigquit option to AllowVacant, to more properly
       reflect it's purpose.
-
-Version 7.2h (devel - v8.0 prerelease) 12/7/2003
 
     7.2h
 

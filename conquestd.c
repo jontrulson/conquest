@@ -1883,7 +1883,10 @@ static int hello(void)
 
   /* now send the server stats normally */
   if (!sendServerStat(sInfo.sock))
-    return FALSE;
+    {
+      clog("NET: SERVER: hello: sendServerStat failed");
+      return FALSE;
+    }
 
   /* now we want an ack.  If we get it, we're done! */
   if ((pkttype = readPacket(PKT_FROMCLIENT, sockl, buf, PKT_MAXSIZE, 5)) < 0)
@@ -1893,7 +1896,11 @@ static int hello(void)
     }
 
   if (pkttype != CP_ACK)
-    return FALSE;
+    {
+      clog("NET: SERVER: hello: got packet type %d, expected CP_ACK", 
+           pkttype);
+      return FALSE;
+    }
 
   if (sInfo.tryUDP)
     {

@@ -132,23 +132,9 @@ static int _newship( int unum, int *snum )
           return TRUE;
 	  break;
 	  
-	  /* we might get these packets too */
-	case SP_PLANET:
-	case SP_PLANETSML:
-	case SP_PLANETLOC:
-	case SP_SHIP:
-	case SP_SHIPSML:
-	case SP_SHIPLOC:
-	case SP_MESSAGE:
-	case SP_USER:
-	case SP_TEAM:
-	case SP_HISTORY:
-	  processPacket(buf);
-
-	  break;
-
+	  /* we might get other packets too */
 	default:
-	  clog("nPlay: _newship: unexpected packet type %d", pkttype);
+	  processPacket(buf);
 	  break;
 	}
     }

@@ -78,11 +78,10 @@ struct _generic_var {
   Unsgn8 len;
   Unsgn16 pad1;
 
-  void *payload;                /* the actual data */
+  /* the actual data would be written following this*/
 };
 
-typedef struct _generic_var spVariable_t;
-typedef struct _generic_var cpVariable_t;
+typedef struct _generic_var pktVariable_t;
 
 /* server -> client packets */
 typedef struct _sp_null {

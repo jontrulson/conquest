@@ -426,6 +426,7 @@ int readPacket(int direction, int sockl[], Unsgn8 *buf, int blen,
   fd_set readfds;
   int maxfd;
   int gotudp = FALSE;           
+  int vartype;                  /* variable type (SP/CP) */
 
   if (connDead || direction == -1) 
     return -1;
@@ -484,9 +485,11 @@ int readPacket(int direction, int sockl[], Unsgn8 *buf, int blen,
     {
     case PKT_FROMSERVER:
       len = serverPktSize(type);
+      vartype = SP_VARIABLE;    /* possible variable */
       break;
     case PKT_FROMCLIENT:
       len = clientPktSize(type);
+      vartype = CP_VARIABLE;      /* possible variable */
       break;
     default:
 #if defined(DEBUG_PKT)
@@ -505,8 +508,17 @@ int readPacket(int direction, int sockl[], Unsgn8 *buf, int blen,
           clog("gotudp: rv != len: %d %d", rv, len);
           *buf = 0;
           type = 0;
+
+          return 0;
         }
 
+      if (type == vartype)
+        {                       /* if encap packet, do the right thing */
+          memcpy(buf, buf + sizeof(struct _generic_var), 
+                 rv - sizeof(struct _generic_var));
+          type = buf[0];
+        }
+ 
       return type;
     }
         
@@ -545,6 +557,26 @@ int readPacket(int direction, int sockl[], Unsgn8 *buf, int blen,
 		      continue;	/* get rest of packet */
 		    }
 
+                                /* we're done... maybe */
+                  if (type == vartype)
+                    {         /* if encap packet, do the right thing */
+                      pktVariable_t *vpkt = (pktVariable_t *)buf;
+
+                      /* read the first byte (type) of new pkt */
+                      if ((rv = read(sockl[0], &type, 1)) <= 0)
+                        {
+                          *buf = 0;
+                          return -1;
+                        }
+
+                      /* now reset the bytes left so the encapsulated pkt
+                         can be read */
+
+                      len = left = (vpkt->len - 1);
+                      continue;
+                    }
+
+                  /* really done */
 		  buf[0] = type;
 		  return type;
 		}
