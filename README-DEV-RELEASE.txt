@@ -1,4 +1,5 @@
 11/27/2003
+7.2g
 
         - we did a conquer test and found one bug where others in the
           game would not be properly informed about who did the actual
@@ -8,6 +9,7 @@
           updates and any new bugs that show up).
 
 11/24/2003
+7.2f
 
         - fixed an fd leak in metaUpdateSetver().  Oops.
 
