@@ -1,0 +1,524 @@
+
+         +--------------------------------------------------------+
+         |  CCC    OOO   N   N   QQQ   U   U  EEEEE   SSSS  TTTTT |
+         | C   C  O   O  NN  N  Q   Q  U   U  E      S        T   |
+         | C      O   O  N N N  Q   Q  U   U  EEE     SSS     T   |
+         | C   C  O   O  N  NN  Q  Q   U   U  E          S    T   |
+         |  CCC    OOO   N   N   QQ Q   UUU   EEEEE  SSSS     T   |
+         +--------------------------------------------------------+
+
+
+### DISTRIBUTION
+
+	You should have received one (or both) of the following files:
+	(where x.y is the current revision)
+
+	conquest-x.y.pkg.gz	- gziped Unixware binary package (in 
+                                  stream format) for use with pkgadd(1).
+
+		Use the following commands to unpack and install on
+		Unixware:
+
+		$ gunzip conquest-x.y.pkg.tar.gz
+		$ tar xvf conquest-x.y.pkg.tar
+		(as root)
+		# pkgadd -d /full/path/to/conquest-x.y.pkg
+
+
+	conquest-x.y.src.tar.gz	- gziped tar archive of the source
+                                  distribution.
+
+		Unzip/untar this in a nice, quiet, peaceful place.  I
+                use 'gzcat conquest-x.y.src.tar.gz |tar -xvf -'.
+
+		cd into the the source directory and type
+'./configure'.  Configure will try to determine some characteristics
+about your system and build a Makefile and config.h for you.  The
+default is to install Conquest into /opt.  You can use the '--prefix='
+option to configure a different location, as in './configure
+--prefix=/usr/local'.
+
+	Currently, only the following OS's have ports:
+
+		Unixware 2.03 (1.x/2.x should be fine too)
+		Linux 2.0.0, with ncurses-1.9.9e (old ncurses *may* work)
+		FreeBSD 2.2-100696-SNAP (stock curses works, but
+			without color apparently...)
+
+	ncurses-1.9.9e will work on both fbsd and Linux.  If the
+curses implementation on your machine has problems, you might try
+ncurses... It's free and does a reasonable job at emulating svr4
+curses.
+
+	TERMINAL NOTE: Conquest depends on a properly configured
+terminfo entry for your terminal in order to make use of Fkey's, the
+arrow keys, the keypad, and color.  The standard at386 terminfo entry
+on Unixware for example, does not define the SHIFT-Fkeys, nor the
+keypad (upperright, lowerleft, etc).  Some modification to your
+terminfo entry may be required to use these extended features.
+
+	You should read conquest.doc and conqnews.doc for new
+information and instructions on how to play the game.
+
+### CONQUEST SYNOPSIS
+
+	Here's an extract from the conquest.doc file:
+
+          NAME
+               Conquest  -  a multi-player real-time screen-oriented space
+               war game
+
+          SYNOPSIS
+               conquest
+
+          DESCRIPTION
+
+
+               1. OBJECT OF THE GAME.
+
+               The object of the game is twofold. The  short-range  goal
+               is  to accumulate "kills" by shooting down enemy players.
+               You get one kill point for each  enemy  ship  shot  down,
+               plus  some  extra  if  the enemy had kills too. The major
+               weapon used to shoot down ships is the photon torpedo.
+
+               The long-range goal is to conquer the universe  for  your
+               team  by taking every planet. You take planets by killing
+               off the enemy's armies via bombardment, and then  beaming
+               your  team's  armies down. When all the planets have been
+               taken, the game ends, a new game begins, and  the  player
+               who  actually  took  the last planet gets his/her name up
+               in lights.
+
+               ...
+
+	See conquest.doc (or use the (h)elp lesson from within Conquest)
+for more information and available commands.
+
+
+### A LITTLE BACKGROUND
+
+	Conquest was originally written in Ratfor for the VAX/VMS
+platform in 1983 by Jef Poskanzer and Craig Leres.  I wasted
+incredible amounts of time playing this game with my geek friends in
+the terminal labs at college, and when I actually had a multi-user
+system running at home (Unixware) I decided to try and translate/port
+the code to C in Unix.  While doing the port, I added several new
+features including color and Fkey macro support, as well as many other
+minor 'tweaks' (Though color support is not pervasive yet).  
+
+	For those who played the original Conquest, you may notice
+that cloaking is more usable, (though not *too* usable), torps have a
+slightly longer range, the keypad can be used for 1-key steering, the
+Conquest driver recovers almost immediately from a crash/kill, and
+other small changes.  Where possible, I've tried to keep the mechanics
+and balance of the game identical to the original.  More tweakage
+should be expected though, as well as the continuing removal of now
+useless or downright dead code.
+
+
+### BUILDING
+
+	You will need to create a group called 'conquest' before doing
+a 'make install'
+
+	See the INSTALL file for information on building conquest.
+
+	Read the conquest.doc and the conqnews.doc files to get info
+on what conquest is and how to play it.
+	
+### UNIXWARE
+
+	By default, when installing the Unixware binary package or
+doing a 'gmake install' on a Unixware system, the Makefile will use
+the 'filepriv' command to give Conquest the ability to raise it's
+priority and lock the common block (64KB) into memory via the TSHAR
+and the PLOCK privileges.  If you don't like this, either don't set
+the privs OR comment out '#define USE_COMMONMLOCK' and '#define
+SET_PRIORITY' in defs.h.  Conquest will complain in the
+/opt/conquest/etc/conquest.log file if you simply remove the
+privileges, but it will still run.  If your not building or running
+this on Unixware this doesn't apply to you.  Unfortunately the only
+way to provide these services on other Unixen besides Unixware is to
+give Conquest suid privileges, which I consider extremely unwise.
+There's something to be said about giving processes only those
+privileges they really need...
+
+### GENERAL
+	
+	DO NOT run Conquest suid root on any machine.  (currently the
+only way to get priority privs on Linux).  Conquest was not designed
+to run suid root (or suid at all) and I take *no* responsibility for
+the consequences if you try to do so.
+
+	Conquest's binaries *do* have to run setgid to 'conquest' to
+prevent unscrupulous tampering/cheating.  Installing the Unixware
+binary package will add the Conquest group id to your system.
+
+	After the compile, (as root) initialize the system-wide
+conquestrc file (/opt/conquest/etc/conquestrc by default) by typing:
+
+	/opt/bin/conqoper -C
+
+	Edit /opt/conquest/etc/conquestrc and see if everything there
+is ok for your site.
+
+	Then run the conqoper program and (i)nitialize->(e)verything,
+open the game, and you should now be ready to rock-n-roll.
+
+	If you've installed the Unixware Conquest binary package, an
+already initialized, enabled common block has been supplied for you.
+See below for more information on conqoper.
+
+	After running Conquest for the first time, a file called
+~/.conquestrc should have been created.  Look at this file (it's
+self-explanatory) for various options you can set.  Conquest Gods (or
+CG's, see below) should look at /opt/conquest/etc/conquestrc for a few
+system wide options you may or may not want.
+
+	By default, the only way to leave a game (if you're not a CG)
+is to self-destruct (Q<TAB>).  CG's can exit via the QUIT signal
+(normally ^\).  If allow_sigquit=true is set in the
+/opt/conquest/etc/conquestrc file, then any user can exit this way.
+This can eat up player slots so it's set to false by default.  Note,
+your ship is wide open to attack if you leave this way, since no one
+is piloting it any more, you can, however, return to your ship by
+re-entering Conquest and re-incarnating to the ship.
+
+### FILES
+
+	The primary files and their functions/perms are as follows:
+
+	Note, on my machine everything is owned by jon, this helps me
+in recompiling/updating without having to be root... You can make
+everything owned by root or whatever you want, but the group *has* to
+be conquest, with the perms specified below (the makefile and/or
+pkgadd will do this for you).
+
+/opt/conquest/...         perms           owner    group
+-----------------         ----------      -----    -----
+
+bin/			  drwxr-xr-x    2 jon      conquest
+
+	conquest	
+			- the game itself
+			  -rwxrws--x    1 jon      conquest
+
+	conqdriv	
+			- the universe driver process.  A driver is
+			  kicked off whenever someone enters Conquest
+			  and a driver isn't already running.  You
+			  cannot start the driver manually.  (You
+			  should never have to.)  
+			  -rwxrws--x    1 jon      conquest
+
+	conqoper	
+			- This is the Conquest Operator program that allows
+			  suitably privileged individuals (Conquest Gods, 
+			  or CG's) to control, monitor, and modify the 
+			  behavior of the game.  The root user is
+                          always a CG and therefore can run the conqoper 
+                          program.  If you want to allow other people to be 
+                          CG's, you will need to add them to the conquest 
+                          group in /etc/group.  My conquest entry in /etc/group
+			  looks like this:
+
+				conquest::102:jon,davep,johnc
+
+			  jon, davep, and johnc all have CG status on
+			  my machine.  Be careful who you give CG status
+			  to, a bad CG can cheat, or otherwise disrupt
+			  a game.  In addition, due to the fact that a CG
+			  is a member of the conquest group, a bad CG will 
+			  be able to trash the common block, as well as 
+			  other undesirable things.  A CG with
+			  permission to overwrite the system-wide 
+			  conquestrc file can call conqoper with the
+			  '-C' option to update the file with a newer 
+			  version.  User-level ~/.conquestrc files are
+			  always updated automatically when conquest
+			  is run.
+			  -rwxrws--x    1 jon      conquest
+
+	conqai		
+			- supplied with the source dist only.  This program
+			  allows a CG to take over robot control from the
+			  Conquest driver for debugging purposes.  
+			  Don't run it if you don't know what it does.  It 
+			  can disable the driver's robotai code, requiring 
+			  a universe re-init to fix.
+			  -rwxrws--x    1 jon      conquest
+
+etc/			  drwxrwxr-x    2 jon      conquest
+
+	conquest_common.img 
+			- The Conquest (ex-Fortran) Common Block.
+			  This file contains the 'state' of the universe.
+			  It is mapped into the address space (mmap()) of
+			  the Conquest executables.  Never manually edit 
+			  this file.  Use conqoper to change the
+			  universe. ;-)
+			  This file *must* have perms of 660 with a 
+			  group of conquest.  If read/write access is 
+                          opened up to all, then all will be able to modify 
+			  the common block, and hence, the universe.
+			  Gives me the willies just thinking about it.
+			  -rw-rw----    1 jon      conquest
+
+	conqnews.doc	
+			- latest Conquest news.  View via (N)ews in 
+			  the Conquest main menu.
+			  -rw-rw-r--    1 jon      conquest
+
+	conquest.doc
+			- Conquest instructions and commands. View 
+			  via (H)elp lesson in the Conquest main menu.
+			  -rw-rw-r--    1 jon      conquest
+
+	conquest.log
+			- Conquest's log file.  All errors/warnings,
+			  and debug messages are written here.  For the
+			  src dist, see the bottom of defs.h for 
+			  a list of debugables.
+			  -rw-rw----    1 jon      conquest
+
+	conquestrc
+			- system wide options.
+			  -rw-rw-r--    1 jon      conquest
+
+
+lib/			  drwxr-xr-x    2 jon      conquest
+
+	libconquest.so	
+			- shared lib used by Conquest executables
+                          (except FreeBSD)
+			  -rw-r--r--    1 jon      conquest
+
+
+~/.conquestrc
+			- user options and macro definitions.
+
+### OTHER INFO/TIPS
+
+THE ROBOTS - CONQSTRAT
+
+	The AI code used by the robot ships is the original strategy
+table that was generated by the conqstrat.r program with the exception
+of one new rule that lessens robot sun-deaths somewhat.
+
+	The conqstrat program can be used to modify the Robot strategy
+tables if you don't like the supplied rules.  You can have a maximum of
+32 rules.  Conquest is supplied with a file called conqrule that
+describes in a simplistic 'language' how a robot should behave under
+certain conditions... You can edit this file, and use conqstrat to
+generate a new conqdata.h file, or update the common block directly.
+
+	For example, the following command parses the conqrule file
+and updates the common block with the newly generated strategy table:
+
+	conqstrat -U <conqrule
+
+	The following command will generate a new conqdata.h file.
+You can then recompile conquest to get the new default strategy table.
+
+	conqstrat -o conqdata.h <conqrule
+	make all
+	make install
+
+
+	To new users, the robots may seem tough.  Gleefully harsh,
+even.  But they are kinda stupid, and can be taken.  One thing to
+remember, NEVER attack one head-on (let alone 2 or three...).  They
+are much faster on the trigger than you are, and you'll probably lose.
+
+	Robots are created one of two ways:
+
+	A.  You attack a home-system planet of an opposing team, and
+there are no players around to defend it.  Presto, one pissed robot
+headed your way.
+
+	B.  A Conquest Operator (CG) fires up conqoper and creates some
+with the (r)obot menu option.  
+
+CONQOPER SEMAPHORE STATUS LINE
+
+	The semaphore status line (line 2) in conqoper can give you
+useful information on the locks used by conquest to prevent
+simultaneous writes the the common block.  The following is an example
+line, labeled by the letters 'A'-'I' above it.
+
+  A         B   C     D  E        F    G     H  I
+  -         -   -     -  -        -    -     -  -
+  MesgCnt = 268(25116:0) CmnCnt = 4693(25116:0) Last: Nov 28 13:10:38
+	
+KEY:	A. status for the messaging semephore.  preceded by '*' if
+	   currently locked
+	B. number of semops on this semaphore
+	C. PID of last process to alter this semaphore
+	D. number of processes waiting for the semaphore to become
+	   zero.  ie. the number of processes waiting to aquire a
+	   lock.  This should be 0 99.9999% of the time.
+	E. status for the common block semaphore (everything except
+	   messages).
+	F. number of semops on this semaphore
+	G. PID of last process to alter this semaphore
+	H. number of processes waiting for the semaphore to become
+	   zero.  ie. the number of processes waiting to aquire a
+	   lock.  This should be 0 99.9999% of the time.
+	I. time and date of last semop.
+
+LEAVING A SCREEN IN CONQOPER
+
+	When watching another ship in conqoper or editing a player or
+planet, use 'q' to quit.
+
+	In most other screens, you can use RETURN or SPACE to quit.  I
+know... some consistency is needed.  
+
+PLANETS
+
+	You cannot change the owner team for 'core' planets via
+conqoper.  Core planets are those that need to be conquered in order
+to take the universe.  The (?)planet list option in conqoper/conquest
+will identify core planets with a '+' sign.  Currently, there are only
+3 non-core planets, that while not necessary to conquer the universe,
+can provide some strategic advantage.  These are Altair, Jinx, and
+Hell.  Particularly Atlair.  Keep an eye on Altair ;-)
+
+SUNS
+
+	Suns are hot.  Don't fly through them unless it absolutely,
+positively, has to be there overnight.  Hint: Robots don't seem to
+worry about suns, sometimes to their detriment.  
+
+CLOAKING
+
+	Cloaking can be very useful in battle.  Unfortunately, it's
+expensive in terms of fuel and engine heating.  At warp 0 however,
+it's not bad at all.  There are ways of locating (at least
+approximately) cloaked ships.  Really.  Note, robots can't detect
+cloaked ships at warp 0.
+
+TRACTORS
+
+	These aren't really useful in Conquest.  This may change in
+the future... The only use I've seen for them so far is to drag a
+helpless ship into the sun, so it's death can be as humiliating as
+possible.  Never allow yourself to get fragged this way.
+Self-Destruct first.  It the only way to preserve your honor ;-)
+
+STRENGTH
+
+	Different teams have different strengths.  Romulans have the
+best weapons, but the worst engines.  Orions have the best engines and
+the worst weapons.  The feds/klings are in-between.  The number of
+kills your ship has determines how much more efficient your weapons
+and engines are than the base efficiency you started out with.  When
+your kills count reaches DOUBLE_E_KILLS (currently 40), your
+efficiency will be double what you started out with.  It's very nice
+to be in a ship with alot of kills.
+
+LEAVING THE GAME
+
+	To exit Conquest, normally you must self-destruct, or be
+killed.  CG's can use QUIT (^\) to exit cleanly, leaving their ship
+intact, if somewhat vacant.  If allow_sigquit=true is set in the
+system-wide conquestrc file, then any user can exit this way.  If you
+exit this way, I'd be careful where you leave your ship.  People who
+exit with QUIT and leave their ship running for awhile will still add
+to the the elapsed time statistics, even if no-one's playing.  You do
+not lose points for self-destructing, though if you do it often, and
+don't get any kills before doing so, your skill ranking will probably
+suffer.
+
+TEAMS
+
+	When you first enter Conquest, it will randomly select a team
+for you, before bringing you to the main menu.  At this point, you can
+switch teams with the (s)witch teams option if you wish.  Remember,
+different teams have different strengths and weaknesses.  Federation
+and Klingon teams are pretty middle-of-the-road as far as
+engine/weapons efficiency goes, while Orions have better engines, and
+Romulans have stronger weapons.
+
+COMBAT
+
+	Taking on a robot versus taking on a real human player are two
+completely different experiences.  With a robot, in time you learn
+it's strategy, and compensate for it.  After you've done it a few
+hundred times, robots aren't too much of a challenge, ...if you don't
+do anything brave and stupid :-).  Humans on the other hand, tend to
+adapt to your strategies, forcing you to come up with new ones.
+Believe it or not, there are various strategies that can be employed
+effectively against your opponent.  A famous one (we used to use) is
+the lame-duck maneuver.  If you take alot of damage, though you have
+plenty of fuel and your weapons are cool, sometimes you can trick a
+player into thinking your really hurting...by limping away at warp 2
+with your shields down for example.  He'll do an info on you and see
+your damaged.  He might think it's an easy kill.  Sometimes you can
+surprise him ;-) It's simple, but often effective with a player
+determined to 'finish you off' carelessly (right John?).
+
+	Cloaking can be used to excellent effect on an unsuspecting
+opponent.  I leave it up to you to explore the possibilities.  
+
+	Fkey (Function key) macros defined in your ~/.conquestrc file
+can be *quite* useful in battle with a few well chosen commands
+attached to them.  For example, I find it nice to have an Fkey defined
+as 'dP\r' which detonates enemy torps, and fires a torp spread in the
+last direction you fired, among other useful combinations...
+
+	Using the direction keys ('qweadzxc') to the (k)ourse or
+weapons commands can be faster than specifying the direction in
+degrees.  If a ship is approaching from 90 degrees, it's easier (and
+faster) to type 'Pw\r' than 'P90\r'.  You're also less likely to screw
+up in the heat of battle.  See conquest.doc for a description of the
+direction keys, and how they work.
+
+
+DOOMSDAY
+
+	The Doomsday machine (if activated) *can* be killed.  It
+probably requires that you've seen the (old) Star Trek episode called
+'The Doomsday Machine' though.  Heh.
+
+
+MORE INFO
+
+	More information, a command list/description and some
+specifics of the game can be found in conquest.doc.  
+
+	See conqnews.doc for the lastest information on Conquest.
+
+OBTAINING CONQUEST
+
+	The latest verson of Conquest will be available from
+http://home.rmi.net/~jon.
+
+COPYRIGHT INFO
+
+                 C O N Q U E S T   (VAX/VMS Ratfor)
+
+      Copyright (C)1983-1986 by Jef Poskanzer and Craig Leres 
+ Permission to use, copy, modify, and distribute this software and 
+ its documentation for any purpose and without fee is hereby granted, 
+ provided that this copyright notice appear in all copies and in all 
+ supporting documentation. Jef Poskanzer and Craig Leres make no 
+ representations about the suitability of this software for any 
+ purpose. It is provided "as is" without express or implied warranty. 
+
+
+ Unix/C specific porting and supporting code Copyright (C)1994-1996 
+ by Jon Trulson <jon@radscan.com> under the same terms, conditions,  
+ and restrictions of the original copyright by Jef Poskanzer and Craig    
+ Leres.                                                             
+
+
+ Score one for the Orions!                                                         
+
+
+
+Jon Trulson <jon@radscan.com>
+7/6/96
+
+
