@@ -28,10 +28,10 @@ void clbOrbit( int snum, int pnum );
 int clbPhaser( int snum, real dir );
 real clbPhaserHit( int snum, real dis );
 void clbResign( int unum, int isoper );
-void clbTakePlanet( int pnum, int snum );
+int clbTakePlanet( int pnum, int snum );
 void clbUserline( int unum, int snum, char *buf, int showgods, int showteam );
 void clbStatline( int unum, char *buf );
-void clbZeroPlanet( int pnum, int snum );
+int clbZeroPlanet( int pnum, int snum );
 char *clbWarPrompt(int snum, int twar[]);
 
 void appkb( int kb, char *buf );

@@ -204,7 +204,7 @@ static int nPlayDisplay(dspConfig_t *dsp)
             case PERR_TOOMANYSHIPS:
               i = MSG_LIN2/2;
               cprintf(i, 0, ALIGN_CENTER, 
-                      "I'm sorry, but your playing on too many ships right now.");
+                      "I'm sorry, but you're playing on too many ships right now.");
               i = i + 1;
               c_strcpy( "You are only allowed to fly ", cbuf );
               j = Users[Context.unum].multiple;

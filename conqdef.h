@@ -517,7 +517,7 @@
 
 /* JET - these were a bit high, 120 and 240 respectively. */
 #define MIN_COUP_MINUTES 10 	/* minimum time till coup in minutes */
-#define MAX_COUP_MINUTES 90 	/* maximum time till coup in minutes */
+#define MAX_COUP_MINUTES 45 	/* maximum time till coup in minutes */
 
 #define MIN_COUP_KILLS 3.0 	/* minimum kills required before a coup */
 #define MAX_COUP_ENEMY_ARMIES 20 /* maximum enemies allowable for coup to work */

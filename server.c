@@ -22,6 +22,9 @@
 #define MAXUDPERRS    (15)
 static int sudperrs = 0;        /* keep track of udp write errors */
 
+static string guilt="Team genocided.  Any armies you were carrying died of guilt.";
+
+
 /* called when a write to a UDP socket fails. If the error threshold
    is exceeded, disable UDP to client and let them know */
 static void handleUDPErr(void)
@@ -935,6 +938,7 @@ void procCoup(cpCommand_t *cmd)
   real failprob;
   string nhp="We must be orbiting our home planet to attempt a coup.";
   char cbuf[128];
+  int rv = -1;
 
   if (!validPkt(CP_COMMAND, cmd))
     return;
@@ -1029,7 +1033,7 @@ void procCoup(cpCommand_t *cmd)
       return;
     }
   
-  clbTakePlanet( pnum, snum );
+  rv = clbTakePlanet( pnum, snum );
 
   /* Make the planet not scanned. */
   for ( i = 0; i < NUMPLAYERTEAMS; i = i + 1 )
@@ -1044,6 +1048,9 @@ void procCoup(cpCommand_t *cmd)
   PVUNLOCK(&ConqInfo->lockword);
 
   sendFeedback("Coup successful!");
+
+  if (rv >= 0)          /* someone was geno'd, send team msg */
+    clbStoreMsg( MSG_COMP, -rv, guilt );
 
   /* force a team update for this ship */
   sendTeam(sInfo.sock, Ships[snum].team, TRUE);
@@ -1657,6 +1664,7 @@ void procBeam(cpCommand_t *cmd)
   char cbuf[BUFFER_SIZE];
   real rkills;
   string lastfew="Fleet orders prohibit removing the last three armies.";
+  int rv = -1;
 
   if (!validPkt(CP_COMMAND, cmd))
     return;
@@ -1870,7 +1878,7 @@ void procBeam(cpCommand_t *cmd)
 	      Ships[snum].armies = Ships[snum].armies - 1;
 	      if ( Planets[pnum].team == TEAM_NOTEAM || Planets[pnum].armies == 0 )
 		{
-		  clbTakePlanet( pnum, snum );
+		  rv = clbTakePlanet( pnum, snum );
 		  conqed = TRUE;
 		}
 	      else if ( Planets[pnum].team != Ships[snum].team )
@@ -1878,7 +1886,7 @@ void procBeam(cpCommand_t *cmd)
 		  Planets[pnum].armies = Planets[pnum].armies - 1;
 		  if ( Planets[pnum].armies == 0 )
 		    {
-		      clbZeroPlanet( pnum, snum );
+		      rv = clbZeroPlanet( pnum, snum );
 		      zeroed = TRUE;
 		    }
 		}
@@ -1888,6 +1896,9 @@ void procBeam(cpCommand_t *cmd)
 	  PVUNLOCK(&ConqInfo->lockword);
 	  total = total + 1;
 	  
+          if (rv >= 0)          /* someone was geno'd, send team msg */
+            clbStoreMsg( MSG_COMP, -rv, guilt );
+
 	  if ( total >= num )
 	    {
 	      /* Done. */

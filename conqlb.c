@@ -807,16 +807,19 @@ void clbResign( int unum, int isoper )
 
 
 
-/*  takeplanet - take a planet (DOES SPECIAL LOCKING) */
-/*  SYNOPSIS */
-/*    int pnum, snum */
-/*    clbTakePlanet( pnum, snum ) */
-/*  Note: This routines ASSUMES you have the common locked before you it. */
-void clbTakePlanet( int pnum, int snum )
+/*  takeplanet - take a planet (DOES SPECIAL LOCKING) 
+ *  SYNOPSIS 
+ *    int pnum, snum 
+ *    clbTakePlanet( pnum, snum ) 
+ *  Note: This routines ASSUMES you have the common locked before you call 
+ *  it. Returns team that was genocided, -1 otherwise.
+ */
+int clbTakePlanet( int pnum, int snum )
 {
   int i;
   char buf[MSGMAXLINE];
   int oteam, didgeno;
+  int rv = -1;
   
   oteam = Planets[pnum].team;
   Planets[pnum].team = Ships[snum].team;
@@ -836,7 +839,8 @@ void clbTakePlanet( int pnum, int snum )
 
       for ( i = 1; i <= NUMPLANETS; i = i + 1 )
         {
-          if ( Planets[i].real && (Planets[i].team == oteam) )
+          if ( Planets[i].real && (Planets[i].team == oteam) 
+               && Planets[i].armies > 0)
             {
               didgeno = 0;
               break;
@@ -845,6 +849,7 @@ void clbTakePlanet( int pnum, int snum )
       /* Yes. */
       if ( didgeno && (snum > 0 && snum <= MAXSHIPS) )
         {
+          rv = oteam;
           Users[Ships[snum].unum].stats[USTAT_GENOCIDE] += 1;
           Teams[Ships[snum].team].stats[TSTAT_GENOCIDE] += 1;
 
@@ -853,10 +858,9 @@ void clbTakePlanet( int pnum, int snum )
               if (Ships[i].status == SS_LIVE && Ships[i].team == oteam &&
                   Ships[i].armies > 0)
                 {
-                  clog("INFO: summarily executed %d geno'd armies on ship %d",
+                  clog("INFO: summarily suicided %d geno'd armies on ship %d",
                        Ships[i].armies, i);
                   Ships[i].armies = 0;
-
                 }
             }
 
@@ -881,7 +885,7 @@ void clbTakePlanet( int pnum, int snum )
 	{
 	  /* No. */
 	  clbStoreMsg( -pnum, -Ships[snum].team, buf );
-	  return;
+	  return rv;
 	}
   /* Yes! */
   getdandt( ConqInfo->conqtime, 0 );
@@ -904,7 +908,8 @@ void clbTakePlanet( int pnum, int snum )
   clbInitGame();
   PVLOCK(&ConqInfo->lockword);
   
-  return;
+  return -1;                    /* doesn't matter if geno happened if
+                                   universe was conquered */
   
 }
 
@@ -1075,13 +1080,15 @@ void clbStatline( int unum, char *buf )
 }
 
 
-/*  clbZeroPlanet - zero a planet (DOES SPECIAL LOCKING) */
-/*  SYNOPSIS */
-/*    int pnum, snum */
-/*    clbZeroPlanet( pnum, snum ) */
-/*  NOTE */
-/*    This routines ASSUMES you have the common area locked before you it. */
-void clbZeroPlanet( int pnum, int snum )
+/*  clbZeroPlanet - zero a planet (DOES SPECIAL LOCKING) 
+ *  SYNOPSIS 
+ *    int pnum, snum
+ *    clbZeroPlanet( pnum, snum ) 
+ *  NOTE 
+ *    This routines ASSUMES you have the common area locked before you call
+  *    it.  Returns team that was genocided, -1 otherwise.
+ */
+int clbZeroPlanet( int pnum, int snum )
 {
   int oteam, i; 
   int didgeno;
@@ -1097,14 +1104,15 @@ void clbZeroPlanet( int pnum, int snum )
   /* check for genos here */
   if ( oteam != TEAM_SELFRULED && oteam != TEAM_NOTEAM )
     {
-      didgeno = 1;
+      didgeno = TRUE;
 
       /* Check whether that was the last planet owned by the vanquished. */
       for ( i = 1; i <= NUMPLANETS; i = i + 1 )
         {
-          if ( Planets[i].real && (Planets[i].team == oteam) )
+          if ( Planets[i].real && (Planets[i].team == oteam) && 
+               Planets[i].armies > 0)
             {
-              didgeno = 0;
+              didgeno = FALSE;
               break;
             }
         }
@@ -1126,13 +1134,11 @@ void clbZeroPlanet( int pnum, int snum )
                   if (Ships[i].status == SS_LIVE && Ships[i].team == oteam &&
                       Ships[i].armies > 0)
                     {
-                      clog("INFO: summarily executed %d geno'd armies on ship %d",
+                      clog("INFO: summarily suicided %d geno'd armies on ship %d",
                            Ships[i].armies, i);
                       Ships[i].armies = 0;
-                      
                     }
                 }
-
 
               clog("INFO: %s (%s) genocided the %s team!",
                    Users[Ships[snum].unum].username,
@@ -1142,7 +1148,10 @@ void clbZeroPlanet( int pnum, int snum )
         }
     }
   
-  return;
+  if (didgeno)
+    return oteam;
+  else
+    return -1;
   
 }
 
