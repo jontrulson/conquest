@@ -21,7 +21,7 @@
   See SERVER.TXT for information on how to setup and run a Conquest
   server.
 
-  See conqnews.doc for the latest news and modification history.
+  See HISTORY for the latest news and modification history.
 
   See conquest.doc for information on available commands, and how to
   play the game.
@@ -80,6 +80,7 @@
           # Leaving a screen on conqoper
    ### The installed files
        ## conquest
+       ## conquestgl
        ## conquestd
        ## conqmetad
        ## conquestsh
@@ -88,13 +89,17 @@
        ## conqreplay
        ## conqai
        ## conquest_common.img
-       ## conqnews.doc
+       ## HISTORY
        ## conquest.doc
        ## conquest.log
        ## conquestrc
        ## libconquest.so
        ## libconqclnt.so
        ## libconqserv.so
+       ## libUi.so
+       ## libUiCU.so
+       ## libUiGL.so
+       ## img/*
        ## ~/.conquestrc
    ### Getting more information
    ### Obtaining Conquest
@@ -171,24 +176,35 @@
 
 ## Starting Conquest
 
-   You can start Conquest with various options.  Type 'conquest -?' to
-   see a list of supported options, and what they do.  In short:
+   Starting with Conquest 8.0.1a, there are two conquest clients you
+   can use to connect to a game: 
+
+   conquestgl                 - the new GLUT/OpenGL client
+   conquest                   - original curses based client
+
+   You can start a Conquest client with various options.  For example
+   type 'conquestgl -?' to see a list of supported options, and what
+   they do.
+
+   In the following examples we will use the OpenGL client
+   'conquestgl', but you can substitute 'conquest' if you want to use
+   the curses client instead.
 
    To connect to a conquest server running on the local host:
 
-       $ conquest
+       $ conquestgl
 
        or
       
-       $ conquest -s localhost
+       $ conquestgl -s localhost
 
    To connect to a conquest server on a remote host:
 
-       $ conquest -s conquest.radscan.com
+       $ conquestgl -s conquest.radscan.com
 
              - connects to a server running on conquest.radscan.com.
 
-       $ conquest -s conquest.radscan.com:1702
+       $ conquestgl -s conquest.radscan.com:1702
 
              - connects to conquest.radscan.com, port 1702.
 
@@ -196,10 +212,10 @@
    conquest.radscan.com) and select from a list of available online
    servers:
 
-       $ conquest -m
+       $ conquestgl -m
 
-   If you want to connect to a server on your local machine, be sure
-   conquestd is running.  See SERVER.TXT for more information on
+   NOTE: If you want to connect to a server on your local machine, be
+   sure conquestd is running.  See SERVER.TXT for more information on
    conquestd and running a server.
 
 ## Default network ports
@@ -1072,8 +1088,15 @@
 
 ## bin/conquest
 
-   The Conquest client. type 'conquest -?' to see a list of options.
+   The Conquest curses client. type 'conquest -?' to see a list of options.
 
+## bin/conquestgl
+
+   This is the OpenGL version of the conquest client. Type 'conquest -?' 
+   to see a list of options.  
+
+   The OpenGL client can also be used to replay conquest recording
+   (.cqr) files using the '-P' option to conquestgl.
 
 ## bin/conquestd
 
@@ -1174,12 +1197,13 @@
 ## bin/conqreplay
 
    A utility for playing back Conquest Recording (CQR) files made when
-   conquest is run with the '-r <filename>' flag.
+   conquest is run with the '-r <filename>' flag.  
+
+   Note, this is a curses app only.  If you want to see the replay using
+   OpenGL, use the '-P' option to conquestgl (version >=8.0.1a).
 
    This is a much nicer way to save and playback games than using
-   something like script, or Xterm logging.  You can play the
-   recordings back on any curses terminal, regardless of the curses
-   terminal in use when the game was recorded.
+   something like script, or Xterm logging.  
 
    conqreplay allows you to speed up or slowdown the playback, as well
    as giving you the ability to jump forward and backward in a
@@ -1196,9 +1220,10 @@
 
      conqreplay -f dethfun.cqr
 
-   To play it back at high speed:
+   If you want to replay the game using the OpenGL client instead, use
+   the '-P' option to conquestgl:
 
-     conqreplay -d 0.001 -f dethfun.cqr
+     conquestgl -P dethfun.cqr
 
    There is a 'demonstration' CQR file up on the website if you want
    to try one out.
@@ -1240,7 +1265,7 @@
    about it.
 
 
-## share/conqnews.doc
+## share/HISTORY
 
    Latest Conquest news.  View via (N)ews in the Conquest main menu.
    Contains a chronological order of changes and modifications.
@@ -1281,6 +1306,22 @@
 
    Shared library used by Conquest server.
 
+## libUi.so
+
+   Shared generic UI (User Interface) lib.
+
+## libUiCU.so
+
+   UI related code for curses client.
+
+## libUiGL.so
+
+   UI related code for GLUT/OpenGL client.
+
+## img/*
+
+   Textures and texfonts used by the OpenGL client (conquestgl).
+
 ## ~/.conquestrc
 
    User options and macro definitions.  Can be edited directly or
@@ -1294,7 +1335,7 @@
 
     See SERVER.TXT for information on running a server.
 
-    See conqnews.doc for the latest change/modification history
+    See HISTORY for the latest change/modification history
     information for Conquest.
 
 ### Obtaining Conquest

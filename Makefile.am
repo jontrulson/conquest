@@ -120,10 +120,10 @@ conquestsh_SOURCES = conquestsh.c
 conqmetad_SOURCES = conqmetad.c meta.h
 conqmetad_LDADD = libconquest.la 
 
-data_DATA = conquest.doc conqnews.doc README conqrule 
+data_DATA = conquest.doc HISTORY README conqrule 
 #sysconf_DATA = conquestrc
 
-EXTRA_DIST = conquest.doc conqnews.doc README conqrule # conquestrc
+EXTRA_DIST = conquest.doc HISTORY README conqrule # conquestrc
 
 install-exec-hook:
 	$(mkinstalldirs) -m 755 $(DESTDIR)$(localstatedir) \

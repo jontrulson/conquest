@@ -14,7 +14,7 @@
    other things to keep in mind.  
 
    Before reading this file, you may want to read the README, INSTALL,
-   conqnews.doc, and conquest.doc files so that you have an idea of
+   HISTORY, and conquest.doc files so that you have an idea of
    what Conquest is, and how to play.
 
 

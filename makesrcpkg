@@ -30,7 +30,7 @@ FILELIST="ratfor.c cd2lb.h cd2lb.c iolb.h iolb.c conqlb.c
         options.c
 	ship.h user.h planet.h team.h torp.h msg.h doomsday.h
 	driver.h conqinfo.h robot.h history.h shiptype.h
-	conquest.doc conqnews.doc configure.ac configure
+	conquest.doc HISTORY configure.ac configure
 	config.h.in config.guess config.sub Makefile.in README  
 	conqstrat.h conqstrat-lex.l conqstrat-yacc.y 
         conqrule Makefile.am aclocal.m4 depcomp install-sh ltmain.sh

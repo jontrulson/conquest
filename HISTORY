@@ -7,7 +7,168 @@
          |  CCC    OOO   N   N   QQ Q   UUU   EEEEE  SSSS     T   |
          +--------------------------------------------------------+
 
-                              Conquest News
+                              Conquest HISTORY
+
+Version 8.0.1a 5/08/2004 (devel)
+
+        - Adds a GLUT/OpenGL client, conquestgl.  Yay!
+
+          - See http://radscan.com/conquest/index.html for a couple of
+            screen shots.
+
+          - The gl client is called 'conquestgl' - use this to run the
+            OpenGL version of the client.  The curses client
+            'conquest' is still present of course, for those who
+            really dig the retro experience.
+
+          - if you do not have OpenGL and GLUT libraries/headers on
+            your system, supply the '--disable-gl' command line
+            argument to the 'configure' script, as in:
+
+            ./configure --disable-gl
+
+            This will prevent the GL related clients and libraries from
+            being compiled, and you will be stuck with the curses only
+            client :)
+
+          - Note, the GL client does not provide a 6 DOF (flight
+            simulator-type) playing experience.  Sorry - that would be
+            an entirely new game.  OpenGL and GLUT are used to
+            basically present the same game experience as the current
+            curses client, however, the use of a graphical client
+            provides a much nicer experience visually.  To be honest,
+            I never use the curses client to play anymore :)
+
+          - phaser shots from other ships are rendered in the GL
+            client.  
+
+          - new user option:
+
+            do_enemyshipbox
+
+            when set to 'true', will draw a 1 pixel red square around
+            enemy ships in the LR/SR views in the GL client.
+
+          - currently the maximum Frames Per Second (FPS) is capped
+            around 100.  A 10ms delay will be inserted between
+            frames if the FPS exceeds 75, which is really more than
+            sufficient for conquestgl's rendering requirements.
+
+          - there are no specific GL extensions required or used.
+            OpenGL 1.1 and greater should be sufficient for
+            building/running conquestgl.  
+
+            I have not tried running conquestgl on a software GL
+            implementation like Mesa.  With a fast enough processor,
+            it could be playable though, since we are not talking
+            about Quake 3 rendering requirements here :)
+
+          - the mouse is not used in conquestgl - everything still
+            runs by keyboard :)
+
+          - up to 36 macros can be handled in conquestgl:
+
+                  F1 - F12
+            SHIFT F1 - F12
+            CTL   F1 - F12
+
+          - conquestgl can also play conquest recording (.cqr) files.
+            Use the -P 'cqr filename' option.
+
+            conquestgl -P dethfun.cqr
+
+            It's much nicer to watch recordings in the OpenGL version
+            than using the curses-only 'conqreplay' program.
+
+            Other than this, the options are the same for conquestgl
+            as the curses client 'conquest'.
+
+          - there are many enhancements that could be made to the
+            various displays still:
+
+            - a star/galaxy texture in the background of the viewer
+              (partially implemented but not yet enabled).
+
+            - spiffing up the text only screens in Conquest (user list,
+              planet list, etc)
+
+            - a better conquest logo display
+
+            - non-destructive (alpha blended) information viewing
+              (ship list, etc ) while in the middle of a fight.
+
+            - phasers should probably be drawn using an alpha blended
+              texture rather than a blended line.
+
+            - need a better way to display explosions 
+
+            - need to increase line length and number of lines for the
+              display of incoming messages.
+
+            - the list goes on. Sigh.
+
+        - conquestd/conqdriv changes
+
+          - on entry to the game, the server will send a complete user
+            list to the client.  Previously, only users currently
+            playing in the game or present in the history list were
+            sent to the client.  This means the '(U)ser list' option
+            in the clients will list all of the users now.
+
+          - conqdriv now updates planet positions every 10th/sec.
+            Previously these were only updated every 5 seconds.  This
+            provides much smoother planet movement, especially in the
+            GL client.  Of course this increases the required bandwith
+            some.  If this is too much for your internet connection,
+            reduce your 'updates_per_sec' option.
+
+          - conqdriv now updates a ship's orbital position every
+            10th/sec rather than 1/sec.  This makes orbiting planets
+            much smoother - this is more noticable in the GL client.
+
+        - missing doomsday protocol added.  Believe it or not, with
+          the 8.0.1 release version. I forgot to added the protocol
+          for the doomsday.  Using an older client (pre 8.0.1a) will
+          results in an 'invisible' doomsday machine.  Upgrade to a
+          8.0.1a or better client.  The GL client uses a texture made
+          from the original Star Trek episode "The Doomsday Machine"
+          :)
+
+        - conqmeta changes
+
+          - meta server now sorts output server list by the number of
+            currently active players, rather than the server
+            registration order.
+
+          - fixed a bug where the meta server could not distinguish
+            between multiple servers that were running on the same
+            host, but listening on different ports.
+
+        - alot of restructuring of the code and the creation of new
+          libraries.  
+
+          - No UI specific code is present in libconquest anymore.
+
+          - new generic libUi
+
+          - all curses functions and the functions that depend on them
+            are now in libUiCU
+
+          - GL related functions and their dependants are located in
+            libUiGL. 
+
+          - curses related functions removed from libconqclnt and
+            libconqserv
+
+          - new color implemetation, (colors.h) - UI agnostic.
+
+          - much cleanup up of c_defs.h.
+
+          - conqnews.doc renamed to HISTORY.
+
+        - added CREDITS file to give credit where credit is due
+          (netrek for the original pixmaps that formed the basis of
+          the ship textures in conquestgl, etc)
 
 Version 8.0.1 1/17/2004
 
@@ -1549,7 +1710,7 @@ fly a ship. Wow.
 
 
 
-	The following is the original conqnews file distributed with
+	The following is the original conqnews.doc file distributed with
 the VAX/VMS DECUS distribution, circa 1985. 
 
 	It is provided for historical reasons only and should not be
