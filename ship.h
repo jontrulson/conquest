@@ -20,6 +20,7 @@ typedef struct {
   int unum;			/* user number of the ship's captain */
   int team;			/* team of the ship */
   int pid;			/* process id of ships owner process */
+  int shiptype;			/* one of the ST_* values  */
   real x;			/* x and y coordinates of ship */
   real y;
   real dx;			/* x and y increments */

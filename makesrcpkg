@@ -52,9 +52,9 @@ cp -p ti/*.ti $CONQVER/ti/
 
 chmod 644 $CONQVER/ti/*
 
-chmod 640 $CONQVER/*
+chmod 644 $CONQVER/*
 chmod 755 $CONQVER/ti
-chmod 750 $CONQVER/configure $CONQVER/config.guess $CONQVER/config.sub
+chmod 755 $CONQVER/configure $CONQVER/config.guess $CONQVER/config.sub
 
 
 tar cvf ${ARCFILE} $CONQVER

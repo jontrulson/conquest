@@ -8,6 +8,7 @@
 ###########################################################################
 
 # User defineable options
+CONQGROUP = @CONQGROUP@
 CONQBIN = @prefix@/bin
 CONQHOME = @prefix@/conquest
 MAKE = make
@@ -18,8 +19,7 @@ MAKE = make
 
 LCFLAGS = 
 
-
-CFLAGS = @CFLAGS@ @DEFS@ $(LCFLAGS) -DCONQHOME=\"$(CONQHOME)\"
+CFLAGS = @CFLAGS@ @DEFS@ $(LCFLAGS) -DCONQHOME=\"$(CONQHOME)\" -DCONQUEST_GROUP=\"$(CONQGROUP)\"
 CONQUEST = conquest
 CONQAI = conqai
 CONQOPER = conqoper
@@ -81,7 +81,7 @@ all: $(CONQLB) $(CONQUEST) $(CONQOPER) $(CONQAI) $(CONQDRIV) $(CONQSTRAT)
 conquest: conquest.o 
 	@-rm -f conquest
 	$(CC) -o conquest $(CFLAGS) conquest.o $(CURDIR)/$(CONQLB) $(EXTLBS)
-	@chgrp conquest conquest
+	@chgrp $(CONQGROUP) conquest
 	@chmod 2771 conquest
 
 conquest.o: conquest.c c_defs.h defs.h conqdef.h conqcom.h conqcom2.h
@@ -93,13 +93,13 @@ conqdriv.o: conqdriv.c c_defs.h defs.h conqdef.h conqcom.h conqcom2.h
 conqdriv: conqdriv.o 
 	@-rm -f conqdriv
 	$(CC) -o conqdriv $(CFLAGS) conqdriv.o $(CURDIR)/$(CONQLB) $(EXTLBS)
-	@chgrp conquest conqdriv
+	@chgrp $(CONQGROUP) conqdriv
 	@chmod 2771 conqdriv
 
 conqai: conqai.o 
 	@-rm -f conqai
 	$(CC) -o conqai $(CFLAGS) conqai.o $(CURDIR)/$(CONQLB) $(EXTLBS)
-	@chgrp conquest conqai
+	@chgrp $(CONQGROUP) conqai
 	@chmod 2771 conqai
 
 conqai.o: conqai.c c_defs.h defs.h conqdef.h conqcom.h conqcom2.h conqdata.h
@@ -112,7 +112,7 @@ conqai_nomain.o: conqai.c c_defs.h defs.h conqdef.h conqcom.h conqcom2.h conqdat
 conqoper: conqoper.o 
 	@-rm -f conqoper
 	$(CC) -o conqoper $(CFLAGS) conqoper.o $(CURDIR)/$(CONQLB) $(EXTLBS)
-	@chgrp conquest conqoper
+	@chgrp $(CONQGROUP) conqoper
 	@chmod 2771 conqoper
 
 conqoper.o: conqoper.c c_defs.h defs.h conqdef.h conqcom.h conqcom2.h
@@ -155,7 +155,7 @@ install: all $(CONQHOME) $(CONQHOME)/etc $(CONQHOME)/bin $(CONQHOME)/lib \
 @prefix@:
 	mkdir -p @prefix@
 	chmod 775 @prefix@
-	chgrp conquest @prefix@
+	chgrp $(CONQGROUP) @prefix@
 
 $(CONQBIN):
 	mkdir -p $(CONQBIN)
@@ -184,38 +184,38 @@ $(CONQBIN)/conqai: $(BCONQAI)
 $(CONQHOME):
 	mkdir -p $(CONQHOME)
 	chmod 775 $(CONQHOME)
-	chgrp conquest $(CONQHOME)
+	chgrp $(CONQGROUP) $(CONQHOME)
 
 $(CONQHOME)/lib/$(CONQLB): $(CONQLB)
 	cp $(CONQLB) $(CONQHOME)/lib/$(CONQLB)
-	chgrp conquest $(CONQHOME)/lib/$(CONQLB)
+	chgrp $(CONQGROUP) $(CONQHOME)/lib/$(CONQLB)
 	chmod 644 $(CONQHOME)/lib/$(CONQLB)
 
 $(CONQHOME)/etc:
 	mkdir -p $(CONQHOME)/etc
 	chmod 775 $(CONQHOME)/etc
-	chgrp conquest $(CONQHOME)/etc
+	chgrp $(CONQGROUP) $(CONQHOME)/etc
 
 $(CONQHOME)/bin:
 	mkdir -p $(CONQHOME)/bin
 	chmod 775 $(CONQHOME)/bin
-	chgrp conquest $(CONQHOME)/bin
+	chgrp $(CONQGROUP) $(CONQHOME)/bin
 
 $(CONQHOME)/lib:
 	mkdir -p $(CONQHOME)/lib
 	chmod 775 $(CONQHOME)/lib
-	chgrp conquest $(CONQHOME)/lib
+	chgrp $(CONQGROUP) $(CONQHOME)/lib
 
 $(CONQHOME)/etc/conquestrc: $(BCONQOPER)
 	$(BCONQOPER) -C
 	chmod 664 $(CONQHOME)/etc/conquestrc
-	chgrp conquest $(CONQHOME)/etc/conquestrc
+	chgrp $(CONQGROUP) $(CONQHOME)/etc/conquestrc
 
 $(BCONQUEST): conquest
 	@-rm -f $(BCONQUEST)
 	$(CC) -o conquest $(CFLAGS) conquest.o $(CONQHOME)/lib/$(CONQLB) $(EXTLBS)
 	cp conquest $(BCONQUEST)
-	chgrp conquest $(BCONQUEST)
+	chgrp $(CONQGROUP) $(BCONQUEST)
 	chmod 2771 $(BCONQUEST)
 	@FILEPRIV@ -f plock,tshar,core $(BCONQUEST)
 
@@ -223,7 +223,7 @@ $(BCONQOPER): conqoper
 	@-rm -f $(BCONQOPER)
 	$(CC) -o conqoper $(CFLAGS) conqoper.o $(CONQHOME)/lib/$(CONQLB) $(EXTLBS)
 	cp conqoper $(BCONQOPER)
-	chgrp conquest $(BCONQOPER)
+	chgrp $(CONQGROUP) $(BCONQOPER)
 	chmod 2771 $(BCONQOPER)
 	@FILEPRIV@ -f plock,tshar,core $(BCONQOPER)
 
@@ -231,7 +231,7 @@ $(BCONQDRIV): conqdriv
 	@-rm -f $(BCONQDRIV)
 	$(CC) -o conqdriv $(CFLAGS) conqdriv.o $(CONQHOME)/lib/$(CONQLB) $(EXTLBS)
 	cp conqdriv $(BCONQDRIV)
-	chgrp conquest $(BCONQDRIV)
+	chgrp $(CONQGROUP) $(BCONQDRIV)
 	chmod 2771 $(BCONQDRIV)
 	@FILEPRIV@ -f plock,tshar,core $(BCONQDRIV)
 
@@ -239,7 +239,7 @@ $(BCONQAI): conqai
 	@-rm -f $(BCONQAI)
 	$(CC) -o conqai $(CFLAGS) conqai.o $(CONQHOME)/lib/$(CONQLB) $(EXTLBS)
 	cp conqai $(BCONQAI)
-	chgrp conquest $(BCONQAI)
+	chgrp $(CONQGROUP) $(BCONQAI)
 	chmod 2770 $(BCONQAI)
 	@FILEPRIV@ -f plock,tshar,core $(BCONQAI)	
 
@@ -247,27 +247,27 @@ $(BCONQSTRAT): conqstrat
 	@-rm -f $(BCONQSTRAT)
 	-$(CC) -o conqstrat $(CFLAGS) lex.yy.o y.tab.o $(LIBS) $(CONQHOME)/lib/$(CONQLB) $(EXTLBS)
 	-cp conqstrat $(BCONQSTRAT)
-	-chgrp conquest $(BCONQSTRAT)
+	-chgrp $(CONQGROUP) $(BCONQSTRAT)
 	-chmod 751 $(BCONQSTRAT)
 
 $(CONQHOME)/etc/conqrule: conqrule
 	cp conqrule $(CONQHOME)/etc/conqrule
-	chgrp conquest $(CONQHOME)/etc/conqrule
+	chgrp $(CONQGROUP) $(CONQHOME)/etc/conqrule
 	chmod 644 $(CONQHOME)/etc/conqrule
 
 $(HCONQREADME): README
 	cp README $(HCONQREADME)
-	chgrp conquest $(HCONQREADME)
+	chgrp $(CONQGROUP) $(HCONQREADME)
 	chmod 644 $(HCONQREADME)
 
 $(HCONQHELP): $(CONQHELP)
 	cp $(CONQHELP) $(HCONQHELP)
-	chgrp conquest $(HCONQHELP)
+	chgrp $(CONQGROUP) $(HCONQHELP)
 	chmod 644 $(HCONQHELP)
 
 $(HCONQNEWS): $(CONQNEWS)
 	cp $(CONQNEWS) $(HCONQNEWS)
-	chgrp conquest $(HCONQNEWS)
+	chgrp $(CONQGROUP) $(HCONQNEWS)
 	chmod 644 $(HCONQNEWS)
 
 clean:

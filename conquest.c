@@ -390,6 +390,12 @@ void command( int ch )
     case 'Q':				/* self destruct */
       doselfdest( CqContext.snum );
       break;
+    case 'r':				/* refit */
+      if (sysconf_AllowRefits)
+	dorefit( CqContext.snum, TRUE );
+      else
+	cdbeep();
+      break;
     case 'R':				/* repair mode */
       if ( ! Ships[CqContext.snum].cloaked )
 	{
@@ -1144,7 +1150,7 @@ void dobeam( int snum )
     }
   else
     {
-      capacity = min( ifix( rkills ) * 2, Teams[Ships[snum].team].armylim );
+      capacity = min( ifix( rkills ) * 2, ShipTypes[Ships[snum].shiptype].armylim );
       upmax = min( Planets[pnum].armies - MIN_BEAM_ARMIES, 
 		   capacity - Ships[snum].armies );
     }
@@ -1665,6 +1671,138 @@ void docloak( int snum )
   
 }
 
+/*  dorefit - attempt to change the nature of things */
+/*  SYNOPSIS */
+/*    int snum */
+/*    dorefit( snum ) */
+void dorefit( int snum, int dodisplay )
+{
+  int i, ch, pnum, now, entertime, leave;
+  char buf1[128], buf2[128];
+  int oldstype = 0, stype = 0;
+  string ntp="We must be orbiting a team owned planet to refit.";
+  string nek="You must have at least one kill to refit.";
+  string conf="Press TAB to change, ENTER to accept: ";
+  
+  cdclrl( MSG_LIN2, 1 );
+  
+  /* Check for allowability. */
+  if ( oneplace( Ships[snum].kills ) < MIN_REFIT_KILLS )
+    {
+      c_putmsg( nek, MSG_LIN1 );
+      return;
+    }
+
+  pnum = -Ships[snum].lock;
+
+  if (Planets[pnum].team != Ships[snum].team || Ships[snum].warp >= 0.0)
+    {
+      c_putmsg( ntp, MSG_LIN1 );
+      return;
+    }
+
+				/* we have at least 1 kill, and are */
+				/* orbiting a team owned planet */
+
+  stype = oldstype = Ships[snum].shiptype;
+  leave = FALSE;
+
+  while ( stillalive( snum ) && !leave)
+  {
+    /* Display the current options. */
+    
+    cdclrl( MSG_LIN1, 1 );
+    cdclrl( MSG_LIN2, 1 );    
+    
+    buf1[0] = '\0';
+    appstr("Refit ship type: ", buf1);
+    appstr(ShipTypes[stype].name, buf1);
+    
+    c_putmsg(buf1, MSG_LIN1);
+    c_putmsg(conf, MSG_LIN2);
+      
+    cdrefresh();
+      
+    /* Get a character. */
+    if ( ! iogtimed( &ch, 1 ) )
+      continue; /* next; */
+    switch ( ch )
+      {
+      case TERM_EXTRA:
+	stype = modp1( stype + 1, MAXNUMSHIPTYPES );
+	leave = FALSE;
+
+	if ( dodisplay )
+	  {
+	    /* Force an update. */
+	    stoptimer();
+	    display( snum, FALSE );
+	    settimer();
+	  }
+
+	break;
+
+      case TERM_NORMAL:
+	leave = TRUE;
+	break;
+
+      case TERM_ABORT:
+	/* Decided to abort; restore things. */
+
+	stype = oldstype;
+	leave = TRUE;
+
+	if ( dodisplay )
+	  {
+	    /* Force an update. */
+	    stoptimer();
+	    display( snum, FALSE );		/* update the display */
+	    settimer();
+	  }
+	
+	break;
+      default:
+	cdbeep();
+	leave = FALSE;
+	break;
+      }
+  }
+  
+  if (stype == oldstype)
+    {
+      cdclrl( MSG_LIN1, 1 );
+      cdclrl( MSG_LIN2, 1 );
+      
+      return; 
+    }
+
+  /* Now wait it out... */
+  cdclrl( MSG_LIN1, 1 );
+  cdclrl( MSG_LIN2, 1 );
+  c_putmsg( "Refitting ship...", MSG_LIN1 );
+  cdrefresh();
+  grand( &entertime );
+  while ( dgrand( entertime, &now ) < REFIT_GRAND )
+    {
+      /* See if we're still alive. */
+      if ( ! stillalive( snum ) )
+	return;
+      
+      /* Sleep (and enable asts so the display will work). */
+      aston();
+      c_sleep( ITER_SECONDS );
+      astoff();
+    }
+  
+				/* set it */
+  Ships[snum].shiptype = stype;
+
+  cdclrl( MSG_LIN1, 1 );
+  cdclrl( MSG_LIN2, 1 );
+
+  return;
+  
+}
 
 /*  docoup - attempt to rise from the ashes (DOES LOCKING) */
 /*  SYNOPSIS */
@@ -1768,6 +1906,7 @@ void docoup( int snum )
     }
   
   failprob = Planets[pnum].armies / MAX_COUP_ENEMY_ARMIES * 0.5 + 0.5;
+
   if ( rnd() < failprob )
     {
       /* Failed; setup new reorganization time. */
@@ -2074,6 +2213,11 @@ void dohelp( void )
   tlin++;
   cprintf(tlin,col,ALIGN_NONE,sfmt, "Q", "initiate self-destruct");
   tlin++;
+  if (sysconf_AllowRefits)
+    {
+      cprintf(tlin,col,ALIGN_NONE,sfmt, "r", "refit ship to new type");
+      tlin++;
+    }
   cprintf(tlin,col,ALIGN_NONE,sfmt, "R", "enter repair mode");
   tlin++;
   cprintf(tlin,col,ALIGN_NONE,sfmt, "S", "more user statistics");
@@ -2963,7 +3107,7 @@ void dowarp( int snum, real warp )
     }
   
   /* Handle ship limitations. */
-  Ships[snum].dwarp = min( warp, Teams[Ships[snum].team].warplim );
+  Ships[snum].dwarp = min( warp, ShipTypes[Ships[snum].shiptype].warplim );
   
   sprintf( cbuf, "Warp %d.", (int) Ships[snum].dwarp );
   c_putmsg( cbuf, MSG_LIN1 );
@@ -3083,8 +3227,10 @@ void menu(void)
   /* Set up a few ship characteristics here rather than in initship(). */
   Ships[CqContext.snum].unum = CqContext.unum;
   Ships[CqContext.snum].team = Users[CqContext.unum].team;
+  Ships[CqContext.snum].shiptype = Teams[Ships[CqContext.snum].team].shiptype;
 
   Ships[CqContext.snum].pid = CqContext.pid;
+
   for ( i = 0; i < MAXOPTIONS; i = i + 1 )
     Ships[CqContext.snum].options[i] = Users[CqContext.unum].options[i];
   for ( i = 0; i < NUMPLAYERTEAMS; i = i + 1 )
@@ -3287,7 +3433,10 @@ void menu(void)
 	    cdbeep();
 	  else
 	    {
-	      Ships[CqContext.snum].team = modp1( Ships[CqContext.snum].team+1, NUMPLAYERTEAMS );
+	      Ships[CqContext.snum].team = 
+		modp1( Ships[CqContext.snum].team+1, NUMPLAYERTEAMS );
+	      Ships[CqContext.snum].shiptype = 
+		Teams[Ships[CqContext.snum].team].shiptype;
 	      Users[CqContext.unum].team = Ships[CqContext.snum].team;
 	      Ships[CqContext.snum].war[Ships[CqContext.snum].team] = FALSE;
 	      Users[CqContext.unum].war[Users[CqContext.unum].team] = FALSE;
@@ -3629,6 +3778,7 @@ int newship( int unum, int *snum )
     {
 				/* (re)init the ship's team! (bug 1/10/98) */
       Ships[*snum].team = Users[CqContext.unum].team;
+      Ships[*snum].shiptype = Teams[Ships[*snum].team].shiptype; 
       system = Ships[*snum].team;
       if ( ! capentry( *snum, &system ) )
 	{

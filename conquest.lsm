@@ -1,11 +1,11 @@
 Begin3
 Title:          Conquest source package for Unixware/Linux/FreeBSD
-Version:        7.0
-Entered-date:   1999-02-01
+Version:        7.1
+Entered-date:   2000-01-03
 Description:    Multi-player, curses based, space warfare game.
 Keywords:       multiuser game conquest space warfare die curses fun unix
 Author:         Original VMS/Ratfor (1985): Craig Leres, Jef Poskanzer
-Author:         Unix/C translation/port (1996-1999): Jon Trulson
+Author:         Unix/C translation/port (1996-2001): Jon Trulson
 Author:         Linux porting work: Dave Payne
 Maintained-by:  Jon Trulson <jon@radscan.com>
 Primary-site:   http://radscan.com/conquest.html

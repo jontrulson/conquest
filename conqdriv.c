@@ -385,7 +385,7 @@ void iterdrive( int *ship )
 			}
 		      else if ( ( dis - ORBIT_DIST ) <=
 			       acdist( Ships[i].warp, MAX_ORBIT_WARP,
-				      Teams[Ships[i].team].accelfac * 
+				      ShipTypes[Ships[i].shiptype].accelfac * 
 				       engeff( i ) ) )
 			{
 			  /* Time to slow down. */

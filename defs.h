@@ -38,7 +38,9 @@
  *   to... This is also the group that the conquest executables setgid()
  *   to as well.  You should leave it as is... Default: conquest.  
  */
-#define CONQUEST_GROUP "conquest"
+#ifndef CONQUEST_GROUP
+# define CONQUEST_GROUP "conquest"
+#endif
 
 #ifndef CONQHOME
 # define CONQHOME "/opt/conquest"

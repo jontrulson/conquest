@@ -14,16 +14,23 @@ dnl AC_CANONICAL_SYSTEM
 dnl Checks for programs.
 dnl get the system type and set accordingly.  first init some defaults.
 
-AC_MSG_CHECKING(system type)
+AC_ARG_WITH(conquest-group,
+  [  --with-conquest-group=groupname  The conquest group name (Default: conquest)],
+  conquest_group="$withval", conquest_group="conquest")
 
+CONQGROUP="$conquest_group"
+AC_SUBST(CONQGROUP)
+
+AC_MSG_CHECKING(system type)
 uname=`uname -s`
 urev=`uname -r`
 uvers=`uname -v`
 
+
+
 case "$uname" in
   Linux*)
 	AC_DEFINE(LINUX)    
-	CFLAGS="$CFLAGS -D__NO_MATH_INLINES -O2 -fPIC -fno-builtin"
 
 	FILEPRIV="@-echo filepriv"
 	AC_SUBST(FILEPRIV)
@@ -44,7 +51,6 @@ case "$uname" in
 	;;
   FreeBSD*)
 	AC_DEFINE(FREEBSD)
-	CFLAGS="$CFLAGS -D__NO_MATH_INLINES -O2 -fPIC -fno-builtin"
 
 	FILEPRIV="@-echo filepriv"
 	AC_SUBST(FILEPRIV)
@@ -148,7 +154,6 @@ case "$uname" in
   *)	
 	# assume something safe...
 	AC_DEFINE(UNKNOWN)     
-	CFLAGS="$CFLAGS -O"
 
 	FILEPRIV="@-echo filepriv"
 	AC_SUBST(FILEPRIV)
@@ -170,6 +175,12 @@ case "$uname" in
 esac
 
 AC_PROG_CC
+
+if test -n "$GCC"
+then
+	CFLAGS="$CFLAGS -D__NO_MATH_INLINES -O2 -fPIC -fno-builtin"
+fi
+
 AC_PROG_MAKE_SET
 
 dnl check for a yacc parser and libs - borrowed from autoconf. (AC_PROG_YACC)

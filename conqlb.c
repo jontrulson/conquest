@@ -627,15 +627,26 @@ void infoship( int snum, int scanner )
     appstr( " (CLOAKED) ", cbuf );
   else
     appstr( ", ", cbuf );
+
+  if (sysconf_AllowRefits)
+    {
+      appstr("a ", cbuf);
+      appstr(ShipTypes[Ships[snum].shiptype].name, cbuf);
+      appstr(", ", cbuf);
+    }
+
   if ( godlike )
     {
       appsstatus( status, cbuf );
       appchr( '.', cbuf );
     }
-  else if ( Ships[snum].war[Ships[scanner].team] )
-    appstr( "at WAR.", cbuf );
-  else
-    appstr( "at peace.", cbuf );
+  else 
+    {
+      if ( Ships[snum].war[Ships[scanner].team] )
+	appstr( "at WAR.", cbuf );
+      else
+	appstr( "at peace.", cbuf );
+    }
   
   c_putmsg( cbuf, MSG_LIN1 );
   
@@ -1003,7 +1014,7 @@ int launch( int snum, real dir, int number, int ltype )
 	  Ships[snum].torps[tslot[i]].fuse = TORPEDO_FUSE;
 	  Ships[snum].torps[tslot[i]].x = rndnor( Ships[snum].x, 100.0 );
 	  Ships[snum].torps[tslot[i]].y = rndnor( Ships[snum].y, 100.0 );
-	  speed = Teams[Ships[snum].team].torpwarp * MM_PER_SEC_PER_WARP * 
+	  speed = ShipTypes[Ships[snum].shiptype].torpwarp * MM_PER_SEC_PER_WARP * 
 	    ITER_SECONDS;
 	  adir = rndnor( dir, 2.0 );
 	  Ships[snum].torps[tslot[i]].dx = (real) (speed * cosd(adir));
@@ -1456,7 +1467,7 @@ void playlist( int godlike, int doall, int snum )
   char pidbuf[20];
   char ubuf[SIZEUSERNAME + 2];
   int ch;
-  char *hd1="ship name          pseudonym              kills      pid";
+  char *hd1="ship  name          pseudonym              kills      pid";
   
   /* Do some screen setup. */
   cdclear();
@@ -1496,6 +1507,11 @@ void playlist( int godlike, int doall, int snum )
 	    {
 	      sbuf[0] = EOS;
 	      appship( i, sbuf );
+	      if (sysconf_AllowRefits)
+		{
+		  appstr(" ", sbuf);
+		  appchr(ShipTypes[Ships[i].shiptype].name[0], sbuf);
+		}
 	      unum = Ships[i].unum;
 	      if ( unum >= 0 && unum < MAXUSERS )
 		{
@@ -1513,12 +1529,12 @@ void playlist( int godlike, int doall, int snum )
 		  strcat(ubuf, Users[unum].username);
 
 		  sprintf(kbuf, "%6.1f", (Ships[i].kills + Ships[i].strkills));
-		  sprintf( cbuf, "%-4s %-13.13s %-21.21s %-8s %6s",
+		  sprintf( cbuf, "%-5s %-13.13s %-21.21s %-8s %6s",
 			   sbuf, ubuf, Ships[i].alias, 
 			   kbuf, pidbuf );
 		}
 	      else
-		sprintf( cbuf, "%-4s %13s %21s %8s %6s", sbuf,
+		sprintf( cbuf, "%-5s %13s %21s %8s %6s", sbuf,
 		       " ", " ", " ", " " );
 	      if ( doall && kb != 0 )
 		{

@@ -204,7 +204,7 @@ void buildai( int snum, int vars[], int *bnenum, real *bdne, real *bane )
 		{
 		  /* Just guess at other ships efficiency. */
 		  dam = dam + explosion(
-					TORPEDO_HIT * 1.1 * Teams[Ships[i].team].weafac,
+					TORPEDO_HIT * 1.1 * ShipTypes[Ships[i].shiptype].weafac,
 					dist(Ships[snum].x,Ships[snum].y,Ships[i].torps[j].x,Ships[i].torps[j].y) );
 		}
       AISCALE( vars[VAR_INCOMING], dam, 10.0 );
@@ -622,6 +622,12 @@ int newrob( int *snum, int unum )
   /* Initialize the things that aren't done by initship(). */
   Ships[*snum].unum = unum;
   Ships[*snum].team = Users[unum].team;
+
+  if (sysconf_AllowRefits)
+    Ships[*snum].shiptype = rndint( 0, MAXNUMSHIPTYPES - 1 );
+  else
+    Ships[*snum].shiptype = Teams[Ships[*snum].team].shiptype;
+
   Ships[*snum].sdfuse = 0;
   Ships[*snum].pid = 0;
 

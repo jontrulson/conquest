@@ -9,6 +9,51 @@
 
                               Conquest News
 
+Version 7.1 Mon Jan  1 11:45:20 MST 2001 Jon Trulson  <jon@radscan.com>
+
+	- added a ship refit capability.  It's sys-wide configurable
+          (allow_refits), and enabled by default.  This allows users
+          to be able to change ship types once they have at least one
+          kill, and are orbiting a team owned planet.  There are 3
+          ship types: Scout (Orion equiv), Destroyer
+          (Klingon/Federation equiv) and Cruiser (Romulan equiv).
+
+          Robots will be given a random ship type when they enter the
+          game.
+
+	  Users will get whatever shiptype is normal for their team
+	  until they change it.  Use the 'r' option to refit during
+	  play. 
+
+	  This change required a new common block, so I had to reset
+	  it, losing all current user data on the conquest.radscan.com
+	  server.  Sorry.
+
+	  The ship type a user is using can be determined by doing an
+	  (i)nfo on the ship.  Also, the '(/)player list' option will
+	  show an 'S' (Scout), 'D' (Destroyer), or 'C' (Cruiser) next
+	  to their ship number, indicating the variety they are
+	  flying.  
+
+	- Worked with Jef Poskanzer (the original Conquest God) to fix
+          semaphore problems on Sparc systems, and added a new
+          '--with-conquest-group=<groupname>' option to the configure
+          script so that you can easily choose which group you want
+          conquest to run under.
+
+	  Oh, and we did skirmish a bit, and I actually blew him up
+	  ;-) 
+
+	- added message logging sys-wide option (log_messages).  Now
+          all messages can be saved into the logfile.
+
+	- skip users with a negative difftime so they are not expired.
+          I had a problem with my system clock one day - it reset to
+          1996.  And of course, after logging into Conquest, it
+          proceeded to expire all remote users.  Bummer.
+
+	- Fixed typo in remote user login screen.
+
 Version 7.0.1  Fri Sep  3 18:20:52 MST 1999 Jon Trulson  <jon@radscan.com>
 
         - This is a maintenance release, fixing some minor bugs and

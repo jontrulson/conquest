@@ -342,6 +342,8 @@ void map_common(void)
 
   map1d(Ships, Ship_t, MAXSHIPS + 1);
 
+  map1d(ShipTypes, ShipType_t, MAXNUMSHIPTYPES);
+
   map1d(Msgs, Msg_t, MAXMESSAGES);
 
   map1d(EndOfCBlock, int, 1);

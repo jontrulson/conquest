@@ -57,6 +57,9 @@ CEXTERN int sysconf_UserExpiredays;
 				   the logfile */
 CEXTERN int sysconf_LogMessages;
 
+				/* whether to allow refitting */
+CEXTERN int sysconf_AllowRefits;
+
 				/* User options */
 				/* Whether to beep on an incoming message */
 CEXTERN int conf_MessageBell;

@@ -1428,6 +1428,7 @@ void initship( int snum, int unum )
   /* suser(snum)				# setup in menu() or newrob() */
   /* steam(snum)				# setup in menu() or newrob() */
   /* spid(snum)				# setup in menu() or newrob() */
+  /* shiptype - setup in newship and newrob */
   Ships[snum].strkills = 0.0;	/* init to 0.0, newrob will init this
 				   for robots to make them stronger, faster.. ;-) */
   Ships[snum].x = 0.0;
@@ -1521,6 +1522,30 @@ void inituniverse(void)
   /* Turn off the universe. */
   ConqInfo->closed = TRUE;
   
+  stcpn( "Scout", ShipTypes[ST_SCOUT].name, MAXSTNAME );
+  ShipTypes[ST_SCOUT].armylim = 7;
+  ShipTypes[ST_SCOUT].warplim = 10.0;
+  ShipTypes[ST_SCOUT].engfac = 1.2;
+  ShipTypes[ST_SCOUT].accelfac = 1.6;
+  ShipTypes[ST_SCOUT].weafac = 0.83;
+  ShipTypes[ST_SCOUT].torpwarp = 14.0;
+
+  stcpn( "Destroyer", ShipTypes[ST_DESTROYER].name, MAXSTNAME );
+  ShipTypes[ST_DESTROYER].armylim = 9;
+  ShipTypes[ST_DESTROYER].warplim = 9.0;
+  ShipTypes[ST_DESTROYER].engfac = 1.0;
+  ShipTypes[ST_DESTROYER].accelfac = 1.0;
+  ShipTypes[ST_DESTROYER].weafac = 1.0;
+  ShipTypes[ST_DESTROYER].torpwarp = 12.0;
+
+  stcpn( "Cruiser", ShipTypes[ST_CRUISER].name, MAXSTNAME );
+  ShipTypes[ST_CRUISER].armylim = 11;
+  ShipTypes[ST_CRUISER].warplim = 8.0;
+  ShipTypes[ST_CRUISER].engfac = 0.8;
+  ShipTypes[ST_CRUISER].accelfac = 0.8;
+  ShipTypes[ST_CRUISER].weafac = 1.17;
+  ShipTypes[ST_CRUISER].torpwarp = 10.0;
+
   Teams[TEAM_FEDERATION].teamhplanets[0] = PNUM_EARTH;
   Teams[TEAM_FEDERATION].teamhplanets[1] = PNUM_TELOS;
   Teams[TEAM_FEDERATION].teamhplanets[2] = PNUM_OMEGA;
@@ -1544,35 +1569,10 @@ void inituniverse(void)
   Teams[TEAM_KLINGON].homesun = PNUM_KEJELA;
   Teams[TEAM_ORION].homesun = PNUM_BETELGEUSE;
   
-  Teams[TEAM_FEDERATION].warplim = 9.0;
-  Teams[TEAM_ROMULAN].warplim = 8.0;
-  Teams[TEAM_KLINGON].warplim = 9.0;
-  Teams[TEAM_ORION].warplim = 10.0;
-  
-  Teams[TEAM_FEDERATION].armylim = 9;
-  Teams[TEAM_ROMULAN].armylim = 11;
-  Teams[TEAM_KLINGON].armylim = 9;
-  Teams[TEAM_ORION].armylim = 7;
-  
-  Teams[TEAM_FEDERATION].engfac = 1.0;
-  Teams[TEAM_ROMULAN].engfac = 0.8;
-  Teams[TEAM_KLINGON].engfac = 1.0;
-  Teams[TEAM_ORION].engfac = 1.2;
-  
-  Teams[TEAM_FEDERATION].accelfac = 1.0;
-  Teams[TEAM_ROMULAN].accelfac = 0.8;
-  Teams[TEAM_KLINGON].accelfac = 1.0;
-  Teams[TEAM_ORION].accelfac = 1.6;
-  
-  Teams[TEAM_ROMULAN].weafac = 1.17;
-  Teams[TEAM_ORION].weafac = 0.83;
-  Teams[TEAM_FEDERATION].weafac = 1.0;
-  Teams[TEAM_KLINGON].weafac = 1.0;
-  
-  Teams[TEAM_FEDERATION].torpwarp = 12.0;
-  Teams[TEAM_ROMULAN].torpwarp = 10.0;
-  Teams[TEAM_KLINGON].torpwarp = 12.0;
-  Teams[TEAM_ORION].torpwarp = 14.0;
+  Teams[TEAM_FEDERATION].shiptype = ST_DESTROYER;
+  Teams[TEAM_KLINGON].shiptype = ST_DESTROYER;
+  Teams[TEAM_ROMULAN].shiptype = ST_CRUISER;
+  Teams[TEAM_ORION].shiptype = ST_SCOUT;
   
   stcpn( "Federation", Teams[TEAM_FEDERATION].name, MAXTEAMNAME );
   stcpn( "Romulan", Teams[TEAM_ROMULAN].name, MAXTEAMNAME );
@@ -1699,7 +1699,7 @@ real newarp( int snum, real dwarp )
   real x, acc;
   
   x = dwarp - Ships[snum].warp;
-  acc = (real) Teams[Ships[snum].team].accelfac * 
+  acc = (real) ShipTypes[Ships[snum].shiptype].accelfac * 
     (real) engeff( snum ) * ITER_SECONDS;
   if ( acc >= fabs( x ) )
     return ( dwarp );			/* close enough (or equal) */
@@ -2478,6 +2478,7 @@ void zeroship( int snum )
   Ships[snum].armies = 0;
   Ships[snum].rmode = FALSE;
   Ships[snum].cloaked = FALSE;
+  Ships[snum].shiptype = ST_SCOUT;
   for ( i = 0; i < MAXOPTIONS; i = i + 1 )
     Ships[snum].options[i] = FALSE;
   for ( i = 0; i < NUMPLAYERTEAMS; i = i + 1 )

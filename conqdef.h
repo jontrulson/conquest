@@ -57,7 +57,8 @@
 /*#define COMMONSTAMP 961019 		 stardate? */
 /*#define COMMONSTAMP 971207 		 stardate? */
 /*#define COMMONSTAMP 980628 		 stardate? */
-#define COMMONSTAMP 990124 		 /* stardate? */
+/*#define COMMONSTAMP 990124 		 stardate? */
+#define COMMONSTAMP 20001231 		 /* stardate? */
 
 /* Copyright notice string. */
 #define COPYRIGHT "(C) 1983-1986 by Jef Poskanzer and Craig Leres"
@@ -96,6 +97,14 @@
 #define TS_LIVE 3 		/* armed and flying */
 #define TS_DETONATE 4 		/* detonate signal sent */
 #define TS_FIREBALL 5 		/* exploding, needed for display() */
+
+#define MAXSTNAME 32
+#define MAXNUMSHIPTYPES 3
+#define ST_SCOUT      0		/* scout vessel (Ori) */
+#define ST_DESTROYER  1		/* Destroyer (Fed/Kli) */
+#define ST_CRUISER    2		/* Cruiser (Rom) */
+
+#define REFIT_GRAND 10000       /* hunderths to complete a refit */
 
 #define NUMALLTEAMS 8 		/* total number of teams */
 #define MAXTEAMNAME 12 
@@ -515,6 +524,7 @@
 #define SELFDESTRUCT_FUSE 15 	/* seconds to self-destruct */
 #define REARM_GRAND 10000 	/* hunderths to declaring war/peace */
 #define COUP_GRAND 10000 	/* hunderths to attempt a coup */
+#define MIN_REFIT_KILLS 1.0     /* min kill to refit */
 
 #define MSG_LIN1 (DISPLAY_LINS + 2) 
 #define MSG_LIN2 (MSG_LIN1 + 1)	/* line for messages */
@@ -582,13 +592,13 @@
 #define vowel(x) (x=='a' || x=='e' || x=='i' || x=='o' || x=='u' )
 #define satwar(x,y) (Ships[x].war[Ships[y].team] || Ships[y].war[Ships[x].team])
 #define selfwar(x) Ships[x].war[Ships[x].team]
-#define maxwarp(x) (real)min(Teams[Ships[x].team].warplim, \
+#define maxwarp(x) (real)min(ShipTypes[Ships[x].shiptype].warplim, \
 			     max(0.0, around(((100.0-Ships[x].damage)/100.0)*12.0)))
 #define engeff(x) (real)(((Ships[x].engalloc +50.0)/100.0) * \
-			 Teams[Ships[x].team].engfac * \
+			 ShipTypes[Ships[x].shiptype].engfac * \
 			 (((Ships[x].kills+Ships[x].strkills)+DOUBLE_E_KILLS)/DOUBLE_E_KILLS))
 #define weaeff(x) (real)(((Ships[x].weapalloc+50.0)/100.0) * \
-			 Teams[Ships[x].team].weafac * \
+			 ShipTypes[Ships[x].shiptype].weafac * \
 			 (((Ships[x].kills+Ships[x].strkills)+DOUBLE_E_KILLS)/DOUBLE_E_KILLS))
 
 #endif /*  CONQDEF_H_INCLUDED */

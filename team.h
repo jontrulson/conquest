@@ -15,12 +15,7 @@ typedef struct {
   int homeplanet;		/* planet number of the home planet */
   int homesun;			/* sun number of the home system */
   int teamhplanets[3];		/* planet numbers of the home system */
-  int armylim;			/* maximum armies a team ship can carry */
-  real warplim;			/* maximum warp based on team */
-  real engfac;			/* team engine constants */
-  real accelfac;		/* team acceleration constants */
-  real weafac;			/* team weapons constants */
-  real torpwarp;		/* torp speed for team */
+  int shiptype;			/* type of ship, one of the ST_* types */
   int stats[MAXTSTATS];		/* team stats */
   int coupinfo;			/* coup info */
   int couptime;			/* couptime */

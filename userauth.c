@@ -30,6 +30,8 @@ int Logon(char *username, char *password)
   string c3="C      O   O  N N N  Q   Q  U   U  EEE     SSS     T";
   string c4="C   C  O   O  N  NN  Q  Q   U   U  E          S    T";
   string c5=" CCC    OOO   N   N   QQ Q   UUU   EEEEE  SSSS     T";
+  extern char *ConquestVersion;
+  extern char *ConquestDate;
 
   expire_users();		/* now is a good time to expire users */
 
@@ -68,6 +70,16 @@ int Logon(char *username, char *password)
   cdbox( 1, col - 2, lin, col + lenc1 + 1 );
   attrset(0);
 
+  lin++;
+
+  if ( ConqInfo->closed )
+    cprintf( lin, 0, ALIGN_CENTER, "#%d#%s", RedLevelColor,
+	     "The game is closed.");
+  else
+    cprintf( lin, 1, ALIGN_CENTER, "#%d#%s (%s)", YellowLevelColor,
+	     ConquestVersion, ConquestDate);
+
+
   lin += 4;
   slin = lin;
 
@@ -80,7 +92,7 @@ int Logon(char *username, char *password)
       slin = lin;
       cdclrl( slin, CqContext.maxlin - slin - 1 );
       cprintf( slin, col, ALIGN_CENTER, 
-	       "#%dWelome to Conquest, Please login...",
+	       "#%dWelcome to Conquest, Please login...",
 	       SpecialColor);
 
       slin += 3;

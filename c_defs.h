@@ -212,6 +212,7 @@ void dobeam( int snum );
 void dobomb( int snum );
 void doburst( int snum );
 void docloak( int snum );
+void dorefit( int snum, int dodisplay );
 void docoup( int snum );
 void docourse( int snum );
 void dodet( int snum );

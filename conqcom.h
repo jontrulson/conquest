@@ -33,6 +33,7 @@
 #endif
 
 #include "user.h"
+#include "shiptype.h"
 #include "ship.h"
 #include "planet.h"
 #include "team.h"
@@ -66,6 +67,8 @@ CEXTERN History_t *History;	/* History */
 CEXTERN Driver_t *Driver;	/* Driver. */
 
 CEXTERN Ship_t *Ships;		/* Ships. */
+
+CEXTERN ShipType_t *ShipTypes;		/* Ship types. */
 
 CEXTERN Msg_t *Msgs;		/* Messages. */
 

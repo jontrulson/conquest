@@ -1,7 +1,7 @@
 
           Conquest(tool)        05Oct85 (Original)         Conquest(tool)
 
-          LAST UPDATED: 5/1/96 Jon Trulson
+          LAST UPDATED: 1/2/2001 
 
           NAME
                Conquest  -  a multi-player real-time screen-oriented space
@@ -203,6 +203,17 @@
                    o - Orbit. Use  'o'  to  come  into  orbit  around  a
                        planet (or a sun, if you want a tan).
 
+                   r - Refit.  If you have at least one kill, and are
+		       orbiting a team owned planet, you can use this
+		       option to switch to a new ship type.  Valid
+		       types are Scout (great engines, weak weapons),
+		       Destroyer (good engines, good weapons), and
+		       Cruiser (weak engines, great weapons).
+
+		       The refit ability in Conquest can be disabled
+		       by conqoper, by setting the allow_refit
+		       sys-wide option. 
+
                    S - Displays a list of secondary user statistics.
 
                    t - Tractor  beams.  You can use these to tow another
@@ -342,6 +353,7 @@
                    p      launch photon torpedoes
                    P      launch photon torpedo burst
                    Q      initiate self-destruct
+		   r      refit your ship
                    R      enter repair mode
                    S      more user statistics
                    t      engage tractor beams

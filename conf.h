@@ -248,10 +248,24 @@ struct Conf SysConfData[] =
     CTYPE_BOOL,
     "log_messages=",
     &sysconf_LogMessages,
-    "Log all player messages into the log file.",
+    "Log all player messages into the log file",
     {
       "# Whether or not to log all player messages into the logfile.",
       "#  Default: false   ",
+      NULL
+    }
+  },
+  {
+    FALSE,
+    CTYPE_BOOL,
+    "allow_refits=",
+    &sysconf_AllowRefits,
+    "Allow players to refit their ships",
+    {
+      "# Whether or not to allow players to refit their ships to a ",
+      "#  different ship type - if they have a kill, and are orbiting",
+      "#  a team owned planet.",
+      "#  Default: true   ",
       NULL
     }
   }
