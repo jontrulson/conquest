@@ -324,7 +324,11 @@ void display( int snum )
 	  /* If it's a sun or we any planet we haven't scanned... */
 	  if ( ptype[i] == PLANET_SUN || ! pscanned[i][steam[snum]] )
 	    {
-	      attrset(palertcol);
+	      if (ptype[i] == PLANET_SUN)
+		attrset(RedLevelColor); /* suns have a red core */
+	      else
+		attrset(palertcol);
+
 	      cdput( chrplanets[ptype[i]], lin, col );
 	      attrset(0);
 	    }
@@ -403,10 +407,13 @@ void display( int snum )
 	    {
 	      if (lin <= DISPLAY_LINS && lin > 0 )
 		{
-		  if (! pscanned[i][steam[snum]] || ptype[i] == PLANET_SUN)
-		    attrset(palertcol);
-		  else 
-		    attrset(InfoColor);
+		  if (! pscanned[i][steam[snum]])
+		    attrset(palertcol);	/* default to yellow for unscanned */
+		  else
+		    attrset(InfoColor);	/* scanned (known) value */
+
+		  if (ptype[i] == PLANET_SUN)
+		    attrset(RedLevelColor); /* suns have a red core */
 
 		  cdput( chrplanets[ptype[i]], lin, col + 1);
 		  attrset(0);
