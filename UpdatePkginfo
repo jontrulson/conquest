@@ -1,0 +1,48 @@
+#!/bin/ksh
+#
+# UpdatePkginfo - strips version number info from version.c and update
+#		  some of the fields in the pkginfo file
+#
+# Jon Trulson - 4/13/96
+#
+# $Id$
+#
+# $Log$
+# Revision 1.1  1996/04/28 07:02:43  jon
+# Initial revision
+#
+# Revision 1.2  1996/04/28  07:02:29  jon
+# - cleans up after itself now.
+#
+# Revision 1.1  1996/04/22  23:30:19  jon
+# Initial revision
+#
+#
+#
+#########################################################################################
+
+co -l pkginfo
+
+grep -v PSTAMP pkginfo |grep -v IDENT |grep -v VERSION >/tmp/version.$$
+
+cp /tmp/version.$$ pkginfo
+
+IDENT=`grep ConquestId version.c`
+IDENT=`echo $IDENT |tr -d '$;"' |cut -d: -f2-`
+
+echo IDENT = $IDENT
+echo "IDENT=$IDENT" >>pkginfo
+
+VERSION=`grep ConquestVersion version.c`
+VERSION=`echo $VERSION |tr -d '$;"' |cut -d: -f2-`
+
+echo VERSION = $VERSION
+echo "VERSION=$VERSION" >>pkginfo
+
+ci -m"Checkin" pkginfo
+co pkginfo
+
+/bin/rm /tmp/version.$$
+exit
+
+
