@@ -1018,38 +1018,9 @@ void handleSimpleCmdPkt(cpCommand_t *ccmd)
 
     case CPCMD_DISCONNECT:
       clog("CPCMD_DISCONNECT");
-      if (sInfo.state == SVR_STATE_PLAY)
-	{
-	  if (SysConf.AllowVacant)
-	    {			/* this allows vacant ships */
-	      stopUpdate();
-	      
-	      drpexit();
-	      conqstats(Context.snum);          /* update stats */
-	      /* now we clear ship's elapsed/cpu seconds so
-		 that there won't be a huge addition to the
-		 Teams/Users/Ships timing stats when a VACANT
-		 ships re-enters Conquest */
-	      Ships[Context.snum].ctime = 0;
-	      Ships[Context.snum].etime = 0;
-
-	      SFSET(Context.snum, SHIP_F_VACANT); /* help the driver */
-	    }
-	  else
-	    {
-	      /* so we can detect cowards */
-	      killship( Context.snum, KB_LIGHTNING );
-	    }
-	}
-      else
-        {                       /* not playing (main menu, etc) */
-          /* if we aren't playing, then just turn it off */
-          if (Context.snum >= 1 && Context.snum <= MAXSHIPS)
-            Ships[Context.snum].status = SS_OFF;
-        }
-      conqend();
-      exit(0);
-
+      /* 'fake' signal.  cleans up and exits. */
+      handleSignal(0);
+      /* NOTREACHED */
       break;
 
     default:
@@ -1180,6 +1151,8 @@ void menu(void)
 	{
 	  freeship();
 	  clog("conquestd:menu: waitforpacket returned %d", pkttype); 
+          handleSignal(0);
+          /* not reached */
 
 	  return;
 	}
@@ -1504,6 +1477,8 @@ int play()
 	  if (errno != EINTR)
 	    {
 	      clog("conquestd:play:waitForPacket: %s", strerror(errno));
+              handleSignal(0);
+              /* NOTREACHED */
 	      return FALSE;
 	    }
 	}
@@ -1782,7 +1757,7 @@ void catchSignals(void)
   signal(SIGHUP, (void (*)(int))handleSignal);
   signal(SIGTSTP, SIG_IGN);
   signal(SIGTERM, (void (*)(int))handleSignal);
-  signal(SIGINT, SIG_IGN);
+  signal(SIGINT, (void (*)(int))handleSignal);
   signal(SIGPIPE, (void (*)(int))handleSignal);
   signal(SIGQUIT, (void (*)(int))handleSignal);
 
@@ -1791,32 +1766,44 @@ void catchSignals(void)
 
 void handleSignal(int sig)
 {
-  switch(sig)
+  if (sig)
+    clog("conquestd: exiting on signal %d", sig);
+
+  stopUpdate();
+  
+  if (sInfo.state == SVR_STATE_PLAY)
     {
-    case SIGINT:
-    case SIGTERM:
-    case SIGHUP:
-    case SIGPIPE:
-    case SIGQUIT:
-      stopUpdate();
-
-      drpexit();
-      conqstats(Context.snum);          /* update stats */
-		      /* now we clear ship's elapsed/cpu seconds so
-			 that there won't be a huge addition to the
-			 Teams/Users/Ships timing stats when a VACANT
-			 ships re-enters Conquest */
-      Ships[Context.snum].ctime = 0;
-      Ships[Context.snum].etime = 0;
-      conqend();
-      exit(0);
-      break;
-
-    default:
-      break;
+      if (SysConf.AllowVacant)
+        {			/* this allows vacant ships */
+          drpexit();
+          conqstats(Context.snum);          /* update stats */
+          /* now we clear ship's elapsed/cpu seconds so
+             that there won't be a huge addition to the
+             Teams/Users/Ships timing stats when a VACANT
+             ships re-enters Conquest */
+          Ships[Context.snum].ctime = 0;
+          Ships[Context.snum].etime = 0;
+          
+          SFSET(Context.snum, SHIP_F_VACANT); /* help the driver */
+        }
+      else
+        {
+          /* so we can detect cowards */
+          killship( Context.snum, KB_LIGHTNING );
+          /* turn ship off */
+          Ships[Context.snum].status = SS_OFF;
+        }
     }
-  catchSignals();        /* reset */
-  return;
+  else
+    {                       /* not playing (main menu, etc) */
+      /* if we aren't playing, then just turn it off */
+      if (Context.snum >= 1 && Context.snum <= MAXSHIPS)
+        Ships[Context.snum].status = SS_OFF;
+    }
+
+  conqend();
+  exit(0);
+
 }
 
 /*  conqend - machine dependent clean-up */
