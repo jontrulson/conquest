@@ -34,7 +34,9 @@ Version 7.0.1  Fri Sep  3 18:20:52 MST 1999 Jon Trulson  <jon@radscan.com>
           port
 
         - and of course, the addition of the -D__NO_MATH_INLINES CFLAG
-          required on RH6.0 systems that caused strange conqdriv failures.
+          required on RH6.0 systems to work around a bug that
+          caused strange conqdriv failures.
+
 
 Version 7.0    Thu Jan 28 21:14:41 MST 1999 Jon Trulson  <jon@radscan.com>
 
