@@ -9,7 +9,7 @@
 
                               Conquest HISTORY
 
-Version 8.0.1m 11/14/2004 (stable)
+Version 8.0.1m 11/14/2004 (devel)
 
         - builds under cygwin (11/11/2004) again.  Both the server and
           clients (including the OpenGL client, conquestgl) seem to
