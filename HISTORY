@@ -9,19 +9,11 @@
 
                               Conquest HISTORY
 
-Version 8.0.1g 8/04/2004 (devel)
+Version 8.0.1g 8/08/2004 (devel)
 
-        - corrected pointer alignment issue with ctime() on Sparc
-          architectures (or any architecture that will not tolerate
-          misaligned pointers).  Reported by Clint Adams.
-
-        - Planet trajectories are now computed in the client so that
-          the server no longer needs to send a butt-load of packets to
-          the client to get smooth planet motion.
-
-          Did the same for torpedo motion.  Torpedo trajectories are
-          now computed client-side for smoother motion and a
-          significant reduction in the packet count.
+        - Planet and torpedo trajectories are now computed in the
+          client for smoother motion and a significant reduction in
+          the packet count needed from the server.
 
           The network protocol version changed as a result so only new
           clients can play with new servers.
@@ -37,6 +29,15 @@ Version 8.0.1g 8/04/2004 (devel)
 
         - fixed CPCMD_RELOAD to properly send a full update to the
           client when a client starts recording.        
+
+        - addition of new CP_VARIABLE/SP_VARIABLE packet types so
+          that new packets types can be added cleanly without
+          neccessarily having to break the network protocol.
+
+        - corrected pointer alignment issue with ctime() on Sparc
+          architectures (or any other architecture that does not
+          tolerate misaligned pointers).  Reported by Clint Adams
+          (Debian).
 
 Version 8.0.1f 7/11/2004 (devel)
 
