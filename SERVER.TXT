@@ -75,7 +75,7 @@ CONTENTS:
 
     In it's simplest (and insecure) form, you can simply run:
 
-       $ conquest -d
+       $ conquestd -d
 
        This will start conquestd, which will fork itself into the
        background and run as your user id.
