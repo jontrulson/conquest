@@ -1,0 +1,17 @@
+Begin3
+Title:          Conquest source package for Unixware/Linux/FreeBSD
+Version:        6.4
+Entered-date:   1997-03-28
+Description:    Multi-player, curses based, space warfare game.
+Keywords:       multiuser game conquest space warfare die curses fun unix
+Author:         Original VMS/Ratfor (1985): Craig Leres, Jef Poskanzer
+Author:         Unix/C (1996,97):           Jon Trulson
+Author:         Linux port:                 Dave Payne
+Maintained-by:  Jon Trulson <jon@radscan.com>, http://home.rmi.net/~jon
+Primary-site:   http://home.rmi.net/~jon,  
+Primary-site:   ftp.freebird.org <exact location not known at this time>
+Alternate-site: sunsite.unc.edu <exact location not known at this time>
+Copying-policy: Original policy spelled out by Craig Leres and
+Copying-policy: Jef Poskanzer - freely distributable with accompanying
+Copying-policy: copyright notices, attributions, and documentation.
+End
