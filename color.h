@@ -2,33 +2,7 @@
 
 /************************************************************************
  *
- * $Header$
- *
- *
- * $Log$
- * Revision 1.1  1996/11/23 06:20:07  jon
- * Initial revision
- *
- * Revision 1.4  1996/11/23  06:19:40  jon
- * - deleted dup pair.
- * - mods to handle ncurses quirks.
- *
- * Revision 1.3  1996/07/02  03:05:05  jon
- * *** empty log message ***
- *
- * Revision 1.2  1995/01/09  00:46:44  jon
- * Added PVLOCK/UNLOCK capability, fixed some minor bugs, changed cloak
- * code so that a cloaked, warp 0 ship is invisible to alert scanners.
- * Increase torp fuse to 50 seconds, thereby increasing range.  Added
- * msync() to implement the upchuck() function.
- *
- * Revision 1.1  1995/01/01  08:32:54  jon
- * Initial revision
- *
- * Revision 1.1  1995/01/01  08:32:54  jon
- * Initial revision
- *
- *
+ * $Id$
  *
  ***********************************************************************/
 

@@ -6,47 +6,6 @@
  *
  * $Id$
  *
- *
- * $Log$
- * Revision 1.1  1997/03/28 22:15:10  jon
- * Initial revision
- *
- * Revision 1.8  1997/03/28  22:15:00  jon
- * - added default for sig quit
- *
- * Revision 1.7  1996/11/23  06:20:24  jon
- * - heavily modified to make it easier to maintain.  added some new options.
- * - added code so that conqoper -C could be used to init the global conquestrc
- *   file if it's determined to be out of date.
- *
- * Revision 1.6  1996/07/03  02:15:32  jon
- * - added new config option, rcv_player_msgs option.  See ~/.conquestrc
- *   more more info.
- *
- * Revision 1.5  1996/07/02  03:05:21  jon
- * *** empty log message ***
- *
- * Revision 1.4  1996/05/25  00:29:06  jon
- * - added GetSysConf() function to support system-wide configuration
- *   values.
- *
- * Revision 1.3  1996/05/02  01:04:29  jon
- * - added some comments
- * - removed confVersion and confDate. - confId is good enough
- *
- * Revision 1.2  1996/04/28  05:37:48  jon
- * - basically re-wrote this whole module.  It's sensitive to different
- *   revisions of a user's .conquestrc file and will regenerate a new
- *   one if it finds one that's out of date, preserving your settings.
- *   *Much* nicer.
- * - depends on new conf.h header file that contains all the valid
- *   options, comments, and default values.
- *
- * Revision 1.1  1996/04/15  06:02:19  jon
- * Initial revision
- *
- *
- *
  ***********************************************************************/
 
 /**********************************************************************/

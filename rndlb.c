@@ -2,44 +2,7 @@
 
 /************************************************************************
  *
- * $Header$
- *
- *
- * $Log$
- * Revision 1.1  1996/11/23 07:03:41  jon
- * Initial revision
- *
- * Revision 1.7  1996/11/23  07:03:19  jon
- * - type fixes
- *
- * Revision 1.6  1996/07/02  20:30:17  jon
- * - lots of code cleanup
- *
- * Revision 1.5  1996/03/16  22:11:20  jon
- * cerror() -> clog() changes.
- *
- * Revision 1.4  1995/02/08  05:03:33  jon
- * global change of all _And_'s to &&'s and _Or_ to ||'s.  other minor
- * 'corrections' and cleanups.
- *
- * Revision 1.3  1995/01/14  22:43:53  jon
- * fixed rndini(): wrong seed init function being called - srand(), should
- * have been srand48().
- * fixed rndint(): was returning (low, high], should have been (low, high).
- *
- * Revision 1.2  1995/01/09  00:46:44  jon
- * Added PVLOCK/UNLOCK capability, fixed some minor bugs, changed cloak
- * code so that a cloaked, warp 0 ship is invisible to alert scanners.
- * Increase torp fuse to 50 seconds, thereby increasing range.  Added
- * msync() to implement the upchuck() function.
- *
- * Revision 1.1  1995/01/01  08:32:54  jon
- * Initial revision
- *
- * Revision 1.1  1995/01/01  08:32:54  jon
- * Initial revision
- *
- *
+ * $Id$
  *
  ***********************************************************************/
 

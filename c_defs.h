@@ -3,6 +3,8 @@
 * c_defs.h - C macro defines to ease ratfor to C conversion.  Included
 *               in all files.
 *
+* $Id$
+*
 * Author: Jon Trulson
 ************************************************************************/
 
@@ -13,95 +15,6 @@
 /* Leres.                                                             */
 /* Have Phun!                                                         */
 /**********************************************************************/
-
-/************************************************************************
- *
- * $Header$
- *
- *
- * $Log$
- * Revision 1.1  1996/12/08 05:05:37  jon
- * Initial revision
- *
- * Revision 1.18  1996/12/08  05:05:11  jon
- * - added parameter 'snum' to doselfdest()
- *
- * Revision 1.17  1996/11/23  06:08:00  jon
- * - changes required to accomodate autoconf.
- *   Now builds on Linux and FreeBSD 2.2x (with ncurses 1.9.9e).
- *
- * Revision 1.16  1996/07/02  02:52:22  jon
- * - mods to support linux
- * - removed old/uness macros
- * - changed launch() prototype to support new arg.
- * - removed USETIMER stuff.  you always USETIMER now.
- * - removed proto's for dead functions
- *
- * Revision 1.15  1996/05/25  00:27:11  jon
- * - modified to support system config file, added GetSysConf()
- *   prototype
- * - changed isagod() prototype to reflect new usage
- * - added getsemtxt() prototype - conqoper sem info support
- *
- * Revision 1.14  1996/05/02  01:03:34  jon
- * - added funtion protoypes for the semaphore module - sem.c
- *
- * Revision 1.13  1996/04/28  06:30:26  jon
- * - fixed typo in MakeConf() specification
- *
- * Revision 1.12  1996/04/28  05:33:52  jon
- * - removed dead (unused) function prototypes
- * - added process_bool() and MakeConf() prototypes
- *
- * Revision 1.11  1996/03/31  23:32:14  jon
- * - added function prototypes for new functions: lower, GetConquestUID,
- *   GetConquestGID, iBufInit, iBufEmpty, iBufPut, iBufGetCh, and DoMacro.
- *
- * Revision 1.10  1996/03/16  21:45:42  jon
- * removed sc*() dead functions...Yeah! removed en*() dead func too.
- *
- * Revision 1.9  1995/02/08  05:05:11  jon
- * minor fixes, replaced all _And_ and _Or_ macros with && and
- * || respectively.
- *
- * Revision 1.8  1995/01/30  06:04:58  jon
- * appchr() - fixed indexing bug.
- * Added prototypes for DoSig() and EnableSignalHandler().
- *
- * Revision 1.7  1995/01/29  05:59:10  jon
- * Added new function KPAngle() to return an angle depending on which
- * keypad key was pressed.
- * command() - changed to use KPAngle().
- *
- * Revision 1.6  1995/01/27  04:37:40  jon
- * *() - another attempt at using the curses input routines. Changed
- * input routine return values to int's so can decode terminfo data on
- * keypad and arrow keys.  Changed team effectiveness values back to
- * their original settings. 
- *
- * Revision 1.5  1995/01/15  07:25:14  jon
- * added ETA calculation ability to infoplanet() and infoship(). Enabled
- * by defining DO_ETASTATS.
- *
- * Revision 1.4  1995/01/14  22:52:40  jon
- * minor fixes, and formatting
- *
- * Revision 1.3  1995/01/09  00:46:44  jon
- * Added PVLOCK/UNLOCK capability, fixed some minor bugs, changed cloak
- * code so that a cloaked, warp 0 ship is invisible to alert scanners.
- * Increase torp fuse to 50 seconds, thereby increasing range.  Added
- * msync() to implement the upchuck() function.
- *
- * Revision 1.2  1995/01/02  00:58:58  jon
- * Changed references to NUMPLANETS and MAXSHIPS so that valid
- * values would be between 1 and NUMPLANETS/MAXSHIPS.
- *
- * Revision 1.1  1995/01/01  08:32:54  jon
- * Initial revision
- *
- *
- *
- ***********************************************************************/
 
 /* Get some valuable info... */
 #include "config.h"

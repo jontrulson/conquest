@@ -2,38 +2,7 @@
 
 /************************************************************************
  *
- * $Header$
- *
- *
- * $Log$
- * Revision 1.1  1996/11/23 06:56:46  jon
- * Initial revision
- *
- * Revision 1.5  1996/07/02  20:25:55  jon
- * - code cleanup
- * - lots of code cleanup.
- *
- * Revision 1.4  1996/03/16  22:08:55  jon
- * removed scopy() calls - uhg.
- * changed definition of gamlinit() function declaration.
- *
- * Revision 1.3  1995/02/08  05:03:33  jon
- * global change of all _And_'s to &&'s and _Or_ to ||'s.  other minor
- * 'corrections' and cleanups.
- *
- * Revision 1.2  1995/01/09  00:46:44  jon
- * Added PVLOCK/UNLOCK capability, fixed some minor bugs, changed cloak
- * code so that a cloaked, warp 0 ship is invisible to alert scanners.
- * Increase torp fuse to 50 seconds, thereby increasing range.  Added
- * msync() to implement the upchuck() function.
- *
- * Revision 1.1  1995/01/01  08:32:54  jon
- * Initial revision
- *
- * Revision 1.1  1995/01/01  08:32:54  jon
- * Initial revision
- *
- *
+ * $Id$
  *
  ***********************************************************************/
 

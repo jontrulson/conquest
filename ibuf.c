@@ -5,35 +5,7 @@
  * ibuf.c - input buffering to support Function key macros
  * Jon Trulson 3/30/96
  *
- * $Header$
- *
- *
- * $Log$
- * Revision 1.1  1996/11/30 20:25:00  jon
- * Initial revision
- *
- * Revision 1.5  1996/11/30  20:24:18  jon
- * - rewrote DoMacro() function to compute an fkey offset into the conf_MacrosF[]
- *   array instead of using a large swtch statement.  ick.  Now if the
- *   number of supported Fkey macros is changed, this function won't need
- *   to be modified.
- *
- * Revision 1.4  1996/11/23  06:59:06  jon
- * - moved ibuf related vars from global.h to a new ibuf.h where
- *   they belong.
- *
- * Revision 1.3  1996/07/02  20:27:34  jon
- * - code cleanup
- *
- * Revision 1.2  1996/04/28  06:20:03  jon
- * - fixed potential problem with null string passed to iBufPut()
- * - re-did DoMacros() so that values are obtained from the conf_MacrosF[][]
- *   array rather than hardcoded. Yes!
- *
- * Revision 1.1  1996/04/01  00:42:36  jon
- * Initial revision
- *
- *
+ * $Id$
  *
  **********************************************************************/
 

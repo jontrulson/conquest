@@ -2,41 +2,7 @@
 
 /************************************************************************
  *
- * $Header$
- *
- *
- * $Log$
- * Revision 1.1  1996/11/23 07:00:19  jon
- * Initial revision
- *
- * Revision 1.5  1996/07/02  20:29:37  jon
- * - code cleanup
- * - changes to support linux and the use of the select() syscall.
- *
- * Revision 1.4  1995/02/08  05:03:33  jon
- * global change of all _And_'s to &&'s and _Or_ to ||'s.  other minor
- * 'corrections' and cleanups.
- *
- * Revision 1.3  1995/01/27  04:37:40  jon
- * *() - another attempt at using the curses input routines. Changed
- * input routine return values to int's so can decode terminfo data on
- * keypad and arrow keys.  Changed team effectiveness values back to
- * their original settings.
- * ^ regardless of DOALT_UNIV definition.
- *
- * Revision 1.2  1995/01/09  00:46:44  jon
- * Added PVLOCK/UNLOCK capability, fixed some minor bugs, changed cloak
- * code so that a cloaked, warp 0 ship is invisible to alert scanners.
- * Increase torp fuse to 50 seconds, thereby increasing range.  Added
- * msync() to implement the upchuck() function.
- *
- * Revision 1.1  1995/01/01  08:32:54  jon
- * Initial revision
- *
- * Revision 1.1  1995/01/01  08:32:54  jon
- * Initial revision
- *
- *
+ * $Id$
  *
  ***********************************************************************/
 

@@ -6,33 +6,6 @@
  *
  * $Id$
  *
- *
- * $Log$
- * Revision 1.1  1996/11/23 07:05:45  jon
- * Initial revision
- *
- * Revision 1.5  1996/11/23  07:05:11  jon
- * - *lots* of fixes for linux/fbsd.
- * - modifed GetSemVals() to report the pid of the last proc
- *   to alter the sems, and the number of procs waiting for a lock.
- *
- * Revision 1.4  1996/07/02  20:30:44  jon
- * - code cleanup
- *
- * Revision 1.3  1996/05/25  01:01:17  jon
- * - made Unlock check to see if the semaphore is already
- *   unlocked before trying to unlock it again.  This prevented
- *   a conquest (of the universe) from working right.
- *
- * Revision 1.2  1996/05/02  01:22:58  jon
- * - implemented GetSemVal() for use in conqoper.c
- * - commented some code, cleaned up a bit.
- *
- * Revision 1.1  1996/05/01  05:18:40  jon
- * Initial revision
- *
- *
- *
  ***********************************************************************/
 
 /**********************************************************************/

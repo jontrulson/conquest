@@ -16,7 +16,8 @@ CONQHOME = /opt/conquest
 # Unixware: try -Ki486 or -Kpentium -
 #  might improve performance depending on processor type.
 #LCFLAGS = -Kpentium
-LCFLAGS = -Kpentium
+
+LCFLAGS = 
 
 
 CFLAGS =  -O -Xa -DHAVE_CONFIG_H $(LCFLAGS) -DCONQHOME=\"$(CONQHOME)\"
@@ -253,117 +254,3 @@ depend:
 	makedepend -s "# DO NOT DELETE - MAKEDEPEND" -- *.h -- *.c >/dev/null 2>&1
 
 
-# DO NOT DELETE - MAKEDEPEND
-
-c_defs.o: config.h /usr/include/time.h /usr/include/math.h
-c_defs.o: /usr/include/memory.h /usr/include/sys/ioctl.h
-c_defs.o: /usr/include/sys/stat.h /usr/include/sys/types.h
-c_defs.o: /usr/include/sys/time.h /usr/include/pwd.h /usr/include/grp.h
-c_defs.o: defs.h
-global.o: defs.h
-cd2lb.o: c_defs.h config.h /usr/include/time.h /usr/include/math.h
-cd2lb.o: /usr/include/memory.h /usr/include/sys/ioctl.h
-cd2lb.o: /usr/include/sys/stat.h /usr/include/sys/types.h
-cd2lb.o: /usr/include/sys/time.h /usr/include/pwd.h /usr/include/grp.h defs.h
-cd2lb.o: conqdef.h cdcom.h conqcom2.h global.h color.h
-conf.o: c_defs.h config.h /usr/include/time.h /usr/include/math.h
-conf.o: /usr/include/memory.h /usr/include/sys/ioctl.h
-conf.o: /usr/include/sys/stat.h /usr/include/sys/types.h
-conf.o: /usr/include/sys/time.h /usr/include/pwd.h /usr/include/grp.h defs.h
-conf.o: global.h conf.h
-conqai.o: c_defs.h config.h /usr/include/time.h /usr/include/math.h
-conqai.o: /usr/include/memory.h /usr/include/sys/ioctl.h
-conqai.o: /usr/include/sys/stat.h /usr/include/sys/types.h
-conqai.o: /usr/include/sys/time.h /usr/include/pwd.h /usr/include/grp.h
-conqai.o: defs.h conqdef.h conqcom.h conqcom2.h global.h
-conqcm.o: c_defs.h config.h /usr/include/time.h /usr/include/math.h
-conqcm.o: /usr/include/memory.h /usr/include/sys/ioctl.h
-conqcm.o: /usr/include/sys/stat.h /usr/include/sys/types.h
-conqcm.o: /usr/include/sys/time.h /usr/include/pwd.h /usr/include/grp.h
-conqcm.o: defs.h global.h conqdef.h conqcom.h conqcom2.h
-conqdriv.o: c_defs.h config.h /usr/include/time.h /usr/include/math.h
-conqdriv.o: /usr/include/memory.h /usr/include/sys/ioctl.h
-conqdriv.o: /usr/include/sys/stat.h /usr/include/sys/types.h
-conqdriv.o: /usr/include/sys/time.h /usr/include/pwd.h /usr/include/grp.h
-conqdriv.o: defs.h conqdef.h conqcom.h conqcom2.h global.h
-conqfig.o: c_defs.h config.h /usr/include/time.h /usr/include/math.h
-conqfig.o: /usr/include/memory.h /usr/include/sys/ioctl.h
-conqfig.o: /usr/include/sys/stat.h /usr/include/sys/types.h
-conqfig.o: /usr/include/sys/time.h /usr/include/pwd.h /usr/include/grp.h
-conqfig.o: defs.h
-conqlb.o: c_defs.h config.h /usr/include/time.h /usr/include/math.h
-conqlb.o: /usr/include/memory.h /usr/include/sys/ioctl.h
-conqlb.o: /usr/include/sys/stat.h /usr/include/sys/types.h
-conqlb.o: /usr/include/sys/time.h /usr/include/pwd.h /usr/include/grp.h
-conqlb.o: defs.h conqdef.h conqcom.h conqcom2.h global.h color.h
-conqmisc.o: c_defs.h config.h /usr/include/time.h /usr/include/math.h
-conqmisc.o: /usr/include/memory.h /usr/include/sys/ioctl.h
-conqmisc.o: /usr/include/sys/stat.h /usr/include/sys/types.h
-conqmisc.o: /usr/include/sys/time.h /usr/include/pwd.h /usr/include/grp.h
-conqmisc.o: defs.h conqdef.h conqcom.h conqcom2.h conqdata.h global.h color.h
-conqoper.o: c_defs.h config.h /usr/include/time.h /usr/include/math.h
-conqoper.o: /usr/include/memory.h /usr/include/sys/ioctl.h
-conqoper.o: /usr/include/sys/stat.h /usr/include/sys/types.h
-conqoper.o: /usr/include/sys/time.h /usr/include/pwd.h /usr/include/grp.h
-conqoper.o: defs.h conqdef.h conqcom.h conqcom2.h global.h
-conqsvr42.o: c_defs.h config.h /usr/include/time.h /usr/include/math.h
-conqsvr42.o: /usr/include/memory.h /usr/include/sys/ioctl.h
-conqsvr42.o: /usr/include/sys/stat.h /usr/include/sys/types.h
-conqsvr42.o: /usr/include/sys/time.h /usr/include/pwd.h /usr/include/grp.h
-conqsvr42.o: defs.h conqdef.h conqcom.h conqcom2.h global.h
-conquest.o: c_defs.h config.h /usr/include/time.h /usr/include/math.h
-conquest.o: /usr/include/memory.h /usr/include/sys/ioctl.h
-conquest.o: /usr/include/sys/stat.h /usr/include/sys/types.h
-conquest.o: /usr/include/sys/time.h /usr/include/pwd.h /usr/include/grp.h
-conquest.o: defs.h conqdef.h conqcom.h conqcom2.h global.h
-conqutil.o: c_defs.h config.h /usr/include/time.h /usr/include/math.h
-conqutil.o: /usr/include/memory.h /usr/include/sys/ioctl.h
-conqutil.o: /usr/include/sys/stat.h /usr/include/sys/types.h
-conqutil.o: /usr/include/sys/time.h /usr/include/pwd.h /usr/include/grp.h
-conqutil.o: defs.h conqdef.h conqcom.h global.h
-gamlb.o: c_defs.h config.h /usr/include/time.h /usr/include/math.h
-gamlb.o: /usr/include/memory.h /usr/include/sys/ioctl.h
-gamlb.o: /usr/include/sys/stat.h /usr/include/sys/types.h
-gamlb.o: /usr/include/sys/time.h /usr/include/pwd.h /usr/include/grp.h defs.h
-global.o: c_defs.h config.h /usr/include/time.h /usr/include/math.h
-global.o: /usr/include/memory.h /usr/include/sys/ioctl.h
-global.o: /usr/include/sys/stat.h /usr/include/sys/types.h
-global.o: /usr/include/sys/time.h /usr/include/pwd.h /usr/include/grp.h
-global.o: defs.h global.h
-ibuf.o: c_defs.h config.h /usr/include/time.h /usr/include/math.h
-ibuf.o: /usr/include/memory.h /usr/include/sys/ioctl.h
-ibuf.o: /usr/include/sys/stat.h /usr/include/sys/types.h
-ibuf.o: /usr/include/sys/time.h /usr/include/pwd.h /usr/include/grp.h defs.h
-ibuf.o: global.h ibuf.h
-ionlb.o: c_defs.h config.h /usr/include/time.h /usr/include/math.h
-ionlb.o: /usr/include/memory.h /usr/include/sys/ioctl.h
-ionlb.o: /usr/include/sys/stat.h /usr/include/sys/types.h
-ionlb.o: /usr/include/sys/time.h /usr/include/pwd.h /usr/include/grp.h defs.h
-ionlb.o: global.h
-ioplb.o: c_defs.h config.h /usr/include/time.h /usr/include/math.h
-ioplb.o: /usr/include/memory.h /usr/include/sys/ioctl.h
-ioplb.o: /usr/include/sys/stat.h /usr/include/sys/types.h
-ioplb.o: /usr/include/sys/time.h /usr/include/pwd.h /usr/include/grp.h defs.h
-ioxlb.o: c_defs.h config.h /usr/include/time.h /usr/include/math.h
-ioxlb.o: /usr/include/memory.h /usr/include/sys/ioctl.h
-ioxlb.o: /usr/include/sys/stat.h /usr/include/sys/types.h
-ioxlb.o: /usr/include/sys/time.h /usr/include/pwd.h /usr/include/grp.h defs.h
-ioxlb.o: global.h
-ratfor.o: c_defs.h config.h /usr/include/time.h /usr/include/math.h
-ratfor.o: /usr/include/memory.h /usr/include/sys/ioctl.h
-ratfor.o: /usr/include/sys/stat.h /usr/include/sys/types.h
-ratfor.o: /usr/include/sys/time.h /usr/include/pwd.h /usr/include/grp.h
-ratfor.o: defs.h
-rndlb.o: c_defs.h config.h /usr/include/time.h /usr/include/math.h
-rndlb.o: /usr/include/memory.h /usr/include/sys/ioctl.h
-rndlb.o: /usr/include/sys/stat.h /usr/include/sys/types.h
-rndlb.o: /usr/include/sys/time.h /usr/include/pwd.h /usr/include/grp.h defs.h
-sem.o: c_defs.h config.h /usr/include/time.h /usr/include/math.h
-sem.o: /usr/include/memory.h /usr/include/sys/ioctl.h /usr/include/sys/stat.h
-sem.o: /usr/include/sys/types.h /usr/include/sys/time.h /usr/include/pwd.h
-sem.o: /usr/include/grp.h defs.h /usr/include/sys/ipc.h
-sem.o: /usr/include/sys/ipc_f.h /usr/include/sys/sem.h
-sem.o: /usr/include/sys/list.h /usr/include/sys/listasm.h
-sem.o: /usr/include/sys/ksynch.h /usr/include/sys/dl.h /usr/include/sys/ipl.h
-sem.o: /usr/include/sys/disp_p.h /usr/include/sys/trap.h
-sem.o: /usr/include/sys/ksynch_p.h global.h conqcom.h

@@ -2,56 +2,7 @@
 
 /************************************************************************
  *
- * $Header$
- *
- *
- * $Log$
- * Revision 1.1  1996/12/25 00:13:26  jon
- * Initial revision
- *
- * Revision 1.10  1996/12/25  00:13:01  jon
- * - added sysconf_allow_sigquit.
- *
- * Revision 1.9  1996/11/23  06:57:15  jon
- * - added RMsg_Line to support line 25 msg line
- * - added sysconf_DoRandomRobotKills
- *
- * Revision 1.8  1996/07/03  02:15:32  jon
- * - added new config option, rcv_player_msgs option.  See ~/.conquestrc
- *   more more info.
- *
- * Revision 1.7  1996/07/02  20:26:57  jon
- * - code cleanup
- *
- * Revision 1.6  1996/05/25  00:59:36  jon
- * - added sysconf_DoLRTorpScan, sysconf_DoLocalLRScan,
- *   sysconf_DoETAStats, and sysconf_NoDoomsday - new
- *   system-wide config options
- *
- * Revision 1.5  1996/05/02  01:21:06  jon
- * - added LOCKMSG and LOCKCMN, used to indicate which semaphore (there
- *   are 2) an operation is for.  (ie: which part of the common block
- *   to lock.)
- *
- * Revision 1.4  1996/04/28  06:18:13  jon
- * - added conf_MessageBell, conf_NoColor, conf_NoRobotMsgs, and
- *   conf_MacrosF[][] globals to support personal customization via
- *   ~/.conquestrc.
- *
- * Revision 1.3  1996/04/01  00:28:09  jon
- * - added ConquestGID, ConquestUID, iBufOffset, and iBuffer globals. Also
- *   IBUFMAX for the size of iBuffer.
- *
- * Revision 1.2  1995/01/09  00:46:44  jon
- * - Added PVLOCK/UNLOCK capability, fixed some minor bugs, changed cloak
- *   code so that a cloaked, warp 0 ship is invisible to alert scanners.
- * - Increase torp fuse to 50 seconds, thereby increasing range.  
- * - added msync() to implement the upchuck() function.
- *
- * Revision 1.1  1995/01/01  08:32:54  jon
- * - Initial revision
- *
- *
+ * $Id$
  *
  ***********************************************************************/
 

@@ -2,71 +2,7 @@
 
 /************************************************************************
  *
- * $Header$
- *
- *
- * $Log$
- * Revision 1.1  1996/12/07 04:12:43  jon
- * Initial revision
- *
- * Revision 1.12  1996/12/07  04:06:47  jon
- * - renamed 'uname' var to 'cuname' to avoid conflict in newer linuxen
- *   that caused a SEGV when mapping uname into the common block... Most
- *   unfortunate. ;-\
- *
- * Revision 1.11  1996/11/23  06:26:35  jon
- * - added new array sstrkills to the common block.  This allow the
- *   sysconf_DoRandomRobotKills option to function without screwing up
- *   the user/ship stats.
- *
- * Revision 1.10  1996/07/07  01:07:32  jon
- * - fixed ownership problems when creating a new
- *   common block
- *
- * Revision 1.9  1996/07/02  19:43:21  jon
- * - changes to support linux
- * - code cleanup
- *
- * Revision 1.8  1996/05/25  00:32:41  jon
- * - changed filename gen code to use CONQHOME.  Everythings anchored
- *   from CONQHOME now.
- *
- * Revision 1.7  1996/05/02  01:07:49  jon
- * - added conqcmId ident variable
- * - added USE_SEMS to indicate whether the new semaphore locking
- *   code will be used or the old spin-loop method.
- * - added PVLOCK/PVUNLOCK() wrappers around the Lock/Unlock()
- *   semaphore calls.  (if USE_SEMS is defined)
- *
- * Revision 1.6  1996/04/28  05:41:37  jon
- * - comment changes
- * - fixed a bad clog() call
- *
- * Revision 1.5  1996/03/31  23:39:15  jon
- * - added extra check to PVLOCK() to make sure we *actually* got the lock.
- *   also added extra clog()'s and a DEBUG_LOCKING #define'able
- * - I swear.  Semephores are on the way. Honest. ;-)
- *
- * Revision 1.4  1996/03/16  21:51:36  jon
- * - cerror() -> clog() changes.
- * - changed mem lock code so that failure to lock common block in memory
- *   (due to insufficient privs) is no longer fatal.
- * - added umask(0) call in map_commo() to fix file creation mode problems.
- *
- * Revision 1.3  1995/01/09  00:46:44  jon
- * - Added PVLOCK/UNLOCK capability, fixed some minor bugs, changed cloak
- *   code so that a cloaked, warp 0 ship is invisible to alert scanners.
- * - Increase torp fuse to 50 seconds, thereby increasing range.  
- * - Added msync() to implement the upchuck() function.
- *
- * Revision 1.2  1995/01/02  00:58:58  jon
- * - Changed references to NUMPLANETS and MAXSHIPS so that valid
- *   values would be between 1 and NUMPLANETS/MAXSHIPS.
- *
- * Revision 1.1  1995/01/01  08:32:54  jon
- * Initial revision
- *
- *
+ * $Id$
  *
  ***********************************************************************/
 
