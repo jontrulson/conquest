@@ -4,7 +4,7 @@
  *
  * $Id$
  *
- * Copyright 1999 Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
+ * Copyright 1999-2004 Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
  ***********************************************************************/
 
 /*                               C O N Q C M */
@@ -32,12 +32,11 @@
 #include "conqcom.h"		/* common block vars defined here */
 #include "context.h"		/* some extra stuff */
 #include "user.h"
-static char *conqcmId = "$Id$";
 
 static char *cBasePtr = NULL;	/* common block ptr */
 static int coff = 0;		/* offset into common block */
 
-#define CMN_MODE 0660		/* mode of a new common block */
+static int fakeCommon = FALSE;	/* for the clients */
 
 				/* map a 1D variable into the common block */
 #define map1d(thevarp, thetype, size) {  \
@@ -45,36 +44,9 @@ static int coff = 0;		/* offset into common block */
               coff += (sizeof(thetype) * (size)); \
 	}
 
-				/* map a 2D variable into the common block */
-#define map2d(thevarp, thetype, sizex, sizey) { \
-              int i; \
-              thevarp = (thetype **) mymalloc((sizex) * sizeof(thetype *));  \
-	      for (i=0; i<(sizex); i++) \
-		thevarp[i] = (thetype *) ((cBasePtr + coff) + (sizey) * \
-					  sizeof(thetype) * i); \
-	      coff += ((sizex) * (sizey) * sizeof(thetype)); \
-	}
 
-				/* map a 3D variable into the common block */
-#define map3d(thevarp, thetype, sizex, sizey, sizez) { \
-              int i, j; \
-              thevarp = (thetype ***) mymalloc((sizex) * sizeof(thetype **));  \
-	      for (i=0; i<(sizex); i++) \
-		thevarp[i] = (thetype **) mymalloc((sizey) * sizeof(thetype *));\
-	      for (i=0; i<(sizex); i++) \
-		for (j=0; j<(sizey); j++) \
-		     thevarp[i][j]= (thetype *)\
-                      (cBasePtr + coff) + (sizez) * sizeof(thetype) * j + \
-		        ((sizey) * (sizez) * i); \
-	      coff += ((sizex) * (sizey) * (sizez) * sizeof(thetype)); \
-	}
+static void map_vars(void);
 
-
-#if defined(USE_PVLOCK)		/* use a block locking mech */
-
-# if defined(USE_SEMS)		/* use semaphores for locking (BEST) */
-				/* when using sems, we use lockword
-				   and lockmesg as counters */
 
 /* we'll use a hack to translate the lock[mesg|word] pointers into
    a semaphore selector */
@@ -109,64 +81,12 @@ void PVUNLOCK(int *lockptr)
   return;
 }
     
-# else /* don't USE_SEMS - Bad idea... */  
-
-void PVLOCK(int *lockptr)
-{
-
-  const int Timeout = 30;	/* ~3 seconds */
-  static int tenths;
-  int t;
-
-  tenths = 0;
-  while (*lockptr != 0 && tenths < Timeout) 
-    {
-#ifdef DEBUG_LOCKING
-      if ((tenths % 2) == 0)
-	clog("conqcm: PVLOCK(): lock held by %d, tenths = %d",
-	     *lockptr,
-	     tenths);
-#endif
-
-      c_sleep(0.1);
-      tenths++;
-    }
-
-  if (tenths < Timeout)
-    *lockptr = pid;
-  else
-    {
-      t = *lockptr;
-      PVUNLOCK(lockptr);
-      *lockptr = pid;
-      clog("conqcm: PVLOCK(%d): timed out - pid: %d was holding the lock",
-	     pid, t);
-    }
-
-  if (*lockptr != pid)
-    clog("conqcm: PVLOCK(%d): Lost the lock to: %d!", 
-	 pid,
-	 *lockptr);
-
-  return;
-}
-
-void PVUNLOCK(int *lockptr)
-{
-
-  *lockptr = 0;
-
-  return;
-}
-
-
-# endif /* USE_SEMS */
-
-#endif /* USE_PVLOCK */
-
 /* flush_common() - flush a common block */
 void flush_common(void)
 {
+  if (fakeCommon)
+    return;
+
 				/* fbsd doesn't like MS_SYNC       */
 				/* which is prefered, but oh well */
 #if defined(FREEBSD)
@@ -185,7 +105,6 @@ int check_cblock(char *fname, int fmode, int sizeofcb)
 {
   int ffd;
   struct stat sbuf;
-  int rv;
 
 				/* first stat the file, if it exists
 				   then verify the size.  unlink if size
@@ -197,7 +116,7 @@ int check_cblock(char *fname, int fmode, int sizeofcb)
 	  printf("%s: File size mismatch (expected %d, was %d), removing.\n", 
 		 fname,
 		 sizeofcb,
-		 sbuf.st_size);
+		 (unsigned int)sbuf.st_size);
 	  if (unlink(fname) == -1)
 	    {
 	      printf("check_cblock(): unlink(%s) failed: %s\n",
@@ -276,6 +195,8 @@ void lock_common(void)
 				   PLOCK privilege on Unixware. if we
 				   fail, we'll complain to the logfile
 				   and continue... */
+  if (fakeCommon)
+    return;
 
   if (memcntl((caddr_t)cBasePtr, SIZEOF_COMMONBLOCK,
 	     MC_LOCK, (caddr_t)0, 0, 0) == -1)
@@ -291,8 +212,9 @@ void map_common(void)
   int cmn_fd;
   static char cmnfile[MID_BUFFER_SIZE];
 
-  coff = 0;
-  
+  if (fakeCommon)
+    return;
+
   sprintf(cmnfile, "%s/%s", CONQSTATE, C_CONQ_COMMONBLK);
 
 				/* verify it's validity */
@@ -322,7 +244,30 @@ void map_common(void)
 
 				        /* now map the variables into the
 					   common block */
+  map_vars();
 
+				/* now lets lock it */
+#if defined(USE_COMMONMLOCK)
+  lock_common();
+#endif
+
+  return;
+}
+
+void zero_common(void)
+{				/* zero the common block, called from
+				   init everything */
+  memset(cBasePtr, 0, SIZEOF_COMMONBLOCK);
+  upchuck();			/* flush the commonblock */
+
+  return;
+}
+
+/* maps the actual vars into the common block */
+static void map_vars(void)
+{
+  coff = 0;
+  
   map1d(CBlockRevision, int, 1);	/* this *must* be the first var */
   map1d(ConqInfo, ConqInfo_t, 1)
 
@@ -347,21 +292,19 @@ void map_common(void)
   map1d(Msgs, Msg_t, MAXMESSAGES);
 
   map1d(EndOfCBlock, int, 1);
-				/* now lets lock it */
-#if defined(USE_COMMONMLOCK)
-  lock_common();
-#endif
 
   return;
 }
 
-void zero_common(void)
-{				/* zero the common block, called from
-				   init everything */
-  cdfill('\0', cBasePtr, SIZEOF_COMMONBLOCK);
-  upchuck();			/* flush the commonblock */
+void fake_common(void)
+{
+  fakeCommon = TRUE;
 
+  /* this will exit if it fails */
+  cBasePtr = mymalloc(SIZEOF_COMMONBLOCK);
+
+  map_vars();
+
+  zero_common();
   return;
 }
-
-

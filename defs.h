@@ -6,7 +6,7 @@
  *
  * $Id$
  *
- * Copyright 1999 Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
+ * Copyright 1999-2004 Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
  ***********************************************************************/
 
 /**********************************************************************/
@@ -17,6 +17,8 @@
 /*                                                                    */
 /**********************************************************************/
 
+#ifndef _DEFS_H
+#define _DEFS_H
 /* Basic information */
 
 /* ROOT_USER - username that game related files created by conquest
@@ -70,23 +72,6 @@
 # define USE_COMMONMLOCK 
 #endif
 
-/* USE_PVLOCK - Use a locking mechinism to prevent simultanious writes to
- *  the common block.  The method I use only reduces the chance of a
- *  a collision.  A real sync method would use semaphores, (and eventually
- *  conquest will) which will prevent them altogether.
- *  
- * USE_SEMS
- *  Well.. now conquest supports semaphores!  #define USE_SEMS to
- *  use them.   If USE_SEMS is undefined, the old locking mechanism will
- *  be used, though you *may* experience random SEGV's...
- */
-
-#define USE_PVLOCK		/* use a locking mechanism for the cmn blk */
-				/* RECOMMENDED!!! */
-#ifdef USE_PVLOCK
-# define USE_SEMS		/* use semephores in PV[UN]LOCK */
-#endif
-
 /* WARP0CLOAK - Although the code made it difficult to scan a ship that was
  *  cloaked at warp 0, it was still possible to scan such a ship if it was
  *  within alert range.  Defining this means you CANNOT be detected (even by 
@@ -124,25 +109,31 @@
 
 /* OPER_MSG_BEEP - if defined, beep when a message arrives in conqoper.
  */
-/* #define OPER_MSG_BEEP */
+#undef OPER_MSG_BEEP
 
 
 /* DEBUG* - debug some things */
 
-/*#define DEBUG_FLOW	*/	/* trace init flow */
-/*#define DEBUGGING	*/	/* general debugging */
-/*#define DEBUG_LOCKING	*/	/* debugging common block locking */
-/*#define DEBUG_CONFIG	*/	/* debug configuration file processing */
-/*#define DEBUG_SEM	*/	/* semaphore debugging */
-/*#define DEBUG_MACROS	*/	/* MACRO debugging */
-/*#define DEBUG_IO	*/	/* IO debugging */
-/*#define DEBUG_SIG	*/	/* debug signal handling */
-/*#define DEBUG_AI	*/	/* debug the robots */
-/*#define DEBUG_MISC	*/	/* debug other misc stuff */
-/*#define DEBUG_RANDOM	*/	/* debug the random number library */
-/*#define DEBUG_COLOR	*/	/* debug color processing */
-/*#define DEBUG_IOGTIMED */     /* debug timed input */
-/*#define DEBUG_SERVER  */      /* debug server operation */
-/*#define DEBUG_OPTIONS */      /* debug option screens/handling */
-/*#define DEBUG_REC     */      /* debug recording */
+#undef DEBUG_FLOW		/* trace init flow */
+#undef DEBUGGING		/* general debugging */
+#undef DEBUG_LOCKING		/* debugging common block locking */
+#undef DEBUG_CONFIG             /* debug configuration file processing */
+#undef DEBUG_SEM		/* semaphore debugging */
+#undef DEBUG_MACROS		/* MACRO debugging */
+#undef DEBUG_IO                 /* IO debugging */
+#undef DEBUG_SIG		/* debug signal handling */
+#undef DEBUG_AI                 /* debug the robots */
+#undef DEBUG_MISC		/* debug other misc stuff */
+#undef DEBUG_RANDOM		/* debug the random number library */
+#undef DEBUG_COLOR		/* debug color processing */
+#undef DEBUG_IOGTIMED           /* debug timed input */
+#undef DEBUG_SERVERAUTH         /* debug server auth operation */
+#undef DEBUG_OPTIONS            /* debug option screens/handling */
+#undef DEBUG_REC                /* debug recording */
+#undef DEBUG_SERVERPROC         /* server proc*() routines */
+#undef DEBUG_SERVERCLNTSTAT     /* server sendClientStat() */
+#undef DEBUG_SERVERSEND         /* server send*() routines */
+#undef DEBUG_CLIENTPROC         /* client proc* routines */
+#undef DEBUG_CLIENTSEND         /* client send* routines */
 
+#endif /* _DEFS_H */

@@ -3,7 +3,7 @@
  *
  * $Id$
  *
- * Copyright 1999 Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
+ * Copyright 1999-2004 Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
  ***********************************************************************/
 
 /*                              C O N Q D E F */
@@ -58,7 +58,8 @@
 /*#define COMMONSTAMP 971207 		 stardate? */
 /*#define COMMONSTAMP 980628 		 stardate? */
 /*#define COMMONSTAMP 990124 		 stardate? */
-#define COMMONSTAMP 20001231 		 /* stardate? */
+/*#define COMMONSTAMP 20001231 		 stardate? */
+#define COMMONSTAMP 20030829 		 /* stardate? */
 
 /* Copyright notice string. */
 #define COPYRIGHT "(C) 1983-1986 by Jef Poskanzer and Craig Leres"
@@ -108,6 +109,11 @@
 
 #define NUMALLTEAMS 8 		/* total number of teams */
 #define MAXTEAMNAME 12 
+
+#define TEAM_UPDATE_INTERVAL 60	/* update client team data every x seconds */
+#define CONQINFO_UPDATE_INTERVAL 120 
+#define HISTORY_UPDATE_INTERVAL 60 
+
 #define TEAM_FEDERATION 0 	/* Feddie Bears */
 #define TEAM_ROMULAN 1 	/* Rom Dogs */
 #define TEAM_KLINGON 2 	/* Klings */
@@ -205,13 +211,11 @@
 				   are extra */
 
 
-#define MAXUSERS 500 		/* maximum number of registered users */
-#define MAXUSERNAME 30 		/* maximum size of a user's login name */
-#define SIZEUSERNAME 32 		/* actual size (for alignment purposes) */
-#define MAXUSERPNAME 22 		/* maximum size of a user's pseudonym */
-#define SIZEUSERPNAME 24 	/* actual size (for alignment purposes) */
-#define MAXLASTWORDS 60 		/* maximum size of conquering remarks */
-#define MAXHISTLOG 40 		/* maximum number of user history entries */
+#define MAXUSERS     500      /* maximum number of registered users */
+#define MAXUSERNAME  32	     /* maximum size of a user's login name */
+#define MAXUSERPNAME 24	      /* maximum size of a user's pseudonym */
+#define MAXLASTWORDS 60	      /* maximum size of conquering remarks */
+#define MAXHISTLOG   40	  /* maximum number of user history entries */
 
 #define MAXTSTATS 20 
 #define TSTAT_SECONDS 1 	/* elapsed seconds for each team */
@@ -243,15 +247,17 @@
 #define USTAT_ARMSHIP 12 	/* armies killed on a ship */
 #define USTAT_CONQPLANETS 13 	/* number of planets conquered */
 #define USTAT_GENOCIDE 0 	/* number of genocides completed */
+#define USTAT_TOTALSTATS 14
 
 #define MAXOOPTIONS 12 		/* number of operator options */
 #define OOPT_PLAYWHENCLOSED 0 	/* can play when the game is closed */
 #define OOPT_MULTIPLE 1 	/* can play on more than one terminal */
 #define OOPT_SWITCHTEAMS 2 	/* can switch teams */
 #define OOPT_SHITLIST 3 	/* can't play at all */
-#define OOPT_GODMSG 4 		/* read messages send to GOD */
+#define OOPT_OPER 4 		/* identified as conquest operator */
 #define OOPT_LOSE 5 		/* heh, heh, heh... */
 #define OOPT_AUTOPILOT 6 	/* can use the autopilot */
+#define OOPT_TOTALOOPTION 7
 
 #define MAXOPTIONS 12 		/* number of user options */
 #define OPT_PHASERGRAPHICS 0 	/* show phaser shots */
@@ -573,7 +579,7 @@
 #define MTXT_MORE "--- press [SPACE] to continue, any other key to quit ---"
 #define MTXT_DONE "--- press any key when done ---"
 
-				/* validuser types */
+				/* validuser types - not used anymore */
 #define UT_LOCAL (0)
 #define UT_REMOTE (1)
 
@@ -603,5 +609,11 @@
 #define weaeff(x) (real)(((Ships[x].weapalloc+50.0)/100.0) * \
 			 ShipTypes[Ships[x].shiptype].weafac * \
 			 (((Ships[x].kills+Ships[x].strkills)+DOUBLE_E_KILLS)/DOUBLE_E_KILLS))
+
+/* some help with da bits */
+#define bitIsSet(x, b) ((x) & (b))
+#define bitSet(x, b) ((x) |= (b))
+#define bitClear(x, b) ((x) &= ~(b))
+
 
 #endif /*  CONQDEF_H_INCLUDED */

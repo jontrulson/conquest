@@ -3,7 +3,7 @@
  *
  * $Id$
  *
- * Copyright 1999 Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
+ * Copyright 1999-2004 Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
  */
 
 #ifndef CONQINFO_H_INCLUDED
@@ -29,11 +29,12 @@ typedef struct {
   char lastupchuck[DATESIZE];	/* last time the common block was updated */
   char ptname[MAXPLANETTYPES][MAXPTYPENAME]; /* planet type names */
   char chrplanets[MAXPLANETTYPES]; /* class M = M, dead = D, sun = S */
-  char conqueror[SIZEUSERPNAME]; /* user who last conquered */
+  char conqueror[MAXUSERPNAME]; /* user who last conquered */
   char conqteam[MAXTEAMNAME];	/* team s/he was on */
   char conqtime[DATESIZE];	/* time of last conquering */
   char lastwords[MAXLASTWORDS];	/* remarks upon conquering */
   char inittime[DATESIZE];	/* time the universe was initialized */
+  int conqservPID;		/* the conqserv pid */
 } ConqInfo_t;
 
 #endif /* CONQINFO_H_INCLUDED */

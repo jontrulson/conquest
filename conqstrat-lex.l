@@ -45,9 +45,6 @@ int goterror;
 int Lineno = 1; /* current line number of the scanner */
 
 
-static char buf[MAXLINE];
-static int i;
-
 extern int yylval; 
 
 #undef ECHO

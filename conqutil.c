@@ -4,7 +4,7 @@
  *
  * $Id$
  *
- * Copyright 1999 Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
+ * Copyright 1999-2004 Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
  ***********************************************************************/
 
 /*                               C O N Q U T I L */
@@ -28,7 +28,10 @@
 #include "conqcom.h"
 #include "global.h"
 #include "color.h"
+#include "display.h"
 
+/* if set, clog uses the system log, else it is created in HOME */
+static int systemlog = TRUE;
 
 /*  acdist - figure distance traveled while changing velocities */
 /*  SYNOPSIS */
@@ -433,6 +436,16 @@ int arrows( char *str, real *dir )
   
 }
 
+void setSystemLog(int usesys)
+{
+  if (usesys)
+    systemlog = TRUE;
+  else
+    systemlog = FALSE;
+ 
+  return;
+}
+
 
 /*  cerror - conquest error message */
 /*  SYNOPSIS */
@@ -443,7 +456,7 @@ int arrows( char *str, real *dir )
 void cerror(char *fmt, ...)
 {
   va_list ap;
-  char buf[MSGMAXLINE];
+  char buf[BIG_BUFFER_SIZE];
   
   va_start(ap, fmt);
   (void)vsprintf(buf, fmt, ap);
@@ -458,11 +471,18 @@ void cerror(char *fmt, ...)
 
 void clog(char *fmt, ...)
 {
+# define HOME_BUFSZ 1024
   va_list ap;
+  static int nolog = FALSE;     /* if set, ignore logging */
   static char buf[BIG_BUFFER_SIZE];
-  static char errfile[BUFFER_SIZE];
+  static char errfile[MID_BUFFER_SIZE];
   static FILE *errfd = NULL;
+  char home[HOME_BUFSZ];
+  char *homevar;
   int tmp;
+
+  if (nolog)
+    return;
   
   va_start(ap, fmt);
   (void)vsprintf(buf, fmt, ap);
@@ -471,12 +491,27 @@ void clog(char *fmt, ...)
 
   if (errfd == NULL)
     {
-      umask(007);
-      sprintf(errfile, "%s/%s", CONQSTATE, C_CONQ_ERRLOG);
-      if (ConquestGID == ERR)
+      
+      if (systemlog)
 	{
-	  fprintf(stderr, "conqutil: clog():  ConquestUID == ERR!\n");
-	  exit(1);
+	  umask(007);
+	  sprintf(errfile, "%s/%s", CONQSTATE, C_CONQ_ERRLOG);
+	  if (ConquestGID == ERR)
+	    {
+	      fprintf(stderr, "conqutil: clog():  ConquestGID == ERR!\n");
+	      exit(1);
+	    }
+	}
+      else
+	{			/* local logfile */
+          memset(home, 0, HOME_BUFSZ);
+	  if ((homevar = getenv("HOME")) != NULL)
+            {
+              strncpy(home, homevar, HOME_BUFSZ - 1);
+              sprintf(errfile, "%s/.%s", home, C_CONQ_ERRLOG);
+            }
+	  else
+	    sprintf(errfile, "%s", C_CONQ_ERRLOG);
 	}
 
       if ((errfd = fopen(errfile, "a+")) == NULL)
@@ -487,18 +522,25 @@ void clog(char *fmt, ...)
 		      errfile,
 		      strerror(errno));
 	      
-	      exit(1);
+              if (!systemlog)
+                {
+                  nolog = TRUE;
+                  return;
+                }
+              else
+                exit(1);
 	    }
 	  else
 	    {
 	      close(tmp);
 
-	      if (chmod(errfile, 
-			(S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP)) == -1)
-		{
-		  perror("clog():chmod()");
-		  exit(1);
-		}
+	      if (systemlog)
+		if (chmod(errfile, 
+			  (S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP)) == -1)
+		  {
+		    perror("clog():chmod()");
+		    exit(1);
+		  }
 	    }
 	}
       else
@@ -506,7 +548,8 @@ void clog(char *fmt, ...)
 	  fclose(errfd);
 	}
       
-      chown(errfile, 0, ConquestGID);
+      if (systemlog)
+	chown(errfile, 0, ConquestGID);
 
       if ((errfd = fopen(errfile, "a+")) == NULL)
 	{
@@ -675,12 +718,14 @@ void fmtminutes( int itime, char *buf )
   days = i / 24;			/* days */
   
   if ( minus )
-    if ( days > 0 )
-      days = -days;
-    else if ( hours > 0 )
-      hours = -hours;
-    else
-      minutes = -minutes;
+    {
+      if ( days > 0 )
+	days = -days;
+      else if ( hours > 0 )
+	hours = -hours;
+      else
+	minutes = -minutes;
+    }
   
   /* Format time. */
   sprintf( junk, "%d %2d:%02d", days, hours, minutes );
@@ -726,14 +771,16 @@ void fmtseconds( int itime, char *buf )
   days = i / 24;			/* days */
   
   if ( minus )
-    if ( days > 0 )
-      days = -days;
-    else if ( hours > 0 )
-      hours = -hours;
-    else if ( minutes > 0 )
-      minutes = -minutes;
-    else
-      seconds = -seconds;
+    {
+      if ( days > 0 )
+	days = -days;
+      else if ( hours > 0 )
+	hours = -hours;
+      else if ( minutes > 0 )
+	minutes = -minutes;
+      else
+	seconds = -seconds;
+    }
   
   /* Format time. */
   sprintf( junk, "%d %2d:%02d:%02d", days, hours, minutes, seconds );
@@ -752,19 +799,14 @@ void fmtseconds( int itime, char *buf )
 /*    gotone = getamsg( snum, msg ) */
 int getamsg( int snum, int *msg )
 {
-  
   while ( *msg != ConqInfo->lastmsg )
     {
       *msg = modp1( *msg + 1, MAXMESSAGES );
       
-      /* If we can read it, only do so if it's not from us to GOD. */
-      
       if ( canread( snum, *msg ) )
-	return(MSG_GOD != Msgs[*msg].msgto);
-	
-      /*      	return ( snum != Msgs[*msg].msgfrom || MSG_GOD != Msgs[*msg].msgto );*/
+        return(TRUE);
     }
-  
+
   return ( FALSE );
   
 }
@@ -1071,7 +1113,10 @@ void c_putmsg( char *msg, int line )
 {
   cdclrl( line, 1 );
   cdputs( msg, line, 1 );
-  
+#ifdef CONQGL
+  showMessage(line, msg);
+#endif
+
   return;
   
 }

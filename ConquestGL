@@ -1,0 +1,80 @@
+! $Id$
+
+!ConquestGL*iconImage: testrd
+*fontList: -*-lucida-medium-r-*-*-*-120-75-75-*-*-iso8859-1
+! some basic colors
+!
+*blackPixel: black
+*whitePixel: white
+*redPixel: red
+*yellowPixel: yellow
+*greenPixel: green
+*bluePixel: blue
+*cyanPixel: cyan
+*magentaPixel: magenta
+
+*defaultPixel: white
+*infoPixel: cyan
+*specialPixel: magenta
+*statsepPixel: slategrey
+
+! default glx drawing area size
+!
+*glxarea*width: 450
+*glxarea*height: 450
+
+! attributes for glx drawing area frame
+*frame*shadowType: SHADOW_IN
+*frame*x: 10
+*frame*y: 10
+*frame*topOffset: 10
+*frame*rightOffset: 5
+*frame*leftOffset: 5
+
+! bottom frame
+*bframe*topOffset: 5
+
+! warp label
+!
+*warplabel*fontList: -*-helvetica-bold-r-*-*-*-240-*-*-*-*-*-*
+*warplabel*foreground: white
+*warplabel*background: black
+*warplabelval*fontList: -*-helvetica-bold-r-*-*-*-240-*-*-*-*-*-*
+*warplabelval*foreground: cyan
+*warplabelval*background: black
+
+! heading label
+!
+*headlabel*fontList: -*-helvetica-bold-r-*-*-*-240-*-*-*-*-*-*
+*headlabel*foreground: white
+*headlabel*background: black
+*headlabelval*fontList: -*-helvetica-bold-r-*-*-*-240-*-*-*-*-*-*
+*headlabelval*foreground: cyan
+*headlabelval*background: black
+
+! info line label
+*ilabel*rightOffset: 5
+*ilabel*leftOffset: 5
+*ilabel*foreground: black
+*ilabel*background: black
+*ilabel*fontList: fixed
+*ilabel*renderTable: inforend, datarend
+!*ilabel*renderTable.*.font: fixed
+!*ilabel*renderTable.*.fontType: FONT_IS_FONT
+*ilabel*renderTable.inforend.renditionForeground: blue
+*ilabel*renderTable.datarend.renditionForeground: cyan
+
+*killlabel.fontList: -*-helvetica-medium-r-*-*-*-170-*-*-*-*-*-*
+*killlabel*foreground: white
+*killlabel*background: black
+*killlabelval.fontList: -*-helvetica-bold-r-*-*-*-170-*-*-*-*-*-*
+*killlabelval*foreground: magenta
+*killlabelval*background: black
+
+*framelabel*fontList: -*-helvetica-bold-r-*-*-*-240-*-*-*-*-*-*
+
+*msglabel*fontList: -*-lucida-medium-r-normal-*-*-180-*-*-*-*-*-*
+
+*promptlabel1*fontList: -*-lucida-medium-r-normal-*-*-180-*-*-*-*-*-*
+
+*promptlabel2*fontList: -*-lucida-medium-r-normal-*-*-180-*-*-*-*-*-*

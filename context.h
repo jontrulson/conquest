@@ -3,7 +3,7 @@
  *
  * $Id$
  *
- * Copyright 1999 Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
+ * Copyright 1999-2004 Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
  ***********************************************************************/
 
 /*                             C O N Q C O M 2 */
@@ -55,6 +55,7 @@ typedef struct {
   int lasttang;			/* last target angle */
   int lasttdist;		/* last target distance */
   int hascolor;			/* do we have color support? */
+  int updsec;			/* updates per second */
   char lasttarg[BUFFER_SIZE];   /* string of last ship/planet (I)nfo'd */
   char lastinfostr[MSGMAXLINE]; /* last string used in doinfo() */
   char intrchar;		/* users interrupt char */

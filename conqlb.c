@@ -4,7 +4,7 @@
  *
  * $Id$
  *
- * Copyright 1999 Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
+ * Copyright 1999-2004 Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
  ***********************************************************************/
 
 /*                                 C O N Q L B */
@@ -77,22 +77,6 @@ void chalkup( int snum )
   
 }
 
-/*  cloak - attempt to engage the cloaking device */
-/*  SYNOPSIS */
-/*    int didit, cloak */
-/*    int snum */
-/*    didit = cloak( snum ) */
-int cloak( int snum )
-{
-  Ships[snum].rmode = FALSE;
-  if ( ! usefuel( snum, CLOAK_ON_FUEL, FALSE ) )
-    return ( FALSE );
-  Ships[snum].cloaked = TRUE;
-  return ( TRUE );
-  
-}
-
-
 /*  damage - damage a ship */
 /*  SYNOPSIS */
 /*    int snum, kb */
@@ -140,9 +124,9 @@ int enemydet( int snum )
   int i, j;
   
   /* Stop repairing. */
-  Ships[snum].rmode = FALSE;
+  SFCLR(snum, SHIP_F_REPAIR);
   
-  if ( ! usefuel( snum, DETONATE_FUEL, TRUE ) )
+  if ( ! usefuel( snum, DETONATE_FUEL, TRUE, TRUE ) )
     return ( FALSE );
   
   for ( i = 1; i <= MAXSHIPS; i = i + 1 )
@@ -167,20 +151,24 @@ int enemydet( int snum )
 void hit( int snum, real ht, int kb )
 {
   if ( ht > 0.0 )
-    if ( Ships[snum].shup && ! Ships[snum].rmode )
-      if ( ht > Ships[snum].shields )
+    {
+      if ( SSHUP(snum) && ! SREPAIR(snum) )
 	{
- 	  damage( snum, ht-Ships[snum].shields, kb ); 
-	  Ships[snum].shields = 0.0;
+	  if ( ht > Ships[snum].shields )
+	    {
+	      damage( snum, ht-Ships[snum].shields, kb ); 
+	      Ships[snum].shields = 0.0;
+	    }
+	  else
+	    {
+	      Ships[snum].shields = Ships[snum].shields - ht;
+	    }
 	}
       else
 	{
-	  Ships[snum].shields = Ships[snum].shields - ht;
+	  damage( snum, ht, kb );
 	}
-    else
-      {
-	damage( snum, ht, kb );
-      }
+    }
 
   return;
 }
@@ -273,7 +261,7 @@ void ikill( int snum, int kb )
       Teams[team].stats[TSTAT_LOSSES] += 1;
     }
   
-  if ( ! Ships[snum].robot || Ships[snum].pid != 0 )
+  if ( ! SROBOT(snum) || Ships[snum].pid != 0 )
     {
       Ships[snum].status = SS_DEAD;
       Ships[snum].sdfuse = -TIMEOUT_PLAYER;		/* setup dead timeout timer */
@@ -372,7 +360,7 @@ void infoplanet( char *str, int pnum, int snum )
   Context.lasttdist = round(dist( x, y, Planets[pnum].x, Planets[pnum].y));
   Context.lasttang = round(angle( x, y, Planets[pnum].x, Planets[pnum].y ));
 
-  if (SysConf.DoETAStats)
+  if (UserConf.DoETAStats)
     {
       static char tmpstr[64];
       
@@ -542,14 +530,13 @@ void infoship( int snum, int scanner )
   char junk[MSGMAXLINE];
   real x, y, dis, kills, appx, appy;
   int godlike, canscan;
-  real cumwarp;
   static char tmpstr[BUFFER_SIZE];
 
 #define BETTER_ETA		/* we'll try this out for a release */
 #undef DEBUG_ETA		/* define for debugging */
 
 #if defined(BETTER_ETA)
-  real pwarp, diffdis, oldttime, close_rate;
+  real pwarp, diffdis, close_rate;
   time_t difftime, curtime;
   static time_t oldtime = 0;
   static real avgclose_rate, olddis = 0.0, oldclose_rate = 0.0;
@@ -596,10 +583,19 @@ void infoship( int snum, int scanner )
       x = Ships[scanner].x;
       y = Ships[scanner].y;
     }
-  if ( Ships[snum].cloaked )
+  if ( SCLOAKED(snum) )
     {
-      appx = rndnor(Ships[snum].x, CLOAK_SMEAR_DIST);
-      appy = rndnor(Ships[snum].y, CLOAK_SMEAR_DIST);
+      if (godlike)
+	{
+	  appx = rndnor(Ships[snum].x, CLOAK_SMEAR_DIST);
+	  appy = rndnor(Ships[snum].y, CLOAK_SMEAR_DIST);
+	}
+      else			/* client */
+	{			/* for clients, these have already been
+				   smeared */
+	  appx = Ships[snum].x;
+	  appy = Ships[snum].y;
+	}
     }
   else
     {
@@ -611,12 +607,9 @@ void infoship( int snum, int scanner )
     canscan = TRUE;
   else
     {
-      /* Help out the driver with this scan. */
-      if ( (dis < ACCINFO_DIST && ! Ships[snum].cloaked) && ! selfwar(scanner) )
-	Ships[snum].scanned[ Ships[scanner].team] = SCANNED_FUSE;
       
       /* Decide if we can do an acurate scan. */
-      canscan = ( (dis < ACCINFO_DIST && ! Ships[snum].cloaked) ||
+      canscan = ( (dis < ACCINFO_DIST && ! SCLOAKED(snum)) ||
 		 ( (Ships[snum].scanned[ Ships[scanner].team] > 0) && ! selfwar(scanner) ) );
     }
   
@@ -637,17 +630,14 @@ void infoship( int snum, int scanner )
   appstr( " kill", cbuf );
   if ( kills != 1.0 )
     appchr( 's', cbuf );
-  if ( dis < ACCINFO_DIST && Ships[snum].cloaked )
+  if ( SCLOAKED(snum) && ( godlike || SSCANDIST(snum) ) )
     appstr( " (CLOAKED) ", cbuf );
   else
     appstr( ", ", cbuf );
 
-  if (SysConf.AllowRefits)
-    {
-      appstr("a ", cbuf);
-      appstr(ShipTypes[Ships[snum].shiptype].name, cbuf);
-      appstr(", ", cbuf);
-    }
+  appstr("a ", cbuf);
+  appstr(ShipTypes[Ships[snum].shiptype].name, cbuf);
+  appstr(", ", cbuf);
 
   if ( godlike )
     {
@@ -664,7 +654,7 @@ void infoship( int snum, int scanner )
   
   c_putmsg( cbuf, MSG_LIN1 );
   
-  if ( ! Ships[snum].cloaked || Ships[snum].warp > 0.0 )
+  if ( ! SCLOAKED(snum) || Ships[snum].warp > 0.0 )
     {
       Context.lasttdist = round( dis ); /* save these puppies for alt hud */
       Context.lasttang = round( angle( x, y, appx, appy ) );
@@ -673,7 +663,7 @@ void infoship( int snum, int scanner )
 
 
 #if defined(BETTER_ETA)
-      if (SysConf.DoETAStats)
+      if (UserConf.DoETAStats)
 	{
 	  if (Ships[scanner].warp > 0.0 || Ships[snum].warp > 0.0)
 	    {
@@ -766,7 +756,7 @@ clog("infoship:\tdis(%.1f) pwarp(%.1f) = (close_rate(%.1f) / MM_PER_SEC_PER_WARP
 	} /* if do ETA stats */
 #else /* not a BETTER_ETA */
 
-      if (SysConf.DoETAStats)
+      if (UserConf.DoETAStats)
 	{
 	  if (Ships[scanner].warp > 0.0 || Ships[snum].warp > 0.0)
 	    {
@@ -794,7 +784,7 @@ clog("infoship:\tdis(%.1f) pwarp(%.1f) = (close_rate(%.1f) / MM_PER_SEC_PER_WARP
       if ( cbuf[0] != EOS )
 	appstr( ", ", cbuf );
       appstr( "shields ", cbuf );
-      if ( Ships[snum].shup && ! Ships[snum].rmode )
+      if ( SSHUP(snum) && ! SREPAIR(snum) )
 	appint( round( Ships[snum].shields ), cbuf );
       else
 	appstr( "DOWN", cbuf );
@@ -838,7 +828,7 @@ clog("infoship:\tdis(%.1f) pwarp(%.1f) = (close_rate(%.1f) / MM_PER_SEC_PER_WARP
 /*    kill( snum, kb ) */
 void killship( int snum, int kb )
 {
-  int sendmsg = FALSE;
+  int sendmesg = FALSE;
   char msgbuf[BUFFER_SIZE];
 
 #if defined(DO_EXPLODING_SHIPS)
@@ -852,7 +842,7 @@ void killship( int snum, int kb )
   PVUNLOCK(&ConqInfo->lockword);
 
 				/* send a msg to all... */
-  sendmsg = FALSE;
+  sendmesg = FALSE;
 
   /* Figure out why we died. */
   switch ( kb )
@@ -862,7 +852,7 @@ void killship( int snum, int kb )
 	      Teams[Ships[snum].team].teamchar,
 	      snum,
 	      Ships[snum].alias);
-      sendmsg = TRUE;
+      sendmesg = TRUE;
       
       break;
     case KB_NEGENB:
@@ -870,7 +860,7 @@ void killship( int snum, int kb )
 	      Teams[Ships[snum].team].teamchar,
 	      snum,
 	      Ships[snum].alias);
-      sendmsg = TRUE;
+      sendmesg = TRUE;
       
       break;
       
@@ -879,7 +869,7 @@ void killship( int snum, int kb )
 	      Teams[Ships[snum].team].teamchar,
 	      snum,
 	      Ships[snum].alias);
-      sendmsg = TRUE;
+      sendmesg = TRUE;
       
       break;
     case KB_DOOMSDAY:
@@ -887,7 +877,7 @@ void killship( int snum, int kb )
 	      Teams[Ships[snum].team].teamchar,
 	      snum,
 	      Ships[snum].alias);
-      sendmsg = TRUE;
+      sendmesg = TRUE;
       
       break;
     case KB_DEATHSTAR:
@@ -895,15 +885,15 @@ void killship( int snum, int kb )
 	      Teams[Ships[snum].team].teamchar,
 	      snum,
 	      Ships[snum].alias);
-      sendmsg = TRUE;
+      sendmesg = TRUE;
 
       break;
     case KB_LIGHTNING:
-      sprintf(msgbuf, "%c%d (%s) was destroyed by lightning bolt.",
+      sprintf(msgbuf, "%c%d (%s) was destroyed by a lightning bolt.",
 	      Teams[Ships[snum].team].teamchar,
 	      snum,
 	      Ships[snum].alias);
-      sendmsg = TRUE;
+      sendmesg = TRUE;
 
       break;
     default:
@@ -918,7 +908,7 @@ void killship( int snum, int kb )
 		  Teams[Ships[kb].team].teamchar,
 		  kb,
 		  Ships[kb].alias);
-	  sendmsg = TRUE;
+	  sendmesg = TRUE;
 
 	}
       else if ( -kb > 0 && -kb <= NUMPLANETS )
@@ -929,7 +919,7 @@ void killship( int snum, int kb )
 		  Ships[snum].alias,
 		  Planets[-kb].name);
 
-	  sendmsg = TRUE;
+	  sendmesg = TRUE;
 	  
 	  if ( Planets[-kb].type == PLANET_SUN )
 	    {
@@ -942,11 +932,35 @@ void killship( int snum, int kb )
 	}
     }
 
-  if (sendmsg == TRUE)
+  if (sendmesg == TRUE)
     stormsg(MSG_COMP, MSG_ALL, msgbuf);
 
   return;
   
+}
+
+/* see if we could launch some if we wanted too... */
+/* does NO LOCKING, so only use from the client */
+int checklaunch(int snum, int number)
+{
+  register int i, j;
+
+  if (number == 0)
+    return TRUE;
+
+  j = 0;
+  for ( i = 0; i < MAXTORPS && number != 0; i++ )
+    if ( Ships[snum].torps[i].status == TS_OFF )
+      {
+	/* Found one. */
+	j++;
+	number--;
+      }
+
+  if (j == 0)
+    return FALSE;
+  else
+    return TRUE;
 }
 
 
@@ -961,7 +975,7 @@ int launch( int snum, real dir, int number, int ltype )
   static int tslot[MAXTORPS];
   
   /* Stop repairing. */
-  Ships[snum].rmode = FALSE;
+  SFCLR(snum, SHIP_F_REPAIR);
   
   /* Remember this important direction. */
   Ships[snum].lastblast = dir;
@@ -993,7 +1007,7 @@ int launch( int snum, real dir, int number, int ltype )
   for (i=0; i<numslots; i++)
     {
       /* Use fuel. */
-      if ( usefuel( snum, TORPEDO_FUEL, TRUE ) == FALSE)
+      if ( usefuel( snum, TORPEDO_FUEL, TRUE, TRUE ) == FALSE)
 	{
 	  Ships[snum].torps[tslot[i]].status = TS_OFF;
 	  continue;
@@ -1130,14 +1144,14 @@ int phaser( int snum, real dir )
   Ships[snum].lastblast = dir;
   
   /* Stop repairing. */
-  Ships[snum].rmode = FALSE;
+  SFCLR(snum, SHIP_F_REPAIR);
   
   /* See if ok to fire. */
   if ( Ships[snum].pfuse > 0 )
     return ( FALSE );
   
   /* Try to use fuel for this shot. */
-  if ( ! usefuel( snum, PHASER_FUEL, TRUE ) )
+  if ( ! usefuel( snum, PHASER_FUEL, TRUE, TRUE ) )
     return ( FALSE );
   
   /* Update stats. */
@@ -1373,10 +1387,12 @@ void planlist( int team, int snum )
 	      
 	      /* Moons aren't supposed to have armies. */
 	      if ( Planets[pnum].type == PLANET_MOON )
-		if ( team != TEAM_NOTEAM )
-		  junk[0] = EOS;
-		else if ( Planets[pnum].armies == 0 )
-		  junk[0] = EOS;
+		{
+		  if ( team != TEAM_NOTEAM )
+		    junk[0] = EOS;
+		  else if ( Planets[pnum].armies == 0 )
+		    junk[0] = EOS;
+		}
 	      
 	      coreflag = ' ';
 	      
@@ -1485,14 +1501,19 @@ void playlist( int godlike, int doall, int snum )
   char sbuf[20];
   char kbuf[20];
   char pidbuf[20];
-  char ubuf[SIZEUSERNAME + 2];
+  char ubuf[MAXUSERNAME + 2];
   int ch;
   char *hd1="ship  name          pseudonym              kills      pid";
+  char *hd2="ship  name          pseudonym              kills     type";
   
   /* Do some screen setup. */
   cdclear();
   attrset(LabelColor);  /* dwp */
-  c_strcpy( hd1, cbuf );
+
+  if (godlike)
+    c_strcpy( hd1, cbuf );
+  else
+    c_strcpy( hd2, cbuf );
 
   col = (int)(cdcols() - strlen( cbuf )) / (int)2;
   lin = 2;
@@ -1527,26 +1548,25 @@ void playlist( int godlike, int doall, int snum )
 	    {
 	      sbuf[0] = EOS;
 	      appship( i, sbuf );
-	      if (SysConf.AllowRefits)
-		{
-		  appstr(" ", sbuf);
-		  appchr(ShipTypes[Ships[i].shiptype].name[0], sbuf);
-		}
+	      appstr(" ", sbuf);
+	      appchr(ShipTypes[Ships[i].shiptype].name[0], sbuf);
+
 	      unum = Ships[i].unum;
 	      if ( unum >= 0 && unum < MAXUSERS )
 		{
-		  if (Ships[i].pid == 0) /* robot */
+		  if (SROBOT(i)) /* robot */
 		    strcpy(pidbuf, " ROBOT");
-		  else if (CheckPid(Ships[i].pid) == FALSE) 
+		  else if (SVACANT(i)) 
 		    strcpy(pidbuf, "VACANT");
 		  else
-		    sprintf(pidbuf, "%6d", Ships[i].pid);
+		    {
+		      if (godlike)
+			sprintf(pidbuf, "%6d", Ships[i].pid);
+		      else
+			strcpy(pidbuf, "  LIVE");
+		    }
 		
-		  if (Users[unum].type == UT_REMOTE)
-		    strcpy(ubuf, "@");
-		  else
-		    strcpy(ubuf, "");
-		  strcat(ubuf, Users[unum].username);
+		  strcpy(ubuf, Users[unum].username);
 
 		  sprintf(kbuf, "%6.1f", (Ships[i].kills + Ships[i].strkills));
 		  sprintf( cbuf, "%-5s %-13.13s %-21.21s %-8s %6s",
@@ -1637,43 +1657,6 @@ void playlist( int godlike, int doall, int snum )
   
 }
 
-
-/*  pseudo - change an user's pseudonym */
-/*  SYNOPSIS */
-/*    int unum, snum */
-/*    pseudo( unum, snum ) */
-void pseudo( int unum, int snum )
-{
-  char ch, buf[MSGMAXLINE];
-  
-  buf[0] = EOS;
-
-  cdclrl( MSG_LIN1, 2 );
-  c_strcpy( "Old pseudonym: ", buf );
-  if ( snum > 0 && snum <= MAXSHIPS )
-    appstr( Ships[snum].alias, buf );
-  else
-    appstr( Users[unum].alias, buf );
-  cdputc( buf, MSG_LIN1 );
-  ch = getcx( "Enter a new pseudonym: ",
-	     MSG_LIN2, -4, TERMS, buf, MAXUSERPNAME );
-  if ( ch == TERM_ABORT || buf[0] == EOS)
-    {
-      cdclrl( MSG_LIN1, 2 );
-      return;
-    }
-
-  stcpn( buf, Users[unum].alias, MAXUSERPNAME );
-  if ( snum > 0 && snum <= MAXSHIPS )
-    stcpn( buf, Ships[snum].alias, MAXUSERPNAME );
-  
-  cdclrl( MSG_LIN1, 2 );
-  
-  return;
-  
-}
-
-
 /*  register - register a new user (DOES LOCKING) */
 /*  SYNOPSIS */
 /*    char lname(), rname() */
@@ -1693,11 +1676,9 @@ int c_register( char *lname, char *rname, int team, int *unum )
 	Users[i].rating = 0.0;
 	Users[i].team = team;
 	Users[i].robot = FALSE;
-	Users[i].multiple = 2;		/* but the option bit is off */
-	if (IsRemoteUser())
-	  Users[i].type = UT_REMOTE;
-	else
-	  Users[i].type = UT_LOCAL;
+	Users[i].multiple = 1;		/* but the option bit is off */
+
+	Users[i].type = 0;	/* we will use this someday */
 	
 	for ( j = 0; j < MAXUSTATS; j = j + 1 )
 	  Users[i].stats[j] = 0;
@@ -1705,14 +1686,6 @@ int c_register( char *lname, char *rname, int team, int *unum )
 	for ( j = 0; j < NUMPLAYERTEAMS; j = j + 1 )
 	  Users[i].war[j] = TRUE;
 	Users[i].war[Users[i].team] = FALSE;
-	
-	for ( j = 0; j < MAXOPTIONS; j = j + 1 )
-	  Users[i].options[j] = TRUE;
-/*	options[i][OPT_INTRUDERALERT] = FALSE; JET - this turns off ALL msgs
-                                                     from planets. not a
-						     good default... */
-	Users[i].options[OPT_NUMERICMAP] = FALSE;
-	Users[i].options[OPT_TERSE] = FALSE;
 	
 	for ( j = 0; j < MAXOOPTIONS; j = j + 1 )
 	  Users[i].ooptions[j] = FALSE;
@@ -1745,33 +1718,18 @@ int c_register( char *lname, char *rname, int team, int *unum )
 /*    resign( unum ) */
 void resign( int unum, int isoper )
 {
-  int i, haderror = FALSE;
-  char *home = NULL;
-  char filenm[MID_BUFFER_SIZE];
-  char usrname[SIZEUSERNAME], usralias[SIZEUSERPNAME];
-  static struct passwd *pwp = NULL;
-
-  if (isoper == TRUE)
-    {				/* from conqoper, need to get homedir
-				   of CONQUEST_USER */
-      if (pwp == NULL)
-	{
-	  if ((pwp = getpwnam(CONQUEST_USER)) == NULL)
-	    {
-	      clog("resign(unum = %d): getpwnam(%s) failed.",
-		   unum, CONQUEST_USER);
-	    }
-	}
-    }
+  int i;
+  char usrname[MAXUSERNAME], usralias[MAXUSERPNAME];
 
 				/* make copies */
-  strncpy(usrname, Users[unum].username, SIZEUSERNAME - 1);
-  strncpy(usralias, Users[unum].alias, SIZEUSERPNAME - 1);
+  strncpy(usrname, Users[unum].username, MAXUSERNAME - 1);
+  strncpy(usralias, Users[unum].alias, MAXUSERPNAME - 1);
 
   PVLOCK(&ConqInfo->lockword);
   if ( unum >= 0 && unum < MAXUSERS )
     {
       Users[unum].live = FALSE;
+
       for ( i = 0; i < MAXHISTLOG; i = i + 1 )
 	if ( unum == History[i].histunum )
 	  {
@@ -1779,29 +1737,6 @@ void resign( int unum, int isoper )
 	    History[i].histlog = 0;
 	  }
     }
-
-  if (Users[unum].type == UT_REMOTE)
-    {				/* remove .conquestrc.unum file if
-				   remote user */
-      if (isoper == TRUE)	/* from conqoper */
-	home = (pwp != NULL) ? pwp->pw_dir : NULL;
-      else
-	home = getenv("HOME");
-      
-      if (home == NULL)
-	{
-	  clog("resign(unum = %d, isoper = %d): could not get homedir", 
-	       unum, isoper);
-	}
-      else
-	{
-      	  sprintf(filenm, "%s/.conquestrc.%d", home, unum);
-	  if (unlink(filenm) == -1)
-	    clog("resign(unum = %d): unlink('%s') failed: %s",
-		 unum, filenm, strerror(errno));
-	}
-    }
-
   PVUNLOCK(&ConqInfo->lockword);
 
   if (isoper != TRUE)
@@ -2221,11 +2156,13 @@ void teamlist( int team )
       sprintf( timbuf[i], "%d", Teams[i].couptime );
   
   if ( ! godlike )
-    for ( i = 0; i < 4; i++ )
-      if ( team != i )
-	c_strcpy( "-", timbuf[i] );
-      else if ( ! Teams[i].coupinfo && timbuf[i][0] != EOS )
-	c_strcpy( "?", timbuf[i] );
+    {
+      for ( i = 0; i < 4; i++ )
+	if ( team != i )
+	  c_strcpy( "-", timbuf[i] );
+	else if ( ! Teams[i].coupinfo && timbuf[i][0] != EOS )
+	  c_strcpy( "?", timbuf[i] );
+    }
   
   timbuf[4][0] = EOS;
   
@@ -2250,12 +2187,11 @@ void teamlist( int team )
 /* the ship instead of the user. */
 void userline( int unum, int snum, char *buf, int showgods, int showteam )
 {
-  int i, team;
+  int team;
   char ch, ch2, junk[MSGMAXLINE], timstr[20], name[MAXUSERPNAME];
   
   char *hd1="name          pseudonym           team skill  wins  loss mxkls  ships     time";
-  char *rch;		/* remote user flag */
-  char tname[SIZEUSERNAME + 2];	/* posss '@' and NULL */
+  char tname[MAXUSERNAME + 2];	/* posss '@' and NULL */
   
   
   if ( unum < 0 || unum >= MAXUSERS )
@@ -2270,22 +2206,9 @@ void userline( int unum, int snum, char *buf, int showgods, int showteam )
     }
   
   ch2 = ' ';
-  if ( showgods )
-    {
-      for ( i = 2; i < MAXOOPTIONS; i++)
-	if ( Users[unum].ooptions[i] )
-	  {
-	    if (i != OOPT_SWITCHTEAMS || (i == OOPT_SWITCHTEAMS && 
-					  SysConf.AllowSwitchteams != TRUE)) 
-	      {			/* don't want false positive on
-				   switchteams option - when enabled */
-		ch2 = '+';
-		break;
-	      }
-	  }
-      if ( ch2 != '+' && isagod(unum))
-	ch2 = '+';		
-    }
+
+  if ( ch2 != '+' && isagod(unum))
+    ch2 = '+';		
   
   /* If we were given a valid ship number, use it's information. */
   if ( snum > 0 && snum <= MAXSHIPS )
@@ -2295,27 +2218,19 @@ void userline( int unum, int snum, char *buf, int showgods, int showteam )
     }
   else
     {
+
       c_strcpy( Users[unum].alias, name );
       team = Users[unum].team;
-    }
-  
+    } 
+
   /* Figure out which team he's on. */
   if ( Users[unum].ooptions[OOPT_MULTIPLE] && ! showteam )
     ch = 'M';
   else
     ch = Teams[team].teamchar;
 
-  if (Users[unum].type == UT_REMOTE)
-    {
-      tname[0] = '@';
-      strncpy(&tname[1], Users[unum].username, SIZEUSERNAME - 2);
-      tname[SIZEUSERNAME - 1] = EOS;
-    }
-   else
-     { 
-       strncpy(tname, Users[unum].username, SIZEUSERNAME - 1);
-       tname[SIZEUSERNAME - 1] = EOS;
-     }
+  strncpy(tname, Users[unum].username, MAXUSERNAME - 1);
+  tname[MAXUSERNAME - 1] = EOS;
 
   sprintf( junk, "%-12.12s %c%-21.21s %c %6.1f",
 	   tname,
@@ -2452,12 +2367,14 @@ void userlist( int godlike, int snum )
 	  putpmt( MTXT_MORE, MSG_LIN2 );
 	  cdrefresh();
 	  if ( iogtimed( &ch, 1.0 ) )
-	    if ( ch == TERM_EXTRA )
-	      fuser = 0;			/* move to first page */
-	    else if ( ch == ' ' )
-	      fuser = i;			/* move to next page */
-	    else
-	      break;
+	    {
+	      if ( ch == TERM_EXTRA )
+		fuser = 0;			/* move to first page */
+	      else if ( ch == ' ' )
+		fuser = i;			/* move to next page */
+	      else
+		break;
+	    }
 	}
     }
   
@@ -2609,7 +2526,7 @@ void statline( int unum, char *buf )
   int i, j;
   char ch, junk[MSGMAXLINE], percent[MSGMAXLINE], morejunk[MSGMAXLINE];
   char datestr[DATESIZE];
-  char tname[SIZEUSERNAME + 2];	/* posss '@' and NULL */
+  char tname[MAXUSERNAME + 2];	/* posss '@' and NULL */
 
   if ( unum < 0 || unum >= MAXUSERS )
     {
@@ -2630,11 +2547,7 @@ void statline( int unum, char *buf )
       sprintf( percent, "%3d%%", (i + 5) / 10 );
     }
  
-  if (Users[unum].type == UT_REMOTE)
-    strcpy(tname, "@");			/* flags a remote user */
-  else
-    strcpy(tname, "");
-  strcat(tname, Users[unum].username);
+  strcpy(tname, Users[unum].username);
 
   sprintf( junk, "%-12s %4s %4d %4d %4d",
 	 tname,
@@ -2734,30 +2647,3 @@ void zeroplanet( int pnum, int snum )
 }
 
 
-/* IsRemoteUser(void)  - returns true if username == CONQUEST_USER */
-int IsRemoteUser()
-{
-  static char tmpuser[SIZEUSERNAME] = "";
-
-  if (strlen(tmpuser) == 0)	/* first time */
-    {				/* get system username */
-      glname( tmpuser, SIZEUSERNAME);
-    }
-
-  if (strncmp(tmpuser, CONQUEST_USER, SIZEUSERNAME) == 0)
-    {
-#ifdef DEBUG_SERVER
-      clog("IsRemoteUser(): glname = '%s', CONQUEST_USER = '%s', returning TRUE",
-	   tmpuser, CONQUEST_USER);
-#endif
-      return(TRUE);
-    }
-  else
-    {
-#ifdef DEBUG_SERVER
-      clog("IsRemoteUser(): glname = '%s', CONQUEST_USER = '%s', returning FLASE",
-	   tmpuser, CONQUEST_USER);
-#endif
-      return(FALSE);
-    }
-}

@@ -3,7 +3,7 @@
  *
  * $Id$
  *
- * Copyright 1999 Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
+ * Copyright 1999-2004 Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
  */
 
 #ifndef DOOMSDAY_H_INCLUDED
@@ -19,7 +19,7 @@ typedef struct {
   real dy;
   real heading;			/* heading */
   int lock;			/* destination: 0, ship #, or -planet # */
-  char name[SIZEUSERPNAME];	/* name of doomsday machine */
+  char name[MAXUSERPNAME];	/* name of doomsday machine */
 } Doomsday_t;
 
 #endif /* DOOMSDAY_H_INCLUDED */

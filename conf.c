@@ -6,7 +6,7 @@
  *
  * $Id$
  *
- * Copyright 1999 Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
+ * Copyright 1999-2004 Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
  ***********************************************************************/
 
 /**********************************************************************/
@@ -19,14 +19,23 @@
 
 #include "global.h"
 #include "conqcom.h"
-
+#include "color.h"
 #define NOEXTERN
 #include "conf.h"
 #undef NOEXTERN
 
-		/* For id purposes... */
-static char *confId = "$Id$";
+#define HOME_BUFSZ 1024
 
+/* if this is set, then the conquest client is running as the shell on
+   a telnet based server.  In this case, we will never try to load or save
+   the user config file.   GetConf() will only set the defaults. */
+static int telnetClient = FALSE;
+
+void confSetTelnetClientMode(int telnetc)
+{
+  telnetClient = telnetc;
+  return;
+}
 
 /* GetSysConf(int checkonly) - load system-wide configuration values */
 /*  If checkonly is TRUE, then just load internel defaults, and the existing
@@ -37,18 +46,14 @@ static char *confId = "$Id$";
 int GetSysConf(int checkonly)
 {
   FILE *conf_fd;
-  int i, j, n;
-  char conf_name[256];
+  int i, j;
+  char conf_name[MID_BUFFER_SIZE];
   char buffer[BUFFER_SIZE];
   int FoundOne = FALSE;
   int buflen;
-  char *bufptr, *cptr;
+  char *bufptr;
 
 				/* init some defaults */
-  SysConf.DoLRTorpScan = TRUE;
-  SysConf.DoLocalLRScan = TRUE;
-  SysConf.DoETAStats = TRUE;
-  SysConf.AllowFastUpdate = TRUE;
   SysConf.NoDoomsday = FALSE;
   SysConf.DoRandomRobotKills = FALSE;
   SysConf.AllowSigquit = FALSE;
@@ -56,7 +61,12 @@ int GetSysConf(int checkonly)
   SysConf.UserExpiredays = DEFAULT_USEREXPIRE;
   SysConf.LogMessages = FALSE;
   SysConf.AllowRefits = TRUE;
-  SysConf.AllowAltHUD = FALSE;
+  SysConf.AllowSlingShot = FALSE;
+
+  strncpy(SysConf.ServerName, "Generic Conquest Server", 
+	  CONF_SERVER_NAME_SZ);
+  strncpy(SysConf.ServerMotd, "Keep your shields up in battle.",
+	  CONF_SERVER_MOTD_SZ);
 
 				/* start building the filename */
   sprintf(conf_name, "%s/%s", CONQETC, SYSCONFIG_FILE);
@@ -164,6 +174,18 @@ int GetSysConf(int checkonly)
 			    FoundOne = TRUE;
 			  }
 			break;
+
+		      case CTYPE_STRING:
+			memset((char *)(SysConfData[j].ConfValue), 0,
+			       SysConfData[j].max);
+			strncpy((char *)(SysConfData[j].ConfValue), 
+				bufptr, SysConfData[j].max);
+			((char *)SysConfData[j].ConfValue)[SysConfData[j].max - 1] = 0;
+
+			SysConfData[j].Found = TRUE;
+			FoundOne = TRUE;
+			break;
+
 		      
 		      } /* switch */
 		  } /* if */
@@ -228,39 +250,49 @@ int GetSysConf(int checkonly)
 	}
     }
 
-
-
-
   return(TRUE);
 }
 
 				/* get user's configuration */
-int GetConf(int isremote, int usernum)
+int GetConf(int usernum)
 {
   FILE *conf_fd;
   int i, j, n;
   char conf_name[MID_BUFFER_SIZE];
   char *homevar, *cptr;
+  char home[HOME_BUFSZ];
   char buffer[BUFFER_SIZE];
   int buflen;
   char *bufptr;
   int FoundOne = FALSE;
 
 				/* init some defaults */
+  UserConf.DoAlarms = TRUE;
+  UserConf.ShowPhasers = TRUE;
+  UserConf.ShowPlanNames = TRUE;
+  UserConf.DoIntrudeAlert = TRUE;
+  UserConf.DoNumMap = TRUE;
+  UserConf.Terse = FALSE;
+  UserConf.DoExplode = TRUE;
   UserConf.MessageBell = TRUE;
   UserConf.NoColor = FALSE;
   UserConf.NoRobotMsgs = FALSE;
-  UserConf.RecPlayerMsgs = TRUE;
-  UserConf.DoFastUpdate = TRUE;
-  UserConf.DoLimitBell = TRUE;
-  UserConf.ClearOldMsgs = TRUE;
+  UserConf.UpdatesPerSecond = 5;	/* default of 5 per sec */
   UserConf.DistressToFriendly = FALSE;
   UserConf.AltHUD = FALSE;
+  UserConf.DoLRTorpScan = TRUE;
+  UserConf.DoLocalLRScan = TRUE;
+  UserConf.DoETAStats = TRUE;
 
   for (i=0; i<MAX_MACROS; i++)
     {
       UserConf.MacrosF[i][0] = EOS;
     }
+
+
+  /* a telnet client leaves here after the defaults are set */
+  if (telnetClient)
+    return TRUE;
 
 				/* start building the filename */
   if ((homevar = getenv("HOME")) == NULL)
@@ -271,24 +303,20 @@ int GetConf(int isremote, int usernum)
       return(ERR);
     }
 
-  if (isremote == TRUE && usernum > 0)
-    {				/* build the remote user version */
-      umask(007);
-      sprintf(conf_name, "%s/%s.%d", homevar, CONFIG_FILE, usernum);
-    }
-  else
-      sprintf(conf_name, "%s/%s", homevar, CONFIG_FILE);
+  memset(home, 0, HOME_BUFSZ);
+  strncpy(home, homevar, HOME_BUFSZ - 1);
 
+  sprintf(conf_name, "%s/%s", home, CONFIG_FILE);
 
   if ((conf_fd = fopen(conf_name, "r")) == NULL)
     {
       if (errno != ENOENT)
 	{
-	  clog("GetConf(): fopen(%s) failed: %s",
+	  clog("GetConf(): fopen(%s) failed: %s, using defaults",
 	       conf_name,
 	       strerror(errno));
 	  
-	  fprintf(stderr, "Error opening config file: %s: %s\n",
+	  fprintf(stderr, "Error opening config file: %s: %s, using defaults\n",
 		  conf_name,
 		  strerror(errno));
 
@@ -469,23 +497,28 @@ int SaveUserConfig(int unum)
 {
   char conf_name[MID_BUFFER_SIZE];
   char *homevar;
+  char home[HOME_BUFSZ];
+
+  /* telnet shell clients can't save their configs :( */
+  if (telnetClient)
+    {
+      InitColors();
+      return TRUE;
+    }
 
 				/* start building the filename */
   if ((homevar = getenv("HOME")) == NULL)
     {
-      clog("SaveAndReloadUserConfig(): getenv(HOME) failed");
+      clog("SaveUserConfig(): getenv(HOME) failed");
 
       fprintf(stderr, "SaveUserConfig(): Can't get HOME environment variable. Exiting\n");
       return(ERR);
     }
 
-  if (unum > 0 && Users[unum].type == UT_REMOTE)
-    {				/* build the remote user version */
-      umask(007);
-      sprintf(conf_name, "%s/%s.%d", homevar, CONFIG_FILE, unum);
-    }
-  else
-      sprintf(conf_name, "%s/%s", homevar, CONFIG_FILE);
+  memset(home, 0, HOME_BUFSZ);
+  strncpy(home, homevar, HOME_BUFSZ - 1);
+
+  sprintf(conf_name, "%s/%s", home, CONFIG_FILE);
 
 #ifdef DEBUG_OPTIONS
   clog("SaveUserConfig(): saving user config: conf_name = '%s'", conf_name);
@@ -650,6 +683,11 @@ int MakeConf(char *filename)
   FILE *conf_fd;
   int i, j, n;
 
+
+  /* a telnet client should never get here, but... */
+  if (telnetClient)
+    return TRUE;
+
   unlink(filename);
 
   if ((conf_fd = fopen(filename, "w")) == NULL)
@@ -782,6 +820,11 @@ int MakeSysConf()
       if (SysConfData[j].ConfType != CTYPE_NULL)
 	switch (SysConfData[j].ConfType)
 	  {
+	  case CTYPE_STRING:
+	    fprintf(sysconf_fd, "%s%s\n",
+		    SysConfData[j].ConfName,
+		    (char *)SysConfData[j].ConfValue);
+	    break;
 	  case CTYPE_MACRO:
 	    for (n=0; n < MAX_MACROS; n++)
 	      {

@@ -4,7 +4,7 @@
  *
  * $Id$
  *
- * Copyright 1999 Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
+ * Copyright 1999-2004 Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
  ***********************************************************************/
 
 /**********************************************************************/
@@ -22,6 +22,7 @@
 #include "global.h"
 #include "color.h"
 
+#include "record.h"
 
 #define GREEN_ALERT 0
 #define YELLOW_ALERT 1
@@ -51,7 +52,7 @@ void do_bottomborder(int snum, char *buf, int attrib, int bufattr)
   /* now the buffer, if there */
   if ( buf && buf[0] != EOS )
     {
-      if (SysConf.AllowAltHUD && UserConf.AltHUD)
+      if (UserConf.AltHUD)
 	col = Context.maxcol - (strlen(buf) + 1);
       else
 	col = (int) (Context.maxcol - STAT_COLS - strlen(buf)) / 
@@ -73,7 +74,7 @@ void do_bottomborder(int snum, char *buf, int attrib, int bufattr)
     }
 
   /* if alt hud and we are a ship... */
-  if ((SysConf.AllowAltHUD && UserConf.AltHUD) && snum > 0 && 
+  if (UserConf.AltHUD && snum > 0 && 
       snum <= MAXSHIPS)
     {				/* some additional info */
       /* current firing angle */
@@ -195,15 +196,15 @@ void display( int snum, int display_info )
   minsenemy = 0;
 
   if (snum > 0)
-    lsmap = Ships[snum].map;
+    lsmap = SMAP(snum);
   else
-    lsmap = FALSE;
+    lsmap = 0;
   
   if ( lsmap )
     {
       scale = MAP_FAC;
       
-      if (SysConf.DoLocalLRScan)
+      if (UserConf.DoLocalLRScan)
 	{
 	  cenx = Ships[snum].x;
 	  ceny = Ships[snum].y;
@@ -278,7 +279,7 @@ void display( int snum, int display_info )
 		ch = Teams[Planets[i].team].torpchar;
 	      
 	      /* Display the planet; either it's numeric or it's not. */
-	      if ( Ships[snum].options[OPT_NUMERICMAP] )
+	      if ( UserConf.DoNumMap )
 		{
 		  sprintf( buf, "%d", Planets[i].armies);
 		  l = strlen(buf);
@@ -326,7 +327,7 @@ void display( int snum, int display_info )
 	  
 	  /* If necessary, display the planet name. */
 	  if ( snum < 0 || (snum > 0 && 
-			    Ships[snum].options[OPT_PLANETNAMES]) ) /* dwp */
+			    UserConf.ShowPlanNames) ) /* dwp */
 	    {
 	      sprintf(buf, "%c%c%c", Planets[i].name[0], Planets[i].name[1], Planets[i].name[2]);
 	      attrset(palertcol);
@@ -356,7 +357,7 @@ void display( int snum, int display_info )
 		  cdput( ConqInfo->chrplanets[Planets[i].type], lin, col + 1);
 		  attrset(0);
 		}
-	      if ( snum < 0 || (snum > 0 && Ships[snum].options[OPT_PLANETNAMES]) ) /* dwp */
+	      if ( snum < 0 || (snum > 0 && UserConf.ShowPlanNames) ) /* dwp */
 		if ( (lin + 1 <= DISPLAY_LINS) && col + 1< cdcols() )
 		  {
 		    attrset(palertcol);
@@ -397,7 +398,7 @@ void display( int snum, int display_info )
     {
       /* Display phaser graphics. */
       if ( ! lsmap && Ships[snum].pfuse > 0 )
-	if ( Ships[snum].options[ OPT_PHASERGRAPHICS] )
+	if ( UserConf.ShowPhasers )
 	  {
 	    sd = sind(Ships[snum].lastphase);
 	    cd = cosd(Ships[snum].lastphase);
@@ -416,7 +417,7 @@ void display( int snum, int display_info )
   for ( i = 1; i <= MAXSHIPS; i = i + 1 )
     if ( Ships[i].status != SS_OFF )
       {
-	if (SysConf.DoLRTorpScan)
+	if (UserConf.DoLRTorpScan)
 	  {
 	    /* Display the torps on a LR scan if it's a friend. */
 	    if (lsmap)
@@ -443,7 +444,7 @@ void display( int snum, int display_info )
 	if ( ! lsmap )
 	  {
 	    /* First display exploding torps. */
-	    if ( snum < 0 || (snum > 0 && Ships[snum].options[ OPT_EXPLOSIONS]) ) /* dwp */
+	    if ( snum < 0 || (snum > 0 && UserConf.DoExplode) ) /* dwp */
 	      for ( j = 0; j < MAXTORPS; j = j + 1 )
 		if ( Ships[i].torps[j].status == TS_FIREBALL )
 		  if ( cvtcoords( cenx, ceny, Ships[i].torps[j].x, Ships[i].torps[j].y,
@@ -492,9 +493,6 @@ void display( int snum, int display_info )
 		dis = (real) dist(Ships[snum].x, Ships[snum].y, Ships[i].x, Ships[i].y );
 	    
 		/* Here's where ship to ship accurate information is "gathered". */
-		if ( dis < ACCINFO_DIST && ! Ships[i].cloaked && ! selfwar( snum ) )
-		  Ships[i].scanned[Ships[snum].team] = SCANNED_FUSE;
-	    
 		/* Check for nearest enemy and nearest scanned enemy. */
 		if ( satwar( i, snum ) )
 		  if ( i != snum )
@@ -504,7 +502,7 @@ void display( int snum, int display_info )
 		      /* 1/6/94 */
 		      /* we want any cloaked ship at warp 0.0 */
 		      /* to be invisible. */
-		      if (Ships[i].cloaked && Ships[i].warp == 0.0)
+		      if (SCLOAKED(i) && Ships[i].warp == 0.0)
 			{
 			  /* skip to next ship. this one isn't here */
 			  /* ;-} */
@@ -531,7 +529,7 @@ void display( int snum, int display_info )
 	      }	/* if a ship view (snum > 0) */
 
 	    /* There is potential for un-cloaked ships and ourselves. */
-	    if ( ! Ships[i].cloaked || i == snum )
+	    if ( ! SCLOAKED(i) || i == snum )
 	      {
 		/* ... especially if he's in the bounds of our current */
 		/*  display (either tactical or strategic map) */
@@ -540,7 +538,7 @@ void display( int snum, int display_info )
 		  {
 		    /* He's on the screen. */
 		    /* We can see him if one of the following is true: */
-#
+
 		    /*  - We are not looking at our strategic map */
 		    /*  - We're mutually at peace */
 		    /*  - Our team has scanned him and we're not self-war */
@@ -552,7 +550,7 @@ void display( int snum, int display_info )
 			  !selfwar(snum) ) ||
 			( dis <= ACCINFO_DIST ) )
 		      {
-			if ( snum > 0 && ( i == snum ) && Ships[snum].cloaked )
+			if ( snum > 0 && ( i == snum ) && SCLOAKED(snum) )
 			  ch = CHAR_CLOAKED;
 			else
 			  ch = Teams[Ships[i].team].teamchar;
@@ -621,7 +619,7 @@ void display( int snum, int display_info )
 
   if (snum > 0)
     {				/* if a ship view */
-      if ( minenemy != 0 || Ships[snum].talert )
+      if ( minenemy != 0 || STALERT(snum) )
 	{
 	  if ( mindis <= PHASER_DIST )
 	    {
@@ -639,7 +637,7 @@ void display( int snum, int display_info )
 	      c_strcpy( "Alert ", buf );
 	      dobeep = TRUE;
 	    }
-	  else if ( Ships[snum].talert )
+	  else if ( STALERT(snum) )
 	    {
 	      /* Nearby torpedos. */
 	      outattr = COLOR_PAIR(COL_YELLOWBLACK);
@@ -673,7 +671,7 @@ void display( int snum, int display_info )
 	  if ( minenemy != 0 )
 	    {
 	      appship( minenemy, buf );
-	      if ( Ships[minenemy].cloaked )
+	      if ( SCLOAKED(minenemy) )
 		appstr( " (CLOAKED)", buf );
 	    }
 	}
@@ -689,8 +687,7 @@ void display( int snum, int display_info )
       OldAlert = AlertLevel;
     }
   
-  if ( (strcmp( buf, zzbuf ) != 0) || (SysConf.AllowAltHUD && 
-				       UserConf.AltHUD))
+  if ( (strcmp( buf, zzbuf ) != 0) || UserConf.AltHUD)
     {
       lin = DISPLAY_LINS + 1;
       do_bottomborder(snum, buf, alertcolor(AlertLevel), outattr);
@@ -715,7 +712,7 @@ void display( int snum, int display_info )
 	zzcshields = ' ';
       }
     i = round( Ships[snum].shields );
-    if ( ! Ships[snum].shup || Ships[snum].rmode )
+    if ( ! SSHUP(snum) || SREPAIR(snum) )
       i = -1;
     if ( i != zzsshields || i == -1)
       {
@@ -1041,7 +1038,7 @@ void display( int snum, int display_info )
 	zzsdamage = i;
       }
   
-    if ( Ships[snum].rmode )
+    if ( SREPAIR(snum) )
       j = 'r';
     else if ( i >= 50 )
       j = 'D';
@@ -1133,7 +1130,7 @@ void display( int snum, int display_info )
     lin = lin + 2;
     if ( Context.redraw )
       zzssdfuse = -9;
-    if ( Ships[snum].cloaked )
+    if ( SCLOAKED(snum) )
       i = -1;
     else
       i = max( 0, Ships[snum].sdfuse );
@@ -1159,7 +1156,7 @@ void display( int snum, int display_info )
       }
   
     if ( dobeep )
-      if ( Ships[snum].options[OPT_ALARMBELL] )
+      if ( UserConf.DoAlarms && !SROBOT(snum))
 	cdbeep();
   
   } /* end of ship stats display */
@@ -1298,9 +1295,6 @@ void display( int snum, int display_info )
   cdrefresh();
   Context.redraw = FALSE;
 
-				/* update to recording state */
-  recordUpdateState();
-  
   return;
   
 }
@@ -1333,7 +1327,7 @@ void display_headers(int snum)
 	      (int)(Context.maxcol - STAT_COLS - (strlen(hbuf))) / (int)2 + 1);
       attrset(0);
     }
-  else if ( Ships[snum].robot )
+  else if ( SROBOT(snum) )
     {
       if (ConqInfo->externrobots == TRUE) 
 	{

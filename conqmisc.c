@@ -4,7 +4,7 @@
  *
  * $Id$
  *
- * Copyright 1999 Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
+ * Copyright 1999-2004 Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
  ***********************************************************************/
 
 /*                               C O N Q M I S C */
@@ -120,10 +120,11 @@ void appship( int snum, char *str )
 int canread( int snum, int msgnum )
 {
   int from, to;
-  
+  unsigned char flags;
   
   from = Msgs[msgnum].msgfrom;
   to = Msgs[msgnum].msgto;
+  flags = Msgs[msgnum].flags;
   
   if (from == 0 && to == 0)
     {				/* uninitialized msgs */
@@ -132,62 +133,32 @@ int canread( int snum, int msgnum )
 
   /* If we're GOD, we can read it. unless it's a COMP MSG*/
   if ( snum == MSG_GOD && from != MSG_COMP)
-    return ( TRUE );
+    {
+      return ( TRUE );
+    }
   
   /* It's to us. */
   if ( to == snum )
-    {				/* extra check to see if is from a robot
-				   and it is a valid ship */
-      if (UserConf.NoRobotMsgs == TRUE && from > 0 &&
-	  Ships[from].robot == TRUE && 
-	  (snum > 0 && snum <= MAXSHIPS))
-	{                       /* see if it's a robot, if so ignore */
-          return(FALSE);
-	}
-      else
-	{
-	  return ( TRUE );
-	}
-    }
+    return(TRUE);
 
   /* It's from us */
   if (from == snum)
     return(TRUE);
   
+  /* if it's to god, and we are an oper... */
+  if (to == MSG_GOD && Users[Ships[snum].unum].ooptions[OOPT_OPER])
+    return TRUE;
+
   /* It's to everybody. */
   if ( to == MSG_ALL )
-    {				/* extra check for player enter/leave msg */
-      if (from == MSG_COMP && snum != MSG_GOD)
-	{				/* a player enter/exit/info message */
-	  if (UserConf.RecPlayerMsgs == FALSE)
-	    return(FALSE);
-	  else
-	    return(TRUE);
-	}
-				/* else, we can read it */
-      return(TRUE);
-    }
+    return(TRUE);
   
   /* Only check these if we're a ship. */
   if ( snum > 0 && snum <= MAXSHIPS )
     {
-				/* if user doesn't want robot msgs
-				   don't show any */
-      if (UserConf.NoRobotMsgs == TRUE && from > 0 && 
-	  Ships[from].robot == TRUE)
-	{			/* see if it's a robot, if so ignore */
-	  return(FALSE);
-	}
-      
       /* We can only read team messages if we're not self-war. */
       if ( ( -to == Ships[snum].team ) && ! selfwar(snum) )
-	{
-	  /* Planet alert for our team. */
-	  if ( -from > 0 && -from <= NUMPLANETS )
-	    return ( Ships[snum].options[OPT_INTRUDERALERT] );
-	  else
-	    return ( TRUE );
-	}
+	return ( TRUE );
       
       /* see if it's a message to friendly ships from another ship */
 
@@ -200,7 +171,7 @@ int canread( int snum, int msgnum )
 
       /* See if we are allowed to read GOD messages. */
       if ( to == MSG_GOD || from == MSG_GOD || to == MSG_IMPLEMENTORS )
-	return ( Users[Ships[snum].unum].ooptions[OOPT_GODMSG] );
+	return ( Users[Ships[snum].unum].ooptions[OOPT_OPER] );
     }
   
   /* If we got here, we can't read it. */
@@ -344,19 +315,31 @@ int findship( int *snum )
   PVLOCK(&ConqInfo->lockword);
   *snum = -1;
   for ( i = 1; i <= MAXSHIPS; i = i + 1 )
-    if ( Ships[i].status == SS_OFF )
-      {
-	*snum = i;
-	zeroship( *snum );
-	Ships[*snum].status = SS_RESERVED;
-	Ships[*snum].lastmsg = LMSG_NEEDINIT;
-	Ships[*snum].sdfuse = -TIMEOUT_PLAYER;
-	Ships[*snum].ctime = 0;
-	Ships[*snum].etime = 0;
-	Ships[*snum].cacc = 0;
-	Ships[*snum].eacc = 0;
-	break;
-      }
+    {
+      /* first, look for reserved ships that have no valid pid */
+      if ( Ships[i].status == SS_RESERVED )
+        if (!CheckPid(Ships[i].pid))
+          {
+            Ships[i].status = SS_OFF; /* no-one there, turn it off */
+            clog("INFO: findship(): turned off reserved ship %d\n",
+                 i);
+          }
+
+      /* if it's off, grab it */
+      if ( Ships[i].status == SS_OFF )
+        {
+          *snum = i;
+          zeroship( *snum );
+          Ships[*snum].status = SS_RESERVED;
+          Ships[*snum].lastmsg = LMSG_NEEDINIT;
+          Ships[*snum].sdfuse = -TIMEOUT_PLAYER;
+          Ships[*snum].ctime = 0;
+          Ships[*snum].etime = 0;
+          Ships[*snum].cacc = 0;
+          Ships[*snum].eacc = 0;
+          break;
+        }
+    }
   PVUNLOCK(&ConqInfo->lockword);
   
   return ( *snum != -1 );
@@ -410,25 +393,27 @@ int findspecial( int snum, int token, int count, int *sorpnum, int *xsorpnum )
 	    if ( valid )
 	      {
 #ifdef WARP0CLOAK
-		if (Ships[i].cloaked && Ships[i].warp == 0.0 && 
+		if (SCLOAKED(i) && Ships[i].warp == 0.0 && 
 		    satwar(snum, i) &&
-		    Ships[snum].robot)
+		    SROBOT(snum))
 		  continue; /* nobody here but us chickens... */
 #endif /* WARP0CLOAK */
 		td = dist(Ships[snum].x, Ships[snum].y, Ships[i].x, Ships[i].y);
 		if ( td < nd )
-		  if ( td < d )
-		    {
-		      *xsorpnum = *sorpnum;
-		      nd = d;
-		      *sorpnum = i;
-		      d = td;
-		    }
-		  else
-		    {
-		      *xsorpnum = i;
-		      nd = td;
-		    }
+		  {
+		    if ( td < d )
+		      {
+			*xsorpnum = *sorpnum;
+			nd = d;
+			*sorpnum = i;
+			d = td;
+		      }
+		    else
+		      {
+			*xsorpnum = i;
+			nd = td;
+		      }
+		  }
 	      }
 	  }
       break;
@@ -481,25 +466,27 @@ int findspecial( int snum, int token, int count, int *sorpnum, int *xsorpnum )
 	      /*  distance is of last importance. */
 	      if ( tu < nu ||
 		  ( tu == nu && ( ta < na || ( ta == na && td < nd ) ) ) )
-		if ( tu < u ||
-		    ( tu == u && ( ta < a || ( ta == a && td < d ) ) ) )
-		  {
-		    *xsorpnum = *sorpnum;
-		    na = a;
-		    nu = u;
-		    nd = d;
-		    *sorpnum = i;
-		    a = ta;
-		    u = tu;
-		    d = td;
-		  }
-		else
-		  {
-		    *xsorpnum = i;
-		    na = ta;
-		    nu = tu;
-		    nd = td;
-		  }
+		{
+		  if ( tu < u ||
+		       ( tu == u && ( ta < a || ( ta == a && td < d ) ) ) )
+		    {
+		      *xsorpnum = *sorpnum;
+		      na = a;
+		      nu = u;
+		      nd = d;
+		      *sorpnum = i;
+		      a = ta;
+		      u = tu;
+		      d = td;
+		    }
+		  else
+		    {
+		      *xsorpnum = i;
+		      na = ta;
+		      nu = tu;
+		      nd = td;
+		    }
+		}
 	    }
 	}
       break;
@@ -562,40 +549,44 @@ int findspecial( int snum, int token, int count, int *sorpnum, int *xsorpnum )
 	    }
 	  /* Handle army threshold logic. */
 	  if ( valid )
-	    switch ( token )
-	      {
-	      case SPECIAL_ARMYPLANET:
-		valid = ( ( Planets[i].armies - 3 ) >= count );
-		break;
-	      case SPECIAL_PLANET:
-	      case SPECIAL_ENEMYPLANET:
-		valid = ( ! Planets[i].scanned[Ships[snum].team] ||
-			 Planets[i].armies >= count );
-		break;
-	      case SPECIAL_FUELPLANET:
-	      case SPECIAL_REPAIRPLANET:
-	      case SPECIAL_TEAMPLANET:
-		valid = ( Planets[i].armies >= count );
-		break;
-	      default:
-		return ( FALSE );	/* this can't happen */
-	      }
+	    {
+	      switch ( token )
+		{
+		case SPECIAL_ARMYPLANET:
+		  valid = ( ( Planets[i].armies - 3 ) >= count );
+		  break;
+		case SPECIAL_PLANET:
+		case SPECIAL_ENEMYPLANET:
+		  valid = ( ! Planets[i].scanned[Ships[snum].team] ||
+			    Planets[i].armies >= count );
+		  break;
+		case SPECIAL_FUELPLANET:
+		case SPECIAL_REPAIRPLANET:
+		case SPECIAL_TEAMPLANET:
+		  valid = ( Planets[i].armies >= count );
+		  break;
+		default:
+		  return ( FALSE );	/* this can't happen */
+		}
+	    }
 	  if ( valid )
 	    {
 	      td = dist(Ships[snum].x, Ships[snum].y, Planets[i].x, Planets[i].y);
 	      if ( td < nd )
-		if ( td < d )
-		  {
-		    *xsorpnum = *sorpnum;
-		    nd = d;
-		    *sorpnum = i;
-		    d = td;
-		  }
-		else
-		  {
-		    *xsorpnum = i;
-		    nd = td;
-		  }
+		{
+		  if ( td < d )
+		    {
+		      *xsorpnum = *sorpnum;
+		      nd = d;
+		      *sorpnum = i;
+		      d = td;
+		    }
+		  else
+		    {
+		      *xsorpnum = i;
+		      nd = td;
+		    }
+		}
 	    }
 	}
       break;
@@ -633,23 +624,12 @@ void fixdeltas( int snum )
 /*    truth = gunum( unum, lname ) */
 int gunum( int *unum, char *lname, int ltype )
 {
-  int i, chktype;
+  int i;
   char *lptr = lname;
-
-  if (*lptr == '@')
-    {				/* a remote user only lookup  */
-      lptr++;
-      chktype = UT_REMOTE;
-    }
-  else
-    chktype = UT_LOCAL;
-  
-  if (ltype != -1)
-    chktype = ltype;		/* provide override via option */
 
   *unum = -1;
   for ( i = 0; i < MAXUSERS; i = i + 1 )
-    if ( Users[i].live && Users[i].type == chktype)
+    if ( Users[i].live )
       if ( strcmp( lptr, Users[i].username ) == 0 )
 	{
 	  *unum = i;
@@ -670,7 +650,7 @@ void histlist( int godlike )
   int i, j, unum, lin, col, fline, lline, thistptr = 0;
   int ch;
   char *hd0="C O N Q U E S T   U S E R   H I S T O R Y";
-  char puname[SIZEUSERNAME + 2]; /* for '\0' and '@' */
+  char puname[MAXUSERNAME + 2]; /* for '\0' and '@' */
   char connecttm[BUFFER_SIZE];
   char histentrytm[DATESIZE + 1];
 
@@ -703,10 +683,8 @@ void histlist( int godlike )
 	    continue; 
 	  if ( ! Users[unum].live )
 	    continue; 
-	  if (Users[unum].type == UT_REMOTE)
-	    sprintf(puname, "@%s", Users[unum].username);
-	  else
-	    strcpy(puname, Users[unum].username);
+
+	  strcpy(puname, Users[unum].username);
 	  
 				/* entry time */
 	  getdandt( histentrytm, History[i].histlog);
@@ -766,11 +744,9 @@ void initeverything(void)
   /* Turn off the universe. */
   ConqInfo->closed = TRUE;
   
-  /* reset the lockwords if using semaphores */
-#if defined(USE_PVLOCK) && defined(USE_SEMS)
+  /* reset the lockwords  */
   ConqInfo->lockword = 0;
   ConqInfo->lockmesg = 0;
-#endif
 
   /* Zero team stats. */
   for ( i = 0; i < NUMPLAYERTEAMS; i = i + 1 )
@@ -1450,7 +1426,7 @@ void initship( int snum, int unum )
   Ships[snum].warp = 0.0;
   Ships[snum].dwarp = 0.0;
   Ships[snum].lock = 0;
-  Ships[snum].shup = TRUE;
+  SFSET(snum, SHIP_F_SHUP);
   Ships[snum].shields = 100.0;
   Ships[snum].kills = 0.0;
   Ships[snum].damage = 0.0;
@@ -1462,8 +1438,8 @@ void initship( int snum, int unum )
   Ships[snum].weapalloc = 40;
   Ships[snum].engalloc = 100 - Ships[snum].weapalloc;
   Ships[snum].armies = 0;
-  Ships[snum].rmode = FALSE;
-  Ships[snum].cloaked = FALSE;
+  SFCLR(snum, SHIP_F_REPAIR);
+  SFCLR(snum, SHIP_F_CLOAKED);
   /* soption(snum,i)				# setup in menu() */
   for ( i = 0; i < NUMPLAYERTEAMS; i = i + 1 )
     {
@@ -1481,14 +1457,14 @@ void initship( int snum, int unum )
       Ships[snum].alastmsg = Ships[snum].lastmsg;
     }
   PVUNLOCK(&ConqInfo->lockmesg);
-  Ships[snum].map = FALSE;
+  SFCLR(snum, SHIP_F_MAP);
   Ships[snum].towing = 0;
   Ships[snum].towedby = 0;
   Ships[snum].lastblast = 0.0;
   Ships[snum].lastphase = 0.0;
   Ships[snum].pfuse = 0;
-  Ships[snum].talert = FALSE;
-  Ships[snum].robot = FALSE;
+  SFCLR(snum, SHIP_F_TALERT);
+  SFCLR(snum, SHIP_F_ROBOT);
   Ships[snum].action = 0;
   /* spname(1,snum)				# setup in menu() or newrob() */
   
@@ -1511,7 +1487,8 @@ void initship( int snum, int unum )
 
   Users[unum].stats[USTAT_ENTRIES] += 1;
   Teams[Ships[snum].team].stats[TSTAT_ENTRIES] += 1;
-  
+
+  Ships[snum].flags = SHIP_F_NONE;
   return;
   
 }
@@ -1653,25 +1630,27 @@ void intrude( int snum, int pnum )
   if ( Planets[pnum].real &&
       Planets[pnum].team != TEAM_SELFRULED &&
       Planets[pnum].team != TEAM_NOTEAM )
-    if ( snum == MSG_DOOM )
-      {
-	c_strcpy( Doomsday->name, buf );
-	upper( Doomsday->name );
-	appstr( atta, buf );
-	appstr( armeq, buf );
-	appint( Planets[pnum].armies, buf );
-	stormsg( -pnum, -Planets[pnum].team, buf );
-      }
-    else if ( Ships[snum].war[Planets[pnum].team] )
-      {
-	c_strcpy( "INTRUDER ALERT - ", buf );
-	appship( snum, buf );
-	appstr( atta, buf );
-	appstr( armeq, buf );
-	appint( Planets[pnum].armies, buf );
-	stormsg( -pnum, -Planets[pnum].team, buf );
-	defend( snum, pnum );
-      }
+    {
+      if ( snum == MSG_DOOM )
+	{
+	  c_strcpy( Doomsday->name, buf );
+	  upper( Doomsday->name );
+	  appstr( atta, buf );
+	  appstr( armeq, buf );
+	  appint( Planets[pnum].armies, buf );
+	  stormsgf( -pnum, -Planets[pnum].team, buf, MSG_FLAGS_INTRUDER );
+	}
+      else if ( Ships[snum].war[Planets[pnum].team] )
+	{
+	  c_strcpy( "INTRUDER ALERT - ", buf );
+	  appship( snum, buf );
+	  appstr( atta, buf );
+	  appstr( armeq, buf );
+	  appint( Planets[pnum].armies, buf );
+	  stormsgf( -pnum, -Planets[pnum].team, buf, MSG_FLAGS_INTRUDER );
+	  defend( snum, pnum );
+	}
+    }
   
   return;
   
@@ -1899,7 +1878,6 @@ void putship( int snum, real basex, real basey )
   
   /* If we got here, we couldn't find a "good" position, */
   /*  so just report the error and let it slide. */
-  cerror( "putship(): Failed retry maximum on ship %d", snum );
   clog( "putship(): Failed retry maximum on ship %d", snum );
   
   return;
@@ -1986,7 +1964,6 @@ int fmtmsg(int to, int from, char *buf)
 /*    readmsg( snum, msgnum ) */
 int readmsg( int snum, int msgnum, int dsplin )
 {
-  int i;
   char buf[MSGMAXLINE];
   unsigned int attrib = 0;
   
@@ -1999,7 +1976,6 @@ int readmsg( int snum, int msgnum, int dsplin )
     }
 
   fmtmsg(Msgs[msgnum].msgto, Msgs[msgnum].msgfrom, buf);
-
   appstr( ": ", buf );
   appstr( Msgs[msgnum].msgbuf, buf );
 
@@ -2013,211 +1989,6 @@ int readmsg( int snum, int msgnum, int dsplin )
     }
   
   return(TRUE);
-  
-}
-
-
-/*  sendmsg - prompt the user for a message and send it */
-/*  SYNOPSIS */
-/*    int from */
-/*    sendmsg( from, terse ) */
-void sendmsg( int from, int terse )
-{
-  int i, j; 
-  char buf[MSGMAXLINE] = "", msg[MESSAGE_SIZE] = "";
-  int ch;
-  int editing; 
-  string mto="Message to: ";
-  string nf="Not found.";
-  string huh="I don't understand.";
-
-  int append_flg;  /* when user types to the limit. */
-  int do_append_flg;
-  
-  static int to = MSG_NOONE;
-  
-  /* First, find out who we're sending to. */
-  cdclrl( MSG_LIN1, 2 );
-  buf[0] = EOS;
-  ch = cdgetx( mto, MSG_LIN1, 1, TERMS, buf, MSGMAXLINE, TRUE );
-  if ( ch == TERM_ABORT )
-    {
-      cdclrl( MSG_LIN1, 1 );
-      return;
-    }
-  
-  /* TAB or RETURN means use the target from the last message. */
-  editing = ( (ch == TERM_EXTRA || ch == TERM_NORMAL) && buf[0] == EOS );
-  if ( editing )
-    {
-      /* Make up a default string using the last target. */
-      if ( to > 0 && to <= MAXSHIPS )
-	sprintf( buf, "%d", to );
-      else if ( -to >= 0 && -to < NUMPLAYERTEAMS )
-	c_strcpy( Teams[-to].name, buf );
-      else switch ( to )
-	{
-	case MSG_ALL:
-	  c_strcpy( "All", buf );
-	  break;
-	case MSG_GOD:
-	  c_strcpy( "GOD", buf );
-	  break;
-	case MSG_IMPLEMENTORS:
-	  c_strcpy( "Implementors", buf );
-	  break;
-	case MSG_FRIENDLY:
-	  c_strcpy( "Friend", buf );
-	  break;
-	default:
-	  buf[0] = EOS;
-	  break;
-	}
-      
-    }
-  
-  /* Got a target, parse it. */
-  delblanks( buf );
-  upper( buf );
-  if ( alldig( buf ) == TRUE )
-    {
-      /* All digits means a ship number. */
-      i = 0;
-      safectoi( &j, buf, i );		/* ignore status */
-      if ( j < 1 || j > MAXSHIPS )
-	{
-	  c_putmsg( "No such ship.", MSG_LIN2 );
-	  return;
-	}
-      if ( Ships[j].status != SS_LIVE )
-	{
-	  c_putmsg( nf, MSG_LIN2 );
-	  return;
-	}
-      to = j;
-    }
-  else switch ( buf[0] )
-    {
-    case 'A':
-    case 'a':
-      to = MSG_ALL;
-      break;
-    case 'G':
-    case 'g':
-      to = MSG_GOD;
-      break;
-    case 'I':
-    case 'i':
-      to = MSG_IMPLEMENTORS;
-      break;
-    default:
-      /* check for 'Friend' */
-      if (buf[0] == 'F' && buf[1] == 'R')
-	{			/* to friendlies */
-	  to = MSG_FRIENDLY;
-	}
-      else
-	{
-	  /* Check for a team character. */
-	  for ( i = 0; i < NUMPLAYERTEAMS; i = i + 1 )
-	    if ( buf[0] == Teams[i].teamchar || buf[0] == (char)tolower(Teams[i].teamchar) )
-	      break;
-	  if ( i >= NUMPLAYERTEAMS )
-	    {
-	      c_putmsg( huh, MSG_LIN2 );
-	      return;
-	    }
-	  to = -i;
-	};
-      break;
-    }
-  
-  /* Now, construct a header for the selected target. */
-  c_strcpy( "Message to ", buf );
-  if ( to > 0 && to <= MAXSHIPS )
-    {
-      if ( Ships[to].status != SS_LIVE )
-	{
-	  c_putmsg( nf, MSG_LIN2 );
-	  return;
-	}
-      appship( to, buf );
-      appchr( ':', buf );
-    }
-  else if ( -to >= 0 && -to < NUMPLAYERTEAMS )
-    {
-      appstr( Teams[-to].name, buf );
-      appstr( "s:", buf );
-    }
-  else switch ( to ) 
-    {
-    case MSG_ALL:
-      appstr( "everyone:", buf );
-      break;
-    case MSG_GOD:
-      appstr( "GOD:", buf );
-      break;
-    case MSG_IMPLEMENTORS:
-      appstr( "The Implementors:", buf );
-      break;
-    case MSG_FRIENDLY:
-      appstr( "Friend:", buf );
-      break;
-    default:
-      c_putmsg( huh, MSG_LIN2 );
-      return;
-      break;
-    }
-  
-  if ( ! terse )
-    appstr( " (ESCAPE to abort)", buf );
-  
-  c_putmsg( buf, MSG_LIN1 );
-  cdclrl( MSG_LIN2, 1 );
-  
-  if ( ! editing )
-    msg[0] = EOS;
-  
-  if ( to == MSG_IMPLEMENTORS )
-    i = MSGMAXLINE;
-  else
-    i = MESSAGE_SIZE;
-  
-  append_flg = TRUE;
-  while (append_flg == TRUE) {
-  append_flg = FALSE;
-  do_append_flg = TRUE;
-  msg[0] = EOS;
-  if ( cdgetp( ">", MSG_LIN2, 1, TERMS, msg, i, 
-	       &append_flg, do_append_flg, TRUE ) != TERM_ABORT )
-    if ( to != MSG_IMPLEMENTORS )
-      stormsg( from, to, msg );
-    else
-      {
-	/* Handle a message to the Implementors. */
-	c_strcpy( "Communique from ", buf );
-	if ( from > 0 && from <= MAXSHIPS )
-	  {
-	    appstr( Ships[from].alias, buf );
-	    appstr( " on board ", buf );
-	    appship( from, buf );
-	  }
-	else if ( from == MSG_GOD )
-	  appstr( "GOD", buf );
-	else
-	  {
-	    appchr( '(', buf );
-	    appint( from, buf );
-	    appchr( ')', buf );
-	  }
-	stormsg( from, MSG_IMPLEMENTORS, msg ); /* GOD == IMP */
-	/* log it to the logfile too */
-	clog("MESSAGE TO IMPLEMENTORS: %s: %s", buf, msg);
-      }
-    } /* end while loop */ 
-  cdclrl( MSG_LIN1, 2 );
-  
-  return;
   
 }
 
@@ -2309,8 +2080,6 @@ int spwar( int snum, int pnum )
       return ( Ships[snum].srpwar[pnum] );
     }
   
-  /*    return ( TRUE );			/* can't get here... */
-  
 }
 
 
@@ -2321,6 +2090,8 @@ int spwar( int snum, int pnum )
 /*    flag = stillalive( snum ) */
 int stillalive( int snum )
 {
+
+
   if (snum < 0 || snum > MAXSHIPS)
     return(TRUE);
 
@@ -2329,29 +2100,33 @@ int stillalive( int snum )
     {
       if ( Ships[snum].status == SS_LIVE )
 	killship( snum, KB_SHIT );
+
       return ( FALSE );
     }
   if ( ConqInfo->closed && ! Users[Ships[snum].unum].ooptions[OOPT_PLAYWHENCLOSED] )
     {
       if ( Ships[snum].status == SS_LIVE )
 	killship( snum, KB_EVICT );
+
       return ( FALSE );
     }
-  
+
   if ( Ships[snum].status == SS_RESERVED || Ships[snum].status == SS_ENTERING )
     return ( TRUE );
-  
+
   return ( Ships[snum].status == SS_LIVE );
   
 }
 
-
-/*  stormsg - store a message in the message buffer (DOES LOCKING) */
-/*  SYNOPSIS */
-/*    int from, to */
-/*    char msg() */
-/*    stormsg( from, to, msg ) */
+/* wrapper for stormsg.  Most routines just use this version. */
 void stormsg( int from, int to, char *msg )
+{
+  stormsgf(from, to, msg, MSG_FLAGS_NONE);
+  return;
+}
+
+/*  stormsgf - store a message in the msg buffer with flags (DOES LOCKING) */
+void stormsgf( int from, int to, char *msg, unsigned char flags )
 {
   int nlastmsg, i;
   char buf[128];
@@ -2360,11 +2135,17 @@ void stormsg( int from, int to, char *msg )
   if (*CBlockRevision != COMMONSTAMP)
     return;
 
+  /* don't bother with tersables to robots */
+  if (to > 0 && to <= MAXSHIPS && SROBOT(to))
+    if (flags & MSG_FLAGS_TERSABLE)
+      return;
+
   PVLOCK(&ConqInfo->lockmesg);
   nlastmsg = modp1( ConqInfo->lastmsg + 1, MAXMESSAGES );
   stcpn( msg, Msgs[nlastmsg].msgbuf, MESSAGE_SIZE );
   Msgs[nlastmsg].msgfrom = from;
   Msgs[nlastmsg].msgto = to;
+  Msgs[nlastmsg].flags = flags;
   ConqInfo->lastmsg = nlastmsg;
   
   /* Remove allowable last message restrictions. */
@@ -2392,8 +2173,12 @@ void stormsg( int from, int to, char *msg )
 /*    real fuel */
 /*    int ok, usefuel, weapon */
 /*    ok = usefuel( snum, fuel, weapon ) */
-int usefuel( int snum, real fuel, int weapon )
+int usefuel( int snum, real fuel, int weapon, int forreal )
 {
+  /* 'forreal' allows the client to test whether a command would succeed
+     before bothering to send it to the server (where it will just be
+     ignored anyway if you don't have the fuel).  */
+
   if ( fuel <= 0.0 )
     return ( FALSE );
   if ( weapon )
@@ -2405,50 +2190,66 @@ int usefuel( int snum, real fuel, int weapon )
     {
       if ( Ships[snum].efuse > 0 )
 	{
-	  Ships[snum].dwarp = 0.0;
+	  if (forreal)
+	    Ships[snum].dwarp = 0.0;
 	  return ( FALSE );
 	}
     }
 
-  Ships[snum].fuel = Ships[snum].fuel - fuel;
+  if (forreal)
+    Ships[snum].fuel = Ships[snum].fuel - fuel;
 
   if ( Ships[snum].fuel < 0.0 )
     {
       /* When you're out of gas, you're out of fun... */
-      Ships[snum].fuel = 0.0;
-      Ships[snum].cloaked = FALSE;
-      Ships[snum].dwarp = 0.0;
+      if (forreal) 
+	{
+	  Ships[snum].fuel = 0.0;
+	  SFCLR(snum, SHIP_F_CLOAKED);
+	  Ships[snum].dwarp = 0.0;
+	}
       return ( FALSE );
     }
   else if ( Ships[snum].fuel > 999.0 )
-    Ships[snum].fuel = 999.0;
+    {
+      if (forreal)
+	Ships[snum].fuel = 999.0;
+    }
   
   /* Temperature. */
   if ( weapon )
     {
-      Ships[snum].wtemp += ((fuel * TEMPFUEL_FAC) / weaeff ( snum ));
-      if ( Ships[snum].wtemp < 0.0 )
-	Ships[snum].wtemp = 0.0;
-      else if ( Ships[snum].wtemp >= 100.0 )
-	if ( rnd() < WEAPON_DOWN_PROB )
-	  {
-	    Ships[snum].wfuse = rndint( MIN_DOWN_FUSE, MAX_DOWN_FUSE );
-	    if ( ! Ships[snum].options[OPT_TERSE] )
-	      stormsg( MSG_COMP, snum, "Weapons overload." );
-	  }
+      if (forreal)
+	{
+	  /* the server will send this message if needed */
+	  Ships[snum].wtemp += ((fuel * TEMPFUEL_FAC) / weaeff ( snum ));
+	  if ( Ships[snum].wtemp < 0.0 )
+	    Ships[snum].wtemp = 0.0;
+	  else if ( Ships[snum].wtemp >= 100.0 )
+	    if ( rnd() < WEAPON_DOWN_PROB )
+	      {
+		Ships[snum].wfuse = rndint( MIN_DOWN_FUSE, MAX_DOWN_FUSE );
+		stormsgf( MSG_COMP, snum, "Weapons overload.",
+			  MSG_FLAGS_TERSABLE);
+	      }
+	}
     }
   else
     {
-      Ships[snum].etemp = Ships[snum].etemp + fuel * TEMPFUEL_FAC / engeff( snum );
-      if ( Ships[snum].etemp < 0.0 )
-	Ships[snum].etemp = 0.0;
-      else if ( Ships[snum].etemp >= 100.0 )
-	if ( rnd() < ENGINE_DOWN_PROB )
-	  {
-	    Ships[snum].efuse = rndint( MIN_DOWN_FUSE, MAX_DOWN_FUSE );
-	    if ( ! Ships[snum].options[OPT_TERSE] )
-	      stormsg( MSG_COMP, snum, "Engines super-heated." );
-	  }
+      if (forreal)
+	{
+	  /* the server will send this message if needed */
+	  Ships[snum].etemp = Ships[snum].etemp + fuel * TEMPFUEL_FAC / engeff( snum );
+	  if ( Ships[snum].etemp < 0.0 )
+	    Ships[snum].etemp = 0.0;
+	  else if ( Ships[snum].etemp >= 100.0 )
+	    if ( rnd() < ENGINE_DOWN_PROB )
+	      {
+		Ships[snum].efuse = rndint( MIN_DOWN_FUSE, MAX_DOWN_FUSE );
+		stormsgf( MSG_COMP, snum, "Engines super-heated.",
+			  MSG_FLAGS_TERSABLE);
+	      }
+	}
     }
   
   return ( TRUE );
@@ -2491,7 +2292,7 @@ void zeroship( int snum )
   Ships[snum].warp = 0.0;
   Ships[snum].dwarp = 0.0;
   Ships[snum].lock = 0;
-  Ships[snum].shup = FALSE;
+  SFSET(snum, SHIP_F_SHUP);
   Ships[snum].shields = 0.0;
   Ships[snum].kills = 0.0;
   Ships[snum].damage = 0.0;
@@ -2503,11 +2304,9 @@ void zeroship( int snum )
   Ships[snum].weapalloc = 0;
   Ships[snum].engalloc = 0;
   Ships[snum].armies = 0;
-  Ships[snum].rmode = FALSE;
-  Ships[snum].cloaked = FALSE;
+  SFCLR(snum, SHIP_F_REPAIR);
+  SFCLR(snum, SHIP_F_CLOAKED);
   Ships[snum].shiptype = ST_SCOUT;
-  for ( i = 0; i < MAXOPTIONS; i = i + 1 )
-    Ships[snum].options[i] = FALSE;
   for ( i = 0; i < NUMPLAYERTEAMS; i = i + 1 )
     {
       Ships[snum].rwar[i] = FALSE;
@@ -2519,16 +2318,16 @@ void zeroship( int snum )
   Ships[snum].sdfuse = 0;
   Ships[snum].lastmsg = 0;
   Ships[snum].alastmsg = 0;
-  Ships[snum].map = FALSE;
+  SFCLR(snum, SHIP_F_MAP);
   Ships[snum].towing = 0;
   Ships[snum].towedby = 0;
   Ships[snum].lastblast = 0.0;
   Ships[snum].lastphase = 0.0;
   Ships[snum].pfuse = 0;
-  Ships[snum].talert = FALSE;
-  Ships[snum].robot = FALSE;
+  SFCLR(snum, SHIP_F_TALERT);
+  SFCLR(snum, SHIP_F_ROBOT);
   Ships[snum].action = 0;
-  for ( i = 0; i < SIZEUSERPNAME; i = i + 1 )
+  for ( i = 0; i < MAXUSERPNAME; i = i + 1 )
     Ships[snum].alias[i] = EOS;
   Ships[snum].ctime = 0;
   Ships[snum].etime = 0;
@@ -2658,4 +2457,33 @@ int KP2DirKey(int *ch)
 
   return(rv);
 }
+
+/* get the current username.  We really only need to look it up once
+   per session... returns a pointer to a static string. */
+char *glname(void)
+{
+#define MAXPWNAME 128
+  struct passwd *pwd = NULL;
+  static char pwname[MAXPWNAME] = "";
+
+  if (pwname[0] == 0)
+    {
+      if ((pwd = getpwuid(geteuid())) == NULL)
+	{
+	  clog("ERROR: glname(): getpwuid(geteuid()) failed: %s",
+	       strerror(errno));
+	  
+	  pwname[0] = 0;
+	}
+      else
+	{
+	  memset(pwname, 0, MAXPWNAME);
+	  strncpy(pwname, pwd->pw_name, MAXPWNAME - 1);
+	}
+    }
+
+  return pwname;
+}
+      
+
 

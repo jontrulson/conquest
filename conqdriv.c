@@ -3,7 +3,7 @@
  *
  * $Id$
  *
- * Copyright 1999 Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
+ * Copyright 1999-2004 Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
  ***********************************************************************/
 
 /**********************************************************************/
@@ -31,15 +31,13 @@
 #include "conf.h"
 #include "global.h"
 
-static char *conqdrivId = "$Id$";
-
 #define SUBMIN_SECONDS 5 	/* seconds between planet movement */
 #define MINUTE_SECONDS 60 
 #define FIVEMINUTE_SECONDS 300 
 
 
 /*  conqdriv - main program (DOES LOCKING) */
-main(int argc, char *argv[])
+int main(int argc, char *argv[])
 {
   int s, i, j, pid, drivtenths, ship[MAXSHIPS + 1];
   int ctime, etime, cacc, eacc;
@@ -48,9 +46,9 @@ main(int argc, char *argv[])
   
   /* First things first. */
   
-  if ((ConquestUID = GetConquestUID()) == ERR)
+  if ((ConquestUID = GetUID(ROOT_USER)) == ERR)
     {
-      fprintf(stderr, "conqdriv: GetConquestUID() failed\n");
+      fprintf(stderr, "conqdriv: GetUID() failed\n");
       exit(1);
     }
   
@@ -81,18 +79,20 @@ main(int argc, char *argv[])
       exit(1);
     }
   
-#ifdef USE_SEMS
   if (GetSem() == ERR)
     {
       fprintf(stderr, "GetSem() failed to get semaphores. exiting.\n");
       exit(1);
     }
-#endif
+
+  /* close all file descriptors */
+  for (i=0; i < FOPEN_MAX; i++)
+    close(i);
   
   map_common();
   
   if ( *CBlockRevision != COMMONSTAMP )
-    error("common block mismatch");
+    clog("conqdriv:ERROR:common block mismatch");
   
 #ifdef SET_PRIORITY
   /* Increase our priority a bit */
@@ -140,14 +140,12 @@ main(int argc, char *argv[])
 	{
 	  PVUNLOCK(&ConqInfo->lockword);
 	  clog("conqdriv: we shouldn't be starting: drivstat = %d\n", Driver->drivstat);
-	  error("conqdriv: We shouldn't be starting...");
 	}
       
       if ( Driver->drivpid != 0 )
 	{
 	  PVUNLOCK(&ConqInfo->lockword);
 	  clog("conqdriv: Driver->drivpid != 0, drivpid = %d", Driver->drivpid);
-	  error("conqdriv: drivpid != 0");
 	}
     }
   else
@@ -164,13 +162,15 @@ main(int argc, char *argv[])
 	    }
 	}
     }
+
   
   Driver->drivstat = DRS_STARTING;		/* show intent of becoming "the" driver */
   rndini( 0, 0 );			/* init random numbers */
   pid = getpid(); /* store our pid */
   Driver->drivpid = pid;
 
-  glname(Driver->drivowner, SIZEUSERNAME);
+  strncpy(Driver->drivowner, glname(), MAXUSERNAME);
+  Driver->drivowner[MAXUSERNAME - 1] = 0;
   
   /* Start within bounds. */
   Driver->drivsecs = modp1( Driver->drivsecs, FIVEMINUTE_SECONDS );
@@ -375,13 +375,10 @@ void iterdrive( int *ship )
 			    {
 			      /* Close enough to orbit. */
 			      orbit( i, j );
-			      if ( ! Ships[i].options[OPT_TERSE] )
-				{
-				  sprintf( buf,
-					 "Coming into orbit around %s.",
-					 Planets[j].name );
-				  stormsg( MSG_COMP, i, buf );
-				}
+			      sprintf( buf,
+				       "Coming into orbit around %s.",
+				       Planets[j].name );
+			      stormsgf( MSG_COMP, i, buf, MSG_FLAGS_TERSABLE );
 			    }
 			}
 		      else if ( ( dis - ORBIT_DIST ) <=
@@ -393,14 +390,11 @@ void iterdrive( int *ship )
 			  if ( Ships[i].dwarp > MAX_ORBIT_WARP )
 			    {
 			      Ships[i].dwarp = MAX_ORBIT_WARP;
-			      if ( ! Ships[i].options[OPT_TERSE] )
-				{
-				  /* "WARNING, WILL ROBINSON!!" */
-				  sprintf( buf,
-					 "Approaching %s - commencing orbital insertion maneuver.",
-					 Planets[j].name );
-				  stormsg( MSG_COMP, i, buf );
-				}
+			      /* "WARNING, WILL ROBINSON!!" */
+			      sprintf( buf,
+				       "Approaching %s - commencing orbital insertion maneuver.",
+				       Planets[j].name );
+			      stormsgf( MSG_COMP, i, buf, MSG_FLAGS_TERSABLE );
 			    }
 			}
 		    }
@@ -455,6 +449,17 @@ void iterdrive( int *ship )
   /* Drive the planet eater. */
   if ( Doomsday->status == DS_LIVE )
     {
+      if (Doomsday->lock < 0 && distf( Doomsday->x, Doomsday->y, 
+				       Planets[-Doomsday->lock].x, 
+				       Planets[-Doomsday->lock].y )
+				 <= DOOMSDAY_DIST)
+      {				/* if we are locked onto a planet, and are
+				   close enough, don't bother getting
+				   any closer
+				   */
+	Doomsday->dx = Doomsday->dy = 0.0;
+      }
+	
       Doomsday->x = Doomsday->x + Doomsday->dx;
       Doomsday->y = Doomsday->y + Doomsday->dy;
     }
@@ -503,7 +508,9 @@ void secdrive( int *ship )
 	    }
 	}
       
-      /* The ship is alive; see if we've been kicked out. */
+      /* The ship is alive */
+
+      /* see if we've been kicked out. */
       if ( Users[Ships[i].unum].ooptions[OOPT_SHITLIST] )
 	{
 	  killship( i, KB_SHIT );
@@ -517,7 +524,7 @@ void secdrive( int *ship )
 	  }
       
       /* The ship is still alive. */
-      if ( Ships[i].robot )
+      if ( SROBOT(i) )
 	if ( ! ConqInfo->externrobots )
 	  robotai( i );
       
@@ -525,38 +532,39 @@ void secdrive( int *ship )
       warp = Ships[i].warp;
       pnum = -Ships[i].lock;
       if ( pnum > 0 && pnum <= NUMPLANETS )
-	if ( warp < 0.0 )
-	  {
-	    /* Orbiting. */
-	    if ( warp == ORBIT_CW )
-	      {
-		/* Orbiting clockwise. */
-		Ships[i].head = mod360( Ships[i].head - ORBIT_FAC );
-		
-		Ships[i].x = (real)(Planets[pnum].x + (ORBIT_DIST * 
-					   cosd(Ships[i].head + 90.0)));
-		
-		Ships[i].y = (real)(Planets[pnum].y + (ORBIT_DIST * 
-					   sind(Ships[i].head + 90.0)));
-	      }
-	    else if ( warp == ORBIT_CCW )
-	      {
-		/* Orbiting counter-clockwise. */
-		Ships[i].head = mod360( Ships[i].head + ORBIT_FAC );
-
-		Ships[i].x = (real)(Planets[pnum].x + (ORBIT_DIST * 
-					   cosd(Ships[i].head - 90.0)));
-
-		Ships[i].y = (real)(Planets[pnum].y + (ORBIT_DIST * 
-					   sind(Ships[i].head - 90.0)));
-	      }
-	  }
-	else
-	  {
-	    /* Cruising, locked on; update ship's desired heading. */
-	    Ships[i].dhead = (real) angle(Ships[i].x, Ships[i].y, Planets[pnum].x, Planets[pnum].y);
-	  }
-      
+	{
+	  if ( warp < 0.0 )
+	    {
+	      /* Orbiting. */
+	      if ( warp == ORBIT_CW )
+		{
+		  /* Orbiting clockwise. */
+		  Ships[i].head = mod360( Ships[i].head - ORBIT_FAC );
+		  
+		  Ships[i].x = (real)(Planets[pnum].x + (ORBIT_DIST * 
+							 cosd(Ships[i].head + 90.0)));
+		  
+		  Ships[i].y = (real)(Planets[pnum].y + (ORBIT_DIST * 
+							 sind(Ships[i].head + 90.0)));
+		}
+	      else if ( warp == ORBIT_CCW )
+		{
+		  /* Orbiting counter-clockwise. */
+		  Ships[i].head = mod360( Ships[i].head + ORBIT_FAC );
+		  
+		  Ships[i].x = (real)(Planets[pnum].x + (ORBIT_DIST * 
+							 cosd(Ships[i].head - 90.0)));
+		  
+		  Ships[i].y = (real)(Planets[pnum].y + (ORBIT_DIST * 
+							 sind(Ships[i].head - 90.0)));
+		}
+	    }
+	  else
+	    {
+	      /* Cruising, locked on; update ship's desired heading. */
+	      Ships[i].dhead = (real) angle(Ships[i].x, Ships[i].y, Planets[pnum].x, Planets[pnum].y);
+	    }
+	}
       /* Ships - Teams. */
       for ( j = 0; j <  NUMPLAYERTEAMS; j = j + 1 )
 	if ( Ships[i].scanned[j] > 0 )
@@ -584,7 +592,7 @@ void secdrive( int *ship )
 	    /* Does the planet scan us? */
 	    if ( j <= NUMPLANETS )
 	      if ( dis <= ACCINFO_DIST )
-		if ( ! Ships[i].cloaked )
+		if ( ! SCLOAKED(i) )
 		  {
 		    k = Planets[j].team;
 		    if ( k >= 0 && k <  NUMPLAYERTEAMS )
@@ -595,7 +603,10 @@ void secdrive( int *ship )
       /* Planet eater. */
       if ( Doomsday->status == DS_LIVE )
 	if ( dist( Ships[i].x, Ships[i].y, Doomsday->x, Doomsday->y ) <= DOOMSDAY_DIST )
-	  hit( i, rndnor( DOOMSDAY_HIT, 1.0 ), KB_DOOMSDAY );
+	  {
+	    hit( i, rndnor( DOOMSDAY_HIT, 1.0 ), KB_DOOMSDAY );
+	  }
+   
       
       /* Negative energy barrier. */
       if ( fabs( Ships[i].x ) >= NEGENB_DIST || fabs(Ships[i].y) >= NEGENB_DIST )
@@ -608,16 +619,16 @@ void secdrive( int *ship )
 	{
 	  /* Shields repair twice as fast when they're down. */
 	  x = SHIELD_FAC;
-	  if ( ! Ships[i].shup )
+	  if ( ! SSHUP(i) )
 	    x = x * 2.0;
 	  Ships[i].shields = min( 100.0, Ships[i].shields + x );
 	}
       
       /* Repair. */
       repair = REPAIR_FAC;
-      if ( Ships[i].rmode )
+      if ( SREPAIR(i) )
 	{
-	  Ships[i].cloaked = FALSE;
+	  SFCLR(i, SHIP_F_CLOAKED);
 	  if ( Ships[i].warp >= 0.0 )
 	    Ships[i].dwarp = 0.0;
 	  repair = repair * RMODE_REPAIR_MULT;
@@ -630,8 +641,8 @@ void secdrive( int *ship )
       if ( Ships[i].damage < 0.0 )
 	{
 	  Ships[i].damage = 0.0;
-	  if ( Ships[i].rmode )
-	    Ships[i].rmode = FALSE;
+	  if ( SREPAIR(i) )
+	    SFCLR(i, SHIP_F_REPAIR);
 	}
       
       /* Weapons/engines down fuses. */
@@ -639,16 +650,16 @@ void secdrive( int *ship )
 	{
 	  Ships[i].wfuse = Ships[i].wfuse - 1;
 	  if ( Ships[i].wfuse <= 0 )
-	    if ( ! Ships[i].options[OPT_TERSE] )
-	      stormsg( MSG_COMP, i, "Weapons are back on-line." );
+	    stormsgf( MSG_COMP, i, "Weapons are back on-line.",
+		      MSG_FLAGS_TERSABLE);
 	}
       if ( Ships[i].efuse > 0 )
 	{
 	  Ships[i].efuse = Ships[i].efuse - 1;
 	  Ships[i].dwarp = 0.0;
 	  if ( Ships[i].efuse <= 0 )
-	    if ( ! Ships[i].options[OPT_TERSE] )
-	      stormsg( MSG_COMP, i, "Engine power has been restored." );
+	    stormsgf( MSG_COMP, i, "Engine power has been restored.",
+		      MSG_FLAGS_TERSABLE);
 	}
       
       /* Fuel. */
@@ -658,7 +669,7 @@ void secdrive( int *ship )
 	{
 	  /* You get fuel for orbiting friendly, populated class M, */
 	  /*  with shields down. */
-	  if ( ! Ships[i].shup || Ships[i].rmode )
+	  if ( ! SSHUP(i) || SREPAIR(i) )
 	    if ( Planets[-Ships[i].lock].type == PLANET_CLASSM )
 	      if ( ! spwar( i,-Ships[i].lock ) )
 		if ( Planets[-Ships[i].lock].armies > 0 )
@@ -673,7 +684,7 @@ void secdrive( int *ship )
 	   * ie: your fuel consumption should be based on how
 	   * fast your going, not how fast you *want* to go.
 	   */
-	  if ( Ships[i].shup )
+	  if ( SSHUP(i) )
 	    dec = dec + Ships[i].warp * FUELWARP_FAC * FUELSHIELDS_MULT;
 	  else
 	    dec = dec + Ships[i].warp * FUELWARP_FAC;
@@ -682,7 +693,7 @@ void secdrive( int *ship )
 	  
 	  if ( Ships[i].towing != 0 )
 	    {
-	      if ( Ships[Ships[i].towing].shup )
+	      if ( SSHUP(Ships[i].towing) )
 		dec = dec + Ships[i].warp * FUELWARP_FAC * FUELSHIELDS_MULT;
 	      else
 		dec = dec + Ships[i].warp * FUELWARP_FAC;
@@ -691,16 +702,16 @@ void secdrive( int *ship )
 	    }
 	}
       /* Cloaking. */
-      if ( Ships[i].cloaked )
+      if ( SCLOAKED(i) )
 	{
-	  Ships[i].rmode = FALSE;
+	  SFCLR(i, SHIP_F_REPAIR);
 	  dec = dec + CLOAK_FUEL;
 	  if ( Ships[i].warp > 0.0 )
 	    dec = dec + Ships[i].dwarp * CLOAK_WARP_FUEL;
 	}
       Ships[i].fuel = min( 999.0, Ships[i].fuel + inc );
       if ( dec > 0.0 )
-	usefuel( i, dec, FALSE );
+	usefuel( i, dec, FALSE, TRUE );
       
       /* Cool-down. */
       if ( Ships[i].warp < 0.0 && !spwar( i,-Ships[i].lock) 
@@ -765,7 +776,7 @@ void secdrive( int *ship )
 			/* Proximity check for the doomsday machine. */
 			if ( Doomsday->status == DS_LIVE )
 			  if ( distf( Ships[i].torps[j].x, Ships[i].torps[j].y, Doomsday->x, Doomsday->y ) <=
-			      TORPEDO_PROX )
+			      (TORPEDO_PROX * 3.0))
 			    {
 			      detonate( i, j );
 			      break;
@@ -777,7 +788,10 @@ void secdrive( int *ship )
     }
   /* Finish up torp alert logic. */
   for ( i = 1; i <= MAXSHIPS; i = i + 1 )
-    Ships[i].talert = talert[i];
+    if (talert[i])
+      SFSET(i, SHIP_F_TALERT);
+    else
+      SFCLR(i, SHIP_F_TALERT);
   
   /* Planet eater. */
   if ( Doomsday->status == DS_LIVE )
@@ -876,7 +890,13 @@ void mindrive(void)
       if ( Teams[i].couptime > 0 )
 	Teams[i].couptime = Teams[i].couptime - 1;
     }
-  
+
+  /* look for vacant ships that aren't marked vacant */
+  for (i=1; i <= MAXSHIPS; i++)
+    if (Ships[i].status == SS_LIVE && !SVACANT(i))
+      if (Ships[i].pid > 0 && !CheckPid(Ships[i].pid))
+	SFSET(i, SHIP_F_VACANT);
+
   for ( i = 1; i <= NUMPLANETS; i = i + 1 )
     {
       /* Decrement puninhabtime(). */
@@ -910,33 +930,37 @@ void fivemindrive(void)
   PVLOCK(&ConqInfo->lockword);
   for ( i = 1; i <= NUMPLANETS; i = i + 1 )
     if (Planets[i].type != PLANET_SUN)
-      if ( Planets[i].armies > 0 && Planets[i].team != TEAM_GOD )
-	if ( Planets[i].armies < SPARSE_THRESH )
+      {
+	if ( Planets[i].armies > 0 && Planets[i].team != TEAM_GOD )
 	  {
-	    if ( rnd() <= SPARSE_REPOP_PROB )
-	      Planets[i].armies = Planets[i].armies + 1;
-	  }
-	else
-	  {
-	    if ( Planets[i].type == PLANET_CLASSM )
-	      thresh = MALTHUS_M_THRESH;
-	    else
-	      thresh = MALTHUS_D_THRESH;
-	    
-	    if ( Planets[i].armies >= thresh && rnd() <= MALTHUS_PROB )
+	    if ( Planets[i].armies < SPARSE_THRESH )
 	      {
-		r = rnd();	/* save to avoid the unfortunate side effects of
+		if ( rnd() <= SPARSE_REPOP_PROB )
+		  Planets[i].armies = Planets[i].armies + 1;
+	      }
+	    else
+	      {
+		if ( Planets[i].type == PLANET_CLASSM )
+		  thresh = MALTHUS_M_THRESH;
+		else
+		  thresh = MALTHUS_D_THRESH;
+		
+		if ( Planets[i].armies >= thresh && rnd() <= MALTHUS_PROB )
+		  {
+		    r = rnd();	/* save to avoid the unfortunate side effects of
 				   max() bieng a macro (rnd() actually got exc'd
 				   twice, resluting in an occasional 0 return val) */
-		
-		Planets[i].armies = max( round( Planets[i].armies * r ), 1 );
-	      }
-	    else
-	      {
-		Planets[i].armies = Planets[i].armies +
-		  rndint( REPOP_LOWER_BOUND, REPOP_UPPER_BOUND );
+		    
+		    Planets[i].armies = max( round( Planets[i].armies * r ), 1 );
+		  }
+		else
+		  {
+		    Planets[i].armies = Planets[i].armies +
+		      rndint( REPOP_LOWER_BOUND, REPOP_UPPER_BOUND );
+		  }
 	      }
 	  }
+      }
   PVUNLOCK(&ConqInfo->lockword);
   
   return;

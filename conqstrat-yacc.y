@@ -38,8 +38,6 @@
 int rulenum, trstrat[MAX_VAR][10], trvec[32];
 int debug_scanner, verbose;
 
-static char buf[MAXLINE];
-static int i;
 static int UpdateCmnBlock = FALSE;
 
 extern int Lineno;
@@ -97,9 +95,8 @@ expr		:	TOK_VARIABLE TOK_OPERATOR TOK_NUMBER
 %%
 
 /* conqstrat - main program */
-main(int argc, char **argv)
+int main(int argc, char **argv)
 {
-  int i;
   extern char *optarg;
   extern int optind, opterr, optopt;
   char filename[FILENAMESIZE];
@@ -311,7 +308,7 @@ void dumprule( int action )
 
       if (debug_scanner)
 	{
-	  fprintf(stderr, "\t\tDEBUG:dumprule(): tbits = %b\n", tbits);
+	  fprintf(stderr, "\t\tDEBUG:dumprule(): tbits = 0x%08X\n", tbits);
 	}
 
 	if ( ( tbits & ibset( 0, rulenum ) ) == 0 )

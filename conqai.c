@@ -4,7 +4,7 @@
  *
  * $Id$
  *
- * Copyright 1999 Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
+ * Copyright 1999-2004 Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
  ***********************************************************************/
 
 /*            Copyright (C)1983-1986 by Jef Poskanzer and Craig Leres */
@@ -81,7 +81,7 @@ void buildai( int snum, int vars[], int *bnenum, real *bdne, real *bane )
   *bdne = 1e9;
   if ( findspecial( snum, SPECIAL_ENEMYSHIP, 0, bnenum, &xnenum ) )
     {
-      if ( Ships[*bnenum].cloaked )
+      if ( SCLOAKED(*bnenum) )
 	{
 	  x = rndnor( Ships[*bnenum].x, CLOAK_SMEAR_DIST );
 	  y = rndnor( Ships[*bnenum].y, CLOAK_SMEAR_DIST );
@@ -97,7 +97,7 @@ void buildai( int snum, int vars[], int *bnenum, real *bdne, real *bane )
       /* Enemy is cloaked (-) */
       if ( *bdne < ACCINFO_DIST )
 	{
-	  AIBOOLEAN( vars[VAR_ENEMYCLOAKED], Ships[*bnenum].cloaked == TRUE );
+	  AIBOOLEAN( vars[VAR_ENEMYCLOAKED], SCLOAKED(*bnenum));
 	  AISCALE( vars[VAR_ENEMYDAMAGE], Ships[*bnenum].damage, 10.0 );
 	} 
     }
@@ -107,7 +107,7 @@ void buildai( int snum, int vars[], int *bnenum, real *bdne, real *bane )
   AISCALE( vars[VAR_DAMAGE], Ships[snum].damage, 10.0 );
   
   /* Possible ship damage from enemy torps (10) */
-  if ( Ships[snum].talert )
+  if ( STALERT(snum) )
     {
       dam = 0.0;
       for ( i = 1; i <= MAXSHIPS; i = i + 1 )
@@ -154,13 +154,13 @@ void buildai( int snum, int vars[], int *bnenum, real *bdne, real *bane )
   AISCALE( vars[VAR_WARP], Ships[snum].dwarp, 1.0 );
   
   /* Ship shields are up (-) */
-  AIBOOLEAN( vars[VAR_SHUP], Ships[snum].shup );
+  AIBOOLEAN( vars[VAR_SHUP], SSHUP(snum) );
   
   /* Are in repair mode (-) */
-  AIBOOLEAN( vars[VAR_REPAIRING], Ships[snum].rmode );
+  AIBOOLEAN( vars[VAR_REPAIRING], SREPAIR(snum) );
   
   /* Are cloaked (-) */
-  AIBOOLEAN( vars[VAR_CLOAKED], Ships[snum].cloaked );
+  AIBOOLEAN( vars[VAR_CLOAKED], SCLOAKED(snum) );
   
   /* Weapons are allocated (-) */
   AIBOOLEAN( vars[VAR_WALLOC], Ships[snum].weapalloc > 50 );
@@ -295,7 +295,7 @@ void executeai( int snum, int token )
 		 Ships[snum].dhead = Ships[snum].head; \
 	}                      \
 	if ( (x) > 0.0 )             \
-		 Ships[snum].rmode = FALSE;  \
+		 SFCLR(snum, SHIP_F_REPAIR);  \
 	Ships[snum].dwarp = (x);          \
   }
     
@@ -365,7 +365,10 @@ void executeai( int snum, int token )
       launch( snum, ane, 3, LAUNCH_NORMAL );
       break;
     case ROB_SHIELD:
-      Ships[snum].shup = (Ships[snum].shup) ? FALSE : TRUE;
+      if (SSHUP(snum))
+	SFCLR(snum, SHIP_F_SHUP);
+      else
+	SFSET(snum, SHIP_F_SHUP);
       break;
     case ROB_WARP_0:
       SETWARP( 0.0 );
@@ -386,13 +389,16 @@ void executeai( int snum, int token )
       SETCOURSE( mod360( ane + 180.0 + rnduni( -10.0, 10.0 ) ) );
       break;
     case ROB_SILENT:
-      if ( ! Ships[snum].cloaked )
+      if ( ! SCLOAKED(snum) )
 	Ships[snum].dwarp = 0.0;
-      Ships[snum].cloaked = ! Ships[snum].cloaked;
+      if (SCLOAKED(snum))
+	SFCLR(snum, SHIP_F_CLOAKED);
+      else
+	SFSET(snum, SHIP_F_CLOAKED);
       break;
     case ROB_INSULT:
       robreply( buf );
-      stormsg( snum, nenum, buf );
+      stormsgf( snum, nenum, buf, MSG_FLAGS_ROBOT );
       break;
     case ROB_READMSG:
       /* Try to read a message and reply to it */
@@ -407,26 +413,26 @@ void executeai( int snum, int token )
 		continue; 	/* don't talk back to planets */
 
 	      if ( j > 0 && j <= MAXSHIPS )
-		if ( Ships[j].robot )
+		if ( SROBOT(j) )
 		  continue; 	/* don't talk back to robots */
 
 	      if (j == MSG_GOD)
 		continue;	/* don't talk back to GOD */
 
-	      if (j == MSG_COMP)
+	      if (j == MSG_COMP || (Msgs[i].flags & MSG_FLAGS_TERSABLE))
 		continue;	/* don't talk back to the computer */
    
 	      robreply( buf );
-	      stormsg( snum, j, buf );
+	      stormsgf( snum, j, buf, MSG_FLAGS_ROBOT );
 	      break;
 	    }
 	}
       break;
     case ROB_MESSAGE:
-      stormsg( snum, MSG_ALL, "Give me drugs." );
+      stormsgf( snum, MSG_ALL, "Give me drugs.", MSG_FLAGS_ROBOT );
       break;
     case ROB_TAKEDRUGS:
-      stormsg( snum, MSG_ALL, "I'm on drugs." );
+      stormsgf( snum, MSG_ALL, "I'm on drugs.", MSG_FLAGS_ROBOT );
       break;
     case ROB_DETONATE:
       enemydet( snum );
@@ -445,7 +451,7 @@ void executeai( int snum, int token )
 	  }
       break;
     case ROB_REPAIR:
-      Ships[snum].rmode = TRUE;
+      SFSET(snum, SHIP_F_REPAIR);
       break;
     default:
       robstr( token, buf );
@@ -523,7 +529,7 @@ int newrob( int *snum, int unum )
   /* Initialize the ship. */
   PVLOCK(&ConqInfo->lockword);
   initship( *snum, unum );
-  Ships[*snum].robot = TRUE;			/* we're a robot */
+  SFSET(*snum, SHIP_F_ROBOT);			/* we're a robot */
 
 				/* see if we should randomize it's strength
 				   otherwise do nothing since sstrkills
@@ -553,16 +559,6 @@ int newrob( int *snum, int unum )
 				   initship(). */
   Ships[*snum].weapalloc = 30;
   Ships[*snum].engalloc = 100 - Ships[*snum].weapalloc;
-
-  
-  for ( i = 0; i < MAXOPTIONS; i = i + 1 )
-    Ships[*snum].options[i] = Users[unum].options[i];
-
-  Ships[*snum].options[OPT_INTRUDERALERT] = TRUE; /* want intruder alerts */
-  Ships[*snum].options[OPT_TERSE] = TRUE; /* don't want stupid
-					     messages */
-  Ships[*snum].options[OPT_ALARMBELL] = FALSE; /* don't want beeping during a
-						  watch */
 
   for ( i = 0; i < NUMPLAYERTEAMS; i = i + 1 )
     {
@@ -674,7 +670,7 @@ void robotloop(void)
     {
       for ( s = 1; s <= MAXSHIPS; s = s + 1 )
 	if ( Ships[s].status == SS_LIVE )
-	  if ( Ships[s].robot )
+	  if ( SROBOT(s) )
 	    {
 	      /* This code taken from conqdriv. */
 	      initstats( &Ships[s].ctime, &j );
@@ -698,7 +694,7 @@ void robotloop(void)
 /*    robreply( buf ) */
 void robreply( char buf[] )
 {
-  const int NUMRREPLIES = 59;
+  const int NUMRREPLIES = 60;
   static char *robreplies[] = {
     "Hey sucker, eat me!",
     "Take off, eh?",
@@ -722,6 +718,7 @@ void robreply( char buf[] )
     "Do not worry about birth control devices, I have many.",
     "I bet you only talk big.",
     "Kiss my ram memory.",
+    "Kiss my shiny metal ass.",
     "Do you think we can use battery operated devices under water?",
     "Nothing shocks me - I'm a robot.",
     "Ok, eh?",

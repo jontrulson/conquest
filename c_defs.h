@@ -5,7 +5,7 @@
  *
  * $Id$
  *
- * Copyright 1999 Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
+ * Copyright 1999-2004 Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
  ************************************************************************/
 
 /**********************************************************************/
@@ -24,8 +24,15 @@
 # include <limits.h>
 #endif
 
-#if defined(HAVE_UNISTD_H)
+#if defined(HAVE_SYS_TYPES_H)
 # include <sys/types.h>
+#endif
+
+#if defined(HAVE_UNISTD_H)
+# if defined(LINUX)
+#  define _XOPEN_SOURCE
+#  define __USE_XOPEN		/* Why? */
+# endif
 # include <unistd.h>
 #endif 
 
@@ -37,6 +44,16 @@
 # include <signal.h>
 # include <stdarg.h>
 #endif 
+
+/* JET - need checks here? */
+#include <sys/ioctl.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <netinet/tcp.h>
+#include <arpa/inet.h>
+#include <netdb.h>
+#include <fcntl.h>
+
 
 #if defined(HAVE_STRING_H)
 # include <string.h>
@@ -184,11 +201,6 @@ typedef double real;
 #define max(x, y) (((x) > (y)) ? (x) : (y))
 #define max0(x, y) max((x), (y))
 #define fold(x) /* Who knows what this does... */
-#define glname(x, y) {\
-                      strncpy((char *)x, (char *)cuserid(NULL), y - 1); \
-                      x[y - 1] = EOS; \
-		     }
-      
 #define ifix(x) ((int) (x))
 
 /* Function prototypes for ratfor.c */
@@ -264,6 +276,7 @@ void appnumtim( int now[], char *buf );
 void appsstatus( int status, char *buf );
 void apptitle( int team, char *buf );
 int arrows( char *str, real *dir );
+void setSystemLog(int usesys);
 void cerror(char *fmt, ...);
 void clog(char *fmt, ...);
 int confirm(void);
@@ -304,11 +317,11 @@ void infoplanet( char *str, int pnum, int snum );
 char *ETAstr(real warp, real distance);
 void infoship( int snum, int scanner );
 void killship( int snum, int kb );
+int checklaunch( int snum, int number );
 int launch( int snum, real dir, int number, int ltype );
 void orbit( int snum, int pnum );
 int phaser( int snum, real dir );
 real phaserhit( int snum, real dis );
-void pseudo( int unum, int snum );
 void planlist( int team, int snum );
 void playlist( int godlike, int doall, int snum );
 void resign( int unum, int isoper );
@@ -320,7 +333,6 @@ void userlist( int godlike, int snum );   /* dwp */
 void userstats( int godlike , int snum ); /* dwp */
 void statline( int unum, char *buf );
 void zeroplanet( int pnum, int snum );
-int IsRemoteUser(void);
 
 /** conqmisc.c */
 
@@ -355,17 +367,20 @@ real newarp( int snum, real dwarp );
 int phoon( int pnum );
 void puthing( int what, int lin, int col );
 void putship( int snum, real basex, real basey );
-void sendmsg( int from, int terse );
+void sendMsg( int from, int terse );
 int readmsg( int snum, int msgnum, int dsplin );
 int stillalive( int snum );
 void zeroeverything(void);
 void stormsg( int from, int to, char *msg );
+void stormsgf( int from, int to, char *msg, unsigned char flags );
 void zeroship( int snum );
 int planmatch(char *str, int *pnum, int godlike);
-int usefuel( int snum, real fuel, int weapon );
+int usefuel( int snum, real fuel, int weapon, int test );
 int findspecial( int snum, int token, int count, int *sorpnum, int *xsorpnum );
 int KPAngle(int ch, real *angle);
 int KP2DirKey(int *ch);
+int fmtmsg(int to, int from, char *buf);
+char *glname(void);
 
 /* cd2lb.c */
 
@@ -449,17 +464,9 @@ void SigTerminate(int sig);
 
 /* conqsvr42.c */
 
-int GetConquestUID(void);
+int GetUID(char *name);
 int GetConquestGID(void);
-void astoff(void);
-void aston(void);
-void EnableConquestSignalHandler(void);
-void EnableConqoperSignalHandler(void);
-void DoConquestSig(int sig);
-void DoConqoperSig(int sig);
-void astservice(int sig);	/* our SIGALARM handler */
 void comsize( unsigned long *size );
-void conqend(void);
 void conqinit(void);
 void conqstats( int snum );
 void drcheck(void);
@@ -474,11 +481,6 @@ int isagod( int unum );
 void news(void);
 int mailimps( char *subject, char *msg);
 int CheckPid(int pidnum);
-
-void settimer(void);
-void setopertimer(void);
-void stoptimer(void);
-
 void upchuck(void);
 void upstats( int *ctemp, int *etemp, int *caccum, int *eaccum, int *ctime, int *etime );
 
@@ -505,41 +507,6 @@ int iogchar ( void );
 int iogtimed ( int *ch, real seconds );
 void ioeat(void);
 
-/* conqcm.c */
-char *mymalloc(int size);
-void map_common(void);
-void lock_common(void);
-void flush_common(void);
-int check_cblock(char *fname, int fmode, int sizeofcb);
-#ifndef USE_PVLOCK
-# define PVLOCK(x)
-# define PVUNLOCK(x)
-#else
- void PVLOCK(int *);
- void PVUNLOCK(int *);
-#endif
-void zero_common(void);
-
-
-/* ibuf.c */
-
-void iBufInit(void);
-int iBufEmpty(void);
-void iBufPut(char *thestr);
-void iBufPutc(char thechar);
-char iBufGetCh(void);
-int DoMacro(int ch);
-
-/* conf.c */
-
-int GetSysConf(int checkonly);
-int GetConf(int isremote, int usernum);
-int MakeSysConf(void);
-int SaveUserConfig(int unum);
-int SaveSysConfig(void);
-char *Str2Macro(char *str);
-char *Macro2Str(char *str);
-
 /* sem.c */
 
 char *getsemtxt(int what);
@@ -556,10 +523,6 @@ void do_bottomborder(int snum, char *buf, int attrib, int bufattrib);
 void do_border(int snum, int attr);
 int alertcolor(int alert);
 void draw_alertborder(int snum, int alert);
-
-/* userauth.c */
-int Logon(char *username, char *password);
-void ChangePassword(int unum, int godlike);
 
 /* options.c */
 void SysOptsMenu(void);

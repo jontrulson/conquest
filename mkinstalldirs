@@ -5,7 +5,7 @@
 # Public domain
 
 errstatus=0
-dirmode=""
+dirmode="755"
 
 usage="\
 Usage: mkinstalldirs [-h] [--help] [-m mode] dir ..."

@@ -3,25 +3,8 @@
  *
  * $Id$
  *
- * Copyright 1999 Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
+ * Copyright 1999-2004 Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
  ***********************************************************************/
-
-/*                              C O N Q C O M */
-/*            Copyright (C)1983-1986 by Jef Poskanzer and Craig Leres */
-/*    Permission to use, copy, modify, and distribute this software and */
-/*    its documentation for any purpose and without fee is hereby granted, */
-/*    provided that this copyright notice appear in all copies and in all */
-/*    supporting documentation. Jef Poskanzer and Craig Leres make no */
-/*    representations about the suitability of this software for any */
-/*    purpose. It is provided "as is" without express or implied warranty. */
-
-/**********************************************************************/
-/* Unix/C specific porting and supporting code Copyright (C)1994-1996 */
-/* by Jon Trulson <jon@radscan.com> under the same terms and          */
-/* conditions of the original copyright by Jef Poskanzer and Craig    */
-/* Leres.                                                             */
-/*                                                                    */
-/**********************************************************************/
 
 #ifndef CONQCOM_H
 #define CONQCOM_H
@@ -43,6 +26,29 @@
 #include "conqinfo.h"
 #include "history.h"
 #include "robot.h"
+
+/* for mapping variables into the common block */
+#define map1d(thevarp, thetype, size) {  \
+              thevarp = (thetype *) (cBasePtr + coff); \
+              coff += (sizeof(thetype) * (size)); \
+}
+
+#define CMN_MODE 0660		/* mode of a new common block */
+
+
+/* conqcm.c */
+char *mymalloc(int size);
+void map_common(void);
+void fake_common(void);		/* malloc cmn rather than map */
+void lock_common(void);
+void flush_common(void);
+int check_cblock(char *fname, int fmode, int sizeofcb);
+
+void PVLOCK(int *);
+void PVUNLOCK(int *);
+
+void zero_common(void);
+void fake_common(void);
 
 				/* The Common Block in all it's majesty */
 

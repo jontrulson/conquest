@@ -4,7 +4,7 @@
  *
  * $Id$
  *
- * Copyright 1999 Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
+ * Copyright 1999-2004 Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
  ***********************************************************************/
 
 /*                               C O N Q O P E R */
@@ -25,14 +25,18 @@
 /**********************************************************************/
 
 #define NOEXTERN
+#include "global.h"
+#include "conf.h"
 #include "conqdef.h"
 #include "conqcom.h"
 #include "context.h"
 #include "global.h"
 #include "color.h"
 #include "record.h"
+#include "display.h"
+#include "clientlb.h"
+#include "clntauth.h"
 
-static char *conqoperId = "$Id$";
 static char cbuf[MID_BUFFER_SIZE]; /* general purpose buffer */
 
 				/* option masks */
@@ -44,8 +48,14 @@ static char cbuf[MID_BUFFER_SIZE]; /* general purpose buffer */
 
 static char operName[MAXUSERNAME];
 
+void DoConqoperSig(int sig);
+void astoperservice(int sig);
+void EnableConqoperSignalHandler(void);
+void operStopTimer(void);
+void operSetTimer(void);
+
 /*  conqoper - main program */
-main(int argc, char *argv[])
+int main(int argc, char *argv[])
 {
   int i;
   char msgbuf[128];
@@ -58,7 +68,8 @@ main(int argc, char *argv[])
 
   OptionAction = OP_NONE;
 
-  glname( operName, MAXUSERNAME );
+  strncpy(operName, glname(), MAXUSERNAME);
+  operName[MAXUSERNAME - 1] = 0;
 
   if ( ! isagod(-1) )
     {
@@ -107,9 +118,9 @@ main(int argc, char *argv[])
 	break;
       }
 
-  if ((ConquestUID = GetConquestUID()) == ERR)
+  if ((ConquestUID = GetUID(ROOT_USER)) == ERR)
     {
-      fprintf(stderr, "conqoper: GetConquestUID() failed\n");
+      fprintf(stderr, "conqoper: GetUID() failed\n");
       exit(1);
     }
   
@@ -129,13 +140,11 @@ main(int argc, char *argv[])
 	  exit(1);
 	}
 
-#ifdef USE_SEMS
       if (GetSem() == ERR)
 	{
 	  fprintf(stderr, "GetSem() failed to get semaphores. exiting.\n");
 	  exit(1);
 	}
-#endif
 
       GetSysConf(TRUE);		/* init defaults... */
       map_common();		/* Map the conquest universe common block */
@@ -193,7 +202,9 @@ main(int argc, char *argv[])
       ;
     }
 
-  if (GetConf(FALSE, 0) == ERR)	/* use one if there, else defaults
+  Context.updsec = 2;		/* default upd per sec */
+
+  if (GetConf(0) == ERR)	/* use one if there, else defaults
 				   A missing or out-of-date conquestrc file
 				   will be ignored */
     {
@@ -213,13 +224,11 @@ main(int argc, char *argv[])
       exit(1);
     }
   
-#ifdef USE_SEMS
   if (GetSem() == ERR)
     {
       fprintf(stderr, "GetSem() failed to get semaphores. exiting.\n");
       exit(1);
     }
-#endif
   
 #ifdef SET_PRIORITY
   /* Increase our priority a bit */
@@ -258,6 +267,7 @@ main(int argc, char *argv[])
   sprintf(msgbuf, "OPER: User %s has entered conqoper.",
           operName);
   clog(msgbuf);			/* log it too... */
+  stormsg( MSG_COMP, MSG_GOD, msgbuf );
 
   operate();
   
@@ -280,14 +290,16 @@ void bigbang(void)
   cnt = 0;
   for ( snum = 1; snum <= MAXSHIPS; snum = snum + 1 )
     if ( Ships[snum].status == SS_LIVE )
-      for ( i = 0; i < MAXTORPS; i = i + 1 )
-	if ( ! launch( snum, dir, 1, LAUNCH_NORMAL ) )
-	  break;
-	else
-	  {
-	    dir = mod360( dir + 40.0 );
-	    cnt = cnt + 1;
-	  }
+      {
+	for ( i = 0; i < MAXTORPS; i = i + 1 )
+	  if ( ! launch( snum, dir, 1, LAUNCH_NORMAL ) )
+	    break;
+	  else
+	    {
+	      dir = mod360( dir + 40.0 );
+	      cnt = cnt + 1;
+	    }
+      }
   cprintf(MSG_LIN1,0,ALIGN_CENTER, 
   "#%d#bigbang: Fired #%d#%d #%d#torpedos, hoo hah won't they be surprised!", 
 	InfoColor,SpecialColor,cnt,InfoColor );
@@ -341,7 +353,7 @@ void debugdisplay( int snum )
   cprintf(lin,tcol,ALIGN_NONE,"#%d#%s",LabelColor, "    ship:");
   buf[0] = EOS;
   appship( snum, buf );
-  if ( Ships[snum].robot )
+  if ( SROBOT(snum) )
     appstr( " (ROBOT)", buf );
   cprintf( lin, dcol,ALIGN_NONE,"#%d#%s",InfoColor,buf );
   lin++;
@@ -440,7 +452,7 @@ void debugdisplay( int snum )
     {
       sprintf( buf, "%d ", i );
     }
-  if ( Ships[snum].cloaked )
+  if ( SCLOAKED(snum) )
     appstr( "(CLOAKED)", buf );
   cprintf(lin,dcol,ALIGN_NONE,"#%d#%s",LabelColor, buf);
   lin++;
@@ -477,14 +489,14 @@ void debugdisplay( int snum )
   lin++;
   cprintf(lin,tcol,ALIGN_NONE,"#%d#%s",LabelColor, "   shields:");
   cprintf(lin,dcol,ALIGN_NONE,"#%d#%0d",InfoColor, round(Ships[snum].shields));
-  if ( ! Ships[snum].shup )
+  if ( ! SSHUP(snum) )
   	cprintf(lin,dcol+5,ALIGN_NONE,"#%d#%c",InfoColor, 'D');
   else
   	cprintf(lin,dcol+5,ALIGN_NONE,"#%d#%c",InfoColor, 'U');
   lin++;
   cprintf(lin,tcol,ALIGN_NONE,"#%d#%s",LabelColor, "   sdamage:");
   cprintf(lin,dcol,ALIGN_NONE,"#%d#%0d",InfoColor, round(Ships[snum].damage));
-  if ( Ships[snum].rmode )
+  if ( SREPAIR(snum) )
   	cprintf(lin,dcol+5,ALIGN_NONE,"#%d#%c",InfoColor, 'R');
   lin++;
   cprintf(lin,tcol,ALIGN_NONE,"#%d#%s",LabelColor, "  stowedby:");
@@ -529,26 +541,13 @@ void debugdisplay( int snum )
   buf[NUMPLAYERTEAMS+2] = EOS;
   cprintf(lin,dcol,ALIGN_NONE,"#%d#%s",InfoColor, buf);
   
+  lin ++;
+
+  cprintf(lin,tcol,ALIGN_NONE,"#%d#%s",LabelColor, "     flags:");
+  cprintf(lin,dcol,ALIGN_NONE,"#%d#0x%04x",InfoColor, Ships[snum].flags);
+
   lin++;
-  cprintf(lin,tcol,ALIGN_NONE,"#%d#%s",LabelColor, "   soption:");
-  c_strcpy( "(gpainte)", buf );
-  for ( i = 0; i < MAXOPTIONS; i = i + 1 )
-    if ( Ships[snum].options[i] )
-      buf[i+1] = (char)toupper(buf[i+1]);
-  cprintf(lin,dcol,ALIGN_NONE,"#%d#%s",InfoColor, buf);
-  
-  lin++;
-  cprintf(lin,tcol,ALIGN_NONE,"#%d#%s",LabelColor, "   options:");
-  if ( unum >= 0 && unum < MAXUSERS )
-    {
-      c_strcpy( "(gpainte)", buf );
-      for ( i = 0; i < MAXOPTIONS; i = i + 1 )
-	if ( Users[unum].options[i] )
-	  buf[i + 1] = (char)toupper(buf[i + 1]);
-      cprintf(lin,dcol,ALIGN_NONE,"#%d#%s",InfoColor, buf);
-    }
-  
-  lin++;
+
   cprintf(lin,tcol,ALIGN_NONE,"#%d#%s",LabelColor, "   saction:");
   i = Ships[snum].action;
   if ( i != 0 )
@@ -619,7 +618,7 @@ void debugplan(void)
   int i, j, k, cmd, lin, col, olin;
   int outattr;
   static int sv[NUMPLANETS + 1];
-  char buf[MSGMAXLINE], junk[10], uninhab[20];
+  char junk[10], uninhab[20];
   char hd0[MSGMAXLINE*4];
   char *hd1="D E B U G G I N G  P L A N E T   L I S T";
   string hd2="planet        C T arm uih scan        planet        C T arm uih scan";
@@ -1185,31 +1184,8 @@ void operate(void)
 		  xbuf,LabelColor,", eater ",InfoColor,buf);
 	  
 	  /* Line 2. */
-#ifdef USE_SEMS
 	  strcpy(buf, GetSemVal(0));
-#else
-	  c_strcpy( "lockword", buf );
-	  if ( ConqInfo->lockword == 0 )
-	    cntlockword = 0;
-	  else if ( cntlockword < 5 )
-	    cntlockword = cntlockword + 1;
-	  else
-	    upper( buf );
-	  c_strcpy( buf, junk );
-	  appstr( " = %d, ", junk );
-      
-	  c_strcpy( "lockmesg", buf );
-	  if ( ConqInfo->lockmesg == 0 )
-	    cntlockmesg = 0;
-	  else if ( cntlockmesg < 5 )
-	    cntlockmesg = cntlockmesg + 1;
-	  else
-	    upper( buf );
-	  appstr( buf, junk );
-	  appstr( " = %d", junk );
-	  sprintf( buf, junk, ConqInfo->lockword, ConqInfo->lockmesg );
-#endif
-      
+
 	  lin++;
 	  cdclrl( lin, 1 );
 	  attrset(SpecialColor);
@@ -1326,7 +1302,7 @@ void operate(void)
 	  review( MSG_GOD, ConqInfo->glastmsg );
 	  break;
 	case 'm':
-	  sendmsg( MSG_GOD, TRUE );
+	  clntSendMsg( MSG_GOD, TRUE, FALSE );
 	  break;
 	case 'O':
 	  SysOptsMenu();
@@ -1365,7 +1341,7 @@ void operate(void)
 	  break;
 	case 'w':
 	  watch();
-	  stoptimer();		/* to be sure */
+	  operStopTimer();		/* to be sure */
 	  redraw = TRUE;
 	  break;
 	case '/':
@@ -2462,20 +2438,14 @@ void opuadd(void)
     }
   else		
     {
-      if (nameptr != name)	/* a remote user (@) */
-	Users[unum].type = UT_REMOTE;
-      else
-	Users[unum].type = UT_LOCAL;
-
       clog("OPER: %s added user '%s'.",
 	   operName, name);
 
     }
   cdclrl( MSG_LIN1, 2 );
   
-				/* if a remote user, get a pw */
-  if (Users[unum].type == UT_REMOTE)
-    ChangePassword(unum, TRUE);
+
+  ChangePassword(unum, TRUE);
 
   return;
 
@@ -2494,7 +2464,6 @@ void opuedit(void)
   char buf[MSGMAXLINE];
   int ch, left = TRUE;
   char datestr[DATESIZE];
-  static char *prompt = "Use arrow keys to position, [SPACE] to modify";
   static char *prompt2 = "any other key to quit.";
   static char *rprompt = "Use arrow keys to position, [SPACE] to modify, [TAB] to change password";
   char *promptptr;
@@ -2541,30 +2510,13 @@ void opuedit(void)
 	      Users[unum].multiple);
       
       lin++;
-      for ( i = 0; i < MAXOPTIONS; i++ )
+      for ( i = 0; i < MAXOOPTIONS; i++ )
 	{
-      cprintf(lin+i,tcol,ALIGN_NONE,"#%d#%17d:", LabelColor,i);
-	  if ( Users[unum].options[i] )
-      	cprintf(lin+i,dcol,ALIGN_NONE,"#%d#%c", GreenLevelColor,'T');
-	  else
-      	cprintf(lin+i,dcol,ALIGN_NONE,"#%d#%c", RedLevelColor,'F');
+	  cprintf(lin+i,tcol,ALIGN_NONE,"#%d#%17d:", LabelColor,i);
+	  cprintf(lin+i,dcol,ALIGN_NONE,"#%d#%c", RedLevelColor,'F');
 	}
-      cprintf(lin+OPT_PHASERGRAPHICS,tcol,ALIGN_NONE,"#%d#%s", 
-		LabelColor,"  Phaser graphics:");
-      cprintf(lin+OPT_PLANETNAMES,tcol,ALIGN_NONE,"#%d#%s", 
-		LabelColor,"     Planet names:");
-      cprintf(lin+OPT_ALARMBELL,tcol,ALIGN_NONE,"#%d#%s", 
-		LabelColor,"       Alarm bell:");
-      cprintf(lin+OPT_INTRUDERALERT,tcol,ALIGN_NONE,"#%d#%s", 
-		LabelColor,"  Intruder alerts:");
-      cprintf(lin+OPT_NUMERICMAP,tcol,ALIGN_NONE,"#%d#%s", 
-		LabelColor,"      Numeric map:");
-      cprintf(lin+OPT_TERSE,tcol,ALIGN_NONE,"#%d#%s", 
-		LabelColor,"            Terse:");
-      cprintf(lin+OPT_EXPLOSIONS,tcol,ALIGN_NONE,"#%d#%s", 
-		LabelColor,"       Explosions:");
-      
-      lin+=(MAXOPTIONS + 1);
+
+      lin+=(MAXOOPTIONS + 1);
       cprintf(lin,tcol,ALIGN_NONE,"#%d#%s", LabelColor,"          Urating:");
       cprintf(lin,dcol,ALIGN_NONE,"#%d#%0g",InfoColor, 
 	      oneplace(Users[unum].rating));
@@ -2594,11 +2546,7 @@ void opuedit(void)
       dcol = 22;
       lcol = dcol - 1;
       
-      if (Users[unum].type == UT_REMOTE)
-	cprintf(lin,tcol,ALIGN_NONE,"#%d#%s#%d#%s", RedLevelColor, 
-		"    (REMOTE) ", LabelColor,"Name:");
-      else
-	cprintf(lin,tcol,ALIGN_NONE,"#%d#%s", LabelColor,"             Name:");
+      cprintf(lin,tcol,ALIGN_NONE,"#%d#%s", LabelColor,"             Name:");
 
 
       cprintf(lin,dcol,ALIGN_NONE,"#%d#%s",InfoColor, 
@@ -2615,11 +2563,11 @@ void opuedit(void)
       lin++;
       for ( i = 0; i < MAXOOPTIONS; i++ )
 	{
-      cprintf(lin+i,tcol,ALIGN_NONE,"#%d#%17d:", LabelColor,i);
+	  cprintf(lin+i,tcol,ALIGN_NONE,"#%d#%17d:", LabelColor,i);
 	  if ( Users[unum].ooptions[i] )
-      	cprintf(lin+i,dcol,ALIGN_NONE,"#%d#%c", GreenLevelColor,'T');
+	    cprintf(lin+i,dcol,ALIGN_NONE,"#%d#%c", GreenLevelColor,'T');
 	  else
-      	cprintf(lin+i,dcol,ALIGN_NONE,"#%d#%c", RedLevelColor,'F');
+	    cprintf(lin+i,dcol,ALIGN_NONE,"#%d#%c", RedLevelColor,'F');
 	}
       cprintf(lin+OOPT_MULTIPLE,tcol,ALIGN_NONE,"#%d#%s", 
 		LabelColor,"         Multiple:");
@@ -2629,8 +2577,8 @@ void opuedit(void)
 		LabelColor," Play when closed:");
       cprintf(lin+OOPT_SHITLIST,tcol,ALIGN_NONE,"#%d#%s", 
 		LabelColor,"          Disable:");
-      cprintf(lin+OOPT_GODMSG,tcol,ALIGN_NONE,"#%d#%s", 
-		LabelColor,"     GOD messages:");
+      cprintf(lin+OOPT_OPER,tcol,ALIGN_NONE,"#%d#%s", 
+		LabelColor,"Conquest Operator:");
       cprintf(lin+OOPT_LOSE,tcol,ALIGN_NONE,"#%d#%s", 
 		LabelColor,"             Lose:");
       cprintf(lin+OOPT_AUTOPILOT,tcol,ALIGN_NONE,"#%d#%s", 
@@ -2733,11 +2681,7 @@ void opuedit(void)
       cprintf(lin,dcol,ALIGN_NONE,"#%d#%0d",InfoColor, 
       	Users[unum].stats[USTAT_ENTRIES]);
       
-      /* Display the stuff */
-      if (Users[unum].type == UT_REMOTE)
-	promptptr = rprompt;
-      else
-	promptptr = prompt;
+      promptptr = rprompt;
 
       cprintf(MSG_LIN1,0,ALIGN_CENTER,"#%d#%s", InfoColor,
 	      promptptr);
@@ -2889,16 +2833,12 @@ void opuedit(void)
 		else
 		  cdbeep();
 	      else
-		if ( i >= 0 && i < MAXOPTIONS )
-		  Users[unum].options[i] = ! Users[unum].options[i];
-		else
-		  cdbeep();
+		cdbeep();
 	    }
 	  break;
 
 	case TERM_EXTRA:	/* change passwd */
-	  if (Users[unum].type == UT_REMOTE)
-	    ChangePassword(unum, TRUE);
+	  ChangePassword(unum, TRUE);
 	  break;
 	  
 	case 0x0c:
@@ -2944,7 +2884,7 @@ void watch(void)
 	  grand( &msgrand );
 
 	  Context.snum = snum;		/* so display knows what to display */
-	  setopertimer();
+	  operSetTimer();
 
 	  while (TRUE)	/* repeat */
 	    {
@@ -3008,10 +2948,10 @@ void watch(void)
 		    cdbeep();
 		  break;
 		case 'h':
-		  stoptimer();
+		  operStopTimer();
 		  dowatchhelp();
 		  Context.redraw = TRUE;
-		  setopertimer();
+		  operSetTimer();
 		  break;
 		case 'i':
 		  opinfo( MSG_GOD );
@@ -3020,7 +2960,7 @@ void watch(void)
 		  kiss(Context.snum, TRUE);
 		  break;
 		case 'm':
-		  sendmsg( MSG_GOD, TRUE );
+		  clntSendMsg( MSG_GOD, TRUE, FALSE );
 		  break;
 		case 'r':  /* just for fun - dwp */
 		  oprobot();
@@ -3029,14 +2969,14 @@ void watch(void)
 		  review( MSG_GOD, ConqInfo->glastmsg );
 		  break;
 		case 0x0c:
-		  stoptimer();
+		  operStopTimer();
 		  cdredo();
 		  Context.redraw = TRUE;
-		  setopertimer();
+		  operSetTimer();
 		  break;
 		case 'q':
 		case 'Q':
-		  stoptimer();
+		  operStopTimer();
 		  return;
 		  break;
 		case 'w': /* look at any ship (live or not) if specifically asked for */
@@ -3052,9 +2992,9 @@ void watch(void)
 		      Context.snum = snum;
 		      if (normal)
 			{
-			  stoptimer();
+			  operStopTimer();
 			  display( Context.snum, headerflag );
-			  setopertimer();
+			  operSetTimer();
 			}
 		    }
 		  break;
@@ -3077,9 +3017,9 @@ void watch(void)
 			  Context.redraw = TRUE;
 			  if (normal)
 			    {
-			      stoptimer();
+			      operStopTimer();
 			      display( Context.snum, headerflag );
-			      setopertimer();
+			      operSetTimer();
 			    }
 			}
 		    }
@@ -3100,16 +3040,16 @@ void watch(void)
 		    cdbeep();
 		  break;
 		case '/':                /* ship list - dwp */
-		  stoptimer();
+		  operStopTimer();
 		  playlist( TRUE, FALSE, 0 );
 		  Context.redraw = TRUE;
-		  setopertimer();
+		  operSetTimer();
 		  break;
 		case '\\':               /* big ship list - dwp */
-		  stoptimer();
+		  operStopTimer();
 		  playlist( TRUE, TRUE, 0 );
 		  Context.redraw = TRUE;
-		  setopertimer();
+		  operSetTimer();
 		  break;
 		case '!':
 		  if (toggle_flg)
@@ -3189,9 +3129,9 @@ void watch(void)
 		    }
 		  if (normal)
 		    {
-		      stoptimer();
+		      operStopTimer();
 		      display( Context.snum, headerflag );
-		      setopertimer();
+		      operSetTimer();
 		    }
 		  break;
 		case '<':  /* reverse rotate ship numbers (including doomsday)  - dwp */
@@ -3267,9 +3207,9 @@ void watch(void)
 		    }
 		  if (normal)
 		    {
-		      stoptimer();
+		      operStopTimer();
 		      display( Context.snum, headerflag );
-		      setopertimer();
+		      operSetTimer();
 		    }
 
 		  break;
@@ -3611,4 +3551,155 @@ int DoInit(char InitChar, int cmdline)
   clog("OPER: %s initialized '%c'",
        operName, InitChar);
 
+  return TRUE;
 }
+
+void EnableConqoperSignalHandler(void)
+{
+#ifdef DEBUG_SIG
+  clog("EnableConquestSignalHandler() ENABLED");
+#endif
+  
+  signal(SIGHUP, (void (*)(int))DoConqoperSig);
+  signal(SIGTSTP, SIG_IGN);
+  signal(SIGTERM, (void (*)(int))DoConqoperSig);  
+  signal(SIGINT, (void (*)(int))DoConqoperSig);
+  signal(SIGQUIT, (void (*)(int))DoConqoperSig);
+
+  return;
+}
+
+void DoConqoperSig(int sig)
+{
+  
+#ifdef DEBUG_SIG
+  clog("DoSig() got SIG %d", sig);
+#endif
+  
+  switch(sig)
+    {
+    case SIGTERM:
+    case SIGINT:
+    case SIGHUP:
+    case SIGQUIT:
+      operStopTimer();
+      cdrefresh();
+      cdend();
+      exit(0);			/* WE EXIT HERE */
+      break;
+    default:
+      break;
+    }
+
+  EnableConqoperSignalHandler();	/* reset */
+  return;
+}
+
+
+/*  astoperservice - ast service routine for conqoper */
+/*  SYNOPSIS */
+/*    astservice */
+/* This routine gets called from a sys$setimr ast. Normally, it outputs */
+/* one screen update and then sets up another timer request. */
+void astoperservice(int sig)
+{
+  /* Don't do anything if we're not supposed to. */
+  if ( ! Context.display )
+    return;
+  
+  operStopTimer();
+  
+  /* Perform one ship display update. */
+  display( Context.snum, headerflag );
+  
+  /* Schedule for next time. */
+  operSetTimer();
+  
+  return;
+  
+}
+
+/*  operSetTimer - set timer to display() for conqoper...*/
+/*  SYNOPSIS */
+void operSetTimer(void)
+{
+  static struct sigaction Sig;
+  
+#ifdef HAS_SETITIMER
+  struct itimerval itimer;
+#endif
+  
+  Sig.sa_handler = (void (*)(int))astoperservice;
+  
+  Sig.sa_flags = 0;
+
+  if (sigaction(SIGALRM, &Sig, NULL) == -1)
+    {
+      clog("clntSetTimer():sigaction(): %s\n", strerror(errno));
+      exit(errno);
+    }
+  
+#ifdef HAS_SETITIMER
+
+  if (Context.updsec >= 1 && Context.updsec <= 10)
+    {
+      if (Context.updsec == 1)
+	{
+	  itimer.it_value.tv_sec = 1;
+	  itimer.it_value.tv_usec = 0;
+	}
+      else
+	{
+	  itimer.it_value.tv_sec = 0;
+	  itimer.it_value.tv_usec = (1000000 / Context.updsec);
+	}
+    }
+  else
+    {
+      itimer.it_value.tv_sec = 0;
+      itimer.it_value.tv_usec = (1000000 / 2); /* 2/sec */
+    }
+
+  itimer.it_interval.tv_sec = itimer.it_value.tv_sec;
+  itimer.it_interval.tv_usec = itimer.it_value.tv_usec;
+
+  setitimer(ITIMER_REAL, &itimer, NULL);
+#else
+  alarm(1);			/* set alarm() */
+#endif  
+  return;
+  
+}
+
+
+
+/*  operStopTimer - cancel timer */
+/*  SYNOPSIS */
+/*    operStopTimer */
+void operStopTimer(void)
+{
+#ifdef HAS_SETITIMER
+  struct itimerval itimer;
+#endif
+  
+  Context.display = FALSE;
+  
+
+  signal(SIGALRM, SIG_IGN);
+  
+#ifdef HAS_SETITIMER
+  itimer.it_value.tv_sec = itimer.it_interval.tv_sec = 0;
+  itimer.it_value.tv_usec = itimer.it_interval.tv_usec = 0;
+  
+  setitimer(ITIMER_REAL, &itimer, NULL);
+#else
+  alarm(0);
+#endif
+
+
+  Context.display = TRUE;
+  
+  return;
+  
+}
+

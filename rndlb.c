@@ -4,7 +4,7 @@
  *
  * $Id$
  *
- * Copyright 1999 Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
+ * Copyright 1999-2004 Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
  ***********************************************************************/
 
 
@@ -85,7 +85,7 @@ void rndini ( int seed1, int seed2 )
   mult2 = 5146;	inc2 = 4100;	modu2 = 19683;
   
   getnow ( now, 0 );
-  
+
   if ( seed1 != 0 )
     value1 = seed1;
   else
@@ -168,7 +168,6 @@ int rndint ( int ilow, int ihigh )
   int rc;
 
   rc = ifix ( rnd() * creal(ihigh-ilow+1.0) ) + ilow;
-  
 #ifdef DEBUG_RANDOM
   clog("rndint(): rc = %d", rc);
 #endif

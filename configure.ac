@@ -10,6 +10,8 @@ AM_INIT_AUTOMAKE
 AC_PROG_LIBTOOL
 AC_PROG_YACC
 AC_PROG_LEX
+AC_PATH_X
+AC_PATH_XTRA
 
 AC_PREFIX_DEFAULT(/opt)
 
@@ -131,8 +133,10 @@ dnl Checks for library functions.
 AC_FUNC_MMAP
 AC_TYPE_SIGNAL
 AC_FUNC_VPRINTF
-AC_CHECK_FUNCS(select strstr fileno)
+AC_CHECK_FUNCS(select strstr fileno setpgrp daemon)
 AC_CHECK_FUNCS(getmsg poll setitimer strerror)
+
+AC_FUNC_SETPGRP
 
 dnl check for sys_errlist decl
 

@@ -581,15 +581,12 @@ int goterror;
 int Lineno = 1; /* current line number of the scanner */
 
 
-static char buf[MAXLINE];
-static int i;
-
 extern int yylval; 
 
 #undef ECHO
 #define ECHO (void)fprintf(yyout, "Unrecognized input: '%s', ignored.\n",yytext)
 
-#line 593 "conqstrat-lex.c"
+#line 590 "conqstrat-lex.c"
 
 /* Macros after this point can all be overridden by user definitions in
  * section 1.
@@ -740,11 +737,11 @@ YY_DECL
 	register char *yy_cp = NULL, *yy_bp = NULL;
 	register int yy_act;
 
-#line 61 "conqstrat-lex.l"
+#line 58 "conqstrat-lex.l"
 
 
 
-#line 748 "conqstrat-lex.c"
+#line 745 "conqstrat-lex.c"
 
 	if ( yy_init )
 		{
@@ -829,272 +826,272 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 64 "conqstrat-lex.l"
+#line 61 "conqstrat-lex.l"
 {yylval = VAR_RANDOM; return( TOK_VARIABLE );}
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 65 "conqstrat-lex.l"
+#line 62 "conqstrat-lex.l"
 {yylval = VAR_DNE; return( TOK_VARIABLE );}
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 66 "conqstrat-lex.l"
+#line 63 "conqstrat-lex.l"
 {yylval = VAR_DAMAGE; return( TOK_VARIABLE );}
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 67 "conqstrat-lex.l"
+#line 64 "conqstrat-lex.l"
 {yylval = VAR_INCOMING; return( TOK_VARIABLE );}
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 68 "conqstrat-lex.l"
+#line 65 "conqstrat-lex.l"
 {yylval = VAR_FUEL; return( TOK_VARIABLE );}
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 69 "conqstrat-lex.l"
+#line 66 "conqstrat-lex.l"
 {yylval = VAR_NUMTORPS; return( TOK_VARIABLE );}
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 70 "conqstrat-lex.l"
+#line 67 "conqstrat-lex.l"
 {yylval = VAR_SHIELDS; return( TOK_VARIABLE );}
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 71 "conqstrat-lex.l"
+#line 68 "conqstrat-lex.l"
 {yylval = VAR_ETEMP; return( TOK_VARIABLE );}
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 72 "conqstrat-lex.l"
+#line 69 "conqstrat-lex.l"
 {yylval = VAR_WTEMP; return( TOK_VARIABLE );}
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 73 "conqstrat-lex.l"
+#line 70 "conqstrat-lex.l"
 {yylval = VAR_PHASERDAM; return( TOK_VARIABLE );}
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 74 "conqstrat-lex.l"
+#line 71 "conqstrat-lex.l"
 {yylval = VAR_TORPDAM; return( TOK_VARIABLE );}
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 75 "conqstrat-lex.l"
+#line 72 "conqstrat-lex.l"
 {yylval = VAR_WARP; return( TOK_VARIABLE );}
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 76 "conqstrat-lex.l"
+#line 73 "conqstrat-lex.l"
 {yylval = VAR_SHUP; return( TOK_VARIABLE );}
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 77 "conqstrat-lex.l"
+#line 74 "conqstrat-lex.l"
 {yylval = VAR_WALLOC; return( TOK_VARIABLE );}
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 78 "conqstrat-lex.l"
+#line 75 "conqstrat-lex.l"
 {yylval = VAR_ORBITING; return( TOK_VARIABLE );}
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
-#line 79 "conqstrat-lex.l"
+#line 76 "conqstrat-lex.l"
 {yylval = VAR_REPAIRING; return( TOK_VARIABLE );}
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
-#line 80 "conqstrat-lex.l"
+#line 77 "conqstrat-lex.l"
 {yylval = VAR_CLOAKED; return( TOK_VARIABLE );}
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
-#line 81 "conqstrat-lex.l"
+#line 78 "conqstrat-lex.l"
 {yylval = VAR_ENEMYCLOAKED; return( TOK_VARIABLE );}
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
-#line 82 "conqstrat-lex.l"
+#line 79 "conqstrat-lex.l"
 {yylval = VAR_ENEMYDAMAGE; return( TOK_VARIABLE );}
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
-#line 83 "conqstrat-lex.l"
+#line 80 "conqstrat-lex.l"
 {yylval = VAR_CANREAD; return( TOK_VARIABLE );}
 	YY_BREAK
 case 21:
 YY_RULE_SETUP
-#line 85 "conqstrat-lex.l"
+#line 82 "conqstrat-lex.l"
 {yylval = ROB_NOOP; return( TOK_ACTION );}
 	YY_BREAK
 case 22:
 YY_RULE_SETUP
-#line 86 "conqstrat-lex.l"
+#line 83 "conqstrat-lex.l"
 {yylval = ROB_GOHOME; return( TOK_ACTION );}
 	YY_BREAK
 case 23:
 YY_RULE_SETUP
-#line 87 "conqstrat-lex.l"
+#line 84 "conqstrat-lex.l"
 {yylval = ROB_GOREPAIR; return( TOK_ACTION );}
 	YY_BREAK
 case 24:
 YY_RULE_SETUP
-#line 88 "conqstrat-lex.l"
+#line 85 "conqstrat-lex.l"
 {yylval = ROB_ALLOCATE; return( TOK_ACTION );}
 	YY_BREAK
 case 25:
 YY_RULE_SETUP
-#line 89 "conqstrat-lex.l"
+#line 86 "conqstrat-lex.l"
 {yylval = ROB_DETONATE; return( TOK_ACTION );}
 	YY_BREAK
 case 26:
 YY_RULE_SETUP
-#line 90 "conqstrat-lex.l"
+#line 87 "conqstrat-lex.l"
 {yylval = ROB_MYDETONATE; return( TOK_ACTION );}
 	YY_BREAK
 case 27:
 YY_RULE_SETUP
-#line 91 "conqstrat-lex.l"
+#line 88 "conqstrat-lex.l"
 {yylval = ROB_PHASER; return( TOK_ACTION );}
 	YY_BREAK
 case 28:
 YY_RULE_SETUP
-#line 92 "conqstrat-lex.l"
+#line 89 "conqstrat-lex.l"
 {yylval = ROB_TORPEDO; return( TOK_ACTION );}
 	YY_BREAK
 case 29:
 YY_RULE_SETUP
-#line 93 "conqstrat-lex.l"
+#line 90 "conqstrat-lex.l"
 {yylval = ROB_BURST; return( TOK_ACTION );}
 	YY_BREAK
 case 30:
 YY_RULE_SETUP
-#line 94 "conqstrat-lex.l"
+#line 91 "conqstrat-lex.l"
 {yylval = ROB_SHIELD; return( TOK_ACTION );}
 	YY_BREAK
 case 31:
 YY_RULE_SETUP
-#line 95 "conqstrat-lex.l"
+#line 92 "conqstrat-lex.l"
 {yylval = ROB_UNTRACTOR; return( TOK_ACTION );}
 	YY_BREAK
 case 32:
 YY_RULE_SETUP
-#line 96 "conqstrat-lex.l"
+#line 93 "conqstrat-lex.l"
 {yylval = ROB_WARP_0; return( TOK_ACTION );}
 	YY_BREAK
 case 33:
 YY_RULE_SETUP
-#line 97 "conqstrat-lex.l"
+#line 94 "conqstrat-lex.l"
 {yylval = ROB_WARP_2; return( TOK_ACTION );}
 	YY_BREAK
 case 34:
 YY_RULE_SETUP
-#line 98 "conqstrat-lex.l"
+#line 95 "conqstrat-lex.l"
 {yylval = ROB_WARP_5; return( TOK_ACTION );}
 	YY_BREAK
 case 35:
 YY_RULE_SETUP
-#line 99 "conqstrat-lex.l"
+#line 96 "conqstrat-lex.l"
 {yylval = ROB_WARP_8; return( TOK_ACTION );}
 	YY_BREAK
 case 36:
 YY_RULE_SETUP
-#line 100 "conqstrat-lex.l"
+#line 97 "conqstrat-lex.l"
 {yylval = ROB_TRACK; return( TOK_ACTION );}
 	YY_BREAK
 case 37:
 YY_RULE_SETUP
-#line 101 "conqstrat-lex.l"
+#line 98 "conqstrat-lex.l"
 {yylval = ROB_SILENT; return( TOK_ACTION );}
 	YY_BREAK
 case 38:
 YY_RULE_SETUP
-#line 102 "conqstrat-lex.l"
+#line 99 "conqstrat-lex.l"
 {yylval = ROB_MESSAGE; return( TOK_ACTION );}
 	YY_BREAK
 case 39:
 YY_RULE_SETUP
-#line 103 "conqstrat-lex.l"
+#line 100 "conqstrat-lex.l"
 {yylval = ROB_TAKEDRUGS; return( TOK_ACTION );}
 	YY_BREAK
 case 40:
 YY_RULE_SETUP
-#line 104 "conqstrat-lex.l"
+#line 101 "conqstrat-lex.l"
 {yylval = ROB_REPAIR; return( TOK_ACTION );}
 	YY_BREAK
 case 41:
 YY_RULE_SETUP
-#line 105 "conqstrat-lex.l"
+#line 102 "conqstrat-lex.l"
 {yylval = ROB_READMSG; return( TOK_ACTION );}
 	YY_BREAK
 case 42:
 YY_RULE_SETUP
-#line 106 "conqstrat-lex.l"
+#line 103 "conqstrat-lex.l"
 {yylval = ROB_INSULT; return( TOK_ACTION );}
 	YY_BREAK
 case 43:
 YY_RULE_SETUP
-#line 107 "conqstrat-lex.l"
+#line 104 "conqstrat-lex.l"
 {yylval = ROB_GOFUEL; return( TOK_ACTION );}
 	YY_BREAK
 case 44:
 YY_RULE_SETUP
-#line 108 "conqstrat-lex.l"
+#line 105 "conqstrat-lex.l"
 {yylval = ROB_RUNAWAY; return( TOK_ACTION );}
 	YY_BREAK
 case 45:
 YY_RULE_SETUP
-#line 110 "conqstrat-lex.l"
+#line 107 "conqstrat-lex.l"
 {yylval = OP_LT; return( TOK_OPERATOR );}
 	YY_BREAK
 case 46:
 YY_RULE_SETUP
-#line 111 "conqstrat-lex.l"
+#line 108 "conqstrat-lex.l"
 {yylval = OP_LE; return( TOK_OPERATOR );}
 	YY_BREAK
 case 47:
 YY_RULE_SETUP
-#line 112 "conqstrat-lex.l"
+#line 109 "conqstrat-lex.l"
 {yylval = OP_GT; return( TOK_OPERATOR );}
 	YY_BREAK
 case 48:
 YY_RULE_SETUP
-#line 113 "conqstrat-lex.l"
+#line 110 "conqstrat-lex.l"
 {yylval = OP_GE; return( TOK_OPERATOR );}
 	YY_BREAK
 case 49:
 YY_RULE_SETUP
-#line 114 "conqstrat-lex.l"
+#line 111 "conqstrat-lex.l"
 {yylval = OP_EQ; return( TOK_OPERATOR );}
 	YY_BREAK
 case 50:
 YY_RULE_SETUP
-#line 115 "conqstrat-lex.l"
+#line 112 "conqstrat-lex.l"
 {yylval = OP_NE; return( TOK_OPERATOR );}
 	YY_BREAK
 case 51:
 YY_RULE_SETUP
-#line 117 "conqstrat-lex.l"
+#line 114 "conqstrat-lex.l"
 return( TOK_NOT );
 	YY_BREAK
 case 52:
 YY_RULE_SETUP
-#line 118 "conqstrat-lex.l"
+#line 115 "conqstrat-lex.l"
 return( TOK_AND );
 	YY_BREAK
 case 53:
 YY_RULE_SETUP
-#line 119 "conqstrat-lex.l"
+#line 116 "conqstrat-lex.l"
 return( TOK_TERMINATOR );
 	YY_BREAK
 case 54:
 YY_RULE_SETUP
-#line 121 "conqstrat-lex.l"
+#line 118 "conqstrat-lex.l"
 {
 /*                        printf("**=- buf = %s yytext = %s -=**\n", buf, yytext); */
 			yylval = atoi( yytext );
@@ -1103,25 +1100,25 @@ YY_RULE_SETUP
 	YY_BREAK
 case 55:
 YY_RULE_SETUP
-#line 127 "conqstrat-lex.l"
+#line 124 "conqstrat-lex.l"
 /*# eat comments */
 	YY_BREAK
 case 56:
 YY_RULE_SETUP
-#line 130 "conqstrat-lex.l"
+#line 127 "conqstrat-lex.l"
 /* eat gratuitous white space */
 	YY_BREAK
 case 57:
 YY_RULE_SETUP
-#line 132 "conqstrat-lex.l"
+#line 129 "conqstrat-lex.l"
 {Lineno++; /* eat newlines */}
 	YY_BREAK
 case 58:
 YY_RULE_SETUP
-#line 134 "conqstrat-lex.l"
+#line 131 "conqstrat-lex.l"
 ECHO;
 	YY_BREAK
-#line 1125 "conqstrat-lex.c"
+#line 1122 "conqstrat-lex.c"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -2007,7 +2004,7 @@ int main()
 	return 0;
 	}
 #endif
-#line 134 "conqstrat-lex.l"
+#line 131 "conqstrat-lex.l"
 
 
 /* parser error reporting routine */

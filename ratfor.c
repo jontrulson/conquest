@@ -3,7 +3,7 @@
  *
  * $Id$
  *
- * Copyright 1999 Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
+ * Copyright 1999-2004 Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
  ***********************************************************************/
 
 /**********************************************************************/
@@ -103,8 +103,9 @@ void upper(char *buf)
 }
 
 /* load the now[] array with the current time - make sure it's 
-/*   decl [NOWSIZE] */
-/*  always returns the current time in time_t format. */
+   decl [NOWSIZE] 
+   always returns the current time in time_t format. 
+*/
 time_t getnow (int now[NOWSIZE], time_t thetime)
 {
   struct tm *thetm;

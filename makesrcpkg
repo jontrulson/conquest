@@ -9,6 +9,8 @@
 ##############################################################################
 # set -x
 
+umask 022
+
 VERSION=`grep ConquestVersion version.c`
 VERSION=`echo $VERSION |tr -d '$;"' |cut -d' ' -f6 |tr -d " "`
 
@@ -20,7 +22,7 @@ rm -f ${ARCFILE}.gz
 rm -rf $CONQVER
 echo Arcive name: $ARCFILE
 
-FILELIST="ratfor.c cd2lb.c display.c iolb.c conqlb.c
+FILELIST="ratfor.c cd2lb.c iolb.c conqlb.c
 	rndlb.c conqmisc.c conqutil.c conqcm.c conqsvr42.c global.c 
 	ibuf.c ibuf.h version.c conf.c sem.c conquest.c conqoper.c conqdriv.c
 	conqai.c c_defs.h color.h conqcom.h conqdata.h defs.h 
@@ -32,9 +34,15 @@ FILELIST="ratfor.c cd2lb.c display.c iolb.c conqlb.c
 	conqstrat.h conqstrat-lex.l conqstrat-yacc.y 
         conqrule Makefile.am aclocal.m4 depcomp install-sh ltmain.sh
         mkinstalldirs missing conqai_main.c
-        record.h record.c conqreplay.c
-	COPYRIGHT LICENSE INSTALL TODO SERVER.TXT"
+        record.h record.c conqreplay.c 
+	COPYRIGHT LICENSE INSTALL TODO SERVER.TXT CREDITS
+        conquest.h display.c display.h client.h client.c clientlb.h 
+        clientlb.c server.h server.c packet.h packet.c protocol.h
+        conqnet.h datatypes.h userauth.h servauth.h clntauth.h 
+        clntauth.c servauth.c conquestd.c serverpkt.c serverpkt.h 
+        servercmd.h servercmd.c conquestsh.c README-DEV-RELEASE.txt"
 
+#IMAGES="img/*.bmp"
 
 if [ -e CHANGES ]
 then
@@ -43,10 +51,13 @@ then
 fi
 
 mkdir $CONQVER 2>/dev/null
+#mkdir $CONQVER/img
 
 cp -p $FILELIST $CONQVER/
 cp -p conquest.txt $CONQVER/$CONQVER.txt
 cp -p conquest.lsm $CONQVER/$CONQVER.lsm
+
+#cp -p $IMAGES $CONQVER/img/
 
 # now the terminfo files
 mkdir $CONQVER/ti
@@ -54,9 +65,12 @@ chmod 755 $CONQVER/ti
 cp -p ti/*.ti $CONQVER/ti/
 
 chmod 644 $CONQVER/ti/*
+#chmod 644 $CONQVER/img/*
 
 chmod 644 $CONQVER/*
+
 chmod 755 $CONQVER/ti
+#chmod 755 $CONQVER/img
 chmod 755 $CONQVER/configure $CONQVER/config.guess $CONQVER/config.sub
 
 

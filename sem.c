@@ -6,7 +6,7 @@
  *
  * $Id$
  *
- * Copyright 1999 Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
+ * Copyright 1999-2004 Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
  ***********************************************************************/
 
 /**********************************************************************/
@@ -24,14 +24,11 @@
 #include "global.h"
 #include "conqcom.h"
 
-		/* For id purposes... */
-static char *semId = "$Id$";
-
 #define CONQSEMKEY   (0xff001701) /* hope that's unique! */
 #define CONQSEMPERMS (00664)
 #define CONQNUMSEMS  (2)
 
-static key_t ConquestSemID;
+static key_t ConquestSemID = -1; 
 static struct sembuf semops[CONQNUMSEMS];
 
 char *getsemtxt(int what)
@@ -96,6 +93,9 @@ void Lock(int what)
 {
   static int Done;
 
+  if (ConquestSemID == -1)
+    return;			/* clients don't use sems... */
+
 #ifdef DEBUG_SEM
   clog("Lock(%s): Attempting to aquire a lock.",
        getsemtxt(what));
@@ -159,6 +159,9 @@ void Unlock(int what)
     struct semid_ds *buf;
     ushort *array;
   } arg;
+
+  if (ConquestSemID == -1)
+    return;			/* clients don't use sems... */
 
   arg.array = semvals;
 

@@ -6,7 +6,7 @@
  *
  * $Id$
  *
- * Copyright 1999-2002 Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
+ * Copyright 1999-2004 Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
  ***********************************************************************/
 
 #define NOEXTERN
@@ -15,22 +15,20 @@
 #include "context.h"
 #include "global.h"
 #include "color.h"
-
+#include "display.h"
 #include "record.h"
+#include "conf.h"
+#include "datatypes.h"
+#include "protocol.h"
+#include "packet.h"
+#include "client.h"
+#include "clientlb.h"
 
-/* we will have our own copy of the common block here, so setup some stuff */
-static char *rcBasePtr = NULL;
-static int rcoff = 0;
-				/* our own copy */
-#define map1d(thevarp, thetype, size) {  \
-              thevarp = (thetype *) (rcBasePtr + rcoff); \
-              rcoff += (sizeof(thetype) * (size)); \
-	}
-
-static rData_t rdata;		/* the input/output record */
 static fileHeader_t fhdr;
 
 static real framedelay = -1.0;	/* delaytime between frames */
+
+static Unsgn32 frameCount = 0;
 
 static char *rfname;		/* game file we are playing */
 
@@ -40,7 +38,6 @@ static time_t currTime = 0;
 static time_t totElapsed = 0;	/* total game time */
 
 static void replay(void);
-
 
 void printUsage(void)
 {
@@ -54,28 +51,16 @@ void printUsage(void)
 /* create and map our own version of the common block */
 static int map_lcommon()
 {
-
-  if ((rcBasePtr = malloc(SZ_CMB)) == NULL)
-    {
-      perror("map_lcommon(): memory allocation failed\n");
-      return(FALSE);
-    }
-
-
-  map1d(CBlockRevision, int, 1);	/* this *must* be the first var */
-  map1d(ConqInfo, ConqInfo_t, 1)
-  map1d(Users, User_t, MAXUSERS);
-  map1d(Robot, Robot_t, 1);
-  map1d(Planets, Planet_t, NUMPLANETS + 1);
-  map1d(Teams, Team_t, NUMALLTEAMS);
-  map1d(Doomsday, Doomsday_t, 1);
-  map1d(History, History_t, MAXHISTLOG);
-  map1d(Driver, Driver_t, 1);
-  map1d(Ships, Ship_t, MAXSHIPS + 1);
-  map1d(ShipTypes, ShipType_t, MAXNUMSHIPTYPES);
-  map1d(Msgs, Msg_t, MAXMESSAGES);
-  map1d(EndOfCBlock, int, 1);
-
+  /* a parallel universe, it is */
+  fake_common();
+  initeverything();
+  initmsgs();
+  *CBlockRevision = COMMONSTAMP;
+  ConqInfo->closed = FALSE;
+  Driver->drivstat = DRS_OFF;
+  Driver->drivpid = 0;
+  Driver->drivowner[0] = EOS;
+  
   return(TRUE);
 }
 
@@ -86,10 +71,10 @@ static int map_lcommon()
    the game and return it */
 static int initReplay(char *fname, time_t *elapsed)
 {
-  int rv;
-  int rtype;
+  int pkttype;
   time_t starttm = 0;
   time_t curTS = 0;
+  Unsgn8 buf[PKT_MAXSIZE];
 
   if (!recordOpenInput(fname))
     {
@@ -97,12 +82,9 @@ static int initReplay(char *fname, time_t *elapsed)
       return(FALSE);
     }
 
+  /* don't bother mapping for just a count */
   if (!elapsed)
-    if (map_lcommon() == FALSE)
-      {
-	printf("initReplay: could not map a CMB\n");
-	return(FALSE);
-      }
+    map_lcommon();
 
   /* now lets read in the file header and check a few things. */
 
@@ -111,25 +93,15 @@ static int initReplay(char *fname, time_t *elapsed)
       
   if (fhdr.vers != RECVERSION)
     {				/* wrong vers */
+      clog("initReplay: version mismatch.  got %d, need %d\n",
+           fhdr.vers,
+           RECVERSION);
+
       printf("initReplay: version mismatch.  got %d, need %d\n",
 	     fhdr.vers,
 	     RECVERSION);
       return(FALSE);
     }
-
-  /* the next packet should be the cmb data block */
-  if ((rtype = recordReadPkt(&rdata, NULL)) != RDATA_CMB)
-    {
-      printf("initReplay: first packet type (%d) is not RDATA_CMB\n",
-	     rtype);
-      return(FALSE);
-    }
-
-  
-  /* ok, now copy it into our local version if we are not looking for
-     elapsed time */
-  if (!elapsed)
-    memcpy((char *)CBlockRevision, (char *)rdata.data.rcmb, SZ_CMB);
 
   /* if we are looking for the elapsed time, scan the whole file
      looking for timestamps. */
@@ -142,12 +114,21 @@ static int initReplay(char *fname, time_t *elapsed)
       curTS = 0;
       /* read through the entire file, looking for timestamps. */
       
+#if defined(DEBUG_REC)
+      clog("conqreplay: initReplay: reading elapsed time");
+#endif
+
       while (!done)
 	{
-	  if ((rtype = recordReadPkt(&rdata, NULL)) == RDATA_TIME)
-	    curTS = rdata.data.rtime;
+          if ((pkttype = recordReadPkt(buf, PKT_MAXSIZE)) == SP_FRAME)
+            {
+              spFrame_t *frame = (spFrame_t *)buf;
+              
+              /* fix up the endianizational interface for the time */
+              curTS = (time_t)ntohl(frame->time);
+            }
 
-	  if (rtype == RDATA_NONE)
+	  if (pkttype == SP_NULL)
 	    done = TRUE;	/* we're done */
 	}
 
@@ -203,7 +184,6 @@ void displayReplayData(void)
 /* display a message - mostly ripped from readmsg() */
 void displayMsg(Msg_t *themsg)
 {
-  int i;
   char buf[MSGMAXLINE];
   unsigned int attrib = 0;
 
@@ -236,6 +216,9 @@ void displayMsg(Msg_t *themsg)
   else
     {				/* just clear the message line */
       cdclrl( RMsg_Line, 1 );
+#ifdef CONQGL
+      showMessage(0, NULL);
+#endif
     }
 
   return;
@@ -248,50 +231,96 @@ void displayMsg(Msg_t *themsg)
 
 int processPacket(void)
 {
-  int rdsize, rv, rtype;
+  Unsgn8 buf[PKT_MAXSIZE];
+  spFrame_t *frame;
+  int pkttype;
+  Msg_t Msg;
+  spMessage_t *smsg;
 
-  if ((rtype = recordReadPkt(&rdata, NULL)) == RDATA_NONE)
-    return(RDATA_NONE);
-    
-  /* figure out what it is and apply it */
-  switch(rtype)
-    {
-    case RDATA_SHIP:
-      Ships[rdata.index] = rdata.data.rship;
-      /* stop annoying beeps for all ships. */
-      Ships[rdata.index].options[OPT_ALARMBELL] = FALSE;
-      break;
-
-    case RDATA_PLANET:
-      Planets[rdata.index] = rdata.data.rplanet;
-      break;
-
-    case RDATA_TIME: 		/* timestamp */
-      if (startTime == (time_t)0)
-	startTime = rdata.data.rtime;
-      currTime = rdata.data.rtime;
-      break;
-
-    case RDATA_MESSAGE:
-      displayMsg(&rdata.data.rmsg);
-      break;
-
-#ifdef DEBUG_REC
-    default:
-      fprintf(stderr, "processPacket: Invalid rtype %d\n", rtype);
-      break;
+#if defined(DEBUG_REC)
+  clog("conqreply: processPacket ENTER");
 #endif
+
+  if ((pkttype = recordReadPkt(buf, PKT_MAXSIZE)) != SP_NULL)
+    {
+      switch(pkttype)
+        {
+        case SP_SHIP:
+          procShip(buf);
+          break;
+        case SP_SHIPSML:
+          procShipSml(buf);
+          break;
+        case SP_SHIPLOC:
+          procShipLoc(buf);
+          break;
+        case SP_USER:
+          procUser(buf);
+          break;
+        case SP_PLANET:
+          procPlanet(buf);
+          break;
+        case SP_PLANETSML:
+          procPlanetSml(buf);
+          break;
+        case SP_PLANETLOC:
+          procPlanetLoc(buf);
+          break;
+        case SP_TORP:
+          procTorp(buf);
+          break;
+        case SP_TORPLOC:
+          procTorpLoc(buf);
+          break;
+        case SP_TEAM:
+          procTeam(buf);
+          break;
+        case SP_MESSAGE:
+          smsg = (spMessage_t *)buf;
+          memset((void *)&Msg, 0, sizeof(Msg_t));
+          strncpy(Msg.msgbuf, smsg->msg, MESSAGE_SIZE);
+          Msg.msgfrom = (int)((Sgn16)ntohs(smsg->from));
+          Msg.msgto = (int)((Sgn16)ntohs(smsg->to));
+          Msg.flags = smsg->flags;
+
+          if (Msg.flags & MSG_FLAGS_FEEDBACK)
+            clntDisplayFeedback(smsg->msg);
+          else
+            displayMsg(&Msg);
+
+          break;
+
+        case SP_FRAME:
+          frame = (spFrame_t *)buf;
+          /* endian correction*/
+          frame->time = (Unsgn32)ntohl(frame->time);
+          frame->frame = (Unsgn32)ntohl(frame->frame);
+
+          if (startTime == (time_t)0)
+            startTime = (time_t)frame->time;
+          currTime = (time_t)frame->time;
+
+          frameCount = (Unsgn32)frame->frame;
+
+          break;
+          
+        default:
+#ifdef DEBUG_REC
+          fprintf(stderr, "processPacket: Invalid rtype %d\n", pkttype);
+#endif
+          break;          
+        }
     }
 
-  return(rtype);
+  return pkttype;
 }
 
-/* read and process packets until a TS packaet or EOD is found */
+/* read and process packets until a FRAME packet or EOD is found */
 int processIter(void)
 {
   int rtype;
 
-  while(((rtype = processPacket()) != RDATA_NONE) && rtype != RDATA_TIME)
+  while(((rtype = processPacket()) != SP_NULL) && rtype != SP_FRAME)
     ;
 
   return(rtype);
@@ -308,12 +337,7 @@ void fileSeek(time_t newtime)
       /* we have to reset everything and start from scratch. */
 
       recordCloseInput();
-      if (rcBasePtr)
-	{
-	  free(rcBasePtr);
-	  rcBasePtr = NULL;
-	  rcoff = 0;
-	}
+
       if (!initReplay(rfname, NULL))
 	return;			/* bummer */
       
@@ -327,7 +351,7 @@ void fileSeek(time_t newtime)
   Context.display = FALSE; /* don't display things while looking */
   
   while (currTime < newtime)
-    if (processPacket() == RDATA_NONE)
+    if ((processPacket() == SP_NULL))
       break;		/* no more data */
   
   Context.display = TRUE;
@@ -337,7 +361,7 @@ void fileSeek(time_t newtime)
 	  
 
 /* MAIN */
-main(int argc, char *argv[])
+int main(int argc, char *argv[])
 {
   int i;
   extern char *optarg;
@@ -375,9 +399,14 @@ main(int argc, char *argv[])
       exit(1);
     }
 
+  setSystemLog(FALSE);	/* use $HOME for logfile */
 
+  GetSysConf(TRUE);             /* need this? */
+  GetConf(0);
 
-  GetSysConf(TRUE);
+  /* turn off annoying beeps */
+  UserConf.DoAlarms = FALSE;
+
   rndini( 0, 0 );		/* initialize random numbers */
 
   /* first, let's get the elapsed time */
@@ -407,7 +436,7 @@ main(int argc, char *argv[])
 
   /* if framedelay wasn't overridden, setup based on samplerate */
   if (framedelay == -1.0)
-    framedelay = (fhdr.samplerate == 1) ? 1.0 : 0.5;
+    framedelay = 1.0 / (real)fhdr.samplerate;
 
   replay();
   
@@ -428,7 +457,6 @@ static void replay(void)
   int FirstTime = TRUE;
   static char sfmt[MSGMAXLINE * 2];
   static char cfmt[MSGMAXLINE * 2];
-  string prmt="Command: ";
   int ch;
   int done = FALSE;
   char *c;
@@ -453,24 +481,35 @@ static void replay(void)
   do 
     {
       lin = 1;
-      if ( *CBlockRevision == COMMONSTAMP ) 
+      if ( fhdr.vers != RECVERSION ) 
 	{
-	  attrset(NoColor|A_BOLD);
-	  cdputc( "CONQUEST REPLAY PROGRAM", lin );
-	  attrset(YellowLevelColor);
-	  sprintf( cbuf, "%s (%s)",
-		   ConquestVersion, ConquestDate);
-	  cdputc( cbuf, lin+1 );
+	  attrset(RedLevelColor);
+	  sprintf( cbuf, "CONQUEST CQR VERSION MISMATCH %d != %d",
+		   fhdr.vers, RECVERSION );
+	  cdputc( cbuf, lin );
+	  attrset(0);
+          c_sleep(3.0);
+          return;
 	}
-      else
+      
+      if ( fhdr.cmnrev != COMMONSTAMP ) 
 	{
 	  attrset(RedLevelColor);
 	  sprintf( cbuf, "CONQUEST COMMON BLOCK MISMATCH %d != %d",
-		   *CBlockRevision, COMMONSTAMP );
+		   fhdr.cmnrev, COMMONSTAMP );
 	  cdputc( cbuf, lin );
 	  attrset(0);
+          c_sleep(3.0);
+          return;
 	}
       
+      attrset(NoColor|A_BOLD);
+      cdputc( "CONQUEST REPLAY PROGRAM", lin );
+      attrset(YellowLevelColor);
+      sprintf( cbuf, "%s (%s)",
+               ConquestVersion, ConquestDate);
+      cdputc( cbuf, lin+1 );
+
       lin+=3;
       
       cprintf(lin,0,ALIGN_CENTER,"#%d#%s",NoColor, "Recording info:");
@@ -479,29 +518,43 @@ static void replay(void)
       
       col = 5;
       
-      cprintf(lin,col,ALIGN_NONE,sfmt, "File              ", rfname);
+      cprintf(lin,col,ALIGN_NONE,sfmt, "File               ", rfname);
       lin++;
-      cprintf(lin,col,ALIGN_NONE,sfmt, "Recorded By       ", fhdr.user);
+
+      cprintf(lin,col,ALIGN_NONE,sfmt, "Recorded By        ", fhdr.user);
       lin++;
-      cprintf(lin,col,ALIGN_NONE,sfmt, "Recorded On       ", 
-	      ctime(&fhdr.rectime));
+
+      if (fhdr.snum == 0)
+        cprintf(lin,col,ALIGN_NONE,sfmt, "Recording Type     ", "Server");
+      else
+        {
+          sprintf(cbuf, "Client (Ship %d)", fhdr.snum);
+          cprintf(lin,col,ALIGN_NONE,sfmt, "Recording Type     ", cbuf);
+        }
+      lin++;
+
+      cprintf(lin,col,ALIGN_NONE,sfmt, "Recorded On        ", 
+	      ctime((time_t *)&fhdr.rectime));
       lin++;
       sprintf(cbuf, "%d (delay: %0.3fs)", fhdr.samplerate, framedelay);
-      cprintf(lin,col,ALIGN_NONE,sfmt, "Frames per second ", cbuf);
+      cprintf(lin,col,ALIGN_NONE,sfmt, "Updates per second ", cbuf);
       lin++;
       fmtseconds(totElapsed, cbuf);
-      if (cbuf[0] = '0')	/* see if we need the day count */
+
+      if (cbuf[0] == '0')	/* see if we need the day count */
 	c = &cbuf[2];	
       else
 	c = cbuf;
-      cprintf(lin,col,ALIGN_NONE,sfmt, "Total Game Time   ", c);
+
+      cprintf(lin,col,ALIGN_NONE,sfmt, "Total Game Time    ", c);
       lin++;
       fmtseconds((currTime - startTime), cbuf);
-      if (cbuf[0] = '0')
+
+      if (cbuf[0] == '0')
 	c = &cbuf[2];	
       else
 	c = cbuf;
-      cprintf(lin,col,ALIGN_NONE,sfmt, "Current Time      ", c);
+      cprintf(lin,col,ALIGN_NONE,sfmt, "Current Time       ", c);
       lin++;
       lin++;
       
@@ -562,7 +615,7 @@ void watch(void)
   int ptype;
   int snum, tmp_snum, old_snum;
   int ch, normal;
-  int msgrand, readone, now;
+  int msgrand;
   char buf[MSGMAXLINE];
   int live_ships = TRUE;
   int toggle_flg = FALSE;   /* jon no like the toggle line ... :-) */
@@ -587,13 +640,8 @@ void watch(void)
       while (TRUE)
 	{
 	  if (Context.recmode == RECMODE_PLAYING)
-	    if ((ptype = processIter()) == RDATA_NONE)
+	    if ((ptype = processIter()) == SP_NULL)
 	      return;
-
-#ifdef DEBUG_REC
-	  fprintf(stderr, "watch: got iter: packet type: %d\n", 
-		  ptype);
-#endif
 
 	  Context.display = TRUE;
 	  
@@ -642,6 +690,14 @@ void watch(void)
 	      upddsp = TRUE;
 	      break;
 	      
+	    case 'M':	/* toggle lr/sr */
+              if (SMAP(Context.snum))
+                SFCLR(Context.snum, SHIP_F_MAP);
+              else
+                SFSET(Context.snum, SHIP_F_MAP);
+	      upddsp = TRUE;
+	      break;
+	      
 	    case 'b':	/* move backward 30 seconds */
 	      displayMsg(NULL);
 	      cdputs( "Rewinding...", MSG_LIN1, 0);
@@ -683,7 +739,7 @@ void watch(void)
 		    
 	    case 'n':		/* set framedelay to normal playback
 				   speed.*/
-	      framedelay = (fhdr.samplerate == 1) ? 1.0 : 0.5;
+	      framedelay = 1.0 / (real)fhdr.samplerate;
 	      upddsp = TRUE;
 	      break;
 
@@ -945,7 +1001,12 @@ int prompt_ship(char buf[], int *snum, int *normal)
   tmpsnum = *snum;
 
   cdclrl( MSG_LIN1, 2 );
-  buf[0] = EOS;
+
+  if (fhdr.snum == 0)
+    buf[0] = EOS;
+  else
+    sprintf(buf, "%d", fhdr.snum);
+
   tch = cdgetx( pmt, MSG_LIN1, 1, TERMS, buf, MSGMAXLINE, TRUE );
   cdclrl( MSG_LIN1, 1 );
 
@@ -1048,6 +1109,8 @@ void dowatchhelp(void)
   cprintf(tlin,col,ALIGN_NONE,sfmt, "-", "slow down playback by doubling the frame delay");
   tlin++;
   cprintf(tlin,col,ALIGN_NONE,sfmt, "+", "speed up playback by halfing the frame delay");
+  tlin++;
+  cprintf(tlin,col,ALIGN_NONE,sfmt, "M", "short/long range sensor toggle");
   tlin++;
   cprintf(tlin,col,ALIGN_NONE,sfmt, "n", "reset to normal playback speed");
   tlin++;

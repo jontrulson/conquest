@@ -4,7 +4,7 @@
  *
  * $Id$
  *
- * Copyright 1999 Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
+ * Copyright 1999-2004 Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
  ***********************************************************************/
 
 /*            Copyright (C)1983-1986 by Jef Poskanzer and Craig Leres */
@@ -30,24 +30,21 @@
 #include "context.h"
 #include "global.h"
 #include "user.h"
+#include "conf.h"
 
-static int nenum; 
 static int debug; 
-static real dne, ane;
 
 /*  conqai - robot AI test program */
 
-main(int argc, char *argv[])
+int main(int argc, char *argv[])
 {
-  int i;
-  string usage="usage: conqai [-vd]";
   int arg;
   
   /* First things first. */
   
-  if ((ConquestUID = GetConquestUID()) == ERR)
+  if ((ConquestUID = GetUID(ROOT_USER)) == ERR)
     {
-      fprintf(stderr, "conqai: GetConquestUID() failed\n");
+      fprintf(stderr, "conqai: GetUID() failed\n");
       exit(1);
     }
   
@@ -74,14 +71,11 @@ main(int argc, char *argv[])
       exit(1);
     }
   
-#ifdef USE_SEMS
   if (GetSem() == ERR)
     {
       fprintf(stderr, "GetSem() failed to get semaphores. exiting.\n");
       exit(1);
     }
-#endif
-  
   
   
   map_common();

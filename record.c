@@ -3,7 +3,7 @@
  *
  * $Id$
  *
- * Copyright 1999-2002 Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
+ * Copyright 1999-2004 Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
  */
 
 #include "c_defs.h"
@@ -13,51 +13,24 @@
 #include "context.h"
 #include "conf.h"
 
+#include "protocol.h"
+#include "client.h"
+
 #include "record.h"
 
 #if defined(HAVE_LIBZ) && defined(HAVE_ZLIB_H)
 #include <zlib.h>		/* lets try compression. */
 #endif
 
-/* we will have our own copy of the common block here, so setup some stuff */
-static char *rcBasePtr = NULL;
-static int rcoff = 0;
-				/* our own copy */
-#define map1d(thevarp, thetype, size) {  \
-              thevarp = (thetype *) (rcBasePtr + rcoff); \
-              rcoff += (sizeof(thetype) * (size)); \
-	}
-
-static rData_t rdata;		/* the input/output record */
 static int rdata_wfd = -1;	/* the currently open file for writing */
 static int rdata_rfd = -1;	/* ... reading */
+
+static Unsgn32 recordFrameCount = 0;
+
 #ifdef HAVE_LIBZ
 static gzFile rdata_wfdz = NULL; /* for compressed files */
 static gzFile rdata_rfdz = NULL;
 #endif
-
-/* We need our own copies of the variables stored in the common block -
-   which is why it's important to keep this code synced up with conqcm.c */
-
-static int *lCBlockRevision;    /* common block rev number */
-static ConqInfo_t *lConqInfo;   /* misc game info */
-static User_t *lUsers;          /* User statistics. */
-static Robot_t *lRobot;         /* Robots. */
-static Planet_t *lPlanets;      /* Planets. */
-static Team_t *lTeams;          /* Teams. */
-static Doomsday_t *lDoomsday;   /* Doomsday machine. */
-static History_t *lHistory;     /* History */
-static Driver_t *lDriver;       /* Driver. */
-static Ship_t *lShips;          /* Ships. */
-static ShipType_t *lShipTypes;          /* Ship types. */
-static Msg_t *lMsgs;            /* Messages. */
-static int *lEndOfCBlock;       /* end of the common block */
-
-static int diffShip(Ship_t *ship1, Ship_t *ship2);
-static int updateShips(void);
-
-static int diffPlanet(Planet_t *p1, Planet_t *p2);
-static int updatePlanets(void);
 
 /* open a recording input file */
 int recordOpenInput(char *fname)
@@ -101,12 +74,11 @@ void recordCloseInput(void)
   return;
 }
 
-/* create the recording output file, and alloc space for a cmb copy. */
+/* create the recording output file. */
 /* runs under user level privs */
-int recordOpenOutput(char *fname)
+int recordOpenOutput(char *fname, int logit)
 {
   struct stat sbuf;
-  int rv;
 
   rdata_wfd = -1;
 #ifdef HAVE_LIBZ
@@ -116,8 +88,12 @@ int recordOpenOutput(char *fname)
   /* check to see if the file exists.  If so, it's an error. */
   if (stat(fname, &sbuf) != -1) 
     {				/* it exists.  issue error and return */
-      printf("%s: file exists.  You cannot record to an existing file\n",
+      if (logit)
+        clog("%s: file exists.  You cannot record to an existing file\n",
 	     fname);
+      else
+        printf("%s: file exists.  You cannot record to an existing file\n",
+               fname);
       return(FALSE);
     }
 
@@ -125,34 +101,29 @@ int recordOpenOutput(char *fname)
 
   if ((rdata_wfd = creat(fname, S_IWUSR|S_IRUSR)) == -1)
     {
-      printf("recordOpenOutput(): creat(%s) failed: %s\n",
-	     fname,
-	     strerror(errno));
+      if (logit)
+        clog("recordOpenOutput(): creat(%s) failed: %s\n",
+               fname,
+               strerror(errno));
+      else
+        printf("recordOpenOutput(): creat(%s) failed: %s\n",
+               fname,
+               strerror(errno));
       return(FALSE);
     }
+
+  chmod(fname, (S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH));
 
 #ifdef HAVE_LIBZ
   if ((rdata_wfdz = gzdopen(rdata_wfd, "wb")) == NULL)
     {
-      printf("initReplay: gzdopen failed\n");
+      if (logit)
+        clog("initReplay: gzdopen failed\n");
+      else
+        printf("initReplay: gzdopen failed\n");
       return(FALSE);
     }
 #endif
-
-  /* create our copy of the common block */
-  if ((rcBasePtr = malloc(SZ_CMB)) == NULL)
-    {
-      printf("recordOpenOutput(): memory allocation failed\n");
-#ifdef HAVE_LIBZ
-      gzclose(rdata_wfdz);
-      rdata_wfdz = NULL;
-#else
-      close(rdata_wfd);
-#endif
-      rdata_wfd = -1;
-      unlink(fname);
-      return(FALSE);
-    }
 
   return(TRUE);
 }
@@ -160,12 +131,7 @@ int recordOpenOutput(char *fname)
 /* close the output stream */  
 void recordCloseOutput(void)
 {
-
-  /* write out a final timestamp */
-  rdata.index = 0;		/* no index for these */
-  rdata.data.rtime = getnow(NULL, 0);
-
-  recordWritePkt(RDATA_TIME, &rdata, "TIMESTAMP");
+  recordUpdateFrame();
 
 #ifdef HAVE_LIBZ
   if (rdata_wfdz != NULL)
@@ -185,367 +151,227 @@ void recordCloseOutput(void)
 /* read the file header */
 int recordReadHeader(fileHeader_t *fhdr)
 {
+  int rv;
   /* assumes you've already opened the stream */
   if (rdata_rfd == -1)
     return(FALSE);
 
 #ifdef HAVE_LIBZ
-  if (gzread(rdata_rfdz, (char *)fhdr, SZ_FILEHEADER) != SZ_FILEHEADER)
+  if ((rv = gzread(rdata_rfdz, (char *)fhdr, SZ_FILEHEADER)) != SZ_FILEHEADER)
 #else
-  if (read(rdata_rfd, (char *)fhdr, SZ_FILEHEADER) != SZ_FILEHEADER)
+  if ((rv = read(rdata_rfd, (char *)fhdr, SZ_FILEHEADER)) != SZ_FILEHEADER)
 #endif
     {
       printf("recordReadHeader: could not read a proper header\n");
       return(FALSE);
     }
 
-  return(TRUE);
-}
-
-/* write a file header */
-int recordWriteHeader(fileHeader_t *fhdr)
-{
-  /* assumes you've already opened the stream */
-  if (rdata_wfd == -1)
-    return(FALSE);
-
-#ifdef HAVE_LIBZ
-  if (gzwrite(rdata_wfdz, (char *)fhdr, SZ_FILEHEADER) != SZ_FILEHEADER)
-#else
-  if (write(rdata_wfd, (char *)fhdr, SZ_FILEHEADER) != SZ_FILEHEADER)
+#ifdef DEBUG_REC
+  clog("recordReadHeader: read %d bytes\n",
+       rv);
 #endif
-    {
-      printf("recordWriteHeader: could not write the file header\n");
-      return(FALSE);
-    }
+
+  /* now endianize the data */
+
+  fhdr->vers = (Unsgn32)ntohl(fhdr->vers);
+  fhdr->rectime = (Unsgn32)ntohl(fhdr->rectime);
+  fhdr->cmnrev = (Unsgn32)ntohl(fhdr->cmnrev);
+
+#ifdef DEBUG_REC
+  clog("recordReadHeader: vers = %d, rectime = %d, cmnrev = %d\n",
+       fhdr->vers, fhdr->rectime, fhdr->cmnrev);
+#endif
+
 
   return(TRUE);
 }
 
-/* setup our copy of the common block, build and generate a file header,
-   output a cmb rdata header and an cmb rdata unit. assumes conq privs
-   are on */
-int recordInit(int unum, time_t thetime)
+/* build and generate a file header
+ */
+int recordInitOutput(int unum, time_t thetime, int snum)
 {
-  int i;
   fileHeader_t fhdr;
-  rDataHeader_t rdatahdr;
   
   if (rdata_wfd == -1)
     return(FALSE);
 
-  /* the fd is already open, and the cmb allocated. map our local versions */
-
-  map1d(lCBlockRevision, int, 1);        /* this *must* be the first var */
-  map1d(lConqInfo, ConqInfo_t, 1)
-  map1d(lUsers, User_t, MAXUSERS);
-  map1d(lRobot, Robot_t, 1);
-  map1d(lPlanets, Planet_t, NUMPLANETS + 1);
-  map1d(lTeams, Team_t, NUMALLTEAMS);
-  map1d(lDoomsday, Doomsday_t, 1);
-  map1d(lHistory, History_t, MAXHISTLOG);
-  map1d(lDriver, Driver_t, 1);
-  map1d(lShips, Ship_t, MAXSHIPS + 1);
-  map1d(lShipTypes, ShipType_t, MAXNUMSHIPTYPES);
-  map1d(lMsgs, Msg_t, MAXMESSAGES);
-  map1d(lEndOfCBlock, int, 1);
-
-  /* now copy the current common block into our copy */
-  memcpy((char *)lCBlockRevision, (char *)CBlockRevision, SZ_CMB);
-
-
-  /* To be nice, lets loop through all of the user slots,
-     and clear out all the passwords for remote users ;-) */
-  for (i=0; i<MAXUSERS; i++)
-    memset(&lUsers[i].pw, 0, SIZEUSERNAME);
+  recordFrameCount = 0;
 
   /* now make a file header and write it */
   memset(&fhdr, 0, sizeof(fhdr));
-  fhdr.vers = RECVERSION;
-  if (SysConf.AllowFastUpdate == TRUE && UserConf.DoFastUpdate == TRUE)
-    fhdr.samplerate = 2;
-  else
-    fhdr.samplerate = 1;
+  fhdr.vers = (Unsgn32)htonl(RECVERSION);
 
-  fhdr.rectime = thetime;
-  strncpy(fhdr.user, Users[unum].username, SIZEUSERNAME - 1);
+  fhdr.samplerate = (Unsgn8)Context.updsec;
 
-  if (!recordWriteHeader(&fhdr))
+  fhdr.rectime = (Unsgn32)htonl((Unsgn32)thetime);
+  strncpy(fhdr.user, Users[unum].username, MAXUSERNAME - 1);
+
+  fhdr.cmnrev = (Unsgn32)htonl((Unsgn32)COMMONSTAMP);
+  fhdr.snum = snum;
+
+  if (!recordWriteBuf((Unsgn8 *)&fhdr, sizeof(fileHeader_t)))
     return(FALSE);
 
-  /* write a cmb packet */
-  rdata.index = 0;
-  memcpy(&rdata.data.rcmb, (char *)lCBlockRevision, SZ_CMB);
-
-  if (!recordWritePkt(RDATA_CMB, &rdata, "COMMONBLOCK"))
-    return(FALSE);
+  /* add a frame packet */
+  recordUpdateFrame();
 
   /* ready to go I hope */
   return(TRUE);
 }
 
-int recordAddMsg(Msg_t *themsg)
+/* note, if we get a write error here, we turn off recording */
+void recordWriteEvent(Unsgn8 *buf)
 {
-  if (Context.recmode != RECMODE_ON)
-    return(FALSE);              /* bail */
-
-  rdata.index = 0;
-  rdata.data.rmsg = *themsg;
-
-  recordWritePkt(RDATA_MESSAGE, &rdata, "MSG");
-
-  return(TRUE);
-}
-
-/* check some things and write some packets */
-int recordUpdateState(void)
-{
+  int pkttype;
+  int len;
 
   if (Context.recmode != RECMODE_ON)
-    return(FALSE);		/* bail */
+    return;
+
+  if (!buf)
+    return;
+
+  pkttype = (int)buf[0];
   
-  /* write a TS packet */
-  rdata.index = 0;		/* no index for these */
-  rdata.data.rtime = getnow(NULL, 0);
+  len = serverPktSize(pkttype);
+  if (!len)
+    {
+      clog("recordWriteEvent: invalid packet type %d", pkttype);
+      return;
+    }
 
-  recordWritePkt(RDATA_TIME, &rdata, "TIMESTAMP");
+  if (!recordWriteBuf(buf, len))
+    {
+      clog("recordWriteEvent: write error: %s, recording terminated",
+           strerror(errno));
+      Context.recmode = RECMODE_OFF;
+    }
 
-  updateShips();
-
-  updatePlanets();
-
-  return(TRUE);
+  return;
 }
 
-/* return the expected size of a packet based on type.  Note:  This function
-   adds SZ_DRHSIZE to the returned value (unless read error). */
-int recordPkt2Sz(int rtype)
+/* write a frame packet and increment recordFrameCount */
+void recordUpdateFrame(void)
 {
-  int rdsize = 0;
+  spFrame_t frame;
 
-  switch(rtype)
-    {
-    case RDATA_CMB:
-      rdsize = SZ_CMB;
-      break;
-
-    case RDATA_SHIP:
-      rdsize = SZ_SHIPD;
-      break;
-
-    case RDATA_PLANET:
-      rdsize = SZ_PLANETD;
-      break;
-
-    case RDATA_MESSAGE:
-      rdsize = SZ_MSG;
-      break;
-
-    case RDATA_TIME:
-      rdsize = SZ_TIME;
-      break;
-
-    default:
-#ifdef DEBUG_REC
-      fprintf(stderr, "recordPkt2Sz: invalid rtype: %d, returning 0\n",
-	   rtype);
-#endif
-      
-      rdsize = 0;
-      break;
-    }
-
-  return((rdsize == 0) ? 0 : (rdsize + SZ_DRHSIZE));
-}
+  if (Context.recmode != RECMODE_ON)
+    return;		/* bail */
   
-/* read in a rdata header and it's rdata block, returning the packet type */
-int recordReadPkt(rData_t *rdat, char *comment)
+  memset((void *)&frame, 0, sizeof(spFrame_t));
+
+  frame.type = SP_FRAME;
+  frame.frame = (Unsgn32)htonl(recordFrameCount);
+  frame.time = (Unsgn32)htonl((Unsgn32)getnow(NULL, 0));
+
+  recordWriteEvent((Unsgn8 *)&frame);
+
+  recordFrameCount++;
+
+  return;
+}
+
+/* write out a buffer */
+int recordWriteBuf(Unsgn8 *buf, int len)
 {
-  rDataHeader_t rdatahdr;
-  int rdsize, rv;
-
-  if (rdata_rfd == -1)
-    return(FALSE);
-
-  /* first read in the data header */
-#ifdef HAVE_LIBZ
-  if ((rv = gzread(rdata_rfdz, (char *)&rdatahdr, SZ_RDATAHEADER)) !=
-      SZ_RDATAHEADER)
-#else
-  if ((rv = read(rdata_rfd, (char *)&rdatahdr, SZ_RDATAHEADER)) !=
-      SZ_RDATAHEADER)
-#endif
-    {
-#ifdef DEBUG_REC
-      fprintf(stderr, 
-	      "recordReadPkt: could not read data header, returned %d\n",
-	      rv);
-#endif
-
-      return(RDATA_NONE);
-    }
-
-  if (!(rdsize = recordPkt2Sz(rdatahdr.type)))
-    return(RDATA_NONE);
-  
-  /* if comment is non-NULL, memcpy the comment string in */
-  if (comment)
-    memcpy(comment, rdatahdr.comment, SZ_RDATAHDR_COMMENT);
-
-  /* so now read in the data pkt */
-#ifdef HAVE_LIBZ
-  if ((rv = gzread(rdata_rfdz, (char *)rdat, rdsize)) !=
-      rdsize)
-#else
-  if ((rv = read(rdata_rfd, (char *)rdat, rdsize)) !=
-      rdsize)
-#endif
-    {
-#ifdef DEBUG_REC
-      fprintf(stderr, 
-	      "recordReadPkt: could not read data packet, returned %d\n",
-	      rv);
-#endif
-      
-      return(RDATA_NONE);
-    }
-
-#ifdef DEBUG_REC
-  fprintf(stderr, "recordReadPkt: rdatahdr.type = %d, rdata.index = %d\n",
-          rdatahdr.type, rdat->index);
-#endif
-
-  return(rdatahdr.type);
-}
-
-
-/* write out an rdata header and it's rdata block */
-int recordWritePkt(int rtype, rData_t *rdat, char *comment)
-{				/* kind of a misnomer as we are actually
-				   writing 2 'packets' - the header and
-				   the data */
-  rDataHeader_t rdatahdr;
-  int rdsize, rv;
-
   if (rdata_wfd == -1)
     return(FALSE);
-
-  /* invalid size? */
-  if (!(rdsize = recordPkt2Sz(rtype)))
-    return(FALSE);
-
-  /* write data header */
-  memset(&rdatahdr, 0, SZ_RDATAHEADER);
-  rdatahdr.type = rtype;
-  strncpy(rdatahdr.comment, comment, SZ_RDATAHDR_COMMENT - 1);
   
 #ifdef DEBUG_REC
-  clog("recordWritePkt: write header: type %d (%s) %d bytes\n",
-       rtype, comment, SZ_RDATAHEADER);
+  clog("recordWriteBuf: len = %d\n", len);
 #endif
 
 #ifdef HAVE_LIBZ
-  if (gzwrite(rdata_wfdz, &rdatahdr, SZ_RDATAHEADER) != SZ_RDATAHEADER)
+  if (gzwrite(rdata_wfdz, buf, len) != len)
 #else
-  if (write(rdata_wfd, &rdatahdr, SZ_RDATAHEADER) != SZ_RDATAHEADER)
+  if (write(rdata_wfd, buf, len) != len)
 #endif
     {
-      clog("recordWritePkt: couldn't write full packet header of %d bytes\n",
-	   rdsize);
-      return(FALSE);
-    }
-
-
-  /* write data block */
-#ifdef HAVE_LIBZ
-  if (gzwrite(rdata_wfdz, rdat, rdsize) != rdsize)
-#else
-  if (write(rdata_wfd, rdat, rdsize) != rdsize)
-#endif
-    {
-      /* hmmm */
-      clog("recordWritePkt: couldn't write full packet of %d bytes\n",
-	   rdsize);
+      clog("recordWriteBuf: couldn't write buffer of %d bytes\n",
+	   len);
       return(FALSE);
     }
 
   return(TRUE);
 }
 
-static int diffShip(Ship_t *ship1, Ship_t *ship2)
+
+/* read in a packet, returning the packet type */
+int recordReadPkt(Unsgn8 *buf, int blen)
 {
-  /* for now we will just memcmp them */
+  int len, rv;
+  int pkttype;
 
-  if (memcmp(ship1, ship2, SZ_SHIPD) == 0)
-    return(FALSE);
-  else
-    return(TRUE);
-}
+  if (rdata_rfd == -1)
+    return(SP_NULL);
 
-/* loop through the ships, writing update packets for any that have changed */
-static int updateShips(void)
-{
-  int i;
+  if (!buf || !blen)
+    return(SP_NULL);
 
-  for (i=1; i<=MAXSHIPS; i++)
+  /* first read in the first byte to get the packet type */
+#ifdef HAVE_LIBZ
+  if ((rv = gzread(rdata_rfdz, (char *)buf, 1)) != 1)
+#else
+  if ((rv = read(rdata_rfd, (char *)buf, 1)) != 1)
+#endif
     {
-      if (diffShip(&Ships[i], &lShips[i]))
-	{
-	  /* need to write a packet */
-	  
-	  /* update our local common block */
-	  lShips[i] = Ships[i];
-	  
-	  /* now write the puppy */
-	  
-	  rdata.index = i;
-	  rdata.data.rship = lShips[i];
-	  
-	  recordWritePkt(RDATA_SHIP, &rdata, "SHIP");
-	}
+#ifdef DEBUG_REC
+      clog("recordReadPkt: could not read pkt type, returned %d\n",
+              rv);
+#endif
+
+      return(SP_NULL);
     }
 
-  return(TRUE);
-}
+  pkttype = (int)buf[0];
 
-static int diffPlanet(Planet_t *p1, Planet_t *p2)
-{
-  /* for now we will just memcmp them */
+  len = serverPktSize(pkttype);
 
-  if (memcmp(p1, p2, SZ_PLANETD) == 0)
-    return(FALSE);
-  else
-    return(TRUE);
-}
-
-/* loop through the planets, writing update packets for any that have
-   changed */
-static int updatePlanets(void)
-{
-  int i;
-
-  for (i=1; i<=NUMPLANETS; i++)
+  if (blen < len)
     {
-				/* we are only interested in real ones */
-      if (Planets[i].real)
-	{			/* see if it's different than our copy */
-	  if (diffPlanet(&Planets[i], &lPlanets[i]))
-	    {
-	      /* need to write a packet */
-	      
-	      /* update our local common block */
-	      lPlanets[i] = Planets[i];
+      fprintf(stderr,
+              "recordReadPkt: buffer too small. got %d, need %d\n",
+              len, blen);
+      return(SP_NULL);
+    }
+    
 
-	      /* now write the puppy */
+  if (!len)
+    {
+      clog("recordReadPkt: invalid packet %d\n",
+              pkttype);
+      fprintf(stderr,
+              "recordReadPkt: invalid packet %d\n",
+              pkttype);
+      return(SP_NULL);
+    }
+  else
+    {
+      len = len - sizeof(Unsgn8);
 
-	      rdata.index = i;
-	      rdata.data.rplanet = lPlanets[i];
+  /* so now read in the rest of the packet */
+#ifdef HAVE_LIBZ
+      if ((rv = gzread(rdata_rfdz, (char *)(buf + 1), len)) != len)
+#else
+      if ((rv = read(rdata_rfd, (char *)(buf + 1), len)) != len )
+#endif
+      {
+#ifdef DEBUG_REC
+         fprintf(stderr, 
+	         "recordReadPkt: could not read data packet, returned %d\n",
+	         rv);
+#endif
+      
+         return(SP_NULL);
+       }
 
-	      recordWritePkt(RDATA_PLANET, &rdata, "PLANET");
-	    }
-	}
     }
 
-  return(TRUE);
+#ifdef DEBUG_REC
+     clog("recordReadPkt: read pkttype  = %d\n",
+          pkttype);
+#endif
+
+  return(pkttype);
 }
 

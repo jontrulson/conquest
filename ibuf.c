@@ -7,7 +7,7 @@
  *
  * $Id$
  *
- * Copyright 1999 Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
+ * Copyright 1999-2004 Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
  **********************************************************************/
 
 /**********************************************************************/
@@ -23,13 +23,18 @@
 #include "defs.h"
 #include "ibuf.h"
 
+/* the buffer */
+static unsigned int *rp, *wp;
+static int ndata;
+static unsigned int data[IBUFMAX];
+
 /* iBufInit - intialize the input buffer */
 
 void iBufInit(void)
 {
-  iBufOffset = -1;
-
-  iBuffer[0] = EOS;
+  data[0] = 0;
+  rp = wp = data;
+  ndata = 0;
 
   return;
 }
@@ -39,51 +44,99 @@ void iBufInit(void)
  * empty 
  */
 
-int iBufEmpty(void)
+int iBufCount(void)
 {
-  if (iBufOffset == -1)
-    return(TRUE);
-  else
-    return(FALSE);
+  return ndata;
 }
+
+static int putRing(int *buf, int len)
+{
+  int left, wlen = len, i;
+  int *rptr = buf;
+
+  left = IBUFMAX - ndata; /* max space available */
+
+  /* a null buf means to simply return the space left */
+
+  if (!rptr)
+    return(left);
+
+  if (wlen > left)
+    wlen = left;
+
+  if (rptr != NULL)
+    {
+      for (i=0; i < wlen; i++, rptr++)
+        {
+          if ( wp >= (data + IBUFMAX) ) 
+            wp = data;
+
+          *wp = *rptr;
+          ndata++;
+	  wp++;
+        }
+    }
+
+  return(wlen);
+}
+
+
+static int getRing(int *buf, int len, int update)
+{
+  unsigned int *wptr = buf, *rptr = rp;
+  int rlen = len, tlen, numdata = ndata;
+
+  if (rlen > ndata)
+    rlen = ndata;
+
+  tlen = rlen;
+
+  while (rlen--)
+    {
+      if (rptr >= (data + IBUFMAX)) 
+        rptr = data;
+
+      if (wptr)                 /* NULL buf doesn't copy data - Pop */
+        {
+          *wptr = *rptr;
+          wptr++;
+        }
+      rptr++;
+      numdata--;
+    }
+
+  if (update)
+    {
+      rp = rptr;
+      ndata = numdata;
+    }
+
+  return(tlen);
+}
+
 
 /* iBufPut - put a string into the buffer */
 
 void iBufPut(char *thestr)
 {
-  int i, j, k;
+  int i;
+  int n = strlen(thestr);
+  int idata[IBUFMAX];
 
-  i = iBufOffset + 1;
+  /* cvt to int array */
+  for (i=0; i<n; i++)
+    idata[i] = thestr[i] & 0xff;
 
-  j = strlen(thestr);
-
-  if (j > 0)
-    {
-      for (k=(j - 1); k >= 0 && i < IBUFMAX; k--)
-	{
-	  iBuffer[i] = thestr[k];	/* copy it in backwards */
-	  i++;
-	}
-      
-      iBufOffset = i - 1;
-    }
+  putRing(idata, n);
 
   return;
 }
 
 /* iBufPutc - put a char into the buffer */
 
-void iBufPutc(char thechar)
+void iBufPutc(unsigned int thechar)
 {
-  int i;
-
-  i = iBufOffset + 1;
-
-  if (i < IBUFMAX)
-    {
-      iBuffer[i] = thechar;
-      iBufOffset++;
-    }
+  putRing(&thechar, 1);
 
   return;
 }
@@ -91,19 +144,19 @@ void iBufPutc(char thechar)
 
 /* iBufGetCh - return next char from the input buffer */
 
-char iBufGetCh(void)
+unsigned int iBufGetCh(void)
 {
-  static char c;
+  static int c;
 
-  if (iBufEmpty() == TRUE)
-    return('\0');
-
-  c = iBuffer[iBufOffset--];
+  if (!iBufCount())
+    {
+      clog("IBUF GETC EMPTY, returning 0\n");
+      return('\0');
+    }
+  getRing(&c, 1, TRUE);
 
   return(c);
 }
-  
-      
   
 /* DoMacro - stuff the buffer if an fkey pressed */
 

@@ -4,7 +4,7 @@
  *
  * $Id$
  *
- * Copyright 1999 Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
+ * Copyright 1999-2004 Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
  ***********************************************************************/
 
 /**********************************************************************/
@@ -36,12 +36,17 @@
 #define CTYPE_MACRO (3)	
 #define CTYPE_NUMERIC (4)
 
+/* limits for some options */
+#define CONF_SERVER_NAME_SZ   70
+#define CONF_SERVER_MOTD_SZ   70
+
 struct Conf 
 {
   int Found;
   int ConfType;
   char *ConfName;
   void *ConfValue;
+  int min, max;			/* for CTYPE_NUMERIC, CTYPE_STRING */
   char *OneLineDesc;
   char *ConfComment[CONF_MAXCOMMENTS];
 };
@@ -66,19 +71,9 @@ typedef struct _userConf {
   int NoColor;
 				/* whether or not you want to see robot msgs */
   int NoRobotMsgs;
-				/* whether or not to send announcements on */
-				/* player entries/deaths to you. */
-  int RecPlayerMsgs;
 				/* whether to update the screen twice per */
 				/* second instead of once per second. */
-  int DoFastUpdate;
-				/* whether to restrict bells to no more than */
-				/* one per second.  Handy when do_fastupdate */
-				/* is set. */
-  int DoLimitBell;
-				/* whether or not to clear out old msgs after
-				   a reincarnate */
-  int ClearOldMsgs;
+  int UpdatesPerSecond;
 				/* whether to send emergency distress calls
 				   to all friendly ships, rather than just
 				   your team mates */
@@ -87,21 +82,35 @@ typedef struct _userConf {
 				   allow_alt_hud is false */
   int AltHUD;
 				/* Macro keys - F1-F<MAX_MACROS> */
-  char MacrosF[MAX_MACROS][MAX_MACRO_LEN];
 
-} UserConf_t;
+  int ShowPhasers;		/* want phaser graphics? */
 
-typedef struct _sysConf {
+  int ShowPlanNames;		/* show planet names? */
+
+  int DoAlarms;			/* want alarm bell? */
+
+  int DoIntrudeAlert;		/* want intruder alerts */
+
+  int DoNumMap;			/* want numeric map */
+
+  int Terse;			/* be terse? */
+ 
+  int DoExplode;		/* show explosions? */
+
 				/* can see friendly torps on LR scan? */
   int DoLRTorpScan;
 				/* (M)ap is actually LongeRange scan? */
   int DoLocalLRScan;
 				/* (I)nfo cmds return ETA data? */
   int DoETAStats;
+
+  char MacrosF[MAX_MACROS][MAX_MACRO_LEN];
+
+} UserConf_t;
+
+typedef struct _sysConf {
 				/* randomly gen a doomsday machine? */
   int NoDoomsday;
-				/* allow users to use do_fastupdate */
-  int AllowFastUpdate;
 				/* allow randomized robot strengths */
   int DoRandomRobotKills;
 				/* allow non gods to SIGQUIT out */
@@ -119,8 +128,14 @@ typedef struct _sysConf {
 
 				/* whether to allow refitting */
   int AllowRefits;
-				/* whether to allow alternate HUD */
-  int AllowAltHUD;
+
+  int AllowSlingShot;           /* slingshot bug enabled? */
+
+  /* server name */
+  char ServerName[CONF_SERVER_NAME_SZ];
+  /* server motd */
+  char ServerMotd[CONF_SERVER_MOTD_SZ];
+
 } SysConf_t;
 
 
@@ -139,9 +154,18 @@ CEXTERN UserConf_t UserConf;
 CEXTERN SysConf_t SysConf;
 
 				/* local function declarations */
+void confSetTelnetClientMode(int telnetc);
+CEXTERN int GetSysConf(int checkonly);
+CEXTERN int GetConf(int usernum);
+CEXTERN int MakeSysConf(void);
+CEXTERN int SaveUserConfig(int unum);
+CEXTERN int SaveSysConfig(void);
+CEXTERN char *Str2Macro(char *str);
+CEXTERN char *Macro2Str(char *str);
 CEXTERN char *process_macrostr(char *str);
 CEXTERN int process_bool(char *bufptr);
 CEXTERN int MakeConf(char *filename);
+
 
 
 				/* Initialize the system configurables */
@@ -155,6 +179,7 @@ struct Conf SysConfData[] =
     CTYPE_NULL,
     "SysConqfigVersion=",
     ConfigVersion,
+    0, 0,			/* mix/max */
     "System Config Version",
     {
       NULL
@@ -165,6 +190,7 @@ struct Conf SysConfData[] =
     CTYPE_NULL,
     NULL,
     NULL,
+    0, 0,			/* mix/max */
     "System Config File Header",
     {
       "###################################################################",
@@ -186,49 +212,9 @@ struct Conf SysConfData[] =
   {
     FALSE,
     CTYPE_BOOL,
-    "do_lr_torpscan=",
-    &SysConf.DoLRTorpScan,
-    "Show friendly torps on a long-range scan",
-    {
-      "# define this as 'true' if you want to be able to see friendly",
-      "#  torps (including yours) on a long-range scan.  Default: true",
-      NULL
-    }
-  },
-  {
-    FALSE,
-    CTYPE_BOOL,
-    "do_local_lrscan=",
-    &SysConf.DoLocalLRScan,
-    "Long Range Scan is centered on ship, not Murisak",
-    {
-      "# define this as 'false' if you want the (M)ap command to have",
-      "#  it's original meaning - a static map of the universe with",
-      "#  Murisak at the center.  Setting to true makes the (M)ap",
-      "#  command have more 'realism' (IMHO) by providing a dynamic",
-      "#  map of the universe centered on your ship's current location.",
-      "#  Default: true",
-      NULL
-    }
-  },
-  {
-    FALSE,
-    CTYPE_BOOL,
-    "do_etastats=",
-    &SysConf.DoETAStats,
-    "Compute and display Estimated Time of Arrival (ETA) stats",
-    {
-      "# define this as 'true' if you want Estimated Time of Arrival (ETA)",
-      "#  information to be computed and displayed when getting (I)nfo on",
-      "#  another object.  Default: true",
-      NULL
-    }
-  },
-  {
-    FALSE,
-    CTYPE_BOOL,
     "no_doomsday=",
     &SysConf.NoDoomsday,
+    0, 0,			/* mix/max */
     "Disable the Doomsday machine",
     {
       "# define this as 'true' if you never want the Doomsday Machine to",
@@ -239,25 +225,9 @@ struct Conf SysConfData[] =
   {
     FALSE,
     CTYPE_BOOL,
-    "allow_fastupdate=",
-    &SysConf.AllowFastUpdate,
-    "Allow 2 screen updates per second rather than 1",
-    {
-      "# define this as 'true' if you want to allow users to enable the",
-      "#  'do_fastupdate' option, which gives users 2 screen updates per",
-      "#  second instead of one.  This can provide a smoother game, but",
-      "#  requires more CPU and better bandwith to be useful. This option",
-      "#  has no effect (nor does do_fastupdate) if Conquest was compiled",
-      "#  with HAS_SETITIMER undefined in defs.h.",
-      "#  Default: true",
-      NULL
-    }
-  },
-  {
-    FALSE,
-    CTYPE_BOOL,
     "do_random_robotkills=",
     &SysConf.DoRandomRobotKills,
+    0, 0,			/* mix/max */
     "Robots have randomized kills when created",
     {
       "# define this as 'true' if you want robots to be created with a",
@@ -278,6 +248,7 @@ struct Conf SysConfData[] =
     CTYPE_BOOL,
     "allow_sigquit=",
     &SysConf.AllowSigquit,
+    0, 0,			/* mix/max */
     "Allow users to exit Conquest immediately with a QUIT signal",
     {
       "# define this as 'true' if you want to allow non Conquest Gods to",
@@ -291,6 +262,7 @@ struct Conf SysConfData[] =
     CTYPE_BOOL,
     "allow_switchteams=",
     &SysConf.AllowSwitchteams,
+    0, 0,			/* mix/max */
     "Allow users to (s)witch teams at the main menu",
     {
       "# define this as 'false' if you want to prevent users from being",
@@ -304,6 +276,7 @@ struct Conf SysConfData[] =
     CTYPE_NUMERIC,
     "user_expiredays=",
     &SysConf.UserExpiredays,
+    0, 4000,			/* mix/max */
     "Number of days after which to expire inactive users",
     {
       "# number of days of inactivity, after which a user is expired.",
@@ -317,6 +290,7 @@ struct Conf SysConfData[] =
     CTYPE_BOOL,
     "log_messages=",
     &SysConf.LogMessages,
+    0, 0,			/* mix/max */
     "Log all player messages into the log file",
     {
       "# Whether or not to log all player messages into the logfile.",
@@ -327,28 +301,56 @@ struct Conf SysConfData[] =
   {
     FALSE,
     CTYPE_BOOL,
-    "allow_alt_hud=",
-    &SysConf.AllowAltHUD,
-    "Allow users to use an alternate (experimental) HUD",
-    {
-      "# Whether or not to allow users to enable an alternate and ",
-      "# experimental HUD that provides some more info along",
-      "# the bottom view border.",
-      "#  Default: false   ",
-      NULL
-    }
-  },
-  {
-    FALSE,
-    CTYPE_BOOL,
     "allow_refits=",
     &SysConf.AllowRefits,
+    0, 0,			/* mix/max */
     "Allow players to refit their ships",
     {
       "# Whether or not to allow players to refit their ships to a ",
       "#  different ship type - if they have a kill, and are orbiting",
       "#  a team owned planet.",
       "#  Default: true   ",
+      NULL
+    }
+  },
+  {
+    FALSE,
+    CTYPE_BOOL,
+    "allow_slingshot=",
+    &SysConf.AllowSlingShot,
+    0, 0,			/* mix/max */
+    "Enable the Slingshot bug.",
+    {
+      "# Whether or not to enable the slingshot bug.",
+      "#  This is a towing bug in the original conquest. Good fun!",
+      "#  Default: false",
+      NULL
+    }
+  },
+  {
+    FALSE,
+    CTYPE_STRING,
+    "server_name=",
+    SysConf.ServerName,
+    0, CONF_SERVER_NAME_SZ,	/* mix/max */
+    "Server's Name",
+    {
+      "# The name of your server, displayed on the client login",
+      "#  screen",
+      "#  Default: Generic Conquest Server",
+      NULL
+    }
+  },
+  {
+    FALSE,
+    CTYPE_STRING,
+    "server_motd=",
+    SysConf.ServerMotd,
+    0, CONF_SERVER_MOTD_SZ,	/* mix/max */
+    "Server MOTD",
+    {
+      "# Message of the day (MOTD) for your server",
+      "#  Default: Keep your shields up in battle.",
       NULL
     }
   }
@@ -365,6 +367,7 @@ struct Conf ConfData[] =
     CTYPE_NULL,
     "ConqfigVersion=",
     ConfigVersion,
+    0, 0,			/* mix/max */
     "User Config Version",
     {
       NULL
@@ -375,6 +378,7 @@ struct Conf ConfData[] =
     CTYPE_NULL,
     NULL,
     NULL,
+    0, 0,			/* mix/max */
     "User Config File Header",
     {
       "###################################################################",
@@ -407,8 +411,106 @@ struct Conf ConfData[] =
   {
     FALSE,
     CTYPE_BOOL,
+    "do_alarm_bell=",
+    &UserConf.DoAlarms,
+    0, 0,			/* mix/max */
+    "Beep when something important is happening",
+    {
+      "# define this as 'true' if you want beeps when under attack, ",
+      "# taking damage, etc.",
+      "# Default: true",
+      NULL
+    }
+  },
+  {
+    FALSE,
+    CTYPE_BOOL,
+    "show_phaser_graphics=",
+    &UserConf.ShowPhasers,
+    0, 0,			/* mix/max */
+    "Display phaser graphics",
+    {
+      "# define this as 'true' if you want to see phasers",
+      "# Default: true",
+      NULL
+    }
+  },
+  {
+    FALSE,
+    CTYPE_BOOL,
+    "show_planet_names=",
+    &UserConf.ShowPlanNames,
+    0, 0,			/* mix/max */
+    "Show Planet names on the scanners",
+    {
+      "# define this as 'true' if you want planets labeled with their",
+      "# names on your scanners.",
+      "# Default: true",
+      NULL
+    }
+  },
+  {
+    FALSE,
+    CTYPE_BOOL,
+    "do_intruder_alerts=",
+    &UserConf.DoIntrudeAlert,
+    0, 0,			/* mix/max */
+    "Receive Intruder alerts",
+    {
+      "# define this as 'true' if you want to receive a message when",
+      "# someone attacks one of your team's planets.",
+      "# Default: true",
+      NULL
+    }
+  },
+  {
+    FALSE,
+    CTYPE_BOOL,
+    "numeric_planet_map=",
+    &UserConf.DoNumMap,
+    0, 0,			/* mix/max */
+    "Show army counts for planets on LR scan",
+    {
+      "# define this as 'true' if you want to see the number of armies",
+      "# on each (scanned) planet in the long range map.",
+      "# Default: true",
+      NULL
+    }
+  },
+  {
+    FALSE,
+    CTYPE_BOOL,
+    "terse=",
+    &UserConf.Terse,
+    0, 0,			/* mix/max */
+    "Be Terse",
+    {
+      "# define this as 'true' if you don't want to receive certain",
+      "# mundane messages like 'Entering orbit', etc...",
+      "# Default: false",
+      NULL
+    }
+  },
+  {
+    FALSE,
+    CTYPE_BOOL,
+    "show_explosions=",
+    &UserConf.DoExplode,
+    0, 0,			/* mix/max */
+    "Show torpedo and ship explosions",
+    {
+      "# define this as 'true' if you want to see exploding torps and",
+      "# ships.",
+      "# Default: true",
+      NULL
+    }
+  },
+  {
+    FALSE,
+    CTYPE_BOOL,
     "do_msg_alarm=",
     &UserConf.MessageBell,
+    0, 0,			/* mix/max */
     "Beep when a message arrives",
     {
       "# define this as 'true' if you want beeps when a message is",
@@ -421,6 +523,7 @@ struct Conf ConfData[] =
     CTYPE_BOOL,
     "no_color=",
     &UserConf.NoColor,
+    0, 0,			/* mix/max */
     "Disable color, even if your terminal/terminfo entry supports it",
     {
       "# define this as 'true' if you never want to see color,",
@@ -433,6 +536,7 @@ struct Conf ConfData[] =
     CTYPE_BOOL,
     "no_robot_msgs=",
     &UserConf.NoRobotMsgs,
+    0, 0,			/* mix/max */
     "Disable messages from robots to your ship",
     {
       "# define this as 'true' if you don't want to recieve messages",
@@ -446,62 +550,17 @@ struct Conf ConfData[] =
   },
   {
     FALSE,
-    CTYPE_BOOL,
-    "rcv_player_msgs=",
-    &UserConf.RecPlayerMsgs,
-    "Recieve messages indicating when a player enters or dies",
+    CTYPE_NUMERIC,
+    "updates_per_sec=",
+    &UserConf.UpdatesPerSecond,
+    1, 10,			/* mix/max */
+    "Updates per second (1-10)",
     {
-      "# define this as 'true' if you want to recieve a message",
-      "#  whenever someone enters the game, or dies in it.",
-      "#  Default: true",
+      "# define this as the number of updates per second in which to",
+      "#  recieve packets and update the display. Number must be between",
+      "#  1 and 10 inclusive.",
+      "#  Default: 2",
       NULL
-    }
-  },
-  {
-    FALSE,
-    CTYPE_BOOL,
-    "do_fastupdate=",
-    &UserConf.DoFastUpdate,
-    "Update the display twice per second (if system allows it)",
-    {
-      "# define this as 'true' if you want 2 screen updates per second",
-      "#  instead of the usual 1 per second.  This option has NO EFFECT",
-      "#  if 'allow_fastupdate' is set to 'false' in the system-wide",
-      "#  conquestrc file, (by default /opt/conquest/etc/conquestrc) OR",
-      "#  HAS_SETITIMER was not defined (in defs.h) when Conquest was",
-      "#  compiled.",
-      "#  Default: true",
-      NULL
-    }
-  },
-  {
-    FALSE,
-    CTYPE_BOOL,
-    "do_limitbell=",
-    &UserConf.DoLimitBell,
-    "Limit beeping to no more than 1 per second",
-    {
-      "# define this as 'true' if you want no more than one 'beep'",
-      "#  maximum per second.  Additional beeps that occur in the same",
-      "#  second as the last beep are ignored.  This means you might",
-      "#  miss beeps, but is real nice when do_fastupdate is enabled.",
-      "#  Default: true",
-      NULL
-    }
-  },
-  {
-    FALSE,
-    CTYPE_BOOL,
-    "clear_old_msgs=",
-    &UserConf.ClearOldMsgs,
-    "When re-incarnating to a ship, discard any old messages",
-    {
-      "# define this as true if you want old msgs cleared out when you",
-      "#  reincarnate to another ship.  If this is defined as false, then",
-      "#  any messages sent to you while you were gone from your ship",
-      "#  are displayed as usual when you enter the game.",
-      "#  Default: true",
-      NULL,
     }
   },
   {
@@ -509,6 +568,7 @@ struct Conf ConfData[] =
     CTYPE_BOOL,
     "distress_to_friendly=",
     &UserConf.DistressToFriendly,
+    0, 0,			/* mix/max */
     "Send emergency distress calls to friendly ships",
     {
       "# define this as true if you want emergency distress calls to be",
@@ -522,14 +582,58 @@ struct Conf ConfData[] =
     CTYPE_BOOL,
     "alt_hud=",
     &UserConf.AltHUD,
+    0, 0,			/* mix/max */
     "Use an alternate, experimental HUD",
     {
       "# define this as true if you want to use a new, experimental",
-      "#  HUD.  This option has no effect if allow_alt_hud is not ",
-      "#  enabled in the sys-wide config file.  This option allows the",
-      "#  display of certain information on the bottom view line."
+      "#  HUD.  This option allows the display of certain information",
+      "#  on the bottom view line.  There may be more in the future.",
       "#  Default: false",
       NULL,
+    }
+  },
+  {
+    FALSE,
+    CTYPE_BOOL,
+    "do_lr_torpscan=",
+    &UserConf.DoLRTorpScan,
+    0, 0,			/* mix/max */
+    "Show friendly torps on a long-range scan",
+    {
+      "# define this as 'true' if you want to be able to see friendly",
+      "#  torps (including yours) on a long-range scan.  Default: true",
+      NULL
+    }
+  },
+  {
+    FALSE,
+    CTYPE_BOOL,
+    "do_local_lrscan=",
+    &UserConf.DoLocalLRScan,
+    0, 0,			/* mix/max */
+    "Long Range Scan is centered on ship, not Murisak",
+    {
+      "# define this as 'false' if you want the (M)ap command to have",
+      "#  it's original meaning - a static map of the universe with",
+      "#  Murisak at the center.  Setting to true makes the (M)ap",
+      "#  command have more 'realism' (IMHO) by providing a dynamic",
+      "#  map of the universe centered on your ship's current location.",
+      "#  Default: true",
+      NULL
+    }
+  },
+  {
+    FALSE,
+    CTYPE_BOOL,
+    "do_etastats=",
+    &UserConf.DoETAStats,
+    0, 0,			/* mix/max */
+    "Compute and display Estimated Time of Arrival (ETA) stats",
+    {
+      "# define this as 'true' if you want Estimated Time of Arrival (ETA)",
+      "#  information to be computed and displayed when getting (I)nfo on",
+      "#  another object.  Default: true",
+      NULL
     }
   },
   {				/* Macros are special - these should be last */
@@ -537,6 +641,7 @@ struct Conf ConfData[] =
     CTYPE_MACRO,
     "macro_f",
     UserConf.MacrosF,
+    0, 0,			/* mix/max */
     "Macro Keys",
     {
       "# Macro definitions.  The format in the ~/.conquestrc file is",

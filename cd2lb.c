@@ -4,7 +4,7 @@
  *
  * $Id$
  *
- * Copyright 1999 Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
+ * Copyright 1999-2004 Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
  ***********************************************************************/
 
 /**********************************************************************/
@@ -58,6 +58,8 @@
 #include "conf.h"
 #include "global.h"
 #include "color.h"
+#include "ibuf.h"
+#include "display.h"
 
 #define MSGMAXLINE 90 			/* used for screen formatting */
 
@@ -332,7 +334,7 @@ int cdgetx ( char pmt[], int lin, int col, char terms[], char str[],
 /*       maxlen - size of str */
 /*       append_flg - return for more input flag */
 /*       do_append_flg - append operation acceptable flag */
-/*       doecho - whether or not to echo input 
+/*       doecho - whether or not to echo input */
 /* description */
 /*    This routine prompts for input from the terminal. The prompt ``pmt'' */
 /*    and initial contents of ``str'' and displayed and then input is read */
@@ -382,17 +384,19 @@ int cdgetp ( char pmt[], int lin, int col, char terms[], char str[],
       ch = iogchar();
 
       if ( terms[0] != EOS )
-	if ( c_index ( terms, ch ) != ERR )
-	  break;
-	else if ( ch == TERM_NORMAL )
-	  break;
+	{
+	  if ( c_index ( terms, ch ) != ERR )
+	    break;
+	  else if ( ch == TERM_NORMAL )
+	    break;
+	}
 
 				/* translate KP keys (if any)
 				   into 'direction' keys. */
       (void)KP2DirKey(&ch);
 
       if (ch != TERM_NORMAL && ch != TERM_EXTRA && StrInit == TRUE &&
-	  isprint(ch))
+	  isprint(ch & 0xff))
 	{			/* clear out the preload */
 	  str[0] = ch;
 	  str[1] = EOS;
@@ -406,7 +410,7 @@ int cdgetp ( char pmt[], int lin, int col, char terms[], char str[],
 	  continue;
 	}
       else
-	if (!isprint(ch))
+	if (!isprint(ch & 0xff))
 	  {			/* redraw init str in std input color */
 	    attrset(NoColor);
 	    cdclra ( lin, icol, lin, cdcols() );
@@ -488,7 +492,7 @@ int cdgetp ( char pmt[], int lin, int col, char terms[], char str[],
 	{
 	  cdredo();
 	}
-      else if ( ! isprint ( ch ) )
+      else if ( ! isprint ( ch & 0xff) )
 	{
 #ifdef DEBUG_IO
 	  clog("cdgetp1:Got a strange char: ascii %d, errno=%d", ch, errno);
@@ -571,21 +575,16 @@ int cdgetp ( char pmt[], int lin, int col, char terms[], char str[],
 
 void cdbeep(void)
 {
-  int i;
-  static int old = 0;
+  time_t i;
+  static time_t old = 0;
   
-  if (UserConf.DoLimitBell == TRUE)	/* limit beeps to no more than 1 per sec */
-    {
-      i = time(0);
+  i = time(0);
       
-      if (i != old)
-	{
-	  old = i;
-	  beep();
-	}
+  if (i != old)
+    {
+      old = i;
+      beep();
     }
-  else
-    beep();			/* else beep whenever the urge hits you */
   
   return;
 }
@@ -598,6 +597,7 @@ void cdbeep(void)
 /*    This routine must be called before all others in cdlb. */
 void cdinit(void)
 {
+
 #if defined(HAVE_TERMIOS_H)
   struct termios term;
 #endif
@@ -667,6 +667,16 @@ void cdinit(void)
 #endif
 
   cdclear();
+
+#ifdef CONQGL
+  if (!GLinited)
+    {
+      InitGL(0, NULL);
+      GLinited = TRUE;
+      procEvents();
+    }
+#endif
+
   return;
   
 }
@@ -855,7 +865,7 @@ void cdputs ( char str[], int lin, int col )
   
   strcpy(tmpstr, str);
   
-  len = Context.maxcol - col; /* - 1; /* max str that will fit on screen */
+  len = Context.maxcol - col; /* max str that will fit on screen */
   slen = strlen(tmpstr);
   
   len = (len >= 0) ? len : 0;

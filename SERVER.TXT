@@ -7,7 +7,9 @@
          |  CCC    OOO   N   N   QQ Q   UUU   EEEEE  SSSS     T   |
          +--------------------------------------------------------+
 
-
+         See README-DEV-RELEASE.txt for the latest info on this
+         development release.  The info below has not been updated yet
+         to reflect the new version.
 
 	So.  You want to run a Conquest Server over the internet, eh?
 Then this is the file to read.  It gives you an overview of how to

@@ -5,7 +5,7 @@
  *
  * $Id$
  *
- * Copyright 1999 Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
+ * Copyright 1999-2004 Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
  ***********************************************************************/
 
 /**********************************************************************/
@@ -17,6 +17,8 @@
 /**********************************************************************/
 
 #include "global.h"
+#include "ibuf.h"
+#include "display.h"
 
 /* iochav - test whether a char is available to be read or not */
 /* synopsis */
@@ -52,10 +54,14 @@ int iochav( void )
   
   int retval;
   
-  if (iBufEmpty() == FALSE)
+  if (iBufCount())
     {
       return(TRUE);
     }
+#ifdef CONQGL
+  else
+    return FALSE;		/* JETGL */
+#endif
   
 #if defined(USE_SELECT)	
   
@@ -174,8 +180,9 @@ void ioeat(void)
 
 int iogchar ( void )
 {
-  static unsigned int thechar;
-  
+  static unsigned int thechar = 0;
+  /*JETGL*/
+
   /* This is a good place to flush the output buffer and to */
   /*  check for terminal broadcasts. */
   
@@ -185,8 +192,20 @@ int iogchar ( void )
   
  reloop:
   
-  if (iBufEmpty() == TRUE)
-    thechar = wgetch(stdscr);
+  if (!iBufCount())
+    {
+#if CONQGL
+      procEvent();		/* proc events until one arrives */
+      //c_sleep(0.1);		/* JETGL */
+      usleep(100000);		/* better? JETGL */
+    /*thechar = wgetch(stdscr);*/
+      //      clog("AFTER procEvent()\n");
+      goto reloop;
+#else
+      c_sleep(0.1);
+      thechar = wgetch(stdscr);
+#endif
+    }
   else
     thechar = iBufGetCh();
   
@@ -198,10 +217,44 @@ int iogchar ( void )
       goto reloop;
     }
   
-  
   return(thechar);
 }
 
+
+/*  iogtimed - get a char with timeout */
+/*  SYNOPSIS */
+/*    int *ch */
+/*    int seconds */
+/*    gotone = iogtimed ( &ch, seconds ) */
+
+#ifdef CONQGL
+int iogtimed ( int *ch, real seconds )
+{
+  real cumm;
+  const real incr = 0.1;
+
+  cumm = 0.0;
+  clog("IOGTIMED - STARTING\n");
+  do
+    {
+      procEvent();
+      
+      if (iochav())
+	{				/* char waiting */
+	  *ch = iBufGetCh();
+	  clog("IOGTIMED - TRUE\n");
+	  return TRUE;
+	}
+      else 
+	{
+	  c_sleep(incr);
+	  cumm += incr;
+	}
+    } while (cumm < seconds);
+  clog("IOGTIMED - FALSE\n");
+  return FALSE;
+}
+#else      
 
 /*  iogtimed - get a char with timeout */
 /*  SYNOPSIS */
@@ -226,13 +279,12 @@ int iogtimed ( int *ch, real seconds )
 
 #endif
   int retval;
-  static int starttime = 0, curtime;
   
   /* This is a good place to flush the output buffer. */
   
   cdrefresh();
   
-  if (iBufEmpty() == FALSE)
+  if (iBufCount())
     {
       *ch = iBufGetCh();
       return(TRUE);
@@ -376,6 +428,6 @@ int iogtimed ( int *ch, real seconds )
   
 }
 
-
+#endif 
 
 

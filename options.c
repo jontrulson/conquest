@@ -6,7 +6,7 @@
  *
  * $Id$
  *
- * Copyright 1999 Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
+ * Copyright 1999-2004 Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
  *
  ***********************************************************************/
 
@@ -15,7 +15,11 @@
 #include "conqcom.h"
 #include "color.h"
 #include "conf.h"
+#include "clntauth.h"
+#include "client.h"
+#include "clientlb.h"
 
+#include "context.h"
 struct compile_options {
   char *name;
   char *oneliner;
@@ -33,9 +37,6 @@ static void DisplayHelpScreen(struct Conf *confitem);
 
 static int ChangedSomething = FALSE;
 
-
-		/* For id purposes... */
-static char *optionsId = "$Id$";
 
 /*************************************************************************
  * DisplayCompileOptions() - do what name indicates
@@ -75,14 +76,6 @@ static void DisplayCompileOptions(void)
 #else
      (void *)FALSE
 #endif /* SET_PRIORITY */
-    },
-
-    {"USE_SEMS", "uses semaphores for locking", CTYPE_BOOL, 
-#ifdef USE_SEMS
-     (void *)TRUE
-#else
-     (void *)FALSE
-#endif /* USE_SEMS */
     },
 
     {"WARP0CLOAK", "can't be seen when cloaked at warp 0", CTYPE_BOOL,
@@ -247,14 +240,11 @@ void UserOptsMenu(int unum)
 {
   static char *header = "User Options Menu";
   static char *mopts[] = { 
-    "View compile-time Options",
-    "View System-wide Options",
-    "View/Edit User Options",
+    "View/Edit Options",
     "View/Edit Macros",
     "Change Password"
   };
-  const int numoptions = 5;	/* don't exceed 9 - one char input is used */
-  const int passwdopt = 4;	/* optional ch passwd option number */  
+  const int numoptions = 3;	/* don't exceed 9 - one char input is used */
   static char *prompt = "Enter a number to select an item, any other key to quit.";
   int lin = 0, col = 0;
   int i;
@@ -288,13 +278,16 @@ void UserOptsMenu(int unum)
       
       for (i = 0; i < numoptions; i++)
 	{
-	  if (i == passwdopt && Users[unum].type != UT_REMOTE)	
-	    continue;		/* chg pwd option - only for remote users */
-
 	  cprintf(lin, col, ALIGN_NONE, "#%d#%d.#%d# %s#%d#", InfoColor, 
 		  i + 1, LabelColor, mopts[i], NoColor);
 	  lin++;
 	}
+
+      lin++;
+      lin++;
+      cprintf(lin, col, ALIGN_NONE, "#%d#Flags:#%d# %s#%d#", LabelColor,
+              InfoColor, clntServerFlagsStr(&sStat),
+              NoColor);
       
       cdclrl( MSG_LIN1, 2  );
       cdputs(prompt, MSG_LIN1, 1);
@@ -304,23 +297,20 @@ void UserOptsMenu(int unum)
       
       switch(ch)
 	{
-	case '1':			/* compile time options */
-	  DisplayCompileOptions();
-	  break;
-
-	case '2':			/* sys-wide opts */
-	  ViewEditOptions(SysConfData, SysCfEnd, FALSE);
-	  break;
-
-	case '3':			/* user opts */
+	case '1':			/* user opts */
 	  ChangedSomething = FALSE; 
 	  ViewEditOptions(ConfData, CfEnd, TRUE);
 				/* save and reload the config */
 	  if (ChangedSomething == TRUE)
-	    SaveUserConfig(unum);
+	    {
+	      SaveUserConfig(unum);
+	      /* set new update rate */
+	      Context.updsec = UserConf.UpdatesPerSecond;
+	      sendCommand(CPCMD_SETRATE, Context.updsec);
+	    }
 	  break;
 
-	case '4':		/* macros */
+	case '2':		/* macros */
 	  if (macroptr != NULL)
 	    {
 	      ChangedSomething = FALSE; 
@@ -331,9 +321,8 @@ void UserOptsMenu(int unum)
 
 	  break;
 
-	case '5':			/* chg passwd */
-	  if (Users[unum].type == UT_REMOTE) /* pw option is valid */
-	    ChangePassword(unum, FALSE);
+	case '3':			/* chg passwd */
+	  ChangePassword(unum, FALSE);
 	  break;
 
 	default:
@@ -353,8 +342,9 @@ void UserOptsMenu(int unum)
 
 static void ChangeOption(struct Conf *cdata, int lin)
 {
+#define CBUFLEN 128
   int j, rv;
-  char buf[MSGMAXLINE], *ch;
+  char buf[CBUFLEN];
 
   switch(cdata->ConfType)
     {
@@ -375,18 +365,22 @@ static void ChangeOption(struct Conf *cdata, int lin)
 
 				/* these will need prompting on line 'lin' */
     case CTYPE_STRING:
+      if (cdata->max > CBUFLEN)
+	{
+	  clog("ChangeOption: conf data max exceeds local buffer size.");
+	  break;
+	}
       cdclrl(lin, 1);
-      rv = cdgets("Enter string: ", lin, 1, buf, MSGMAXLINE - 1);
+      strncpy(buf, ((char *)cdata->ConfValue), CBUFLEN);
+      buf[CBUFLEN - 1] = 0;
+      rv = cdgets("Value: ", lin, 1, buf, cdata->max - 1);
 
       if (rv != ERR)
 	{
-	  ch = strdup(buf);
-	  if (ch != NULL)
-	    {
-	      cdata->ConfValue = (void *)ch;
+	  strncpy((char *)cdata->ConfValue, buf, cdata->max);
+	  ((char *)cdata->ConfValue)[cdata->max - 1] = 0;
 				/* signal that something has been changed */
-	      ChangedSomething = TRUE;
-	    }
+	  ChangedSomething = TRUE;
 	}
 
       break;
@@ -397,9 +391,12 @@ static void ChangeOption(struct Conf *cdata, int lin)
 
       if (rv != ERR)
 	{
-	  *(int *)(cdata->ConfValue) = j;
-				/* signal that something has been changed */
-	  ChangedSomething = TRUE;
+	  if (j >= cdata->min && j <= cdata->max)
+	    {
+	      *(int *)(cdata->ConfValue) = j;
+	      /* signal that something has been changed */
+	      ChangedSomething = TRUE;
+	    }
 	}
 
       break;
@@ -544,7 +541,7 @@ static int ViewEditOptions(struct Conf ConfigData[], int ConfSize,
 	      break;
 	      
 	    case CTYPE_STRING:
-	      cprintf(lin, settingcol, ALIGN_NONE, "#%d#%s#%d#",
+	      cprintf(lin, settingcol, ALIGN_NONE, "#%d#%13s#%d#",
 		      InfoColor, (char *) ConfigData[i].ConfValue,
 		      NoColor);
 	      break;
@@ -630,7 +627,7 @@ clog("ViewEditOptions(): maxllin = %d, llin = %d, k = %d", maxllin, llin, k);
 #endif
     }
 
-  return;
+  return TRUE;
 }
 
 /*************************************************************************
@@ -845,7 +842,7 @@ static int ViewEditMacros(struct Conf *ConfigData)
 #endif
     }
 
-  return;
+  return TRUE;
 }
 
 /* DisplayHelpScreen() - display a help (actually the conf item comment)

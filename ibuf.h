@@ -2,7 +2,7 @@
  *
  * $Id$
  *
- * Copyright 1999 Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
+ * Copyright 1999-2004 Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
  ***********************************************************************/
 
 /**********************************************************************/
@@ -16,9 +16,13 @@
 #ifndef IBUF_H
 #define IBUF_H
 
-/* Input Buffer (ibuf.c) variables */
-#define    IBUFMAX 128
-static int iBufOffset;
-static char iBuffer[IBUFMAX];
+#define    IBUFMAX 1024
+
+void iBufInit(void);
+int iBufCount(void);
+void iBufPut(char *thestr);
+void iBufPutc(unsigned int thechar);
+unsigned int iBufGetCh(void);
+int DoMacro(int ch);
 
 #endif

@@ -4,7 +4,7 @@
  *
  * $Id$
  *
- * Copyright 1999 Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
+ * Copyright 1999-2004 Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
  ***********************************************************************/
 
 /*                               C O N Q V M S */
@@ -29,26 +29,31 @@
 #include "context.h"
 #include "conf.h"
 #include "global.h"
+#include "record.h"
 
-
-/* int GetConquestUID(void) - return conquest's User ID */
-int GetConquestUID(void)
+#include "server.h"
+/* int GetUID(void) - return a User ID */
+int GetUID(char *name)
 {
   struct passwd *conq_pwd;
-  static int theuid;
-  
-  if ((conq_pwd = getpwnam(ROOT_USER)) == NULL)
+  char *myusername = glname();
+  char *chkname;
+
+  if (!name)
+    chkname = myusername;
+  else
+    chkname = name;
+
+  if ((conq_pwd = getpwnam(name)) == NULL)
     {
-      fprintf(stderr, "conqsvr42: GetConquestUID(%s): can't get user: %s",
-	      ROOT_USER,
+      fprintf(stderr, "conqsvr42: GetUID(%s): can't get user: %s\n",
+	      chkname,
 	      strerror(errno));
       
       return(ERR);
     }
   
-  theuid = conq_pwd->pw_uid;
-  
-  return(theuid);
+  return(conq_pwd->pw_uid);
 }
 
 
@@ -73,255 +78,9 @@ int GetConquestGID(void)
 }
 
 
-
-
 /*  astoff - disable asts */
 /*  SYNOPSIS */
 /*    astoff */
-void astoff(void)
-{
-  
-  /*    sys__setast( %val(0) )		/* disable asts */
-    /*  JET_ASTOFF();			/* block sigs? */
-  return;
-  
-}
-
-
-/*  aston - enable asts */
-/*  SYNOPSIS */
-/*    aston */
-void aston(void)
-{
-  
-  /*    sys$setast( %val(1) )		/* enable asts */
-    /*  JET_ASTON();			/* enable sigs? */
-  return;
-  
-}
-
-void EnableConquestSignalHandler(void)
-{
-#ifdef DEBUG_SIG
-  clog("EnableConquestSignalHandler() ENABLED");
-#endif
-  
-  signal(SIGHUP, (void (*)(int))DoConquestSig);
-  signal(SIGTSTP, SIG_IGN);
-  signal(SIGTERM, (void (*)(int))DoConquestSig);  
-  signal(SIGINT, SIG_IGN);
-
-  if (isagod(-1) || SysConf.AllowSigquit == TRUE)
-    {
-      signal(SIGQUIT, (void (*)(int))DoConquestSig);
-    }
-  else
-    {
-      signal(SIGQUIT, SIG_IGN);
-    }
-  
-  return;
-}
-
-void EnableConqoperSignalHandler(void)
-{
-#ifdef DEBUG_SIG
-  clog("EnableConquestSignalHandler() ENABLED");
-#endif
-  
-  signal(SIGHUP, (void (*)(int))DoConqoperSig);
-  signal(SIGTSTP, SIG_IGN);
-  signal(SIGTERM, (void (*)(int))DoConqoperSig);  
-  signal(SIGINT, (void (*)(int))DoConqoperSig);
-  signal(SIGQUIT, (void (*)(int))DoConqoperSig);
-
-  return;
-}
-
-void DoConquestSig(int sig)
-{
-  
-#ifdef DEBUG_SIG
-  clog("DoConquestSig() got SIG %d", sig);
-#endif
-  
-  switch(sig)
-    {
-    case SIGQUIT:
-      stoptimer();
-      drpexit();
-      cdclear();
-      cdrefresh();
-      conqstats(Context.snum);		/* update stats */
-				/* now we clear ship's elapsed/cpu seconds
-				   so that there won't be a huge addition to
-				   the Teams/Users/Ships timing stats when
-				   a VACANT ships re-enters Conquest */
-      Ships[Context.snum].ctime = 0;
-      Ships[Context.snum].etime = 0;
-      conqend();
-      cdend();
-      
-      exit(0);
-      break;
-
-    case SIGINT:
-    case SIGTERM:
-    case SIGHUP:
-      cdend();
-      exit(0);
-      break;
-    default:
-      break;
-    }
-
-  EnableConquestSignalHandler();	/* reset */
-  return;
-}
-
-void DoConqoperSig(int sig)
-{
-  
-#ifdef DEBUG_SIG
-  clog("DoSig() got SIG %d", sig);
-#endif
-  
-  switch(sig)
-    {
-    case SIGTERM:
-    case SIGINT:
-    case SIGHUP:
-    case SIGQUIT:
-      stoptimer();
-      cdrefresh();
-      conqend();
-      cdend();
-      exit(0);			/* WE EXIT HERE */
-      break;
-    default:
-      break;
-    }
-
-  EnableConqoperSignalHandler();	/* reset */
-  return;
-}
-
-
-/*  astservice - ast service routine for conquest */
-/*  SYNOPSIS */
-/*    astservice */
-/* This routine gets called from a sys$setimr ast. Normally, it outputs */
-/* one screen update and then sets up another timer request. */
-void astservice(int sig)
-{
-  int now;
-  int readone;
-  static int RMsggrand = 0;
-  int difftime;
-
-  /* Don't do anything if we're not supposed to. */
-  if ( ! Context.display )
-    return;
-  
-  /* Don't do anything if we're dead. */
-  if ( ! stillalive( Context.snum ) )
-    return;
-  stoptimer();
-  drcheck();				/* handle driver logic */
-  
-  /* See if we can display a new message. */
-
-				/* for people with 25 lines, we
-				   use a different timer so that
-				   NEWMSG_GRAND intervals will determine
-				   whether it's time to display a new
-				   message... Otherwise, Context.msgrand
-				   is used - which means that NEWMSG_GRAND
-				   interval will have to pass after issuing
-				   any command before a new msg will disp
-				   12/28/98 */
-  readone = FALSE;
-  if ( Context.msgok )
-    {
-      /*
-      clog("### RMsggrand = %d, Context.msgrand = %d", RMsggrand, Context.msgrand);
-      */
-
-      if (RMsg_Line != MSG_LIN1)
-	{			/* we have line 25 for msgs */
-	  difftime = dgrand( RMsggrand, &now );
-	}
-      else
-	{
-	  difftime = dgrand( Context.msgrand, &now );
-	}
-
-      /*
-	clog("difftime = %d, RMsg_Line = %d, MSG_LIN1 = %d\n\tNEWMSG_GRAND = %d, now = %d", difftime, RMsg_Line, MSG_LIN1, NEWMSG_GRAND, now);
-       */
-
-      if ( difftime >= NEWMSG_GRAND )
-	if ( getamsg( Context.snum, &Ships[Context.snum].lastmsg ) )
-	  {
-	    if (readmsg( Context.snum, Ships[Context.snum].lastmsg, 
-			 RMsg_Line ) == TRUE)
-	      {
-		if (Msgs[Ships[Context.snum].lastmsg].msgfrom != 
-		    Context.snum)
-		  if (UserConf.MessageBell == TRUE)
-		    cdbeep();
-				/* set both timers, regardless of which
-				   one we're actally concerned with */
-		Context.msgrand = now;
-		RMsggrand = now;
-		readone = TRUE;
-		recordAddMsg(&Msgs[Ships[Context.snum].lastmsg]);
-	      }
-	  }
-    }
-
-  /* Perform one ship display update. */
-  display( Context.snum, FALSE );
-  
-  
-  /* Un-read the message if there's a chance it got garbaged. */
-  /* JET 3/24/96 - another try with curses timer disabled */
-  if ( readone )
-    if (RMsg_Line == MSG_LIN1)	/* we don't have an extra msg line */
-      if ( iochav() )
-	Ships[Context.snum].lastmsg = modp1( Ships[Context.snum].lastmsg - 1, MAXMESSAGES );
-  
-  /* Schedule for next time. */
-  settimer();
-  
-  return;
-  
-}
-
-/*  astoperservice - ast service routine for conqoper */
-/*  SYNOPSIS */
-/*    astservice */
-/* This routine gets called from a sys$setimr ast. Normally, it outputs */
-/* one screen update and then sets up another timer request. */
-void astoperservice(int sig)
-{
-  /* Don't do anything if we're not supposed to. */
-  if ( ! Context.display )
-    return;
-  
-  stoptimer();
-  
-  /* Perform one ship display update. */
-  display( Context.snum, headerflag );
-  
-  /* Schedule for next time. */
-  setopertimer();
-  
-  return;
-  
-}
-
-
 /*  comsize - return size of the common block (in bytes) */
 /*  SYNOPSIS */
 /*    int size */
@@ -338,28 +97,6 @@ void comsize( unsigned long *size )
 
   /*clog("sizeof(real) = %d, val = %d", sizeof(real), val); */
   
-  return;
-  
-}
-
-
-/*  conqend - machine dependent clean-up */
-/*  SYNOPSIS */
-/*    conqend */
-void conqend(void)
-{
-
-  char msgbuf[128];
-
-  if (Context.entship == TRUE)
-    {				/* let everyone know we're leaving */
-      sprintf(msgbuf, "%s has left the game.",
-	      Users[Context.unum].alias);
-      stormsg(MSG_COMP, MSG_ALL, msgbuf);
-    }
-  
-  recordCloseOutput();
-
   return;
   
 }
@@ -394,8 +131,6 @@ void conqinit(void)
   
   /* Set up game environment. */
   
-  /* Figure out which gamcron file to use (and if we're gonna use one). */
-  
   /* Other house keeping. */
   Context.pid = getpid();		
   Context.hasnewsfile = ( strcmp( C_CONQ_NEWSFILE, "" ) != 0 );
@@ -409,7 +144,6 @@ void conqinit(void)
   /* Haven't scanned anything yet. */
   Context.lastinfostr[0] = EOS;
 
-  
   return;
   
 }
@@ -671,7 +405,10 @@ void initstats( int *ctemp, int *etemp )
 }
 
 
-/*  isagod - determine if a user is a god or not - NULL means current user */
+/*  isagod - determine if a user is a god (oper) or not */
+/*   if a valid user is passed, then the OOPT_OPER priviledge is */
+/*    checked.  Otherwise, the current user must be a member of */
+/*    the 'conquest' group (conqoper, conqdriv, etc */
 /*  SYNOPSIS */
 /*    int flag, isagod */
 /*    flag = isagod() */
@@ -685,16 +422,17 @@ int isagod( int unum )
   god = FALSE;
   
   if (unum == -1)		/* get god status for current user */
-    {				/* now find out whether we're in it */
-      strncpy(myname, (char *)cuserid(NULL), BUFFER_SIZE - 2);
+    {
+      strncpy(myname, glname(), BUFFER_SIZE);
       myname[BUFFER_SIZE - 1] = EOS;
     }
   else
     {				/* else a user number passed in */
-				/* only locals can be godlike */
-      if (Users[unum].type != UT_LOCAL)
-	return(FALSE);
-      strcpy(myname, Users[unum].username);
+				/* just check for OOPT_OPER */
+      if (Users[unum].ooptions[OOPT_OPER])
+	return TRUE;
+      else
+	return FALSE;
     }
   
   if (grp == NULL)
@@ -746,7 +484,6 @@ int isagod( int unum )
 void news(void)
 {
   char newsfile[BUFFER_SIZE];
-  extern char *c_conq_newsfile;
   
   sprintf(newsfile, "%s/%s", CONQSHARE, C_CONQ_NEWSFILE);
   
@@ -757,140 +494,7 @@ void news(void)
 }
 
 
-/*  settimer - set timer to display() */
-/*  SYNOPSIS */
-/*    csetimer */
-void settimer(void)
-{
-  static struct sigaction Sig;
-  
-#ifdef HAS_SETITIMER
-  struct itimerval itimer;
-#endif
-  
-  Sig.sa_handler = (void (*)(int))astservice;
-  
-/*  Sig.sa_flags = SA_RESTART;*/	/* restart syscalls! */
 
-  Sig.sa_flags = 0;
-
-  if (sigaction(SIGALRM, &Sig, NULL) == -1)
-    {
-      clog("settimer():sigaction(): %s\n", strerror(errno));
-      exit(errno);
-    }
-  
-#ifdef HAS_SETITIMER
-
-  if (SysConf.AllowFastUpdate == TRUE && UserConf.DoFastUpdate == TRUE)
-    {
-      
-      /* 2 updates per sec */
-      itimer.it_value.tv_sec = 0;
-      itimer.it_value.tv_usec = 500000;
-      
-      itimer.it_interval.tv_sec = 0;
-      itimer.it_interval.tv_usec = 500000;
-    }
-  else
-    {
-
-      /* 1 update per second */
-      itimer.it_value.tv_sec = 1;
-      itimer.it_value.tv_usec = 0;
-      
-      itimer.it_interval.tv_sec = 1;
-      itimer.it_interval.tv_usec = 0;
-    }
-
-  setitimer(ITIMER_REAL, &itimer, NULL);
-#else
-  alarm(1);			/* set alarm() */
-#endif  
-  return;
-  
-}
-
-
-/*  setopertimer - set timer to display() for conqoper...*/
-/*  SYNOPSIS */
-void setopertimer(void)
-{
-  static struct sigaction Sig;
-  
-#ifdef HAS_SETITIMER
-  struct itimerval itimer;
-#endif
-  
-  Sig.sa_handler = (void (*)(int))astoperservice;
-  
-  Sig.sa_flags = 0;
-
-  if (sigaction(SIGALRM, &Sig, NULL) == -1)
-    {
-      clog("settimer():sigaction(): %s\n", strerror(errno));
-      exit(errno);
-    }
-  
-#ifdef HAS_SETITIMER
-
-  if (SysConf.AllowFastUpdate == TRUE && UserConf.DoFastUpdate == TRUE)
-    {
-      
-      /* 2 updates per sec */
-      itimer.it_value.tv_sec = 0;
-      itimer.it_value.tv_usec = 500000;
-      
-      itimer.it_interval.tv_sec = 0;
-      itimer.it_interval.tv_usec = 500000;
-    }
-  else
-    {
-
-      /* 1 update per second */
-      itimer.it_value.tv_sec = 1;
-      itimer.it_value.tv_usec = 0;
-      
-      itimer.it_interval.tv_sec = 1;
-      itimer.it_interval.tv_usec = 0;
-    }
-
-  setitimer(ITIMER_REAL, &itimer, NULL);
-#else
-  alarm(1);			/* set alarm() */
-#endif  
-  return;
-  
-}
-
-
-/*  stoptimer - cancel timer */
-/*  SYNOPSIS */
-/*    stoptimer */
-void stoptimer(void)
-{
-#ifdef HAS_SETITIMER
-  struct itimerval itimer;
-#endif
-  
-  Context.display = FALSE;
-  
-  signal(SIGALRM, SIG_IGN);
-  
-#ifdef HAS_SETITIMER
-  itimer.it_value.tv_sec = itimer.it_interval.tv_sec = 0;
-  itimer.it_value.tv_usec = itimer.it_interval.tv_usec = 0;
-  
-  setitimer(ITIMER_REAL, &itimer, NULL);
-#else
-  alarm(0);
-#endif
-  
-  Context.display = TRUE;
-  
-  return;
-  
-}
 
 
 /*  upchuck - update the common block to disk. */

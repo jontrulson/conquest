@@ -3,7 +3,7 @@
  *
  * $Id$
  *
- * Copyright 1999 Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
+ * Copyright 1999-2004 Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
  */
 
 #ifndef USER_H_INCLUDED
@@ -20,11 +20,10 @@ typedef struct {
   real rating;			/* user's rating */
   int robot;			/* a robot? */
   int war[NUMPLAYERTEAMS];	/* teams you're at war with */
-  int options[MAXOPTIONS];	/* user's options */
   int ooptions[MAXOOPTIONS];	/* operator settable options */
-  char username[SIZEUSERNAME];	/* user's name (login name) */
-  char pw[SIZEUSERNAME];	/* user's password if server login */
-  char alias[SIZEUSERPNAME];	/* user's pseudonym */
+  char username[MAXUSERNAME];	/* user's name (login name) */
+  char pw[MAXUSERNAME];	/* user's password if server login */
+  char alias[MAXUSERPNAME];	/* user's pseudonym */
   time_t lastentry;		/* last entry time */
 } User_t;
 
