@@ -1,3 +1,12 @@
+11/27/2003
+
+        - we did a conquer test and found one bug where others in the
+          game would not be properly informed about who did the actual
+          conquer.  Long sentence for such a short bug.
+
+          I think we are close to a final release now (pending doc
+          updates and any new bugs that show up).
+
 11/24/2003
 
         - fixed an fd leak in metaUpdateSetver().  Oops.

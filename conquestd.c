@@ -1566,10 +1566,11 @@ int play()
   
   /* Asts are still enabled, simply cancel the next screen update. */
 
-  c_sleep( 2.0 );
+
   stopUpdate();
   updateClient();	/* one last, to be sure. */
-
+  sendConqInfo(sInfo.sock, TRUE);
+  c_sleep( 2.0 );
   dead( Context.snum, Context.leave );
   
   return(TRUE);
