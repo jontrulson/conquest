@@ -38,12 +38,13 @@ static scrNode_t nCPHelpNode = {
 };
 
 
-void nCPHelpInit(void)
+scrNode_t *nCPHelpInit(int setnode)
 {
 
-  setNode(&nCPHelpNode);
+  if (setnode)
+    setNode(&nCPHelpNode);
 
-  return;
+  return(&nCPHelpNode);
 }
 
 
@@ -183,6 +184,7 @@ static int nCPHelpIdle(void)
   if (clientFlags & SPCLNTSTAT_FLAG_KILLED)
     {
       /* time to die properly. */
+      setONode(NULL);
       nDeadInit();
       return NODE_OK;
     }
@@ -195,6 +197,7 @@ static int nCPHelpInput(int ch)
 {
   /* go back */
 
+  setONode(NULL);
   nCPInit();
 
   return NODE_OK;

@@ -48,7 +48,7 @@ static scrNode_t nUserlNode = {
 
 static int retnode;             /* the node to return to */
 
-void nUserlInit(int nodeid, int sn, int gl, int extra)
+scrNode_t *nUserlInit(int nodeid, int setnode, int sn, int gl, int extra)
 {
   int i, unum;
 
@@ -73,9 +73,10 @@ void nUserlInit(int nodeid, int sn, int gl, int extra)
 
   fuser = 0;
 
-  setNode(&nUserlNode);
+  if (setnode)
+    setNode(&nUserlNode);
 
-  return;
+  return(&nUserlNode);
 }
 
 
@@ -192,6 +193,7 @@ static int nUserlIdle(void)
   if (clientFlags & SPCLNTSTAT_FLAG_KILLED && retnode == DSP_NODE_CP)
     {
       /* time to die properly. */
+      setONode(NULL);
       nDeadInit();
       return NODE_OK;
     }
@@ -221,15 +223,18 @@ static int nUserlInput(int ch)
   switch (retnode)
     {
     case DSP_NODE_CP:
+      setONode(NULL);
       nCPInit();
       break;
     case DSP_NODE_MENU:
+      setONode(NULL);
       nMenuInit();
       break;
 
     default:
       clog("nUserlInput: invalid return node: %d, going to DSP_NODE_MENU",
            retnode);
+      setONode(NULL);
       nMenuInit();
       break;
     }

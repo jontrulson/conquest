@@ -9,6 +9,6 @@
 #ifndef _NCPHELP_H
 #define _NCPHELP_H
 
-void nCPHelpInit(void);
+scrNode_t *nCPHelpInit(int setnode);
 
 #endif /* _NCPHELP_H */

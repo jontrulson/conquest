@@ -35,6 +35,10 @@ void initTexFonts(void)
 {
   char fbuf[MID_BUFFER_SIZE];
 
+#ifdef DEBUG_GL
+  clog("%s: ENTER...", __FUNCTION__);
+#endif
+
   sprintf(fbuf, "%s/img/%s", CONQSHARE, "large.txf");
 
   fontLargeTxf = txfLoadFont(fbuf);
@@ -71,6 +75,8 @@ void initTexFonts(void)
   txfEstablishTexture(fontLargeTxf, 0, GL_TRUE);
   GLError();
   txfEstablishTexture(fontFixedTxf, 0, GL_TRUE);
+  GLError();
+  txfEstablishTexture(fontTinyFixedTxf, 0, GL_TRUE);
   GLError();
   txfEstablishTexture(fontMsgTxf, 0, GL_TRUE);
   GLError();
@@ -115,11 +121,10 @@ void initFonts(void)
 }
   
 
-void glfRender(GLfloat x, GLfloat y, GLfloat w, GLfloat h,
+void glfRender(GLfloat x, GLfloat y, GLfloat z, GLfloat w, GLfloat h,
                        TexFont *font, char *str, int color, 
                int scalex, int dofancy, int ortho)
 {
-#warning "fix inverty for viewer"
   GLfloat inverty = ((ortho) ? -1.0 : 1.0);
   int width, ascent, descent;
   GLfloat xs = 1.0, ys = 1.0;
@@ -154,14 +159,18 @@ void glfRender(GLfloat x, GLfloat y, GLfloat w, GLfloat h,
   glEnable(GL_TEXTURE_2D);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, 
                   GL_LINEAR_MIPMAP_LINEAR);
-  glEnable(GL_ALPHA_TEST);
 
   glPushMatrix();
   glLoadIdentity();
 
   if (ortho) 
     {
-      glTranslatef( x, y + h, 0.0f );
+      glTranslatef( x, y + h, z );
+      glScalef(xs, inverty * ys, 1.0);
+    }
+  else
+    {
+      glTranslatef( x, y - h, z );
       glScalef(xs, inverty * ys, 1.0);
     }
 
@@ -174,7 +183,6 @@ void glfRender(GLfloat x, GLfloat y, GLfloat w, GLfloat h,
 
   glPopMatrix();
 
-  glDisable(GL_ALPHA_TEST);
   glDisable(GL_TEXTURE_2D);
 
   return;
@@ -183,9 +191,6 @@ void glfRender(GLfloat x, GLfloat y, GLfloat w, GLfloat h,
 void drawString(GLfloat x, GLfloat y, GLfloat z, char *str, 
                 GLuint DL, int color, int ortho)
 {
-#warning "FIXME get rid of me"
-  /*  int ortho = (glutGetWindow() == dConf.mainw);*/
-
   if (!str)
     return;
 
@@ -200,7 +205,7 @@ void drawString(GLfloat x, GLfloat y, GLfloat z, char *str,
       glPushMatrix();
       glLoadIdentity();
       
-      glTranslatef(0.0, 0.0, TRANZ /*-75.0*/);
+      glTranslatef(0.0, 0.0, TRANZ);
     }
 
   if (color != -1)              /* not overridden */

@@ -50,7 +50,7 @@ static scrNode_t nPlanetlNode = {
 
 static int retnode;             /* the node to return to */
 
-void nPlanetlInit(int nodeid, int sn, int tn)
+scrNode_t *nPlanetlInit(int nodeid, int setnode, int sn, int tn)
 {
   retnode = nodeid;
 
@@ -59,9 +59,10 @@ void nPlanetlInit(int nodeid, int sn, int tn)
   snum = sn;
   team = tn;
 
-  setNode(&nPlanetlNode);
+  if (setnode)
+    setNode(&nPlanetlNode);
 
-  return;
+  return(&nPlanetlNode);
 }
 
 
@@ -307,6 +308,7 @@ static int nPlanetlIdle(void)
   if (clientFlags & SPCLNTSTAT_FLAG_KILLED && retnode == DSP_NODE_CP)
     {
       /* time to die properly. */
+      setONode(NULL);
       nDeadInit();
       return NODE_OK;
     }
@@ -330,15 +332,18 @@ static int nPlanetlInput(int ch)
   switch (retnode)
     {
     case DSP_NODE_CP:
+      setONode(NULL);
       nCPInit();
       break;
     case DSP_NODE_MENU:
+      setONode(NULL);
       nMenuInit();
       break;
 
     default:
       clog("nPlanetlInput: invalid return node: %d, going to DSP_NODE_MENU",
            retnode);
+      setONode(NULL);
       nMenuInit();
       break;
     }

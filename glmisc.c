@@ -16,6 +16,7 @@
 #include "ibuf.h"
 #include "gldisplay.h"
 #include "conf.h"
+#include "node.h"
 
 #include <GL/glut.h>
 #include <GL/gl.h>
@@ -48,7 +49,7 @@ void mglConqLogo(dspConfig_t *dsp)
   x = dsp->wW * 0.15;
   y = dsp->ppRow;
 
-  glfRender(x, y, w, h, fontLargeTxf, Conquest, RedLevelColor, 
+  glfRender(x, y, 0.0, w, h, fontLargeTxf, Conquest, RedLevelColor, 
             TRUE, FALSE, TRUE);
 
   drawLineBox(x, y + (h / 20.0),
@@ -80,6 +81,24 @@ void mglBeep(void)
           XBell(dpy, 0);
           XFlush(dpy);
         }
+    }
+
+  return;
+}
+
+/* draw a window sizes, semi-opaque quad for overlay nodes */
+void mglOverlayQuad(void)
+{
+  if (getTopONode())
+    {                           /* if an overlay node is active, fade
+                                   the CP some */
+      glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+      glEnable(GL_BLEND);
+      glColor4f(0.0, 0.0, 0.0, 0.5);
+      drawQuad((GLfloat)dConf.wX, (GLfloat)dConf.wY, (GLfloat)dConf.wW, 
+               (GLfloat)dConf.wH, 
+               0.0);
+      glDisable(GL_BLEND);
     }
 
   return;

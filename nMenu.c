@@ -411,7 +411,7 @@ static int nMenuInput(int ch)
       break;
 
     case 'H':
-      nHistlInit(DSP_NODE_MENU);
+      nHistlInit(DSP_NODE_MENU, TRUE);
       break;
 
     case 'N':
@@ -473,19 +473,19 @@ static int nMenuInput(int ch)
       break;
 
     case 'O':
-      nOptionsInit(NOPT_USER, DSP_NODE_MENU);
+      nOptionsInit(NOPT_USER, TRUE, DSP_NODE_MENU);
       break;
 
     case 'S':
-      nUserlInit(DSP_NODE_MENU, Context.snum, FALSE, TRUE);
+      nUserlInit(DSP_NODE_MENU, TRUE, Context.snum, FALSE, TRUE);
       break;
 
     case 'T':
-      nTeamlInit(DSP_NODE_MENU, Ships[Context.snum].team);
+      nTeamlInit(DSP_NODE_MENU, TRUE, Ships[Context.snum].team);
       break;
 
     case 'U':
-      nUserlInit(DSP_NODE_MENU, Context.snum, FALSE, FALSE);
+      nUserlInit(DSP_NODE_MENU, TRUE, Context.snum, FALSE, FALSE);
       break;
 
     case 'W':
@@ -504,14 +504,14 @@ static int nMenuInput(int ch)
 
       break;
     case '/':
-      nShiplInit(DSP_NODE_MENU);
+      nShiplInit(DSP_NODE_MENU, TRUE);
       break;
      
     case '?':
       if (Context.snum > 0 && Context.snum <= MAXSHIPS)
-        nPlanetlInit(DSP_NODE_MENU, Context.snum, Ships[Context.snum].team);
+        nPlanetlInit(DSP_NODE_MENU, TRUE, Context.snum, Ships[Context.snum].team);
       else          /* then use user team if user doen't have a ship yet */
-        nPlanetlInit(DSP_NODE_MENU, Context.snum, Users[Context.unum].team);
+        nPlanetlInit(DSP_NODE_MENU, TRUE, Context.snum, Users[Context.unum].team);
       break;
      
     case 'q':

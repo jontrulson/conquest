@@ -44,6 +44,8 @@ dspData_t dData;
 int frame=0, gtime, timebase=0;
 static float FPS = 0.0;
 
+#define TEXT_HEIGHT    ((GLfloat)1.75)   /* 7.0/4.0 - text font height */
+
 Bool drawing = True;
 
 /* textures... */
@@ -221,11 +223,9 @@ void drawQuad(GLfloat x, GLfloat y, GLfloat w, GLfloat h, GLfloat z)
 }
 
 
-void drawTexBox(GLfloat x, GLfloat y, GLfloat size)
+void drawTexBox(GLfloat x, GLfloat y, GLfloat z, GLfloat size)
 {				/* draw textured square centered on x,y
 				   USE BETWEEN glBegin/End pair! */
-  const GLfloat z = -5.0;	/* we want to drop these down a bit
-				   so that they don't occlude anything */
   GLfloat rx, ry;
 
 #ifdef DEBUG
@@ -271,7 +271,7 @@ void drawExplosion(GLfloat x, GLfloat y)
   glColor3f(1.0, 0.5, 0.0);	/* orange. */
 
   glBegin(GL_POLYGON);
-  drawTexBox(0.0, 0.0, 7.5);
+  drawTexBox(0.0, 0.0, 0.0, 7.5);
   glEnd();
 
   glDisable(GL_TEXTURE_2D); 
@@ -287,7 +287,7 @@ void uiDrawPlanet( GLfloat x, GLfloat y, int pnum, int scale,
 {
   int what;
   GLfloat size = 10.0;
-  char buf32[32];
+  char buf[BUFFER_SIZE];
   char torpchar;
   char planame[BUFFER_SIZE];
   int showpnams = UserConf.ShowPlanNames;
@@ -335,8 +335,6 @@ void uiDrawPlanet( GLfloat x, GLfloat y, int pnum, int scale,
 
   GLError();
 
-  glTranslatef(0.0, 0.0, TRANZ);
-  
   glBlendFunc(GL_SRC_ALPHA, GL_ONE);
   glEnable(GL_BLEND);
   
@@ -394,21 +392,26 @@ void uiDrawPlanet( GLfloat x, GLfloat y, int pnum, int scale,
   if (scale == MAP_FAC)
     size /= 4.0;
   
-  drawTexBox(x, y, size);
+  drawTexBox(x, y, TRANZ, size);
   
   glEnd();
   
   glDisable(GL_TEXTURE_2D); 
-  glDisable(GL_BLEND); 
 
   /*  text data... */
+  glBlendFunc(GL_ONE, GL_ONE);
+
   if (scale == SCALE_FAC)
     {
       if (showpnams)
         {
-          snprintf(buf32, 32 - 1, "%s", Planets[pnum].name);
-          drawString(x, y - ((GLfloat)size / 2.0), -5.0, buf32, vFontDL, 
-                     textcolor, FALSE);
+          snprintf(buf, BUFFER_SIZE - 1, "%s", Planets[pnum].name);
+          glfRender(x, 
+                    ((scale == SCALE_FAC) ? y - 4.0 : y - 1.0), 
+                    TRANZ, /* planet's Z */
+                    ((GLfloat)strlen(buf) * 2.0) / ((scale == SCALE_FAC) ? 1.0 : 2.0), 
+                    TEXT_HEIGHT, fontTinyFixedTxf, buf, textcolor, 
+                    TRUE, FALSE, FALSE);
         }
     }
   else
@@ -432,24 +435,34 @@ void uiDrawPlanet( GLfloat x, GLfloat y, int pnum, int scale,
         planame[0] = EOS;
 
       if (UserConf.DoNumMap && (torpchar != ' '))
-        snprintf(buf32, 32 - 1, "%c%d%c%s", 
+        snprintf(buf, BUFFER_SIZE - 1, "#%d#%c#%d#%d#%d#%c%s", 
+                 textcolor,
                  torpchar,
+                 InfoColor,
                  Planets[pnum].armies,
+                 textcolor,
                  torpchar,
                  planame);
       else
-        snprintf(buf32, 32 - 1, "%c%c%c%s", 
+        snprintf(buf, BUFFER_SIZE - 1, "#%d#%c#%d#%c#%d#%c%s", 
+                 textcolor,
                  torpchar,
+                 InfoColor,
                  ConqInfo->chrplanets[Planets[pnum].type],
+                 textcolor,
                  torpchar,
                  planame);
 
-      
-      drawString(x, 
-                 y - ((GLfloat)size / 2.0),
-                 -5.0, buf32, vFontDL, textcolor, FALSE);
+      glfRender(x, 
+                ((scale == SCALE_FAC) ? y - 2.0 : y - 1.0), 
+                TRANZ - 5.0,  
+                ((GLfloat)uiCStrlen(buf) * 2.0) / ((scale == SCALE_FAC) ? 1.0 : 2.0), 
+                TEXT_HEIGHT, fontTinyFixedTxf, buf, textcolor, 
+                TRUE, TRUE, FALSE);
 
     }
+
+  glDisable(GL_BLEND); 
 
   glPopMatrix();
 
@@ -924,6 +937,7 @@ resize(int w, int h)
 static int renderNode(void)
 {
   scrNode_t *node = getTopNode();
+  scrNode_t *onode = getTopONode();
   int rv;
 
   if (node)
@@ -934,15 +948,26 @@ static int renderNode(void)
 
           rv = (*node->display)(&dConf);
 
-          glutSwapBuffers();
-
           if (rv == NODE_EXIT)
             return rv;
+
+          if (onode && onode->display)
+            rv = (*onode->display)(&dConf);
+          
+          if (rv == NODE_EXIT)
+            return rv;
+
+          glutSwapBuffers();
+
         }
 
       if (node->idle)
         rv = (*node->idle)();
-      
+      if (rv == NODE_EXIT)
+        return rv;
+
+      if (onode && onode->idle)
+        rv = (*onode->idle)();
       if (rv == NODE_EXIT)
         return rv;
     }
@@ -996,7 +1021,7 @@ static void renderFrame(void)
 
 void uiPrintFixed(GLfloat x, GLfloat y, GLfloat w, GLfloat h, char *str)
 {                               /* this works for non-viewer only */
-  glfRender(x, y, w, h, fontFixedTxf, str, NoColor, TRUE, TRUE, TRUE);
+  glfRender(x, y, 0.0, w, h, fontFixedTxf, str, NoColor, TRUE, TRUE, TRUE);
 
   return;
 }
@@ -1203,14 +1228,14 @@ drawShip(GLfloat x, GLfloat y, GLfloat angle, char ch, int i, int color,
 
   glDisable(GL_TEXTURE_2D);   
   
-#warning "test"
-#if 0
-  glfRender(x - 30.0, 
-             y, 
-             70.0, 
-             10.0, fontFixedTxf, "Hi There!!!!!", RedLevelColor, 
+  glBlendFunc(GL_ONE, GL_ONE);
+
+  glfRender(x, 
+            ((scale == SCALE_FAC) ? y - 4.0 : y - 1.0), 
+            TRANZ,  
+            ((GLfloat)strlen(buf) * 2.0) / ((scale == SCALE_FAC) ? 1.0 : 2.0), 
+             TEXT_HEIGHT, fontTinyFixedTxf, buf, color, 
             TRUE, FALSE, FALSE);
-#endif
 
   /* highlight enemy ships... */
   if (UserConf.EnemyShipBox)
@@ -1220,11 +1245,6 @@ drawShip(GLfloat x, GLfloat y, GLfloat angle, char ch, int i, int color,
   glPopMatrix();
 
   glDisable(GL_BLEND);
-
-  drawString(x, ((scale == SCALE_FAC) ? y - 5.0 : y - 4.0), z, buf, 
-             vFontDL, color, FALSE);
-
-
 
   return;
 }
@@ -1334,6 +1354,7 @@ static void procInput(int key, int x, int y)
 {
   int rv = NODE_OK;
   scrNode_t *node = getTopNode();
+  scrNode_t *onode = getTopONode();
 
 #if 0
   clog("GL: procInput: key = %d, x = %d y = %d",
@@ -1342,13 +1363,26 @@ static void procInput(int key, int x, int y)
 
   if (node)
     {
-      if (node->input)
-        rv = (*node->input)(key);
-
-      if (rv == NODE_EXIT)
+      /* we give input priority to the overlay node */
+      if (onode && onode->input)
         {
-          conqend();
-          exit(1);
+          rv = (*onode->input)(key);
+          if (rv == NODE_EXIT)
+            {
+              conqend();
+              exit(1);
+            }
+        }
+      else
+        {
+          if (node->input)
+            rv = (*node->input)(key);
+          
+          if (rv == NODE_EXIT)
+            {
+              conqend();
+              exit(1);
+            }
         }
     }
 

@@ -19,5 +19,6 @@ void _GLError(char *funcname, int line);
 
 void mglConqLogo(dspConfig_t *dsp);
 void mglBeep(void);  
+void mglOverlayQuad(void);
 
 #endif /* _MISCGL_H */

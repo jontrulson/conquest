@@ -39,7 +39,7 @@ extern TexFont *fontTinyFixedTxf;
 extern TexFont *fontMsgTxf;
 #endif /* NOEXTERN_GLFONT */
 
-void glfRender(GLfloat x, GLfloat y, GLfloat w, GLfloat h,
+void glfRender(GLfloat x, GLfloat y, GLfloat z, GLfloat w, GLfloat h,
                        TexFont *font, char *str, int color, int scalex,
                int dofancy, int ortho);
 void drawString(GLfloat x, GLfloat y, GLfloat z, char *str,

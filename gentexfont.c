@@ -254,6 +254,8 @@ printGlyph(FontInfoPtr font, int c)
       putchar('\n');
     }
   }
+  putchar('\n');
+
 }
 
 void
@@ -261,6 +263,8 @@ getMetric(FontInfoPtr font, int c, TexGlyphInfo * tgi)
 {
   PerGlyphInfoPtr glyph;
   unsigned char *bitmapData;
+
+  /*  printGlyph(font, c);*/
 
   tgi->c = c;
   if (c < font->min_char || c > font->max_char) {

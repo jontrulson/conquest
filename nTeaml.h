@@ -8,6 +8,6 @@
 #ifndef _NTEAML_H
 #define _NTEAML_H
 
-void nTeamlInit(int nodeid, int tn);
+scrNode_t *nTeamlInit(int nodeid, int setnode, int tn);
 
 #endif /* _NTEAML_H */

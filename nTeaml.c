@@ -42,14 +42,15 @@ static scrNode_t nTeamlNode = {
 
 static int retnode;             /* the node to return to */
 
-void nTeamlInit(int nodeid, int tn)
+scrNode_t *nTeamlInit(int nodeid, int setnode, int tn)
 {
   team = tn;
   retnode = nodeid;
 
-  setNode(&nTeamlNode);
+  if (setnode)
+    setNode(&nTeamlNode);
 
-  return;
+  return(&nTeamlNode);
 }
 
 
@@ -314,6 +315,7 @@ static int nTeamlIdle(void)
   if (clientFlags & SPCLNTSTAT_FLAG_KILLED && retnode == DSP_NODE_CP)
     {
       /* time to die properly. */
+      setONode(NULL);
       nDeadInit();
       return NODE_OK;
     }
@@ -328,15 +330,18 @@ static int nTeamlInput(int ch)
   switch (retnode)
     {
     case DSP_NODE_CP:
+      setONode(NULL);
       nCPInit();
       break;
     case DSP_NODE_MENU:
+      setONode(NULL);
       nMenuInit();
       break;
 
     default:
       clog("nTeamlInput: invalid return node: %d, going to DSP_NODE_MENU",
            retnode);
+      setONode(NULL);
       nMenuInit();
       break;
     }

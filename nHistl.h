@@ -8,6 +8,6 @@
 #ifndef _NHISTL_H
 #define _NHISTL_H
 
-void nHistlInit(int nodeid);
+scrNode_t *nHistlInit(int nodeid, int setnode);
 
 #endif /* _NHISTL_H */

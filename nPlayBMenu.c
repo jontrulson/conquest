@@ -141,7 +141,7 @@ static int nPlayBMenuInput(int ch)
   switch (ch)
     {
     case '/':
-      nShiplInit(DSP_NODE_PLAYBMENU);
+      nShiplInit(DSP_NODE_PLAYBMENU, TRUE);
       break;
 
     case 'q':

@@ -211,8 +211,15 @@ txfLoadFont(char *filename)
   }
   w = txf->tex_width;
   h = txf->tex_height;
+#if 0
+/* JET - this seems to clip off the glyph along the left and bottom
+   edges.  Therefore, we will not do this. :) */
   xstep = 0.5 / w;
   ystep = 0.5 / h;
+#else
+  xstep = ystep = 0;
+#endif
+
   for (i = 0; i < txf->num_glyphs; i++) {
     TexGlyphInfo *tgi;
 
@@ -304,6 +311,7 @@ txfLoadFont(char *filename)
     }
     got = fread(texbitmap, 1, stride * height, file);
     EXPECT(stride * height);
+
     if (useLuminanceAlpha) {
       txf->teximage = (unsigned char *) calloc(width * height * 2, 1);
       if (txf->teximage == NULL) {

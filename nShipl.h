@@ -9,6 +9,6 @@
 #ifndef _NSHIPL_H
 #define _NSHIPL_H
 
-void nShiplInit(int nodeid);
+scrNode_t *nShiplInit(int nodeid, int setnode);
 
 #endif /* _NSHIPL_H */

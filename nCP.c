@@ -2139,10 +2139,10 @@ static void command( int ch )
       _dophase(lastphase);
       break;
     case 'h':
-      nCPHelpInit();
+      setONode(nCPHelpInit(FALSE));
       break;
     case 'H':
-      nHistlInit(DSP_NODE_CP);
+      setONode(nHistlInit(DSP_NODE_CP, FALSE));
       break;
     case 'i':				/* information */
       state = S_DOINFO;
@@ -2224,7 +2224,7 @@ static void command( int ch )
       break;
 
     case 'O':
-      nOptionsInit(NOPT_USER, DSP_NODE_CP);
+      setONode(nOptionsInit(NOPT_USER, FALSE, DSP_NODE_CP));
       break;
 
     case 'o':				/* orbit nearby planet */
@@ -2335,16 +2335,16 @@ static void command( int ch )
         }
       break;
     case 'S':				/* more user stats */
-      nUserlInit(DSP_NODE_CP, Context.snum, FALSE, TRUE);
+      setONode(nUserlInit(DSP_NODE_CP, FALSE, Context.snum, FALSE, TRUE));
       break;
     case 'T':				/* team list */
-      nTeamlInit(DSP_NODE_CP, Ships[Context.snum].team);
+      setONode(nTeamlInit(DSP_NODE_CP, FALSE, Ships[Context.snum].team));
       break;
     case 'u':				/* un-tractor */
       sendCommand(CPCMD_UNTOW, 0);
       break;
     case 'U':				/* user stats */
-      nUserlInit(DSP_NODE_CP, Context.snum, FALSE, FALSE);
+      setONode(nUserlInit(DSP_NODE_CP, FALSE, Context.snum, FALSE, FALSE));
       break;
     case 'W':				/* war and peace */
       for ( i = 0; i < NUMPLAYERTEAMS; i = i + 1 )
@@ -2370,13 +2370,13 @@ static void command( int ch )
       _doshields( Context.snum, TRUE );
       break;
     case '/':				/* player list */
-      nShiplInit(DSP_NODE_CP);  /* shipl node */
+      setONode(nShiplInit(DSP_NODE_CP, FALSE));  /* shipl node */
       break;
     case '?':				/* planet list */
       if (Context.snum > 0 && Context.snum <= MAXSHIPS)
-        nPlanetlInit(DSP_NODE_CP, Context.snum, Ships[Context.snum].team);
+        setONode(nPlanetlInit(DSP_NODE_CP, FALSE, Context.snum, Ships[Context.snum].team));
       else          /* then use user team if user doen't have a ship yet */
-        nPlanetlInit(DSP_NODE_CP, Context.snum, Users[Context.unum].team);
+        setONode(nPlanetlInit(DSP_NODE_CP, FALSE, Context.snum, Users[Context.unum].team));
       break;
     case TERM_REDRAW:			/* clear all the prompts */
       clrPrompt(MSG_LIN1);
@@ -2438,6 +2438,9 @@ static int nCPDisplay(dspConfig_t *dsp)
 
   /* Main/Hud */
   renderHud();
+
+  /* draw the overlay bg if active */
+  mglOverlayQuad();
 
   return NODE_OK;
 }  

@@ -35,11 +35,12 @@ static scrNode_t nPlayBHelpNode = {
 };
 
 
-void nPlayBHelpInit(void)
+scrNode_t *nPlayBHelpInit(int setnode)
 {
-  setNode(&nPlayBHelpNode);
+  if (setnode)
+    setNode(&nPlayBHelpNode);
 
-  return;
+  return(&nPlayBHelpNode);
 }
 
 
@@ -57,6 +58,7 @@ static int nPlayBHelpInput(int ch)
 {
   /* go back */
 
+  setONode(NULL);
   nPlayBInit();
 
   return NODE_OK;

@@ -181,6 +181,8 @@ static int nPlayBDisplay(dspConfig_t *dsp)
       
       setPrompt(MSG_MSG, NULL, NoColor, buf, CyanColor);
     }
+
+  mglOverlayQuad();             /* render the overlay bg */
   
   if (prompting)
     setPrompt(prm.index, prm.pbuf, NoColor, prm.buf, CyanColor);
@@ -277,7 +279,7 @@ static int nPlayBInput(int ch)
       return NODE_OK;
       break;
     case 'h':
-      nPlayBHelpInit();
+      setONode(nPlayBHelpInit(FALSE));
       break;
     case 'f':	/* move forward 30 seconds */
       cp_putmsg(NULL, MSG_LIN1);
@@ -395,7 +397,7 @@ static int nPlayBInput(int ch)
       break;
 
     case '/':
-      nShiplInit(DSP_NODE_PLAYB);
+      setONode(nShiplInit(DSP_NODE_PLAYB, FALSE));
       return NODE_OK;
       break;
 

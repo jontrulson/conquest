@@ -9,6 +9,6 @@
 #ifndef _NPLAYBHELP_H
 #define _NPLAYBHELP_H
 
-void nPlayBHelpInit(void);
+scrNode_t *nPlayBHelpInit(int setnode);
 
 #endif /* _NPLAYBHELP_H */

@@ -9,6 +9,21 @@
 
                               Conquest HISTORY
 
+Version 8.0.1i 9/03/2004 (devel)
+
+        - when in the cockpit, various screens that used to be
+          seperate such as help, userlist, planetlist, etc, are now
+          displayed on top of the cockpit display, which is then made
+          transparent.  This allows you to still see what is going on
+          with your ship while reading the info.  
+
+          This also works when playing back a recorded game.
+
+        - redid the viewer fonts - now use a tex mapped font as well,
+          instead of the glut bitmap fonts. 
+
+        - recolorized army count in planet names on long range display.
+
 Version 8.0.1h 8/10/2004 (devel)
 
         - added proper moon texture for Luna.
@@ -16,8 +31,8 @@ Version 8.0.1h 8/10/2004 (devel)
         - torp packets are no longer sent, only recorded.  TorpEvent
           packets are the only torp packets sent to the client now.
 
-        - cleaned up GL.c a lot.  No longer use two seperate windows 
-          for the viewer and everything else.
+        - cleaned up GL.c a lot.  No longer use a seperate window (and
+          associated GL context) for the viewer.
 
 Version 8.0.1g 8/08/2004 (devel)
 

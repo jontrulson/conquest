@@ -31,5 +31,7 @@ typedef struct _scr_node {
 
 void setNode(scrNode_t *node);
 scrNode_t *getTopNode(void);
+void setONode(scrNode_t *node);
+scrNode_t *getTopONode(void);
 
 #endif /* _NODE_H */

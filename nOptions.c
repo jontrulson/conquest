@@ -106,10 +106,12 @@ static void quitNode(void)
   switch (retnode)
     {
     case DSP_NODE_CP:
+      setONode(NULL);
       nCPInit();
       break;
     case DSP_NODE_MENU:
     default:
+      setONode(NULL);
       nMenuInit();
       break;
     }
@@ -574,7 +576,7 @@ static void _showOptScreen(void)
 }
   
 
-void nOptionsInit(int what, int rnode)
+scrNode_t *nOptionsInit(int what, int setnode, int rnode)
 {
   int i, k;
   struct Conf *ConfigData;
@@ -631,10 +633,11 @@ void nOptionsInit(int what, int rnode)
                                    + (i * MAX_MACRO_LEN));
           }
     }
-  
-  setNode(&nOptionsNode);
 
-  return;
+  if (setnode)
+    setNode(&nOptionsNode);
+
+  return(&nOptionsNode);
 }
 
 
@@ -713,6 +716,7 @@ static int nOptionsIdle(void)
   if ((retnode == DSP_NODE_CP) && (clientFlags & SPCLNTSTAT_FLAG_KILLED))
     {
       /* if we were flying, time to die properly. */
+      setONode(NULL);
       nDeadInit();
       return NODE_OK;
     }

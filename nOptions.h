@@ -12,6 +12,6 @@
 #define NOPT_USER    0          /* user opts */
 #define NOPT_SYS     1          /* sysopts */
 
-void nOptionsInit(int what, int rnode);
+scrNode_t *nOptionsInit(int what, int setmode, int rnode);
 
 #endif /* _NOPTIONS_H */

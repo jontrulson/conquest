@@ -47,13 +47,14 @@ static scrNode_t nShiplNode = {
 
 static int retnode;             /* the node to return to */
 
-void nShiplInit(int nodeid)
+scrNode_t *nShiplInit(int nodeid, int setnode)
 {
   retnode = nodeid;
 
-  setNode(&nShiplNode);
+  if (setnode)
+    setNode(&nShiplNode);
 
-  return;
+  return(&nShiplNode);
 }
 
 
@@ -174,7 +175,7 @@ static int nShiplIdle(void)
   Unsgn8 buf[PKT_MAXSIZE];
   int sockl[2] = {cInfo.sock, cInfo.usock};
 
-  if (Context.recmode == RECMODE_PLAYING)
+  if (Context.recmode == RECMODE_PLAYING || Context.recmode == RECMODE_PAUSED)
     return NODE_OK;             /* no packet reading here */
 
   while ((pkttype = waitForPacket(PKT_FROMSERVER, sockl, PKT_ANYPKT,
@@ -191,6 +192,7 @@ static int nShiplIdle(void)
   if (clientFlags & SPCLNTSTAT_FLAG_KILLED && retnode == DSP_NODE_CP)
     {
       /* time to die properly. */
+      setONode(NULL);
       nDeadInit();
       return NODE_OK;
     }
@@ -205,23 +207,28 @@ static int nShiplInput(int ch)
   switch (retnode)
     {
     case DSP_NODE_CP:
+      setONode(NULL);
       nCPInit();
       break;
     case DSP_NODE_MENU:
+      setONode(NULL);
       nMenuInit();
       break;
 
     case DSP_NODE_PLAYBMENU:
+      setONode(NULL);
       nPlayBMenuInit();
       break;
 
     case DSP_NODE_PLAYB:
+      setONode(NULL);
       nPlayBInit();
       break;
 
     default:
       clog("nShiplInput: invalid return node: %d, going to DSP_NODE_MENU",
            retnode);
+      setONode(NULL);
       nMenuInit();
       break;
     }

@@ -38,13 +38,14 @@ static scrNode_t nHistlNode = {
 
 static int retnode;             /* the node to return to */
 
-void nHistlInit(int nodeid)
+scrNode_t *nHistlInit(int nodeid, int setnode)
 {
   retnode = nodeid;
 
-  setNode(&nHistlNode);
+  if (setnode)
+    setNode(&nHistlNode);
 
-  return;
+  return(&nHistlNode);
 }
 
 
@@ -132,6 +133,7 @@ static int nHistlIdle(void)
   if (clientFlags & SPCLNTSTAT_FLAG_KILLED && retnode == DSP_NODE_CP)
     {
       /* time to die properly. */
+      setONode(NULL);
       nDeadInit();
       return NODE_OK;
     }
@@ -146,15 +148,18 @@ static int nHistlInput(int ch)
   switch (retnode)
     {
     case DSP_NODE_CP:
+      setONode(NULL);
       nCPInit();
       break;
     case DSP_NODE_MENU:
+      setONode(NULL);
       nMenuInit();
       break;
 
     default:
       clog("nHistlInput: invalid return node: %d, going to DSP_NODE_MENU",
            retnode);
+      setONode(NULL);
       nMenuInit();
       break;
     }
