@@ -192,7 +192,6 @@ int str2srec(metaSRec_t *srec, char *buf)
   free(tbuf);
 
 
-  clog("version = %d, fielno = %d\n", srec->version, fieldno);
   switch (srec->version)
     {
     case 1:
