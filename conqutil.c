@@ -472,7 +472,7 @@ void clog(char *fmt, ...)
   if (errfd == NULL)
     {
       umask(007);
-      sprintf(errfile, "%s/%s", CONQHOME, C_CONQ_ERRLOG);
+      sprintf(errfile, "%s/%s", CONQSTATE, C_CONQ_ERRLOG);
       if (ConquestGID == ERR)
 	{
 	  fprintf(stderr, "conqutil: clog():  ConquestUID == ERR!\n");

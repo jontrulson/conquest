@@ -24,7 +24,7 @@
 # define CEXTERN extern
 #endif
 
-#define SYSCONFIG_FILE "etc/conquestrc"	/* relative to CONQHOME */
+#define SYSCONFIG_FILE "conquestrc"	/* relative to CONQETC */
 #define CONFIG_FILE ".conquestrc"
 
 #define CONF_MAXCOMMENTS 50

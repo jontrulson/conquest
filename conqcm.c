@@ -293,7 +293,7 @@ void map_common(void)
 
   coff = 0;
   
-  sprintf(cmnfile, "%s/%s", CONQHOME, C_CONQ_COMMONBLK);
+  sprintf(cmnfile, "%s/%s", CONQSTATE, C_CONQ_COMMONBLK);
 
 				/* verify it's validity */
   if (check_cblock(cmnfile, CMN_MODE, SIZEOF_COMMONBLOCK) == FALSE)

@@ -52,16 +52,16 @@ CONTENTS:
 	       # SEMAPHORE STATUS LINE
 	       # LEAVING A SCREEN IN CONQOPER
 	    ## THE INSTALLED FILES
-	       # bin/conquest
-	       # bin/conqdriv
-	       # bin/conqoper
-	       # bin/conqai
-	       # etc/conquest_common.img
-	       # etc/conqnews.doc
-	       # etc/conquest.doc
-	       # etc/conquest.log
-	       # etc/conquestrc
-	       # lib/libconquest.so
+	       # conquest
+	       # conqdriv
+	       # conqoper
+	       # conqai
+	       # conquest_common.img
+	       # conqnews.doc
+	       # conquest.doc
+	       # conquest.log
+	       # conquestrc
+	       # libconquest.so
 	       # ~/.conquestrc
 	### MORE INFO
 	### OBTAINING CONQUEST
@@ -479,8 +479,8 @@ know... some consistency is needed.
 ## THE INSTALLED FILES
 
 	Here are the files installed by Conquest, and a brief synopsis
-of what each does.  All paths are relative the the installation
-directory (/opt/conquest by default).
+of what each does.  All paths are relative to the installation
+directory (/opt by default).
 
 
 # bin/conquest
@@ -491,10 +491,10 @@ directory (/opt/conquest by default).
 # bin/conqdriv
 
 	The universe driver process.  A driver is kicked off whenever
-someone enters Conquest and a driver isn't already running.  You
-cannot start the driver manually.  (You should never have to.)  A CO
-can manually start the driver for debugging purposes by supplying the
-'-f' option.
+someone enters Conquest and a driver isn't already running.  A normal
+user cannot start the driver manually.  (You should never have to.)  A
+CO can manually start the driver for debugging purposes by supplying
+the '-f' option.
 
 
 # bin/conqoper
@@ -557,7 +557,7 @@ purpose, be sure to re-run it with the '-r' option to return control
 of the robots to the Conquest driver when you're done.
 
 
-# etc/conquest_common.img
+# var/conquest/conquest_common.img
 
 	The Conquest (ex-Fortran) Common Block.  This file contains
 the 'state' of the universe.  It is mapped into the address space
@@ -568,7 +568,7 @@ up to all, then all will be able to modify the common block, and
 hence, the universe.  Gives me the willies just thinking about it.
 
 
-# etc/conqnews.doc
+# share/conqnews.doc
 
 	Latest Conquest news.  View via (N)ews in the Conquest main
 menu.  Contains a chronological order of changes and modifications.
@@ -576,7 +576,7 @@ Definitely worth viewing if you want to see what's changed since the
 previous releases.
 
 
-# etc/conquest.doc
+# share/conquest.doc
 
 	Conquest instructions and commands. View via (H)elp lesson in
 the Conquest main menu.   You might also want to print this out.  The
@@ -584,7 +584,7 @@ last page contains a command summary - a handy reference for new
 players. 
 
 
-# etc/conquest.log
+# var/conquest/conquest.log
 
 	Conquest's log file.  All errors/warnings, and debug messages
 are written here.  For the source distribution, see the bottom of

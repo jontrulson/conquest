@@ -182,7 +182,7 @@ typedef double real;
 #define max0(x, y) max((x), (y))
 #define fold(x) /* Who knows what this does... */
 #define glname(x, y) {\
-                      strncpy(x, cuserid(NULL), y - 1); \
+                      strncpy((char *)x, (char *)cuserid(NULL), y - 1); \
                       x[y - 1] = EOS; \
 		     }
       

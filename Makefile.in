@@ -7,10 +7,22 @@
 #
 ###########################################################################
 
+# fun with autoconf
+prefix = @prefix@
+exec_prefix = @exec_prefix@
+bindir = @bindir@
+datadir = @datadir@
+libdir = @libdir@
+libexecdir = @libexecdir@
+localstatedir = @localstatedir@
+rlocalstatedir = $(localstatedir)/conquest
+sysconfdir = @sysconfdir@
+
+DIRTARGETS = $(exec_prefix) $(bindir) $(datadir) $(libdir) \
+	     $(libexecdir) $(localstatedir) $(rlocalstatedir) $(sysconfdir)
+
 # User defineable options
 CONQGROUP = @CONQGROUP@
-CONQBIN = @prefix@/bin
-CONQHOME = @prefix@/conquest
 MAKE = make
 
 # Unixware: try -Ki486 or -Kpentium -
@@ -19,7 +31,9 @@ MAKE = make
 
 LCFLAGS = 
 
-CFLAGS = @CFLAGS@ @DEFS@ $(LCFLAGS) -DCONQHOME=\"$(CONQHOME)\" -DCONQUEST_GROUP=\"$(CONQGROUP)\"
+CFLAGS = @CFLAGS@ @DEFS@ $(LCFLAGS) -DCONQUEST_GROUP=\"$(CONQGROUP)\" \
+	-DCONQSTATE=\"$(rlocalstatedir)\" -DCONQLIBEXEC=\"$(libexecdir)\" \
+	-DCONQSHARE=\"$(datadir)\" -DCONQETC=\"$(sysconfdir)\"
 CONQUEST = conquest
 CONQAI = conqai
 CONQOPER = conqoper
@@ -41,15 +55,16 @@ CONQOBJS = ratfor.o cd2lb.o display.o iolb.o  \
 	conqsvr42.o global.o ibuf.o version.o conf.o sem.o color.o \
 	userauth.o options.o
 
-# For installation
-BCONQUEST = $(CONQHOME)/bin/conquest
-BCONQOPER = $(CONQHOME)/bin/conqoper
-BCONQDRIV = $(CONQHOME)/bin/conqdriv
-BCONQAI = $(CONQHOME)/bin/conqai
-BCONQSTRAT = $(CONQHOME)/bin/conqstrat
-HCONQHELP = $(CONQHOME)/etc/$(CONQHELP)
-HCONQNEWS = $(CONQHOME)/etc/$(CONQNEWS)
-HCONQREADME = $(CONQHOME)/etc/README
+# For installation (needed so a build can be run in the build directory
+#                   without contaminating an already installed game)
+BCONQUEST = $(bindir)/conquest
+BCONQOPER = $(bindir)/conqoper
+BCONQDRIV = $(libexecdir)/conqdriv
+BCONQAI = $(bindir)/conqai
+BCONQSTRAT = $(bindir)/conqstrat
+HCONQHELP = $(datadir)/$(CONQHELP)
+HCONQNEWS = $(datadir)/$(CONQNEWS)
+HCONQREADME = $(datadir)/conquest.README
 
 CONQLB = @CONQLB@
 
@@ -131,7 +146,7 @@ lex.yy.c: conqstrat.c.l
 	-$(LEX) conqstrat.c.l
 
 lex.yy.o: lex.yy.c
- 
+
 # library building 
 ################
 
@@ -144,76 +159,31 @@ $(CONQLB): conqai_nomain.o $(CONQOBJS)
 # Install it!
 #############################
 
-install: all $(CONQHOME) $(CONQHOME)/etc $(CONQHOME)/bin $(CONQHOME)/lib \
-	$(CONQHOME)/lib/$(CONQLB) $(BCONQUEST) $(BCONQOPER) $(BCONQDRIV)  \
-	$(HCONQHELP) $(HCONQNEWS) $(CONQHOME)/lib/$(CONQLB) @prefix@ \
-	$(CONQBIN) $(CONQHOME)/etc/conqrule $(BCONQSTRAT) $(BCONQAI) \
-	$(CONQHOME)/etc/conquestrc $(CONQBIN)/conquest $(CONQBIN)/conqoper \
-	$(CONQBIN)/conqstrat $(CONQBIN)/conqdriv $(CONQBIN)/conqai \
-	$(HCONQREADME)
+dirs: $(DIRTARGETS)
 
-@prefix@:
-	mkdir -p @prefix@
-	chmod 775 @prefix@
-	chgrp $(CONQGROUP) @prefix@
+$(DIRTARGETS):
+	mkdir -m 755 -p $(DIRTARGETS)
+	chgrp $(CONQGROUP) $(rlocalstatedir)
+	chmod 775 $(rlocalstatedir)
 
-$(CONQBIN):
-	mkdir -p $(CONQBIN)
-	chmod 775 $(CONQBIN)
+install: all dirs $(libdir)/$(CONQLB) $(BCONQUEST) $(BCONQOPER) $(BCONQDRIV) \
+	$(HCONQHELP) $(HCONQNEWS) $(datadir)/conqrule $(BCONQSTRAT) \
+	$(BCONQAI) $(sysconfdir)/conquestrc $(HCONQREADME)
 
-$(CONQBIN)/conquest: $(BCONQUEST)
-	@-rm -f $(CONQBIN)/conquest
-	@-ln -s $(BCONQUEST) $(CONQBIN)/conquest
 
-$(CONQBIN)/conqoper: $(BCONQOPER)
-	@-rm -f $(CONQBIN)/conqoper
-	@-ln -s $(BCONQOPER) $(CONQBIN)/conqoper
+$(libdir)/$(CONQLB): $(CONQLB)
+	cp $(CONQLB) $(libdir)/$(CONQLB)
+	chgrp $(CONQGROUP) $(libdir)/$(CONQLB)
+	chmod 644 $(libdir)/$(CONQLB)
 
-$(CONQBIN)/conqdriv: $(BCONQDRIV)
-	@-rm -f $(CONQBIN)/conqdriv
-	@-ln -s $(BCONQDRIV) $(CONQBIN)/conqdriv
-
-$(CONQBIN)/conqstrat: $(BCONQSTRAT)
-	@-rm -f $(CONQBIN)/conqstrat
-	@-ln -s $(BCONQSTRAT) $(CONQBIN)/conqstrat
-
-$(CONQBIN)/conqai: $(BCONQAI)
-	@-rm -f $(CONQBIN)/conqai
-	@-ln -s $(BCONQAI) $(CONQBIN)/conqai
-
-$(CONQHOME):
-	mkdir -p $(CONQHOME)
-	chmod 775 $(CONQHOME)
-	chgrp $(CONQGROUP) $(CONQHOME)
-
-$(CONQHOME)/lib/$(CONQLB): $(CONQLB)
-	cp $(CONQLB) $(CONQHOME)/lib/$(CONQLB)
-	chgrp $(CONQGROUP) $(CONQHOME)/lib/$(CONQLB)
-	chmod 644 $(CONQHOME)/lib/$(CONQLB)
-
-$(CONQHOME)/etc:
-	mkdir -p $(CONQHOME)/etc
-	chmod 775 $(CONQHOME)/etc
-	chgrp $(CONQGROUP) $(CONQHOME)/etc
-
-$(CONQHOME)/bin:
-	mkdir -p $(CONQHOME)/bin
-	chmod 775 $(CONQHOME)/bin
-	chgrp $(CONQGROUP) $(CONQHOME)/bin
-
-$(CONQHOME)/lib:
-	mkdir -p $(CONQHOME)/lib
-	chmod 775 $(CONQHOME)/lib
-	chgrp $(CONQGROUP) $(CONQHOME)/lib
-
-$(CONQHOME)/etc/conquestrc: $(BCONQOPER)
+$(sysconfdir)/conquestrc: $(BCONQOPER)
 	$(BCONQOPER) -C
-	chmod 664 $(CONQHOME)/etc/conquestrc
-	chgrp $(CONQGROUP) $(CONQHOME)/etc/conquestrc
+	chmod 664 $(sysconfdir)/conquestrc
+	chgrp $(CONQGROUP) $(sysconfdir)/conquestrc
 
 $(BCONQUEST): conquest
 	@-rm -f $(BCONQUEST)
-	$(CC) -o conquest $(CFLAGS) conquest.o $(CONQHOME)/lib/$(CONQLB) $(EXTLBS)
+	$(CC) -o conquest $(CFLAGS) conquest.o $(libdir)/$(CONQLB) $(EXTLBS)
 	cp conquest $(BCONQUEST)
 	chgrp $(CONQGROUP) $(BCONQUEST)
 	chmod 2771 $(BCONQUEST)
@@ -221,7 +191,7 @@ $(BCONQUEST): conquest
 
 $(BCONQOPER): conqoper
 	@-rm -f $(BCONQOPER)
-	$(CC) -o conqoper $(CFLAGS) conqoper.o $(CONQHOME)/lib/$(CONQLB) $(EXTLBS)
+	$(CC) -o conqoper $(CFLAGS) conqoper.o $(libdir)/$(CONQLB) $(EXTLBS)
 	cp conqoper $(BCONQOPER)
 	chgrp $(CONQGROUP) $(BCONQOPER)
 	chmod 2771 $(BCONQOPER)
@@ -229,7 +199,7 @@ $(BCONQOPER): conqoper
 
 $(BCONQDRIV): conqdriv
 	@-rm -f $(BCONQDRIV)
-	$(CC) -o conqdriv $(CFLAGS) conqdriv.o $(CONQHOME)/lib/$(CONQLB) $(EXTLBS)
+	$(CC) -o conqdriv $(CFLAGS) conqdriv.o $(libdir)/$(CONQLB) $(EXTLBS)
 	cp conqdriv $(BCONQDRIV)
 	chgrp $(CONQGROUP) $(BCONQDRIV)
 	chmod 2771 $(BCONQDRIV)
@@ -237,7 +207,7 @@ $(BCONQDRIV): conqdriv
 
 $(BCONQAI): conqai
 	@-rm -f $(BCONQAI)
-	$(CC) -o conqai $(CFLAGS) conqai.o $(CONQHOME)/lib/$(CONQLB) $(EXTLBS)
+	$(CC) -o conqai $(CFLAGS) conqai.o $(libdir)/$(CONQLB) $(EXTLBS)
 	cp conqai $(BCONQAI)
 	chgrp $(CONQGROUP) $(BCONQAI)
 	chmod 2770 $(BCONQAI)
@@ -245,15 +215,15 @@ $(BCONQAI): conqai
 
 $(BCONQSTRAT): conqstrat
 	@-rm -f $(BCONQSTRAT)
-	-$(CC) -o conqstrat $(CFLAGS) lex.yy.o y.tab.o $(LIBS) $(CONQHOME)/lib/$(CONQLB) $(EXTLBS)
+	-$(CC) -o conqstrat $(CFLAGS) lex.yy.o y.tab.o $(LIBS) $(libdir)/$(CONQLB) $(EXTLBS)
 	-cp conqstrat $(BCONQSTRAT)
 	-chgrp $(CONQGROUP) $(BCONQSTRAT)
 	-chmod 751 $(BCONQSTRAT)
 
-$(CONQHOME)/etc/conqrule: conqrule
-	cp conqrule $(CONQHOME)/etc/conqrule
-	chgrp $(CONQGROUP) $(CONQHOME)/etc/conqrule
-	chmod 644 $(CONQHOME)/etc/conqrule
+$(datadir)/conqrule: conqrule
+	cp conqrule $(datadir)/conqrule
+	chgrp $(CONQGROUP) $(datadir)/conqrule
+	chmod 644 $(datadir)/conqrule
 
 $(HCONQREADME): README
 	cp README $(HCONQREADME)

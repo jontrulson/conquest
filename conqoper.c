@@ -124,9 +124,6 @@ main(int argc, char *argv[])
       /* need to be conq grp for these */
       if (setgid(ConquestGID) == -1)
 	{
-	  clog("conqoper: setgid(%d): %s",
-	       ConquestGID,
-	       sys_errlist[errno]);
 	  fprintf(stderr, "conqoper: setgid(): failed\n");
 	  exit(1);
 	}

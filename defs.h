@@ -42,19 +42,15 @@
 # define CONQUEST_GROUP "conquest"
 #endif
 
-#ifndef CONQHOME
-# define CONQHOME "/opt/conquest"
-#endif
-
 /* Some variables that used to be in conqfig.c - relative to conquest
- *  installation directory (CONQHOME)
+ *  installation directories
  */
 
-#define C_CONQ_CONQDRIV  "bin/conqdriv"
-#define C_CONQ_COMMONBLK "etc/conquest_common.img"
-#define C_CONQ_ERRLOG    "etc/conquest.log"
-#define C_CONQ_NEWSFILE  "etc/conqnews.doc"
-#define C_CONQ_HELPFILE  "etc/conquest.doc"
+#define C_CONQ_CONQDRIV  "conqdriv"
+#define C_CONQ_COMMONBLK "conquest_common.img"
+#define C_CONQ_ERRLOG    "conquest.log"
+#define C_CONQ_NEWSFILE  "conqnews.doc"
+#define C_CONQ_HELPFILE  "conquest.doc"
 
 
 /* HAS_SETITIMER - Define if your system supports setitimer/getitimer().

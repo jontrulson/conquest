@@ -534,7 +534,7 @@ void drcreate(void)
   
   if (pid == 0)
     {				/* The child: aka "The Driver" */
-      sprintf(drivcmd, "%s/%s", CONQHOME, C_CONQ_CONQDRIV);
+      sprintf(drivcmd, "%s/%s", CONQLIBEXEC, C_CONQ_CONQDRIV);
       execl(drivcmd, drivcmd, NULL);
       clog("drcreate(): exec(): %s", sys_errlist[errno]);
       perror("exec");		/* shouldn't be reached */
@@ -643,7 +643,7 @@ void helplesson(void)
   char buf[MSGMAXLINE];
   char helpfile[BUFFER_SIZE];
   
-  sprintf(helpfile, "%s/%s", CONQHOME, C_CONQ_HELPFILE);
+  sprintf(helpfile, "%s/%s", CONQSHARE, C_CONQ_HELPFILE);
   sprintf( buf, "%s: Can't open.", helpfile );
   pagefile( helpfile, buf);
   
@@ -682,7 +682,7 @@ int isagod( int unum )
   
   if (unum == -1)		/* get god status for current user */
     {				/* now find out whether we're in it */
-      strncpy(myname, cuserid(NULL), BUFFER_SIZE - 2);
+      strncpy(myname, (char *)cuserid(NULL), BUFFER_SIZE - 2);
       myname[BUFFER_SIZE - 1] = EOS;
     }
   else
@@ -744,7 +744,7 @@ void news(void)
   char newsfile[BUFFER_SIZE];
   extern char *c_conq_newsfile;
   
-  sprintf(newsfile, "%s/%s", CONQHOME, C_CONQ_NEWSFILE);
+  sprintf(newsfile, "%s/%s", CONQSHARE, C_CONQ_NEWSFILE);
   
   pagefile( newsfile, "No news is good news.");
   

@@ -58,7 +58,7 @@ int GetSysConf(int checkonly)
   sysconf_AllowRefits = TRUE;
 
 				/* start building the filename */
-  sprintf(conf_name, "%s/%s", CONQHOME, SYSCONFIG_FILE);
+  sprintf(conf_name, "%s/%s", CONQETC, SYSCONFIG_FILE);
 
   if ((conf_fd = fopen(conf_name, "r")) == NULL)
     {
@@ -737,7 +737,7 @@ int MakeSysConf()
   char conf_name[BUFFER_SIZE];
   int i, j, n;
 
-  sprintf(conf_name, "%s/%s", CONQHOME, SYSCONFIG_FILE);
+  sprintf(conf_name, "%s/%s", CONQETC, SYSCONFIG_FILE);
   umask(002);
   unlink(conf_name);
 
@@ -753,6 +753,7 @@ int MakeSysConf()
       return(ERR);
     }
 
+  clog("OPER: Updating %s file...", conf_name);
   fprintf(stderr, "Updating %s file...", conf_name);
 
   for (j=0; j<SYSCF_END; j++)
