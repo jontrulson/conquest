@@ -9,7 +9,7 @@
 #define YY_FLEX_MINOR_VERSION 5
 
 #include <stdio.h>
-#include <errno.h>
+
 
 /* cfront 1.2 defines "c_plusplus" instead of "__cplusplus" */
 #ifdef c_plusplus
@@ -22,9 +22,7 @@
 #ifdef __cplusplus
 
 #include <stdlib.h>
-#ifndef _WIN32
 #include <unistd.h>
-#endif
 
 /* Use prototypes in function declarations. */
 #define YY_USE_PROTOS
@@ -591,7 +589,7 @@ extern int yylval;
 #undef ECHO
 #define ECHO (void)fprintf(yyout, "Unrecognized input: '%s', ignored.\n",yytext)
 
-#line 595 "conqstrat-lex.c"
+#line 593 "conqstrat-lex.c"
 
 /* Macros after this point can all be overridden by user definitions in
  * section 1.
@@ -691,20 +689,9 @@ YY_MALLOC_DECL
 			YY_FATAL_ERROR( "input in flex scanner failed" ); \
 		result = n; \
 		} \
-	else \
-		{ \
-		errno=0; \
-		while ( (result = fread(buf, 1, max_size, yyin))==0 && ferror(yyin)) \
-			{ \
-			if( errno != EINTR) \
-				{ \
-				YY_FATAL_ERROR( "input in flex scanner failed" ); \
-				break; \
-				} \
-			errno=0; \
-			clearerr(yyin); \
-			} \
-		}
+	else if ( ((result = fread( buf, 1, max_size, yyin )) == 0) \
+		  && ferror( yyin ) ) \
+		YY_FATAL_ERROR( "input in flex scanner failed" );
 #endif
 
 /* No semi-colon after return; correct usage is to write "yyterminate();" -
@@ -750,14 +737,14 @@ YY_MALLOC_DECL
 YY_DECL
 	{
 	register yy_state_type yy_current_state;
-	register char *yy_cp, *yy_bp;
+	register char *yy_cp = NULL, *yy_bp = NULL;
 	register int yy_act;
 
 #line 61 "conqstrat-lex.l"
 
 
 
-#line 761 "conqstrat-lex.c"
+#line 748 "conqstrat-lex.c"
 
 	if ( yy_init )
 		{
@@ -1134,7 +1121,7 @@ YY_RULE_SETUP
 #line 134 "conqstrat-lex.l"
 ECHO;
 	YY_BREAK
-#line 1138 "conqstrat-lex.c"
+#line 1125 "conqstrat-lex.c"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -1698,13 +1685,9 @@ YY_BUFFER_STATE b;
 	}
 
 
-#ifndef _WIN32
-#include <unistd.h>
-#else
 #ifndef YY_ALWAYS_INTERACTIVE
 #ifndef YY_NEVER_INTERACTIVE
 extern int isatty YY_PROTO(( int ));
-#endif
 #endif
 #endif
 

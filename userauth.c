@@ -7,12 +7,15 @@
  */
 
 #include "c_defs.h"
-#include "conf.h"
 #include "global.h"
 #include "conqdef.h"
 #include "conqcom.h"
 #include "context.h"
+#include "conf.h"
 #include "color.h"
+
+#include <pwd.h>
+#include <sys/types.h>
 
 #define MAX_USERLEN 10		/* only 10 chars for users */
 
@@ -81,6 +84,8 @@ int Logon(char *username, char *password)
   string c4="C   C  O   O  N  NN  Q  Q   U   U  E          S    T";
   string c5=" CCC    OOO   N   N   QQ Q   UUU   EEEEE  SSSS     T";
   int done;
+  struct passwd *pwent;
+  static char homedir[256];
   extern char *ConquestVersion;
   extern char *ConquestDate;
 
@@ -98,6 +103,14 @@ int Logon(char *username, char *password)
 #if defined DEBUG_SERVER
   clog("INFO: Detected a remote user\n");
 #endif
+
+				/* we'll get the homedir of the */
+				/* conquest user, and set HOME */
+  if ((pwent = getpwnam(CONQUEST_USER)) == NULL)
+    clog("ERROR: Logon: getpwnam(%s) failed\n");
+
+  sprintf(homedir, "HOME=%s", pwent->pw_dir);
+  putenv(homedir);		/* for getconf, et. al */
 
   done = FALSE;
 
