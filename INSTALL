@@ -24,7 +24,9 @@ CONTENTS:
     So you are impatient and want to build and play.  Here's a short
     list to get you going.  Read the later sections for more details.
 
-    - unpack and build the sources
+    - unpack and build the sources. (If you are using Cygwin under MS
+      Windows, see README.cygwin for further information.  Ignore the
+      'groupadd' commands listed below.)
 
       # groupadd conquest
       $ tar xzvf conquest-x.y.src.tar.gz
@@ -88,7 +90,7 @@ CONTENTS:
         OSF1/Digital Unix V4.0 for Alpha
            - Thanks to Jim Anderson (janderson@NOVALIS.COM)
              for this port!
-        MS Windows using the cygwin (www.cygwin.com) environment.
+        MS Windows using the Cygwin (www.cygwin.com) environment.
 
         Note, I no longer have access to these machines (only
         linux) so YMMV...
@@ -106,7 +108,8 @@ CONTENTS:
     To build conquest, unpack the src archive.  
 
     Create the 'conquest' group.  In Linux this can be done with
-    (as root) 'groupadd conquest'.
+    (as root) 'groupadd conquest'.  Don't bother doing this on Cygwin
+    systems.  See README.cygwin for further info on these systems.
 
     NOTE: You *must* create a conquest group, or '[make |make install]'
     will fail!

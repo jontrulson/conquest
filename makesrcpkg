@@ -30,7 +30,7 @@ FILELIST="ratfor.c cd2lb.c iolb.c conqlb.c
 	ship.h user.h planet.h team.h torp.h msg.h doomsday.h
 	driver.h conqinfo.h robot.h history.h shiptype.h
 	conquest.doc conqnews.doc configure.ac configure
-	config.h.in config.guess config.sub Makefile.in README 
+	config.h.in config.guess config.sub Makefile.in README  
 	conqstrat.h conqstrat-lex.l conqstrat-yacc.y 
         conqrule Makefile.am aclocal.m4 depcomp install-sh ltmain.sh
         mkinstalldirs missing conqai_main.c
@@ -41,7 +41,8 @@ FILELIST="ratfor.c cd2lb.c iolb.c conqlb.c
         conqnet.h datatypes.h userauth.h servauth.h clntauth.h 
         clntauth.c servauth.c conquestd.c serverpkt.c serverpkt.h 
         servercmd.h servercmd.c conquestsh.c
-        conqmetad.c meta.c meta.h acinclude.m4 snprintf.h snprintf.c"
+        conqmetad.c meta.c meta.h acinclude.m4 snprintf.h snprintf.c 
+        README.cygwin"
 
 #IMAGES="img/*.bmp"
 

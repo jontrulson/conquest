@@ -1,0 +1,88 @@
+
+        This document lists the requirements and additional
+        procedures for compiling and installing Conquest 8.0.1+ under
+        Cygwin ( www.cygwin.com ) for MS Windows systems.
+
+        - When installing Cygwin, make sure you also install the
+          following packages:
+
+            ncurses
+            cygipc
+            bison
+            flex
+            crypt
+
+            in addition to the development packages (gcc, etc) of course.
+
+        - before compiling Conquest, make sure the ipc deamon is
+          running (from the cygipc package).  This program must also
+          be running before starting any Conquest executables.
+
+          To start the daemon:
+
+          ipc-daemon2 &
+
+        - When compiling conquest, you should specify a group to
+          configure, like:
+
+          ./configure --with-counquest-group=<group name>
+
+          The default is to use group 'Users' which may not exist
+          in your locale (for example, in Germany, this group is
+          'Benutzer').
+
+          Use 
+
+          cat /etc/groups
+
+          in a Cygwin shell to see what groups you currently have
+          available.
+
+          Group ownership is used on unix/linux to prevent cheating -
+          this isn't really an issue on Windows, since it is not
+          likely ever going to be providing shell access to internet
+          users.  It's really just a formality on Windows systems, and
+          conqoper will not pay attention to this on Cygwin systems
+          anyway. 
+
+        - by default, Conquest will want to install all of it's
+          exectuables and data files in the /opt hierarchy.  You can
+          change this of course with the '--prefix=' option to
+          'configure'.  If you elect to go with the default of /opt,
+          make sure you add the path to the executables to your
+          shell's PATH variable.  For example:
+
+          edit /etc/profile, and add the following near the bottom:
+
+          export PATH="$PATH:/opt/bin"
+
+        - If you want line drawing to work properly, also add the
+          following to /etc/profile:
+
+          export CYGWIN="$CYGWIN codepage:oem"
+
+        - Instructions for compiling, installing, and running Conquest
+          are the same as unix otherwise.  See the INSTALL, and README
+          files for more information.
+
+        - The Cygwin console seems to work best for playing Conquest.
+          I have messed with rxvt, but it's color assignments don't
+          match what Conquest expects (via curses).  As a result, if
+          you prefer a black background, which Conquest does, Some
+          text won't be displayed properly (as it's black instead of
+          the white it should be').
+
+          Curses color does appear to work correctly in the cygwin
+          consoles. 
+
+          I have not figured out how to get the functions keys to work
+          (for macros).  If someone knows the magic, let me know it
+          too :)
+
+
+        Thanks to Sean for trying out these cygwin versions, providing
+        some valuable feedback, and most of the content of this
+        document.
+
+
+$Id$

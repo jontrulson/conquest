@@ -9,15 +9,16 @@
 
                               Conquest News
 
-1/7/2004
-8.0a (devel)
+Version 8.0.1 1/17/2004
 
         - fixed rather serious problem with dead() handling.  When you
           were killed by an external (ship, sun, etc), you could get
           stuck in dead() once your ship exploded.
 
-          For this reason, the public server at conquest.radscan.com
-          has been updated to this version.
+          I recommend that server operators upgrade to this version.
+
+        - cleaned up some logic that should allow conquestd to handle
+          unexpected client disconnects better.
 
         - fixed a VACANT check in conquestd:newship().  It might
           resolve an issue some users have seen where if their
@@ -34,32 +35,17 @@
         - added some casts for sa_addr in the network connection
           routines to eliminate some gcc warnings.
 
-        - force 1-byte alignment of the packet structs.
+        - force 1-byte alignment of the wire packet structs to avoid
+          future troubles.
 
         - a variety of other minor fixes and adjustments.
 
+        - added patches from Clint Adams, adding portable snprintf()
+          and friends.
+
         - Cygwin support under MS Windows (tested with XP):
 
-          - you will need the following cygwin packages to be
-            installed in addition to the development kit (gcc,
-            headers, etc):
-
-            ncurses
-            cygipc
-            bison
-            flex
-            crypt
-
-            I think that is all, let me know if there are others I
-            forgot...
-
-          - You will need to be sure ipc-daemon2 (part of the cygipc
-            package) is running before building/running conquest, or
-            you will get semget() errors.
-
-            Start it like so:
-
-            ipc-daemon2 &
+          - read README.cygwin for cygwin requirements and information.
 
           - added better mmap() check for cygwin systems.  We don't
             use MAP_FIXED in Conquest anyways, so we don't care if it
@@ -67,9 +53,9 @@
 
           - default to 'Users" conquest group for cygwin.
 
-          - isagod() checks pretty much disabled for conqoper.  If you
-            can get a shell, you can run conqoper, as there is no
-            root user.
+          - isagod() checks pretty much disabled for conqoper under
+            cygwin.  If you can get a shell, you can run conqoper, as
+            there is no root user.
 
           - deals with .exe extensions properly
 
@@ -85,13 +71,6 @@
             (from conquest's perspective) comes out as black.  The
             normal Cygwin console seems to work fine.  
 
-        12/21/2003
-
-        - added patches from Clint Adams, adding portable snprintf()
-          and friends.
-
-        - fixed potential overrun (not a user exploitable one) in
-          clog() - now uses snprintf as well.
 
 
 Version 8.0 12/13/2003

@@ -15,6 +15,9 @@
   conquest, as well as information on terminfo requirements and system
   specific issues.
 
+  See README.cygwin for information on building/using conquest on MS
+  Windows systems. 
+
   See SERVER.TXT for information on how to setup and run a Conquest
   server.
 
@@ -23,7 +26,7 @@
   See conquest.doc for information on available commands, and how to
   play the game.
 
-  NEW USERS: Please read the section '## General playing tips' below
+  NEW USERS: Please read the section '## Hints for new players' below
              for some useful information you should know.  Reading the
              whole document is advised, but this section is probably
              the most important as far as providing some useful
@@ -37,14 +40,14 @@
 
    ### Conquest Synopsis
    ### A Little Background
-   ### General Information and tips
+   ### General Information 
        ## Starting Conquest
        ## Default network ports
        ## Server game flags
        ## Meta Server
        ## ~/.conquestrc
        ## Recording Games
-       ## General playing tips
+       ## Hints for new players
           # Shields
           # Energy Allocation
           # Bombing
@@ -75,24 +78,24 @@
        ## Using conqoper
           # The semaphore status line
           # Leaving a screen on conqoper
-       ## The installed files
-          # conquest
-          # conquestd
-          # conqmetad
-          # conquestsh
-          # conqdriv
-          # conqoper
-          # conqreplay
-          # conqai
-          # conquest_common.img
-          # conqnews.doc
-          # conquest.doc
-          # conquest.log
-          # conquestrc
-          # libconquest.so
-          # libconqclnt.so
-          # libconqserv.so
-          # ~/.conquestrc
+   ### The installed files
+       ## conquest
+       ## conquestd
+       ## conqmetad
+       ## conquestsh
+       ## conqdriv
+       ## conqoper
+       ## conqreplay
+       ## conqai
+       ## conquest_common.img
+       ## conqnews.doc
+       ## conquest.doc
+       ## conquest.log
+       ## conquestrc
+       ## libconquest.so
+       ## libconqclnt.so
+       ## libconqserv.so
+       ## ~/.conquestrc
    ### Getting more information
    ### Obtaining Conquest
    ### Copyright Information
@@ -164,7 +167,7 @@
     client/server game.  Conquest clients connect to a local or remote
     conquestd server to play.
 
-### General Information and tips
+### General Information
 
 ## Starting Conquest
 
@@ -436,7 +439,7 @@
    I'll happily make them available on the website. ;-)
 
 
-## General playing tips
+## Hints for new players
 
    Here are some general things to keep in mind while playing.
 
@@ -1059,77 +1062,82 @@
   know... some consistency is needed.
 
 
-## The installed files
+### The installed files
 
-   Here are the files installed by Conquest, and a brief synopsis of
-   what each does.  All paths are relative to the installation
-   directory (/opt by default).
+    Here are the files installed by Conquest, and a brief synopsis of
+    what each does.  All paths are relative to the installation
+    directory (/opt by default).
 
 
-# bin/conquest
+## bin/conquest
 
-  The Conquest client. type 'conquest -?' to see a list of options.
+   The Conquest client. type 'conquest -?' to see a list of options.
 
-# bin/conquestd
 
-  This is the conquest server. Type 'conquestd -?' to see a list of
-  options.  See SERVER.TXT for information on the server and how to
-  set one up.  If all you want to do is use the conquest client to
-  fight on remote servers, you do not need to run your own server.
+## bin/conquestd
 
-  In addition, if run with the '-m' flag, conquestd will notify the
-  metaserver at conquest.radscan.com of your game, so that others that
-  query the metaserver will see your server and might jump in.
+   This is the conquest server. Type 'conquestd -?' to see a list of
+   options.  See SERVER.TXT for information on the server and how to
+   set one up.  If all you want to do is use the conquest client to
+   fight on remote servers, you do not need to run your own server.
 
-  Oh, and if your conquestd server is not accessible from the
-  Internet, please don't register it with the metaserver.  ;-)
+   In addition, if run with the '-m' flag, conquestd will notify the
+   metaserver at conquest.radscan.com of your game, so that others
+   that query the metaserver will see your server and might jump in.
 
-# bin/conqmetad
+   Oh, and if your conquestd server is not accessible from the
+   Internet, please don't register it with the metaserver.  ;-)
 
-  The Conquest metaserver.  You should never need to run this unless
-  you have a group of conquest servers on your private network that you
-  do not want to advertise to the world.  The definitive metaserver for
-  public Internet conquest games is running at conquest.radscan.com.
 
-# conquestsh
+## bin/conqmetad
 
-  The is a Conquest 'shell' used if you are going to allow telnet
-  access to you server.  It basically exec()'s conquest like so:
+   The Conquest metaserver.  You should never need to run this unless
+   you have a group of conquest servers on your private network that
+   you do not want to advertise to the world.  The definitive
+   metaserver for public Internet conquest games is running at
+   conquest.radscan.com.
+
+
+## conquestsh
+
+   The is a Conquest 'shell' used if you are going to allow telnet
+   access to you server.  It basically exec()'s conquest like so:
 
     $ conquest -t -s localhost
 
-  The '-t' option tells conquest not to attempt to load/save the user
-  configuration (~/.conquestrc).  
+   The '-t' option tells conquest not to attempt to load/save the user
+   configuration (~/.conquestrc).
 
-  See SERVER.TXT for further information on how to setup a telnet
-  interface for a conquest server.
-
-
-# bin/conqdriv
-
-  The universe driver process.  A driver is kicked off whenever
-  someone enters Conquest and a driver isn't already running.  A
-  normal user cannot start the driver manually.  (You should never
-  have to.)  A CO can manually start the driver for debugging purposes
-  by supplying the '-f' option.
+   See SERVER.TXT for further information on how to setup a telnet
+   interface for a conquest server.
 
 
-# bin/conqoper
+## bin/conqdriv
 
-  This is the Conquest Operator program that allows suitably
-  privileged individuals to control, monitor, and modify the behavior
-  of the game.  The root user is always a CO and therefore can run the
-  conqoper program.  If you want to allow other people to be CO's, you
-  will need to add them to the conquest group in /etc/group.
+   The universe driver process.  A driver is kicked off whenever
+   someone enters Conquest and a driver isn't already running.  A
+   normal user cannot start the driver manually.  (You should never
+   have to.)  A CO can manually start the driver for debugging
+   purposes by supplying the '-f' option.
 
-  My conquest entry in /etc/group looks like this:
+
+## bin/conqoper
+
+   This is the Conquest Operator program that allows suitably
+   privileged individuals to control, monitor, and modify the behavior
+   of the game.  The root user is always a CO and therefore can run
+   the conqoper program.  If you want to allow other people to be
+   CO's, you will need to add them to the conquest group in
+   /etc/group.
+
+   My conquest entry in /etc/group looks like this:
 
      conquest::102:jon,davep,johnc
 
      jon, davep, and johnc all have CO status on my machine.  
 
-  Conqoper currently supports the following options, (type conqoper -?
-  to see the various options):
+   Conqoper currently supports the following options, (type conqoper
+   -?  to see the various options):
 
      usage: conqoper [-C] [-D] [-E] [-I <what>]
         -C               rebuild systemwide conquestrc file
@@ -1149,52 +1157,52 @@
       The init and enable/disable options are of primary interest to
       server operators.
 
-   Be careful who you give CO status to, a bad CO can cheat, or
-   otherwise disrupt a game.  In addition, due to the fact that a CO
-   is a member of the conquest group, a bad CO will be able to trash
-   the common block, as well as other undesirable things.
+    Be careful who you give CO status to, a bad CO can cheat, or
+    otherwise disrupt a game.  In addition, due to the fact that a CO
+    is a member of the conquest group, a bad CO will be able to trash
+    the common block, as well as other undesirable things.
 
-   A CO with permission to overwrite the system-wide conquestrc file
-   can call conqoper with the '-C' option to update the file with a
-   newer version.  User-level ~/.conquestrc files are always updated
-   automatically when conquest is run.  This is not done automatically
-   for the system wide conquestrc file due to potential security
-   problems.
+    A CO with permission to overwrite the system-wide conquestrc file
+    can call conqoper with the '-C' option to update the file with a
+    newer version.  User-level ~/.conquestrc files are always updated
+    automatically when conquest is run.  This is not done
+    automatically for the system wide conquestrc file due to potential
+    security problems.
 
 
-# bin/conqreplay
+## bin/conqreplay
 
-  A utility for playing back Conquest Recording (CQR) files made when
-  conquest is run with the '-r <filename>' flag.
+   A utility for playing back Conquest Recording (CQR) files made when
+   conquest is run with the '-r <filename>' flag.
 
-  This is a much nicer way to save and playback games than using
-  something like script, or Xterm logging.  You can play the
-  recordings back on any curses terminal, regardless of the curses
-  terminal in use when the game was recorded.
+   This is a much nicer way to save and playback games than using
+   something like script, or Xterm logging.  You can play the
+   recordings back on any curses terminal, regardless of the curses
+   terminal in use when the game was recorded.
 
-  conqreplay allows you to speed up or slowdown the playback, as well
-  as giving you the ability to jump forward and backward in a
-  recording.  Not as nice as a VCR but close enough.
+   conqreplay allows you to speed up or slowdown the playback, as well
+   as giving you the ability to jump forward and backward in a
+   recording.  Not as nice as a VCR but close enough.
 
-  conqreplay currently supports the following options:
+   conqreplay currently supports the following options:
 
      usage: conqreplay [ -d <dly> ] -f <cqr file>
         -f <cqr>         specify the file to replay
         -d <dly>         specify the frame delay
 
 
-  For example, to play back a files called dethfun.cqr:
+   For example, to play back a files called dethfun.cqr:
 
      conqreplay -f dethfun.cqr
 
-  To play it back at high speed:
+   To play it back at high speed:
 
      conqreplay -d 0.001 -f dethfun.cqr
 
-  There is a 'demonstration' CQR file up on the website if you want to
-  try one out.
+   There is a 'demonstration' CQR file up on the website if you want
+   to try one out.
 
-  See the section '## Recording Games' for more information.
+   See the section '## Recording Games' for more information.
    
    NOTES:
 
@@ -1207,73 +1215,75 @@
      '-r' option to start client recording, and the entire session will be
      recorded.
 
-# bin/conqai
 
-  This program allows a CO to take over robot control from the
-  Conquest driver for debugging purposes.  Don't run it if you don't
-  know what it does.  It will disable robot AI control by the driver.
-  After running conqai for some purpose, be sure to re-run it with the
-  '-r' option to return control of the robots to the Conquest driver
-  when you're done.
+## bin/conqai
 
-
-# var/conquest/conquest_common.img
-
-  The Conquest (ex-Fortran) Common Block.  This file contains the
-  'state' of the universe for the server.  It is mapped into the
-  address space (using mmap(2)) of the Conquest server executables.
-  Never manually edit this file.  Use conqoper to change the
-  universe. ;-) This file *must* have perms of 660 with a group of
-  conquest.  If read/write access is opened up to all, then anybody
-  with shell access to the server will be able to modify the common
-  block, and hence, the universe.  Gives me the willies just thinking
-  about it.
+   This program allows a CO to take over robot control from the
+   Conquest driver for debugging purposes.  Don't run it if you don't
+   know what it does.  It will disable robot AI control by the driver.
+   After running conqai for some purpose, be sure to re-run it with
+   the '-r' option to return control of the robots to the Conquest
+   driver when you're done.
 
 
-# share/conqnews.doc
+## var/conquest/conquest_common.img
 
-  Latest Conquest news.  View via (N)ews in the Conquest main menu.
-  Contains a chronological order of changes and modifications.
-  Definitely worth viewing if you want to see what's changed since the
-  previous releases.
-
-
-# share/conquest.doc
-
-  Conquest instructions and commands. View via (H)elp lesson in the
-  Conquest main menu.  You might also want to print this out.  The
-  last page contains a command summary - a handy reference for new
-  players.
+   The Conquest (ex-Fortran) Common Block.  This file contains the
+   'state' of the universe for the server.  It is mapped into the
+   address space (using mmap(2)) of the Conquest server executables.
+   Never manually edit this file.  Use conqoper to change the
+   universe. ;-) This file *must* have perms of 660 with a group of
+   conquest.  If read/write access is opened up to all, then anybody
+   with shell access to the server will be able to modify the common
+   block, and hence, the universe.  Gives me the willies just thinking
+   about it.
 
 
-# var/conquest/conquest.log
+## share/conqnews.doc
 
-  Conquest's log file.  All errors/warnings, and debug messages are
-  written here.  For the source distribution, see the bottom of defs.h
-  for a list of debuggables.
+   Latest Conquest news.  View via (N)ews in the Conquest main menu.
+   Contains a chronological order of changes and modifications.
+   Definitely worth viewing if you want to see what's changed since
+   the previous releases.
 
 
-# etc/conquestrc
+## share/conquest.doc
 
-  System wide options.  Read it, it should be self explanatory.  Can
-  be edited directly or using the (O)ptions Menu from within conqoper.
+   Conquest instructions and commands. View via (H)elp lesson in the
+   Conquest main menu.  You might also want to print this out.  The
+   last page contains a command summary - a handy reference for new
+   players.
 
-# lib/libconquest.so
 
-  Shared library used by Conquest executables.
+## var/conquest/conquest.log
 
-# lib/libconqclnt.so
+   Conquest's log file.  All errors/warnings, and debug messages are
+   written here.  For the source distribution, see the bottom of
+   defs.h for a list of debuggables.
 
-  Shared library used by Conquest client(s).
 
-# lib/libconqserv.so
+## etc/conquestrc
 
-  Shared library used by Conquest server.
+   System wide options.  Read it, it should be self explanatory.  Can
+   be edited directly or using the (O)ptions Menu from within
+   conqoper.
 
-# ~/.conquestrc
+## lib/libconquest.so
 
-  User options and macro definitions.  Can be edited directly or using
-  the (O)ptions Menu from within conquest.
+   Shared library used by Conquest executables.
+
+## lib/libconqclnt.so
+
+   Shared library used by Conquest client(s).
+
+## lib/libconqserv.so
+
+   Shared library used by Conquest server.
+
+## ~/.conquestrc
+
+   User options and macro definitions.  Can be edited directly or
+   using the (O)ptions Menu from within conquest.
 
 
 ### Getting more information
