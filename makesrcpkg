@@ -30,6 +30,7 @@ FILELIST="ratfor.c cd2lb.c display.c iolb.c conqlb.c
 	conquest.doc conqnews.doc configure.in configure
 	config.h.in config.guess config.sub Makefile.in README 
 	acconfig.h conqstrat.h conqstrat.c.l conqstrat.c.y conqrule
+        record.h record.c conqreplay.c
 	COPYRIGHT LICENSE INSTALL TODO SERVER.DOC"
 
 

@@ -30,15 +30,48 @@
 #include "conqcom2.h"
 #include "global.h"
 #include "color.h"
+#include "record.h"
 
 static char *conquestId = "$Id$";
 static char cbuf[MID_BUFFER_SIZE]; /* general purpose buffer */
 
+void printUsage()
+{
+  printf("\nUsage: conquest [-r rec file]\n");
+  printf("       -r recfile             Record game to <recfile>\n\n");
+  return;
+}
+
 /*  conquest - main program */
 main(int argc, char *argv[]) 
 {
-  
+  int i;
+
   CqContext.entship = FALSE;
+  CqContext.recmode = RECMODE_OFF;
+
+  /* check options */
+  while ((i = getopt(argc, argv, "r:")) != EOF)    /* get command args */
+    switch (i)
+      {
+      case 'r': 
+	if (recordOpenOutput(optarg))
+	  {			/* we are almost ready... */
+	    CqContext.recmode = RECMODE_STARTING;
+	    printf("Recording game to %s...\n", optarg);
+	  }
+	else
+	  {
+	    CqContext.recmode = RECMODE_OFF;
+            printf("Cannot record game to %s... terminating\n", optarg);
+	    exit(1);
+	  }
+        break;
+
+      default:
+	printUsage();
+	exit(1);
+      }
 
   if ((ConquestUID = GetConquestUID()) == ERR)
     {
@@ -116,6 +149,7 @@ main(int argc, char *argv[])
 #ifdef DEBUG_FLOW
   clog("%s@%d: main() starting cdinit().", __FILE__, __LINE__);
 #endif
+
   
   
   cdinit();			/* set up display environment */
@@ -134,7 +168,18 @@ main(int argc, char *argv[])
 #endif
   
   if ( welcome( &CqContext.unum ) )
-    menu();
+    {
+      if (CqContext.recmode == RECMODE_STARTING)
+	{
+	  if (recordInit(CqContext.unum, getnow(NULL, 0)))
+	    CqContext.recmode = RECMODE_ON;
+	  else
+	    CqContext.recmode = RECMODE_OFF;
+	  /* will probably need to prime the pump here too */
+	}
+
+      menu();
+    }
   
   drpexit();			/* make the driver go away */
   cdend();			/* clean up display environment */

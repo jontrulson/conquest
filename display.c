@@ -1264,6 +1264,9 @@ void display( int snum, int display_info )
 
   cdrefresh();
   CqContext.redraw = FALSE;
+
+				/* update to recording state */
+  recordUpdateState();
   
   return;
   

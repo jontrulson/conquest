@@ -30,6 +30,7 @@
 #include "conqcom2.h"
 #include "global.h"
 #include "color.h"
+#include "record.h"
 
 static char *conqoperId = "$Id$";
 static char cbuf[MID_BUFFER_SIZE]; /* general purpose buffer */
@@ -250,6 +251,7 @@ main(int argc, char *argv[])
   CqContext.maxlin = cdlins();	/* number of lines */
   
   CqContext.maxcol = cdcols();	/* number of columns */
+  CqContext.recmode = RECMODE_OFF;
 
   sprintf(msgbuf, "OPER: User %s has entered conqoper.",
           operName);

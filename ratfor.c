@@ -173,11 +173,14 @@ int lib_ffs(int start, int len, int bits, int *rule)
 /* sleep with a millisecond granularity using poll() */
 void c_sleep(real sleeptime)
 {
-
 #ifdef USE_SELECT
 
   unsigned int secs, usecs;
   struct timeval stime;
+
+
+  if (sleeptime == 0.0)
+    return;
 
 				/* some systems don't grok usecs >1,000,000 */
   if (sleeptime >= 1.0)
@@ -213,6 +216,9 @@ void c_sleep(real sleeptime)
 # endif
 
 #else
+
+  if (sleeptime == 0.0)
+    return;
 
   /* Here I use poll to provide a msec */
   /* granularity sleep.  Actually it's */

@@ -274,6 +274,7 @@ void astservice(int sig)
 		CqContext.msgrand = now;
 		RMsggrand = now;
 		readone = TRUE;
+		recordAddMsg(&Msgs[Ships[CqContext.snum].lastmsg]);
 	      }
 	  }
     }
@@ -356,6 +357,8 @@ void conqend(void)
       stormsg(MSG_COMP, MSG_ALL, msgbuf);
     }
   
+  recordCloseOutput();
+
   return;
   
 }

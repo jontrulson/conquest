@@ -39,6 +39,7 @@ CONQAI = conqai
 CONQOPER = conqoper
 CONQDRIV = conqdriv
 CONQSTRAT = conqstrat
+CONQREPLAY = conqreplay
 
 # The documentation
 CONQHELP = conquest.doc
@@ -48,12 +49,12 @@ CURDIR=.
 CONQC = ratfor.c cd2lb.c display.c iolb.c  \
 	conqlb.c rndlb.c conqmisc.c conqutil.c conqcm.c \
 	conqsvr42.c global.c ibuf.c version.c conf.c sem.c color.c \
-	userauth.c options.c
+	userauth.c options.c record.c
 
 CONQOBJS = ratfor.o cd2lb.o display.o iolb.o  \
 	conqlb.o rndlb.o conqmisc.o conqutil.o conqcm.o \
 	conqsvr42.o global.o ibuf.o version.o conf.o sem.o color.o \
-	userauth.o options.o
+	userauth.o options.o record.o
 
 # For installation (needed so a build can be run in the build directory
 #                   without contaminating an already installed game)
@@ -62,6 +63,7 @@ BCONQOPER = $(bindir)/conqoper
 BCONQDRIV = $(libexecdir)/conqdriv
 BCONQAI = $(bindir)/conqai
 BCONQSTRAT = $(bindir)/conqstrat
+BCONQREPLAY = $(bindir)/conqreplay
 HCONQHELP = $(datadir)/$(CONQHELP)
 HCONQNEWS = $(datadir)/$(CONQNEWS)
 HCONQREADME = $(datadir)/conquest.README
@@ -78,17 +80,19 @@ LBFLAGS = @LBFLAGS@
 
 # End of config options - No user servicable parts inside.
 default:
-	@echo "type gmake <target>, where <target> is:"
+	@echo "Available targets:"
 	@echo ""
-	@echo "all        - make all the binaries"
+	@echo "all        - make all the binaries (DEFAULT)"
 	@echo "install    - to install the binaries (must be root)"
 	@echo "clean      - to remove all .o's, libs, and binaries"
 	@echo "realclean  - like clean, but removes configure genned files too"
 	@echo "depend     - to make a dependancy list for your makefile."
 	@echo "             Use 'gmake clean' before building if you are"
 	@echo "             lacking a 'makedepend' command."
+	$(MAKE) all
 
-all: $(CONQLB) $(CONQUEST) $(CONQOPER) $(CONQAI) $(CONQDRIV) $(CONQSTRAT)
+all: $(CONQLB) $(CONQUEST) $(CONQOPER) $(CONQAI) $(CONQDRIV) $(CONQSTRAT) \
+	$(CONQREPLAY)
 
 # program building  
 ##################
@@ -133,6 +137,13 @@ conqoper: conqoper.o
 conqoper.o: conqoper.c c_defs.h defs.h conqdef.h conqcom.h conqcom2.h
 	$(CC) $(CFLAGS) -c conqoper.c 
 
+conqreplay.o: conqreplay.c c_defs.h defs.h conqdef.h conqcom.h conqcom2.h record.h
+	$(CC) $(CFLAGS) -c conqreplay.c
+
+conqreplay: conqreplay.o 
+	@-rm -f conqreplay
+	$(CC) -o conqreplay $(CFLAGS) conqreplay.o $(CURDIR)/$(CONQLB) $(EXTLBS)
+
 # we won't die if the following fails, since a default conqdata.h is supplied
 conqstrat:  y.tab.o lex.yy.o
 	-$(CC) -o conqstrat $(CFLAGS) lex.yy.o y.tab.o $(LIBS) $(CURDIR)/$(CONQLB) $(EXTLBS)
@@ -168,7 +179,7 @@ $(DIRTARGETS):
 
 install: all dirs $(libdir)/$(CONQLB) $(BCONQUEST) $(BCONQOPER) $(BCONQDRIV) \
 	$(HCONQHELP) $(HCONQNEWS) $(datadir)/conqrule $(BCONQSTRAT) \
-	$(BCONQAI) $(sysconfdir)/conquestrc $(HCONQREADME)
+	$(BCONQAI) $(BCONQREPLAY) $(sysconfdir)/conquestrc $(HCONQREADME)
 
 
 $(libdir)/$(CONQLB): $(CONQLB)
@@ -204,6 +215,12 @@ $(BCONQDRIV): conqdriv
 	chgrp $(CONQGROUP) $(BCONQDRIV)
 	chmod 2771 $(BCONQDRIV)
 	@FILEPRIV@ -f plock,tshar,core $(BCONQDRIV)
+
+$(BCONQREPLAY): conqreplay
+	@-rm -f $(BCONQREPLAY)
+	$(CC) -o conqreplay $(CFLAGS) conqreplay.o $(libdir)/$(CONQLB) $(EXTLBS)
+	cp conqreplay $(BCONQREPLAY)
+	chmod 755 $(BCONQREPLAY)
 
 $(BCONQAI): conqai
 	@-rm -f $(BCONQAI)

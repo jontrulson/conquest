@@ -51,6 +51,7 @@ typedef struct {
   int redraw;			/* should redraw in display() */
   int msgok;			/* allow new messages */
   int entship;			/* entered a ship? */
+  int recmode;			/* recording mode: one of RECMODE_* */
   char lastinfostr[MSGMAXLINE]; /* last string used in doinfo() */
   char intrchar;		/* users interrupt char */
 } CqContext_t;

@@ -144,4 +144,5 @@
 /*#define DEBUG_IOGTIMED        /* debug timed input */
 /*#define DEBUG_SERVER          /* debug server operation */
 /*#define DEBUG_OPTIONS         /* debug option screens/handling */
+/*#define DEBUG_REC               /* debug recording */
 
