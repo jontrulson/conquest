@@ -2554,6 +2554,7 @@ static int nCPIdle(void)
       sendCommand(CPCMD_BOMB, 0); /* to be sure */
       state = S_NONE;
       prompting = FALSE;
+      clrPrompt(MSG_LIN2);
       return NODE_OK;           /* next iter will process the char */
     }
 
@@ -2562,6 +2563,7 @@ static int nCPIdle(void)
       sendCommand(CPCMD_BEAM, 0); /* to be sure */
       state = S_NONE;
       prompting = FALSE;
+      clrPrompt(MSG_LIN2);
       return NODE_OK;           /* next iter will process the char */
     }
 
