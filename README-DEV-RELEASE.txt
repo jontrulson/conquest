@@ -1,3 +1,13 @@
+11/22/2003
+7.2e
+
+        - fixed bug introduced in 7.2d, where when you were killed,
+          you would be booted out of the game.
+
+        - conquestd will now reload sysConf before updating the
+          metaserver so that any changes (flags, motd, etc) will be
+          kept up to date.
+
 11/20/2003
 7.2d
 
@@ -10,7 +20,9 @@
 
           conquest -s conquest.radscan.com:1702
 
-        - added meta server (conqmetad) and functionality to conquestd.
+        - added meta server (conqmetad) and functionality to
+          conquestd, based on a suggestion and some ideas from Josef
+          Jahn. 
 
           - meta server listens on TCP and UDP port 1700.  The UDP
             port is incoming only, and is used to recieve updates from
@@ -22,9 +34,10 @@
 
           - new options added to conquestd:
 
-            '-m' update the meta server (default: conquest.radscan.com)
+            '-m' update the meta server 
 
-            '-M <metaserver>' use metaserver <metaserver>
+            '-M <metaserver>' use metaserver <metaserver>. (default:
+            conquest.radscan.com) 
 
             '-N <myname>' tell the metaserver to use <myname> as the
             server address.  Otherwise conqmetad will use the src

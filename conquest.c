@@ -991,6 +991,11 @@ void dead( int snum, int leave )
       sendMessage(MSG_GOD, buf);
     }      
 
+  /* set the ship reserved (locally).  The server has already done this
+     but we have not processed any packets since we died.  This keeps
+     menu() from booting us out of the game. */
+  Ships[Context.snum].status = SS_RESERVED;
+
   ioeat();
   putpmt( MTXT_DONE, MSG_LIN2 );
   cdrefresh();
@@ -2931,7 +2936,7 @@ void menu(void)
         break;
     }
   while ( stillalive( Context.snum ) &&  !Context.leave );
-  
+
   return;
   
 }
@@ -3331,9 +3336,6 @@ int welcome( int *unum )
       *unum = (int)ntohs(scstat->unum);
       Context.snum = scstat->snum;
       Ships[Context.snum].team = scstat->team;
-
-      clog("conquest:welcome: SP_CLIENTSTAT: unum = %d(%d), team = %d (%d), snum = %d",
-	   *unum, scstat->unum, Ships[Context.snum].team, scstat->team, Context.snum);
 
       break;
     case SP_ACK:

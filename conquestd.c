@@ -173,7 +173,12 @@ void checkMaster(void)
   while (TRUE) 
     {
       if (updateMeta)
-        metaUpdateServer(metaServer, myServerName, listenPort);
+        {
+          /* get any changes to sysconf so that meta updates are
+             up to date */
+          GetSysConf(TRUE);
+          metaUpdateServer(metaServer, myServerName, listenPort);
+        }
 
       tv.tv_sec = 120;           /* update meta server every 120 secs */
       tv.tv_usec = 0;
@@ -750,9 +755,12 @@ void dead( int snum, int leave )
 		      Context.unum, 0))
     {				/* an error, let the ai code choose some
 				   last words and bail */
-      robreply(buf);
-      strncpy(ConqInfo->lastwords, buf, MAXLASTWORDS - 1);
-      ConqInfo->lastwords[MAXLASTWORDS - 1] = 0;
+      if (kb == KB_CONQUER)
+        {
+          robreply(buf);
+          strncpy(ConqInfo->lastwords, buf, MAXLASTWORDS - 1);
+          ConqInfo->lastwords[MAXLASTWORDS - 1] = 0;
+        }
 
       return;
     }

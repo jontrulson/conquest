@@ -231,7 +231,7 @@ void metaListen(void)
       exit(1);
     }
   
-  /* allocate an open socket for incoming UDP connections */
+  /* allocate an open socket for incoming TCP connections */
   if (( t = socket(AF_INET, SOCK_STREAM, 0)) < 0) 
     {
       perror ( "TCP socket" );
@@ -263,7 +263,7 @@ void metaListen(void)
   /* go into infinite loop waiting for new connections */
   while (TRUE) 
     {
-      tv.tv_sec = 30;           /* age servers avery 30 secs */
+      tv.tv_sec = 30;           /* age servers every 30 secs */
       tv.tv_usec = 0;
       FD_ZERO(&readfds);
       FD_SET(s, &readfds);
@@ -473,8 +473,6 @@ int main(int argc, char *argv[])
   /* setup, listen for, and process  client connections. */
 
   metaListen();
-
-  /*  clog("CONNECT: client %s\n", sInfo.remotehost);*/
 
   exit(0);
   
