@@ -9,6 +9,90 @@
 
                               Conquest News
 
+1/7/2004
+8.0a (devel)
+
+        - fixed rather serious problem with dead() handling.  When you
+          were killed by an external (ship, sun, etc), you could get
+          stuck in dead() once your ship exploded.
+
+          For this reason, the public server at conquest.radscan.com
+          has been updated to this version.
+
+        - fixed a VACANT check in conquestd:newship().  It might
+          resolve an issue some users have seen where if their
+          connection is terminated unexpectedly, they cannot reconnect
+          to their ship for awhile ("already playing on another ship")
+          because conquestd thinks it's still alive and active.
+
+          If you still see this problem, let me know as well as a way
+          to reproduce it.
+
+        - fixed a stupid bug that prevented compilation on non-linux
+          systems.  
+
+        - added some casts for sa_addr in the network connection
+          routines to eliminate some gcc warnings.
+
+        - force 1-byte alignment of the packet structs.
+
+        - a variety of other minor fixes and adjustments.
+
+        - Cygwin support under MS Windows (tested with XP):
+
+          - you will need the following cygwin packages to be
+            installed in addition to the development kit (gcc,
+            headers, etc):
+
+            ncurses
+            cygipc
+            bison
+            flex
+
+            I think that is all, let me know if there are others I
+            forgot...
+
+          - You will need to be sure ipc_daemon2 (part of the cygipc
+            package) is running before building/running conquest, or
+            you will get semget() errors.
+
+            Start it like so:
+
+            ipc_daemon2 &
+
+          - added better mmap() check for cygwin systems.  We don't
+            care about MAP_FIXED in Conquest anyways, so who cares if
+            it doesn't work.
+
+          - default to 'Users" conquest group for cygwin.
+
+          - isagod() checks pretty much disabled for conqoper.  If you
+            can get a shell, you can run conqoper, as there is no
+            root user.
+
+          - deals with .exe extensions properly
+
+          - packet.c - clientPackets[]/serverPackets[] struct arrays
+            are statically defined and no longer exported.  cygwin's
+            linker seems to have 'issues' with external references to
+            struct arrays.
+
+          - sem.c - some changes to deal with unimplemeted cygwin
+            semctl() operations.
+
+          - rxvt's choice of colors seems to be off... non-bold white
+            (from conquest's perspective) comes out as black.  The
+            normal Cygwin console seems to work fine.  
+
+        12/21/2003
+
+        - added patches from Clint Adams, adding portable snprintf()
+          and friends.
+
+        - fixed potential overrun (not a user exploitable one) in
+          clog() - now uses snprintf as well.
+
+
 Version 8.0 12/13/2003
 
     - the official v8.0 release
