@@ -9,6 +9,60 @@
 
                               Conquest News
 
+Version 7.1.2 Sun Jul  4 16:19:40 MST 2001 Jon Trulson  <jon@radscan.com>
+
+	- a long overdue update
+
+	- automatically exclude VACANT ships when deciding whether to
+          create a robot when a home planet is attacked.  This problem
+          allowed some remote players to take over home planets
+          without the excitement and stimulation of having to deal
+          with the robots in the process.  Shame on you ;-)
+
+	- way past due for a public update. Sorry.
+
+	- added the ability to record and playback games ;-)
+
+	  For example:
+
+	   conquest -r somefile.cqr
+
+	  Then to play it back:
+
+	   conqreplay -f somefile.cqr
+
+	  This isn't available to remote players, as I don't know of a
+	  secure, reliable way to get the recoded file back to the
+	  remote user. 
+
+	12/27/2001
+
+	- added patches by Clint Adams to handle configure's various
+	  install location options (libexecdir, sysconfigdir, etc).  
+	  The programs and data files will be installed according to
+	  the values of these items. 
+
+          If you already are using an older version of Conquest, you
+          will need to move a couple of files to their new homes
+          before running conqoper or conquest if you want to preserve
+          your current state and configuration.
+
+	  Old files: 
+
+	  <prefix>/conquest/etc/conquest.common.img
+	  <prefix>/conquest/etc/conquest.log
+	  <prefix>/conquest/etc/conquestrc
+
+          New files: 
+
+	  <prefix>/var/conquest/conquest.common.img
+	  <prefix>/var/conquest/conquest.log
+	  <prefix>/etc/conquestrc
+
+	  Other files have moved as well, but these are the important
+	  ones for preserving state.
+
+
 Version 7.1.1 Wed Dec 26 15:04:50 MST 2001 Jon Trulson  <jon@radscan.com>
 
 	- corrected problem where genos weren't always counted.

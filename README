@@ -31,6 +31,7 @@ CONTENTS:
 	### A LITTLE BACKGROUND
 	### GENERAL INFORMATION AND TIPS ABOUT CONQUEST
 	    ## ~/.conquestrc
+	    ## Recording Games
 	    ## CURSES/TERMINFO
 	    ## PLANETS
 	    ## SUNS
@@ -143,6 +144,34 @@ wide options you may or may not want.  As of version 7.0, all options
 (user and system-wide) can be viewed and edited using the new
 (O)ptions Menu.  This menu is available at the conquest/conqoper main
 menus, as well as being accessable from within the game.
+
+## Recording Games
+
+   New with version 7.1.2, you can record games and play them back
+   later.  
+
+   To record a game:
+
+    conquest -r somefile.cqr
+
+   To replay the game:
+
+    conqreplay -f somefile.cqr
+
+
+   If libz is available on your system when building conquest, game
+   data will be recorded using gzip compression.  It's a good idea to
+   use this.  A typical 3 hour game with 3 players plus robots can
+   suck up about 100MB of diskspace.  Fortunately, the game file
+   compresses well ;-) conqreplay can read either uncompressed or gzip
+   compressed files, and can be played back on any curses/terminfo
+   terminal.
+
+   conqreplay also supports a few options - try 'conqreplay -?' for a
+   current list.
+
+   If anyone creates some amusing recordings and sends them to me,
+   I'll happily make them available on the website. ;-)
 
 
 ## CURSES/TERMINFO

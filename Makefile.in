@@ -173,7 +173,7 @@ $(CONQLB): conqai_nomain.o $(CONQOBJS)
 dirs: $(DIRTARGETS)
 
 $(DIRTARGETS):
-	mkdir -m 755 -p $(DIRTARGETS)
+	-mkdir -m 755 -p $(DIRTARGETS)
 	chgrp $(CONQGROUP) $(rlocalstatedir)
 	chmod 775 $(rlocalstatedir)
 

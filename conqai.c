@@ -284,9 +284,10 @@ void defend( int attacker, int pnum )
   
   /* See if there are any team ships to defend. */
   for ( i = 1; i <= MAXSHIPS; i = i + 1 )
-    if ( Ships[i].status == SS_LIVE )
-      if ( Ships[i].team == team )
-	return;
+    if ( Ships[i].status == SS_LIVE ) /* live */
+      if ( Ships[i].team == team ) /* same team */
+	if (CheckPid(Ships[i].pid)) /* not vacant */
+	  return;
   
   /* Count how many robot users are on the right team and can play. */
   j = 0;
