@@ -32,6 +32,7 @@
 #include "conqlb.h"
 #include "context.h"
 #include "global.h"
+#include "sem.h"
 #include "color.h"
 #include "ui.h"
 #include "options.h"
@@ -169,9 +170,9 @@ int main(int argc, char *argv[])
 	  exit(1);
 	}
 
-      if (GetSem() == ERR)
+      if (semInit() == ERR)
 	{
-	  fprintf(stderr, "GetSem() failed to get semaphores. exiting.\n");
+	  fprintf(stderr, "semInit() failed to get semaphores. exiting.\n");
 	  exit(1);
 	}
 
@@ -253,9 +254,9 @@ int main(int argc, char *argv[])
       exit(1);
     }
   
-  if (GetSem() == ERR)
+  if (semInit() == ERR)
     {
-      fprintf(stderr, "GetSem() failed to get semaphores. exiting.\n");
+      fprintf(stderr, "semInit() failed to get semaphores. exiting.\n");
       exit(1);
     }
   
@@ -1213,7 +1214,7 @@ void operate(void)
 		  xbuf,LabelColor,", eater ",InfoColor,buf);
 	  
 	  /* Line 2. */
-	  strcpy(buf, GetSemVal(0));
+	  strcpy(buf, semGetStatusStr());
 
 	  lin++;
 	  cdclrl( lin, 1 );

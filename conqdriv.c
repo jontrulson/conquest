@@ -31,6 +31,7 @@
 #include "context.h"
 #include "conf.h"
 #include "global.h"
+#include "sem.h"
 
 #define SUBMIN_SECONDS 5 	/* seconds between planet movement */
 #define MINUTE_SECONDS 60 
@@ -79,9 +80,9 @@ int main(int argc, char *argv[])
       exit(1);
     }
   
-  if (GetSem() == ERR)
+  if (semInit() == ERR)
     {
-      fprintf(stderr, "GetSem() failed to get semaphores. exiting.\n");
+      fprintf(stderr, "semInit() failed to get semaphores. exiting.\n");
       exit(1);
     }
 

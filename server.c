@@ -186,14 +186,11 @@ int sendPlanet(int sock, Unsgn8 pnum, int force)
       return FALSE;
 
   /* SP_PLANETINFO */
-  /* we don't record these server-side, relying on loc packets instead */
-#if 0
   if (Context.recmode == RECMODE_ON)
     {
       if ((splaninfo = spktPlanetInfo(pnum, TRUE)))
         recordWriteEvent((Unsgn8 *)splaninfo);
     }
-#endif
 
   if ((splaninfo = spktPlanetInfo(pnum, FALSE)))
     if (writePacket(PKT_TOCLIENT, sock, (Unsgn8 *)splaninfo) <= 0)
@@ -332,7 +329,36 @@ int sendTorp(int sock, Unsgn8 tsnum, Unsgn8 tnum)
   return TRUE;
 }
 
-int sendMessage(int sock, Msg_t *msg)
+/* send a Feedback (MSG_FLAGS_FEEDBACK) message to the client.
+ * For MSG_FLAGS_FEEDBACK msgs, we do not need to deposit into                
+ * the CB ringbuffer and deal with the associated 'lock-hogging' for a        
+ * busy server.  We will send these immediately and return.                   
+ */
+void sendFeedback(char *msg)
+{
+  char buf[MESSAGE_SIZE + 64];
+  Msg_t themsg;
+
+  memset((void *)&themsg, 0, sizeof(Msg_t));
+  themsg.msgto = Context.snum;
+  themsg.msgfrom = MSG_COMP;
+  themsg.flags = MSG_FLAGS_FEEDBACK;
+  strncpy(themsg.msgbuf, msg, MESSAGE_SIZE - 1);
+
+  sendMessage(&themsg);
+
+  if (SysConf.LogMessages == TRUE)
+    {
+      clbFmtMsg(themsg.msgto, themsg.msgfrom, buf);
+      clog("MSG:FEEDBACK: %s: %s",
+           buf, themsg.msgbuf);
+    }
+
+  return;
+}
+
+/* send a msg to the client */
+int sendMessage(Msg_t *msg)
 {
   spMessage_t smsg;
 
@@ -359,11 +385,10 @@ int sendMessage(int sock, Msg_t *msg)
 
   /* don't record feeback or tersable msgs */
   if (Context.recmode == RECMODE_ON)
-    if (!(smsg.flags & MSG_FLAGS_FEEDBACK) && 
-        !(smsg.flags & MSG_FLAGS_TERSABLE))
+    if (!(smsg.flags & (MSG_FLAGS_FEEDBACK | MSG_FLAGS_TERSABLE)))
       recordWriteEvent((Unsgn8 *)&smsg);
 
-  if (!writePacket(PKT_TOCLIENT, sock, (Unsgn8 *)&smsg))
+  if (!writePacket(PKT_TOCLIENT, sInfo.sock, (Unsgn8 *)&smsg))
     {
       clog("sendMessage: writePacket failed\n");
       return FALSE;
@@ -529,17 +554,13 @@ void procSetWarp(cpCommand_t *swarp)
       /* See if engines are working. */
       if ( Ships[snum].efuse > 0 )
 	{
-	  clbStoreMsgf(MSG_COMP, snum, 
-                   "Engines are currently overloaded.", 
-                   MSG_FLAGS_FEEDBACK);
+	  sendFeedback("Engines are currently overloaded.");
 	  return;
 	}
             /* No charge if already warp 0. */
       if ( clbUseFuel( snum, ENGINES_ON_FUEL, FALSE, TRUE ) == FALSE)
 	{
-	  clbStoreMsgf(MSG_COMP, snum, 
-                   "We don't have enough fuel.", 
-                   MSG_FLAGS_FEEDBACK);
+	  sendFeedback("We don't have enough fuel.");
 	  return;
 	}
       
@@ -564,7 +585,7 @@ void procSetWarp(cpCommand_t *swarp)
     {
       sprintf(cbuf, 
               "(Due to damage, warp is currently limited to %.1f.)", mw);
-      clbStoreMsgf(MSG_COMP, snum, cbuf, MSG_FLAGS_FEEDBACK);
+      sendFeedback(cbuf);
     }
 
   return;
@@ -652,21 +673,19 @@ void procCloak(cpCommand_t *cmd)
     }
   if ( Ships[snum].efuse > 0 )
     {
-      clbStoreMsgf(MSG_COMP, snum, 
-               "Engines are currently overloaded.", 
-               MSG_FLAGS_FEEDBACK);
+      sendFeedback("Engines are currently overloaded.");
       return;
     }
   if ( Ships[snum].fuel < CLOAK_ON_FUEL )
     {
-      clbStoreMsgf(MSG_COMP, snum, nofuel, MSG_FLAGS_FEEDBACK);
+      sendFeedback(nofuel);
       return;
     }
 
   SFCLR(snum, SHIP_F_REPAIR);
   if ( ! clbUseFuel( snum, CLOAK_ON_FUEL, FALSE, TRUE ) )
     {
-      clbStoreMsgf(MSG_COMP, snum, nofuel, MSG_FLAGS_FEEDBACK);
+      sendFeedback(nofuel);
       return;
     }
 
@@ -835,30 +854,24 @@ void procFirePhaser(cpCommand_t *cmd)
 
   if ( SCLOAKED(snum) )
     {
-      clbStoreMsgf(MSG_COMP, snum, 
-               "The cloaking device is using all available power.",
-               MSG_FLAGS_FEEDBACK);
+      sendFeedback("The cloaking device is using all available power.");
       return;
     }
 
   if ( Ships[snum].wfuse > 0 )
     {
-      clbStoreMsgf(MSG_COMP, snum, 
-               "Weapons are currently overloaded.", 
-               MSG_FLAGS_FEEDBACK);
+      sendFeedback("Weapons are currently overloaded.");
       return;
     }
 
   if ( Ships[snum].fuel < PHASER_FUEL )
     {
-      clbStoreMsgf(MSG_COMP, snum, 
-               "Not enough fuel to fire phasers.", 
-               MSG_FLAGS_FEEDBACK);
+      sendFeedback("Not enough fuel to fire phasers.");
       return;
     }
   
   if ( !clbPhaser( snum, dir ) )
-    clbStoreMsgf(MSG_COMP, snum, ">PHASERS DRAINED<", MSG_FLAGS_FEEDBACK);
+    sendFeedback(">PHASERS DRAINED<");
 
   return;
 }
@@ -936,37 +949,31 @@ void procCoup(cpCommand_t *cmd)
   /* Check for allowability. */
   if ( oneplace( Ships[snum].kills ) < MIN_COUP_KILLS )
     {
-      clbStoreMsgf(MSG_COMP, snum,
-	      "Fleet orders require three kills before a coup can be attempted.",
-	       MSG_FLAGS_FEEDBACK);
+      sendFeedback("Fleet orders require three kills before a coup can be attempted.");
       return;
     }
   for ( i = 1; i <= NUMPLANETS; i = i + 1 )
     if ( Planets[i].team == Ships[snum].team && Planets[i].armies > 0 )
       {
-	 clbStoreMsgf(MSG_COMP, snum,
-		 "We don't need to coup, we still have armies left!",
-		  MSG_FLAGS_FEEDBACK);
+	 sendFeedback("We don't need to coup, we still have armies left!");
 	return;
       }
 
   if ( Ships[snum].warp >= 0.0 )
     {
-      clbStoreMsgf(MSG_COMP, snum, nhp, MSG_FLAGS_FEEDBACK );
+      sendFeedback(nhp);
       return;
     }
 
   pnum = -Ships[snum].lock;
   if ( pnum != Teams[Ships[snum].team].homeplanet )
     {
-      clbStoreMsgf(MSG_COMP, snum, nhp, MSG_FLAGS_FEEDBACK );
+      sendFeedback(nhp);
       return;
     }
   if ( Planets[pnum].armies > MAX_COUP_ENEMY_ARMIES )
     {
-      clbStoreMsgf(MSG_COMP, snum, 
-	      "The enemy is still too strong to attempt a coup.",
-	       MSG_FLAGS_FEEDBACK);
+      sendFeedback("The enemy is still too strong to attempt a coup.");
       return;
     }
   i = Planets[pnum].uninhabtime;
@@ -974,7 +981,7 @@ void procCoup(cpCommand_t *cmd)
     {
       sprintf( cbuf, "This planet is uninhabitable for %d more minutes.",
 	     i );
-      clbStoreMsgf(MSG_COMP, snum, cbuf, MSG_FLAGS_FEEDBACK);
+      sendFeedback(cbuf);
       return;
     }
   
@@ -985,12 +992,12 @@ void procCoup(cpCommand_t *cmd)
   if ( i > 0 )
     {
       sprintf( cbuf, "Our forces need %d more minutes to organize.", i );
-      clbStoreMsgf(MSG_COMP, snum, cbuf, MSG_FLAGS_FEEDBACK);
+      sendFeedback(cbuf);
       return;
     }
   
   /* Now wait it out... */
-  clbStoreMsgf( MSG_COMP, snum, "Attempting coup...", MSG_FLAGS_FEEDBACK );
+  sendFeedback("Attempting coup...");
   grand( &entertime );
   while ( dgrand( entertime, &now ) < COUP_GRAND )
     {
@@ -1006,9 +1013,7 @@ void procCoup(cpCommand_t *cmd)
   if ( Planets[pnum].team == Ships[snum].team )
     {
       PVUNLOCK(&ConqInfo->lockword);
-      clbStoreMsgf( MSG_COMP, snum, 
-	       "Sensors show hostile forces eliminated from the planet.",
-		MSG_FLAGS_FEEDBACK);
+      sendFeedback("Sensors show hostile forces eliminated from the planet.");
       return;
     }
   
@@ -1019,7 +1024,7 @@ void procCoup(cpCommand_t *cmd)
       /* Failed; setup new reorganization time. */
       Teams[Ships[snum].team].couptime = rndint( 5, 10 );
       PVUNLOCK(&ConqInfo->lockword);
-      clbStoreMsgf( MSG_COMP, snum, "Coup unsuccessful.", MSG_FLAGS_FEEDBACK );
+      sendFeedback("Coup unsuccessful.");
       return;
     }
   
@@ -1028,7 +1033,7 @@ void procCoup(cpCommand_t *cmd)
   Users[Ships[snum].unum].stats[USTAT_COUPS] += 1;
   Teams[Ships[snum].team].stats[TSTAT_COUPS] += 1;
   PVUNLOCK(&ConqInfo->lockword);
-  clbStoreMsgf( MSG_COMP, snum, "Coup successful!", MSG_FLAGS_FEEDBACK );
+  sendFeedback("Coup successful!");
 
   /* force a team update for this ship */
   sendTeam(sInfo.sock, Ships[snum].team, TRUE);
@@ -1061,31 +1066,25 @@ void procFireTorps(Unsgn8 *buf)
 
   if ( SCLOAKED(snum) )
     {
-      clbStoreMsgf(MSG_COMP, snum, 
-               "The cloaking device is using all available power.",
-	       MSG_FLAGS_FEEDBACK);
+      sendFeedback("The cloaking device is using all available power.");
       return;
     }
 
   if ( Ships[snum].wfuse > 0 )
     {
-      clbStoreMsgf(MSG_COMP, snum, 
-               "Weapons are currently overloaded.", 
-               MSG_FLAGS_FEEDBACK);
+      sendFeedback("Weapons are currently overloaded.");
       return;
     }
 
   if ( Ships[snum].fuel < TORPEDO_FUEL )
     {
-      clbStoreMsgf(MSG_COMP, snum, 
-               "Not enough fuel to launch a torpedo.", 
-               MSG_FLAGS_FEEDBACK);
+      sendFeedback("Not enough fuel to launch a torpedo.");
       return;
     }
 
   if ( ! clbLaunch( snum, dir, num, LAUNCH_NORMAL ) )
     {
-      clbStoreMsgf(MSG_COMP, snum, ">TUBES EMPTY<", MSG_FLAGS_FEEDBACK);
+      sendFeedback(">TUBES EMPTY<");
     }
   
   return;
@@ -1227,9 +1226,7 @@ void procRefit(cpCommand_t *cmd)
   /* Check for allowability. */
   if ( oneplace( Ships[snum].kills ) < MIN_REFIT_KILLS )
     {
-      clbStoreMsgf(MSG_COMP, snum, 
-               "You must have at least one kill to refit.",
-               MSG_FLAGS_FEEDBACK);
+      sendFeedback("You must have at least one kill to refit.");
       return;
     }
 
@@ -1237,17 +1234,13 @@ void procRefit(cpCommand_t *cmd)
 
   if (Planets[pnum].team != Ships[snum].team || Ships[snum].warp >= 0.0)
     {
-      clbStoreMsgf(MSG_COMP, snum, 
-               "We must be orbiting a team owned planet to refit.",
-               MSG_FLAGS_FEEDBACK);
+      sendFeedback("We must be orbiting a team owned planet to refit.");
       return;
     }
 
   if (Ships[snum].armies != 0)
     {
-      clbStoreMsgf(MSG_COMP, snum, 
-               "You cannot refit while carrying armies",
-               MSG_FLAGS_FEEDBACK);
+      sendFeedback("You cannot refit while carrying armies");
       return;
     }
   
@@ -1319,7 +1312,7 @@ void procTow(cpCommand_t *cmd)
       c_strcpy( "But we are being towed by ", cbuf );
       appship( Ships[snum].towedby, cbuf );
       appchr( '!', cbuf );
-      clbStoreMsgf( MSG_COMP, snum, cbuf, MSG_FLAGS_FEEDBACK );
+      sendFeedback(cbuf);
       return;
     }
   if ( Ships[snum].towing != 0 )
@@ -1327,7 +1320,7 @@ void procTow(cpCommand_t *cmd)
       c_strcpy( "But we're already towing ", cbuf );
       appship( Ships[snum].towing, cbuf );
       appchr( '.', cbuf );
-      clbStoreMsgf( MSG_COMP, snum, cbuf, MSG_FLAGS_FEEDBACK );
+      sendFeedback(cbuf);
       return;
     }
   cbuf[0] = 0;
@@ -1359,7 +1352,7 @@ void procTow(cpCommand_t *cmd)
     }
   PVUNLOCK(&ConqInfo->lockword);
 
-  clbStoreMsgf( MSG_COMP, snum, cbuf, MSG_FLAGS_FEEDBACK );
+  sendFeedback(cbuf);
   
   return;
 
@@ -1400,8 +1393,7 @@ void procUnTow(cpCommand_t *cmd)
 	    }
 	}
       if ( warsome && ( rnd() > BREAKAWAY_PROB ) )
-	clbStoreMsgf(MSG_COMP, snum, "Attempt to break free failed.",
-                 MSG_FLAGS_FEEDBACK);
+	sendFeedback("Attempt to break free failed.");
       else
 	{
 	  c_strcpy( "Breaking free from ship ", cbuf );
@@ -1429,7 +1421,7 @@ void procUnTow(cpCommand_t *cmd)
 	    }
 	  PVUNLOCK(&ConqInfo->lockword);
 	  appchr( '.', cbuf );
-	  clbStoreMsgf(MSG_COMP, snum, cbuf, MSG_FLAGS_FEEDBACK);
+	  sendFeedback(cbuf);
 	}
     }
   else if ( Ships[snum].towing != 0 )
@@ -1460,11 +1452,10 @@ void procUnTow(cpCommand_t *cmd)
 	}
       PVUNLOCK(&ConqInfo->lockword);
       appchr( '.', cbuf );
-      clbStoreMsgf(MSG_COMP, snum, cbuf, MSG_FLAGS_FEEDBACK);
+      sendFeedback(cbuf);
     }
   else
-    clbStoreMsgf(MSG_COMP, snum, "No tractor beam activity detected.",
-            MSG_FLAGS_FEEDBACK);
+    sendFeedback("No tractor beam activity detected.");
   
   return;
   
@@ -1502,8 +1493,7 @@ void procBomb(cpCommand_t *cmd)
   /* Check for allowability. */
   if ( Ships[snum].warp >= 0.0 )
     {
-      clbStoreMsgf(MSG_COMP, snum, "We must be orbiting a planet to bombard it.",
-	       MSG_FLAGS_FEEDBACK );
+      sendFeedback("We must be orbiting a planet to bombard it.");
       sendAck(sInfo.sock, PKT_TOCLIENT, PSEV_INFO, PERR_CANCELED, NULL);
       return;
     }
@@ -1511,23 +1501,20 @@ void procBomb(cpCommand_t *cmd)
   if ( Planets[pnum].type == PLANET_SUN || Planets[pnum].type == PLANET_MOON ||
       Planets[pnum].team == TEAM_NOTEAM || Planets[pnum].armies == 0 )
     {
-      clbStoreMsgf(MSG_COMP, snum, "There is no one there to bombard.",
-	       MSG_FLAGS_FEEDBACK);
+      sendFeedback("There is no one there to bombard.");
       sendAck(sInfo.sock, PKT_TOCLIENT, PSEV_INFO, PERR_CANCELED, NULL);
       return;
     }
   if ( Planets[pnum].team == Ships[snum].team )
     {
-      clbStoreMsgf(MSG_COMP, snum, "We can't bomb our own armies!",
-	      MSG_FLAGS_FEEDBACK);
+      sendFeedback("We can't bomb our own armies!");
       sendAck(sInfo.sock, PKT_TOCLIENT, PSEV_INFO, PERR_CANCELED, NULL);
       return;
     }
   if ( Planets[pnum].team != TEAM_SELFRULED && Planets[pnum].team != TEAM_GOD )
     if ( ! Ships[snum].war[Planets[pnum].team] )
       {
-	clbStoreMsgf(MSG_COMP, snum, "But we are not at war with this planet!",
-		 MSG_FLAGS_FEEDBACK);
+	sendFeedback("But we are not at war with this planet!");
 	sendAck(sInfo.sock, PKT_TOCLIENT, PSEV_INFO, PERR_CANCELED, NULL);
 	return;
       }
@@ -1544,7 +1531,7 @@ void procBomb(cpCommand_t *cmd)
   if ( Planets[pnum].team == TEAM_GOD )
     {
       sprintf( cbuf, "That was a bad idea, %s...", Ships[snum].alias );
-      clbStoreMsgf(MSG_COMP, snum, cbuf, MSG_FLAGS_FEEDBACK);
+      sendFeedback(cbuf);
       clbDamage( snum,  rnduni( 50.0, 100.0 ), KB_LIGHTNING );
       sendAck(sInfo.sock, PKT_TOCLIENT, PSEV_INFO, PERR_CANCELED, NULL);
       return;
@@ -1571,8 +1558,7 @@ void procBomb(cpCommand_t *cmd)
 	{
 	  if ( Ships[snum].wfuse > 0 )
 	    {
-	      clbStoreMsgf(MSG_COMP, snum, "Weapons are currently overloaded.",
-		       MSG_FLAGS_FEEDBACK);
+	      sendFeedback("Weapons are currently overloaded.");
 	      sendAck(sInfo.sock, PKT_TOCLIENT, PSEV_INFO, PERR_CANCELED, 
 		      NULL);
 	      goto cbrk22; /* break 2;*/
@@ -1580,8 +1566,7 @@ void procBomb(cpCommand_t *cmd)
 	  x = BOMBARD_FUEL * (real)(BOMBARD_GRAND / 1000.0);
 	  if ( ! clbUseFuel( snum, x, TRUE, TRUE ) )
 	    {
-	      clbStoreMsgf(MSG_COMP, snum, "Not enough fuel to bombard.",
-		       MSG_FLAGS_FEEDBACK);
+	      sendFeedback("Not enough fuel to bombard.");
 	      sendAck(sInfo.sock, PKT_TOCLIENT, PSEV_INFO, PERR_CANCELED, 
 		      NULL);
 	      goto cbrk22; /* break 2;*/
@@ -1599,7 +1584,7 @@ void procBomb(cpCommand_t *cmd)
 		{
 		  /* No more armies left to bomb. */
 		  PVUNLOCK(&ConqInfo->lockword);
-		  clbStoreMsgf(MSG_COMP, snum, lastfew, MSG_FLAGS_FEEDBACK);
+		  sendFeedback(lastfew);
 		  sendAck(sInfo.sock, PKT_TOCLIENT, PSEV_INFO, PERR_CANCELED, 
 			  NULL);
 		  goto cbrk22; /* break 2;*/
@@ -1617,7 +1602,7 @@ void procBomb(cpCommand_t *cmd)
       if ( Planets[pnum].armies <= MIN_BOMB_ARMIES )
 	{
 	  /* No more armies left to bomb. */
-	  clbStoreMsgf(MSG_COMP, snum, lastfew, MSG_FLAGS_FEEDBACK);
+	  sendFeedback(lastfew);
 	  sendAck(sInfo.sock, PKT_TOCLIENT, PSEV_INFO, PERR_CANCELED, NULL);
 	  break;
 	}
@@ -1632,7 +1617,7 @@ void procBomb(cpCommand_t *cmd)
 	    c_strcpy( "ies", buf );
 	  sprintf( cbuf, "Bombing %s, %d arm%s killed, %d left.",
 		 Planets[pnum].name, total, buf, oparmies );
-	  clbStoreMsgf(MSG_COMP, snum, cbuf, MSG_FLAGS_FEEDBACK);
+	  sendFeedback(cbuf);
 	  
 	  ototal = total;
 	}
@@ -1691,9 +1676,7 @@ void procBeam(cpCommand_t *cmd)
   /* Check for allowability. */
   if ( Ships[snum].warp >= 0.0 )
     {
-      clbStoreMsgf(MSG_COMP, snum, 
-	       "We must be orbiting a planet to use the transporter.",
-	       MSG_FLAGS_FEEDBACK);
+      sendFeedback("We must be orbiting a planet to use the transporter.");
       sendAck(sInfo.sock, PKT_TOCLIENT, PSEV_INFO, PERR_CANCELED, NULL);
       return;
     }
@@ -1702,25 +1685,19 @@ void procBeam(cpCommand_t *cmd)
     {
       if ( Planets[pnum].type == PLANET_SUN )
 	{
-	  clbStoreMsgf(MSG_COMP, snum,
-		   "Idiot!  Our armies will fry down there!", 
-		   MSG_FLAGS_FEEDBACK );
+	  sendFeedback("Idiot!  Our armies will fry down there!");
 	  sendAck(sInfo.sock, PKT_TOCLIENT, PSEV_INFO, PERR_CANCELED, NULL);
 	  return;
 	}
       else if ( Planets[pnum].type == PLANET_MOON )
 	{
-	  clbStoreMsgf(MSG_COMP, snum, 
-		   "Fool!  Our armies will suffocate down there!",
-		   MSG_FLAGS_FEEDBACK );
+	  sendFeedback("Fool!  Our armies will suffocate down there!");
 	  sendAck(sInfo.sock, PKT_TOCLIENT, PSEV_INFO, PERR_CANCELED, NULL);
 	  return;
 	}
       else if ( Planets[pnum].team == TEAM_GOD )
 	{
-	  clbStoreMsgf(MSG_COMP, snum,
-		   "GOD->you: YOUR ARMIES AREN'T GOOD ENOUGH FOR THIS PLANET.",
-		   MSG_FLAGS_FEEDBACK );
+	  sendFeedback("GOD->you: YOUR ARMIES AREN'T GOOD ENOUGH FOR THIS PLANET.");
 	  sendAck(sInfo.sock, PKT_TOCLIENT, PSEV_INFO, PERR_CANCELED, NULL);
 	  return;
 	}
@@ -1734,7 +1711,7 @@ void procBeam(cpCommand_t *cmd)
       if ( i != 1 )
 	appchr( 's', cbuf );
       appchr( '.', cbuf );
-      clbStoreMsgf(MSG_COMP, snum, cbuf, MSG_FLAGS_FEEDBACK );
+      sendFeedback(cbuf);
       sendAck(sInfo.sock, PKT_TOCLIENT, PSEV_INFO, PERR_CANCELED, NULL);
       return;
     }
@@ -1744,8 +1721,7 @@ void procBeam(cpCommand_t *cmd)
       Planets[pnum].team != TEAM_NOTEAM )
     if ( ! Ships[snum].war[Planets[pnum].team] && Planets[pnum].armies != 0) /* can take empty planets */
       {
-	clbStoreMsgf(MSG_COMP, snum, "But we are not at war with this planet!", 
-		 MSG_FLAGS_FEEDBACK );
+	sendFeedback("But we are not at war with this planet!");
 	sendAck(sInfo.sock, PKT_TOCLIENT, PSEV_INFO, PERR_CANCELED, NULL);
 	return;
       }
@@ -1753,7 +1729,7 @@ void procBeam(cpCommand_t *cmd)
   if ( Ships[snum].armies == 0 &&
       Planets[pnum].team == Ships[snum].team && Planets[pnum].armies <= MIN_BEAM_ARMIES )
     {
-      clbStoreMsgf(MSG_COMP, snum, lastfew, MSG_FLAGS_FEEDBACK );
+      sendFeedback(lastfew);
       sendAck(sInfo.sock, PKT_TOCLIENT, PSEV_INFO, PERR_CANCELED, NULL);
       return;
     }
@@ -1762,9 +1738,7 @@ void procBeam(cpCommand_t *cmd)
 
   if ( rkills < (real)1.0 )
     {
-      clbStoreMsgf(MSG_COMP, snum, 
-	       "Fleet orders prohibit beaming armies until you have a kill.",
-	       MSG_FLAGS_FEEDBACK );
+      sendFeedback("Fleet orders prohibit beaming armies until you have a kill.");
       sendAck(sInfo.sock, PKT_TOCLIENT, PSEV_INFO, PERR_CANCELED, NULL);
       return;
     }
@@ -1797,7 +1771,7 @@ void procBeam(cpCommand_t *cmd)
 	  else
 	    appstr( "ies are", cbuf );
 	  appstr( " reluctant to beam aboard a pirate vessel.", cbuf );
-	  clbStoreMsgf(MSG_COMP, snum, cbuf, MSG_FLAGS_FEEDBACK );
+	  sendFeedback(cbuf);
 	  sendAck(sInfo.sock, PKT_TOCLIENT, PSEV_INFO, PERR_CANCELED, NULL);
 	  return;
 	}
@@ -1807,7 +1781,7 @@ void procBeam(cpCommand_t *cmd)
   /* Figure out which direction to beam. */
   if ( upmax <= 0 && downmax <= 0 )
     {
-      clbStoreMsgf(MSG_COMP, snum, "There is no one to beam.", MSG_FLAGS_FEEDBACK );
+      sendFeedback("There is no one to beam.");
       sendAck(sInfo.sock, PKT_TOCLIENT, PSEV_INFO, PERR_CANCELED, NULL);
       return;
     }
@@ -1872,7 +1846,7 @@ void procBeam(cpCommand_t *cmd)
 	      if ( Planets[pnum].armies <= MIN_BEAM_ARMIES )
 		{
 		  PVUNLOCK(&ConqInfo->lockword);
-		  clbStoreMsgf(MSG_COMP, snum, lastfew, MSG_FLAGS_FEEDBACK );
+		  sendFeedback(lastfew);
 		  sendAck(sInfo.sock, PKT_TOCLIENT, PSEV_INFO, PERR_CANCELED, 
 			  NULL);
 		  break;
@@ -1938,13 +1912,13 @@ void procBeam(cpCommand_t *cmd)
 	  appstr( " transported, ", cbuf );
 	  appint( num - total, cbuf );
 	  appstr( " to go.", cbuf );
-	  clbStoreMsgf(MSG_COMP, snum, cbuf, MSG_FLAGS_FEEDBACK);
+	  sendFeedback(cbuf);
 	  ototal = total;
 	}
       
       if ( dirup && Planets[pnum].armies <= MIN_BEAM_ARMIES )
 	{
-	  clbStoreMsgf(MSG_COMP, snum, lastfew, MSG_FLAGS_FEEDBACK);
+	  sendFeedback(lastfew);
 	  break;
 	}
       
@@ -1960,12 +1934,10 @@ void procBeam(cpCommand_t *cmd)
   if ( conqed )
     {
       sprintf( cbuf, "You have conquered %s.", Planets[pnum].name );
-      clbStoreMsgf(MSG_COMP, snum, cbuf, MSG_FLAGS_FEEDBACK);
+      sendFeedback(cbuf);
     }
   else if ( zeroed )
-    clbStoreMsgf(MSG_COMP, snum, 
-	     "Sensors show hostile forces eliminated from the planet.",
-	     MSG_FLAGS_FEEDBACK);
+    sendFeedback("Sensors show hostile forces eliminated from the planet.");
   
   return;
   
@@ -1994,9 +1966,7 @@ void procDestruct(cpCommand_t *cmd)
 
   if ( SCLOAKED(snum) )
     {
-      clbStoreMsgf(MSG_COMP, snum, 
-	      "The cloaking device is using all available power.",
-               MSG_FLAGS_FEEDBACK);
+      sendFeedback("The cloaking device is using all available power.");
       sendAck(sInfo.sock, PKT_TOCLIENT, PSEV_INFO, PERR_CANCELED,
 	      NULL);
       return;
@@ -2091,7 +2061,7 @@ void procAutoPilot(cpCommand_t *cmd)
       return;
     }
 
-  clbStoreMsgf(MSG_COMP, snum, "Autopilot activated.", MSG_FLAGS_FEEDBACK);
+  sendFeedback("Autopilot activated.");
   SFSET(snum, SHIP_F_ROBOT);
 
   gsecs( &laststat );			/* initialize stat timer */

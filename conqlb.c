@@ -2973,14 +2973,14 @@ void clbStoreMsgf( int from, int to, char *msg, unsigned char flags )
 {
   int nlastmsg, i;
   char buf[128];
-  
+
 				/* don't do this if invalid common block */
   if (*CBlockRevision != COMMONSTAMP)
     return;
 
-  /* don't bother with tersables to robots */
+  /* don't bother with tersables/feedbacks to robots */
   if (to > 0 && to <= MAXSHIPS && SROBOT(to))
-    if (flags & MSG_FLAGS_TERSABLE)
+    if (flags & (MSG_FLAGS_TERSABLE | MSG_FLAGS_FEEDBACK))
       return;
 
   PVLOCK(&ConqInfo->lockmesg);

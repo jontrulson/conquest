@@ -146,8 +146,13 @@ char *padstr(int l)
 
   if (l > 256)
     l = 256;
+
+  if (l < 0)
+    l = 0;
   
-  memset(padding, ' ', l);
+  if (l > 0)
+    memset(padding, ' ', l);
+
   padding[l] = 0;
 
   return padding;

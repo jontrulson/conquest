@@ -303,12 +303,4 @@ int rndgeo ( real prob );
 int rndbin ( int trials, real prob );
 int rndpoi ( real mean );
 
-/* sem.c */
-
-char *getsemtxt(int what);
-int GetSem(void);
-void Lock(int what);
-void Unlock(int what);
-char *GetSemVal(int thesem);
-
 

@@ -31,6 +31,7 @@
 #include "global.h"
 #include "user.h"
 #include "conf.h"
+#include "sem.h"
 
 static int debug; 
 static void exitai(void);
@@ -66,9 +67,9 @@ int main(int argc, char *argv[])
       exit(1);
     }
   
-  if (GetSem() == ERR)
+  if (semInit() == ERR)
     {
-      fprintf(stderr, "GetSem() failed to get semaphores. exiting.\n");
+      fprintf(stderr, "semInit() failed to get semaphores. exiting.\n");
       exit(1);
     }
   

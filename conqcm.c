@@ -25,7 +25,6 @@
 /**********************************************************************/
 
 #include "global.h"
-
 #include "conqdef.h"
 #include "conqlb.h"
 
@@ -33,6 +32,7 @@
 #include "conqcom.h"		/* common block vars defined here */
 #include "context.h"		/* some extra stuff */
 #include "user.h"
+#include "sem.h"
 
 static char *cBasePtr = NULL;	/* common block ptr */
 static int coff = 0;		/* offset into common block */

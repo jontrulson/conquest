@@ -25,7 +25,7 @@ echo Arcive name: $ARCFILE
 FILELIST="ratfor.c cd2lb.h cd2lb.c iolb.h iolb.c conqlb.c
 	rndlb.c cumisc.h cumisc.c conqutil.c conqcm.c conqsvr42.c global.c 
 	ibuf.c ibuf.h version.c conf.c sem.c conquest.c conqoper.c conqdriv.c
-	conqai.c c_defs.h color.h conqcom.h conqdata.h defs.h 
+	conqai.c c_defs.h color.h conqcom.h conqdata.h defs.h sem.h
 	conf.h context.h conqdef.h global.h color.c userauth.c options.h
         options.c
 	ship.h user.h planet.h team.h torp.h msg.h doomsday.h

@@ -21,6 +21,7 @@
 #include "color.h"
 #include "record.h"
 #include "ibuf.h"
+#include "sem.h"
 
 #include "conqnet.h"
 #include "packet.h"
@@ -342,12 +343,12 @@ int main(int argc, char *argv[])
 #endif
   
 #ifdef DEBUG_FLOW
-  clog("%s@%d: main() getting semephores - GetSem()", __FILE__, __LINE__);
+  clog("%s@%d: main() getting semephores - semInit()", __FILE__, __LINE__);
 #endif
   
-  if (GetSem() == ERR)
+  if (semInit() == ERR)
     {
-      fprintf(stderr, "GetSem() failed to get semaphores. exiting.\n");
+      fprintf(stderr, "semInit() failed to get semaphores. exiting.\n");
       exit(1);
     }
   
@@ -507,7 +508,7 @@ void updateProc(void)
 
   /* check for and send any new messages */
   if ( getamsg( Context.snum, &Ships[Context.snum].lastmsg ) )
-    sendMessage(sInfo.sock, &(Msgs[Ships[Context.snum].lastmsg]));
+    sendMessage(&(Msgs[Ships[Context.snum].lastmsg]));
 
   /* Schedule for next time. */
   startUpdate();

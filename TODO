@@ -1,4 +1,18 @@
 
+- BUGS
+
+  - when couping, re-couped planet should not be marked scanned by any
+    other team, like normal planet takes.
+
+  - When cloaked and in orbt, should get the random x/y lias if moving
+    while cloaked.
+
+  - When geno'ing, geno'd armies on ships should 'disappear'
+
+  - check 'extra' planets on cqr files
+
+
+
 - add local server time to hello/srvrstat
 
 - local ship computation?

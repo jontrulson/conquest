@@ -3375,7 +3375,6 @@ int play()
   stopTimer();
 
   c_sleep( 1.0 );
-  clog("INFO: Died, calling dead()");
   dead( Context.snum, Context.leave );
   
   return(TRUE);

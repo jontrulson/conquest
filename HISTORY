@@ -9,6 +9,29 @@
 
                               Conquest HISTORY
 
+Version 8.0.1q 12/11/2004 (devel)
+
+        - FEEDBACK messages (beaming/bombing, etc) are now sent
+          directly from the server rather than being enqueued into the
+          common block's message ring for later delivery.  This avoids
+          alot of uneccessary lock contention, and makes sure the
+          client gets feedback messages quickly, without making a trip
+          through the common block.
+
+        - a server's client update interrupts are now blocked when a
+          lock is aquired, and unblocked when the lock is released.
+          This avoids some potential races that could cause a lock to
+          be held too long, or to be improperly interrupted.
+
+        - semaphore interface cleaned up
+
+        - fixed potential core in GL.c when padding message lines.
+          This could happen most often when getting (i)nfo or locking
+          onto a planet.
+
+        - recording/playback of planet 'realness' was broken.  Now it
+          isn't.  
+
 Version 8.0.1p 11/21/2004 (devel)
 
         - another 8.1 release candidate

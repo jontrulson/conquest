@@ -1,0 +1,208 @@
+12/01/2004 - a brief outline of the OpenGL Conquest client.
+
+NODES
+
+    Unlike the curses conquest client, the OpenGL/X11 client is
+    defined in terms of state and a current rendering node.  In the
+    curses client, program flow progresses in a linear fashion.  Ie,
+    something is displayed, and then the program waits for some input,
+    and then proceeds onward.
+
+    X11/OpenGL programming doesn't work this way, since input handling
+    and rendering are distinct, asynchronous processes, and therefore
+    the current 'mode' of the program must be handled in terms of state.
+
+    For this reason, I developed a 'rendering node' paradigm for the
+    OpenGL conquest client.  At any given time, conquestgl is running
+    a specific 'node', ie: the login screen.  Control is transferred
+    from node to node throughout the life of the program. ie: Auth ->
+    Welcome -> ConSrvr -> MainMenu ->.....
+
+    OpenGL rendering in conquest is handled by 'nodes'.  Nodes are
+    implemented in C files that represent a 'state' in conquest that
+    provides all of the logic for displaying a single screen (menu,
+    cockpit (CP), userlist, etc), as well as idling and Input handling.
+
+    A node is defined by a scrNode_t typedef which is defined in
+    node.h.  This structure contains pointers to 3 functions and one
+    link to another subnode (currently unused).
+
+    The 3 functions that a node defines are all optional, however if
+    no functions are defined by a node, and control is ever tranferred
+    to it, the client will softlock (spin in an infinite loop), so
+    don't do that.
+
+    You can, of course, implement any other (statically defined)
+    functions within a node to do whatever you require.
+
+    In addition to these three functions (described below) is an init
+    function that is called by other code to initialize the node and
+    transfer rendering control to it.
+    
+    The init function is defined by the programmer to accept whatever
+    arguements are appropriate to that node.  
+
+    Node control is handled by the primary rendering function
+    renderFrame() in GL.c.  You should never need to change anything
+    there. 
+
+    renderFrame() calls renderNode() which is responsible for actually
+    executing the current 'Top' node.  Currently there two Top nodes
+    possible.  Top, and OTop.  OTop is a special node that renders
+    onto the current Top node, seperated by a Quad with a 0.5 alpha
+    blend applied.  setONode() is used to setup this node.  You can
+    see how this is used in nPlayB to display transparent data over
+    the screen while replaying a recording.
+
+    You transfer control from one node to another by calling the new
+    node's init function.
+
+    The 4 functions that are defined in a scrNode_t are:
+
+    init(<up to programmer>) - required
+
+       sets up whatever state is required for a node and uses
+       setNode(*node) to set the toplevel node to the current node; 
+
+    display(dspConfig_t *)   - optional
+
+       dspConfig_t is defined in gldisplay.h and contains information
+       about the screen (width, height, etc).
+       
+       This node is responsible for rendering the complete frame for
+       the node.
+
+    idle(void)               - optional
+
+       The idle method is called immediately after the node's
+       display method.  This node can be used for tracking special
+       state, looking for available packets from the client and
+       processing them, etc.  It should never try to display
+       anything. 
+
+    input(int ch)            - optional
+
+       'ch' is the key that was pressed.
+
+       this method handles any keyboard events that occur during node
+       execution. 
+
+
+    If you add a node, please use my current naming convention for the
+    node code files and the function names, for example in nPlay.c:
+
+            nPlayInit(void) (not using any args here)
+            nPlayDisplay(dspConfig_t *)
+            nPlayIdle(void)
+            nPlayInput(int ch)
+
+    Here's a list of the current nodes and roughly what they do (if
+    the name doesn't make it clear):
+
+
+    nAuth.c      - initial authentication and login screen
+    nCP.c        - cockpit (CP) node (main playing screen)
+    nCPHelp.c    - displays CP help screen
+    nConsvr.c    - connects to server, displays any relevant
+                   status/errors     
+    nDead.c      - where you go when you die (dead screen)
+    nMenu.c      - main menu
+    nMeta.c      - meta server screen
+    nOptions.c   - all options screens/state
+    nPlanetl.c   - planet list
+    nPlay.c      - aquires a ship, preps you for entering CP
+    nPlayB.c     - playback screen (playing back recordings) - like CP
+                   but quite a bit simpler.  This would be more like
+                   what a conqoper would use for (w)atching a ship.
+    nPlayBHelp.c - playback help
+    nPlayBMenu.c - playback menu
+    nHistl.c     - history list
+    nShipl.c
+    nPlanetl.c 
+    nTeaml.c
+    nUserl.c
+    nWelcome.c   - "W E L C O M E", etc...
+
+
+    You should look at the nodes to get an idea of how they work.
+
+GL
+
+    Most OpenGL rendering is performed by functions in GL.c (drawing
+    planets, ships, etc).  You should not need to mess with anything
+    there. 
+
+    One of the big diffs between OpenGL vs. curses rendering is that
+    the complete display is rendered on every frame.  It's an
+    important distinction.  Account for this in your display()
+    method.  Though for doing things like rendering the viewer use a
+    predefined function renderViewer() (render.c).
+
+    Color handling has been revamped (color.c, color.h) to abstract
+    the implemetation.  curses attrib() calls now use a UI specific
+    UiPutColor() function.
+
+    Keybord handling is also quite different and standardized
+    (cqkeys.h). Prompting may seem strange at first.  look at
+    prm.[hc]. It's probably easier to just copy existing uses in the
+    input() methods used in the various nodes.
+    
+
+Other info:
+
+    With very few exceptions, a node will require it's own state so
+    that is knows what it is currently doing (prompting for a ship,
+    displaying the options list, etc).  In my nodes, I use 'S_<state>'
+    defines to represent the various states a node can be in, and a
+    variable called 'state' that indicates the state of the current
+    node. 
+
+    Some functions have been redefined to have an OpenGL equivalent.
+    For example, I wrote a version of cprintf() (glcprintf.c) that can
+    be used in your display() method to draw texture mapped text to a
+    3D window. It accepts the same arguments and will work the same
+    way.  It logically divides the rendering area into an 80x25 cell
+    character display.
+
+    One thing to be aware of are OpenGL Projection Matrices.  I use 2
+    of them - one for the viewer, and one for everything else (hud -
+    which uses an X11-like orthographic projection).  cprintf will
+    only work with hud-type projection matrices.  You should hopefully
+    not have to care - but keep this in mind if you are trying to
+    render text in the viewer.  The viewer uses true perspective
+    correction and Z.
+
+    The most complex node in the client is the cockpit node, nCP.c.
+    You will notice there is alot of duplication of some of the
+    original conquest functions in this file.  Someday it would be
+    nice to 're-unify' these with their older curses only counterparts
+    and eliminate some duplicate code.  Big job, so right now I'm
+    only doing it if I find myself needing to correct the same problem
+    in 2 places :)
+            
+    Using the PlayB nodes may be good place to start looking as the
+    conqoper node(s) should operate in pretty much the identical way
+    (diff commands, etc) but functionally equivalent.  In addition,
+    you will not need to worry about packet handling as conqoper deals
+    with the CB directly.  You will need to be careful about locking
+    though (PVLOCK()).  You do not want to inadvertantly aquire a lock
+    in one node, then transfer to a another node before unlocking it,
+    or you will deadlock the client.  The current clients do not use an
+    external CB so no locking is needed.
+
+    The more I think about it, the more it does not seem like this
+    should be too hard, especially if you are already using cprintf to
+    draw menus and such in the curses version.  Mainly managing input
+    and display handling via state are the main changes, most of the
+    hard work (view, hud, etc) is already done and can be re-used with
+    minimal tweaks (the hud will need tweaking to support displaying
+    from the doomsday perspective etc).
+
+    Anyway, here's a brief overview.  Hope you enjoyed it.
+
+
+
+    
+
+
+    
