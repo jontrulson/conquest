@@ -833,6 +833,18 @@ void initgame(void)
   pteam[PNUM_GHOST2] = TEAM_NOTEAM;
   pteam[PNUM_GHOST3] = TEAM_NOTEAM;
   pteam[PNUM_GHOST4] = TEAM_NOTEAM;
+
+				/* set up teams for extra planets */
+  if (NUM_EXTRAPLANETS > 0)
+    {				/* there are extra planets
+				   they are numbered starting at
+				   1 (+ NUM_BASEPLANETS) */
+      for (i=1; i<= NUM_EXTRAPLANETS; i++) 
+	{
+	  pteam[NUM_BASEPLANETS + i] = TEAM_SELFRULED;
+	}
+    }
+
   
   parmies[PNUM_SOL] = rndint(80, 180);
   parmies[PNUM_EARTH] = 50;

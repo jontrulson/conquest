@@ -3185,7 +3185,7 @@ void dowatchhelp(void)
   tlin++;
   cprintf(tlin,col,ALIGN_NONE,sfmt, "L", "review messages");
   tlin++;
-  cprintf(tlin,col,ALIGN_NONE,sfmt, "k", "kill this ship");
+  cprintf(tlin,col,ALIGN_NONE,sfmt, "k", "kill a ship");
   tlin++;
   cprintf(tlin,col,ALIGN_NONE,sfmt, "h", "this message");
   tlin++;

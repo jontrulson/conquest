@@ -550,10 +550,7 @@ void cdinit(void)
 {
   /* Initialize screen library (this MUST be done first). */
   
-#ifdef ENABLE_MACROS
   iBufInit();
-#endif
-  
   
   PollInputfd = 0;		/* for stdin */
   

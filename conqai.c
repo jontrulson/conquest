@@ -828,7 +828,7 @@ void robreply( char buf[] )
     "M-5. This unit must survive.",
     "This unit is the ultimate achievement in computer evolution.",
     "This unit is a superior creation.",
-    "I Scream The Body Electric."
+    "I Scream the Body Electric."
   };
   
   c_strcpy(robreplies[rndint(0, NUMRREPLIES - 1)], buf);

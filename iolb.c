@@ -39,12 +39,10 @@ int iochav( void )
   
   int retval;
   
-#ifdef ENABLE_MACROS
   if (iBufEmpty() == FALSE)
     {
       return(TRUE);
     }
-#endif
   
 #if defined(USE_SELECT)	
   
@@ -174,14 +172,10 @@ int iogchar ( void )
   
  reloop:
   
-#ifdef ENABLE_MACROS
   if (iBufEmpty() == TRUE)
     thechar = wgetch(stdscr);
   else
     thechar = iBufGetCh();
-#else
-  thechar = wgetch(stdscr);
-#endif
   
   if (thechar == ERR)
     {
@@ -216,13 +210,11 @@ int iogtimed ( int *ch, int seconds )
   
   cdrefresh();
   
-#ifdef ENABLE_MACROS
   if (iBufEmpty() == FALSE)
     {
       *ch = iBufGetCh();
       return(TRUE);
     }
-#endif
   
 #if !defined(USE_SELECT)
   timeout(seconds * 1000);	/* msecs - apparently useless

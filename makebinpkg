@@ -7,6 +7,10 @@
 # $Id$
 #
 # $Log$
+# Revision 1.3  1998/01/10 19:43:13  jon
+# 	Minor 'adjustments' in preperation for the final release of
+# 6.6.. Wish I could remember what all the changes were...
+#
 # Revision 1.2  1997/06/28 23:40:34  jon
 # fixing dist scipts
 #
@@ -44,6 +48,9 @@ tar -cvf ${CONQVER}.pkg.tar ${ARCFILE} ${CONQVER}.txt README INSTALL
 
 gzip -v ${CONQVER}.pkg.tar
 
+set -x 
+cp -f ${CONQVER}.pkg.tar.gz ~/tx/conquest/
+chmod 644 ~/tx/conquest/${CONQVER}.pkg.tar.gz
 
 exit
 	

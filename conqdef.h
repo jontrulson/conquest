@@ -480,7 +480,7 @@
 #define DOOMSDAY_DIST 1500.0 	/* distance it starts shooting */
 #define DOOMSDAY_KILL_DIST 300.0  /* minimum distance for killing it */
 #define DOOMSDAY_HIT 7.0 	/* blast per second */
-#define DOOMSDAY_PROB 0.001 	/* probability per minute that it appears */
+#define DOOMSDAY_PROB 0.0001 	/* probability per minute that it appears */
 #define MIN_UNINHAB_MINUTES 45 	/* minimum time till inhabitable */
 #define MAX_UNINHAB_MINUTES 120 	/* maximum time till inhabitable */
 

@@ -135,7 +135,7 @@ Version 6.6    Thu Dec 24 16:03:31 1997  Jon Trulson  <jon@radscan.com>
           to cover up a logic 'hole' that became apparent when this bug 
           was fixed.  This bug was in the original RATFOR code.
 
-        - some terminfo enties that work good with conquest are now
+        - some terminfo entries that work good with conquest are now
           supplied with the source distribution.
 
         - a new 'realclean' target is provided in the Makefile.  This

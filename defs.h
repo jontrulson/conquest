@@ -98,14 +98,12 @@
 # define CONQDRIV_PRI (-7)
 #endif
 
-/* ENABLE_MACROS - use the input buffer, and therefore macro F keys 
+/* ENABLE_MACROS - enable use of the macro F keys 
  */
 #define ENABLE_MACROS
 
-#ifdef ENABLE_MACROS
-# define MAX_MACROS 24		/* max number of macros supported */
-# define MAX_MACRO_LEN 81	/* max length of a macro */
-#endif
+#define MAX_MACROS 24		/* max number of macros supported */
+#define MAX_MACRO_LEN 81	/* max length of a macro */
 
 /* OPER_MSG_BEEP - if defined, beep when a message arrives in conqoper.
  */
