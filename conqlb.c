@@ -699,7 +699,7 @@ void killship( int snum, int kb )
 
 #if defined(DO_EXPLODING_SHIPS)
   /* launch all torps - sorta, we'll use 'explode' mode... */
-  launch(snum, 0.0, 6, LAUNCH_EXPLODE);
+  launch(snum, 0.0, EXPLODESHIP_TORP_COUNT, LAUNCH_EXPLODE);
 #endif
   
 				/* internal routine. */
@@ -865,8 +865,8 @@ int launch( int snum, real dir, int number, int ltype )
 				   that shouldn't go anywhere... */
 	  tfuse[snum][tslot[i]] = 1; /* shouldn't last long */
 				/* should be close to the ship */
-	  tx[snum][tslot[i]] = rndnor( sx[snum], 15.0 );
-	  ty[snum][tslot[i]] = rndnor( sy[snum], 15.0 );
+	  tx[snum][tslot[i]] = rndnor( sx[snum], EXPLODESHIP_TORP_SPREAD );
+	  ty[snum][tslot[i]] = rndnor( sy[snum], EXPLODESHIP_TORP_SPREAD );
 				/* no movement */
 	  speed = 0.0;
 				/* no direction or deltas */
@@ -898,12 +898,9 @@ int launch( int snum, real dir, int number, int ltype )
       for ( j = 0; j < NUMTEAMS; j = j + 1 )
 	{
 	  if (ltype == LAUNCH_EXPLODE)
-	    {			/* we're at war with everything except
-				   our own team */
-	      if (j == steam[snum])
-		twar[snum][tslot[i]][j] = FALSE;
-	      else
-		twar[snum][tslot[i]][j] = TRUE; 
+	    {			/* if our ship is exploding we're at war
+				   with everything. */
+	      twar[snum][tslot[i]][j] = TRUE; 
 	    }
 	  else
 	    twar[snum][tslot[i]][j] = swar[snum][j]; /* just enemies */

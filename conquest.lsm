@@ -9,8 +9,8 @@ Author:         Unix/C (1996-1998):         Jon Trulson
 Author:         Linux port:                 Dave Payne
 Maintained-by:  Jon Trulson <jon@radscan.com>, http://home.rmi.net/~jon
 Primary-site:   http://home.rmi.net/~jon,  
-Primary-site:   ftp.freebird.org <exact location not known at this time>
-Alternate-site: sunsite.unc.edu <exact location not known at this time>
+Primary-site:   ftp://ftp.freebird.org/unixware/freebird/games/conquest/ 
+Alternate-site: ftp://sunsite.unc.edu/pub/Linux/games/multiplayer/
 Copying-policy: Original policy spelled out by Craig Leres and
 Copying-policy: Jef Poskanzer - freely distributable with accompanying
 Copying-policy: copyright notices, attributions, and documentation.

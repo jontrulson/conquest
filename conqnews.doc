@@ -18,7 +18,7 @@ Version 6.6    Thu Dec 24 16:03:31 1997  Jon Trulson  <jon@radscan.com>
         - switched to the use of 'double' as the floating point type
           instead of 'float'
 
-        - New common block due to the float -> double change, and the
+        - new common block due to the float -> double change, and the
           new play planets.
 
         - full coloring of LR/SR displays.  The color scheme used is
@@ -34,12 +34,9 @@ Version 6.6    Thu Dec 24 16:03:31 1997  Jon Trulson  <jon@radscan.com>
           coloring for enhancement only (except when watching a ship).
 
         - exploding ships. Ouch.  Implemented by 'faking' a special
-          type of torp launch.  The only thing an exploding ship 
-          will not damage, is a team ship.  Any others (including
-          peaceful ships) can take damage if they are too close
-          to an exploding ship.
+          type of torp launch.  
 
-        - The messages sent regarding entering/dying in conquest
+        - the messages sent regarding entering/dying in conquest
           now use per ship information, rather than per user 
           information.  This make things consistent, and also
           works properly for users with multiple ships.
@@ -63,12 +60,12 @@ Version 6.6    Thu Dec 24 16:03:31 1997  Jon Trulson  <jon@radscan.com>
           field indicator as you move around between the various
           options.
 
-        - Destroying a warlike ship, no longer causes 'invisible'
+        - destroying a warlike ship, no longer causes 'invisible'
           sticky war with that team if you weren't officially at war 
           with that team when you killed it (but it was at war with you).
 
         - beaming armies down to a self-ruled planet without bombing
-          it no longer works.  You could take planets this way without 
+          it, no longer works.  You could take planets this way without 
           suffering any damage, but it would take a long time, and alot
           of armies.  Now when you beam armies down to a self-ruled 
           planet, it is considered an act of war, just like bombing is.
@@ -77,7 +74,7 @@ Version 6.6    Thu Dec 24 16:03:31 1997  Jon Trulson  <jon@radscan.com>
           "VACANT" if the ship has no controlling process, or "ROBOT" 
           if the ship is a robot.
 
-        - You can type long messages now.  While typing a mesage, when 
+        - you can type long messages now.  While typing a mesage, when 
           you reach the end of the line, what you've typed is sent, 
           followed by a '-', and then you are prompted for more text.  
           Much easier to type long messages.  Thanks to Dave Payne
@@ -90,10 +87,10 @@ Version 6.6    Thu Dec 24 16:03:31 1997  Jon Trulson  <jon@radscan.com>
           and forgetting no screen updates were taking place. I had 
           24 kills too. ;-)
 
-        - an bug in the driver that caused ship headings to briefly 
+        - a bug in the driver that caused ship headings to briefly 
           go negative or invalid during a slow turn has been fixed.
 
-        - bug in towing that miscalculated relative velocities between
+        - a bug in towing that miscalculated relative velocities between
           two ships has been fixed.  This bug was in the original RATFOR 
           code.
 
@@ -102,7 +99,7 @@ Version 6.6    Thu Dec 24 16:03:31 1997  Jon Trulson  <jon@radscan.com>
           tower was in orbit.  Can you say "hyperdimensional 
           shifting"?   This bug was in the original RATFOR code.
 
-        - handling of multiple ships, and entering while already
+        - the handling of multiple ships, and entering while already
           playing are much improved.  Now you get the option of 
           re-incarnating to other ships (if you are allowed multiple 
           ships), and/or creating a new one. Players who are not 
@@ -116,7 +113,7 @@ Version 6.6    Thu Dec 24 16:03:31 1997  Jon Trulson  <jon@radscan.com>
 
         - gamlb module removed - no longer needed
 
-        - most transition (Ratfor to C) macros removed.
+        - most translation (Ratfor to C) macros removed.
 
         - combined ioxlb.c, ionlb.c, and ioplb.c into one module:
           iolb.c
@@ -131,7 +128,7 @@ Version 6.6    Thu Dec 24 16:03:31 1997  Jon Trulson  <jon@radscan.com>
         - several rounding problems related to using abs() when should
           have been using fabs() fixed.
 
-        - bug in buildai() that scaled fuel incorrectly causing 
+        - bug fixed in buildai() that scaled fuel incorrectly causing 
           robots to do dumb things when fuel was low (they always 
           thought they had plenty of fuel).  This fix has resulted 
           in smarter robots.  Two rules in conqrule had to be modified 

@@ -548,6 +548,17 @@
 #define LAUNCH_NORMAL   (0)
 #define LAUNCH_EXPLODE  (1)
 
+				/* exploding ship characteristics */
+
+                                /* number of stationary torps 'fired'
+				   when a ship dies */
+#define EXPLODESHIP_TORP_COUNT    6
+				/* Maximum distance from ship an 'explode
+				   ship' spread of torps will be located.
+				   ie: This confines the blast radius
+				   for an exploding ship */
+#define EXPLODESHIP_TORP_SPREAD   15.0	
+
 /* Macros, here order is important. */
 
 /*#define round(x) jnint(x )				/* int round */

@@ -88,9 +88,6 @@ conqnews.doc ((n)ews from within conquest) for instructions on how to
 play and what's changed.
 
 
-Jon Trulson <jon@radscan.com> 12/24/97
-
-
 COPYRIGHT
 
                  C O N Q U E S T   (VAX/VMS Ratfor)
@@ -109,3 +106,5 @@ COPYRIGHT
  conditions of the original copyright by Jef Poskanzer and Craig    
  Leres.                                                             
 
+
+Jon Trulson <jon@radscan.com> 12/24/97

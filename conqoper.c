@@ -1123,7 +1123,7 @@ void operate(void)
       else 
 	{ /* COMMONBLOCK MISMATCH */
 
-	  cprintf(4, 0, ALIGN_CENTER, "#%d#You must (I)nitialize (E)verything.",
+	  cprintf(4, 0, ALIGN_CENTER, "#%d#You must (I)nitialize (e)verything.",
 		  RedLevelColor);
 	  cdmove( 1, 1 );
 	  cdrefresh();
