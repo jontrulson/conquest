@@ -9,7 +9,18 @@
 
                               Conquest News
 
-Version 7.1.2 Sun Jul  4 16:19:40 MST 2001 Jon Trulson  <jon@radscan.com>
+Version 7.1.2a Sat Nov  9 23:47:53 MST 2002 Jon Trulson  <jon@radscan.com>
+
+	- patch from Clint Adams for conqai.c changing 'char arg' to
+          'int arg' for getopt.
+
+	- fix problem in conqai.c defend() that would allow multiple
+          robot defenders.
+	  
+	- fixup login screen a little, provide some stats...
+
+
+Version 7.1.2 Sun Jul  4 16:19:40 MST 2002 Jon Trulson  <jon@radscan.com>
 
 	- a long overdue update
 

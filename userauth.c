@@ -18,10 +18,58 @@
 static int checkuname(char *username);
 static void expire_users(void);
 
+static void PrintStatus(int lin)
+{
+  char buf[MID_BUFFER_SIZE];
+  int numusers = 0;
+  int numships = 0;
+  int numshipsactive = 0;
+  int numshipsvacant = 0;
+  int numshipsrobot = 0;
+  int i;
+
+  sprintf(buf, 
+	  "#%d#STATUS: #%d#Users #%d#%%d, #%d#Ships #%d#%%d #%d#"
+	  "(#%d#%%d #%d#active, #%d#%%d #%d#vacant, "
+	  "#%d#%%d #%d#robot)",
+	  MagentaColor, NoColor, CyanColor, NoColor, CyanColor, NoColor,
+	  CyanColor, NoColor, CyanColor, NoColor, 
+	  CyanColor, NoColor);
+
+  /* get total users */
+  for ( i = 0; i < MAXUSERS; i++)
+    if ( Users[i].live)
+      numusers++;
+
+  /* count ships */
+  for ( i = 1; i <= MAXSHIPS; i++ )
+    {
+      if ( Ships[i].status == SS_LIVE )
+	{
+	  numships++;
+
+	  if (Users[Ships[i].unum].robot)
+	    numshipsrobot++;
+	  else
+	    {
+	      if (CheckPid(Ships[i].pid))
+		numshipsactive++;
+	      else
+		numshipsvacant++;
+	    }
+	}
+    }
+    
+  cprintf(lin, 0, ALIGN_CENTER, buf,
+	  numusers, numships, numshipsactive, numshipsvacant, numshipsrobot);
+
+  return;
+}
+
 int Logon(char *username, char *password)
 {
   int col, lin, slin, lenc1, unum;
-  int ch;
+  int ch, statline;
   char nm[SIZEUSERNAME], pw[SIZEUSERNAME], pwr[SIZEUSERNAME], 
     epw[SIZEUSERNAME];
   char salt[3];
@@ -73,12 +121,22 @@ int Logon(char *username, char *password)
   lin++;
 
   if ( ConqInfo->closed )
-    cprintf( lin, 0, ALIGN_CENTER, "#%d#%s", RedLevelColor,
-	     "The game is closed.");
+    {
+      cprintf( lin, 0, ALIGN_CENTER, "#%d#%s", RedLevelColor,
+	       "The game is closed.");
+      cdend();
+      exit(2);
+    }
   else
-    cprintf( lin, 1, ALIGN_CENTER, "#%d#%s (%s)", YellowLevelColor,
+    cprintf( lin, 1, ALIGN_CENTER, "#%d#Welcome to #%d#Conquest#%d# %s (%s)", 
+	     YellowLevelColor,
+	     RedLevelColor,
+	     YellowLevelColor,
 	     ConquestVersion, ConquestDate);
 
+  lin++;
+  statline = lin;
+  PrintStatus(statline);
 
   lin += 4;
   slin = lin;
@@ -91,12 +149,11 @@ int Logon(char *username, char *password)
     {
       slin = lin;
       cdclrl( slin, CqContext.maxlin - slin - 1 );
-      cprintf( slin, col, ALIGN_CENTER, 
-	       "#%dWelcome to Conquest, Please login...",
-	       SpecialColor);
-
       slin += 3;
       cdputs("You can use A-Z, a-z, 0-9, '_', or '-'.", MSG_LIN1, 1);
+      cprintf( slin - 1, 1, ALIGN_LEFT,
+               "#%dPlease login. (RETURN to exit)",
+               SpecialColor);
       ch = cdgetx( "Username: ", slin, 1, TERMS, nm, MAX_USERLEN, TRUE );
 
       if (ch == TERM_ABORT || nm[0] == EOS)

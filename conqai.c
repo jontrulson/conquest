@@ -286,8 +286,10 @@ void defend( int attacker, int pnum )
   for ( i = 1; i <= MAXSHIPS; i = i + 1 )
     if ( Ships[i].status == SS_LIVE ) /* live */
       if ( Ships[i].team == team ) /* same team */
-	if (CheckPid(Ships[i].pid)) /* not vacant */
-	  return;
+	if (Users[Ships[i].unum].robot || CheckPid(Ships[i].pid)) 
+	  {   /* robot or non-vacant human */
+	    return;
+	  }
   
   /* Count how many robot users are on the right team and can play. */
   j = 0;
@@ -641,11 +643,12 @@ int newrob( int *snum, int unum )
   
   for ( i = 0; i < MAXOPTIONS; i = i + 1 )
     Ships[*snum].options[i] = Users[unum].options[i];
-  Ships[*snum].options[OPT_INTRUDERALERT] = TRUE;	/* want intruder alerts */
-  Ships[*snum].options[OPT_TERSE] = TRUE;		/* don't want stupid
-						   messages */
+
+  Ships[*snum].options[OPT_INTRUDERALERT] = TRUE; /* want intruder alerts */
+  Ships[*snum].options[OPT_TERSE] = TRUE; /* don't want stupid
+					     messages */
   Ships[*snum].options[OPT_ALARMBELL] = FALSE; /* don't want beeping during a
-					    watch */
+						  watch */
 
   for ( i = 0; i < NUMPLAYERTEAMS; i = i + 1 )
     {
@@ -653,7 +656,7 @@ int newrob( int *snum, int unum )
       Ships[*snum].rwar[i] = FALSE;
       Ships[*snum].war[i] = FALSE;
     }
-  stcpn ( Users[unum].alias, Ships[*snum].alias, MAXUSERPNAME );	/* -[] -[] */
+  stcpn ( Users[unum].alias, Ships[*snum].alias, MAXUSERPNAME );	
   
   /* Place the ship. */
   if ( Planets[Teams[Ships[*snum].team].homeplanet].primary == 
