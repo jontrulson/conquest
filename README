@@ -56,6 +56,7 @@ CONTENTS:
 	       # conquest
 	       # conqdriv
 	       # conqoper
+	       # conqreplay
 	       # conqai
 	       # conquest_common.img
 	       # conqnews.doc
@@ -514,8 +515,9 @@ directory (/opt by default).
 
 # bin/conquest
 
-	The game itself. It currently accepts no arguments.
-
+	The game itself. The only valid arguement is '-r <file.cqr>'
+used to record a games (see conqreplay).  The file can not already
+exist or conquest will exit.
 
 # bin/conqdriv
 
@@ -575,6 +577,58 @@ automatically when conquest is run.  This is not done automatically
 for the system wide conquestrc file due to potential security
 problems. 
 
+
+# bin/conqreplay
+
+        A utility for playing back Conquest Recording (CQR) files made
+when conquest is run with the '-r <filename>' flag.  
+
+        This is a much nicer way to save and playback games than using
+something like script, or Xterm logging.  You can play the recordings
+back on any curses terminal, regardless of the curses terminal in use
+when the game was recorded.
+
+        While playing back a game, you can watch from the perspective
+of any ship that was in the game when you made the recording.
+conqreplay also allows you to speed up or slowdown the playback, as
+well as giving you the ability to jump forward and backward in a
+recording.  Not as nice as a VCR but close enough.
+
+ conqreplay currently supports the following options:
+
+ usage: conqreplay [ -d <dly> ] -f <cqr file>
+        -f <cqr>         specify the file to replay
+        -d <dly>         specify the frame delay
+
+
+	For example, to play back a files called dethfun.cqr:
+
+		conqreplay -f dethfun.cqr
+
+	To play it back at high speed:
+
+		conqreplay -d 0.001 -f dethfun.cqr
+
+	There is a 'demonstration' CQR file up on the website.  It's
+	probably pretty boring - don't want to give too much away ;-)
+	
+ NOTES:
+
+	- Only the messages sent to the player that made the recording
+          are saved into the CQR file.  You can't use a recording to
+          'snoop' on other players conversations.
+
+	- I have no way of sending a recorded file back to a remote
+          user, so I have provided no method that would allow remote
+          users to record games.  This could be easily implemented, by
+          perhaps using email.  Though I'd prefer not to depend on
+          executing extenal programs if possible, hence the current
+          lack of support...
+
+	- there is no way at this time to manually start and stop
+          recording from within the game.  You must start conquest
+          with the '-r' option to start recording, and the entire
+          session will be recorded.
 
 # bin/conqai
 
