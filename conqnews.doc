@@ -9,13 +9,13 @@
 
                               Conquest News
 
-Version 7.2h (devel - prerelease) 12/7/2003
+Version 7.2h (devel - v8.0 prerelease) 12/7/2003
 
     7.2h
 
-    - The client/server release.  Much has changed.  Read the docs
-      (README, SERVER.TXT, etc) if you really must know all the
-      details. 
+    - This is a prerelease version of the Conquest v8.0 client/server
+      release.  Much has changed.  Read the docs (README, SERVER.TXT,
+      etc) if you really must know all the details.
 
     - added meta server browser into conquest.  To get a list of
       servers registered with the meta server, and select one to play
@@ -108,8 +108,8 @@ Version 7.2h (devel - prerelease) 12/7/2003
       telnetable client to connect to a different server than
       'localhost'.
 
-    - removed GL/X11 dependancies that snuck in.  We aren't ready for
-      that yet.
+    - removed OpenGL/X11 dependancies that snuck in.  We aren't ready
+      for that yet. :)
 
     7.2c-cs-11
 
@@ -157,7 +157,7 @@ Version 7.2h (devel - prerelease) 12/7/2003
     - conquest is now client/server.  In the old days, the conquest
       binary had to be run on the same machine as the common block
       (universe).  In order to run a 'server', a telnet interface was
-      used so remote players could connect.
+      required so remote players could connect.
 
       Now, conquest is a client that can connect over the network to
       any conquest server (conquestd).  In the future, there will be a
@@ -209,7 +209,7 @@ Version 7.2h (devel - prerelease) 12/7/2003
       operators so they can become the tin plated dictators with
       delusions of godhood most of them secretly want to be. :)
 
-    - Previous versions of conquest (v7.0+) used to distinguish
+    - Previous versions of conquest (v7.x) used to distinguish
       between 'local' and 'remote' users.  Local users were users who
       were playing conquest from a shell account on the machine where
       conquest was installed.  Remote users were users playing from a
@@ -315,10 +315,11 @@ Version 7.2h (devel - prerelease) 12/7/2003
     - the 'I' command is no longer provided.  All of those options
       have been added to the User options menu.
 
-    - Users can no longer have multiple ships.  If you have a vacant
-      ship, you will be automatically attached to it.  The game still
-      has most of this code present, so this feature could be added
-      back in the future if enough people whine.
+    - Users can no longer have multiple ships running at the same
+      time.  If you have a vacant ship, you will be automatically
+      attached to it.  The game still has most of this code present,
+      so this feature could be added back in the future if enough
+      people whine.
 
     - When using the (U)sers command in the client, only those users
       attached to currently active ships, or attached to entries in
@@ -415,8 +416,8 @@ Version 7.2h (devel - prerelease) 12/7/2003
       targeting' or other type of advantage.  It's for information
       purposes only ;-)
 
-      To use this, enable the 'Allow Alt HUD' option in in (O)ptions
-      from within conquest.  Set to 'false' by default.
+      To use this, enable the 'Allow Alt HUD' option in the (O)ptions
+      menu from within conquest.  Set to 'false' by default.
 
 
 Version 7.2 Sun Dec  1 15:55:27 MST 2002 Jon Trulson  <jon@radscan.com>

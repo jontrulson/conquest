@@ -23,36 +23,59 @@
   See conquest.doc for information on available commands, and how to
   play the game.
 
+  NEW USERS: Please read the section '## General playing tips' below
+             for some useful information you should know.  Reading the
+             whole document is advised, but this section is probably
+             the most important as far as providing some useful
+             playing tips.
+
+  In the sections below, commands you issue to conquest will be
+  enclosed in parantheses '()'.  The RETURN key is represented as '\r',
+  and the TAB key is represented as '\t'.
+
   CONTENTS:
 
-   ### CONQUEST SYNOPSIS
-   ### A LITTLE BACKGROUND
-   ### GENERAL INFORMATION AND TIPS ABOUT CONQUEST
+   ### Conquest Synopsis
+   ### A Little Background
+   ### General Information and tips
        ## Starting Conquest
        ## Default network ports
        ## Server game flags
+       ## Meta Server
        ## ~/.conquestrc
        ## Recording Games
-       ## PLANETS
-       ## SUNS
-       ## CLOAKING
-       ## TRACTORS
-       ## STRENGTH
-       ## REFITTING
-       ## LEAVING THE GAME
-       ## TEAMS
-       ## COMBAT
-       ## MACRO KEYS
-       ## NAVIGATION
-       ## THE ROBOTS
-          # CONQSTRAT
-          # COMBAT
-          # CREATING ROBOTS
-       ## DOOMSDAY MACHINE
-       ## CONQOPER
-          # SEMAPHORE STATUS LINE
-          # LEAVING A SCREEN IN CONQOPER
-       ## THE INSTALLED FILES
+       ## General playing tips
+          # Shields
+          # Energy Allocation
+          # Bombing
+          # Repairing
+          # Cloaking
+          # Carrying armies
+          # Detonating enemy torps
+          # Using torpedos
+          # Using phasers
+          # Kill points
+          # Robot scanning range
+       ## Planets
+       ## Suns
+       ## Cloaking
+       ## Tractor beams
+       ## Ship Strength
+       ## Refiting
+       ## Leaving the game
+       ## Teams
+       ## Combat
+       ## Macro Keys
+       ## Navigation
+       ## The Robots
+          # Conqstrat
+          # Combat
+          # Creating Robots
+       ## The Doomsday Machine
+       ## Using conqoper
+          # The semaphore status line
+          # Leaving a screen on conqoper
+       ## The installed files
           # conquest
           # conquestd
           # conqmetad
@@ -70,13 +93,13 @@
           # libconqclnt.so
           # libconqserv.so
           # ~/.conquestrc
-   ### MORE INFO
-   ### OBTAINING CONQUEST
-   ### COPYRIGHT INFO
+   ### Getting more information
+   ### Obtaining Conquest
+   ### Copyright Information
 
 
 
-### CONQUEST SYNOPSIS
+### Conquest Synopsis
 
    Here's an extract from the conquest.doc file:
 
@@ -109,7 +132,7 @@
                ...
 
 
-### A LITTLE BACKGROUND
+### A Little Background
 
     A quote from Michael Erskine: 
 
@@ -141,7 +164,7 @@
     client/server game.  Conquest clients connect to a local or remote
     conquestd server to play.
 
-### GENERAL INFORMATION AND TIPS ABOUT CONQUEST
+### General Information and tips
 
 ## Starting Conquest
 
@@ -180,14 +203,23 @@
 
    This is the list of default network ports Conquest uses:
 
-   1700/udp    - metaserver update port (to conqmetad)
-   1700/tcp    - metaserver query port  (from conqmetad)
+   1700/udp    - metaserver update port 
+                 - conquestd sends updates to conqmetad on this port
+                   (when run with '-m')
 
-   1701/tcp    - default game server port (to conquestd)
+   1700/tcp    - metaserver query port 
+                 - when you (or a conquest client) connects to this
+                   port on the metaserver host (conquest.radscan.com),
+                   the metaserver dumps the current server list out on
+                   this port and disconnects.
+
+   1701/tcp    - default game server port
+                 - conquestd listens on this port for client
+                   connections.
 
 ## Server game flags
 
-   The server operator can set vaious game flags via the conqoper
+   The server operator can set various game flags via the conqoper
    Options menu.  These flags are displayed on the conquest login
    screen (when connecting to a server), as well as when the user
    selects the Options menu from from within the game (while already
@@ -254,6 +286,42 @@
 
           SwitchTeam         - when enabled, users can switch teams at
                                the conquest main menu.
+
+
+## Meta Server
+
+   With Conqest v8.0, a meta server is supported.  There is one
+   running at conquest.radscan.com.  
+
+   If you want to see what servers are available, run conquest with
+   the '-m' option:
+
+   $ conquest -m
+
+   This will query the meta server and list the curently active
+   servers.  From here, you can select one and connect.
+
+   There is a cgi-bin perl script on the Conquest website where you
+   can also get this info:
+
+   http://radscan.com/cgi-bin/conqmeta.pl
+
+   If you want to run a server that other internet players can play
+   on, and you want them to know about it, you will want to run your
+   conquestd server with the '-m' flag.
+
+   $ conquestd -d -m
+
+   Depending on your network topology, you may also need the '-N' flag
+   if the internet has a different idea about your server hostname
+   than you do internally.  For example, here, conquest.radscan.com is
+   an external only address, so I must explicitely specify it to the
+   metaserver, or it will use the address the update packet came in on
+   (which no-one would be able to resolve and connect to).  For
+   example, here is the complete line I use on my server to start
+   conquestd:
+
+   # conquestd -d -u nobody -m -N conquest.radscan.com
 
 
 ## ~/.conquestrc
@@ -348,11 +416,18 @@
 
       $ conqreplay -f somefile.cqr
 
-   If libz is available on your system when building conquest, game
-   data will be recorded using gzip compression.  It's a good idea to
-   use this.  conqreplay can read either uncompressed or gzip
-   compressed files, and can be played back on any curses/terminfo
-   terminal.
+   If libz and it's development header files are available on your
+   system when building conquest, game data will be recorded using
+   gzip compression.  It's a good idea to use this.  conqreplay can
+   read either uncompressed or gzip compressed files, and can be
+   played back on any curses/terminfo terminal.
+
+   If your conqreplay was not compiled with libz support, then you
+   will need to uncompress any compressed .cqr files you may have
+   before you can replay them.  A simple way is:
+
+   $ gunzip -f <somefile.cqr >somefile-nocompress.cqr
+   $ conqreplay -f somefile-nocompress.cqr
 
    conqreplay also supports a few options - try 'conqreplay -?' for a
    current list.
@@ -361,7 +436,263 @@
    I'll happily make them available on the website. ;-)
 
 
-## PLANETS
+## General playing tips
+
+   Here are some general things to keep in mind while playing.
+
+# Shields
+
+  Shields are important for protecting your ship.  Once your shields
+  are down, then your ship can start taking damage.
+
+  One main thing to remember:
+
+  - When your shields are up, they consume more power and cause your
+    engines to heat faster.
+
+    For this reason, *only* keep your shields up when you are in
+    danger - ie: an enemy ship is nearby, or you are close to an enemy
+    planet, torps, or a Sun, etc.
+
+    Don't run around the universe with your shields up all the time.
+    It just flags you as inexperienced and probably an easy kill.
+
+    On the other hand, when an enemy gets close, don't forget to raise
+    them :)
+
+  Your shields will repair at twice the normal rate if you lower
+  them. 
+
+# Energy Allocation
+
+  In Conquest, you can assign an energy allocation that is split
+  between your engines and your weapons.  The max allocation
+  percentage is 30/70.
+
+  When you are just flying around, set your allocation so your engines
+  get most of the power.  This can be done with (A30\r).  This way
+  your engines will be as efficient as possible - using less fuel and
+  generating less heat.
+
+  When bombing, do the opposite.  Having your weapons have the maximum
+  power allocation increases your army kill rate.  This can be done
+  with (A70\r).
+
+  When dogfighting, you will probably want to quickly switch between
+  the two.  I would use a Macro for this (see the '## Macro Keys'
+  section).  In this case, what you want to do is keep maximum power
+  for your engines, but switch to max weapons whenever you fire them.
+  This increases their power, and potential damage to an enemy.
+
+  I personally use a Macro for most phaser firing and torping (except
+  for aiming them).  This macro switches to max weapon allocation,
+  fires the weapon, then switches back to max engine allocation.
+
+  Most eficient.  Sometimes when you are dogfighting someone else (or
+  a robot) the first one to overload or run out of fuel loses.  It's
+  important that you are not the one that this happens too :)
+
+  Some battles I have fought have depended entirely on the efficient
+  use of fuel and heat resources.  A good player will always try to
+  get you to waste fuel and heat up.  Robots, being fairly stupid, can
+  be goaded into wasting fuel and heat too, if you are careful.
+
+# Bombing
+
+  Bombing is the usual way to get kills (unless you are good with
+  robots).
+
+  To bomb a planet, raise shields and go into orbit.  Set weapons
+  allocation to max (A70\r), and use the (B) command.
+
+  If you want to bomb a team owned planet (those that are not
+  'self-ruled'), you will need to declare war with the team first
+  (W).  Bombing a self-ruled planet automatically makes you at war
+  with that planet.
+
+  The more armies a planet has, the faster it will damage you.  Keep
+  this in mind.
+
+  When bombing, set your weapons allocation to max (A70\r).  This
+  will increase your army kills per bomb run.
+
+  While bombing, break off and repair when your damage gets around
+  50-70%.  As you get more experienced, you can push the line a bit.
+  But it's important to know that the more damage you have, the slower
+  you will be able to run.  With 70% damage, your maximum speed will
+  be about warp 3.  On a 100 army planet, this may not be fast enough
+  for you to move away from the planet before the armies overwelm your
+  shields and you explode.  Excercise caution :)
+
+  Bombing a home system planet of a team will create a robot defender.
+  Be ready for this.
+
+  Home systems, and their planets are the following:
+
+  Federation:         Earth, Telos, Omega
+  Klingon:            Klingus, Leudus, Tarsus
+  Romulan:            Romulus, Remus, Rho
+  Orion:              Orion, Oberon, Umbriel
+
+  All other planets are self-ruled when a game is initialized, and
+  will not create robot defenders when bombed (even if owned by
+  another, non self-ruled team).  These are the ones newcomers should
+  probably bomb first until they are ready to handle robot defenders.
+
+  All planets, with the exception of Altair, Hell, and Jinx, must be
+  taken in order to conquer the universe.
+
+# Repairing
+
+  When you are damaged, you will want to repair as soon as you are
+  able, so that you can regain your max warp and efficiency.
+
+  When not under attack, you will repair at a 'nominal' rate - which
+  will be quite slow.
+
+  Use the (R) command to go into repair mode.  This sets you at warp 0
+  and lowers your shields - so don't do it in the middle of battle.
+  Repairing is faster this way.
+
+  If there is a friendly planet nearby, go into orbit around it before
+  using (R).  You will repair even faster.
+
+  You will also cool down much faster when in orbit about a friendly
+  planet. 
+
+# Cloaking
+
+  You can cloak your ship if you wish with the (C\t) command.
+
+  Cloaking consumes alot of power and heat.  If you are moving, you
+  will exhaust your fuel or overload fairly quickly.  How fast this
+  happens depends on your ship type, and how fast you are moving.  If
+  you put your shields up, you will overload even faster.  Overloading
+  your engines is really bad in battle as you are basically a sitting
+  duck afterwards.
+
+  If you are moving when you are cloaked, you are detectable (only to
+  an approximate location however).
+
+  If you are at warp 0, and you cloak, you cannot be detected at all.
+  This is a good trick to use when you want to ambush an enemy who is
+  approaching (assuming he does not already know you are in the
+  vicinity).
+
+  This is also a good way to escape from robots if you find you are in
+  trouble.  You can cloak and go to warp 0.  Then even robots cannot
+  detect you.  This may give you the time you need to heal a little,
+  and perhaps the robot will wander off somewhere and give you some
+  breathing room.
+
+  Keep in mind that depending on ship type and your kills score,
+  decelerating can take a little time.  So, if you are trying to evade
+  a robot, and he is very close, don't go to warp 0 and cloak.  While
+  you are decelerating you are still detectable enough for the robot
+  to steamroll right over you.  Get a little distance from it first.
+
+# Carrying armies
+
+  You should only cary armies when you are going to take over a
+  planet.  If there are alot of enemy armies on the planet, bomb them
+  down some before bringing armies.
+
+  Carrying armies will increase fuel consumption and heating, so only
+  carry them when you are going to use them fairly quickly.
+
+  It's a real bummer to have to get into a dogfight when you are
+  carrying.  Unless you are good and your opponent is bad, you will
+  probably not survive since you will most likey run out of fuel or
+  overload before he does.
+
+# Detonating enemy torps
+
+  With the (d) command, you can try to detonate enemy torps before
+  they hit you.  This command consumes fuel and heat, and will only
+  work on torps that are relatively close to you.
+
+  It is better to detonate torps before they hit you, to limit damage.
+  If it is possible for you to simply move out of the way of oncoming
+  torps, then doing so is more efficient than detting them.  
+
+  If you can move out of the way rather than det them, the enemy ship
+  will have wasted fuel and heat firing them, and will then also have
+  to det them himself in order to free up torps slots to fire more -
+  while you have expended far less fuel and heat to evade them.
+
+  Getting the enemy to waste fuel and heat faster than you is an
+  important strategy in battle, and can often be the deciding factor
+  in a dogfight.
+
+# Using torpedos
+
+  Torpedos are probably the most used weapon in Conquest.  When fired,
+  they head in the direction they were fired until they hit an ememy
+  ship, or timeout (about 50 seconds).
+
+  The damage they inflict depends on the ship type that fired them,
+  the number of kills the ship has (more is better), as well as the
+  weapons allocation in effect when they were fired.
+
+  For the maximum damage potential, you should set weapons
+  allocation to 70% (A70\r) when firing.  Maybe use a macro. :)
+
+  You can only have 9 torps out at a time.  If you have fired them
+  all, and they missed, you should detonate them (D) so that you can
+  free up slots to fire more.  Hopefully with better aim this time. :)
+
+# Using phasers
+
+  Phasers are a close-in weapon.  If the ship you are firing at is not
+  in RED ALERT range (about 1000) they won't have much (if any)
+  effect, and you will just waste fuel and heat using them.
+
+  They are *very* effective close up though, so don't abandon them in
+  favor of using torps only.  
+
+  You can only fire a phaser about once per second.  When in really
+  close combat, alternate between firing your phasers and torpedoes.
+
+# Kill points
+
+  In short, the more kill points your ship has, the better.
+
+  You get kills by bombing planets, and blowing up enemy ships.
+
+  The number of kills you have will affect your ship in the following
+  ways: 
+
+  - The more kills you have, the more efficient your weapons and
+    engines will be, in terms of fuel consumption and heating.
+
+  - The more kills you have, the more damage your weapons can
+    inflict. 
+
+  - The more kills you have, the faster acceleration and decceleration
+    will be.  You will also be able to turn quicker at higher speeds.
+
+  See also, the '## Ship Strength' section for more information.
+
+  If you are fighting enemy players, you will probably want to
+  concentrate on those with the highest number of kills.  If you let
+  someone get a huge number of kills, it will just get harder to
+  destroy them, unless they make a mistake, or you ambush them.
+
+# Robot scanning range
+
+  Robots have a somewhat limited scanning range.  Basically, if you
+  are within around 6500 of an enemy robot, he can scan you and will
+  come after you if he can.
+
+  If you are bombing planets and there are other enemy robots around,
+  you might want to do frequent info commands on them (ine\r) to make
+  sure you stay outside this rough radius.  Otherwise, they will see
+  you and come after you.
+
+  This is especially good advice if you are not good at fighting
+  robots :)  Avoid them if you can.  
+
+## Planets
 
    You need at least one kill before you will be able to transport
    armies to, or from, a planet.
@@ -384,14 +715,14 @@
    Use them together.  Use them in peace.
 
 
-## SUNS
+## Suns
 
    Suns are hot.  Don't fly through them unless it absolutely,
    positively, has to be there overnight.  Hint: Robots don't seem to
-   worry about suns, sometimes to their detriment.
+   worry about suns.  This can be used against them.
 
 
-## CLOAKING
+## Cloaking
 
    Cloaking can be very useful in battle.  Unfortunately, it's
    expensive in terms of fuel and engine heating.  But at warp 0
@@ -401,17 +732,16 @@
    ships... right Dave?  Robots can't detect cloaked ships at warp 0.
 
 
-## TRACTORS
+## Tractor beams
 
    One use I've seen for them so far is to drag a helpless ship into
-   the sun, so it's death can be as humiliating as possible.
-   There *are* a few other interesting
-   uses for them as well ;-)
+   the sun, so it's death can be as humiliating as possible.  There
+   *are* a few other interesting uses for them as well ;-)
 
    If the server has the SlingShot flag enabled, even better ;-)
 
 
-## STRENGTH
+## Ship Strength
 
    Different teams have different strengths.  Romulans have the best
    weapons, but the worst engines.  Orions have the best engines and
@@ -435,7 +765,7 @@
    foes, unless you run and cloak alot.
 
 
-## REFITTING
+## Refiting
 
    If the server you are connecting to has enabled the Refit flag, you
    will be able to refit your ship to a new ship type.
@@ -469,7 +799,7 @@
    The ability to refit is controlled by the server operator with the
    'Refit' option in the conqoper options menu.
 
-## LEAVING THE GAME
+## Leaving the game
 
    To exit Conquest, normally you must self-destruct, or be killed.
 
@@ -477,7 +807,7 @@
    signal (usually the Control-\ key).
 
    If the server operator has enabled the 'Vacant' flag in the
-   conqoper Options menu, then your ship will be left intact, on the
+   conqoper Options menu, then your ship will be left intact on the
    server, so you can reconnect to it in the future.
 
    If you exit this way, I'd be careful where you leave your ship.
@@ -487,7 +817,7 @@
    the server.
 
 
-## TEAMS
+## Teams
 
    When you first enter Conquest, it will randomly select a team for
    you, before bringing you to the main menu.  At this point, you can
@@ -501,7 +831,7 @@
    Refit if the server allows it...
 
 
-## COMBAT
+## Combat
 
    Taking on a robot is quite a bit different from taking on a human
    player.  With a robot, in time you learn it's strategy, and
@@ -527,8 +857,11 @@
    Cloaking can be used to excellent effect on an unsuspecting
    opponent.  I leave it up to you to explore the possibilities.
 
+   Getting your opponent to waste fuel and heat is also a good idea if
+   you can arrange it.
 
-## MACRO KEYS
+
+## Macro Keys
 
    The reason I added macros to Conquest, was that at the time I was
    starting to play, I used PC emulators like MS-KERMIT to play from
@@ -558,9 +891,7 @@
        Which makes my F1 key detonate enemy torps (d), and fire a
        spread of 3 torps in the last direction I fired (P\r).  
 
-
    Here is a 'starburst' macro:
-
    
        macro_f2=A70\rpe\rpd\rpc\rpx\rpz\rpa\rpq\rpw\rA30\r
 
@@ -569,7 +900,7 @@
        8 primary compass points (pe\r...), then resets to maximum
        engine efficiency (A30\r).  Aside from putting on a pretty
        display, this can also be used to attempt to locate nearby
-       cloaked ships. :)
+       cloaked ships by watching for 'unexplaned' detonations. :)
 
    There are many other interesting and useful combinations that I
    won't detail... After all, choosing the right macros and using them
@@ -577,20 +908,22 @@
    opponents.
 
 
-## NAVIGATION
+## Navigation
 
    Using the direction keys ('qweadzxc') to the (k)ourse or weapons
    commands can be faster than specifying the direction in degrees.
+
    If a ship is approaching from 90 degrees, it's easier (and faster)
    to type 'Pw\r' than 'P90\r' to fire the torps in the proper
    direction.  You're also less likely to screw up in the heat of
    battle.  See conquest.doc for a description of the direction keys,
    and how they work.
 
-   You can set course and lock onto a planet by typing the planet name
-   (or first 3 unique characters) followed by [TAB] as input to the
-   (k)ourse command.  You will automatically enter orbit when you get
-   close enough to your destination.
+   You can set course, lock onto, and automatically enter orbit around
+   a planet by typing the planet name (or first 3 unique characters)
+   followed by [TAB] as input to the (k)ourse command.  You will
+   automatically enter orbit when you get close enough to your
+   destination.
 
    In addition, the (i)nfo command understands several special strings
    like 'ne' for info on nearest enemy.  Obviously you can't fire
@@ -608,9 +941,9 @@
         123     zxc
 
 
-## THE ROBOTS
+## The Robots
 
-# CONQSTRAT
+# Conqstrat
 
   The AI code used by the robot ships is the original strategy table
   that was generated by the conqstrat.r program with the exception of
@@ -643,7 +976,7 @@
       make all
       make install
 
-# COMBAT
+# Combat
 
   To new users, the robots may seem tough.  Gleefully harsh, even.
   But they are kinda stupid, and can be taken once you learn their
@@ -656,7 +989,7 @@
   was much more fun to figure it out via trial and error (death).
 
 
-# CREATING ROBOTS
+# Creating Robots
 
   Robots are created one of two ways:
 
@@ -668,7 +1001,7 @@
       (r)obot menu option.
 
 
-## DOOMSDAY MACHINE
+## The Doomsday Machine
 
    The Doomsday machine (if activated) *can* be killed.  It probably
    requires that you've seen the (old) Star Trek episode called 'The
@@ -676,14 +1009,14 @@
 
    It can also be rather annoying after a time or two though.  If you
    get tired of it, you can set the 'NoDoomsday' flag in the conqoper
-   Options menu true, which will prevent it from randomly starting up
-   and wasting the universe.  I'd recommend this for public access
+   Options menu to true, which will prevent it from randomly starting
+   up and wasting the universe.  I'd recommend this for public access
    servers.
 
 
-## CONQOPER 
+## Using conqoper 
 
-# SEMAPHORE STATUS LINE
+# The semaphore status line
 
   The semaphore status line (line 2) in conqoper can give you useful
   information on the locks used by Conquest to prevent simultaneous
@@ -712,7 +1045,7 @@
         I. time and date of last semop.
 
 
-# LEAVING A SCREEN IN CONQOPER
+# Leaving a screen on conqoper
 
   When watching another ship in conqoper or editing a player or
   planet, use 'q' to quit.
@@ -721,7 +1054,7 @@
   know... some consistency is needed.
 
 
-## THE INSTALLED FILES
+## The installed files
 
    Here are the files installed by Conquest, and a brief synopsis of
    what each does.  All paths are relative to the installation
@@ -735,21 +1068,21 @@
 # bin/conquestd
 
   This is the conquest server. Type 'conquestd -?' to see a list of
-  options.  You only need to run conquestd when you wish to run a
-  Conquest server.  See SERVER.TXT for information on the server and
-  how to set one up.  
+  options.  See SERVER.TXT for information on the server and how to
+  set one up.  If all you want to do is use the conquest client to
+  fight on remote servers, you do not need to run your own server.
 
   In addition, if run with the '-m' flag, conquestd will notify the
   metaserver at conquest.radscan.com of your game, so that others that
   query the metaserver will see your server and might jump in.
 
-  If your conquestd server is not accessable from the internet, don't
-  register it with the metaserver.  ;-)
+  Oh, and if your conquestd server is not accessable from the
+  internet, please don't register it with the metaserver.  ;-)
 
 # bin/conqmetad
 
   The Conquest metaserver.  You should never need to run this unless
-  you have a group of conquest server on your private network that you
+  you have a group of conquest servers on your private network that you
   do not want to advertise to the world.  The definitive metaserver for
   public internet conquest games is running at conquest.radscan.com.
 
@@ -932,32 +1265,30 @@
 
   Shared library used by Conquest server.
 
-
 # ~/.conquestrc
 
   User options and macro definitions.  Can be edited directly or using
   the (O)ptions Menu from within conquest.
 
 
-### MORE INFO
+### Getting more information
 
     More information, a command list/description and some specifics of
     the game can be found in conquest.doc.
 
     See SERVER.TXT for information on running a server.
 
-    See conqnews.doc for the latest information on Conquest.
+    See conqnews.doc for the latest change/modification history
+    information for Conquest.
 
-    See TODO for a list of things being planned or thought about.
+### Obtaining Conquest
 
-### OBTAINING CONQUEST
-
-    The latest version of Conquest will always be available from:
+    The latest stable and development versions of Conquest will always
+    be available from:
 
     http://radscan.com/conquest.html
 
-
-### COPYRIGHT INFO
+### Copyright Information
 
                  C O N Q U E S T   (VAX/VMS Ratfor)
 
@@ -970,7 +1301,6 @@
      Leres make no representations about the suitability of this
      software for any purpose. It is provided "as is" without express
      or implied warranty.
-
 
      Unix/C specific porting and supporting code Copyright
      (C)1994-2004 by Jon Trulson <jon@radscan.com> under the same

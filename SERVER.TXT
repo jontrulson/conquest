@@ -7,8 +7,8 @@
          |  CCC    OOO   N   N   QQ Q   UUU   EEEEE  SSSS     T   |
          +--------------------------------------------------------+
 
-   So.  You want to run a Conquest Server over the internet, eh?  Then
-   this is the file to read.  
+   So.  You want to run a Conquest Server, eh?  Then this is the file
+   to read.
 
    It gives you an overview of how to setup and manage one, as well as
    other things to keep in mind.  
@@ -40,7 +40,8 @@ CONTENTS:
 
     To run a server, you must run the conquestd program.
 
-    Clients then connect to your server and the game is played.
+    Clients (even ones on your local machine) then connect to your
+    server and the game is played.
 
 ### Setting up a server
 
@@ -117,8 +118,8 @@ CONTENTS:
 
    Every 2 minutes or so, it will update the meta server with various
    particulars of your server (like how many players are currently
-   connected, what flags you support, what your server name and MOTD
-   are, etc).
+   connected, what flags you support, what your server name, version,
+   and MOTD are, etc).
 
    This way, other people can find out about your server and connect
    to it to play.
@@ -129,7 +130,7 @@ CONTENTS:
       http://radscan.com/cgi-bin/conqmeta.pl
 
    If you want to be primitive, you can see the current list of
-   servers in raw format by:
+   servers in raw format by simply:
 
       telnet conquest.radscan.com 1700
 
@@ -151,13 +152,13 @@ CONTENTS:
    To run a telnet'able server, you need to create an account on your
    machine that people will log into when they telnet to your machine.
 
-   I use 'conquest' with a password of conquest.
+   I recommend user 'conquest' with a password of 'conquest'.
 
    In a nutshell:
 
    1. Compile and install Conquest as per the BUILDING section in the
-      INSTALL file.  Make sure it runs normally by typing 'conquest'
-      and goofing off for a little while.
+      INSTALL file.  Make sure it runs normally by starting a server,
+      and typing 'conquest' and goofing off for a little while.
 
    2. Create the 'conquest' account on your system using whatever
       means are appropriate for your system.  On UnixWare and newer
@@ -180,7 +181,7 @@ CONTENTS:
       It's a very simple program.
 
       By default, conquestsh will exec '/full/path/to/conquest -t -s
-      localhost'.
+      localhost' when run.
 
    4. set the password for the 'conquest' account.  I recommend that
       you either:
@@ -208,6 +209,10 @@ CONTENTS:
    from the conquest Options menu, they will not be abe to save them.
    Sorry.
 
+   If you want others to know about your telnet'able server, let me
+   know the particulars and I'll stick it in the 'Conquest Servers'
+   section of the Conquest webpage, since the meta server has no way
+   of knowing whether your server is reachable via a telnet interface.
 
 ## Expiring users
 
@@ -258,6 +263,7 @@ CONTENTS:
       of the game, and tells the metaserver that the address
       'conquest.radscan.com' is the address of your server, as seen from
       the internet.
+
 
 $Id$
 	

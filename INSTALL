@@ -9,6 +9,7 @@
 
 CONTENTS:
 
+        ### QUICKSTART GUIDE
 	### DISTRIBUTION
 	### BUILDING
 	### OTHER USEFUL INFORMATION
@@ -17,6 +18,53 @@ CONTENTS:
             ## UNIXWARE NOTE
             ## SOLARIS/DU NOTE
 	    ## CONQUEST GROUP
+
+### QUICKSTART GUIDE
+
+    So you are impatient and want to build and play.  Here's a short
+    list to get you going.  Read the later sections for more details.
+
+    - unpack and build the sources
+
+      # groupadd conquest
+      $ tar xzvf conquest-x.y.src.tar.gz
+      $ cd conquest-x.y
+      $ ./configure
+      $ make
+      $ make install
+
+    - to play on your own local server
+
+      - Init everything
+
+        $ conqoper -C
+        $ conqoper -Ie -E
+
+        $ conqoper
+
+          - this runs conqoper in interactive mode.  Go into the
+            Options menu and set any flags you want enabled for your
+            server.
+
+      - startup a server    
+
+        $ conquestd -d
+
+      - play
+
+        $ conquest
+
+    - to play on a remote server
+
+      - using the meta server to list available servers, and allow you
+        to select one to play on:
+
+        $ conquest -m
+
+      - to go directly to a specific server (conquest.radscan.com in
+        this case):
+
+        $ conquest -s conquest.radscan.com
 
 
 ### DISTRIBUTION
@@ -116,6 +164,7 @@ CONTENTS:
 
     Read the conquest.doc and the conqnews.doc files to get info on
     what conquest is and how to play it.
+
 
 ### OTHER USEFUL INFORMATION
 

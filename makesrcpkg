@@ -35,12 +35,12 @@ FILELIST="ratfor.c cd2lb.c iolb.c conqlb.c
         conqrule Makefile.am aclocal.m4 depcomp install-sh ltmain.sh
         mkinstalldirs missing conqai_main.c
         record.h record.c conqreplay.c 
-	COPYRIGHT LICENSE INSTALL TODO SERVER.TXT CREDITS
+	COPYRIGHT LICENSE INSTALL SERVER.TXT CREDITS
         conquest.h display.c display.h client.h client.c clientlb.h 
         clientlb.c server.h server.c packet.h packet.c protocol.h
         conqnet.h datatypes.h userauth.h servauth.h clntauth.h 
         clntauth.c servauth.c conquestd.c serverpkt.c serverpkt.h 
-        servercmd.h servercmd.c conquestsh.c README-DEV-RELEASE.txt
+        servercmd.h servercmd.c conquestsh.c
         conqmetad.c meta.c meta.h"
 
 #IMAGES="img/*.bmp"

@@ -49,7 +49,7 @@ CCDEPMODE = @CCDEPMODE@
 
 
 # User defineable options
-CFLAGS = -Wall -g3 -D__NO_MATH_INLINES -fPIC -fno-builtin
+CFLAGS = -Wall -D__NO_MATH_INLINES -fPIC -fno-builtin
 CONQGROUP = @CONQGROUP@
 CPP = @CPP@
 CPPFLAGS = @CPPFLAGS@
@@ -322,7 +322,7 @@ DIST_SOURCES = $(libconqclnt_la_SOURCES) $(libconqserv_la_SOURCES) \
 	$(conquestsh_SOURCES)
 DATA = $(data_DATA)
 
-DIST_COMMON = README INSTALL Makefile.am Makefile.in TODO aclocal.m4 \
+DIST_COMMON = README INSTALL Makefile.am Makefile.in aclocal.m4 \
 	config.guess config.h.in config.sub configure configure.ac \
 	conqstrat-lex.c conqstrat-yacc.c conqstrat-yacc.h depcomp \
 	install-sh ltmain.sh missing mkinstalldirs
