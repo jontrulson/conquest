@@ -61,6 +61,10 @@
 # include <sys/times.h>
 #endif
 
+#if defined(HAVE_TERMIOS_H)
+# include <termios.h>
+#endif
+
 #include <math.h>
 
 #if defined(HAVE_FCNTL_H)

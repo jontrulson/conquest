@@ -50,7 +50,9 @@ typedef struct {
   int display;			/* should do anything in astservice() */
   int redraw;			/* should redraw in display() */
   int msgok;			/* allow new messages */
+  int entship;			/* entered a ship? */
   char lastinfostr[MSGMAXLINE]; /* last string used in doinfo() */
+  char intrchar;		/* users interrupt char */
 } CqContext_t;
 
 C2EXTERN CqContext_t CqContext;

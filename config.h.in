@@ -3,6 +3,33 @@
 /* Define to empty if the keyword does not work.  */
 #undef const
 
+/* Define if you don't have vprintf but do have _doprnt.  */
+#undef HAVE_DOPRNT
+
+/* Define if you have a working `mmap' system call.  */
+#undef HAVE_MMAP
+
+/* Define if you have the vprintf function.  */
+#undef HAVE_VPRINTF
+
+/* Define as the return type of signal handlers (int or void).  */
+#undef RETSIGTYPE
+
+/* Define to `unsigned' if <sys/types.h> doesn't define.  */
+#undef size_t
+
+/* Define if you have the ANSI C header files.  */
+#undef STDC_HEADERS
+
+/* Define if you can safely include both <sys/time.h> and <time.h>.  */
+#undef TIME_WITH_SYS_TIME
+
+/* Define if your <sys/time.h> declares struct tm.  */
+#undef TM_IN_SYS_TIME
+
+/* Define to empty if the keyword does not work.  */
+#undef const
+
 /* Define if this is FreeBSD */
 #undef FREEBSD
 
@@ -69,9 +96,6 @@
 /* Define if you have the strstr function.  */
 #undef HAVE_STRSTR
 
-/* Define if you have the valloc function.  */
-#undef HAVE_VALLOC
-
 /* Define if you have the <curses.h> header file.  */
 #undef HAVE_CURSES_H
 
@@ -113,6 +137,9 @@
 
 /* Define if you have the <termio.h> header file.  */
 #undef HAVE_TERMIO_H
+
+/* Define if you have the <termios.h> header file.  */
+#undef HAVE_TERMIOS_H
 
 /* Define if you have the <time.h> header file.  */
 #undef HAVE_TIME_H

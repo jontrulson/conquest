@@ -207,8 +207,17 @@ int cdcols ( void )
 /*    This must be the last routine called from cdlb. */
 void cdend(void)
 {
-  
+#if defined(HAVE_TERMIOS_H)
+  struct termios term;
+#endif
+
   endwin();
+
+#if defined (HAVE_TERMIOS_H)
+  tcgetattr(PollInputfd, &term);
+  term.c_cc[VINTR] = CqContext.intrchar; /* restore INTR */
+  tcsetattr(PollInputfd, TCSANOW, &term);
+#endif
   
   return;
 }
@@ -586,6 +595,10 @@ void cdbeep(void)
 /*    This routine must be called before all others in cdlb. */
 void cdinit(void)
 {
+#if defined(HAVE_TERMIOS_H)
+  struct termios term;
+#endif
+
   /* Initialize screen library (this MUST be done first). */
   
   iBufInit();
@@ -633,8 +646,21 @@ void cdinit(void)
       RMsg_Line = MSG_LIN1;
     }
 
-#if 0
-  clog("cdinit(): RMsg_Line = %d", RMsg_Line);
+				/* get the users INTR char if possible
+				   so it can be stuffed into the KB
+				   buffer if a INTR is recieved.  Useful
+				   for unixware systems where DEL is the
+				   default INTR char.  This should allow
+				   DEL to be used for deleting text
+				   for example */
+
+  CqContext.intrchar = 0;	/* default - nothing */
+
+#if defined (HAVE_TERMIOS_H)
+  tcgetattr(PollInputfd, &term);
+  CqContext.intrchar = term.c_cc[VINTR]; /* save it */
+  term.c_cc[VINTR] = 0x03;	/* ^C - harmless */
+  tcsetattr(PollInputfd, TCSANOW, &term);
 #endif
 
   cdclear();

@@ -1728,6 +1728,7 @@ void resign( int unum, int isoper )
   int i, haderror = FALSE;
   char *home = NULL;
   char filenm[MID_BUFFER_SIZE];
+  char usrname[SIZEUSERNAME], usralias[SIZEUSERPNAME];
   static struct passwd *pwp = NULL;
 
   if (isoper == TRUE)
@@ -1742,6 +1743,10 @@ void resign( int unum, int isoper )
 	    }
 	}
     }
+
+				/* make copies */
+  strncpy(usrname, Users[unum].username, SIZEUSERNAME - 1);
+  strncpy(usralias, Users[unum].alias, SIZEUSERPNAME - 1);
 
   PVLOCK(&ConqInfo->lockword);
   if ( unum >= 0 && unum < MAXUSERS )
@@ -1778,6 +1783,10 @@ void resign( int unum, int isoper )
     }
 
   PVUNLOCK(&ConqInfo->lockword);
+
+  if (isoper != TRUE)
+    clog("INFO: %s (%s) has resigned",
+	 usrname, usralias);
 	      
   return;
 }
@@ -1887,12 +1896,44 @@ void takeplanet( int pnum, int snum )
 {
   int i;
   char buf[MSGMAXLINE];
+  int oteam, didgeno;
   
+  oteam = Planets[pnum].team;
   Planets[pnum].team = Ships[snum].team;
   Planets[pnum].armies = 1;
   Ships[snum].kills = Ships[snum].kills + PLANET_KILLS;
   Users[Ships[snum].unum].stats[USTAT_CONQPLANETS] += 1;
   Teams[Ships[snum].team].stats[TSTAT_CONQPLANETS] += 1;
+
+
+				/* Check here for genocides */
+
+  if ( oteam != TEAM_SELFRULED && oteam != TEAM_NOTEAM )
+    {
+      /* Check whether that was the last planet owned by the vanquished. */
+
+      didgeno = 1;
+
+      for ( i = 1; i <= NUMPLANETS; i = i + 1 )
+        if ( Planets[i].team == oteam )
+	  {
+	    didgeno = 0;
+	    break;
+	  }
+      /* Yes. */
+      if ( didgeno && (snum > 0 && snum <= MAXSHIPS) )
+        {
+          Users[Ships[snum].unum].stats[USTAT_GENOCIDE] += 1;
+          Teams[Ships[snum].team].stats[TSTAT_GENOCIDE] += 1;
+	  clog("INFO: %s (%s) genocided the %s team!",
+	       Users[Ships[snum].unum].username,
+	       Ships[snum].alias,
+	       Teams[Ships[snum].team].name);
+        }
+
+    }
+
+
   sprintf( buf, "All hail the liberating %s armies.  Thanks, ",
 	 Teams[Ships[snum].team].name );
   appship( snum, buf );
@@ -1914,6 +1955,11 @@ void takeplanet( int pnum, int snum )
   Users[Ships[snum].unum].stats[USTAT_CONQUERS] += 1;
   Teams[Ships[snum].team].stats[TSTAT_CONQUERS] += 1;
   stcpn( Teams[Ships[snum].team].name, ConqInfo->conqteam, MAXTEAMNAME );
+
+  clog("INFO: %s (%s) has Conquered the Universe!",
+       Users[Ships[snum].unum].username, 
+       Ships[snum].alias);
+  
   ikill( snum, KB_CONQUER );
   for ( i = 1; i <= MAXSHIPS; i = i + 1 )
     if ( Ships[i].status == SS_LIVE )
@@ -2656,6 +2702,10 @@ void zeroplanet( int pnum, int snum )
 	{
 	  Users[Ships[snum].unum].stats[USTAT_GENOCIDE] += 1;
 	  Teams[Ships[snum].team].stats[TSTAT_GENOCIDE] += 1;
+          clog("INFO: %s (%s) genocided the %s team!",
+               Users[Ships[snum].unum].username,
+               Ships[snum].alias,
+               Teams[Ships[snum].team].name);
 	}
     }
   

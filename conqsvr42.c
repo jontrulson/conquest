@@ -163,8 +163,9 @@ void DoConquestSig(int sig)
       
       exit(0);
       break;
-    case SIGTERM:
+
     case SIGINT:
+    case SIGTERM:
     case SIGHUP:
       cdend();
       exit(0);
@@ -345,6 +346,15 @@ void comsize( unsigned long *size )
 /*    conqend */
 void conqend(void)
 {
+
+  char msgbuf[128];
+
+  if (CqContext.entship == TRUE)
+    {				/* let everyone know we're leaving */
+      sprintf(msgbuf, "%s has left the game.",
+	      Users[CqContext.unum].alias);
+      stormsg(MSG_COMP, MSG_ALL, msgbuf);
+    }
   
   return;
   
@@ -394,6 +404,7 @@ void conqinit(void)
   
   /* Haven't scanned anything yet. */
   CqContext.lastinfostr[0] = EOS;
+
   
   return;
   

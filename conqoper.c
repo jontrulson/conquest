@@ -41,11 +41,12 @@ static char cbuf[MID_BUFFER_SIZE]; /* general purpose buffer */
 #define OP_DISABLEGAME (unsigned int)(0x00000004)
 #define OP_ENABLEGAME (unsigned int)(0x00000008)
 
+static char operName[MAXUSERNAME];
+
 /*  conqoper - main program */
 main(int argc, char *argv[])
 {
   int i;
-  char name[MAXUSERNAME];
   char msgbuf[128];
   unsigned int OptionAction;
 
@@ -56,7 +57,7 @@ main(int argc, char *argv[])
 
   OptionAction = OP_NONE;
 
-  glname( name, MAXUSERNAME );
+  glname( operName, MAXUSERNAME );
 
   if ( ! isagod(-1) )
     {
@@ -173,7 +174,7 @@ main(int argc, char *argv[])
 	  fprintf(stdout, "Game enabled.\n");
 	}
 
-				/* turn the game on */
+				/* turn the game off */
       if ((OptionAction & OP_DISABLEGAME) != 0)
 	{
 	  ConqInfo->closed = TRUE;
@@ -246,17 +247,15 @@ main(int argc, char *argv[])
   
   CqContext.unum = MSG_GOD;	/* stow user number */
   CqContext.snum = ERR;		/* don't display in cdgetp - JET */
+  CqContext.entship = FALSE;	/* never entered a ship */
   CqContext.histslot = ERR;	/* useless as an op */
   CqContext.display = TRUE;
   CqContext.maxlin = cdlins();	/* number of lines */
   
   CqContext.maxcol = cdcols();	/* number of columns */
 
-				/* send a message telling people
-				   that a user has entered conqoper */
-  sprintf(msgbuf, "User %s has entered conqoper.",
-          name);
-  /*stormsg(MSG_COMP, MSG_ALL, msgbuf);*/
+  sprintf(msgbuf, "OPER: User %s has entered conqoper.",
+          operName);
   clog(msgbuf);			/* log it too... */
 
   operate();
@@ -292,6 +291,9 @@ void bigbang(void)
   "#%d#bigbang: Fired #%d#%d #%d#torpedos, hoo hah won't they be surprised!", 
 	InfoColor,SpecialColor,cnt,InfoColor );
   
+  clog("OPER: %s fired BigBang - %d tropedos",
+       operName, cnt);
+
   return;
   
 }
@@ -866,6 +868,7 @@ void kiss(int snum, int prompt_flg)
 	  Driver->drivstat = DRS_KAMIKAZE;
       cdclrl( MSG_LIN1, 2 );
       cdmove( 1, 1 );
+      clog("OPER: %s killed the driver", operName);
       return;
     }
   
@@ -896,6 +899,8 @@ void kiss(int snum, int prompt_flg)
 	  {
 	    killship( snum, KB_GOD );
 	    cdclrl( MSG_LIN2, 1 );
+	    clog("OPER: %s killed ship %d",
+		 operName, snum);
 	  }
 	cdclrl( MSG_LIN1, 1 );
       }
@@ -918,7 +923,11 @@ void kiss(int snum, int prompt_flg)
 		    Ships[snum].alias);
 	    cdputs( buf, MSG_LIN1, 1 );
 	    if ( confirm() )
-	      killship( snum, KB_GOD );
+	      {
+		clog("OPER: %s killed ship %d",
+		     operName, snum);
+		killship( snum, KB_GOD );
+	      }
 	  }
       if ( didany )
 	cdclrl( MSG_LIN1, 2 );
@@ -951,7 +960,12 @@ void kiss(int snum, int prompt_flg)
 		  buf);
 	  cdputs( mbuf, MSG_LIN1, 1 );
 	  if ( confirm() )
+		  {
 	    killship( snum, KB_GOD );
+	    cdclrl( MSG_LIN2, 1 );
+	    clog("OPER: %s killed ship %d",
+		 operName, snum);
+	  }
 	}
   if ( ! didany ) {
 	cdclrl( MSG_LIN1, 1 );
@@ -1250,9 +1264,17 @@ void operate(void)
 	  break;
 	case 'd':
 	  if ( Doomsday->status == DS_LIVE )
-	    Doomsday->status = DS_OFF;
+	    {
+	      Doomsday->status = DS_OFF;
+	      clog("OPER: %s deactivated the Doomsday machine",
+		   operName);
+	    }
 	  else
-	    doomsday();
+	    {
+	      doomsday();
+	      clog("OPER: %s has ACTIVATED the Doomsday machine",
+		   operName);
+	    }
 	  break;
 	case 'e':
 	  opuedit();
@@ -1268,9 +1290,16 @@ void operate(void)
 	      Driver->drivstat = DRS_OFF;
 	      Driver->drivpid = 0;
 	      Driver->drivowner[0] = EOS;
+	      
+	      clog("OPER: %s has enabled the game",
+		   operName);
 	    }
 	  else if ( confirm() )
-	    ConqInfo->closed = TRUE;
+	    {
+	      ConqInfo->closed = TRUE;
+	      clog("OPER: %s has disabled the game",
+                   operName);
+	    }
 	  break;
 	case 'h':
 	  if ( Driver->drivstat == DRS_HOLDING )
@@ -2049,7 +2078,14 @@ void opresign(void)
       c_sleep( 1.0 );
     }
   else if ( confirm() )
-    resign( unum, TRUE );
+    {
+      clog("OPER: %s has resigned %s (%s)",
+	   operName,
+	   Users[unum].username,
+	   Users[unum].alias);
+
+      resign( unum, TRUE );
+    }
   cdclrl( MSG_LIN1, 2 );
   
   return;
@@ -2143,6 +2179,13 @@ void oprobot(void)
     }
   
   /* Report the good news. */
+  clog("OPER: %s created %d %s%s (%s) robot(s)",
+       operName,
+       anum, 
+       (warlike == TRUE) ? "WARLIKE " : "",
+       Users[unum].alias, 
+       Users[unum].username);
+
   sprintf( buf, "Automation %s (%s) is now flying ",
 	 Users[unum].alias, Users[unum].username );
   if ( anum == 1 )
@@ -2422,6 +2465,10 @@ void opuadd(void)
 	Users[unum].type = UT_REMOTE;
       else
 	Users[unum].type = UT_LOCAL;
+
+      clog("OPER: %s added user '%s'.",
+	   operName, name);
+
     }
   cdclrl( MSG_LIN1, 2 );
   
@@ -2473,7 +2520,7 @@ void opuedit(void)
     }
   cdclear();
   cdclrl( MSG_LIN1, 2 );
-  
+
   while (TRUE) /* repeat */
     {
       /* Do the right side first. */
@@ -3560,6 +3607,7 @@ int DoInit(char InitChar, int cmdline)
       break;
     }
       
-
+  clog("OPER: %s initialized '%c'",
+       operName, InitChar);
 
 }

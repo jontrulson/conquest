@@ -39,13 +39,13 @@ int Logon(char *username, char *password)
     {				/* if local, just get uname */
       glname(username, SIZEUSERNAME);
       password[0] = EOS;	/* locals don't have passwords */
-      clog("Logon(): Local user '%s' logged in", username);
+      clog("INFO: Local user '%s' logged in", username);
       return(UT_LOCAL);
     }
 				/* if we're here it means we're remote,
 				   need to get password and username here */
 #if defined DEBUG_SERVER
-  clog("Detected a remote user\n");
+  clog("INFO: Detected a remote user\n");
 #endif
 
   cdclear();
@@ -156,7 +156,7 @@ int Logon(char *username, char *password)
 	      strncpy(epw, (char *)crypt(pw, salt), SIZEUSERNAME - 2);
 	      epw[SIZEUSERNAME - 1] = EOS;
 
-	      clog("Logon(): New remote user '%s' logged in", nm);
+	      clog("INFO: New remote user '%s' logged in", nm);
 
 	      break;
 	    }
@@ -191,13 +191,13 @@ int Logon(char *username, char *password)
 		  cdputs("Invalid Password.", MSG_LIN2, 1);
 		  attrset(NoColor);
 		  cdrefresh();
-		  clog("Logon(): Invalid password for user '%s'", nm);
+		  clog("INFO: Invalid password for user '%s'", nm);
 		  sleep(2);
 		  continue;
 	    }
 	  
 				/* good pw - go for the gusto */
-	  clog("Logon(): Remote user '%s' logged in", nm);
+	  clog("INFO: Remote user '%s' logged in", nm);
 	  break;
 	}
     }
@@ -257,7 +257,7 @@ void ChangePassword(int unum, int godlike)
 	  cdputs("Invalid Password.", MSG_LIN2, 1);
 	  attrset(RedLevelColor);
 	  cdrefresh();
-	  clog("ChangePassword(): Invalid old password for user '%s'", 
+	  clog("INFO: ChangePassword(): Invalid old password for user '%s'", 
 	       Users[unum].username);
 	  sleep(2);
 	  return;
@@ -338,13 +338,13 @@ void expire_users(void)
   unsigned int expire_secs;
 
 #if defined(DEBUG_SERVER)
-  clog("expire_users(): Expiring users...");
+  clog("INFO: expire_users(): Expiring users...");
 #endif
 
   if (sysconf_UserExpiredays == 0)
     {				/* expiration has been disabled */
 #if defined(DEBUG_SERVER)
-      clog("expire_users(): sysconf_UserExpiredays == 0, expiration disabled");
+      clog("INFO: expire_users(): sysconf_UserExpiredays == 0, expiration disabled");
 #endif
 
       return;
@@ -365,7 +365,7 @@ void expire_users(void)
 	{			/* screen out negative expirations -
 				   only happens when system clock goes
 				   way back */
-	  clog("expire_users(): difftime (%d) is less than 0, skipping user %s\n",
+	  clog("INFO: expire_users(): difftime (%d) is less than 0, skipping user %s\n",
 	       difftime, Users[i].username);
 	  continue;
 	}
@@ -403,7 +403,7 @@ void expire_users(void)
 
 	  if (hasship)
 	    {			/* we can't waste him */
-	      clog("expire_users(): Couldn't expire remote user '%s' due to active ship(s)",
+	      clog("INFO: expire_users(): Couldn't expire remote user '%s' due to active ship(s)",
 		   Users[i].username);
 	    }
 	  else
@@ -417,7 +417,7 @@ void expire_users(void)
 #endif
 
 	      resign(i, TRUE);
-	      clog("expire_users(): Expired remote user '%s' after %d days of inactivity",
+	      clog("INFO: expire_users(): Expired remote user '%s' after %d days of inactivity",
 		   Users[i].username,
 		   difftime / SECS_PER_DAY);
 				/* re-aquire the lock */

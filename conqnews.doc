@@ -9,6 +9,24 @@
 
                               Conquest News
 
+Version 7.1.1 Wed Dec 26 15:04:50 MST 2001 Jon Trulson  <jon@radscan.com>
+
+	- corrected problem where genos weren't always counted.
+
+	- sends a message when a user leaves the game
+
+	- fixed bug that allowed a refit while carrying armies
+
+	- 'E' distress call provides more info.  Can be used as a
+	  quick status report to team mates.
+
+	- many things now logged, like resignations, most conqoper
+	  actions, and other things...
+
+	- corrected problem where DEL wouldn't work properly
+          on some systems for deleting text.
+
+
 Version 7.1 Mon Jan  1 11:45:20 MST 2001 Jon Trulson  <jon@radscan.com>
 
 	- added a ship refit capability.  It's sys-wide configurable

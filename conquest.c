@@ -38,6 +38,8 @@ static char cbuf[MID_BUFFER_SIZE]; /* general purpose buffer */
 main(int argc, char *argv[]) 
 {
   
+  CqContext.entship = FALSE;
+
   if ((ConquestUID = GetConquestUID()) == ERR)
     {
       fprintf(stderr, "conquest: GetConquestUID() failed\n");
@@ -136,7 +138,7 @@ main(int argc, char *argv[])
   
   drpexit();			/* make the driver go away */
   cdend();			/* clean up display environment */
-  conqend();			/* machine dependent clean-up */
+  conqend();	/* machine dependent clean-up */
   
 #ifdef DEBUG_FLOW
   clog("%s@%d: main() *EXITING*", __FILE__, __LINE__);
@@ -1683,6 +1685,7 @@ void dorefit( int snum, int dodisplay )
   string ntp="We must be orbiting a team owned planet to refit.";
   string nek="You must have at least one kill to refit.";
   string conf="Press TAB to change, ENTER to accept: ";
+  string cararm="You cannot refit while carrying armies";
   
   cdclrl( MSG_LIN2, 1 );
   
@@ -1698,6 +1701,12 @@ void dorefit( int snum, int dodisplay )
   if (Planets[pnum].team != Ships[snum].team || Ships[snum].warp >= 0.0)
     {
       c_putmsg( ntp, MSG_LIN1 );
+      return;
+    }
+
+  if (Ships[snum].armies != 0)
+    {
+      c_putmsg( cararm, MSG_LIN1 );
       return;
     }
 
@@ -2085,6 +2094,9 @@ void dodistress( int snum )
 {
   int i;
   string pmt="Press TAB to send an emergency distress call: ";
+  char buf[128];
+  real x;
+  int isorb = FALSE;
   
   cdclrl( MSG_LIN1, 2 );
 
@@ -2093,10 +2105,11 @@ void dodistress( int snum )
 	       TRUE) == TERM_EXTRA )
     {
       sprintf( cbuf,
-	     "sh=%d, dam=%d, fuel=%d, temp=",
-	     round(Ships[snum].shields),
-	     round(Ships[snum].damage),
-	     round(Ships[snum].fuel) );
+	       "sh=%d%c, dam=%d, fuel=%d, temp=",
+	       round(Ships[snum].shields),
+	       (Ships[snum].shup) ? 'U' : 'D',
+	       round(Ships[snum].damage),
+	       round(Ships[snum].fuel) );
       i = round(Ships[snum].wtemp);
       if ( i < 100 )
 	appint( i, cbuf );
@@ -2111,14 +2124,46 @@ void dodistress( int snum )
       i = Ships[snum].armies;
       if ( i > 0 )
 	{
-	  appstr( ", armies=", cbuf );
+	  appstr( ", arm=", cbuf );
 	  appint( i, cbuf );
 	}
       if ( Ships[snum].wfuse > 0 )
-	appstr( ", -weapons", cbuf );
+	appstr( ", -weap", cbuf );
       if ( Ships[snum].efuse > 0 )
-	appstr( ", -engines", cbuf );
+	appstr( ", -eng", cbuf );
+
+				/* warp */
+      x = Ships[snum].warp;
+      if ( x >= 0.0 )
+	{
+	  sprintf( buf, ", warp=%.1f", x );
+	  appstr(buf, cbuf);
+	  isorb = FALSE;
+	}
+      else
+	{
+	  sprintf( buf, ", orbiting %.3s", 
+		   Planets[-Ships[snum].lock].name );
+          appstr(buf, cbuf);
+	  isorb = TRUE;
+	}
+				/* heading */
       
+      if (isorb == FALSE)
+	{
+	  i = Ships[snum].lock;
+	  
+	  if ( i >= 0 || Ships[snum].warp < 0.0)
+	    i = round( Ships[snum].head );
+	  
+	  if ( -i > 0 && -i <= NUMPLANETS)
+	    sprintf( buf, ", head=%.3s", Planets[-i].name );
+	  else
+	    sprintf( buf, ", head=%d", i );
+	  
+	  appstr(buf, cbuf);
+	}
+	  
       stormsg( snum, -Ships[snum].team, cbuf );
     }
   
@@ -3843,6 +3888,7 @@ int newship( int unum, int *snum )
   Ships[*snum].status = SS_LIVE;
   
   PVUNLOCK(&ConqInfo->lockword);
+  CqContext.entship = TRUE;
   
   return ( TRUE );
   
