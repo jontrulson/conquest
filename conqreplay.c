@@ -137,7 +137,6 @@ static int initReplay(char *fname, time_t *elapsed)
     {
       int done = FALSE;
 
-      /*  */
       starttm = fhdr.rectime;
 
       curTS = 0;
@@ -172,13 +171,23 @@ void displayReplayData(void)
 {
   char buf[128];
   time_t elapsed = (currTime - startTime);
+  char *c;
 
   /* elapsed time */
   fmtseconds((int)elapsed, buf);
-  cdputs( buf, DISPLAY_LINS + 1, 2 );
+  c = &buf[2];			/* skip day count */
+  cdputs( c, DISPLAY_LINS + 1, 2 );
 
   /* current frame delay */
-  sprintf(buf, "%0.3fs", framedelay);
+#if 1
+  sprintf(buf, "%2.3fs", framedelay);
+#else  /* an attempt at fps. */
+  if (framedelay != 0)
+    sprintf(buf, "%3.2f fps", (1.0 / framedelay));
+  else
+    sprintf(buf, "MAX fps");
+#endif
+
   cdputs( buf, DISPLAY_LINS + 1, 15);
 
   /* paused status */
@@ -208,18 +217,25 @@ void displayMsg(Msg_t *themsg)
       attrib = COLOR_PAIR(COL_CYANBLACK);
     }
 
-  fmtmsg(themsg->msgto, themsg->msgfrom, buf);
-
-  appstr( ": ", buf );
-  appstr( themsg->msgbuf, buf );
-
-  attrset(attrib);
-  c_putmsg( buf, RMsg_Line );
-  attrset(0);
-  /* clear second line if sending to MSG_LIN1 */
-  if (RMsg_Line == MSG_LIN1)
+  if (themsg)
     {
-      cdclrl( MSG_LIN2, 1 );
+      fmtmsg(themsg->msgto, themsg->msgfrom, buf);
+      
+      appstr( ": ", buf );
+      appstr( themsg->msgbuf, buf );
+      
+      attrset(attrib);
+      c_putmsg( buf, RMsg_Line );
+      attrset(0);
+      /* clear second line if sending to MSG_LIN1 */
+      if (RMsg_Line == MSG_LIN1)
+	{
+	  cdclrl( MSG_LIN2, 1 );
+	}
+    }
+  else
+    {				/* just clear the message line */
+      cdclrl( RMsg_Line, 1 );
     }
 
   return;
@@ -284,8 +300,6 @@ int processIter(void)
 /* seek around in a game.  backwards seeks will be slooow... */
 void fileSeek(time_t newtime)
 {
-  /* determine if the newtime is greater or less than the current time */
-
   if (newtime == currTime)
     return;			/* simple case */
 
@@ -414,6 +428,7 @@ static void replay(void)
   string prmt="Command: ";
   int ch;
   int done = FALSE;
+  char *c;
 
   if (FirstTime == TRUE)
     {
@@ -472,10 +487,18 @@ static void replay(void)
       cprintf(lin,col,ALIGN_NONE,sfmt, "Frames per second ", cbuf);
       lin++;
       fmtseconds(totElapsed, cbuf);
-      cprintf(lin,col,ALIGN_NONE,sfmt, "Total Game Time   ", cbuf);
+      if (cbuf[0] = '0')	/* see if we need the day count */
+	c = &cbuf[2];	
+      else
+	c = cbuf;
+      cprintf(lin,col,ALIGN_NONE,sfmt, "Total Game Time   ", c);
       lin++;
       fmtseconds((currTime - startTime), cbuf);
-      cprintf(lin,col,ALIGN_NONE,sfmt, "Current Time      ", cbuf);
+      if (cbuf[0] = '0')
+	c = &cbuf[2];	
+      else
+	c = cbuf;
+      cprintf(lin,col,ALIGN_NONE,sfmt, "Current Time      ", c);
       lin++;
       lin++;
       
@@ -493,7 +516,7 @@ static void replay(void)
       
       cdclrl( MSG_LIN1, 2 );
 
-      if ( ! iogtimed( &ch, 1 ) )
+      if ( ! iogtimed( &ch, 1.0 ) )
 	continue; 
 
       /* got a char */
@@ -540,6 +563,8 @@ void watch(void)
   char buf[MSGMAXLINE];
   int live_ships = TRUE;
   int toggle_flg = FALSE;   /* jon no like the toggle line ... :-) */
+  int upddsp = FALSE;
+
   normal = TRUE;
 
   if (!prompt_ship(buf, &snum, &normal))
@@ -579,18 +604,17 @@ void watch(void)
 				 planets though, so we'll keep this
 				 in for now */
 	  
-	  display( CqContext.snum, headerflag );
-	  displayReplayData();
-	  
-	  if (!iochav())
+	  if (CqContext.recmode == RECMODE_PLAYING || upddsp)
 	    {
-	      c_sleep(framedelay);
-	      continue;
+	      display(CqContext.snum, headerflag);
+	      displayReplayData();
+	      upddsp = FALSE;	/* use this for one-shots */
 	    }
 	  
-	  /* got a char */
-	  ch = iogchar();
+	  if (!iogtimed(&ch, framedelay))
+	  continue;
 	  
+	  /* got a char */
 	  cdclrl( MSG_LIN1, 2 );
 	  switch ( ch )
 	    {
@@ -600,35 +624,45 @@ void watch(void)
 	    case 'h':
 	      dowatchhelp();
 	      CqContext.redraw = TRUE;
+	      upddsp = TRUE;
 	      break;
 	      
 	    case 'f':	/* move forward 30 seconds */
+	      displayMsg(NULL);
 	      fileSeek(currTime + 30);
+	      upddsp = TRUE;
 	      break;
 	      
 	    case 'F':	/* move forward 2 minutes */
+	      displayMsg(NULL);
 	      fileSeek(currTime + (2 * 60));
+	      upddsp = TRUE;
 	      break;
 	      
 	    case 'b':	/* move backward 30 seconds */
+	      displayMsg(NULL);
 	      cdputs( "Rewinding...", MSG_LIN1, 0);
 	      cdrefresh();
 	      fileSeek(currTime - 30);
 	      cdclrl( MSG_LIN1, 1 );
+	      upddsp = TRUE;
 	      break;
 	      
 	    case 'B':	/* move backward 2 minutes */
+	      displayMsg(NULL);
 	      cdputs( "Rewinding...", MSG_LIN1, 0);
 	      cdrefresh();
 	      fileSeek(currTime - (2 * 60));
 	      cdclrl( MSG_LIN1, 1 );
+	      upddsp = TRUE;
 	      break;
 
 	    case 'r':	/* reset to beginning */
-	      cdputs( "Rewinding...", MSG_LIN1, 15);
+	      cdputs( "Rewinding...", MSG_LIN1, 0);
 	      cdrefresh();
 	      fileSeek(startTime);
 	      cdclrl( MSG_LIN1, 1 );
+	      upddsp = TRUE;
 	      break;
 
 	    case ' ':	/* pause/resume playback */
@@ -641,9 +675,18 @@ void watch(void)
 		  CqContext.recmode = RECMODE_PLAYING;
 		}
 
+	      upddsp = TRUE;
 	      break;
 		    
-	    case '+':
+	    case 'n':		/* set framedelay to normal playback
+				   speed.*/
+	      framedelay = (fhdr.samplerate == 1) ? 1.0 : 0.5;
+	      upddsp = TRUE;
+	      break;
+
+	      /* these seem backward, but it's easier to understand
+		 the '+' is faster, and '-' is slower ;-) */
+	    case '-':
 	      /* if it's at 0, we should still
 		 be able to double it. sorta. */
 	      if (framedelay == 0.0) 
@@ -652,16 +695,26 @@ void watch(void)
 	      if (framedelay > 10.0) /* really, 10s is a *long* time
 					between frames... */
 		framedelay = 10.0;
+	      upddsp = TRUE;
 	      break;
 
-	    case '-': 
+	    case '+': 
+	    case '=':
 	      if (framedelay != 0)
-		{		/* can't devide 0 */
+		{		/* can't divide 0 in our universe */
 		  framedelay /= 2;
 		  if (framedelay < 0.0)
 		    framedelay = 0.0;
 		}
+	      upddsp = TRUE;
 	      break;
+
+	    case '\014':	/* ^L */
+	      cdclear();
+	      CqContext.redraw = TRUE;
+	      upddsp = TRUE;
+	      break;
+
 
 	    case 'w': /* look at any ship (live or not) if specifically
 			 asked for */
@@ -676,6 +729,7 @@ void watch(void)
 		    }
 		  CqContext.snum = snum;
 		}
+	      upddsp = TRUE;
 	      break;
 
 	    case '`':                 /* toggle between two ships */
@@ -689,7 +743,7 @@ void watch(void)
 			  
 		      CqContext.snum = snum;
 		      CqContext.redraw = TRUE;
-		      display( CqContext.snum, headerflag );
+		      upddsp = TRUE;
 		    }
 		}
 	      else
@@ -699,10 +753,7 @@ void watch(void)
 	    case '/':                /* ship list - dwp */
 	      playlist( TRUE, FALSE, 0 );
 	      CqContext.redraw = TRUE;
-	      break;
-	    case '\\':               /* big ship list - dwp */
-	      playlist( TRUE, TRUE, 0 );
-	      CqContext.redraw = TRUE;
+	      upddsp = TRUE;
 	      break;
 	    case '!':
 	      if (toggle_flg)
@@ -781,7 +832,8 @@ void watch(void)
 		    }
 		}
 
-	      display( CqContext.snum, headerflag );
+	      upddsp = TRUE;
+
 	      break;
 	    case '<':  /* reverse rotate ship numbers (including doomsday)  - dwp */
 	    case KEY_LEFT:
@@ -854,7 +906,8 @@ void watch(void)
 		      break;
 		    }
 		}
-	      display( CqContext.snum, headerflag );
+	      upddsp = TRUE;
+
 
 	      break;
 	    case TERM_ABORT:
@@ -989,9 +1042,11 @@ void dowatchhelp(void)
   tlin++;
   cprintf(tlin,col,ALIGN_NONE,sfmt, "[SPACE]", "pause/resume playback");
   tlin++;
-  cprintf(tlin,col,ALIGN_NONE,sfmt, "-", "decrease frame delay by half (faster)");
+  cprintf(tlin,col,ALIGN_NONE,sfmt, "-", "slow down playback by doubling the frame delay");
   tlin++;
-  cprintf(tlin,col,ALIGN_NONE,sfmt, "+", "double the frame delay (slower)");
+  cprintf(tlin,col,ALIGN_NONE,sfmt, "+", "speed up playback by halfing the frame delay");
+  tlin++;
+  cprintf(tlin,col,ALIGN_NONE,sfmt, "n", "reset to normal playback speed");
   tlin++;
   cprintf(tlin,col,ALIGN_NONE,sfmt, "`", "toggle between two ships");
   tlin++;
@@ -999,7 +1054,7 @@ void dowatchhelp(void)
 
   putpmt( MTXT_DONE, MSG_LIN2 );
   cdrefresh();
-  while ( ! iogtimed( &ch, 1 ) )
+  while ( ! iogtimed( &ch, 1.0 ) )
     ;
   cdclrl( MSG_LIN2, 1 );
   

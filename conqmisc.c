@@ -727,7 +727,7 @@ void histlist( int godlike )
       
       putpmt( MTXT_DONE, MSG_LIN2 );
       cdrefresh();
-      if ( iogtimed( &ch, 1 ) )
+      if ( iogtimed( &ch, 1.0 ) )
 	break;				/* exit loop if we got one */
     }
   

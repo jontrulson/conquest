@@ -1420,7 +1420,7 @@ void planlist( int team, int snum )
 
 	  cdrefresh();
 
-	  if (iogtimed( &cmd, 1 ))
+	  if (iogtimed( &cmd, 1.0 ))
 	    {			/* got a char */
 	      if (cmd == 'q' || cmd == 'Q' || cmd == TERM_ABORT)
 		{		/* quit */
@@ -1588,7 +1588,7 @@ void playlist( int godlike, int doall, int snum )
 	  /* We're displaying the last page. */
 	  putpmt( MTXT_DONE, MSG_LIN2 );
 	  cdrefresh();
-	  if ( iogtimed( &ch, 1 ) )
+	  if ( iogtimed( &ch, 1.0 ) )
 	    {
 	      if ( ch == TERM_EXTRA )
 		fship = 1;			/* move to first page */
@@ -1601,7 +1601,7 @@ void playlist( int godlike, int doall, int snum )
 	  /* There are ships left to display. */
 	  putpmt( MTXT_MORE, MSG_LIN2 );
 	  cdrefresh();
-	  if ( iogtimed( &ch, 1 ) )
+	  if ( iogtimed( &ch, 1.0 ) )
 	    {
 	      if ( ch == TERM_EXTRA )
 		fship = 0;			/* move to first page */
@@ -2418,7 +2418,7 @@ void userlist( int godlike, int snum )
 	  /* We're displaying the last page. */
 	  putpmt( MTXT_DONE, MSG_LIN2 );
 	  cdrefresh();
-	  if ( iogtimed( &ch, 1 ) )
+	  if ( iogtimed( &ch, 1.0 ) )
 	    {
 	      if ( ch == TERM_EXTRA )
 		fuser = 0;			/* move to first page */
@@ -2431,7 +2431,7 @@ void userlist( int godlike, int snum )
 	  /* There are users left to display. */
 	  putpmt( MTXT_MORE, MSG_LIN2 );
 	  cdrefresh();
-	  if ( iogtimed( &ch, 1 ) )
+	  if ( iogtimed( &ch, 1.0 ) )
 	    if ( ch == TERM_EXTRA )
 	      fuser = 0;			/* move to first page */
 	    else if ( ch == ' ' )
@@ -2549,7 +2549,7 @@ void userstats( int godlike , int snum )
 	  /* We're displaying the last page. */
 	  putpmt( MTXT_DONE, MSG_LIN2 );
 	  cdrefresh();
-	  if ( iogtimed( &ch, 1 ) )
+	  if ( iogtimed( &ch, 1.0 ) )
 	    {
 	      if ( ch == TERM_EXTRA )
 		fuser = 0;			/* move to first page */
@@ -2562,7 +2562,7 @@ void userstats( int godlike , int snum )
 	  /* There are users left to display. */
 	  putpmt( MTXT_MORE, MSG_LIN2 );
 	  cdrefresh();
-	  if ( iogtimed( &ch, 1 ) )
+	  if ( iogtimed( &ch, 1.0 ) )
 	    {
 	      if ( ch == TERM_EXTRA )
 		fuser = 0;			/* move to first page */

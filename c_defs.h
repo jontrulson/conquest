@@ -499,7 +499,7 @@ int rndpoi ( real mean );
 
 int iochav( void );
 int iogchar ( void );
-int iogtimed ( int *ch, int seconds );
+int iogtimed ( int *ch, real seconds );
 void ioeat(void);
 
 /* conqcm.c */

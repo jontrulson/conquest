@@ -256,7 +256,7 @@ int capentry( int snum, int *system )
   
   while ( stillalive( CqContext.snum ) )
     {
-      if ( ! iogtimed( &ch, 1 ) )
+      if ( ! iogtimed( &ch, 1.0 ) )
 	continue; /* next */
       switch  ( ch )
 	{
@@ -924,7 +924,7 @@ void dead( int snum, int leave )
       ioeat();
       putpmt( MTXT_DONE, MSG_LIN2 );
       cdrefresh();
-      while ( ! iogtimed( &ch, 1 ) && stillalive( CqContext.snum ) )
+      while ( ! iogtimed( &ch, 1.0 ) && stillalive( CqContext.snum ) )
 	;
       break;
     }
@@ -1066,7 +1066,7 @@ void doautopilot( int snum )
 	}
       
       /* Get a character. */
-      if ( ! iogtimed( &ch, 1 ) )
+      if ( ! iogtimed( &ch, 1.0 ) )
 	continue;		/* next . echo */
       CqContext.msgok = FALSE;
       grand( &CqContext.msgrand );
@@ -1238,7 +1238,7 @@ void dobeam( int snum )
       done = FALSE;
       while ( stillalive( CqContext.snum ) && done == FALSE)
 	{
-	  if ( ! iogtimed( &ch, 1 ) )
+	  if ( ! iogtimed( &ch, 1.0 ) )
 	    {
 	      continue;	/* next */
 	    }
@@ -1780,7 +1780,7 @@ void dorefit( int snum, int dodisplay )
     cdrefresh();
       
     /* Get a character. */
-    if ( ! iogtimed( &ch, 1 ) )
+    if ( ! iogtimed( &ch, 1.0 ) )
       continue; /* next; */
     switch ( ch )
       {
@@ -2343,7 +2343,7 @@ void dohelp( void )
   
   putpmt( MTXT_DONE, MSG_LIN2 );
   cdrefresh();
-  while ( ! iogtimed( &ch, 1 ) && stillalive( CqContext.snum ) )
+  while ( ! iogtimed( &ch, 1.0 ) && stillalive( CqContext.snum ) )
     ;
   
   return;
@@ -2521,7 +2521,7 @@ void dooption( int snum, int dodisplay )
       cdrefresh();
       
       /* Get a character. */
-      if ( ! iogtimed( &ch, 1 ) )
+      if ( ! iogtimed( &ch, 1.0 ) )
 	continue; /* next; */
       switch ( ch )
 	{
@@ -2698,7 +2698,7 @@ void doreview( int snum )
       c_putmsg( "There are no old messages.", MSG_LIN1 );
       putpmt( MTXT_MORE, MSG_LIN2 );
       cdrefresh();
-      while ( ! iogtimed( &ch, 1 ) && stillalive( CqContext.snum ) )
+      while ( ! iogtimed( &ch, 1.0 ) && stillalive( CqContext.snum ) )
 	;
       cdclrl( MSG_LIN1, 2 );
     }
@@ -2854,7 +2854,7 @@ void doteamlist( int team )
       teamlist( team );
       putpmt( MTXT_DONE, MSG_LIN2 );
       cdrefresh();
-      if ( iogtimed( &ch, 1 ) )
+      if ( iogtimed( &ch, 1.0 ) )
 	break;
     }
   return;
@@ -3092,7 +3092,7 @@ void dowar( int snum )
 	    cdput( ' ', MSG_LIN1, WOffset+(i*2) );
 	  }
       cdrefresh();
-      if ( iogtimed( &ch, 1 ) == FALSE )
+      if ( iogtimed( &ch, 1.0 ) == FALSE )
 	{
 	  continue; /* next; */
 	}
@@ -3441,7 +3441,7 @@ void menu(void)
       Ships[CqContext.snum].sdfuse = -TIMEOUT_PLAYER;
       
       /* Get a char with timeout. */
-      if ( ! iogtimed( &ch, 1 ) )
+      if ( ! iogtimed( &ch, 1.0 ) )
 	{
 	  /* We get here if a char hasn't been typed. */
 	  sleepy = sleepy + 1;
@@ -3796,7 +3796,7 @@ int newship( int unum, int *snum )
 	      cdmove(0, 0);
 	      cdrefresh();
 
-	      if (iogtimed(&ch, 1))
+	      if (iogtimed(&ch, 1.0))
 		{
 		  iBufPutc(ch);	/* stuff the char back in */
 		  selectship[0] = EOS;
@@ -3988,7 +3988,7 @@ int play()
 	break;
       
       /* Get a char with one second timeout. */
-      if ( iogtimed( &ch, 1 ) )
+      if ( iogtimed( &ch, 1.0 ) )
 	{
 	  if (RMsg_Line == MSG_LIN1)
 	    CqContext.msgok = FALSE;	/* off if we  have no msg line */

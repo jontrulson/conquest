@@ -755,7 +755,7 @@ void debugplan(void)
 
           cdrefresh();
 	  
-          if (iogtimed( &cmd, 1 ))
+          if (iogtimed( &cmd, 1.0 ))
             {                   /* got a char */
               if (cmd != ' ')
                 {               /* quit */
@@ -1249,7 +1249,7 @@ void operate(void)
 
 
       /* Get a char with timeout. */
-      if ( ! iogtimed( &ch, 1 ) )
+      if ( ! iogtimed( &ch, 1.0 ) )
 	continue;		/* next */
       switch ( ch )
 	{
@@ -1849,7 +1849,7 @@ void oppedit(void)
       cdmove( 0, 0 );
       cdrefresh();
       
-      if ( ! iogtimed( &ch, 1 ) )
+      if ( ! iogtimed( &ch, 1.0 ) )
 	continue;		/* next */
       switch ( ch )
 	{
@@ -2350,7 +2350,7 @@ void opstats(void)
       attrset(0);
       cdrefresh();
     }
-  while ( !iogtimed( &ch, 1 ) ); /* until */
+  while ( !iogtimed( &ch, 1.0 ) ); /* until */
   
   return;
   
@@ -2372,7 +2372,7 @@ void opteamlist(void)
       putpmt( MTXT_DONE, MSG_LIN2 );
       cdrefresh();
     }
-  while ( !iogtimed( &ch, 1 ) ); /* until */
+  while ( !iogtimed( &ch, 1.0 ) ); /* until */
   
 }
 
@@ -2752,7 +2752,7 @@ void opuedit(void)
       cdrefresh();
       
       /* Now, get a char and process it. */
-      if ( ! iogtimed( &ch, 1 ) )
+      if ( ! iogtimed( &ch, 1.1 ) )
 	continue;		/* next */
       switch ( ch )
 	{
@@ -2989,7 +2989,7 @@ void watch(void)
 		  ConqInfo->glastmsg = modp1( ConqInfo->glastmsg - 1, MAXMESSAGES );
 	      
 	      /* Get a char with timeout. */
-	      if ( ! iogtimed( &ch, 1 ) )
+	      if ( ! iogtimed( &ch, 1.0 ) )
 		continue; /* next */
 	      cdclrl( MSG_LIN1, 2 );
 	      switch ( ch )
@@ -3414,7 +3414,7 @@ void dowatchhelp(void)
 
   putpmt( MTXT_DONE, MSG_LIN2 );
   cdrefresh();
-  while ( ! iogtimed( &ch, 1 ) )
+  while ( ! iogtimed( &ch, 1.0 ) )
     ;
   cdclrl( MSG_LIN2, 1 );
   

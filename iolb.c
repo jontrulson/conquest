@@ -209,9 +209,11 @@ int iogchar ( void )
 /*    int seconds */
 /*    gotone = iogtimed ( &ch, seconds ) */
 
-int iogtimed ( int *ch, int seconds )
+int iogtimed ( int *ch, real seconds )
 {
   static int c;
+  unsigned int secs, usecs;
+
 #if defined(USE_SELECT)
   static struct timeval timeout;
 
@@ -236,10 +238,20 @@ int iogtimed ( int *ch, int seconds )
       return(TRUE);
     }
   
-#if !defined(USE_SELECT)
-  timeout(seconds * 1000);	/* msecs - apparently useless
-				   on Linux ncurses 1.9.9 */
-#endif
+
+  /* compute proper secs/usecs to allow for subsecond sleeps */
+  /* some systems don't grok usecs >1,000,000 */
+  if (seconds >= 1.0)
+    {
+      secs = (int) seconds;
+      usecs = (int) (1000000 * (seconds - (real) secs));
+    }
+  else
+    {
+      secs = 0;
+      usecs = (1000000 * seconds);
+    }
+
 
 #if defined(LINUX) && defined(USE_SELECT)
   /* with linux, select returns the time
@@ -252,8 +264,8 @@ int iogtimed ( int *ch, int seconds )
   FD_ZERO(&readfds);
   FD_SET(PollInputfd, &readfds);
   
-  timeout.tv_sec = seconds;
-  timeout.tv_usec = 0;
+  timeout.tv_sec = secs;
+  timeout.tv_usec = usecs;
 #endif
 
 #if !defined(LINUX)
@@ -278,8 +290,8 @@ int iogtimed ( int *ch, int seconds )
       FD_ZERO(&readfds);
       FD_SET(PollInputfd, &readfds);
       
-      timeout.tv_sec = seconds;
-      timeout.tv_usec = 0;
+      timeout.tv_sec = secs;
+      timeout.tv_usec = usecs;
 #endif 
       
 #if defined(USE_SELECT)
@@ -307,7 +319,7 @@ int iogtimed ( int *ch, int seconds )
 				 return 0, else try again */
 	      curtime = time(0);
 
-	      if (curtime >= (starttime + seconds))
+	      if (curtime >= (starttime + secs))
 		{
 		  *ch = 0;
 		  return(FALSE);
@@ -354,26 +366,9 @@ int iogtimed ( int *ch, int seconds )
 	  return(FALSE);
 	}
       
-#else /* ! USE_SELECT */
-      
-      if((c = wgetch(stdscr)) == ERR)	/* timeout or signal? */
-	{
-	  
-	  if (errno != EINTR)	/* timeout */
-	    {
-	      *ch = 0;
-	      
-	      cdrefresh();
-	      return(FALSE);
-	    }
-	}
-      else				/* char avail */
-	{
-	  *ch = c;
-	  
-	  return(TRUE);
-	}
-#endif 
+#else
+#error "You need the select() system call"
+#endif
       
       /* If we're here, the read was interupted, try again */
       
