@@ -792,16 +792,14 @@ void procFirePhaser(cpCommand_t *cmd)
     return;
 
   dir = (real)ntohs(cmd->detail) / 100.0;
-#warning "clean me"
-  clog("PROC FIREPHASER: PRE dir = %f", dir);
+
   if (dir < 0)
     dir = 0.0;
 
   if (dir > 359.9)
     dir = 359.9;
 
-#warning "clean me"
-#if 1 /*defined(DEBUG_SERVERPROC)*/
+#if defined(DEBUG_SERVERPROC)
   clog("PROC FIREPHASER: dir = %f", dir);
 #endif
 
