@@ -7,15 +7,18 @@
 # $Id$
 #
 # $Log$
-# Revision 1.1  1997/05/24 19:40:45  jon
-# Initial revision
+# Revision 1.2  1997/06/28 23:40:34  jon
+# fixing dist scipts
+#
+# Revision 1.1.1.1  1997/05/24 19:40:45  jon
+# Conquest 6.4 distribution
 #
 #
 ##############################################################################
 # set -x
 
 VERSION=`grep ConquestVersion version.c`
-VERSION=`echo $VERSION |tr -d '$;"' |cut -d: -f2- |tr -d " "`
+VERSION=`echo $VERSION |tr -d '$;"' |cut -d' ' -f6 |tr -d " "`
 
 CONQVER="conquest-$VERSION"
 
@@ -29,6 +32,9 @@ CURDIR=$(pwd)
 
 ./UpdatePkginfo
 rm -f ChangeLog
+
+mkdir -p $CURDIR/pkg >/dev/null 2>&1
+
 pkgmk -d $CURDIR/pkg -o SRCDIR="$CURDIR"
 pkgtrans -s $CURDIR/pkg $CURDIR/$ARCFILE conquest
 

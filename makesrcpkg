@@ -7,8 +7,11 @@
 # $Id$
 #
 # $Log$
-# Revision 1.1  1997/05/24 19:39:23  jon
-# Initial revision
+# Revision 1.2  1997/06/28 23:40:35  jon
+# fixing dist scipts
+#
+# Revision 1.1.1.1  1997/05/24 19:39:23  jon
+# Conquest 6.4 distribution
 #
 # Revision 1.4  1996/11/30  20:44:08  jon
 # *** empty log message ***
@@ -28,7 +31,7 @@
 # set -x
 
 VERSION=`grep ConquestVersion version.c`
-VERSION=`echo $VERSION |tr -d '$;"' |cut -d: -f2- |tr -d " "`
+VERSION=`echo $VERSION |tr -d '$;"' |cut -d' ' -f6 |tr -d " "`
 
 CONQVER="conquest-$VERSION"
 
@@ -44,7 +47,7 @@ FILELIST="conqfig.c ratfor.c cd2lb.c ionlb.c ioxlb.c conqlb.c gamlb.c
 	conqai.c c_defs.h color.h conqcom.h conqdata.h defs.h 
 	cdcom.h conf.h conqcom2.h conqdef.h global.h
 	conquest.doc conqnews.doc configure.in configure
-	config.h.in config.guess config.sub Makefile.in README README.linux 
+	config.h.in config.guess config.sub Makefile.in README 
 	acconfig.h conqstrat.h conqstrat.c.l conqstrat.c.y conqrule
 	INSTALL TODO COPYRIGHT"
 

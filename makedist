@@ -13,7 +13,7 @@ makesrcpkg
 makebinpkg
 
 VERSION=`grep ConquestVersion version.c`
-VERSION=`echo $VERSION |tr -d '$;"' |cut -d: -f2- |tr -d " "`
+VERSION=`echo $VERSION |tr -d '$;"' |cut -d' ' -f6 |tr -d " "`
 
 CONQVER="conquest-$VERSION"
 

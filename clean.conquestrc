@@ -1,0 +1,64 @@
+SysConqfigVersion=$Revision$
+
+###################################################################
+#
+# conquestrc - Conquest system-wide defaults
+#
+# SYNTAX - <variable>=<value>
+#
+#  No spaces on either side of the '=' sign, no leading white space.
+#
+# BOOLEANS - use 'true', 'false', 'yes', or 'no' in upper/lower
+#  case.
+#
+#
+
+
+
+# define this as 'true' if you want to be able to see friendly
+#  torps (including yours) on a long-range scan.  Default: true
+do_lr_torpscan=true
+
+# define this as 'false' if you want the (M)ap command to have
+#  it's original meaning - a static map of the universe with
+#  Murisak at the center.  Setting to true makes the (M)ap
+#  command have more 'realism' (IMHO) by providing a dynamic
+#  map of the universe centered on your ship's current location.
+#  Default: true
+do_local_lrscan=true
+
+# define this as 'true' if you want Estimated Time of Arrival (ETA)
+#  information to be computed and displayed when getting (I)nfo on
+#  another object.  Default: true
+do_etastats=true
+
+# define this as 'true' if you never want the Doomsday Machine to
+#  randomly startup (except manually via conqoper).  Default: false
+no_doomsday=false
+
+# define this as 'true' if you want to allow users to enable the
+#  'do_fastupdate' option, which gives users 2 screen updates per
+#  second instead of one.  This can provide a smoother game, but
+#  requires more CPU and better bandwith to be useful. This option
+#  has no effect (nor does do_fastupdate) if Conquest was compiled
+#  with HAS_SETITIMER undefined in defs.h.
+#  Default: true
+allow_fastupdate=true
+
+# define this as 'true' if you want robots to be created with a
+#  randomized kill point value.  A ship's kill points influences how 
+#  'efficient' that ship is.  This means that when robots are created,
+#  with a randomized kill point value, they can be much more deadly 
+#  than if the default kill point value of 0.0 is used.
+#  It also makes them a little less predictable.  NOTE: When this
+#  is enabled, the extra kills given to a robot are not used in 
+#  calculating Team or User statistics.  It just makes them a little
+#  tougher... probably not a good idea for new players though ;-)
+#  Default: false
+do_random_robotkills=false
+
+# define this as 'true' if you want to allow non Conquest Gods to
+#  be able to use SIGQUIT (normally ^\) to leave conquest.
+#  Default: false
+allow_sigquit=false
+

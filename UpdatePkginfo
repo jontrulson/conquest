@@ -8,8 +8,11 @@
 # $Id$
 #
 # $Log$
-# Revision 1.1  1996/04/28 07:02:43  jon
-# Initial revision
+# Revision 1.2  1997/06/28 23:40:31  jon
+# fixing dist scipts
+#
+# Revision 1.1.1.1  1996/04/28 07:02:43  jon
+# Conquest 6.4 distribution
 #
 # Revision 1.2  1996/04/28  07:02:29  jon
 # - cleans up after itself now.
@@ -19,28 +22,20 @@
 #
 #
 #
-#########################################################################################
-
-co -l pkginfo
+############################################################################
 
 grep -v PSTAMP pkginfo |grep -v IDENT |grep -v VERSION >/tmp/version.$$
 
 cp /tmp/version.$$ pkginfo
 
-IDENT=`grep ConquestId version.c`
-IDENT=`echo $IDENT |tr -d '$;"' |cut -d: -f2-`
+IDENT=`grep ConquestVersion version.c`
+IDENT=`echo $IDENT |tr -d '$;"' |cut -d' ' -f6 |tr -d " "`
 
 echo IDENT = $IDENT
 echo "IDENT=$IDENT" >>pkginfo
 
-VERSION=`grep ConquestVersion version.c`
-VERSION=`echo $VERSION |tr -d '$;"' |cut -d: -f2-`
-
-echo VERSION = $VERSION
-echo "VERSION=$VERSION" >>pkginfo
-
-ci -m"Checkin" pkginfo
-co pkginfo
+echo VERSION = $IDENT
+echo "VERSION=$IDENT" >>pkginfo
 
 /bin/rm /tmp/version.$$
 exit
