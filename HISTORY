@@ -8,7 +8,7 @@
          +--------------------------------------------------------+
 
                               Conquest HISTORY
-Version 8.0.1f 7/10/2004 (devel)
+Version 8.0.1f 7/11/2004 (devel)
 
         - switch to TARGA (.tga) format textures rather than BMP.
           That alpha channel comes in handy.
@@ -17,6 +17,10 @@ Version 8.0.1f 7/10/2004 (devel)
           someone wants to create individual textures for each
           planet someday? :)
           
+        - added new torp texture rather than re-using the star texture.
+
+          redid torp rendering somewhat.
+
         - hitting [SPACE] while looking at long-range map will toggle
           between a Murisak centered, or ship centered map.  The
           default map display is whatever you set for the

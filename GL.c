@@ -86,7 +86,9 @@ struct _texinfo {
 
 #define TEX_VBG      17
 
-#define NUM_TEX 18
+#define TEX_TORP     18
+
+#define NUM_TEX 19
 
 struct _texinfo TexInfo[NUM_TEX] = { /* need to correlate with defines above */
   { "img/star.tga",      255 },
@@ -116,6 +118,7 @@ struct _texinfo TexInfo[NUM_TEX] = { /* need to correlate with defines above */
 
   { "img/vbg.tga",   255 },
 
+  { "img/torp.tga",  255 },
 };
 
 GLuint  textures[NUM_TEX];       /* texture storage */
@@ -1216,24 +1219,41 @@ void uiPrintFixed(GLfloat x, GLfloat y, GLfloat w, GLfloat h, char *str)
 
 void drawTorp(GLfloat x, GLfloat y, char torpchar, int torpcolor)
 {
+  const GLfloat z = -5.0;
+  const GLfloat size = 3.0;
+  GLfloat sizeh = (size / 2.0);
+
   glPushMatrix();
   glLoadIdentity();
 
-  glTranslatef(0.0, 0.0, TRANZ );
+  glTranslatef(x , y , TRANZ);
+  glRotatef(rnduni( 0.0, 360.0 ), 0.0, 0.0, z);
 
   glBlendFunc(GL_SRC_ALPHA, GL_ONE);
   glEnable(GL_BLEND);
 
   glEnable(GL_TEXTURE_2D); 
-  glBindTexture(GL_TEXTURE_2D, textures[TEX_SUN]); /* mini suns */
-
+  glBindTexture(GL_TEXTURE_2D, textures[TEX_TORP]); 
 
   glBegin(GL_POLYGON);		
 
-  uiPutColor(torpcolor);
+  uiPutColor(torpcolor |CQC_A_BOLD);
 
-  drawTexBox(x, y, 3.0);
+  glTexCoord2f(1.0f, 0.0f);
+  glVertex3f(-sizeh, -sizeh, z); /* ll */
+
+  glTexCoord2f(1.0f, 1.0f);
+  glVertex3f(sizeh, -sizeh, z); /* lr */
+
+  glTexCoord2f(0.0f, 1.0f);
+  glVertex3f(sizeh, sizeh, z); /* ur */
+
+  glTexCoord2f(0.0f, 0.0f);
+  glVertex3f(-sizeh, sizeh, z); /* ul */
+
+
   glEnd();
+
   glDisable(GL_TEXTURE_2D); 
   glDisable(GL_BLEND);
 
@@ -1250,7 +1270,6 @@ drawShip(GLfloat x, GLfloat y, GLfloat angle, char ch, int i, int color,
   GLfloat alpha = 1.0;
   const GLfloat z = 1.0;
   GLfloat size = 7.0;
-  GLfloat rx, ry;
   GLfloat sizeh;
   GLint texsel;
   const GLfloat viewrange = VIEWANGLE * 2; 
@@ -1372,9 +1391,6 @@ drawShip(GLfloat x, GLfloat y, GLfloat angle, char ch, int i, int color,
   glTranslatef(x , y , TRANZ);
   /* THEN rotate ;-) */
   glRotatef(angle, 0.0, 0.0, z);
-
-  rx = x - (size / 2);
-  ry = y - (size / 2);
 
   glColor4f(1.0, 1.0, 1.0, alpha);	
 
