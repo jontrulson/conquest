@@ -18,6 +18,9 @@
 /* Define if running on Linux */
 #undef LINUX
 
+/* Define if running on Alpha OSF1/Digital Unix */
+#undef OSF
+
 /* Define as the return type of signal handlers (int or void).  */
 #undef RETSIGTYPE
 
@@ -38,6 +41,9 @@
 
 /* Define if your <sys/time.h> declares struct tm.  */
 #undef TM_IN_SYS_TIME
+
+/* Define if running on an unknown machine type */
+#undef UNKNOWN
 
 /* Define if running on UnixWare (SVR4.2[MP]) */
 #undef UNIXWARE

@@ -9,6 +9,33 @@
 
                               Conquest News
 
+Version 7.0.1  Fri Sep  3 18:20:52 MST 1999 Jon Trulson  <jon@radscan.com>
+
+        - This is a maintenance release, fixing some minor bugs and
+          a major one for RH6.0 (uhg), as well as a new port.
+
+        - Conquest now runs on on Digital Unix V4.0 (OSF1).  Thanks to
+          an old Conquest junkie, Jim Anderson (janderson@NOVALIS.COM)
+          for this port.  Thanks Jim!
+
+          DU has the same lex problem that Solaris has... See the 
+          SOLARIS/DU NOTES section in the INSTALL file for a hacky 
+          workaround.  If anyone has the magic syntax to achieve the
+          same effect, but work on all systems, please let me know... 
+          It's annoying.
+
+        - configure.in modified so that the options used on an UNKNOWN
+          system type are more likly to succeed (it no longer assumes a 
+          UnixWare system).
+
+        - one fix to options.c, the ESC cancel wasn't working right
+
+	- a cast problem picked up by Jim Anderson while doing the OSF/DU
+          port
+
+        - and of course, the addition of the -D__NO_MATH_INLINES CFLAG
+          required on RH6.0 systems that caused strange conqdriv failures.
+
 Version 7.0    Thu Jan 28 21:14:41 MST 1999 Jon Trulson  <jon@radscan.com>
 
         - Remote User support, which should make things much nicer for

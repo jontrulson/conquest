@@ -7,6 +7,20 @@
          |  CCC    OOO   N   N   QQ Q   UUU   EEEEE  SSSS     T   |
          +--------------------------------------------------------+
 
+CONTENTS:
+
+	### DISTRIBUTION
+	### BUILDING
+	### OTHER USEFUL INFORMATION
+	    ## CURSES/TERMINFO
+               # LINUX NOTE
+               # GENERAL TERMINAL NOTE
+	       # TERMINFO ENTRIES
+	    ## UNIXWARE NOTE
+            ## SOLARIS/DU NOTE
+	    ## CONQUEST GROUP
+	### INSTALLED FILES
+
 
 ### DISTRIBUTION
 
@@ -39,6 +53,9 @@
 		Solaris 2.6 with gcc 2.7.2
 		FreeBSD 2.2-100696-SNAP (stock curses works, but
 			without color apparently...)
+		OSF1/Digital Unix V4.0 for Alpha
+			- Thanks to Jim Anderson (janderson@NOVALIS.COM)
+				for this port!
 
 	ncurses-1.9.9e will work on both fbsd and Linux.  If the
 curses implementation on your machine has problems, you might try
@@ -151,6 +168,8 @@ on Unixware for example, does not define the SHIFT-Fkeys, nor the
 Keypad keys (upperright, lowerleft, etc).  Some modification to your
 terminfo entry may be required to use these extended features.
 
+# TERMINFO ENTRIES
+
 	I recieved permission from SCO to supply my modified terminfo
 entries for Unixware.  Thanks SCO!  The modified entries are located
 in the ti/ subdirectory of the source distribution along with some
@@ -214,17 +233,17 @@ responsibility for the consequences if you try to do so.  Actually, I
 take no responsibiliy for anything regarding the use of this software
 ;-)
 
-## SOLARIS NOTE
+## SOLARIS/DU NOTE
 
-There is a problem with the lexer (lex) on Solaris.  When it processes
-conqstrat.c.l into lex.yy.c, a syntax error is introduced.  If you
-compile the resulting code (make will try this) you'll get a syntax
-error.  Simply edit the file (should be lex.yy.c) delete the offending
-line, and recompile.  The only result of this 'fix' is that when (or
-if) you use conqstrat to build a new robot strategy table, all
-whitespace in the rule file will be output to stdout.  Annoying, but
-livable.  It does not affect the parsing of the rule file in any other
-way.
+There is a problem with the lexer (lex) on Solaris and Digital Unix
+(OSF1).  When it processes conqstrat.c.l into lex.yy.c, a syntax error
+is introduced.  If you compile the resulting code (make will try this)
+you'll get a syntax error.  Simply edit the file (should be lex.yy.c)
+delete the offending line, and recompile.  The only result of this
+'fix' is that when (or if) you use conqstrat to build a new robot
+strategy table, all whitespace in the rule file will be output to
+stdout.  Annoying, but livable.  It does not affect the parsing of the
+rule file in any other way.
 
 ## CONQUEST GROUP
 
@@ -236,7 +255,7 @@ binary package will add the Conquest group id to your system.
 create the conquest group before building.
 
 
-### FILES
+### INSTALLED FILES
 
 	Note, on my machine everything is owned by jon, this helps me
 in recompiling/updating without having to be root... You can make

@@ -246,9 +246,9 @@ $(BCONQAI): conqai
 $(BCONQSTRAT): conqstrat
 	@-rm -f $(BCONQSTRAT)
 	-$(CC) -o conqstrat $(CFLAGS) lex.yy.o y.tab.o $(LIBS) $(CONQHOME)/lib/$(CONQLB) $(EXTLBS)
-	cp conqstrat $(BCONQSTRAT)
-	chgrp conquest $(BCONQSTRAT)
-	chmod 751 $(BCONQSTRAT)
+	-cp conqstrat $(BCONQSTRAT)
+	-chgrp conquest $(BCONQSTRAT)
+	-chmod 751 $(BCONQSTRAT)
 
 $(CONQHOME)/etc/conqrule: conqrule
 	cp conqrule $(CONQHOME)/etc/conqrule

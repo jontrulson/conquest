@@ -1,0 +1,44 @@
+
+7/5/99
+
+Note for RedHat 6.0 users, or anyone using the EGCS compiler to build
+Conquest.
+
+
+	A user recently reported a problem with Conquest after
+compiling it on a RedHat 6.0 system (which, by defualt uses the EGCS
+compiler).
+
+	Symptoms:
+
+	The game built, and initially appeared to run fine.  However,
+after getting into battle (with exploding torps around), or anything
+else math intensive, the game driver would appear to hang.  No movment
+was taking place, though Conquest would accept change course commands,
+warp commands, help, etc.
+
+	Analysis:
+
+	I was able to easily reproduce the problem.  What would happen
+is that the driver (conqdriv) would get a SEGV.  The problem (in
+addition to the SEGV ;-) was that the driver would never actually
+exit, therefore the other Conquest executables would not notice the
+driver was dead, and therefore would not start another one.  The cause
+of the SEGV is myserious and strange.  In all cases, the core would
+occurr in an EGCS math inline.  This brought me back to a problem we
+encountered at work with EGCS math inlining in one of our products.
+Identical behavior.  Fortunately the workaround we use also seems to
+solve the conqdriv problem.
+
+	Solution:
+
+	After running configure, edit the generated Makefile, and add
+the following to the CFLAGS definition:
+
+-D__NO_MATH_INLINES
+
+	After adding this, do a 'make clean' followed by 'make all'
+and 'make install'.  This should work around the problem.  The next
+version of Conquest will add this by default since function overhead
+in math calls is negligible in Conquest.
+

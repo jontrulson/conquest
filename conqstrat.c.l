@@ -126,6 +126,7 @@ ROB_RUNAWAY		{yylval = ROB_RUNAWAY; return( TOK_ACTION );}
 
 #+.*			/*# eat comments */
 
+
 {WS}			/* eat gratuitous white space */
 
 \n			{Lineno++; /* eat newlines */}

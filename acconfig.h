@@ -181,6 +181,9 @@ undef HAVE_STRINGS_H
 /* Define to `long' if <sys/types.h> doesn't define.  */
 #undef off_t
 
+/* Define if running on Alpha OSF1/Digital Unix */
+#undef OSF
+
 /* Define to `int' if <sys/types.h> doesn't define.  */
 #undef pid_t
 
@@ -266,6 +269,9 @@ undef HAVE_STRINGS_H
 
 /* Define if lex declares yytext as a char * by default, not a char[].  */
 #undef YYTEXT_POINTER
+
+/* Define if running on an unknown machine type */
+#undef UNKNOWN
 
 /* Define if running on UnixWare (SVR4.2[MP]) */
 #undef UNIXWARE

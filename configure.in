@@ -18,6 +18,7 @@ AC_MSG_CHECKING(system type)
 
 uname=`uname -s`
 urev=`uname -r`
+uvers=`uname -v`
 
 case "$uname" in
   Linux*)
@@ -68,7 +69,7 @@ case "$uname" in
 	AC_DEFINE(SOLARIS)
 
 	CC="gcc"
-	CFLAGS="$CFLAGS -O2 -fPIC -fno-builtin"
+	CFLAGS="$CFLAGS -D__NO_MATH_INLINES -O2 -fPIC -fno-builtin"
 
 	FILEPRIV="@-echo filepriv"
 	AC_SUBST(FILEPRIV)
@@ -110,29 +111,61 @@ case "$uname" in
 
 	AC_MSG_RESULT(UnixWare)
 	;;
-  *)	
-	# assume Unixware
-	AC_DEFINE(UNIXWARE)     # this enables some things too
-	CFLAGS="$CFLAGS -O -KPIC -Xa"
+  OSF1*)
 
-	FILEPRIV="/sbin/filepriv"
+	case "$uvers" in
+		V4.*)	
+			true
+			;;
+		*)
+			echo "This port is only known to work on DU 4.x"
+			echo "Assuming OSF V4.x"
+			;;
+	esac
+			
+	AC_DEFINE(OSF)
+	CFLAGS="$CFLAGS -O"
+
+	FILEPRIV="@-echo filepriv"
 	AC_SUBST(FILEPRIV)
 
-	CONQLB="libconquest.so"
+	CONQLB="libconquest.a"
 	AC_SUBST(CONQLB)
 
-	LBFLAGS="$LBFLAGS -G \$(CFLAGS) -o \$(CONQLB)"
+	LBFLAGS="-ruv \$(CONQLB)"
 	AC_SUBST(LBFLAGS)
 
 	CC="cc"
 
-	LBBUILD="\$(CC)"
+	LBBUILD="ar"
 	AC_SUBST(LBBUILD)
 
-	RANLIB="echo"
+	RANLIB="ranlib"
 	AC_SUBST(RANLIB)
 
-	AC_MSG_RESULT(UNKNOWN - using UnixWare)
+	AC_MSG_RESULT(Digital Unix 4.x+)
+	;;
+  *)	
+	# assume something safe...
+	AC_DEFINE(UNKNOWN)     
+	CFLAGS="$CFLAGS -O"
+
+	FILEPRIV="@-echo filepriv"
+	AC_SUBST(FILEPRIV)
+
+	CONQLB="libconquest.a"
+	AC_SUBST(CONQLB)
+
+	LBFLAGS="-ruv \$(CONQLB)"
+	AC_SUBST(LBFLAGS)
+
+	LBBUILD="ar"
+	AC_SUBST(LBBUILD)
+
+	RANLIB="ranlib"
+	AC_SUBST(RANLIB)
+
+	AC_MSG_RESULT(UNKNOWN)
 	;;
 esac
 
