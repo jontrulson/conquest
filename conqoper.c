@@ -2467,6 +2467,7 @@ void opuedit(void)
   static char *prompt2 = "any other key to quit.";
   static char *rprompt = "Use arrow keys to position, [SPACE] to modify, [TAB] to change password";
   char *promptptr;
+
   cdclrl( MSG_LIN1, 2 );
   attrset(InfoColor);
   ch = getcx( "Edit which user: ", MSG_LIN1, 0, TERMS, buf, MAXUSERNAME );
