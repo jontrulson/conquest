@@ -272,5 +272,7 @@ int metaUpdateServer(char *remotehost, char *name, int port)
       return FALSE;
     }
 
+  close(s);
+
   return TRUE;
 }

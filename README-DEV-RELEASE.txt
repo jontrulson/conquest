@@ -1,3 +1,7 @@
+11/24/2003
+
+        - fixed an fd leak in metaUpdateSetver().  Oops.
+
 11/22/2003
 7.2e
 
