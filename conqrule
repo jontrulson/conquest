@@ -98,7 +98,7 @@ dne <= 3 & fuel > 0 & torpdam > 0 & numtorps > 0 ; ROB_TORPEDO
 fuel > 0 & incoming > 0 & damage < 8 ; ROB_DETONATE
 dne < 3 & numtorps < 3 & wtemp < 8 ; ROB_MYDETONATE
 
-# JET
+# 12/24/96
 # raise shields if damage, and the threat can't be an enemy. 
 #  this should reduce the number of sun-deaths for robots a bit 
 dne > 3 & incoming == 0 & ! shup & damage > 0 & etemp < 4 & 
