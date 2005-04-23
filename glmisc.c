@@ -86,7 +86,7 @@ void mglBeep(void)
   return;
 }
 
-/* draw a window sizes, semi-opaque quad for overlay nodes */
+/* draw a window sized, semi-opaque quad for overlay nodes */
 void mglOverlayQuad(void)
 {
   if (getTopONode())

@@ -26,6 +26,13 @@
 
   - observer support?
 
+  - new flag? KillTeam - determines whether a ship can set war with
+    own team 
+
+  - GL - do something cool for displaying the neg eng barrier?
+
+  - 'Fast' flag... speeding up the game?
+
 - PROTOCOL
 
   - add local server time to hello/srvrstat

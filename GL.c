@@ -1516,7 +1516,8 @@ static int LoadGLTextures()
 	texti = malloc(sizeof(textureImage));
         if (!texti)
           {
-            clog("LoadGLTextures(): memory allocation failed for %d bytes\n");
+            clog("LoadGLTextures(): memory allocation failed for %d bytes\n",
+                 sizeof(textureImage));
             return FALSE;
           }
 	snprintf(filenm, MID_BUFFER_SIZE - 1, "%s/%s", 

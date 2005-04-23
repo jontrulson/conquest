@@ -34,6 +34,7 @@
 void initTexFonts(void)
 {
   char fbuf[MID_BUFFER_SIZE];
+  int fail = FALSE;
 
 #ifdef DEBUG_GL
   clog("%s: ENTER...", __FUNCTION__);
@@ -46,6 +47,8 @@ void initTexFonts(void)
   if (!fontLargeTxf)
     {
       clog("initTexFonts: load %s failed", fbuf);
+      fprintf(stderr, "initTexFonts: load %s failed\n", fbuf);
+      fail = TRUE;
     }
 
   sprintf(fbuf, "%s/img/%s", CONQSHARE, "fixed.txf");
@@ -54,6 +57,8 @@ void initTexFonts(void)
   if (!fontFixedTxf)
     {
       clog("initTexFonts: load %s failed", fbuf);
+      fprintf(stderr, "initTexFonts: load %s failed\n", fbuf);
+      fail = TRUE;
     }
 
   sprintf(fbuf, "%s/img/%s", CONQSHARE, "tinyfixed.txf");
@@ -62,6 +67,8 @@ void initTexFonts(void)
   if (!fontTinyFixedTxf)
     {
       clog("initTexFonts: load %s failed", fbuf);
+      fprintf(stderr, "initTexFonts: load %s failed\n", fbuf);
+      fail = TRUE;
     }
 
   sprintf(fbuf, "%s/img/%s", CONQSHARE, "msg.txf");
@@ -70,7 +77,12 @@ void initTexFonts(void)
   if (!fontMsgTxf)
     {
       clog("initTexFonts: load %s failed", fbuf);
+      fprintf(stderr, "initTexFonts: load %s failed\n", fbuf);
+      fail = TRUE;
     }
+
+  if (fail)
+    exit(1);
 
   txfEstablishTexture(fontLargeTxf, 0, GL_TRUE);
   GLError();
@@ -146,42 +158,6 @@ void glfRender(GLfloat x, GLfloat y, GLfloat z, GLfloat w, GLfloat h,
   glPopMatrix();
 
   glDisable(GL_TEXTURE_2D);
-
-  return;
-}
-
-void drawString(GLfloat x, GLfloat y, GLfloat z, char *str, 
-                GLuint DL, int color, int ortho)
-{
-  if (!str)
-    return;
-
-#if 0
-  clog("%s: x = %.1f, y = %.1f, str = '%s'\n", __FUNCTION__,
-       x, y, str);
-#endif
-
-  /* no translations for mainw */
-  if (!ortho)
-    {
-      glPushMatrix();
-      glLoadIdentity();
-      
-      glTranslatef(0.0, 0.0, TRANZ);
-    }
-
-  if (color != -1)              /* not overridden */
-    uiPutColor(color);
-
-  glRasterPos3f(x, y, z);
-
-  glListBase(DL);
-  GLError();
-  glCallLists(strlen(str), GL_UNSIGNED_BYTE, str);
-  GLError();
-
-  if (!ortho)
-    glPopMatrix();
 
   return;
 }

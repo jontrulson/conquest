@@ -9,6 +9,13 @@
 
                               Conquest HISTORY
 
+Version 8.1a (devel)
+
+        - remove drawString(), not needed anymore.
+
+        - properly report an error and exit of the texfont(s) cannot
+          be loaded (rather than core). 
+
 Version 8.1 (stable)
 
         - changes since the last development release (8.0.1q)

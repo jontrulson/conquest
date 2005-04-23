@@ -488,8 +488,8 @@ void upchuck(void)
   
   PVLOCK(&ConqInfo->lockword);
   
-  flush_common();
   getdandt( ConqInfo->lastupchuck, 0 );
+  flush_common();
   
   PVUNLOCK(&ConqInfo->lockword);
   
