@@ -11,10 +11,16 @@
 
 Version 8.1a (devel)
 
+        - redid explosion rendering in the GL client.
+
         - remove drawString(), not needed anymore.
 
         - properly report an error and exit of the texfont(s) cannot
           be loaded (rather than core). 
+
+        - can see the negative energy barrier now in the GL client.
+
+
 
 Version 8.1 (stable)
 

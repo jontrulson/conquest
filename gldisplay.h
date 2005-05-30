@@ -196,7 +196,8 @@ void setXtraInfo(void);
 int GLcvtcoords(real cenx, real ceny, real x, real y, real scale,
 		 GLfloat *rx, GLfloat *ry );
 
-void drawTorp(GLfloat x, GLfloat y, char torpchar, int color, int scale);
+void drawTorp(GLfloat x, GLfloat y, char torpchar, int color, int scale,
+              int snum, int torpnum);
 void drawShip(GLfloat x, GLfloat y, GLfloat angle, char ch, int i, 
 	      int color, GLfloat scale);
 void drawDoomsday(GLfloat x, GLfloat y, GLfloat angle, GLfloat scale);
@@ -232,7 +233,7 @@ void drawLineBox(GLfloat x, GLfloat y,
                  GLfloat w, GLfloat h, int color, 
                  GLfloat lw);
 void drawQuad(GLfloat x, GLfloat y, GLfloat w, GLfloat h, GLfloat z);
-void drawExplosion(GLfloat x, GLfloat y);
+void drawExplosion(GLfloat x, GLfloat y, int snum, int torpnum);
 
 
 #endif /* _GLDISPLAY_H */

@@ -234,7 +234,7 @@ void display( int snum, int display_info )
 					 &glx, &gly ) )
 			  {
 			    drawTorp(glx, gly, Teams[Ships[i].team].torpchar, 
-				     color, scale);			    
+				     color, scale, i, j);			    
 			  }
 		  }
 	      }
@@ -348,7 +348,7 @@ void display( int snum, int display_info )
 		if ( GLcvtcoords( cenx, ceny, Ships[i].torps[j].x, 
                                   Ships[i].torps[j].y, scale, &glx, &gly ))
 		  { 
-		    drawExplosion(glx, gly);
+		    drawExplosion(glx, gly, i, j);
 		  }
 	  /* Now display the live torps. */
 	  
@@ -374,7 +374,7 @@ void display( int snum, int display_info )
                                Ships[i].torps[j].y, scale, &glx, &gly))
 		{
 		  drawTorp(glx, gly, Teams[Ships[i].team].torpchar, color,
-                           scale);
+                           scale, i, j);
 		}
 	}
     }

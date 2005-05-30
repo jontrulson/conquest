@@ -163,16 +163,7 @@ unsigned int iBufGetCh(void)
 int DoMacro(int fkey)
 {
   if (fkey < 0 || fkey >= MAX_MACROS)
-  {
-#ifdef DEBUG_MACROS
-    
-    clog("DoMacro(): KEY_F(0) = %d, KEY_F(MAX_MACROS) = %d ch = %d, fkey = %d", 
-	 KEY_F(0), KEY_F(MAX_MACROS), ch, fkey);
-    clog("DoMacro(): got invalid Fkey: %d", ch);
-#endif
-
     return(FALSE);
-  }
 
   iBufPut(UserConf.MacrosF[fkey]);	
 

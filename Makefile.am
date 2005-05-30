@@ -14,7 +14,7 @@ IMAGES = img/classd.tga img/classm.tga img/doomsday.tga img/explode.tga \
 	img/shipkde.tga img/shipksc.tga img/shipocr.tga img/shipode.tga \
 	img/shiposc.tga img/shiprcr.tga img/shiprde.tga img/shiprsc.tga \
 	img/star.tga img/fixed.txf img/msg.txf img/large.txf img/vbg.tga \
-	img/torp.tga img/luna.tga img/tinyfixed.txf
+	img/torp.tga img/luna.tga img/tinyfixed.txf img/barrier.tga
 
 
 XLIBS = @X_LIBS@ @X_EXTRA_LIBS@ -lglut -lGL -lGLU -lXt @X_PRE_LIBS@ -lXext -lXi -lX11 -lXmu  

@@ -13,6 +13,7 @@
 #include "global.h"
 #include "color.h"
 #include "conqcom.h"
+#include "conqlb.h"
 #include "ibuf.h"
 #define NOEXTERN_DCONF
 #include "gldisplay.h"
@@ -38,6 +39,46 @@ extern void conqend(void);
 
 #define NOEXTERN
 #include "conquest.h"
+
+/* torp animation state */
+typedef struct _torpanimrec {
+  GLfloat r;
+  GLfloat g;
+  GLfloat b;
+  GLfloat a;
+
+  GLfloat size;
+} torpAnimRec;
+
+static torpAnimRec torpAnimate[16] = {
+  { 1.0, 1.0, 1.0, 1.0, 12.5 },
+  { 1.0, 1.0, 1.0, 1.0, 12.5 },
+  { 1.0, 1.0, 1.0, 1.0, 12.5 },
+  { 1.0, 1.0, 1.0, 1.0, 12.5 },
+  { 1.0, 0.7, 0.8, 1.0, 12.5 },
+  { 1.0, 0.7, 0.7, 1.0, 12.5 },
+  { 1.0, 0.6, 0.5, 1.0, 12.5 },
+  { 1.0, 0.6, 0.5, 1.0, 12.5 },
+  { 1.0, 0.5, 0.4, 1.0, 12.5 },
+  { 1.0, 0.5, 0.3, 1.0, 12.5 },
+  { 1.0, 0.5, 0.3, 1.0, 12.5 },
+  { 1.0, 0.5, 0.2, 1.0, 12.5 },
+  { 1.0, 0.5, 0.1, 1.0, 12.5 },
+  { 1.0, 0.5, 0.1, 1.0, 12.5 },
+  { 1.0, 0.5, 0.1, 1.0, 12.5 },
+  { 1.0, 0.5, 0.0, 1.0, 12.5 },
+};
+
+typedef struct tainfo {
+  int running;
+  real x, y;                    /* stored x/y so we can detect ship
+                                   explosions */
+  Unsgn32 lasttime;
+  int stage;                    /* index into above or -1 */
+  torpAnimRec anim;             /* how to draw */
+} TAInfoRec;
+
+static TAInfoRec torpAnim [MAXSHIPS + 1][MAXTORPS] = {};
 
 dspData_t dData;
 
@@ -89,7 +130,26 @@ struct _texinfo {
 #define TEX_TORP     18
 #define TEX_LUNA     19
 
-#define NUM_TEX 20
+#define TEX_BARRIER  20
+
+#define TEX_EXP0     21
+#define TEX_EXP1     22
+#define TEX_EXP2     23
+#define TEX_EXP3     24
+#define TEX_EXP4     25
+#define TEX_EXP5     26
+#define TEX_EXP6     27
+#define TEX_EXP7     28
+#define TEX_EXP8     29
+#define TEX_EXP9     30
+#define TEX_EXP10    31
+#define TEX_EXP11    32
+#define TEX_EXP12    33
+#define TEX_EXP13    34
+#define TEX_EXP14    35
+#define TEX_EXP15    36
+
+#define NUM_TEX 37
 
 struct _texinfo TexInfo[NUM_TEX] = { /* need to correlate with defines above */
   { "img/star.tga" },
@@ -122,6 +182,27 @@ struct _texinfo TexInfo[NUM_TEX] = { /* need to correlate with defines above */
   { "img/torp.tga" },
 
   { "img/luna.tga" },
+
+  { "img/barrier.tga" },
+
+
+  { "img/exp0.tga" },
+  { "img/exp1.tga" },
+  { "img/exp2.tga" },
+  { "img/exp3.tga" },
+  { "img/exp4.tga" },
+  { "img/exp5.tga" },
+  { "img/exp6.tga" },
+  { "img/exp7.tga" },
+  { "img/exp8.tga" },
+  { "img/exp9.tga" },
+  { "img/exp10.tga" },
+  { "img/exp11.tga" },
+  { "img/exp12.tga" },
+  { "img/exp13.tga" },
+  { "img/exp14.tga" },
+  { "img/exp15.tga" },
+
 };
 
 GLuint  textures[NUM_TEX];       /* texture storage */
@@ -232,10 +313,107 @@ void drawTexBox(GLfloat x, GLfloat y, GLfloat z, GLfloat size)
   return;
 }
 
-void drawExplosion(GLfloat x, GLfloat y)
+void drawExplosion(GLfloat x, GLfloat y, int snum, int torpnum)
 {
-  const GLfloat z = 5.0;
+  Unsgn32 thetime = clbGetMillis();
+  const static int maxtime = 100;
+  int waittime;
+  GLint texsel;
 
+  if (Context.recmode == RECMODE_PLAYING)
+    waittime = (int) (((real)maxtime * 10.0) * framedelay);
+  else
+    waittime = maxtime;
+
+  /* if we are not running, OR if we are running, but our x/y
+     changed (maybe a ship exploded), reset the animation for a run */
+
+  if (!torpAnim[snum][torpnum].running ||
+      (torpAnim[snum][torpnum].running && 
+       (Ships[snum].torps[torpnum].x != torpAnim[snum][torpnum].x ||
+        Ships[snum].torps[torpnum].y != torpAnim[snum][torpnum].y)))
+    {
+      torpAnim[snum][torpnum].running = TRUE;
+      torpAnim[snum][torpnum].lasttime = 0;
+      torpAnim[snum][torpnum].stage = 0;
+      torpAnim[snum][torpnum].anim = torpAnimate[0];
+      torpAnim[snum][torpnum].x = Ships[snum].torps[torpnum].x;
+      torpAnim[snum][torpnum].y = Ships[snum].torps[torpnum].y;
+    }
+  else 
+    {
+      if ((thetime - torpAnim[snum][torpnum].lasttime) > waittime)
+        {
+          
+          if (torpAnim[snum][torpnum].stage != -1)
+            {
+              torpAnim[snum][torpnum].stage++;
+              if (torpAnim[snum][torpnum].stage <= 15)
+                torpAnim[snum][torpnum].anim = 
+                  torpAnimate[torpAnim[snum][torpnum].stage];
+            }
+          else
+            {
+              if (torpAnim[snum][torpnum].anim.g > 0.0)
+                torpAnim[snum][torpnum].anim.g -= 0.001;
+              else
+                torpAnim[snum][torpnum].anim.g = 0.0;
+
+              if (torpAnim[snum][torpnum].anim.b > 0.0)
+                torpAnim[snum][torpnum].anim.b -= 0.01;
+              else
+                torpAnim[snum][torpnum].anim.b = 0.0;
+
+              torpAnim[snum][torpnum].anim.a -= 0.1;
+              torpAnim[snum][torpnum].anim.size += 0.4;
+            }
+
+          if (torpAnim[snum][torpnum].stage > 15)
+            {
+              torpAnim[snum][torpnum].stage = -1;
+              torpAnim[snum][torpnum].anim = 
+                torpAnimate[15];
+            }
+
+          torpAnim[snum][torpnum].lasttime = thetime;
+        }
+    }
+
+  if (torpAnim[snum][torpnum].stage == -1)
+    texsel = 15 + TEX_EXP0;
+  else
+    texsel = torpAnim[snum][torpnum].stage + TEX_EXP0;
+
+  glPushMatrix();
+  glLoadIdentity();
+
+  /* translate to correct position, */
+  glTranslatef(x , y , TRANZ);
+  /*  glRotatef(rnduni( 0.0, 360.0 ), 0.0, 0.0, z);*/
+
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+  glEnable(GL_BLEND);
+  
+  glEnable(GL_TEXTURE_2D);
+  glBindTexture(GL_TEXTURE_2D, textures[texsel]);
+  
+  glColor4f(torpAnim[snum][torpnum].anim.r,
+            torpAnim[snum][torpnum].anim.g,
+            torpAnim[snum][torpnum].anim.b,
+            torpAnim[snum][torpnum].anim.a);
+
+  glBegin(GL_POLYGON);
+  drawTexBox(0.0, 0.0, 0.0, 
+             torpAnim[snum][torpnum].anim.size);
+  glEnd();
+
+  glDisable(GL_TEXTURE_2D); 
+  glDisable(GL_BLEND);
+
+  glPopMatrix();
+
+
+#if 0                           /* old explosion code */
   glPushMatrix();
   glLoadIdentity();
 
@@ -260,7 +438,7 @@ void drawExplosion(GLfloat x, GLfloat y)
   glDisable(GL_BLEND);
 
   glPopMatrix();
-
+#endif
   return;
 }
 
@@ -1013,7 +1191,7 @@ void uiPrintFixed(GLfloat x, GLfloat y, GLfloat w, GLfloat h, char *str)
 
 
 void drawTorp(GLfloat x, GLfloat y, char torpchar, int torpcolor, 
-              int scale)
+              int scale, int snum, int torpnum)
 {
   const GLfloat z = -5.0;
   GLfloat size = 3.0;
@@ -1058,6 +1236,10 @@ void drawTorp(GLfloat x, GLfloat y, char torpchar, int torpcolor,
   glDisable(GL_BLEND);
 
   glPopMatrix();
+
+  /* torpanim init */
+  if (torpAnim[snum][torpnum].running)
+    torpAnim[snum][torpnum].running = FALSE;
 
   return;
 }
@@ -1296,9 +1478,46 @@ drawDoomsday(GLfloat x, GLfloat y, GLfloat angle, GLfloat scale)
 void drawViewerBG(int snum)
 {
   GLfloat z = TRANZ * 3.0;
+  static const real nebwidth = (NEGENBEND_DIST - NEGENB_DIST) / 1000.0;
   const GLfloat size = VIEWANGLE * 34.0; /* empirically determined */
   const GLfloat sizeh = size / 2.0;
+  const GLfloat size2 = VIEWANGLE * (34.0 + nebwidth); /* 37.5 */ 
+  const GLfloat sizeh2 = size2 / 2.0;
+  const int maxtime = 100;
+  static Unsgn32 lasttime = 0;
+  Unsgn32 thetime = clbGetMillis();
+  static GLfloat r0 = 0.0;
+  static GLfloat r1 = 1.0;
   GLfloat x, y;
+
+  if ((thetime - lasttime) > maxtime)
+    {
+      static real dir0 = 1.0;
+      static real dir1 = -1.0;
+
+      if (rnduni(0.0, 1.0) < 0.01)
+        dir0 *= -1.0;
+
+       if (rnduni(0.0, 1.0) < 0.01)
+         dir1 *= -1.0;
+
+      if (r0 <= 0.0)
+        dir0 = 1.0;
+      else if (r0 >= 0.4)
+        dir0 = -1.0;
+
+      if (r1 >= 1.0)
+        dir1 = -1.0;
+      else if (r1 <= 0.6)
+        dir1 = 1.0;
+
+      r1 += (dir1 * 0.0002);
+      r0 += (dir0 * 0.0002);
+      
+      /*      clog("r0 = %f (%f) r1 = %f(%f)\n", r0, dir0, r1, dir1);*/
+
+      lasttime = thetime;
+    }
 
   if (snum < 1 || snum > MAXSHIPS)
     GLcvtcoords(0.0, 0.0, 0.0, 0.0, SCALE_FAC, &x, &y);
@@ -1321,9 +1540,32 @@ void drawViewerBG(int snum)
   glLoadIdentity();
   glTranslatef(x , y , z);
 
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+  glEnable(GL_BLEND);
+
   glEnable(GL_TEXTURE_2D);
+
+  /* negative energy barrier */
+  glBindTexture(GL_TEXTURE_2D, textures[TEX_BARRIER]);
+  glColor4f(0.7, 0.5, 0.7, 0.8);
+
+  glBegin(GL_POLYGON);
+  glTexCoord2f(r1, r0);
+  glVertex3f(-sizeh2, -sizeh2, -1.0); /* ll */
+
+  glTexCoord2f(r1, r1);
+  glVertex3f(sizeh2, -sizeh2, -1.0); /* lr */
+
+  glTexCoord2f(r0, r1);
+  glVertex3f(sizeh2, sizeh2, -1.0); /* ur */
+
+  glTexCoord2f(r0, r0);
+  glVertex3f(-sizeh2, sizeh2, -1.0); /* ul */
+  glEnd();
+
+
+  /* viewer background */
   glBindTexture(GL_TEXTURE_2D, textures[TEX_VBG]);
-  
   glColor3f(0.8, 0.8, 0.8);	
 
   glBegin(GL_POLYGON);
@@ -1343,6 +1585,7 @@ void drawViewerBG(int snum)
   glEnd();
 
   glDisable(GL_TEXTURE_2D); 
+  glDisable(GL_BLEND);
 
   glPopMatrix();
 
@@ -1440,7 +1683,7 @@ static int LoadTGA(char *filename, textureImage *texture)
 
   if (!file)
     {
-      clog("Error reading file: %s\n", strerror(errno));
+      clog("Error reading file '%s': %s\n", filename, strerror(errno));
       return FALSE;
     }
 
