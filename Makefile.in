@@ -315,7 +315,11 @@ IMAGES = img/classd.tga img/classm.tga img/doomsday.tga img/explode.tga \
 	img/shipkde.tga img/shipksc.tga img/shipocr.tga img/shipode.tga \
 	img/shiposc.tga img/shiprcr.tga img/shiprde.tga img/shiprsc.tga \
 	img/star.tga img/fixed.txf img/msg.txf img/large.txf img/vbg.tga \
-	img/torp.tga img/luna.tga img/tinyfixed.txf img/barrier.tga
+	img/torp.tga img/luna.tga img/tinyfixed.txf img/barrier.tga \
+	img/exp0.tga img/exp1.tga img/exp2.tga img/exp3.tga img/exp4.tga \
+	img/exp5.tga img/exp6.tga img/exp7.tga img/exp8.tga img/exp9.tga \
+	img/exp10.tga img/exp11.tga img/exp12.tga img/exp13.tga \
+	img/exp14.tga img/exp15.tga
 
 XLIBS = @X_LIBS@ @X_EXTRA_LIBS@ -lglut -lGL -lGLU -lXt @X_PRE_LIBS@ -lXext -lXi -lX11 -lXmu  
 INCLUDES = -DCONQUEST_GROUP=\"$(CONQGROUP)\" \
