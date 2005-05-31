@@ -1275,7 +1275,7 @@ drawShip(GLfloat x, GLfloat y, GLfloat angle, char ch, int i, int color,
       glTranslatef(x , y , TRANZ);
       glRotatef(Ships[i].lastphase - 90.0, 0.0, 0.0, z);
 
-      glColor4f(1.0, 1.0, 1.0, 0.7);
+      glColor4f(1.0, 1.0, 1.0, 1.0);
       glEnable(GL_TEXTURE_2D); 
       glBindTexture(GL_TEXTURE_2D, textures[TEX_PHASER]);
       GLError();
@@ -1287,6 +1287,7 @@ drawShip(GLfloat x, GLfloat y, GLfloat angle, char ch, int i, int color,
       glTexCoord2f(1.0f, 1.0f);
       glVertex3f(1.5, 0.0, -1.0); /* lr */
       
+      glColor4f(1.0, 1.0, 1.0, 0.3);
       glTexCoord2f(0.0f, 1.0f);
       glVertex3f(1.5, phaseradius, -1.0); /* ur */
       
