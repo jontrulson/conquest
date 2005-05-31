@@ -310,7 +310,7 @@ CONQLIBEXECDIR = @libexecdir@
 CONQDATADIR = @datadir@
 CONQSYSCONFDIR = @sysconfdir@
 CONQIMGDIR = $(CONQDATADIR)/img
-IMAGES = img/classd.tga img/classm.tga img/doomsday.tga img/explode.tga \
+IMAGES = img/classd.tga img/classm.tga img/doomsday.tga img/phaser.tga \
 	img/shipfcr.tga img/shipfde.tga img/shipfsc.tga img/shipkcr.tga \
 	img/shipkde.tga img/shipksc.tga img/shipocr.tga img/shipode.tga \
 	img/shiposc.tga img/shiprcr.tga img/shiprde.tga img/shiprsc.tga \

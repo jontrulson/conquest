@@ -105,7 +105,7 @@ struct _texinfo {
 #define TEX_SUN 0
 #define TEX_CLASSM 1
 #define TEX_CLASSD 2
-#define TEX_EXPLODE 3
+#define TEX_PHASER 3
 
 #define TEX_SHIP_FSC 4
 #define TEX_SHIP_FDE 5
@@ -157,7 +157,7 @@ struct _texinfo TexInfo[NUM_TEX] = { /* need to correlate with defines above */
   { "img/classm.tga" },
   { "img/classd.tga" },
 
-  { "img/explode.tga" },
+  { "img/phaser.tga" },
 
   { "img/shipfsc.tga" },
   { "img/shipfde.tga" },
@@ -1273,18 +1273,29 @@ drawShip(GLfloat x, GLfloat y, GLfloat angle, char ch, int i, int color,
       glLoadIdentity();
       /* translate to correct position, */
       glTranslatef(x , y , TRANZ);
-      /* THEN rotate ;-) */
-      glRotatef(Ships[i].lastphase, 0.0, 0.0, z);
+      glRotatef(Ships[i].lastphase - 90.0, 0.0, 0.0, z);
 
-      glLineWidth(2.0);
-
-      glBegin(GL_LINES);
-      glColor4f(1.0, 1.0, 1.0, .9);
-      glVertex3f(0.0, 0.0, z + 1.0);
-      glColor4f(1.0, 0.0, 0.0, 0.25);
-      glVertex3f(phaseradius, 0.0, z + 1.0);
+      glColor4f(1.0, 1.0, 1.0, 0.7);
+      glEnable(GL_TEXTURE_2D); 
+      glBindTexture(GL_TEXTURE_2D, textures[TEX_PHASER]);
+      GLError();
+      glBegin(GL_POLYGON);
+      
+      glTexCoord2f(1.0f, 0.0f);
+      glVertex3f(-1.5, 0.0, -1.0); /* ll */
+      
+      glTexCoord2f(1.0f, 1.0f);
+      glVertex3f(1.5, 0.0, -1.0); /* lr */
+      
+      glTexCoord2f(0.0f, 1.0f);
+      glVertex3f(1.5, phaseradius, -1.0); /* ur */
+      
+      glTexCoord2f(0.0f, 0.0f);
+      glVertex3f(-1.5, phaseradius, -1.0); /* ul */
+      
       glEnd();
       
+      glDisable(GL_TEXTURE_2D);   
       glPopMatrix();
     }
 

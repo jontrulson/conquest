@@ -13,6 +13,8 @@ Version 8.1a (devel)
 
         - redid explosion rendering in the GL client.
 
+        - now use a textured quad for phasers rather than a line.
+
         - remove drawString(), not needed anymore.
 
         - properly report an error and exit of the texfont(s) cannot
