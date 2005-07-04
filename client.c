@@ -683,10 +683,19 @@ int sendCommand(Unsgn8 cmd, Unsgn16 detail)
   ccmd.cmd = cmd;
   ccmd.detail = htons(detail);
 
-  if (writePacket(PKT_TOSERVER, cInfo.sock, (Unsgn8 *)&ccmd) <= 0)
-    return FALSE;
-  else 
-    return TRUE;
+  if (cmd == CPCMD_KEEPALIVE && cInfo.tryUDP)
+    {
+      writePacket(PKT_TOSERVER, cInfo.usock, (Unsgn8 *)&ccmd);
+      return TRUE;
+    }
+  else
+    {
+
+      if (writePacket(PKT_TOSERVER, cInfo.sock, (Unsgn8 *)&ccmd) <= 0)
+        return FALSE;
+      else 
+        return TRUE;
+    }
 }
 
 int sendFireTorps(int num, real dir)

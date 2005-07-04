@@ -9,6 +9,14 @@
 
                               Conquest HISTORY
 
+Version 8.1b (devel)
+
+        - during playback of a recording, honor the user config
+          NoRobotMsgs option.
+
+        - test UDP keepalive to see if johns 'disappearing UDP
+          problems disappear.
+
 Version 8.1a (devel)
 
         - redid explosion rendering in the GL client.
@@ -17,7 +25,7 @@ Version 8.1a (devel)
 
         - remove drawString(), not needed anymore.
 
-        - properly report an error and exit of the texfont(s) cannot
+        - properly report an error and exit if the texfont(s) cannot
           be loaded (rather than core). 
 
         - can see the negative energy barrier now in the GL client.

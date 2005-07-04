@@ -1115,6 +1115,9 @@ void handleSimpleCmdPkt(cpCommand_t *ccmd)
       clbUnblockAlarm();
       break;
 
+    case CPCMD_KEEPALIVE:       /* these we just ignore */
+      break;
+
     default:
       clog("conquestd: handleSimpleCmdPkt(): unexpected command code %d",
 	   cmd);

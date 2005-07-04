@@ -412,33 +412,6 @@ void drawExplosion(GLfloat x, GLfloat y, int snum, int torpnum)
 
   glPopMatrix();
 
-
-#if 0                           /* old explosion code */
-  glPushMatrix();
-  glLoadIdentity();
-
-  /* translate to correct position, */
-  glTranslatef(x , y , TRANZ);
-  /* THEN rotate ;-) */
-  glRotatef(rnduni( 0.0, 360.0 ), 0.0, 0.0, z);
-
-  glBlendFunc(GL_SRC_ALPHA, GL_ONE);
-  glEnable(GL_BLEND);
-  
-  glEnable(GL_TEXTURE_2D);
-  glBindTexture(GL_TEXTURE_2D, textures[TEX_EXPLODE]);
-  
-  glColor3f(1.0, 0.5, 0.0);	/* orange. */
-
-  glBegin(GL_POLYGON);
-  drawTexBox(0.0, 0.0, 0.0, 7.5);
-  glEnd();
-
-  glDisable(GL_TEXTURE_2D); 
-  glDisable(GL_BLEND);
-
-  glPopMatrix();
-#endif
   return;
 }
 
@@ -1020,7 +993,7 @@ void graphicsInit(void)
 
 }
 
-void
+static void
 resize(int w, int h)
 {
   static int minit = FALSE;
