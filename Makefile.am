@@ -2,7 +2,7 @@ AUTOMAKE_OPTIONS = foreign
 
 # User defineable options
 
-CFLAGS = @CONQ_CFLAGS@ -g3 -DNDEBUG
+CFLAGS = @CONQ_CFLAGS@ -O -DNDEBUG
 CONQGROUP = @CONQGROUP@
 CONQLOCALSTATEDIR = @localstatedir@/conquest
 CONQLIBEXECDIR = @libexecdir@

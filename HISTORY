@@ -9,13 +9,16 @@
 
                               Conquest HISTORY
 
-Version 8.1b (devel)
+Version 8.1c (devel)
 
         - during playback of a recording, honor the user config
           NoRobotMsgs option.
 
-        - test UDP keepalive to see if johns 'disappearing UDP
-          problems disappear.
+        - send a UDP keepalive packet every 60 seconds to keep
+          UDP connections alive for certain firewalls that seem to
+          timeout the connection if there is no client->server
+          activity. 
+          
 
 Version 8.1a (devel)
 

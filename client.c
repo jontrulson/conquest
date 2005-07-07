@@ -18,6 +18,7 @@
 #include "client.h"
 #undef CLIENT_NOEXTERN
 
+#include "conqlb.h"
 #include "clientlb.h"
 #include "conqcom.h"
 #include "context.h"
@@ -683,7 +684,7 @@ int sendCommand(Unsgn8 cmd, Unsgn16 detail)
   ccmd.cmd = cmd;
   ccmd.detail = htons(detail);
 
-  if (cmd == CPCMD_KEEPALIVE && cInfo.tryUDP)
+  if (cmd == CPCMD_KEEPALIVE && cInfo.usock != -1)
     {
       writePacket(PKT_TOSERVER, cInfo.usock, (Unsgn8 *)&ccmd);
       return TRUE;
@@ -970,6 +971,7 @@ void processPacket(Unsgn8 *buf)
     case SP_TEAM:
       procTeam(buf);
       break;
+
     case SP_CLIENTSTAT:
       scstat = (spClientStat_t *)buf;
       Context.snum = scstat->snum;
@@ -1021,4 +1023,24 @@ void processPacket(Unsgn8 *buf)
   return;
 }
 
+/* Some routers/firewalls seem to disconnect a UDP conncetion if there haven't
+ * been any outgoing (client->server) packets for awhile.  Normally, conquest
+ * never sends UDP packets except during UDP negotiation at the start of a
+ * game.  This routine will send a CPCMD_KEEPALIVE packet every 60 seconds
+ * if a UDP connection is enabled.  Seems to solve clute's problem.
+ */
+void sendUDPKeepAlive(void)
+{
+  static Unsgn32 katime = 0;     /* UDP keepalive packets */
+  const Unsgn32 kawait = 60000;  /* ms (60 seconds) */
+  Unsgn32 iternow = clbGetMillis();  
 
+  /* send a UDP keepalive packet if it's time */
+  if (((iternow - katime) > kawait) && cInfo.usock != -1)
+    {
+      sendCommand(CPCMD_KEEPALIVE, 0);
+      katime = iternow;
+    }
+
+  return;
+}

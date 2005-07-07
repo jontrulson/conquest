@@ -3360,6 +3360,9 @@ int play()
 	  cdrefresh();
         }
 
+      /* send a UDP keepalive packet if it's time */
+      sendUDPKeepAlive();
+
     } /* while stillalive */
 	  
   Context.display = FALSE;

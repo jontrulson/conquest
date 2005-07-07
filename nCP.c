@@ -2467,8 +2467,6 @@ static int nCPIdle(void)
   Unsgn32 iternow = clbGetMillis();
   const Unsgn32 iterwait = 50;   /* ms */
   const Unsgn32 pingwait = 2000; /* ms (2 seconds) */
-  static Unsgn32 katime = 0;     /* UDP keepalive packets */
-  const Unsgn32 kawait = 60000;  /* ms (60 seconds) */
   real tdelta = (real)iternow - (real)iterstart;
 
 
@@ -2511,11 +2509,7 @@ static int nCPIdle(void)
     }
 
   /* send a UDP keepalive packet if it's time */
-  if (((iternow - katime) > kawait) && cInfo.doUDP)
-    {
-      sendCommand(CPCMD_KEEPALIVE, 0);
-      katime = iternow;
-    }
+  sendUDPKeepAlive();
 
   /* send a ping if it's time */
   if (!pingPending && ((iternow - pingtime) > pingwait))

@@ -89,5 +89,6 @@ int clientHello(char *clientname);
 
 void processPacket(Unsgn8 *buf);
 
+void sendUDPKeepAlive(void);
 
 #endif /* CLIENT_H_INCLUDED */
