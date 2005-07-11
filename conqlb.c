@@ -850,10 +850,14 @@ int clbTakePlanet( int pnum, int snum )
                 }
             }
 #endif
-	  clog("INFO: %s (%s) genocided the %s team!",
-	       Users[Ships[snum].unum].username,
-	       Ships[snum].alias,
-	       Teams[oteam].name);
+          sprintf(buf, "%c%d (%s) genocided the %s team!",
+                  Teams[Ships[snum].team].teamchar,
+                  snum,
+                  Ships[snum].alias,
+                  Teams[oteam].name);
+                  
+          clbStoreMsg(MSG_COMP, MSG_ALL, buf);
+
         }
 
     }
@@ -1077,7 +1081,7 @@ void clbStatline( int unum, char *buf )
 int clbZeroPlanet( int pnum, int snum )
 {
   int oteam, i; 
-  int didgeno;
+  int didgeno = FALSE;
 
   oteam = Planets[pnum].team;
   Planets[pnum].team = TEAM_NOTEAM;

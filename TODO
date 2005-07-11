@@ -1,15 +1,70 @@
 
 - BUGS
 
-  NONE
+  NONE :)
 
+- improved configure support
 
-- IP restrictions
+  - detect when vital things are missing (bison, flex, glut.h, etc.)
+
+  - add a BUILD REQUIREMENTS section somewhere - web page, README, build
+    docs etc.  
+
+- GENERAL
+
+  - local ship movement computation?  Big/trickey job. would require
+    protocol change.
+
+    - how to handle/sync orbiting, tow, etc...
+
+  - observer support?
+
+  - new server flag? NoKillTeam - determines whether a ship can
+    set war with it's own team.
+
+  - support for more teams.  would have to go hand in hand with items
+    below. 
+
+  - split up common block
+
+    - ship, user, game/admin common, planets, teams, etc.  Would
+      require protocol changes.  Want to keep cqr's compatible as
+      well.
+
+      conversion to a new cmnblk format should be possible without
+      losing existing data.
+
+    - would allow more dynamic creation of games (for example adding a
+      new team, increasing the number of ships, planets, etc).
+
+    - allow definiton of new ship types/capabilities/limits?  
+
+  - provide 'game config' dir containing config files that specify
+    things like number of ships allowed, planet definitions (for custom
+    universes, etc) for a particular game.
+
+  - provide seperate 'game data dir' like above containing common blocks,
+    log locations, etc so a single binary installation could handle
+    multiple games (rather than compiling a conquest for each game
+    with a different --prefix= ).
+
+    - perhaps game data location, etc defined in conquestrc file that
+      can be specified on the conquest/conqoper/conquestd cmd line?
+
+  - enable/disable client recording from within the game
+
+  - allow user to go to the meta list from within the game (without
+    restarting with the -m flag).
+
+  - add more EXEC commands for operators to send to GOD - kill a ship(s),
+    create robot(s), etc...
+
+- IP restrictions?
 
   - how to handle telnet servers?
 
-  - need new 'client driver' common block, NUMSHIPS structures with
-    IP, PID, broadcast flags, etc.
+  - would need new 'client driver' common block, NUMSHIPS structures
+    with IP, PID, interclient-event broadcast flags, etc.
 
   - IP config file, listing IP's and their limits
 
@@ -18,24 +73,27 @@
 
     - consider enabling/re-implementing the multiple ships per user stuff?
 
-- GENERAL
 
-  - local ship movement computation?
+- OpenGL
 
-    - how to handle orbiting, tow, etc...
+  - add more 'animated activity' like the new explosion and NEB
+    rendering in 8.1a+. Generalize to generic per-node animation lists
+    using a new 'animation engine'.
 
-  - observer support?
+  - individual textures for each planet
 
-  - new flag? KillTeam - determines whether a ship can set war with
-    own team 
+  - more flexible color specification for suns, etc rather than being
+    limited to primary colors like red, blue, green, yellow etc.
 
-  - GL - do something cool for displaying the neg eng barrier?
+  - texture-mapped HUD?
 
-  - 'Fast' flag... speeding up the game?
+  - asynchronous server connection handling, so client isn't 'stuck'
+    while establishing a connection to a server.
+
+  - better UDP negotiation.  Option to enable/disable from within the
+    game. 
 
 - PROTOCOL
-
-  - add local server time to hello/srvrstat
 
   - add pads to those structures not having them?
 
@@ -44,8 +102,24 @@
 
   - versioning improvment... use major == incompat, minor == compat...
 
+  - revamp so there is eough info provided to the client to create the
+    common block(s) from scratch, rather than relying on compiled-in
+    definitions, sizes, names, etc.
 
+- Blue Sky
 
-- support for more teams
+  - different game types:
+
+    - classic (like it is now)
+
+    - deathmatch - free for all, or team.  
+
+    - Capture The Planet :)
+
+  - wormholes, moving, stationary, uni or bidirectional?  
+
+  - 'Fast' flag... speeding up the game?  Faster regen/cooldown, bombing,
+    beaming, speed, firing, etc?
+
 
 

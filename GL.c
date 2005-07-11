@@ -1087,24 +1087,30 @@ static int renderNode(void)
             return rv;
 
           if (onode && onode->display)
-            rv = (*onode->display)(&dConf);
+            {
+              rv = (*onode->display)(&dConf);
           
-          if (rv == NODE_EXIT)
-            return rv;
+              if (rv == NODE_EXIT)
+                return rv;
+            }
 
           glutSwapBuffers();
 
         }
 
       if (node->idle)
-        rv = (*node->idle)();
-      if (rv == NODE_EXIT)
-        return rv;
+        {
+          rv = (*node->idle)();
+          if (rv == NODE_EXIT)
+            return rv;
+        }
 
       if (onode && onode->idle)
-        rv = (*onode->idle)();
-      if (rv == NODE_EXIT)
-        return rv;
+        {
+          rv = (*onode->idle)();
+          if (rv == NODE_EXIT)
+            return rv;
+        }
     }
 
   return NODE_OK;

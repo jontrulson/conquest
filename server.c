@@ -22,12 +22,6 @@
 #define MAXUDPERRS    (15)
 static int sudperrs = 0;        /* keep track of udp write errors */
 
-#if 0
-static string guilt="Team genocided.  Any armies you were carrying died of guilt.";
-#endif
-static string guilt="Your team was genocided.";
-
-
 /* called when a write to a UDP socket fails. If the error threshold
    is exceeded, disable UDP to client and let them know */
 static void handleUDPErr(void)
@@ -1052,9 +1046,6 @@ void procCoup(cpCommand_t *cmd)
 
   sendFeedback("Coup successful!");
 
-  if (rv >= 0 && rv < NUMPLAYERTEAMS)  /* someone was geno'd, send team msg */
-    clbStoreMsg( MSG_COMP, -rv, guilt );
-
   /* force a team update for this ship */
   sendTeam(sInfo.sock, Ships[snum].team, TRUE);
   
@@ -1898,10 +1889,6 @@ void procBeam(cpCommand_t *cmd)
 	    }
 	  PVUNLOCK(&ConqInfo->lockword);
 	  total = total + 1;
-
-	  /* someone was geno'd, send team msg */
-          if (rv >= 0 && rv < NUMPLAYERTEAMS)  
-            clbStoreMsg( MSG_COMP, -rv, guilt );
 
 	  if ( total >= num )
 	    {

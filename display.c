@@ -122,7 +122,7 @@ void do_border(int snum, int attr)
 
 int alertcolor(int alert)
 {
-  int theattrib;
+  int theattrib = 0;
   
   switch (alert)
     {
@@ -158,7 +158,7 @@ void display( int snum, int display_info )
   int i, j, k, l, m, idx, lin, col, dcol, datacol, minenemy, minsenemy;
   int linofs[8] = {0, -1, -1, -1, 0, 1, 1, 1};
   int colofs[8] = {1, 1, 0, -1, -1, -1, 0, 1};
-  cqColor outattr;
+  cqColor outattr = 0;
   static int OldAlert = 0;
   static string dirch="-/|\\-/|\\";
   char ch, buf[MSGMAXLINE];
@@ -197,6 +197,7 @@ void display( int snum, int display_info )
   minsdis = 1.0e6;
   minenemy = 0;
   minsenemy = 0;
+  dis = 0.0;
 
   if (snum > 0)
     lsmap = SMAP(snum);

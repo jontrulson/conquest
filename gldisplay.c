@@ -48,7 +48,7 @@ extern real LastPhasDist;	/* defined in conqlb.c */
 
 static int alertcolor(int alert)
 {
-  int theattrib;
+  int theattrib = 0;
   
   switch (alert)
     {
@@ -77,7 +77,7 @@ static int alertcolor(int alert)
 void display( int snum, int display_info )
 {
   int i, j, minenemy, minsenemy;
-  int outattr;
+  int outattr = 0;
   static int OldAlert = 0;
   char ch, buf[MSGMAXLINE];
   int dobeep, lsmap;
@@ -109,6 +109,8 @@ void display( int snum, int display_info )
   minsdis = 1.0e6;
   minenemy = 0;
   minsenemy = 0;
+
+  dis = 0;
 
   if (snum > 0)
     lsmap = SMAP(snum);

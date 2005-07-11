@@ -9,7 +9,7 @@
 
                               Conquest HISTORY
 
-Version 8.1c (devel)
+Version 8.1d (devel)
 
         - during playback of a recording, honor the user config
           NoRobotMsgs option.
@@ -18,6 +18,16 @@ Version 8.1c (devel)
           UDP connections alive for certain firewalls that seem to
           timeout the connection if there is no client->server
           activity. 
+
+          The symptom is that you could get into the game and play for
+          awhile (10-15 minutes) then suddenly all ship movement
+          would stop.  Everything else would work (commands, etc) just
+          no ship movement.
+
+        - clean up some compiler warnings regarding possible use of
+          uninited variables.
+
+        - When a geno occurs, send a message notifying everyone.
           
 
 Version 8.1a (devel)
