@@ -9,7 +9,7 @@
 
                               Conquest HISTORY
 
-Version 8.1d (devel)
+Version 8.1.1 (stable)
 
         - during playback of a recording, honor the user config
           NoRobotMsgs option.
@@ -19,19 +19,16 @@ Version 8.1d (devel)
           timeout the connection if there is no client->server
           activity. 
 
-          The symptom is that you could get into the game and play for
-          awhile (10-15 minutes) then suddenly all ship movement
-          would stop.  Everything else would work (commands, etc) just
-          no ship movement.
+          The symptom reported is that you could get into the game and
+          play for awhile (10-15 minutes) when suddenly all ship
+          movement would stop.  Everything else would work (commands,
+          etc) just no ship movement (meaning UDP stopped).
 
         - clean up some compiler warnings regarding possible use of
-          uninited variables.
+          uninited variables.  
 
         - When a geno occurs, send a message notifying everyone.
           
-
-Version 8.1a (devel)
-
         - redid explosion rendering in the GL client.
 
         - now use a textured quad for phasers rather than a line.

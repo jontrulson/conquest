@@ -11,6 +11,7 @@ CONTENTS:
 
         ### QUICKSTART GUIDE
 	### DISTRIBUTION
+        ### REQUIREMENTS
 	### BUILDING
 	### OTHER USEFUL INFORMATION
             # GENERAL TERMINAL NOTE
@@ -102,6 +103,20 @@ CONTENTS:
 
     The README file provides useful information about conquest, please
     look it over.
+
+### REQUIREMENTS
+
+    To build Conquest, you need:
+
+    bison or yacc (bison preferred)
+    lex or flex
+
+    For the OpenGL client, conquestgl, you will need:
+
+    GLUT libraries and the glut.h header file
+    OpenGL libraries and headers
+    X11 Libraries and headers.
+
 
 ### BUILDING
 

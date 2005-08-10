@@ -838,18 +838,6 @@ int clbTakePlanet( int pnum, int snum )
           Users[Ships[snum].unum].stats[USTAT_GENOCIDE] += 1;
           Teams[Ships[snum].team].stats[TSTAT_GENOCIDE] += 1;
 
-#if 0
-          for (i=1; i <= MAXSHIPS; i++)
-            {                   /* eliminate any geno'd armies from ships */
-              if (Ships[i].status == SS_LIVE && Ships[i].team == oteam &&
-                  Ships[i].armies > 0)
-                {
-                  clog("INFO: summarily suicided %d geno'd armies on ship %d",
-                       Ships[i].armies, i);
-                  Ships[i].armies = 0;
-                }
-            }
-#endif
           sprintf(buf, "%c%d (%s) genocided the %s team!",
                   Teams[Ships[snum].team].teamchar,
                   snum,
@@ -857,7 +845,7 @@ int clbTakePlanet( int pnum, int snum )
                   Teams[oteam].name);
                   
           clbStoreMsg(MSG_COMP, MSG_ALL, buf);
-
+          clog(buf);
         }
 
     }
@@ -1082,6 +1070,7 @@ int clbZeroPlanet( int pnum, int snum )
 {
   int oteam, i; 
   int didgeno = FALSE;
+  char buf[MSGMAXLINE];
 
   oteam = Planets[pnum].team;
   Planets[pnum].team = TEAM_NOTEAM;
@@ -1119,23 +1108,14 @@ int clbZeroPlanet( int pnum, int snum )
               Users[Ships[snum].unum].stats[USTAT_GENOCIDE] += 1;
               Teams[Ships[snum].team].stats[TSTAT_GENOCIDE] += 1;
 
-#if 0
-              for (i=1; i <= MAXSHIPS; i++)
-                { /* eliminate any geno'd armies from ships */
-                  if (Ships[i].status == SS_LIVE && Ships[i].team == oteam &&
-                      Ships[i].armies > 0)
-                    {
-                      clog("INFO: summarily suicided %d geno'd armies on ship %d",
-                           Ships[i].armies, i);
-                      Ships[i].armies = 0;
-                    }
-                }
-#endif
-
-              clog("INFO: %s (%s) genocided the %s team!",
-                   Users[Ships[snum].unum].username,
-                   Ships[snum].alias,
-                   Teams[oteam].name);
+              sprintf(buf, "%c%d (%s) genocided the %s team!",
+                      Teams[Ships[snum].team].teamchar,
+                      snum,
+                      Ships[snum].alias,
+                      Teams[oteam].name);
+              
+              clbStoreMsg(MSG_COMP, MSG_ALL, buf);
+              clog(buf);
             }
         }
     }

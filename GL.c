@@ -364,7 +364,11 @@ void drawExplosion(GLfloat x, GLfloat y, int snum, int torpnum)
               else
                 torpAnim[snum][torpnum].anim.b = 0.0;
 
-              torpAnim[snum][torpnum].anim.a -= 0.1;
+              if (torpAnim[snum][torpnum].anim.a > 0.0)
+                torpAnim[snum][torpnum].anim.a -= 0.1;
+              else
+                torpAnim[snum][torpnum].anim.a = 0.0;
+
               torpAnim[snum][torpnum].anim.size += 0.4;
             }
 
@@ -389,7 +393,6 @@ void drawExplosion(GLfloat x, GLfloat y, int snum, int torpnum)
 
   /* translate to correct position, */
   glTranslatef(x , y , TRANZ);
-  /*  glRotatef(rnduni( 0.0, 360.0 ), 0.0, 0.0, z);*/
 
   glBlendFunc(GL_SRC_ALPHA, GL_ONE);
   glEnable(GL_BLEND);
@@ -1674,7 +1677,7 @@ static int LoadTGA(char *filename, textureImage *texture)
 
   if (!file)
     {
-      clog("Error reading file '%s': %s\n", filename, strerror(errno));
+      clog("Error opening file '%s': %s\n", filename, strerror(errno));
       return FALSE;
     }
 
@@ -1682,7 +1685,7 @@ static int LoadTGA(char *filename, textureImage *texture)
       memcmp(TGAheader,TGAcompare,sizeof(TGAheader)) !=0 || 
       fread(header,1,sizeof(header),file) != sizeof(header))
     {
-      clog("Invalid file: %s\n", filename);
+      clog("Invalid file: %s, not a TGA file\n", filename);
       fclose(file);
       return FALSE;
     }
