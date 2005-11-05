@@ -20839,7 +20839,6 @@ fi
 
 
 GLCLIENT=""
-CONQ_CFLAGS=""
 conquest_group=""
 
 # Check whether --with-conquest-group or --without-conquest-group was given.
@@ -21814,7 +21813,9 @@ CONQGROUP="$conquest_group"
 
 if test -n "$GCC"
 then
-	CONQ_CFLAGS="-D__NO_MATH_INLINES -Wall -fPIC -fno-builtin"
+	CONQ_CFLAGS="$CFLAGS -D__NO_MATH_INLINES -Wall -fPIC -fno-builtin -DNDEBUG"
+else
+	CONQ_CFLAGS="$CFLAGS -DNDEBUG"
 fi
 
 

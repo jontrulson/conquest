@@ -21,7 +21,6 @@ dnl Checks for programs.
 dnl get the system type and set accordingly.  first init some defaults.
 
 GLCLIENT=""
-CONQ_CFLAGS=""
 conquest_group=""
 AC_ARG_WITH(conquest-group,
   [  --with-conquest-group=groupname  The conquest group name (Default: conquest)],
@@ -112,7 +111,9 @@ AC_SUBST(CONQGROUP)
 
 if test -n "$GCC"
 then
-	CONQ_CFLAGS="-D__NO_MATH_INLINES -Wall -fPIC -fno-builtin"
+	CONQ_CFLAGS="$CFLAGS -D__NO_MATH_INLINES -Wall -fPIC -fno-builtin -DNDEBUG"
+else
+	CONQ_CFLAGS="$CFLAGS -DNDEBUG"
 fi
 
 AC_SUBST(CONQ_CFLAGS)

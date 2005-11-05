@@ -43,23 +43,9 @@ void confSetTelnetClientMode(int telnetc)
   return;
 }
 
-/* GetSysConf(int checkonly) - load system-wide configuration values */
-/*  If checkonly is TRUE, then just load internel defaults, and the existing
-    conquesrtc file, if there.  Don't output errmsgs since this will
-    only be TRUE when 'priming the pump' in conqoper -C, before writing a
-    new conquestrc file (preserving existing settings if possible). 
-*/
-int GetSysConf(int checkonly)
+/* set default sys config */
+static void setSysConfDefaults(void)
 {
-  FILE *conf_fd;
-  int i, j;
-  char conf_name[MID_BUFFER_SIZE];
-  char buffer[BUFFER_SIZE];
-  int FoundOne = FALSE;
-  int buflen;
-  char *bufptr;
-
-				/* init some defaults */
   SysConf.NoDoomsday = FALSE;
   SysConf.DoRandomRobotKills = FALSE;
   SysConf.AllowVacant = FALSE;
@@ -76,7 +62,61 @@ int GetSysConf(int checkonly)
   strncpy(SysConf.ServerContact, "root@localhost",
 	  META_GEN_STRSIZE);
 
-				/* start building the filename */
+  return;
+}
+
+/* set default user config */
+void setUserConfDefaults(void)
+{
+  int i;
+
+  UserConf.DoAlarms = TRUE;
+  UserConf.ShowPhasers = TRUE;
+  UserConf.ShowPlanNames = TRUE;
+  UserConf.DoIntrudeAlert = TRUE;
+  UserConf.DoNumMap = TRUE;
+  UserConf.Terse = FALSE;
+  UserConf.DoExplode = TRUE;
+  UserConf.MessageBell = TRUE;
+  UserConf.NoColor = FALSE;
+  UserConf.NoRobotMsgs = FALSE;
+  UserConf.UpdatesPerSecond = 5;	/* default of 5 per sec */
+  UserConf.DistressToFriendly = FALSE;
+  UserConf.AltHUD = FALSE;
+  UserConf.DoLRTorpScan = TRUE;
+  UserConf.DoLocalLRScan = TRUE;
+  UserConf.DoETAStats = TRUE;
+  UserConf.EnemyShipBox = TRUE;
+  UserConf.doVBG = TRUE;
+  
+  for (i=0; i<MAX_MACROS; i++)
+    {
+      UserConf.MacrosF[i][0] = EOS;
+    }
+
+  return;
+}
+
+/* GetSysConf(int checkonly) - load system-wide configuration values */
+/*  If checkonly is TRUE, then just load internel defaults, and the existing
+    conquesrtc file, if there.  Don't output errmsgs since this will
+    only be TRUE when 'priming the pump' in conqoper -C, before writing a
+    new conquestrc file (preserving existing settings if possible). 
+*/
+int GetSysConf(int checkonly)
+{
+  FILE *conf_fd;
+  int i, j;
+  char conf_name[MID_BUFFER_SIZE];
+  char buffer[BUFFER_SIZE];
+  int FoundOne = FALSE;
+  int buflen;
+  char *bufptr;
+
+  /* init some defaults */
+  setSysConfDefaults();
+	
+  /* start building the filename */
   snprintf(conf_name, sizeof(conf_name)-1, "%s/%s", CONQETC, SYSCONFIG_FILE);
 
   if ((conf_fd = fopen(conf_name, "r")) == NULL)
@@ -274,37 +314,14 @@ int GetConf(int usernum)
   char *bufptr;
   int FoundOne = FALSE;
 
-				/* init some defaults */
-  UserConf.DoAlarms = TRUE;
-  UserConf.ShowPhasers = TRUE;
-  UserConf.ShowPlanNames = TRUE;
-  UserConf.DoIntrudeAlert = TRUE;
-  UserConf.DoNumMap = TRUE;
-  UserConf.Terse = FALSE;
-  UserConf.DoExplode = TRUE;
-  UserConf.MessageBell = TRUE;
-  UserConf.NoColor = FALSE;
-  UserConf.NoRobotMsgs = FALSE;
-  UserConf.UpdatesPerSecond = 5;	/* default of 5 per sec */
-  UserConf.DistressToFriendly = FALSE;
-  UserConf.AltHUD = FALSE;
-  UserConf.DoLRTorpScan = TRUE;
-  UserConf.DoLocalLRScan = TRUE;
-  UserConf.DoETAStats = TRUE;
-  UserConf.EnemyShipBox = TRUE;
-  UserConf.doVBG = TRUE;
-
-  for (i=0; i<MAX_MACROS; i++)
-    {
-      UserConf.MacrosF[i][0] = EOS;
-    }
-
+  /* init some defaults */
+  setUserConfDefaults();
 
   /* a telnet client leaves here after the defaults are set */
   if (telnetClient)
     return TRUE;
 
-				/* start building the filename */
+  /* start building the filename */
   if ((homevar = getenv("HOME")) == NULL)
     {
       clog("GetConf(): getenv(HOME) failed");

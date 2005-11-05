@@ -383,8 +383,9 @@ int procPlanetInfo(Unsgn8 *buf)
     return FALSE;
 
   primary = splaninfo->primary;
-  
-  if (primary <= 0 || primary > NUMPLANETS)
+
+  /* Roy fix - 10/17/2005 - let's mur data be sent. */
+  if (primary < 0 || primary > NUMPLANETS)
     return FALSE;
 
   /* we will record them if we get them */

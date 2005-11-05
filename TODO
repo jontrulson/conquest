@@ -39,6 +39,11 @@
 
     - allow definiton of new ship types/capabilities/limits?  
 
+  - run a telnet server that takes you directly to a meta list?  That
+    would be cool - run a 'proxy' for telnet players allowing them to
+    connect to any registered server rather than just the main server
+    at conquest.radscan.com... 
+
   - provide 'game config' dir containing config files that specify
     things like number of ships allowed, planet definitions (for custom
     universes, etc) for a particular game.
@@ -55,6 +60,9 @@
 
   - allow user to go to the meta list from within the game (without
     restarting with the -m flag).
+
+    - maybe if conquest was run with '-m', then when the users quits
+      from the main menu, you go back to the meta list?  
 
   - add more EXEC commands for operators to send to GOD - kill a ship(s),
     create robot(s), etc...
@@ -93,6 +101,13 @@
   - better UDP negotiation.  Option to enable/disable from within the
     game. 
 
+  - SDL backend?
+
+  - have doomsday 'beam' rendered when it's attacking it's target.
+
+    - have server send an attacking flag, and client is responsible
+      for drawing it.
+
 - PROTOCOL
 
   - add pads to those structures not having them?
@@ -107,6 +122,8 @@
     definitions, sizes, names, etc.
 
 - Blue Sky
+
+  - sound?  SDL?
 
   - different game types:
 
