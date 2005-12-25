@@ -918,13 +918,13 @@ void setPrompt(int line, char *prompt, int pcolor,
 }
 
 
-static void dspInitData(void)
+void dspInitData(void)
 {
   memset((void *)&dConf, 0, sizeof(dspConfig_t));
 
+  dConf.fullScreen = FALSE;
+  dConf.geomSpeced = FALSE;
   dConf.wX = dConf.wY = 0;
-  dConf.wW = 800;
-  dConf.wH = 600;
 
   memset((void *)&dData, 0, sizeof(dspData_t));
 
@@ -960,15 +960,18 @@ int uiGLInit(int *argc, char **argv)
 
   dConf.inited = False;
 
-  dspInitData();
-
   glutInit(argc, argv);
   glutInitDisplayMode(GLUT_DEPTH | GLUT_DOUBLE | GLUT_RGBA | GLUT_ALPHA);
 
   glutInitWindowPosition(0,0);
-  glutInitWindowSize(dConf.wW, dConf.wH);
+
+  if (!dConf.geomSpeced)
+    glutInitWindowSize(800, 600);
   
   dConf.mainw = glutCreateWindow(CONQUESTGL_NAME);
+
+  if(dConf.fullScreen)
+    glutFullScreen();
 
   glutKeyboardFunc       (charInput);
   glutSpecialFunc        (input);

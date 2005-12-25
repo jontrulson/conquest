@@ -26,7 +26,7 @@
 #define HAVE_FILENO 1
 
 /* Define to 1 if you have the `getmsg' function. */
-/* #undef HAVE_GETMSG */
+#define HAVE_GETMSG 1
 
 /* Define to 1 if you have the <GL/glut.h> header file. */
 #define HAVE_GL_GLUT_H 1

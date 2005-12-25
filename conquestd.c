@@ -499,8 +499,6 @@ void updateProc(void)
 
   stopUpdate();
 
-  drcheck();			/* check the driver */  
-
   /* update client view of the universe */
   updateClient(FALSE);
 
@@ -1634,6 +1632,11 @@ int play(void)
 	  conqstats( Context.snum );
 	  laststat = now;
 	}
+
+      clbBlockAlarm();          /* no signals can be accepted when
+                                   drcheck is run */
+      drcheck();
+      clbUnblockAlarm();
 
       if (didsomething)         
         continue;               /* see if there is another pkt */

@@ -121,10 +121,18 @@ int main(int argc, char *argv[])
 
   cInfo.remotehost = strdup("localhost"); /* default to your own server */
 
+  dspInitData();
+
   /* check options */
-  while ((i = getopt(argc, argv, "mM:s:r:tP:d:u")) != EOF)    /* get command args */
+  while ((i = getopt(argc, argv, "fmM:s:r:tP:d:ug:")) != EOF)    /* get command args */
     switch (i)
       {
+      case 'f':
+        dConf.fullScreen = TRUE;
+        break;
+      case 'g':                 /* to let '-geometry' slide by *HACK* */
+        dConf.geomSpeced = TRUE; /* let glut figure it out */
+        break;
       case 'm':
         wantMetaList = TRUE;
         break;

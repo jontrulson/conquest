@@ -40,6 +40,7 @@
 
 #include "nCP.h"
 
+/* node specific states */
 #define S_NONE         0
 #define S_COURSE       1        /* setting course */
 #define S_DOINFO       2

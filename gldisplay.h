@@ -37,6 +37,8 @@ typedef struct _dspConfig {
 
   unsigned int flags; 
 
+  int fullScreen;
+  int geomSpeced;               /* whether -geometry was specified */
 } dspConfig_t;
 
 #ifdef NOEXTERN_DCONF
@@ -235,5 +237,6 @@ void drawLineBox(GLfloat x, GLfloat y,
 void drawQuad(GLfloat x, GLfloat y, GLfloat w, GLfloat h, GLfloat z);
 void drawExplosion(GLfloat x, GLfloat y, int snum, int torpnum);
 
+void dspInitData(void);
 
 #endif /* _GLDISPLAY_H */

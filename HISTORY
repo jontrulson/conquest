@@ -9,6 +9,17 @@
 
                               Conquest HISTORY
 
+???
+
+        - add patch by Bill Patterson adding a '-f' fullscreen option
+          to conquestgl.
+
+        - fixed localtime() libc futex wait hang in conquestd by
+          moving drcheck() out of the signal handler.  Bad Juju.
+          Thanks to Bill Patterson for letting me have access to his
+          server to locate the problem and test a fix.
+
+
 Version 8.1.1 (stable)
 
         - during playback of a recording, honor the user config
