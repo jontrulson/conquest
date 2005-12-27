@@ -53,7 +53,12 @@ void conqend(void);
 void printUsage()
 {
   printf("Usage: conquestgl [-m ][-s server[:port]] [-r recfile] [ -t ]\n");
-  printf("                  [ -M <metaserver> ] [ -u ]\n\n");
+  printf("                  [-f ][-g <geometry>] [ -u ]\n");
+  printf("                  [ -M <metaserver> ]\n\n");
+  printf("    -f               run in fullscreen mode\n");
+  printf("    -g <geometry>    specify intial window width/height.\n");
+  printf("                      Format is WxH (ex: 1024x768).\n");
+  printf("                      Default is 800x600.\n");
   printf("    -m               query the metaserver\n");
   printf("    -s server[:port] connect to <server> at <port>\n");
   printf("                      default: localhost:1701\n");
@@ -89,6 +94,44 @@ int getLocalhost(char *buf, int len)
 
   return TRUE;
 }
+
+/* parse the geometry arg.  Ensure that dConf init w/h are only
+ *  set if the geom arg was reasonably valid. Format WxH (ex: 1024x768)
+ */
+static void parseGeometry(char *geom)
+{
+  char geomcpy[32];
+  char *ch;
+  int w, h;
+
+  if (!geom || !*geom)
+    return;
+
+  memset((void *)geomcpy, 0, 32);
+  strncpy(geomcpy, geom, 32 - 1);
+
+  if ((ch = strchr(geomcpy, 'x')) == NULL)
+    return;                     /* invalid */
+
+  *ch = 0;
+  ch++;
+
+  if (!*ch)
+    return;
+
+  w = abs(atoi(geomcpy));
+  h = abs(atoi(ch));
+
+  if (!w || !h)
+    return;
+
+  /* set it up */
+  dConf.initWidth = w;
+  dConf.initHeight = h;
+
+  return;
+}
+
 
 /*  conquest - main program */
 int main(int argc, char *argv[]) 
@@ -131,7 +174,7 @@ int main(int argc, char *argv[])
         dConf.fullScreen = TRUE;
         break;
       case 'g':                 /* to let '-geometry' slide by *HACK* */
-        dConf.geomSpeced = TRUE; /* let glut figure it out */
+        parseGeometry(optarg);
         break;
       case 'm':
         wantMetaList = TRUE;

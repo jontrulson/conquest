@@ -38,7 +38,7 @@ typedef struct _dspConfig {
   unsigned int flags; 
 
   int fullScreen;
-  int geomSpeced;               /* whether -geometry was specified */
+  int initWidth, initHeight;    /* initial wxh geometry */
 } dspConfig_t;
 
 #ifdef NOEXTERN_DCONF

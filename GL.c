@@ -37,7 +37,6 @@ extern void conqend(void);
 #include "glmisc.h"
 #include "glfont.h"
 
-#define NOEXTERN
 #include "conquest.h"
 
 /* torp animation state */
@@ -922,8 +921,11 @@ void dspInitData(void)
 {
   memset((void *)&dConf, 0, sizeof(dspConfig_t));
 
+  dConf.inited = False;
+
   dConf.fullScreen = FALSE;
-  dConf.geomSpeced = FALSE;
+  dConf.initWidth = 800;
+  dConf.initHeight = 600;
   dConf.wX = dConf.wY = 0;
 
   memset((void *)&dData, 0, sizeof(dspData_t));
@@ -956,17 +958,13 @@ int uiGLInit(int *argc, char **argv)
 #ifdef DEBUG_GL
   clog("uiGLInit: ENTER");
 #endif
-  memset(&ConqData, 0, sizeof(ConqData));
-
-  dConf.inited = False;
 
   glutInit(argc, argv);
   glutInitDisplayMode(GLUT_DEPTH | GLUT_DOUBLE | GLUT_RGBA | GLUT_ALPHA);
 
   glutInitWindowPosition(0,0);
 
-  if (!dConf.geomSpeced)
-    glutInitWindowSize(800, 600);
+  glutInitWindowSize(dConf.initWidth, dConf.initHeight);
   
   dConf.mainw = glutCreateWindow(CONQUESTGL_NAME);
 
