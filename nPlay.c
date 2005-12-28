@@ -247,13 +247,15 @@ static int nPlayIdle(void)
           if (recordInitOutput(Context.unum, getnow(NULL, 0), Context.snum))
             {
               Context.recmode = RECMODE_ON;
-              /* need to tell the server to resend all the crap it already
-                 sent in menu so it can be recorded... sorry. */
-              sendCommand(CPCMD_RELOAD, 0);
             }
           else
             Context.recmode = RECMODE_OFF;
         }
+
+
+      /* need to tell the server to resend all the crap it already
+         sent in menu - our ship may have chenged */
+      sendCommand(CPCMD_RELOAD, 0);
 
       nCPInit();            /* play */
     }

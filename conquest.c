@@ -3283,13 +3283,15 @@ int play()
       if (recordInitOutput(Context.unum, getnow(NULL, 0), Context.snum))
         {
           Context.recmode = RECMODE_ON;
-          /* need to tell the server to resend all the crap it already
-             sent in menu so it can be recorded... sorry. */
-          sendCommand(CPCMD_RELOAD, 0);
         }
       else
         Context.recmode = RECMODE_OFF;
     }
+
+  /* need to tell the server to resend all the crap it already
+     sent in menu - our ship may have changed */
+  sendCommand(CPCMD_RELOAD, 0);
+  
 
   /* While we're alive, field commands and process them. Inbound
      packets are handled by astservice() */

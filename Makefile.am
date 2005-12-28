@@ -133,7 +133,10 @@ install-exec-hook:
 	$(mkinstalldirs) -m 755 $(DESTDIR)$(localstatedir) \
 		$(DESTDIR)$(CONQSYSCONFDIR) \
 		$(DESTDIR)$(CONQLOCALSTATEDIR) \
-		$(DESTDIR)$(CONQIMGDIR)
+		$(DESTDIR)$(CONQIMGDIR) \
+		$(DESTDIR)$(bindir) \
+		$(DESTDIR)$(libexecdir) \
+		$(DESTDIR)$(libdir)
 	chmod 775 $(DESTDIR)$(CONQLOCALSTATEDIR) 
 	chgrp $(CONQGROUP) $(DESTDIR)$(CONQLOCALSTATEDIR)
 	cp -f $(IMAGES) $(DESTDIR)$(CONQIMGDIR)/

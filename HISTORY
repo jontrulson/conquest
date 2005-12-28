@@ -9,18 +9,25 @@
 
                               Conquest HISTORY
 
-???
-
-        - add patch by Bill Patterson adding a '-f' fullscreen option
-          to conquestgl.
+Version 8.1.2 (stable) 12/27/2005
 
         - fixed localtime() libc futex wait hang in conquestd by
           moving drcheck() out of the signal handler.  Bad Juju.
           Thanks to Bill Patterson for letting me have access to his
           server to locate the problem and test a fix.
 
+        - fixed potential problem with ship attributes that could
+          cause ships (including your own) to appear to be stuck in
+          Murisak when you enter a game.  Now the clients will
+          issue a CPCMD_RELOAD request to the server upon entering a
+          ship so that data is always accurate.
 
-Version 8.1.1 (stable)
+        - add patch by Bill Patterson adding a '-f' fullscreen option
+          to conquestgl.  Add '-g WxH' option to set the intial window
+          size as well.
+
+
+Version 8.1.1 (stable) 8/8/2005
 
         - during playback of a recording, honor the user config
           NoRobotMsgs option.
