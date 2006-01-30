@@ -173,7 +173,7 @@ int main(int argc, char *argv[])
       case 'f':
         dConf.fullScreen = TRUE;
         break;
-      case 'g':                 /* to let '-geometry' slide by *HACK* */
+      case 'g':                 
         parseGeometry(optarg);
         break;
       case 'm':

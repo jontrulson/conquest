@@ -9,6 +9,11 @@
 
                               Conquest HISTORY
 
+???
+
+        - add patch by Ralph Moritz fixing an issue with FreeBSD and
+          SIGCHLD. 
+
 Version 8.1.2 (stable) 12/27/2005
 
         - fixed localtime() libc futex wait hang in conquestd by

@@ -45,6 +45,10 @@
 # include <stdarg.h>
 #endif 
 
+#ifndef SIGCLD                                                     
+#define SIGCLD SIGCHLD
+#endif 
+
 /* JET - need checks here? */
 #include <sys/ioctl.h>
 #include <sys/socket.h>
