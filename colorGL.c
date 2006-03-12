@@ -30,7 +30,14 @@
 void uiPutColor(cqColor color)
 {
   GLfloat base = 0.7;
+  GLfloat alpha = color & CQC_ALPHA_MASK;
   
+  if (!alpha)
+    alpha = 1.0;
+  else
+    alpha = (1.0 / 256.0) * 
+      (GLfloat)((color & CQC_ALPHA_MASK) >>CQC_ALPHA_SHIFT);
+
   /* convert a 'conquest' color into something more useful in GL :) */
 
   if (color & CQC_A_BOLD)
@@ -42,23 +49,23 @@ void uiPutColor(cqColor color)
   color &= CQC_FG_MASK;         /* strip everything but color info */
 
   if (color == NoColor)         /* white */
-    glColor3f(base, base, base);
+    glColor4f(base, base, base, alpha);
   else if (color == RedColor)   /* red */
-    glColor3f(base, 0.0, 0.0);
+    glColor4f(base, 0.0, 0.0, alpha);
   else if (color == GreenColor) /* green */
-    glColor3f(0.0, base, 0.0);
+    glColor4f(0.0, base, 0.0, alpha);
   else if (color == BlueColor)  /* blue */
-    glColor3f(0.0, 0.0, base);
+    glColor4f(0.0, 0.0, base, alpha);
   else if (color == YellowColor) /* yellow */
-    glColor3f(base, base, 0.0);
+    glColor4f(base, base, 0.0, alpha);
   else if (color == CyanColor)  /* cyan */
-    glColor3f(0.0, base, base);
+    glColor4f(0.0, base, base, alpha);
   else if (color == MagentaColor) /* magenta */
-    glColor3f(base, 0.0, base);
+    glColor4f(base, 0.0, base, alpha);
   else if (color == BlackColor) /* black */
-    glColor3f(0.0, 0.0, 0.0);
+    glColor4f(0.0, 0.0, 0.0, alpha);
   else                          /* unknown */
-    glColor3f(1.0, 1.0, 1.0);
+    glColor4f(1.0, 1.0, 1.0, alpha);
   
   return;
 }

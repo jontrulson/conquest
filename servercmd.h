@@ -17,7 +17,5 @@
 #include "record.h"
 
 int checkOperExec(int from, int to, char *msg);
-void startRecord(void);
-void stopRecord(void);
 
 #endif /* _SERVERCMD_H */

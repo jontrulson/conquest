@@ -9,12 +9,283 @@
 
                               Conquest HISTORY
 
-???
+8.1.2a (devel release)  3/05/2006
+
+       - at long last
+
+       - This is a pretty major revision compared to the last stable
+         8.1.2 release.  This version incorporates new artwork textures and
+         a new 'Icon' HUD layout, curtesy of Cataboligne (aka Roy)
+         including:
+
+          - new ship textures
+          - team specific photon torpedos/animations and phaser textures
+          - team specific LR tactical grids
+          - doomsday fires an anti-proton beam at unfortunate
+            planets. 
+
+         It also corrects some potential server problems and adds new
+         OPER commands.  I would not hesitate to recommend upgrading
+         to this server version at least :)
+
+         Do to the rather large changes from Cat, it was clear that
+         certain internal mechanisms (like texture management) in
+         conquestgl needed major overhaul.  So, in addition to the new
+         art, the texture and animation backend has been completely
+         rewritten from scratch, based on the new cqi (conqinit)
+         lex/yacc parser.
+
+         Texture and Animation descriptions are defined in the global
+         'texturesrc' file, or a user's own ~/.conquest/*.trc files.
+
+         In addition, a much more complete customization of conquest's
+         planets is possible via the global 'conqinitrc' file.
+
+         The goal was to provide maximum flexibility to users/hackers
+         w/o having to change the code each time :)  
+
+         conqinit is discussed in more detail in the CONQINIT.TXT file
+         (currently crude, but will be improved for a stable release. :)
+
+       - changes since last snapshot release:
+
+         - cqi animation specific parser done.  GLAnimDefs and
+           the animQue runner/iterator done.  We have animations :)
+
+         - re-added the team specific torp animators that Cat
+           originally supplied in his patch, but were left out of the
+           snapshot releases until the new animator 'engine' was done.
+
+         - other animators currently present (and working :) are the
+           'explosion', and blinker animations.
+
+           See texturesrc for all texture and anim definitions if you
+           want to see them for yourself.
+
+           The only one(s) currently missing from the original patch,
+           that will be added in the future, are the solar animators (for
+           the suns).  But I need some better textures from Cat first
+           :)
+
+         - conquestd: reworked server OPER commands.  As you may (or
+           may not) know, users marked as CONQ_OPER in conqoper, can
+           send certain commands to the server when logged into the
+           game, by sending a specially crafted message to GOD.  This
+           version no longer uses 'EXEC' as the command prefix, rather
+           '/' is now used.
+
+           - kill a ship or user:
+
+             /k[ill] <what>     
+
+           - create robot(s)
+
+             /r[obot] <username> [<number> <warlike if non-null>] 
+
+           - start a server recording
+
+             /recon
+
+           - stop a server recording
+        
+             /recoff
+
+         - conquestd: fix problem where the recording packet cache was
+           not cleared when starting a new recording, except for the
+           first one.
+
+         - reduced the size of all of the 1kx1k textures, saving alot
+           of texture memory/file space :)  The src package size went
+           down to 5.2MB compared to 8.3MB in the snapshot releases.
+
+       - The following are notes from the 3 previous snapshot
+         releases leading up to this release.  Worth reading (if you
+         are bored) as there were alot of important changes not
+         mentioned above.
+
+         8.1.2ng3 (snapshot release)  2/05/2006
+
+         - Got rid of the old HUD.  The new Icon HUD is now the only
+           hud in conquestgl and is a huge improvement over the old
+           one.  Thanks Cat!  The DoIconHud and related options are
+           now gone.
+
+         - added new shield graphics.  It's basically an edited
+           version of Cat's original 'layer' texture, but with the
+           insides 'partially' hollowed out and color coded according
+           to strength.  It think it gives a nice 'bubble effect'... I
+           much prefer it - hope you do too!
+
+           The shield layer options are gone, and only do_shields
+           remains - indicating whether you want to see a shield
+           graphic or not.
+
+           do_shields is now on by default.
+
+         - re-arranged the 'alert' indicator text, armies text and
+           towing text around the ship icon.  The alert text was too
+           hard to read in certain cases.
+
+         - changed the doomsday AP beam rendering to be less cpu
+           intensive.  The beam simply uses an on/off duty-cycle of
+           600ms now.
+
+         - correct problem where clients might exit incorrectly when
+           an unexpected packet arrives during the welcome phase.
+
+         - While playing on CyberBilly's server, I noticed that when
+           no ships are moving (and hence no UDP traffic is occuring),
+           his firewall would terminate the UDP connection after 60
+           seconds, and the client would exit.
+           
+           It's basically the reverse of the problem that required
+           implementing a client UDP keepalive mechanism in v8.1.1. 
+
+           So the server has been modified to always emit at least one
+           ship update for your ship every 5 seconds if UDP is active,
+           and no other UDP data has been sent in that time.  This
+           should work around the issue by keeping the connection
+           'live'.
+
+         - add more debugging to readPacket() so problems might be
+           known. 
+
+         - texturesrc - remove layer shield textures, added new shield
+           textures.  Updated to load the correct one for each ship.
+           There are only 3 new textures that all the ships use
+           depending on their shape :)
+
+         - add a little explanation for the mysteryies in
+           updateIconHudGeo(). 
+
+        8.1.2ng2 (snapshot release)  1/30/2006
+
+        - The main focus of this release was to get the icon hud
+          working.  It now scales properly.  
+
+          The geometry setup was completely redone, since the code
+          from Cat didn't quite work properly - probably because he
+          didn't know what updateGeo() was really doing :) I will add
+          some comments later.  I promise.
+
+          Some things changed as well:
+
+          - alert status/bars
+
+            The alert is now identified by 'alert bars' located on
+            either side of the iconic ship diagram.  The ship causing
+            the alert is displayed just below the icon.
+
+            The bars are coded the same as in the original hud, though
+            there is no text on them.
+
+            - steady yellow = proximity alert
+            - blink yellow  = enemy ship in yellow alert range
+            - steady red    = ship in red alert range
+            - blink red     = ship in phaser range
+
+          - Cat's torp 'pip' stuff is gone as well (though the texture
+            is still there).  The main problem there was that each
+            ship was different in where in the decal texture the pip
+            array is located.  This made it far too tedious/painful to
+            implement correctly.  I'd also like to try to make it
+            reasonable for someone to add a new shiptype someday
+            without severe pain.
+
+            I like the idea though, so it may return in a more
+            'generic' way that looks and acts the same on all ships,
+            and is therfore easier to code and maintain.
+
+          - The 'animated' tractor icon decal was removed for the same
+            reason. 
+
+          - The decal indicating you are carrying armies does not
+            display the army count.  Same reasons as above.  I'll
+            remove the empty '[]'s soon.
+
+          - there is no room for some of the standard indicators in
+            the new hud, so some are located in other areas, for
+            example:
+
+            numeric warp and heading, these are displayed to the
+            bottom left of their respective icons.
+
+            armies/ai - this is indicated by '%d armies' displayed in
+            the upper left of the icon area, or by the action token
+            when watching a robot.
+
+            towing/towed by - this is indicated in the lower left of
+            the icon area.
+
+            destruct - this is now rendered in large, semi-transparent
+            blinking letters centered in the viewer.  Don't know why I
+            didn't do that in the first place, 'cause it looks kinda
+            cool :)
+
+          - changed default WxH to 1024x768 as 800x600 is difficult
+            with the iconhud.
+
+          - uiPutColor() can understand alpha now.  
+
+          - fixed several minor conqinit parser issues.
+
+          - ALT-G will toggle the tac display on/off in LR scan.
+
+
+        8.1.2ng1 (snapshot release)  1/05/2006
+
+        - This version incorporates Cataboligne's massive artwork
+          patch.  Among them: 
+
+          - new ship textures
+          - team specific photon torpedos and phaser textures
+          - team specific LR tactical grids
+          - doomsday fires an anti-proton beam at unfortunate
+            planets. 
+          - original 8.1.2 Conquest included 37 textures.  This version
+            includes 173 textures.  The src tarball got a little
+            bigger :)
+
+          This also includes the new 'icon hud' functionality, which
+          promises to be the future default hud, once the kinks are
+          worked out.
+
+        - User config data (~/.conquestrc) is now stored in a new
+          ~/.conquest/ directory.  The files that can currently be
+          present in this directory are:
+
+          conquestrc           # used to be ~/.conquestrc
+          conquest.log         # what it says
+          img/                 # directory containing user textures
+                                 (.tga) files.
+          *.trc                # user supplied texture definition files.
+
+          If you already had a ~/.conquestrc with your settings in it,
+          simply copy it into ~/.conquest/conquestrc before starting
+          the game.
+
+        - conquestgl will now emit it's log entries to stderr as well
+          so that gl users might see something useful if something
+          breaks :)
+
+        - planet and texture configuration and intialization have been
+          completely rewritten through the new CQI infrastructure.
+
+        - texture loader now supports compressed tga files.
+
+        - fix server recordings so they include TORPEVENT
+          packets. These were only being recorded for clinet
+          recordings.  This is important when rendering the new
+          'directional' torp graphics Cat added when playing back a
+          recording.
+
+        - this version includes all of the bug fixes in 8.1.2.
+
+
+Version 8.1.2 (stable) 12/27/2005
 
         - add patch by Ralph Moritz fixing an issue with FreeBSD and
           SIGCHLD. 
-
-Version 8.1.2 (stable) 12/27/2005
 
         - fixed localtime() libc futex wait hang in conquestd by
           moving drcheck() out of the signal handler.  Bad Juju.
@@ -32,7 +303,7 @@ Version 8.1.2 (stable) 12/27/2005
           size as well.
 
 
-Version 8.1.1 (stable) 8/8/2005
+Version 8.1.1 (stable)
 
         - during playback of a recording, honor the user config
           NoRobotMsgs option.

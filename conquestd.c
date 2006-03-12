@@ -36,6 +36,8 @@
 #include "servercmd.h"
 #include "meta.h"
 
+#include "conqinit.h"
+
 #define LISTEN_BACKLOG 5 /* # of requests we're willing to to queue */
 
 static Unsgn16 listenPort = CN_DFLT_PORT;
@@ -142,7 +144,7 @@ void checkMaster(void)
 
   if ((hp = gethostbyname(sInfo.localhost)) == NULL) 
     {
-      perror("gethostbyname");
+      clog("NET: gethostbyname() failed: %s", strerror(errno));
       exit (1);
     }
   
@@ -158,7 +160,7 @@ void checkMaster(void)
   /* allocate an open socket for incoming connections */
   if (( s = socket(hp->h_addrtype, SOCK_STREAM, 0)) < 0) 
     {
-      perror ( "socket" );
+      clog("NET: socket() failed: %s", strerror(errno));
       exit(1);
     }
   
@@ -167,7 +169,7 @@ void checkMaster(void)
    */
   if ( bind( s, (struct sockaddr *)&sa, sizeof ( sa )) < 0 ) 
     {
-      perror( "bind" );
+      clog("NET: bind() failed: %s", strerror(errno));
       exit(1);
     }
   
@@ -355,7 +357,7 @@ int main(int argc, char *argv[])
 #ifdef DEBUG_FLOW
   clog("%s@%d: main() mapping common block.", __FILE__, __LINE__);
 #endif
-  
+
   map_common();
 
   if ( *CBlockRevision != COMMONSTAMP )
@@ -444,10 +446,12 @@ int main(int argc, char *argv[])
 #endif
     }
 
-
-
   conqinit();			/* machine dependent initialization */
   
+  /* load the globals/planets/textures, for each client */
+  cqiLoadRC(CQI_FILE_CONQINITRC, NULL, 1, 0);
+  cqiLoadRC(CQI_FILE_TEXTURESRC, NULL, 1, 0);
+
   rndini( 0, 0 );		/* initialize random numbers */
   
   clog("CONNECT: client %s\n", sInfo.remotehost);
@@ -1690,7 +1694,6 @@ int welcome( int *unum )
 	  return ( FALSE );
 	}
       team = rndint( 0, NUMPLAYERTEAMS - 1 );
-      clog("CONQD: TEAM = %d", team);
       
       cbuf[0] = EOS;
       apptitle( team, cbuf );

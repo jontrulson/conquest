@@ -198,7 +198,7 @@ static int nAuthDisplay(dspConfig_t *dsp)
   extern char *ConquestDate;
 
   /* display the logo */
-  mglConqLogo(dsp);
+  mglConqLogo(dsp, FALSE);
 
   lin = 7;
 

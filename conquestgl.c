@@ -46,6 +46,8 @@
 #include "nConsvr.h"
 #include "nMeta.h"
 
+#include "conqinit.h"
+
 void catchSignals(void);
 void handleSignal(int sig);
 void conqend(void);
@@ -58,7 +60,7 @@ void printUsage()
   printf("    -f               run in fullscreen mode\n");
   printf("    -g <geometry>    specify intial window width/height.\n");
   printf("                      Format is WxH (ex: 1024x768).\n");
-  printf("                      Default is 800x600.\n");
+  printf("                      Default is 1024x768.\n");
   printf("    -m               query the metaserver\n");
   printf("    -s server[:port] connect to <server> at <port>\n");
   printf("                      default: localhost:1701\n");
@@ -132,6 +134,48 @@ static void parseGeometry(char *geom)
   return;
 }
 
+/* first load the main texturesrc file.  Then look for and load any
+   ~/.conquest/ *.trc files */
+void loadTextureRCFiles()
+{
+  char cqdir[BUFFER_SIZE];
+  char filenm[BUFFER_SIZE];
+  char *homevar;
+  DIR *dirp;
+  struct dirent *direntp;
+  char *ch;
+
+  /* load the main texturesrc file first */
+  cqiLoadRC(CQI_FILE_TEXTURESRC, NULL, 1, 0);
+
+  if ((homevar = getenv("HOME")) == NULL)
+    return;
+
+  snprintf(cqdir, sizeof(cqdir)-1, "%s/.conquest", 
+           homevar);
+
+  if ((dirp = opendir(cqdir)))
+    {
+      while ((direntp = readdir(dirp)) != NULL)
+        {                       /* here, we will just check out the .trc
+                                   files */
+          if ((!strcmp(direntp->d_name, "..") ||
+               !strcmp(direntp->d_name, ".")))
+            continue;
+
+          if ((ch = strstr(direntp->d_name, ".trc")))
+            {                   /* found one */
+              snprintf(filenm, sizeof(filenm)-1, "%s/%s", 
+                       cqdir,direntp->d_name);
+
+              cqiLoadRC(CQI_FILE_TEXTURESRC_ADD, filenm, 1, 0);
+            }
+        }
+    }
+
+  return;
+}
+
 
 /*  conquest - main program */
 int main(int argc, char *argv[]) 
@@ -158,7 +202,7 @@ int main(int argc, char *argv[])
   cInfo.isLoggedIn = FALSE;
   cInfo.remoteport = CN_DFLT_PORT;
 
-  setSystemLog(FALSE);	/* use $HOME for logfile */
+  setSystemLog(FALSE, TRUE);	/* use $HOME for logfile */
   if (!getLocalhost(cInfo.localhost, MAXHOSTNAME))
     return(1);
 
@@ -288,6 +332,7 @@ int main(int argc, char *argv[])
       /* turn off annoying beeps */
       UserConf.DoAlarms = FALSE;
     }
+
   if (serveropt && wantMetaList)
     {
       printf("-m ignored, since -s was specified\n");
@@ -315,6 +360,12 @@ int main(int argc, char *argv[])
              nums);
     }
 
+  /* load the globals/planets, etc */
+  cqiLoadRC(CQI_FILE_CONQINITRC, NULL, 1, 0);
+
+  /* load the main texturesrc file and any user supplied ~/.conquest/ *.trc
+     files */
+  loadTextureRCFiles();
 
   /* a parallel universe, it is */
   map_lcommon();

@@ -302,7 +302,14 @@ int sendTorp(int sock, Unsgn8 tsnum, Unsgn8 tnum)
 
 
   /* SP_TORPEVENT */
-  /* we only send these */
+  if (Context.recmode == RECMODE_ON)
+    {
+      if ((storpev = spktTorpEvent(tsnum, tnum, TRUE)))
+        {
+          recordWriteEvent((Unsgn8 *)storpev);
+        }
+    }
+
   if ((storpev = spktTorpEvent(tsnum, tnum, FALSE)))
     {
       if (writePacket(PKT_TOCLIENT, sock, (Unsgn8 *)storpev) <= 0)

@@ -35,6 +35,13 @@
 #include "global.h"
 #include "user.h"
 #include "color.h"
+#include "conqinit.h"
+                                      /* Cataboligne - 10.7.05 := planetsrc mods */
+  int  planet_img[NUMPLANETS + 1];        /* image for gl client */
+  real planet_size[NUMPLANETS + 1];       /* image size for gl client */
+  Unsgn32 planet_col[NUMPLANETS + 1];        /* image color for gl client */
+                                     /* end of Cat mod */
+
 
 				/* shared with display.c */
 real LastPhasDist = PHASER_DIST;
@@ -1296,7 +1303,7 @@ void clbDoomFind(void)
 	}
   
   for ( i = 1; i <= MAXSHIPS; i = i + 1 )
-    if ( Ships[i].status == SS_LIVE )
+    if ( Ships[i].status == SS_LIVE)
       {
 	taste = ( 1.0 +
 		 Ships[i].kills * KILLS_KILLS +
@@ -1762,10 +1769,6 @@ void clbInitEverything(void)
 /*    initgame */
 void clbInitGame(void)
 {
-  
-  int i, j;
-  
-  
   /* Twiddle the lockword. */
   PVUNLOCK(&ConqInfo->lockword);
   
@@ -1784,128 +1787,11 @@ void clbInitGame(void)
   Doomsday->lock = 0;
   stcpn( "Doomsday Machine", Doomsday->name, MAXUSERPNAME );
   
-  /* Set up initial armies on planets. */
-  Planets[PNUM_SOL].team = TEAM_NOTEAM;
-  Planets[PNUM_EARTH].team = TEAM_FEDERATION;
-  Planets[PNUM_TELOS].team = TEAM_FEDERATION;
-  Planets[PNUM_OMEGA].team = TEAM_FEDERATION;
-  Planets[PNUM_SIRIUS].team = TEAM_NOTEAM;
-  Planets[PNUM_ROMULUS].team = TEAM_ROMULAN;
-  Planets[PNUM_REMUS].team = TEAM_ROMULAN;
-  Planets[PNUM_RHO].team = TEAM_ROMULAN;
-  Planets[PNUM_KEJELA].team = TEAM_NOTEAM;
-  Planets[PNUM_KLINGUS].team = TEAM_KLINGON;
-  Planets[PNUM_LEUDUS].team = TEAM_KLINGON;
-  Planets[PNUM_TARSUS].team = TEAM_KLINGON;
-  Planets[PNUM_BETELGEUSE].team = TEAM_NOTEAM;
-  Planets[PNUM_ORION].team = TEAM_ORION;
-  Planets[PNUM_OBERON].team = TEAM_ORION;
-  Planets[PNUM_UMBRIEL].team = TEAM_ORION;
-  Planets[PNUM_MURISAK].team = TEAM_NOTEAM;
-  Planets[PNUM_JANUS].team = TEAM_SELFRULED;
-  Planets[PNUM_SERITIL].team = TEAM_SELFRULED;
-  Planets[PNUM_ELAS].team = TEAM_SELFRULED;
-  Planets[PNUM_SHERMAN].team = TEAM_SELFRULED;
-  Planets[PNUM_CHERON].team = TEAM_SELFRULED;
-  Planets[PNUM_DAKEL].team = TEAM_SELFRULED;
-  Planets[PNUM_OLDAR].team = TEAM_SELFRULED;
-  Planets[PNUM_SARAC].team = TEAM_SELFRULED;
-  Planets[PNUM_EMINIAR].team = TEAM_SELFRULED;
-  Planets[PNUM_VENAR].team = TEAM_SELFRULED;
-  Planets[PNUM_DYNEB].team = TEAM_SELFRULED;
-  Planets[PNUM_XIDEX].team = TEAM_SELFRULED;
-  Planets[PNUM_RIGELB].team = TEAM_SELFRULED;
-  
-  Planets[PNUM_SYRINX].team = TEAM_NOTEAM;
-  Planets[PNUM_ALTAIR].team = TEAM_SELFRULED;
-  Planets[PNUM_HELL].team = TEAM_SELFRULED;
-  Planets[PNUM_JINX].team = TEAM_SELFRULED;
-  Planets[PNUM_LUNA].team = TEAM_NOTEAM;
-  
-  Planets[PNUM_GHOST1].team = TEAM_NOTEAM;
-  Planets[PNUM_GHOST2].team = TEAM_NOTEAM;
-  Planets[PNUM_GHOST3].team = TEAM_NOTEAM;
-  Planets[PNUM_GHOST4].team = TEAM_NOTEAM;
-
-				/* set up teams for extra planets */
-  if (NUM_EXTRAPLANETS > 0)
-    {				/* there are extra planets
-				   they are numbered starting at
-				   1 (+ NUM_BASEPLANETS) */
-      for (i=1; i<= NUM_EXTRAPLANETS; i++) 
-	{
-	  Planets[NUM_BASEPLANETS + i].team = TEAM_SELFRULED;
-	}
-    }
-
-  
-  Planets[PNUM_SOL].armies = rndint(80, 180);
-  Planets[PNUM_EARTH].armies = 50;
-  Planets[PNUM_TELOS].armies = 50;
-  Planets[PNUM_OMEGA].armies = 50;
-  Planets[PNUM_SIRIUS].armies = rndint(80, 180);
-  Planets[PNUM_ROMULUS].armies = 50;
-  Planets[PNUM_REMUS].armies = 50;
-  Planets[PNUM_RHO].armies = 50;
-  Planets[PNUM_KEJELA].armies = rndint(80, 180);
-  Planets[PNUM_KLINGUS].armies = 50;
-  Planets[PNUM_LEUDUS].armies = 50;
-  Planets[PNUM_TARSUS].armies = 50;
-  Planets[PNUM_BETELGEUSE].armies = rndint(80, 180);
-  Planets[PNUM_ORION].armies = 50;
-  Planets[PNUM_OBERON].armies = 50;
-  Planets[PNUM_UMBRIEL].armies = 50;
-  Planets[PNUM_MURISAK].armies = rndint(80, 180);
-  Planets[PNUM_JANUS].armies = 25;
-  Planets[PNUM_SERITIL].armies = 25;
-  Planets[PNUM_ELAS].armies = 25;
-  Planets[PNUM_SHERMAN].armies = 25;
-  Planets[PNUM_CHERON].armies = 25;
-  Planets[PNUM_DAKEL].armies = 25;
-  Planets[PNUM_OLDAR].armies = 25;
-  Planets[PNUM_SARAC].armies = 25;
-  Planets[PNUM_EMINIAR].armies = 25;
-  Planets[PNUM_VENAR].armies = 25;
-  Planets[PNUM_DYNEB].armies = 25;
-  Planets[PNUM_XIDEX].armies = 25;
-  Planets[PNUM_RIGELB].armies = 25;
-  Planets[PNUM_SYRINX].armies = rndint(100, 200);
-  
-  /* The rest don't matter since you don't have to conquer them. */
-
-  Planets[PNUM_ALTAIR].armies = rndint(80, 120);
-  Planets[PNUM_HELL].armies = rndint(50, 100);
-  Planets[PNUM_JINX].armies = rndint(100, 200);
-  Planets[PNUM_LUNA].armies = 0;
-  
-  Planets[PNUM_GHOST1].armies = 0;
-  Planets[PNUM_GHOST2].armies = 0;
-  Planets[PNUM_GHOST3].armies = 0;
-  Planets[PNUM_GHOST4].armies = 0;
-  
-  /* Set up the pscanned array so that each team has scanned its own planets. */
-  for ( i = 1 ; i <= NUMPLANETS; i = i + 1 )
-    {
-      Planets[i].uninhabtime = 0;		/* planets start out inhabitable */
-      for ( j = 0; j < NUMPLAYERTEAMS; j = j + 1 )
-	Planets[i].scanned[j] = FALSE;
-    }
-  
-  for ( i = 0; i < NUMPLAYERTEAMS; i = i + 1 )
-    {
-      /* Each team has scanned its own planets. */
-      for ( j = 0; j < 3; j = j + 1 )
-	Planets[Teams[i].teamhplanets[j]].scanned[i] = TRUE;
-      
-      Teams[i].couptime = 0;		/* time left to coup starts at zero. */
-      Teams[i].coupinfo = FALSE;		/* don't know coup time */
-    }
-  
   /* Un-twiddle the lockword. */
   PVUNLOCK(&ConqInfo->lockword);
   
   /* Set up the physical universe. */
-  clbInitPlanets();
+  cqiInitPlanets();
   
   return;
   
@@ -1929,398 +1815,6 @@ void clbInitMsgs(void)
     }
   ConqInfo->lastmsg = 0;
   ConqInfo->glastmsg = ConqInfo->lastmsg;
-  
-  return;
-  
-}
-
-
-/*  initplanets - initialize the planets */
-/*  SYNOPSIS */
-/*    initplanets */
-void clbInitPlanets(void)
-{
-  /* SETPLANET( name, pnum ) */
-#define SETPLANET(x, y)  stcpn( x, Planets[y].name, MAXPLANETNAME ) 
-  
-  int i; 
-  real orbang, orbvel;
-  
-  /* Twiddle the lockword. */
-  PVUNLOCK(&ConqInfo->lockword);
-  PVLOCK(&ConqInfo->lockword);
-  
-  SETPLANET( "Sol", PNUM_SOL );
-  SETPLANET( "Earth", PNUM_EARTH );
-  SETPLANET( "Telos", PNUM_TELOS );
-  SETPLANET( "Omega", PNUM_OMEGA );
-  SETPLANET( "Sirius", PNUM_SIRIUS );
-  SETPLANET( "Romulus", PNUM_ROMULUS );
-  SETPLANET( "Remus", PNUM_REMUS );
-  SETPLANET( "Rho", PNUM_RHO );
-  SETPLANET( "Kejela", PNUM_KEJELA );
-  SETPLANET( "Klingus", PNUM_KLINGUS );
-  SETPLANET( "Leudus", PNUM_LEUDUS );
-  SETPLANET( "Tarsus", PNUM_TARSUS );
-  SETPLANET( "Betelgeuse", PNUM_BETELGEUSE );
-  SETPLANET( "Orion", PNUM_ORION );
-  SETPLANET( "Oberon", PNUM_OBERON );
-  SETPLANET( "Umbriel", PNUM_UMBRIEL );
-  SETPLANET( "Murisak", PNUM_MURISAK );
-  SETPLANET( "Janus", PNUM_JANUS );
-  SETPLANET( "Seritil", PNUM_SERITIL );
-  SETPLANET( "Elas", PNUM_ELAS );
-  SETPLANET( "Sherman", PNUM_SHERMAN );
-  SETPLANET( "Cheron", PNUM_CHERON );
-  SETPLANET( "Dakel", PNUM_DAKEL );
-  SETPLANET( "Oldar", PNUM_OLDAR );
-  SETPLANET( "Sarac", PNUM_SARAC );
-  SETPLANET( "Eminiar", PNUM_EMINIAR );
-  SETPLANET( "Venar", PNUM_VENAR );
-  SETPLANET( "Dyneb", PNUM_DYNEB );
-  SETPLANET( "Xidex", PNUM_XIDEX );
-  SETPLANET( "RigelB", PNUM_RIGELB );
-  
-  SETPLANET( "Syrinx", PNUM_SYRINX );
-  SETPLANET( "Luna", PNUM_LUNA );
-  SETPLANET( "Altair", PNUM_ALTAIR );
-  SETPLANET( "Hell", PNUM_HELL );
-  SETPLANET( "Jinx", PNUM_JINX );
-  
-  SETPLANET( "Ghost 1", PNUM_GHOST1 );
-  SETPLANET( "Ghost 2", PNUM_GHOST2 );
-  SETPLANET( "Ghost 3", PNUM_GHOST3 );
-  SETPLANET( "Ghost 4", PNUM_GHOST4 );
-  SETPLANET( "Ghost 5", PNUM_GHOST5 );
-  
-  Planets[PNUM_SOL].type = PLANET_SUN;
-  Planets[PNUM_EARTH].type = PLANET_CLASSM;
-  Planets[PNUM_TELOS].type = PLANET_DEAD;
-  Planets[PNUM_OMEGA].type = PLANET_DEAD;
-  Planets[PNUM_SIRIUS].type = PLANET_SUN;
-  Planets[PNUM_ROMULUS].type = PLANET_CLASSM;
-  Planets[PNUM_REMUS].type = PLANET_DEAD;
-  Planets[PNUM_RHO].type = PLANET_DEAD;
-  Planets[PNUM_KEJELA].type = PLANET_SUN;
-  Planets[PNUM_KLINGUS].type = PLANET_CLASSM;
-  Planets[PNUM_LEUDUS].type = PLANET_DEAD;
-  Planets[PNUM_TARSUS].type = PLANET_DEAD;
-  Planets[PNUM_BETELGEUSE].type = PLANET_SUN;
-  Planets[PNUM_ORION].type = PLANET_CLASSM;
-  Planets[PNUM_OBERON].type = PLANET_DEAD;
-  Planets[PNUM_UMBRIEL].type = PLANET_DEAD;
-  Planets[PNUM_MURISAK].type = PLANET_SUN;
-  Planets[PNUM_JANUS].type = PLANET_CLASSM;
-  Planets[PNUM_SERITIL].type = PLANET_DEAD;
-  Planets[PNUM_ELAS].type = PLANET_CLASSM;
-  Planets[PNUM_SHERMAN].type = PLANET_CLASSM;
-  Planets[PNUM_CHERON].type = PLANET_DEAD;
-  Planets[PNUM_DAKEL].type = PLANET_CLASSM;
-  Planets[PNUM_OLDAR].type = PLANET_DEAD;
-  Planets[PNUM_SARAC].type = PLANET_CLASSM;
-  Planets[PNUM_EMINIAR].type = PLANET_DEAD;
-  Planets[PNUM_VENAR].type = PLANET_CLASSM;
-  Planets[PNUM_DYNEB].type = PLANET_DEAD;
-  Planets[PNUM_XIDEX].type = PLANET_CLASSM;
-  Planets[PNUM_RIGELB].type = PLANET_DEAD;
-  Planets[PNUM_GHOST1].type = PLANET_GHOST;
-  Planets[PNUM_GHOST2].type = PLANET_GHOST;
-  Planets[PNUM_GHOST3].type = PLANET_GHOST;
-  Planets[PNUM_GHOST4].type = PLANET_GHOST;
-  Planets[PNUM_GHOST5].type = PLANET_GHOST;
-  
-  Planets[PNUM_SYRINX].type = PLANET_SUN;
-  Planets[PNUM_LUNA].type = PLANET_MOON;
-  Planets[PNUM_ALTAIR].type = PLANET_CLASSM;
-  Planets[PNUM_HELL].type = PLANET_DEAD;
-  Planets[PNUM_JINX].type = PLANET_CLASSM;
-  
-  stcpn( "class M planet", ConqInfo->ptname[PLANET_CLASSM], MAXPTYPENAME );
-  stcpn( "dead planet", ConqInfo->ptname[PLANET_DEAD], MAXPTYPENAME );
-  stcpn( "sun", ConqInfo->ptname[PLANET_SUN], MAXPTYPENAME );
-  stcpn( "moon", ConqInfo->ptname[PLANET_MOON], MAXPTYPENAME );
-  stcpn( "ghost planet", ConqInfo->ptname[PLANET_GHOST], MAXPTYPENAME );
-  stcpn( "class A planet", ConqInfo->ptname[PLANET_CLASSA], MAXPTYPENAME );
-  stcpn( "class O planet", ConqInfo->ptname[PLANET_CLASSO], MAXPTYPENAME );
-  stcpn( "class Z planet", ConqInfo->ptname[PLANET_CLASSZ], MAXPTYPENAME );
-  
-  for ( i = 1; i <= NUMPLANETS; i = i + 1 )
-    {
-      Planets[i].real = TRUE;	/* by default, you can see most planets */
-      Planets[i].orbvel = 0.0;
-      Planets[i].orbrad = 0;
-      Planets[i].primary = 0;
-    }
-  
-  /* Can't see the ghost planets. */
-  Planets[PNUM_GHOST1].real = FALSE;
-  Planets[PNUM_GHOST2].real = FALSE;
-  Planets[PNUM_GHOST3].real = FALSE;
-  Planets[PNUM_GHOST4].real = FALSE;
-  Planets[PNUM_GHOST5].real = FALSE;
-  
-  /* Set up the X-Y coordinates of the suns.  Start with Murisak. */
-  /* at the center, then place the other eight suns relative to it, */
-  /* then the radii of the planets. */
-  Planets[PNUM_MURISAK].x = 0.0;
-  Planets[PNUM_MURISAK].y = 0.0;
-  Planets[PNUM_MURISAK].primary = 0;	/* the only "stationary" object */
-  Planets[PNUM_MURISAK].orbrad = 0.0;
-  Planets[PNUM_MURISAK].orbang = 0.0;
-  Planets[PNUM_MURISAK].orbvel = 0.0;
-  
-  Planets[PNUM_BETELGEUSE].primary = PNUM_MURISAK;
-  Planets[PNUM_BETELGEUSE].orbrad = 11000.0;
-  Planets[PNUM_BETELGEUSE].orbang = 45.0;
-  Planets[PNUM_BETELGEUSE].orbvel = 0.0;
-  
-  Planets[PNUM_KEJELA].primary = PNUM_MURISAK;
-  Planets[PNUM_KEJELA].orbrad = 11000.0;
-  Planets[PNUM_KEJELA].orbang = 135.0;
-  Planets[PNUM_KEJELA].orbvel = 0.0;
-  
-  Planets[PNUM_SIRIUS].primary = PNUM_MURISAK;
-  Planets[PNUM_SIRIUS].orbrad = 11000.0;
-  Planets[PNUM_SIRIUS].orbang = 225.0;
-  Planets[PNUM_SIRIUS].orbvel = 0.0;
-  
-  Planets[PNUM_SOL].primary = PNUM_MURISAK;
-  Planets[PNUM_SOL].orbrad = 11000.0;
-  Planets[PNUM_SOL].orbang = 315.0;
-  Planets[PNUM_SOL].orbvel = 0.0;
-  
-  Planets[PNUM_GHOST1].primary = PNUM_MURISAK;
-  Planets[PNUM_GHOST1].orbrad = 12000.0;
-  Planets[PNUM_GHOST1].orbang = 0.0;
-  Planets[PNUM_GHOST1].orbvel = 0.0;
-  
-  Planets[PNUM_GHOST2].primary = PNUM_MURISAK;
-  Planets[PNUM_GHOST2].orbrad = 12000.0;
-  Planets[PNUM_GHOST2].orbang = 90.0;
-  Planets[PNUM_GHOST2].orbvel = 0.0;
-  
-  Planets[PNUM_GHOST3].primary = PNUM_MURISAK;
-  Planets[PNUM_GHOST3].orbrad = 12000.0;
-  Planets[PNUM_GHOST3].orbang = 180.0;
-  Planets[PNUM_GHOST3].orbvel = 0.0;
-  
-  Planets[PNUM_GHOST4].primary = PNUM_MURISAK;
-  Planets[PNUM_GHOST4].orbrad = 12000.0;
-  Planets[PNUM_GHOST4].orbang = 270.0;
-  Planets[PNUM_GHOST4].orbvel = 0.0;
-  
-  Planets[PNUM_GHOST5].primary = PNUM_MURISAK;
-  Planets[PNUM_GHOST5].orbrad = 12000.0;
-  Planets[PNUM_GHOST5].orbang = 0.0;
-  Planets[PNUM_GHOST5].orbvel = 0.0;
-  
-  /* Murisak's planets. */
-  Planets[PNUM_JANUS].primary = PNUM_MURISAK;
-  Planets[PNUM_JANUS].orbrad = 2600.0;
-  Planets[PNUM_SERITIL].primary = PNUM_MURISAK;
-  Planets[PNUM_SERITIL].orbrad = 2600.0;
-  Planets[PNUM_ELAS].primary = PNUM_MURISAK;
-  Planets[PNUM_ELAS].orbrad = 2600.0;
-  Planets[PNUM_SHERMAN].primary = PNUM_MURISAK;
-  Planets[PNUM_SHERMAN].orbrad = 2600.0;
-  Planets[PNUM_CHERON].primary = PNUM_MURISAK;
-  Planets[PNUM_CHERON].orbrad = 2600.0;
-  /* Sol's planets. */
-  Planets[PNUM_EARTH].primary = PNUM_SOL;
-  Planets[PNUM_EARTH].orbrad = 2600.0;
-  Planets[PNUM_TELOS].primary = PNUM_SOL;
-  Planets[PNUM_TELOS].orbrad = 2600.0;
-  Planets[PNUM_OMEGA].primary = PNUM_SOL;
-  Planets[PNUM_OMEGA].orbrad = 2600.0;
-  /* Sirius' planets. */
-  Planets[PNUM_ROMULUS].primary = PNUM_SIRIUS;
-  Planets[PNUM_ROMULUS].orbrad = 2600.0;
-  Planets[PNUM_REMUS].primary = PNUM_SIRIUS;
-  Planets[PNUM_REMUS].orbrad = 2600.0;
-  Planets[PNUM_RHO].primary = PNUM_SIRIUS;
-  Planets[PNUM_RHO].orbrad = 2600.0;
-  /* Kejela's planets. */
-  Planets[PNUM_KLINGUS].primary = PNUM_KEJELA;
-  Planets[PNUM_KLINGUS].orbrad = 2600.0;
-  Planets[PNUM_LEUDUS].primary = PNUM_KEJELA;
-  Planets[PNUM_LEUDUS].orbrad = 2600.0;
-  Planets[PNUM_TARSUS].primary = PNUM_KEJELA;
-  Planets[PNUM_TARSUS].orbrad = 2600.0;
-  /* Betelgeuse's planets. */
-  Planets[PNUM_ORION].primary = PNUM_BETELGEUSE;
-  Planets[PNUM_ORION].orbrad = 2600.0;
-  Planets[PNUM_OBERON].primary = PNUM_BETELGEUSE;
-  Planets[PNUM_OBERON].orbrad = 2600.0;
-  Planets[PNUM_UMBRIEL].primary = PNUM_BETELGEUSE;
-  Planets[PNUM_UMBRIEL].orbrad = 2600.0;
-  /* Side systems. */
-  Planets[PNUM_XIDEX].primary = PNUM_GHOST1;
-  Planets[PNUM_XIDEX].orbrad = 1150.0;
-  Planets[PNUM_RIGELB].primary = PNUM_GHOST1;
-  Planets[PNUM_RIGELB].orbrad = 1150.0;
-  Planets[PNUM_VENAR].primary = PNUM_GHOST2;
-  Planets[PNUM_VENAR].orbrad = 1150.0;
-  Planets[PNUM_DYNEB].primary = PNUM_GHOST2;
-  Planets[PNUM_DYNEB].orbrad = 1150.0;
-  Planets[PNUM_SARAC].primary = PNUM_GHOST3;
-  Planets[PNUM_SARAC].orbrad = 1150.0;
-  Planets[PNUM_EMINIAR].primary = PNUM_GHOST3;
-  Planets[PNUM_EMINIAR].orbrad = 1150.0;
-  Planets[PNUM_DAKEL].primary = PNUM_GHOST4;
-  Planets[PNUM_DAKEL].orbrad = 1150.0;
-  Planets[PNUM_OLDAR].primary = PNUM_GHOST4;
-  Planets[PNUM_OLDAR].orbrad = 1150.0;
-  
-  Planets[PNUM_SYRINX].primary = PNUM_MURISAK;
-  Planets[PNUM_SYRINX].orbrad = 23000.0;
-  
-  Planets[PNUM_LUNA].primary = PNUM_EARTH;
-  Planets[PNUM_LUNA].orbrad = 1250.0;
-  
-  Planets[PNUM_ALTAIR].primary = PNUM_MURISAK;
-  Planets[PNUM_ALTAIR].orbrad = 6125.0;
-
-  Planets[PNUM_HELL].primary = PNUM_SYRINX;
-  Planets[PNUM_HELL].orbrad = 1900.0;
-  Planets[PNUM_JINX].primary = PNUM_SYRINX;
-  Planets[PNUM_JINX].orbrad = 2600.0;
-  
-  
-  /* Set orbital angles and velocities for planets, and place them. */
-  /* Murisak's planets. */
-  orbang = rnduni( 0.0, 360.0 );
-  orbvel = rndnor( PLANET_ORBIT_FAC, 2.0 ) * ( rndint( 0, 1 ) * 2 - 1 );
-  Planets[PNUM_JANUS].orbang = orbang;
-  Planets[PNUM_JANUS].orbvel = orbvel;
-  Planets[PNUM_CHERON].orbang = mod360( orbang + 1.0/5.0*360.0 );
-  Planets[PNUM_CHERON].orbvel = orbvel;
-  Planets[PNUM_SHERMAN].orbang = mod360( orbang + 2.0/5.0*360.0 );
-  Planets[PNUM_SHERMAN].orbvel = orbvel;
-  Planets[PNUM_ELAS].orbang = mod360( orbang + 3.0/5.0*360.0 );
-  Planets[PNUM_ELAS].orbvel = orbvel;
-  Planets[PNUM_SERITIL].orbang = mod360( orbang + 4.0/5.0*360.0 );
-  Planets[PNUM_SERITIL].orbvel = orbvel;
-  /* Sol's planets. */
-  orbang = rnduni( 0.0, 360.0 );
-  orbvel = rndnor( PLANET_ORBIT_FAC, 2.0 ) * ( rndint( 0, 1 ) * 2 - 1 );
-  Planets[PNUM_EARTH].orbang = orbang;
-  Planets[PNUM_EARTH].orbvel = orbvel;
-  Planets[PNUM_TELOS].orbang = mod360( orbang + 2.0/3.0*360.0 );
-  Planets[PNUM_TELOS].orbvel = orbvel;
-  Planets[PNUM_OMEGA].orbang = mod360( orbang + 1.0/3.0*360.0 );
-  Planets[PNUM_OMEGA].orbvel = orbvel;
-  /* Luna. */
-  Planets[PNUM_LUNA].orbvel = 12.0 * orbvel;
-  Planets[PNUM_LUNA].orbang = rnduni( 0.0, 360.0 );
-  /* Sirius' planets. */
-  orbang = rnduni( 0.0, 360.0 );
-  orbvel = rndnor( PLANET_ORBIT_FAC, 2.0 ) * ( rndint( 0, 1 ) * 2 - 1 );
-  Planets[PNUM_ROMULUS].orbang = orbang;
-  Planets[PNUM_ROMULUS].orbvel = orbvel;
-  Planets[PNUM_REMUS].orbang = mod360( orbang + 2.0/3.0*360.0 );
-  Planets[PNUM_REMUS].orbvel = orbvel;
-  Planets[PNUM_RHO].orbang = mod360( orbang + 1.0/3.0*360.0 );
-  Planets[PNUM_RHO].orbvel = orbvel;
-  /* Kejela's planets. */
-  orbang = rnduni( 0.0, 360.0 );
-  orbvel = rndnor( PLANET_ORBIT_FAC, 2.0 ) * ( rndint( 0, 1 ) * 2 - 1 );
-  Planets[PNUM_KLINGUS].orbang = orbang;
-  Planets[PNUM_KLINGUS].orbvel = orbvel;
-  Planets[PNUM_LEUDUS].orbang = mod360( orbang + 2.0/3.0*360.0 );
-  Planets[PNUM_LEUDUS].orbvel = orbvel;
-  Planets[PNUM_TARSUS].orbang = mod360( orbang + 1.0/3.0*360.0 );
-  Planets[PNUM_TARSUS].orbvel = orbvel;
-  /* Betelgeuse's planets. */
-  orbang = rnduni( 0.0, 360.0 );
-  orbvel = rndnor( PLANET_ORBIT_FAC, 2.0 ) * ( rndint( 0, 1 ) * 2 - 1 );
-  Planets[PNUM_ORION].orbang = orbang;
-  Planets[PNUM_ORION].orbvel = orbvel;
-  Planets[PNUM_OBERON].orbang = mod360( orbang + 2.0/3.0*360.0 );
-  Planets[PNUM_OBERON].orbvel = orbvel;
-  Planets[PNUM_UMBRIEL].orbang = mod360( orbang + 1.0/3.0*360.0 );
-  Planets[PNUM_UMBRIEL].orbvel = orbvel;
-  /* Side systems. */
-  orbang = rnduni( 0.0, 360.0 );
-  orbvel = rndnor( PLANET_ORBIT_FAC, 2.0 ) * ( rndint( 0, 1 ) * 2 - 1 );
-  Planets[PNUM_XIDEX].orbang = orbang;
-  Planets[PNUM_XIDEX].orbvel = orbvel;
-  Planets[PNUM_RIGELB].orbang = mod360( orbang + 1.0/2.0*360.0 );
-  Planets[PNUM_RIGELB].orbvel = orbvel;
-  orbang = rnduni( 0.0, 360.0 );
-  orbvel = rndnor( PLANET_ORBIT_FAC, 2.0 ) * ( rndint( 0, 1 ) * 2 - 1 );
-  Planets[PNUM_VENAR].orbang = orbang;
-  Planets[PNUM_VENAR].orbvel = orbvel;
-  Planets[PNUM_DYNEB].orbang = mod360( orbang + 1.0/2.0*360.0 );
-  Planets[PNUM_DYNEB].orbvel = orbvel;
-  orbang = rnduni( 0.0, 360.0 );
-  orbvel = rndnor( PLANET_ORBIT_FAC, 2.0 ) * ( rndint( 0, 1 ) * 2 - 1 );
-  Planets[PNUM_SARAC].orbang = orbang;
-  Planets[PNUM_SARAC].orbvel = orbvel;
-  Planets[PNUM_EMINIAR].orbang = mod360( orbang + 1.0/2.0*360.0 );
-  Planets[PNUM_EMINIAR].orbvel = orbvel;
-  orbang = rnduni( 0.0, 360.0 );
-  orbvel = rndnor( PLANET_ORBIT_FAC, 2.0 ) * ( rndint( 0, 1 ) * 2 - 1 );
-  Planets[PNUM_DAKEL].orbang = orbang;
-  Planets[PNUM_DAKEL].orbvel = orbvel;
-  Planets[PNUM_OLDAR].orbang = mod360( orbang + 1.0/2.0*360.0 );
-  Planets[PNUM_OLDAR].orbvel = orbvel;
-  
-  Planets[PNUM_SYRINX].orbvel = -6.314179;
-  Planets[PNUM_SYRINX].orbang = rnduni(0.0, 360.0);
-  
-  /* Syrinx's planets. */
-  orbang = rnduni( 0.0, 360.0 );
-  orbvel = rndnor( PLANET_ORBIT_FAC, 2.0 ) * ( rndint( 0, 1 ) * 2 - 1 );
-
-  Planets[PNUM_ALTAIR].orbang = rnduni(0.0, 360.0);
-  Planets[PNUM_ALTAIR].orbvel = -23.1;
-
-  Planets[PNUM_HELL].orbang = mod360( orbang + 2.0/3.0*360.0 );
-  Planets[PNUM_HELL].orbvel = orbvel;
-
-  Planets[PNUM_JINX].orbang = mod360( orbang + 1.0/3.0*360.0 );
-  Planets[PNUM_JINX].orbvel = 7.5;
-
-  /* Place the planets in their proper orbits. */
-  for ( i = NUMPLANETS; i > 0; i = i - 1 )
-    if ( Planets[i].primary != 0 )
-      {
-	Planets[i].x = Planets[Planets[i].primary].x + 
-	  Planets[i].orbrad * cosd(Planets[i].orbang);
-	Planets[i].y = Planets[Planets[i].primary].y + 
-	  Planets[i].orbrad * sind(Planets[i].orbang);
-      }
-  
-				/* Now we init the 'extra' planets with
-				   defaults */
-  if (NUM_EXTRAPLANETS > 0)
-    {				/* there are extra planets
-				   they are numbered starting at
-				   1 (+ NUM_BASEPLANETS) */
-      for (i=1; i<= NUM_EXTRAPLANETS; i++) 
-	{
-	  char buf[64];
-	  int t;
-
-	  t = NUM_BASEPLANETS + i;
-	  sprintf(buf, "Extra %d", i);
-	  strcpy(Planets[t].name, buf);
-	  Planets[t].type = PLANET_GHOST;
-	  Planets[t].real = FALSE;
-	  Planets[t].x = 0.0;
-	  Planets[t].y = 0.0;
-	  Planets[t].primary = PNUM_MURISAK;
-	  Planets[t].orbrad = rnduni(30000.0, 70000.0);
-	  Planets[t].orbvel = rnduni(-5.0, +5.0);
-	  Planets[t].orbang = rnduni(0.0, 360.0);
-	}
-    }
-
-  /* Un-twiddle the lockword. */
-  PVUNLOCK(&ConqInfo->lockword);
-  
-  /* Protect against a system crash here! */
-  upchuck();
   
   return;
   
@@ -2503,29 +1997,6 @@ void clbInitUniverse(void)
   ShipTypes[ST_CRUISER].weafac = 1.17;
   ShipTypes[ST_CRUISER].torpwarp = 10.0;
 
-  Teams[TEAM_FEDERATION].teamhplanets[0] = PNUM_EARTH;
-  Teams[TEAM_FEDERATION].teamhplanets[1] = PNUM_TELOS;
-  Teams[TEAM_FEDERATION].teamhplanets[2] = PNUM_OMEGA;
-  Teams[TEAM_ROMULAN].teamhplanets[0] = PNUM_ROMULUS;
-  Teams[TEAM_ROMULAN].teamhplanets[1] = PNUM_REMUS;
-  Teams[TEAM_ROMULAN].teamhplanets[2] = PNUM_RHO;
-  Teams[TEAM_KLINGON].teamhplanets[0] = PNUM_KLINGUS;
-  Teams[TEAM_KLINGON].teamhplanets[1] = PNUM_LEUDUS;
-  Teams[TEAM_KLINGON].teamhplanets[2] = PNUM_TARSUS;
-  Teams[TEAM_ORION].teamhplanets[0] = PNUM_ORION;
-  Teams[TEAM_ORION].teamhplanets[1] = PNUM_OBERON;
-  Teams[TEAM_ORION].teamhplanets[2] = PNUM_UMBRIEL;
-  
-  Teams[TEAM_FEDERATION].homeplanet = PNUM_EARTH;
-  Teams[TEAM_ROMULAN].homeplanet = PNUM_ROMULUS;
-  Teams[TEAM_KLINGON].homeplanet = PNUM_KLINGUS;
-  Teams[TEAM_ORION].homeplanet = PNUM_ORION;
-  
-  Teams[TEAM_FEDERATION].homesun = PNUM_SOL;
-  Teams[TEAM_ROMULAN].homesun = PNUM_SIRIUS;
-  Teams[TEAM_KLINGON].homesun = PNUM_KEJELA;
-  Teams[TEAM_ORION].homesun = PNUM_BETELGEUSE;
-  
   Teams[TEAM_FEDERATION].shiptype = ST_DESTROYER;
   Teams[TEAM_KLINGON].shiptype = ST_DESTROYER;
   Teams[TEAM_ROMULAN].shiptype = ST_CRUISER;
@@ -2548,6 +2019,15 @@ void clbInitUniverse(void)
   ConqInfo->chrplanets[PLANET_CLASSA] = 'A';
   ConqInfo->chrplanets[PLANET_CLASSO] = 'O';
   ConqInfo->chrplanets[PLANET_CLASSZ] = 'Z';
+
+  stcpn( "class M planet", ConqInfo->ptname[PLANET_CLASSM], MAXPTYPENAME );
+  stcpn( "dead planet", ConqInfo->ptname[PLANET_DEAD], MAXPTYPENAME );
+  stcpn( "sun", ConqInfo->ptname[PLANET_SUN], MAXPTYPENAME );
+  stcpn( "moon", ConqInfo->ptname[PLANET_MOON], MAXPTYPENAME );
+  stcpn( "ghost planet", ConqInfo->ptname[PLANET_GHOST], MAXPTYPENAME );
+  stcpn( "class A planet", ConqInfo->ptname[PLANET_CLASSA], MAXPTYPENAME );
+  stcpn( "class O planet", ConqInfo->ptname[PLANET_CLASSO], MAXPTYPENAME );
+  stcpn( "class Z planet", ConqInfo->ptname[PLANET_CLASSZ], MAXPTYPENAME );
   
   Teams[TEAM_FEDERATION].teamchar = 'F';
   Teams[TEAM_ROMULAN].teamchar = 'R';
@@ -3022,7 +2502,7 @@ void clbStoreMsgf( int from, int to, char *msg, unsigned char flags )
       Ships[i].alastmsg = LMSG_READALL;
   PVUNLOCK(&ConqInfo->lockmesg);
 
-  if (SysConf.LogMessages == TRUE)
+  if (SysConf.LogMessages == TRUE || to == MSG_GOD || from == MSG_GOD)
     {
       clbFmtMsg(to, from, buf);
       clog("MSG: %s: %s",

@@ -251,6 +251,9 @@ static int nPlayIdle(void)
           else
             Context.recmode = RECMODE_OFF;
         }
+      
+      /* our ship might have chaged, so reload all server data */
+      sendCommand(CPCMD_RELOAD, 0);
 
 
       /* need to tell the server to resend all the crap it already

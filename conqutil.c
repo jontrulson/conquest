@@ -32,7 +32,10 @@
 #include "conqlb.h"
 
 /* if set, clog uses the system log, else it is created in HOME */
-static int systemlog = TRUE;
+static int systemlog   = TRUE;
+static int echo2stderr = FALSE;  /* whether to echo clog to stderr */
+                                 /* this will be ignored if systemlog is
+                                    TRUE */
 
 /*  acdist - figure distance traveled while changing velocities */
 /*  SYNOPSIS */
@@ -512,12 +515,18 @@ int arrows( char *str, real *dir )
   
 }
 
-void setSystemLog(int usesys)
+void setSystemLog(int usesys, int echostderr)
 {
   if (usesys)
-    systemlog = TRUE;
+    {
+      systemlog = TRUE;
+      echo2stderr = FALSE;
+    }
   else
-    systemlog = FALSE;
+    {
+      systemlog = FALSE;
+      echo2stderr = echostderr;
+    }
  
   return;
 }
@@ -547,19 +556,14 @@ void cerror(char *fmt, ...)
 
 void clog(char *fmt, ...)
 {
-# define HOME_BUFSZ 1024
   va_list ap;
-  static int nolog = FALSE;     /* if set, ignore logging */
+  static int nowarn = FALSE;     /* if set, ignore logging */
   static char buf[BIG_BUFFER_SIZE];
   static char errfile[MID_BUFFER_SIZE];
   static FILE *errfd = NULL;
-  char home[HOME_BUFSZ];
   char *homevar;
   int tmp;
 
-  if (nolog)
-    return;
-  
   va_start(ap, fmt);
   (void)vsnprintf(buf, sizeof(buf) - 1, fmt, ap);
   
@@ -580,12 +584,10 @@ void clog(char *fmt, ...)
 	}
       else
 	{			/* local logfile */
-          memset(home, 0, HOME_BUFSZ);
 	  if ((homevar = getenv("HOME")) != NULL)
             {
-              strncpy(home, homevar, HOME_BUFSZ - 1);
-              snprintf(errfile, sizeof(errfile) - 1, "%s/.%s", 
-                       home, C_CONQ_ERRLOG);
+              snprintf(errfile, sizeof(errfile) - 1, "%s/.conquest/%s", 
+                       homevar, C_CONQ_ERRLOG);
             }
 	  else
 	    snprintf(errfile, sizeof(errfile) - 1, "%s", C_CONQ_ERRLOG);
@@ -595,13 +597,17 @@ void clog(char *fmt, ...)
 	{
 	  if ((tmp = creat(errfile, 0660)) == -1)
 	    {
-	      fprintf(stderr, "clog(): creat(%s): %s\n",
-		      errfile,
-		      strerror(errno));
+              if (!nowarn)
+                fprintf(stderr, "clog(): creat(%s): %s\n",
+                        errfile,
+                        strerror(errno));
 	      
               if (!systemlog)
                 {
-                  nolog = TRUE;
+                  /* if the logfile could not be created for a user,
+                     keep trying (the .conquest/ dir may not exist
+                     yet), but only log an error once. */
+                  nowarn = TRUE;
                   return;
                 }
               else
@@ -639,6 +645,13 @@ void clog(char *fmt, ...)
       fprintf(errfd, "%ld:%d:%s\n", time(0), (int)getpid(), buf);
       fflush(errfd);
     }
+
+  if (echo2stderr)
+    {
+      fprintf(stderr, "%s\n", buf);
+      fflush(stderr);
+    }
+
   
   return;
   

@@ -55,7 +55,9 @@ FILELIST="ratfor.c cd2lb.h cd2lb.c iolb.h iolb.c conqlb.c
         render.h render.c nPlayBMenu.h nPlayBMenu.c playback.h
         playback.c nPlayB.h nPlayB.c nPlayBHelp.h nPlayBHelp.c
         nOptions.h nOptions.c colorGL.c colorCU.c cuclient.c ui.h uimisc.c
-        cuclient.h conqlb.h udp.h udp.c"  
+        cuclient.h conqlb.h udp.h udp.c texdata.h initdata.h conqinit-yacc.y
+        planinit.c textures.h conqinit.h conqinit.c conqinit-lex.l
+        ylwrap conqinitrc texturesrc anim.h anim.c CONQINIT.TXT"  
 
 IMAGES="img/*.tga img/*.txf"
 
@@ -84,7 +86,7 @@ chmod 755 $CONQVER/configure $CONQVER/config.guess $CONQVER/config.sub
 
 
 tar cvf ${ARCFILE} $CONQVER
-gzip -v $ARCFILE
+gzip --best -v $ARCFILE
 rm -rf $CONQVER
 
 set -x 

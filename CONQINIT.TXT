@@ -1,0 +1,234 @@
+
+# $Id$
+
+Conqinit. Very raw documentation to be cleaned up later.
+
+
+       Textures:
+
+       The old hardcoded texture filenames and integer index stuff in
+       the original conquestgl proved to be, unsustainable :)  Cat's
+       patches extended ConquestGL's texture handling to be a little
+       more flexible, but there were still issues.  Texture
+       configuration, loading and resolution have been completely
+       reworked in the version of Conquest.
+ 
+       All textures that can be used in conquest are specified in a
+       global 'texturesrc' file located in the main etc/ dir of a
+       conquest installation.  Additional textures can be specified in
+       a users ~/.conquest/*.trc files.
+
+       Each texture is specified like:
+
+       Simplest form:
+
+                texture {
+                  name         "star"       # required
+                }
+
+       Textures are referenced in conquest by this name during setup.
+       The name should never change - they have been created to easily
+       find textures for a given object, team, and shiptype for example.
+       The image file loaded in this case would be 'star.tga'.
+
+       You can also optionally specify a filename (if it's different
+       from 'name'), and you can optionally specify a color (which would
+       be normally be used as part of a texture animation).  So a more
+       complex one with all values specified looks like:
+
+               texture {
+                 name         "conqlogoF"
+                 filename     "conq-fed"    # optional, defaults to name
+                 color        "ffe6e6e6"    # optional
+               }
+
+
+               This is the federation conquest logo.  Inside conquest,
+               when this texture should be rendered, conquest will
+               simply look for textures with a name 'conquestlogoT'
+               where 'T' is the first char of the team name.  You can
+               change the filename to whatever you want and conquest
+               will still find it, since all textures are referenced
+               by the 'name' field.
+
+       When conquest starts, it will load/parse this file so it has a
+       complete texture list in the cqiTextures[] array (which is
+       dynamically allocated).
+
+       When LoadTextures() is called, it will simply go through this
+       cqiTextures array and load each texture it can.
+
+       For things like drawing planets, ships, etc, the texture id's
+       are looked up the first time they are referenced from the
+       GLTextures array and saved away for future use, eliminating the
+       need to search for textures when rendering - it's just a direct
+       lookup which is alot faster.
+
+       Users can override texture definitions as well.  After
+       conquestgl parses the main texturesrc file, it will then load
+       and parse any *.trc files it finds in your ~/.conquest/
+       directory.  These files have the same format as texturesrc.
+       Textures can be provided in a user's ~/.conquest/img/
+       directory, which will also be searched when texture loading
+       starts.  So for example, if you absolutely hate the vbg (Viewer
+       Backgroud) texture, you could make it what ever you want by
+       creating a ~/.conquest/vbg.trc file with the following
+       contents:
+
+         texture {
+           name "vbg"
+           filename "my_better_vbg"
+         }
+
+         Then place your my_better_vbg.tga file into ~/.conquest/img/ .
+
+       That's the gist of textures.
+
+       Planets:
+
+       The planets are also handled differently. They are now all
+       loaded from the global conqinitrc file.  There are also
+       'global', and 'shiptype' sections in this file which,
+       currently, should never be changed until the protocol and
+       common block is changed to support it.  But the planet sections
+       can be edited at will.
+
+       Here's an example for Jinx:        
+
+              planet {
+                name        "Jinx"           
+                primary     "Syrinx"         
+                angle       304.393088       
+                velocity    7.500000         
+                radius      2600.000000
+                ptype       "M"
+                pteam       "S"
+                armies      153
+                visible     "yes"
+                core        "yes"
+                homeplanet  "no"
+                xcoord      -19392.238383
+                ycoord      -11831.705377
+                size        300
+                color       "ffe6e6e6"
+              }
+
+      'size' is specified in CQ's (Conquest Units of measurement).
+
+       You can optionally have a 'texname' parameter that specifies
+       the texture to use to display a planet, but this should almost
+       never be done.  The default rules (described below) for
+       finding a planet texture are generally the best choice.
+
+       If 'angle' is negative, a random value will be chosen at parse
+       time.
+
+       The 'armies' field can accept two numbers as well, representing
+       the mix and max values to use to generate a random value.
+
+             ...  
+             armies 20 100 
+             ...
+
+             Will choose a random value between 20 and 100 at parse
+             time. 
+
+       The downside here is that it is currently not possible to define
+       a planets orbital characteristics to be dependant on another
+       planet (like what was done in the original conq).  I do not
+       consider this a loss... You may disagree :)
+
+       Planet textures in the game are selected for a planet using the
+       following rules:
+
+       1. see if one was specified in the conqinitrc entry for
+          the planet, if so, use it.  This should usually not be done
+          except in special cases.
+
+       2. see if a texture exists with the same name as the planet, if
+          so use it.
+
+       3. if all else fails, use the default textures 'classm',
+          classd', 'star' etc.
+
+       So in general, you never really need to specify a texture for a
+       planet in conqinitrc.  If you want a specific texture to be
+       displayed for a planet, just create a texture with the same
+       name as the planet and add an entry for it in the texturesrc
+       (or a user .trc) file.
+
+      conqinit:
+
+      There is a new executable called conqinit.  conqinit can be used
+      to test the new parser, as well as to generate a texdata.h file
+      based on texturesrc data, and generate a initdata.h file based on
+      conqinitrc data.
+
+      These initdata.h and texdata.h files contain defaults for the
+      planets and textures compiled directly into conquest in the event
+      the respective conquestrc and texturesrc file could not be found
+      or successfully read on startup.  
+
+      examples:
+
+      $ conqinit
+
+        Simply parses the global conqinitrc file and exits, reporting
+        any errors, warnings, etc.
+
+      $ conqinit -f <file>
+
+        Does the same thing but parses <file>.
+
+      $ conqinit -t
+
+        parses the default texturesrc file and exits, reporting any
+        errors/warnings.
+
+      $ conqinit -t -f <file>
+
+        does the samething but parses <file> instead, and treats it
+        like a file in texturesrc format.
+
+      $ conqinit -f <file> -h >conqinit.h
+
+        parses <file> as a conqinitrc file and generates a conqinit.h
+        file that can be compiled into conquest to specify 'last-ditch'
+        defaults in case the normal files could not be parsed for some
+        reason.
+
+
+      Note, you should never have to gen any .h files, the parser runs
+      when conquest starts up and will always use the data it found if
+      it can.  Valid texdata.h and initdata.h files are supplied in
+      the conquest distribution.
+
+     - Animations.  Done. Now I need to explain them better than below.
+
+              animation {
+                 name    "animation name"
+                 animdef "animdefname"
+              }
+
+              and then an animation would be specified like so:
+
+              animdef {
+                 name "animdefname"
+                 texanim {
+                          .... texture anim data
+                         }
+
+                 colanim {
+                          .... color animation data
+                         }
+
+                 geoanim {
+                          .... geometry anim data
+                         }
+              }
+
+              animations will be 'executed' via the main renderNode()
+              function and be fairly autonomous with respect to the
+              primary rendering node.
+
+* FINISH ME *

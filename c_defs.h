@@ -16,6 +16,8 @@
 /*                                                                    */
 /**********************************************************************/
 
+#ifndef _C_DEFS_H
+#define _C_DEFS_H
 /* Get some valuable info... */
 #include "config.h"
 
@@ -57,6 +59,10 @@
 #include <arpa/inet.h>
 #include <netdb.h>
 #include <fcntl.h>
+
+#ifdef HAVE_DIRENT_H
+#include <dirent.h>
+#endif
 
 
 #if defined(HAVE_STRING_H)
@@ -243,7 +249,7 @@ void apptitle( int team, char *buf );
 void appship( int snum, char *str );
 void appkb( int kb, char *buf );
 int arrows( char *str, real *dir );
-void setSystemLog(int usesys);
+void setSystemLog(int usesys, int echostderr);
 void cerror(char *fmt, ...);
 void clog(char *fmt, ...);
 void delblanks( char *str );
@@ -307,4 +313,5 @@ int rndgeo ( real prob );
 int rndbin ( int trials, real prob );
 int rndpoi ( real mean );
 
+#endif /* _C_DEFS_H */
 

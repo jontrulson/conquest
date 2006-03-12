@@ -410,7 +410,7 @@ void display( int snum, int display_info )
 	      /* Nearby torpedos. */
 	      outattr = YellowLevelColor;
 	      AlertLevel = YELLOW_ALERT;
-	      c_strcpy( "Torp alert", buf );
+	      c_strcpy( "Torp Alert", buf );
 	      minenemy = 0;			/* disable nearby enemy code */
 	      dobeep = TRUE;
 	    }
@@ -673,13 +673,13 @@ void display( int snum, int display_info )
       {
 	if ( i > 0 )
 	  {
-	    sprintf( buf, "%d", i );
-	    setArmies("Armies = ", buf);
+	    sprintf( buf, "%2d ", i );
+	    setArmies(buf, "armies");
 	  }
 	else if ( i < 0 )
 	  {
 	    robstr( -i, buf );
-	    setArmies("AI: ", buf);
+	    setArmies("", buf);
 	  }
 	else
 	  setArmies("", "");
@@ -717,7 +717,7 @@ void display( int snum, int display_info )
       {
 	if ( i > 0 )
 	  {
-	    sprintf( buf, "DESTRUCT MINUS %-3d", i );
+	    sprintf( buf, "DESTRUCT MINUS %3d", i );
 	    setCloakDestruct(buf, RedLevelColor);
 	  }
 	else if ( i == -1 )

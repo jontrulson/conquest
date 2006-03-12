@@ -354,12 +354,27 @@ spShipLoc_t *spktShipLoc(Unsgn8 snum, int rec)
   real x, y;
   int canscan = FALSE;
   real dis;
+  static const Unsgn32 maxtime = 5000;  /* 5 seconds */
+  static Unsgn32 lasttime = 0;
+  Unsgn32 thetime = clbGetMillis();
+  static int forceMyShip = TRUE;
 
   memset((void *)&sshiploc, 0, sizeof(spShipLoc_t));
 
   sshiploc.type = SP_SHIPLOC;
   sshiploc.snum = snum;
   sshiploc.warp = (Sgn8)(Ships[snum].warp * 10.0);
+
+  /* we need to ensure that if we are doing UDP, and we haven't
+     updated a ship in awhile (causing UDP traffic), force an update
+     of your ship even if it isn't neccessary.  This should help with
+     those firewalls that disconnect a UDP connection when there has
+     been no trafic on it for a while. */
+  if (sInfo.doUDP && (snum == mysnum) && ((thetime - lasttime) > maxtime))
+    {
+      lasttime = thetime;
+      forceMyShip = TRUE;
+    }
 
   /* RESTRICT */
   if ((snum == mysnum) || rec)
@@ -417,10 +432,16 @@ spShipLoc_t *spktShipLoc(Unsgn8 snum, int rec)
     }
   else
     {
-      if (memcmp((void *)&sshiploc, (void *)&pktShipLoc[snum], 
+      if (forceMyShip || memcmp((void *)&sshiploc, (void *)&pktShipLoc[snum], 
                  sizeof(spShipLoc_t)))
         { 
           pktShipLoc[snum] = sshiploc;
+          /* if we are doing udp, and we are going to send a packet,
+             reset the timer so we won't need a nother force (as we do
+             not need one now :) */
+          if (sInfo.doUDP)
+            lasttime = thetime;
+          forceMyShip = FALSE;
           return &sshiploc;
         }
     }

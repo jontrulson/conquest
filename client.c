@@ -318,6 +318,10 @@ int procPlanetSml(Unsgn8 *buf)
 
   Planets[pnum].uninhabtime = (int)splansml->uninhabtime;
 
+#if 0
+  clog("%s: %d scanned = %x", __FUNCTION__, pnum, splansml->scanned);
+#endif
+
   return TRUE;
 }
 

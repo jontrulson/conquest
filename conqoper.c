@@ -45,6 +45,7 @@
 #include "clntauth.h"
 #include "cuclient.h"
 #include "display.h"
+#include "conqinit.h"
 
 static char cbuf[MID_BUFFER_SIZE]; /* general purpose buffer */
 
@@ -112,6 +113,8 @@ int main(int argc, char *argv[])
       printf( "Poor cretins such as yourself lack the");
       error( " skills necessary to use this program.\n" );
     }
+
+  rndini( 0, 0 );		/* initialize random numbers */
   
   while ((i = getopt(argc, argv, "CDEI:")) != EOF)    /* get command args */
     switch (i)
@@ -177,6 +180,10 @@ int main(int argc, char *argv[])
 	}
 
       GetSysConf(TRUE);		/* init defaults... */
+
+      /* load conqinitrc */
+      cqiLoadRC(CQI_FILE_CONQINITRC, NULL, 0, 0);
+
       map_common();		/* Map the conquest universe common block */
   
 				/* regen sysconf file? */
@@ -260,6 +267,10 @@ int main(int argc, char *argv[])
       exit(1);
     }
   
+  /* load conqinitrc */
+  cqiLoadRC(CQI_FILE_CONQINITRC, NULL, 0, 0);
+
+
 #ifdef SET_PRIORITY
   /* Increase our priority a bit */
   
@@ -278,7 +289,6 @@ int main(int argc, char *argv[])
 #endif
   
   
-  rndini( 0, 0 );		/* initialize random numbers */
   map_common();			/* Map the conquest universe common block */
   cdinit();			/* initialize display environment */
   
@@ -3518,7 +3528,7 @@ int DoInit(char InitChar, int cmdline)
       break;
 
     case 'p': 
-      clbInitPlanets();
+      cqiInitPlanets();
       *CBlockRevision = COMMONSTAMP;
 
       if (cmdline == TRUE)

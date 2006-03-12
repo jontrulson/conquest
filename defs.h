@@ -41,6 +41,8 @@
 #define C_CONQ_NEWSFILE  "HISTORY"
 #define C_CONQ_HELPFILE  "conquest.doc"
 
+#define C_CONQ_INITRC    "conqinitrc"
+
 /* 
  * USE_COMMONMLOCK - Lock the common block into memory via memctl(). 
  *  Requires the PLOCK privilege (unixware).

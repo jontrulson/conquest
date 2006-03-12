@@ -12,14 +12,18 @@
 #define NODE_OK        TRUE
 #define NODE_EXIT      FALSE
 #define NODE_ERR       ERR
-/* menu/screen node */
 
+/* menu/screen node */
 
 typedef struct _scr_node {
   int (*display)(dspConfig_t *); /* display routine */
   int (*idle)(void);            /* idle routine */
   int (*input)(int ch);         /* input routine */
-  struct _scr_node *next;       /* sub-nodes */
+  void *animQue;                /* optional aimation que.
+                                   we use void* for this since
+                                   we don't want to bring GL into
+                                   the picture here. */
+  struct _scr_node *next;       /* sub-nodes ? */
 } scrNode_t;
 
 /* some nodes are called from other, multiple nodes, so we need

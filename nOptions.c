@@ -387,7 +387,7 @@ static void _dispHelpScreen(void)
   struct Conf *confitem;
 
   if (oldstate == S_UOPTS)
-    confitem = &ConfigData[cvec[clin]];
+    confitem = &ConfigData[cvec[(curpage * items_per_page) + clin]];
   else
     confitem = macroptr;
 
@@ -754,7 +754,7 @@ static int nOptionsInput(int ch)
           if (irv > 0)
             {
               if (irv != TERM_ABORT)
-                _changeOption(&ConfigData[cvec[clin]], FALSE);
+                _changeOption(&ConfigData[cvec[(curpage * items_per_page) + clin]], FALSE);
 
               prompting = FALSE;
             }
@@ -911,7 +911,7 @@ static int nOptionsInput(int ch)
           if (state == S_MACROS)
             _changeMacro((curpage * items_per_page) + clin + 1, TRUE);
           else if (state == S_UOPTS)
-            _changeOption(&ConfigData[cvec[clin]], TRUE);
+            _changeOption(&ConfigData[cvec[(curpage * items_per_page) + clin]], TRUE);
 	  break;
 
 	case '?':

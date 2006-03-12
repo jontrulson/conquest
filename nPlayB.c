@@ -40,6 +40,7 @@
 #include "glmisc.h"
 #include "glfont.h"
 #include "render.h"
+#include "anim.h"
 
 #include "nPlayB.h"
 
@@ -70,9 +71,18 @@ static scrNode_t nPlayBNode = {
   nPlayBDisplay,               /* display */
   nPlayBIdle,                  /* idle */
   nPlayBInput,                  /* input */
-  NULL                          /* next */
+  NULL                          /* animation que */
 };
 
+static animQue_t animQue;
+
+/* blinker states - we borrow them from nCP */
+extern animStateRec_t ncpBlinkerOneSec;
+extern animStateRec_t ncpBlinkerHalfSec;
+extern animStateRec_t ncpBlinkerQtrSec;
+
+/* team torp anim states borrowed fron nCP */
+extern animStateRec_t ncpTorpAnims[NUMPLAYERTEAMS];
 
 static void set_header(int snum)
 {
@@ -154,6 +164,51 @@ void nPlayBInit(void)
 {
   prompting = FALSE;
   state = S_NONE;
+
+  if (!nPlayBNode.animQue)
+    {
+      int i;
+
+      nPlayBNode.animQue = &animQue;
+      animQueInit(nPlayBNode.animQue);
+
+      /* now setup the blinkers */
+      /* these are toggle animations that never expire, so they
+         only need to be done once at inittime */
+      if (!animInitState("onesec", &ncpBlinkerOneSec, NULL))
+        clog("%s: failed to init animstate for animation 'onesec'",
+             __FUNCTION__);
+      else
+        animQueAdd(nPlayBNode.animQue, &ncpBlinkerOneSec);
+
+      if (!animInitState("halfsec", &ncpBlinkerHalfSec, NULL))
+        clog("%s: failed to init animstate for animation 'halfsec'",
+             __FUNCTION__);
+      else
+        animQueAdd(nPlayBNode.animQue, &ncpBlinkerHalfSec);
+
+      if (!animInitState("qtrsec", &ncpBlinkerQtrSec, NULL))
+        clog("%s: failed to init animstate for animation 'qtrsec'",
+             __FUNCTION__);
+      else
+        animQueAdd(nPlayBNode.animQue, &ncpBlinkerQtrSec);
+
+      /* now setup the team torp animators */
+      for (i=0; i<NUMPLAYERTEAMS; i++)
+        {
+          char nm[TEXFILEMAX];
+          
+          snprintf(nm, TEXFILEMAX - 1, "ship%c-torp", 
+                   Teams[i].name[0]);
+          
+          if (!animInitState(nm, &ncpTorpAnims[i], NULL))
+            clog("%s: failed to init animstate for animation '%s'",
+                 __FUNCTION__,
+                 nm);
+          else
+            animQueAdd(nPlayBNode.animQue, &ncpTorpAnims[i]);
+        }
+    }
 
   setNode(&nPlayBNode);
 

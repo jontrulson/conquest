@@ -26,7 +26,7 @@
 #endif
 
 #define SYSCONFIG_FILE "conquestrc"	/* relative to CONQETC */
-#define CONFIG_FILE ".conquestrc"
+#define CONFIG_FILE "conquestrc"
 
 #define CONF_MAXCOMMENTS 50
 
@@ -110,6 +110,13 @@ typedef struct _userConf {
   int EnemyShipBox;
 
   int doVBG;                    /* draw the background in the viewer? */
+
+  int DoShields;                /* Cataboligne - enhanced colored shield
+                                   indicator */
+
+  int DoTacBkg;                 /* tactical background graphic */
+
+  int DoTacShade;               /* tactical background alpha */
 
   char MacrosF[MAX_MACROS][MAX_MACRO_LEN];
 
@@ -685,6 +692,46 @@ struct Conf ConfData[] =
       "#  background image displayed in the viewer.  ",
       "#  Valid for GL client only.",
       "#  Default: true",
+      NULL
+    }
+  },
+  {
+    FALSE,
+    CTYPE_BOOL,
+    "do_shields=",
+    &UserConf.DoShields,
+    0, 0,
+    "Display shield graphics",
+    {
+      "# define this as 'true' if you want a color coded shield strength",
+      "#  graphic displayed around the ships.  Default: true",
+      NULL
+    }
+  },
+  {
+    FALSE,
+    CTYPE_BOOL,
+    "do_tac_bkg=",
+    &UserConf.DoTacBkg,
+    0, 0,
+    "Display tactical display background image",
+    {
+      "# define this as 'true' if you want a tactical LR gauge",
+      "#  Default: false",
+      NULL
+    }
+  },
+  {
+    FALSE,
+    CTYPE_NUMERIC,
+    "do_tac_shade=",
+    &UserConf.DoTacShade,
+    1, 100,                      /* min/max */
+    "Tactical display background shade (1-100)",
+    {
+      "# If tactical background is true, this will be the shade alpha",
+      "#  valid values 1 - 100",
+      "#  Default: 50",
       NULL
     }
   },

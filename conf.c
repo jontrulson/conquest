@@ -88,12 +88,72 @@ void setUserConfDefaults(void)
   UserConf.DoETAStats = TRUE;
   UserConf.EnemyShipBox = TRUE;
   UserConf.doVBG = TRUE;
+
+  UserConf.DoShields = TRUE;
+  UserConf.DoTacBkg = FALSE;
+  UserConf.DoTacShade = 50;
   
   for (i=0; i<MAX_MACROS; i++)
     {
       UserConf.MacrosF[i][0] = EOS;
     }
 
+  return;
+}
+
+/* here we look for a ~/.conquest/ directory, and try to create it if it
+   does nt exist */
+static void checkCreateUserConfDir(void)
+{
+  char buffer[BUFFER_SIZE];
+  struct stat sbuf;
+  char *home;
+  
+  if (telnetClient)             /* ...except for telnet users */
+    return;
+  
+  if ((home = getenv("HOME")) == NULL)
+    {
+      clog("checkCreateUserConfDir(): getenv(HOME) failed");
+      
+      return;
+    }
+  
+  /* start building the filename */
+  snprintf(buffer, sizeof(buffer) - 1, "%s/.conquest", home);
+  
+  if (stat(buffer, &sbuf) >= 0)
+    {
+      /* make sure it's a directory */
+      
+#ifdef S_ISDIR
+      if (!S_ISDIR(sbuf.st_mode))
+        {
+          clog("checkCreateUserConfDir(): %s exists, but is not a directory.",
+               buffer);
+          return;
+        }
+#endif
+      
+      /* else everythings ok (if S_ISDIR was understood) */
+      return;
+    }
+  
+  /* try to create it */
+  if (mkdir(buffer, (S_IRUSR | S_IWUSR | S_IXUSR |S_IRGRP | S_IXGRP)) < 0)
+    {                             /* not happy */
+      clog("checkCreateUserConfDir(): mkdir(%s) failed: %s.",
+           buffer, strerror(errno));
+      return;
+    }
+  else
+    {
+      clog("Created '%s' config directory.",
+           buffer);
+    }      
+  
+  /* we're done */
+  
   return;
 }
 
@@ -217,7 +277,16 @@ int GetSysConf(int checkonly)
 		      case CTYPE_NUMERIC:
 			if (alldig(bufptr))
 			  {
-			    *((int *) SysConfData[j].ConfValue) = atoi(bufptr);
+                            int *n = ((int *) SysConfData[j].ConfValue);
+
+			    *n = atoi(bufptr);
+
+                            if (*n < SysConfData[j].min)
+                              *n = SysConfData[j].min;
+
+                            if (*n > SysConfData[j].max)
+                              *n = SysConfData[j].max;
+
 			    SysConfData[j].Found = TRUE;
 			    FoundOne = TRUE;
 			  }
@@ -308,7 +377,6 @@ int GetConf(int usernum)
   int i, j, n;
   char conf_name[MID_BUFFER_SIZE];
   char *homevar, *cptr;
-  char home[HOME_BUFSZ];
   char buffer[BUFFER_SIZE];
   int buflen;
   char *bufptr;
@@ -316,6 +384,9 @@ int GetConf(int usernum)
 
   /* init some defaults */
   setUserConfDefaults();
+
+  /* check for the user config dir */
+  checkCreateUserConfDir();
 
   /* a telnet client leaves here after the defaults are set */
   if (telnetClient)
@@ -330,10 +401,8 @@ int GetConf(int usernum)
       return(ERR);
     }
 
-  memset(home, 0, HOME_BUFSZ);
-  strncpy(home, homevar, HOME_BUFSZ - 1);
-
-  snprintf(conf_name, sizeof(conf_name)-1, "%s/%s", home, CONFIG_FILE);
+  snprintf(conf_name, sizeof(conf_name)-1, "%s/.conquest/%s", 
+           homevar, CONFIG_FILE);
 
   if ((conf_fd = fopen(conf_name, "r")) == NULL)
     {
@@ -462,7 +531,16 @@ int GetConf(int usernum)
 		      case CTYPE_NUMERIC:
 			if (alldig(bufptr))
 			  {
-			    *((int *) ConfData[j].ConfValue) = atoi(bufptr);
+                            int *n = ((int *) ConfData[j].ConfValue);
+
+			    *n = atoi(bufptr);
+
+                            if (*n < ConfData[j].min)
+                              *n = ConfData[j].min;
+
+                            if (*n > ConfData[j].max)
+                              *n = ConfData[j].max;
+
 			    ConfData[j].Found = TRUE;
 			    FoundOne = TRUE;
 			  }
@@ -493,7 +571,7 @@ int GetConf(int usernum)
 
 				/* see if we found the version */
   if (ConfData[CF_VERSION].Found == FALSE)
-    {				/* .conquestrc version not found */
+    {				/* conquestrc version not found */
 #ifdef DEBUG_CONFIG
       clog("GetConf(): Incorrect version found. - rebuilding");
 #endif
@@ -524,7 +602,6 @@ int SaveUserConfig(void)
 {
   char conf_name[MID_BUFFER_SIZE];
   char *homevar;
-  char home[HOME_BUFSZ];
 
 				/* start building the filename */
   if ((homevar = getenv("HOME")) == NULL)
@@ -535,10 +612,8 @@ int SaveUserConfig(void)
       return(ERR);
     }
 
-  memset(home, 0, HOME_BUFSZ);
-  strncpy(home, homevar, HOME_BUFSZ - 1);
-
-  snprintf(conf_name, sizeof(conf_name)-1, "%s/%s", home, CONFIG_FILE);
+  snprintf(conf_name, sizeof(conf_name)-1, "%s/.conquest/%s", 
+           homevar, CONFIG_FILE);
 
 #ifdef DEBUG_OPTIONS
   clog("SaveUserConfig(): saving user config: conf_name = '%s'", conf_name);

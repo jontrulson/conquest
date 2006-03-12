@@ -65,7 +65,7 @@ static int nConsvrDisplay(dspConfig_t *dsp)
     return NODE_EXIT;
 
   /* display the logo */
-  mglConqLogo(dsp);
+  mglConqLogo(dsp, FALSE);
 
   lin = 12;
 

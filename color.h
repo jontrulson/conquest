@@ -13,10 +13,12 @@
 #define CQC_FG_MASK      (0x000000ff)
 #define CQC_BG_MASK      (0x0000ff00)
 #define CQC_ATTR_MASK    (0x00ff0000)
+#define CQC_ALPHA_MASK   (0xff000000)
 
 #define CQC_FG_SHIFT     (0)
 #define CQC_BG_SHIFT     (8)
 #define CQC_ATTR_SHIFT   (16)
+#define CQC_ALPHA_SHIFT  (24)
 
 /* colors for conquest */
 

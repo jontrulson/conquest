@@ -12,12 +12,11 @@
 #define VIEWANGLE 45.0
 #define TRANZ     -100.0
 
-void _GLError(char *funcname, int line);
+int _GLError(const char *funcname, const char *filename, int line);
 
-#define GLError() _GLError(__FUNCTION__, __LINE__)
+#define GLError() _GLError(__FUNCTION__, __FILE__, __LINE__)
 
-
-void mglConqLogo(dspConfig_t *dsp);
+void mglConqLogo(dspConfig_t *dsp, bool mult);
 void mglBeep(void);  
 void mglOverlayQuad(void);
 

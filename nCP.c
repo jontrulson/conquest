@@ -37,7 +37,7 @@
 #include "glmisc.h"
 #include "glfont.h"
 #include "render.h"
-
+#include "anim.h"
 #include "nCP.h"
 
 /* node specific states */
@@ -131,11 +131,22 @@ static int nCPIdle(void);
 static int nCPInput(int ch);
 
 static scrNode_t nCPNode = {
-  nCPDisplay,               /* display */
-  nCPIdle,                  /* idle */
-  nCPInput,                  /* input */
-  NULL
+  nCPDisplay,                   /* display */
+  nCPIdle,                      /* idle */
+  nCPInput,                     /* input */
+  NULL                          /* will contain our animation que */
 };
+
+static animQue_t animQue;
+
+/* blinker states (exported) */
+
+animStateRec_t ncpBlinkerOneSec;
+animStateRec_t ncpBlinkerHalfSec;
+animStateRec_t ncpBlinkerQtrSec;
+
+/* team torp anim states (exported) */
+animStateRec_t ncpTorpAnims[NUMPLAYERTEAMS];
 
 /* convert a KP key into an angle */
 static int _KPAngle(int ch, real *angle)
@@ -2434,6 +2445,50 @@ void nCPInit(void)
   pingPending = FALSE;
   pingStart = 0;
 
+  if (!nCPNode.animQue)
+    {
+      int i;
+
+      nCPNode.animQue = &animQue;
+      animQueInit(nCPNode.animQue);
+
+      /* now setup the blinkers */
+      /* these are toggle animations that never expire, so they
+         only need to be done once at inittime */
+      if (!animInitState("onesec", &ncpBlinkerOneSec, NULL))
+        clog("%s: failed to init animstate for animation 'onesec'",
+             __FUNCTION__);
+      else
+        animQueAdd(nCPNode.animQue, &ncpBlinkerOneSec);
+
+      if (!animInitState("halfsec", &ncpBlinkerHalfSec, NULL))
+        clog("%s: failed to init animstate for animation 'halfsec'",
+             __FUNCTION__);
+      else
+        animQueAdd(nCPNode.animQue, &ncpBlinkerHalfSec);
+
+      if (!animInitState("qtrsec", &ncpBlinkerQtrSec, NULL))
+        clog("%s: failed to init animstate for animation 'qtrsec'",
+             __FUNCTION__);
+      else
+        animQueAdd(nCPNode.animQue, &ncpBlinkerQtrSec);
+
+      /* now setup the team torp animators */
+      for (i=0; i<NUMPLAYERTEAMS; i++)
+        {
+          char nm[TEXFILEMAX];
+
+          snprintf(nm, TEXFILEMAX - 1, "ship%c-torp", 
+                   Teams[i].name[0]);
+
+          if (!animInitState(nm, &ncpTorpAnims[i], NULL))
+            clog("%s: failed to init animstate for animation '%s'",
+                 __FUNCTION__, nm);
+          else
+            animQueAdd(nCPNode.animQue, &ncpTorpAnims[i]);
+        }
+    }
+
   setNode(&nCPNode);
 
   return;
@@ -2636,6 +2691,13 @@ static int nCPInput(int ch)
       CQ_MODIFIER(ch) & CQ_KEY_MOD_ALT)
     {
       dostats = !dostats;
+      return NODE_OK;
+    }
+
+  if ((CQ_CHAR(ch) == 'G' || CQ_CHAR(ch) == 'g') && 
+      CQ_MODIFIER(ch) & CQ_KEY_MOD_ALT)
+    {
+      UserConf.DoTacBkg = !UserConf.DoTacBkg;
       return NODE_OK;
     }
 

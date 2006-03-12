@@ -94,6 +94,18 @@ expr		:	TOK_VARIABLE TOK_OPERATOR TOK_NUMBER
 
 %%
 
+
+/* this program uses a yacc parser that would conflict with the
+   conqinit parser, so we do not link it here.  However, conqlb references
+   a function it provides (but is not needed in the program, so we make a
+   fake version here. */
+
+void cqiInitPlanets(void)
+{
+  return;
+}
+
+
 /* conqstrat - main program */
 int main(int argc, char **argv)
 {

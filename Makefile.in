@@ -41,17 +41,19 @@ host_triplet = @host@
 @GLCLIENT_FALSE@bin_PROGRAMS = conquest$(EXEEXT) conqai$(EXEEXT) \
 @GLCLIENT_FALSE@	conqoper$(EXEEXT) conqstrat$(EXEEXT) \
 @GLCLIENT_FALSE@	conquestd$(EXEEXT) conquestsh$(EXEEXT) \
-@GLCLIENT_FALSE@	conqmetad$(EXEEXT)
+@GLCLIENT_FALSE@	conqmetad$(EXEEXT) conqinit$(EXEEXT)
 @GLCLIENT_TRUE@bin_PROGRAMS = conquest$(EXEEXT) conquestgl$(EXEEXT) \
 @GLCLIENT_TRUE@	conqai$(EXEEXT) conqoper$(EXEEXT) \
 @GLCLIENT_TRUE@	conqstrat$(EXEEXT) conquestd$(EXEEXT) \
-@GLCLIENT_TRUE@	conquestsh$(EXEEXT) conqmetad$(EXEEXT)
+@GLCLIENT_TRUE@	conquestsh$(EXEEXT) conqmetad$(EXEEXT) \
+@GLCLIENT_TRUE@	conqinit$(EXEEXT)
 libexec_PROGRAMS = conqdriv$(EXEEXT)
 DIST_COMMON = README $(am__configure_deps) $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in $(srcdir)/config.h.in \
 	$(top_srcdir)/configure INSTALL TODO config.guess config.sub \
-	conqstrat-lex.c conqstrat-yacc.c conqstrat-yacc.h depcomp \
-	install-sh ltmain.sh missing mkinstalldirs snprintf.c ylwrap
+	conqinit-lex.c conqinit-yacc.c conqinit-yacc.h conqstrat-lex.c \
+	conqstrat-yacc.c conqstrat-yacc.h depcomp install-sh ltmain.sh \
+	missing mkinstalldirs snprintf.c ylwrap
 subdir = .
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/acinclude.m4 \
@@ -70,7 +72,8 @@ am__vpath_adj = case $$p in \
   esac;
 am__strip_dir = `echo $$p | sed -e 's|^.*/||'`;
 am__installdirs = "$(DESTDIR)$(libdir)" "$(DESTDIR)$(bindir)" \
-	"$(DESTDIR)$(libexecdir)" "$(DESTDIR)$(datadir)"
+	"$(DESTDIR)$(libexecdir)" "$(DESTDIR)$(datadir)" \
+	"$(DESTDIR)$(sysconfdir)"
 libLTLIBRARIES_INSTALL = $(INSTALL)
 LTLIBRARIES = $(lib_LTLIBRARIES)
 libUi_la_LIBADD =
@@ -90,7 +93,7 @@ am_libUiGL_la_OBJECTS = GL.lo texfont.lo glfont.lo glmisc.lo \
 	nPlay.lo nCP.lo nDead.lo nCPHelp.lo nShipl.lo node.lo \
 	nPlanetl.lo nTeaml.lo nUserl.lo nHistl.lo glcprintf.lo \
 	gldisplay.lo render.lo nPlayBMenu.lo nPlayB.lo nPlayBHelp.lo \
-	nOptions.lo colorGL.lo
+	nOptions.lo colorGL.lo anim.lo
 libUiGL_la_OBJECTS = $(am_libUiGL_la_OBJECTS)
 @GLCLIENT_TRUE@am_libUiGL_la_rpath = -rpath $(libdir)
 libconqclnt_la_LIBADD =
@@ -98,6 +101,12 @@ am_libconqclnt_la_OBJECTS = client.lo clientlb.lo playback.lo
 libconqclnt_la_OBJECTS = $(am_libconqclnt_la_OBJECTS)
 @GLCLIENT_FALSE@am_libconqclnt_la_rpath = -rpath $(libdir)
 @GLCLIENT_TRUE@am_libconqclnt_la_rpath = -rpath $(libdir)
+libconqinit_la_LIBADD =
+am_libconqinit_la_OBJECTS = conqinit-yacc.lo conqinit-lex.lo \
+	planinit.lo
+libconqinit_la_OBJECTS = $(am_libconqinit_la_OBJECTS)
+@GLCLIENT_FALSE@am_libconqinit_la_rpath = -rpath $(libdir)
+@GLCLIENT_TRUE@am_libconqinit_la_rpath = -rpath $(libdir)
 libconqserv_la_LIBADD =
 am_libconqserv_la_OBJECTS = servauth.lo server.lo serverpkt.lo \
 	servercmd.lo
@@ -117,33 +126,42 @@ libexecPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
 PROGRAMS = $(bin_PROGRAMS) $(libexec_PROGRAMS)
 am_conqai_OBJECTS = conqai_main.$(OBJEXT)
 conqai_OBJECTS = $(am_conqai_OBJECTS)
-conqai_DEPENDENCIES = libconquest.la
+am__DEPENDENCIES_1 =
+conqai_DEPENDENCIES = libconqinit.la libconquest.la \
+	$(am__DEPENDENCIES_1)
 am_conqdriv_OBJECTS = conqdriv.$(OBJEXT)
 conqdriv_OBJECTS = $(am_conqdriv_OBJECTS)
-conqdriv_DEPENDENCIES = libconquest.la
+conqdriv_DEPENDENCIES = libconqinit.la libconquest.la \
+	$(am__DEPENDENCIES_1)
+am_conqinit_OBJECTS = conqinit.$(OBJEXT)
+conqinit_OBJECTS = $(am_conqinit_OBJECTS)
+conqinit_DEPENDENCIES = libconqinit.la libconquest.la \
+	$(am__DEPENDENCIES_1)
 am_conqmetad_OBJECTS = conqmetad.$(OBJEXT)
 conqmetad_OBJECTS = $(am_conqmetad_OBJECTS)
-conqmetad_DEPENDENCIES = libconquest.la
+conqmetad_DEPENDENCIES = libconqinit.la libconquest.la \
+	$(am__DEPENDENCIES_1)
 am_conqoper_OBJECTS = conqoper.$(OBJEXT)
 conqoper_OBJECTS = $(am_conqoper_OBJECTS)
-conqoper_DEPENDENCIES = libUiCU.la libUi.la libconqclnt.la \
-	libconquest.la
+conqoper_DEPENDENCIES = libconqinit.la libUiCU.la libUi.la \
+	libconqclnt.la libconquest.la $(am__DEPENDENCIES_1)
 am_conqstrat_OBJECTS = conqstrat-yacc.$(OBJEXT) \
 	conqstrat-lex.$(OBJEXT)
 conqstrat_OBJECTS = $(am_conqstrat_OBJECTS)
-am__DEPENDENCIES_1 =
 conqstrat_DEPENDENCIES = libconquest.la $(am__DEPENDENCIES_1)
 am_conquest_OBJECTS = conquest.$(OBJEXT) conqreplay.$(OBJEXT)
 conquest_OBJECTS = $(am_conquest_OBJECTS)
-conquest_DEPENDENCIES = libUiCU.la libUi.la libconqclnt.la \
-	libconquest.la
+conquest_DEPENDENCIES = libconqinit.la libUiCU.la libUi.la \
+	libconqclnt.la libconquest.la $(am__DEPENDENCIES_1)
 am_conquestd_OBJECTS = conquestd.$(OBJEXT)
 conquestd_OBJECTS = $(am_conquestd_OBJECTS)
-conquestd_DEPENDENCIES = libconqserv.la libconquest.la
+conquestd_DEPENDENCIES = libconqinit.la libconqserv.la libconquest.la \
+	$(am__DEPENDENCIES_1)
 am_conquestgl_OBJECTS = conquestgl.$(OBJEXT)
 conquestgl_OBJECTS = $(am_conquestgl_OBJECTS)
-conquestgl_DEPENDENCIES = libUiGL.la libUi.la libconqclnt.la \
-	libconquest.la $(am__DEPENDENCIES_1)
+conquestgl_DEPENDENCIES = libconqinit.la libUiGL.la libUi.la \
+	libconqclnt.la libconquest.la $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_1)
 am_conquestsh_OBJECTS = conquestsh.$(OBJEXT)
 conquestsh_OBJECTS = $(am_conquestsh_OBJECTS)
 conquestsh_LDADD = $(LDADD)
@@ -160,25 +178,29 @@ LINK = $(LIBTOOL) --tag=CC --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
 	$(AM_LDFLAGS) $(LDFLAGS) -o $@
 LEXCOMPILE = $(LEX) $(LFLAGS) $(AM_LFLAGS)
 LTLEXCOMPILE = $(LIBTOOL) --mode=compile $(LEX) $(LFLAGS) $(AM_LFLAGS)
+YLWRAP = $(top_srcdir)/ylwrap
 YACCCOMPILE = $(YACC) $(YFLAGS) $(AM_YFLAGS)
 LTYACCCOMPILE = $(LIBTOOL) --mode=compile $(YACC) $(YFLAGS) \
 	$(AM_YFLAGS)
 SOURCES = $(libUi_la_SOURCES) $(libUiCU_la_SOURCES) \
 	$(libUiGL_la_SOURCES) $(libconqclnt_la_SOURCES) \
-	$(libconqserv_la_SOURCES) $(libconquest_la_SOURCES) \
-	$(conqai_SOURCES) $(conqdriv_SOURCES) $(conqmetad_SOURCES) \
+	$(libconqinit_la_SOURCES) $(libconqserv_la_SOURCES) \
+	$(libconquest_la_SOURCES) $(conqai_SOURCES) \
+	$(conqdriv_SOURCES) $(conqinit_SOURCES) $(conqmetad_SOURCES) \
 	$(conqoper_SOURCES) $(conqstrat_SOURCES) $(conquest_SOURCES) \
 	$(conquestd_SOURCES) $(conquestgl_SOURCES) \
 	$(conquestsh_SOURCES)
 DIST_SOURCES = $(libUi_la_SOURCES) $(libUiCU_la_SOURCES) \
 	$(libUiGL_la_SOURCES) $(libconqclnt_la_SOURCES) \
-	$(libconqserv_la_SOURCES) $(libconquest_la_SOURCES) \
-	$(conqai_SOURCES) $(conqdriv_SOURCES) $(conqmetad_SOURCES) \
+	$(libconqinit_la_SOURCES) $(libconqserv_la_SOURCES) \
+	$(libconquest_la_SOURCES) $(conqai_SOURCES) \
+	$(conqdriv_SOURCES) $(conqinit_SOURCES) $(conqmetad_SOURCES) \
 	$(conqoper_SOURCES) $(conqstrat_SOURCES) $(conquest_SOURCES) \
 	$(conquestd_SOURCES) $(conquestgl_SOURCES) \
 	$(conquestsh_SOURCES)
 dataDATA_INSTALL = $(INSTALL_DATA)
-DATA = $(data_DATA)
+sysconfDATA_INSTALL = $(INSTALL_DATA)
+DATA = $(data_DATA) $(sysconf_DATA)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -309,17 +331,7 @@ CONQLIBEXECDIR = @libexecdir@
 CONQDATADIR = @datadir@
 CONQSYSCONFDIR = @sysconfdir@
 CONQIMGDIR = $(CONQDATADIR)/img
-IMAGES = img/classd.tga img/classm.tga img/doomsday.tga img/phaser.tga \
-	img/shipfcr.tga img/shipfde.tga img/shipfsc.tga img/shipkcr.tga \
-	img/shipkde.tga img/shipksc.tga img/shipocr.tga img/shipode.tga \
-	img/shiposc.tga img/shiprcr.tga img/shiprde.tga img/shiprsc.tga \
-	img/star.tga img/fixed.txf img/msg.txf img/large.txf img/vbg.tga \
-	img/torp.tga img/luna.tga img/tinyfixed.txf img/barrier.tga \
-	img/exp0.tga img/exp1.tga img/exp2.tga img/exp3.tga img/exp4.tga \
-	img/exp5.tga img/exp6.tga img/exp7.tga img/exp8.tga img/exp9.tga \
-	img/exp10.tga img/exp11.tga img/exp12.tga img/exp13.tga \
-	img/exp14.tga img/exp15.tga
-
+IMAGES = img/*.tga img/*.txf
 XLIBS = @X_LIBS@ @X_EXTRA_LIBS@ -lglut -lGL -lGLU -lXt @X_PRE_LIBS@ -lXext -lXi -lX11 -lXmu  
 INCLUDES = -DCONQUEST_GROUP=\"$(CONQGROUP)\" \
 	-DCONQSTATE=\"$(CONQLOCALSTATEDIR)\" -DCONQLIBEXEC=\"$(CONQLIBEXECDIR)\" \
@@ -329,10 +341,10 @@ INCLUDES = -DCONQUEST_GROUP=\"$(CONQGROUP)\" \
 
 AM_YFLAGS = -d
 @GLCLIENT_FALSE@lib_LTLIBRARIES = libconquest.la libconqclnt.la libconqserv.la \
-@GLCLIENT_FALSE@	libUi.la libUiCU.la
+@GLCLIENT_FALSE@	libconqinit.la libUi.la libUiCU.la
 
 @GLCLIENT_TRUE@lib_LTLIBRARIES = libconquest.la libconqclnt.la libconqserv.la \
-@GLCLIENT_TRUE@	libUi.la libUiGL.la libUiCU.la
+@GLCLIENT_TRUE@	libconqinit.la libUi.la libUiGL.la libUiCU.la 
 
 libconquest_la_SOURCES = conqai.c ratfor.c  \
 	conqlb.h conqlb.c rndlb.c conqutil.c conqcm.c \
@@ -362,7 +374,7 @@ libUiGL_la_SOURCES = GL.c texfont.c glfont.c glfont.h \
 	nTeaml.c nUserl.h nUserl.c nHistl.h nHistl.c cprintf.h glcprintf.c \
 	gldisplay.h gldisplay.c disputil.h render.h render.c \
 	nPlayBMenu.h nPlayBMenu.c nPlayB.h nPlayB.c nPlayBHelp.h \
-	nPlayBHelp.c nOptions.h nOptions.c colorGL.c ui.h
+	nPlayBHelp.c nOptions.h nOptions.c colorGL.c ui.h anim.c anim.h
 
 libUiGL_la_LDFLAGS = -version-info 1:0:0
 libUiCU_la_SOURCES = display.c cprintf.h cprintf.c disputil.h colorCU.c \
@@ -370,31 +382,35 @@ libUiCU_la_SOURCES = display.c cprintf.h cprintf.c disputil.h colorCU.c \
 	cuclient.c options.h options.c clntauth.c ui.h display.h 
 
 libUiCU_la_LDFLAGS = -version-info 1:0:0
+libconqinit_la_SOURCES = conqinit-yacc.y conqinit-lex.l conqinit.h initdata.h planinit.c
+libconqinit_la_LDFLAGS = -version-info 1:0:0
 conquest_SOURCES = conquest.c c_defs.h defs.h conqdef.h conqcom.h context.h \
 	conqreplay.c
 
-conquest_LDADD = libUiCU.la libUi.la libconqclnt.la libconquest.la
+conquest_LDADD = libconqinit.la libUiCU.la libUi.la libconqclnt.la libconquest.la $(LEXLIB) $(YACCLIB)
 conquestgl_SOURCES = conquestgl.c c_defs.h defs.h conqdef.h conqcom.h context.h
-conquestgl_LDADD = libUiGL.la libUi.la libconqclnt.la libconquest.la $(XLIBS)
+conquestgl_LDADD = libconqinit.la libUiGL.la libUi.la libconqclnt.la libconquest.la $(XLIBS) $(LEXLIB) $(YACCLIB)
 conquestd_SOURCES = conquestd.c c_defs.h defs.h conqdef.h conqcom.h \
-	context.h conqnet.h
+	context.h conqnet.h 
 
-conquestd_LDADD = libconqserv.la libconquest.la 
+conquestd_LDADD = libconqinit.la libconqserv.la libconquest.la $(LEXLIB) $(YACCLIB) 
 conqai_SOURCES = conqai_main.c c_defs.h defs.h conqdef.h conqcom.h \
                  context.h conqdata.h
 
-conqai_LDADD = libconquest.la 
-conqoper_SOURCES = conqoper.c c_defs.h defs.h conqdef.h conqcom.h context.h
-conqoper_LDADD = libUiCU.la libUi.la libconqclnt.la libconquest.la
+conqai_LDADD = libconqinit.la libconquest.la  $(LEXLIB) $(YACCLIB)
+conqoper_SOURCES = conqoper.c c_defs.h defs.h conqdef.h conqcom.h context.h 
+conqoper_LDADD = libconqinit.la libUiCU.la libUi.la libconqclnt.la libconquest.la $(LEXLIB) $(YACCLIB) 
 conqdriv_SOURCES = conqdriv.c c_defs.h defs.h conqdef.h conqcom.h context.h
-conqdriv_LDADD = libconquest.la 
+conqdriv_LDADD = libconqinit.la libconquest.la  $(LEXLIB) $(YACCLIB)
 conqstrat_SOURCES = conqstrat-yacc.y conqstrat-lex.l conqstrat.h
 conqstrat_LDADD = libconquest.la $(LEXLIB) $(YACCLIB) 
+conqinit_SOURCES = conqinit.c conqinit.h 
+conqinit_LDADD = libconqinit.la libconquest.la $(LEXLIB) $(YACCLIB) 
 conquestsh_SOURCES = conquestsh.c
 conqmetad_SOURCES = conqmetad.c meta.h
-conqmetad_LDADD = libconquest.la 
+conqmetad_LDADD = libconqinit.la libconquest.la  $(LEXLIB) $(YACCLIB)
 data_DATA = conquest.doc HISTORY README conqrule 
-#sysconf_DATA = conquestrc
+sysconf_DATA = conqinitrc texturesrc
 EXTRA_DIST = conquest.doc HISTORY README conqrule # conquestrc
 all: config.h
 	$(MAKE) $(AM_MAKEFLAGS) all-am
@@ -486,6 +502,13 @@ libUiGL.la: $(libUiGL_la_OBJECTS) $(libUiGL_la_DEPENDENCIES)
 	$(LINK) $(am_libUiGL_la_rpath) $(libUiGL_la_LDFLAGS) $(libUiGL_la_OBJECTS) $(libUiGL_la_LIBADD) $(LIBS)
 libconqclnt.la: $(libconqclnt_la_OBJECTS) $(libconqclnt_la_DEPENDENCIES) 
 	$(LINK) $(am_libconqclnt_la_rpath) $(libconqclnt_la_LDFLAGS) $(libconqclnt_la_OBJECTS) $(libconqclnt_la_LIBADD) $(LIBS)
+conqinit-yacc.h: conqinit-yacc.c
+	@if test ! -f $@; then \
+	  rm -f conqinit-yacc.c; \
+	  $(MAKE) conqinit-yacc.c; \
+	else :; fi
+libconqinit.la: $(libconqinit_la_OBJECTS) $(libconqinit_la_DEPENDENCIES) 
+	$(LINK) $(am_libconqinit_la_rpath) $(libconqinit_la_LDFLAGS) $(libconqinit_la_OBJECTS) $(libconqinit_la_LIBADD) $(LIBS)
 libconqserv.la: $(libconqserv_la_OBJECTS) $(libconqserv_la_DEPENDENCIES) 
 	$(LINK) $(am_libconqserv_la_rpath) $(libconqserv_la_LDFLAGS) $(libconqserv_la_OBJECTS) $(libconqserv_la_LIBADD) $(LIBS)
 libconquest.la: $(libconquest_la_OBJECTS) $(libconquest_la_DEPENDENCIES) 
@@ -552,6 +575,9 @@ conqai$(EXEEXT): $(conqai_OBJECTS) $(conqai_DEPENDENCIES)
 conqdriv$(EXEEXT): $(conqdriv_OBJECTS) $(conqdriv_DEPENDENCIES) 
 	@rm -f conqdriv$(EXEEXT)
 	$(LINK) $(conqdriv_LDFLAGS) $(conqdriv_OBJECTS) $(conqdriv_LDADD) $(LIBS)
+conqinit$(EXEEXT): $(conqinit_OBJECTS) $(conqinit_DEPENDENCIES) 
+	@rm -f conqinit$(EXEEXT)
+	$(LINK) $(conqinit_LDFLAGS) $(conqinit_OBJECTS) $(conqinit_LDADD) $(LIBS)
 conqmetad$(EXEEXT): $(conqmetad_OBJECTS) $(conqmetad_DEPENDENCIES) 
 	@rm -f conqmetad$(EXEEXT)
 	$(LINK) $(conqmetad_LDFLAGS) $(conqmetad_OBJECTS) $(conqmetad_LDADD) $(LIBS)
@@ -587,6 +613,7 @@ distclean-compile:
 
 @AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/snprintf.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/GL.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/anim.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cd2lb.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/client.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/clientlb.Plo@am__quote@
@@ -599,6 +626,9 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/conqai_main.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/conqcm.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/conqdriv.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/conqinit-lex.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/conqinit-yacc.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/conqinit.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/conqlb.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/conqmetad.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/conqoper.Po@am__quote@
@@ -644,6 +674,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/node.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/options.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/packet.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/planinit.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/playback.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/prm.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ratfor.Plo@am__quote@
@@ -683,30 +714,10 @@ distclean-compile:
 @am__fastdepCC_FALSE@	$(LTCOMPILE) -c -o $@ $<
 
 .l.c:
-	$(LEXCOMPILE) $<
-	sed '/^#/ s|$(LEX_OUTPUT_ROOT)\.c|$@|' $(LEX_OUTPUT_ROOT).c >$@
-	rm -f $(LEX_OUTPUT_ROOT).c
+	$(SHELL) $(YLWRAP) $< $(LEX_OUTPUT_ROOT).c $@ -- $(LEXCOMPILE)
 
 .y.c:
-	$(YACCCOMPILE) $<
-	if test -f y.tab.h; then \
-	  to=`echo "$*_H" | sed \
-                -e 'y/abcdefghijklmnopqrstuvwxyz/ABCDEFGHIJKLMNOPQRSTUVWXYZ/' \
-                -e 's/[^ABCDEFGHIJKLMNOPQRSTUVWXYZ]/_/g'`; \
-	  sed -e "/^#/!b" -e "s/Y_TAB_H/$$to/g" -e "s|y\.tab\.h|$*.h|" \
-            y.tab.h >$*.ht; \
-	  rm -f y.tab.h; \
-	  if cmp -s $*.ht $*.h; then \
-	    rm -f $*.ht ;\
-	  else \
-	    mv $*.ht $*.h; \
-	  fi; \
-	fi
-	if test -f y.output; then \
-	  mv y.output $*.output; \
-	fi
-	sed '/^#/ s|y\.tab\.c|$@|' y.tab.c >$@t && mv $@t $@
-	rm -f y.tab.c
+	$(SHELL) $(YLWRAP) $< y.tab.c $@ y.tab.h $*.h y.output $*.output -- $(YACCCOMPILE)
 
 mostlyclean-libtool:
 	-rm -f *.lo
@@ -733,6 +744,23 @@ uninstall-dataDATA:
 	  f=$(am__strip_dir) \
 	  echo " rm -f '$(DESTDIR)$(datadir)/$$f'"; \
 	  rm -f "$(DESTDIR)$(datadir)/$$f"; \
+	done
+install-sysconfDATA: $(sysconf_DATA)
+	@$(NORMAL_INSTALL)
+	test -z "$(sysconfdir)" || $(mkdir_p) "$(DESTDIR)$(sysconfdir)"
+	@list='$(sysconf_DATA)'; for p in $$list; do \
+	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
+	  f=$(am__strip_dir) \
+	  echo " $(sysconfDATA_INSTALL) '$$d$$p' '$(DESTDIR)$(sysconfdir)/$$f'"; \
+	  $(sysconfDATA_INSTALL) "$$d$$p" "$(DESTDIR)$(sysconfdir)/$$f"; \
+	done
+
+uninstall-sysconfDATA:
+	@$(NORMAL_UNINSTALL)
+	@list='$(sysconf_DATA)'; for p in $$list; do \
+	  f=$(am__strip_dir) \
+	  echo " rm -f '$(DESTDIR)$(sysconfdir)/$$f'"; \
+	  rm -f "$(DESTDIR)$(sysconfdir)/$$f"; \
 	done
 
 ID: $(HEADERS) $(SOURCES) $(LISP) $(TAGS_FILES)
@@ -915,7 +943,7 @@ all-am: Makefile $(LTLIBRARIES) $(PROGRAMS) $(DATA) config.h
 install-binPROGRAMS: install-libLTLIBRARIES
 
 installdirs:
-	for dir in "$(DESTDIR)$(libdir)" "$(DESTDIR)$(bindir)" "$(DESTDIR)$(libexecdir)" "$(DESTDIR)$(datadir)"; do \
+	for dir in "$(DESTDIR)$(libdir)" "$(DESTDIR)$(bindir)" "$(DESTDIR)$(libexecdir)" "$(DESTDIR)$(datadir)" "$(DESTDIR)$(sysconfdir)"; do \
 	  test -z "$$dir" || $(mkdir_p) "$$dir"; \
 	done
 install: install-am
@@ -942,6 +970,9 @@ distclean-generic:
 maintainer-clean-generic:
 	@echo "This command is intended for maintainers to use"
 	@echo "it deletes files that may require special tools to rebuild."
+	-rm -f conqinit-lex.c
+	-rm -f conqinit-yacc.c
+	-rm -f conqinit-yacc.h
 	-rm -f conqstrat-lex.c
 	-rm -f conqstrat-yacc.c
 	-rm -f conqstrat-yacc.h
@@ -970,7 +1001,7 @@ info-am:
 install-data-am: install-dataDATA
 
 install-exec-am: install-binPROGRAMS install-libLTLIBRARIES \
-	install-libexecPROGRAMS
+	install-libexecPROGRAMS install-sysconfDATA
 	@$(NORMAL_INSTALL)
 	$(MAKE) $(AM_MAKEFLAGS) install-exec-hook
 
@@ -1002,7 +1033,7 @@ ps-am:
 
 uninstall-am: uninstall-binPROGRAMS uninstall-dataDATA \
 	uninstall-info-am uninstall-libLTLIBRARIES \
-	uninstall-libexecPROGRAMS
+	uninstall-libexecPROGRAMS uninstall-sysconfDATA
 
 .PHONY: CTAGS GTAGS all all-am am--refresh check check-am clean \
 	clean-binPROGRAMS clean-generic clean-libLTLIBRARIES \
@@ -1015,26 +1046,26 @@ uninstall-am: uninstall-binPROGRAMS uninstall-dataDATA \
 	install-data-am install-dataDATA install-exec install-exec-am \
 	install-exec-hook install-info install-info-am \
 	install-libLTLIBRARIES install-libexecPROGRAMS install-man \
-	install-strip installcheck installcheck-am installdirs \
-	maintainer-clean maintainer-clean-generic mostlyclean \
-	mostlyclean-compile mostlyclean-generic mostlyclean-libtool \
-	pdf pdf-am ps ps-am tags uninstall uninstall-am \
-	uninstall-binPROGRAMS uninstall-dataDATA uninstall-info-am \
-	uninstall-libLTLIBRARIES uninstall-libexecPROGRAMS
+	install-strip install-sysconfDATA installcheck installcheck-am \
+	installdirs maintainer-clean maintainer-clean-generic \
+	mostlyclean mostlyclean-compile mostlyclean-generic \
+	mostlyclean-libtool pdf pdf-am ps ps-am tags uninstall \
+	uninstall-am uninstall-binPROGRAMS uninstall-dataDATA \
+	uninstall-info-am uninstall-libLTLIBRARIES \
+	uninstall-libexecPROGRAMS uninstall-sysconfDATA
 
 
 install-exec-hook:
 	$(mkinstalldirs) -m 755 $(DESTDIR)$(localstatedir) \
 		$(DESTDIR)$(CONQSYSCONFDIR) \
 		$(DESTDIR)$(CONQLOCALSTATEDIR) \
-		$(DESTDIR)$(CONQIMGDIR) \
-		$(DESTDIR)$(bindir) \
-		$(DESTDIR)$(libexecdir) \
-		$(DESTDIR)$(libdir)
+		$(DESTDIR)$(CONQIMGDIR)
 	chmod 775 $(DESTDIR)$(CONQLOCALSTATEDIR) 
 	chgrp $(CONQGROUP) $(DESTDIR)$(CONQLOCALSTATEDIR)
 	cp -f $(IMAGES) $(DESTDIR)$(CONQIMGDIR)/
 	chmod 644 $(DESTDIR)$(CONQIMGDIR)/*.tga $(DESTDIR)$(CONQIMGDIR)/*.txf
+	chgrp $(CONQGROUP) $(DESTDIR)$(CONQSYSCONFDIR)/*rc
+	chmod 664 $(DESTDIR)$(CONQSYSCONFDIR)/*rc
 	chmod 755 $(prefix) $(DESTDIR)$(datadir)
 	chgrp $(CONQGROUP) $(DESTDIR)$(bindir)/conqoper$(EXEEXT) \
 		$(DESTDIR)$(libexecdir)/conqdriv$(EXEEXT) \

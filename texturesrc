@@ -1,0 +1,1068 @@
+# Texture defs...
+#
+# $Id$
+#
+
+texture {
+  name         "star"
+}
+
+texture {
+  name         "classm"
+}
+
+texture {
+  name         "classd"
+}
+
+texture {
+  name         "doomsday"
+  color        "ffffffff"
+}
+
+texture {
+  name         "doombeam"
+  color        "ffffffff"
+}
+
+texture {
+  name         "vbg"
+# uncomment below for a sparser vbg
+# filename     "TOS-vbg"
+}
+
+texture {
+  name         "torp"
+}
+
+texture {
+  name         "luna"
+}
+
+texture {
+  name         "barrier"
+}
+
+texture {
+  name         "TOS-bmsk"
+}
+
+
+# animdef explosion texanim textures
+# Say that 3 times fast.
+#
+####################################
+
+texture {
+  name         "exp0"
+  color        "ffffffff"
+}
+
+texture {
+  name         "exp1"
+  color        "ffffffff"
+}
+
+texture {
+  name         "exp2"
+  color        "ffffffff"
+}
+
+texture {
+  name         "exp3"
+  color        "ffffffff"
+}
+
+texture {
+  name         "exp4"
+  color        "ffffb3cc"
+}
+
+texture {
+  name         "exp5"
+  color        "ffffb3b3"
+}
+
+texture {
+  name         "exp6"
+  color        "ffff9980"
+}
+
+texture {
+  name         "exp7"
+  color        "ffff9980"
+}
+
+texture {
+  name         "exp8"
+  color        "ffff8066"
+}
+
+texture {
+  name         "exp9"
+  color        "ffff804c"
+}
+
+texture {
+  name         "exp10"
+  color        "ffff804c"
+}
+
+texture {
+  name         "exp11"
+  color        "ffff8033"
+}
+
+texture {
+  name         "exp12"
+  color        "ffff8019"
+}
+
+texture {
+  name         "exp13"
+  color        "ffff8019"
+}
+
+texture {
+  name         "exp14"
+  color        "ffff8019"
+}
+
+texture {
+  name         "exp15"
+  color        "ffff8000"
+}
+
+
+# team specific logos
+#
+#####################
+
+texture {
+  name         "conqlogoF"
+  filename     "conq-fed"
+  color        "ffe6e6e6"
+}
+
+texture {
+  name         "conqlogoR"
+  filename     "conq-rom"
+  color        "ffe6e6e6"
+}
+
+texture {
+  name         "conqlogoK"
+  filename     "conq-kli"
+  color        "ffe6e6e6"
+}
+
+texture {
+  name         "conqlogoO"
+  filename     "conq-ori"
+  color        "ffe6e6e6"
+}
+
+
+# Federation ships
+#
+##################
+
+# scout 
+texture {
+  name         "shipFSc"
+  filename     "TOSfsc"
+}
+
+# scout shield
+texture {
+  name         "shipFSc-sh"
+  filename     "TOSf-sh"
+}
+
+texture {
+  name         "shipFDe"
+  filename     "TOSfde"
+}
+
+texture {
+  name         "shipFDe-sh"
+  filename     "TOSf-sh"
+}
+
+texture {
+  name         "shipFCr"
+  filename     "TOSfcr"
+}
+
+texture {
+  name         "shipFCr-sh"
+  filename     "TOSf-sh"
+}
+
+texture {
+  name         "shipF-tac"
+  filename     "TOS-ftac"
+}
+
+texture {
+  name         "shipF-phaser"
+  filename     "TOS-fph"
+}
+
+texture {
+  name         "shipF-torp0"
+  filename     "TOS-ftorp1"
+}
+
+texture {
+  name         "shipF-torp1"
+  filename     "TOS-ftorp2"
+}
+
+texture {
+  name         "shipF-torp2"
+  filename     "TOS-ftorp3"
+}
+
+texture {
+  name         "shipFSc-ico"
+  filename     "TOS-fico_s"
+}
+
+texture {
+  name         "shipFDe-ico"
+  filename     "TOS-fico"
+}
+
+texture {
+  name         "shipFCr-ico"
+  filename     "TOS-fico_c"
+}
+
+texture {
+  name         "shipFSc-ico-sh"
+  filename     "TOS-fish_s"
+}
+
+texture {
+  name         "shipFDe-ico-sh"
+  filename     "TOS-fish"
+}
+
+texture {
+  name         "shipFCr-ico-sh"
+  filename     "TOS-fish_c"
+}
+
+texture {
+  name         "shipF-ico-decal1"
+  filename     "TOS-fdecal1"
+}
+
+texture {
+  name         "shipF-ico-decal2"
+  filename     "TOS-fdecal2"
+}
+
+texture {
+  name         "shipF-dial"
+  filename     "TOS-fihd"
+}
+
+texture {
+  name         "shipF-dialp"
+  filename     "TOS-fihp"
+}
+
+texture {
+  name         "shipF-warp"
+  filename     "TOS-fwarp"
+}
+
+texture {
+  name         "shipF-ico-armies"
+  filename     "TOS-fi-armies"
+}
+
+texture {
+  name         "shipF-ico-cloak"
+  filename     "TOS-fi-cloak"
+}
+
+texture {
+  name         "shipF-ico-tractor"
+  filename     "TOS-fi-tractor"
+}
+
+texture {
+  name         "shipF-ico-shcrit"
+  filename     "TOS-fi-shcrit"
+}
+
+texture {
+  name         "shipF-ico-engcrit"
+  filename     "TOS-fi-engcrit"
+}
+
+texture {
+  name         "shipF-ico-wepcrit"
+  filename     "TOS-fi-wepcrit"
+}
+
+texture {
+  name         "shipF-ico-hulcrit"
+  filename     "TOS-fi-hulcrit"
+}
+
+texture {
+  name         "shipF-ico-shfail"
+  filename     "TOS-fi-shfail"
+}
+
+texture {
+  name         "shipF-ico-engfail"
+  filename     "TOS-fi-engfail"
+}
+
+texture {
+  name         "shipF-ico-repair"
+  filename     "TOS-fi-repair"
+}
+
+texture {
+  name         "shipF-ico-photon"
+  filename     "TOS-fi-photon"
+}
+
+
+# Romulan Ships
+#
+################
+
+texture {
+  name         "shipRSc"
+  filename     "TOSrsc"
+}
+
+texture {
+  name         "shipRSc-sh"
+  filename     "TOSr-sh"
+}
+
+texture {
+  name         "shipRDe"
+  filename     "TOSrde"
+}
+
+texture {
+  name         "shipRDe-sh"
+  filename     "TOSr-sh"
+}
+
+texture {
+  name         "shipRCr"
+  filename     "TOSrcr"
+}
+
+texture {
+  name         "shipRCr-sh"
+  filename     "TOSr-sh"
+}
+
+texture {
+  name         "shipR-tac"
+  filename     "TOS-rtac"
+}
+
+texture {
+  name         "shipR-phaser"
+  filename     "TOS-rph"
+}
+
+texture {
+  name         "shipR-torp0"
+  filename     "TOS-rtorp1"
+}
+
+texture {
+  name         "shipR-torp1"
+  filename     "TOS-rtorp3"
+}
+
+texture {
+  name         "shipR-torp2"
+  filename     "TOS-rtorp3"
+}
+
+texture {
+  name         "shipRSc-ico"
+  filename     "TOS-rico_s"
+}
+
+texture {
+  name         "shipRDe-ico"
+  filename     "TOS-rico"
+}
+
+texture {
+  name         "shipRCr-ico"
+  filename     "TOS-rico_c"
+}
+
+texture {
+  name         "shipRSc-ico-sh"
+  filename     "TOS-rish_s"
+}
+
+texture {
+  name         "shipRDe-ico-sh"
+  filename     "TOS-rish"
+}
+
+texture {
+  name         "shipRCr-ico-sh"
+  filename     "TOS-rish_c"
+}
+
+texture {
+  name         "shipR-ico-decal1"
+  filename     "TOS-rdecal1"
+}
+
+texture {
+  name         "shipR-ico-decal2"
+  filename     "TOS-rdecal2"
+}
+
+texture {
+  name         "shipR-dial"
+  filename     "TOS-rihd"
+}
+
+texture {
+  name         "shipR-dialp"
+  filename     "TOS-rihp"
+}
+
+texture {
+  name         "shipR-warp"
+  filename     "TOS-rwarp"
+}
+
+texture {
+  name         "shipR-ico-armies"
+  filename     "TOS-ri-armies"
+}
+
+texture {
+  name         "shipR-ico-cloak"
+  filename     "TOS-ri-cloak"
+}
+
+texture {
+  name         "shipR-ico-tractor"
+  filename     "TOS-ri-tractor"
+}
+
+texture {
+  name         "shipR-ico-shcrit"
+  filename     "TOS-ri-shcrit"
+}
+
+texture {
+  name         "shipR-ico-engcrit"
+  filename     "TOS-ri-engcrit"
+}
+
+texture {
+  name         "shipR-ico-wepcrit"
+  filename     "TOS-ri-wepcrit"
+}
+
+texture {
+  name         "shipR-ico-hulcrit"
+  filename     "TOS-ri-hulcrit"
+}
+
+texture {
+  name         "shipR-ico-shfail"
+  filename     "TOS-ri-shfail"
+}
+
+texture {
+  name         "shipR-ico-engfail"
+  filename     "TOS-ri-engfail"
+}
+
+texture {
+  name         "shipR-ico-repair"
+  filename     "TOS-ri-repair"
+}
+
+texture {
+  name         "shipR-ico-photon"
+  filename     "TOS-ri-photon"
+}
+
+
+# Klingon ships
+#
+###############
+
+texture {
+  name         "shipKSc"
+  filename     "TOSksc"
+}
+
+texture {
+  name         "shipKSc-sh"
+  filename     "TOSk-sh"
+}
+
+texture {
+  name         "shipKDe"
+  filename     "TOSkde"
+}
+
+texture {
+  name         "shipKDe-sh"
+  filename     "TOSk-sh"
+}
+
+texture {
+  name         "shipKCr"
+  filename     "TOSkcr"
+}
+
+texture {
+  name         "shipKCr-sh"
+  filename     "TOSk-sh"
+}
+
+texture {
+  name         "shipK-tac"
+  filename     "TOS-ktac"
+}
+
+texture {
+  name         "shipK-phaser"
+  filename     "TOS-kph"
+}
+
+texture {
+  name         "shipK-torp0"
+  filename     "TOS-ktorp1"
+}
+
+texture {
+  name         "shipK-torp1"
+  filename     "TOS-ktorp2"
+}
+
+texture {
+  name         "shipK-torp2"
+  filename     "TOS-ktorp3"
+}
+
+texture {
+  name         "shipKSc-ico"
+  filename     "TOS-kico_s"
+}
+
+texture {
+  name         "shipKDe-ico"
+  filename     "TOS-kico"
+}
+
+texture {
+  name         "shipKCr-ico"
+  filename     "TOS-kico_c"
+}
+
+texture {
+  name         "shipKSc-ico-sh"
+  filename     "TOS-kish_s"
+}
+
+texture {
+  name         "shipKDe-ico-sh"
+  filename     "TOS-kish"
+}
+
+texture {
+  name         "shipKCr-ico-sh"
+  filename     "TOS-kish_c"
+}
+
+texture {
+  name         "shipK-ico-decal1"
+  filename     "TOS-kdecal1"
+}
+
+texture {
+  name         "shipK-ico-decal2"
+  filename     "TOS-kdecal2"
+}
+
+texture {
+  name         "shipK-dial"
+  filename     "TOS-kihd"
+}
+
+texture {
+  name         "shipK-dialp"
+  filename     "TOS-kihp"
+}
+
+texture {
+  name         "shipK-warp"
+  filename     "TOS-kwarp"
+}
+
+texture {
+  name         "shipK-ico-armies"
+  filename     "TOS-ki-armies"
+}
+
+texture {
+  name         "shipK-ico-cloak"
+  filename     "TOS-ki-cloak"
+}
+
+texture {
+  name         "shipK-ico-tractor"
+  filename     "TOS-ki-tractor"
+}
+
+texture {
+  name         "shipK-ico-shcrit"
+  filename     "TOS-ki-shcrit"
+}
+
+texture {
+  name         "shipK-ico-engcrit"
+  filename     "TOS-ki-engcrit"
+}
+
+texture {
+  name         "shipK-ico-wepcrit"
+  filename     "TOS-ki-wepcrit"
+}
+
+texture {
+  name         "shipK-ico-hulcrit"
+  filename     "TOS-ki-hulcrit"
+}
+
+texture {
+  name         "shipK-ico-shfail"
+  filename     "TOS-ki-shfail"
+}
+
+texture {
+  name         "shipK-ico-engfail"
+  filename     "TOS-ki-engfail"
+}
+
+texture {
+  name         "shipK-ico-repair"
+  filename     "TOS-ki-repair"
+}
+
+texture {
+  name         "shipK-ico-photon"
+  filename     "TOS-ki-photon"
+}
+
+
+# Orion ships
+#
+#############
+
+texture {
+  name         "shipOSc"
+  filename     "TOSosc"
+}
+
+# we use fed shield image by default
+# ...but use the romulan one for the scout, due to it's different shape.
+texture {
+  name         "shipOSc-sh"
+  filename     "TOSr-sh"
+}
+
+texture {
+  name         "shipODe"
+  filename     "TOSode"
+}
+
+texture {
+  name         "shipODe-sh"
+  filename     "TOSf-sh"
+}
+
+texture {
+  name         "shipOCr"
+  filename     "TOSocr"
+}
+
+texture {
+  name         "shipOCr-sh"
+  filename     "TOSf-sh"
+}
+
+texture {
+  name         "shipO-tac"
+  filename     "TOS-otac"
+}
+
+texture {
+  name         "shipO-phaser"
+  # guess we just use the default phaser
+  filename     "phaser"
+}
+
+texture {
+  name         "shipOSc-ico"
+  filename     "TOS-oico_s"
+}
+
+texture {
+  name         "shipODe-ico"
+  filename     "TOS-oico"
+}
+
+texture {
+  name         "shipOCr-ico"
+  filename     "TOS-oico_c"
+}
+
+texture {
+  name         "shipOSc-ico-sh"
+  filename     "TOS-oish_s"
+}
+
+texture {
+  name         "shipODe-ico-sh"
+  filename     "TOS-oish"
+}
+
+texture {
+  name         "shipOCr-ico-sh"
+  filename     "TOS-oish_c"
+}
+
+texture {
+  name         "shipO-ico-decal1"
+  filename     "TOS-odecal1"
+}
+
+texture {
+  name         "shipO-ico-decal2"
+  filename     "TOS-odecal2"
+}
+
+texture {
+  name         "shipO-dial"
+  filename     "TOS-oihd"
+}
+
+texture {
+  name         "shipO-dialp"
+  filename     "TOS-oihp"
+}
+
+texture {
+  name         "shipO-warp"
+  filename     "TOS-owarp"
+}
+
+texture {
+  name         "shipO-ico-armies"
+  filename     "TOS-oi-armies"
+}
+
+texture {
+  name         "shipO-ico-cloak"
+  filename     "TOS-oi-cloak"
+}
+
+texture {
+  name         "shipO-ico-tractor"
+  filename     "TOS-oi-tractor"
+}
+
+texture {
+  name         "shipO-ico-shcrit"
+  filename     "TOS-oi-shcrit"
+}
+
+texture {
+  name         "shipO-ico-engcrit"
+  filename     "TOS-oi-engcrit"
+}
+
+texture {
+  name         "shipO-ico-wepcrit"
+  filename     "TOS-oi-wepcrit"
+}
+
+texture {
+  name         "shipO-ico-hulcrit"
+  filename     "TOS-oi-hulcrit"
+}
+
+texture {
+  name         "shipO-ico-shfail"
+  filename     "TOS-oi-shfail"
+}
+
+texture {
+  name         "shipO-ico-engfail"
+  filename     "TOS-oi-engfail"
+}
+
+texture {
+  name         "shipO-ico-repair"
+  filename     "TOS-oi-repair"
+}
+
+texture {
+  name         "shipO-ico-photon"
+  filename     "TOS-oi-photon"
+}
+
+
+# Irken planet textures
+#
+###############
+
+texture {
+  name         "Nhar-Gh'ok"
+}
+
+texture {
+  name         "Blorch"
+}
+
+texture {
+  name         "Callnowia"
+}
+
+texture {
+  name         "Conveyors"
+}
+
+texture {
+  name         "Devastis"
+}
+
+texture {
+  name         "Foodcourtia"
+}
+
+texture {
+  name         "Invalis"
+}
+
+texture {
+  name         "Irk"
+}
+
+texture {
+  name         "Meekrob"
+}
+
+texture {
+  name         "Plookesia"
+}
+
+texture {
+  name         "Praxis"
+}
+
+texture {
+  name         "Siriusminor"
+}
+
+texture {
+  name         "Vort"
+}
+
+texture {
+  name         "Conventia"
+}
+
+
+# Animations and animation definitions
+#
+######################################
+
+# explosion animation
+animation {
+  name         "explosion"
+  animdef      "explode"
+}
+
+# blinker animations
+animation {
+  name         "onesec"
+}
+animation {
+  name         "halfsec"
+}
+animation {
+  name         "qtrsec"
+}
+
+# team torp animations
+animation {
+  name         "shipK-torp"
+}
+
+animation {
+  name         "shipO-torp"
+}
+
+animation {
+  name         "shipF-torp"
+}
+
+animation {
+  name         "shipR-torp"
+}
+
+## animation defs
+#################
+
+# blinker animdefs
+# 1 sec
+animdef {
+  name         "onesec"
+
+  toganim {
+    delayms    1000
+  }
+}
+# half sec
+animdef {
+  name         "halfsec"
+
+  toganim {
+    delayms    500
+  }
+}
+# qtr sec
+animdef {
+  name         "qtrsec"
+
+  toganim {
+    delayms    250
+  }
+}
+
+# team torp animdefs
+
+# klingon
+animdef {
+  name         "shipK-torp"
+
+  # initial state
+  istate {
+    size       180         # in CU's
+  }
+    
+  texanim {
+    stages     3
+    loops      0           # runs forever
+    delayms    50
+  }
+}
+
+# federation
+animdef {
+  name         "shipF-torp"
+
+  # initial state
+  istate {
+    size       120         # in CU's
+  }
+    
+  texanim {
+    stages     3
+    loops      0           # runs forever
+    delayms    100
+  }
+}
+
+# romulan
+animdef {
+  name         "shipR-torp"
+
+  # initial state
+  istate {
+    size       110         # in CU's
+  }
+    
+  texanim {
+    stages     3
+    loops      0           # runs forever
+    delayms    100
+  }
+}
+
+# orion
+animdef {
+  name         "shipO-torp"
+  texname      "torp"
+
+  # initial state
+  istate {
+    size       110         # in CU's
+    angle      -1.0        # random
+  }
+
+  geoanim {
+    loops      0           # runs forever
+    delayms    70          # randomly change angle every delayms 
+  }
+}
+
+# explosion animdef
+animdef {
+  name         "explode"
+  texname      "exp"
+
+  # initial state
+  istate {
+    size       450         # in CU's
+  }
+    
+  texanim {
+    stages     16
+    loops      1
+    delayms    100
+  }
+
+  # this runs when texanim has expired
+  colanim {
+    stages     10
+    loops      1
+    delayms    80
+    
+    deltaa     -0.1 
+    deltar     0.0
+    deltag     -0.001
+    deltab     -0.01
+  }
+
+  # this runs when texanim has expired
+  geoanim {
+    stages     10
+    loops      1
+    delayms    100
+
+    deltas     10.0        # in CU's
+  }
+}
+

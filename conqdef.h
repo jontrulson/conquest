@@ -49,6 +49,7 @@
 /*                  .Operate(), watch(): Get msg timestamp after action switch. */
 /*                  .Putship(): Increase smear factor slightly. */
 /*                  .*(): Converted maxwarp(), engeff() and weaeff() to macros. */
+/* 8.12  7Oct05     .clbInitPlanets(): mod for .planetsrc data input */
 
 /* Common block time stamp. */
 /* This define should be changed every time the common block changes. */
@@ -59,7 +60,8 @@
 /*#define COMMONSTAMP 980628 		 stardate? */
 /*#define COMMONSTAMP 990124 		 stardate? */
 /*#define COMMONSTAMP 20001231 		 stardate? */
-#define COMMONSTAMP 20030829 		 /* stardate? */
+#define COMMONSTAMP 20030829
+
 
 /* Copyright notice string. */
 #define COPYRIGHT "(C) 1983-1986 by Jef Poskanzer and Craig Leres"
@@ -588,6 +590,9 @@
 				/* validuser types - not used anymore */
 #define UT_LOCAL (0)
 #define UT_REMOTE (1)
+
+#define TEXFILEMAX 64           /* maximum lenth of a texture filename (no
+                                   path) */
 
 /* Macros, here order is important. */
 

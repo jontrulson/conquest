@@ -9,16 +9,8 @@ CONQLIBEXECDIR = @libexecdir@
 CONQDATADIR = @datadir@
 CONQSYSCONFDIR = @sysconfdir@
 CONQIMGDIR = $(CONQDATADIR)/img
-IMAGES = img/classd.tga img/classm.tga img/doomsday.tga img/phaser.tga \
-	img/shipfcr.tga img/shipfde.tga img/shipfsc.tga img/shipkcr.tga \
-	img/shipkde.tga img/shipksc.tga img/shipocr.tga img/shipode.tga \
-	img/shiposc.tga img/shiprcr.tga img/shiprde.tga img/shiprsc.tga \
-	img/star.tga img/fixed.txf img/msg.txf img/large.txf img/vbg.tga \
-	img/torp.tga img/luna.tga img/tinyfixed.txf img/barrier.tga \
-	img/exp0.tga img/exp1.tga img/exp2.tga img/exp3.tga img/exp4.tga \
-	img/exp5.tga img/exp6.tga img/exp7.tga img/exp8.tga img/exp9.tga \
-	img/exp10.tga img/exp11.tga img/exp12.tga img/exp13.tga \
-	img/exp14.tga img/exp15.tga
+
+IMAGES = img/*.tga img/*.txf
 
 
 XLIBS = @X_LIBS@ @X_EXTRA_LIBS@ -lglut -lGL -lGLU -lXt @X_PRE_LIBS@ -lXext -lXi -lX11 -lXmu  
@@ -33,10 +25,10 @@ AM_YFLAGS = -d
 
 if GLCLIENT
 lib_LTLIBRARIES = libconquest.la libconqclnt.la libconqserv.la \
-	libUi.la libUiGL.la libUiCU.la
+	libconqinit.la libUi.la libUiGL.la libUiCU.la 
 else
 lib_LTLIBRARIES = libconquest.la libconqclnt.la libconqserv.la \
-	libUi.la libUiCU.la
+	libconqinit.la libUi.la libUiCU.la
 endif
 
 libconquest_la_SOURCES = conqai.c ratfor.c  \
@@ -73,7 +65,7 @@ libUiGL_la_SOURCES = GL.c texfont.c glfont.c glfont.h \
 	nTeaml.c nUserl.h nUserl.c nHistl.h nHistl.c cprintf.h glcprintf.c \
 	gldisplay.h gldisplay.c disputil.h render.h render.c \
 	nPlayBMenu.h nPlayBMenu.c nPlayB.h nPlayB.c nPlayBHelp.h \
-	nPlayBHelp.c nOptions.h nOptions.c colorGL.c ui.h
+	nPlayBHelp.c nOptions.h nOptions.c colorGL.c ui.h anim.c anim.h
 
 libUiGL_la_LDFLAGS = -version-info 1:0:0
 
@@ -83,49 +75,56 @@ libUiCU_la_SOURCES = display.c cprintf.h cprintf.c disputil.h colorCU.c \
 
 libUiCU_la_LDFLAGS = -version-info 1:0:0
 
+libconqinit_la_SOURCES = conqinit-yacc.y conqinit-lex.l conqinit.h initdata.h planinit.c
+
+libconqinit_la_LDFLAGS = -version-info 1:0:0
+
 if GLCLIENT
 bin_PROGRAMS = conquest conquestgl conqai conqoper conqstrat \
-	conquestd conquestsh conqmetad
+	conquestd conquestsh conqmetad conqinit
 else
 bin_PROGRAMS = conquest conqai conqoper conqstrat \
-	conquestd conquestsh conqmetad
+	conquestd conquestsh conqmetad conqinit
 endif
 
 libexec_PROGRAMS = conqdriv
-          
+
 conquest_SOURCES = conquest.c c_defs.h defs.h conqdef.h conqcom.h context.h \
 	conqreplay.c
 
-conquest_LDADD = libUiCU.la libUi.la libconqclnt.la libconquest.la
+conquest_LDADD = libconqinit.la libUiCU.la libUi.la libconqclnt.la libconquest.la $(LEXLIB) $(YACCLIB)
 
 conquestgl_SOURCES = conquestgl.c c_defs.h defs.h conqdef.h conqcom.h context.h
-conquestgl_LDADD = libUiGL.la libUi.la libconqclnt.la libconquest.la $(XLIBS)
+conquestgl_LDADD = libconqinit.la libUiGL.la libUi.la libconqclnt.la libconquest.la $(XLIBS) $(LEXLIB) $(YACCLIB)
 
 conquestd_SOURCES = conquestd.c c_defs.h defs.h conqdef.h conqcom.h \
-	context.h conqnet.h
-conquestd_LDADD = libconqserv.la libconquest.la 
+	context.h conqnet.h 
+conquestd_LDADD = libconqinit.la libconqserv.la libconquest.la $(LEXLIB) $(YACCLIB) 
 
 conqai_SOURCES = conqai_main.c c_defs.h defs.h conqdef.h conqcom.h \
                  context.h conqdata.h
 
-conqai_LDADD = libconquest.la 
+conqai_LDADD = libconqinit.la libconquest.la  $(LEXLIB) $(YACCLIB)
 
-conqoper_SOURCES = conqoper.c c_defs.h defs.h conqdef.h conqcom.h context.h
-conqoper_LDADD = libUiCU.la libUi.la libconqclnt.la libconquest.la
+conqoper_SOURCES = conqoper.c c_defs.h defs.h conqdef.h conqcom.h context.h 
+conqoper_LDADD = libconqinit.la libUiCU.la libUi.la libconqclnt.la libconquest.la $(LEXLIB) $(YACCLIB) 
 
 conqdriv_SOURCES = conqdriv.c c_defs.h defs.h conqdef.h conqcom.h context.h
-conqdriv_LDADD = libconquest.la 
+conqdriv_LDADD = libconqinit.la libconquest.la  $(LEXLIB) $(YACCLIB)
 
 conqstrat_SOURCES = conqstrat-yacc.y conqstrat-lex.l conqstrat.h
 conqstrat_LDADD = libconquest.la $(LEXLIB) $(YACCLIB) 
 
+conqinit_SOURCES = conqinit.c conqinit.h 
+conqinit_LDADD = libconqinit.la libconquest.la $(LEXLIB) $(YACCLIB) 
+
 conquestsh_SOURCES = conquestsh.c
 
 conqmetad_SOURCES = conqmetad.c meta.h
-conqmetad_LDADD = libconquest.la 
+conqmetad_LDADD = libconqinit.la libconquest.la  $(LEXLIB) $(YACCLIB)
 
 data_DATA = conquest.doc HISTORY README conqrule 
-#sysconf_DATA = conquestrc
+sysconf_DATA = conqinitrc texturesrc
 
 EXTRA_DIST = conquest.doc HISTORY README conqrule # conquestrc
 
@@ -141,6 +140,8 @@ install-exec-hook:
 	chgrp $(CONQGROUP) $(DESTDIR)$(CONQLOCALSTATEDIR)
 	cp -f $(IMAGES) $(DESTDIR)$(CONQIMGDIR)/
 	chmod 644 $(DESTDIR)$(CONQIMGDIR)/*.tga $(DESTDIR)$(CONQIMGDIR)/*.txf
+	chgrp $(CONQGROUP) $(DESTDIR)$(CONQSYSCONFDIR)/*rc
+	chmod 664 $(DESTDIR)$(CONQSYSCONFDIR)/*rc
 	chmod 755 $(prefix) $(DESTDIR)$(datadir)
 	chgrp $(CONQGROUP) $(DESTDIR)$(bindir)/conqoper$(EXEEXT) \
 		$(DESTDIR)$(libexecdir)/conqdriv$(EXEEXT) \

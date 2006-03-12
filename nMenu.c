@@ -92,7 +92,7 @@ static void _conqds(dspConfig_t *dsp)
 	}
   
   /* Display the logo. */
-  mglConqLogo(dsp);
+  mglConqLogo(dsp, TRUE);
 
   lin = 7;
 

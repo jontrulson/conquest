@@ -13,6 +13,8 @@
 #include <GL/glu.h>
 #include <GL/glx.h>
 
+#include "textures.h"
+
 typedef struct _dspConfig {
   Bool inited;
   /* glut win ids */
@@ -43,9 +45,12 @@ typedef struct _dspConfig {
 
 #ifdef NOEXTERN_DCONF
 dspConfig_t dConf;
+Unsgn32     frameTime;
 #else
 extern dspConfig_t dConf;
+extern Unsgn32     frameTime;
 #endif
+
 
 /* cockpit display items */
 struct _warp {
@@ -195,6 +200,8 @@ void uiDrawPlanet( GLfloat x, GLfloat y, int pnum, int scale,
                    int textcolor, int scanned );
 void setXtraInfo(void);
 
+real cu2GLSize(real size);
+
 int GLcvtcoords(real cenx, real ceny, real x, real y, real scale,
 		 GLfloat *rx, GLfloat *ry );
 
@@ -203,7 +210,7 @@ void drawTorp(GLfloat x, GLfloat y, char torpchar, int color, int scale,
 void drawShip(GLfloat x, GLfloat y, GLfloat angle, char ch, int i, 
 	      int color, GLfloat scale);
 void drawDoomsday(GLfloat x, GLfloat y, GLfloat angle, GLfloat scale);
-void drawViewerBG();
+void drawViewerBG(int snum, int dovbg);
 
 void clrPrompt(int line);
 void setPrompt(int line, char *prompt, int pcolor,
@@ -235,8 +242,10 @@ void drawLineBox(GLfloat x, GLfloat y,
                  GLfloat w, GLfloat h, int color, 
                  GLfloat lw);
 void drawQuad(GLfloat x, GLfloat y, GLfloat w, GLfloat h, GLfloat z);
+void drawTexQuad(GLfloat x, GLfloat y, GLfloat w, GLfloat h, GLfloat z);
 void drawExplosion(GLfloat x, GLfloat y, int snum, int torpnum);
 
 void dspInitData(void);
+void hex2GLColor(Unsgn32 hcol, GLColor_t *col);
 
 #endif /* _GLDISPLAY_H */

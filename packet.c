@@ -450,6 +450,8 @@ int readPacket(int direction, int sockl[], Unsgn8 *buf, int blen,
 	  if ((rv = read(sockl[0], &type, 1)) <= 0)
 	    {
 	      *buf = 0;
+              clog("ERROR: readPacket(): TCP read(header type): %s",
+                   strerror(errno));
 	      return -1;
 	    }
 	}
@@ -458,6 +460,8 @@ int readPacket(int direction, int sockl[], Unsgn8 *buf, int blen,
           if ((rv = read(sockl[1], buf, blen)) <= 0)
             {
               *buf = 0;
+              clog("ERROR: readPacket(): UDP read(header type): %s",
+                   strerror(errno));
               return -1;
             }
           else
@@ -478,6 +482,8 @@ int readPacket(int direction, int sockl[], Unsgn8 *buf, int blen,
     }
   else if (rv < 0)		/* error */
     {
+      clog("ERROR: readPacket(): select(): %s",
+           strerror(errno));
       return -1;
     }
 
@@ -492,9 +498,7 @@ int readPacket(int direction, int sockl[], Unsgn8 *buf, int blen,
       vartype = CP_VARIABLE;      /* possible variable */
       break;
     default:
-#if defined(DEBUG_PKT)
-      clog("readPacket: Invalid dir code %s\n", direction);
-#endif
+      clog("readPacket: Invalid dir code %s", direction);
       return -1;
       break;
     }
@@ -527,7 +531,7 @@ int readPacket(int direction, int sockl[], Unsgn8 *buf, int blen,
     {
       if (len >= blen)		/* buf too small */
 	{
-	  clog("readPacket: buffer too small\n");
+	  clog("readPacket: buffer too small");
 	  return -1;
 	}
       len = len - sizeof(Unsgn8);
@@ -550,7 +554,7 @@ int readPacket(int direction, int sockl[], Unsgn8 *buf, int blen,
 		    {
 #if defined(DEBUG_PKT)
 		      clog("readPacket: short packet: type(%d) len = %d, "
-                           "rlen = %d left = %d\n",
+                           "rlen = %d left = %d",
 			   type, len, rlen, left - rlen);
 #endif
 		      left -= rlen;
@@ -566,6 +570,8 @@ int readPacket(int direction, int sockl[], Unsgn8 *buf, int blen,
                       if ((rv = read(sockl[0], &type, 1)) <= 0)
                         {
                           *buf = 0;
+                          clog("ERROR: readPacket(): VARTYPE read(header type): %s",
+                               strerror(errno));
                           return -1;
                         }
 
@@ -584,9 +590,7 @@ int readPacket(int direction, int sockl[], Unsgn8 *buf, int blen,
 		{
 		  if (rlen == 0)
 		    {
-#if defined(DEBUG_PKT)
-		      clog("readPacket: read returned 0");
-#endif
+		      clog("readPacket: ERROR: read returned 0");
 		      return -1;
 		    }
 
@@ -603,7 +607,7 @@ int readPacket(int direction, int sockl[], Unsgn8 *buf, int blen,
 
 	  if (rv == 0)		/* timeout */
 	    {
-	      clog("readPacket: timed out - connDead\n");
+	      clog("readPacket: timed out - connDead");
 	      connDead = 1;
 	      return -1;
 	    }
@@ -611,7 +615,7 @@ int readPacket(int direction, int sockl[], Unsgn8 *buf, int blen,
 	    {
 	      if (errno == EINTR)
 		continue;
-	      clog("readPacket: select error: %s\n", strerror(errno));
+	      clog("readPacket: select error: %s", strerror(errno));
 	      return -1;
 	    }
 	}

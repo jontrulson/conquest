@@ -83,41 +83,47 @@ void nWelcomeInit(void)
   int pkttype;
   Unsgn8 buf[PKT_MAXSIZE];
   int sockl[2] = {cInfo.sock, cInfo.usock};
-
-  /* now look for SP_CLIENTSTAT or SP_ACK */
-  if ((pkttype = 
-       readPacket(PKT_FROMSERVER, sockl, buf, PKT_MAXSIZE, 60)) <= 0)
-    {
-      clog("nWelcomeInit: read SP_CLIENTSTAT or SP_ACK failed: %d\n",
-           pkttype);
-      fatal = TRUE;
-      return;
-    }
+  int done = FALSE;
 
   setNode(&nWelcomeNode);
 
-  switch (pkttype)
+  /* now look for SP_CLIENTSTAT or SP_ACK */
+  while (!done)
     {
-    case SP_CLIENTSTAT:
-      scstat = (spClientStat_t *)buf;
-
-      Context.unum = (int)ntohs(scstat->unum);
-      Context.snum = scstat->snum;
-      Ships[Context.snum].team = scstat->team;
-      break;
-    case SP_ACK:
-      sack = *(spAck_t *)buf;
-      state = S_ERROR;
-      serror = TRUE;
-
-      break;
-    default:
-      clog("nWelcomeInit: got unexpected packet type %d\n", pkttype);
-      fatal = TRUE;
-      state = S_ERROR;
-      return;
-
-      break;
+      if ((pkttype = 
+           readPacket(PKT_FROMSERVER, sockl, buf, PKT_MAXSIZE, 60)) <= 0)
+        {
+          clog("nWelcomeInit: read SP_CLIENTSTAT or SP_ACK failed: %d",
+               pkttype);
+          fatal = TRUE;
+          done = TRUE;
+          return;
+        }
+      
+      switch (pkttype)
+        {
+        case SP_CLIENTSTAT:
+          scstat = (spClientStat_t *)buf;
+          
+          Context.unum = (int)ntohs(scstat->unum);
+          Context.snum = scstat->snum;
+          Ships[Context.snum].team = scstat->team;
+          done = TRUE;
+          break;
+        case SP_ACK:
+          sack = *(spAck_t *)buf;
+          state = S_ERROR;
+          serror = TRUE;
+          done = TRUE;
+          
+          break;
+        default:
+          clog("nWelcomeInit: got unexpected packet type %d. Ignoring.", 
+               pkttype);
+          done = FALSE;
+          
+          break;
+        }
     }
 
   if (pkttype == SP_CLIENTSTAT && (scstat->flags & SPCLNTSTAT_FLAG_NEW))
@@ -133,9 +139,8 @@ void nWelcomeInit(void)
         state = S_DONE;           /* need to wait for user packet */
       else
         snooze = (time(0) + 4);
-
+      
     }
-
 
   return;
 }

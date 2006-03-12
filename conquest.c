@@ -49,6 +49,7 @@
 #include "cuclient.h"
 #include "udp.h"
 #include "meta.h"
+#include "conqinit.h"
 
 #define CLIENTNAME "Conquest"	/* our client name */
 
@@ -263,7 +264,7 @@ int main(int argc, char *argv[])
   cInfo.isLoggedIn = FALSE;
   cInfo.remoteport = CN_DFLT_PORT;
 
-  setSystemLog(FALSE);	/* use $HOME for logfile */
+  setSystemLog(FALSE, FALSE);	/* use $HOME for logfile */
   if (!getLocalhost(cInfo.localhost, MAXHOSTNAME))
     return(1);
 
@@ -346,6 +347,9 @@ int main(int argc, char *argv[])
 
   rndini( 0, 0 );		/* initialize random numbers */
   
+  cqiLoadRC(CQI_FILE_CONQINITRC, NULL, 1, 0);
+
+
 #ifdef DEBUG_CONFIG
   clog("%s@%d: main() Reading Configuration files.", __FILE__, __LINE__);
 #endif
@@ -3287,11 +3291,10 @@ int play()
       else
         Context.recmode = RECMODE_OFF;
     }
-
-  /* need to tell the server to resend all the crap it already
-     sent in menu - our ship may have changed */
-  sendCommand(CPCMD_RELOAD, 0);
   
+  /* need to tell the server to resend all the data it already
+     sent in menu, since our ship might have changed. */
+  sendCommand(CPCMD_RELOAD, 0);
 
   /* While we're alive, field commands and process them. Inbound
      packets are handled by astservice() */
@@ -3400,6 +3403,7 @@ int welcome( int *unum )
   int pkttype;
   Unsgn8 buf[PKT_MAXSIZE];
   int sockl[2] = {cInfo.sock, cInfo.usock};
+  int done = FALSE;
   
   col=0;
 
@@ -3409,31 +3413,37 @@ int welcome( int *unum )
       return FALSE;
     }
 
-  /* now look for SP_CLIENTSTAT or SP_ACK */
-  if ((pkttype = 
-       readPacket(PKT_FROMSERVER, sockl, buf, PKT_MAXSIZE, 60)) <= 0)
+  while (!done)
     {
-      clog("welcome: read SP_CLIENTSTAT or SP_ACK failed: %d\n", pkttype);
-      return FALSE;
-    }
+      /* now look for SP_CLIENTSTAT or SP_ACK */
+      if ((pkttype = 
+           readPacket(PKT_FROMSERVER, sockl, buf, PKT_MAXSIZE, 60)) <= 0)
+        {
+          clog("welcome: read SP_CLIENTSTAT or SP_ACK failed: %d\n", pkttype);
+          return FALSE;
+        }
+      
+      switch (pkttype)
+        {
+        case SP_CLIENTSTAT:
+          scstat = *(spClientStat_t *)buf;
+          
+          *unum = (int)ntohs(scstat.unum);
+          Context.snum = scstat.snum;
+          Ships[Context.snum].team = scstat.team;
+          done = TRUE;
 
-  switch (pkttype)
-    {
-    case SP_CLIENTSTAT:
-      scstat = *(spClientStat_t *)buf;
-
-      *unum = (int)ntohs(scstat.unum);
-      Context.snum = scstat.snum;
-      Ships[Context.snum].team = scstat.team;
-
-      break;
-    case SP_ACK:
-      sack = (spAck_t *)buf;
-      break;
-    default:
-      clog("conquest:welcome: got unexpected packet type %d\n", pkttype);
-      return FALSE;
-      break;
+          break;
+        case SP_ACK:
+          sack = (spAck_t *)buf;
+          done = TRUE;
+          break;
+        default:
+          clog("welcome: got unexpected packet type %d. Ignoring.", 
+               pkttype);
+          done = FALSE;         /* redundant, but it gets the point across */
+          break;
+        }
     }
 
   if ( pkttype == SP_CLIENTSTAT && (scstat.flags & SPCLNTSTAT_FLAG_NEW) )
