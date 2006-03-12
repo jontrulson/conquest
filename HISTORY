@@ -9,6 +9,13 @@
 
                               Conquest HISTORY
 
+???
+
+       - fix bug in render.c that miscalculated the size of the warp
+         indicator quad in certain situations.
+
+       - merge 8.1.2a into conquest HEAD branch.
+
 8.1.2a (devel release)  3/05/2006
 
        - at long last
