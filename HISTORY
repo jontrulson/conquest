@@ -11,10 +11,28 @@
 
 ???
 
+       - remove doomsday AP firing timer and convert to an animdef
+         (doomsday-ap-fire) specified in texturesrc.
+
+       - modify parser to allow using a texture {} section simply to
+         store a 'named' color.  This is done by treating texture
+         definitions that specify "" as the filename, as a special case,
+         indicating that only a color is specified there.
+
+         This allowed me to get rid of some hardcoded per-team color
+         defines in render.c :) Warp quad indicator color, and other
+         'textureless' color specifications can now be defined in the
+         texturesrc or *.trc files with reckless abandon.
+
+         I think eventually, all colors used in conquestgl will be
+         specifed this way in the future.
+
        - fix bug in render.c that miscalculated the size of the warp
          indicator quad in certain situations.
 
-       - merge 8.1.2a into conquest HEAD branch.
+       - merge 8.1.2a into conquest HEAD branch.  My computer almost
+         exploded. 
+
 
 8.1.2a (devel release)  3/05/2006
 

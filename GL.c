@@ -46,6 +46,10 @@ extern void conqend(void);
 #include "glmisc.h"
 #include "glfont.h"
 
+#define NOEXTERN_GL
+#include "GL.h"
+#undef NOEXTERN_GL
+
 #include "conquest.h"
 
 
@@ -86,33 +90,8 @@ static struct {
   GLColor_t beamcol;
 } GLDoomsday = {};
 
-/* storage for ship textures, indexed by team/shiptype */
-static struct {
-  GLint     ship;             /* main ship texture */
-  GLint     sh;               /* main ship shield texture */
-  GLint     tac;              /* team tactical grid */
-  GLint     phas;             /* phaser */
-  GLint     ico;              /* ship icon */
-  GLint     ico_sh;           /* icon shields id */
-  GLint     ico_armies;       /* armies indicator */
-  GLint     ico_cloak;        /* cloak indicator */
-  GLint     ico_tractor;      /* tractor */
-  GLint     ico_shcrit;       /* shields critical */
-  GLint     ico_engcrit;      /* engines critical */
-  GLint     ico_wepcrit;      /* weapons critical */
-  GLint     ico_hulcrit;      /* hull critical */
-  GLint     ico_shfail;       /* dead shielding */
-  GLint     ico_engfail;      /* dead engines */
-  GLint     ico_repair;       /* repairing */
-  GLint     ico_photonload;   /* photons left to fire */
-  GLint     decal1;           /* sh/hull gauges */
-  GLint     decal2;           /* fuel/w/e/alloc/kills gauges */
-  GLint     dial;             /* ships astrogator dial */
-  GLint     dialp;            /* astrogator pointer */
-  GLint     warp;             /* id of warp gauge */
-} GLShips[NUMPLAYERTEAMS][MAXNUMSHIPTYPES] = {}; 
 
-/* textures... */
+/* raw TGA texture data */
 typedef struct              
 {
   GLubyte	*imageData; 
@@ -291,6 +270,7 @@ static int initGLAnimDefs(void)
       
       /* convert to GL size */
       GLAnimDefs[i].isize  = cu2GLSize(cqiAnimDefs[i].isize); 
+
       if (cqiAnimDefs[i].iangle < 0.0) /* neg is special (random)  */
         GLAnimDefs[i].iangle = cqiAnimDefs[i].iangle;
       else
@@ -413,8 +393,7 @@ static int initGLAnimDefs(void)
 
 
 
-/* init the explosion texid's.  short term until new animation stuff is
-   written. */
+/* init the explosion animation states. */
 static int initGLExplosions(void)
 {
   int i, j;
@@ -438,7 +417,7 @@ static int initGLExplosions(void)
   return TRUE;
 }
 
-/* utility function for initGLShips */
+/* utility functions for initGLShips */
 static GLint _get_ship_texid(char *name)
 {
   int ndx;
@@ -452,6 +431,23 @@ static GLint _get_ship_texid(char *name)
     clog("%s: Could not find texture '%s'", __FUNCTION__, name);
 
   return 0;
+}
+static int _get_ship_texcolor(char *name, GLColor_t *col)
+{
+  int ndx;
+
+  if (!name)
+    return -1;
+
+  if ((ndx = findGLTexture(name)) >= 0)
+    {
+      if (col)
+        *col = GLTextures[ndx].col;
+    }
+  else
+    clog("%s: Could not find color '%s'", __FUNCTION__, name);
+
+  return ndx;
 }
 
 /* initialize the GLShips array */
@@ -513,6 +509,13 @@ static int initGLShips(void)
           snprintf(buffer, TEXFILEMAX - 1, "%s-warp", shipPfx);
           GLShips[i][j].warp = _get_ship_texid(buffer);
           
+          /* here we just want the color */
+          snprintf(buffer, TEXFILEMAX - 1, "%s-warp-col", shipPfx);
+          if (_get_ship_texcolor(buffer, &GLShips[i][j].warpq_col) < 0)
+            {                   /* do something sane */
+              hex2GLColor(0xffeeeeee, &GLShips[i][j].warpq_col);
+            }
+
           snprintf(buffer, TEXFILEMAX - 1, "%s-ico-armies", shipPfx);
           GLShips[i][j].ico_armies = _get_ship_texid(buffer);
           
@@ -548,7 +551,6 @@ static int initGLShips(void)
 
           /* this is ugly... we want to fail if any of these texid's are
              0, indicating the texture wasn't found */
-
           if (!(GLShips[i][j].ship &&
                 GLShips[i][j].sh &&
                 GLShips[i][j].tac &&
@@ -559,6 +561,7 @@ static int initGLShips(void)
                 GLShips[i][j].decal2 &&
                 GLShips[i][j].dial &&
                 GLShips[i][j].dialp &&
+                GLShips[i][j].warp &&
                 GLShips[i][j].phas &&
                 GLShips[i][j].ico_armies &&
                 GLShips[i][j].ico_cloak &&
@@ -774,7 +777,7 @@ void drawIconHUDDecal(GLfloat rx, GLfloat ry, GLfloat w, GLfloat h,
                   int imgp, int icol)
 {
   int steam = Ships[Context.snum].team, stype = Ships[Context.snum].shiptype;
-  int norender = FALSE;
+  static int norender = FALSE;
   GLint id = 0;
 
   if (norender)
@@ -1728,7 +1731,7 @@ static void renderFrame(void)
 
   /* get FPS */
   frame++;
-  frameTime = glutGet(GLUT_ELAPSED_TIME);
+  frameTime = clbGetMillis();
   if (frameTime - timebase > 1000) 
     {
       FPS = (frame*1000.0/(frameTime-timebase));
@@ -2048,9 +2051,6 @@ drawShip(GLfloat x, GLfloat y, GLfloat angle, char ch, int snum, int color,
 
 void drawDoomsday(GLfloat x, GLfloat y, GLfloat angle, GLfloat scale)
 {
-  Unsgn32 thetime = clbGetMillis();
-  const static int maxtime = 600;
-  static Unsgn32 lasttime = 0;
   const GLfloat z = 1.0;
   GLfloat size = 30.0;  
   GLfloat sizeh;
@@ -2059,7 +2059,8 @@ void drawDoomsday(GLfloat x, GLfloat y, GLfloat angle, GLfloat scale)
   static int norender = FALSE;  /* if no tex, no point... */
   static real ox = 0.0, oy = 0.0;  /* for doomsday weapon antiproton beam */
   static int drawAPBeam = TRUE;
-
+  static animStateRec_t doomapfire = {}; /* animdef state for ap firing */
+  static int last_apstate;      /* toggle this when it expires */
 
   if (norender)
     return;
@@ -2103,6 +2104,12 @@ void drawDoomsday(GLfloat x, GLfloat y, GLfloat angle, GLfloat scale)
           return;
         }
 
+      /* init and startup the doom ap blinker */
+      if (animInitState("doomsday-ap-fire", &doomapfire, NULL))
+        {
+          scrNode_t *node = getTopNode();
+          animQueAdd(node->animQue, &doomapfire);
+        }
     }        
 
   if (scale == MAP_FAC)
@@ -2122,9 +2129,11 @@ void drawDoomsday(GLfloat x, GLfloat y, GLfloat angle, GLfloat scale)
   /*
     Cataboligne - fire doomsday antiproton beam!
   */
-  if ((thetime - lasttime) > maxtime)
+
+  if (last_apstate != doomapfire.state.armed)
     {
-      lasttime = thetime;
+      last_apstate = doomapfire.state.armed;
+
       /* we only want to draw it if we think it's stationary */
       if (ox == Doomsday->x && oy == Doomsday->y)
         drawAPBeam = !drawAPBeam;
@@ -2484,7 +2493,7 @@ static void charInput(unsigned char key, int x, int y)
 }
 
 /* try to instantiate a texture using a PROXY_TEXTURE_2D to see if the
-   implementation can handle the texture. */
+   implementation can handle it. */
 static int checkTexture(char *filename, textureImage *texture)
 {
   GLint type, components, param;
@@ -2848,15 +2857,19 @@ static int LoadGLTextures()
     {
       int texid = 0;
       int ndx = -1;
+      int col_only = FALSE;     /* color-only texture? */
 
       memset((void *)&curTexture, 0, sizeof(GLTexture_t));
       texid = 0;
       rv = FALSE;
 
+      if (cqiTextures[i].flags & CQITEX_F_COLOR_SPEC)
+        col_only = TRUE;
+
       /* first see if a texture with the same filename was already loaded.
          if so, no need to do it again, just copy the previously loaded
          data */
-      if (GLTextures && 
+      if (GLTextures && !col_only && 
           (ndx = findGLTextureByFile(cqiTextures[i].filename)) > 0)
         {                       /* the same hw texture was previously loaded
                                    just save it's texture id */
@@ -2867,7 +2880,7 @@ static int LoadGLTextures()
 #endif
         }
 
-      if (!texid)
+      if (!texid && !col_only)
         {
           texti = malloc(sizeof(textureImage));
           
@@ -2928,7 +2941,8 @@ static int LoadGLTextures()
             }    
         }
 
-      if (rv || texid)     /* texload/locate succeeded, add it to the list */
+      if (rv || texid || col_only)     /* tex/color load/locate succeeded,
+                                          add it to the list */
         {
           texptr = (GLTexture_t *)realloc((void *)GLTextures, 
                                           sizeof(GLTexture_t) * 

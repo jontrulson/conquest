@@ -280,6 +280,12 @@ texture {
 }
 
 texture {
+  name         "shipF-warp-col"
+  filename     ""  # we are only using this to store a color
+  color        "ffd72d00"
+}
+
+texture {
   name         "shipF-ico-armies"
   filename     "TOS-fi-armies"
 }
@@ -447,6 +453,12 @@ texture {
 texture {
   name         "shipR-warp"
   filename     "TOS-rwarp"
+}
+
+texture {
+  name         "shipR-warp-col"
+  filename     ""  # we are only using this to store a color
+  color        "ffbfbcbc"
 }
 
 texture {
@@ -620,6 +632,12 @@ texture {
 }
 
 texture {
+  name         "shipK-warp-col"
+  filename     ""  # we are only using this to store a color
+  color        "ffd72d00"
+}
+
+texture {
   name         "shipK-ico-armies"
   filename     "TOS-ki-armies"
 }
@@ -778,6 +796,12 @@ texture {
 }
 
 texture {
+  name         "shipO-warp-col"
+  filename     ""  # we are only using this to store a color
+  color        "ff9fefff"
+}
+
+texture {
   name         "shipO-ico-armies"
   filename     "TOS-oi-armies"
 }
@@ -932,6 +956,11 @@ animation {
   name         "shipR-torp"
 }
 
+# doomsday AP beam firing interval
+animation {
+  name         "doomsday-ap-fire"
+}
+
 ## animation defs
 #################
 
@@ -1066,3 +1095,11 @@ animdef {
   }
 }
 
+# blink the doomsday's AP beam
+animdef {
+  name         "doomsday-ap-fire"
+
+  toganim {
+    delayms    700
+  }
+}

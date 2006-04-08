@@ -42,6 +42,8 @@
 #include "render.h"
 #include "anim.h"
 
+#include "GL.h"
+
 #include "nPlayB.h"
 
 #define cp_putmsg(str, lin)  setPrompt(lin, NULL, NoColor, str, NoColor)
@@ -75,11 +77,6 @@ static scrNode_t nPlayBNode = {
 };
 
 static animQue_t animQue;
-
-/* blinker states - we borrow them from nCP */
-extern animStateRec_t ncpBlinkerOneSec;
-extern animStateRec_t ncpBlinkerHalfSec;
-extern animStateRec_t ncpBlinkerQtrSec;
 
 /* team torp anim states borrowed fron nCP */
 extern animStateRec_t ncpTorpAnims[NUMPLAYERTEAMS];
@@ -175,23 +172,23 @@ void nPlayBInit(void)
       /* now setup the blinkers */
       /* these are toggle animations that never expire, so they
          only need to be done once at inittime */
-      if (!animInitState("onesec", &ncpBlinkerOneSec, NULL))
+      if (!animInitState("onesec", &GLBlinkerOneSec, NULL))
         clog("%s: failed to init animstate for animation 'onesec'",
              __FUNCTION__);
       else
-        animQueAdd(nPlayBNode.animQue, &ncpBlinkerOneSec);
+        animQueAdd(nPlayBNode.animQue, &GLBlinkerOneSec);
 
-      if (!animInitState("halfsec", &ncpBlinkerHalfSec, NULL))
+      if (!animInitState("halfsec", &GLBlinkerHalfSec, NULL))
         clog("%s: failed to init animstate for animation 'halfsec'",
              __FUNCTION__);
       else
-        animQueAdd(nPlayBNode.animQue, &ncpBlinkerHalfSec);
+        animQueAdd(nPlayBNode.animQue, &GLBlinkerHalfSec);
 
-      if (!animInitState("qtrsec", &ncpBlinkerQtrSec, NULL))
+      if (!animInitState("qtrsec", &GLBlinkerQtrSec, NULL))
         clog("%s: failed to init animstate for animation 'qtrsec'",
              __FUNCTION__);
       else
-        animQueAdd(nPlayBNode.animQue, &ncpBlinkerQtrSec);
+        animQueAdd(nPlayBNode.animQue, &GLBlinkerQtrSec);
 
       /* now setup the team torp animators */
       for (i=0; i<NUMPLAYERTEAMS; i++)

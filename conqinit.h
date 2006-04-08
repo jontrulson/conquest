@@ -60,10 +60,16 @@ typedef struct _cqi_planet_init {
   Unsgn32 color;
 } cqiPlanetInitRec_t, *cqiPlanetInitPtr_t;
 
+#define CQITEX_F_COLOR_SPEC       0x00000001 /* This texture definition
+                                                only really specifies a
+                                                color and not a texture */
+
+
 /* textures */
 typedef struct _cqi_texture_init {
   char name[TEXFILEMAX];        /* texid */
   char filename[TEXFILEMAX];    /* if different from textid */
+  Unsgn32 flags;                /* flags for this cqi texture (CQITEX_F_*)*/
   Unsgn32 color;                /* hex encoded color (AARRGGBB) */
 } cqiTextureInitRec_t, *cqiTextureInitPtr_t ;
 

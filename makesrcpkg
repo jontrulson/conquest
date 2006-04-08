@@ -46,7 +46,7 @@ FILELIST="ratfor.c cd2lb.h cd2lb.c iolb.h iolb.c conqlb.c
         README.cygwin texfont.c TexFont.h 
         cprintf.h cprintf.c glfont.h glfont.c
         glmisc.h glmisc.c nMeta.c nMeta.h cqkeys.h 
-        prm.c prm.h nAuth.h nAuth.c GL.c
+        prm.c prm.h nAuth.h nAuth.c GL.c GL.h
         nCP.c nCP.h nConsvr.c nConsvr.h nMenu.c nMenu.h nPlay.c nPlay.h
         nWelcome.c nWelcome.h nDead.h nDead.c nCPHelp.h nCPHelp.c 
         nShipl.h nShipl.c node.c node.h nPlanetl.h nPlanetl.c 

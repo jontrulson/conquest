@@ -38,6 +38,7 @@
 #include "glfont.h"
 #include "render.h"
 #include "anim.h"
+#include "GL.h"
 #include "nCP.h"
 
 /* node specific states */
@@ -138,12 +139,6 @@ static scrNode_t nCPNode = {
 };
 
 static animQue_t animQue;
-
-/* blinker states (exported) */
-
-animStateRec_t ncpBlinkerOneSec;
-animStateRec_t ncpBlinkerHalfSec;
-animStateRec_t ncpBlinkerQtrSec;
 
 /* team torp anim states (exported) */
 animStateRec_t ncpTorpAnims[NUMPLAYERTEAMS];
@@ -2454,24 +2449,25 @@ void nCPInit(void)
 
       /* now setup the blinkers */
       /* these are toggle animations that never expire, so they
-         only need to be done once at inittime */
-      if (!animInitState("onesec", &ncpBlinkerOneSec, NULL))
+         only need to be done once at inittime (but for each node
+         that wishes to make use of them. */
+      if (!animInitState("onesec", &GLBlinkerOneSec, NULL))
         clog("%s: failed to init animstate for animation 'onesec'",
              __FUNCTION__);
       else
-        animQueAdd(nCPNode.animQue, &ncpBlinkerOneSec);
+        animQueAdd(nCPNode.animQue, &GLBlinkerOneSec);
 
-      if (!animInitState("halfsec", &ncpBlinkerHalfSec, NULL))
+      if (!animInitState("halfsec", &GLBlinkerHalfSec, NULL))
         clog("%s: failed to init animstate for animation 'halfsec'",
              __FUNCTION__);
       else
-        animQueAdd(nCPNode.animQue, &ncpBlinkerHalfSec);
+        animQueAdd(nCPNode.animQue, &GLBlinkerHalfSec);
 
-      if (!animInitState("qtrsec", &ncpBlinkerQtrSec, NULL))
+      if (!animInitState("qtrsec", &GLBlinkerQtrSec, NULL))
         clog("%s: failed to init animstate for animation 'qtrsec'",
              __FUNCTION__);
       else
-        animQueAdd(nCPNode.animQue, &ncpBlinkerQtrSec);
+        animQueAdd(nCPNode.animQue, &GLBlinkerQtrSec);
 
       /* now setup the team torp animators */
       for (i=0; i<NUMPLAYERTEAMS; i++)

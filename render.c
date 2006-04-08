@@ -28,17 +28,11 @@
 #include "render.h"
 #include "textures.h"
 #include "anim.h"
+#include "GL.h"
 
 extern dspData_t dData;
 
-/* from nCP.c */
-extern animStateRec_t ncpBlinkerOneSec;
-extern animStateRec_t ncpBlinkerHalfSec;
-extern animStateRec_t ncpBlinkerQtrSec;
-/* easier macros */
-#define BLINK_ONESEC      (ncpBlinkerOneSec.state.armed)
-#define BLINK_HALFSEC     (ncpBlinkerHalfSec.state.armed)
-#define BLINK_QTRSEC      (ncpBlinkerQtrSec.state.armed)
+#define GLCOLOR4F(glcol) glColor4f(glcol.r, glcol.g, glcol.b, glcol.a) 
 
 /*
  Cataboligne - new controls for icon HUD, pass code to render
@@ -127,12 +121,14 @@ void updateIconHudGeo(void)
   o.w = dConf.wW;
   o.h = dConf.wH;
 
+  /* the width of the entire hud info drawing area */
   o.xstatw = dConf.vX - (dConf.borderW * 2.0);
 
   tx = dConf.vX;
   ty = dConf.vY + dConf.vH;
   o.sb_ih = (dConf.wH - (dConf.borderW * 2.0) - ty) / 4.0;
 
+  /* alert border */
   o.alertb.x = dConf.vX - 3.0;
   o.alertb.y = dConf.vY - 3.0;
   o.alertb.w = dConf.vW + (3.0 * 2.0);
@@ -172,7 +168,7 @@ void updateIconHudGeo(void)
    */
 
   /* heading tex and label 
-   * we devide the section horizontally into 6.0 parts
+   * we divide the section horizontally into 6 parts
    * the heading icon occupies 2 parts, and the warp 3, then
    * centered within the 6-part area.
    */
@@ -232,7 +228,7 @@ void updateIconHudGeo(void)
   o.d1damn.w = o.xstatw - (tx + o.decal1.w);
   o.d1damn.h = o.d1damg.h * 2.0;
 
-  /* position the icon area within decal 1 */
+  /* position the ship icon area within decal 1 */
   o.d1icon.x = tx + ((o.xstatw / 6.0) * 1.0);
   o.d1icon.y = o.decal1.y + ((43.0 / 256.0) * th) ;
   o.d1icon.w = ((o.xstatw / 6.0) * 4.0);
@@ -393,8 +389,7 @@ void renderHud(int dostats)
 {				/* assumes context is current*/
   char sbuf1024[1024];
   char fbuf[128];
-  float FPS = getFPS();
-  int team = Ships[Context.snum].team;
+  int FPS = (int)getFPS();
   int icl;
   real warp = Ships[Context.snum].warp;
   real maxwarp = ShipTypes[Ships[Context.snum].shiptype].warplim;
@@ -414,10 +409,10 @@ void renderHud(int dostats)
       rxtime = frameTime;
     }
 
-  if (FPS > 999.0)
-    sprintf(fbuf, "FPS: 999+");
+  if (FPS > 999)
+    sprintf(fbuf, "FPS: ***");
   else
-    sprintf(fbuf, "FPS: %3.1f", FPS);
+    sprintf(fbuf, "FPS: %03d", FPS);
 
   sprintf(sbuf1024, "%4dms %3.1fKB/s %s",  
           pingAvgMS, 
@@ -451,12 +446,8 @@ void renderHud(int dostats)
             fontLargeTxf, dData.warp.warp, InfoColor, TRUE, FALSE, TRUE);
   
   /* warp quad indicator color */
-  if (team == TEAM_ORION) 
-    hexColor(0xFF9FEFFF);
-  else if (team == TEAM_ROMULAN) 
-    hexColor(0xFFBFBCBC);
-  else
-    hexColor(0xFFD72D00);
+  
+  GLCOLOR4F(GLShips[Ships[Context.snum].team][Ships[Context.snum].shiptype].warpq_col);
 
   /* warp indicator quad */
   if (warp >= 0.1)
@@ -477,7 +468,6 @@ void renderHud(int dostats)
                   dData.sh.color);
   
   /* damage gauge */
-
   renderScale(o.d1damg.x, o.d1damg.y, 
               o.d1damg.w, o.d1damg.h,
               0, 100, dData.dam.damage, dData.dam.color);
@@ -547,7 +537,7 @@ void renderHud(int dostats)
         {                       /* need to blink these */
         case 'R':               /* red alert (not Alert) */
         case 'Y':               /* yellow alert (not Prox) */
-          icl = (BLINK_HALFSEC) ? dData.aStat.color & ~CQC_A_BOLD : 
+          icl = (GL_BLINK_HALFSEC) ? dData.aStat.color & ~CQC_A_BOLD : 
             dData.aStat.color | CQC_A_BOLD;
           break;
         default:
@@ -701,7 +691,7 @@ void renderHud(int dostats)
                 o.cloakdest.w, o.cloakdest.h, 
                 fontMsgTxf, 
                 dData.cloakdest.str, 
-                (BLINK_ONESEC) ? 
+                (GL_BLINK_ONESEC) ? 
                 dData.cloakdest.color | CQC_A_BOLD | 0x50000000: 
                 (dData.cloakdest.color | 0x50000000) & ~CQC_A_BOLD, 
                 TRUE, FALSE, TRUE);

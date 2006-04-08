@@ -41,10 +41,11 @@ typedef struct _anim_state {
 
   Unsgn32 expired;         /* anim types that have expired (ANIM_TYPE_) */
 
-  /* ##### private - should only be accessed by animator and API */
-
   Unsgn32 anims;                /* bitmask of animation types present
                                    ANIM_TYPE_* */
+
+  /* ##### private - should only be accessed by animator and API */
+
   int adIndex;                  /* index into GLAnimDefs that specifies the
                                    animdef responsible for running this
                                    state. */

@@ -65,7 +65,8 @@ libUiGL_la_SOURCES = GL.c texfont.c glfont.c glfont.h \
 	nTeaml.c nUserl.h nUserl.c nHistl.h nHistl.c cprintf.h glcprintf.c \
 	gldisplay.h gldisplay.c disputil.h render.h render.c \
 	nPlayBMenu.h nPlayBMenu.c nPlayB.h nPlayB.c nPlayBHelp.h \
-	nPlayBHelp.c nOptions.h nOptions.c colorGL.c ui.h anim.c anim.h
+	nPlayBHelp.c nOptions.h nOptions.c colorGL.c ui.h anim.c anim.h \
+	GL.h
 
 libUiGL_la_LDFLAGS = -version-info 1:0:0
 

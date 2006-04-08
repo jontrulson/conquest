@@ -86,6 +86,9 @@ shiptype {
   fuelmax    999
 }
 
+# Planet definitions
+####################
+
 planet {
   name        "Earth"
   primary     "Sol"

@@ -1097,8 +1097,8 @@ void handleSimpleCmdPkt(cpCommand_t *ccmd)
       break;
 
     case CPCMD_RELOAD:
-      procReload(ccmd);
       clbBlockAlarm();
+      procReload(ccmd);
       updateClient(TRUE);
       clbUnblockAlarm();
 

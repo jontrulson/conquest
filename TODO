@@ -22,9 +22,6 @@
   - new server flag? NoKillTeam - determines whether a ship can
     set war with it's own team.
 
-  - support for more teams.  would have to go hand in hand with items
-    below. 
-
   - split up common block
 
     - ship, user, game/admin common, planets, teams, etc.  Would
@@ -38,11 +35,6 @@
       new team, increasing the number of ships, planets, etc).
 
     - allow definiton of new ship types/capabilities/limits?  
-
-  - run a telnet server that takes you directly to a meta list?  That
-    would be cool - run a 'proxy' for telnet players allowing them to
-    connect to any registered server rather than just the main server
-    at conquest.radscan.com... 
 
   - provide 'game config' dir containing config files that specify
     things like number of ships allowed, planet definitions (for custom
@@ -120,6 +112,10 @@
   - revamp so there is eough info provided to the client to create the
     common block(s) from scratch, rather than relying on compiled-in
     definitions, sizes, names, etc.
+
+  - UDP improvements.  allow to negotiate while playing.  if client
+    gets udp error, send packet (TCP) to server telling it to switch
+    to TCP only.
 
 - Blue Sky
 

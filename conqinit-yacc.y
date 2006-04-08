@@ -432,7 +432,7 @@ stmt            : /* error */
                    }                      
                 | ANIMDEF string
                    {            /* in this form, it's a statement
-y                                   rather than a section */
+                                   rather than a section */
                         cfgSections(ANIMDEF, $2);
                    }                      
                 | STAGES number
@@ -1154,9 +1154,10 @@ void dumpTexDataHdr(void)
          cqiNumTextures);
 
   for (i=0; i<cqiNumTextures; i++)
-    printf(" { \"%s\", \"%s\", 0x%08x },\n",
+    printf(" { \"%s\", \"%s\", 0x%08x, 0x%08x },\n",
            cqiTextures[i].name,
            cqiTextures[i].filename,
+           cqiTextures[i].flags,
            cqiTextures[i].color);
 
   printf("};\n\n");
@@ -1793,9 +1794,10 @@ static void endSection(void)
            just copy the new definition over it */
         exists = _cqiFindTexture(currTexture.name);
         
-        /* if a filename wasn't specified, then copy in the
-           texname as the default */
-        if (!strlen(currTexture.filename))
+        /* if a filename wasn't specified, and this is not a 'color only'
+           texture, then copy in the texname as the default */
+        if (!strlen(currTexture.filename) && 
+            !(currTexture.flags & CQITEX_F_COLOR_SPEC))
           strncpy(currTexture.filename, currTexture.name, TEXFILEMAX - 1);
         
         if (exists >= 0)
@@ -2392,7 +2394,10 @@ void cfgSections(int item, char *val)
             strncpy(currTexture.name, val, TEXFILEMAX - 1);
             break;
           case FILENAME:
-            strncpy(currTexture.filename, val, TEXFILEMAX - 1);
+            if (val[0] == 0)    /* empty filename means only color matters */
+              currTexture.flags |= CQITEX_F_COLOR_SPEC;
+            else
+              strncpy(currTexture.filename, val, TEXFILEMAX - 1);
             break;
           case COLOR:
             currTexture.color = hex2color(val);
