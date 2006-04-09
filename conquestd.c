@@ -489,11 +489,12 @@ int main(int argc, char *argv[])
 void updateProc(void)
 {
 #if 0
+  /* debugging code to see update latencies */
   static Unsgn32 lastms = 0;
   Unsgn32 millis = clbGetMillis();
 
-  if ((millis - lastms) > 100)
-    clog("millisdiff = %u", (millis - lastms));
+  if ((millis - lastms) > (int)((1.0 / (real)Context.updsec) * 1000.0))
+    clog("millisdiff = %u(%d)", (millis - lastms), Context.updsec);
   lastms = millis;
 #endif
 
