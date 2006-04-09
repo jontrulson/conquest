@@ -488,21 +488,23 @@ int main(int argc, char *argv[])
 /* responsible for updating the client */
 void updateProc(void)
 {
-#if 0
-  /* debugging code to see update latencies */
-  static Unsgn32 lastms = 0;
-  Unsgn32 millis = clbGetMillis();
-
-  if ((millis - lastms) > (int)((1.0 / (real)Context.updsec) * 1000.0))
-    clog("millisdiff = %u(%d)", (millis - lastms), Context.updsec);
-  lastms = millis;
-#endif
-
   /* Don't do anything if we're not supposed to. */
   if (sInfo.state != SVR_STATE_PLAY)
     return;
 
   stopUpdate();
+
+#if 0
+  {
+    /* debugging code to see update latencies */
+    static Unsgn32 lastms = 0;
+    Unsgn32 millis = clbGetMillis();
+    
+    if ((millis - lastms) > (int)((1.0 / (real)Context.updsec) * 1000.0))
+      clog("millisdiff = %u(%d)", (millis - lastms), Context.updsec);
+    lastms = millis;
+  }
+#endif
 
   /* update client view of the universe */
   updateClient(FALSE);
