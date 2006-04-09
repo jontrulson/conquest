@@ -1753,12 +1753,16 @@ static void renderFrame(void)
 
   /* if we are playing back a recording, we use the current
      frame delay, else the default throttle */
-  if (Context.recmode == RECMODE_PLAYING)
-    c_sleep(framedelay);
-  else
+
+  if (frameDelay != 0.0)
     {
-      if (FPS > 75.0)               /* a little throttling... */
-        c_sleep(0.01);
+      if (Context.recmode == RECMODE_PLAYING)
+        c_sleep(frameDelay);
+      else
+        {
+          if (FPS > 75.0)               
+            c_sleep(0.01);
+        }
     }
 
   return;
@@ -1853,7 +1857,7 @@ void drawTorp(GLfloat x, GLfloat y, char torpchar, int torpcolor,
 }
 
 /* utility func for converting a shield level into a color */
-static Unsgn32 _get_sh_color(real sh)
+static inline Unsgn32 _get_sh_color(real sh)
 {
   Unsgn32 color;
   Unsgn8 alpha;

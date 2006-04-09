@@ -148,7 +148,7 @@ void set_rectime(void)
   c = &buf[2];			/* skip day count */
   
   /* current frame delay */
-  sprintf(hbuf, "%s  %2.3fs", c, framedelay);
+  sprintf(hbuf, "%s  %2.3fs", c, frameDelay);
 
   setRecTime(hbuf);
 
@@ -391,9 +391,9 @@ static int nPlayBInput(int ch)
       
       break;
       
-    case 'n':		/* set framedelay to normal playback
+    case 'n':		/* set frameDelay to normal playback
                            speed.*/
-      framedelay = 1.0 / (real)fhdr.samplerate;
+      frameDelay = 1.0 / (real)fhdr.samplerate;
       break;
       
       /* these seem backward, but it's easier to understand
@@ -401,21 +401,21 @@ static int nPlayBInput(int ch)
     case '-':
       /* if it's at 0, we should still
          be able to double it. sorta. */
-      if (framedelay == 0.0) 
-        framedelay = 0.001;
-      framedelay *= 2;
-      if (framedelay > 10.0) /* really, 10s is a *long* time
+      if (frameDelay == 0.0) 
+        frameDelay = 0.001;
+      frameDelay *= 2;
+      if (frameDelay > 10.0) /* really, 10s is a *long* time
                                 between frames... */
-        framedelay = 10.0;
+        frameDelay = 10.0;
       break;
       
     case '+': 
     case '=':
-      if (framedelay != 0)
+      if (frameDelay != 0)
         {		/* can't divide 0 in our universe */
-          framedelay /= 2;
-          if (framedelay < 0.0)
-            framedelay = 0.0;
+          frameDelay /= 2;
+          if (frameDelay < 0.0)
+            frameDelay = 0.0;
         }
       break;
       

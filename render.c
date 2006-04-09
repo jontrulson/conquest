@@ -34,10 +34,6 @@ extern dspData_t dData;
 
 #define GLCOLOR4F(glcol) glColor4f(glcol.r, glcol.g, glcol.b, glcol.a) 
 
-/*
- Cataboligne - new controls for icon HUD, pass code to render
-*/
-
 extern void hexColor(Unsgn32);
 
 /* we store geometry here that should only need to be recomputed

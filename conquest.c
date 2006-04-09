@@ -128,7 +128,7 @@ void printUsage()
   printf("    -M metaserver   specify alternate <metaserver> to contact.\n");
   printf("                     default: %s\n", META_DFLT_SERVER);
   printf("    -P <cqr file>   Play back a Conquest recording (.cqr)\n");
-  printf("    -d <dly>        specify default framedelay for CQR playback.\n");
+  printf("    -d <dly>        specify default frameDelay for CQR playback.\n");
   printf("                    (example -d .01, for 1/100sec frame delay\n");
   printf("    -u              do not attempt to use UDP from server.\n");
   return;
@@ -332,8 +332,8 @@ int main(int argc, char *argv[])
         Context.recmode = RECMODE_PLAYING;
         break;
 
-      case 'd':                 /* framedelay */
-        framedelay = ctor(optarg);
+      case 'd':                 /* frameDelay */
+        frameDelay = ctor(optarg);
         break;
 
       case 'u':
@@ -3284,7 +3284,8 @@ int play()
   /* start recording if neccessary */
   if (Context.recmode == RECMODE_STARTING)
     {
-      if (recordInitOutput(Context.unum, getnow(NULL, 0), Context.snum))
+      if (recordInitOutput(Context.unum, getnow(NULL, 0), Context.snum, 
+                           FALSE))
         {
           Context.recmode = RECMODE_ON;
         }

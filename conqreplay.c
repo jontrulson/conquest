@@ -39,7 +39,7 @@ static void dowatchhelp(void);
 static char *build_toggle_str(char *snum_str, int snum);
 
 
-/* overlay the elapsed time, and current framedelay */
+/* overlay the elapsed time, and current frameDelay */
 void displayReplayData(void)
 {
   char buf[128];
@@ -53,10 +53,10 @@ void displayReplayData(void)
 
   /* current frame delay */
 #if 1
-  sprintf(buf, "%2.3fs", framedelay);
+  sprintf(buf, "%2.3fs", frameDelay);
 #else  /* an attempt at fps. */
-  if (framedelay != 0)
-    sprintf(buf, "%3.2f fps", (1.0 / framedelay));
+  if (frameDelay != 0)
+    sprintf(buf, "%3.2f fps", (1.0 / frameDelay));
   else
     sprintf(buf, "MAX fps");
 #endif
@@ -117,9 +117,9 @@ void displayMsg(Msg_t *themsg)
 /* MAIN */
 void conquestReplay(void)
 {
-  /* if framedelay wasn't overridden, setup based on samplerate */
-  if (framedelay == -1.0)
-    framedelay = 1.0 / (real)fhdr.samplerate;
+  /* if frameDelay wasn't overridden, setup based on samplerate */
+  if (frameDelay == -1.0)
+    frameDelay = 1.0 / (real)fhdr.samplerate;
 
   replay();
   
@@ -254,7 +254,7 @@ static void watch(void)
 	      upddsp = FALSE;	/* use this for one-shots */
 	    }
 	  
-	  if (!iogtimed(&ch, framedelay))
+	  if (!iogtimed(&ch, frameDelay))
 	  continue;
 	  
 	  /* got a char */
@@ -329,9 +329,9 @@ static void watch(void)
 	      upddsp = TRUE;
 	      break;
 		    
-	    case 'n':		/* set framedelay to normal playback
+	    case 'n':		/* set frameDelay to normal playback
 				   speed.*/
-	      framedelay = 1.0 / (real)fhdr.samplerate;
+	      frameDelay = 1.0 / (real)fhdr.samplerate;
 	      upddsp = TRUE;
 	      break;
 
@@ -340,22 +340,22 @@ static void watch(void)
 	    case '-':
 	      /* if it's at 0, we should still
 		 be able to double it. sorta. */
-	      if (framedelay == 0.0) 
-		framedelay = 0.001;
-	      framedelay *= 2;
-	      if (framedelay > 10.0) /* really, 10s is a *long* time
+	      if (frameDelay == 0.0) 
+		frameDelay = 0.001;
+	      frameDelay *= 2;
+	      if (frameDelay > 10.0) /* really, 10s is a *long* time
 					between frames... */
-		framedelay = 10.0;
+		frameDelay = 10.0;
 	      upddsp = TRUE;
 	      break;
 
 	    case '+': 
 	    case '=':
-	      if (framedelay != 0)
+	      if (frameDelay != 0)
 		{		/* can't divide 0 in our universe */
-		  framedelay /= 2;
-		  if (framedelay < 0.0)
-		    framedelay = 0.0;
+		  frameDelay /= 2;
+		  if (frameDelay < 0.0)
+		    frameDelay = 0.0;
 		}
 	      upddsp = TRUE;
 	      break;

@@ -63,7 +63,8 @@ static void startRecord(void)
   /* start recording */
   if (Context.recmode == RECMODE_STARTING)
     {
-      if (recordInitOutput(Context.unum, getnow(NULL, 0), 0))
+      if (recordInitOutput(Context.unum, getnow(NULL, 0), Context.snum,
+                           TRUE))
         {
           Context.recmode = RECMODE_ON;
           clog("conquestd: Recording to %s", fname);

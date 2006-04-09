@@ -1,0 +1,31 @@
+Index: GL.c
+===================================================================
+RCS file: /home/jon/src/repository/conquest/GL.c,v
+retrieving revision 1.15
+diff -c -r1.15 GL.c
+*** GL.c	2004/10/25 00:15:33	1.15
+--- GL.c	2004/11/27 20:25:41
+***************
+*** 146,153 ****
+  
+    if (l > 256)
+      l = 256;
+    
+!   memset(padding, ' ', l);
+    padding[l] = 0;
+  
+    return padding;
+--- 146,158 ----
+  
+    if (l > 256)
+      l = 256;
++ 
++   if (l < 0)
++     l = 0;
+    
+!   if (l > 0)
+!     memset(padding, ' ', l);
+! 
+    padding[l] = 0;
+  
+    return padding;

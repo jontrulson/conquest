@@ -164,7 +164,9 @@ void recordCloseOutput(void)
 int recordReadHeader(fileHeader_t *fhdr)
 {
   int rv;
+
   /* assumes you've already opened the stream */
+
   if (rdata_rfd == -1)
     return(FALSE);
 
@@ -183,11 +185,12 @@ int recordReadHeader(fileHeader_t *fhdr)
        rv);
 #endif
 
-  /* now endianize the data */
+  /* now de-endianize the data */
 
   fhdr->vers = (Unsgn32)ntohl(fhdr->vers);
   fhdr->rectime = (Unsgn32)ntohl(fhdr->rectime);
   fhdr->cmnrev = (Unsgn32)ntohl(fhdr->cmnrev);
+  fhdr->flags = (Unsgn32)ntohl(fhdr->flags);
 
 #ifdef DEBUG_REC
   clog("recordReadHeader: vers = %d, rectime = %d, cmnrev = %d\n",
@@ -200,7 +203,7 @@ int recordReadHeader(fileHeader_t *fhdr)
 
 /* build and generate a file header
  */
-int recordInitOutput(int unum, time_t thetime, int snum)
+int recordInitOutput(int unum, time_t thetime, int snum, int isserver)
 {
   fileHeader_t fhdr;
   
@@ -211,6 +214,11 @@ int recordInitOutput(int unum, time_t thetime, int snum)
 
   /* now make a file header and write it */
   memset(&fhdr, 0, sizeof(fhdr));
+
+  /* set all neccesary flags here, before endianizing below */
+  if (isserver)                 /* this is a server recording */
+    fhdr.flags |= RECORD_F_SERVER;
+
   fhdr.vers = (Unsgn32)htonl(RECVERSION);
 
   fhdr.samplerate = (Unsgn8)Context.updsec;
@@ -220,6 +228,7 @@ int recordInitOutput(int unum, time_t thetime, int snum)
 
   fhdr.cmnrev = (Unsgn32)htonl((Unsgn32)COMMONSTAMP);
   fhdr.snum = snum;
+  fhdr.flags = (Unsgn32)htonl((Unsgn32)fhdr.flags);
 
   if (!recordWriteBuf((Unsgn8 *)&fhdr, sizeof(fileHeader_t)))
     return(FALSE);
@@ -412,17 +421,37 @@ int initReplay(char *fname, time_t *elapsed)
   if (!recordReadHeader(&fhdr))
     return(FALSE);
       
-  if (fhdr.vers != RECVERSION)
-    {				/* wrong vers */
-      clog("initReplay: version mismatch.  got %d, need %d\n",
-           fhdr.vers,
-           RECVERSION);
-      printf("initReplay: version mismatch.  got %d, need %d\n",
-	     fhdr.vers,
-	     RECVERSION);
-      return FALSE;
-    }
 
+  /* version check */
+  switch (fhdr.vers)
+    {
+    case RECVERSION:            /* no problems here */
+      break;
+
+    case RECVERSION_20031004:
+      {
+        /* in this version we differentiated server/client recordings
+           by looking at snum.  If snum == 0, then it was a server
+           recording, else it was a client.  the 'flags' member did not
+           exist.  So here we massage it so it will work ok. */
+
+        if (fhdr.snum == 0)     /* it was a server recording */
+          fhdr.flags |= RECORD_F_SERVER;
+      }
+      break;
+
+    default:
+      {
+        clog("initReplay: version mismatch.  got %d, need %d\n",
+             fhdr.vers,
+             RECVERSION);
+        printf("initReplay: version mismatch.  got %d, need %d\n",
+               fhdr.vers,
+               RECVERSION);
+        return FALSE;
+      }
+      break;
+    }
 
   if ( fhdr.cmnrev != COMMONSTAMP )
     {

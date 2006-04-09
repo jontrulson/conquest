@@ -717,7 +717,7 @@ static int cqiValidateAnimations(void)
 static int cqiValidatePlanets(void)
 {
   int i;
-  static int mur = -1;
+  int mur = -1;
   int homeplan[NUMPLAYERTEAMS];             /* count of home planets */
 
   /* first things first... If there was no global read, then no

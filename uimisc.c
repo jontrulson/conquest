@@ -73,19 +73,29 @@ void dspReplayMenu(void)
   cprintf(lin,col,ALIGN_NONE,sfmt, "Recorded By        ", fhdr.user);
   lin++;
   
-  if (fhdr.snum == 0)
-    cprintf(lin,col,ALIGN_NONE,sfmt, "Recording Type     ", "Server");
+  if (fhdr.flags & RECORD_F_SERVER)
+    {
+      if (fhdr.vers != RECVERSION)
+        sprintf(cbuf, "Server [%d]", fhdr.vers);
+      else
+        sprintf(cbuf, "Server (Ship %d)", fhdr.snum);
+    }
   else
     {
-      sprintf(cbuf, "Client (Ship %d)", fhdr.snum);
-      cprintf(lin,col,ALIGN_NONE,sfmt, "Recording Type     ", cbuf);
+      if (fhdr.vers != RECVERSION)
+        sprintf(cbuf, "Client (Ship %d) [%d]", fhdr.snum, fhdr.vers);
+      else
+        sprintf(cbuf, "Client (Ship %d)", fhdr.snum);
     }
+
+  cprintf(lin,col,ALIGN_NONE,sfmt, "Recording Type     ", cbuf);
+
   lin++;
   
   cprintf(lin,col,ALIGN_NONE,sfmt, "Recorded On        ", recordedon);
 
   lin++;
-  sprintf(cbuf, "%d (delay: %0.3fs)", fhdr.samplerate, framedelay);
+  sprintf(cbuf, "%d (delay: %0.3fs)", fhdr.samplerate, frameDelay);
   cprintf(lin,col,ALIGN_NONE,sfmt, "Updates per second ", cbuf);
   lin++;
   fmtseconds(totElapsed, cbuf);

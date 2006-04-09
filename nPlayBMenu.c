@@ -60,9 +60,9 @@ void nPlayBMenuInit(void)
   state = S_NONE;
   prompting = FALSE;
 
-  /* if framedelay wasn't overridden, setup based on samplerate */
-  if (framedelay == -1.0)
-    framedelay = 1.0 / (real)fhdr.samplerate;
+  /* if frameDelay wasn't overridden, setup based on samplerate */
+  if (frameDelay == -1.0)
+    frameDelay = 1.0 / (real)fhdr.samplerate;
 
   setNode(&nPlayBMenuNode);
 

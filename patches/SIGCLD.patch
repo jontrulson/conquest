@@ -1,0 +1,18 @@
+Index: c_defs.h
+===================================================================
+RCS file: /home/jon/src/repository/conquest/c_defs.h,v
+retrieving revision 1.22
+diff -u -r1.22 c_defs.h
+--- c_defs.h	23 Apr 2005 21:54:46 -0000	1.22
++++ c_defs.h	7 Jan 2006 01:32:19 -0000
+@@ -45,6 +45,10 @@
+ # include <stdarg.h>
+ #endif 
+ 
++#ifndef SIGCLD                                                     
++#define SIGCLD SIGCHLD
++#endif 
++
+ /* JET - need checks here? */
+ #include <sys/ioctl.h>
+ #include <sys/socket.h>

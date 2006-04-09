@@ -1,0 +1,28 @@
+Index: conquestd.c
+===================================================================
+RCS file: /home/jon/src/repository/conquest/conquestd.c,v
+retrieving revision 1.26
+diff -u -r1.26 conquestd.c
+--- conquestd.c	4 Jul 2005 03:18:22 -0000	1.26
++++ conquestd.c	22 Dec 2005 02:35:35 -0000
+@@ -499,8 +499,6 @@
+ 
+   stopUpdate();
+ 
+-  drcheck();			/* check the driver */  
+-
+   /* update client view of the universe */
+   updateClient(FALSE);
+ 
+@@ -1635,6 +1633,11 @@
+ 	  laststat = now;
+ 	}
+ 
++      clbBlockAlarm();          /* no signals can be accepted when
++                                   drcheck is run */
++      drcheck();
++      clbUnblockAlarm();
++
+       if (didsomething)         
+         continue;               /* see if there is another pkt */
+ 

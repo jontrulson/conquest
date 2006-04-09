@@ -184,16 +184,16 @@ int animIterState(animStatePtr_t astate)
 
   glad = &GLAnimDefs[astate->adIndex];
 
-  /* fix up our framedelay in case we are playing back a recording */
+  /* fix up our frameDelay in case we are playing back a recording */
   if (Context.recmode == RECMODE_PLAYING || Context.recmode == RECMODE_PAUSED)
     {              /* it changed, re-adjust our timing for playback */
-      if (lastfdelay != framedelay)
+      if (lastfdelay != frameDelay)
         {
-          lastfdelay = framedelay;
-          timescale = (framedelay * 10.0); /* 100ms = 1X */
+          lastfdelay = frameDelay;
+          timescale = (frameDelay * 10.0); /* 100ms = 1X */
 #if 0
-          clog("SETTING TIMESCALE: framedelay = %f, timescale = %f",
-               framedelay, timescale);
+          clog("SETTING TIMESCALE: frameDelay = %f, timescale = %f",
+               frameDelay, timescale);
 #endif
         }
     }
@@ -346,7 +346,7 @@ int animIterState(animStatePtr_t astate)
       /* when playing back at hi speed, it's annoying to have the blinker
          anims accelerated according to timescale.  So, if we are the only
          animtype in this animdef (standard blinker anim) then we do not
-         rescale the time according to framedelay.  */
+         rescale the time according to frameDelay.  */
       if (!glad->tog.delayms || 
           (frameTime - astate->tog.lasttime) > 
           (int)((real)glad->tog.delayms * 

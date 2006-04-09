@@ -75,7 +75,7 @@ void printUsage()
 
                                  
   printf("    -P <cqr file>   Play back a Conquest recording (.cqr)\n");
-  printf("    -d <dly>        specify default framedelay for CQR playback.\n");
+  printf("    -d <dly>        specify default frameDelay for CQR playback.\n");
   printf("                    (example -d .01, for 1/100sec frame delay\n");
   printf("    -u              do not attempt to use UDP from server.\n");
 
@@ -278,8 +278,8 @@ int main(int argc, char *argv[])
         Context.recmode = RECMODE_PLAYING;
         break;
 
-      case 'd':                 /* framedelay */
-        framedelay = ctor(optarg);
+      case 'd':                 /* frameDelay */
+        frameDelay = ctor(optarg);
         break;
 
       case 'u':

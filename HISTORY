@@ -9,7 +9,21 @@
 
                               Conquest HISTORY
 
-???
+8.1.2b (devel (not released))  4/09/2006
+
+       - enhance recording protocol so that server recordings are
+         easier to determine.  Always store the ship number that made
+         the recording into the header.
+
+         Existing recording (CQR) files are compatible, though playing
+         a new recording on an old client, will show the 'Recording Type'
+         as always being 'Client', even if it's really a server
+         recording.  Everything else will work fine.
+
+       - If you pass '-d 0.0' on the conquestgl command line, the
+         75 FPS frame throttle is disabled.  This is mainly useful for
+         'benchmarking'.  This works for playing back a recording as
+         well as playing the game normally.  
 
        - remove doomsday AP firing timer and convert to an animdef
          (doomsday-ap-fire) specified in texturesrc.
