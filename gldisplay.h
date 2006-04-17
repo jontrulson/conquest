@@ -211,6 +211,7 @@ void drawShip(GLfloat x, GLfloat y, GLfloat angle, char ch, int i,
 	      int color, GLfloat scale);
 void drawDoomsday(GLfloat x, GLfloat y, GLfloat angle, GLfloat scale);
 void drawViewerBG(int snum, int dovbg);
+void drawNEB(int snum);
 
 void clrPrompt(int line);
 void setPrompt(int line, char *prompt, int pcolor,

@@ -41,12 +41,8 @@ texture {
 
 texture {
   name         "barrier"
+  color        "bfc38a8a"
 }
-
-texture {
-  name         "TOS-bmsk"
-}
-
 
 # animdef explosion texanim textures
 # Say that 3 times fast.

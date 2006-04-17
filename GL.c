@@ -52,6 +52,7 @@ extern void conqend(void);
 
 #include "conquest.h"
 
+#define CLAMP(min, max, val) ((val < min) ? min : ((val > max) ? max : val))
 
 /* torp direction tracking */
 static real torpdir[MAXSHIPS + 1][MAXTORPS]; 
@@ -656,24 +657,20 @@ static int initGLPlanets(void)
           switch (Planets[plani].type)
             {
             case PLANET_SUN:
-              if ((ndx = findGLTexture("star")) >= 0)
-                gltndx = ndx;
+              gltndx = findGLTexture("star");
               break;
               
             case PLANET_CLASSM:
-              if ((ndx = findGLTexture("classm")) >= 0)
-                gltndx = ndx;
+              gltndx = findGLTexture("classm");
               break;
               
             case PLANET_DEAD:
-              if ((ndx = findGLTexture("classd")) >= 0)
-                gltndx = ndx;
+              gltndx = findGLTexture("classd");
               break;
               
             case PLANET_MOON:
             default:
-              if ((ndx = findGLTexture("luna")) >= 0)
-                gltndx = ndx;
+              gltndx = findGLTexture("luna");
               break;
             }
         }
@@ -754,27 +751,9 @@ static int initGLPlanets(void)
   return TRUE;
 }
 
-/*
- Cataboligne - convert an int read as hex color triple and perform gl Color
- alpha - if > 0.0, use as alpha val in glColor 4f
-*/
-
-void hexColor(Unsgn32 col)
-{
-  GLubyte r, g, b, a;
-
-  b = (col & 0xff) ;
-  g = ((col & 0x0000ff00) >> 8) ;
-  r = ((col & 0x00ff0000) >> 16) ;
-  a = ((col & 0xff000000) >> 24) ;
-
-  glColor4ub(r, g, b, a);
-}
-
-
 /* render a 'decal' for renderHud()  */
 void drawIconHUDDecal(GLfloat rx, GLfloat ry, GLfloat w, GLfloat h, 
-                  int imgp, int icol)
+                  int imgp, cqColor icol)
 {
   int steam = Ships[Context.snum].team, stype = Ships[Context.snum].shiptype;
   static int norender = FALSE;
@@ -896,7 +875,22 @@ char *padstr(int l)
 
 static void mouse(int b, int state, int x, int y)
 {
-  /*  clog("MOUSE CLICK: b = %d, state = %d x = %d, y = %d", b, state, x, y);*/
+#if 0
+  clog("MOUSE CLICK: b = %d, state = %d x = %d, y = %d", b, state, x, y);
+
+  if (state == 0)
+    {
+      Unsgn32 kmod = glutGetModifiers();
+
+      clog ("%s: angle is %f kmod = %08x\n", 
+            __FUNCTION__,
+            angle(dConf.vX + (dConf.vW / 2.0), 
+                  dConf.vY + (dConf.vH / 2.0), 
+                  (real)x, 
+                  (dConf.vY + dConf.vH) - (real)y),
+            kmod);
+    }
+#endif
   return;
 }
 
@@ -1194,11 +1188,13 @@ int GLcvtcoords(real cenx, real ceny, real x, real y, real scale,
 		 GLfloat *rx, GLfloat *ry )
 {
   GLfloat rscale;
-  static const GLfloat limit = (VIEWANGLE * 2.0); /* be generous */
+  /* we add a little fudge factor here for the limits */
+  static const GLfloat slimit = (VIEWANGLE * 1.4);  /* sr - be generous */
+  static const GLfloat llimit = (VIEWANGLE * 1.21); /* lr  */
+  GLfloat limit = (scale == SCALE_FAC) ? slimit : llimit;
 
   /* 21 = lines in viewer in curses client. */
   rscale = ((GLfloat)DISPLAY_LINS * (float)scale / (VIEWANGLE * 2));
-
 
   *rx = ((((VIEWANGLE * dConf.vAspect) - (x-cenx)) / rscale) * -1.0);
   *ry = (((VIEWANGLE - (y-ceny)) / rscale) * -1.0);
@@ -1651,7 +1647,7 @@ resize(int w, int h)
   glMatrixMode(GL_PROJECTION);
   glLoadIdentity();
   gluPerspective(VIEWANGLE, dConf.vW / dConf.vH, 
-                 0.0, 1000.0);
+                 1.0, 1000.0);
 
   /* save a copy of this matrix */
   glGetFloatv(GL_PROJECTION_MATRIX, dConf.vmat);
@@ -2226,58 +2222,145 @@ void drawDoomsday(GLfloat x, GLfloat y, GLfloat angle, GLfloat scale)
   return;
 }
 
-void drawViewerBG(int snum, int dovbg)
+/* (maybe) draw the Negative Energy Barrier */
+void drawNEB(int snum)
 {
-  GLfloat z = TRANZ * 3.0;
-
-  /* barrier inner edge mask */
-
-  const GLfloat size = VIEWANGLE * 34.0; /* empirically determined */
-  const GLfloat sizeh = (size / 2.0);
-
-  /* barrier width */
-
-  static const real nebwidth = (NEGENBEND_DIST - NEGENB_DIST) / 1000.0;
-  const GLfloat size2 = VIEWANGLE * (34.0 + nebwidth); /* 37.5 */ 
-  const GLfloat sizeh2 = (size2 / 2.0);
-
-  /* star field inside barrier - the galaxy */
-
-  GLfloat sizeb = (VIEWANGLE * (20.0 + 14)) / 2.0;
-
-  const int maxtime = 100;
+  int nebXVisible = FALSE;
+  int nebYVisible = FALSE;
+  static int inited = FALSE;
+  static const GLfloat nebCenter = ((NEGENBEND_DIST - NEGENB_DIST) / 2.0);
+  real nearx, neary;
+  GLfloat tx, ty;
+  GLfloat nebWidth, nebHeight;
+  static GLfloat nebWidthSR, nebHeightSR;
+  static GLfloat nebWidthLR, nebHeightLR;
+  static GLfloat nebX, nebY;
+  static GLint texid_neb;
+  static const int maxtime = 100;
   static Unsgn32 lasttime = 0;
   static GLfloat r0 = 0.0;
   static GLfloat r1 = 1.0;
-  GLfloat x, y, rx, ry;
-  static GLint texid_vbg = 0, texid_neb = 0, texid_bmsk = 0;
+  static GLColor_t col;
+  static int norender = FALSE;
 
-  if (!GLTextures || !GLShips[0][0].ship)
+  if (norender)
     return;
 
-      /* try to init them */
-  if (!texid_vbg || !texid_neb || !texid_bmsk)
+  if (!inited)
     {
       int ndx;
 
-      if ((ndx = findGLTexture("vbg")) >= 0)
-        texid_vbg = GLTextures[ndx].id;
-      else
-        texid_vbg = 0;
+      inited = TRUE;
 
       if ((ndx = findGLTexture("barrier")) >= 0)
-        texid_neb = GLTextures[ndx].id;
+        {
+          texid_neb = GLTextures[ndx].id;
+          col = GLTextures[ndx].col;
+        }
       else
-        texid_neb = 0;
+        {
+          norender = TRUE;
+          texid_neb = 0;
+          return;
+        }
 
-      if ((ndx = findGLTexture("TOS-bmsk")) >= 0)
-        texid_bmsk = GLTextures[ndx].id;
-      else
-        texid_bmsk = 0;
+
+      /* figure out approriate width/height of neb quad in SR/LR */
+
+      /* width/height SR */
+      GLcvtcoords(0.0, 0.0, NEGENBEND_DIST * 2.0, 
+                  (NEGENBEND_DIST - NEGENB_DIST), 
+                  SCALE_FAC,
+                  &nebWidthSR, &nebHeightSR);
+
+      /* width/height LR */
+      GLcvtcoords(0.0, 0.0, NEGENBEND_DIST * 2.0, 
+                  (NEGENBEND_DIST - NEGENB_DIST), 
+                  MAP_FAC,
+                  &nebWidthLR, &nebHeightLR);
     }
 
+  /* see if a neb wall is actually visible.  If not, we can save alot of
+     cycles... */
+
+  /* first, if we're LR and !UserConf.DoLocalLRScan, then you
+     can't see it */
+
+  if (SMAP(snum) && !UserConf.DoLocalLRScan)
+    return;
+
+  /* test for x wall */
+  if (Ships[snum].x < 0.0)
+    {
+      if (Ships[snum].x > (-NEGENB_DIST - nebCenter))
+        nearx = -NEGENB_DIST;
+      else
+        nearx = -NEGENBEND_DIST;
+    }
+  else
+    {
+      if (Ships[snum].x < (NEGENB_DIST + nebCenter))
+        nearx = NEGENB_DIST;
+      else
+        nearx = NEGENBEND_DIST;
+    }
+
+  /* we check against a mythical Y point aligned on the nearest X NEB wall
+     edge to test for visibility. */
+  if (GLcvtcoords(Ships[snum].x, Ships[snum].y,
+                  nearx, 
+                  CLAMP(-NEGENBEND_DIST, NEGENBEND_DIST, Ships[snum].y), 
+                  (SMAP(snum) ? MAP_FAC : SCALE_FAC),
+                  &tx, &ty))
+    {
+      nebXVisible = TRUE;
+    }
+  
+#if 0                           /* debugging test point (murisak) */
+  uiDrawPlanet( tx, ty, 34, (SMAP(snum) ? MAP_FAC : SCALE_FAC), 
+                             MagentaColor, TRUE);
+#endif
+
+  /* test for y wall */
+  if (Ships[snum].y < 0.0)
+    {
+      if (Ships[snum].y > (-NEGENB_DIST - nebCenter))
+        neary = -NEGENB_DIST;
+      else
+        neary = -NEGENBEND_DIST;
+    }
+  else
+    {
+      if (Ships[snum].y < (NEGENB_DIST + nebCenter))
+        neary = NEGENB_DIST;
+      else
+        neary = NEGENBEND_DIST;
+    }
+
+  /* we check against a mythical X point aligned on the nearest Y NEB wall
+     edge to test for visibility. */
+  if (GLcvtcoords(Ships[snum].x, Ships[snum].y,
+                  CLAMP(-NEGENBEND_DIST, NEGENBEND_DIST, Ships[snum].x), 
+                  neary, 
+                  (SMAP(snum) ? MAP_FAC : SCALE_FAC),
+                  &tx, &ty))
+    {
+      nebYVisible = TRUE;
+    }
+
+#if 0                           /* debugging test point (murisak) */
+  uiDrawPlanet( tx, ty, 34, (SMAP(snum) ? MAP_FAC : SCALE_FAC), 
+                             MagentaColor, TRUE);
+#endif
+
+  /* nothing to see here */
+  if (!nebXVisible && !nebYVisible)
+    return;
+
+  /* draw it/them */
 
   /* it would be nice to be able to do this in an animdef someday. */
+  /* basically we are 'sliding' the x/y tex coords around a little here */
   if ((frameTime - lasttime) > maxtime)
     {
       static real dir0 = 1.0;
@@ -2291,12 +2374,12 @@ void drawViewerBG(int snum, int dovbg)
 
       if (r0 <= 0.0)
         dir0 = 1.0;
-      else if (r0 >= 0.4)
+      else if (r0 >= 0.1)
         dir0 = -1.0;
 
       if (r1 >= 1.0)
         dir1 = -1.0;
-      else if (r1 <= 0.6)
+      else if (r1 <= 0.9)
         dir1 = 1.0;
 
       r1 += (dir1 * 0.0002);
@@ -2307,74 +2390,195 @@ void drawViewerBG(int snum, int dovbg)
       lasttime = frameTime;
     }
 
-  if (snum < 1 || snum > MAXSHIPS)
-    GLcvtcoords(0.0, 0.0, 0.0, 0.0, SCALE_FAC, &x, &y);
-  else
-    {
-      if (SMAP(snum) && !UserConf.DoLocalLRScan)
-        GLcvtcoords(0.0, 0.0, 0.0, 0.0, 
-                    SCALE_FAC, &x, &y);
-      else
-        GLcvtcoords((GLfloat)Ships[snum].x, 
-                    (GLfloat)Ships[snum].y, 
-                    0.0, 0.0, 
-                    SCALE_FAC, &x, &y);
-    }
-  
-  if (SMAP(snum))
-    z *= 3.0;
 
   glPushMatrix();
   glLoadIdentity();
-  glTranslatef(x , y , z);
-
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
   glEnable(GL_BLEND);
 
   glEnable(GL_TEXTURE_2D);
 
-  /* negative energy barrier */
   glBindTexture(GL_TEXTURE_2D, texid_neb);
-  glColor4f(0.7, 0.5, 0.7, 0.8);
 
-  glBegin(GL_POLYGON);
-  glTexCoord2f(r1, r0);
-  glVertex3f(-sizeh2, -sizeh2, -1.0); /* ll */
+  nebWidth = (SMAP(snum) ? nebWidthLR : nebWidthSR);
+  nebHeight = (SMAP(snum) ? nebHeightLR : nebHeightSR);
 
-  glTexCoord2f(r1, r1);
-  glVertex3f(sizeh2, -sizeh2, -1.0); /* lr */
+  glColor4f(col.r,
+            col.g,
+            col.b,
+            col.a);
 
-  glTexCoord2f(r0, r1);
-  glVertex3f(sizeh2, sizeh2, -1.0); /* ur */
+  if (nebYVisible)
+    {
+      if (Ships[snum].y > 0.0)
+        {
+          /* top */
+          GLcvtcoords(Ships[snum].x, Ships[snum].y,
+                      -NEGENBEND_DIST, NEGENB_DIST, 
+                      (SMAP(snum) ? MAP_FAC : SCALE_FAC),
+                      &nebX, &nebY);
+          /*           clog("Y TOP VISIBLE"); */
+        }
+      else
+        {
+          /* bottom */
+          GLcvtcoords(Ships[snum].x, Ships[snum].y,
+                      -NEGENBEND_DIST, -NEGENBEND_DIST, 
+                      (SMAP(snum) ? MAP_FAC : SCALE_FAC),
+                      &nebX, &nebY);
+          /*           clog("Y BOTTOM VISIBLE"); */
+        }
+      
+      /* draw the Y neb wall */
 
-  glTexCoord2f(r0, r0);
-  glVertex3f(-sizeh2, sizeh2, -1.0); /* ul */
-  glEnd();
+      glBegin(GL_POLYGON);
+      
+      glTexCoord2f(r0, r0);
+      glVertex3f(nebX, nebY, TRANZ); /* ll */
+      
+      glTexCoord2f(r1, r0);
+      glVertex3f(nebX + nebWidth, nebY, TRANZ); /* lr */
+      
+      glTexCoord2f(r1, r1);
+      glVertex3f(nebX + nebWidth, nebY + nebHeight, TRANZ); /* ur */
+      
+      glTexCoord2f(r0, r1);
+      glVertex3f(nebX, nebY + nebHeight, TRANZ); /* ul */
+      
+      glEnd();
+    }
 
-  /* vbg or blank background mask */
-  if (!dovbg)
-    glBindTexture(GL_TEXTURE_2D, texid_bmsk); 
+  if (nebXVisible)
+    {
+      if (Ships[snum].x > 0.0)
+        {
+          /* right */
+          GLcvtcoords(Ships[snum].x, Ships[snum].y,
+                      NEGENB_DIST, -NEGENBEND_DIST, 
+                      (SMAP(snum) ? MAP_FAC : SCALE_FAC),
+                      &nebX, &nebY);
+          /*           clog("X RIGHT VISIBLE"); */
+        }
+      else
+        {
+          /* left */
+          GLcvtcoords(Ships[snum].x, Ships[snum].y,
+                      -NEGENBEND_DIST, -NEGENBEND_DIST, 
+                      (SMAP(snum) ? MAP_FAC : SCALE_FAC),
+                      &nebX, &nebY);
+          /*           clog("X LEFT VISIBLE"); */
+        }
+
+      /* draw the X neb wall */
+
+      /* like we drew the Y neb wall, but since we play games by swapping
+         the w/h (since we are drawing the quad 'on it's side') we need
+         to swap the texcoords as well so things don't look squashed.  */
+      glBegin(GL_POLYGON);
+      
+      glTexCoord2f(r0, r1);
+      glVertex3f(nebX, nebY, TRANZ); /* ll */
+      
+      glTexCoord2f(r0, r0);
+      glVertex3f(nebX + nebHeight, nebY, TRANZ); /* lr */
+      
+      glTexCoord2f(r1, r0);
+      glVertex3f(nebX + nebHeight, nebY + nebWidth, TRANZ); /* ur */
+      
+      glTexCoord2f(r1, r1);
+      glVertex3f(nebX, nebY + nebWidth, TRANZ); /* ul */
+      
+      glEnd();
+    }
+
+  glDisable(GL_TEXTURE_2D); 
+  glDisable(GL_BLEND);
+  
+  glPopMatrix();
+
+  return;
+}
+
+void drawViewerBG(int snum, int dovbg)
+{
+  GLfloat z = TRANZ * 3.0;
+
+  /* barrier inner edge mask */
+
+  const GLfloat size = VIEWANGLE * 34.0; /* empirically determined */
+  const GLfloat sizeh = (size / 2.0);
+
+  /* star field inside barrier - the galaxy */
+
+  GLfloat sizeb = (VIEWANGLE * (20.0 + 14)) / 2.0;
+
+   GLfloat x, y, rx, ry;
+  static GLint texid_vbg = 0;
+
+  if (snum < 1 || snum > MAXSHIPS)
+    return;
+
+  if (!GLTextures || !GLShips[0][0].ship)
+    return;
+
+      /* try to init them */
+  if (!texid_vbg)
+    {
+      int ndx;
+
+      if ((ndx = findGLTexture("vbg")) >= 0)
+        texid_vbg = GLTextures[ndx].id;
+      else
+        texid_vbg = 0;
+    }
+
+  if (!dovbg && !(UserConf.DoTacBkg && SMAP(snum)))
+    return;
+  
+  if (SMAP(snum) && !UserConf.DoLocalLRScan)
+    GLcvtcoords(0.0, 0.0, 0.0, 0.0, 
+                SCALE_FAC, &x, &y);
   else
-    glBindTexture(GL_TEXTURE_2D, texid_vbg); 
+    GLcvtcoords((GLfloat)Ships[snum].x, 
+                (GLfloat)Ships[snum].y, 
+                0.0, 0.0, 
+                SCALE_FAC, &x, &y);
+  
+  if (SMAP(snum))
+    z *= 3.0;
+  
+  glPushMatrix();
+  glLoadIdentity();
+  glTranslatef(x , y , z);
+  
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+  glEnable(GL_BLEND);
+  
+  glEnable(GL_TEXTURE_2D);
 
-  glColor3f(0.8, 0.8, 0.8);	
+  if (dovbg)
+    {
+      glBindTexture(GL_TEXTURE_2D, texid_vbg); 
+      
+      glColor3f(0.8, 0.8, 0.8);	
+      
+      glBegin(GL_POLYGON);
+      
+      glTexCoord2f(1.0f, 0.0f);
+      glVertex3f(-sizeh, -sizeh, 0.0); /* ll */
+      
+      glTexCoord2f(1.0f, 1.0f);
+      glVertex3f(sizeh, -sizeh, 0.0); /* lr */
+      
+      glTexCoord2f(0.0f, 1.0f);
+      glVertex3f(sizeh, sizeh, 0.0); /* ur */
+      
+      glTexCoord2f(0.0f, 0.0f);
+      glVertex3f(-sizeh, sizeh, 0.0); /* ul */
+      
+      glEnd();
+    }
   
-  glBegin(GL_POLYGON);
-  
-  glTexCoord2f(1.0f, 0.0f);
-  glVertex3f(-sizeh, -sizeh, 0.0); /* ll */
-  
-  glTexCoord2f(1.0f, 1.0f);
-  glVertex3f(sizeh, -sizeh, 0.0); /* lr */
-  
-  glTexCoord2f(0.0f, 1.0f);
-  glVertex3f(sizeh, sizeh, 0.0); /* ur */
-  
-  glTexCoord2f(0.0f, 0.0f);
-  glVertex3f(-sizeh, sizeh, 0.0); /* ul */
-  
-  glEnd();
-
   if (UserConf.DoTacBkg && SMAP(snum))  
     {                            /* check option and image load state */
       glLoadIdentity();
@@ -2410,7 +2614,7 @@ void drawViewerBG(int snum, int dovbg)
       
       glEnd();
     }
-  
+
   glDisable(GL_TEXTURE_2D); 
   glDisable(GL_BLEND);
   

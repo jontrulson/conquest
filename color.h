@@ -40,10 +40,11 @@
 
 /* colors are formatted like so:
 
-   0x00aabbff 
+   0xAAaabbff 
 
    where
    
+   AA = Alpha component
    aa = attrib
    bb = background color
    ff = forground color

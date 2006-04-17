@@ -11,6 +11,7 @@
 
 #include "datatypes.h"
 #include "conqinit.h"
+#include "color.h"
 
 typedef struct _GLcolor {
   GLfloat a, r, g, b;
@@ -56,7 +57,7 @@ int findGLTexture(char *texname);
 #define HUD_ITORPIN    21
 
 void drawIconHUDDecal(GLfloat rx, GLfloat ry, GLfloat w, GLfloat h, 
-                  int imgp, int icol);
+                  int imgp, cqColor icol);
 
 
 #endif /* _TEXTURES_H */

@@ -9,6 +9,27 @@
 
                               Conquest HISTORY
 
+???
+
+       - fixed up the limit checks in GLcvtcoords().  Now we are a bit
+         more agressive in checking the visbility of an object before
+         rendering it, particularly in LR view.
+
+       - redid the Negative Energy Barrier (NEB).  It's split off into
+         a seperate function. 
+
+         The NEB is now drawn as a 'wall' (and at most, only 2 can
+         possibly be in view at a time), rather than the large
+         textured quad spanning the universe that was previously used.
+
+         This allows us to be smart and not render it when it's not in
+         view (saving frames and cycles).  Also, the TOS-bmsk texture
+         is no longer needed and has been removed.
+
+         In addition, the barrier's width/height are now scaled
+         properly in relation the ship's position.
+
+
 8.1.2b (devel (not released))  4/09/2006
 
        - enhance recording protocol so that server recordings are
@@ -33,19 +54,13 @@
          definitions that specify "" as the filename, as a special case,
          indicating that only a color is specified there.
 
-         This allowed me to get rid of some hardcoded per-team color
-         defines in render.c :) Warp quad indicator color, and other
-         'textureless' color specifications can now be defined in the
-         texturesrc or *.trc files with reckless abandon.
-
-         I think eventually, all colors used in conquestgl will be
-         specifed this way in the future.
+         I think all colors used in conquestgl will eventually
+         be specifed this way.
 
        - fix bug in render.c that miscalculated the size of the warp
          indicator quad in certain situations.
 
-       - merge 8.1.2a into conquest HEAD branch.  My computer almost
-         exploded. 
+       - merge 8.1.2a into conquest HEAD branch.  
 
 
 8.1.2a (devel release)  3/05/2006

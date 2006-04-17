@@ -34,8 +34,6 @@ extern dspData_t dData;
 
 #define GLCOLOR4F(glcol) glColor4f(glcol.r, glcol.g, glcol.b, glcol.a) 
 
-extern void hexColor(Unsgn32);
-
 /* we store geometry here that should only need to be recomputed
    when the screen is resized, not every single frame :) */
 
@@ -386,7 +384,7 @@ void renderHud(int dostats)
   char sbuf1024[1024];
   char fbuf[128];
   int FPS = (int)getFPS();
-  int icl;
+  cqColor icl;
   real warp = Ships[Context.snum].warp;
   real maxwarp = ShipTypes[Ships[Context.snum].shiptype].warplim;
   static int rxtime = 0;
@@ -776,10 +774,52 @@ void renderViewer(int dovbg)
   glDisable(GL_BLEND);
 #endif
 
-
   drawViewerBG(Context.snum, dovbg);
+  drawNEB(Context.snum);
 
   display( Context.snum, FALSE );
+
+#if 0                           /* TEST GRID */
+  {
+    int i;
+    static const int nlines = 10; /* 30 lines, each side of 0 */
+    GLfloat gx, gy;
+    
+    uiPutColor(InfoColor);
+    for (i = 0; i < nlines; i++)
+      {
+        if (!i)
+          gx = gy = 0.0;
+        else
+          GLcvtcoords(0.0, 0.0,
+                      i * 1000.0, i * 1000.0, 
+                      (SMAP(Context.snum) ? MAP_FAC : SCALE_FAC),
+                      &gx, &gy);
+
+        //        if (i == (nlines - 1))
+        //          clog("nlines: %d gx = %f gx = %f\n", nlines, gx, gy);
+        
+        glBegin(GL_LINES);
+
+        /* x */
+        glVertex3f(gx, -VIEWANGLE, TRANZ); /* ul */
+        glVertex3f(gx, VIEWANGLE, TRANZ); /* ur */
+        
+        glVertex3f(-gx, -VIEWANGLE, TRANZ); /* ul */
+        glVertex3f(-gx, VIEWANGLE, TRANZ); /* ur */
+        
+        /* y */
+        glVertex3f(-VIEWANGLE, gy, TRANZ); /* ul */
+        glVertex3f(VIEWANGLE, gy, TRANZ); /* ur */
+
+        glVertex3f(-VIEWANGLE, -gy, TRANZ); /* ul */
+        glVertex3f(VIEWANGLE, -gy, TRANZ); /* ur */
+
+        glEnd();
+      }
+  }
+#endif
+
 
   /* reset for everything else */
   glViewport(0, 0, dConf.wW, dConf.wH);

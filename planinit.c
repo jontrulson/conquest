@@ -31,7 +31,7 @@ void cqiInitPlanets(void)
 
   if (!cqiGlobal)
     {
-      clog("ERROR: cqiInitPlanets(): cqiGlobal is NULL, can't init planets\n");
+      clog("WARNING: cqiInitPlanets(): cqiGlobal is NULL, can't init planets");
       PVUNLOCK(&ConqInfo->lockword);
       return;
     }
