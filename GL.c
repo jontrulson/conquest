@@ -1194,10 +1194,10 @@ int GLcvtcoords(real cenx, real ceny, real x, real y, real scale,
   GLfloat limit = (scale == SCALE_FAC) ? slimit : llimit;
 
   /* 21 = lines in viewer in curses client. */
-  rscale = ((GLfloat)DISPLAY_LINS * (float)scale / (VIEWANGLE * 2));
+  rscale = ((GLfloat)DISPLAY_LINS * scale / (VIEWANGLE * 2.0));
 
-  *rx = ((((VIEWANGLE * dConf.vAspect) - (x-cenx)) / rscale) * -1.0);
-  *ry = (((VIEWANGLE - (y-ceny)) / rscale) * -1.0);
+  *rx = -(((VIEWANGLE * dConf.vAspect) - (x-cenx)) / rscale);
+  *ry = -((VIEWANGLE - (y-ceny)) / rscale);
 
 #if 0
   clog("GLCVTCOORDS: rscale = %f limit = %f cx = %.2f, cy = %.2f, \n\tx = %.2f, y = %.2f, glx = %.2f,"
@@ -2223,6 +2223,30 @@ void drawDoomsday(GLfloat x, GLfloat y, GLfloat angle, GLfloat scale)
 }
 
 /* (maybe) draw the Negative Energy Barrier */
+/* this routine is a bit more complicated than the original neb rendering,
+   however it's a lot faster and 'works' better by providing a more
+   accurate scaling and motion in relation to the ship.
+
+   The neb is rendered as a series (maximum of 2) barrier 'walls' that are
+   only drawn when they would be in view.  They are scaled
+   appropriately and drawn at the ship's depth plane.  The old neb
+   renderer would draw 1 large quad underneath the VBG, which made the
+   perspective 'a little strange'.
+
+   First we determine what qaudrant we are in.  From there we plot two
+   imaginary points aligned with the ship's x/y coordinates, and
+   placed on the nearest wall(s) edge.  Then a determination is made
+   (using a fixed GLcvtcoords()) to determine whether that point would
+   be visible.
+
+   If so, then the appropriate X and/or Y walls are drawn.  At most
+   only 2 walls can ever be displayed (if you are in view of a
+   'corner' of the barrier for example).
+
+   We save alot of cycles by not rendering what we don't need to,
+   unlike the original neb rendering, which was done all the time,
+   regardless of barrier visibility.
+*/
 void drawNEB(int snum)
 {
   int nebXVisible = FALSE;
@@ -2252,6 +2276,7 @@ void drawNEB(int snum)
 
       inited = TRUE;
 
+      /* get the barrier tex and color */
       if ((ndx = findGLTexture("barrier")) >= 0)
         {
           texid_neb = GLTextures[ndx].id;
@@ -2292,6 +2317,7 @@ void drawNEB(int snum)
   /* test for x wall */
   if (Ships[snum].x < 0.0)
     {
+      /* find out which side of the barrier we are on */
       if (Ships[snum].x > (-NEGENB_DIST - nebCenter))
         nearx = -NEGENB_DIST;
       else
@@ -2360,7 +2386,8 @@ void drawNEB(int snum)
   /* draw it/them */
 
   /* it would be nice to be able to do this in an animdef someday. */
-  /* basically we are 'sliding' the x/y tex coords around a little here */
+  /* basically we are 'sliding' the x/y tex coords around a little
+     here to give a 'motion' effect */
   if ((frameTime - lasttime) > maxtime)
     {
       static real dir0 = 1.0;
