@@ -41,7 +41,7 @@ texture {
 
 texture {
   name         "barrier"
-  color        "bfc38a8a"
+  color        "bfc3baba"
 }
 
 # animdef explosion texanim textures
