@@ -9,7 +9,7 @@
 
                               Conquest HISTORY
 
-???
+??? 8.1.2c (devel) 5/7/2006
 
        - fixed up the limit checks in GLcvtcoords().  Now we are a bit
          more agressive in checking the visbility of an object before
@@ -24,41 +24,45 @@
 
          This allows us to be smart and not render it when it's not in
          view (saving frames and cycles).  Also, the TOS-bmsk texture
-         is no longer needed and has been removed.
+         is no longer needed as a result, and has been removed.
 
          In addition, the barrier's width/height are now scaled
-         properly in relation the ship's position.
+         properly in relation the ship's position.  It looks alot
+         bigger in SR view when you are passing through it :)
 
+       - finished CONQINIT.TXT, describing CQI, and the format of the
+         conqinitrc and texturesrc files in all their glory.
 
-8.1.2b (devel (not released))  4/09/2006
+       8.1.2b (not released)
+
+       - fix bug in render.c that miscalculated the size of the warp
+         indicator quad in certain situations.
 
        - enhance recording protocol so that server recordings are
          easier to determine.  Always store the ship number that made
          the recording into the header.
 
-         Existing recording (CQR) files are compatible, though playing
-         a new recording on an old client, will show the 'Recording Type'
-         as always being 'Client', even if it's really a server
-         recording.  Everything else will work fine.
+         Existing recording (CQR) files are compatible.
 
-       - If you pass '-d 0.0' on the conquestgl command line, the
-         75 FPS frame throttle is disabled.  This is mainly useful for
-         'benchmarking'.  This works for playing back a recording as
-         well as playing the game normally.  
+       - If you pass '-d 0.0' on the conquestgl command line, the 75
+         FPS frame throttle is disabled.  This is mainly useful for
+         'benchmarking' - having conquestgl always render at full
+         speed.  This works for playing back a recording as well as
+         playing the game normally.
 
        - remove doomsday AP firing timer and convert to an animdef
          (doomsday-ap-fire) specified in texturesrc.
 
-       - modify parser to allow using a texture {} section simply to
-         store a 'named' color.  This is done by treating texture
-         definitions that specify "" as the filename, as a special case,
-         indicating that only a color is specified there.
+       - modify CQI parser to allow (ab)using a texture {} section
+         simply to store a 'named' color.  This is done by treating
+         texture definitions that specify "" as the filename, as a
+         special case, indicating that only a color is specified
+         there.  I just didn't see the point in creating a whole new
+         'colordef' section and related CQI infrastructure just for
+         this.
 
          I think all colors used in conquestgl will eventually
          be specifed this way.
-
-       - fix bug in render.c that miscalculated the size of the warp
-         indicator quad in certain situations.
 
        - merge 8.1.2a into conquest HEAD branch.  
 

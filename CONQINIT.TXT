@@ -1,175 +1,792 @@
-
-# $Id$
-
-Conqinit. Very raw documentation to be cleaned up later.
+$Id$
 
 
-       Textures:
+CONTENTS:
 
-       The old hardcoded texture filenames and integer index stuff in
-       the original conquestgl proved to be, unsustainable :)  Cat's
-       patches extended ConquestGL's texture handling to be a little
-       more flexible, but there were still issues.  Texture
-       configuration, loading and resolution have been completely
-       reworked in the version of Conquest.
- 
-       All textures that can be used in conquest are specified in a
-       global 'texturesrc' file located in the main etc/ dir of a
-       conquest installation.  Additional textures can be specified in
-       a users ~/.conquest/*.trc files.
-
-       Each texture is specified like:
-
-       Simplest form:
-
-                texture {
-                  name         "star"       # required
-                }
-
-       Textures are referenced in conquest by this name during setup.
-       The name should never change - they have been created to easily
-       find textures for a given object, team, and shiptype for example.
-       The image file loaded in this case would be 'star.tga'.
-
-       You can also optionally specify a filename (if it's different
-       from 'name'), and you can optionally specify a color (which would
-       be normally be used as part of a texture animation).  So a more
-       complex one with all values specified looks like:
-
-               texture {
-                 name         "conqlogoF"
-                 filename     "conq-fed"    # optional, defaults to name
-                 color        "ffe6e6e6"    # optional
-               }
+  ## OVERVIEW
+  ## conqinitrc
+     ## global
+     ## shiptype
+     ## planet
+  ## texturesrc or user .trc files
+     ## texture
+     ## animation
+     ## animdef
+        # istate subsection
+        # texanim subsection
+        # colanim subsection
+        # geoanim subsection
+        # toganim subsection
+  ## conqinit utility
+  ## example of a user overriding a system defined texture.
+     # overriding a texture image
+     # overriding a texture definition
+  ## conquest's texture format
 
 
-               This is the federation conquest logo.  Inside conquest,
-               when this texture should be rendered, conquest will
-               simply look for textures with a name 'conquestlogoT'
-               where 'T' is the first char of the team name.  You can
-               change the filename to whatever you want and conquest
-               will still find it, since all textures are referenced
-               by the 'name' field.
+## OVERVIEW
 
-       When conquest starts, it will load/parse this file so it has a
-       complete texture list in the cqiTextures[] array (which is
-       dynamically allocated).
+       This document describes the 'conqinit' (CQI)
+       parser/configurator used in Conquest as of 8.1.2a (devel), as
+       well as the format of the new configuration files (conqinitrc
+       and texturesrc).
 
-       When LoadTextures() is called, it will simply go through this
-       cqiTextures array and load each texture it can.
+       CQI is a lex/yacc parser that reads certain configuration files
+       and builds up an internal, validated representation of the data
+       contained therein.
 
-       For things like drawing planets, ships, etc, the texture id's
-       are looked up the first time they are referenced from the
-       GLTextures array and saved away for future use, eliminating the
-       need to search for textures when rendering - it's just a direct
-       lookup which is alot faster.
+       This document is intended for developers, or those who want to
+       modify the characteristics of their conquest experience :)  
 
-       Users can override texture definitions as well.  After
-       conquestgl parses the main texturesrc file, it will then load
-       and parse any *.trc files it finds in your ~/.conquest/
-       directory.  These files have the same format as texturesrc.
-       Textures can be provided in a user's ~/.conquest/img/
-       directory, which will also be searched when texture loading
-       starts.  So for example, if you absolutely hate the vbg (Viewer
-       Backgroud) texture, you could make it what ever you want by
-       creating a ~/.conquest/vbg.trc file with the following
-       contents:
+       CQI data is currently used to represent all planet data (name,
+       size, type, team, etc), all texture data (Well Known Name
+       (WKN)), filename, color), animation data (WKN, animdef), and
+       animdefs (name, animation characteristics).  A detailed
+       description of each of these is given below.
 
-         texture {
-           name "vbg"
-           filename "my_better_vbg"
-         }
+       Currently, CQI can be used to parse these types of files:
 
-         Then place your my_better_vbg.tga file into ~/.conquest/img/ .
+         - <prefix>/etc/conqinitrc 
 
-       That's the gist of textures.
+           file that decribes certain characteristics of the game,
+           such as how many ships can play, detailed descriptions of
+           each of the planets, and other related data.  The format of
+           the sections in the conqinitrc file will be described
+           below.
 
-       Planets:
+         - <prefix>/etc/texturesrc
+         - ~/.conquest/*.trc
 
-       The planets are also handled differently. They are now all
-       loaded from the global conqinitrc file.  There are also
-       'global', and 'shiptype' sections in this file which,
-       currently, should never be changed until the protocol and
-       common block is changed to support it.  But the planet sections
-       can be edited at will.
+           These files describe the characteristics of textures,
+           colors, animations, and animdefs used by conquestgl for
+           rendering.
 
-       Here's an example for Jinx:        
 
-              planet {
-                name        "Jinx"           
-                primary     "Syrinx"         
-                angle       304.393088       
-                velocity    7.500000         
-                radius      2600.000000
-                ptype       "M"
-                pteam       "S"
-                armies      153
-                visible     "yes"
-                core        "yes"
-                homeplanet  "no"
-                xcoord      -19392.238383
-                ycoord      -11831.705377
-                size        300
-                color       "ffe6e6e6"
-              }
+       The general syntax of a section entry in these files is as
+       follows:
 
-      'size' is specified in CQ's (Conquest Units of measurement).
+           sectionname {
+              variable  value
+              ...
+           }
 
-       You can optionally have a 'texname' parameter that specifies
-       the texture to use to display a planet, but this should almost
-       never be done.  The default rules (described below) for
-       finding a planet texture are generally the best choice.
+           Comments are preceded by a '#' character.
+           # like this
 
-       If 'angle' is negative, a random value will be chosen at parse
-       time.
+       The types of <value> depend on the variable being defined.
+       Currently, the following types are supported:
 
-       The 'armies' field can accept two numbers as well, representing
-       the mix and max values to use to generate a random value.
+              Type   Valid Values
+           --------  ------------
 
-             ...  
-             armies 20 100 
-             ...
+           STRING:   "some characters" enclosed in double quotes
+           BOOL:     STRING equal to: "yes", "no", "on", or "off"
+           NUMBER:   any valid integer value
+           RATIONAL: any valid floating point value
+           COLOR:    STRING equal to a 32b hex value: "ffabcdef"
+                     in AARRGGBB format (8 bits per component).
 
-             Will choose a random value between 20 and 100 at parse
-             time. 
+       In the descriptions below, these types will be referenced.
 
-       The downside here is that it is currently not possible to define
-       a planets orbital characteristics to be dependant on another
-       planet (like what was done in the original conq).  I do not
-       consider this a loss... You may disagree :)
 
-       Planet textures in the game are selected for a planet using the
-       following rules:
+## conqinitrc
+
+       The conqinitrc file is used to specify the global, shiptype,
+       and planet information used in conquest.
+
+       These are the valid sections that can appear in the conqinitrc
+       file.
+
+       ## global
+
+          The global section describe the various limits for
+          conquest.  Currently, you should never change this, until
+          the common block (and therefore compatibility) is changed to
+          support them.  For now, leave these alone :).  
+
+          global {
+            planetmax 60
+            shipmax   20
+            usermax   500
+            histmax   40
+            msgmax    60
+          }
+
+          planetmax:  NUMBER
+                      specifies the maximum number of planets in the
+                      universe. 
+
+
+          shipmax:    NUMBER
+                      specifies the maximum number of ships that can
+                      play. 
+
+          usermax:    NUMBER
+                      specifies the maximum number of users the game
+                      can handle (and store stats for).
+
+          histmax:    NUMBER
+                      specifies the maximum number of history entries
+                      that can be stored.  Maybe not useful?
+
+          msgmax:     NUMBER
+                      The maximum number of message slots available.
+          
+
+       ## shiptype
+
+          The shiptype sections are currently ignored.  They could be
+          used someday to allow the creation of new shiptypes with
+          differing characteristics.
+
+          shiptype {
+            name       "Destroyer"
+            engfac     1.000000
+            weafac     1.000000
+            accelfac   1.000000
+            torpwarp   12
+            warpmax    9
+            armymax    9
+            shmax      100
+            dammax     100
+            torpmax    9
+            fuelmax    999
+          }
+
+          name:       STRING
+                      specifies the name of the shiptype.
+
+          engfac:     RATIONAL
+                      engine mult factor
+
+          weafac:     RATIONAL
+                      weapon mult factor
+
+          accelfac:   RATIONAL
+                      acceleration mult factor
+
+          torpwarp:   NUMBER
+                      speed of the ship's torpedos
+
+          warpmax:    NUMBER
+                      maximum speed of the ship
+
+          armymax:    NUMBER
+                      maximum number of armies that can be carried by
+                      the ship
+
+          shmax:      NUMBER
+                      maximum shield strength
+
+          dammax:     NUMBER
+                      maximum damage before exploding
+
+          torpmax:    NUMBER
+                      maximum number of torps a ship can carry/fire
+
+          fuelmax:    NUMBER
+                      maximum fuel that can be carried
+
+
+       ## planet
+
+          The planet sections are used to describe all of the planets
+          and their characteristics in conquest.  This data is used to
+          initialize conquest's planet list on a game reset.  This
+          should allow budding universe builders alot of freedom.
+          Even more when the common block has been changed (in a
+          future release) to support things like colors, size, etc.
+
+          planet {
+            name        "Klingus"
+            primary     "Kejela"
+            angle       136.215891
+            velocity    -7.284646
+            radius      2600.000000
+            ptype       "M"
+            pteam       "K"
+            armies      50
+            visible     "yes"
+            core        "yes"
+            homeplanet  "yes"
+            xcoord      -9655.250220
+            ycoord      9577.226313
+            size        300
+            color       "ffe6e6e6"
+            texname     "kling"                  # optional
+          }
+
+          name:       STRING
+                      the name of the planet
+
+          primary:    STRING
+                      The name of the body this planet orbits.  If set
+                      to be the same as the planet's name, then the
+                      planet is marked as not orbiting anything
+                      (stationary).  The default is Murisak.
+
+          angle:      RATIONAL
+                      The starting angle of the planet relative to
+                      it's primary.  If the angle is negative, a
+                      random angle is chosen when the planet is
+                      initialized. 
+
+          velocity:   RATIONAL
+                      The velocity of the planet.  A positive number
+                      has the planet orbit it's primary
+                      counterclockwise, while negative orbits 
+                      clockwise. 
+
+          radius:     RATIONAL
+                      The distance of the planet from it's primary (in
+                      Conquest Units (CU)).
+                      
+          ptype:      STRING
+                      The planet type.  Valid values are:
+                      "M"               Class M (fuel)
+                      "D"               Class D (dead)
+                      "S"               Sun
+                      "m"               Moon
+                      "G"               Ghost
+                      "A"               Class A
+                      "O"               Class O
+                      "Z"               Class Z
+
+          pteam:      STRING
+                      The planet's team.  Valid values are:
+                      "F"               Federation
+                      "R"               Romulan
+                      "K"               Klingon
+                      "O"               Orion
+                      "S"               Self Ruled
+                      "N"               No Team (non)
+                      "G"               God
+                      "E"               Empire
+
+          armies:     NUMBER, NUMBER PAIR
+                      specifies the number of armies put on the planet
+                      at init time.  The value can be a single NUMBER,
+                      or a pair of NUMBERs.
+
+                      armies  20     
+                              20 armies placed on planet
+
+                      armies  10 100
+                              a random number of armies,
+                              between 10 and 100, placed on the
+                              planet.  This is typically used for suns
+                              where you want it's 'damage potential' to
+                              vary randomly with each new game.
+
+          visible:    BOOL
+                      whether the planet is visible
+
+          core:       BOOL
+                      wether the planet must be taken in order to
+                      conquer the universe.  This value has no meaning
+                      currently, as this is hardcoded into the game.
+                      When the common block is reworked, this value
+                      will actually mean something :)
+
+          homeplanet: BOOL
+                      whether this planet is one of the owner team's
+                      homeplanets. This value has no meaning
+                      currently, as this is hardcoded into the game.
+                      When the common block is reworked, this value
+                      will actually mean something.
+
+                      Currently, you must ensure that 3, and only 3
+                      planets are marked as a 'homeplanet' for each of
+                      the player teams (f, k, r, and o).
+
+          xcoord:     RATIONAL
+                      starting x coordinate of the planet's location.
+                      This value is ignored if the planet is not
+                      stationary. 
+
+          ycoord:     RATIONAL
+                      starting y coordinate of the planet's location.
+                      This value is ignored if the planet is not
+                      stationary. 
+
+          size:       NUMBER
+                      size of the planet in CU's.  This only matters
+                      to the gl client for now.  In the future, this
+                      value will be stored with the planet into the
+                      common block, and propagated out to clients.
+
+          color:      COLOR
+                      the desired base color of the planet.  This only
+                      matters to the gl client for now.  In the
+                      future, this value will be stored with the
+                      planet into the common block, and propagated out
+                      to clients.
+
+          texname:    STRING
+                      optional.  Explicitly specifies the texture to
+                      be used to draw the planet.  In general this
+                      option should not be used for planet definitions.  
+
+
+       Currently in conquestgl, the following steps are made to
+       determine the proper texture to use to display a planet:
 
        1. see if one was specified in the conqinitrc entry for
           the planet, if so, use it.  This should usually not be done
           except in special cases.
 
-       2. see if a texture exists with the same name as the planet, if
-          so use it.
+       2. see if a texture exists with the same name (case sensitive)
+          as the planet, if so use it.
 
        3. if all else fails, use the default textures 'classm',
           classd', 'star' etc.
 
        So in general, you never really need to specify a texture for a
        planet in conqinitrc.  If you want a specific texture to be
-       displayed for a planet, just create a texture with the same
-       name as the planet and add an entry for it in the texturesrc
-       (or a user .trc) file.
+       displayed for a planet, just create a texture definition with
+       the same name as the planet and add an entry for it in the
+       texturesrc (or a user .trc) file.
 
-      conqinit:
 
-      There is a new executable called conqinit.  conqinit can be used
-      to test the new parser, as well as to generate a texdata.h file
-      based on texturesrc data, and generate a initdata.h file based on
-      conqinitrc data.
+## texturesrc or user .trc files
 
-      These initdata.h and texdata.h files contain defaults for the
-      planets and textures compiled directly into conquest in the event
-      the respective conquestrc and texturesrc file could not be found
-      or successfully read on startup.  
+       These files contain sections that describe each of the
+       texture, animation, and animdef's used in conquestgl.
+
+       A texture section specifies a texture by a Well Known Name (WKN),
+       the base filename that contains the image data used to draw the
+       texture, and the base color of the texture.  If the filename of
+       a texture is equal to "", then this indicates that only a color
+       is described therein (no texture image data is used).
+
+       Users can override the system's texture definitions (defined in
+       <prefix>/etc/texturesrc).  After conquestgl parses the main
+       texturesrc file, it will then load and parse any *.trc files it
+       finds in your ~/.conquest/ directory.  These files have the
+       same format as texturesrc.  Texture image (TGA) files can be
+       provided in a user's ~/.conquest/img/ directory, which will
+       also be searched when texture loading starts.  This allows
+       users to override the games textures if they wish.
+
+       The ability for a user to create his/her own .trc files and
+       supply their own texture images (TGA) allows them to modify or
+       override the system entries as they prefer.  Much better than
+       having to hack the src code :)
+
+       Most of these sections have a Well Known Name (WKN) that
+       'labels' the entry.  These labels are used by conquest to look
+       up the information they contain.  For example, to find out the
+       texture and color used for the generic 'torpedo' texture,
+       conquest will look up the WKN 'torp' in the texture list and
+       use it's data to draw one.
+
+       The WKN of an entry should never be changed, as these are
+       hard-coded into conquest.  The other data related to a WKN can
+       of course be modified. 
+
+       The following provides a detailed description of the valid
+       texturesrc sections that can appear in the global texturesrc
+       file or a user's ~/.conquest/*.trc files.   
+
+       ## texture
+
+          A texture section specifies the characteristics of a
+          texture (or color) to conquest by it's WKN.
+
+          texture {
+            name         "conqlogoF"
+            filename     "conq-fed"              # optional
+            color        "ffe6e6e6"              # optional
+          }
+     
+          name:       STRING
+                      the WKN of the texture.  In the above example,
+                      this texture refers the the conquest logo for
+                      Federation players, and is composed of the word
+                      'conqlogo' followed by the first (case
+                      sensitive) character of the team.  This is what
+                      conquestgl will use when looking for the
+                      Federation Conquest Logo texture.
+
+          filename:   STRING
+                      optional.  This field specifies the base name of
+                      the texture file that contains the texture image
+                      data (without an extension).  In the above
+                      example, conquest will look for and load a
+                      texture image file called 'conq-fed.tga' in the
+                      texture image directory(s).
+
+                      If the filename is specified as "", then this
+                      indicates that there is no image data associated
+                      with this texture, and that only a color is
+                      stored there.
+
+                      If the filename is not specified at all, then
+                      the default is to use the same name as 'name'
+                      when loading the texture.
+
+          color:      COLOR
+                      optional. Specifies the base color of the
+                      texture used when it is rendered.  If not
+                      specified, the default depends on how the
+                      texture is being used in conquest.
+
+
+       ## animation
+
+          An animation section is used to provide a WKN to conquest
+          for a given animation, and to specify the 'animdef' to be
+          used to render the animation, based on it's current 'state'.
+          This provides the ability to have several animations use the
+          same 'animdef'.
+
+          animation {
+            name         "explosion"
+            animdef      "explode"               # optional
+          }
+
+          name:       STRING
+                      the WKN of the animation.  In the above example,
+                      this animation refers to the animation that is
+                      used when something is exploding.  
+
+          animdef:    STRING
+                      optional. Specifies the name of the animdef
+                      section to use for this animation.  In this
+                      example, an animdef named 'explode' will be used
+                      to modify the animation's state.
+
+                      If 'animdef' is not specified, then the default
+                      is to look for an animdef with the same WKN of
+                      the animation section.
+
+       ## animdef
+
+          An animdef section is used to describe the specific
+          characteristics of how to 'run' an animation.  It is
+          composed of base data, and one or more nested animation
+          types, for each animation type supported.  
+
+          Animdefs are 'compiled' at parse time and represent a series
+          of operations to perform on a programmer specified animation
+          'state' within conquest at defined intervals.  Animation
+          drawing states are used throughout conquestgl to draw
+          explosions, torpedo's, and several other things.
+
+          An animation drawing 'state' in conquest is defined as a
+          structure that contains the following variables:
+
+          id                              - current texture id
+          color (ARGB)                    - current color
+          geometry (size, rotation, x, y) - current geo info
+          armed                           - current toggle value (on/off)
+
+          An animdef is soley responsible for defining how these
+          values will be modified as the animation is run (or
+          'executed').  Which elements of the animation state that are
+          actually modified also depends entirely on the animdef
+          specification.
+
+          Each animdef can contain specifications for up to 4
+          different animation types that can be 'executed' to change
+          the various components of it's relevant 'state'.  The 4
+          types are:
+
+          texanim:     Specifies parameters for a texture
+                       animation. Modifies state's 'id' value.
+
+          colanim:     Specifies parameters for a color animation.
+                       Modfies the state's 'color' values.
+                       colanim's can only run if no texanim is
+                       currently executing.  
+
+          geoanim:     Specifies parameters for a geometry animation.
+                       Modfies the state's 'geometry' values.
+                       geoanim's can only run if no texanim is
+                       currently executing.
+
+          toganim:     Specifies parameters for a toggle (on/off)
+                       animation.  Modfies the state's 'armed' value.
+
+
+          When these animations 'expire' their state (ie: run their
+          course), the state is automatically removed from the
+          animator's run que.  It's important that you ensure that
+          for animations that conquest is expecting to expire at some
+          future point, actually do expire at some future point :).
+
+          Here is an example of the most complicated animdef currently
+          provided.  Although this example incorporates components
+          that are not really used for the 'explode' animdef, all
+          possible options are listed here anyway for compleness and
+          documentation purposes.  
+
+
+          animdef {
+            name         "explode"
+            texname      "exp"                   # semi-optional
+            timelimit    3000                    # optional
+
+            # initial state
+            istate {                             # optional
+              size       450         # in CU's   # optional
+              angle      -1.0        # random
+            }
+    
+            texanim {                            # optional
+              stages     16 
+              loops      1                       # optional
+              delayms    100                     
+            }
+
+            # this runs when texanim has expired
+            colanim {                            # optional
+              stages     10                      
+              loops      1                       # optional
+              delayms    80
+    
+              deltaa     -0.1                    # optional
+              deltar     0.0                     # optional
+              deltag     -0.001                  # optional
+              deltab     -0.01                   # optional
+            }
+
+            # this runs when texanim has expired
+            geoanim {                            # optional
+              stages     10
+              loops      1                       # optional
+              delayms    100
+
+              deltas     10.0                    # optional (in CU's)
+            }
+
+            toganim {                            # optional
+              delayms    250
+            }
+          } 
+
+          name:       STRING
+                      the name of the animdef, referenced by the WKN
+                      of an 'animation' section as described earlier.
+
+          texname:    STRING 
+                      semi-optional.  Specifies the WKN of a texture
+                      to use in the default anim state (ie: when an
+                      animation state is first initialized).  If a
+                      texanim section is specified, then this field is
+                      required.
+
+                      If the animdef specifies a texanim, then this
+                      name is used to look up the textures for each of
+                      the stages in the texanim, by concatinating the
+                      stage number onto the texname. In the example
+                      above, the texanim will look for and use,
+                      WKN textures named 'exp0', 'exp1', ..., 'exp15',
+                      since there are 16 stages defined for the
+                      texanim.
+
+          timelimit   NUMBER 
+                      optional.  Specifies the maximum time in
+                      milliseconds this animdef should run on a state.
+                      When the timelimit expires, all animation types
+                      making up the animdef are expired for the state
+                      regardless of their own defined parameters.
+
+          # istate subsection
+
+            optional.  This subsection is provided to allow you to
+            specify certain 'starting' conditions to be used when an 
+            animation state is reset for a run.
+
+            size:       NUMBER
+                        optional.  Allows you to specify the initial
+                        value of the 'size' anim state variable when the
+                        animation is reset for a run.  Value is in
+                        CU's.  
+
+            angle:      RATIONAL 
+                        optional.  Allows you to specify the initial
+                        value of the 'angle' anim state variable when the
+                        animation is reset for a run.  
+
+                        If a negative value is specified as the angle,
+                        then a random angle will be chosen every time
+                        the anim state is reset for a run.
+
+          # texanim subsection
+
+            optional.  This subsection is used to describe the
+            charactistics of a texture animation type.  A texture
+            animation is a sequence of textures, displayed in
+            ascending order at a given time interval. The number of
+            textures displayed depends on the 'stages' field of the
+            texanim definition.
+
+            stages:     NUMBER
+                        a non-zero number specifying the number of
+                        individual textures that make up the texanim.
+
+            loops:      NUMBER
+                        optional.  defaults to 1.  Specifies how many
+                        times to to display all of the textures.  In
+                        the above example, the 16 textures are
+                        displayed only once, in the sequence 'exp0',
+                        'exp1', ..., 'exp15', and then the texanim is
+                        expired.
+
+            delayms:    NUMBER
+                        The delay, in milliseconds, before advancing
+                        onto the next stage.
+                    
+
+          # colanim subsection
+
+            optional.  This subsection is used to describe a 'color'
+            animation type.  A color animation is used to modify 1 or
+            more of the Alpha (A), Red (R), Green (G), and/or Blue (B)
+            channels of the animdef's color anim state at predefined
+            time intervals.  
+
+            If a texanim was specified as part of the animdef, then a
+            color anim will not run until it (the texanim) has
+            expired. 
+
+            All resulting color channels (ARGB) are clamped to a value
+            between 0.0 (black) to 1.0 (white) before being placed in
+            the anim's active color state.  For alpha, the values are
+            clamped to 0.0 (fully transparent) to 1.0 (fully opaque).
+
+            stages:     NUMBER
+                        a number specifying the number of iterations
+                        to perform.  If set equal to 0, then the
+                        colanim will run forever.  Generally you will
+                        never want to do this.
+
+            loops:      NUMBER
+                        optional.  defaults to 1.  If equal to 0, loop
+                        'stages' forever.  Generally you will never
+                        want to do this.
+
+            delayms:    NUMBER
+                        The delay, in milliseconds, before advancing
+                        onto the next stage.
+                    
+            deltaa:     RATIONAL
+                        optional.  delta to apply to the anim state's
+                        alpha color channel per stage iteration.
+                    
+            deltar:     RATIONAL
+                        optional.  delta to apply to the anim state's
+                        red color channel per stage iteration.
+                    
+            deltag:     RATIONAL
+                        optional.  delta to apply to the anim state's
+                        green color channel per stage iteration.
+                    
+            deltab:     RATIONAL
+                        optional.  delta to apply to the anim state's
+                        blue color channel per stage iteration.
+                    
+
+          # geoanim subsection
+
+            optional.  This subsection is used to describe a 'geometry'
+            animation type.  A geometry animation modifies the
+            geometry values in the anim's state by applying a
+            specified delta to a geometry component at a specified
+            interval.
+
+            If a texanim was specified as part of the animdef, then a
+            geometry anim will not run until it (the texanim) has
+            expired.
+
+            The current geometry state includes X/Y coordinates,
+            rotation, and size.  These state variables are modified
+            according to the deltas supplied.
+
+            stages:     NUMBER
+                        a number specifying the number of iterations
+                        to perform.  If set equal to 0, then the
+                        geoanim will run forever.  Generally you will
+                        never want to do this.
+
+            loops:      NUMBER
+                        optional.  defaults to 1.  If equal to 0, loop
+                        'stages' forever.  Generally you will never
+                        want to do this.
+
+            delayms:    NUMBER
+                        The delay, in milliseconds, before advancing
+                        onto the next stage.
+                    
+            deltax:     RATIONAL
+                        optional.  delta to apply to the anim state's
+                        X geometry variable per stage iteration.
+
+            deltay:     RATIONAL
+                        optional.  delta to apply to the anim state's
+                        Y geometry variable per stage iteration.
+
+            deltas:     RATIONAL
+                        optional.  In CU's. delta to apply to the anim
+                        state's size geometry variable per stage iteration.
+
+            deltar:     RATIONAL
+                        optional.  delta to apply to the anim state's
+                        rotation geometry variable per stage iteration.
+
+
+          # toganim subsection
+
+            optional.  This subsection is used to describe a 'toggle'
+            animation type.  A toggle animation simply toggles the
+            animation state's 'armed' variable on or off at a specified
+            time interval.  
+
+            An animdef composed solely of a toganim always runs
+            forever (it never expires).  These types of animdefs are
+            refered to as 'blinker' anims in conquest, and are used
+            for things like blinking the "SELF DESTRUCT IN XX" message
+            in conquestgl.
+
+            A toganim combined with another animation type will expire
+            as soon as all other specified animation types have expired.
+
+            toganim's are primarily used in conquest as 'blinkers'.
+            For example the 'onesec' animdef provides a 'blinker' anim
+            that toggles it's state from on to off (and vice-versa),
+            every second.
+
+            delayms:    NUMBER
+                        The delay, in milliseconds, before toggling
+                        the state's 'armed' variable.
+
+
+## conqinit utility
+
+      There is a new executable called conqinit provided.  conqinit
+      can be used to test the parser, perform syntax checking on
+      conqinitrc and texturesrc files, as well as to generate a
+      texdata.h file based on texturesrc data, or an initdata.h file
+      based on conqinitrc data.
+
+      These (pre-generated) initdata.h and texdata.h files contain
+      defaults for the planets and textures, compiled directly into
+      conquest, in the event the respective conquestrc and texturesrc
+      file could not be found or successfully read on startup.
+
+      If you are modifying the conquestrc or texturesrc system files
+      used by conquest, you should at least run conqinit on them to
+      check for syntax or other validation errors.  If conquest (or
+      conquestd) fails to properly load and parse the file at
+      runtime, the built in internal defaults will be used and a warning
+      message will be logged.
 
       examples:
+
+      NOTE: all of these forms support '-v' to enable verbose mode and
+            '-d' to enable extremely verbose debugging modes,
+            respectively. 
 
       $ conqinit
 
@@ -187,48 +804,126 @@ Conqinit. Very raw documentation to be cleaned up later.
 
       $ conqinit -t -f <file>
 
-        does the samething but parses <file> instead, and treats it
+        does the same thing but parses <file> instead, and treats it
         like a file in texturesrc format.
 
       $ conqinit -f <file> -h >conqinit.h
 
         parses <file> as a conqinitrc file and generates a conqinit.h
-        file that can be compiled into conquest to specify 'last-ditch'
-        defaults in case the normal files could not be parsed for some
-        reason.
+        file on stdout that can be compiled into conquest to specify
+        'last-ditch' defaults in case the normal files could not be
+        parsed for some reason at runtime.
+
+        Note, you should never have to gen any .h files, the parser runs
+        when conquest starts up and will always use the data it found if
+        it can.  Valid texdata.h and initdata.h files are supplied in
+        the conquest distribution.
+
+      $ conqinit -D 
+
+        You must be a conqoper (or have direct read permission on the
+        common block) to use this option. 
+
+        This option is sort of a hack.  It loads the current state of
+        the universe on the local machine and generates a conqinitrc
+        format file on stdout.  This file can be saved and made the
+        default conqinitrc for a system.
+
+        If you do this, you will almost certainly want to edit the
+        file and at least change the colors of the suns, and the sun's
+        randomized army counts.  Since this data is not currently
+        stored in the common block, conqinit tries to choose
+        reasonable defaults for them.  Make sure it did :)
+
+        This capability is useful if you init the universe, then use
+        conqoper to edit and or create new planets and arrange them
+        just like you want them.  Then, using the above command, dump
+        the universe to a conqinitrc file, edit it if neccessary (to
+        clean up colors, etc).  
+
+        Then copy that file over the system's conqinitrc file.  From
+        then on, whenever the planets are initialized (due to a
+        successful conquer, or the actions of an oper in conqoper),
+        your definitions will be used as the default planet
+        configuration. 
 
 
-      Note, you should never have to gen any .h files, the parser runs
-      when conquest starts up and will always use the data it found if
-      it can.  Valid texdata.h and initdata.h files are supplied in
-      the conquest distribution.
+## example of a user overriding a system defined texture.
 
-     - Animations.  Done. Now I need to explain them better than below.
+   Here is an example of how a user can override a a system-wide
+   texture image or texture definition.
 
-              animation {
-                 name    "animation name"
-                 animdef "animdefname"
-              }
+   For the purposes of this discussion, a 'texture image' represents
+   the file (in TGA format) that contains the image data for the
+   texture.  A 'texture definition' represents a mapping between a WKN
+   texture, and the actual texture's filename/color information.  Texture
+   definitions are specified in texturesrc or *.trc files.
 
-              and then an animation would be specified like so:
+   # overriding a texture image
 
-              animdef {
-                 name "animdefname"
-                 texanim {
-                          .... texture anim data
-                         }
+     When loading texture image (TGA) files, a user's ~/.conquest/img/
+     directory is searched prior to the system-wide
+     (<prefix>/share/img/) image directory.  This allows users to
+     trivially substitute a different texture in place of the system
+     defined ones.  Just make a texture with the same name as the one
+     you want to replace, and put it in your ~/.conquest/img/
+     directory.  Fun to play around with :)
 
-                 colanim {
-                          .... color animation data
-                         }
+   # overriding a texture definition
 
-                 geoanim {
-                          .... geometry anim data
-                         }
-              }
+     You can override one of conquest's WKN texture definitions by
+     adding an appropriate entry into a user .trc file.
 
-              animations will be 'executed' via the main renderNode()
-              function and be fairly autonomous with respect to the
-              primary rendering node.
+     After conquestgl parses the main texturesrc file, it will then
+     load and parse any *.trc files it finds in your ~/.conquest/
+     directory.
 
-* FINISH ME *
+     These files have the same format as texturesrc.  They can be used
+     to remap a WKN texture to a different texture image filename, or to
+     use a different color. 
+
+     So for example, if you absolutely hate the Viewer Backgroud
+     texture (it's WKN is 'vbg'), you could make it whatever you want
+     by creating a ~/.conquest/vbg.trc file with the following
+     contents:
+
+         texture {
+           name "vbg"                      # WKN of the vbg texture
+           filename "my_better_vbg"
+         }
+
+         Then place your 'my_better_vbg.tga' file into your
+         ~/.conquest/img/ directory.
+
+         Now when conquest wants to draw the 'vbg' texture, it will
+         use your definition instead.  
+
+         NOTE: I just randomly chose the name 'vbg.trc' for this
+         example.  You can name the file to whatever you want, just as
+         long as it has a .trc extension.
+
+
+## conquest's texture format
+
+   ConquestGL currently uses Targa (.tga) image format files to
+   represent textures.  This is a simple and easy to use format,
+   though not as good as formats like PNG in terms of compression.
+
+   TGA files you use with in Conquest must have the following
+   characteristics: 
+
+   - uncompressed or RLE compressed TGA
+   - 24 bit RGB or 32bit ARGB pixel data
+   - be a power of two in their width and height, 256x128 is okay,
+     3x27 is not. :)
+
+   I would limit texture sizes to no more than 512x512.
+   
+   For Conquest's textures, I use The Gimp (www.gimp.org) under linux.
+   It can save in compressed ARGB TGA format.  For the 'Save' options
+   dialog, select 'RLE Compressed' and de-select 'Origin in lower
+   left'.
+
+
+
+$Id$

@@ -1140,9 +1140,11 @@ void uiDrawPlanet( GLfloat x, GLfloat y, int pnum, int scale,
           torpchar = Teams[Planets[pnum].team].torpchar;
 
       if (showpnams)
-        {
-          strcpy(planame, Planets[pnum].name);
-          planame[3] = EOS;    /* just want first 3 chars */
+        {                       /* just want first 3 chars */
+          planname[0] = Planets[pnum].name[0];
+          planname[1] = Planets[pnum].name[1];
+          planname[2] = Planets[pnum].name[2];
+          planame[3] = EOS;
         }
       else
         planame[0] = EOS;
@@ -2224,7 +2226,7 @@ void drawDoomsday(GLfloat x, GLfloat y, GLfloat angle, GLfloat scale)
 
 /* (maybe) draw the Negative Energy Barrier */
 /* this routine is a bit more complicated than the original neb rendering,
-   however it's a lot faster and 'works' better by providing a more
+   however it's a lot faster and 'works' better by providing more
    accurate scaling and motion in relation to the ship.
 
    The neb is rendered as a series (maximum of 2) barrier 'walls' that are
@@ -2529,17 +2531,12 @@ void drawNEB(int snum)
 void drawViewerBG(int snum, int dovbg)
 {
   GLfloat z = TRANZ * 3.0;
-
   /* barrier inner edge mask */
-
   const GLfloat size = VIEWANGLE * 34.0; /* empirically determined */
   const GLfloat sizeh = (size / 2.0);
-
   /* star field inside barrier - the galaxy */
-
   GLfloat sizeb = (VIEWANGLE * (20.0 + 14)) / 2.0;
-
-   GLfloat x, y, rx, ry;
+  GLfloat x, y, rx, ry;
   static GLint texid_vbg = 0;
 
   if (snum < 1 || snum > MAXSHIPS)
@@ -2556,7 +2553,10 @@ void drawViewerBG(int snum, int dovbg)
       if ((ndx = findGLTexture("vbg")) >= 0)
         texid_vbg = GLTextures[ndx].id;
       else
-        texid_vbg = 0;
+        {
+          texid_vbg = 0;
+          return;
+        }
     }
 
   if (!dovbg && !(UserConf.DoTacBkg && SMAP(snum)))

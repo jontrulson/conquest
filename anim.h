@@ -12,7 +12,7 @@
 #include "datatypes.h"
 #include "conqinit.h"
 
-/* basic state used/modified by an animator */
+/* basic draw state used/modified by an animator */
 typedef struct _anim_draw_state {
   /* texture id */
   GLint id;
@@ -156,8 +156,8 @@ typedef struct _gl_animdef {
 
 /* a struct for the animation Que that nodes will use */
 typedef struct _anim_que {
-  int maxentries;               /* current max entries que can
-                                    currently hold */
+  int maxentries;               /* max entries que can
+                                   currently hold */
   int numentries;               /* number of states in que */
 
   animStatePtr_t *que;          /* que of anim state ptrs to run */
