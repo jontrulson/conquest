@@ -2560,9 +2560,6 @@ static int nCPIdle(void)
       return NODE_EXIT;
     }
 
-  /* send a UDP keepalive packet if it's time */
-  sendUDPKeepAlive();
-
   /* send a ping if it's time */
   if (!pingPending && ((iternow - pingtime) > pingwait))
     {                           /* send a ping request */

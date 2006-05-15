@@ -1034,15 +1034,26 @@ void processPacket(Unsgn8 *buf)
  * game.  This routine will send a CPCMD_KEEPALIVE packet every 60 seconds
  * if a UDP connection is enabled.  Seems to solve clute's problem.
  */
-void sendUDPKeepAlive(void)
+void sendUDPKeepAlive(Unsgn32 timebase)
 {
   static Unsgn32 katime = 0;     /* UDP keepalive packets */
-  const Unsgn32 kawait = 60000;  /* ms (60 seconds) */
-  Unsgn32 iternow = clbGetMillis();  
+  static const Unsgn32 kawait = 30000;  /* ms (30 seconds) */
+  Unsgn32 iternow;
+
+  if (!cInfo.doUDP)
+    return;                     /* no point */
+
+  if (timebase)                 /* don't query the clock */
+    iternow = timebase;
+  else
+    iternow = clbGetMillis();  
 
   /* send a UDP keepalive packet if it's time */
   if (((iternow - katime) > kawait) && cInfo.usock != -1)
     {
+#if 0
+      clog("%s: Sending CPCMD_KEEPALIVE\n", __FUNCTION__);
+#endif
       sendCommand(CPCMD_KEEPALIVE, 0);
       katime = iternow;
     }

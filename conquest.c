@@ -3367,7 +3367,7 @@ int play()
         }
 
       /* send a UDP keepalive packet if it's time */
-      sendUDPKeepAlive();
+      sendUDPKeepAlive(0);
 
     } /* while stillalive */
 	  

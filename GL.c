@@ -33,6 +33,7 @@
 #undef NOEXTERN_GLANIM
 
 #include "node.h"
+#include "client.h"
 #include "conf.h"
 #include "cqkeys.h"
 #include "record.h"
@@ -782,10 +783,16 @@ void drawIconHUDDecal(GLfloat rx, GLfloat ry, GLfloat w, GLfloat h,
       id = GLShips[steam][stype].ico_sh;
       break;
     case HUD_DECAL1:
-      id = GLShips[steam][stype].decal1;
+      if (UserConf.DoNativeLang)
+        id = GLShips[steam][stype].decal1;
+      else
+        id = GLShips[TEAM_FEDERATION][stype].decal1;
       break;
     case HUD_DECAL2:
-      id = GLShips[steam][stype].decal2;
+      if (UserConf.DoNativeLang)
+        id = GLShips[steam][stype].decal2;
+      else
+        id = GLShips[TEAM_FEDERATION][stype].decal2;
       break;
     case HUD_HEAD:
       id = GLShips[steam][stype].dial;
@@ -1141,9 +1148,9 @@ void uiDrawPlanet( GLfloat x, GLfloat y, int pnum, int scale,
 
       if (showpnams)
         {                       /* just want first 3 chars */
-          planname[0] = Planets[pnum].name[0];
-          planname[1] = Planets[pnum].name[1];
-          planname[2] = Planets[pnum].name[2];
+          planame[0] = Planets[pnum].name[0];
+          planame[1] = Planets[pnum].name[1];
+          planame[2] = Planets[pnum].name[2];
           planame[3] = EOS;
         }
       else
@@ -1708,6 +1715,9 @@ static int renderNode(void)
             return rv;
         }
 
+      /* send a udp keep alive if it's time */
+      sendUDPKeepAlive(frameTime);
+
       if (onode && onode->idle)
         {
           rv = (*onode->idle)();
@@ -2227,13 +2237,15 @@ void drawDoomsday(GLfloat x, GLfloat y, GLfloat angle, GLfloat scale)
 /* (maybe) draw the Negative Energy Barrier */
 /* this routine is a bit more complicated than the original neb rendering,
    however it's a lot faster and 'works' better by providing more
-   accurate scaling and motion in relation to the ship.
+   accurate scaling and motion in relation to the ship.  In addition,
+   if you can't see it, we won't waste time rendering it.
 
-   The neb is rendered as a series (maximum of 2) barrier 'walls' that are
-   only drawn when they would be in view.  They are scaled
+   The neb is rendered as a series (maximum of 2) barrier 'walls' that
+   are only drawn when they would be in view.  They are scaled
    appropriately and drawn at the ship's depth plane.  The old neb
    renderer would draw 1 large quad underneath the VBG, which made the
-   perspective 'a little strange'.
+   perspective wrong.  This also required that the neb quad be
+   rendered all the time, even if you couldn't see it.
 
    First we determine what qaudrant we are in.  From there we plot two
    imaginary points aligned with the ship's x/y coordinates, and
@@ -2260,13 +2272,13 @@ void drawNEB(int snum)
   GLfloat nebWidth, nebHeight;
   static GLfloat nebWidthSR, nebHeightSR;
   static GLfloat nebWidthLR, nebHeightLR;
-  static GLfloat nebX, nebY;
+  GLfloat nebX, nebY;
   static GLint texid_neb;
+  static GLColor_t col_neb;
   static const int maxtime = 100;
   static Unsgn32 lasttime = 0;
   static GLfloat r0 = 0.0;
   static GLfloat r1 = 1.0;
-  static GLColor_t col;
   static int norender = FALSE;
 
   if (norender)
@@ -2282,7 +2294,7 @@ void drawNEB(int snum)
       if ((ndx = findGLTexture("barrier")) >= 0)
         {
           texid_neb = GLTextures[ndx].id;
-          col = GLTextures[ndx].col;
+          col_neb = GLTextures[ndx].col;
         }
       else
         {
@@ -2432,10 +2444,10 @@ void drawNEB(int snum)
   nebWidth = (SMAP(snum) ? nebWidthLR : nebWidthSR);
   nebHeight = (SMAP(snum) ? nebHeightLR : nebHeightSR);
 
-  glColor4f(col.r,
-            col.g,
-            col.b,
-            col.a);
+  glColor4f(col_neb.r,
+            col_neb.g,
+            col_neb.b,
+            col_neb.a);
 
   if (nebYVisible)
     {

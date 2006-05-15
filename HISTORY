@@ -9,14 +9,25 @@
 
                               Conquest HISTORY
 
-??? 8.1.2c (devel) 5/7/2006
+8.1.2c (devel) 5/7/2006
+
+       - new user option 'do_native_lang'.  When set to true, you will
+         see the scale labels in the HUD displayed in the team's
+         'native' language.  When false (default) you will see the
+         labels in english (Federation).  Yes, this is a bit of a
+         hack.  When Cat can deliver to me Orion, Romulan, and Klingon
+         language font files, then we can do it properly :)
 
        - fixed up the limit checks in GLcvtcoords().  Now we are a bit
          more agressive in checking the visbility of an object before
          rendering it, particularly in LR view.
 
-       - redid the Negative Energy Barrier (NEB).  It's split off into
-         a seperate function. 
+       - UDP keepalive's are sent from the client to the server every
+         30 seconds from the GL client, regardless of what screen you
+         are on.  Previously these were only sent if you were in the
+         cockpit (CP).
+
+       - redid the Negative Energy Barrier (NEB).  
 
          The NEB is now drawn as a 'wall' (and at most, only 2 can
          possibly be in view at a time), rather than the large
@@ -24,16 +35,17 @@
 
          This allows us to be smart and not render it when it's not in
          view (saving frames and cycles).  Also, the TOS-bmsk texture
-         is no longer needed as a result, and has been removed.
+         is no longer needed now, and has been removed.
 
-         In addition, the barrier's width/height are now scaled
-         properly in relation the ship's position.  It looks alot
-         bigger in SR view when you are passing through it :)
+         In addition, the barrier is now drawn at the ship's depth
+         plane, correcting it's position and size relative to the
+         ship. It sure looks alot bigger in SR view when you are
+         passing through it :)
 
        - finished CONQINIT.TXT, describing CQI, and the format of the
          conqinitrc and texturesrc files in all their glory.
 
-       8.1.2b (not released)
+       8.1.2b (not publically released)
 
        - fix bug in render.c that miscalculated the size of the warp
          indicator quad in certain situations.
@@ -54,15 +66,15 @@
          (doomsday-ap-fire) specified in texturesrc.
 
        - modify CQI parser to allow (ab)using a texture {} section
-         simply to store a 'named' color.  This is done by treating
+         to store 'named' colors.  This is done by treating
          texture definitions that specify "" as the filename, as a
          special case, indicating that only a color is specified
          there.  I just didn't see the point in creating a whole new
          'colordef' section and related CQI infrastructure just for
-         this.
+         color parsing and storage.
 
-         I think all colors used in conquestgl will eventually
-         be specifed this way.
+         All colors used in conquestgl will eventually be specifed
+         this way.
 
        - merge 8.1.2a into conquest HEAD branch.  
 

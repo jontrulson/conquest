@@ -314,7 +314,6 @@ static int nMenuIdle(void)
       return NODE_EXIT;
     }
 
-
   return NODE_OK;
 }
 

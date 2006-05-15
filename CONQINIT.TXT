@@ -36,13 +36,22 @@ CONTENTS:
        contained therein.
 
        This document is intended for developers, or those who want to
-       modify the characteristics of their conquest experience :)  
+       modify the characteristics of their conquest experience :) 
 
-       CQI data is currently used to represent all planet data (name,
-       size, type, team, etc), all texture data (Well Known Name
-       (WKN)), filename, color), animation data (WKN, animdef), and
-       animdefs (name, animation characteristics).  A detailed
-       description of each of these is given below.
+       If you are not interested in any of that, there is probably no
+       point in reading further :)
+
+       CQI data is currently used to represent the following
+       information in Conquest:
+
+       - planet data (name, size, type, team, etc).  Used for
+         initializing the Planets in the common block. 
+       - texture data (Well Known Name (WKN)), 
+         filename, color).  Used for texture drawing.
+       - animation data (WKN, animdef).  Drawing. 
+       - animdef data (name, animation characteristics).  Drawing.
+
+       A detailed description of each of these is given below.
 
        Currently, CQI can be used to parse these types of files:
 
@@ -271,12 +280,12 @@ CONTENTS:
                       armies  20     
                               20 armies placed on planet
 
-                      armies  10 100
-                              a random number of armies,
-                              between 10 and 100, placed on the
-                              planet.  This is typically used for suns
-                              where you want it's 'damage potential' to
-                              vary randomly with each new game.
+                      armies  80 180
+                              a random number of armies, between 80
+                              and 180, placed on the planet.  This
+                              form is typically used for suns where
+                              you want it's 'damage potential' to vary
+                              randomly with each new game.
 
           visible:    BOOL
                       whether the planet is visible
@@ -482,13 +491,12 @@ CONTENTS:
           armed                           - current toggle value (on/off)
 
           An animdef is soley responsible for defining how these
-          values will be modified as the animation is run (or
-          'executed').  Which elements of the animation state that are
-          actually modified also depends entirely on the animdef
-          specification.
+          values will be modified as the animation is 'executed'.
+          Which elements of the animation state that are actually
+          modified also depends entirely on the animdef specification.
 
           Each animdef can contain specifications for up to 4
-          different animation types that can be 'executed' to change
+          different animation types that can be executed to change
           the various components of it's relevant 'state'.  The 4
           types are:
 
@@ -512,7 +520,7 @@ CONTENTS:
           When these animations 'expire' their state (ie: run their
           course), the state is automatically removed from the
           animator's run que.  It's important that you ensure that
-          for animations that conquest is expecting to expire at some
+          any animations that conquest is expecting to expire at some
           future point, actually do expire at some future point :).
 
           Here is an example of the most complicated animdef currently
@@ -814,10 +822,11 @@ CONTENTS:
         'last-ditch' defaults in case the normal files could not be
         parsed for some reason at runtime.
 
-        Note, you should never have to gen any .h files, the parser runs
-        when conquest starts up and will always use the data it found if
-        it can.  Valid texdata.h and initdata.h files are supplied in
-        the conquest distribution.
+        Note, you should never have to gen any .h files, the parser
+        runs when conquest starts up and will always use the data it
+        found if it can.  Valid texdata.h and initdata.h files are
+        supplied in the conquest distribution and should not be
+        modified by end users.
 
       $ conqinit -D 
 
@@ -833,7 +842,7 @@ CONTENTS:
         file and at least change the colors of the suns, and the sun's
         randomized army counts.  Since this data is not currently
         stored in the common block, conqinit tries to choose
-        reasonable defaults for them.  Make sure it did :)
+        reasonable defaults for them.  Make sure it actually did :)
 
         This capability is useful if you init the universe, then use
         conqoper to edit and or create new planets and arrange them
@@ -900,7 +909,8 @@ CONTENTS:
 
          NOTE: I just randomly chose the name 'vbg.trc' for this
          example.  You can name the file to whatever you want, just as
-         long as it has a .trc extension.
+         long as it has a .trc extension, and lives in your
+         ~/.conquest/ directory.
 
 
 ## conquest's texture format
@@ -920,9 +930,9 @@ CONTENTS:
    I would limit texture sizes to no more than 512x512.
    
    For Conquest's textures, I use The Gimp (www.gimp.org) under linux.
-   It can save in compressed ARGB TGA format.  For the 'Save' options
-   dialog, select 'RLE Compressed' and de-select 'Origin in lower
-   left'.
+   It can save in compressed ARGB/RGB TGA format.  For the 'Save'
+   options dialog, select 'RLE Compressed' and de-select 'Origin in
+   lower left'.
 
 
 

@@ -23,6 +23,9 @@
 
   See HISTORY for the latest news and modification history.
 
+  See CONQINIT.TXT for information on CQI, and the format of the
+  conqinitrc and texturesrc files.
+
   See conquest.doc for information on available commands, and how to
   play the game.
 
@@ -49,6 +52,7 @@
        ## Recording Games
        ## Replaying Games
        ## Hints for new players
+          # Orbiting a planet
           # Shields
           # Energy Allocation
           # Bombing
@@ -512,6 +516,24 @@
 ## Hints for new players
 
    Here are some general things to keep in mind while playing.
+
+# Orbiting a planet
+
+  The easiest way to get into orbit around a planet is to lock onto
+  it, set a warp, and let the ship automatically enter orbit when you
+  are close enough.
+
+  For example, to 'lock' onto Janus and enter orbit, enter (kjan\t).
+  When you are close enough, your ship will deccelerate and
+  automatically enter orbit.
+
+  To enter orbit manually, get close to the planet, slow down to warp
+  2 (at the fastest) and hit (o).  You cannot enter orbit if you are
+  going faster than warp 2.
+
+  See the section '## Navigation' for more information on navigating
+  around. 
+
 
 # Shields
 

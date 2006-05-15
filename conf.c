@@ -92,6 +92,8 @@ void setUserConfDefaults(void)
   UserConf.DoShields = TRUE;
   UserConf.DoTacBkg = FALSE;
   UserConf.DoTacShade = 50;
+
+  UserConf.DoNativeLang = FALSE;
   
   for (i=0; i<MAX_MACROS; i++)
     {

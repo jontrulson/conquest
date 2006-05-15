@@ -1258,7 +1258,10 @@ void menu(void)
 	  return;
 	}
       
-      if ( pkttype == 0 )	/* timeout */
+      /* we get sleepy if we are recieving no packets, of only
+         keepalive packets */
+      if ( pkttype == 0 || ((pkttype == CP_COMMAND) && 
+                            CPCMD_KEEPALIVE == (((cpCommand_t *)buf)->cmd)))
 	{
 	  /* We get here if a packet hasn't been recieved. */
 	  sleepy++;
@@ -1266,6 +1269,7 @@ void menu(void)
 	    break;
 	  continue; /* next */
 	}
+
 
       switch(pkttype)
 	{

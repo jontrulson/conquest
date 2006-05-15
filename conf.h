@@ -118,6 +118,10 @@ typedef struct _userConf {
 
   int DoTacShade;               /* tactical background alpha */
 
+  int DoNativeLang;             /* whether to use 'native' language
+                                   text in the hud scale decals, or
+                                   english (federation). */
+
   char MacrosF[MAX_MACROS][MAX_MACRO_LEN];
 
 } UserConf_t;
@@ -732,6 +736,20 @@ struct Conf ConfData[] =
       "# If tactical background is true, this will be the shade alpha",
       "#  valid values 1 - 100",
       "#  Default: 50",
+      NULL
+    }
+  },
+  {
+    FALSE,
+    CTYPE_BOOL,
+    "do_native_lang=",
+    &UserConf.DoNativeLang,
+    0, 0,
+    "Display HUD in the native team language",
+    {
+      "# define this as 'true' if you want certain labels in the HUD",
+      "#  (scales, currently) to be displayed in the team's native language.",
+      "#  Default: false",
       NULL
     }
   },
