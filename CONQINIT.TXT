@@ -501,7 +501,8 @@ CONTENTS:
           types are:
 
           texanim:     Specifies parameters for a texture
-                       animation. Modifies state's 'id' value.
+                       animation. Modifies state's 'id' and 'color'
+                       values .
 
           colanim:     Specifies parameters for a color animation.
                        Modfies the state's 'color' values.
