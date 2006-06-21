@@ -411,7 +411,10 @@ conquestsh_SOURCES = conquestsh.c
 conqmetad_SOURCES = conqmetad.c meta.h
 conqmetad_LDADD = libconqinit.la libconquest.la  $(LEXLIB) $(YACCLIB)
 data_DATA = conquest.doc HISTORY README conqrule 
-sysconf_DATA = conqinitrc texturesrc
+
+# we install conqinitrc in the intall-exec-hook, so that we only install
+#  conqinitrc if it does not already exist.
+sysconf_DATA = texturesrc
 EXTRA_DIST = conquest.doc HISTORY README conqrule # conquestrc
 all: config.h
 	$(MAKE) $(AM_MAKEFLAGS) all-am
@@ -1068,6 +1071,10 @@ install-exec-hook:
 	chgrp $(CONQGROUP) $(DESTDIR)$(CONQLOCALSTATEDIR)
 	cp -f $(IMAGES) $(DESTDIR)$(CONQIMGDIR)/
 	chmod 644 $(DESTDIR)$(CONQIMGDIR)/*.tga $(DESTDIR)$(CONQIMGDIR)/*.txf
+	if [ ! -f $(DESTDIR)$(CONQSYSCONFDIR)/conqinitrc ] ; \
+	then \
+		cp conqinitrc $(DESTDIR)$(CONQSYSCONFDIR)/conqinitrc; \
+	fi
 	chgrp $(CONQGROUP) $(DESTDIR)$(CONQSYSCONFDIR)/*rc
 	chmod 664 $(DESTDIR)$(CONQSYSCONFDIR)/*rc
 	chmod 755 $(prefix) $(DESTDIR)$(datadir)

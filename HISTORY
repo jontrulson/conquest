@@ -9,6 +9,45 @@
 
                               Conquest HISTORY
 
+8.1.2d (devel) 6/17/2006
+
+       - added 'bombing' graphics.  Now when you bomb a planet, you
+         see explosions on it.  
+         
+         The server protocol changed as a result, though the change is
+         backward compatible.  
+
+         When connecting to an older server (< 8.1.2d) you will only
+         see explosions if you are bombing a planet yourself (we fake
+         it on the client).  'Bombing' state for a ship won't be
+         recorded, so you won't see the bombing graphics when playing
+         it back.
+
+         Playing on a newer server (>= 8.1.2d), you will see bombing
+         graphics for any ship in scanning range that is currently
+         bombing a planet.  In addition, recording files, when played
+         back, will show bombing graphics for those ships that were
+         bombing at the time. 
+
+       - fixed problem in GL client, where if a planet's type, etc
+         changed after initGLPlanets was run, the user would not see
+         the change in texture/color/size, etc.  Now we update the GL
+         display characteristics of a planet whenever a packet that
+         could affect these characteristics arrives.
+
+       - when doing a 'make install', only overwrite the system
+         conquestrc file if it does not already exist, to prevent
+         accidentally overwriting any local planet modifications.  The
+         texturesrc file is always overwritten on install.
+
+       - cleaned up the Klingon warp indicator texture.
+
+       - fixed drawTexBox to not gratutitously invert Y, and adjusted
+         planet textures to compensate.  Same for drawTexQuad and the
+         conq-logo textures. Now, WYSIWYG as far as texture editing
+         goes.
+
+
 8.1.2c (devel) 5/7/2006
 
        - new user option 'do_native_lang'.  When set to true, you will

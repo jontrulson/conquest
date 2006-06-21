@@ -913,11 +913,6 @@ texture {
 }
 
 texture {
-  name         "Praxis"
-  filename     "praxis"
-}
-
-texture {
   name         "Siriusminor"
   filename     "siriusminor"
 }
@@ -936,6 +931,12 @@ texture {
 animation {
   name         "explosion"
   animdef      "explode"
+}
+
+# like explosion, but smaller/quicker
+animation {
+  name         "bombing"
+  animdef      "bomb"
 }
 
 # blinker animations
@@ -1111,5 +1112,37 @@ animdef {
 
   toganim {
     delayms    700
+  }
+}
+
+# bombing animdef
+# this is the similiar to 'explosion' but is smaller in size
+#  and doesn't last as long.
+animdef {
+  name         "bomb"
+  texname      "exp"
+
+  # initial state
+  istate {
+    size       100         # in CU's
+  }
+    
+  texanim {
+    stages     16
+    loops      1
+    delayms    40
+  }
+
+  # this runs when texanim has expired
+  # fade to black...
+  colanim {
+    stages     10
+    loops      1
+    delayms    20
+    
+    deltaa     -0.1 
+    deltar     0.0
+    deltag     -0.001
+    deltab     -0.01
   }
 }

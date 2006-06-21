@@ -752,7 +752,7 @@ void renderHud(int dostats)
   return;
 }
 
-void renderViewer(int dovbg)
+void renderViewer(int dovbg, int dobomb)
 {
   /* setup the proper viewport and projection matrix for the viewer */
   glViewport(dConf.vX, 
@@ -763,21 +763,14 @@ void renderViewer(int dovbg)
   glLoadMatrixf(dConf.vmat);
   glMatrixMode(GL_MODELVIEW);
   
-#if 0
-   /* TEST */
-  glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
-  glEnable(GL_BLEND);
-  glColor4f(0.2, 0.2, 0.2, 1.0);
-  drawQuad(-((GLfloat)dConf.vW / 2.0), 
-           -((GLfloat)dConf.vH / 2.0), 
-           (GLfloat)dConf.vW, (GLfloat)dConf.vH, TRANZ/ 2.0);
-  glDisable(GL_BLEND);
-#endif
-
   drawViewerBG(Context.snum, dovbg);
   drawNEB(Context.snum);
 
   display( Context.snum, FALSE );
+
+  /* if we're faking it, (nCP.c), do it */
+  if (dobomb)
+    drawBombing(Context.snum);
 
 #if 0                           /* TEST GRID */
   {

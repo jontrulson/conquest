@@ -1,4 +1,4 @@
-$Id$
+CONQINIT, the Unrated Edition.
 
 
 CONTENTS:
@@ -518,11 +518,11 @@ CONTENTS:
                        animation.  Modfies the state's 'armed' value.
 
 
-          When these animations 'expire' their state (ie: run their
-          course), the state is automatically removed from the
-          animator's run que.  It's important that you ensure that
-          any animations that conquest is expecting to expire at some
-          future point, actually do expire at some future point :).
+          When these animations expire, their state is automatically
+          removed from the animator's run que.  It's important that
+          you ensure that any animations that conquest is expecting to
+          expire at some future point, actually do expire at some
+          future point :).
 
           Here is an example of the most complicated animdef currently
           provided.  Although this example incorporates components
@@ -539,7 +539,7 @@ CONTENTS:
             # initial state
             istate {                             # optional
               size       450         # in CU's   # optional
-              angle      -1.0        # random
+              angle      -1.0        # random    # optional
             }
     
             texanim {                            # optional
@@ -587,7 +587,7 @@ CONTENTS:
 
                       If the animdef specifies a texanim, then this
                       name is used to look up the textures for each of
-                      the stages in the texanim, by concatinating the
+                      the stages in the texanim, by concatenating the
                       stage number onto the texname. In the example
                       above, the texanim will look for and use,
                       WKN textures named 'exp0', 'exp1', ..., 'exp15',
@@ -761,11 +761,6 @@ CONTENTS:
             A toganim combined with another animation type will expire
             as soon as all other specified animation types have expired.
 
-            toganim's are primarily used in conquest as 'blinkers'.
-            For example the 'onesec' animdef provides a 'blinker' anim
-            that toggles it's state from on to off (and vice-versa),
-            every second.
-
             delayms:    NUMBER
                         The delay, in milliseconds, before toggling
                         the state's 'armed' variable.
@@ -920,7 +915,7 @@ CONTENTS:
    represent textures.  This is a simple and easy to use format,
    though not as good as formats like PNG in terms of compression.
 
-   TGA files you use with in Conquest must have the following
+   TGA files you use in Conquest must have the following
    characteristics: 
 
    - uncompressed or RLE compressed TGA

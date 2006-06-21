@@ -2493,8 +2493,16 @@ void nCPInit(void)
 
 static int nCPDisplay(dspConfig_t *dsp)
 {
+  /* Older servers do not send the ships SHIP_F_BOMBING flag, so if
+     our state is S_BOMBING, but our ship isn't marked as such (by the
+     server), we fake it by setting dobombing, so you can at least see
+     your own ship bombing a planet.  If the server is new enough to
+     send this flag, gldisplay() will display it instead of this
+     boolean. */
+  int dobombing = ((state == S_BOMBING) && !SBOMBING(Context.snum));
+
   /* Viewer */
-  renderViewer(UserConf.doVBG);
+  renderViewer(UserConf.doVBG, dobombing);
 
   /* Main/Hud */
   renderHud(dostats);

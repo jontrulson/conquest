@@ -330,6 +330,8 @@ void display( int snum, int display_info )
 			  color = YellowLevelColor; /* special view */
 
 			drawShip(glx, gly, Ships[i].head, ch, i, color, scale);
+                        if (SBOMBING(i))
+                          drawBombing(i);
 		      }
 		  }
 	      }

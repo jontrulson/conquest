@@ -245,6 +245,7 @@ void drawLineBox(GLfloat x, GLfloat y,
 void drawQuad(GLfloat x, GLfloat y, GLfloat w, GLfloat h, GLfloat z);
 void drawTexQuad(GLfloat x, GLfloat y, GLfloat w, GLfloat h, GLfloat z);
 void drawExplosion(GLfloat x, GLfloat y, int snum, int torpnum);
+void drawBombing(int snum);
 
 void dspInitData(void);
 void hex2GLColor(Unsgn32 hcol, GLColor_t *col);

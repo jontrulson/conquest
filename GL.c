@@ -61,8 +61,11 @@ static real torpdir[MAXSHIPS + 1][MAXTORPS];
 /* loaded texture list (the list itself is exported in textures.h) */
 static int loadedGLTextures = 0; /* count of total successful tex loads */
 
-/* torp animation state */
+/* torp animation states */
 static animStateRec_t torpAStates[MAXSHIPS + 1][MAXTORPS] = {};
+ 
+/* bomb (torp) animation state */
+static animStateRec_t bombAState[MAXSHIPS + 1] = {};
  
 dspData_t dData;
 
@@ -584,12 +587,173 @@ static int initGLShips(void)
 
 }
 
+/* figure out the texture, color, and size info for a planet */
+static int _get_glplanet_info(GLPlanet_t *curGLPlanet, int plani)
+{
+  int ndx;
+  GLfloat size;
+  int gltndx = -1;
+  int plnndx = -1;
+
+  if (!GLPlanets)
+    return FALSE;
+
+  if (plani < 1 || plani > NUMPLANETS)
+    return FALSE;
+
+  /* first find the appropriate texture.  We look for one in this order: 
+   *
+   * 1. look for a cqiPlanets entry for the planet.  If so, and it
+   *    specifies a texture, try to use it if present.  
+   * 2. If no cqiPlanets[] entry for the planet, (or the specified
+   *    texture was not available) look for a texture named
+   *    the same as the planet.  If available, use it.
+   * 3. All else failing, then select a default texture (classm, etc)
+   *    based on the planet type.
+   */
+  
+  if ((ndx = cqiFindPlanet(Planets[plani].name)) >= 0)
+    {                       /* found one. */
+      /* save the index for possible color and size setup */
+      plnndx = ndx;
+      
+      /* see if it specified a texture */
+      
+      if (strlen(cqiPlanets[ndx].texname))
+        if ((ndx = findGLTexture(cqiPlanets[ndx].texname)) >= 0)
+          gltndx = ndx;     /* yes, and it is present */
+    }
+  
+  /* still no texture? */
+  if (gltndx == -1)
+    {                       /* see if there is a texture available
+                               named after the planet */
+      if ((ndx = findGLTexture(Planets[plani].name)) >= 0)
+        gltndx = ndx;       /* yes */
+    }
+  
+  /* still no luck? What a loser. */
+  if (gltndx == -1)
+    {                       /* now we just choose a default */
+      switch (Planets[plani].type)
+        {
+        case PLANET_SUN:
+          gltndx = findGLTexture("star");
+          break;
+          
+        case PLANET_CLASSM:
+          gltndx = findGLTexture("classm");
+          break;
+          
+        case PLANET_DEAD:
+          gltndx = findGLTexture("classd");
+          break;
+          
+        case PLANET_MOON:
+        default:
+          gltndx = findGLTexture("luna");
+          break;
+        }
+    }
+  
+  /* if we still haven't found one, it's time to accept defeat
+     and bail... */
+  
+  if (gltndx == -1)
+    {
+      clog("%s: ERROR: Unable to locate a texture for planet '%s'.", 
+           __FUNCTION__,
+           Planets[plani].name);
+      
+      return FALSE;
+    }
+  
+  /* now we are set, setup initial state for the glplanet */
+  
+  curGLPlanet->gltex = &GLTextures[gltndx];
+  curGLPlanet->id = curGLPlanet->gltex->id; /* a copy of the texid */
+  
+  /* choose the base color */
+  
+  /* if the texture has specified a color, use that */
+  if (HAS_GLCOLOR(&(curGLPlanet->gltex->col)))
+    curGLPlanet->col = curGLPlanet->gltex->col;
+  else if (plnndx != -1 && cqiPlanets[plnndx].color)/* cqiPlanet */
+    hex2GLColor(cqiPlanets[plnndx].color, &(curGLPlanet->col));
+  else
+    {                       /* we choose a default */
+      switch (Planets[plani].type)
+        {
+        case PLANET_SUN:    /* default to red for unknown suns */
+          hex2GLColor(0xffcc0000, &(curGLPlanet->col)); 
+          break;
+        default:            /* off white for everything else */
+          hex2GLColor(0xffe6e6e6, &(curGLPlanet->col)); 
+          break;
+        }
+    }
+  
+  /* size - should use server values if available someday, for now use
+     cqi, and if not that, the standard defaults */
+  
+  if (plnndx == -1)
+    {
+      /* no cqi planet was found so will set a default.  One day the
+         server might send this data :) */
+      switch (Planets[plani].type)
+        {
+        case PLANET_SUN:
+          size = 50.0;
+          break;
+        case PLANET_MOON:
+          size = 5.0;
+          break;
+        default:
+          size = 10.0;
+          break;
+        }
+    }
+  else
+    {                       /* cqi was found, so get/cvt it. */
+      size = cu2GLSize(cqiPlanets[plnndx].size);
+#if 0
+      clog("Computed size %f for planet %s\n",
+           size, Planets[plani].name);
+#endif
+    }
+  
+  curGLPlanet->size = size;
+  
+  return TRUE;
+}
+
+/* uiUpdatePlanet - this is called by the client when a packet that
+   could change the appearance of a planet arrives.  Here, we load the
+   GLPlanet struct for the planet, go through the process of
+   determining it's texture, color, etc and set up the relevant
+   GLPlanet items so that you will see the change.
+*/
+int uiUpdatePlanet(int plani)
+{
+  GLPlanet_t *curGLPlanet = NULL;
+
+  if (!GLPlanets)
+    return FALSE;
+
+  if (plani < 1 || plani > NUMPLANETS)
+    return FALSE;
+
+  curGLPlanet = &GLPlanets[plani - 1];
+
+  return _get_glplanet_info(curGLPlanet, plani);
+}
+
+
 /* initialize the GLPlanets array */
 static int initGLPlanets(void)
 {
-  int i, ndx;
+  int i;
   GLPlanet_t curGLPlanet;
-  GLfloat size;
 
   clog("%s: Initializing...", __FUNCTION__);
 
@@ -616,134 +780,11 @@ static int initGLPlanets(void)
   for (i=0; i<NUMPLANETS; i++)
     {
       int plani = i + 1;        /* cleaner looking instead of +1 crap? */
-      int gltndx = -1;
-      int plnndx = -1;
 
       memset((void *)&curGLPlanet, 0, sizeof(GLPlanet_t));
 
-      /* first find the appropriate texture.  We look for one in this order: 
-       *
-       * 1. look for a cqiPlanets entry for the planet.  If so, and it
-       *    specifies a texture, try to use it if present.  
-       * 2. If no cqiPlanets[] entry for the planet, (or the specified
-       *    texture was not available) look for a texture named
-       *    the same as the planet.  If available, use it.
-       * 3. All else failing, then select a default texture (classm, etc)
-       *    based on the planet type.
-       */
-
-      if ((ndx = cqiFindPlanet(Planets[plani].name)) >= 0)
-        {                       /* found one. */
-          /* save the index for possible color and size setup */
-          plnndx = ndx;
-
-          /* see if it specified a texture */
-
-          if (strlen(cqiPlanets[ndx].texname))
-            if ((ndx = findGLTexture(cqiPlanets[ndx].texname)) >= 0)
-              gltndx = ndx;     /* yes, and it is present */
-        }
-
-      /* still no texture? */
-      if (gltndx == -1)
-        {                       /* see if there is a texture available
-                                   named after the planet */
-          if ((ndx = findGLTexture(Planets[plani].name)) >= 0)
-            gltndx = ndx;       /* yes */
-        }
-
-      /* still no luck? What a loser. */
-      if (gltndx == -1)
-        {                       /* now we just choose a default */
-          switch (Planets[plani].type)
-            {
-            case PLANET_SUN:
-              gltndx = findGLTexture("star");
-              break;
-              
-            case PLANET_CLASSM:
-              gltndx = findGLTexture("classm");
-              break;
-              
-            case PLANET_DEAD:
-              gltndx = findGLTexture("classd");
-              break;
-              
-            case PLANET_MOON:
-            default:
-              gltndx = findGLTexture("luna");
-              break;
-            }
-        }
-
-      /* if we still haven't found one, it's time to accept defeat
-         and bail... */
-
-      if (gltndx == -1)
-        {
-          clog("%s: ERROR: Unable to locate a texture for planet '%s'.", 
-               __FUNCTION__,
-               Planets[plani].name);
-          
-          return FALSE;
-        }
-
-      /* now we are set, setup initial state for the glplanet */
-      
-      curGLPlanet.gltex = &GLTextures[gltndx];
-      curGLPlanet.id = curGLPlanet.gltex->id; /* a copy of the texid */
-
-      /* choose the base color */
-
-      /* if the texture has specified a color, use that */
-      if (HAS_GLCOLOR(&curGLPlanet.gltex->col))
-        curGLPlanet.col = curGLPlanet.gltex->col;
-      else if (plnndx != -1 && cqiPlanets[plnndx].color)/* cqiPlanet */
-        hex2GLColor(cqiPlanets[plnndx].color, &curGLPlanet.col);
-      else
-        {                       /* we choose a default */
-          switch (Planets[plani].type)
-            {
-            case PLANET_SUN:    /* default to red for unknown suns */
-              hex2GLColor(0xffcc0000, &curGLPlanet.col); 
-              break;
-            default:            /* off white for everything else */
-              hex2GLColor(0xffe6e6e6, &curGLPlanet.col); 
-              break;
-            }
-        }
-  
-      /* size - should use server values if available someday, for now use
-         cqi, and if not that, the standard defaults */
-
-      if (plnndx == -1)
-        {
-          /* no cqi planet was found so will set a default.  One day the
-             server might send this data :) */
-          switch (Planets[plani].type)
-            {
-            case PLANET_SUN:
-              size = 50.0;
-              break;
-            case PLANET_MOON:
-              size = 5.0;
-              break;
-            default:
-              size = 10.0;
-              break;
-            }
-        }
-      else
-        {                       /* cqi was found, so get/cvt it. */
-          size = cu2GLSize(cqiPlanets[plnndx].size);
-
-#if 0
-          clog("Computed size %f for planet %s\n",
-               size, Planets[plani].name);
-#endif
-        }
-      
-      curGLPlanet.size = size;
+      if (!_get_glplanet_info(&curGLPlanet, plani))
+        return FALSE;
 
       /* we're done, assign it and go on to the next one */
       GLPlanets[i] = curGLPlanet;
@@ -973,16 +1014,16 @@ void drawTexBox(GLfloat x, GLfloat y, GLfloat z, GLfloat size)
   rx = x - (size / 2);
   ry = y - (size / 2);
 
-  glTexCoord2f(0.0f, 0.0f);
+  glTexCoord2f(0.0f, 1.0f);
   glVertex3f(rx, ry, z); /* ll */
 
-  glTexCoord2f(1.0f, 0.0f);
+  glTexCoord2f(1.0f, 1.0f);
   glVertex3f(rx + size, ry, z); /* lr */
 
-  glTexCoord2f(1.0f, 1.0f);
+  glTexCoord2f(1.0f, 0.0f);
   glVertex3f(rx + size, ry + size, z); /* ur */
 
-  glTexCoord2f(0.0f, 1.0f);
+  glTexCoord2f(0.0f, 0.0f);
   glVertex3f(rx, ry + size, z); /* ul */
 
   return;
@@ -1044,6 +1085,118 @@ void drawExplosion(GLfloat x, GLfloat y, int snum, int torpnum)
 
   glBegin(GL_POLYGON);
   drawTexBox(0.0, 0.0, 0.0, torpAStates[snum][torpnum].state.size);
+  glEnd();
+
+  glDisable(GL_TEXTURE_2D); 
+  glDisable(GL_BLEND);
+
+  glPopMatrix();
+
+  return;
+}
+
+/* draw bombing graphics */
+void drawBombing(int snum)
+{
+  scrNode_t *curnode = getTopNode();
+  GLfloat x, y;
+  int i;
+  static animStateRec_t initastate;    /* initial state of a bomb explosion */
+  struct _rndxy {               /* anim state private area */
+    real rndx;                  /* random X offset from planet */
+    real rndy;                  /* random Y offset from planet */
+  } *rnd;
+
+  if (snum < 1 || snum > MAXSHIPS)
+    return;
+
+  /* don't bother if we aren't orbiting anything */
+  if (Ships[snum].lock >= 0)
+    return;
+
+  /* init - look at first ship */
+  if (!bombAState[1].anims)
+    {
+      if (!animInitState("bombing", &initastate, NULL))
+        return;
+
+      /* start out expired */
+      initastate.expired = CQI_ANIMS_MASK;
+
+      for (i=1; i <= MAXSHIPS; i++)
+        {
+          bombAState[i] = initastate;
+
+          /* setup the private area we'll store with the state */
+          if (!(rnd = malloc(sizeof(struct _rndxy))))
+            {                   /* malloc failure, undo everything */
+              int j;
+
+              for (j=1; j < i; j++)
+                free(bombAState[j].state.private);
+              bombAState[1].anims = 0; /* clear 1st so we can retry
+                                          again later */
+              clog("%s: malloc(%d) failed", sizeof(struct _rndxy));
+              return;
+            }
+          else
+            {
+              bombAState[i].state.private = (void *)rnd;
+            }
+        }
+    }
+
+  /* get the state's private area */
+  if (!(rnd = (struct _rndxy *)bombAState[snum].state.private))
+    return;             /* shouldn't happen */
+
+  /* if it's expired, reset for a new one */
+  if (ANIM_EXPIRED(&bombAState[snum]))
+    {
+      /* reset it, adjust the initial starting conditions, and
+         pick a nice place for it. */
+      
+      if (curnode->animQue)
+        {
+          animResetState(&bombAState[snum], frameTime);
+          
+          /* choose a psuedorandom offset from planet x/y, and store
+             them in the state's private area. */
+          /* FIXME - use the planet size to limit, when available someday */
+          rnd->rndx = rnduni(-100.0, 100.0); /* rnd X */
+          rnd->rndy = rnduni(-100.0, 100.0); /* rnd Y */
+          animQueAdd(curnode->animQue, &bombAState[snum]);
+        }
+    }
+
+  glPushMatrix();
+  glLoadIdentity();
+
+  /* calc and translate to correct position */
+  GLcvtcoords( Ships[Context.snum].x, 
+               Ships[Context.snum].y, 
+               Planets[-Ships[snum].lock].x + rnd->rndx,
+               Planets[-Ships[snum].lock].y + rnd->rndy,
+               (SMAP(snum) ? MAP_FAC : SCALE_FAC), 
+               &x, 
+               &y);
+  bombAState[snum].state.x = (real)x;
+  bombAState[snum].state.y = (real)y;
+  glTranslatef(bombAState[snum].state.x , bombAState[snum].state.y, TRANZ);
+
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+  glEnable(GL_BLEND);
+  
+  glEnable(GL_TEXTURE_2D);
+  glBindTexture(GL_TEXTURE_2D, bombAState[snum].state.id);
+  
+  glColor4f(bombAState[snum].state.col.r,
+            bombAState[snum].state.col.g,
+            bombAState[snum].state.col.b,
+            bombAState[snum].state.col.a);
+
+  glBegin(GL_POLYGON);
+  drawTexBox(0.0, 0.0, 0.0, bombAState[snum].state.size);
   glEnd();
 
   glDisable(GL_TEXTURE_2D); 

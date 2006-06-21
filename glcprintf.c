@@ -24,8 +24,8 @@
 
 static char buf[MID_BUFFER_SIZE];
 /* 
- * int lin - line num if pertinent
- * int col - line num if pertinent
+ * int lin - line if pertinent
+ * int col - column if pertinent
  * int align - ALIGN_CENTER 3
  *             ALIGN_RIGHT  2
  *             ALIGN_LEFT   1

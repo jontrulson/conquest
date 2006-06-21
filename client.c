@@ -25,6 +25,8 @@
 #include "msg.h"
 #include "record.h"
 #include "udp.h"
+#include "color.h"
+#include "ui.h"
 
 /* send an auth packet and wait for a response (if not CHPWD).
    returns the error code from the ack, or error from write/read */
@@ -289,6 +291,8 @@ int procPlanet(Unsgn8 *buf)
 
   splan->name[MAXPLANETNAME - 1] = 0;
   strncpy(Planets[pnum].name, splan->name, MAXPLANETNAME);
+
+  uiUpdatePlanet(pnum);
 
   return TRUE;
 }

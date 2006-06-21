@@ -218,7 +218,7 @@ static int nPlayBDisplay(dspConfig_t *dsp)
   char buf[MSGMAXLINE];
       
   /* Viewer */
-  renderViewer(UserConf.doVBG);
+  renderViewer(UserConf.doVBG, FALSE);
 
   /* Main/Hud */
   set_header(Context.snum);

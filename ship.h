@@ -22,6 +22,7 @@
 #define SHIP_F_ROBOT       0x0020 /* true if is a robot ship */
 #define SHIP_F_MAP         0x0040 /* strategic map or not */
 #define SHIP_F_SCANDIST    0x0080 /* ship dist < ACCINFO_DIST */
+#define SHIP_F_BOMBING     0x0100 /* ship is currently bombing */
 
 /* helpers */
 #define SCLOAKED(x)  ( bitIsSet(Ships[x].flags, SHIP_F_CLOAKED) )
@@ -32,6 +33,7 @@
 #define SROBOT(x)    ( bitIsSet(Ships[x].flags, SHIP_F_ROBOT) )
 #define SMAP(x)      ( bitIsSet(Ships[x].flags, SHIP_F_MAP) )
 #define SSCANDIST(x) ( bitIsSet(Ships[x].flags, SHIP_F_SCANDIST) )
+#define SBOMBING(x)  ( bitIsSet(Ships[x].flags, SHIP_F_BOMBING) )
 
 #define SFSET(x, b)  (bitSet(Ships[x].flags, b))
 #define SFCLR(x, b)  (bitClear(Ships[x].flags, b))

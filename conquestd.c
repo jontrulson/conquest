@@ -1691,7 +1691,7 @@ int welcome( int *unum )
   sInfo.isLoggedIn = TRUE;
 
   if ( ! clbGetUserNum( unum, name, 0 ) )
-    {				
+    {
       flags |= SPCLNTSTAT_FLAG_NEW;
       /* Must be a new player. */
       if ( ConqInfo->closed )

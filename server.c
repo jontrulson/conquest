@@ -1564,12 +1564,19 @@ void procBomb(cpCommand_t *cmd)
   ototal = -1;			/* force an update the first time */
   oparmies = -1;
   grand( &entertime );		/* get start time */
+  SFSET(snum, SHIP_F_BOMBING);
   while(TRUE)
     {
       if ( ! clbStillAlive( Context.snum ) )
-	return;
+        {
+          SFCLR(snum, SHIP_F_BOMBING);
+          return;
+        }
       if ( isPacketWaiting(sInfo.sock) )
-	break;
+        {
+          SFCLR(snum, SHIP_F_BOMBING);
+          break;
+        }
       
       /* See if it's time to bomb yet. */
       while ((int) fabs ((real)dgrand( (int)entertime, (int *)&now )) >= BOMBARD_GRAND )
@@ -1615,7 +1622,7 @@ void procBomb(cpCommand_t *cmd)
 	      PVUNLOCK(&ConqInfo->lockword);
 	      total = total + 1;
 	    }
-	}
+	} /* while */
       
       if ( Planets[pnum].armies <= MIN_BOMB_ARMIES )
 	{
@@ -1642,10 +1649,13 @@ void procBomb(cpCommand_t *cmd)
       
       c_sleep( ITER_SECONDS );
       
-    }
+    } /* while */
  cbrk22:
   ;
   
+  /* no longer bombing */
+  SFCLR(snum, SHIP_F_BOMBING);
+
   /* Restore shields. */
   if (oldsshup)
     SFSET(snum, SHIP_F_SHUP);

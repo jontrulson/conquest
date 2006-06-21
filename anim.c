@@ -121,8 +121,15 @@ void animResetState(animStatePtr_t astate, Unsgn32 thetime)
   /* set the starting time in case there is a time limit */
   astate->starttime = thetime;
 
-  /* first reset the draw state from initial draw state */
-  astate->state = astate->istate;
+  /* first reset the draw state from initial draw state - we only copy the
+     non private items - explicitly */
+  astate->state.id    = astate->istate.id;
+  astate->state.col   = astate->istate.col;
+  astate->state.x     = astate->istate.x;
+  astate->state.y     = astate->istate.y;
+  astate->state.z     = astate->istate.z;
+  astate->state.angle = astate->istate.angle;
+  astate->state.size  = astate->istate.size;
 
   /* need to check for a negative angle.  If so, gen a
      random one. */

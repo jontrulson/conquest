@@ -262,7 +262,7 @@ spShipSml_t *spktShipSml(Unsgn8 snum, int rec)
 
   if ((snum == mysnum) || rec)
     {			     /* really only useful for our own ship */
-      sflags |= (SHIP_F_REPAIR | SHIP_F_TALERT);
+      sflags |= (SHIP_F_REPAIR | SHIP_F_TALERT | SHIP_F_BOMBING);
 
       sshipsml.action = (Unsgn8)Ships[snum].action;
       sshipsml.lastblast = htons((Unsgn16)(Ships[snum].lastblast * 100.0));
@@ -310,11 +310,14 @@ spShipSml_t *spktShipSml(Unsgn8 snum, int rec)
 
   if (canscan)
     {				/* if we get all the stats */
-      sflags |= SHIP_F_SHUP;
+      sflags |= SHIP_F_SHUP | SHIP_F_BOMBING;
 
       sshipsml.shields = (Unsgn8)Ships[snum].shields;
       sshipsml.damage = (Unsgn8)Ships[snum].damage;
       sshipsml.armies = Ships[snum].armies;
+
+      /* so we can do bombing */
+      sshipsml.lock = (Sgn16)htons((Unsgn16)Ships[snum].lock);
 
       /* so we can disp phasers in graphical client ;-) */
       sshipsml.lastphase = htons((Unsgn16)(Ships[snum].lastphase * 100.0));

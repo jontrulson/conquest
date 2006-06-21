@@ -22,6 +22,10 @@ typedef struct _anim_draw_state {
   real x, y, z, angle, size;
   /* toggle (it's always either on (non-0) or off (0)) */
   int armed;
+
+  /* a private area for data storage */
+  void *private;
+
 } animDrawStateRec_t, *animDrawStatePtr_t;
 
 /* this structure contains all the state (public and private) needed by
