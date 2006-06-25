@@ -1180,9 +1180,8 @@ void drawBombing(int snum)
                (SMAP(snum) ? MAP_FAC : SCALE_FAC), 
                &x, 
                &y);
-  bombAState[snum].state.x = (real)x;
-  bombAState[snum].state.y = (real)y;
-  glTranslatef(bombAState[snum].state.x , bombAState[snum].state.y, TRANZ);
+
+  glTranslatef(x, y, TRANZ);
 
   glBlendFunc(GL_SRC_ALPHA, GL_ONE);
   glEnable(GL_BLEND);

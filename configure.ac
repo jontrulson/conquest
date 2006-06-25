@@ -6,6 +6,10 @@ dnl
 
 AC_INIT([conquest],[8.1],[jon@radscan.com])
 AC_CONFIG_HEADER(config.h)
+
+dnl disable static libs by default
+AM_DISABLE_STATIC
+
 AM_INIT_AUTOMAKE
 AC_PROG_LIBTOOL
 AC_PROG_YACC
@@ -14,6 +18,8 @@ AC_PATH_X
 AC_PATH_XTRA
 
 AC_PREFIX_DEFAULT(/opt)
+
+
 
 dnl checks the system
 dnl AC_CANONICAL_TARGET([])
@@ -184,6 +190,7 @@ main()
   AC_DEFINE(SYS_ERRLIST_DECLARED, 1, [sys_errlist declared])],[AC_MSG_RESULT(no)],[:])
 
 AM_CONDITIONAL(GLCLIENT, test $GLCLIENT)
+
 AC_CONFIG_FILES([Makefile])
 AC_OUTPUT
 
