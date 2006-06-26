@@ -252,12 +252,12 @@ texture {
 
 texture {
   name         "shipF-ico-decal1"
-  filename     "TOS-fdecal1"
+  filename     "hud-decal1"
 }
 
 texture {
   name         "shipF-ico-decal2"
-  filename     "TOS-fdecal2"
+  filename     "hud-decal2"
 }
 
 texture {
@@ -282,58 +282,33 @@ texture {
 }
 
 texture {
-  name         "shipF-ico-armies"
-  filename     "TOS-fi-armies"
-}
-
-texture {
   name         "shipF-ico-cloak"
-  filename     "TOS-fi-cloak"
-}
-
-texture {
-  name         "shipF-ico-tractor"
-  filename     "TOS-fi-tractor"
+  filename     "ico-cloak"
 }
 
 texture {
   name         "shipF-ico-shcrit"
-  filename     "TOS-fi-shcrit"
+  filename     "ico-shcrit"
 }
 
 texture {
   name         "shipF-ico-engcrit"
-  filename     "TOS-fi-engcrit"
+  filename     "ico-engcrit"
 }
 
 texture {
   name         "shipF-ico-wepcrit"
-  filename     "TOS-fi-wepcrit"
+  filename     "ico-wepcrit"
 }
 
 texture {
   name         "shipF-ico-hulcrit"
-  filename     "TOS-fi-hulcrit"
-}
-
-texture {
-  name         "shipF-ico-shfail"
-  filename     "TOS-fi-shfail"
-}
-
-texture {
-  name         "shipF-ico-engfail"
-  filename     "TOS-fi-engfail"
+  filename     "ico-hulcrit"
 }
 
 texture {
   name         "shipF-ico-repair"
-  filename     "TOS-fi-repair"
-}
-
-texture {
-  name         "shipF-ico-photon"
-  filename     "TOS-fi-photon"
+  filename     "ico-repair"
 }
 
 
@@ -428,12 +403,12 @@ texture {
 
 texture {
   name         "shipR-ico-decal1"
-  filename     "TOS-rdecal1"
+  filename     "hud-decal1"
 }
 
 texture {
   name         "shipR-ico-decal2"
-  filename     "TOS-rdecal2"
+  filename     "hud-decal2"
 }
 
 texture {
@@ -458,59 +433,35 @@ texture {
 }
 
 texture {
-  name         "shipR-ico-armies"
-  filename     "TOS-ri-armies"
-}
-
-texture {
   name         "shipR-ico-cloak"
-  filename     "TOS-ri-cloak"
-}
-
-texture {
-  name         "shipR-ico-tractor"
-  filename     "TOS-ri-tractor"
+  filename     "ico-cloak"
 }
 
 texture {
   name         "shipR-ico-shcrit"
-  filename     "TOS-ri-shcrit"
+  filename     "ico-shcrit"
 }
 
 texture {
   name         "shipR-ico-engcrit"
-  filename     "TOS-ri-engcrit"
+  filename     "ico-engcrit"
 }
 
 texture {
   name         "shipR-ico-wepcrit"
-  filename     "TOS-ri-wepcrit"
+  filename     "ico-wepcrit"
 }
 
 texture {
   name         "shipR-ico-hulcrit"
-  filename     "TOS-ri-hulcrit"
-}
-
-texture {
-  name         "shipR-ico-shfail"
-  filename     "TOS-ri-shfail"
-}
-
-texture {
-  name         "shipR-ico-engfail"
-  filename     "TOS-ri-engfail"
+  filename     "ico-hulcrit"
 }
 
 texture {
   name         "shipR-ico-repair"
-  filename     "TOS-ri-repair"
+  filename     "ico-repair"
 }
 
-texture {
-  name         "shipR-ico-photon"
-  filename     "TOS-ri-photon"
-}
 
 
 # Klingon ships
@@ -604,12 +555,12 @@ texture {
 
 texture {
   name         "shipK-ico-decal1"
-  filename     "TOS-kdecal1"
+  filename     "hud-decal1"
 }
 
 texture {
   name         "shipK-ico-decal2"
-  filename     "TOS-kdecal2"
+  filename     "hud-decal2"
 }
 
 texture {
@@ -634,59 +585,35 @@ texture {
 }
 
 texture {
-  name         "shipK-ico-armies"
-  filename     "TOS-ki-armies"
-}
-
-texture {
   name         "shipK-ico-cloak"
-  filename     "TOS-ki-cloak"
-}
-
-texture {
-  name         "shipK-ico-tractor"
-  filename     "TOS-ki-tractor"
+  filename     "ico-cloak"
 }
 
 texture {
   name         "shipK-ico-shcrit"
-  filename     "TOS-ki-shcrit"
+  filename     "ico-shcrit"
 }
 
 texture {
   name         "shipK-ico-engcrit"
-  filename     "TOS-ki-engcrit"
+  filename     "ico-engcrit"
 }
 
 texture {
   name         "shipK-ico-wepcrit"
-  filename     "TOS-ki-wepcrit"
+  filename     "ico-wepcrit"
 }
 
 texture {
   name         "shipK-ico-hulcrit"
-  filename     "TOS-ki-hulcrit"
-}
-
-texture {
-  name         "shipK-ico-shfail"
-  filename     "TOS-ki-shfail"
-}
-
-texture {
-  name         "shipK-ico-engfail"
-  filename     "TOS-ki-engfail"
+  filename     "ico-hulcrit"
 }
 
 texture {
   name         "shipK-ico-repair"
-  filename     "TOS-ki-repair"
+  filename     "ico-repair"
 }
 
-texture {
-  name         "shipK-ico-photon"
-  filename     "TOS-ki-photon"
-}
 
 
 # Orion ships
@@ -768,12 +695,12 @@ texture {
 
 texture {
   name         "shipO-ico-decal1"
-  filename     "TOS-odecal1"
+  filename     "hud-decal1"
 }
 
 texture {
   name         "shipO-ico-decal2"
-  filename     "TOS-odecal2"
+  filename     "hud-decal2"
 }
 
 texture {
@@ -798,128 +725,33 @@ texture {
 }
 
 texture {
-  name         "shipO-ico-armies"
-  filename     "TOS-oi-armies"
-}
-
-texture {
   name         "shipO-ico-cloak"
-  filename     "TOS-oi-cloak"
-}
-
-texture {
-  name         "shipO-ico-tractor"
-  filename     "TOS-oi-tractor"
+  filename     "ico-cloak"
 }
 
 texture {
   name         "shipO-ico-shcrit"
-  filename     "TOS-oi-shcrit"
+  filename     "ico-shcrit"
 }
 
 texture {
   name         "shipO-ico-engcrit"
-  filename     "TOS-oi-engcrit"
+  filename     "ico-engcrit"
 }
 
 texture {
   name         "shipO-ico-wepcrit"
-  filename     "TOS-oi-wepcrit"
+  filename     "ico-wepcrit"
 }
 
 texture {
   name         "shipO-ico-hulcrit"
-  filename     "TOS-oi-hulcrit"
-}
-
-texture {
-  name         "shipO-ico-shfail"
-  filename     "TOS-oi-shfail"
-}
-
-texture {
-  name         "shipO-ico-engfail"
-  filename     "TOS-oi-engfail"
+  filename     "ico-hulcrit"
 }
 
 texture {
   name         "shipO-ico-repair"
-  filename     "TOS-oi-repair"
-}
-
-texture {
-  name         "shipO-ico-photon"
-  filename     "TOS-oi-photon"
-}
-
-
-# Irken planet textures
-#
-###############
-
-texture {
-  name         "Nhar-Gh'ok"
-  filename     "Nhar-Gh'ok"
-}
-
-texture {
-  name         "Blorch"
-  filename     "blorch"
-}
-
-texture {
-  name         "Callnowia"
-  filename     "callnowia"
-}
-
-texture {
-  name         "Conventia"
-  filename     "conventia"
-}
-
-texture {
-  name         "Conveyors"
-  filename     "conveyors"
-}
-
-texture {
-  name         "Devastis"
-  filename     "devastis"
-}
-
-texture {
-  name         "Foodcourtia"
-  filename     "foodcourtia"
-}
-
-texture {
-  name         "Invalis"
-  filename     "invalis"
-}
-
-texture {
-  name         "Irk"
-  filename     "irk"
-}
-
-texture {
-  name         "Meekrob"
-  filename     "meekrob"
-}
-
-texture {
-  name         "Plookesia"
-  filename     "plookesia"
-}
-
-texture {
-  name         "Siriusminor"
-  filename     "siriusminor"
-}
-
-texture {
-  name         "Vort"
-  filename     "vort"
+  filename     "ico-repair"
 }
 
 

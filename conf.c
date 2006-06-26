@@ -93,8 +93,6 @@ void setUserConfDefaults(void)
   UserConf.DoTacBkg = FALSE;
   UserConf.DoTacShade = 50;
 
-  UserConf.DoNativeLang = FALSE;
-  
   for (i=0; i<MAX_MACROS; i++)
     {
       UserConf.MacrosF[i][0] = EOS;

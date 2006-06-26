@@ -264,9 +264,9 @@ void updateIconHudGeo(void)
   o.d2weptn.w = o.xstatw - (tx + o.decal2.w);
   o.d2weptn.h = o.d2weptg.h * 2.0;
 
-  o.d2allocg.x = tx + ((96.0 / 256.0) * tw);
-  o.d2allocg.y = o.decal2.y + ((185.0 / 256.0) * th);
-  o.d2allocg.w = (((175.0 - 96.0) / 256.0) * tw);
+  o.d2allocg.x = tx + ((50.0 / 256.0) * tw);
+  o.d2allocg.y = o.decal2.y + ((184.0 / 256.0) * th);
+  o.d2allocg.w = (((198.0 - 50.0) / 256.0) * tw);
   o.d2allocg.h = ((17.0 / 256.0) * th);
 
   o.d2allocn.x = o.decal2.x + o.decal2.w;
@@ -280,34 +280,34 @@ void updateIconHudGeo(void)
   o.d2killb.w = (((249.0 - 164.0) / 256.0) * tw);
   o.d2killb.h = ((16.0 / 256.0) * th);
 
-  /* tow message, overlayed in upper left corner of icon area */
-  o.tow.x = tx + 2.0;
-  o.tow.y = o.d1icon.y;
-  o.tow.w = o.d1icon.w * 0.40;
-  o.tow.h = o.d1icon.h * 0.15;
+  /* destructing message.  try to center within viewer. */
+  o.tow.x = dConf.vX + ((dConf.vW / 8.0) * 1.0);
+  o.tow.y = dConf.vY + (dConf.vH - ((dConf.vH / 20.0) * 2.0));
+  o.tow.w = (dConf.vW / 8.0) * 1.0;
+  o.tow.h = (dConf.vH / 20.0) * 1.0;
 
   /* armies in upper right */
-  o.arm.x = tx + ((o.xstatw / 2.0) - (o.arm.w / 2.0));
+  o.arm.x = dConf.vX + ((dConf.vW / 8.0) * 6.0);
   o.arm.y = o.tow.y;
   o.arm.w = o.tow.w;
   o.arm.h = o.tow.h;
 
   /* alert bars */
   o.d1abar1.x = tx + 2.0;
-  o.d1abar1.y = o.tow.y + o.tow.h;
+  o.d1abar1.y = o.d1icon.y + (o.d1icon.h * 0.15);
   o.d1abar1.w = o.d1icon.w * 0.10;
-  o.d1abar1.h = o.d1icon.h - (o.arm.h * 2.0);
+  o.d1abar1.h = o.d1icon.h - ((o.d1icon.h * 0.15) * 2.0);
 
   o.d1abar2.x = o.d1icon.x + o.d1icon.w + o.d1abar1.w;
-  o.d1abar2.y = o.tow.y + o.tow.h;
-  o.d1abar2.w = o.d1icon.w * 0.10;
-  o.d1abar2.h = o.d1icon.h - (o.arm.h * 2.0);
+  o.d1abar2.y = o.d1abar1.y;
+  o.d1abar2.w = o.d1abar1.w;
+  o.d1abar2.h = o.d1icon.h - ((o.d1icon.h * 0.15) * 2.0);
 
   /* alert text (area below the icon decal) */
   o.d1atarg.x = tx + 2.0;
-  o.d1atarg.y = (o.d1icon.y + o.d1icon.h) - o.tow.h;
+  o.d1atarg.y = (o.d1icon.y + o.d1icon.h) - (o.d1icon.h * 0.15);
   o.d1atarg.w = (o.d1abar2.x + o.d1abar2.w) - o.d1atarg.x;
-  o.d1atarg.h = o.arm.h * 0.9;
+  o.d1atarg.h = (o.d1icon.h * 0.15) * 0.9;
 
   /* destructing message.  try to center within viewer. */
   o.cloakdest.x = dConf.vX + ((dConf.vW / 6.0) * 1.0);
@@ -353,7 +353,7 @@ void updateIconHudGeo(void)
 }
 
 void renderScaleVal(GLfloat x, GLfloat y, GLfloat w, GLfloat h, 
-                    TexFont *lfont, int val, int col)
+                    TexFont *lfont, int val, int col, int boxcol)
 {
   char buf32[32];
 
@@ -362,7 +362,7 @@ void renderScaleVal(GLfloat x, GLfloat y, GLfloat w, GLfloat h,
   /* a scale value (number) */
   glfRender(x, y, 0.0, w * 0.9, h * 0.8, lfont, buf32, col, TRUE, FALSE, TRUE);
   
-  drawLineBox(x, y, w, h, BlueColor, 1.0);
+  drawLineBox(x, y, w, h, boxcol, 1.0);
 
   return;
 }
@@ -459,7 +459,7 @@ void renderHud(int dostats)
                  o.d1shn.w, o.d1shn.h,
                  fontFixedTxf, 
                  (dData.sh.shields < 0) ? 0 : dData.sh.shields, 
-                  dData.sh.color);
+                  dData.sh.color, NoColor);
   
   /* damage gauge */
   renderScale(o.d1damg.x, o.d1damg.y, 
@@ -469,7 +469,8 @@ void renderHud(int dostats)
   /* damage num */
   renderScaleVal(o.d1damn.x, o.d1damn.y,
                  o.d1damn.w, o.d1damn.h,
-                 fontFixedTxf, dData.dam.damage, dData.dam.color);
+                 fontFixedTxf, dData.dam.damage, dData.dam.color,
+                 NoColor);
 
   /* fuel guage */
   renderScale(o.d2fuelg.x, o.d2fuelg.y, o.d2fuelg.w, o.d2fuelg.h,
@@ -478,7 +479,8 @@ void renderHud(int dostats)
   /* fuel value */
   renderScaleVal(o.d2fueln.x, o.d2fueln.y,
                  o.d2fueln.w, o.d2fueln.h,
-                 fontFixedTxf, dData.fuel.fuel, dData.fuel.color);
+                 fontFixedTxf, dData.fuel.fuel, dData.fuel.color,
+                 NoColor);
 
   /* etemp guage */
   renderScale(o.d2engtg.x, o.d2engtg.y, o.d2engtg.w, o.d2engtg.h,
@@ -487,7 +489,8 @@ void renderHud(int dostats)
   /* etemp value */
   renderScaleVal(o.d2engtn.x, o.d2engtn.y,
                  o.d2engtn.w, o.d2engtn.h,
-                 fontFixedTxf, dData.etemp.etemp, dData.etemp.color);
+                 fontFixedTxf, dData.etemp.etemp, dData.etemp.color,
+                 BlueColor);
 
   /* wtemp gauge */
   renderScale(o.d2weptg.x, o.d2weptg.y, o.d2weptg.w, o.d2weptg.h,
@@ -496,7 +499,8 @@ void renderHud(int dostats)
   /* wtemp value*/
   renderScaleVal(o.d2weptn.x, o.d2weptn.y,
                  o.d2weptn.w, o.d2weptn.h,
-                 fontFixedTxf, dData.wtemp.wtemp, dData.wtemp.color);
+                 fontFixedTxf, dData.wtemp.wtemp, dData.wtemp.color,
+                 BlueColor);
 
   /* alloc */
   renderAlloc(o.d2allocg.x, o.d2allocg.y, o.d2allocg.w, o.d2allocg.h,
@@ -517,12 +521,45 @@ void renderHud(int dostats)
             o.d2killb.h, fontFixedTxf, dData.kills.kills, InfoColor,
             TRUE, TRUE, TRUE);
 
-  /* towed/towing */
-  if (dData.tow.str[0]) 
-    glfRender(o.tow.x, o.tow.y, 0.0, 
-              o.tow.w, o.tow.h, 
-              fontFixedTxf, dData.tow.str, 
-              MagentaColor | CQC_A_BOLD, TRUE, FALSE, TRUE);
+  /* towed-towing/armies/destruct */
+  if (dData.tow.str[0] || dData.armies.str[0] || dData.cloakdest.str[0] == 'D')
+    {
+      /* we want to add an alhpa for these */
+
+      glBlendFunc(GL_ONE_MINUS_SRC_ALPHA, GL_ONE);
+      glEnable(GL_BLEND);
+      
+      if (dData.tow.str[0])
+        glfRender(o.tow.x, o.tow.y, 0.0, 
+                  o.tow.w, o.tow.h, 
+                  fontFixedTxf, dData.tow.str, 
+                  MagentaColor | 0x50000000, 
+                  TRUE, FALSE, TRUE);
+      
+      if (dData.armies.str[0])
+        glfRender(o.arm.x, o.arm.y, 0.0, 
+                  o.arm.w, o.arm.h, 
+                  fontFixedTxf, 
+                  dData.armies.str, 
+                  InfoColor | 0x50000000, 
+                  TRUE, FALSE, TRUE);
+      
+
+      /* Destruct msg, centered in the viewer */
+      if (dData.cloakdest.str[0] == 'D') /* destructing */
+        {
+          glfRender(o.cloakdest.x, o.cloakdest.y, 0.0, 
+                    o.cloakdest.w, o.cloakdest.h, 
+                    fontMsgTxf, 
+                    dData.cloakdest.str, 
+                    (GL_BLINK_ONESEC) ? 
+                    dData.cloakdest.color | CQC_A_BOLD | 0x50000000: 
+                    (dData.cloakdest.color | 0x50000000) & ~CQC_A_BOLD, 
+                    TRUE, FALSE, TRUE);
+        }
+
+      glDisable(GL_BLEND);
+    }
 
   /* alert stat bars */
   if (dData.aStat.alertStatus[0])
@@ -601,58 +638,42 @@ void renderHud(int dostats)
 
   /* regular conq stuff - tractor beam, armies, cloak */
   
-  if (dData.tow.str[0]) 
-    drawIconHUDDecal(o.d1icon.x, o.d1icon.y, o.d1icon.w, o.d1icon.h,
-                     HUD_ITRACTOR, icl);
-  if (dData.armies.str[0] && !SROBOT(Context.snum)) 
-    drawIconHUDDecal(o.d1icon.x, o.d1icon.y, o.d1icon.w, o.d1icon.h,
-                     HUD_IARMIES, icl);
-
   /* hacky.. for sure. */
   if (dData.cloakdest.str[1] == 'C') 
     drawIconHUDDecal(o.d1icon.x, o.d1icon.y, o.d1icon.w, o.d1icon.h,
                      HUD_ICLOAK, icl);
+  else
+    if (SREPAIR(Context.snum)) 
+      drawIconHUDDecal(o.d1icon.x, o.d1icon.y, o.d1icon.w, o.d1icon.h,
+                       HUD_IREPAIR, icl);
   
   /*
     Cataboligne + display critical alerts decals
     
     critical levels - display decal
     
-    shields  < 31
+    shields  < 20
     eng temp > 80
     wep temp > 80
-    hull dmg > 69
-    
-    failure levels - display decal
-    
-    shields < 4
-    hull dmg > 95
+    hull dmg >= 70
   */
 
-  if ((dData.sh.shields < 4 && SSHUP(Context.snum) 
-       && !SREPAIR(Context.snum)))  
-    drawIconHUDDecal(o.d1icon.x, o.d1icon.y, o.d1icon.w, o.d1icon.h,
-                     HUD_ISHFAIL, icl);
-  else if ((dData.sh.shields < 31 && SSHUP(Context.snum) && 
-            !SREPAIR(Context.snum))) 
-    drawIconHUDDecal(o.d1icon.x, o.d1icon.y, o.d1icon.w, o.d1icon.h,
-                     HUD_ISHCRIT, icl);
-  if (dData.etemp.etemp > 80) 
+  /* we ensure that these two blink alternately so they are readable */
+  if (dData.etemp.etemp > 80 && GL_BLINK_HALFSEC) 
     drawIconHUDDecal(o.d1icon.x, o.d1icon.y, o.d1icon.w, o.d1icon.h,
                      HUD_IENGCRIT, icl);
-  if (dData.wtemp.wtemp > 80) 
+  if (dData.wtemp.wtemp > 80 && !GL_BLINK_HALFSEC) 
     drawIconHUDDecal(o.d1icon.x, o.d1icon.y, o.d1icon.w, o.d1icon.h,
                      HUD_IWEPCRIT, icl);
-  if (dData.dam.damage > 90) 
+
+  if ((dData.sh.shields < 20 && SSHUP(Context.snum) && 
+       !SREPAIR(Context.snum)) && GL_BLINK_QTRSEC) 
     drawIconHUDDecal(o.d1icon.x, o.d1icon.y, o.d1icon.w, o.d1icon.h,
-                     HUD_IENGFAIL, icl);
-  if (dData.dam.damage > 69) 
+                     HUD_ISHCRIT, icl);
+  if (dData.dam.damage >= 70 && GL_BLINK_QTRSEC) 
     drawIconHUDDecal(o.d1icon.x, o.d1icon.y, o.d1icon.w, o.d1icon.h,
                      HUD_IHULCRIT, icl);
-  if (SREPAIR(Context.snum)) 
-    drawIconHUDDecal(o.d1icon.x, o.d1icon.y, o.d1icon.w, o.d1icon.h,
-                     HUD_IREPAIR, icl);
-  
+
   /* draw warp and decals */
   drawIconHUDDecal(o.warp.x, o.warp.y, o.warp.w, o.warp.h, 
                    HUD_WARP, icl);
@@ -665,32 +686,6 @@ void renderHud(int dostats)
   /* GL */
   glDisable(GL_TEXTURE_2D);
   glDisable(GL_BLEND);
-
-  /* armies */
-  if (dData.armies.str[0])
-    {
-      glfRender(o.arm.x, o.arm.y, 0.0, 
-                o.arm.w, o.arm.h, 
-                fontFixedTxf, 
-                dData.armies.str, InfoColor, TRUE, FALSE, TRUE);
-    }
-
-  /* Destruct msg, centered in the viewer */
-  if (dData.cloakdest.str[0] == 'D') /* destructing */
-    {
-      glBlendFunc(GL_ONE_MINUS_SRC_ALPHA, GL_ONE);
-      glEnable(GL_BLEND);
-      /* we want to add an alhpa for this */
-      glfRender(o.cloakdest.x, o.cloakdest.y, 0.0, 
-                o.cloakdest.w, o.cloakdest.h, 
-                fontMsgTxf, 
-                dData.cloakdest.str, 
-                (GL_BLINK_ONESEC) ? 
-                dData.cloakdest.color | CQC_A_BOLD | 0x50000000: 
-                (dData.cloakdest.color | 0x50000000) & ~CQC_A_BOLD, 
-                TRUE, FALSE, TRUE);
-      glDisable(GL_BLEND);
-    }
 
   /* END stat box */
   

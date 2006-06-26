@@ -1,0 +1,72 @@
+# Irken planet textures, by 'Cat'.
+#
+# This file goes in your ~/.conquest/ directory.  The irken image
+#  files go int ~/.conquest/img/
+##################################
+
+texture {
+  name         "Nhar-Gh'ok"
+  filename     "Nhar-Gh'ok"
+}
+
+texture {
+  name         "Blorch"
+  filename     "blorch"
+}
+
+texture {
+  name         "Callnowia"
+  filename     "callnowia"
+}
+
+texture {
+  name         "Conventia"
+  filename     "conventia"
+}
+
+texture {
+  name         "Conveyors"
+  filename     "conveyors"
+}
+
+texture {
+  name         "Devastis"
+  filename     "devastis"
+}
+
+texture {
+  name         "Foodcourtia"
+  filename     "foodcourtia"
+}
+
+texture {
+  name         "Invalis"
+  filename     "invalis"
+}
+
+texture {
+  name         "Irk"
+  filename     "irk"
+}
+
+texture {
+  name         "Meekrob"
+  filename     "meekrob"
+}
+
+texture {
+  name         "Plookesia"
+  filename     "plookesia"
+}
+
+texture {
+  name         "Siriusminor"
+  filename     "siriusminor"
+}
+
+texture {
+  name         "Vort"
+  filename     "vort"
+}
+
+

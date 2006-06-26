@@ -41,17 +41,12 @@ typedef struct _glship {
   GLint     phas;             /* phaser */
   GLint     ico;              /* ship icon */
   GLint     ico_sh;           /* icon shields id */
-  GLint     ico_armies;       /* armies indicator */
   GLint     ico_cloak;        /* cloak indicator */
-  GLint     ico_tractor;      /* tractor */
   GLint     ico_shcrit;       /* shields critical */
   GLint     ico_engcrit;      /* engines critical */
   GLint     ico_wepcrit;      /* weapons critical */
   GLint     ico_hulcrit;      /* hull critical */
-  GLint     ico_shfail;       /* dead shielding */
-  GLint     ico_engfail;      /* dead engines */
   GLint     ico_repair;       /* repairing */
-  GLint     ico_photonload;   /* photons left to fire */
   GLint     decal1;           /* sh/hull gauges */
   GLint     decal2;           /* fuel/w/e/alloc/kills gauges */
   GLint     dial;             /* ships astrogator dial */

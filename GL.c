@@ -109,7 +109,7 @@ typedef struct
 static void resize(int w, int h);
 static void charInput(unsigned char key, int x, int y);
 static void input(int key, int x, int y);
-static int LoadGLTextures(void);
+static int loadGLTextures(void);
 static void renderFrame(void);
 static int renderNode(void);
 
@@ -521,14 +521,8 @@ static int initGLShips(void)
               hex2GLColor(0xffeeeeee, &GLShips[i][j].warpq_col);
             }
 
-          snprintf(buffer, TEXFILEMAX - 1, "%s-ico-armies", shipPfx);
-          GLShips[i][j].ico_armies = _get_ship_texid(buffer);
-          
           snprintf(buffer, TEXFILEMAX - 1, "%s-ico-cloak", shipPfx);
           GLShips[i][j].ico_cloak = _get_ship_texid(buffer);
-          
-          snprintf(buffer, TEXFILEMAX - 1, "%s-ico-tractor", shipPfx);
-          GLShips[i][j].ico_tractor = _get_ship_texid(buffer);
           
           snprintf(buffer, TEXFILEMAX - 1, "%s-ico-shcrit", shipPfx);
           GLShips[i][j].ico_shcrit = _get_ship_texid(buffer);
@@ -542,18 +536,9 @@ static int initGLShips(void)
           snprintf(buffer, TEXFILEMAX - 1, "%s-ico-hulcrit", shipPfx);
           GLShips[i][j].ico_hulcrit = _get_ship_texid(buffer);
           
-          snprintf(buffer, TEXFILEMAX - 1, "%s-ico-shfail", shipPfx);
-          GLShips[i][j].ico_shfail = _get_ship_texid(buffer);
-          
-          snprintf(buffer, TEXFILEMAX - 1, "%s-ico-engfail", shipPfx);
-          GLShips[i][j].ico_engfail = _get_ship_texid(buffer);
-          
           snprintf(buffer, TEXFILEMAX - 1, "%s-ico-repair", shipPfx);
           GLShips[i][j].ico_repair = _get_ship_texid(buffer);
           
-          snprintf(buffer, TEXFILEMAX - 1, "%s-ico-photon", shipPfx);
-          GLShips[i][j].ico_photonload = _get_ship_texid(buffer);
-
           /* this is ugly... we want to fail if any of these texid's are
              0, indicating the texture wasn't found */
           if (!(GLShips[i][j].ship &&
@@ -568,17 +553,12 @@ static int initGLShips(void)
                 GLShips[i][j].dialp &&
                 GLShips[i][j].warp &&
                 GLShips[i][j].phas &&
-                GLShips[i][j].ico_armies &&
                 GLShips[i][j].ico_cloak &&
-                GLShips[i][j].ico_tractor &&
                 GLShips[i][j].ico_shcrit &&
                 GLShips[i][j].ico_engcrit &&
                 GLShips[i][j].ico_wepcrit &&
                 GLShips[i][j].ico_hulcrit &&
-                GLShips[i][j].ico_shfail &&
-                GLShips[i][j].ico_engfail &&
-                GLShips[i][j].ico_repair &&
-                GLShips[i][j].ico_photonload))
+                GLShips[i][j].ico_repair))
             return FALSE;        /* one was missing */
         }
     }
@@ -824,16 +804,10 @@ void drawIconHUDDecal(GLfloat rx, GLfloat ry, GLfloat w, GLfloat h,
       id = GLShips[steam][stype].ico_sh;
       break;
     case HUD_DECAL1:
-      if (UserConf.DoNativeLang)
-        id = GLShips[steam][stype].decal1;
-      else
-        id = GLShips[TEAM_FEDERATION][stype].decal1;
+      id = GLShips[steam][stype].decal1;
       break;
     case HUD_DECAL2:
-      if (UserConf.DoNativeLang)
-        id = GLShips[steam][stype].decal2;
-      else
-        id = GLShips[TEAM_FEDERATION][stype].decal2;
+      id = GLShips[steam][stype].decal2;
       break;
     case HUD_HEAD:
       id = GLShips[steam][stype].dial;
@@ -844,14 +818,8 @@ void drawIconHUDDecal(GLfloat rx, GLfloat ry, GLfloat w, GLfloat h,
     case HUD_WARP:   
       id = GLShips[steam][stype].warp;
       break;
-    case HUD_IARMIES:  
-      id = GLShips[steam][stype].ico_armies;
-      break;
     case HUD_ICLOAK:   
       id = GLShips[steam][stype].ico_cloak;
-      break;
-    case HUD_ITRACTOR: 
-      id = GLShips[steam][stype].ico_tractor;
       break;
     case HUD_ISHCRIT:  
       id = GLShips[steam][stype].ico_shcrit;
@@ -865,17 +833,8 @@ void drawIconHUDDecal(GLfloat rx, GLfloat ry, GLfloat w, GLfloat h,
     case HUD_IHULCRIT: 
       id = GLShips[steam][stype].ico_hulcrit;
       break;
-    case HUD_ISHFAIL:  
-      id = GLShips[steam][stype].ico_shfail;
-      break;
-    case HUD_IENGFAIL: 
-      id = GLShips[steam][stype].ico_engfail;
-      break;
     case HUD_IREPAIR:  
       id = GLShips[steam][stype].ico_repair;
-      break;
-    case HUD_ITORPIN:
-      id = GLShips[steam][stype].ico_photonload;
       break;
     default:
       break;
@@ -1738,8 +1697,8 @@ void graphicsInit(void)
   glShadeModel(GL_SMOOTH);
   glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
   
-  if (!LoadGLTextures())
-    clog("ERROR: LoadGLTextures() failed\n");
+  if (!loadGLTextures())
+    clog("ERROR: loadGLTextures() failed\n");
   else
     {
       if (!initGLAnimDefs())
@@ -3234,7 +3193,7 @@ static char *_getTexFile(char *tfilenm)
   return NULL;
 }
 
-static int LoadGLTextures()   
+static int loadGLTextures()   
 {
   Bool status;
   int rv = FALSE;
@@ -3243,6 +3202,7 @@ static int LoadGLTextures()
   char *filenm;
   GLTexture_t curTexture;
   GLTexture_t *texptr;
+  int hwtextures = 0;
 
   if (!cqiNumTextures || !cqiTextures)
     {                           /* we have a problem */
@@ -3285,7 +3245,7 @@ static int LoadGLTextures()
           
           if (!texti)
             {
-              clog("LoadGLTextures(): memory allocation failed for %d bytes\n",
+              clog("loadGLTextures(): memory allocation failed for %d bytes\n",
                    sizeof(textureImage));
               return FALSE;
             }
@@ -3327,6 +3287,8 @@ static int LoadGLTextures()
               glTexImage2D(GL_TEXTURE_2D, 0, components, 
                            texti->width, texti->height, 0,
                            type, GL_UNSIGNED_BYTE, texti->imageData);
+
+              hwtextures++;
             } /* if rv */
       
           GLError();
@@ -3371,8 +3333,8 @@ static int LoadGLTextures()
         }
     }
 
-  clog("%s: Successfully loaded %d textures", 
-       __FUNCTION__, loadedGLTextures);
+  clog("%s: Successfully loaded %d textures, (%d files).", 
+       __FUNCTION__, loadedGLTextures, hwtextures);
 
   return TRUE;
 }

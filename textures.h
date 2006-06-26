@@ -44,15 +44,11 @@ int findGLTexture(char *texname);
 #define HUD_HDP        5
 #define HUD_WARP       6
 #define HUD_WARP2      7
-#define HUD_IARMIES    11 
 #define HUD_ICLOAK     12 
-#define HUD_ITRACTOR   13
 #define HUD_ISHCRIT    14
 #define HUD_IENGCRIT   15
 #define HUD_IWEPCRIT   16
 #define HUD_IHULCRIT   17
-#define HUD_ISHFAIL    18
-#define HUD_IENGFAIL   19
 #define HUD_IREPAIR    20
 #define HUD_ITORPIN    21
 
