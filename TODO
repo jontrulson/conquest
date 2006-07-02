@@ -17,7 +17,7 @@
 
     - how to handle/sync orbiting, tow, etc...
 
-  - observer support?
+  - observer support?  Can see viewer view only (no hud).
 
   - new server flag? NoKillTeam - determines whether a ship can
     set war with it's own team.
@@ -100,6 +100,8 @@
     - have server send an attacking flag, and client is responsible
       for drawing it.
 
+  - bigger messages area.
+
 - PROTOCOL
 
   - add pads to those structures not having them?
@@ -116,6 +118,21 @@
   - UDP improvements.  allow to negotiate while playing.  if client
     gets udp error, send packet (TCP) to server telling it to switch
     to TCP only.
+
+  - planets
+ 
+    - add size, color items.
+
+    - doomsday, add attacking flag (so we know when to draw the APB
+      conclusively rather that trying to 'detect' it in the client)
+  
+  - ships
+
+    - look into 'dead reckoning' for client display of ship motion.
+
+    - look at some way of allowing triangulation of cloaked ships.
+
+  - support downloading of textures from server?
 
 - Blue Sky
 

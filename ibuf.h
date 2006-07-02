@@ -16,6 +16,7 @@
 #ifndef IBUF_H
 #define IBUF_H
 
+#include "datatypes.h"
 #define    IBUFMAX 1024
 
 void iBufInit(void);
@@ -24,5 +25,6 @@ void iBufPut(char *thestr);
 void iBufPutc(unsigned int thechar);
 unsigned int iBufGetCh(void);
 int DoMacro(int fkey);
+int DoMouseMacro(int but, Unsgn32 mods, real mangle);
 
 #endif

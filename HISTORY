@@ -9,41 +9,83 @@
 
                               Conquest HISTORY
 
-8.1.2e (devel) 6/25/2006
+8.1.2e (devel) 7/1/2006
 
-       - Well, since it's going to be painful continuing with the
-         alien language thing, they've been removed from this version.
-         All teams use the same decal1/decal2 textures in the HUD now.
+       - added some mouse support in the GL client.  Macros can be
+         assigned to mouse buttons + key modifiers (Control, Alt, and
+         Shift).  Configuration of your mouse macros is available via
+         the (O)ptions menu, or you can edit your conquestrc file
+         directly. 
 
-         Fixed up the decal1/2 textures with new, easier to read
-         fonts, changed a few colors, and re-organized the allocation
-         scale. 
+         The mouse only works when playing the game (in the Cockpit)
+         and the cursor is within the viewer window in the GL client.  
+
+         Three default mouse macros are provided to give you a taste,
+         and will be saved in your conquestrc file the first time you
+         run this version of the client.  They are:
+
+         mouse button 0 (left): Fire phaser at <angle>
+         mouse button 1 (middle): Set course to <angle>
+         mouse button 2 (right): Fire Torp at <angle>
+
+         Of course you can redefine these, as well as add others.
+
+         See the mouse macro comment block in your conquestrc file for
+         a description of the format.
+
+         <angle> is represented as '\a' in the macro string.  When the
+         particular mouse button is hit, the '\a' character sequence,
+         if present in the macro, will be replaced with the angle of
+         the cursor relative to the center of the viewer when the
+         button was pressed.
+
+         Up to 32 buttons (0-31) are supported, and can be used with
+         any combination of the Modifier keys (Shift, Alt, and Control).
+
+         That gives you a total of 256 macros, provided you have a
+         mouse/input device with 32 buttons.
+
+         Enjoy :)
+
+       - Since it's going to be painful continuing with the alien
+         language thing, they've been removed from this version (with
+         the exception of the team-specific Conquest logos).  All
+         teams use the same decal1/decal2 (scale) textures in the HUD
+         now.  The 'do_native_lang' option is gone.  Fixed up the
+         decal1/2 textures with new, easier to read fonts, changed a
+         few colors, and re-organized the allocation scale.
 
          The 'critical' alert icons have also been changed to have an
-         english font.
-
-         Got rid of the eng/sh fail icons.  By the time you would have
-         seen those, you'd be dead anyway :)
+         english font, and all ships use the same set.  Since each
+         ship has a different shape, there was no good way to draw the
+         lines between the text and the area of the ship of interest
+         using a single set of textures.  So, they are more like lamp
+         indicators overlayed on the iconhud now.
 
          Towed/towing status and carried army count is displayed
          semi-transparent at the bottom of the viewer now, rather than
          in the icon hud area - not enough room there :)
+
+         New 'Engine Overload' and 'Weapons Overload' "pulsed"
+         messages are displayed in the viewer when an overload
+         condition exists (using a new animdef).  
          
        - removed the Irken planet textures and texture definitions.
          There does not seem to be an Irken server available anymore
-         so there is no point...
+         so there is no point in including them...
 
          The images and a .trc file are present in the irken-mod.tgz
-         file available from Cat (and the website), should he wish to
-         run a server again :) Just unpack the tarball in your
-         ~/.conquest/ directory and you will be able to see the Irken
-         planets in all their glory.
+         file available from Cat, should he wish to run a server again
+         :) Just unpack the tarball in your ~/.conquest/ directory and
+         you will be able to see the Irken planets in all their
+         glory.  
 
        - removed all of the non-used textures (eng/sh fail, other team
-         decal/icon textures, torpicon/beam/tow, etc).  In other
-         words, massive texture cleanup and removal.  Went from 179 to
-         107 textures.  Woohoo.
+         (alien) decal/icon textures, torpicon/beam/tow, etc).  In
+         other words, massive texture cleanup and removal.  Went from
+         179 to 107 textures.  Woohoo.
 
+       - fixed up configure to not build static libs by default anymore.
 
        8.1.2d (not released)
 
@@ -72,9 +114,10 @@
          could affect these characteristics arrives.
 
        - when doing a 'make install', only overwrite the system
-         conquestrc file if it does not already exist, to prevent
-         accidentally overwriting any local planet modifications.  The
-         texturesrc file is always overwritten on install.
+         conqinitrc file if it does not already exist, to prevent
+         accidentally overwriting any local planet modifications (yes,
+         this happened to me :).  The texturesrc file is always
+         overwritten on install.
 
        - cleaned up the Klingon warp indicator texture.
 

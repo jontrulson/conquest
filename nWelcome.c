@@ -45,8 +45,9 @@ static int nWelcomeDisplay(dspConfig_t *);
 static scrNode_t nWelcomeNode = {
   nWelcomeDisplay,              /* display */
   NULL,                         /* idle */
-  NULL,                          /* input */
-  NULL                          /* next */
+  NULL,                         /* input */
+  NULL,                         /* minput */
+  NULL                          /* animQue */
 };
 
 /*  gretds - block letter "greetings..." */

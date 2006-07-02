@@ -44,7 +44,8 @@ static scrNode_t nUserlNode = {
   nUserlDisplay,               /* display */
   nUserlIdle,                  /* idle */
   nUserlInput,                  /* input */
-  NULL                          /* next */
+  NULL,                         /* minput */
+  NULL                          /* animQue */
 };
 
 static int retnode;             /* the node to return to */

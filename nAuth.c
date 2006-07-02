@@ -65,7 +65,8 @@ static scrNode_t nAuthNode = {
   nAuthDisplay,                 /* display */
   nAuthIdle,                    /* idle */
   nAuthInput,                    /* input */
-  NULL
+  NULL,                         /* minput */
+  NULL                          /* animQue */
 };
 
 

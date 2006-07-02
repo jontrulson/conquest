@@ -8,6 +8,8 @@
 #ifndef _NODE_H
 #define _NODE_H
 
+#include "cqmouse.h"
+
 /* node proc return values */
 #define NODE_OK        TRUE
 #define NODE_EXIT      FALSE
@@ -15,15 +17,16 @@
 
 /* menu/screen node */
 
+
 typedef struct _scr_node {
   int (*display)(dspConfig_t *); /* display routine */
   int (*idle)(void);            /* idle routine */
-  int (*input)(int ch);         /* input routine */
+  int (*input)(int ch);         /* keyboard input routine */
+  int (*minput)(mouseData_t *mdata); /* mouse input routine */
   void *animQue;                /* optional aimation que.
                                    we use void* for this since
                                    we don't want to bring GL into
                                    the picture here. */
-  struct _scr_node *next;       /* sub-nodes ? */
 } scrNode_t;
 
 /* some nodes are called from other, multiple nodes, so we need

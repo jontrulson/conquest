@@ -50,7 +50,9 @@ static scrNode_t nMetaNode = {
   nMetaDisplay,                 /* display */
   NULL,                         /* idle */
   nMetaInput,                   /* input */
-  NULL                          /* next */
+  NULL,                         /* minput */
+  NULL                          /* animQue */
+
 };
 
 

@@ -804,6 +804,12 @@ animation {
   name         "doomsday-ap-fire"
 }
 
+# a 'pulse' text effect for overloading wep/eng.
+animation {
+  name         "overload-pulse"
+  animdef      "pulse"
+}
+
 ## animation defs
 #################
 
@@ -976,5 +982,24 @@ animdef {
     deltar     0.0
     deltag     -0.001
     deltab     -0.01
+  }
+}
+
+# handles 'pulsing' of text, but could be used to pulse anything (red
+# that is :).
+animdef {
+  name         "pulse"
+
+  istate {
+    color      "9fff0000"
+  }
+    
+  # fade to almost black...
+  colanim {
+    stages     20
+    loops      1
+    delayms    50
+    
+    deltaa     -0.015
   }
 }

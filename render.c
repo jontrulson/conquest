@@ -103,6 +103,9 @@ static struct {
   obj_t d2allocn;
   obj_t d2killb;                /* location of kills box */
 
+  obj_t engfailpulse;           /* wep/eng failure pulses */
+  obj_t wepfailpulse;
+
 } o = {};
 
 /* update icon hud geometry if stuff changes (resize).  */
@@ -156,9 +159,9 @@ void updateIconHudGeo(void)
    * height of the area of interest (like the fuel gauge in decal2).
    * These coordinates are hardcoded in the calulations below.  Yes,
    * this does suck.  On the plus side, these calculated positions seem
-   * to be consistant among all of the decal textures.  Actually, this
-   * is pretty much a requirement now.
-   *
+   * to be consistant among all of the decal textures.  For the future,
+   * CQI should be modified to allow specifying named texcoord sections
+   * in a texture definition, avoiding all of the hardcoding below.
    */
 
   /* heading tex and label 
@@ -213,9 +216,9 @@ void updateIconHudGeo(void)
   o.d1shn.h = o.d1shg.h * 2.0;
 
   o.d1damg.x = tx + ((96.0 / 256.0) * tw);
-  o.d1damg.y = o.decal1.y + ((218.0 / 256.0) * th);
+  o.d1damg.y = o.decal1.y + ((219.0 / 256.0) * th);
   o.d1damg.w = (((175.0 - 96.0) / 256.0) * tw);
-  o.d1damg.h = ((22.0 / 256.0) * th);
+  o.d1damg.h = ((21.0 / 256.0) * th);
 
   o.d1damn.x = o.decal1.x + o.decal1.w;
   o.d1damn.y = o.d1damg.y - ((o.d1damg.h * 2.0) * 0.25);
@@ -280,17 +283,33 @@ void updateIconHudGeo(void)
   o.d2killb.w = (((249.0 - 164.0) / 256.0) * tw);
   o.d2killb.h = ((16.0 / 256.0) * th);
 
-  /* destructing message.  try to center within viewer. */
+  /*  For tow, armies, and wep/eng pulses, we divide the viewer into 8
+   *  horizontal, and 20 vertical segments and confine these items to
+   *  one of those segments.
+   */
+
+  /* tow is located in at the bottom left of the viewer area. */
   o.tow.x = dConf.vX + ((dConf.vW / 8.0) * 1.0);
   o.tow.y = dConf.vY + (dConf.vH - ((dConf.vH / 20.0) * 2.0));
   o.tow.w = (dConf.vW / 8.0) * 1.0;
   o.tow.h = (dConf.vH / 20.0) * 1.0;
 
-  /* armies in upper right */
+  /* armies in lower right of the viewer area */
   o.arm.x = dConf.vX + ((dConf.vW / 8.0) * 6.0);
   o.arm.y = o.tow.y;
   o.arm.w = o.tow.w;
   o.arm.h = o.tow.h;
+
+  /* for the eng and wep failure 'pulse' messages (centered) */
+  o.engfailpulse.x = dConf.vX + ((dConf.vW / 8.0) * 1.5);
+  o.engfailpulse.y = dConf.vY + (dConf.vH - ((dConf.vH / 20.0) * 5.0));
+  o.engfailpulse.w = ((dConf.vW / 8.0) * 5.0);
+  o.engfailpulse.h = (dConf.vH / 20.0) * 2.0;
+
+  o.wepfailpulse.x = dConf.vX + ((dConf.vW / 8.0) * 1.5);
+  o.wepfailpulse.y = dConf.vY + (dConf.vH - ((dConf.vH / 20.0) * 16.0));
+  o.wepfailpulse.w = ((dConf.vW / 8.0) * 5.0);
+  o.wepfailpulse.h = (dConf.vH / 20.0) * 2.0;
 
   /* alert bars */
   o.d1abar1.x = tx + 2.0;
@@ -360,7 +379,8 @@ void renderScaleVal(GLfloat x, GLfloat y, GLfloat w, GLfloat h,
   sprintf(buf32, "%3d", val);
 
   /* a scale value (number) */
-  glfRender(x, y, 0.0, w * 0.9, h * 0.8, lfont, buf32, col, TRUE, FALSE, TRUE);
+  glfRender(x, y, 0.0, w * 0.9, h * 0.8, lfont, buf32, col, NULL,
+            TRUE, FALSE, TRUE);
   
   drawLineBox(x, y, w, h, boxcol, 1.0);
 
@@ -371,13 +391,83 @@ void renderAllocVal(GLfloat x, GLfloat y, GLfloat w, GLfloat h,
                     TexFont *lfont, char *val, int col)
 {
   /* a scale value (number) */
-  glfRender(x, y, 0.0, w * 0.9, h * 0.8, lfont, val, col, TRUE, FALSE, TRUE);
+  glfRender(x, y, 0.0, w * 0.9, h * 0.8, lfont, val, col, NULL,
+            TRUE, FALSE, TRUE);
   
   drawLineBox(x, y, w, h, BlueColor, 1.0);
 
   return;
 }
 
+/* draw either or both eng/wep 'overload' message using a 'pulse' effect
+   in the viewer */
+void renderOverloadPulseMsg(void)
+{
+  static animStateRec_t engfail = {}; /* animdef states  */
+  static animStateRec_t wepfail = {}; 
+  static int firsttime = TRUE;
+  scrNode_t *curnode = getTopNode();
+  
+  if (firsttime)
+    {
+      firsttime = FALSE;
+
+      /* init the anims */
+      if (animInitState("overload-pulse", &engfail, NULL))
+        {
+          animQueAdd(curnode->animQue, &engfail);
+        }
+
+      if (animInitState("overload-pulse", &wepfail, NULL))
+        {
+          animQueAdd(curnode->animQue, &wepfail);
+        }
+    }
+
+  if (dData.alloc.ealloc <= 0 || dData.alloc.walloc <= 0)
+    {
+      glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+      glEnable(GL_BLEND);
+    }
+  
+  if (dData.alloc.ealloc <= 0)
+    {
+      if (ANIM_EXPIRED(&engfail))
+        {
+          animResetState(&engfail, frameTime);
+          animQueAdd(curnode->animQue, &engfail);
+        }
+      
+      glfRender(o.engfailpulse.x, o.engfailpulse.y, 0.0, 
+                o.engfailpulse.w, o.engfailpulse.h, 
+                fontLargeTxf, "Engines Overloaded", 
+                0, &engfail.state.col, 
+                TRUE, FALSE, TRUE);
+    }      
+
+  if (dData.alloc.walloc <= 0)
+    {
+      if (ANIM_EXPIRED(&wepfail))
+        {
+          animResetState(&wepfail, frameTime);
+          animQueAdd(curnode->animQue, &wepfail);
+        }
+
+      glfRender(o.wepfailpulse.x, o.wepfailpulse.y, 0.0, 
+                o.wepfailpulse.w, o.wepfailpulse.h, 
+                fontLargeTxf, "Weapons Overloaded", 
+                0, &wepfail.state.col, 
+                TRUE, FALSE, TRUE);
+
+    }      
+
+  if (dData.alloc.ealloc <= 0 || dData.alloc.walloc <= 0)
+    {
+      glDisable(GL_BLEND);
+    }
+
+  return;
+}
 /* This is Cat's icon hud */
 void renderHud(int dostats)
 {				/* assumes context is current*/
@@ -432,12 +522,12 @@ void renderHud(int dostats)
   /* heading val */
   glfRender(o.headl.x, o.headl.y, 0.0, o.headl.w, 
             o.headl.h, fontLargeTxf, dData.heading.heading, 
-            NoColor, TRUE, FALSE, TRUE);
+            NoColor, NULL, TRUE, FALSE, TRUE);
 
   /* warp val */
   glfRender(o.warpl.x, o.warpl.y, 0.0, 
             o.warpl.w, o.warpl.h,
-            fontLargeTxf, dData.warp.warp, InfoColor, TRUE, FALSE, TRUE);
+            fontLargeTxf, dData.warp.warp, InfoColor, NULL, TRUE, FALSE, TRUE);
   
   /* warp quad indicator color */
   
@@ -518,7 +608,7 @@ void renderHud(int dostats)
 
   glfRender(o.d2killb.x, o.d2killb.y, 0.0, 
             o.d2killb.w, 
-            o.d2killb.h, fontFixedTxf, dData.kills.kills, InfoColor,
+            o.d2killb.h, fontFixedTxf, dData.kills.kills, InfoColor, NULL,
             TRUE, TRUE, TRUE);
 
   /* towed-towing/armies/destruct */
@@ -534,7 +624,7 @@ void renderHud(int dostats)
                   o.tow.w, o.tow.h, 
                   fontFixedTxf, dData.tow.str, 
                   MagentaColor | 0x50000000, 
-                  TRUE, FALSE, TRUE);
+                  NULL, TRUE, FALSE, TRUE);
       
       if (dData.armies.str[0])
         glfRender(o.arm.x, o.arm.y, 0.0, 
@@ -542,7 +632,7 @@ void renderHud(int dostats)
                   fontFixedTxf, 
                   dData.armies.str, 
                   InfoColor | 0x50000000, 
-                  TRUE, FALSE, TRUE);
+                  NULL, TRUE, FALSE, TRUE);
       
 
       /* Destruct msg, centered in the viewer */
@@ -555,7 +645,7 @@ void renderHud(int dostats)
                     (GL_BLINK_ONESEC) ? 
                     dData.cloakdest.color | CQC_A_BOLD | 0x50000000: 
                     (dData.cloakdest.color | 0x50000000) & ~CQC_A_BOLD, 
-                    TRUE, FALSE, TRUE);
+                    NULL, TRUE, FALSE, TRUE);
         }
 
       glDisable(GL_BLEND);
@@ -584,7 +674,7 @@ void renderHud(int dostats)
       glfRender(o.d1atarg.x, o.d1atarg.y, 0.0, 
                 o.d1atarg.w, o.d1atarg.h, 
                 fontFixedTxf, dData.aStat.alertStatus, 
-                icl, TRUE, FALSE, TRUE);
+                icl, NULL, TRUE, FALSE, TRUE);
       /* right bar */
       drawQuad(o.d1abar2.x, o.d1abar2.y, o.d1abar2.w, o.d1abar2.h, 0.0);
     }
@@ -653,19 +743,22 @@ void renderHud(int dostats)
     critical levels - display decal
     
     shields  < 20
-    eng temp > 80
-    wep temp > 80
+    eng temp > 80 or overloaded
+    wep temp > 80 or overloaded
     hull dmg >= 70
   */
 
   /* we ensure that these two blink alternately so they are readable */
-  if (dData.etemp.etemp > 80 && GL_BLINK_HALFSEC) 
+  if (((dData.etemp.etemp > 80) || (dData.alloc.ealloc <= 0)) && 
+      GL_BLINK_HALFSEC) 
     drawIconHUDDecal(o.d1icon.x, o.d1icon.y, o.d1icon.w, o.d1icon.h,
                      HUD_IENGCRIT, icl);
-  if (dData.wtemp.wtemp > 80 && !GL_BLINK_HALFSEC) 
+  if (((dData.wtemp.wtemp > 80) || (dData.alloc.walloc <= 0)) && 
+      !GL_BLINK_HALFSEC) 
     drawIconHUDDecal(o.d1icon.x, o.d1icon.y, o.d1icon.w, o.d1icon.h,
                      HUD_IWEPCRIT, icl);
 
+  /* shields and damage */
   if ((dData.sh.shields < 20 && SSHUP(Context.snum) && 
        !SREPAIR(Context.snum)) && GL_BLINK_QTRSEC) 
     drawIconHUDDecal(o.d1icon.x, o.d1icon.y, o.d1icon.w, o.d1icon.h,
@@ -698,14 +791,14 @@ void renderHud(int dostats)
                   0.0, 
                   o.althud.w, o.althud.h,
                   fontFixedTxf, dData.xtrainfo.str, InfoColor, 
-                  TRUE, TRUE, TRUE);
+                  NULL, TRUE, TRUE, TRUE);
       
       if (dostats)
         {
           glfRender(o.rectime.x, o.rectime.y, 0.0, 
                     o.rectime.w, o.rectime.h,
                     fontFixedTxf, sbuf1024, NoColor | CQC_A_DIM, 
-                    TRUE, TRUE, TRUE);
+                    NULL, TRUE, TRUE, TRUE);
         }          
     }
   else
@@ -716,11 +809,12 @@ void renderHud(int dostats)
                 o.althud.w, o.althud.h,
                 fontFixedTxf, dData.recId.str, 
                 MagentaColor | CQC_A_BOLD, 
-                TRUE, TRUE, TRUE);
+                NULL, TRUE, TRUE, TRUE);
       
       glfRender(o.rectime.x, o.rectime.y, 0.0, 
                 o.rectime.w, o.rectime.h,
-                fontFixedTxf, dData.recTime.str, NoColor, TRUE, TRUE, TRUE);
+                fontFixedTxf, dData.recTime.str, NoColor, 
+                NULL, TRUE, TRUE, TRUE);
     }
 
 
@@ -730,19 +824,28 @@ void renderHud(int dostats)
   if (dData.p1.str[0])
     glfRender(o.msg1.x, o.msg1.y, 0.0, 
               o.msg1.w, o.msg1.h,
-              fontFixedTxf, dData.p1.str, InfoColor, TRUE, TRUE, TRUE);
+              fontFixedTxf, dData.p1.str, InfoColor, 
+              NULL, TRUE, TRUE, TRUE);
 
   /* MSG_LIN2 */
   if (dData.p2.str[0])
     glfRender(o.msg2.x, o.msg2.y, 0.0,
               o.msg2.w, o.msg2.h,
-              fontFixedTxf, dData.p2.str, InfoColor, TRUE, TRUE, TRUE);
+              fontFixedTxf, dData.p2.str, InfoColor, 
+              NULL, TRUE, TRUE, TRUE);
 
   /* MSG_MSG */
   if (dData.msg.str[0])
     glfRender(o.msgmsg.x, o.msgmsg.y, 0.0, 
               o.msgmsg.w, o.msgmsg.h,
-              fontMsgTxf, dData.msg.str, InfoColor, TRUE, TRUE, TRUE);
+              fontMsgTxf, dData.msg.str, InfoColor, 
+              NULL, TRUE, TRUE, TRUE);
+
+  /* overload indicators */
+  if (dData.alloc.ealloc <= 0 || dData.alloc.walloc <= 0)
+    {                           /* an overload */
+      renderOverloadPulseMsg();
+    }
 
   return;
 }
@@ -848,6 +951,7 @@ void renderAlloc(GLfloat x, GLfloat y, GLfloat w, GLfloat h,
   GLfloat valxoff = (w / 10.0) * 3.0;
   GLfloat scaleend = x + w - valxoff - (w / 10.0);
   GLfloat scaleh = h / 2.0;
+  int walloc = 0;
   
   /* bg */
   if (a->ealloc > 0)
@@ -858,16 +962,17 @@ void renderAlloc(GLfloat x, GLfloat y, GLfloat w, GLfloat h,
   drawQuad(x, y, scaleend, scaleh, 0.0);
 
   /* fg */
+  walloc = 100 - a->ealloc;
   if (a->walloc > 0)
     uiPutColor(NoColor);
   else
     {
       uiPutColor(RedLevelColor);
-      a->walloc = 100 - a->ealloc;
+      walloc = 100 - a->ealloc;
     }
 
   drawQuad(x, y, 
-           scaleend * (GLfloat)((GLfloat)a->walloc / 100.0),
+           scaleend * (GLfloat)((GLfloat)walloc / 100.0),
            scaleh, 0.0);
 
   return;

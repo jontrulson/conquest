@@ -37,7 +37,8 @@ static scrNode_t nTeamlNode = {
   nTeamlDisplay,               /* display */
   nTeamlIdle,                  /* idle */
   nTeamlInput,                  /* input */
-  NULL                          /* next */
+  NULL,                         /* minput */
+  NULL                          /* animQue */
 };
 
 static int retnode;             /* the node to return to */

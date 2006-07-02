@@ -33,7 +33,8 @@ static scrNode_t nHistlNode = {
   nHistlDisplay,               /* display */
   nHistlIdle,                  /* idle */
   nHistlInput,                  /* input */
-  NULL
+  NULL,                         /* minput */
+  NULL                          /* animQue */
 };
 
 static int retnode;             /* the node to return to */

@@ -28,8 +28,8 @@ extern TexFont *fontMsgTxf;
 #endif /* NOEXTERN_GLFONT */
 
 void glfRender(GLfloat x, GLfloat y, GLfloat z, GLfloat w, GLfloat h,
-                       TexFont *font, char *str, int color, int scalex,
-               int dofancy, int ortho);
+               TexFont *font, char *str, int color, GLColor_t *col,
+               int scalex, int dofancy, int ortho);
 void initTexFonts(void);
 
 

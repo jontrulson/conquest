@@ -119,7 +119,7 @@ void mglConqLogo(dspConfig_t *dsp, bool mult)
     }
   else
     glfRender(x, y, 0.0, w, h, fontLargeTxf, Conquest, RedLevelColor, 
-              TRUE, FALSE, TRUE);
+              NULL, TRUE, FALSE, TRUE);
   
   drawLineBox(x, y + (h / 20.0),
               w,

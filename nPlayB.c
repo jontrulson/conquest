@@ -73,7 +73,8 @@ static scrNode_t nPlayBNode = {
   nPlayBDisplay,               /* display */
   nPlayBIdle,                  /* idle */
   nPlayBInput,                  /* input */
-  NULL                          /* animation que */
+  NULL,                         /* minput */
+  NULL                          /* animQue */
 };
 
 static animQue_t animQue;

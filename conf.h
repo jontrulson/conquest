@@ -19,6 +19,7 @@
 #define CONF_H
 
 #include "datatypes.h"
+#include "cqkeys.h"
 #ifdef CONF_NOEXTERN
 # define CEXTERN
 #else
@@ -28,7 +29,13 @@
 #define SYSCONFIG_FILE "conquestrc"	/* relative to CONQETC */
 #define CONFIG_FILE "conquestrc"
 
-#define CONF_MAXCOMMENTS 50
+#define CONF_MAXCOMMENTS   50
+
+#define CONF_MAXBUTTONS    32     /* max # of mouse buttons we can handle
+                                   (mouse macros) */
+#define CONF_MAXMODIFIERS  (((CQ_KEY_MOD_SHIFT | CQ_KEY_MOD_ALT | \
+                              CQ_KEY_MOD_CTRL) >> CQ_MODIFIER_SHIFT) + 1)
+
 
 				/* config types */
 #define CTYPE_NULL (0)
@@ -36,6 +43,7 @@
 #define CTYPE_STRING (2)
 #define CTYPE_MACRO (3)	
 #define CTYPE_NUMERIC (4)
+#define CTYPE_MOUSE (5)
 
 /* limits for some options */
 #define CONF_SERVER_NAME_SZ   70
@@ -120,6 +128,9 @@ typedef struct _userConf {
 
   char MacrosF[MAX_MACROS][MAX_MACRO_LEN];
 
+  /* mouse macros, indexed by [max buttons][modifiers (8)]  */
+  char Mouse[CONF_MAXBUTTONS][CONF_MAXMODIFIERS][MAX_MACRO_LEN];
+
 } UserConf_t;
 
 typedef struct _sysConf {
@@ -155,8 +166,8 @@ typedef struct _sysConf {
 } SysConf_t;
 
 
-				/* Revision on .conquestrc file */
-				/* - for updating .conquestrc   */
+				/* Revision on conquestrc file */
+				/* - for updating conquestrc   */
 				/*   when something changes */
 #ifndef CONF_NOEXTERN
 CEXTERN char ConfigVersion[];
@@ -392,7 +403,7 @@ CEXTERN struct Conf ConfData[];
 #else
 struct Conf ConfData[] =
 {
-  {				/* The current .conquestrc (conf.h) version */
+  {				/* The current conquestrc (conf.h) version */
     FALSE,
     CTYPE_NULL,
     "ConqfigVersion=",
@@ -413,7 +424,7 @@ struct Conf ConfData[] =
     {
       "###################################################################",
       "#",
-      "# .conquestrc - define some configuration values",
+      "# ~/.conquest/conquestrc - define some configuration values",
       "#",
       "# SYNTAX - <variable>=<value>",
       "#",
@@ -421,18 +432,6 @@ struct Conf ConfData[] =
       "#",
       "# BOOLEANS - use 'true', 'false', 'yes', or 'no' in upper/lower",
       "#  case.",
-      "#",
-      "# MACRO KEYS - program an Fkey to send a series of conquest commands",
-      "#  ALL characters after the '=' up to the end of line are programmed",
-      "#  into the respective FKey.  The following special sequences are ",
-      "#  recognized:  \\r = [RETURN], \\t = [TAB]",
-      "#",
-      "#  An example - make f1 a 'red alert' key:",
-      "#  macro_f1=A60\\r+",
-      "#  Where <A60\\r> = set weapons to 60% power allocation, and",
-      "#        <+>     = raise shields",
-      "#  The conquest commands defined in an FKey, will be fed to",
-      "#  conquest just as if they were typed from the keyboard.",
       "#",
       "",
       NULL
@@ -735,6 +734,46 @@ struct Conf ConfData[] =
       NULL
     }
   },
+  {				/* mouse macros */
+    FALSE,
+    CTYPE_MOUSE,
+    "mouse_",
+    &UserConf.Mouse,
+    0, 0,			/* mix/max */
+    "Mouse macros",
+    {
+      "# Mouse macro definitions.  Same general format as Macros.",
+      "# These only work when in the game and you click within the viewer.",
+      "# GL client only.",
+      "#",
+      "#  'mouse_[s|c|a]N=<string>'",
+      "#  s, c, and a are optional modifiers and represent:",
+      "#  s = Shift key, a = Alt key, c = Control key",
+      "#",
+      "#  'N' is the button number between 0 and 31, inclusive.",
+      "#",
+      "#  <string> is a sequence of Conquest commands to execute when",
+      "#  that particular Button and Modifier combination is pressed.",
+      "#",
+      "# The following special sequences are recognized:",
+      "#  \\r = [RETURN], \\t = [TAB] \\a = [Clicked Angle]",
+      "#",
+      "# Here are some example entries as they might appear in the",
+      "#  ~/.conquest/conquestrc file:",
+      "#",
+      "#  # mouse button 0, fire phaser at angle:",
+      "#  mouse_0=f\\a\\r",
+      "#  # sets course when middle button pressed:",
+      "#  mouse_1=k\\a\\r",
+      "#  # fire spread at angle on Control-Button 0:",
+      "#  mouse_c0=P\\a\\r",
+      "#  # Start self destuct on Control-Shift button 2:",
+      "#  mouse_cs2=Q\\t",
+      "#",
+      "",
+      NULL
+    }
+  },
   {				/* Macros are special - these should be last */
     FALSE,
     CTYPE_MACRO,
@@ -743,7 +782,7 @@ struct Conf ConfData[] =
     0, 0,			/* mix/max */
     "Macro Keys",
     {
-      "# Macro definitions.  The format in the ~/.conquestrc file is",
+      "# Macro definitions.  The format in the ~/.conquest/conquestrc file is",
       "#  'macro_fN=<string>'",
       "#  'N' is a number between 1 and MAX_MACROS, inclusive.",
       "#  <string> is a sequence of Conquest commands to execute when",
@@ -753,7 +792,7 @@ struct Conf ConfData[] =
       "#  \\r = [RETURN], \\t = [TAB]",
       "#",
       "# Here are some example entries as they might appear in the",
-      "#  ~/.conquestrc file:",
+      "#  ~/.conquest/conquestrc file:",
       "#",
       "#  # fires full spread of torps at last dir when F1 key is pressed:",
       "#  macro_f1=P\\rP\\rP\\r",

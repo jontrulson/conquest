@@ -96,7 +96,7 @@ void initTexFonts(void)
 }
 
 void glfRender(GLfloat x, GLfloat y, GLfloat z, GLfloat w, GLfloat h,
-                       TexFont *font, char *str, int color, 
+               TexFont *font, char *str, int color, GLColor_t *glcol,
                int scalex, int dofancy, int ortho)
 {
   GLfloat inverty = ((ortho) ? -1.0 : 1.0);
@@ -114,6 +114,7 @@ void glfRender(GLfloat x, GLfloat y, GLfloat z, GLfloat w, GLfloat h,
   l = strlen(str);
 
   txfBindFontTexture(font);
+  GLError();
   txfGetStringMetrics( font, str, l, &width, 
                        &ascent, &descent);
   if (scalex)
@@ -122,12 +123,12 @@ void glfRender(GLfloat x, GLfloat y, GLfloat z, GLfloat w, GLfloat h,
   ys = ((2.0 * (h/(ascent + descent))) * 0.70);
       
 #if 0
- clog("glfRender(%s): WINDOW: %d, w = %f h = %f, \n"
-      "\twid = %d, asc = %d desc = %d"
-      "\ttxf height = %d",
+  clog("glfRender(%s): WINDOW: %d, w = %f h = %f, \n"
+       "\twid = %d, asc = %d desc = %d"
+       "\ttxf height = %d",
        str, 
-      glutGetWindow(), w, h, width, ascent, descent,
-      font->tex_height);
+       glutGetWindow(), w, h, width, ascent, descent,
+       font->tex_height);
 #endif
 
   glEnable(GL_TEXTURE_2D);
@@ -148,7 +149,15 @@ void glfRender(GLfloat x, GLfloat y, GLfloat z, GLfloat w, GLfloat h,
       glScalef(xs, inverty * ys, 1.0);
     }
 
-  uiPutColor(color);
+  if (glcol)
+    {
+      glColor4f(glcol->r,
+                glcol->g,
+                glcol->b,
+                glcol->a);
+    }
+  else
+    uiPutColor(color);
   
   if (dofancy)
     txfRenderFancyString(font, str, l);

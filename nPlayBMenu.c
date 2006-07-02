@@ -49,10 +49,12 @@ static int nPlayBMenuInput(int ch);
 static char *nss = NULL;        /* no such ship */
 
 static scrNode_t nPlayBMenuNode = {
-  nPlayBMenuDisplay,               /* display */
+  nPlayBMenuDisplay,            /* display */
   NULL,                         /* idle */
-  nPlayBMenuInput,                  /* input */
-  NULL                          /* next */
+  nPlayBMenuInput,              /* input */
+  NULL,                         /* minput */
+  NULL                          /* animQue */
+
 };
 
 void nPlayBMenuInit(void)

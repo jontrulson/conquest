@@ -34,7 +34,8 @@ static scrNode_t nCPHelpNode = {
   nCPHelpDisplay,               /* display */
   nCPHelpIdle,                  /* idle */
   nCPHelpInput,                  /* input */
-  NULL
+  NULL,                         /* minput */
+  NULL                          /* animQue */
 };
 
 

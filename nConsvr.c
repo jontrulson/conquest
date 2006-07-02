@@ -40,7 +40,8 @@ static scrNode_t nConsvrNode = {
   nConsvrDisplay,               /* display */
   nConsvrIdle,                  /* idle */
   nConsvrInput,                  /* input */
-  NULL
+  NULL,                         /* minput */
+  NULL                          /* animQue */
 };
 
 

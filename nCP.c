@@ -130,12 +130,14 @@ static int pingPending = FALSE;
 static int nCPDisplay(dspConfig_t *);
 static int nCPIdle(void);
 static int nCPInput(int ch);
+static int nCPMInput(mouseData_t *mdata);
 
 static scrNode_t nCPNode = {
   nCPDisplay,                   /* display */
   nCPIdle,                      /* idle */
   nCPInput,                     /* input */
-  NULL                          /* will contain our animation que */
+  nCPMInput,                    /* minput */
+  NULL                          /* animQue */
 };
 
 static animQue_t animQue;
@@ -3243,3 +3245,31 @@ static int nCPInput(int ch)
   return NODE_OK;
 }
 
+static int nCPMInput(mouseData_t *mdata)
+{
+#if 0
+  clog ("%s: mod = %08x, button = %d state = %d\n", 
+        __FUNCTION__,
+        mdata->mod,
+        mdata->button,
+        mdata->state);
+#endif
+
+  /* check to see if event is in viewer area, and a button press */
+  if (((mdata->x >= dConf.vX) && (mdata->x <= (dConf.vX + dConf.vW)) &&
+       (mdata->y >= dConf.vY) && (mdata->y <= (dConf.vY + dConf.vH))) &&
+      (mdata->state == CQ_MOUSE_BDOWN))
+
+    {
+      /* compute an angle relative to center of viewer and do
+         the macro thang */
+      real dir = angle((real)(dConf.vX + (dConf.vW / 2.0)), 
+                       (real)(dConf.vY + (dConf.vH / 2.0)), 
+                       (real)mdata->x, 
+                       (real)(dConf.vY + dConf.vH) - (real)mdata->y);
+      
+      DoMouseMacro(mdata->button, mdata->mod, dir);
+    }
+
+  return NODE_OK;
+}

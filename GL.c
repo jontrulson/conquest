@@ -36,6 +36,7 @@
 #include "client.h"
 #include "conf.h"
 #include "cqkeys.h"
+#include "cqmouse.h"
 #include "record.h"
 
 extern void conqend(void);
@@ -882,22 +883,60 @@ char *padstr(int l)
 
 static void mouse(int b, int state, int x, int y)
 {
+  static mouseData_t mdata;
+  Unsgn32 kmod = glutGetModifiers();
+  int rv = NODE_OK;
+  scrNode_t *node = getTopNode();
+  scrNode_t *onode = getTopONode();
+
 #if 0
-  clog("MOUSE CLICK: b = %d, state = %d x = %d, y = %d", b, state, x, y);
-
-  if (state == 0)
-    {
-      Unsgn32 kmod = glutGetModifiers();
-
-      clog ("%s: angle is %f kmod = %08x\n", 
-            __FUNCTION__,
-            angle(dConf.vX + (dConf.vW / 2.0), 
-                  dConf.vY + (dConf.vH / 2.0), 
-                  (real)x, 
-                  (dConf.vY + dConf.vH) - (real)y),
-            kmod);
-    }
+  clog("%s: b = %d, state = %d x = %d, y = %d", 
+       __FUNCTION__,
+       b, state, x, y);
 #endif
+
+  if (node)
+    {
+      mdata.x = x;
+      mdata.y = y;
+      /* pretty glut specific for now, easy to change later */
+      mdata.button = b;
+      mdata.state = state;
+      mdata.mod = 0;
+
+      if (kmod & GLUT_ACTIVE_SHIFT)
+        mdata.mod |= CQ_KEY_MOD_SHIFT;
+      if (kmod & GLUT_ACTIVE_CTRL)
+        mdata.mod |= CQ_KEY_MOD_CTRL;
+      if (kmod & GLUT_ACTIVE_ALT)
+        mdata.mod |= CQ_KEY_MOD_ALT;
+      
+      if (mdata.mod)
+        mdata.mod = (mdata.mod >> CQ_MODIFIER_SHIFT);
+
+      /* we give input priority to the overlay node */
+      if (onode && onode->minput)
+        {
+          rv = (*onode->minput)(&mdata);
+          if (rv == NODE_EXIT)
+            {
+              conqend();
+              exit(1);
+            }
+        }
+      else
+        {
+          if (node->minput)
+            rv = (*node->minput)(&mdata);
+          
+          if (rv == NODE_EXIT)
+            {
+              conqend();
+              exit(1);
+            }
+        }
+    }
+
   return;
 }
 
@@ -1241,7 +1280,7 @@ void uiDrawPlanet( GLfloat x, GLfloat y, int pnum, int scale,
                     ((scale == SCALE_FAC) ? y - 4.0 : y - 1.0), 
                     TRANZ, /* planet's Z */
                     ((GLfloat)strlen(buf) * 2.0) / ((scale == SCALE_FAC) ? 1.0 : 2.0), 
-                    TEXT_HEIGHT, fontTinyFixedTxf, buf, textcolor, 
+                    TEXT_HEIGHT, fontTinyFixedTxf, buf, textcolor, NULL,
                     TRUE, FALSE, FALSE);
         }
     }
@@ -1290,7 +1329,7 @@ void uiDrawPlanet( GLfloat x, GLfloat y, int pnum, int scale,
                 ((scale == SCALE_FAC) ? y - 2.0 : y - 1.0), 
                 TRANZ,  
                 ((GLfloat)uiCStrlen(buf) * 2.0) / ((scale == SCALE_FAC) ? 1.0 : 2.0), 
-                TEXT_HEIGHT, fontTinyFixedTxf, buf, textcolor, 
+                TEXT_HEIGHT, fontTinyFixedTxf, buf, textcolor, NULL,
                 TRUE, TRUE, FALSE);
 
     }
@@ -1891,7 +1930,8 @@ static void renderFrame(void)
 
 void uiPrintFixed(GLfloat x, GLfloat y, GLfloat w, GLfloat h, char *str)
 {                               /* this works for non-viewer only */
-  glfRender(x, y, 0.0, w, h, fontFixedTxf, str, NoColor, TRUE, TRUE, TRUE);
+  glfRender(x, y, 0.0, w, h, fontFixedTxf, str, NoColor, NULL, 
+            TRUE, TRUE, TRUE);
 
   return;
 }
@@ -2157,7 +2197,7 @@ drawShip(GLfloat x, GLfloat y, GLfloat angle, char ch, int snum, int color,
             ((scale == SCALE_FAC) ? y - 4.0: y - 1.0), 
             TRANZ,  
             ((GLfloat)strlen(buf) * 2.0) / ((scale == SCALE_FAC) ? 1.0 : 2.0), 
-             TEXT_HEIGHT, fontTinyFixedTxf, buf, color, 
+            TEXT_HEIGHT, fontTinyFixedTxf, buf, color, NULL,
             TRUE, FALSE, FALSE);
 
   /* highlight enemy ships... */

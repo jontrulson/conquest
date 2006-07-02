@@ -42,7 +42,8 @@ static scrNode_t nShiplNode = {
   nShiplDisplay,               /* display */
   nShiplIdle,                  /* idle */
   nShiplInput,                  /* input */
-  NULL                          /* next */
+  NULL,                         /* minput */
+  NULL                          /* animQue */
 };
 
 static int retnode;             /* the node to return to */

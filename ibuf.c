@@ -175,3 +175,51 @@ int DoMacro(int fkey)
 
 }
       
+int DoMouseMacro(int but, Unsgn32 mods, real mangle)
+{
+  int myangle = ((mangle < 0.0) ? 0 : (int)mod360(mangle));
+  char *s;
+  static char buf[MAX_MACRO_LEN];
+
+  
+  if (but < 0 || but >= CONF_MAXBUTTONS)
+    return(FALSE);
+
+  if (mods < 0 || mods >= CONF_MAXMODIFIERS)
+    return(FALSE);
+
+  /* we need to translate any occurances of \a into the mangle (angle) */
+
+  s = UserConf.Mouse[but][mods];
+
+#if defined(DEBUG_MACROS)
+  clog("DoMouseMacro(): got MOUSE Macro Key: %d, mod %d string = '%s'", but,
+       mods, s);
+#endif
+
+  while (*s)
+    {
+      if (*s == '\\')
+        {
+          s++;
+
+          if (*s == 'a')
+            {
+              s++;
+              snprintf(buf, MAX_MACRO_LEN - 1, "%d",
+                       myangle);
+              iBufPut(buf); 
+            }
+          else
+            iBufPutc('\\');
+        }
+      else
+        {
+          iBufPutc((int)*s);
+          s++;
+        }
+    }
+
+  return(TRUE);
+}
+      

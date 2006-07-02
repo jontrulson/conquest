@@ -68,7 +68,7 @@ static void setSysConfDefaults(void)
 /* set default user config */
 void setUserConfDefaults(void)
 {
-  int i;
+  int i, j;
 
   UserConf.DoAlarms = TRUE;
   UserConf.ShowPhasers = TRUE;
@@ -94,8 +94,26 @@ void setUserConfDefaults(void)
   UserConf.DoTacShade = 50;
 
   for (i=0; i<MAX_MACROS; i++)
+    UserConf.MacrosF[i][0] = EOS;
+
+  for (i=0; i<CONF_MAXBUTTONS; i++)
     {
-      UserConf.MacrosF[i][0] = EOS;
+      for (j=0; j<CONF_MAXMODIFIERS; j++)
+        UserConf.Mouse[i][j][0] = EOS;
+
+      /* set up default mouse macros, '\a' mean 'angle' substitution */
+
+      /* fire phaser (left button (0), no modifiers) */
+      strncpy(UserConf.Mouse[0][0], 
+              "f\\a\r", MAX_MACRO_LEN);
+
+      /* set course (middle button (1), no modifiers) */
+      strncpy(UserConf.Mouse[1][0], 
+              "k\\a\r", MAX_MACRO_LEN);
+
+      /* fire torp (right button (2), no modifiers) */
+      strncpy(UserConf.Mouse[2][0], 
+              "p\\a\r", MAX_MACRO_LEN);
     }
 
   return;
@@ -370,6 +388,58 @@ int GetSysConf(int checkonly)
   return(TRUE);
 }
 
+/* parse a mouse macro mod/but string */
+static int 
+parseMouseModNum(char *str, Unsgn32 *mods, Unsgn32 *button)
+{
+  int done = FALSE;
+  if (!mods || !button || !str)
+    return FALSE;
+
+  if (!*str)
+    return FALSE;
+
+  *mods = 0;
+  *button = 0;
+
+  while (*str && !done)
+    {
+      if (!isdigit(*str))
+        {
+          /* check for 'a', 'c', and 's' */
+          switch (*str)
+            {
+            case 'a':
+              *mods |= (CQ_KEY_MOD_ALT >> CQ_MODIFIER_SHIFT) ;
+              break;
+            case 'c':
+              *mods |= (CQ_KEY_MOD_CTRL >> CQ_MODIFIER_SHIFT);
+              break;
+            case 's':
+              *mods |= (CQ_KEY_MOD_SHIFT >> CQ_MODIFIER_SHIFT);
+              break;
+            default:
+              clog("parseMouseModNum: Invalid modifier char '%c'",
+                   *str);
+              return FALSE;
+              break;
+            }
+          str++;
+        }
+      else                      /* the mouse button number, always last */
+        {
+          *button = atoi(str);
+          done = TRUE;
+        }   
+    }
+
+  if (*button < 0 || *button >= CONF_MAXBUTTONS)
+    return FALSE;
+  if (*mods < 0 || *mods >= CONF_MAXMODIFIERS)
+    return FALSE;
+
+  return TRUE;
+}
 				/* get user's configuration */
 int GetConf(int usernum)
 {
@@ -514,7 +584,7 @@ int GetConf(int usernum)
 #endif
 				/* clean it first... */
 				memset((char *)(((char *)ConfData[j].ConfValue)
-					 + ((n - 1) * MAX_MACRO_LEN)), 
+                                                + ((n - 1) * MAX_MACRO_LEN)), 
 				       0,
 				       MAX_MACRO_LEN);
 				strncpy((char *)(((char *)ConfData[j].ConfValue)
@@ -526,6 +596,39 @@ int GetConf(int usernum)
 			      }
 			  }
 				
+			break;
+
+		      case CTYPE_MOUSE:
+                        {
+                          Unsgn32 mods;
+                          Unsgn32 button;
+
+                          /* need to parse out mods/button #. */
+                          cptr = strchr(bufptr, '=');
+
+                          if (cptr != NULL)
+                            {	/* valid entry */
+                              *cptr = '\0';
+                              if (parseMouseModNum(bufptr,
+                                                   &mods, &button))
+                                { /* got a valid button and modifier(s) */
+                                  
+#if defined(DEBUG_CONFIG)
+                                  clog("GetConf(): Mouse %d %d, value '%s' read",
+                                       button, mods, (char *)cptr + 1);
+#endif
+                                  /* clean it first... */
+                                  memset(UserConf.Mouse[button][mods], 
+                                         0,
+                                         MAX_MACRO_LEN);
+                                  strncpy(UserConf.Mouse[button][mods], 
+                                          Str2Macro((char *)cptr + 1), 
+                                          MAX_MACRO_LEN - 1);
+                                  ConfData[j].Found = TRUE;
+                                  FoundOne = TRUE;
+                                }
+                            }
+                        }
 			break;
 
 		      case CTYPE_NUMERIC:
@@ -582,7 +685,8 @@ int GetConf(int usernum)
       for (i=0; i<CfEnd; i++)
 	{
 	  if (ConfData[i].ConfType != CTYPE_NULL && 
-	      ConfData[i].ConfType != CTYPE_MACRO )
+	      ConfData[i].ConfType != CTYPE_MACRO && 
+              ConfData[i].ConfType != CTYPE_MOUSE )
 	    if (ConfData[i].Found != TRUE)
 	      {
 #ifdef DEBUG_CONFIG
@@ -666,8 +770,12 @@ char *Str2Macro(char *str)
 		  s++;
 		  break;
 		case '\\':
+		  retstr[i++] = '\\';
+                  s++;
+                  break;
 		default:
 		  retstr[i++] = '\\';
+		  retstr[i++] = *s;
                   s++;
                   break;
 		}
@@ -723,11 +831,13 @@ char *Macro2Str(char *str)
 	  retstr[i++] = 'n';
 	  s++;
 	  break;
+#if 0
 	case '\\':
 	  retstr[i++] = '\\';
 	  retstr[i++] = '\\';
 	  s++;
 	  break;
+#endif
 	default:
 	  retstr[i++] = *s;
 	  s++;
@@ -819,6 +929,39 @@ int MakeConf(char *filename)
       if (ConfData[j].ConfType != CTYPE_NULL)
 	switch (ConfData[j].ConfType)
 	  {
+	  case CTYPE_MOUSE:
+            {
+              int b, m;
+
+              for (b=0; b < CONF_MAXBUTTONS; b++)
+                {
+                  for (m=0; m<CONF_MAXMODIFIERS; m++)
+                    {
+                      if (strlen(UserConf.Mouse[b][m]) != 0)
+                        {
+                          char buffer[16]; /* max 'acs\0' */
+                          int o = 0;
+                          
+                          buffer[0] = 0;
+                          if (m & (CQ_KEY_MOD_SHIFT >> CQ_MODIFIER_SHIFT))
+                            strcat(buffer, "s");
+                          if (m & (CQ_KEY_MOD_CTRL  >> CQ_MODIFIER_SHIFT))
+                            strcat(buffer, "c");
+                          if (m & (CQ_KEY_MOD_ALT   >> CQ_MODIFIER_SHIFT))
+                            strcat(buffer, "a");
+
+                          fprintf(conf_fd, "%s%s%d=%s\n",
+                                  ConfData[j].ConfName,
+                                  buffer,
+                                  b,
+                                  Macro2Str(UserConf.Mouse[b][m]));
+                        }
+
+                    }
+                }
+            }
+	    break;
+
 	  case CTYPE_MACRO:
 	    for (n=0; n < MAX_MACROS; n++)
 	      {

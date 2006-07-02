@@ -41,6 +41,7 @@ static int uopts = FALSE;       /* are we doing user opts? */
 #define S_GETPW         6       /* changing password */
 #define S_GETRPW        7
 #define S_HELP          8
+#define S_MOUSE         9       /* changing mouse macros */
 static int state;
 
 static prm_t prm;
@@ -54,10 +55,13 @@ static char *phelper = "Use any printable characters.";
 static char *nodef = "<Not Defined>";
 
 static char *mheader = "View/Edit Macros";
+static char *mmheader = "View/Edit Mouse Macros";
+static char *mmheader2 = "'a' = Alt, 'c' = Control 's' = Shift";
 static char *uheader = "User Configurable Options";
 static char *sheader = "System-wide Configurable Options";
 
 static char *meprompt = "Enter Conquest commands.  ([RETURN] = \\r, [TAB] = \\t)";
+static char *mmeprompt = "Enter Conquest commands.  ([RETURN] = \\r, [TAB] = \\t <angle> = \\a)";
 static char *eprompt = "Arrow keys to select an item, [SPACE] to change, any other key to quit.";
 static char *eprompt2 = "Type '?' for help on an item.";
 static char *mprompt = "Arrow keys to select a macro, [SPACE] to change, any other key to quit.";
@@ -67,7 +71,7 @@ static const int settingcol = 65;
 
 static char cursor = ' ';       /* the cursor */
 
-static const int umenuopts = 3; /* don't exceed 9 - one char input is used */
+static const int umenuopts = 4; /* don't exceed 9 - one char input is used */
 
 static int flin, llin, clin, pages, curpage;
 static const int items_per_page = 18;
@@ -78,7 +82,17 @@ static int maxuopts;
 static int maxsopts = 0;        /* not impl yet */
 static char *macrovec[MAX_MACROS];
 
+#define MAX_MOUSE (CONF_MAXBUTTONS * CONF_MAXMODIFIERS)
+static char *mousevec[MAX_MOUSE];
+
+#define MOUSE2VEC(_but, _mod)   ((_(but) * CONF_MAXMODIFIERS) + (_mod)) 
+#define VEC2MOUSE(_vecnum, _but, _mod) { \
+                 (_but) = ((_vecnum) / CONF_MAXMODIFIERS); \
+                 (_mod) = (((_vecnum) - ((_but) * CONF_MAXMODIFIERS))); \
+               }
+
 static struct Conf *macroptr = NULL; /* points to macro element of ConfData */
+static struct Conf *mouseptr = NULL; /* points to mouse macro element of ConfData */
 static struct Conf *ConfigData = NULL;
 
 static char *oheader = "";
@@ -90,10 +104,12 @@ static int nOptionsIdle(void);
 static int nOptionsInput(int ch);
 
 static scrNode_t nOptionsNode = {
-  nOptionsDisplay,               /* display */
-  nOptionsIdle,                  /* idle */
-  nOptionsInput,                  /* input */
-  NULL                          /* next */
+  nOptionsDisplay,              /* display */
+  nOptionsIdle,                 /* idle */
+  nOptionsInput,                /* input */
+  NULL,                         /* minput */
+  NULL                          /* animQue */
+
 };
 
 /* return to the correct node */
@@ -121,8 +137,6 @@ static void quitNode(void)
 static void _changePasswd(int init)
 {
   static char pw[MAXUSERNAME], rpw[MAXUSERNAME];
-
-  clog("CHPW: init = %d, state = %d ", init, state);
 
   if (init)
     {                           /* start prompting */
@@ -154,13 +168,10 @@ static void _changePasswd(int init)
       else
         {                       /* done. do a compare and send new pw
                                    if they match */
-          clog("CHPW: init = %dGETRPW?", init);
-  
          if (strcmp(pw, rpw) != 0)
             {                       /* pw's don't match */
               mglBeep();
               state = S_USRMENU;
-           clog("CHPW: init = %d, mismatch", init);
               return;
             }
           else
@@ -168,8 +179,6 @@ static void _changePasswd(int init)
 
           prompting = FALSE;
           state = S_USRMENU;
-          clog("CHPW: init = %d, changed", init);
-
         }
       
     }
@@ -202,6 +211,49 @@ static void _changeMacro(int macronum, int init)
       strncpy(UserConf.MacrosF[macronum - 1], Str2Macro(prm.buf), 
               MAX_MACRO_LEN);
       UserConf.MacrosF[macronum - 1][MAX_MACRO_LEN - 1] = EOS;
+    }
+
+  return;
+}
+
+static void _changeMouse(int mousevec, int init)
+{
+  int lin;
+  Unsgn32 mod, but;
+  static char prmpt[BUFFER_SIZE];
+  static char modstr[16];
+  lin = MSG_LIN1;
+  
+  VEC2MOUSE(mousevec, but, mod);
+
+  if (init)
+    {                           /* start prompting */
+      modstr[0] = EOS;
+
+      if (mod & (CQ_KEY_MOD_CTRL  >> CQ_MODIFIER_SHIFT))
+        strcat(modstr, "c");
+      if (mod & (CQ_KEY_MOD_SHIFT >> CQ_MODIFIER_SHIFT))
+        strcat(modstr, "s");
+      if (mod & (CQ_KEY_MOD_ALT   >> CQ_MODIFIER_SHIFT))
+        strcat(modstr, "a");
+
+      sprintf(prmpt, "%3s%2d = ", modstr, but);
+      strcpy(cbuf, Macro2Str(UserConf.Mouse[but][mod]));
+
+      prm.preinit = TRUE;
+      prm.buf = cbuf;
+      prm.buflen = MAX_MACRO_LEN - 1;
+      prm.pbuf = prmpt;
+      prm.terms = TERMS;
+      prm.index = lin;
+      prompting = TRUE;
+      
+    }
+  else
+    {                           /* change it for real */
+      strncpy(UserConf.Mouse[but][mod], Str2Macro(prm.buf), 
+              MAX_MACRO_LEN);
+      UserConf.Mouse[but][mod][MAX_MACRO_LEN - 1] = EOS;
     }
 
   return;
@@ -287,6 +339,7 @@ static void _dispUserOptsMenu(void)
   static char *mopts[] = { 
     "View/Edit Options",
     "View/Edit Macros",
+    "View/Edit Mouse Macros",
     "Change Password"
   };
   static char *prompt = "Enter a number to select an item, any other key to quit.";
@@ -299,37 +352,43 @@ static void _dispUserOptsMenu(void)
       clog("_dispUserOptsMenu(): ERROR: macroptr == NULL, no CTYPE_MACRO found in ConfData");
     }
 
-				/* First clear the display. */
-      lin = 1;
-      cprintf(lin, 0, ALIGN_CENTER, "#%d#%s", NoColor, header);
-      
-      lin += 3;
-      col = 5;
-      
-      for (i = 0; i < umenuopts; i++)
-	{
-	  cprintf(lin, col, ALIGN_NONE, "#%d#%d.#%d# %s#%d#", InfoColor, 
-		  i + 1, LabelColor, mopts[i], NoColor);
-	  lin++;
-	}
+  if (mouseptr == NULL)
+    {				/* if this happens, something is
+				   seriously confused */
+      clog("_dispUserOptsMenu(): ERROR: mouseptr == NULL, no CTYPE_MOUSE found in ConfData");
+    }
 
-      lin = 19;
-      cprintf(lin, col, ALIGN_NONE, "#%d#UDP:  #%d# %s#%d#", LabelColor,
-              InfoColor, (cInfo.doUDP) ? "On" : "Off",
-              NoColor);
+  /* First clear the display. */
+  lin = 1;
+  cprintf(lin, 0, ALIGN_CENTER, "#%d#%s", NoColor, header);
+  
+  lin += 3;
+  col = 5;
+  
+  for (i = 0; i < umenuopts; i++)
+    {
+      cprintf(lin, col, ALIGN_NONE, "#%d#%d.#%d# %s#%d#", InfoColor, 
+              i + 1, LabelColor, mopts[i], NoColor);
       lin++;
-      cprintf(lin, col, ALIGN_NONE, "#%d#Flags:#%d# %s#%d#", LabelColor,
-              InfoColor, clntServerFlagsStr(sStat.flags),
-              NoColor);
-      
-      if (!prompting)
-        {
-          clrPrompt(MSG_LIN1);
-          clrPrompt(MSG_LIN2);
-          cprintf(MSG_LIN2, 0, ALIGN_NONE, prompt);
-        }
-      
-      return;
+    }
+  
+  lin = 19;
+  cprintf(lin, col, ALIGN_NONE, "#%d#UDP:  #%d# %s#%d#", LabelColor,
+          InfoColor, (cInfo.doUDP) ? "On" : "Off",
+          NoColor);
+  lin++;
+  cprintf(lin, col, ALIGN_NONE, "#%d#Flags:#%d# %s#%d#", LabelColor,
+          InfoColor, clntServerFlagsStr(sStat.flags),
+          NoColor);
+  
+  if (!prompting)
+    {
+      clrPrompt(MSG_LIN1);
+      clrPrompt(MSG_LIN2);
+      cprintf(MSG_LIN2, 0, ALIGN_NONE, prompt);
+    }
+  
+  return;
 }
 
 static void _initOptsScreen(void)
@@ -373,6 +432,19 @@ static void _initOptsScreen(void)
         pages = 1;
 
       break;
+
+    case S_MOUSE:
+      oheader = mmheader;
+      if (MAX_MOUSE >= items_per_page)
+        {
+          pages = MAX_MOUSE / items_per_page;
+          if ((MAX_MOUSE % items_per_page) != 0)
+            pages++;                /* for runoff */
+        }
+      else
+        pages = 1;
+
+      break;
     }
 
   return;
@@ -388,8 +460,11 @@ static void _dispHelpScreen(void)
 
   if (oldstate == S_UOPTS)
     confitem = &ConfigData[cvec[(curpage * items_per_page) + clin]];
-  else
+  else if (oldstate == S_MACROS)
     confitem = macroptr;
+  else 
+    confitem = mouseptr;
+  
 
   lin = 1;
   col = 0;
@@ -470,6 +545,16 @@ static void _showOptScreen(void)
         llin = items_per_page;
       break;
 
+    case S_MOUSE:
+      header = mmheader;
+      prompt = mprompt;
+      prompt2 = mprompt2;
+      if (curpage == (pages - 1)) /* last page - might be less than full */
+        llin = (MAX_MOUSE % items_per_page); /* ..or more than empty? ;-) */
+      else
+        llin = items_per_page;
+      break;
+
     default:                    /* shouldn't get here */
       header = "";
       break;
@@ -480,7 +565,10 @@ static void _showOptScreen(void)
   
   lin = 1;
   cprintf(lin, 0, ALIGN_CENTER, "#%d#%s", NoColor, headerbuf);
-  
+
+  if (state == S_MOUSE)         /* need an extra header for mouse */
+    cprintf(lin + 1, 0, ALIGN_CENTER, "#%d#%s", NoColor, mmheader2);
+
   lin = flin;
   col = 1;
   
@@ -513,6 +601,53 @@ static void _showOptScreen(void)
           cprintf(lin, col, ALIGN_NONE, "#%d#f%2d = #%d#%s#%d#",
                   (k == ((curpage * items_per_page) + clin)) ? RedColor : InfoColor, 
                   k + 1, vattrib, 
+                  dispmac,
+                  NoColor);
+          
+          lin++;
+          i++;
+        }
+
+      if (state == S_MOUSE)
+        {
+          static char modstr[16];
+          Unsgn32 mod, but;
+
+          /* get the mouse macro number for this line */
+          k = (curpage * items_per_page) + i; 
+          
+          VEC2MOUSE(k, but, mod);
+          modstr[0] = EOS;
+          
+          if (mod & (CQ_KEY_MOD_CTRL  >> CQ_MODIFIER_SHIFT))
+            strcat(modstr, "c");
+          if (mod & (CQ_KEY_MOD_SHIFT >> CQ_MODIFIER_SHIFT))
+            strcat(modstr, "s");
+          if (mod & (CQ_KEY_MOD_ALT   >> CQ_MODIFIER_SHIFT))
+            strcat(modstr, "a");
+
+          if (mousevec[k][0] == EOS)
+            {			/* not defined */
+              dispmac = nodef;
+              vattrib = RedLevelColor;
+            }
+          else
+            {
+              dispmac = Macro2Str(mousevec[k]);
+              vattrib = GreenLevelColor;
+            }
+          
+#ifdef DEBUG_OPTIONS
+          clog("_showOptScreen(): k = %d, dispmac = '%s'", 
+               k, 
+               dispmac);
+          clog("\t: but = %d, mod = %d", 
+               but, 
+               mod);
+#endif
+          cprintf(lin, col, ALIGN_NONE, "#%d#%3s%2d = #%d#%s#%d#",
+                  (k == ((curpage * items_per_page) + clin)) ? RedColor : InfoColor, 
+                  modstr, but, vattrib, 
                   dispmac,
                   NoColor);
           
@@ -626,7 +761,11 @@ scrNode_t *nOptionsInit(int what, int setnode, int rnode)
           if (ConfData[i].ConfType == CTYPE_MACRO)
             {
               macroptr = &ConfData[i];
-              break;
+            }
+
+          if (ConfData[i].ConfType == CTYPE_MOUSE)
+            {
+              mouseptr = &ConfData[i];
             }
         }
       
@@ -636,6 +775,17 @@ scrNode_t *nOptionsInit(int what, int setnode, int rnode)
             macrovec[i] = (char *)(((char *)macroptr->ConfValue)
                                    + (i * MAX_MACRO_LEN));
           }
+
+      if (mouseptr)
+        {
+          Unsgn32 but, mod;
+
+          for (i=0; i < MAX_MOUSE; i++)
+            {
+              VEC2MOUSE(i, but, mod);
+              mousevec[i] = UserConf.Mouse[but][mod];
+            }
+        }
     }
 
   if (setnode)
@@ -662,7 +812,7 @@ static int nOptionsDisplay(dspConfig_t *dsp)
               NoColor, phelper);
     }
 
-  if ((state == S_UOPTS) || (state == S_MACROS))
+  if ((state == S_UOPTS) || (state == S_MACROS) || (state == S_MOUSE))
     {
       _showOptScreen();
 
@@ -674,6 +824,9 @@ static int nOptionsDisplay(dspConfig_t *dsp)
           if (state == S_MACROS)
             cprintf(MSG_LIN2, 0, ALIGN_NONE, "#%d#%s",
                     NoColor, meprompt);
+          if (state == S_MOUSE)
+            cprintf(MSG_LIN2, 0, ALIGN_NONE, "#%d#%s",
+                    NoColor, mmeprompt);
         }
 
     }
@@ -686,7 +839,7 @@ static int nOptionsDisplay(dspConfig_t *dsp)
 
 static int nOptionsIdle(void)
 {
-  int gtime = glutGet(GLUT_ELAPSED_TIME);
+  int gtime = frameTime;
   static int old = 0;
   int pkttype;
   Unsgn8 buf[PKT_MAXSIZE];
@@ -750,6 +903,16 @@ static int nOptionsInput(int ch)
             }
           break;
 
+        case S_MOUSE:
+          if (irv > 0)
+            {
+              if (irv != TERM_ABORT)
+                _changeMouse((curpage * items_per_page) + clin, FALSE);
+
+              prompting = FALSE;
+            }
+          break;
+
         case S_UOPTS:
           if (irv > 0)
             {
@@ -798,6 +961,11 @@ static int nOptionsInput(int ch)
           break;
 
         case '3':
+          state = S_MOUSE;
+          _initOptsScreen();
+          break;
+
+        case '4':
           state = S_GETPW;
           _changePasswd(TRUE);
           break;
@@ -811,9 +979,9 @@ static int nOptionsInput(int ch)
       return NODE_OK;
     }
 
-  if (state == S_UOPTS || state == S_MACROS)
+  if (state == S_UOPTS || state == S_MACROS || state == S_MOUSE)
     {
-      int maxitms = (state == S_UOPTS) ? maxuopts : MAX_MACROS;
+      int maxitms = ((state == S_UOPTS) ? maxuopts : ((state == S_MACROS) ? MAX_MACROS : MAX_MOUSE));
 
       switch(ch)
 	{
@@ -910,6 +1078,8 @@ static int nOptionsInput(int ch)
 	case ' ':	/* change something */
           if (state == S_MACROS)
             _changeMacro((curpage * items_per_page) + clin + 1, TRUE);
+          else if (state == S_MOUSE)
+            _changeMouse((curpage * items_per_page) + clin, TRUE);
           else if (state == S_UOPTS)
             _changeOption(&ConfigData[cvec[(curpage * items_per_page) + clin]], TRUE);
 	  break;
