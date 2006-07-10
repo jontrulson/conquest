@@ -9,6 +9,49 @@
 
                               Conquest HISTORY
 
+8.1.2f (devel) 7/10/2006
+
+       - fixed bug with mouse macros and angles that would cause the
+         computed angle to be off by a few degrees depending on where
+         you clicked.
+
+       - Engine/weapon critical alerts now pulsed in viewer.  Got rid
+         of iconhud eng/wep critical decal textures.
+
+       - added 'Fuel Critical' alert pulse in viewer when fuel is < 100.
+
+       - 'alert bars' are gone.  In their place are torp status pips,
+         indicating torpedo status for each torp (left), and a
+         vertical phaser status gauge, indicating phaser recharge
+         state (right).
+
+         Torp pip colors:
+              Green - ready to fire
+              White - in flight
+              Red   - exploding
+         
+         Phaser recharge:
+              Green - ready to fire
+              Red   - recharging
+
+       - Alert text is now displayed at bottom of viewer, instead of
+         hud icon area.
+
+       - army counts and team owner are now displayed on SR scan as
+         well when numeric_planet_map is enabled.  Previously this
+         only worked when in LR scan.
+
+       - 'p', 'P', and 'f' firing commands always accept an angle,
+         even if you can't actually fire them.  This avoids certain
+         'accidents' when using macros, where if the fire command
+         could not succeed for some reason, the angle would be
+         mistakenly interpreted as a warp command.
+
+       - When in orbit, use 'Orbit' instead of 'o' in warp indicator.
+
+       - add conquest homepage URL and mailing list suggestion to main
+         menu. 
+
 8.1.2e (devel) 7/1/2006
 
        - added some mouse support in the GL client.  Macros can be

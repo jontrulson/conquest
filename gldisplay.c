@@ -527,7 +527,7 @@ void display( int snum, int display_info )
 	  }
 	else
 	  {
-	    setWarp(" o ");
+	    setWarp("Orbit");
 	  }
 	
 	zzswarp = x;

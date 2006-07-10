@@ -34,6 +34,19 @@ extern dspData_t dData;
 
 #define GLCOLOR4F(glcol) glColor4f(glcol.r, glcol.g, glcol.b, glcol.a) 
 
+/* critical limits */
+
+/*   shields  < 20
+ *   eng temp > 80 or overloaded
+ *   wep temp > 80 or overloaded
+ *   hull dmg >= 70
+ *   fuel < 100 critical
+*/
+
+#define E_CRIT     80
+#define W_CRIT     80
+#define F_CRIT     100
+
 /* we store geometry here that should only need to be recomputed
    when the screen is resized, not every single frame :) */
 
@@ -89,8 +102,7 @@ static struct {
   obj_t d1damg;           
   obj_t d1damn;           
   obj_t d1icon;                 /* the icon area */
-  obj_t d1abar1;                /* first alert bar */
-  obj_t d1abar2;                /* second alert bar */
+  obj_t phasstat;                /* second alert bar */
   obj_t d1atarg;                /* ship causing alert */
   obj_t decal2;                 /* decal 2 location */
   obj_t d2fuelg;                /* fuel gauge */
@@ -105,6 +117,8 @@ static struct {
 
   obj_t engfailpulse;           /* wep/eng failure pulses */
   obj_t wepfailpulse;
+  obj_t fuelcritpulse;
+  obj_t torppips[MAXTORPS];
 
 } o = {};
 
@@ -112,6 +126,7 @@ static struct {
 void updateIconHudGeo(void)
 {				/* assumes context is current*/
   GLfloat tx, ty, th, tw;
+  int i;
 
   o.x = dConf.wX;
   o.y = dConf.wY;
@@ -300,7 +315,12 @@ void updateIconHudGeo(void)
   o.arm.w = o.tow.w;
   o.arm.h = o.tow.h;
 
-  /* for the eng and wep failure 'pulse' messages (centered) */
+  /* for the eng/wep/fuel failure/crit 'pulse' messages (centered) */
+  o.fuelcritpulse.x = dConf.vX + ((dConf.vW / 8.0) * 1.5);
+  o.fuelcritpulse.y = dConf.vY + (dConf.vH - ((dConf.vH / 20.0) * 19.0));
+  o.fuelcritpulse.w = ((dConf.vW / 8.0) * 5.0);
+  o.fuelcritpulse.h = (dConf.vH / 20.0) * 2.0;
+
   o.engfailpulse.x = dConf.vX + ((dConf.vW / 8.0) * 1.5);
   o.engfailpulse.y = dConf.vY + (dConf.vH - ((dConf.vH / 20.0) * 5.0));
   o.engfailpulse.w = ((dConf.vW / 8.0) * 5.0);
@@ -311,22 +331,27 @@ void updateIconHudGeo(void)
   o.wepfailpulse.w = ((dConf.vW / 8.0) * 5.0);
   o.wepfailpulse.h = (dConf.vH / 20.0) * 2.0;
 
-  /* alert bars */
-  o.d1abar1.x = tx + 2.0;
-  o.d1abar1.y = o.d1icon.y + (o.d1icon.h * 0.15);
-  o.d1abar1.w = o.d1icon.w * 0.10;
-  o.d1abar1.h = o.d1icon.h - ((o.d1icon.h * 0.15) * 2.0);
+  /* torp pips, aligned along left side of hud icon area */
 
-  o.d1abar2.x = o.d1icon.x + o.d1icon.w + o.d1abar1.w;
-  o.d1abar2.y = o.d1abar1.y;
-  o.d1abar2.w = o.d1abar1.w;
-  o.d1abar2.h = o.d1icon.h - ((o.d1icon.h * 0.15) * 2.0);
-
-  /* alert text (area below the icon decal) */
-  o.d1atarg.x = tx + 2.0;
-  o.d1atarg.y = (o.d1icon.y + o.d1icon.h) - (o.d1icon.h * 0.15);
-  o.d1atarg.w = (o.d1abar2.x + o.d1abar2.w) - o.d1atarg.x;
-  o.d1atarg.h = (o.d1icon.h * 0.15) * 0.9;
+  for (i=0; i < MAXTORPS; i++)
+    {
+      o.torppips[i].x = tx + 2.0;
+      o.torppips[i].y = (o.d1icon.y + (o.d1icon.h * 0.15)) +
+        (o.d1icon.h - ((o.d1icon.h * 0.15) * 2.0)) / (real)MAXTORPS * (real)i;
+      o.torppips[i].w = o.d1icon.w * 0.10;
+      o.torppips[i].h = (o.d1icon.h - ((o.d1icon.h * 0.15) * 2.0)) / (real)MAXTORPS;
+    } 
+        
+  o.phasstat.x = tx + 2.0 + o.d1icon.x + o.d1icon.w + (o.d1icon.w * 0.10);
+  o.phasstat.y = o.d1icon.y + (o.d1icon.h * 0.15);
+  o.phasstat.w = o.torppips[0].w / 2.0 /*o.d1icon.w * 0.10*/;
+  o.phasstat.h = o.d1icon.h - ((o.d1icon.h * 0.15) * 2.0);
+  
+  /* alert target - bottom of viewer */
+  o.d1atarg.x = dConf.vX + ((dConf.vW / 8.0) * 1.5);
+  o.d1atarg.y = dConf.vY + (dConf.vH - ((dConf.vH / 20.0) * 1.0));
+  o.d1atarg.w = ((dConf.vW / 8.0) * 5.0);
+  o.d1atarg.h = (dConf.vH / 20.0) * 1.0;
 
   /* destructing message.  try to center within viewer. */
   o.cloakdest.x = dConf.vX + ((dConf.vW / 6.0) * 1.0);
@@ -400,13 +425,17 @@ void renderAllocVal(GLfloat x, GLfloat y, GLfloat w, GLfloat h,
 }
 
 /* draw either or both eng/wep 'overload' message using a 'pulse' effect
-   in the viewer */
-void renderOverloadPulseMsg(void)
+   in the viewer.  Use a slower pulse for 'critical' levels. */
+void renderPulseMsgs(void)
 {
   static animStateRec_t engfail = {}; /* animdef states  */
   static animStateRec_t wepfail = {}; 
+  static animStateRec_t wepcrit = {}; 
+  static animStateRec_t engcrit = {}; 
+  static animStateRec_t fuelcrit = {}; 
   static int firsttime = TRUE;
   scrNode_t *curnode = getTopNode();
+  int drawing = FALSE;
   
   if (firsttime)
     {
@@ -422,14 +451,50 @@ void renderOverloadPulseMsg(void)
         {
           animQueAdd(curnode->animQue, &wepfail);
         }
+
+      if (animInitState("critical-pulse", &engcrit, NULL))
+        {
+          animQueAdd(curnode->animQue, &engcrit);
+        }
+
+      if (animInitState("critical-pulse", &wepcrit, NULL))
+        {
+          animQueAdd(curnode->animQue, &wepcrit);
+        }
+
+      if (animInitState("overload-pulse", &fuelcrit, NULL))
+        {
+          animQueAdd(curnode->animQue, &fuelcrit);
+        }
     }
 
-  if (dData.alloc.ealloc <= 0 || dData.alloc.walloc <= 0)
+  if (dData.alloc.ealloc <= 0 || dData.alloc.walloc <= 0 ||
+      dData.etemp.etemp > E_CRIT  || dData.wtemp.wtemp > W_CRIT ||
+      dData.fuel.fuel < F_CRIT)
+    drawing = TRUE;
+
+  if (!drawing)
+    return;
+
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+  glEnable(GL_BLEND);
+ 
+  if (dData.fuel.fuel < F_CRIT)
     {
-      glBlendFunc(GL_SRC_ALPHA, GL_ONE);
-      glEnable(GL_BLEND);
-    }
-  
+      if (ANIM_EXPIRED(&fuelcrit))
+        {
+          animResetState(&fuelcrit, frameTime);
+          animQueAdd(curnode->animQue, &fuelcrit);
+        }
+      
+      glfRender(o.fuelcritpulse.x, o.fuelcritpulse.y, 0.0, 
+                o.fuelcritpulse.w, o.fuelcritpulse.h, 
+                fontLargeTxf, "Fuel Critical", 
+                0, &fuelcrit.state.col, 
+                TRUE, FALSE, TRUE);
+      
+    }      
+
   if (dData.alloc.ealloc <= 0)
     {
       if (ANIM_EXPIRED(&engfail))
@@ -444,6 +509,21 @@ void renderOverloadPulseMsg(void)
                 0, &engfail.state.col, 
                 TRUE, FALSE, TRUE);
     }      
+  else if (dData.etemp.etemp > E_CRIT)
+    {
+      if (ANIM_EXPIRED(&engcrit))
+        {
+          animResetState(&engcrit, frameTime);
+          animQueAdd(curnode->animQue, &engcrit);
+        }
+      
+      glfRender(o.engfailpulse.x, o.engfailpulse.y, 0.0, 
+                o.engfailpulse.w, o.engfailpulse.h, 
+                fontLargeTxf, "Engines Critical", 
+                0, &engcrit.state.col, 
+                TRUE, FALSE, TRUE);
+    }      
+  
 
   if (dData.alloc.walloc <= 0)
     {
@@ -460,11 +540,23 @@ void renderOverloadPulseMsg(void)
                 TRUE, FALSE, TRUE);
 
     }      
-
-  if (dData.alloc.ealloc <= 0 || dData.alloc.walloc <= 0)
+  else if (dData.wtemp.wtemp > W_CRIT)
     {
-      glDisable(GL_BLEND);
-    }
+      if (ANIM_EXPIRED(&wepcrit))
+        {
+          animResetState(&wepcrit, frameTime);
+          animQueAdd(curnode->animQue, &wepcrit);
+        }
+      
+      glfRender(o.wepfailpulse.x, o.wepfailpulse.y, 0.0, 
+                o.wepfailpulse.w, o.wepfailpulse.h, 
+                fontLargeTxf, "Weapons Critical", 
+                0, &wepcrit.state.col, 
+                TRUE, FALSE, TRUE);
+      
+    }      
+
+  glDisable(GL_BLEND);
 
   return;
 }
@@ -480,6 +572,8 @@ void renderHud(int dostats)
   static int rxtime = 0;
   static int oldrx = 0;
   static int rxdiff = 0;
+  int i;
+
   
   if (!GLTextures)
     return;                     /* don't render until we actually can */
@@ -611,8 +705,9 @@ void renderHud(int dostats)
             o.d2killb.h, fontFixedTxf, dData.kills.kills, InfoColor, NULL,
             TRUE, TRUE, TRUE);
 
-  /* towed-towing/armies/destruct */
-  if (dData.tow.str[0] || dData.armies.str[0] || dData.cloakdest.str[0] == 'D')
+  /* towed-towing/armies/destruct/alert - blended text displayed in viewer */
+  if (dData.tow.str[0] || dData.armies.str[0] || 
+      dData.cloakdest.str[0] == 'D' || dData.aStat.alertStatus[0])
     {
       /* we want to add an alhpa for these */
 
@@ -648,35 +743,28 @@ void renderHud(int dostats)
                     NULL, TRUE, FALSE, TRUE);
         }
 
-      glDisable(GL_BLEND);
-    }
-
-  /* alert stat bars */
-  if (dData.aStat.alertStatus[0])
-    {
-      switch(dData.aStat.alertStatus[0])  /* define alert decal */
-        {                       /* need to blink these */
-        case 'R':               /* red alert (not Alert) */
-        case 'Y':               /* yellow alert (not Prox) */
-          icl = (GL_BLINK_HALFSEC) ? dData.aStat.color & ~CQC_A_BOLD : 
-            dData.aStat.color | CQC_A_BOLD;
-          break;
-        default:
-          icl = dData.aStat.color;
-          break;
+      /* alert target */
+      if (dData.aStat.alertStatus[0])
+        {
+          switch(dData.aStat.alertStatus[0])  /* define alert decal */
+            {                       /* need to blink these */
+            case 'R':               /* red alert (not Alert) */
+            case 'Y':               /* yellow alert (not Prox) */
+              icl = (GL_BLINK_HALFSEC) ? dData.aStat.color & ~CQC_A_BOLD : 
+                dData.aStat.color | CQC_A_BOLD;
+              break;
+            default:
+              icl = dData.aStat.color;
+              break;
+            }
+          
+          glfRender(o.d1atarg.x, o.d1atarg.y, 0.0, 
+                    o.d1atarg.w, o.d1atarg.h, 
+                    fontLargeTxf, dData.aStat.alertStatus, 
+                    icl | 0x50000000, NULL, TRUE, FALSE, TRUE);
         }
 
-      uiPutColor(icl);
-
-      /* left bar */
-      drawQuad(o.d1abar1.x, o.d1abar1.y, o.d1abar1.w, o.d1abar1.h, 0.0);
-      /* the object of our affection */
-      glfRender(o.d1atarg.x, o.d1atarg.y, 0.0, 
-                o.d1atarg.w, o.d1atarg.h, 
-                fontFixedTxf, dData.aStat.alertStatus, 
-                icl, NULL, TRUE, FALSE, TRUE);
-      /* right bar */
-      drawQuad(o.d1abar2.x, o.d1abar2.y, o.d1abar2.w, o.d1abar2.h, 0.0);
+      glDisable(GL_BLEND);
     }
   
   /* GL */
@@ -748,16 +836,6 @@ void renderHud(int dostats)
     hull dmg >= 70
   */
 
-  /* we ensure that these two blink alternately so they are readable */
-  if (((dData.etemp.etemp > 80) || (dData.alloc.ealloc <= 0)) && 
-      GL_BLINK_HALFSEC) 
-    drawIconHUDDecal(o.d1icon.x, o.d1icon.y, o.d1icon.w, o.d1icon.h,
-                     HUD_IENGCRIT, icl);
-  if (((dData.wtemp.wtemp > 80) || (dData.alloc.walloc <= 0)) && 
-      !GL_BLINK_HALFSEC) 
-    drawIconHUDDecal(o.d1icon.x, o.d1icon.y, o.d1icon.w, o.d1icon.h,
-                     HUD_IWEPCRIT, icl);
-
   /* shields and damage */
   if ((dData.sh.shields < 20 && SSHUP(Context.snum) && 
        !SREPAIR(Context.snum)) && GL_BLINK_QTRSEC) 
@@ -775,6 +853,35 @@ void renderHud(int dostats)
   drawIconHUDDecal(o.decal2.x, o.decal2.y, o.decal2.w, o.decal2.h, 
                    HUD_DECAL2, icl);
 
+
+  /* torp pips */
+  if (Context.snum > 0 && Context.snum <= MAXSHIPS)
+    {
+      glBindTexture(GL_TEXTURE_2D, 
+                    GLShips[Ships[Context.snum].team][Ships[Context.snum].shiptype].ico_torp);
+      
+      for (i=0; i < MAXTORPS; i++)
+        {
+          switch (Ships[Context.snum].torps[i].status)
+            {
+            case TS_OFF:
+              uiPutColor(GreenColor);
+              break;
+            case TS_FIREBALL:
+              uiPutColor(RedColor);
+              break;
+            default:
+              uiPutColor(NoColor);
+              break;
+            }
+          
+          drawTexQuad(o.torppips[i].x, 
+                      o.torppips[i].y, 
+                      o.torppips[i].w, 
+                      o.torppips[i].h, 
+                      0.0);
+        }
+    }
 
   /* GL */
   glDisable(GL_TEXTURE_2D);
@@ -841,10 +948,20 @@ void renderHud(int dostats)
               fontMsgTxf, dData.msg.str, InfoColor, 
               NULL, TRUE, TRUE, TRUE);
 
-  /* overload indicators */
-  if (dData.alloc.ealloc <= 0 || dData.alloc.walloc <= 0)
-    {                           /* an overload */
-      renderOverloadPulseMsg();
+  /* critical/overload indicators */
+  renderPulseMsgs();
+
+  /* phaser recharge status */
+  if (Context.snum > 0 && Context.snum <= MAXSHIPS)
+    {
+      if (Ships[Context.snum].pfuse <= 0)
+        uiPutColor(GreenColor);
+      else
+        uiPutColor(RedColor);
+        
+      drawQuad(o.phasstat.x, o.phasstat.y, o.phasstat.w, 
+               (Ships[Context.snum].pfuse <= 0) ? o.phasstat.h :
+               (o.phasstat.h - (o.phasstat.h / 10.0) * (real)Ships[Context.snum].pfuse), 0.0);
     }
 
   return;
@@ -927,6 +1044,28 @@ void renderScale(GLfloat x, GLfloat y, GLfloat w, GLfloat h,
   GLfloat valxoff = (w / 10.0) * 3.0;
   GLfloat scaleend = x + w - valxoff - (w / 10.0);
   GLfloat scaleh = h / 2.0;
+  
+  if (val < min)
+    val = min;
+  if (val > max)
+    val = max;
+
+  uiPutColor(scalecolor);
+  
+  /* gauge */
+  drawQuad(x, y, 
+           scaleend * (GLfloat)((GLfloat)val / ((GLfloat)max - (GLfloat)min)),
+           scaleh, 0.0);
+  
+  return;
+}
+
+void renderPhaserScale(GLfloat x, GLfloat y, GLfloat w, GLfloat h,
+                       int min, int max, int val, int scalecolor) 
+{
+  GLfloat valyoff = (h / 10.0) * 3.0;
+  GLfloat scaleend = x + h - valyoff - (h / 10.0);
+  GLfloat scaleh = w / 2.0;
   
   if (val < min)
     val = min;

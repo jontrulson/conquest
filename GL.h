@@ -43,8 +43,6 @@ typedef struct _glship {
   GLint     ico_sh;           /* icon shields id */
   GLint     ico_cloak;        /* cloak indicator */
   GLint     ico_shcrit;       /* shields critical */
-  GLint     ico_engcrit;      /* engines critical */
-  GLint     ico_wepcrit;      /* weapons critical */
   GLint     ico_hulcrit;      /* hull critical */
   GLint     ico_repair;       /* repairing */
   GLint     decal1;           /* sh/hull gauges */
@@ -53,6 +51,7 @@ typedef struct _glship {
   GLint     dialp;            /* astrogator pointer */
   GLint     warp;             /* id of warp gauge */
   GLColor_t warpq_col;        /* the color of the warp indicator quad */
+  GLint     ico_torp;         /* torpedo icon(s) */
 } GLShip_t;
 
 #if defined(NOEXTERN_GL)

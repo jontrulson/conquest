@@ -731,58 +731,17 @@ static int _gettarget(char *buf, real cdefault, real *dir, char ch)
   
 }
 
-static int _chktorp(void)
-{
-  int snum = Context.snum;
-  
-  if ( SCLOAKED(snum) )
-    {
-      cp_putmsg( "The cloaking device is using all available power.",
-	       MSG_LIN1 );
-      return FALSE;
-    }
-  if ( Ships[snum].wfuse > 0 )
-    {
-      cp_putmsg( "Weapons are currently overloaded.", MSG_LIN1 );
-      return FALSE;
-    }
-  if ( Ships[snum].fuel < TORPEDO_FUEL )
-    {
-      cp_putmsg( "Not enough fuel to launch a torpedo.", MSG_LIN1 );
-      return FALSE;
-    }
-
-  return TRUE;
-}
-
-static int _chkphase(void)
-{
-  int snum = Context.snum;
-
-  if ( SCLOAKED(snum) )
-    {
-      cp_putmsg( "The cloaking device is using all available power.",
-	       MSG_LIN1 );
-      return FALSE;
-    }
-  if ( Ships[snum].wfuse > 0 )
-    {
-      cp_putmsg( "Weapons are currently overloaded.", MSG_LIN1 );
-      return FALSE;
-    }
-  if ( Ships[snum].fuel < PHASER_FUEL )
-    {
-      cp_putmsg( "Not enough fuel to fire phasers.", MSG_LIN1 );
-      return FALSE;
-    }
-
-  return TRUE;
-}
-
 static void _dophase( real dir )
 {
   int snum = Context.snum;
   
+  if ( SCLOAKED(snum) )
+    {
+      cp_putmsg( "The cloaking device is using all available power.",
+	       MSG_LIN1 );
+      return;
+    }
+
   if ( Ships[snum].wfuse > 0 )
     {
       cp_putmsg( "Weapons are currently overloaded.", MSG_LIN1 );
@@ -811,6 +770,23 @@ static void _dophase( real dir )
 static void _dotorp(real dir, int num)
 {
   int snum = Context.snum;
+
+  if ( SCLOAKED(snum) )
+    {
+      cp_putmsg( "The cloaking device is using all available power.",
+	       MSG_LIN1 );
+      return;
+    }
+  if ( Ships[snum].wfuse > 0 )
+    {
+      cp_putmsg( "Weapons are currently overloaded.", MSG_LIN1 );
+      return;
+    }
+  if ( Ships[snum].fuel < TORPEDO_FUEL )
+    {
+      cp_putmsg( "Not enough fuel to launch a torpedo.", MSG_LIN1 );
+      return;
+    }
 
   if ( ! clbCheckLaunch( snum, num ) )
     cp_putmsg( ">TUBES EMPTY<", MSG_LIN2 );
@@ -2129,20 +2105,19 @@ static void command( int ch )
       prompting = TRUE;
       break;
     case 'f':				/* phasers */
-      if (_chkphase())
-        {
-          state = S_TARGET;
-          desttarg = T_PHASER;
-          prm.preinit = False;
-          prm.buf = cbuf;
-          prm.buflen = MSGMAXLINE;
-          prm.pbuf = "Fire phasers: ";
-          prm.terms = TERMS;
-          prm.index = MSG_LIN1;
-          prm.buf[0] = EOS;
-          setPrompt(prm.index, prm.pbuf, NoColor, prm.buf, NoColor);
-          prompting = TRUE;
-        }
+      {
+        state = S_TARGET;
+        desttarg = T_PHASER;
+        prm.preinit = False;
+        prm.buf = cbuf;
+        prm.buflen = MSGMAXLINE;
+        prm.pbuf = "Fire phasers: ";
+        prm.terms = TERMS;
+        prm.index = MSG_LIN1;
+        prm.buf[0] = EOS;
+        setPrompt(prm.index, prm.pbuf, NoColor, prm.buf, NoColor);
+        prompting = TRUE;
+      }
       break;
     case 'F':				/* phasers, same direction */
       _dophase(lastphase);
@@ -2240,36 +2215,34 @@ static void command( int ch )
       _doorbit( Context.snum );
       break;
     case 'P':				/* photon torpedo burst */
-      if (_chktorp())
-        {
-          state = S_TARGET;
-          desttarg = T_BURST;
-          prm.preinit = False;
-          prm.buf = cbuf;
-          prm.buflen = MSGMAXLINE;
-          prm.pbuf = "Torpedo burst: ";
-          prm.terms = TERMS;
-          prm.index = MSG_LIN1;
-          prm.buf[0] = EOS;
-          setPrompt(prm.index, prm.pbuf, NoColor, prm.buf, NoColor);
-          prompting = TRUE;
-        }
+      {
+        state = S_TARGET;
+        desttarg = T_BURST;
+        prm.preinit = False;
+        prm.buf = cbuf;
+        prm.buflen = MSGMAXLINE;
+        prm.pbuf = "Torpedo burst: ";
+        prm.terms = TERMS;
+        prm.index = MSG_LIN1;
+        prm.buf[0] = EOS;
+        setPrompt(prm.index, prm.pbuf, NoColor, prm.buf, NoColor);
+        prompting = TRUE;
+      }
       break;
     case 'p':				/* photon torpedoes */
-      if (_chktorp())
-        {
-          state = S_TARGET;
-          desttarg = T_TORP;
-          prm.preinit = False;
-          prm.buf = cbuf;
-          prm.buflen = MSGMAXLINE;
-          prm.pbuf = "Launch torpedo: ";
-          prm.terms = TERMS;
-          prm.index = MSG_LIN1;
-          prm.buf[0] = EOS;
-          setPrompt(prm.index, prm.pbuf, NoColor, prm.buf, NoColor);
-          prompting = TRUE;
-        }
+      {
+        state = S_TARGET;
+        desttarg = T_TORP;
+        prm.preinit = False;
+        prm.buf = cbuf;
+        prm.buflen = MSGMAXLINE;
+        prm.pbuf = "Launch torpedo: ";
+        prm.terms = TERMS;
+        prm.index = MSG_LIN1;
+        prm.buf[0] = EOS;
+        setPrompt(prm.index, prm.pbuf, NoColor, prm.buf, NoColor);
+        prompting = TRUE;
+      }
       break;
     case 'Q':				/* self destruct */
       if ( SCLOAKED(Context.snum) )
@@ -3266,8 +3239,9 @@ static int nCPMInput(mouseData_t *mdata)
       real dir = angle((real)(dConf.vX + (dConf.vW / 2.0)), 
                        (real)(dConf.vY + (dConf.vH / 2.0)), 
                        (real)mdata->x, 
-                       (real)(dConf.vY + dConf.vH) - (real)mdata->y);
-      
+                       (real)(dConf.vY + dConf.vH) - ((real)mdata->y - dConf.vY)
+                       );
+
       DoMouseMacro(mdata->button, mdata->mod, dir);
     }
 

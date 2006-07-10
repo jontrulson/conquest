@@ -498,10 +498,10 @@ struct Conf ConfData[] =
     "numeric_planet_map=",
     &UserConf.DoNumMap,
     0, 0,			/* mix/max */
-    "Show army counts for planets on LR scan",
+    "Show army counts for planets",
     {
       "# define this as 'true' if you want to see the number of armies",
-      "# on each (scanned) planet in the long range map.",
+      "# on each (scanned) planet.",
       "# Default: true",
       NULL
     }

@@ -159,6 +159,14 @@ texture {
 }
 
 
+# Icon torp 
+#
+###########
+
+texture {
+  name         "ico-torp"
+}
+
 # Federation ships
 #
 ##################
@@ -289,16 +297,6 @@ texture {
 texture {
   name         "shipF-ico-shcrit"
   filename     "ico-shcrit"
-}
-
-texture {
-  name         "shipF-ico-engcrit"
-  filename     "ico-engcrit"
-}
-
-texture {
-  name         "shipF-ico-wepcrit"
-  filename     "ico-wepcrit"
 }
 
 texture {
@@ -440,16 +438,6 @@ texture {
 texture {
   name         "shipR-ico-shcrit"
   filename     "ico-shcrit"
-}
-
-texture {
-  name         "shipR-ico-engcrit"
-  filename     "ico-engcrit"
-}
-
-texture {
-  name         "shipR-ico-wepcrit"
-  filename     "ico-wepcrit"
 }
 
 texture {
@@ -595,16 +583,6 @@ texture {
 }
 
 texture {
-  name         "shipK-ico-engcrit"
-  filename     "ico-engcrit"
-}
-
-texture {
-  name         "shipK-ico-wepcrit"
-  filename     "ico-wepcrit"
-}
-
-texture {
   name         "shipK-ico-hulcrit"
   filename     "ico-hulcrit"
 }
@@ -735,16 +713,6 @@ texture {
 }
 
 texture {
-  name         "shipO-ico-engcrit"
-  filename     "ico-engcrit"
-}
-
-texture {
-  name         "shipO-ico-wepcrit"
-  filename     "ico-wepcrit"
-}
-
-texture {
   name         "shipO-ico-hulcrit"
   filename     "ico-hulcrit"
 }
@@ -807,7 +775,13 @@ animation {
 # a 'pulse' text effect for overloading wep/eng.
 animation {
   name         "overload-pulse"
-  animdef      "pulse"
+  animdef      "pulse-normal"
+}
+
+# a 'pulse' text effect for critical wep/eng.
+animation {
+  name         "critical-pulse"
+  animdef      "pulse-slow"
 }
 
 ## animation defs
@@ -988,15 +962,32 @@ animdef {
 # handles 'pulsing' of text, but could be used to pulse anything (red
 # that is :).
 animdef {
-  name         "pulse"
+  name         "pulse-normal"
 
   istate {
     color      "9fff0000"
   }
     
-  # fade to almost black...
+  # fade toward black...
   colanim {
     stages     20
+    loops      1
+    delayms    50
+    
+    deltaa     -0.015
+  }
+}
+
+animdef {
+  name         "pulse-slow"
+
+  istate {
+    color      "9fff0000"
+  }
+    
+  # fade toward black...
+  colanim {
+    stages     40
     loops      1
     delayms    50
     

@@ -80,7 +80,12 @@ void setUserConfDefaults(void)
   UserConf.MessageBell = TRUE;
   UserConf.NoColor = FALSE;
   UserConf.NoRobotMsgs = FALSE;
-  UserConf.UpdatesPerSecond = 5;	/* default of 5 per sec */
+
+  if (telnetClient)             /* 5/sec for telneters, 10 for everyone else */
+    UserConf.UpdatesPerSecond = 5;
+  else
+    UserConf.UpdatesPerSecond = 10;
+
   UserConf.DistressToFriendly = FALSE;
   UserConf.AltHUD = FALSE;
   UserConf.DoLRTorpScan = TRUE;
@@ -940,7 +945,6 @@ int MakeConf(char *filename)
                       if (strlen(UserConf.Mouse[b][m]) != 0)
                         {
                           char buffer[16]; /* max 'acs\0' */
-                          int o = 0;
                           
                           buffer[0] = 0;
                           if (m & (CQ_KEY_MOD_SHIFT >> CQ_MODIFIER_SHIFT))

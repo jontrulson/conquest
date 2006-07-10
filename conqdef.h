@@ -70,6 +70,9 @@
 # define PI 3.141592654
 #endif
 
+#define CONQ_HTTP   "http://radscan.com/conquest.html"
+#define CONQ_MLIST  "Mailing list: majordomo@radscan.com, send 'subscribe conquest' in body"
+
 #define MAXSHIPS 20 		/* number of available ships */
 
   /* Values for sstatus() */

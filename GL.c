@@ -514,7 +514,7 @@ static int initGLShips(void)
           
           snprintf(buffer, TEXFILEMAX - 1, "%s-warp", shipPfx);
           GLShips[i][j].warp = _get_ship_texid(buffer);
-          
+
           /* here we just want the color */
           snprintf(buffer, TEXFILEMAX - 1, "%s-warp-col", shipPfx);
           if (_get_ship_texcolor(buffer, &GLShips[i][j].warpq_col) < 0)
@@ -528,17 +528,13 @@ static int initGLShips(void)
           snprintf(buffer, TEXFILEMAX - 1, "%s-ico-shcrit", shipPfx);
           GLShips[i][j].ico_shcrit = _get_ship_texid(buffer);
           
-          snprintf(buffer, TEXFILEMAX - 1, "%s-ico-engcrit", shipPfx);
-          GLShips[i][j].ico_engcrit = _get_ship_texid(buffer);
-          
-          snprintf(buffer, TEXFILEMAX - 1, "%s-ico-wepcrit", shipPfx);
-          GLShips[i][j].ico_wepcrit = _get_ship_texid(buffer);
-          
           snprintf(buffer, TEXFILEMAX - 1, "%s-ico-hulcrit", shipPfx);
           GLShips[i][j].ico_hulcrit = _get_ship_texid(buffer);
           
           snprintf(buffer, TEXFILEMAX - 1, "%s-ico-repair", shipPfx);
           GLShips[i][j].ico_repair = _get_ship_texid(buffer);
+          
+          GLShips[i][j].ico_torp = _get_ship_texid("ico-torp");
           
           /* this is ugly... we want to fail if any of these texid's are
              0, indicating the texture wasn't found */
@@ -556,9 +552,8 @@ static int initGLShips(void)
                 GLShips[i][j].phas &&
                 GLShips[i][j].ico_cloak &&
                 GLShips[i][j].ico_shcrit &&
-                GLShips[i][j].ico_engcrit &&
-                GLShips[i][j].ico_wepcrit &&
                 GLShips[i][j].ico_hulcrit &&
+                GLShips[i][j].ico_torp &&
                 GLShips[i][j].ico_repair))
             return FALSE;        /* one was missing */
         }
@@ -824,12 +819,6 @@ void drawIconHUDDecal(GLfloat rx, GLfloat ry, GLfloat w, GLfloat h,
       break;
     case HUD_ISHCRIT:  
       id = GLShips[steam][stype].ico_shcrit;
-      break;
-    case HUD_IENGCRIT: 
-      id = GLShips[steam][stype].ico_engcrit;
-      break;
-    case HUD_IWEPCRIT: 
-      id = GLShips[steam][stype].ico_wepcrit;
       break;
     case HUD_IHULCRIT: 
       id = GLShips[steam][stype].ico_hulcrit;
@@ -1271,31 +1260,43 @@ void uiDrawPlanet( GLfloat x, GLfloat y, int pnum, int scale,
   /*  text data... */
   glBlendFunc(GL_ONE, GL_ONE);
 
+  if (Planets[pnum].type == PLANET_SUN || Planets[pnum].type == PLANET_MOON ||
+      !Planets[pnum].scanned[Ships[Context.snum].team] )
+    torpchar = ' ';
+  else
+    if ( Planets[pnum].armies <= 0 || Planets[pnum].team < 0 || 
+         Planets[pnum].team >= NUMPLAYERTEAMS )
+      torpchar = '-';
+    else
+      torpchar = Teams[Planets[pnum].team].torpchar;
+
   if (scale == SCALE_FAC)
     {
       if (showpnams)
         {
-          snprintf(buf, BUFFER_SIZE - 1, "%s", Planets[pnum].name);
+          if (UserConf.DoNumMap && (torpchar != ' '))
+            snprintf(buf, BUFFER_SIZE - 1, "#%d#%c#%d#%d#%d#%c%s", 
+                     textcolor,
+                     torpchar,
+                     InfoColor,
+                     Planets[pnum].armies,
+                     textcolor,
+                     torpchar,
+                     Planets[pnum].name);
+          else
+            snprintf(buf, BUFFER_SIZE - 1, "%s", Planets[pnum].name);
+
+
           glfRender(x, 
                     ((scale == SCALE_FAC) ? y - 4.0 : y - 1.0), 
                     TRANZ, /* planet's Z */
-                    ((GLfloat)strlen(buf) * 2.0) / ((scale == SCALE_FAC) ? 1.0 : 2.0), 
+                    ((GLfloat)uiCStrlen(buf) * 2.0) / ((scale == SCALE_FAC) ? 1.0 : 2.0), 
                     TEXT_HEIGHT, fontTinyFixedTxf, buf, textcolor, NULL,
-                    TRUE, FALSE, FALSE);
+                    TRUE, TRUE, FALSE);
         }
     }
   else
     {                           /* MAP_FAC */
-      if (Planets[pnum].type == PLANET_SUN || 
-          !Planets[pnum].scanned[Ships[Context.snum].team] )
-        torpchar = ' ';
-      else
-        if ( Planets[pnum].armies <= 0 || Planets[pnum].team < 0 || 
-             Planets[pnum].team >= NUMPLAYERTEAMS )
-          torpchar = '-';
-        else
-          torpchar = Teams[Planets[pnum].team].torpchar;
-
       if (showpnams)
         {                       /* just want first 3 chars */
           planame[0] = Planets[pnum].name[0];
@@ -1724,6 +1725,7 @@ int uiGLInit(int *argc, char **argv)
   glutIdleFunc           (renderFrame);
   glutReshapeFunc        (resize);
   glutEntryFunc          (NULL);
+  /*  glutSetCursor          (GLUT_CURSOR_CROSSHAIR);*/
 
   return 0;             
 }
