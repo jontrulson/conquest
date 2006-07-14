@@ -1,7 +1,7 @@
 Credit where credit is due.  
 
-- original ship pixmaps, netrek (with modifications)
-- TGA loader, NeHe
+- TGA loader, NeHe (though pretty much a complete rewrite.  Geez that
+  code is bad)
 - Earth, Mars (classm/classd) pics, JPL/NASA.
 - glut, Mark Kilgard
 - texfont, Mark Kilgard

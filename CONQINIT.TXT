@@ -241,10 +241,10 @@ CONTENTS:
                       initialized. 
 
           velocity:   RATIONAL
-                      The velocity of the planet.  A positive number
-                      has the planet orbit it's primary
-                      counterclockwise, while negative orbits 
-                      clockwise. 
+                      The velocity of the planet in degrees per
+                      minute.  A positive number has the planet orbit
+                      it's primary counterclockwise, while negative
+                      orbits clockwise.
 
           radius:     RATIONAL
                       The distance of the planet from it's primary (in
