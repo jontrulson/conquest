@@ -40,10 +40,6 @@ void iBufInit(void)
 }
 
 
-/* iBufEmpty - return TRUE or FALSE depending on whether the buffer is 
- * empty 
- */
-
 int iBufCount(void)
 {
   return ndata;
