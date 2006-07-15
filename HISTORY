@@ -52,6 +52,21 @@
        - add conquest homepage URL and mailing list suggestion to main
          menu. 
 
+       - switched to Subversion (svn) source code control.  An svn
+         conquest repository can be found at:
+
+         - 'current' development:
+
+           svn://radscan.com/conquest/trunk
+
+         - tagged (officially released) revisions:
+
+           svn://radscan.com/conquest/tags/
+
+         - branches 
+
+           svn://radscan.com/conquest/branches/
+
 8.1.2e (devel) 7/1/2006
 
        - added some mouse support in the GL client.  Macros can be
