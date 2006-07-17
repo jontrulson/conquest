@@ -1,0 +1,115 @@
+.\" $Id$
+.TH "conquest" 1 "" ""
+.SH NAME
+conquestgl \- a GLUT based OpenGL client for Conquest
+.PP
+conquest \- a curses client for Conquest
+.SH SYNOPSIS
+.PP
+\fBconquestgl\fP and \fBconquest\fP are OpenGL and curses based
+clients, respectively, that are used to connect to a conquest server
+to play. 
+.PP
+\fBconquestgl\fP [OPTIONS]...
+.PP
+\fBconquest\fP [OPTIONS]...
+.SH DESCRIPTION
+.PP
+Conquest is a multi-player, real-time space combat game.  The object
+of the game is twofold. The short-range goal is to accumulate "kills"
+by shooting down enemy players.  You get one kill point for each enemy
+ship shot down, plus some extra if the enemy had kills too. The major
+weapon used to shoot down ships is the photon torpedo.
+.PP
+The long-range goal is to conquer the universe for your team by taking
+every \fIcore\fP planet. You take planets by killing off the enemy's armies via
+bombardment, and then beaming your team's armies down. When all the
+planets have been taken, the game ends, a new game begins, and the
+player who actually took the last planet gets his/her name up in
+lights.
+.SH "OPTIONS"
+.PP
+\fBconquestgl\fP and \fBconquest\fP each take similiar options.
+Where an option is only suported by a paticular client, this
+difference will be noted.  If the \fI\-s\fP or \fI\-m\fP options are
+not specified, the client will try to connect to a server running on
+your local host at port 1701.
+.TP 8
+.B \-f
+Run in fullscreen mode.  OpenGL client only.
+.TP 8
+.B \-g <geometry> 
+Specify intial window width/height.  OpenGL client only.  Format is
+WxH (ex: 1024x768). The default is currently 1024x768.
+.TP 8
+.B \-m  
+Query the metaserver and provide a list of servers to choose from.
+.TP 8
+.B \-M <metaserver> 
+Specify an alternate metaserver.  The default is
+\fIconquest.radscan.com\fP. 
+.TP 8
+.B \-r <record file> 
+Record the game to <record file>.
+.TP 8
+.B \-s <server[:port]> 
+Connect to server running on \fIserver\fP port \fIport\fP.  The default
+port is 1701.
+.TP 8
+.B \-t  
+Telnet mode.  Curses client only.  When running in telnet mode user
+configuration files are never loaded nor stored, and the server update
+rate defaults to 5 per sencond.  This is only of use when running a
+telnetable server.  See SERVER.TXT in the distribution for more
+information on server types and configuration.
+.TP 8
+.B \-P <record file> 
+Play back a previously recorded game.
+.TP 8
+.B \-u
+Disable UDP to/from the server and use TCP only.  The default is to
+try to negotiate UDP and use it for certain conquest protocol
+packets.  If you have problems with a server \- for example, you
+always wind up stuck in the middle of Murisak when you enter the game,
+try disabling UDP with this option.
+.SH "AUTHOR"
+Jon Trulson
+.SH "SEE ALSO"
+.PP
+conquestd(1), conqoper(1), conqdriv(1), conquestsh(1),
+conqmetad(1) 
+.PP
+See README in the conquest distribution (usually installed in
+<conquest install prefix>/etc/) for information and tips on how to
+play. 
+.PP
+See INSTALL for instructions on unpacking, compiling, and installing
+conquest, as well as information on terminfo requirements (for the
+curses client) and other system specific issues.
+.PP
+See README.cygwin for information on building/using conquest on MS
+Windows systems. 
+.PP
+See SERVER.TXT for information on how to setup and run a Conquest
+server.
+.PP
+See HISTORY for the latest news and modification history.
+.PP
+See CONQINIT.TXT for information on CQI, and the format of the
+conqinitrc and texturesrc files.
+.SH "COPYRIGHT"
+.PP
+Copyright (C)1994-2006 by Jon Trulson <jon@radscan.com> under the
+ARTISTIC License.
+.PP
+Original VAX/VMS Ratfor Conquest:
+.PP
+Copyright (C)1983-1986 by Jef Poskanzer and Craig Leres.  Permission to
+use, copy, modify, and distribute this software and its documentation
+for any purpose and without fee is hereby granted, provided that this
+copyright notice appear in all copies and in all supporting
+documentation. Jef Poskanzer and Craig Leres make no representations
+about the suitability of this software for any purpose. It is provided
+"as is" without express or implied warranty.
+
+

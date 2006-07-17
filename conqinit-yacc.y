@@ -741,12 +741,11 @@ static int cqiValidatePlanets(void)
   /* first fill in any empty slots */
   if (numPlanets < NUMPLANETS)
     {
-      int j = 0;
-
       for (i = numPlanets; i < _cqiGlobal->maxplanets; i++)
         {
+          /* use the slot number in the name to reduce chance of dup names */
           snprintf(_cqiPlanets[i].name, MAXPLANETNAME - 1, "ZZExtra %d", 
-                   j++);
+                   i);
           /* FIXME - no hc mur */
           strcpy(_cqiPlanets[i].primname, "Murisak");
 

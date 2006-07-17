@@ -60,6 +60,7 @@ FILELIST="ratfor.c cd2lb.h cd2lb.c iolb.h iolb.c conqlb.c
         conqinitrc texturesrc anim.h anim.c CONQINIT.TXT cqmouse.h"  
 
 IMAGES="img/*.tga img/*.txf"
+MANPAGES="*.man"
 
 mkdir $CONQVER 2>/dev/null
 mkdir $CONQVER/img
@@ -68,6 +69,7 @@ cp -p $FILELIST $CONQVER/
 cp -p conquest.txt $CONQVER/$CONQVER.txt
 
 cp -p $IMAGES $CONQVER/img/
+cp -p $MANPAGES $CONQVER/
 
 # now the terminfo files
 mkdir $CONQVER/ti

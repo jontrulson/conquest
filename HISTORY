@@ -9,6 +9,11 @@
 
                               Conquest HISTORY
 
+??? (devel) 7/16/2006
+
+       - added some man pages for conqdriv, conqmetad, conqoper,
+         conquest/conquestgl and conquestd.  
+
 8.1.2f (devel) 7/10/2006
 
        - fixed bug with mouse macros and angles that would cause the

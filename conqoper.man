@@ -1,0 +1,88 @@
+.\" $Id$
+.TH "conqoper" 1 "" ""
+.SH NAME
+conqoper \- Conquest Operator (CO) program.
+.SH SYNOPSIS
+.PP
+\fBconqoper\fP [OPTIONS]...
+.SH DESCRIPTION
+.PP
+\fBconqoper\fP is a program used to monitor and configure a conquest
+game.  It is a curses based application that must be run on the same
+host your server is running on.  It allows suitably privileged
+individuals to view and modify various characteristics of the game, as
+well as perform common administrative tasks.
+.PP
+In order to run \fBconqoper\fP, you must be a member of the
+\fIconquest\fP group (in /etc/groups), or you must be the root user.
+.PP
+\fBconqoper\fP supports a few \fInon\-interactive\fP options listed
+below.  When any of these options are specified, \fBconqoper\fP will
+perform the requested action and exit.  When no options are specified,
+\fBconqoper\fP will run in an interactive mode.
+.SH "OPTIONS"
+.PP
+.TP 8
+.B \-C
+Rebuild the system wide \fIconquestrc\fP file.
+.TP 8
+.B \-D
+Disable the game.  Clients that connect, will be told that the game is
+closed after they have authenticated to the server.  If the
+authenticating user is marked with the 'Play when closed flag', that
+user will be allowed into the game anyway.  You can edit these flags
+by selecting (\fBe\fP)dit user at the \fBconqoper\fP main menu.
+.TP 8
+.B \-E
+Enable the game.
+.TP 8
+.B \-I <what> 
+Initialize \fIwhat\fP where \fIwhat\fP is: \fBe\fP \- everything,
+\fBg\fP \- game, \fBl\fP \- lockwords, \fBm\fP \- messages, \fBp\fP \-
+planets, \fBr\fP \- robots, \fBs\fP \- ships, \fBu\fP \- universe, and
+\fBz\fP \- zero out everything.  Note, when zeroing out everything,
+the common block cannot be used to play.  You must still initialize
+\fBe\fPverything (and enable the game).
+.PP
+When either the \fIuniverse\fP or \fIeverything\fP is initialized, the
+game will be set to disabled by default.  You must manually enable the
+game from the \fBconqoper\fP main menu, or by using the \fB\-E\fP option.
+.SH "AUTHOR"
+Jon Trulson
+.SH "SEE ALSO"
+.PP
+conquest(1), conquestd(1), conqoper(1), conqdriv(1), conquestsh(1),
+conqmetad(1) 
+.PP
+See README in the conquest distribution (usually installed in
+<conquest install prefix>/etc/) for information and tips on how to
+play. 
+.PP
+See INSTALL for instructions on unpacking, compiling, and installing
+conquest, as well as information on terminfo requirements (for the
+curses client) and other system specific issues.
+.PP
+See README.cygwin for information on building/using conquest on MS
+Windows systems. 
+.PP
+See SERVER.TXT for information on how to setup and run a Conquest
+server.
+.PP
+See HISTORY for the latest news and modification history.
+.PP
+See CONQINIT.TXT for information on CQI, and the format of the
+conqinitrc and texturesrc files.
+.SH "COPYRIGHT"
+.PP
+Copyright (C)1994-2006 by Jon Trulson <jon@radscan.com> under the
+ARTISTIC License.
+.PP
+Original VAX/VMS Ratfor Conquest:
+.PP
+Copyright (C)1983-1986 by Jef Poskanzer and Craig Leres.  Permission to
+use, copy, modify, and distribute this software and its documentation
+for any purpose and without fee is hereby granted, provided that this
+copyright notice appear in all copies and in all supporting
+documentation. Jef Poskanzer and Craig Leres make no representations
+about the suitability of this software for any purpose. It is provided
+"as is" without express or implied warranty.

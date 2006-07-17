@@ -1,0 +1,107 @@
+.\" $Id$
+.TH "conquestd" 1 "" ""
+.SH NAME
+conquestd \- a Conquest game server
+.SH SYNOPSIS
+.PP
+\fBconquestd\fP [OPTIONS]
+.SH DESCRIPTION
+.PP
+\fBconquestd\fP is a game server for Conquest.  Clients, such as
+\fBconquestgl\fP and \fBconquest\fP are used to connect to a
+\fBconquestd\fP server to play the game.
+.SH "OPTIONS"
+.PP
+.TP 8
+.B \-d 
+Daemon mode.  
+.TP 8
+.B \-l
+Listen for local connections only.  When this option is supplied, only
+clients on the local host will be able to connect.
+.TP 8
+.B \-p <port>
+Listen for game connnections on port \fIport\fP.  The default port is 1701.
+.TP 8
+.B \-m
+Notify the metaserver of the presence of your game server.  When this
+option is specified, \fBconquestd\fP will notify the meta server
+(default \fIconquest.radscan.com\fP) of your server, so that other players
+can see it in the server list and connect to it.  Do not use this option
+if your server is not actually available from the Internet.
+.TP 8
+.B \-M <meta server> 
+Notify \fImeta server\fP instead of the default meta server running at
+\fIconquest.radscan.com\fP. 
+.TP 8
+.B \-N <my name> 
+Explicitly specify server name \fImy name\fP to the meta server when
+announcing your game.  This is useful if your server is accessed with
+a different host name internal to your network, than the host name
+that an Internet client would need to use to connect.
+.TP 8
+.B \-u <user>
+Run as user \fIuser\fP.  This option is advised when running as root.
+It is generally not a good idea to run an Internet accessable game
+server as the root user :)  Only the root user can use this option.
+.SH "EXAMPLES"
+.TP 8
+.B conquestd -d
+This is \fBconquestd\fP simplest (and insecure) form.  It kicks off
+into the background (running as your UID) and serves a conquest game.
+.TP 8
+.B conquestd -d -u nobody
+When started as the root user, this will have \fBconquestd\fP setuid to
+the user 'nobody' (a common, unprivileged account on unix systems) and
+begin serving connections.  For an Internet accessable server, these
+are the recommended minimum options to use.
+.TP 8
+.B conquestd -d -u nobody -l
+Run the server us user \fInobody\fP, serving only local clients.
+.TP 8
+.B conquestd -d -u nobody -m -N conquest.radscan.com
+Run the server us user \fInobody\fP, announcing your server to the
+conquest meta server, and tell the meta server that Internet clients
+should use the hostname \fIconquest.radscan.com\fP to connect to your
+server.
+.SH "AUTHOR"
+Jon Trulson
+.SH "SEE ALSO"
+.PP
+conquest(1), conquestd(1), conqoper(1), conqdriv(1), conquestsh(1),
+conqmetad(1) 
+.PP
+See README in the conquest distribution (usually installed in
+<conquest install prefix>/etc/) for information and tips on how to
+play. 
+.PP
+See INSTALL for instructions on unpacking, compiling, and installing
+conquest, as well as information on terminfo requirements (for the
+curses client) and other system specific issues.
+.PP
+See README.cygwin for information on building/using conquest on MS
+Windows systems. 
+.PP
+See SERVER.TXT for information on how to setup and run a Conquest
+server.
+.PP
+See HISTORY for the latest news and modification history.
+.PP
+See CONQINIT.TXT for information on CQI, and the format of the
+conqinitrc and texturesrc files.
+.SH "COPYRIGHT"
+.PP
+Copyright (C)1994-2006 by Jon Trulson <jon@radscan.com> under the
+ARTISTIC License.
+.PP
+Original VAX/VMS Ratfor Conquest:
+.PP
+Copyright (C)1983-1986 by Jef Poskanzer and Craig Leres.  Permission to
+use, copy, modify, and distribute this software and its documentation
+for any purpose and without fee is hereby granted, provided that this
+copyright notice appear in all copies and in all supporting
+documentation. Jef Poskanzer and Craig Leres make no representations
+about the suitability of this software for any purpose. It is provided
+"as is" without express or implied warranty.
+
+

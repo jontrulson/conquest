@@ -48,7 +48,7 @@
        ## Default network ports
        ## Server game flags
        ## Meta Server
-       ## ~/.conquestrc
+       ## ~/.conquest/conquestrc
        ## Recording Games
        ## Replaying Games
        ## Hints for new players
@@ -73,7 +73,7 @@
        ## Leaving the game
        ## Teams
        ## Combat
-       ## Macro Keys
+       ## Macro Keys / Mouse Macros
        ## Navigation
        ## The Robots
           # Conqstrat
@@ -104,7 +104,7 @@
        ## libUiCU.so
        ## libUiGL.so
        ## img/*
-       ## ~/.conquestrc
+       ## ~/.conquest/conquestrc
    ### Getting more information
    ### Obtaining Conquest
    ### Copyright Information
@@ -175,6 +175,10 @@
     Starting with Version 8.0, Conquest has been split into a true
     client/server game.  Conquest clients connect to a local or remote
     conquestd server to play.
+
+    Starting with Version 8.0.1a, a GLUT based OpenGL client,
+    conquestgl, is provided.  
+
 
 ### General Information
 
@@ -366,11 +370,11 @@
    # conquestd -d -u nobody -m -N conquest.radscan.com
 
 
-## ~/.conquestrc
+## ~/.conquest/conquestrc
 
    After running Conquest for the first time, a file called
-   ~/.conquestrc should have been created.  Look at this file (it's
-   self-explanatory) for various options you can set.  Conquest
+   ~/.conquest/conquestrc should have been created.  Look at this file
+   (it's self-explanatory) for various options you can set.  Conquest
    Operators (or CO's) should look at /opt/conquest/etc/conquestrc for
    a few system wide options you may or may not want.  As of version
    7.0, all options (user and system-wide) can be viewed and edited
@@ -408,7 +412,7 @@
    whenever a CO with the OOPTION_OPER set in their user record, sends
    a command to GOD from within the game containing:
 
-     exec recon
+     /recon
 
      server recording files will be saved in:
 
@@ -417,7 +421,7 @@
      To turn off server recording, send the following to GOD from
      within the game:
 
-     exec recoff
+     /recoff
     
    Aside from how the different recording types are made, the main
    difference between the two are:
@@ -739,6 +743,9 @@
   For the maximum damage potential, you should set weapons
   allocation to 70% (A70\r) when firing.  Maybe use a macro. :)
 
+  With the 8.1.2f OpenGL client, you can click the right mouse button
+  (by default) in the viewer to fire a torpedo in that direction.
+
   You can only have 9 torps out at a time.  If you have fired them
   all, and they missed, you should detonate them (D) so that you can
   free up slots to fire more.  Hopefully with better aim this time. :)
@@ -751,6 +758,9 @@
 
   They are *very* effective close up though, so don't abandon them in
   favor of using torps only.  
+
+  With the 8.1.2f OpenGL client, you can click the left mouse button
+  (by default) in the viewer to fire the phasers in that direction.
 
   You can only fire a phaser about once per second.  When in really
   close combat, alternate between firing your phasers and torpedoes.
@@ -962,46 +972,49 @@
    you can arrange it.
 
 
-## Macro Keys
-
-   The reason I added macros to Conquest, was that at the time I was
-   starting to play, I used PC emulators like MS-KERMIT to play from
-   home.  
-
-   Kermit made it pretty easy to redefine keys, and when you can have
-   one key that does the work of several keys (such as changing
-   allocation, firing a spread, and resetting allocation) it was too
-   useful an ability to ignore.  
-
-   Secondly, since a player with macros can be quite formidable to a
-   player without, I thought that Conquest itself should support a
-   similar ability so that such a disadvantage wouldn't be an issue.
+## Macro Keys / Mouse Macros
 
    Macros are sequences of Conquest commands that are issued when a
    Function Key (Fkey) is hit.  On PC hardware, these are the F1-F12
    keys.  With certain emulators (like Unixware's at386 console) the
    Shifted F1-12 keys (F13-F24) are available too.
 
-   Fkey macros are defined in your ~/.conquestrc file.  Users can edit
-   their macro keys from within Conquest using the (O)ptions Menu.
+   With the GL client, version 8.1.2f or better, support for assigning
+   macros to mouse buttons is also provided.  Modifiers like Alt,
+   Control, and Shift can also be used with the mouse buttons.  Up to
+   32 buttons are supported with any combination of the 3 modifiers
+   (or no modifiers) giving you a maximum of 256 assignable mouse
+   macros.  If you have a 32 button mouse that is :)
 
-   One handy macro I like is 
+   Mouse and Key macros are defined in your ~/conquest/conquestrc
+   file.  Users can edit their macro keys from within Conquest using
+   the (O)ptions Menu.
+
+   Here is an example for the F1 function key
 
        macro_f1=dP\r
 
        Which makes my F1 key detonate enemy torps (d), and fire a
        spread of 3 torps in the last direction I fired (P\r).  
 
-   Here is a 'star burst' macro:
-   
-       macro_f2=A70\rpe\rpd\rpc\rpx\rpz\rpa\rpq\rpw\rA30\r
+   The mouse only works when playing the game (in the Cockpit) and the
+   cursor is within the viewer window in the GL client.
 
-       This macro for the F2 key changes weapons alloc to maximum
-       efficiency (A70\r), and then fires a single torp at each of the
-       8 primary compass points (pe\r...), then resets to maximum
-       engine efficiency (A30\r).  Aside from putting on a pretty
-       display, this can also be used to attempt to locate nearby
-       cloaked ships by watching for 'unexplained' detonations. :)
+   Three default mouse macros are provided to give you a taste, and
+   will be saved in your conquestrc file the first time you run an
+   8.1.2f or better version of the client.  They are:
+
+      mouse button 0 (left): Fire phaser at <angle>
+      mouse button 1 (middle): Set course to <angle>
+      mouse button 2 (right): Fire Torp at <angle>
+
+   Of course you can redefine these, as well as add others.  With
+   mouse macros, a special character sequence, '\a' can be used to
+   represent the angle of the cursor relative to the center of the
+   viewer when the button was pressed.
+
+   See the mouse macro comment block in your conquestrc file for a
+   description of the format.
 
    There are many other interesting and useful combinations that I
    won't detail... After all, choosing the right macros and using them
@@ -1011,8 +1024,12 @@
 
 ## Navigation
 
-   Using the direction keys ('qweadzxc') to the (k)ourse or weapons
-   commands can be faster than specifying the direction in degrees.
+   With the 8.1.2f OpenGL client, you can click the middle mouse button
+   (be default) in the viewer to set a course in that direction.
+
+   For the keyboard, using the direction keys ('qweadzxc') to the
+   (k)ourse or weapons commands can be faster than specifying the
+   direction in degrees.
 
    If a ship is approaching from 90 degrees, it's easier (and faster)
    to type 'Pw\r' than 'P90\r' to fire the torps in the proper
@@ -1027,9 +1044,10 @@
    destination.
 
    In addition, the (i)nfo command understands several special strings
-   like 'ne' for info on nearest enemy.  Obviously you can't fire
+   like 'ne' for info on 'nearest enemy'.  Obviously you can't fire
    weapons like that though - that would be too easy.  See
-   conquest.doc for more info.
+   conquest.doc for more info on the direction keys and special
+   strings understood by conquest.  
 
    The Keypad keys/Arrow keys (if your terminal emulator and terminfo
    entry supports them) can be used for 1-key steering, which can be
@@ -1099,7 +1117,9 @@
       robot headed your way.
 
   B.  A Conquest Operator fires up conqoper and creates some with the
-      (r)obot menu option.
+      (r)obot menu option.  A user marked as a Conquest Operator can
+      also create robots by sending special messages to GOD from
+      within the game.
 
 
 ## The Doomsday Machine
@@ -1172,7 +1192,7 @@
 
 ## bin/conquestgl
 
-   This is the OpenGL version of the conquest client. Type 'conquest -?' 
+   This is the OpenGL version of the conquest client. Type 'conquestgl -?' 
    to see a list of options.  
 
    The OpenGL client can also be used to replay conquest recording
@@ -1204,13 +1224,14 @@
 
 ## conquestsh
 
-   The is a Conquest 'shell' used if you are going to allow telnet
-   access to you server.  It basically exec()'s conquest like so:
+   This is a Conquest 'shell' used if you are going to allow telnet
+   access to your server (to run the curses client).  It basically
+   exec()'s conquest like so:
 
     $ conquest -t -s localhost
 
    The '-t' option tells conquest not to attempt to load/save the user
-   configuration (~/.conquestrc).
+   configuration (~/.conquest/conquestrc).
 
    See SERVER.TXT for further information on how to setup a telnet
    interface for a conquest server.
@@ -1230,16 +1251,14 @@
    This is the Conquest Operator program that allows suitably
    privileged individuals to control, monitor, and modify the behavior
    of the game.  The root user is always a CO and therefore can run
-   the conqoper program.  If you want to allow other people to be
-   CO's, you will need to add them to the conquest group in
+   the conqoper program.  If you want to allow other people to be able
+   to run conqoper, you will need to add them to the conquest group in
    /etc/group.
 
-   My conquest entry in /etc/group looks like this:
-
-     conquest::102:jon,davep,johnc
-
-     jon, davep, and johnc all have CO status on my machine.  
-
+   If you want to allow specific players to be able to issue certain
+   operator commands from within the game, (e)dit them in conqoper and
+   set the 'Conquest Operator' flag.  
+   
    Conqoper currently supports the following options, (type conqoper
    -?  to see the various options):
 
@@ -1268,7 +1287,7 @@
 
     A CO with permission to overwrite the system-wide conquestrc file
     can call conqoper with the '-C' option to update the file with a
-    newer version.  User-level ~/.conquestrc files are always updated
+    newer version.  User-level ~/.conquest/conquestrc files are always updated
     automatically when conquest is run.  This is not done
     automatically for the system wide conquestrc file due to potential
     security problems.
@@ -1354,7 +1373,7 @@
 
    Textures and texfonts used by the OpenGL client (conquestgl).
 
-## ~/.conquestrc
+## ~/.conquest/conquestrc
 
    User options and macro definitions.  Can be edited directly or
    using the (O)ptions Menu from within conquest.
@@ -1392,7 +1411,7 @@
      or implied warranty.
 
      Unix/C specific porting and supporting code Copyright
-     (C)1994-2004 by Jon Trulson <jon@radscan.com> under the same
+     (C)1994-2006 by Jon Trulson <jon@radscan.com> under the same
      terms, conditions, and restrictions of the original copyright by
      Jef Poskanzer and Craig Leres.
 

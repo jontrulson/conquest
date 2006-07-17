@@ -1,0 +1,73 @@
+.\" $Id$
+.TH "conqmetad" 1 "" ""
+.SH NAME
+conqmetad \- a Conquest Meta server
+.SH SYNOPSIS
+.PP
+\fBconqmetad\fP [OPTIONS]
+.SH DESCRIPTION
+.PP
+\fBconqmetad\fP is a meta server for Conquest.  A meta server listens
+for game availablity announcements from other \fBconquestd\fP servers
+scattered about, and makes this list available to conquest clients that use the
+\fB\-m\fP option.  This makes it easy for people to find prospective
+games. 
+.PP
+The de-facto Conquest Meta server runs at \fBconquest.radscan.com\fP.
+.PP
+The meta server listens on port UDP port 1700 for announcements from
+\fBconquestd\fP servers.  TCP connections to port 1700 cause
+\fBconqmetad\fP to dump the current server list and their associated
+data in an easily parsable text format, one server per line, and
+disconnect. 
+.SH "OPTIONS"
+.PP
+.TP 8
+.B \-d 
+Daemon mode.  
+.TP 8
+.B \-l
+Listen for local connections only.  When this option is supplied, only
+clients on the local host will be able to connect.
+.TP 8
+.B \-u <user>
+Run as user \fIuser\fP.  
+.SH "AUTHOR"
+Jon Trulson
+.SH "SEE ALSO"
+.PP
+conquest(1), conquestd(1), conqoper(1), conqdriv(1), conquestsh(1),
+conqmetad(1) 
+.PP
+See README in the conquest distribution (usually installed in
+<conquest install prefix>/etc/) for information and tips on how to
+play. 
+.PP
+See INSTALL for instructions on unpacking, compiling, and installing
+conquest, as well as information on terminfo requirements (for the
+curses client) and other system specific issues.
+.PP
+See README.cygwin for information on building/using conquest on MS
+Windows systems. 
+.PP
+See SERVER.TXT for information on how to setup and run a Conquest
+server.
+.PP
+See HISTORY for the latest news and modification history.
+.PP
+See CONQINIT.TXT for information on CQI, and the format of the
+conqinitrc and texturesrc files.
+.SH "COPYRIGHT"
+.PP
+Copyright (C)1994-2006 by Jon Trulson <jon@radscan.com> under the
+ARTISTIC License.
+.PP
+Original VAX/VMS Ratfor Conquest:
+.PP
+Copyright (C)1983-1986 by Jef Poskanzer and Craig Leres.  Permission to
+use, copy, modify, and distribute this software and its documentation
+for any purpose and without fee is hereby granted, provided that this
+copyright notice appear in all copies and in all supporting
+documentation. Jef Poskanzer and Craig Leres make no representations
+about the suitability of this software for any purpose. It is provided
+"as is" without express or implied warranty.
