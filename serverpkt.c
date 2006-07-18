@@ -310,7 +310,7 @@ spShipSml_t *spktShipSml(Unsgn8 snum, int rec)
 
   if (canscan)
     {				/* if we get all the stats */
-      sflags |= SHIP_F_SHUP | SHIP_F_BOMBING;
+      sflags |= SHIP_F_SHUP | SHIP_F_BOMBING | SHIP_F_REPAIR;
 
       sshipsml.shields = (Unsgn8)Ships[snum].shields;
       sshipsml.damage = (Unsgn8)Ships[snum].damage;

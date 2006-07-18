@@ -525,12 +525,6 @@ static int initGLShips(void)
           snprintf(buffer, TEXFILEMAX - 1, "%s-ico-cloak", shipPfx);
           GLShips[i][j].ico_cloak = _get_ship_texid(buffer);
           
-          snprintf(buffer, TEXFILEMAX - 1, "%s-ico-shcrit", shipPfx);
-          GLShips[i][j].ico_shcrit = _get_ship_texid(buffer);
-          
-          snprintf(buffer, TEXFILEMAX - 1, "%s-ico-hulcrit", shipPfx);
-          GLShips[i][j].ico_hulcrit = _get_ship_texid(buffer);
-          
           snprintf(buffer, TEXFILEMAX - 1, "%s-ico-repair", shipPfx);
           GLShips[i][j].ico_repair = _get_ship_texid(buffer);
           
@@ -551,8 +545,6 @@ static int initGLShips(void)
                 GLShips[i][j].warp &&
                 GLShips[i][j].phas &&
                 GLShips[i][j].ico_cloak &&
-                GLShips[i][j].ico_shcrit &&
-                GLShips[i][j].ico_hulcrit &&
                 GLShips[i][j].ico_torp &&
                 GLShips[i][j].ico_repair))
             return FALSE;        /* one was missing */
@@ -816,12 +808,6 @@ void drawIconHUDDecal(GLfloat rx, GLfloat ry, GLfloat w, GLfloat h,
       break;
     case HUD_ICLOAK:   
       id = GLShips[steam][stype].ico_cloak;
-      break;
-    case HUD_ISHCRIT:  
-      id = GLShips[steam][stype].ico_shcrit;
-      break;
-    case HUD_IHULCRIT: 
-      id = GLShips[steam][stype].ico_hulcrit;
       break;
     case HUD_IREPAIR:  
       id = GLShips[steam][stype].ico_repair;

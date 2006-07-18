@@ -46,6 +46,8 @@ extern dspData_t dData;
 #define E_CRIT     80
 #define W_CRIT     80
 #define F_CRIT     100
+#define SH_CRIT    20
+#define HULL_CRIT  75
 
 /* we store geometry here that should only need to be recomputed
    when the screen is resized, not every single frame :) */
@@ -118,6 +120,9 @@ static struct {
   obj_t engfailpulse;           /* wep/eng failure pulses */
   obj_t wepfailpulse;
   obj_t fuelcritpulse;
+  obj_t shcritpulse;
+  obj_t hullcritpulse;
+  
   obj_t torppips[MAXTORPS];
 
 } o = {};
@@ -321,15 +326,25 @@ void updateIconHudGeo(void)
   o.fuelcritpulse.w = ((dConf.vW / 8.0) * 5.0);
   o.fuelcritpulse.h = (dConf.vH / 20.0) * 2.0;
 
-  o.engfailpulse.x = dConf.vX + ((dConf.vW / 8.0) * 1.5);
-  o.engfailpulse.y = dConf.vY + (dConf.vH - ((dConf.vH / 20.0) * 5.0));
-  o.engfailpulse.w = ((dConf.vW / 8.0) * 5.0);
-  o.engfailpulse.h = (dConf.vH / 20.0) * 2.0;
-
   o.wepfailpulse.x = dConf.vX + ((dConf.vW / 8.0) * 1.5);
   o.wepfailpulse.y = dConf.vY + (dConf.vH - ((dConf.vH / 20.0) * 16.0));
   o.wepfailpulse.w = ((dConf.vW / 8.0) * 5.0);
   o.wepfailpulse.h = (dConf.vH / 20.0) * 2.0;
+
+  o.hullcritpulse.x = dConf.vX + ((dConf.vW / 8.0) * 1.5);
+  o.hullcritpulse.y = dConf.vY + (dConf.vH - ((dConf.vH / 20.0) * 13.0));
+  o.hullcritpulse.w = ((dConf.vW / 8.0) * 5.0);
+  o.hullcritpulse.h = (dConf.vH / 20.0) * 2.0;
+
+  o.shcritpulse.x = dConf.vX + ((dConf.vW / 8.0) * 1.5);
+  o.shcritpulse.y = dConf.vY + (dConf.vH - ((dConf.vH / 20.0) * 8.0));
+  o.shcritpulse.w = ((dConf.vW / 8.0) * 5.0);
+  o.shcritpulse.h = (dConf.vH / 20.0) * 2.0;
+
+  o.engfailpulse.x = dConf.vX + ((dConf.vW / 8.0) * 1.5);
+  o.engfailpulse.y = dConf.vY + (dConf.vH - ((dConf.vH / 20.0) * 5.0));
+  o.engfailpulse.w = ((dConf.vW / 8.0) * 5.0);
+  o.engfailpulse.h = (dConf.vH / 20.0) * 2.0;
 
   /* torp pips, aligned along left side of hud icon area */
 
@@ -424,8 +439,9 @@ void renderAllocVal(GLfloat x, GLfloat y, GLfloat w, GLfloat h,
   return;
 }
 
-/* draw either or both eng/wep 'overload' message using a 'pulse' effect
-   in the viewer.  Use a slower pulse for 'critical' levels. */
+/* draw overload/critical  messages using a 'pulse' effect
+   in the viewer.  Use a slower pulse for 'critical' levels, except
+   for hull critical. */
 void renderPulseMsgs(void)
 {
   static animStateRec_t engfail = {}; /* animdef states  */
@@ -433,7 +449,10 @@ void renderPulseMsgs(void)
   static animStateRec_t wepcrit = {}; 
   static animStateRec_t engcrit = {}; 
   static animStateRec_t fuelcrit = {}; 
+  static animStateRec_t shcrit = {}; 
+  static animStateRec_t hullcrit = {}; 
   static int firsttime = TRUE;
+  static const int testlamps = 0;
   scrNode_t *curnode = getTopNode();
   int drawing = FALSE;
   
@@ -466,11 +485,24 @@ void renderPulseMsgs(void)
         {
           animQueAdd(curnode->animQue, &fuelcrit);
         }
+
+      if (animInitState("overload-pulse", &shcrit, NULL))
+        {
+          animQueAdd(curnode->animQue, &shcrit);
+        }
+
+      if (animInitState("overload-pulse", &hullcrit, NULL))
+        {
+          animQueAdd(curnode->animQue, &hullcrit);
+        }
     }
 
-  if (dData.alloc.ealloc <= 0 || dData.alloc.walloc <= 0 ||
+  if (testlamps || dData.alloc.ealloc <= 0 || dData.alloc.walloc <= 0 ||
       dData.etemp.etemp > E_CRIT  || dData.wtemp.wtemp > W_CRIT ||
-      dData.fuel.fuel < F_CRIT)
+      dData.fuel.fuel < F_CRIT || 
+      (dData.sh.shields <= SH_CRIT && 
+       SSHUP(Context.snum) && !SREPAIR(Context.snum)) ||
+      dData.dam.damage >= HULL_CRIT)
     drawing = TRUE;
 
   if (!drawing)
@@ -479,7 +511,7 @@ void renderPulseMsgs(void)
   glBlendFunc(GL_SRC_ALPHA, GL_ONE);
   glEnable(GL_BLEND);
  
-  if (dData.fuel.fuel < F_CRIT)
+  if (testlamps ||dData.fuel.fuel < F_CRIT)
     {
       if (ANIM_EXPIRED(&fuelcrit))
         {
@@ -495,7 +527,7 @@ void renderPulseMsgs(void)
       
     }      
 
-  if (dData.alloc.ealloc <= 0)
+  if (testlamps ||dData.alloc.ealloc <= 0)
     {
       if (ANIM_EXPIRED(&engfail))
         {
@@ -525,7 +557,7 @@ void renderPulseMsgs(void)
     }      
   
 
-  if (dData.alloc.walloc <= 0)
+  if (testlamps ||dData.alloc.walloc <= 0)
     {
       if (ANIM_EXPIRED(&wepfail))
         {
@@ -554,6 +586,39 @@ void renderPulseMsgs(void)
                 0, &wepcrit.state.col, 
                 TRUE, FALSE, TRUE);
       
+    }      
+
+  if (testlamps || (dData.sh.shields < SH_CRIT && SSHUP(Context.snum) && 
+       !SREPAIR(Context.snum)))
+    {
+      if (ANIM_EXPIRED(&shcrit))
+        {
+          animResetState(&shcrit, frameTime);
+          animQueAdd(curnode->animQue, &shcrit);
+        }
+
+      glfRender(o.shcritpulse.x, o.shcritpulse.y, 0.0, 
+                o.shcritpulse.w, o.shcritpulse.h, 
+                fontLargeTxf, "Shields Critical", 
+                0, &shcrit.state.col, 
+                TRUE, FALSE, TRUE);
+
+    }      
+
+  if (testlamps || dData.dam.damage >= HULL_CRIT)
+    {
+      if (ANIM_EXPIRED(&hullcrit))
+        {
+          animResetState(&hullcrit, frameTime);
+          animQueAdd(curnode->animQue, &hullcrit);
+        }
+
+      glfRender(o.hullcritpulse.x, o.hullcritpulse.y, 0.0, 
+                o.hullcritpulse.w, o.hullcritpulse.h, 
+                fontLargeTxf, "Hull Critical", 
+                0, &hullcrit.state.col, 
+                TRUE, FALSE, TRUE);
+
     }      
 
   glDisable(GL_BLEND);
@@ -835,15 +900,6 @@ void renderHud(int dostats)
     wep temp > 80 or overloaded
     hull dmg >= 70
   */
-
-  /* shields and damage */
-  if ((dData.sh.shields < 20 && SSHUP(Context.snum) && 
-       !SREPAIR(Context.snum)) && GL_BLINK_QTRSEC) 
-    drawIconHUDDecal(o.d1icon.x, o.d1icon.y, o.d1icon.w, o.d1icon.h,
-                     HUD_ISHCRIT, icl);
-  if (dData.dam.damage >= 70 && GL_BLINK_QTRSEC) 
-    drawIconHUDDecal(o.d1icon.x, o.d1icon.y, o.d1icon.w, o.d1icon.h,
-                     HUD_IHULCRIT, icl);
 
   /* draw warp and decals */
   drawIconHUDDecal(o.warp.x, o.warp.y, o.warp.w, o.warp.h, 

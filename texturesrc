@@ -295,16 +295,6 @@ texture {
 }
 
 texture {
-  name         "shipF-ico-shcrit"
-  filename     "ico-shcrit"
-}
-
-texture {
-  name         "shipF-ico-hulcrit"
-  filename     "ico-hulcrit"
-}
-
-texture {
   name         "shipF-ico-repair"
   filename     "ico-repair"
 }
@@ -433,16 +423,6 @@ texture {
 texture {
   name         "shipR-ico-cloak"
   filename     "ico-cloak"
-}
-
-texture {
-  name         "shipR-ico-shcrit"
-  filename     "ico-shcrit"
-}
-
-texture {
-  name         "shipR-ico-hulcrit"
-  filename     "ico-hulcrit"
 }
 
 texture {
@@ -578,16 +558,6 @@ texture {
 }
 
 texture {
-  name         "shipK-ico-shcrit"
-  filename     "ico-shcrit"
-}
-
-texture {
-  name         "shipK-ico-hulcrit"
-  filename     "ico-hulcrit"
-}
-
-texture {
   name         "shipK-ico-repair"
   filename     "ico-repair"
 }
@@ -705,16 +675,6 @@ texture {
 texture {
   name         "shipO-ico-cloak"
   filename     "ico-cloak"
-}
-
-texture {
-  name         "shipO-ico-shcrit"
-  filename     "ico-shcrit"
-}
-
-texture {
-  name         "shipO-ico-hulcrit"
-  filename     "ico-hulcrit"
 }
 
 texture {

@@ -42,8 +42,6 @@ typedef struct _glship {
   GLint     ico;              /* ship icon */
   GLint     ico_sh;           /* icon shields id */
   GLint     ico_cloak;        /* cloak indicator */
-  GLint     ico_shcrit;       /* shields critical */
-  GLint     ico_hulcrit;      /* hull critical */
   GLint     ico_repair;       /* repairing */
   GLint     decal1;           /* sh/hull gauges */
   GLint     decal2;           /* fuel/w/e/alloc/kills gauges */

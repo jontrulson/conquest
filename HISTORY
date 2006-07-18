@@ -9,12 +9,23 @@
 
                               Conquest HISTORY
 
-??? (devel) 7/16/2006
+8.1.2g (devel) 7/16/2006
 
-       - added some man pages for conqdriv, conqmetad, conqoper,
-         conquest/conquestgl and conquestd.  
+       - add 'Hull Critical' and 'Shields Critical' pulse messages to
+         viewer.  Remove icon sh/hull critical texture decals.
 
-8.1.2f (devel) 7/10/2006
+       - server fix: propagate SHIP_F_REPAIR flag for ships other than
+         your own that are within scanning range so that shield status
+         is accurate when repairing.
+
+       - added man pages for conqdriv, conqmetad, conqoper,
+         conquest/conquestgl (one manpage for both), conquestd, and
+         conquestsh.
+
+         These will be beefed up more in the future from info in the
+         README and other files.
+
+       8.1.2f (devel - not publically released)
 
        - fixed bug with mouse macros and angles that would cause the
          computed angle to be off by a few degrees depending on where
