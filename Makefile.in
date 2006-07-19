@@ -72,7 +72,7 @@ am__vpath_adj = case $$p in \
   esac;
 am__strip_dir = `echo $$p | sed -e 's|^.*/||'`;
 am__installdirs = "$(DESTDIR)$(libdir)" "$(DESTDIR)$(bindir)" \
-	"$(DESTDIR)$(libexecdir)" "$(DESTDIR)$(man1dir)" \
+	"$(DESTDIR)$(libexecdir)" "$(DESTDIR)$(man6dir)" \
 	"$(DESTDIR)$(datadir)" "$(DESTDIR)$(sysconfdir)"
 libLTLIBRARIES_INSTALL = $(INSTALL)
 LTLIBRARIES = $(lib_LTLIBRARIES)
@@ -198,9 +198,9 @@ DIST_SOURCES = $(libUi_la_SOURCES) $(libUiCU_la_SOURCES) \
 	$(conqoper_SOURCES) $(conqstrat_SOURCES) $(conquest_SOURCES) \
 	$(conquestd_SOURCES) $(conquestgl_SOURCES) \
 	$(conquestsh_SOURCES)
-man1dir = $(mandir)/man1
+man6dir = $(mandir)/man6
 NROFF = nroff
-MANS = $(man1_MANS)
+MANS = $(man6_MANS)
 dataDATA_INSTALL = $(INSTALL_DATA)
 sysconfDATA_INSTALL = $(INSTALL_DATA)
 DATA = $(data_DATA) $(sysconf_DATA)
@@ -335,8 +335,8 @@ CONQDATADIR = @datadir@
 CONQSYSCONFDIR = @sysconfdir@
 CONQIMGDIR = $(CONQDATADIR)/img
 IMAGES = img/*.tga img/*.txf
-man1_MANS = conqdriv.man conqmetad.man conqoper.man conquest.man \
-	conquestd.man conquestsh.man	
+man6_MANS = conqdriv.man conqmetad.man conqoper.man conquest.man \
+	conquestd.man conquestsh.man conqai.man 
 
 XLIBS = @X_LIBS@ @X_EXTRA_LIBS@ -lglut -lGL -lGLU -lXt @X_PRE_LIBS@ -lXext -lXi -lX11 -lXmu  
 INCLUDES = -DCONQUEST_GROUP=\"$(CONQGROUP)\" \
@@ -421,7 +421,7 @@ data_DATA = conquest.doc HISTORY README conqrule
 # we install conqinitrc in the intall-exec-hook, so that we only install
 #  conqinitrc if it does not already exist.
 sysconf_DATA = texturesrc
-EXTRA_DIST = conquest.doc SERVER.TXT CONQINIT.TXT HISTORY README conqrule $(man1_MANS)
+EXTRA_DIST = conquest.doc SERVER.TXT CONQINIT.TXT HISTORY README conqrule $(man6_MANS)
 all: config.h
 	$(MAKE) $(AM_MAKEFLAGS) all-am
 
@@ -738,14 +738,14 @@ clean-libtool:
 distclean-libtool:
 	-rm -f libtool
 uninstall-info-am:
-install-man1: $(man1_MANS) $(man_MANS)
+install-man6: $(man6_MANS) $(man_MANS)
 	@$(NORMAL_INSTALL)
-	test -z "$(man1dir)" || $(mkdir_p) "$(DESTDIR)$(man1dir)"
-	@list='$(man1_MANS) $(dist_man1_MANS) $(nodist_man1_MANS)'; \
+	test -z "$(man6dir)" || $(mkdir_p) "$(DESTDIR)$(man6dir)"
+	@list='$(man6_MANS) $(dist_man6_MANS) $(nodist_man6_MANS)'; \
 	l2='$(man_MANS) $(dist_man_MANS) $(nodist_man_MANS)'; \
 	for i in $$l2; do \
 	  case "$$i" in \
-	    *.1*) list="$$list $$i" ;; \
+	    *.6*) list="$$list $$i" ;; \
 	  esac; \
 	done; \
 	for i in $$list; do \
@@ -753,35 +753,35 @@ install-man1: $(man1_MANS) $(man_MANS)
 	  else file=$$i; fi; \
 	  ext=`echo $$i | sed -e 's/^.*\\.//'`; \
 	  case "$$ext" in \
-	    1*) ;; \
-	    *) ext='1' ;; \
+	    6*) ;; \
+	    *) ext='6' ;; \
 	  esac; \
 	  inst=`echo $$i | sed -e 's/\\.[0-9a-z]*$$//'`; \
 	  inst=`echo $$inst | sed -e 's/^.*\///'`; \
 	  inst=`echo $$inst | sed '$(transform)'`.$$ext; \
-	  echo " $(INSTALL_DATA) '$$file' '$(DESTDIR)$(man1dir)/$$inst'"; \
-	  $(INSTALL_DATA) "$$file" "$(DESTDIR)$(man1dir)/$$inst"; \
+	  echo " $(INSTALL_DATA) '$$file' '$(DESTDIR)$(man6dir)/$$inst'"; \
+	  $(INSTALL_DATA) "$$file" "$(DESTDIR)$(man6dir)/$$inst"; \
 	done
-uninstall-man1:
+uninstall-man6:
 	@$(NORMAL_UNINSTALL)
-	@list='$(man1_MANS) $(dist_man1_MANS) $(nodist_man1_MANS)'; \
+	@list='$(man6_MANS) $(dist_man6_MANS) $(nodist_man6_MANS)'; \
 	l2='$(man_MANS) $(dist_man_MANS) $(nodist_man_MANS)'; \
 	for i in $$l2; do \
 	  case "$$i" in \
-	    *.1*) list="$$list $$i" ;; \
+	    *.6*) list="$$list $$i" ;; \
 	  esac; \
 	done; \
 	for i in $$list; do \
 	  ext=`echo $$i | sed -e 's/^.*\\.//'`; \
 	  case "$$ext" in \
-	    1*) ;; \
-	    *) ext='1' ;; \
+	    6*) ;; \
+	    *) ext='6' ;; \
 	  esac; \
 	  inst=`echo $$i | sed -e 's/\\.[0-9a-z]*$$//'`; \
 	  inst=`echo $$inst | sed -e 's/^.*\///'`; \
 	  inst=`echo $$inst | sed '$(transform)'`.$$ext; \
-	  echo " rm -f '$(DESTDIR)$(man1dir)/$$inst'"; \
-	  rm -f "$(DESTDIR)$(man1dir)/$$inst"; \
+	  echo " rm -f '$(DESTDIR)$(man6dir)/$$inst'"; \
+	  rm -f "$(DESTDIR)$(man6dir)/$$inst"; \
 	done
 install-dataDATA: $(data_DATA)
 	@$(NORMAL_INSTALL)
@@ -998,7 +998,7 @@ all-am: Makefile $(LTLIBRARIES) $(PROGRAMS) $(MANS) $(DATA) config.h
 install-binPROGRAMS: install-libLTLIBRARIES
 
 installdirs:
-	for dir in "$(DESTDIR)$(libdir)" "$(DESTDIR)$(bindir)" "$(DESTDIR)$(libexecdir)" "$(DESTDIR)$(man1dir)" "$(DESTDIR)$(datadir)" "$(DESTDIR)$(sysconfdir)"; do \
+	for dir in "$(DESTDIR)$(libdir)" "$(DESTDIR)$(bindir)" "$(DESTDIR)$(libexecdir)" "$(DESTDIR)$(man6dir)" "$(DESTDIR)$(datadir)" "$(DESTDIR)$(sysconfdir)"; do \
 	  test -z "$$dir" || $(mkdir_p) "$$dir"; \
 	done
 install: install-am
@@ -1062,7 +1062,7 @@ install-exec-am: install-binPROGRAMS install-libLTLIBRARIES \
 
 install-info: install-info-am
 
-install-man: install-man1
+install-man: install-man6
 
 installcheck-am:
 
@@ -1090,7 +1090,7 @@ uninstall-am: uninstall-binPROGRAMS uninstall-dataDATA \
 	uninstall-info-am uninstall-libLTLIBRARIES \
 	uninstall-libexecPROGRAMS uninstall-man uninstall-sysconfDATA
 
-uninstall-man: uninstall-man1
+uninstall-man: uninstall-man6
 
 .PHONY: CTAGS GTAGS all all-am am--refresh check check-am clean \
 	clean-binPROGRAMS clean-generic clean-libLTLIBRARIES \
@@ -1103,13 +1103,13 @@ uninstall-man: uninstall-man1
 	install-data-am install-dataDATA install-exec install-exec-am \
 	install-exec-hook install-info install-info-am \
 	install-libLTLIBRARIES install-libexecPROGRAMS install-man \
-	install-man1 install-strip install-sysconfDATA installcheck \
+	install-man6 install-strip install-sysconfDATA installcheck \
 	installcheck-am installdirs maintainer-clean \
 	maintainer-clean-generic mostlyclean mostlyclean-compile \
 	mostlyclean-generic mostlyclean-libtool pdf pdf-am ps ps-am \
 	tags uninstall uninstall-am uninstall-binPROGRAMS \
 	uninstall-dataDATA uninstall-info-am uninstall-libLTLIBRARIES \
-	uninstall-libexecPROGRAMS uninstall-man uninstall-man1 \
+	uninstall-libexecPROGRAMS uninstall-man uninstall-man6 \
 	uninstall-sysconfDATA
 
 
@@ -1122,7 +1122,7 @@ install-exec-hook:
 		$(DESTDIR)$(libexecdir) \
 		$(DESTDIR)$(libdir) \
 		$(DESTDIR)/$(mandir) \
-		$(DESTDIR)/$(mandir)/man1 
+		$(DESTDIR)/$(mandir)/man6 
 	chmod 775 $(DESTDIR)$(CONQLOCALSTATEDIR) 
 	chgrp $(CONQGROUP) $(DESTDIR)$(CONQLOCALSTATEDIR)
 	cp -f $(IMAGES) $(DESTDIR)$(CONQIMGDIR)/

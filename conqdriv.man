@@ -1,5 +1,5 @@
 .\" $Id$
-.TH "conqdriv" 1 "" ""
+.TH "conqdriv" 6 "" ""
 .SH NAME
 conqdriv \- Drive a Conquest universe.
 .SH SYNOPSIS
@@ -27,8 +27,8 @@ control of the universe.
 Jon Trulson
 .SH "SEE ALSO"
 .PP
-conquest(1), conquestd(1), conqoper(1), conqdriv(1), conquestsh(1),
-conqmetad(1) 
+conquest(6), conquestd(6), conqoper(6), conqdriv(6), conquestsh(6),
+conqmetad(6) 
 .PP
 See README in the conquest distribution (usually installed in
 <conquest install prefix>/etc/) for information and tips on how to

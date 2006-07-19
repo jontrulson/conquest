@@ -13,7 +13,7 @@ CONQIMGDIR = $(CONQDATADIR)/img
 IMAGES = img/*.tga img/*.txf
 
 man6_MANS = conqdriv.man conqmetad.man conqoper.man conquest.man \
-	conquestd.man conquestsh.man	
+	conquestd.man conquestsh.man conqai.man 
 
 XLIBS = @X_LIBS@ @X_EXTRA_LIBS@ -lglut -lGL -lGLU -lXt @X_PRE_LIBS@ -lXext -lXi -lX11 -lXmu  
 

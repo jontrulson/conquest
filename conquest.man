@@ -1,5 +1,5 @@
 .\" $Id$
-.TH "conquest" 1 "" ""
+.TH "conquest" 6 "" ""
 .SH NAME
 conquestgl \- a GLUT based OpenGL client for Conquest
 .PP
@@ -76,8 +76,8 @@ try disabling UDP with this option.
 Jon Trulson
 .SH "SEE ALSO"
 .PP
-conquestd(1), conqoper(1), conqdriv(1), conquestsh(1),
-conqmetad(1) 
+conquestd(6), conqoper(6), conqdriv(6), conquestsh(6),
+conqmetad(6) 
 .PP
 See README in the conquest distribution (usually installed in
 <conquest install prefix>/etc/) for information and tips on how to
