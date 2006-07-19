@@ -12,7 +12,7 @@ CONQIMGDIR = $(CONQDATADIR)/img
 
 IMAGES = img/*.tga img/*.txf
 
-man1_MANS = conqdriv.man conqmetad.man conqoper.man conquest.man \
+man6_MANS = conqdriv.man conqmetad.man conqoper.man conquest.man \
 	conquestd.man conquestsh.man	
 
 XLIBS = @X_LIBS@ @X_EXTRA_LIBS@ -lglut -lGL -lGLU -lXt @X_PRE_LIBS@ -lXext -lXi -lX11 -lXmu  
@@ -132,7 +132,7 @@ data_DATA = conquest.doc HISTORY README conqrule
 #  conqinitrc if it does not already exist.
 sysconf_DATA = texturesrc
 
-EXTRA_DIST = conquest.doc SERVER.TXT CONQINIT.TXT HISTORY README conqrule $(man1_MANS)
+EXTRA_DIST = conquest.doc SERVER.TXT CONQINIT.TXT HISTORY README conqrule $(man6_MANS)
 
 install-exec-hook:
 	$(mkinstalldirs) -m 755 $(DESTDIR)$(localstatedir) \
@@ -143,7 +143,7 @@ install-exec-hook:
 		$(DESTDIR)$(libexecdir) \
 		$(DESTDIR)$(libdir) \
 		$(DESTDIR)/$(mandir) \
-		$(DESTDIR)/$(mandir)/man1 
+		$(DESTDIR)/$(mandir)/man6 
 	chmod 775 $(DESTDIR)$(CONQLOCALSTATEDIR) 
 	chgrp $(CONQGROUP) $(DESTDIR)$(CONQLOCALSTATEDIR)
 	cp -f $(IMAGES) $(DESTDIR)$(CONQIMGDIR)/

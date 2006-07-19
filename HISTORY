@@ -9,6 +9,9 @@
 
                               Conquest HISTORY
 
+???    - patch from Clint Adams, putting the manpages in their proper
+         place (section 6 rather than 1)
+
 8.1.2g (devel) 7/16/2006
 
        - add 'Hull Critical' and 'Shields Critical' pulse messages to
