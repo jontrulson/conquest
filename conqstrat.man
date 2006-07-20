@@ -1,0 +1,52 @@
+.TH "CONQSTRAT" "6" 
+.SH "NAME" 
+conqstrat \(em modify Robot strategy tables 
+.SH "SYNOPSIS" 
+.PP 
+\fBconqstrat\fP [\fB-v\fP]  [\fB-d\fP]  [\fB-U\fP]  [\fB-o \fIfile\fP\fP]  
+.SH "DESCRIPTION" 
+.PP 
+This manual page documents briefly the 
+\fBconqstrat\fP command. 
+.PP 
+This manual page was written for the \fBDebian\fP distribution 
+because the original program does not have a manual page. 
+Instead, it has documentation in plain text format; see below. 
+.PP 
+\fBconqstrat\fP is a program reads rules from 
+stdin to update Robot strategy tables. 
+.SH "OPTIONS" 
+.IP "\fB-v\fP         " 10 
+Be verbose about everything. 
+.IP "\fB-d\fP         " 10 
+Turn on lots of debugging. 
+.IP "\fB-U\fP         " 10 
+Update the common block directly. 
+.IP "\fB-o \fP\fIfile\fP         " 10 
+Output to \fIfile\fP.  Without this 
+option, output will go to stdout. 
+.SH "SEE ALSO" 
+.PP 
+conquest (6), conqai (6), conqoper (6). 
+.PP 
+The programs are documented in text files 
+present in /usr/share/doc/conquest/ . 
+.SH "AUTHOR" 
+.PP 
+This manual page was written by Clint Adams <schizo@debian.org> for 
+the \fBDebian\fP system (but may be used by others).  Permission is 
+granted to copy, distribute and/or modify this document under 
+the terms of the GNU GPL.  Conquest is 
+.PP
+Copyright (C)1994-2006 by Jon Trulson <jon@radscan.com> under the
+ARTISTIC License.
+.PP
+Original VAX/VMS Ratfor Conquest:
+.PP
+Copyright (C)1983-1986 by Jef Poskanzer and Craig Leres.  Permission to
+use, copy, modify, and distribute this software and its documentation
+for any purpose and without fee is hereby granted, provided that this
+copyright notice appear in all copies and in all supporting
+documentation. Jef Poskanzer and Craig Leres make no representations
+about the suitability of this software for any purpose. It is provided
+"as is" without express or implied warranty.

@@ -2212,7 +2212,7 @@ void dohelp( void )
   tlin++;
   cprintf(tlin,col,ALIGN_NONE,sfmt, "o", "come into orbit");
   tlin++;
-  cprintf(tlin,col,ALIGN_NONE,sfmt, "p", "launch photon torpedoes");
+  cprintf(tlin,col,ALIGN_NONE,sfmt, "p", "launch photon torpedo");
   tlin++;
   cprintf(tlin,col,ALIGN_NONE,sfmt, "P", "launch photon torpedo burst");
   tlin++;
