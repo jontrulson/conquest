@@ -676,6 +676,7 @@ void procCloak(cpCommand_t *cmd)
   if ( SCLOAKED(snum) )
     {
       SFCLR(snum, SHIP_F_CLOAKED);
+      sendFeedback("Cloaking device disengaged.");
       return;
     }
   if ( Ships[snum].efuse > 0 )
@@ -697,6 +698,7 @@ void procCloak(cpCommand_t *cmd)
     }
 
   SFSET(snum, SHIP_F_CLOAKED);
+  sendFeedback("Cloaking device engaged.");
 
   return;
   

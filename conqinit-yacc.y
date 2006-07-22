@@ -1510,24 +1510,25 @@ void dumpUniverse(void)
         case PLANET_SUN:
           printf("  size        1500\n");
           printf("  texname     \"star\"\n");
+          printf("  color       \"ffcc0000\"\n");
           break;
         case PLANET_CLASSM:
           printf("  size        300\n");
           printf("  texname     \"classm\"\n");
-          break;
-        case PLANET_GHOST:
-        case PLANET_DEAD:
-          printf("  size        300\n");
-          printf("  texname     \"classd\"\n");
+          printf("  color       \"ffe6e6e6\"\n");
           break;
         case PLANET_MOON:
-        default:
           printf("  size        160\n");
           printf("  texname     \"luna\"\n");
+          printf("  color       \"ffe6e6e6\"\n");
+          break;
+        default:
+          printf("  size        300\n");
+          printf("  texname     \"classd\"\n");
+          printf("  color       \"ffe6e6e6\"\n");
           break;
         }
-      
-      printf("  color       \"ffe6e6e6\"\n");
+
       printf("}\n\n");
     }
   

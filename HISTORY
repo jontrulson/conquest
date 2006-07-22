@@ -10,8 +10,12 @@
                               Conquest HISTORY
 
 ???    - patches from Clint Adams, putting the manpages in their proper
-         place (section 6 rather than 1), and supplying a conqai
-         manpage.
+         place (section 6 rather than 1), and supplying a conqai and
+         conqstrat manpage.
+
+       - in initGLPlanets, use the classd texture by default (for
+         class A, O, and Z, for example) rather than the moon
+         texture. 
 
 8.1.2g (devel) 7/16/2006
 

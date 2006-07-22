@@ -124,8 +124,15 @@ extern dspData_t dData;
 /* Ping status */
 static Unsgn32 pingStart = 0;
 static int pingPending = FALSE;
-
 #define cp_putmsg(str, lin)  setPrompt(lin, NULL, NoColor, str, NoColor)
+
+#if 0                           /* for debugging */
+void cp_putmsg(char *str, int lin)
+{
+  setPrompt(lin, NULL, NoColor, str, NoColor); 
+  clog("PUTMSG: %s", str); 
+}
+#endif
 
 static int nCPDisplay(dspConfig_t *);
 static int nCPIdle(void);
@@ -733,35 +740,12 @@ static int _gettarget(char *buf, real cdefault, real *dir, char ch)
 
 static void _dophase( real dir )
 {
-  int snum = Context.snum;
+  /* we used to do some pre-checks here, but depending on lag,
+     these checks can be racy.  Now we will send the command regardless
+     of what things look like locally, and let the server deal with it. */
   
-  if ( SCLOAKED(snum) )
-    {
-      cp_putmsg( "The cloaking device is using all available power.",
-	       MSG_LIN1 );
-      return;
-    }
-
-  if ( Ships[snum].wfuse > 0 )
-    {
-      cp_putmsg( "Weapons are currently overloaded.", MSG_LIN1 );
-      return;
-    }
-  if ( Ships[snum].fuel < PHASER_FUEL )
-    {
-      cp_putmsg( "Not enough fuel to fire phasers.", MSG_LIN2 );
-      return;
-    }
-
-  if ( Ships[snum].pfuse == 0 && clbUseFuel( snum, PHASER_FUEL, 
-                                          TRUE, FALSE ) )
-    {			/* a local approximation of course */
-      cp_putmsg( "Firing phasers...", MSG_LIN2 );
-      Ships[snum].pfuse = -1;   /* fake it out until next upd */
-      sendCommand(CPCMD_FIREPHASER, (Unsgn16)(dir * 100.0));
-    }
-  else
-    cp_putmsg( ">PHASERS DRAINED<", MSG_LIN2 );
+  cp_putmsg( "Firing phasers...", MSG_LIN2 );
+  sendCommand(CPCMD_FIREPHASER, (Unsgn16)(dir * 100.0));
 
   return;
   
@@ -769,32 +753,12 @@ static void _dophase( real dir )
 
 static void _dotorp(real dir, int num)
 {
-  int snum = Context.snum;
-
-  if ( SCLOAKED(snum) )
-    {
-      cp_putmsg( "The cloaking device is using all available power.",
-	       MSG_LIN1 );
-      return;
-    }
-  if ( Ships[snum].wfuse > 0 )
-    {
-      cp_putmsg( "Weapons are currently overloaded.", MSG_LIN1 );
-      return;
-    }
-  if ( Ships[snum].fuel < TORPEDO_FUEL )
-    {
-      cp_putmsg( "Not enough fuel to launch a torpedo.", MSG_LIN1 );
-      return;
-    }
-
-  if ( ! clbCheckLaunch( snum, num ) )
-    cp_putmsg( ">TUBES EMPTY<", MSG_LIN2 );
-  else
-    {			/* a local approx */
-      sendFireTorps(num, dir);
-      clrPrompt(MSG_LIN1);
-    }
+  /* we used to do some pre-checks here, but depending on lag,
+     these checks can be racy.  Now we will send the command regardless
+     of what things look like locally, and let the server deal with it. */
+  
+  sendFireTorps(num, dir);
+  clrPrompt(MSG_LIN1);
 
   return;
 }
@@ -1593,27 +1557,13 @@ static void _docourse( char *buf, char ch)
 /* will decloak if cloaked */
 static int _chkcloak(void)
 {
-  int snum = Context.snum;
-  string nofuel="Not enough fuel to engage cloaking device.";
-  
   clrPrompt(MSG_LIN1);
   clrPrompt(MSG_LIN2);
   
-  if ( SCLOAKED(snum) )
+  if ( SCLOAKED(Context.snum) )
     {
       sendCommand(CPCMD_CLOAK, 0);
       cp_putmsg( "Cloaking device disengaged.", MSG_LIN1 );
-      SFCLR(snum, SHIP_F_CLOAKED); /* do it locally too */
-      return FALSE;
-    }
-  if ( Ships[snum].efuse > 0 )
-    {
-      cp_putmsg( "Engines are currently overloaded.", MSG_LIN1 );
-      return FALSE;
-    }
-  if ( Ships[snum].fuel < CLOAK_ON_FUEL )
-    {
-      cp_putmsg( nofuel, MSG_LIN1 );
       return FALSE;
     }
 
@@ -1622,23 +1572,10 @@ static int _chkcloak(void)
 
 static void _docloak( char *buf, char ch)
 {
-  int snum = Context.snum;
-  string nofuel="Not enough fuel to engage cloaking device.";
-  
   clrPrompt(MSG_LIN1);
 
   if (ch == TERM_EXTRA)
-    {
-      if ( ! clbUseFuel( snum, CLOAK_ON_FUEL, FALSE, TRUE ) )
-	{			/* an approximation of course... */
-	  cp_putmsg( nofuel, MSG_LIN2 );
-	  return;
-	}
-
-      sendCommand(CPCMD_CLOAK, 0);
-      SFSET(snum, SHIP_F_CLOAKED); /* do it locally */
-      cp_putmsg( "Cloaking device engaged.", MSG_LIN2 );
-    }
+    sendCommand(CPCMD_CLOAK, 0);
 
   clrPrompt(MSG_LIN1);
 
@@ -2288,18 +2225,8 @@ static void command( int ch )
         mglBeep();
       break;
     case 'R':				/* repair mode */
-      if ( ! SCLOAKED(Context.snum) )
-	{
-          clrPrompt(MSG_LIN1);
-	  sendCommand(CPCMD_REPAIR, 0);
-	}
-      else
-	{
-          clrPrompt(MSG_LIN2);
-	  cp_putmsg(
-		   "You cannot repair while the cloaking device is engaged.",
-		   MSG_LIN1 );
-	}
+      clrPrompt(MSG_LIN1);
+      sendCommand(CPCMD_REPAIR, 0);
       break;
     case 't':
       if (_chktow())

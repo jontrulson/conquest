@@ -1662,32 +1662,10 @@ void doburst( int snum )
   
   cdclrl( MSG_LIN2, 1 );
   
-  if ( SCLOAKED(snum) )
-    {
-      mcuPutMsg( "The cloaking device is using all available power.",
-	       MSG_LIN1 );
-      return;
-    }
-  if ( Ships[snum].wfuse > 0 )
-    {
-      mcuPutMsg( "Weapons are currently overloaded.", MSG_LIN1 );
-      return;
-    }
-  if ( Ships[snum].fuel < TORPEDO_FUEL )
-    {
-      mcuPutMsg( "Not enough fuel to launch a torpedo.", MSG_LIN1 );
-      return;
-    }
-  
   if ( mcuGetTarget( "Torpedo burst: ", MSG_LIN1, 1, &dir, Ships[snum].lastblast ) )
     {
-      if ( ! clbCheckLaunch( snum, 3 ) )
-	mcuPutMsg( ">TUBES EMPTY<", MSG_LIN2 );
-      else
-	{			/* a local approx */
-	  sendFireTorps(3, dir);
-	  cdclrl( MSG_LIN1, 1 );
-	}
+      sendFireTorps(3, dir);
+      cdclrl( MSG_LIN1, 1 );
     }
   else
     {
@@ -1707,7 +1685,6 @@ void doburst( int snum )
 void docloak( int snum )
 {
   string pmt="Press TAB to engage cloaking device: ";
-  string nofuel="Not enough fuel to engage cloaking device.";
   
   cdclrl( MSG_LIN1, 1 );
   cdclrl( MSG_LIN2, 1 );
@@ -1715,18 +1692,6 @@ void docloak( int snum )
   if ( SCLOAKED(snum) )
     {
       sendCommand(CPCMD_CLOAK, 0);
-      mcuPutMsg( "Cloaking device disengaged.", MSG_LIN1 );
-      SFCLR(snum, SHIP_F_CLOAKED); /* do it locally */
-      return;
-    }
-  if ( Ships[snum].efuse > 0 )
-    {
-      mcuPutMsg( "Engines are currently overloaded.", MSG_LIN1 );
-      return;
-    }
-  if ( Ships[snum].fuel < CLOAK_ON_FUEL )
-    {
-      mcuPutMsg( nofuel, MSG_LIN1 );
       return;
     }
   
@@ -1735,15 +1700,7 @@ void docloak( int snum )
   if ( cdgetx( pmt, MSG_LIN1, 1, TERMS, cbuf, MSGMAXLINE,
 	       TRUE) == TERM_EXTRA )
     {
-      if ( ! clbUseFuel( snum, CLOAK_ON_FUEL, FALSE, TRUE ) )
-	{			/* an approximation of course... */
-	  mcuPutMsg( nofuel, MSG_LIN2 );
-	  return;
-	}
-
       sendCommand(CPCMD_CLOAK, 0);
-      SFSET(snum, SHIP_F_CLOAKED); /* do it locally */
-      mcuPutMsg( "Cloaking device engaged.", MSG_LIN2 );
     }
   cdclrl( MSG_LIN1, 1 );
   
@@ -2362,23 +2319,6 @@ void dolastphase( int snum )
 {
   cdclrl( MSG_LIN1, 1 );
   
-  if ( SCLOAKED(snum) )
-    {
-      mcuPutMsg( "The cloaking device is using all available power.",
-	       MSG_LIN2 );
-      return;
-    }
-  if ( Ships[snum].wfuse > 0 )
-    {
-      mcuPutMsg( "Weapons are currently overloaded.", MSG_LIN1 );
-      return;
-    }
-  if ( Ships[snum].fuel < PHASER_FUEL )
-    {
-      mcuPutMsg( "Not enough fuel to fire phasers.", MSG_LIN2 );
-      return;
-    }
-  
   sendCommand(CPCMD_FIREPHASER, (Unsgn16)(Ships[snum].lastphase * 100.0));
   cdclrl( MSG_LIN2, 1 );
   
@@ -2449,33 +2389,11 @@ void dophase( int snum )
   real dir;
   
   cdclrl( MSG_LIN2, 1 );
-  if ( SCLOAKED(snum) )
-    {
-      mcuPutMsg( "The cloaking device is using all available power.",
-	       MSG_LIN1 );
-      return;
-    }
-  if ( Ships[snum].wfuse > 0 )
-    {
-      mcuPutMsg( "Weapons are currently overloaded.", MSG_LIN1 );
-      return;
-    }
-  if ( Ships[snum].fuel < PHASER_FUEL )
-    {
-      mcuPutMsg( "Not enough fuel to fire phasers.", MSG_LIN1 );
-      return;
-    }
-  
+
   if ( mcuGetTarget( "Fire phasers: ", MSG_LIN1, 1, &dir, Ships[snum].lastblast ) )
     {
-      if ( Ships[snum].pfuse <= 0 && clbUseFuel( snum, PHASER_FUEL, 
-					      TRUE, FALSE ) )
-	{			/* a local approximation of course */
-	  mcuPutMsg( "Firing phasers...", MSG_LIN2 );
-	  sendCommand(CPCMD_FIREPHASER, (Unsgn16)(dir * 100.0));
-	}
-      else
-	mcuPutMsg( ">PHASERS DRAINED<", MSG_LIN2 );
+      mcuPutMsg( "Firing phasers...", MSG_LIN2 );
+      sendCommand(CPCMD_FIREPHASER, (Unsgn16)(dir * 100.0));
     }
   else
     {
