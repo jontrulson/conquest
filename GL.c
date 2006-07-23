@@ -1928,7 +1928,7 @@ void uiPrintFixed(GLfloat x, GLfloat y, GLfloat w, GLfloat h, char *str)
 void drawTorp(GLfloat x, GLfloat y, char torpchar, int torpcolor, 
               int scale, int snum, int torpnum)
 {
-  const GLfloat z = -5.0;
+  static const GLfloat z = 1.0;
   GLfloat size, sizeh;
   int steam = Ships[snum].team;
 
@@ -1960,15 +1960,20 @@ void drawTorp(GLfloat x, GLfloat y, char torpchar, int torpcolor,
 
   if (torpdir[snum][torpnum] == 0.0) 
     {
-      torpdir[snum][torpnum] = -angle(0.0, 0.0, 
-                                      Ships[snum].torps[torpnum].dx, 
-                                      Ships[snum].torps[torpnum].dy);
+      torpdir[snum][torpnum] = angle(0.0, 0.0, 
+                                     Ships[snum].torps[torpnum].dx, 
+                                     Ships[snum].torps[torpnum].dy);
+#if 0
+      clog("SNUM %d TORPNUM %d angle %f", snum, torpnum,  
+           torpdir[snum][torpnum]);
+#endif
     }
 
   if (ncpTorpAnims[steam].state.angle) /* use it */
-    glRotatef(ncpTorpAnims[steam].state.angle, 0.0, 0.0, z);  
+    glRotatef((GLfloat)ncpTorpAnims[steam].state.angle, 0.0, 0.0, z);  
   else
-    glRotatef(torpdir[snum][torpnum], 0.0, 0.0, z);  /* face firing angle */
+    glRotatef((GLfloat)torpdir[snum][torpnum], 
+              0.0, 0.0, z);  /* face firing angle */
 
   sizeh = (size / 2.0);
 
@@ -1982,16 +1987,16 @@ void drawTorp(GLfloat x, GLfloat y, char torpchar, int torpcolor,
 
   uiPutColor(torpcolor |CQC_A_BOLD);
 
-  glTexCoord2f(1.0f, 0.0f);
+  glTexCoord2f(1.0f, 1.0f);
   glVertex3f(-sizeh, -sizeh, z); /* ll */
 
-  glTexCoord2f(1.0f, 1.0f);
+  glTexCoord2f(1.0f, 0.0f);
   glVertex3f(sizeh, -sizeh, z); /* lr */
 
-  glTexCoord2f(0.0f, 1.0f);
+  glTexCoord2f(0.0f, 0.0f);
   glVertex3f(sizeh, sizeh, z); /* ur */
 
-  glTexCoord2f(0.0f, 0.0f);
+  glTexCoord2f(0.0f, 1.0f);
   glVertex3f(-sizeh, sizeh, z); /* ul */
 
   glEnd();
@@ -2030,7 +2035,7 @@ drawShip(GLfloat x, GLfloat y, GLfloat angle, char ch, int snum, int color,
 {
   char buf[16];
   GLfloat alpha = 1.0;
-  const GLfloat z = 1.0;
+  static const GLfloat z = 1.0;
   GLfloat size = 7.0;
   GLfloat sizeh;
   const GLfloat viewrange = VIEWANGLE * 2; 
@@ -2164,16 +2169,16 @@ drawShip(GLfloat x, GLfloat y, GLfloat angle, char ch, int snum, int color,
 
   glBegin(GL_POLYGON);
 
-  glTexCoord2f(1.0f, 0.0f);
+  glTexCoord2f(1.0f, 1.0f);
   glVertex3f(-sizeh, -sizeh, z); /* ll */
 
-  glTexCoord2f(1.0f, 1.0f);
+  glTexCoord2f(1.0f, 0.0f);
   glVertex3f(sizeh, -sizeh, z); /* lr */
 
-  glTexCoord2f(0.0f, 1.0f);
+  glTexCoord2f(0.0f, 0.0f);
   glVertex3f(sizeh, sizeh, z); /* ur */
 
-  glTexCoord2f(0.0f, 0.0f);
+  glTexCoord2f(0.0f, 1.0f);
   glVertex3f(-sizeh, sizeh, z); /* ul */
 
   glEnd();

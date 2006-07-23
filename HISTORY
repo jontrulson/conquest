@@ -9,7 +9,17 @@
 
                               Conquest HISTORY
 
-???    - patches from Clint Adams, putting the manpages in their proper
+???    - fixed torpdir stuff in GL.c - should no longer get occasional
+         incorrect torp angles.
+
+       - changes ship textures and drawShip() to not use lower left as
+         the ship's texture origin, like the other textures.
+
+
+       8.1.2h (devel - not released) 7/21/2006
+                           
+
+       - patches from Clint Adams, putting the manpages in their proper
          place (section 6 rather than 1), and supplying a conqai and
          conqstrat manpage.
 
