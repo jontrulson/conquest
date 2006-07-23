@@ -17,6 +17,21 @@
          class A, O, and Z, for example) rather than the moon
          texture. 
 
+       - When looking for ~/.conquest/*.trc files, only look for files
+         that *end* in .trc .
+
+       - previously, the client(s) tried to be smart and not waste
+         the server's time with requests it knew the server would
+         reject, for example, firing a phaser when you are cloaked.  
+
+         Unfortunately, this introduced race conditions when the
+         connection had any significant lag, which would cause the
+         client's idea of what would succeed to be incorrect.
+
+         Now, we simply send such commands to the server, regardless
+         of the local client's state, and let the server determine
+         the validity of a command.
+
 8.1.2g (devel) 7/16/2006
 
        - add 'Hull Critical' and 'Shields Critical' pulse messages to

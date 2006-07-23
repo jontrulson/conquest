@@ -159,11 +159,18 @@ void loadTextureRCFiles()
       while ((direntp = readdir(dirp)) != NULL)
         {                       /* here, we will just check out the .trc
                                    files */
+          int len;
+          static const int trc_len = 4; /* . t r c */
+
           if ((!strcmp(direntp->d_name, "..") ||
                !strcmp(direntp->d_name, ".")))
             continue;
 
-          if ((ch = strstr(direntp->d_name, ".trc")))
+          len = strlen(direntp->d_name);
+          if (len < trc_len)
+            continue;
+          
+          if (!strncmp(&(direntp->d_name[len - trc_len]), ".trc", trc_len)) 
             {                   /* found one */
               snprintf(filenm, sizeof(filenm)-1, "%s/%s", 
                        cqdir,direntp->d_name);
