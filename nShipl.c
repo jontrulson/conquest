@@ -89,7 +89,7 @@ static int nShiplDisplay(dspConfig_t *dsp)
   
   i = fship;
 
-  lin = fline;
+  lin = fline - 1;
   while ( i <= MAXSHIPS && lin <= lline )
     {
       status = Ships[i].status;

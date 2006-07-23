@@ -487,6 +487,7 @@ stmt            : /* error */
                    {
                         cfgSectioni(TIMELIMIT, $2);
                    }                      
+                | error closesect
                 ;
 
 string		: STRING		{ ptr = (char *)malloc(strlen($1)+1);
@@ -905,6 +906,8 @@ int cqiLoadRC(int rcid, char *filename, int verbosity, int debugl)
 
   yyin = infile;
 
+  goterror = FALSE;
+  lineNum = 0;
   if ( yyparse() == ERR || goterror )
     {
       clog("conqinit: parse error." );
