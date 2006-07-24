@@ -696,6 +696,23 @@ static int _get_glplanet_info(GLPlanet_t *curGLPlanet, int plani)
   return TRUE;
 }
 
+/* Ala Cataboligne, we will 'directionalize' all torp angles.  */
+int uiUpdateTorpDir(int snum, int tnum)
+{
+
+  if (snum < 1 || snum > MAXSHIPS)
+    return FALSE;
+
+  if (tnum < 0 || tnum >= MAXTORPS)
+    return FALSE;
+
+  torpdir[snum][tnum] = angle(0.0, 0.0, 
+                              Ships[snum].torps[tnum].dx, 
+                              Ships[snum].torps[tnum].dy);
+  return TRUE;
+}
+
+
 /* uiUpdatePlanet - this is called by the client when a packet that
    could change the appearance of a planet arrives.  Here, we load the
    GLPlanet struct for the planet, go through the process of
@@ -1020,8 +1037,6 @@ void drawExplosion(GLfloat x, GLfloat y, int snum, int torpnum)
         norender = TRUE;
         return;                 /* we need to bail here... */
       }
-
-  torpdir[snum][torpnum] = 0.0;
 
   /* if it expired and moved, reset and que a new one */
   if (ANIM_EXPIRED(&torpAStates[snum][torpnum]) && 
@@ -1954,20 +1969,6 @@ void drawTorp(GLfloat x, GLfloat y, char torpchar, int torpcolor,
   glLoadIdentity();
 
   glTranslatef(x , y , TRANZ);
-
-  /* Ala Cataboligne, we will 'directionalize' all torp angles.  When
-     animations are available, more excitement will be possible :) */
-
-  if (torpdir[snum][torpnum] == 0.0) 
-    {
-      torpdir[snum][torpnum] = angle(0.0, 0.0, 
-                                     Ships[snum].torps[torpnum].dx, 
-                                     Ships[snum].torps[torpnum].dy);
-#if 0
-      clog("SNUM %d TORPNUM %d angle %f", snum, torpnum,  
-           torpdir[snum][torpnum]);
-#endif
-    }
 
   if (ncpTorpAnims[steam].state.angle) /* use it */
     glRotatef((GLfloat)ncpTorpAnims[steam].state.angle, 0.0, 0.0, z);  

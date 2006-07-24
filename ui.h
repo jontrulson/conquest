@@ -23,5 +23,7 @@ int uiCStrlen(char *buf);
 /* for the GL client, this is defined in GL.c, for the curses client
    this will be a noop defined in cumisc.c */
 int uiUpdatePlanet(int pnum);
+/* update the direction of the torp (GL only) */
+int uiUpdateTorpDir(int snum, int tnum);
 
 #endif /* _UI_H */

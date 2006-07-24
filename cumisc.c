@@ -2157,3 +2157,8 @@ int uiUpdatePlanet(int pnum)
 {
   return TRUE;                  /* NOOP */
 }
+/* update the direction of the torp (GL only) */
+int uiUpdateTorpDir(int snum, int tnum)
+{
+  return TRUE;
+}

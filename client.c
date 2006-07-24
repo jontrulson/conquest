@@ -518,6 +518,8 @@ int procTorpEvent(Unsgn8 *buf)
   Ships[snum].torps[tnum].dy = 
     (real)((real)((Sgn32)ntohl(storpev->dy)) / 1000.0);
 
+  uiUpdateTorpDir(snum, tnum);
+
   return TRUE;
 }
 

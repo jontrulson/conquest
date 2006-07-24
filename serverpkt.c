@@ -821,9 +821,7 @@ spTorpEvent_t *spktTorpEvent(Unsgn8 tsnum, Unsgn8 tnum, int rec)
   storpev.status = (Unsgn8)Ships[tsnum].torps[tnum].status;
 
   /* RESTRICT */
-  /* we can always see friendly torps.  enemy torps can only be seen if 
-     within ACCINFO_DIST of your ship.  torp war stat only applies to
-     your ship. */
+  /* torp war stat only applies to your ship. */
 
   x = Ships[tsnum].torps[tnum].x;
   y = Ships[tsnum].torps[tnum].y;
