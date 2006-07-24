@@ -933,6 +933,8 @@ void procRepair(cpCommand_t *cmd)
       SFSET(snum, SHIP_F_REPAIR);
       Ships[snum].dwarp = 0.0;
     }
+  else
+    sendFeedback("The cloaking device is using all available power.");
 
   return;
 }
