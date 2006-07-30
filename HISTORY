@@ -9,7 +9,8 @@
 
                               Conquest HISTORY
 
-???    
+8.1.2i (devel) 7/29/2006
+
        - fixed old bug that prevented phasers from damaging a target
          if it's angle was between 315 and 360 from your ship.  
 
@@ -22,7 +23,6 @@
        - fix off-by-one in GL ship list.
 
        8.1.2h (devel - not released) 7/21/2006
-                           
 
        - patches from Clint Adams, putting the manpages in their proper
          place (section 6 rather than 1), and supplying a conqai and
