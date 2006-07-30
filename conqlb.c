@@ -675,8 +675,6 @@ int clbPhaser( int snum, real dir )
 	  if ( dis <= PHASER_DIST )
 	    {
 	      ang = angle( Ships[snum].x, Ships[snum].y, Ships[k].x, Ships[k].y );
-	      if ( ang > 315.0 )
-		ang = ang - 360.0;
 	      if ( fabs( dir - ang ) <= PHASER_SPREAD )
 		{
 		  clbHit( k, clbPhaserHit( snum, dis ), snum );

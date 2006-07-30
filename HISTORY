@@ -9,14 +9,17 @@
 
                               Conquest HISTORY
 
-???    - fixed torpdir stuff in GL.c - should no longer get occasional
-         incorrect torp angles.
+???    
+       - fixed old bug that prevented phasers from damaging a target
+         if it's angle was between 315 and 360 from your ship.  
 
-       - changes ship textures and drawShip() to not use lower left as
+       - fixed torpdir stuff in GL.c - should no longer get occasional
+         incorrect directional torp angles.
+
+       - changed ship textures and drawShip() to not use lower left as
          the ship's texture origin, like the other textures.
 
        - fix off-by-one in GL ship list.
-
 
        8.1.2h (devel - not released) 7/21/2006
                            

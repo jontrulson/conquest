@@ -39,7 +39,7 @@ your local host at port 1701.
 Run in fullscreen mode.  OpenGL client only.
 .TP 8
 .B \-g <geometry> 
-Specify intial window width/height.  OpenGL client only.  Format is
+Specify initial window width/height.  OpenGL client only.  Format is
 WxH (ex: 1024x768). The default is currently 1024x768.
 .TP 8
 .B \-m  

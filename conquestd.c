@@ -400,21 +400,21 @@ int main(int argc, char *argv[])
 #else
 # if defined(HAVE_SETPGRP)
 #  if defined(SETPGRP_VOID)
-          setpgrp ();
+          setpgrp();
 #  else
-          setpgrp (0, getpid());
+          setpgrp(0, getpid());
 #  endif
 # endif
 
-          close (0);
-          close (1);
-          close (2);
+          close(0);
+          close(1);
+          close(2);
 
           /* Set up the standard file descriptors. */
 
-          (void) open ("/", O_RDONLY);        /* root inode already in core */
-          (void) dup2 (0, 1);
-          (void) dup2 (0, 2);
+          (void) open("/", O_RDONLY);        /* root inode already in core */
+          (void) dup2(0, 1);
+          (void) dup2(0, 2);
 
 #endif /* !HAVE_DAEMON */
 
