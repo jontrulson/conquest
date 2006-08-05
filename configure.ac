@@ -87,7 +87,6 @@ case "$uname" in
   CYGWIN*)
         AC_DEFINE(CYGWIN, 1, [Cygwin])
 
-        LIBS="$LIBS -lcygipc"
         if test ! -n "$conquest_group"
         then
                 conquest_group="Users"

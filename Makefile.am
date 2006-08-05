@@ -95,36 +95,36 @@ libexec_PROGRAMS = conqdriv
 conquest_SOURCES = conquest.c c_defs.h defs.h conqdef.h conqcom.h context.h \
 	conqreplay.c
 
-conquest_LDADD = libconqinit.la libUiCU.la libUi.la libconqclnt.la libconquest.la $(LEXLIB) $(YACCLIB)
+conquest_LDADD = libUiCU.la libUi.la libconqclnt.la libconquest.la libconqinit.la $(LEXLIB) $(YACCLIB)
 
 conquestgl_SOURCES = conquestgl.c c_defs.h defs.h conqdef.h conqcom.h context.h
-conquestgl_LDADD = libconqinit.la libUiGL.la libUi.la libconqclnt.la libconquest.la $(XLIBS) $(LEXLIB) $(YACCLIB)
+conquestgl_LDADD = libUiGL.la libUi.la libconqclnt.la libconquest.la libconqinit.la $(XLIBS) $(LEXLIB) $(YACCLIB)
 
 conquestd_SOURCES = conquestd.c c_defs.h defs.h conqdef.h conqcom.h \
 	context.h conqnet.h 
-conquestd_LDADD = libconqinit.la libconqserv.la libconquest.la $(LEXLIB) $(YACCLIB) 
+conquestd_LDADD = libconqserv.la libconquest.la libconqinit.la $(LEXLIB) $(YACCLIB) 
 
 conqai_SOURCES = conqai_main.c c_defs.h defs.h conqdef.h conqcom.h \
                  context.h conqdata.h
 
-conqai_LDADD = libconqinit.la libconquest.la  $(LEXLIB) $(YACCLIB)
+conqai_LDADD = libconquest.la libconqinit.la  $(LEXLIB) $(YACCLIB)
 
 conqoper_SOURCES = conqoper.c c_defs.h defs.h conqdef.h conqcom.h context.h 
-conqoper_LDADD = libconqinit.la libUiCU.la libUi.la libconqclnt.la libconquest.la $(LEXLIB) $(YACCLIB) 
+conqoper_LDADD = libUiCU.la libUi.la libconqclnt.la libconquest.la libconqinit.la $(LEXLIB) $(YACCLIB) 
 
 conqdriv_SOURCES = conqdriv.c c_defs.h defs.h conqdef.h conqcom.h context.h
-conqdriv_LDADD = libconqinit.la libconquest.la  $(LEXLIB) $(YACCLIB)
+conqdriv_LDADD = libconquest.la libconqinit.la $(LEXLIB) $(YACCLIB)
 
 conqstrat_SOURCES = conqstrat-yacc.y conqstrat-lex.l conqstrat.h
 conqstrat_LDADD = libconquest.la $(LEXLIB) $(YACCLIB) 
 
 conqinit_SOURCES = conqinit.c conqinit.h 
-conqinit_LDADD = libconqinit.la libconquest.la $(LEXLIB) $(YACCLIB) 
+conqinit_LDADD = libconquest.la libconqinit.la $(LEXLIB) $(YACCLIB) 
 
 conquestsh_SOURCES = conquestsh.c
 
 conqmetad_SOURCES = conqmetad.c meta.h
-conqmetad_LDADD = libconqinit.la libconquest.la  $(LEXLIB) $(YACCLIB)
+conqmetad_LDADD = libconquest.la libconqinit.la $(LEXLIB) $(YACCLIB)
 
 data_DATA = conquest.doc HISTORY README conqrule 
 

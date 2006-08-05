@@ -20332,7 +20332,6 @@ cat >>confdefs.h <<\_ACEOF
 _ACEOF
 
 
-        LIBS="$LIBS -lcygipc"
         if test ! -n "$conquest_group"
         then
                 conquest_group="Users"

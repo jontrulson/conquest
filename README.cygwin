@@ -7,25 +7,48 @@
           following packages:
 
             ncurses
-            cygipc
             bison
             flex
             crypt
 
+
             For the OpenGL client (conquestgl), you will need the X11
-            (xorg-x11-*), Mesa (opengl), and GLUT (opengl?) packages
+            (xorg-x11-*), Mesa (opengl), and GLUT packages
             (runtime and development) installed.
+
+            xorg-*
+            opengl
+            freeglut
 
             these are in addition to the development packages (gcc,
             etc) of course. 
 
-        - before compiling Conquest, make sure the ipc deamon is
-          running (from the cygipc package).  This program must also
-          be running before starting any Conquest executables.
+        - before compiling Conquest, make sure that IPC services are
+          available.  In newer cygwins (8/5/2006), ipc services are
+          handled by the 'cygserver' process (installed by default)
+          rather than the now obsoleted cygipc package.  This program
+          must also be running before starting any Conquest
+          executables.
 
-          To start the daemon:
+          According the the README's, after installing cygwin, run:
 
-          ipc-daemon2 &
+          $ /bin/cygserver-config 
+
+          to configure the service.  Select 'y' when asked if the
+          cygserver process should be installed as a service.
+
+          Then start it:
+
+          $ net start cygserver
+
+          Next, for IPC services to be available to a process, the
+          word 'server' must be present in your CYGWIN environmant
+          variable. 
+
+          This can be done in your /etc/profile, .bashrc or other startup
+          script as:
+
+          export CYGWIN="$CYGWIN server"
 
         - When compiling conquest, you should specify a group to
           configure, like:
@@ -85,7 +108,6 @@
           too :)
 
 
-
         To run the OpenGL client, you will need to run it from within
         an X11 session.  Any easy way at the cygwin console is:
 
@@ -93,6 +115,10 @@
 
         From within X, open up an xterm and just run 'conquestgl' with
         appropriate options.
+
+        Note, unfortunately the OpenGL rendering available in cygwin
+        is software (mesa) only.  So it may be too slow to be worth
+        using :(
 
         Thanks to Sean for trying out these cygwin versions, providing
         some valuable feedback, and most of the content of this

@@ -127,40 +127,40 @@ PROGRAMS = $(bin_PROGRAMS) $(libexec_PROGRAMS)
 am_conqai_OBJECTS = conqai_main.$(OBJEXT)
 conqai_OBJECTS = $(am_conqai_OBJECTS)
 am__DEPENDENCIES_1 =
-conqai_DEPENDENCIES = libconqinit.la libconquest.la \
+conqai_DEPENDENCIES = libconquest.la libconqinit.la \
 	$(am__DEPENDENCIES_1)
 am_conqdriv_OBJECTS = conqdriv.$(OBJEXT)
 conqdriv_OBJECTS = $(am_conqdriv_OBJECTS)
-conqdriv_DEPENDENCIES = libconqinit.la libconquest.la \
+conqdriv_DEPENDENCIES = libconquest.la libconqinit.la \
 	$(am__DEPENDENCIES_1)
 am_conqinit_OBJECTS = conqinit.$(OBJEXT)
 conqinit_OBJECTS = $(am_conqinit_OBJECTS)
-conqinit_DEPENDENCIES = libconqinit.la libconquest.la \
+conqinit_DEPENDENCIES = libconquest.la libconqinit.la \
 	$(am__DEPENDENCIES_1)
 am_conqmetad_OBJECTS = conqmetad.$(OBJEXT)
 conqmetad_OBJECTS = $(am_conqmetad_OBJECTS)
-conqmetad_DEPENDENCIES = libconqinit.la libconquest.la \
+conqmetad_DEPENDENCIES = libconquest.la libconqinit.la \
 	$(am__DEPENDENCIES_1)
 am_conqoper_OBJECTS = conqoper.$(OBJEXT)
 conqoper_OBJECTS = $(am_conqoper_OBJECTS)
-conqoper_DEPENDENCIES = libconqinit.la libUiCU.la libUi.la \
-	libconqclnt.la libconquest.la $(am__DEPENDENCIES_1)
+conqoper_DEPENDENCIES = libUiCU.la libUi.la libconqclnt.la \
+	libconquest.la libconqinit.la $(am__DEPENDENCIES_1)
 am_conqstrat_OBJECTS = conqstrat-yacc.$(OBJEXT) \
 	conqstrat-lex.$(OBJEXT)
 conqstrat_OBJECTS = $(am_conqstrat_OBJECTS)
 conqstrat_DEPENDENCIES = libconquest.la $(am__DEPENDENCIES_1)
 am_conquest_OBJECTS = conquest.$(OBJEXT) conqreplay.$(OBJEXT)
 conquest_OBJECTS = $(am_conquest_OBJECTS)
-conquest_DEPENDENCIES = libconqinit.la libUiCU.la libUi.la \
-	libconqclnt.la libconquest.la $(am__DEPENDENCIES_1)
+conquest_DEPENDENCIES = libUiCU.la libUi.la libconqclnt.la \
+	libconquest.la libconqinit.la $(am__DEPENDENCIES_1)
 am_conquestd_OBJECTS = conquestd.$(OBJEXT)
 conquestd_OBJECTS = $(am_conquestd_OBJECTS)
-conquestd_DEPENDENCIES = libconqinit.la libconqserv.la libconquest.la \
+conquestd_DEPENDENCIES = libconqserv.la libconquest.la libconqinit.la \
 	$(am__DEPENDENCIES_1)
 am_conquestgl_OBJECTS = conquestgl.$(OBJEXT)
 conquestgl_OBJECTS = $(am_conquestgl_OBJECTS)
-conquestgl_DEPENDENCIES = libconqinit.la libUiGL.la libUi.la \
-	libconqclnt.la libconquest.la $(am__DEPENDENCIES_1) \
+conquestgl_DEPENDENCIES = libUiGL.la libUi.la libconqclnt.la \
+	libconquest.la libconqinit.la $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1)
 am_conquestsh_OBJECTS = conquestsh.$(OBJEXT)
 conquestsh_OBJECTS = $(am_conquestsh_OBJECTS)
@@ -394,28 +394,28 @@ libconqinit_la_LDFLAGS = -version-info 1:0:0
 conquest_SOURCES = conquest.c c_defs.h defs.h conqdef.h conqcom.h context.h \
 	conqreplay.c
 
-conquest_LDADD = libconqinit.la libUiCU.la libUi.la libconqclnt.la libconquest.la $(LEXLIB) $(YACCLIB)
+conquest_LDADD = libUiCU.la libUi.la libconqclnt.la libconquest.la libconqinit.la $(LEXLIB) $(YACCLIB)
 conquestgl_SOURCES = conquestgl.c c_defs.h defs.h conqdef.h conqcom.h context.h
-conquestgl_LDADD = libconqinit.la libUiGL.la libUi.la libconqclnt.la libconquest.la $(XLIBS) $(LEXLIB) $(YACCLIB)
+conquestgl_LDADD = libUiGL.la libUi.la libconqclnt.la libconquest.la libconqinit.la $(XLIBS) $(LEXLIB) $(YACCLIB)
 conquestd_SOURCES = conquestd.c c_defs.h defs.h conqdef.h conqcom.h \
 	context.h conqnet.h 
 
-conquestd_LDADD = libconqinit.la libconqserv.la libconquest.la $(LEXLIB) $(YACCLIB) 
+conquestd_LDADD = libconqserv.la libconquest.la libconqinit.la $(LEXLIB) $(YACCLIB) 
 conqai_SOURCES = conqai_main.c c_defs.h defs.h conqdef.h conqcom.h \
                  context.h conqdata.h
 
-conqai_LDADD = libconqinit.la libconquest.la  $(LEXLIB) $(YACCLIB)
+conqai_LDADD = libconquest.la libconqinit.la  $(LEXLIB) $(YACCLIB)
 conqoper_SOURCES = conqoper.c c_defs.h defs.h conqdef.h conqcom.h context.h 
-conqoper_LDADD = libconqinit.la libUiCU.la libUi.la libconqclnt.la libconquest.la $(LEXLIB) $(YACCLIB) 
+conqoper_LDADD = libUiCU.la libUi.la libconqclnt.la libconquest.la libconqinit.la $(LEXLIB) $(YACCLIB) 
 conqdriv_SOURCES = conqdriv.c c_defs.h defs.h conqdef.h conqcom.h context.h
-conqdriv_LDADD = libconqinit.la libconquest.la  $(LEXLIB) $(YACCLIB)
+conqdriv_LDADD = libconquest.la libconqinit.la $(LEXLIB) $(YACCLIB)
 conqstrat_SOURCES = conqstrat-yacc.y conqstrat-lex.l conqstrat.h
 conqstrat_LDADD = libconquest.la $(LEXLIB) $(YACCLIB) 
 conqinit_SOURCES = conqinit.c conqinit.h 
-conqinit_LDADD = libconqinit.la libconquest.la $(LEXLIB) $(YACCLIB) 
+conqinit_LDADD = libconquest.la libconqinit.la $(LEXLIB) $(YACCLIB) 
 conquestsh_SOURCES = conquestsh.c
 conqmetad_SOURCES = conqmetad.c meta.h
-conqmetad_LDADD = libconqinit.la libconquest.la  $(LEXLIB) $(YACCLIB)
+conqmetad_LDADD = libconquest.la libconqinit.la $(LEXLIB) $(YACCLIB)
 data_DATA = conquest.doc HISTORY README conqrule 
 
 # we install conqinitrc in the intall-exec-hook, so that we only install

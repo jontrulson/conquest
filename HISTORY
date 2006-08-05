@@ -9,7 +9,7 @@
 
                               Conquest HISTORY
 
-?????? (devel) 7/29/2006
+8.1.2j (devel) 8/5/2006
 
        - draw a line below the shield gauge that will indicate current
          shield strength when shields are down.  This is useful for
@@ -18,11 +18,22 @@
 
        - move CLAMP() macro into conqdef.h for everyone to use.
 
+       - fixup the cygwin build
 
-8.1.2i (devel) 7/29/2006
+         - update README.cygwin for current info and methods for
+           enabling IPC services.
+
+         - re-arrange the lib ordering a bit at link time so the
+           stupid linker can handle libconqinit/libconquest
+           dependancies (cqiInitPlanets).
+
+       8.1.2i (devel - not released) 7/29/2006
 
        - fixed old bug that prevented phasers from damaging a target
-         if it's angle was between 315 and 360 from your ship.  
+         if it's angle was between 315 and 360 from your ship.  It is
+         definitely advisable for server operators to upgrade to this
+         version if you want phasers to work when fired within this
+         angle range
 
        - fixed torpdir stuff in GL.c - should no longer get occasional
          incorrect directional torp angles.
