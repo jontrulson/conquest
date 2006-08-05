@@ -629,5 +629,8 @@
 #define bitSet(x, b)   ((x) |= (b))
 #define bitClear(x, b) ((x) &= ~(b))
 
+/* clamp */
+#undef CLAMP
+#define CLAMP(_min, _max, _val) (((_val) < (_min)) ? (_min) : (((_val) > (_max)) ? (_max) : (_val)))
 
 #endif /*  CONQDEF_H_INCLUDED */

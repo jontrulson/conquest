@@ -9,6 +9,16 @@
 
                               Conquest HISTORY
 
+?????? (devel) 7/29/2006
+
+       - draw a line below the shield gauge that will indicate current
+         shield strength when shields are down.  This is useful for
+         allowing you to check your shield's recharge status without
+         having to raise them first.
+
+       - move CLAMP() macro into conqdef.h for everyone to use.
+
+
 8.1.2i (devel) 7/29/2006
 
        - fixed old bug that prevented phasers from damaging a target

@@ -28,9 +28,6 @@
 #include "conf.h"
 #include "record.h"
 
-#undef CLAMP
-#define CLAMP(min, max, val) ((val < min) ? min : ((val > max) ? max : val))
-
 /* init an animstate.  can specify an optional istate drawing state */
 int animInitState(char *animname, animStatePtr_t astate, 
                   animDrawStatePtr_t istate)

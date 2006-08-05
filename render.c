@@ -122,6 +122,7 @@ static struct {
   obj_t fuelcritpulse;
   obj_t shcritpulse;
   obj_t hullcritpulse;
+  obj_t shcharge;               /* shield charge status */
   
   obj_t torppips[MAXTORPS];
 
@@ -235,6 +236,13 @@ void updateIconHudGeo(void)
   o.d1shn.w = o.xstatw - (tx + o.decal1.w);
   o.d1shn.h = o.d1shg.h * 2.0;
 
+  /* shield charge level (this is just a line) */
+  o.shcharge.x = o.d1shg.x;
+  o.shcharge.y = o.d1shn.y + o.d1shn.h;
+  o.shcharge.w = o.d1shg.w;
+  o.shcharge.h = 2.0;           /* the glLineWidth() */
+
+  /* damage */
   o.d1damg.x = tx + ((96.0 / 256.0) * tw);
   o.d1damg.y = o.decal1.y + ((219.0 / 256.0) * th);
   o.d1damg.w = (((175.0 - 96.0) / 256.0) * tw);
@@ -356,7 +364,8 @@ void updateIconHudGeo(void)
       o.torppips[i].w = o.d1icon.w * 0.10;
       o.torppips[i].h = (o.d1icon.h - ((o.d1icon.h * 0.15) * 2.0)) / (real)MAXTORPS;
     } 
-        
+
+  /* phaser recharge status */
   o.phasstat.x = tx + 2.0 + o.d1icon.x + o.d1icon.w + (o.d1icon.w * 0.10);
   o.phasstat.y = o.d1icon.y + (o.d1icon.h * 0.15);
   o.phasstat.w = o.torppips[0].w / 2.0 /*o.d1icon.w * 0.10*/;
@@ -458,6 +467,9 @@ void renderPulseMsgs(void)
   
   if (firsttime)
     {
+      if (!curnode->animQue)
+        return;                 /* mmaybe we'll get one next time */
+
       firsttime = FALSE;
 
       /* init the anims */
@@ -511,7 +523,7 @@ void renderPulseMsgs(void)
   glBlendFunc(GL_SRC_ALPHA, GL_ONE);
   glEnable(GL_BLEND);
  
-  if (testlamps ||dData.fuel.fuel < F_CRIT)
+  if (testlamps || dData.fuel.fuel < F_CRIT)
     {
       if (ANIM_EXPIRED(&fuelcrit))
         {
@@ -625,10 +637,34 @@ void renderPulseMsgs(void)
 
   return;
 }
+
+/* render the shield's current strength when down */
+void renderShieldCharge(void)
+{
+  GLfloat valxoff = (o.shcharge.w / 10.0) * 3.0;
+  GLfloat scaleend = o.shcharge.x + o.shcharge.w - valxoff - (o.shcharge.w / 10.0);
+  real val;
+  
+  val = CLAMP(0.0, 100.0, Ships[Context.snum].shields);
+
+  if (!val)
+    return;
+  
+  uiPutColor(dData.sh.color);
+  
+  /* gauge */
+  drawLine(o.shcharge.x, o.shcharge.y, 
+           scaleend * (GLfloat)((GLfloat)val / 100.0),
+           o.shcharge.h);
+
+  return;
+}
+
+
 /* This is Cat's icon hud */
 void renderHud(int dostats)
 {				/* assumes context is current*/
-  char sbuf1024[1024];
+  char sbuf[128];
   char fbuf[128];
   int FPS = (int)getFPS();
   cqColor icl;
@@ -657,7 +693,7 @@ void renderHud(int dostats)
   else
     sprintf(fbuf, "FPS: %03d", FPS);
 
-  sprintf(sbuf1024, "%4dms %3.1fKB/s %s",  
+  sprintf(sbuf, "%4dms %3.1fKB/s %s",  
           pingAvgMS, 
           ((float)rxdiff / 1000.0),
           fbuf);
@@ -709,6 +745,10 @@ void renderHud(int dostats)
                  fontFixedTxf, 
                  (dData.sh.shields < 0) ? 0 : dData.sh.shields, 
                   dData.sh.color, NoColor);
+
+  /* shield charging status */
+  if (!SSHUP(Context.snum) || SREPAIR(Context.snum))
+    renderShieldCharge();
   
   /* damage gauge */
   renderScale(o.d1damg.x, o.d1damg.y, 
@@ -960,7 +1000,7 @@ void renderHud(int dostats)
         {
           glfRender(o.rectime.x, o.rectime.y, 0.0, 
                     o.rectime.w, o.rectime.h,
-                    fontFixedTxf, sbuf1024, NoColor | CQC_A_DIM, 
+                    fontFixedTxf, sbuf, NoColor | CQC_A_DIM, 
                     NULL, TRUE, TRUE, TRUE);
         }          
     }

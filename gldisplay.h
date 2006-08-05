@@ -239,6 +239,7 @@ void setPrompt(int line, char *prompt, int pcolor,
                char *buf, int color);
 float getFPS(void);
 
+void drawLine(GLfloat x, GLfloat y, GLfloat len, GLfloat lw);
 void drawLineBox(GLfloat x, GLfloat y, 
                  GLfloat w, GLfloat h, int color, 
                  GLfloat lw);

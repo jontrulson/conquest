@@ -76,7 +76,7 @@ static int alertcolor(int alert)
 /*    display( snum, display_info ) */
 void display( int snum, int display_info )
 {
-  int i, j, minenemy, minsenemy;
+  int i, j, k, minenemy, minsenemy;
   int outattr = 0;
   static int OldAlert = 0;
   char ch, buf[MSGMAXLINE];
@@ -467,41 +467,25 @@ void display( int snum, int display_info )
   
   /* Build and display the status info as necessary. */
   if (snum > 0) 
-    { /* we're watching a ship */  /* dwp */
-    
+    {                           /* we're watching a ship - dwp */
     /* Shields. */
     if ( Ships[snum].shields < prevsh )
       dobeep = TRUE;
     prevsh = Ships[snum].shields;
     
-    i = round( Ships[snum].shields );
+    i = k = round( Ships[snum].shields );
     if ( ! SSHUP(snum) || SREPAIR(snum) )
       i = -1;
     if ( i != zzsshields || i == -1)
       {
-	if ( i == -1 )
-	  {
-	    if (AlertLevel == YELLOW_ALERT) 
-	      color = YellowLevelColor;
-	    else if (AlertLevel == RED_ALERT)
-	      color = RedLevelColor ;
-	    else
-	      color = GreenLevelColor;
-	    
-	    setShields(i, color);
-
-	  }
-	else
-	  {
-	    if (i >= 0 && i <= 50)
-	      ShieldAttrib = RedLevelColor;
-	    else if (i >=51 && i <=80)
-	      ShieldAttrib = YellowLevelColor;
-	    else if (i >= 81)
-	      ShieldAttrib = GreenLevelColor;
-	    
-	    setShields(i, ShieldAttrib);
-	  }
+        if (k >= 0 && k <= 50)
+          ShieldAttrib = RedLevelColor;
+        else if (k >=51 && k <=80)
+          ShieldAttrib = YellowLevelColor;
+        else if (k >= 81)
+          ShieldAttrib = GreenLevelColor;
+        
+        setShields(i, ShieldAttrib);
 	zzsshields = i;
       }
     

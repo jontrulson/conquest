@@ -54,8 +54,6 @@ extern void conqend(void);
 
 #include "conquest.h"
 
-#define CLAMP(min, max, val) ((val < min) ? min : ((val > max) ? max : val))
-
 /* torp direction tracking */
 static real torpdir[MAXSHIPS + 1][MAXTORPS]; 
 
@@ -930,6 +928,27 @@ static void mouse(int b, int state, int x, int y)
         }
     }
 
+  return;
+}
+
+void drawLine(GLfloat x, GLfloat y, GLfloat len, GLfloat lw)
+{
+
+#if 0
+  clog("drawLine: x = %f, y = %f len = %f",
+       x, y, len);
+#endif
+
+  glLineWidth(lw);
+
+  GLError();
+
+  glBegin(GL_LINES);
+  glVertex3f(x, y, 0.0); /* ul */
+  glVertex3f(x + len, y, 0.0); /* ur */
+  glEnd();
+
+  GLError();
   return;
 }
 
