@@ -43,7 +43,8 @@
 
           Next, for IPC services to be available to a process, the
           word 'server' must be present in your CYGWIN environmant
-          variable. 
+          variable.  I have no idea why, but that's what the doc's
+          say, and that's what I did :)
 
           This can be done in your /etc/profile, .bashrc or other startup
           script as:
@@ -118,11 +119,12 @@
 
         Note, unfortunately the OpenGL rendering available in cygwin
         is software (mesa) only.  So it may be too slow to be worth
-        using :(
+        using :(  On a P4/3.2Ghz with the vbg off, I can get about 15
+        fps at the default resolution.
 
-        Thanks to Sean for trying out these cygwin versions, providing
-        some valuable feedback, and most of the content of this
-        document.
+        Thanks to Sean for trying out the original cygwin version,
+        providing some valuable feedback, and most of the original
+        content of this document.
 
 
 $Id$

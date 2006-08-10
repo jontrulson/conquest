@@ -27,6 +27,15 @@ bombardment, and then beaming your team's armies down. When all the
 planets have been taken, the game ends, a new game begins, and the
 player who actually took the last planet gets his/her name up in
 lights.
+.PP
+The first time \fBconquestgl\fP or \fBconquest\fP is run, a directory
+called ~/.conquest/ will be created in your home directory.  This
+directory cantains your 'user options' data as well as the logfile.
+Additionally, with \fBconquestgl\fP, texturesrc (.trc) files and
+texture image data (in ~/.conquest/img/) can be stored there. See
+CONQINIT.TXT for more information on texturesrc and texture image
+files are. 
+
 .SH "OPTIONS"
 .PP
 \fBconquestgl\fP and \fBconquest\fP each take similiar options.
@@ -77,7 +86,7 @@ Jon Trulson
 .SH "SEE ALSO"
 .PP
 conquestd(6), conqoper(6), conqdriv(6), conquestsh(6),
-conqmetad(6) 
+conqmetad(6), conqinit(6)
 .PP
 See README in the conquest distribution (usually installed in
 <conquest install prefix>/etc/) for information and tips on how to

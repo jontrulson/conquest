@@ -9,12 +9,18 @@
 
                               Conquest HISTORY
 
-8.1.2j (devel) 8/5/2006
+8.1.2j (devel) 8/9/2006
+
+       - 8.2 pre-release, barring significant issues.
 
        - draw a line below the shield gauge that will indicate current
          shield strength when shields are down.  This is useful for
          allowing you to check your shield's recharge status without
          having to raise them first.
+
+       - change 'REPAIRING' icon decal color from green to cyan-ish.
+
+       - add a conqinit man page.
 
        - move CLAMP() macro into conqdef.h for everyone to use.
 
@@ -29,11 +35,11 @@
 
        8.1.2i (devel - not released) 7/29/2006
 
-       - fixed old bug that prevented phasers from damaging a target
-         if it's angle was between 315 and 360 from your ship.  It is
-         definitely advisable for server operators to upgrade to this
-         version if you want phasers to work when fired within this
-         angle range
+       - fixed an old (and serious) bug that prevented phasers from
+         damaging a target if it's angle was between 315 and 360 from
+         your ship.  It is definitely advisable for server operators
+         to upgrade to this version if you want phasers to work when
+         fired within this angle range
 
        - fixed torpdir stuff in GL.c - should no longer get occasional
          incorrect directional torp angles.
