@@ -1716,7 +1716,7 @@ void clbInitEverything(void)
 
   PVLOCK(&ConqInfo->lockword);
   
-  /* Turn off the universe. */
+  /* Turn off the universe. It will be turned back on in initUniverse() */
   ConqInfo->closed = TRUE;
   
   /* reset the lockwords  */
@@ -1968,9 +1968,6 @@ void clbInitUniverse(void)
   PVUNLOCK(&ConqInfo->lockword);
   PVLOCK(&ConqInfo->lockword);
   
-  /* Turn off the universe. */
-  ConqInfo->closed = TRUE;
-  
   stcpn( "Scout", ShipTypes[ST_SCOUT].name, MAXSTNAME );
   ShipTypes[ST_SCOUT].armylim = 7;
   ShipTypes[ST_SCOUT].warplim = 10.0;
@@ -2059,6 +2056,9 @@ void clbInitUniverse(void)
   clbInitGame();
   clbClearShips();
   clbInitMsgs();
+
+  /* Turn the universe back on (turned off in initEverything()). */
+  ConqInfo->closed = FALSE;
   
   return;
   

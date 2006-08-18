@@ -9,6 +9,14 @@
 
                               Conquest HISTORY
 
+??? 8/9/2006
+
+       - When initializing (e)verything or (u)niverse in conqoper,
+         enable the game by default.  Previously the game had to
+         always be manually enabled after initializing any of these
+         things. 
+
+
 8.1.2j (devel) 8/9/2006
 
        - 8.2 pre-release, barring significant issues.
