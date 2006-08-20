@@ -76,22 +76,13 @@
 
 - OpenGL
 
-  - add more 'animated activity' like the new explosion and NEB
-    rendering in 8.1a+. Generalize to generic per-node animation lists
-    using a new 'animation engine'.
-
   - individual textures for each planet
 
   - more flexible color specification for suns, etc rather than being
     limited to primary colors like red, blue, green, yellow etc.
 
-  - texture-mapped HUD?
-
   - asynchronous server connection handling, so client isn't 'stuck'
     while establishing a connection to a server.
-
-  - better UDP negotiation.  Option to enable/disable from within the
-    game. 
 
   - SDL backend?
 
@@ -104,11 +95,14 @@
 
   - enemy kills box bigger
 
-  - indicate team war stat below icon?
+  - indicate team war stat below icon?  Use 'team' icons?
 
 - PROTOCOL
 
   - add pads to those structures not having them?
+
+  - better UDP negotiation.  Option to enable/disable from within the
+    game. 
 
   - for packets with strings, standardize string len (align 32b) -
     same for meta proto?  increase MOTD, etc...?

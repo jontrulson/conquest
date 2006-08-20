@@ -24,10 +24,10 @@ NODES
     cockpit (CP), userlist, etc), as well as idling and Input handling.
 
     A node is defined by a scrNode_t typedef which is defined in
-    node.h.  This structure contains pointers to 3 functions and one
-    link to another subnode (currently unused).
+    node.h.  This structure contains pointers to 4 functions and one
+    pointer to an animation que initilized with animQueInit().
 
-    The 3 functions that a node defines are all optional, however if
+    The 4 functions that a node defines are all optional, however if
     no functions are defined by a node, and control is ever tranferred
     to it, the client will softlock (spin in an infinite loop), so
     don't do that.
@@ -35,7 +35,7 @@ NODES
     You can, of course, implement any other (statically defined)
     functions within a node to do whatever you require.
 
-    In addition to these three functions (described below) is an init
+    In addition to these four functions (described below) is an init
     function that is called by other code to initialize the node and
     transfer rendering control to it.
     
@@ -57,7 +57,7 @@ NODES
     You transfer control from one node to another by calling the new
     node's init function.
 
-    The 4 functions that are defined in a scrNode_t are:
+    The 5 functions that are used in a Node are:
 
     init(<up to programmer>) - required
 
@@ -86,6 +86,15 @@ NODES
 
        this method handles any keyboard events that occur during node
        execution. 
+
+
+    minput(mouseData_t *mdata)            - optional
+
+       'mdata' contains the relevant information for dealing with
+       mouse events.  mouseData_t is defined in cqmouse.h.
+
+       this method handles any mouse events that occur during node
+       execution.
 
 
     If you add a node, please use my current naming convention for the
@@ -154,8 +163,8 @@ Other info:
     that is knows what it is currently doing (prompting for a ship,
     displaying the options list, etc).  In my nodes, I use 'S_<state>'
     defines to represent the various states a node can be in, and a
-    variable called 'state' that indicates the state of the current
-    node. 
+    static variable called 'state' that indicates the state of the
+    current node.
 
     Some functions have been redefined to have an OpenGL equivalent.
     For example, I wrote a version of cprintf() (glcprintf.c) that can
