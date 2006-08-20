@@ -10,8 +10,7 @@ conquestsh \- a Conquest shell for telnet players
 \fBconquestsh\fP is a very simple program that executes the curses
 conquest client, passing certain options, notably \fB\-t\fP.  It is
 intended to be the 'shell' of an account that an operator has setup to
-support telnet users.  See the SERVER.TXT file in the conquest
-distribution (typically installed in <prefix>/share/) for information
+support telnet users.  See the \fBconquestd\fP manpage for information
 on setting up a server for telnet access.  In general, you will never
 want to support telnet servers.  Users should use an appropriate
 client.  I run a telnet server here for the time being so that users
@@ -36,9 +35,6 @@ curses client) and other system specific issues.
 .PP
 See README.cygwin for information on building/using conquest on MS
 Windows systems. 
-.PP
-See SERVER.TXT for information on how to setup and run a Conquest
-server.
 .PP
 See HISTORY for the latest news and modification history.
 .PP

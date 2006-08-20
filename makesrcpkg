@@ -30,13 +30,13 @@ FILELIST="ratfor.c cd2lb.h cd2lb.c iolb.h iolb.c conqlb.c
         options.c ylwrap
 	ship.h user.h planet.h team.h torp.h msg.h doomsday.h
 	driver.h conqinfo.h robot.h history.h shiptype.h
-	conquest.doc HISTORY configure.ac configure
+	HISTORY configure.ac configure
 	config.h.in config.guess config.sub Makefile.in README  
 	conqstrat.h conqstrat-lex.l conqstrat-yacc.y 
         conqrule Makefile.am aclocal.m4 depcomp install-sh ltmain.sh
-        mkinstalldirs missing conqai_main.c
+        mkinstalldirs missing conqai_main.c conqrule.easy
         record.h record.c conqreplay.c 
-	COPYRIGHT LICENSE INSTALL SERVER.TXT CREDITS display.h
+	COPYRIGHT LICENSE INSTALL  CREDITS display.h
         conquest.h display.c disputil.h client.h client.c clientlb.h 
         clientlb.c server.h server.c packet.h packet.c protocol.h
         conqnet.h datatypes.h userauth.h servauth.h clntauth.h 

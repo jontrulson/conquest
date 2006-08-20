@@ -1,9 +1,7 @@
 .\" $Id$
 .TH "conquest" 6 "" ""
 .SH NAME
-conquestgl \- a GLUT based OpenGL client for Conquest
-.PP
-conquest \- a curses client for Conquest
+conquestgl,conquest \- Conquest game clients
 .SH SYNOPSIS
 .PP
 \fBconquestgl\fP and \fBconquest\fP are OpenGL and curses based
@@ -68,9 +66,8 @@ port is 1701.
 .B \-t  
 Telnet mode.  Curses client only.  When running in telnet mode user
 configuration files are never loaded nor stored, and the server update
-rate defaults to 5 per sencond.  This is only of use when running a
-telnetable server.  See SERVER.TXT in the distribution for more
-information on server types and configuration.
+rate defaults to 5 per second.  This is only of use when running a
+telnetable server.  
 .TP 8
 .B \-P <record file> 
 Play back a previously recorded game.
@@ -81,8 +78,376 @@ try to negotiate UDP and use it for certain conquest protocol
 packets.  If you have problems with a server \- for example, you
 always wind up stuck in the middle of Murisak when you enter the game,
 try disabling UDP with this option.
+
+.SH "IMPORTANT COMMANDS"
+.PP
+This section lists the basic commands of Conquest.  The next section
+lists the more advanced / obscure commands, and at the end of this
+document there is a summary list.  The list is also available in the game
+via the \fBh\fP command.
+.TP 8
+.B 0\-9,= 
+To set your warp factor, just type a digit, or \fB=\fP for your ship's
+maximum warp. The ships teams have different top speeds: 8 for Cruisers, 9
+for Destroyers, and 10 for Scouts.
+.TP 8
+.B -,+
+Use \fB+\fP to raise your energy shields, \fB-\fP to lower them.  Shields
+protect you from enemy weapons; however, it takes more fuel and heat
+to fly with them up.
+.TP 8
+.B k 
+The \fBk\fP command is used to set your course.  You can specify your
+course a number of different ways: in degrees (0=east,90=north), via
+the arrow keys (see below), a ship number (precede it with an 's'), or
+a planet name.  If you set course for a planet, you have the option of
+locking on to it by terminating the line with a TAB instead of a
+carriage return - then you will orbit automatically when you get
+there.
+.TP 8
+.B p,P 
+These two commands fire photon torpedoes.  Lower case \fBp\fP fires one at
+a time, and is less useful. Upper case \fBP\fP fires a burst of three.
+When you are in the heat of battle, you will want to fire every torp
+you have got (nine), so you will almost always use \fBP\fP. You can
+specify the direction to fire using either degrees or the arrow keys.
+.TP 8
+.B *,d,D 
+Lower case \fBd\fP or \fB*\fP detonates near-by enemy torps before they get
+close enough to damage you.  Use this command *alot*.  Upper case \fBD\fP
+detonates your own torps, for instance in case you missed.  Since you
+can only have nine torps out at a time, this can be useful.
+.TP 8
+.B f,F
+These two commands let you fire phasers.  Lower case \fBf\fP is used to
+fire one phaser blast. It takes about one second to fire
+phasers. Upper case \fBF\fP fires phasers again in the same direction.
+.TP 8
+.B B
+To capture enemy planets, you first have to get rid of the enemy
+armies by bombarding them.  Orbit the planet, type \fBB\fP, confirm with a
+TAB, and then watch your damage closely. You will continue to bombard
+until you type another command.  When your damage gets up above 60 or
+70 percent, set a warp factor and get out fast.
+
+You cannot bomb a planet down to less than 3 armies.  Once you have
+reduced a planet's army count to 3, you must beam down your own armies
+in order to kill the remaining armies and conquer the planet.
+.TP 8
+.B R
+After a bombing run, you can repair your damage three times faster by
+going into repair mode.  While repairing, your shields are down and
+you can't move or fire.  Repairing is useful any time you are damaged.
+If you are in orbit about a friendly planet when you repair, you will
+repair even faster.
+.TP 8
+.B b
+Once you have blasted a planet down to three armies, you can beam your
+own armies down to do hand-to-hand combat and replace them.
+.TP 8
+.B m
+Use the \fBm\fP command to send messages. You can send to single ships
+(using the ship number), entire teams, (first letter of team name) or
+everyone ("all"). You can even send messages to GOD, but don't expect
+an answer.  Messages to GOD will be seen be any conquest operators
+(CO's) who happen to be in the game.  
+
+This command is useful for bothering the experts and asking them
+annoying questions.  It is also useful for trading insults.  If you
+type RETURN or TAB as the target of a message, the message will be
+sent to the last person(s) you sent a message to.
+.TP 8
+.B i,TAB,RETURN
+You can get information on planets and ships with the \fBi\fP command.
+Pressing RETURN will show you the last information you asked for.
+Pressing TAB will show you the 'next' last information you asked for.
+.TP 8
+.B Q 
+The only way out besides getting killed is to self-destruct. There is
+a 15-second time delay because it is not honorable to quit in the heat
+of battle.  If the server has the \fIVacant\fP flag enabled, then you
+can use the Control-Backslash key to quit immediately, leaving your
+ship intact.  If you decide to go \fIVacant\fP, be careful where you
+leave your ship. :)
+.TP 8
+.B /
+To see which other people are currently playing Conquest, use the \fB/\fP
+command.
+.TP 8
+.B h
+This command gives you a short command summary (such as the one that
+is found at the end of this document).
+.SH "LESS IMPORTANT COMMANDS"
+.PP
+.TP 8
+.B A
+Type \fBA\fP to change your weapons/engines power allocations.  You can
+either enter a new weapons allocation percentage or else type TAB to
+toggle between the two extremes of 30/70 and 70/30. The power
+allocation controls things like how powerful your weapons are, how
+efficient your engines are, etc.
+.TP 8
+.B C
+Cloaking device. You can activate the cloaking device by typing \fBC\fP
+followed by a TAB.  While the cloaking device is in operation, you are
+invisible, even to your teammates. However, the cloaker uses a LOT of
+energy - so much that you can't use your weapons while it's on. A
+second \fBC\fP will turn it off again.
+.TP 8
+.B E
+Emergency distress signal. A quick way to let your team mates know
+that you are in trouble is by typing \fBE\fP followed by a TAB.  Every
+ship on your team (except those who are at war with your team) will
+get a short message from you that includes information about your
+fuel, shields, and ship damage.
+.TP 8
+.B H
+History. This command displays the list of recent Conquest players.
+.TP 8
+.B O
+Use this comment to enter the options menu.  From there you can
+configure various things like your settings and your macros.
+.TP 8
+.B K
+Attempt a coup. If all of your team's armies get killed, you may think
+you are in deep fecal matter.  Not so - you can still get some back by
+pulling a coup.  Try it.
+.TP 8
+.B L
+List Messages.  Type \fBL\fP to review old messages that have been
+sent to you.
+.TP 8
+.B M
+Type \fBM\fP to toggle your display between the short range and long range
+tactical displays.
+
+When in the long range tactical display, you can use SPACE to toggle
+the center of the map beteen your ship and the Murisak (the sun at the
+center of the universe).
+.TP 8
+.B N
+Pseudonym.  Use this command to change your battle name.
+.TP 8
+.B o
+Orbit. Use \fBo\fP to come into orbit around a planet (or a sun, if you
+want a tan).  You cannot enter orbit if your speed exceeds warp 2.
+.TP 8
+.B r
+Refit.  If the server has enabled the \fIRefit\fP flag, and you have
+at least one kill, and you are orbiting a team owned planet, you can
+use this option to switch to a new ship type.  Valid types are Scout
+(great engines, weak weapons), Destroyer (good engines, good weapons),
+and Cruiser (weak engines, great weapons).
+.TP 8
+.B S
+Displays a list of secondary user statistics.
+.TP 8
+.B t
+Tractor beams.  You can use these to tow another ship, even if it is
+hostile.  This can be fun when you are cloaked :)
+.TP 8
+.B T
+Team list. Displays a list of team statistics, and information on when
+and who last conqered the universe.
+.TP 8
+.B u
+Untractor. Disengage your tractor beams if you are towing another ship
+or attempt to break free of another ships tractor beam if you are
+being towed.
+.TP 8
+.B U
+Displays a list of users and some primary statistics.
+.TP 8
+.B W
+Type \fBW\fP to change your war and peace settings.  Note that there is a
+10 second delay for declaring war on another team.  Also, if you do
+something nasty to another team such as bomb one of their planets,
+your war with that team becomes sticky and you may not declare peace
+with them until you get a new ship (by dying).
+.TP 8
+.B ?
+To get a list of planets, use the \fB?\fP command.  Planets that must
+be taken in order to conquer the universe are marked with a \fI+\fP sign.
+.TP 8
+.B ^L
+When you type \fB^L\fP, the screen is cleared and redrawn.
+.SH "DIRECTION KEYS"
+.PP
+The easiest and quickest way to change direction is with the direction
+keys or the keypad if your terminal definition supports it.  However,
+if you are prompted to enter a direction, for example to fire phasers,
+or set course, you can use the letters "qweadzxc" on the left-hand
+side of your keyboard, called "direction keys" for historical
+reasons. The keys are assumed to be arranged as follows (if you have a
+Dvorak keyboard, you are in trouble):
+
+                    Q W E
+                     \\|/
+                   A--+--D
+                     /|\\
+                    Z X C
+
+You can use them singly, e.g. 'd'  would  be  0  degrees,
+'q'  would  be  135,  etc.  You  can  also  use  them  in
+combination: "ed" would be halfway between 'e'  and  'd',
+which  is  22.5  degrees; "edd" is like 'e' + 'd' + 'd' /
+3, or 15 degrees.
+.SH "DESTINATION SEARCHING"
+.PP
+There are several special strings you can use when setting course or
+getting information:
+.TP 8
+.B ne
+nearest enemy 
+.TP 8
+.B ns
+nearest ship
+.TP 8
+.B nts
+nearest (friendly) team ship
+.TP 8
+.B np
+nearest planet
+.TP 8
+.B nep
+nearest enemy planet
+.TP 8
+.B nrp
+nearest friendly (repair) planet
+.TP 8
+.B nfp
+nearest friendly class-M (fuel) planet
+.TP 8
+.B nap
+nearest planet with available armies (greater than 3 total armies)
+.TP 8
+.B ntp
+nearest planet owned by your team
+.TP 8
+.B wp
+weakest planet not owned by your team
+.TP 8
+.B hp
+home planet for your team
+.TP 8
+.B sN
+ship N (where N is a integer number)
+.TP 8
+.B time
+time of day (info only)
+.PP
+All of these can be abbreviated to their shortest unique string. Also,
+for the planets, you can type a number after the special string to
+specify an army threshold; that is, planets with less than that number
+of armies won't be considered.  For example, \fBna8\fP specifies the
+nearest planet with 8 (eight) or more armies, \fBnf14\fP is the nearest
+fuel planet with 14 or more armies, \fBnep1000\fP is the nearest
+non-scanned planet.
+
+You can find info out about the second nearest object by terminating
+your information request with a TAB instead of a carriage return. For
+example, to find out about the second nearest planet type
+\fBinp<TAB>\fP. 
+
+You can't use these when firing weapons - that would be too easy.
+
+.SH "MACROS"
+.PP
+Macros are sequences of Conquest commands that are issued when a
+Function Key (Fkey) or mouse button (OpenGL client only) is hit.  On
+PC hardware, these are the F1-F12 keys.  With certain emulators the
+Shifted F1-12 keys (F13-F24) are available too.
+
+With the GL client, version 8.1.2f or better, support for assigning
+macros to mouse buttons is also provided.  Modifiers like Alt,
+Control, and Shift can also be used with the mouse buttons.  Up to 32
+buttons are supported with any combination of the 3 modifiers (or no
+modifiers) giving you a maximum of 256 assignable mouse macros.  If
+you have a 32 button mouse that is :)
+
+Mouse and Key macros are defined in your ~/conquest/conquestrc file.
+Users can edit their macro keys from within Conquest using the
+(O)ptions Menu.
+
+Here is an example for the F1 function key
+
+       macro_f1=dP\\r
+
+Which makes my F1 key detonate enemy torps \fBd\fP, and fire a
+spread of 3 torps in the last direction I fired \fBP\\r\fP.  
+
+The mouse only works when playing the game (in the Cockpit) and the
+cursor is within the viewer window in the GL client.
+
+Three default mouse macros are provided to give you a taste, and will
+be saved in your conquestrc file the first time you run an 8.1.2f or
+better version of the client.  They are:
+
+      mouse button 0 (left): Fire phaser at <angle>
+      mouse button 1 (middle): Set course to <angle>
+      mouse button 2 (right): Fire Torp at <angle>
+
+Of course you can redefine these, as well as add others.  With mouse
+macros, a special character sequence, \fB\\a\fP can be used to represent
+the angle of the cursor relative to the center of the viewer when the
+button was pressed.
+
+See the mouse macro comment block in your conquestrc file for a
+description of the format.
+
+There are many other interesting and useful combinations that I won't
+detail... After all, choosing the right macros and using them well is
+an important part of the strategy you employ against your opponents.
+
+
+.SH "COMMAND LIST"
+.PP
+Here is a quick command reference.
+
+                   0-9,=  set warp factor (= is 10)
+                   A      change w/e allocations
+                   b      beam armies
+                   B      bombard a planet
+                   C      cloaking device
+                   d,*    detonate enemy torpedoes
+                   D      detonate your own torpedoes
+                   E      send emergency distress call
+                   f      fire phasers
+                   F      fire phasers, same direction
+                   h      this
+                   H      user history
+                   i      information
+                   I      set user options
+                   k      set course
+                   K      try a coup
+                   L      review old messages
+                   m      send a message
+                   M      strategic map toggle
+                   N      change your name
+                   o      come into orbit
+                   p      launch photon torpedoes
+                   P      launch photon torpedo burst
+                   Q      initiate self-destruct
+                   r      refit your ship
+                   R      enter repair mode
+                   S      more user statistics
+                   t      engage tractor beams
+                   T      team list
+                   u      un-engage tractor beams
+                   U      user statistics
+                   W      set war or peace
+                   -      lower shields
+                   +      raise shields
+                   /      player list
+                   ?      planet list
+                   ^L     refresh the screen
+
+              RETURN      get last (i)nfo.        (like 'i<RETURN>')
+                 TAB      get 'next' last info.   (like 'i<TAB>')
+
+
 .SH "AUTHOR"
-Jon Trulson
+Jon Trulson, Jeff Poskanzer
 .SH "SEE ALSO"
 .PP
 conquestd(6), conqoper(6), conqdriv(6), conquestsh(6),
@@ -98,9 +463,6 @@ curses client) and other system specific issues.
 .PP
 See README.cygwin for information on building/using conquest on MS
 Windows systems. 
-.PP
-See SERVER.TXT for information on how to setup and run a Conquest
-server.
 .PP
 See HISTORY for the latest news and modification history.
 .PP

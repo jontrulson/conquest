@@ -9,12 +9,15 @@ CONQLIBEXECDIR = @libexecdir@
 CONQDATADIR = @datadir@
 CONQSYSCONFDIR = @sysconfdir@
 CONQIMGDIR = $(CONQDATADIR)/img
+CONQDOCDIR = $(CONQDATADIR)/doc/conquest
+
+CONQDOCS = HISTORY README CONQINIT.TXT conqrule conqrule.easy
 
 IMAGES = img/*.tga img/*.txf
 
 man6_MANS = conqdriv.man conqmetad.man conqoper.man conquest.man \
 	conquestd.man conquestsh.man conqai.man conqstrat.man \
-	conqinit.man
+	conqinit.man conquestgl.man
 
 XLIBS = @X_LIBS@ @X_EXTRA_LIBS@ -lglut -lGL -lGLU -lXt @X_PRE_LIBS@ -lXext -lXi -lX11 -lXmu  
 
@@ -22,6 +25,7 @@ INCLUDES = -DCONQUEST_GROUP=\"$(CONQGROUP)\" \
 	-DCONQSTATE=\"$(CONQLOCALSTATEDIR)\" -DCONQLIBEXEC=\"$(CONQLIBEXECDIR)\" \
 	-DCONQSHARE=\"$(CONQDATADIR)\" -DCONQETC=\"$(CONQSYSCONFDIR)\" \
 	-DCONQUESTSH_EXEC=\"$(DESTDIR)$(bindir)/conquest$(EXEEXT)\" \
+	-DCONQDOCDIR=\"$(CONQDATADIR)\" \
 	@X_CFLAGS@
 
 AM_YFLAGS = -d
@@ -127,18 +131,19 @@ conquestsh_SOURCES = conquestsh.c
 conqmetad_SOURCES = conqmetad.c meta.h
 conqmetad_LDADD = libconquest.la libconqinit.la $(LEXLIB) $(YACCLIB)
 
-data_DATA = conquest.doc HISTORY README conqrule 
-
 # we install conqinitrc in the intall-exec-hook, so that we only install
 #  conqinitrc if it does not already exist.
 sysconf_DATA = texturesrc
 
-EXTRA_DIST = conquest.doc SERVER.TXT CONQINIT.TXT HISTORY README conqrule $(man6_MANS)
+EXTRA_DIST = $(man6_MANS)
 
 install-exec-hook:
 	$(mkinstalldirs) -m 755 $(DESTDIR)$(localstatedir) \
 		$(DESTDIR)$(CONQSYSCONFDIR) \
 		$(DESTDIR)$(CONQLOCALSTATEDIR) \
+		$(DESTDIR)$(CONQDATADIR) \
+		$(DESTDIR)$(CONQDATADIR)/doc \
+		$(DESTDIR)$(CONQDATADIR)/doc/conquest \
 		$(DESTDIR)$(CONQIMGDIR) \
 		$(DESTDIR)$(bindir) \
 		$(DESTDIR)$(libexecdir) \
@@ -149,6 +154,8 @@ install-exec-hook:
 	chgrp $(CONQGROUP) $(DESTDIR)$(CONQLOCALSTATEDIR)
 	cp -f $(IMAGES) $(DESTDIR)$(CONQIMGDIR)/
 	chmod 644 $(DESTDIR)$(CONQIMGDIR)/*.tga $(DESTDIR)$(CONQIMGDIR)/*.txf
+	cp -f $(CONQDOCS) $(DESTDIR)$(CONQDOCDIR)/
+	chmod 644 $(DESTDIR)$(CONQDOCDIR)/*
 	if [ ! -f $(DESTDIR)$(CONQSYSCONFDIR)/conqinitrc ] ; \
 	then \
 		cp conqinitrc $(DESTDIR)$(CONQSYSCONFDIR)/conqinitrc; \

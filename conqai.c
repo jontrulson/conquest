@@ -549,6 +549,9 @@ int newrob( int *snum, int unum )
   Ships[*snum].sdfuse = 0;
   Ships[*snum].pid = 0;
 
+  /* randomize it's desired heading */
+  Ships[*snum].dhead = rnduni(0.0, 359.9);
+
 				/* robots now can use 30/70
 				   instead of the default 40/60 set in
 				   clbInitShip(). */

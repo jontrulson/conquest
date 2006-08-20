@@ -52,6 +52,7 @@
        ## Recording Games
        ## Replaying Games
        ## Hints for new players
+          # Moving around (Navigation)
           # Orbiting a planet
           # Shields
           # Energy Allocation
@@ -74,7 +75,6 @@
        ## Teams
        ## Combat
        ## Macro Keys / Mouse Macros
-       ## Navigation
        ## The Robots
           # Conqstrat
           # Combat
@@ -519,7 +519,38 @@
 
 ## Hints for new players
 
-   Here are some general things to keep in mind while playing.
+   Here are some general hints for new players.  There's more to
+   playing than what is described in this section, but it should be a
+   good start.
+
+
+# Moving around (Navigation)
+
+  With the version 8.1.2f or better OpenGL client, you can click the
+  middle mouse button (by default) in the viewer to set a course in
+  that direction.
+
+  For the keyboard, using the direction keys ('qweadzxc') to the
+  (k)ourse or weapons commands can be faster than specifying the
+  direction in degrees.
+
+  See conquest.doc for a description of the direction keys, and how
+  they work.
+
+  You can set course, lock onto, and automatically enter orbit around
+  a planet by typing the planet name (or first 3 unique characters)
+  followed by [TAB] as input to the (k)ourse command.  You will
+  automatically enter orbit when you get close enough to your
+  destination.
+
+  The Keypad keys/Arrow keys (if your terminal emulator and terminfo
+  entry supports them) can be used for 1-key steering, which can be
+  faster in battle.
+
+  Of course, once you have set a direction, you need to set a warp
+  speed if one is not already set, or you are not going to actually go
+  anywhere.  Use the number keys (0) to (9) to set the warp.  Use (=)
+  to set the maximum warp your ship can go.
 
 # Orbiting a planet
 
@@ -535,8 +566,8 @@
   2 (at the fastest) and hit (o).  You cannot enter orbit if you are
   going faster than warp 2.
 
-  See the section '## Navigation' for more information on navigating
-  around. 
+  See the section '# Moving around (Navigation)' for more information
+  on navigating around.
 
 
 # Shields
@@ -554,13 +585,13 @@
     planet, torps, or a Sun, etc.
 
     Don't run around the universe with your shields up all the time.
-    It just flags you as inexperienced and probably an easy kill.
+    You are just wasting fuel and heat.  
 
     On the other hand, when an enemy gets close, don't forget to raise
     them :)
 
-  Your shields will repair at twice the normal rate if you lower
-  them. 
+  Your shields will repair at twice the normal rate when lowered.
+
 
 # Energy Allocation
 
@@ -631,7 +662,10 @@
   shields and you explode.  Exercise caution :)
 
   Bombing a home system planet of a team will create a robot defender.
-  Be ready for this.
+  Be ready for this.  If you accidentally end up creating a robot that
+  you do not/can not fight, just cloak, raise your shields and go to
+  warp 0.  If the robot wasn't too close to you when you did this, you
+  should survive and the robot will lose interest :)
 
   Home systems, and their planets are the following:
 
@@ -672,10 +706,11 @@
   You can cloak your ship if you wish with the (C\t) command.
 
   Cloaking consumes alot of power and heat.  If you are moving, you
-  will exhaust your fuel or overload fairly quickly.  How fast this
-  happens depends on your ship type, and how fast you are moving.  If
-  you put your shields up, you will overload even faster.  Overloading
-  your engines is really bad in battle for obvious reasons.
+  will exhaust your fuel or overload your engines fairly quickly.  How
+  fast this happens depends on your ship type, and how fast you are
+  moving.  If you put your shields up, you will overload even faster.
+  Overloading your engines is really bad in battle for obvious
+  reasons.
 
   If you are moving when you are cloaked, you are detectable - but only to
   an approximate location.
@@ -727,8 +762,7 @@
   while you have expended far less fuel and heat to evade them.
 
   Getting the enemy to waste fuel and heat faster than you is an
-  important strategy in battle, and can often be the deciding factor
-  in a dogfight.
+  important strategy in battle.
 
 # Using torpedos
 
@@ -747,13 +781,14 @@
   (by default) in the viewer to fire a torpedo in that direction.
 
   You can only have 9 torps out at a time.  If you have fired them
-  all, and they missed, you should detonate them (D) so that you can
-  free up slots to fire more.  Hopefully with better aim this time. :)
+  all, and they missed, you should self-detonate them (D) so that you
+  can free up slots to fire more.  Hopefully with better aim this
+  time. :)
 
 # Using phasers
 
   Phasers are a close-in weapon.  If the ship you are firing at is not
-  in RED ALERT range (about 1000) they won't have much (if any)
+  in RED ALERT range (about 1000 CU's) they won't have much (if any)
   effect, and you will just waste fuel and heat using them.
 
   They are *very* effective close up though, so don't abandon them in
@@ -777,11 +812,10 @@
   - The more kills you have, the more efficient your weapons and
     engines will be, in terms of fuel consumption and heating.
 
-  - The more kills you have, the more damage your weapons can
-    inflict. 
+  - the more damage your weapons can inflict.
 
-  - The more kills you have, the faster acceleration and deceleration
-    will be.  You will also be able to turn quicker at higher speeds.
+  - and acceleration and deceleration will be faster.  You will also
+    be able to turn quicker at higher speeds.
 
   See also, the '## Ship Strength' section for more information.
 
@@ -1020,44 +1054,6 @@
    won't detail... After all, choosing the right macros and using them
    well is an important part of the strategy you employ against your
    opponents.
-
-
-## Navigation
-
-   With the 8.1.2f OpenGL client, you can click the middle mouse button
-   (be default) in the viewer to set a course in that direction.
-
-   For the keyboard, using the direction keys ('qweadzxc') to the
-   (k)ourse or weapons commands can be faster than specifying the
-   direction in degrees.
-
-   If a ship is approaching from 90 degrees, it's easier (and faster)
-   to type 'Pw\r' than 'P90\r' to fire the torps in the proper
-   direction.  You're also less likely to screw up in the heat of
-   battle.  See conquest.doc for a description of the direction keys,
-   and how they work.
-
-   You can set course, lock onto, and automatically enter orbit around
-   a planet by typing the planet name (or first 3 unique characters)
-   followed by [TAB] as input to the (k)ourse command.  You will
-   automatically enter orbit when you get close enough to your
-   destination.
-
-   In addition, the (i)nfo command understands several special strings
-   like 'ne' for info on 'nearest enemy'.  Obviously you can't fire
-   weapons like that though - that would be too easy.  See
-   conquest.doc for more info on the direction keys and special
-   strings understood by conquest.  
-
-   The Keypad keys/Arrow keys (if your terminal emulator and terminfo
-   entry supports them) can be used for 1-key steering, which can be
-   faster in battle.  They (the keypad keys) can also be used as input
-   to the fire and course commands, as they are translated into the
-   appropriate 'direction' keys like so:
-
-        789     qwe 
-        4 6 --> a d 
-        123     zxc
 
 
 ## The Robots

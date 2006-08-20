@@ -1,0 +1,1 @@
+.so man6/conquest.6

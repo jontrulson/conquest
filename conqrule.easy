@@ -1,0 +1,148 @@
+# This file contains a modified robot strategy to make them dumber,
+#  and therefore easeir for new players to deal with.
+#
+###############################################################################
+#
+# $Id: conqrule 552 2006-07-17 04:47:23Z jon $
+#
+###############################################################################
+#
+# compile with 'conqstrat <conqrule >conqdata.h' , then re-compile conquest
+#  to install as the new standard strategy table.
+# OR
+# compile with 'conqstrat -U <conqrule' to update the common block directly.
+#
+###############################################################################
+#
+# A maximum of 32 rules are allowed.
+#
+# Rule syntax: <condition> & <condition> & ... ; ACTION
+#         All comments (starting with '#') and whitespace are ignored.
+#
+# Operators:
+#       
+#       <  <=  >  >=  =  ==  !=  <>  !  &	
+#
+# Variables:
+#	random		dne		damage		incoming
+#	fuel		numtorps	shields		etemp
+#	wtemp		phaserdam	torpdam		warp
+#	shup		walloc		orbiting	repairing
+#	enemycloaked	enemydamage	canread
+#
+#  All variables are scaled to values between 0-9 inclusive.
+#
+# Actions:
+#
+#       ROB_NOOP        ROB_GOHOME	ROB_GOREPAIR	ROB_ALLOCATE	
+#       ROB_DETONATE	ROB_MYDETONATE	ROB_PHASER	ROB_TORPEDO	
+#       ROB_BURST	ROB_SHIELD	ROB_UNTRACTOR	ROB_WARP_0	
+#       ROB_WARP_2	ROB_WARP_5	ROB_WARP_8	ROB_TRACK	
+#       ROB_SLIENT	ROB_MESSAGE	ROB_TAKEDRUGS	ROB_REPAIR	
+#       ROB_READMSG	ROB_INSULT	ROB_GOFUEL	ROB_RUNAWAY	
+#
+# Distance Scaling factors:
+#
+#	dist	value
+#	0	0
+#	100	1
+#	600	1
+#	700	2
+#	1300	2
+#	1400	3
+#	2000	3
+#	2100	4
+#	2800	4
+#	2900	5
+#	3600	5
+#	3700	6
+#	4500	6
+#	4600	7
+#	5500	7
+#	5600	8
+#	6700	8
+#	6800	9
+###############################################################################
+
+# Toggle shields if an enemy has gotten close or if there are enemy torps.
+dne <= 3 & shields >= 2 & ! shup ; ROB_SHIELD
+incoming > 0 & shields >= 2 & ! shup ; ROB_SHIELD
+
+# Allocate to weapons if an enemy has gotten close.
+# dne <= 3 & ! walloc ; ROB_ALLOCATE
+
+# Weapon rules. Avoid phasers if we can't aim them.
+dne < 2 & fuel > 0 & phaserdam > 7 & ! enemycloaked ; ROB_PHASER
+dne <= 2 & fuel > 3 & torpdam > 0 & numtorps >= 3 ; ROB_BURST
+dne <= 2 & fuel > 0 & torpdam > 0 & numtorps > 0 ; ROB_TORPEDO
+
+# Detonate rules.
+fuel > 0 & incoming > 0 & damage < 8 ; ROB_DETONATE
+dne < 3 & numtorps < 3 & wtemp < 8 ; ROB_MYDETONATE
+
+# 12/24/96
+# raise shields if damage, and the threat can't be an enemy. 
+#  this should reduce the number of sun-deaths for robots a bit 
+dne > 3 & incoming == 0 & ! shup & damage > 0 & etemp < 4 & 
+	! repairing ; ROB_SHIELD
+
+# Lower shields when it's safe.
+dne > 3 & incoming == 0 & shup & ! damage; ROB_SHIELD
+
+# Deallocate weapons if we're not going to use them.
+# dne > 3 & walloc ; ROB_ALLOCATE 
+
+# Movement rules. Don't set warp if we are orbiting. (But notice that
+#  if we decide to lock on to a new planet, we're no longer orbiting
+#  and can set warp. Be careful to avoid continuous speed changes.
+! orbiting & fuel == 0 & warp != 0 ; ROB_WARP_0
+! orbiting & etemp >= 9 & warp != 0 ; ROB_WARP_0
+! orbiting & fuel > 0 & warp != 2 & damage < 9 &
+    etemp > 7 & etemp < 9 ; ROB_WARP_2
+! orbiting & fuel > 0 & warp != 5 & damage < 7 &
+    etemp > 4 & etemp < 7 ; ROB_WARP_5
+! orbiting & fuel >= 3 & warp != 8 & damage < 5 &
+    etemp < 4 ; ROB_WARP_8
+
+# Course rules.
+dne < 4 & fuel >= 5 & damage < 2 ; ROB_TRACK
+# 12/21/97
+# this rule added to mitigate a logic 'hole' with fuel ranges between
+#  150-350 that caused NOOP's at inoppertune times. This flaw became
+#  apparent when the fuel scaling bug in buildai() was fixed, as robots 
+#  no longer think they always have maximum fuel.
+dne < 5 & fuel >= 3 & fuel < 5 & damage < 4; ROB_TRACK
+
+! orbiting & dne < 3 & damage <= 6 & fuel >= 4 & enemydamage >= 8 ; ROB_TRACK
+! orbiting & dne <= 4 & damage >= 5 & damage < 9 & fuel > 0 ; ROB_RUNAWAY
+
+# 12/21/97
+# relating to the fuel scaling bug above, the fuel comparison was changed
+#  to be a bit more conservative.  (was fuel < 2)
+fuel <= 2 & warp != 0 & damage < 4 ; ROB_GOFUEL
+
+! orbiting & warp != 0 & damage >= 4 ; ROB_GOREPAIR
+
+# Repair rules. If we're damaged and in orbit, repair. If we're damaged and
+#  can't move (i.e. warp is zero), repair.
+dne > 3 & incoming == 0 & damage > 0 & ! repairing & orbiting ; ROB_REPAIR
+dne > 3 & incoming == 0 & damage > 0 & ! repairing & ! orbiting &
+    warp == 0 ; ROB_REPAIR
+# This rule is probably covered by the previous one.
+## dne > 3 & incoming == 0 & damage >= 9 & ! repairing ; ROB_REPAIR
+
+# Send our enemy some insults when he's approaching.
+# random == 3 & dne >= 7 & dne <= 8 ; ROB_INSULT
+
+# Read a message if we can.
+canread ; ROB_READMSG
+
+# If nothing happens for awhile, go home.
+random == 7 & dne >= 5 & ! orbiting ; ROB_GOHOME
+
+
+###############################################################################
+#
+# Copyright 1999-2006 Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
+#
+#

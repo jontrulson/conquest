@@ -50,9 +50,6 @@ curses client) and other system specific issues.
 See README.cygwin for information on building/using conquest on MS
 Windows systems. 
 .PP
-See SERVER.TXT for information on how to setup and run a Conquest
-server.
-.PP
 See HISTORY for the latest news and modification history.
 .PP
 See CONQINIT.TXT for information on CQI, and the format of the

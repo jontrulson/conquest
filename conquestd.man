@@ -44,6 +44,140 @@ that an Internet client would need to use to connect.
 Run as user \fIuser\fP.  This option is advised when running as root.
 It is generally not a good idea to run an Internet accessable game
 server as the root user :)  Only the root user can use this option.
+.SH "OVERVIEW"
+.PP
+With version 8.0 of Conquest or better, a great deal of work has gone
+into making Conquest a true client/server game playable over the
+Internet (or just your local LAN).
+
+Conquest has two main parts, the server component (conquestd) and the
+client (OpenGL version: conquestgl, curses version: conquest).
+
+To run a server, you must run the conquestd program.
+
+Clients (including ones on your local machine) then connect to your
+server and the game is played.
+.SH "SETTING UP A SERVER"
+.PP
+\fBconquestd\fP is used to provide a Conquest game.  Even if all you
+want to do is play by yourself on your own machine, you will need
+to run \fBconquestd\fP in order to play.
+
+If all you want to do is use conquest to play on someone else's
+server, then you do not need to be reading this document. :)
+
+In it's simplest (and insecure) form, you can simply run:
+
+       $ conquestd -d
+
+This will start \fBconquestd\fP, which will fork itself into the background
+and run as your user id.
+
+It will listen on the default port (1701) for client connections, and
+spawn a new \fBconquestd\fP for each client connection.  It will be
+available to anyone who can connect to TCP port 1701 on your machine.
+
+SECURITY NOTE: I would only run a server this way if no one else from
+the Internet will be able to connect (if you are behind a firewall for
+example).  This is more INSECURE since \fBconquestd\fP will be running
+as your uid.  Read further for a more secure way to run the server.
+
+To support internet playes securely, start \fBconquestd\fP as root,
+and have it run as user 'nobody' by passing the \fB\-u nobody\fP option on
+the command line.  Of course you can create and use some other
+non-privileged, non-interactive user for this task as well.
+
+Something like the following is a good idea:
+
+        # conquestd -d -u nobody
+
+This will have \fBconquestd\fP setuid() permanently to user 'nobody' before
+beginning operations.  On most unix systems, user 'nobody' has no home
+directory, password, or privileges, and therefore is a safe user id to
+run under.
+
+You must be the root user in order to use the '-u' option.
+
+DO NOT run \fBconquestd\fP as the root user itself.  Although the code
+*should* be safe, don't take my word for it.
+
+.SH "NOTIFYING THE METASERVER"
+.PP
+If you are going to run a server that will be available to the public
+via the Internet, you should pass the '-m' option to conquestd when
+you start it.
+
+When running with the '-m' option, conquestd will contact the Conquest
+Meta Server running at conquest.radscan.com, and announce your server,
+so that other people will know about it.
+
+Every 2 minutes or so, it will update the meta server with various
+particulars of your server (like how many players are currently
+connected, what flags you support, what your server name, version,
+and MOTD are, etc).
+
+This way, other people can find out about your server and connect
+to it to play.
+
+The list of currently active servers can be seen in the game by
+running your client (conquestgl or conquest) with the '-m' flag.
+
+You can also point your web browser to:
+
+     \fIhttp://radscan.com/cgi-bin/conqmeta.pl\fP
+
+If you want to be primitive, you can see the current list of servers
+in raw format by simply:
+
+     telnet conquest.radscan.com 1700
+
+Of course, please make sure that your server is actually reachable
+from the Internet before notifying the Meta server.
+
+.SH "FIREWALL CONSIDERATIONS"
+.PP
+Most people that will run a server (or client) will also be using a
+firewall of some sort to protect their networks.
+
+Inbound access:
+
+If you wish to allow internet access to your server, you will
+need to allow inbound TCP _and_ UDP access to the game port (1701
+by default).
+
+Outbound access:
+
+If you restrict outbound internet connections, you might want to
+allow the following outgoing ports:
+
+1700/tcp - if you want clients to be able to query the
+metaserver for active servers.
+
+1700/udp - if you want your own server to be able to announce
+it's availability to the metaserver at conquest.radscan.com.
+.SH "EXPIRING USERS"
+.PP
+By default, whenever a user logs into Conquest, an autoexpire is
+run to locate and 'resign' all inactive remote users.
+
+A user is expired: 
+
+A) if the user is a non OPER or non robot user - no expiration is
+ever done on these users.
+
+B) the user hasn't entered the game in 'user_expiredays' days,
+which is set in the system-wide conquestrc file.
+
+C) the user isn't currently flying a ship.
+
+If all of these conditions are met, the remote user is resigned
+from the game.
+
+You can disable user expiration altogether by setting user_expiredays
+to 0.
+
+You can configure this in the (O)ptions menu in \fBconqoper\fP.
+
 .SH "EXAMPLES"
 .TP 8
 .B conquestd -d
@@ -81,9 +215,6 @@ curses client) and other system specific issues.
 .PP
 See README.cygwin for information on building/using conquest on MS
 Windows systems. 
-.PP
-See SERVER.TXT for information on how to setup and run a Conquest
-server.
 .PP
 See HISTORY for the latest news and modification history.
 .PP
