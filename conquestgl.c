@@ -134,25 +134,12 @@ static void parseGeometry(char *geom)
   return;
 }
 
-/* first load the main texturesrc file.  Then look for and load any
-   ~/.conquest/ *.trc files */
-void loadTextureRCFiles()
+/* utility function to look for and load all .trc files in a given dir */
+static void _loadTRCs(char *cqdir)
 {
-  char cqdir[BUFFER_SIZE];
   char filenm[BUFFER_SIZE];
-  char *homevar;
   DIR *dirp;
   struct dirent *direntp;
-  char *ch;
-
-  /* load the main texturesrc file first */
-  cqiLoadRC(CQI_FILE_TEXTURESRC, NULL, 1, 0);
-
-  if ((homevar = getenv("HOME")) == NULL)
-    return;
-
-  snprintf(cqdir, sizeof(cqdir)-1, "%s/.conquest", 
-           homevar);
 
   if ((dirp = opendir(cqdir)))
     {
@@ -179,6 +166,31 @@ void loadTextureRCFiles()
             }
         }
     }
+
+  return;
+}
+
+/* first load the main texturesrc and *.trc files.  Then look for and
+   load any ~/.conquest/*.trc files */
+void loadTextureRCFiles()
+{
+  char cqdir[BUFFER_SIZE];
+  char *homevar;
+
+  /* load the main texturesrc file first */
+  cqiLoadRC(CQI_FILE_TEXTURESRC, NULL, 1, 0);
+
+  /* now load any .trc files in there (CONQETC) */
+  _loadTRCs(CONQETC);
+
+  /* now load any in the users own ~/.conquest/ dir */
+  if ((homevar = getenv("HOME")) == NULL)
+    return;
+
+  snprintf(cqdir, sizeof(cqdir)-1, "%s/.conquest", 
+           homevar);
+
+  _loadTRCs(cqdir);
 
   return;
 }

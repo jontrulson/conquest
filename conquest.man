@@ -31,8 +31,8 @@ called ~/.conquest/ will be created in your home directory.  This
 directory cantains your 'user options' data as well as the logfile.
 Additionally, with \fBconquestgl\fP, texturesrc (.trc) files and
 texture image data (in ~/.conquest/img/) can be stored there. See
-CONQINIT.TXT for more information on texturesrc and texture image
-files are. 
+CONQINIT.TXT for more information on what \fItexturesrc\fP and
+\fItexture image files\fP are.
 
 .SH "OPTIONS"
 .PP
@@ -64,7 +64,7 @@ Connect to server running on \fIserver\fP port \fIport\fP.  The default
 port is 1701.
 .TP 8
 .B \-t  
-Telnet mode.  Curses client only.  When running in telnet mode user
+Telnet mode.  Curses client only.  When running in telnet mode, user
 configuration files are never loaded nor stored, and the server update
 rate defaults to 5 per second.  This is only of use when running a
 telnetable server.  

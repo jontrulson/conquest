@@ -1,5 +1,5 @@
 /* 
- * nCP help node
+ * Planet listing
  *
  * $Id$
  *
@@ -241,10 +241,10 @@ static int nPlanetlDisplay(dspConfig_t *dsp)
                 coreflag = '+';
             }
           
-          sprintf(xbuf,"%c ",coreflag);  /* coreflag */
-          cprintf(lin, col,  ALIGN_NONE, "#%d#%s", SpecialColor, xbuf);
-          
-          col+=(strlen(xbuf));
+          cprintf(lin, col,  ALIGN_NONE, "#%d#%c", SpecialColor, 
+                  coreflag);
+          col += 2;
+
           sprintf(xbuf,"%-11s ",Planets[pnum].name);  /* Planets[pnum].name */
           cprintf(lin, col,  ALIGN_NONE, "#%d#%s", outattr, xbuf);
           

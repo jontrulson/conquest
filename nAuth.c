@@ -171,7 +171,7 @@ void nAuthInit(void)
 /* all we do here is 'blink' the cursor ;-) */
 static int nAuthIdle(void)
 {
-  int gtime = glutGet(GLUT_ELAPSED_TIME);
+  int gtime = clbGetMillis();
   static int old = 0;
 
   if ((gtime - old) > 250)

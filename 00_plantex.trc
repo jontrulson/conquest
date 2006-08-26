@@ -1,0 +1,84 @@
+# $Id$
+#
+# This file specifies default textures to use for some of the planets,
+# class D for now, though others will be added in the future.  
+# NOTE: this file will be overwritten by a 'make install' so do not edit
+# it directly if you want to change or add entries... Make a copy of
+# it in your ~/.conquest/ dir and modify it there.
+#
+
+# Klingon D planets
+texture {
+    name        "Tarsus"
+    filename    "jupiter"
+}
+
+texture {
+    name        "Leudus"
+    filename    "uranus"
+}
+
+# Fed D planets
+texture {
+    name        "Omega"
+    filename    "jupiter"
+}
+
+# Romulan D planets
+texture {
+    name        "Rho"
+    filename    "jupiter"
+}
+
+texture {
+    name        "Remus"
+    filename    "uranus"
+}
+
+# Orion D planets
+texture {
+    name        "Umbriel"
+    filename    "jupiter"
+}
+
+texture {
+    name        "Oberon"
+    filename    "uranus"
+}
+
+# Non Team (Self Ruled) D planets
+texture {
+    name        "Dyneb"
+    filename    "jupiter"
+}
+
+texture {
+    name        "Eminiar"
+    filename    "jupiter"
+}
+
+texture {
+    name        "Cheron"
+    filename    "jupiter"
+}
+
+texture {
+    name        "Seritil"
+    filename    "neptune"
+}
+
+texture {
+    name        "Omega"
+    filename    "neptune"
+}
+
+texture {
+    name        "Oldar"
+    filename    "uranus"
+}
+
+texture {
+    name        "RigelB"
+    filename    "neptune"
+}
+

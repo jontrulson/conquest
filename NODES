@@ -74,27 +74,26 @@ NODES
 
     idle(void)               - optional
 
-       The idle method is called immediately after the node's
-       display method.  This node can be used for tracking special
-       state, looking for available packets from the client and
-       processing them, etc.  It should never try to display
-       anything. 
+       The idle method is called immediately after the node's display
+       method.  This node can be used for tracking special state,
+       looking for available packets from the server and processing
+       them, etc.  It should never try to display anything.
 
     input(int ch)            - optional
 
        'ch' is the key that was pressed.
 
        this method handles any keyboard events that occur during node
-       execution. 
+       execution.  See cqkeys.h for the keys that are understood.
 
 
     minput(mouseData_t *mdata)            - optional
 
-       'mdata' contains the relevant information for dealing with
-       mouse events.  mouseData_t is defined in cqmouse.h.
-
        this method handles any mouse events that occur during node
        execution.
+
+       'mdata' contains the relevant information for dealing with
+       mouse events.  mouseData_t is defined in cqmouse.h.
 
 
     If you add a node, please use my current naming convention for the
@@ -160,7 +159,7 @@ GL
 Other info:
 
     With very few exceptions, a node will require it's own state so
-    that is knows what it is currently doing (prompting for a ship,
+    that it knows what it is currently doing (prompting for a ship,
     displaying the options list, etc).  In my nodes, I use 'S_<state>'
     defines to represent the various states a node can be in, and a
     static variable called 'state' that indicates the state of the
@@ -170,8 +169,8 @@ Other info:
     For example, I wrote a version of cprintf() (glcprintf.c) that can
     be used in your display() method to draw texture mapped text to a
     3D window. It accepts the same arguments and will work the same
-    way.  It logically divides the rendering area into an 80x25 cell
-    character display.
+    way as the curses version.  It logically divides the rendering
+    area into an 80x25 cell character display.
 
     One thing to be aware of are OpenGL Projection Matrices.  I use 2
     of them - one for the viewer, and one for everything else (hud -
@@ -179,7 +178,7 @@ Other info:
     only work with hud-type projection matrices.  You should hopefully
     not have to care - but keep this in mind if you are trying to
     render text in the viewer.  The viewer uses true perspective
-    correction and Z.
+    correction and Z.  glfRender() (glfont.c) is needed for that.
 
     The most complex node in the client is the cockpit node, nCP.c.
     You will notice there is alot of duplication of some of the
@@ -196,8 +195,8 @@ Other info:
     with the CB directly.  You will need to be careful about locking
     though (PVLOCK()).  You do not want to inadvertantly aquire a lock
     in one node, then transfer to a another node before unlocking it,
-    or you will deadlock the client.  The current clients do not use an
-    external CB so no locking is needed.
+    or you will deadlock the client.  The current clients do not use a
+    shared external CB so no locking is needed.
 
     The more I think about it, the more it does not seem like this
     should be too hard, especially if you are already using cprintf to

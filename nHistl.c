@@ -54,7 +54,6 @@ static int nHistlDisplay(dspConfig_t *dsp)
 {
   int i, j, unum, lin, col, fline, lline, thistptr = 0;
   char *hd0="C O N Q U E S T   U S E R   H I S T O R Y";
-  char puname[MAXUSERNAME + 2]; /* for '\0' and '@' */
   char connecttm[BUFFER_SIZE];
   char histentrytm[DATESIZE + 1];
 
@@ -79,8 +78,6 @@ static int nHistlDisplay(dspConfig_t *dsp)
       if ( ! Users[unum].live )
         continue; 
       
-      strcpy(puname, Users[unum].username);
-      
       /* entry time */
       getdandt( histentrytm, History[i].histlog);
       
@@ -93,7 +90,7 @@ static int nHistlDisplay(dspConfig_t *dsp)
       cprintf( lin, col, ALIGN_NONE, 
                "#%d#%-10.10s #%d#%16s#%d#-#%d#%7s", 
                YellowLevelColor,
-               puname, 
+               Users[unum].username, 
                GreenLevelColor,
                histentrytm,
                NoColor,

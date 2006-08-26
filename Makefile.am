@@ -14,6 +14,7 @@ CONQDOCDIR = $(CONQDATADIR)/doc/conquest
 CONQDOCS = HISTORY README CONQINIT.TXT conqrule conqrule.easy
 
 IMAGES = img/*.tga img/*.txf
+TRC = *.trc
 
 man6_MANS = conqdriv.man conqmetad.man conqoper.man conquest.man \
 	conquestd.man conquestsh.man conqai.man conqstrat.man \
@@ -133,7 +134,7 @@ conqmetad_LDADD = libconquest.la libconqinit.la $(LEXLIB) $(YACCLIB)
 
 # we install conqinitrc in the intall-exec-hook, so that we only install
 #  conqinitrc if it does not already exist.
-sysconf_DATA = texturesrc
+sysconf_DATA = texturesrc $(TRC)
 
 EXTRA_DIST = $(man6_MANS)
 

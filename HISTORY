@@ -11,6 +11,28 @@
 
 ??? 8/9/2006
 
+       - convert remaining glutGet(GLUT_ELAPSED_TIME) to
+         clbGetMillis(). 
+
+       - When loading textures, we now look for system-wide *.trc
+         files in CONQETC after loading the main 'texturedrc' file.
+
+         So the texture/anim config loading order is now:
+
+           System-wide CONQETC/texturesrc
+           System-wide CONQETC/*.trc
+           User ~/.conquest/*.trc
+
+         This will make it easier to add 'misc' texture definitions to
+         the distribution w/o neccessarily having to change
+         texturesrc, which should only contain 'base' information. 
+
+         Along those lines, added system-wide '00_plantex.trc' file
+         that specifies some different texures for some of the class D
+         planets.  
+
+         Added new textures jupiter, neptune, and uranus.
+
        - add new 'conrule.easy' robot rule file.  This file specifies
          a robot stragegy that should make robots more 'fun' (read:
          less hopelessly lethal) for newbies.  Experienced players
@@ -21,10 +43,11 @@
 
          conqstrat -U < conqrule.easy
 
-         I will probably run this one on the public/newbie server at
-         conquest.radscan.com:1701 .
+         I will probably run this one on the public server at
+         conquest.radscan.com:1701, since alot of new people show up
+         there (and get their butts kicked by robots). 
 
-       - randomize robot headings when one is created.
+       - randomize robot headings when created.
 
        - when initializing (e)verything or (u)niverse in conqoper,
          enable the game by default.  Previously the game had to
@@ -34,7 +57,7 @@
        - arrange for the conquest AI rule files, and the non-manpage
          documentation to be installed in $prefix/share/doc/conquest/ 
 
-       - manpages: 
+       - manpages/documentation: 
 
          - add contents of conquest.doc into the conquest manpage.
            Get rid of conquest.doc.  Also add section on macros to the

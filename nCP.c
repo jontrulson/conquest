@@ -2336,7 +2336,7 @@ void nCPInit(void)
   clientFlags = 0;
 
   /* init timers */
-  rftime = glutGet(GLUT_ELAPSED_TIME);
+  rftime = frameTime;
   lastblast = Ships[Context.snum].lastblast;
   lastphase = Ships[Context.snum].lastphase;
   pingPending = FALSE;
@@ -2420,7 +2420,6 @@ static int nCPIdle(void)
   spAck_t *sack;
   int pkttype;
   int now;
-  int gnow = glutGet(GLUT_ELAPSED_TIME);
   Unsgn8 buf[PKT_MAXSIZE];
   int difftime = dgrand( Context.msgrand, &now );
   int sockl[2] = {cInfo.sock, cInfo.usock};
@@ -2485,6 +2484,7 @@ static int nCPIdle(void)
           pingPending = TRUE;
           sendCommand(CPCMD_PING, 0);
         }
+      else
     }
 
   /* drive the local universe */
@@ -2493,7 +2493,8 @@ static int nCPIdle(void)
       clbPlanetDrive(tdelta / 1000.0);
       clbTorpDrive(tdelta / 1000.0);
       iterstart = iternow;
-      recordGenTorpLoc();
+      if (Context.recmode == RECMODE_ON)
+        recordGenTorpLoc();
     }
 
   if (clientFlags & SPCLNTSTAT_FLAG_KILLED)
@@ -2564,10 +2565,13 @@ static int nCPIdle(void)
           }
     }
 
-  if ((gnow - rftime) > (int)((1.0 / (real)Context.updsec) * 1000.0))
-    {                           /* record a frame */
-      recordUpdateFrame();
-      rftime = gnow;
+  if (Context.recmode == RECMODE_ON)
+    {
+      if ((iternow - rftime) > (int)((1.0 / (real)Context.updsec) * 1000.0))
+        {                           /* record a frame */
+          recordUpdateFrame();
+          rftime = iternow;
+        }
     }
 
   return NODE_OK;
