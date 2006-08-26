@@ -2484,7 +2484,6 @@ static int nCPIdle(void)
           pingPending = TRUE;
           sendCommand(CPCMD_PING, 0);
         }
-      else
     }
 
   /* drive the local universe */
