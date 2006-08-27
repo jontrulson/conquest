@@ -2412,7 +2412,7 @@ void drawDoomsday(GLfloat x, GLfloat y, GLfloat angle, GLfloat scale)
    perspective wrong.  This also required that the neb quad be
    rendered all the time, even if you couldn't see it.
 
-   First we determine what qaudrant we are in.  From there we plot two
+   First we determine what quadrant we are in.  From there we plot two
    imaginary points aligned with the ship's x/y coordinates, and
    placed on the nearest wall(s) edge.  Then a determination is made
    (using a fixed GLcvtcoords()) to determine whether that point would
