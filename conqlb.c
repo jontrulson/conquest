@@ -36,11 +36,6 @@
 #include "user.h"
 #include "color.h"
 #include "conqinit.h"
-                                      /* Cataboligne - 10.7.05 := planetsrc mods */
-  int  planet_img[NUMPLANETS + 1];        /* image for gl client */
-  real planet_size[NUMPLANETS + 1];       /* image size for gl client */
-  Unsgn32 planet_col[NUMPLANETS + 1];        /* image color for gl client */
-                                     /* end of Cat mod */
 
 
 				/* shared with display.c */
@@ -2741,7 +2736,7 @@ void clbPlanetDrive(real itersec)
 	  Planets[i].orbang = mod360( Planets[i].orbang + 
                                       Planets[i].orbvel *
                                       itersec / 60.0 );
-        
+
 	  Planets[i].x = Planets[Planets[i].primary].x + 
 	    Planets[i].orbrad * cosd(Planets[i].orbang);
 	  Planets[i].y = Planets[Planets[i].primary].y + 
