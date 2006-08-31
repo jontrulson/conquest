@@ -124,6 +124,8 @@ extern dspData_t dData;
 /* Ping status */
 static Unsgn32 pingStart = 0;
 static int pingPending = FALSE;
+
+/* common output */
 #define cp_putmsg(str, lin)  setPrompt(lin, NULL, NoColor, str, NoColor)
 
 #if 0                           /* for debugging */
