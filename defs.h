@@ -95,6 +95,12 @@
 #undef OPER_MSG_BEEP
 
 
+/* 
+ * AUTO_RECORD - have conquestd automatically record all games.
+ */
+
+#undef AUTO_RECORD
+
 /* DEBUG* - debug some things */
 
 #undef DEBUG_FLOW		/* trace init flow */

@@ -19,7 +19,7 @@
 #include "servercmd.h"
 #include "conqlb.h"
 
-static void startRecord(void)
+void startRecord(int f)
 {
   char fname[MID_BUFFER_SIZE];
   char bname[MID_BUFFER_SIZE];
@@ -31,7 +31,8 @@ static void startRecord(void)
   if (Context.recmode == RECMODE_ON)
     {
       clog("conquestd: startRecord: already recording.");
-      clbStoreMsg(MSG_GOD, Context.snum, "We are already recording.");
+      if (f)
+        clbStoreMsg(MSG_GOD, Context.snum, "We are already recording.");
       return;
     }
 
@@ -56,7 +57,8 @@ static void startRecord(void)
       Context.recmode = RECMODE_OFF;
       clog("conquestd: Cannot record to %s", fname);
       sprintf(cbuf, "Cannot record to %s", bname);
-      clbStoreMsg(MSG_GOD, Context.snum, cbuf);
+      if (f)
+        clbStoreMsg(MSG_GOD, Context.snum, cbuf);
       return;
     }
 
@@ -69,7 +71,8 @@ static void startRecord(void)
           Context.recmode = RECMODE_ON;
           clog("conquestd: Recording to %s", fname);
           sprintf(cbuf, "Recording to %s", bname);
-          clbStoreMsg(MSG_GOD, Context.snum, cbuf);
+          if (f)
+            clbStoreMsg(MSG_GOD, Context.snum, cbuf);
 
           /* now reset the recorded packet cache so we can start
              fresh */
@@ -79,8 +82,9 @@ static void startRecord(void)
         {
           Context.recmode = RECMODE_OFF;
           clog("conquestd: recordInitOutput failed");
-          clbStoreMsg(MSG_GOD, Context.snum, 
-                  "conquestd: recordInitOutput failed");
+          if (f)
+            clbStoreMsg(MSG_GOD, Context.snum, 
+                        "conquestd: recordInitOutput failed");
         }
     }
 
@@ -403,7 +407,7 @@ int checkOperExec(int from, int to, char *msg)
   /* recording */
   if (!strncmp(umsg, "RECON", 5))
     {
-      startRecord();
+      startRecord(TRUE);
       return TRUE;
     }
   

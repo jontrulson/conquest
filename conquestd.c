@@ -1566,7 +1566,15 @@ int play(void)
 	  Ships[Context.snum].alias);
   
   clbStoreMsg(MSG_COMP, MSG_ALL, msgbuf);
-  
+
+#if defined(AUTO_RECORD)
+  {                             /* automatically record all games */
+    extern void startRecord(int);
+
+    if (Context.recmode != RECMODE_ON)
+      startRecord(FALSE);
+  }
+#endif
 
   /* client updates will be handled by updateProc */
   /* While we're alive, field commands and process them. */

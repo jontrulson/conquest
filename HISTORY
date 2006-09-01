@@ -34,12 +34,12 @@
 
            If you have an existing ~/.conquestrc config file you
            should copy it into ~/.conquest/conquestrc if you want to
-           keep your settings.  ~/.conquestrc is no longer used.
+           keep your settings.  The ~/.conquestrc is no longer used.
 
-         - Using the new CQI init parser, the planet initialization
-           code was also rewritten.  This makes it easier for someone
-           to create 'custom' planet configuations for their
-           server(s).
+         - Using the new conqinit (CQI) parser, the planet
+           initialization code was rewritten.  This makes it easier
+           for someone to create 'custom' planet configuations for
+           their server(s).
 
          - manpages for all of the commands.  Text documentation
            (README, CONQINIT.TXT, etc) are installed in
@@ -70,8 +70,8 @@
            client's idea of what would succeed to be incorrect.
 
            Now, we simply send such commands to the server, regardless
-           of the local client's state, and let the server determine
-           the validity of a command.
+           of the local client's state, and let the server sort it
+           out.
     
          - Add a new 'conqurule.easy' robot AI definition to the
            distribution.  This rule file makes the robots a bit less
@@ -90,10 +90,10 @@
 
        - conquestgl
 
-         - All new HUD with new ship artwork provided by Cataboligne
-           (aka Roy).  He spent incredible amounts of time on
-           acquiring new textures and adding them into Conquest.  The
-           Cockpit (CP) looks *much* nicer as a result.  Among these:
+         - All new cockpit (CP) with new ship artwork provided by
+           Cataboligne (aka Roy).  He spent incredible amounts of time
+           on acquiring new textures and adding them into Conquest.
+           The CP looks *much* nicer as a result.  Among these:
 
            - new ship textures
            - team specific torp texture animations.  Torps are
@@ -103,7 +103,7 @@
            - new doomsday texture.  Doomsday now fires a visible AP
              beam at unfortunate planets.
            - new shield textures (now you can see your shields as well
-             as other ship's shields and their strength).
+             as other ship's shields and their strengths).
            - Iconic ship status representation
            - new gauges
            - new conquest logos
@@ -151,7 +151,7 @@
            from the orginal patch from Cat].
 
            CQI provides a way of adding (and allowing users to add or
-           redefine) textures and animation using external human
+           redefine) textures and animations using external human
            readable/editable text files parsed by CQI.  
 
            For a complete description of CQI, See the CONQINIT.TXT
@@ -194,6 +194,10 @@
            that are within scanning range so that shield status is
            accurate when repairing.
 
+         - new SHIP_F_BOMBING flag so that clients can easily
+           determine who is bombing a planet (for the bombing
+           graphics).
+
 
        The following are the detailed notes for the intervening
        development versions leading up to this release.  Probably not
@@ -201,7 +205,13 @@
        changes described above :)
 
 
-       8.1.2i (devel - not publically released) 8/29/2006
+       8.1.2k (devel - not publically released) 8/29/2006
+
+       - get rid of '-d n.n' option, use '-B' option now for
+         'benchmark mode'.  Still needs work to be useful.
+
+       - add 'AUTO_RECORD' define in defs.h (default is undefined).
+         When defined, the server automatically records all games.
 
        - convert remaining glutGet(GLUT_ELAPSED_TIME) to
          clbGetMillis(). 
