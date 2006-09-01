@@ -9,7 +9,199 @@
 
                               Conquest HISTORY
 
-??? 8/9/2006
+8.2 (stable) 9/1/2006
+
+       This version represents a major update to Conquest, primarily
+       in the GL client, conquestgl.
+
+       A variety of new enhancments and bugs fixes are present.  The
+       following section will outline the major changes to the various
+       Conquest components in this version (compared to the last
+       stable revision 8.1.2).  Following that is the much more
+       detailed HISTORY that went into each intervening development
+       release (if you are bored). 
+
+       By far the most work went into the GL client.  There were
+       several important server fixes as well, so please upgrade your
+       servers to this release if you run one :)
+       
+       - General
+
+         - Conquest now creates a ~/.conquest/ directory in which to
+           store conquestrc (the user config file), the conquest.log
+           file, and texture/animation definitions, and images
+           (~/.conquest/img/).
+
+           If you have an existing ~/.conquestrc config file you
+           should copy it into ~/.conquest/conquestrc if you want to
+           keep your settings.  ~/.conquestrc is no longer used.
+
+         - Using the new CQI init parser, the planet initialization
+           code was also rewritten.  This makes it easier for someone
+           to create 'custom' planet configuations for their
+           server(s).
+
+         - manpages for all of the commands.  Text documentation
+           (README, CONQINIT.TXT, etc) are installed in
+           <prefix>/share/doc/conquest now.
+
+         - rework remote OPER commands.  Now use '/' as a prefix for
+           sending certain commands to 'GOD' from within the game.
+           Only users with the 'OPER' bit set in their user record can
+           send oper commands to the server.  New commands allow
+           OPER's to create robots and kill ships, in addition to
+           starting/stopping server-based game recording.
+
+         - correct problem where clients might exit incorrectly when
+           an unexpected packet arrives during the welcome phase.
+
+         - enhance recording protocol so that server recordings are
+           easier to determine.  Always store the ship number that
+           made the recording into the header.
+
+           Existing recording (CQR) files are compatible.
+
+         - previously, the client(s) tried to be smart and not waste
+           the server's time with requests it knew the server would
+           reject, for example, firing a phaser when you are cloaked.
+
+           Unfortunately, this introduced race conditions when the
+           connection had any significant lag, which would cause the
+           client's idea of what would succeed to be incorrect.
+
+           Now, we simply send such commands to the server, regardless
+           of the local client's state, and let the server determine
+           the validity of a command.
+    
+         - Add a new 'conqurule.easy' robot AI definition to the
+           distribution.  This rule file makes the robots a bit less
+           lethal to new players.  You can install it for a running
+           game with something like 'conqstrat -U <conqrule.easy'.
+
+         - switched to Subversion (svn) source code control.  An svn
+           conquest repository can be found at:
+
+           - 'current' (possibly unstable) development:
+             svn://radscan.com/conquest/trunk
+
+           - tagged (officially released) revisions:
+             svn://radscan.com/conquest/tags/
+
+
+       - conquestgl
+
+         - All new HUD with new ship artwork provided by Cataboligne
+           (aka Roy).  He spent incredible amounts of time on
+           acquiring new textures and adding them into Conquest.  The
+           Cockpit (CP) looks *much* nicer as a result.  Among these:
+
+           - new ship textures
+           - team specific torp texture animations.  Torps are
+             'directionally' displayed.
+           - new per-team phaser textures
+           - team-specific LR tactical grids
+           - new doomsday texture.  Doomsday now fires a visible AP
+             beam at unfortunate planets.
+           - new shield textures (now you can see your shields as well
+             as other ship's shields and their strength).
+           - Iconic ship status representation
+           - new gauges
+           - new conquest logos
+           - he also supplied new texture management and planet
+             configuration support.  However, these were removed and
+             replaced with the CQI infrastructure I was already
+             working on at the time.
+
+         - rework some of the status indicators:
+
+           - self destruct and current alert target are now shown in
+             the viewer.
+           - New alert 'pulse' messages are displayed in the viewer
+             indicating: engines critical, engines overloaded,
+             weapons critical, weapons overloaded, shield critical,
+             hull critical, and fuel critical.
+           - add torp 'pip' display based on original work by Cat.
+             These indicate torp status (ready, in-flight,
+             exploding). 
+           - show shield recharge status (when down)
+           - show phaser charging status
+
+         - bombing graphics.  You can see your explosions as you bomb
+           victim planets.
+
+         - Mouse support in the CP.  You can now assign macros to
+           mouse buttons (+ modifiers).  This allows you to use the
+           mouse in the viewer while in the CP to do... just about
+           anything you can cram into a macro :)  
+
+           The default configuration assigns the left button to fire
+           phasers at the indicated angle, middle button to set
+           course, and right button to fire a torp.  Of course you
+           can redefine these in the Options menu or by editing your
+           ~/.conquest/conquestrc file directly.
+
+           See the comments in the conquestrc file or the conquest(6)
+           manpage for more information.
+
+         - complete rewrite of the texture managent code.  Previously
+           Conquest used 37 'hardcoded' textures.  With the new
+           atrwork from Cat (173 textures), this was no longer a good
+           way to do things :)  [Note the release distribution
+           contains approximately 107 textures - many were removed
+           from the orginal patch from Cat].
+
+           CQI provides a way of adding (and allowing users to add or
+           redefine) textures and animation using external human
+           readable/editable text files parsed by CQI.  
+
+           For a complete description of CQI, See the CONQINIT.TXT
+           file in the source distribution.  See the conqinit(6)
+           manpage for information on the conqinit utility.
+
+         - texture loader now suports RLE compressed TGA files.  All
+           textures are supplied in compressed format now.
+
+         - New negative energy barrier (NEB) rendering.
+
+         - default resolution is 1024x768 now.  Can run in fullscreen
+           by passing the -f flag to conquestgl.
+
+         - UDP keepalive's are sent from the client to the server
+           every 30 seconds from the GL client, regardless of what
+           screen you are on.  Previously these were only sent if you
+           were in the cockpit (CP).  This is needed to keep some
+           firewalls happy.
+
+         - fix off-by-one in GL ship list.
+
+
+       - conquestd (game server)         
+
+         - fix very old (and rather serious) bug that prevented
+           phasers fired within 315-360 degrees from causing any
+           damage.  Server operators, please upgrade to this release
+           :).
+
+         - fix problem where the recording packet cache was not
+           cleared when starting a new recording, except for the first
+           one.
+
+         - always emit at least one ship update via UDP (if enabled)
+           to prevent some firewalls from closing down the connection
+           after a period of seeming inactivity.
+
+         - propagate SHIP_F_REPAIR flag for ships other than your own
+           that are within scanning range so that shield status is
+           accurate when repairing.
+
+
+       The following are the detailed notes for the intervening
+       development versions leading up to this release.  Probably not
+       worth reading unless you are looking for more details on the
+       changes described above :)
+
+
+       8.1.2i (devel - not publically released) 8/29/2006
 
        - convert remaining glutGet(GLUT_ELAPSED_TIME) to
          clbGetMillis(). 
@@ -31,7 +223,7 @@
          that specifies some different texures for some of the class D
          planets.  
 
-         Added new textures jupiter, neptune, and uranus.
+         Added new texture images for jupiter, neptune, and uranus.
 
        - add new 'conrule.easy' robot rule file.  This file specifies
          a robot stragegy that should make robots more 'fun' (read:
@@ -72,7 +264,7 @@
          - various minor fixes
 
 
-8.1.2j (devel) 8/9/2006
+       8.1.2j (devel) 8/9/2006
 
        - 8.2 pre-release, barring significant issues.
 
@@ -137,7 +329,7 @@
          of the local client's state, and let the server determine
          the validity of a command.
 
-8.1.2g (devel) 7/16/2006
+       8.1.2g (devel) 7/16/2006
 
        - add 'Hull Critical' and 'Shields Critical' pulse messages to
          viewer.  Remove icon sh/hull critical texture decals.
@@ -208,7 +400,7 @@
            svn://radscan.com/conquest/tags/
 
 
-8.1.2e (devel) 7/1/2006
+       8.1.2e (devel) 7/1/2006
 
        - added some mouse support in the GL client.  Macros can be
          assigned to mouse buttons + key modifiers (Control, Alt, and
@@ -326,7 +518,7 @@
          goes.
 
 
-8.1.2c (devel) 5/7/2006
+       8.1.2c (devel) 5/7/2006
 
        - new user option 'do_native_lang'.  When set to true, you will
          see the scale labels in the HUD displayed in the team's
@@ -396,7 +588,7 @@
        - merge 8.1.2a into conquest HEAD branch.  
 
 
-8.1.2a (devel release)  3/05/2006
+       8.1.2a (devel)  3/05/2006
 
        - at long last
 

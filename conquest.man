@@ -42,6 +42,17 @@ difference will be noted.  If the \fI\-s\fP or \fI\-m\fP options are
 not specified, the client will try to connect to a server running on
 your local host at port 1701.
 .TP 8
+.B \-B
+Benchmark mode.  When this option is specified, and playback of a
+previously recorded game is specified with \fI\-P\fP, then the default
+playback speed will be set to the highest speed possible (no frame
+delay).  This is really only of use for the OpenGL client, but can be
+specified to the curses client (\fBconquest\fP) as well.  
+
+It's not really much of a 'benckmark' yet as it does not currently
+emit any rendering statistics on exit.  The will be added in the
+future. 
+.TP 8
 .B \-f
 Run in fullscreen mode.  OpenGL client only.
 .TP 8

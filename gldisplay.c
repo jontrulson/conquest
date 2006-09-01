@@ -458,7 +458,7 @@ void display( int snum, int display_info )
       OldAlert = AlertLevel;
     }
   
-  if ((strcmp( buf, zzbuf ) != 0) || UserConf.AltHUD)
+  if (UserConf.AltHUD || (strcmp( buf, zzbuf ) != 0))
     {
       setXtraInfo();
       setAlertLabel(buf, outattr);

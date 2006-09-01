@@ -7,21 +7,18 @@ conqai \(em Conquest AI override program
 \fBconqai\fP [\fB-r\fP]  
 .SH "DESCRIPTION" 
 .PP 
-This manual page documents briefly the 
-\fBconqai\fP command. 
-.PP 
-This manual page was written for the \fBDebian\fP distribution 
-because the original program does not have a manual page. 
-Instead, it has documentation in plain text format; see below. 
-.PP 
-\fBconqai\fP is a program that allows 
-suitably privileged individuals to take over robot control from the 
-Conquest driver, for debugging purposes. 
-.PP 
-The root user is always a Conquest Operator (CO) and therefore 
-can run the conqoper program.  If you want to allow other people to 
-be CO's, you will need to add them to the conquest group. 
- 
+\fBconqai\fP is a program that allows suitably privileged individuals
+to take over robot control from the Conquest driver for debugging
+purposes.  In order to use this command, you must be a member of the
+conquest group (or root).  This command is used strictly for debugging
+the AI code.  When you run it, it will tell the driver to relinquish
+control of the robot AI and turn it over to \fBconqai\fP.
+.PP
+When finished with your debugging, do not forget to return AI control
+back to the Conquest driver with the \fI\-r\fP option.  If you fail to
+do this, then the robots will stand around doing nothing unless
+\fBconqai\fP is running.
+.PP
 .SH "OPTIONS" 
 .IP "\fB-r\fP         " 10 
 Return control of the robots to the Conquest driver.  Be sure to do
@@ -30,15 +27,12 @@ the robots won't do anything but sit there.
 .SH "SEE ALSO" 
 .PP 
 conquest (6), conqoper (6), conqstrat (6). 
-.PP 
-The programs are documented in text files present in 
-/usr/share/doc/conquest/ . 
 .SH "AUTHOR" 
 .PP 
-This manual page was written by Clint Adams <schizo@debian.org> for 
-the \fBDebian\fP system (but may be used by others).  Permission is 
-granted to copy, distribute and/or modify this document under 
-the terms of the GNU GPL.  Conquest is 
+This manual page was originally written by Clint Adams
+<schizo@debian.org> for the \fBDebian\fP system (but may be used by
+others).  Permission is granted to copy, distribute and/or modify this
+document under the terms of the GNU GPL.  Conquest is
 .PP
 Copyright (C)1994-2006 by Jon Trulson <jon@radscan.com> under the
 ARTISTIC License.

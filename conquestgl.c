@@ -56,7 +56,7 @@ void printUsage()
 {
   printf("Usage: conquestgl [-m ][-s server[:port]] [-r recfile] [ -t ]\n");
   printf("                  [-f ][-g <geometry>] [ -u ]\n");
-  printf("                  [ -M <metaserver> ]\n\n");
+  printf("                  [ -M <metaserver> ] [ -B ]\n\n");
   printf("    -f               run in fullscreen mode\n");
   printf("    -g <geometry>    specify intial window width/height.\n");
   printf("                      Format is WxH (ex: 1024x768).\n");
@@ -75,8 +75,8 @@ void printUsage()
 
                                  
   printf("    -P <cqr file>   Play back a Conquest recording (.cqr)\n");
-  printf("    -d <dly>        specify default frameDelay for CQR playback.\n");
-  printf("                    (example -d .01, for 1/100sec frame delay\n");
+  printf("    -B              Benchmark mode.  When playing back a recording,\n");
+  printf("                    the default playback speed will be as fast as possible.\n");
   printf("    -u              do not attempt to use UDP from server.\n");
 
                                  
@@ -230,9 +230,12 @@ int main(int argc, char *argv[])
   dspInitData();
 
   /* check options */
-  while ((i = getopt(argc, argv, "fmM:s:r:tP:d:ug:")) != EOF)    /* get command args */
+  while ((i = getopt(argc, argv, "fmM:s:r:tP:Bug:")) != EOF)    /* get command args */
     switch (i)
       {
+      case 'B':                 /* Benchmark mode, set frameDelay to 0.0 */
+        frameDelay = 0.0;
+        break;
       case 'f':
         dConf.fullScreen = TRUE;
         break;
@@ -295,10 +298,6 @@ int main(int argc, char *argv[])
       case 'P':
         rfname = optarg;
         Context.recmode = RECMODE_PLAYING;
-        break;
-
-      case 'd':                 /* frameDelay */
-        frameDelay = ctor(optarg);
         break;
 
       case 'u':

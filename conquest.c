@@ -116,7 +116,7 @@ void dead( int snum, int leave );
 void printUsage()
 {
   printf("Usage: conquest [-m ][-s server[:port]] [-r recfile] [ -t ]\n");
-  printf("                [ -M <metaserver> ] [ -u ]\n\n");
+  printf("                [ -M <metaserver> ] [ -u ] [ -B ]\n\n");
   printf("    -m               query the metaserver\n");
   printf("    -s server[:port] connect to <server> at <port>\n");
   printf("                      default: localhost:1701\n");
@@ -128,8 +128,8 @@ void printUsage()
   printf("    -M metaserver   specify alternate <metaserver> to contact.\n");
   printf("                     default: %s\n", META_DFLT_SERVER);
   printf("    -P <cqr file>   Play back a Conquest recording (.cqr)\n");
-  printf("    -d <dly>        specify default frameDelay for CQR playback.\n");
-  printf("                    (example -d .01, for 1/100sec frame delay\n");
+  printf("    -B              Benchmark mode.  When playing back a recording,\n");
+  printf("                    the default playback speed will be as fast as possible.\n");
   printf("    -u              do not attempt to use UDP from server.\n");
   return;
 }
@@ -271,9 +271,12 @@ int main(int argc, char *argv[])
   cInfo.remotehost = strdup("localhost"); /* default to your own server */
 
   /* check options */
-  while ((i = getopt(argc, argv, "mM:s:r:tP:d:u")) != EOF)    /* get command args */
+  while ((i = getopt(argc, argv, "mM:s:r:tP:Bu")) != EOF)    /* get command args */
     switch (i)
       {
+      case 'B':                 /* Benchmark mode, set frameDelay to 0.0 */
+        frameDelay = 0.0;
+        break;
       case 'm':
         wantMetaList = TRUE;
         break;
@@ -330,10 +333,6 @@ int main(int argc, char *argv[])
       case 'P':
         rfname = optarg;
         Context.recmode = RECMODE_PLAYING;
-        break;
-
-      case 'd':                 /* frameDelay */
-        frameDelay = ctor(optarg);
         break;
 
       case 'u':

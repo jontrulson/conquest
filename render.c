@@ -104,7 +104,7 @@ static struct {
   obj_t d1damg;           
   obj_t d1damn;           
   obj_t d1icon;                 /* the icon area */
-  obj_t phasstat;                /* second alert bar */
+  obj_t phasstat;               /* phaser charge status */
   obj_t d1atarg;                /* ship causing alert */
   obj_t decal2;                 /* decal 2 location */
   obj_t d2fuelg;                /* fuel gauge */
@@ -124,7 +124,7 @@ static struct {
   obj_t hullcritpulse;
   obj_t shcharge;               /* shield charge status */
   
-  obj_t torppips[MAXTORPS];
+  obj_t torppips[MAXTORPS];     /* the torp pips */
 
 } o = {};
 
@@ -240,7 +240,7 @@ void updateIconHudGeo(void)
   o.shcharge.x = o.d1shg.x;
   o.shcharge.y = o.d1shn.y + o.d1shn.h;
   o.shcharge.w = o.d1shg.w;
-  o.shcharge.h = 2.0;           /* the glLineWidth() */
+  o.shcharge.h = 2.0;           /* the glLineWidth() in reality */
 
   /* damage */
   o.d1damg.x = tx + ((96.0 / 256.0) * tw);

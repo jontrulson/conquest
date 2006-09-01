@@ -1,5 +1,5 @@
 /* 
- * nCP help node
+ * Ship list
  *
  * $Id$
  *
