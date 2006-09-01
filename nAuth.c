@@ -18,6 +18,7 @@
 #include "node.h"
 #include "client.h"
 #include "clientlb.h"
+#include "conqlb.h"
 #include "nMeta.h"
 #include "nWelcome.h"
 #include "userauth.h"

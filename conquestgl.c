@@ -171,7 +171,7 @@ static void _loadTRCs(char *cqdir)
 }
 
 /* first load the main texturesrc and *.trc files.  Then look for and
-   load any ~/.conquest/*.trc files */
+   load any ~/.conquest/ *.trc files */
 void loadTextureRCFiles()
 {
   char cqdir[BUFFER_SIZE];
