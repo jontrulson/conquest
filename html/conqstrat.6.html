@@ -18,57 +18,71 @@ conqstrat -- modify Robot strategy tables
 <p>
 This manual page documents briefly the  <b>conqstrat</b>
 command.  <p>
-This manual page was written for the <b>Debian</b> distribution  because
-the original program does not have a manual page.  Instead, it has documentation
-in plain text format; see below.  <p>
-<b>conqstrat</b> is a program reads rules from
- stdin to update Robot strategy tables.  
+<b>conqstrat</b> is a utility which reads rules from stdin to update
+Robot strategy tables.  It's normal use is to update the common block (the
+game's current 'state') with a 'compiled' robot AI state, defined by a file
+such as <i>conqrule</i>.  <p>
+If you want to modify the robot's AI, you can do so and
+use <b>conqstrat</b> to either update the common block (running game) with the
+new AI directly, or generate a conqdata.h file that can be compiled into
+Conquest and used as the default when the universe is initialized.  
 <h2><a name='sect3' href='#toc3'>Options</a></h2>
 
 <dl>
 
-<dt><b>-v</b>         </dt>
-<dd>Be verbose about
-everything.  </dd>
+<dt><b>-v</b>
+        </dt>
+<dd>Be verbose about everything.  </dd>
 
 <dt><b>-d</b>         </dt>
-<dd>Turn on lots of debugging.  </dd>
+<dd>Turn on lots of debugging.
+ </dd>
 
 <dt><b>-U</b>         </dt>
-<dd>Update the common
-block directly.  </dd>
+<dd>Update the common block directly.  This is the most common use
+for non-conquest developers.  NOTE: If you then use <i>conqoper</i> to initialize
+the common block, your AI will be lost and replaced with the compiled-in
+default, so you will need to re-run this command to re-install your own AI
+again. </dd>
 
 <dt><b>-o </b><i>file</i>         </dt>
-<dd>Output to <i>file</i>.  Without this  option, output
-will go to stdout.  </dd>
+<dd>Output to <i>file</i>.  Without this  option, output will
+go to stdout.  The normal use of this option is to generate a header file
+that is compiled directly into conquest (<i>conqdata.h</i>).  </dd>
 </dl>
 
 <h2><a name='sect4' href='#toc4'>See Also</a></h2>
 <p>
 <a href='conquest.6.html'>conquest (6)</a>
-, <a href='conqai.6.html'>conqai (6)</a>
+,
+<a href='conqai.6.html'>conqai (6)</a>
 , <a href='conqoper.6.html'>conqoper (6)</a>
 .  <p>
-The
-programs are documented in text files  present in /usr/share/doc/conquest/
-.  
+See the <i>conqrule</i> and <i>conqrule.easy</i> files for two
+robot strategies supplied in the conquest distribution, and installed in
+&lt;install_prefix&gt;/share/doc/conquest/.  <i>conqrule</i> is the original AI (with minor
+fixes) supplied in the original VAX/VMS conquest distribution.  It is also
+the default AI compiled into Conquest. <i>conqrule.easy</i> is an AI that is a bit
+easier on new players :) You can install it in an initialized game with
+<i>conqstrat -U &lt;conqrule.easy</i>.  
 <h2><a name='sect5' href='#toc5'>Author</a></h2>
 <p>
-This manual page was written by Clint Adams &lt;schizo@debian.org&gt; for
- the <b>Debian</b> system (but may be used by others).  Permission is  granted
-to copy, distribute and/or modify this document under  the terms of the
-GNU GPL.  Conquest is  <p>
-Copyright (C)1994-2006 by Jon Trulson &lt;jon@radscan.com&gt;
-under the ARTISTIC License. <p>
-Original VAX/VMS Ratfor Conquest: <p>
-Copyright
-(C)1983-1986 by Jef Poskanzer and Craig Leres.  Permission to use, copy,
-modify, and distribute this software and its documentation for any purpose
-and without fee is hereby granted, provided that this copyright notice
-appear in all copies and in all supporting documentation. Jef Poskanzer
-and Craig Leres make no representations about the suitability of this software
-for any purpose. It is provided "as is" without express or implied warranty.
-<p>
+This manual page was originally written
+by Clint Adams &lt;schizo@debian.org&gt; for the <b>Debian</b> system (but may be used
+by others).  Permission is granted to copy, distribute and/or modify this
+document under the terms of the GNU GPL. Conquest is <p>
+Copyright (C)1994-2006
+by Jon Trulson &lt;jon@radscan.com&gt; under the ARTISTIC License. <p>
+Original VAX/VMS
+Ratfor Conquest: <p>
+Copyright (C)1983-1986 by Jef Poskanzer and Craig Leres.
+ Permission to use, copy, modify, and distribute this software and its
+documentation for any purpose and without fee is hereby granted, provided
+that this copyright notice appear in all copies and in all supporting documentation.
+Jef Poskanzer and Craig Leres make no representations about the suitability
+of this software for any purpose. It is provided "as is" without express
+or implied warranty. 
+<p> <p>
 
 <hr><p>
 <a name='toc'><b>Table of Contents</b></a><p>

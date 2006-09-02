@@ -20,44 +20,41 @@ conqai -- Conquest AI override program
 <b>conqai</b> [<b>-r</b>]   
 <h2><a name='sect2' href='#toc2'>Description</a></h2>
 <p>
-This
-manual page documents briefly the  <b>conqai</b> command.  <p>
-This manual page was
-written for the <b>Debian</b> distribution  because the original program does
-not have a manual page.  Instead, it has documentation in plain text format;
-see below.  <p>
-<b>conqai</b> is a program that allows  suitably privileged individuals
-to take over robot control from the  Conquest driver, for debugging purposes.
- <p>
-The root user is always a Conquest Operator (CO) and therefore  can run
-the conqoper program.  If you want to allow other people to  be CO's, you
-will need to add them to the conquest group.   <br>
- 
+<b>conqai</b>
+is a program that allows suitably privileged individuals to take over robot
+control from the Conquest driver for debugging purposes.  In order to use
+this command, you must be a member of the conquest group (or root).  This
+command is used strictly for debugging the AI code.  When you run it, it
+will tell the driver to relinquish control of the robot AI and turn it
+over to <b>conqai</b>. <p>
+When finished with your debugging, do not forget to return
+AI control back to the Conquest driver with the <i>-r</i> option.  If you fail to
+do this, then the robots will stand around doing nothing unless <b>conqai</b>
+is running. <p>
+
 <h2><a name='sect3' href='#toc3'>Options</a></h2>
 
 <dl>
 
 <dt><b>-r</b>         </dt>
-<dd>Return control of the robots to the Conquest driver. 
-Be sure to do this after you are finished running conqai to debug the AI,
-otherwise the robots won't do anything but sit there. </dd>
+<dd>Return control of the robots to the Conquest
+driver.  Be sure to do this after you are finished running conqai to debug
+the AI, otherwise the robots won't do anything but sit there. </dd>
 </dl>
 
 <h2><a name='sect4' href='#toc4'>See Also</a></h2>
 <p>
-<a href='conquest.6.html'>conquest (6)</a>
-,
-<a href='conqoper.6.html'>conqoper (6)</a>
+<a href='conquest.6.html'>conquest
+(6)</a>
+, <a href='conqoper.6.html'>conqoper (6)</a>
 , <a href='conqstrat.6.html'>conqstrat (6)</a>
-.  <p>
-The programs are documented in text files
-present in  /usr/share/doc/conquest/ .  
+.  
 <h2><a name='sect5' href='#toc5'>Author</a></h2>
 <p>
-This manual page was written
-by Clint Adams &lt;schizo@debian.org&gt; for  the <b>Debian</b> system (but may be used
-by others).  Permission is  granted to copy, distribute and/or modify this
-document under  the terms of the GNU GPL.  Conquest is  <p>
+This manual page was originally
+written by Clint Adams &lt;schizo@debian.org&gt; for the <b>Debian</b> system (but may
+be used by others).  Permission is granted to copy, distribute and/or modify
+this document under the terms of the GNU GPL.  Conquest is <p>
 Copyright (C)1994-2006
 by Jon Trulson &lt;jon@radscan.com&gt; under the ARTISTIC License. <p>
 Original VAX/VMS
