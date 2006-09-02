@@ -597,10 +597,18 @@ void clog(char *fmt, ...)
 	{
 	  if ((tmp = creat(errfile, 0660)) == -1)
 	    {
+
               if (!nowarn)
-                fprintf(stderr, "clog(): creat(%s): %s\n",
-                        errfile,
-                        strerror(errno));
+                {
+                  /* don't tell telnet users about logfile
+                     creation failures */
+                  if (!confGetTelnetClientMode())
+                    fprintf(stderr, "clog(): creat(%s): %s\n",
+                            errfile,
+                            strerror(errno));
+                  else
+                    nowarn = TRUE;
+                }
 	      
               if (!systemlog)
                 {

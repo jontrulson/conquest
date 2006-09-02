@@ -182,6 +182,7 @@ CEXTERN SysConf_t SysConf;
 
 				/* local function declarations */
 void confSetTelnetClientMode(int telnetc);
+int confGetTelnetClientMode(void);
 CEXTERN int GetSysConf(int checkonly);
 CEXTERN int GetConf(int usernum);
 CEXTERN int MakeSysConf(void);

@@ -929,7 +929,7 @@ void conqds( int multiple, int switchteams )
   cprintf(lin,0,ALIGN_CENTER,"#%d#%s",NoColor, "Options:");
   
   col = 13;
-  lin+=2;
+  lin++;
   i = lin;
   cprintf(lin,col,ALIGN_NONE,sfmt, 'e', "enter the game");
   if ( Context.hasnewsfile )

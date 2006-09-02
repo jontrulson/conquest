@@ -43,6 +43,11 @@ void confSetTelnetClientMode(int telnetc)
   return;
 }
 
+int confGetTelnetClientMode(void)
+{
+  return telnetClient;
+}
+
 /* set default sys config */
 static void setSysConfDefaults(void)
 {
