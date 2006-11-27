@@ -9,9 +9,41 @@
 
                               Conquest HISTORY
 
-8.2-snd1 (???) 11/26/2006
+8.2a (devel) 11/27/2006
 
-       - getting close to a devel release.
+       - Added sound support using SDL and the SDL_mixer API based on
+         patches and samples from Cataboligne.  
+
+         This version supports sound effects for phasers, torps,
+         explosions, and pile of other things.
+
+         In addition, an optional 'musicpak' tarball provides some
+         appropriate Conquest music to listen to during your campaign
+         of terror.
+
+         The musicpak is located on the webpage with the source
+         tarball and can be installed by unpacking it into your
+         ~/.conquest/ directory.
+
+         SDL and SDL_mixer development header files and libs are
+         required.  All sound effects and music are supplied in OGG
+         Vorbis (.ogg) format.  I believe all linux systems at least,
+         support OGG in their SDL implementation.    
+
+         Sound is only supported in the OpenGL (conquestgl) client. 
+
+         I have to say thanks again to Mr. Cataboligne - sound is a
+         definite improvment to the Conquest experience :)
+
+       The following is a somewhat more detailed log of the sound
+       work.  You do not really need to read it unless you are curious
+       about the details :)
+
+       - Add option (-S) to disable sound in conquestgl.
+
+       - Effect and Music volume (if you installed the musicpak) are
+         configurable from the options page.  Sounds, like textures,
+         can be overridden by the user.
 
        - moved the music into a seperate area in the repository
          (music/).  Music is packaged in it's own tarball since it's
