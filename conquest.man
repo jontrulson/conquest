@@ -90,6 +90,12 @@ packets.  If you have problems with a server \- for example, you
 always wind up stuck in the middle of Murisak when you enter the game,
 try disabling UDP with this option.
 
+.TP 8
+.B \-S
+Disable sound support.  If \fBconquestgl\fP was compiled with sound
+support, then this option will disable the playing of all music and
+effects.  OpenGL client only. 
+
 .SH "IMPORTANT COMMANDS"
 .PP
 This section lists the basic commands of Conquest.  The next section

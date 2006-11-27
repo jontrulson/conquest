@@ -199,7 +199,7 @@ static int nCPHelpInput(int ch)
   /* go back */
 
   setONode(NULL);
-  nCPInit();
+  nCPInit(FALSE);
 
   return NODE_OK;
 }

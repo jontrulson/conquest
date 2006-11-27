@@ -217,7 +217,7 @@ void clrPrompt(int line);
 void setPrompt(int line, char *prompt, int pcolor,
                char *buf, int color);
 void setHeading(char *);
-void setWarp(char *);
+void setWarp(real);
 void setKills(char *);
 void setFuel(int, int);
 void setShields(int, int);
@@ -245,7 +245,7 @@ void drawLineBox(GLfloat x, GLfloat y,
                  GLfloat lw);
 void drawQuad(GLfloat x, GLfloat y, GLfloat w, GLfloat h, GLfloat z);
 void drawTexQuad(GLfloat x, GLfloat y, GLfloat w, GLfloat h, GLfloat z);
-void drawExplosion(GLfloat x, GLfloat y, int snum, int torpnum);
+void drawExplosion(GLfloat x, GLfloat y, int snum, int torpnum, int scale);
 void drawBombing(int snum);
 
 void dspInitData(void);

@@ -30,11 +30,11 @@
 #include "gldisplay.h"
 #include "textures.h"
 
+#include "cqsound.h"
+
 /*
  Cataboligne - multi lingual giant conquest title
 */
-
-#define TITLE(x)  100 + x
 
 
 int _GLError(const char *funcname, const char *filename, int line)
@@ -59,6 +59,7 @@ void mglConqLogo(dspConfig_t *dsp, bool mult)
   static int firstime = TRUE;
   static GLint logos[NUMPLAYERTEAMS]; /* texid for each team */
   static GLColor_t colors[NUMPLAYERTEAMS]; /* colors for each */
+
   h = dsp->ppRow * 5.0;
   w = (dsp->wW * 0.70);
 
@@ -69,14 +70,14 @@ void mglConqLogo(dspConfig_t *dsp, bool mult)
   if (firstime)
     {                           /* init the texids */
       int i;
-      char buffer[64];
+      char buffer[CQI_NAMELEN];
 
       firstime = FALSE;
 
       for (i=0; i<NUMPLAYERTEAMS; i++)
         {
           int ndx;
-          snprintf(buffer, 64 - 1, "conqlogo%c", 
+          snprintf(buffer, CQI_NAMELEN - 1, "conqlogo%c", 
                    Teams[i].name[0]);
 
           if ((ndx = findGLTexture(buffer)) >= 0)
@@ -94,6 +95,7 @@ void mglConqLogo(dspConfig_t *dsp, bool mult)
                    __FUNCTION__, buffer);
             }
         }
+
     }
 
   /* Cataboligne - new title set */
@@ -118,8 +120,10 @@ void mglConqLogo(dspConfig_t *dsp, bool mult)
       glDisable(GL_BLEND);
     }
   else
-    glfRender(x, y, 0.0, w, h, fontLargeTxf, Conquest, RedLevelColor, 
-              NULL, TRUE, FALSE, TRUE);
+    {
+      glfRender(x, y, 0.0, w, h, fontLargeTxf, Conquest, RedLevelColor, 
+                NULL, TRUE, FALSE, TRUE);
+    }
   
   drawLineBox(x, y + (h / 20.0),
               w,
@@ -130,21 +134,62 @@ void mglConqLogo(dspConfig_t *dsp, bool mult)
   return;
 }
 
-/* this is cheesy, but glut does not provide a bell. */
-void mglBeep(void)
+void mglBeep(int type)
 {
   static Display *dpy = NULL;
   time_t i;
-  static time_t old = 0;
-
-  if (dpy == NULL)
-    dpy = XOpenDisplay(NULL);
+  static time_t old = 0, oldmsg = 0, olderr = 0;
+  static int beep_alertfx = -1;
+  static int beep_msgfx = -1;
+  static int beep_errfx = -1;
 
   i = time(0);
 
-  if (i != old)
+  /* the effects way */
+  if (CQS_ISENABLED(CQS_EFFECTS))
     {
+      if (beep_alertfx == -1)
+        beep_alertfx = cqsFindEffect("beep-alert");
+      if (beep_msgfx == -1)
+        beep_msgfx = cqsFindEffect("beep-msg");
+      if (beep_errfx == -1)
+        beep_errfx = cqsFindEffect("beep-err");
+
+      switch (type)
+        {
+        case MGL_BEEP_ERR:
+          if (i != olderr)
+            {
+              cqsEffectPlay(beep_errfx, 0, 0, 0);
+              olderr = i;
+            }
+          break;
+        case MGL_BEEP_MSG:
+          if (i != oldmsg)
+            {
+              cqsEffectPlay(beep_msgfx, 0, 0, 0);
+              oldmsg = i;
+            }
+          break;
+        case MGL_BEEP_ALERT:
+        default:
+          if (i != old)
+            {
+              cqsEffectPlay(beep_alertfx, 0, 0, 0);
+              old = i;
+            }
+          break;
+        }
+    }
+  else if (old != i)
+    {
+      /* this is cheesy, but glut does not provide a bell. */
+
       old = i;
+      
+      if (dpy == NULL)
+        dpy = XOpenDisplay(NULL);
+      
       if (dpy)
         {
           XBell(dpy, 0);

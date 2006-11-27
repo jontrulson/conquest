@@ -1,0 +1,223 @@
+# Music definitions by Cat for Conquest.
+#
+# $Id$
+#
+
+# This file belongs in your ~/.conquest/ directory.  Any music files
+# in sound/ go in your ~/.conquest/sound/ directory.  You can just
+# unpack the whole musicpak file in your ~/.conquest/ directory to
+# make sure everything goes where it should.
+
+
+# General Music
+#
+###############
+
+music {
+  name         "intro"  
+  filename     "TOS-intro"
+
+  fadeinms     0
+  fadeoutms    1000
+  loops        1
+  limit        1
+}
+
+music {
+  name         "doomsday"  
+  filename     "TOS-doom"
+
+  fadeinms     0
+  fadeoutms    1000
+  loops        1
+  limit        1
+}
+
+music {
+  name         "doomsday-in"  
+  filename     "TOS-doomin"
+
+  fadeinms     0
+  fadeoutms    1000
+  loops        1
+  limit        1
+}
+
+music {
+  name         "doomsday-kill"  
+  filename     "TOS-doomkill"
+
+  fadeinms     0
+  fadeoutms    1000
+  loops        1
+  limit        1
+}
+
+
+# feds
+music {
+  name         "shipF-intro"
+  filename     "TOS-fintro"
+
+  fadeinms     0
+  fadeoutms    1000
+  loops        1
+  limit        1
+}
+
+music {
+  name         "shipF-battle"  
+  filename     "ST2-fbattle"
+
+  fadeinms     0
+  fadeoutms    1000
+  loops        1
+  limit        1
+}
+
+music {
+  name         "shipF-approach"  
+  filename     "TOS-fapproach"
+
+  fadeinms     0
+  fadeoutms    1000
+  loops        1
+  limit        1
+}
+
+music {
+  name         "shipF-theme"  
+  filename     "TOS-ftheme1"
+
+  fadeinms     0
+  fadeoutms    1000
+  loops        1
+  limit        1
+}
+
+
+# roms
+music {
+  name         "shipR-intro"  
+  filename     "TOS-rintro"
+
+  fadeinms     0
+  fadeoutms    1000
+  loops        1
+  limit        1
+}
+
+music {
+  name         "shipR-battle"  
+  filename     "TOS-rbattle"
+
+  fadeinms     0
+  fadeoutms    1000
+  loops        1
+  limit        1
+}
+
+music {
+  name         "shipR-approach"  
+  filename     "TOS-rapproach"
+
+  fadeinms     0
+  fadeoutms    1000
+  loops        1
+  limit        1
+}
+
+music {
+  name         "shipR-theme"  
+  filename     "TOS-rtheme1"
+
+  fadeinms     0
+  fadeoutms    1000
+  loops        1
+  limit        1
+}
+
+# kli
+music {
+  name         "shipK-intro"  
+  filename     "STMP-kintro"
+
+  fadeinms     0
+  fadeoutms    1000
+  loops        1
+  limit        1
+}
+
+music {
+  name         "shipK-battle"  
+  filename     "ST3-kbattle"
+
+  fadeinms     0
+  fadeoutms    1000
+  loops        1
+  limit        1
+}
+
+music {
+  name         "shipK-approach"  
+  filename     "STMP-kapproach"
+
+  fadeinms     0
+  fadeoutms    1000
+  loops        1
+  limit        1
+}
+
+music {
+  name         "shipK-theme"  
+  filename     "ST3-ktheme1"
+
+  fadeinms     0
+  fadeoutms    1000
+  loops        1
+  limit        1
+}
+
+
+# ori 
+music {
+  name         "shipO-intro"
+  filename     "ointro"
+
+  fadeinms     0
+  fadeoutms    1000
+  loops        1
+  limit        1
+}
+
+music {
+  name         "shipO-battle"  
+  filename     "obattle"
+
+  fadeinms     0
+  fadeoutms    1000
+  loops        1
+  limit        1
+}
+
+music {
+  name         "shipO-approach"  
+  filename     "oapproach"
+
+  fadeinms     0
+  fadeoutms    1000
+  loops        1
+  limit        1
+}
+
+music {
+  name         "shipO-theme"  
+  filename     "otheme"
+
+  fadeinms     0
+  fadeoutms    1000
+  loops        1
+  limit        1
+}
+
+

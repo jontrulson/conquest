@@ -28,6 +28,9 @@
 
 #include "node.h"
 
+#include "cqsound.h"
+
+
 #include <GL/gl.h>
 #include <GL/glu.h>
 #include <GL/glx.h>
@@ -100,7 +103,7 @@ void display( int snum, int display_info )
   static int DamageAttrib = 0;
   int color;
   GLfloat glx, gly;
-
+  
   setXtraInfo();
   setAlertBorder(alertcolor(AlertLevel));
 
@@ -343,19 +346,22 @@ void display( int snum, int display_info )
      blending of explosions works on the ships. */
   for ( i = 1; i <= MAXSHIPS; i = i + 1 )
     {
-      if ( ! lsmap )
+      /* explosions first */
+      if ( snum < 0 || (snum > 0 && UserConf.DoExplode) ) /* dwp */
+        for ( j = 0; j < MAXTORPS; j = j + 1 )
+          if ( Ships[i].torps[j].status == TS_FIREBALL )
+            {
+              /* First display exploding torps. */
+              if ( GLcvtcoords( cenx, ceny, Ships[i].torps[j].x, 
+                                Ships[i].torps[j].y, scale, &glx, &gly ))
+                { 
+                  drawExplosion(glx, gly, i, j, scale);
+                }
+            }
+
+      if ( ! lsmap ) 
 	{
-	  /* First display exploding torps. */
-	  if ( snum < 0 || (snum > 0 && UserConf.DoExplode) ) /* dwp */
-	    for ( j = 0; j < MAXTORPS; j = j + 1 )
-	      if ( Ships[i].torps[j].status == TS_FIREBALL )
-		if ( GLcvtcoords( cenx, ceny, Ships[i].torps[j].x, 
-                                  Ships[i].torps[j].y, scale, &glx, &gly ))
-		  { 
-		    drawExplosion(glx, gly, i, j);
-		  }
 	  /* Now display the live torps. */
-	  
 	  if (snum > 0)
 	    {			/* a ship */
 
@@ -504,16 +510,7 @@ void display( int snum, int display_info )
     x = Ships[snum].warp;
     if ( x != zzswarp )
       {
-	if ( x >= 0.0 )
-	  {
-	    sprintf( buf, "%2.1f", x );
-	    setWarp(buf);
-	  }
-	else
-	  {
-	    setWarp("Orbit");
-	  }
-	
+        setWarp(x);
 	zzswarp = x;
       }
     
@@ -609,7 +606,12 @@ void display( int snum, int display_info )
     
     /* Damage/repair. */
     if ( Ships[snum].damage > prevdam )
-      dobeep = TRUE;
+      {
+        if ( (Ships[snum].damage - prevdam) > 5 )
+          cqsEffectPlay(teamEffects[Ships[snum].team].hit, 0, 0, 0);
+
+        dobeep = TRUE;
+      }
     prevdam = Ships[snum].damage;
     
     i = round( Ships[snum].damage );
@@ -719,7 +721,7 @@ void display( int snum, int display_info )
   
     if ( dobeep )
       if ( UserConf.DoAlarms )
-	mglBeep();
+	mglBeep(MGL_BEEP_ALERT);
   
   } /* end of ship stats display */
   

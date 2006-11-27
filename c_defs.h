@@ -31,10 +31,6 @@
 #endif
 
 #if defined(HAVE_UNISTD_H)
-# if defined(LINUX)
-#  define _XOPEN_SOURCE
-#  define __USE_XOPEN		/* Why? */
-# endif
 # include <unistd.h>
 #endif 
 

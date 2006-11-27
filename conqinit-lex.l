@@ -103,6 +103,22 @@ deltay                 {return ( DELTAY );}
 deltaz                 {return ( DELTAZ );}
 deltas                 {return ( DELTAS );}
 
+soundconf              {return ( SOUNDCONF );}
+samplerate             {return ( SAMPLERATE );}
+volume                 {return ( VOLUME );}
+pan                    {return ( PAN );}
+stereo                 {return ( STEREO );}
+fxchannels             {return ( FXCHANNELS );}
+chunksize              {return ( CHUNKSIZE );}
+
+effect                 {return ( EFFECT );}
+fadeinms               {return ( FADEINMS );}
+fadeoutms              {return ( FADEOUTMS );}
+framelimit             {return ( FRAMELIMIT );}
+limit                  {return ( LIMIT );}
+
+music                  {return ( MUSIC );}
+
 {number}		{ 
                           yylval.num = atoi( yytext );
                           return NUMBER;

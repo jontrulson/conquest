@@ -594,9 +594,6 @@
 #define UT_LOCAL (0)
 #define UT_REMOTE (1)
 
-#define TEXFILEMAX 64           /* maximum lenth of a texture filename (no
-                                   path) */
-
 /* Macros, here order is important. */
 
 #define my_rint(x) ((real)floor((x) + 0.5)) /* standard round. */

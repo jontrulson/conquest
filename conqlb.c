@@ -446,7 +446,10 @@ void clbKillShip( int snum, int kb )
 /* does NO LOCKING, so only use from the client */
 int clbCheckLaunch(int snum, int number)
 {
-  register int i;
+  int i;
+
+  if (Ships[snum].wfuse > 0)
+    return FALSE;               /* weapons overloaded */
 
   if (number == 0)
     return TRUE;

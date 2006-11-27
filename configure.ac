@@ -4,7 +4,7 @@ dnl
 dnl $Id$
 dnl
 
-AC_INIT([conquest],[8.1],[jon@radscan.com])
+AC_INIT([conquest],[8.2],[jon@radscan.com])
 AC_CONFIG_HEADER(config.h)
 
 dnl disable static libs by default
@@ -35,6 +35,16 @@ AC_ARG_WITH(conquest-group,
 AC_ARG_ENABLE(gl,
   [  --disable-gl  Don't build the OpenGL bits.],
   GLCLIENT="", GLCLIENT="yes")
+
+AC_ARG_ENABLE(sound,
+  [  --disable-sound  Don't enable sound support.],
+  SNDCLIENT="", SNDCLIENT="yes")
+
+dnl can't have sound without gl
+if ! test -n "$GLCLIENT"
+then
+  SNDCLIENT=""
+fi
 
 AC_MSG_CHECKING(system type)
 uname=`uname -s`
@@ -154,7 +164,8 @@ AC_CHECK_HEADERS(fcntl.h limits.h sys/ioctl.h sys/times.h termio.h unistd.h)
 AC_CHECK_HEADERS(ncurses.h term.h sys/time.h sys/select.h stropts.h poll.h)
 AC_CHECK_HEADERS(curses.h time.h string.h strings.h termios.h zlib.h)
 AC_CHECK_HEADERS(stdint.h dirent.h)
-AC_CHECK_HEADERS(GL/glut.h GL/gl.h GL/glu.h)
+
+AC_CHECK_HEADERS(GL/glut.h GL/gl.h GL/glu.h, :, GLCLIENT=""; SNDCLIENT="")
 
 dnl Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
@@ -188,10 +199,43 @@ main()
 ]])],[AC_MSG_RESULT(yes)
   AC_DEFINE(SYS_ERRLIST_DECLARED, 1, [sys_errlist declared])],[AC_MSG_RESULT(no)],[:])
 
+dnl see if we should check for SLD and friends
+if test -n "$SNDCLIENT"
+then
+
+dnl Check for SDL
+SDL_VERSION=1.2.0
+AM_PATH_SDL($SDL_VERSION,
+            CONQ_CFLAGS="$CONQ_CFLAGS -DHAVE_SDL=1",
+            AC_MSG_ERROR([*** SDL version $SDL_VERSION not found!])
+)
+CONQ_CFLAGS="$CONQ_CFLAGS $SDL_CFLAGS"
+
+dnl Check for SDL_mixer
+AC_CHECK_LIB(SDL_mixer, Mix_OpenAudio, CONQ_CFLAGS="$CONQ_CFLAGS -DHAVE_SDL_MIXER=1"; LIBS="-lSDL_mixer $LIBS", AC_MSG_ERROR([*** SDL_mixer not found!]))
+
+fi
+
 AM_CONDITIONAL(GLCLIENT, test $GLCLIENT)
+AM_CONDITIONAL(SNDCLIENT, test $SNDCLIENT)
 
 AC_CONFIG_FILES([Makefile])
 AC_OUTPUT
+
+echo
+if ! test -n "$GLCLIENT"
+then
+        echo "### OpenGL support is disabled"
+else
+        echo "### OpenGL support is enabled"
+fi
+
+if ! test -n "$SNDCLIENT"
+then
+        echo "### SDL sound support is disabled"
+else
+        echo "### SDL sound support is enabled"
+fi
 
 
 

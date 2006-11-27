@@ -41,6 +41,8 @@
 #include "GL.h"
 #include "nCP.h"
 
+#include "cqsound.h"
+
 /* node specific states */
 #define S_NONE         0
 #define S_COURSE       1        /* setting course */
@@ -125,6 +127,13 @@ extern dspData_t dData;
 static Unsgn32 pingStart = 0;
 static int pingPending = FALSE;
 
+/* bombing effect */
+static int bombingfx;
+static cqsHandle bombingHandle;    /* so we can stop it */
+
+/* ack alert klaxon with <ESC> - Cataboligne */
+extern cqsHandle alertHandle;
+
 /* common output */
 #define cp_putmsg(str, lin)  setPrompt(lin, NULL, NoColor, str, NoColor)
 
@@ -153,6 +162,9 @@ static animQue_t animQue;
 
 /* team torp anim states (exported) */
 animStateRec_t ncpTorpAnims[NUMPLAYERTEAMS];
+
+/* storage for the beam up/down sound handles */
+static cqsHandle beamHandle = CQS_INVHANDLE;
 
 /* convert a KP key into an angle */
 static int _KPAngle(int ch, real *angle)
@@ -510,7 +522,7 @@ static void _infoplanet( char *str, int pnum, int snum )
     {
       cp_putmsg( "No such planet.", MSG_LIN1 );
       clrPrompt(MSG_LIN2);
-      cerror("_infoplanet: Called with invalid pnum (%d).",
+      clog("_infoplanet: Called with invalid pnum (%d).",
 	     pnum );
       return;
     }
@@ -704,6 +716,9 @@ static void _dowarp( int snum, real warp )
   
   sprintf( cbuf, "Warp %d.", (int) warp );
   cp_putmsg( cbuf, MSG_LIN1 );
+
+  /* we set it locally since the server won't send it to us */
+  Ships[snum].dwarp = warp;
   
   return;
   
@@ -745,8 +760,14 @@ static void _dophase( real dir )
   /* we used to do some pre-checks here, but depending on lag,
      these checks can be racy.  Now we will send the command regardless
      of what things look like locally, and let the server deal with it. */
-  
+
+  /*  Cataboligne - sound code 10.16.6 */
+  if ( Ships[Context.snum].pfuse == 0 && 
+       clbUseFuel( Context.snum, PHASER_FUEL, TRUE, FALSE ) )
+    cqsEffectPlay(teamEffects[Ships[Context.snum].team].phaser, 0, 0, 0);
+ 
   cp_putmsg( "Firing phasers...", MSG_LIN2 );
+
   sendCommand(CPCMD_FIREPHASER, (Unsgn16)(dir * 100.0));
 
   return;
@@ -759,6 +780,16 @@ static void _dotorp(real dir, int num)
      these checks can be racy.  Now we will send the command regardless
      of what things look like locally, and let the server deal with it. */
   
+  if ( clbCheckLaunch( Context.snum, num ) ) 
+    {
+      /* Cat - torp fired sound */
+
+      if (num > 1) 
+        cqsEffectPlay(teamEffects[Ships[Context.snum].team].torp3, 0, 0, 0);
+      else
+        cqsEffectPlay(teamEffects[Ships[Context.snum].team].torp, 0, 0, 0);
+    }
+
   sendFireTorps(num, dir);
   clrPrompt(MSG_LIN1);
 
@@ -842,10 +873,12 @@ static void _doinfo( char *buf, char ch )
   else
     {
       cp_putmsg( "I don't understand.", MSG_LIN2 );
+      return;
     }
-  
-  return;
-  
+
+/* Cataboligne - Spocks viewer sound */
+  if (rnd() < 0.4)
+    cqsEffectPlay(teamEffects[Ships[Context.snum].team].info, 0, 0, 0);
 }
 
 
@@ -1917,6 +1950,16 @@ static void _dobeam(char *buf, int ch)
 
   /* detail is (armies & 0x00ff), 0x8000 set if beaming down */
 
+  /* start the effects */
+  if (dirup)
+    cqsEffectPlayTracked(teamEffects[Ships[Context.snum].team].beamu, 
+                         &beamHandle,
+                         0, 0, 0);
+  else
+    cqsEffectPlayTracked(teamEffects[Ships[Context.snum].team].beamd, 
+                         &beamHandle,
+                         0, 0, 0);
+
   sendCommand(CPCMD_BEAM, 
 	      (dirup) ? (Unsgn16)(num & 0x00ff): 
 	      (Unsgn16)((num & 0x00ff) | 0x8000));
@@ -1986,7 +2029,7 @@ static void command( int ch )
 	}
       else
 	{
-          mglBeep();
+          mglBeep(MGL_BEEP_ERR);
           cp_putmsg( "Type h for help.", MSG_LIN2 );
 	}
       break;
@@ -2224,7 +2267,7 @@ static void command( int ch )
             }
         }
       else
-        mglBeep();
+        mglBeep(MGL_BEEP_ERR);
       break;
     case 'R':				/* repair mode */
       clrPrompt(MSG_LIN1);
@@ -2302,6 +2345,15 @@ static void command( int ch )
       _doinfo(cbuf, TERM_NORMAL);
       break;
 
+/* ack red alert by turning klaxon off  Cataboligne - sound code 11.14.6 */
+    case TERM_ABORT:
+      if (alertHandle != CQS_INVHANDLE)
+        {
+        cqsEffectStop(alertHandle, FALSE);
+        alertHandle = CQS_INVHANDLE;
+        }
+      break;
+
     case ' ':
       if (SMAP(snum))
         UserConf.DoLocalLRScan = !UserConf.DoLocalLRScan;
@@ -2322,7 +2374,7 @@ static void command( int ch )
 
       /* nothing. */
     default:
-      mglBeep();
+      mglBeep(MGL_BEEP_ERR);
       cp_putmsg( "Type h for help.", MSG_LIN2 );
     }
   
@@ -2330,9 +2382,199 @@ static void command( int ch )
   
 }
 
+/*
+  Cataboligne - 11.15.6 - theme players for:
+  - doomsday music
+  - theme sounds (random selection? - need a text file with 1 
+    song per line, with possible complete path)
+  - ship travel sounds (approach, battle, theme)
+*/
 
-void nCPInit(void)
+/*
+  play various theme music
+  
+  on approach - play music theme for team ships, 
+    default when no others supplied
+  (actually happens in a certain distance range)
+  
+*/
+
+/*
+ theme music data from .soundsrc - doesnt seem to be in cqi file...hrm
+ min distance
+ max distance
+ wait time in millis
+ percentage
+*/
+#define BATTLE_MAXDIS 2200.0
+#define BATTLE_MINDIS 1000.0
+#define BATTLE_PROB 0.70        /* chance to play battle music */
+#define APPROACH_MINDIS 1000.0
+#define APPROACH_MAXDIS 1700.0
+#define APPROACH_PROB 0.40      /* chance to play approach music */
+#define THEME_PROB 0.30         /* chance to play random theme music */
+
+static void themes()
 {
+  real dis;
+  int mus = -1;                 /* the music we might play */
+  real odist = max(BATTLE_MAXDIS, APPROACH_MAXDIS);
+  int snum = Context.snum;
+  int warlike;
+  real prob = rnd();
+  int i;
+
+  if (cqsMusicPlaying()) 
+    return;
+
+  /* go through each ship. */
+
+  warlike = FALSE;
+  for ( i = 1; i <= MAXSHIPS; i++ )
+    {
+      int atwar = satwar(snum, i);
+
+      if (i == snum)
+        continue;               /* don't care about our ship */
+
+      if ( Ships[i].status != SS_LIVE )
+        continue;               /* don't care about the non-living */
+
+      /* check range */
+      dis = distf( Ships[snum].x, Ships[snum].y, 
+                   Ships[i].x, Ships[i].y );
+      
+      if (atwar && (dis > BATTLE_MAXDIS || dis < BATTLE_MINDIS))
+      {
+        continue;               /* not in the right 'battle range band' */
+      }
+
+      if (!atwar && (dis > APPROACH_MAXDIS || dis < APPROACH_MINDIS))
+        {
+          continue;
+        } /* not on the right approach range */
+
+      /* if we've already found a warlike ship, and this ship
+         is not at war with you, we should ignore it. */
+      if (warlike && !atwar)
+        {
+          continue;
+        }
+
+      /* see if we already found one closer */
+      if (dis >= odist)
+        {
+          continue;
+        }
+
+      odist = dis;
+
+      /* by now, we have found a closer living ship in range, choose
+         the right music.  We give priority to warlike ships, so if
+         we've already found one, it will not be overridden by the fact
+         that a friendly ship is closer.  */
+
+      if (atwar)
+        {
+          warlike = TRUE;
+          mus = teamMusic[Ships[i].team].battle;
+        }
+      else if (!warlike /*&& Ships[Context.snum].team == Ships[i].team*/)
+        mus = teamMusic[Ships[i].team].approach;
+    }
+  
+  /* now, either we found some theme music to play or we didn't.  If we
+     did, play it, else choose a random team's theme music */
+
+  if (mus >= 0)
+    {
+      /* return if the probabilities are not with us */
+      if (warlike && (prob > BATTLE_PROB))
+        return;
+      else if (prob > APPROACH_PROB)
+        return;
+
+      /* play it */
+      cqsMusicPlay(mus, FALSE);
+      return;
+    }
+
+  /* see if the stars are with us */
+  if (prob > THEME_PROB)
+    return;                     /* nope */
+
+  /* if we are here, choose a random team song to play.  We randomly
+     choose a team, and to provide some variation, we randomly choose
+     the team's intro or theme music */
+  
+  /* first choose whether we will play theme or intro music */
+  if (rnd() < 0.5)
+    mus = teamMusic[rndint(0, NUMPLAYERTEAMS - 1)].theme;
+  else
+    mus = teamMusic[rndint(0, NUMPLAYERTEAMS - 1)].intro;
+
+  /* now play it */
+  cqsMusicPlay(mus, FALSE);
+
+  /* done */
+  return;
+}
+
+/* play doomsday theme music for nearby players if flags allow -
+   dis is distance to doomsday */
+
+/* play intro first when within this range */
+#define DOOM_INTRODIS 2200.0
+/* play kill music if in this range and self destructing */
+#define DOOM_KILLDIS 1400.0
+/* play doomsday main theme when in this range */
+#define DOOM_MUSDIS 1800.0
+
+static void doomsday_theme (void)
+{
+  real dis = dist( Ships[Context.snum].x, Ships[Context.snum].y, 
+                   Doomsday->x, Doomsday->y );
+  static int first_doom = 0;
+  
+  if (Doomsday->status != DS_LIVE)
+    return;
+
+  /* doomsday music theme for ships nearby */
+  
+  /* first sight of doomsday - wait for other themes */
+  if (first_doom < 2 && dis < DOOM_INTRODIS && !cqsMusicPlaying())
+    {
+      cqsMusicPlay(doomMusic.doomin, FALSE);
+      first_doom = 2;                                                                     /* intro music only plays once */
+    }
+  else if (Ships[Context.snum].sdfuse > 0 && 
+           dis < DOOM_KILLDIS && first_doom != 3)
+    {                           /* self destructing & doom < 1000.0 */
+      /*
+        this is a 37 sec sample -
+        would be real nice if it could be timed so the last 10
+        secs play with the ship explosion...
+        NOTE: for this to happen we would have to start 12 secs
+        prior to the player init of self destruct
+        
+        fix - we really want to fade any other music instantly - no delays
+      */
+      cqsMusicPlay(doomMusic.doomkill, FALSE);
+      first_doom = 3;   /* dont restart playing this */
+    }
+  else if (dis < DOOM_MUSDIS && !cqsMusicPlaying())
+    {
+      cqsMusicPlay(doomMusic.doom, FALSE);
+      first_doom = 4;   /* enable kill music if it played once already */
+    }
+}
+
+
+void nCPInit(int istopnode)
+{
+  static int introsPlayed[NUMPLAYERTEAMS];
+  char buf[CQI_NAMELEN];
+
   prompting = FALSE;
   state = S_NONE;
   clientFlags = 0;
@@ -2344,6 +2586,7 @@ void nCPInit(void)
   pingPending = FALSE;
   pingStart = 0;
 
+  /* first time through */
   if (!nCPNode.animQue)
     {
       int i;
@@ -2376,9 +2619,9 @@ void nCPInit(void)
       /* now setup the team torp animators */
       for (i=0; i<NUMPLAYERTEAMS; i++)
         {
-          char nm[TEXFILEMAX];
+          char nm[CQI_NAMELEN];
 
-          snprintf(nm, TEXFILEMAX - 1, "ship%c-torp", 
+          snprintf(nm, CQI_NAMELEN - 1, "ship%c-torp", 
                    Teams[i].name[0]);
 
           if (!animInitState(nm, &ncpTorpAnims[i], NULL))
@@ -2387,9 +2630,39 @@ void nCPInit(void)
           else
             animQueAdd(nCPNode.animQue, &ncpTorpAnims[i]);
         }
+
+      /* init the intro music array.  We want to ensure that we play
+         a team-specific intro only once */
+      for (i=0; i<NUMPLAYERTEAMS; i++)
+        introsPlayed[i] = FALSE;
+
+      bombingfx = cqsFindEffect("bombing");
     }
 
+  /* only if we are running this as a topnode frpm nPlay
+     do we want to do this */
+  if (istopnode && !introsPlayed[Ships[Context.snum].team])
+    {
+      introsPlayed[Ships[Context.snum].team] = TRUE;
+      snprintf(buf, CQI_NAMELEN - 1, "ship%c-intro", 
+               Teams[Ships[Context.snum].team].name[0]);
+      cqsMusicPlay(cqsFindMusic(buf), FALSE);
+    }
+  else if (istopnode)
+    {                           /* play the theme music if
+                                   we've already done the intro music
+                                   for this team. */
+      snprintf(buf, CQI_NAMELEN - 1, "ship%c-theme", 
+               Teams[Ships[Context.snum].team].name[0]);
+      cqsMusicPlay(cqsFindMusic(buf), FALSE);
+    }
+  /* else, don't start playing anything */
+
   setNode(&nCPNode);
+
+  /* init this so the warp effects don't kick in incorrectly */
+  if (istopnode)
+    Ships[Context.snum].dwarp = -1;
 
   return;
 }
@@ -2423,18 +2696,21 @@ static int nCPIdle(void)
   int pkttype;
   int now;
   Unsgn8 buf[PKT_MAXSIZE];
-  int difftime = dgrand( Context.msgrand, &now );
+  Unsgn32 difftime = dgrand( Context.msgrand, &now );
   int sockl[2] = {cInfo.sock, cInfo.usock};
   static Unsgn32 iterstart = 0;
   static Unsgn32 pingtime = 0;
+  static Unsgn32 themetime = 0;
   Unsgn32 iternow = clbGetMillis();
-  const Unsgn32 iterwait = 50;   /* ms */
-  const Unsgn32 pingwait = 2000; /* ms (2 seconds) */
+  static const Unsgn32 iterwait = 50;   /* ms */
+  static const Unsgn32 pingwait = 2000; /* ms (2 seconds) */
+  static const Unsgn32 themewait = 5000; /* ms (5 seconds) */
   real tdelta = (real)iternow - (real)iterstart;
 
 
   if (state == S_DEAD)
     {                           /* transfer to the dead node */
+      cqsEffectStop(CQS_INVHANDLE, TRUE);
       nDeadInit();
       return NODE_OK;
     }
@@ -2508,6 +2784,7 @@ static int nCPIdle(void)
 
   if (state == S_BOMBING && lastServerError)
     {                           /* the server stopped bombing for us */
+      cqsEffectStop(bombingHandle, FALSE);
       sendCommand(CPCMD_BOMB, 0); /* to be sure */
       state = S_NONE;
       prompting = FALSE;
@@ -2517,6 +2794,7 @@ static int nCPIdle(void)
 
   if (state == S_BEAMING && lastServerError)
     {                           /* the server stopped beaming for us */
+      cqsEffectStop(beamHandle, FALSE);
       sendCommand(CPCMD_BEAM, 0); /* to be sure */
       state = S_NONE;
       prompting = FALSE;
@@ -2560,7 +2838,7 @@ static int nCPIdle(void)
             if (Msgs[Ships[Context.snum].lastmsg].msgfrom !=
                 Context.snum)
               if (UserConf.MessageBell)
-                mglBeep();
+                mglBeep(MGL_BEEP_MSG);
             
             Context.msgrand = now;
           }
@@ -2572,6 +2850,25 @@ static int nCPIdle(void)
         {                           /* record a frame */
           recordUpdateFrame();
           rftime = iternow;
+        }
+    }
+
+  /*
+    Cataboligne - code for theme checks - 11.20.6
+    calls a theme check for any live ship in game
+    
+    hope this is ok here Jon
+    also perhaps put doomsday_theme check here
+    
+    Jon: "Yes!" :)
+  */
+  if (CQS_ISENABLED(CQS_MUSIC))
+    {
+      if (((iternow - themetime) > themewait))
+        {
+          themetime = iternow;
+          doomsday_theme();
+          themes();
         }
     }
 
@@ -2629,6 +2926,7 @@ static int nCPInput(int ch)
   if (state == S_BOMBING && ch)
     {                           /* aborting */
       iBufPutc(ch);             /* just que it */
+      cqsEffectStop(bombingHandle, FALSE);
       sendCommand(CPCMD_BOMB, 0);
       state = S_NONE;
       prompting = FALSE;
@@ -2640,6 +2938,7 @@ static int nCPInput(int ch)
   if (state == S_BEAMING && ch)
     {                           /* aborting */
       iBufPutc(ch);             /* just que it */
+      cqsEffectStop(beamHandle, FALSE);
       sendCommand(CPCMD_BEAM, 0);
       state = S_NONE;
       prompting = FALSE;
@@ -2869,7 +3168,7 @@ static int nCPInput(int ch)
               clrPrompt(MSG_LIN2);
               prm.buf[0] = EOS;
 	      cp_putmsg( "Press ESCAPE to abort self destruct.", MSG_LIN1 );
-	      mglBeep();
+	      mglBeep(MGL_BEEP_ERR);
             }
           
           break;
@@ -2880,6 +3179,8 @@ static int nCPInput(int ch)
               sendCommand(CPCMD_BOMB, 1);   /* start the bombing */
               state = S_BOMBING;
               prompting = FALSE;
+
+              cqsEffectPlayTracked(bombingfx, &bombingHandle, 0.0, 0.0, 0.0);
               clrPrompt(MSG_LIN1);
             }
           else
@@ -3091,7 +3392,7 @@ static int nCPInput(int ch)
 		}
 	      if (tmsg == lastone)
 		{
-		  mglBeep();
+		  mglBeep(MGL_BEEP_ERR);
 		}
 	      else
 		msg = tmsg;
@@ -3106,7 +3407,7 @@ static int nCPInput(int ch)
 		}
 	      if (tmsg == (lstmsg + 1))
 		{
-		  mglBeep();
+		  mglBeep(MGL_BEEP_ERR);
 		}
 	      else
 		msg = tmsg;

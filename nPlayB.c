@@ -194,9 +194,9 @@ void nPlayBInit(void)
       /* now setup the team torp animators */
       for (i=0; i<NUMPLAYERTEAMS; i++)
         {
-          char nm[TEXFILEMAX];
+          char nm[CQI_NAMELEN];
           
-          snprintf(nm, TEXFILEMAX - 1, "ship%c-torp", 
+          snprintf(nm, CQI_NAMELEN - 1, "ship%c-torp", 
                    Teams[i].name[0]);
           
           if (!animInitState(nm, &ncpTorpAnims[i], NULL))
@@ -454,7 +454,7 @@ static int nPlayBInput(int ch)
           Context.snum = snum;
         }
       else
-        mglBeep();
+        mglBeep(MGL_BEEP_ERR);
 
       break;
 
@@ -491,7 +491,7 @@ static int nPlayBInput(int ch)
               
               if (foundone == FALSE)
                 {
-                  mglBeep();
+                  mglBeep(MGL_BEEP_ERR);
                   break; /* didn't find one, beep, leave everything
                             alone*/
                 }
@@ -560,7 +560,7 @@ static int nPlayBInput(int ch)
               
               if (foundone == FALSE)
                 {
-                  mglBeep();
+                  mglBeep(MGL_BEEP_ERR);
                   break; /* didn't find one, beep, leave everything
                             alone*/
                 }
@@ -607,7 +607,7 @@ static int nPlayBInput(int ch)
       return NODE_OK;
       break;
     default:
-      mglBeep();
+      mglBeep(MGL_BEEP_ERR);
       cp_putmsg( "Type h for help.", MSG_LIN2 );
       break;
     }

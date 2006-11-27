@@ -9,6 +9,6 @@
 #ifndef _NCP_H
 #define _NCP_H
 
-void nCPInit(void);
+void nCPInit(int istopnode);
 
 #endif /* _NCP_H */

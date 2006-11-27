@@ -353,6 +353,16 @@ void drstart(void)
 void gcputime( int *cpu )
 {
   static struct tms Ptimes;
+#ifndef CLK_TCK
+# ifdef LINUX
+   extern long int __sysconf (int);
+#  define CLK_TCK ((__clock_t) __sysconf (_SC_CLK_TCK))
+# else
+#  define CLK_TCK CLOCKS_PER_SEC
+# endif
+#endif
+
+   /* JET - I think this function has outlived it's usefulness. */
   
   times(&Ptimes);
   

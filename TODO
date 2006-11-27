@@ -1,7 +1,13 @@
 
 - BUGS
 
-  NONE :)
+  - protocol
+
+    - Sgn16 (x100) 'rating' in _sp_user is wrong.  either needs to be
+      expanded (Sgn32) or re-scaled (x10).  ratings over 327.0
+      will be wrong otherwise...
+
+  - send dwarp in ship packet so sounds can work better.
 
 - improved configure support
 
@@ -56,8 +62,9 @@
     - maybe if conquest was run with '-m', then when the users quits
       from the main menu, you go back to the meta list?  
 
-  - add more EXEC commands for operators to send to GOD - kill a ship(s),
-    create robot(s), etc...
+  - resignation - preserve history data.
+
+  - prevent team killing (NoTK flag, on by default)
 
 - IP restrictions?
 
@@ -97,6 +104,11 @@
 
   - indicate team war stat below icon?  Use 'team' icons?
 
+  - add option to disable the 'pulse' messages.
+
+  - texcoord {} subsection within a texture {} subsection, so some of
+    Cat's missing stuff could be supported.
+
 - PROTOCOL
 
   - add pads to those structures not having them?
@@ -131,6 +143,12 @@
     - look at some way of allowing triangulation of cloaked ships.
 
   - support downloading of textures from server?
+
+  - meta
+
+    - detect/highlight closed/private servers.  make 'dimmer' sorted
+      last? 
+
 
 - Blue Sky
 

@@ -34,6 +34,18 @@ extern dspData_t dData;
 
 #define GLCOLOR4F(glcol) glColor4f(glcol.r, glcol.g, glcol.b, glcol.a) 
 
+/*
+ Cataboligne - 11.20.6
+ ack alert klaxon with <ESC>
+*/
+#include "cqsound.h"
+
+#define ALERT_OFF 0
+#define ALERT_ON 1
+#define ALERT_ACK 2
+
+cqsHandle alertHandle = CQS_INVHANDLE;
+
 /* critical limits */
 
 /*   shields  < 20
@@ -674,8 +686,8 @@ void renderHud(int dostats)
   static int oldrx = 0;
   static int rxdiff = 0;
   int i;
+  static int ack_alert = 0;
 
-  
   if (!GLTextures)
     return;                     /* don't render until we actually can */
 
@@ -870,6 +882,49 @@ void renderHud(int dostats)
         }
 
       glDisable(GL_BLEND);
+    }
+
+/*
+ Cataboligne - sound code to handle red alert klaxon
+
+ logic - ack_alert inits 0
+ when in red range - if handle is INV meaning sound is off -
+  if ack is OFF play snd, set ack ON
+  if ack is ON - klaxon was turned off with ESC - set ack to ACK
+  when out of red range -
+  set ack to OFF
+  stop sound if playing
+
+  another idea - play sound whenever near a cloaked ship and
+  (CLOAKED) displays if info gotten
+*/
+  if (dData.aStat.alertStatus[0] == 'R' || dData.aStat.alertStatus[0] == 'A')
+    {                   /* alert condition red - check klaxon state */
+      if (alertHandle == CQS_INVHANDLE) /* not playing now */
+        {
+          if (ack_alert == ALERT_OFF) /* was off */
+            {
+              ack_alert = ALERT_ON;
+              cqsEffectPlayTracked(teamEffects[Ships[Context.snum].team].alert, &alertHandle, 0.0, 0.0, 0.0);
+            }
+          else if (ack_alert == ALERT_ON) /* was on - turned off */
+            {
+              ack_alert = ALERT_ACK;  /* been ack'ed in nCP.c with <ESC> */
+            }
+        }
+    }
+  else
+    {
+      /* Cataboligne
+         - idea time out the alert if going beyond the red range?
+         (or just plain stop it here...hmm) */
+      
+      if (alertHandle != CQS_INVHANDLE)
+        {
+          cqsEffectStop(alertHandle, FALSE);
+          alertHandle = CQS_INVHANDLE;
+        }
+      ack_alert = ALERT_OFF; 
     }
   
   /* GL */

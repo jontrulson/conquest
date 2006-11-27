@@ -47,6 +47,7 @@
 #include "nMeta.h"
 
 #include "conqinit.h"
+#include "cqsound.h"
 
 void catchSignals(void);
 void handleSignal(int sig);
@@ -78,6 +79,7 @@ void printUsage()
   printf("    -B              Benchmark mode.  When playing back a recording,\n");
   printf("                    the default playback speed will be as fast as possible.\n");
   printf("    -u              do not attempt to use UDP from server.\n");
+  printf("    -S              disable sound support.\n");
 
                                  
   return;
@@ -134,12 +136,26 @@ static void parseGeometry(char *geom)
   return;
 }
 
-/* utility function to look for and load all .trc files in a given dir */
-static void _loadTRCs(char *cqdir)
+static int _cmpfile(void *cmp1, void *cmp2)
+{
+  char *str1 = *(char **)cmp1;
+  char *str2 = *(char **)cmp2;
+  return(strcmp(str1, str2));
+}
+
+static void _loadRCFiles(int type, char *cqdir, char *suffix)
 {
   char filenm[BUFFER_SIZE];
   DIR *dirp;
   struct dirent *direntp;
+  char **filelist = NULL;
+  char **tmplist = NULL;
+  int numfiles = 0;
+  int i;
+
+  if (!cqdir || !suffix)
+    return;
+
 
   if ((dirp = opendir(cqdir)))
     {
@@ -147,24 +163,71 @@ static void _loadTRCs(char *cqdir)
         {                       /* here, we will just check out the .trc
                                    files */
           int len;
-          static const int trc_len = 4; /* . t r c */
+          int suff_len = strlen(suffix); 
 
           if ((!strcmp(direntp->d_name, "..") ||
                !strcmp(direntp->d_name, ".")))
             continue;
 
           len = strlen(direntp->d_name);
-          if (len < trc_len)
+          if (len < suff_len)
             continue;
           
-          if (!strncmp(&(direntp->d_name[len - trc_len]), ".trc", trc_len)) 
+          if (!strncmp(&(direntp->d_name[len - suff_len]), suffix, suff_len)) 
             {                   /* found one */
-              snprintf(filenm, sizeof(filenm)-1, "%s/%s", 
-                       cqdir,direntp->d_name);
+              char *ptr;
 
-              cqiLoadRC(CQI_FILE_TEXTURESRC_ADD, filenm, 1, 0);
+              snprintf(filenm, sizeof(filenm)-1, "%s/%s", 
+                       cqdir, direntp->d_name);
+
+              if (!(ptr = strdup(filenm)))
+                {
+                  clog("%s: Could not strdup %s, ignoring.",
+                       __FUNCTION__,
+                       filenm);
+
+                }
+
+              /* add it to the list */
+
+              tmplist = (char **)realloc((void *)filelist, 
+                                         sizeof(char *) * 
+                                         (numfiles + 1));
+              
+              if (!tmplist)
+                {  
+                  clog("%s: Could not realloc %d files, ignoring '%s'",
+                       __FUNCTION__,
+                       numfiles + 1,
+                       filenm);
+                  if (ptr)
+                    free(ptr);
+
+                  continue;
+                }
+              
+              filelist = tmplist;
+              filelist[numfiles] = ptr;
+              numfiles++;
             }
         }
+
+      /* now sort it */
+      if (!numfiles)
+        return;
+
+      qsort(filelist, numfiles, sizeof(char *),  
+            (int (*)(const void *, const void *))_cmpfile); 
+
+      /* print them out for testing */
+      for(i=0; i <numfiles; i++)
+        {
+          cqiLoadRC(type, filelist[i], 1, 0);
+          free(filelist[i]);
+        }
+      free(filelist);
+      filelist = NULL;
+      numfiles = 0;
     }
 
   return;
@@ -181,7 +244,7 @@ void loadTextureRCFiles()
   cqiLoadRC(CQI_FILE_TEXTURESRC, NULL, 1, 0);
 
   /* now load any .trc files in there (CONQETC) */
-  _loadTRCs(CONQETC);
+  _loadRCFiles(CQI_FILE_TEXTURESRC_ADD, CONQETC, ".trc");
 
   /* now load any in the users own ~/.conquest/ dir */
   if ((homevar = getenv("HOME")) == NULL)
@@ -190,7 +253,30 @@ void loadTextureRCFiles()
   snprintf(cqdir, sizeof(cqdir)-1, "%s/.conquest", 
            homevar);
 
-  _loadTRCs(cqdir);
+  _loadRCFiles(CQI_FILE_TEXTURESRC_ADD, cqdir, ".trc");
+
+  return;
+}
+
+void loadSoundRCFiles()
+{
+  char cqdir[BUFFER_SIZE];
+  char *homevar;
+
+  /* load the main sound file first */
+  cqiLoadRC(CQI_FILE_SOUNDRC, NULL, 1, 0);
+
+  /* now load any .src files in there (CONQETC) */
+  _loadRCFiles(CQI_FILE_SOUNDRC_ADD, CONQETC, ".src");
+
+  /* now load any in the users own ~/.conquest/ dir */
+  if ((homevar = getenv("HOME")) == NULL)
+    return;
+
+  snprintf(cqdir, sizeof(cqdir)-1, "%s/.conquest", 
+           homevar);
+
+  _loadRCFiles(CQI_FILE_SOUNDRC_ADD, cqdir, ".src");
 
   return;
 }
@@ -206,6 +292,7 @@ int main(int argc, char *argv[])
   int nums = 0;                     /* num servers from metaGetServerList() */
   char *metaServer = META_DFLT_SERVER; 
   metaSRec_t *metaServerList;   /* list of servers */
+  int dosound = TRUE;
 
   Context.entship = FALSE;
   Context.recmode = RECMODE_OFF;
@@ -230,7 +317,7 @@ int main(int argc, char *argv[])
   dspInitData();
 
   /* check options */
-  while ((i = getopt(argc, argv, "fmM:s:r:tP:Bug:")) != EOF)    /* get command args */
+  while ((i = getopt(argc, argv, "fmM:s:r:tP:Bug:S")) != EOF)    
     switch (i)
       {
       case 'B':                 /* Benchmark mode, set frameDelay to 0.0 */
@@ -298,13 +385,18 @@ int main(int argc, char *argv[])
       case 'P':
         rfname = optarg;
         Context.recmode = RECMODE_PLAYING;
+        dosound = FALSE;        /* no sound during playback */
         break;
 
       case 'u':
         cInfo.tryUDP = FALSE;
         break;
+ 
+      case 'S':
+        dosound = FALSE;
+        break;
 
-      default:
+     default:
 	printUsage();
 	exit(1);
       }
@@ -387,7 +479,16 @@ int main(int argc, char *argv[])
 
   /* a parallel universe, it is */
   map_lcommon();
-  
+
+  /* init and load the sounds */
+  if (dosound)
+    {
+      loadSoundRCFiles();
+      cqsInitSound();
+    }
+  else
+    cqsSoundAvailable = FALSE;
+
 #ifdef DEBUG_FLOW
   clog("%s@%d: main() starting conqinit().", __FILE__, __LINE__);
 #endif
@@ -402,6 +503,8 @@ int main(int argc, char *argv[])
   
   uiGLInit(&argc, argv);
   
+  cqsMusicPlay(cqsFindMusic("intro"), FALSE);
+
   Context.maxlin = 25;
   Context.maxcol = 80;
   Context.snum = 0;		/* force menu to get a new ship */
@@ -437,7 +540,7 @@ void catchSignals(void)
 #endif
   
   signal(SIGHUP, (void (*)(int))handleSignal);
-  signal(SIGTSTP, SIG_IGN);
+  /*  signal(SIGTSTP, SIG_IGN);*/
   signal(SIGTERM, (void (*)(int))handleSignal);  
   signal(SIGINT, SIG_IGN);
   signal(SIGQUIT, (void (*)(int))handleSignal);

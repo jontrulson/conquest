@@ -103,6 +103,9 @@ void setUserConfDefaults(void)
   UserConf.DoTacBkg = FALSE;
   UserConf.DoTacShade = 50;
 
+  UserConf.musicVol = 100;
+  UserConf.effectsVol = 100;
+
   for (i=0; i<MAX_MACROS; i++)
     UserConf.MacrosF[i][0] = EOS;
 
@@ -130,7 +133,7 @@ void setUserConfDefaults(void)
 }
 
 /* here we look for a ~/.conquest/ directory, and try to create it if it
-   does nt exist */
+   doesn't exist */
 static void checkCreateUserConfDir(void)
 {
   char buffer[BUFFER_SIZE];

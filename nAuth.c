@@ -304,7 +304,7 @@ static int nAuthInput(int ch)
           /* check validity */
           if (checkuname(prm.buf) == FALSE)
             {                   /* invalid username */
-              mglBeep();
+              mglBeep(MGL_BEEP_ERR);
               errlin = "Invalid character in username.";
               prm.buf[0] = EOS;
               return NODE_OK;
@@ -453,7 +453,7 @@ static int nAuthInput(int ch)
 
           if (strcmp(pw, pwr) != 0)
             {                   /* pw's don't match, start over */
-              mglBeep();
+              mglBeep(MGL_BEEP_ERR);
 
               errlin = "Passwords don't match.";
               /* go back to username prompt */

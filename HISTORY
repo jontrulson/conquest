@@ -9,6 +9,75 @@
 
                               Conquest HISTORY
 
+8.2-snd1 (???) 11/26/2006
+
+       - getting close to a devel release.
+
+       - moved the music into a seperate area in the repository
+         (music/).  Music is packaged in it's own tarball since it's
+         pretty large (15MB).  To hear the glorious music of Conquest,
+         you must unpack the musicpak tarball into your ~/.conquest/
+         directory.
+
+         The effects are shipped in the main src tarball as they are
+         small in comparison :)
+
+         If you have a checked out version of the repository, you can
+         create the musicpak tarball by running 'makemuspkg'.
+
+       - fixed doomsday beam sound to not try to fire more than once
+         per second, and made it a positional sound.
+
+       - moved doomsday_theme checks into nCP.c.
+
+       - add beep sounds for alert, message, and error conditions.
+         The sounds aren't too bad, if you have better ones... :)  
+
+       - hook up 'hit' effect.  If you take more then 5 points of
+         damage, it will play.
+
+       - fix problem with volume.  If an effect isn't using a panning
+         mixer effect, then make sure all panning is disabled for that
+         channel.  Failure to do this results in non-positional
+         effects playing at half their normal volume.
+
+         As a result of this fix, went through soundrc and re-adjusted
+         (equalized) some of the effect volumes.
+
+       - rework themes() stuff, move into nCP.c
+
+       - set the alert klaxon loop couts in soundrc to 0 (infinite).
+
+       - Apply Cat's patch adding the themes() stuff and a few misc
+         effect hookups.
+
+       - fix clbCheckLaunch() to fail if weapons are overloaded. 
+
+       - Add option (-S) to disable sound in conquestgl.
+
+       - Add support for .src (add-on sound RC files).  These work the
+         same as texture add-on files (.trc), allowing operators or
+         users to override sound related definitions.  They are looked
+         for in the system-wide <install prefix>/etc/ directory, then
+         the user's ~/.conquest/ directory.
+
+       - beef up configure a bit.  Properly detect when SDL headers
+         are missing (sound support) and glut/GL headers are missing
+         (OpenGL support).  Don't try to build the relevant OpenGL and
+         sound bits if not supported.
+
+       - when searching for .trc and .src files, sort the filenames
+         first before loading them, so that they are always loaded in
+         a consistent order (alphabetically).
+
+       - add engine background sound (engine).
+
+       - converted all .wav's to .ogg's.  
+
+       - Initial sound support based on work by Cat.  soundrc and
+         associate parser working.  Can init SDL/SDL_mixer and
+         load/use sounds.  Yay.
+
 8.2 (stable) 9/1/2006
 
        This version represents a major update to Conquest, primarily

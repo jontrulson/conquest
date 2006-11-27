@@ -17,6 +17,10 @@ CONTENTS:
         # colanim subsection
         # geoanim subsection
         # toganim subsection
+  ## soundrc or user .src files
+     ## soundconf 
+     ## music
+     ## effect
   ## conqinit utility
   ## example of a user overriding a system defined texture.
      # overriding a texture image
@@ -28,8 +32,8 @@ CONTENTS:
 
        This document describes the 'conqinit' (CQI)
        parser/configurator used in Conquest as of 8.1.2a (devel), as
-       well as the format of the new configuration files (conqinitrc
-       and texturesrc).
+       well as the format of the new configuration files (conqinitrc,
+       texturesrc, and soundrc).
 
        CQI is a lex/yacc parser that reads certain configuration files
        and builds up an internal, validated representation of the data
@@ -69,6 +73,13 @@ CONTENTS:
            These files describe the characteristics of textures,
            colors, animations, and animdefs used by conquestgl for
            rendering.
+
+
+         - <prefix>/etc/soundrc
+         - ~/.conquest/*.src
+
+           These files describe the characteristics of sound
+           configuration, effect definitions, and music definitions
 
 
        The general syntax of a section entry in these files is as
@@ -764,6 +775,167 @@ CONTENTS:
             delayms:    NUMBER
                         The delay, in milliseconds, before toggling
                         the state's 'armed' variable.
+
+
+## soundrc or user .src files
+
+      These files contain basic sound configuration support (fx
+      channels, samplerate, etc), definitions for sound effects
+      (phaser firing, explosions, etc), and music definitions. 
+
+      Music definitions and music files are not supplied in the
+      conquest src tarball due to their size.  They are supplied in a
+      seperate 'music pak' tarball that must be unpacked in your
+      ~/.conquest/ directory.  I recommend it for the full experience
+      :) 
+
+      Users can override the system's sound definitions (defined in
+      <prefix>/etc/soundrc and <prefix>/etc/*.src).  After conquestgl
+      parses the main soundrc file, it will then load and parse any
+      *.src files it finds in your ~/.conquest/ directory.  These
+      files have the same format as soundrc.  Sound files (.wav or
+      .ogg) can be provided in a user's ~/.conquest/sound/ directory,
+      which will also be searched when sound loading starts.  This
+      allows users to override the games sounds if they wish.
+
+      Like textures, sound effects and music are known by a Well
+      Known Name (WKN) that is hardcoded into conquest.  The WKN's
+      should never be modified, however any data associated with them
+      can be overridden by the user or the operator.
+      
+      So, without further ado, here are the valid sections that can be
+      present in a soundrc file.  In each section, all possible
+      variables and their values will be shown.
+
+      ## soundconf
+
+         A soundconf section specifies certain parameters for the SDL
+         mixer API, which is used to provide sound.  Feel free to
+         change these if you'd like, though the defaults should be
+         ok on most modern systems. 
+
+         soundconf {
+           samplerate   44100
+           stereo       "yes"
+           fxchannels   16
+           chunksize    512        # low latency
+         }
+
+         samplerate:  NUMBER
+                      The specified the samplerate the mixer will
+                      use. If you have a slow processor (but a decent
+                      sound card that can resample in hw) try 22050 to
+                      reduce CPU requirements somewhat.
+
+         stereo:      BOOL
+                      Indicates whether to use stereo or not.
+
+         fxchannels:  NUMBER
+                      The number of channels to allocate for the
+                      effects pool.  This is a decent number.  I doubt
+                      you would need more than this.
+
+         chunksize:   NUMBER 
+                      This value determines the chunksize the mixer
+                      will use.  A slow CPU might need a larger
+                      chunksize, but will intorduce latency.  256 is
+                      the minimum, 8192 is the maximum.  512 (the
+                      default) is a good balance for low latency.
+
+
+      ## effect
+      ## music
+
+         The effect section describes an effect for conquest.  Effects
+         include engine rumble, phasers, explosions, beaming, bombing,
+         etc... Effects can be modified or overriden by user in a .src
+         file. 
+
+         Effect and Music files have the same information associated
+         with them, so we will only use an effect section below to
+         describe it's parts.  A music definition look the same,
+         though some options probably do not make sense for music.  A
+         music section for the intro music is shown below.
+
+         music {
+           name         "intro"  
+           filename     "TOS-intro"
+
+           fadeinms     0
+           fadeoutms    1000
+           loops        1
+         }
+
+         effect {
+           name         "explosion"  
+           filename     "explosion"
+
+           volume       45
+           fadeinms     0
+           fadeoutms    0
+           loops        1
+           framelimit   2
+           delayms      100
+         }
+         
+
+         name:        STRING
+                      This is the WKN of the music of effect.  It
+                      should never be changed, since it is hardcoded
+                      into conquest.
+
+         filename:    STRING
+                      This specifies the filename (basename only, no
+                      extension) that contains the audio samples.  The
+                      sound loader can handle .WAV or .OGG files
+                      only.  Only .OGG files are shipp with conquest. 
+
+         volume:      NUMBER
+                      0 to 100. Specifies the volume of the effect or
+                      music sample.  This volume is used when the
+                      sound is prepared for playing.  It is used to
+                      provide the ability to 'equalize' the various
+                      sound volumes being used, so they are even.  
+      
+         pan:         NUMBER
+                      -127 to 127. The default pan of the effect when
+                      created.  If it is a positional affect
+                      (explosion for example), this value will have
+                      no effect.
+
+         fadeinms:    NUMBER
+                      The number of milliseconds to take to fade in
+                      the effect or music.
+
+         fadeoutms:   NUMBER
+                      The number of milliseconds to take to fade out
+                      the effect or music.  
+
+         loops:       NUMBER
+                      Number of loops to play the effect of music.  0
+                      means to loop infinitely.
+
+         limit:       NUMBER
+                      Specifies the maximum number times this effect
+                      can be running concurrently.  Attempts to play
+                      this effect after the limit is hit are ignored.
+                      Music can never run at the same time as another
+                      music file, so this option is only of use will
+                      effects.  
+
+         framelimit:  NUMBER
+                      Specifies the number of times per frame that
+                      this effect can be queued to play.  Attempts to
+                      play the effect once the framelimit is exceeded
+                      are ignored.  This is useful when there is the
+                      potential for a large number of the same effect
+                      (like an explosion) being triggered during the
+                      same frame.  
+
+         delayms:     NUMBER
+                      When specified, indicates the minimum number of
+                      milliseconds that must pass before the effect
+                      can be played again.
 
 
 ## conqinit utility

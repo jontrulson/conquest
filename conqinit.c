@@ -26,6 +26,7 @@ void print_usage()
   fprintf(stderr, "\t-v            be verbose about everything.\n");
   fprintf(stderr, "\t-d            turns on debugging.\n");
   fprintf(stderr, "\t-t            parse texture data instead of conqinit data\n");
+  fprintf(stderr, "\t-s            parse sound data instead of conqinit data\n");
   fprintf(stderr, "\t-h            dump parsed file to stdout in initdata.h/texdata.h format\n");
   fprintf(stderr, "\t              The output format chosen depends on the \n"
                   "\t              presence of the '-t' option\n");
@@ -46,7 +47,7 @@ int main(int argc, char **argv)
   
   setSystemLog(FALSE, TRUE);    /* log + stderr! :) */
 
-  while ( (ch = getopt( argc, argv, "vdDf:ht" )) != EOF )
+  while ( (ch = getopt( argc, argv, "vdDf:hts" )) != EOF )
     {      switch(ch)
 	{
 	case 'v':
@@ -68,6 +69,9 @@ int main(int argc, char **argv)
         case 't':
           ftype = CQI_FILE_TEXTURESRC_ADD;
           break;
+        case 's':
+          ftype = CQI_FILE_SOUNDRC_ADD;
+          break;
 	default:
 	  print_usage();
 	  return 1;
@@ -78,11 +82,18 @@ int main(int argc, char **argv)
     {
       if (doheader)
         {
-          if (ftype == CQI_FILE_TEXTURESRC_ADD)
-            dumpTexDataHdr();
-          else
-            dumpInitDataHdr();
-
+          switch(ftype)
+            {
+            case CQI_FILE_CONQINITRC:
+              dumpInitDataHdr();
+              break;
+            case CQI_FILE_TEXTURESRC_ADD:
+              dumpTexDataHdr();
+              break;
+            case CQI_FILE_SOUNDRC_ADD:
+              dumpSoundDataHdr();
+              break;
+            }
         }
     }
 

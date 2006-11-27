@@ -24,6 +24,7 @@
 #include "nDead.h"
 #include "nOptions.h"
 #include "cqkeys.h"
+#include "cqsound.h"
 
 /* from conquestgl */
 extern Unsgn8 clientFlags;
@@ -112,18 +113,21 @@ static scrNode_t nOptionsNode = {
 
 };
 
-/* return to the correct node */
+/* return to the correct node, and (re)set certain options */
 static void quitNode(void)
 {
   SaveUserConfig();
   Context.updsec = UserConf.UpdatesPerSecond;
   sendCommand(CPCMD_SETRATE, Context.updsec);
 
+  /* set the volumes */
+  cqsUpdateVolume();
+
   switch (retnode)
     {
     case DSP_NODE_CP:
       setONode(NULL);
-      nCPInit();
+      nCPInit(FALSE);
       break;
     case DSP_NODE_MENU:
     default:
@@ -170,7 +174,7 @@ static void _changePasswd(int init)
                                    if they match */
          if (strcmp(pw, rpw) != 0)
             {                       /* pw's don't match */
-              mglBeep();
+              mglBeep(MGL_BEEP_ERR);
               state = S_USRMENU;
               return;
             }

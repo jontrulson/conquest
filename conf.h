@@ -126,6 +126,9 @@ typedef struct _userConf {
 
   int DoTacShade;               /* tactical background alpha */
 
+  int musicVol;                 /* nusic/effects volume */
+  int effectsVol;
+
   char MacrosF[MAX_MACROS][MAX_MACRO_LEN];
 
   /* mouse macros, indexed by [max buttons][modifiers (8)]  */
@@ -732,6 +735,34 @@ struct Conf ConfData[] =
       "# If tactical background is true, this will be the shade alpha",
       "#  valid values 1 - 100",
       "#  Default: 50",
+      NULL
+    }
+  },
+  {
+    FALSE,
+    CTYPE_NUMERIC,
+    "music_vol=",
+    &UserConf.musicVol,
+    0, 100,                      /* min/max */
+    "Music Volume (0-100) 0 = off",
+    {
+      "# Set the music volume.  If set to 0, then music is turned",
+      "#  off.  valid values 0 - 100",
+      "#  Default: 100",
+      NULL
+    }
+  },
+  {
+    FALSE,
+    CTYPE_NUMERIC,
+    "effects_vol=",
+    &UserConf.effectsVol,
+    0, 100,                      /* min/max */
+    "Effects Volume (0-100) 0 = off",
+    {
+      "# Set the effects volume.  If set to 0, then effects are turned",
+      "#  off.  valid values 0 - 100",
+      "#  Default: 100",
       NULL
     }
   },

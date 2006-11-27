@@ -1,0 +1,53 @@
+#!/bin/bash
+#
+# makemuspkg - make the musicpak distribution
+#
+# $Id$
+#
+##############################################################################
+# set -x
+
+umask 022
+
+VERSION=`grep ConquestVersion version.c`
+VERSION=`echo $VERSION |tr -d '$;"' |cut -d' ' -f6 |tr -d " "`
+
+CONQVER="conquest-musicpak-$VERSION"
+
+ARCFILE="${CONQVER}.src.tar"
+
+rm -f ${ARCFILE}.gz
+rm -rf $CONQVER
+echo Arcive name: $ARCFILE
+
+
+MUSIC="music/sound/*.ogg"
+SRC="music/*.src"
+
+mkdir $CONQVER 2>/dev/null
+mkdir $CONQVER/sound
+chmod 755 $CONQVER/sound
+
+cp -p $SRC $CONQVER/
+
+cp -p $MUSIC $CONQVER/sound/
+
+chmod 644 $CONQVER/*.src
+chmod 644 $CONQVER/sound/*.ogg
+
+cd $CONQVER
+tar cvf ../${ARCFILE} .
+cd ..
+gzip --best -v ${ARCFILE}
+rm -rf $CONQVER
+
+set -x 
+if [ -e ~/tx/conquest/ ]
+then
+    cp -f ${ARCFILE}.gz ~/tx/conquest/
+    chmod 644 ~/tx/conquest/${ARCFILE}.gz
+fi
+
+exit
+	
+

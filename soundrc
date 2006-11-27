@@ -1,0 +1,603 @@
+# Sound definitions
+#
+# $Id$
+#
+
+# only one of these.
+soundconf {
+  samplerate   44100
+  stereo       "yes"
+  fxchannels   16
+  chunksize    512        # low latency
+}
+
+##
+## The music definitions are stored in a seperate file with the
+## musicpak. 
+##
+
+
+# general effects
+#
+#################
+
+effect {
+  name         "doomsday-beam"  
+  filename     "TOS-doombeam"
+
+  volume       70
+  fadeinms     0
+  fadeoutms    0
+  loops        1
+  limit        1
+  delayms      1000
+}
+
+effect {
+  name         "explosion"  
+  filename     "explosion"
+
+  volume       45
+  fadeinms     0
+  fadeoutms    0
+  loops        1
+  framelimit   2
+}
+
+effect {
+  name         "bombing"  
+  filename     "TOS-bomb"
+
+  fadeinms     0
+  fadeoutms    1000
+  loops        0  # infinite
+  limit        1
+}
+
+
+effect {
+  name         "engines"  
+  filename     "engines"
+
+  fadeinms     1000
+  fadeoutms    2000
+  loops        0  # infinite
+  limit        1
+}
+
+
+effect {
+  name         "beep-alert"  
+  filename     "beep-alert"
+
+  volume       60
+  fadeinms     0
+  fadeoutms    0
+  loops        1 
+  limit        1
+  delayms      1500
+}
+
+
+effect {
+  name         "beep-err"  
+  filename     "beep-err"
+
+  volume       65
+  fadeinms     0
+  fadeoutms    0
+  loops        1 
+  limit        1
+}
+
+
+effect {
+  name         "beep-msg"  
+  filename     "beep-msg"
+
+  volume       40
+  fadeinms     0
+  fadeoutms    0
+  loops        1 
+  limit        1
+}
+
+
+# feds
+######
+
+effect {
+  name         "shipF-phaser"  
+  filename     "TOS-fphaz"
+
+  volume       60
+  fadeinms     0
+  fadeoutms    0
+  loops        1
+  limit        2
+}
+
+effect {
+  name         "shipF-torp"  
+  filename     "TOS-fphoton"
+
+  volume       50
+  fadeinms     0
+  fadeoutms    0
+  loops        1
+  limit        0        # unlimited
+  delayms      100
+}
+
+effect {
+  name         "shipF-torp3"  
+  filename     "TOS-fphoton3"
+
+  volume       50
+  fadeinms     0
+  fadeoutms    0
+  loops        1
+  limit        3
+  delayms      100
+}
+
+effect {
+  name         "shipF-alert"  
+  filename     "TOS-falert"
+
+  volume       35
+  fadeinms     0
+  fadeoutms    0
+  loops        0
+  limit        1
+}
+
+effect {
+  name         "shipF-beam-down"  
+  filename     "TOS-fbeamd"
+
+  fadeinms     0
+  fadeoutms    1000
+  loops        1
+  limit        1
+}
+
+effect {
+  name         "shipF-beam-up"  
+  filename     "TOS-fbeamu"
+
+  fadeinms     0
+  fadeoutms    1000
+  loops        1
+  limit        1
+}
+
+effect {
+  name         "shipF-hit"  
+  filename     "TOS-fblast"
+
+  fadeinms     0
+  fadeoutms    1000
+  loops        1
+  limit        1
+}
+
+effect {
+  name         "shipF-info"  
+  filename     "TOS-finfo"
+
+  volume       70
+  fadeinms     0
+  fadeoutms    0
+  loops        1
+  limit        1
+  delayms      5000
+}
+
+effect {
+  name         "shipF-mag"  
+  filename     "TOS-fmag"
+
+  volume       70
+  fadeinms     0
+  fadeoutms    0
+  loops        1
+  limit        1
+}
+
+effect {
+  name         "shipF-warp-up"
+  filename     "TOS-fwarpu"
+
+  volume       70
+  fadeinms     0
+  fadeoutms    3000
+  loops        1
+  limit        1
+}
+
+effect {
+  name         "shipF-warp-down"
+  filename     "TOS-fwarpd"
+
+  volume       50
+  fadeinms     0
+  fadeoutms    3000
+  loops        1
+  limit        1
+}
+
+
+# roms
+######
+
+effect {
+  name         "shipR-phaser"  
+  filename     "TOS-fphaz"
+
+  volume       60
+  fadeinms     0
+  fadeoutms    0
+  loops        1
+  limit        2
+}
+
+effect {
+  name         "shipR-torp"  
+  filename     "TOS-rphoton"
+
+  volume       50
+  fadeinms     0
+  fadeoutms    0
+  loops        1
+  limit        0        # unlimited
+  delayms      100
+}
+
+effect {
+  name         "shipR-torp3"  
+  filename     "TOS-rphoton3"
+
+  volume       50
+  fadeinms     0
+  fadeoutms    0
+  loops        1
+  limit        1
+  delayms      100
+}
+
+effect {
+  name         "shipR-alert"  
+  filename     "TOS-falert"
+
+  volume       35
+  fadeinms     0
+  fadeoutms    0
+  loops        0
+  limit        1
+}
+
+effect {
+  name         "shipR-beam-down"  
+  filename     "TOS-fbeamd"
+
+  fadeinms     0
+  fadeoutms    1000
+  loops        1
+  limit        1
+}
+
+effect {
+  name         "shipR-beam-up"  
+  filename     "TOS-fbeamu"
+
+  fadeinms     0
+  fadeoutms    1000
+  loops        1
+  limit        1
+}
+
+effect {
+  name         "shipR-hit"  
+  filename     "TOS-fblast"
+
+  fadeinms     0
+  fadeoutms    1000
+  loops        1
+  limit        1
+}
+
+effect {
+  name         "shipR-info"  
+  filename     "TOS-finfo"
+
+  volume       70
+  fadeinms     0
+  fadeoutms    0
+  loops        1
+  limit        1
+  delayms      5000
+}
+
+effect {
+  name         "shipR-mag"  
+  filename     "TOS-fmag"
+
+  volume       70
+  fadeinms     0
+  fadeoutms    0
+  loops        1
+  limit        1
+}
+
+effect {
+  name         "shipR-warp-up"
+  filename     "TOS-fwarpu"
+
+  volume       70
+  fadeinms     0
+  fadeoutms    3000
+  loops        1
+  limit        1
+}
+
+effect {
+  name         "shipR-warp-down"
+  filename     "TOS-fwarpd"
+
+  volume       50
+  fadeinms     0
+  fadeoutms    3000
+  loops        1
+  limit        1
+}
+
+# kli
+#####
+
+effect {
+  name         "shipK-phaser"  
+  filename     "TOS-fphaz"
+
+  volume       60
+  fadeinms     0
+  fadeoutms    0
+  loops        1
+  limit        2
+}
+
+effect {
+  name         "shipK-torp"  
+  filename     "TOS-fphoton"
+
+  volume       50
+  fadeinms     0
+  fadeoutms    0
+  loops        1
+  limit        0        # unlimited
+  delayms      100
+}
+
+effect {
+  name         "shipK-torp3"  
+  filename     "TOS-fphoton3"
+
+  volume       50
+  fadeinms     0
+  fadeoutms    0
+  loops        1
+  limit        1
+  delayms      100
+}
+
+effect {
+  name         "shipK-alert"  
+  filename     "TOS-falert"
+
+  volume       35
+  fadeinms     0
+  fadeoutms    0
+  loops        0
+  limit        1
+}
+
+effect {
+  name         "shipK-beam-down"  
+  filename     "TOS-fbeamd"
+
+  fadeinms     0
+  fadeoutms    1000
+  loops        1
+  limit        1
+}
+
+effect {
+  name         "shipK-beam-up"  
+  filename     "TOS-fbeamu"
+
+  fadeinms     0
+  fadeoutms    1000
+  loops        1
+  limit        1
+}
+
+effect {
+  name         "shipK-hit"  
+  filename     "TOS-fblast"
+
+  fadeinms     0
+  fadeoutms    1000
+  loops        1
+  limit        1
+}
+
+effect {
+  name         "shipK-info"  
+  filename     "TOS-finfo"
+
+  volume       70
+  fadeinms     0
+  fadeoutms    0
+  loops        1
+  limit        1
+  delayms      5000
+}
+
+effect {
+  name         "shipK-mag"  
+  filename     "TOS-fmag"
+
+  volume       70
+  fadeinms     0
+  fadeoutms    0
+  loops        1
+  limit        1
+}
+
+effect {
+  name         "shipK-warp-up"
+  filename     "TOS-fwarpu"
+
+  volume       70
+  fadeinms     0
+  fadeoutms    3000
+  loops        1
+  limit        1
+}
+
+effect {
+  name         "shipK-warp-down"
+  filename     "TOS-fwarpd"
+
+  volume       50
+  fadeinms     0
+  fadeoutms    3000
+  loops        1
+  limit        1
+}
+
+
+# ori
+#####
+
+effect {
+  name         "shipO-phaser"  
+  filename     "TOS-fphaz"
+
+  volume       60
+  fadeinms     0
+  fadeoutms    0
+  loops        1
+  limit        2
+}
+
+effect {
+  name         "shipO-torp"  
+  filename     "TOS-fphoton"
+
+  volume       40
+  fadeinms     0
+  fadeoutms    0
+  loops        1
+  limit        0        # unlimited
+  delayms      100
+}
+
+effect {
+  name         "shipO-torp3"  
+  filename     "TOS-fphoton3"
+
+  volume       50
+  fadeinms     0
+  fadeoutms    0
+  loops        1
+  limit        1
+  delayms      100
+}
+
+effect {
+  name         "shipO-alert"  
+  filename     "TOS-falert"
+
+  volume       35
+  fadeinms     0
+  fadeoutms    0
+  loops        0
+  limit        1
+}
+
+effect {
+  name         "shipO-beam-down"  
+  filename     "TOS-fbeamd"
+
+  fadeinms     0
+  fadeoutms    1000
+  loops        1
+  limit        1
+}
+
+effect {
+  name         "shipO-beam-up"  
+  filename     "TOS-fbeamu"
+
+  fadeinms     0
+  fadeoutms    1000
+  loops        1
+  limit        1
+}
+
+effect {
+  name         "shipO-hit"  
+  filename     "TOS-fblast"
+
+  fadeinms     0
+  fadeoutms    1000
+  loops        1
+  limit        1
+}
+
+effect {
+  name         "shipO-info"  
+  filename     "TOS-finfo"
+
+  volume       70
+  fadeinms     0
+  fadeoutms    0
+  loops        1
+  limit        1
+  delayms      5000
+}
+
+effect {
+  name         "shipO-mag"  
+  filename     "TOS-fmag"
+
+  volume       70
+  fadeinms     0
+  fadeoutms    0
+  loops        1
+  limit        1
+}
+
+effect {
+  name         "shipO-warp-up"
+  filename     "TOS-fwarpu"
+
+  volume       70
+  fadeinms     0
+  fadeoutms    3000
+  loops        1
+  limit        1
+}
+
+effect {
+  name         "shipO-warp-down"
+  filename     "TOS-fwarpd"
+
+  volume       50
+  fadeinms     0
+  fadeoutms    3000
+  loops        1
+  limit        1
+}
+

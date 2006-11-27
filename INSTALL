@@ -9,6 +9,7 @@
 
 CONTENTS:
 
+        ### REQUIREMENTS
         ### QUICKSTART GUIDE
 	### DISTRIBUTION
         ### REQUIREMENTS
@@ -20,14 +21,46 @@ CONTENTS:
             ## SOLARIS/DU NOTE
 	    ## CONQUEST GROUP
 
+### REQUIREMENTS
+
+    Hopefully Conquest's requirements aren't too arduous.  
+
+    At a minimum:
+
+    - a C compiler.  GCC is the one I use, though I try not to
+      introduce gcc-isms.
+
+    - bison or yacc.
+
+    - flex or lex
+
+    - a decent curses implementation
+
+    For building the OpenGL client 'conquestgl', you will need:
+
+    - X11 (or xorg) libraries and header files (all of them :)
+
+    - OpenGL libraries and header files.
+
+    - glut or freeglut libraries and header files.
+
+    For sound support (OpenGL client only) you will need:
+
+    - SDL libraries and header files ( http://www.libsdl.org/ ), with
+      OGG Vorbis support (pretty much standard I think).
+
+    - SDL_mixer library and header files
+      ( http://www.libsdl.org/projects/SDL_mixer/ ).  
+
+
 ### QUICKSTART GUIDE
 
     So you are impatient and want to build and play.  Here's a short
     list to get you going.  Read the later sections for more details.
 
     - unpack and build the sources. (If you are using Cygwin under MS
-      Windows, see README.cygwin for further information.  Ignore the
-      'groupadd' commands listed below.)
+      Windows, see README.cygwin for further information and ignore
+      the 'groupadd' commands listed below.)
 
       # groupadd conquest
       $ tar xzvf conquest-x.y.src.tar.gz
@@ -72,50 +105,15 @@ CONTENTS:
 
 ### DISTRIBUTION
 
-    conquest-x.y.src.tar.gz	- gziped tar archive of the source
-                                  distribution.
+    conquest-x.y.src.tar.gz       - gziped tar archive of the source
+                                    distribution.
 
     Unzip/untar this in a nice, quiet, peaceful place.  I use:
 
        $ tar xzvf conquest-x.y.src.tar.gz
 
-    Currently, only the following OS's have ports (these are the
-    minimum versions needed.  It should run on newer versions of these
-    OS's):
-	
-        Unixware 2.03 (1.x/2.x/7.x should be fine too)
-        Linux 2.0.0, with ncurses-1.9.9e+ (older ncurses *may* work)
-        Solaris Intel/Sparc 2.6 with gcc 2.7.2
-        FreeBSD 2.2-100696-SNAP (stock curses works, but
-                without color apparently...)
-        OSF1/Digital Unix V4.0 for Alpha
-           - Thanks to Jim Anderson (janderson@NOVALIS.COM)
-             for this port!
-        MS Windows using the Cygwin (www.cygwin.com) environment.
-
-        Note, I no longer have access to these machines (only
-        linux) so YMMV...
-
-    At least ncurses-1.9.9e is required on both FreeBSD and Linux.  If
-    the curses implementation on your machine has problems, you might
-    try ncurses... It's free and does a reasonable job at emulating
-    svr4 curses.
-
     The README file provides useful information about conquest, please
     look it over.
-
-### REQUIREMENTS
-
-    To build Conquest, you need:
-
-    bison or yacc (bison preferred)
-    lex or flex
-
-    For the OpenGL client, conquestgl, you will need:
-
-    GLUT libraries and the glut.h header file
-    OpenGL libraries and headers
-    X11 Libraries and headers.
 
 
 ### BUILDING
@@ -157,6 +155,11 @@ CONTENTS:
 
       If you do not want to build the GLUT/OpenGL bits, pass
       '--disable-gl' the the configure cmdline.
+
+    --disable-sound
+
+      If you do not want to build sound support pass
+      '--disable-sound' the the configure cmdline.
 
     You may also want to peek at the defs.h file, though the defaults
     should be fine.  If your porting this to something else, good

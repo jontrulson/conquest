@@ -24,6 +24,7 @@
 #if 1
 #include "initdata.h"
 #include "texdata.h"
+#include "sounddata.h"
 #else
 #warning "Enable this for debugging only! It will core if you use it in anything other than conqinit!"
   cqiGlobalInitRec_t    defaultGlobalInit = {};
@@ -35,6 +36,12 @@
   int                   defaultNumAnimations = 0;
   cqiAnimDefInitPtr_t   defaultAnimDefs = NULL;
   int                   defaultNumAnimDefs = 0;
+
+  cqiSoundConfRec_t     defaultSoundConf = {};
+  cqiSoundPtr_t         defaultSoundEffects = NULL;
+  int                   defaultNumSoundEffects = 0;
+  cqiSoundPtr_t         defaultSoundMusic = NULL;
+  int                   defaultNumSoundMusic = 0;
 #endif
 
 static int cqiVerbose = 0;
@@ -55,6 +62,10 @@ static cqiPlanetInitPtr_t      _cqiPlanets;
 static cqiTextureInitPtr_t     _cqiTextures;
 static cqiAnimationInitPtr_t   _cqiAnimations;
 static cqiAnimDefInitPtr_t     _cqiAnimDefs;
+ 
+static cqiSoundConfPtr_t       _cqiSoundConf;
+static cqiSoundPtr_t           _cqiSoundEffects;
+static cqiSoundPtr_t           _cqiSoundMusic;
 
 static int globalRead   = FALSE;
 static int numShiptypes = 0;
@@ -62,16 +73,22 @@ static int numPlanets   = 0;
 static int numTextures  = 0;
 static int numAnimations= 0;
 static int numAnimDefs  = 0;
+static int numSoundEffects   = 0;
+static int numSoundMusic     = 0;
 
 static int fileNumTextures = 0; /* # of textures loaded per file */
 static int fileNumAnimations = 0;
 static int fileNumAnimDefs = 0;
+static int fileNumEffects = 0;
+static int fileNumMusic = 0;
 
 static cqiPlanetInitRec_t  currPlanet;
 static cqiTextureInitRec_t currTexture;
 
 static cqiAnimationInitRec_t   currAnimation;
 static cqiAnimDefInitRec_t     currAnimDef;
+
+static cqiSoundRec_t currSound;
 
 static void startSection(int section);
 static void startSubSection(int subsection);
@@ -111,6 +128,10 @@ static int parsebool(char *str);
 %token <num> TEXANIM COLANIM GEOANIM TOGANIM ISTATE
 %token <num> DELTAA DELTAR DELTAG DELTAB DELTAX DELTAY DELTAZ DELTAS 
 
+%token <num> SOUNDCONF SAMPLERATE VOLUME PAN STEREO FXCHANNELS CHUNKSIZE
+%token <num> EFFECT FADEINMS FADEOUTMS LIMIT FRAMELIMIT
+%token <num> MUSIC
+
 %token <ptr>  STRING 
 %token <rnum> RATIONAL
 
@@ -134,6 +155,9 @@ section         : globalconfig
                 | textureconfig
                 | animationconfig
                 | animdefconfig
+                | soundconfconfig
+                | effectconfig
+                | musicconfig
                 ;
 
 globalconfig    : startglobal stmts closesect
@@ -279,6 +303,47 @@ startistate     : istateword opensect
 istateword     : ISTATE
                 {;}
                 ;
+
+soundconfconfig    : startsoundconf stmts closesect
+                   ;
+
+startsoundconf     : soundconfword opensect
+                   {
+                      startSection(SOUNDCONF);
+                   }
+                   ;
+
+soundconfword      : SOUNDCONF
+                   {;}
+                   ;
+
+effectconfig   : starteffect stmts closesect
+               ;
+
+starteffect    : effectword opensect
+               {
+                  startSection(EFFECT);
+               }
+               ;
+
+effectword     : EFFECT
+               {;}
+               ;
+
+
+musicconfig    : startmusic stmts closesect
+               ;
+
+startmusic     : musicword opensect
+               {
+                  startSection(MUSIC);
+               }
+               ;
+
+musicword      : MUSIC
+               {;}
+               ;
+
 
 opensect        : OPENSECT
                 {;}
@@ -487,6 +552,46 @@ stmt            : /* error */
                    {
                         cfgSectioni(TIMELIMIT, $2);
                    }                      
+                | SAMPLERATE number
+                   {
+                        cfgSectioni(SAMPLERATE, $2);
+                   }                      
+                | VOLUME number
+                   {
+                        cfgSectioni(VOLUME, $2);
+                   }                      
+                | PAN number
+                   {
+                        cfgSectioni(PAN, $2);
+                   }                      
+                | STEREO string
+                   {
+                        cfgSectionb(STEREO, $2);
+                   }                      
+                | FXCHANNELS number
+                   {
+                        cfgSectioni(FXCHANNELS, $2);
+                   }                      
+                | CHUNKSIZE number
+                   {
+                        cfgSectioni(CHUNKSIZE, $2);
+                   }                      
+                | FADEINMS number
+                   {
+                        cfgSectioni(FADEINMS, $2);
+                   }                      
+                | FADEOUTMS number
+                   {
+                        cfgSectioni(FADEOUTMS, $2);
+                   }                      
+                | FRAMELIMIT number
+                   {
+                        cfgSectioni(FRAMELIMIT, $2);
+                   }                      
+                | LIMIT number
+                   {
+                        cfgSectioni(LIMIT, $2);
+                   }                      
                 | error closesect
                 ;
 
@@ -536,7 +641,7 @@ static int _cqiFindTexture(char *texname)
   int i;
 
   for (i=0; i<numTextures; i++)
-    if (!strncmp(_cqiTextures[i].name, texname, TEXFILEMAX))
+    if (!strncmp(_cqiTextures[i].name, texname, CQI_NAMELEN))
       return i;
   
   return -1;
@@ -548,7 +653,7 @@ static int _cqiFindAnimation(char *animname)
   int i;
 
   for (i=0; i<numAnimations; i++)
-    if (!strncmp(_cqiAnimations[i].name, animname, TEXFILEMAX))
+    if (!strncmp(_cqiAnimations[i].name, animname, CQI_NAMELEN))
       return i;
   
   return -1;
@@ -559,7 +664,53 @@ static int _cqiFindAnimDef(char *defname)
   int i;
 
   for (i=0; i<numAnimDefs; i++)
-    if (!strncmp(_cqiAnimDefs[i].name, defname, TEXFILEMAX))
+    if (!strncmp(_cqiAnimDefs[i].name, defname, CQI_NAMELEN))
+      return i;
+  
+  return -1;
+}
+
+/* search internal effect list */
+static int _cqiFindEffect(char *name)
+{
+  int i;
+
+  for (i=0; i<numSoundEffects; i++)
+    if (!strncmp(_cqiSoundEffects[i].name, name, CQI_NAMELEN))
+      return i;
+  
+  return -1;
+}
+
+static int _cqiFindMusic(char *name)
+{
+  int i;
+
+  for (i=0; i<numSoundMusic; i++)
+    if (!strncmp(_cqiSoundMusic[i].name, name, CQI_NAMELEN))
+      return i;
+  
+  return -1;
+}
+
+/* search public effect list */
+int cqiFindEffect(char *name)
+{
+  int i;
+
+  for (i=0; i<cqiNumSoundEffects; i++)
+    if (!strncmp(cqiSoundEffects[i].name, name, CQI_NAMELEN))
+      return i;
+  
+  return -1;
+}
+
+int cqiFindMusic(char *name)
+{
+  int i;
+
+  for (i=0; i<cqiNumSoundMusic; i++)
+    if (!strncmp(cqiSoundMusic[i].name, name, CQI_NAMELEN))
       return i;
   
   return -1;
@@ -588,7 +739,7 @@ static Unsgn32 hex2color(char *str)
 static int cqiValidateAnimations(void)
 {
   int i, j;
-  char tbuf[TEXFILEMAX];
+  char tbuf[CQI_NAMELEN];
   int ndx;
 
   /* if no textures, no point */
@@ -634,14 +785,14 @@ static int cqiValidateAnimations(void)
             {
               /* copy the animdef name over */
               strncpy(_cqiAnimDefs[i].texname, _cqiAnimDefs[i].name, 
-                      TEXFILEMAX - 1);
+                      CQI_NAMELEN - 1);
             }
 
           /* for each stage, build a texname and make sure it
              exists */
           for (j=0; j<_cqiAnimDefs[i].texanim.stages; j++)
             {
-              snprintf(tbuf, TEXFILEMAX - 1, "%s%d",
+              snprintf(tbuf, CQI_NAMELEN - 1, "%s%d",
                        _cqiAnimDefs[i].texname,
                        j);
               
@@ -865,6 +1016,13 @@ int cqiLoadRC(int rcid, char *filename, int verbosity, int debugl)
       else
         snprintf(buffer, sizeof(buffer)-1, "%s/%s", CONQETC, "texturesrc");
       break;
+    case CQI_FILE_SOUNDRC:
+    case CQI_FILE_SOUNDRC_ADD: 
+      if (filename)
+        strncpy(buffer, filename, BUFFER_SIZE - 1);
+      else
+        snprintf(buffer, sizeof(buffer)-1, "%s/%s", CONQETC, "soundrc");
+      break;
     default:                    /* programmer error */
       clog("%s: invalid rcid %d, bailing.", __FUNCTION__, rcid);
       return FALSE;
@@ -883,22 +1041,30 @@ int cqiLoadRC(int rcid, char *filename, int verbosity, int debugl)
          CQI_FILE_TEXTURESRC/CONQINITRC is another story however... */
 
       clog("%s: using default init tables.", __FUNCTION__);
-      if (rcid == CQI_FILE_TEXTURESRC)
+      switch(rcid)
         {
-          cqiTextures  = defaultTextures;
-          cqiNumTextures = defaultNumTextures;
-          cqiAnimations = defaultAnimations;
-          cqiNumAnimations = defaultNumAnimations;
-          cqiAnimDefs = defaultAnimDefs;
-          cqiNumAnimDefs = defaultNumAnimDefs;
+        case CQI_FILE_TEXTURESRC:
+          {
+            cqiTextures  = defaultTextures;
+            cqiNumTextures = defaultNumTextures;
+            cqiAnimations = defaultAnimations;
+            cqiNumAnimations = defaultNumAnimations;
+            cqiAnimDefs = defaultAnimDefs;
+            cqiNumAnimDefs = defaultNumAnimDefs;
+          }
+          break;
+          
+        case CQI_FILE_SOUNDRC:
+          {
+            cqiSoundConf = &defaultSoundConf;
+            cqiSoundEffects  = defaultSoundEffects;
+            cqiNumSoundEffects = defaultNumSoundEffects;
+            cqiSoundMusic = defaultSoundMusic;
+            cqiNumSoundMusic = defaultNumSoundMusic;
+          }
+          break;
         }
-      else if (rcid != CQI_FILE_TEXTURESRC_ADD)
-        {
-          cqiGlobal    = &defaultGlobalInit;
-          cqiShiptypes = defaultShiptypes;
-          cqiPlanets   = defaultPlanets;
-        }
-      
+
       return FALSE;
     }
 
@@ -965,6 +1131,35 @@ int cqiLoadRC(int rcid, char *filename, int verbosity, int debugl)
 
       return TRUE;
     }
+
+  /* sounds */
+  if (rcid == CQI_FILE_SOUNDRC || rcid == CQI_FILE_SOUNDRC_ADD)
+    {
+      if (fail && rcid == CQI_FILE_SOUNDRC)
+        {
+          clog("%s: using default sound data.", __FUNCTION__);
+          cqiSoundConf = &defaultSoundConf;
+          cqiSoundEffects  = defaultSoundEffects;
+          cqiNumSoundEffects = defaultNumSoundEffects;
+          cqiSoundMusic = defaultSoundMusic;
+          cqiNumSoundMusic = defaultNumSoundMusic;
+
+          return FALSE;
+        }
+
+      clog("%s: loaded %d Music definitions.",
+           __FUNCTION__, fileNumMusic);
+      clog("%s: loaded %d Effect definitions.",
+           __FUNCTION__, fileNumEffects);
+      cqiSoundConf = _cqiSoundConf;
+      cqiSoundEffects = _cqiSoundEffects;
+      cqiNumSoundEffects = numSoundEffects;
+      cqiSoundMusic = _cqiSoundMusic;
+      cqiNumSoundMusic = numSoundMusic;
+
+      return TRUE;
+    }
+
 
   if (!fail && !cqiValidatePlanets())
     {
@@ -1129,6 +1324,93 @@ static int str2team(char *str)
   
   return TEAM_NOTEAM;           /* default */
 }
+
+/* Dump the parsed soundrc to stdout in sounddata.h format */
+/* this includes soundconf, effects, and music */
+void dumpSoundDataHdr(void)
+{
+  char buf[MAXLINE];
+  int i;
+  
+
+  if (!cqiSoundConf || !cqiNumSoundEffects)
+    return;
+
+  /* preamble */
+  getdandt( buf, 0 );
+  printf("/* Generated by conqinit on %s */\n", buf);
+  printf("/* $Id$ */\n");
+  printf("\n\n");
+
+  printf("#ifndef _SOUNDDATA_H\n");
+  printf("#define _SOUNDDATA_H\n\n");
+
+
+  printf("static cqiSoundConfRec_t defaultSoundConf = {\n");
+  printf("  %d,\n", cqiSoundConf->samplerate);
+  printf("  %d,\n", cqiSoundConf->stereo);
+  printf("  %d,\n", cqiSoundConf->fxchannels);
+  printf("  %d\n", cqiSoundConf->chunksize);
+  printf("};\n\n");
+    
+
+  printf("static int defaultNumSoundMusic = %d;\n\n", cqiNumSoundMusic);
+
+  /* if there is no music built in... */
+  if (!cqiNumSoundMusic)
+    {
+      printf("static cqiSoundRec_t *defaultSoundMusic = NULL;\n");
+      printf("\n\n");
+    }
+  else
+    {
+      printf("static cqiSoundRec_t defaultSoundMusic[%d] = {\n", 
+             cqiNumSoundMusic);
+      
+      /* music */
+      for (i=0; i<cqiNumSoundMusic; i++)
+        printf(" { \"%s\", \"%s\", %d, %d, %d, %d, %d, %d, %d, %d },\n",
+               cqiSoundMusic[i].name,
+               cqiSoundMusic[i].filename,
+               cqiSoundMusic[i].volume,
+               cqiSoundMusic[i].pan,
+               cqiSoundMusic[i].fadeinms,
+               cqiSoundMusic[i].fadeoutms,
+               cqiSoundMusic[i].loops,
+               cqiSoundMusic[i].limit,
+               cqiSoundMusic[i].framelimit,
+               cqiSoundMusic[i].delayms);
+      
+      printf("};\n\n");
+    }
+
+  /* effect */
+  printf("static int defaultNumSoundEffects = %d;\n\n", cqiNumSoundEffects);
+  printf("static cqiSoundRec_t defaultSoundEffects[%d] = {\n", 
+         cqiNumSoundEffects);
+
+  for (i=0; i<cqiNumSoundEffects; i++)
+    printf(" { \"%s\", \"%s\", %d, %d, %d, %d, %d, %d, %d, %d },\n",
+           cqiSoundEffects[i].name,
+           cqiSoundEffects[i].filename,
+           cqiSoundEffects[i].volume,
+           cqiSoundEffects[i].pan,
+           cqiSoundEffects[i].fadeinms,
+           cqiSoundEffects[i].fadeoutms,
+           cqiSoundEffects[i].loops,
+           cqiSoundEffects[i].limit,
+           cqiSoundEffects[i].framelimit,
+           cqiSoundEffects[i].delayms);
+  
+  printf("};\n\n");
+
+  printf("#endif /* _SOUNDDATA_H */\n\n");
+
+  
+  return;
+}
+
+
 
 /* Dump the parsed texturesrc to stdout in texinit.h format */
 /* this includes textures, animations, and animdefs */
@@ -1596,6 +1878,14 @@ static void startSection(int section)
     {
     case GLOBAL:    
       {
+        if (globalRead)
+          {
+            clog("%s: global section already configured\n",
+                 __FUNCTION__);
+            goterror++;
+            return;
+          }
+
         _cqiGlobal = malloc(sizeof(cqiGlobalInitRec_t));
         if (!_cqiGlobal)
           {
@@ -1651,6 +1941,38 @@ static void startSection(int section)
     case ANIMDEF:
       {
         memset((void *)&currAnimDef, 0, sizeof(cqiAnimDefInitRec_t));
+      }
+      break;
+
+    case SOUNDCONF:    
+      {
+        if (!_cqiSoundConf)
+          {                     /* starting fresh */
+            _cqiSoundConf = malloc(sizeof(cqiSoundConfRec_t));
+            if (!_cqiSoundConf)
+              {
+                clog("%s: Could not allocate SoundConf",
+                     __FUNCTION__);
+                goterror++;
+              }
+            else
+              {
+                memset((void *)_cqiSoundConf, 0, sizeof(cqiSoundConfRec_t));
+                _cqiSoundConf->stereo = TRUE; /* default to stereo */
+              }
+            
+          } /* else we are just overriding */
+      }
+      break;
+
+    case EFFECT:
+    case MUSIC:
+      {
+        memset((void *)&currSound, 0, sizeof(cqiSoundRec_t));
+        
+        currSound.loops = 1;    /* default to 1 loop */
+        currSound.volume = 100;
+        currSound.pan = 0;
       }
       break;
 
@@ -1801,7 +2123,7 @@ static void endSection(void)
            texture, then copy in the texname as the default */
         if (!strlen(currTexture.filename) && 
             !(currTexture.flags & CQITEX_F_COLOR_SPEC))
-          strncpy(currTexture.filename, currTexture.name, TEXFILEMAX - 1);
+          strncpy(currTexture.filename, currTexture.name, CQI_NAMELEN - 1);
         
         if (exists >= 0)
           {
@@ -1856,7 +2178,7 @@ static void endSection(void)
         /* if a animdef wasn't specified, then copy in the
            name as the default */
         if (!strlen(currAnimation.animdef))
-          strncpy(currAnimation.animdef, currAnimation.name, TEXFILEMAX - 1);
+          strncpy(currAnimation.animdef, currAnimation.name, CQI_NAMELEN - 1);
 
         if (exists >= 0)
           {
@@ -1942,12 +2264,153 @@ static void endSection(void)
       }        
       break;
       
+    case SOUNDCONF:    
+      {                         /* make sure everything is specified */
+
+        if (!_cqiSoundConf->samplerate)
+          _cqiSoundConf->samplerate = 22050;
+        
+        /* stereo is already enabled by default in startSection() */
+
+        if (!_cqiSoundConf->fxchannels)
+          _cqiSoundConf->fxchannels = 16;
+
+        if (!_cqiSoundConf->chunksize)
+          _cqiSoundConf->chunksize = 512;
+      }
+      break;
+
+
+    case EFFECT:
+      {
+        cqiSoundPtr_t sndptr;
+        char *ch;
+        int exists = -1;
+        
+        /* verify the required info was provided */
+        if (!strlen(currSound.name))
+          {
+            clog("%s: effect name at or near line %d was not specified, ignoring.",
+                 __FUNCTION__, lineNum);
+            return;
+          }
+
+        
+        /* check the name for banned substances ('/' and '.') */
+        while ((ch = strchr(currSound.name, '.')))
+          *ch = '_';
+        while ((ch = strchr(currSound.name, '/')))
+          *ch = '_';
+        
+        /* if the effect was overridden by a later definition
+           just copy the new definition over it */
+        exists = _cqiFindEffect(currSound.name);
+
+        /* if a filename wasn't specified, then copy in the name
+           as the default */
+        if (!strlen(currSound.filename))
+          strncpy(currSound.filename, currSound.name, CQI_NAMELEN - 1);
+
+        if (exists >= 0)
+          {
+            /* overwrite existing def */
+            _cqiSoundEffects[exists] = currSound;
+            if (cqiDebugl)
+              clog("%s: effect '%s' near line %d: overriding already "
+                   "loaded effect.",
+                   __FUNCTION__, currSound.name, lineNum);
+          }
+        else
+          {                     /* make a new one */
+            sndptr = (cqiSoundPtr_t)realloc((void *)_cqiSoundEffects, 
+                                                  sizeof(cqiSoundRec_t) * 
+                                                  (numSoundEffects + 1));
+            
+            if (!sndptr)
+              {  
+                clog("%s: Could not realloc %d effect, ignoring effect '%s'",
+                     __FUNCTION__,
+                     numSoundEffects + 1,
+                     currSound.name);
+                return;
+              }
+            
+            _cqiSoundEffects = sndptr;
+            _cqiSoundEffects[numSoundEffects] = currSound;
+            numSoundEffects++;
+          }
+        fileNumEffects++;
+      }
+      break;
+
+    case MUSIC:
+      {
+        cqiSoundPtr_t sndptr;
+        char *ch;
+        int exists = -1;
+        
+        /* verify the required info was provided */
+        if (!strlen(currSound.name))
+          {
+            clog("%s: music name at or near line %d was not specified, ignoring.",
+                 __FUNCTION__, lineNum);
+            return;
+          }
+
+        
+        /* check the name for banned substances ('/' and '.') */
+        while ((ch = strchr(currSound.name, '.')))
+          *ch = '_';
+        while ((ch = strchr(currSound.name, '/')))
+          *ch = '_';
+        
+        /* if the music was overridden by a later definition
+           just copy the new definition over it */
+        exists = _cqiFindMusic(currSound.name);
+
+        /* if a filename wasn't specified, then copy in the name
+           as the default */
+        if (!strlen(currSound.filename))
+          strncpy(currSound.filename, currSound.name, CQI_NAMELEN - 1);
+
+        if (exists >= 0)
+          {
+            /* overwrite existing def */
+            _cqiSoundMusic[exists] = currSound;
+            if (cqiDebugl)
+              clog("%s: music '%s' near line %d: overriding already "
+                   "loaded music slot.",
+                   __FUNCTION__, currSound.name, lineNum);
+          }
+        else
+          {                     /* make a new one */
+            sndptr = (cqiSoundPtr_t)realloc((void *)_cqiSoundMusic, 
+                                                  sizeof(cqiSoundRec_t) * 
+                                                  (numSoundMusic + 1));
+            
+            if (!sndptr)
+              {  
+                clog("%s: Could not realloc %d music slots, ignoring music '%s'",
+                     __FUNCTION__,
+                     numSoundMusic + 1,
+                     currSound.name);
+                return;
+              }
+            
+            _cqiSoundMusic = sndptr;
+            _cqiSoundMusic[numSoundMusic] = currSound;
+            numSoundMusic++;
+          }
+        fileNumMusic++;
+      }
+      break;
+
     default:
       break;
     }
   
   cursection = 0;
-
+  
   return;
 }
 
@@ -2108,6 +2571,58 @@ static void cfgSectioni(int item, int val)
         currAnimDef.timelimit = abs(val);
       }
       break;
+
+    case SOUNDCONF:    
+      {
+        switch (item)
+          {
+          case SAMPLERATE:
+            _cqiSoundConf->samplerate = CLAMP(8192, 44100, abs(val));
+            break;
+          case FXCHANNELS:
+            _cqiSoundConf->fxchannels = CLAMP(2, 64, abs(val));
+            break;
+          case CHUNKSIZE:
+            _cqiSoundConf->chunksize = CLAMP(256, 8192, abs(val));
+            break;
+          default:
+            break;
+          }
+      }
+
+    case EFFECT:
+    case MUSIC:
+      {
+        switch(item)
+          {
+          case VOLUME:
+            currSound.volume = CLAMP(0, 100, abs(val));
+            break;
+          case PAN:
+            currSound.pan = CLAMP(-128, 128, abs(val));
+            break;
+          case FADEINMS:
+            currSound.fadeinms = CLAMP(0, 10000, abs(val));
+            break;
+          case FADEOUTMS:
+            currSound.fadeoutms = CLAMP(0, 10000, abs(val));
+            break;
+          case LOOPS:
+            currSound.loops = abs(val);
+            break;
+          case LIMIT:
+            currSound.limit = abs(val);
+            break;
+          case FRAMELIMIT:
+            currSound.framelimit = abs(val);
+            break;
+          case DELAYMS:
+            currSound.delayms = abs(val);
+            break;
+          }
+
+      }
+      
     default:
       break;
     }
@@ -2339,7 +2854,7 @@ void cfgSections(int item, char *val)
                       currAnimDef.istates |= AD_ISTATE_COL;
                       break;
                     case TEXNAME:
-                      strncpy(currAnimDef.itexname, val, TEXFILEMAX - 1);
+                      strncpy(currAnimDef.itexname, val, CQI_NAMELEN - 1);
                       currAnimDef.istates |= AD_ISTATE_TEX;
                       break;
                     }
@@ -2380,7 +2895,7 @@ void cfgSections(int item, char *val)
             currPlanet.pteam = str2team(val);
             break;
           case TEXNAME:
-            strncpy(currPlanet.texname, val, TEXFILEMAX - 1);
+            strncpy(currPlanet.texname, val, CQI_NAMELEN - 1);
             break;
           case COLOR:
             currPlanet.color = hex2color(val);
@@ -2394,13 +2909,13 @@ void cfgSections(int item, char *val)
         switch(item)
           {
           case NAME:
-            strncpy(currTexture.name, val, TEXFILEMAX - 1);
+            strncpy(currTexture.name, val, CQI_NAMELEN - 1);
             break;
           case FILENAME:
             if (val[0] == 0)    /* empty filename means only color matters */
               currTexture.flags |= CQITEX_F_COLOR_SPEC;
             else
-              strncpy(currTexture.filename, val, TEXFILEMAX - 1);
+              strncpy(currTexture.filename, val, CQI_NAMELEN - 1);
             break;
           case COLOR:
             currTexture.color = hex2color(val);
@@ -2414,10 +2929,10 @@ void cfgSections(int item, char *val)
         switch(item)
           {
           case NAME:
-            strncpy(currAnimation.name, val, TEXFILEMAX - 1);
+            strncpy(currAnimation.name, val, CQI_NAMELEN - 1);
             break;
           case ANIMDEF:
-            strncpy(currAnimation.animdef, val, TEXFILEMAX - 1);
+            strncpy(currAnimation.animdef, val, CQI_NAMELEN - 1);
             break;
           }
       }
@@ -2428,17 +2943,29 @@ void cfgSections(int item, char *val)
         switch(item)
           {
           case NAME:
-            strncpy(currAnimDef.name, val, TEXFILEMAX - 1);
+            strncpy(currAnimDef.name, val, CQI_NAMELEN - 1);
             break;
           case TEXNAME:
-            strncpy(currAnimDef.texname, val, TEXFILEMAX - 1);
+            strncpy(currAnimDef.texname, val, CQI_NAMELEN - 1);
             break;
           }
       }
       break;
 
-    default:
+    case EFFECT:
+    case MUSIC:
+      {
+        switch(item)
+          {
+          case NAME:
+            strncpy(currSound.name, val, CQI_NAMELEN - 1);
+            break;
+          case FILENAME:
+            strncpy(currSound.filename, val, CQI_NAMELEN - 1);
+          }
+      }
       break;
+
     }
 
   /* be sure to free the value allocated */
@@ -2492,10 +3019,22 @@ static void cfgSectionb(int item, char *val)
       break;
     case TEXTURE:
       break;
+
+    case SOUNDCONF:    
+      {
+        switch (item)
+          {
+          case STEREO:
+            _cqiSoundConf->stereo = bval;
+            break;
+          }
+      }
+      break;
+      
     default:
       break;
     }
-
+  
   return;
 }
 
@@ -2520,6 +3059,21 @@ static char *sect2str(int section)
       break;
     case ANIMDEF:
       return "ANIMDEF";
+      break;
+    case SOUNDCONF:
+      return "SOUNDCONF";
+      break;
+    case EFFECT:
+      return "EFFECT";
+      break;
+    case MUSIC:
+      return "MUSIC";
+      break;
+    case LIMIT:
+      return "LIMIT";
+      break;
+    case FRAMELIMIT:
+      return "FRAMELIMIT";
       break;
 
       /* subsections */
@@ -2685,6 +3239,34 @@ static char *item2str(int item)
     case DELTAS:
       return "DELTAS";
       break;
+
+    case SAMPLERATE:
+      return "SAMPLERATE";
+      break;
+    case VOLUME:
+      return "VOLUME";
+      break;
+    case PAN:
+      return "PAN";
+      break;
+    case STEREO:
+      return "STEREO";
+      break;
+    case FXCHANNELS:
+      return "FXCHANNELS";
+      break;
+    case CHUNKSIZE:
+      return "CHUNKSIZE";
+      break;
+    case FADEINMS:
+      return "FADEINMS";
+      break;
+    case FADEOUTMS:
+      return "FADEOUTMS";
+      break;
+    case LIMIT:
+      return "LIMIT";
+      break;
     }
   
   return "UNKNOWN";
@@ -2840,6 +3422,39 @@ static void initrun(int rcid)
           _cqiPlanets = NULL;
           numPlanets = 0;
         }
+    }
+
+  if (rcid == CQI_FILE_SOUNDRC || rcid == CQI_FILE_SOUNDRC_ADD)
+    {
+      if (rcid == CQI_FILE_SOUNDRC)
+        {                       /* if we are not adding, re-init */
+          if (_cqiSoundConf)
+            {
+              if (_cqiSoundConf != &defaultSoundConf)
+                free(_cqiSoundConf);
+              _cqiSoundConf = NULL;
+            }              
+
+          if (_cqiSoundEffects)
+            {
+              if (_cqiSoundEffects != defaultSoundEffects)
+                free(_cqiSoundEffects);
+              _cqiSoundEffects = NULL;
+            }
+          numSoundEffects = 0;
+
+          if (_cqiSoundMusic)
+            {
+              if (_cqiSoundMusic != defaultSoundMusic)
+                free(_cqiSoundMusic);
+              _cqiSoundMusic = NULL;
+            }
+          numSoundMusic = 0;
+        }
+              
+      fileNumEffects = 0;
+      fileNumMusic = 0;
+
     }
 
   if (rcid == CQI_FILE_TEXTURESRC || rcid == CQI_FILE_TEXTURESRC_ADD)

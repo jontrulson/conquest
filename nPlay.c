@@ -258,7 +258,7 @@ static int nPlayIdle(void)
          sent in menu - our ship may have chenged */
       sendCommand(CPCMD_RELOAD, 0);
 
-      nCPInit();            /* play */
+      nCPInit(TRUE);            /* play */
     }
   else if (state == S_MENU)
     nMenuInit();
@@ -300,7 +300,7 @@ static int nPlayInput(int ch)
                 }
             
             /* Didn't get a good one; complain and try again. */
-            mglBeep();
+            mglBeep(MGL_BEEP_ERR);
             break;
           }
       }

@@ -367,7 +367,7 @@ static int nMetaInput(int ch)
           nConsvrInit(cInfo.remotehost, cInfo.remoteport);
         }
       else
-        mglBeep();
+        mglBeep(MGL_BEEP_ERR);
 
       break;
       

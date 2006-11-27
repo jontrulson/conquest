@@ -336,7 +336,7 @@ static int nPlanetlInput(int ch)
     {
     case DSP_NODE_CP:
       setONode(NULL);
-      nCPInit();
+      nCPInit(FALSE);
       break;
     case DSP_NODE_MENU:
       setONode(NULL);

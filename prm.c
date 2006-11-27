@@ -82,7 +82,7 @@ int prmProcInput(prm_t *prm, int ch)
         }
     }
   else if (!isprint(c))
-    mglBeep();
+    mglBeep(MGL_BEEP_ERR);
   else 
     {
       prm->buf[clen] = c;

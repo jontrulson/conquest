@@ -2,25 +2,34 @@ AUTOMAKE_OPTIONS = foreign
 
 # User defineable options
 
-CFLAGS = @CONQ_CFLAGS@
+CFLAGS = @CONQ_CFLAGS@ $(SDL_CFLAGS)
 CONQGROUP = @CONQGROUP@
 CONQLOCALSTATEDIR = @localstatedir@/conquest
 CONQLIBEXECDIR = @libexecdir@
 CONQDATADIR = @datadir@
 CONQSYSCONFDIR = @sysconfdir@
 CONQIMGDIR = $(CONQDATADIR)/img
+CONQSNDDIR = $(CONQDATADIR)/sound
 CONQDOCDIR = $(CONQDATADIR)/doc/conquest
+
+#if SNDCLIENT
+#SDL_LIBS=-lSDL_mixer -lSDL 
+#else
+#SDL_LIBS=
+#endif
 
 CONQDOCS = HISTORY README CONQINIT.TXT conqrule conqrule.easy
 
 IMAGES = img/*.tga img/*.txf
+SOUNDS = sound/*.ogg 
 TRC = *.trc
+SRC = *.src
 
 man6_MANS = conqdriv.man conqmetad.man conqoper.man conquest.man \
 	conquestd.man conquestsh.man conqai.man conqstrat.man \
 	conqinit.man conquestgl.man
 
-XLIBS = @X_LIBS@ @X_EXTRA_LIBS@ -lglut -lGL -lGLU -lXt @X_PRE_LIBS@ -lXext -lXi -lX11 -lXmu  
+XLIBS = @X_LIBS@ @X_EXTRA_LIBS@ -lglut -lGL -lGLU -lXt $(SDL_LIBS) @X_PRE_LIBS@ -lXext -lXi -lX11 -lXmu  
 
 INCLUDES = -DCONQUEST_GROUP=\"$(CONQGROUP)\" \
 	-DCONQSTATE=\"$(CONQLOCALSTATEDIR)\" -DCONQLIBEXEC=\"$(CONQLIBEXECDIR)\" \
@@ -33,7 +42,7 @@ AM_YFLAGS = -d
 
 if GLCLIENT
 lib_LTLIBRARIES = libconquest.la libconqclnt.la libconqserv.la \
-	libconqinit.la libUi.la libUiGL.la libUiCU.la 
+	libconqinit.la libUi.la libUiGL.la libUiCU.la libcqsound.la
 else
 lib_LTLIBRARIES = libconquest.la libconqclnt.la libconqserv.la \
 	libconqinit.la libUi.la libUiCU.la
@@ -88,6 +97,10 @@ libconqinit_la_SOURCES = conqinit-yacc.y conqinit-lex.l conqinit.h initdata.h pl
 
 libconqinit_la_LDFLAGS = -version-info 1:0:0
 
+libcqsound_la_SOURCES = cqsound.c cqsound.h
+
+libcqsound_la_LDFLAGS = -version-info 1:0:0
+
 if GLCLIENT
 bin_PROGRAMS = conquest conquestgl conqai conqoper conqstrat \
 	conquestd conquestsh conqmetad conqinit
@@ -104,7 +117,7 @@ conquest_SOURCES = conquest.c c_defs.h defs.h conqdef.h conqcom.h context.h \
 conquest_LDADD = libUiCU.la libUi.la libconqclnt.la libconquest.la libconqinit.la $(LEXLIB) $(YACCLIB)
 
 conquestgl_SOURCES = conquestgl.c c_defs.h defs.h conqdef.h conqcom.h context.h
-conquestgl_LDADD = libUiGL.la libUi.la libconqclnt.la libconquest.la libconqinit.la $(XLIBS) $(LEXLIB) $(YACCLIB)
+conquestgl_LDADD = libUiGL.la libUi.la libconqclnt.la libconquest.la libcqsound.la libconqinit.la $(XLIBS) $(LEXLIB) $(YACCLIB)
 
 conquestd_SOURCES = conquestd.c c_defs.h defs.h conqdef.h conqcom.h \
 	context.h conqnet.h 
@@ -134,18 +147,19 @@ conqmetad_LDADD = libconquest.la libconqinit.la $(LEXLIB) $(YACCLIB)
 
 # we install conqinitrc in the intall-exec-hook, so that we only install
 #  conqinitrc if it does not already exist.
-sysconf_DATA = texturesrc $(TRC)
+sysconf_DATA = texturesrc soundrc $(TRC) #$(SRC)
 
 EXTRA_DIST = $(man6_MANS)
 
 install-exec-hook:
-	$(mkinstalldirs) -m 755 $(DESTDIR)$(localstatedir) \
+	$(mkinstalldirs) -m 755 $(DESTDIR) $(DESTDIR)$(localstatedir) \
 		$(DESTDIR)$(CONQSYSCONFDIR) \
 		$(DESTDIR)$(CONQLOCALSTATEDIR) \
 		$(DESTDIR)$(CONQDATADIR) \
 		$(DESTDIR)$(CONQDATADIR)/doc \
 		$(DESTDIR)$(CONQDATADIR)/doc/conquest \
 		$(DESTDIR)$(CONQIMGDIR) \
+		$(DESTDIR)$(CONQSNDDIR) \
 		$(DESTDIR)$(bindir) \
 		$(DESTDIR)$(libexecdir) \
 		$(DESTDIR)$(libdir) \
@@ -155,6 +169,8 @@ install-exec-hook:
 	chgrp $(CONQGROUP) $(DESTDIR)$(CONQLOCALSTATEDIR)
 	cp -f $(IMAGES) $(DESTDIR)$(CONQIMGDIR)/
 	chmod 644 $(DESTDIR)$(CONQIMGDIR)/*.tga $(DESTDIR)$(CONQIMGDIR)/*.txf
+	cp -f $(SOUNDS) $(DESTDIR)$(CONQSNDDIR)/
+	chmod 644 $(DESTDIR)$(CONQSNDDIR)/*.ogg 
 	cp -f $(CONQDOCS) $(DESTDIR)$(CONQDOCDIR)/
 	chmod 644 $(DESTDIR)$(CONQDOCDIR)/*
 	if [ ! -f $(DESTDIR)$(CONQSYSCONFDIR)/conqinitrc ] ; \

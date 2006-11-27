@@ -26,6 +26,7 @@
 
 
 static void expire_users(void);
+
 static int doLogin(char *login, char *pw, char *epw)
 {
   char salt[3];
@@ -257,9 +258,10 @@ void expire_users(void)
 #endif
 
 	      clbResign(i, TRUE);
-	      clog("INFO: expire_users(): Expired remote user '%s' after %d days of inactivity",
+	      clog("INFO: expire_users(): Expired remote user '%s' after %d days of inactivity. (limit %d days)",
 		   Users[i].username,
-		   difftime / SECS_PER_DAY);
+		   difftime / SECS_PER_DAY,
+                   SysConf.UserExpiredays);
 				/* re-aquire the lock */
 	      PVLOCK(&ConqInfo->lockword);
 	    }

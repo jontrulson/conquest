@@ -54,6 +54,9 @@ extern void conqend(void);
 
 #include "conquest.h"
 
+#include "cqsound.h"
+
+
 /* torp direction tracking */
 static real torpdir[MAXSHIPS + 1][MAXTORPS]; 
 
@@ -155,7 +158,7 @@ int findGLTexture(char *texname)
   for (i=0; i<loadedGLTextures; i++)
     {
       if (!strncmp(cqiTextures[GLTextures[i].cqiIndex].name, 
-                   texname, TEXFILEMAX))
+                   texname, CQI_NAMELEN))
         return i;
     }
   
@@ -174,7 +177,7 @@ int findGLAnimDef(char *animname)
   for (i=0; i<cqiNumAnimations; i++)
     {
       if (!strncmp(cqiAnimations[i].name, 
-                   animname, TEXFILEMAX))
+                   animname, CQI_NAMELEN))
         return cqiAnimations[i].adIndex;
     }
   
@@ -192,7 +195,7 @@ static int findGLTextureByFile(char *texfile)
   for (i=0; i<loadedGLTextures; i++)
     {
       if (!strncmp(cqiTextures[GLTextures[i].cqiIndex].filename, 
-                   texfile, TEXFILEMAX))
+                   texfile, CQI_NAMELEN))
         return i;
     }
   
@@ -203,7 +206,7 @@ static int initGLAnimDefs(void)
 {
   int i, j;
   int ndx;
-  char buffer[TEXFILEMAX];
+  char buffer[CQI_NAMELEN];
 
   clog("%s: Initializing...", __FUNCTION__);
 
@@ -314,7 +317,7 @@ static int initGLAnimDefs(void)
 
           for (j=0; j<GLAnimDefs[i].tex.stages; j++)
             {
-              snprintf(buffer, TEXFILEMAX - 1, "%s%d", 
+              snprintf(buffer, CQI_NAMELEN - 1, "%s%d", 
                        cqiAnimDefs[i].texname, j);
 
               if ((ndx = findGLTexture(buffer)) >= 0)
@@ -458,8 +461,8 @@ static int _get_ship_texcolor(char *name, GLColor_t *col)
 static int initGLShips(void)
 {
   int i, j;
-  char shipPfx[TEXFILEMAX];
-  char buffer[TEXFILEMAX];
+  char shipPfx[CQI_NAMELEN];
+  char buffer[CQI_NAMELEN];
 
   clog("%s: Initializing...", __FUNCTION__);
 
@@ -470,60 +473,60 @@ static int initGLShips(void)
   for (i=0; i<NUMPLAYERTEAMS; i++)
     {
       /* build the prefix for this ship */
-      snprintf(shipPfx, TEXFILEMAX - 1, "ship%c",
+      snprintf(shipPfx, CQI_NAMELEN - 1, "ship%c",
                Teams[i].name[0]);
 
       for (j=0; j<MAXNUMSHIPTYPES; j++)
         {
 
-          snprintf(buffer, TEXFILEMAX - 1, "%s%c%c", shipPfx, 
+          snprintf(buffer, CQI_NAMELEN - 1, "%s%c%c", shipPfx, 
                    ShipTypes[j].name[0], ShipTypes[j].name[1]);
           GLShips[i][j].ship = _get_ship_texid(buffer);
           
-          snprintf(buffer, TEXFILEMAX - 1, "%s%c%c-sh", shipPfx, 
+          snprintf(buffer, CQI_NAMELEN - 1, "%s%c%c-sh", shipPfx, 
                    ShipTypes[j].name[0], ShipTypes[j].name[1]);
           GLShips[i][j].sh = _get_ship_texid(buffer);
           
-          snprintf(buffer, TEXFILEMAX - 1, "%s-tac", shipPfx);
+          snprintf(buffer, CQI_NAMELEN - 1, "%s-tac", shipPfx);
           GLShips[i][j].tac = _get_ship_texid(buffer);
           
-          snprintf(buffer, TEXFILEMAX - 1, "%s-phaser", shipPfx);
+          snprintf(buffer, CQI_NAMELEN - 1, "%s-phaser", shipPfx);
           GLShips[i][j].phas = _get_ship_texid(buffer);
 
-          snprintf(buffer, TEXFILEMAX - 1, "%s%c%c-ico", shipPfx, 
+          snprintf(buffer, CQI_NAMELEN - 1, "%s%c%c-ico", shipPfx, 
                    ShipTypes[j].name[0], ShipTypes[j].name[1]);
           GLShips[i][j].ico = _get_ship_texid(buffer);
           
-          snprintf(buffer, TEXFILEMAX - 1, "%s%c%c-ico-sh", shipPfx, 
+          snprintf(buffer, CQI_NAMELEN - 1, "%s%c%c-ico-sh", shipPfx, 
                    ShipTypes[j].name[0], ShipTypes[j].name[1]);
           GLShips[i][j].ico_sh = _get_ship_texid(buffer);
           
-          snprintf(buffer, TEXFILEMAX - 1, "%s-ico-decal1", shipPfx);
+          snprintf(buffer, CQI_NAMELEN - 1, "%s-ico-decal1", shipPfx);
           GLShips[i][j].decal1 = _get_ship_texid(buffer);
           
-          snprintf(buffer, TEXFILEMAX - 1, "%s-ico-decal2", shipPfx);
+          snprintf(buffer, CQI_NAMELEN - 1, "%s-ico-decal2", shipPfx);
           GLShips[i][j].decal2 = _get_ship_texid(buffer);
           
-          snprintf(buffer, TEXFILEMAX - 1, "%s-dial", shipPfx);
+          snprintf(buffer, CQI_NAMELEN - 1, "%s-dial", shipPfx);
           GLShips[i][j].dial = _get_ship_texid(buffer);
           
-          snprintf(buffer, TEXFILEMAX - 1, "%s-dialp", shipPfx);
+          snprintf(buffer, CQI_NAMELEN - 1, "%s-dialp", shipPfx);
           GLShips[i][j].dialp = _get_ship_texid(buffer);
           
-          snprintf(buffer, TEXFILEMAX - 1, "%s-warp", shipPfx);
+          snprintf(buffer, CQI_NAMELEN - 1, "%s-warp", shipPfx);
           GLShips[i][j].warp = _get_ship_texid(buffer);
 
           /* here we just want the color */
-          snprintf(buffer, TEXFILEMAX - 1, "%s-warp-col", shipPfx);
+          snprintf(buffer, CQI_NAMELEN - 1, "%s-warp-col", shipPfx);
           if (_get_ship_texcolor(buffer, &GLShips[i][j].warpq_col) < 0)
             {                   /* do something sane */
               hex2GLColor(0xffeeeeee, &GLShips[i][j].warpq_col);
             }
 
-          snprintf(buffer, TEXFILEMAX - 1, "%s-ico-cloak", shipPfx);
+          snprintf(buffer, CQI_NAMELEN - 1, "%s-ico-cloak", shipPfx);
           GLShips[i][j].ico_cloak = _get_ship_texid(buffer);
           
-          snprintf(buffer, TEXFILEMAX - 1, "%s-ico-repair", shipPfx);
+          snprintf(buffer, CQI_NAMELEN - 1, "%s-ico-repair", shipPfx);
           GLShips[i][j].ico_repair = _get_ship_texid(buffer);
           
           GLShips[i][j].ico_torp = _get_ship_texid("ico-torp");
@@ -1039,10 +1042,11 @@ void drawTexBox(GLfloat x, GLfloat y, GLfloat z, GLfloat size)
   return;
 }
 
-void drawExplosion(GLfloat x, GLfloat y, int snum, int torpnum)
+void drawExplosion(GLfloat x, GLfloat y, int snum, int torpnum, int scale)
 {
   static int norender = FALSE;
   scrNode_t *curnode = getTopNode();
+  static int explodefx = -1;
 
   if (norender)
     return;
@@ -1053,26 +1057,51 @@ void drawExplosion(GLfloat x, GLfloat y, int snum, int torpnum)
       {
         clog("%s: initGLExplosions failed, bailing.", 
              __FUNCTION__);
-        norender = TRUE;
-        return;                 /* we need to bail here... */
+          norender = TRUE;
+          return;                 /* we need to bail here... */
       }
+
+  if (explodefx == -1)
+    explodefx = cqsFindEffect("explosion");
 
   /* if it expired and moved, reset and que a new one */
   if (ANIM_EXPIRED(&torpAStates[snum][torpnum]) && 
       (torpAStates[snum][torpnum].state.x != Ships[snum].torps[torpnum].x &&
        torpAStates[snum][torpnum].state.y != Ships[snum].torps[torpnum].y))
     {
+
+      /* start the 'exploding' sound */
+      if (cqsSoundAvailable)
+        {
+          real ang;
+          real dis;
+          
+          ang = angle(Ships[Context.snum].x, Ships[Context.snum].y, 
+                      Ships[snum].torps[torpnum].x,
+                      Ships[snum].torps[torpnum].y);
+          dis = dist(Ships[Context.snum].x, Ships[Context.snum].y,
+                     Ships[snum].torps[torpnum].x,
+                     Ships[snum].torps[torpnum].y);
+          cqsEffectPlay(explodefx, YELLOW_DIST, dis, ang);
+        }
+
       if (curnode->animQue)
         {
           animResetState(&torpAStates[snum][torpnum], frameTime);
+
           /* we cheat a little by abusing the animstate's x and
              y as per-state storage. This allows us to detect if
              we really should Reset if expired */
           torpAStates[snum][torpnum].state.x = Ships[snum].torps[torpnum].x;
           torpAStates[snum][torpnum].state.y = Ships[snum].torps[torpnum].y;
+
           animQueAdd(curnode->animQue, &torpAStates[snum][torpnum]);
         }
     }
+
+
+  if (scale != SCALE_FAC) 
+    return;              /* we do not want to display if not in range. */
 
   glPushMatrix();
   glLoadIdentity();
@@ -1121,6 +1150,9 @@ void drawBombing(int snum)
   /* don't bother if we aren't orbiting anything */
   if (Ships[snum].lock >= 0)
     return;
+
+  if (SMAP(Context.snum))
+    return;                     /* no bombing graphics in LRS */
 
   /* init - look at first ship */
   if (!bombAState[1].anims)
@@ -1175,6 +1207,7 @@ void drawBombing(int snum)
           rnd->rndy = rnduni(-100.0, 100.0); /* rnd Y */
           animQueAdd(curnode->animQue, &bombAState[snum]);
         }
+
     }
 
   glPushMatrix();
@@ -1450,13 +1483,126 @@ void setHeading(char *heading)
   return;
 }
 
-void setWarp(char *warp)
-{
-  int l = sizeof(dData.warp.warp);
+#define WARP_UP     0
+#define WARP_DOWN   1
 
-  strncpy(dData.warp.warp, warp, 
-          l - 1);
+void setWarp(real warp)
+{
+  static cqsHandle warpHandle = CQS_INVHANDLE;
+  static cqsHandle engineHandle = CQS_INVHANDLE;
+  static const int l = sizeof(dData.warp.warp);
+  static int warpufx = -1;
+  static int warpdfx = -1;
+  static int enginefx = -1;
+  real dwarp = Ships[Context.snum].dwarp;
+  static int lastwarpdir = -1;
+  int warpdir;
+  static real lastwarp = 0;
+  static char buf[128];
+
+  if (warpufx == -1)
+    {
+      snprintf(buf, 128 - 1, "ship%c-warp-up", 
+               Teams[Ships[Context.snum].team].name[0]);
+      warpufx = cqsFindEffect(buf);
+    }
+
+  if (warpdfx == -1)
+    {
+      snprintf(buf, 128 - 1, "ship%c-warp-down", 
+               Teams[Ships[Context.snum].team].name[0]);
+      warpdfx = cqsFindEffect(buf);
+    }
+
+  if (enginefx == -1)
+    {
+      enginefx = cqsFindEffect("engines");
+    }
+
+  if (warp >= 0)
+    snprintf(dData.warp.warp, l - 1, "%2.1f", warp );
+  else
+    strncpy(dData.warp.warp, "Orbit", l - 1);
+
   dData.warp.warp[l - 1] = 0;
+
+  /* first, the engine sounds */
+  if (warp > 0)
+    {
+      if (engineHandle == CQS_INVHANDLE)
+        {                       /* start it */
+          cqsEffectPlayTracked(enginefx, &engineHandle, 0.0, 0.0, 0.0);
+        }
+    }
+  else
+    {                           /* stop it */
+      if (engineHandle != CQS_INVHANDLE)
+        {             
+          cqsEffectStop(engineHandle, FALSE);
+          engineHandle = CQS_INVHANDLE;
+        }
+    }
+          
+
+  /* figure out where we are heading */
+#if 0
+  clog ("warp = %f, dwarp %f lastwarp %f", warp, dwarp, lastwarp);
+#endif
+
+  if (warp == dwarp || warp <= 0.0 || dwarp < 0 || 
+      warp == maxwarp(Context.snum))
+    {                           /* we are where we want to be */
+      if (warpHandle != CQS_INVHANDLE)
+        cqsEffectStop(warpHandle, FALSE);
+      warpHandle = CQS_INVHANDLE;
+      lastwarpdir = -1;
+      lastwarp = warp;
+      return;
+    }
+
+  if (warp < dwarp)
+    {
+      /* we need to do an extra check here for entering orbit */
+      if (warp < lastwarp) /* we're really decelerating into orbit */
+        warpdir = WARP_DOWN;
+      else
+        warpdir = WARP_UP;
+    }
+  else
+    warpdir = WARP_DOWN;
+
+  lastwarp = warp;
+
+  if (warpHandle != CQS_INVHANDLE)
+    {                           /* we are still playing one */
+      /* we need to see if the direction has changed,
+         if so, we need to stop the current effect and start the
+         'other one' */
+
+      if (warpdir != lastwarpdir)
+        {
+          cqsEffectStop(warpHandle, FALSE);
+          warpHandle = CQS_INVHANDLE;
+          
+          if (warpdir == WARP_UP)
+            cqsEffectPlayTracked(warpufx, &warpHandle, 0.0, 0.0, 0.0);
+          else if (warpdir == WARP_DOWN)
+            cqsEffectPlayTracked(warpdfx, &warpHandle, 0.0, 0.0, 0.0);
+
+          lastwarpdir = warpdir;
+        }
+
+      return;
+    }   
+  else
+    {                           /* we need to start one */
+      if (warpdir == WARP_UP)
+        cqsEffectPlayTracked(warpufx, &warpHandle, 0.0, 0.0, 0.0);
+      else if (warpdir == WARP_DOWN)
+        cqsEffectPlayTracked(warpdfx, &warpHandle, 0.0, 0.0, 0.0);
+      
+      lastwarpdir = warpdir;
+    }
 
   return;
 }
@@ -2226,7 +2372,7 @@ drawShip(GLfloat x, GLfloat y, GLfloat angle, char ch, int snum, int color,
   return;
 }
 
-void drawDoomsday(GLfloat x, GLfloat y, GLfloat angle, GLfloat scale)
+void drawDoomsday(GLfloat x, GLfloat y, GLfloat dangle, GLfloat scale)
 {
   const GLfloat z = 1.0;
   GLfloat size = 30.0;  
@@ -2238,9 +2384,25 @@ void drawDoomsday(GLfloat x, GLfloat y, GLfloat angle, GLfloat scale)
   static int drawAPBeam = TRUE;
   static animStateRec_t doomapfire = {}; /* animdef state for ap firing */
   static int last_apstate;      /* toggle this when it expires */
+  static int beamfx = -1; /* Cataboligne - beam sound */
+  static const Unsgn32 beamfx_delay = 1000; /* 1 second */
+  static Unsgn32 lastbeam = 0;
+  real dis, ang;
 
   if (norender)
     return;
+
+  /*
+    Cataboligne - 11.20.6
+    doomsday music theme for ships nearby
+    find a way to move this check to nCPidle( )
+  */
+  
+  dis = dist( Ships[Context.snum].x, Ships[Context.snum].y, 
+              Doomsday->x, Doomsday->y );
+  
+  ang = angle(Ships[Context.snum].x, Ships[Context.snum].y,  
+              Doomsday->x, Doomsday->y); 
 
   if (!GLDoomsday.id)
     {                           /* init first time around */
@@ -2287,6 +2449,9 @@ void drawDoomsday(GLfloat x, GLfloat y, GLfloat angle, GLfloat scale)
           scrNode_t *node = getTopNode();
           animQueAdd(node->animQue, &doomapfire);
         }
+
+      if (beamfx == -1) 
+        beamfx = cqsFindEffect("doomsday-beam");
     }        
 
   if (scale == MAP_FAC)
@@ -2300,7 +2465,7 @@ void drawDoomsday(GLfloat x, GLfloat y, GLfloat angle, GLfloat scale)
   GLError();
     
 #ifdef DEBUG
-  clog("DRAWDOOMSDAY(%s) x = %.1f, y = %.1f, ang = %.1f\n", buf, x, y, angle);
+  clog("DRAWDOOMSDAY(%s) x = %.1f, y = %.1f, ang = %.1f\n", buf, x, y, dangle);
 #endif
 
   /*
@@ -2359,6 +2524,16 @@ void drawDoomsday(GLfloat x, GLfloat y, GLfloat angle, GLfloat scale)
       
       glDisable(GL_TEXTURE_2D);
       glPopMatrix();
+
+      /*
+        Cataboligne - sound code 11.16.6
+        play doombeam sound
+      */
+      if (dis < YELLOW_DIST && ((frameTime - lastbeam) > beamfx_delay))
+        {
+          cqsEffectPlay(beamfx, YELLOW_DIST * 2, dis, ang);
+          lastbeam = frameTime;
+        }
   }  /* drawAPBeam */
 
   glPushMatrix();
@@ -2369,7 +2544,7 @@ void drawDoomsday(GLfloat x, GLfloat y, GLfloat angle, GLfloat scale)
   glBindTexture(GL_TEXTURE_2D, GLDoomsday.id);
   
   glTranslatef(x , y , TRANZ);
-  glRotatef(angle, 0.0, 0.0, z);
+  glRotatef(dangle, 0.0, 0.0, z);
 
   glColor4f(GLDoomsday.col.r, GLDoomsday.col.g, 
             GLDoomsday.col.b, GLDoomsday.col.a);	

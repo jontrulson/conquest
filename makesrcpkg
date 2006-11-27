@@ -57,18 +57,22 @@ FILELIST="ratfor.c cd2lb.h cd2lb.c iolb.h iolb.c conqlb.c
         nOptions.h nOptions.c colorGL.c colorCU.c cuclient.c ui.h uimisc.c
         cuclient.h conqlb.h udp.h udp.c texdata.h initdata.h conqinit-yacc.y
         planinit.c textures.h conqinit.h conqinit.c conqinit-lex.l
-        conqinitrc texturesrc anim.h anim.c CONQINIT.TXT cqmouse.h"  
+        conqinitrc texturesrc anim.h anim.c CONQINIT.TXT cqmouse.h
+        cqsound.h cqsound.c sounddata.h soundrc"  
 
 IMAGES="img/*.tga img/*.txf"
+SOUNDS="sound/*.ogg"
 MANPAGES="*.man"
 TRC="*.trc"
 
 mkdir $CONQVER 2>/dev/null
 mkdir $CONQVER/img
+mkdir $CONQVER/sound
 
 cp -p $FILELIST $CONQVER/
 cp -p conquest.txt $CONQVER/$CONQVER.txt
 
+cp -p $SOUNDS $CONQVER/sound/
 cp -p $IMAGES $CONQVER/img/
 cp -p $MANPAGES $CONQVER/
 cp -p $TRC $CONQVER/
@@ -80,12 +84,14 @@ cp -p ti/*.ti $CONQVER/ti/
 
 chmod 644 $CONQVER/ti/*
 chmod 644 $CONQVER/img/*
+chmod 644 $CONQVER/sound/*
 chmod 644 $CONQVER/*.trc
 
 chmod 644 $CONQVER/*
 
 chmod 755 $CONQVER/ti
 chmod 755 $CONQVER/img
+chmod 755 $CONQVER/sound
 chmod 755 $CONQVER/configure $CONQVER/config.guess $CONQVER/config.sub
 
 
@@ -94,8 +100,11 @@ gzip --best -v $ARCFILE
 rm -rf $CONQVER
 
 set -x 
-cp -f ${ARCFILE}.gz ~/tx/conquest/
-chmod 644 ~/tx/conquest/${ARCFILE}.gz
+if [ -e ~/tx/conquest/ ]
+then
+    cp -f ${ARCFILE}.gz ~/tx/conquest/
+    chmod 644 ~/tx/conquest/${ARCFILE}.gz
+fi
 
 exit
 	

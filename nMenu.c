@@ -437,7 +437,7 @@ static int nMenuInput(int ch)
 
     case 'r':
       if ( multiple )
-        mglBeep();
+        mglBeep(MGL_BEEP_ERR);
       else
         {
           for ( i = 1; i <= MAXSHIPS; i = i + 1 )
@@ -447,7 +447,7 @@ static int nMenuInput(int ch)
                 break;
 
           if ( i <= MAXSHIPS )
-            mglBeep();
+            mglBeep(MGL_BEEP_ERR);
           else
             {
               state = S_RESIGN;
@@ -463,7 +463,7 @@ static int nMenuInput(int ch)
       break;
     case 's':
       if ( ! multiple && ! switchteams )
-        mglBeep();
+        mglBeep(MGL_BEEP_ERR);
       else
         {
           /* we'll update local data here anyway, even though it will be

@@ -158,13 +158,13 @@
 #define PACKAGE_NAME "conquest"
 
 /* Define to the full name and version of this package. */
-#define PACKAGE_STRING "conquest 8.1"
+#define PACKAGE_STRING "conquest 8.2"
 
 /* Define to the one symbol short name of this package. */
 #define PACKAGE_TARNAME "conquest"
 
 /* Define to the version of this package. */
-#define PACKAGE_VERSION "8.1"
+#define PACKAGE_VERSION "8.2"
 
 /* "enable replacement (v)snprintf if system (v)snprintf is broken" */
 /* #undef PREFER_PORTABLE_SNPRINTF */
@@ -197,7 +197,7 @@
 /* #undef UNKNOWN */
 
 /* Version number of package */
-#define VERSION "8.1"
+#define VERSION "8.2"
 
 /* Define to 1 if the X Window System is missing or not being used. */
 /* #undef X_DISPLAY_MISSING */
