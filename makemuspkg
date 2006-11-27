@@ -14,7 +14,7 @@ VERSION=`echo $VERSION |tr -d '$;"' |cut -d' ' -f6 |tr -d " "`
 
 CONQVER="conquest-musicpak-$VERSION"
 
-ARCFILE="${CONQVER}.src.tar"
+ARCFILE="${CONQVER}.tar"
 
 rm -f ${ARCFILE}.gz
 rm -rf $CONQVER
