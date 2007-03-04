@@ -984,11 +984,13 @@ void processPacket(Unsgn8 *buf)
       break;
 
     case SP_CLIENTSTAT:
-      scstat = (spClientStat_t *)buf;
-      Context.snum = scstat->snum;
-      Context.unum = (int)ntohs(scstat->unum);
-      Ships[Context.snum].team = scstat->team;
-      clientFlags = scstat->flags;
+      if ((scstat = chkClientStat(buf)))
+        {
+          Context.snum = scstat->snum;
+          Context.unum = scstat->unum;
+          Ships[Context.snum].team = scstat->team;
+          clientFlags = scstat->flags;
+        }
       break;
 
     case SP_MESSAGE:
@@ -1066,3 +1068,45 @@ void sendUDPKeepAlive(Unsgn32 timebase)
 
   return;
 }
+
+/* this function accepts a character buffer representing a clientstat packet
+   and validates it.  It return a pointer to a static spClientStat_t
+   packet if everything is in order, NULL otherwise. */
+spClientStat_t *chkClientStat(char *buf)
+{
+  static spClientStat_t scstat;
+
+  if (!buf)
+    return NULL;
+
+  scstat = *(spClientStat_t *)buf;
+  
+  scstat.unum = (Unsgn16)ntohs(scstat.unum);
+
+  if (scstat.unum >= MAXUSERS)
+    {
+#if defined(DEBUG_PKT)
+      clog("%s: unum not in valid range", __FUNCTION__);
+#endif
+      return NULL;
+    }
+
+  if (scstat.snum < 1 || scstat.snum > MAXSHIPS)
+    {
+#if defined(DEBUG_PKT)
+      clog("%s: snum not in valid range", __FUNCTION__);
+#endif
+      return NULL;
+    }
+
+  if (scstat.team >= NUMALLTEAMS)
+    {
+#if defined(DEBUG_PKT)
+      clog("%s: team not in valid range", __FUNCTION__);
+#endif
+      return NULL;
+    }
+
+  return &scstat;
+}
+  

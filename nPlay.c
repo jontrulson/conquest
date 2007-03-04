@@ -124,13 +124,25 @@ static int _newship( int unum, int *snum )
 	  break;
 	  
 	case SP_CLIENTSTAT:
-	  scstat = *(spClientStat_t *)buf; /* make a copy... */
-	  /* first things first */
-	  Context.unum = (int)ntohs(scstat.unum);
-	  Context.snum = scstat.snum;
-	  Ships[Context.snum].team = scstat.team;
-	  
-          return TRUE;
+          {
+            spClientStat_t *scstatp;
+
+            if ((scstatp = chkClientStat(buf)))
+              {
+                scstat = *scstatp; /* make a copy */
+                /* first things first */
+                Context.unum = scstat.unum;
+                Context.snum = scstat.snum;
+                Ships[Context.snum].team = scstat.team;
+                
+                return TRUE;
+              }
+            else
+              {
+                clog("nPlay: _newship: invalid CLIENTSTAT");
+                return FALSE;
+              }
+          }
 	  break;
 	  
 	  /* we might get other packets too */

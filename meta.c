@@ -352,12 +352,14 @@ int metaUpdateServer(char *remotehost, char *name, int port)
 /* contact a meta server, and return a pointer to a static array of
    metaSRec_t's coresponding to the server list.  returns number
    of servers found, or ERR if error */
+#define SERVER_BUFSIZE 1024
+
 int metaGetServerList(char *remotehost, metaSRec_t **srvlist)
 {
   static metaSRec_t servers[META_MAXSERVERS];
   struct sockaddr_in sa;
   struct hostent *hp;
-  char buf[1024];               /* server buffer */
+  char buf[SERVER_BUFSIZE];               /* server buffer */
   int off;
   int firsttime = TRUE;
   int s;                        /* socket */
@@ -405,7 +407,7 @@ int metaGetServerList(char *remotehost, metaSRec_t **srvlist)
   off = 0;
   while (read(s, &c, 1) > 0)
     {
-      if (c != '\n')
+      if (c != '\n' && off < (SERVER_BUFSIZE - 1))
         {
           buf[off++] = c;
         }
@@ -414,11 +416,19 @@ int metaGetServerList(char *remotehost, metaSRec_t **srvlist)
           buf[off] = 0;
 
           /* convert to a metaSRec_t */
-          if (str2srec(&servers[nums], buf))
-            nums++;
+          if (nums < META_MAXSERVERS)
+            {
+              if (str2srec(&servers[nums], buf))
+                nums++;
+              else
+                clog("metaGetServerList: str2srec(%s) failed, skipping", buf);
+            }
           else
-            clog("metaGetServerList: str2srec(%s) failed, skipping", buf);
-          
+            {
+              clog("metaGetServerList: num servers exceeds %d, skipping", 
+                   META_MAXSERVERS);
+            }
+            
           off = 0;
         }
     }

@@ -104,12 +104,20 @@ void nWelcomeInit(void)
       switch (pkttype)
         {
         case SP_CLIENTSTAT:
-          scstat = (spClientStat_t *)buf;
-          
-          Context.unum = (int)ntohs(scstat->unum);
-          Context.snum = scstat->snum;
-          Ships[Context.snum].team = scstat->team;
-          done = TRUE;
+          if ((scstat = chkClientStat(buf)))
+            {
+              Context.unum = scstat->unum;
+              Context.snum = scstat->snum;
+              Ships[Context.snum].team = scstat->team;
+              done = TRUE;
+            }
+          else
+            {
+              clog("nWelcomeInit: invalid CLIENTSTAT");
+              fatal = TRUE;
+              done = TRUE;
+              return;
+            }
           break;
         case SP_ACK:
           sack = *(spAck_t *)buf;

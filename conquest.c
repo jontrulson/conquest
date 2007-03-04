@@ -3132,7 +3132,7 @@ int newship( int unum, int *snum )
 	      break;
 	      
 	    default:
-	      clog("conquest:newship: unexpected ack code %d",
+	      clog("newship: unexpected ack code %d",
 		   sack->code);
 	      break;
 	    }
@@ -3141,21 +3141,27 @@ int newship( int unum, int *snum )
 	  break;
 	  
 	case SP_CLIENTSTAT:
-	  scstat = (spClientStat_t *)buf;
-	  
-	  /* first things first */
-	  Context.unum = (int)ntohs(scstat->unum);
-	  Context.snum = scstat->snum;
-	  Ships[Context.snum].team = scstat->team;
-	  
-	  if (scstat->esystem == 0)	/* we are done */
-	    return TRUE;
-	  
-	  /* otherwise, need to prompt for system to enter */
-	  if (selectentry(scstat->esystem))
-	    return TRUE;		/* done */
-	  else
-	    return FALSE;
+          if ((scstat = chkClientStat(buf)))  
+            {
+              /* first things first */
+              Context.unum = scstat->unum;
+              Context.snum = scstat->snum;
+              Ships[Context.snum].team = scstat->team;
+              
+              if (scstat->esystem == 0)	/* we are done */
+                return TRUE;
+              
+              /* otherwise, need to prompt for system to enter */
+              if (selectentry(scstat->esystem))
+                return TRUE;		/* done */
+              else
+                return FALSE;
+            }
+          else
+            {
+              clog("newship: invalid CLIENTSTAT\n");
+              return FALSE;       /* don't want to hang if a bad pkt */
+            }
 	  
 	  break;
 	  
@@ -3322,7 +3328,7 @@ int welcome( int *unum )
   char * selected_str="You have been selected to command a";
   char * starship_str=" starship.";
   char * prepare_str="Prepare to be beamed aboard...";
-  spClientStat_t scstat = {};
+  spClientStat_t *scstat;
   spAck_t *sack = NULL;
   int pkttype;
   Unsgn8 buf[PKT_MAXSIZE];
@@ -3350,12 +3356,18 @@ int welcome( int *unum )
       switch (pkttype)
         {
         case SP_CLIENTSTAT:
-          scstat = *(spClientStat_t *)buf;
-          
-          *unum = (int)ntohs(scstat.unum);
-          Context.snum = scstat.snum;
-          Ships[Context.snum].team = scstat.team;
-          done = TRUE;
+          if ((scstat = chkClientStat(buf)))
+            {
+              *unum = scstat->unum;
+              Context.snum = scstat->snum;
+              Ships[Context.snum].team = scstat->team;
+              done = TRUE;
+            }
+          else
+            {
+              clog("welcome: invalid CLIENTSTAT\n");
+              return FALSE;
+            }
 
           break;
         case SP_ACK:
@@ -3370,7 +3382,7 @@ int welcome( int *unum )
         }
     }
 
-  if ( pkttype == SP_CLIENTSTAT && (scstat.flags & SPCLNTSTAT_FLAG_NEW) )
+  if ( pkttype == SP_CLIENTSTAT && (scstat->flags & SPCLNTSTAT_FLAG_NEW) )
     {				
       /* Must be a new player. */
       cdclear();
@@ -3385,7 +3397,7 @@ int welcome( int *unum )
 	  c_sleep( 2.0 );
 	  return ( FALSE );
 	}
-      team = scstat.team;
+      team = scstat->team;
       cbuf[0] = EOS;
       apptitle( team, cbuf );
       appchr( ' ', cbuf );

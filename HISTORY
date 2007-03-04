@@ -9,6 +9,14 @@
 
                               Conquest HISTORY
 
+???
+
+3/3/2006
+
+       - fixed some security (possble buffer overruns) in the client
+         (meta.c and CLIENTSTAT processing) reported by Luigi Auriemma.
+
+
 8.2a (devel) 11/27/2006
 
        - Added sound support using SDL and the SDL_mixer API based on

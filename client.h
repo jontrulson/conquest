@@ -91,4 +91,6 @@ void processPacket(Unsgn8 *buf);
 
 void sendUDPKeepAlive(Unsgn32 timebase);
 
+spClientStat_t *chkClientStat(char *buf);
+
 #endif /* CLIENT_H_INCLUDED */
