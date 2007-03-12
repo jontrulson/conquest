@@ -134,6 +134,10 @@ static cqsHandle bombingHandle;    /* so we can stop it */
 /* ack alert klaxon with <ESC> - Cataboligne */
 extern cqsHandle alertHandle;
 
+/* current SR and LR magnification factors. (-5-5) */
+int ncpLRMagFactor = 0;
+int ncpSRMagFactor = 0;
+
 /* common output */
 #define cp_putmsg(str, lin)  setPrompt(lin, NULL, NoColor, str, NoColor)
 
@@ -2326,6 +2330,65 @@ static void command( int ch )
     case '/':				/* player list */
       setONode(nShiplInit(DSP_NODE_CP, FALSE));  /* shipl node */
       break;
+
+    case '[':                   /* zoom out */
+      {
+        if (SMAP(Context.snum))
+          {                     /* LR */
+            if (ncpLRMagFactor - 1 >= -5)
+              {
+                ncpLRMagFactor--;
+                cqsEffectPlay(teamEffects[Ships[snum].team].mag, 0, 0, 0);
+              }
+            else
+              mglBeep(MGL_BEEP_ERR);
+
+            setViewerScaling(ncpLRMagFactor, TRUE);
+          }
+        else
+          {
+            if (ncpSRMagFactor - 1 >= -5)
+              {
+                ncpSRMagFactor--;
+                cqsEffectPlay(teamEffects[Ships[snum].team].mag, 0, 0, 0);
+              }
+            else
+              mglBeep(MGL_BEEP_ERR);
+
+            setViewerScaling(ncpSRMagFactor, FALSE);
+          }
+      }
+      break;
+
+    case ']':                   /* zoom in */
+      {
+        if (SMAP(Context.snum))
+          {                     /* LR */
+            if (ncpLRMagFactor + 1 <= 5)
+              {
+                ncpLRMagFactor++;
+                cqsEffectPlay(teamEffects[Ships[snum].team].mag, 0, 0, 0);
+              }
+            else
+              mglBeep(MGL_BEEP_ERR);
+
+            setViewerScaling(ncpLRMagFactor, TRUE);
+          }
+        else
+          {
+            if (ncpSRMagFactor + 1 <= 5)
+              {
+                ncpSRMagFactor++;
+                cqsEffectPlay(teamEffects[Ships[snum].team].mag, 0, 0, 0);
+              }
+            else
+              mglBeep(MGL_BEEP_ERR);
+
+            setViewerScaling(ncpSRMagFactor, FALSE);
+          }
+      }
+      break;
+
     case '?':				/* planet list */
       if (Context.snum > 0 && Context.snum <= MAXSHIPS)
         setONode(nPlanetlInit(DSP_NODE_CP, FALSE, Context.snum, Ships[Context.snum].team));
@@ -2336,6 +2399,12 @@ static void command( int ch )
       clrPrompt(MSG_LIN1);
       clrPrompt(MSG_LIN2);
       clrPrompt(MSG_MSG);
+
+      /* reset the scaling factors */
+      ncpLRMagFactor = ncpSRMagFactor = 0;
+      setViewerScaling(ncpLRMagFactor, TRUE);
+      setViewerScaling(ncpSRMagFactor, FALSE);
+
       break;
       
     case TERM_NORMAL:		/* Have [RETURN] act like 'I[RETURN]'  */

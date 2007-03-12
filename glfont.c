@@ -121,7 +121,8 @@ void glfRender(GLfloat x, GLfloat y, GLfloat z, GLfloat w, GLfloat h,
     xs = w/(GLfloat)width;
 
   ys = ((2.0 * (h/(ascent + descent))) * 0.70);
-      
+
+
 #if 0
   clog("glfRender(%s): WINDOW: %d, w = %f h = %f, \n"
        "\twid = %d, asc = %d desc = %d"
@@ -136,7 +137,6 @@ void glfRender(GLfloat x, GLfloat y, GLfloat z, GLfloat w, GLfloat h,
                   GL_LINEAR_MIPMAP_LINEAR);
 
   glPushMatrix();
-  glLoadIdentity();
 
   if (ortho) 
     {
@@ -146,7 +146,7 @@ void glfRender(GLfloat x, GLfloat y, GLfloat z, GLfloat w, GLfloat h,
   else
     {
       glTranslatef( x, y - h, z );
-      glScalef(xs, inverty * ys, 1.0);
+      glScalef(xs, inverty * ys, 1.0); 
     }
 
   if (glcol)

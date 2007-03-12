@@ -138,6 +138,7 @@ static struct {
   
   obj_t torppips[MAXTORPS];     /* the torp pips */
 
+  obj_t magfac;                 /* mag factor */
 } o = {};
 
 /* update icon hud geometry if stuff changes (resize).  */
@@ -322,6 +323,12 @@ void updateIconHudGeo(void)
   o.d2killb.y = o.decal2.y + ((217.0 / 256.0) * th);
   o.d2killb.w = (((249.0 - 164.0) / 256.0) * tw);
   o.d2killb.h = ((16.0 / 256.0) * th);
+
+  /* Cat 'gridscale'.  Now, magfac. */
+  o.magfac.x = dConf.vX + ((dConf.vW / 180.0) * 1.0);
+  o.magfac.y = dConf.vY + (dConf.vH - ((dConf.vH / 20.0) * 1.35));
+  o.magfac.w = (dConf.vW / 12.0) * 1.0;
+  o.magfac.h = (dConf.vH / 38.0) * 1.0;
 
   /*  For tow, armies, and wep/eng pulses, we divide the viewer into 8
    *  horizontal, and 20 vertical segments and confine these items to
@@ -676,8 +683,8 @@ void renderShieldCharge(void)
 /* This is Cat's icon hud */
 void renderHud(int dostats)
 {				/* assumes context is current*/
-  char sbuf[128];
-  char fbuf[128];
+  static char sbuf[128];
+  static char fbuf[128];
   int FPS = (int)getFPS();
   cqColor icl;
   real warp = Ships[Context.snum].warp;
@@ -687,11 +694,18 @@ void renderHud(int dostats)
   static int rxdiff = 0;
   int i;
   static int ack_alert = 0;
+  static struct {
+    real oldFPS;
+    Unsgn32 oldPingAvg;
+    real oldRxdiff;
+  } oldData = {};
+  int magFac;
+  extern int ncpLRMagFactor; /* from nCP */
+  extern int ncpSRMagFactor;
+
 
   if (!GLTextures)
     return;                     /* don't render until we actually can */
-
-  /* draw fps/bps... */
 
   if ((frameTime - rxtime) > 1000)
     {
@@ -700,15 +714,21 @@ void renderHud(int dostats)
       rxtime = frameTime;
     }
 
-  if (FPS > 999)
-    sprintf(fbuf, "FPS: ***");
-  else
-    sprintf(fbuf, "FPS: %03d", FPS);
+  /* update althud stats data, if needed */
+  if (UserConf.AltHUD && (FPS != oldData.oldFPS || 
+      pingAvgMS != oldData.oldPingAvg || rxdiff != oldData.oldRxdiff))
+    {
+      oldData.oldFPS = FPS;
+      oldData.oldPingAvg = pingAvgMS;
+      oldData.oldRxdiff = rxdiff;
 
-  sprintf(sbuf, "%4dms %3.1fKB/s %s",  
-          pingAvgMS, 
-          ((float)rxdiff / 1000.0),
-          fbuf);
+      snprintf(fbuf, 128 - 1, "FPS: %03d", FPS);
+
+      snprintf(sbuf, 128 - 1, "%4dms %3.1fKB/s %s",  
+               pingAvgMS, 
+               ((float)rxdiff / 1000.0),
+               fbuf);
+    }
 
   if (o.x != dConf.wX || o.y != dConf.wY || o.w != dConf.wW ||
       o.h != dConf.wH)
@@ -822,8 +842,9 @@ void renderHud(int dostats)
             o.d2killb.h, fontFixedTxf, dData.kills.kills, InfoColor, NULL,
             TRUE, TRUE, TRUE);
 
+  magFac = (!SMAP(Context.snum)) ? ncpSRMagFactor : ncpLRMagFactor;
   /* towed-towing/armies/destruct/alert - blended text displayed in viewer */
-  if (dData.tow.str[0] || dData.armies.str[0] || 
+  if (magFac || dData.tow.str[0] || dData.armies.str[0] || 
       dData.cloakdest.str[0] == 'D' || dData.aStat.alertStatus[0])
     {
       /* we want to add an alhpa for these */
@@ -879,6 +900,21 @@ void renderHud(int dostats)
                     o.d1atarg.w, o.d1atarg.h, 
                     fontLargeTxf, dData.aStat.alertStatus, 
                     icl | 0x50000000, NULL, TRUE, FALSE, TRUE);
+        }
+
+      /* magnification factor */
+      if (magFac)
+        {
+          if (magFac > 0)
+            sprintf(sbuf, "MAG +%1d", magFac);
+          else 
+            sprintf(sbuf, "MAG %1d", magFac);
+          
+          glfRender(o.magfac.x, o.magfac.y, 0.0,
+                    o.magfac.w, o.magfac.h,
+                    fontFixedTxf, sbuf,
+                    SpecialColor | 0x50000000,
+                    NULL, TRUE, FALSE, TRUE);
         }
 
       glDisable(GL_BLEND);

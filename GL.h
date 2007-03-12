@@ -54,8 +54,44 @@ typedef struct _glship {
 
 #if defined(NOEXTERN_GL)
 GLShip_t GLShips[NUMPLAYERTEAMS][MAXNUMSHIPTYPES] = {}; 
+
+/* the LR scaling array (-5 - 5) */
+GLfloat scaleFactorsLR[10] = {
+  /* zoom out (mag-) */
+  0.75,
+  0.8,
+  0.85,
+  0.9,
+  0.95,
+  /* zoom in (mag+) */
+  1.25,
+  1.3,
+  1.35,
+  1.4,
+  1.45
+};
+
+/* the SR scaling array (-5 - 5) */
+GLfloat scaleFactorsSR[10] = {
+  /* zoom out (mag-) */
+  0.5,
+  0.6,
+  0.7,
+  0.8,
+  0.9,
+  /* zoom in (mag+) */
+  1.45, 
+  1.90, 
+  2.35, 
+  2.80, 
+  3.25
+};
+
 #else
 extern GLShip_t GLShips[NUMPLAYERTEAMS][MAXNUMSHIPTYPES]; 
+
+extern GLfloat scaleFactorsLR[10];
+extern GLfloat scaleFactorsSR[10];
 #endif
 
 #endif /* _C_GL_H */

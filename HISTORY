@@ -11,7 +11,19 @@
 
 ???
 
-3/3/2006
+3/11/2006
+
+       - based on 'mag factor' idea from Cat, implemented zoom in/out
+         in both SR and LR views.  There are 5 levels of zoom out and
+         zoom in.  You can zoom in/out wit the '[' and ']' keys.  ^L
+         resets the view to default zoom (none).  
+
+         During this work some subtle bugs in GLcvtcoords() were fixed,
+         yielding much more accurate placing of objects.  Other BS
+         assumptions of mine also fixed.  
+
+       - cursor now uses cross-hair shape.  With a fixed GLcvtcoords,
+         it is actually accurate in the viewer now. :)
 
        - fixed some security (possble buffer overruns) in the client
          (meta.c and CLIENTSTAT processing) reported by Luigi Auriemma.

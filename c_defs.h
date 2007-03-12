@@ -34,6 +34,10 @@
 # include <unistd.h>
 #endif 
 
+#if defined(HAVE_CRYPT_H)
+# include <crypt.h>
+#endif 
+
 #if defined(STDC_HEADERS)
 # include <stdlib.h>
 # include <stdio.h>

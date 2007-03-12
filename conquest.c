@@ -3328,7 +3328,7 @@ int welcome( int *unum )
   char * selected_str="You have been selected to command a";
   char * starship_str=" starship.";
   char * prepare_str="Prepare to be beamed aboard...";
-  spClientStat_t *scstat;
+  spClientStat_t *scstat = NULL;
   spAck_t *sack = NULL;
   int pkttype;
   Unsgn8 buf[PKT_MAXSIZE];

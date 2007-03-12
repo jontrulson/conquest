@@ -30,6 +30,9 @@ typedef struct _dspConfig {
   GLfloat vW, vH;               /* viewer width/height */
   GLfloat vAspect;
 
+  /* LR/SR viewer scaling factors (magnification) */
+  GLfloat vScaleLR, vScaleSR;
+
   GLfloat ppCol, ppRow;         /* pixels per [Row|Col] */
 
   GLfloat borderW;              /* width of outside mainw border */
@@ -250,5 +253,6 @@ void drawBombing(int snum);
 
 void dspInitData(void);
 void hex2GLColor(Unsgn32 hcol, GLColor_t *col);
+void setViewerScaling(int scale, int isLR);
 
 #endif /* _GLDISPLAY_H */

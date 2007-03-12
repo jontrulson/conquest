@@ -75,7 +75,9 @@
 
 #define MAXSHIPS 20 		/* number of available ships */
 
-  /* Values for sstatus() */
+#define SHIPSIZE 225            /* base size of a ship in CU's */
+#define DOOMSIZE 900            /* base size of doomsday in CU's */
+/* Values for sstatus() */
 #define SS_OFF 1 		/* available for use */
 #define SS_ENTERING 2 		/* outfitting the ship in newship() */
 #define SS_LIVE 3 		/* flying around */
