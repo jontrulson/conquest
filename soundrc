@@ -203,6 +203,7 @@ effect {
   fadeoutms    0
   loops        1
   limit        1
+  delayms      5000
 }
 
 effect {
@@ -328,6 +329,7 @@ effect {
   fadeoutms    0
   loops        1
   limit        1
+  delayms      5000
 }
 
 effect {
@@ -452,6 +454,7 @@ effect {
   fadeoutms    0
   loops        1
   limit        1
+  delayms      5000
 }
 
 effect {
@@ -577,6 +580,7 @@ effect {
   fadeoutms    0
   loops        1
   limit        1
+  delayms      5000
 }
 
 effect {

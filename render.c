@@ -684,6 +684,7 @@ void renderShieldCharge(void)
 void renderHud(int dostats)
 {				/* assumes context is current*/
   static char sbuf[128];
+  static char ibuf[128];        /* fps, stats, etc */
   static char fbuf[128];
   int FPS = (int)getFPS();
   cqColor icl;
@@ -724,7 +725,7 @@ void renderHud(int dostats)
 
       snprintf(fbuf, 128 - 1, "FPS: %03d", FPS);
 
-      snprintf(sbuf, 128 - 1, "%4dms %3.1fKB/s %s",  
+      snprintf(ibuf, 128 - 1, "%4dms %3.1fKB/s %s",  
                pingAvgMS, 
                ((float)rxdiff / 1000.0),
                fbuf);
@@ -1091,7 +1092,7 @@ void renderHud(int dostats)
         {
           glfRender(o.rectime.x, o.rectime.y, 0.0, 
                     o.rectime.w, o.rectime.h,
-                    fontFixedTxf, sbuf, NoColor | CQC_A_DIM, 
+                    fontFixedTxf, ibuf, NoColor | CQC_A_DIM, 
                     NULL, TRUE, TRUE, TRUE);
         }          
     }

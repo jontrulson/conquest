@@ -11,6 +11,13 @@
 
 ???
 
+3/26/2007
+
+       - fix bug in stats display when magfactor is non-zero.
+
+       - make sure the mag change sound doesn't play more than once
+         every 5 seconds.
+
 3/11/2006
 
        - based on 'mag factor' idea from Cat, implemented zoom in/out
