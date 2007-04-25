@@ -480,7 +480,8 @@ void renderPulseMsgs(void)
   static animStateRec_t shcrit = {}; 
   static animStateRec_t hullcrit = {}; 
   static int firsttime = TRUE;
-  static const int testlamps = 0;
+  static const int testlamps = 0; /* set to non-zero to see them all
+                                     at once (for testing) */
   scrNode_t *curnode = getTopNode();
   int drawing = FALSE;
   
@@ -1198,18 +1199,18 @@ void renderViewer(int dovbg, int dobomb)
         glBegin(GL_LINES);
 
         /* x */
-        glVertex3f(gx, -VIEWANGLE, TRANZ); /* ul */
-        glVertex3f(gx, VIEWANGLE, TRANZ); /* ur */
+        glVertex3f(gx, -VIEWANGLE, TRANZ);  /* left */
+        glVertex3f(gx, VIEWANGLE, TRANZ);   /* right */
         
-        glVertex3f(-gx, -VIEWANGLE, TRANZ); /* ul */
-        glVertex3f(-gx, VIEWANGLE, TRANZ); /* ur */
+        glVertex3f(-gx, -VIEWANGLE, TRANZ); /* left */
+        glVertex3f(-gx, VIEWANGLE, TRANZ);  /* right */
         
         /* y */
-        glVertex3f(-VIEWANGLE, gy, TRANZ); /* ul */
-        glVertex3f(VIEWANGLE, gy, TRANZ); /* ur */
+        glVertex3f(-VIEWANGLE, gy, TRANZ);  /* top */
+        glVertex3f(VIEWANGLE, gy, TRANZ);   /* bottom */
 
-        glVertex3f(-VIEWANGLE, -gy, TRANZ); /* ul */
-        glVertex3f(VIEWANGLE, -gy, TRANZ); /* ur */
+        glVertex3f(-VIEWANGLE, -gy, TRANZ); /* top */
+        glVertex3f(VIEWANGLE, -gy, TRANZ);  /* bottom */
 
         glEnd();
       }

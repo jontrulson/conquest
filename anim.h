@@ -149,7 +149,7 @@ typedef struct _gl_animdef {
     real deltay;
     real deltaz;
     real deltar;                /* rotation (degrees) */
-    real deltas;                /* size */
+    real deltas;                /* size in CU's */
   } geo;
 
   struct {

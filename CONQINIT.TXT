@@ -54,6 +54,8 @@ CONTENTS:
          filename, color).  Used for texture drawing.
        - animation data (WKN, animdef).  Drawing. 
        - animdef data (name, animation characteristics).  Drawing.
+       - sound data (name, music/effect configuration, files, limits,
+         etc).
 
        A detailed description of each of these is given below.
 

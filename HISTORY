@@ -11,29 +11,53 @@
 
 ???
 
+4/24/2007
+
+  - major rework of the scaling code.  Other subtle bugs like double
+    scaling were fixed.
+
+  - Limit checks in GLcvtcoords fixed to properly account for
+    magscaling.  It's main weakness now is accounting for the sizes of
+    objects.  Oh well :)
+
+  - some sillyness fixed in cu2GLSize.  
+
+  - Animdefs now always handle sizes in CUs, (istate and deltas and
+    geo size).  These values must be rescaled via cu2GLSize or glScale
+    prior to rendering now, in order for the magfactors to work
+    properly.
+
+  - major rework of the vbg rendering.  It was pretty screwy,
+    especially when you threw magfactors into it :)
+
+  - Due to the size/scaling rework for the animdefs, explosions can
+    now be drawn properly in LR scan, and therefore are now drawn in
+    LR scan.  Planet bombing could work as well in LR, but for now it
+    isn't.
+
 3/26/2007
 
-       - fix bug in stats display when magfactor is non-zero.
+  - fix bug in stats display when magfactor is non-zero.
 
-       - make sure the mag change sound doesn't play more than once
-         every 5 seconds.
+  - make sure the mag change sound doesn't play more than once
+    every 5 seconds.
 
 3/11/2006
 
-       - based on 'mag factor' idea from Cat, implemented zoom in/out
-         in both SR and LR views.  There are 5 levels of zoom out and
-         zoom in.  You can zoom in/out wit the '[' and ']' keys.  ^L
-         resets the view to default zoom (none).  
+  - based on 'mag factor' idea from Cat, implemented zoom in/out in
+    both SR and LR views.  There are 5 levels of zoom out and zoom in.
+    You can zoom in/out wit the '[' and ']' keys.  ^L resets the view
+    to default zoom (none).
 
-         During this work some subtle bugs in GLcvtcoords() were fixed,
-         yielding much more accurate placing of objects.  Other BS
-         assumptions of mine also fixed.  
+    During this work some subtle bugs in GLcvtcoords() were fixed,
+    yielding much more accurate placing of objects.  Other BS
+    assumptions of mine also fixed.
 
-       - cursor now uses cross-hair shape.  With a fixed GLcvtcoords,
-         it is actually accurate in the viewer now. :)
+  - cursor now uses cross-hair shape.  With a fixed GLcvtcoords, it is
+    actually accurate in the viewer now. :)
 
-       - fixed some security (possble buffer overruns) in the client
-         (meta.c and CLIENTSTAT processing) reported by Luigi Auriemma.
+  - fixed some security (possble buffer overruns) in the client
+    (meta.c and CLIENTSTAT processing) reported by Luigi Auriemma.
 
 
 8.2a (devel) 11/27/2006

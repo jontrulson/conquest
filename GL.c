@@ -74,6 +74,10 @@ dspData_t dData;
 int frame=0, timebase=0;
 static float FPS = 0.0;
 
+/* a 'prescaling factor for certain objects, so they are drawn a
+   little larger than their 'native' CU size */
+#define OBJ_PRESCALE        1.3 
+
 #define TEXT_HEIGHT    ((GLfloat)1.75)   /* 7.0/4.0 - text font height
                                             for viewer */
 /* from nCP */
@@ -84,7 +88,7 @@ typedef struct _gl_planet {
   GLTexture_t  *gltex;          /* pointer to the proper GLTexture entry */
   GLint        id;              /* copy of gltex texture id */
   GLColor_t    col;             /* the desired color */
-  GLfloat      size;            /* the prefered size */
+  GLfloat      size;            /* the prefered size, in prescaled CU's*/
 } GLPlanet_t;
 
 static GLPlanet_t *GLPlanets = NULL;
@@ -137,13 +141,13 @@ void hex2GLColor(Unsgn32 hcol, GLColor_t *col)
 }
 
 /* convert a size in 'CU's to GL pixels */
-real cu2GLSize(real size)
+real cu2GLSize(real size, int scale)
 {
   GLfloat x, y;
 
-  GLcvtcoords(0.0, 0.0, size, size, SCALE_FAC, &x, &y);
+  GLcvtcoords(0.0, 0.0, size, 0.0, scale, &x, &y);
   
-  return fabs(sqrtf((x*x) + (y*y)));
+  return x;
 }
 
 
@@ -275,8 +279,8 @@ static int initGLAnimDefs(void)
         hex2GLColor(cqiAnimDefs[i].icolor, 
                     &GLAnimDefs[i].icolor);
       
-      /* convert to GL size */
-      GLAnimDefs[i].isize  = cu2GLSize(cqiAnimDefs[i].isize); 
+      /* copy the CU size */
+      GLAnimDefs[i].isize = cqiAnimDefs[i].isize; 
 
       if (cqiAnimDefs[i].iangle < 0.0) /* neg is special (random)  */
         GLAnimDefs[i].iangle = cqiAnimDefs[i].iangle;
@@ -376,17 +380,8 @@ static int initGLAnimDefs(void)
           GLAnimDefs[i].geo.deltaz = cqiAnimDefs[i].geoanim.deltaz;
           GLAnimDefs[i].geo.deltar = cqiAnimDefs[i].geoanim.deltar;
 
-          /* cqi size delta is specified in CU's.  Convert to GL size
-             delta */
-          if (cqiAnimDefs[i].geoanim.deltas)
-            {
-              if (cqiAnimDefs[i].geoanim.deltas < 0)
-                GLAnimDefs[i].geo.deltas = 
-                  -cu2GLSize(fabs(cqiAnimDefs[i].geoanim.deltas));
-              else
-                GLAnimDefs[i].geo.deltas = 
-                  cu2GLSize(cqiAnimDefs[i].geoanim.deltas);
-            }
+          /* cqi size delta is specified in CU's. */
+          GLAnimDefs[i].geo.deltas = cqiAnimDefs[i].geoanim.deltas;
         }
       
       /* toganim */
@@ -673,19 +668,19 @@ static int _get_glplanet_info(GLPlanet_t *curGLPlanet, int plani)
       switch (Planets[plani].type)
         {
         case PLANET_SUN:
-          size = 50.0;
+          size = 1500.0;
           break;
         case PLANET_MOON:
-          size = 5.0;
+          size = 160.0;
           break;
         default:
-          size = 10.0;
+          size = 300.0;
           break;
         }
     }
   else
-    {                       /* cqi was found, so get/cvt it. */
-      size = cu2GLSize(cqiPlanets[plnndx].size);
+    {                       /* cqi was found, so get it. */
+      size = cqiPlanets[plnndx].size * OBJ_PRESCALE;
 #if 0
       clog("Computed size %f for planet %s\n",
            size, Planets[plani].name);
@@ -1048,6 +1043,7 @@ void drawExplosion(GLfloat x, GLfloat y, int snum, int torpnum, int scale)
   scrNode_t *curnode = getTopNode();
   static int explodefx = -1;
   GLfloat scaleFac = (scale == SCALE_FAC) ? dConf.vScaleSR : dConf.vScaleLR;
+  GLfloat size;
 
   if (norender)
     return;
@@ -1100,9 +1096,10 @@ void drawExplosion(GLfloat x, GLfloat y, int snum, int torpnum, int scale)
         }
     }
 
+  size = cu2GLSize(torpAStates[snum][torpnum].state.size, -scale);
 
-  if (scale != SCALE_FAC) 
-    return;              /* we do not want to display if not in range. */
+  if (scale == MAP_FAC)
+    size = size * 2.0;
 
   glPushMatrix();
   glLoadIdentity();
@@ -1123,7 +1120,7 @@ void drawExplosion(GLfloat x, GLfloat y, int snum, int torpnum, int scale)
             torpAStates[snum][torpnum].state.col.a);
 
   glBegin(GL_POLYGON);
-  drawTexBox(0.0, 0.0, 0.0, torpAStates[snum][torpnum].state.size * scaleFac);
+  drawTexBox(0.0, 0.0, 0.0, size);
   glEnd();
 
   glDisable(GL_TEXTURE_2D); 
@@ -1138,7 +1135,7 @@ void drawExplosion(GLfloat x, GLfloat y, int snum, int torpnum, int scale)
 void drawBombing(int snum)
 {
   scrNode_t *curnode = getTopNode();
-  GLfloat x, y;
+  GLfloat x, y, size;
   int i;
   static animStateRec_t initastate;    /* initial state of a bomb explosion */
   GLfloat scaleFac = dConf.vScaleSR;
@@ -1216,16 +1213,18 @@ void drawBombing(int snum)
   glPushMatrix();
   glLoadIdentity();
 
-  glScalef(scaleFac, scaleFac, 1.0);
-
   /* calc and translate to correct position */
   GLcvtcoords( Ships[Context.snum].x, 
                Ships[Context.snum].y, 
                Planets[-Ships[snum].lock].x + rnd->rndx,
                Planets[-Ships[snum].lock].y + rnd->rndy,
-               (SMAP(snum) ? MAP_FAC : SCALE_FAC), 
+               -(SMAP(snum) ? MAP_FAC : SCALE_FAC), 
                &x, 
                &y);
+
+  size = cu2GLSize(bombAState[snum].state.size, -SCALE_FAC);
+  
+  glScalef(scaleFac, scaleFac, 1.0);
 
   glTranslatef(x, y, TRANZ);
 
@@ -1241,7 +1240,7 @@ void drawBombing(int snum)
             bombAState[snum].state.col.a);
 
   glBegin(GL_POLYGON);
-  drawTexBox(0.0, 0.0, 0.0, bombAState[snum].state.size * scaleFac);
+  drawTexBox(0.0, 0.0, 0.0, size);
   glEnd();
 
   glDisable(GL_TEXTURE_2D); 
@@ -1308,10 +1307,11 @@ void uiDrawPlanet( GLfloat x, GLfloat y, int pnum, int scale,
   glColor4f(GLPlanets[pnum - 1].col.r, GLPlanets[pnum - 1].col.g,
             GLPlanets[pnum - 1].col.b, GLPlanets[pnum - 1].col.a);	
 
-  size = GLPlanets[pnum - 1].size * scaleFac;
+  size = cu2GLSize(GLPlanets[pnum - 1].size, -scale);
 
+  /* so it's more visible... */
   if (scale == MAP_FAC)
-    size /= 4.0;
+    size *= 2.0;
     
   drawTexBox(x, y, TRANZ, size);
   
@@ -1406,25 +1406,48 @@ void uiDrawPlanet( GLfloat x, GLfloat y, int pnum, int scale,
 }
 
 
+/* convert 'CU' coordinates into GL coordinates.  Account for LR/SR
+ *  'baseline' scaling as well as magfactor scaling.  If 'scale' is
+ *  negative, then we do not scale the GL x/y coordinates according to
+ *  the current magfactor, but we must always scale the limits with
+ *  the inverse magfactor, so limit checking will work correctly.  You
+ *  will typically only want to do this when the caller will be
+ *  responsible for proper magfactor scaling during drawing (using
+ *  glScale for example).
+ */
 int GLcvtcoords(real cenx, real ceny, real x, real y, real scale,
 		 GLfloat *rx, GLfloat *ry )
 {
   GLfloat rscale;
-  /* we add a little fudge factor here for the limits */
-  static const GLfloat slimit = (VIEWANGLE * 1.4);  /* sr - be generous */
-  static const GLfloat llimit = (VIEWANGLE * 1.21); /* lr  */
-  GLfloat limit = (scale == SCALE_FAC) ? slimit : llimit; 
-  GLfloat vscale = (scale == SCALE_FAC) ? dConf.vScaleSR : dConf.vScaleLR;
+  static const GLfloat fuzz = 1.3; /* 'fuzz' factor to pad the limit
+                                      a little */
+  int ascale = abs(scale);
+  GLfloat limit;
+  GLfloat vscale;
+  GLfloat magscale; 
 
-  /* 21 = lines in viewer in curses client. */
-  rscale = ((GLfloat)DISPLAY_LINS * scale / (VIEWANGLE * 2.0));
+  magscale = (ascale == SCALE_FAC) ? dConf.vScaleSR : dConf.vScaleLR;
+
+  /* if scale is negative, do not scale the x/y with the current
+     magfactor */
+  if (scale < 0.0)
+    vscale = 1.0;
+  else
+    vscale = magscale;
+
+  /* determine number of CU's that could be seen vertically in LR or
+     SR. (no magscale scaling) */
+  rscale = ((GLfloat)DISPLAY_LINS * ascale / (VIEWANGLE * 2.0));
+
+  /* we must always scale the limit, regardless of whether X/Y are
+     being scaled by vscale.  We multiply the VIEWANGLE with fuzz to
+     allow a little leeyway to the limit, so objects are less likely
+     to just appear/disappear at the edges of the viewer, at the cost
+     of potentially rendering an object that can't be seen. */
+  limit = ((VIEWANGLE * fuzz) * (1.0 / magscale)); 
 
   *rx = ((x-cenx) / rscale) * vscale; 
   *ry = ((y-ceny) / rscale) * vscale; 
-
-  /* viewer limit scaling */
-  if (vscale < 1.0)             /* adj only if zoomed out */
-    limit /= vscale;
 
 #if 0
   clog("GLCVTCOORDS: rscale = %f limit = %f cx = %.2f, cy = %.2f, \n\tx = %.2f, y = %.2f, glx = %.2f,"
@@ -1433,9 +1456,13 @@ int GLcvtcoords(real cenx, real ceny, real x, real y, real scale,
 #endif
 
   if (*rx < -limit || *rx > limit)
-    return FALSE;
+    {
+      return FALSE;
+    }
   if (*ry < -limit || *ry > limit)
-    return FALSE;
+    {
+      return FALSE;
+    }
 
   return TRUE; 
 }
@@ -2142,10 +2169,10 @@ void drawTorp(GLfloat x, GLfloat y, char torpchar, int torpcolor,
   if (steam < 0 || steam >= NUMPLAYERTEAMS)
     return;
 
-  size = ncpTorpAnims[steam].state.size * scaleFac;
+  size = cu2GLSize(ncpTorpAnims[steam].state.size, -scale);
 
   if (scale == MAP_FAC)
-    size = size / 2.0;
+    size = size * 2.0;
 
   glPushMatrix();
   glLoadIdentity();
@@ -2223,14 +2250,12 @@ drawShip(GLfloat x, GLfloat y, GLfloat angle, char ch, int snum, int color,
   static const GLfloat z = 1.0;
   GLfloat size;
   GLfloat sizeh;
-  static GLfloat shipsize;
-  static const GLfloat viewrange = VIEWANGLE * 2; 
-  static const GLfloat phaserinitradius = 
-    (PHASER_DIST / ((21.0 * SCALE_FAC) / viewrange));
+  static GLfloat shipsizeSR, shipsizeLR;
   static int norender = FALSE;
   int steam = Ships[snum].team, stype = Ships[snum].shiptype;
   GLfloat scaleFac = (scale == SCALE_FAC) ? dConf.vScaleSR : dConf.vScaleLR;
   static int firsttime = TRUE;
+  static GLfloat phaseradius;
 
   if (norender)
     return;
@@ -2248,13 +2273,19 @@ drawShip(GLfloat x, GLfloat y, GLfloat angle, char ch, int snum, int color,
   if (firsttime)
     {                         /* firsttime things */
       firsttime = FALSE;
-      /* setup the ship size - ships are SHIPSIZE CU's in SR size. */
-      shipsize = cu2GLSize(SHIPSIZE);
+      /* setup the ship sizes - ships are SHIPSIZE CU's. */
+      shipsizeSR = cu2GLSize(SHIPSIZE * OBJ_PRESCALE, -SCALE_FAC);
+      shipsizeLR = cu2GLSize(SHIPSIZE * OBJ_PRESCALE, -MAP_FAC);
+
+      /* can only see phaser in SR, so... */
+      phaseradius = cu2GLSize(PHASER_DIST, -SCALE_FAC);
     }
 
-  size = shipsize * scaleFac;
-  if (scale == MAP_FAC)
-    size = size / 2.0;
+  size = ((scale == SCALE_FAC) ? shipsizeSR : shipsizeLR);
+
+  /* make a little more visible in LR */
+  if (scale == MAP_FAC) 
+    size = size * 2.0; 
 
   sizeh = size / 2.0;
 
@@ -2264,8 +2295,7 @@ drawShip(GLfloat x, GLfloat y, GLfloat angle, char ch, int snum, int color,
   /* phasers - we draw this before the ship */
   if (((scale == SCALE_FAC) && Ships[snum].pfuse > 0)) /* phaser action */
     {
-      GLfloat phaseradius = phaserinitradius * scaleFac;
-      GLfloat phaserwidth = 1.5 * scaleFac;
+      static const GLfloat phaserwidth = 1.5;
 
       glPushMatrix();
       glLoadIdentity();
@@ -2306,7 +2336,7 @@ drawShip(GLfloat x, GLfloat y, GLfloat angle, char ch, int snum, int color,
    *  Cataboligne - shield visual
    */
 
-  if (UserConf.DoShields && SSHUP(snum) && ! SREPAIR(snum))  
+  if (UserConf.DoShields && SSHUP(snum) && !SREPAIR(snum))  
     {             /* user opt, shield up, not repairing */
       glPushMatrix();
       glLoadIdentity();
@@ -2421,18 +2451,16 @@ drawShip(GLfloat x, GLfloat y, GLfloat angle, char ch, int snum, int color,
 void drawDoomsday(GLfloat x, GLfloat y, GLfloat dangle, GLfloat scale)
 {
   static const GLfloat z = 1.0;
-  static GLfloat doomsize;
+  static GLfloat doomsizeSR, doomsizeLR;
   GLfloat size;  
   GLfloat sizeh;
-  static const GLfloat viewrange = VIEWANGLE * 2;
-  static const GLfloat beaminitradius = 
-    (PHASER_DIST * 1.3333 / ((21.0 * SCALE_FAC) / viewrange));
+  static GLfloat beamradius;
   static int norender = FALSE;  /* if no tex, no point... */
-  static real ox = 0.0, oy = 0.0;  /* for doomsday weapon antiproton beam */
+  static real ox = 0.0, oy = 0.0; /* for doomsday weapon antiproton beam */
   static int drawAPBeam = TRUE;
   static animStateRec_t doomapfire = {}; /* animdef state for ap firing */
   static int last_apstate;      /* toggle this when it expires */
-  static int beamfx = -1; /* Cataboligne - beam sound */
+  static int beamfx = -1;       /* Cataboligne - beam sound */
   static const Unsgn32 beamfx_delay = 1000; /* 1 second */
   static Unsgn32 lastbeam = 0;
   real dis, ang;
@@ -2442,18 +2470,13 @@ void drawDoomsday(GLfloat x, GLfloat y, GLfloat dangle, GLfloat scale)
   if (norender)
     return;
 
-  /*
-    Cataboligne - 11.20.6
-    doomsday music theme for ships nearby
-    find a way to move this check to nCPidle( )
-  */
-  
   dis = dist( Ships[Context.snum].x, Ships[Context.snum].y, 
               Doomsday->x, Doomsday->y );
   
   ang = angle(Ships[Context.snum].x, Ships[Context.snum].y,  
               Doomsday->x, Doomsday->y); 
 
+  /* find the textures if we haven't already */
   if (!GLDoomsday.id)
     {                           /* init first time around */
       int ndx = findGLTexture("doomsday");
@@ -2507,14 +2530,18 @@ void drawDoomsday(GLfloat x, GLfloat y, GLfloat dangle, GLfloat scale)
   if (firsttime)
     {
       firsttime = FALSE;
+
       /* doomsday is DOOMSIZE CU's in size */
-      doomsize = cu2GLSize(DOOMSIZE);
+      doomsizeSR = cu2GLSize(DOOMSIZE * OBJ_PRESCALE, -SCALE_FAC);
+      doomsizeLR = cu2GLSize(DOOMSIZE * OBJ_PRESCALE, -MAP_FAC);
+
+      beamradius = cu2GLSize(PHASER_DIST * 1.333, -SCALE_FAC);
     }
 
-  size = doomsize * scaleFac;
+  size = ((scale == SCALE_FAC) ? doomsizeSR : doomsizeLR);
 
   if (scale == MAP_FAC)
-    size = size / 3.0;
+    size = size * 2.0;
 
   sizeh = size / 2.0;
 
@@ -2549,8 +2576,7 @@ void drawDoomsday(GLfloat x, GLfloat y, GLfloat dangle, GLfloat scale)
   /* if it's time to draw the beam, then let her rip */
   if ( drawAPBeam && (scale == SCALE_FAC))
     {
-      GLfloat beamradius = beaminitradius * scaleFac;
-      GLfloat beamwidth  = 3.0 * scaleFac;
+      static const GLfloat beamwidth = 3.0;
 
       glPushMatrix();
       glLoadIdentity();
@@ -2680,8 +2706,8 @@ void drawNEB(int snum)
   real nearx, neary;
   GLfloat tx, ty;
   GLfloat nebWidth, nebHeight;
-  static GLfloat nebWidthSR, nebHeightSR;
-  static GLfloat nebWidthLR, nebHeightLR;
+  GLfloat nebWidthSR, nebHeightSR;
+  GLfloat nebWidthLR, nebHeightLR;
   GLfloat nebX, nebY;
   static GLint texid_neb;
   static GLColor_t col_neb;
@@ -2690,6 +2716,7 @@ void drawNEB(int snum)
   static GLfloat r0 = 0.0;
   static GLfloat r1 = 1.0;
   static int norender = FALSE;
+  GLfloat scaleFac = (SMAP(snum) ? dConf.vScaleLR : dConf.vScaleSR);
 
   if (norender)
     return;
@@ -2712,22 +2739,20 @@ void drawNEB(int snum)
           texid_neb = 0;
           return;
         }
-
-
-      /* figure out approriate width/height of neb quad in SR/LR */
-
-      /* width/height SR */
-      GLcvtcoords(0.0, 0.0, NEGENBEND_DIST * 2.0, 
-                  (NEGENBEND_DIST - NEGENB_DIST), 
-                  SCALE_FAC,
-                  &nebWidthSR, &nebHeightSR);
-
-      /* width/height LR */
-      GLcvtcoords(0.0, 0.0, NEGENBEND_DIST * 2.0, 
-                  (NEGENBEND_DIST - NEGENB_DIST), 
-                  MAP_FAC,
-                  &nebWidthLR, &nebHeightLR);
     }
+
+  /* figure out appropriate width/height of neb quad in SR/LR */
+  /* width/height SR */
+  GLcvtcoords(0.0, 0.0, NEGENBEND_DIST * 2.0, 
+              (NEGENBEND_DIST - NEGENB_DIST), 
+              SCALE_FAC,
+              &nebWidthSR, &nebHeightSR);
+  
+  /* width/height LR */
+  GLcvtcoords(0.0, 0.0, NEGENBEND_DIST * 2.0, 
+              (NEGENBEND_DIST - NEGENB_DIST), 
+              MAP_FAC,
+              &nebWidthLR, &nebHeightLR);
 
   /* see if a neb wall is actually visible.  If not, we can save alot of
      cycles... */
@@ -2952,15 +2977,18 @@ void drawNEB(int snum)
 
 void drawViewerBG(int snum, int dovbg)
 {
-  GLfloat z = TRANZ * 3.0;
-  /* barrier inner edge mask */
-  const GLfloat size = VIEWANGLE * 34.0; /* empirically determined */
-  const GLfloat sizeh = (size / 2.0);
+  /* depth of VBG, seems about right :) */
+  static const GLfloat z = TRANZ * 1.65; 
+
   /* star field inside barrier - the galaxy */
   GLfloat sizeb = (VIEWANGLE * (20.0 + 14)) / 2.0;
-  GLfloat x, y, rx, ry;
+
+  GLfloat x, y, x2, y2, rx, ry;
   static GLint texid_vbg = 0;
-  GLfloat scaleFac = (!SMAP(snum)) ? dConf.vScaleSR : dConf.vScaleLR;
+  GLfloat scaleFac = (SMAP(snum)) ? dConf.vScaleLR : dConf.vScaleSR;
+
+  /* half-width of vbg at TRANZ */
+  static const GLfloat vbgrad = NEGENBEND_DIST * 1.2; 
 
   if (snum < 1 || snum > MAXSHIPS)
     return;
@@ -2986,22 +3014,32 @@ void drawViewerBG(int snum, int dovbg)
     return;
   
   if (SMAP(snum) && !UserConf.DoLocalLRScan)
-    GLcvtcoords(0.0, 0.0, 0.0, 0.0, 
-                SCALE_FAC, &x, &y);
+    {                           /* murisak centered LR */
+      GLcvtcoords(0.0, 0.0,
+                  -vbgrad, -vbgrad, 
+                  -SFAC(snum),
+                  &x, &y);
+      GLcvtcoords(0.0, 0.0,
+                  vbgrad, vbgrad, 
+                  -SFAC(snum),
+                  &x2, &y2);
+    }
   else
-    GLcvtcoords((GLfloat)Ships[snum].x, 
-                (GLfloat)Ships[snum].y, 
-                0.0, 0.0, 
-                SCALE_FAC, &x, &y);
-  
-  if (SMAP(snum))
-    z *= 3.0;
-  
+    {                           /* everything else */
+      GLcvtcoords(Ships[snum].x, Ships[snum].y,
+                  -vbgrad, -vbgrad, 
+                  -SFAC(snum),
+                  &x, &y);
+      GLcvtcoords(Ships[snum].x, Ships[snum].y,
+                  vbgrad, vbgrad, 
+                  -SFAC(snum),
+                  &x2, &y2);
+    }
+
   glPushMatrix();
   glLoadIdentity();
-  glTranslatef(x , y , z);
 
-  glScalef(scaleFac, scaleFac, 1.0);
+  glScalef(scaleFac, scaleFac, 1.0); 
 
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
   glEnable(GL_BLEND);
@@ -3016,26 +3054,26 @@ void drawViewerBG(int snum, int dovbg)
       
       glBegin(GL_POLYGON);
       
-      glTexCoord2f(1.0f, 0.0f);
-      glVertex3f(-sizeh, -sizeh, 0.0); /* ll */
+      glTexCoord2f(0.0f, 1.0f);
+      glVertex3f(x, y, z); /* ll */
       
       glTexCoord2f(1.0f, 1.0f);
-      glVertex3f(sizeh, -sizeh, 0.0); /* lr */
+      glVertex3f(x2, y, z); /* lr */
       
-      glTexCoord2f(0.0f, 1.0f);
-      glVertex3f(sizeh, sizeh, 0.0); /* ur */
+      glTexCoord2f(1.0f, 0.0f);
+      glVertex3f(x2, y2, z); /* ur */
       
       glTexCoord2f(0.0f, 0.0f);
-      glVertex3f(-sizeh, sizeh, 0.0); /* ul */
-      
+      glVertex3f(x, y2, z); /* ul */
+
       glEnd();
     }
   
   if (UserConf.DoTacBkg && SMAP(snum))  
-    {                            /* check option and image load state */
+    {                           /* draw tac? */
       glLoadIdentity();
       
-      glTranslatef(0.0 , 0.0 , -1.0);
+      glTranslatef(0.0, 0.0, -1.0);
       
       glBlendFunc(GL_SRC_ALPHA, GL_ONE);
       

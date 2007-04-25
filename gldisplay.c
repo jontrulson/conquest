@@ -153,7 +153,7 @@ void display( int snum, int display_info )
     {
       if ( ! Planets[i].real )
 	continue; /*next;*/
-      if ( !GLcvtcoords( cenx, ceny, Planets[i].x, Planets[i].y, scale, 
+      if ( !GLcvtcoords( cenx, ceny, Planets[i].x, Planets[i].y, -scale, 
                          &glx, &gly ))
 	continue; /* next;*/
 
@@ -202,7 +202,7 @@ void display( int snum, int display_info )
   /* Display the planet eater. */
   if ( Doomsday->status == DS_LIVE )
     {
-      if (GLcvtcoords( cenx, ceny, Doomsday->x, Doomsday->y, scale, 
+      if (GLcvtcoords( cenx, ceny, Doomsday->x, Doomsday->y, -scale, 
 		       &glx, &gly ))
 	{
 	  drawDoomsday(glx, gly, (GLfloat)Doomsday->heading, scale);
@@ -235,7 +235,7 @@ void display( int snum, int display_info )
 		      if ( Ships[i].torps[j].status == TS_LIVE 
 			  || Ships[i].torps[j].status == TS_DETONATE )
 			if ( GLcvtcoords( cenx, ceny, Ships[i].torps[j].x, 
-					 Ships[i].torps[j].y, scale, 
+					 Ships[i].torps[j].y, -scale, 
 					 &glx, &gly ) )
 			  {
 			    drawTorp(glx, gly, Teams[Ships[i].team].torpchar, 
@@ -296,7 +296,7 @@ void display( int snum, int display_info )
 		/* ... especially if he's in the bounds of our current */
 		/*  display (either tactical or strategic map) */
 		if (GLcvtcoords( cenx, ceny, Ships[i].x, Ships[i].y, 
-				 scale, &glx, &gly ))
+				 -scale, &glx, &gly ))
 		  {
 		    /* He's on the screen. */
 		    /* We can see him if one of the following is true: */
@@ -353,7 +353,7 @@ void display( int snum, int display_info )
             {
               /* First display exploding torps. */
               if ( GLcvtcoords( cenx, ceny, Ships[i].torps[j].x, 
-                                Ships[i].torps[j].y, scale, &glx, &gly ))
+                                Ships[i].torps[j].y, -scale, &glx, &gly ))
                 { 
                   drawExplosion(glx, gly, i, j, scale);
                 }
@@ -381,7 +381,7 @@ void display( int snum, int display_info )
 	    if ( Ships[i].status != SS_DYING && Ships[i].status != SS_DEAD && 
 		 (Ships[i].torps[j].status == TS_LIVE || Ships[i].torps[j].status == TS_DETONATE) )
 	      if (GLcvtcoords( cenx, ceny, Ships[i].torps[j].x, 
-                               Ships[i].torps[j].y, scale, &glx, &gly))
+                               Ships[i].torps[j].y, -scale, &glx, &gly))
 		{
 		  drawTorp(glx, gly, Teams[Ships[i].team].torpchar, color,
                            scale, i, j);
