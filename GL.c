@@ -2716,7 +2716,6 @@ void drawNEB(int snum)
   static GLfloat r0 = 0.0;
   static GLfloat r1 = 1.0;
   static int norender = FALSE;
-  GLfloat scaleFac = (SMAP(snum) ? dConf.vScaleLR : dConf.vScaleSR);
 
   if (norender)
     return;
