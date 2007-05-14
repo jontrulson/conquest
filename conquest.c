@@ -131,6 +131,7 @@ void printUsage()
   printf("    -B              Benchmark mode.  When playing back a recording,\n");
   printf("                    the default playback speed will be as fast as possible.\n");
   printf("    -u              do not attempt to use UDP from server.\n");
+  printf("    -v              be more verbose.\n");
   return;
 }
 
@@ -271,7 +272,7 @@ int main(int argc, char *argv[])
   cInfo.remotehost = strdup("localhost"); /* default to your own server */
 
   /* check options */
-  while ((i = getopt(argc, argv, "mM:s:r:tP:Bu")) != EOF)    /* get command args */
+  while ((i = getopt(argc, argv, "mM:s:r:tP:Buv")) != EOF)    /* get command args */
     switch (i)
       {
       case 'B':                 /* Benchmark mode, set frameDelay to 0.0 */
@@ -337,6 +338,10 @@ int main(int argc, char *argv[])
 
       case 'u':
         cInfo.tryUDP = FALSE;
+        break;
+
+      case 'v':
+        cqDebug++;
         break;
 
       default:

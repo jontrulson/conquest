@@ -11,6 +11,16 @@
 
 ???
 
+5/13/2007
+
+  - some NEB work so it looks a little better.  Need to add support
+    for texcoord animation support.
+
+  - add new '-v' option to increase verbosity
+
+  - output some basic GL info.  Using '-v' will list the GL
+    implementations various limits.
+
 4/24/2007
 
   - major rework of the scaling code.  Other subtle bugs like double

@@ -29,12 +29,18 @@ CEXTERN	   int PollInputfd;	/* a copy of stdin's fd for poll()/select() */
 CEXTERN    int ConquestGID;	/* Conquest's GID */
 CEXTERN    int RMsg_Line;
 
-				/* for the semaphores */
-
+/* for the semaphores */
 #define LOCKMSG      (0)	/* lock the message portion  */
 #define LOCKCMN      (1)	/* lock everything else  */
 
 CEXTERN int headerflag;         /* whether to show header flag */
+
+/* verbosity/debugging */
+#if defined(NOEXTERNGLOBALS)
+int cqDebug = 0;
+#else
+CEXTERN int cqDebug;
+#endif
 
 #undef CEXTERN			/* cleanup */
 #endif

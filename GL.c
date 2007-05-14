@@ -1938,6 +1938,76 @@ int uiGLInit(int *argc, char **argv)
   return 0;             
 }
 
+/* this function was borrowed (with slight edits) from Brian Paul's
+ * xglinfo.c program.
+ */
+static void
+_print_gl_info(void)
+{
+  struct token_name {
+    GLuint count;
+    GLenum token;
+    const char *name;
+  };
+  static const struct token_name limits[] = {
+    { 1, GL_MAX_ATTRIB_STACK_DEPTH, "GL_MAX_ATTRIB_STACK_DEPTH" },
+    { 1, GL_MAX_CLIENT_ATTRIB_STACK_DEPTH, "GL_MAX_CLIENT_ATTRIB_STACK_DEPTH" },
+    { 1, GL_MAX_CLIP_PLANES, "GL_MAX_CLIP_PLANES" },
+    { 1, GL_MAX_COLOR_MATRIX_STACK_DEPTH, "GL_MAX_COLOR_MATRIX_STACK_DEPTH" },
+    { 1, GL_MAX_ELEMENTS_VERTICES, "GL_MAX_ELEMENTS_VERTICES" },
+    { 1, GL_MAX_ELEMENTS_INDICES, "GL_MAX_ELEMENTS_INDICES" },
+    { 1, GL_MAX_EVAL_ORDER, "GL_MAX_EVAL_ORDER" },
+    { 1, GL_MAX_LIGHTS, "GL_MAX_LIGHTS" },
+    { 1, GL_MAX_LIST_NESTING, "GL_MAX_LIST_NESTING" },
+    { 1, GL_MAX_MODELVIEW_STACK_DEPTH, "GL_MAX_MODELVIEW_STACK_DEPTH" },
+    { 1, GL_MAX_NAME_STACK_DEPTH, "GL_MAX_NAME_STACK_DEPTH" },
+    { 1, GL_MAX_PIXEL_MAP_TABLE, "GL_MAX_PIXEL_MAP_TABLE" },
+    { 1, GL_MAX_PROJECTION_STACK_DEPTH, "GL_MAX_PROJECTION_STACK_DEPTH" },
+    { 1, GL_MAX_TEXTURE_STACK_DEPTH, "GL_MAX_TEXTURE_STACK_DEPTH" },
+    { 1, GL_MAX_TEXTURE_SIZE, "GL_MAX_TEXTURE_SIZE" },
+    { 1, GL_MAX_3D_TEXTURE_SIZE, "GL_MAX_3D_TEXTURE_SIZE" },
+    { 1, GL_MAX_CUBE_MAP_TEXTURE_SIZE_ARB, "GL_MAX_CUBE_MAP_TEXTURE_SIZE_ARB" },
+    { 1, GL_MAX_RECTANGLE_TEXTURE_SIZE_NV, "GL_MAX_RECTANGLE_TEXTURE_SIZE_NV" },
+    { 1, GL_NUM_COMPRESSED_TEXTURE_FORMATS_ARB, "GL_NUM_COMPRESSED_TEXTURE_FORMATS_ARB" },
+    { 1, GL_MAX_TEXTURE_UNITS_ARB, "GL_MAX_TEXTURE_UNITS_ARB" },
+    { 1, GL_MAX_TEXTURE_LOD_BIAS_EXT, "GL_MAX_TEXTURE_LOD_BIAS_EXT" },
+    { 1, GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, "GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT" },
+    { 2, GL_MAX_VIEWPORT_DIMS, "GL_MAX_VIEWPORT_DIMS" },
+    { 2, GL_ALIASED_LINE_WIDTH_RANGE, "GL_ALIASED_LINE_WIDTH_RANGE" },
+    { 2, GL_SMOOTH_LINE_WIDTH_RANGE, "GL_SMOOTH_LINE_WIDTH_RANGE" },
+    { 2, GL_ALIASED_POINT_SIZE_RANGE, "GL_ALIASED_POINT_SIZE_RANGE" },
+    { 2, GL_SMOOTH_POINT_SIZE_RANGE, "GL_SMOOTH_POINT_SIZE_RANGE" },
+    { 0, (GLenum) 0, NULL }
+  };
+  GLint i, max[2];
+  const char *glVendor   = (const char *) glGetString(GL_VENDOR);
+  const char *glRenderer = (const char *) glGetString(GL_RENDERER);
+  const char *glVersion  = (const char *) glGetString(GL_VERSION);
+  
+  clog("OpenGL Vendor:      %s", glVendor);
+  clog("OpenGL Renderer:    %s", glRenderer);
+  clog("OpenGL Version:     %s", glVersion);
+  if (cqDebug)
+    {
+      clog("OpenGL limits:");
+
+      for (i = 0; limits[i].count; i++) 
+        {
+          glGetIntegerv(limits[i].token, max);
+          if (glGetError() == GL_NONE) 
+            {
+              if (limits[i].count == 1)
+                clog("    %s = %d", limits[i].name, max[0]);
+              else /* XXX fix if we ever query something with more than 2 values */
+                clog("    %s = %d, %d", limits[i].name, max[0], max[1]);
+            }
+        }
+    }
+
+  return;
+}
+
+
 void graphicsInit(void)
 {
   glClearDepth(1.0);
@@ -1946,6 +2016,8 @@ void graphicsInit(void)
   glShadeModel(GL_SMOOTH);
   glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
   
+  _print_gl_info();
+
   if (!loadGLTextures())
     clog("ERROR: loadGLTextures() failed\n");
   else
@@ -2711,10 +2783,12 @@ void drawNEB(int snum)
   GLfloat nebX, nebY;
   static GLint texid_neb;
   static GLColor_t col_neb;
-  static const int maxtime = 100;
+/* JET  static const int maxtime = 100; */
+  static const int maxtime = 10;
   static Unsgn32 lasttime = 0;
   static GLfloat r0 = 0.0;
   static GLfloat r1 = 1.0;
+  static GLfloat xoff = 0.0;
   static int norender = FALSE;
 
   if (norender)
@@ -2841,6 +2915,8 @@ void drawNEB(int snum)
       static real dir0 = 1.0;
       static real dir1 = -1.0;
 
+      xoff += 0.002;
+#if 0
       if (rnduni(0.0, 1.0) < 0.01)
         dir0 *= -1.0;
 
@@ -2859,7 +2935,8 @@ void drawNEB(int snum)
 
       r1 += (dir1 * 0.0002);
       r0 += (dir0 * 0.0002);
-      
+#endif
+
       /*      clog("r0 = %f (%f) r1 = %f(%f)\n", r0, dir0, r1, dir1);*/
 
       lasttime = frameTime;
@@ -2908,16 +2985,16 @@ void drawNEB(int snum)
 
       glBegin(GL_POLYGON);
       
-      glTexCoord2f(r0, r0);
+      glTexCoord2f(r0+xoff, r0);
       glVertex3f(nebX, nebY, TRANZ); /* ll */
       
-      glTexCoord2f(r1, r0);
+      glTexCoord2f(r1+xoff, r0);
       glVertex3f(nebX + nebWidth, nebY, TRANZ); /* lr */
       
-      glTexCoord2f(r1, r1);
+      glTexCoord2f(r1+xoff, r1);
       glVertex3f(nebX + nebWidth, nebY + nebHeight, TRANZ); /* ur */
       
-      glTexCoord2f(r0, r1);
+      glTexCoord2f(r0+xoff, r1);
       glVertex3f(nebX, nebY + nebHeight, TRANZ); /* ul */
       
       glEnd();
@@ -2951,16 +3028,16 @@ void drawNEB(int snum)
          to swap the texcoords as well so things don't look squashed.  */
       glBegin(GL_POLYGON);
       
-      glTexCoord2f(r0, r1);
+      glTexCoord2f(r0-xoff, r1);
       glVertex3f(nebX, nebY, TRANZ); /* ll */
       
-      glTexCoord2f(r0, r0);
+      glTexCoord2f(r0-xoff, r0);
       glVertex3f(nebX + nebHeight, nebY, TRANZ); /* lr */
       
-      glTexCoord2f(r1, r0);
+      glTexCoord2f(r1-xoff, r0);
       glVertex3f(nebX + nebHeight, nebY + nebWidth, TRANZ); /* ur */
       
-      glTexCoord2f(r1, r1);
+      glTexCoord2f(r1-xoff, r1);
       glVertex3f(nebX, nebY + nebWidth, TRANZ); /* ul */
       
       glEnd();

@@ -69,18 +69,19 @@ void printUsage()
   printf("                      recfile will be in compressed format\n");
   printf("                      if conquest was compiled with libz\n");
   printf("                      support\n");
-  printf("    -t              telnet mode (no user conf load/save)\n");
+  printf("    -t               telnet mode (no user conf load/save)\n");
   
-  printf("    -M metaserver   specify alternate <metaserver> to contact.\n");
-  printf("                     default: %s\n", META_DFLT_SERVER);
+  printf("    -M metaserver    specify alternate <metaserver> to contact.\n");
+  printf("                      default: %s\n", META_DFLT_SERVER);
 
                                  
-  printf("    -P <cqr file>   Play back a Conquest recording (.cqr)\n");
-  printf("    -B              Benchmark mode.  When playing back a recording,\n");
-  printf("                    the default playback speed will be as fast as possible.\n");
-  printf("    -u              do not attempt to use UDP from server.\n");
-  printf("    -S              disable sound support.\n");
-
+  printf("    -P <cqr file>    Play back a Conquest recording (.cqr)\n");
+  printf("    -B               Benchmark mode.  When playing back a recording,\n");
+  printf("                      the default playback speed will be as fast as possible.\n");
+  printf("    -u               do not attempt to use UDP from server.\n");
+  printf("    -S               disable sound support.\n");
+  printf("    -v               be more verbose.\n");
+  
                                  
   return;
 }
@@ -317,7 +318,7 @@ int main(int argc, char *argv[])
   dspInitData();
 
   /* check options */
-  while ((i = getopt(argc, argv, "fmM:s:r:tP:Bug:S")) != EOF)    
+  while ((i = getopt(argc, argv, "fmM:s:r:tP:Bug:Sv")) != EOF)    
     switch (i)
       {
       case 'B':                 /* Benchmark mode, set frameDelay to 0.0 */
@@ -394,6 +395,10 @@ int main(int argc, char *argv[])
  
       case 'S':
         dosound = FALSE;
+        break;
+
+      case 'v':
+        cqDebug++;
         break;
 
      default:
