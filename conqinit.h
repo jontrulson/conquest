@@ -136,9 +136,13 @@ typedef struct _cqi_animdef_init {
   struct {
     Unsgn32 color;              /* will override per-tex colors */
     Unsgn32 stages;             /* number of stages (textures) */
-    Unsgn32 loops;              /* number of loops, 0 = inf */
     Unsgn32 delayms;            /* delay per-stage in ms */
+    Unsgn32 loops;              /* number of loops, 0 = inf */
     Unsgn32 looptype;           /* the type of loop (asc/dec/pingpong/etc) */
+
+    /* texcoord anims */
+    real deltas;                /* s and t deltas */
+    real deltat;
   } texanim;
 
   /* color animations */

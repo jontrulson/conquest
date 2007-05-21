@@ -744,6 +744,11 @@ animation {
   animdef      "pulse-slow"
 }
 
+# a 'pulse' text effect for critical wep/eng.
+animation {
+  name         "neb"
+}
+
 ## animation defs
 #################
 
@@ -954,3 +959,28 @@ animdef {
     deltaa     -0.015
   }
 }
+
+# Negative Energy Barrier (neb)
+# since we use a texanim, but only use one texture, create a texture
+# alias here for it
+
+texture {
+  name         "barrier0"
+  filename     "barrier" 
+  color        "bfc3baba"
+}
+
+animdef {
+  name         "neb"
+  texname      "barrier"
+
+  # move texture along s axis, rapidly
+  texanim {
+    stages     1           # only one texture
+    loops      0           # runs forever
+    delayms    10
+
+    deltas     0.002
+  }
+}
+

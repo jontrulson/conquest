@@ -131,6 +131,7 @@ static int parsebool(char *str);
 %token <num> SOUNDCONF SAMPLERATE VOLUME PAN STEREO FXCHANNELS CHUNKSIZE
 %token <num> EFFECT FADEINMS FADEOUTMS LIMIT FRAMELIMIT
 %token <num> MUSIC
+%token <num> DELTAT SCOORD TCOORD
 
 %token <ptr>  STRING 
 %token <rnum> RATIONAL
@@ -591,6 +592,18 @@ stmt            : /* error */
                 | LIMIT number
                    {
                         cfgSectioni(LIMIT, $2);
+                   }                      
+                | SCOORD rational
+                   {
+                        cfgSectionf(SCOORD, $2);
+                   }                      
+                | TCOORD rational
+                   {
+                        cfgSectionf(TCOORD, $2);
+                   }                      
+                | DELTAT rational
+                   {
+                        cfgSectionf(DELTAT, $2);
                    }                      
                 | error closesect
                 ;
@@ -1502,8 +1515,12 @@ void dumpTexDataHdr(void)
              cqiAnimDefs[i].texanim.delayms);
       printf("     %d,\n",
              cqiAnimDefs[i].texanim.loops);
-      printf("     %d\n",
+      printf("     %d,\n",
              cqiAnimDefs[i].texanim.looptype);
+      printf("     %f,\n",
+             cqiAnimDefs[i].texanim.deltas);
+      printf("     %f\n",
+             cqiAnimDefs[i].texanim.deltat);
       printf("   },\n");
 
       /* colanim */
@@ -2700,6 +2717,19 @@ static void cfgSectionf(int item, real val)
           {
             switch(cursubsection)
               {
+              case TEXANIM:
+                {
+                  switch(item)
+                    {
+                    case DELTAS:
+                      currAnimDef.texanim.deltas = val;
+                      break;
+                    case DELTAT:
+                      currAnimDef.texanim.deltat = val;
+                      break;
+                    }
+                }
+                break;
               case COLANIM:
                 {
                   switch(item)
@@ -3238,6 +3268,9 @@ static char *item2str(int item)
       break;
     case DELTAS:
       return "DELTAS";
+      break;
+    case DELTAT:
+      return "DELTAT";
       break;
 
     case SAMPLERATE:

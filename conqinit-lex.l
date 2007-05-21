@@ -69,7 +69,9 @@ armies                 {return ( ARMIES );}
 visible                {return ( VISIBLE );}
 core                   {return ( CORE );}
 xcoord                 {return ( XCOORD );}
+{WS}x{WS}              {return ( XCOORD );}
 ycoord                 {return ( YCOORD );}
+{WS}y{WS}              {return ( YCOORD );}
 texname                {return ( TEXNAME );}
 color                  {return ( COLOR );}
 size                   {return ( SIZE );}
@@ -102,6 +104,7 @@ deltax                 {return ( DELTAX );}
 deltay                 {return ( DELTAY );}
 deltaz                 {return ( DELTAZ );}
 deltas                 {return ( DELTAS );}
+deltat                 {return ( DELTAT );}
 
 soundconf              {return ( SOUNDCONF );}
 samplerate             {return ( SAMPLERATE );}
@@ -118,6 +121,9 @@ framelimit             {return ( FRAMELIMIT );}
 limit                  {return ( LIMIT );}
 
 music                  {return ( MUSIC );}
+
+{WS}s{WS}              {return ( SCOORD );}
+{WS}t{WS}              {return ( SCOORD );}
 
 {number}		{ 
                           yylval.num = atoi( yytext );

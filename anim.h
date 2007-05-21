@@ -16,6 +16,8 @@
 typedef struct _anim_draw_state {
   /* texture id */
   GLint id;
+  /* texture coordinates */
+  GLTexcoord_t tc;
   /* color */
   GLColor_t col;
   /* geometry */
@@ -121,6 +123,9 @@ typedef struct _gl_animdef {
     Unsgn32 loops;              /* number of loops, 0 = inf */
     Unsgn32 delayms;            /* delay per-stage in ms */
     Unsgn32 looptype;           /* the type of loop (asc/dec/pingpong/etc) */
+
+    GLfloat deltas;
+    GLfloat deltat;
     /* list of texanim entries, generated at creation time */
     struct _anim_texture_ent *tex;
   } tex;
@@ -179,6 +184,8 @@ int findGLAnimDef(char *animname); /* GL.c */
 int animInitState(char *animname, animStatePtr_t astate, 
                   animDrawStatePtr_t istate);
 void animResetState(animStatePtr_t astate, Unsgn32 lasttime);
+
+int animIterState(animStatePtr_t astate);
 
 void animQueInit(animQue_t *aque);
 void animQueAdd(animQue_t *aque, animStatePtr_t astate);

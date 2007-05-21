@@ -24,6 +24,10 @@ typedef struct _GLtexture {
   Unsgn32 w, h;                 /* width/height of texture */
 } GLTexture_t;  
 
+typedef struct _GLtexcoord {
+  GLfloat s, t;                 /* texture coordinates or tc offsets */
+} GLTexcoord_t;
+
 #ifdef NOEXTERN_GLTEXTURES
 GLTexture_t *GLTextures = NULL;
 #else

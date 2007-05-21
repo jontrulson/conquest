@@ -231,8 +231,8 @@ CONTENTS:
             visible     "yes"
             core        "yes"
             homeplanet  "yes"
-            xcoord      -9655.250220
-            ycoord      9577.226313
+            x          -9655.250220
+            y          9577.226313
             size        300
             color       "ffe6e6e6"
             texname     "kling"                  # optional
@@ -321,12 +321,12 @@ CONTENTS:
                       planets are marked as a 'homeplanet' for each of
                       the player teams (f, k, r, and o).
 
-          xcoord:     RATIONAL
+          x:          RATIONAL
                       starting x coordinate of the planet's location.
                       This value is ignored if the planet is not
                       stationary. 
 
-          ycoord:     RATIONAL
+          y:          RATIONAL
                       starting y coordinate of the planet's location.
                       This value is ignored if the planet is not
                       stationary. 
@@ -499,6 +499,9 @@ CONTENTS:
           structure that contains the following variables:
 
           id                              - current texture id
+          s, t                            - texture S and T coordinate
+                                            offset (defaults to S=0.0
+                                            and T=0.0) 
           color (ARGB)                    - current color
           geometry (size, rotation, x, y) - current geo info
           armed                           - current toggle value (on/off)
@@ -515,7 +518,9 @@ CONTENTS:
 
           texanim:     Specifies parameters for a texture
                        animation. Modifies state's 'id' and 'color'
-                       values .
+                       values.  If deltas and deltat
+                       offsets/incrementors are present, modifies
+                       texture's S and T coordinates.
 
           colanim:     Specifies parameters for a color animation.
                        Modfies the state's 'color' values.
@@ -559,6 +564,8 @@ CONTENTS:
               stages     16 
               loops      1                       # optional
               delayms    100                     
+              deltas     0.02                    # optional
+              deltat     0.02                    # optional
             }
 
             # this runs when texanim has expired
@@ -660,6 +667,14 @@ CONTENTS:
                         The delay, in milliseconds, before advancing
                         onto the next stage.
                     
+            deltas:     RATIONAL
+                        Specify an offset to be applied to the texture
+                        state's S coordinate variable.
+
+            deltat:     RATIONAL
+                        Specify an offset to be applied to the texture
+                        state's T coordinate variable.
+
 
           # colanim subsection
 

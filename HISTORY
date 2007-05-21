@@ -11,15 +11,16 @@
 
 ???
 
-5/13/2007
+5/20/2007
 
-  - some NEB work so it looks a little better.  Need to add support
-    for texcoord animation support.
+  - more NEB rework so it looks a little better.  Added support
+    to CQI texanim to modify the texture's s and t offsets.  Now use a
+    'neb' animdef for rendering it.
 
   - add new '-v' option to increase verbosity
 
   - output some basic GL info.  Using '-v' will list the GL
-    implementations various limits.
+    implementation's various limits.
 
 4/24/2007
 

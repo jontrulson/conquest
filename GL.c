@@ -301,6 +301,9 @@ static int initGLAnimDefs(void)
           GLAnimDefs[i].tex.delayms = cqiAnimDefs[i].texanim.delayms;
           GLAnimDefs[i].tex.looptype = cqiAnimDefs[i].texanim.looptype;
 
+          GLAnimDefs[i].tex.deltas = cqiAnimDefs[i].texanim.deltas;
+          GLAnimDefs[i].tex.deltat = cqiAnimDefs[i].texanim.deltat;
+
           /* now allocate and build the _anim_texure_ent array */
           if (!(GLAnimDefs[i].tex.tex = 
                 (struct _anim_texture_ent *)malloc(sizeof(struct _anim_texture_ent) * GLAnimDefs[i].tex.stages)))
@@ -2781,35 +2784,22 @@ void drawNEB(int snum)
   GLfloat nebWidthSR, nebHeightSR;
   GLfloat nebWidthLR, nebHeightLR;
   GLfloat nebX, nebY;
-  static GLint texid_neb;
-  static GLColor_t col_neb;
-/* JET  static const int maxtime = 100; */
-  static const int maxtime = 10;
-  static Unsgn32 lasttime = 0;
-  static GLfloat r0 = 0.0;
-  static GLfloat r1 = 1.0;
-  static GLfloat xoff = 0.0;
   static int norender = FALSE;
+  /* our wall animation state */
+  static animStateRec_t nebastate;    /* initial state of neb texture */
+
 
   if (norender)
     return;
 
   if (!inited)
     {
-      int ndx;
-
       inited = TRUE;
 
-      /* get the barrier tex and color */
-      if ((ndx = findGLTexture("barrier")) >= 0)
-        {
-          texid_neb = GLTextures[ndx].id;
-          col_neb = GLTextures[ndx].col;
-        }
-      else
+      /* get our anim */
+      if (!animInitState("neb", &nebastate, NULL))
         {
           norender = TRUE;
-          texid_neb = 0;
           return;
         }
     }
@@ -2836,66 +2826,83 @@ void drawNEB(int snum)
   if (SMAP(snum) && !UserConf.DoLocalLRScan)
     return;
 
-  /* test for x wall */
-  if (Ships[snum].x < 0.0)
-    {
-      /* find out which side of the barrier we are on */
-      if (Ships[snum].x > (-NEGENB_DIST - nebCenter))
-        nearx = -NEGENB_DIST;
-      else
-        nearx = -NEGENBEND_DIST;
-    }
-  else
-    {
-      if (Ships[snum].x < (NEGENB_DIST + nebCenter))
-        nearx = NEGENB_DIST;
-      else
-        nearx = NEGENBEND_DIST;
-    }
+  /* if we are inside the barrier. of course we
+     can see it */
+   if (fabs( Ships[snum].x ) >= NEGENB_DIST && 
+       fabs( Ships[snum].x ) <= NEGENBEND_DIST)
+     nebXVisible = TRUE;
+     
+   if (fabs( Ships[snum].y ) >= NEGENB_DIST && 
+       fabs( Ships[snum].y ) <= NEGENBEND_DIST)
+     nebYVisible = TRUE;
 
-  /* we check against a mythical Y point aligned on the nearest X NEB wall
-     edge to test for visibility. */
-  if (GLcvtcoords(Ships[snum].x, Ships[snum].y,
-                  nearx, 
-                  CLAMP(-NEGENBEND_DIST, NEGENBEND_DIST, Ships[snum].y), 
-                  (SMAP(snum) ? MAP_FAC : SCALE_FAC),
-                  &tx, &ty))
-    {
-      nebXVisible = TRUE;
-    }
-  
+   if (!nebXVisible)
+     {
+       /* test for x wall */
+       if (Ships[snum].x < 0.0)
+         {
+           /* find out which side of the barrier we are on */
+           if (Ships[snum].x > (-NEGENB_DIST - nebCenter))
+             nearx = -NEGENB_DIST;
+           else
+             nearx = -NEGENBEND_DIST;
+         }
+       else
+         {
+           if (Ships[snum].x < (NEGENB_DIST + nebCenter))
+             nearx = NEGENB_DIST;
+           else
+             nearx = NEGENBEND_DIST;
+         }
+       
+       /* we check against a mythical Y point aligned on the nearest X
+          NEB wall edge to test for visibility. */
+       
+       if (GLcvtcoords(Ships[snum].x, Ships[snum].y,
+                       nearx, 
+                       CLAMP(-NEGENBEND_DIST, NEGENBEND_DIST, Ships[snum].y), 
+                       (SMAP(snum) ? MAP_FAC : SCALE_FAC),
+                       &tx, &ty))
+         {
+           nebXVisible = TRUE;
+         }
+     }  
+
 #if 0                           /* debugging test point (murisak) */
   uiDrawPlanet( tx, ty, 34, (SMAP(snum) ? MAP_FAC : SCALE_FAC), 
                              MagentaColor, TRUE);
 #endif
 
-  /* test for y wall */
-  if (Ships[snum].y < 0.0)
+  if (!nebYVisible)
     {
-      if (Ships[snum].y > (-NEGENB_DIST - nebCenter))
-        neary = -NEGENB_DIST;
+      /* test for y wall */
+      if (Ships[snum].y < 0.0)
+        {
+          if (Ships[snum].y > (-NEGENB_DIST - nebCenter))
+            neary = -NEGENB_DIST;
+          else
+            neary = -NEGENBEND_DIST;
+        }
       else
-        neary = -NEGENBEND_DIST;
+        {
+          if (Ships[snum].y < (NEGENB_DIST + nebCenter))
+            neary = NEGENB_DIST;
+          else
+            neary = NEGENBEND_DIST;
+        }
+      
+      /* we check against a mythical X point aligned on the nearest Y NEB wall
+         edge to test for visibility. */
+      
+      if (GLcvtcoords(Ships[snum].x, Ships[snum].y,
+                      CLAMP(-NEGENBEND_DIST, NEGENBEND_DIST, Ships[snum].x), 
+                      neary, 
+                      (SMAP(snum) ? MAP_FAC : SCALE_FAC),
+                      &tx, &ty))
+        {
+          nebYVisible = TRUE;
+        }
     }
-  else
-    {
-      if (Ships[snum].y < (NEGENB_DIST + nebCenter))
-        neary = NEGENB_DIST;
-      else
-        neary = NEGENBEND_DIST;
-    }
-
-  /* we check against a mythical X point aligned on the nearest Y NEB wall
-     edge to test for visibility. */
-  if (GLcvtcoords(Ships[snum].x, Ships[snum].y,
-                  CLAMP(-NEGENBEND_DIST, NEGENBEND_DIST, Ships[snum].x), 
-                  neary, 
-                  (SMAP(snum) ? MAP_FAC : SCALE_FAC),
-                  &tx, &ty))
-    {
-      nebYVisible = TRUE;
-    }
-
 #if 0                           /* debugging test point (murisak) */
   uiDrawPlanet( tx, ty, 34, (SMAP(snum) ? MAP_FAC : SCALE_FAC), 
                              MagentaColor, TRUE);
@@ -2905,43 +2912,14 @@ void drawNEB(int snum)
   if (!nebXVisible && !nebYVisible)
     return;
 
+  /* here we iterate the neb anim state 'manually'.  We do not que
+   *   this in the normal animQue, since we only want to run it when
+   *   this function is executed, rather than all the time.  Saves cycles.
+   */
+
+  animIterState(&nebastate);
+
   /* draw it/them */
-
-  /* it would be nice to be able to do this in an animdef someday. */
-  /* basically we are 'sliding' the x/y tex coords around a little
-     here to give a 'motion' effect */
-  if ((frameTime - lasttime) > maxtime)
-    {
-      static real dir0 = 1.0;
-      static real dir1 = -1.0;
-
-      xoff += 0.002;
-#if 0
-      if (rnduni(0.0, 1.0) < 0.01)
-        dir0 *= -1.0;
-
-      if (rnduni(0.0, 1.0) < 0.01)
-        dir1 *= -1.0;
-
-      if (r0 <= 0.0)
-        dir0 = 1.0;
-      else if (r0 >= 0.1)
-        dir0 = -1.0;
-
-      if (r1 >= 1.0)
-        dir1 = -1.0;
-      else if (r1 <= 0.9)
-        dir1 = 1.0;
-
-      r1 += (dir1 * 0.0002);
-      r0 += (dir0 * 0.0002);
-#endif
-
-      /*      clog("r0 = %f (%f) r1 = %f(%f)\n", r0, dir0, r1, dir1);*/
-
-      lasttime = frameTime;
-    }
-
 
   glPushMatrix();
   glLoadIdentity();
@@ -2950,15 +2928,15 @@ void drawNEB(int snum)
 
   glEnable(GL_TEXTURE_2D);
 
-  glBindTexture(GL_TEXTURE_2D, texid_neb);
+  glBindTexture(GL_TEXTURE_2D, nebastate.state.id);
 
   nebWidth = (SMAP(snum) ? nebWidthLR : nebWidthSR);
   nebHeight = (SMAP(snum) ? nebHeightLR : nebHeightSR);
 
-  glColor4f(col_neb.r,
-            col_neb.g,
-            col_neb.b,
-            col_neb.a);
+  glColor4f(nebastate.state.col.r,
+            nebastate.state.col.g,
+            nebastate.state.col.b,
+            nebastate.state.col.a);
 
   if (nebYVisible)
     {
@@ -2985,16 +2963,20 @@ void drawNEB(int snum)
 
       glBegin(GL_POLYGON);
       
-      glTexCoord2f(r0+xoff, r0);
+      glTexCoord2f(0.0 + nebastate.state.tc.s, 
+                   0.0 + nebastate.state.tc.t);
       glVertex3f(nebX, nebY, TRANZ); /* ll */
       
-      glTexCoord2f(r1+xoff, r0);
+      glTexCoord2f(1.0 + nebastate.state.tc.s, 
+                   0.0 + nebastate.state.tc.t);
       glVertex3f(nebX + nebWidth, nebY, TRANZ); /* lr */
       
-      glTexCoord2f(r1+xoff, r1);
+      glTexCoord2f(1.0 + nebastate.state.tc.s, 
+                   1.0 + nebastate.state.tc.t);
       glVertex3f(nebX + nebWidth, nebY + nebHeight, TRANZ); /* ur */
       
-      glTexCoord2f(r0+xoff, r1);
+      glTexCoord2f(0.0 + nebastate.state.tc.s, 
+                   1.0 + nebastate.state.tc.t);
       glVertex3f(nebX, nebY + nebHeight, TRANZ); /* ul */
       
       glEnd();
@@ -3028,16 +3010,20 @@ void drawNEB(int snum)
          to swap the texcoords as well so things don't look squashed.  */
       glBegin(GL_POLYGON);
       
-      glTexCoord2f(r0-xoff, r1);
+      glTexCoord2f(0.0 + nebastate.state.tc.s, 
+                   1.0 + nebastate.state.tc.t);
       glVertex3f(nebX, nebY, TRANZ); /* ll */
       
-      glTexCoord2f(r0-xoff, r0);
+      glTexCoord2f(0.0 + nebastate.state.tc.s, 
+                   0.0 + nebastate.state.tc.t);
       glVertex3f(nebX + nebHeight, nebY, TRANZ); /* lr */
       
-      glTexCoord2f(r1-xoff, r0);
+      glTexCoord2f(1.0 + nebastate.state.tc.s, 
+                   0.0 + nebastate.state.tc.t);
       glVertex3f(nebX + nebHeight, nebY + nebWidth, TRANZ); /* ur */
       
-      glTexCoord2f(r1-xoff, r1);
+      glTexCoord2f(1.0 + nebastate.state.tc.s, 
+                   1.0 + nebastate.state.tc.t);
       glVertex3f(nebX, nebY + nebWidth, TRANZ); /* ul */
       
       glEnd();

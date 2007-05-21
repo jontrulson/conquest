@@ -86,6 +86,10 @@ int animInitState(char *animname, animStatePtr_t astate,
             astate->istate.id = GLAnimDefs[ndx].tex.tex[0].id;
             astate->istate.col = GLAnimDefs[ndx].tex.tex[0].col;
           }
+
+        /* setup default s/t offsets */
+        astate->istate.tc.s = 0.0;
+        astate->istate.tc.t = 0.0;
       }
     
     /* colanim */
@@ -121,6 +125,8 @@ void animResetState(animStatePtr_t astate, Unsgn32 thetime)
   /* first reset the draw state from initial draw state - we only copy the
      non private items - explicitly */
   astate->state.id    = astate->istate.id;
+  astate->state.tc.s  = astate->istate.tc.s;
+  astate->state.tc.t  = astate->istate.tc.t;
   astate->state.col   = astate->istate.col;
   astate->state.x     = astate->istate.x;
   astate->state.y     = astate->istate.y;
@@ -245,6 +251,10 @@ int animIterState(animStatePtr_t astate)
             {
               astate->state.id = glad->tex.tex[astate->tex.curstage].id;
               astate->state.col = glad->tex.tex[astate->tex.curstage].col;
+
+              /* iter tc's */
+              astate->state.tc.s += glad->tex.deltas;
+              astate->state.tc.t += glad->tex.deltat;
             }
         }
     }
