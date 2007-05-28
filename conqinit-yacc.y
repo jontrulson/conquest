@@ -23,19 +23,12 @@
 /* The default initdata */
 #if 1
 #include "initdata.h"
-#include "texdata.h"
 #include "sounddata.h"
 #else
 #warning "Enable this for debugging only! It will core if you use it in anything other than conqinit!"
   cqiGlobalInitRec_t    defaultGlobalInit = {};
   cqiShiptypeInitPtr_t  defaultShiptypes = NULL;
   cqiPlanetInitPtr_t    defaultPlanets = NULL;
-  cqiTextureInitPtr_t   defaultTextures = NULL;
-  int                   defaultNumTextures = 0;
-  cqiAnimationInitPtr_t defaultAnimations = NULL;
-  int                   defaultNumAnimations = 0;
-  cqiAnimDefInitPtr_t   defaultAnimDefs = NULL;
-  int                   defaultNumAnimDefs = 0;
 
   cqiSoundConfRec_t     defaultSoundConf = {};
   cqiSoundPtr_t         defaultSoundEffects = NULL;
@@ -88,6 +81,10 @@ static cqiTextureInitRec_t currTexture;
 static cqiAnimationInitRec_t   currAnimation;
 static cqiAnimDefInitRec_t     currAnimDef;
 
+static cqiTextureAreaRec_t     currTexArea;
+static int numTexAreas = 0;
+static cqiTextureAreaPtr_t     currTexAreas = NULL;
+
 static cqiSoundRec_t currSound;
 
 static void startSection(int section);
@@ -131,7 +128,7 @@ static int parsebool(char *str);
 %token <num> SOUNDCONF SAMPLERATE VOLUME PAN STEREO FXCHANNELS CHUNKSIZE
 %token <num> EFFECT FADEINMS FADEOUTMS LIMIT FRAMELIMIT
 %token <num> MUSIC
-%token <num> DELTAT SCOORD TCOORD
+%token <num> DELTAT SCOORD TCOORD WIDTH HEIGHT TEXAREA
 
 %token <ptr>  STRING 
 %token <rnum> RATIONAL
@@ -305,6 +302,20 @@ istateword     : ISTATE
                 {;}
                 ;
 
+
+texareaconfig  : starttexarea stmts closesect
+                ;
+
+starttexarea   : texareaword opensect
+                {
+                    startSubSection(TEXAREA);
+                }
+                ;
+
+texareaword     : TEXAREA
+                {;}
+                ;
+
 soundconfconfig    : startsoundconf stmts closesect
                    ;
 
@@ -361,6 +372,7 @@ stmts           : /* empty */
                 | stmts geoanimconfig
                 | stmts toganimconfig
                 | stmts istateconfig
+                | stmts texareaconfig
                 ;
 
 stmt            : /* error */
@@ -605,6 +617,14 @@ stmt            : /* error */
                    {
                         cfgSectionf(DELTAT, $2);
                    }                      
+                | WIDTH rational
+                   {
+                        cfgSectionf(WIDTH, $2);
+                   }                      
+                | HEIGHT rational
+                   {
+                        cfgSectionf(HEIGHT, $2);
+                   }                      
                 | error closesect
                 ;
 
@@ -658,6 +678,33 @@ static int _cqiFindTexture(char *texname)
       return i;
   
   return -1;
+}
+
+/* search the 'public' planet list */
+cqiTextureAreaPtr_t cqiFindTexArea(char *texnm, char *tanm, 
+                                   cqiTextureAreaPtr_t defaultta)
+{
+  int tidx, i;
+
+  if (!texnm || !tanm)
+    {
+      return defaultta;
+    }
+
+  if ((tidx = _cqiFindTexture(texnm)) == -1)
+    {
+      return defaultta;
+    }
+
+  for (i=0; i<_cqiTextures[tidx].numTexAreas; i++)
+    if (!strncmp(_cqiTextures[tidx].texareas[i].name, tanm, MAXPLANETNAME))
+      return &(_cqiTextures[tidx].texareas[i]);
+
+  clog("%s: could not find texarea %s in texture %s",
+       __FUNCTION__,
+       tanm, texnm);
+
+  return defaultta;
 }
 
 /* search internal animation list */
@@ -757,6 +804,9 @@ static int cqiValidateAnimations(void)
 
   /* if no textures, no point */
   if (!_cqiTextures)
+    return FALSE;
+
+  if (!numAnimDefs || !numAnimations)
     return FALSE;
 
   /* go through each anim def, checking various things */
@@ -1058,12 +1108,8 @@ int cqiLoadRC(int rcid, char *filename, int verbosity, int debugl)
         {
         case CQI_FILE_TEXTURESRC:
           {
-            cqiTextures  = defaultTextures;
-            cqiNumTextures = defaultNumTextures;
-            cqiAnimations = defaultAnimations;
-            cqiNumAnimations = defaultNumAnimations;
-            cqiAnimDefs = defaultAnimDefs;
-            cqiNumAnimDefs = defaultNumAnimDefs;
+            clog("%s: FATAL: no textures.", __FUNCTION__);
+            return FALSE;
           }
           break;
           
@@ -1101,13 +1147,7 @@ int cqiLoadRC(int rcid, char *filename, int verbosity, int debugl)
     {
       if (fail && rcid == CQI_FILE_TEXTURESRC)
         {
-          clog("%s: using default texture tables.", __FUNCTION__);
-          cqiTextures  = defaultTextures;
-          cqiNumTextures = defaultNumTextures;
-          cqiAnimations = defaultAnimations;
-          cqiNumAnimations = defaultNumAnimations;
-          cqiAnimDefs = defaultAnimDefs;
-          cqiNumAnimDefs = defaultNumAnimDefs;
+          clog("%s: FATAL: no textures.", __FUNCTION__);
           return FALSE;
         }
 
@@ -1121,11 +1161,7 @@ int cqiLoadRC(int rcid, char *filename, int verbosity, int debugl)
       /* now validate any animations */
       if (!cqiValidateAnimations())
         {
-          clog("%s: using default animation tables.", __FUNCTION__);
-          cqiAnimations = defaultAnimations;
-          cqiNumAnimations = defaultNumAnimations;
-          cqiAnimDefs = defaultAnimDefs;
-          cqiNumAnimDefs = defaultNumAnimDefs;
+          clog("%s: FATAL: no animations.", __FUNCTION__);
           return FALSE;
         }
 
@@ -1424,167 +1460,6 @@ void dumpSoundDataHdr(void)
 }
 
 
-
-/* Dump the parsed texturesrc to stdout in texinit.h format */
-/* this includes textures, animations, and animdefs */
-void dumpTexDataHdr(void)
-{
-  char buf[MAXLINE];
-  int i;
-  
-
-  if (!cqiNumTextures)
-    return;
-
-  /* preamble */
-  getdandt( buf, 0 );
-  printf("/* Generated by conqinit on %s */\n", buf);
-  printf("/* $Id$ */\n");
-  printf("\n\n");
-
-  printf("#ifndef _TEXDATA_H\n");
-  printf("#define _TEXDATA_H\n\n");
-
-
-  printf("static int defaultNumTextures = %d;\n\n", cqiNumTextures);
-  printf("static cqiTextureInitRec_t defaultTextures[%d] = {\n", 
-         cqiNumTextures);
-
-  for (i=0; i<cqiNumTextures; i++)
-    printf(" { \"%s\", \"%s\", 0x%08x, 0x%08x },\n",
-           cqiTextures[i].name,
-           cqiTextures[i].filename,
-           cqiTextures[i].flags,
-           cqiTextures[i].color);
-
-  printf("};\n\n");
-
-  /* animations */
-  printf("static int defaultNumAnimations = %d;\n\n", cqiNumAnimations);
-  printf("static cqiAnimationInitRec_t defaultAnimations[%d] = {\n", 
-         cqiNumAnimations);
-
-  for (i=0; i<cqiNumAnimations; i++)
-    printf(" { \"%s\", \"%s\", %d },\n",
-           cqiAnimations[i].name,
-           cqiAnimations[i].animdef,
-           cqiAnimations[i].adIndex);
-
-  printf("};\n\n");
-
-  /* animdefs */
-  printf("static int defaultNumAnimDefs = %d;\n\n", cqiNumAnimDefs);
-  printf("static cqiAnimDefInitRec_t defaultAnimDefs[%d] = {\n", 
-         cqiNumAnimDefs);
-
-  for (i=0; i<cqiNumAnimDefs; i++)
-    {
-      printf(" { \n");
-
-      printf("   \"%s\",\n",
-             cqiAnimDefs[i].name);
-
-      printf("   \"%s\",\n",
-             cqiAnimDefs[i].texname);
-
-      printf("   %d,\n",
-             cqiAnimDefs[i].timelimit);
-      printf("   0x%08x,\n",
-             cqiAnimDefs[i].anims);
-  
-
-      /* istate */
-      printf("   0x%08x, /* istate */\n",
-             cqiAnimDefs[i].istates);
-      printf("   \"%s\",\n",
-             cqiAnimDefs[i].itexname);
-      printf("   0x%08x,\n",
-             cqiAnimDefs[i].icolor);
-      printf("   %f,\n",
-             cqiAnimDefs[i].iangle);
-      printf("   %f,\n",
-             cqiAnimDefs[i].isize);
-
-      /* texanim */
-      printf("   { /* texanim */\n");
-      printf("     0x%08x,\n",
-             cqiAnimDefs[i].texanim.color);
-      printf("     %d,\n",
-             cqiAnimDefs[i].texanim.stages);
-      printf("     %d,\n",
-             cqiAnimDefs[i].texanim.delayms);
-      printf("     %d,\n",
-             cqiAnimDefs[i].texanim.loops);
-      printf("     %d,\n",
-             cqiAnimDefs[i].texanim.looptype);
-      printf("     %f,\n",
-             cqiAnimDefs[i].texanim.deltas);
-      printf("     %f\n",
-             cqiAnimDefs[i].texanim.deltat);
-      printf("   },\n");
-
-      /* colanim */
-      printf("   { /* colanim */\n");
-      printf("     0x%08x,\n",
-             cqiAnimDefs[i].colanim.color);
-      printf("     %d,\n",
-             cqiAnimDefs[i].colanim.stages);
-      printf("     %d,\n",
-             cqiAnimDefs[i].colanim.delayms);
-      printf("     %d,\n",
-             cqiAnimDefs[i].colanim.loops);
-      printf("     %d,\n",
-             cqiAnimDefs[i].colanim.looptype);
-      printf("     %f,\n",
-             cqiAnimDefs[i].colanim.deltaa);
-      printf("     %f,\n",
-             cqiAnimDefs[i].colanim.deltar);
-      printf("     %f,\n",
-             cqiAnimDefs[i].colanim.deltag);
-      printf("     %f\n",
-             cqiAnimDefs[i].colanim.deltab);
-      printf("   },\n");
-
-      /* geoanim */
-      printf("   { /* geoanim */\n");
-      printf("     %d,\n",
-             cqiAnimDefs[i].geoanim.stages);
-      printf("     %d,\n",
-             cqiAnimDefs[i].geoanim.delayms);
-      printf("     %d,\n",
-             cqiAnimDefs[i].geoanim.loops);
-      printf("     %d,\n",
-             cqiAnimDefs[i].geoanim.looptype);
-      printf("     %f,\n",
-             cqiAnimDefs[i].geoanim.deltax);
-      printf("     %f,\n",
-             cqiAnimDefs[i].geoanim.deltay);
-      printf("     %f,\n",
-             cqiAnimDefs[i].geoanim.deltaz);
-      printf("     %f,\n",
-             cqiAnimDefs[i].geoanim.deltar);
-      printf("     %f\n",
-             cqiAnimDefs[i].geoanim.deltas);
-      printf("   },\n");
-
-      /* toganim */
-      printf("   { /* toganim */\n");
-      printf("     %d\n",
-             cqiAnimDefs[i].toganim.delayms);
-      printf("   },\n");
-
-      printf(" },\n");          /* end of animdef */
-
-    }
-  printf("};\n\n");         /* end of animdefs */
-  
-  printf("#endif /* _TEXDATA_H */\n\n");
-
-  
-  return;
-}
-
-
 /* Dump the parsed initdata to stdout in initdata.h format */
 void dumpInitDataHdr(void)
 {
@@ -1875,6 +1750,24 @@ static void startSubSection(int subsection)
       }
       break;
 
+    case TEXTURE:
+      {
+        switch (subsection)
+          {
+          case TEXAREA:
+            {
+              memset((void *)&currTexArea, 0, sizeof(cqiTextureAreaRec_t));
+            }
+            break;
+          default:
+            clog("%s: subsection %s not supported for TEXTURE.",
+                 __FUNCTION__, sect2str(subsection));
+            goterror++;
+            break;
+          }
+      }
+      break;
+
     default:
       clog("%s: cursection %s does not support subsection %s.",
            __FUNCTION__, sect2str(cursection), sect2str(subsection));
@@ -1947,14 +1840,18 @@ static void startSection(int section)
     case TEXTURE:
       {
         memset((void *)&currTexture, 0, sizeof(cqiTextureInitRec_t));
+        currTexAreas = NULL;
+        numTexAreas = 0;
       }
       break;
+
     case ANIMATION:
       {
         memset((void *)&currAnimation, 0, sizeof(cqiAnimationInitRec_t));
         currAnimation.adIndex = -1;
       }
       break;
+
     case ANIMDEF:
       {
         memset((void *)&currAnimDef, 0, sizeof(cqiAnimDefInitRec_t));
@@ -2035,6 +1932,47 @@ static void endSection(void)
             currAnimDef.anims |= CQI_ANIMS_TOG;
           }
           break;
+
+        case TEXAREA:
+          /* this is only valid from within a texture definition */
+          if (cursection == TEXTURE)
+            {
+              cqiTextureAreaPtr_t taptr;
+              
+              if (strlen(currTexArea.name))
+                {
+                  
+                  /* resize the current list and add to it. */
+                  
+                  taptr = (cqiTextureAreaPtr_t)realloc((void *)currTexAreas, 
+                                                       sizeof(cqiTextureAreaRec_t) * 
+                                                       (numTexAreas + 1));
+                  
+                  if (!taptr)
+                    {  
+                      clog("%s: Could not realloc %d texareas for texture %s, ignoring texarea '%s'",
+                         __FUNCTION__,
+                           numTexAreas + 1,
+                           currTexture.name,
+                           currTexArea.name);
+                      break;
+                    }
+
+                  currTexAreas = taptr;
+                  currTexAreas[numTexAreas] = currTexArea;
+                  numTexAreas++;
+                  currTexture.texareas = currTexAreas;
+                  currTexture.numTexAreas = numTexAreas;
+                  
+                }
+              else
+                {
+                  clog("%s: texarea name at or near line %d was not specified, ignoring.",
+                       __FUNCTION__, lineNum);
+                }
+            }
+          break;
+
         default:
           break;
         }
@@ -2165,7 +2103,7 @@ static void endSection(void)
                      currTexture.name);
                 return;
               }
-            
+
             _cqiTextures = texptr;
             _cqiTextures[numTextures] = currTexture;
             numTextures++;
@@ -2786,9 +2724,37 @@ static void cfgSectionf(int item, real val)
                 break;
 
               } /* switch cursubsection */
-
+            
           }
           break;
+          
+        case TEXTURE:
+          {
+            switch(cursubsection)
+              {
+              case TEXAREA:
+                {
+                  switch(item)
+                    {
+                    case XCOORD:
+                      currTexArea.x = fabs(val);
+                      break;
+                    case YCOORD:
+                      currTexArea.y = fabs(val);
+                      break;
+                    case WIDTH:
+                      currTexArea.w = fabs(val);
+                      break;
+                    case HEIGHT:
+                      currTexArea.h = fabs(val);
+                      break;
+                    }
+                }
+                break;
+              } /* switch subsection */
+          } /* TEXTURE */
+          break;
+          
         } /* switch cursection */
       
       return;
@@ -2895,6 +2861,25 @@ void cfgSections(int item, char *val)
 
           }
           break;
+
+        case TEXTURE:
+          {
+            switch(cursubsection)
+              {
+              case TEXAREA:
+                {
+                  switch (item)
+                    {
+                    case NAME:
+                      strncpy(currTexArea.name, val, CQI_NAMELEN - 1);
+                      break;
+                    }
+                }
+                break;
+              }
+          }
+          break;
+
         } /* switch cursection */
       
       /* be sure to free the value allocated */
@@ -3122,6 +3107,9 @@ static char *sect2str(int section)
     case ISTATE:
       return "ISTATE";
       break;
+    case TEXAREA:
+      return "TEXAREA";
+      break;
     }
   
   return "UNKNOWN";
@@ -3215,6 +3203,12 @@ static char *item2str(int item)
     case YCOORD:
       return "YCOORD";
       break;
+    case SCOORD:
+      return "SCOORD";
+      break;
+    case TCOORD:
+      return "TCOORD";
+      break;
     case TEXNAME:
       return "TEXNAME";
       break;
@@ -3271,6 +3265,12 @@ static char *item2str(int item)
       break;
     case DELTAT:
       return "DELTAT";
+      break;
+    case WIDTH:
+      return "WIDTH";
+      break;
+    case HEIGHT:
+      return "HEIGHT";
       break;
 
     case SAMPLERATE:
@@ -3496,24 +3496,21 @@ static void initrun(int rcid)
         {                       /* if we are not adding, re-init */
           if (_cqiTextures)
             {
-              if (_cqiTextures != defaultTextures)
-                free(_cqiTextures);
+              free(_cqiTextures);
               _cqiTextures = NULL;
             }
           numTextures = 0;
 
           if (_cqiAnimations)
             {
-              if (_cqiAnimations != defaultAnimations)
-                free(_cqiAnimations);
+              free(_cqiAnimations);
               _cqiAnimations = NULL;
             }
           numAnimations = 0;
 
           if (_cqiAnimDefs)
             {
-              if (_cqiAnimDefs != defaultAnimDefs)
-                free(_cqiAnimDefs);
+              free(_cqiAnimDefs);
               _cqiAnimDefs = NULL;
             }
           numAnimDefs = 0;

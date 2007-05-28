@@ -194,6 +194,20 @@ typedef struct _dspData {
 } dspData_t;
 
 
+/* a generic GL rectangle struct */
+typedef struct _gl_box
+{
+  GLfloat x, y;
+  GLfloat w, h;
+} GLRect_t;
+
+/* a macro for clamping a rectable within a min/max width/height */
+#define CLAMPRECT(_w, _h, _rect) { \
+ (_rect)->x = CLAMP(0.0, (_w), (_rect)->x);    \
+ (_rect)->y = CLAMP(0.0, (_h), (_rect)->y);    \
+ (_rect)->w = CLAMP(1.0, (_w), (_rect)->w);    \
+ (_rect)->h = CLAMP(1.0, (_h), (_rect)->h);    \
+}
 void display( int snum, int display_info );
 
 int uiCStrlen(char *buf);

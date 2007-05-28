@@ -261,11 +261,164 @@ texture {
 texture {
   name         "shipF-ico-decal1"
   filename     "hud-decal1"
+
+  # shield gauge location
+  texarea {
+    name       "shieldg"
+    x          77.0
+    y          20.0
+    w          121.0
+    h          9.0
+  }
+
+  # shield charge gauge location
+  texarea {
+    name       "shchargeg"
+    x          77.0
+    y          50.0
+    w          121.0
+    h          2.0
+  }
+
+  # shield value (number) location
+  texarea {
+    name       "shieldn"
+    x          208.0
+    y          18.0
+    w          38.0
+    h          30.0
+  }
+
+  # damage gauge location
+  texarea {
+    name       "damageg"
+    x          77.0
+    y          221.0
+    w          121.0
+    h          9.0
+  }
+
+  # damage value (number) location
+  texarea {
+    name       "damagen"
+    x          208.0
+    y          215.0
+    w          38.0
+    h          30.0
+  }
+
+  # iconic ship location
+  texarea {
+    name       "icon"
+    x          4.0
+    y          56.0
+    w          191.0
+    h          154.0
+  }
+
+  # torp status
+  texarea {
+    name       "torps"
+    x          204.0
+    y          61.0
+    w          19.0
+    h          144.0
+  }
+
+  # phaser charge
+  texarea {
+    name       "phaserchrg"
+    x          235.0
+    y          61.0
+    w          10.0
+    h          144.0
+  }
 }
 
 texture {
   name         "shipF-ico-decal2"
   filename     "hud-decal2"
+
+  # fuel gauge location
+  texarea {
+    name       "fuelg"
+    x          77.0
+    y          22.0
+    w          121.0
+    h          9.0
+  }
+
+  # fuel gauge number
+  texarea {
+    name       "fueln"
+    x          209.0
+    y          14.0
+    w          37.0
+    h          26.0
+  }
+
+  # etemp gauge location
+  texarea {
+    name       "etempg"
+    x          77.0
+    y          74.0
+    w          121.0
+    h          8.0
+  }
+
+  # etemp gauge number
+  texarea {
+    name       "etempn"
+    x          209.0
+    y          66.0
+    w          37.0
+    h          26.0
+  }
+
+  # wtemp gauge location
+  texarea {
+    name       "wtempg"
+    x          77.0
+    y          127.0
+    w          121.0
+    h          8.0
+  }
+
+  # wtemp gauge number
+  texarea {
+    name       "wtempn"
+    x          209.0
+    y          120.0
+    w          37.0
+    h          26.0
+  }
+
+  # alloc gauge location
+  texarea {
+    name       "allocg"
+    x          40.0
+    y          183.0
+    w          121.0
+    h          9.0
+  }
+
+  # alloc gauge number
+  texarea {
+    name       "allocn"
+    x          209.0
+    y          170.0
+    w          37.0
+    h          25.0
+  }
+
+  # kills number
+  texarea {
+    name       "killsbox"
+    x          192.0
+    y          215.0
+    w          50.0
+    h          16.0
+  }
 }
 
 texture {
@@ -392,11 +545,164 @@ texture {
 texture {
   name         "shipR-ico-decal1"
   filename     "hud-decal1"
+
+  # shield gauge location
+  texarea {
+    name       "shieldg"
+    x          77.0
+    y          20.0
+    w          121.0
+    h          9.0
+  }
+
+  # shield charge gauge location
+  texarea {
+    name       "shchargeg"
+    x          77.0
+    y          50.0
+    w          121.0
+    h          2.0
+  }
+
+  # shield value (number) location
+  texarea {
+    name       "shieldn"
+    x          208.0
+    y          18.0
+    w          38.0
+    h          30.0
+  }
+
+  # damage gauge location
+  texarea {
+    name       "damageg"
+    x          77.0
+    y          221.0
+    w          121.0
+    h          9.0
+  }
+
+  # damage value (number) location
+  texarea {
+    name       "damagen"
+    x          208.0
+    y          215.0
+    w          38.0
+    h          30.0
+  }
+
+  # iconic ship location
+  texarea {
+    name       "icon"
+    x          4.0
+    y          56.0
+    w          191.0
+    h          154.0
+  }
+
+  # torp status
+  texarea {
+    name       "torps"
+    x          204.0
+    y          61.0
+    w          19.0
+    h          144.0
+  }
+
+  # phaser charge
+  texarea {
+    name       "phaserchrg"
+    x          235.0
+    y          61.0
+    w          10.0
+    h          144.0
+  }
 }
 
 texture {
   name         "shipR-ico-decal2"
   filename     "hud-decal2"
+
+  # fuel gauge location
+  texarea {
+    name       "fuelg"
+    x          77.0
+    y          22.0
+    w          121.0
+    h          9.0
+  }
+
+  # fuel gauge number
+  texarea {
+    name       "fueln"
+    x          209.0
+    y          14.0
+    w          37.0
+    h          26.0
+  }
+
+  # etemp gauge location
+  texarea {
+    name       "etempg"
+    x          77.0
+    y          74.0
+    w          121.0
+    h          8.0
+  }
+
+  # etemp gauge number
+  texarea {
+    name       "etempn"
+    x          209.0
+    y          66.0
+    w          37.0
+    h          26.0
+  }
+
+  # wtemp gauge location
+  texarea {
+    name       "wtempg"
+    x          77.0
+    y          127.0
+    w          121.0
+    h          8.0
+  }
+
+  # wtemp gauge number
+  texarea {
+    name       "wtempn"
+    x          209.0
+    y          120.0
+    w          37.0
+    h          26.0
+  }
+
+  # alloc gauge location
+  texarea {
+    name       "allocg"
+    x          40.0
+    y          183.0
+    w          121.0
+    h          9.0
+  }
+
+  # alloc gauge number
+  texarea {
+    name       "allocn"
+    x          209.0
+    y          170.0
+    w          37.0
+    h          25.0
+  }
+
+  # kills number
+  texarea {
+    name       "killsbox"
+    x          192.0
+    y          215.0
+    w          50.0
+    h          16.0
+  }
 }
 
 texture {
@@ -524,11 +830,164 @@ texture {
 texture {
   name         "shipK-ico-decal1"
   filename     "hud-decal1"
+
+  # shield gauge location
+  texarea {
+    name       "shieldg"
+    x          77.0
+    y          20.0
+    w          121.0
+    h          9.0
+  }
+
+  # shield charge gauge location
+  texarea {
+    name       "shchargeg"
+    x          77.0
+    y          50.0
+    w          121.0
+    h          2.0
+  }
+
+  # shield value (number) location
+  texarea {
+    name       "shieldn"
+    x          208.0
+    y          18.0
+    w          38.0
+    h          30.0
+  }
+
+  # damage gauge location
+  texarea {
+    name       "damageg"
+    x          77.0
+    y          221.0
+    w          121.0
+    h          9.0
+  }
+
+  # damage value (number) location
+  texarea {
+    name       "damagen"
+    x          208.0
+    y          215.0
+    w          38.0
+    h          30.0
+  }
+
+  # iconic ship location
+  texarea {
+    name       "icon"
+    x          4.0
+    y          56.0
+    w          191.0
+    h          154.0
+  }
+
+  # torp status
+  texarea {
+    name       "torps"
+    x          204.0
+    y          61.0
+    w          19.0
+    h          144.0
+  }
+
+  # phaser charge
+  texarea {
+    name       "phaserchrg"
+    x          235.0
+    y          61.0
+    w          10.0
+    h          144.0
+  }
 }
 
 texture {
   name         "shipK-ico-decal2"
   filename     "hud-decal2"
+
+  # fuel gauge location
+  texarea {
+    name       "fuelg"
+    x          77.0
+    y          22.0
+    w          121.0
+    h          9.0
+  }
+
+  # fuel gauge number
+  texarea {
+    name       "fueln"
+    x          209.0
+    y          14.0
+    w          37.0
+    h          26.0
+  }
+
+  # etemp gauge location
+  texarea {
+    name       "etempg"
+    x          77.0
+    y          74.0
+    w          121.0
+    h          8.0
+  }
+
+  # etemp gauge number
+  texarea {
+    name       "etempn"
+    x          209.0
+    y          66.0
+    w          37.0
+    h          26.0
+  }
+
+  # wtemp gauge location
+  texarea {
+    name       "wtempg"
+    x          77.0
+    y          127.0
+    w          121.0
+    h          8.0
+  }
+
+  # wtemp gauge number
+  texarea {
+    name       "wtempn"
+    x          209.0
+    y          120.0
+    w          37.0
+    h          26.0
+  }
+
+  # alloc gauge location
+  texarea {
+    name       "allocg"
+    x          40.0
+    y          183.0
+    w          121.0
+    h          9.0
+  }
+
+  # alloc gauge number
+  texarea {
+    name       "allocn"
+    x          209.0
+    y          170.0
+    w          37.0
+    h          25.0
+  }
+
+  # kills number
+  texarea {
+    name       "killsbox"
+    x          192.0
+    y          215.0
+    w          50.0
+    h          16.0
+  }
 }
 
 texture {
@@ -644,11 +1103,164 @@ texture {
 texture {
   name         "shipO-ico-decal1"
   filename     "hud-decal1"
+
+  # shield gauge location
+  texarea {
+    name       "shieldg"
+    x          77.0
+    y          20.0
+    w          121.0
+    h          9.0
+  }
+
+  # shield charge gauge location
+  texarea {
+    name       "shchargeg"
+    x          77.0
+    y          50.0
+    w          121.0
+    h          2.0
+  }
+
+  # shield value (number) location
+  texarea {
+    name       "shieldn"
+    x          208.0
+    y          18.0
+    w          38.0
+    h          30.0
+  }
+
+  # damage gauge location
+  texarea {
+    name       "damageg"
+    x          77.0
+    y          221.0
+    w          121.0
+    h          9.0
+  }
+
+  # damage value (number) location
+  texarea {
+    name       "damagen"
+    x          208.0
+    y          215.0
+    w          38.0
+    h          30.0
+  }
+
+  # iconic ship location
+  texarea {
+    name       "icon"
+    x          4.0
+    y          56.0
+    w          191.0
+    h          154.0
+  }
+
+  # torp status
+  texarea {
+    name       "torps"
+    x          204.0
+    y          61.0
+    w          19.0
+    h          144.0
+  }
+
+  # phaser charge
+  texarea {
+    name       "phaserchrg"
+    x          235.0
+    y          61.0
+    w          10.0
+    h          144.0
+  }
 }
 
 texture {
   name         "shipO-ico-decal2"
   filename     "hud-decal2"
+
+  # fuel gauge location
+  texarea {
+    name       "fuelg"
+    x          77.0
+    y          22.0
+    w          121.0
+    h          9.0
+  }
+
+  # fuel gauge number
+  texarea {
+    name       "fueln"
+    x          209.0
+    y          14.0
+    w          37.0
+    h          26.0
+  }
+
+  # etemp gauge location
+  texarea {
+    name       "etempg"
+    x          77.0
+    y          74.0
+    w          121.0
+    h          8.0
+  }
+
+  # etemp gauge number
+  texarea {
+    name       "etempn"
+    x          209.0
+    y          66.0
+    w          37.0
+    h          26.0
+  }
+
+  # wtemp gauge location
+  texarea {
+    name       "wtempg"
+    x          77.0
+    y          127.0
+    w          121.0
+    h          8.0
+  }
+
+  # wtemp gauge number
+  texarea {
+    name       "wtempn"
+    x          209.0
+    y          120.0
+    w          37.0
+    h          26.0
+  }
+
+  # alloc gauge location
+  texarea {
+    name       "allocg"
+    x          40.0
+    y          183.0
+    w          121.0
+    h          9.0
+  }
+
+  # alloc gauge number
+  texarea {
+    name       "allocn"
+    x          209.0
+    y          170.0
+    w          37.0
+    h          25.0
+  }
+
+  # kills number
+  texarea {
+    name       "killsbox"
+    x          192.0
+    y          215.0
+    w          50.0
+    h          16.0
+  }
 }
 
 texture {
@@ -983,4 +1595,5 @@ animdef {
     deltas     0.002
   }
 }
+
 

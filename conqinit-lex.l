@@ -125,6 +125,11 @@ music                  {return ( MUSIC );}
 {WS}s{WS}              {return ( SCOORD );}
 {WS}t{WS}              {return ( SCOORD );}
 
+{WS}w{WS}              {return ( WIDTH );}
+{WS}h{WS}              {return ( HEIGHT );}
+
+texarea                {return ( TEXAREA );}
+
 {number}		{ 
                           yylval.num = atoi( yytext );
                           return NUMBER;

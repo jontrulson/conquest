@@ -70,13 +70,22 @@ typedef struct _cqi_planet_init {
                                                 only really specifies a
                                                 color and not a texture */
 
+typedef struct _cqi_texture_area {
+  char name[CQI_NAMELEN];       /* WKN of area */
+  real x, y;                    /* X/Y coord of lower left of area as
+                                   measured from the from upper left (0.0)
+                                   of the texture as a whole */
+  real w, h;                    /* w/h of area */
+} cqiTextureAreaRec_t, *cqiTextureAreaPtr_t;
 
 /* textures */
 typedef struct _cqi_texture_init {
-  char name[CQI_NAMELEN];        /* texid */
-  char filename[CQI_NAMELEN];    /* if different from textid */
+  char name[CQI_NAMELEN];       /* texid */
+  char filename[CQI_NAMELEN];   /* if different from textid */
   Unsgn32 flags;                /* flags for this cqi texture (CQITEX_F_*)*/
   Unsgn32 color;                /* hex encoded color (AARRGGBB) */
+  int numTexAreas;              /* number of texture areas */
+  cqiTextureAreaPtr_t texareas; /* optional texture areas */
 } cqiTextureInitRec_t, *cqiTextureInitPtr_t ;
 
 
@@ -250,6 +259,8 @@ extern int                   cqiNumSoundMusic;
 int cqiLoadRC(int rcid, char *filename, int verbosity, int debugl);
 
 int cqiFindPlanet(char *str);
+cqiTextureAreaPtr_t cqiFindTexArea(char *texnm, char *tanm, 
+                                   cqiTextureAreaPtr_t defaultta);
 int cqiFindEffect(char *str);
 int cqiFindMusic(char *str);
 

@@ -8,29 +8,26 @@ conqinit \- a utility for the Conquest Init parser (CQI)
 .SH DESCRIPTION
 .PP
 \fBconqinit\fP can be used to test the parser, perform syntax checking
-on conqinitrc and texturesrc files, as well as to generate a
-texdata.h file based on texturesrc data, or an initdata.h file
-based on conqinitrc data.
+on conqinitrc and texturesrc files, as well as to generate initdata.h
+and sounddata.h header files containing compiled-in defaults.
 .PP
 CQI is a lex/yacc parser that is used by \fBConquest\fP 8.1.2a or
 later for configuration of the planets and other general purpose data,
 and for the GL client \fBconquestgl\fP, for the specification of
-colors, textures, and animation definitions.  It is not used for user
-or system configuration options.
+colors, textures, animation definitions, sound, and music.
 .PP
-These (pre-generated) initdata.h and texdata.h files contain
-defaults for the planets and textures, compiled directly into
-conquest, in the event the respective conquestrc and texturesrc
-file could not be found or successfully read on startup.  End users
-should not generally generate these files.  Validated initdata.h and
-texdata.h files are supplied in the src distribution.
+These pre\-generated header files (initdata.h, sounddata.h) contain
+defaults compiled directly into conquest, in the event the relevant
+CQI config file could not be opened or successfully read on startup.
+End users should not generate these files.  Validated header files are
+included with the src distribution.
 .PP
-If you are modifying the conquestrc or texturesrc system files
-used by conquest, you should at least run conqinit on them to
-check for syntax or other validation errors.  If conquest (or
-conquestd) fails to properly load and parse the file at
-runtime, the built in internal defaults will be used and a warning
-message will be logged.
+If you are modifying one of the CQI config files, (conquestrc,
+soundrc, etc), you should at least run conqinit on them to check for
+syntax or other validation errors.  If conquest (or conquestd) fails
+to properly load and parse the file at runtime, the built in internal
+defaults will be used (when possible) and a warning message will be
+logged. 
 .SH "OPTIONS"
 .PP
 .TP 8
@@ -43,13 +40,17 @@ Be verbose about everything.
 .B \-d
 Turns on alot of debugging.
 .TP 8
+.B \-s 
+Treat the input file as a file in soundrc format.  The default is
+to treat the file as if it were in conqinitrc format.
+.TP 8
 .B \-t 
 Treat the input file as a file in texturesrc format.  The default is
 to treat the file as if it were in conqinitrc format.
 .TP 8
 .B \-h
-Dump the parsed file out to stdout in initdata.h or texdata.h format 
-(depending on the \fB\-t\fP option).
+Dump the parsed file out to stdout in initdata.h sounddata.h format 
+(depending on the presence of the \fB\-s\fP option).
 .TP 8
 .B \-D
 Dump the current universe to stdout in conqinitrc format.
@@ -60,7 +61,8 @@ Dump the current universe to stdout in conqinitrc format.
         default conqinitrc for a system.
 .PP
         If you do this, you will almost certainly want to edit the
-        file and at least change the colors of the suns, and the sun's
+        generated file and at least change the colors of the suns, and
+        the sun's
         randomized army counts.  Since this data is not currently
         stored in the common block, conqinit tries to choose
         reasonable defaults for them.  Make sure it actually did :)
@@ -71,7 +73,8 @@ Dump the current universe to stdout in conqinitrc format.
         the universe to a conqinitrc file, edit it if neccessary (to
         clean up colors, etc).  
 .PP
-        Then copy that file over the system's conqinitrc file.  From
+        Then copy that file over the system's conqinitrc file (or email
+        it to your friends :).  From
         then on, whenever the planets are initialized (due to a
         successful conquer, or the actions of an oper in conqoper),
         your definitions will be used as the default planet

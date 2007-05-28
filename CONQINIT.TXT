@@ -419,6 +419,14 @@ CONTENTS:
             name         "conqlogoF"
             filename     "conq-fed"              # optional
             color        "ffe6e6e6"              # optional
+
+            texarea {                            # optional
+              name       "somerect_in_texture"
+              x          10.0
+              y          10.0
+              w          10.0
+              h          10.0
+            }
           }
      
           name:       STRING
@@ -452,6 +460,23 @@ CONTENTS:
                       texture used when it is rendered.  If not
                       specified, the default depends on how the
                       texture is being used in conquest.
+
+          texarea:    SUBSECTION
+                      optional. A texarea subsection is used to
+                      describe a named rectangle within the texture.
+                      These can be looked up by the gme and used to
+                      describe and position areas within a texture.
+
+                      The x, y, w, and h parameters describe a
+                      rectangle within the texture.
+
+                      The decal textures use these to describe the
+                      locations within the texture of where the fuel
+                      gauge scale, for example, is positioned.
+
+                      The above texture section example does not need
+                      a texarea section - it is provided for
+                      documentation/example purposes.
 
 
        ## animation

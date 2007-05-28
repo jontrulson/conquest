@@ -64,12 +64,6 @@ cqsHandle alertHandle = CQS_INVHANDLE;
 /* we store geometry here that should only need to be recomputed
    when the screen is resized, not every single frame :) */
 
-typedef struct _obj
-{
-  GLfloat x, y;
-  GLfloat w, h;
-
-} obj_t;
 
 static struct {
   GLfloat x, y;                 /* stored x/y/w/h of game window */
@@ -79,73 +73,189 @@ static struct {
 
   GLfloat sb_ih;                /* statbox item height */
 
-  obj_t alertb;                 /* alert border */
+  GLRect_t alertb;                 /* alert border */
 
-  obj_t head;
-  obj_t headl;
+  GLRect_t head;
+  GLRect_t headl;
 
-  obj_t warp;
-  obj_t warpl;
+  GLRect_t warp;
+  GLRect_t warpl;
 
-  obj_t sh;
-  obj_t dam;
-  obj_t fuel;
-  obj_t etemp;
-  obj_t wtemp;
-  obj_t alloc;
+  GLRect_t sh;
+  GLRect_t dam;
+  GLRect_t fuel;
+  GLRect_t etemp;
+  GLRect_t wtemp;
+  GLRect_t alloc;
 
   /* 'stat' box */
-  obj_t kills;
-  obj_t tow;
-  obj_t arm;
-  obj_t cloakdest;
+  GLRect_t kills;
+  GLRect_t tow;
+  GLRect_t arm;
+  GLRect_t cloakdest;
 
-  obj_t althud;
-  obj_t rectime;
+  GLRect_t althud;
+  GLRect_t rectime;
 
   /* msg/prompt lines */
-  obj_t msg1;
-  obj_t msg2;
-  obj_t msgmsg;
+  GLRect_t msg1;
+  GLRect_t msg2;
+  GLRect_t msgmsg;
 
   /* iconhud specific */
 
-  obj_t decal1;                 /* decal 1 location */
-  obj_t d1shg;                  /* shield gauge */
-  obj_t d1shn;                  /* shield value (number) */
-  obj_t d1damg;           
-  obj_t d1damn;           
-  obj_t d1icon;                 /* the icon area */
-  obj_t phasstat;               /* phaser charge status */
-  obj_t d1atarg;                /* ship causing alert */
-  obj_t decal2;                 /* decal 2 location */
-  obj_t d2fuelg;                /* fuel gauge */
-  obj_t d2fueln;                /* fuel value (number) */
-  obj_t d2engtg;
-  obj_t d2engtn;
-  obj_t d2weptg;
-  obj_t d2weptn;
-  obj_t d2allocg;
-  obj_t d2allocn;
-  obj_t d2killb;                /* location of kills box */
+  GLRect_t decal1;                 /* decal 1 location */
+  GLRect_t d1shg;                  /* shield gauge */
+  GLRect_t d1shn;                  /* shield value (number) */
+  GLRect_t d1damg;           
+  GLRect_t d1damn;           
+  GLRect_t d1icon;                 /* the icon area */
+  GLRect_t phasstat;               /* phaser charge status */
+  GLRect_t d1atarg;                /* ship causing alert */
 
-  obj_t engfailpulse;           /* wep/eng failure pulses */
-  obj_t wepfailpulse;
-  obj_t fuelcritpulse;
-  obj_t shcritpulse;
-  obj_t hullcritpulse;
-  obj_t shcharge;               /* shield charge status */
+  GLRect_t decal2;                 /* decal 2 location */
+  GLRect_t d2fuelg;                /* fuel gauge */
+  GLRect_t d2fueln;                /* fuel value (number) */
+  GLRect_t d2engtg;
+  GLRect_t d2engtn;
+  GLRect_t d2weptg;
+  GLRect_t d2weptn;
+  GLRect_t d2allocg;
+  GLRect_t d2allocn;
+  GLRect_t d2killb;                /* location of kills box */
+
+  GLRect_t engfailpulse;           /* wep/eng failure pulses */
+  GLRect_t wepfailpulse;
+  GLRect_t fuelcritpulse;
+  GLRect_t shcritpulse;
+  GLRect_t hullcritpulse;
+  GLRect_t shcharge;               /* shield charge status */
   
-  obj_t torppips[MAXTORPS];     /* the torp pips */
+  GLRect_t d1torps;               /* location of the the torp pip area */
+  GLRect_t torppips[MAXTORPS];  /* the torp pips */
 
-  obj_t magfac;                 /* mag factor */
+  GLRect_t magfac;                 /* mag factor */
 } o = {};
 
+/* a useful 'mapping' macros for the decals */
+#define MAPAREAX(_decalw, _decalh, _box) \
+        ( tx + (((_box)->x / (_decalw) ) * tw) )
+
+#define MAPAREAY(_decalw, _decalh, _box) \
+        ( decaly + (((_box)->y / (_decalh)) * th) )
+
+#define MAPAREAW(_decalw, _decalh, _box) \
+        ( (((_box)->w / (_decalw)) * tw) )
+
+#define MAPAREAH(_decalw, _decalh, _box) \
+        ( (((_box)->h / (_decalh)) * th) )
+
+#define MAPAREA(_decalptr, _boxptr, _optr) \
+        {                                 \
+          (_optr)->x = MAPAREAX((_decalptr)->w, (_decalptr)->h, (_boxptr)); \
+          (_optr)->y = MAPAREAY((_decalptr)->w, (_decalptr)->h, (_boxptr)); \
+          (_optr)->w = MAPAREAW((_decalptr)->w, (_decalptr)->h, (_boxptr)); \
+          (_optr)->h = MAPAREAH((_decalptr)->w, (_decalptr)->h, (_boxptr)); \
+        }
+
 /* update icon hud geometry if stuff changes (resize).  */
-void updateIconHudGeo(void)
+void updateIconHudGeo(int snum)
 {				/* assumes context is current*/
-  GLfloat tx, ty, th, tw;
+  GLfloat tx, ty, th, tw, decaly;
   int i;
+  static int steam = -1;
+  /* these two boxes will be used to store the texture size
+     (in pixels) of each of the 2 decal areas (in w and h).  */
+  static GLRect_t decal1_sz, decal2_sz;
+  /* area pointers */
+  static cqiTextureAreaPtr_t d1shg = NULL;  /* d1 sh gauge */
+  static cqiTextureAreaPtr_t d1shchrg = NULL;  /* d1 sh charge gauge */
+  static cqiTextureAreaPtr_t d1shn = NULL;  /* d1 sh number */
+  static cqiTextureAreaPtr_t d1damg = NULL; /* d1 damage gauge */
+  static cqiTextureAreaPtr_t d1damn = NULL; /* d1 damage number */
+  static cqiTextureAreaPtr_t d1torps = NULL; /* d1 torp icon area */
+  static cqiTextureAreaPtr_t d1phaserchrg = NULL; /* d1 phaser charge */
+  static cqiTextureAreaPtr_t d1icon = NULL; /* d1 ship icon area */
+
+  static cqiTextureAreaPtr_t d2fuelg = NULL; /* d2 fuel */
+  static cqiTextureAreaPtr_t d2fueln = NULL; /* d2 number */
+  static cqiTextureAreaPtr_t d2engtg = NULL; /* d2 engine temp */
+  static cqiTextureAreaPtr_t d2engtn = NULL; /* d2 engine number */
+  static cqiTextureAreaPtr_t d2weptg = NULL; /* d2 weapon temp */
+  static cqiTextureAreaPtr_t d2weptn = NULL; /* d2 weapon number */
+  static cqiTextureAreaPtr_t d2allocg = NULL; /* d2 alloc */
+  static cqiTextureAreaPtr_t d2allocn = NULL; /* d2 alloc number */
+  static cqiTextureAreaPtr_t d2killb = NULL; /* d2 kills box */
+  /* default texarea if we couldn't find the right one (1 pixel size) */
+  static cqiTextureAreaRec_t defaultTA = { "NULL", 0.0, 0.0, 1.0, 1.0 };
+  char buffer[CQI_NAMELEN];
+
+  if (Ships[snum].team != steam)
+    {                           /* we switched teams, reload the decal
+                                   texareas */
+      int ndx;
+      steam = Ships[snum].team;
+
+      /* decal 1 */
+      snprintf(buffer, CQI_NAMELEN - 1, "ship%c-ico-decal1", 
+               Teams[steam].name[0]);
+
+      /* get decal1 size */
+      memset((void*)&decal1_sz, 0, sizeof(GLRect_t));
+      if ((ndx = findGLTexture(buffer)) >= 0 )
+        {
+          decal1_sz.w = (GLfloat)GLTextures[ndx].w;
+          decal1_sz.h = (GLfloat)GLTextures[ndx].h;
+        } 
+        
+      d1shg     = cqiFindTexArea(buffer, "shieldg", &defaultTA);
+      CLAMPRECT(decal1_sz.w, decal1_sz.h, d1shg);
+      d1shchrg  = cqiFindTexArea(buffer, "shchargeg", &defaultTA);
+      CLAMPRECT(decal1_sz.w, decal1_sz.h, d1shchrg);
+      d1shn     = cqiFindTexArea(buffer, "shieldn", &defaultTA);
+      CLAMPRECT(decal1_sz.w, decal1_sz.h, d1shn);
+      d1damg    = cqiFindTexArea(buffer, "damageg", &defaultTA);
+      CLAMPRECT(decal1_sz.w, decal1_sz.h, d1damg);
+      d1damn    = cqiFindTexArea(buffer, "damagen", &defaultTA);
+      CLAMPRECT(decal1_sz.w, decal1_sz.h, d1damn);
+      d1icon    = cqiFindTexArea(buffer, "icon", &defaultTA);
+      CLAMPRECT(decal1_sz.w, decal1_sz.h, d1icon);
+      d1torps    = cqiFindTexArea(buffer, "torps", &defaultTA);
+      CLAMPRECT(decal1_sz.w, decal1_sz.h, d1torps);
+      d1phaserchrg = cqiFindTexArea(buffer, "phaserchrg", &defaultTA);
+      CLAMPRECT(decal1_sz.w, decal1_sz.h, d1phaserchrg);
+
+      /* decal 2 */
+      snprintf(buffer, CQI_NAMELEN - 1, "ship%c-ico-decal2", 
+               Teams[steam].name[0]);
+
+      /* get decal2 size */
+      memset((void*)&decal2_sz, 0, sizeof(GLRect_t));
+      if ((ndx = findGLTexture(buffer)) >= 0 )
+        {
+          decal2_sz.w = (GLfloat)GLTextures[ndx].w;
+          decal2_sz.h = (GLfloat)GLTextures[ndx].h;
+        } 
+        
+      d2fuelg   = cqiFindTexArea(buffer, "fuelg", &defaultTA);
+      CLAMPRECT(decal2_sz.w, decal2_sz.h, d2fuelg);
+      d2fueln   = cqiFindTexArea(buffer, "fueln", &defaultTA);
+      CLAMPRECT(decal2_sz.w, decal2_sz.h, d2fueln);
+      d2engtg   = cqiFindTexArea(buffer, "etempg", &defaultTA);
+      CLAMPRECT(decal2_sz.w, decal2_sz.h, d2engtg);
+      d2engtn   = cqiFindTexArea(buffer, "etempn", &defaultTA);
+      CLAMPRECT(decal2_sz.w, decal2_sz.h, d2engtn);
+      d2weptg   = cqiFindTexArea(buffer, "wtempg", &defaultTA);
+      CLAMPRECT(decal2_sz.w, decal2_sz.h, d2weptg);
+      d2weptn   = cqiFindTexArea(buffer, "wtempn", &defaultTA);
+      CLAMPRECT(decal2_sz.w, decal2_sz.h, d2weptn);
+      d2allocg  = cqiFindTexArea(buffer, "allocg", &defaultTA);
+      CLAMPRECT(decal2_sz.w, decal2_sz.h, d2allocg);
+      d2allocn  = cqiFindTexArea(buffer, "allocn", &defaultTA);
+      CLAMPRECT(decal2_sz.w, decal2_sz.h, d2allocn);
+      d2killb   = cqiFindTexArea(buffer, "killsbox", &defaultTA);
+      CLAMPRECT(decal2_sz.w, decal2_sz.h, d2killb);
+    }
 
   o.x = dConf.wX;
   o.y = dConf.wY;
@@ -157,6 +267,7 @@ void updateIconHudGeo(void)
 
   tx = dConf.vX;
   ty = dConf.vY + dConf.vH;
+  /* icon height */
   o.sb_ih = (dConf.wH - (dConf.borderW * 2.0) - ty) / 4.0;
 
   /* alert border */
@@ -186,16 +297,15 @@ void updateIconHudGeo(void)
    * use absolute screen pixel x/y positions in computing these
    * values or scaling/resizing will be broken.
    *
-   * Of course with the decals, these calculations assume a texture
-   * size of 256x256.  The actual texture pixel values were determined
-   * by loading the tex into gimp, positioning the cursor on the area
-   * of interest, and recording the texture pixel start, length, and
+   * The decal texture sizes and the texareas specified in their
+   * texture definitions are used to compute the right x/y/w/h values
+   * for items that are going to be mapped into them (like a fuel
+   * gauge.  The actual texture pixel values were determined by
+   * loading the tex into gimp, positioning the cursor on the area of
+   * interest, and recording the texture pixel start, length, and
    * height of the area of interest (like the fuel gauge in decal2).
-   * These coordinates are hardcoded in the calulations below.  Yes,
-   * this does suck.  On the plus side, these calculated positions seem
-   * to be consistant among all of the decal textures.  For the future,
-   * CQI should be modified to allow specifying named texcoord sections
-   * in a texture definition, avoiding all of the hardcoding below.
+   * These coordinates are specified as 'texareas' in the decal's
+   * texture definition.  No more hardcoding! :)
    */
 
   /* heading tex and label 
@@ -228,49 +338,46 @@ void updateIconHudGeo(void)
   /* pixel height of decal 1 & 2 */
   th = (dConf.vH / 10.0) * 4.0;
   /* pixel width of decal 1 & 2 */
-  tw = o.xstatw - ((o.xstatw / 10.0) * 2.5);
+  tw = o.xstatw/* - ((o.xstatw / 10.0) * 2.5)*/;
 
   /* decal 1 */
-
   o.decal1.x = tx;
   o.decal1.y = ty + ((dConf.vH / 10.0) * 2.0);
   o.decal1.w = tw;
   o.decal1.h = (dConf.vH / 10.0) * 4.0;
 
+  decaly = o.decal1.y;          /* save this for mapping */
+
   /* shield gauge */
-  o.d1shg.x = tx + ((96.0 / 256.0) * tw);
-  o.d1shg.y = o.decal1.y + ((18.0 / 256.0) * th);
-  o.d1shg.w = (((175.0 - 96.0) / 256.0) * tw);
-  o.d1shg.h = ((22.0 / 256.0) * th);
+  MAPAREA(&decal1_sz, d1shg, &o.d1shg);
 
   /* shield number (value) */
-  o.d1shn.x = o.decal1.x + o.decal1.w;
-  o.d1shn.y = o.d1shg.y - ((o.d1shg.h * 2.0) * 0.25);
-  o.d1shn.w = o.xstatw - (tx + o.decal1.w);
-  o.d1shn.h = o.d1shg.h * 2.0;
+  MAPAREA(&decal1_sz, d1shn, &o.d1shn);
 
   /* shield charge level (this is just a line) */
-  o.shcharge.x = o.d1shg.x;
-  o.shcharge.y = o.d1shn.y + o.d1shn.h;
-  o.shcharge.w = o.d1shg.w;
-  o.shcharge.h = 2.0;           /* the glLineWidth() in reality */
+  MAPAREA(&decal1_sz, d1shchrg, &o.shcharge);
 
   /* damage */
-  o.d1damg.x = tx + ((96.0 / 256.0) * tw);
-  o.d1damg.y = o.decal1.y + ((219.0 / 256.0) * th);
-  o.d1damg.w = (((175.0 - 96.0) / 256.0) * tw);
-  o.d1damg.h = ((21.0 / 256.0) * th);
+  MAPAREA(&decal1_sz, d1damg, &o.d1damg);
 
-  o.d1damn.x = o.decal1.x + o.decal1.w;
-  o.d1damn.y = o.d1damg.y - ((o.d1damg.h * 2.0) * 0.25);
-  o.d1damn.w = o.xstatw - (tx + o.decal1.w);
-  o.d1damn.h = o.d1damg.h * 2.0;
+  MAPAREA(&decal1_sz, d1damn, &o.d1damn);
 
   /* position the ship icon area within decal 1 */
-  o.d1icon.x = tx + ((o.xstatw / 6.0) * 1.0);
-  o.d1icon.y = o.decal1.y + ((43.0 / 256.0) * th) ;
-  o.d1icon.w = ((o.xstatw / 6.0) * 4.0);
-  o.d1icon.h = (o.decal1.y + ((209.0 / 256.0) * th)) - o.d1icon.y;
+  MAPAREA(&decal1_sz, d1icon, &o.d1icon);
+
+  /* torp pips */
+  MAPAREA(&decal1_sz, d1torps, &o.d1torps);
+  for (i=0; i < MAXTORPS; i++)
+    {
+      o.torppips[i].x = o.d1torps.x;
+      o.torppips[i].y = o.d1torps.y + 
+        (o.d1torps.h / (real)MAXTORPS * (real)i);
+      o.torppips[i].w = o.d1torps.w;
+      o.torppips[i].h = o.d1torps.h / (real)MAXTORPS;
+    } 
+
+  /* phaser recharge status */
+  MAPAREA(&decal1_sz, d1phaserchrg, &o.phasstat);
 
   /* decal 2 */
   o.decal2.x = tx;
@@ -278,51 +385,32 @@ void updateIconHudGeo(void)
   o.decal2.w = tw;
   o.decal2.h = (dConf.vH / 10.0) * 4.0;
 
-  o.d2fuelg.x = tx + ((96.0 / 256.0) * tw);
-  o.d2fuelg.y = o.decal2.y + ((22.0 / 256.0) * th);
-  o.d2fuelg.w = (((175.0 - 96.0) / 256.0) * tw);
-  o.d2fuelg.h = ((17.0 / 256.0) * th);
+  decaly = o.decal2.y;          /* save this for mapping */
 
-  o.d2fueln.x = o.decal2.x + o.decal2.w;
-  o.d2fueln.y = o.d2fuelg.y - ((o.d2fuelg.h * 2.0) * 0.25);
-  o.d2fueln.w = o.xstatw - (tx + o.decal2.w);
-  o.d2fueln.h = o.d2fuelg.h * 2.0;
+  /* fuel */
+  MAPAREA(&decal2_sz, d2fuelg, &o.d2fuelg);
+
+  MAPAREA(&decal2_sz, d2fueln, &o.d2fueln);
   
-  o.d2engtg.x = tx + ((96.0 / 256.0) * tw);
-  o.d2engtg.y = o.decal2.y + ((75.0 / 256.0) * th);
-  o.d2engtg.w = (((175.0 - 96.0) / 256.0) * tw);
-  o.d2engtg.h = ((17.0 / 256.0) * th);
+  /* etemp */
+  MAPAREA(&decal2_sz, d2engtg, &o.d2engtg);
 
-  o.d2engtn.x = o.decal2.x + o.decal2.w;
-  o.d2engtn.y = o.d2engtg.y - ((o.d2engtg.h * 2.0) * 0.25);
-  o.d2engtn.w = o.xstatw - (tx + o.decal2.w);
-  o.d2engtn.h = o.d2engtg.h * 2.0;
+  MAPAREA(&decal2_sz, d2engtn, &o.d2engtn);
 
-  o.d2weptg.x = tx + ((96.0 / 256.0) * tw);
-  o.d2weptg.y = o.decal2.y + ((127.0 / 256.0) * th);
-  o.d2weptg.w = (((175.0 - 96.0) / 256.0) * tw);
-  o.d2weptg.h = ((17.0 / 256.0) * th);
+  /* wtemp */
+  MAPAREA(&decal2_sz, d2weptg, &o.d2weptg);
 
-  o.d2weptn.x = o.decal2.x + o.decal2.w;
-  o.d2weptn.y = o.d2weptg.y - ((o.d2weptg.h * 2.0) * 0.25);
-  o.d2weptn.w = o.xstatw - (tx + o.decal2.w);
-  o.d2weptn.h = o.d2weptg.h * 2.0;
+  MAPAREA(&decal2_sz, d2weptn, &o.d2weptn);
 
-  o.d2allocg.x = tx + ((50.0 / 256.0) * tw);
-  o.d2allocg.y = o.decal2.y + ((184.0 / 256.0) * th);
-  o.d2allocg.w = (((198.0 - 50.0) / 256.0) * tw);
-  o.d2allocg.h = ((17.0 / 256.0) * th);
+  /* allocations */
+  MAPAREA(&decal2_sz, d2allocg, &o.d2allocg);
 
-  o.d2allocn.x = o.decal2.x + o.decal2.w;
-  o.d2allocn.y = o.d2allocg.y - ((o.d2allocg.h * 2.0) * 0.25);
-  o.d2allocn.w = o.xstatw - (tx + o.decal2.w);
-  o.d2allocn.h = o.d2allocg.h * 2.0;
+  MAPAREA(&decal2_sz, d2allocn, &o.d2allocn);
 
   /* kills, embedded in decal2 */
-  o.d2killb.x = tx + ((164.0 / 256.0) * tw);
-  o.d2killb.y = o.decal2.y + ((217.0 / 256.0) * th);
-  o.d2killb.w = (((249.0 - 164.0) / 256.0) * tw);
-  o.d2killb.h = ((16.0 / 256.0) * th);
+  MAPAREA(&decal2_sz, d2killb, &o.d2killb);
+
+  /* END of the DECALS! */
 
   /* Cat 'gridscale'.  Now, magfac. */
   o.magfac.x = dConf.vX + ((dConf.vW / 180.0) * 1.0);
@@ -373,23 +461,6 @@ void updateIconHudGeo(void)
   o.engfailpulse.w = ((dConf.vW / 8.0) * 5.0);
   o.engfailpulse.h = (dConf.vH / 20.0) * 2.0;
 
-  /* torp pips, aligned along left side of hud icon area */
-
-  for (i=0; i < MAXTORPS; i++)
-    {
-      o.torppips[i].x = tx + 2.0;
-      o.torppips[i].y = (o.d1icon.y + (o.d1icon.h * 0.15)) +
-        (o.d1icon.h - ((o.d1icon.h * 0.15) * 2.0)) / (real)MAXTORPS * (real)i;
-      o.torppips[i].w = o.d1icon.w * 0.10;
-      o.torppips[i].h = (o.d1icon.h - ((o.d1icon.h * 0.15) * 2.0)) / (real)MAXTORPS;
-    } 
-
-  /* phaser recharge status */
-  o.phasstat.x = tx + 2.0 + o.d1icon.x + o.d1icon.w + (o.d1icon.w * 0.10);
-  o.phasstat.y = o.d1icon.y + (o.d1icon.h * 0.15);
-  o.phasstat.w = o.torppips[0].w / 2.0 /*o.d1icon.w * 0.10*/;
-  o.phasstat.h = o.d1icon.h - ((o.d1icon.h * 0.15) * 2.0);
-  
   /* alert target - bottom of viewer */
   o.d1atarg.x = dConf.vX + ((dConf.vW / 8.0) * 1.5);
   o.d1atarg.y = dConf.vY + (dConf.vH - ((dConf.vH / 20.0) * 1.0));
@@ -447,11 +518,8 @@ void renderScaleVal(GLfloat x, GLfloat y, GLfloat w, GLfloat h,
   sprintf(buf32, "%3d", val);
 
   /* a scale value (number) */
-  glfRender(x, y, 0.0, w * 0.9, h * 0.8, lfont, buf32, col, NULL,
+  glfRender(x, y, 0.0, w, h, lfont, buf32, col, NULL,
             TRUE, FALSE, TRUE);
-  
-  drawLineBox(x, y, w, h, boxcol, 1.0);
-
   return;
 }
 
@@ -459,11 +527,8 @@ void renderAllocVal(GLfloat x, GLfloat y, GLfloat w, GLfloat h,
                     TexFont *lfont, char *val, int col)
 {
   /* a scale value (number) */
-  glfRender(x, y, 0.0, w * 0.9, h * 0.8, lfont, val, col, NULL,
+  glfRender(x, y, 0.0, w, h, lfont, val, col, NULL,
             TRUE, FALSE, TRUE);
-  
-  drawLineBox(x, y, w, h, BlueColor, 1.0);
-
   return;
 }
 
@@ -661,8 +726,6 @@ void renderPulseMsgs(void)
 /* render the shield's current strength when down */
 void renderShieldCharge(void)
 {
-  GLfloat valxoff = (o.shcharge.w / 10.0) * 3.0;
-  GLfloat scaleend = o.shcharge.x + o.shcharge.w - valxoff - (o.shcharge.w / 10.0);
   real val;
   
   val = CLAMP(0.0, 100.0, Ships[Context.snum].shields);
@@ -674,7 +737,7 @@ void renderShieldCharge(void)
   
   /* gauge */
   drawLine(o.shcharge.x, o.shcharge.y, 
-           scaleend * (GLfloat)((GLfloat)val / 100.0),
+           o.shcharge.w * (GLfloat)((GLfloat)val / 100.0),
            o.shcharge.h);
 
   return;
@@ -691,6 +754,8 @@ void renderHud(int dostats)
   cqColor icl;
   real warp = Ships[Context.snum].warp;
   real maxwarp = ShipTypes[Ships[Context.snum].shiptype].warplim;
+  int steam = Ships[Context.snum].team;
+  static int oldteam = -1;
   static int rxtime = 0;
   static int oldrx = 0;
   static int rxdiff = 0;
@@ -733,9 +798,10 @@ void renderHud(int dostats)
     }
 
   if (o.x != dConf.wX || o.y != dConf.wY || o.w != dConf.wW ||
-      o.h != dConf.wH)
+      o.h != dConf.wH || oldteam != steam)
     {
-      updateIconHudGeo();
+      updateIconHudGeo(Context.snum);
+      oldteam = steam;
     }
 
   /* draw alert border */
@@ -1230,43 +1296,14 @@ void renderViewer(int dovbg, int dobomb)
 void renderScale(GLfloat x, GLfloat y, GLfloat w, GLfloat h,
                  int min, int max, int val, int scalecolor) 
 {
-  GLfloat valxoff = (w / 10.0) * 3.0;
-  GLfloat scaleend = x + w - valxoff - (w / 10.0);
-  GLfloat scaleh = h / 2.0;
+  val = CLAMP(min, max, val);
   
-  if (val < min)
-    val = min;
-  if (val > max)
-    val = max;
-
   uiPutColor(scalecolor);
   
   /* gauge */
   drawQuad(x, y, 
-           scaleend * (GLfloat)((GLfloat)val / ((GLfloat)max - (GLfloat)min)),
-           scaleh, 0.0);
-  
-  return;
-}
-
-void renderPhaserScale(GLfloat x, GLfloat y, GLfloat w, GLfloat h,
-                       int min, int max, int val, int scalecolor) 
-{
-  GLfloat valyoff = (h / 10.0) * 3.0;
-  GLfloat scaleend = x + h - valyoff - (h / 10.0);
-  GLfloat scaleh = w / 2.0;
-  
-  if (val < min)
-    val = min;
-  if (val > max)
-    val = max;
-
-  uiPutColor(scalecolor);
-  
-  /* gauge */
-  drawQuad(x, y, 
-           scaleend * (GLfloat)((GLfloat)val / ((GLfloat)max - (GLfloat)min)),
-           scaleh, 0.0);
+           w * (GLfloat)((GLfloat)val / ((GLfloat)max - (GLfloat)min)),
+           h, 0.0);
   
   return;
 }
@@ -1276,9 +1313,6 @@ void renderAlloc(GLfloat x, GLfloat y, GLfloat w, GLfloat h,
                struct _alloc *a,
                TexFont *lfont, TexFont *vfont, int HUD)
 {
-  GLfloat valxoff = (w / 10.0) * 3.0;
-  GLfloat scaleend = x + w - valxoff - (w / 10.0);
-  GLfloat scaleh = h / 2.0;
   int walloc = 0;
   
   /* bg */
@@ -1287,21 +1321,23 @@ void renderAlloc(GLfloat x, GLfloat y, GLfloat w, GLfloat h,
   else
     uiPutColor(RedLevelColor);
 
-  drawQuad(x, y, scaleend, scaleh, 0.0);
+  drawQuad(x, y, w, h, 0.0);
 
   /* fg */
-  walloc = 100 - a->ealloc;
+  
+  if (!a->ealloc)
+    walloc = a->walloc;         /* e overload */
+  else
+    walloc = 100 - a->ealloc;
+
   if (a->walloc > 0)
     uiPutColor(NoColor);
   else
-    {
-      uiPutColor(RedLevelColor);
-      walloc = 100 - a->ealloc;
-    }
+    uiPutColor(RedLevelColor);
 
   drawQuad(x, y, 
-           scaleend * (GLfloat)((GLfloat)walloc / 100.0),
-           scaleh, 0.0);
+           w * (GLfloat)((GLfloat)walloc / 100.0),
+           h, 0.0);
 
   return;
 }

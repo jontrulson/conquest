@@ -1987,12 +1987,13 @@ _print_gl_info(void)
   const char *glRenderer = (const char *) glGetString(GL_RENDERER);
   const char *glVersion  = (const char *) glGetString(GL_VERSION);
   
-  clog("OpenGL Vendor:      %s", glVendor);
-  clog("OpenGL Renderer:    %s", glRenderer);
-  clog("OpenGL Version:     %s", glVersion);
+  clog("graphicsInit: OpenGL Vendor:      %s", glVendor);
+  clog("graphicsInit: OpenGL Renderer:    %s", glRenderer);
+  clog("graphicsInit: OpenGL Version:     %s", glVersion);
+
   if (cqDebug)
     {
-      clog("OpenGL limits:");
+      clog("graphicsInit: OpenGL limits:");
 
       for (i = 0; limits[i].count; i++) 
         {
@@ -3616,12 +3617,13 @@ static int loadGLTextures()
   /* now try to load each texture and setup the proper data */
   for (i=0; i<cqiNumTextures; i++)
     {
-      int texid = 0;
+      int texid = 0, texw = 0, texh = 0;
       int ndx = -1;
       int col_only = FALSE;     /* color-only texture? */
 
       memset((void *)&curTexture, 0, sizeof(GLTexture_t));
       texid = 0;
+      texw = texh = 0;          /* default width/height */
       rv = FALSE;
 
       if (cqiTextures[i].flags & CQITEX_F_COLOR_SPEC)
@@ -3633,8 +3635,10 @@ static int loadGLTextures()
       if (GLTextures && !col_only && 
           (ndx = findGLTextureByFile(cqiTextures[i].filename)) > 0)
         {                       /* the same hw texture was previously loaded
-                                   just save it's texture id */
+                                   just save it's texture id and w/h */
           texid = GLTextures[ndx].id;
+          texw = GLTextures[ndx].w;
+          texh = GLTextures[ndx].h;
 #ifdef DEBUG_GL
           clog("%s: texture file '%s' already loaded, using existing tid.", 
                __FUNCTION__, cqiTextures[i].filename);
@@ -3668,7 +3672,6 @@ static int loadGLTextures()
               
               curTexture.w = texti->width;
               curTexture.h = texti->height;
-
               GLError();
               /* use linear filtering */
               glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -3725,7 +3728,11 @@ static int loadGLTextures()
           
           /* now set it up */
           if (texid)
-            curTexture.id = texid;
+            {
+              curTexture.id = texid;
+              curTexture.w = texw;
+              curTexture.h = texh;
+            }
 
           curTexture.cqiIndex = i;
           hex2GLColor(cqiTextures[i].color, &curTexture.col);

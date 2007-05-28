@@ -27,9 +27,7 @@ void print_usage()
   fprintf(stderr, "\t-d            turns on debugging.\n");
   fprintf(stderr, "\t-t            parse texture data instead of conqinit data\n");
   fprintf(stderr, "\t-s            parse sound data instead of conqinit data\n");
-  fprintf(stderr, "\t-h            dump parsed file to stdout in initdata.h/texdata.h format\n");
-  fprintf(stderr, "\t              The output format chosen depends on the \n"
-                  "\t              presence of the '-t' option\n");
+  fprintf(stderr, "\t-h            dump parsed file to stdout in header file format\n");
   fprintf(stderr, "\t-D            dump current universe to stdout in conqinitrc format\n");
 }
 
@@ -86,9 +84,6 @@ int main(int argc, char **argv)
             {
             case CQI_FILE_CONQINITRC:
               dumpInitDataHdr();
-              break;
-            case CQI_FILE_TEXTURESRC_ADD:
-              dumpTexDataHdr();
               break;
             case CQI_FILE_SOUNDRC_ADD:
               dumpSoundDataHdr();

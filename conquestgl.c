@@ -241,8 +241,9 @@ void loadTextureRCFiles()
   char cqdir[BUFFER_SIZE];
   char *homevar;
 
-  /* load the main texturesrc file first */
-  cqiLoadRC(CQI_FILE_TEXTURESRC, NULL, 1, 0);
+  /* load the main texturesrc file first.  It's fatal if this fails. */
+  if (!cqiLoadRC(CQI_FILE_TEXTURESRC, NULL, 1, 0))
+      exit(1);
 
   /* now load any .trc files in there (CONQETC) */
   _loadRCFiles(CQI_FILE_TEXTURESRC_ADD, CONQETC, ".trc");
