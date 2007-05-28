@@ -73,7 +73,7 @@ static struct {
 
   GLfloat sb_ih;                /* statbox item height */
 
-  GLRect_t alertb;                 /* alert border */
+  GLRect_t alertb;              /* alert border */
 
   GLRect_t head;
   GLRect_t headl;
@@ -88,8 +88,7 @@ static struct {
   GLRect_t wtemp;
   GLRect_t alloc;
 
-  /* 'stat' box */
-  GLRect_t kills;
+  /* misc info (viewer) */
   GLRect_t tow;
   GLRect_t arm;
   GLRect_t cloakdest;
@@ -102,60 +101,63 @@ static struct {
   GLRect_t msg2;
   GLRect_t msgmsg;
 
-  /* iconhud specific */
-
-  GLRect_t decal1;                 /* decal 1 location */
-  GLRect_t d1shg;                  /* shield gauge */
-  GLRect_t d1shn;                  /* shield value (number) */
-  GLRect_t d1damg;           
-  GLRect_t d1damn;           
-  GLRect_t d1icon;                 /* the icon area */
-  GLRect_t phasstat;               /* phaser charge status */
-  GLRect_t d1atarg;                /* ship causing alert */
-
-  GLRect_t decal2;                 /* decal 2 location */
-  GLRect_t d2fuelg;                /* fuel gauge */
-  GLRect_t d2fueln;                /* fuel value (number) */
-  GLRect_t d2engtg;
-  GLRect_t d2engtn;
-  GLRect_t d2weptg;
-  GLRect_t d2weptn;
-  GLRect_t d2allocg;
-  GLRect_t d2allocn;
-  GLRect_t d2killb;                /* location of kills box */
-
-  GLRect_t engfailpulse;           /* wep/eng failure pulses */
+  /* pulse messages (viewer) */
+  GLRect_t engfailpulse;        /* wep/eng failure pulses */
   GLRect_t wepfailpulse;
   GLRect_t fuelcritpulse;
   GLRect_t shcritpulse;
   GLRect_t hullcritpulse;
-  GLRect_t shcharge;               /* shield charge status */
   
-  GLRect_t d1torps;               /* location of the the torp pip area */
-  GLRect_t torppips[MAXTORPS];  /* the torp pips */
-
   GLRect_t magfac;                 /* mag factor */
+
+  /* iconhud decals */
+
+  /* decal1 */
+  GLRect_t decal1;              /* decal 1 location */
+  GLRect_t d1shg;               /* shield gauge */
+  GLRect_t d1shcharge;          /* shield charge status */
+  GLRect_t d1shn;               /* shield value (number) */
+  GLRect_t d1damg;              /* damage */
+  GLRect_t d1damn;           
+  GLRect_t d1icon;              /* the ship icon area */
+  GLRect_t d1torps;             /* location of the torp pip area */
+  GLRect_t d1torppips[MAXTORPS]; /* the torp pips */
+  GLRect_t d1phcharge;          /* phaser charge status */
+  GLRect_t d1atarg;             /* ship causing alert */
+
+  /* decal2 */
+  GLRect_t decal2;              /* decal 2 location */
+  GLRect_t d2fuelg;             /* fuel gauge */
+  GLRect_t d2fueln;             /* fuel value (number) */
+  GLRect_t d2engtg;             /* etemp */
+  GLRect_t d2engtn;
+  GLRect_t d2weptg;             /* wtemp */
+  GLRect_t d2weptn;
+  GLRect_t d2allocg;            /* alloc */
+  GLRect_t d2allocn;
+  GLRect_t d2killb;             /* location of kills box */
+
 } o = {};
 
 /* a useful 'mapping' macros for the decals */
-#define MAPAREAX(_decalw, _decalh, _box) \
-        ( tx + (((_box)->x / (_decalw) ) * tw) )
+#define MAPAREAX(_decalw, _decalh, _rect) \
+        ( tx + (((_rect)->x / (_decalw) ) * tw) )
 
-#define MAPAREAY(_decalw, _decalh, _box) \
-        ( decaly + (((_box)->y / (_decalh)) * th) )
+#define MAPAREAY(_decalw, _decalh, _rect) \
+        ( decaly + (((_rect)->y / (_decalh)) * th) )
 
-#define MAPAREAW(_decalw, _decalh, _box) \
-        ( (((_box)->w / (_decalw)) * tw) )
+#define MAPAREAW(_decalw, _decalh, _rect) \
+        ( (((_rect)->w / (_decalw)) * tw) )
 
-#define MAPAREAH(_decalw, _decalh, _box) \
-        ( (((_box)->h / (_decalh)) * th) )
+#define MAPAREAH(_decalw, _decalh, _rect) \
+        ( (((_rect)->h / (_decalh)) * th) )
 
-#define MAPAREA(_decalptr, _boxptr, _optr) \
+#define MAPAREA(_decalptr, _taptr, _optr) \
         {                                 \
-          (_optr)->x = MAPAREAX((_decalptr)->w, (_decalptr)->h, (_boxptr)); \
-          (_optr)->y = MAPAREAY((_decalptr)->w, (_decalptr)->h, (_boxptr)); \
-          (_optr)->w = MAPAREAW((_decalptr)->w, (_decalptr)->h, (_boxptr)); \
-          (_optr)->h = MAPAREAH((_decalptr)->w, (_decalptr)->h, (_boxptr)); \
+          (_optr)->x = MAPAREAX((_decalptr)->w, (_decalptr)->h, (_taptr)); \
+          (_optr)->y = MAPAREAY((_decalptr)->w, (_decalptr)->h, (_taptr)); \
+          (_optr)->w = MAPAREAW((_decalptr)->w, (_decalptr)->h, (_taptr)); \
+          (_optr)->h = MAPAREAH((_decalptr)->w, (_decalptr)->h, (_taptr)); \
         }
 
 /* update icon hud geometry if stuff changes (resize).  */
@@ -164,10 +166,10 @@ void updateIconHudGeo(int snum)
   GLfloat tx, ty, th, tw, decaly;
   int i;
   static int steam = -1;
-  /* these two boxes will be used to store the texture size
-     (in pixels) of each of the 2 decal areas (in w and h).  */
+  /* these two rects will just be used to store the texture size (in
+     hw pixels) of each of the 2 decal areas (in w and h).  */
   static GLRect_t decal1_sz, decal2_sz;
-  /* area pointers */
+  /* area pointers, decal1 */
   static cqiTextureAreaPtr_t d1shg = NULL;  /* d1 sh gauge */
   static cqiTextureAreaPtr_t d1shchrg = NULL;  /* d1 sh charge gauge */
   static cqiTextureAreaPtr_t d1shn = NULL;  /* d1 sh number */
@@ -177,6 +179,7 @@ void updateIconHudGeo(int snum)
   static cqiTextureAreaPtr_t d1phaserchrg = NULL; /* d1 phaser charge */
   static cqiTextureAreaPtr_t d1icon = NULL; /* d1 ship icon area */
 
+  /* area pointers, decal2 */
   static cqiTextureAreaPtr_t d2fuelg = NULL; /* d2 fuel */
   static cqiTextureAreaPtr_t d2fueln = NULL; /* d2 number */
   static cqiTextureAreaPtr_t d2engtg = NULL; /* d2 engine temp */
@@ -191,8 +194,8 @@ void updateIconHudGeo(int snum)
   char buffer[CQI_NAMELEN];
 
   if (Ships[snum].team != steam)
-    {                           /* we switched teams, reload the decal
-                                   texareas */
+    {                           /* we switched teams, reload/remap the
+                                   decal texareas */
       int ndx;
       steam = Ships[snum].team;
 
@@ -203,11 +206,13 @@ void updateIconHudGeo(int snum)
       /* get decal1 size */
       memset((void*)&decal1_sz, 0, sizeof(GLRect_t));
       if ((ndx = findGLTexture(buffer)) >= 0 )
-        {
+        {                       /* this is the decal's texture size
+                                   in pixels */
           decal1_sz.w = (GLfloat)GLTextures[ndx].w;
           decal1_sz.h = (GLfloat)GLTextures[ndx].h;
         } 
         
+      /* look up the texareas, and clamp to the texture size */
       d1shg     = cqiFindTexArea(buffer, "shieldg", &defaultTA);
       CLAMPRECT(decal1_sz.w, decal1_sz.h, d1shg);
       d1shchrg  = cqiFindTexArea(buffer, "shchargeg", &defaultTA);
@@ -300,9 +305,9 @@ void updateIconHudGeo(int snum)
    * The decal texture sizes and the texareas specified in their
    * texture definitions are used to compute the right x/y/w/h values
    * for items that are going to be mapped into them (like a fuel
-   * gauge.  The actual texture pixel values were determined by
+   * gauge).  The actual texture pixel values were determined by
    * loading the tex into gimp, positioning the cursor on the area of
-   * interest, and recording the texture pixel start, length, and
+   * interest, and recording the texture pixel start X, Y, width, and
    * height of the area of interest (like the fuel gauge in decal2).
    * These coordinates are specified as 'texareas' in the decal's
    * texture definition.  No more hardcoding! :)
@@ -313,6 +318,11 @@ void updateIconHudGeo(int snum)
    * the heading icon occupies 2 parts, and the warp 3, then
    * centered within the 6-part area.
    */
+
+  /* we should probably re-do heading/warp as a single texture
+     (decal0?) with texarea's describing the right location to draw
+     things (like decal1 and 2 are handled). */
+
   o.head.x = tx + 2.0;
   o.head.y = ty;
   o.head.w = ((o.xstatw / 6.0) * 2.0);
@@ -338,7 +348,7 @@ void updateIconHudGeo(int snum)
   /* pixel height of decal 1 & 2 */
   th = (dConf.vH / 10.0) * 4.0;
   /* pixel width of decal 1 & 2 */
-  tw = o.xstatw/* - ((o.xstatw / 10.0) * 2.5)*/;
+  tw = o.xstatw;
 
   /* decal 1 */
   o.decal1.x = tx;
@@ -346,7 +356,7 @@ void updateIconHudGeo(int snum)
   o.decal1.w = tw;
   o.decal1.h = (dConf.vH / 10.0) * 4.0;
 
-  decaly = o.decal1.y;          /* save this for mapping */
+  decaly = o.decal1.y;          /* save this for mapping macros */
 
   /* shield gauge */
   MAPAREA(&decal1_sz, d1shg, &o.d1shg);
@@ -355,7 +365,7 @@ void updateIconHudGeo(int snum)
   MAPAREA(&decal1_sz, d1shn, &o.d1shn);
 
   /* shield charge level (this is just a line) */
-  MAPAREA(&decal1_sz, d1shchrg, &o.shcharge);
+  MAPAREA(&decal1_sz, d1shchrg, &o.d1shcharge);
 
   /* damage */
   MAPAREA(&decal1_sz, d1damg, &o.d1damg);
@@ -369,15 +379,15 @@ void updateIconHudGeo(int snum)
   MAPAREA(&decal1_sz, d1torps, &o.d1torps);
   for (i=0; i < MAXTORPS; i++)
     {
-      o.torppips[i].x = o.d1torps.x;
-      o.torppips[i].y = o.d1torps.y + 
+      o.d1torppips[i].x = o.d1torps.x;
+      o.d1torppips[i].y = o.d1torps.y + 
         (o.d1torps.h / (real)MAXTORPS * (real)i);
-      o.torppips[i].w = o.d1torps.w;
-      o.torppips[i].h = o.d1torps.h / (real)MAXTORPS;
+      o.d1torppips[i].w = o.d1torps.w;
+      o.d1torppips[i].h = o.d1torps.h / (real)MAXTORPS;
     } 
 
   /* phaser recharge status */
-  MAPAREA(&decal1_sz, d1phaserchrg, &o.phasstat);
+  MAPAREA(&decal1_sz, d1phaserchrg, &o.d1phcharge);
 
   /* decal 2 */
   o.decal2.x = tx;
@@ -407,7 +417,7 @@ void updateIconHudGeo(int snum)
 
   MAPAREA(&decal2_sz, d2allocn, &o.d2allocn);
 
-  /* kills, embedded in decal2 */
+  /* kills box */
   MAPAREA(&decal2_sz, d2killb, &o.d2killb);
 
   /* END of the DECALS! */
@@ -513,9 +523,14 @@ void updateIconHudGeo(int snum)
 void renderScaleVal(GLfloat x, GLfloat y, GLfloat w, GLfloat h, 
                     TexFont *lfont, int val, int col, int boxcol)
 {
-  char buf32[32];
+  static char buf32[32];
+  static int oldval = -1;
 
-  sprintf(buf32, "%3d", val);
+  if (val != oldval)
+    {
+      snprintf(buf32, 32 - 1, "%3d", val);
+      oldval = val;
+    }
 
   /* a scale value (number) */
   glfRender(x, y, 0.0, w, h, lfont, buf32, col, NULL,
@@ -523,14 +538,6 @@ void renderScaleVal(GLfloat x, GLfloat y, GLfloat w, GLfloat h,
   return;
 }
 
-void renderAllocVal(GLfloat x, GLfloat y, GLfloat w, GLfloat h, 
-                    TexFont *lfont, char *val, int col)
-{
-  /* a scale value (number) */
-  glfRender(x, y, 0.0, w, h, lfont, val, col, NULL,
-            TRUE, FALSE, TRUE);
-  return;
-}
 
 /* draw overload/critical  messages using a 'pulse' effect
    in the viewer.  Use a slower pulse for 'critical' levels, except
@@ -736,9 +743,9 @@ void renderShieldCharge(void)
   uiPutColor(dData.sh.color);
   
   /* gauge */
-  drawLine(o.shcharge.x, o.shcharge.y, 
-           o.shcharge.w * (GLfloat)((GLfloat)val / 100.0),
-           o.shcharge.h);
+  drawLine(o.d1shcharge.x, o.d1shcharge.y, 
+           o.d1shcharge.w * (GLfloat)((GLfloat)val / 100.0),
+           o.d1shcharge.h);
 
   return;
 }
@@ -896,9 +903,10 @@ void renderHud(int dostats)
               &dData.alloc, fontLargeTxf, fontFixedTxf, 
               TRUE);
   
-  renderAllocVal(o.d2allocn.x, o.d2allocn.y,
-                 o.d2allocn.w, o.d2allocn.h,
-                 fontFixedTxf, dData.alloc.allocstr, InfoColor);
+  /* alloc value */
+  glfRender(o.d2allocn.x, o.d2allocn.y, 0.0, o.d2allocn.w, o.d2allocn.h, 
+            fontFixedTxf, dData.alloc.allocstr, InfoColor, 
+            NULL, TRUE, FALSE, TRUE);
   
   /* BEGIN "stat" box -
      kills, towing/towed by, x armies, CLOAKED/destruct */
@@ -915,7 +923,7 @@ void renderHud(int dostats)
   if (magFac || dData.tow.str[0] || dData.armies.str[0] || 
       dData.cloakdest.str[0] == 'D' || dData.aStat.alertStatus[0])
     {
-      /* we want to add an alhpa for these */
+      /* we want to use blending for these */
 
       glBlendFunc(GL_ONE_MINUS_SRC_ALPHA, GL_ONE);
       glEnable(GL_BLEND);
@@ -1009,7 +1017,8 @@ void renderHud(int dostats)
           if (ack_alert == ALERT_OFF) /* was off */
             {
               ack_alert = ALERT_ON;
-              cqsEffectPlayTracked(teamEffects[Ships[Context.snum].team].alert, &alertHandle, 0.0, 0.0, 0.0);
+              cqsEffectPlayTracked(teamEffects[Ships[Context.snum].team].alert,
+                                   &alertHandle, 0.0, 0.0, 0.0);
             }
           else if (ack_alert == ALERT_ON) /* was on - turned off */
             {
@@ -1130,10 +1139,10 @@ void renderHud(int dostats)
               break;
             }
           
-          drawTexQuad(o.torppips[i].x, 
-                      o.torppips[i].y, 
-                      o.torppips[i].w, 
-                      o.torppips[i].h, 
+          drawTexQuad(o.d1torppips[i].x, 
+                      o.d1torppips[i].y, 
+                      o.d1torppips[i].w, 
+                      o.d1torppips[i].h, 
                       0.0);
         }
     }
@@ -1214,9 +1223,10 @@ void renderHud(int dostats)
       else
         uiPutColor(RedColor);
         
-      drawQuad(o.phasstat.x, o.phasstat.y, o.phasstat.w, 
-               (Ships[Context.snum].pfuse <= 0) ? o.phasstat.h :
-               (o.phasstat.h - (o.phasstat.h / 10.0) * (real)Ships[Context.snum].pfuse), 0.0);
+      drawQuad(o.d1phcharge.x, o.d1phcharge.y, o.d1phcharge.w, 
+               (Ships[Context.snum].pfuse <= 0) ? o.d1phcharge.h :
+               (o.d1phcharge.h - (o.d1phcharge.h / 10.0) * 
+                (real)Ships[Context.snum].pfuse), 0.0);
     }
 
   return;
