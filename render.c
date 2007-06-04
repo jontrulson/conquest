@@ -996,20 +996,20 @@ void renderHud(int dostats)
       glDisable(GL_BLEND);
     }
 
-/*
- Cataboligne - sound code to handle red alert klaxon
-
- logic - ack_alert inits 0
- when in red range - if handle is INV meaning sound is off -
-  if ack is OFF play snd, set ack ON
-  if ack is ON - klaxon was turned off with ESC - set ack to ACK
-  when out of red range -
-  set ack to OFF
-  stop sound if playing
-
-  another idea - play sound whenever near a cloaked ship and
-  (CLOAKED) displays if info gotten
-*/
+  /*
+    Cataboligne - sound code to handle red alert klaxon
+    
+    logic - ack_alert inits 0
+    when in red range - if handle is INV meaning sound is off -
+    if ack is OFF play snd, set ack ON
+    if ack is ON - klaxon was turned off with ESC - set ack to ACK
+    when out of red range -
+    set ack to OFF
+    stop sound if playing
+    
+    another idea - play sound whenever near a cloaked ship and
+    (CLOAKED) displays if info gotten
+  */
   if (dData.aStat.alertStatus[0] == 'R' || dData.aStat.alertStatus[0] == 'A')
     {                   /* alert condition red - check klaxon state */
       if (alertHandle == CQS_INVHANDLE) /* not playing now */

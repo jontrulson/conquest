@@ -2487,13 +2487,13 @@ static void themes()
 {
   real dis;
   int mus = -1;                 /* the music we might play */
-  real odist = max(BATTLE_MAXDIS, APPROACH_MAXDIS);
+  static real odist = max(BATTLE_MAXDIS, APPROACH_MAXDIS);
   int snum = Context.snum;
   int warlike;
   real prob = rnd();
   int i;
 
-  if (cqsMusicPlaying()) 
+  if (!cqsSoundAvailable || cqsMusicPlaying()) 
     return;
 
   /* go through each ship. */

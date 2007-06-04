@@ -101,9 +101,13 @@ void display( int snum, int display_info )
   static int WeapAttrib = 0;
   static int EngAttrib = 0;
   static int DamageAttrib = 0;
+  static int talertfx = -1;
   int color;
   GLfloat glx, gly;
   
+  if (talertfx == -1)
+      talertfx = cqsFindEffect("torp-alert");
+
   setXtraInfo();
   setAlertBorder(alertcolor(AlertLevel));
 
@@ -420,6 +424,8 @@ void display( int snum, int display_info )
 	      AlertLevel = YELLOW_ALERT;
 	      c_strcpy( "Torp Alert", buf );
 	      minenemy = 0;			/* disable nearby enemy code */
+              cqsEffectPlay(talertfx, 0, 0, 0);
+
 	      dobeep = TRUE;
 	    }
 	  else if ( mindis < YELLOW_DIST )

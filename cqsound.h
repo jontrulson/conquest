@@ -106,20 +106,20 @@ extern teamMus_t teamMusic[NUMPLAYERTEAMS];
 extern doomMus_t doomMusic;
 #endif
 
-#if !(HAVE_SDL && HAVE_SDL_MIXER)
+#if !((defined(HAVE_SDL) && HAVE_SDL == 1) && (defined(HAVE_SDL_MIXER) && HAVE_SDL_MIXER == 1))
 #define CQS_NO_SOUND            /* we will not compile with sound support */
 
 /* fake them out */
 #define cqsInitSound()                      
 #define cqsFindEffect(x)                    (-1)
 #define cqsFindMusic(x)                     (-1)
-#define cqsMusicPlay(x, y)                  FALSE
-#define cqsMusicStop(x)                     FALSE
-#define cqsEffectPlay(x, y, z, a)           FALSE
-#define cqsEffectPlayTracked(x, y, z, a, b) FALSE
-#define cqsEffectStop(x, y)                 FALSE
+#define cqsMusicPlay(x, y)                  do {;} while (0)
+#define cqsMusicStop(x)                     do {;} while (0)
+#define cqsEffectPlay(x, y, z, a)           do {;} while (0)
+#define cqsEffectPlayTracked(x, y, z, a, b) do {;} while (0)
+#define cqsEffectStop(x, y)                 do {;} while (0)
 #define cqsUpdateVolume()                   
-#define cqsMusicPlaying()
+#define cqsMusicPlaying()                   (0)
 
 #else  /* !(HAVE_SDL && HAVE_SDL_MIXER) */
 /* the real thing */

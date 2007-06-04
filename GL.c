@@ -1916,7 +1916,7 @@ int uiGLInit(int *argc, char **argv)
 #endif
 
   glutInit(argc, argv);
-  glutInitDisplayMode(GLUT_DEPTH | GLUT_DOUBLE | GLUT_RGBA | GLUT_ALPHA);
+  glutInitDisplayMode(/*GLUT_DEPTH |*/ GLUT_DOUBLE | GLUT_RGBA | GLUT_ALPHA);
 
   glutInitWindowPosition(0,0);
 

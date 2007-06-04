@@ -115,6 +115,7 @@ esac
 
 AC_SUBST(FILEPRIV)
 AC_PROG_CC
+AC_PROG_LIBTOOL
 
 if test ! -n "$conquest_group"
 then
@@ -207,12 +208,12 @@ dnl Check for SDL
 SDL_VERSION=1.2.0
 AM_PATH_SDL($SDL_VERSION,
             CONQ_CFLAGS="$CONQ_CFLAGS -DHAVE_SDL=1",
-            AC_MSG_ERROR([*** SDL version $SDL_VERSION not found!])
+            SNDCLIENT=""; AC_MSG_WARN([*** SDL version $SDL_VERSION not found!])
 )
 CONQ_CFLAGS="$CONQ_CFLAGS $SDL_CFLAGS"
 
 dnl Check for SDL_mixer
-AC_CHECK_LIB(SDL_mixer, Mix_OpenAudio, CONQ_CFLAGS="$CONQ_CFLAGS -DHAVE_SDL_MIXER=1"; LIBS="-lSDL_mixer $LIBS", AC_MSG_ERROR([*** SDL_mixer not found!]))
+AC_CHECK_LIB(SDL_mixer, Mix_OpenAudio, CONQ_CFLAGS="$CONQ_CFLAGS -DHAVE_SDL_MIXER=1"; LIBS="-lSDL_mixer $LIBS", SNDCLIENT=""; AC_MSG_WARN([*** SDL_mixer not found!]))
 
 fi
 

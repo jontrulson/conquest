@@ -103,6 +103,19 @@ effect {
 }
 
 
+effect {
+  name         "torp-alert"  
+  filename     "torpalert"
+
+  volume       70
+  fadeinms     0
+  fadeoutms    0
+  loops        2
+  limit        1
+  delayms      3000
+}
+
+
 # feds
 ######
 
@@ -191,7 +204,7 @@ effect {
   fadeoutms    0
   loops        1
   limit        1
-  delayms      5000
+  delayms      60000
 }
 
 effect {
@@ -203,7 +216,7 @@ effect {
   fadeoutms    0
   loops        1
   limit        1
-  delayms      5000
+  delayms      60000
 }
 
 effect {
@@ -317,7 +330,7 @@ effect {
   fadeoutms    0
   loops        1
   limit        1
-  delayms      5000
+  delayms      60000
 }
 
 effect {
@@ -329,7 +342,7 @@ effect {
   fadeoutms    0
   loops        1
   limit        1
-  delayms      5000
+  delayms      60000
 }
 
 effect {
@@ -442,7 +455,7 @@ effect {
   fadeoutms    0
   loops        1
   limit        1
-  delayms      5000
+  delayms      60000
 }
 
 effect {
@@ -454,7 +467,7 @@ effect {
   fadeoutms    0
   loops        1
   limit        1
-  delayms      5000
+  delayms      60000
 }
 
 effect {
@@ -568,7 +581,7 @@ effect {
   fadeoutms    0
   loops        1
   limit        1
-  delayms      5000
+  delayms      60000
 }
 
 effect {
@@ -580,7 +593,7 @@ effect {
   fadeoutms    0
   loops        1
   limit        1
-  delayms      5000
+  delayms      60000
 }
 
 effect {

@@ -661,7 +661,9 @@ int cqsEffectPlayTracked(int fxidx, cqsHandle *handle, real maxdist,
     return FALSE;               /* already playing the limit */
 
   /* check the delay limit if any */
-  if (cqsEffects[fxidx].delayms && 
+  /* we make sure that lasttime is non-zero so it will always play
+     the first time without delay */
+  if (cqsEffects[fxidx].lasttime && cqsEffects[fxidx].delayms && 
       ((frameTime - cqsEffects[fxidx].lasttime) < cqsEffects[fxidx].delayms))
     {
       return FALSE;
@@ -758,7 +760,9 @@ int cqsEffectPlay(int fxidx, real maxdist, real dist, real ang)
   dist = CLAMP(0.0, maxdist, dist);
 
   /* check the delay limit if any */
-  if (cqsEffects[fxidx].delayms && 
+  /* we make sure that lasttime is non-zero so it will always play
+     the first time without delay */
+  if (cqsEffects[fxidx].lasttime && cqsEffects[fxidx].delayms && 
       ((frameTime - cqsEffects[fxidx].lasttime) < cqsEffects[fxidx].delayms))
       {
         return FALSE;

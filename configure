@@ -22295,6 +22295,7 @@ fi
 
 
 
+
 if test ! -n "$conquest_group"
 then
         conquest_group="conquest"
@@ -25285,9 +25286,8 @@ rm -f conftest.err conftest.$ac_objext \
      SDL_CFLAGS=""
      SDL_CXXFLAGS=""
      SDL_LIBS=""
-     { { echo "$as_me:$LINENO: error: *** SDL version $SDL_VERSION not found!" >&5
-echo "$as_me: error: *** SDL version $SDL_VERSION not found!" >&2;}
-   { (exit 1); exit 1; }; }
+     SNDCLIENT=""; { echo "$as_me:$LINENO: WARNING: *** SDL version $SDL_VERSION not found!" >&5
+echo "$as_me: WARNING: *** SDL version $SDL_VERSION not found!" >&2;}
 
   fi
 
@@ -25363,9 +25363,8 @@ echo "${ECHO_T}$ac_cv_lib_SDL_mixer_Mix_OpenAudio" >&6
 if test $ac_cv_lib_SDL_mixer_Mix_OpenAudio = yes; then
   CONQ_CFLAGS="$CONQ_CFLAGS -DHAVE_SDL_MIXER=1"; LIBS="-lSDL_mixer $LIBS"
 else
-  { { echo "$as_me:$LINENO: error: *** SDL_mixer not found!" >&5
-echo "$as_me: error: *** SDL_mixer not found!" >&2;}
-   { (exit 1); exit 1; }; }
+  SNDCLIENT=""; { echo "$as_me:$LINENO: WARNING: *** SDL_mixer not found!" >&5
+echo "$as_me: WARNING: *** SDL_mixer not found!" >&2;}
 fi
 
 

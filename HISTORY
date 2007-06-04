@@ -9,16 +9,31 @@
 
                               Conquest HISTORY
 
-???
+8.2b (devel) 06/04/2007
 
-5/28/2007
+  - 8.2b devel release
 
-  - add capability of specifying named texture rectangles as part of a
-    texture definition into CQI.  This makes it possible to define the
-    element positions of the 2 decals used in the hud in the
-    texturesrc file, rather than hardcoding all that crap into
-    updateIconHudGeo().   Simplified alot of the hud computations,
-    especially in updateIconHudGeo().  
+  - fix bug that prevented timed effects from being triggered for
+    delayms (if specified in the soundrc file) after the game started.
+ 
+  - disable allocation of a depth buffer.  We aren't using it,
+    so... Might help those with 16bpp displays.
+
+  - added sound effect for torp alerts.
+
+  - fixed up configure so that it won't barf if sdl-config or other
+    SDL checks fail.  If that happens, sound support will just be
+    disabled. 
+
+    Also fixed some problems that prevented the GL client from being
+    built when sound support was not available.  Sorry about that.
+
+  - add capability of specifying named texture rectangles (texareas)
+    as part of a texture definition into CQI.  This makes it possible
+    to define the element positions of the 2 decals used in the hud in
+    the texturesrc file, rather than hardcoding all that crap into
+    updateIconHudGeo().  Simplified alot of the hud computations,
+    especially in updateIconHudGeo().
 
     Simplified scale/gauge drawing considerably.  No more stupid stuff
     in there anymore I hope :)
@@ -32,58 +47,44 @@
 
   - new hud decal1 and decal2 textures are provided.  These have been
     modified to contain all of the relevant decal data, so there is
-    no more seperate fuel gauge and fuel number rendering for
+    no more seperate fuel gauge and fuel number rendering, for
     example.  The number boxes are contained within the decal textures
     now - their locations are specified via texarea subsections in
     their respective texture definitions.
 
-  - the compiled-in texture default configuration (texdata.h) has been
-    removed.  All texture data is read from the texture config files
-    at startup time always.  The GL client will fail to start if the
-    main texturesrc file cannot be found, or contains a syntax error.
+  - the compiled-in texture default configuration header file
+    (texdata.h) has been removed.  All texture data is read from the
+    texture config files at startup time, always.  The GL client will
+    fail to start if the main texturesrc file cannot be found, or
+    contains a syntax error.
 
   - more NEB rework so it looks a little better.  Added support
     to CQI texanim to modify the texture's s and t offsets.  Now use a
     'neb' animdef for rendering it to provide that 'high speed
     streaming cloud' look. :)
 
-  - add new '-v' option to the clients increase verbosity
+  - add new '-v' option to the clients to increase verbosity
 
   - output some basic GL info.  Using '-v' will list the GL
     implementation's various limits.
 
-  4/24/2007
-
-  - major rework of the scaling code.  Other subtle bugs like double
-    scaling were fixed.
-
-  - Limit checks in GLcvtcoords fixed to properly account for
-    magscaling.  It's main weakness now is accounting for the sizes of
-    objects.  Oh well :)
-
   - some sillyness fixed in cu2GLSize.  
+
+  - major rework of the vbg rendering.  It was pretty screwy,
+    especially when you threw magfactors into it :)  
 
   - Animdefs now always handle sizes in CUs, (istate and deltas and
     geo size).  These values must be rescaled via cu2GLSize or glScale
     prior to rendering now, in order for the magfactors to work
     properly.
 
-  - major rework of the vbg rendering.  It was pretty screwy,
-    especially when you threw magfactors into it :)
-
   - Due to the size/scaling rework for the animdefs, explosions can
-    now be drawn properly in LR scan, and therefore are now drawn in
-    LR scan.  Planet bombing could work as well in LR, but for now it
-    isn't.
-
-3/26/2007
-
-  - fix bug in stats display when magfactor is non-zero.
+    now be drawn properly in LR scan, and therefore, are now drawn in
+    LR scan :).  Planet bombing could work as well in LR, but for now
+    it isn't.
 
   - make sure the mag change sound doesn't play more than once
-    every 5 seconds.
-
-3/11/2006
+    every 60 seconds.  Same for the info sound.
 
   - based on 'mag factor' idea from Cat, implemented zoom in/out in
     both SR and LR views.  There are 5 levels of zoom out and zoom in.
@@ -91,8 +92,12 @@
     to default zoom (none).
 
     During this work some subtle bugs in GLcvtcoords() were fixed,
-    yielding much more accurate placing of objects.  Other BS
-    assumptions of mine also fixed.
+    yielding much more accurate placing of objects.  Limit checks in
+    GLcvtcoords fixed to properly account for magscaling.  It's main
+    weakness now is accounting for the sizes of objects.  Oh well :)
+    
+    There were a variety of other scaling and sizing bugs fixed as a
+    result of this work.  
 
   - cursor now uses cross-hair shape.  With a fixed GLcvtcoords, it is
     actually accurate in the viewer now. :)
