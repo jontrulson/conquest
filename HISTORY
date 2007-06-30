@@ -8,6 +8,28 @@
          +--------------------------------------------------------+
 
                               Conquest HISTORY
+???
+
+6/30/2007
+
+  - bug report from Adam Sampson: 'make install' should not
+    chgrp/chmod $(DESTDIR)$(CONQSYSCONFDIR)/*rc . Depending on where
+    $(DESTDIR)$(CONQSYSCONFDIR) actually is (say, /etc) this can cause
+    'issues' :)
+
+  - fix bug whereby statistics data (ALT-S) in conquestgl (FPS, RTT,
+    bandwidth) would not be shown unless althud was also enabled.
+
+  - clear all of the message/prompt lines when initting the CP node.
+    If you self-destructed for example, then re-entered, you could
+    still see the destruct confirmation message in the prompt area. 
+
+  - add the ability to zoom in/out during playback of a previously
+    recorded game.
+
+  - fix issue where in SR scan, but zoomed all the way out, you could
+    see ships that you can't really see.  
+
 
 8.2b (devel) 06/04/2007
 

@@ -1947,6 +1947,8 @@ int uiGLInit(int *argc, char **argv)
 static void
 _print_gl_info(void)
 {
+#if defined(DEBUG_GL)
+
   struct token_name {
     GLuint count;
     GLenum token;
@@ -1983,6 +1985,7 @@ _print_gl_info(void)
     { 0, (GLenum) 0, NULL }
   };
   GLint i, max[2];
+#endif /* DEBUG_GL */
   const char *glVendor   = (const char *) glGetString(GL_VENDOR);
   const char *glRenderer = (const char *) glGetString(GL_RENDERER);
   const char *glVersion  = (const char *) glGetString(GL_VERSION);
@@ -1991,6 +1994,7 @@ _print_gl_info(void)
   clog("graphicsInit: OpenGL Renderer:    %s", glRenderer);
   clog("graphicsInit: OpenGL Version:     %s", glVersion);
 
+#if defined(DEBUG_GL)
   if (cqDebug)
     {
       clog("graphicsInit: OpenGL limits:");
@@ -2007,10 +2011,10 @@ _print_gl_info(void)
             }
         }
     }
+#endif /* DEBUG_GL */
 
   return;
 }
-
 
 void graphicsInit(void)
 {
@@ -2020,6 +2024,7 @@ void graphicsInit(void)
   glShadeModel(GL_SMOOTH);
   glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
   
+
   _print_gl_info();
 
   if (!loadGLTextures())

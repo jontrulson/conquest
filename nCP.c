@@ -2655,6 +2655,11 @@ void nCPInit(int istopnode)
   pingPending = FALSE;
   pingStart = 0;
 
+  /* clear the prompt lines */
+  clrPrompt(MSG_LIN1);
+  clrPrompt(MSG_LIN2);
+  clrPrompt(MSG_MSG);
+
   /* first time through */
   if (!nCPNode.animQue)
     {

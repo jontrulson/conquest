@@ -46,6 +46,8 @@
 
 #include "nPlayB.h"
 
+#include "cqsound.h"
+
 #define cp_putmsg(str, lin)  setPrompt(lin, NULL, NoColor, str, NoColor)
 
 #define S_NONE         0
@@ -64,6 +66,9 @@ static int old_snum = 1;
 static char *nss = NULL;        /* no such ship */
 
 extern dspData_t dData;
+
+extern int ncpSRMagFactor;
+extern int ncpLRMagFactor;
 
 static int nPlayBDisplay(dspConfig_t *);
 static int nPlayBIdle(void);
@@ -602,6 +607,77 @@ static int nPlayBInput(int ch)
         }
       
       break;
+
+    case '[':                   /* zoom out */
+      {
+        if (SMAP(snum))
+          {                     /* LR */
+            if (ncpLRMagFactor - 1 >= -5)
+              {
+                ncpLRMagFactor--;
+                cqsEffectPlay(teamEffects[Ships[snum].team].mag, 0, 0, 0);
+              }
+            else
+              mglBeep(MGL_BEEP_ERR);
+
+            setViewerScaling(ncpLRMagFactor, TRUE);
+          }
+        else
+          {
+            if (ncpSRMagFactor - 1 >= -5)
+              {
+                ncpSRMagFactor--;
+                cqsEffectPlay(teamEffects[Ships[snum].team].mag, 0, 0, 0);
+              }
+            else
+              mglBeep(MGL_BEEP_ERR);
+
+            setViewerScaling(ncpSRMagFactor, FALSE);
+          }
+      }
+      break;
+
+    case ']':                   /* zoom in */
+      {
+        if (SMAP(snum))
+          {                     /* LR */
+            if (ncpLRMagFactor + 1 <= 5)
+              {
+                ncpLRMagFactor++;
+                cqsEffectPlay(teamEffects[Ships[snum].team].mag, 0, 0, 0);
+              }
+            else
+              mglBeep(MGL_BEEP_ERR);
+
+            setViewerScaling(ncpLRMagFactor, TRUE);
+          }
+        else
+          {
+            if (ncpSRMagFactor + 1 <= 5)
+              {
+                ncpSRMagFactor++;
+                cqsEffectPlay(teamEffects[Ships[snum].team].mag, 0, 0, 0);
+              }
+            else
+              mglBeep(MGL_BEEP_ERR);
+
+            setViewerScaling(ncpSRMagFactor, FALSE);
+          }
+      }
+      break;
+
+    case TERM_REDRAW:			/* clear all the prompts */
+      clrPrompt(MSG_LIN1);
+      clrPrompt(MSG_LIN2);
+      clrPrompt(MSG_MSG);
+
+      /* reset the scaling factors */
+      ncpLRMagFactor = ncpSRMagFactor = 0;
+      setViewerScaling(ncpLRMagFactor, TRUE);
+      setViewerScaling(ncpSRMagFactor, FALSE);
+
+      break;
+
     case TERM_ABORT:
       nPlayBMenuInit();
       return NODE_OK;

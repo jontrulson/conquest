@@ -1356,7 +1356,7 @@ animation {
   animdef      "pulse-slow"
 }
 
-# a 'pulse' text effect for critical wep/eng.
+# negative energy barrier (neb)
 animation {
   name         "neb"
 }

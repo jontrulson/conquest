@@ -305,12 +305,13 @@ void display( int snum, int display_info )
 		    /* He's on the screen. */
 		    /* We can see him if one of the following is true: */
 
-		    /*  - We are not looking at our strategic map */
+		    /*  - We are not looking at our strategic map and
+                          the ship is within scanning distance */
 		    /*  - We're mutually at peace */
 		    /*  - Our team has scanned him and we're not self-war */
 		    /*  - He's within accurate scanning range */
 		    
-		    if ( ( ! lsmap ) ||
+		    if ( ( ! lsmap && SSCANDIST(i)) ||
 			( snum > 0 && !satwar(i, snum) ) ||
 			( snum > 0 && Ships[i].scanned[Ships[snum].team] && 
 			  !selfwar(snum) ) ||

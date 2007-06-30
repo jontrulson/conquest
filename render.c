@@ -788,9 +788,9 @@ void renderHud(int dostats)
       rxtime = frameTime;
     }
 
-  /* update althud stats data, if needed */
-  if (UserConf.AltHUD && (FPS != oldData.oldFPS || 
-      pingAvgMS != oldData.oldPingAvg || rxdiff != oldData.oldRxdiff))
+  /* update stats data, if needed */
+  if (FPS != oldData.oldFPS || 
+      pingAvgMS != oldData.oldPingAvg || rxdiff != oldData.oldRxdiff)
     {
       oldData.oldFPS = FPS;
       oldData.oldPingAvg = pingAvgMS;

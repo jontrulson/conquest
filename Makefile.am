@@ -12,11 +12,9 @@ CONQIMGDIR = $(CONQDATADIR)/img
 CONQSNDDIR = $(CONQDATADIR)/sound
 CONQDOCDIR = $(CONQDATADIR)/doc/conquest
 
-#if SNDCLIENT
-#SDL_LIBS=-lSDL_mixer -lSDL 
-#else
-#SDL_LIBS=
-#endif
+TEXTURESRC = $(DESTDIR)$(CONQSYSCONFDIR)/texturesrc
+CONQINITRC = $(DESTDIR)$(CONQSYSCONFDIR)/conqinitrc
+SOUNDRC    = $(DESTDIR)$(CONQSYSCONFDIR)/soundrc
 
 CONQDOCS = HISTORY README CONQINIT.TXT conqrule conqrule.easy
 
@@ -177,9 +175,8 @@ install-exec-hook:
 	then \
 		cp conqinitrc $(DESTDIR)$(CONQSYSCONFDIR)/conqinitrc; \
 	fi
-	chgrp $(CONQGROUP) $(DESTDIR)$(CONQSYSCONFDIR)/*rc
-	chmod 664 $(DESTDIR)$(CONQSYSCONFDIR)/*rc
-	chmod 755 $(prefix) $(DESTDIR)$(datadir)
+	chgrp $(CONQGROUP) $(TEXTURESRC) $(CONQINITRC) $(SOUNDRC) 
+	chmod 664 $(TEXTURESRC) $(CONQINITRC) $(SOUNDRC)
 	chgrp $(CONQGROUP) $(DESTDIR)$(bindir)/conqoper$(EXEEXT) \
 		$(DESTDIR)$(libexecdir)/conqdriv$(EXEEXT) \
 		$(DESTDIR)$(bindir)/conquestd$(EXEEXT)
