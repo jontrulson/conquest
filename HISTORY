@@ -33,6 +33,8 @@
   - when quitting from the main menu, or in the CP via ^\ , stop all
     music and FX channels before leaving to avoid stuttering audio.
 
+  - added warp2 (background warp) textures from Cat (with some slight
+    changes).
 
 8.2b (devel) 06/04/2007
 

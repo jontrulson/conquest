@@ -437,6 +437,11 @@ texture {
 }
 
 texture {
+  name         "shipF-warp2"
+  filename     "TOS-fwarp2"
+}
+
+texture {
   name         "shipF-warp-col"
   filename     ""  # we are only using this to store a color
   color        "ffd72d00"
@@ -721,9 +726,14 @@ texture {
 }
 
 texture {
+  name         "shipR-warp2"
+  filename     "TOS-rwarp2"
+}
+
+texture {
   name         "shipR-warp-col"
   filename     ""  # we are only using this to store a color
-  color        "ffbfbcbc"
+  color        "ff47b6a4"
 }
 
 texture {
@@ -1006,6 +1016,11 @@ texture {
 }
 
 texture {
+  name         "shipK-warp2"
+  filename     "TOS-kwarp2"
+}
+
+texture {
   name         "shipK-warp-col"
   filename     ""  # we are only using this to store a color
   color        "ffd72d00"
@@ -1279,9 +1294,14 @@ texture {
 }
 
 texture {
+  name         "shipO-warp2"
+  filename     "TOS-owarp2"
+}
+
+texture {
   name         "shipO-warp-col"
   filename     ""  # we are only using this to store a color
-  color        "ff9fefff"
+  color        "ff0f395a"
 }
 
 texture {

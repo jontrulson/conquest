@@ -48,6 +48,7 @@ typedef struct _glship {
   GLint     dial;             /* ships astrogator dial */
   GLint     dialp;            /* astrogator pointer */
   GLint     warp;             /* id of warp gauge */
+  GLint     warp2;            /* id of warp gauge background*/
   GLColor_t warpq_col;        /* the color of the warp indicator quad */
   GLint     ico_torp;         /* torpedo icon(s) */
 } GLShip_t;

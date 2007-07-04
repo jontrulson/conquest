@@ -32,10 +32,6 @@
 
 #include "cqsound.h"
 
-/*
- Cataboligne - multi lingual giant conquest title
-*/
-
 
 int _GLError(const char *funcname, const char *filename, int line)
 {
@@ -51,6 +47,10 @@ int _GLError(const char *funcname, const char *filename, int line)
 
   return rv;
 }
+
+/*
+ * Cataboligne - multi lingual giant conquest title
+ */
 
 void mglConqLogo(dspConfig_t *dsp, bool mult)
 {

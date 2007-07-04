@@ -333,7 +333,7 @@ void updateIconHudGeo(int snum)
   o.headl.w = ((o.xstatw / 6.0) * 1.5);
   o.headl.h = (o.head.h / 10.0) * 2.0;
 
-  /* warp tex and label */
+  /* warp tex and label, used for warp backgraound as well */
   o.warp.x = (o.xstatw / 6.0) * 3.0;
   o.warp.y = ty;
   o.warp.w = (o.xstatw / 6.0) * 3.0;
@@ -825,6 +825,19 @@ void renderHud(int dostats)
   glfRender(o.headl.x, o.headl.y, 0.0, o.headl.w, 
             o.headl.h, fontLargeTxf, dData.heading.heading, 
             NoColor, NULL, TRUE, FALSE, TRUE);
+
+  /* warp background */
+  /* kindof sucky to do this here, but since we are drawing a quad
+     sandwiched between two textures... */
+  glEnable(GL_TEXTURE_2D);
+  glEnable(GL_BLEND);
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+  drawIconHUDDecal(o.warp.x, o.warp.y, o.warp.w, o.warp.h,
+                   HUD_WARP2, 0xffffffff);
+
+  glDisable(GL_BLEND);
+  glDisable(GL_TEXTURE_2D);
 
   /* warp val */
   glfRender(o.warpl.x, o.warpl.y, 0.0, 

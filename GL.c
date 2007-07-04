@@ -514,6 +514,9 @@ static int initGLShips(void)
           snprintf(buffer, CQI_NAMELEN - 1, "%s-warp", shipPfx);
           GLShips[i][j].warp = _get_ship_texid(buffer);
 
+          snprintf(buffer, CQI_NAMELEN - 1, "%s-warp2", shipPfx);
+          GLShips[i][j].warp2 = _get_ship_texid(buffer);
+
           /* here we just want the color */
           snprintf(buffer, CQI_NAMELEN - 1, "%s-warp-col", shipPfx);
           if (_get_ship_texcolor(buffer, &GLShips[i][j].warpq_col) < 0)
@@ -542,6 +545,7 @@ static int initGLShips(void)
                 GLShips[i][j].dial &&
                 GLShips[i][j].dialp &&
                 GLShips[i][j].warp &&
+                GLShips[i][j].warp2 &&
                 GLShips[i][j].phas &&
                 GLShips[i][j].ico_cloak &&
                 GLShips[i][j].ico_torp &&
@@ -823,18 +827,21 @@ void drawIconHUDDecal(GLfloat rx, GLfloat ry, GLfloat w, GLfloat h,
     case HUD_WARP:   
       id = GLShips[steam][stype].warp;
       break;
+    case HUD_WARP2:   
+      id = GLShips[steam][stype].warp2;
+      break;
     case HUD_ICLOAK:   
       id = GLShips[steam][stype].ico_cloak;
       break;
     case HUD_IREPAIR:  
       id = GLShips[steam][stype].ico_repair;
-      break;
+     break;
     default:
       break;
     }
   
   glBindTexture(GL_TEXTURE_2D, id);
-
+  GLError();
   uiPutColor(icol);
 
   glBegin(GL_POLYGON);
