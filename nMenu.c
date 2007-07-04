@@ -29,6 +29,7 @@
 #include "nTeaml.h"
 #include "nOptions.h"
 #include "cqkeys.h"
+#include "cqsound.h"
 
 extern void processPacket(Unsgn8 *buf);
 
@@ -524,7 +525,12 @@ static int nMenuInput(int ch)
       break;
      
     case 'q':
+      /* first stop all music and effects */
+      cqsEffectStop(CQS_INVHANDLE, TRUE);
+      cqsMusicStop(TRUE);
+      
       return NODE_EXIT;
+
       break;                    /* NOTREACHED */
 
     }

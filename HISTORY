@@ -30,6 +30,9 @@
   - fix issue where in SR scan, but zoomed all the way out, you could
     see ships that you can't really see.  
 
+  - when quitting from the main menu, or in the CP via ^\ , stop all
+    music and FX channels before leaving to avoid stuttering audio.
+
 
 8.2b (devel) 06/04/2007
 

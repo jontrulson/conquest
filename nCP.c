@@ -2982,8 +2982,15 @@ static int nCPInput(int ch)
 
   ch = CQ_CHAR(ch) | CQ_FKEY(ch);
 
+                                /* Control-/ (INSTA-QUIT (tm)) */
   if (ch == 0x1c)
-    return NODE_EXIT;                  /* Control-/ (INSTA-QUIT (tm)) */
+    {
+      /* first stop all music and effects */
+      cqsEffectStop(CQS_INVHANDLE, TRUE);
+      cqsMusicStop(TRUE);
+      
+      return NODE_EXIT;
+    }
 
   if (state == S_REFITING && ch) /* if refitting, just que all chars */
     {
