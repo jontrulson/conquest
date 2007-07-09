@@ -38,6 +38,8 @@
 
 #include "conqinit.h"
 
+#include "tcpwrap.h"
+
 #define LISTEN_BACKLOG 5 /* # of requests we're willing to to queue */
 
 static Unsgn16 listenPort = CN_DFLT_PORT;
@@ -124,6 +126,8 @@ void checkMaster(void)
   struct hostent *hp;		/* result of host name lookup */
   struct timeval tv;
   fd_set readfds;
+  static const int optOn = 1;
+  int opt = optOn;
 
   signal(SIGCLD, SIG_IGN);	/* allow children to die */
 
@@ -164,6 +168,26 @@ void checkMaster(void)
       exit(1);
     }
   
+#if defined(SO_REUSEPORT)
+  /* set reuse port */
+  if (setsockopt(s, SOL_SOCKET, SO_REUSEPORT,
+                 (SSOType)&opt, sizeof(opt)) < 0) 
+    {
+      clog("NET: setsockopt SO_REUSEPORT: %s", strerror(errno));
+    }
+
+#endif 
+
+#if defined(SO_REUSEADDR)
+  /* set reuse address */
+  if (setsockopt(s, SOL_SOCKET, SO_REUSEADDR,
+                 (SSOType)&opt, sizeof(opt)) < 0) 
+    {
+      clog("NET: setsockopt SO_REUSEADDR: %s", 
+           strerror(errno));
+    }
+#endif
+
   /* bind the socket to the service port so we hear incoming
    * connections 
    */
@@ -213,12 +237,21 @@ void checkMaster(void)
       
           if ( fork() == 0 ) 
             {			/* child - client driver */
-              sInfo.sock = t;
-              pktSetNodelay(sInfo.sock);
-              memset(sInfo.remotehost, 0, MAXHOSTNAME);
-              getHostname(sInfo.sock, sInfo.remotehost, MAXHOSTNAME - 1);
-              
               clog("NET: forked client driver, pid = %d", getpid());
+              sInfo.sock = t;
+
+              memset(sInfo.remotehost, 0, MAXHOSTNAME);
+              getHostname(sInfo.sock, sInfo.remotehost, MAXHOSTNAME - 1); 
+              if (!tcpwCheckHostAccess(sInfo.remotehost))
+                {
+                  sendAck(sInfo.sock, PKT_TOCLIENT, PSEV_FATAL, PERR_UNSPEC,
+                          "Access Denied: You are not allowed to connect to this server.");
+                  close(t);
+                  exit(1);
+                }
+
+              pktSetNodelay(sInfo.sock);
+              
               return;
             }
           
@@ -454,16 +487,16 @@ int main(int argc, char *argv[])
 
   rndini( 0, 0 );		/* initialize random numbers */
   
-  clog("CONNECT: client %s\n", sInfo.remotehost);
+  clog("CONNECT: client %s", sInfo.remotehost);
 
   /* now we need to negotiate. */
   if (!hello())
     {
-      clog("conquestd: hello() failed\n");
+      clog("conquestd: hello() failed");
       exit(1);
     }
 
-  clog("CONNECT: client %s SUCCESS.\n", sInfo.remotehost);
+  clog("CONNECT: client %s SUCCESS.", sInfo.remotehost);
 
   Context.recmode = RECMODE_OFF; /* always */
 

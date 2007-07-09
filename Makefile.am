@@ -23,6 +23,9 @@ SOUNDS = sound/*.ogg
 TRC = *.trc
 SRC = *.src
 
+TCPW_H = tcpwrap.h
+TCPW_C = tcpwrap.c
+
 man6_MANS = conqdriv.man conqmetad.man conqoper.man conquest.man \
 	conquestd.man conquestsh.man conqai.man conqstrat.man \
 	conqinit.man conquestgl.man
@@ -117,9 +120,15 @@ conquest_LDADD = libUiCU.la libUi.la libconqclnt.la libconquest.la libconqinit.l
 conquestgl_SOURCES = conquestgl.c c_defs.h defs.h conqdef.h conqcom.h context.h
 conquestgl_LDADD = libUiGL.la libUi.la libconqclnt.la libconquest.la libcqsound.la libconqinit.la $(XLIBS) $(LEXLIB) $(YACCLIB)
 
+if TCPW
 conquestd_SOURCES = conquestd.c c_defs.h defs.h conqdef.h conqcom.h \
-	context.h conqnet.h 
-conquestd_LDADD = libconqserv.la libconquest.la libconqinit.la $(LEXLIB) $(YACCLIB) 
+	context.h conqnet.h $(TCPW_H) $(TCPW_C) 
+conquestd_LDADD = libconqserv.la libconquest.la libconqinit.la $(LEXLIB) $(YACCLIB) $(TCPWLIB) $(NSLLIB)
+else
+conquestd_SOURCES = conquestd.c c_defs.h defs.h conqdef.h conqcom.h \
+	context.h conqnet.h $(TCPW_H) 
+conquestd_LDADD = libconqserv.la libconquest.la libconqinit.la $(LEXLIB) $(YACCLIB)
+endif
 
 conqai_SOURCES = conqai_main.c c_defs.h defs.h conqdef.h conqcom.h \
                  context.h conqdata.h

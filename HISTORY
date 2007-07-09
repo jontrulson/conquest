@@ -8,17 +8,17 @@
          +--------------------------------------------------------+
 
                               Conquest HISTORY
-???
 
-6/30/2007
+8.2c (devel) 07/08/2007
 
   - bug report from Adam Sampson: 'make install' should not
     chgrp/chmod $(DESTDIR)$(CONQSYSCONFDIR)/*rc . Depending on where
     $(DESTDIR)$(CONQSYSCONFDIR) actually is (say, /etc) this can cause
     'issues' :)
 
-  - fix bug whereby statistics data (ALT-S) in conquestgl (FPS, RTT,
-    bandwidth) would not be shown unless althud was also enabled.
+  - fix bug whereby statistics data (ALT-S) in conquestgl (FPS, ping
+    RTT, bandwidth, etc) would not be shown unless althud was also
+    enabled.
 
   - clear all of the message/prompt lines when initting the CP node.
     If you self-destructed for example, then re-entered, you could
@@ -35,6 +35,13 @@
 
   - added warp2 (background warp) textures from Cat (with some slight
     changes).
+
+  - add tcp wrappers support to conquestd - not compiled in by
+    default.  You can enable by specifying '--enable-tcpwrappers' to
+    the configure command line.  You will need to have tcpd.h and
+    libwrap installed.  The daemon name (for your system hosts.allow
+    file) is 'conquestd'.
+
 
 8.2b (devel) 06/04/2007
 
@@ -187,7 +194,7 @@
        - moved doomsday_theme checks into nCP.c.
 
        - add beep sounds for alert, message, and error conditions.
-         The sounds aren't too bad, if you have better ones... :)  
+         No more X11 beeping :)  
 
        - hook up 'hit' effect.  If you take more then 5 points of
          damage, it will play.

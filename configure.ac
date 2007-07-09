@@ -28,6 +28,7 @@ dnl get the system type and set accordingly.  first init some defaults.
 
 GLCLIENT=""
 conquest_group=""
+
 AC_ARG_WITH(conquest-group,
   [  --with-conquest-group=groupname  The conquest group name (Default: conquest)],
   conquest_group="$withval", conquest_group="")
@@ -39,6 +40,10 @@ AC_ARG_ENABLE(gl,
 AC_ARG_ENABLE(sound,
   [  --disable-sound  Don't enable sound support.],
   SNDCLIENT="", SNDCLIENT="yes")
+
+AC_ARG_ENABLE(tcpwrappers,
+  [  --enable-tcpwrappers  Enable TCP Wrappers support.],
+  TCPW="yes", TCPW="")
 
 dnl can't have sound without gl
 if ! test -n "$GLCLIENT"
@@ -168,6 +173,25 @@ AC_CHECK_HEADERS(stdint.h dirent.h crypt.h)
 
 AC_CHECK_HEADERS(GL/glut.h GL/gl.h GL/glu.h, :, GLCLIENT=""; SNDCLIENT="")
 
+dnl tcpd checks.  What a pain in the ass.
+AC_CHECK_HEADERS(tcpd.h, :, TCPW="")
+
+NSLLIB=""
+AC_CHECK_LIB(nsl, yp_get_default_domain, NSLLIB="-lnsl")
+TCPWLIB=""
+olibs="$LIBS"
+LIBS="$olibs $NSLLIB"
+AC_CHECK_LIB(wrap, hosts_ctl, TCPWLIB="-lwrap")
+LIBS="$olibs"
+
+if test -n "$TCPW"
+then
+  CONQ_CFLAGS="$CONQ_CFLAGS -DHAVE_TCPW"
+  AC_SUBST(TCPWLIB)
+  AC_SUBST(NSLLIB)
+fi
+
+
 dnl Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
 AC_TYPE_SIZE_T
@@ -219,6 +243,8 @@ fi
 
 AM_CONDITIONAL(GLCLIENT, test $GLCLIENT)
 AM_CONDITIONAL(SNDCLIENT, test $SNDCLIENT)
+AM_CONDITIONAL(TCPW, test $TCPW)
+
 
 AC_CONFIG_FILES([Makefile])
 AC_OUTPUT
@@ -236,6 +262,13 @@ then
         echo "### SDL sound support is disabled"
 else
         echo "### SDL sound support is enabled"
+fi
+
+if ! test -n "$TCPW"
+then
+        echo "### TCP Wrappers support is disabled"
+else
+        echo "### TCP Wrappers support is enabled"
 fi
 
 

@@ -158,10 +158,20 @@ am_conquest_OBJECTS = conquest.$(OBJEXT) conqreplay.$(OBJEXT)
 conquest_OBJECTS = $(am_conquest_OBJECTS)
 conquest_DEPENDENCIES = libUiCU.la libUi.la libconqclnt.la \
 	libconquest.la libconqinit.la $(am__DEPENDENCIES_1)
-am_conquestd_OBJECTS = conquestd.$(OBJEXT)
+am__conquestd_SOURCES_DIST = conquestd.c c_defs.h defs.h conqdef.h \
+	conqcom.h context.h conqnet.h tcpwrap.h tcpwrap.c
+am__objects_1 =
+am__objects_2 = tcpwrap.$(OBJEXT)
+@TCPW_FALSE@am_conquestd_OBJECTS = conquestd.$(OBJEXT) \
+@TCPW_FALSE@	$(am__objects_1)
+@TCPW_TRUE@am_conquestd_OBJECTS = conquestd.$(OBJEXT) $(am__objects_1) \
+@TCPW_TRUE@	$(am__objects_2)
 conquestd_OBJECTS = $(am_conquestd_OBJECTS)
-conquestd_DEPENDENCIES = libconqserv.la libconquest.la libconqinit.la \
-	$(am__DEPENDENCIES_1)
+@TCPW_FALSE@conquestd_DEPENDENCIES = libconqserv.la libconquest.la \
+@TCPW_FALSE@	libconqinit.la $(am__DEPENDENCIES_1)
+@TCPW_TRUE@conquestd_DEPENDENCIES = libconqserv.la libconquest.la \
+@TCPW_TRUE@	libconqinit.la $(am__DEPENDENCIES_1) \
+@TCPW_TRUE@	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
 am_conquestgl_OBJECTS = conquestgl.$(OBJEXT)
 conquestgl_OBJECTS = $(am_conquestgl_OBJECTS)
 am__DEPENDENCIES_2 = $(am__DEPENDENCIES_1)
@@ -202,8 +212,8 @@ DIST_SOURCES = $(libUi_la_SOURCES) $(libUiCU_la_SOURCES) \
 	$(libconquest_la_SOURCES) $(libcqsound_la_SOURCES) \
 	$(conqai_SOURCES) $(conqdriv_SOURCES) $(conqinit_SOURCES) \
 	$(conqmetad_SOURCES) $(conqoper_SOURCES) $(conqstrat_SOURCES) \
-	$(conquest_SOURCES) $(conquestd_SOURCES) $(conquestgl_SOURCES) \
-	$(conquestsh_SOURCES)
+	$(conquest_SOURCES) $(am__conquestd_SOURCES_DIST) \
+	$(conquestgl_SOURCES) $(conquestsh_SOURCES)
 man6dir = $(mandir)/man6
 NROFF = nroff
 MANS = $(man6_MANS)
@@ -272,6 +282,7 @@ LIBTOOL = @LIBTOOL@
 LN_S = @LN_S@
 LTLIBOBJS = @LTLIBOBJS@
 MAKEINFO = @MAKEINFO@
+NSLLIB = @NSLLIB@
 OBJEXT = @OBJEXT@
 PACKAGE = @PACKAGE@
 PACKAGE_BUGREPORT = @PACKAGE_BUGREPORT@
@@ -289,6 +300,9 @@ SHELL = @SHELL@
 SNDCLIENT_FALSE = @SNDCLIENT_FALSE@
 SNDCLIENT_TRUE = @SNDCLIENT_TRUE@
 STRIP = @STRIP@
+TCPWLIB = @TCPWLIB@
+TCPW_FALSE = @TCPW_FALSE@
+TCPW_TRUE = @TCPW_TRUE@
 VERSION = @VERSION@
 X_CFLAGS = @X_CFLAGS@
 X_EXTRA_LIBS = @X_EXTRA_LIBS@
@@ -358,6 +372,8 @@ IMAGES = img/*.tga img/*.txf
 SOUNDS = sound/*.ogg 
 TRC = *.trc
 SRC = *.src
+TCPW_H = tcpwrap.h
+TCPW_C = tcpwrap.c
 man6_MANS = conqdriv.man conqmetad.man conqoper.man conquest.man \
 	conquestd.man conquestsh.man conqai.man conqstrat.man \
 	conqinit.man conquestgl.man
@@ -424,10 +440,14 @@ conquest_SOURCES = conquest.c c_defs.h defs.h conqdef.h conqcom.h context.h \
 conquest_LDADD = libUiCU.la libUi.la libconqclnt.la libconquest.la libconqinit.la $(LEXLIB) $(YACCLIB)
 conquestgl_SOURCES = conquestgl.c c_defs.h defs.h conqdef.h conqcom.h context.h
 conquestgl_LDADD = libUiGL.la libUi.la libconqclnt.la libconquest.la libcqsound.la libconqinit.la $(XLIBS) $(LEXLIB) $(YACCLIB)
-conquestd_SOURCES = conquestd.c c_defs.h defs.h conqdef.h conqcom.h \
-	context.h conqnet.h 
+@TCPW_FALSE@conquestd_SOURCES = conquestd.c c_defs.h defs.h conqdef.h conqcom.h \
+@TCPW_FALSE@	context.h conqnet.h $(TCPW_H) 
 
-conquestd_LDADD = libconqserv.la libconquest.la libconqinit.la $(LEXLIB) $(YACCLIB) 
+@TCPW_TRUE@conquestd_SOURCES = conquestd.c c_defs.h defs.h conqdef.h conqcom.h \
+@TCPW_TRUE@	context.h conqnet.h $(TCPW_H) $(TCPW_C) 
+
+@TCPW_FALSE@conquestd_LDADD = libconqserv.la libconquest.la libconqinit.la $(LEXLIB) $(YACCLIB)
+@TCPW_TRUE@conquestd_LDADD = libconqserv.la libconquest.la libconqinit.la $(LEXLIB) $(YACCLIB) $(TCPWLIB) $(NSLLIB)
 conqai_SOURCES = conqai_main.c c_defs.h defs.h conqdef.h conqcom.h \
                  context.h conqdata.h
 
@@ -725,6 +745,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/server.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/servercmd.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/serverpkt.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tcpwrap.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/texfont.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/udp.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/uimisc.Plo@am__quote@

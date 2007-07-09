@@ -772,6 +772,22 @@ int clientHello(char *clientname)
     return FALSE;
   }
 
+  /* we only get this if there's problem (server denied access, usually) */
+  if (pkttype == SP_ACKMSG || pkttype == SP_ACK)
+    {
+      if (pkttype == SP_ACKMSG)
+        {
+          sackmsg = (spAckMsg_t *)buf;
+          if (sackmsg->txt)
+            {
+              clog("clientHello: %s '%s'",
+                   psev2String(sackmsg->severity),
+                   sackmsg->txt);
+            }
+        }
+      return FALSE;
+    }
+
   if (pkttype != SP_HELLO)
   {
     clog("clientHello: read server hello: wrong packet type %d\n", pkttype);

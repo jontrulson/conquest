@@ -55,7 +55,9 @@ int udpOpen(int port, struct sockaddr_in* addr)
     close(fd);
     return -1;
   }
-#elif defined(SO_REUSEADDR)
+#endif
+
+#if defined(SO_REUSEADDR)
   /* set reuse address */
   opt = optOn;
   if (setsockopt(fd, SOL_SOCKET, SO_REUSEADDR,
