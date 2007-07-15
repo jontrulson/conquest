@@ -16,8 +16,11 @@
 #include <tcpd.h>
 #include "tcpwrap.h"
 
-extern int allow_severity;
-extern int deny_severity;
+int allow_severity;
+int deny_severity;
+
+extern int hosts_ctl(char *daemon, char *client_name, char *client_addr,
+                     char *client_user);
 
 int tcpwCheckHostAccess(char *remotehost)
 {
@@ -26,11 +29,11 @@ int tcpwCheckHostAccess(char *remotehost)
   if (NOT_INADDR(remotehost))
     {
       allowed = hosts_ctl(TCPW_DAEMON, remotehost, 
-                           STRING_UNKNOWN, STRING_UNKNOWN);
+                          "", STRING_UNKNOWN);
     }
   else
     {
-      allowed = hosts_ctl(TCPW_DAEMON, STRING_UNKNOWN, 
+      allowed = hosts_ctl(TCPW_DAEMON, "", 
                            remotehost, STRING_UNKNOWN);
     }
   
