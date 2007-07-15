@@ -841,7 +841,6 @@ void drawIconHUDDecal(GLfloat rx, GLfloat ry, GLfloat w, GLfloat h,
     }
   
   glBindTexture(GL_TEXTURE_2D, id);
-  GLError();
   uiPutColor(icol);
 
   glBegin(GL_POLYGON);
@@ -949,14 +948,11 @@ void drawLine(GLfloat x, GLfloat y, GLfloat len, GLfloat lw)
 
   glLineWidth(lw);
 
-  GLError();
-
   glBegin(GL_LINES);
   glVertex3f(x, y, 0.0); /* ul */
   glVertex3f(x + len, y, 0.0); /* ur */
   glEnd();
 
-  GLError();
   return;
 }
 
@@ -972,8 +968,6 @@ void drawLineBox(GLfloat x, GLfloat y,
 
   glLineWidth(lw);
 
-  GLError();
-
   glBegin(GL_LINE_LOOP);
   uiPutColor(color);
   glVertex3f(x, y, 0.0); /* ul */
@@ -982,7 +976,6 @@ void drawLineBox(GLfloat x, GLfloat y,
   glVertex3f(x, y + h, 0.0); /* ll */
   glEnd();
 
-  GLError();
   return;
 }
 
@@ -1308,7 +1301,6 @@ void uiDrawPlanet( GLfloat x, GLfloat y, int pnum, int scale,
   glEnable(GL_TEXTURE_2D); 
 
   glBindTexture(GL_TEXTURE_2D, GLPlanets[pnum - 1].id);
-  GLError();
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
   glEnable(GL_BLEND);
   
@@ -1954,45 +1946,97 @@ int uiGLInit(int *argc, char **argv)
 static void
 _print_gl_info(void)
 {
-#if defined(DEBUG_GL)
-
   struct token_name {
     GLuint count;
     GLenum token;
     const char *name;
   };
   static const struct token_name limits[] = {
+#if defined(GL_MAX_ATTRIB_STACK_DEPTH)
     { 1, GL_MAX_ATTRIB_STACK_DEPTH, "GL_MAX_ATTRIB_STACK_DEPTH" },
+#endif
+#if defined(GL_MAX_CLIENT_ATTRIB_STACK_DEPTH)
     { 1, GL_MAX_CLIENT_ATTRIB_STACK_DEPTH, "GL_MAX_CLIENT_ATTRIB_STACK_DEPTH" },
+#endif
+#if defined(GL_MAX_CLIP_PLANES)
     { 1, GL_MAX_CLIP_PLANES, "GL_MAX_CLIP_PLANES" },
+#endif
+#if defined(GL_MAX_COLOR_MATRIX_STACK_DEPTH)
     { 1, GL_MAX_COLOR_MATRIX_STACK_DEPTH, "GL_MAX_COLOR_MATRIX_STACK_DEPTH" },
+#endif
+#if defined(GL_MAX_ELEMENTS_VERTICES)
     { 1, GL_MAX_ELEMENTS_VERTICES, "GL_MAX_ELEMENTS_VERTICES" },
+#endif
+#if defined(GL_MAX_ELEMENTS_INDICES)
     { 1, GL_MAX_ELEMENTS_INDICES, "GL_MAX_ELEMENTS_INDICES" },
+#endif
+#if defined(GL_MAX_EVAL_ORDER)
     { 1, GL_MAX_EVAL_ORDER, "GL_MAX_EVAL_ORDER" },
+#endif
+#if defined(GL_MAX_LIGHTS)
     { 1, GL_MAX_LIGHTS, "GL_MAX_LIGHTS" },
+#endif
+#if defined(GL_MAX_LIST_NESTING)
     { 1, GL_MAX_LIST_NESTING, "GL_MAX_LIST_NESTING" },
+#endif
+#if defined(GL_MAX_MODELVIEW_STACK_DEPTH)
     { 1, GL_MAX_MODELVIEW_STACK_DEPTH, "GL_MAX_MODELVIEW_STACK_DEPTH" },
+#endif
+#if defined(GL_MAX_NAME_STACK_DEPTH)
     { 1, GL_MAX_NAME_STACK_DEPTH, "GL_MAX_NAME_STACK_DEPTH" },
+#endif
+#if defined(GL_MAX_PIXEL_MAP_TABLE)
     { 1, GL_MAX_PIXEL_MAP_TABLE, "GL_MAX_PIXEL_MAP_TABLE" },
+#endif
+#if defined(GL_MAX_PROJECTION_STACK_DEPTH)
     { 1, GL_MAX_PROJECTION_STACK_DEPTH, "GL_MAX_PROJECTION_STACK_DEPTH" },
+#endif
+#if defined(GL_MAX_TEXTURE_STACK_DEPTH)
     { 1, GL_MAX_TEXTURE_STACK_DEPTH, "GL_MAX_TEXTURE_STACK_DEPTH" },
+#endif
+#if defined(GL_MAX_TEXTURE_SIZE)
     { 1, GL_MAX_TEXTURE_SIZE, "GL_MAX_TEXTURE_SIZE" },
+#endif
+#if defined(GL_MAX_3D_TEXTURE_SIZE)
     { 1, GL_MAX_3D_TEXTURE_SIZE, "GL_MAX_3D_TEXTURE_SIZE" },
+#endif
+#if defined(GL_MAX_CUBE_MAP_TEXTURE_SIZE_ARB)
     { 1, GL_MAX_CUBE_MAP_TEXTURE_SIZE_ARB, "GL_MAX_CUBE_MAP_TEXTURE_SIZE_ARB" },
+#endif
+#if defined(GL_MAX_RECTANGLE_TEXTURE_SIZE_NV)
     { 1, GL_MAX_RECTANGLE_TEXTURE_SIZE_NV, "GL_MAX_RECTANGLE_TEXTURE_SIZE_NV" },
+#endif
+#if defined(GL_NUM_COMPRESSED_TEXTURE_FORMATS_ARB)
     { 1, GL_NUM_COMPRESSED_TEXTURE_FORMATS_ARB, "GL_NUM_COMPRESSED_TEXTURE_FORMATS_ARB" },
+#endif
+#if defined(GL_MAX_TEXTURE_UNITS_ARB)
     { 1, GL_MAX_TEXTURE_UNITS_ARB, "GL_MAX_TEXTURE_UNITS_ARB" },
+#endif
+#if defined(GL_MAX_TEXTURE_LOD_BIAS_EXT)
     { 1, GL_MAX_TEXTURE_LOD_BIAS_EXT, "GL_MAX_TEXTURE_LOD_BIAS_EXT" },
+#endif
+#if defined(GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT)
     { 1, GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, "GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT" },
+#endif
+#if defined(GL_MAX_VIEWPORT_DIMS)
     { 2, GL_MAX_VIEWPORT_DIMS, "GL_MAX_VIEWPORT_DIMS" },
+#endif
+#if defined(GL_ALIASED_LINE_WIDTH_RANGE)
     { 2, GL_ALIASED_LINE_WIDTH_RANGE, "GL_ALIASED_LINE_WIDTH_RANGE" },
+#endif
+#if defined(GL_SMOOTH_LINE_WIDTH_RANGE)
     { 2, GL_SMOOTH_LINE_WIDTH_RANGE, "GL_SMOOTH_LINE_WIDTH_RANGE" },
+#endif
+#if defined(GL_ALIASED_POINT_SIZE_RANGE)
     { 2, GL_ALIASED_POINT_SIZE_RANGE, "GL_ALIASED_POINT_SIZE_RANGE" },
+#endif
+#if defined(GL_SMOOTH_POINT_SIZE_RANGE)
     { 2, GL_SMOOTH_POINT_SIZE_RANGE, "GL_SMOOTH_POINT_SIZE_RANGE" },
+#endif
     { 0, (GLenum) 0, NULL }
   };
+
   GLint i, max[2];
-#endif /* DEBUG_GL */
   const char *glVendor   = (const char *) glGetString(GL_VENDOR);
   const char *glRenderer = (const char *) glGetString(GL_RENDERER);
   const char *glVersion  = (const char *) glGetString(GL_VERSION);
@@ -2001,7 +2045,6 @@ _print_gl_info(void)
   clog("graphicsInit: OpenGL Renderer:    %s", glRenderer);
   clog("graphicsInit: OpenGL Version:     %s", glVersion);
 
-#if defined(DEBUG_GL)
   if (cqDebug)
     {
       clog("graphicsInit: OpenGL limits:");
@@ -2018,7 +2061,6 @@ _print_gl_info(void)
             }
         }
     }
-#endif /* DEBUG_GL */
 
   return;
 }
@@ -2030,7 +2072,6 @@ void graphicsInit(void)
 
   glShadeModel(GL_SMOOTH);
   glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
-  
 
   _print_gl_info();
 
@@ -2398,7 +2439,6 @@ drawShip(GLfloat x, GLfloat y, GLfloat angle, char ch, int snum, int color,
       glEnable(GL_TEXTURE_2D); 
 
       glBindTexture(GL_TEXTURE_2D, GLShips[steam][stype].phas);
-      GLError();
       glBegin(GL_POLYGON);
       
       glTexCoord2f(1.0f, 0.0f);
@@ -2438,7 +2478,6 @@ drawShip(GLfloat x, GLfloat y, GLfloat angle, char ch, int snum, int color,
       
       glBindTexture(GL_TEXTURE_2D, GLShips[steam][stype].sh);
 
-      GLError();
 
       /* standard sh graphic */
       uiPutColor(_get_sh_color(Ships[snum].shields));
@@ -2457,7 +2496,6 @@ drawShip(GLfloat x, GLfloat y, GLfloat angle, char ch, int snum, int color,
       glVertex3f(-size, size, z); /* ul */
       
       glEnd();
-      GLError();
 
       glDisable(GL_TEXTURE_2D);
       glPopMatrix();
@@ -2469,8 +2507,6 @@ drawShip(GLfloat x, GLfloat y, GLfloat angle, char ch, int snum, int color,
   if (ch == '~')
     alpha = 0.4;		/* semi-transparent */
 
-  GLError();
-  
 #if 0 && defined( DEBUG_GL )
   clog("DRAWSHIP(%s) x = %.1f, y = %.1f, ang = %.1f\n", buf, x, y, angle);
 #endif
@@ -2636,8 +2672,6 @@ void drawDoomsday(GLfloat x, GLfloat y, GLfloat dangle, GLfloat scale)
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
   glEnable(GL_BLEND);
 
-  GLError();
-    
 #ifdef DEBUG
   clog("DRAWDOOMSDAY(%s) x = %.1f, y = %.1f, ang = %.1f\n", buf, x, y, dangle);
 #endif
@@ -2676,7 +2710,6 @@ void drawDoomsday(GLfloat x, GLfloat y, GLfloat dangle, GLfloat scale)
       
       glEnable(GL_TEXTURE_2D);
       glBindTexture(GL_TEXTURE_2D, GLDoomsday.beamid);
-      GLError();
       
       glColor4f(GLDoomsday.beamcol.r, 
                 GLDoomsday.beamcol.g,
@@ -3157,7 +3190,6 @@ void drawViewerBG(int snum, int dovbg)
       glBindTexture(GL_TEXTURE_2D, 
                     GLShips[Ships[snum].team][Ships[snum].shiptype].tac);
 
-      GLError();
       glColor4f(1.0, 1.0, 1.0, UserConf.DoTacShade/100.0);
 
       
@@ -3681,10 +3713,10 @@ static int loadGLTextures()
               
               glGenTextures(1, &curTexture.id);   /* create the texture */
               glBindTexture(GL_TEXTURE_2D, curTexture.id);
+              GLError();
               
               curTexture.w = texti->width;
               curTexture.h = texti->height;
-              GLError();
               /* use linear filtering */
               glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
               glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
