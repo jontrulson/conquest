@@ -36,11 +36,12 @@
   - added warp2 (background warp) textures from Cat (with some slight
     changes).
 
-  - add tcp wrappers support to conquestd - not compiled in by
-    default.  You can enable by specifying '--enable-tcpwrappers' to
-    the configure command line.  You will need to have tcpd.h and
-    libwrap installed.  The daemon name (for your system hosts.allow
-    file) is 'conquestd'.
+  - add tcp wrappers support to conquestd and conqmetad - not compiled
+    in by default.  You can enable by specifying
+    '--enable-tcpwrappers' to the configure command line.  You will
+    need to have tcpd.h and libwrap installed.  The daemon name (for
+    your system hosts.allow file) is 'conquestd' and 'conqmetad'
+    respectively. 
 
 
 8.2b (devel) 06/04/2007

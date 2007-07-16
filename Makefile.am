@@ -149,8 +149,13 @@ conqinit_LDADD = libconquest.la libconqinit.la $(LEXLIB) $(YACCLIB)
 
 conquestsh_SOURCES = conquestsh.c
 
-conqmetad_SOURCES = conqmetad.c meta.h
-conqmetad_LDADD = libconquest.la libconqinit.la $(LEXLIB) $(YACCLIB)
+if TCPW
+conqmetad_SOURCES = conqmetad.c meta.h $(TCPW_H) $(TCPW_C) 
+conqmetad_LDADD = libconquest.la libconqinit.la $(LEXLIB) $(YACCLIB) $(TCPWLIB) $(NSLLIB)
+else
+conqmetad_SOURCES = conqmetad.c meta.h $(TCPW_H) 
+conqmetad_LDADD = libconquest.la libconqinit.la $(LEXLIB) $(YACCLIB) 
+endif
 
 # we install conqinitrc in the intall-exec-hook, so that we only install
 #  conqinitrc if it does not already exist.

@@ -242,7 +242,8 @@ void checkMaster(void)
 
               memset(sInfo.remotehost, 0, MAXHOSTNAME);
               getHostname(sInfo.sock, sInfo.remotehost, MAXHOSTNAME - 1); 
-              if (!tcpwCheckHostAccess(sInfo.remotehost))
+              if (!tcpwCheckHostAccess(TCPW_DAEMON_CONQUESTD, 
+                                       sInfo.remotehost))
                 {
                   sendAck(sInfo.sock, PKT_TOCLIENT, PSEV_FATAL, PERR_UNSPEC,
                           "Access Denied: You are not allowed to connect to this server.");

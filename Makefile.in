@@ -142,10 +142,19 @@ am_conqinit_OBJECTS = conqinit.$(OBJEXT)
 conqinit_OBJECTS = $(am_conqinit_OBJECTS)
 conqinit_DEPENDENCIES = libconquest.la libconqinit.la \
 	$(am__DEPENDENCIES_1)
-am_conqmetad_OBJECTS = conqmetad.$(OBJEXT)
+am__conqmetad_SOURCES_DIST = conqmetad.c meta.h tcpwrap.h tcpwrap.c
+am__objects_1 =
+am__objects_2 = tcpwrap.$(OBJEXT)
+@TCPW_FALSE@am_conqmetad_OBJECTS = conqmetad.$(OBJEXT) \
+@TCPW_FALSE@	$(am__objects_1)
+@TCPW_TRUE@am_conqmetad_OBJECTS = conqmetad.$(OBJEXT) $(am__objects_1) \
+@TCPW_TRUE@	$(am__objects_2)
 conqmetad_OBJECTS = $(am_conqmetad_OBJECTS)
-conqmetad_DEPENDENCIES = libconquest.la libconqinit.la \
-	$(am__DEPENDENCIES_1)
+@TCPW_FALSE@conqmetad_DEPENDENCIES = libconquest.la libconqinit.la \
+@TCPW_FALSE@	$(am__DEPENDENCIES_1)
+@TCPW_TRUE@conqmetad_DEPENDENCIES = libconquest.la libconqinit.la \
+@TCPW_TRUE@	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
+@TCPW_TRUE@	$(am__DEPENDENCIES_1)
 am_conqoper_OBJECTS = conqoper.$(OBJEXT)
 conqoper_OBJECTS = $(am_conqoper_OBJECTS)
 conqoper_DEPENDENCIES = libUiCU.la libUi.la libconqclnt.la \
@@ -160,8 +169,6 @@ conquest_DEPENDENCIES = libUiCU.la libUi.la libconqclnt.la \
 	libconquest.la libconqinit.la $(am__DEPENDENCIES_1)
 am__conquestd_SOURCES_DIST = conquestd.c c_defs.h defs.h conqdef.h \
 	conqcom.h context.h conqnet.h tcpwrap.h tcpwrap.c
-am__objects_1 =
-am__objects_2 = tcpwrap.$(OBJEXT)
 @TCPW_FALSE@am_conquestd_OBJECTS = conquestd.$(OBJEXT) \
 @TCPW_FALSE@	$(am__objects_1)
 @TCPW_TRUE@am_conquestd_OBJECTS = conquestd.$(OBJEXT) $(am__objects_1) \
@@ -211,9 +218,10 @@ DIST_SOURCES = $(libUi_la_SOURCES) $(libUiCU_la_SOURCES) \
 	$(libconqinit_la_SOURCES) $(libconqserv_la_SOURCES) \
 	$(libconquest_la_SOURCES) $(libcqsound_la_SOURCES) \
 	$(conqai_SOURCES) $(conqdriv_SOURCES) $(conqinit_SOURCES) \
-	$(conqmetad_SOURCES) $(conqoper_SOURCES) $(conqstrat_SOURCES) \
-	$(conquest_SOURCES) $(am__conquestd_SOURCES_DIST) \
-	$(conquestgl_SOURCES) $(conquestsh_SOURCES)
+	$(am__conqmetad_SOURCES_DIST) $(conqoper_SOURCES) \
+	$(conqstrat_SOURCES) $(conquest_SOURCES) \
+	$(am__conquestd_SOURCES_DIST) $(conquestgl_SOURCES) \
+	$(conquestsh_SOURCES)
 man6dir = $(mandir)/man6
 NROFF = nroff
 MANS = $(man6_MANS)
@@ -461,8 +469,10 @@ conqstrat_LDADD = libconquest.la $(LEXLIB) $(YACCLIB)
 conqinit_SOURCES = conqinit.c conqinit.h 
 conqinit_LDADD = libconquest.la libconqinit.la $(LEXLIB) $(YACCLIB) 
 conquestsh_SOURCES = conquestsh.c
-conqmetad_SOURCES = conqmetad.c meta.h
-conqmetad_LDADD = libconquest.la libconqinit.la $(LEXLIB) $(YACCLIB)
+@TCPW_FALSE@conqmetad_SOURCES = conqmetad.c meta.h $(TCPW_H) 
+@TCPW_TRUE@conqmetad_SOURCES = conqmetad.c meta.h $(TCPW_H) $(TCPW_C) 
+@TCPW_FALSE@conqmetad_LDADD = libconquest.la libconqinit.la $(LEXLIB) $(YACCLIB) 
+@TCPW_TRUE@conqmetad_LDADD = libconquest.la libconqinit.la $(LEXLIB) $(YACCLIB) $(TCPWLIB) $(NSLLIB)
 
 # we install conqinitrc in the intall-exec-hook, so that we only install
 #  conqinitrc if it does not already exist.

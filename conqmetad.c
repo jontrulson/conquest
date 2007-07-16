@@ -20,6 +20,8 @@
 
 #include "meta.h"
 
+#include "tcpwrap.h"
+
 #define LISTEN_BACKLOG 5 /* # of requests we're willing to to queue */
 
 metaSRec_t metaServerList[META_MAXSERVERS];
@@ -334,6 +336,12 @@ void metaListen(void)
           
           hostbuf[CONF_SERVER_NAME_SZ - 1] = 0;
 
+          if (!tcpwCheckHostAccess(TCPW_DAEMON_CONQMETAD, hostbuf))
+            {
+              close(tc);
+              continue;
+            }
+
           metaProcList(tc, hostbuf);
           close(tc);
         }
@@ -361,6 +369,11 @@ void metaListen(void)
             }
 
           hostbuf[CONF_SERVER_NAME_SZ - 1] = 0;
+
+          if (!tcpwCheckHostAccess(TCPW_DAEMON_CONQMETAD, hostbuf))
+            {
+              continue;
+            }
 
           metaProcUpd(rbuf, rlen, hostbuf);
 

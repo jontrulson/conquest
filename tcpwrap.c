@@ -22,27 +22,27 @@ int deny_severity;
 extern int hosts_ctl(char *daemon, char *client_name, char *client_addr,
                      char *client_user);
 
-int tcpwCheckHostAccess(char *remotehost)
+int tcpwCheckHostAccess(char *daemon, char *remotehost)
 {
   int allowed = 0;
 
   if (NOT_INADDR(remotehost))
     {
-      allowed = hosts_ctl(TCPW_DAEMON, remotehost, 
+      allowed = hosts_ctl(daemon, remotehost, 
                           "", STRING_UNKNOWN);
     }
   else
     {
-      allowed = hosts_ctl(TCPW_DAEMON, "", 
-                           remotehost, STRING_UNKNOWN);
+      allowed = hosts_ctl(daemon, "", 
+                          remotehost, STRING_UNKNOWN);
     }
   
   if (!allowed)
-    clog("TCPW: %s: ACCESS DENIED",
-         remotehost);
+    clog("TCPW: %s: %s: ACCESS DENIED",
+         daemon, remotehost);
   else
-    clog("TCPW: %s: ACCESS GRANTED",
-         remotehost);
+    clog("TCPW: %s: %s: ACCESS GRANTED",
+         daemon, remotehost);
       
   return((allowed) ? TRUE : FALSE);
 
