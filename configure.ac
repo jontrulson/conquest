@@ -4,7 +4,7 @@ dnl
 dnl $Id$
 dnl
 
-AC_INIT([conquest],[8.2],[jon@radscan.com])
+AC_INIT([conquest],[8.3],[jon@radscan.com])
 AC_CONFIG_HEADER(config.h)
 
 dnl disable static libs by default

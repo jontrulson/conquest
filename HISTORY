@@ -9,7 +9,60 @@
 
                               Conquest HISTORY
 
-8.2c (devel) 07/08/2007
+8.3 (stable) 09/03/2007
+
+  - stable release.  We hope.  The main features for this release are: 
+
+  - Sound support. This version of conquest updates the GL client to
+    support sound via SDL and SDL_mixer.  A wide variety of effects
+    and sounds are now provided.  No more of that insipid X11 beeping.
+
+    Cat provided the original patch and samples adding this support,
+    though it was completely rewritten using a new internal cqs* API
+    within conquest, and is configurable via CQI config files (soundrc).
+
+    The conquest distribution includes the sounds used for the
+    effects.
+
+    An optional musicpak tarball is available seperately, due to it's
+    size.  To use it, simply unpack the musicpak tarball into your
+    ~/.conquest/ directory.
+
+    To use sound support, you must have SDL and SDL_Mixer libraries
+    and headers.  
+
+  - The ability to zoom in and out in SR/LR scan was added to the GL
+    client, based loosely on a patch from Cat.  You can zoom in or out
+    in +/- 5 steps (magfactors) in either LR or SR scan.
+
+  - In addition, several changes and improvements have taken place
+    regarding rendering in the GL client:
+
+    - The HUD is laid out a little differently (and more configurably)
+      via CQI.
+
+    - The VBG and NEB are rendered better (scaling and appearence).
+
+    - A large number of scaling bugs were fixed.
+
+    - A crosshair cursor is now used in the GL client.    
+
+    - The torp pips have been relocated next to the phaser recharge
+      indicator.
+
+    - explosions are now visible in LR scan.
+
+    - several other fixes too minor to mention.
+
+  - optional TCP Wrappers support for conquestd and conqmetad.
+
+  - fixed some security (possble buffer overruns) in the client
+    (meta.c and CLIENTSTAT processing) reported by Luigi Auriemma.
+
+  The following is the more detailed history of the intervening devel
+  releases, if you really have nothing better to do than read it :).
+
+  8.2c (devel) 07/08/2007
 
   - bug report from Adam Sampson: 'make install' should not
     chgrp/chmod $(DESTDIR)$(CONQSYSCONFDIR)/*rc . Depending on where
@@ -44,7 +97,7 @@
     respectively. 
 
 
-8.2b (devel) 06/04/2007
+  8.2b (devel) 06/04/2007
 
   - 8.2b devel release
 
@@ -52,7 +105,7 @@
     delayms (if specified in the soundrc file) after the game started.
  
   - disable allocation of a depth buffer.  We aren't using it,
-    so... Might help those with 16bpp displays.
+    so...
 
   - added sound effect for torp alerts.
 
@@ -141,35 +194,34 @@
     (meta.c and CLIENTSTAT processing) reported by Luigi Auriemma.
 
 
-8.2a (devel) 11/27/2006
+  8.2a (devel) 11/27/2006
 
-       - Added sound support using SDL and the SDL_mixer API based on
-         patches and samples from Cataboligne.  
+  - Added sound support using SDL and the SDL_mixer API based on
+    patches and samples from Cataboligne.
 
-         This version supports sound effects for phasers, torps,
-         explosions, and pile of other things.
+    This version supports sound effects for phasers, torps,
+    explosions, and pile of other things.
 
-         In addition, an optional 'musicpak' tarball provides some
-         appropriate Conquest music to listen to during your campaign
-         of terror.
+    In addition, an optional 'musicpak' tarball provides some
+    appropriate Conquest music to listen to during your campaign of
+    terror.
 
-         The musicpak is located on the webpage with the source
-         tarball and can be installed by unpacking it into your
-         ~/.conquest/ directory.
+    The musicpak is located on the webpage with the source tarball and
+    can be installed by unpacking it into your ~/.conquest/ directory.
 
-         SDL and SDL_mixer development header files and libs are
-         required.  All sound effects and music are supplied in OGG
-         Vorbis (.ogg) format.  I believe all linux systems at least,
-         support OGG in their SDL implementation.    
+    SDL and SDL_mixer development header files and libs are required.
+    All sound effects and music are supplied in OGG Vorbis (.ogg)
+    format.  I believe all linux systems at least, support OGG in
+    their SDL implementation.
 
-         Sound is only supported in the OpenGL (conquestgl) client. 
+    Sound is only supported in the OpenGL (conquestgl) client. 
 
-         I have to say thanks again to Mr. Cataboligne - sound is a
-         definite improvment to the Conquest experience :)
+    I have to say thanks again to Mr. Cataboligne - sound is a
+    definite improvment to the Conquest experience :)
 
-       The following is a somewhat more detailed log of the sound
-       work.  You do not really need to read it unless you are curious
-       about the details :)
+    The following is a somewhat more detailed log of the sound work.
+    You do not really need to read it unless you are curious about the
+    details :)
 
        - Add option (-S) to disable sound in conquestgl.
 

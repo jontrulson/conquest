@@ -22,25 +22,24 @@ conqinit - a utility for the Conquest Init parser (CQI)
 <h2><a name='sect2' href='#toc2'>Description</a></h2>
 <p>
 <b>conqinit</b> can be used to test the parser, perform syntax
-checking on conqinitrc and texturesrc files, as well as to generate a texdata.h
-file based on texturesrc data, or an initdata.h file based on conqinitrc
-data. <p>
-CQI is a lex/yacc parser that is used by <b>Conquest</b> 8.1.2a or later for
-configuration of the planets and other general purpose data, and for the
-GL client <b>conquestgl</b>, for the specification of colors, textures, and animation
-definitions.  It is not used for user or system configuration options. <p>
-These
-(pre-generated) initdata.h and texdata.h files contain defaults for the planets
-and textures, compiled directly into conquest, in the event the respective
-conquestrc and texturesrc file could not be found or successfully read
-on startup.  End users should not generally generate these files.  Validated
-initdata.h and texdata.h files are supplied in the src distribution. <p>
-If you
-are modifying the conquestrc or texturesrc system files used by conquest,
-you should at least run conqinit on them to check for syntax or other validation
-errors.  If conquest (or conquestd) fails to properly load and parse the
-file at runtime, the built in internal defaults will be used and a warning
-message will be logged. 
+checking on conqinitrc and texturesrc files, as well as to generate initdata.h
+and sounddata.h header files containing compiled-in defaults. <p>
+CQI is a lex/yacc
+parser that is used by <b>Conquest</b> 8.1.2a or later for configuration of the
+planets and other general purpose data, and for the GL client <b>conquestgl</b>,
+for the specification of colors, textures, animation definitions, sound,
+and music. <p>
+These pre-generated header files (initdata.h, sounddata.h) contain
+defaults compiled directly into conquest, in the event the relevant CQI
+config file could not be opened or successfully read on startup. End users
+should not generate these files.  Validated header files are included with
+the src distribution. <p>
+If you are modifying one of the CQI config files,
+(conquestrc, soundrc, etc), you should at least run conqinit on them to
+check for syntax or other validation errors.  If conquest (or conquestd)
+fails to properly load and parse the file at runtime, the built in internal
+defaults will be used (when possible) and a warning message will be logged.
+ 
 <h2><a name='sect3' href='#toc3'>Options</a></h2>
 <p>
 
@@ -50,34 +49,39 @@ message will be logged.
 <dd>Read data from file &lt;file&gt;. </dd>
 
 <dt><b>-v </b> </dt>
-<dd>Be verbose
-about everything. </dd>
+<dd>Be verbose about everything.
+</dd>
 
 <dt><b>-d</b> </dt>
 <dd>Turns on alot of debugging. </dd>
 
+<dt><b>-s </b> </dt>
+<dd>Treat the input file as a file in soundrc
+format.  The default is to treat the file as if it were in conqinitrc format.
+</dd>
+
 <dt><b>-t </b> </dt>
-<dd>Treat the input file as
-a file in texturesrc format.  The default is to treat the file as if it
-were in conqinitrc format. </dd>
+<dd>Treat the input file as a file in texturesrc format.  The default is
+to treat the file as if it were in conqinitrc format. </dd>
 
 <dt><b>-h</b> </dt>
-<dd>Dump the parsed file out to stdout in initdata.h
-or texdata.h format  (depending on the <b>-t</b> option). </dd>
+<dd>Dump the parsed
+file out to stdout in initdata.h sounddata.h format  (depending on the presence
+of the <b>-s</b> option). </dd>
 
 <dt><b>-D</b> </dt>
-<dd>Dump the current universe
-to stdout in conqinitrc format. </dd>
+<dd>Dump the current universe to stdout in conqinitrc format.
+</dd>
 </dl>
 <p>
-        This option is sort of a hack.  It
-loads the current state of<br>
+        This option is sort of a hack.  It loads the current state of<br>
          the universe on the local machine and generates a conqinitrc<br>
          format file on stdout.  This file can be saved and made the<br>
          default conqinitrc for a system.<br>
  <p>
         If you do this, you will almost certainly want to edit the<br>
-         file and at least change the colors of the suns, and the sun's<br>
+         generated file and at least change the colors of the suns, and<br>
+         the sun's<br>
          randomized army counts.  Since this data is not currently<br>
          stored in the common block, conqinit tries to choose<br>
          reasonable defaults for them.  Make sure it actually did :)<br>
@@ -88,7 +92,8 @@ loads the current state of<br>
          the universe to a conqinitrc file, edit it if neccessary (to<br>
          clean up colors, etc).  <br>
  <p>
-        Then copy that file over the system's conqinitrc file.  From<br>
+        Then copy that file over the system's conqinitrc file (or email<br>
+         it to your friends :).  From<br>
          then on, whenever the planets are initialized (due to a<br>
          successful conquer, or the actions of an oper in conqoper),<br>
          your definitions will be used as the default planet<br>
