@@ -11,7 +11,7 @@
 
 8.3 (stable) 09/03/2007
 
-  - stable release.  We hope.  The main features for this release are: 
+  - 8.3 stable release.  We hope.  The main features for this release are: 
 
   - Sound support. This version of conquest updates the GL client to
     support sound via SDL and SDL_mixer.  A wide variety of effects
