@@ -7,6 +7,7 @@
  */
 
 #include "c_defs.h"
+#include "global.h"
 #include "config.h"
 
 #if defined(HAVE_TCPW) && defined(HAVE_TCPD_H) 
@@ -40,7 +41,7 @@ int tcpwCheckHostAccess(char *daemon, char *remotehost)
   if (!allowed)
     clog("TCPW: %s: %s: ACCESS DENIED",
          daemon, remotehost);
-  else
+  else if (cqDebug)
     clog("TCPW: %s: %s: ACCESS GRANTED",
          daemon, remotehost);
       
