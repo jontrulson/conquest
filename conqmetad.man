@@ -32,6 +32,9 @@ clients on the local host will be able to connect.
 .TP 8
 .B \-u <user>
 Run as user \fIuser\fP.  
+.TP 8
+.B \-v
+Be more verbose.  
 .SH "AUTHOR"
 Jon Trulson
 .SH "SEE ALSO"

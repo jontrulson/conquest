@@ -81,6 +81,7 @@ void printUsage()
   printf("   -M metaserver specify an alternate metaserver to contact\n");
   printf("   -N myname     explicitly specify server name 'myname' to metaserver\n");
   printf("   -u user       run as user 'user'.\n");
+  printf("   -v            be more verbose.\n");
   return;
 }
 
@@ -283,7 +284,7 @@ int main(int argc, char *argv[])
   sInfo.isMaster = FALSE;
   sInfo.isLoggedIn = FALSE;
 
-  while ((i = getopt(argc, argv, "dlp:u:mM:N:")) != EOF)    /* get command args */
+  while ((i = getopt(argc, argv, "dlp:u:mM:N:v")) != EOF)    /* get command args */
     switch (i)
       {
       case 'd':
@@ -312,6 +313,10 @@ int main(int argc, char *argv[])
 
       case 'N':
         myServerName = optarg;
+        break;
+
+      case 'v':
+        cqDebug++;
         break;
 
       default:

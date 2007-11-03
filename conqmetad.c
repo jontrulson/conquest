@@ -63,10 +63,11 @@ static void sortmetas( int mv[], int numentries )
 
 void printUsage()
 {
-  printf("Usage: conqmetad [ -d ] [ -l ] [ -u user ]\n");
+  printf("Usage: conqmetad [ -d ] [ -l ] [ -u user ] [ -v ] \n");
   printf("   -d            daemon mode\n");
   printf("   -l            listen for local connections only\n");
   printf("   -u user       run as user 'user'.\n");
+  printf("   -v            be more verbose.\n");
 
   return;
 }
@@ -396,7 +397,7 @@ int main(int argc, char *argv[])
 
   progName = argv[0];
 
-  while ((i = getopt(argc, argv, "dlp:u:")) != EOF)    /* get command args */
+  while ((i = getopt(argc, argv, "dlp:u:v")) != EOF)    /* get command args */
     switch (i)
       {
       case 'd':
@@ -414,6 +415,11 @@ int main(int argc, char *argv[])
       case 'u':
         myuidname = optarg;
         break;
+
+      case 'v':
+        cqDebug++;
+        break;
+
       default:
 	printUsage();
 	exit(1);

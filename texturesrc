@@ -1612,7 +1612,7 @@ animdef {
     loops      0           # runs forever
     delayms    10
 
-    deltas     0.002
+    deltas     0.002       # S texture coord
   }
 }
 

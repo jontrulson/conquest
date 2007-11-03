@@ -11,6 +11,8 @@
 
 ??? 10/05/2007
 
+  - add a '-v' verbose option to the clients.
+
   - tcpwrap.c: only log successful connections if verbose/debug is
     specified. 
 

@@ -44,6 +44,9 @@ that an Internet client would need to use to connect.
 Run as user \fIuser\fP.  This option is advised when running as root.
 It is generally not a good idea to run an Internet accessable game
 server as the root user :)  Only the root user can use this option.
+.TP 8
+.B \-v 
+Be a little more verbose.  
 .SH "OVERVIEW"
 .PP
 With version 8.0 of Conquest or better, a great deal of work has gone
