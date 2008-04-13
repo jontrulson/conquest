@@ -558,8 +558,8 @@ spPlanetLoc_t *spktPlanetLoc(Unsgn8 pnum, int rec, int force)
   int team = Ships[snum].team;
   static spPlanetLoc_t splanloc;
   real dx, dy;
-  static real px[NUMPLANETS] = {}; /* saved x/y */
-  static real py[NUMPLANETS] = {}; 
+  static real px[NUMPLANETS + 1] = {}; /* saved x/y */
+  static real py[NUMPLANETS + 1] = {}; 
   
   memset((void *)&splanloc, 0, sizeof(spPlanetLoc_t));
 
@@ -639,7 +639,7 @@ spPlanetLoc2_t *spktPlanetLoc2(Unsgn8 pnum, int rec, int force)
   static spPlanetLoc2_t splanloc2;
   Unsgn32 iternow = clbGetMillis(); /* we send the loc2 packets only every 5 secs */
   const Unsgn32 iterwait = 5000.0; /* ms */
-  static Unsgn32 tstart[NUMPLANETS] = {}; /* saved time deltas */
+  static Unsgn32 tstart[NUMPLANETS + 1] = {}; /* saved time deltas */
   int tooearly = FALSE;
   
   /* 
