@@ -89,7 +89,7 @@ int rbPut(ringBuffer_t *RB, Unsgn8 *buf, unsigned int len)
 }
 
 /* get or remove data from a ring buffer */
-int rbGet(ringBuffer_t *RB, Unsgn8 *buf, int len, int update)
+unsigned int rbGet(ringBuffer_t *RB, Unsgn8 *buf, unsigned int len, int update)
 {
   Unsgn8 *wptr = buf, *rptr;
   unsigned int rlen = len, tlen, ndata;
