@@ -693,7 +693,10 @@ int writePacket(int direction, int sock, Unsgn8 *packet)
 	}
     }
   else
-    clog("writePacket: invalid packet type %d\n", type);
+    {
+      clog("writePacket: invalid packet type %d\n", type);
+/*       abort(); */
+    }
 
   return(FALSE);
 }  

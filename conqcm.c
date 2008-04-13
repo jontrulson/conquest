@@ -43,7 +43,7 @@ static int fakeCommon = FALSE;	/* for the clients */
 #define map1d(thevarp, thetype, size) {  \
               thevarp = (thetype *) (cBasePtr + coff); \
               coff += (sizeof(thetype) * (size)); \
-	}
+}
 
 
 static void map_vars(void);

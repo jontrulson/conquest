@@ -314,22 +314,24 @@ char *semGetStatusStr(void)
   lastoptime = max(lastoptime, SemDS.sem_otime);
 #endif
 
-  if (semvals[LOCKMSG] != 0)	/* currently locked */
-    sprintf(mesgtxt, "*MesgCnt = %d(%d:%d)", ConqInfo->lockmesg, lastmsgpid, msgzcnt);
-  else
-    sprintf(mesgtxt, "MesgCnt = %d(%d:%d)", ConqInfo->lockmesg, lastmsgpid, msgzcnt);
+  snprintf(mesgtxt, 80 - 1, "%sMesgCnt = %d(%d:%d)", 
+           (semvals[LOCKMSG]) ? "*" : "",
+           ConqInfo->lockmesg, 
+           lastmsgpid, 
+           msgzcnt);
 
-  if (semvals[LOCKCMN] != 0)
-    sprintf(wordtxt, "*CmnCnt = %d(%d:%d)", ConqInfo->lockword, lastcmnpid, cmnzcnt);
-  else
-    sprintf(wordtxt, "CmnCnt = %d(%d:%d)", ConqInfo->lockword, lastcmnpid, cmnzcnt);
+  snprintf(wordtxt, 80 - 1, "%sCmnCnt = %d(%d:%d)", 
+           (semvals[LOCKCMN]) ? "*" : "",
+           ConqInfo->lockword, 
+           lastcmnpid, 
+           cmnzcnt);
 
   strcpy(stimebuffer, ctime(&lastoptime));
   strncpy(newtime, &stimebuffer[4], 15); /* get the interesting part */
 
 				/* now build the string */
 
-  sprintf(buf, "%s %s Last: %s",
+  snprintf(buf, 80 - 1, "%s %s Last: %s",
 	  mesgtxt,
 	  wordtxt,
 	  newtime);

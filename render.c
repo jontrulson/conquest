@@ -139,6 +139,13 @@ static struct {
 
 } o = {};
 
+/* FIXME - re-generate this... Pass the main rect (decal) as a rect
+   and pass decal1/2 as rects.. 
+
+   ie: pass the proper decal_sz, and the 'hw' decal representation as
+   args instead of 'global' tx,ty,tw,th - make it a friggin rect!
+*/
+
 /* a useful 'mapping' macros for the decals */
 #define MAPAREAX(_decalw, _decalh, _rect) \
         ( tx + (((_rect)->x / (_decalw) ) * tw) )
@@ -433,7 +440,7 @@ void updateIconHudGeo(int snum)
    *  one of those segments.
    */
 
-  /* tow is located in at the bottom left of the viewer area. */
+  /* tow is located at the bottom left of the viewer area. */
   o.tow.x = dConf.vX + ((dConf.vW / 8.0) * 1.0);
   o.tow.y = dConf.vY + (dConf.vH - ((dConf.vH / 20.0) * 2.0));
   o.tow.w = (dConf.vW / 8.0) * 1.0;

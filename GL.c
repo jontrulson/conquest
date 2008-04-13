@@ -716,6 +716,8 @@ int uiUpdateTorpDir(int snum, int tnum)
 }
 
 
+/* FIXME - implement a 'notify' interface for this kind of thing. */
+
 /* uiUpdatePlanet - this is called by the client when a packet that
    could change the appearance of a planet arrives.  Here, we load the
    GLPlanet struct for the planet, go through the process of

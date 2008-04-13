@@ -27,12 +27,6 @@
 #include "history.h"
 #include "robot.h"
 
-/* for mapping variables into the common block */
-#define map1d(thevarp, thetype, size) {  \
-              thevarp = (thetype *) (cBasePtr + coff); \
-              coff += (sizeof(thetype) * (size)); \
-}
-
 #define CMN_MODE 0660		/* mode of a new common block */
 
 
