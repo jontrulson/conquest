@@ -2,7 +2,7 @@
  *
  * $Id$
  *
- * Copyright 1999-2004 Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
+ * Copyright 1999-2008 Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
  ***********************************************************************/
 
 /**********************************************************************/
@@ -13,17 +13,21 @@
 /*                                                                    */
 /**********************************************************************/
 
-#ifndef IBUF_H
-#define IBUF_H
+#ifndef RB_H
+#define RB_H
 
 #include "datatypes.h"
 
-void iBufInit(void);
-int iBufCount(void);
-void iBufPut(char *thestr);
-void iBufPutc(unsigned int thechar);
-unsigned int iBufGetCh(void);
-int DoMacro(int fkey);
-int DoMouseMacro(int but, Unsgn32 mods, real mangle);
+typedef struct _ringBuffer {
+  unsigned int  ndata; /* data in the rb */
+  unsigned int  len;   /* length of RB */
+  Unsgn8        *rp, *wp;       /* r/w ptrs for ring */
+  Unsgn8        *data;          /* the buffer */
+} ringBuffer_t;
 
-#endif
+ringBuffer_t *rbCreate(unsigned int len);
+void          rbDestroy(ringBuffer_t *RB);
+int           rbPut(ringBuffer_t *RB, Unsgn8 *buf, unsigned int len);
+int           rbGet(ringBuffer_t *RB, Unsgn8 *buf, int len, int update);
+
+#endif /* RB_H */

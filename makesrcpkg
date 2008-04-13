@@ -58,7 +58,8 @@ FILELIST="ratfor.c cd2lb.h cd2lb.c iolb.h iolb.c conqlb.c
         cuclient.h conqlb.h udp.h udp.c initdata.h conqinit-yacc.y
         planinit.c textures.h conqinit.h conqinit.c conqinit-lex.l
         conqinitrc texturesrc anim.h anim.c CONQINIT.TXT cqmouse.h
-        cqsound.h cqsound.c sounddata.h soundrc tcpwrap.h tcpwrap.c"  
+        cqsound.h cqsound.c sounddata.h soundrc tcpwrap.h tcpwrap.c
+        rb.h rb.c"  
 
 IMAGES="img/*.tga img/*.txf"
 SOUNDS="sound/*.ogg"

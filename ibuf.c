@@ -22,19 +22,31 @@
 #include "global.h"
 #include "defs.h"
 #include "ibuf.h"
+#include "rb.h"
 
-/* the buffer */
-static unsigned int *rp, *wp;
-static int ndata;
-static unsigned int data[IBUFMAX];
+/* the input ringbuffer */
+static ringBuffer_t *ibufRB = NULL;
+
+/* we use the ringbuffer stuff in rb.c, however, the input
+ *  buffer is really a buffer of integers, so we hide all that here, since
+ *  the RB itself is byte oriented.
+ */
+
+/* convert the lengths into the 'real' lengths between the length we
+ *  care about here (integers) vs the RB length (bytes).
+ */
+#define I2RB_LEN(x)       ((x) * sizeof(unsigned int))
+#define RB2I_LEN(x)       ((x) / sizeof(unsigned int))
+
+/* size of input ringbuffer */
+#define IBUF_RBMAX 1024
+
 
 /* iBufInit - intialize the input buffer */
 
 void iBufInit(void)
 {
-  data[0] = 0;
-  rp = wp = data;
-  ndata = 0;
+  ibufRB = rbCreate(I2RB_LEN(IBUF_RBMAX));
 
   return;
 }
@@ -42,72 +54,10 @@ void iBufInit(void)
 
 int iBufCount(void)
 {
-  return ndata;
-}
-
-static int putRing(int *buf, int len)
-{
-  int left, wlen = len, i;
-  int *rptr = buf;
-
-  left = IBUFMAX - ndata; /* max space available */
-
-  /* a null buf means to simply return the space left */
-
-  if (!rptr)
-    return(left);
-
-  if (wlen > left)
-    wlen = left;
-
-  if (rptr != NULL)
-    {
-      for (i=0; i < wlen; i++, rptr++)
-        {
-          if ( wp >= (data + IBUFMAX) ) 
-            wp = data;
-
-          *wp = *rptr;
-          ndata++;
-	  wp++;
-        }
-    }
-
-  return(wlen);
-}
-
-
-static int getRing(int *buf, int len, int update)
-{
-  unsigned int *wptr = buf, *rptr = rp;
-  int rlen = len, tlen, numdata = ndata;
-
-  if (rlen > ndata)
-    rlen = ndata;
-
-  tlen = rlen;
-
-  while (rlen--)
-    {
-      if (rptr >= (data + IBUFMAX)) 
-        rptr = data;
-
-      if (wptr)                 /* NULL buf doesn't copy data - Pop */
-        {
-          *wptr = *rptr;
-          wptr++;
-        }
-      rptr++;
-      numdata--;
-    }
-
-  if (update)
-    {
-      rp = rptr;
-      ndata = numdata;
-    }
-
-  return(tlen);
+  if (ibufRB)
+    return RB2I_LEN(ibufRB->ndata);
+  else
+    return 0;
 }
 
 
@@ -117,13 +67,15 @@ void iBufPut(char *thestr)
 {
   int i;
   int n = strlen(thestr);
-  int idata[IBUFMAX];
+  int c;
 
-  /* cvt to int array */
+  /* cvt to int's and insert into rb */
   for (i=0; i<n; i++)
-    idata[i] = thestr[i] & 0xff;
-
-  putRing(idata, n);
+    {
+      c = thestr[i] & 0xff;
+      /* hopefully there is enough room, or... */
+      rbPut(ibufRB, (Unsgn8 *)&c, I2RB_LEN(1));
+    }
 
   return;
 }
@@ -132,7 +84,7 @@ void iBufPut(char *thestr)
 
 void iBufPutc(unsigned int thechar)
 {
-  putRing(&thechar, 1);
+  rbPut(ibufRB, (Unsgn8 *)&thechar, I2RB_LEN(1));
 
   return;
 }
@@ -142,16 +94,16 @@ void iBufPutc(unsigned int thechar)
 
 unsigned int iBufGetCh(void)
 {
-  static int c;
+  int c;
 
   if (!iBufCount())
     {
-      /*      clog("IBUF GETC EMPTY, returning 0\n");*/
-      return('\0');
+      return 0;
     }
-  getRing(&c, 1, TRUE);
 
-  return(c);
+  rbGet(ibufRB, (Unsgn8 *)&c, I2RB_LEN(1), TRUE);
+
+  return c;
 }
   
 /* DoMacro - stuff the buffer if an fkey pressed */

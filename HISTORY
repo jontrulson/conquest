@@ -9,7 +9,32 @@
 
                               Conquest HISTORY
 
-11/2/2007
+??? 4/12/2008
+
+  - correct some nasty off-by-one's (NUMPLANETS) in
+    serverpkt.c:spktPlanetLoc() and spktPlanetLoc2().  Depending on
+    your environment (OS, compiler, etc) your results could vary.  The
+    typical symptoms would be reports of invalid packet types or sizes
+    in the logs (client and/or server), and usually a rapid ship death
+    with a killed-by of "Nothing in particular".
+
+    Sorry about that - a couple of people had reported this problem,
+    but I had never seen it myself until building and running a server
+    under slackware 12 with a gcc 4.x compiler.  This is a server-only
+    bug, and all servers should be upgraded, whether or not your
+    clients have seen this problem, since it's certain that something
+    got corrupted :).
+
+  - implement a generic ringbuffer mechanism (rb.h, rb.c). Currently,
+    only ibuf (keyboard/macro handling) uses it, but in the future it
+    will also be used for network buffers when that code is reworked
+    to use non-blocking sockets.
+
+  - fix configure.ac to SUBST YFLAGS.  No idea why this is now needed
+    (perhaps the switch to AC_PROG_YACC in a previous release?).
+
+
+??? 11/2/2007
 
   - migrate svn repo to sourceforge page.
 

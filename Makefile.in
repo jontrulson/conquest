@@ -38,7 +38,6 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-target_triplet = @target@
 @GLCLIENT_FALSE@bin_PROGRAMS = conquest$(EXEEXT) conqai$(EXEEXT) \
 @GLCLIENT_FALSE@	conqoper$(EXEEXT) conqstrat$(EXEEXT) \
 @GLCLIENT_FALSE@	conquestd$(EXEEXT) conquestsh$(EXEEXT) \
@@ -118,7 +117,7 @@ libconquest_la_DEPENDENCIES = @LTLIBOBJS@
 am_libconquest_la_OBJECTS = conqai.lo ratfor.lo conqlb.lo rndlb.lo \
 	conqutil.lo conqcm.lo conqsvr42.lo global.lo ibuf.lo \
 	version.lo conf.lo sem.lo color.lo userauth.lo record.lo \
-	packet.lo meta.lo udp.lo
+	packet.lo meta.lo udp.lo rb.lo
 libconquest_la_OBJECTS = $(am_libconquest_la_OBJECTS)
 @GLCLIENT_FALSE@am_libconquest_la_rpath = -rpath $(libdir)
 @GLCLIENT_TRUE@am_libconquest_la_rpath = -rpath $(libdir)
@@ -276,6 +275,7 @@ FFLAGS = @FFLAGS@
 FILEPRIV = @FILEPRIV@
 GLCLIENT_FALSE = @GLCLIENT_FALSE@
 GLCLIENT_TRUE = @GLCLIENT_TRUE@
+GREP = @GREP@
 INSTALL_DATA = @INSTALL_DATA@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
 INSTALL_SCRIPT = @INSTALL_SCRIPT@
@@ -303,6 +303,7 @@ RANLIB = @RANLIB@
 SDL_CFLAGS = @SDL_CFLAGS@
 SDL_CONFIG = @SDL_CONFIG@
 SDL_LIBS = @SDL_LIBS@
+SED = @SED@
 SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
 SNDCLIENT_FALSE = @SNDCLIENT_FALSE@
@@ -312,17 +313,16 @@ TCPWLIB = @TCPWLIB@
 TCPW_FALSE = @TCPW_FALSE@
 TCPW_TRUE = @TCPW_TRUE@
 VERSION = @VERSION@
+XMKMF = @XMKMF@
 X_CFLAGS = @X_CFLAGS@
 X_EXTRA_LIBS = @X_EXTRA_LIBS@
 X_LIBS = @X_LIBS@
 X_PRE_LIBS = @X_PRE_LIBS@
 YACC = @YACC@
-ac_ct_AR = @ac_ct_AR@
+YFLAGS = @YFLAGS@
 ac_ct_CC = @ac_ct_CC@
 ac_ct_CXX = @ac_ct_CXX@
 ac_ct_F77 = @ac_ct_F77@
-ac_ct_RANLIB = @ac_ct_RANLIB@
-ac_ct_STRIP = @ac_ct_STRIP@
 am__fastdepCC_FALSE = @am__fastdepCC_FALSE@
 am__fastdepCC_TRUE = @am__fastdepCC_TRUE@
 am__fastdepCXX_FALSE = @am__fastdepCXX_FALSE@
@@ -339,31 +339,34 @@ build_cpu = @build_cpu@
 build_os = @build_os@
 build_vendor = @build_vendor@
 datadir = @datadir@
+datarootdir = @datarootdir@
+docdir = @docdir@
+dvidir = @dvidir@
 exec_prefix = @exec_prefix@
 host = @host@
 host_alias = @host_alias@
 host_cpu = @host_cpu@
 host_os = @host_os@
 host_vendor = @host_vendor@
+htmldir = @htmldir@
 includedir = @includedir@
 infodir = @infodir@
 install_sh = @install_sh@
 libdir = @libdir@
 libexecdir = @libexecdir@
+localedir = @localedir@
 localstatedir = @localstatedir@
 mandir = @mandir@
 mkdir_p = @mkdir_p@
 oldincludedir = @oldincludedir@
+pdfdir = @pdfdir@
 prefix = @prefix@
 program_transform_name = @program_transform_name@
+psdir = @psdir@
 sbindir = @sbindir@
 sharedstatedir = @sharedstatedir@
 sysconfdir = @sysconfdir@
-target = @target@
 target_alias = @target_alias@
-target_cpu = @target_cpu@
-target_os = @target_os@
-target_vendor = @target_vendor@
 AUTOMAKE_OPTIONS = foreign
 CONQLOCALSTATEDIR = @localstatedir@/conquest
 CONQLIBEXECDIR = @libexecdir@
@@ -407,7 +410,8 @@ libconquest_la_SOURCES = conqai.c ratfor.c  \
 	userauth.c record.c color.h user.h shiptype.h \
 	ship.h planet.h team.h msg.h doomsday.h driver.h conqinfo.h \
 	history.h robot.h global.h torp.h ibuf.h conf.h  display.h \
-	protocol.h packet.h packet.c userauth.h meta.c meta.h udp.c udp.h
+	protocol.h packet.h packet.c userauth.h meta.c meta.h udp.c udp.h \
+	rb.h rb.c
 
 libconquest_la_LIBADD = @LTLIBOBJS@
 libconquest_la_LDFLAGS = -version-info 1:0:0
@@ -747,6 +751,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/playback.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/prm.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ratfor.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/rb.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/record.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/render.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/rndlb.Plo@am__quote@

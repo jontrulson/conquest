@@ -138,6 +138,8 @@ else
 fi
 
 AC_SUBST(CONQ_CFLAGS)
+dnl no idea why this is neccessary now.
+AC_SUBST(YFLAGS)
 
 AC_PROG_MAKE_SET
 
