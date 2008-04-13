@@ -16,6 +16,19 @@
 
 #include "rb.h"
 
+/* flush (empty) a ringbuffer */
+void rbFlush(ringBuffer_t *RB)
+{
+  if (RB)
+    {
+      RB->rp = RB->wp = RB->data;
+      RB->ndata = 0;
+    }
+
+  return;
+}
+
+
 /* create a ringbuffer of a specified length */
 ringBuffer_t *rbCreate(unsigned int len)
 {
@@ -33,9 +46,9 @@ ringBuffer_t *rbCreate(unsigned int len)
       return NULL;
     }
 
-  RB->rp = RB->wp = RB->data;
-  RB->ndata = 0;
-  RB->len = len;
+  RB->len = len;                /* save the length */
+
+  rbFlush(RB);                  /* init to empty */
 
   return RB;
 }
@@ -54,21 +67,34 @@ void rbDestroy(ringBuffer_t *RB)
   return;
 }
 
-/* put data into a ring buffer, or query available space */
-int rbPut(ringBuffer_t *RB, Unsgn8 *buf, unsigned int len)
+/* return the number of bytes in use in the rb */
+unsigned int rbBytesUsed(ringBuffer_t *RB)
+{
+  if (RB)
+    return RB->ndata;
+  else 
+    return 0;
+}
+
+/* return the number of bytes available in the rb */
+unsigned int rbBytesFree(ringBuffer_t *RB)
+{
+  if (RB)
+    return (RB->len - RB->ndata);
+  else 
+    return 0;
+}
+
+/* put data into a ring buffer */
+unsigned int rbPut(ringBuffer_t *RB, Unsgn8 *buf, unsigned int len)
 {
   unsigned int left, wlen = len, i;
   Unsgn8 *rptr = buf;
 
-  if (!RB) 
+  if (!RB || !rptr) 
     return 0;
 
   left = RB->len - RB->ndata; /* max space available */
-
-  /* a null buf means to simply return the space left */
-
-  if (!rptr)
-    return(left);
 
   if (wlen > left)
     wlen = left;
@@ -85,7 +111,8 @@ int rbPut(ringBuffer_t *RB, Unsgn8 *buf, unsigned int len)
       RB->wp++;
     }
 
-  return(wlen);
+  /* return amount written */
+  return wlen;
 }
 
 /* get or remove data from a ring buffer */
@@ -118,6 +145,7 @@ unsigned int rbGet(ringBuffer_t *RB, Unsgn8 *buf, unsigned int len, int update)
       ndata--;
     }
 
+  /* if we wanted to really remove the returned data from the rb, do it. */
   if (update)
     {
       RB->rp    = rptr;

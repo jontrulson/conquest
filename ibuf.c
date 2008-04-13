@@ -38,7 +38,7 @@ static ringBuffer_t *ibufRB = NULL;
 #define I2RB_LEN(x)       ((x) * sizeof(unsigned int))
 #define RB2I_LEN(x)       ((x) / sizeof(unsigned int))
 
-/* size of input ringbuffer */
+/* size of input ringbuffer (in integers) */
 #define IBUF_RBMAX 1024
 
 
@@ -55,7 +55,7 @@ void iBufInit(void)
 int iBufCount(void)
 {
   if (ibufRB)
-    return RB2I_LEN(ibufRB->ndata);
+    return RB2I_LEN(rbBytesUsed(ibufRB));
   else
     return 0;
 }
