@@ -42,6 +42,7 @@ typedef struct {
   Unsgn8 localhost[MAXHOSTNAME];
   Unsgn8 *remotehost; /* self evident */
   Unsgn16 remoteport;
+  Unsgn8 metaServer[MAXHOSTNAME]; /* the metaserver we are using */
 } ClientInfo_t;
 
 EXTERNAL ClientInfo_t cInfo;

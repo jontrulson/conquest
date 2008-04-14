@@ -54,7 +54,7 @@ struct _packetent {
 #define PERR_LOSE         11 	/* lose in menu() */
 #define PERR_FLYING       12 	/* already flying a ship (newship()) */
 #define PERR_TOOMANYSHIPS 13	/* you are flying too many ships (newship()) */
-#define PERR_CANCELED    14	/* an operation (bombing, etc) was canceled
+#define PERR_CANCELED     14	/* an operation (bombing, etc) was canceled
 				   for some reason. */
 #define PERR_DONE         15    /* finished something - like beaming */
 #define PERR_DOUDP        16	/* used in hello to tell server udp is ok */

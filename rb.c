@@ -94,7 +94,7 @@ unsigned int rbPut(ringBuffer_t *RB, Unsgn8 *buf, unsigned int len)
   if (!RB || !rptr) 
     return 0;
 
-  left = RB->len - RB->ndata; /* max space available */
+  left = rbBytesFree(RB); /* max space available */
 
   if (wlen > left)
     wlen = left;

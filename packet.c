@@ -19,11 +19,14 @@
 #error "The select() system call is required"
 #endif
 
+/* these need to be kept in sync with the protocol numbers in
+ *  protocol.h
+ */
 static struct _packetent clientPackets[] = {
-  { CP_NULL, 
-    sizeof(cpNull_t), 
-    "CP_NULL", 
-    pktNotImpl 
+  { CP_NULL,                    /* pktid */
+    sizeof(cpNull_t),           /* size */
+    "CP_NULL",                  /* name */
+    pktNotImpl                  /* handler */
   },	/* never used */
   { CP_HELLO, 
     sizeof(cpHello_t), 
@@ -83,10 +86,10 @@ static struct _packetent clientPackets[] = {
 };
 
 static struct _packetent serverPackets[] = {
-  { SP_NULL, 
-    sizeof(spNull_t), 
-    "SP_NULL", 
-    pktNotImpl 
+  { SP_NULL,                    /* pktid */
+    sizeof(spNull_t),           /* size */
+    "SP_NULL",                  /* name */
+    pktNotImpl                  /* handler */
   },	/* never used */
   { SP_HELLO, 
     sizeof(spHello_t), 
@@ -518,7 +521,7 @@ int readPacket(int direction, int sockl[], Unsgn8 *buf, int blen,
 
       if (type == vartype)
         {                       /* if encap packet, do the right thing */
-          memcpy(buf, buf + sizeof(struct _generic_var), 
+          memmove(buf, buf + sizeof(struct _generic_var), 
                  rv - sizeof(struct _generic_var));
           type = buf[0];
         }

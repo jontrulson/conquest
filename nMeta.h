@@ -11,6 +11,6 @@
 
 #include "meta.h"
 
-void nMetaInit(metaSRec_t *metaServerList, int numserv);
+void nMetaInit(void);
 
 #endif /* _NMETA_H */

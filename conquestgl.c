@@ -291,9 +291,6 @@ int main(int argc, char *argv[])
   char *ch;
   int wantMetaList = FALSE;     /* wants to see a list from metaserver */
   int serveropt = FALSE;        /* specified a server with '-s' */
-  int nums = 0;                     /* num servers from metaGetServerList() */
-  char *metaServer = META_DFLT_SERVER; 
-  metaSRec_t *metaServerList;   /* list of servers */
   int dosound = TRUE;
 
   Context.entship = FALSE;
@@ -301,6 +298,7 @@ int main(int argc, char *argv[])
   Context.updsec = 10;		/* dflt - 10/sec */
   Context.msgrand = getnow(NULL, 0);
 
+  strncpy(cInfo.metaServer, META_DFLT_SERVER, MAXHOSTNAME - 1);
   cInfo.sock = -1;
   cInfo.usock = -1;
   cInfo.doUDP = FALSE;
@@ -335,7 +333,8 @@ int main(int argc, char *argv[])
         wantMetaList = TRUE;
         break;
       case 'M':
-        metaServer = optarg;
+        strncpy(cInfo.metaServer, optarg, MAXHOSTNAME - 1);
+
         break;
       case 's':                 /* [host[:port]] */
 	cInfo.remotehost = (Unsgn8 *)strdup(optarg);
@@ -454,27 +453,6 @@ int main(int argc, char *argv[])
       printf("-m ignored, since -s was specified\n");
       wantMetaList = FALSE;
     }
-  else if (wantMetaList)
-    {                           /* get the metalist and display */
-      printf("Querying metaserver at %s\n",
-             metaServer);
-      nums = metaGetServerList(metaServer, &metaServerList);
-
-      if (nums < 0)
-        {
-          printf("metaGetServerList() failed\n");
-          return 1;
-        }
-
-      if (nums == 0)
-        {
-          printf("metaGetServerList() reported 0 servers online\n");
-          return 1;
-        }
-
-      printf("Found %d server(s)\n",
-             nums);
-    }
 
   /* load the globals/planets, etc */
   cqiLoadRC(CQI_FILE_CONQINITRC, NULL, 1, 0);
@@ -524,7 +502,7 @@ int main(int argc, char *argv[])
   if (Context.recmode == RECMODE_PLAYING)
     nPlayBMenuInit();
   else if (wantMetaList)
-    nMetaInit(metaServerList, nums);
+    nMetaInit();
   else
     nConsvrInit(cInfo.remotehost, cInfo.remoteport);
 

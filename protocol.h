@@ -78,7 +78,7 @@ struct _generic_var {
   Unsgn8 len;
   Unsgn16 pad1;
 
-  /* the actual data would be written following this*/
+  /* the actual data would be written following this */
 };
 
 typedef struct _generic_var pktVariable_t;

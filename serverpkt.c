@@ -452,7 +452,6 @@ spShipLoc_t *spktShipLoc(Unsgn8 snum, int rec)
   return NULL;
 }
 
-/* we have the potential to send 3 packets here. */
 spPlanet_t *spktPlanet(Unsgn8 pnum, int rec)
 {
   int snum = Context.snum;

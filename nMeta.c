@@ -1,11 +1,11 @@
 /* 
- * meta select server node
+ * meta server node
  *
  * can NODE_EXIT or transfer to ConSvr node
  *
  * $Id$
  *
- * Copyright 1999-2004 Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
+ * Copyright 1999-2008 Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
  */
 
 #include "c_defs.h"
@@ -44,7 +44,9 @@ static int nMetaDisplay(dspConfig_t *);
 static int nMetaInput(int ch);
 
 static metaSRec_t *metaServerList;
-static int nums;
+static int numMetaServers;   /* number of servers in metaServerList */
+
+static metaSRec_t *metaServerList;   /* list of servers */
 
 static scrNode_t nMetaNode = {
   nMetaDisplay,                 /* display */
@@ -148,25 +150,42 @@ static void dispServerInfo(dspConfig_t *dsp, metaSRec_t *metaServerList,
 }
 
 
-void nMetaInit(metaSRec_t *ServerList, int numserv)
+void nMetaInit(void)
 {
   int i;
-  metaServerList = ServerList;
-  nums = numserv;
+
+  /* get the server list */
+  clog("nMetaInit: Querying metaserver at %s", cInfo.metaServer);
+  numMetaServers = metaGetServerList(cInfo.metaServer, &metaServerList);
+  
+  if (numMetaServers < 0)
+    {
+      clog("nMetaInit: metaGetServerList() failed");
+      return NODE_EXIT;
+    }
+  
+  if (numMetaServers == 0)
+    {
+      clog("nMetaInit: metaGetServerList() reported 0 servers online");
+      return NODE_EXIT;
+    }
+  
+  clog("nMetaInit: Found %d server(s)", numMetaServers);
 
   /* this is the number of required pages,        
      though page accesses start at 0 */
-  if (nums >= servers_per_page)
+
+  if (numMetaServers >= servers_per_page)
     {
-      pages = nums / servers_per_page;
-      if ((nums % servers_per_page) != 0)
+      pages = numMetaServers / servers_per_page;
+      if ((numMetaServers % servers_per_page) != 0)
         pages++;                /* for runoff */
     }
   else
     pages = 1;
 
 				/* init the servervec array */
-  for (i=0; i < nums; i++)
+  for (i=0; i < numMetaServers; i++)
   {
     if (metaServerList[i].version >= 2) /* valid for newer meta protocols */
       servervec[i].vers = metaServerList[i].protovers;
@@ -212,7 +231,7 @@ static int nMetaDisplay(dspConfig_t *dsp)
 				   this page */
 
   if (curpage == (pages - 1)) /* last page - might be less than full */
-    llin = (nums % servers_per_page);	/* ..or more than empty? ;-) */
+    llin = (numMetaServers % servers_per_page);	/* ..or more than empty? ;-) */
   else
     llin = servers_per_page;
   
@@ -290,7 +309,7 @@ static int nMetaInput(int ch)
           
           /* setup llin  for current page */
           if (curpage == (pages - 1)) 
-            llin = (nums % servers_per_page);
+            llin = (numMetaServers % servers_per_page);
           else
             llin = servers_per_page;
           
