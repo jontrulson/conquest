@@ -1,15 +1,29 @@
 Credit where credit is due.  
 
 - TGA loader, NeHe (though pretty much a complete rewrite.  Geez that
-  code is bad)
+  code was bad)
+
 - Earth, Mars (classm/classd) pics, JPL/NASA.
+
+- star (base image) - NASA SOHO 
+  http://sohowww.nascom.nasa.gov/data/realtime/gif/
+
 - glut, Mark Kilgard
+
 - texfont, Mark Kilgard
+
 - OpenGL, The OpenGL dudes
+
 - Doomsday Machine, Star Trek (TOS): The Doomsday Machine
+
 - viewer backgound, Hubble Ultra Deep Field
+
 - some of the sound effects for the gl client: Star Trek Dimension
   http://www.stdimension.org/MediaLib/computere.htm 
+
+- GIMP 
+  http://www.gimp.org
+
 - Xserver, Summit Platinum from Xi Graphics (www.xig.com). There is no
   substitute.  :)
 

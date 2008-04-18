@@ -101,8 +101,8 @@ planet {
   visible     "yes"
   core        "yes"
   homeplanet  "yes"
-  xcoord      8056.194584
-  ycoord      -10363.267407
+  x           8056.194584
+  y           -10363.267407
   size        300
   color       "ffe6e6e6"
 }
@@ -119,8 +119,8 @@ planet {
   visible     "yes"
   core        "yes"
   homeplanet  "yes"
-  xcoord      -5474.862444
-  ycoord      -6572.043111
+  x           -5474.862444
+  y           -6572.043111
   size        300
   color       "ffe6e6e6"
 }
@@ -137,8 +137,8 @@ planet {
   visible     "yes"
   core        "yes"
   homeplanet  "yes"
-  xcoord      -9655.250220
-  ycoord      9577.226313
+  x           -9655.250220
+  y           9577.226313
   size        300
   color       "ffe6e6e6"
 }
@@ -155,8 +155,8 @@ planet {
   visible     "yes"
   core        "yes"
   homeplanet  "yes"
-  xcoord      5932.856423
-  ycoord      5946.563049
+  x           5932.856423
+  y           5946.563049
   size        300
   color       "ffe6e6e6"
 }
@@ -173,8 +173,8 @@ planet {
   visible     "yes"
   core        "yes"
   homeplanet  "yes"
-  xcoord      -7885.290153
-  ycoord      -10375.967171
+  x           -7885.290153
+  y           -10375.967171
   size        300
   color       "ffe6e6e6"
 }
@@ -191,8 +191,8 @@ planet {
   visible     "yes"
   core        "yes"
   homeplanet  "yes"
-  xcoord      -5281.612289
-  ycoord      8504.243904
+  x           -5281.612289
+  y           8504.243904
   size        300
   color       "ffe6e6e6"
 }
@@ -209,8 +209,8 @@ planet {
   visible     "yes"
   core        "yes"
   homeplanet  "yes"
-  xcoord      7114.611550
-  ycoord      10292.072780
+  x           7114.611550
+  y           10292.072780
   size        300
   color       "ffe6e6e6"
 }
@@ -227,8 +227,8 @@ planet {
   visible     "yes"
   core        "yes"
   homeplanet  "yes"
-  xcoord      5400.408553
-  ycoord      -6726.400547
+  x           5400.408553
+  y           -6726.400547
   size        300
   color       "ffe6e6e6"
 }
@@ -245,8 +245,8 @@ planet {
   visible     "yes"
   core        "yes"
   homeplanet  "yes"
-  xcoord      -8397.661277
-  ycoord      5253.053554
+  x           -8397.661277
+  y           5253.053554
   size        300
   color       "ffe6e6e6"
 }
@@ -263,8 +263,8 @@ planet {
   visible     "yes"
   core        "yes"
   homeplanet  "yes"
-  xcoord      10287.055805
-  ycoord      7095.887954
+  x           10287.055805
+  y           7095.887954
   size        300
   color       "ffe6e6e6"
 }
@@ -281,8 +281,8 @@ planet {
   visible     "yes"
   core        "yes"
   homeplanet  "yes"
-  xcoord      9877.920660
-  ycoord      -6244.855809
+  x           9877.920660
+  y           -6244.855809
   size        300
   color       "ffe6e6e6"
 }
@@ -299,8 +299,8 @@ planet {
   visible     "yes"
   core        "yes"
   homeplanet  "yes"
-  xcoord      -9974.371169
-  ycoord      -6386.513510
+  x           -9974.371169
+  y           -6386.513510
   size        300
   color       "ffe6e6e6"
 }
@@ -317,8 +317,8 @@ planet {
   visible     "yes"
   core        "yes"
   homeplanet  "no"
-  xcoord      -2494.165496
-  ycoord      734.260497
+  x           -2494.165496
+  y           734.260497
   size        300
   color       "ffe6e6e6"
 }
@@ -335,8 +335,8 @@ planet {
   visible     "yes"
   core        "yes"
   homeplanet  "no"
-  xcoord      2449.409765
-  ycoord      872.004474
+  x           2449.409765
+  y           872.004474
   size        300
   color       "ffe6e6e6"
 }
@@ -353,8 +353,8 @@ planet {
   visible     "yes"
   core        "yes"
   homeplanet  "no"
-  xcoord      1586.234782
-  ycoord      -2060.062916
+  x           1586.234782
+  y           -2060.062916
   size        300
   color       "ffe6e6e6"
 }
@@ -371,8 +371,8 @@ planet {
   visible     "yes"
   core        "yes"
   homeplanet  "no"
-  xcoord      -72.416294
-  ycoord      2598.991320
+  x           -72.416294
+  y           2598.991320
   size        300
   color       "ffe6e6e6"
 }
@@ -389,8 +389,8 @@ planet {
   visible     "yes"
   core        "yes"
   homeplanet  "no"
-  xcoord      -1469.062755
-  ycoord      -2145.193376
+  x           -1469.062755
+  y           -2145.193376
   size        300
   color       "ffe6e6e6"
 }
@@ -407,8 +407,8 @@ planet {
   visible     "yes"
   core        "yes"
   homeplanet  "no"
-  xcoord      -580.938063
-  ycoord      -11007.522817
+  x           -580.938063
+  y           -11007.522817
   size        300
   color       "ffe6e6e6"
 }
@@ -425,8 +425,8 @@ planet {
   visible     "yes"
   core        "yes"
   homeplanet  "no"
-  xcoord      -12566.771058
-  ycoord      -1000.635087
+  x           -12566.771058
+  y           -1000.635087
   size        300
   color       "ffe6e6e6"
 }
@@ -443,8 +443,8 @@ planet {
   visible     "yes"
   core        "yes"
   homeplanet  "no"
-  xcoord      819.850362
-  ycoord      11193.560058
+  x           819.850362
+  y           11193.560058
   size        300
   color       "ffe6e6e6"
 }
@@ -461,8 +461,8 @@ planet {
   visible     "yes"
   core        "yes"
   homeplanet  "no"
-  xcoord      10850.243955
-  ycoord      23.686230
+  x           10850.243955
+  y           23.686230
   size        300
   color       "ffe6e6e6"
 }
@@ -479,8 +479,8 @@ planet {
   visible     "yes"
   core        "yes"
   homeplanet  "no"
-  xcoord      580.938079
-  ycoord      -12992.477182
+  x           580.938079
+  y           -12992.477182
   size        300
   color       "ffe6e6e6"
 }
@@ -497,8 +497,8 @@ planet {
   visible     "yes"
   core        "yes"
   homeplanet  "no"
-  xcoord      -11433.228942
-  ycoord      1000.635077
+  x           -11433.228942
+  y           1000.635077
   size        300
   color       "ffe6e6e6"
 }
@@ -515,8 +515,8 @@ planet {
   visible     "yes"
   core        "yes"
   homeplanet  "no"
-  xcoord      -819.850367
-  ycoord      12806.439942
+  x           -819.850367
+  y           12806.439942
   size        300
   color       "ffe6e6e6"
 }
@@ -533,8 +533,8 @@ planet {
   visible     "yes"
   core        "yes"
   homeplanet  "no"
-  xcoord      13149.756045
-  ycoord      -23.686229
+  x           13149.756045
+  y           -23.686229
   size        300
   color       "ffe6e6e6"
 }
@@ -551,8 +551,8 @@ planet {
   visible     "yes"
   core        "no"
   homeplanet  "no"
-  xcoord      -1128.972084
-  ycoord      -536.583669
+  x           -1128.972084
+  y           -536.583669
   size        160
   color       "ffe6e6e6"
 }
@@ -569,8 +569,8 @@ planet {
   visible     "yes"
   core        "yes"
   homeplanet  "no"
-  xcoord      5974.991371
-  ycoord      -1347.257629
+  x           5974.991371
+  y           -1347.257629
   size        300
   color       "ffe6e6e6"
 }
@@ -587,8 +587,8 @@ planet {
   visible     "yes"
   core        "yes"
   homeplanet  "no"
-  xcoord      -20039.724127
-  ycoord      -7972.850339
+  x           -20039.724127
+  y           -7972.850339
   size        300
   color       "ffe6e6e6"
 }
@@ -605,11 +605,13 @@ planet {
   visible     "yes"
   core        "yes"
   homeplanet  "no"
-  xcoord      -19392.238383
-  ycoord      -11831.705377
+  x           -19392.238383
+  y           -11831.705377
   size        300
   color       "ffe6e6e6"
 }
+
+## Suns 
 
 planet {
   name        "Sol"
@@ -619,14 +621,14 @@ planet {
   radius      11000.000000
   ptype       "S"
   pteam       "N"
-  armies      80 180
+  armies      100 200 
   visible     "yes"
   core        "no"
   homeplanet  "no"
-  xcoord      7778.174599
-  ycoord      -7778.174587
+  x           7778.174599
+  y           -7778.174587
   size        1500
-  color       "ffcccc00"
+  color       "ffeeee00"
 }
 
 planet {
@@ -637,12 +639,12 @@ planet {
   radius      11000.000000
   ptype       "S"
   pteam       "N"
-  armies      80 180
+  armies      100 200
   visible     "yes"
   core        "no"
   homeplanet  "no"
-  xcoord      -7778.174589
-  ycoord      -7778.174597
+  x           -7778.174589
+  y           -7778.174597
   size        1500
   color       "ffcc0000"
 }
@@ -655,14 +657,14 @@ planet {
   radius      11000.000000
   ptype       "S"
   pteam       "N"
-  armies      80 180
+  armies      100 200
   visible     "yes"
   core        "no"
   homeplanet  "no"
-  xcoord      -7778.174595
-  ycoord      7778.174591
+  x           -7778.174595
+  y           7778.174591
   size        1500
-  color       "ffcccc00"
+  color       "ffeeee00"
 }
 
 planet {
@@ -673,14 +675,14 @@ planet {
   radius      11000.000000
   ptype       "S"
   pteam       "N"
-  armies      80 180
+  armies      100 200
   visible     "yes"
   core        "no"
   homeplanet  "no"
-  xcoord      7778.174592
-  ycoord      7778.174594
+  x           7778.174592
+  y           7778.174594
   size        1500
-  color       "ff0000cc"
+  color       "ff886aea"
 }
 
 planet {
@@ -691,20 +693,20 @@ planet {
   radius      0.000000
   ptype       "S"
   pteam       "N"
-  armies      80 180
+  armies      100 200
   visible     "yes"
   core        "no"
   homeplanet  "no"
-  xcoord      0.000000
-  ycoord      0.000000
+  x           0.000000
+  y           0.000000
   size        1500
-  color       "ff0000cc"
+  color       "ff886aea"
 }
 
 planet {
   name        "Syrinx"
   primary     "Murisak"
-  angle       -1.0             # random
+  angle       -1		# random
   velocity    -6.314179
   radius      23000.000000
   ptype       "S"
@@ -713,11 +715,13 @@ planet {
   visible     "yes"
   core        "no"
   homeplanet  "no"
-  xcoord      -20860.893765
-  ycoord      -9686.233082
+  x           18655.801085
+  y           13452.177738
   size        1500
   color       "ffcc0000"
 }
+
+## others
 
 planet {
   name        "Ghost 1"
@@ -731,8 +735,8 @@ planet {
   visible     "no"
   core        "no"
   homeplanet  "no"
-  xcoord      12000.000000
-  ycoord      0.000000
+  x           12000.000000
+  y           0.000000
   size        300
   texname     "classd"
   color       "ffe6e6e6"
@@ -750,8 +754,8 @@ planet {
   visible     "no"
   core        "no"
   homeplanet  "no"
-  xcoord      -0.000002
-  ycoord      12000.000000
+  x           -0.000002
+  y           12000.000000
   size        300
   texname     "classd"
   color       "ffe6e6e6"
@@ -769,8 +773,8 @@ planet {
   visible     "no"
   core        "no"
   homeplanet  "no"
-  xcoord      -12000.000000
-  ycoord      -0.000005
+  x           -12000.000000
+  y           -0.000005
   size        300
   texname     "classd"
   color       "ffe6e6e6"
@@ -788,8 +792,8 @@ planet {
   visible     "no"
   core        "no"
   homeplanet  "no"
-  xcoord      0.000007
-  ycoord      -12000.000000
+  x           0.000007
+  y           -12000.000000
   size        300
   texname     "classd"
   color       "ffe6e6e6"
@@ -807,8 +811,8 @@ planet {
   visible     "no"
   core        "no"
   homeplanet  "no"
-  xcoord      12000.000000
-  ycoord      0.000000
+  x           12000.000000
+  y           0.000000
   size        300
   texname     "classd"
   color       "ffe6e6e6"
@@ -826,8 +830,8 @@ planet {
   visible     "no"
   core        "no"
   homeplanet  "no"
-  xcoord      0.000000
-  ycoord      0.000000
+  x           0.000000
+  y           0.000000
   size        300
   texname     "classd"
   color       "ffe6e6e6"
@@ -845,8 +849,8 @@ planet {
   visible     "no"
   core        "no"
   homeplanet  "no"
-  xcoord      0.000000
-  ycoord      0.000000
+  x           0.000000
+  y           0.000000
   size        300
   texname     "classd"
   color       "ffe6e6e6"
@@ -864,8 +868,8 @@ planet {
   visible     "no"
   core        "no"
   homeplanet  "no"
-  xcoord      0.000000
-  ycoord      0.000000
+  x           0.000000
+  y           0.000000
   size        300
   texname     "classd"
   color       "ffe6e6e6"
@@ -883,8 +887,8 @@ planet {
   visible     "no"
   core        "no"
   homeplanet  "no"
-  xcoord      0.000000
-  ycoord      0.000000
+  x           0.000000
+  y           0.000000
   size        300
   texname     "classd"
   color       "ffe6e6e6"
@@ -902,8 +906,8 @@ planet {
   visible     "no"
   core        "no"
   homeplanet  "no"
-  xcoord      0.000000
-  ycoord      0.000000
+  x           0.000000
+  y           0.000000
   size        300
   texname     "classd"
   color       "ffe6e6e6"
@@ -921,8 +925,8 @@ planet {
   visible     "no"
   core        "no"
   homeplanet  "no"
-  xcoord      0.000000
-  ycoord      0.000000
+  x           0.000000
+  y           0.000000
   size        300
   texname     "classd"
   color       "ffe6e6e6"
@@ -940,8 +944,8 @@ planet {
   visible     "no"
   core        "no"
   homeplanet  "no"
-  xcoord      0.000000
-  ycoord      0.000000
+  x           0.000000
+  y           0.000000
   size        300
   texname     "classd"
   color       "ffe6e6e6"
@@ -959,8 +963,8 @@ planet {
   visible     "no"
   core        "no"
   homeplanet  "no"
-  xcoord      0.000000
-  ycoord      0.000000
+  x           0.000000
+  y           0.000000
   size        300
   texname     "classd"
   color       "ffe6e6e6"
@@ -978,8 +982,8 @@ planet {
   visible     "no"
   core        "no"
   homeplanet  "no"
-  xcoord      0.000000
-  ycoord      0.000000
+  x           0.000000
+  y           0.000000
   size        300
   texname     "classd"
   color       "ffe6e6e6"
@@ -997,8 +1001,8 @@ planet {
   visible     "no"
   core        "no"
   homeplanet  "no"
-  xcoord      0.000000
-  ycoord      0.000000
+  x           0.000000
+  y           0.000000
   size        300
   texname     "classd"
   color       "ffe6e6e6"
@@ -1016,8 +1020,8 @@ planet {
   visible     "no"
   core        "no"
   homeplanet  "no"
-  xcoord      0.000000
-  ycoord      0.000000
+  x           0.000000
+  y           0.000000
   size        300
   texname     "classd"
   color       "ffe6e6e6"
@@ -1035,8 +1039,8 @@ planet {
   visible     "no"
   core        "no"
   homeplanet  "no"
-  xcoord      0.000000
-  ycoord      0.000000
+  x           0.000000
+  y           0.000000
   size        300
   texname     "classd"
   color       "ffe6e6e6"
@@ -1054,8 +1058,8 @@ planet {
   visible     "no"
   core        "no"
   homeplanet  "no"
-  xcoord      0.000000
-  ycoord      0.000000
+  x           0.000000
+  y           0.000000
   size        300
   texname     "classd"
   color       "ffe6e6e6"
@@ -1073,8 +1077,8 @@ planet {
   visible     "no"
   core        "no"
   homeplanet  "no"
-  xcoord      0.000000
-  ycoord      0.000000
+  x           0.000000
+  y           0.000000
   size        300
   texname     "classd"
   color       "ffe6e6e6"
@@ -1092,8 +1096,8 @@ planet {
   visible     "no"
   core        "no"
   homeplanet  "no"
-  xcoord      0.000000
-  ycoord      0.000000
+  x           0.000000
+  y           0.000000
   size        300
   texname     "classd"
   color       "ffe6e6e6"
@@ -1111,8 +1115,8 @@ planet {
   visible     "no"
   core        "no"
   homeplanet  "no"
-  xcoord      0.000000
-  ycoord      0.000000
+  x           0.000000
+  y           0.000000
   size        300
   texname     "classd"
   color       "ffe6e6e6"
@@ -1130,8 +1134,8 @@ planet {
   visible     "no"
   core        "no"
   homeplanet  "no"
-  xcoord      0.000000
-  ycoord      0.000000
+  x           0.000000
+  y           0.000000
   size        300
   texname     "classd"
   color       "ffe6e6e6"
@@ -1149,8 +1153,8 @@ planet {
   visible     "no"
   core        "no"
   homeplanet  "no"
-  xcoord      0.000000
-  ycoord      0.000000
+  x           0.000000
+  y           0.000000
   size        300
   texname     "classd"
   color       "ffe6e6e6"
@@ -1168,8 +1172,8 @@ planet {
   visible     "no"
   core        "no"
   homeplanet  "no"
-  xcoord      0.000000
-  ycoord      0.000000
+  x           0.000000
+  y           0.000000
   size        300
   texname     "classd"
   color       "ffe6e6e6"
@@ -1187,8 +1191,8 @@ planet {
   visible     "no"
   core        "no"
   homeplanet  "no"
-  xcoord      0.000000
-  ycoord      0.000000
+  x           0.000000
+  y           0.000000
   size        300
   texname     "classd"
   color       "ffe6e6e6"
