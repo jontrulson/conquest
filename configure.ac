@@ -74,6 +74,8 @@ case "$uname" in
   SunOS*)
 	AC_DEFINE(SOLARIS, 1, [Solaris])
 
+	LIBS="$LIBS -lsocket -lnsl"
+
 	AC_MSG_RESULT(Solaris)
 	;;
   UNIX_SV*|UnixWare)

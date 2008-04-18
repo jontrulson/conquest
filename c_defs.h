@@ -108,16 +108,16 @@
 # error "You need System V curses or ncurses 1.9.9e. Badly."
 #endif
 
+#if defined(HAVE_TERMIO_H)
+# include <termio.h>
+#endif
+
 #if defined(HAVE_TERM_H)
 # include <term.h>
 #endif
 
 #include <memory.h>
 #include <sys/ioctl.h>
-
-#if defined(HAVE_TERMIO_H)
-# include <termio.h>
-#endif
 
 #if defined(HAVE_MMAP)
 # include <sys/mman.h>
