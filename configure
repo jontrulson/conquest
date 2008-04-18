@@ -20998,6 +20998,8 @@ cat >>confdefs.h <<\_ACEOF
 _ACEOF
 
 
+	LIBS="$LIBS -lsocket -lnsl"
+
 	{ echo "$as_me:$LINENO: result: Solaris" >&5
 echo "${ECHO_T}Solaris" >&6; }
 	;;
