@@ -846,7 +846,7 @@ static int nOptionsIdle(void)
   int gtime = frameTime;
   static int old = 0;
   int pkttype;
-  Unsgn8 buf[PKT_MAXSIZE];
+  char buf[PKT_MAXSIZE];
   int sockl[2] = {cInfo.sock, cInfo.usock};
 
   /* 'blink' the cursor */

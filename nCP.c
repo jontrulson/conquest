@@ -2769,7 +2769,7 @@ static int nCPIdle(void)
   spAck_t *sack;
   int pkttype;
   int now;
-  Unsgn8 buf[PKT_MAXSIZE];
+  char buf[PKT_MAXSIZE];
   Unsgn32 difftime = dgrand( Context.msgrand, &now );
   int sockl[2] = {cInfo.sock, cInfo.usock};
   static Unsgn32 iterstart = 0;

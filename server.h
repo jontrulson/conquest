@@ -34,8 +34,8 @@ typedef struct {
   Unsgn32 clientDead;		/* is the client dead/ */
   Unsgn32 isMaster;		/* is the Maseter server? */
   Unsgn32 isLoggedIn;		/* is the client logged in? */
-  Unsgn8 remotehost[MAXHOSTNAME]; /* self evident */
-  Unsgn8 localhost[MAXHOSTNAME]; /* self evident */
+  char    remotehost[MAXHOSTNAME]; /* self evident */
+  char    localhost[MAXHOSTNAME]; /* self evident */
 } ServerInfo_t;
 
 
@@ -64,8 +64,8 @@ int sendConqInfo(int sock, int force);
 int sendHistory(int sock, int hnum);
 int sendDoomsday(int sock);
 
-void procSetName(Unsgn8 *buf);
-void procSetCourse(Unsgn8 *buf);
+void procSetName(char *buf);
+void procSetCourse(char *buf);
 
 void procSetWarp(cpCommand_t *swarp);
 void procSetShields(cpCommand_t *cmd);
@@ -88,9 +88,9 @@ void procBeam(cpCommand_t *cmd);
 void procDestruct(cpCommand_t *cmd);
 void procAutoPilot(cpCommand_t *cmd);
 
-void procFireTorps(Unsgn8 *buf);
-void procMessage(Unsgn8 *buf);
-void procChangePassword(Unsgn8 *buf);
+void procFireTorps(char *buf);
+void procMessage(char *buf);
+void procChangePassword(char *buf);
 void procReload(cpCommand_t *cmd);
 
 int checkOperExec(int from, int to, char *msg);

@@ -29,6 +29,8 @@ void dspReplayMenu(void)
 
   if (FirstTime == TRUE)
     {
+      time_t recon = (time_t)fhdr.rectime;
+
       FirstTime = FALSE;
       sprintf(sfmt,
 	      "#%d#%%s#%d#: %%s",
@@ -41,7 +43,7 @@ void dspReplayMenu(void)
               InfoColor,
               LabelColor);
 
-      strncpy(recordedon, ctime((time_t *)&fhdr.rectime), MSGMAXLINE - 1);
+      strncpy(recordedon, ctime(&recon), MSGMAXLINE - 1);
       recordedon[MSGMAXLINE - 1] = EOS;
 
       for (i=0; i < strlen(recordedon); i++)

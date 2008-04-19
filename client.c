@@ -30,9 +30,9 @@
 
 /* send an auth packet and wait for a response (if not CHPWD).
    returns the error code from the ack, or error from write/read */
-int sendAuth(int sock, Unsgn8 flag, Unsgn8 *login, Unsgn8 *pw)
+int sendAuth(int sock, Unsgn8 flag, char *login, char *pw)
 {
-  Unsgn8 buf[PKT_MAXSIZE];
+  char buf[PKT_MAXSIZE];
   int rv;
   spAck_t *sack;
   cpAuthenticate_t cauth;
@@ -44,16 +44,16 @@ int sendAuth(int sock, Unsgn8 flag, Unsgn8 *login, Unsgn8 *pw)
   cauth.flag = flag;
 
   if (login)
-    strncpy(cauth.login, login, MAXUSERNAME - 1);
+    strncpy((char *)cauth.login, (char *)login, MAXUSERNAME - 1);
   if (pw)
-    strncpy(cauth.pw, pw, MAXUSERNAME - 1);
+    strncpy((char *)cauth.pw, (char *)pw, MAXUSERNAME - 1);
 
 #if defined(DEBUG_CLIENTSEND)
   clog("sendAuth: LOGIN = '%s' PW = '%s'\n",
        login, pw);
 #endif
 
-  if ((rv = writePacket(PKT_TOSERVER, cInfo.sock, (Unsgn8 *)&cauth)) <= 0)
+  if ((rv = writePacket(PKT_TOSERVER, cInfo.sock, &cauth)) <= 0)
     {
       clog("sendAuth: writePacket returned %d\n", rv);
       return rv;
@@ -90,13 +90,13 @@ int sendSetCourse(int sock, Sgn8 lock, real head)
   csc.lock = lock;
   csc.head = (Unsgn16)htons((Unsgn16)(head * 100.0));
 
-  if (writePacket(PKT_TOSERVER, sock, (Unsgn8 *)&csc) <= 0)
+  if (writePacket(PKT_TOSERVER, sock, &csc) <= 0)
     return FALSE;
   else
     return TRUE;
 }
 
-int procUser(Unsgn8 *buf)
+int procUser(char *buf)
 {
   int i;
   int unum;
@@ -135,13 +135,13 @@ int procUser(Unsgn8 *buf)
   for (i=0; i<USTAT_TOTALSTATS; i++)
     Users[unum].stats[i] = (Sgn32)ntohl(suser->stats[i]);
 
-  strncpy(Users[unum].username, suser->username, MAXUSERNAME - 1);
-  strncpy(Users[unum].alias, suser->alias, MAXUSERPNAME - 1);
+  strncpy(Users[unum].username, (char *)suser->username, MAXUSERNAME - 1);
+  strncpy(Users[unum].alias, (char *)suser->alias, MAXUSERPNAME - 1);
  
   return TRUE;
 }
   
-int procShip(Unsgn8 *buf)
+int procShip(char *buf)
 {
   int i;
   spShip_t *sship = (spShip_t *)buf;
@@ -189,12 +189,12 @@ int procShip(Unsgn8 *buf)
     Ships[snum].scanned[i] = (int)sship->scanned[i];
 
   sship->alias[MAXUSERPNAME - 1] = 0;
-  strncpy(Ships[snum].alias, sship->alias, MAXUSERPNAME - 1);
+  strncpy(Ships[snum].alias, (char *)sship->alias, MAXUSERPNAME - 1);
   
   return TRUE;
 }
 
-int procShipSml(Unsgn8 *buf)
+int procShipSml(char *buf)
 {
   int snum;
   spShipSml_t *sshipsml = (spShipSml_t *)buf;
@@ -241,7 +241,7 @@ int procShipSml(Unsgn8 *buf)
   return TRUE;
 }
 
-int procShipLoc(Unsgn8 *buf)
+int procShipLoc(char *buf)
 {
   int snum;
   spShipLoc_t *sshiploc = (spShipLoc_t *)buf;
@@ -270,7 +270,7 @@ int procShipLoc(Unsgn8 *buf)
   return TRUE;
 }
 
-int procPlanet(Unsgn8 *buf)
+int procPlanet(char *buf)
 {
   spPlanet_t *splan = (spPlanet_t *)buf;
   int pnum;
@@ -290,14 +290,14 @@ int procPlanet(Unsgn8 *buf)
   Planets[pnum].team = splan->team;
 
   splan->name[MAXPLANETNAME - 1] = 0;
-  strncpy(Planets[pnum].name, splan->name, MAXPLANETNAME);
+  strncpy(Planets[pnum].name, (char *)splan->name, MAXPLANETNAME);
 
   uiUpdatePlanet(pnum);
 
   return TRUE;
 }
 
-int procPlanetSml(Unsgn8 *buf)
+int procPlanetSml(char *buf)
 {
   int i;
   spPlanetSml_t *splansml = (spPlanetSml_t *)buf;
@@ -329,7 +329,7 @@ int procPlanetSml(Unsgn8 *buf)
   return TRUE;
 }
 
-int procPlanetLoc(Unsgn8 *buf)
+int procPlanetLoc(char *buf)
 {
   spPlanetLoc_t *splanloc = (spPlanetLoc_t *)buf;
   int pnum;
@@ -352,7 +352,7 @@ int procPlanetLoc(Unsgn8 *buf)
   return TRUE;
 }
 
-int procPlanetLoc2(Unsgn8 *buf)
+int procPlanetLoc2(char *buf)
 {
   spPlanetLoc2_t *splanloc2 = (spPlanetLoc2_t *)buf;
   int pnum;
@@ -376,7 +376,7 @@ int procPlanetLoc2(Unsgn8 *buf)
   return TRUE;
 }
 
-int procPlanetInfo(Unsgn8 *buf)
+int procPlanetInfo(char *buf)
 {
   spPlanetInfo_t *splaninfo = (spPlanetInfo_t *)buf;
   int pnum;
@@ -392,7 +392,7 @@ int procPlanetInfo(Unsgn8 *buf)
 
   primary = splaninfo->primary;
 
-  /* Roy fix - 10/17/2005 - let's mur data be sent. */
+  /* Roy fix - 10/17/2005 - let mur data be sent. */
   if (primary < 0 || primary > NUMPLANETS)
     return FALSE;
 
@@ -422,7 +422,7 @@ int procPlanetInfo(Unsgn8 *buf)
 }
 
 
-int procTorp(Unsgn8 *buf)
+int procTorp(char *buf)
 {
   int snum, tnum;
   spTorp_t *storp = (spTorp_t *)buf;
@@ -447,7 +447,7 @@ int procTorp(Unsgn8 *buf)
   return TRUE;
 }
 
-int procTorpLoc(Unsgn8 *buf)
+int procTorpLoc(char *buf)
 {
   int snum, tnum, i;
   spTorpLoc_t *storploc = (spTorpLoc_t *)buf;
@@ -480,7 +480,7 @@ int procTorpLoc(Unsgn8 *buf)
 }
 
 
-int procTorpEvent(Unsgn8 *buf)
+int procTorpEvent(char *buf)
 {
   int snum, tnum, i;
   spTorpEvent_t *storpev = (spTorpEvent_t *)buf;
@@ -524,7 +524,7 @@ int procTorpEvent(Unsgn8 *buf)
 }
 
 
-int procMessage(Unsgn8 *buf)
+int procMessage(char *buf)
 {
   spMessage_t *smsg = (spMessage_t *)buf;
   
@@ -550,14 +550,14 @@ int procMessage(Unsgn8 *buf)
     recordWriteEvent(buf);
 
   if (smsg->flags & MSG_FLAGS_FEEDBACK)
-    clntDisplayFeedback(smsg->msg);
+    clntDisplayFeedback((char *)smsg->msg);
   else
     clntStoreMessage(smsg);
 
   return TRUE;
 }
 
-int procTeam(Unsgn8 *buf)
+int procTeam(char *buf)
 {
   int team, i;
   spTeam_t *steam = (spTeam_t *)buf;
@@ -590,12 +590,12 @@ int procTeam(Unsgn8 *buf)
   for (i=0; i<MAXTSTATS; i++)
     Teams[team].stats[i] = (int)ntohl(steam->stats[i]);
 
-  strncpy(Teams[team].name, steam->name, MAXTEAMNAME - 1);
+  strncpy(Teams[team].name, (char *)steam->name, MAXTEAMNAME - 1);
 
   return TRUE;
 }
 
-int procServerStat(Unsgn8 *buf)
+int procServerStat(char *buf)
 {
   spServerStat_t *sstat = (spServerStat_t *)buf;
 
@@ -612,26 +612,26 @@ int procServerStat(Unsgn8 *buf)
   return TRUE;
 }
 
-int procConqInfo(Unsgn8 *buf)
+int procConqInfo(char *buf)
 {
   spConqInfo_t *spci = (spConqInfo_t *)buf;
 
   if (!validPkt(SP_CONQINFO, buf))
     return FALSE;
 
-  strncpy(ConqInfo->conqueror, spci->conqueror, MAXUSERPNAME);
+  strncpy(ConqInfo->conqueror, (char *)spci->conqueror, MAXUSERPNAME);
   ConqInfo->conqueror[MAXUSERPNAME - 1] = 0;
-  strncpy(ConqInfo->conqteam, spci->conqteam, MAXTEAMNAME);
+  strncpy(ConqInfo->conqteam, (char *)spci->conqteam, MAXTEAMNAME);
   ConqInfo->conqteam[MAXTEAMNAME - 1] = 0;
-  strncpy(ConqInfo->conqtime, spci->conqtime, DATESIZE);
+  strncpy(ConqInfo->conqtime, (char *)spci->conqtime, DATESIZE);
   ConqInfo->conqtime[DATESIZE - 1] = 0;
-  strncpy(ConqInfo->lastwords, spci->lastwords, MAXLASTWORDS);
+  strncpy(ConqInfo->lastwords, (char *)spci->lastwords, MAXLASTWORDS);
   ConqInfo->lastwords[MAXLASTWORDS - 1] = 0;
 
   return TRUE;
 }
 
-int procHistory(Unsgn8 *buf)
+int procHistory(char *buf)
 { 
   spHistory_t *hist = (spHistory_t *)buf;
   int hnum;
@@ -650,7 +650,7 @@ int procHistory(Unsgn8 *buf)
   return TRUE;
 }
 
-int procDoomsday(Unsgn8 *buf)
+int procDoomsday(char *buf)
 { 
   spDoomsday_t *dd = (spDoomsday_t *)buf;
 
@@ -669,7 +669,7 @@ int procDoomsday(Unsgn8 *buf)
 }
 
 /* send a command to server to change name */
-int sendSetName(Unsgn8 *name)
+int sendSetName(char *name)
 {
   cpSetName_t sname;
 
@@ -678,9 +678,9 @@ int sendSetName(Unsgn8 *name)
 
   memset((void *)&sname, 0, sizeof(cpSetName_t));
   sname.type = CP_SETNAME;
-  strncpy(sname.alias, name, MAXUSERPNAME - 1);
+  strncpy((char *)sname.alias, (char *)name, MAXUSERPNAME - 1);
 
-  if (writePacket(PKT_TOSERVER, cInfo.sock, (Unsgn8 *)&sname) <= 0)
+  if (writePacket(PKT_TOSERVER, cInfo.sock, &sname) <= 0)
     return FALSE;
   else 
     return TRUE;
@@ -697,13 +697,13 @@ int sendCommand(Unsgn8 cmd, Unsgn16 detail)
 
   if (cmd == CPCMD_KEEPALIVE && cInfo.usock != -1)
     {
-      writePacket(PKT_TOSERVER, cInfo.usock, (Unsgn8 *)&ccmd);
+      writePacket(PKT_TOSERVER, cInfo.usock, &ccmd);
       return TRUE;
     }
   else
     {
 
-      if (writePacket(PKT_TOSERVER, cInfo.sock, (Unsgn8 *)&ccmd) <= 0)
+      if (writePacket(PKT_TOSERVER, cInfo.sock, &ccmd) <= 0)
         return FALSE;
       else 
         return TRUE;
@@ -720,7 +720,7 @@ int sendFireTorps(int num, real dir)
   ftorps.num = (Unsgn8)num;
   ftorps.dir = htons((Unsgn16)(dir * 100.0));
 
-  if (writePacket(PKT_TOSERVER, cInfo.sock, (Unsgn8 *)&ftorps) <= 0)
+  if (writePacket(PKT_TOSERVER, cInfo.sock, &ftorps) <= 0)
     return FALSE;
   else 
     return TRUE;
@@ -738,9 +738,9 @@ int sendMessage(int to, char *msg)
   memset((void *)&cmsg, 0, sizeof(cpMessage_t));
   cmsg.type = CP_MESSAGE;
   cmsg.to = (Sgn16)htons(to);
-  strncpy(cmsg.msg, msg, MESSAGE_SIZE - 1);
+  strncpy((char *)cmsg.msg, msg, MESSAGE_SIZE - 1);
 
-  if (writePacket(PKT_TOSERVER, cInfo.sock, (Unsgn8 *)&cmsg) <= 0)
+  if (writePacket(PKT_TOSERVER, cInfo.sock, &cmsg) <= 0)
     return FALSE;
   else 
     return TRUE;
@@ -750,7 +750,7 @@ int clientHello(char *clientname)
 {
   cpHello_t chello;
   spAckMsg_t *sackmsg;
-  Unsgn8 buf[PKT_MAXSIZE];
+  char buf[PKT_MAXSIZE];
   int pkttype;
   extern char *ConquestVersion, *ConquestDate;
   int rv;
@@ -835,14 +835,14 @@ int clientHello(char *clientname)
   chello.protover = htons(PROTOCOL_VERSION);
   chello.cmnrev = htonl(COMMONSTAMP);
 
-  strncpy(chello.clientname, clientname, CONF_SERVER_NAME_SZ);
-  strncpy(chello.clientver, ConquestVersion, CONF_SERVER_NAME_SZ);
+  strncpy((char *)chello.clientname, clientname, CONF_SERVER_NAME_SZ);
+  strncpy((char *)chello.clientver, ConquestVersion, CONF_SERVER_NAME_SZ);
 
-  strcat(chello.clientver, " ");
-  strncat(chello.clientver, ConquestDate, 
+  strcat((char *)chello.clientver, " ");
+  strncat((char *)chello.clientver, ConquestDate, 
 	  (CONF_SERVER_NAME_SZ - strlen(ConquestVersion)) - 2);
 
-  if (!writePacket(PKT_TOSERVER, cInfo.sock, (Unsgn8 *)&chello))
+  if (!writePacket(PKT_TOSERVER, cInfo.sock, &chello))
     {
       clog("clientHello: write client hello failed\n");
       return FALSE;
@@ -933,7 +933,7 @@ int clientHello(char *clientname)
   return TRUE;
 }
 
-void processPacket(Unsgn8 *buf)
+void processPacket(char *buf)
 {
   int pkttype;
   spClientStat_t *scstat;

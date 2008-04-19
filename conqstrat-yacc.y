@@ -43,6 +43,7 @@ static int UpdateCmnBlock = FALSE;
 extern int Lineno;
 extern int goterror;
 extern void yyerror(char *s);
+int yylex(void);
 %}
 
 

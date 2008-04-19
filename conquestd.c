@@ -122,7 +122,8 @@ int getHostname(int sock, char *buf, int buflen)
 void checkMaster(void)
 {
   int s,t;			/* socket descriptor */
-  int i,rv;			/* general purpose integer */
+  int rv;			/* general purpose integer */
+  socklen_t sockln;
   struct sockaddr_in sa, isa;	/* internet socket addr. structure */
   struct hostent *hp;		/* result of host name lookup */
   struct timeval tv;
@@ -227,10 +228,10 @@ void checkMaster(void)
       if (FD_ISSET(s, &readfds))
         {        
 
-          i = sizeof (isa);
+          sockln = (socklen_t)sizeof (isa);
       
           /* hang in accept() while waiting for new connections */
-          if ((t = accept(s, (struct sockaddr *)&isa, &i )) < 0) 
+          if ((t = accept(s, (struct sockaddr *)&isa, &sockln )) < 0) 
             {
               perror ( "accept" );
               exit (1);
@@ -644,7 +645,7 @@ int capentry( int snum, int *system )
   int owned[NUMPLAYERTEAMS]; 
   int pkttype;
   cpCommand_t *ccmd;
-  Unsgn8 buf[PKT_MAXSIZE];
+  char buf[PKT_MAXSIZE];
   Unsgn8 esystem = 0;
   int sockl[2] = {sInfo.sock, sInfo.usock};
   
@@ -856,7 +857,7 @@ void dead( int snum, int leave )
 	  cpMessage_t *cmsg = (cpMessage_t *)buf;
 
 	  /* copy as much of the message as you can. */
-	  strncpy(ConqInfo->lastwords, cmsg->msg, MAXLASTWORDS);
+	  strncpy(ConqInfo->lastwords, (char *)cmsg->msg, MAXLASTWORDS);
           ConqInfo->lastwords[MAXLASTWORDS - 1] = 0;
 	}
     }
@@ -1191,7 +1192,7 @@ void menu(void)
   int lose, oclosed, switchteams, multiple, redraw;
   int playrv;
   int pkttype;
-  Unsgn8 buf[PKT_MAXSIZE];
+  char buf[PKT_MAXSIZE];
   cpCommand_t *ccmd;
   int sockl[2] = {sInfo.sock, sInfo.usock};
 
@@ -1562,7 +1563,7 @@ int play(void)
   int rv;
   char msgbuf[128];
   int pkttype;
-  Unsgn8 buf[PKT_MAXSIZE];
+  char buf[PKT_MAXSIZE];
   int sockl[2] = {sInfo.sock, sInfo.usock};
 
   /* Can't carry on without a vessel. */
@@ -1810,7 +1811,7 @@ int welcome( int *unum )
 static int hello(void)
 {
   spHello_t shello;
-  Unsgn8 buf[PKT_MAXSIZE];
+  char buf[PKT_MAXSIZE];
   char cbuf[MESSAGE_SIZE * 2];
   int pkttype;
   extern char *ConquestVersion, *ConquestDate;
@@ -1834,18 +1835,18 @@ static int hello(void)
   shello.protover = (Unsgn16)htons(PROTOCOL_VERSION);
 
   shello.cmnrev = (Unsgn32)htonl(COMMONSTAMP);
-  strncpy(shello.servername, SysConf.ServerName, CONF_SERVER_NAME_SZ);
-  strncpy(shello.serverver, ConquestVersion, CONF_SERVER_NAME_SZ);
-  strcat(shello.serverver, " ");
-  strncat(shello.serverver, ConquestDate, 
+  strncpy((char *)shello.servername, SysConf.ServerName, CONF_SERVER_NAME_SZ);
+  strncpy((char *)shello.serverver, ConquestVersion, CONF_SERVER_NAME_SZ);
+  strcat((char *)shello.serverver, " ");
+  strncat((char *)shello.serverver, ConquestDate, 
          (CONF_SERVER_NAME_SZ - strlen(ConquestVersion)) - 2);
-  strncpy(shello.motd, SysConf.ServerMotd, CONF_SERVER_MOTD_SZ);
+  strncpy((char *)shello.motd, SysConf.ServerMotd, CONF_SERVER_MOTD_SZ);
   shello.flags = 0;
 
   if (ConqInfo->closed)
     shello.flags |= SPHELLO_FLAGS_CLOSED;
 
-  if (!writePacket(PKT_TOCLIENT, sInfo.sock, (Unsgn8 *)&shello))
+  if (!writePacket(PKT_TOCLIENT, sInfo.sock, &shello))
     {
       clog("NET: SERVER: hello: write shello failed\n");
       return FALSE;

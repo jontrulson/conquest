@@ -18,7 +18,6 @@ CONTENTS:
             # GENERAL TERMINAL NOTE
             # TERMINFO ENTRIES
             ## UNIXWARE NOTE
-            ## SOLARIS/DU NOTE
 	    ## CONQUEST GROUP
 
 ### REQUIREMENTS
@@ -270,18 +269,6 @@ not designed to run suid root (or suid at all) and I take *no*
 responsibility for the consequences if you try to do so.  Actually, I
 take no responsibiliy for anything regarding the use of this software
 ;-)
-
-## SOLARIS/DU NOTE
-
-There is a problem with the lexer (lex) on Solaris and Digital Unix
-(OSF1).  When it processes conqstrat.c.l into lex.yy.c, a syntax error
-is introduced.  If you compile the resulting code (make will try this)
-you'll get a syntax error.  Simply edit the file (should be lex.yy.c)
-delete the offending line, and recompile.  The only result of this
-'fix' is that when (or if) you use conqstrat to build a new robot
-strategy table, all whitespace in the rule file will be output to
-stdout.  Annoying, but livable.  It does not affect the parsing of the
-rule file in any other way.
 
 ## CONQUEST GROUP
 

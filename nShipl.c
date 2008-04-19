@@ -173,7 +173,7 @@ static int nShiplDisplay(dspConfig_t *dsp)
 static int nShiplIdle(void)
 {
   int pkttype;
-  Unsgn8 buf[PKT_MAXSIZE];
+  char buf[PKT_MAXSIZE];
   int sockl[2] = {cInfo.sock, cInfo.usock};
 
   if (Context.recmode == RECMODE_PLAYING || Context.recmode == RECMODE_PAUSED)

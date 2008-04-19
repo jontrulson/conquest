@@ -233,12 +233,12 @@ void pktNotImpl(void *nothing)
 /* sends acks. to/from client/server. The server (TOCLIENT) can add a
    string message as well. */
 
-int sendAck(int sock, int dir, Unsgn8 severity, Unsgn8 code, Unsgn8 *msg)
+int sendAck(int sock, int dir, Unsgn8 severity, Unsgn8 code, char *msg)
 {
   cpAck_t cack;
   spAck_t sack;
   spAckMsg_t sackmsg;
-  Unsgn8 *buf;
+  void *buf;
 
   switch (dir)
     {
@@ -247,7 +247,7 @@ int sendAck(int sock, int dir, Unsgn8 severity, Unsgn8 code, Unsgn8 *msg)
       cack.severity = severity;
       cack.code = code;
 
-      buf = (Unsgn8 *)&cack;
+      buf = &cack;
 
       break;
     case PKT_TOCLIENT:
@@ -255,11 +255,11 @@ int sendAck(int sock, int dir, Unsgn8 severity, Unsgn8 code, Unsgn8 *msg)
 	{
 	  sackmsg.type = SP_ACKMSG;
 	  memset(sackmsg.txt, 0, MESSAGE_SIZE);
-	  strncpy(sackmsg.txt, msg, MESSAGE_SIZE - 1);
+	  strncpy((char *)sackmsg.txt, msg, MESSAGE_SIZE - 1);
 	  sackmsg.severity = severity;
 	  sackmsg.code = code;
 
-	  buf = (Unsgn8 *)&sackmsg;
+	  buf = &sackmsg;
 	}
       else
 	{
@@ -268,7 +268,8 @@ int sendAck(int sock, int dir, Unsgn8 severity, Unsgn8 code, Unsgn8 *msg)
 	  sack.code = code;
 	  sack.severity = severity;
 	  sack.code = code;
-	  buf = (Unsgn8 *)&sack;
+
+	  buf = &sack;
 	}
       break;
 
@@ -336,7 +337,7 @@ int invertDir(int dir)
   return -1;			/* NOTREACHED */
 }
 
-int waitForPacket(int dir, int sockl[], int type, Unsgn8 *buf, int blen, 
+int waitForPacket(int dir, int sockl[], int type, char *buf, int blen, 
 		  int delay, char *nakmsg)
 {
   int pkttype;
@@ -350,7 +351,8 @@ int waitForPacket(int dir, int sockl[], int type, Unsgn8 *buf, int blen,
 	    return pkttype;
 
 	  if (pkttype != type && nakmsg) /* we need to use a msg nak */
-	    sendAck(sockl[0], invertDir(dir), PSEV_ERROR, PERR_UNSPEC, nakmsg); 
+	    sendAck(sockl[0], invertDir(dir), PSEV_ERROR, PERR_UNSPEC, 
+                    nakmsg); 
 	}
 
       if (pkttype < 0)
@@ -420,7 +422,7 @@ int isPacketWaiting(int sock)
 
 
 /* sockl[0] is expected tcp socket, sockl[1] is for udp */
-int readPacket(int direction, int sockl[], Unsgn8 *buf, int blen, 
+int readPacket(int direction, int sockl[], char *buf, int blen, 
 	       unsigned int delay)
 {
   Unsgn8 type;
@@ -632,10 +634,13 @@ int readPacket(int direction, int sockl[], Unsgn8 *buf, int blen,
 }
 
 
-int writePacket(int direction, int sock, Unsgn8 *packet)
+int writePacket(int direction, int sock, void *data)
 {
   int len, wlen, left;
-  Unsgn8 type = *packet;	/* first byte is ALWAYS pkt type */
+  Unsgn8 type;
+  char *packet = (char *)data;
+
+  type = (Unsgn8)*packet;	/* first byte is ALWAYS pkt type */
 
   if (connDead) 
     return -1;

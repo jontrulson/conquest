@@ -31,8 +31,6 @@
 #include "cqkeys.h"
 #include "cqsound.h"
 
-extern void processPacket(Unsgn8 *buf);
-
 static char *if1="Suddenly  a  sinister,  wraithlike  figure appears before you";
 static char *if2="seeming to float in the air.  In a low,  sorrowful  voice  he";
 static char *if3="says, \"Alas, the very nature of the universe has changed, and";
@@ -164,7 +162,7 @@ static void _conqds(dspConfig_t *dsp)
 
 void nMenuInit(void)
 {
-  Unsgn8 buf[PKT_MAXSIZE];
+  char buf[PKT_MAXSIZE];
   static int inited = FALSE;
   int sockl[2] = {cInfo.sock, cInfo.usock};
 
@@ -287,7 +285,7 @@ static int nMenuDisplay(dspConfig_t *dsp)
 static int nMenuIdle(void)
 {
   int pkttype;
-  Unsgn8 buf[PKT_MAXSIZE];
+  char buf[PKT_MAXSIZE];
   spAck_t *sack;
   int sockl[2] = {cInfo.sock, cInfo.usock};
 

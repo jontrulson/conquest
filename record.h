@@ -79,12 +79,12 @@ void recordCloseOutput(void);
 int recordInitOutput(int unum, time_t thetime, int snum, int isserver);
 
 int recordReadHeader(fileHeader_t *fhdr);
-int recordReadPkt(Unsgn8 *buf, int blen);
+int recordReadPkt(char *buf, int blen);
 
-int recordWriteBuf(Unsgn8 *buf, int len);
+int recordWriteBuf(void *buf, int len);
 
 void recordUpdateFrame(void);
-void recordWriteEvent(Unsgn8 *buf);
+void recordWriteEvent(void *data);
 
 int initReplay(char *fname, time_t *elapsed);
 void recordGenTorpLoc(void);

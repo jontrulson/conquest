@@ -21,7 +21,7 @@ void pktNotImpl(void *);	/* a no-show */
 struct _packetent {
   Unsgn32 pktid;
   Unsgn32 size;
-  Unsgn8 *name;
+  char *name;
   void (*handler)();
 };
 
@@ -68,22 +68,22 @@ extern int pktRXBytes;
 extern Unsgn32 pingAvgMS;
 #endif
 
-int sendAck(int sock, int dir, Unsgn8 severity, Unsgn8 code, Unsgn8 *msg);
+int sendAck(int sock, int dir, Unsgn8 severity, Unsgn8 code, char *msg);
 int isConnDead(void);
 void pktNotImpl(void *nothing);
 void pktSetNodelay(int sock);
 char *psev2String(int psev);
 int invertDir(int dir);
 
-int waitForPacket(int dir, int sockl[], int type, Unsgn8 *buf, int blen, 
+int waitForPacket(int dir, int sockl[], int type, char *buf, int blen, 
 		  int delay, char *nakmsg);
 
 int clientPktSize(int type);
 int serverPktSize(int type);
 
 int isPacketWaiting(int sock);
-int writePacket(int direction, int sock, Unsgn8 *packet);
-int readPacket(int direction, int sockl[], Unsgn8 *buf, int len, 
+int writePacket(int direction, int sock, void *data);
+int readPacket(int direction, int sockl[], char *buf, int len, 
 	       unsigned int delay);
 int validPkt(int pkttype, void *pkt);
 

@@ -74,7 +74,7 @@ int Authenticate(char *username, char *password)
 {
   cpAuthenticate_t *cauth;
   int unum;
-  Unsgn8 buf[PKT_MAXSIZE];
+  char buf[PKT_MAXSIZE];
   int done, rv;
   char epw[MAXUSERNAME];
   int logcount = 3;
@@ -103,7 +103,7 @@ int Authenticate(char *username, char *password)
       cauth->login[MAXUSERNAME - 1] = 0;
       cauth->pw[MAXUSERNAME - 1] = 0;
 
-      if (checkuname(cauth->login) == FALSE)
+      if (checkuname((char *)cauth->login) == FALSE)
 	{
 	  sendAck(sInfo.sock, PKT_TOCLIENT, PSEV_ERROR, PERR_INVUSER,
 		  NULL);
@@ -114,7 +114,7 @@ int Authenticate(char *username, char *password)
 	{
 	case CPAUTH_CHECKUSER:
 
-	  if (clbGetUserNum( &unum, cauth->login, 0 ) == TRUE)
+	  if (clbGetUserNum( &unum, (char *)cauth->login, 0 ) == TRUE)
 	    {			/* user exits */
 	      sendAck(sInfo.sock, PKT_TOCLIENT, PSEV_INFO, PERR_OK,
 		      NULL);
@@ -136,7 +136,8 @@ int Authenticate(char *username, char *password)
 	      return FALSE;
 	    }
 
-	  if ((rv = doLogin(cauth->login, cauth->pw, epw)) != PERR_OK)
+	  if ((rv = doLogin((char *)cauth->login, (char *)cauth->pw, 
+                            epw)) != PERR_OK)
 	    {			/* somethings wrong, bad/inv pw, etc */
 	      sendAck(sInfo.sock, PKT_TOCLIENT, PSEV_ERROR, rv,
 		      NULL);
@@ -158,7 +159,7 @@ int Authenticate(char *username, char *password)
 	}
     }
 
-  strncpy(username, cauth->login, MAXUSERNAME);
+  strncpy(username, (char *)cauth->login, MAXUSERNAME);
   strncpy(password, epw, MAXUSERNAME);
 
   return(TRUE);

@@ -29,8 +29,6 @@
 #define S_SELSYS     2          /* select system */
 #define S_MENU       3          /* go back to menu */
 
-extern void processPacket(Unsgn8 *buf);
-
 static int state;
 static int fatal = FALSE;
 static spAck_t *sack = NULL;
@@ -91,7 +89,7 @@ static void selectentry( Unsgn8 esystem )
 static int _newship( int unum, int *snum )
 {
   int pkttype;
-  Unsgn8 buf[PKT_MAXSIZE];
+  char buf[PKT_MAXSIZE];
   int sockl[2] = {cInfo.sock, cInfo.usock};
 
   /* here we will wait for ack's or a clientstat pkt. Acks indicate an

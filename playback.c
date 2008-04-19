@@ -28,7 +28,7 @@
    other error. */
 int pbProcessPackets(void)
 {
-  Unsgn8 buf[PKT_MAXSIZE];
+  char buf[PKT_MAXSIZE];
   spFrame_t *frame;
   int pkttype;
   spMessage_t *smsg;
@@ -87,7 +87,7 @@ int pbProcessPackets(void)
               ((smsg->flags & MSG_FLAGS_ROBOT) && !UserConf.NoRobotMsgs))
             {
               memset((void *)&recMsg, 0, sizeof(Msg_t));
-              strncpy(recMsg.msgbuf, smsg->msg, MESSAGE_SIZE);
+              strncpy(recMsg.msgbuf, (char *)smsg->msg, MESSAGE_SIZE);
               recMsg.msgfrom = (int)((Sgn16)ntohs(smsg->from));
               recMsg.msgto = (int)((Sgn16)ntohs(smsg->to));
               recMsg.flags = smsg->flags;

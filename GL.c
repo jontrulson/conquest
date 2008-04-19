@@ -3712,8 +3712,9 @@ static int loadGLTextures()
           else if ((rv = LoadTGA(filenm, texti)) == TRUE)
             {
               status = TRUE;
-              
-              glGenTextures(1, &curTexture.id);   /* create the texture */
+
+              /* create the texture */
+              glGenTextures(1, (GLuint *)&curTexture.id); 
               glBindTexture(GL_TEXTURE_2D, curTexture.id);
               GLError();
               

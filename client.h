@@ -39,10 +39,10 @@ typedef struct {
   Unsgn32 state;		/* current state */
   Unsgn32 serverDead;		/* is the client dead/ */
   Unsgn32 isLoggedIn;		/* is the client logged in? */
-  Unsgn8 localhost[MAXHOSTNAME];
-  Unsgn8 *remotehost; /* self evident */
+  char    localhost[MAXHOSTNAME];
+  char   *remotehost; /* self evident */
   Unsgn16 remoteport;
-  Unsgn8 metaServer[MAXHOSTNAME]; /* the metaserver we are using */
+  char    metaServer[MAXHOSTNAME]; /* the metaserver we are using */
 } ClientInfo_t;
 
 EXTERNAL ClientInfo_t cInfo;
@@ -58,37 +58,37 @@ EXTERNAL Unsgn8 clientFlags;
 
 #undef EXTERNAL
 
-int sendAuth(int sock, Unsgn8 flag, Unsgn8 *login, Unsgn8 *pw);
+int sendAuth(int sock, Unsgn8 flag, char *login, char *pw);
 int sendSetCourse(int sock, Sgn8 lock, real head);
 
 /* packet proc routines */
-int procUser(Unsgn8 *buf);
-int procShip(Unsgn8 *buf);
-int procShipSml(Unsgn8 *buf);
-int procShipLoc(Unsgn8 *buf);
-int procPlanet(Unsgn8 *buf);
-int procPlanetSml(Unsgn8 *buf);
-int procPlanetLoc(Unsgn8 *buf);
-int procPlanetLoc2(Unsgn8 *buf);
-int procPlanetInfo(Unsgn8 *buf);
-int procTorp(Unsgn8 *buf);
-int procTorpLoc(Unsgn8 *buf);
-int procTorpEvent(Unsgn8 *buf);
-int procTeam(Unsgn8 *buf);
-int procMessage(Unsgn8 *buf);
-int procServerStat(Unsgn8 *buf);
-int procConqInfo(Unsgn8 *buf);
-int procHistory(Unsgn8 *buf);
-int procDoomsday(Unsgn8 *buf);
+int procUser(char *buf);
+int procShip(char *buf);
+int procShipSml(char *buf);
+int procShipLoc(char *buf);
+int procPlanet(char *buf);
+int procPlanetSml(char *buf);
+int procPlanetLoc(char *buf);
+int procPlanetLoc2(char *buf);
+int procPlanetInfo(char *buf);
+int procTorp(char *buf);
+int procTorpLoc(char *buf);
+int procTorpEvent(char *buf);
+int procTeam(char *buf);
+int procMessage(char *buf);
+int procServerStat(char *buf);
+int procConqInfo(char *buf);
+int procHistory(char *buf);
+int procDoomsday(char *buf);
 
-int sendSetName(Unsgn8 *name);
+int sendSetName(char *name);
 int sendCommand(Unsgn8 cmd, Unsgn16 detail);
 int sendFireTorps(int num, real dir);
 int sendMessage(int to, char *msg);
 
 int clientHello(char *clientname);
 
-void processPacket(Unsgn8 *buf);
+void processPacket(char *buf);
 
 void sendUDPKeepAlive(Unsgn32 timebase);
 

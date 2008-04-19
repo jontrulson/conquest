@@ -27,8 +27,7 @@ extern int cqiDebugl;                       /* from conqinit-yacc.y */
 
 %}
 
-WS	 [ \t]+
-OWS	 [ \t]*
+whtspc	 [ \t]+
 string   \"([^"]|\\.)*\"
 number   [0-9]+
 rational -?(([0-9]+)|([0-9]*\.[0-9]+)([eE][-+]?[0-9]+)?)
@@ -69,9 +68,9 @@ armies                 {return ( ARMIES );}
 visible                {return ( VISIBLE );}
 core                   {return ( CORE );}
 xcoord                 {return ( XCOORD );}
-{WS}x{WS}              {return ( XCOORD );}
+{whtspc}x{whtspc}      {return ( XCOORD );}
 ycoord                 {return ( YCOORD );}
-{WS}y{WS}              {return ( YCOORD );}
+{whtspc}y{whtspc}      {return ( YCOORD );}
 texname                {return ( TEXNAME );}
 color                  {return ( COLOR );}
 size                   {return ( SIZE );}
@@ -122,11 +121,11 @@ limit                  {return ( LIMIT );}
 
 music                  {return ( MUSIC );}
 
-{WS}s{WS}              {return ( SCOORD );}
-{WS}t{WS}              {return ( SCOORD );}
+{whtspc}s{whtspc}      {return ( SCOORD );}
+{whtspc}t{whtspc}      {return ( SCOORD );}
 
-{WS}w{WS}              {return ( WIDTH );}
-{WS}h{WS}              {return ( HEIGHT );}
+{whtspc}w{whtspc}      {return ( WIDTH );}
+{whtspc}h{whtspc}      {return ( HEIGHT );}
 
 texarea                {return ( TEXAREA );}
 
@@ -151,7 +150,7 @@ texarea                {return ( TEXAREA );}
 #+.*			/* eat comments */
 
 
-{WS}			/* eat gratuitous white space */
+{whtspc}		/* eat gratuitous white space */
 
 \n			{lineNum++; /* eat newlines */}
 

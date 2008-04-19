@@ -337,7 +337,7 @@ int main(int argc, char *argv[])
 
         break;
       case 's':                 /* [host[:port]] */
-	cInfo.remotehost = (Unsgn8 *)strdup(optarg);
+	cInfo.remotehost = strdup(optarg);
         if (!cInfo.remotehost)
           {
             printf("strdup failed\n");

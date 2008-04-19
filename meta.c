@@ -295,8 +295,8 @@ int metaUpdateServer(char *remotehost, char *name, int port)
   strncpy(sRec.servername, SysConf.ServerName, CONF_SERVER_NAME_SZ);
   pipe2ul(sRec.servername);
   strncpy(sRec.serverver, ConquestVersion, CONF_SERVER_NAME_SZ);
-  strcat(sRec.serverver, " ");
-  strncat(sRec.serverver, ConquestDate,
+  strcat((char *)sRec.serverver, " ");
+  strncat((char *)sRec.serverver, ConquestDate,
           (CONF_SERVER_NAME_SZ - strlen(ConquestVersion)) - 2);
   pipe2ul(sRec.serverver);
   strncpy(sRec.motd, SysConf.ServerMotd, CONF_SERVER_MOTD_SZ);

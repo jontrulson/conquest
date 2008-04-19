@@ -52,8 +52,7 @@ extern int yylval;
 
 %}
 
-WS	[ \t]+
-OWS	[ \t]*
+whtspc	[ \t]+
 
 %%
 
@@ -124,7 +123,7 @@ ROB_RUNAWAY		{yylval = ROB_RUNAWAY; return( TOK_ACTION );}
 #+.*			/*# eat comments */
 
 
-{WS}			/* eat gratuitous white space */
+{whtspc}		/* eat gratuitous white space */
 
 \n			{Lineno++; /* eat newlines */}
 

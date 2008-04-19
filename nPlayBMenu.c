@@ -32,8 +32,6 @@
 #include "nTeaml.h"
 #include "cqkeys.h"
 
-extern void processPacket(Unsgn8 *buf);
-
 #define S_NONE          0
 #define S_WATCH         1       /* prompt for a ship */
 static int state;

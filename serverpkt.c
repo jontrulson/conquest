@@ -145,8 +145,8 @@ spUser_t *spktUser(Unsgn16 unum)
   for (i=0; i<USTAT_TOTALSTATS; i++)
     suser.stats[i] = (Sgn32)htonl(Users[unum].stats[i]);
 
-  strncpy(suser.username, Users[unum].username, MAXUSERNAME - 1);
-  strncpy(suser.alias, Users[unum].alias, MAXUSERPNAME - 1);
+  strncpy((char *)suser.username, Users[unum].username, MAXUSERNAME - 1);
+  strncpy((char *)suser.alias, Users[unum].alias, MAXUSERPNAME - 1);
 
   if (memcmp((void *)&suser, (void *)&pktUser[unum], sizeof(spUser_t)))
     {
@@ -217,7 +217,7 @@ spShip_t *spktShip(Unsgn8 snum, int rec)
   for (i=0; i<NUMPLAYERTEAMS; i++)
     sship.scanned[i] = (Unsgn8)Ships[snum].scanned[i];
 
-  strncpy(sship.alias, Ships[snum].alias, MAXUSERPNAME - 1);
+  strncpy((char *)sship.alias, Ships[snum].alias, MAXUSERPNAME - 1);
 
   if (rec)
     {
@@ -475,7 +475,7 @@ spPlanet_t *spktPlanet(Unsgn8 pnum, int rec)
   else
     splan.team = TEAM_SELFRULED; /* until we know for sure... */
 
-  strncpy(splan.name, Planets[pnum].name, MAXPLANETNAME);
+  strncpy((char *)splan.name, Planets[pnum].name, MAXPLANETNAME);
 
   if (rec)
     {
@@ -897,7 +897,7 @@ spTeam_t *spktTeam(Unsgn8 team, int force, int rec)
   for (i=0; i<MAXTSTATS; i++)
     steam.stats[i] = (Unsgn32)htonl(Teams[team].stats[i]);
 
-  strncpy(steam.name, Teams[team].name, MAXTEAMNAME - 1);
+  strncpy((char *)steam.name, Teams[team].name, MAXTEAMNAME - 1);
   
   if (rec)
     {
@@ -929,10 +929,10 @@ spConqInfo_t *spktConqInfo(int force)
 
   spci.type = SP_CONQINFO;
 
-  strncpy(spci.conqueror, ConqInfo->conqueror, MAXUSERPNAME - 1);
-  strncpy(spci.conqteam, ConqInfo->conqteam, MAXTEAMNAME - 1);
-  strncpy(spci.conqtime, ConqInfo->conqtime, DATESIZE - 1);
-  strncpy(spci.lastwords, ConqInfo->lastwords, MAXLASTWORDS - 1);
+  strncpy((char *)spci.conqueror, ConqInfo->conqueror, MAXUSERPNAME - 1);
+  strncpy((char *)spci.conqteam, ConqInfo->conqteam, MAXTEAMNAME - 1);
+  strncpy((char *)spci.conqtime, ConqInfo->conqtime, DATESIZE - 1);
+  strncpy((char *)spci.lastwords, ConqInfo->lastwords, MAXLASTWORDS - 1);
   
   if (memcmp((void *)&spci, (void *)&pktConqInfo,
              sizeof(spConqInfo_t)) || force)

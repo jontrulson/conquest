@@ -23,25 +23,25 @@
 
 /* internal representation of a server record for the meta server */
 typedef struct _meta_srec {
-  int valid;
+  int     valid;
   Unsgn16 version;
-  Unsgn8 numactive;
-  Unsgn8 numvacant;
-  Unsgn8 numrobot;
-  Unsgn8 numtotal;
-  time_t lasttime;              /* last contact time */
+  Unsgn8  numactive;
+  Unsgn8  numvacant;
+  Unsgn8  numrobot;
+  Unsgn8  numtotal;
+  time_t  lasttime;             /* last contact time */
   Unsgn32 flags;                /* same as spServerStat_t */
   Unsgn16 port;
-  Unsgn8 addr[CONF_SERVER_NAME_SZ]; /* server's detected address */
-  Unsgn8 altaddr[CONF_SERVER_NAME_SZ]; /* specified real address */
-  Unsgn8 servername[CONF_SERVER_NAME_SZ];
-  Unsgn8 serverver[CONF_SERVER_NAME_SZ]; /* server's proto version */
-  Unsgn8 motd[CONF_SERVER_MOTD_SZ];
+  char    addr[CONF_SERVER_NAME_SZ]; /* server's detected address */
+  char    altaddr[CONF_SERVER_NAME_SZ]; /* specified real address */
+  char    servername[CONF_SERVER_NAME_SZ];
+  char    serverver[CONF_SERVER_NAME_SZ]; /* server's proto version */
+  char    motd[CONF_SERVER_MOTD_SZ];
 
   /* Version 0x0002 */
   Unsgn16 protovers;
-  Unsgn8 contact[META_GEN_STRSIZE];
-  Unsgn8 walltime[META_GEN_STRSIZE];
+  char    contact[META_GEN_STRSIZE];
+  char    walltime[META_GEN_STRSIZE];
 
 } metaSRec_t;
 

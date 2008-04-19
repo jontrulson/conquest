@@ -156,18 +156,19 @@ void nMetaInit(void)
 
   /* get the server list */
   clog("nMetaInit: Querying metaserver at %s", cInfo.metaServer);
-  numMetaServers = metaGetServerList(cInfo.metaServer, &metaServerList);
+  numMetaServers = metaGetServerList(cInfo.metaServer, 
+                                     &metaServerList);
   
   if (numMetaServers < 0)
     {
       clog("nMetaInit: metaGetServerList() failed");
-      return NODE_EXIT;
+      return;
     }
   
   if (numMetaServers == 0)
     {
       clog("nMetaInit: metaGetServerList() reported 0 servers online");
-      return NODE_EXIT;
+      return;
     }
   
   clog("nMetaInit: Found %d server(s)", numMetaServers);

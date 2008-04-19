@@ -60,7 +60,7 @@ int sendClientStat(int sock, Unsgn8 flags, Unsgn8 snum, Unsgn8 team,
   scstat.unum = htons(unum);
   scstat.esystem = esystem;
 
-  if (writePacket(PKT_TOCLIENT, sock, (Unsgn8 *)&scstat) <= 0)
+  if (writePacket(PKT_TOCLIENT, sock, &scstat) <= 0)
     return FALSE;
   else
     return TRUE;
@@ -78,11 +78,11 @@ int sendUser(int sock, Unsgn16 unum)
   /* not really any priv bits, but in case we add some later */
   if ((suser = spktUser(unum)))
     {
-      if (writePacket(PKT_TOCLIENT, sock, (Unsgn8 *)suser) <= 0)
+      if (writePacket(PKT_TOCLIENT, sock, suser) <= 0)
         return FALSE;
 
       if (Context.recmode == RECMODE_ON)
-        recordWriteEvent((Unsgn8 *)suser);
+        recordWriteEvent(suser);
     }
 
   return TRUE;
@@ -104,22 +104,22 @@ int sendShip(int sock, Unsgn8 snum)
   if (Context.recmode == RECMODE_ON)
     {
       if ((sship = spktShip(snum, TRUE)))
-        recordWriteEvent((Unsgn8 *)sship);
+        recordWriteEvent(sship);
     }
 
   if ((sship = spktShip(snum, FALSE)))
-    if (writePacket(PKT_TOCLIENT, sock, (Unsgn8 *)sship) <= 0)
+    if (writePacket(PKT_TOCLIENT, sock, sship) <= 0)
       return FALSE;
 
   /* SP_SHIPSML */
   if (Context.recmode == RECMODE_ON)
     {
       if ((sshipsml = spktShipSml(snum, TRUE)))
-        recordWriteEvent((Unsgn8 *)sshipsml);
+        recordWriteEvent(sshipsml);
     }
 
   if ((sshipsml = spktShipSml(snum, FALSE)))
-    if (writePacket(PKT_TOCLIENT, sock, (Unsgn8 *)sshipsml) <= 0)
+    if (writePacket(PKT_TOCLIENT, sock, sshipsml) <= 0)
       return FALSE;
 
   /* SP_SHIPLOC */
@@ -127,14 +127,14 @@ int sendShip(int sock, Unsgn8 snum)
   if (Context.recmode == RECMODE_ON)
     {
       if ((sshiploc = spktShipLoc(snum, TRUE)))
-        recordWriteEvent((Unsgn8 *)sshiploc);
+        recordWriteEvent(sshiploc);
     }
   
   if ((sshiploc = spktShipLoc(snum, FALSE)))
     {
       if (sInfo.doUDP)
         {
-          if (writePacket(PKT_TOCLIENT, sInfo.usock, (Unsgn8 *)sshiploc) <= 0)
+          if (writePacket(PKT_TOCLIENT, sInfo.usock, sshiploc) <= 0)
             {
               handleUDPErr();
               return FALSE;
@@ -142,7 +142,7 @@ int sendShip(int sock, Unsgn8 snum)
         }
       else
         {
-          if (writePacket(PKT_TOCLIENT, sock, (Unsgn8 *)sshiploc) <= 0)
+          if (writePacket(PKT_TOCLIENT, sock, sshiploc) <= 0)
             return FALSE;
         }
     }
@@ -167,33 +167,33 @@ int sendPlanet(int sock, Unsgn8 pnum, int force)
   if (Context.recmode == RECMODE_ON)
     {
       if ((splan = spktPlanet(pnum, TRUE)))
-        recordWriteEvent((Unsgn8 *)splan);
+        recordWriteEvent(splan);
     }
 
   if ((splan = spktPlanet(pnum, FALSE)))
-    if (writePacket(PKT_TOCLIENT, sock, (Unsgn8 *)splan) <= 0)
+    if (writePacket(PKT_TOCLIENT, sock, splan) <= 0)
       return FALSE;
 
   /* SP_PLANETSML */
   if (Context.recmode == RECMODE_ON)
     {
       if ((splansml = spktPlanetSml(pnum, TRUE)))
-        recordWriteEvent((Unsgn8 *)splansml);
+        recordWriteEvent(splansml);
     }
 
   if ((splansml = spktPlanetSml(pnum, FALSE)))
-    if (writePacket(PKT_TOCLIENT, sock, (Unsgn8 *)splansml) <= 0)
+    if (writePacket(PKT_TOCLIENT, sock, splansml) <= 0)
       return FALSE;
 
   /* SP_PLANETINFO */
   if (Context.recmode == RECMODE_ON)
     {
       if ((splaninfo = spktPlanetInfo(pnum, TRUE)))
-        recordWriteEvent((Unsgn8 *)splaninfo);
+        recordWriteEvent(splaninfo);
     }
 
   if ((splaninfo = spktPlanetInfo(pnum, FALSE)))
-    if (writePacket(PKT_TOCLIENT, sock, (Unsgn8 *)splaninfo) <= 0)
+    if (writePacket(PKT_TOCLIENT, sock, splaninfo) <= 0)
       return FALSE;
 
   /* we will do loc packets for recording purposes only.  loc2 is sent
@@ -204,12 +204,12 @@ int sendPlanet(int sock, Unsgn8 pnum, int force)
   if (Context.recmode == RECMODE_ON)
     {
       if ((splanloc = spktPlanetLoc(pnum, TRUE, force)))
-        recordWriteEvent((Unsgn8 *)splanloc);
+        recordWriteEvent(splanloc);
     }
 
   /* SP_PLANETLOC2 */
   if ((splanloc2 = spktPlanetLoc2(pnum, FALSE, force)))
-    if (writePacket(PKT_TOCLIENT, sock, (Unsgn8 *)splanloc2) <= 0)
+    if (writePacket(PKT_TOCLIENT, sock, splanloc2) <= 0)
       return FALSE;
 
   return TRUE;
@@ -271,7 +271,7 @@ int sendServerStat(int sock)
 
   sStat.servertime = (Unsgn32)htonl(getnow(NULL, 0));
   
-  if (!writePacket(PKT_TOCLIENT, sock, (Unsgn8 *)&sStat))
+  if (!writePacket(PKT_TOCLIENT, sock, &sStat))
     {
       clog("sendServerStats: writePacket failed\n");
       return FALSE;
@@ -306,13 +306,13 @@ int sendTorp(int sock, Unsgn8 tsnum, Unsgn8 tnum)
     {
       if ((storpev = spktTorpEvent(tsnum, tnum, TRUE)))
         {
-          recordWriteEvent((Unsgn8 *)storpev);
+          recordWriteEvent(storpev);
         }
     }
 
   if ((storpev = spktTorpEvent(tsnum, tnum, FALSE)))
     {
-      if (writePacket(PKT_TOCLIENT, sock, (Unsgn8 *)storpev) <= 0)
+      if (writePacket(PKT_TOCLIENT, sock, storpev) <= 0)
         return FALSE;
     }
 
@@ -321,7 +321,7 @@ int sendTorp(int sock, Unsgn8 tsnum, Unsgn8 tnum)
   if (Context.recmode == RECMODE_ON)
     {
       if ((storp = spktTorp(tsnum, tnum, TRUE)))
-        recordWriteEvent((Unsgn8 *)storp);
+        recordWriteEvent(storp);
     }
 
   /* SP_TORPLOC */
@@ -330,7 +330,7 @@ int sendTorp(int sock, Unsgn8 tsnum, Unsgn8 tnum)
   if (Context.recmode == RECMODE_ON)
     {
       if ((storploc = spktTorpLoc(tsnum, tnum, TRUE)))
-        recordWriteEvent((Unsgn8 *)storploc);
+        recordWriteEvent(storploc);
     }
 
   return TRUE;
@@ -388,14 +388,14 @@ int sendMessage(Msg_t *msg)
   smsg.to = (Sgn16)htons(msg->msgto);
   smsg.flags = msg->flags;
   
-  strncpy(smsg.msg, msg->msgbuf, MESSAGE_SIZE - 1);
+  strncpy((char *)smsg.msg, msg->msgbuf, MESSAGE_SIZE - 1);
 
   /* don't record feeback or tersable msgs */
   if (Context.recmode == RECMODE_ON)
     if (!(smsg.flags & (MSG_FLAGS_FEEDBACK | MSG_FLAGS_TERSABLE)))
-      recordWriteEvent((Unsgn8 *)&smsg);
+      recordWriteEvent(&smsg);
 
-  if (!writePacket(PKT_TOCLIENT, sInfo.sock, (Unsgn8 *)&smsg))
+  if (!writePacket(PKT_TOCLIENT, sInfo.sock, &smsg))
     {
       clog("sendMessage: writePacket failed\n");
       return FALSE;
@@ -415,11 +415,11 @@ int sendTeam(int sock, Unsgn8 team, int force)
   if (Context.recmode == RECMODE_ON)
     {
       if ((steam = spktTeam(team, force, TRUE)))
-        recordWriteEvent((Unsgn8 *)steam);
+        recordWriteEvent(steam);
     }
 
   if ((steam = spktTeam(team, force, FALSE)))
-    if (writePacket(PKT_TOCLIENT, sock, (Unsgn8 *)steam) <= 0)
+    if (writePacket(PKT_TOCLIENT, sock, steam) <= 0)
       return FALSE;
 
   return TRUE;
@@ -434,7 +434,7 @@ int sendConqInfo(int sock, int force)
 #endif
 
   if ((spci = spktConqInfo(force)))
-    if (writePacket(PKT_TOCLIENT, sock, (Unsgn8 *)spci) <= 0)
+    if (writePacket(PKT_TOCLIENT, sock, spci) <= 0)
       return FALSE;
 
   return TRUE;
@@ -452,7 +452,7 @@ int sendHistory(int sock, int hnum)
 #endif
 
   if ((shist = spktHistory(hnum)))
-    if (writePacket(PKT_TOCLIENT, sock, (Unsgn8 *)shist) <= 0)
+    if (writePacket(PKT_TOCLIENT, sock, shist) <= 0)
       return FALSE;
 
   return TRUE;
@@ -469,18 +469,18 @@ int sendDoomsday(int sock)
   if (Context.recmode == RECMODE_ON)
     {
       if ((dd = spktDoomsday(TRUE)))
-        recordWriteEvent((Unsgn8 *)dd);
+        recordWriteEvent(dd);
     }
 
   if ((dd = spktDoomsday(FALSE)))
-    if (writePacket(PKT_TOCLIENT, sock, (Unsgn8 *)dd) <= 0)
+    if (writePacket(PKT_TOCLIENT, sock, dd) <= 0)
       return FALSE;
 
   return TRUE;
 }
   
 
-void procSetName(Unsgn8 *buf)
+void procSetName(char *buf)
 {
   cpSetName_t *cpsetn = (cpSetName_t *)buf;
 
@@ -489,15 +489,15 @@ void procSetName(Unsgn8 *buf)
 
   cpsetn->alias[MAXUSERPNAME - 1] = 0;
 
-  strncpy(Users[Context.unum].alias, cpsetn->alias, MAXUSERPNAME);
+  strncpy(Users[Context.unum].alias, (char *)cpsetn->alias, MAXUSERPNAME);
 
   if (Context.snum > 0 && Context.snum <= MAXSHIPS)
-    strncpy(Ships[Context.snum].alias, cpsetn->alias, MAXUSERPNAME);
+    strncpy(Ships[Context.snum].alias, (char *)cpsetn->alias, MAXUSERPNAME);
 
   return;
 }
 
-void procSetCourse(Unsgn8 *buf)
+void procSetCourse(char *buf)
 {
   cpSetCourse_t *csc = (cpSetCourse_t *)buf;
   int lock;
@@ -1063,7 +1063,7 @@ void procCoup(cpCommand_t *cmd)
   return;
 }
   
-void procFireTorps(Unsgn8 *buf)
+void procFireTorps(char *buf)
 {
   int snum = Context.snum;		/* we always use our own ship */
   cpFireTorps_t *cftorp = (cpFireTorps_t *)buf;
@@ -1113,7 +1113,7 @@ void procFireTorps(Unsgn8 *buf)
   
 }
 
-void procMessage(Unsgn8 *buf)
+void procMessage(char *buf)
 {
   int snum = Context.snum;		/* we always use our own ship */
   cpMessage_t *cmsg = (cpMessage_t *)buf;
@@ -1132,13 +1132,13 @@ void procMessage(Unsgn8 *buf)
   clog("PROC MESSAGE: to %d", to);
 #endif
 
-  clbStoreMsg(snum, to, cmsg->msg);
-  checkOperExec(snum, to, cmsg->msg);
+  clbStoreMsg(snum, to, (char *)cmsg->msg);
+  checkOperExec(snum, to, (char *)cmsg->msg);
 
   return;
 }
 
-void procChangePassword(Unsgn8 *buf)
+void procChangePassword(char *buf)
 {
   char salt[3];
   int unum = Context.unum;
@@ -1161,7 +1161,8 @@ void procChangePassword(Unsgn8 *buf)
     'T';
   salt[2] = EOS;
 
-  strncpy(Users[unum].pw, (char *)crypt(cauth->pw, salt), MAXUSERNAME - 2);
+  strncpy(Users[unum].pw, (char *)crypt((char *)cauth->pw, salt), 
+          MAXUSERNAME - 2);
   Users[unum].pw[MAXUSERNAME - 1] = EOS;
 
   return;

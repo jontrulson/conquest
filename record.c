@@ -224,13 +224,13 @@ int recordInitOutput(int unum, time_t thetime, int snum, int isserver)
   fhdr.samplerate = (Unsgn8)Context.updsec;
 
   fhdr.rectime = (Unsgn32)htonl((Unsgn32)thetime);
-  strncpy(fhdr.user, Users[unum].username, MAXUSERNAME - 1);
+  strncpy((char*)fhdr.user, Users[unum].username, MAXUSERNAME - 1);
 
   fhdr.cmnrev = (Unsgn32)htonl((Unsgn32)COMMONSTAMP);
   fhdr.snum = snum;
   fhdr.flags = (Unsgn32)htonl((Unsgn32)fhdr.flags);
 
-  if (!recordWriteBuf((Unsgn8 *)&fhdr, sizeof(fileHeader_t)))
+  if (!recordWriteBuf(&fhdr, sizeof(fileHeader_t)))
     return(FALSE);
 
   /* add a frame packet */
@@ -241,9 +241,10 @@ int recordInitOutput(int unum, time_t thetime, int snum, int isserver)
 }
 
 /* note, if we get a write error here, we turn off recording */
-void recordWriteEvent(Unsgn8 *buf)
+void recordWriteEvent(void *data)
 {
-  int pkttype;
+  char *buf = (char *)data;
+  Unsgn8 pkttype;
   int len;
 
   if (Context.recmode != RECMODE_ON)
@@ -252,7 +253,7 @@ void recordWriteEvent(Unsgn8 *buf)
   if (!buf)
     return;
 
-  pkttype = (int)buf[0];
+  pkttype = (Unsgn8)*buf;
   
   len = serverPktSize(pkttype);
   if (!len)
@@ -285,7 +286,7 @@ void recordUpdateFrame(void)
   frame.frame = (Unsgn32)htonl(recordFrameCount);
   frame.time = (Unsgn32)htonl((Unsgn32)getnow(NULL, 0));
 
-  recordWriteEvent((Unsgn8 *)&frame);
+  recordWriteEvent(&frame);
 
   recordFrameCount++;
 
@@ -293,7 +294,7 @@ void recordUpdateFrame(void)
 }
 
 /* write out a buffer */
-int recordWriteBuf(Unsgn8 *buf, int len)
+int recordWriteBuf(void *buf, int len)
 {
   if (rdata_wfd == -1)
     return(FALSE);
@@ -318,7 +319,7 @@ int recordWriteBuf(Unsgn8 *buf, int len)
 
 
 /* read in a packet, returning the packet type */
-int recordReadPkt(Unsgn8 *buf, int blen)
+int recordReadPkt(char *buf, int blen)
 {
   int len, rv;
   int pkttype;
@@ -404,7 +405,7 @@ int initReplay(char *fname, time_t *elapsed)
   int pkttype;
   time_t starttm = 0;
   time_t curTS = 0;
-  Unsgn8 buf[PKT_MAXSIZE];
+  char buf[PKT_MAXSIZE];
 
   if (!recordOpenInput(fname))
     {
@@ -574,7 +575,7 @@ void recordGenTorpLoc(void)
                                sizeof(spTorpLoc_t)))
                       {
                         pktTorpLoc[i][j] = storploc;
-                        recordWriteEvent((Unsgn8 *)&storploc);
+                        recordWriteEvent(&storploc);
                       }
                 }
             }

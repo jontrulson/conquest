@@ -114,7 +114,7 @@ static int nHistlDisplay(dspConfig_t *dsp)
 static int nHistlIdle(void)
 {
   int pkttype;
-  Unsgn8 buf[PKT_MAXSIZE];
+  char buf[PKT_MAXSIZE];
   int sockl[2] = {cInfo.sock, cInfo.usock};
 
   while ((pkttype = waitForPacket(PKT_FROMSERVER, sockl, PKT_ANYPKT,

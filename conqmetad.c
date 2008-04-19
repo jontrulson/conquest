@@ -239,10 +239,11 @@ void metaListen(void)
   struct timeval tv;
   socklen_t len;
   struct hostent *hp;
-  int rv, rlen, i;
+  int rv, rlen;
+  socklen_t sockln;
   char hostbuf[CONF_SERVER_NAME_SZ];
   char rbuf[BUFFERSZ];
-  int alen;
+  socklen_t alen;
   fd_set readfds;
 
   sa.sin_port = htons(listenPort);
@@ -316,8 +317,8 @@ void metaListen(void)
       /* TCP (list) socket */
       if (FD_ISSET(t, &readfds))
         {
-          i = sizeof (isa);
-          if ((tc = accept(t, (struct sockaddr *)&tisa, &i )) < 0) 
+          sockln = sizeof (isa);
+          if ((tc = accept(t, (struct sockaddr *)&tisa, &sockln )) < 0) 
             {
               clog("META: accept failed: %s", strerror(errno) );
               continue;

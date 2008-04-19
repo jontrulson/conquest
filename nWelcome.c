@@ -82,7 +82,7 @@ void nWelcomeInit(void)
 {
   spClientStat_t *scstat = NULL;
   int pkttype;
-  Unsgn8 buf[PKT_MAXSIZE];
+  char buf[PKT_MAXSIZE];
   int sockl[2] = {cInfo.sock, cInfo.usock};
   int done = FALSE;
 
@@ -157,7 +157,7 @@ void nWelcomeInit(void)
 
 static int nWelcomeDisplay(dspConfig_t *dsp)
 {
-  Unsgn8 buf[PKT_MAXSIZE];
+  char buf[PKT_MAXSIZE];
   int team, col = 0;
   time_t t = time(0);
   int sockl[2] = {cInfo.sock, cInfo.usock};
@@ -269,4 +269,3 @@ static int nWelcomeDisplay(dspConfig_t *dsp)
   return NODE_OK;
 }  
   
-

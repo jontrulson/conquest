@@ -266,7 +266,7 @@ int main(int argc, char *argv[])
   cInfo.remoteport = CN_DFLT_PORT;
 
   setSystemLog(FALSE, FALSE);	/* use $HOME for logfile */
-  if (!getLocalhost(cInfo.localhost, MAXHOSTNAME))
+  if (!getLocalhost((char *)cInfo.localhost, MAXHOSTNAME))
     return(1);
 
   cInfo.remotehost = strdup("localhost"); /* default to your own server */
@@ -285,7 +285,7 @@ int main(int argc, char *argv[])
         metaServer = optarg;
         break;
       case 's':                 /* [host[:port]] */
-	cInfo.remotehost = (Unsgn8 *)strdup(optarg);
+	cInfo.remotehost = strdup(optarg);
         if (!cInfo.remotehost)
           {
             printf("strdup failed\n");
@@ -466,7 +466,7 @@ int main(int argc, char *argv[])
       if (cInfo.remotehost)
         free(cInfo.remotehost);
 
-      if ((cInfo.remotehost = strdup(metaServerList[i].altaddr)) == NULL)
+      if ((cInfo.remotehost = strdup((char *)metaServerList[i].altaddr)) == NULL)
         {
           clog("strdup(metaServerList[i]) failed");
           cdend();
@@ -2736,7 +2736,7 @@ void menu(void)
   int pkttype;
   struct timeval timeout;
   fd_set readfds;
-  Unsgn8 buf[PKT_MAXSIZE];
+  char buf[PKT_MAXSIZE];
   spAck_t *sack;
   char *if1="Suddenly  a  sinister,  wraithlike  figure appears before you";
   char *if2="seeming to float in the air.  In a low,  sorrowful  voice  he";
@@ -3075,7 +3075,7 @@ int newship( int unum, int *snum )
   spAck_t *sack;
   spClientStat_t *scstat;
   int pkttype;
-  Unsgn8 buf[PKT_MAXSIZE];
+  char buf[PKT_MAXSIZE];
   int sockl[2] = {cInfo.sock, cInfo.usock};
   /* here we will wait for ack's or a clientstat pkt. Acks indicate an
      error.  If the clientstat pkt's esystem is !0, we need to prompt
@@ -3336,7 +3336,7 @@ int welcome( int *unum )
   spClientStat_t *scstat = NULL;
   spAck_t *sack = NULL;
   int pkttype;
-  Unsgn8 buf[PKT_MAXSIZE];
+  char buf[PKT_MAXSIZE];
   int sockl[2] = {cInfo.sock, cInfo.usock};
   int done = FALSE;
   
@@ -3553,7 +3553,7 @@ void astservice(int sig)
   int readone;
   static int RMsggrand = 0;
   int difftime;
-  Unsgn8 buf[PKT_MAXSIZE];
+  char buf[PKT_MAXSIZE];
   int sockl[2] = {cInfo.sock, cInfo.usock};
   static Unsgn32 iterstart = 0;
   Unsgn32 iternow = clbGetMillis();
