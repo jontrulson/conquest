@@ -167,7 +167,6 @@ void Unlock(int what)
   if (ConquestSemID == -1)
     return;			/* clients don't use sems... */
 
-  arg.array = semvals;
 
 #ifdef DEBUG_SEM
   clog("Unlock(%s): Attempting to free a lock.",
@@ -176,7 +175,8 @@ void Unlock(int what)
 #endif
 
 
-				/* get the values of the semaphores */
+  /* get the values of the semaphores */
+  arg.array = semvals;
   retval = semctl(ConquestSemID, 0, GETALL, arg);
   
   if (retval != 0)
@@ -258,10 +258,6 @@ char *semGetStatusStr(void)
     ushort *array;
   } arg;
 
-				/* get the values of the semaphores */
-  arg.array = semvals;
-  retval = semctl(ConquestSemID, 0, GETALL, arg);
-
 #if defined(CYGWIN)
   /* apparently not implemented */
   lastcmnpid = 0;
@@ -270,27 +266,20 @@ char *semGetStatusStr(void)
   msgzcnt = 0;
 #else /* !CYGWIN */
 
-  lastcmnpid = semctl(ConquestSemID, LOCKCMN, GETPID, semvals);
-  cmnzcnt = semctl(ConquestSemID, LOCKCMN, GETZCNT, semvals);
-  lastmsgpid = semctl(ConquestSemID, LOCKMSG, GETPID, semvals);
-  msgzcnt = semctl(ConquestSemID, LOCKMSG, GETZCNT, semvals);
+  lastcmnpid = semctl(ConquestSemID, LOCKCMN, GETPID, arg);
+  cmnzcnt = semctl(ConquestSemID, LOCKCMN, GETZCNT, arg);
+  lastmsgpid = semctl(ConquestSemID, LOCKMSG, GETPID, arg);
+  msgzcnt = semctl(ConquestSemID, LOCKMSG, GETZCNT, arg);
 #endif
-  retval = semctl(ConquestSemID, 0, GETALL, semvals);
-
-  if (retval != 0)
-    {
-      clog("semGetStatusStr(): semctl(GETALL) failed: %s",
-	   strerror(errno));
-    }
 
  
-  arg.buf = &SemDS;
-
 #if defined(CYGWIN)
   /* these do not appear to be implemented in cygwin */
   lastoptime = 0;
 #else /* !CYGWIN */    
-				/* get latest semop time  */
+
+  /* get latest semop time  */
+  arg.buf = &SemDS;
   retval = semctl(ConquestSemID, LOCKMSG, IPC_STAT, arg);
 
   if (retval != 0)
@@ -313,6 +302,17 @@ char *semGetStatusStr(void)
 
   lastoptime = max(lastoptime, SemDS.sem_otime);
 #endif
+
+  /* get the values of the semaphores */
+  arg.array = semvals;
+  retval = semctl(ConquestSemID, 0, GETALL, arg);
+
+  if (retval != 0)
+    {
+      clog("semGetStatusStr(): semctl(GETALL) failed: %s",
+	   strerror(errno));
+    }
+
 
   snprintf(mesgtxt, 80 - 1, "%sMesgCnt = %d(%d:%d)", 
            (semvals[LOCKMSG]) ? "*" : "",

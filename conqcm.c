@@ -35,14 +35,33 @@
 #include "sem.h"
 
 static char *cBasePtr = NULL;	/* common block ptr */
-static int coff = 0;		/* offset into common block */
+static unsigned int coff = 0;   /* offset into common block */
 
 static int fakeCommon = FALSE;	/* for the clients */
 
-				/* map a 1D variable into the common block */
-#define map1d(thevarp, thetype, size) {  \
-              thevarp = (thetype *) (cBasePtr + coff); \
-              coff += (sizeof(thetype) * (size)); \
+/* Some (most) architectures do not like unaligned accesses (like
+ *  sparc) so we need to ensure proper alignment of the structures
+ *  contained within the common block.  
+ *
+ * We should do this on all architectures, but I'm not ready to break
+ * CB compatibility on x86 yet, so for now only do this on non x86
+ * platforms.
+ */
+
+
+#if defined(__i386__) || defined(__x86_64__) || defined(__amd64__)
+# define CB_ALIGN(_off, _x)  ( _off )
+#else
+# define CB_ALIGN(_off, _x)  ( ((_off) + (_x)) & ~((_x) - 1) )
+#endif 
+
+/* On those platforms where we want proper alignment, align everything
+ * to 16 bytes.
+ */
+#define map1d(thevarp, thetype, size) {            \
+    thevarp = (thetype *) (cBasePtr + coff);       \
+    coff += (sizeof(thetype) * (size));            \
+    coff = CB_ALIGN(coff, 16);                     \
 }
 
 
@@ -237,7 +256,7 @@ void map_common(void)
 
   if ((cBasePtr = mmap((caddr_t) 0, (size_t) SIZEOF_COMMONBLOCK, 
                        PROT_READ | PROT_WRITE, MAP_SHARED | MAP_FILE, 
-		       cmn_fd, 0)) == (caddr_t) -1)
+		       cmn_fd, 0)) == MAP_FAILED)
     {
       perror("map_common():mmap()");
       exit(1);
@@ -270,7 +289,8 @@ static void map_vars(void)
   coff = 0;
   
   map1d(CBlockRevision, int, 1);	/* this *must* be the first var */
-  map1d(ConqInfo, ConqInfo_t, 1)
+
+  map1d(ConqInfo, ConqInfo_t, 1);
 
   map1d(Users, User_t, MAXUSERS);
 
