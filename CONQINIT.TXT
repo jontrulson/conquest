@@ -234,7 +234,6 @@ CONTENTS:
             x          -9655.250220
             y          9577.226313
             size        300
-            color       "ffe6e6e6"
             texname     "kling"                  # optional
           }
 
@@ -336,13 +335,6 @@ CONTENTS:
                       to the gl client for now.  In the future, this
                       value will be stored with the planet into the
                       common block, and propagated out to clients.
-
-          color:      COLOR
-                      the desired base color of the planet.  This only
-                      matters to the gl client for now.  In the
-                      future, this value will be stored with the
-                      planet into the common block, and propagated out
-                      to clients.
 
           texname:    STRING
                       optional.  Explicitly specifies the texture to
@@ -1025,18 +1017,17 @@ CONTENTS:
         does the same thing but parses <file> instead, and treats it
         like a file in texturesrc format.
 
-      $ conqinit -f <file> -h >conqinit.h
+      $ conqinit -f <file> -h >initdata.h
 
-        parses <file> as a conqinitrc file and generates a conqinit.h
+        parses <file> as a conqinitrc file and generates an initdata.h
         file on stdout that can be compiled into conquest to specify
         'last-ditch' defaults in case the normal files could not be
         parsed for some reason at runtime.
 
         Note, you should never have to gen any .h files, the parser
         runs when conquest starts up and will always use the data it
-        found if it can.  Valid texdata.h and initdata.h files are
-        supplied in the conquest distribution and should not be
-        modified by end users.
+        found if it can.  A valid initdata.h file is supplied in the
+        conquest distribution and should not be modified by end users.
 
       $ conqinit -D 
 

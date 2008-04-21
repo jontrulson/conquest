@@ -650,8 +650,6 @@ static int _get_glplanet_info(GLPlanet_t *curGLPlanet, int plani)
   /* if the texture has specified a color, use that */
   if (HAS_GLCOLOR(&(curGLPlanet->gltex->col)))
     curGLPlanet->col = curGLPlanet->gltex->col;
-  else if (plnndx != -1 && cqiPlanets[plnndx].color)/* cqiPlanet */
-    hex2GLColor(cqiPlanets[plnndx].color, &(curGLPlanet->col));
   else
     {                       /* we choose a default */
       switch (Planets[plani].type)
@@ -671,7 +669,9 @@ static int _get_glplanet_info(GLPlanet_t *curGLPlanet, int plani)
   if (plnndx == -1)
     {
       /* no cqi planet was found so will set a default.  One day the
-         server might send this data :) */
+       * server might send this data :) 
+       * These are in CU's.
+       */
       switch (Planets[plani].type)
         {
         case PLANET_SUN:

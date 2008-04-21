@@ -978,7 +978,6 @@ static int cqiValidatePlanets(void)
           _cqiPlanets[i].xcoord = 0.0;
           _cqiPlanets[i].ycoord = 0.0;
           /* leave texname blank so default rules will fire if neccessary */
-          _cqiPlanets[i].color = 0xffe6e6e6;
         }
 
       if (cqiVerbose)
@@ -1554,7 +1553,6 @@ void dumpInitDataHdr(void)
       /* we never write out a planet texture name */
       printf("   \"\",\n");
 
-      printf("   0x%08x\n", cqiPlanets[i].color);
       printf(" },\n");
 
     }
@@ -1831,7 +1829,6 @@ static void startSection(int section)
 
         currPlanet.primary = -1;
         currPlanet.size = 300;  /* ### */
-        currPlanet.color = 0;
       }
       break;
 
@@ -2067,6 +2064,8 @@ static void endSection(void)
           *ch = '_';
         while ((ch = strchr(currTexture.name, '/')))
           *ch = '_';
+        while ((ch = strchr(currTexture.name, '\\')))
+          *ch = '_';
         
         /* if the texture was overrided by a later definition
            just copy the new definition over it */
@@ -2254,6 +2253,8 @@ static void endSection(void)
           *ch = '_';
         while ((ch = strchr(currSound.name, '/')))
           *ch = '_';
+        while ((ch = strchr(currTexture.name, '\\')))
+          *ch = '_';
         
         /* if the effect was overridden by a later definition
            just copy the new definition over it */
@@ -2315,6 +2316,8 @@ static void endSection(void)
         while ((ch = strchr(currSound.name, '.')))
           *ch = '_';
         while ((ch = strchr(currSound.name, '/')))
+          *ch = '_';
+        while ((ch = strchr(currTexture.name, '\\')))
           *ch = '_';
         
         /* if the music was overridden by a later definition
@@ -2911,7 +2914,11 @@ void cfgSections(int item, char *val)
             strncpy(currPlanet.texname, val, CQI_NAMELEN - 1);
             break;
           case COLOR:
-            currPlanet.color = hex2color(val);
+            /* this used to be allowed, so for now just warn if 
+             * verbose is on 
+             */
+            if (cqDebug)
+              clog("CQI: 'color' is no longer valid in planet definitions");
             break;
           }
       }

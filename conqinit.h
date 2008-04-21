@@ -63,7 +63,6 @@ typedef struct _cqi_planet_init {
   real ycoord;
   real size;                    /* in CU's (Conquest Units (mega meters))  */
   char texname[CQI_NAMELEN];     /* texid */
-  Unsgn32 color;
 } cqiPlanetInitRec_t, *cqiPlanetInitPtr_t;
 
 #define CQITEX_F_COLOR_SPEC       0x00000001 /* This texture definition
