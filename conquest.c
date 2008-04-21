@@ -466,7 +466,7 @@ int main(int argc, char *argv[])
       if (cInfo.remotehost)
         free(cInfo.remotehost);
 
-      if ((cInfo.remotehost = strdup((char *)metaServerList[i].altaddr)) == NULL)
+      if ((cInfo.remotehost = strdup(metaServerList[i].altaddr)) == NULL)
         {
           clog("strdup(metaServerList[i]) failed");
           cdend();

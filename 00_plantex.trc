@@ -1,84 +1,141 @@
 # $Id$
 #
-# This file specifies default textures to use for some of the planets,
-# class D for now, though others will be added in the future.  
+# This file specifies default textures and colors to use for the
+# supplied planets and stars.  The planet/stars not mentioed here
+# use internal defaults. (classd, classm, star, etc).
+#
 # NOTE: this file will be overwritten by a 'make install' so do not edit
 # it directly if you want to change or add entries... Make a copy of
 # it in your ~/.conquest/ dir and modify it there.
 #
 
+# The stars.
+
+texture {
+    name        "Sol"
+    filename    "star"
+    color       "ffeeee00"
+}
+
+texture {
+    name        "Sirius"
+    filename    "star"
+    color       "ff886aea"
+}
+
+texture {
+    name        "Kejela"
+    filename    "star"
+    color       "ffeeee00"
+}
+
+texture {
+    name        "Betelgeuse"
+    filename    "star"
+    color       "ffcc0000"
+}
+
+texture {
+    name        "Murisak"
+    filename    "star"
+    color       "ff886aea"
+}
+
+texture {
+    name        "Syrinx"
+    filename    "star"
+    color       "ffcc0000"
+}
+
+
+
 # Klingon D planets
 texture {
     name        "Tarsus"
     filename    "jupiter"
+    color       "ffe6e6e6"
 }
 
 texture {
     name        "Leudus"
     filename    "uranus"
+    color       "ffe6e6e6"
 }
 
 # Fed D planets
 texture {
     name        "Omega"
     filename    "jupiter"
+    color       "ffe6e6e6"
 }
+
 
 # Romulan D planets
 texture {
     name        "Rho"
     filename    "jupiter"
+    color       "ffe6e6e6"
 }
 
 texture {
     name        "Remus"
     filename    "uranus"
+    color       "ffe6e6e6"
 }
 
 # Orion D planets
 texture {
     name        "Umbriel"
     filename    "jupiter"
+    color       "ffe6e6e6"
 }
 
 texture {
     name        "Oberon"
     filename    "uranus"
+    color       "ffe6e6e6"
 }
 
 # Non Team (Self Ruled) D planets
 texture {
     name        "Dyneb"
     filename    "jupiter"
+    color       "ffe6e6e6"
 }
 
 texture {
     name        "Eminiar"
     filename    "jupiter"
+    color       "ffe6e6e6"
 }
 
 texture {
     name        "Cheron"
     filename    "jupiter"
+    color       "ffe6e6e6"
 }
 
 texture {
     name        "Seritil"
     filename    "neptune"
+    color       "ffe6e6e6"
 }
 
 texture {
     name        "Omega"
     filename    "neptune"
+    color       "ffe6e6e6"
 }
 
 texture {
     name        "Oldar"
     filename    "uranus"
+    color       "ffe6e6e6"
 }
 
 texture {
     name        "RigelB"
     filename    "neptune"
+    color       "ffe6e6e6"
 }
 

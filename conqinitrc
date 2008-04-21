@@ -104,7 +104,6 @@ planet {
   x           8056.194584
   y           -10363.267407
   size        300
-  color       "ffe6e6e6"
 }
 
 planet {
@@ -122,7 +121,6 @@ planet {
   x           -5474.862444
   y           -6572.043111
   size        300
-  color       "ffe6e6e6"
 }
 
 planet {
@@ -140,7 +138,6 @@ planet {
   x           -9655.250220
   y           9577.226313
   size        300
-  color       "ffe6e6e6"
 }
 
 planet {
@@ -158,7 +155,6 @@ planet {
   x           5932.856423
   y           5946.563049
   size        300
-  color       "ffe6e6e6"
 }
 
 planet {
@@ -176,7 +172,6 @@ planet {
   x           -7885.290153
   y           -10375.967171
   size        300
-  color       "ffe6e6e6"
 }
 
 planet {
@@ -194,7 +189,6 @@ planet {
   x           -5281.612289
   y           8504.243904
   size        300
-  color       "ffe6e6e6"
 }
 
 planet {
@@ -212,7 +206,6 @@ planet {
   x           7114.611550
   y           10292.072780
   size        300
-  color       "ffe6e6e6"
 }
 
 planet {
@@ -230,7 +223,6 @@ planet {
   x           5400.408553
   y           -6726.400547
   size        300
-  color       "ffe6e6e6"
 }
 
 planet {
@@ -248,7 +240,6 @@ planet {
   x           -8397.661277
   y           5253.053554
   size        300
-  color       "ffe6e6e6"
 }
 
 planet {
@@ -266,7 +257,6 @@ planet {
   x           10287.055805
   y           7095.887954
   size        300
-  color       "ffe6e6e6"
 }
 
 planet {
@@ -284,7 +274,6 @@ planet {
   x           9877.920660
   y           -6244.855809
   size        300
-  color       "ffe6e6e6"
 }
 
 planet {
@@ -302,7 +291,6 @@ planet {
   x           -9974.371169
   y           -6386.513510
   size        300
-  color       "ffe6e6e6"
 }
 
 planet {
@@ -320,7 +308,6 @@ planet {
   x           -2494.165496
   y           734.260497
   size        300
-  color       "ffe6e6e6"
 }
 
 planet {
@@ -338,7 +325,6 @@ planet {
   x           2449.409765
   y           872.004474
   size        300
-  color       "ffe6e6e6"
 }
 
 planet {
@@ -356,7 +342,6 @@ planet {
   x           1586.234782
   y           -2060.062916
   size        300
-  color       "ffe6e6e6"
 }
 
 planet {
@@ -374,7 +359,6 @@ planet {
   x           -72.416294
   y           2598.991320
   size        300
-  color       "ffe6e6e6"
 }
 
 planet {
@@ -392,7 +376,6 @@ planet {
   x           -1469.062755
   y           -2145.193376
   size        300
-  color       "ffe6e6e6"
 }
 
 planet {
@@ -410,7 +393,6 @@ planet {
   x           -580.938063
   y           -11007.522817
   size        300
-  color       "ffe6e6e6"
 }
 
 planet {
@@ -428,7 +410,6 @@ planet {
   x           -12566.771058
   y           -1000.635087
   size        300
-  color       "ffe6e6e6"
 }
 
 planet {
@@ -446,7 +427,6 @@ planet {
   x           819.850362
   y           11193.560058
   size        300
-  color       "ffe6e6e6"
 }
 
 planet {
@@ -464,7 +444,6 @@ planet {
   x           10850.243955
   y           23.686230
   size        300
-  color       "ffe6e6e6"
 }
 
 planet {
@@ -482,7 +461,6 @@ planet {
   x           580.938079
   y           -12992.477182
   size        300
-  color       "ffe6e6e6"
 }
 
 planet {
@@ -500,7 +478,6 @@ planet {
   x           -11433.228942
   y           1000.635077
   size        300
-  color       "ffe6e6e6"
 }
 
 planet {
@@ -518,7 +495,6 @@ planet {
   x           -819.850367
   y           12806.439942
   size        300
-  color       "ffe6e6e6"
 }
 
 planet {
@@ -536,7 +512,6 @@ planet {
   x           13149.756045
   y           -23.686229
   size        300
-  color       "ffe6e6e6"
 }
 
 planet {
@@ -554,7 +529,6 @@ planet {
   x           -1128.972084
   y           -536.583669
   size        160
-  color       "ffe6e6e6"
 }
 
 planet {
@@ -572,7 +546,6 @@ planet {
   x           5974.991371
   y           -1347.257629
   size        300
-  color       "ffe6e6e6"
 }
 
 planet {
@@ -590,7 +563,6 @@ planet {
   x           -20039.724127
   y           -7972.850339
   size        300
-  color       "ffe6e6e6"
 }
 
 planet {
@@ -608,7 +580,6 @@ planet {
   x           -19392.238383
   y           -11831.705377
   size        300
-  color       "ffe6e6e6"
 }
 
 ## Suns 
@@ -628,7 +599,6 @@ planet {
   x           7778.174599
   y           -7778.174587
   size        1500
-  color       "ffeeee00"
 }
 
 planet {
@@ -646,7 +616,6 @@ planet {
   x           -7778.174589
   y           -7778.174597
   size        1500
-  color       "ffcc0000"
 }
 
 planet {
@@ -664,7 +633,6 @@ planet {
   x           -7778.174595
   y           7778.174591
   size        1500
-  color       "ffeeee00"
 }
 
 planet {
@@ -682,7 +650,6 @@ planet {
   x           7778.174592
   y           7778.174594
   size        1500
-  color       "ff886aea"
 }
 
 planet {
@@ -700,7 +667,6 @@ planet {
   x           0.000000
   y           0.000000
   size        1500
-  color       "ff886aea"
 }
 
 planet {
@@ -718,7 +684,6 @@ planet {
   x           18655.801085
   y           13452.177738
   size        1500
-  color       "ffcc0000"
 }
 
 ## others
@@ -739,7 +704,6 @@ planet {
   y           0.000000
   size        300
   texname     "classd"
-  color       "ffe6e6e6"
 }
 
 planet {
@@ -758,7 +722,6 @@ planet {
   y           12000.000000
   size        300
   texname     "classd"
-  color       "ffe6e6e6"
 }
 
 planet {
@@ -777,7 +740,6 @@ planet {
   y           -0.000005
   size        300
   texname     "classd"
-  color       "ffe6e6e6"
 }
 
 planet {
@@ -796,7 +758,6 @@ planet {
   y           -12000.000000
   size        300
   texname     "classd"
-  color       "ffe6e6e6"
 }
 
 planet {
@@ -815,7 +776,6 @@ planet {
   y           0.000000
   size        300
   texname     "classd"
-  color       "ffe6e6e6"
 }
 
 planet {
@@ -834,7 +794,6 @@ planet {
   y           0.000000
   size        300
   texname     "classd"
-  color       "ffe6e6e6"
 }
 
 planet {
@@ -853,7 +812,6 @@ planet {
   y           0.000000
   size        300
   texname     "classd"
-  color       "ffe6e6e6"
 }
 
 planet {
@@ -872,7 +830,6 @@ planet {
   y           0.000000
   size        300
   texname     "classd"
-  color       "ffe6e6e6"
 }
 
 planet {
@@ -891,7 +848,6 @@ planet {
   y           0.000000
   size        300
   texname     "classd"
-  color       "ffe6e6e6"
 }
 
 planet {
@@ -910,7 +866,6 @@ planet {
   y           0.000000
   size        300
   texname     "classd"
-  color       "ffe6e6e6"
 }
 
 planet {
@@ -929,7 +884,6 @@ planet {
   y           0.000000
   size        300
   texname     "classd"
-  color       "ffe6e6e6"
 }
 
 planet {
@@ -948,7 +902,6 @@ planet {
   y           0.000000
   size        300
   texname     "classd"
-  color       "ffe6e6e6"
 }
 
 planet {
@@ -967,7 +920,6 @@ planet {
   y           0.000000
   size        300
   texname     "classd"
-  color       "ffe6e6e6"
 }
 
 planet {
@@ -986,7 +938,6 @@ planet {
   y           0.000000
   size        300
   texname     "classd"
-  color       "ffe6e6e6"
 }
 
 planet {
@@ -1005,7 +956,6 @@ planet {
   y           0.000000
   size        300
   texname     "classd"
-  color       "ffe6e6e6"
 }
 
 planet {
@@ -1024,7 +974,6 @@ planet {
   y           0.000000
   size        300
   texname     "classd"
-  color       "ffe6e6e6"
 }
 
 planet {
@@ -1043,7 +992,6 @@ planet {
   y           0.000000
   size        300
   texname     "classd"
-  color       "ffe6e6e6"
 }
 
 planet {
@@ -1062,7 +1010,6 @@ planet {
   y           0.000000
   size        300
   texname     "classd"
-  color       "ffe6e6e6"
 }
 
 planet {
@@ -1081,7 +1028,6 @@ planet {
   y           0.000000
   size        300
   texname     "classd"
-  color       "ffe6e6e6"
 }
 
 planet {
@@ -1100,7 +1046,6 @@ planet {
   y           0.000000
   size        300
   texname     "classd"
-  color       "ffe6e6e6"
 }
 
 planet {
@@ -1119,7 +1064,6 @@ planet {
   y           0.000000
   size        300
   texname     "classd"
-  color       "ffe6e6e6"
 }
 
 planet {
@@ -1138,7 +1082,6 @@ planet {
   y           0.000000
   size        300
   texname     "classd"
-  color       "ffe6e6e6"
 }
 
 planet {
@@ -1157,7 +1100,6 @@ planet {
   y           0.000000
   size        300
   texname     "classd"
-  color       "ffe6e6e6"
 }
 
 planet {
@@ -1176,7 +1118,6 @@ planet {
   y           0.000000
   size        300
   texname     "classd"
-  color       "ffe6e6e6"
 }
 
 planet {
@@ -1195,6 +1136,5 @@ planet {
   y           0.000000
   size        300
   texname     "classd"
-  color       "ffe6e6e6"
 }
 

@@ -1681,30 +1681,26 @@ void dumpUniverse(void)
       else
         printf("  homeplanet  \"yes\"\n");
 
-      printf("  xcoord      %f\n", Planets[i].x);
-      printf("  ycoord      %f\n", Planets[i].y);
+      printf("  x           %f\n", Planets[i].x);
+      printf("  y           %f\n", Planets[i].y);
       
       switch(Planets[i].type)
         {
         case PLANET_SUN:
           printf("  size        1500\n");
           printf("  texname     \"star\"\n");
-          printf("  color       \"ffcc0000\"\n");
           break;
         case PLANET_CLASSM:
           printf("  size        300\n");
           printf("  texname     \"classm\"\n");
-          printf("  color       \"ffe6e6e6\"\n");
           break;
         case PLANET_MOON:
           printf("  size        160\n");
           printf("  texname     \"luna\"\n");
-          printf("  color       \"ffe6e6e6\"\n");
           break;
         default:
           printf("  size        300\n");
           printf("  texname     \"classd\"\n");
-          printf("  color       \"ffe6e6e6\"\n");
           break;
         }
 

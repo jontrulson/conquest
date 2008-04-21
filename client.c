@@ -678,7 +678,7 @@ int sendSetName(char *name)
 
   memset((void *)&sname, 0, sizeof(cpSetName_t));
   sname.type = CP_SETNAME;
-  strncpy((char *)sname.alias, (char *)name, MAXUSERPNAME - 1);
+  strncpy((char *)sname.alias, name, MAXUSERPNAME - 1);
 
   if (writePacket(PKT_TOSERVER, cInfo.sock, &sname) <= 0)
     return FALSE;
