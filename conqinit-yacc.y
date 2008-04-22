@@ -41,9 +41,18 @@ static int cqiVerbose = 0;
 int cqiDebugl = 0;
 
 static char *ptr;
- 
-static int cursection = 0; /* current section */
-static int cursubsection = 0; /* current subsection */
+
+/* a nesting depth of 0 implies the top-level, though currently only
+ * other sections can be defined in it, so PREVSECTION looks only at
+ * nesting levels > 1.  Bascause of this, your max available nesting
+ * depth is really MAX_NESTING_DEPTH - 1.
+ */ 
+#define MAX_NESTING_DEPTH     16
+static int sections[MAX_NESTING_DEPTH] = {};
+static int curDepth = 0;
+
+#define CURSECTION()          (sections[curDepth])
+#define PREVSECTION()         ((curDepth > 1) ? sections[curDepth - 1] : 0)
 
 extern int lineNum;
 extern int goterror;
@@ -90,8 +99,8 @@ static cqiTextureAreaPtr_t     currTexAreas = NULL;
 static cqiSoundRec_t currSound;
 
 static void startSection(int section);
-static void startSubSection(int subsection);
 static void endSection(void);
+
 static void cfgSectioni(int item, int val);
 static void cfgSectionil(int item, int val1, int val2);
 static void cfgSectionf(int item, real val);
@@ -244,7 +253,7 @@ texanimconfig   : starttexanim stmts closesect
 
 starttexanim    : texanimword opensect
                 {
-                    startSubSection(TEXANIM);
+                    startSection(TEXANIM);
                 }
                 ;
 
@@ -257,7 +266,7 @@ colanimconfig   : startcolanim stmts closesect
 
 startcolanim    : colanimword opensect
                 {
-                    startSubSection(COLANIM);
+                    startSection(COLANIM);
                 }
                 ;
 
@@ -270,7 +279,7 @@ geoanimconfig   : startgeoanim stmts closesect
 
 startgeoanim    : geoanimword opensect
                 {
-                    startSubSection(GEOANIM);
+                    startSection(GEOANIM);
                 }
                 ;
 
@@ -283,7 +292,7 @@ toganimconfig   : starttoganim stmts closesect
 
 starttoganim    : toganimword opensect
                 {
-                    startSubSection(TOGANIM);
+                    startSection(TOGANIM);
                 }
                 ;
 
@@ -296,7 +305,7 @@ istateconfig    : startistate stmts closesect
 
 startistate     : istateword opensect
                 {
-                    startSubSection(ISTATE);
+                    startSection(ISTATE);
                 }
                 ;
 
@@ -310,7 +319,7 @@ texareaconfig  : starttexarea stmts closesect
 
 starttexarea   : texareaword opensect
                 {
-                    startSubSection(TEXAREA);
+                    startSection(TEXAREA);
                 }
                 ;
 
@@ -630,14 +639,13 @@ stmt            : /* error */
                 | error closesect
                 ;
 
-string		: STRING		{ ptr = (char *)malloc(strlen($1)+1);
-                                          if (ptr)
-                                          { 
-                                             strcpy(ptr, $1);
-                                             rmDQuote(ptr);
-                                          }
-					  $$ = ptr;
-					}
+string		: STRING
+                  { 
+                    ptr = (char *)strdup($1);
+                    if (ptr)
+                      rmDQuote(ptr);
+                    $$ = ptr;
+                  }
                 ;
 number		: NUMBER		{ $$ = $1; }
 		;
@@ -1708,78 +1716,21 @@ void dumpUniverse(void)
   return;
 }
 
-static void startSubSection(int subsection)
-{
-  if (cqiDebugl)
-    clog(" %s: %s", __FUNCTION__, sect2str(subsection));
-
-  if (!cursection)
-    {                           /* can't have a subsection then */
-      cursubsection = 0;
-      clog("%s: cursection not active, cannot set subsection %s .",
-           __FUNCTION__, sect2str(subsection));
-      return;
-    }
-      
-  if (!subsection)
-    return;
-
-  switch (cursection)
-    {
-    case ANIMDEF:
-      {
-        switch (subsection)
-          {
-          case TEXANIM:
-          case COLANIM:
-          case GEOANIM:
-          case TOGANIM:
-          case ISTATE:
-            /* OK */
-            break;
-          default:
-            clog("%s: subsection %s not supported for ANIMDEF.",
-                 __FUNCTION__, sect2str(subsection));
-            goterror++;
-            break;
-          }
-      }
-      break;
-
-    case TEXTURE:
-      {
-        switch (subsection)
-          {
-          case TEXAREA:
-            {
-              memset((void *)&currTexArea, 0, sizeof(cqiTextureAreaRec_t));
-            }
-            break;
-          default:
-            clog("%s: subsection %s not supported for TEXTURE.",
-                 __FUNCTION__, sect2str(subsection));
-            goterror++;
-            break;
-          }
-      }
-      break;
-
-    default:
-      clog("%s: cursection %s does not support subsection %s.",
-           __FUNCTION__, sect2str(cursection), sect2str(subsection));
-      return;
-      break;
-    }
-
-  cursubsection = subsection;
-  return;
-}
     
 static void startSection(int section)
 {
   if (cqiDebugl)
     clog("%s: %s", __FUNCTION__, sect2str(section));
   
+  /* check for overflow */
+  if ((curDepth + 1)>= MAX_NESTING_DEPTH)
+    {
+      clog("CQI: %s: maximum nesting depth exceeded, ignoring section %s", 
+           __FUNCTION__, sect2str(section));
+      goterror++;
+      return;
+    }
+
   switch (section)
     {
     case GLOBAL:    
@@ -1889,95 +1840,17 @@ static void startSection(int section)
       break;
     }
   
-  cursection = section;
+  /* add it to the list */
+  sections[++curDepth] = section;
   return;
 }
 
 static void endSection(void)
 {
   if (cqiDebugl)
-    {
-      if (cursubsection)
-        clog(" %s: %s", __FUNCTION__, sect2str(cursubsection));
-      else
-        clog("%s: %s", __FUNCTION__, sect2str(cursection));
-    }        
+    clog("%s: [%d] %s", __FUNCTION__, curDepth, sect2str(CURSECTION()));
   
-  if (cursubsection)
-    {                           /* then we are ending a subsection */
-      switch (cursubsection)
-        {
-        case TEXANIM:
-          {
-            currAnimDef.anims |= CQI_ANIMS_TEX; 
-          }
-          break;
-        case COLANIM:
-          {
-            currAnimDef.anims |= CQI_ANIMS_COL; 
-          }
-          break;
-        case GEOANIM:
-          {
-            currAnimDef.anims |= CQI_ANIMS_GEO;
-          }
-          break;
-        case TOGANIM:
-          {
-            currAnimDef.anims |= CQI_ANIMS_TOG;
-          }
-          break;
-
-        case TEXAREA:
-          /* this is only valid from within a texture definition */
-          if (cursection == TEXTURE)
-            {
-              cqiTextureAreaPtr_t taptr;
-              
-              if (strlen(currTexArea.name))
-                {
-                  
-                  /* resize the current list and add to it. */
-                  
-                  taptr = (cqiTextureAreaPtr_t)realloc((void *)currTexAreas, 
-                                                       sizeof(cqiTextureAreaRec_t) * 
-                                                       (numTexAreas + 1));
-                  
-                  if (!taptr)
-                    {  
-                      clog("%s: Could not realloc %d texareas for texture %s, ignoring texarea '%s'",
-                         __FUNCTION__,
-                           numTexAreas + 1,
-                           currTexture.name,
-                           currTexArea.name);
-                      break;
-                    }
-
-                  currTexAreas = taptr;
-                  currTexAreas[numTexAreas] = currTexArea;
-                  numTexAreas++;
-                  currTexture.texareas = currTexAreas;
-                  currTexture.numTexAreas = numTexAreas;
-                  
-                }
-              else
-                {
-                  clog("%s: texarea name at or near line %d was not specified, ignoring.",
-                       __FUNCTION__, lineNum);
-                }
-            }
-          break;
-
-        default:
-          break;
-        }
-
-      cursubsection = 0;
-      return; 
-    }
-
-  /* else we are ending a toplevel section */
-  switch (cursection)
+  switch (CURSECTION())
     {
     case GLOBAL:    
       {                         /* make sure everything is specified, alloc
@@ -2015,8 +1888,74 @@ static void endSection(void)
           }
       }
       break;
+      
     case SHIPTYPE:    
       break;
+
+    case TEXANIM:
+      {
+        currAnimDef.anims |= CQI_ANIMS_TEX; 
+      }
+      break;
+
+    case COLANIM:
+      {
+        currAnimDef.anims |= CQI_ANIMS_COL; 
+      }
+      break;
+
+    case GEOANIM:
+      {
+        currAnimDef.anims |= CQI_ANIMS_GEO;
+      }
+      break;
+
+    case TOGANIM:
+      {
+        currAnimDef.anims |= CQI_ANIMS_TOG;
+      }
+      break;
+      
+    case TEXAREA:
+      /* this is only valid from within a texture definition */
+      if (PREVSECTION() == TEXTURE)
+        {
+          cqiTextureAreaPtr_t taptr;
+          
+          if (strlen(currTexArea.name))
+            {
+              
+              /* resize the current list and add to it. */
+              
+              taptr = (cqiTextureAreaPtr_t)realloc((void *)currTexAreas, 
+                                                   sizeof(cqiTextureAreaRec_t) * 
+                                                   (numTexAreas + 1));
+              
+              if (!taptr)
+                {  
+                  clog("%s: Could not realloc %d texareas for texture %s, ignoring texarea '%s'",
+                       __FUNCTION__,
+                       numTexAreas + 1,
+                       currTexture.name,
+                       currTexArea.name);
+                  break;
+                }
+              
+              currTexAreas = taptr;
+              currTexAreas[numTexAreas] = currTexArea;
+              numTexAreas++;
+              currTexture.texareas = currTexAreas;
+              currTexture.numTexAreas = numTexAreas;
+              
+            }
+          else
+            {
+              clog("%s: texarea name at or near line %d was not specified, ignoring.",
+                   __FUNCTION__, lineNum);
+            }
+        }
+      break;
+
     case PLANET:    
       {
         /* check some basic things */
@@ -2365,7 +2304,9 @@ static void endSection(void)
       break;
     }
   
-  cursection = 0;
+  sections[curDepth] = 0;
+  if (curDepth > 0)
+    curDepth--;
   
   return;
 }
@@ -2374,22 +2315,16 @@ static void endSection(void)
 static void cfgSectioni(int item, int val)
 {
   if (cqiDebugl)
-    {
-      if (cursubsection)
-        clog("   subsection = %s\titem = %s\tvali = %d",
-             sect2str(cursubsection), item2str(item), val);
-      else
-        clog(" section = %s\titem = %s\tvali = %d",
-             sect2str(cursection), item2str(item), val);
-    }
+    clog(" [%d] section = %s\titem = %s\tvali = %d",
+         curDepth, sect2str(CURSECTION()), item2str(item), val);
   
-  if (cursubsection)
+  if (PREVSECTION())
     {
-      switch (cursection)
+      switch (PREVSECTION())
         {
         case ANIMDEF:
           {
-            switch(cursubsection)
+            switch(CURSECTION())
               {
               case TEXANIM:
                 {
@@ -2473,16 +2408,16 @@ static void cfgSectioni(int item, int val)
                     }
                 }
                 break;
-              } /* switch cursubsection */
+              } /* switch CURSECTION */
 
           }
           break;
-        } /* switch cursection */
+        } /* switch PREVSECTION */
 
       return;
     }
 
-  switch (cursection)
+  switch (CURSECTION())
     {
     case GLOBAL:    
       {
@@ -2590,16 +2525,10 @@ static void cfgSectioni(int item, int val)
 void cfgSectionil(int item, int val1, int val2)
 {
   if (cqiDebugl)
-    {
-      if (cursubsection)
-        clog("    subsection = %s\titem = %s\tvalil = %d, %d",
-             sect2str(cursubsection), item2str(item), val1, val2);
-      else
-        clog(" section = %s\titem = %s\tvalil = %d, %d",
-             sect2str(cursection), item2str(item), val1, val2);
-    }
+    clog(" [%d] section = %s\titem = %s\tvalil = %d, %d",
+         curDepth, sect2str(CURSECTION()), item2str(item), val1, val2);
 
-  switch (cursection)
+  switch (CURSECTION())
     {
     case PLANET:    
       {
@@ -2638,23 +2567,16 @@ void cfgSectionil(int item, int val1, int val2)
 static void cfgSectionf(int item, real val)
 {
   if (cqiDebugl)
-    {
+    clog(" [%d] section = %s\titem = %s\tvalf = %f",
+         curDepth, sect2str(CURSECTION()), item2str(item), val);
 
-      if (cursubsection)
-        clog("   subsection = %s\titem = %s\tvalf = %f",
-             sect2str(cursubsection), item2str(item), val);
-      else
-        clog(" section = %s\titem = %s\tvalf = %f",
-             sect2str(cursection), item2str(item), val);
-    }
-
-  if (cursubsection)
+  if (PREVSECTION())
     {
-      switch (cursection)
+      switch (PREVSECTION())
         {
         case ANIMDEF:
           {
-            switch(cursubsection)
+            switch(CURSECTION())
               {
               case TEXANIM:
                 {
@@ -2724,14 +2646,14 @@ static void cfgSectionf(int item, real val)
                 }
                 break;
 
-              } /* switch cursubsection */
+              } /* switch CURSECTION */
             
           }
           break;
           
         case TEXTURE:
           {
-            switch(cursubsection)
+            switch(CURSECTION())
               {
               case TEXAREA:
                 {
@@ -2752,16 +2674,16 @@ static void cfgSectionf(int item, real val)
                     }
                 }
                 break;
-              } /* switch subsection */
+              } /* switch CURSECTION */
           } /* TEXTURE */
           break;
           
-        } /* switch cursection */
+        } /* switch PREVSECTION */
       
       return;
     }
 
-  switch (cursection)
+  switch (CURSECTION())
     {
     case GLOBAL:    
       break;
@@ -2800,25 +2722,20 @@ static void cfgSectionf(int item, real val)
 void cfgSections(int item, char *val)
 {
   if (cqiDebugl)
-    {
-      if (cursubsection)
-        clog("   subsection = %s\titem = %s\tvals = '%s'",
-             sect2str(cursubsection), item2str(item), (val) ? val : "(NULL)" );
-      else
-        clog(" section = %s\titem = %s\tvals = '%s'",
-             sect2str(cursection), item2str(item), (val) ? val : "(NULL)" );
-    }  
+    clog(" [%d] section = %s\titem = %s\tvals = '%s'",
+         curDepth, sect2str(CURSECTION()), 
+         item2str(item), (val) ? val : "(NULL)" );
 
   if (!val)
     return;
 
-  if (cursubsection)
+  if (PREVSECTION())
     {
-      switch (cursection)
+      switch (PREVSECTION())
         {
         case ANIMDEF:
           {
-            switch(cursubsection)
+            switch(CURSECTION())
               {
               case TEXANIM:
                 {
@@ -2858,14 +2775,14 @@ void cfgSections(int item, char *val)
                 }
                 break;
 
-              } /* switch cursubsection */
+              } /* switch CURSECTION */
 
           }
           break;
 
         case TEXTURE:
           {
-            switch(cursubsection)
+            switch(CURSECTION())
               {
               case TEXAREA:
                 {
@@ -2881,14 +2798,14 @@ void cfgSections(int item, char *val)
           }
           break;
 
-        } /* switch cursection */
+        } /* switch PREVSECTION */
       
       /* be sure to free the value allocated */
       free(val);
       return;
     }
 
-  switch (cursection)
+  switch (CURSECTION())
     {
     case GLOBAL:    
       break;
@@ -2999,23 +2916,16 @@ static void cfgSectionb(int item, char *val)
   int bval = parsebool(val);
 
   if (cqiDebugl)
-    {
-      if (cursubsection)
-        clog("   subsection = %s\titem = %s\tvalb = '%s'",
-             sect2str(cursubsection), item2str(item), 
-             (bval ? "yes" : "no"));
-      else
-        clog(" section = %s\titem = %s\tvalb = '%s'",
-             sect2str(cursection), item2str(item), 
-             (bval ? "yes" : "no"));
-    }
+    clog(" [%d] section = %s\titem = %s\tvalb = '%s'",
+         curDepth, sect2str(CURSECTION()), item2str(item), 
+         (bval ? "yes" : "no"));
 
   if (bval == -1)
     {                           /* an error, do something sane */
       bval = 0;
     }
   
-  switch (cursection)
+  switch (CURSECTION())
     {
     case GLOBAL:    
       break;
@@ -3096,7 +3006,7 @@ static char *sect2str(int section)
       return "FRAMELIMIT";
       break;
 
-      /* subsections */
+      /* nested sections */
     case TEXANIM:
       return "TEXANIM";
       break;
