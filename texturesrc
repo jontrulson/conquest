@@ -1322,74 +1322,6 @@ texture {
 ## animation defs
 #################
 
-# team torp animdefs
-
-# klingon
-animdef {
-  name         "shipK-torp"
-
-  # initial state
-  istate {
-    size       180         # in CU's
-  }
-    
-  texanim {
-    stages     3
-    loops      0           # runs forever
-    delayms    50
-  }
-}
-
-# federation
-animdef {
-  name         "shipF-torp"
-
-  # initial state
-  istate {
-    size       120         # in CU's
-  }
-    
-  texanim {
-    stages     3
-    loops      0           # runs forever
-    delayms    100
-  }
-}
-
-# romulan
-animdef {
-  name         "shipR-torp"
-
-  # initial state
-  istate {
-    size       110         # in CU's
-  }
-    
-  texanim {
-    stages     3
-    loops      0           # runs forever
-    delayms    100
-  }
-}
-
-# orion
-animdef {
-  name         "shipO-torp"
-  texname      "torp"
-
-  # initial state
-  istate {
-    size       110         # in CU's
-    angle      -1.0        # random
-  }
-
-  geoanim {
-    stages     1           # always need at least 1 stage
-    loops      0           # runs forever
-    delayms    70          # randomly change angle every delayms 
-  }
-}
-
 # handles 'pulsing' of text, but could be used to pulse anything (red
 # that is :).
 animdef {
@@ -1545,20 +1477,86 @@ animation {
 }
 
 # team torp animations
+
+# klingon
 animation {
   name         "shipK-torp"
+
+  animdef {
+    texname    "shipK-torp"
+
+    # initial state
+    istate {
+      size       180         # in CU's
+    }
+    
+    texanim {
+      stages     3
+      loops      0           # runs forever
+      delayms    50
+    }
+  }
 }
 
+# orion
 animation {
   name         "shipO-torp"
+
+  animdef {
+    texname      "torp"
+
+    # initial state
+    istate {
+      size       110         # in CU's
+      angle      -1.0        # random
+    }
+
+    geoanim {
+      stages     1           # always need at least 1 stage
+      loops      0           # runs forever
+      delayms    70          # randomly change angle every delayms 
+    }
+  }
 }
 
+# federation
 animation {
   name         "shipF-torp"
+
+  animdef {
+    texname    "shipF-torp"
+
+    # initial state
+    istate {
+      size       120         # in CU's
+    }
+    
+    texanim {
+      stages     3
+      loops      0           # runs forever
+      delayms    100
+    }
+  }
 }
 
+# romulan
 animation {
   name         "shipR-torp"
+
+  animdef {
+    texname    "shipR-torp"
+
+    # initial state
+    istate {
+      size       110         # in CU's
+    }
+    
+    texanim {
+      stages     3
+      loops      0           # runs forever
+      delayms    100
+    }
+  }
 }
 
 # doomsday AP beam 
