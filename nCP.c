@@ -3557,6 +3557,25 @@ static int nCPMInput(mouseData_t *mdata)
                        );
 
       DoMouseMacro(mdata->button, mdata->mod, dir);
+
+      /* clean up the state - stop bombing/beaming if neccessary... */
+      if (state == S_BOMBING)
+        {
+          cqsEffectStop(bombingHandle, FALSE);
+          sendCommand(CPCMD_BOMB, 0); /* to be sure */
+          state = S_NONE;
+          prompting = FALSE;
+          clrPrompt(MSG_LIN2);
+        }
+      
+      if (state == S_BEAMING)
+        {
+          cqsEffectStop(beamHandle, FALSE);
+          sendCommand(CPCMD_BEAM, 0); /* to be sure */
+          state = S_NONE;
+          prompting = FALSE;
+          clrPrompt(MSG_LIN2);
+        }
     }
 
   return NODE_OK;

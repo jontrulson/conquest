@@ -72,7 +72,7 @@ typedef struct _cqi_planet_init {
 typedef struct _cqi_texture_area {
   char name[CQI_NAMELEN];       /* WKN of area */
   real x, y;                    /* X/Y coord of lower left of area as
-                                   measured from the from upper left (0.0)
+                                   measured from the upper left (0.0)
                                    of the texture as a whole */
   real w, h;                    /* w/h of area */
 } cqiTextureAreaRec_t, *cqiTextureAreaPtr_t;

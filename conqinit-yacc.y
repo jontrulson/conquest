@@ -111,7 +111,7 @@ static char *item2str(int item);
 static char *team2str(int pteam);
 static int str2team(char *str);
 static void initrun(int rcid);
-static void rmDQuote(char *str);
+static void checkStr(char *str);
 static int parsebool(char *str);
 
 
@@ -384,10 +384,10 @@ stmts           : /* empty */
                 | stmts toganimconfig
                 | stmts istateconfig
                 | stmts texareaconfig
+                | stmts animdefconfig
                 ;
 
-stmt            : /* error */
-                | PLANETMAX number
+stmt            : PLANETMAX number
                    {
                         cfgSectioni(PLANETMAX, $2);
                    }                      
@@ -643,7 +643,7 @@ string		: STRING
                   { 
                     ptr = (char *)strdup($1);
                     if (ptr)
-                      rmDQuote(ptr);
+                      checkStr(ptr);
                     $$ = ptr;
                   }
                 ;
@@ -839,15 +839,19 @@ static int cqiValidateAnimations(void)
           }
       }
 
-      /* now check each anim type */
-      
+      /* now check each anim type 
+       *  
+       * stages must be > 0 
+       * a stage == 0 means to disable an anim type, in which case
+       *  the anim type will never have been be enabled (endSection)
+       */
+
       /* texanim */
       if (_cqiAnimDefs[i].anims & CQI_ANIMS_TEX)
         {
-          /* stages must be non-zero */
-          if (!_cqiAnimDefs[i].texanim.stages)
+          if (_cqiAnimDefs[i].texanim.stages <= 0)
             {
-              clog("%s: animdef %s: texanim: stages must be non-zero.",
+              clog("%s: animdef %s: texanim: stages must greater than zero.",
                    __FUNCTION__, 
                    _cqiAnimDefs[i].name);
               return FALSE;
@@ -879,24 +883,17 @@ static int cqiValidateAnimations(void)
                   return FALSE;
                 }
             }
-          
         }
       
       /* colanim */
       if (_cqiAnimDefs[i].anims & CQI_ANIMS_COL)
         {
-          /* if stages is 0 (meaning infinite) then loops is meaningless -
-             set to 0 and warn. */
-          if (!_cqiAnimDefs[i].colanim.stages && 
-              _cqiAnimDefs[i].colanim.loops)
+          if (_cqiAnimDefs[i].colanim.stages <= 0)
             {
-              if (cqiVerbose)
-                clog("%s: animdef %s: colanim: stages is 0, forcing loops to 0.",
-                     __FUNCTION__, 
-                     _cqiAnimDefs[i].name,
-                     tbuf);
-              
-              _cqiAnimDefs[i].colanim.loops = 0;
+              clog("%s: animdef %s: colanim: stages must greater than zero.",
+                   __FUNCTION__, 
+                   _cqiAnimDefs[i].name);
+              return FALSE;
             }
         }
 
@@ -905,16 +902,12 @@ static int cqiValidateAnimations(void)
         {
           /* if stages is 0 (meaning infinite) then loops is meaningless -
              set to 0 and warn. */
-          if (!_cqiAnimDefs[i].geoanim.stages && 
-              _cqiAnimDefs[i].geoanim.loops)
+          if (_cqiAnimDefs[i].geoanim.stages <= 0)
             {
-              if (cqiVerbose)
-                clog("%s: animdef %s: geoanim: stages is 0, forcing loops to 0.",
-                     __FUNCTION__, 
-                     _cqiAnimDefs[i].name,
-                     tbuf);
-              
-              _cqiAnimDefs[i].geoanim.loops = 0;
+              clog("%s: animdef %s: geoanim: stages must greater than zero.",
+                   __FUNCTION__, 
+                   _cqiAnimDefs[i].name);
+              return FALSE;
             }
         }
     } /* for */
@@ -1720,16 +1713,24 @@ void dumpUniverse(void)
 static void startSection(int section)
 {
   if (cqiDebugl)
-    clog("%s: %s", __FUNCTION__, sect2str(section));
+    clog("%s: [%d] %s", __FUNCTION__, 
+         curDepth + 1,
+         sect2str(section));
   
   /* check for overflow */
-  if ((curDepth + 1)>= MAX_NESTING_DEPTH)
+  if ((curDepth + 1) >= MAX_NESTING_DEPTH)
     {
-      clog("CQI: %s: maximum nesting depth exceeded, ignoring section %s", 
-           __FUNCTION__, sect2str(section));
+      clog("CQI: %s: maximum nesting depth (%d) exceeded, ignoring "
+           "section %s, near line %d", 
+           __FUNCTION__, MAX_NESTING_DEPTH, sect2str(section),
+           lineNum);
       goterror++;
+      /* just return here as we haven't changed curDepth yet */
       return;
     }
+
+  /* add it to the list */
+  sections[++curDepth] = section;
 
   switch (section)
     {
@@ -1740,7 +1741,7 @@ static void startSection(int section)
             clog("%s: global section already configured\n",
                  __FUNCTION__);
             goterror++;
-            return;
+            goto error_return;
           }
 
         _cqiGlobal = malloc(sizeof(cqiGlobalInitRec_t));
@@ -1749,6 +1750,7 @@ static void startSection(int section)
             clog("%s: Could not allocate GlobalInitRec",
                     __FUNCTION__);
             goterror++;
+            goto error_return;
           }
         else
           memset((void *)_cqiGlobal, 0, sizeof(cqiGlobalInitRec_t));
@@ -1762,7 +1764,7 @@ static void startSection(int section)
             clog("%s: Have not read the global section (which must always be first). Ignoring SHIPTYPE",
                     __FUNCTION__);
             goterror++;
-            return;
+            goto error_return;
           }
       }
       break;
@@ -1800,7 +1802,79 @@ static void startSection(int section)
 
     case ANIMDEF:
       {
-        memset((void *)&currAnimDef, 0, sizeof(cqiAnimDefInitRec_t));
+        if (PREVSECTION() == ANIMATION) /* an inlined animdef */
+          { 
+            int _adndx = -1;
+            char tmpname[CQI_NAMELEN];
+
+            /* inlined animdef 
+             *
+             * for inlined animdefs, the animation name it's a part of,
+             * must have been specified already.  If not, then
+             * something is wrong, declare an error and bail.
+             */
+            if (!currAnimation.name[0])
+              {
+                clog("CQI: can't inline animdef at or near line %d: "
+                     "animation's name has not been specified.", 
+                     lineNum);
+                goterror++;
+                goto error_return;
+              }
+                
+            /* Now, see if an animdef name was specified in the
+             * animation.  If so, then we want to derive our new
+             * animdef from a previously existing one, which must
+             * already have been defined.
+             */
+            if (currAnimation.animdef[0])
+              {                 
+                /* it's been specified, look for it and init our new
+                 * animdef with it 
+                 */
+                if ((_adndx = _cqiFindAnimDef(currAnimation.animdef)) < 0)
+                  {
+                    /* couldn't find it, error */
+                    clog("CQI: can't inline animdef at or near line %d: "
+                         "source animdef %s is not defined.", 
+                         lineNum, currAnimation.animdef);
+                    goterror++;
+                    goto error_return;
+                  }
+
+                /* initialize it, the new animdef name will be overridden
+                 * below 
+                 */
+                currAnimDef = _cqiAnimDefs[_adndx];
+              }
+            else
+              {                 /* just inlining a complete animdef, init */
+                memset((void *)&currAnimDef, 0, sizeof(cqiAnimDefInitRec_t));
+              }
+
+            /* choose a unique name for this animdef.  We prefix it
+             * with '.' (since '.' cannot be specified as part of a
+             * name in a config file), and add the current (projected)
+             * slot number to make it unique.
+             */
+            snprintf(tmpname, 
+                     CQI_NAMELEN - 1 - (strlen(".-NNNNNN")), 
+                     ".%s",
+                     currAnimation.name);
+            snprintf(currAnimDef.name, CQI_NAMELEN - 1, "%s-%06d",
+                     tmpname, numAnimDefs + 1);
+
+            /* now, reset the animation's animdef specification
+             * (whether or not it had one) to point toward the new
+             * animdef 
+             */
+            strncpy(currAnimation.animdef, currAnimDef.name, CQI_NAMELEN - 1);
+          }
+        else
+          {
+            /* a global animdef */
+            memset((void *)&currAnimDef, 0, sizeof(cqiAnimDefInitRec_t));
+          }
       }
       break;
 
@@ -1814,6 +1888,7 @@ static void startSection(int section)
                 clog("%s: Could not allocate SoundConf",
                      __FUNCTION__);
                 goterror++;
+                goto error_return;
               }
             else
               {
@@ -1840,8 +1915,13 @@ static void startSection(int section)
       break;
     }
   
-  /* add it to the list */
-  sections[++curDepth] = section;
+  return;
+
+  /* clean things up if there was an error */
+ error_return:
+  /* remove the section from the list */
+  sections[curDepth] = 0;
+  curDepth--;
   return;
 }
 
@@ -1861,8 +1941,7 @@ static void endSection(void)
             !_cqiGlobal->maxusers || !_cqiGlobal->maxhist ||
             !_cqiGlobal->maxmsgs)
           {                     /* something missing */
-            clog("%s: GLOBAL section is incomplete, ignoring.",
-                 __FUNCTION__);
+            clog("CQI: GLOBAL section is incomplete, ignoring.");
             globalRead = FALSE; /* redundant I know, but.... */
           }
         else
@@ -1877,8 +1956,7 @@ static void endSection(void)
             
             if (!_cqiPlanets)
               {
-                clog("%s: could not allocate memory for planets.",
-                     __FUNCTION__);
+                clog("CQI: could not allocate memory for planets.");
                 globalRead = FALSE; /* redundant I know, but.... */
                 goterror++;
               }
@@ -1894,25 +1972,42 @@ static void endSection(void)
 
     case TEXANIM:
       {
-        currAnimDef.anims |= CQI_ANIMS_TEX; 
+        /* stage == 0 means to disable the anim type */
+        if (currAnimDef.texanim.stages) 
+          currAnimDef.anims |= CQI_ANIMS_TEX; 
+        else
+          currAnimDef.anims &= ~CQI_ANIMS_TEX; 
+          
       }
       break;
 
     case COLANIM:
       {
-        currAnimDef.anims |= CQI_ANIMS_COL; 
+        /* stage == 0 means to disable the anim type */
+        if (currAnimDef.colanim.stages)
+          currAnimDef.anims |= CQI_ANIMS_COL; 
+        else
+          currAnimDef.anims &= ~CQI_ANIMS_COL; 
       }
       break;
 
     case GEOANIM:
       {
-        currAnimDef.anims |= CQI_ANIMS_GEO;
+        /* stage == 0 means to disable the anim type */
+        if (currAnimDef.geoanim.stages)
+          currAnimDef.anims |= CQI_ANIMS_GEO;
+        else
+          currAnimDef.anims &= ~CQI_ANIMS_GEO; 
       }
       break;
 
     case TOGANIM:
       {
-        currAnimDef.anims |= CQI_ANIMS_TOG;
+        /* delayms on a toganim == 0 means to disable the anim type */
+        if (currAnimDef.toganim.delayms)
+          currAnimDef.anims |= CQI_ANIMS_TOG;
+        else
+          currAnimDef.anims &= ~CQI_ANIMS_TOG; 
       }
       break;
       
@@ -1933,8 +2028,8 @@ static void endSection(void)
               
               if (!taptr)
                 {  
-                  clog("%s: Could not realloc %d texareas for texture %s, ignoring texarea '%s'",
-                       __FUNCTION__,
+                  clog("CQI: Could not realloc %d texareas for texture %s, "
+                       "ignoring texarea '%s'",
                        numTexAreas + 1,
                        currTexture.name,
                        currTexArea.name);
@@ -1950,8 +2045,10 @@ static void endSection(void)
             }
           else
             {
-              clog("%s: texarea name at or near line %d was not specified, ignoring.",
-                   __FUNCTION__, lineNum);
+              clog("CQI: texarea name at or near line %d was not specified, "
+                   "ignoring.",
+                   lineNum);
+              goto endsection;
             }
         }
       break;
@@ -1961,18 +2058,18 @@ static void endSection(void)
         /* check some basic things */
         if (!currPlanet.name[0] || !currPlanet.primname[0])
           {
-            clog("%s: planet %d is missing name and/or primary",
-                 __FUNCTION__, numPlanets);
+            clog("CQI: planet %d is missing name and/or primary",
+                 numPlanets);
             goterror++;
             return;
           }
         
         if (numPlanets >= _cqiGlobal->maxplanets)
           {
-            clog("%s: planet '%s' (%d) exceeds maxplanets (%d), ignoring.",
-                 __FUNCTION__, currPlanet.name, numPlanets, 
+            clog("CQI: planet '%s' (%d) exceeds maxplanets (%d), ignoring.",
+                  currPlanet.name, numPlanets, 
                  _cqiGlobal->maxplanets);
-            return;
+            goto endsection;
           }
         
         /* need more checks here ? */
@@ -1987,24 +2084,16 @@ static void endSection(void)
     case TEXTURE:
       {
         cqiTextureInitPtr_t texptr;
-        char *ch;
         int exists = -1;
         
         /* verify the required info was provided */
         if (!strlen(currTexture.name))
           {
-            clog("%s: texture name at or near line %d was not specified, ignoring.",
-                 __FUNCTION__, lineNum);
-            return;
+            clog("CQI: texture name at or near line %d was not specified, "
+                 "ignoring.",
+                 lineNum);
+            goto endsection;
           }
-        
-        /* check the texname for banned substances ('/' and '.') */
-        while ((ch = strchr(currTexture.name, '.')))
-          *ch = '_';
-        while ((ch = strchr(currTexture.name, '/')))
-          *ch = '_';
-        while ((ch = strchr(currTexture.name, '\\')))
-          *ch = '_';
         
         /* if the texture was overrided by a later definition
            just copy the new definition over it */
@@ -2021,9 +2110,9 @@ static void endSection(void)
             /* overwrite existing texture def */
             _cqiTextures[exists] = currTexture;
             if (cqiDebugl)
-              clog("%s: texture '%s' near line %d: overriding already "
+              clog("CQI: texture '%s' near line %d: overriding already "
                    "loaded texture.",
-                   __FUNCTION__, currTexture.name, lineNum);
+                   currTexture.name, lineNum);
           }
         else
           {                     /* make a new one */
@@ -2033,11 +2122,10 @@ static void endSection(void)
             
             if (!texptr)
               {  
-                clog("%s: Could not realloc %d textures, ignoring texture '%s'",
-                     __FUNCTION__,
+                clog("CQI: Could not realloc %d textures, ignoring texture '%s'",
                      numTextures + 1,
                      currTexture.name);
-                return;
+                goto endsection;
               }
 
             _cqiTextures = texptr;
@@ -2056,9 +2144,10 @@ static void endSection(void)
         /* verify the required info was provided */
         if (!strlen(currAnimation.name))
           {
-            clog("%s: animation name at or near line %d was not specified, ignoring.",
-                 __FUNCTION__, lineNum);
-            return;
+            clog("CQI: animation name at or near line %d was not specified, "
+                 "ignoring.",
+                 lineNum);
+            goto endsection;
           }
         
         /* if the animation was overridden by a later definition
@@ -2075,9 +2164,9 @@ static void endSection(void)
           {
             _cqiAnimations[exists] = currAnimation;
             if (cqiDebugl)
-              clog("%s: animation '%s' near line %d: overriding already loaded "
-                   "animation.",
-                   __FUNCTION__, currAnimation.name, lineNum);
+              clog("CQI: animation '%s' near line %d: overriding already "
+                   "loaded animation.",
+                   currAnimation.name, lineNum);
           }
         else
           {                     /* make a new one */
@@ -2087,11 +2176,11 @@ static void endSection(void)
             
             if (!animptr)
               {  
-                clog("%s: Could not realloc %d animations, ignoring animation '%s'",
-                     __FUNCTION__,
+                clog("CQI: Could not realloc %d animations, ignoring "
+                     "animation '%s'",
                      numAnimations + 1,
                      currAnimation.name);
-                return;
+                goto endsection;
               }
             
             _cqiAnimations = animptr;
@@ -2110,9 +2199,10 @@ static void endSection(void)
         /* verify the required info was provided */
         if (!strlen(currAnimDef.name))
           {
-            clog("%s: animdef name at or near line %d was not specified, ignoring.",
-                 __FUNCTION__, lineNum);
-            return;
+            clog("CQI: animdef name at or near line %d was not specified, "
+                 "ignoring.",
+                 lineNum);
+            goto endsection;
           }
         
         exists = _cqiFindAnimDef(currAnimDef.name);
@@ -2121,16 +2211,16 @@ static void endSection(void)
           {
             _cqiAnimDefs[exists] = currAnimDef;
             if (cqiDebugl)
-              clog("%s: animdef '%s' near line %d: overriding already loaded "
+              clog("CQI: animdef '%s' near line %d: overriding already loaded "
                    "animdef.",
-                   __FUNCTION__, currAnimDef.name, lineNum);
+                   currAnimDef.name, lineNum);
           }
         else if (!currAnimDef.anims)
           {                     /* no animation types were declared */
-            clog("%s: animdef '%s' near line %d: declared no animation "
+            clog("CQI: animdef '%s' near line %d: declared no animation "
                  "type sections. Ignoring.",
-                 __FUNCTION__, currAnimDef.name, lineNum);
-            return;
+                 currAnimDef.name, lineNum);
+            goto endsection;
           }
         else
           {                     /* make a new one */
@@ -2140,11 +2230,11 @@ static void endSection(void)
             
             if (!animptr)
               {  
-                clog("%s: Could not realloc %d animdefs, ignoring animdef '%s'",
-                     __FUNCTION__,
+                clog("CQI: Could not realloc %d animdefs, ignoring "
+                     "animdef '%s'",
                      numAnimDefs + 1,
                      currAnimDef.name);
-                return;
+                goto endsection;
               }
             
             _cqiAnimDefs = animptr;
@@ -2175,26 +2265,17 @@ static void endSection(void)
     case EFFECT:
       {
         cqiSoundPtr_t sndptr;
-        char *ch;
         int exists = -1;
         
         /* verify the required info was provided */
         if (!strlen(currSound.name))
           {
-            clog("%s: effect name at or near line %d was not specified, ignoring.",
-                 __FUNCTION__, lineNum);
-            return;
+            clog("CQI: effect name at or near line %d was not specified, "
+                 "ignoring.",
+                 lineNum);
+            goto endsection;
           }
 
-        
-        /* check the name for banned substances ('/' and '.') */
-        while ((ch = strchr(currSound.name, '.')))
-          *ch = '_';
-        while ((ch = strchr(currSound.name, '/')))
-          *ch = '_';
-        while ((ch = strchr(currTexture.name, '\\')))
-          *ch = '_';
-        
         /* if the effect was overridden by a later definition
            just copy the new definition over it */
         exists = _cqiFindEffect(currSound.name);
@@ -2209,9 +2290,9 @@ static void endSection(void)
             /* overwrite existing def */
             _cqiSoundEffects[exists] = currSound;
             if (cqiDebugl)
-              clog("%s: effect '%s' near line %d: overriding already "
+              clog("CQI: effect '%s' near line %d: overriding already "
                    "loaded effect.",
-                   __FUNCTION__, currSound.name, lineNum);
+                   currSound.name, lineNum);
           }
         else
           {                     /* make a new one */
@@ -2221,11 +2302,10 @@ static void endSection(void)
             
             if (!sndptr)
               {  
-                clog("%s: Could not realloc %d effect, ignoring effect '%s'",
-                     __FUNCTION__,
+                clog("CQI: Could not realloc %d effect, ignoring effect '%s'",
                      numSoundEffects + 1,
                      currSound.name);
-                return;
+                goto endsection;
               }
             
             _cqiSoundEffects = sndptr;
@@ -2239,26 +2319,17 @@ static void endSection(void)
     case MUSIC:
       {
         cqiSoundPtr_t sndptr;
-        char *ch;
         int exists = -1;
         
         /* verify the required info was provided */
         if (!strlen(currSound.name))
           {
-            clog("%s: music name at or near line %d was not specified, ignoring.",
-                 __FUNCTION__, lineNum);
-            return;
+            clog("CQI: music name at or near line %d was not specified, "
+                 "ignoring.",
+                 lineNum);
+            goto endsection;
           }
 
-        
-        /* check the name for banned substances ('/' and '.') */
-        while ((ch = strchr(currSound.name, '.')))
-          *ch = '_';
-        while ((ch = strchr(currSound.name, '/')))
-          *ch = '_';
-        while ((ch = strchr(currTexture.name, '\\')))
-          *ch = '_';
-        
         /* if the music was overridden by a later definition
            just copy the new definition over it */
         exists = _cqiFindMusic(currSound.name);
@@ -2273,9 +2344,9 @@ static void endSection(void)
             /* overwrite existing def */
             _cqiSoundMusic[exists] = currSound;
             if (cqiDebugl)
-              clog("%s: music '%s' near line %d: overriding already "
+              clog("CQI: music '%s' near line %d: overriding already "
                    "loaded music slot.",
-                   __FUNCTION__, currSound.name, lineNum);
+                   currSound.name, lineNum);
           }
         else
           {                     /* make a new one */
@@ -2285,11 +2356,11 @@ static void endSection(void)
             
             if (!sndptr)
               {  
-                clog("%s: Could not realloc %d music slots, ignoring music '%s'",
-                     __FUNCTION__,
+                clog("CQI: Could not realloc %d music slots, "
+                     "ignoring music '%s'",
                      numSoundMusic + 1,
                      currSound.name);
-                return;
+                goto endsection;
               }
             
             _cqiSoundMusic = sndptr;
@@ -2303,7 +2374,9 @@ static void endSection(void)
     default:
       break;
     }
-  
+
+ endsection:
+
   sections[curDepth] = 0;
   if (curDepth > 0)
     curDepth--;
@@ -2318,105 +2391,6 @@ static void cfgSectioni(int item, int val)
     clog(" [%d] section = %s\titem = %s\tvali = %d",
          curDepth, sect2str(CURSECTION()), item2str(item), val);
   
-  if (PREVSECTION())
-    {
-      switch (PREVSECTION())
-        {
-        case ANIMDEF:
-          {
-            switch(CURSECTION())
-              {
-              case TEXANIM:
-                {
-                  switch(item)
-                    {
-                    case STAGES:
-                      currAnimDef.texanim.stages = abs(val);
-                      break;
-                    case LOOPS:
-                      currAnimDef.texanim.loops = abs(val);
-                      break;
-                    case DELAYMS:
-                      currAnimDef.texanim.delayms = abs(val);
-                      break;
-                    case LOOPTYPE:
-                      currAnimDef.texanim.looptype = abs(val);
-                      break;
-                    }
-                }
-                break;
-
-              case COLANIM:
-                {
-                  switch(item)
-                    {
-                    case STAGES:
-                      currAnimDef.colanim.stages = abs(val);
-                      break;
-                    case LOOPS:
-                      currAnimDef.colanim.loops = abs(val);
-                      break;
-                    case DELAYMS:
-                      currAnimDef.colanim.delayms = abs(val);
-                      break;
-                    case LOOPTYPE:
-                      currAnimDef.colanim.looptype = abs(val);
-                      break;
-                    }
-                }
-                break;
-
-              case GEOANIM:
-                {
-                  switch(item)
-                    {
-                    case STAGES:
-                      currAnimDef.geoanim.stages = abs(val);
-                      break;
-                    case LOOPS:
-                      currAnimDef.geoanim.loops = abs(val);
-                      break;
-                    case DELAYMS:
-                      currAnimDef.geoanim.delayms = abs(val);
-                      break;
-                    case LOOPTYPE:
-                      currAnimDef.geoanim.looptype = abs(val);
-                      break;
-                    }
-                }
-                break;
-
-              case TOGANIM:
-                {
-                  switch(item)
-                    {
-                    case DELAYMS:
-                      currAnimDef.toganim.delayms = abs(val);
-                      break;
-                    }
-                }
-                break;
-
-              case ISTATE:
-                {
-                  switch(item)
-                    {
-                    case SIZE:
-                      currAnimDef.isize = fabs((real)val);
-                      currAnimDef.istates |= AD_ISTATE_SZ;
-                      break;
-                    }
-                }
-                break;
-              } /* switch CURSECTION */
-
-          }
-          break;
-        } /* switch PREVSECTION */
-
-      return;
-    }
-
   switch (CURSECTION())
     {
     case GLOBAL:    
@@ -2513,6 +2487,89 @@ static void cfgSectioni(int item, int val)
           }
 
       }
+
+    case TEXANIM:
+      {
+        switch(item)
+          {
+          case STAGES:
+            currAnimDef.texanim.stages = abs(val);
+            break;
+          case LOOPS:
+            currAnimDef.texanim.loops = abs(val);
+            break;
+          case DELAYMS:
+            currAnimDef.texanim.delayms = abs(val);
+            break;
+          case LOOPTYPE:
+            currAnimDef.texanim.looptype = abs(val);
+            break;
+          }
+      }
+      break;
+      
+    case COLANIM:
+      {
+        switch(item)
+          {
+          case STAGES:
+            currAnimDef.colanim.stages = abs(val);
+            break;
+          case LOOPS:
+            currAnimDef.colanim.loops = abs(val);
+            break;
+          case DELAYMS:
+            currAnimDef.colanim.delayms = abs(val);
+            break;
+          case LOOPTYPE:
+            currAnimDef.colanim.looptype = abs(val);
+            break;
+          }
+      }
+      break;
+      
+    case GEOANIM:
+      {
+        switch(item)
+          {
+          case STAGES:
+            currAnimDef.geoanim.stages = abs(val);
+            break;
+          case LOOPS:
+            currAnimDef.geoanim.loops = abs(val);
+            break;
+          case DELAYMS:
+            currAnimDef.geoanim.delayms = abs(val);
+            break;
+          case LOOPTYPE:
+            currAnimDef.geoanim.looptype = abs(val);
+            break;
+          }
+      }
+      break;
+      
+    case TOGANIM:
+      {
+        switch(item)
+          {
+          case DELAYMS:
+            currAnimDef.toganim.delayms = abs(val);
+            break;
+          }
+      }
+      break;
+      
+    case ISTATE:
+      {
+        switch(item)
+          {
+          case SIZE:
+            currAnimDef.isize = fabs((real)val);
+            currAnimDef.istates |= AD_ISTATE_SZ;
+            break;
+          }
+      }
+      break;
       
     default:
       break;
@@ -2570,119 +2627,6 @@ static void cfgSectionf(int item, real val)
     clog(" [%d] section = %s\titem = %s\tvalf = %f",
          curDepth, sect2str(CURSECTION()), item2str(item), val);
 
-  if (PREVSECTION())
-    {
-      switch (PREVSECTION())
-        {
-        case ANIMDEF:
-          {
-            switch(CURSECTION())
-              {
-              case TEXANIM:
-                {
-                  switch(item)
-                    {
-                    case DELTAS:
-                      currAnimDef.texanim.deltas = val;
-                      break;
-                    case DELTAT:
-                      currAnimDef.texanim.deltat = val;
-                      break;
-                    }
-                }
-                break;
-              case COLANIM:
-                {
-                  switch(item)
-                    {
-                    case DELTAA:
-                      currAnimDef.colanim.deltaa = val;
-                      break;
-                    case DELTAR: /* red */
-                      currAnimDef.colanim.deltar = val;
-                      break;
-                    case DELTAG:
-                      currAnimDef.colanim.deltag = val;
-                      break;
-                    case DELTAB:
-                      currAnimDef.colanim.deltab = val;
-                      break;
-                    }
-                }
-                break;
-
-              case GEOANIM:
-                {
-                  switch(item)
-                    {
-                    case DELTAX:
-                      currAnimDef.geoanim.deltax = val;
-                      break;
-                    case DELTAY:
-                      currAnimDef.geoanim.deltay = val;
-                      break;
-                    case DELTAZ:
-                      currAnimDef.geoanim.deltaz = val;
-                      break;
-                    case DELTAR: /* rotation */
-                      currAnimDef.geoanim.deltar = val;
-                      break;
-                    case DELTAS: /* size */
-                      currAnimDef.geoanim.deltas = val;
-                      break;
-                    }
-                }
-                break;
-
-              case ISTATE:
-                {
-                  switch(item)
-                    {
-                    case ANGLE:
-                      currAnimDef.iangle = val;
-                      currAnimDef.istates |= AD_ISTATE_ANG;
-                      break;
-                    }
-                }
-                break;
-
-              } /* switch CURSECTION */
-            
-          }
-          break;
-          
-        case TEXTURE:
-          {
-            switch(CURSECTION())
-              {
-              case TEXAREA:
-                {
-                  switch(item)
-                    {
-                    case XCOORD:
-                      currTexArea.x = fabs(val);
-                      break;
-                    case YCOORD:
-                      currTexArea.y = fabs(val);
-                      break;
-                    case WIDTH:
-                      currTexArea.w = fabs(val);
-                      break;
-                    case HEIGHT:
-                      currTexArea.h = fabs(val);
-                      break;
-                    }
-                }
-                break;
-              } /* switch CURSECTION */
-          } /* TEXTURE */
-          break;
-          
-        } /* switch PREVSECTION */
-      
-      return;
-    }
-
   switch (CURSECTION())
     {
     case GLOBAL:    
@@ -2712,6 +2656,95 @@ static void cfgSectionf(int item, real val)
       }
 
       break;
+
+    case TEXANIM:
+      {
+        switch(item)
+          {
+          case DELTAS:
+            currAnimDef.texanim.deltas = val;
+            break;
+          case DELTAT:
+            currAnimDef.texanim.deltat = val;
+            break;
+          }
+      }
+      break;
+    case COLANIM:
+      {
+        switch(item)
+          {
+          case DELTAA:
+            currAnimDef.colanim.deltaa = val;
+            break;
+          case DELTAR: /* red */
+            currAnimDef.colanim.deltar = val;
+            break;
+          case DELTAG:
+            currAnimDef.colanim.deltag = val;
+            break;
+          case DELTAB:
+            currAnimDef.colanim.deltab = val;
+            break;
+          }
+      }
+      break;
+      
+    case GEOANIM:
+      {
+        switch(item)
+          {
+          case DELTAX:
+            currAnimDef.geoanim.deltax = val;
+            break;
+          case DELTAY:
+            currAnimDef.geoanim.deltay = val;
+            break;
+          case DELTAZ:
+            currAnimDef.geoanim.deltaz = val;
+            break;
+          case DELTAR: /* rotation */
+            currAnimDef.geoanim.deltar = val;
+            break;
+          case DELTAS: /* size */
+            currAnimDef.geoanim.deltas = val;
+            break;
+          }
+      }
+      break;
+      
+    case ISTATE:
+      {
+        switch(item)
+          {
+          case ANGLE:
+            currAnimDef.iangle = val;
+            currAnimDef.istates |= AD_ISTATE_ANG;
+            break;
+          }
+      }
+      break;
+
+    case TEXAREA:
+      {
+        switch(item)
+          {
+          case XCOORD:
+            currTexArea.x = fabs(val);
+            break;
+          case YCOORD:
+            currTexArea.y = fabs(val);
+            break;
+          case WIDTH:
+            currTexArea.w = fabs(val);
+            break;
+          case HEIGHT:
+            currTexArea.h = fabs(val);
+            break;
+          }
+      }
+      break;
+      
     default:
       break;
     }
@@ -2729,88 +2762,60 @@ void cfgSections(int item, char *val)
   if (!val)
     return;
 
-  if (PREVSECTION())
-    {
-      switch (PREVSECTION())
-        {
-        case ANIMDEF:
-          {
-            switch(CURSECTION())
-              {
-              case TEXANIM:
-                {
-                  switch(item)
-                    {
-                    case COLOR:
-                      currAnimDef.texanim.color = hex2color(val);
-                      break;
-                    }
-                }
-                break;
-
-              case COLANIM:
-                {
-                  switch(item)
-                    {
-                    case COLOR:
-                      currAnimDef.colanim.color = hex2color(val);
-                      break;
-                    }
-                }
-                break;
-
-              case ISTATE:
-                {
-                  switch(item)
-                    {
-                    case COLOR:
-                      currAnimDef.icolor = hex2color(val);
-                      currAnimDef.istates |= AD_ISTATE_COL;
-                      break;
-                    case TEXNAME:
-                      strncpy(currAnimDef.itexname, val, CQI_NAMELEN - 1);
-                      currAnimDef.istates |= AD_ISTATE_TEX;
-                      break;
-                    }
-                }
-                break;
-
-              } /* switch CURSECTION */
-
-          }
-          break;
-
-        case TEXTURE:
-          {
-            switch(CURSECTION())
-              {
-              case TEXAREA:
-                {
-                  switch (item)
-                    {
-                    case NAME:
-                      strncpy(currTexArea.name, val, CQI_NAMELEN - 1);
-                      break;
-                    }
-                }
-                break;
-              }
-          }
-          break;
-
-        } /* switch PREVSECTION */
-      
-      /* be sure to free the value allocated */
-      free(val);
-      return;
-    }
-
   switch (CURSECTION())
     {
     case GLOBAL:    
       break;
     case SHIPTYPE:    
       break;
+    case TEXAREA:
+      {
+        switch (item)
+          {
+          case NAME:
+            strncpy(currTexArea.name, val, CQI_NAMELEN - 1);
+            break;
+          }
+      }
+      break;
+    case TEXANIM:
+      {
+        switch(item)
+          {
+          case COLOR:
+            currAnimDef.texanim.color = hex2color(val);
+            break;
+          }
+      }
+      break;
+      
+    case COLANIM:
+      {
+        switch(item)
+          {
+          case COLOR:
+            currAnimDef.colanim.color = hex2color(val);
+            break;
+          }
+      }
+      break;
+      
+    case ISTATE:
+      {
+        switch(item)
+          {
+          case COLOR:
+            currAnimDef.icolor = hex2color(val);
+            currAnimDef.istates |= AD_ISTATE_COL;
+            break;
+          case TEXNAME:
+            strncpy(currAnimDef.itexname, val, CQI_NAMELEN - 1);
+            currAnimDef.istates |= AD_ISTATE_TEX;
+            break;
+          }
+      }
+      break;
+      
     case PLANET:    
       {
         switch (item)
@@ -2880,7 +2885,15 @@ void cfgSections(int item, char *val)
         switch(item)
           {
           case NAME:
-            strncpy(currAnimDef.name, val, CQI_NAMELEN - 1);
+            if (PREVSECTION() == ANIMATION)
+              {
+                /* not allowed to set a name on inlined animdefs - it's
+                 * already been done for you.
+                 */
+                  clog("CQI: field 'name' is ignored for inlined animdefs.");
+              }
+            else
+              strncpy(currAnimDef.name, val, CQI_NAMELEN - 1);
             break;
           case TEXNAME:
             strncpy(currAnimDef.texname, val, CQI_NAMELEN - 1);
@@ -3220,88 +3233,53 @@ static char *item2str(int item)
   return "UNKNOWN";
 }
 
-
-static void rmDQuote(char *str)
+/* go through the string and convert all '.', '/', '\', and
+ * non-printable characters into '_'.  Remove any double quotes. 
+ *
+ */
+static void checkStr(char *str)
 {
-  char *i, *o;
-  int n;
-  int count;
+  char *s = str, *s2;
   
-  for (i=str+1, o=str; *i && *i != '\"'; o++)
+  if (!s)
+    return;
+
+  while (*s)
     {
-      if (*i == '\\')
-	{
-          switch (*++i)
-	    {
-	    case 'n':
-              *o = '\n';
-              i++;
-              break;
-	    case 'b':
-              *o = '\b';
-              i++;
-              break;
-	    case 'r':
-              *o = '\r';
-              i++;
-              break;
-	    case 't':
-              *o = '\t';
-              i++;
-              break;
-	    case 'f':
-              *o = '\f';
-              i++;
-              break;
-	    case '0':
-              if (*++i == 'x')
-                goto hex;
-              else
-                --i;
-	    case '1': case '2': case '3':
-	    case '4': case '5': case '6': case '7':
-              n = 0;
-              count = 0;
-              while (*i >= '0' && *i <= '7' && count < 3)
-		{
-                  n = (n<<3) + (*i++ - '0');
-                  count++;
-		}
-              *o = n;
-              break;
-	    hex:
-	    case 'x':
-              n = 0;
-              count = 0;
-              while (i++, count++ < 2)
-		{
-                  if (*i >= '0' && *i <= '9')
-                    n = (n<<4) + (*i - '0');
-                  else if (*i >= 'a' && *i <= 'f')
-                    n = (n<<4) + (*i - 'a') + 10;
-                  else if (*i >= 'A' && *i <= 'F')
-                    n = (n<<4) + (*i - 'A') + 10;
-                  else
-                    break;
-		}
-              *o = n;
-              break;
-	    case '\n':
-              i++;	/* punt */
-              o--;	/* to account for o++ at end of loop */
-              break;
-	    case '\"':
-	    case '\'':
-	    case '\\':
-	    default:
-              *o = *i++;
-              break;
-	    }
-	}
-      else
-        *o = *i++;
+      switch (*s)
+        {
+        case '\\':
+        case '/':
+        case '.':
+        case ' ':
+          *s = '_';
+          s++;
+          break;
+
+        case '"':               /* copy over it */
+          {
+            s2 = s + 1;
+            do 
+              {
+                *(s2 - 1) = *s2;
+                s2++;
+              } while (*(s2 - 1));
+          }
+          /* do not increment s here */
+          break;
+          
+        default:
+          {
+            if (!isprint((unsigned int)*s))
+              *s = '_';
+          }
+          s++;
+          break;
+        }
+
     }
-  *o = '\0';
+
+  return;
 }
 
 static int parsebool(char *str)
@@ -3310,7 +3288,7 @@ static int parsebool(char *str)
   
   s = str;
   
-  if (s == NULL)
+  if (!s)
     return(-1);
   
   while(*s)
@@ -3344,96 +3322,109 @@ static int parsebool(char *str)
 /* initrun - initalize for the run */
 static void initrun(int rcid)
 {
-  if (rcid == CQI_FILE_CONQINITRC)
+
+  switch (rcid)
     {
+    case CQI_FILE_CONQINITRC:
+      {
+        if (_cqiGlobal)
+          {
+            if (_cqiGlobal != &defaultGlobalInit)
+              free(_cqiGlobal);
+            _cqiGlobal = NULL;
+            globalRead = FALSE;
+          }
+        
+        if (_cqiShiptypes)
+          {
+            if (_cqiShiptypes != defaultShiptypes)
+              free(_cqiShiptypes);
+            _cqiShiptypes = NULL;
+            numShiptypes = 0;
+          }
+        
+        if (_cqiPlanets)
+          {
+            if (_cqiPlanets != defaultPlanets)
+              free(_cqiPlanets);
+            _cqiPlanets = NULL;
+            numPlanets = 0;
+          }
+      }
 
-      if (_cqiGlobal)
-        {
-          if (_cqiGlobal != &defaultGlobalInit)
-            free(_cqiGlobal);
-          _cqiGlobal = NULL;
-          globalRead = FALSE;
-        }
-      
-      if (_cqiShiptypes)
-        {
-          if (_cqiShiptypes != defaultShiptypes)
-            free(_cqiShiptypes);
-          _cqiShiptypes = NULL;
-          numShiptypes = 0;
-        }
+      break;
 
-      if (_cqiPlanets)
-        {
-          if (_cqiPlanets != defaultPlanets)
-            free(_cqiPlanets);
-          _cqiPlanets = NULL;
-          numPlanets = 0;
-        }
-    }
+    case CQI_FILE_SOUNDRC:
+    case CQI_FILE_SOUNDRC_ADD:
+      {
+        if (rcid == CQI_FILE_SOUNDRC)
+          {                       /* if we are not adding, re-init */
+            if (_cqiSoundConf)
+              {
+                if (_cqiSoundConf != &defaultSoundConf)
+                  free(_cqiSoundConf);
+                _cqiSoundConf = NULL;
+              }              
+            
+            if (_cqiSoundEffects)
+              {
+                if (_cqiSoundEffects != defaultSoundEffects)
+                  free(_cqiSoundEffects);
+                _cqiSoundEffects = NULL;
+              }
+            numSoundEffects = 0;
+            
+            if (_cqiSoundMusic)
+              {
+                if (_cqiSoundMusic != defaultSoundMusic)
+                  free(_cqiSoundMusic);
+                _cqiSoundMusic = NULL;
+              }
+            numSoundMusic = 0;
+          }
+        
+        fileNumEffects = 0;
+        fileNumMusic = 0;
 
-  if (rcid == CQI_FILE_SOUNDRC || rcid == CQI_FILE_SOUNDRC_ADD)
-    {
-      if (rcid == CQI_FILE_SOUNDRC)
-        {                       /* if we are not adding, re-init */
-          if (_cqiSoundConf)
-            {
-              if (_cqiSoundConf != &defaultSoundConf)
-                free(_cqiSoundConf);
-              _cqiSoundConf = NULL;
-            }              
+      }
+      break;
 
-          if (_cqiSoundEffects)
-            {
-              if (_cqiSoundEffects != defaultSoundEffects)
-                free(_cqiSoundEffects);
-              _cqiSoundEffects = NULL;
-            }
-          numSoundEffects = 0;
+    case CQI_FILE_TEXTURESRC:
+    case CQI_FILE_TEXTURESRC_ADD:
+      {      /* free/setup textures here */
+        if (rcid == CQI_FILE_TEXTURESRC)
+          {                       /* if we are not adding, re-init */
+            if (_cqiTextures)
+              {
+                free(_cqiTextures);
+                _cqiTextures = NULL;
+              }
+            numTextures = 0;
+            
+            if (_cqiAnimations)
+              {
+                free(_cqiAnimations);
+                _cqiAnimations = NULL;
+              }
+            numAnimations = 0;
+            
+            if (_cqiAnimDefs)
+              {
+                free(_cqiAnimDefs);
+                _cqiAnimDefs = NULL;
+              }
+            numAnimDefs = 0;
+          }
+        
+        fileNumTextures = 0;
+        fileNumAnimations = 0;
+        fileNumAnimDefs = 0;
+      }
+      break;
 
-          if (_cqiSoundMusic)
-            {
-              if (_cqiSoundMusic != defaultSoundMusic)
-                free(_cqiSoundMusic);
-              _cqiSoundMusic = NULL;
-            }
-          numSoundMusic = 0;
-        }
-              
-      fileNumEffects = 0;
-      fileNumMusic = 0;
-
-    }
-
-  if (rcid == CQI_FILE_TEXTURESRC || rcid == CQI_FILE_TEXTURESRC_ADD)
-    {      /* free/setup textures here */
-      if (rcid == CQI_FILE_TEXTURESRC)
-        {                       /* if we are not adding, re-init */
-          if (_cqiTextures)
-            {
-              free(_cqiTextures);
-              _cqiTextures = NULL;
-            }
-          numTextures = 0;
-
-          if (_cqiAnimations)
-            {
-              free(_cqiAnimations);
-              _cqiAnimations = NULL;
-            }
-          numAnimations = 0;
-
-          if (_cqiAnimDefs)
-            {
-              free(_cqiAnimDefs);
-              _cqiAnimDefs = NULL;
-            }
-          numAnimDefs = 0;
-        }
-
-      fileNumTextures = 0;
-      fileNumAnimations = 0;
-      fileNumAnimDefs = 0;
+   default:
+      clog("CQI: initrun: unkown rcid %d", rcid);
+      break;
     }
 
   return;

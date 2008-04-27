@@ -482,6 +482,10 @@ CONTENTS:
           animation {
             name         "explosion"
             animdef      "explode"               # optional
+
+            animdef {                            # optional inlined animdef
+               ...
+            }
           }
 
           name:       STRING
@@ -498,6 +502,28 @@ CONTENTS:
                       If 'animdef' is not specified, then the default
                       is to look for an animdef with the same WKN of
                       the animation section.
+
+          anumdef {}: An animdef section (see description below) can
+                      also be defined inline within an animation
+                      section.
+
+                      If an animdef name was also specified for the
+                      animation, then that animdef (which must have
+                      already been defined) is used to initialize the
+                      inlined animdef base data.  In this usage, the
+                      inlined animdef section can be used to override
+                      characteristics of an already pre-defined
+                      animdef.
+
+                      In this way, animations can be derived from
+                      common, previously defined animdefs.
+
+                      If no animdef name was specified as part of the
+                      animation, then the inlined animdef section is
+                      treated as just another (private) animdef, only
+                      usable with this animation.
+
+                      Get all that? :)
 
        ## animdef
 
@@ -567,7 +593,11 @@ CONTENTS:
 
 
           animdef {
-            name         "explode"
+            name         "explode"               # required for
+                                                 # non-inlined (global)
+                                                 # animdefs, otherwise 
+                                                 # ignored
+                                                      
             texname      "exp"                   # semi-optional
             timelimit    3000                    # optional
 
@@ -614,6 +644,13 @@ CONTENTS:
           name:       STRING
                       the name of the animdef, referenced by the WKN
                       of an 'animation' section as described earlier.
+
+                      'name' is required for global (non-inlined)
+                      animdefs.  An inlined animdef is an animdef
+                      defined within an animation section. 
+
+                      'name' is ignored for inlined animdefs, and
+                      should not be specified for them.
 
           texname:    STRING 
                       semi-optional.  Specifies the WKN of a texture
@@ -672,6 +709,9 @@ CONTENTS:
                         a non-zero number specifying the number of
                         individual textures that make up the texanim.
 
+                        setting stages to 0 disables the anim type.
+                        This is useful for derived inline animdefs.
+
             loops:      NUMBER
                         optional.  defaults to 1.  Specifies how many
                         times to to display all of the textures.  In
@@ -712,9 +752,10 @@ CONTENTS:
 
             stages:     NUMBER
                         a number specifying the number of iterations
-                        to perform.  If set equal to 0, then the
-                        colanim will run forever.  Generally you will
-                        never want to do this.
+                        to perform. 
+
+                        setting stages to 0 disables the anim type.
+                        This is useful for derived inline animdefs.
 
             loops:      NUMBER
                         optional.  defaults to 1.  If equal to 0, loop
@@ -760,9 +801,10 @@ CONTENTS:
 
             stages:     NUMBER
                         a number specifying the number of iterations
-                        to perform.  If set equal to 0, then the
-                        geoanim will run forever.  Generally you will
-                        never want to do this.
+                        to perform. 
+
+                        setting stages to 0 disables the anim type.
+                        This is useful for derived inline animdefs.
 
             loops:      NUMBER
                         optional.  defaults to 1.  If equal to 0, loop
@@ -810,6 +852,8 @@ CONTENTS:
                         The delay, in milliseconds, before toggling
                         the state's 'armed' variable.
 
+                        setting delayms to 0 disables the anim type.
+                        This is useful for derived inline animdefs.
 
 ## soundrc or user .src files
 

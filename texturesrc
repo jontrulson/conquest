@@ -1319,96 +1319,8 @@ texture {
 #
 ######################################
 
-# explosion animation
-animation {
-  name         "explosion"
-  animdef      "explode"
-}
-
-# like explosion, but smaller/quicker
-animation {
-  name         "bombing"
-  animdef      "bomb"
-}
-
-# blinker animations
-animation {
-  name         "onesec"
-}
-animation {
-  name         "halfsec"
-}
-animation {
-  name         "qtrsec"
-}
-
-# team torp animations
-animation {
-  name         "shipK-torp"
-}
-
-animation {
-  name         "shipO-torp"
-}
-
-animation {
-  name         "shipF-torp"
-}
-
-animation {
-  name         "shipR-torp"
-}
-
-# doomsday AP beam firing interval
-animation {
-  name         "doomsday-ap-fire"
-}
-
-# a 'pulse' text effect for overloading wep/eng.
-animation {
-  name         "overload-pulse"
-  animdef      "pulse-normal"
-}
-
-# a 'pulse' text effect for critical wep/eng.
-animation {
-  name         "critical-pulse"
-  animdef      "pulse-slow"
-}
-
-# negative energy barrier (neb)
-animation {
-  name         "neb"
-}
-
 ## animation defs
 #################
-
-# blinker animdefs
-# 1 sec
-animdef {
-  name         "onesec"
-
-  toganim {
-    delayms    1000
-  }
-}
-# half sec
-animdef {
-  name         "halfsec"
-
-  toganim {
-    delayms    500
-  }
-}
-# qtr sec
-animdef {
-  name         "qtrsec"
-
-  toganim {
-    delayms    250
-  }
-}
 
 # team torp animdefs
 
@@ -1472,12 +1384,49 @@ animdef {
   }
 
   geoanim {
+    stages     1           # always need at least 1 stage
     loops      0           # runs forever
     delayms    70          # randomly change angle every delayms 
   }
 }
 
-# explosion animdef
+# handles 'pulsing' of text, but could be used to pulse anything (red
+# that is :).
+animdef {
+  name         "pulse-normal"
+
+  istate {
+    color      "9fff0000"
+  }
+    
+  # fade to black...
+  colanim {
+    stages     20
+    loops      1
+    delayms    50
+    
+    deltaa     -0.015
+  }
+}
+
+animdef {
+  name         "pulse-slow"
+
+  istate {
+    color      "9fff0000"
+  }
+    
+  # fade to black...
+  colanim {
+    stages     40
+    loops      1
+    delayms    50
+    
+    deltaa     -0.015
+  }
+}
+
+# explode animdef
 animdef {
   name         "explode"
   texname      "exp"
@@ -1515,81 +1464,125 @@ animdef {
   }
 }
 
-# blink the doomsday's AP beam
-animdef {
+# explosion animation
+animation {
+  name         "explosion"
+  animdef      "explode"
+}
+
+# like explosion, but smaller/quicker
+animation {
+  name         "bombing"
+  animdef      "explode"
+
+  # use the 'explode' animdef by default, but overide certain
+  # aspects of it to make it smaller and faster than normal explosions.
+  animdef {
+
+    # initial state
+    istate {
+      size       100         # in CU's
+    }
+    
+    texanim {
+      stages     16
+      loops      1
+      delayms    40
+    }
+
+    # fade to black after texanim finishes...
+    colanim {
+      stages     10
+      loops      1
+      delayms    20
+    
+      deltaa     -0.1 
+      deltar     0.0
+      deltag     -0.001
+      deltab     -0.01
+    }
+
+    # we don't want explode's geo anim, so disable it
+    geoanim {
+      stages     0
+    }
+  }
+}
+
+# blinker animations
+
+# one second
+animation {
+  name         "onesec"
+
+  animdef {
+    toganim {
+      delayms    1000
+    }
+  }
+}
+
+# half second
+animation {
+  name         "halfsec"
+
+  animdef {
+    toganim {
+      delayms    500
+    }
+  }
+}
+
+# quarter second
+animation {
+  name         "qtrsec"
+
+  animdef {
+    toganim {
+      delayms    250
+    }
+  }
+}
+
+# team torp animations
+animation {
+  name         "shipK-torp"
+}
+
+animation {
+  name         "shipO-torp"
+}
+
+animation {
+  name         "shipF-torp"
+}
+
+animation {
+  name         "shipR-torp"
+}
+
+# doomsday AP beam 
+animation {
   name         "doomsday-ap-fire"
 
-  toganim {
-    delayms    700
+  # blink the doomsday's AP beam
+  animdef {
+    toganim {
+      delayms    700
+    }
   }
 }
 
-# bombing animdef
-# this is the similiar to 'explosion' but is smaller in size
-#  and doesn't last as long.
-animdef {
-  name         "bomb"
-  texname      "exp"
-
-  # initial state
-  istate {
-    size       100         # in CU's
-  }
-    
-  texanim {
-    stages     16
-    loops      1
-    delayms    40
-  }
-
-  # this runs when texanim has expired
-  # fade to black...
-  colanim {
-    stages     10
-    loops      1
-    delayms    20
-    
-    deltaa     -0.1 
-    deltar     0.0
-    deltag     -0.001
-    deltab     -0.01
-  }
+# a 'pulse' text effect for overloading wep/eng.
+animation {
+  name         "overload-pulse"
+  animdef      "pulse-normal"
 }
 
-# handles 'pulsing' of text, but could be used to pulse anything (red
-# that is :).
-animdef {
-  name         "pulse-normal"
-
-  istate {
-    color      "9fff0000"
-  }
-    
-  # fade toward black...
-  colanim {
-    stages     20
-    loops      1
-    delayms    50
-    
-    deltaa     -0.015
-  }
-}
-
-animdef {
-  name         "pulse-slow"
-
-  istate {
-    color      "9fff0000"
-  }
-    
-  # fade toward black...
-  colanim {
-    stages     40
-    loops      1
-    delayms    50
-    
-    deltaa     -0.015
-  }
+# a 'pulse' text effect for critical wep/eng.
+animation {
+  name         "critical-pulse"
+  animdef      "pulse-slow"
 }
 
 # Negative Energy Barrier (neb)
@@ -1602,18 +1595,22 @@ texture {
   color        "bfc3baba"
 }
 
-animdef {
+animation {
   name         "neb"
-  texname      "barrier"
 
-  # move texture along s axis, rapidly
-  texanim {
-    stages     1           # only one texture
-    loops      0           # runs forever
-    delayms    10
+  animdef {
+    texname      "barrier"
 
-    deltas     0.002       # S texture coord
+    # move texture along s axis, rapidly
+    texanim {
+      stages     1           # only one texture
+      loops      0           # runs forever
+      delayms    10
+
+      deltas     0.002       # S texture coord
+    }
   }
 }
+
 
 
