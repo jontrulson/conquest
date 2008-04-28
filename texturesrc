@@ -1584,15 +1584,6 @@ animation {
 }
 
 # Negative Energy Barrier (neb)
-# since we use a texanim, but only use one texture, create a texture
-# alias here for it
-
-texture {
-  name         "barrier0"
-  filename     "barrier" 
-  color        "bfc3baba"
-}
-
 animation {
   name         "neb"
 

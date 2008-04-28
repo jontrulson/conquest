@@ -869,9 +869,18 @@ static int cqiValidateAnimations(void)
              exists */
           for (j=0; j<_cqiAnimDefs[i].texanim.stages; j++)
             {
-              snprintf(tbuf, CQI_NAMELEN - 1, "%s%d",
-                       _cqiAnimDefs[i].texname,
-                       j);
+
+              /* if the texanim only contains a single stage (one texture)
+               * then do not append the stage number to the texname.
+               */
+
+              if (_cqiAnimDefs[i].texanim.stages == 1)
+                snprintf(tbuf, CQI_NAMELEN - 1, "%s",
+                         _cqiAnimDefs[i].texname);
+              else
+                snprintf(tbuf, CQI_NAMELEN - 1, "%s%d",
+                         _cqiAnimDefs[i].texname,
+                         j);
               
               /* locate the texture */
               if (_cqiFindTexture(tbuf) < 0)

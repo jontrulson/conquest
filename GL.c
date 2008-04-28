@@ -324,8 +324,16 @@ static int initGLAnimDefs(void)
 
           for (j=0; j<GLAnimDefs[i].tex.stages; j++)
             {
-              snprintf(buffer, CQI_NAMELEN - 1, "%s%d", 
-                       cqiAnimDefs[i].texname, j);
+
+              /* if the texanim only contains a single stage (one texture)
+               * then do not append the stage number to the texname.
+               */
+              if (GLAnimDefs[i].tex.stages == 1)
+                snprintf(buffer, CQI_NAMELEN - 1, "%s", 
+                         cqiAnimDefs[i].texname);
+              else
+                snprintf(buffer, CQI_NAMELEN - 1, "%s%d", 
+                         cqiAnimDefs[i].texname, j);
 
               if ((ndx = findGLTexture(buffer)) >= 0)
                 {

@@ -554,6 +554,14 @@ CONTENTS:
           Which elements of the animation state that are actually
           modified also depends entirely on the animdef specification.
 
+          An animdef can be declared globally, or inlined.  Inlined
+          animdef's are defined within the animation definition itself,
+          and are only usable by that animation.
+
+          Global animdefs can be used by any animation.  Inlining them
+          within an animation allows for deriving new animdefs based
+          on previously defined (global) animdefs. 
+
           Each animdef can contain specifications for up to 4
           different animation types that can be executed to change
           the various components of it's relevant 'state'.  The 4
@@ -650,7 +658,8 @@ CONTENTS:
                       defined within an animation section. 
 
                       'name' is ignored for inlined animdefs, and
-                      should not be specified for them.
+                      should not be specified for them, as these are
+                      internally generated when they are created.
 
           texname:    STRING 
                       semi-optional.  Specifies the WKN of a texture
@@ -662,11 +671,16 @@ CONTENTS:
                       If the animdef specifies a texanim, then this
                       name is used to look up the textures for each of
                       the stages in the texanim, by concatenating the
-                      stage number onto the texname. In the example
-                      above, the texanim will look for and use,
-                      WKN textures named 'exp0', 'exp1', ..., 'exp15',
+                      stage number onto the texname, but only if there
+                      is more than one stage (texture). In the example
+                      above, the texanim will look for and use, WKN
+                      textures named 'exp0', 'exp1', ..., 'exp15',
                       since there are 16 stages defined for the
                       texanim.
+
+                      If the texanim only specifies 1 stage, then
+                      texname is used directly to lookup the texture,
+                      without appending the stage number first. 
 
           timelimit   NUMBER 
                       optional.  Specifies the maximum time in
@@ -696,6 +710,10 @@ CONTENTS:
                         then a random angle will be chosen every time
                         the anim state is reset for a run.
 
+            color:      STRING
+                        optional.  Specify a starting color.
+             
+
           # texanim subsection
 
             optional.  This subsection is used to describe the
@@ -708,8 +726,13 @@ CONTENTS:
             stages:     NUMBER
                         a non-zero number specifying the number of
                         individual textures that make up the texanim.
+                        
+                        For texanims that contain only a single stage
+                        (texture), the texname specified for the
+                        animdef is used directly to lookup the
+                        texture.  
 
-                        setting stages to 0 disables the anim type.
+                        Setting stages to 0 disables the anim type.
                         This is useful for derived inline animdefs.
 
             loops:      NUMBER
@@ -754,7 +777,7 @@ CONTENTS:
                         a number specifying the number of iterations
                         to perform. 
 
-                        setting stages to 0 disables the anim type.
+                        Setting stages to 0 disables the anim type.
                         This is useful for derived inline animdefs.
 
             loops:      NUMBER
@@ -803,7 +826,7 @@ CONTENTS:
                         a number specifying the number of iterations
                         to perform. 
 
-                        setting stages to 0 disables the anim type.
+                        Setting stages to 0 disables the anim type.
                         This is useful for derived inline animdefs.
 
             loops:      NUMBER
