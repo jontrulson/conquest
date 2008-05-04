@@ -133,7 +133,7 @@ void glfRender(GLfloat x, GLfloat y, GLfloat z, GLfloat w, GLfloat h,
 #endif
 
   /* remove the glyph backgrounds */
-  glAlphaFunc(GL_GREATER, 0.5);
+  glAlphaFunc(GL_GREATER, 0.2);
   glEnable(GL_ALPHA_TEST);
 
   glEnable(GL_TEXTURE_2D);
