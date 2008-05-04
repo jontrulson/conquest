@@ -15,36 +15,48 @@ texture {
     name        "Sol"
     filename    "star"
     color       "ffeeee00"
+
+    mipmap      "yes"
 }
 
 texture {
     name        "Sirius"
     filename    "star"
     color       "ff886aea"
+
+    mipmap      "yes"
 }
 
 texture {
     name        "Kejela"
     filename    "star"
     color       "ffeeee00"
+
+    mipmap      "yes"
 }
 
 texture {
     name        "Betelgeuse"
     filename    "star"
     color       "ffcc0000"
+
+    mipmap      "yes"
 }
 
 texture {
     name        "Murisak"
     filename    "star"
     color       "ff886aea"
+
+    mipmap      "yes"
 }
 
 texture {
     name        "Syrinx"
     filename    "star"
     color       "ffcc0000"
+
+    mipmap      "yes"
 }
 
 
@@ -54,12 +66,16 @@ texture {
     name        "Tarsus"
     filename    "jupiter"
     color       "ffe6e6e6"
+
+    mipmap      "yes"
 }
 
 texture {
     name        "Leudus"
     filename    "uranus"
     color       "ffe6e6e6"
+
+    mipmap      "yes"
 }
 
 # Fed D planets
@@ -67,6 +83,8 @@ texture {
     name        "Omega"
     filename    "jupiter"
     color       "ffe6e6e6"
+
+    mipmap      "yes"
 }
 
 
@@ -75,12 +93,16 @@ texture {
     name        "Rho"
     filename    "jupiter"
     color       "ffe6e6e6"
+
+    mipmap      "yes"
 }
 
 texture {
     name        "Remus"
     filename    "uranus"
     color       "ffe6e6e6"
+
+    mipmap      "yes"
 }
 
 # Orion D planets
@@ -88,12 +110,16 @@ texture {
     name        "Umbriel"
     filename    "jupiter"
     color       "ffe6e6e6"
+
+    mipmap      "yes"
 }
 
 texture {
     name        "Oberon"
     filename    "uranus"
     color       "ffe6e6e6"
+
+    mipmap      "yes"
 }
 
 # Non Team (Self Ruled) D planets
@@ -101,41 +127,55 @@ texture {
     name        "Dyneb"
     filename    "jupiter"
     color       "ffe6e6e6"
+
+    mipmap      "yes"
 }
 
 texture {
     name        "Eminiar"
     filename    "jupiter"
     color       "ffe6e6e6"
+
+    mipmap      "yes"
 }
 
 texture {
     name        "Cheron"
     filename    "jupiter"
     color       "ffe6e6e6"
+
+    mipmap      "yes"
 }
 
 texture {
     name        "Seritil"
     filename    "neptune"
     color       "ffe6e6e6"
+
+    mipmap      "yes"
 }
 
 texture {
     name        "Omega"
     filename    "neptune"
     color       "ffe6e6e6"
+
+    mipmap      "yes"
 }
 
 texture {
     name        "Oldar"
     filename    "uranus"
     color       "ffe6e6e6"
+
+    mipmap      "yes"
 }
 
 texture {
     name        "RigelB"
     filename    "neptune"
     color       "ffe6e6e6"
+
+    mipmap      "yes"
 }
 

@@ -140,6 +140,7 @@ static int parsebool(char *str);
 %token <num> EFFECT FADEINMS FADEOUTMS LIMIT FRAMELIMIT
 %token <num> MUSIC
 %token <num> DELTAT SCOORD TCOORD WIDTH HEIGHT TEXAREA
+%token <num> MIPMAP
 
 %token <ptr>  STRING 
 %token <rnum> RATIONAL
@@ -498,6 +499,10 @@ stmt            : PLANETMAX number
                 | CORE string
                    {
                         cfgSectionb(CORE, $2);
+                   }                      
+                | MIPMAP string
+                   {
+                        cfgSectionb(MIPMAP, $2);
                    }                      
                 | XCOORD rational
                    {
@@ -2969,7 +2974,20 @@ static void cfgSectionb(int item, char *val)
           }
       }
       break;
+
     case TEXTURE:
+      {
+        switch(item) 
+          {
+          case MIPMAP:
+            if (bval)
+              currTexture.flags |= CQITEX_F_GEN_MIPMAPS;
+            else
+              currTexture.flags &= ~CQITEX_F_GEN_MIPMAPS;
+              
+            break;
+          }
+      }
       break;
 
     case SOUNDCONF:    
@@ -3208,6 +3226,9 @@ static char *item2str(int item)
       break;
     case HEIGHT:
       return "HEIGHT";
+      break;
+    case MIPMAP:
+      return "MIPMAP";
       break;
 
     case SAMPLERATE:

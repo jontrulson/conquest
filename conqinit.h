@@ -65,9 +65,12 @@ typedef struct _cqi_planet_init {
   char texname[CQI_NAMELEN];     /* texid */
 } cqiPlanetInitRec_t, *cqiPlanetInitPtr_t;
 
+/* texture flags */
 #define CQITEX_F_COLOR_SPEC       0x00000001 /* This texture definition
                                                 only really specifies a
                                                 color and not a texture */
+#define CQITEX_F_GEN_MIPMAPS      0x00000002 /* Generate mipmaps for this
+                                                texture */
 
 typedef struct _cqi_texture_area {
   char name[CQI_NAMELEN];       /* WKN of area */

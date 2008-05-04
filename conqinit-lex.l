@@ -128,6 +128,7 @@ music                  {return ( MUSIC );}
 {whtspc}h{whtspc}      {return ( HEIGHT );}
 
 texarea                {return ( TEXAREA );}
+mipmap                 {return ( MIPMAP );}
 
 {number}		{ 
                           yylval.num = atoi( yytext );

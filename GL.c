@@ -189,18 +189,22 @@ int findGLAnimDef(char *animname)
 }
 
 /* search texture list (by filename) and return index if found */
-static int findGLTextureByFile(char *texfile)
+static int findGLTextureByFile(char *texfile, Unsgn32 flags)
 {
   int i;
 
   if (!loadedGLTextures || !GLTextures || !cqiNumTextures || !cqiTextures)
     return -1;
 
+  /* we check both the filename and the mipmap flag */
   for (i=0; i<loadedGLTextures; i++)
     {
       if (!strncmp(cqiTextures[GLTextures[i].cqiIndex].filename, 
-                   texfile, CQI_NAMELEN))
-        return i;
+                   texfile, CQI_NAMELEN) && 
+          ( (flags & CQITEX_F_GEN_MIPMAPS) == (cqiTextures[GLTextures[i].cqiIndex].flags & CQITEX_F_GEN_MIPMAPS) ) )
+        {
+          return i;
+        }
     }
   
   return -1;
@@ -484,7 +488,6 @@ static int initGLShips(void)
 
       for (j=0; j<MAXNUMSHIPTYPES; j++)
         {
-
           snprintf(buffer, CQI_NAMELEN - 1, "%s%c%c", shipPfx, 
                    ShipTypes[j].name[0], ShipTypes[j].name[1]);
           GLShips[i][j].ship = _get_ship_texid(buffer);
@@ -3371,13 +3374,12 @@ static int LoadTGA(char *filename, textureImage *texture)
       clog("%s: %s", filename, strerror(errno));
       return FALSE;
     }
-#if defined(DEBUG_GL)      
-  else
+
+  if (cqDebug > 1)
     {
       clog("%s: Loading texture %s",
            __FUNCTION__, filename);
     }
-#endif
 
 
   if (fread(TGAHeaderBytes, 1, sizeof(TGAHeaderBytes), file) != 
@@ -3687,16 +3689,17 @@ static int loadGLTextures()
          if so, no need to do it again, just copy the previously loaded
          data */
       if (GLTextures && !col_only && 
-          (ndx = findGLTextureByFile(cqiTextures[i].filename)) > 0)
+          (ndx = findGLTextureByFile(cqiTextures[i].filename, 
+                                     cqiTextures[i].flags )) >= 0)
         {                       /* the same hw texture was previously loaded
                                    just save it's texture id and w/h */
           texid = GLTextures[ndx].id;
           texw = GLTextures[ndx].w;
           texh = GLTextures[ndx].h;
-#ifdef DEBUG_GL
-          clog("%s: texture file '%s' already loaded, using existing tid.", 
-               __FUNCTION__, cqiTextures[i].filename);
-#endif
+
+          if (cqDebug > 1)
+            clog("%s: texture file '%s' already loaded, using existing tid.", 
+                 __FUNCTION__, cqiTextures[i].filename);
         }
 
       if (!texid && !col_only)
@@ -3728,10 +3731,7 @@ static int loadGLTextures()
               
               curTexture.w = texti->width;
               curTexture.h = texti->height;
-              /* use linear filtering */
-              glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-              glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-              
+
               if (texti->bpp == 32)
                 {
                   type = GL_RGBA;
@@ -3742,11 +3742,30 @@ static int loadGLTextures()
                   type = GL_RGB;
                   components = 3;
                 }
+
+              /* use linear filtering */
+              glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
               
-              /* generate the texture */
-              glTexImage2D(GL_TEXTURE_2D, 0, components, 
-                           texti->width, texti->height, 0,
-                           type, GL_UNSIGNED_BYTE, texti->imageData);
+              /* gen mipmaps if requested */
+              if (cqiTextures[i].flags & CQITEX_F_GEN_MIPMAPS)
+                {
+                  /* this is highest quality.  It should be configurable. */
+                  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, 
+                                  GL_LINEAR_MIPMAP_LINEAR);
+
+                  gluBuild2DMipmaps(GL_TEXTURE_2D, components,
+                                    texti->width, texti->height,
+                                    type, GL_UNSIGNED_BYTE, texti->imageData);
+                }
+              else
+                {
+                  /* just generate the texture */
+                  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, 
+                                  GL_LINEAR);
+                  glTexImage2D(GL_TEXTURE_2D, 0, components, 
+                               texti->width, texti->height, 0,
+                               type, GL_UNSIGNED_BYTE, texti->imageData);
+                }
 
               hwtextures++;
             } /* if rv */

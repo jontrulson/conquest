@@ -5,19 +5,27 @@
 
 texture {
   name         "star"
+
+  mipmap       "yes"
 }
 
 texture {
   name         "classm"
+
+  mipmap       "yes"
 }
 
 texture {
   name         "classd"
+
+  mipmap       "yes"
 }
 
 texture {
   name         "doomsday"
   color        "ffffffff"
+
+  mipmap       "yes"
 }
 
 texture {
@@ -37,6 +45,8 @@ texture {
 
 texture {
   name         "luna"
+
+  mipmap       "yes"
 }
 
 texture {
@@ -175,6 +185,8 @@ texture {
 texture {
   name         "shipFSc"
   filename     "TOSfsc"
+
+  mipmap       "yes"
 }
 
 # scout shield
@@ -186,6 +198,8 @@ texture {
 texture {
   name         "shipFDe"
   filename     "TOSfde"
+
+  mipmap       "yes"
 }
 
 texture {
@@ -196,6 +210,8 @@ texture {
 texture {
   name         "shipFCr"
   filename     "TOSfcr"
+
+  mipmap       "yes"
 }
 
 texture {
@@ -465,6 +481,8 @@ texture {
 texture {
   name         "shipRSc"
   filename     "TOSrsc"
+
+  mipmap       "yes"
 }
 
 texture {
@@ -475,6 +493,8 @@ texture {
 texture {
   name         "shipRDe"
   filename     "TOSrde"
+
+  mipmap       "yes"
 }
 
 texture {
@@ -485,6 +505,8 @@ texture {
 texture {
   name         "shipRCr"
   filename     "TOSrcr"
+
+  mipmap       "yes"
 }
 
 texture {
@@ -755,6 +777,8 @@ texture {
 texture {
   name         "shipKSc"
   filename     "TOSksc"
+
+  mipmap       "yes"
 }
 
 texture {
@@ -765,6 +789,8 @@ texture {
 texture {
   name         "shipKDe"
   filename     "TOSkde"
+
+  mipmap       "yes"
 }
 
 texture {
@@ -775,6 +801,8 @@ texture {
 texture {
   name         "shipKCr"
   filename     "TOSkcr"
+
+  mipmap       "yes"
 }
 
 texture {
@@ -1045,6 +1073,8 @@ texture {
 texture {
   name         "shipOSc"
   filename     "TOSosc"
+
+  mipmap       "yes"
 }
 
 # we use fed shield image by default
@@ -1057,6 +1087,8 @@ texture {
 texture {
   name         "shipODe"
   filename     "TOSode"
+
+  mipmap       "yes"
 }
 
 texture {
@@ -1067,6 +1099,8 @@ texture {
 texture {
   name         "shipOCr"
   filename     "TOSocr"
+
+  mipmap       "yes"
 }
 
 texture {

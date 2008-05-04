@@ -132,14 +132,14 @@ unsigned int rbGet(ringBuffer_t *RB, Unsgn8 *buf, unsigned int len, int update)
   while (rlen--)
     {
       if (rptr >= (RB->data + RB->len)) 
-	rptr = RB->data;
-
+        rptr = RB->data;
+      
       /* a NULL write ptr doesn't copy data */
-      if (wptr)			
-	{
-	  *wptr = *rptr;
-	  wptr++;
-	}
+      if (wptr)
+        {
+          *wptr = *rptr;
+          wptr++;
+        }
 
       rptr++;
       ndata--;

@@ -412,6 +412,8 @@ CONTENTS:
             filename     "conq-fed"              # optional
             color        "ffe6e6e6"              # optional
 
+            mipmap       "yes"                   # optional
+
             texarea {                            # optional
               name       "somerect_in_texture"
               x          10.0
@@ -452,6 +454,15 @@ CONTENTS:
                       texture used when it is rendered.  If not
                       specified, the default depends on how the
                       texture is being used in conquest.
+
+          mipmap:     BOOL
+                      optional.  If set to yes, generate mipmaps for
+                      this texture.  This is useful for the ships,
+                      planets, and the doomsday machine and other
+                      textures.  It improves the quality of the
+                      texture at different sizes, at the expense of
+                      requiring more texture memory and rendering
+                      work. The default is "no".
 
           texarea:    SUBSECTION
                       optional. A texarea subsection is used to
