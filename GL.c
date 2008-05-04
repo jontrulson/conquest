@@ -2397,7 +2397,7 @@ drawShip(GLfloat x, GLfloat y, GLfloat angle, char ch, int snum, int color,
   int steam = Ships[snum].team, stype = Ships[snum].shiptype;
   GLfloat scaleFac = (scale == SCALE_FAC) ? dConf.vScaleSR : dConf.vScaleLR;
   static int firsttime = TRUE;
-  static GLfloat phaseradius;
+  static GLfloat phaserRadiusSR, phaserRadiusLR, phaserRadius;
 
   if (norender)
     return;
@@ -2419,11 +2419,13 @@ drawShip(GLfloat x, GLfloat y, GLfloat angle, char ch, int snum, int color,
       shipsizeSR = cu2GLSize(SHIPSIZE * OBJ_PRESCALE, -SCALE_FAC);
       shipsizeLR = cu2GLSize(SHIPSIZE * OBJ_PRESCALE, -MAP_FAC);
 
-      /* can only see phaser in SR, so... */
-      phaseradius = cu2GLSize(PHASER_DIST, -SCALE_FAC);
+      phaserRadiusSR = cu2GLSize(PHASER_DIST, -SCALE_FAC);
+      phaserRadiusLR = cu2GLSize(PHASER_DIST, -MAP_FAC);
     }
 
   size = ((scale == SCALE_FAC) ? shipsizeSR : shipsizeLR);
+  phaserRadius = ((scale == SCALE_FAC) ? phaserRadiusSR : phaserRadiusLR);
+
 
   /* make a little more visible in LR */
   if (scale == MAP_FAC) 
@@ -2435,9 +2437,10 @@ drawShip(GLfloat x, GLfloat y, GLfloat angle, char ch, int snum, int color,
   glEnable(GL_BLEND);
 
   /* phasers - we draw this before the ship */
-  if (((scale == SCALE_FAC) && Ships[snum].pfuse > 0)) /* phaser action */
+  if (Ships[snum].pfuse > 0) /* phaser action */
     {
-      static const GLfloat phaserwidth = 1.5;
+      GLfloat phaserwidth = 1.5;
+      phaserwidth = ((scale == SCALE_FAC) ? 1.5 : 0.5);
 
       glPushMatrix();
       glLoadIdentity();
@@ -2462,10 +2465,10 @@ drawShip(GLfloat x, GLfloat y, GLfloat angle, char ch, int snum, int color,
       
       glColor4f(1.0, 1.0, 1.0, 0.3);
       glTexCoord2f(0.0f, 1.0f);
-      glVertex3f(phaserwidth, phaseradius, -1.0); /* ur */
+      glVertex3f(phaserwidth, phaserRadius, -1.0); /* ur */
       
       glTexCoord2f(0.0f, 0.0f);
-      glVertex3f(-phaserwidth, phaseradius, -1.0); /* ul */
+      glVertex3f(-phaserwidth, phaserRadius, -1.0); /* ul */
       
       glEnd();
       
