@@ -1270,7 +1270,7 @@ void renderViewer(int dovbg, int dobomb)
 
   /* if we're faking it, (nCP.c), do it */
   if (dobomb)
-    drawBombing(Context.snum);
+    drawBombing(Context.snum, (SMAP(Context.snum) ? MAP_FAC : SCALE_FAC));
 
 #if 0                           /* TEST GRID */
   {

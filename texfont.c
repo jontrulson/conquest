@@ -384,6 +384,11 @@ txfEstablishTexture(
   }
 #if !defined(USE_DISPLAY_LISTS)
   glBindTexture(GL_TEXTURE_2D, txf->texobj);
+  /* use linear MAG filtering */
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  /* this is highest quality.  It should be configurable. */
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, 
+                  GL_LINEAR_MIPMAP_LINEAR);
 #else
   glNewList(txf->texobj, GL_COMPILE);
 #endif

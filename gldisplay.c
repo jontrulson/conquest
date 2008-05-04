@@ -339,7 +339,7 @@ void display( int snum, int display_info )
 
 			drawShip(glx, gly, Ships[i].head, ch, i, color, scale);
                         if (SBOMBING(i))
-                          drawBombing(i);
+                          drawBombing(i, scale);
 		      }
 		  }
 	      }

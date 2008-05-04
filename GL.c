@@ -1148,13 +1148,13 @@ void drawExplosion(GLfloat x, GLfloat y, int snum, int torpnum, int scale)
 }
 
 /* draw bombing graphics */
-void drawBombing(int snum)
+void drawBombing(int snum, int scale)
 {
   scrNode_t *curnode = getTopNode();
   GLfloat x, y, size;
   int i;
   static animStateRec_t initastate;    /* initial state of a bomb explosion */
-  GLfloat scaleFac = dConf.vScaleSR;
+  GLfloat scaleFac = (scale == SCALE_FAC) ? dConf.vScaleSR : dConf.vScaleLR;
   struct _rndxy {               /* anim state private area */
     real rndx;                  /* random X offset from planet */
     real rndy;                  /* random Y offset from planet */
@@ -1166,9 +1166,6 @@ void drawBombing(int snum)
   /* don't bother if we aren't orbiting anything */
   if (Ships[snum].lock >= 0)
     return;
-
-  if (SMAP(Context.snum))
-    return;                     /* no bombing graphics in LRS */
 
   /* init - look at first ship */
   if (!bombAState[1].anims)
@@ -1234,12 +1231,14 @@ void drawBombing(int snum)
                Ships[Context.snum].y, 
                Planets[-Ships[snum].lock].x + rnd->rndx,
                Planets[-Ships[snum].lock].y + rnd->rndy,
-               -(SMAP(snum) ? MAP_FAC : SCALE_FAC), 
+               -scale, 
                &x, 
                &y);
 
-  size = cu2GLSize(bombAState[snum].state.size, -SCALE_FAC);
-  
+  size = cu2GLSize(bombAState[snum].state.size, -scale);
+  if (scale == MAP_FAC)
+    size = size * 2.0;
+
   glScalef(scaleFac, scaleFac, 1.0);
 
   glTranslatef(x, y, TRANZ);
