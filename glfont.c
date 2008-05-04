@@ -132,9 +132,11 @@ void glfRender(GLfloat x, GLfloat y, GLfloat z, GLfloat w, GLfloat h,
        font->tex_height);
 #endif
 
+  /* remove the glyph backgrounds */
+  glAlphaFunc(GL_GREATER, 0.5);
+  glEnable(GL_ALPHA_TEST);
+
   glEnable(GL_TEXTURE_2D);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, 
-                  GL_LINEAR_MIPMAP_LINEAR);
 
   glPushMatrix();
 
@@ -167,6 +169,7 @@ void glfRender(GLfloat x, GLfloat y, GLfloat z, GLfloat w, GLfloat h,
   glPopMatrix();
 
   glDisable(GL_TEXTURE_2D);
+  glDisable(GL_ALPHA_TEST);
 
   return;
 }
