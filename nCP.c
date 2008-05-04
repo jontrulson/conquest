@@ -2660,6 +2660,9 @@ void nCPInit(int istopnode)
   clrPrompt(MSG_LIN2);
   clrPrompt(MSG_MSG);
 
+  /* flush the input buffer */
+  iBufFlush();
+
   /* first time through */
   if (!nCPNode.animQue)
     {

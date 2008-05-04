@@ -51,6 +51,13 @@ void iBufInit(void)
   return;
 }
 
+void iBufFlush(void)
+{
+  rbFlush(ibufRB);
+
+  return;
+}
+
 
 int iBufCount(void)
 {

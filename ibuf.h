@@ -19,6 +19,7 @@
 #include "datatypes.h"
 
 void iBufInit(void);
+void iBufFlush(void);
 int iBufCount(void);
 void iBufPut(char *thestr);
 void iBufPutc(unsigned int thechar);
