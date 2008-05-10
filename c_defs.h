@@ -98,14 +98,14 @@
 # include <fcntl.h>
 #endif
 
-/* if we have ncurses_lib, we'll use it, else curses, else error */
+/* if we have curses, we'll use it, else ncurses */
 
-#if defined(HAVE_NCURSES_H)
-# include <ncurses.h>
-#elif defined(HAVE_CURSES_H)
+#if defined(HAVE_CURSES_H)
 # include <curses.h>
+#elif defined(HAVE_NCURSES_H)
+# include <ncurses.h>
 #else
-# error "You need System V curses or ncurses 1.9.9e. Badly."
+# error "You need the System V curses or ncurses library and headers."
 #endif
 
 #if defined(HAVE_TERMIO_H)

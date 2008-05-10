@@ -150,11 +150,11 @@ dnl Replace `main' with a function in -lm:
 
 AC_CHECK_LIB(m, main)
 
-dnl check for ncurses
+dnl check for curses, we give preference to a native curses
 olibs="$LIBS"
-AC_CHECK_LIB(ncurses, initscr, LIBS="-lncurses $olibs",
-  AC_CHECK_LIB(curses, initscr, LIBS="-lcurses $olibs",
-    AC_MSG_WARN(I cannot find initscr.  you might need to help me)))
+AC_CHECK_LIB(curses, initscr, LIBS="-lcurses $olibs",
+  AC_CHECK_LIB(ncurses, initscr, LIBS="-lncurses $olibs",
+    AC_MSG_WARN(I cannot find initscr (curses).  You might need to help me)))
 
 dnl check for libcrypt
 olibs="$LIBS"
