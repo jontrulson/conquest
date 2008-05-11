@@ -9,7 +9,7 @@
 
                               Conquest HISTORY
 
-??? 4/12/2008
+8.3a (devel) 05/10/2008
 
   - correct some nasty off-by-one's (NUMPLANETS) in
     serverpkt.c:spktPlanetLoc() and spktPlanetLoc2().  Depending on
@@ -18,32 +18,174 @@
     in the logs (client and/or server), and usually a rapid ship death
     with a killed-by of "Nothing in particular".
 
-    Sorry about that - a couple of people had reported this problem,
-    but I had never seen it myself until building and running a server
-    under slackware 12 with a gcc 4.x compiler.  This is a server-only
-    bug, and all servers should be upgraded, whether or not your
-    clients have seen this problem, since it's certain that something
-    got corrupted :).
+    This is a server-only bug, and all servers should be upgraded,
+    whether or not your clients have seen this problem, since it's
+    pretty certain that something important in memory will get
+    corrupted :).
+
+  - bombing graphics and phasers are now displayed in LR scan.
+
+  - enable alpha testing in glfRender so that font glyph backgrounds
+    aren't rendered (obvious in the text overlay nodes like ship
+    list, planet list, etc).
+
+  - nCP.c (cockpit): Fix case where when bombing or beaming, and a
+    mouse macro is used, the relevant sound effects might not stop and
+    proper state restored.
+
+  - new star texture, based on prodding from Michael Derek Barnett who
+    pointed me toward NASA's SOHO site
+    http://sohowww.nascom.nasa.gov/data/realtime/gif/ .
+
+    One of the images of the sun from this site was used, and with
+    alot of GIMP majik, a new star texture was born :) I think it
+    looks a lot nicer.  Note, stars will appear larger now, as a
+    proper star should.
+
+  - Per Derek Barnett, set Sirius to be a blue star, and Betelguese to
+    be a red star, just like in real life :)
+
+  - Add texture definitions (and appropriate colors) for the stars to
+    the 00_plantex.trc file.  Remove all planet/star color
+    specifications from conqinitrc as they don't really belong there -
+    color is a texture property, not a planetary one...
+
+  - Massive code cleanup, mainly related to the confusing use of
+    Unsgn8 and char.  gcc 4.1.2 complains bitterly about these with
+    '-Wall', so they have all been fixed up to use char where
+    appropriate (strcpy, el .al) and Unsgn8 (packet data).
+
+  - CQI parser:
+
+    - fixup parsing routines to be 'flat' according to the current
+      section, and only care about (nested) subsections when really
+      neccessary.
+
+    - fixup the CQI parser so that sections can be nested up to a
+      depth of 15.  Get rid of the subsection crap^Wstuff - no longer
+      needed.
+
+    - add ability to inline animdefs directly into an animation.
+
+    - add ability to derive inlined animdefs from previously defined
+      global (non-inlined) animdefs.
+
+    - remove the rmDQuote() function.  Now use checkString(), which
+      ensures all strings specified to CQI are properly 'cleaned' at
+      parse time :)
+
+    - fix a reduce conflict in 'stmt' grammer
+
+    - use a 'CQI' prefix to error/warning messages generated when a
+      section is finished parsing.
+
+    - remove multiple copies of 'check for banned substances' code
+      since all strings are now sanitized as soon as they are parsed.
+
+    - improve error handling/recovery during parsing of certain
+      sections.
+
+    - add ability to disable anim types within an animdef, by setting
+      'stages' to 0, or in the case of toganims, delayms to 0.  Useful
+      for derived animdefs.
+
+    - remove the ability to specify a color specification within a
+      planet definition.  Colors should only be specified with the
+      planet's texture definition.
+
+      This means you will need to update your
+      <install_prefix>/etc/conqinitrc file maunally - if you have
+      previously installed conquest, as color values can no longer be
+      specified for a planet.  If you don't, then you will just get
+      warnings since the conqinitrc file is not overwritten on
+      an install...
+
+  - texturesrc - inline most animdefs, and re-arange for the new
+    world order.
+
+    Derive the inlined 'bombing' animdef from the 'explosion'
+    animdef.  Neat. :)
+
+  - add support for mipmapping of textures.  Textures can specify the
+    boolean 'mipmap' in their texture definition to specify that mipmaps
+    should be generated for the texture.  This is now done for stars,
+    planets, ships, and the doomsday machine.
+
+    This improves the quality of these textures significantly when
+    viewed at different sizes (scaling and magfactor).
+
+    For now, the GL_TEXTURE_MIN_FILTER is set to
+    GL_LINEAR_MIPMAP_LINEAR (highest quality).  The min-filter is
+    currently not configurable, nor can mipmaps be completely disabled
+    (without editing the texture config files) though they should be.
+
+  - use iBufFlush to flush the input buffer when entering the CP, so
+    that previously queued commands aren't issued when you re-enter a
+    ship after you've died in glorious battle.
+
+  - fix configure.ac to SUBST YFLAGS.  No idea why this is now needed
+    (perhaps the switch to AC_PROG_YACC in a previous release?).
+
+  - sparc/solaris porting.  
+
+    - Sparc (and probably everything else) does not really like
+      unaligned accesses to the common block.  On sparc, a bus error
+      occurs when certain CB accesses are made.
+
+      Now, on non-x86 hardware, always align the CB structures on a 16
+      byte boundary.  This should be done on all architectures, but I
+      do not want to break x86 CB compatibility yet.  Soon though,
+      very soon :)
+
+    - prefer OS native curses libraries and header files to ncurses
+      when available.
+
+    - include termio before term in c_defs.h to avoid SGTTY compile
+      issue.
+
+    - include -lsocket and -lnsl libraries during linking.
+
+    - fixed longstanding problem with the lexer on Solaris and other
+      systems.  Apparently, 'WS' is already pre-defined somewhere, so
+      rename 'WS' to 'whtspc' in the lex (*.l) files.  Got rid of the
+      'OWS' tokens since we aren't using them anyway.
+
+  - fix some stupidness in sem.c.
+
+  - move metaserver query into the nMeta node, where it belongs
+    (conquestgl).
+
+  - makesrcpkg: make sure install-sh and ylwrap are executable.
+
+  - add a '-v' verbose option to the clients.  More '-v's increase
+    verbosity.
 
   - implement a generic ringbuffer mechanism (rb.h, rb.c). Currently,
     only ibuf (keyboard/macro handling) uses it, but in the future it
     will also be used for network buffers when that code is reworked
     to use non-blocking sockets.
 
-  - fix configure.ac to SUBST YFLAGS.  No idea why this is now needed
-    (perhaps the switch to AC_PROG_YACC in a previous release?).
-
-
-??? 11/2/2007
-
-  - migrate svn repo to sourceforge page.
-
-??? 10/05/2007
-
-  - add a '-v' verbose option to the clients.
-
   - tcpwrap.c: only log successful connections if verbose/debug is
-    specified. 
+    specified.  Only 'access denied' events are always logged.
+
+  - correct/update some of the documentation for CONQINIT.TXT (CQI).
+
+  - New SourceForge project page (Conq):
+
+    https://sourceforge.net/projects/conq/    
+
+    - migrated svn source repo to sourceforge.
+
+    - svn URL's
+
+      - current (possibly unstable) development
+
+        https://conq.svn.sourceforge.net/svnroot/conq/trunk 
+
+      - tagged (official) releases
+
+        https://conq.svn.sourceforge.net/svnroot/conq/tags/
+
 
 8.3 (stable) 09/03/2007
 
