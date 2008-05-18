@@ -22,6 +22,7 @@
 #include "nDead.h"
 #include "nMenu.h"
 #include "cqkeys.h"
+#include "cqsound.h"
 
 extern Unsgn8 clientFlags;      /* conquestgl.c */
 
@@ -81,7 +82,7 @@ void nDeadInit(void)
     }
 
 
-  setNode(&nDeadNode);
+  setONode(&nDeadNode);
 
   return;
 }
@@ -240,7 +241,8 @@ static int nDeadDisplay(dspConfig_t *dsp)
 	InfoColor, CQC_A_BOLD, oneplace(Ships[snum].kills), InfoColor );
 
   if (state == S_PRESSANY)
-    cprintf(MSG_LIN1, 0, ALIGN_CENTER, MTXT_DONE);
+    cprintf(MSG_LIN1, 0, ALIGN_CENTER, 
+            "ESC to quit, any other key to continue.");
   else
     {
       if (state == S_LASTWORDS)
@@ -282,8 +284,20 @@ static int nDeadInput(int ch)
   switch (state)
     {
     case S_PRESSANY:
-      nMenuInit();                /* go to menu */
+      setONode(NULL);
+      /* turn off any running effects */
+      cqsEffectStop(CQS_INVHANDLE, TRUE);
 
+      if (ch == TERM_ABORT)     /* ESC - main menu */
+        nMenuInit();                /* go to menu */
+      else
+        {
+          /* since the server is already in the 'menu' waiting for us
+           * go for it.
+           */
+          nPlayInit();          /* start playing */
+          return NODE_OK;
+        }
       break;
 
     case S_LASTWORDS:
@@ -297,6 +311,7 @@ static int nDeadInput(int ch)
       if (ch == TERM_EXTRA)
         {                       /* we are done */
           sendMessage(MSG_GOD, lastwords);
+          setONode(NULL);
           nMenuInit();
         }
       else

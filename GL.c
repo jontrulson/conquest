@@ -2267,7 +2267,8 @@ static void renderFrame(void)
 
   if (frameDelay != 0.0)
     {
-      if (Context.recmode == RECMODE_PLAYING)
+      if (Context.recmode == RECMODE_PLAYING ||
+          Context.recmode == RECMODE_PAUSED)
         c_sleep(frameDelay);
       else
         {

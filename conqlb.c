@@ -246,7 +246,7 @@ void clbIKill( int snum, int kb )
 	}
       
       /* Sticky war logic. */
-				/* should set sticky war too. -JET */
+      /* should set sticky war too. -JET */
 
       if ( ! Ships[snum].war[kteam] )
 	{
@@ -2226,8 +2226,8 @@ int clbPlanetMatch( char *str, int *pnum, int godlike )
 /*  SYNOPSIS */
 /*    int snum */
 /*    real basex, basey */
-/*    clPutShip( snum, basex, basey ) */
-void clPutShip( int snum, real basex, real basey )
+/*    clbPutShip( snum, basex, basey ) */
+void clbPutShip( int snum, real basex, real basey )
 {
   int i, j;
   real smear; 
@@ -2256,7 +2256,7 @@ void clPutShip( int snum, real basex, real basey )
   
   /* If we got here, we couldn't find a "good" position, */
   /*  so just report the error and let it slide. */
-  clog( "clPutShip(): Failed retry maximum on ship %d", snum );
+  clog( "clbPutShip(): Failed retry maximum on ship %d", snum );
   
   return;
   

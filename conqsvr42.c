@@ -81,9 +81,6 @@ int getConquestGID(void)
 }
 
 
-/*  astoff - disable asts */
-/*  SYNOPSIS */
-/*    astoff */
 /*  comsize - return size of the common block (in bytes) */
 /*  SYNOPSIS */
 /*    int size */

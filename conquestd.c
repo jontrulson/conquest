@@ -773,7 +773,7 @@ void dead( int snum, int leave )
     {
       updateClient(FALSE);
       i = 0;
-      for ( j = 0; j < MAXTORPS; j = j + 1 )
+      for ( j = 0; j < MAXTORPS; j++ )
 	if ( Ships[snum].torps[j].status == TS_DETONATE )
 	  i = i + 1;
       if ( i <= 0 )
@@ -1188,12 +1188,14 @@ void freeship(void)
 /*    menu */
 void menu(void)
 {
-  int i, sleepy, countdown;
+  int i;
+  Unsgn32 sleepy;
   int lose, oclosed, switchteams, multiple, redraw;
   int playrv;
   int pkttype;
   char buf[PKT_MAXSIZE];
   cpCommand_t *ccmd;
+  static const Unsgn32 sleeplimit = ((1000 * 60) * 5); /* 5 minutes */
   int sockl[2] = {sInfo.sock, sInfo.usock};
 
   catchSignals();	/* enable trapping of interesting signals */
@@ -1227,8 +1229,7 @@ void menu(void)
   oclosed = ConqInfo->closed;
   Context.leave = FALSE;
   redraw = TRUE;
-  sleepy = 0;
-  countdown = 0;
+  sleepy = clbGetMillis();
   playrv = FALSE;
 
   /* send a ship packet for our ship.  Since this is the first ship packet,
@@ -1275,20 +1276,11 @@ void menu(void)
 	  return;
 	}
       
-      /* Try to kill the driver if we started one the last time */
-      /*  we played and we've been in the menu long enough. */
-      if ( countdown > 0 )
-	{
-	  countdown = countdown - 1;
-	  if ( countdown <= 0 )
-	    drkill();
-	}
-      
       /* Reset up the destruct fuse. */
       Ships[Context.snum].sdfuse = -TIMEOUT_PLAYER;
       
       if ((pkttype = waitForPacket(PKT_FROMCLIENT, sockl, PKT_ANYPKT,
-			buf, PKT_MAXSIZE, 1, NULL)) < 0)
+                                   buf, PKT_MAXSIZE, 0, NULL)) < 0)
 	{
 	  freeship();
 	  clog("conquestd:menu: waitforpacket returned %d", pkttype); 
@@ -1298,18 +1290,18 @@ void menu(void)
 	  return;
 	}
       
-      /* we get sleepy if we are recieving no packets, of only
+      /* we get sleepy if we are recieving no packets, or only
          keepalive packets */
       if ( pkttype == 0 || ((pkttype == CP_COMMAND) && 
                             CPCMD_KEEPALIVE == (((cpCommand_t *)buf)->cmd)))
 	{
-	  /* We get here if a packet hasn't been recieved. */
-	  sleepy++;
-	  if ( sleepy > 300 )
+          if ((clbGetMillis() - sleepy) > sleeplimit)
 	    break;
-	  continue; /* next */
-	}
+          else
+            c_sleep(0.05);
 
+	  continue; 
+	}
 
       switch(pkttype)
 	{
@@ -1327,10 +1319,6 @@ void menu(void)
 	    {			/* time to play */
 	      playrv = play();
 	      sInfo.state = SVR_STATE_MAINMENU;
-	      if ( Context.childpid != 0 )
-		countdown = 15;
-	      else
-		countdown = 0;
 	      break;
 	    }
 	  else if (ccmd->cmd == CPCMD_RESIGN)
@@ -1353,13 +1341,14 @@ void menu(void)
 	  break;
 
 	default:
-	  clog("conquestd: MENU: got unexp packet type %d", pkttype);
+          if (cqDebug)
+            clog("conquestd: MENU: got unexp packet type %d", pkttype);
 	  break;
 	}
       
-      /* Got a character, zero timeout. */
+      /* Got something, reset timeout. */
       
-      sleepy = 0;
+      sleepy = clbGetMillis();
     }
   while ( clbStillAlive( Context.snum ) &&  !Context.leave );
   
@@ -1367,6 +1356,10 @@ void menu(void)
   if ( Ships[Context.snum].status == SS_RESERVED )
     freeship();
   
+  /* Try to kill the driver if we started one the last time */
+  /*  we played and we've been in the menu long enough. */
+  drkill();
+      
   return;
   
 }
@@ -1517,7 +1510,7 @@ int newship( int unum, int *snum )
 	i = Teams[system].homesun;
       else
 	i = Teams[system].homeplanet;
-      clPutShip( *snum, Planets[i].x, Planets[i].y );
+      clbPutShip( *snum, Planets[i].x, Planets[i].y );
       Ships[*snum].dhead = rnduni( 0.0, 359.9 );
       Ships[*snum].head = Ships[*snum].dhead;
       Ships[*snum].dwarp = (real) rndint( 2, 5 ) ;/* #~~~ this is a kludge*/
@@ -1708,12 +1701,10 @@ int play(void)
   
   /* Asts are still enabled, simply cancel the next screen update. */
 
-
   stopUpdate();
   updateClient(FALSE);	/* one last, to be sure. */
   sendConqInfo(sInfo.sock, TRUE);
-  c_sleep( 2.0 );
-  clog("INFO: ship %d died, calling dead()", Context.snum);
+  clog("PLAY: ship %d died, calling dead()", Context.snum);
   dead( Context.snum, Context.leave );
   
   return(TRUE);

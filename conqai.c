@@ -572,7 +572,7 @@ int newrob( int *snum, int unum )
     i = Teams[Ships[*snum].team].homesun;
   else
     i = Teams[Ships[*snum].team].homeplanet;
-  clPutShip( *snum, Planets[i].x, Planets[i].y );
+  clbPutShip( *snum, Planets[i].x, Planets[i].y );
   clbFixDeltas( *snum );
   Ships[*snum].status = SS_LIVE;
   PVUNLOCK(&ConqInfo->lockword);

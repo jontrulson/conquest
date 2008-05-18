@@ -248,7 +248,7 @@ static int nPlayIdle(void)
       grand( &Context.msgrand );            /* initialize message timer */
       Context.leave = FALSE;                /* assume we won't want to bail */
       Context.redraw = TRUE;                /* want redraw first time */
-      Context.msgok = TRUE;         /* ok to get messages */
+      Context.msgok = TRUE;                 /* ok to get messages */
       
       Context.display = TRUE;               /* ok to display */
       

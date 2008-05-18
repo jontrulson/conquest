@@ -825,7 +825,7 @@ int clientHello(char *clientname)
           /* see if this will succeed in setting up a NAT tunnel
              to the server */
           clog("NET: clientHello: send udp to server.");
-          udpSend(cInfo.usock, "Open Me", 7, &cInfo.servaddr);
+          write(cInfo.usock, "Open Me", 7);
         }
     }
 

@@ -845,11 +845,16 @@ int cqsEffectStop(cqsHandle handle, int halt)
        halt, handle);
 #endif
 
-  if (handle == CQS_INVHANDLE && halt)
-    {                           /* this is a special case, meaning to
-                                   immediately halt all channels */
-      Mix_HaltChannel(-1);
-      return TRUE;
+  if (handle == CQS_INVHANDLE)
+    {
+      if (halt)
+        {                           /* this is a special case, meaning to
+                                       immediately halt all channels */
+          Mix_HaltChannel(-1);
+          return TRUE;
+        }
+
+      return FALSE;
     }
 
   if (handle < 0 || handle >= CQS_MAX_CHANNELS || 

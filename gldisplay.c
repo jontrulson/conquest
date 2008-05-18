@@ -219,11 +219,12 @@ void display( int snum, int display_info )
       {
 	if (UserConf.DoLRTorpScan)
 	  {
-	    /* Display the torps on a LR scan if it's a friend. */
+	    /* Display the torps on a LR scan if it's a friend (or you). */
 	    if (lsmap)
 	      {
-		if (snum > 0 && Ships[snum].war[Ships[i].team] == FALSE &&
-		    Ships[i].war[Ships[snum].team] == FALSE)
+		if (snum > 0 && ((snum == i) || 
+                                 (Ships[snum].war[Ships[i].team] == FALSE &&
+                                  Ships[i].war[Ships[snum].team] == FALSE)) )
 		  {
                     
                     if (i == snum) /* if it's your torps you're a ship */

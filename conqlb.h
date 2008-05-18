@@ -59,7 +59,7 @@ int clbLogHist( int unum );
 real clbNewWarp( int snum, real dwarp );
 int clbPhoon( int pnum );
 int clbPlanetMatch( char *str, int *pnum, int godlike );
-void clPutShip( int snum, real basex, real basey );
+void clbPutShip( int snum, real basex, real basey );
 int clbFmtMsg(int to, int from, char *buf);
 void clbSortPlanets( int sv[] );
 void clbSortUsers( int uv[], int numentries );

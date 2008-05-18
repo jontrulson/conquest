@@ -72,6 +72,7 @@
 #define S_WAR          25
 #define S_WARRING      26
 #define S_PSEUDO       27       /* name change */
+#define S_GHOST        28       /* died, but still watching */
 static int state;
 
 #define T_PHASER       0        /* S_TARGET */
@@ -134,6 +135,9 @@ static cqsHandle bombingHandle;    /* so we can stop it */
 /* ack alert klaxon with <ESC> - Cataboligne */
 extern cqsHandle alertHandle;
 
+/* storage for the beam up/down sound handles */
+static cqsHandle beamHandle = CQS_INVHANDLE;
+
 /* current SR and LR magnification factors. (-5-5) */
 int ncpLRMagFactor = 0;
 int ncpSRMagFactor = 0;
@@ -166,9 +170,6 @@ static animQue_t animQue;
 
 /* team torp anim states (exported) */
 animStateRec_t ncpTorpAnims[NUMPLAYERTEAMS];
-
-/* storage for the beam up/down sound handles */
-static cqsHandle beamHandle = CQS_INVHANDLE;
 
 /* convert a KP key into an angle */
 static int _KPAngle(int ch, real *angle)
@@ -2414,7 +2415,8 @@ static void command( int ch )
       _doinfo(cbuf, TERM_NORMAL);
       break;
 
-/* ack red alert by turning klaxon off  Cataboligne - sound code 11.14.6 */
+      /* ack red alert by turning klaxon off  Cataboligne -
+         sound code 11.14.6 */
     case TERM_ABORT:
       if (alertHandle != CQS_INVHANDLE)
         {
@@ -2778,18 +2780,24 @@ static int nCPIdle(void)
   static Unsgn32 iterstart = 0;
   static Unsgn32 pingtime = 0;
   static Unsgn32 themetime = 0;
+  static Unsgn32 dietime = 0;
   Unsgn32 iternow = clbGetMillis();
   static const Unsgn32 iterwait = 50;   /* ms */
   static const Unsgn32 pingwait = 2000; /* ms (2 seconds) */
   static const Unsgn32 themewait = 5000; /* ms (5 seconds) */
+  static const Unsgn32 dyingwait = 5000; /* watching yourself die */
   real tdelta = (real)iternow - (real)iterstart;
 
 
   if (state == S_DEAD)
-    {                           /* transfer to the dead node */
-      cqsEffectStop(CQS_INVHANDLE, TRUE);
-      nDeadInit();
-      return NODE_OK;
+    {                           /* die for awhile */
+      clientFlags = 0;
+      /* also turns off warp/engine sounds */
+      /* nDead will stop all other sound effects for us on exit */
+      setWarp(0);
+      state = S_GHOST;
+      /* start a timer so you can see yourself die :) */
+      dietime = iternow;
     }
 
   while ((pkttype = waitForPacket(PKT_FROMSERVER, sockl, PKT_ANYPKT,
@@ -2903,7 +2911,9 @@ static int nCPIdle(void)
         return NODE_OK;
     }
 
-  nCPInput(0);                   /* handle any queued chars */
+  /* the nDead node will finish up with any further input if we are dead */
+  if (state != S_GHOST)
+    nCPInput(0);                   /* handle any queued chars */
 
   /* check for messages */
   if (Context.msgok)
@@ -2948,7 +2958,21 @@ static int nCPIdle(void)
           themes();
         }
     }
+ 
+  if ((state == S_GHOST) && ((iternow - dietime) > dyingwait))
+    {
+      /* we've died long enough, time to go home :( */
+      /* stop any effects we care about */
+      cqsEffectStop(bombingHandle, FALSE);
+      cqsEffectStop(beamHandle, FALSE);
+      cqsEffectStop(alertHandle, FALSE);
 
+      beamHandle = CQS_INVHANDLE;
+      bombingHandle = CQS_INVHANDLE;
+      alertHandle = CQS_INVHANDLE;
+
+      nDeadInit();
+    }
   return NODE_OK;
 }
 
