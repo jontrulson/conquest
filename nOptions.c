@@ -61,8 +61,8 @@ static char *mmheader2 = "'a' = Alt, 'c' = Control 's' = Shift";
 static char *uheader = "User Configurable Options";
 static char *sheader = "System-wide Configurable Options";
 
-static char *meprompt = "Enter Conquest commands.  ([RETURN] = \\r, [TAB] = \\t)";
-static char *mmeprompt = "Enter Conquest commands.  ([RETURN] = \\r, [TAB] = \\t <angle> = \\a)";
+static char *meprompt = "Enter Conquest commands.  ([ENTER] = \\r, [TAB] = \\t)";
+static char *mmeprompt = "Enter Conquest commands.  ([ENTER] = \\r, [TAB] = \\t <angle> = \\a)";
 static char *eprompt = "Arrow keys to select an item, [SPACE] to change, any other key to quit.";
 static char *eprompt2 = "Type '?' for help on an item.";
 static char *mprompt = "Arrow keys to select a macro, [SPACE] to change, any other key to quit.";

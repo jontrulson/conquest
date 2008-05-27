@@ -1133,7 +1133,7 @@ int clbZeroPlanet( int pnum, int snum )
 char *clbWarPrompt(int snum, int twar[])
 {
   static char wbuf[BUFFER_SIZE];
-  static char *fmt = "Press TAB when done, ESCAPE to abort:  Peace: %c %c %c %c  War: %c %c %c %c";
+  static char *fmt = "Press [TAB] when done, [ESC] to abort:  Peace: %c %c %c %c  War: %c %c %c %c";
   int i;
   char ch, peace[NUMPLAYERTEAMS], war[NUMPLAYERTEAMS];
 
@@ -2806,6 +2806,44 @@ void clbTorpDrive(real itersec)
 
   return;
 }
+
+/* cmpute a ship's proper position when orbiting */
+void clbAdjOrbitalPosition(int snum)
+{
+  if (snum > 0 && snum <= MAXSHIPS && Ships[snum].warp < 0.0)
+    {                           
+      int pnum = -Ships[snum].lock;
+      
+      if ( pnum > 0 && pnum <= NUMPLANETS )
+        {
+          /* ajust the ship's X/Y based on orbit direction and heading */
+          if ( Ships[snum].warp == ORBIT_CW )
+            {
+              Ships[snum].x = 
+                (real)(Planets[pnum].x + (ORBIT_DIST * 
+                                          cosd(Ships[snum].head + 90.0)));
+              
+              Ships[snum].y = 
+                (real)(Planets[pnum].y + (ORBIT_DIST * 
+                                          sind(Ships[snum].head + 90.0)));
+            }
+          else if ( Ships[snum].warp == ORBIT_CCW )
+            {
+              /* Orbiting counter-clockwise. */
+              Ships[snum].x = 
+                (real)(Planets[pnum].x + (ORBIT_DIST * 
+                                          cosd(Ships[snum].head - 90.0)));
+              
+              Ships[snum].y = 
+                (real)(Planets[pnum].y + (ORBIT_DIST * 
+                                          sind(Ships[snum].head - 90.0)));
+              
+            }
+        }
+    }
+  return;
+}
+
 
 /* borrowed from glut */
 #if defined(SVR4) && !defined(sun)  /* Sun claims SVR4, but

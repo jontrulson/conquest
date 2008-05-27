@@ -226,7 +226,7 @@ static int nAuthDisplay(dspConfig_t *dsp)
     tmpcolor = NoColor;
 
   cprintf( slin - 2, 1, ALIGN_LEFT,
-           "#%d#Please login. Press [RETURN] to exit.",
+           "#%d#Please login. Press [ENTER] to exit.",
            SpecialColor);
   
   cprintf( slin - 1, 1, ALIGN_LEFT,

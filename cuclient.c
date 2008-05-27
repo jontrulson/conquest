@@ -175,7 +175,7 @@ void cucSendMsg( int from, int terse, int remote )
       return;
     }
   
-  /* TAB or RETURN means use the target from the last message. */
+  /* TAB or ENTER means use the target from the last message. */
   editing = ( (ch == TERM_EXTRA || ch == TERM_NORMAL) && buf[0] == EOS );
   if ( editing )
     {
@@ -299,7 +299,7 @@ void cucSendMsg( int from, int terse, int remote )
     }
   
   if ( ! terse )
-    appstr( " (ESCAPE to abort)", buf );
+    appstr( " ([ESC] to abort)", buf );
   
   mcuPutMsg( buf, MSG_LIN1 );
   cdclrl( MSG_LIN2, 1 );

@@ -853,7 +853,7 @@ void command( int ch )
       startTimer();
       break;
       
-    case TERM_NORMAL:		/* Have [RETURN] act like 'I[RETURN]'  */
+    case TERM_NORMAL:		/* Have [ENTER] act like 'I[ENTER]'  */
     case KEY_ENTER:
     case '\n':
       iBufPut("i\r");		/* (get last info) */
@@ -1190,7 +1190,7 @@ void dead( int snum, int leave )
 	  else
 	    cprintf( 14,0,ALIGN_CENTER,"#%d#%s", InfoColor,
 		   "You have chosen to NOT leave any last words:" );
-	  ch = mcuGetCX( "Press TAB to confirm:", 16, 0,
+	  ch = mcuGetCX( "Press [TAB] to confirm:", 16, 0,
 		     TERMS, cbuf, 10 );
 	}
       while ( ch != TERM_EXTRA ); /* until . while */
@@ -1276,7 +1276,7 @@ void doalloc( int snum )
 void doautopilot( int snum )
 {
   int ch; 
-  string conf="Press TAB to engage autopilot:";
+  string conf="Press [TAB] to engage autopilot:";
   
   cdclrl( MSG_LIN1, 2 );
   cbuf[0] = EOS;
@@ -1308,7 +1308,7 @@ void doautopilot( int snum )
 	  cdredo();
 	  break;
 	default:
-	  mcuPutMsg( "Press ESCAPE to abort autopilot.", MSG_LIN1 );
+	  mcuPutMsg( "Press [ESC] to abort autopilot.", MSG_LIN1 );
 	  cdbeep();
 	  cdrefresh();
 	}
@@ -1611,7 +1611,7 @@ void dobomb( int snum )
       }
   
   /* Confirm. */
-  sprintf( cbuf, "Press TAB to bombard %s, %d armies:",
+  sprintf( cbuf, "Press [TAB] to bombard %s, %d armies:",
 	 Planets[pnum].name, Planets[pnum].armies );
   cdclrl( MSG_LIN1, 1 );
   cdclrl( MSG_LIN2, 1 );
@@ -1688,7 +1688,7 @@ void doburst( int snum )
 /*    docloak( snum ) */
 void docloak( int snum )
 {
-  string pmt="Press TAB to engage cloaking device: ";
+  string pmt="Press [TAB] to engage cloaking device: ";
   
   cdclrl( MSG_LIN1, 1 );
   cdclrl( MSG_LIN2, 1 );
@@ -1723,7 +1723,7 @@ void dorefit( int snum, int dodisplay )
   int oldstype = 0, stype = 0;
   string ntp="We must be orbiting a team owned planet to refit.";
   string nek="You must have at least one kill to refit.";
-  string conf="Press TAB to change, ENTER to accept: ";
+  string conf="Press [TAB] to change, [ENTER] to accept: ";
   string cararm="You cannot refit while carrying armies";
   
   cdclrl( MSG_LIN2, 1 );
@@ -1856,7 +1856,7 @@ void docoup( int snum )
 {
   int i, pnum;
   string nhp="We must be orbiting our home planet to attempt a coup.";
-  string conf="Press TAB to try it: ";
+  string conf="Press [TAB] to try it: ";
   
   cdclrl( MSG_LIN2, 1 );
   
@@ -2079,7 +2079,7 @@ void dodet( int snum )
 /*    dodistress( snum ) */
 void dodistress( int snum )
 {
-  string pmt="Press TAB to send an emergency distress call: ";
+  string pmt="Press [TAB] to send an emergency distress call: ";
   
   cdclrl( MSG_LIN1, 2 );
 
@@ -2211,7 +2211,7 @@ void dohelp( void )
   "^L", "refresh the screen");
   tlin++;
   cprintf(tlin,col,ALIGN_NONE,sfmt, 
-  "[RETURN]", "get last info");
+  "[ENTER]", "get last info");
   tlin++;
   cprintf(tlin,col,ALIGN_NONE,sfmt, "[TAB]", "get next last info");
   
@@ -2471,7 +2471,7 @@ void doReviewMsgs( int snum )
 /*    doselfdest */
 void doselfdest(int snum)
 {
-  string pmt="Press TAB to initiate self-destruct sequence: ";
+  string pmt="Press [TAB] to initiate self-destruct sequence: ";
   
   cdclrl( MSG_LIN1, 2 );
 
@@ -2513,7 +2513,7 @@ void doselfdest(int snum)
 	    }
 	  else
 	    {
-	      mcuPutMsg( "Press ESCAPE to abort self destruct.", MSG_LIN1 );
+	      mcuPutMsg( "Press [ESC] to abort self destruct.", MSG_LIN1 );
 	      cdbeep();
 	      cdrefresh();
 	    }

@@ -156,7 +156,7 @@ static int nCPHelpDisplay(dspConfig_t *dsp)
   "^L", "refresh the screen");
   tlin++;
   cprintf(tlin,col,ALIGN_NONE,sfmt, 
-  "[RETURN]", "get last info");
+  "[ENTER]", "get last info");
   tlin++;
   cprintf(tlin,col,ALIGN_NONE,sfmt, "[TAB]", "get next last info");
   

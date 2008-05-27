@@ -204,6 +204,9 @@ void display( int snum, int display_info )
   else
     lsmap = 0;
   
+  /* adjust the ships obital position if neccessary */
+  clbAdjOrbitalPosition(snum);
+
   if ( lsmap )
     {
       scale = MAP_FAC;
@@ -530,6 +533,16 @@ void display( int snum, int display_info )
 			    }
 		      
 		    }
+
+                /* if the ship is in orbit, adjust it's position for
+                 *  smoother motion on fast moving planets.  Our own
+                 *  ship's position will have already been adjusted
+                 *  above.
+                 */
+
+                if (snum != i)
+                  clbAdjOrbitalPosition(i);
+
 	      }	/* if a ship view (snum > 0) */
 
 	    /* There is potential for un-cloaked ships and ourselves. */

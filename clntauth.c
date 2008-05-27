@@ -121,7 +121,7 @@ int Logon(char *username)
 	  slin += 3;
 	  cdputs("You can use A-Z, a-z, 0-9, '_', or '-'.", MSG_LIN1, 1);
 	  cprintf( slin - 2, 1, ALIGN_LEFT,
-		   "#%dPlease login. Press [RETURN] to exit.",
+		   "#%dPlease login. Press [ENTER] to exit.",
 		   SpecialColor);
 	  
 	  cprintf( slin - 1, 1, ALIGN_LEFT,

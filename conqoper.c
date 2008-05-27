@@ -2160,7 +2160,7 @@ void oprobot(void)
   if ( ch == TERM_EXTRA )
     {
       buf[0] = EOS;
-      ch = (char)cdgetx( "Enter number desired (TAB for warlike): ",
+      ch = (char)cdgetx( "Enter number desired ([TAB] for warlike): ",
 		  MSG_LIN2, 1, TERMS, buf, MAXUSERNAME, TRUE );
       if ( ch == TERM_ABORT )
 	{

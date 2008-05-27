@@ -124,42 +124,8 @@ void display( int snum, int display_info )
   else
     lsmap = FALSE;
   
-  /* if we are in orbit, adjust our position for smoother motion on
-   *  fast moving planets 
-   */
-  if (snum > 0 && snum <= MAXSHIPS && Ships[snum].warp < 0.0)
-    {                           
-      int pnum = -Ships[snum].lock;
-
-      if ( pnum > 0 && pnum <= NUMPLANETS )
-        {
-          /* if it's our ship, and we are in orbit adjust the ships
-           *  position relative to the planet's position as we see it
-           */
-          if ( Ships[snum].warp == ORBIT_CW )
-            {
-              Ships[snum].x = 
-                (real)(Planets[pnum].x + (ORBIT_DIST * 
-                                          cosd(Ships[snum].head + 90.0)));
-              
-              Ships[snum].y = 
-                (real)(Planets[pnum].y + (ORBIT_DIST * 
-                                          sind(Ships[snum].head + 90.0)));
-            }
-          else if ( Ships[snum].warp == ORBIT_CCW )
-            {
-              /* Orbiting counter-clockwise. */
-              Ships[snum].x = 
-                (real)(Planets[pnum].x + (ORBIT_DIST * 
-                                          cosd(Ships[snum].head - 90.0)));
-              
-              Ships[snum].y = 
-                (real)(Planets[pnum].y + (ORBIT_DIST * 
-                                          sind(Ships[snum].head - 90.0)));
-              
-            }
-        }
-    }
+  /* adjust the ships obital position if neccessary */
+  clbAdjOrbitalPosition(snum);
 
   if ( lsmap )
     {
@@ -331,53 +297,20 @@ void display( int snum, int display_info )
 		      
 		    }
 
-                /* if the ship is in orbit, adjust our position for
+                /* if the ship is in orbit, adjust it's position for
                  *  smoother motion on fast moving planets.  Our own
                  *  ship's position will have already been adjusted
-                 *  above
+                 *  above.
                  */
 
                 if (snum != i)
-                  {                           
-                    int pnum = -Ships[i].lock;
-                    if ( pnum > 0 && pnum <= NUMPLANETS )
-                      {
-                        if ( Ships[i].warp < 0.0 )
-                          {                       /* orbiting */
-                            if ( Ships[i].warp == ORBIT_CW )
-                              {
-                                Ships[i].x = 
-                                  (real)(Planets[pnum].x + (ORBIT_DIST * 
-                                                            cosd(Ships[i].head + 90.0)));
-                                
-                                Ships[i].y = 
-                                  (real)(Planets[pnum].y + (ORBIT_DIST * 
-                                                            sind(Ships[i].head + 90.0)));
-                              }
-                            else if ( Ships[i].warp == ORBIT_CCW )
-                              {
-                                /* Orbiting counter-clockwise. */
-                                Ships[i].x = 
-                                  (real)(Planets[pnum].x + (ORBIT_DIST * 
-                                                            cosd(Ships[i].head - 90.0)));
-                                
-                                Ships[i].y = 
-                                  (real)(Planets[pnum].y + (ORBIT_DIST * 
-                                                            sind(Ships[i].head - 90.0)));
-                                
-                              }
-                          }
-                      }
-                  } /* snum != i */
-	      }	/* if a ship view (snum > 0) */
+                  clbAdjOrbitalPosition(i);
 
+	      }	/* if a ship view (snum > 0) */
 
 	    /* There is potential for un-cloaked ships and ourselves. */
 	    if ( ! SCLOAKED(i) || i == snum )
 	      {
-
-
-
 		/* ... especially if he's in the bounds of our current */
 		/*  display (either tactical or strategic map) */
 		if (GLcvtcoords( cenx, ceny, Ships[i].x, Ships[i].y, 

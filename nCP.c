@@ -1196,7 +1196,7 @@ static void _domsgto(char *buf, int ch, int terse)
 
   c_strcpy( buf, tbuf);  
 
-  /* TAB or RETURN means use the target from the last message. */
+  /* TAB or ENTER means use the target from the last message. */
   editing = ( (ch == TERM_EXTRA || ch == TERM_NORMAL) && buf[0] == EOS );
   if ( editing )
     {
@@ -1331,7 +1331,7 @@ static void _domsgto(char *buf, int ch, int terse)
     }
   
   if (!terse)
-    appstr( " (ESCAPE to abort)", tbuf );
+    appstr( " ([ESC] to abort)", tbuf );
   
   cp_putmsg( tbuf, MSG_LIN1 );
   clrPrompt(MSG_LIN2);
@@ -1724,7 +1724,7 @@ static void _dobomb(void)
   
   /* set up the state, and proceed. */
 
-  sprintf( pbuf, "Press TAB to bombard %s, %d armies:",
+  sprintf( pbuf, "Press [TAB] to bombard %s, %d armies:",
            Planets[pnum].name, Planets[pnum].armies );
 
   state = S_BOMB;
@@ -2025,7 +2025,7 @@ static void command( int ch )
           prm.preinit = False;
           prm.buf = cbuf;
           prm.buflen = MSGMAXLINE;
-          prm.pbuf = "Press TAB to engage autopilot: ";
+          prm.pbuf = "Press [TAB] to engage autopilot: ";
           prm.terms = TERMS;
           prm.index = MSG_LIN1;
           prm.buf[0] = EOS;
@@ -2063,7 +2063,7 @@ static void command( int ch )
           prm.preinit = False;
           prm.buf = cbuf;
           prm.buflen = MSGMAXLINE;
-          prm.pbuf = "Press TAB to engage cloaking device: ";
+          prm.pbuf = "Press [TAB] to engage cloaking device: ";
           prm.terms = TERMS;
           prm.index = MSG_LIN1;
           prm.buf[0] = EOS;
@@ -2083,7 +2083,7 @@ static void command( int ch )
       prm.preinit = False;
       prm.buf = cbuf;
       prm.buflen = MSGMAXLINE;
-      prm.pbuf = "Press TAB to send an emergency distress call: ";
+      prm.pbuf = "Press [TAB] to send an emergency distress call: ";
       prm.terms = TERMS;
       prm.index = MSG_LIN1;
       prm.buf[0] = EOS;
@@ -2147,7 +2147,7 @@ static void command( int ch )
           prm.preinit = False;
           prm.buf = cbuf;
           prm.buflen = MSGMAXLINE;
-          prm.pbuf = "Press TAB to try it: ";
+          prm.pbuf = "Press [TAB] to try it: ";
           prm.terms = TERMS;
           prm.index = MSG_LIN1;
           prm.buf[0] = EOS;
@@ -2243,7 +2243,7 @@ static void command( int ch )
           prm.preinit = False;
           prm.buf = cbuf;
           prm.buflen = MSGMAXLINE;
-          prm.pbuf = "Press TAB to initiate self-destruct sequence: ";
+          prm.pbuf = "Press [TAB] to initiate self-destruct sequence: ";
           prm.terms = TERMS;
           prm.index = MSG_LIN1;
           prm.buf[0] = EOS;
@@ -2267,7 +2267,7 @@ static void command( int ch )
               prm.index = MSG_LIN1;
               prm.buf[0] = EOS;
               setPrompt(prm.index, prm.pbuf, NoColor, prm.buf, NoColor);
-              cp_putmsg("Press TAB to change, ENTER to accept: ", MSG_LIN2);
+              cp_putmsg("Press [TAB] to change, [ENTER] to accept: ", MSG_LIN2);
               prompting = TRUE;
             }
         }
@@ -2408,7 +2408,7 @@ static void command( int ch )
 
       break;
       
-    case TERM_NORMAL:		/* Have [RETURN] act like 'I[RETURN]'  */
+    case TERM_NORMAL:		/* Have [ENTER] act like 'I[ENTER]'  */
     case KEY_ENTER:
     case '\n':
       cbuf[0] = EOS;
@@ -3224,7 +3224,7 @@ static int nCPInput(int ch)
               state = S_NONE;
             }
           else
-            cp_putmsg("Press ESCAPE to abort autopilot.", MSG_LIN1);
+            cp_putmsg("Press [ESC] to abort autopilot.", MSG_LIN1);
 
           break;
 
@@ -3275,7 +3275,7 @@ static int nCPInput(int ch)
               clrPrompt(MSG_LIN1);
               clrPrompt(MSG_LIN2);
               prm.buf[0] = EOS;
-	      cp_putmsg( "Press ESCAPE to abort self destruct.", MSG_LIN1 );
+	      cp_putmsg( "Press [ESC] to abort self destruct.", MSG_LIN1 );
 	      mglBeep(MGL_BEEP_ERR);
             }
           

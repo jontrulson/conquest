@@ -314,24 +314,20 @@ void iterdrive( int *ship )
                   if ( warp == ORBIT_CW )
                     {
                       /* Orbiting clockwise. */
-                      Ships[i].head = mod360( Ships[i].head - (ORBIT_FAC/10.0));
+                      Ships[i].head = 
+                        mod360( Ships[i].head - (ORBIT_FAC/10.0) );
                       
-                      Ships[i].x = (real)(Planets[pnum].x + (ORBIT_DIST * 
-                                                             cosd(Ships[i].head + 90.0)));
-                      
-                      Ships[i].y = (real)(Planets[pnum].y + (ORBIT_DIST * 
-                                                             sind(Ships[i].head + 90.0)));
+                      /* adjust the ships obital position */
+                      clbAdjOrbitalPosition(i);
                     }
                   else if ( warp == ORBIT_CCW )
                     {
                       /* Orbiting counter-clockwise. */
-                      Ships[i].head = mod360( Ships[i].head + (ORBIT_FAC/10.0) );
+                      Ships[i].head = 
+                        mod360( Ships[i].head + (ORBIT_FAC/10.0) );
                       
-                      Ships[i].x = (real)(Planets[pnum].x + (ORBIT_DIST * 
-                                                             cosd(Ships[i].head - 90.0)));
-                      
-                      Ships[i].y = (real)(Planets[pnum].y + (ORBIT_DIST * 
-                                                             sind(Ships[i].head - 90.0)));
+                      /* adjust the ships obital position */
+                      clbAdjOrbitalPosition(i);
                     }
                 }
               else
@@ -486,19 +482,32 @@ void iterdrive( int *ship )
   /* Drive the planet eater. */
   if ( Doomsday->status == DS_LIVE )
     {
-      if (Doomsday->lock < 0 && distf( Doomsday->x, Doomsday->y, 
+
+      /* We want to creep up on our target, without sitting and spinning
+       * around on top of it, so only move when we are too far away
+       * from our target to inflict damage.
+       */
+
+      /* planet lock */
+      if (Doomsday->lock < 0 && (distf( Doomsday->x, Doomsday->y, 
 				       Planets[-Doomsday->lock].x, 
 				       Planets[-Doomsday->lock].y )
-				 <= DOOMSDAY_DIST)
-      {				/* if we are locked onto a planet, and are
-				   close enough, don't bother getting
-				   any closer
-				   */
-	Doomsday->dx = Doomsday->dy = 0.0;
+                                 >= DOOMSDAY_DIST) )
+      {
+        Doomsday->x = Doomsday->x + Doomsday->dx;
+        Doomsday->y = Doomsday->y + Doomsday->dy;
+      }
+
+      /* ship lock */
+      if (Doomsday->lock > 0 && (distf( Doomsday->x, Doomsday->y, 
+				       Ships[Doomsday->lock].x, 
+				       Ships[Doomsday->lock].y )
+                                 >= DOOMSDAY_DIST) )
+      {
+        Doomsday->x = Doomsday->x + Doomsday->dx;
+        Doomsday->y = Doomsday->y + Doomsday->dy;
       }
 	
-      Doomsday->x = Doomsday->x + Doomsday->dx;
-      Doomsday->y = Doomsday->y + Doomsday->dy;
     }
   
   return;

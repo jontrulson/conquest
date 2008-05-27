@@ -21,8 +21,10 @@
 #include "conqlb.h"
 #include "nDead.h"
 #include "nMenu.h"
+#include "nPlay.h"
 #include "cqkeys.h"
 #include "cqsound.h"
+#include "glmisc.h"
 
 extern Unsgn8 clientFlags;      /* conquestgl.c */
 
@@ -242,7 +244,7 @@ static int nDeadDisplay(dspConfig_t *dsp)
 
   if (state == S_PRESSANY)
     cprintf(MSG_LIN1, 0, ALIGN_CENTER, 
-            "ESC to quit, any other key to continue.");
+            "[ESC] for Main Menu, [TAB] to re-enter the game.");
   else
     {
       if (state == S_LASTWORDS)
@@ -284,22 +286,29 @@ static int nDeadInput(int ch)
   switch (state)
     {
     case S_PRESSANY:
-      setONode(NULL);
-      /* turn off any running effects */
-      cqsEffectStop(CQS_INVHANDLE, TRUE);
-
-      if (ch == TERM_ABORT)     /* ESC - main menu */
-        nMenuInit();                /* go to menu */
-      else
+      if (ch == TERM_ABORT || ch == TERM_EXTRA) /* ESC or TAB */
         {
-          /* since the server is already in the 'menu' waiting for us
-           * go for it.
-           */
-          nPlayInit();          /* start playing */
-          return NODE_OK;
-        }
-      break;
+          setONode(NULL);
+          /* turn off any running effects */
+          cqsEffectStop(CQS_INVHANDLE, TRUE);
 
+          switch (ch)
+            {
+            case TERM_ABORT:    /* ESC */
+              nMenuInit();      /* go to menu */
+              return NODE_OK;
+            case TERM_EXTRA:
+              /* since the server is already in the 'menu' waiting for us
+               * just go for it.
+               */
+              nPlayInit();
+              return NODE_OK;
+            }
+        }
+      else
+        mglBeep(MGL_BEEP_ERR);
+
+      break;
     case S_LASTWORDS:
       irv = prmProcInput(&prm, ch); 
       if (irv > 0)

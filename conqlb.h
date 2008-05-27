@@ -73,6 +73,7 @@ void clbZeroShip( int snum );
 char *clbGetUserLogname(void);
 void clbPlanetDrive(real itersec);
 void clbTorpDrive(real itersec);
+void clbAdjOrbitalPosition(int snum);
 Unsgn32 clbGetMillis(void);
 void clbBlockAlarm(void);
 void clbUnblockAlarm(void);

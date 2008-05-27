@@ -416,7 +416,7 @@ static void ChangeOption(struct Conf *cdata, int lin)
 static void ChangeMacro(int macronum)
 {
   int lin;
-  static char *prmpt2 = "Enter Conquest commands.  ([RETURN] = \\r, [TAB] = \\t)";
+  static char *prmpt2 = "Enter Conquest commands.  ([ENTER] = \\r, [TAB] = \\t)";
   char buf[MAX_MACRO_LEN + 1];
   char prmpt[BUFFER_SIZE];
   int ch;
