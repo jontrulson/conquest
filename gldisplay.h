@@ -59,22 +59,16 @@ extern Unsgn32     frameTime;
 struct _warp {
   char warp[16];
   int color;
-  char label[16];
-  int lcolor;
 };
 
 struct _heading {
   char heading[16];
   int color;
-  char label[16];
-  int lcolor;
 };
 
 struct _kills {
   char kills[16];
   int color;
-  char label[16];
-  int lcolor;
 };
 
 struct _alertStatus {
@@ -89,45 +83,33 @@ struct _alertBorder {
 struct _shields {
   int shields;
   int color;
-  char label[32];
-  int lcolor;
 };
 
 struct _damage {
   int damage;
   int color;
-  char label[16];
-  int lcolor;
 };
 
 struct _fuel {
   int fuel;
   int color;
-  char label[16];
-  int lcolor;
 };
 
 struct _alloc {
   char allocstr[16];
   int walloc, ealloc;
   int color;
-  char label[32];
-  int lcolor;
 };
 
 struct _etemp {
   int etemp;
   int color;
-  char label[32];
-  int lcolor;
   int overl;
 };
 
 struct _wtemp {
   int wtemp;
   int color;
-  char label[32];
-  int lcolor;
   int overl;
 };
 
@@ -167,8 +149,6 @@ struct _recTime {
 };
 
 
-
-
 /* This holds all of the info for the cockpit display. */
 typedef struct _dspData {
   struct _warp warp;
@@ -191,7 +171,7 @@ typedef struct _dspData {
   struct _xtrainfo xtrainfo;
   struct _recId recId;
   struct _recTime recTime;
-} dspData_t;
+} hudData_t;
 
 
 /* a generic GL rectangle struct */

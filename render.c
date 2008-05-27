@@ -30,7 +30,7 @@
 #include "anim.h"
 #include "GL.h"
 
-extern dspData_t dData;
+extern hudData_t hudData;
 
 #define GLCOLOR4F(glcol) glColor4f(glcol.r, glcol.g, glcol.b, glcol.a) 
 
@@ -608,12 +608,12 @@ void renderPulseMsgs(void)
         }
     }
 
-  if (testlamps || dData.alloc.ealloc <= 0 || dData.alloc.walloc <= 0 ||
-      dData.etemp.etemp > E_CRIT  || dData.wtemp.wtemp > W_CRIT ||
-      dData.fuel.fuel < F_CRIT || 
-      (dData.sh.shields <= SH_CRIT && 
+  if (testlamps || hudData.alloc.ealloc <= 0 || hudData.alloc.walloc <= 0 ||
+      hudData.etemp.etemp > E_CRIT  || hudData.wtemp.wtemp > W_CRIT ||
+      hudData.fuel.fuel < F_CRIT || 
+      (hudData.sh.shields <= SH_CRIT && 
        SSHUP(Context.snum) && !SREPAIR(Context.snum)) ||
-      dData.dam.damage >= HULL_CRIT)
+      hudData.dam.damage >= HULL_CRIT)
     drawing = TRUE;
 
   if (!drawing)
@@ -622,7 +622,7 @@ void renderPulseMsgs(void)
   glBlendFunc(GL_SRC_ALPHA, GL_ONE);
   glEnable(GL_BLEND);
  
-  if (testlamps || dData.fuel.fuel < F_CRIT)
+  if (testlamps || hudData.fuel.fuel < F_CRIT)
     {
       if (ANIM_EXPIRED(&fuelcrit))
         {
@@ -638,7 +638,7 @@ void renderPulseMsgs(void)
       
     }      
 
-  if (testlamps ||dData.alloc.ealloc <= 0)
+  if (testlamps ||hudData.alloc.ealloc <= 0)
     {
       if (ANIM_EXPIRED(&engfail))
         {
@@ -652,7 +652,7 @@ void renderPulseMsgs(void)
                 0, &engfail.state.col, 
                 TRUE, FALSE, TRUE);
     }      
-  else if (dData.etemp.etemp > E_CRIT)
+  else if (hudData.etemp.etemp > E_CRIT)
     {
       if (ANIM_EXPIRED(&engcrit))
         {
@@ -668,7 +668,7 @@ void renderPulseMsgs(void)
     }      
   
 
-  if (testlamps ||dData.alloc.walloc <= 0)
+  if (testlamps ||hudData.alloc.walloc <= 0)
     {
       if (ANIM_EXPIRED(&wepfail))
         {
@@ -683,7 +683,7 @@ void renderPulseMsgs(void)
                 TRUE, FALSE, TRUE);
 
     }      
-  else if (dData.wtemp.wtemp > W_CRIT)
+  else if (hudData.wtemp.wtemp > W_CRIT)
     {
       if (ANIM_EXPIRED(&wepcrit))
         {
@@ -699,7 +699,7 @@ void renderPulseMsgs(void)
       
     }      
 
-  if (testlamps || (dData.sh.shields < SH_CRIT && SSHUP(Context.snum) && 
+  if (testlamps || (hudData.sh.shields < SH_CRIT && SSHUP(Context.snum) && 
        !SREPAIR(Context.snum)))
     {
       if (ANIM_EXPIRED(&shcrit))
@@ -716,7 +716,7 @@ void renderPulseMsgs(void)
 
     }      
 
-  if (testlamps || dData.dam.damage >= HULL_CRIT)
+  if (testlamps || hudData.dam.damage >= HULL_CRIT)
     {
       if (ANIM_EXPIRED(&hullcrit))
         {
@@ -747,7 +747,7 @@ void renderShieldCharge(void)
   if (!val)
     return;
   
-  uiPutColor(dData.sh.color);
+  uiPutColor(hudData.sh.color);
   
   /* gauge */
   drawLine(o.d1shcharge.x, o.d1shcharge.y, 
@@ -822,7 +822,7 @@ void renderHud(int dostats)
   drawLineBox(o.alertb.x, o.alertb.y, 
               o.alertb.w,
               o.alertb.h,
-              dData.aBorder.alertColor,
+              hudData.aBorder.alertColor,
               2.0);
 
 
@@ -830,7 +830,7 @@ void renderHud(int dostats)
 
   /* heading val */
   glfRender(o.headl.x, o.headl.y, 0.0, o.headl.w, 
-            o.headl.h, fontLargeTxf, dData.heading.heading, 
+            o.headl.h, fontLargeTxf, hudData.heading.heading, 
             NoColor, NULL, TRUE, FALSE, TRUE);
 
   /* warp background */
@@ -849,7 +849,7 @@ void renderHud(int dostats)
   /* warp val */
   glfRender(o.warpl.x, o.warpl.y, 0.0, 
             o.warpl.w, o.warpl.h,
-            fontLargeTxf, dData.warp.warp, InfoColor, NULL, TRUE, FALSE, TRUE);
+            fontLargeTxf, hudData.warp.warp, InfoColor, NULL, TRUE, FALSE, TRUE);
   
   /* warp quad indicator color */
   
@@ -862,16 +862,16 @@ void renderHud(int dostats)
              o.warp.h * 0.79 /*empirical. ick.*/, 0.0);
 
   /* shields gauge */
-  if (dData.sh.shields > 0.0)
+  if (hudData.sh.shields > 0.0)
     renderScale(o.d1shg.x, o.d1shg.y, o.d1shg.w, o.d1shg.h,
-                0, 100, dData.sh.shields, dData.sh.color);
+                0, 100, hudData.sh.shields, hudData.sh.color);
   
   /* shields num */
   renderScaleVal(o.d1shn.x, o.d1shn.y,
                  o.d1shn.w, o.d1shn.h,
                  fontFixedTxf, 
-                 (dData.sh.shields < 0) ? 0 : dData.sh.shields, 
-                  dData.sh.color, NoColor);
+                 (hudData.sh.shields < 0) ? 0 : hudData.sh.shields, 
+                  hudData.sh.color, NoColor);
 
   /* shield charging status */
   if (!SSHUP(Context.snum) || SREPAIR(Context.snum))
@@ -880,52 +880,52 @@ void renderHud(int dostats)
   /* damage gauge */
   renderScale(o.d1damg.x, o.d1damg.y, 
               o.d1damg.w, o.d1damg.h,
-              0, 100, dData.dam.damage, dData.dam.color);
+              0, 100, hudData.dam.damage, hudData.dam.color);
 
   /* damage num */
   renderScaleVal(o.d1damn.x, o.d1damn.y,
                  o.d1damn.w, o.d1damn.h,
-                 fontFixedTxf, dData.dam.damage, dData.dam.color,
+                 fontFixedTxf, hudData.dam.damage, hudData.dam.color,
                  NoColor);
 
   /* fuel guage */
   renderScale(o.d2fuelg.x, o.d2fuelg.y, o.d2fuelg.w, o.d2fuelg.h,
-              0, 999, dData.fuel.fuel, dData.fuel.color);
+              0, 999, hudData.fuel.fuel, hudData.fuel.color);
   
   /* fuel value */
   renderScaleVal(o.d2fueln.x, o.d2fueln.y,
                  o.d2fueln.w, o.d2fueln.h,
-                 fontFixedTxf, dData.fuel.fuel, dData.fuel.color,
+                 fontFixedTxf, hudData.fuel.fuel, hudData.fuel.color,
                  NoColor);
 
   /* etemp guage */
   renderScale(o.d2engtg.x, o.d2engtg.y, o.d2engtg.w, o.d2engtg.h,
-              0, 100, dData.etemp.etemp, dData.etemp.color);
+              0, 100, hudData.etemp.etemp, hudData.etemp.color);
 
   /* etemp value */
   renderScaleVal(o.d2engtn.x, o.d2engtn.y,
                  o.d2engtn.w, o.d2engtn.h,
-                 fontFixedTxf, dData.etemp.etemp, dData.etemp.color,
+                 fontFixedTxf, hudData.etemp.etemp, hudData.etemp.color,
                  BlueColor);
 
   /* wtemp gauge */
   renderScale(o.d2weptg.x, o.d2weptg.y, o.d2weptg.w, o.d2weptg.h,
-              0, 100, dData.wtemp.wtemp, dData.wtemp.color);
+              0, 100, hudData.wtemp.wtemp, hudData.wtemp.color);
 
   /* wtemp value*/
   renderScaleVal(o.d2weptn.x, o.d2weptn.y,
                  o.d2weptn.w, o.d2weptn.h,
-                 fontFixedTxf, dData.wtemp.wtemp, dData.wtemp.color,
+                 fontFixedTxf, hudData.wtemp.wtemp, hudData.wtemp.color,
                  BlueColor);
 
   /* alloc */
   renderAlloc(o.d2allocg.x, o.d2allocg.y, o.d2allocg.w, o.d2allocg.h,
-              &dData.alloc, fontLargeTxf, fontFixedTxf, 
+              &hudData.alloc, fontLargeTxf, fontFixedTxf, 
               TRUE);
   
   /* alloc value */
   glfRender(o.d2allocn.x, o.d2allocn.y, 0.0, o.d2allocn.w, o.d2allocn.h, 
-            fontFixedTxf, dData.alloc.allocstr, InfoColor, 
+            fontFixedTxf, hudData.alloc.allocstr, InfoColor, 
             NULL, TRUE, FALSE, TRUE);
   
   /* BEGIN "stat" box -
@@ -935,66 +935,66 @@ void renderHud(int dostats)
 
   glfRender(o.d2killb.x, o.d2killb.y, 0.0, 
             o.d2killb.w, 
-            o.d2killb.h, fontFixedTxf, dData.kills.kills, InfoColor, NULL,
+            o.d2killb.h, fontFixedTxf, hudData.kills.kills, InfoColor, NULL,
             TRUE, TRUE, TRUE);
 
   magFac = (!SMAP(Context.snum)) ? ncpSRMagFactor : ncpLRMagFactor;
   /* towed-towing/armies/destruct/alert - blended text displayed in viewer */
-  if (magFac || dData.tow.str[0] || dData.armies.str[0] || 
-      dData.cloakdest.str[0] == 'D' || dData.aStat.alertStatus[0])
+  if (magFac || hudData.tow.str[0] || hudData.armies.str[0] || 
+      hudData.cloakdest.str[0] == 'D' || hudData.aStat.alertStatus[0])
     {
       /* we want to use blending for these */
 
       glBlendFunc(GL_ONE_MINUS_SRC_ALPHA, GL_ONE);
       glEnable(GL_BLEND);
       
-      if (dData.tow.str[0])
+      if (hudData.tow.str[0])
         glfRender(o.tow.x, o.tow.y, 0.0, 
                   o.tow.w, o.tow.h, 
-                  fontFixedTxf, dData.tow.str, 
+                  fontFixedTxf, hudData.tow.str, 
                   MagentaColor | 0x50000000, 
                   NULL, TRUE, FALSE, TRUE);
       
-      if (dData.armies.str[0])
+      if (hudData.armies.str[0])
         glfRender(o.arm.x, o.arm.y, 0.0, 
                   o.arm.w, o.arm.h, 
                   fontFixedTxf, 
-                  dData.armies.str, 
+                  hudData.armies.str, 
                   InfoColor | 0x50000000, 
                   NULL, TRUE, FALSE, TRUE);
       
 
       /* Destruct msg, centered in the viewer */
-      if (dData.cloakdest.str[0] == 'D') /* destructing */
+      if (hudData.cloakdest.str[0] == 'D') /* destructing */
         {
           glfRender(o.cloakdest.x, o.cloakdest.y, 0.0, 
                     o.cloakdest.w, o.cloakdest.h, 
                     fontMsgTxf, 
-                    dData.cloakdest.str, 
+                    hudData.cloakdest.str, 
                     (GL_BLINK_ONESEC) ? 
-                    dData.cloakdest.color | CQC_A_BOLD | 0x50000000: 
-                    (dData.cloakdest.color | 0x50000000) & ~CQC_A_BOLD, 
+                    hudData.cloakdest.color | CQC_A_BOLD | 0x50000000: 
+                    (hudData.cloakdest.color | 0x50000000) & ~CQC_A_BOLD, 
                     NULL, TRUE, FALSE, TRUE);
         }
 
       /* alert target */
-      if (dData.aStat.alertStatus[0])
+      if (hudData.aStat.alertStatus[0])
         {
-          switch(dData.aStat.alertStatus[0])  /* define alert decal */
+          switch(hudData.aStat.alertStatus[0])  /* define alert decal */
             {                       /* need to blink these */
             case 'R':               /* red alert (not Alert) */
             case 'Y':               /* yellow alert (not Prox) */
-              icl = (GL_BLINK_HALFSEC) ? dData.aStat.color & ~CQC_A_BOLD : 
-                dData.aStat.color | CQC_A_BOLD;
+              icl = (GL_BLINK_HALFSEC) ? hudData.aStat.color & ~CQC_A_BOLD : 
+                hudData.aStat.color | CQC_A_BOLD;
               break;
             default:
-              icl = dData.aStat.color;
+              icl = hudData.aStat.color;
               break;
             }
           
           glfRender(o.d1atarg.x, o.d1atarg.y, 0.0, 
                     o.d1atarg.w, o.d1atarg.h, 
-                    fontLargeTxf, dData.aStat.alertStatus, 
+                    fontLargeTxf, hudData.aStat.alertStatus, 
                     icl | 0x50000000, NULL, TRUE, FALSE, TRUE);
         }
 
@@ -1030,7 +1030,7 @@ void renderHud(int dostats)
     another idea - play sound whenever near a cloaked ship and
     (CLOAKED) displays if info gotten
   */
-  if (dData.aStat.alertStatus[0] == 'R' || dData.aStat.alertStatus[0] == 'A')
+  if (hudData.aStat.alertStatus[0] == 'R' || hudData.aStat.alertStatus[0] == 'A')
     {                   /* alert condition red - check klaxon state */
       if (alertHandle == CQS_INVHANDLE) /* not playing now */
         {
@@ -1068,22 +1068,22 @@ void renderHud(int dostats)
   /* it's pretty hacky how we determine some of this stuff... */
 
   /* icon shield decal */
-  if (dData.sh.shields > 0.0)
+  if (hudData.sh.shields > 0.0)
     {
-      if (dData.cloakdest.str[1] == 'C') 
-        icl = dData.sh.color | 0x80000000; /* set some alpha if cloaked */
+      if (hudData.cloakdest.str[1] == 'C') 
+        icl = hudData.sh.color | 0x80000000; /* set some alpha if cloaked */
       else 
-        icl = dData.sh.color;
+        icl = hudData.sh.color;
       
       drawIconHUDDecal(o.d1icon.x, o.d1icon.y, o.d1icon.w, o.d1icon.h, 
                        HUD_SHI, icl);
     }
   
   /* ship icon decal */
-  if (dData.cloakdest.str[1] == 'C') 
-    icl = dData.dam.color | 0x80000000; /* set some alpha if cloaked */
+  if (hudData.cloakdest.str[1] == 'C') 
+    icl = hudData.dam.color | 0x80000000; /* set some alpha if cloaked */
   else 
-    icl = dData.dam.color;
+    icl = hudData.dam.color;
 
   drawIconHUDDecal(o.d1icon.x, o.d1icon.y, o.d1icon.w, o.d1icon.h, 
                    HUD_ICO, icl);
@@ -1110,7 +1110,7 @@ void renderHud(int dostats)
   /* regular conq stuff - tractor beam, armies, cloak */
   
   /* hacky.. for sure. */
-  if (dData.cloakdest.str[1] == 'C') 
+  if (hudData.cloakdest.str[1] == 'C') 
     drawIconHUDDecal(o.d1icon.x, o.d1icon.y, o.d1icon.w, o.d1icon.h,
                      HUD_ICLOAK, icl);
   else
@@ -1181,7 +1181,7 @@ void renderHud(int dostats)
         glfRender(o.althud.x, o.althud.y, 
                   0.0, 
                   o.althud.w, o.althud.h,
-                  fontFixedTxf, dData.xtrainfo.str, InfoColor, 
+                  fontFixedTxf, hudData.xtrainfo.str, InfoColor, 
                   NULL, TRUE, TRUE, TRUE);
       
       if (dostats)
@@ -1198,13 +1198,13 @@ void renderHud(int dostats)
       glfRender(o.althud.x, o.althud.y, 
                 0.0, 
                 o.althud.w, o.althud.h,
-                fontFixedTxf, dData.recId.str, 
+                fontFixedTxf, hudData.recId.str, 
                 MagentaColor | CQC_A_BOLD, 
                 NULL, TRUE, TRUE, TRUE);
       
       glfRender(o.rectime.x, o.rectime.y, 0.0, 
                 o.rectime.w, o.rectime.h,
-                fontFixedTxf, dData.recTime.str, NoColor, 
+                fontFixedTxf, hudData.recTime.str, NoColor, 
                 NULL, TRUE, TRUE, TRUE);
     }
 
@@ -1212,24 +1212,24 @@ void renderHud(int dostats)
   /* the 3 prompt/msg lines  */
 
   /* MSG_LIN1 */
-  if (dData.p1.str[0])
+  if (hudData.p1.str[0])
     glfRender(o.msg1.x, o.msg1.y, 0.0, 
               o.msg1.w, o.msg1.h,
-              fontFixedTxf, dData.p1.str, InfoColor, 
+              fontFixedTxf, hudData.p1.str, InfoColor, 
               NULL, TRUE, TRUE, TRUE);
 
   /* MSG_LIN2 */
-  if (dData.p2.str[0])
+  if (hudData.p2.str[0])
     glfRender(o.msg2.x, o.msg2.y, 0.0,
               o.msg2.w, o.msg2.h,
-              fontFixedTxf, dData.p2.str, InfoColor, 
+              fontFixedTxf, hudData.p2.str, InfoColor, 
               NULL, TRUE, TRUE, TRUE);
 
   /* MSG_MSG */
-  if (dData.msg.str[0])
+  if (hudData.msg.str[0])
     glfRender(o.msgmsg.x, o.msgmsg.y, 0.0, 
               o.msgmsg.w, o.msgmsg.h,
-              fontMsgTxf, dData.msg.str, InfoColor, 
+              fontMsgTxf, hudData.msg.str, InfoColor, 
               NULL, TRUE, TRUE, TRUE);
 
   /* critical/overload indicators */

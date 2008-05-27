@@ -69,7 +69,8 @@ static animStateRec_t torpAStates[MAXSHIPS + 1][MAXTORPS] = {};
 /* bomb (torp) animation state */
 static animStateRec_t bombAState[MAXSHIPS + 1] = {};
  
-dspData_t dData;
+/* global hud data */
+hudData_t hudData;
 
 int frame=0, timebase=0;
 static float FPS = 0.0;
@@ -1485,9 +1486,9 @@ int GLcvtcoords(real cenx, real ceny, real x, real y, real scale,
 void setRecId(char *str)
 {
   if (str)
-    strcpy(dData.recId.str, str);
+    strcpy(hudData.recId.str, str);
   else
-    dData.recId.str[0] = EOS;
+    hudData.recId.str[0] = EOS;
 
   return;
 }
@@ -1496,18 +1497,18 @@ void setRecId(char *str)
 void setRecTime(char *str)
 {
   if (str)
-    strcpy(dData.recTime.str, str);
+    strcpy(hudData.recTime.str, str);
   else
-    dData.recTime.str[0] = EOS;
+    hudData.recTime.str[0] = EOS;
 
   return;
 }
 
 void setXtraInfo(void)
 {
-  int l = sizeof(dData.xtrainfo.str);
+  int l = sizeof(hudData.xtrainfo.str);
 
-  snprintf(dData.xtrainfo.str, l,
+  snprintf(hudData.xtrainfo.str, l,
           "#%d#FA:#%d#%3d #%d#TA/D:#%d#%3s#%d#:#%d#%3d#%d#/#%d#%5d",
           LabelColor,
           InfoColor,
@@ -1522,17 +1523,17 @@ void setXtraInfo(void)
           InfoColor,
           Context.lasttdist);
 
-  dData.xtrainfo.str[l - 1] = 0;
+  hudData.xtrainfo.str[l - 1] = 0;
 
   return;
 }
 
 void setHeading(char *heading)
 {
-  int l = sizeof(dData.heading.heading);
-  strncpy(dData.heading.heading, heading, 
+  int l = sizeof(hudData.heading.heading);
+  strncpy(hudData.heading.heading, heading, 
           l - 1);
-  dData.heading.heading[l - 1] = 0;
+  hudData.heading.heading[l - 1] = 0;
 
   return;
 }
@@ -1544,7 +1545,7 @@ void setWarp(real warp)
 {
   static cqsHandle warpHandle = CQS_INVHANDLE;
   static cqsHandle engineHandle = CQS_INVHANDLE;
-  static const int l = sizeof(dData.warp.warp);
+  static const int l = sizeof(hudData.warp.warp);
   static int warpufx = -1;
   static int warpdfx = -1;
   static int enginefx = -1;
@@ -1574,11 +1575,11 @@ void setWarp(real warp)
     }
 
   if (warp >= 0)
-    snprintf(dData.warp.warp, l - 1, "%2.1f", warp );
+    snprintf(hudData.warp.warp, l - 1, "%2.1f", warp );
   else
-    strncpy(dData.warp.warp, "Orbit", l - 1);
+    strncpy(hudData.warp.warp, "Orbit", l - 1);
 
-  dData.warp.warp[l - 1] = 0;
+  hudData.warp.warp[l - 1] = 0;
 
   /* first, the engine sounds */
   if (warp > 0)
@@ -1663,11 +1664,11 @@ void setWarp(real warp)
 
 void setKills(char *kills)
 {
-  int l = sizeof(dData.kills.kills);
+  int l = sizeof(hudData.kills.kills);
 
-  strncpy(dData.kills.kills, kills,
+  strncpy(hudData.kills.kills, kills,
           l - 1);
-  dData.kills.kills[l - 1] = 0;
+  hudData.kills.kills[l - 1] = 0;
   
   return;
 }
@@ -1675,49 +1676,40 @@ void setKills(char *kills)
 void setFuel(int fuel, int color)
 {
 
-  dData.fuel.fuel = fuel;
-  dData.fuel.color = color;
-  dData.fuel.lcolor = color;
+  hudData.fuel.fuel = fuel;
+  hudData.fuel.color = color;
 
   return;
 }
 
 void setAlertLabel(char *buf, int color)
 {
-  int l = sizeof(dData.aStat.alertStatus);
+  int l = sizeof(hudData.aStat.alertStatus);
 
-  strncpy(dData.aStat.alertStatus, buf, l - 1);
-  dData.aStat.alertStatus[l - 1] = 0;
-  dData.aStat.color = color;
+  strncpy(hudData.aStat.alertStatus, buf, l - 1);
+  hudData.aStat.alertStatus[l - 1] = 0;
+  hudData.aStat.color = color;
 
   return;
 }
 
 void setShields(int shields, int color)
 {
-  int l = sizeof(dData.sh.label);
-
-  dData.sh.shields = shields;
-  dData.sh.color = color;
-  dData.sh.lcolor = color;
-
-  if (shields == -1)
-    strncpy(dData.sh.label, "Shields D", l - 1);
-  else
-    strncpy(dData.sh.label, "Shields U", l - 1);
+  hudData.sh.shields = shields;
+  hudData.sh.color = color;
 
   return;
 }
 
 void setAlloc(int w, int e, char *alloc)
 {
-  int l = sizeof(dData.alloc.allocstr);
+  int l = sizeof(hudData.alloc.allocstr);
 
-  snprintf(dData.alloc.allocstr, l - 1, "%5s", alloc);
-  dData.alloc.allocstr[l - 1] = 0;
+  snprintf(hudData.alloc.allocstr, l - 1, "%5s", alloc);
+  hudData.alloc.allocstr[l - 1] = 0;
 
-  dData.alloc.walloc = w;
-  dData.alloc.ealloc = e;
+  hudData.alloc.walloc = w;
+  hudData.alloc.ealloc = e;
 
   return;
 }
@@ -1730,80 +1722,65 @@ void setTemp(int etemp, int ecolor, int wtemp, int wcolor,
   if (wtemp > 100)
     wtemp = 100;
 
-  dData.etemp.etemp = etemp;
-  dData.etemp.color = ecolor;
-  dData.etemp.lcolor = ecolor;
+  hudData.etemp.etemp = etemp;
+  hudData.etemp.color = ecolor;
   if (efuse > 0)
-    dData.etemp.overl = TRUE;
+    hudData.etemp.overl = TRUE;
   else
-    dData.etemp.overl = FALSE;
+    hudData.etemp.overl = FALSE;
 
-  dData.wtemp.wtemp = wtemp;
-  dData.wtemp.color = wcolor;
-  dData.wtemp.lcolor = wcolor;
+  hudData.wtemp.wtemp = wtemp;
+  hudData.wtemp.color = wcolor;
   if (wfuse > 0)
-    dData.wtemp.overl = TRUE;
+    hudData.wtemp.overl = TRUE;
   else
-    dData.wtemp.overl = FALSE;
+    hudData.wtemp.overl = FALSE;
 
   return;
 }
 
 void setDamage(int dam, int color)
 {
-  dData.dam.damage = dam;
-  dData.dam.color = color;
-  dData.dam.lcolor = color;
-
-  return;
-}
-
-void setDamageLabel(char *buf, int color)
-{
-  int l = sizeof(dData.dam.label);
-
-  strncpy(dData.dam.label, buf, l - 1);
-  dData.dam.label[l - 1] = 0;
-
-  dData.dam.lcolor = color;
+  hudData.dam.damage = dam;
+  hudData.dam.color = color;
 
   return;
 }
 
 void setArmies(char *labelbuf, char *buf)
 {				/* this also displays robot actions... */
-  int l = sizeof(dData.armies.str);
+  int l = sizeof(hudData.armies.str);
 
-  snprintf(dData.armies.str, l - 1, "%s%s", labelbuf, buf);
-  dData.armies.str[l - 1] = 0;
+  snprintf(hudData.armies.str, l - 1, "%s%s", labelbuf, buf);
+  hudData.armies.str[l - 1] = 0;
   
   return;
 }  
 
 void setTow(char *buf)
 {
-  int l = sizeof(dData.tow.str);
+  int l = sizeof(hudData.tow.str);
 
-  strncpy(dData.tow.str, buf, l - 1);
-  dData.tow.str[l - 1] = 0;
+  strncpy(hudData.tow.str, buf, l - 1);
+  hudData.tow.str[l - 1] = 0;
 
   return;
 }
 
 void setCloakDestruct(char *buf, int color)
 {
-  int l = sizeof(dData.cloakdest.str);
+  int l = sizeof(hudData.cloakdest.str);
 
-  strncpy(dData.cloakdest.str, buf, l - 1);
-  dData.cloakdest.str[l - 1] = 0;
-  dData.cloakdest.color = color;
+  strncpy(hudData.cloakdest.str, buf, l - 1);
+  hudData.cloakdest.str[l - 1] = 0;
+  hudData.cloakdest.color = color;
 
   return;
 }
 
 void setAlertBorder(int color)
 {
-  dData.aBorder.alertColor = color;
+  hudData.aBorder.alertColor = color;
 
   return;
 }
@@ -1819,7 +1796,7 @@ void clrPrompt(int line)
 void setPrompt(int line, char *prompt, int pcolor, 
                char *buf, int color)
 {
-  int l = sizeof(dData.p1.str); 
+  int l = sizeof(hudData.p1.str); 
   char *str;
   char *pstr;
   int pl;
@@ -1830,17 +1807,17 @@ void setPrompt(int line, char *prompt, int pcolor,
   switch(line)
     {
     case MSG_LIN1:
-      str = dData.p1.str;
+      str = hudData.p1.str;
       break;
 
     case MSG_LIN2:
-      str = dData.p2.str;
+      str = hudData.p2.str;
       break;
 
     case MSG_MSG:
     default:
       color = InfoColor;
-      str = dData.msg.str;
+      str = hudData.msg.str;
       break;
     }
 
@@ -1893,27 +1870,7 @@ void dspInitData(void)
   dConf.wX = dConf.wY = 0;
   dConf.vScaleLR = dConf.vScaleSR = 1.0;
 
-  memset((void *)&dData, 0, sizeof(dspData_t));
-
-  strcpy(dData.warp.label, "Warp");
-  strcpy(dData.heading.label, "Head");
-
-  strcpy(dData.kills.label, "Kills =");
-  dData.kills.lcolor = SpecialColor;
-
-  strcpy(dData.sh.label, "Shields D");
-  dData.sh.lcolor = GreenLevelColor;
-  strcpy(dData.dam.label, "Damage  ");
-  dData.dam.lcolor = GreenLevelColor;
-  strcpy(dData.fuel.label, "Fuel    ");
-  dData.fuel.lcolor = GreenLevelColor;
-  strcpy(dData.alloc.label, "W   Alloc   E");
-  strcpy(dData.etemp.label, "E Temp   ");
-  dData.etemp.color = GreenLevelColor;
-  dData.etemp.lcolor = GreenLevelColor;
-  strcpy(dData.wtemp.label, "W Temp   ");
-  dData.wtemp.color = GreenLevelColor;
-  dData.wtemp.lcolor = GreenLevelColor;
+  memset((void *)&hudData, 0, sizeof(hudData_t));
 
   dConf.inited = False;
 

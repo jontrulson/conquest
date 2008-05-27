@@ -65,7 +65,7 @@ static int live_ships = TRUE;
 static int old_snum = 1;
 static char *nss = NULL;        /* no such ship */
 
-extern dspData_t dData;
+extern hudData_t hudData;
 
 extern int ncpSRMagFactor;
 extern int ncpLRMagFactor;

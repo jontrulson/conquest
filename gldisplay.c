@@ -656,24 +656,6 @@ void display( int snum, int display_info )
 	zzsdamage = i;
       }
 
-    if ( SREPAIR(snum) )
-      j = 'r';
-    else if ( i >= 50 )
-      j = 'D';
-    else if ( i > 0 )
-      j = 'd';
-    else
-      j = ' ';
-
-    if ( j == 'r' )
-      setDamageLabel("REPAIR", GreenLevelColor);
-    else if ( j == 'd' )
-      setDamageLabel("damage", YellowLevelColor);
-    else if ( j == 'D' )
-      setDamageLabel("DAMAGE", RedLevelColor);
-    else 
-      setDamageLabel("No Damage", GreenLevelColor);
-
     /* Armies. */
     i = Ships[snum].armies;
     if ( i == 0 )

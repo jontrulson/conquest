@@ -122,7 +122,7 @@ static char *abt = "...aborted...";
 
 static int dostats = FALSE;     /* whether to display rendering stats */
 
-extern dspData_t dData;
+extern hudData_t hudData;
 
 /* Ping status */
 static Unsgn32 pingStart = 0;
