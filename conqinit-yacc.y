@@ -1392,7 +1392,7 @@ static int str2team(char *str)
 
 /* Dump the parsed soundrc to stdout in sounddata.h format */
 /* this includes soundconf, effects, and music */
-void dumpSounhudDataHdr(void)
+void dumpSoundDataHdr(void)
 {
   char buf[MAXLINE];
   int i;
