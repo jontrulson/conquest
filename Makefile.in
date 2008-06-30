@@ -93,7 +93,7 @@ am_libUiGL_la_OBJECTS = GL.lo texfont.lo glfont.lo glmisc.lo \
 	nPlay.lo nCP.lo nDead.lo nCPHelp.lo nShipl.lo node.lo \
 	nPlanetl.lo nTeaml.lo nUserl.lo nHistl.lo glcprintf.lo \
 	gldisplay.lo render.lo nPlayBMenu.lo nPlayB.lo nPlayBHelp.lo \
-	nOptions.lo colorGL.lo anim.lo
+	nOptions.lo colorGL.lo anim.lo hud.lo
 libUiGL_la_OBJECTS = $(am_libUiGL_la_OBJECTS)
 @GLCLIENT_TRUE@am_libUiGL_la_rpath = -rpath $(libdir)
 libconqclnt_la_LIBADD =
@@ -434,7 +434,7 @@ libUiGL_la_SOURCES = GL.c texfont.c glfont.c glfont.h \
 	gldisplay.h gldisplay.c disputil.h render.h render.c \
 	nPlayBMenu.h nPlayBMenu.c nPlayB.h nPlayB.c nPlayBHelp.h \
 	nPlayBHelp.c nOptions.h nOptions.c colorGL.c ui.h anim.c anim.h \
-	GL.h
+	GL.h hud.h hud.c
 
 libUiGL_la_LDFLAGS = -version-info 1:0:0
 libUiCU_la_SOURCES = display.c cprintf.h cprintf.c disputil.h colorCU.c \
@@ -723,6 +723,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/glfont.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/glmisc.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/global.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/hud.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ibuf.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/iolb.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/meta.Plo@am__quote@

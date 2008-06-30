@@ -69,9 +69,6 @@ static animStateRec_t torpAStates[MAXSHIPS + 1][MAXTORPS] = {};
 /* bomb (torp) animation state */
 static animStateRec_t bombAState[MAXSHIPS + 1] = {};
  
-/* global hud data */
-hudData_t hudData;
-
 int frame=0, timebase=0;
 static float FPS = 0.0;
 
@@ -1528,16 +1525,6 @@ void setXtraInfo(void)
   return;
 }
 
-void setHeading(char *heading)
-{
-  int l = sizeof(hudData.heading.heading);
-  strncpy(hudData.heading.heading, heading, 
-          l - 1);
-  hudData.heading.heading[l - 1] = 0;
-
-  return;
-}
-
 #define WARP_UP     0
 #define WARP_DOWN   1
 
@@ -1545,7 +1532,6 @@ void setWarp(real warp)
 {
   static cqsHandle warpHandle = CQS_INVHANDLE;
   static cqsHandle engineHandle = CQS_INVHANDLE;
-  static const int l = sizeof(hudData.warp.warp);
   static int warpufx = -1;
   static int warpdfx = -1;
   static int enginefx = -1;
@@ -1573,13 +1559,6 @@ void setWarp(real warp)
     {
       enginefx = cqsFindEffect("engines");
     }
-
-  if (warp >= 0)
-    snprintf(hudData.warp.warp, l - 1, "%2.1f", warp );
-  else
-    strncpy(hudData.warp.warp, "Orbit", l - 1);
-
-  hudData.warp.warp[l - 1] = 0;
 
   /* first, the engine sounds */
   if (warp > 0)
@@ -1662,91 +1641,6 @@ void setWarp(real warp)
   return;
 }
 
-void setKills(char *kills)
-{
-  int l = sizeof(hudData.kills.kills);
-
-  strncpy(hudData.kills.kills, kills,
-          l - 1);
-  hudData.kills.kills[l - 1] = 0;
-  
-  return;
-}
-
-void setFuel(int fuel, int color)
-{
-
-  hudData.fuel.fuel = fuel;
-  hudData.fuel.color = color;
-
-  return;
-}
-
-void setAlertLabel(char *buf, int color)
-{
-  int l = sizeof(hudData.aStat.alertStatus);
-
-  strncpy(hudData.aStat.alertStatus, buf, l - 1);
-  hudData.aStat.alertStatus[l - 1] = 0;
-  hudData.aStat.color = color;
-
-  return;
-}
-
-void setShields(int shields, int color)
-{
-  hudData.sh.shields = shields;
-  hudData.sh.color = color;
-
-  return;
-}
-
-void setAlloc(int w, int e, char *alloc)
-{
-  int l = sizeof(hudData.alloc.allocstr);
-
-  snprintf(hudData.alloc.allocstr, l - 1, "%5s", alloc);
-  hudData.alloc.allocstr[l - 1] = 0;
-
-  hudData.alloc.walloc = w;
-  hudData.alloc.ealloc = e;
-
-  return;
-}
-
-void setTemp(int etemp, int ecolor, int wtemp, int wcolor, 
-             int efuse, int wfuse)
-{
-  if (etemp > 100)
-    etemp = 100;
-  if (wtemp > 100)
-    wtemp = 100;
-
-  hudData.etemp.etemp = etemp;
-  hudData.etemp.color = ecolor;
-  if (efuse > 0)
-    hudData.etemp.overl = TRUE;
-  else
-    hudData.etemp.overl = FALSE;
-
-  hudData.wtemp.wtemp = wtemp;
-  hudData.wtemp.color = wcolor;
-  if (wfuse > 0)
-    hudData.wtemp.overl = TRUE;
-  else
-    hudData.wtemp.overl = FALSE;
-
-  return;
-}
-
-void setDamage(int dam, int color)
-{
-  hudData.dam.damage = dam;
-  hudData.dam.color = color;
-
-  return;
-}
-
 void setArmies(char *labelbuf, char *buf)
 {				/* this also displays robot actions... */
   int l = sizeof(hudData.armies.str);
@@ -1774,13 +1668,6 @@ void setCloakDestruct(char *buf, int color)
   strncpy(hudData.cloakdest.str, buf, l - 1);
   hudData.cloakdest.str[l - 1] = 0;
   hudData.cloakdest.color = color;
-
-  return;
-}
-
-void setAlertBorder(int color)
-{
-  hudData.aBorder.alertColor = color;
 
   return;
 }

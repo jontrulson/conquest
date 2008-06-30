@@ -29,8 +29,7 @@
 #include "textures.h"
 #include "anim.h"
 #include "GL.h"
-
-extern hudData_t hudData;
+#include "hud.h"
 
 #define GLCOLOR4F(glcol) glColor4f(glcol.r, glcol.g, glcol.b, glcol.a) 
 
@@ -527,25 +526,6 @@ void updateIconHudGeo(int snum)
 
 }
 
-void renderScaleVal(GLfloat x, GLfloat y, GLfloat w, GLfloat h, 
-                    TexFont *lfont, int val, int col, int boxcol)
-{
-  static char buf32[32];
-  static int oldval = -1;
-
-  if (val != oldval)
-    {
-      snprintf(buf32, 32 - 1, "%3d", val);
-      oldval = val;
-    }
-
-  /* a scale value (number) */
-  glfRender(x, y, 0.0, w, h, lfont, buf32, col, NULL,
-            TRUE, FALSE, TRUE);
-  return;
-}
-
-
 /* draw overload/critical  messages using a 'pulse' effect
    in the viewer.  Use a slower pulse for 'critical' levels, except
    for hull critical. */
@@ -609,7 +589,7 @@ void renderPulseMsgs(void)
     }
 
   if (testlamps || hudData.alloc.ealloc <= 0 || hudData.alloc.walloc <= 0 ||
-      hudData.etemp.etemp > E_CRIT  || hudData.wtemp.wtemp > W_CRIT ||
+      hudData.etemp.temp > E_CRIT  || hudData.wtemp.temp > W_CRIT ||
       hudData.fuel.fuel < F_CRIT || 
       (hudData.sh.shields <= SH_CRIT && 
        SSHUP(Context.snum) && !SREPAIR(Context.snum)) ||
@@ -652,7 +632,7 @@ void renderPulseMsgs(void)
                 0, &engfail.state.col, 
                 TRUE, FALSE, TRUE);
     }      
-  else if (hudData.etemp.etemp > E_CRIT)
+  else if (hudData.etemp.temp > E_CRIT)
     {
       if (ANIM_EXPIRED(&engcrit))
         {
@@ -683,7 +663,7 @@ void renderPulseMsgs(void)
                 TRUE, FALSE, TRUE);
 
     }      
-  else if (hudData.wtemp.wtemp > W_CRIT)
+  else if (hudData.wtemp.temp > W_CRIT)
     {
       if (ANIM_EXPIRED(&wepcrit))
         {
@@ -822,7 +802,7 @@ void renderHud(int dostats)
   drawLineBox(o.alertb.x, o.alertb.y, 
               o.alertb.w,
               o.alertb.h,
-              hudData.aBorder.alertColor,
+              hudData.aStat.color,
               2.0);
 
 
@@ -830,8 +810,8 @@ void renderHud(int dostats)
 
   /* heading val */
   glfRender(o.headl.x, o.headl.y, 0.0, o.headl.w, 
-            o.headl.h, fontLargeTxf, hudData.heading.heading, 
-            NoColor, NULL, TRUE, FALSE, TRUE);
+            o.headl.h, fontLargeTxf, hudData.heading.headstr, 
+            hudData.heading.color, NULL, TRUE, FALSE, TRUE);
 
   /* warp background */
   /* kindof sucky to do this here, but since we are drawing a quad
@@ -849,7 +829,8 @@ void renderHud(int dostats)
   /* warp val */
   glfRender(o.warpl.x, o.warpl.y, 0.0, 
             o.warpl.w, o.warpl.h,
-            fontLargeTxf, hudData.warp.warp, InfoColor, NULL, TRUE, FALSE, TRUE);
+            fontLargeTxf, hudData.warp.warpstr, 
+            hudData.warp.color, NULL, TRUE, FALSE, TRUE);
   
   /* warp quad indicator color */
   
@@ -867,11 +848,10 @@ void renderHud(int dostats)
                 0, 100, hudData.sh.shields, hudData.sh.color);
   
   /* shields num */
-  renderScaleVal(o.d1shn.x, o.d1shn.y,
-                 o.d1shn.w, o.d1shn.h,
-                 fontFixedTxf, 
-                 (hudData.sh.shields < 0) ? 0 : hudData.sh.shields, 
-                  hudData.sh.color, NoColor);
+  glfRender(o.d1shn.x, o.d1shn.y, 0.0, o.d1shn.w, o.d1shn.h, 
+            fontFixedTxf, 
+            hudData.sh.shieldstr, hudData.sh.color, 
+            NULL, TRUE, FALSE, TRUE);
 
   /* shield charging status */
   if (!SSHUP(Context.snum) || SREPAIR(Context.snum))
@@ -883,40 +863,40 @@ void renderHud(int dostats)
               0, 100, hudData.dam.damage, hudData.dam.color);
 
   /* damage num */
-  renderScaleVal(o.d1damn.x, o.d1damn.y,
-                 o.d1damn.w, o.d1damn.h,
-                 fontFixedTxf, hudData.dam.damage, hudData.dam.color,
-                 NoColor);
+  glfRender(o.d1damn.x, o.d1damn.y, 0.0, o.d1damn.w, o.d1damn.h, 
+            fontFixedTxf, 
+            hudData.dam.damagestr, hudData.dam.color, 
+            NULL, TRUE, FALSE, TRUE);
 
   /* fuel guage */
   renderScale(o.d2fuelg.x, o.d2fuelg.y, o.d2fuelg.w, o.d2fuelg.h,
               0, 999, hudData.fuel.fuel, hudData.fuel.color);
   
   /* fuel value */
-  renderScaleVal(o.d2fueln.x, o.d2fueln.y,
-                 o.d2fueln.w, o.d2fueln.h,
-                 fontFixedTxf, hudData.fuel.fuel, hudData.fuel.color,
-                 NoColor);
+  glfRender(o.d2fueln.x, o.d2fueln.y, 0.0, o.d2fueln.w, o.d2fueln.h, 
+            fontFixedTxf, 
+            hudData.fuel.fuelstr, hudData.fuel.color, 
+            NULL, TRUE, FALSE, TRUE);
 
   /* etemp guage */
   renderScale(o.d2engtg.x, o.d2engtg.y, o.d2engtg.w, o.d2engtg.h,
-              0, 100, hudData.etemp.etemp, hudData.etemp.color);
+              0, 100, hudData.etemp.temp, hudData.etemp.color);
 
   /* etemp value */
-  renderScaleVal(o.d2engtn.x, o.d2engtn.y,
-                 o.d2engtn.w, o.d2engtn.h,
-                 fontFixedTxf, hudData.etemp.etemp, hudData.etemp.color,
-                 BlueColor);
+  glfRender(o.d2engtn.x, o.d2engtn.y, 0.0, o.d2engtn.w, o.d2engtn.h, 
+            fontFixedTxf, 
+            hudData.etemp.tempstr, hudData.etemp.color, 
+            NULL, TRUE, FALSE, TRUE);
 
   /* wtemp gauge */
   renderScale(o.d2weptg.x, o.d2weptg.y, o.d2weptg.w, o.d2weptg.h,
-              0, 100, hudData.wtemp.wtemp, hudData.wtemp.color);
+              0, 100, hudData.wtemp.temp, hudData.wtemp.color);
 
   /* wtemp value*/
-  renderScaleVal(o.d2weptn.x, o.d2weptn.y,
-                 o.d2weptn.w, o.d2weptn.h,
-                 fontFixedTxf, hudData.wtemp.wtemp, hudData.wtemp.color,
-                 BlueColor);
+  glfRender(o.d2weptn.x, o.d2weptn.y, 0.0, o.d2weptn.w, o.d2weptn.h, 
+            fontFixedTxf, 
+            hudData.wtemp.tempstr, hudData.wtemp.color, 
+            NULL, TRUE, FALSE, TRUE);
 
   /* alloc */
   renderAlloc(o.d2allocg.x, o.d2allocg.y, o.d2allocg.w, o.d2allocg.h,
@@ -925,7 +905,7 @@ void renderHud(int dostats)
   
   /* alloc value */
   glfRender(o.d2allocn.x, o.d2allocn.y, 0.0, o.d2allocn.w, o.d2allocn.h, 
-            fontFixedTxf, hudData.alloc.allocstr, InfoColor, 
+            fontFixedTxf, hudData.alloc.allocstr, hudData.alloc.color, 
             NULL, TRUE, FALSE, TRUE);
   
   /* BEGIN "stat" box -
@@ -935,13 +915,15 @@ void renderHud(int dostats)
 
   glfRender(o.d2killb.x, o.d2killb.y, 0.0, 
             o.d2killb.w, 
-            o.d2killb.h, fontFixedTxf, hudData.kills.kills, InfoColor, NULL,
+            o.d2killb.h, fontFixedTxf, 
+            hudData.kills.killstr, 
+            hudData.kills.color, NULL,
             TRUE, TRUE, TRUE);
 
   magFac = (!SMAP(Context.snum)) ? ncpSRMagFactor : ncpLRMagFactor;
   /* towed-towing/armies/destruct/alert - blended text displayed in viewer */
   if (magFac || hudData.tow.str[0] || hudData.armies.str[0] || 
-      hudData.cloakdest.str[0] == 'D' || hudData.aStat.alertStatus[0])
+      hudData.cloakdest.str[0] == 'D' || hudData.aStat.alertstr[0])
     {
       /* we want to use blending for these */
 
@@ -978,12 +960,12 @@ void renderHud(int dostats)
         }
 
       /* alert target */
-      if (hudData.aStat.alertStatus[0])
+      if (hudData.aStat.alertLevel != GREEN_ALERT)
         {
-          switch(hudData.aStat.alertStatus[0])  /* define alert decal */
-            {                       /* need to blink these */
-            case 'R':               /* red alert (not Alert) */
-            case 'Y':               /* yellow alert (not Prox) */
+          switch(hudData.aStat.alertLevel)  /* define alert decal */
+            {                               /* need to blink these */
+            case PHASER_ALERT:               /* red alert (not Alert) */
+            case YELLOW_ALERT:               /* yellow alert (not Prox) */
               icl = (GL_BLINK_HALFSEC) ? hudData.aStat.color & ~CQC_A_BOLD : 
                 hudData.aStat.color | CQC_A_BOLD;
               break;
@@ -994,7 +976,7 @@ void renderHud(int dostats)
           
           glfRender(o.d1atarg.x, o.d1atarg.y, 0.0, 
                     o.d1atarg.w, o.d1atarg.h, 
-                    fontLargeTxf, hudData.aStat.alertStatus, 
+                    fontLargeTxf, hudData.aStat.alertstr, 
                     icl | 0x50000000, NULL, TRUE, FALSE, TRUE);
         }
 
@@ -1030,7 +1012,8 @@ void renderHud(int dostats)
     another idea - play sound whenever near a cloaked ship and
     (CLOAKED) displays if info gotten
   */
-  if (hudData.aStat.alertStatus[0] == 'R' || hudData.aStat.alertStatus[0] == 'A')
+  if (hudData.aStat.alertLevel == PHASER_ALERT || 
+      hudData.aStat.alertLevel == RED_ALERT)
     {                   /* alert condition red - check klaxon state */
       if (alertHandle == CQS_INVHANDLE) /* not playing now */
         {

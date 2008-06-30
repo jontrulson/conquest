@@ -30,6 +30,7 @@
 
 #include "cqsound.h"
 
+#include "hud.h"
 
 #include <GL/gl.h>
 #include <GL/glu.h>
@@ -37,41 +38,13 @@
 
 
 
-#define GREEN_ALERT 0
-#define YELLOW_ALERT 1
-#define RED_ALERT 2
-
 #define DS_LIVE_STR "DS_LIVE"
 #define DS_OFF_STR  "DS_OFF"
 
 /* Global to this module */
 
-static int AlertLevel = GREEN_ALERT;
+static alertLevel_t AlertLevel = GREEN_ALERT;
 extern real LastPhasDist;	/* defined in conqlb.c */
-
-static int alertcolor(int alert)
-{
-  int theattrib = 0;
-  
-  switch (alert)
-    {
-    case GREEN_ALERT:
-      theattrib = GreenLevelColor;
-      break;
-    case YELLOW_ALERT:
-      theattrib = YellowLevelColor;
-      break;
-    case RED_ALERT:
-      theattrib = RedLevelColor;
-      break;
-    default:
-      clog("alertcolor(): invalid alert level: %d", alert);
-      break;
-    }
-
-  return(theattrib);
-}
-
 
 /*  display - do one update of a ships screen */
 /*  SYNOPSIS */
@@ -79,28 +52,14 @@ static int alertcolor(int alert)
 /*    display( snum, display_info ) */
 void display( int snum, int display_info )
 {
-  int i, j, k, minenemy, minsenemy;
-  int outattr = 0;
-  static int OldAlert = 0;
+  int i, j, minenemy, minsenemy;
   char ch, buf[MSGMAXLINE];
   int dobeep, lsmap;
   int palertcol;
-  real x, scale, cenx, ceny, dis, mindis, minsdis;
-  static real zzskills = -20.0, 
-    zzswarp = 92.0; /* "Warp 92 Mr. Sulu." */
-  static char zzbuf[MSGMAXLINE] = "";
-  static int zzsshields = -9, zzshead = 999, 
-    zzsfuel = -99;
-  static int zzsweapons = -1, zzsengines = -1, zzsdamage = -1, 
-    zzsarmies = -1701;
-  static int zzsetemp = 0, zzswtemp = 0, 
-    zzssdfuse = -9;
-  static real prevsh = 0.0 , prevdam = 100.0 ;
-  static int ShieldAttrib = 0;
-  static int FuelAttrib = 0;
-  static int WeapAttrib = 0;
-  static int EngAttrib = 0;
-  static int DamageAttrib = 0;
+  real scale, cenx, ceny, dis, mindis, minsdis;
+  static int zzsarmies = -1701;
+  static int zzssdfuse = -9;
+  real prevdam;
   static int talertfx = -1;
   int color;
   GLfloat glx, gly;
@@ -109,7 +68,8 @@ void display( int snum, int display_info )
       talertfx = cqsFindEffect("torp-alert");
 
   setXtraInfo();
-  setAlertBorder(alertcolor(AlertLevel));
+
+  hudSetAlertStatus(snum, 0, AlertLevel);
 
   dobeep = FALSE;
   mindis = 1.0e6;
@@ -409,7 +369,8 @@ void display( int snum, int display_info )
     }
   
   
-  /* Construct alert status line. */
+  /* Figure out the ship's current alert status, and the ship causing the
+   *  alert, if needed */
   buf[0] = EOS;
 
   if (snum > 0)
@@ -419,58 +380,41 @@ void display( int snum, int display_info )
 	  if ( mindis <= PHASER_DIST )
 	    {
 	      /* Nearest enemy is very close. */
-	      outattr = RedLevelColor;
-	      AlertLevel = RED_ALERT;
-	      c_strcpy( "RED ALERT ", buf );
+	      AlertLevel = PHASER_ALERT;
 	      dobeep = TRUE;
 	    }
 	  else if ( mindis < ALERT_DIST )
 	    {
 	      /* Nearest enemy is close. */
-	      outattr = RedLevelColor;
 	      AlertLevel = RED_ALERT;
-	      c_strcpy( "Alert ", buf );
 	      dobeep = TRUE;
 	    }
 	  else if ( STALERT(snum) )
 	    {
 	      /* Nearby torpedos. */
-	      outattr = YellowLevelColor;
-	      AlertLevel = YELLOW_ALERT;
-	      c_strcpy( "Torp Alert", buf );
 	      minenemy = 0;			/* disable nearby enemy code */
               cqsEffectPlay(talertfx, 0, 0, 0);
 
+	      AlertLevel = TORP_ALERT;
 	      dobeep = TRUE;
 	    }
 	  else if ( mindis < YELLOW_DIST )
 	    {
 	      /* Near an enemy. */
-	      outattr = YellowLevelColor;
 	      AlertLevel = YELLOW_ALERT;
-	      c_strcpy( "Yellow alert ", buf );
 	    }
 	  else if ( minsenemy != 0 )
 	    {
 	      /* An enemy near one of our ships or planets. */
-	      outattr = YellowLevelColor;
 	      minenemy = minsenemy;		/* for cloaking code below */
-	      AlertLevel = YELLOW_ALERT;
-	      c_strcpy( "Proximity Alert ", buf );
+	      AlertLevel = PROXIMITY_ALERT;
 	    }
 	  else
 	    {
-	      outattr = GreenLevelColor;
 	      AlertLevel = GREEN_ALERT;
 	      minenemy = 0;
 	    }
-	  
-	  if ( minenemy != 0 )
-	    {
-	      appship( minenemy, buf );
-	      if ( SCLOAKED(minenemy) )
-		appstr( " (CLOAKED)", buf );
-	    }
+
 	}
       else
 	AlertLevel = GREEN_ALERT;
@@ -478,255 +422,118 @@ void display( int snum, int display_info )
   else /* if snum < 0 */
     AlertLevel = GREEN_ALERT;	/* for a special */
 
-  if (OldAlert != AlertLevel)
-    {
-      setXtraInfo();
-      setAlertBorder(alertcolor(AlertLevel));
-      OldAlert = AlertLevel;
-    }
-  
-  if (UserConf.AltHUD || (strcmp( buf, zzbuf ) != 0))
-    {
-      setXtraInfo();
-      setAlertLabel(buf, outattr);
-      c_strcpy( buf, zzbuf );
-    }
+  hudSetAlertStatus(snum, minenemy, AlertLevel);
   
   /* Build and display the status info as necessary. */
   if (snum > 0) 
     {                           /* we're watching a ship - dwp */
-    /* Shields. */
-    if ( Ships[snum].shields < prevsh )
-      dobeep = TRUE;
-    prevsh = Ships[snum].shields;
-    
-    i = k = round( Ships[snum].shields );
-    if ( ! SSHUP(snum) || SREPAIR(snum) )
-      i = -1;
-    if ( i != zzsshields || i == -1)
-      {
-        if (k >= 0 && k <= 50)
-          ShieldAttrib = RedLevelColor;
-        else if (k >=51 && k <=80)
-          ShieldAttrib = YellowLevelColor;
-        else if (k >= 81)
-          ShieldAttrib = GreenLevelColor;
-        
-        setShields(i, ShieldAttrib);
-	zzsshields = i;
-      }
-    
-    /* Kills. */
-    x = (Ships[snum].kills + Ships[snum].strkills);
-    if ( x != zzskills )
-      {
-	sprintf( buf, "%0.1f", oneplace(x) );
-	
-	setKills(buf);
-	
-	zzskills = x;
-      }
-    
-    /* Warp. */
-    x = Ships[snum].warp;
-    if ( x != zzswarp )
-      {
-        setWarp(x);
-	zzswarp = x;
-      }
-    
-    /* Heading. */
-    i = Ships[snum].lock;
-    if ( i >= 0 || Ships[snum].warp < 0.0)
-      i = round( Ships[snum].head );
-    if ( i != zzshead)
-      {
-	if ( -i > 0 && -i <= NUMPLANETS)
-	  sprintf( buf, "%.3s", Planets[-i].name );
-	else
-	  sprintf( buf, "%3d", i );
-	setHeading(buf);
-	zzshead = i;
-      }
-    
-    /* Fuel. */
-    i = round( Ships[snum].fuel );
-    if ( i != zzsfuel )
-      {
-	if (i >= 0 && i <= 200)
-	  FuelAttrib = RedLevelColor;
-	else if (i >=201 && i <=500)
-	  FuelAttrib = YellowLevelColor;
-	else if (i >= 501)
-	  FuelAttrib = GreenLevelColor;
-	
-	setFuel(i, FuelAttrib);
-	zzsfuel = i;
-      }
-    
-    /* Allocation. */
-    i = Ships[snum].weapalloc;
-    j = Ships[snum].engalloc;
-    if ( Ships[snum].wfuse > 0 )
-      i = 0;
-    if ( Ships[snum].efuse > 0 )
-      j = 0;
-    if ( i != zzsweapons || j != zzsengines )
-      {
-	buf[0] = EOS;
-	if ( i == 0 )
-	  appstr( "**", buf );
-	else
-	  appint( i, buf );
-	appchr( '/', buf );
-	if ( j == 0 )
-	  appstr( "**", buf );
-	else
-	  appint( j, buf );
-	setAlloc(i, j, buf);
-	zzsweapons = i;
-      }
-    
-    /* Temperature. */
-    i = round( Ships[snum].wtemp );
-    j = round( Ships[snum].etemp );
-    if ( i > 100 )
-      i = 100;
-    if ( j > 100 )
-      j = 100;
-    if ( i != zzswtemp || j != zzsetemp )
-      {
-	if ( i != 0 || j != 0 )
-	  {
-	    buf[0] = EOS;
-	    
-	    if (i >= 0 && i <= 50)
-	      WeapAttrib = GreenLevelColor;
-	    else if (i >=51 && i <=75)
-	      WeapAttrib = YellowLevelColor;
-	    else if (i >= 76)
-	      WeapAttrib = RedLevelColor;
-	    
-	    if (j >= 0 && j <= 50)
-	      EngAttrib = GreenLevelColor;
-	    else if (j >=51 && j <=80)
-	      EngAttrib = YellowLevelColor;
-	    else if (j >= 81)
-	      EngAttrib = RedLevelColor;
-	    
-	    setTemp(j, EngAttrib, i, WeapAttrib, Ships[snum].efuse,
-		     Ships[snum].wfuse);
-	    
-	  }
-	else
-	  setTemp(0, GreenLevelColor, 0, GreenLevelColor, 0, 0);
-	    
-	zzswtemp = i;
-	zzsetemp = j;
-      }
-    
-    /* Damage/repair. */
-    if ( Ships[snum].damage > prevdam )
-      {
-        if ( (Ships[snum].damage - prevdam) > 5 )
-          cqsEffectPlay(teamEffects[Ships[snum].team].hit, 0, 0, 0);
+      /* Shields. 
+       * this will set dobeep if the shields dropped in power since last
+       *  update 
+       */
+      hudSetShields(snum, &dobeep);
 
-        dobeep = TRUE;
-      }
-    prevdam = Ships[snum].damage;
-    
-    i = round( Ships[snum].damage );
-    if ( i != zzsdamage )
-      {
-	if ( i > 0 )
-	  {
-	    sprintf( buf, "%d", i );
-	    if (i >= 0 && i <= 10)
-	      DamageAttrib = GreenLevelColor;
-	    else if (i >=11 && i <=65)
-	      DamageAttrib = YellowLevelColor;
-	    else if (i >= 66)
-	      DamageAttrib = RedLevelColor;
-	  
-	    setDamage(i, DamageAttrib);
+      /* Kills. */
+      hudSetKills(snum);
 
-	  }
-	else
-	  setDamage(0, GreenLevelColor);
-	zzsdamage = i;
-      }
+      /* Warp. */
+      hudSetWarp(snum);
+      
+      /* Heading. */
+      hudSetHeading(snum);
+      
+      /* Fuel. */
+      hudSetFuel(snum);
 
-    /* Armies. */
-    i = Ships[snum].armies;
-    if ( i == 0 )
-      i = -Ships[snum].action;
-    if ( i != zzsarmies )
-      {
-	if ( i > 0 )
-	  {
-	    sprintf( buf, "%2d ", i );
-	    setArmies(buf, "armies");
-	  }
-	else if ( i < 0 )
-	  {
-	    robstr( -i, buf );
-	    setArmies("", buf);
-	  }
-	else
-	  setArmies("", "");
+      /* Allocation. */
 
-	zzsarmies = i;
-      }
-  
-    /* Tractor beams. */
-    i = Ships[snum].towedby;
-    if ( i == 0 )
-      i = -Ships[snum].towing;
-    
-    if ( i == 0 )
-      {
-        buf[0] = EOS;
-      }
-    else if ( i < 0 )
-      {
-        c_strcpy( "towing ", buf );
-        appship( -i, buf );
-      }
-    else if ( i > 0 )
-      {
-        c_strcpy( "towed by ", buf );
-        appship( i, buf );
-      }
-    setTow(buf);
-  
-    /* Self destruct fuse. */
-    if ( SCLOAKED(snum) )
-      i = -1;
-    else
-      i = max( 0, Ships[snum].sdfuse );
-    if ( i != zzssdfuse )
-      {
-	if ( i > 0 )
-	  {
-	    sprintf( buf, "DESTRUCT MINUS %3d", i );
-	    setCloakDestruct(buf, RedLevelColor);
-	  }
-	else if ( i == -1 )
-	  {
-	    setCloakDestruct(" CLOAKED ", MagentaColor);
-	  }
-	else 
-	  {
-	    setCloakDestruct("", NoColor);
-	  }
-	zzssdfuse = i;
-      }
-  
-    if ( dobeep )
-      if ( UserConf.DoAlarms )
-	mglBeep(MGL_BEEP_ALERT);
-  
-  } /* end of ship stats display */
+      hudSetAlloc(snum);
+
+      /* Temperature. */
+      hudSetTemps(snum);
+
+      /* Damage/repair. */
+      hudSetDamage(snum, &prevdam);
+
+      if ( Ships[snum].damage > prevdam )
+        {
+          if ( (Ships[snum].damage - prevdam) > 5.0 )
+            cqsEffectPlay(teamEffects[Ships[snum].team].hit, 0, 0, 0);
+          
+          dobeep = TRUE;
+        }
+      
+      /* Armies. */
+      i = Ships[snum].armies;
+      if ( i == 0 )
+        i = -Ships[snum].action;
+      if ( i != zzsarmies )
+        {
+          if ( i > 0 )
+            {
+              sprintf( buf, "%2d ", i );
+              setArmies(buf, "armies");
+            }
+          else if ( i < 0 )
+            {
+              robstr( -i, buf );
+              setArmies("", buf);
+            }
+          else
+            setArmies("", "");
+          
+          zzsarmies = i;
+        }
+      
+      /* Tractor beams. */
+      i = Ships[snum].towedby;
+      if ( i == 0 )
+        i = -Ships[snum].towing;
+      
+      if ( i == 0 )
+        {
+          buf[0] = EOS;
+        }
+      else if ( i < 0 )
+        {
+          c_strcpy( "towing ", buf );
+          appship( -i, buf );
+        }
+      else if ( i > 0 )
+        {
+          c_strcpy( "towed by ", buf );
+          appship( i, buf );
+        }
+      setTow(buf);
+      
+      /* Self destruct fuse. */
+      if ( SCLOAKED(snum) )
+        i = -1;
+      else
+        i = max( 0, Ships[snum].sdfuse );
+      if ( i != zzssdfuse )
+        {
+          if ( i > 0 )
+            {
+              sprintf( buf, "DESTRUCT MINUS %3d", i );
+              setCloakDestruct(buf, RedLevelColor);
+            }
+          else if ( i == -1 )
+            {
+              setCloakDestruct(" CLOAKED ", MagentaColor);
+            }
+          else 
+            {
+              setCloakDestruct("", NoColor);
+            }
+          zzssdfuse = i;
+        }
+      
+      if ( dobeep )
+        if ( UserConf.DoAlarms )
+          mglBeep(MGL_BEEP_ALERT);
+      
+    } /* end of ship stats display */
   
   return;
   

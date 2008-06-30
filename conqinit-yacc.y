@@ -695,7 +695,7 @@ static int _cqiFindTexture(char *texname)
   return -1;
 }
 
-/* search the 'public' planet list */
+/* search the public tex area list */
 cqiTextureAreaPtr_t cqiFindTexArea(char *texnm, char *tanm, 
                                    cqiTextureAreaPtr_t defaultta)
 {

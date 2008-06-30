@@ -14,6 +14,7 @@
 #include <GL/glx.h>
 
 #include "textures.h"
+#include "hud.h"
 
 typedef struct _dspConfig {
   Bool inited;
@@ -55,125 +56,6 @@ extern Unsgn32     frameTime;
 #endif
 
 
-/* cockpit display items */
-struct _warp {
-  char warp[16];
-  int color;
-};
-
-struct _heading {
-  char heading[16];
-  int color;
-};
-
-struct _kills {
-  char kills[16];
-  int color;
-};
-
-struct _alertStatus {
-  char alertStatus[64];
-  int color;
-};
-
-struct _alertBorder {
-  int alertColor;
-};
-
-struct _shields {
-  int shields;
-  int color;
-};
-
-struct _damage {
-  int damage;
-  int color;
-};
-
-struct _fuel {
-  int fuel;
-  int color;
-};
-
-struct _alloc {
-  char allocstr[16];
-  int walloc, ealloc;
-  int color;
-};
-
-struct _etemp {
-  int etemp;
-  int color;
-  int overl;
-};
-
-struct _wtemp {
-  int wtemp;
-  int color;
-  int overl;
-};
-
-struct _tow {
-  char str[32];
-  int color;
-};
-
-struct _armies {
-  char str[16];
-  char label[32];
-  int color;
-};
-
-struct _cloakdest {             /* cloak OR destruct msg */
-  char str[32];
-  int color;
-  int bgcolor;
-};
-
-/* prompt areas */
-
-struct _prompt_lin {
-  char str[1024];
-};
-
-struct _xtrainfo {
-  char str[256];
-};
-
-struct _recId {
-  char str[256];
-};
-
-struct _recTime {
-  char str[256];
-};
-
-
-/* This holds all of the info for the cockpit display. */
-typedef struct _dspData {
-  struct _warp warp;
-  struct _heading heading;
-  struct _kills kills;
-  struct _alertStatus aStat;
-  struct _alertBorder aBorder;
-  struct _shields sh;
-  struct _damage dam;
-  struct _fuel fuel;
-  struct _alloc alloc;
-  struct _etemp etemp;
-  struct _wtemp wtemp;
-  struct _tow tow;
-  struct _armies armies;
-  struct _cloakdest cloakdest;
-  struct _prompt_lin p1;
-  struct _prompt_lin p2;
-  struct _prompt_lin msg;
-  struct _xtrainfo xtrainfo;
-  struct _recId recId;
-  struct _recTime recTime;
-} hudData_t;
-
-
 /* a generic GL rectangle struct */
 typedef struct _gl_box
 {
@@ -213,27 +95,12 @@ void drawNEB(int snum);
 void clrPrompt(int line);
 void setPrompt(int line, char *prompt, int pcolor,
                char *buf, int color);
-void setHeading(char *);
-void setWarp(real);
-void setKills(char *);
-void setFuel(int, int);
-void setShields(int, int);
-void setAlloc(int w, int e, char *alloc);
-void setTemp(int etemp, int ecolor, int wtemp, int wcolor, 
-	      int efuse, int wfuse);
-void setDamage(int dam, int color);
-void setDamageLabel(char *buf, int color);
 void setArmies(char *labelbuf, char *buf);
 void setCloakDestruct(char *buf, int color);
 void setTow(char *buf);
-void setAlertBorder(int color);
-void setAlertLabel(char *buf, int color);
 void setRecTime(char *str);
 void setRecId(char *str);
 
-
-void setPrompt(int line, char *prompt, int pcolor,
-               char *buf, int color);
 float getFPS(void);
 
 void drawLine(GLfloat x, GLfloat y, GLfloat len, GLfloat lw);

@@ -41,6 +41,8 @@
 #include "GL.h"
 #include "nCP.h"
 
+#include "hud.h"
+
 #include "cqsound.h"
 
 /* node specific states */
@@ -141,6 +143,9 @@ static cqsHandle beamHandle = CQS_INVHANDLE;
 /* current SR and LR magnification factors. (-5-5) */
 int ncpLRMagFactor = 0;
 int ncpSRMagFactor = 0;
+
+extern void setWarp(real warp); /* FIXME - GL.c */
+
 
 /* common output */
 #define cp_putmsg(str, lin)  setPrompt(lin, NULL, NoColor, str, NoColor)
@@ -2656,6 +2661,9 @@ void nCPInit(int istopnode)
   lastphase = Ships[Context.snum].lastphase;
   pingPending = FALSE;
   pingStart = 0;
+
+  /* init the hud */
+  hudInitData();
 
   /* clear the prompt lines */
   clrPrompt(MSG_LIN1);
