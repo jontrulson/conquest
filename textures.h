@@ -40,17 +40,17 @@ int findGLTexture(char *texname);
 #define HAS_GLCOLOR(x) ((x)->a || (x)->r || (x)->g || (x)->b)
 
 /* ico texture identifiers for drawIconHUDDecal() */
-#define HUD_ICO        0
-#define HUD_SHI        1
-#define HUD_DECAL1     2
-#define HUD_DECAL2     3
-#define HUD_HEAD       4
-#define HUD_HDP        5
-#define HUD_WARP       6
-#define HUD_WARP2      7
-#define HUD_ICLOAK     12 
-#define HUD_IREPAIR    20
-#define HUD_ITORPIN    21
+#define TEX_HUD_ICO        0
+#define TEX_HUD_SHI        1
+#define TEX_HUD_DECAL1     2
+#define TEX_HUD_DECAL2     3
+#define TEX_HUD_HEAD       4
+#define TEX_HUD_HDP        5
+#define TEX_HUD_WARP       6
+#define TEX_HUD_WARP2      7
+#define TEX_HUD_ICLOAK     12 
+#define TEX_HUD_IREPAIR    20
+#define TEX_HUD_ITORPIN    21
 
 void drawIconHUDDecal(GLfloat rx, GLfloat ry, GLfloat w, GLfloat h, 
                   int imgp, cqColor icol);

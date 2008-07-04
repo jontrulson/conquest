@@ -387,8 +387,8 @@ static void _dispUserOptsMenu(void)
   
   if (!prompting)
     {
-      clrPrompt(MSG_LIN1);
-      clrPrompt(MSG_LIN2);
+      hudClearPrompt(MSG_LIN1);
+      hudClearPrompt(MSG_LIN2);
       cprintf(MSG_LIN2, 0, ALIGN_NONE, prompt);
     }
   

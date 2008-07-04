@@ -92,8 +92,8 @@ void drawDoomsday(GLfloat x, GLfloat y, GLfloat angle, GLfloat scale);
 void drawViewerBG(int snum, int dovbg);
 void drawNEB(int snum);
 
-void clrPrompt(int line);
-void setPrompt(int line, char *prompt, int pcolor,
+void hudClearPrompt(int line);
+void hudSetPrompt(int line, char *prompt, int pcolor,
                char *buf, int color);
 void setArmies(char *labelbuf, char *buf);
 void setCloakDestruct(char *buf, int color);

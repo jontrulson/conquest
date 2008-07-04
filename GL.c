@@ -55,6 +55,7 @@ extern void conqend(void);
 #include "conquest.h"
 
 #include "cqsound.h"
+#include "hud.h"
 
 
 /* torp direction tracking */
@@ -817,34 +818,34 @@ void drawIconHUDDecal(GLfloat rx, GLfloat ry, GLfloat w, GLfloat h,
 
   switch (imgp)
     {
-    case HUD_ICO:
+    case TEX_HUD_ICO:
       id = GLShips[steam][stype].ico;
       break;
-    case HUD_SHI:
+    case TEX_HUD_SHI:
       id = GLShips[steam][stype].ico_sh;
       break;
-    case HUD_DECAL1:
+    case TEX_HUD_DECAL1:
       id = GLShips[steam][stype].decal1;
       break;
-    case HUD_DECAL2:
+    case TEX_HUD_DECAL2:
       id = GLShips[steam][stype].decal2;
       break;
-    case HUD_HEAD:
+    case TEX_HUD_HEAD:
       id = GLShips[steam][stype].dial;
       break;
-    case HUD_HDP:    
+    case TEX_HUD_HDP:    
       id = GLShips[steam][stype].dialp;
       break;
-    case HUD_WARP:   
+    case TEX_HUD_WARP:   
       id = GLShips[steam][stype].warp;
       break;
-    case HUD_WARP2:   
+    case TEX_HUD_WARP2:   
       id = GLShips[steam][stype].warp2;
       break;
-    case HUD_ICLOAK:   
+    case TEX_HUD_ICLOAK:   
       id = GLShips[steam][stype].ico_cloak;
       break;
-    case HUD_IREPAIR:  
+    case TEX_HUD_IREPAIR:  
       id = GLShips[steam][stype].ico_repair;
      break;
     default:
@@ -869,25 +870,6 @@ void drawIconHUDDecal(GLfloat rx, GLfloat ry, GLfloat w, GLfloat h,
   glVertex2f(rx, ry + h);
 
   glEnd();
-}
-
-/* return a 'space' buffer for padding */
-char *padstr(int l)
-{
-  static char padding[256 + 1];
-
-  if (l > 256)
-    l = 256;
-
-  if (l < 0)
-    l = 0;
-  
-  if (l > 0)
-    memset(padding, ' ', l);
-
-  padding[l] = 0;
-
-  return padding;
 }
 
 static void mouse(int b, int state, int x, int y)
@@ -1501,6 +1483,7 @@ void setRecTime(char *str)
   return;
 }
 
+#if 0
 void setXtraInfo(void)
 {
   int l = sizeof(hudData.xtrainfo.str);
@@ -1524,6 +1507,7 @@ void setXtraInfo(void)
 
   return;
 }
+#endif
 
 #define WARP_UP     0
 #define WARP_DOWN   1
@@ -1539,18 +1523,18 @@ void setWarp(real warp)
   static int lastwarpdir = -1;
   int warpdir;
   static real lastwarp = 0;
-  static char buf[128];
+  static char buf[CQI_NAMELEN];
 
   if (warpufx == -1)
     {
-      snprintf(buf, 128 - 1, "ship%c-warp-up", 
+      snprintf(buf, CQI_NAMELEN - 1, "ship%c-warp-up", 
                Teams[Ships[Context.snum].team].name[0]);
       warpufx = cqsFindEffect(buf);
     }
 
   if (warpdfx == -1)
     {
-      snprintf(buf, 128 - 1, "ship%c-warp-down", 
+      snprintf(buf, CQI_NAMELEN - 1, "ship%c-warp-down", 
                Teams[Ships[Context.snum].team].name[0]);
       warpdfx = cqsFindEffect(buf);
     }
@@ -1641,109 +1625,6 @@ void setWarp(real warp)
   return;
 }
 
-void setArmies(char *labelbuf, char *buf)
-{				/* this also displays robot actions... */
-  int l = sizeof(hudData.armies.str);
-
-  snprintf(hudData.armies.str, l - 1, "%s%s", labelbuf, buf);
-  hudData.armies.str[l - 1] = 0;
-  
-  return;
-}  
-
-void setTow(char *buf)
-{
-  int l = sizeof(hudData.tow.str);
-
-  strncpy(hudData.tow.str, buf, l - 1);
-  hudData.tow.str[l - 1] = 0;
-
-  return;
-}
-
-void setCloakDestruct(char *buf, int color)
-{
-  int l = sizeof(hudData.cloakdest.str);
-
-  strncpy(hudData.cloakdest.str, buf, l - 1);
-  hudData.cloakdest.str[l - 1] = 0;
-  hudData.cloakdest.color = color;
-
-  return;
-}
-
-/* a shortcut */
-void clrPrompt(int line)
-{
-  setPrompt(line, NULL, NoColor, NULL, NoColor);
-
-  return;
-}
-
-void setPrompt(int line, char *prompt, int pcolor, 
-               char *buf, int color)
-{
-  int l = sizeof(hudData.p1.str); 
-  char *str;
-  char *pstr;
-  int pl;
-  char *bstr;
-  int bl;
-  const int maxwidth = 80;
-
-  switch(line)
-    {
-    case MSG_LIN1:
-      str = hudData.p1.str;
-      break;
-
-    case MSG_LIN2:
-      str = hudData.p2.str;
-      break;
-
-    case MSG_MSG:
-    default:
-      color = InfoColor;
-      str = hudData.msg.str;
-      break;
-    }
-
-  if (!buf && !prompt)
-    {
-      strcpy(str, "");
-      return;
-    }
-
-  if (!buf)
-    {
-      bl = 0;
-      bstr = "";
-    }
-  else
-    {
-      bl = strlen(buf);
-      bstr = buf;
-    }
-
-  if (!prompt)
-    {
-      pl = 0;
-      pstr = "";
-    }
-  else
-    {
-      pl = strlen(prompt);
-      pstr = prompt;
-    }
-
-  snprintf(str, l,
-           "#%d#%s#%d#%s%s",
-           pcolor, pstr, color, bstr, padstr(maxwidth - (pl + bl)));
-
-  return;
-}
-
-
 void dspInitData(void)
 {
   memset((void *)&dConf, 0, sizeof(dspConfig_t));
@@ -1757,7 +1638,7 @@ void dspInitData(void)
   dConf.wX = dConf.wY = 0;
   dConf.vScaleLR = dConf.vScaleSR = 1.0;
 
-  memset((void *)&hudData, 0, sizeof(hudData_t));
+  hudInitData();
 
   dConf.inited = False;
 

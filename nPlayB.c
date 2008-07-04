@@ -46,9 +46,11 @@
 
 #include "nPlayB.h"
 
+#include "hud.h"
+
 #include "cqsound.h"
 
-#define cp_putmsg(str, lin)  setPrompt(lin, NULL, NoColor, str, NoColor)
+#define cp_putmsg(str, lin)  hudSetPrompt(lin, NULL, NoColor, str, NoColor)
 
 #define S_NONE         0
 #define S_WATCH        1
@@ -213,6 +215,7 @@ void nPlayBInit(void)
         }
     }
 
+  Context.redraw = TRUE;
   setNode(&nPlayBNode);
 
   return;
@@ -237,13 +240,13 @@ static int nPlayBDisplay(dspConfig_t *dsp)
       appstr( ": ", buf );
       appstr( recMsg.msgbuf, buf );
       
-      setPrompt(MSG_MSG, NULL, NoColor, buf, CyanColor);
+      hudSetPrompt(MSG_MSG, NULL, NoColor, buf, CyanColor);
     }
 
   mglOverlayQuad();             /* render the overlay bg */
   
   if (prompting)
-    setPrompt(prm.index, prm.pbuf, NoColor, prm.buf, CyanColor);
+    hudSetPrompt(prm.index, prm.pbuf, NoColor, prm.buf, CyanColor);
 
   return NODE_OK;
 }  
@@ -325,19 +328,19 @@ static int nPlayBInput(int ch)
           state = S_NONE;
 
           Context.snum = tmpsnum;
-          clrPrompt(MSG_LIN1);
+          hudClearPrompt(MSG_LIN1);
           nPlayBInit();         /* start playing */
         }
 
       if (nss)
-        setPrompt(MSG_LIN2, NULL, NoColor, nss, NoColor);
+        hudSetPrompt(MSG_LIN2, NULL, NoColor, nss, NoColor);
 
       return NODE_OK;
     }
 
 
   nss = NULL;
-  clrPrompt(MSG_LIN1);
+  hudClearPrompt(MSG_LIN1);
 
   switch (ch)
     {
@@ -351,11 +354,13 @@ static int nPlayBInput(int ch)
     case 'f':	/* move forward 30 seconds */
       cp_putmsg(NULL, MSG_LIN1);
       pbFileSeek(currTime + 30);
+      Context.redraw = TRUE;
       break;
       
     case 'F':	/* move forward 2 minutes */
       cp_putmsg(NULL, MSG_LIN1);
       pbFileSeek(currTime + (2 * 60));
+      Context.redraw = TRUE;
       break;
       
     case 'M':	/* toggle lr/sr */
@@ -369,18 +374,21 @@ static int nPlayBInput(int ch)
       cp_putmsg("Rewinding...", MSG_LIN1);
       pbFileSeek(currTime - 30);
       cp_putmsg(NULL, MSG_LIN1);
+      Context.redraw = TRUE;
       break;
       
     case 'B':	/* move backward 2 minutes */
       cp_putmsg("Rewinding...", MSG_LIN1);
       pbFileSeek(currTime - (2 * 60));
       cp_putmsg(NULL, MSG_LIN1);
+      Context.redraw = TRUE;
       break;
       
     case 'r':	/* reset to beginning */
       cp_putmsg("Rewinding...", MSG_LIN1);
       pbFileSeek(startTime);
       cp_putmsg(NULL, MSG_LIN1);
+      Context.redraw = TRUE;
       break;
       
     case ' ':	/* pause/resume playback */
@@ -457,6 +465,7 @@ static int nPlayBInput(int ch)
           old_snum = tmp_snum;
           
           Context.snum = snum;
+          Context.redraw = TRUE;
         }
       else
         mglBeep(MGL_BEEP_ERR);
@@ -667,9 +676,9 @@ static int nPlayBInput(int ch)
       break;
 
     case TERM_REDRAW:			/* clear all the prompts */
-      clrPrompt(MSG_LIN1);
-      clrPrompt(MSG_LIN2);
-      clrPrompt(MSG_MSG);
+      hudClearPrompt(MSG_LIN1);
+      hudClearPrompt(MSG_LIN2);
+      hudClearPrompt(MSG_MSG);
 
       /* reset the scaling factors */
       ncpLRMagFactor = ncpSRMagFactor = 0;

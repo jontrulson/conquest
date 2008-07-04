@@ -90,7 +90,7 @@ static struct {
   /* misc info (viewer) */
   GLRect_t tow;
   GLRect_t arm;
-  GLRect_t cloakdest;
+  GLRect_t destruct;
 
   GLRect_t althud;
   GLRect_t rectime;
@@ -484,10 +484,10 @@ void updateIconHudGeo(int snum)
   o.d1atarg.h = (dConf.vH / 20.0) * 1.0;
 
   /* destructing message.  try to center within viewer. */
-  o.cloakdest.x = dConf.vX + ((dConf.vW / 6.0) * 1.0);
-  o.cloakdest.y = dConf.vY + (dConf.vH / 2.0) - ((dConf.vH / 6.0) / 2.0);
-  o.cloakdest.w = ((dConf.vW / 6.0) * 4.0);
-  o.cloakdest.h = (dConf.vH / 6.0);
+  o.destruct.x = dConf.vX + ((dConf.vW / 6.0) * 1.0);
+  o.destruct.y = dConf.vY + (dConf.vH / 2.0) - ((dConf.vH / 6.0) / 2.0);
+  o.destruct.w = ((dConf.vW / 6.0) * 4.0);
+  o.destruct.h = (dConf.vH / 6.0);
 
   /* althud/altinfo */
   tx = dConf.vX;
@@ -749,6 +749,7 @@ void renderHud(int dostats)
   real warp = Ships[Context.snum].warp;
   real maxwarp = ShipTypes[Ships[Context.snum].shiptype].warplim;
   int steam = Ships[Context.snum].team;
+  int snum = Context.snum;
   static int oldteam = -1;
   static int rxtime = 0;
   static int oldrx = 0;
@@ -794,7 +795,7 @@ void renderHud(int dostats)
   if (o.x != dConf.wX || o.y != dConf.wY || o.w != dConf.wW ||
       o.h != dConf.wH || oldteam != steam)
     {
-      updateIconHudGeo(Context.snum);
+      updateIconHudGeo(snum);
       oldteam = steam;
     }
 
@@ -810,7 +811,7 @@ void renderHud(int dostats)
 
   /* heading val */
   glfRender(o.headl.x, o.headl.y, 0.0, o.headl.w, 
-            o.headl.h, fontLargeTxf, hudData.heading.headstr, 
+            o.headl.h, fontLargeTxf, hudData.heading.str, 
             hudData.heading.color, NULL, TRUE, FALSE, TRUE);
 
   /* warp background */
@@ -821,7 +822,7 @@ void renderHud(int dostats)
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
   drawIconHUDDecal(o.warp.x, o.warp.y, o.warp.w, o.warp.h,
-                   HUD_WARP2, 0xffffffff);
+                   TEX_HUD_WARP2, 0xffffffff);
 
   glDisable(GL_BLEND);
   glDisable(GL_TEXTURE_2D);
@@ -829,12 +830,12 @@ void renderHud(int dostats)
   /* warp val */
   glfRender(o.warpl.x, o.warpl.y, 0.0, 
             o.warpl.w, o.warpl.h,
-            fontLargeTxf, hudData.warp.warpstr, 
+            fontLargeTxf, hudData.warp.str, 
             hudData.warp.color, NULL, TRUE, FALSE, TRUE);
   
   /* warp quad indicator color */
   
-  GLCOLOR4F(GLShips[Ships[Context.snum].team][Ships[Context.snum].shiptype].warpq_col);
+  GLCOLOR4F(GLShips[Ships[snum].team][Ships[snum].shiptype].warpq_col);
 
   /* warp indicator quad */
   if (warp >= 0.1)
@@ -850,11 +851,11 @@ void renderHud(int dostats)
   /* shields num */
   glfRender(o.d1shn.x, o.d1shn.y, 0.0, o.d1shn.w, o.d1shn.h, 
             fontFixedTxf, 
-            hudData.sh.shieldstr, hudData.sh.color, 
+            hudData.sh.str, hudData.sh.color, 
             NULL, TRUE, FALSE, TRUE);
 
   /* shield charging status */
-  if (!SSHUP(Context.snum) || SREPAIR(Context.snum))
+  if (!SSHUP(snum) || SREPAIR(snum))
     renderShieldCharge();
   
   /* damage gauge */
@@ -865,7 +866,7 @@ void renderHud(int dostats)
   /* damage num */
   glfRender(o.d1damn.x, o.d1damn.y, 0.0, o.d1damn.w, o.d1damn.h, 
             fontFixedTxf, 
-            hudData.dam.damagestr, hudData.dam.color, 
+            hudData.dam.str, hudData.dam.color, 
             NULL, TRUE, FALSE, TRUE);
 
   /* fuel guage */
@@ -875,7 +876,7 @@ void renderHud(int dostats)
   /* fuel value */
   glfRender(o.d2fueln.x, o.d2fueln.y, 0.0, o.d2fueln.w, o.d2fueln.h, 
             fontFixedTxf, 
-            hudData.fuel.fuelstr, hudData.fuel.color, 
+            hudData.fuel.str, hudData.fuel.color, 
             NULL, TRUE, FALSE, TRUE);
 
   /* etemp guage */
@@ -885,7 +886,7 @@ void renderHud(int dostats)
   /* etemp value */
   glfRender(o.d2engtn.x, o.d2engtn.y, 0.0, o.d2engtn.w, o.d2engtn.h, 
             fontFixedTxf, 
-            hudData.etemp.tempstr, hudData.etemp.color, 
+            hudData.etemp.str, hudData.etemp.color, 
             NULL, TRUE, FALSE, TRUE);
 
   /* wtemp gauge */
@@ -895,7 +896,7 @@ void renderHud(int dostats)
   /* wtemp value*/
   glfRender(o.d2weptn.x, o.d2weptn.y, 0.0, o.d2weptn.w, o.d2weptn.h, 
             fontFixedTxf, 
-            hudData.wtemp.tempstr, hudData.wtemp.color, 
+            hudData.wtemp.str, hudData.wtemp.color, 
             NULL, TRUE, FALSE, TRUE);
 
   /* alloc */
@@ -905,7 +906,7 @@ void renderHud(int dostats)
   
   /* alloc value */
   glfRender(o.d2allocn.x, o.d2allocn.y, 0.0, o.d2allocn.w, o.d2allocn.h, 
-            fontFixedTxf, hudData.alloc.allocstr, hudData.alloc.color, 
+            fontFixedTxf, hudData.alloc.str, hudData.alloc.color, 
             NULL, TRUE, FALSE, TRUE);
   
   /* BEGIN "stat" box -
@@ -916,46 +917,55 @@ void renderHud(int dostats)
   glfRender(o.d2killb.x, o.d2killb.y, 0.0, 
             o.d2killb.w, 
             o.d2killb.h, fontFixedTxf, 
-            hudData.kills.killstr, 
+            hudData.kills.str, 
             hudData.kills.color, NULL,
             TRUE, TRUE, TRUE);
 
-  magFac = (!SMAP(Context.snum)) ? ncpSRMagFactor : ncpLRMagFactor;
+  magFac = (!SMAP(snum)) ? ncpSRMagFactor : ncpLRMagFactor;
   /* towed-towing/armies/destruct/alert - blended text displayed in viewer */
-  if (magFac || hudData.tow.str[0] || hudData.armies.str[0] || 
-      hudData.cloakdest.str[0] == 'D' || hudData.aStat.alertstr[0])
+  if (magFac || hudData.tow.towstat || hudData.armies.armies || 
+      hudData.destruct.fuse || hudData.aStat.alertLevel)
     {
       /* we want to use blending for these */
 
       glBlendFunc(GL_ONE_MINUS_SRC_ALPHA, GL_ONE);
       glEnable(GL_BLEND);
       
-      if (hudData.tow.str[0])
+      if (hudData.tow.towstat)
         glfRender(o.tow.x, o.tow.y, 0.0, 
                   o.tow.w, o.tow.h, 
                   fontFixedTxf, hudData.tow.str, 
-                  MagentaColor | 0x50000000, 
+                  hudData.tow.color | 0x50000000, 
                   NULL, TRUE, FALSE, TRUE);
       
-      if (hudData.armies.str[0])
+      /* army count or robot action - we position the robot action
+       *  at the same location as the army count...
+       */
+      if (SROBOT(snum))
+        glfRender(o.arm.x, o.arm.y, 0.0, 
+                  o.arm.w, o.arm.h, 
+                  fontFixedTxf, 
+                  hudData.raction.str, 
+                  hudData.raction.color | 0x50000000, 
+                  NULL, TRUE, FALSE, TRUE);
+      else if (hudData.armies.armies)
         glfRender(o.arm.x, o.arm.y, 0.0, 
                   o.arm.w, o.arm.h, 
                   fontFixedTxf, 
                   hudData.armies.str, 
-                  InfoColor | 0x50000000, 
+                  hudData.armies.color | 0x50000000, 
                   NULL, TRUE, FALSE, TRUE);
-      
-
+        
       /* Destruct msg, centered in the viewer */
-      if (hudData.cloakdest.str[0] == 'D') /* destructing */
+      if (hudData.destruct.fuse) /* destructing */
         {
-          glfRender(o.cloakdest.x, o.cloakdest.y, 0.0, 
-                    o.cloakdest.w, o.cloakdest.h, 
+          glfRender(o.destruct.x, o.destruct.y, 0.0, 
+                    o.destruct.w, o.destruct.h, 
                     fontMsgTxf, 
-                    hudData.cloakdest.str, 
+                    hudData.destruct.str, 
                     (GL_BLINK_ONESEC) ? 
-                    hudData.cloakdest.color | CQC_A_BOLD | 0x50000000: 
-                    (hudData.cloakdest.color | 0x50000000) & ~CQC_A_BOLD, 
+                    hudData.destruct.color | CQC_A_BOLD | 0x50000000: 
+                    (hudData.destruct.color | 0x50000000) & ~CQC_A_BOLD, 
                     NULL, TRUE, FALSE, TRUE);
         }
 
@@ -976,7 +986,7 @@ void renderHud(int dostats)
           
           glfRender(o.d1atarg.x, o.d1atarg.y, 0.0, 
                     o.d1atarg.w, o.d1atarg.h, 
-                    fontLargeTxf, hudData.aStat.alertstr, 
+                    fontLargeTxf, hudData.aStat.str, 
                     icl | 0x50000000, NULL, TRUE, FALSE, TRUE);
         }
 
@@ -1020,7 +1030,7 @@ void renderHud(int dostats)
           if (ack_alert == ALERT_OFF) /* was off */
             {
               ack_alert = ALERT_ON;
-              cqsEffectPlayTracked(teamEffects[Ships[Context.snum].team].alert,
+              cqsEffectPlayTracked(teamEffects[Ships[snum].team].alert,
                                    &alertHandle, 0.0, 0.0, 0.0);
             }
           else if (ack_alert == ALERT_ON) /* was on - turned off */
@@ -1048,34 +1058,32 @@ void renderHud(int dostats)
   glEnable(GL_BLEND);
   glEnable(GL_TEXTURE_2D);
   
-  /* it's pretty hacky how we determine some of this stuff... */
-
   /* icon shield decal */
   if (hudData.sh.shields > 0.0)
     {
-      if (hudData.cloakdest.str[1] == 'C') 
+      if (SCLOAKED(snum)) 
         icl = hudData.sh.color | 0x80000000; /* set some alpha if cloaked */
       else 
         icl = hudData.sh.color;
       
       drawIconHUDDecal(o.d1icon.x, o.d1icon.y, o.d1icon.w, o.d1icon.h, 
-                       HUD_SHI, icl);
+                       TEX_HUD_SHI, icl);
     }
   
   /* ship icon decal */
-  if (hudData.cloakdest.str[1] == 'C') 
+  if (SCLOAKED(snum)) 
     icl = hudData.dam.color | 0x80000000; /* set some alpha if cloaked */
   else 
     icl = hudData.dam.color;
 
   drawIconHUDDecal(o.d1icon.x, o.d1icon.y, o.d1icon.w, o.d1icon.h, 
-                   HUD_ICO, icl);
+                   TEX_HUD_ICO, icl);
 
   icl = 0xFFFFFFFF;
   
   /* heading decal */
   drawIconHUDDecal(o.head.x, o.head.y, o.head.w, o.head.h,
-                   HUD_HEAD, icl);
+                   TEX_HUD_HEAD, icl);
   
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
   
@@ -1084,22 +1092,21 @@ void renderHud(int dostats)
   glPushMatrix();
   glTranslatef(o.head.x + (o.head.w / 2.0), 
                o.head.y + (o.head.h / 2.0), 0.0);
-  glRotatef(Ships[Context.snum].head, 0.0, 0.0, -1.0);
+  glRotatef(Ships[snum].head, 0.0, 0.0, -1.0);
   drawIconHUDDecal(-(o.head.w / 2.0), -(o.head.h / 2.0), 
                    o.head.w, o.head.h,
-                   HUD_HDP, icl);
+                   TEX_HUD_HDP, icl);
   glPopMatrix();
 
   /* regular conq stuff - tractor beam, armies, cloak */
   
-  /* hacky.. for sure. */
-  if (hudData.cloakdest.str[1] == 'C') 
+  if (SCLOAKED(snum)) 
     drawIconHUDDecal(o.d1icon.x, o.d1icon.y, o.d1icon.w, o.d1icon.h,
-                     HUD_ICLOAK, icl);
+                     TEX_HUD_ICLOAK, icl);
   else
-    if (SREPAIR(Context.snum)) 
+    if (SREPAIR(snum)) 
       drawIconHUDDecal(o.d1icon.x, o.d1icon.y, o.d1icon.w, o.d1icon.h,
-                       HUD_IREPAIR, icl);
+                       TEX_HUD_IREPAIR, icl);
   
   /*
     Cataboligne + display critical alerts decals
@@ -1114,22 +1121,22 @@ void renderHud(int dostats)
 
   /* draw warp and decals */
   drawIconHUDDecal(o.warp.x, o.warp.y, o.warp.w, o.warp.h, 
-                   HUD_WARP, icl);
+                   TEX_HUD_WARP, icl);
   drawIconHUDDecal(o.decal1.x, o.decal1.y, o.decal1.w, o.decal1.h, 
-                   HUD_DECAL1, icl);
+                   TEX_HUD_DECAL1, icl);
   drawIconHUDDecal(o.decal2.x, o.decal2.y, o.decal2.w, o.decal2.h, 
-                   HUD_DECAL2, icl);
+                   TEX_HUD_DECAL2, icl);
 
 
   /* torp pips */
-  if (Context.snum > 0 && Context.snum <= MAXSHIPS)
+  if (snum > 0 && snum <= MAXSHIPS)
     {
       glBindTexture(GL_TEXTURE_2D, 
-                    GLShips[Ships[Context.snum].team][Ships[Context.snum].shiptype].ico_torp);
+                    GLShips[Ships[snum].team][Ships[snum].shiptype].ico_torp);
       
       for (i=0; i < MAXTORPS; i++)
         {
-          switch (Ships[Context.snum].torps[i].status)
+          switch (Ships[snum].torps[i].status)
             {
             case TS_OFF:
               uiPutColor(GreenColor);
@@ -1159,6 +1166,7 @@ void renderHud(int dostats)
   if ((Context.recmode != RECMODE_PLAYING) &&
       (Context.recmode != RECMODE_PAUSED))
     {
+#if 0
       /* althud */
       if (UserConf.AltHUD)
         glfRender(o.althud.x, o.althud.y, 
@@ -1167,6 +1175,7 @@ void renderHud(int dostats)
                   fontFixedTxf, hudData.xtrainfo.str, InfoColor, 
                   NULL, TRUE, TRUE, TRUE);
       
+#endif
       if (dostats)
         {
           glfRender(o.rectime.x, o.rectime.y, 0.0, 
@@ -1219,17 +1228,17 @@ void renderHud(int dostats)
   renderPulseMsgs();
 
   /* phaser recharge status */
-  if (Context.snum > 0 && Context.snum <= MAXSHIPS)
+  if (snum > 0 && snum <= MAXSHIPS)
     {
-      if (Ships[Context.snum].pfuse <= 0)
+      if (Ships[snum].pfuse <= 0)
         uiPutColor(GreenColor);
       else
         uiPutColor(RedColor);
         
       drawQuad(o.d1phcharge.x, o.d1phcharge.y, o.d1phcharge.w, 
-               (Ships[Context.snum].pfuse <= 0) ? o.d1phcharge.h :
+               (Ships[snum].pfuse <= 0) ? o.d1phcharge.h :
                (o.d1phcharge.h - (o.d1phcharge.h / 10.0) * 
-                (real)Ships[Context.snum].pfuse), 0.0);
+                (real)Ships[snum].pfuse), 0.0);
     }
 
   return;

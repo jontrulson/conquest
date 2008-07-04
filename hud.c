@@ -61,6 +61,18 @@ void hudInitData(void)
   hudData.wtemp.color      = GreenLevelColor;
   hudData.wtemp.overl      = FALSE;
 
+  hudData.tow.towstat      = 0;
+  hudData.tow.color        = MagentaColor;
+
+  hudData.armies.armies    = -1701;
+  hudData.armies.color     = InfoColor;
+
+  hudData.raction.action   = 0;
+  hudData.raction.color    = InfoColor;
+
+  hudData.destruct.fuse    = -1;
+  hudData.destruct.color   = RedLevelColor;
+
   return;
 }
 
@@ -73,12 +85,12 @@ void hudSetWarp(int snum)
     {
       hudData.warp.warp = Ships[snum].warp;
       if (hudData.warp.warp >= 0)
-        snprintf(hudData.warp.warpstr, HUD_STR_SZ - 1, "%2.1f", 
+        snprintf(hudData.warp.str, HUD_STR_SZ - 1, "%2.1f", 
                  hudData.warp.warp );
       else
-        strncpy(hudData.warp.warpstr, "Orbiting", HUD_STR_SZ - 1);
+        strncpy(hudData.warp.str, "Orbiting", HUD_STR_SZ - 1);
 
-      hudData.warp.warpstr[HUD_STR_SZ] = 0;
+      hudData.warp.str[HUD_STR_SZ - 1] = 0;
 
       /* set the right sound effects */
       setWarp(hudData.warp.warp);
@@ -98,15 +110,15 @@ void hudSetHeading(int snum)
     {
       if ( -i > 0 && -i <= NUMPLANETS)
         {                       /* just the first 3 characters if locked */
-          hudData.heading.headstr[0] = Planets[-i].name[0];
-          hudData.heading.headstr[1] = Planets[-i].name[1];
-          hudData.heading.headstr[2] = Planets[-i].name[2];
-          hudData.heading.headstr[3] = 0;
+          hudData.heading.str[0] = Planets[-i].name[0];
+          hudData.heading.str[1] = Planets[-i].name[1];
+          hudData.heading.str[2] = Planets[-i].name[2];
+          hudData.heading.str[3] = 0;
         }
       else
         {
-          snprintf( hudData.heading.headstr, HUD_STR_SZ - 1, "%3d", i );
-          hudData.heading.headstr[HUD_STR_SZ] = 0;
+          snprintf( hudData.heading.str, HUD_STR_SZ - 1, "%3d", i );
+          hudData.heading.str[HUD_STR_SZ - 1] = 0;
         }
 
       hudData.heading.head = i;
@@ -124,7 +136,7 @@ void hudSetAlertStatus(int snum, int asnum, alertLevel_t astatus)
         {
           hudData.aStat.alertLevel = GREEN_ALERT;
           hudData.aStat.color = GreenLevelColor;
-          hudData.aStat.alertstr[0] = 0;
+          hudData.aStat.str[0] = 0;
         }
       
       return;
@@ -138,35 +150,35 @@ void hudSetAlertStatus(int snum, int asnum, alertLevel_t astatus)
         case PHASER_ALERT:
           {
             hudData.aStat.color = RedLevelColor;
-            strcpy(hudData.aStat.alertstr, "RED ALERT ");
+            strcpy(hudData.aStat.str, "RED ALERT ");
           }
           break;
 
         case RED_ALERT:
           {
             hudData.aStat.color = RedLevelColor;
-            strcpy(hudData.aStat.alertstr, "Alert ");
+            strcpy(hudData.aStat.str, "Alert ");
           }
           break;
 
         case TORP_ALERT:
           {
             hudData.aStat.color = YellowLevelColor;
-            strcpy(hudData.aStat.alertstr, "Torp Alert ");
+            strcpy(hudData.aStat.str, "Torp Alert ");
           }
           break;
 
         case YELLOW_ALERT:
           {
             hudData.aStat.color = YellowLevelColor;
-            strcpy(hudData.aStat.alertstr, "Yellow Alert ");
+            strcpy(hudData.aStat.str, "Yellow Alert ");
           }
           break;
 
         case PROXIMITY_ALERT:
           {
             hudData.aStat.color = YellowLevelColor;
-            strcpy(hudData.aStat.alertstr, "Proximity Alert ");
+            strcpy(hudData.aStat.str, "Proximity Alert ");
           }
           break;
 
@@ -174,18 +186,18 @@ void hudSetAlertStatus(int snum, int asnum, alertLevel_t astatus)
         default:
           {
             hudData.aStat.color = GreenLevelColor;
-            hudData.aStat.alertstr[0] = 0;
+            hudData.aStat.str[0] = 0;
           }
           break;
         }
 
       if (asnum)
-        appship(asnum, hudData.aStat.alertstr);
+        appship(asnum, hudData.aStat.str);
 
       if (SCLOAKED(asnum))
-        appstr( " (CLOAKED)", hudData.aStat.alertstr );
+        appstr( " (CLOAKED)", hudData.aStat.str );
 
-      hudData.aStat.alertstr[HUD_STR_SZ] = 0;
+      hudData.aStat.str[HUD_STR_SZ - 1] = 0;
 
       hudData.aStat.alertLevel = astatus;
       hudData.aStat.aShip      = asnum;
@@ -201,7 +213,7 @@ void hudSetKills(int snum)
 
   if ( x != hudData.kills.kills )
     {
-      snprintf( hudData.kills.killstr, HUD_STR_SZ - 1, "%0.1f", oneplace(x) );
+      snprintf( hudData.kills.str, HUD_STR_SZ - 1, "%0.1f", oneplace(x) );
       hudData.kills.kills = x;
     }
 
@@ -235,8 +247,8 @@ void hudSetShields(int snum, int *dobeep)
 
       hudData.sh.shields = i;
 
-      snprintf(hudData.sh.shieldstr, HUD_STR_SZ - 1, "%3d", (i < 0) ? 0 : i);
-      hudData.sh.shieldstr[HUD_STR_SZ] = 0;
+      snprintf(hudData.sh.str, HUD_STR_SZ - 1, "%3d", (i < 0) ? 0 : i);
+      hudData.sh.str[HUD_STR_SZ - 1] = 0;
     }
 
   return;
@@ -259,9 +271,9 @@ void hudSetDamage(int snum, real *lastdamage)
       else if (i >= 66)
         hudData.dam.color = RedLevelColor;
 
-      snprintf( hudData.dam.damagestr, HUD_STR_SZ - 1, "%3d",
+      snprintf( hudData.dam.str, HUD_STR_SZ - 1, "%3d",
                 (i < 0) ? 0 : i );
-      hudData.dam.damagestr[HUD_STR_SZ] = 0;
+      hudData.dam.str[HUD_STR_SZ - 1] = 0;
 
       hudData.dam.damage = r;
     }
@@ -284,9 +296,9 @@ void hudSetFuel(int snum)
       else if (i >= 501)
         hudData.fuel.color = GreenLevelColor;
       
-      snprintf( hudData.fuel.fuelstr, HUD_STR_SZ - 1, "%3d",
+      snprintf( hudData.fuel.str, HUD_STR_SZ - 1, "%3d",
                 (i < 0) ? 0 : i );
-      hudData.fuel.fuelstr[HUD_STR_SZ] = 0;
+      hudData.fuel.str[HUD_STR_SZ - 1] = 0;
 
       hudData.fuel.fuel = r;
     }
@@ -307,19 +319,19 @@ void hudSetAlloc(int snum)
 
   if ( i != hudData.alloc.walloc || j != hudData.alloc.ealloc )
     {
-      hudData.alloc.allocstr[0] = 0;
+      hudData.alloc.str[0] = 0;
 
       if ( i == 0 )
-        appstr( "**", hudData.alloc.allocstr );
+        appstr( "**", hudData.alloc.str );
       else
-        appint( i, hudData.alloc.allocstr );
+        appint( i, hudData.alloc.str );
 
-      appchr( '/', hudData.alloc.allocstr );
+      appchr( '/', hudData.alloc.str );
 
       if ( j == 0 )
-        appstr( "**", hudData.alloc.allocstr );
+        appstr( "**", hudData.alloc.str );
       else
-        appint( j, hudData.alloc.allocstr );
+        appint( j, hudData.alloc.str );
 
       hudData.alloc.walloc  = i;
       hudData.alloc.ealloc  = j;
@@ -361,9 +373,9 @@ void hudSetTemps(int snum)
       else if (i >= 81)
         hudData.etemp.color = RedLevelColor;
 
-      snprintf( hudData.etemp.tempstr, HUD_STR_SZ - 1, "%3d",
+      snprintf( hudData.etemp.str, HUD_STR_SZ - 1, "%3d",
                 (i < 0) ? 0 : i );
-      hudData.etemp.tempstr[HUD_STR_SZ] = 0;
+      hudData.etemp.str[HUD_STR_SZ - 1] = 0;
 
       hudData.etemp.temp  = etemp;
       hudData.etemp.overl = eOverl;
@@ -380,9 +392,9 @@ void hudSetTemps(int snum)
       else if (i >= 81)
         hudData.wtemp.color = RedLevelColor;
 
-      snprintf( hudData.wtemp.tempstr, HUD_STR_SZ - 1, "%3d",
+      snprintf( hudData.wtemp.str, HUD_STR_SZ - 1, "%3d",
                 (i < 0) ? 0 : i );
-      hudData.wtemp.tempstr[HUD_STR_SZ] = 0;
+      hudData.wtemp.str[HUD_STR_SZ - 1] = 0;
 
       hudData.wtemp.temp  = wtemp;
       hudData.wtemp.overl = wOverl;
@@ -391,3 +403,183 @@ void hudSetTemps(int snum)
 
   return;
 }
+
+void hudSetTow(int snum)
+{
+  int i = Ships[snum].towedby;
+
+  if ( i == 0 )
+    i = -Ships[snum].towing;
+
+  if (i != hudData.tow.towstat)
+    {
+      if ( i == 0 )
+        {
+          hudData.tow.str[0] = 0;
+        }
+      else if ( i < 0 )
+        {
+          strcpy(hudData.tow.str, "towing ");
+          appship( -i, hudData.tow.str );
+        }
+      else if ( i > 0 )
+        {
+          strcpy(hudData.tow.str, "towed by ");
+          appship( i, hudData.tow.str );
+        }
+
+      hudData.tow.towstat = i;
+    }
+
+  return;
+}
+
+
+void hudSetArmies(int snum)
+{
+  int i = Ships[snum].armies;
+  
+  if (i != hudData.armies.armies)
+    {
+      if (i == 0)
+        hudData.armies.str[0] = 0;
+      else
+        {
+          snprintf( hudData.armies.str, HUD_STR_SZ - 1, "%2d armies", i );
+          hudData.armies.str[HUD_STR_SZ - 1] = 0;
+        }
+
+      hudData.armies.armies = i;
+    }
+
+  return;
+}
+
+void hudSetRobotAction(int snum)
+{
+  int i = Ships[snum].action;
+  
+  if (i != hudData.raction.action)
+    {
+      robstr( i, hudData.raction.str );
+
+      hudData.raction.action = i;
+    }
+
+  return;
+}
+
+void hudSetDestruct(int snum)
+{
+  int i = max( 0, Ships[snum].sdfuse );
+
+  if (i != hudData.destruct.fuse)
+    {
+      if (!i)
+        hudData.destruct.str[0] = 0;
+      else
+        {
+          snprintf( hudData.destruct.str, HUD_STR_SZ - 1, 
+                    "DESTRUCT MINUS %2d", i );
+          hudData.destruct.str[HUD_STR_SZ - 1] = 0;
+        }
+
+      hudData.destruct.fuse = i;
+    }
+
+  return;
+}
+
+
+/* return a 'space' buffer for padding */
+static char *_padstr(int l)
+{
+  static char padding[HUD_PROMPT_SZ];
+
+  if (l >= HUD_PROMPT_SZ)
+    l = HUD_PROMPT_SZ - 1;
+
+  if (l < 0)
+    l = 0;
+  
+  if (l > 0)
+    memset(padding, ' ', l);
+
+  padding[HUD_PROMPT_SZ - 1] = 0;
+
+  return padding;
+}
+
+
+void hudSetPrompt(int line, char *prompt, int pcolor, 
+                  char *buf, int color)
+{
+  char *str;
+  char *pstr;
+  int pl;
+  char *bstr;
+  int bl;
+  const int maxwidth = 80;
+
+  switch(line)
+    {
+    case MSG_LIN1:
+      str = hudData.p1.str;
+      break;
+
+    case MSG_LIN2:
+      str = hudData.p2.str;
+      break;
+
+    case MSG_MSG:
+    default:
+      color = InfoColor;
+      str = hudData.msg.str;
+      break;
+    }
+
+  if (!buf && !prompt)
+    {
+      str[0] = 0;
+      return;
+    }
+
+  if (!buf)
+    {
+      bl = 0;
+      bstr = "";
+    }
+  else
+    {
+      bl = strlen(buf);
+      bstr = buf;
+    }
+
+  if (!prompt)
+    {
+      pl = 0;
+      pstr = "";
+    }
+  else
+    {
+      pl = strlen(prompt);
+      pstr = prompt;
+    }
+
+  snprintf(str, HUD_PROMPT_SZ - 1,
+           "#%d#%s#%d#%s%s",
+           pcolor, pstr, color, bstr, _padstr(maxwidth - (pl + bl)));
+  str[HUD_PROMPT_SZ - 1] = 0;
+
+  return;
+}
+
+/* a shortcut */
+void hudClearPrompt(int line)
+{
+  hudSetPrompt(line, NULL, NoColor, NULL, NoColor);
+
+  return;
+}
+
+

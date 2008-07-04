@@ -53,12 +53,10 @@ extern real LastPhasDist;	/* defined in conqlb.c */
 void display( int snum, int display_info )
 {
   int i, j, minenemy, minsenemy;
-  char ch, buf[MSGMAXLINE];
+  char ch;
   int dobeep, lsmap;
   int palertcol;
   real scale, cenx, ceny, dis, mindis, minsdis;
-  static int zzsarmies = -1701;
-  static int zzssdfuse = -9;
   real prevdam;
   static int talertfx = -1;
   int color;
@@ -67,7 +65,17 @@ void display( int snum, int display_info )
   if (talertfx == -1)
       talertfx = cqsFindEffect("torp-alert");
 
+  /* if we need to reset cached state... */
+  if (Context.redraw)
+    {
+      AlertLevel = GREEN_ALERT;
+      hudInitData();
+      Context.redraw = FALSE;
+    }
+
+#if 0
   setXtraInfo();
+#endif
 
   hudSetAlertStatus(snum, 0, AlertLevel);
 
@@ -371,8 +379,6 @@ void display( int snum, int display_info )
   
   /* Figure out the ship's current alert status, and the ship causing the
    *  alert, if needed */
-  buf[0] = EOS;
-
   if (snum > 0)
     {				/* if a ship view */
       if ( minenemy != 0 || STALERT(snum) )
@@ -463,75 +469,20 @@ void display( int snum, int display_info )
           dobeep = TRUE;
         }
       
-      /* Armies. */
-      i = Ships[snum].armies;
-      if ( i == 0 )
-        i = -Ships[snum].action;
-      if ( i != zzsarmies )
-        {
-          if ( i > 0 )
-            {
-              sprintf( buf, "%2d ", i );
-              setArmies(buf, "armies");
-            }
-          else if ( i < 0 )
-            {
-              robstr( -i, buf );
-              setArmies("", buf);
-            }
-          else
-            setArmies("", "");
-          
-          zzsarmies = i;
-        }
-      
-      /* Tractor beams. */
-      i = Ships[snum].towedby;
-      if ( i == 0 )
-        i = -Ships[snum].towing;
-      
-      if ( i == 0 )
-        {
-          buf[0] = EOS;
-        }
-      else if ( i < 0 )
-        {
-          c_strcpy( "towing ", buf );
-          appship( -i, buf );
-        }
-      else if ( i > 0 )
-        {
-          c_strcpy( "towed by ", buf );
-          appship( i, buf );
-        }
-      setTow(buf);
-      
-      /* Self destruct fuse. */
-      if ( SCLOAKED(snum) )
-        i = -1;
+      /* Armies/Robot action. */
+      if (SROBOT(snum))
+        hudSetRobotAction(snum);
       else
-        i = max( 0, Ships[snum].sdfuse );
-      if ( i != zzssdfuse )
-        {
-          if ( i > 0 )
-            {
-              sprintf( buf, "DESTRUCT MINUS %3d", i );
-              setCloakDestruct(buf, RedLevelColor);
-            }
-          else if ( i == -1 )
-            {
-              setCloakDestruct(" CLOAKED ", MagentaColor);
-            }
-          else 
-            {
-              setCloakDestruct("", NoColor);
-            }
-          zzssdfuse = i;
-        }
-      
-      if ( dobeep )
-        if ( UserConf.DoAlarms )
-          mglBeep(MGL_BEEP_ALERT);
+        hudSetArmies(snum);
+
+      /* Tractor beams. */
+      hudSetTow(snum);
+
+      /* self destruct fuse */
+      hudSetDestruct(snum);
+
+      if ( UserConf.DoAlarms && dobeep )
+        mglBeep(MGL_BEEP_ALERT);
       
     } /* end of ship stats display */
   
@@ -544,7 +495,7 @@ void displayFeedback(char *msg, int lin)
   if (!msg)
     return;
 
-  setPrompt(MSG_LIN1, NULL, NoColor, msg, NoColor);
+  hudSetPrompt(MSG_LIN1, NULL, NoColor, msg, NoColor);
 
   return;
 }
