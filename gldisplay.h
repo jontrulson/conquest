@@ -77,8 +77,6 @@ void uiPrintFixed(GLfloat x, GLfloat y, GLfloat w, GLfloat h, char *str);
 int uiGLInit(int *argc, char **argv);
 void uiDrawPlanet( GLfloat x, GLfloat y, int pnum, int scale,
                    int textcolor, int scanned );
-void setXtraInfo(void);
-
 real cu2GLSize(real size, int scale);
 
 int GLcvtcoords(real cenx, real ceny, real x, real y, real scale,

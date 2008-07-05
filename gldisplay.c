@@ -73,10 +73,6 @@ void display( int snum, int display_info )
       Context.redraw = FALSE;
     }
 
-#if 0
-  setXtraInfo();
-#endif
-
   hudSetAlertStatus(snum, 0, AlertLevel);
 
   dobeep = FALSE;
