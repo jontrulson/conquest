@@ -119,6 +119,10 @@ static struct {
   GLRect_t d1damg;              /* damage */
   GLRect_t d1damn;           
   GLRect_t d1icon;              /* the ship icon area */
+  GLRect_t d1icon_rep;          /* the ship icon "cloaked" indicator */
+  GLRect_t d1icon_clo;          /* the ship icon "repairing" indicator */
+  GLRect_t d1icon_fa;           /* the ship icon firing angle indicator */
+  GLRect_t d1icon_tad;          /* last target, angle, dist indicator */
   GLRect_t d1torps;             /* location of the torp pip area */
   GLRect_t d1torppips[MAXTORPS]; /* the torp pips */
   GLRect_t d1phcharge;          /* phaser charge status */
@@ -184,6 +188,10 @@ void updateIconHudGeo(int snum)
   static cqiTextureAreaPtr_t d1torps = NULL; /* d1 torp icon area */
   static cqiTextureAreaPtr_t d1phaserchrg = NULL; /* d1 phaser charge */
   static cqiTextureAreaPtr_t d1icon = NULL; /* d1 ship icon area */
+  static cqiTextureAreaPtr_t d1icon_rep = NULL; /* d1 ship icon "repairing" */
+  static cqiTextureAreaPtr_t d1icon_clo = NULL; /* d1 ship icon "cloaked" */
+  static cqiTextureAreaPtr_t d1icon_fa = NULL;  /* d1 ship icon firing ang */
+  static cqiTextureAreaPtr_t d1icon_tad = NULL; /* d1 ship icon target data */
 
   /* area pointers, decal2 */
   static cqiTextureAreaPtr_t d2fuelg = NULL; /* d2 fuel */
@@ -231,6 +239,14 @@ void updateIconHudGeo(int snum)
       CLAMPRECT(decal1_sz.w, decal1_sz.h, d1damn);
       d1icon    = cqiFindTexArea(buffer, "icon", &defaultTA);
       CLAMPRECT(decal1_sz.w, decal1_sz.h, d1icon);
+      d1icon_rep = cqiFindTexArea(buffer, "icon-repairing", &defaultTA);
+      CLAMPRECT(decal1_sz.w, decal1_sz.h, d1icon_rep);
+      d1icon_clo = cqiFindTexArea(buffer, "icon-cloaked", &defaultTA);
+      CLAMPRECT(decal1_sz.w, decal1_sz.h, d1icon_clo);
+      d1icon_fa = cqiFindTexArea(buffer, "icon-fangle", &defaultTA);
+      CLAMPRECT(decal1_sz.w, decal1_sz.h, d1icon_fa);
+      d1icon_tad = cqiFindTexArea(buffer, "icon-tad", &defaultTA);
+      CLAMPRECT(decal1_sz.w, decal1_sz.h, d1icon_tad);
       d1torps    = cqiFindTexArea(buffer, "torps", &defaultTA);
       CLAMPRECT(decal1_sz.w, decal1_sz.h, d1torps);
       d1phaserchrg = cqiFindTexArea(buffer, "phaserchrg", &defaultTA);
@@ -380,6 +396,14 @@ void updateIconHudGeo(int snum)
 
   /* position the ship icon area within decal 1 */
   MAPAREA(&decal1_sz, d1icon, &o.d1icon);
+
+  /* position the 'cloaked' and 'repairing' indicator areas */
+  MAPAREA(&decal1_sz, d1icon_clo, &o.d1icon_clo);
+  MAPAREA(&decal1_sz, d1icon_rep, &o.d1icon_rep);
+
+  /* position the 'firing angle' and 'target, ang, distance' indicators */
+  MAPAREA(&decal1_sz, d1icon_fa, &o.d1icon_fa);
+  MAPAREA(&decal1_sz, d1icon_tad, &o.d1icon_tad);
 
   /* torp pips */
   MAPAREA(&decal1_sz, d1torps, &o.d1torps);
@@ -1099,15 +1123,7 @@ void renderHud(int dostats)
   glPopMatrix();
 
   /* regular conq stuff - tractor beam, armies, cloak */
-  
-  if (SCLOAKED(snum)) 
-    drawIconHUDDecal(o.d1icon.x, o.d1icon.y, o.d1icon.w, o.d1icon.h,
-                     TEX_HUD_ICLOAK, icl);
-  else
-    if (SREPAIR(snum)) 
-      drawIconHUDDecal(o.d1icon.x, o.d1icon.y, o.d1icon.w, o.d1icon.h,
-                       TEX_HUD_IREPAIR, icl);
-  
+
   /*
     Cataboligne + display critical alerts decals
     
@@ -1163,19 +1179,46 @@ void renderHud(int dostats)
 
   /* END stat box */
   
+  /* cloaked or repairing icon indicators */
+  if (SCLOAKED(snum)) 
+    glfRender(o.d1icon_clo.x, o.d1icon_clo.y, 
+              0.0, 
+              o.d1icon_clo.w, o.d1icon_clo.h,
+              fontFixedTxf, "CLOAKED", MagentaColor | CQC_A_BOLD, 
+              NULL, TRUE, FALSE, TRUE);
+  else if (SREPAIR(snum)) 
+      glfRender(o.d1icon_rep.x, o.d1icon_rep.y, 
+                0.0, 
+                o.d1icon_rep.w, o.d1icon_rep.h,
+                fontFixedTxf, "REPAIRING", CyanColor | CQC_A_BOLD, 
+                NULL, TRUE, FALSE, TRUE);
+
+  /* last firing angle, target angle and distance icon indicators */
+
+  /* first update the data if neccessary */
+  if (snum > 0)
+    hudSetInfoFiringAngle(Ships[snum].lastblast);
+  hudSetInfoTargetAngle(Context.lasttang);
+  hudSetInfoTargetDist(Context.lasttdist);
+
+  /* render fa */
+  glfRender(o.d1icon_fa.x, o.d1icon_fa.y, 
+            0.0, 
+            o.d1icon_fa.w, o.d1icon_fa.h,
+            fontFixedTxf, hudData.info.lastblaststr, NoColor, 
+            NULL, TRUE, TRUE, TRUE);
+
+  /* render tad */
+  if (hudData.info.lasttadstr[0])
+    glfRender(o.d1icon_tad.x, o.d1icon_tad.y, 
+              0.0, 
+              o.d1icon_tad.w, o.d1icon_tad.h,
+              fontFixedTxf, hudData.info.lasttadstr, NoColor, 
+              NULL, TRUE, TRUE, TRUE);
+
   if ((Context.recmode != RECMODE_PLAYING) &&
       (Context.recmode != RECMODE_PAUSED))
     {
-#if 0
-      /* althud */
-      if (UserConf.AltHUD)
-        glfRender(o.althud.x, o.althud.y, 
-                  0.0, 
-                  o.althud.w, o.althud.h,
-                  fontFixedTxf, hudData.xtrainfo.str, InfoColor, 
-                  NULL, TRUE, TRUE, TRUE);
-      
-#endif
       if (dostats)
         {
           glfRender(o.rectime.x, o.rectime.y, 0.0, 

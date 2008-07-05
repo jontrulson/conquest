@@ -41,8 +41,6 @@ typedef struct _glship {
   GLint     phas;             /* phaser */
   GLint     ico;              /* ship icon */
   GLint     ico_sh;           /* icon shields id */
-  GLint     ico_cloak;        /* cloak indicator */
-  GLint     ico_repair;       /* repairing */
   GLint     decal1;           /* sh/hull gauges */
   GLint     decal2;           /* fuel/w/e/alloc/kills gauges */
   GLint     dial;             /* ships astrogator dial */

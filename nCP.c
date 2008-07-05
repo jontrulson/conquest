@@ -232,17 +232,12 @@ static void _infoship( int snum, int scanner )
   real x, y, dis, kills, appx, appy;
   int godlike, canscan;
   static char tmpstr[BUFFER_SIZE];
-
-#define BETTER_ETA		/* we'll try this out for a release */
-#undef DEBUG_ETA		/* define for debugging */
-
-#if defined(BETTER_ETA)
+  /* ETA related vars */
   real pwarp, diffdis, close_rate;
   time_t difftime, curtime;
   static time_t oldtime = 0;
   static real avgclose_rate, olddis = 0.0, oldclose_rate = 0.0;
   static int oldsnum = 0;
-#endif /* BETTER_ETA */
 
   godlike = ( scanner < 1 || scanner > MAXSHIPS );
   
@@ -262,6 +257,7 @@ static void _infoship( int snum, int scanner )
   cbuf[0] = Context.lasttarg[0] = EOS;
   appship( snum, cbuf );
   strcpy(Context.lasttarg, cbuf); /* save for alt hud */
+  hudSetInfoTarget(snum);
 
   if ( snum == scanner )
     {
@@ -354,13 +350,12 @@ static void _infoship( int snum, int scanner )
   
   if ( ! SCLOAKED(snum) || Ships[snum].warp != 0.0 )
     {
-      Context.lasttdist = round( dis ); /* save these puppies for alt hud */
+      Context.lasttdist = round( dis ); /* save these puppies for hud info */
       Context.lasttang = round( angle( x, y, appx, appy ) );
+
       sprintf( cbuf, "Range %d, direction %d",
 	     Context.lasttdist, Context.lasttang );
 
-
-#if defined(BETTER_ETA)
       if (UserConf.DoETAStats)
 	{
 	  if (Ships[scanner].warp > 0.0 || Ships[snum].warp > 0.0)
@@ -452,24 +447,6 @@ clog("_infoship:\tdis(%.1f) pwarp(%.1f) = (close_rate(%.1f) / MM_PER_SEC_PER_WAR
 		}
 	    }
 	} /* if do ETA stats */
-#else /* not a BETTER_ETA */
-
-      if (UserConf.DoETAStats)
-	{
-	  if (Ships[scanner].warp > 0.0 || Ships[snum].warp > 0.0)
-	    {
-				/* take other ships velocity into account */
-	      cumwarp = 
-		(((Ships[scanner].warp > 0.0) ? Ships[scanner].warp : 0.0) + 
-		((Ships[snum].warp > 0.0) ? Ships[snum].warp : 0.0));
-
-	      sprintf(tmpstr, ", ETA %s",
-		      clbETAStr(cumwarp, dis));
-	      appstr(tmpstr, cbuf);
-	    }
-	} /* if do ETA stats */
-#endif /* !BETTER_ETA */
-
     }
   else				/* else cloaked and at w0 */
     {
@@ -599,27 +576,28 @@ static void _infoplanet( char *str, int pnum, int snum )
 
       sprintf( buf, "%s%s, a %s%s, range %d, direction %d%s",
 	       str,
-	     Planets[pnum].name,
-	     ConqInfo->ptname[Planets[pnum].type],
-	     junk,
-	     Context.lasttdist,
-	     Context.lasttang,
-	     tmpstr);
+               Planets[pnum].name,
+               ConqInfo->ptname[Planets[pnum].type],
+               junk,
+               Context.lasttdist,
+               Context.lasttang,
+               tmpstr);
 
 
     }
   else
     sprintf( buf, "%s%s, a %s%s, range %d, direction %d",
-	   str,
-	   Planets[pnum].name,
-	   ConqInfo->ptname[Planets[pnum].type],
-	   junk,
-	   Context.lasttdist,
-	   Context.lasttang);
+             str,
+             Planets[pnum].name,
+             ConqInfo->ptname[Planets[pnum].type],
+             junk,
+             Context.lasttdist,
+             Context.lasttang);
   
   /* save for the alt hud */
   strncpy(Context.lasttarg, Planets[pnum].name, 3);
   Context.lasttarg[3] = EOS;
+  hudSetInfoTarget(-pnum);
 
   if ( godlike )
     canscan = TRUE;
@@ -2662,8 +2640,16 @@ void nCPInit(int istopnode)
   pingPending = FALSE;
   pingStart = 0;
 
-  /* init the hud */
-  hudInitData();
+  /* init the hud when starting a fresh ship. */
+  if (istopnode)
+    {
+      hudInitData();
+      hudSetInfoFiringAngle(0);
+      hudSetInfoTarget(0);
+      hudSetInfoTargetAngle(0);
+      hudSetInfoTargetDist(0);
+    }
+
 
   /* clear the prompt lines */
   hudClearPrompt(MSG_LIN1);

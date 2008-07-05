@@ -48,8 +48,6 @@ int findGLTexture(char *texname);
 #define TEX_HUD_HDP        5
 #define TEX_HUD_WARP       6
 #define TEX_HUD_WARP2      7
-#define TEX_HUD_ICLOAK     12 
-#define TEX_HUD_IREPAIR    20
 #define TEX_HUD_ITORPIN    21
 
 void drawIconHUDDecal(GLfloat rx, GLfloat ry, GLfloat w, GLfloat h, 

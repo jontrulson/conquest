@@ -111,8 +111,17 @@ struct _prompt_lin {
   char str[HUD_PROMPT_SZ];
 };
 
-struct _xtrainfo {
-  char str[HUD_INFO_STR_SZ];
+/* data from last info command for the iconic ship */
+struct _info {
+  real lastblast;
+
+  int lastang;
+  int lastdist;
+  int lasttarget;
+
+  char lastblaststr[HUD_INFO_STR_SZ];  /* last "FA:" blast (firing) angle */
+  char lasttargetstr[HUD_INFO_STR_SZ]; /* last target in string form */
+  char lasttadstr[HUD_INFO_STR_SZ];    /* full "TA/D" target:ang/dist str */
 };
 
 struct _recId {
@@ -143,7 +152,7 @@ typedef struct _dspData {
   struct _prompt_lin        p1;
   struct _prompt_lin        p2;
   struct _prompt_lin        msg;
-  struct _xtrainfo          xtrainfo;
+  struct _info              info;
   struct _recId             recId;
   struct _recTime           recTime;
 } hudData_t;
@@ -175,9 +184,9 @@ void hudSetDestruct(int snum);
 void hudSetPrompt(int line, char *prompt, int pcolor, 
                   char *buf, int color);
 void hudClearPrompt(int line);
-
-
-
-
+void hudSetInfoFiringAngle(real blastang);
+void hudSetInfoTarget(int tnum);
+void hudSetInfoTargetAngle(int ang);
+void hudSetInfoTargetDist(int tdist);
 
 #endif /* _HUD_H */

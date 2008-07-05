@@ -73,6 +73,12 @@ void hudInitData(void)
   hudData.destruct.fuse    = -1;
   hudData.destruct.color   = RedLevelColor;
 
+  hudData.info.lastblast   = -1;
+  hudData.info.lastang     = -1;
+  hudData.info.lastdist    = -1;
+  hudData.info.lasttarget  = 0;
+  hudSetInfoFiringAngle(0);
+
   return;
 }
 
@@ -491,7 +497,7 @@ void hudSetDestruct(int snum)
 }
 
 
-/* return a 'space' buffer for padding */
+/* return a buffer of spaces for padding */
 static char *_padstr(int l)
 {
   static char padding[HUD_PROMPT_SZ];
@@ -505,7 +511,7 @@ static char *_padstr(int l)
   if (l > 0)
     memset(padding, ' ', l);
 
-  padding[HUD_PROMPT_SZ - 1] = 0;
+  padding[l - 1] = 0;
 
   return padding;
 }
@@ -569,7 +575,7 @@ void hudSetPrompt(int line, char *prompt, int pcolor,
   snprintf(str, HUD_PROMPT_SZ - 1,
            "#%d#%s#%d#%s%s",
            pcolor, pstr, color, bstr, _padstr(maxwidth - (pl + bl)));
-  str[HUD_PROMPT_SZ - 1] = 0;
+  str[HUD_PROMPT_SZ - 1] = 0; 
 
   return;
 }
@@ -583,3 +589,97 @@ void hudClearPrompt(int line)
 }
 
 
+void hudSetInfoFiringAngle(real blastang)
+{
+  int i = (int)blastang;
+
+  if (blastang != hudData.info.lastblast)
+    { 
+      snprintf(hudData.info.lastblaststr, HUD_INFO_STR_SZ - 1,
+               "#%d#FA:#%d#%3d",
+               MagentaColor,
+               InfoColor,
+               (i >= 0) ? i : 0);
+      
+      hudData.info.lastblaststr[HUD_INFO_STR_SZ - 1] = 0;
+
+      hudData.info.lastblast = blastang;
+    }
+  
+  return;
+}
+
+/* utility - based on cached data, build the proper target info string in
+ *  the lasttadstr string.
+ */
+void _updateTargetInfoString(void)
+{
+  if (!hudData.info.lasttarget)
+    hudData.info.lasttadstr[0] = 0;
+  else
+    snprintf(hudData.info.lasttadstr, HUD_INFO_STR_SZ - 1,
+             "#%d#TA/D:#2%d#%3s#%d#:#%d#%3d#%d#/#%d#%5d",
+             MagentaColor,
+             SpecialColor,
+             hudData.info.lasttargetstr,
+             MagentaColor,
+             InfoColor,
+             hudData.info.lastang,
+             MagentaColor,
+             InfoColor,
+             hudData.info.lastdist);
+  
+  return;
+}
+
+void hudSetInfoTarget(int tnum)
+{
+  /* < 0 = planet number, > 0 ship number, 0 = no target */
+  if (tnum != hudData.info.lasttarget)
+    {
+      hudData.info.lasttargetstr[0] = 0;
+      if (tnum)
+        {
+          if (tnum > 0)
+            appship( tnum, hudData.info.lasttargetstr );
+          else if (tnum < 0)
+            {                   /* planet, just need 3 chars */
+              hudData.info.lasttargetstr[0] = Planets[-tnum].name[0];
+              hudData.info.lasttargetstr[1] = Planets[-tnum].name[1];
+              hudData.info.lasttargetstr[2] = Planets[-tnum].name[2];
+              hudData.info.lasttargetstr[3] = 0;
+            }
+
+          _updateTargetInfoString();
+        }
+
+      hudData.info.lasttarget = tnum;
+    }
+
+  return;
+}
+
+void hudSetInfoTargetAngle(int ang)
+{
+  if (ang != hudData.info.lastang)
+    {
+      hudData.info.lastang = ang;
+
+      _updateTargetInfoString();
+    }
+
+  return;
+}
+      
+void hudSetInfoTargetDist(int tdist)
+{
+  if (tdist != hudData.info.lastdist)
+    {
+      hudData.info.lastdist = tdist;
+
+      _updateTargetInfoString();
+    }
+
+  return;
+}
+      

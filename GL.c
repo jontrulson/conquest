@@ -534,33 +534,9 @@ static int initGLShips(void)
               hex2GLColor(0xffeeeeee, &GLShips[i][j].warpq_col);
             }
 
-          snprintf(buffer, CQI_NAMELEN - 1, "%s-ico-cloak", shipPfx);
-          GLShips[i][j].ico_cloak = _get_ship_texid(buffer);
-          
-          snprintf(buffer, CQI_NAMELEN - 1, "%s-ico-repair", shipPfx);
-          GLShips[i][j].ico_repair = _get_ship_texid(buffer);
-          
           GLShips[i][j].ico_torp = _get_ship_texid("ico-torp");
           
-          /* this is ugly... we want to fail if any of these texid's are
-             0, indicating the texture wasn't found */
-          if (!(GLShips[i][j].ship &&
-                GLShips[i][j].sh &&
-                GLShips[i][j].tac &&
-                GLShips[i][j].phas &&
-                GLShips[i][j].ico &&
-                GLShips[i][j].ico_sh &&
-                GLShips[i][j].decal1 &&
-                GLShips[i][j].decal2 &&
-                GLShips[i][j].dial &&
-                GLShips[i][j].dialp &&
-                GLShips[i][j].warp &&
-                GLShips[i][j].warp2 &&
-                GLShips[i][j].phas &&
-                GLShips[i][j].ico_cloak &&
-                GLShips[i][j].ico_torp &&
-                GLShips[i][j].ico_repair))
-            return FALSE;        /* one was missing */
+          /* if we failed to find some of them, you'll see soon enough. */
         }
     }
   
@@ -842,12 +818,6 @@ void drawIconHUDDecal(GLfloat rx, GLfloat ry, GLfloat w, GLfloat h,
     case TEX_HUD_WARP2:   
       id = GLShips[steam][stype].warp2;
       break;
-    case TEX_HUD_ICLOAK:   
-      id = GLShips[steam][stype].ico_cloak;
-      break;
-    case TEX_HUD_IREPAIR:  
-      id = GLShips[steam][stype].ico_repair;
-     break;
     default:
       break;
     }
@@ -1482,32 +1452,6 @@ void setRecTime(char *str)
 
   return;
 }
-
-#if 0
-void setXtraInfo(void)
-{
-  int l = sizeof(hudData.xtrainfo.str);
-
-  snprintf(hudData.xtrainfo.str, l,
-          "#%d#FA:#%d#%3d #%d#TA/D:#%d#%3s#%d#:#%d#%3d#%d#/#%d#%5d",
-          LabelColor,
-          InfoColor,
-          (int)Ships[Context.snum].lastblast,
-          LabelColor,
-          SpecialColor,
-          Context.lasttarg,
-          LabelColor,
-          InfoColor,
-          Context.lasttang,
-          LabelColor,
-          InfoColor,
-          Context.lasttdist);
-
-  hudData.xtrainfo.str[l - 1] = 0;
-
-  return;
-}
-#endif
 
 #define WARP_UP     0
 #define WARP_DOWN   1

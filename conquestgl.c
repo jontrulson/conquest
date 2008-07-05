@@ -48,6 +48,8 @@
 
 #include "conqinit.h"
 #include "cqsound.h"
+#include "hud.h"
+
 
 void catchSignals(void);
 void handleSignal(int sig);
@@ -438,11 +440,6 @@ int main(int argc, char *argv[])
         exit(1);
 
       Context.unum = MSG_GOD;       /* stow user number */
-      Context.snum = ERR;           /* don't display in cdgetp - JET */
-      Context.entship = FALSE;      /* never entered a ship */
-      Context.histslot = ERR;       /* useless as an op */
-      Context.lasttdist = Context.lasttang = 0;
-      Context.lasttarg[0] = EOS;
 
       /* turn off annoying beeps */
       UserConf.DoAlarms = FALSE;
@@ -494,6 +491,8 @@ int main(int argc, char *argv[])
   Context.snum = 0;		/* force menu to get a new ship */
   Context.histslot = ERR;
   Context.lasttang = Context.lasttdist = 0;
+
+  Context.lasttdist = Context.lasttang = 0;
   Context.lasttarg[0] = EOS;
   catchSignals();       /* enable trapping of interesting signals */
 

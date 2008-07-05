@@ -332,6 +332,43 @@ texture {
     h          154.0
   }
 
+  ## "Cloaked" indicator position within "icon" area
+  texarea {
+    name       "icon-cloaked"
+    x          104.0
+    y          66.0
+    w          84.0
+    h          10.0
+  }
+
+  ## "Repairing" indicator position within "icon" area
+  texarea {
+    name       "icon-repairing"
+    x          104.0
+    y          66.0
+    w          84.0
+    h          10.0
+  }
+
+  ## "FA:%d" firing angle indicator position within "icon" area
+  texarea {
+    name       "icon-fangle"
+    x          7.0
+    y          190.0
+    w          40.0
+    h          10.0
+  }
+
+  ## "TA/D: %s:%d/%d" last Target, target Angle and target Distance 
+  ##  indicator position within "icon" area
+  texarea {
+    name       "icon-tad"
+    x          60.0
+    y          190.0
+    w          132.0
+    h          10.0
+  }
+
   # torp status
   texarea {
     name       "torps"
@@ -462,17 +499,6 @@ texture {
   filename     ""  # we are only using this to store a color
   color        "ffd72d00"
 }
-
-texture {
-  name         "shipF-ico-cloak"
-  filename     "ico-cloak"
-}
-
-texture {
-  name         "shipF-ico-repair"
-  filename     "ico-repair"
-}
-
 
 # Romulan Ships
 #
@@ -627,6 +653,43 @@ texture {
     h          154.0
   }
 
+  ## "Cloaked" indicator position within "icon" area
+  texarea {
+    name       "icon-cloaked"
+    x          104.0
+    y          66.0
+    w          84.0
+    h          10.0
+  }
+
+  ## "Repairing" indicator position within "icon" area
+  texarea {
+    name       "icon-repairing"
+    x          104.0
+    y          66.0
+    w          84.0
+    h          10.0
+  }
+
+  ## "FA:%d" firing angle indicator position within "icon" area
+  texarea {
+    name       "icon-fangle"
+    x          7.0
+    y          190.0
+    w          40.0
+    h          10.0
+  }
+
+  ## "TA/D: %s:%d/%d" last Target, target Angle and target Distance 
+  ##  indicator position within "icon" area
+  texarea {
+    name       "icon-tad"
+    x          60.0
+    y          190.0
+    w          132.0
+    h          10.0
+  }
+
   # torp status
   texarea {
     name       "torps"
@@ -757,17 +820,6 @@ texture {
   filename     ""  # we are only using this to store a color
   color        "ff47b6a4"
 }
-
-texture {
-  name         "shipR-ico-cloak"
-  filename     "ico-cloak"
-}
-
-texture {
-  name         "shipR-ico-repair"
-  filename     "ico-repair"
-}
-
 
 
 # Klingon ships
@@ -923,6 +975,43 @@ texture {
     h          154.0
   }
 
+  ## "Cloaked" indicator position within "icon" area
+  texarea {
+    name       "icon-cloaked"
+    x          104.0
+    y          66.0
+    w          84.0
+    h          10.0
+  }
+
+  ## "Repairing" indicator position within "icon" area
+  texarea {
+    name       "icon-repairing"
+    x          104.0
+    y          66.0
+    w          84.0
+    h          10.0
+  }
+
+  ## "FA:%d" firing angle indicator position within "icon" area
+  texarea {
+    name       "icon-fangle"
+    x          7.0
+    y          190.0
+    w          40.0
+    h          10.0
+  }
+
+  ## "TA/D: %s:%d/%d" last Target, target Angle and target Distance 
+  ##  indicator position within "icon" area
+  texarea {
+    name       "icon-tad"
+    x          60.0
+    y          190.0
+    w          132.0
+    h          10.0
+  }
+
   # torp status
   texarea {
     name       "torps"
@@ -1053,17 +1142,6 @@ texture {
   filename     ""  # we are only using this to store a color
   color        "ffd72d00"
 }
-
-texture {
-  name         "shipK-ico-cloak"
-  filename     "ico-cloak"
-}
-
-texture {
-  name         "shipK-ico-repair"
-  filename     "ico-repair"
-}
-
 
 
 # Orion ships
@@ -1207,6 +1285,43 @@ texture {
     h          154.0
   }
 
+  ## "Cloaked" indicator position within "icon" area
+  texarea {
+    name       "icon-cloaked"
+    x          104.0
+    y          66.0
+    w          84.0
+    h          10.0
+  }
+
+  ## "Repairing" indicator position within "icon" area
+  texarea {
+    name       "icon-repairing"
+    x          104.0
+    y          66.0
+    w          84.0
+    h          10.0
+  }
+
+  ## "FA:%d" firing angle indicator position within "icon" area
+  texarea {
+    name       "icon-fangle"
+    x          7.0
+    y          190.0
+    w          40.0
+    h          10.0
+  }
+
+  ## "TA/D: %s:%d/%d" last Target, target Angle and target Distance 
+  ##  indicator position within "icon" area
+  texarea {
+    name       "icon-tad"
+    x          60.0
+    y          190.0
+    w          132.0
+    h          10.0
+  }
+
   # torp status
   texarea {
     name       "torps"
@@ -1337,17 +1452,6 @@ texture {
   filename     ""  # we are only using this to store a color
   color        "ff0f395a"
 }
-
-texture {
-  name         "shipO-ico-cloak"
-  filename     "ico-cloak"
-}
-
-texture {
-  name         "shipO-ico-repair"
-  filename     "ico-repair"
-}
-
 
 # Animations and animation definitions
 #
