@@ -93,6 +93,7 @@ void setUserConfDefaults(void)
 
   UserConf.DistressToFriendly = FALSE;
   UserConf.AltHUD = FALSE;
+  UserConf.hudInfo = TRUE;
   UserConf.DoLRTorpScan = TRUE;
   UserConf.DoLocalLRScan = TRUE;
   UserConf.DoETAStats = TRUE;

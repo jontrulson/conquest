@@ -443,6 +443,8 @@ int main(int argc, char *argv[])
 
       /* turn off annoying beeps */
       UserConf.DoAlarms = FALSE;
+      /* turn off hudInfo */
+      UserConf.hudInfo = FALSE;
     }
 
   if (serveropt && wantMetaList)

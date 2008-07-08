@@ -256,7 +256,7 @@ static void _infoship( int snum, int scanner )
 
   cbuf[0] = Context.lasttarg[0] = EOS;
   appship( snum, cbuf );
-  strcpy(Context.lasttarg, cbuf); /* save for alt hud */
+  strcpy(Context.lasttarg, cbuf); /* save for hudInfo */
   hudSetInfoTarget(snum);
 
   if ( snum == scanner )
@@ -594,7 +594,7 @@ static void _infoplanet( char *str, int pnum, int snum )
              Context.lasttdist,
              Context.lasttang);
   
-  /* save for the alt hud */
+  /* save for the hudInfo */
   strncpy(Context.lasttarg, Planets[pnum].name, 3);
   Context.lasttarg[3] = EOS;
   hudSetInfoTarget(-pnum);

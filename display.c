@@ -55,7 +55,7 @@ void do_bottomborder(int snum, char *buf, int attrib, int bufattr)
   /* now the buffer, if there */
   if ( buf && buf[0] != EOS )
     {
-      if (UserConf.AltHUD)
+      if (UserConf.hudInfo)
 	col = Context.maxcol - (strlen(buf) + 1);
       else
 	col = (int) (Context.maxcol - STAT_COLS - strlen(buf)) / 
@@ -76,8 +76,8 @@ void do_bottomborder(int snum, char *buf, int attrib, int bufattr)
       uiPutColor(0);
     }
 
-  /* if alt hud and we are a ship... */
-  if (UserConf.AltHUD && snum > 0 && 
+  /* if hudInfo and we are a ship... */
+  if (UserConf.hudInfo && snum > 0 && 
       snum <= MAXSHIPS)
     {				/* some additional info */
       /* current firing angle */
@@ -704,7 +704,7 @@ void display( int snum, int display_info )
       OldAlert = AlertLevel;
     }
   
-  if ( (strcmp( buf, zzbuf ) != 0) || UserConf.AltHUD)
+  if ( (strcmp( buf, zzbuf ) != 0) || UserConf.hudInfo)
     {
       lin = DISPLAY_LINS + 1;
       do_bottomborder(snum, buf, alertcolor(AlertLevel), outattr);

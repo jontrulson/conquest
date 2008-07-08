@@ -92,7 +92,7 @@ static struct {
   GLRect_t arm;
   GLRect_t destruct;
 
-  GLRect_t althud;
+  GLRect_t pbitem;              /* planet/ship we are watching */
   GLRect_t rectime;
 
   /* msg/prompt lines */
@@ -513,14 +513,14 @@ void updateIconHudGeo(int snum)
   o.destruct.w = ((dConf.vW / 6.0) * 4.0);
   o.destruct.h = (dConf.vH / 6.0);
 
-  /* althud/altinfo */
+  /* playback item (ship/planet, name, team, etc) */
   tx = dConf.vX;
   ty = dConf.vY + dConf.vH;
 
-  o.althud.x = tx;
-  o.althud.y = ty + (o.sb_ih * 0.2);
-  o.althud.w = ((dConf.vX + dConf.vW) - tx);
-  o.althud.h =  (o.sb_ih * 0.7);
+  o.pbitem.x = tx;
+  o.pbitem.y = ty + (o.sb_ih * 0.2);
+  o.pbitem.w = ((dConf.vX + dConf.vW) - tx);
+  o.pbitem.h =  (o.sb_ih * 0.7);
 
   /* rectime or stats info */
   tx = dConf.borderW;
@@ -550,10 +550,58 @@ void updateIconHudGeo(int snum)
 
 }
 
+static void renderScale(GLfloat x, GLfloat y, GLfloat w, GLfloat h,
+                 int min, int max, int val, int scalecolor) 
+{
+  val = CLAMP(min, max, val);
+  
+  uiPutColor(scalecolor);
+  
+  /* gauge */
+  drawQuad(x, y, 
+           w * (GLfloat)((GLfloat)val / ((GLfloat)max - (GLfloat)min)),
+           h, 0.0);
+  
+  return;
+}
+
+/* like renderScale, but more specific */
+static void renderAlloc(GLfloat x, GLfloat y, GLfloat w, GLfloat h,
+               struct _alloc *a)
+{
+  int walloc = 0;
+  
+  /* bg */
+  if (a->ealloc > 0)
+    uiPutColor(BlueColor);
+  else
+    uiPutColor(RedLevelColor);
+
+  drawQuad(x, y, w, h, 0.0);
+
+  /* fg */
+  
+  if (!a->ealloc)
+    walloc = a->walloc;         /* e overload */
+  else
+    walloc = 100 - a->ealloc;
+
+  if (a->walloc > 0)
+    uiPutColor(NoColor);
+  else
+    uiPutColor(RedLevelColor);
+
+  drawQuad(x, y, 
+           w * (GLfloat)((GLfloat)walloc / 100.0),
+           h, 0.0);
+
+  return;
+}
+
 /* draw overload/critical  messages using a 'pulse' effect
    in the viewer.  Use a slower pulse for 'critical' levels, except
    for hull critical. */
-void renderPulseMsgs(void)
+static void renderPulseMsgs(void)
 {
   static animStateRec_t engfail = {}; /* animdef states  */
   static animStateRec_t wepfail = {}; 
@@ -742,7 +790,7 @@ void renderPulseMsgs(void)
 }
 
 /* render the shield's current strength when down */
-void renderShieldCharge(void)
+static void renderShieldCharge(void)
 {
   real val;
   
@@ -925,8 +973,7 @@ void renderHud(int dostats)
 
   /* alloc */
   renderAlloc(o.d2allocg.x, o.d2allocg.y, o.d2allocg.w, o.d2allocg.h,
-              &hudData.alloc, fontLargeTxf, fontFixedTxf, 
-              TRUE);
+              &hudData.alloc);
   
   /* alloc value */
   glfRender(o.d2allocn.x, o.d2allocn.y, 0.0, o.d2allocn.w, o.d2allocn.h, 
@@ -1201,20 +1248,23 @@ void renderHud(int dostats)
   hudSetInfoTargetAngle(Context.lasttang);
   hudSetInfoTargetDist(Context.lasttdist);
 
-  /* render fa */
-  glfRender(o.d1icon_fa.x, o.d1icon_fa.y, 
-            0.0, 
-            o.d1icon_fa.w, o.d1icon_fa.h,
-            fontFixedTxf, hudData.info.lastblaststr, NoColor, 
-            NULL, TRUE, TRUE, TRUE);
-
-  /* render tad */
-  if (hudData.info.lasttadstr[0])
-    glfRender(o.d1icon_tad.x, o.d1icon_tad.y, 
-              0.0, 
-              o.d1icon_tad.w, o.d1icon_tad.h,
-              fontFixedTxf, hudData.info.lasttadstr, NoColor, 
-              NULL, TRUE, TRUE, TRUE);
+  if (UserConf.hudInfo)
+    {
+      /* render fa */
+      glfRender(o.d1icon_fa.x, o.d1icon_fa.y, 
+                0.0, 
+                o.d1icon_fa.w, o.d1icon_fa.h,
+                fontFixedTxf, hudData.info.lastblaststr, NoColor, 
+                NULL, TRUE, TRUE, TRUE);
+      
+      /* render tad */
+      if (hudData.info.lasttadstr[0])
+        glfRender(o.d1icon_tad.x, o.d1icon_tad.y, 
+                  0.0, 
+                  o.d1icon_tad.w, o.d1icon_tad.h,
+                  fontFixedTxf, hudData.info.lasttadstr, NoColor, 
+                  NULL, TRUE, TRUE, TRUE);
+    }
 
   if ((Context.recmode != RECMODE_PLAYING) &&
       (Context.recmode != RECMODE_PAUSED))
@@ -1230,9 +1280,9 @@ void renderHud(int dostats)
   else
     {
       /* for playback, the ship/item we are watching */
-      glfRender(o.althud.x, o.althud.y, 
+      glfRender(o.pbitem.x, o.pbitem.y, 
                 0.0, 
-                o.althud.w, o.althud.h,
+                o.pbitem.w, o.pbitem.h,
                 fontFixedTxf, hudData.recId.str, 
                 MagentaColor | CQC_A_BOLD, 
                 NULL, TRUE, TRUE, TRUE);
@@ -1354,55 +1404,6 @@ void renderViewer(int dovbg, int dobomb)
   glMatrixMode(GL_PROJECTION);
   glLoadMatrixf(dConf.hmat);
   glMatrixMode(GL_MODELVIEW);
-
-  return;
-}
-
-void renderScale(GLfloat x, GLfloat y, GLfloat w, GLfloat h,
-                 int min, int max, int val, int scalecolor) 
-{
-  val = CLAMP(min, max, val);
-  
-  uiPutColor(scalecolor);
-  
-  /* gauge */
-  drawQuad(x, y, 
-           w * (GLfloat)((GLfloat)val / ((GLfloat)max - (GLfloat)min)),
-           h, 0.0);
-  
-  return;
-}
-
-/* like renderScale, but more specific */
-void renderAlloc(GLfloat x, GLfloat y, GLfloat w, GLfloat h,
-               struct _alloc *a,
-               TexFont *lfont, TexFont *vfont, int HUD)
-{
-  int walloc = 0;
-  
-  /* bg */
-  if (a->ealloc > 0)
-    uiPutColor(BlueColor);
-  else
-    uiPutColor(RedLevelColor);
-
-  drawQuad(x, y, w, h, 0.0);
-
-  /* fg */
-  
-  if (!a->ealloc)
-    walloc = a->walloc;         /* e overload */
-  else
-    walloc = 100 - a->ealloc;
-
-  if (a->walloc > 0)
-    uiPutColor(NoColor);
-  else
-    uiPutColor(RedLevelColor);
-
-  drawQuad(x, y, 
-           w * (GLfloat)((GLfloat)walloc / 100.0),
-           h, 0.0);
 
   return;
 }

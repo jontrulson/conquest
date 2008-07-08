@@ -460,7 +460,7 @@ void mcuInfoPlanet( char *str, int pnum, int snum )
 	   Context.lasttdist,
 	   Context.lasttang);
   
-  /* save for the alt hud */
+  /* save for hudInfo */
   strncpy(Context.lasttarg, Planets[pnum].name, 3);
   Context.lasttarg[3] = EOS;
 
@@ -593,7 +593,7 @@ void mcuInfoShip( int snum, int scanner )
 
   cbuf[0] = Context.lasttarg[0] = EOS;
   appship( snum, cbuf );
-  strcpy(Context.lasttarg, cbuf); /* save for alt hud */
+  strcpy(Context.lasttarg, cbuf); /* save for hudInfo */
 
   if ( snum == scanner )
     {
@@ -687,7 +687,7 @@ void mcuInfoShip( int snum, int scanner )
   
   if ( ! SCLOAKED(snum) || Ships[snum].warp != 0.0 )
     {
-      Context.lasttdist = round( dis ); /* save these puppies for alt hud */
+      Context.lasttdist = round( dis ); /* save these puppies for hudInfo */
       Context.lasttang = round( angle( x, y, appx, appy ) );
       sprintf( cbuf, "Range %d, direction %d",
 	     Context.lasttdist, Context.lasttang );

@@ -20,11 +20,6 @@
 
 #include "datatypes.h"
 #include "cqkeys.h"
-#ifdef CONF_NOEXTERN
-# define CEXTERN
-#else
-# define CEXTERN extern
-#endif
 
 #define SYSCONFIG_FILE "conquestrc"	/* relative to CONQETC */
 #define CONFIG_FILE "conquestrc"
@@ -76,59 +71,84 @@ struct Conf
 #define SYSCF_END (sizeof(SysConfData)/sizeof(struct Conf))
 
 typedef struct _userConf {
-				/* Whether to beep on an incoming message */
+  /* Whether to beep on an incoming message */
   int MessageBell;
-				/* Whether or not to disable color */
+
+  /* Whether or not to disable color */
   int NoColor;
-				/* whether or not you want to see robot msgs */
+
+  /* whether or not you want to see robot msgs */
   int NoRobotMsgs;
-				/* whether to update the screen twice per */
-				/* second instead of once per second. */
+
+  /* whether to update the screen twice per 
+   * second instead of once per second. 
+   */
   int UpdatesPerSecond;
-				/* whether to send emergency distress calls
-				   to all friendly ships, rather than just
-				   your team mates */
+
+  /* whether to send emergency distress calls
+   *  to all friendly ships, rather than just
+   *  your team mates 
+   */
   int DistressToFriendly;
-				/* whether to use alt HUD.  no effect if
-				   allow_alt_hud is false */
+
+  /* not currently used. */
   int AltHUD;
-				/* Macro keys - F1-F<MAX_MACROS> */
 
-  int ShowPhasers;		/* want phaser graphics? */
+  /* whether to display last firing angle, and target, distance, and
+   *  angle of the last ship or planet that was (i)nfo'd
+   */
+  int hudInfo; 
 
-  int ShowPlanNames;		/* show planet names? */
+  /* want phaser graphics? */
+  int ShowPhasers;
 
-  int DoAlarms;			/* want alarm bell? */
+  /* show planet names? */
+  int ShowPlanNames;
 
-  int DoIntrudeAlert;		/* want intruder alerts */
+  /* want alarm bell? */
+  int DoAlarms;
 
-  int DoNumMap;			/* want numeric map */
+  /* want intruder alerts */
+  int DoIntrudeAlert;
 
-  int Terse;			/* be terse? */
- 
-  int DoExplode;		/* show explosions? */
+  /* want numeric map */
+  int DoNumMap;
 
-				/* can see friendly torps on LR scan? */
+  /* be terse? */
+  int Terse;
+
+  /* show explosions? */
+  int DoExplode;
+
+  /* can see friendly torps on LR scan? */
   int DoLRTorpScan;
-                              /* (M)ap is actually LongeRange scan? */
+
+  /* (M)ap is actually LongeRange scan? */
   int DoLocalLRScan;
-                                /* (I)nfo cmds return ETA data? */
+
+  /* (I)nfo cmds return ETA data? */
   int DoETAStats;
-     /* for the GL client only - draws a red box around enemy ships */
+
+  /* for the GL client only - draws a red box around enemy ships */
   int EnemyShipBox;
 
-  int doVBG;                    /* draw the background in the viewer? */
+  /* draw the background in the viewer? */
+  int doVBG;
 
-  int DoShields;                /* Cataboligne - enhanced colored shield
-                                   indicator */
+  /* Cataboligne - enhanced colored shield indicator */
+  int DoShields;
 
-  int DoTacBkg;                 /* tactical background graphic */
+  /* tactical background graphic */
+  int DoTacBkg;
 
-  int DoTacShade;               /* tactical background alpha */
+  /* tactical background alpha */
+  int DoTacShade;
 
-  int musicVol;                 /* nusic/effects volume */
+  /* nusic/effects volume */
+  int musicVol;
   int effectsVol;
 
+  /* Macro keys - F1-F<MAX_MACROS> */
   char MacrosF[MAX_MACROS][MAX_MACRO_LEN];
 
   /* mouse macros, indexed by [max buttons][modifiers (8)]  */
@@ -137,32 +157,36 @@ typedef struct _userConf {
 } UserConf_t;
 
 typedef struct _sysConf {
-				/* randomly gen a doomsday machine? */
+  /* randomly gen a doomsday machine? */
   int NoDoomsday;
-				/* allow randomized robot strengths */
+
+  /* allow randomized robot strengths */
   int DoRandomRobotKills;
-				/* allow vacant ships */
+
+  /* allow vacant ships */
   int AllowVacant;
-				/* allow users to (s)witchteams from main
-				   menu */
+
+  /* allow users to (s)witchteams from main menu */
   int AllowSwitchteams;
-				/* number of days of inactivity before
-				   expiring a user */
+
+  /* number of days of inactivity before expiring a user */
   int UserExpiredays;
 
-				/* whether to log all messages into
-				   the logfile */
+  /* whether to log all messages into the logfile */
   int LogMessages;
 
-				/* whether to allow refitting */
+  /* whether to allow refitting */
   int AllowRefits;
 
-  int AllowSlingShot;           /* slingshot bug enabled? */
+  /* slingshot bug enabled? */
+  int AllowSlingShot; 
 
   /* server name */
   char ServerName[CONF_SERVER_NAME_SZ];
+
   /* server motd */
   char ServerMotd[CONF_SERVER_MOTD_SZ];
+
   /* server owner contact info */
   char ServerContact[META_GEN_STRSIZE];
 
@@ -173,34 +197,36 @@ typedef struct _sysConf {
 				/* - for updating conquestrc   */
 				/*   when something changes */
 #ifndef CONF_NOEXTERN
-CEXTERN char ConfigVersion[];
+extern char ConfigVersion[];
+/* Config's */
+extern UserConf_t UserConf;
+extern SysConf_t SysConf;
 
 #else
 char ConfigVersion[] = "$Revision$";
+UserConf_t UserConf;
+SysConf_t  SysConf;
 #endif /* CONF_NOEXTERN */
 
-/* Config's */
-CEXTERN UserConf_t UserConf;
-CEXTERN SysConf_t SysConf;
 
 				/* local function declarations */
 void confSetTelnetClientMode(int telnetc);
 int confGetTelnetClientMode(void);
-CEXTERN int GetSysConf(int checkonly);
-CEXTERN int GetConf(int usernum);
-CEXTERN int MakeSysConf(void);
-CEXTERN int SaveUserConfig(void);
-CEXTERN int SaveSysConfig(void);
-CEXTERN char *Str2Macro(char *str);
-CEXTERN char *Macro2Str(char *str);
-CEXTERN char *process_macrostr(char *str);
-CEXTERN int process_bool(char *bufptr);
-CEXTERN int MakeConf(char *filename);
-CEXTERN Unsgn32 getServerFlags(void);
+int GetSysConf(int checkonly);
+int GetConf(int usernum);
+int MakeSysConf(void);
+int SaveUserConfig(void);
+int SaveSysConfig(void);
+char *Str2Macro(char *str);
+char *Macro2Str(char *str);
+char *process_macrostr(char *str);
+int process_bool(char *bufptr);
+int MakeConf(char *filename);
+Unsgn32 getServerFlags(void);
 
 				/* Initialize the system configurables */
 #ifndef CONF_NOEXTERN
-CEXTERN struct Conf SysConfData[];
+extern struct Conf SysConfData[];
 #else
 struct Conf SysConfData[] =
 {
@@ -403,7 +429,7 @@ struct Conf SysConfData[] =
 #endif /* CONF_NOEXTERN */
 				/* Initialize the user configurables */
 #ifndef CONF_NOEXTERN
-CEXTERN struct Conf ConfData[];
+extern struct Conf ConfData[];
 #else
 struct Conf ConfData[] =
 {
@@ -618,10 +644,27 @@ struct Conf ConfData[] =
     0, 0,			/* mix/max */
     "Use an alternate, experimental HUD",
     {
-      "# define this as true if you want to use a new, experimental",
-      "#  HUD.  This option allows the display of certain information",
-      "#  on the bottom view line.  There may be more in the future.",
+      "# Not currently used, but might be in a future revision.",
       "#  Default: false",
+      NULL,
+    }
+  },
+  {
+    FALSE,
+    CTYPE_BOOL,
+    "hud_info=",
+    &UserConf.hudInfo,
+    0, 0,			/* mix/max */
+    "Display and retain certain (i)nfo'd data in the cockpit HUD",
+    {
+      "# define this as true if you want to display last firing angle, ",
+      "#  and the target, distance, and angle of the last ship or planet ",
+      "#  that was (i)nfo'd in the 'hud'",
+      "#",
+      "# For the curses client, this info will displayed below the viewer.",
+      "# For the OpenGL client, this info will be displayed below the ",
+      "#  HUD iconic ship display.",
+      "#  Default: true",
       NULL,
     }
   },
@@ -842,17 +885,15 @@ struct Conf ConfData[] =
 #endif /* CONF_NOEXTERN */
 
 #ifndef CONF_NOEXTERN
-CEXTERN int CfEnd;
+extern int CfEnd;
 #else
 int CfEnd = CF_END;
 #endif /* CONF_NOEXTERN */
 
 #ifndef CONF_NOEXTERN
-CEXTERN int SysCfEnd;
+extern int SysCfEnd;
 #else
 int SysCfEnd = SYSCF_END;
 #endif /* CONF_NOEXTERN */
-
-#undef CEXTERN			/* cleanup */
 
 #endif /* CONF_H */
