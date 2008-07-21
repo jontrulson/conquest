@@ -60,7 +60,7 @@ void nPlayBMenuInit(void)
   state = S_NONE;
   prompting = FALSE;
 
-  /* if frameDelay wasn't overridden, setup based on samplerate */
+  /* init frameDelay based on samplerate if neccessary */
   if (frameDelay == -1.0)
     frameDelay = 1.0 / (real)fhdr.samplerate;
 

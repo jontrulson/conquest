@@ -21,7 +21,10 @@
 #include "protocol.h"
 #include "client.h"
 #include "record.h"
+
+#define NOEXTERN_PLAYBACK
 #include "playback.h"
+#undef NOEXTERN_PLAYBACK
 
 /* read in a header/data packet pair, and add them to our cmb.  return
    the packet type processed or RDATA_NONE if there is no more data or
@@ -169,4 +172,40 @@ int pbProcessIter(void)
   return(rtype);
 }
 
+/* This function accepts a playback speed, checks the limits, and sets
+ * the frameDelay appropriately.
+ */
+void pbSetPlaybackSpeed(int speed, int samplerate)
+{
+  /* first check the limits and adjust accordingly */
 
+  if (speed > PB_SPEED_INFINITE)
+    speed = PB_SPEED_INFINITE;
+
+  if (speed < -PB_SPEED_MAX_TIMES)
+    speed = -PB_SPEED_MAX_TIMES;
+
+  /* now we need to check for and 'skip' speeds of 0 and -1 */
+
+  /* going slower (can only get there from 1x incrementally) */
+  if (speed == 0)
+    speed = -2;
+
+  /* going faster (can only get there from -2x incrementally) */
+  if (speed == -1)
+    speed = 1;
+    
+  /* save the new speed */
+  pbSpeed = speed;
+
+  /* now compute the new frameDelay */
+  
+  if (pbSpeed == PB_SPEED_INFINITE)
+    frameDelay = 0.0;
+  else if (pbSpeed > 0)
+    frameDelay = (1.0 / (real)samplerate) / (real)pbSpeed;
+  else if (pbSpeed < 0)
+    frameDelay = -(real)pbSpeed * (1.0 / (real)samplerate);
+
+  return;
+}

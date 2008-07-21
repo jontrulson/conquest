@@ -50,6 +50,7 @@
 #include "udp.h"
 #include "meta.h"
 #include "conqinit.h"
+#include "playback.h"
 
 #define CLIENTNAME "Conquest"	/* our client name */
 
@@ -276,6 +277,7 @@ int main(int argc, char *argv[])
     switch (i)
       {
       case 'B':                 /* Benchmark mode, set frameDelay to 0.0 */
+        pbSpeed = PB_SPEED_INFINITE;
         frameDelay = 0.0;
         break;
       case 'm':

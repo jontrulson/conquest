@@ -45,23 +45,24 @@ void displayReplayData(void)
   char buf[128];
   time_t elapsed = (currTime - startTime);
   char *c;
+  real percent;
 
   /* elapsed time */
   fmtseconds((int)elapsed, buf);
   c = &buf[2];			/* skip day count */
-  cdputs( c, DISPLAY_LINS + 1, 2 );
+  if (elapsed <= 0)
+    elapsed = 1;
+  
+  percent = ((real)elapsed / (real)totElapsed ) * 100.0;
 
-  /* current frame delay */
-#if 1
-  sprintf(buf, "%2.3fs", frameDelay);
-#else  /* an attempt at fps. */
-  if (frameDelay != 0)
-    sprintf(buf, "%3.2f fps", (1.0 / frameDelay));
+  /* current speed */
+  if (pbSpeed == PB_SPEED_INFINITE)
+    /* current frame delay */
+    sprintf(buf, "%s (%d%%) INF", c, (int)percent);
   else
-    sprintf(buf, "MAX fps");
-#endif
+    sprintf(buf, "%s (%d%%) %2dx ", c, (int)percent, pbSpeed);
 
-  cdputs( buf, DISPLAY_LINS + 1, 15);
+  cdputs( buf, DISPLAY_LINS + 1, 2);
 
   /* paused status */
   if (Context.recmode == RECMODE_PAUSED)
@@ -331,32 +332,20 @@ static void watch(void)
 		    
 	    case 'n':		/* set frameDelay to normal playback
 				   speed.*/
-	      frameDelay = 1.0 / (real)fhdr.samplerate;
+              pbSetPlaybackSpeed(1, fhdr.samplerate);
 	      upddsp = TRUE;
 	      break;
 
 	      /* these seem backward, but it's easier to understand
 		 the '+' is faster, and '-' is slower ;-) */
 	    case '-':
-	      /* if it's at 0, we should still
-		 be able to double it. sorta. */
-	      if (frameDelay == 0.0) 
-		frameDelay = 0.001;
-	      frameDelay *= 2;
-	      if (frameDelay > 10.0) /* really, 10s is a *long* time
-					between frames... */
-		frameDelay = 10.0;
+              pbSetPlaybackSpeed(pbSpeed - 1, fhdr.samplerate);
 	      upddsp = TRUE;
 	      break;
 
 	    case '+': 
 	    case '=':
-	      if (frameDelay != 0)
-		{		/* can't divide 0 in our universe */
-		  frameDelay /= 2;
-		  if (frameDelay < 0.0)
-		    frameDelay = 0.0;
-		}
+              pbSetPlaybackSpeed(pbSpeed + 1, fhdr.samplerate);
 	      upddsp = TRUE;
 	      break;
 

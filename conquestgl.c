@@ -50,6 +50,7 @@
 #include "cqsound.h"
 #include "hud.h"
 
+#include "playback.h"
 
 void catchSignals(void);
 void handleSignal(int sig);
@@ -323,6 +324,7 @@ int main(int argc, char *argv[])
     switch (i)
       {
       case 'B':                 /* Benchmark mode, set frameDelay to 0.0 */
+        pbSpeed = PB_SPEED_INFINITE;
         frameDelay = 0.0;
         break;
       case 'f':

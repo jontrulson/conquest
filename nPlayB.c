@@ -150,13 +150,23 @@ void set_rectime(void)
   static char hbuf[128];
   time_t elapsed = (currTime - startTime);
   char *c;
+  real percent;
+  real speed;
 
   /* elapsed time */
   fmtseconds((int)elapsed, buf);
   c = &buf[2];			/* skip day count */
-  
-  /* current frame delay */
-  sprintf(hbuf, "%s  %2.3fs", c, frameDelay);
+
+  if (elapsed <= 0)
+    elapsed = 1;
+
+  percent = ((real)elapsed / (real)totElapsed ) * 100.0;
+
+  if (pbSpeed == PB_SPEED_INFINITE)
+    /* current frame delay */
+    sprintf(hbuf, "%s (%d%%) INF", c, (int)percent);
+  else
+    sprintf(hbuf, "%s (%d%%) %2dx", c, (int)percent, pbSpeed);
 
   setRecTime(hbuf);
 
@@ -407,30 +417,19 @@ static int nPlayBInput(int ch)
       
     case 'n':		/* set frameDelay to normal playback
                            speed.*/
-      frameDelay = 1.0 / (real)fhdr.samplerate;
+      pbSetPlaybackSpeed(1, fhdr.samplerate);
       break;
       
       /* these seem backward, but it's easier to understand
          the '+' is faster, and '-' is slower ;-) */
     case '-':
-      /* if it's at 0, we should still
-         be able to double it. sorta. */
-      if (frameDelay == 0.0) 
-        frameDelay = 0.001;
-      frameDelay *= 2;
-      if (frameDelay > 10.0) /* really, 10s is a *long* time
-                                between frames... */
-        frameDelay = 10.0;
+
+      pbSetPlaybackSpeed(pbSpeed - 1, fhdr.samplerate);
       break;
       
     case '+': 
     case '=':
-      if (frameDelay != 0)
-        {		/* can't divide 0 in our universe */
-          frameDelay /= 2;
-          if (frameDelay < 0.0)
-            frameDelay = 0.0;
-        }
+      pbSetPlaybackSpeed(pbSpeed + 1, fhdr.samplerate);
       break;
       
     case 'w':
