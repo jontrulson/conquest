@@ -9,6 +9,121 @@
 
                               Conquest HISTORY
 
+8.3b (devel) 07/21/2008
+
+  - rework 'dead' handling.
+
+    - Now, at least in the GL client, when you die you will actually
+      see it.
+      
+    - The 'dead' node has been converted to an overlay node.  After
+      you've died, you will still see what is going on around you. 
+
+    - in the dead node, hitting ESC will take you back to the main
+      menu, hitting [TAB] will re-enter your ship directly without
+      having to go through the menu.
+
+  - clients now compute orbital position directly rather than using
+    the server's idea of your ship's position in orbit around a
+    planet.  This provides for much smoother movement when you see
+    ships (including your own) that are in orbit around fast moving
+    objects.
+
+  - fix doomsday motion.  Instead of simply stopping when within range
+    of a locked-on planet or ship, continue to stay in range when possible
+    (ie: should the planet/ship move out of range).
+
+  - conquestd (server) changes
+
+    - dead rework.  No longer sleep for 2 seconds after a ship is
+      killed.
+
+    - in the menu state, no longer wait for 1 second before updating
+      the client.  Now we update at full speed.  
+
+    - got rid of the driver countdown timer.  There is really no need
+      to kill the driver (if your client driver started it) just
+      because your ship has been dead for more than 15 seconds.  This
+      is the 21st century after all.
+
+    - Older clients playing on newer servers will notice that you go
+      immediately to the 'dead' screen when you die, since the server
+      no longer sleeps for 2 seconds on ship death.  
+
+    - Newer clients playing on older servers will notice that when
+      they die, ship and planet updates will decrease to one per
+      second.  After 15 seconds, and if you are the only player,
+      updates will stop entirely.
+
+      Other than these changes in behavior, client/servers are still
+      compatible.  As usual, use the latest client on the latest
+      server for the best results :)
+
+  - fix bug that prevented you from seeing your own torps on LR scan
+    if you were at war with your team.
+
+  - redo how data data is cached and stored in the GL client.  New
+    hud.c and hud.h files handle the setting of hud information (alert
+    level, warp, damage, etc).  Move this stuff out of GL.c.  Move hud
+    caching out of gldisplay and into the hud data structs where it
+    belongs.
+
+    This should speed up hud endering somewhat by avoiding
+    unneccessary computations and string generation.
+
+  - reworked the 'alt_hud' stuff.  When enabled, this would allow
+    certain information (distance, direction) about a ship or planet
+    that was last (i)nfo'd to be displayed.
+
+    This option is now called hud_info, and is enabled by default.
+
+    For the GL client, this data is displayed below the ship's status
+    icon in the hud.  For the curses client, this information is
+    displayed just below the viewer.
+
+    The alt_hud config option is still present but does nothing.  In
+    the future it will be used to enable an experimental cockpit
+    (hud/viewer), if one is ever written.
+
+  - re-implemented the 'REPAIR' and 'CLOAKED' icon ship indicators to
+    just render the text directly rather than use textures.
+
+    got rid of the icon cloak and repair textures since their services
+    are no longer required.  There were 8 of them, though only two
+    were even being used.
+
+  - got rid of the 'BETTER_ETA' defines.  This code has been in use
+    forever, I think it works, so no need to conditionally compile it
+    :)
+
+  - initGLShips() - don't go all fatal on us just because some textures
+    couldn't be found...
+
+  - When pausing during playback of a recording, use the framedelay
+    rather than spinning as fast as possible.
+
+  - rework the way the playback speed and time is displayed in both
+    the curses and GL clients.  Now show the percentage into the
+    recording you are currently viewing, and instead of displaying the
+    internal framedelay, show the 'speed' (1x, 2x, -3x, etc).
+
+  - fix UDP error on Solaris (possibly others).  Use write() rather
+    than sendto() when a UDP connection has already been properly
+    established (EISCONN). 
+
+  - standardize how some buttons are referenced in the game's text for
+    consistancy:
+
+    RETURN -> [ENTER]
+    TAB    -> [TAB]
+    ESCAPE -> [ESC]
+ 
+  - rename clPutShip() -> clbPutShip(), like most everything else in
+    conqlb.
+
+  - minor code cleanups
+
+
 8.3a (devel) 05/10/2008
 
   - correct some nasty off-by-one's (NUMPLANETS) in

@@ -612,7 +612,7 @@ void hudSetInfoFiringAngle(real blastang)
 /* utility - based on cached data, build the proper target info string in
  *  the lasttadstr string.
  */
-void _updateTargetInfoString(void)
+static void _updateTargetInfoString(void)
 {
   if (!hudData.info.lasttarget)
     hudData.info.lasttadstr[0] = 0;

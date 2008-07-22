@@ -151,7 +151,6 @@ void set_rectime(void)
   time_t elapsed = (currTime - startTime);
   char *c;
   real percent;
-  real speed;
 
   /* elapsed time */
   fmtseconds((int)elapsed, buf);
