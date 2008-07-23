@@ -23,10 +23,10 @@
 #include "ui.h"
 #include "datatypes.h"
 #include "conqnet.h"
+#include "conqutil.h"
 
-#define CONF_NOEXTERN
+#define NOEXTERN_CONF
 #include "conf.h"
-#undef CONF_NOEXTERN
 
 #include "protocol.h"
 
@@ -146,7 +146,7 @@ static void checkCreateUserConfDir(void)
   
   if ((home = getenv("HOME")) == NULL)
     {
-      clog("checkCreateUserConfDir(): getenv(HOME) failed");
+      utLog("checkCreateUserConfDir(): getenv(HOME) failed");
       
       return;
     }
@@ -161,7 +161,7 @@ static void checkCreateUserConfDir(void)
 #ifdef S_ISDIR
       if (!S_ISDIR(sbuf.st_mode))
         {
-          clog("checkCreateUserConfDir(): %s exists, but is not a directory.",
+          utLog("checkCreateUserConfDir(): %s exists, but is not a directory.",
                buffer);
           return;
         }
@@ -174,13 +174,13 @@ static void checkCreateUserConfDir(void)
   /* try to create it */
   if (mkdir(buffer, (S_IRUSR | S_IWUSR | S_IXUSR |S_IRGRP | S_IXGRP)) < 0)
     {                             /* not happy */
-      clog("checkCreateUserConfDir(): mkdir(%s) failed: %s.",
+      utLog("checkCreateUserConfDir(): mkdir(%s) failed: %s.",
            buffer, strerror(errno));
       return;
     }
   else
     {
-      clog("Created '%s' config directory.",
+      utLog("Created '%s' config directory.",
            buffer);
     }      
   
@@ -217,7 +217,7 @@ int GetSysConf(int checkonly)
 
       err = errno;
 
-      clog("GetSysConf(): fopen(%s) failed: %s",
+      utLog("GetSysConf(): fopen(%s) failed: %s",
 	       conf_name,
 	       strerror(err));
 
@@ -235,7 +235,7 @@ int GetSysConf(int checkonly)
     }
 
 #ifdef DEBUG_CONFIG
-      clog("GetSysConf(): Opened '%s'", conf_name);
+      utLog("GetSysConf(): Opened '%s'", conf_name);
 #endif
 
 				/* Do it dude... */
@@ -258,7 +258,7 @@ int GetSysConf(int checkonly)
 
 	  
 #ifdef DEBUG_CONFIG
-      clog("GetSysConf(): got '%s'", buffer);
+      utLog("GetSysConf(): got '%s'", buffer);
 #endif
 
 				/* check for everything else */
@@ -289,7 +289,7 @@ int GetSysConf(int checkonly)
 			      {
 				SysConfData[j].Found = TRUE;
 #ifdef DEBUG_CONFIG
-				clog("GetSysConf(): got correct version = '%s'", buffer);
+				utLog("GetSysConf(): got correct version = '%s'", buffer);
 #endif
 			      }
 			  }
@@ -364,7 +364,7 @@ int GetSysConf(int checkonly)
   if (SysConfData[SYSCF_VERSION].Found == FALSE)
     {				/* conquestrc version not found */
 #ifdef DEBUG_CONFIG
-      clog("GetSysConf(): Incorrect version found.  Update needed.");
+      utLog("GetSysConf(): Incorrect version found.  Update needed.");
 #endif
       
       if (checkonly != TRUE)
@@ -383,7 +383,7 @@ int GetSysConf(int checkonly)
 	    if (SysConfData[i].Found != TRUE)
 	      {
 #ifdef DEBUG_CONFIG
-		clog("GetSysConf(): option '%s' not found - Update needed.",
+		utLog("GetSysConf(): option '%s' not found - Update needed.",
 		   SysConfData[i].ConfName);
 #endif
 		if (checkonly != TRUE)
@@ -433,7 +433,7 @@ parseMouseModNum(char *str, Unsgn32 *mods, Unsgn32 *button)
               *mods |= (CQ_KEY_MOD_SHIFT >> CQ_MODIFIER_SHIFT);
               break;
             default:
-              clog("parseMouseModNum: Invalid modifier char '%c'",
+              utLog("parseMouseModNum: Invalid modifier char '%c'",
                    *str);
               return FALSE;
               break;
@@ -479,7 +479,7 @@ int GetConf(int usernum)
   /* start building the filename */
   if ((homevar = getenv("HOME")) == NULL)
     {
-      clog("GetConf(): getenv(HOME) failed");
+      utLog("GetConf(): getenv(HOME) failed");
 
       fprintf(stderr, "Can't get HOME environment variable. Exiting\n");
       return(ERR);
@@ -492,7 +492,7 @@ int GetConf(int usernum)
     {
       if (errno != ENOENT)
 	{
-	  clog("GetConf(): fopen(%s) failed: %s, using defaults",
+	  utLog("GetConf(): fopen(%s) failed: %s, using defaults",
 	       conf_name,
 	       strerror(errno));
 	  
@@ -504,7 +504,7 @@ int GetConf(int usernum)
 	}
 
 #ifdef DEBUG_CONFIG
-      clog("GetConf(): No config file.");
+      utLog("GetConf(): No config file.");
 #endif
       
       if (MakeConf(conf_name) == ERR)
@@ -514,7 +514,7 @@ int GetConf(int usernum)
     }
 
 #ifdef DEBUG_CONFIG
-      clog("GetConf(): Opened '%s'", conf_name);
+      utLog("GetConf(): Opened '%s'", conf_name);
 #endif
 
 
@@ -538,7 +538,7 @@ int GetConf(int usernum)
       buflen--;
 
 #ifdef DEBUG_CONFIG
-      clog("GetConf(): got '%s'", buffer);
+      utLog("GetConf(): got '%s'", buffer);
 #endif
 
       FoundOne = FALSE;
@@ -567,7 +567,7 @@ int GetConf(int usernum)
 				ConfData[j].Found = TRUE;
 				FoundOne = TRUE;
 #ifdef DEBUG_CONFIG
-				clog("GetConf(): got correct version = '%s'", buffer);
+				utLog("GetConf(): got correct version = '%s'", buffer);
 #endif
 			      }
 			  }
@@ -593,7 +593,7 @@ int GetConf(int usernum)
 			    if (n > 0 && n <= MAX_MACROS)
 			      { /* valid macro number */
 #ifdef DEBUG_CONFIG
-				clog("GetConf(): Macro %d[%d], value '%s' read",
+				utLog("GetConf(): Macro %d[%d], value '%s' read",
 				     n, n - 1, (char *)cptr + 1);
 #endif
 				/* clean it first... */
@@ -628,7 +628,7 @@ int GetConf(int usernum)
                                 { /* got a valid button and modifier(s) */
                                   
 #if defined(DEBUG_CONFIG)
-                                  clog("GetConf(): Mouse %d %d, value '%s' read",
+                                  utLog("GetConf(): Mouse %d %d, value '%s' read",
                                        button, mods, (char *)cptr + 1);
 #endif
                                   /* clean it first... */
@@ -690,7 +690,7 @@ int GetConf(int usernum)
   if (ConfData[CF_VERSION].Found == FALSE)
     {				/* conquestrc version not found */
 #ifdef DEBUG_CONFIG
-      clog("GetConf(): Incorrect version found. - rebuilding");
+      utLog("GetConf(): Incorrect version found. - rebuilding");
 #endif
       MakeConf(conf_name);	/* rebuild */
     }
@@ -704,7 +704,7 @@ int GetConf(int usernum)
 	    if (ConfData[i].Found != TRUE)
 	      {
 #ifdef DEBUG_CONFIG
-		clog("GetConf(): option '%s' not found - rebuilding.",
+		utLog("GetConf(): option '%s' not found - rebuilding.",
 		   ConfData[i].ConfName);
 #endif
 		MakeConf(conf_name);	/* rebuild - one not found */
@@ -724,7 +724,7 @@ int SaveUserConfig(void)
 				/* start building the filename */
   if ((homevar = getenv("HOME")) == NULL)
     {
-      clog("SaveUserConfig(): getenv(HOME) failed");
+      utLog("SaveUserConfig(): getenv(HOME) failed");
 
       fprintf(stderr, "SaveUserConfig(): Can't get HOME environment variable. Exiting\n");
       return(ERR);
@@ -734,7 +734,7 @@ int SaveUserConfig(void)
            homevar, CONFIG_FILE);
 
 #ifdef DEBUG_OPTIONS
-  clog("SaveUserConfig(): saving user config: conf_name = '%s'", conf_name);
+  utLog("SaveUserConfig(): saving user config: conf_name = '%s'", conf_name);
 #endif
 
   return(MakeConf(conf_name));
@@ -744,7 +744,7 @@ int SaveUserConfig(void)
 int SaveSysConfig(void)
 {
 #ifdef DEBUG_OPTIONS
-  clog("SaveSysConfig(): saving system config");
+  utLog("SaveSysConfig(): saving system config");
 #endif
 
   return(MakeSysConf());
@@ -821,9 +821,9 @@ char *Macro2Str(char *str)
 
 #if defined(DEBUG_CONFIG)
   if (str != NULL )
-    clog("Macro2Str('%s')", str);
+    utLog("Macro2Str('%s')", str);
   else
-    clog("Macro2Str(NULL)");
+    utLog("Macro2Str(NULL)");
 #endif
 
   while (*s && i < (BUFFER_SIZE - 1))
@@ -908,7 +908,7 @@ int MakeConf(char *filename)
 
   if ((conf_fd = fopen(filename, "w")) == NULL)
     {
-      clog("Makeconf(): fopen(%s) failed: %s",
+      utLog("Makeconf(): fopen(%s) failed: %s",
 	   filename,
 	   strerror(errno));
 
@@ -1010,7 +1010,7 @@ int MakeConf(char *filename)
   fclose(conf_fd);
 
 #ifdef DEBUG_CONFIG
-  clog("MakeConf(%s): Succeeded.", filename);
+  utLog("MakeConf(%s): Succeeded.", filename);
 #endif
 
 				/* that's it! */
@@ -1032,7 +1032,7 @@ int MakeSysConf()
 
   if ((sysconf_fd = fopen(conf_name, "w")) == NULL)
     {
-      clog("MakeSysconf(): fopen(%s) failed: %s",
+      utLog("MakeSysconf(): fopen(%s) failed: %s",
 	   conf_name,
 	   strerror(errno));
       
@@ -1042,7 +1042,7 @@ int MakeSysConf()
       return(ERR);
     }
 
-  clog("OPER: Updating %s file...", conf_name);
+  utLog("OPER: Updating %s file...", conf_name);
   fprintf(stderr, "Updating %s file...", conf_name);
 
   for (j=0; j<SysCfEnd; j++)
@@ -1105,7 +1105,7 @@ int MakeSysConf()
   fclose(sysconf_fd);
 
 #ifdef DEBUG_CONFIG
-  clog("MakeSysConf(%s): Succeeded.", conf_name);
+  utLog("MakeSysConf(%s): Succeeded.", conf_name);
 #endif
 
   fprintf(stderr, "Done.\n");

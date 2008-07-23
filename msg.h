@@ -19,15 +19,15 @@
 #define MSG_FLAGS_INTRUDER   0x08 /* intruder alert */
 
 typedef struct {
-  int msgfrom;			/* >0: ship the message is from */
+  int           msgfrom;        /* >0: ship the message is from */
 				/* =0: from GOD */
 				/* <0: planet with intruder alert */
-  int msgto;			/* >0: ship the message is to */
+  int           msgto;          /* >0: ship the message is to */
 				/* =0: to nobody */
 				/* <0: team the message is to, and */
 				/*     TEAM_SELFRULED means everyone */
   unsigned char flags;		/* some flags. */
-  char msgbuf[MESSAGE_SIZE];	/* the message itself */
+  char          msgbuf[MESSAGE_SIZE]; /* the message itself */
 } Msg_t;
 
 #endif /* MSG_H_INCLUDED */

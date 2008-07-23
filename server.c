@@ -12,6 +12,7 @@
 #include "conqdef.h"
 #include "conqcom.h"
 #include "conqlb.h"
+#include "conqutil.h"
 #include "conf.h"
 #include "server.h"
 #include "serverpkt.h"
@@ -34,7 +35,7 @@ static void handleUDPErr(void)
       sInfo.doUDP = FALSE;
       close(sInfo.usock);
       sInfo.usock = -1;
-      clog("NET: too many UDP send errors to client, switching to TCP");
+      utLog("NET: too many UDP send errors to client, switching to TCP");
       clbStoreMsg(MSG_COMP, Context.snum, 
               "SERVER: too many UDP send errors. Switching to TCP");
     }
@@ -49,7 +50,7 @@ int sendClientStat(int sock, Unsgn8 flags, Unsgn8 snum, Unsgn8 team,
   memset((void *)&scstat, 0, sizeof(spClientStat_t));
 
 #if defined(DEBUG_SERVERCLNTSTAT)
-  clog("sendClientStat: snum = %d, unum = %d, flags = 0x%x, team = %d",
+  utLog("sendClientStat: snum = %d, unum = %d, flags = 0x%x, team = %d",
        snum, unum, flags, team);
 #endif
 
@@ -60,7 +61,7 @@ int sendClientStat(int sock, Unsgn8 flags, Unsgn8 snum, Unsgn8 team,
   scstat.unum = htons(unum);
   scstat.esystem = esystem;
 
-  if (writePacket(PKT_TOCLIENT, sock, &scstat) <= 0)
+  if (pktWrite(PKT_TOCLIENT, sock, &scstat) <= 0)
     return FALSE;
   else
     return TRUE;
@@ -71,18 +72,18 @@ int sendUser(int sock, Unsgn16 unum)
   spUser_t *suser;
 
 #if defined(DEBUG_SERVERSEND)
-  clog("sendUser: unum = %d",
+  utLog("sendUser: unum = %d",
        unum);
 #endif
 
   /* not really any priv bits, but in case we add some later */
   if ((suser = spktUser(unum)))
     {
-      if (writePacket(PKT_TOCLIENT, sock, suser) <= 0)
+      if (pktWrite(PKT_TOCLIENT, sock, suser) <= 0)
         return FALSE;
 
       if (Context.recmode == RECMODE_ON)
-        recordWriteEvent(suser);
+        recWriteEvent(suser);
     }
 
   return TRUE;
@@ -96,7 +97,7 @@ int sendShip(int sock, Unsgn8 snum)
   spShipLoc_t *sshiploc;
 
 #if defined(DEBUG_SERVERSEND)
-  clog("sendShip: snum = %d",
+  utLog("sendShip: snum = %d",
        snum);
 #endif
 
@@ -104,22 +105,22 @@ int sendShip(int sock, Unsgn8 snum)
   if (Context.recmode == RECMODE_ON)
     {
       if ((sship = spktShip(snum, TRUE)))
-        recordWriteEvent(sship);
+        recWriteEvent(sship);
     }
 
   if ((sship = spktShip(snum, FALSE)))
-    if (writePacket(PKT_TOCLIENT, sock, sship) <= 0)
+    if (pktWrite(PKT_TOCLIENT, sock, sship) <= 0)
       return FALSE;
 
   /* SP_SHIPSML */
   if (Context.recmode == RECMODE_ON)
     {
       if ((sshipsml = spktShipSml(snum, TRUE)))
-        recordWriteEvent(sshipsml);
+        recWriteEvent(sshipsml);
     }
 
   if ((sshipsml = spktShipSml(snum, FALSE)))
-    if (writePacket(PKT_TOCLIENT, sock, sshipsml) <= 0)
+    if (pktWrite(PKT_TOCLIENT, sock, sshipsml) <= 0)
       return FALSE;
 
   /* SP_SHIPLOC */
@@ -127,14 +128,14 @@ int sendShip(int sock, Unsgn8 snum)
   if (Context.recmode == RECMODE_ON)
     {
       if ((sshiploc = spktShipLoc(snum, TRUE)))
-        recordWriteEvent(sshiploc);
+        recWriteEvent(sshiploc);
     }
   
   if ((sshiploc = spktShipLoc(snum, FALSE)))
     {
       if (sInfo.doUDP)
         {
-          if (writePacket(PKT_TOCLIENT, sInfo.usock, sshiploc) <= 0)
+          if (pktWrite(PKT_TOCLIENT, sInfo.usock, sshiploc) <= 0)
             {
               handleUDPErr();
               return FALSE;
@@ -142,7 +143,7 @@ int sendShip(int sock, Unsgn8 snum)
         }
       else
         {
-          if (writePacket(PKT_TOCLIENT, sock, sshiploc) <= 0)
+          if (pktWrite(PKT_TOCLIENT, sock, sshiploc) <= 0)
             return FALSE;
         }
     }
@@ -159,7 +160,7 @@ int sendPlanet(int sock, Unsgn8 pnum, int force)
   spPlanetInfo_t *splaninfo;
 
 #if defined(DEBUG_SERVERSEND)
-  clog("sendPlanet: pnum = %d",
+  utLog("sendPlanet: pnum = %d",
        pnum);
 #endif
 
@@ -167,33 +168,33 @@ int sendPlanet(int sock, Unsgn8 pnum, int force)
   if (Context.recmode == RECMODE_ON)
     {
       if ((splan = spktPlanet(pnum, TRUE)))
-        recordWriteEvent(splan);
+        recWriteEvent(splan);
     }
 
   if ((splan = spktPlanet(pnum, FALSE)))
-    if (writePacket(PKT_TOCLIENT, sock, splan) <= 0)
+    if (pktWrite(PKT_TOCLIENT, sock, splan) <= 0)
       return FALSE;
 
   /* SP_PLANETSML */
   if (Context.recmode == RECMODE_ON)
     {
       if ((splansml = spktPlanetSml(pnum, TRUE)))
-        recordWriteEvent(splansml);
+        recWriteEvent(splansml);
     }
 
   if ((splansml = spktPlanetSml(pnum, FALSE)))
-    if (writePacket(PKT_TOCLIENT, sock, splansml) <= 0)
+    if (pktWrite(PKT_TOCLIENT, sock, splansml) <= 0)
       return FALSE;
 
   /* SP_PLANETINFO */
   if (Context.recmode == RECMODE_ON)
     {
       if ((splaninfo = spktPlanetInfo(pnum, TRUE)))
-        recordWriteEvent(splaninfo);
+        recWriteEvent(splaninfo);
     }
 
   if ((splaninfo = spktPlanetInfo(pnum, FALSE)))
-    if (writePacket(PKT_TOCLIENT, sock, splaninfo) <= 0)
+    if (pktWrite(PKT_TOCLIENT, sock, splaninfo) <= 0)
       return FALSE;
 
   /* we will do loc packets for recording purposes only.  loc2 is sent
@@ -204,12 +205,12 @@ int sendPlanet(int sock, Unsgn8 pnum, int force)
   if (Context.recmode == RECMODE_ON)
     {
       if ((splanloc = spktPlanetLoc(pnum, TRUE, force)))
-        recordWriteEvent(splanloc);
+        recWriteEvent(splanloc);
     }
 
   /* SP_PLANETLOC2 */
   if ((splanloc2 = spktPlanetLoc2(pnum, FALSE, force)))
-    if (writePacket(PKT_TOCLIENT, sock, splanloc2) <= 0)
+    if (pktWrite(PKT_TOCLIENT, sock, splanloc2) <= 0)
       return FALSE;
 
   return TRUE;
@@ -229,7 +230,7 @@ int sendServerStat(int sock)
   memset((void *)&sStat, 0, sizeof(spServerStat_t));
 
 #if defined(DEBUG_SERVERSEND)
-  clog("sendServerStats: ENTER");
+  utLog("sendServerStats: ENTER");
 #endif
 
   /* get total users */
@@ -271,9 +272,9 @@ int sendServerStat(int sock)
 
   sStat.servertime = (Unsgn32)htonl(getnow(NULL, 0));
   
-  if (!writePacket(PKT_TOCLIENT, sock, &sStat))
+  if (!pktWrite(PKT_TOCLIENT, sock, &sStat))
     {
-      clog("sendServerStats: writePacket failed\n");
+      utLog("sendServerStats: pktWrite failed\n");
       return FALSE;
     }
 
@@ -297,7 +298,7 @@ int sendTorp(int sock, Unsgn8 tsnum, Unsgn8 tnum)
     return FALSE;
 
 #if defined(DEBUG_SERVERSEND)
-  clog("sendTorp: %d %d", tsnum, tnum);
+  utLog("sendTorp: %d %d", tsnum, tnum);
 #endif
 
 
@@ -306,13 +307,13 @@ int sendTorp(int sock, Unsgn8 tsnum, Unsgn8 tnum)
     {
       if ((storpev = spktTorpEvent(tsnum, tnum, TRUE)))
         {
-          recordWriteEvent(storpev);
+          recWriteEvent(storpev);
         }
     }
 
   if ((storpev = spktTorpEvent(tsnum, tnum, FALSE)))
     {
-      if (writePacket(PKT_TOCLIENT, sock, storpev) <= 0)
+      if (pktWrite(PKT_TOCLIENT, sock, storpev) <= 0)
         return FALSE;
     }
 
@@ -321,7 +322,7 @@ int sendTorp(int sock, Unsgn8 tsnum, Unsgn8 tnum)
   if (Context.recmode == RECMODE_ON)
     {
       if ((storp = spktTorp(tsnum, tnum, TRUE)))
-        recordWriteEvent(storp);
+        recWriteEvent(storp);
     }
 
   /* SP_TORPLOC */
@@ -330,7 +331,7 @@ int sendTorp(int sock, Unsgn8 tsnum, Unsgn8 tnum)
   if (Context.recmode == RECMODE_ON)
     {
       if ((storploc = spktTorpLoc(tsnum, tnum, TRUE)))
-        recordWriteEvent(storploc);
+        recWriteEvent(storploc);
     }
 
   return TRUE;
@@ -357,7 +358,7 @@ void sendFeedback(char *msg)
   if (SysConf.LogMessages == TRUE)
     {
       clbFmtMsg(themsg.msgto, themsg.msgfrom, buf);
-      clog("MSG:FEEDBACK: %s: %s",
+      utLog("MSG:FEEDBACK: %s: %s",
            buf, themsg.msgbuf);
     }
 
@@ -378,7 +379,7 @@ int sendMessage(Msg_t *msg)
   memset((void *)&smsg, 0, sizeof(spMessage_t));
 
 #if defined(DEBUG_SERVERSEND) 
-  clog("sendMessage: to = %d, from = %d, flags = 0x%02x, msg = '%s'",
+  utLog("sendMessage: to = %d, from = %d, flags = 0x%02x, msg = '%s'",
        msg->msgto, msg->msgfrom, msg->flags, msg->msgbuf);
 #endif
 
@@ -393,11 +394,11 @@ int sendMessage(Msg_t *msg)
   /* don't record feeback or tersable msgs */
   if (Context.recmode == RECMODE_ON)
     if (!(smsg.flags & (MSG_FLAGS_FEEDBACK | MSG_FLAGS_TERSABLE)))
-      recordWriteEvent(&smsg);
+      recWriteEvent(&smsg);
 
-  if (!writePacket(PKT_TOCLIENT, sInfo.sock, &smsg))
+  if (!pktWrite(PKT_TOCLIENT, sInfo.sock, &smsg))
     {
-      clog("sendMessage: writePacket failed\n");
+      utLog("sendMessage: pktWrite failed\n");
       return FALSE;
     }
 
@@ -409,17 +410,17 @@ int sendTeam(int sock, Unsgn8 team, int force)
   spTeam_t *steam;
 
 #if defined(DEBUG_SERVERSEND)
-  clog("sendTeam: team = %d, f = %d", team, force);
+  utLog("sendTeam: team = %d, f = %d", team, force);
 #endif
 
   if (Context.recmode == RECMODE_ON)
     {
       if ((steam = spktTeam(team, force, TRUE)))
-        recordWriteEvent(steam);
+        recWriteEvent(steam);
     }
 
   if ((steam = spktTeam(team, force, FALSE)))
-    if (writePacket(PKT_TOCLIENT, sock, steam) <= 0)
+    if (pktWrite(PKT_TOCLIENT, sock, steam) <= 0)
       return FALSE;
 
   return TRUE;
@@ -430,11 +431,11 @@ int sendConqInfo(int sock, int force)
   spConqInfo_t *spci;
 
 #if defined(DEBUG_SERVERSEND)
-  clog("sendConqInfo: f = %d", force);
+  utLog("sendConqInfo: f = %d", force);
 #endif
 
   if ((spci = spktConqInfo(force)))
-    if (writePacket(PKT_TOCLIENT, sock, spci) <= 0)
+    if (pktWrite(PKT_TOCLIENT, sock, spci) <= 0)
       return FALSE;
 
   return TRUE;
@@ -448,11 +449,11 @@ int sendHistory(int sock, int hnum)
     return FALSE;
 
 #if defined(DEBUG_SERVERSEND)
-  clog("sendHistory: hnum = %d", hnum);
+  utLog("sendHistory: hnum = %d", hnum);
 #endif
 
   if ((shist = spktHistory(hnum)))
-    if (writePacket(PKT_TOCLIENT, sock, shist) <= 0)
+    if (pktWrite(PKT_TOCLIENT, sock, shist) <= 0)
       return FALSE;
 
   return TRUE;
@@ -463,17 +464,17 @@ int sendDoomsday(int sock)
   spDoomsday_t *dd;
 
 #if defined(DEBUG_SERVERSEND)
-  clog("sendDoomsday");
+  utLog("sendDoomsday");
 #endif
 
   if (Context.recmode == RECMODE_ON)
     {
       if ((dd = spktDoomsday(TRUE)))
-        recordWriteEvent(dd);
+        recWriteEvent(dd);
     }
 
   if ((dd = spktDoomsday(FALSE)))
-    if (writePacket(PKT_TOCLIENT, sock, dd) <= 0)
+    if (pktWrite(PKT_TOCLIENT, sock, dd) <= 0)
       return FALSE;
 
   return TRUE;
@@ -484,7 +485,7 @@ void procSetName(char *buf)
 {
   cpSetName_t *cpsetn = (cpSetName_t *)buf;
 
-  if (!validPkt(CP_SETNAME, cpsetn))
+  if (!pktIsValid(CP_SETNAME, cpsetn))
     return;
 
   cpsetn->alias[MAXUSERPNAME - 1] = 0;
@@ -503,14 +504,14 @@ void procSetCourse(char *buf)
   int lock;
   real dir;
 
-  if (!validPkt(CP_SETCOURSE, csc))
+  if (!pktIsValid(CP_SETCOURSE, csc))
     return;
 
   lock = (int)csc->lock;
   dir = (real)((real)ntohs(csc->head) / 100.0);
 
 #if defined(DEBUG_SERVERPROC)
-  clog("PROC SETCOURSE: lock = %d, head = %f",
+  utLog("PROC SETCOURSE: lock = %d, head = %f",
        lock, dir);
 #endif
 
@@ -544,7 +545,7 @@ void procSetWarp(cpCommand_t *swarp)
   real warp;
   real mw;
 
-  if (!validPkt(CP_COMMAND, swarp))
+  if (!pktIsValid(CP_COMMAND, swarp))
     return;
 
   if (swarp->cmd != CPCMD_SETWARP)
@@ -553,7 +554,7 @@ void procSetWarp(cpCommand_t *swarp)
   warp = (real)ntohs(swarp->detail);
 
 #if defined(DEBUG_SERVERPROC)
-  clog("PROC SETWARP: warp = %f", warp);
+  utLog("PROC SETWARP: warp = %f", warp);
 #endif
 
   if ( Ships[snum].dwarp == 0.0 && warp != 0.0 )
@@ -603,7 +604,7 @@ void procSetShields(cpCommand_t *cmd)
   int snum = Context.snum;		/* we always use our own ship */
   int shup;
 
-  if (!validPkt(CP_COMMAND, cmd))
+  if (!pktIsValid(CP_COMMAND, cmd))
     return;
 
   if (cmd->cmd != CPCMD_SETSHIELDS)
@@ -612,7 +613,7 @@ void procSetShields(cpCommand_t *cmd)
   shup = (((int)ntohs(cmd->detail)) ? TRUE : FALSE);
 
 #if defined(DEBUG_SERVERPROC)
-  clog("PROC SETSHIELDS: sh = %d", shup);
+  utLog("PROC SETSHIELDS: sh = %d", shup);
 #endif
 
   if (shup)
@@ -631,7 +632,7 @@ void procAlloc(cpCommand_t *cmd)
   int snum = Context.snum;		/* we always use our own ship */
   int alloc;
 
-  if (!validPkt(CP_COMMAND, cmd))
+  if (!pktIsValid(CP_COMMAND, cmd))
     return;
 
   if (cmd->cmd != CPCMD_ALLOC)
@@ -647,7 +648,7 @@ void procAlloc(cpCommand_t *cmd)
     alloc = 70;
 
 #if defined(DEBUG_SERVERPROC)
-  clog("PROC ALLOC: (w)alloc = %d", alloc);
+  utLog("PROC ALLOC: (w)alloc = %d", alloc);
 #endif
 
   Ships[snum].weapalloc = alloc;
@@ -662,14 +663,14 @@ void procCloak(cpCommand_t *cmd)
   int snum = Context.snum;		/* we always use our own ship */
   string nofuel="Not enough fuel to engage cloaking device.";
 
-  if (!validPkt(CP_COMMAND, cmd))
+  if (!pktIsValid(CP_COMMAND, cmd))
     return;
 
   if (cmd->cmd != CPCMD_CLOAK)
     return;
 
 #if defined(DEBUG_SERVERPROC)
-  clog("PROC CLOAK");
+  utLog("PROC CLOAK");
 #endif
 
 
@@ -709,14 +710,14 @@ void procDetSelf(cpCommand_t *cmd)
   int snum = Context.snum;		/* we always use our own ship */
   int j;
 
-  if (!validPkt(CP_COMMAND, cmd))
+  if (!pktIsValid(CP_COMMAND, cmd))
     return;
 
   if (cmd->cmd != CPCMD_DETSELF)
     return;
 
 #if defined(DEBUG_SERVERPROC)
-  clog("PROC DETSELF");
+  utLog("PROC DETSELF");
 #endif
 
   for ( j = 0; j < MAXTORPS; j++ )
@@ -729,14 +730,14 @@ void procDetEnemy(cpCommand_t *cmd)
 {
   int snum = Context.snum;		/* we always use our own ship */
 
-  if (!validPkt(CP_COMMAND, cmd))
+  if (!pktIsValid(CP_COMMAND, cmd))
     return;
 
   if (cmd->cmd != CPCMD_DETENEMY)
     return;
 
 #if defined(DEBUG_SERVERPROC)
-  clog("PROC DETENEMY");
+  utLog("PROC DETENEMY");
 #endif
 
   clbEnemyDet( snum );
@@ -752,7 +753,7 @@ void procDistress(cpCommand_t *cmd)
   int i, isorb = FALSE;
   int tofriendly;
 
-  if (!validPkt(CP_COMMAND, cmd))
+  if (!pktIsValid(CP_COMMAND, cmd))
     return;
 
   if (cmd->cmd != CPCMD_DISTRESS)
@@ -761,7 +762,7 @@ void procDistress(cpCommand_t *cmd)
   tofriendly = (int)ntohs(cmd->detail);
 
 #if defined(DEBUG_SERVERPROC)
-  clog("PROC DISTRESS: tofriendly = %d", tofriendly);
+  utLog("PROC DISTRESS: tofriendly = %d", tofriendly);
 #endif
 
   sprintf( cbuf,
@@ -773,13 +774,13 @@ void procDistress(cpCommand_t *cmd)
 
   i = round(Ships[snum].wtemp);
   if ( i < 100 )
-    appint( i, cbuf );
+    utAppendInt( i, cbuf );
   else
     appstr( "**", cbuf );
   appchr( '/', cbuf );
   i = round(Ships[snum].etemp);
   if ( i < 100 )
-    appint( i, cbuf );
+    utAppendInt( i, cbuf );
   else
     appstr( "**", cbuf );
   i = Ships[snum].armies;
@@ -787,7 +788,7 @@ void procDistress(cpCommand_t *cmd)
   if ( i > 0 )
     {
       appstr( ", arm=", cbuf );
-      appint( i, cbuf );
+      utAppendInt( i, cbuf );
     }
 
   if ( Ships[snum].wfuse > 0 )
@@ -843,7 +844,7 @@ void procFirePhaser(cpCommand_t *cmd)
   int snum = Context.snum;		/* we always use our own ship */
   real dir;
 
-  if (!validPkt(CP_COMMAND, cmd))
+  if (!pktIsValid(CP_COMMAND, cmd))
     return;
 
   if (cmd->cmd != CPCMD_FIREPHASER)
@@ -858,7 +859,7 @@ void procFirePhaser(cpCommand_t *cmd)
     dir = 359.9;
 
 #if defined(DEBUG_SERVERPROC)
-  clog("PROC FIREPHASER: dir = %f", dir);
+  utLog("PROC FIREPHASER: dir = %f", dir);
 #endif
 
   if ( SCLOAKED(snum) )
@@ -890,14 +891,14 @@ void procOrbit(cpCommand_t *cmd)
   int snum = Context.snum;		/* we always use our own ship */
   int pnum;
 
-  if (!validPkt(CP_COMMAND, cmd))
+  if (!pktIsValid(CP_COMMAND, cmd))
     return;
 
   if (cmd->cmd != CPCMD_ORBIT)
     return;
 
 #if defined(DEBUG_SERVERPROC)
-  clog("PROC ORBIT");
+  utLog("PROC ORBIT");
 #endif
 
   if ( ( Ships[snum].warp == ORBIT_CW ) || ( Ships[snum].warp == ORBIT_CCW ) )
@@ -918,14 +919,14 @@ void procRepair(cpCommand_t *cmd)
 {
   int snum = Context.snum;		/* we always use our own ship */
 
-  if (!validPkt(CP_COMMAND, cmd))
+  if (!pktIsValid(CP_COMMAND, cmd))
     return;
 
   if (cmd->cmd != CPCMD_REPAIR)
     return;
 
 #if defined(DEBUG_SERVERPROC)
-  clog("PROC REPAIR");
+  utLog("PROC REPAIR");
 #endif
 
   if ( ! SCLOAKED(snum) )
@@ -948,14 +949,14 @@ void procCoup(cpCommand_t *cmd)
   char cbuf[128];
   int rv = -1;
 
-  if (!validPkt(CP_COMMAND, cmd))
+  if (!pktIsValid(CP_COMMAND, cmd))
     return;
 
   if (cmd->cmd != CPCMD_COUP)
     return;
 
 #if defined(DEBUG_SERVERPROC)
-  clog("PROC COUP");
+  utLog("PROC COUP");
 #endif
 
   /* Check for allowability. */
@@ -1011,8 +1012,8 @@ void procCoup(cpCommand_t *cmd)
   
   /* Now wait it out... */
   sendFeedback("Attempting coup...");
-  grand( &entertime );
-  while ( dgrand( entertime, &now ) < COUP_GRAND )
+  utGrand( &entertime );
+  while ( utDeltaGrand( entertime, &now ) < COUP_GRAND )
     {
       /* See if we're still alive. */
       if ( ! clbStillAlive( Context.snum ) )
@@ -1070,7 +1071,7 @@ void procFireTorps(char *buf)
   real dir;
   int num;
 
-  if (!validPkt(CP_FIRETORPS, cftorp))
+  if (!pktIsValid(CP_FIRETORPS, cftorp))
     return;
 
   dir = (real)((real)ntohs(cftorp->dir) / 100.0);
@@ -1083,7 +1084,7 @@ void procFireTorps(char *buf)
     dir = 359.9;
 
 #if defined(DEBUG_SERVERPROC)
-  clog("PROC FIRETORPS: dir = %f, num = %d", dir, num);
+  utLog("PROC FIRETORPS: dir = %f, num = %d", dir, num);
 #endif
 
   if ( SCLOAKED(snum) )
@@ -1122,14 +1123,14 @@ void procMessage(char *buf)
   if (sInfo.state != SVR_STATE_PLAY)
     return;
    
-  if (!validPkt(CP_MESSAGE, cmsg))
+  if (!pktIsValid(CP_MESSAGE, cmsg))
     return;
 
   to = (Sgn16)ntohs(cmsg->to);
   cmsg->msg[MESSAGE_SIZE - 1] = 0;
 
 #if defined(DEBUG_SERVERPROC)
-  clog("PROC MESSAGE: to %d", to);
+  utLog("PROC MESSAGE: to %d", to);
 #endif
 
   clbStoreMsg(snum, to, (char *)cmsg->msg);
@@ -1144,7 +1145,7 @@ void procChangePassword(char *buf)
   int unum = Context.unum;
   cpAuthenticate_t *cauth = (cpAuthenticate_t *)buf;
 
-  if (!validPkt(CP_AUTHENTICATE, buf))
+  if (!pktIsValid(CP_AUTHENTICATE, buf))
     return;
 
   cauth->pw[MAXUSERNAME - 1] = 0;
@@ -1152,7 +1153,7 @@ void procChangePassword(char *buf)
   /* we are just interested in the pw */
  
 #if defined(DEBUG_SERVERPROC)
-  clog("PROC ChangePassword");
+  utLog("PROC ChangePassword");
 #endif
  
   salt[0] = (Users[unum].username[0] != EOS) ? Users[unum].username[0] :
@@ -1176,7 +1177,7 @@ void procSetWar(cpCommand_t *cmd)
   int dowait = FALSE, entertime, now, i;
   Unsgn8 war;
 
-  if (!validPkt(CP_COMMAND, cmd))
+  if (!pktIsValid(CP_COMMAND, cmd))
     return;
 
   if (cmd->cmd != CPCMD_SETWAR)
@@ -1185,7 +1186,7 @@ void procSetWar(cpCommand_t *cmd)
   war = (Unsgn8)ntohs(cmd->detail);
 
 #if defined(DEBUG_SERVERPROC)
-  clog("PROC SETWAR war = 0x%02x", war);
+  utLog("PROC SETWAR war = 0x%02x", war);
 #endif
 
   for (i=0; i<NUMPLAYERTEAMS; i++)
@@ -1209,8 +1210,8 @@ void procSetWar(cpCommand_t *cmd)
   /* any packets the client tries to send will have to wait ;-) */
   if (dowait && Ships[Context.snum].status != SS_RESERVED)
     {
-      grand( &entertime );
-      while ( dgrand( entertime, &now ) < REARM_GRAND )
+      utGrand( &entertime );
+      while ( utDeltaGrand( entertime, &now ) < REARM_GRAND )
 	{
 	  /* See if we're still alive. */
 	  if ( ! clbStillAlive( Context.snum ) )
@@ -1231,7 +1232,7 @@ void procRefit(cpCommand_t *cmd)
   int stype;
   int pnum;
 
-  if (!validPkt(CP_COMMAND, cmd))
+  if (!pktIsValid(CP_COMMAND, cmd))
     return;
 
   if (cmd->cmd != CPCMD_REFIT)
@@ -1243,7 +1244,7 @@ void procRefit(cpCommand_t *cmd)
     return;
 
 #if defined(DEBUG_SERVERPROC)
-  clog("PROC REFIT: snum - %d, stype = %d", snum, stype);
+  utLog("PROC REFIT: snum - %d, stype = %d", snum, stype);
 #endif
   
   /* Check for allowability. */
@@ -1268,8 +1269,8 @@ void procRefit(cpCommand_t *cmd)
     }
   
   /* now we wait for a bit. */
-  grand( &entertime );
-  while ( dgrand( entertime, &now ) < REFIT_GRAND )
+  utGrand( &entertime );
+  while ( utDeltaGrand( entertime, &now ) < REFIT_GRAND )
     {
       /* See if we're still alive. */
       if ( ! clbStillAlive( snum ) )
@@ -1292,7 +1293,7 @@ void procSetRate(cpCommand_t *cmd)
 #endif
   int rate;
 
-  if (!validPkt(CP_COMMAND, cmd))
+  if (!pktIsValid(CP_COMMAND, cmd))
     return;
 
   if (cmd->cmd != CPCMD_SETRATE)
@@ -1304,7 +1305,7 @@ void procSetRate(cpCommand_t *cmd)
     return;
 
 #if defined(DEBUG_SERVERPROC)
-  clog("PROC SETRATE: snum = %d, rate = %d", snum, rate);
+  utLog("PROC SETRATE: snum = %d, rate = %d", snum, rate);
 #endif
 
   Context.updsec = rate;
@@ -1318,14 +1319,14 @@ void procTow(cpCommand_t *cmd)
   int other;
   char cbuf[BUFFER_SIZE];
 
-  if (!validPkt(CP_COMMAND, cmd))
+  if (!pktIsValid(CP_COMMAND, cmd))
     return;
 
   if (cmd->cmd != CPCMD_TOW)
     return;
 
 #if defined(DEBUG_SERVERPROC)
-  clog("PROC TOW: snum = %d", snum);
+  utLog("PROC TOW: snum = %d", snum);
 #endif
 
   other = (int)ntohs(cmd->detail);
@@ -1333,7 +1334,7 @@ void procTow(cpCommand_t *cmd)
   if ( Ships[snum].towedby != 0 )
     {
       c_strcpy( "But we are being towed by ", cbuf );
-      appship( Ships[snum].towedby, cbuf );
+      utAppendShip( Ships[snum].towedby, cbuf );
       appchr( '!', cbuf );
       sendFeedback(cbuf);
       return;
@@ -1341,7 +1342,7 @@ void procTow(cpCommand_t *cmd)
   if ( Ships[snum].towing != 0 )
     {
       c_strcpy( "But we're already towing ", cbuf );
-      appship( Ships[snum].towing, cbuf );
+      utAppendShip( Ships[snum].towing, cbuf );
       appchr( '.', cbuf );
       sendFeedback(cbuf);
       return;
@@ -1388,14 +1389,14 @@ void procUnTow(cpCommand_t *cmd)
   int entertime, now;
   int warsome; 
 
-  if (!validPkt(CP_COMMAND, cmd))
+  if (!pktIsValid(CP_COMMAND, cmd))
     return;
 
   if (cmd->cmd != CPCMD_UNTOW)
     return;
 
 #if defined(DEBUG_SERVERPROC)
-  clog("PROC UNTOW: snum = %d", snum);
+  utLog("PROC UNTOW: snum = %d", snum);
 #endif
 
   if ( Ships[snum].towedby != 0 )
@@ -1405,8 +1406,8 @@ void procUnTow(cpCommand_t *cmd)
       warsome = ( satwar( snum, Ships[snum].towedby) );
       if ( warsome )
 	{
-	  grand( &entertime );
-	  while ( dgrand( entertime, &now ) < BREAKAWAY_GRAND )
+	  utGrand( &entertime );
+	  while ( utDeltaGrand( entertime, &now ) < BREAKAWAY_GRAND )
 	    {
 	      if ( ! clbStillAlive( Context.snum ) )
 		return;
@@ -1420,7 +1421,7 @@ void procUnTow(cpCommand_t *cmd)
       else
 	{
 	  c_strcpy( "Breaking free from ship ", cbuf );
-	  appship( Ships[snum].towedby, cbuf );
+	  utAppendShip( Ships[snum].towedby, cbuf );
 	  PVLOCK(&ConqInfo->lockword);
 	  if ( Ships[snum].towedby != 0 )
 	    {
@@ -1450,7 +1451,7 @@ void procUnTow(cpCommand_t *cmd)
   else if ( Ships[snum].towing != 0 )
     {
       c_strcpy( "Tow released from ship ", cbuf );
-      appship( Ships[snum].towing, cbuf );
+      utAppendShip( Ships[snum].towing, cbuf );
       PVLOCK(&ConqInfo->lockword);
       if ( Ships[snum].towing != 0 )
 	{
@@ -1496,7 +1497,7 @@ void procBomb(cpCommand_t *cmd)
   string lastfew="The last few armies are eluding us.";
 
 
-  if (!validPkt(CP_COMMAND, cmd))
+  if (!pktIsValid(CP_COMMAND, cmd))
     return;
 
   if (cmd->cmd != CPCMD_BOMB)
@@ -1505,7 +1506,7 @@ void procBomb(cpCommand_t *cmd)
   bomb = (int)ntohs(cmd->detail);
 
 #if defined(DEBUG_SERVERPROC)
-  clog("PROC BOMB: snum = %d, start bombing = %d", snum, bomb);
+  utLog("PROC BOMB: snum = %d, start bombing = %d", snum, bomb);
 #endif
 
   if (!bomb)			/* the bombing has stopped. yaay. */
@@ -1516,7 +1517,7 @@ void procBomb(cpCommand_t *cmd)
   /* Check for allowability. */
   if ( Ships[snum].warp >= 0.0 )
     {
-      sendAck(sInfo.sock, PKT_TOCLIENT, PSEV_INFO, PERR_CANCELED, NULL);
+      pktSendAck(sInfo.sock, PKT_TOCLIENT, PSEV_INFO, PERR_CANCELED, NULL);
       sendFeedback("We must be orbiting a planet to bombard it.");
       return;
     }
@@ -1524,20 +1525,20 @@ void procBomb(cpCommand_t *cmd)
   if ( Planets[pnum].type == PLANET_SUN || Planets[pnum].type == PLANET_MOON ||
       Planets[pnum].team == TEAM_NOTEAM || Planets[pnum].armies == 0 )
     {
-      sendAck(sInfo.sock, PKT_TOCLIENT, PSEV_INFO, PERR_CANCELED, NULL);
+      pktSendAck(sInfo.sock, PKT_TOCLIENT, PSEV_INFO, PERR_CANCELED, NULL);
       sendFeedback("There is no one there to bombard.");
       return;
     }
   if ( Planets[pnum].team == Ships[snum].team )
     {
-      sendAck(sInfo.sock, PKT_TOCLIENT, PSEV_INFO, PERR_CANCELED, NULL);
+      pktSendAck(sInfo.sock, PKT_TOCLIENT, PSEV_INFO, PERR_CANCELED, NULL);
       sendFeedback("We can't bomb our own armies!");
       return;
     }
   if ( Planets[pnum].team != TEAM_SELFRULED && Planets[pnum].team != TEAM_GOD )
     if ( ! Ships[snum].war[Planets[pnum].team] )
       {
-	sendAck(sInfo.sock, PKT_TOCLIENT, PSEV_INFO, PERR_CANCELED, NULL);
+	pktSendAck(sInfo.sock, PKT_TOCLIENT, PSEV_INFO, PERR_CANCELED, NULL);
 	sendFeedback("But we are not at war with this planet!");
 	return;
       }
@@ -1555,7 +1556,7 @@ void procBomb(cpCommand_t *cmd)
     {
       sprintf( cbuf, "That was a bad idea, %s...", Ships[snum].alias );
       clbDamage( snum,  rnduni( 50.0, 100.0 ), KB_LIGHTNING );
-      sendAck(sInfo.sock, PKT_TOCLIENT, PSEV_INFO, PERR_CANCELED, NULL);
+      pktSendAck(sInfo.sock, PKT_TOCLIENT, PSEV_INFO, PERR_CANCELED, NULL);
       sendFeedback(cbuf);
       return;
     }
@@ -1568,7 +1569,7 @@ void procBomb(cpCommand_t *cmd)
   total = 0;
   ototal = -1;			/* force an update the first time */
   oparmies = -1;
-  grand( &entertime );		/* get start time */
+  utGrand( &entertime );		/* get start time */
   SFSET(snum, SHIP_F_BOMBING);
   while(TRUE)
     {
@@ -1577,18 +1578,18 @@ void procBomb(cpCommand_t *cmd)
           SFCLR(snum, SHIP_F_BOMBING);
           return;
         }
-      if ( isPacketWaiting(sInfo.sock) )
+      if ( pktIsPacketWaiting(sInfo.sock) )
         {
           SFCLR(snum, SHIP_F_BOMBING);
           break;
         }
       
       /* See if it's time to bomb yet. */
-      while ((int) fabs ((real)dgrand( (int)entertime, (int *)&now )) >= BOMBARD_GRAND )
+      while ((int) fabs ((real)utDeltaGrand( (int)entertime, (int *)&now )) >= BOMBARD_GRAND )
 	{
 	  if ( Ships[snum].wfuse > 0 )
 	    {
-	      sendAck(sInfo.sock, PKT_TOCLIENT, PSEV_INFO, PERR_CANCELED, 
+	      pktSendAck(sInfo.sock, PKT_TOCLIENT, PSEV_INFO, PERR_CANCELED, 
 		      NULL);
 	      sendFeedback("Weapons are currently overloaded.");
 	      goto cbrk22; /* break 2;*/
@@ -1596,13 +1597,13 @@ void procBomb(cpCommand_t *cmd)
 	  x = BOMBARD_FUEL * (real)(BOMBARD_GRAND / 1000.0);
 	  if ( ! clbUseFuel( snum, x, TRUE, TRUE ) )
 	    {
-	      sendAck(sInfo.sock, PKT_TOCLIENT, PSEV_INFO, PERR_CANCELED, 
+	      pktSendAck(sInfo.sock, PKT_TOCLIENT, PSEV_INFO, PERR_CANCELED, 
 		      NULL);
 	      sendFeedback("Not enough fuel to bombard.");
 	      goto cbrk22; /* break 2;*/
 	    }
 	  /*  entertime = mod( entertime + BOMBARD_GRAND, 24*60*60*1000 );*/
-	  grand(&entertime);
+	  utGrand(&entertime);
 	  killprob = (real)((BOMBARD_PROB *
 			     ((real) weaeff( snum ) *
 			      (real)((real)Planets[pnum].armies/100.0))) + 0.5);
@@ -1614,7 +1615,7 @@ void procBomb(cpCommand_t *cmd)
 		{
 		  /* No more armies left to bomb. */
 		  PVUNLOCK(&ConqInfo->lockword);
-		  sendAck(sInfo.sock, PKT_TOCLIENT, PSEV_INFO, PERR_CANCELED, 
+		  pktSendAck(sInfo.sock, PKT_TOCLIENT, PSEV_INFO, PERR_CANCELED, 
 			  NULL);
 		  sendFeedback(lastfew);
 		  goto cbrk22; /* break 2;*/
@@ -1632,7 +1633,7 @@ void procBomb(cpCommand_t *cmd)
       if ( Planets[pnum].armies <= MIN_BOMB_ARMIES )
 	{
 	  /* No more armies left to bomb. */
-	  sendAck(sInfo.sock, PKT_TOCLIENT, PSEV_INFO, PERR_CANCELED, NULL);
+	  pktSendAck(sInfo.sock, PKT_TOCLIENT, PSEV_INFO, PERR_CANCELED, NULL);
 	  sendFeedback(lastfew);
 	  break;
 	}
@@ -1682,7 +1683,7 @@ void procBeam(cpCommand_t *cmd)
   string lastfew="Fleet orders prohibit removing the last three armies.";
   int rv = -1;
 
-  if (!validPkt(CP_COMMAND, cmd))
+  if (!pktIsValid(CP_COMMAND, cmd))
     return;
 
   if (cmd->cmd != CPCMD_BEAM)
@@ -1701,7 +1702,7 @@ void procBeam(cpCommand_t *cmd)
     beamup = TRUE;		/* beaming up */
 
 #if defined(DEBUG_SERVERPROC)
-  clog("PROC BEAM: snum = %d, detail = 0x%04x, beamup = %d, beam = %d", 
+  utLog("PROC BEAM: snum = %d, detail = 0x%04x, beamup = %d, beam = %d", 
        snum, cmd->detail, beamup, beam);
 #endif
 
@@ -1710,7 +1711,7 @@ void procBeam(cpCommand_t *cmd)
   /* Check for allowability. */
   if ( Ships[snum].warp >= 0.0 )
     {
-      sendAck(sInfo.sock, PKT_TOCLIENT, PSEV_INFO, PERR_CANCELED, NULL);
+      pktSendAck(sInfo.sock, PKT_TOCLIENT, PSEV_INFO, PERR_CANCELED, NULL);
       sendFeedback("We must be orbiting a planet to use the transporter.");
       return;
     }
@@ -1719,19 +1720,19 @@ void procBeam(cpCommand_t *cmd)
     {
       if ( Planets[pnum].type == PLANET_SUN )
 	{
-	  sendAck(sInfo.sock, PKT_TOCLIENT, PSEV_INFO, PERR_CANCELED, NULL);
+	  pktSendAck(sInfo.sock, PKT_TOCLIENT, PSEV_INFO, PERR_CANCELED, NULL);
 	  sendFeedback("Idiot!  Our armies will fry down there!");
 	  return;
 	}
       else if ( Planets[pnum].type == PLANET_MOON )
 	{
-	  sendAck(sInfo.sock, PKT_TOCLIENT, PSEV_INFO, PERR_CANCELED, NULL);
+	  pktSendAck(sInfo.sock, PKT_TOCLIENT, PSEV_INFO, PERR_CANCELED, NULL);
 	  sendFeedback("Fool!  Our armies will suffocate down there!");
 	  return;
 	}
       else if ( Planets[pnum].team == TEAM_GOD )
 	{
-	  sendAck(sInfo.sock, PKT_TOCLIENT, PSEV_INFO, PERR_CANCELED, NULL);
+	  pktSendAck(sInfo.sock, PKT_TOCLIENT, PSEV_INFO, PERR_CANCELED, NULL);
 	  sendFeedback("GOD->you: YOUR ARMIES AREN'T GOOD ENOUGH FOR THIS PLANET.");
 	  return;
 	}
@@ -1745,7 +1746,7 @@ void procBeam(cpCommand_t *cmd)
       if ( i != 1 )
 	appchr( 's', cbuf );
       appchr( '.', cbuf );
-      sendAck(sInfo.sock, PKT_TOCLIENT, PSEV_INFO, PERR_CANCELED, NULL);
+      pktSendAck(sInfo.sock, PKT_TOCLIENT, PSEV_INFO, PERR_CANCELED, NULL);
       sendFeedback(cbuf);
       return;
     }
@@ -1755,7 +1756,7 @@ void procBeam(cpCommand_t *cmd)
       Planets[pnum].team != TEAM_NOTEAM )
     if ( ! Ships[snum].war[Planets[pnum].team] && Planets[pnum].armies != 0) /* can take empty planets */
       {
-	sendAck(sInfo.sock, PKT_TOCLIENT, PSEV_INFO, PERR_CANCELED, NULL);
+	pktSendAck(sInfo.sock, PKT_TOCLIENT, PSEV_INFO, PERR_CANCELED, NULL);
 	sendFeedback("But we are not at war with this planet!");
 	return;
       }
@@ -1763,7 +1764,7 @@ void procBeam(cpCommand_t *cmd)
   if ( Ships[snum].armies == 0 &&
       Planets[pnum].team == Ships[snum].team && Planets[pnum].armies <= MIN_BEAM_ARMIES )
     {
-      sendAck(sInfo.sock, PKT_TOCLIENT, PSEV_INFO, PERR_CANCELED, NULL);
+      pktSendAck(sInfo.sock, PKT_TOCLIENT, PSEV_INFO, PERR_CANCELED, NULL);
       sendFeedback(lastfew);
       return;
     }
@@ -1772,7 +1773,7 @@ void procBeam(cpCommand_t *cmd)
 
   if ( rkills < (real)1.0 )
     {
-      sendAck(sInfo.sock, PKT_TOCLIENT, PSEV_INFO, PERR_CANCELED, NULL);
+      pktSendAck(sInfo.sock, PKT_TOCLIENT, PSEV_INFO, PERR_CANCELED, NULL);
       sendFeedback("Fleet orders prohibit beaming armies until you have a kill.");
       return;
     }
@@ -1805,7 +1806,7 @@ void procBeam(cpCommand_t *cmd)
 	  else
 	    appstr( "ies are", cbuf );
 	  appstr( " reluctant to beam aboard a pirate vessel.", cbuf );
-	  sendAck(sInfo.sock, PKT_TOCLIENT, PSEV_INFO, PERR_CANCELED, NULL);
+	  pktSendAck(sInfo.sock, PKT_TOCLIENT, PSEV_INFO, PERR_CANCELED, NULL);
 	  sendFeedback(cbuf);
 	  return;
 	}
@@ -1815,7 +1816,7 @@ void procBeam(cpCommand_t *cmd)
   /* Figure out which direction to beam. */
   if ( upmax <= 0 && downmax <= 0 )
     {
-      sendAck(sInfo.sock, PKT_TOCLIENT, PSEV_INFO, PERR_CANCELED, NULL);
+      pktSendAck(sInfo.sock, PKT_TOCLIENT, PSEV_INFO, PERR_CANCELED, NULL);
       sendFeedback("There is no one to beam.");
       return;
     }
@@ -1861,18 +1862,18 @@ void procBeam(cpCommand_t *cmd)
   zeroed = FALSE;
   conqed = FALSE;
   
-  grand( &entertime );
+  utGrand( &entertime );
   while(TRUE)
     {
       if ( ! clbStillAlive( Context.snum ) )
 	return;
-      if ( isPacketWaiting(sInfo.sock) )
+      if ( pktIsPacketWaiting(sInfo.sock) )
 	break;
       
       /* See if it's time to beam again. */
-      while ( dgrand( entertime, &now ) >= BEAM_GRAND )
+      while ( utDeltaGrand( entertime, &now ) >= BEAM_GRAND )
 	{
-	  grand(&entertime);
+	  utGrand(&entertime);
 	  PVLOCK(&ConqInfo->lockword);
 	  if ( dirup )
 	    {
@@ -1880,7 +1881,7 @@ void procBeam(cpCommand_t *cmd)
 	      if ( Planets[pnum].armies <= MIN_BEAM_ARMIES )
 		{
 		  PVUNLOCK(&ConqInfo->lockword);
-		  sendAck(sInfo.sock, PKT_TOCLIENT, PSEV_INFO, PERR_CANCELED, 
+		  pktSendAck(sInfo.sock, PKT_TOCLIENT, PSEV_INFO, PERR_CANCELED, 
 			  NULL);
 		  sendFeedback(lastfew);
 		  break;
@@ -1915,7 +1916,7 @@ void procBeam(cpCommand_t *cmd)
 	  if ( total >= num )
 	    {
 	      /* Done. */
-	      sendAck(sInfo.sock, PKT_TOCLIENT, PSEV_INFO, PERR_DONE, 
+	      pktSendAck(sInfo.sock, PKT_TOCLIENT, PSEV_INFO, PERR_DONE, 
 		      NULL);
               sendFeedback("");
 	      goto cbrk21; 
@@ -1934,7 +1935,7 @@ void procBeam(cpCommand_t *cmd)
 	  if ( total == 0 )
 	    appstr( "no", cbuf );
 	  else
-	    appint( total, cbuf );
+	    utAppendInt( total, cbuf );
 	  appstr( " arm", cbuf );
 	  if ( total == 1 )
 	    {
@@ -1945,7 +1946,7 @@ void procBeam(cpCommand_t *cmd)
 	      appstr( "ies", cbuf );
 	    }
 	  appstr( " transported, ", cbuf );
-	  appint( num - total, cbuf );
+	  utAppendInt( num - total, cbuf );
 	  appstr( " to go.", cbuf );
 	  sendFeedback(cbuf);
 	  ototal = total;
@@ -1983,14 +1984,14 @@ void procDestruct(cpCommand_t *cmd)
   int snum = Context.snum;
   int entertime, now; 
 
-  if (!validPkt(CP_COMMAND, cmd))
+  if (!pktIsValid(CP_COMMAND, cmd))
     return;
   
   if (cmd->cmd != CPCMD_DESTRUCT)
     return;
 
 #if defined(DEBUG_SERVERPROC)
-  clog("PROC DESTRUCT: snum = %d, detail = 0x%04x", 
+  utLog("PROC DESTRUCT: snum = %d, detail = 0x%04x", 
        snum, cmd->detail);
 #endif
 
@@ -2001,7 +2002,7 @@ void procDestruct(cpCommand_t *cmd)
 
   if ( SCLOAKED(snum) )
     {
-      sendAck(sInfo.sock, PKT_TOCLIENT, PSEV_INFO, PERR_CANCELED,
+      pktSendAck(sInfo.sock, PKT_TOCLIENT, PSEV_INFO, PERR_CANCELED,
 	      NULL);
       sendFeedback("The cloaking device is using all available power.");
       return;
@@ -2010,13 +2011,13 @@ void procDestruct(cpCommand_t *cmd)
   /* Set up the destruct fuse. */
   Ships[Context.snum].sdfuse = SELFDESTRUCT_FUSE;
   
-  gsecs( &entertime );
+  utGetSecs( &entertime );
   
 
   Context.msgok = TRUE;			/* messages are ok in the beginning */
   while ( Ships[Context.snum].sdfuse > 0 )
     {
-      Ships[Context.snum].sdfuse = SELFDESTRUCT_FUSE - dsecs ( entertime, &now );
+      Ships[Context.snum].sdfuse = SELFDESTRUCT_FUSE - utDeltaSecs ( entertime, &now );
 
       /* Display new messages until T-minus 3 seconds. */
 
@@ -2030,10 +2031,10 @@ void procDestruct(cpCommand_t *cmd)
 	  return;
 	}
 
-      if ( isPacketWaiting(sInfo.sock) )
+      if ( pktIsPacketWaiting(sInfo.sock) )
 	{
 	  Ships[Context.snum].sdfuse = 0;
-	  sendAck(sInfo.sock, PKT_TOCLIENT, PSEV_INFO, PERR_CANCELED,
+	  pktSendAck(sInfo.sock, PKT_TOCLIENT, PSEV_INFO, PERR_CANCELED,
 		  NULL);
 	  return;
 	}
@@ -2063,7 +2064,7 @@ void procDestruct(cpCommand_t *cmd)
 	clbKillShip( Context.snum, KB_SELF );
     }
   
-  sendAck(sInfo.sock, PKT_TOCLIENT, PSEV_INFO, PERR_DONE,
+  pktSendAck(sInfo.sock, PKT_TOCLIENT, PSEV_INFO, PERR_DONE,
 	  NULL);
   return;
   
@@ -2074,14 +2075,14 @@ void procAutoPilot(cpCommand_t *cmd)
   int snum = Context.snum;
   int laststat, now; 
 
-  if (!validPkt(CP_COMMAND, cmd))
+  if (!pktIsValid(CP_COMMAND, cmd))
     return;
   
   if (cmd->cmd != CPCMD_AUTOPILOT)
     return;
 
 #if defined(DEBUG_SERVERPROC)
-  clog("PROC AUTOPILOT: snum = %d, detail = 0x%04x", 
+  utLog("PROC AUTOPILOT: snum = %d, detail = 0x%04x", 
        snum, ntohs(cmd->detail));
 #endif
 
@@ -2091,7 +2092,7 @@ void procAutoPilot(cpCommand_t *cmd)
   /* allowed? */
   if (!Users[Ships[snum].unum].ooptions[OOPT_AUTOPILOT])
     {
-      clog("PROC AUTOPILOT: unum = %d, snum = %d: NOT ALLOWED", 
+      utLog("PROC AUTOPILOT: unum = %d, snum = %d: NOT ALLOWED", 
            Ships[snum].unum, snum);
       return;
     }
@@ -2099,7 +2100,7 @@ void procAutoPilot(cpCommand_t *cmd)
  sendFeedback("Autopilot activated.");
  SFSET(snum, SHIP_F_ROBOT);
 
-  gsecs( &laststat );			/* initialize stat timer */
+  utGetSecs( &laststat );			/* initialize stat timer */
   while ( clbStillAlive( Context.snum ) )
     {
       /* Make sure we still control our ship. */
@@ -2107,15 +2108,15 @@ void procAutoPilot(cpCommand_t *cmd)
 	break;
       
       /* See if it's time to update the statistics. */
-      if ( dsecs( laststat, &now ) >= 15 )
+      if ( utDeltaSecs( laststat, &now ) >= 15 )
 	{
 	  conqstats( Context.snum );
 	  laststat = now;
 	}
 
-      if ( isPacketWaiting(sInfo.sock) ) 
+      if ( pktIsPacketWaiting(sInfo.sock) ) 
         {
-          sendAck(sInfo.sock, PKT_TOCLIENT, PSEV_INFO, PERR_CANCELED,
+          pktSendAck(sInfo.sock, PKT_TOCLIENT, PSEV_INFO, PERR_CANCELED,
                   NULL);
           break;
         }
@@ -2126,7 +2127,7 @@ void procAutoPilot(cpCommand_t *cmd)
   SFCLR(snum, SHIP_F_ROBOT);
   Ships[snum].action = 0;
   
-  sendAck(sInfo.sock, PKT_TOCLIENT, PSEV_INFO, PERR_DONE,
+  pktSendAck(sInfo.sock, PKT_TOCLIENT, PSEV_INFO, PERR_DONE,
 	  NULL);
   return;
   
@@ -2134,7 +2135,7 @@ void procAutoPilot(cpCommand_t *cmd)
 
 void procReload(cpCommand_t *cmd)
 {
-  if (!validPkt(CP_COMMAND, cmd))
+  if (!pktIsValid(CP_COMMAND, cmd))
     return;
 
   if (cmd->cmd != CPCMD_RELOAD)

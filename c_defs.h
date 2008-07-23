@@ -234,41 +234,6 @@ void error(char *str);
 
 /* Function prototypes for everything else */
 
-/** conqutil.c */
-
-real acdist( real curvel, real newvel, real acc );
-void stcpn( char *from, char *to, int tosize );
-int safectoi(int *num, char *buf, int useless);
-real subang( real a1, real a2);
-real angle( real fromx, real fromy, real tox, real toy );
-void appint( int i, char *str );
-void appnum( int num, char *buf );
-void appnumtim( int now[], char *buf );
-void appsstatus( int status, char *buf );
-void apptitle( int team, char *buf );
-void appship( int snum, char *str );
-void appkb( int kb, char *buf );
-int arrows( char *str, real *dir );
-void setSystemLog(int usesys, int echostderr);
-void cerror(char *fmt, ...);
-void clog(char *fmt, ...);
-void delblanks( char *str );
-int dsecs( int s, int *n );
-real explosion( real basehits, real dis );
-void fmtminutes( int itime, char *buf );
-void fmtseconds( int itime, char *buf );
-int getamsg( int snum, int *msg );
-void getdandt( char *buf, time_t thetime );
-int dgrand(int s, int *n);
-void grand( int *h );
-void gsecs( int *s );
-real mod360( real r );
-int modp1( int i, int modulus );
-int special( char *str, int *what, int *token, int *count );
-void stcpn( char *from, char *to, int tosize );
-int stmatch( char *str1, char *str2, int casesensitive );
-
-
 /* conqai.c */
 void defend( int attacker, int pnum );
 int newrob( int *snum, int unum );

@@ -1,6 +1,4 @@
 /* 
- * Team structure
- *
  * $Id$
  *
  * Copyright 1999-2004 Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
@@ -19,9 +17,10 @@ void dspReplayHelp(void);
 
 int uiCStrlen(char *buf);
 
-/* planet updating (textures, etc) */
-/* for the GL client, this is defined in GL.c, for the curses client
-   this will be a noop defined in cumisc.c */
+/* planet updating (textures, etc) 
+ * for the GL client, this is defined in GL.c, for the curses client
+ *  this will be a noop defined in cumisc.c 
+ */
 int uiUpdatePlanet(int pnum);
 /* update the direction of the torp (GL only) */
 int uiUpdateTorpDir(int snum, int tnum);

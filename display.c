@@ -20,6 +20,7 @@
 #include "context.h"
 #include "conf.h"
 #include "conqlb.h"
+#include "conqutil.h"
 #include "cd2lb.h"
 #include "cumisc.h"
 #include "global.h"
@@ -136,7 +137,7 @@ int alertcolor(int alert)
       theattrib = RedLevelColor;
       break;
     default:
-      clog("alertcolor(): invalid alert level: %d", alert);
+      utLog("alertcolor(): invalid alert level: %d", alert);
       break;
     }
 
@@ -600,7 +601,7 @@ void display( int snum, int display_info )
 			/* itself elsewhere... anyway, a kludge: */
 			idx = ((idx == 8) ? 0 : idx);
 			
-			/*			    cerror("idx = %d", idx);*/
+			/*			    utError("idx = %d", idx);*/
 			
 			j = lin+linofs[idx];
 			k = col+colofs[idx];
@@ -687,7 +688,7 @@ void display( int snum, int display_info )
 	  
 	  if ( minenemy != 0 )
 	    {
-	      appship( minenemy, buf );
+	      utAppendShip( minenemy, buf );
 	      if ( SCLOAKED(minenemy) )
 		appstr( " (CLOAKED)", buf );
 	    }
@@ -919,12 +920,12 @@ void display( int snum, int display_info )
 	if ( i == 0 )
 	  appstr( "**", buf );
 	else
-	  appint( i, buf );
+	  utAppendInt( i, buf );
 	appchr( '/', buf );
 	if ( j == 0 )
 	  appstr( "**", buf );
 	else
-	  appint( j, buf );
+	  utAppendInt( j, buf );
 	uiPutColor(InfoColor);
 	cdputs( buf, lin, datacol );
 	uiPutColor(0);
@@ -1130,12 +1131,12 @@ void display( int snum, int display_info )
 	else if ( i < 0 )
 	  {
 	    c_strcpy( "towing ", buf );
-	    appship( -i, buf );
+	    utAppendShip( -i, buf );
 	  }
 	else if ( i > 0 )
 	  {
 	    c_strcpy( "towed by ", buf );
-	    appship( i, buf );
+	    utAppendShip( i, buf );
 	  }
 	uiPutColor(InfoColor);
 	cdputs( buf, lin, col );
@@ -1282,7 +1283,7 @@ void display( int snum, int display_info )
 	  else if ( i > 0 && i <= MAXSHIPS )
 	    {
 	      buf[0] = EOS;
-	      appship( i, buf );
+	      utAppendShip( i, buf );
 	      uiPutColor(RedLevelColor);
 	      cdputs( buf, lin, dcol );
 	      uiPutColor(0);
@@ -1300,7 +1301,7 @@ void display( int snum, int display_info )
 	}
       else
 	{			/* not the doomsday, nothing yet... */
-	  clog("display(): got invalid ship number %d", snum);
+	  utLog("display(): got invalid ship number %d", snum);
 	}
       
     }
@@ -1331,7 +1332,7 @@ void display_headers(int snum)
   ssbuf[0] = EOS;
   
   appstr( ", ", ssbuf );
-  appsstatus( Ships[snum].status, ssbuf);
+  utAppendShipStatus( Ships[snum].status, ssbuf);
   
   if ( ConqInfo->closed) 
     {

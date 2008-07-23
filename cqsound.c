@@ -18,10 +18,11 @@
 
 #include "conf.h"
 #include "conqinit.h"
+#include "conqutil.h"
 
-#define _CQSOUND_NOEXTERN
+#define NOEXTERN_CQSOUND
 #include "cqsound.h"
-#undef  _CQSOUND_NOEXTERN
+#undef  NOEXTERN_CQSOUND
 
 #ifndef CQS_NO_SOUND
 #include "SDL/SDL.h"
@@ -52,13 +53,13 @@ static void _music_finished(void)
   _mus_idx = -1;
 
 #if defined(DEBUG_SOUND)
-  clog("%s: called, curque %d", __FUNCTION__,
+  utLog("%s: called, curque %d", __FUNCTION__,
         curque);
 #endif
 
   if (Mix_PlayingMusic())
     {                           /* shouldn't happen */
-      clog("%s: Music is still playing!");
+      utLog("%s: Music is still playing!");
       return;
     }
 
@@ -228,7 +229,7 @@ static int cqsLoadSounds(void)
           
           if ((ch = _getSoundFile(cqiSoundMusic[i].filename)) == NULL)
             {
-              clog("%s: Could not find Music file '%s'",
+              utLog("%s: Could not find Music file '%s'",
                    __FUNCTION__,
                    cqiSoundMusic[i].filename);
               continue;
@@ -236,7 +237,7 @@ static int cqsLoadSounds(void)
 
           if ((mm = Mix_LoadMUS(ch)) == NULL)
             {
-              clog("%s: Could not load Music file '%s': %s",
+              utLog("%s: Could not load Music file '%s': %s",
                    __FUNCTION__,
                    cqiSoundMusic[i].filename, Mix_GetError());
               continue;
@@ -276,7 +277,7 @@ static int cqsLoadSounds(void)
                                       (cqsNumMusic + 1));
       if (!sndptr)
         {
-          clog("%s: Could not realloc %d Music slots, ignoring Music '%s'",
+          utLog("%s: Could not realloc %d Music slots, ignoring Music '%s'",
                __FUNCTION__,
                cqsNumMusic + 1,
                cqiSoundMusic[i].name);
@@ -310,7 +311,7 @@ static int cqsLoadSounds(void)
           
           if ((ch = _getSoundFile(cqiSoundEffects[i].filename)) == NULL)
             {
-              clog("%s: Could not find Effects file '%s'",
+              utLog("%s: Could not find Effects file '%s'",
                    __FUNCTION__,
                    cqiSoundEffects[i].filename);
               continue;
@@ -318,7 +319,7 @@ static int cqsLoadSounds(void)
 
           if ((mc = Mix_LoadWAV(ch)) == NULL)
             {
-              clog("%s: Could not load Effects file '%s': %s",
+              utLog("%s: Could not load Effects file '%s': %s",
                    __FUNCTION__,
                    cqiSoundEffects[i].filename, Mix_GetError());
               continue;
@@ -358,7 +359,7 @@ static int cqsLoadSounds(void)
       
       if (!sndptr)
         {
-          clog("%s: Could not realloc %d Effects slots, ignoring Effects '%s'",
+          utLog("%s: Could not realloc %d Effects slots, ignoring Effects '%s'",
                __FUNCTION__,
                cqsNumEffects + 1,
                cqiSoundEffects[i].name);
@@ -373,8 +374,8 @@ static int cqsLoadSounds(void)
       cqsNumEffects++;
     }
 
-  clog("%s: Loaded %d Music files.", __FUNCTION__, nummus);
-  clog("%s: Loaded %d Effect files.", __FUNCTION__, numfx);
+  utLog("%s: Loaded %d Music files.", __FUNCTION__, nummus);
+  utLog("%s: Loaded %d Effect files.", __FUNCTION__, numfx);
 
   return TRUE;
 }
@@ -387,20 +388,20 @@ void cqsInitSound(void)
   char buf[128];
   int i;
 
-  clog("%s: Initializing...", __FUNCTION__);
+  utLog("%s: Initializing...", __FUNCTION__);
   cqsSoundAvailable = FALSE;
   CQS_DISABLE(CQS_EFFECTS | CQS_MUSIC);
 
   if (!cqiSoundConf || (!cqiSoundEffects && !cqiSoundMusic))
     {
-      clog("%s: cqiSound not initialized, bailing");
+      utLog("%s: cqiSound not initialized, bailing");
       return;
     }
 
   /* first init SDL */
   if (SDL_Init(SDL_INIT_AUDIO))
     {
-      clog("%s: SDL_Init() failed: %s",  
+      utLog("%s: SDL_Init() failed: %s",  
            __FUNCTION__,
            SDL_GetError());
       return;
@@ -412,7 +413,7 @@ void cqsInitSound(void)
                     (cqiSoundConf->stereo) ? 2 : 1,
                     cqiSoundConf->chunksize))
     {
-      clog("%s: SDL_OpenAudio() failed: %s",  
+      utLog("%s: SDL_OpenAudio() failed: %s",  
            __FUNCTION__, Mix_GetError());
       return;
     }
@@ -426,7 +427,7 @@ void cqsInitSound(void)
 
   if (!chnptr)
     {
-      clog("%s: Could not realloc %d channel slots, sound disabled",
+      utLog("%s: Could not realloc %d channel slots, sound disabled",
            __FUNCTION__,
            CQS_MAX_CHANNELS);
       return;
@@ -447,7 +448,7 @@ void cqsInitSound(void)
   /* now loadup the sounds */
   if (!cqsLoadSounds())
     {
-      clog("%s: _cqiLoadSounds() failed, sound disabled",
+      utLog("%s: _cqiLoadSounds() failed, sound disabled",
            __FUNCTION__);
       return;
     }
@@ -457,61 +458,61 @@ void cqsInitSound(void)
   for (i=0; i<NUMPLAYERTEAMS; i++)
     {
       snprintf(buf, 128 - 1, "ship%c-phaser", Teams[i].name[0]);
-      teamEffects[i].phaser = cqsFindEffect(buf);
+      cqsTeamEffects[i].phaser = cqsFindEffect(buf);
 
       snprintf(buf, 128 - 1, "ship%c-torp", Teams[i].name[0]);
-      teamEffects[i].torp = cqsFindEffect(buf);
+      cqsTeamEffects[i].torp = cqsFindEffect(buf);
 
       snprintf(buf, 128 - 1, "ship%c-torp3", Teams[i].name[0]);
-      teamEffects[i].torp3 = cqsFindEffect(buf);
+      cqsTeamEffects[i].torp3 = cqsFindEffect(buf);
 
       snprintf(buf, 128 - 1, "ship%c-alert", Teams[i].name[0]);
-      teamEffects[i].alert = cqsFindEffect(buf);
+      cqsTeamEffects[i].alert = cqsFindEffect(buf);
 
       snprintf(buf, 128 - 1, "ship%c-beam-down", Teams[i].name[0]);
-      teamEffects[i].beamd = cqsFindEffect(buf);
+      cqsTeamEffects[i].beamd = cqsFindEffect(buf);
 
       snprintf(buf, 128 - 1, "ship%c-beam-up", Teams[i].name[0]);
-      teamEffects[i].beamu = cqsFindEffect(buf);
+      cqsTeamEffects[i].beamu = cqsFindEffect(buf);
 
       snprintf(buf, 128 - 1, "ship%c-hit", Teams[i].name[0]);
-      teamEffects[i].hit = cqsFindEffect(buf);
+      cqsTeamEffects[i].hit = cqsFindEffect(buf);
 
       snprintf(buf, 128 - 1, "ship%c-info", Teams[i].name[0]);
-      teamEffects[i].info = cqsFindEffect(buf);
+      cqsTeamEffects[i].info = cqsFindEffect(buf);
 
       snprintf(buf, 128 - 1, "ship%c-mag", Teams[i].name[0]);
-      teamEffects[i].mag = cqsFindEffect(buf);
+      cqsTeamEffects[i].mag = cqsFindEffect(buf);
 
       snprintf(buf, 128 - 1, "ship%c-warp-up", Teams[i].name[0]);
-      teamEffects[i].warpu = cqsFindEffect(buf);
+      cqsTeamEffects[i].warpu = cqsFindEffect(buf);
 
       snprintf(buf, 128 - 1, "ship%c-warp-down", Teams[i].name[0]);
-      teamEffects[i].warpd = cqsFindEffect(buf);
+      cqsTeamEffects[i].warpd = cqsFindEffect(buf);
 
       /* music */
       snprintf(buf, 128 - 1, "ship%c-intro", Teams[i].name[0]);
-      teamMusic[i].intro = cqsFindMusic(buf);
+      cqsTeamMusic[i].intro = cqsFindMusic(buf);
 
       snprintf(buf, 128 - 1, "ship%c-battle", Teams[i].name[0]);
-      teamMusic[i].battle = cqsFindMusic(buf);
+      cqsTeamMusic[i].battle = cqsFindMusic(buf);
 
       snprintf(buf, 128 - 1, "ship%c-approach", Teams[i].name[0]);
-      teamMusic[i].approach = cqsFindMusic(buf);
+      cqsTeamMusic[i].approach = cqsFindMusic(buf);
 
       snprintf(buf, 128 - 1, "ship%c-theme", Teams[i].name[0]);
-      teamMusic[i].theme = cqsFindMusic(buf);
+      cqsTeamMusic[i].theme = cqsFindMusic(buf);
     }
 
   /* doomsday music */
   snprintf(buf, 128 - 1, "doomsday");
-  doomMusic.doom = cqsFindMusic(buf);
+  cqsDoomsdayMusic.doom = cqsFindMusic(buf);
 
   snprintf(buf, 128 - 1, "doomsday-in");
-  doomMusic.doomin = cqsFindMusic(buf);
+  cqsDoomsdayMusic.doomin = cqsFindMusic(buf);
 
   snprintf(buf, 128 - 1, "doomsday-kill");
-  doomMusic.doomkill = cqsFindMusic(buf);
+  cqsDoomsdayMusic.doomkill = cqsFindMusic(buf);
 
   /* now, enable sound */
   if (cqsNumEffects || cqsNumMusic)
@@ -524,7 +525,7 @@ void cqsInitSound(void)
       if (cqsNumMusic)
         CQS_ENABLE(CQS_MUSIC);
 
-      clog("%s: samplerate = %d channels = %d chunksize = %d stereo = %s",
+      utLog("%s: samplerate = %d channels = %d chunksize = %d stereo = %s",
            __FUNCTION__,
            cqiSoundConf->samplerate, CQS_MAX_CHANNELS,
            cqiSoundConf->chunksize, (cqiSoundConf->stereo ? "yes" : "no"));
@@ -541,7 +542,7 @@ int cqsMusicPlay(int musidx, int halt)
     return FALSE;
 
 #if defined(DEBUG_SOUND)
-  clog("%s: playing %d (%s)", __FUNCTION__,
+  utLog("%s: playing %d (%s)", __FUNCTION__,
         musidx, cqiSoundMusic[cqsMusic[musidx].cqiIndex].name);
 #endif
   
@@ -551,7 +552,7 @@ int cqsMusicPlay(int musidx, int halt)
           cqsMusic[_mus_idx].fadeoutms)
         {                   /* need to fade out first */
 #if defined(DEBUG_SOUND)
-          clog("%s: queing %d, fadeout %d", __FUNCTION__,
+          utLog("%s: queing %d, fadeout %d", __FUNCTION__,
                musidx, cqsMusic[_mus_idx].fadeoutms);
 #endif
           _mus_que = musidx;
@@ -578,7 +579,7 @@ int cqsMusicPlay(int musidx, int halt)
   
   if (rv == -1)
     {
-      clog("%s: PlayMusic/FadeInMusic failed: %s", __FUNCTION__,
+      utLog("%s: PlayMusic/FadeInMusic failed: %s", __FUNCTION__,
            Mix_GetError());
       _mus_idx = -1;
       return FALSE;
@@ -597,7 +598,7 @@ int cqsMusicStop(int halt)
     return FALSE;
 
 #if defined(DEBUG_SOUND)
-  clog("%s: stopping music halt = %d idx %d (fade %d)", __FUNCTION__,
+  utLog("%s: stopping music halt = %d idx %d (fade %d)", __FUNCTION__,
        halt,_mus_idx, cqsMusic[_mus_idx].fadeoutms);
 #endif
 
@@ -633,7 +634,7 @@ int cqsEffectPlayTracked(int fxidx, cqsHandle *handle, real maxdist,
     return FALSE;
 
 #if defined(DEBUG_SOUND)
-  clog("%s: playing %d (%s) loops %d vol = %d pan = %d  - %f %f %f", 
+  utLog("%s: playing %d (%s) loops %d vol = %d pan = %d  - %f %f %f", 
        __FUNCTION__,
         fxidx, cqiSoundEffects[cqsEffects[fxidx].cqiIndex].name,
        cqsEffects[fxidx].loops, cqsEffects[fxidx].vol,
@@ -695,7 +696,7 @@ int cqsEffectPlayTracked(int fxidx, cqsHandle *handle, real maxdist,
                        cqsEffects[fxidx].loops)) == -1)
     {                           /* some failure */
 #ifdef DEBUG_SOUND
-      clog("%s: could not play '%s'", __FUNCTION__,
+      utLog("%s: could not play '%s'", __FUNCTION__,
            cqiSoundEffects[cqsEffects[fxidx].cqiIndex].name);
 #endif
       
@@ -732,7 +733,7 @@ int cqsEffectPlayTracked(int fxidx, cqsHandle *handle, real maxdist,
       if (!ang)
         mangle = 0;             /* directly in front */
       else
-        mangle = (Sint16)mod360(fabs(360.0 - ang) + 90.0);
+        mangle = (Sint16)utMod360(fabs(360.0 - ang) + 90.0);
 
       Mix_SetPosition(cqsChannels[empty].channel, mangle, mdist);
     }
@@ -750,7 +751,7 @@ int cqsEffectPlay(int fxidx, real maxdist, real dist, real ang)
     return FALSE;
 
 #if defined(DEBUG_SOUND)
-  clog("%s: playing %d (%s) loops %d vol = %d pan = %d - %f %f %f", 
+  utLog("%s: playing %d (%s) loops %d vol = %d pan = %d - %f %f %f", 
        __FUNCTION__,
         fxidx, cqiSoundEffects[cqsEffects[fxidx].cqiIndex].name,
        cqsEffects[fxidx].loops, cqsEffects[fxidx].vol,
@@ -795,7 +796,7 @@ int cqsEffectPlay(int fxidx, real maxdist, real dist, real ang)
                                  cqsEffects[fxidx].loops)) == -1)
     {                           /* some failure */
 #ifdef DEBUG_SOUND
-      clog("%s: could not play '%s'", __FUNCTION__,
+      utLog("%s: could not play '%s'", __FUNCTION__,
            cqiSoundEffects[cqsEffects[fxidx].cqiIndex].name);
 #endif
       
@@ -827,7 +828,7 @@ int cqsEffectPlay(int fxidx, real maxdist, real dist, real ang)
       if (!ang)
         mangle = 0;             /* directly in front */
       else
-        mangle = (Sint16)mod360(fabs(360.0 - ang) + 90.0);
+        mangle = (Sint16)utMod360(fabs(360.0 - ang) + 90.0);
 
       Mix_SetPosition(channel, mangle, mdist);
     }
@@ -841,7 +842,7 @@ int cqsEffectStop(cqsHandle handle, int halt)
     return FALSE;
 
 #if defined(DEBUG_SOUND)
-  clog("%s: stopping effects halt = %d (hndl %d)", __FUNCTION__,
+  utLog("%s: stopping effects halt = %d (hndl %d)", __FUNCTION__,
        halt, handle);
 #endif
 

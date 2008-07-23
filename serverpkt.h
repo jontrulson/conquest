@@ -16,30 +16,30 @@
 #include "packet.h"
 
 
-void spktInit(void);
-void spktInitPkt(void);
-void spktInitRec(void);
+void           spktInit(void);
+void           spktInitPkt(void);
+void           spktInitRec(void);
 
-spUser_t *spktUser(Unsgn16 unum);
+spUser_t       *spktUser(Unsgn16 unum);
 
-spShip_t *spktShip(Unsgn8 snum, int rec);
-spShipSml_t *spktShipSml(Unsgn8 snum, int rec);
-spShipLoc_t *spktShipLoc(Unsgn8 snum, int rec);
+spShip_t       *spktShip(Unsgn8 snum, int rec);
+spShipSml_t    *spktShipSml(Unsgn8 snum, int rec);
+spShipLoc_t    *spktShipLoc(Unsgn8 snum, int rec);
 
-spPlanet_t *spktPlanet(Unsgn8 pnum, int rec);
-spPlanetSml_t *spktPlanetSml(Unsgn8 pnum, int rec);
-spPlanetLoc_t *spktPlanetLoc(Unsgn8 pnum, int rec, int force);
+spPlanet_t     *spktPlanet(Unsgn8 pnum, int rec);
+spPlanetSml_t  *spktPlanetSml(Unsgn8 pnum, int rec);
+spPlanetLoc_t  *spktPlanetLoc(Unsgn8 pnum, int rec, int force);
 spPlanetLoc2_t *spktPlanetLoc2(Unsgn8 pnum, int rec, int force);
 
-spTorp_t *spktTorp(Unsgn8 tsnum, Unsgn8 tnum, int rec);
-spTorpLoc_t *spktTorpLoc(Unsgn8 tsnum, Unsgn8 tnum, int rec);
-spTorpEvent_t *spktTorpEvent(Unsgn8 tsnum, Unsgn8 tnum, int rec);
+spTorp_t       *spktTorp(Unsgn8 tsnum, Unsgn8 tnum, int rec);
+spTorpLoc_t    *spktTorpLoc(Unsgn8 tsnum, Unsgn8 tnum, int rec);
+spTorpEvent_t  *spktTorpEvent(Unsgn8 tsnum, Unsgn8 tnum, int rec);
 
-spTeam_t *spktTeam(Unsgn8 team, int force, int rec);
-spConqInfo_t *spktConqInfo(int force);
+spTeam_t       *spktTeam(Unsgn8 team, int force, int rec);
+spConqInfo_t   *spktConqInfo(int force);
 
-spHistory_t *spktHistory(int hnum);
-spDoomsday_t *spktDoomsday(int rec);
+spHistory_t    *spktHistory(int hnum);
+spDoomsday_t   *spktDoomsday(int rec);
 
 spPlanetInfo_t *spktPlanetInfo(Unsgn8 pnum, int rec);
 

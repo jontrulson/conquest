@@ -11,10 +11,8 @@
 #include "conqinit.h"
 #include "conqinit-yacc.h"
 
-#define NOEXTERN
 #include "conqdef.h"
 #include "conqcom.h"
-#include "context.h"
 
 int goterror = 0;
 int lineNum = 1; /* current line number of the scanner */

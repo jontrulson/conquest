@@ -11,6 +11,8 @@
 #include "conqdef.h"
 #include "conqcom.h"
 #include "conqlb.h"
+#include "conqutil.h"
+
 #include "context.h"
 #include "conf.h"
 #include "global.h"
@@ -19,12 +21,11 @@
 #include "protocol.h"
 #include "packet.h"
 
-#include "protocol.h"
 #include "client.h"
 
-#define REC_NOEXTERN
+#define NOEXTERN_RECORD
 #include "record.h"
-#undef REC_NOEXTERN
+#undef NOEXTERN_RECORD
 
 extern char *ConquestVersion;
 extern char *ConquestDate;
@@ -45,13 +46,13 @@ static gzFile rdata_rfdz = NULL;
 #endif
 
 /* open a recording input file */
-int recordOpenInput(char *fname)
+int recOpenInput(char *fname)
 {
   rdata_rfd = -1;
 
   if ((rdata_rfd = open(fname, O_RDONLY)) == -1)
     {
-      printf("recordOpenInput: open(%s) failed: %s\n", fname, 
+      printf("recOpenInput: open(%s) failed: %s\n", fname, 
 	     strerror(errno));
       return(FALSE);
     }
@@ -59,8 +60,8 @@ int recordOpenInput(char *fname)
 #ifdef HAVE_LIBZ
   if ((rdata_rfdz = gzdopen(rdata_rfd, "rb")) == NULL)
     {
-      printf("recordOpenInput: gzdopen failed\n"); /* we use printf here
-						 since clog maynot be
+      printf("recOpenInput: gzdopen failed\n"); /* we use printf here
+						 since utLog maynot be
 						 available */
       return(FALSE);
     }
@@ -69,7 +70,7 @@ int recordOpenInput(char *fname)
   return(TRUE);
 }
 
-void recordCloseInput(void)
+void recCloseInput(void)
 {
 #ifdef HAVE_LIBZ
   if (rdata_rfdz != NULL)
@@ -88,7 +89,7 @@ void recordCloseInput(void)
 
 /* create the recording output file. */
 /* runs under user level privs */
-int recordOpenOutput(char *fname, int logit)
+int recOpenOutput(char *fname, int logit)
 {
   struct stat sbuf;
 
@@ -101,7 +102,7 @@ int recordOpenOutput(char *fname, int logit)
   if (stat(fname, &sbuf) != -1) 
     {				/* it exists.  issue error and return */
       if (logit)
-        clog("%s: file exists.  You cannot record to an existing file\n",
+        utLog("%s: file exists.  You cannot record to an existing file\n",
 	     fname);
       else
         printf("%s: file exists.  You cannot record to an existing file\n",
@@ -114,11 +115,11 @@ int recordOpenOutput(char *fname, int logit)
   if ((rdata_wfd = creat(fname, S_IWUSR|S_IRUSR)) == -1)
     {
       if (logit)
-        clog("recordOpenOutput(): creat(%s) failed: %s\n",
+        utLog("recOpenOutput(): creat(%s) failed: %s\n",
                fname,
                strerror(errno));
       else
-        printf("recordOpenOutput(): creat(%s) failed: %s\n",
+        printf("recOpenOutput(): creat(%s) failed: %s\n",
                fname,
                strerror(errno));
       return(FALSE);
@@ -130,9 +131,9 @@ int recordOpenOutput(char *fname, int logit)
   if ((rdata_wfdz = gzdopen(rdata_wfd, "wb")) == NULL)
     {
       if (logit)
-        clog("initReplay: gzdopen failed\n");
+        utLog("recInitReplay: gzdopen failed\n");
       else
-        printf("initReplay: gzdopen failed\n");
+        printf("recInitReplay: gzdopen failed\n");
       return(FALSE);
     }
 #endif
@@ -141,9 +142,9 @@ int recordOpenOutput(char *fname, int logit)
 }
 
 /* close the output stream */  
-void recordCloseOutput(void)
+void recCloseOutput(void)
 {
-  recordUpdateFrame();
+  recUpdateFrame();
 
 #ifdef HAVE_LIBZ
   if (rdata_wfdz != NULL)
@@ -161,7 +162,7 @@ void recordCloseOutput(void)
 }
 
 /* read the file header */
-int recordReadHeader(fileHeader_t *fhdr)
+int recReadHeader(fileHeader_t *fhdr)
 {
   int rv;
 
@@ -176,12 +177,12 @@ int recordReadHeader(fileHeader_t *fhdr)
   if ((rv = read(rdata_rfd, (char *)fhdr, SZ_FILEHEADER)) != SZ_FILEHEADER)
 #endif
     {
-      printf("recordReadHeader: could not read a proper header\n");
+      printf("recReadHeader: could not read a proper header\n");
       return(FALSE);
     }
 
 #ifdef DEBUG_REC
-  clog("recordReadHeader: read %d bytes\n",
+  utLog("recReadHeader: read %d bytes\n",
        rv);
 #endif
 
@@ -193,7 +194,7 @@ int recordReadHeader(fileHeader_t *fhdr)
   fhdr->flags = (Unsgn32)ntohl(fhdr->flags);
 
 #ifdef DEBUG_REC
-  clog("recordReadHeader: vers = %d, rectime = %d, cmnrev = %d\n",
+  utLog("recReadHeader: vers = %d, rectime = %d, cmnrev = %d\n",
        fhdr->vers, fhdr->rectime, fhdr->cmnrev);
 #endif
 
@@ -203,7 +204,7 @@ int recordReadHeader(fileHeader_t *fhdr)
 
 /* build and generate a file header
  */
-int recordInitOutput(int unum, time_t thetime, int snum, int isserver)
+int recInitOutput(int unum, time_t thetime, int snum, int isserver)
 {
   fileHeader_t fhdr;
   
@@ -230,18 +231,18 @@ int recordInitOutput(int unum, time_t thetime, int snum, int isserver)
   fhdr.snum = snum;
   fhdr.flags = (Unsgn32)htonl((Unsgn32)fhdr.flags);
 
-  if (!recordWriteBuf(&fhdr, sizeof(fileHeader_t)))
+  if (!recWriteBuf(&fhdr, sizeof(fileHeader_t)))
     return(FALSE);
 
   /* add a frame packet */
-  recordUpdateFrame();
+  recUpdateFrame();
 
   /* ready to go I hope */
   return(TRUE);
 }
 
 /* note, if we get a write error here, we turn off recording */
-void recordWriteEvent(void *data)
+void recWriteEvent(void *data)
 {
   char *buf = (char *)data;
   Unsgn8 pkttype;
@@ -255,16 +256,16 @@ void recordWriteEvent(void *data)
 
   pkttype = (Unsgn8)*buf;
   
-  len = serverPktSize(pkttype);
+  len = pktServerPacketSize(pkttype);
   if (!len)
     {
-      clog("recordWriteEvent: invalid packet type %d", pkttype);
+      utLog("recWriteEvent: invalid packet type %d", pkttype);
       return;
     }
 
-  if (!recordWriteBuf(buf, len))
+  if (!recWriteBuf(buf, len))
     {
-      clog("recordWriteEvent: write error: %s, recording terminated",
+      utLog("recWriteEvent: write error: %s, recording terminated",
            strerror(errno));
       Context.recmode = RECMODE_OFF;
     }
@@ -273,7 +274,7 @@ void recordWriteEvent(void *data)
 }
 
 /* write a frame packet and increment recordFrameCount */
-void recordUpdateFrame(void)
+void recUpdateFrame(void)
 {
   spFrame_t frame;
 
@@ -286,7 +287,7 @@ void recordUpdateFrame(void)
   frame.frame = (Unsgn32)htonl(recordFrameCount);
   frame.time = (Unsgn32)htonl((Unsgn32)getnow(NULL, 0));
 
-  recordWriteEvent(&frame);
+  recWriteEvent(&frame);
 
   recordFrameCount++;
 
@@ -294,13 +295,13 @@ void recordUpdateFrame(void)
 }
 
 /* write out a buffer */
-int recordWriteBuf(void *buf, int len)
+int recWriteBuf(void *buf, int len)
 {
   if (rdata_wfd == -1)
     return(FALSE);
   
 #ifdef DEBUG_REC
-  clog("recordWriteBuf: len = %d\n", len);
+  utLog("recWriteBuf: len = %d\n", len);
 #endif
 
 #ifdef HAVE_LIBZ
@@ -309,7 +310,7 @@ int recordWriteBuf(void *buf, int len)
   if (write(rdata_wfd, buf, len) != len)
 #endif
     {
-      clog("recordWriteBuf: couldn't write buffer of %d bytes\n",
+      utLog("recWriteBuf: couldn't write buffer of %d bytes\n",
 	   len);
       return(FALSE);
     }
@@ -319,7 +320,7 @@ int recordWriteBuf(void *buf, int len)
 
 
 /* read in a packet, returning the packet type */
-int recordReadPkt(char *buf, int blen)
+int recReadPkt(char *buf, int blen)
 {
   int len, rv;
   int pkttype;
@@ -338,7 +339,7 @@ int recordReadPkt(char *buf, int blen)
 #endif
     {
 #ifdef DEBUG_REC
-      clog("recordReadPkt: could not read pkt type, returned %d\n",
+      utLog("recReadPkt: could not read pkt type, returned %d\n",
               rv);
 #endif
 
@@ -347,12 +348,12 @@ int recordReadPkt(char *buf, int blen)
 
   pkttype = (int)buf[0];
 
-  len = serverPktSize(pkttype);
+  len = pktServerPacketSize(pkttype);
 
   if (blen < len)
     {
       fprintf(stderr,
-              "recordReadPkt: buffer too small. got %d, need %d\n",
+              "recReadPkt: buffer too small. got %d, need %d\n",
               len, blen);
       return(SP_NULL);
     }
@@ -360,10 +361,10 @@ int recordReadPkt(char *buf, int blen)
 
   if (!len)
     {
-      clog("recordReadPkt: invalid packet %d\n",
+      utLog("recReadPkt: invalid packet %d\n",
               pkttype);
       fprintf(stderr,
-              "recordReadPkt: invalid packet %d\n",
+              "recReadPkt: invalid packet %d\n",
               pkttype);
       return(SP_NULL);
     }
@@ -380,7 +381,7 @@ int recordReadPkt(char *buf, int blen)
       {
 #ifdef DEBUG_REC
          fprintf(stderr, 
-	         "recordReadPkt: could not read data packet, returned %d\n",
+	         "recReadPkt: could not read data packet, returned %d\n",
 	         rv);
 #endif
       
@@ -390,7 +391,7 @@ int recordReadPkt(char *buf, int blen)
     }
 
 #ifdef DEBUG_REC
-     clog("recordReadPkt: read pkttype  = %d\n",
+     utLog("recReadPkt: read pkttype  = %d\n",
           pkttype);
 #endif
 
@@ -400,16 +401,16 @@ int recordReadPkt(char *buf, int blen)
 /* open, create/load our cmb, and get ready for action if elapsed == NULL
    otherwise, we read the entire file to determine the elapsed time of
    the game and return it */
-int initReplay(char *fname, time_t *elapsed)
+int recInitReplay(char *fname, time_t *elapsed)
 {
   int pkttype;
   time_t starttm = 0;
   time_t curTS = 0;
   char buf[PKT_MAXSIZE];
 
-  if (!recordOpenInput(fname))
+  if (!recOpenInput(fname))
     {
-      printf("initReplay: recordOpenInput(%s) failed\n", fname);
+      printf("recInitReplay: recOpenInput(%s) failed\n", fname);
       return(FALSE);
     }
 
@@ -419,12 +420,12 @@ int initReplay(char *fname, time_t *elapsed)
 
   /* now lets read in the file header and check a few things. */
 
-  if (!recordReadHeader(&fhdr))
+  if (!recReadHeader(&recFileHeader))
     return(FALSE);
       
 
   /* version check */
-  switch (fhdr.vers)
+  switch (recFileHeader.vers)
     {
     case RECVERSION:            /* no problems here */
       break;
@@ -436,30 +437,30 @@ int initReplay(char *fname, time_t *elapsed)
            recording, else it was a client.  the 'flags' member did not
            exist.  So here we massage it so it will work ok. */
 
-        if (fhdr.snum == 0)     /* it was a server recording */
-          fhdr.flags |= RECORD_F_SERVER;
+        if (recFileHeader.snum == 0)     /* it was a server recording */
+          recFileHeader.flags |= RECORD_F_SERVER;
       }
       break;
 
     default:
       {
-        clog("initReplay: version mismatch.  got %d, need %d\n",
-             fhdr.vers,
+        utLog("recInitReplay: version mismatch.  got %d, need %d\n",
+             recFileHeader.vers,
              RECVERSION);
-        printf("initReplay: version mismatch.  got %d, need %d\n",
-               fhdr.vers,
+        printf("recInitReplay: version mismatch.  got %d, need %d\n",
+               recFileHeader.vers,
                RECVERSION);
         return FALSE;
       }
       break;
     }
 
-  if ( fhdr.cmnrev != COMMONSTAMP )
+  if ( recFileHeader.cmnrev != COMMONSTAMP )
     {
-      clog("initReplay: CONQUEST COMMON BLOCK MISMATCH %d != %d",
-             fhdr.cmnrev, COMMONSTAMP );
-      printf("initReplay: CONQUEST COMMON BLOCK MISMATCH %d != %d",
-             fhdr.cmnrev, COMMONSTAMP );
+      utLog("recInitReplay: CONQUEST COMMON BLOCK MISMATCH %d != %d",
+             recFileHeader.cmnrev, COMMONSTAMP );
+      printf("recInitReplay: CONQUEST COMMON BLOCK MISMATCH %d != %d",
+             recFileHeader.cmnrev, COMMONSTAMP );
       return FALSE;
     }
 
@@ -469,18 +470,18 @@ int initReplay(char *fname, time_t *elapsed)
     {
       int done = FALSE;
 
-      starttm = fhdr.rectime;
+      starttm = recFileHeader.rectime;
 
       curTS = 0;
       /* read through the entire file, looking for timestamps. */
       
 #if defined(DEBUG_REC)
-      clog("conqreplay: initReplay: reading elapsed time");
+      utLog("conqreplay: recInitReplay: reading elapsed time");
 #endif
 
       while (!done)
 	{
-          if ((pkttype = recordReadPkt(buf, PKT_MAXSIZE)) == SP_FRAME)
+          if ((pkttype = recReadPkt(buf, PKT_MAXSIZE)) == SP_FRAME)
             {
               spFrame_t *frame = (spFrame_t *)buf;
               
@@ -497,9 +498,9 @@ int initReplay(char *fname, time_t *elapsed)
       else
 	*elapsed = 0;
 
-      /* now close the file so that the next call of initReplay can
+      /* now close the file so that the next call of recInitReplay can
 	 get a fresh start. */
-      recordCloseInput();
+      recCloseInput();
     }
 
   /* now we are ready to start running packets */
@@ -510,7 +511,7 @@ int initReplay(char *fname, time_t *elapsed)
 
 /* generate torploc packets for client recording purposes 
    no more than once every ITER_SECONDS */
-void recordGenTorpLoc(void)
+void recGenTorpLoc(void)
 {
   int i, j;
   int snum = Context.snum;
@@ -575,7 +576,7 @@ void recordGenTorpLoc(void)
                                sizeof(spTorpLoc_t)))
                       {
                         pktTorpLoc[i][j] = storploc;
-                        recordWriteEvent(&storploc);
+                        recWriteEvent(&storploc);
                       }
                 }
             }

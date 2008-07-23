@@ -45,7 +45,7 @@ void cprintf(int lin, int col, int align, char *fmt, ...)
   (void)vsnprintf(buf, sizeof(buf) - 1, fmt, ap);
   va_end(ap);
   
-  if (dConf.inited)
+  if (DSP_INITED())
     {
       l = uiCStrlen(buf);
       if (align == ALIGN_CENTER)
@@ -55,7 +55,7 @@ void cprintf(int lin, int col, int align, char *fmt, ...)
       
       y = dConf.ppRow * (GLfloat)lin;
       w = dConf.ppCol * (GLfloat)l;
-      uiPrintFixed(x + dConf.borderW, y + dConf.borderW, w, dConf.ppRow, buf);
+      uiPrintFixed(x + dConf.wBorderW, y + dConf.wBorderW, w, dConf.ppRow, buf);
     }
 
   return;

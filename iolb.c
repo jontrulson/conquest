@@ -17,6 +17,7 @@
 /**********************************************************************/
 
 #include "global.h"
+#include "conqutil.h"
 #include "ibuf.h"
 #include "iolb.h"
 #include "cd2lb.h"
@@ -55,7 +56,7 @@ int iochav( void )
   
   int retval;
   
-  if (iBufCount())
+  if (ibufCount())
     {
       return(TRUE);
     }
@@ -71,7 +72,7 @@ int iochav( void )
   
   if ((retval = select(PollInputfd+1, &readfds, NULL, NULL, &timeout)) == -1)
     {
-      clog("iochav(): select(): %s", strerror(errno));
+      utLog("iochav(): select(): %s", strerror(errno));
       return(FALSE);
     }
   
@@ -99,18 +100,18 @@ int iochav( void )
   if (poll(&Stdin_pfd, 1, 0) > 0) /* return immediately if a char avail */
     {
 #ifdef DEBUG_IO
-      clog("ALTiochav(): had a char via poll");
+      utLog("ALTiochav(): had a char via poll");
 #endif
       
       if ((retval = getmsg(PollInputfd, &CtlMsg, &DataMsg, 
 			   &flagsp)) == -1)
 	{
-	  clog("iochav(): getmsg(): failed: %s", strerror(errno));
+	  utLog("iochav(): getmsg(): failed: %s", strerror(errno));
 	}
       else
 	{
 #ifdef DEBUG_IO
-	  clog("iochav(): getmsg() = %d: DataMsg.len = %d CtlMsg.len = %d",
+	  utLog("iochav(): getmsg() = %d: DataMsg.len = %d CtlMsg.len = %d",
 	       retval,
 	       DataMsg.len,
 	       CtlMsg.len);
@@ -119,7 +120,7 @@ int iochav( void )
 	  if (DataMsg.len <= 0 && retval > 0)
 	    {
 #ifdef DEBUG_IO
-              clog("iochav(): getmsg(): DataMsg.len <= 0 retval = %d - TRUE",
+              utLog("iochav(): getmsg(): DataMsg.len <= 0 retval = %d - TRUE",
 		   DataMsg.len,
 		   retval);
 #endif
@@ -130,14 +131,14 @@ int iochav( void )
 	  if (DataMsg.len <= 0 && CtlMsg.len <= 0)
 	    {
 #ifdef DEBUG_IO
-	      clog("iochav(): getmsg(): DataMsg.len & CtlMsg.len <= 0 ret FALSE");
+	      utLog("iochav(): getmsg(): DataMsg.len & CtlMsg.len <= 0 ret FALSE");
 #endif
 	      return(FALSE);
 	    }
 	  else
 	    {
 #ifdef DEBUG_IO
-	      clog("iochav(): getmsg(): DataMsg.len | CtlMsg.len > 0 ret TRUE");
+	      utLog("iochav(): getmsg(): DataMsg.len | CtlMsg.len > 0 ret TRUE");
 #endif
 	      return(TRUE);
 	    }
@@ -146,7 +147,7 @@ int iochav( void )
   else 
     {
 #ifdef DEBUG_IO
-      clog("ALTiochav(): NO char via poll");
+      utLog("ALTiochav(): NO char via poll");
 #endif
       return(FALSE);
     }
@@ -188,18 +189,18 @@ int iogchar ( void )
   
  reloop:
   
-  if (!iBufCount())
+  if (!ibufCount())
     {
       c_sleep(0.1);
       thechar = wgetch(stdscr);
     }
   else
-    thechar = iBufGetCh();
+    thechar = ibufGetc();
   
   if (thechar == ERR)
     {
 #ifdef DEBUG_IO
-      clog("iogchar() thechar == ERR, errno = %d", errno);
+      utLog("iogchar() thechar == ERR, errno = %d", errno);
 #endif
       goto reloop;
     }
@@ -246,9 +247,9 @@ int iogtimed ( int *ch, real seconds )
   
   cdrefresh();
   
-  if (iBufCount())
+  if (ibufCount())
     {
-      *ch = iBufGetCh();
+      *ch = ibufGetc();
       return(TRUE);
     }
   
@@ -316,7 +317,7 @@ int iogtimed ( int *ch, real seconds )
 	  if (errno != EINTR)	/* some error */
 	    {
 	      *ch = 0;
-	      clog("iogtimed(): select() failed: %s", strerror(errno));
+	      utLog("iogtimed(): select() failed: %s", strerror(errno));
 	      cdrefresh();
 	      return(FALSE);
 	    }
@@ -324,7 +325,7 @@ int iogtimed ( int *ch, real seconds )
           else
 	    {
 # if defined(DEBUG_IOGTIMED)
-	      clog("iogtimed(): select(): interrupted: %s", 
+	      utLog("iogtimed(): select(): interrupted: %s", 
 		   strerror(errno));
 # endif
 
@@ -349,13 +350,13 @@ int iogtimed ( int *ch, real seconds )
 	{
 # if defined(DEBUG_IOGTIMED)
           if (FD_ISSET(PollInputfd,&readfds))
-	    clog("After Linux select - FD_ISSET is SET");
+	    utLog("After Linux select - FD_ISSET is SET");
           else
-	    clog("After Linux select - FD_ISSET is NOT SET");
-          clog("iogtimed(): After Linux select - errno   = %d", errno);
-          clog("iogtimed(): After Linux select - tv_sec  = %d", 
+	    utLog("After Linux select - FD_ISSET is NOT SET");
+          utLog("iogtimed(): After Linux select - errno   = %d", errno);
+          utLog("iogtimed(): After Linux select - tv_sec  = %d", 
 	       timeout.tv_sec);
-          clog("iogtimed(): After Linux select - tv_usec = %d", 
+          utLog("iogtimed(): After Linux select - tv_usec = %d", 
 	       timeout.tv_usec);
 # endif
 	  
@@ -363,7 +364,7 @@ int iogtimed ( int *ch, real seconds )
 	  *ch = c;
 	  
 # if defined(DEBUG_IOGTIMED)
-	  clog("iogtimed(): retval = %d, PollInputfd = %d, *ch = %d",
+	  utLog("iogtimed(): retval = %d, PollInputfd = %d, *ch = %d",
 	       retval,PollInputfd,*ch);
 # endif
 	  
@@ -373,7 +374,7 @@ int iogtimed ( int *ch, real seconds )
 	{
 	  *ch = 0;
 # if defined(DEBUG_IOGTIMED)
-	  clog("iogtimed(): retval = %d, PollInputfd = %d, *ch = %d",
+	  utLog("iogtimed(): retval = %d, PollInputfd = %d, *ch = %d",
 	       retval,PollInputfd,*ch);
 # endif
 	  cdrefresh();

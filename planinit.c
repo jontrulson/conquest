@@ -11,6 +11,7 @@
 #include "conqcom.h"
 #include "context.h"
 #include "conqlb.h"
+#include "conqutil.h"
 
 #include "conf.h"
 #include "global.h"
@@ -31,14 +32,14 @@ void cqiInitPlanets(void)
 
   if (!cqiGlobal)
     {
-      clog("WARNING: cqiInitPlanets(): cqiGlobal is NULL, can't init planets");
+      utLog("WARNING: cqiInitPlanets(): cqiGlobal is NULL, can't init planets");
       PVUNLOCK(&ConqInfo->lockword);
       return;
     }
 
   if (cqiGlobal->maxplanets != NUMPLANETS)
     {                           /* bummer - should not happen */
-      clog("ERROR: cqiInitPlanets: cqiGlobal->maxplanets(%d) != NUMPLANETS(%d)\n",
+      utLog("ERROR: cqiInitPlanets: cqiGlobal->maxplanets(%d) != NUMPLANETS(%d)\n",
            cqiGlobal->maxplanets, NUMPLANETS);
 
       PVUNLOCK(&ConqInfo->lockword);
@@ -84,7 +85,7 @@ void cqiInitPlanets(void)
       if (cqiPlanets[i - 1].angle < 0)
         Planets[i].orbang = rnduni( 0.0, 360.0 ); /* randomly choose one */
       else
-        Planets[i].orbang = mod360(cqiPlanets[i - 1].angle);
+        Planets[i].orbang = utMod360(cqiPlanets[i - 1].angle);
     } /* for */
 
   /* now setup the team-based homeplanets, homeplanet, and homesun */
@@ -123,7 +124,7 @@ void cqiInitPlanets(void)
   /* this should not happen */
   if (F != 3 || R != 3 || K != 3 || O != 3)
     {
-      clog("ERROR: cqiInitPlanets: homeplanet count for each team is not == 3! (f=%d o=%d k=%d r=%d)",
+      utLog("ERROR: cqiInitPlanets: homeplanet count for each team is not == 3! (f=%d o=%d k=%d r=%d)",
            F, O, K, R);
       /* continue, but homeplanets will be screwed up */
     }

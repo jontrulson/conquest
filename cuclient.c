@@ -16,6 +16,7 @@
 #include "packet.h"
 #include "client.h"
 #include "clientlb.h"
+#include "conqutil.h"
 #include "cd2lb.h"
 #include "iolb.h"
 #include "cumisc.h"
@@ -111,8 +112,8 @@ void cucDoWar( int snum )
 		       "Reprogramming the battle computer, please stand by...",
 		       MSG_LIN2 );
 	      cdrefresh();
-	      grand( &entertime );
-	      while ( dgrand( entertime, &now ) < REARM_GRAND )
+	      utGrand( &entertime );
+	      while ( utDeltaGrand( entertime, &now ) < REARM_GRAND )
 		{
 		  /* See if we're still alive. */
 		  if ( ! clbStillAlive( Context.snum ) )
@@ -206,13 +207,13 @@ void cucSendMsg( int from, int terse, int remote )
     }
   
   /* Got a target, parse it. */
-  delblanks( buf );
+  utDeleteBlanks( buf );
   upper( buf );
   if ( alldig( buf ) == TRUE )
     {
       /* All digits means a ship number. */
       i = 0;
-      safectoi( &j, buf, i );		/* ignore status */
+      utSafeCToI( &j, buf, i );		/* ignore status */
       if ( j < 1 || j > MAXSHIPS )
 	{
 	  mcuPutMsg( "No such ship.", MSG_LIN2 );
@@ -270,7 +271,7 @@ void cucSendMsg( int from, int terse, int remote )
 	  mcuPutMsg( nf, MSG_LIN2 );
 	  return;
 	}
-      appship( to, buf );
+      utAppendShip( to, buf );
       appchr( ':', buf );
     }
   else if ( -to >= 0 && -to < NUMPLAYERTEAMS )
@@ -335,14 +336,14 @@ void cucSendMsg( int from, int terse, int remote )
 	    {
 	      appstr( Ships[from].alias, buf );
 	      appstr( " on board ", buf );
-	      appship( from, buf );
+	      utAppendShip( from, buf );
 	    }
 	  else if ( from == MSG_GOD )
 	    appstr( "GOD", buf );
 	  else
 	    {
 	      appchr( '(', buf );
-	      appint( from, buf );
+	      utAppendInt( from, buf );
 	      appchr( ')', buf );
 	    }
 	  if (remote)           /* remotes don't send 'from' */
@@ -350,7 +351,7 @@ void cucSendMsg( int from, int terse, int remote )
 	  else
 	    clbStoreMsg( from, MSG_IMPLEMENTORS, msg ); /* GOD == IMP (conqoper) */
 	  /* log it to the logfile too */
-	  clog("MSG: MESSAGE TO IMPLEMENTORS: %s: %s", buf, msg);
+	  utLog("MSG: MESSAGE TO IMPLEMENTORS: %s: %s", buf, msg);
 	}
     }
   } /* end while loop */ 

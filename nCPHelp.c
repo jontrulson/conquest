@@ -17,6 +17,7 @@
 #include "node.h"
 #include "client.h"
 #include "packet.h"
+#include "conqutil.h"
 
 #include "nCP.h"
 #include "nDead.h"
@@ -171,13 +172,13 @@ static int nCPHelpIdle(void)
   char buf[PKT_MAXSIZE];
   int sockl[2] = {cInfo.sock, cInfo.usock};
 
-  while ((pkttype = waitForPacket(PKT_FROMSERVER, sockl, PKT_ANYPKT,
+  while ((pkttype = pktWaitForPacket(PKT_FROMSERVER, sockl, PKT_ANYPKT,
                                   buf, PKT_MAXSIZE, 0, NULL)) > 0)
     processPacket(buf);
 
   if (pkttype < 0)          /* some error */
     {
-      clog("nCPHelpIdle: waiForPacket returned %d", pkttype);
+      utLog("nCPHelpIdle: waiForPacket returned %d", pkttype);
       Ships[Context.snum].status = SS_OFF;
       return NODE_EXIT;
     }

@@ -159,7 +159,7 @@ void cdclra ( int l1, int c1, int l2, int c2 )
   cdfill(' ', tmpstr, j);
   tmpstr[j] = '\0';
 
-  /*  clog("cdclra(): rfl = %d rll = %d rfc = %d rlc = %d, maxcol = %d", rfl, rll, rfc, rlc, maxcol);
+  /*  utLog("cdclra(): rfl = %d rll = %d rfc = %d rlc = %d, maxcol = %d", rfl, rll, rfc, rlc, maxcol);
    */
 
 
@@ -498,7 +498,7 @@ int cdgetp ( char pmt[], int lin, int col, char terms[], char str[],
       else if ( ! isprint ( ch & 0xff) )
 	{
 #ifdef DEBUG_IO
-	  clog("cdgetp1:Got a strange char: ascii %d, errno=%d", ch, errno);
+	  utLog("cdgetp1:Got a strange char: ascii %d, errno=%d", ch, errno);
 #endif
 	  cdbeep();
 	}
@@ -516,7 +516,7 @@ int cdgetp ( char pmt[], int lin, int col, char terms[], char str[],
       else
 	{
 #ifdef DEBUG_IO
-	  clog("cdgetp2:Got a strange char: '%c' = ascii %d", ch, ch);
+	  utLog("cdgetp2:Got a strange char: '%c' = ascii %d", ch, ch);
 #endif
 	  cdbeep(); /* exceeded max. allowable characters. */
 	  if (do_append_flg == TRUE) {
@@ -562,7 +562,7 @@ int cdgetp ( char pmt[], int lin, int col, char terms[], char str[],
 		  str[i] = ' ';
 	      }
 	    } 
-	    iBufPut(mbuf);
+	    ibufPut(mbuf);
 	    *append_flg = TRUE;
 	    break;
 	  } /* end if do_append_flg */
@@ -607,7 +607,7 @@ void cdinit(void)
 
   /* Initialize screen library (this MUST be done first). */
   
-  iBufInit();
+  ibufInit();
   
   PollInputfd = 0;		/* for stdin */
   

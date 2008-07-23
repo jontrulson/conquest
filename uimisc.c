@@ -13,6 +13,7 @@
 #include "color.h"
 #include "datatypes.h"
 #include "record.h"
+#include "conqutil.h"
 
 void dspReplayMenu(void)
 {
@@ -29,7 +30,7 @@ void dspReplayMenu(void)
 
   if (FirstTime == TRUE)
     {
-      time_t recon = (time_t)fhdr.rectime;
+      time_t recon = (time_t)recFileHeader.rectime;
 
       FirstTime = FALSE;
       sprintf(sfmt,
@@ -67,25 +68,25 @@ void dspReplayMenu(void)
   
   col = 5;
   
-  cprintf(lin,col,ALIGN_NONE,sfmt, "File               ", rfname);
+  cprintf(lin,col,ALIGN_NONE,sfmt, "File               ", recFilename);
   lin++;
   
-  cprintf(lin,col,ALIGN_NONE,sfmt, "Recorded By        ", fhdr.user);
+  cprintf(lin,col,ALIGN_NONE,sfmt, "Recorded By        ", recFileHeader.user);
   lin++;
   
-  if (fhdr.flags & RECORD_F_SERVER)
+  if (recFileHeader.flags & RECORD_F_SERVER)
     {
-      if (fhdr.vers != RECVERSION)
-        sprintf(cbuf, "Server [%d]", fhdr.vers);
+      if (recFileHeader.vers != RECVERSION)
+        sprintf(cbuf, "Server [%d]", recFileHeader.vers);
       else
-        sprintf(cbuf, "Server (Ship %d)", fhdr.snum);
+        sprintf(cbuf, "Server (Ship %d)", recFileHeader.snum);
     }
   else
     {
-      if (fhdr.vers != RECVERSION)
-        sprintf(cbuf, "Client (Ship %d) [%d]", fhdr.snum, fhdr.vers);
+      if (recFileHeader.vers != RECVERSION)
+        sprintf(cbuf, "Client (Ship %d) [%d]", recFileHeader.snum, recFileHeader.vers);
       else
-        sprintf(cbuf, "Client (Ship %d)", fhdr.snum);
+        sprintf(cbuf, "Client (Ship %d)", recFileHeader.snum);
     }
 
   cprintf(lin,col,ALIGN_NONE,sfmt, "Recording Type     ", cbuf);
@@ -95,10 +96,10 @@ void dspReplayMenu(void)
   cprintf(lin,col,ALIGN_NONE,sfmt, "Recorded On        ", recordedon);
 
   lin++;
-  sprintf(cbuf, "%d (delay: %0.3fs)", fhdr.samplerate, frameDelay);
+  sprintf(cbuf, "%d (delay: %0.3fs)", recFileHeader.samplerate, recFrameDelay);
   cprintf(lin,col,ALIGN_NONE,sfmt, "Updates per second ", cbuf);
   lin++;
-  fmtseconds(totElapsed, cbuf);
+  utFormatSeconds(recTotalElapsed, cbuf);
   
   if (cbuf[0] == '0')	/* see if we need the day count */
     c = &cbuf[2];	
@@ -107,7 +108,7 @@ void dspReplayMenu(void)
   
   cprintf(lin,col,ALIGN_NONE,sfmt, "Total Game Time    ", c);
   lin++;
-  fmtseconds((currTime - startTime), cbuf);
+  utFormatSeconds((recCurrentTime - recStartTime), cbuf);
   
   if (cbuf[0] == '0')
     c = &cbuf[2];	

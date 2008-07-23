@@ -25,11 +25,11 @@
 #define SVR_STATE_TERMINATE 0x00000020	/* terminating */
 
 typedef struct {
-  int sock;			/* socket to client */
-  int usock;			/* udp socket to client */
-  struct sockaddr_in clntaddr;  /* client's saddrin struct */
-  int doUDP;                    /* send udp? */
-  int tryUDP;                    /* try udp? */
+  int     sock;			/* socket to client */
+  int     usock;                /* udp socket to client */
+  struct  sockaddr_in clntaddr; /* client's saddrin struct */
+  int     doUDP;                /* send udp? */
+  int     tryUDP;               /* try udp? */
   Unsgn32 state;		/* current state */
   Unsgn32 clientDead;		/* is the client dead/ */
   Unsgn32 isMaster;		/* is the Maseter server? */
@@ -41,14 +41,11 @@ typedef struct {
 
 /* we also want to keep a copy of all packets sent */
 
-#ifdef SERVER_NOEXTERN
-# define EXTERN
+#ifdef NOEXTERN_SERVER
+ServerInfo_t sInfo;
 #else
-# define EXTERN extern
+extern ServerInfo_t sInfo;
 #endif
-EXTERN ServerInfo_t sInfo;
-
-#undef EXTERN
 
 int sendClientStat(int sock, Unsgn8 flags, Unsgn8 snum, Unsgn8 team, 
 		   Unsgn16 unum, Unsgn8 esystem);

@@ -39,10 +39,10 @@ int tcpwCheckHostAccess(char *daemon, char *remotehost)
     }
   
   if (!allowed)
-    clog("TCPW: %s: %s: ACCESS DENIED",
+    utLog("TCPW: %s: %s: ACCESS DENIED",
          daemon, remotehost);
   else if (cqDebug)
-    clog("TCPW: %s: %s: ACCESS GRANTED",
+    utLog("TCPW: %s: %s: ACCESS GRANTED",
          daemon, remotehost);
       
   return((allowed) ? TRUE : FALSE);

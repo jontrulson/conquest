@@ -27,6 +27,7 @@
 #include "conqcom.h"
 #include "context.h"
 #include "conqlb.h"
+#include "conqutil.h"
 #include "global.h"
 #include "conf.h"
 #include "user.h"
@@ -100,7 +101,7 @@ static void buildai( int snum, int vars[], int *bnenum, real *bdne, real *bane )
 	  y = Ships[*bnenum].y;
 	}
       *bdne = dist( Ships[snum].x, Ships[snum].y, x, y );
-      *bane = angle( Ships[snum].x, Ships[snum].y, x, y );
+      *bane = utAngle( Ships[snum].x, Ships[snum].y, x, y );
       
       /* Enemy is cloaked (-) */
       if ( *bdne < ACCINFO_DIST )
@@ -125,7 +126,7 @@ static void buildai( int snum, int vars[], int *bnenum, real *bdne, real *bane )
 	      if ( Ships[i].torps[j].war[Ships[snum].team] || Ships[snum].war[Ships[i].team] )
 		{
 		  /* Just guess at other ships efficiency. */
-		  dam = dam + explosion(
+		  dam = dam + utExplosionHits(
 					TORPEDO_HIT * 1.1 * ShipTypes[Ships[i].shiptype].weafac,
 					dist(Ships[snum].x,Ships[snum].y,Ships[i].torps[j].x,Ships[i].torps[j].y) );
 		}
@@ -156,7 +157,7 @@ static void buildai( int snum, int vars[], int *bnenum, real *bdne, real *bane )
   
   /* Possible damage per torpedo to nearest enemy (5) */
   AISCALE( vars[VAR_TORPDAM],
-	  explosion( TORPEDO_HIT * weaeff( snum ), (*bdne)*0.66 ), 5.0 );
+	  utExplosionHits( TORPEDO_HIT * weaeff( snum ), (*bdne)*0.66 ), 5.0 );
   
   /* Ship warp (1) */
   AISCALE( vars[VAR_WARP], Ships[snum].dwarp, 1.0 );
@@ -391,10 +392,10 @@ static void executeai( int snum, int token )
       SETWARP( 8.0 );
       break;
     case ROB_TRACK:
-      SETCOURSE( mod360( ane + rnduni( -10.0, 10.0 ) ) );
+      SETCOURSE( utMod360( ane + rnduni( -10.0, 10.0 ) ) );
       break;
     case ROB_RUNAWAY:
-      SETCOURSE( mod360( ane + 180.0 + rnduni( -10.0, 10.0 ) ) );
+      SETCOURSE( utMod360( ane + 180.0 + rnduni( -10.0, 10.0 ) ) );
       break;
     case ROB_SILENT:
       if ( ! SCLOAKED(snum) )
@@ -412,7 +413,7 @@ static void executeai( int snum, int token )
       /* Try to read a message and reply to it */
       while ( Ships[snum].lastmsg != ConqInfo->lastmsg )
 	{
-	  Ships[snum].lastmsg = modp1( Ships[snum].lastmsg + 1, MAXMESSAGES );
+	  Ships[snum].lastmsg = utModPlusOne( Ships[snum].lastmsg + 1, MAXMESSAGES );
 	  i = Ships[snum].lastmsg;
 	  if ( clbCanRead( snum, i ) )
 	    {
@@ -463,7 +464,7 @@ static void executeai( int snum, int token )
       break;
     default:
       robstr( token, buf );
-      clog( "conqai:executeai(): Unknown token '%s' (%d)\n", buf, token );
+      utLog( "conqai:executeai(): Unknown token '%s' (%d)\n", buf, token );
     }
   
   return;
@@ -564,7 +565,7 @@ int newrob( int *snum, int unum )
       Ships[*snum].rwar[i] = FALSE;
       Ships[*snum].war[i] = FALSE;
     }
-  stcpn ( Users[unum].alias, Ships[*snum].alias, MAXUSERPNAME );	
+  utStcpn ( Users[unum].alias, Ships[*snum].alias, MAXUSERPNAME );	
   
   /* Place the ship. */
   if ( Planets[Teams[Ships[*snum].team].homeplanet].primary == 

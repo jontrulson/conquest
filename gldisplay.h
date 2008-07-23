@@ -16,35 +16,44 @@
 #include "textures.h"
 #include "hud.h"
 
+/* flags for the dsp (display info) structure */
+#define DSP_F_NONE           0x00000000
+#define DSP_F_INITED         0x00000001 /* initialized? */
+#define DSP_F_FULLSCREEN     0x00000002 /* use fullscreen? */
+
+#define DSPFSET(f)           (dConf.flags |=  (f))
+#define DSPFCLR(f)           (dConf.flags &= ~(f))
+
+#define DSP_INITED()         (dConf.flags & DSP_F_INITED)
+#define DSP_FULLSCREEN()     (dConf.flags & DSP_F_FULLSCREEN)
+
 typedef struct _dspConfig {
-  Bool inited;
   /* glut win ids */
-  int mainw;                    /* main window */
+  int          mainw;           /* main window */
 
   /* main window */
-  GLfloat wX, wY;               /* x/y origin */
-  GLfloat wW, wH;               /* width/height  */
-  GLfloat mAspect;
+  GLfloat      wX, wY;          /* x/y origin */
+  GLfloat      wW, wH;          /* width/height  */
+  GLfloat      wAspect;
 
   /* viewer window */
-  GLfloat vX, vY;               /* viewer X/Y */
-  GLfloat vW, vH;               /* viewer width/height */
-  GLfloat vAspect;
+  GLfloat      vX, vY;          /* viewer X/Y */
+  GLfloat      vW, vH;          /* viewer width/height */
+  GLfloat      vAspect;
 
   /* LR/SR viewer scaling factors (magnification) */
-  GLfloat vScaleLR, vScaleSR;
+  GLfloat      vScaleLR, vScaleSR;
 
-  GLfloat ppCol, ppRow;         /* pixels per [Row|Col] */
+  GLfloat      ppCol, ppRow;    /* pixels per [Row|Col] */
 
-  GLfloat borderW;              /* width of outside mainw border */
+  GLfloat      wBorderW;        /* width of outside mainw border */
 
-  GLfloat hmat[16];             /* hud proj matrix */
-  GLfloat vmat[16];             /* viewer proj matrix */
+  GLfloat      hudProjection[16]; /* hud proj matrix */
+  GLfloat      viewerProjection[16]; /* viewer proj matrix */
 
-  unsigned int flags; 
+  Unsgn32      flags; 
 
-  int fullScreen;
-  int initWidth, initHeight;    /* initial wxh geometry */
+  int          initWidth, initHeight; /* initial wxh geometry */
 } dspConfig_t;
 
 #ifdef NOEXTERN_DCONF
@@ -89,15 +98,6 @@ void drawShip(GLfloat x, GLfloat y, GLfloat angle, char ch, int i,
 void drawDoomsday(GLfloat x, GLfloat y, GLfloat angle, GLfloat scale);
 void drawViewerBG(int snum, int dovbg);
 void drawNEB(int snum);
-
-void hudClearPrompt(int line);
-void hudSetPrompt(int line, char *prompt, int pcolor,
-               char *buf, int color);
-void setArmies(char *labelbuf, char *buf);
-void setCloakDestruct(char *buf, int color);
-void setTow(char *buf);
-void setRecTime(char *str);
-void setRecId(char *str);
 
 float getFPS(void);
 

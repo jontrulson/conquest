@@ -460,7 +460,7 @@ void display( int snum, int display_info )
       if ( Ships[snum].damage > prevdam )
         {
           if ( (Ships[snum].damage - prevdam) > 5.0 )
-            cqsEffectPlay(teamEffects[Ships[snum].team].hit, 0, 0, 0);
+            cqsEffectPlay(cqsTeamEffects[Ships[snum].team].hit, 0, 0, 0);
           
           dobeep = TRUE;
         }

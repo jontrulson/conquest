@@ -12,9 +12,10 @@
 #include "datatypes.h"
 #include "conf.h"
 #include "protocol.h"
-#define NOPKT_EXTERN
+#include "conqutil.h"
+#define NOEXTERN_PACKET
 #include "packet.h"
-#undef NOPKT_EXTERN
+#undef NOEXTERN_PACKET
 #ifndef HAVE_SELECT
 #error "The select() system call is required"
 #endif
@@ -219,21 +220,21 @@ static struct _packetent serverPackets[] = {
 
 static int connDead = 0;	/* if we die for some reason */
 
-int isConnDead(void)
+int pktIsConnDead(void)
 {
   return connDead;
 }
 
 void pktNotImpl(void *nothing)
 {
-  clog("packet: NULL/Not Implemented\n");
+  utLog("packet: NULL/Not Implemented\n");
   return;
 }
 
 /* sends acks. to/from client/server. The server (TOCLIENT) can add a
    string message as well. */
 
-int sendAck(int sock, int dir, Unsgn8 severity, Unsgn8 code, char *msg)
+int pktSendAck(int sock, int dir, Unsgn8 severity, Unsgn8 code, char *msg)
 {
   cpAck_t cack;
   spAck_t sack;
@@ -275,16 +276,16 @@ int sendAck(int sock, int dir, Unsgn8 severity, Unsgn8 code, char *msg)
 
     default:
 #if defined(DEBUG_PKT)
-      clog("sendAck: invalid dir = %d\n", dir);
+      utLog("pktSendAck: invalid dir = %d\n", dir);
 #endif
       return -1;
       break;
     }
 
-  return(writePacket(dir, sock, buf));
+  return(pktWrite(dir, sock, buf));
 }
 
-char *psev2String(int psev)
+char *pktSeverity2String(int psev)
 {
   switch (psev)
     {
@@ -314,7 +315,7 @@ char *psev2String(int psev)
 
 /* this just inverts the meaning of a packet direction - TOCLIENT becomes
    FROMCLIENT, etc... */
-int invertDir(int dir)
+int pktInvertDirection(int dir)
 {
   switch (dir)
     {
@@ -337,7 +338,7 @@ int invertDir(int dir)
   return -1;			/* NOTREACHED */
 }
 
-int waitForPacket(int dir, int sockl[], int type, char *buf, int blen, 
+int pktWaitForPacket(int dir, int sockl[], int type, char *buf, int blen, 
 		  int delay, char *nakmsg)
 {
   int pkttype;
@@ -345,13 +346,13 @@ int waitForPacket(int dir, int sockl[], int type, char *buf, int blen,
   while (TRUE)
     {
       errno = 0;		/* be afraid. */
-      if ((pkttype = readPacket(dir, sockl, buf, blen, delay)) >= 0)
+      if ((pkttype = pktRead(dir, sockl, buf, blen, delay)) >= 0)
 	{
 	  if (pkttype == type || type == PKT_ANYPKT || pkttype == 0)
 	    return pkttype;
 
 	  if (pkttype != type && nakmsg) /* we need to use a msg nak */
-	    sendAck(sockl[0], invertDir(dir), PSEV_ERROR, PERR_UNSPEC, 
+	    pktSendAck(sockl[0], pktInvertDirection(dir), PSEV_ERROR, PERR_UNSPEC, 
                     nakmsg); 
 	}
 
@@ -360,7 +361,7 @@ int waitForPacket(int dir, int sockl[], int type, char *buf, int blen,
 	  if (errno != EINTR)
             {
 #if defined(DEBUG_PKT)
-              clog("waitForPacket(dir=%d): read error %s\n", dir, strerror(errno));
+              utLog("pktWaitForPacket(dir=%d): read error %s\n", dir, strerror(errno));
 #endif
               return -1;
             }
@@ -373,11 +374,11 @@ int waitForPacket(int dir, int sockl[], int type, char *buf, int blen,
 
 
 
-int serverPktSize(int type)
+int pktServerPacketSize(int type)
 {
   if (type <= 0 || type >= SERVERPKTMAX)
     {
-      clog("serverPktSize: invalid packet type %d\n",
+      utLog("pktServerPacketSize: invalid packet type %d\n",
 	   type);
 
       /* abort();*/
@@ -388,12 +389,12 @@ int serverPktSize(int type)
   return serverPackets[type].size;
 }
       
-int clientPktSize(int type)
+int pktClientPacketSize(int type)
 {
 
   if (type <= 0 || type >= CLIENTPKTMAX)
     {
-      clog("clientPktSize: invalid packet type %d\n",
+      utLog("pktClientPacketSize: invalid packet type %d\n",
 	   type);
       return 0;
     }
@@ -403,7 +404,7 @@ int clientPktSize(int type)
 
 /* like iochav(), but for the network connection.  return true if there
    is packet data ready */
-int isPacketWaiting(int sock)
+int pktIsPacketWaiting(int sock)
 {
   struct timeval timeout;
   fd_set readfds;
@@ -422,7 +423,7 @@ int isPacketWaiting(int sock)
 
 
 /* sockl[0] is expected tcp socket, sockl[1] is for udp */
-int readPacket(int direction, int sockl[], char *buf, int blen, 
+int pktRead(int direction, int sockl[], char *buf, int blen, 
 	       unsigned int delay)
 {
   Unsgn8 type;
@@ -455,7 +456,7 @@ int readPacket(int direction, int sockl[], char *buf, int blen,
 	  if ((rv = read(sockl[0], &type, 1)) <= 0)
 	    {
 	      *buf = 0;
-              clog("ERROR: readPacket(): TCP read(header type): %s",
+              utLog("ERROR: pktRead(): TCP read(header type): %s",
                    strerror(errno));
 	      return -1;
 	    }
@@ -465,7 +466,7 @@ int readPacket(int direction, int sockl[], char *buf, int blen,
           if ((rv = read(sockl[1], buf, blen)) <= 0)
             {
               *buf = 0;
-              clog("ERROR: readPacket(): UDP read(header type): %s",
+              utLog("ERROR: pktRead(): UDP read(header type): %s",
                    strerror(errno));
               return -1;
             }
@@ -477,7 +478,7 @@ int readPacket(int direction, int sockl[], char *buf, int blen,
         }
       else
         {
-          clog("readPacket: select returned >0, but !FD_ISSET");
+          utLog("pktRead: select returned >0, but !FD_ISSET");
           return 0;
         }
     }
@@ -487,7 +488,7 @@ int readPacket(int direction, int sockl[], char *buf, int blen,
     }
   else if (rv < 0)		/* error */
     {
-      clog("ERROR: readPacket(): select(): %s",
+      utLog("ERROR: pktRead(): select(): %s",
            strerror(errno));
       return -1;
     }
@@ -495,15 +496,15 @@ int readPacket(int direction, int sockl[], char *buf, int blen,
   switch(direction)
     {
     case PKT_FROMSERVER:
-      len = serverPktSize(type);
+      len = pktServerPacketSize(type);
       vartype = SP_VARIABLE;    /* possible variable */
       break;
     case PKT_FROMCLIENT:
-      len = clientPktSize(type);
+      len = pktClientPacketSize(type);
       vartype = CP_VARIABLE;      /* possible variable */
       break;
     default:
-      clog("readPacket: Invalid dir code %s", direction);
+      utLog("pktRead: Invalid dir code %s", direction);
       return -1;
       break;
     }
@@ -514,7 +515,7 @@ int readPacket(int direction, int sockl[], char *buf, int blen,
     {                           /* then we already got the whole packet */
       if (rv != len)
         {
-          clog("gotudp: rv != len: %d %d", rv, len);
+          utLog("gotudp: rv != len: %d %d", rv, len);
           *buf = 0;
           type = 0;
 
@@ -536,7 +537,7 @@ int readPacket(int direction, int sockl[], char *buf, int blen,
     {
       if (len >= blen)		/* buf too small */
 	{
-	  clog("readPacket: buffer too small");
+	  utLog("pktRead: buffer too small");
 	  return -1;
 	}
       len = len - sizeof(Unsgn8);
@@ -558,7 +559,7 @@ int readPacket(int direction, int sockl[], char *buf, int blen,
 		  if ((left - rlen) > 0 /*len != rlen*/)
 		    {
 #if defined(DEBUG_PKT)
-		      clog("readPacket: short packet: type(%d) len = %d, "
+		      utLog("pktRead: short packet: type(%d) len = %d, "
                            "rlen = %d left = %d",
 			   type, len, rlen, left - rlen);
 #endif
@@ -575,7 +576,7 @@ int readPacket(int direction, int sockl[], char *buf, int blen,
                       if ((rv = read(sockl[0], &type, 1)) <= 0)
                         {
                           *buf = 0;
-                          clog("ERROR: readPacket(): VARTYPE read(header type): %s",
+                          utLog("ERROR: pktRead(): VARTYPE read(header type): %s",
                                strerror(errno));
                           return -1;
                         }
@@ -595,7 +596,7 @@ int readPacket(int direction, int sockl[], char *buf, int blen,
 		{
 		  if (rlen == 0)
 		    {
-		      clog("readPacket: ERROR: read returned 0");
+		      utLog("pktRead: ERROR: read returned 0");
 		      return -1;
 		    }
 
@@ -603,7 +604,7 @@ int readPacket(int direction, int sockl[], char *buf, int blen,
 		    continue;
 		  else
 		    {
-		      clog("readPacket: read returned %d: %s", rlen,
+		      utLog("pktRead: read returned %d: %s", rlen,
 			   strerror(errno));
 		      return -1;
 		    }
@@ -612,7 +613,7 @@ int readPacket(int direction, int sockl[], char *buf, int blen,
 
 	  if (rv == 0)		/* timeout */
 	    {
-	      clog("readPacket: timed out - connDead");
+	      utLog("pktRead: timed out - connDead");
 	      connDead = 1;
 	      return -1;
 	    }
@@ -620,21 +621,21 @@ int readPacket(int direction, int sockl[], char *buf, int blen,
 	    {
 	      if (errno == EINTR)
 		continue;
-	      clog("readPacket: select error: %s", strerror(errno));
+	      utLog("pktRead: select error: %s", strerror(errno));
 	      return -1;
 	    }
 	}
 
     }
   else
-    clog("readPacket: invalid packet type read %d\n",
+    utLog("pktRead: invalid packet type read %d\n",
 	 type);
 
   return -1;
 }
 
 
-int writePacket(int direction, int sock, void *data)
+int pktWrite(int direction, int sock, void *data)
 {
   int len, wlen, left;
   Unsgn8 type;
@@ -648,14 +649,14 @@ int writePacket(int direction, int sock, void *data)
   switch(direction)
     {
     case PKT_TOSERVER:
-      len = clientPktSize(type);
+      len = pktClientPacketSize(type);
       break;
     case PKT_TOCLIENT:
-      len = serverPktSize(type);
+      len = pktServerPacketSize(type);
       break;
     default:
 #if defined(DEBUG_PKT)
-      clog("writePacket: Invalid dir code %s\n", direction);
+      utLog("pktWrite: Invalid dir code %s\n", direction);
 #endif
       return -1;
       break;
@@ -672,7 +673,7 @@ int writePacket(int direction, int sock, void *data)
 	      if ((left - wlen) > 0)
 		{
 #if defined(DEBUG_PKT)
-		  clog("writePacket: wrote short packet: left = %d, "
+		  utLog("pktWrite: wrote short packet: left = %d, "
                        "wlen = %d, len = %d",
 		       left, wlen, len);
 #endif
@@ -685,24 +686,24 @@ int writePacket(int direction, int sock, void *data)
 	    {
 	      if (wlen < 0 && errno == EINTR)
 		{
-		  clog("writePacket: write: Interrupted");
+		  utLog("pktWrite: write: Interrupted");
 		  continue;
 		}
 
 	      if (wlen == 0)
 		{
-		  clog("writePacket: wrote 0: %s", strerror(errno));
+		  utLog("pktWrite: wrote 0: %s", strerror(errno));
 		  continue;
 		}
 
-	      clog("writePacket: write (wlen=%d): %s", wlen, strerror(errno));
+	      utLog("pktWrite: write (wlen=%d): %s", wlen, strerror(errno));
 	      return FALSE;
 	    }
 	}
     }
   else
     {
-      clog("writePacket: invalid packet type %d\n", type);
+      utLog("pktWrite: invalid packet type %d\n", type);
 /*       abort(); */
     }
 
@@ -711,7 +712,7 @@ int writePacket(int direction, int sock, void *data)
 
 
 /* Simply check pkt for non-NULL, and compare pkttype with packet's type */
-int validPkt(int pkttype, void *pkt)
+int pktIsValid(int pkttype, void *pkt)
 {
   Unsgn8 *p = (Unsgn8 *)pkt;
 
@@ -732,14 +733,14 @@ void pktSetNodelay(int sock)
 
   if (!p)
     {
-      clog("INFO: getprotobyname(tcp) == NULL");
+      utLog("INFO: getprotobyname(tcp) == NULL");
       return;
     }
 
   if (setsockopt(sock, 
                  p->p_proto, TCP_NODELAY, (void *)&on, sizeof(on)) <  0) 
     {
-      clog("INFO: setsockopt(TCP_NODELAY) failed: %s",
+      utLog("INFO: setsockopt(TCP_NODELAY) failed: %s",
            strerror(errno));
     }
   

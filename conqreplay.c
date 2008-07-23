@@ -9,7 +9,6 @@
  * Copyright 1999-2004 Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
  ***********************************************************************/
 
-#define NOEXTERN
 #include "conqdef.h"
 #include "conqcom.h"
 #include "context.h"
@@ -17,6 +16,7 @@
 #include "color.h"
 #include "ui.h"
 #include "conqlb.h"
+#include "conqutil.h"
 #include "cd2lb.h"
 #include "iolb.h"
 #include "cumisc.h"
@@ -39,21 +39,21 @@ static void dowatchhelp(void);
 static char *build_toggle_str(char *snum_str, int snum);
 
 
-/* overlay the elapsed time, and current frameDelay */
+/* overlay the elapsed time, and current recFrameDelay */
 void displayReplayData(void)
 {
   char buf[128];
-  time_t elapsed = (currTime - startTime);
+  time_t elapsed = (recCurrentTime - recStartTime);
   char *c;
   real percent;
 
   /* elapsed time */
-  fmtseconds((int)elapsed, buf);
+  utFormatSeconds((int)elapsed, buf);
   c = &buf[2];			/* skip day count */
   if (elapsed <= 0)
     elapsed = 1;
   
-  percent = ((real)elapsed / (real)totElapsed ) * 100.0;
+  percent = ((real)elapsed / (real)recTotalElapsed ) * 100.0;
 
   /* current speed */
   if (pbSpeed == PB_SPEED_INFINITE)
@@ -118,9 +118,9 @@ void displayMsg(Msg_t *themsg)
 /* MAIN */
 void conquestReplay(void)
 {
-  /* if frameDelay wasn't overridden, setup based on samplerate */
-  if (frameDelay == -1.0)
-    frameDelay = 1.0 / (real)fhdr.samplerate;
+  /* if recFrameDelay wasn't overridden, setup based on samplerate */
+  if (recFrameDelay == -1.0)
+    recFrameDelay = 1.0 / (real)recFileHeader.samplerate;
 
   replay();
   
@@ -182,7 +182,7 @@ static void replay(void)
 	case 'r':
 	  /* first close the input file, free the common block,
 	     then re-init */
-	  pbFileSeek(startTime);
+	  pbFileSeek(recStartTime);
 	  break;
 
         case '/':
@@ -222,7 +222,7 @@ static void watch(void)
       Context.redraw = TRUE;
       cdclear();
       cdredo();
-      grand( &msgrand );
+      utGrand( &msgrand );
       
       Context.snum = snum;		/* so display knows what to display */
       /*	  setopertimer();*/
@@ -255,7 +255,7 @@ static void watch(void)
 	      upddsp = FALSE;	/* use this for one-shots */
 	    }
 	  
-	  if (!iogtimed(&ch, frameDelay))
+	  if (!iogtimed(&ch, recFrameDelay))
 	  continue;
 	  
 	  /* got a char */
@@ -273,13 +273,13 @@ static void watch(void)
 	      
 	    case 'f':	/* move forward 30 seconds */
 	      displayMsg(NULL);
-	      pbFileSeek(currTime + 30);
+	      pbFileSeek(recCurrentTime + 30);
 	      upddsp = TRUE;
 	      break;
 	      
 	    case 'F':	/* move forward 2 minutes */
 	      displayMsg(NULL);
-	      pbFileSeek(currTime + (2 * 60));
+	      pbFileSeek(recCurrentTime + (2 * 60));
 	      upddsp = TRUE;
 	      break;
 	      
@@ -295,7 +295,7 @@ static void watch(void)
 	      displayMsg(NULL);
 	      cdputs( "Rewinding...", MSG_LIN1, 0);
 	      cdrefresh();
-	      pbFileSeek(currTime - 30);
+	      pbFileSeek(recCurrentTime - 30);
 	      cdclrl( MSG_LIN1, 1 );
 	      upddsp = TRUE;
 	      break;
@@ -304,7 +304,7 @@ static void watch(void)
 	      displayMsg(NULL);
 	      cdputs( "Rewinding...", MSG_LIN1, 0);
 	      cdrefresh();
-	      pbFileSeek(currTime - (2 * 60));
+	      pbFileSeek(recCurrentTime - (2 * 60));
 	      cdclrl( MSG_LIN1, 1 );
 	      upddsp = TRUE;
 	      break;
@@ -312,7 +312,7 @@ static void watch(void)
 	    case 'r':	/* reset to beginning */
 	      cdputs( "Rewinding...", MSG_LIN1, 0);
 	      cdrefresh();
-	      pbFileSeek(startTime);
+	      pbFileSeek(recStartTime);
 	      cdclrl( MSG_LIN1, 1 );
 	      upddsp = TRUE;
 	      break;
@@ -330,22 +330,22 @@ static void watch(void)
 	      upddsp = TRUE;
 	      break;
 		    
-	    case 'n':		/* set frameDelay to normal playback
+	    case 'n':		/* set recFrameDelay to normal playback
 				   speed.*/
-              pbSetPlaybackSpeed(1, fhdr.samplerate);
+              pbSetPlaybackSpeed(1, recFileHeader.samplerate);
 	      upddsp = TRUE;
 	      break;
 
 	      /* these seem backward, but it's easier to understand
 		 the '+' is faster, and '-' is slower ;-) */
 	    case '-':
-              pbSetPlaybackSpeed(pbSpeed - 1, fhdr.samplerate);
+              pbSetPlaybackSpeed(pbSpeed - 1, recFileHeader.samplerate);
 	      upddsp = TRUE;
 	      break;
 
 	    case '+': 
 	    case '=':
-              pbSetPlaybackSpeed(pbSpeed + 1, fhdr.samplerate);
+              pbSetPlaybackSpeed(pbSpeed + 1, recFileHeader.samplerate);
 	      upddsp = TRUE;
 	      break;
 
@@ -583,10 +583,10 @@ static int prompt_ship(char buf[], int *snum, int *normal)
 
   cdclrl( MSG_LIN1, 2 );
 
-  if (fhdr.snum == 0)
+  if (recFileHeader.snum == 0)
     buf[0] = EOS;
   else
-    sprintf(buf, "%d", fhdr.snum);
+    sprintf(buf, "%d", recFileHeader.snum);
 
   tch = cdgetx( pmt, MSG_LIN1, 1, TERMS, buf, MSGMAXLINE, TRUE );
   cdclrl( MSG_LIN1, 1 );
@@ -603,7 +603,7 @@ static int prompt_ship(char buf[], int *snum, int *normal)
   
   *normal = ( tch != TERM_EXTRA );		/* line feed means debugging */
 
-  delblanks( buf );
+  utDeleteBlanks( buf );
 
   if ( strlen( buf ) == 0 ) 
     {              /* watch doomsday machine */
@@ -620,7 +620,7 @@ static int prompt_ship(char buf[], int *snum, int *normal)
 	  c_sleep( 1.0 );
 	  return(FALSE); /* dwp */
 	}
-      safectoi( &tmpsnum, buf, 0 );	/* ignore return status */
+      utSafeCToI( &tmpsnum, buf, 0 );	/* ignore return status */
     }
 
   if ( (tmpsnum < 1 || tmpsnum > MAXSHIPS) && tmpsnum != DISPLAY_DOOMSDAY )

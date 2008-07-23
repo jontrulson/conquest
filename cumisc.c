@@ -12,6 +12,7 @@
 #include "conqdef.h"
 #include "conqcom.h"
 #include "conqlb.h"
+#include "conqutil.h"
 #include "context.h"
 
 #include "conf.h"
@@ -59,7 +60,7 @@ void mcuHistList( int godlike )
       i = thistptr + 1;
       for ( j = 0; j < MAXHISTLOG; j++ )
 	{
-	  i = modp1( i - 1, MAXHISTLOG );
+	  i = utModPlusOne( i - 1, MAXHISTLOG );
 	  unum = History[i].histunum;
 	  
 	  if ( unum < 0 || unum >= MAXUSERS )
@@ -70,11 +71,11 @@ void mcuHistList( int godlike )
 	  strcpy(puname, Users[unum].username);
 	  
 				/* entry time */
-	  getdandt( histentrytm, History[i].histlog);
+	  utFormatTime( histentrytm, History[i].histlog);
 	  
 	  
 				/* now elapsed time */
-	  fmtseconds((int) History[i].elapsed, connecttm);
+	  utFormatSeconds((int) History[i].elapsed, connecttm);
 	  /* strip off seconds, or for long times, anything after 7 bytes */
 	  connecttm[7] = '\0';
 	  
@@ -375,7 +376,7 @@ void mcuInfoPlanet( char *str, int pnum, int snum )
       mcuPutMsg( "No such planet.", MSG_LIN1 );
       cdclrl( MSG_LIN2, 1 );
       cdmove( MSG_LIN1, 1 );
-      cerror("infoplanet: Called with invalid pnum (%d).",
+      utError("infoplanet: Called with invalid pnum (%d).",
 	     pnum );
       return;
     }
@@ -425,7 +426,7 @@ void mcuInfoPlanet( char *str, int pnum, int snum )
     }
   
   Context.lasttdist = round(dist( x, y, Planets[pnum].x, Planets[pnum].y));
-  Context.lasttang = round(angle( x, y, Planets[pnum].x, Planets[pnum].y ));
+  Context.lasttang = round(utAngle( x, y, Planets[pnum].x, Planets[pnum].y ));
 
   if (UserConf.DoETAStats)
     {
@@ -509,7 +510,7 @@ void mcuInfoPlanet( char *str, int pnum, int snum )
 	    {
 	      if ( junk[0] != EOS )
 		appstr( ", ", junk );
-	      appint( j, junk );
+	      utAppendInt( j, junk );
 	      appstr( " minutes until coup time", junk );
 	    }
 	}
@@ -592,7 +593,7 @@ void mcuInfoShip( int snum, int scanner )
     }
 
   cbuf[0] = Context.lasttarg[0] = EOS;
-  appship( snum, cbuf );
+  utAppendShip( snum, cbuf );
   strcpy(Context.lasttarg, cbuf); /* save for hudInfo */
 
   if ( snum == scanner )
@@ -672,7 +673,7 @@ void mcuInfoShip( int snum, int scanner )
 
   if ( godlike )
     {
-      appsstatus( status, cbuf );
+      utAppendShipStatus( status, cbuf );
       appchr( '.', cbuf );
     }
   else 
@@ -688,7 +689,7 @@ void mcuInfoShip( int snum, int scanner )
   if ( ! SCLOAKED(snum) || Ships[snum].warp != 0.0 )
     {
       Context.lasttdist = round( dis ); /* save these puppies for hudInfo */
-      Context.lasttang = round( angle( x, y, appx, appy ) );
+      Context.lasttang = round( utAngle( x, y, appx, appy ) );
       sprintf( cbuf, "Range %d, direction %d",
 	     Context.lasttdist, Context.lasttang );
 
@@ -730,7 +731,7 @@ void mcuInfoShip( int snum, int scanner )
 		  oldclose_rate = close_rate;
 
 #ifdef DEBUG_ETA
-		  clog("infoship: close_rate(%.1f) = diffdis(%.1f) / difftime(%d), avgclose_rate = %.1f",
+		  utLog("infoship: close_rate(%.1f) = diffdis(%.1f) / difftime(%d), avgclose_rate = %.1f",
 		       close_rate,
 		       diffdis,
 		       difftime,
@@ -753,7 +754,7 @@ void mcuInfoShip( int snum, int scanner )
 		      pwarp = (avgclose_rate / (real) MM_PER_SEC_PER_WARP);
 
 #ifdef DEBUG_ETA
-clog("infoship:\tdis(%.1f) pwarp(%.1f) = (close_rate(%.1f) / MM_PER_SEC_PER_WARP(%.1f)", dis, pwarp, close_rate, MM_PER_SEC_PER_WARP);
+utLog("infoship:\tdis(%.1f) pwarp(%.1f) = (close_rate(%.1f) / MM_PER_SEC_PER_WARP(%.1f)", dis, pwarp, close_rate, MM_PER_SEC_PER_WARP);
 #endif
 
 		      sprintf(tmpstr, ", ETA %s",
@@ -797,7 +798,7 @@ clog("infoship:\tdis(%.1f) pwarp(%.1f) = (close_rate(%.1f) / MM_PER_SEC_PER_WARP
 	appstr( ", ", cbuf );
       appstr( "shields ", cbuf );
       if ( SSHUP(snum) && ! SREPAIR(snum) )
-	appint( round( Ships[snum].shields ), cbuf );
+	utAppendInt( round( Ships[snum].shields ), cbuf );
       else
 	appstr( "DOWN", cbuf );
       i = round( Ships[snum].damage );
@@ -1174,7 +1175,7 @@ void mcuPlayList( int godlike, int doall, int snum )
 	      ( doall && ( status != SS_OFF || kb != 0 ) ) )
 	    {
 	      sbuf[0] = EOS;
-	      appship( i, sbuf );
+	      utAppendShip( i, sbuf );
 	      appstr(" ", sbuf);
 	      appchr(ShipTypes[Ships[i].shiptype].name[0], sbuf);
 
@@ -1206,7 +1207,7 @@ void mcuPlayList( int godlike, int doall, int snum )
 	      if ( doall && kb != 0 )
 		{
 		  appstr( "  ", cbuf);
-		  appkb( kb, cbuf );
+		  utAppendKilledBy( kb, cbuf );
 		}
 
 		if (snum > 0 && snum <= MAXSHIPS )
@@ -1240,7 +1241,7 @@ void mcuPlayList( int godlike, int doall, int snum )
 	      if ( doall && status != SS_LIVE )
 		{
 		  cbuf[0] = EOS;
-		  appsstatus( status, cbuf );
+		  utAppendShipStatus( status, cbuf );
 		  
 		  uiPutColor(YellowLevelColor);  
 		  cdputs( cbuf, lin, col - 2 - strlen( cbuf ) );
@@ -1297,7 +1298,7 @@ int mcuReviewMsgs( int snum, int slm )
   didany = FALSE;
   Done = FALSE;
 
-  lastone = modp1( ConqInfo->lastmsg+1, MAXMESSAGES );
+  lastone = utModPlusOne( ConqInfo->lastmsg+1, MAXMESSAGES );
   if ( snum > 0 && snum <= MAXSHIPS )
     {
       if ( Ships[snum].lastmsg == LMSG_NEEDINIT )
@@ -1309,7 +1310,7 @@ int mcuReviewMsgs( int snum, int slm )
   
   cdclrl( MSG_LIN1, 1 );
   
-  /*  for ( msg = slm; msg != lastone; msg = modp1( msg-1, MAXMESSAGES ) )*/
+  /*  for ( msg = slm; msg != lastone; msg = utModPlusOne( msg-1, MAXMESSAGES ) )*/
 
   msg = slm;
 
@@ -1329,10 +1330,10 @@ int mcuReviewMsgs( int snum, int slm )
 	    case '<':
 	    case KEY_UP:
 	    case KEY_LEFT:
-	      tmsg = modp1( msg - 1, MAXMESSAGES );
+	      tmsg = utModPlusOne( msg - 1, MAXMESSAGES );
 	      while(!clbCanRead( snum, tmsg ) && tmsg != lastone)
 		{
-		  tmsg = modp1( tmsg - 1, MAXMESSAGES );
+		  tmsg = utModPlusOne( tmsg - 1, MAXMESSAGES );
 		}
 	      if (tmsg == lastone)
 		{
@@ -1345,10 +1346,10 @@ int mcuReviewMsgs( int snum, int slm )
 	    case '>':
 	    case KEY_DOWN:
 	    case KEY_RIGHT:
-	      tmsg =  modp1( msg + 1, MAXMESSAGES );
+	      tmsg =  utModPlusOne( msg + 1, MAXMESSAGES );
 	      while(!clbCanRead( snum, tmsg ) && tmsg != slm + 1 )
 		{
-		  tmsg = modp1( tmsg + 1, MAXMESSAGES );
+		  tmsg = utModPlusOne( tmsg + 1, MAXMESSAGES );
 		}
 	      if (tmsg == (slm + 1))
 		{
@@ -1365,7 +1366,7 @@ int mcuReviewMsgs( int snum, int slm )
 	}
       else
 	{
-	  msg = modp1( msg - 1, MAXMESSAGES );
+	  msg = utModPlusOne( msg - 1, MAXMESSAGES );
 	  if (msg == lastone)
 	    Done = TRUE;
 	}
@@ -1516,22 +1517,22 @@ void mcuTeamList( int team )
   lin++;
   etime = Teams[0].stats[TSTAT_SECONDS] + Teams[1].stats[TSTAT_SECONDS] +
     Teams[2].stats[TSTAT_SECONDS] + Teams[3].stats[TSTAT_SECONDS];
-  fmtseconds( Teams[0].stats[TSTAT_SECONDS], timbuf[0] );
-  fmtseconds( Teams[1].stats[TSTAT_SECONDS], timbuf[1] );
-  fmtseconds( Teams[2].stats[TSTAT_SECONDS], timbuf[2] );
-  fmtseconds( Teams[3].stats[TSTAT_SECONDS], timbuf[3] );
-  fmtseconds( etime, timbuf[4] );
+  utFormatSeconds( Teams[0].stats[TSTAT_SECONDS], timbuf[0] );
+  utFormatSeconds( Teams[1].stats[TSTAT_SECONDS], timbuf[1] );
+  utFormatSeconds( Teams[2].stats[TSTAT_SECONDS], timbuf[2] );
+  utFormatSeconds( Teams[3].stats[TSTAT_SECONDS], timbuf[3] );
+  utFormatSeconds( etime, timbuf[4] );
   cprintf(lin,col,0, sfmt3, "Time",
 	 timbuf[0], timbuf[1], timbuf[2], timbuf[3], timbuf[4] );
   
   lin++;
   ctime = Teams[0].stats[TSTAT_CPUSECONDS] + Teams[1].stats[TSTAT_CPUSECONDS] +
     Teams[2].stats[TSTAT_CPUSECONDS] + Teams[3].stats[TSTAT_CPUSECONDS];
-  fmtseconds( Teams[0].stats[TSTAT_CPUSECONDS], timbuf[0] );
-  fmtseconds( Teams[1].stats[TSTAT_CPUSECONDS], timbuf[1] );
-  fmtseconds( Teams[2].stats[TSTAT_CPUSECONDS], timbuf[2] );
-  fmtseconds( Teams[3].stats[TSTAT_CPUSECONDS], timbuf[3] );
-  fmtseconds( ctime, timbuf[4] );
+  utFormatSeconds( Teams[0].stats[TSTAT_CPUSECONDS], timbuf[0] );
+  utFormatSeconds( Teams[1].stats[TSTAT_CPUSECONDS], timbuf[1] );
+  utFormatSeconds( Teams[2].stats[TSTAT_CPUSECONDS], timbuf[2] );
+  utFormatSeconds( Teams[3].stats[TSTAT_CPUSECONDS], timbuf[3] );
+  utFormatSeconds( ctime, timbuf[4] );
   cprintf( lin,col,0, sfmt3, "Cpu time",
 	 timbuf[0], timbuf[1], timbuf[2], timbuf[3], timbuf[4] );
   
@@ -1966,7 +1967,7 @@ int mcuGetTarget( char *pmt, int lin, int col, real *dir, real cdefault )
   if ( ch == TERM_ABORT )
     return ( FALSE );
   
-  delblanks( buf );
+  utDeleteBlanks( buf );
   fold( buf );
   if ( buf[0] == EOS )
     {
@@ -1977,12 +1978,12 @@ int mcuGetTarget( char *pmt, int lin, int col, real *dir, real cdefault )
   if ( alldig( buf ) == TRUE )
     {
       i = 0;
-      if ( ! safectoi( &j, buf, i ) )
+      if ( ! utSafeCToI( &j, buf, i ) )
 	return ( FALSE );
-      *dir = mod360( (real) j );
+      *dir = utMod360( (real) j );
       return ( TRUE );
     }
-  if ( arrows( buf, dir ) )
+  if ( utArrowsToDir( buf, dir ) )
     return ( TRUE );
   
   return ( FALSE );
@@ -2027,7 +2028,7 @@ void mcuPageFile( char *file, char *errmsg )
   
   if ((pfd = fopen(file, "r")) == NULL)
     {
-      clog("mcuPageFile(): fopen(%s) failed: %s",
+      utLog("mcuPageFile(): fopen(%s) failed: %s",
 	   file,
 	   strerror(errno));
       

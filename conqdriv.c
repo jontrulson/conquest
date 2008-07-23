@@ -24,11 +24,14 @@
 /*    representations about the suitability of this software for any */
 /*    purpose. It is provided "as is" without express or implied warranty. */
 
-#define NOEXTERN
 #include "conqdef.h"
 #include "conqcom.h"
 #include "conqlb.h"
+#include "conqutil.h"
+
+#define NOEXTERN_CONTEXT
 #include "context.h"
+
 #include "conf.h"
 #include "global.h"
 #include "sem.h"
@@ -63,7 +66,7 @@ int main(int argc, char *argv[])
   if (GetSysConf(FALSE) == ERR)
     {
 #ifdef DEBUG_CONFIG
-      clog("%s@%d: main(): GetSysConf() returned ERR.", __FILE__, __LINE__);
+      utLog("%s@%d: main(): GetSysConf() returned ERR.", __FILE__, __LINE__);
 #endif
 /*      exit(1);*/
 
@@ -73,7 +76,7 @@ int main(int argc, char *argv[])
   
   if (setgid(ConquestGID) == -1)
     {
-      clog("conqdriv: setgid(%d): %s", 
+      utLog("conqdriv: setgid(%d): %s", 
 	   ConquestGID,
 	   strerror(errno));
       fprintf(stderr, "conqdriv: setgid(): failed\n");
@@ -93,20 +96,20 @@ int main(int argc, char *argv[])
   map_common();
   
   if ( *CBlockRevision != COMMONSTAMP )
-    clog("conqdriv:ERROR:common block mismatch");
+    utLog("conqdriv:ERROR:common block mismatch");
   
 #ifdef SET_PRIORITY
   /* Increase our priority a bit */
   
   if (nice(CONQDRIV_PRI) == -1)
     {
-      clog("conqdriv: main(): nice(CONQDRIV_PRI (%d)): failed: %s",
+      utLog("conqdriv: main(): nice(CONQDRIV_PRI (%d)): failed: %s",
 	   CONQDRIV_PRI,
 	   strerror(errno));
     }
 #if defined(DEBUG_FLOW)
   else
-    clog("conqdriv: main(): nice(CONQDRIV_PRI (%d)): succeeded.",
+    utLog("conqdriv: main(): nice(CONQDRIV_PRI (%d)): succeeded.",
 	 CONQDRIV_PRI);
 #endif
 
@@ -117,8 +120,8 @@ int main(int argc, char *argv[])
   eacc = 0;
   
   PVLOCK(&ConqInfo->lockword);
-  gsecs( &Driver->drivtime );		/* prevent driver timeouts */
-  gsecs( &Driver->playtime );
+  utGetSecs( &Driver->drivtime );		/* prevent driver timeouts */
+  utGetSecs( &Driver->playtime );
   
   /* Look for the force flag. */
   
@@ -140,13 +143,13 @@ int main(int argc, char *argv[])
       if ( Driver->drivstat != DRS_RESTART )
 	{
 	  PVUNLOCK(&ConqInfo->lockword);
-	  clog("conqdriv: we shouldn't be starting: drivstat = %d\n", Driver->drivstat);
+	  utLog("conqdriv: we shouldn't be starting: drivstat = %d\n", Driver->drivstat);
 	}
       
       if ( Driver->drivpid != 0 )
 	{
 	  PVUNLOCK(&ConqInfo->lockword);
-	  clog("conqdriv: Driver->drivpid != 0, drivpid = %d", Driver->drivpid);
+	  utLog("conqdriv: Driver->drivpid != 0, drivpid = %d", Driver->drivpid);
 	}
     }
   else
@@ -174,7 +177,7 @@ int main(int argc, char *argv[])
   Driver->drivowner[MAXUSERNAME - 1] = 0;
   
   /* Start within bounds. */
-  Driver->drivsecs = modp1( Driver->drivsecs, FIVEMINUTE_SECONDS );
+  Driver->drivsecs = utModPlusOne( Driver->drivsecs, FIVEMINUTE_SECONDS );
   
   /* Special hack to cause the one second fuse to expire upon entry. */
   drivtenths = 10;
@@ -185,13 +188,13 @@ int main(int argc, char *argv[])
   
   if ( force )
     {
-      clog( "My Lord, driver %d reporting. I have assumed control.", pid );
-      cerror( "My Lord, driver %d reporting. I have assumed control.", pid );
+      utLog( "My Lord, driver %d reporting. I have assumed control.", pid );
+      utError( "My Lord, driver %d reporting. I have assumed control.", pid );
     }
   else
     {
 #ifdef DEBUG_SIG
-      clog("conqdriv(): *DRIVER STARTING* detaching stdio and setting signals");
+      utLog("conqdriv(): *DRIVER STARTING* detaching stdio and setting signals");
 #endif
       
       close(0);
@@ -215,14 +218,14 @@ int main(int argc, char *argv[])
 	  drivtenths = 0;
 	  
 	  /* Check for player timeout. */
-	  if ( dsecs( Driver->playtime, &(Driver->drivtime) ) >= 
+	  if ( utDeltaSecs( Driver->playtime, &(Driver->drivtime) ) >= 
 	       TIMEOUT_PLAYER )
 	    {
 	      Driver->drivpid = 0;
 	      Driver->drivstat = DRS_OFF;
 	      Driver->drivowner[0] = EOS;
 	      upchuck();
-	      clog("conqdriv:player timeout: dsecs(Driver->playtime, &(Driver->drivtime)) = %d\n", dsecs(Driver->playtime, &(Driver->drivtime)));
+	      utLog("conqdriv:player timeout: utDeltaSecs(Driver->playtime, &(Driver->drivtime)) = %d\n", utDeltaSecs(Driver->playtime, &(Driver->drivtime)));
 	      break;
 	    }
 	  
@@ -238,7 +241,7 @@ int main(int argc, char *argv[])
 		}
 	      
 	      /* Do the big things first to sync the small things. */
-	      Driver->drivsecs = modp1( Driver->drivsecs + 1, FIVEMINUTE_SECONDS );
+	      Driver->drivsecs = utModPlusOne( Driver->drivsecs + 1, FIVEMINUTE_SECONDS );
 	      if ( mod( Driver->drivsecs, FIVEMINUTE_SECONDS ) == 0 )
 		fivemindrive(); 
 	      if ( mod( Driver->drivsecs, MINUTE_SECONDS ) == 0 )
@@ -271,7 +274,7 @@ int main(int argc, char *argv[])
       Driver->drivpid = 0;
       Driver->drivstat = DRS_OFF;
       Driver->drivowner[0] = EOS;
-      clog( "conqdriv:DRS_KAMIKAZE: Driver->drivstat = %d\n", Driver->drivstat);
+      utLog( "conqdriv:DRS_KAMIKAZE: Driver->drivstat = %d\n", Driver->drivstat);
     }
   
   /* Make last minute driver stats update. */
@@ -315,7 +318,7 @@ void iterdrive( int *ship )
                     {
                       /* Orbiting clockwise. */
                       Ships[i].head = 
-                        mod360( Ships[i].head - (ORBIT_FAC/10.0) );
+                        utMod360( Ships[i].head - (ORBIT_FAC/10.0) );
                       
                       /* adjust the ships obital position */
                       clbAdjOrbitalPosition(i);
@@ -324,7 +327,7 @@ void iterdrive( int *ship )
                     {
                       /* Orbiting counter-clockwise. */
                       Ships[i].head = 
-                        mod360( Ships[i].head + (ORBIT_FAC/10.0) );
+                        utMod360( Ships[i].head + (ORBIT_FAC/10.0) );
                       
                       /* adjust the ships obital position */
                       clbAdjOrbitalPosition(i);
@@ -333,7 +336,7 @@ void iterdrive( int *ship )
               else
                 {
                   /* Cruising, locked on; update ship's desired heading. */
-                  Ships[i].dhead = (real) angle(Ships[i].x, Ships[i].y, Planets[pnum].x, Planets[pnum].y);
+                  Ships[i].dhead = (real) utAngle(Ships[i].x, Ships[i].y, Planets[pnum].x, Planets[pnum].y);
                 }
             }
           
@@ -341,7 +344,7 @@ void iterdrive( int *ship )
 	  if ( Ships[i].warp >= 0.0 && Ships[i].dhead != Ships[i].head )
 	    {
 	      h = Ships[i].head;
-	      ad = subang( h, Ships[i].dhead );
+	      ad = utSubAngle( h, Ships[i].dhead );
 	      x = (real)max( 210.0 - ((Ships[i].warp*20.0)/engeff( i )), 2.0 ) * (real)ITER_SECONDS;
 	      if ( fabs( ad ) <= x )
 		Ships[i].head = Ships[i].dhead;
@@ -371,8 +374,8 @@ void iterdrive( int *ship )
 	      /* Being towed; slowly (grossly?) align with our tower. */
 	      Ships[i].warp = 0.0;
 	      Ships[i].dwarp = 0.0;
-	      h = angle( Ships[i].x, Ships[i].y, Ships[j].x, Ships[j].y );
-	      ad = subang( h, Ships[j].head );
+	      h = utAngle( Ships[i].x, Ships[i].y, Ships[j].x, Ships[j].y );
+	      ad = utSubAngle( h, Ships[j].head );
 	      if ( ad < 0.0 )
 		h = h - max( ad, -10.0*ITER_SECONDS );
 	      else
@@ -422,7 +425,7 @@ void iterdrive( int *ship )
 			    }
 			}
 		      else if ( ( dis - ORBIT_DIST ) <=
-			       acdist( Ships[i].warp, MAX_ORBIT_WARP,
+			       utAccurateDist( Ships[i].warp, MAX_ORBIT_WARP,
 				      ShipTypes[Ships[i].shiptype].accelfac * 
 				       engeff( i ) ) )
 			{
@@ -465,7 +468,7 @@ void iterdrive( int *ship )
 			if ( Ships[i].torps[j].war[Ships[k].team] || 
 			     Ships[k].war[Ships[i].team] )
 			  {
-			    ht = explosion( (real)(TORPEDO_HIT * 
+			    ht = utExplosionHits( (real)(TORPEDO_HIT * 
 						   Ships[i].torps[j].mult),
 					    dist( Ships[i].torps[j].x, 
 						  Ships[i].torps[j].y, 
@@ -840,9 +843,9 @@ void secdrive( int *ship )
       
       /* Update heading. */
       if ( Doomsday->lock < 0 )
-	Doomsday->heading = angle( Doomsday->x, Doomsday->y, Planets[-Doomsday->lock].x, Planets[-Doomsday->lock].y );
+	Doomsday->heading = utAngle( Doomsday->x, Doomsday->y, Planets[-Doomsday->lock].x, Planets[-Doomsday->lock].y );
       else if ( Doomsday->lock > 0 )
-	Doomsday->heading = angle( Doomsday->x, Doomsday->y, Ships[Doomsday->lock].x, Ships[Doomsday->lock].y );
+	Doomsday->heading = utAngle( Doomsday->x, Doomsday->y, Ships[Doomsday->lock].x, Ships[Doomsday->lock].y );
       Doomsday->dx = DOOMSDAY_WARP * MM_PER_SEC_PER_WARP * ITER_SECONDS * cosd(Doomsday->heading);
       Doomsday->dy = DOOMSDAY_WARP * MM_PER_SEC_PER_WARP * ITER_SECONDS * sind(Doomsday->heading);
     }
@@ -952,7 +955,7 @@ void SigTerminate(int sig)
 {
   Driver->drivstat = DRS_KAMIKAZE;
   
-  clog("conqdriv: Terminating on signal %d", sig);
+  utLog("conqdriv: Terminating on signal %d", sig);
   
   return;
 }

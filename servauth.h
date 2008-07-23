@@ -13,14 +13,6 @@
 #include "datatypes.h"
 #include "protocol.h"
 
-#ifdef SERVAUTH_NOEXTERN
-# define EXTERNAL extern
-#else
-# define EXTERNAL
-#endif
-
-#undef EXTERNAL
-
 int Authenticate(char *name, char *password);
 
 

@@ -23,6 +23,7 @@
 #include "defs.h"
 #include "ibuf.h"
 #include "rb.h"
+#include "conqutil.h"
 
 /* the input ringbuffer */
 static ringBuffer_t *ibufRB = NULL;
@@ -42,16 +43,16 @@ static ringBuffer_t *ibufRB = NULL;
 #define IBUF_RBMAX 1024
 
 
-/* iBufInit - intialize the input buffer */
+/* ibufInit - intialize the input buffer */
 
-void iBufInit(void)
+void ibufInit(void)
 {
   ibufRB = rbCreate(I2RB_LEN(IBUF_RBMAX));
 
   return;
 }
 
-void iBufFlush(void)
+void ibufFlush(void)
 {
   rbFlush(ibufRB);
 
@@ -59,7 +60,7 @@ void iBufFlush(void)
 }
 
 
-int iBufCount(void)
+int ibufCount(void)
 {
   if (ibufRB)
     return RB2I_LEN(rbBytesUsed(ibufRB));
@@ -68,9 +69,9 @@ int iBufCount(void)
 }
 
 
-/* iBufPut - put a string into the buffer */
+/* ibufPut - put a string into the buffer */
 
-void iBufPut(char *thestr)
+void ibufPut(char *thestr)
 {
   int i;
   int n = strlen(thestr);
@@ -87,9 +88,9 @@ void iBufPut(char *thestr)
   return;
 }
 
-/* iBufPutc - put a char into the buffer */
+/* ibufPutc - put a char into the buffer */
 
-void iBufPutc(unsigned int thechar)
+void ibufPutc(unsigned int thechar)
 {
   rbPut(ibufRB, (Unsgn8 *)&thechar, I2RB_LEN(1));
 
@@ -97,13 +98,13 @@ void iBufPutc(unsigned int thechar)
 }
 
 
-/* iBufGetCh - return next char from the input buffer */
+/* ibufGetc - return next char from the input buffer */
 
-unsigned int iBufGetCh(void)
+unsigned int ibufGetc(void)
 {
   int c;
 
-  if (!iBufCount())
+  if (!ibufCount())
     {
       return 0;
     }
@@ -113,26 +114,26 @@ unsigned int iBufGetCh(void)
   return c;
 }
   
-/* DoMacro - stuff the buffer if an fkey pressed */
+/* ibufExpandMacro - stuff the buffer if an fkey pressed */
 
-int DoMacro(int fkey)
+int ibufExpandMacro(int fkey)
 {
   if (fkey < 0 || fkey >= MAX_MACROS)
     return(FALSE);
 
-  iBufPut(UserConf.MacrosF[fkey]);	
+  ibufPut(UserConf.MacrosF[fkey]);	
 
 #ifdef DEBUG_MACROS
-  clog("DoMacro(): got an FKey: %d", ch);
+  utLog("ibufExpandMacro(): got an FKey: %d", ch);
 #endif
   
   return(TRUE);
 
 }
       
-int DoMouseMacro(int but, Unsgn32 mods, real mangle)
+int ibufExpandMouseMacro(int but, Unsgn32 mods, real mangle)
 {
-  int myangle = ((mangle < 0.0) ? 0 : (int)mod360(mangle));
+  int myangle = ((mangle < 0.0) ? 0 : (int)utMod360(mangle));
   char *s;
   static char buf[MAX_MACRO_LEN];
 
@@ -148,7 +149,7 @@ int DoMouseMacro(int but, Unsgn32 mods, real mangle)
   s = UserConf.Mouse[but][mods];
 
 #if defined(DEBUG_MACROS)
-  clog("DoMouseMacro(): got MOUSE Macro Key: %d, mod %d string = '%s'", but,
+  utLog("ibufExpandMouseMacro(): got MOUSE Macro Key: %d, mod %d string = '%s'", but,
        mods, s);
 #endif
 
@@ -163,14 +164,14 @@ int DoMouseMacro(int but, Unsgn32 mods, real mangle)
               s++;
               snprintf(buf, MAX_MACRO_LEN - 1, "%d",
                        myangle);
-              iBufPut(buf); 
+              ibufPut(buf); 
             }
           else
-            iBufPutc('\\');
+            ibufPutc('\\');
         }
       else
         {
-          iBufPutc((int)*s);
+          ibufPutc((int)*s);
           s++;
         }
     }

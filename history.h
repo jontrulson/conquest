@@ -12,7 +12,7 @@
 #include "conqdef.h"
 
 typedef struct {
-  int histunum;			/* user number */
+  int    histunum;              /* user number */
   time_t histlog;		/* date of entry */
   time_t elapsed;		/* elapsed time of this entry */
 } History_t;

@@ -49,45 +49,45 @@ typedef struct _fheader {
 #define RECORD_F_SERVER         0x00000001 /* server recording */
 
 /* playback */
-#ifdef REC_NOEXTERN
-time_t totElapsed = 0;          /* total game time (recorded) */
-time_t startTime = 0;
-time_t currTime = 0;
-char *rfname = NULL;        /* name of recording file for playback */
-fileHeader_t fhdr;
-real frameDelay = -1.0;         /* delaytime between frames */
-Unsgn32 frameCount = 0;
-Msg_t recMsg = {};
+#ifdef NOEXTERN_RECORD
+time_t          recTotalElapsed = 0; /* total game time (recorded) */
+time_t          recStartTime    = 0;
+time_t          recCurrentTime  = 0;
+char           *recFilename     = NULL; /* recording filename for playback */
+fileHeader_t    recFileHeader   = {};
+real            recFrameDelay   = -1.0; /* delaytime between frames */
+Unsgn32         recFrameCount   = 0;
+Msg_t           recMsg          = {}; /* current message */
 #else
-extern time_t totElapsed;          /* total game time (recorded) */
-extern time_t startTime;
-extern time_t currTime;
-extern char *rfname;        /* name of recording file for playback */
-extern fileHeader_t fhdr;
-extern real frameDelay;         /* delaytime between frames */
-extern Unsgn32 frameCount;
-extern Msg_t recMsg;            /* current recMsg */
+extern time_t   recTotalElapsed;
+extern time_t   recStartTime;
+extern time_t   recCurrentTime;
+extern char    *recFilename;
+extern fileHeader_t recFileHeader;
+extern real     recFrameDelay;
+extern Unsgn32  recFrameCount;
+extern Msg_t    recMsg;
 #endif
 
 
 /* function protos */
-int recordOpenInput(char *fname);
-void recordCloseInput(void);
+int  recOpenInput(char *fname);
+void recCloseInput(void);
 
-int recordOpenOutput(char *fname, int logit);
-void recordCloseOutput(void);
-int recordInitOutput(int unum, time_t thetime, int snum, int isserver);
+int  recOpenOutput(char *fname, int logit);
+void recCloseOutput(void);
+int  recInitOutput(int unum, time_t thetime, int snum, int isserver);
 
-int recordReadHeader(fileHeader_t *fhdr);
-int recordReadPkt(char *buf, int blen);
+int  recReadHeader(fileHeader_t *fhdr);
+int  recReadPkt(char *buf, int blen);
 
-int recordWriteBuf(void *buf, int len);
+int  recWriteBuf(void *buf, int len);
 
-void recordUpdateFrame(void);
-void recordWriteEvent(void *data);
+void recUpdateFrame(void);
+void recWriteEvent(void *data);
 
-int initReplay(char *fname, time_t *elapsed);
-void recordGenTorpLoc(void);
+int  recInitReplay(char *fname, time_t *elapsed);
+void recGenTorpLoc(void);
 
 
 #endif /* RECORD_H_INCLUDED */

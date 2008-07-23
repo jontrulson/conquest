@@ -14,6 +14,7 @@
 #include "conf.h"
 #include "conqcom.h"
 #include "conqlb.h"
+#include "conqutil.h"
 #include "gldisplay.h"
 #include "node.h"
 #include "client.h"
@@ -105,7 +106,7 @@ static void set_header(int snum)
   ssbuf[0] = EOS;
   
   appstr( ", ", ssbuf );
-  appsstatus( Ships[snum].status, ssbuf);
+  utAppendShipStatus( Ships[snum].status, ssbuf);
   
   if ( ConqInfo->closed) 
     {
@@ -140,7 +141,7 @@ static void set_header(int snum)
                 Ships[snum].alias, ssbuf);
     }
   
-  setRecId(hbuf);
+  hudSetRecId(hbuf);
 
 }
 
@@ -148,18 +149,18 @@ void set_rectime(void)
 {
   char buf[128];
   static char hbuf[128];
-  time_t elapsed = (currTime - startTime);
+  time_t elapsed = (recCurrentTime - recStartTime);
   char *c;
   real percent;
 
   /* elapsed time */
-  fmtseconds((int)elapsed, buf);
+  utFormatSeconds((int)elapsed, buf);
   c = &buf[2];			/* skip day count */
 
   if (elapsed <= 0)
     elapsed = 1;
 
-  percent = ((real)elapsed / (real)totElapsed ) * 100.0;
+  percent = ((real)elapsed / (real)recTotalElapsed ) * 100.0;
 
   if (pbSpeed == PB_SPEED_INFINITE)
     /* current frame delay */
@@ -167,7 +168,7 @@ void set_rectime(void)
   else
     sprintf(hbuf, "%s (%d%%) %2dx", c, (int)percent, pbSpeed);
 
-  setRecTime(hbuf);
+  hudSetRecTime(hbuf);
 
   return;
 }
@@ -190,19 +191,19 @@ void nPlayBInit(void)
       /* these are toggle animations that never expire, so they
          only need to be done once at inittime */
       if (!animInitState("onesec", &GLBlinkerOneSec, NULL))
-        clog("%s: failed to init animstate for animation 'onesec'",
+        utLog("%s: failed to init animstate for animation 'onesec'",
              __FUNCTION__);
       else
         animQueAdd(nPlayBNode.animQue, &GLBlinkerOneSec);
 
       if (!animInitState("halfsec", &GLBlinkerHalfSec, NULL))
-        clog("%s: failed to init animstate for animation 'halfsec'",
+        utLog("%s: failed to init animstate for animation 'halfsec'",
              __FUNCTION__);
       else
         animQueAdd(nPlayBNode.animQue, &GLBlinkerHalfSec);
 
       if (!animInitState("qtrsec", &GLBlinkerQtrSec, NULL))
-        clog("%s: failed to init animstate for animation 'qtrsec'",
+        utLog("%s: failed to init animstate for animation 'qtrsec'",
              __FUNCTION__);
       else
         animQueAdd(nPlayBNode.animQue, &GLBlinkerQtrSec);
@@ -216,7 +217,7 @@ void nPlayBInit(void)
                    Teams[i].name[0]);
           
           if (!animInitState(nm, &ncpTorpAnims[i], NULL))
-            clog("%s: failed to init animstate for animation '%s'",
+            utLog("%s: failed to init animstate for animation '%s'",
                  __FUNCTION__,
                  nm);
           else
@@ -305,7 +306,7 @@ static int nPlayBInput(int ch)
               return NODE_OK;
             }
 
-          delblanks( prm.buf );
+          utDeleteBlanks( prm.buf );
           if ( strlen( prm.buf ) == 0 )
             {              /* watch doomsday machine */
               tmpsnum = DISPLAY_DOOMSDAY;
@@ -320,7 +321,7 @@ static int nPlayBInput(int ch)
                   nss = "No such ship.";
                   return NODE_OK; 
                 }
-              safectoi( &tmpsnum, prm.buf, 0 );     /* ignore return status */
+              utSafeCToI( &tmpsnum, prm.buf, 0 );     /* ignore return status */
             }
 
           if ( (tmpsnum < 1 || tmpsnum > MAXSHIPS) && 
@@ -362,13 +363,13 @@ static int nPlayBInput(int ch)
       break;
     case 'f':	/* move forward 30 seconds */
       cp_putmsg(NULL, MSG_LIN1);
-      pbFileSeek(currTime + 30);
+      pbFileSeek(recCurrentTime + 30);
       Context.redraw = TRUE;
       break;
       
     case 'F':	/* move forward 2 minutes */
       cp_putmsg(NULL, MSG_LIN1);
-      pbFileSeek(currTime + (2 * 60));
+      pbFileSeek(recCurrentTime + (2 * 60));
       Context.redraw = TRUE;
       break;
       
@@ -381,21 +382,21 @@ static int nPlayBInput(int ch)
       
     case 'b':	/* move backward 30 seconds */
       cp_putmsg("Rewinding...", MSG_LIN1);
-      pbFileSeek(currTime - 30);
+      pbFileSeek(recCurrentTime - 30);
       cp_putmsg(NULL, MSG_LIN1);
       Context.redraw = TRUE;
       break;
       
     case 'B':	/* move backward 2 minutes */
       cp_putmsg("Rewinding...", MSG_LIN1);
-      pbFileSeek(currTime - (2 * 60));
+      pbFileSeek(recCurrentTime - (2 * 60));
       cp_putmsg(NULL, MSG_LIN1);
       Context.redraw = TRUE;
       break;
       
     case 'r':	/* reset to beginning */
       cp_putmsg("Rewinding...", MSG_LIN1);
-      pbFileSeek(startTime);
+      pbFileSeek(recStartTime);
       cp_putmsg(NULL, MSG_LIN1);
       Context.redraw = TRUE;
       break;
@@ -414,26 +415,26 @@ static int nPlayBInput(int ch)
       
       break;
       
-    case 'n':		/* set frameDelay to normal playback
+    case 'n':		/* set recFrameDelay to normal playback
                            speed.*/
-      pbSetPlaybackSpeed(1, fhdr.samplerate);
+      pbSetPlaybackSpeed(1, recFileHeader.samplerate);
       break;
       
       /* these seem backward, but it's easier to understand
          the '+' is faster, and '-' is slower ;-) */
     case '-':
 
-      pbSetPlaybackSpeed(pbSpeed - 1, fhdr.samplerate);
+      pbSetPlaybackSpeed(pbSpeed - 1, recFileHeader.samplerate);
       break;
       
     case '+': 
     case '=':
-      pbSetPlaybackSpeed(pbSpeed + 1, fhdr.samplerate);
+      pbSetPlaybackSpeed(pbSpeed + 1, recFileHeader.samplerate);
       break;
       
     case 'w':
       state = S_WATCH;
-      if (fhdr.snum == 0)
+      if (recFileHeader.snum == 0)
         {
           cbuf[0] = EOS;
           prm.preinit = False;
@@ -441,7 +442,7 @@ static int nPlayBInput(int ch)
         }
       else
         {
-          sprintf(cbuf, "%d", fhdr.snum);
+          sprintf(cbuf, "%d", recFileHeader.snum);
           prm.preinit = True;
         }
 
@@ -622,7 +623,7 @@ static int nPlayBInput(int ch)
             if (ncpLRMagFactor - 1 >= -5)
               {
                 ncpLRMagFactor--;
-                cqsEffectPlay(teamEffects[Ships[snum].team].mag, 0, 0, 0);
+                cqsEffectPlay(cqsTeamEffects[Ships[snum].team].mag, 0, 0, 0);
               }
             else
               mglBeep(MGL_BEEP_ERR);
@@ -634,7 +635,7 @@ static int nPlayBInput(int ch)
             if (ncpSRMagFactor - 1 >= -5)
               {
                 ncpSRMagFactor--;
-                cqsEffectPlay(teamEffects[Ships[snum].team].mag, 0, 0, 0);
+                cqsEffectPlay(cqsTeamEffects[Ships[snum].team].mag, 0, 0, 0);
               }
             else
               mglBeep(MGL_BEEP_ERR);
@@ -651,7 +652,7 @@ static int nPlayBInput(int ch)
             if (ncpLRMagFactor + 1 <= 5)
               {
                 ncpLRMagFactor++;
-                cqsEffectPlay(teamEffects[Ships[snum].team].mag, 0, 0, 0);
+                cqsEffectPlay(cqsTeamEffects[Ships[snum].team].mag, 0, 0, 0);
               }
             else
               mglBeep(MGL_BEEP_ERR);
@@ -663,7 +664,7 @@ static int nPlayBInput(int ch)
             if (ncpSRMagFactor + 1 <= 5)
               {
                 ncpSRMagFactor++;
-                cqsEffectPlay(teamEffects[Ships[snum].team].mag, 0, 0, 0);
+                cqsEffectPlay(cqsTeamEffects[Ships[snum].team].mag, 0, 0, 0);
               }
             else
               mglBeep(MGL_BEEP_ERR);

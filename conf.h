@@ -196,17 +196,17 @@ typedef struct _sysConf {
 				/* Revision on conquestrc file */
 				/* - for updating conquestrc   */
 				/*   when something changes */
-#ifndef CONF_NOEXTERN
-extern char ConfigVersion[];
+#ifdef NOEXTERN_CONF
+char              ConfigVersion[] = "$Revision$";
+/* Config's */
+UserConf_t        UserConf;
+SysConf_t         SysConf;
+#else
+extern char       ConfigVersion[];
 /* Config's */
 extern UserConf_t UserConf;
-extern SysConf_t SysConf;
-
-#else
-char ConfigVersion[] = "$Revision$";
-UserConf_t UserConf;
-SysConf_t  SysConf;
-#endif /* CONF_NOEXTERN */
+extern SysConf_t  SysConf;
+#endif /* NOEXTERN_CONF */
 
 
 				/* local function declarations */
@@ -225,7 +225,7 @@ int MakeConf(char *filename);
 Unsgn32 getServerFlags(void);
 
 				/* Initialize the system configurables */
-#ifndef CONF_NOEXTERN
+#ifndef NOEXTERN_CONF
 extern struct Conf SysConfData[];
 #else
 struct Conf SysConfData[] =
@@ -426,9 +426,9 @@ struct Conf SysConfData[] =
     }
   }
 };
-#endif /* CONF_NOEXTERN */
+#endif /* NOEXTERN_CONF */
 				/* Initialize the user configurables */
-#ifndef CONF_NOEXTERN
+#ifndef NOEXTERN_CONF
 extern struct Conf ConfData[];
 #else
 struct Conf ConfData[] =
@@ -882,18 +882,18 @@ struct Conf ConfData[] =
     }
   }
 };
-#endif /* CONF_NOEXTERN */
+#endif /* NOEXTERN_CONF */
 
-#ifndef CONF_NOEXTERN
+#ifndef NOEXTERN_CONF
 extern int CfEnd;
 #else
 int CfEnd = CF_END;
-#endif /* CONF_NOEXTERN */
+#endif /* NOEXTERN_CONF */
 
-#ifndef CONF_NOEXTERN
+#ifndef NOEXTERN_CONF
 extern int SysCfEnd;
 #else
 int SysCfEnd = SYSCF_END;
-#endif /* CONF_NOEXTERN */
+#endif /* NOEXTERN_CONF */
 
 #endif /* CONF_H */

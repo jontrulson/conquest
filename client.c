@@ -14,11 +14,12 @@
 #include "protocol.h"
 #include "packet.h"
 
-#define CLIENT_NOEXTERN
+#define NOEXTERN_CLIENT
 #include "client.h"
-#undef CLIENT_NOEXTERN
+#undef NOEXTERN_CLIENT
 
 #include "conqlb.h"
+#include "conqutil.h"
 #include "clientlb.h"
 #include "conqcom.h"
 #include "context.h"
@@ -49,13 +50,13 @@ int sendAuth(int sock, Unsgn8 flag, char *login, char *pw)
     strncpy((char *)cauth.pw, (char *)pw, MAXUSERNAME - 1);
 
 #if defined(DEBUG_CLIENTSEND)
-  clog("sendAuth: LOGIN = '%s' PW = '%s'\n",
+  utLog("sendAuth: LOGIN = '%s' PW = '%s'\n",
        login, pw);
 #endif
 
-  if ((rv = writePacket(PKT_TOSERVER, cInfo.sock, &cauth)) <= 0)
+  if ((rv = pktWrite(PKT_TOSERVER, cInfo.sock, &cauth)) <= 0)
     {
-      clog("sendAuth: writePacket returned %d\n", rv);
+      utLog("sendAuth: pktWrite returned %d\n", rv);
       return rv;
     }
 
@@ -64,12 +65,12 @@ int sendAuth(int sock, Unsgn8 flag, char *login, char *pw)
   if (flag == CPAUTH_CHGPWD)
     return PERR_OK;
 
-  rv = waitForPacket(PKT_FROMSERVER, sockl, SP_ACK, buf, PKT_MAXSIZE, 
+  rv = pktWaitForPacket(PKT_FROMSERVER, sockl, SP_ACK, buf, PKT_MAXSIZE, 
 		     60, NULL);
 
   if (rv <= 0)			/* error or timeout (0) */
     {
-      clog("sendAuth: waitForPacket = %d", rv);
+      utLog("sendAuth: pktWaitForPacket = %d", rv);
       return -1;
     }
 
@@ -90,7 +91,7 @@ int sendSetCourse(int sock, Sgn8 lock, real head)
   csc.lock = lock;
   csc.head = (Unsgn16)htons((Unsgn16)(head * 100.0));
 
-  if (writePacket(PKT_TOSERVER, sock, &csc) <= 0)
+  if (pktWrite(PKT_TOSERVER, sock, &csc) <= 0)
     return FALSE;
   else
     return TRUE;
@@ -102,20 +103,20 @@ int procUser(char *buf)
   int unum;
   spUser_t *suser = (spUser_t *)buf;
 
-  if (!validPkt(SP_USER, buf))
+  if (!pktIsValid(SP_USER, buf))
     return FALSE;
 
   unum = (int)((Unsgn16)ntohs(suser->unum));
 
 #if defined(DEBUG_CLIENTPROC)
-  clog("PROC USER: unum = %d", unum);
+  utLog("PROC USER: unum = %d", unum);
 #endif
 
   if (unum < 0 || unum >= MAXUSERS)
     return FALSE;
 
   if (Context.recmode == RECMODE_ON)
-    recordWriteEvent(buf);
+    recWriteEvent(buf);
 
   Users[unum].team = suser->team;
 
@@ -147,7 +148,7 @@ int procShip(char *buf)
   spShip_t *sship = (spShip_t *)buf;
   int snum;
 
-  if (!validPkt(SP_SHIP, buf))
+  if (!pktIsValid(SP_SHIP, buf))
     return FALSE;
 
   snum = sship->snum;
@@ -155,10 +156,10 @@ int procShip(char *buf)
     return FALSE;
 
 #if defined(DEBUG_CLIENTPROC)
-  clog("PROC SHIP: snum = %d", snum);
+  utLog("PROC SHIP: snum = %d", snum);
 #endif
   if (Context.recmode == RECMODE_ON)
-    recordWriteEvent(buf);
+    recWriteEvent(buf);
 
   Ships[snum].status = sship->status;
   Ships[snum].team = sship->team;
@@ -199,7 +200,7 @@ int procShipSml(char *buf)
   int snum;
   spShipSml_t *sshipsml = (spShipSml_t *)buf;
 
-  if (!validPkt(SP_SHIPSML, buf))
+  if (!pktIsValid(SP_SHIPSML, buf))
     return FALSE;
 
   snum = sshipsml->snum;
@@ -208,11 +209,11 @@ int procShipSml(char *buf)
     return FALSE;
 
 #if defined(DEBUG_CLIENTPROC)
-  clog("PROC SHIPSML: snum = %d", snum);
+  utLog("PROC SHIPSML: snum = %d", snum);
 #endif
 
   if (Context.recmode == RECMODE_ON)
-    recordWriteEvent(buf);
+    recWriteEvent(buf);
 
   /* we need to mask out map since it's always local */
   Ships[snum].flags = ((((Unsgn16)ntohs(sshipsml->flags)) & ~SHIP_F_MAP) | SMAP(snum));
@@ -246,7 +247,7 @@ int procShipLoc(char *buf)
   int snum;
   spShipLoc_t *sshiploc = (spShipLoc_t *)buf;
 
-  if (!validPkt(SP_SHIPLOC, buf))
+  if (!pktIsValid(SP_SHIPLOC, buf))
     return FALSE;
 
   snum = sshiploc->snum;
@@ -255,11 +256,11 @@ int procShipLoc(char *buf)
     return FALSE;
 
 #if defined(DEBUG_CLIENTPROC)
-  clog("PROC SHIPLOC: snum = %d", snum);
+  utLog("PROC SHIPLOC: snum = %d", snum);
 #endif
 
   if (Context.recmode == RECMODE_ON)
-    recordWriteEvent(buf);
+    recWriteEvent(buf);
 
   Ships[snum].head = (real)((real)ntohs(sshiploc->head) / 10.0);
   Ships[snum].warp = (real)((real)sshiploc->warp / 10.0);
@@ -275,7 +276,7 @@ int procPlanet(char *buf)
   spPlanet_t *splan = (spPlanet_t *)buf;
   int pnum;
 
-  if (!validPkt(SP_PLANET, buf))
+  if (!pktIsValid(SP_PLANET, buf))
     return FALSE;
 
   pnum = splan->pnum;
@@ -284,7 +285,7 @@ int procPlanet(char *buf)
     return FALSE;
 
   if (Context.recmode == RECMODE_ON)
-    recordWriteEvent(buf);
+    recWriteEvent(buf);
 
   Planets[pnum].type = splan->ptype;
   Planets[pnum].team = splan->team;
@@ -303,7 +304,7 @@ int procPlanetSml(char *buf)
   spPlanetSml_t *splansml = (spPlanetSml_t *)buf;
   int pnum;
 
-  if (!validPkt(SP_PLANETSML, buf))
+  if (!pktIsValid(SP_PLANETSML, buf))
     return FALSE;
   
   pnum = splansml->pnum;
@@ -312,7 +313,7 @@ int procPlanetSml(char *buf)
     return FALSE;
   
   if (Context.recmode == RECMODE_ON)
-    recordWriteEvent(buf);
+    recWriteEvent(buf);
 
   for (i=0; i<NUMPLAYERTEAMS; i++)
     if (splansml->scanned & (1 << i))  
@@ -323,7 +324,7 @@ int procPlanetSml(char *buf)
   Planets[pnum].uninhabtime = (int)splansml->uninhabtime;
 
 #if 0
-  clog("%s: %d scanned = %x", __FUNCTION__, pnum, splansml->scanned);
+  utLog("%s: %d scanned = %x", __FUNCTION__, pnum, splansml->scanned);
 #endif
 
   return TRUE;
@@ -334,7 +335,7 @@ int procPlanetLoc(char *buf)
   spPlanetLoc_t *splanloc = (spPlanetLoc_t *)buf;
   int pnum;
 
-  if (!validPkt(SP_PLANETLOC, buf))
+  if (!pktIsValid(SP_PLANETLOC, buf))
     return FALSE;
 
   pnum = splanloc->pnum;
@@ -343,7 +344,7 @@ int procPlanetLoc(char *buf)
     return FALSE;
 
   if (Context.recmode == RECMODE_ON)
-    recordWriteEvent(buf);
+    recWriteEvent(buf);
 
   Planets[pnum].armies = (int)((Sgn16)ntohs(splanloc->armies));
   Planets[pnum].x = (real)((real)((Sgn32)ntohl(splanloc->x)) / 1000.0);
@@ -357,7 +358,7 @@ int procPlanetLoc2(char *buf)
   spPlanetLoc2_t *splanloc2 = (spPlanetLoc2_t *)buf;
   int pnum;
 
-  if (!validPkt(SP_PLANETLOC2, buf))
+  if (!pktIsValid(SP_PLANETLOC2, buf))
     return FALSE;
 
   pnum = splanloc2->pnum;
@@ -366,7 +367,7 @@ int procPlanetLoc2(char *buf)
     return FALSE;
 
   if (Context.recmode == RECMODE_ON)
-    recordWriteEvent(buf);
+    recWriteEvent(buf);
 
   Planets[pnum].armies = (int)((Sgn16)ntohs(splanloc2->armies));
   Planets[pnum].x = (real)((real)((Sgn32)ntohl(splanloc2->x)) / 1000.0);
@@ -382,7 +383,7 @@ int procPlanetInfo(char *buf)
   int pnum;
   int primary;
 
-  if (!validPkt(SP_PLANETINFO, buf))
+  if (!pktIsValid(SP_PLANETINFO, buf))
     return FALSE;
 
   pnum = splaninfo->pnum;
@@ -398,7 +399,7 @@ int procPlanetInfo(char *buf)
 
   /* we will record them if we get them */
   if (Context.recmode == RECMODE_ON)
-    recordWriteEvent(buf);
+    recWriteEvent(buf);
 
   /* in protocol 6, we 'forgot' planet realness.  To avoid breaking
      protocol again, and allow unpatched clients and/or servers to
@@ -427,7 +428,7 @@ int procTorp(char *buf)
   int snum, tnum;
   spTorp_t *storp = (spTorp_t *)buf;
 
-  if (!validPkt(SP_TORP, buf))
+  if (!pktIsValid(SP_TORP, buf))
     return FALSE;
 
   snum = storp->snum;
@@ -440,7 +441,7 @@ int procTorp(char *buf)
     return FALSE;
 
   if (Context.recmode == RECMODE_ON)
-    recordWriteEvent(buf);
+    recWriteEvent(buf);
 
   Ships[snum].torps[tnum].status = (int)storp->status;
 
@@ -452,7 +453,7 @@ int procTorpLoc(char *buf)
   int snum, tnum, i;
   spTorpLoc_t *storploc = (spTorpLoc_t *)buf;
 
-  if (!validPkt(SP_TORPLOC, buf))
+  if (!pktIsValid(SP_TORPLOC, buf))
     return FALSE;
 
   snum = storploc->snum;
@@ -465,7 +466,7 @@ int procTorpLoc(char *buf)
     return FALSE;
 
   if (Context.recmode == RECMODE_ON)
-    recordWriteEvent(buf);
+    recWriteEvent(buf);
 
   for (i=0; i<NUMPLAYERTEAMS; i++)
     if (storploc->war & (1 << i))
@@ -485,7 +486,7 @@ int procTorpEvent(char *buf)
   int snum, tnum, i;
   spTorpEvent_t *storpev = (spTorpEvent_t *)buf;
 
-  if (!validPkt(SP_TORPEVENT, buf))
+  if (!pktIsValid(SP_TORPEVENT, buf))
     return FALSE;
 
   snum = storpev->snum;
@@ -500,7 +501,7 @@ int procTorpEvent(char *buf)
   Ships[snum].torps[tnum].status = (int)storpev->status;
 
   if (Context.recmode == RECMODE_ON)
-    recordWriteEvent(buf);
+    recWriteEvent(buf);
 
   for (i=0; i<NUMPLAYERTEAMS; i++)
     if (storpev->war & (1 << i))
@@ -528,7 +529,7 @@ int procMessage(char *buf)
 {
   spMessage_t *smsg = (spMessage_t *)buf;
   
-  if (!validPkt(SP_MESSAGE, buf))
+  if (!pktIsValid(SP_MESSAGE, buf))
     return FALSE;
 
   smsg->msg[MESSAGE_SIZE - 1] = 0;
@@ -547,7 +548,7 @@ int procMessage(char *buf)
 
   /* don't record feedbacks */
   if ((Context.recmode == RECMODE_ON) && !(smsg->flags & MSG_FLAGS_FEEDBACK) )
-    recordWriteEvent(buf);
+    recWriteEvent(buf);
 
   if (smsg->flags & MSG_FLAGS_FEEDBACK)
     clntDisplayFeedback((char *)smsg->msg);
@@ -562,7 +563,7 @@ int procTeam(char *buf)
   int team, i;
   spTeam_t *steam = (spTeam_t *)buf;
 
-  if (!validPkt(SP_TEAM, buf))
+  if (!pktIsValid(SP_TEAM, buf))
     return FALSE;
 
   team = steam->team;
@@ -571,7 +572,7 @@ int procTeam(char *buf)
     return FALSE;
 
   if (Context.recmode == RECMODE_ON)
-    recordWriteEvent(buf);
+    recWriteEvent(buf);
 
   Teams[team].homesun = steam->homesun;
 
@@ -599,7 +600,7 @@ int procServerStat(char *buf)
 {
   spServerStat_t *sstat = (spServerStat_t *)buf;
 
-  if (!validPkt(SP_SERVERSTAT, buf))
+  if (!pktIsValid(SP_SERVERSTAT, buf))
     return FALSE;
 
   sStat = *sstat;               /* client.h - clients keep a copy. */
@@ -616,7 +617,7 @@ int procConqInfo(char *buf)
 {
   spConqInfo_t *spci = (spConqInfo_t *)buf;
 
-  if (!validPkt(SP_CONQINFO, buf))
+  if (!pktIsValid(SP_CONQINFO, buf))
     return FALSE;
 
   strncpy(ConqInfo->conqueror, (char *)spci->conqueror, MAXUSERPNAME);
@@ -636,7 +637,7 @@ int procHistory(char *buf)
   spHistory_t *hist = (spHistory_t *)buf;
   int hnum;
 
-  if (!validPkt(SP_HISTORY, buf))
+  if (!pktIsValid(SP_HISTORY, buf))
     return FALSE;
 
   hnum = hist->hnum;
@@ -654,11 +655,11 @@ int procDoomsday(char *buf)
 { 
   spDoomsday_t *dd = (spDoomsday_t *)buf;
 
-  if (!validPkt(SP_DOOMSDAY, buf))
+  if (!pktIsValid(SP_DOOMSDAY, buf))
     return FALSE;
 
   if (Context.recmode == RECMODE_ON)
-    recordWriteEvent(buf);
+    recWriteEvent(buf);
 
   Doomsday->status = dd->status;
   Doomsday->heading =(real)((real)ntohs(dd->heading) / 10.0);
@@ -680,7 +681,7 @@ int sendSetName(char *name)
   sname.type = CP_SETNAME;
   strncpy((char *)sname.alias, name, MAXUSERPNAME - 1);
 
-  if (writePacket(PKT_TOSERVER, cInfo.sock, &sname) <= 0)
+  if (pktWrite(PKT_TOSERVER, cInfo.sock, &sname) <= 0)
     return FALSE;
   else 
     return TRUE;
@@ -697,13 +698,13 @@ int sendCommand(Unsgn8 cmd, Unsgn16 detail)
 
   if (cmd == CPCMD_KEEPALIVE && cInfo.usock != -1)
     {
-      writePacket(PKT_TOSERVER, cInfo.usock, &ccmd);
+      pktWrite(PKT_TOSERVER, cInfo.usock, &ccmd);
       return TRUE;
     }
   else
     {
 
-      if (writePacket(PKT_TOSERVER, cInfo.sock, &ccmd) <= 0)
+      if (pktWrite(PKT_TOSERVER, cInfo.sock, &ccmd) <= 0)
         return FALSE;
       else 
         return TRUE;
@@ -720,7 +721,7 @@ int sendFireTorps(int num, real dir)
   ftorps.num = (Unsgn8)num;
   ftorps.dir = htons((Unsgn16)(dir * 100.0));
 
-  if (writePacket(PKT_TOSERVER, cInfo.sock, &ftorps) <= 0)
+  if (pktWrite(PKT_TOSERVER, cInfo.sock, &ftorps) <= 0)
     return FALSE;
   else 
     return TRUE;
@@ -740,7 +741,7 @@ int sendMessage(int to, char *msg)
   cmsg.to = (Sgn16)htons(to);
   strncpy((char *)cmsg.msg, msg, MESSAGE_SIZE - 1);
 
-  if (writePacket(PKT_TOSERVER, cInfo.sock, &cmsg) <= 0)
+  if (pktWrite(PKT_TOSERVER, cInfo.sock, &cmsg) <= 0)
     return FALSE;
   else 
     return TRUE;
@@ -759,16 +760,16 @@ int clientHello(char *clientname)
   int sockl[2] = {cInfo.sock, cInfo.usock};
 
   /* there should be a server hello waiting for us */
-  if ((pkttype = readPacket(PKT_FROMSERVER, sockl, 
+  if ((pkttype = pktRead(PKT_FROMSERVER, sockl, 
 			    buf, PKT_MAXSIZE, 60)) < 0)
   {
-    clog("clientHello: read server hello failed\n");
+    utLog("clientHello: read server hello failed\n");
     return FALSE;
   }
 
   if (pkttype == 0)
   {
-    clog("clientHello: read server hello: timeout.\n");
+    utLog("clientHello: read server hello: timeout.\n");
     return FALSE;
   }
 
@@ -780,8 +781,8 @@ int clientHello(char *clientname)
           sackmsg = (spAckMsg_t *)buf;
           if (sackmsg->txt)
             {
-              clog("clientHello: %s '%s'",
-                   psev2String(sackmsg->severity),
+              utLog("clientHello: %s '%s'",
+                   pktSeverity2String(sackmsg->severity),
                    sackmsg->txt);
             }
         }
@@ -790,7 +791,7 @@ int clientHello(char *clientname)
 
   if (pkttype != SP_HELLO)
   {
-    clog("clientHello: read server hello: wrong packet type %d\n", pkttype);
+    utLog("clientHello: read server hello: wrong packet type %d\n", pkttype);
     return FALSE;
   }
 
@@ -804,7 +805,7 @@ int clientHello(char *clientname)
   sHello.serverver[CONF_SERVER_NAME_SZ - 1] = 0;
   sHello.motd[CONF_SERVER_MOTD_SZ - 1] = 0;
 
-  clog("SERVERID:%s:%s:0x%04hx:%d:0x%02x:%s",
+  utLog("SERVERID:%s:%s:0x%04hx:%d:0x%02x:%s",
        sHello.servername,
        sHello.serverver,
        sHello.protover,
@@ -817,14 +818,14 @@ int clientHello(char *clientname)
       if (connect(cInfo.usock, (const struct sockaddr *)&cInfo.servaddr, 
                   sizeof(cInfo.servaddr)) < 0)
         {
-          clog("NET: clientHello: udp connect() failed: %s", strerror(errno));
+          utLog("NET: clientHello: udp connect() failed: %s", strerror(errno));
           cInfo.tryUDP = FALSE;
         }
       else
         {
           /* see if this will succeed in setting up a NAT tunnel
              to the server */
-          clog("NET: clientHello: send udp to server.");
+          utLog("NET: clientHello: send udp to server.");
           write(cInfo.usock, "Open Me", 7);
         }
     }
@@ -842,13 +843,13 @@ int clientHello(char *clientname)
   strncat((char *)chello.clientver, ConquestDate, 
 	  (CONF_SERVER_NAME_SZ - strlen(ConquestVersion)) - 2);
 
-  if (!writePacket(PKT_TOSERVER, cInfo.sock, &chello))
+  if (!pktWrite(PKT_TOSERVER, cInfo.sock, &chello))
     {
-      clog("clientHello: write client hello failed\n");
+      utLog("clientHello: write client hello failed\n");
       return FALSE;
     }
 
-  clog("clientHello: sent hello to server");
+  utLog("clientHello: sent hello to server");
 
   if (cInfo.tryUDP)
     {
@@ -862,7 +863,7 @@ int clientHello(char *clientname)
       FD_SET(cInfo.usock, &readfds);
       if ((rv = select(cInfo.usock+1, &readfds, NULL, NULL, &tv)) <= 0)
         {
-          clog("CLIENT: hello: select udp failed: %s", strerror(errno));
+          utLog("CLIENT: hello: select udp failed: %s", strerror(errno));
           cInfo.tryUDP = FALSE;
         }
       else
@@ -871,7 +872,7 @@ int clientHello(char *clientname)
             {
               if ((rv = udpRecv(cInfo.usock, buf, PKT_MAXSIZE, &cInfo.servaddr)) >= 0 )
                 {
-                  clog("NET: got (%d) UDP bytes from server, will ACK for server UDP", rv);
+                  utLog("NET: got (%d) UDP bytes from server, will ACK for server UDP", rv);
                   cInfo.doUDP = TRUE;
                 }
             }
@@ -879,10 +880,10 @@ int clientHello(char *clientname)
     }
   /* now we need a server stat or a Nak */
 
-  if ((pkttype = readPacket(PKT_FROMSERVER, sockl, 
+  if ((pkttype = pktRead(PKT_FROMSERVER, sockl, 
 			    buf, PKT_MAXSIZE, 60)) < 0)
   {
-    clog("clientHello: read of SP_ACK or SP_SERVERSTAT failed\n");
+    utLog("clientHello: read of SP_ACK or SP_SERVERSTAT failed\n");
     return FALSE;
   }
 
@@ -893,11 +894,11 @@ int clientHello(char *clientname)
 	  sackmsg = (spAckMsg_t *)buf;
 	  if (sackmsg->txt)
 	    {
-	      clog("clientHello: %s '%s'\n", 
-		   psev2String(sackmsg->severity), 
+	      utLog("clientHello: %s '%s'\n", 
+		   pktSeverity2String(sackmsg->severity), 
 		   sackmsg->txt);
 	      printf("clientHello: %s '%s'\n", 
-		   psev2String(sackmsg->severity), 
+		   pktSeverity2String(sackmsg->severity), 
 		   sackmsg->txt);
 
 	    }
@@ -909,7 +910,7 @@ int clientHello(char *clientname)
     {
       procServerStat(buf);
 # if defined(DEBUG_CLIENTPROC)
-      clog("clientHello: recv SP_SERVERSTAT: ships = %d, na = %d, nv = %d, nr = %d\n"
+      utLog("clientHello: recv SP_SERVERSTAT: ships = %d, na = %d, nv = %d, nr = %d\n"
            " nu = %d flags = 0x%08x",
 	   sStat.numtotal,
 	   sStat.numactive,
@@ -921,14 +922,14 @@ int clientHello(char *clientname)
     }
   else
     {
-      clog("clientHello: pkttype = %d, was waiting for SP_SERVERSTAT", pkttype);
+      utLog("clientHello: pkttype = %d, was waiting for SP_SERVERSTAT", pkttype);
       return FALSE;
     }
 
   if (cInfo.doUDP)
-    sendAck(cInfo.sock, PKT_TOSERVER, PSEV_INFO, PERR_DOUDP, NULL);
+    pktSendAck(cInfo.sock, PKT_TOSERVER, PSEV_INFO, PERR_DOUDP, NULL);
   else
-    sendAck(cInfo.sock, PKT_TOSERVER, PSEV_INFO, PERR_OK, NULL);
+    pktSendAck(cInfo.sock, PKT_TOSERVER, PSEV_INFO, PERR_OK, NULL);
 
   return TRUE;
 }
@@ -1035,16 +1036,16 @@ void processPacket(char *buf)
       frame->time = (Unsgn32)ntohl(frame->time);
       frame->frame = (Unsgn32)ntohl(frame->frame);
 
-      if (startTime == (time_t)0)
-        startTime = (time_t)frame->time;
-      currTime = (time_t)frame->time;
+      if (recStartTime == (time_t)0)
+        recStartTime = (time_t)frame->time;
+      recCurrentTime = (time_t)frame->time;
 
-      frameCount = (Unsgn32)frame->frame;
+      recFrameCount = (Unsgn32)frame->frame;
 
       break;
 
     default:
-      clog("conquest:processPacket: got unexpected packet type %d",
+      utLog("conquest:processPacket: got unexpected packet type %d",
 	   pkttype);
       break;
     }
@@ -1076,7 +1077,7 @@ void sendUDPKeepAlive(Unsgn32 timebase)
   if (((iternow - katime) > kawait) && cInfo.usock != -1)
     {
 #if 0
-      clog("%s: Sending CPCMD_KEEPALIVE\n", __FUNCTION__);
+      utLog("%s: Sending CPCMD_KEEPALIVE\n", __FUNCTION__);
 #endif
       sendCommand(CPCMD_KEEPALIVE, 0);
       katime = iternow;
@@ -1102,7 +1103,7 @@ spClientStat_t *chkClientStat(char *buf)
   if (scstat.unum >= MAXUSERS)
     {
 #if defined(DEBUG_PKT)
-      clog("%s: unum not in valid range", __FUNCTION__);
+      utLog("%s: unum not in valid range", __FUNCTION__);
 #endif
       return NULL;
     }
@@ -1110,7 +1111,7 @@ spClientStat_t *chkClientStat(char *buf)
   if (scstat.snum < 1 || scstat.snum > MAXSHIPS)
     {
 #if defined(DEBUG_PKT)
-      clog("%s: snum not in valid range", __FUNCTION__);
+      utLog("%s: snum not in valid range", __FUNCTION__);
 #endif
       return NULL;
     }
@@ -1118,7 +1119,7 @@ spClientStat_t *chkClientStat(char *buf)
   if (scstat.team >= NUMALLTEAMS)
     {
 #if defined(DEBUG_PKT)
-      clog("%s: team not in valid range", __FUNCTION__);
+      utLog("%s: team not in valid range", __FUNCTION__);
 #endif
       return NULL;
     }

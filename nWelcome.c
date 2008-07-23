@@ -18,6 +18,7 @@
 #include "nMenu.h"
 #include "gldisplay.h"
 #include "node.h"
+#include "conqutil.h"
 
 #define S_DONE         0        /* nothing to display */
 #define S_GREETINGS    1        /* GREETINGS - new user */
@@ -92,9 +93,9 @@ void nWelcomeInit(void)
   while (!done)
     {
       if ((pkttype = 
-           readPacket(PKT_FROMSERVER, sockl, buf, PKT_MAXSIZE, 60)) <= 0)
+           pktRead(PKT_FROMSERVER, sockl, buf, PKT_MAXSIZE, 60)) <= 0)
         {
-          clog("nWelcomeInit: read SP_CLIENTSTAT or SP_ACK failed: %d",
+          utLog("nWelcomeInit: read SP_CLIENTSTAT or SP_ACK failed: %d",
                pkttype);
           fatal = TRUE;
           done = TRUE;
@@ -113,7 +114,7 @@ void nWelcomeInit(void)
             }
           else
             {
-              clog("nWelcomeInit: invalid CLIENTSTAT");
+              utLog("nWelcomeInit: invalid CLIENTSTAT");
               fatal = TRUE;
               done = TRUE;
               return;
@@ -127,7 +128,7 @@ void nWelcomeInit(void)
           
           break;
         default:
-          clog("nWelcomeInit: got unexpected packet type %d. Ignoring.", 
+          utLog("nWelcomeInit: got unexpected packet type %d. Ignoring.", 
                pkttype);
           done = FALSE;
           
@@ -239,7 +240,7 @@ static int nWelcomeDisplay(dspConfig_t *dsp)
           break;
 
         default:
-          clog("nWelcomeDisplay: unexpected ACK code %d\n", sack.code);
+          utLog("nWelcomeDisplay: unexpected ACK code %d\n", sack.code);
           break;
         }
 
@@ -247,10 +248,10 @@ static int nWelcomeDisplay(dspConfig_t *dsp)
       break;
 
     case S_DONE:
-      if (waitForPacket(PKT_FROMSERVER, sockl, SP_USER, buf, PKT_MAXSIZE,
+      if (pktWaitForPacket(PKT_FROMSERVER, sockl, SP_USER, buf, PKT_MAXSIZE,
                         60, NULL) <= 0)
         {
-          clog("nWelcomeDisplay: waitforpacket SP_USER returned error");
+          utLog("nWelcomeDisplay: waitforpacket SP_USER returned error");
           return NODE_EXIT;
         }
       else
@@ -261,7 +262,7 @@ static int nWelcomeDisplay(dspConfig_t *dsp)
       break;
 
     default:
-      clog("nWelcomeDisplay: unknown state %d", state);
+      utLog("nWelcomeDisplay: unknown state %d", state);
       return NODE_EXIT;
       break;
     }

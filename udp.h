@@ -20,8 +20,8 @@
 int udpOpen(int port, struct sockaddr_in* addr);
 int udpClose(int fd);
 int udpSend(int fd, const void* buffer,
-                   int bufferLength, const struct sockaddr_in*);
+            int bufferLength, const struct sockaddr_in*);
 int udpRecv(int fd, void* buffer,
-                   int bufferLength, struct sockaddr_in*);
+            int bufferLength, struct sockaddr_in*);
 
 #endif /* _UDP_H */

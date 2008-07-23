@@ -316,14 +316,14 @@
 #define THING_EXPLOSION -1 	/* a torpedo explosion */
 #define THING_DEATHSTAR -2 	/* the Empire's new toy */
 
-/* Return values for special(). */
+/* Return values for utIsSpecial(). */
 #define NEAR_SHIP 1 
 #define NEAR_PLANET 2 
 #define NEAR_NONE 3 
 #define NEAR_DIRECTION 4 
 #define NEAR_ERROR 5 
 
-/* Tokens for special() and clbFindSpecial() */
+/* Tokens for utIsSpecial() and clbFindSpecial() */
 #define SPECIAL_NOTSPECIAL 1 
 #define SPECIAL_ENEMYSHIP 2 
 #define SPECIAL_FUELPLANET 3 
@@ -622,11 +622,6 @@
 #define weaeff(x) (real)(((Ships[x].weapalloc+50.0)/100.0) * \
 			 ShipTypes[Ships[x].shiptype].weafac * \
 			 (((Ships[x].kills+Ships[x].strkills)+DOUBLE_E_KILLS)/DOUBLE_E_KILLS))
-
-/* some help with da bits */
-#define bitIsSet(x, b) ((x) & (b))
-#define bitSet(x, b)   ((x) |= (b))
-#define bitClear(x, b) ((x) &= ~(b))
 
 /* clamp */
 #undef CLAMP

@@ -20,6 +20,7 @@
 #include "context.h"
 #include "record.h"
 #include "disputil.h"
+#include "conqutil.h"
 
 
 /* put a recieved message into the clinet's copy of the message buffer
@@ -31,7 +32,7 @@ void clntStoreMessage(spMessage_t *msg)
   if (!msg)
     return;
 
-  nlastmsg = modp1( ConqInfo->lastmsg + 1, MAXMESSAGES );
+  nlastmsg = utModPlusOne( ConqInfo->lastmsg + 1, MAXMESSAGES );
   strncpy(Msgs[nlastmsg].msgbuf, (char *)msg->msg, MESSAGE_SIZE);
   Msgs[nlastmsg].msgfrom = (int)((Sgn16)ntohs(msg->from));
   Msgs[nlastmsg].msgto = (int)((Sgn16)ntohs(msg->to));

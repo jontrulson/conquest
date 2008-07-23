@@ -19,6 +19,7 @@
 #include "prm.h"
 #include "conqcom.h"
 #include "conqlb.h"
+#include "conqutil.h"
 #include "nDead.h"
 #include "nMenu.h"
 #include "nPlay.h"
@@ -63,7 +64,7 @@ void nDeadInit(void)
   /* If something is wrong, don't do anything. */
   if ( snum < 1 || snum > MAXSHIPS )
     {
-      clog("nDead: nDeadInit: snum < 1 || snum > MAXSHIPS (%d)", snum);
+      utLog("nDead: nDeadInit: snum < 1 || snum > MAXSHIPS (%d)", snum);
       nMenuInit();
     }
   
@@ -153,7 +154,7 @@ static int nDeadDisplay(dspConfig_t *dsp)
       junk[0] = EOS;
       if ( kb > 0 && kb <= MAXSHIPS )
 	{
-	  appship( kb, cbuf );
+	  utAppendShip( kb, cbuf );
 	  if ( eShip.status != SS_LIVE )
 	    appstr( ", who also died.", buf );
 	  else
@@ -180,10 +181,10 @@ static int nDeadDisplay(dspConfig_t *dsp)
 	{
 	  /* We were unable to determine the cause of death. */
 	  buf[0] = EOS;
-	  appship( snum, buf );
+	  utAppendShip( snum, buf );
 	  sprintf(cbuf, "dead: %s was killed by %d.", buf, kb);
-	  cerror( cbuf );
-	  clog(cbuf);
+	  utError( cbuf );
+	  utLog(cbuf);
 	  
 	  cprintf(8,0,ALIGN_CENTER,"#%d#%s%s", 
                   RedLevelColor, ywkb, "nothing in particular.  (How strange...)");
@@ -208,9 +209,9 @@ static int nDeadDisplay(dspConfig_t *dsp)
 	  else
 	    {
 	      if ( i < 100 )
-			appnum( i, junk );
+			utAppendNumWord( i, junk );
 	      else
-			appint( i, junk );
+			utAppendInt( i, junk );
 	      strcpy( cbuf, "armies" );
 	    }
 	  if ( i == 1 )

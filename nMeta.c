@@ -23,6 +23,7 @@
 #include "gldisplay.h"
 #include "glmisc.h"
 #include "cqkeys.h"
+#include "conqutil.h"
 
 static char *header = "Server List";
 static char *header2fmt = "(Page %d of %d)";
@@ -155,23 +156,23 @@ void nMetaInit(void)
   int i;
 
   /* get the server list */
-  clog("nMetaInit: Querying metaserver at %s", cInfo.metaServer);
+  utLog("nMetaInit: Querying metaserver at %s", cInfo.metaServer);
   numMetaServers = metaGetServerList(cInfo.metaServer, 
                                      &metaServerList);
   
   if (numMetaServers < 0)
     {
-      clog("nMetaInit: metaGetServerList() failed");
+      utLog("nMetaInit: metaGetServerList() failed");
       return;
     }
   
   if (numMetaServers == 0)
     {
-      clog("nMetaInit: metaGetServerList() reported 0 servers online");
+      utLog("nMetaInit: metaGetServerList() reported 0 servers online");
       return;
     }
   
-  clog("nMetaInit: Found %d server(s)", numMetaServers);
+  utLog("nMetaInit: Found %d server(s)", numMetaServers);
 
   /* this is the number of required pages,        
      though page accesses start at 0 */
@@ -378,7 +379,7 @@ static int nMetaInput(int ch)
         {
           if ((cInfo.remotehost = strdup(metaServerList[i].altaddr)) == NULL)
             {
-              clog("strdup(metaServerList[i]) failed");
+              utLog("strdup(metaServerList[i]) failed");
               return NODE_EXIT;
             }
           cInfo.remoteport = metaServerList[i].port;

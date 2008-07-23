@@ -37,10 +37,10 @@ int pbProcessPackets(void)
   spMessage_t *smsg;
 
 #if defined(DEBUG_REC)
-  clog("conqreply: processPacket ENTER");
+  utLog("conqreply: processPacket ENTER");
 #endif
 
-  if ((pkttype = recordReadPkt(buf, PKT_MAXSIZE)) != SP_NULL)
+  if ((pkttype = recReadPkt(buf, PKT_MAXSIZE)) != SP_NULL)
     {
       switch(pkttype)
         {
@@ -104,11 +104,11 @@ int pbProcessPackets(void)
           frame->time = (Unsgn32)ntohl(frame->time);
           frame->frame = (Unsgn32)ntohl(frame->frame);
 
-          if (startTime == (time_t)0)
-            startTime = (time_t)frame->time;
-          currTime = (time_t)frame->time;
+          if (recStartTime == (time_t)0)
+            recStartTime = (time_t)frame->time;
+          recCurrentTime = (time_t)frame->time;
 
-          frameCount = (Unsgn32)frame->frame;
+          recFrameCount = (Unsgn32)frame->frame;
 
           break;
           
@@ -131,28 +131,28 @@ int pbProcessPackets(void)
 /* seek around in a game.  backwards seeks will be slooow... */
 void pbFileSeek(time_t newtime)
 {
-  if (newtime == currTime)
+  if (newtime == recCurrentTime)
     return;			/* simple case */
 
-  if (newtime < currTime)
+  if (newtime < recCurrentTime)
     {				/* backward */
       /* we have to reset everything and start from scratch. */
 
-      recordCloseInput();
+      recCloseInput();
 
-      if (!initReplay(rfname, NULL))
+      if (!recInitReplay(recFilename, NULL))
 	return;			/* bummer */
       
-      currTime = startTime;
+      recCurrentTime = recStartTime;
     }
 
   /* start searching */
 
-  /* just read packets until 1. currTime exceeds newtime, or 2. no
+  /* just read packets until 1. recCurrentTime exceeds newtime, or 2. no
      data is left */
   Context.display = FALSE; /* don't display things while looking */
   
-  while (currTime < newtime)
+  while (recCurrentTime < newtime)
     if ((pbProcessPackets() == SP_NULL))
       break;		/* no more data */
   
@@ -173,7 +173,7 @@ int pbProcessIter(void)
 }
 
 /* This function accepts a playback speed, checks the limits, and sets
- * the frameDelay appropriately.
+ * the recFrameDelay appropriately.
  */
 void pbSetPlaybackSpeed(int speed, int samplerate)
 {
@@ -198,14 +198,14 @@ void pbSetPlaybackSpeed(int speed, int samplerate)
   /* save the new speed */
   pbSpeed = speed;
 
-  /* now compute the new frameDelay */
+  /* now compute the new recFrameDelay */
   
   if (pbSpeed == PB_SPEED_INFINITE)
-    frameDelay = 0.0;
+    recFrameDelay = 0.0;
   else if (pbSpeed > 0)
-    frameDelay = (1.0 / (real)samplerate) / (real)pbSpeed;
+    recFrameDelay = (1.0 / (real)samplerate) / (real)pbSpeed;
   else if (pbSpeed < 0)
-    frameDelay = -(real)pbSpeed * (1.0 / (real)samplerate);
+    recFrameDelay = -(real)pbSpeed * (1.0 / (real)samplerate);
 
   return;
 }

@@ -19,6 +19,7 @@
 #include "nAuth.h"
 #include "udp.h"
 #include "glmisc.h"
+#include "conqutil.h"
 
 
 #define CLIENTNAME "ConquestGL"
@@ -105,13 +106,13 @@ static int nConsvrIdle(void)
   /* should not happen - debugging */
   if (!cInfo.serverDead)
     {
-      clog("ALREADY CONNECTED! I AM READY TO TRANSFER TO AUTH NODE!!!");      
+      utLog("nConsvrIdle: Already connected.  Ready to transfer to Auth node.");
       return NODE_OK;
     }
 
   if ((hp = gethostbyname(rhost)) == NULL) 
     {
-      clog("conquest: %s: no such host\n", rhost);
+      utLog("conquest: %s: no such host\n", rhost);
 
       snprintf(errbuf1, sizeof(errbuf1) - 1, "%s: no such host", 
               rhost);
@@ -128,7 +129,7 @@ static int nConsvrIdle(void)
 
   if ((s = socket(AF_INET, SOCK_STREAM, 0 )) < 0) 
     {
-      clog("socket: %s", strerror(errno));
+      utLog("socket: %s", strerror(errno));
       snprintf(errbuf1, sizeof(errbuf1) - 1, "socket: %s", rhost);
       err = TRUE;
 
@@ -137,21 +138,21 @@ static int nConsvrIdle(void)
 
   if (cInfo.tryUDP)
     {
-      clog("NET: Opening UDP...");
+      utLog("NET: Opening UDP...");
       if ((cInfo.usock = udpOpen(0, &cInfo.servaddr)) < 0) 
         {
-          clog("NET: udpOpen: %s", strerror(errno));
+          utLog("NET: udpOpen: %s", strerror(errno));
           cInfo.tryUDP = FALSE;
         }
     }
 
-  clog("Connecting to host: %s, port %d\n",
+  utLog("Connecting to host: %s, port %d\n",
        rhost, rport);
 
   /* connect to the remote server */
   if (connect(s, (const struct sockaddr *)&sa, sizeof(sa)) < 0) 
     {
-      clog("connect %s:%d: %s", 
+      utLog("connect %s:%d: %s", 
            rhost, rport, strerror(errno));
 
       snprintf(errbuf1, sizeof(errbuf1) - 1, "connect %s:%d: %s",
@@ -172,7 +173,7 @@ static int nConsvrIdle(void)
 
   if (!clientHello(CLIENTNAME))
     {
-      clog("conquestgl: hello() failed\n");
+      utLog("conquestgl: hello() failed\n");
       printf("conquestgl: hello() failed, check log\n");
 
       cInfo.serverDead = TRUE;

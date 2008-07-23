@@ -28,7 +28,8 @@
 #include "conqcom.h"
 #include "context.h"
 #include "conqlb.h"
-#define NOCDHEXTERN
+#include "conqutil.h"
+#define NOEXTERN_CONQDATA
 #include "conqdata.h"
 
 #include "conf.h"
@@ -606,7 +607,7 @@ void clbOrbit( int snum, int pnum )
   Ships[snum].dwarp = 0.0;
   
   /* Find bearing to planet. */
-  beer = angle( Ships[snum].x, Ships[snum].y, Planets[pnum].x, Planets[pnum].y );
+  beer = utAngle( Ships[snum].x, Ships[snum].y, Planets[pnum].x, Planets[pnum].y );
   if ( Ships[snum].head < ( beer - 180.0 ) )
     beer = beer - 360.0;
   
@@ -614,12 +615,12 @@ void clbOrbit( int snum, int pnum )
   if ( beer <= Ships[snum].head )
     {
       Ships[snum].warp = ORBIT_CW;
-      Ships[snum].head = mod360( beer + 90.0 );
+      Ships[snum].head = utMod360( beer + 90.0 );
     }
   else
     {
       Ships[snum].warp = ORBIT_CCW;
-      Ships[snum].head = mod360( beer - 90.0 );
+      Ships[snum].head = utMod360( beer - 90.0 );
     }
   
   return;
@@ -672,7 +673,7 @@ int clbPhaser( int snum, real dir )
 	  dis = dist( Ships[snum].x, Ships[snum].y, Ships[k].x, Ships[k].y );
 	  if ( dis <= PHASER_DIST )
 	    {
-	      ang = angle( Ships[snum].x, Ships[snum].y, Ships[k].x, Ships[k].y );
+	      ang = utAngle( Ships[snum].x, Ships[snum].y, Ships[k].x, Ships[k].y );
 	      if ( fabs( dir - ang ) <= PHASER_SPREAD )
 		{
 		  clbHit( k, clbPhaserHit( snum, dis ), snum );
@@ -745,8 +746,8 @@ int clbRegister( char *lname, char *rname, int team, int *unum )
 	  Users[i].ooptions[OOPT_SWITCHTEAMS] = FALSE;
 
 	Users[i].lastentry = 0;	/* never */
-	stcpn( lname, Users[i].username, MAXUSERNAME );
-	stcpn( rname, Users[i].alias, MAXUSERPNAME );
+	utStcpn( lname, Users[i].username, MAXUSERNAME );
+	utStcpn( rname, Users[i].alias, MAXUSERPNAME );
 	*unum = i;
 	return ( TRUE );
       }
@@ -786,7 +787,7 @@ void clbResign( int unum, int isoper )
   PVUNLOCK(&ConqInfo->lockword);
 
   if (isoper != TRUE)
-    clog("INFO: %s (%s) has resigned",
+    utLog("INFO: %s (%s) has resigned",
 	 usrname, usralias);
 	      
   return;
@@ -848,7 +849,7 @@ int clbTakePlanet( int pnum, int snum )
                   Teams[oteam].name);
                   
           clbStoreMsg(MSG_COMP, MSG_ALL, buf);
-          clog(buf);
+          utLog(buf);
         }
 
     }
@@ -856,7 +857,7 @@ int clbTakePlanet( int pnum, int snum )
 
   sprintf( buf, "All hail the liberating %s armies.  Thanks, ",
 	 Teams[Ships[snum].team].name );
-  appship( snum, buf );
+  utAppendShip( snum, buf );
   appchr( '!', buf );
   
   /* Check whether the universe has been conquered. */
@@ -869,14 +870,14 @@ int clbTakePlanet( int pnum, int snum )
 	  return rv;
 	}
   /* Yes! */
-  getdandt( ConqInfo->conqtime, 0 );
-  stcpn( Ships[snum].alias, ConqInfo->conqueror, MAXUSERPNAME );
+  utFormatTime( ConqInfo->conqtime, 0 );
+  utStcpn( Ships[snum].alias, ConqInfo->conqueror, MAXUSERPNAME );
   ConqInfo->lastwords[0] = EOS;
   Users[Ships[snum].unum].stats[USTAT_CONQUERS] += 1;
   Teams[Ships[snum].team].stats[TSTAT_CONQUERS] += 1;
-  stcpn( Teams[Ships[snum].team].name, ConqInfo->conqteam, MAXTEAMNAME );
+  utStcpn( Teams[Ships[snum].team].name, ConqInfo->conqteam, MAXTEAMNAME );
 
-  clog("INFO: %s (%s) has Conquered the Universe!",
+  utLog("INFO: %s (%s) has Conquered the Universe!",
        Users[Ships[snum].unum].username, 
        Ships[snum].alias);
   
@@ -957,7 +958,7 @@ void clbUserline( int unum, int snum, char *buf, int showgods, int showteam )
 	   ch,
 	   Users[unum].rating );
   
-  fmtminutes( ( Users[unum].stats[USTAT_SECONDS] + 30 ) / 60, timstr );
+  utFormatMinutes( ( Users[unum].stats[USTAT_SECONDS] + 30 ) / 60, timstr );
   
   sprintf( buf, "%s %5d %5d %5d %5d %9s",
 	 junk,
@@ -1039,7 +1040,7 @@ void clbStatline( int unum, char *buf )
     }      
   else
     {				/* format it properly */
-      getdandt(datestr, Users[unum].lastentry);
+      utFormatTime(datestr, Users[unum].lastentry);
     
       sprintf( junk, " %16.16s", datestr );
       j = 0;
@@ -1118,7 +1119,7 @@ int clbZeroPlanet( int pnum, int snum )
                       Teams[oteam].name);
               
               clbStoreMsg(MSG_COMP, MSG_ALL, buf);
-              clog(buf);
+              utLog(buf);
             }
         }
     }
@@ -1312,9 +1313,9 @@ void clbDoomFind(void)
       }
   
   if ( Doomsday->lock < 0 )
-    Doomsday->heading = angle( Doomsday->x, Doomsday->y, Planets[-Doomsday->lock].x, Planets[-Doomsday->lock].y );
+    Doomsday->heading = utAngle( Doomsday->x, Doomsday->y, Planets[-Doomsday->lock].x, Planets[-Doomsday->lock].y );
   else if ( Doomsday->lock > 0 )
-    Doomsday->heading = angle( Doomsday->x, Doomsday->y, Ships[Doomsday->lock].x, Ships[Doomsday->lock].y );
+    Doomsday->heading = utAngle( Doomsday->x, Doomsday->y, Ships[Doomsday->lock].x, Ships[Doomsday->lock].y );
   
   return;
   
@@ -1378,7 +1379,7 @@ int clbFindShip( int *snum )
         if (!checkPID(Ships[i].pid))
           {
             Ships[i].status = SS_OFF; /* no-one there, turn it off */
-            clog("INFO: clbFindShip(): turned off reserved ship %d\n",
+            utLog("INFO: clbFindShip(): turned off reserved ship %d\n",
                  i);
           }
 
@@ -1741,12 +1742,12 @@ void clbInitEverything(void)
   ConqInfo->rcpuseconds = 0;
   ConqInfo->raccum = 0;
   
-  stcpn( "never", ConqInfo->lastupchuck, DATESIZE );
-  getdandt( ConqInfo->inittime, 0 );
-  getdandt( ConqInfo->conqtime, 0 );
-  stcpn( "GOD", ConqInfo->conqueror, MAXUSERPNAME );
-  stcpn( "self ruled", ConqInfo->conqteam, MAXTEAMNAME );
-  stcpn( "Let there be light...", ConqInfo->lastwords, MAXLASTWORDS );
+  utStcpn( "never", ConqInfo->lastupchuck, DATESIZE );
+  utFormatTime( ConqInfo->inittime, 0 );
+  utFormatTime( ConqInfo->conqtime, 0 );
+  utStcpn( "GOD", ConqInfo->conqueror, MAXUSERPNAME );
+  utStcpn( "self ruled", ConqInfo->conqteam, MAXTEAMNAME );
+  utStcpn( "Let there be light...", ConqInfo->lastwords, MAXLASTWORDS );
   
   /* Un-twiddle the lockwords. */
   PVUNLOCK(&ConqInfo->lockword);
@@ -1781,7 +1782,7 @@ void clbInitGame(void)
   Doomsday->dy = 0.0;
   Doomsday->heading = 0.0;
   Doomsday->lock = 0;
-  stcpn( "Doomsday Machine", Doomsday->name, MAXUSERPNAME );
+  utStcpn( "Doomsday Machine", Doomsday->name, MAXUSERPNAME );
   
   /* Un-twiddle the lockword. */
   PVUNLOCK(&ConqInfo->lockword);
@@ -1828,7 +1829,7 @@ void clbInitRobots(void)
 #define SETROBOT(x, y, z) \
   { \
       if ( clbGetUserNum( &unum, x, UT_LOCAL ) ) \
-          stcpn( y, Users[unum].alias, MAXUSERPNAME ); \
+          utStcpn( y, Users[unum].alias, MAXUSERPNAME ); \
       else if ( clbRegister( x, y, z, &unum ) ) \
       { \
 	  Users[unum].robot = TRUE; \
@@ -1966,7 +1967,7 @@ void clbInitUniverse(void)
   PVUNLOCK(&ConqInfo->lockword);
   PVLOCK(&ConqInfo->lockword);
   
-  stcpn( "Scout", ShipTypes[ST_SCOUT].name, MAXSTNAME );
+  utStcpn( "Scout", ShipTypes[ST_SCOUT].name, MAXSTNAME );
   ShipTypes[ST_SCOUT].armylim = 7;
   ShipTypes[ST_SCOUT].warplim = 10.0;
   ShipTypes[ST_SCOUT].engfac = 1.2;
@@ -1974,7 +1975,7 @@ void clbInitUniverse(void)
   ShipTypes[ST_SCOUT].weafac = 0.83;
   ShipTypes[ST_SCOUT].torpwarp = 14.0;
 
-  stcpn( "Destroyer", ShipTypes[ST_DESTROYER].name, MAXSTNAME );
+  utStcpn( "Destroyer", ShipTypes[ST_DESTROYER].name, MAXSTNAME );
   ShipTypes[ST_DESTROYER].armylim = 9;
   ShipTypes[ST_DESTROYER].warplim = 9.0;
   ShipTypes[ST_DESTROYER].engfac = 1.0;
@@ -1982,7 +1983,7 @@ void clbInitUniverse(void)
   ShipTypes[ST_DESTROYER].weafac = 1.0;
   ShipTypes[ST_DESTROYER].torpwarp = 12.0;
 
-  stcpn( "Cruiser", ShipTypes[ST_CRUISER].name, MAXSTNAME );
+  utStcpn( "Cruiser", ShipTypes[ST_CRUISER].name, MAXSTNAME );
   ShipTypes[ST_CRUISER].armylim = 11;
   ShipTypes[ST_CRUISER].warplim = 8.0;
   ShipTypes[ST_CRUISER].engfac = 0.8;
@@ -1995,14 +1996,14 @@ void clbInitUniverse(void)
   Teams[TEAM_ROMULAN].shiptype = ST_CRUISER;
   Teams[TEAM_ORION].shiptype = ST_SCOUT;
   
-  stcpn( "Federation", Teams[TEAM_FEDERATION].name, MAXTEAMNAME );
-  stcpn( "Romulan", Teams[TEAM_ROMULAN].name, MAXTEAMNAME );
-  stcpn( "Klingon", Teams[TEAM_KLINGON].name, MAXTEAMNAME );
-  stcpn( "Orion", Teams[TEAM_ORION].name, MAXTEAMNAME );
-  stcpn( "self ruled", Teams[TEAM_SELFRULED].name, MAXTEAMNAME );
-  stcpn( "non", Teams[TEAM_NOTEAM].name, MAXTEAMNAME );
-  stcpn( "GOD", Teams[TEAM_GOD].name, MAXTEAMNAME );
-  stcpn( "Empire", Teams[TEAM_EMPIRE].name, MAXTEAMNAME );
+  utStcpn( "Federation", Teams[TEAM_FEDERATION].name, MAXTEAMNAME );
+  utStcpn( "Romulan", Teams[TEAM_ROMULAN].name, MAXTEAMNAME );
+  utStcpn( "Klingon", Teams[TEAM_KLINGON].name, MAXTEAMNAME );
+  utStcpn( "Orion", Teams[TEAM_ORION].name, MAXTEAMNAME );
+  utStcpn( "self ruled", Teams[TEAM_SELFRULED].name, MAXTEAMNAME );
+  utStcpn( "non", Teams[TEAM_NOTEAM].name, MAXTEAMNAME );
+  utStcpn( "GOD", Teams[TEAM_GOD].name, MAXTEAMNAME );
+  utStcpn( "Empire", Teams[TEAM_EMPIRE].name, MAXTEAMNAME );
   
   ConqInfo->chrplanets[PLANET_CLASSM] = 'M';
   ConqInfo->chrplanets[PLANET_DEAD] = 'D';
@@ -2013,14 +2014,14 @@ void clbInitUniverse(void)
   ConqInfo->chrplanets[PLANET_CLASSO] = 'O';
   ConqInfo->chrplanets[PLANET_CLASSZ] = 'Z';
 
-  stcpn( "class M planet", ConqInfo->ptname[PLANET_CLASSM], MAXPTYPENAME );
-  stcpn( "dead planet", ConqInfo->ptname[PLANET_DEAD], MAXPTYPENAME );
-  stcpn( "sun", ConqInfo->ptname[PLANET_SUN], MAXPTYPENAME );
-  stcpn( "moon", ConqInfo->ptname[PLANET_MOON], MAXPTYPENAME );
-  stcpn( "ghost planet", ConqInfo->ptname[PLANET_GHOST], MAXPTYPENAME );
-  stcpn( "class A planet", ConqInfo->ptname[PLANET_CLASSA], MAXPTYPENAME );
-  stcpn( "class O planet", ConqInfo->ptname[PLANET_CLASSO], MAXPTYPENAME );
-  stcpn( "class Z planet", ConqInfo->ptname[PLANET_CLASSZ], MAXPTYPENAME );
+  utStcpn( "class M planet", ConqInfo->ptname[PLANET_CLASSM], MAXPTYPENAME );
+  utStcpn( "dead planet", ConqInfo->ptname[PLANET_DEAD], MAXPTYPENAME );
+  utStcpn( "sun", ConqInfo->ptname[PLANET_SUN], MAXPTYPENAME );
+  utStcpn( "moon", ConqInfo->ptname[PLANET_MOON], MAXPTYPENAME );
+  utStcpn( "ghost planet", ConqInfo->ptname[PLANET_GHOST], MAXPTYPENAME );
+  utStcpn( "class A planet", ConqInfo->ptname[PLANET_CLASSA], MAXPTYPENAME );
+  utStcpn( "class O planet", ConqInfo->ptname[PLANET_CLASSO], MAXPTYPENAME );
+  utStcpn( "class Z planet", ConqInfo->ptname[PLANET_CLASSZ], MAXPTYPENAME );
   
   Teams[TEAM_FEDERATION].teamchar = 'F';
   Teams[TEAM_ROMULAN].teamchar = 'R';
@@ -2083,16 +2084,16 @@ void clbIntrude( int snum, int pnum )
 	  upper( Doomsday->name );
 	  appstr( atta, buf );
 	  appstr( armeq, buf );
-	  appint( Planets[pnum].armies, buf );
+	  utAppendInt( Planets[pnum].armies, buf );
 	  clbStoreMsgf( -pnum, -Planets[pnum].team, buf, MSG_FLAGS_INTRUDER );
 	}
       else if ( Ships[snum].war[Planets[pnum].team] )
 	{
 	  c_strcpy( "INTRUDER ALERT - ", buf );
-	  appship( snum, buf );
+	  utAppendShip( snum, buf );
 	  appstr( atta, buf );
 	  appstr( armeq, buf );
-	  appint( Planets[pnum].armies, buf );
+	  utAppendInt( Planets[pnum].armies, buf );
 	  clbStoreMsgf( -pnum, -Planets[pnum].team, buf, MSG_FLAGS_INTRUDER );
 	  defend( snum, pnum );
 	}
@@ -2112,7 +2113,7 @@ int clbLogHist( int unum )
   int hnum;
 
   PVLOCK(&ConqInfo->lockword);
-  ConqInfo->histptr = modp1( ConqInfo->histptr + 1, MAXHISTLOG );
+  ConqInfo->histptr = utModPlusOne( ConqInfo->histptr + 1, MAXHISTLOG );
 				/* time stamp for this entry */
   History[ConqInfo->histptr].histlog = getnow(NULL, 0 );	
   History[ConqInfo->histptr].elapsed = (time_t)0;
@@ -2175,7 +2176,7 @@ int clbPhoon( int pnum )
     return ( PHOON_NO );
   
   /* Things are cool, now calculate the phase. */
-  ph = (int) ( mod360( Planets[pnum].orbang - Planets[i].orbang - 45.0 ) / 90.0 );
+  ph = (int) ( utMod360( Planets[pnum].orbang - Planets[i].orbang - 45.0 ) / 90.0 );
   
   /* The number calculated is in the range 0 to 3, and works fine */
   /* if the moon is orbiting counter clockwise. If it is orbiting */
@@ -2206,14 +2207,14 @@ int clbPlanetMatch( char *str, int *pnum, int godlike )
   if ( godlike )
     {
       for ( *pnum = 1; *pnum <= NUMPLANETS; *pnum = *pnum + 1 )
-	if ( stmatch( str, Planets[*pnum].name, FALSE ) )
+	if ( utStringMatch( str, Planets[*pnum].name, FALSE ) )
 	  return ( TRUE );
     }
   else
     {
       for ( *pnum = 1; *pnum <= NUMPLANETS; *pnum = *pnum + 1 )
 	if ( Planets[*pnum].real )
-	  if ( stmatch( str, Planets[*pnum].name, FALSE ) )
+	  if ( utStringMatch( str, Planets[*pnum].name, FALSE ) )
 	    return ( TRUE );
     }
   
@@ -2256,7 +2257,7 @@ void clbPutShip( int snum, real basex, real basey )
   
   /* If we got here, we couldn't find a "good" position, */
   /*  so just report the error and let it slide. */
-  clog( "clbPutShip(): Failed retry maximum on ship %d", snum );
+  utLog( "clbPutShip(): Failed retry maximum on ship %d", snum );
   
   return;
   
@@ -2272,7 +2273,7 @@ int clbFmtMsg(int to, int from, char *buf)
 				/* Format who the message is from. */
   if ( from > 0 && from <= MAXSHIPS )
     {
-      appship( from, buf );
+      utAppendShip( from, buf );
     }
   else if ( -from > 0 && -from <= NUMPLANETS )
     c_strcpy( Planets[-from].name, buf );
@@ -2302,7 +2303,7 @@ int clbFmtMsg(int to, int from, char *buf)
   
   /* Format who the message is to. */
   if ( to > 0 && to <= MAXSHIPS )
-    appship( to, buf );
+    utAppendShip( to, buf );
   else if ( -to >= 0 && -to < NUMPLAYERTEAMS )
     {
       appchr( Teams[-to].teamchar, buf );
@@ -2485,8 +2486,8 @@ void clbStoreMsgf( int from, int to, char *msg, unsigned char flags )
       return;
 
   PVLOCK(&ConqInfo->lockmesg);
-  nlastmsg = modp1( ConqInfo->lastmsg + 1, MAXMESSAGES );
-  stcpn( msg, Msgs[nlastmsg].msgbuf, MESSAGE_SIZE );
+  nlastmsg = utModPlusOne( ConqInfo->lastmsg + 1, MAXMESSAGES );
+  utStcpn( msg, Msgs[nlastmsg].msgbuf, MESSAGE_SIZE );
   Msgs[nlastmsg].msgfrom = from;
   Msgs[nlastmsg].msgto = to;
   Msgs[nlastmsg].flags = flags;
@@ -2501,7 +2502,7 @@ void clbStoreMsgf( int from, int to, char *msg, unsigned char flags )
   if (SysConf.LogMessages == TRUE || to == MSG_GOD || from == MSG_GOD)
     {
       clbFmtMsg(to, from, buf);
-      clog("MSG: %s: %s",
+      utLog("MSG: %s: %s",
 	   buf, msg);
     }
 
@@ -2707,7 +2708,7 @@ char *clbGetUserLogname(void)
     {
       if ((pwd = getpwuid(geteuid())) == NULL)
 	{
-	  clog("ERROR: clbGetUserLogname(): getpwuid(geteuid()) failed: %s",
+	  utLog("ERROR: clbGetUserLogname(): getpwuid(geteuid()) failed: %s",
 	       strerror(errno));
 	  
 	  pwname[0] = 0;
@@ -2736,7 +2737,7 @@ void clbPlanetDrive(real itersec)
       if ( Planets[i].primary != 0 )
 	{
 
-	  Planets[i].orbang = mod360( Planets[i].orbang + 
+	  Planets[i].orbang = utMod360( Planets[i].orbang + 
                                       Planets[i].orbvel *
                                       itersec / 60.0 );
 

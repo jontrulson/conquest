@@ -30,10 +30,10 @@
 #include "c_defs.h"
 #include "conqstrat-yacc.h"
 
-#define NOEXTERN
 #include "conqdef.h"
 #include "conqcom.h"
 #include "context.h"
+#include "conqutil.h"
 
 #include "conqstrat.h"
 

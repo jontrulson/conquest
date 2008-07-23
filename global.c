@@ -17,7 +17,7 @@
 
 #include "c_defs.h"
 
-#define NOEXTERNGLOBALS
+#define NOEXTERN_GLOBALS
 #include "global.h"
 
 /* That's it! */

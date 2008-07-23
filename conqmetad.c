@@ -11,12 +11,13 @@
 
 #include "global.h"
 #include "conqcom.h"
-#define NOEXTERN
+#define NOEXTERN_CONTEXT
 #include "context.h"
-#undef NOEXTERN
+#undef NOEXTERN_CONTEXT
 #include "conqdef.h"
 #include "conqnet.h"
 #include "conf.h"
+#include "conqutil.h"
 
 #include "meta.h"
 
@@ -82,7 +83,7 @@ void ageServers(void)
       if (metaServerList[i].valid)
         if (abs(metaServerList[i].lasttime - now) > expireSeconds)
           {
-            clog("META: expiring %s:%u(%s)\n",
+            utLog("META: expiring %s:%u(%s)\n",
                  metaServerList[i].altaddr,
                  metaServerList[i].port,
                  metaServerList[i].addr);
@@ -168,11 +169,11 @@ void metaProcList(int sock, char *hostbuf)
   /* dump the sorted server list */
   for (i=0; i<nm; i++)
     {
-      srec2str(tbuf, &metaServerList[mvec[i]]);
+      metaServerRec2Buffer(tbuf, &metaServerList[mvec[i]]);
       write(sock, tbuf, strlen(tbuf));
     }
 
-  clog("META: server query from %s", hostbuf);
+  utLog("META: server query from %s", hostbuf);
 
   return;
 }
@@ -183,9 +184,9 @@ void metaProcUpd(char *buf, int rlen, char *hostbuf)
   int slot;
   int wasfound;
 
-  if (!str2srec(&sRec, buf))
+  if (!metaBuffer2ServerRec(&sRec, buf))
     {
-      clog("META: malformed buffer '%s', ignoring", buf);
+      utLog("META: malformed buffer '%s', ignoring", buf);
       return;
     }
 
@@ -199,7 +200,7 @@ void metaProcUpd(char *buf, int rlen, char *hostbuf)
   /* now find a slot for it. */
   if ((slot = findSlot(&sRec, &wasfound)) == -1)
     {
-      clog("META: findSlot couldn't find one, ignoring\n");
+      utLog("META: findSlot couldn't find one, ignoring\n");
       return;
     }
 
@@ -211,7 +212,7 @@ void metaProcUpd(char *buf, int rlen, char *hostbuf)
   metaServerList[slot] = sRec;
 
   if (!wasfound)                /* new server */
-    clog("META: Added server %s:%u(%s), slot %d",
+    utLog("META: Added server %s:%u(%s), slot %d",
          metaServerList[slot].altaddr,
          metaServerList[slot].port,
          metaServerList[slot].addr,
@@ -219,7 +220,7 @@ void metaProcUpd(char *buf, int rlen, char *hostbuf)
   else
     {
 #if defined(DEBUG_META)
-      clog("META: Updated server %s(%s)",
+      utLog("META: Updated server %s(%s)",
          metaServerList[slot].altaddr,
            metaServerList[slot].addr);
 #endif
@@ -297,7 +298,7 @@ void metaListen(void)
 
   alen = sizeof(struct sockaddr);
 
-  clog("NET: meta server listening on TCP and UDP port %d\n", listenPort);
+  utLog("NET: meta server listening on TCP and UDP port %d\n", listenPort);
   
   /* go into infinite loop waiting for new connections */
   while (TRUE) 
@@ -310,7 +311,7 @@ void metaListen(void)
 
       if ((rv = select(max(s,t)+1, &readfds, NULL, NULL, &tv)) < 0)
         {
-          clog("META: select failed: %s", strerror(errno));
+          utLog("META: select failed: %s", strerror(errno));
           exit(1);
         }
 
@@ -320,7 +321,7 @@ void metaListen(void)
           sockln = sizeof (isa);
           if ((tc = accept(t, (struct sockaddr *)&tisa, &sockln )) < 0) 
             {
-              clog("META: accept failed: %s", strerror(errno) );
+              utLog("META: accept failed: %s", strerror(errno) );
               continue;
             }
           
@@ -453,18 +454,18 @@ int main(int argc, char *argv[])
           exit(1);
         }        
       else
-        clog("INFO: META running as user '%s', uid %d.", myuidname, myuid); 
+        utLog("INFO: META running as user '%s', uid %d.", myuidname, myuid); 
     }
 
   
 #ifdef DEBUG_CONFIG
-  clog("%s@%d: main() Reading Configuration files.", __FILE__, __LINE__);
+  utLog("%s@%d: main() Reading Configuration files.", __FILE__, __LINE__);
 #endif
   
   if (GetSysConf(FALSE) == ERR)
     {
 #ifdef DEBUG_CONFIG
-      clog("%s@%d: main(): GetSysConf() returned ERR.", __FILE__, __LINE__);
+      utLog("%s@%d: main(): GetSysConf() returned ERR.", __FILE__, __LINE__);
 #endif
     }
 
@@ -472,7 +473,7 @@ int main(int argc, char *argv[])
   if (dodaemon)
     {
       int cpid;
-      clog("INFO: becoming daemon");
+      utLog("INFO: becoming daemon");
       chdir("/");
 
       cpid = fork();
@@ -542,6 +543,6 @@ void catchSignals(void)
 
 void handleSignal(int sig)
 {
-  clog("META: exiting on signal %d", sig);
+  utLog("META: exiting on signal %d", sig);
   exit(0);
 }

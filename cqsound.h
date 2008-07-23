@@ -22,19 +22,19 @@ typedef struct _cqs_channel {
 } cqsChannelRec_t, *cqsChannelPtr_t;
 
 typedef struct _cqs_sound {
-  Unsgn32 cqiIndex;             /* index to cqi sound entry */
-  void *chunk;                  /* ptr to mix/music chunk */
-  int vol;                      /* SDL volume */
-  int pan;                      /* SDL pan */
-  Unsgn32 lasttime;             /* last time this sample was played */
-  int fadeinms;                 /* copies of cqi data */
-  int fadeoutms;
-  int loops;
-  int limit;
-  Unsgn32 framelimit;
-  Unsgn32 lastframe;
-  Unsgn32 framecount;
-  Unsgn32 delayms;
+  Unsgn32  cqiIndex;            /* index to cqi sound entry */
+  void    *chunk;               /* ptr to mix/music chunk */
+  int      vol;                 /* SDL volume */
+  int      pan;                 /* SDL pan */
+  Unsgn32  lasttime;            /* last time this sample was played */
+  int      fadeinms;            /* copies of cqi data */
+  int      fadeoutms;
+  int      loops;
+  int      limit;
+  Unsgn32  framelimit;
+  Unsgn32  lastframe;
+  Unsgn32  framecount;
+  Unsgn32  delayms;
 } cqsSoundRec_t, *cqsSoundPtr_t;
 
 typedef Unsgn32 cqsHandle;      /* sound handle used for some
@@ -84,26 +84,26 @@ typedef struct _doom_mus {
 #define CQS_DISABLE(x)          (cqsSoundEnables &= ~(x))
 #define CQS_SOUND_DISABLED()    (!cqsSoundAvailable || ((cqsSoundEnables & CQS_ENABLE_MASK) == 0))
 
-#ifdef _CQSOUND_NOEXTERN
-Unsgn32 cqsSoundEnables  = 0;
-int cqsSoundAvailable    = FALSE;
-cqsSoundPtr_t cqsMusic   = NULL;
-cqsSoundPtr_t cqsEffects = NULL;
-int cqsNumMusic = 0;
-int cqsNumEffects = 0;
-teamFX_t teamEffects[NUMPLAYERTEAMS] = {};
-teamMus_t teamMusic[NUMPLAYERTEAMS] = {};
-doomMus_t doomMusic = {};
+#ifdef NOEXTERN_CQSOUND
+Unsgn32              cqsSoundEnables  = 0;
+int                  cqsSoundAvailable    = FALSE;
+cqsSoundPtr_t        cqsMusic   = NULL;
+cqsSoundPtr_t        cqsEffects = NULL;
+int                  cqsNumMusic = 0;
+int                  cqsNumEffects = 0;
+teamFX_t             cqsTeamEffects[NUMPLAYERTEAMS] = {};
+teamMus_t            cqsTeamMusic[NUMPLAYERTEAMS] = {};
+doomMus_t            cqsDoomsdayMusic = {};
 #else
-extern Unsgn32 cqsSoundEnables;
-extern int cqsSoundAvailable;
+extern Unsgn32       cqsSoundEnables;
+extern int           cqsSoundAvailable;
 extern cqsSoundPtr_t cqsMusic;
 extern cqsSoundPtr_t cqsEffects;
-extern int cqsNumMusic;
-extern int cqsNumEffects;
-extern teamFX_t teamEffects[NUMPLAYERTEAMS];
-extern teamMus_t teamMusic[NUMPLAYERTEAMS];
-extern doomMus_t doomMusic;
+extern int           cqsNumMusic;
+extern int           cqsNumEffects;
+extern teamFX_t      cqsTeamEffects[NUMPLAYERTEAMS];
+extern teamMus_t     cqsTeamMusic[NUMPLAYERTEAMS];
+extern doomMus_t     cqsDoomsdayMusic;
 #endif
 
 #if !((defined(HAVE_SDL) && HAVE_SDL == 1) && (defined(HAVE_SDL_MIXER) && HAVE_SDL_MIXER == 1))
@@ -124,16 +124,16 @@ extern doomMus_t doomMusic;
 #else  /* !(HAVE_SDL && HAVE_SDL_MIXER) */
 /* the real thing */
 void cqsInitSound(void);
-int cqsFindEffect(char *name);
-int cqsFindMusic(char *name);
-int cqsMusicPlay(int musidx, int halt);
-int cqsMusicStop(int halt);
-int cqsEffectPlay(int fxidx, real maxdist, real dist, real ang);
-int cqsEffectPlayTracked(int fxidx, cqsHandle *handle, real maxdist, 
+int  cqsFindEffect(char *name);
+int  cqsFindMusic(char *name);
+int  cqsMusicPlay(int musidx, int halt);
+int  cqsMusicStop(int halt);
+int  cqsEffectPlay(int fxidx, real maxdist, real dist, real ang);
+int  cqsEffectPlayTracked(int fxidx, cqsHandle *handle, real maxdist, 
                          real dist, real ang);
-int cqsEffectStop(cqsHandle handle, int halt);
+int  cqsEffectStop(cqsHandle handle, int halt);
 void cqsUpdateVolume(void);
-int cqsMusicPlaying(void);
+int  cqsMusicPlaying(void);
  
 #endif /* !(HAVE_SDL && HAVE_SDL_MIXER) */
 

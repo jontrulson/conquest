@@ -24,12 +24,16 @@
 /*                                                                    */
 /**********************************************************************/
 
-#define NOEXTERN
 #include "conqdef.h"
 #include "conqcom.h"
 #include "conqlb.h"
+#include "conqutil.h"
+
+#define NOEXTERN_CONTEXT
 #include "context.h"
+
 #include "conf.h"
+
 #include "global.h"
 #include "color.h"
 #include "ui.h"
@@ -167,7 +171,7 @@ int connectServer(char *remotehost, Unsgn16 remoteport)
 
   if ((hp = gethostbyname(remotehost)) == NULL) 
     {
-      clog("conquest: %s: no such host\n", remotehost);
+      utLog("conquest: %s: no such host\n", remotehost);
 
       cprintf(lin, 0, ALIGN_CENTER, "conquest: %s: no such host", 
               remotehost);
@@ -185,7 +189,7 @@ int connectServer(char *remotehost, Unsgn16 remoteport)
 
   if ((s = socket(AF_INET, SOCK_STREAM, 0 )) < 0) 
     {
-      clog("socket: %s", strerror(errno));
+      utLog("socket: %s", strerror(errno));
       cprintf(lin, 0, ALIGN_CENTER, "socket: %s", 
               remotehost);
       mcuPutPrompt(MTXT_DONE, MSG_LIN2 );
@@ -195,15 +199,15 @@ int connectServer(char *remotehost, Unsgn16 remoteport)
 
   if (cInfo.tryUDP)
     {
-      clog("NET: Opening UDP...");
+      utLog("NET: Opening UDP...");
       if ((cInfo.usock = udpOpen(0, &cInfo.servaddr)) < 0) 
         {
-          clog("NET: udpOpen: %s", strerror(errno));
+          utLog("NET: udpOpen: %s", strerror(errno));
           cInfo.tryUDP = FALSE;
         }
     }
 
-  clog("Connecting to host: %s, port %d\n",
+  utLog("Connecting to host: %s, port %d\n",
        remotehost, remoteport);
 
   cprintf(lin++, 0, ALIGN_CENTER, "Connecting to host: %s, port %d\n",
@@ -213,8 +217,8 @@ int connectServer(char *remotehost, Unsgn16 remoteport)
   /* connect to the remote server */
   if (connect(s, (const struct sockaddr *)&sa, sizeof(sa)) < 0) 
     {
-      clog("connect: %s", strerror(errno));
-      clog("Cannot connect to host %s:%d\n", 
+      utLog("connect: %s", strerror(errno));
+      utLog("Cannot connect to host %s:%d\n", 
            remotehost, remoteport);
 
       cprintf(lin++, 0, ALIGN_CENTER, "connect: %s", strerror(errno));
@@ -266,7 +270,7 @@ int main(int argc, char *argv[])
   cInfo.isLoggedIn = FALSE;
   cInfo.remoteport = CN_DFLT_PORT;
 
-  setSystemLog(FALSE, FALSE);	/* use $HOME for logfile */
+  utSetLogConfig(FALSE, FALSE);	/* use $HOME for logfile */
   if (!getLocalhost((char *)cInfo.localhost, MAXHOSTNAME))
     return(1);
 
@@ -276,9 +280,9 @@ int main(int argc, char *argv[])
   while ((i = getopt(argc, argv, "mM:s:r:tP:Buv")) != EOF)    /* get command args */
     switch (i)
       {
-      case 'B':                 /* Benchmark mode, set frameDelay to 0.0 */
+      case 'B':                 /* Benchmark mode, set recFrameDelay to 0.0 */
         pbSpeed = PB_SPEED_INFINITE;
-        frameDelay = 0.0;
+        recFrameDelay = 0.0;
         break;
       case 'm':
         wantMetaList = TRUE;
@@ -315,7 +319,7 @@ int main(int argc, char *argv[])
         /* don't want to do this if we've already seen -P */
         if (Context.recmode != RECMODE_PLAYING)
           {
-            if (recordOpenOutput(optarg, FALSE))
+            if (recOpenOutput(optarg, FALSE))
               {			/* we are almost ready... */
                 Context.recmode = RECMODE_STARTING;
                 printf("Recording game to %s...\n", optarg);
@@ -334,7 +338,7 @@ int main(int argc, char *argv[])
         break;
 
       case 'P':
-        rfname = optarg;
+        recFilename = optarg;
         Context.recmode = RECMODE_PLAYING;
         break;
 
@@ -357,13 +361,13 @@ int main(int argc, char *argv[])
 
 
 #ifdef DEBUG_CONFIG
-  clog("%s@%d: main() Reading Configuration files.", __FILE__, __LINE__);
+  utLog("%s@%d: main() Reading Configuration files.", __FILE__, __LINE__);
 #endif
   
   if (GetConf(0) == ERR)	
     {
 #ifdef DEBUG_CONFIG
-      clog("%s@%d: main(): GetConf() returned ERR.", __FILE__, __LINE__);
+      utLog("%s@%d: main(): GetConf() returned ERR.", __FILE__, __LINE__);
 #endif
 	exit(1);
       }
@@ -376,12 +380,12 @@ int main(int argc, char *argv[])
         printf("-P option specified.  All other options ignored.\n");
 
       serveropt = wantMetaList = FALSE;
-      printf("Scanning file %s...\n", rfname);
-      if (!initReplay(rfname, &totElapsed))
+      printf("Scanning file %s...\n", recFilename);
+      if (!recInitReplay(recFilename, &recTotalElapsed))
         exit(1);
 
       /* now init for real */
-      if (!initReplay(rfname, NULL))
+      if (!recInitReplay(recFilename, NULL))
         exit(1);
 
       Context.unum = MSG_GOD;       /* stow user number */
@@ -429,14 +433,14 @@ int main(int argc, char *argv[])
   map_lcommon();
 
 #ifdef DEBUG_FLOW
-  clog("%s@%d: main() starting conqinit().", __FILE__, __LINE__);
+  utLog("%s@%d: main() starting conqinit().", __FILE__, __LINE__);
 #endif
   
   conqinit();			/* machine dependent initialization */
-  iBufInit();
+  ibufInit();
   
 #ifdef DEBUG_FLOW
-  clog("%s@%d: main() starting cdinit().", __FILE__, __LINE__);
+  utLog("%s@%d: main() starting cdinit().", __FILE__, __LINE__);
 #endif
 
   cdinit();			/* set up display environment */
@@ -472,7 +476,7 @@ int main(int argc, char *argv[])
 
       if ((cInfo.remotehost = strdup(metaServerList[i].altaddr)) == NULL)
         {
-          clog("strdup(metaServerList[i]) failed");
+          utLog("strdup(metaServerList[i]) failed");
           cdend();
           return 1;
         }
@@ -493,13 +497,13 @@ int main(int argc, char *argv[])
   if (!clientHello(CLIENTNAME))
     {
       cdend();
-      clog("conquest: clientHello() failed\n");
+      utLog("conquest: clientHello() failed\n");
       printf("conquest: clientHello() failed, check log\n");
       exit(1);
     }
 
 #ifdef DEBUG_FLOW
-  clog("%s@%d: main() welcoming player.", __FILE__, __LINE__);
+  utLog("%s@%d: main() welcoming player.", __FILE__, __LINE__);
 #endif
   
   if ( welcome( &Context.unum ) )
@@ -511,7 +515,7 @@ int main(int argc, char *argv[])
   conqend();			/* machine dependent clean-up */
   
 #ifdef DEBUG_FLOW
-  clog("%s@%d: main() *EXITING*", __FILE__, __LINE__);
+  utLog("%s@%d: main() *EXITING*", __FILE__, __LINE__);
 #endif
   
   exit(0);
@@ -860,7 +864,7 @@ void command( int ch )
     case TERM_NORMAL:		/* Have [ENTER] act like 'I[ENTER]'  */
     case KEY_ENTER:
     case '\n':
-      iBufPut("i\r");		/* (get last info) */
+      ibufPut("i\r");		/* (get last info) */
       break;
 
     case ' ':
@@ -868,12 +872,12 @@ void command( int ch )
       break;
 
     case TERM_EXTRA:		/* Have [TAB] act like 'i\t' */
-      iBufPut("i\t");		/* (get next last info) */
+      ibufPut("i\t");		/* (get next last info) */
       break;
       
     case TERM_RELOAD:		/* have server resend current universe */
       sendCommand(CPCMD_RELOAD, 0);
-      clog("client: sent CPCMD_RELOAD");
+      utLog("client: sent CPCMD_RELOAD");
       break;
       
     case -1:			/* really nothing, move along */
@@ -884,7 +888,7 @@ void command( int ch )
     label1:
       cdbeep();
 #ifdef DEBUG_IO
-      clog("command(): got 0%o, KEY_A1 =0%o", ch, KEY_A1);
+      utLog("command(): got 0%o, KEY_A1 =0%o", ch, KEY_A1);
 #endif
       mcuPutMsg( "Type h for help.", MSG_LIN2 );
     }
@@ -1009,7 +1013,7 @@ void dead( int snum, int leave )
   /* If something is wrong, don't do anything. */
   if ( snum < 1 || snum > MAXSHIPS )
     {
-      clog("dead: snum < 1 || snum > MAXSHIPS (%d)", snum);
+      utLog("dead: snum < 1 || snum > MAXSHIPS (%d)", snum);
       return;
     }
   
@@ -1075,7 +1079,7 @@ void dead( int snum, int leave )
 	  junk[0] = EOS;
       if ( kb > 0 && kb <= MAXSHIPS )
 	{
-	  appship( kb, cbuf );
+	  utAppendShip( kb, cbuf );
 	  if ( Ships[kb].status != SS_LIVE )
 	    appstr( ", who also died.", buf );
 	  else
@@ -1102,10 +1106,10 @@ void dead( int snum, int leave )
 	{
 	  /* We were unable to determine the cause of death. */
 	  buf[0] = EOS;
-	  appship( snum, buf );
+	  utAppendShip( snum, buf );
 	  sprintf(cbuf, "dead: %s was killed by %d.", buf, kb);
-	  cerror( cbuf );
-	  clog(cbuf);
+	  utError( cbuf );
+	  utLog(cbuf);
 	  
 	  cprintf(8,0,ALIGN_CENTER,"#%d#%s%s", 
 	  	RedLevelColor, ywkb, "nothing in particular.  (How strange...)");
@@ -1132,9 +1136,9 @@ void dead( int snum, int leave )
 	  else
 	    {
 	      if ( i < 100 )
-			appnum( i, junk );
+			utAppendNumWord( i, junk );
 	      else
-			appint( i, junk );
+			utAppendInt( i, junk );
 	      strcpy( cbuf, "armies" );
 	    }
 	  if ( i == 1 )
@@ -1243,7 +1247,7 @@ void doalloc( int snum )
 
     case TERM_NORMAL:
       i = 0;
-      safectoi( &alloc, cbuf, i );			/* ignore status */
+      utSafeCToI( &alloc, cbuf, i );			/* ignore status */
       if ( alloc != 0 )
 	{
 	  if ( alloc < 30 )
@@ -1303,7 +1307,7 @@ void doautopilot( int snum )
       if ( ! iogtimed( &ch, 1.0 ) )
 	continue;		/* next . echo */
       Context.msgok = FALSE;
-      grand( &Context.msgrand );
+      utGrand( &Context.msgrand );
       switch ( ch )
 	{
 	case TERM_ABORT:
@@ -1520,14 +1524,14 @@ void dobeam( int snum )
     num = beamax;
   else
     {
-      delblanks( buf );
+      utDeleteBlanks( buf );
       if ( alldig( buf ) != TRUE )
 	{
 	  mcuPutMsg( abt, MSG_LIN1 );
 	  return;
 	}
       i = 0;
-      safectoi( &num, buf, i );			/* ignore status */
+      utSafeCToI( &num, buf, i );			/* ignore status */
       if ( num < 1 || num > beamax )
 	{
 	  mcuPutMsg( abt, MSG_LIN1 );
@@ -1781,7 +1785,7 @@ void dorefit( int snum, int dodisplay )
     switch ( ch )
       {
       case TERM_EXTRA:
-	stype = modp1( stype + 1, MAXNUMSHIPTYPES );
+	stype = utModPlusOne( stype + 1, MAXNUMSHIPTYPES );
 	leave = FALSE;
 
 	if ( dodisplay )
@@ -1834,8 +1838,8 @@ void dorefit( int snum, int dodisplay )
   mcuPutMsg( "Refitting ship...", MSG_LIN1 );
   sendCommand(CPCMD_REFIT, (Unsgn16)stype);
   cdrefresh();
-  grand( &entertime );
-  while ( dgrand( entertime, &now ) < REFIT_GRAND )
+  utGrand( &entertime );
+  while ( utDeltaGrand( entertime, &now ) < REFIT_GRAND )
     {
       /* See if we're still alive. */
       if ( ! clbStillAlive( snum ) )
@@ -1943,7 +1947,7 @@ void docourse( int snum )
 
   cbuf[0] = EOS;
   ch = cdgetx( "Come to course: ", MSG_LIN1, 1, TERMS, cbuf, MSGMAXLINE, TRUE );
-  delblanks( cbuf );
+  utDeleteBlanks( cbuf );
   if ( ch == TERM_ABORT || cbuf[0] == EOS )
     {
       cdclrl( MSG_LIN1, 1 );
@@ -1959,10 +1963,10 @@ void docourse( int snum )
       /* Raw angle. */
       cdclrl( MSG_LIN1, 1 );
       i = 0;
-      if ( safectoi( &j, cbuf, i ) )
+      if ( utSafeCToI( &j, cbuf, i ) )
 	{
 	  what = NEAR_DIRECTION;
-	  dir = (real)mod360( (real)( j ) );
+	  dir = (real)utMod360( (real)( j ) );
 	}
     }
   else if ( cbuf[0] == 's' && alldig( &cbuf[1] ) == TRUE )
@@ -1970,12 +1974,12 @@ void docourse( int snum )
       /* Ship. */
 
       i = 1;
-      if ( safectoi( &sorpnum, cbuf, i ) )
+      if ( utSafeCToI( &sorpnum, cbuf, i ) )
 	what = NEAR_SHIP;
     }
-  else if ( arrows( cbuf, &dir ) )
+  else if ( utArrowsToDir( cbuf, &dir ) )
     what = NEAR_DIRECTION;
-  else if ( special( cbuf, &i, &token, &count ) )
+  else if ( utIsSpecial( cbuf, &i, &token, &count ) )
     {
       if ( clbFindSpecial( snum, token, count, &sorpnum, &xsorpnum ) )
 	what = i;
@@ -2014,7 +2018,7 @@ void docourse( int snum )
       appx = Ships[sorpnum].x;
       appy = Ships[sorpnum].y;
 
-      dir = (real)angle( Ships[snum].x, Ships[snum].y, appx, appy );
+      dir = utAngle( Ships[snum].x, Ships[snum].y, appx, appy );
       
       /* Give info if he used TAB. */
       if ( ch == TERM_EXTRA )
@@ -2023,7 +2027,7 @@ void docourse( int snum )
 	cdclrl( MSG_LIN1, 1 );
       break;
     case NEAR_PLANET:
-      dir = angle( Ships[snum].x, Ships[snum].y, Planets[sorpnum].x, Planets[sorpnum].y );
+      dir = utAngle( Ships[snum].x, Ships[snum].y, Planets[sorpnum].x, Planets[sorpnum].y );
       if ( ch == TERM_EXTRA )
 	{
 	  newlock = -sorpnum;
@@ -2252,7 +2256,7 @@ void doinfo( int snum )
   extra = ( ch == TERM_EXTRA );
   
   /* Default to what we did last time. */
-  delblanks( cbuf );
+  utDeleteBlanks( cbuf );
   fold( cbuf );
   if ( cbuf[0] == EOS )
     {
@@ -2266,7 +2270,7 @@ void doinfo( int snum )
   else
     c_strcpy( cbuf, Context.lastinfostr );
   
-  if ( special( cbuf, &what, &token, &count ) )
+  if ( utIsSpecial( cbuf, &what, &token, &count ) )
     {
       if ( ! clbFindSpecial( snum, token, count, &sorpnum, &xsorpnum ) )
 	what = NEAR_NONE;
@@ -2288,22 +2292,22 @@ void doinfo( int snum )
   else if ( cbuf[0] == 's' && alldig( &cbuf[1] ) == TRUE )
     {
       i = 1;
-      safectoi( &j, cbuf, i );		/* ignore status */
+      utSafeCToI( &j, cbuf, i );		/* ignore status */
       mcuInfoShip( j, snum );
     }
   else if ( alldig( cbuf ) == TRUE )
     {
       i = 0;
-      safectoi( &j, cbuf, i );		/* ignore status */
+      utSafeCToI( &j, cbuf, i );		/* ignore status */
       mcuInfoShip( j, snum );
     }
   else if ( clbPlanetMatch( cbuf, &j, FALSE ) )
     mcuInfoPlanet( "", j, snum );
-  else if ( stmatch( cbuf, "time", FALSE ) )
+  else if ( utStringMatch( cbuf, "time", FALSE ) )
     {
       getnow( now, 0 );
       c_strcpy( "It's ", cbuf );
-      appnumtim( now, cbuf );
+      utAppendTime( now, cbuf );
       appchr( '.', cbuf );
       mcuPutMsg( cbuf, MSG_LIN1 );
       cdmove( MSG_LIN1, 1 );
@@ -2644,7 +2648,7 @@ void dotow( int snum )
   if ( Ships[snum].towedby != 0 )
     {
       c_strcpy( "But we are being towed by ", cbuf );
-      appship( Ships[snum].towedby, cbuf );
+      utAppendShip( Ships[snum].towedby, cbuf );
       appchr( '!', cbuf );
       mcuPutMsg( cbuf, MSG_LIN2 );
       return;
@@ -2652,7 +2656,7 @@ void dotow( int snum )
   if ( Ships[snum].towing != 0 )
     {
       c_strcpy( "But we're already towing ", cbuf );
-      appship( Ships[snum].towing, cbuf );
+      utAppendShip( Ships[snum].towing, cbuf );
       appchr( '.', cbuf );
       mcuPutMsg( cbuf, MSG_LIN2 );
       return;
@@ -2665,7 +2669,7 @@ void dotow( int snum )
     return;
   
   i = 0;
-  safectoi( &other, cbuf, i );		/* ignore status */
+  utSafeCToI( &other, cbuf, i );		/* ignore status */
 
   sendCommand(CPCMD_TOW, (Unsgn16)other);
 
@@ -2777,10 +2781,10 @@ void menu(void)
 
   /* now look for our ship packet before we get started.  It should be a
      full SP_SHIP packet for this first time */
-  if (waitForPacket(PKT_FROMSERVER, sockl, SP_SHIP, buf, PKT_MAXSIZE,
+  if (pktWaitForPacket(PKT_FROMSERVER, sockl, SP_SHIP, buf, PKT_MAXSIZE,
 		    60, NULL) <= 0)
     {
-      clog("conquest:menu: didn't get initial SP_SHIP");
+      utLog("conquest:menu: didn't get initial SP_SHIP");
       return;
     }
   else
@@ -2792,7 +2796,7 @@ void menu(void)
 
       lose = FALSE;
 
-      while ((pkttype = waitForPacket(PKT_FROMSERVER, sockl, PKT_ANYPKT,
+      while ((pkttype = pktWaitForPacket(PKT_FROMSERVER, sockl, PKT_ANYPKT,
 				      buf, PKT_MAXSIZE, 0, NULL)) > 0)
 	{			/* proc packets while we get them */
 	  switch (pkttype)
@@ -2802,7 +2806,7 @@ void menu(void)
 	      if (sack->code == PERR_LOSE)
 		lose = TRUE;
 	      else
-		clog("conquest:menu: got unexp ack code %d", sack->code);
+		utLog("conquest:menu: got unexp ack code %d", sack->code);
 
 	      break;
 
@@ -2814,7 +2818,7 @@ void menu(void)
 	      
       if (pkttype < 0)		/* some error */
 	{
-	  clog("conquest:menu:waiForPacket returned %d", pkttype);
+	  utLog("conquest:menu:waiForPacket returned %d", pkttype);
 	  Ships[Context.snum].status = SS_OFF;
 	  return;
 	}
@@ -2992,7 +2996,7 @@ void menu(void)
                          overwritten on the next ship update.  Improves perceived
                          response time. */
                       Ships[Context.snum].team = 
-                        modp1( Ships[Context.snum].team+1, NUMPLAYERTEAMS );
+                        utModPlusOne( Ships[Context.snum].team+1, NUMPLAYERTEAMS );
                       Ships[Context.snum].shiptype = 
                         Teams[Ships[Context.snum].team].shiptype;
                       Users[Context.unum].team = Ships[Context.snum].team;
@@ -3048,7 +3052,7 @@ void menu(void)
 
       if (rv < 0 && errno != EINTR)
         {
-          clog("conquest:menu: select returned %d, %s\n",
+          utLog("conquest:menu: select returned %d, %s\n",
                rv, strerror(errno));
           Context.leave = TRUE;
         }
@@ -3089,10 +3093,10 @@ int newship( int unum, int *snum )
 
   while (TRUE)
     {
-      if ((pkttype = waitForPacket(PKT_FROMSERVER, sockl, PKT_ANYPKT,
+      if ((pkttype = pktWaitForPacket(PKT_FROMSERVER, sockl, PKT_ANYPKT,
 				   buf, PKT_MAXSIZE, 60, NULL)) < 0)
 	{
-	  clog("conquest:newship: waitforpacket returned %d", pkttype);
+	  utLog("conquest:newship: waitforpacket returned %d", pkttype);
 	  return FALSE;
 	}
       
@@ -3128,7 +3132,7 @@ int newship( int unum, int *snum )
 	      i = i + 1;
 	      c_strcpy( "You are only allowed to fly ", cbuf );
 	      j = Users[unum].multiple;
-	      appint( j, cbuf );
+	      utAppendInt( j, cbuf );
 	      appstr( " ship", cbuf );
 	      if ( j != 1 )
 		appchr( 's', cbuf );
@@ -3141,7 +3145,7 @@ int newship( int unum, int *snum )
 	      break;
 	      
 	    default:
-	      clog("newship: unexpected ack code %d",
+	      utLog("newship: unexpected ack code %d",
 		   sack->code);
 	      break;
 	    }
@@ -3168,7 +3172,7 @@ int newship( int unum, int *snum )
             }
           else
             {
-              clog("newship: invalid CLIENTSTAT\n");
+              utLog("newship: invalid CLIENTSTAT\n");
               return FALSE;       /* don't want to hang if a bad pkt */
             }
 	  
@@ -3206,7 +3210,7 @@ int play()
     Context.entship = TRUE;
   
   Ships[Context.snum].sdfuse = 0;	/* zero self destruct fuse */
-  grand( &Context.msgrand );		/* initialize message timer */
+  utGrand( &Context.msgrand );		/* initialize message timer */
   Context.leave = FALSE;		/* assume we won't want to bail */
   Context.redraw = TRUE;		/* want redraw first time */
   Context.msgok = TRUE;		/* ok to get messages */
@@ -3222,7 +3226,7 @@ int play()
   /* start recording if neccessary */
   if (Context.recmode == RECMODE_STARTING)
     {
-      if (recordInitOutput(Context.unum, getnow(NULL, 0), Context.snum, 
+      if (recInitOutput(Context.unum, getnow(NULL, 0), Context.snum, 
                            FALSE))
         {
           Context.recmode = RECMODE_ON;
@@ -3271,11 +3275,11 @@ int play()
                 {
                   if (RMsg_Line == MSG_LIN1)
                     Context.msgok = FALSE;      /* off if we  have no msg line */
-                  if (DoMacro(((ch - KEY_F(0)) - 1)) == TRUE)
+                  if (ibufExpandMacro(((ch - KEY_F(0)) - 1)) == TRUE)
                     {
-                      while (iBufCount())
+                      while (ibufCount())
                         {
-                          ch = iBufGetCh();
+                          ch = ibufGetc();
                           command( ch );
                         }
                     }
@@ -3284,7 +3288,7 @@ int play()
                       do 
                         {
                           command( ch );
-                        } while (iBufCount() && (ch = iBufGetCh()));
+                        } while (ibufCount() && (ch = ibufGetc()));
                     }
                 }
             }
@@ -3293,7 +3297,7 @@ int play()
 
       if (rv < 0 && errno != EINTR)
         {
-          clog("conquest:play: select returned %d, %s\n",
+          utLog("conquest:play: select returned %d, %s\n",
                rv, strerror(errno));
           Context.display = FALSE;
           return FALSE;
@@ -3348,7 +3352,7 @@ int welcome( int *unum )
 
   if (!Logon(name))
     {
-      clog("conquest: Logon failed.");
+      utLog("conquest: Logon failed.");
       return FALSE;
     }
 
@@ -3356,9 +3360,9 @@ int welcome( int *unum )
     {
       /* now look for SP_CLIENTSTAT or SP_ACK */
       if ((pkttype = 
-           readPacket(PKT_FROMSERVER, sockl, buf, PKT_MAXSIZE, 60)) <= 0)
+           pktRead(PKT_FROMSERVER, sockl, buf, PKT_MAXSIZE, 60)) <= 0)
         {
-          clog("welcome: read SP_CLIENTSTAT or SP_ACK failed: %d\n", pkttype);
+          utLog("welcome: read SP_CLIENTSTAT or SP_ACK failed: %d\n", pkttype);
           return FALSE;
         }
       
@@ -3374,7 +3378,7 @@ int welcome( int *unum )
             }
           else
             {
-              clog("welcome: invalid CLIENTSTAT\n");
+              utLog("welcome: invalid CLIENTSTAT\n");
               return FALSE;
             }
 
@@ -3384,7 +3388,7 @@ int welcome( int *unum )
           done = TRUE;
           break;
         default:
-          clog("welcome: got unexpected packet type %d. Ignoring.", 
+          utLog("welcome: got unexpected packet type %d. Ignoring.", 
                pkttype);
           done = FALSE;         /* redundant, but it gets the point across */
           break;
@@ -3408,7 +3412,7 @@ int welcome( int *unum )
 	}
       team = scstat->team;
       cbuf[0] = EOS;
-      apptitle( team, cbuf );
+      utAppendTitle( team, cbuf );
       appchr( ' ', cbuf );
       i = strlen( cbuf );
       appstr( name, cbuf );
@@ -3472,7 +3476,7 @@ int welcome( int *unum )
 	  break;
 
 	default:
-	  clog("welcome: unexpected ACK code %d\n", sack->code);
+	  utLog("welcome: unexpected ACK code %d\n", sack->code);
 	  return FALSE;
 	  break;
 
@@ -3485,10 +3489,10 @@ int welcome( int *unum )
      for a user packet for this user. */
       
 
-  if (waitForPacket(PKT_FROMSERVER, sockl, SP_USER, buf, PKT_MAXSIZE,
+  if (pktWaitForPacket(PKT_FROMSERVER, sockl, SP_USER, buf, PKT_MAXSIZE,
 		    60, NULL) <= 0)
     {
-      clog("conquest:welcome: waitforpacket SP_USER returned error");
+      utLog("conquest:welcome: waitforpacket SP_USER returned error");
       return FALSE;
     }
   else
@@ -3502,7 +3506,7 @@ int welcome( int *unum )
 void catchSignals(void)
 {
 #ifdef DEBUG_SIG
-  clog("catchSignals() ENABLED");
+  utLog("catchSignals() ENABLED");
 #endif
   
   signal(SIGHUP, (void (*)(int))handleSignal);
@@ -3519,7 +3523,7 @@ void handleSignal(int sig)
 {
   
 #ifdef DEBUG_SIG
-  clog("handleSignal() got SIG %d", sig);
+  utLog("handleSignal() got SIG %d", sig);
 #endif
   
   switch(sig)
@@ -3570,7 +3574,7 @@ void astservice(int sig)
      doesn't stop when executing various commands */
 
 
-  while (readPacket(PKT_FROMSERVER, sockl,
+  while (pktRead(PKT_FROMSERVER, sockl,
 		    buf, PKT_MAXSIZE, 0) > 0)
     processPacket(buf); /* process them */
 
@@ -3580,7 +3584,7 @@ void astservice(int sig)
       clbPlanetDrive(tdelta / 1000.0);
       clbTorpDrive(tdelta / 1000.0);
       iterstart = iternow;
-      recordGenTorpLoc();
+      recGenTorpLoc();
     }
 
   /* Don't do anything if we're not supposed to. */
@@ -3606,15 +3610,15 @@ void astservice(int sig)
     {
       if (RMsg_Line != MSG_LIN1)
 	{			/* we have line 25 for msgs */
-	  difftime = dgrand( RMsggrand, &now );
+	  difftime = utDeltaGrand( RMsggrand, &now );
 	}
       else
 	{
-	  difftime = dgrand( Context.msgrand, &now );
+	  difftime = utDeltaGrand( Context.msgrand, &now );
 	}
 
       if ( difftime >= NEWMSG_GRAND )
-	if ( getamsg( Context.snum, &Ships[Context.snum].lastmsg ) )
+	if ( utGetMsg( Context.snum, &Ships[Context.snum].lastmsg ) )
 	  {
 	    if (mcuReadMsg( Context.snum, Ships[Context.snum].lastmsg, 
 			 RMsg_Line ) == TRUE)
@@ -3635,13 +3639,13 @@ void astservice(int sig)
   /* Perform one ship display update. */
   display( Context.snum, FALSE );
 
-  recordUpdateFrame();          /* update recording */
+  recUpdateFrame();          /* update recording */
   
   /* Un-read the message if there's a chance it got garbaged. */
   if ( readone )
     if (RMsg_Line == MSG_LIN1)	/* we don't have an extra msg line */
       if ( iochav() )
-	Ships[Context.snum].lastmsg = modp1( Ships[Context.snum].lastmsg - 1, MAXMESSAGES );
+	Ships[Context.snum].lastmsg = utModPlusOne( Ships[Context.snum].lastmsg - 1, MAXMESSAGES );
   
   /* Schedule for next time. */
   startTimer();
@@ -3703,7 +3707,7 @@ void startTimer(void)
 
   if (sigaction(SIGALRM, &Sig, NULL) == -1)
     {
-      clog("startTimer():sigaction(): %s\n", strerror(errno));
+      utLog("startTimer():sigaction(): %s\n", strerror(errno));
       exit(errno);
     }
   
@@ -3745,7 +3749,7 @@ void startTimer(void)
 void conqend(void)
 {
   sendCommand(CPCMD_DISCONNECT, 0); /* tell the server */
-  recordCloseOutput();
+  recCloseOutput();
 
   return;
   

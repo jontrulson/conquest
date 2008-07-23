@@ -8,17 +8,16 @@
 
 #include "c_defs.h"
 
-#define NOEXTERN
 #include "conqdef.h"
 #include "conqcom.h"
-#include "context.h"
-  
+
 #include "global.h"
 #include "color.h"
 
 #define NOEXTERN_CONQINIT
 #include "conqinit.h"
-#undef NOEXTERN_CONQINIT
+
+#include "conqutil.h"
 
 /* The default initdata */
 #if 1
@@ -715,7 +714,7 @@ cqiTextureAreaPtr_t cqiFindTexArea(char *texnm, char *tanm,
     if (!strncmp(_cqiTextures[tidx].texareas[i].name, tanm, MAXPLANETNAME))
       return &(_cqiTextures[tidx].texareas[i]);
 
-  clog("%s: could not find texarea %s in texture %s",
+  utLog("%s: could not find texarea %s in texture %s",
        __FUNCTION__,
        tanm, texnm);
 
@@ -802,7 +801,7 @@ static Unsgn32 hex2color(char *str)
 
   if (sscanf(str, "%x", &v) != 1)
     {
-      clog("hex2color(): invalid color specification '%s' at line %d, setting to 0",
+      utLog("hex2color(): invalid color specification '%s' at line %d, setting to 0",
            str, lineNum);
       v = 0;
     }
@@ -836,7 +835,7 @@ static int cqiValidateAnimations(void)
         /* make sure the texture exists. */
         if (_cqiFindTexture(_cqiAnimDefs[i].texname) < 0)
           {                     /* nope */
-            clog("%s: animdef %s: texture %s does not exist.",
+            utLog("%s: animdef %s: texture %s does not exist.",
                  __FUNCTION__, 
                  _cqiAnimDefs[i].name,
                  _cqiAnimDefs[i].texname);
@@ -856,7 +855,7 @@ static int cqiValidateAnimations(void)
         {
           if (_cqiAnimDefs[i].texanim.stages <= 0)
             {
-              clog("%s: animdef %s: texanim: stages must greater than zero.",
+              utLog("%s: animdef %s: texanim: stages must greater than zero.",
                    __FUNCTION__, 
                    _cqiAnimDefs[i].name);
               return FALSE;
@@ -890,7 +889,7 @@ static int cqiValidateAnimations(void)
               /* locate the texture */
               if (_cqiFindTexture(tbuf) < 0)
                 {                     /* nope */
-                  clog("%s: animdef %s: texanim: texture %s does not exist.",
+                  utLog("%s: animdef %s: texanim: texture %s does not exist.",
                        __FUNCTION__, 
                        _cqiAnimDefs[i].name,
                        tbuf);
@@ -904,7 +903,7 @@ static int cqiValidateAnimations(void)
         {
           if (_cqiAnimDefs[i].colanim.stages <= 0)
             {
-              clog("%s: animdef %s: colanim: stages must greater than zero.",
+              utLog("%s: animdef %s: colanim: stages must greater than zero.",
                    __FUNCTION__, 
                    _cqiAnimDefs[i].name);
               return FALSE;
@@ -918,7 +917,7 @@ static int cqiValidateAnimations(void)
              set to 0 and warn. */
           if (_cqiAnimDefs[i].geoanim.stages <= 0)
             {
-              clog("%s: animdef %s: geoanim: stages must greater than zero.",
+              utLog("%s: animdef %s: geoanim: stages must greater than zero.",
                    __FUNCTION__, 
                    _cqiAnimDefs[i].name);
               return FALSE;
@@ -933,7 +932,7 @@ static int cqiValidateAnimations(void)
     {
       if ((ndx = _cqiFindAnimDef(_cqiAnimations[i].animdef)) < 0)
         {                       /* nope */
-          clog("%s: animdef %s does not exist for animation %s.",
+          utLog("%s: animdef %s does not exist for animation %s.",
                __FUNCTION__, 
                _cqiAnimations[i].animdef,
                _cqiAnimations[i].name);
@@ -964,7 +963,7 @@ static int cqiValidatePlanets(void)
     {
       if ((mur = _cqiFindPlanet("Murisak")) < 0)
         {
-          clog("%s: cannot find planet Murisak, which must exist",
+          utLog("%s: cannot find planet Murisak, which must exist",
                   __FUNCTION__);
           mur = 0;
         }
@@ -996,7 +995,7 @@ static int cqiValidatePlanets(void)
         }
 
       if (cqiVerbose)
-        clog("%s: filled %d unspecified planet slots.",
+        utLog("%s: filled %d unspecified planet slots.",
                 __FUNCTION__, NUMPLANETS - numPlanets);
     }
 
@@ -1018,7 +1017,7 @@ static int cqiValidatePlanets(void)
           if ((_cqiPlanets[i].primary = _cqiFindPlanet(_cqiPlanets[i].primname)) < 0)
             {                   /* couldn't find it */
               if (cqiVerbose && i != mur)
-                clog("%s: can't find primary '%s' for planet '%s', defaulting to '%s'",
+                utLog("%s: can't find primary '%s' for planet '%s', defaulting to '%s'",
                         __FUNCTION__,
                         _cqiPlanets[i].primname,
                         _cqiPlanets[i].name,
@@ -1051,7 +1050,7 @@ static int cqiValidatePlanets(void)
     {
       if (homeplan[i] != 3)
         {
-          clog("%s: team %s must have 3 homeplanets. %d were specified.",
+          utLog("%s: team %s must have 3 homeplanets. %d were specified.",
                   __FUNCTION__, team2str(i), homeplan[i]);
           return FALSE;
         }
@@ -1059,7 +1058,7 @@ static int cqiValidatePlanets(void)
 
 
   if (cqiVerbose)
-    clog("%s: total planets %d (%d loaded, %d extra)",
+    utLog("%s: total planets %d (%d loaded, %d extra)",
             __FUNCTION__,
             _cqiGlobal->maxplanets, 
             numPlanets, 
@@ -1103,15 +1102,15 @@ int cqiLoadRC(int rcid, char *filename, int verbosity, int debugl)
         snprintf(buffer, sizeof(buffer)-1, "%s/%s", CONQETC, "soundrc");
       break;
     default:                    /* programmer error */
-      clog("%s: invalid rcid %d, bailing.", __FUNCTION__, rcid);
+      utLog("%s: invalid rcid %d, bailing.", __FUNCTION__, rcid);
       return FALSE;
       break;
     }
 
-  clog("%s: Loading '%s'...", __FUNCTION__, buffer);
+  utLog("%s: Loading '%s'...", __FUNCTION__, buffer);
   if ((infile = fopen(buffer, "r")) == NULL)
     {
-      clog("%s: fopen(%s) failed: %s",
+      utLog("%s: fopen(%s) failed: %s",
            __FUNCTION__,
            buffer,
            strerror(errno));
@@ -1119,12 +1118,12 @@ int cqiLoadRC(int rcid, char *filename, int verbosity, int debugl)
       /* a failed CQI_FILE_TEXTURESRC_ADD is no big deal,
          CQI_FILE_TEXTURESRC/CONQINITRC is another story however... */
 
-      clog("%s: using default init tables.", __FUNCTION__);
+      utLog("%s: using default init tables.", __FUNCTION__);
       switch(rcid)
         {
         case CQI_FILE_TEXTURESRC:
           {
-            clog("%s: FATAL: no textures.", __FUNCTION__);
+            utLog("%s: FATAL: no textures.", __FUNCTION__);
             return FALSE;
           }
           break;
@@ -1151,7 +1150,7 @@ int cqiLoadRC(int rcid, char *filename, int verbosity, int debugl)
   lineNum = 0;
   if ( yyparse() == ERR || goterror )
     {
-      clog("conqinit: parse error." );
+      utLog("conqinit: parse error." );
       fail = TRUE;
     }
   
@@ -1163,7 +1162,7 @@ int cqiLoadRC(int rcid, char *filename, int verbosity, int debugl)
     {
       if (fail && rcid == CQI_FILE_TEXTURESRC)
         {
-          clog("%s: FATAL: no textures.", __FUNCTION__);
+          utLog("%s: FATAL: no textures.", __FUNCTION__);
           return FALSE;
         }
 
@@ -1171,21 +1170,21 @@ int cqiLoadRC(int rcid, char *filename, int verbosity, int debugl)
       cqiNumTextures = numTextures;
 
       if (cqiVerbose)
-        clog("%s: loaded %d texture descriptors.",
+        utLog("%s: loaded %d texture descriptors.",
              __FUNCTION__, fileNumTextures);
 
       /* now validate any animations */
       if (!cqiValidateAnimations())
         {
-          clog("%s: FATAL: no animations.", __FUNCTION__);
+          utLog("%s: FATAL: no animations.", __FUNCTION__);
           return FALSE;
         }
 
       if (cqiVerbose)
         {
-          clog("%s: loaded %d Animation descriptors.",
+          utLog("%s: loaded %d Animation descriptors.",
                __FUNCTION__, fileNumAnimations);
-          clog("%s: loaded %d Animation definitions.",
+          utLog("%s: loaded %d Animation definitions.",
                __FUNCTION__, fileNumAnimDefs);
         }
 
@@ -1202,7 +1201,7 @@ int cqiLoadRC(int rcid, char *filename, int verbosity, int debugl)
     {
       if (fail && rcid == CQI_FILE_SOUNDRC)
         {
-          clog("%s: using default sound data.", __FUNCTION__);
+          utLog("%s: using default sound data.", __FUNCTION__);
           cqiSoundConf = &defaultSoundConf;
           cqiSoundEffects  = defaultSoundEffects;
           cqiNumSoundEffects = defaultNumSoundEffects;
@@ -1212,9 +1211,9 @@ int cqiLoadRC(int rcid, char *filename, int verbosity, int debugl)
           return FALSE;
         }
 
-      clog("%s: loaded %d Music definitions.",
+      utLog("%s: loaded %d Music definitions.",
            __FUNCTION__, fileNumMusic);
-      clog("%s: loaded %d Effect definitions.",
+      utLog("%s: loaded %d Effect definitions.",
            __FUNCTION__, fileNumEffects);
       cqiSoundConf = _cqiSoundConf;
       cqiSoundEffects = _cqiSoundEffects;
@@ -1228,12 +1227,12 @@ int cqiLoadRC(int rcid, char *filename, int verbosity, int debugl)
 
   if (!fail && !cqiValidatePlanets())
     {
-      clog("%s: cqiValidatePlanets() failed.", __FUNCTION__);
+      utLog("%s: cqiValidatePlanets() failed.", __FUNCTION__);
 
       cqiGlobal    = &defaultGlobalInit;
       cqiShiptypes = defaultShiptypes;
       cqiPlanets   = defaultPlanets;
-      clog("%s: using default init tables.", __FUNCTION__);
+      utLog("%s: using default init tables.", __FUNCTION__);
       return FALSE;
     }
 
@@ -1246,7 +1245,7 @@ int cqiLoadRC(int rcid, char *filename, int verbosity, int debugl)
     }
   else
     {                           /* use the defaults */
-      clog("%s: using default init tables.", __FUNCTION__);
+      utLog("%s: using default init tables.", __FUNCTION__);
       cqiGlobal    = &defaultGlobalInit;
       cqiShiptypes = defaultShiptypes;
       cqiPlanets   = defaultPlanets;
@@ -1402,7 +1401,7 @@ void dumpSoundDataHdr(void)
     return;
 
   /* preamble */
-  getdandt( buf, 0 );
+  utFormatTime( buf, 0 );
   printf("/* Generated by conqinit on %s */\n", buf);
   printf("/* $Id$ */\n");
   printf("\n\n");
@@ -1483,7 +1482,7 @@ void dumpInitDataHdr(void)
   int i;
   
   /* preamble */
-  getdandt( buf, 0 );
+  utFormatTime( buf, 0 );
   printf("/* Generated by conqinit on %s */\n", buf);
   printf("/* $Id$ */\n");
   printf("\n\n");
@@ -1588,7 +1587,7 @@ void dumpUniverse(void)
   
   map_common();
 
-  getdandt( buf, 0 );
+  utFormatTime( buf, 0 );
   printf("# Generated by conqinit on %s\n", buf);
   printf("#\n#\n");
   /* comments */
@@ -1727,14 +1726,14 @@ void dumpUniverse(void)
 static void startSection(int section)
 {
   if (cqiDebugl)
-    clog("%s: [%d] %s", __FUNCTION__, 
+    utLog("%s: [%d] %s", __FUNCTION__, 
          curDepth + 1,
          sect2str(section));
   
   /* check for overflow */
   if ((curDepth + 1) >= MAX_NESTING_DEPTH)
     {
-      clog("CQI: %s: maximum nesting depth (%d) exceeded, ignoring "
+      utLog("CQI: %s: maximum nesting depth (%d) exceeded, ignoring "
            "section %s, near line %d", 
            __FUNCTION__, MAX_NESTING_DEPTH, sect2str(section),
            lineNum);
@@ -1752,7 +1751,7 @@ static void startSection(int section)
       {
         if (globalRead)
           {
-            clog("%s: global section already configured\n",
+            utLog("%s: global section already configured\n",
                  __FUNCTION__);
             goterror++;
             goto error_return;
@@ -1761,7 +1760,7 @@ static void startSection(int section)
         _cqiGlobal = malloc(sizeof(cqiGlobalInitRec_t));
         if (!_cqiGlobal)
           {
-            clog("%s: Could not allocate GlobalInitRec",
+            utLog("%s: Could not allocate GlobalInitRec",
                     __FUNCTION__);
             goterror++;
             goto error_return;
@@ -1775,7 +1774,7 @@ static void startSection(int section)
       {
         if (!globalRead)
           {
-            clog("%s: Have not read the global section (which must always be first). Ignoring SHIPTYPE",
+            utLog("%s: Have not read the global section (which must always be first). Ignoring SHIPTYPE",
                     __FUNCTION__);
             goterror++;
             goto error_return;
@@ -1786,7 +1785,7 @@ static void startSection(int section)
       {
         if (!globalRead)
           {
-            clog("%s: Have not read the global section (which must always be first). Ignoring PLANET",
+            utLog("%s: Have not read the global section (which must always be first). Ignoring PLANET",
                     __FUNCTION__);
             goterror++;
             return;
@@ -1829,7 +1828,7 @@ static void startSection(int section)
              */
             if (!currAnimation.name[0])
               {
-                clog("CQI: can't inline animdef at or near line %d: "
+                utLog("CQI: can't inline animdef at or near line %d: "
                      "animation's name has not been specified.", 
                      lineNum);
                 goterror++;
@@ -1849,7 +1848,7 @@ static void startSection(int section)
                 if ((_adndx = _cqiFindAnimDef(currAnimation.animdef)) < 0)
                   {
                     /* couldn't find it, error */
-                    clog("CQI: can't inline animdef at or near line %d: "
+                    utLog("CQI: can't inline animdef at or near line %d: "
                          "source animdef %s is not defined.", 
                          lineNum, currAnimation.animdef);
                     goterror++;
@@ -1899,7 +1898,7 @@ static void startSection(int section)
             _cqiSoundConf = malloc(sizeof(cqiSoundConfRec_t));
             if (!_cqiSoundConf)
               {
-                clog("%s: Could not allocate SoundConf",
+                utLog("%s: Could not allocate SoundConf",
                      __FUNCTION__);
                 goterror++;
                 goto error_return;
@@ -1942,7 +1941,7 @@ static void startSection(int section)
 static void endSection(void)
 {
   if (cqiDebugl)
-    clog("%s: [%d] %s", __FUNCTION__, curDepth, sect2str(CURSECTION()));
+    utLog("%s: [%d] %s", __FUNCTION__, curDepth, sect2str(CURSECTION()));
   
   switch (CURSECTION())
     {
@@ -1955,7 +1954,7 @@ static void endSection(void)
             !_cqiGlobal->maxusers || !_cqiGlobal->maxhist ||
             !_cqiGlobal->maxmsgs)
           {                     /* something missing */
-            clog("CQI: GLOBAL section is incomplete, ignoring.");
+            utLog("CQI: GLOBAL section is incomplete, ignoring.");
             globalRead = FALSE; /* redundant I know, but.... */
           }
         else
@@ -1970,7 +1969,7 @@ static void endSection(void)
             
             if (!_cqiPlanets)
               {
-                clog("CQI: could not allocate memory for planets.");
+                utLog("CQI: could not allocate memory for planets.");
                 globalRead = FALSE; /* redundant I know, but.... */
                 goterror++;
               }
@@ -2042,7 +2041,7 @@ static void endSection(void)
               
               if (!taptr)
                 {  
-                  clog("CQI: Could not realloc %d texareas for texture %s, "
+                  utLog("CQI: Could not realloc %d texareas for texture %s, "
                        "ignoring texarea '%s'",
                        numTexAreas + 1,
                        currTexture.name,
@@ -2059,7 +2058,7 @@ static void endSection(void)
             }
           else
             {
-              clog("CQI: texarea name at or near line %d was not specified, "
+              utLog("CQI: texarea name at or near line %d was not specified, "
                    "ignoring.",
                    lineNum);
               goto endsection;
@@ -2072,7 +2071,7 @@ static void endSection(void)
         /* check some basic things */
         if (!currPlanet.name[0] || !currPlanet.primname[0])
           {
-            clog("CQI: planet %d is missing name and/or primary",
+            utLog("CQI: planet %d is missing name and/or primary",
                  numPlanets);
             goterror++;
             return;
@@ -2080,7 +2079,7 @@ static void endSection(void)
         
         if (numPlanets >= _cqiGlobal->maxplanets)
           {
-            clog("CQI: planet '%s' (%d) exceeds maxplanets (%d), ignoring.",
+            utLog("CQI: planet '%s' (%d) exceeds maxplanets (%d), ignoring.",
                   currPlanet.name, numPlanets, 
                  _cqiGlobal->maxplanets);
             goto endsection;
@@ -2103,7 +2102,7 @@ static void endSection(void)
         /* verify the required info was provided */
         if (!strlen(currTexture.name))
           {
-            clog("CQI: texture name at or near line %d was not specified, "
+            utLog("CQI: texture name at or near line %d was not specified, "
                  "ignoring.",
                  lineNum);
             goto endsection;
@@ -2124,7 +2123,7 @@ static void endSection(void)
             /* overwrite existing texture def */
             _cqiTextures[exists] = currTexture;
             if (cqiDebugl)
-              clog("CQI: texture '%s' near line %d: overriding already "
+              utLog("CQI: texture '%s' near line %d: overriding already "
                    "loaded texture.",
                    currTexture.name, lineNum);
           }
@@ -2136,7 +2135,7 @@ static void endSection(void)
             
             if (!texptr)
               {  
-                clog("CQI: Could not realloc %d textures, ignoring texture '%s'",
+                utLog("CQI: Could not realloc %d textures, ignoring texture '%s'",
                      numTextures + 1,
                      currTexture.name);
                 goto endsection;
@@ -2158,7 +2157,7 @@ static void endSection(void)
         /* verify the required info was provided */
         if (!strlen(currAnimation.name))
           {
-            clog("CQI: animation name at or near line %d was not specified, "
+            utLog("CQI: animation name at or near line %d was not specified, "
                  "ignoring.",
                  lineNum);
             goto endsection;
@@ -2178,7 +2177,7 @@ static void endSection(void)
           {
             _cqiAnimations[exists] = currAnimation;
             if (cqiDebugl)
-              clog("CQI: animation '%s' near line %d: overriding already "
+              utLog("CQI: animation '%s' near line %d: overriding already "
                    "loaded animation.",
                    currAnimation.name, lineNum);
           }
@@ -2190,7 +2189,7 @@ static void endSection(void)
             
             if (!animptr)
               {  
-                clog("CQI: Could not realloc %d animations, ignoring "
+                utLog("CQI: Could not realloc %d animations, ignoring "
                      "animation '%s'",
                      numAnimations + 1,
                      currAnimation.name);
@@ -2213,7 +2212,7 @@ static void endSection(void)
         /* verify the required info was provided */
         if (!strlen(currAnimDef.name))
           {
-            clog("CQI: animdef name at or near line %d was not specified, "
+            utLog("CQI: animdef name at or near line %d was not specified, "
                  "ignoring.",
                  lineNum);
             goto endsection;
@@ -2225,13 +2224,13 @@ static void endSection(void)
           {
             _cqiAnimDefs[exists] = currAnimDef;
             if (cqiDebugl)
-              clog("CQI: animdef '%s' near line %d: overriding already loaded "
+              utLog("CQI: animdef '%s' near line %d: overriding already loaded "
                    "animdef.",
                    currAnimDef.name, lineNum);
           }
         else if (!currAnimDef.anims)
           {                     /* no animation types were declared */
-            clog("CQI: animdef '%s' near line %d: declared no animation "
+            utLog("CQI: animdef '%s' near line %d: declared no animation "
                  "type sections. Ignoring.",
                  currAnimDef.name, lineNum);
             goto endsection;
@@ -2244,7 +2243,7 @@ static void endSection(void)
             
             if (!animptr)
               {  
-                clog("CQI: Could not realloc %d animdefs, ignoring "
+                utLog("CQI: Could not realloc %d animdefs, ignoring "
                      "animdef '%s'",
                      numAnimDefs + 1,
                      currAnimDef.name);
@@ -2284,7 +2283,7 @@ static void endSection(void)
         /* verify the required info was provided */
         if (!strlen(currSound.name))
           {
-            clog("CQI: effect name at or near line %d was not specified, "
+            utLog("CQI: effect name at or near line %d was not specified, "
                  "ignoring.",
                  lineNum);
             goto endsection;
@@ -2304,7 +2303,7 @@ static void endSection(void)
             /* overwrite existing def */
             _cqiSoundEffects[exists] = currSound;
             if (cqiDebugl)
-              clog("CQI: effect '%s' near line %d: overriding already "
+              utLog("CQI: effect '%s' near line %d: overriding already "
                    "loaded effect.",
                    currSound.name, lineNum);
           }
@@ -2316,7 +2315,7 @@ static void endSection(void)
             
             if (!sndptr)
               {  
-                clog("CQI: Could not realloc %d effect, ignoring effect '%s'",
+                utLog("CQI: Could not realloc %d effect, ignoring effect '%s'",
                      numSoundEffects + 1,
                      currSound.name);
                 goto endsection;
@@ -2338,7 +2337,7 @@ static void endSection(void)
         /* verify the required info was provided */
         if (!strlen(currSound.name))
           {
-            clog("CQI: music name at or near line %d was not specified, "
+            utLog("CQI: music name at or near line %d was not specified, "
                  "ignoring.",
                  lineNum);
             goto endsection;
@@ -2358,7 +2357,7 @@ static void endSection(void)
             /* overwrite existing def */
             _cqiSoundMusic[exists] = currSound;
             if (cqiDebugl)
-              clog("CQI: music '%s' near line %d: overriding already "
+              utLog("CQI: music '%s' near line %d: overriding already "
                    "loaded music slot.",
                    currSound.name, lineNum);
           }
@@ -2370,7 +2369,7 @@ static void endSection(void)
             
             if (!sndptr)
               {  
-                clog("CQI: Could not realloc %d music slots, "
+                utLog("CQI: Could not realloc %d music slots, "
                      "ignoring music '%s'",
                      numSoundMusic + 1,
                      currSound.name);
@@ -2402,7 +2401,7 @@ static void endSection(void)
 static void cfgSectioni(int item, int val)
 {
   if (cqiDebugl)
-    clog(" [%d] section = %s\titem = %s\tvali = %d",
+    utLog(" [%d] section = %s\titem = %s\tvali = %d",
          curDepth, sect2str(CURSECTION()), item2str(item), val);
   
   switch (CURSECTION())
@@ -2596,7 +2595,7 @@ static void cfgSectioni(int item, int val)
 void cfgSectionil(int item, int val1, int val2)
 {
   if (cqiDebugl)
-    clog(" [%d] section = %s\titem = %s\tvalil = %d, %d",
+    utLog(" [%d] section = %s\titem = %s\tvalil = %d, %d",
          curDepth, sect2str(CURSECTION()), item2str(item), val1, val2);
 
   switch (CURSECTION())
@@ -2611,7 +2610,7 @@ void cfgSectionil(int item, int val1, int val2)
               /* make sure it's valid of course... */
               if (val1 >= val2 || val2 <= val1)
                 {
-                  clog("%s: Planet '%s's army min must be less than it's max: min %d max %d is invalid.",
+                  utLog("%s: Planet '%s's army min must be less than it's max: min %d max %d is invalid.",
                        __FUNCTION__,
                        currPlanet.name,
                        val1, val2);
@@ -2621,7 +2620,7 @@ void cfgSectionil(int item, int val1, int val2)
                 currPlanet.armies = rndint(abs(val1), abs(val2));
 
 #if 0
-              clog("ARMIES got %d %d, rnd = %d\n",
+              utLog("ARMIES got %d %d, rnd = %d\n",
                    val1, val2, currPlanet.armies);
 #endif
             }
@@ -2638,7 +2637,7 @@ void cfgSectionil(int item, int val1, int val2)
 static void cfgSectionf(int item, real val)
 {
   if (cqiDebugl)
-    clog(" [%d] section = %s\titem = %s\tvalf = %f",
+    utLog(" [%d] section = %s\titem = %s\tvalf = %f",
          curDepth, sect2str(CURSECTION()), item2str(item), val);
 
   switch (CURSECTION())
@@ -2769,7 +2768,7 @@ static void cfgSectionf(int item, real val)
 void cfgSections(int item, char *val)
 {
   if (cqiDebugl)
-    clog(" [%d] section = %s\titem = %s\tvals = '%s'",
+    utLog(" [%d] section = %s\titem = %s\tvals = '%s'",
          curDepth, sect2str(CURSECTION()), 
          item2str(item), (val) ? val : "(NULL)" );
 
@@ -2854,7 +2853,7 @@ void cfgSections(int item, char *val)
              * verbose is on 
              */
             if (cqDebug)
-              clog("CQI: 'color' is no longer valid in planet definitions");
+              utLog("CQI: 'color' is no longer valid in planet definitions");
             break;
           }
       }
@@ -2904,7 +2903,7 @@ void cfgSections(int item, char *val)
                 /* not allowed to set a name on inlined animdefs - it's
                  * already been done for you.
                  */
-                  clog("CQI: field 'name' is ignored for inlined animdefs.");
+                  utLog("CQI: field 'name' is ignored for inlined animdefs.");
               }
             else
               strncpy(currAnimDef.name, val, CQI_NAMELEN - 1);
@@ -2943,7 +2942,7 @@ static void cfgSectionb(int item, char *val)
   int bval = parsebool(val);
 
   if (cqiDebugl)
-    clog(" [%d] section = %s\titem = %s\tvalb = '%s'",
+    utLog(" [%d] section = %s\titem = %s\tvalb = '%s'",
          curDepth, sect2str(CURSECTION()), item2str(item), 
          (bval ? "yes" : "no"));
 
@@ -3341,7 +3340,7 @@ static int parsebool(char *str)
     }
   else
     {
-      clog("parsebool(): error parsing '%s' line %d, \n\t%s\n",
+      utLog("parsebool(): error parsing '%s' line %d, \n\t%s\n",
               str, lineNum,
               "Boolean value must be 'yes', 'no', 'true', 'false', 'on', or 'off'.");
       return(-1);
@@ -3453,7 +3452,7 @@ static void initrun(int rcid)
       break;
 
    default:
-      clog("CQI: initrun: unkown rcid %d", rcid);
+      utLog("CQI: initrun: unkown rcid %d", rcid);
       break;
     }
 

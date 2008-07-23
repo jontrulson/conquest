@@ -86,7 +86,7 @@ void uiInitColors(void)
   if (Context.hascolor)
     {
 #ifdef DEBUG_COLOR
-      clog("Terminal has colors, COLORS = %d, COLOR_PAIRS = %d",
+      utLog("Terminal has colors, COLORS = %d, COLOR_PAIRS = %d",
            COLORS,
            COLOR_PAIRS);
 #endif

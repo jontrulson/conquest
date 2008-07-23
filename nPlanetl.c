@@ -18,6 +18,7 @@
 #include "node.h"
 #include "client.h"
 #include "packet.h"
+#include "conqutil.h"
 
 #include "nCP.h"
 #include "nMenu.h"
@@ -296,13 +297,13 @@ static int nPlanetlIdle(void)
   char buf[PKT_MAXSIZE];
   int sockl[2] = {cInfo.sock, cInfo.usock};
 
-  while ((pkttype = waitForPacket(PKT_FROMSERVER, sockl, PKT_ANYPKT,
+  while ((pkttype = pktWaitForPacket(PKT_FROMSERVER, sockl, PKT_ANYPKT,
                                   buf, PKT_MAXSIZE, 0, NULL)) > 0)
     processPacket(buf);
 
   if (pkttype < 0)          /* some error */
     {
-      clog("nPlanetlIdle: waiForPacket returned %d", pkttype);
+      utLog("nPlanetlIdle: waiForPacket returned %d", pkttype);
       Ships[Context.snum].status = SS_OFF;
       return NODE_EXIT;
     }
@@ -344,7 +345,7 @@ static int nPlanetlInput(int ch)
       break;
 
     default:
-      clog("nPlanetlInput: invalid return node: %d, going to DSP_NODE_MENU",
+      utLog("nPlanetlInput: invalid return node: %d, going to DSP_NODE_MENU",
            retnode);
       setONode(NULL);
       nMenuInit();

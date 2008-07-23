@@ -13,7 +13,7 @@
 #include "datatypes.h"
 #include "protocol.h"
 
-int Logon(char *username);
+int  Logon(char *username);
 void ChangePassword(int unum, int isoper);
 
 #endif /* CLNTAUTH_H_INCLUDED */

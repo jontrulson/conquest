@@ -99,7 +99,7 @@ getTCVI(TexFont * txf, int c)
   }
 
 #ifdef DEBUG_GL
-  clog("texfont: tried to access unavailable font character \"%c\" (%d)\n",
+  utLog("texfont: tried to access unavailable font character \"%c\" (%d)\n",
        isprint(c) ? c : '?', c);
   assert(0); 
 #endif

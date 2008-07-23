@@ -14,6 +14,8 @@
 /*                                                                    */
 /**********************************************************************/
 
+#ifndef _CONQSTRAT_H
+#define _CONQSTRAT_H
 
 #define OP_LT 101
 #define OP_LE 102
@@ -24,13 +26,15 @@
  
 /* prototypes for the parser */
 
-void initrun(void);
-void dumprun(void);
-void displayrun(FILE *filefd);
-void dumprule( int action );
-void addrule( int var, int op, int num );
-int invertop( int op );
-void valstr( int value, char *buf );
-void tokstr( int token, char *buf );
+void         initrun(void);
+void         dumprun(void);
+void         displayrun(FILE *filefd);
+void         dumprule( int action );
+void         addrule( int var, int op, int num );
+int          invertop( int op );
+void         valstr( int value, char *buf );
+void         tokstr( int token, char *buf );
 unsigned int ibset(int start, int end);
-void print_usage(void);
+void         print_usage(void);
+
+#endif /* _CONQSTRAT_H */

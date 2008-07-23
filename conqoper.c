@@ -24,13 +24,16 @@
 /*                                                                    */
 /**********************************************************************/
 
-#define NOEXTERN
 #include "global.h"
 #include "conf.h"
 #include "conqdef.h"
 #include "conqcom.h"
 #include "conqlb.h"
+#include "conqutil.h"
+
+#define NOEXTERN_CONTEXT
 #include "context.h"
+
 #include "global.h"
 #include "sem.h"
 #include "color.h"
@@ -233,7 +236,7 @@ int main(int argc, char *argv[])
   if (GetSysConf(FALSE) == ERR)
     {
 #ifdef DEBUG_CONFIG
-      clog("%s@%d: main(): GetSysConf() returned ERR.", __FILE__, __LINE__);
+      utLog("%s@%d: main(): GetSysConf() returned ERR.", __FILE__, __LINE__);
 #endif
       /* */
       ;
@@ -246,7 +249,7 @@ int main(int argc, char *argv[])
 				   will be ignored */
     {
 #ifdef DEBUG_CONFIG
-      clog("%s@%d: main(): GetSysConf() returned ERR.", __FILE__, __LINE__);
+      utLog("%s@%d: main(): GetSysConf() returned ERR.", __FILE__, __LINE__);
 #endif
       /* */
       ;
@@ -254,7 +257,7 @@ int main(int argc, char *argv[])
   
   if (setgid(ConquestGID) == -1)
     {
-      clog("conqoper: setgid(%d): %s",
+      utLog("conqoper: setgid(%d): %s",
 	   ConquestGID,
 	   strerror(errno));
       fprintf(stderr, "conqoper: setgid(): failed\n");
@@ -276,13 +279,13 @@ int main(int argc, char *argv[])
   
   if (nice(CONQUEST_PRI) == -1)
     {
-      clog("conqoper: main(): nice(CONQUEST_PRI (%d)): failed: %s",
+      utLog("conqoper: main(): nice(CONQUEST_PRI (%d)): failed: %s",
 	   CONQUEST_PRI,
 	   strerror(errno));
     }
 #if defined(DEBUG_FLOW)
   else
-    clog("conqoper: main(): nice(CONQUEST_PRI (%d)): succeeded.",
+    utLog("conqoper: main(): nice(CONQUEST_PRI (%d)): succeeded.",
 	 CONQUEST_PRI);
 #endif 
 
@@ -306,7 +309,7 @@ int main(int argc, char *argv[])
 
   sprintf(msgbuf, "OPER: User %s has entered conqoper.",
           operName);
-  clog(msgbuf);			/* log it too... */
+  utLog(msgbuf);			/* log it too... */
   clbStoreMsg( MSG_COMP, MSG_GOD, msgbuf );
 
   operate();
@@ -336,7 +339,7 @@ void bigbang(void)
 	    break;
 	  else
 	    {
-	      dir = mod360( dir + 40.0 );
+	      dir = utMod360( dir + 40.0 );
 	      cnt = cnt + 1;
 	    }
       }
@@ -344,7 +347,7 @@ void bigbang(void)
   "#%d#bigbang: Fired #%d#%d #%d#torpedos, hoo hah won't they be surprised!", 
 	InfoColor,SpecialColor,cnt,InfoColor );
   
-  clog("OPER: %s fired BigBang - %d tropedos",
+  utLog("OPER: %s fired BigBang - %d tropedos",
        operName, cnt);
 
   return;
@@ -392,7 +395,7 @@ void debugdisplay( int snum )
   dcol = tcol + 10;
   cprintf(lin,tcol,ALIGN_NONE,"#%d#%s",LabelColor, "    ship:");
   buf[0] = EOS;
-  appship( snum, buf );
+  utAppendShip( snum, buf );
   if ( SROBOT(snum) )
     appstr( " (ROBOT)", buf );
   cprintf( lin, dcol,ALIGN_NONE,"#%d#%s",InfoColor,buf );
@@ -450,7 +453,7 @@ void debugdisplay( int snum )
 	appchr( ' ', buf );
     }
   appchr( '(', buf );
-  appint( unum, buf );
+  utAppendInt( unum, buf );
   appchr( ')', buf );
   cprintf(lin,dcol,ALIGN_NONE,"#%d#%s",InfoColor, buf);
   lin++;
@@ -474,9 +477,9 @@ void debugdisplay( int snum )
   if ( Ships[snum].wfuse > 0 || Ships[snum].efuse > 0 )
     {
       appstr( " (", buf );
-      appint( Ships[snum].wfuse, buf );
+      utAppendInt( Ships[snum].wfuse, buf );
       appchr( '/', buf );
-      appint( Ships[snum].efuse, buf );
+      utAppendInt( Ships[snum].efuse, buf );
       appchr( ')', buf );
     }
   cprintf(lin,dcol,ALIGN_NONE,"#%d#%s",InfoColor, buf);
@@ -515,7 +518,7 @@ void debugdisplay( int snum )
   dcol = tcol + 12;
   cprintf(lin,tcol,ALIGN_NONE,"#%d#%s",LabelColor, "   sstatus:");
   buf[0] = EOS;
-  appsstatus( Ships[snum].status, buf );
+  utAppendShipStatus( Ships[snum].status, buf );
   cprintf(lin,dcol,ALIGN_NONE,"#%d#%s",InfoColor, buf);
   lin++;
   cprintf(lin,tcol,ALIGN_NONE,"#%d#%s",LabelColor, " skilledby:");
@@ -523,7 +526,7 @@ void debugdisplay( int snum )
   if ( i != 0 )
     {
       buf[0] = EOS;
-      appkb( Ships[snum].killedby, buf );
+      utAppendKilledBy( Ships[snum].killedby, buf );
 	  cprintf(lin,dcol,ALIGN_NONE,"#%d#%s",InfoColor, buf);
     }
   lin++;
@@ -544,7 +547,7 @@ void debugdisplay( int snum )
   if ( i != 0 )
     {
       buf[0] = EOS;
-      appship( i, buf );
+      utAppendShip( i, buf );
   	  cprintf(lin,dcol,ALIGN_NONE,"#%d#%s",InfoColor, buf);
     }
   lin++;
@@ -553,7 +556,7 @@ void debugdisplay( int snum )
   if ( i != 0 )
     {
       buf[0] = EOS;
-      appship( i, buf );
+      utAppendShip( i, buf );
   	  cprintf(lin,dcol,ALIGN_NONE,"#%d#%s",InfoColor, buf);
     }
   lin++;
@@ -838,7 +841,7 @@ int opPlanetMatch( char str[], int *pnum )
   if ( alldig( str ) == TRUE )
     {
       i = 0;
-      if ( ! safectoi( pnum, str, i ) )
+      if ( ! utSafeCToI( pnum, str, i ) )
 	return ( FALSE );
       if ( *pnum < 1 || *pnum > NUMPLANETS )
 	return ( FALSE );
@@ -887,7 +890,7 @@ void kiss(int snum, int prompt_flg)
 	  cdmove( 1, 1 );
 	  return;
 	}
-      delblanks( buf );
+      utDeleteBlanks( buf );
     }
   else 
     {
@@ -908,7 +911,7 @@ void kiss(int snum, int prompt_flg)
 	  Driver->drivstat = DRS_KAMIKAZE;
       cdclrl( MSG_LIN1, 2 );
       cdmove( 1, 1 );
-      clog("OPER: %s killed the driver", operName);
+      utLog("OPER: %s killed the driver", operName);
       return;
     }
   
@@ -916,13 +919,13 @@ void kiss(int snum, int prompt_flg)
   if ( alldig( buf ) == TRUE )
     {
       i = 0;
-      safectoi( &snum, buf, i );		/* ignore status */
+      utSafeCToI( &snum, buf, i );		/* ignore status */
       if ( snum < 1 || snum > MAXSHIPS )
 	cdputs( no_ship_str, MSG_LIN2, 1 );
       else if ( Ships[snum].status != SS_LIVE ) {
 	cdclrl( MSG_LIN1, 1 );
 	ssbuf[0] = EOS; 
-	appsstatus( Ships[snum].status, ssbuf);
+	utAppendShipStatus( Ships[snum].status, ssbuf);
 	sprintf(mbuf, cant_kill_ship_str,
 		Teams[Ships[snum].team].teamchar, 
 		snum, 
@@ -939,7 +942,7 @@ void kiss(int snum, int prompt_flg)
 	  {
 	    clbKillShip( snum, KB_GOD );
 	    cdclrl( MSG_LIN2, 1 );
-	    clog("OPER: %s killed ship %d",
+	    utLog("OPER: %s killed ship %d",
 		 operName, snum);
 	  }
 	cdclrl( MSG_LIN1, 1 );
@@ -949,7 +952,7 @@ void kiss(int snum, int prompt_flg)
     }
   
   /* Kill EVERYBODY? */
-  if ( stmatch( buf, "all", FALSE ) )
+  if ( utStringMatch( buf, "all", FALSE ) )
     {
       didany = FALSE;
       for ( snum = 1; snum <= MAXSHIPS; snum++ )
@@ -964,7 +967,7 @@ void kiss(int snum, int prompt_flg)
 	    cdputs( buf, MSG_LIN1, 1 );
 	    if ( mcuConfirm() )
 	      {
-		clog("OPER: %s killed ship %d",
+		utLog("OPER: %s killed ship %d",
 		     operName, snum);
 		clbKillShip( snum, KB_GOD );
 	      }
@@ -1003,7 +1006,7 @@ void kiss(int snum, int prompt_flg)
 		  {
 	    clbKillShip( snum, KB_GOD );
 	    cdclrl( MSG_LIN2, 1 );
-	    clog("OPER: %s killed ship %d",
+	    utLog("OPER: %s killed ship %d",
 		 operName, snum);
 	  }
 	}
@@ -1153,7 +1156,7 @@ void operate(void)
   ConqInfo->glastmsg = ConqInfo->lastmsg;  
 
   lastrev = *CBlockRevision;
-  grand( &msgrand );
+  utGrand( &msgrand );
 
   redraw = TRUE;
   while (TRUE)      /* repeat */
@@ -1211,7 +1214,7 @@ void operate(void)
 	      if ( -i > 0 && -i <= NUMPLANETS )
 		appstr( Planets[-i].name, buf );
 	      else
-		appship( i, buf );		/* this will handle funny numbers */
+		utAppendShip( i, buf );		/* this will handle funny numbers */
 	      appchr( ')', buf );
 	    }
 	  else
@@ -1235,8 +1238,8 @@ void operate(void)
 
 	  /* Display a new message, if any. */
 	  readone = FALSE;
-	  if ( dgrand( msgrand, &now ) >= NEWMSG_GRAND )
-	    if ( getamsg( MSG_GOD, &ConqInfo->glastmsg ) )
+	  if ( utDeltaGrand( msgrand, &now ) >= NEWMSG_GRAND )
+	    if ( utGetMsg( MSG_GOD, &ConqInfo->glastmsg ) )
 	      {
 		mcuReadMsg( MSG_GOD, ConqInfo->glastmsg, RMsg_Line );
 		
@@ -1252,7 +1255,7 @@ void operate(void)
 	  /* Un-read message, if there's a chance it got garbaged. */
 	  if ( readone )
 	    if ( iochav() )
-	      ConqInfo->glastmsg = modp1( ConqInfo->glastmsg - 1, MAXMESSAGES );
+	      ConqInfo->glastmsg = utModPlusOne( ConqInfo->glastmsg - 1, MAXMESSAGES );
 
 	} /* *CBlockRevision != COMMONSTAMP */
       else 
@@ -1283,13 +1286,13 @@ void operate(void)
 	  if ( Doomsday->status == DS_LIVE )
 	    {
 	      Doomsday->status = DS_OFF;
-	      clog("OPER: %s deactivated the Doomsday machine",
+	      utLog("OPER: %s deactivated the Doomsday machine",
 		   operName);
 	    }
 	  else
 	    {
 	      clbDoomsday();
-	      clog("OPER: %s has ACTIVATED the Doomsday machine",
+	      utLog("OPER: %s has ACTIVATED the Doomsday machine",
 		   operName);
 	    }
 	  break;
@@ -1308,13 +1311,13 @@ void operate(void)
 	      Driver->drivpid = 0;
 	      Driver->drivowner[0] = EOS;
 	      
-	      clog("OPER: %s has enabled the game",
+	      utLog("OPER: %s has enabled the game",
 		   operName);
 	    }
 	  else if ( mcuConfirm() )
 	    {
 	      ConqInfo->closed = TRUE;
-	      clog("OPER: %s has disabled the game",
+	      utLog("OPER: %s has disabled the game",
                    operName);
 	    }
 	  break;
@@ -1412,7 +1415,7 @@ void operate(void)
 	  cdbeep();
 	}
       /* Disable messages for awhile. */
-      grand( &msgrand );
+      utGrand( &msgrand );
     } /* repeat */
   
   /* NOTREACHED */
@@ -1441,7 +1444,7 @@ void opinfo( int snum )
       return;
     }
   
-  delblanks( cbuf );
+  utDeleteBlanks( cbuf );
   fold( cbuf );
   if ( cbuf[0] == EOS )
     {
@@ -1452,22 +1455,22 @@ void opinfo( int snum )
   if ( cbuf[0] == 's' && alldig( &cbuf[1] ) == TRUE )
     {
       i = 0;
-      safectoi( &j, &cbuf[1], i );		/* ignore status */
+      utSafeCToI( &j, &cbuf[1], i );		/* ignore status */
       mcuInfoShip( j, snum );
     }
   else if ( alldig( cbuf ) == TRUE )
     {
       i = 0;
-      safectoi( &j, cbuf, i );		/* ignore status */
+      utSafeCToI( &j, cbuf, i );		/* ignore status */
       mcuInfoShip( j, snum );
     }
   else if ( opPlanetMatch( cbuf, &j ) )
     mcuInfoPlanet( "", j, snum );
-  else if ( stmatch( cbuf, "time", FALSE ) )
+  else if ( utStringMatch( cbuf, "time", FALSE ) )
     {
       getnow( now, 0 );
       c_strcpy( "It's ", cbuf );
-      appnumtim( now, cbuf );
+      utAppendTime( now, cbuf );
       appchr( '.', cbuf );
       mcuPutMsg( cbuf, MSG_LIN1 );
       cdmove( MSG_LIN1, 1 );
@@ -1877,9 +1880,9 @@ void oppedit(void)
 		     TERMS, buf, MSGMAXLINE );
 	  if ( ch == TERM_ABORT || buf[0] == EOS )
 	    continue;	/* next */
-	  delblanks( buf );
+	  utDeleteBlanks( buf );
 	  i = 0;
-	  if ( ! safectoi( &j, buf, i ) )
+	  if ( ! utSafeCToI( &j, buf, i ) )
 	    continue;	/* next */
 
 	  x = ctor( buf);
@@ -1893,9 +1896,9 @@ void oppedit(void)
 		     MSG_LIN1, 0, TERMS, buf, MSGMAXLINE );
 	  if ( ch == TERM_ABORT || buf[0] == EOS )
 	    continue;
-	  delblanks( buf );
+	  utDeleteBlanks( buf );
 	  i = 0;
-	  if ( ! safectoi( &j, buf, i ) )
+	  if ( ! utSafeCToI( &j, buf, i ) )
 	    continue;
 	  Planets[pnum].armies = j;
 	  break;
@@ -1904,7 +1907,7 @@ void oppedit(void)
 	  ch = mcuGetCX( "New name for this planet? ",
 		     MSG_LIN1, 0, TERMS, buf, MAXPLANETNAME );
 	  if ( ch != TERM_ABORT && ( ch == TERM_EXTRA || buf[0] != EOS ) )
-	    stcpn( buf, Planets[pnum].name, MAXPLANETNAME );
+	    utStcpn( buf, Planets[pnum].name, MAXPLANETNAME );
 	  break;
 	case 'o':
 	  /* New primary. */
@@ -1923,9 +1926,9 @@ void oppedit(void)
 		     MSG_LIN1, 0, TERMS, buf, MSGMAXLINE );
 	  if ( ch == TERM_ABORT || buf[0] == EOS )
 	    continue;	/* next */
-	  delblanks( buf );
+	  utDeleteBlanks( buf );
 	  i = 0;
-	  if ( ! safectoi( &j, buf, i ) )
+	  if ( ! utSafeCToI( &j, buf, i ) )
 	    continue;	/* next */
 
 	  Planets[pnum].orbvel = ctor( buf );
@@ -1934,14 +1937,14 @@ void oppedit(void)
 	  /* Rotate owner team. */
 	  if ( pnum > NUMCONPLANETS )
 	    {
-	      Planets[pnum].team = modp1( Planets[pnum].team + 1, NUMALLTEAMS );
+	      Planets[pnum].team = utModPlusOne( Planets[pnum].team + 1, NUMALLTEAMS );
 	    }
 	  else
 	    cdbeep();
 	  break;
 	case 't':
 	  /* Rotate planet type. */
-	  Planets[pnum].type = modp1( Planets[pnum].type + 1, MAXPLANETTYPES );
+	  Planets[pnum].type = utModPlusOne( Planets[pnum].type + 1, MAXPLANETTYPES );
 	  break;
 	case 'x':
 	  /* X coordinate. */
@@ -1949,10 +1952,10 @@ void oppedit(void)
 		     MSG_LIN1, 0, TERMS, buf, MSGMAXLINE );
 	  if ( ch == TERM_ABORT || buf[0] == EOS )
 	    continue;	/* next */
-	  delblanks( buf );
+	  utDeleteBlanks( buf );
 	  i = 0;
 
-	  if ( ! safectoi( &j, buf, i ) )
+	  if ( ! utSafeCToI( &j, buf, i ) )
 	    continue;	/* next */
 
 	  Planets[pnum].x = ctor( buf );
@@ -1963,9 +1966,9 @@ void oppedit(void)
 		     MSG_LIN1, 0, TERMS, buf, MSGMAXLINE );
 	  if ( ch == TERM_ABORT || buf[0] == EOS )
 	    continue;	/* next */
-	  delblanks( buf );
+	  utDeleteBlanks( buf );
 	  i = 0;
-	  if ( ! safectoi( &j, buf, i ) )
+	  if ( ! utSafeCToI( &j, buf, i ) )
 	    continue;	/* next */
 
 	  Planets[pnum].y = ctor( buf );
@@ -1989,9 +1992,9 @@ void oppedit(void)
 		     MSG_LIN1, 0, TERMS, buf, MSGMAXLINE );
 	  if ( ch == TERM_ABORT || buf[0] == EOS )
 	    continue;
-	  delblanks( buf );
+	  utDeleteBlanks( buf );
 	  i = 0;
-	  if ( ! safectoi( &j, buf, i ) )
+	  if ( ! utSafeCToI( &j, buf, i ) )
 	    continue;
 	  Planets[pnum].uninhabtime = j;
 	  break;
@@ -2009,9 +2012,9 @@ void oppedit(void)
 		     MSG_LIN1, 0, TERMS, buf, MSGMAXLINE );
 	  if ( ch == TERM_ABORT || buf[0] == EOS )
 	    continue;	/* next */
-	  delblanks( buf );
+	  utDeleteBlanks( buf );
 	  i = 0;
-	  if ( ! safectoi( &j, buf, i ) )
+	  if ( ! utSafeCToI( &j, buf, i ) )
 	    continue;	/* next */
 
 	  Planets[pnum].orbrad = ctor( buf );
@@ -2096,7 +2099,7 @@ void opresign(void)
     }
   else if ( mcuConfirm() )
     {
-      clog("OPER: %s has resigned %s (%s)",
+      utLog("OPER: %s has resigned %s (%s)",
 	   operName,
 	   Users[unum].username,
 	   Users[unum].alias);
@@ -2168,9 +2171,9 @@ void oprobot(void)
 	  return;
 	}
       warlike = ( ch == TERM_EXTRA );
-      delblanks( buf );
+      utDeleteBlanks( buf );
       i = 0;
-      safectoi( &num, buf, i );
+      utSafeCToI( &num, buf, i );
       if ( num <= 0 )
 	num = 1;
     }
@@ -2196,7 +2199,7 @@ void oprobot(void)
     }
   
   /* Report the good news. */
-  clog("OPER: %s created %d %s%s (%s) robot(s)",
+  utLog("OPER: %s created %d %s%s (%s) robot(s)",
        operName,
        anum, 
        (warlike == TRUE) ? "WARLIKE " : "",
@@ -2206,10 +2209,10 @@ void oprobot(void)
   sprintf( buf, "Automation %s (%s) is now flying ",
 	 Users[unum].alias, Users[unum].username );
   if ( anum == 1 )
-    appship( snum, buf );
+    utAppendShip( snum, buf );
   else
     {
-      appint( anum, buf );
+      utAppendInt( anum, buf );
       appstr( " new ships.", buf );
     }
   cdclrl( MSG_LIN2, 1 );
@@ -2243,13 +2246,13 @@ void opstats(void)
   do /*repeat*/
     {
       lin = 2;
-      fmtseconds( ConqInfo->ccpuseconds, timbuf );
+      utFormatSeconds( ConqInfo->ccpuseconds, timbuf );
       cprintf( lin,col,ALIGN_NONE,sfmt, 
 		LabelColor,"Conquest cpu time:", InfoColor,timbuf );
       
       lin++;
       i = ConqInfo->celapsedseconds;
-      fmtseconds( i, timbuf );
+      utFormatSeconds( i, timbuf );
       cprintf( lin,col,ALIGN_NONE,sfmt, 
 		LabelColor,"Conquest elapsed time:", InfoColor,timbuf );
       
@@ -2262,13 +2265,13 @@ void opstats(void)
 		LabelColor,"Conquest cpu usage:", InfoColor,x);
       
       lin+=2;
-      fmtseconds( ConqInfo->dcpuseconds, timbuf );
+      utFormatSeconds( ConqInfo->dcpuseconds, timbuf );
       cprintf( lin,col,ALIGN_NONE,sfmt, 
 		LabelColor,"Conqdriv cpu time:", InfoColor,timbuf );
       
       lin++;
       i = ConqInfo->delapsedseconds;
-      fmtseconds( i, timbuf );
+      utFormatSeconds( i, timbuf );
       cprintf( lin,col,ALIGN_NONE,sfmt, 
 		LabelColor,"Conqdriv elapsed time:", InfoColor,timbuf );
       
@@ -2281,13 +2284,13 @@ void opstats(void)
 		LabelColor,"Conqdriv cpu usage:", InfoColor,x);
       
       lin+=2;
-      fmtseconds( ConqInfo->rcpuseconds, timbuf );
+      utFormatSeconds( ConqInfo->rcpuseconds, timbuf );
       cprintf( lin,col,ALIGN_NONE,sfmt, 
 		LabelColor,"Robot cpu time:", InfoColor,timbuf );
       
 	  lin++;
       i = ConqInfo->relapsedseconds;
-      fmtseconds( i, timbuf );
+      utFormatSeconds( i, timbuf );
       cprintf( lin,col,ALIGN_NONE,sfmt, 
 		LabelColor,"Robot elapsed time:", InfoColor,timbuf );
       
@@ -2308,12 +2311,12 @@ void opstats(void)
 		LabelColor, "Last conquer:", InfoColor, ConqInfo->conqtime);
       
       lin++;
-      fmtseconds( Driver->playtime, timbuf );
+      utFormatSeconds( Driver->playtime, timbuf );
       cprintf( lin, col, ALIGN_NONE, sfmt, 
 		LabelColor, "Driver time:", InfoColor, timbuf);
       
       lin++;
-      fmtseconds( Driver->drivtime, timbuf );
+      utFormatSeconds( Driver->drivtime, timbuf );
       cprintf( lin, col, ALIGN_NONE, sfmt, 
 		LabelColor, "Play time:", InfoColor, timbuf);
       
@@ -2322,7 +2325,7 @@ void opstats(void)
 		LabelColor, "Last upchuck:", InfoColor, ConqInfo->lastupchuck);
       
       lin++;
-      getdandt( timbuf, 0 );
+      utFormatTime( timbuf, 0 );
       cprintf( lin, col, ALIGN_NONE, tfmt, 
 		LabelColor, "Current time:", InfoColor, timbuf);
       
@@ -2410,7 +2413,7 @@ void opuadd(void)
   name[0] = EOS;
   ch = (char)cdgetx( "Add user: ", MSG_LIN1, 1, TERMS, name, MAXUSERNAME,
 		     TRUE);
-  /*  delblanks( name );*/
+  /*  utDeleteBlanks( name );*/
 
   nameptr = name;
   if (*nameptr == '@')
@@ -2462,7 +2465,7 @@ void opuadd(void)
   
   
   buf[0] = EOS;
-  apptitle( team, buf );
+  utAppendTitle( team, buf );
   appchr( ' ', buf );
   i = strlen( buf );
 
@@ -2478,7 +2481,7 @@ void opuadd(void)
     }
   else		
     {
-      clog("OPER: %s added user '%s'.",
+      utLog("OPER: %s added user '%s'.",
 	   operName, name);
 
     }
@@ -2517,7 +2520,7 @@ void opuedit(void)
 	  uiPutColor(0);
       return;
     }
-  /*  delblanks( buf );*/
+  /*  utDeleteBlanks( buf );*/
 
   if ( ! clbGetUserNum( &unum, buf, -1 ) )
     {
@@ -2632,20 +2635,20 @@ void opuedit(void)
       if (Users[unum].lastentry == 0)
 	strcpy(datestr, "never");
       else
-	getdandt(datestr, Users[unum].lastentry);
+	utFormatTime(datestr, Users[unum].lastentry);
 
       cprintf(lin,dcol,ALIGN_NONE,"#%d#%s",InfoColor, 
 	      datestr);
       
       lin++;
       cprintf(lin,tcol,ALIGN_NONE,"#%d#%s", LabelColor,"  Elapsed seconds:");
-      fmtseconds( Users[unum].stats[TSTAT_SECONDS], buf );
+      utFormatSeconds( Users[unum].stats[TSTAT_SECONDS], buf );
       i = dcol + 11 - strlen( buf );
       cprintf(lin,i,ALIGN_NONE,"#%d#%s",InfoColor, buf);
       
       lin++;
       cprintf(lin,tcol,ALIGN_NONE,"#%d#%s", LabelColor,"      Cpu seconds:");
-      fmtseconds( Users[unum].stats[TSTAT_CPUSECONDS], buf );
+      utFormatSeconds( Users[unum].stats[TSTAT_CPUSECONDS], buf );
       i = dcol + 11 - strlen ( buf );
       cprintf(lin,i,ALIGN_NONE,"#%d#%s",InfoColor, buf);
       
@@ -2824,7 +2827,7 @@ void opuedit(void)
 			 MSG_LIN2, 0, TERMS, buf, MAXUSERPNAME );
 	      if ( ch != TERM_ABORT &&
 		  ( buf[0] != EOS || ch == TERM_EXTRA ) )
-		stcpn( buf, Users[unum].alias, MAXUSERPNAME ); /* -[] */
+		utStcpn( buf, Users[unum].alias, MAXUSERPNAME ); /* -[] */
 	    }
 	  else if ( ! left && row == 1 )
 	    {
@@ -2834,9 +2837,9 @@ void opuedit(void)
 			 MSG_LIN2, 0, TERMS, buf, MAXUSERNAME );
 	      if ( ch != TERM_ABORT && buf[0] != EOS)
 	      {
-		delblanks( buf );
+		utDeleteBlanks( buf );
 		if ( ! clbGetUserNum( &i, buf, -1 ) )
-		  stcpn( buf, Users[unum].username, MAXUSERNAME );
+		  utStcpn( buf, Users[unum].username, MAXUSERNAME );
 		else
 		  {
 		    cdclrl( MSG_LIN1, 2 );
@@ -2851,7 +2854,7 @@ void opuedit(void)
 	  else if ( left && row == 2 )
 	    {
 	      /* Team. */
-	      Users[unum].team = modp1( Users[unum].team + 1, NUMPLAYERTEAMS );
+	      Users[unum].team = utModPlusOne( Users[unum].team + 1, NUMPLAYERTEAMS );
 	    }
 	  else if ( ! left && row == 2 )
 	    {
@@ -2861,9 +2864,9 @@ void opuedit(void)
 			 MSG_LIN2, 0, TERMS, buf, MSGMAXLINE );
 	      if ( ch != TERM_ABORT && buf[0] != EOS )
 		{
-		  delblanks( buf );
+		  utDeleteBlanks( buf );
 		  i = 0;
-		  safectoi( &(Users[unum].multiple), buf, i );
+		  utSafeCToI( &(Users[unum].multiple), buf, i );
 		}
 	    }
 	  else
@@ -2923,7 +2926,7 @@ void watch(void)
 	  Context.redraw = TRUE;
 	  cdclear();
 	  cdredo();
-	  grand( &msgrand );
+	  utGrand( &msgrand );
 
 	  Context.snum = snum;		/* so display knows what to display */
 	  operSetTimer();
@@ -2942,8 +2945,8 @@ void watch(void)
 
 	    /* Try to display a new message. */
 	    readone = FALSE;
-	    if ( dgrand( msgrand, &now ) >= NEWMSG_GRAND )
-		if ( getamsg( MSG_GOD, &ConqInfo->glastmsg ) )
+	    if ( utDeltaGrand( msgrand, &now ) >= NEWMSG_GRAND )
+		if ( utGetMsg( MSG_GOD, &ConqInfo->glastmsg ) )
 		  {
 		    mcuReadMsg( MSG_GOD, ConqInfo->glastmsg, RMsg_Line );
 #if defined(OPER_MSG_BEEP)
@@ -2970,7 +2973,7 @@ void watch(void)
 	      /* Un-read message, if there's a chance it got garbaged. */
 	      if ( readone )
 		if ( iochav() )
-		  ConqInfo->glastmsg = modp1( ConqInfo->glastmsg - 1, MAXMESSAGES );
+		  ConqInfo->glastmsg = utModPlusOne( ConqInfo->glastmsg - 1, MAXMESSAGES );
 	      
 	      /* Get a char with timeout. */
 	      if ( ! iogtimed( &ch, 1.0 ) )
@@ -3271,7 +3274,7 @@ void watch(void)
 		  break;
 		}
 	      /* Disable messages for awhile. */
-	      grand( &msgrand );
+	      utGrand( &msgrand );
 	    }
 	} /* end else */
 
@@ -3312,7 +3315,7 @@ int prompt_ship(char buf[], int *snum, int *normal)
   
   *normal = ( tch != TERM_EXTRA );		/* line feed means debugging */
 
-  delblanks( buf );
+  utDeleteBlanks( buf );
 
   if ( strlen( buf ) == 0 ) 
     {              /* watch doomsday machine */
@@ -3329,7 +3332,7 @@ int prompt_ship(char buf[], int *snum, int *normal)
 	  c_sleep( 1.0 );
 	  return(FALSE); /* dwp */
 	}
-      safectoi( &tmpsnum, buf, 0 );	/* ignore return status */
+      utSafeCToI( &tmpsnum, buf, 0 );	/* ignore return status */
     }
 
   if ( (tmpsnum < 1 || tmpsnum > MAXSHIPS) && tmpsnum != DISPLAY_DOOMSDAY )
@@ -3597,7 +3600,7 @@ int DoInit(char InitChar, int cmdline)
       break;
     }
       
-  clog("OPER: %s initialized '%c'",
+  utLog("OPER: %s initialized '%c'",
        operName, InitChar);
 
   return TRUE;
@@ -3606,7 +3609,7 @@ int DoInit(char InitChar, int cmdline)
 void EnableConqoperSignalHandler(void)
 {
 #ifdef DEBUG_SIG
-  clog("EnableConquestSignalHandler() ENABLED");
+  utLog("EnableConquestSignalHandler() ENABLED");
 #endif
   
   signal(SIGHUP, (void (*)(int))DoConqoperSig);
@@ -3622,7 +3625,7 @@ void DoConqoperSig(int sig)
 {
   
 #ifdef DEBUG_SIG
-  clog("DoSig() got SIG %d", sig);
+  utLog("DoSig() got SIG %d", sig);
 #endif
   
   switch(sig)
@@ -3684,7 +3687,7 @@ void operSetTimer(void)
 
   if (sigaction(SIGALRM, &Sig, NULL) == -1)
     {
-      clog("clntSetTimer():sigaction(): %s\n", strerror(errno));
+      utLog("clntSetTimer():sigaction(): %s\n", strerror(errno));
       exit(errno);
     }
   

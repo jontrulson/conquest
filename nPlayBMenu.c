@@ -21,6 +21,7 @@
 #include "prm.h"
 #include "glmisc.h"
 #include "ui.h"
+#include "conqutil.h"
 
 #include "nPlayB.h"
 #include "nPlayBMenu.h"
@@ -60,9 +61,9 @@ void nPlayBMenuInit(void)
   state = S_NONE;
   prompting = FALSE;
 
-  /* init frameDelay based on samplerate if neccessary */
-  if (frameDelay == -1.0)
-    frameDelay = 1.0 / (real)fhdr.samplerate;
+  /* init recFrameDelay based on samplerate if neccessary */
+  if (recFrameDelay == -1.0)
+    recFrameDelay = 1.0 / (real)recFileHeader.samplerate;
 
   setNode(&nPlayBMenuNode);
 
@@ -106,7 +107,7 @@ static int nPlayBMenuInput(int ch)
               return NODE_OK;
             }
 
-          delblanks( prm.buf );
+          utDeleteBlanks( prm.buf );
           if ( strlen( prm.buf ) == 0 )
             {              /* watch doomsday machine */
               tmpsnum = DISPLAY_DOOMSDAY;
@@ -121,7 +122,7 @@ static int nPlayBMenuInput(int ch)
                   nss = "No such ship.";
                   return NODE_OK; 
                 }
-              safectoi( &tmpsnum, prm.buf, 0 );     /* ignore return status */
+              utSafeCToI( &tmpsnum, prm.buf, 0 );     /* ignore return status */
             }
 
           if ( (tmpsnum < 1 || tmpsnum > MAXSHIPS) && 
@@ -152,12 +153,12 @@ static int nPlayBMenuInput(int ch)
       break;
 
     case 'r':
-      pbFileSeek(startTime);
+      pbFileSeek(recStartTime);
       break;
 
     case 'w':
       state = S_WATCH;
-      if (fhdr.snum == 0)
+      if (recFileHeader.snum == 0)
         {
           cbuf[0] = EOS;
           prm.preinit = False;
@@ -165,7 +166,7 @@ static int nPlayBMenuInput(int ch)
         }
       else
         {
-          sprintf(cbuf, "%d", fhdr.snum);
+          sprintf(cbuf, "%d", recFileHeader.snum);
           prm.preinit = True;
         }
 

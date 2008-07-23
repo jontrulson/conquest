@@ -105,7 +105,7 @@ void rndini ( int seed1, int seed2 )
     }
   
 #ifdef DEBUG_RANDOM
-  clog("rndini(): seed1 = %d, seed2  = %d, value1 = %d, value2 = %d",
+  utLog("rndini(): seed1 = %d, seed2  = %d, value1 = %d, value2 = %d",
        seed1, seed2, value1, value2);
 #endif
   
@@ -126,7 +126,7 @@ real rnd ( void )		/* use 48bit linear congruential */
   
   rc = (real) drand48();
 #ifdef DEBUG_RANDOM
-  clog("rnd(): drand48() = %f", rc);
+  utLog("rnd(): drand48() = %f", rc);
 #endif
   return(rc);
 }
@@ -152,7 +152,7 @@ int rndint ( int ilow, int ihigh )
 
   rc = ifix ( rnd() * rfix(ihigh-ilow+1.0) ) + ilow;
 #ifdef DEBUG_RANDOM
-  clog("rndint(): rc = %d", rc);
+  utLog("rndint(): rc = %d", rc);
 #endif
   
   return(rc);

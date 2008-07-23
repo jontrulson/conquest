@@ -461,7 +461,7 @@ spPlanet_t *spktPlanet(Unsgn8 pnum, int rec)
   memset((void *)&splan, 0, sizeof(spPlanet_t));
 
 #if defined(DEBUG_SERVERSEND)
-  clog("sendPlanet: pnum = %d",
+  utLog("sendPlanet: pnum = %d",
        pnum);
 #endif
 
@@ -585,7 +585,7 @@ spPlanetLoc_t *spktPlanetLoc(Unsgn8 pnum, int rec, int force)
       ((dx + dy) / 2.0) < 3.0)
     {
 #if 0
-      clog("REJECT: %s dx = %f dy = %f [%f]", Planets[pnum].name,
+      utLog("REJECT: %s dx = %f dy = %f [%f]", Planets[pnum].name,
            dx, dy,
            ((dx + dy) / 2.0));
 #endif
@@ -601,7 +601,7 @@ spPlanetLoc_t *spktPlanetLoc(Unsgn8 pnum, int rec, int force)
     }
   
 #if 0
-  clog("%s dx = %f dy = %f [%f]", Planets[pnum].name,
+  utLog("%s dx = %f dy = %f [%f]", Planets[pnum].name,
        dx, dy,
        ((dx + dy) / 2.0));
 #endif

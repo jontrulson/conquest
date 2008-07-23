@@ -30,20 +30,21 @@
 #include "context.h"
 #include "color.h"
 #include "conqlb.h"
+#include "conqutil.h"
 
-/* if set, clog uses the system log, else it is created in HOME */
+/* if set, utLog uses the system log, else it is created in HOME */
 static int systemlog   = TRUE;
-static int echo2stderr = FALSE;  /* whether to echo clog to stderr */
+static int echo2stderr = FALSE;  /* whether to echo utLog to stderr */
                                  /* this will be ignored if systemlog is
                                     TRUE */
 
-/*  acdist - figure distance traveled while changing velocities */
+/*  utAccurateDist - figure distance traveled while changing velocities */
 /*  SYNOPSIS */
 /*    real dis, curvel, newvel, acc */
-/*    dis = acdist( curvel, newvel, acc ) */
+/*    dis = utAccurateDist( curvel, newvel, acc ) */
 /*  DESCRIPTION */
 /*    These formulas works for de-acceleration only. */
-real acdist( real curvel, real newvel, real acc )
+real utAccurateDist( real curvel, real newvel, real acc )
 {
   real t;
   /*    The following is a box approximation that takes into account */
@@ -62,23 +63,23 @@ real acdist( real curvel, real newvel, real acc )
 /*  angle - compute the angle between two points */
 /*  SYNOPSIS */
 /*    real ang, angle, fromx, fromy, tox, toy */
-/*    ang = angle( fromx, fromy, tox, toy ) */
-real angle( real fromx, real fromy, real tox, real toy )
+/*    ang = utAngle( fromx, fromy, tox, toy ) */
+real utAngle( real fromx, real fromy, real tox, real toy )
 {
   if ( fromx == tox && fromy == toy )
     return ( 0.0 );
   
-  return ( mod360( rtod( atan2( toy - fromy, tox - fromx ) ) ) );
+  return ( utMod360( rtod( atan2( toy - fromy, tox - fromx ) ) ) );
   
 }
 
 
-/*  appint - append an int to a string */
+/*  utAppendInt - append an int to a string */
 /*  SYNOPSIS */
 /*    int int */
 /*    char str() */
-/*    appint( i, str ) */
-void appint( int i, char *str )
+/*    utAppendInt( i, str ) */
+void utAppendInt( int i, char *str )
 {
   char buf[BUFFER_SIZE];
   
@@ -91,13 +92,13 @@ void appint( int i, char *str )
 }
 
 
-/*  appnum - append a number in English */
+/*  utAppendNumWord - append a number in English */
 /*  SYNOPSIS */
 /*    int num */
 /*    char buf() */
-/*    appnum( num, buf ) */
+/*    utAppendNumWord( num, buf ) */
 /* Note: This routine only works for the number less than 100. */
-void appnum( int num, char *buf )
+void utAppendNumWord( int num, char *buf )
 {
   int i, j;
   
@@ -215,10 +216,10 @@ void appnum( int num, char *buf )
 }
 
 
-/*  appnumtim - append English formated time and date */
+/*  utAppendTime - append English formated time and date */
 /*  SYNOPSIS */
-/*   appnumtim( now, buf ) */
-void appnumtim( int now[], char *buf )
+/*   utAppendTime( now, buf ) */
+void utAppendTime( int now[], char *buf )
 {
   int hour;
   int am;
@@ -305,9 +306,9 @@ void appnumtim( int now[], char *buf )
       break;
     }
   appchr( ' ', buf );
-  appint( now[3], buf );		/* day of month */
+  utAppendInt( now[3], buf );		/* day of month */
   appstr( ", at ", buf );
-  appnum( hour, buf );		/* hour */
+  utAppendNumWord( hour, buf );		/* hour */
   appchr( ' ', buf );
   if ( now[5] == 0 )			/* minute */
     appstr( "o'clock", buf );
@@ -315,7 +316,7 @@ void appnumtim( int now[], char *buf )
     {
       if ( now[5] < 10 )
 	appstr( "o ", buf );
-      appnum( now[5], buf );
+      utAppendNumWord( now[5], buf );
     }
   appchr( ' ', buf );
   if ( am )
@@ -328,12 +329,12 @@ void appnumtim( int now[], char *buf )
   
 }
 
-/*  appkb - append killed by string */
+/*  utAppendKilledBy - append killed by string */
 /*  SYNOPSIS */
 /*    int kb */
 /*    char buf() */
-/*    appkb( kb, buf ) */
-void appkb( int kb, char *buf )
+/*    utAppendKilledBy( kb, buf ) */
+void utAppendKilledBy( int kb, char *buf )
 {
   
   switch ( kb )
@@ -367,11 +368,11 @@ void appkb( int kb, char *buf )
       break;
     default:
       if ( kb > 0 && kb <= MAXSHIPS )
-	appship( kb, buf );
+	utAppendShip( kb, buf );
       else if ( -kb > 0 && -kb <= NUMPLANETS )
 	appstr( Planets[-kb].name, buf );
       else
-	appint( kb, buf );
+	utAppendInt( kb, buf );
       break;
     }
   
@@ -379,12 +380,12 @@ void appkb( int kb, char *buf )
   
 }
 
-/*  appship - append a ship number to a string */
+/*  utAppendShip - append a ship number to a string */
 /*  SYNOPSIS */
 /*    int snum */
 /*    char str() */
-/*    appship( snum, str ) */
-void appship( int snum, char *str )
+/*    utAppendShip( snum, str ) */
+void utAppendShip( int snum, char *str )
 {
   int i;
   char ch;
@@ -398,18 +399,18 @@ void appship( int snum, char *str )
     }
   
   appchr( ch, str );
-  appint( snum, str );
+  utAppendInt( snum, str );
   
   return;
 }
 
 
-/*  appsstatus - append ship status string */
+/*  utAppendShipStatus - append ship status string */
 /*  SYNOPSIS */
 /*    int status */
 /*    char buf() */
-/*    appsstatus( status, buf ) */
-void appsstatus( int status, char *buf )
+/*    utAppendShipStatus( status, buf ) */
+void utAppendShipStatus( int status, char *buf )
 {
   switch ( status )
     {
@@ -432,7 +433,7 @@ void appsstatus( int status, char *buf )
       appstr( "reserved", buf );
       break;
     default:
-      appint( status, buf );
+      utAppendInt( status, buf );
       break;
     }
   return;
@@ -440,12 +441,12 @@ void appsstatus( int status, char *buf )
 }
 
 
-/*  apptitle - append a team oriented title */
+/*  utAppendTitle - append a team oriented title */
 /*  SYNOPSIS */
 /*    int team */
 /*    char buf() */
-/*    apptitle( team, buf ) */
-void apptitle( int team, char *buf )
+/*    utAppendTitle( team, buf ) */
+void utAppendTitle( int team, char *buf )
 {
   switch ( team )
     {
@@ -468,13 +469,8 @@ void apptitle( int team, char *buf )
 }
 
 
-/*  arrows - interpret arrow keys */
-/*  SYNOPSIS */
-/*    int flag, arrows */
-/*    char str() */
-/*    real dir */
-/*    flag = arrows( str, dir ) */
-int arrows( char *str, real *dir )
+/*  utArrowsToDir - interpret arrow keys */
+int utArrowsToDir( char *str, real *dir )
 {
   int i, n, idx; 
   real thedir, ndir, ndir1, ndir2;
@@ -509,13 +505,13 @@ int arrows( char *str, real *dir )
     }
   
   
-  *dir = mod360( thedir );
+  *dir = utMod360( thedir );
   
   return ( TRUE );
   
 }
 
-void setSystemLog(int usesys, int echostderr)
+void utSetLogConfig(int usesys, int echostderr)
 {
   if (usesys)
     {
@@ -532,13 +528,8 @@ void setSystemLog(int usesys, int echostderr)
 }
 
 
-/*  cerror - conquest error message */
-/*  SYNOPSIS */
-/*    int to, status */
-/*    char fmt() */
-/*    cerror( to, fmt, status ) */
-/*void cerror( int to, char *fmt, int status )*/
-void cerror(char *fmt, ...)
+/*  utError - conquest error message to god */
+void utError(char *fmt, ...)
 {
   va_list ap;
   char buf[BIG_BUFFER_SIZE];
@@ -554,7 +545,7 @@ void cerror(char *fmt, ...)
   
 }
 
-void clog(char *fmt, ...)
+void utLog(char *fmt, ...)
 {
   va_list ap;
   static int nowarn = FALSE;     /* if set, ignore logging */
@@ -578,7 +569,7 @@ void clog(char *fmt, ...)
 	  sprintf(errfile, "%s/%s", CONQSTATE, C_CONQ_ERRLOG);
 	  if (ConquestGID == ERR)
 	    {
-	      fprintf(stderr, "conqutil: clog():  ConquestGID == ERR!\n");
+	      fprintf(stderr, "conqutil: utLog():  ConquestGID == ERR!\n");
 	      exit(1);
 	    }
 	}
@@ -603,7 +594,7 @@ void clog(char *fmt, ...)
                   /* don't tell telnet users about logfile
                      creation failures */
                   if (!confGetTelnetClientMode())
-                    fprintf(stderr, "clog(): creat(%s): %s\n",
+                    fprintf(stderr, "utLog(): creat(%s): %s\n",
                             errfile,
                             strerror(errno));
                   else
@@ -629,7 +620,7 @@ void clog(char *fmt, ...)
 		if (chmod(errfile, 
 			  (S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP)) == -1)
 		  {
-		    perror("clog():chmod()");
+		    perror("utLog():chmod()");
 		    exit(1);
 		  }
 	    }
@@ -644,7 +635,7 @@ void clog(char *fmt, ...)
 
       if ((errfd = fopen(errfile, "a+")) == NULL)
 	{
-	  perror("clog(): can't open logfile");
+	  perror("utLog(): can't open logfile");
 	}
     }
   
@@ -669,11 +660,11 @@ void clog(char *fmt, ...)
 
 
 
-/*  delblanks - remove all blanks from a string */
+/*  utDeleteBlanks - remove all blanks from a string */
 /*  SYNOPSIS */
 /*    char str() */
-/*    delblanks( str ) */
-void delblanks( char *str )
+/*    utDeleteBlanks( str ) */
+void utDeleteBlanks( char *str )
 {
   int i, j;
   
@@ -689,11 +680,11 @@ void delblanks( char *str )
 }
 
 
-/*  dgrand - delta time for thousands */
+/*  utDeltaGrand - delta time for thousands */
 /*  SYNOPSIS */
-/*    int i, dgrand, s, n */
-/*    i = dgrand( s, n ) */
-int dgrand( int s, int *n )
+/*    int i, utDeltaGrand, s, n */
+/*    i = utDeltaGrand( s, n ) */
+int utDeltaGrand( int s, int *n )
 {
   int tn, ts;
   
@@ -701,7 +692,7 @@ int dgrand( int s, int *n )
   ts = s;
   
   /* Get thousands since midnight. */
-  grand( &tn );
+  utGrand( &tn );
   *n = tn;
   
   /* Calculate the difference. */
@@ -713,12 +704,12 @@ int dgrand( int s, int *n )
 }
 
 
-/*  dsecs - delta time for seconds */
+/*  utDeltaSecs - delta time for seconds */
 /*  SYNOPSIS */
-/*    int i, dsecs, s, n */
-/*    i = dsecs( s, n ) */
+/*    int i, utDeltaSecs, s, n */
+/*    i = utDeltaSecs( s, n ) */
 
-int dsecs( int s, int *n )
+int utDeltaSecs( int s, int *n )
 {
   int tn, ts;
   
@@ -726,7 +717,7 @@ int dsecs( int s, int *n )
   ts = s;
   
   /* Get seconds since midnight. */
-  gsecs( &tn );
+  utGetSecs( &tn );
   *n = tn;
   
   /* Calculate the difference. */
@@ -740,9 +731,9 @@ int dsecs( int s, int *n )
 
 /*  explosion - hits based on distance */
 /*  SYNOPSIS */
-/*    real newhits, explosion, basehits, dis */
-/*    newhits = explosion( basehits, dis ) */
-real explosion( real basehits, real dis )
+/*    real newhits, utExplosionHits, basehits, dis */
+/*    newhits = utExplosionHits( basehits, dis ) */
+real utExplosionHits( real basehits, real dis )
 {
   if ( dis > PHASER_DIST )
     return ( 0.0 );
@@ -754,10 +745,10 @@ real explosion( real basehits, real dis )
 }
 
 
-/*  fmtminutes - format a minutes string */
+/*  utFormatMinutes - format a minutes string */
 /*  SYNOPSIS */
-/*   fmtminutes( itime, buf ) */
-void fmtminutes( int itime, char *buf )
+/*   utFormatMinutes( itime, buf ) */
+void utFormatMinutes( int itime, char *buf )
 {
   int i, days, hours, minutes;
   char junk[32];
@@ -805,10 +796,10 @@ void fmtminutes( int itime, char *buf )
 }
 
 
-/*  fmtseconds - format a seconds string */
+/*  utFormatSeconds - format a seconds string */
 /*  SYNOPSIS */
-/*   fmtseconds( itime, buf ) */
-void fmtseconds( int itime, char *buf )
+/*   utFormatSeconds( itime, buf ) */
+void utFormatSeconds( int itime, char *buf )
 {
   int i, days, hours, minutes, seconds;
   char junk[BUFFER_SIZE];
@@ -854,16 +845,16 @@ void fmtseconds( int itime, char *buf )
 }
 
 
-/*  getamsg - find the next readable message */
+/*  utGetMsg - find the next readable message */
 /*  SYNOPSIS */
-/*    int gotone, getamsg */
+/*    int gotone, utGetMsg */
 /*    int snum, msg */
-/*    gotone = getamsg( snum, msg ) */
-int getamsg( int snum, int *msg )
+/*    gotone = utGetMsg( snum, msg ) */
+int utGetMsg( int snum, int *msg )
 {
   while ( *msg != ConqInfo->lastmsg )
     {
-      *msg = modp1( *msg + 1, MAXMESSAGES );
+      *msg = utModPlusOne( *msg + 1, MAXMESSAGES );
       if ( clbCanRead( snum, *msg ) )
         return(TRUE);
 
@@ -873,11 +864,11 @@ int getamsg( int snum, int *msg )
 }
 
 
-/*  getdandt - get the date and time into a string */
+/*  utFormatTime - get the date and time into a string */
 /*  SYNOPSIS */
 /*    char buf() */
-/*    getdandt( buf ) */
-void getdandt( char *buf, time_t thetime )
+/*    utFormatTime( buf ) */
+void utFormatTime( char *buf, time_t thetime )
 {
   int now[NOWSIZE];
   char junk[5];
@@ -936,8 +927,8 @@ void getdandt( char *buf, time_t thetime )
 /*  grand - thousands since midnight */
 /*  SYNOPSIS */
 /*    int h */
-/*    grand( h ) */
-void grand( int *h )
+/*    utGrand( h ) */
+void utGrand( int *h )
 {
   int now[NOWSIZE];
   
@@ -949,11 +940,11 @@ void grand( int *h )
 }
 
 
-/*  gsecs - seconds since midnight */
+/*  utGetSecs - seconds since midnight */
 /*  SYNOPSIS */
 /*    int s */
-/*    gsecs( s ) */
-void gsecs( int *s )
+/*    utGetSecs( s ) */
+void utGetSecs( int *s )
 {
   int now[NOWSIZE];
   
@@ -965,11 +956,11 @@ void gsecs( int *s )
 }
 
 
-/*  mod360 - modularize a real number to 0.0 <= r < 360.0 */
+/*  utMod360 - modularize a real number to 0.0 <= r < 360.0 */
 /*  SYNOPSIS */
-/*    real mr, mod360, r */
-/*    mr = mod360( r ) */
-real mod360( real r )
+/*    real mr, utMod360, r */
+/*    mr = utMod360( r ) */
+real utMod360( real r )
 {
   real mr;
   
@@ -983,11 +974,11 @@ real mod360( real r )
 }
 
 
-/*  modp1 - modulus plus one */
+/*  utModPlusOne - modulus plus one */
 /*  SYNOPSIS */
-/*    int mi, modp1, i, modulus */
-/*    mi = modp1( i, modulus ) */
-int modp1( int i, int modulus )
+/*    int mi, utModPlusOne, i, modulus */
+/*    mi = utModPlusOne( i, modulus ) */
+int utModPlusOne( int i, int modulus )
 {
   int m, n;
   
@@ -1009,13 +1000,13 @@ int modp1( int i, int modulus )
 }
 
 
-/*  safectoi - char to int conversion with overflow protection */
+/*  utSafeCToI - char to int conversion with overflow protection */
 /*  SYNOPSIS */
-/*    int flag, safectoi */
+/*    int flag, utSafeCToI */
 /*    int num, ptr */
 /*    char buf() */
-/*    flag = safectoi( num, buf ptr ) */
-int safectoi( int *num, char *buf, int ptr )
+/*    flag = utSafeCToI( num, buf ptr ) */
+int utSafeCToI( int *num, char *buf, int ptr )
 {
   int retval;
 
@@ -1048,8 +1039,8 @@ int safectoi( int *num, char *buf, int ptr )
 /*    char str() */
 /*    int what, token, count */
 /*    int flag, special */
-/*    flag = special( str, what, token, count ) */
-int special( char *str, int *what, int *token, int *count )
+/*    flag = utIsSpecial( str, what, token, count ) */
+int utIsSpecial( char *str, int *what, int *token, int *count )
 {
   int i; 
   char buf[20];
@@ -1062,67 +1053,67 @@ int special( char *str, int *what, int *token, int *count )
   if ( str[0] != 'n' && str[0] != 'w' && str[0] != 'h' )
     return ( FALSE );
   
-  stcpn( str, buf, 20 );			/* need a private copy */
+  utStcpn( str, buf, 20 );			/* need a private copy */
   
   /* Find threshold count; cleverly, the default will be zero when using ctoi. */
   for ( i = 0; buf[i] != EOS && c_type( buf[i] ) != DIGIT; i = i + 1 )
     ;
   buf[i] = EOS;				/* ditch numeric part */
-  safectoi( count, str, i );		/* ignore status */
+  utSafeCToI( count, str, i );		/* ignore status */
   
-  if ( stmatch( buf, "nes", FALSE ) )	/* this one must be first */
+  if ( utStringMatch( buf, "nes", FALSE ) )	/* this one must be first */
     {
       *what = NEAR_SHIP;
       *token = SPECIAL_ENEMYSHIP;
     }
-  else if ( stmatch( buf, "nfp", FALSE ) )
+  else if ( utStringMatch( buf, "nfp", FALSE ) )
     {
       *what = NEAR_PLANET;
       *token = SPECIAL_FUELPLANET;
     }
-  else if ( stmatch( buf, "nep", FALSE ) )
+  else if ( utStringMatch( buf, "nep", FALSE ) )
     {
       *what = NEAR_PLANET;
       *token = SPECIAL_ENEMYPLANET;
     }
-  else if ( stmatch( buf, "ns", FALSE ) )
+  else if ( utStringMatch( buf, "ns", FALSE ) )
     {
       *what = NEAR_SHIP;
       *token = SPECIAL_SHIP;
     }
-  else if ( stmatch( buf, "np", FALSE ) )
+  else if ( utStringMatch( buf, "np", FALSE ) )
     {
       *what = NEAR_PLANET;
       *token = SPECIAL_PLANET;
     }
-  else if ( stmatch( buf, "nts", FALSE ) )
+  else if ( utStringMatch( buf, "nts", FALSE ) )
     {
       *what = NEAR_SHIP;
       *token = SPECIAL_TEAMSHIP;
     }
-  else if ( stmatch( buf, "nap", FALSE ) )
+  else if ( utStringMatch( buf, "nap", FALSE ) )
     {
       *what = NEAR_PLANET;
       *token = SPECIAL_ARMYPLANET;
       if ( *count <= 0 )
 	*count = 1;
     }
-  else if ( stmatch( buf, "wp", FALSE ) )
+  else if ( utStringMatch( buf, "wp", FALSE ) )
     {
       *what = NEAR_PLANET;
       *token = SPECIAL_WEAKPLANET;
     }
-  else if ( stmatch( buf, "ntp", FALSE ) )
+  else if ( utStringMatch( buf, "ntp", FALSE ) )
     {
       *what = NEAR_PLANET;
       *token = SPECIAL_TEAMPLANET;
     }
-  else if ( stmatch( buf, "nrp", FALSE ) )
+  else if ( utStringMatch( buf, "nrp", FALSE ) )
     {
       *what = NEAR_PLANET;
       *token = SPECIAL_REPAIRPLANET;
     }
-  else if ( stmatch( buf, "hp", FALSE ) )
+  else if ( utStringMatch( buf, "hp", FALSE ) )
     {
       *what = NEAR_PLANET;
       *token = SPECIAL_HOMEPLANET;
@@ -1135,12 +1126,12 @@ int special( char *str, int *what, int *token, int *count )
 }
 
 
-/*  stcpn - copy a string with a size limit */
+/*  utStcpn - copy a string with a size limit */
 /*  SYNOPSIS */
 /*    char from(), to() */
 /*    int tosize */
-/*    stcpn( from, to, tosize ) */
-void stcpn( char *from, char *to, int tosize )
+/*    utStcpn( from, to, tosize ) */
+void utStcpn( char *from, char *to, int tosize )
 {
   strncpy(to, from, tosize);
   to[tosize - 1] = '\0';
@@ -1148,12 +1139,12 @@ void stcpn( char *from, char *to, int tosize )
 }
 
 
-/*  stmatch - check whether two strings match or not */
+/*  utStringMatch - check whether two strings match or not */
 /*  SYNOPSIS */
-/*    int matched, stmatch, casesensitive */
+/*    int matched, utStringMatch, casesensitive */
 /*    char str1(), str2() */
-/*    matched = stmatch( str1, str2, casesensitive ) */
-int stmatch( char *str1, char *str2, int casesensitive )
+/*    matched = utStringMatch( str1, str2, casesensitive ) */
+int utStringMatch( char *str1, char *str2, int casesensitive )
 {
   int i;
   
@@ -1181,11 +1172,11 @@ int stmatch( char *str1, char *str2, int casesensitive )
 }
 
 
-/*  subang - find smallest difference between angles. */
+/*  utSubAngle - find smallest difference between angles. */
 /*  SYNOPSIS */
-/*    real h, subang, a1, a2 */
-/*    h = subang( a1, a2 ) */
-real subang( real a1, real a2 )
+/*    real h, utSubAngle, a1, a2 */
+/*    h = utSubAngle( a1, a2 ) */
+real utSubAngle( real a1, real a2 )
 {
   real x;
   

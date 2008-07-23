@@ -115,9 +115,9 @@ struct _prompt_lin {
 struct _info {
   real lastblast;
 
-  int lastang;
-  int lastdist;
-  int lasttarget;
+  int  lastang;
+  int  lastdist;
+  int  lasttarget;
 
   char lastblaststr[HUD_INFO_STR_SZ];  /* last "FA:" blast (firing) angle */
   char lasttargetstr[HUD_INFO_STR_SZ]; /* last target in string form */
@@ -160,7 +160,7 @@ typedef struct _dspData {
 
 /* global hud data */
 #if defined(NOEXTERN_HUD)
-hudData_t hudData;
+hudData_t hudData = {};
 #else
 extern hudData_t hudData;
 #endif /* NOEXTERN_HUD */
@@ -188,5 +188,7 @@ void hudSetInfoFiringAngle(real blastang);
 void hudSetInfoTarget(int tnum);
 void hudSetInfoTargetAngle(int ang);
 void hudSetInfoTargetDist(int tdist);
+void hudSetRecId(char *str);
+void hudSetRecTime(char *str);
 
 #endif /* _HUD_H */

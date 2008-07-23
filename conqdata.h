@@ -4,7 +4,7 @@
 #ifndef CONQDATA_H
 #define CONQDATA_H
 
-#ifdef NOCDHEXTERN
+#ifdef NOEXTERN_CONQDATA
 # define CDHEXTERN
 #else
 # define CDHEXTERN extern

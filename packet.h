@@ -19,10 +19,10 @@
 void pktNotImpl(void *);	/* a no-show */
 
 struct _packetent {
-  Unsgn32 pktid;
-  Unsgn32 size;
-  char *name;
-  void (*handler)();
+  Unsgn32  pktid;
+  Unsgn32  size;
+  char    *name;
+  void     (*handler)();
 };
 
 
@@ -33,7 +33,7 @@ struct _packetent {
 #define PKT_FROMSERVER 3
 
 /* error/severity codes for Acks, should make sure these sync to
-   psev2String(int psev) */
+   pktSeverity2String(int psev) */
 #define PSEV_INFO     0	
 #define PSEV_WARN     1
 #define PSEV_ERROR    2
@@ -54,37 +54,37 @@ struct _packetent {
 #define PERR_LOSE         11 	/* lose in menu() */
 #define PERR_FLYING       12 	/* already flying a ship (newship()) */
 #define PERR_TOOMANYSHIPS 13	/* you are flying too many ships (newship()) */
-#define PERR_CANCELED     14	/* an operation (bombing, etc) was canceled
+#define PERR_CANCELED     14	/* an operation (bombing, etc) was cancelled
 				   for some reason. */
 #define PERR_DONE         15    /* finished something - like beaming */
 #define PERR_DOUDP        16	/* used in hello to tell server udp is ok */
 #define PERR_PINGRESP     17	/* a ping reponse for nCP */
 
-#ifdef NOPKT_EXTERN
-int pktRXBytes = 0;
-Unsgn32 pingAvgMS = 0;
+#ifdef NOEXTERN_PACKET
+int            pktRXBytes = 0;
+Unsgn32        pktPingAvgMS = 0;
 #else
-extern int pktRXBytes;
-extern Unsgn32 pingAvgMS;
+extern int     pktRXBytes;
+extern Unsgn32 pktPingAvgMS;
 #endif
 
-int sendAck(int sock, int dir, Unsgn8 severity, Unsgn8 code, char *msg);
-int isConnDead(void);
-void pktNotImpl(void *nothing);
-void pktSetNodelay(int sock);
-char *psev2String(int psev);
-int invertDir(int dir);
+int   pktSendAck(int sock, int dir, Unsgn8 severity, Unsgn8 code, char *msg);
+int   pktIsConnDead(void);
+void  pktNotImpl(void *nothing);
+void  pktSetNodelay(int sock);
+char *pktSeverity2String(int psev);
+int   pktInvertDirection(int dir);
 
-int waitForPacket(int dir, int sockl[], int type, char *buf, int blen, 
-		  int delay, char *nakmsg);
+int   pktWaitForPacket(int dir, int sockl[], int type, char *buf, int blen, 
+                    int delay, char *nakmsg);
 
-int clientPktSize(int type);
-int serverPktSize(int type);
+int   pktClientPacketSize(int type);
+int   pktServerPacketSize(int type);
 
-int isPacketWaiting(int sock);
-int writePacket(int direction, int sock, void *data);
-int readPacket(int direction, int sockl[], char *buf, int len, 
-	       unsigned int delay);
-int validPkt(int pkttype, void *pkt);
+int   pktIsPacketWaiting(int sock);
+int   pktWrite(int direction, int sock, void *data);
+int   pktRead(int direction, int sockl[], char *buf, int len, 
+                 unsigned int delay);
+int   pktIsValid(int pkttype, void *pkt);
 
 #endif /* PACKET_H_INCLUDED */

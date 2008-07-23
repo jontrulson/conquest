@@ -27,8 +27,9 @@
 #include "global.h"
 #include "conqdef.h"
 #include "conqlb.h"
+#include "conqutil.h"
 
-#define NOCOMEXTERN
+#define NOEXTERN_CONQCOM
 #include "conqcom.h"		/* common block vars defined here */
 #include "context.h"		/* some extra stuff */
 #include "user.h"
@@ -114,7 +115,7 @@ void flush_common(void)
 #else
   if (msync((caddr_t)cBasePtr, SIZEOF_COMMONBLOCK, MS_SYNC) == -1)
 #endif
-    clog("flush_common(): msync(): %s", strerror(errno));
+    utLog("flush_common(): msync(): %s", strerror(errno));
 
   return;
 }
@@ -221,7 +222,7 @@ void lock_common(void)
   if (memcntl((caddr_t)cBasePtr, SIZEOF_COMMONBLOCK,
 	     MC_LOCK, (caddr_t)0, 0, 0) == -1)
     {
-      clog("map_common(): couldn't lock the common block: %s, continuing...",
+      utLog("map_common(): couldn't lock the common block: %s, continuing...",
 	   strerror(errno));
     }
 }

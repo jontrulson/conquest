@@ -10,18 +10,19 @@
 #define _PRM_H
 
 /* return values from prmProcInput() */
+/* retval > 0 is the terminator char entered */
 
 #define PRM_OK            0     /* everything ok */
 #define PRM_MAXLEN        -1    /* maxlen exceeded */
-/* retval > 0 is the terminator char */
+
 
 typedef struct _prompt {
-  Bool preinit;                 /* pre-initing the prompt resp? */
+  Bool  preinit;                /* pre-initing the prompt resp? */
   char *buf;                    /* response */
-  int buflen;
+  int   buflen;
   char *pbuf;                   /* the prompt */
   char *terms;                  /* terminators */
-  int index;                    /* only used in CP for now */
+  int   index;                  /* only used in CP for now */
 } prm_t;
 
 int prmProcInput(prm_t *prm, int ch);

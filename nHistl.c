@@ -15,6 +15,7 @@
 #include "node.h"
 #include "client.h"
 #include "packet.h"
+#include "conqutil.h"
 
 #include "nCP.h"
 #include "nMenu.h"
@@ -70,7 +71,7 @@ static int nHistlDisplay(dspConfig_t *dsp)
   i = thistptr + 1;
   for ( j = 0; j < MAXHISTLOG; j++ )
     {
-      i = modp1( i - 1, MAXHISTLOG );
+      i = utModPlusOne( i - 1, MAXHISTLOG );
       unum = History[i].histunum;
       
       if ( unum < 0 || unum >= MAXUSERS )
@@ -79,11 +80,11 @@ static int nHistlDisplay(dspConfig_t *dsp)
         continue; 
       
       /* entry time */
-      getdandt( histentrytm, History[i].histlog);
+      utFormatTime( histentrytm, History[i].histlog);
       
       
       /* now elapsed time */
-      fmtseconds((int) History[i].elapsed, connecttm);
+      utFormatSeconds((int) History[i].elapsed, connecttm);
       /* strip off seconds, or for long times, anything after 7 bytes */
       connecttm[7] = '\0';
       
@@ -117,13 +118,13 @@ static int nHistlIdle(void)
   char buf[PKT_MAXSIZE];
   int sockl[2] = {cInfo.sock, cInfo.usock};
 
-  while ((pkttype = waitForPacket(PKT_FROMSERVER, sockl, PKT_ANYPKT,
+  while ((pkttype = pktWaitForPacket(PKT_FROMSERVER, sockl, PKT_ANYPKT,
                                   buf, PKT_MAXSIZE, 0, NULL)) > 0)
     processPacket(buf);
 
   if (pkttype < 0)          /* some error */
     {
-      clog("nHistlIdle: waiForPacket returned %d", pkttype);
+      utLog("nHistlIdle: waiForPacket returned %d", pkttype);
       Ships[Context.snum].status = SS_OFF;
       return NODE_EXIT;
     }
@@ -155,7 +156,7 @@ static int nHistlInput(int ch)
       break;
 
     default:
-      clog("nHistlInput: invalid return node: %d, going to DSP_NODE_MENU",
+      utLog("nHistlInput: invalid return node: %d, going to DSP_NODE_MENU",
            retnode);
       setONode(NULL);
       nMenuInit();

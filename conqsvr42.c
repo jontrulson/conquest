@@ -30,6 +30,7 @@
 #include "conf.h"
 #include "global.h"
 #include "conqlb.h"
+#include "conqutil.h"
 #include "record.h"
 
 #include "server.h"
@@ -109,13 +110,13 @@ void conqinit(void)
   
   if (nice(CONQUEST_PRI) == -1)
     {
-      clog("conqinit(): nice(CONQUEST_PRI (%d)): failed: %s",
+      utLog("conqinit(): nice(CONQUEST_PRI (%d)): failed: %s",
 	   CONQUEST_PRI,
 	   strerror(errno));
     }
 
 #if defined(DEBUG_FLOW)
-    clog("conqinit(): nice(CONQUEST_PRI (%d)): succeeded.",
+    utLog("conqinit(): nice(CONQUEST_PRI (%d)): succeeded.",
 	 CONQUEST_PRI);
 #endif
 
@@ -201,11 +202,10 @@ void drcheck(void)
   int ppid;
   
   /* If we haven't been getting cpu time in recent history, do no-thing. */
-  /*  gsecs(playtime);*/
-  if ( dsecs( Context.drchklastime, &Context.drchklastime ) > TIMEOUT_DRCHECK )
+  if ( utDeltaSecs( Context.drchklastime, &Context.drchklastime ) > TIMEOUT_DRCHECK )
     return;
   
-  if ( dsecs( Driver->drivtime, &(Driver->playtime) ) > TIMEOUT_DRIVER )
+  if ( utDeltaSecs( Driver->drivtime, &(Driver->playtime) ) > TIMEOUT_DRIVER )
     {
       if ( Context.childpid != 0 )
 	{
@@ -214,22 +214,22 @@ void drcheck(void)
 	  if ( kill(Context.childpid, 0) != -1 )
 	    {
 	      /* He's still alive and belongs to us. */
-	      gsecs( &(Driver->drivtime) );
+	      utGetSecs( &(Driver->drivtime) );
 	      return;
 	    }
 	  else
-	    clog( "drcheck(): Wrong ppid %d.", ppid );
+	    utLog( "drcheck(): Wrong ppid %d.", ppid );
 	  
 	  /* If we got here, something was wrong; disown the child. */
 	  Context.childpid = 0;
 	}
       
       PVLOCK(&ConqInfo->lockword);
-      if ( dsecs( Driver->drivtime, &(Driver->playtime) ) > TIMEOUT_DRIVER )
+      if ( utDeltaSecs( Driver->drivtime, &(Driver->playtime) ) > TIMEOUT_DRIVER )
 	{
 	  drcreate();
-	  Driver->drivcnt = modp1( Driver->drivcnt + 1, 1000 );
-	  clog( "Driver timeout #%d.", Driver->drivcnt );
+	  Driver->drivcnt = utModPlusOne( Driver->drivcnt + 1, 1000 );
+	  utLog( "Driver timeout #%d.", Driver->drivcnt );
 	}
       PVUNLOCK(&ConqInfo->lockword);
     }
@@ -249,7 +249,7 @@ void drcreate(void)
   char drivcmd[BUFFER_SIZE];
 
   
-  gsecs( &(Driver->drivtime) );			/* prevent driver timeout */
+  utGetSecs( &(Driver->drivtime) );			/* prevent driver timeout */
   Driver->drivpid = 0;			/* zero current driver pid */
   Driver->drivstat = DRS_RESTART;		/* driver state to restart */
   
@@ -258,7 +258,7 @@ void drcreate(void)
   if ((pid = fork()) == -1)
     {				/* error */
       Driver->drivstat = DRS_OFF;
-      clog( "drcreate(): fork(): %s", strerror(errno));
+      utLog( "drcreate(): fork(): %s", strerror(errno));
       return;
     }
   
@@ -266,7 +266,7 @@ void drcreate(void)
     {				/* The child: aka "The Driver" */
       sprintf(drivcmd, "%s/%s", CONQLIBEXEC, C_CONQ_CONQDRIV);
       execl(drivcmd, drivcmd, NULL);
-      clog("drcreate(): exec(): %s", strerror(errno));
+      utLog("drcreate(): exec(): %s", strerror(errno));
       perror("exec");		/* shouldn't be reached */
       exit(1);
       /* NOTREACHED */
@@ -315,7 +315,7 @@ void drpexit(void)
       for ( i = 1; Context.childpid == Driver->drivpid && i <= 50; i = i + 1 )
 	c_sleep( 0.1 );
       if ( Context.childpid == Driver->drivpid )
-	clog("drpexit(): Driver didn't exit; pid = %08x", Context.childpid );
+	utLog("drpexit(): Driver didn't exit; pid = %08x", Context.childpid );
     }
   
   return;
@@ -367,7 +367,7 @@ void gcputime( int *cpu )
 		 (real)CLK_TCK) * 
 	       100.0);
   
-  /* clog("gcputime() - *cpu = %d", *cpu); */
+  /* utLog("gcputime() - *cpu = %d", *cpu); */
   
   return;
   
@@ -383,7 +383,7 @@ void initstats( int *ctemp, int *etemp )
 {
   
   gcputime( ctemp );
-  grand( etemp );
+  utGrand( etemp );
   
   return;
   
@@ -445,7 +445,7 @@ int isagod( int unum )
       
       if (grp == NULL)
 	{
-	  clog("isagod(%s): getgrnam(%s) failed: %s",
+	  utLog("isagod(%s): getgrnam(%s) failed: %s",
 	       myname,
 	       CONQUEST_GROUP,
 	       strerror(errno));
@@ -495,7 +495,7 @@ void upchuck(void)
   
   PVLOCK(&ConqInfo->lockword);
   
-  getdandt( ConqInfo->lastupchuck, 0 );
+  utFormatTime( ConqInfo->lastupchuck, 0 );
   flush_common();
   
   PVUNLOCK(&ConqInfo->lockword);
@@ -532,9 +532,9 @@ void upstats( int *ctemp, int *etemp, int *caccum, int *eaccum, int *ctime, int 
   
   /* Update elapsed time. */
   if (*etemp == 0)		/* init etemp if 0 - for VACANT ships */
-    grand(etemp);
+    utGrand(etemp);
   
-  *eaccum = *eaccum + dgrand( *etemp, &now );
+  *eaccum = *eaccum + utDeltaGrand( *etemp, &now );
 
   if ( *eaccum > 1000 )
     {

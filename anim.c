@@ -13,6 +13,7 @@
 #include "color.h"
 #include "conqcom.h"
 #include "conqlb.h"
+#include "conqutil.h"
 #include "ibuf.h"
 
 #include <GL/glut.h>
@@ -40,7 +41,7 @@ int animInitState(char *animname, animStatePtr_t astate,
   /* first get the animdef index */
   if ((ndx = findGLAnimDef(animname)) < 0)
     {
-      clog("%s: could not find animdef for animation '%s'", 
+      utLog("%s: could not find animdef for animation '%s'", 
            __FUNCTION__, animname);
       return FALSE;
     }
@@ -194,16 +195,16 @@ int animIterState(animStatePtr_t astate)
 
   glad = &GLAnimDefs[astate->adIndex];
 
-  /* fix up our frameDelay in case we are playing back a recording */
+  /* fix up our recFrameDelay in case we are playing back a recording */
   if (Context.recmode == RECMODE_PLAYING || Context.recmode == RECMODE_PAUSED)
     {              /* it changed, re-adjust our timing for playback */
-      if (lastfdelay != frameDelay)
+      if (lastfdelay != recFrameDelay)
         {
-          lastfdelay = frameDelay;
-          timescale = (frameDelay * 10.0); /* 100ms = 1X */
+          lastfdelay = recFrameDelay;
+          timescale = (recFrameDelay * 10.0); /* 100ms = 1X */
 #if 0
-          clog("SETTING TIMESCALE: frameDelay = %f, timescale = %f",
-               frameDelay, timescale);
+          utLog("SETTING TIMESCALE: recFrameDelay = %f, timescale = %f",
+               recFrameDelay, timescale);
 #endif
         }
     }
@@ -348,7 +349,7 @@ int animIterState(animStatePtr_t astate)
                 astate->state.angle = rnduni( 0.0, 360.0 );
               else
                 astate->state.angle = 
-                  mod360(astate->state.angle + glad->geo.deltar);
+                  utMod360(astate->state.angle + glad->geo.deltar);
             }
         }
     }
@@ -360,7 +361,7 @@ int animIterState(animStatePtr_t astate)
       /* when playing back at hi speed, it's annoying to have the blinker
          anims accelerated according to timescale.  So, if we are the only
          animtype in this animdef (standard blinker anim) then we do not
-         rescale the time according to frameDelay.  */
+         rescale the time according to recFrameDelay.  */
       if (!glad->tog.delayms || 
           (frameTime - astate->tog.lasttime) > 
           (int)((real)glad->tog.delayms * 
@@ -369,7 +370,7 @@ int animIterState(animStatePtr_t astate)
         {
 #if 0
           if (glad->tog.delayms == 500)
-            clog("%s: TOG RUN timescale = %f scaledelay = %d", 
+            utLog("%s: TOG RUN timescale = %f scaledelay = %d", 
                  __FUNCTION__, timescale,
                  (int)((real)glad->tog.delayms * timescale));
 #endif
@@ -398,7 +399,7 @@ void animQueInit(animQue_t *aque)
 
   if (!(aque->que = malloc(aque->maxentries * sizeof(animQue_t *))))
     {
-      clog("%s: malloc(%d) failed.", __FUNCTION__, 
+      utLog("%s: malloc(%d) failed.", __FUNCTION__, 
            aque->maxentries * sizeof(animQue_t *));
       aque->maxentries = 0;
     }
@@ -427,7 +428,7 @@ void animQueAdd(animQue_t *aque, animStatePtr_t astate)
       
       if (!newlist)
         {  
-          clog("%s: Could not realloc %d state pointers, ignoring Add.",
+          utLog("%s: Could not realloc %d state pointers, ignoring Add.",
                __FUNCTION__,
                sizeof(animStatePtr_t) * (aque->maxentries + increment));
           return;               /* do nothing */

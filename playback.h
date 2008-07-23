@@ -1,6 +1,4 @@
 /* 
- * record.h - recording games in conquest
- *
  * $Id$
  *
  * Copyright 1999-2004 Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
@@ -10,7 +8,7 @@
 #define _PLAYBACK_H
 
 #if defined(NOEXTERN_PLAYBACK)
-int pbSpeed = 1;             /* 1x */
+int        pbSpeed = 1;         /* 1x */
 #else
 extern int pbSpeed;
 #endif /* NOEXTERN_PLAYBACK */
@@ -22,7 +20,7 @@ extern int pbSpeed;
  *  PB_SPEED_MAX_TIMESx). 
  */ 
 #define PB_SPEED_MAX_TIMES 10   
-/* the fastest you can go - frameDelay set to 0.0 */
+/* the fastest you can go - recFrameDelay set to 0.0 */
 #define PB_SPEED_INFINITE  (PB_SPEED_MAX_TIMES + 1)   
 
 void pbFileSeek(time_t newtime);

@@ -19,14 +19,11 @@
 
 
 typedef struct _scr_node {
-  int (*display)(dspConfig_t *); /* display routine */
-  int (*idle)(void);            /* idle routine */
-  int (*input)(int ch);         /* keyboard input routine */
-  int (*minput)(mouseData_t *mdata); /* mouse input routine */
-  void *animQue;                /* optional aimation que.
-                                   we use void* for this since
-                                   we don't want to bring GL into
-                                   the picture here. */
+  int   (*display)(dspConfig_t *); /* display routine */
+  int   (*idle)(void);          /* idle routine */
+  int   (*input)(int ch);       /* keyboard input routine */
+  int   (*minput)(mouseData_t *mdata); /* mouse input routine */
+  void *animQue;                /* optional aimation que. */
 } scrNode_t;
 
 /* some nodes are called from other, multiple nodes, so we need
@@ -36,9 +33,10 @@ typedef struct _scr_node {
 #define DSP_NODE_PLAYBMENU 3    /* playback menu */
 #define DSP_NODE_PLAYB     4    /* watching during playback */
 
-void setNode(scrNode_t *node);
+void       setNode(scrNode_t *node);
 scrNode_t *getTopNode(void);
-void setONode(scrNode_t *node);
+
+void       setONode(scrNode_t *node);
 scrNode_t *getTopONode(void);
 
 #endif /* _NODE_H */

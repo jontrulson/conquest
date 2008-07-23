@@ -17,6 +17,7 @@
 #include "node.h"
 #include "client.h"
 #include "packet.h"
+#include "conqutil.h"
 
 #include "nCP.h"
 #include "nMenu.h"
@@ -187,22 +188,22 @@ static int nTeamlDisplay(dspConfig_t *dsp)
   lin++;
   etime = Teams[0].stats[TSTAT_SECONDS] + Teams[1].stats[TSTAT_SECONDS] +
     Teams[2].stats[TSTAT_SECONDS] + Teams[3].stats[TSTAT_SECONDS];
-  fmtseconds( Teams[0].stats[TSTAT_SECONDS], timbuf[0] );
-  fmtseconds( Teams[1].stats[TSTAT_SECONDS], timbuf[1] );
-  fmtseconds( Teams[2].stats[TSTAT_SECONDS], timbuf[2] );
-  fmtseconds( Teams[3].stats[TSTAT_SECONDS], timbuf[3] );
-  fmtseconds( etime, timbuf[4] );
+  utFormatSeconds( Teams[0].stats[TSTAT_SECONDS], timbuf[0] );
+  utFormatSeconds( Teams[1].stats[TSTAT_SECONDS], timbuf[1] );
+  utFormatSeconds( Teams[2].stats[TSTAT_SECONDS], timbuf[2] );
+  utFormatSeconds( Teams[3].stats[TSTAT_SECONDS], timbuf[3] );
+  utFormatSeconds( etime, timbuf[4] );
   cprintf(lin,col,0, sfmt3, "Time",
 	 timbuf[0], timbuf[1], timbuf[2], timbuf[3], timbuf[4] );
   
   lin++;
   ctime = Teams[0].stats[TSTAT_CPUSECONDS] + Teams[1].stats[TSTAT_CPUSECONDS] +
     Teams[2].stats[TSTAT_CPUSECONDS] + Teams[3].stats[TSTAT_CPUSECONDS];
-  fmtseconds( Teams[0].stats[TSTAT_CPUSECONDS], timbuf[0] );
-  fmtseconds( Teams[1].stats[TSTAT_CPUSECONDS], timbuf[1] );
-  fmtseconds( Teams[2].stats[TSTAT_CPUSECONDS], timbuf[2] );
-  fmtseconds( Teams[3].stats[TSTAT_CPUSECONDS], timbuf[3] );
-  fmtseconds( ctime, timbuf[4] );
+  utFormatSeconds( Teams[0].stats[TSTAT_CPUSECONDS], timbuf[0] );
+  utFormatSeconds( Teams[1].stats[TSTAT_CPUSECONDS], timbuf[1] );
+  utFormatSeconds( Teams[2].stats[TSTAT_CPUSECONDS], timbuf[2] );
+  utFormatSeconds( Teams[3].stats[TSTAT_CPUSECONDS], timbuf[3] );
+  utFormatSeconds( ctime, timbuf[4] );
   cprintf( lin,col,0, sfmt3, "Cpu time",
 	 timbuf[0], timbuf[1], timbuf[2], timbuf[3], timbuf[4] );
   
@@ -302,13 +303,13 @@ static int nTeamlIdle(void)
   char buf[PKT_MAXSIZE];
   int sockl[2] = {cInfo.sock, cInfo.usock};
 
-  while ((pkttype = waitForPacket(PKT_FROMSERVER, sockl, PKT_ANYPKT,
+  while ((pkttype = pktWaitForPacket(PKT_FROMSERVER, sockl, PKT_ANYPKT,
                                   buf, PKT_MAXSIZE, 0, NULL)) > 0)
     processPacket(buf);
 
   if (pkttype < 0)          /* some error */
     {
-      clog("nTeamlIdle: waiForPacket returned %d", pkttype);
+      utLog("nTeamlIdle: waiForPacket returned %d", pkttype);
       Ships[Context.snum].status = SS_OFF;
       return NODE_EXIT;
     }
@@ -340,7 +341,7 @@ static int nTeamlInput(int ch)
       break;
 
     default:
-      clog("nTeamlInput: invalid return node: %d, going to DSP_NODE_MENU",
+      utLog("nTeamlInput: invalid return node: %d, going to DSP_NODE_MENU",
            retnode);
       setONode(NULL);
       nMenuInit();

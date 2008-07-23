@@ -16,6 +16,7 @@
 
 
 #include "c_defs.h"		/* includes everthing else */
+#include "conqutil.h"
 
 /* alldig(char *) - returns YES if all chars in str are digits, else NO */
 int alldig(char *buf)
@@ -162,7 +163,7 @@ int lib_ffs(int start, int len, int bits, int *rule)
     }
 
 #ifdef DEBUG_AI
-    clog("bits = %8X, rule = %d", bits, *rule);
+    utLog("bits = %8X, rule = %d", bits, *rule);
 #endif
 
   if (*rule == -1)
@@ -206,7 +207,7 @@ void c_sleep(real sleeptime)
   if (select(0, NULL, NULL, NULL, &stime) == -1)
     {
       if (errno != EINTR) /* Interrupted system call */
-           clog("c_sleep(): select() failed: errno = %d, %s",
+           utLog("c_sleep(): select() failed: errno = %d, %s",
                 errno,strerror(errno));
     }
 
@@ -230,7 +231,7 @@ void c_sleep(real sleeptime)
   if (poll(NULL, 0, (int) (sleeptime * 1000)) == -1)
     {
       if (errno != EINTR) /* Interrupted system call */
-	clog("csleep(): poll() failed: %s",
+	utLog("csleep(): poll() failed: %s",
 	     strerror(errno));
     }
 

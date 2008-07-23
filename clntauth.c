@@ -22,6 +22,7 @@
 #include "userauth.h"
 #include "client.h"
 #include "clientlb.h"
+#include "conqutil.h"
 
 static void PrintStatus(int lin)
 {
@@ -192,12 +193,12 @@ int Logon(char *username)
 
 		  if (rv != PERR_OK)
 		    {
-		      clog("conquest: CPAUTH_LOGIN returned %d\n",
+		      utLog("conquest: CPAUTH_LOGIN returned %d\n",
 			   rv);
 		      continue;
 		    }
 
-		  clog("clntauth: INFO: new user '%s' logged in", nm);
+		  utLog("clntauth: INFO: new user '%s' logged in", nm);
 		  done = TRUE;
 		  break;
 		}
@@ -229,14 +230,14 @@ int Logon(char *username)
 		  cdputs("Invalid Password.", MSG_LIN2, 1);
 		  uiPutColor(NoColor);
 		  cdrefresh();
-		  clog("INFO: Invalid password for user '%s'", nm);
+		  utLog("INFO: Invalid password for user '%s'", nm);
 		  sleep(2);
 		  continue;
 		}
 	  
 	      /* good pw - go for the gusto */
 	      done = TRUE;
-	      clog("clntauth:INFO: user '%s' logged in", nm);
+	      utLog("clntauth:INFO: user '%s' logged in", nm);
 	      break;
 	    }
 	} /* end while */

@@ -13,6 +13,7 @@
 #include "global.h"
 #include "color.h"
 #include "conqcom.h"
+#include "conqutil.h"
 #include "ibuf.h"
 #include "gldisplay.h"
 #include "conf.h"
@@ -40,7 +41,7 @@ int _GLError(const char *funcname, const char *filename, int line)
 
   while ((i = glGetError()) != GL_NO_ERROR)
     {
-      clog("GL ERROR: %s:%s@%d: %s\n",
+      utLog("GL ERROR: %s:%s@%d: %s\n",
            filename, funcname, line, gluErrorString(i));
       rv = 1;
     }
@@ -91,7 +92,7 @@ void mglConqLogo(dspConfig_t *dsp, bool mult)
           else
             {
               logos[i] = 0;
-              clog("%s: could not find texture '%s'\n", 
+              utLog("%s: could not find texture '%s'\n", 
                    __FUNCTION__, buffer);
             }
         }
@@ -121,8 +122,8 @@ void mglConqLogo(dspConfig_t *dsp, bool mult)
     }
   else
     {
-      glfRender(x, y, 0.0, w, h, fontLargeTxf, Conquest, RedLevelColor, 
-                NULL, TRUE, FALSE, TRUE);
+      glfRenderFont(x, y, 0.0, w, h, glfFontLarge, Conquest, RedLevelColor, 
+                NULL, GLF_FONT_F_SCALEX | GLF_FONT_F_ORTHO);
     }
   
   drawLineBox(x, y + (h / 20.0),

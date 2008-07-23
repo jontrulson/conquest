@@ -18,9 +18,9 @@
 /* Blinker animdefs useful to other modules */
 
 #if defined(NOEXTERN_GL)
-animStateRec_t GLBlinkerOneSec = {};
-animStateRec_t GLBlinkerHalfSec = {};
-animStateRec_t GLBlinkerQtrSec = {};
+animStateRec_t        GLBlinkerOneSec = {};
+animStateRec_t        GLBlinkerHalfSec = {};
+animStateRec_t        GLBlinkerQtrSec = {};
 #else
 extern animStateRec_t GLBlinkerOneSec;
 extern animStateRec_t GLBlinkerHalfSec;
@@ -89,8 +89,8 @@ GLfloat scaleFactorsSR[10] = {
 #else
 extern GLShip_t GLShips[NUMPLAYERTEAMS][MAXNUMSHIPTYPES]; 
 
-extern GLfloat scaleFactorsLR[10];
-extern GLfloat scaleFactorsSR[10];
+extern GLfloat  scaleFactorsLR[10];
+extern GLfloat  scaleFactorsSR[10];
 #endif
 
 #endif /* _C_GL_H */

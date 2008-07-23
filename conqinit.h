@@ -1,6 +1,4 @@
 /* 
- * conqinit.h 
- * 
  * $Id$
  *
  * Copyright 1999-2006 Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
@@ -11,7 +9,7 @@
 
 #include "datatypes.h"
 
-#define CQI_NAMELEN 64           /* maximum lenth of a WKN or filename (no
+#define CQI_NAMELEN 64           /* maximum length of a WKN or filename (no
                                     path) */
 
 
@@ -66,9 +64,10 @@ typedef struct _cqi_planet_init {
 } cqiPlanetInitRec_t, *cqiPlanetInitPtr_t;
 
 /* texture flags */
-#define CQITEX_F_COLOR_SPEC       0x00000001 /* This texture definition
-                                                only really specifies a
-                                                color and not a texture */
+#define CQITEX_F_COLOR_SPEC       0x00000001 /* This texture
+                                                definition only
+                                                specifies a color and
+                                                not a texture */
 #define CQITEX_F_GEN_MIPMAPS      0x00000002 /* Generate mipmaps for this
                                                 texture */
 
@@ -82,12 +81,12 @@ typedef struct _cqi_texture_area {
 
 /* textures */
 typedef struct _cqi_texture_init {
-  char name[CQI_NAMELEN];       /* texid */
-  char filename[CQI_NAMELEN];   /* if different from textid */
-  Unsgn32 flags;                /* flags for this cqi texture (CQITEX_F_*)*/
-  Unsgn32 color;                /* hex encoded color (AARRGGBB) */
-  int numTexAreas;              /* number of texture areas */
-  cqiTextureAreaPtr_t texareas; /* optional texture areas */
+  char                 name[CQI_NAMELEN]; /* texid */
+  char                 filename[CQI_NAMELEN]; /* if different from texid */
+  Unsgn32              flags; /* flags for this cqi texture (CQITEX_F_*)*/
+  Unsgn32              color;  /* hex encoded color (AARRGGBB) */
+  int                  numTexAreas; /* number of texture areas */
+  cqiTextureAreaPtr_t  texareas; /* optional texture areas */
 } cqiTextureInitRec_t, *cqiTextureInitPtr_t ;
 
 
@@ -128,20 +127,20 @@ typedef struct _cqi_animation_init {
 
 /* animation definitions */
 typedef struct _cqi_animdef_init {
-  char name[CQI_NAMELEN];        /* animation definition name */
-  char texname[CQI_NAMELEN];     /* base texture if specified. */
+  char     name[CQI_NAMELEN];   /* animation definition name */
+  char     texname[CQI_NAMELEN]; /* base texture if specified. */
 
-  Unsgn32 timelimit;            /* expire anim after this long (ms) 0=inf */
-  Unsgn32 anims;                /* bitmask of animation types that
-                                   were specified (CQI_ANIMS_*) */
+  Unsgn32  timelimit;            /* expire anim after this long (ms) 0=inf */
+  Unsgn32  anims;                /* bitmask of animation types that
+                                    were specified (CQI_ANIMS_*) */
 
   /* initial state values (istate) specifically defined in the
      animdef definition */
-  Unsgn32 istates;              /* AD_ISTATE_* */
-  char    itexname[CQI_NAMELEN];
-  Unsgn32 icolor;
-  real    iangle;
-  real    isize;
+  Unsgn32  istates;              /* AD_ISTATE_* */
+  char     itexname[CQI_NAMELEN];
+  Unsgn32  icolor;
+  real     iangle;
+  real     isize;
 
   /* texture animations */
   struct {
@@ -152,8 +151,8 @@ typedef struct _cqi_animdef_init {
     Unsgn32 looptype;           /* the type of loop (asc/dec/pingpong/etc) */
 
     /* texcoord anims */
-    real deltas;                /* s and t deltas */
-    real deltat;
+    real    deltas;             /* s and t deltas */
+    real    deltat;
   } texanim;
 
   /* color animations */
@@ -165,10 +164,10 @@ typedef struct _cqi_animdef_init {
     Unsgn32 loops;              /* number of loops, 0 = inf */
     Unsgn32 looptype;           /* the type of loop (asc/dec//pingpong/etc) */
 
-    real deltaa;                /* deltas to appliy to ARGB components */
-    real deltar;
-    real deltag;
-    real deltab;
+    real    deltaa;          /* deltas to appliy to ARGB components */
+    real    deltar;
+    real    deltag;
+    real    deltab;
   } colanim;
 
   /* geometry animations */
@@ -178,11 +177,11 @@ typedef struct _cqi_animdef_init {
     Unsgn32 loops;              /* number of loops, 0 = inf */
     Unsgn32 looptype;           /* the type of loop (asc/dec//pingpong/etc) */
 
-    real deltax;                /* x y and z deltas */
-    real deltay;
-    real deltaz;
-    real deltar;                /* rotation (degrees) */
-    real deltas;                /* size */
+    real    deltax;             /* x y and z deltas */
+    real    deltay;
+    real    deltaz;
+    real    deltar;             /* rotation (degrees) */
+    real    deltas;             /* size */
   } geoanim;
 
   /* toggle animations (blinkers) */
@@ -195,42 +194,42 @@ typedef struct _cqi_animdef_init {
 /* sounds */
 
 typedef struct _cqi_sound_conf {
-  int samplerate;               /* mixers sample rate */
+  int samplerate;               /* mixer sample rate */
   int stereo;                   /* enable stereo? */
   int fxchannels;               /* num of fx channels to allocate */
   int chunksize;                /* buffer size for mixing samples */
 } cqiSoundConfRec_t, *cqiSoundConfPtr_t;
 
 typedef struct _cqi_sound {
-  char name[CQI_NAMELEN];        /* sound wkn */
-  char filename[CQI_NAMELEN];    /* if different from name */
-  int volume;
-  int pan;
-  int fadeinms;
-  int fadeoutms;
-  int loops;
-  int limit;                    /* max # running at one time */
-  int framelimit;               /* max number to run per frame, ignored if
+  char    name[CQI_NAMELEN];    /* sound wkn */
+  char    filename[CQI_NAMELEN]; /* if different from name */
+  int     volume;
+  int     pan;
+  int     fadeinms;
+  int     fadeoutms;
+  int     loops;
+  int     limit;                /* max # running at one time */
+  int     framelimit;           /* max number to run per frame, ignored if
                                    limit is specified */
   Unsgn32 delayms;              /* minimum delay for multiple instances */
 } cqiSoundRec_t, *cqiSoundPtr_t;
 
 #ifdef NOEXTERN_CONQINIT
-cqiGlobalInitPtr_t    cqiGlobal = NULL;
-cqiShiptypeInitPtr_t  cqiShiptypes = NULL;
-cqiPlanetInitPtr_t    cqiPlanets = NULL;
-cqiTextureInitPtr_t   cqiTextures = NULL;
-int                   cqiNumTextures = 0;
-cqiAnimationInitPtr_t cqiAnimations = NULL;
-int                   cqiNumAnimations = 0;
-cqiAnimDefInitPtr_t   cqiAnimDefs = NULL;
-int                   cqiNumAnimDefs = 0;
+cqiGlobalInitPtr_t           cqiGlobal = NULL;
+cqiShiptypeInitPtr_t         cqiShiptypes = NULL;
+cqiPlanetInitPtr_t           cqiPlanets = NULL;
+cqiTextureInitPtr_t          cqiTextures = NULL;
+int                          cqiNumTextures = 0;
+cqiAnimationInitPtr_t        cqiAnimations = NULL;
+int                          cqiNumAnimations = 0;
+cqiAnimDefInitPtr_t          cqiAnimDefs = NULL;
+int                          cqiNumAnimDefs = 0;
 
-cqiSoundConfPtr_t     cqiSoundConf = NULL;
-cqiSoundPtr_t         cqiSoundEffects = NULL;
-int                   cqiNumSoundEffects = 0;
-cqiSoundPtr_t         cqiSoundMusic = NULL;
-int                   cqiNumSoundMusic = 0;
+cqiSoundConfPtr_t            cqiSoundConf = NULL;
+cqiSoundPtr_t                cqiSoundEffects = NULL;
+int                          cqiNumSoundEffects = 0;
+cqiSoundPtr_t                cqiSoundMusic = NULL;
+int                          cqiNumSoundMusic = 0;
 
 #else
 extern cqiGlobalInitPtr_t    cqiGlobal;
@@ -258,21 +257,22 @@ extern int                   cqiNumSoundMusic;
 #define CQI_FILE_SOUNDRC        3
 #define CQI_FILE_SOUNDRC_ADD    4
 
-int cqiLoadRC(int rcid, char *filename, int verbosity, int debugl);
+int                 cqiLoadRC(int rcid, char *filename, int verbosity, 
+                              int debugl);
 
-int cqiFindPlanet(char *str);
+int                 cqiFindPlanet(char *str);
 cqiTextureAreaPtr_t cqiFindTexArea(char *texnm, char *tanm, 
                                    cqiTextureAreaPtr_t defaultta);
-int cqiFindEffect(char *str);
-int cqiFindMusic(char *str);
+int                 cqiFindEffect(char *str);
+int                 cqiFindMusic(char *str);
 
-void dumpUniverse(void);
+void                dumpUniverse(void);
 
-void dumpInitDataHdr(void);
-void dumpSoundDataHdr(void);
-void dumpTexDataHdr(void);
+void                dumpInitDataHdr(void);
+void                dumpSoundDataHdr(void);
+void                dumpTexDataHdr(void);
 
 /* planinit.c */
-void cqiInitPlanets(void);
+void                cqiInitPlanets(void);
 
 #endif /* _CONQINIT_H */

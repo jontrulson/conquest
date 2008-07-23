@@ -18,6 +18,7 @@
 #include "record.h"
 #include "servercmd.h"
 #include "conqlb.h"
+#include "conqutil.h"
 
 void startRecord(int f)
 {
@@ -30,7 +31,7 @@ void startRecord(int f)
   
   if (Context.recmode == RECMODE_ON)
     {
-      clog("conquestd: startRecord: already recording.");
+      utLog("conquestd: startRecord: already recording.");
       if (f)
         clbStoreMsg(MSG_GOD, Context.snum, "We are already recording.");
       return;
@@ -48,14 +49,14 @@ void startRecord(int f)
 
   sprintf(fname, "%s/%s", CONQSTATE, bname);
 
-  if (recordOpenOutput(fname, TRUE))
+  if (recOpenOutput(fname, TRUE))
     {                     /* we are almost ready... */
       Context.recmode = RECMODE_STARTING;
     }
   else
     {
       Context.recmode = RECMODE_OFF;
-      clog("conquestd: Cannot record to %s", fname);
+      utLog("conquestd: Cannot record to %s", fname);
       sprintf(cbuf, "Cannot record to %s", bname);
       if (f)
         clbStoreMsg(MSG_GOD, Context.snum, cbuf);
@@ -65,11 +66,11 @@ void startRecord(int f)
   /* start recording */
   if (Context.recmode == RECMODE_STARTING)
     {
-      if (recordInitOutput(Context.unum, getnow(NULL, 0), Context.snum,
+      if (recInitOutput(Context.unum, getnow(NULL, 0), Context.snum,
                            TRUE))
         {
           Context.recmode = RECMODE_ON;
-          clog("conquestd: Recording to %s", fname);
+          utLog("conquestd: Recording to %s", fname);
           sprintf(cbuf, "Recording to %s", bname);
           if (f)
             clbStoreMsg(MSG_GOD, Context.snum, cbuf);
@@ -81,10 +82,10 @@ void startRecord(int f)
       else
         {
           Context.recmode = RECMODE_OFF;
-          clog("conquestd: recordInitOutput failed");
+          utLog("conquestd: recInitOutput failed");
           if (f)
             clbStoreMsg(MSG_GOD, Context.snum, 
-                        "conquestd: recordInitOutput failed");
+                        "conquestd: recInitOutput failed");
         }
     }
 
@@ -95,15 +96,15 @@ static void stopRecord(void)
 {
   if (Context.recmode != RECMODE_ON)
     {
-      clog("conquestd: stopRecord: not recording.");
+      utLog("conquestd: stopRecord: not recording.");
       clbStoreMsg(MSG_GOD, Context.snum, "We aren't recording.");
       return;
     }
 
 
-  clog("conquestd: stopRecord: recording stopped");
+  utLog("conquestd: stopRecord: recording stopped");
   clbStoreMsg(MSG_GOD, Context.snum, "Recording stopped");
-  recordCloseOutput();
+  recCloseOutput();
 
   return;
 }
@@ -168,7 +169,7 @@ static void CreateRobots(int from, char *arg1, char *arg2, char *arg3)
     }
   
   /* Report the good news. */
-  clog("conquestd: %s created %d %s%s (%s) robot(s)",
+  utLog("conquestd: %s created %d %s%s (%s) robot(s)",
        Users[Context.unum].username,
        anum, 
        (warlike == TRUE) ? "WARLIKE " : "",
@@ -179,10 +180,10 @@ static void CreateRobots(int from, char *arg1, char *arg2, char *arg3)
            (warlike) ? "Warlike " : "",
 	 Users[unum].alias, Users[unum].username );
   if ( anum == 1 )
-    appship( snum, buf );
+    utAppendShip( snum, buf );
   else
     {
-      appint( anum, buf );
+      utAppendInt( anum, buf );
       appstr( " new ships.", buf );
     }
   clbStoreMsg(MSG_GOD, from, buf);
@@ -211,7 +212,7 @@ static void Murder(int from, char *what)
       else if ( Ships[snum].status != SS_LIVE ) 
         {
           ssbuf[0] = EOS; 
-          appsstatus( Ships[snum].status, ssbuf);
+          utAppendShipStatus( Ships[snum].status, ssbuf);
           sprintf(mbuf, cant_kill_ship_str,
                   Teams[Ships[snum].team].teamchar, 
                   snum, 
@@ -372,7 +373,7 @@ int checkOperExec(int from, int to, char *msg)
   if (!Users[Ships[from].unum].ooptions[OOPT_OPER])
     {                           /* nice try... */
       clbStoreMsg(MSG_GOD, from, "You are not a Conquest Operator.");
-      clog("conquestd: EXEC from unprivileged ship: %d, '%s'", from,
+      utLog("conquestd: EXEC from unprivileged ship: %d, '%s'", from,
            tmsg);
       return FALSE;
     }

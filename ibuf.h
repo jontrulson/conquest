@@ -18,13 +18,13 @@
 
 #include "datatypes.h"
 
-void iBufInit(void);
-void iBufFlush(void);
-int iBufCount(void);
-void iBufPut(char *thestr);
-void iBufPutc(unsigned int thechar);
-unsigned int iBufGetCh(void);
-int DoMacro(int fkey);
-int DoMouseMacro(int but, Unsgn32 mods, real mangle);
+void         ibufInit(void);
+void         ibufFlush(void);
+int          ibufCount(void);
+void         ibufPut(char *thestr);
+void         ibufPutc(unsigned int thechar);
+unsigned int ibufGetc(void);
+int          ibufExpandMacro(int fkey);
+int          ibufExpandMouseMacro(int but, Unsgn32 mods, real mangle);
 
-#endif
+#endif /* IBUF_H */

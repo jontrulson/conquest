@@ -13,6 +13,7 @@
 #include "color.h"
 #include "conqcom.h"
 #include "conqlb.h"
+#include "conqutil.h"
 
 extern void setWarp(real warp); /* FIXME, GL.c */
 
@@ -198,7 +199,7 @@ void hudSetAlertStatus(int snum, int asnum, alertLevel_t astatus)
         }
 
       if (asnum)
-        appship(asnum, hudData.aStat.str);
+        utAppendShip(asnum, hudData.aStat.str);
 
       if (SCLOAKED(asnum))
         appstr( " (CLOAKED)", hudData.aStat.str );
@@ -330,14 +331,14 @@ void hudSetAlloc(int snum)
       if ( i == 0 )
         appstr( "**", hudData.alloc.str );
       else
-        appint( i, hudData.alloc.str );
+        utAppendInt( i, hudData.alloc.str );
 
       appchr( '/', hudData.alloc.str );
 
       if ( j == 0 )
         appstr( "**", hudData.alloc.str );
       else
-        appint( j, hudData.alloc.str );
+        utAppendInt( j, hudData.alloc.str );
 
       hudData.alloc.walloc  = i;
       hudData.alloc.ealloc  = j;
@@ -426,12 +427,12 @@ void hudSetTow(int snum)
       else if ( i < 0 )
         {
           strcpy(hudData.tow.str, "towing ");
-          appship( -i, hudData.tow.str );
+          utAppendShip( -i, hudData.tow.str );
         }
       else if ( i > 0 )
         {
           strcpy(hudData.tow.str, "towed by ");
-          appship( i, hudData.tow.str );
+          utAppendShip( i, hudData.tow.str );
         }
 
       hudData.tow.towstat = i;
@@ -641,7 +642,7 @@ void hudSetInfoTarget(int tnum)
       if (tnum)
         {
           if (tnum > 0)
-            appship( tnum, hudData.info.lasttargetstr );
+            utAppendShip( tnum, hudData.info.lasttargetstr );
           else if (tnum < 0)
             {                   /* planet, just need 3 chars */
               hudData.info.lasttargetstr[0] = Planets[-tnum].name[0];
@@ -682,4 +683,27 @@ void hudSetInfoTargetDist(int tdist)
 
   return;
 }
+
+/* ship currently being viewed during playback */
+void hudSetRecId(char *str)
+{
+  if (str)
+    strcpy(hudData.recId.str, str);
+  else
+    hudData.recId.str[0] = EOS;
+
+  return;
+}
+
+/* ship currently being viewed during playback */
+void hudSetRecTime(char *str)
+{
+  if (str)
+    strcpy(hudData.recTime.str, str);
+  else
+    hudData.recTime.str[0] = EOS;
+
+  return;
+}
+
       

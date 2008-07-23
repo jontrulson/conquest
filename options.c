@@ -21,6 +21,7 @@
 #include "iolb.h"
 #include "client.h"
 #include "clientlb.h"
+#include "conqutil.h"
 
 #include "context.h"
 
@@ -258,7 +259,7 @@ void UserOptsMenu(int unum)
   if (macroptr == NULL)
     {				/* if this happens, something is
 				   seriously confused */
-      clog("UserOptsMenu(): ERROR: macroptr == NULL, no CTYPE_MACRO found in ConfData");
+      utLog("UserOptsMenu(): ERROR: macroptr == NULL, no CTYPE_MACRO found in ConfData");
     }
 
   while (Done == FALSE)
@@ -369,7 +370,7 @@ static void ChangeOption(struct Conf *cdata, int lin)
     case CTYPE_STRING:
       if (cdata->max > CBUFLEN)
 	{
-	  clog("ChangeOption: conf data max exceeds local buffer size.");
+	  utLog("ChangeOption: conf data max exceeds local buffer size.");
 	  break;
 	}
       cdclrl(lin, 1);
@@ -506,7 +507,7 @@ static int ViewEditOptions(struct Conf ConfigData[], int ConfSize,
       while (i < ConfSize)
 	{
 #ifdef DEBUG_OPTIONS
-	  clog("ViewEditOptions(): ConfSize = %d, i = %d, type = %d, %s", 
+	  utLog("ViewEditOptions(): ConfSize = %d, i = %d, type = %d, %s", 
 	       ConfSize, i, ConfigData[i].ConfType,  
 	       ConfigData[i].OneLineDesc);	  
 #endif
@@ -515,7 +516,7 @@ static int ViewEditOptions(struct Conf ConfigData[], int ConfSize,
 	      ConfigData[i].ConfType != CTYPE_NUMERIC)
 	    {		/* skip special elements */
 #ifdef DEBUG_OPTIONS
-	      clog("ViewEditOptions():\tSKIPPING");
+	      utLog("ViewEditOptions():\tSKIPPING");
 #endif
 	      i++;
 	      continue;
@@ -565,7 +566,7 @@ static int ViewEditOptions(struct Conf ConfigData[], int ConfSize,
       llin = k - 1;
 
 #ifdef DEBUG_OPTIONS
-clog("ViewEditOptions(): maxllin = %d, llin = %d, k = %d", maxllin, llin, k);
+utLog("ViewEditOptions(): maxllin = %d, llin = %d, k = %d", maxllin, llin, k);
 #endif
 
       cdclrl( MSG_LIN1, 2  );
@@ -625,7 +626,7 @@ clog("ViewEditOptions(): maxllin = %d, llin = %d, k = %d", maxllin, llin, k);
 	}
 
 #ifdef DEBUG_OPTIONS
-      clog("ViewEditOptions():###\tllin = %d, clin = %d", llin, clin);
+      utLog("ViewEditOptions():###\tllin = %d, clin = %d", llin, clin);
 #endif
     }
 
@@ -725,7 +726,7 @@ static int ViewEditMacros(struct Conf *ConfigData)
 	    }
 
 #ifdef DEBUG_OPTIONS
-	  clog("ViewEditMacros(): k = %d, dispmac = '%s'", 
+	  utLog("ViewEditMacros(): k = %d, dispmac = '%s'", 
 	       k, 
 	       dispmac);
 #endif
@@ -839,7 +840,7 @@ static int ViewEditMacros(struct Conf *ConfigData)
 	}
 
 #ifdef DEBUG_OPTIONS
-      clog("ViewEditMacros():###\tllin = %d, clin = %d, curpage = %d", 
+      utLog("ViewEditMacros():###\tllin = %d, clin = %d, curpage = %d", 
 	   llin, clin, curpage);
 #endif
     }

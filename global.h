@@ -19,28 +19,27 @@
 #ifndef GLOBAL_H
 #define GLOBAL_H
 
-#ifdef NOEXTERNGLOBALS
-#define CEXTERN 
-#else
-#define CEXTERN extern 
-#endif
-
-CEXTERN	   int PollInputfd;	/* a copy of stdin's fd for poll()/select() */
-CEXTERN    int ConquestGID;	/* Conquest's GID */
-CEXTERN    int RMsg_Line;
-
 /* for the semaphores */
 #define LOCKMSG      (0)	/* lock the message portion  */
 #define LOCKCMN      (1)	/* lock everything else  */
 
-CEXTERN int headerflag;         /* whether to show header flag */
 
 /* verbosity/debugging */
-#if defined(NOEXTERNGLOBALS)
-int cqDebug = 0;
+#if defined(NOEXTERN_GLOBALS)
+int        PollInputfd = -1; /* a copy of stdin's fd for poll()/select() */
+int        ConquestGID;         /* Conquest's GID */
+int        RMsg_Line;           /* this is stupid and should go away */
+
+
+int        cqDebug = 0;
+int        headerflag;         /* whether to show header flag */
 #else
-CEXTERN int cqDebug;
+extern int PollInputfd;	/* a copy of stdin's fd for poll()/select() */
+extern int ConquestGID;	/* Conquest's GID */
+extern int RMsg_Line;
+
+extern int cqDebug;
+extern int headerflag;         /* whether to show header flag */
 #endif
 
-#undef CEXTERN			/* cleanup */
-#endif
+#endif /* GLOBAL_H */

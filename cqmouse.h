@@ -15,10 +15,10 @@
 #define CQ_MOUSE_BUP        1
 
 typedef struct m_mouse_data {
-  int button;                   /* button number, starting at 0 */
-  int state;                    /* CQ_MOUSE_B* */
+  int     button;               /* button number, starting at 0 */
+  int     state;                /* CQ_MOUSE_B* */
   Unsgn32 mod;                  /* key modifiers (CQ_MOD*) */
-  int x, y;                     /* ortho coords of mouse event
+  int     x, y;                 /* ortho coords of mouse event
                                    (topleft = 0,0) */
 } mouseData_t;
 #endif /* _CQMOUSE_H */

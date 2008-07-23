@@ -25,6 +25,7 @@
 #include "global.h"
 #include "conqcom.h"
 #include "conqlb.h"
+#include "conqutil.h"
 
 #define CONQSEMKEY   (0xff001701) /* hope that's unique! */
 #define CONQSEMPERMS (00664)
@@ -56,7 +57,7 @@ int semInit(void)
   if (ConquestSemID == -1)
     {				/* already exists? */
 #ifdef DEBUG_SEM
-      clog("semInit(): semget(IPC_CREAT): failed: %s",
+      utLog("semInit(): semget(IPC_CREAT): failed: %s",
 	   strerror(errno));
 #endif
 
@@ -67,7 +68,7 @@ int semInit(void)
       if (ConquestSemID == -1)
 	{
 #ifdef DEBUG_SEM
-	  clog("semInit(): semget(GET): failed: %s",
+	  utLog("semInit(): semget(GET): failed: %s",
 	       strerror(errno));
 #endif
 
@@ -82,7 +83,7 @@ int semInit(void)
 
 
 #if defined(DEBUG_FLOW) || defined(DEBUG_SEM)
-  clog("semInit(): semget(GET): succeeded, semaphore ID is %d",
+  utLog("semInit(): semget(GET): succeeded, semaphore ID is %d",
        ConquestSemID);
 #endif
   
@@ -99,9 +100,9 @@ void Lock(int what)
     return;			/* clients don't use sems... */
 
 #ifdef DEBUG_SEM
-  clog("Lock(%s): Attempting to aquire a lock.",
+  utLog("Lock(%s): Attempting to aquire a lock.",
        semGetName(what));
-  clog("Lock(%s): %s", semGetName(what), semGetStatusStr());
+  utLog("Lock(%s): %s", semGetName(what), semGetStatusStr());
 #endif
 
   Done = FALSE;
@@ -127,7 +128,7 @@ void Lock(int what)
 	    int err;
 
 	    err = errno;
-	    clog("Lock(%s): semop(): failed: %s",
+	    utLog("Lock(%s): semop(): failed: %s",
 		 semGetName(what),
 		 strerror(err));
 	    fprintf(stderr, "Lock(%s): semop(): failed: %s\n",
@@ -138,7 +139,7 @@ void Lock(int what)
 	  }
 	else
 	  {
-	    clog("Lock(%s): semop(): interrupted. Retrying lock attempt.", semGetName(what));
+	    utLog("Lock(%s): semop(): interrupted. Retrying lock attempt.", semGetName(what));
 	  }
       }
       else			/* we got a successful lock */
@@ -146,7 +147,7 @@ void Lock(int what)
     }
 
 #ifdef DEBUG_SEM
-  clog("Lock(%s): semop(): succeeded, got a lock",
+  utLog("Lock(%s): semop(): succeeded, got a lock",
        semGetName(what));
 #endif
 
@@ -169,9 +170,9 @@ void Unlock(int what)
 
 
 #ifdef DEBUG_SEM
-  clog("Unlock(%s): Attempting to free a lock.",
+  utLog("Unlock(%s): Attempting to free a lock.",
        semGetName(what));
-  clog("Unlock(%s): %s", semGetName(what), semGetStatusStr());
+  utLog("Unlock(%s): %s", semGetName(what), semGetStatusStr());
 #endif
 
 
@@ -182,7 +183,7 @@ void Unlock(int what)
   if (retval != 0)
     {				/* couldn't get semvals */
 #if !defined(CYGWIN)
-      clog("Unlock(%s): semctl(GETALL) failed: %s",
+      utLog("Unlock(%s): semctl(GETALL) failed: %s",
 	   semGetName(what),
 	   strerror(errno));
 #endif
@@ -192,7 +193,7 @@ void Unlock(int what)
 				/* check to see if already unlocked */
       if (semvals[what] == 0)	/* sem already unlocked - report and continue */
 	{
-	  clog("Unlock(%s): semaphore already unlocked.",
+	  utLog("Unlock(%s): semaphore already unlocked.",
 	       semGetName(what));
 	  
           /* allow alarms again */
@@ -211,7 +212,7 @@ void Unlock(int what)
     {
       if (errno != EINTR)
 	{
-	  clog("Unlock(%s): semop(): failed: %s",
+	  utLog("Unlock(%s): semop(): failed: %s",
 	       semGetName(what),
 	       strerror(errno));
 	  fprintf(stderr,"Unlock(%s): semop(): failed: %s",
@@ -221,7 +222,7 @@ void Unlock(int what)
 	}
       else
 	{
-	  clog("Unlock(%s): semop(): interrupted. continuing...", semGetName(what));
+	  utLog("Unlock(%s): semop(): interrupted. continuing...", semGetName(what));
 	  err = EINTR;
 	}
     }
@@ -229,7 +230,7 @@ void Unlock(int what)
 				/* hopefully we got a lock */
 #ifdef DEBUG_SEM
   if (!err)
-    clog("Unlock(%s): semop(): succeeded, removed lock",
+    utLog("Unlock(%s): semop(): succeeded, removed lock",
 	 semGetName(what));
 #endif
 
@@ -284,7 +285,7 @@ char *semGetStatusStr(void)
 
   if (retval != 0)
     {
-      clog("semGetStatusStr(): %s semctl(IPC_STAT) failed: %s",
+      utLog("semGetStatusStr(): %s semctl(IPC_STAT) failed: %s",
            semGetName(LOCKMSG),
 	   strerror(errno));
     }
@@ -295,7 +296,7 @@ char *semGetStatusStr(void)
 
   if (retval != 0)
     {
-      clog("semGetStatusStr(%d): %s semctl(IPC_STAT) failed: %s",
+      utLog("semGetStatusStr(%d): %s semctl(IPC_STAT) failed: %s",
            semGetName(LOCKCMN),
 	   strerror(errno));
     }
@@ -309,7 +310,7 @@ char *semGetStatusStr(void)
 
   if (retval != 0)
     {
-      clog("semGetStatusStr(): semctl(GETALL) failed: %s",
+      utLog("semGetStatusStr(): semctl(GETALL) failed: %s",
 	   strerror(errno));
     }
 

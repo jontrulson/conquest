@@ -15,22 +15,28 @@
 #ifdef NOEXTERN_GLFONT
 
 /* Texture mapped fonts */
-TexFont *fontLargeTxf = NULL;
-TexFont *fontFixedTxf = NULL;
-TexFont *fontTinyFixedTxf = NULL;
-TexFont *fontMsgTxf = NULL;
+TexFont        *glfFontLarge = NULL;
+TexFont        *glfFontFixed = NULL;
+TexFont        *glfFontFixedTiny = NULL;
+TexFont        *glfFontMsg = NULL;
 #else
 
-extern TexFont *fontLargeTxf;
-extern TexFont *fontFixedTxf;
-extern TexFont *fontTinyFixedTxf;
-extern TexFont *fontMsgTxf;
+extern TexFont *glfFontLarge;
+extern TexFont *glfFontFixed;
+extern TexFont *glfFontFixedTiny;
+extern TexFont *glfFontMsg;
 #endif /* NOEXTERN_GLFONT */
 
-void glfRender(GLfloat x, GLfloat y, GLfloat z, GLfloat w, GLfloat h,
-               TexFont *font, char *str, int color, GLColor_t *col,
-               int scalex, int dofancy, int ortho);
-void initTexFonts(void);
+/* font flags for glfRenderFont */
+#define GLF_FONT_F_NONE             0x00000000 /* nothing */
+#define GLF_FONT_F_SCALEX           0x00000001 /* scale to fit width */
+#define GLF_FONT_F_DOCOLOR          0x00000002 /* parse embedded colors */
+#define GLF_FONT_F_ORTHO            0x00000004 /* use an ortho projection */
+
+void glfRenderFont(GLfloat x, GLfloat y, GLfloat z, GLfloat w, GLfloat h,
+                   TexFont *font, char *str, int color, GLColor_t *col,
+                   Unsgn32 flags);
+void glfInitFonts(void);
 
 
 #endif /* _GLFONT_H */

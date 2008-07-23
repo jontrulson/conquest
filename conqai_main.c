@@ -23,11 +23,13 @@
 /*                                                                    */
 /**********************************************************************/
 
-#define NOEXTERN
-
 #include "conqdef.h"
 #include "conqcom.h"
+#include "conqutil.h"
+
+#define NOEXTERN_CONTEXT
 #include "context.h"
+
 #include "global.h"
 #include "user.h"
 #include "conf.h"
@@ -53,14 +55,14 @@ int main(int argc, char *argv[])
   if (GetSysConf(FALSE) == ERR)
     {
 #ifdef DEBUG_CONFIG
-      clog("%s@%d: main(): GetSysConf() returned ERR.", __FILE__, __LINE__);
+      utLog("%s@%d: main(): GetSysConf() returned ERR.", __FILE__, __LINE__);
 #endif
 /*      exit(1);*/
     }
   
   if (setgid(ConquestGID) == -1)
     {
-      clog("conqai: setgid(%d): %s",
+      utLog("conqai: setgid(%d): %s",
 	   ConquestGID,
 	   strerror(errno));
       fprintf(stderr, "conqai: setgid(): failed\n");

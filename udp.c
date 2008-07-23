@@ -15,6 +15,7 @@
 #include "c_defs.h"
 #include "conqnet.h"
 #include "udp.h"
+#include "conqutil.h"
 
 int udpOpen(int port, struct sockaddr_in* addr)
 {
@@ -29,7 +30,7 @@ int udpOpen(int port, struct sockaddr_in* addr)
 
   /* check parameters */
   if (!addr) {
-    clog("NET: openUDPnetwork: Must supply an address structure!");
+    utLog("NET: openUDPnetwork: Must supply an address structure!");
     return -1;
   }
   memset(addr, 0, sizeof(*addr));
@@ -37,7 +38,7 @@ int udpOpen(int port, struct sockaddr_in* addr)
   /* open socket */
   fd = socket(AF_INET, SOCK_DGRAM, 0);
   if (fd < 0) {
-    clog("NET: openUDPnetwork: socket");
+    utLog("NET: openUDPnetwork: socket");
     return -1;
   }
 
@@ -51,7 +52,7 @@ int udpOpen(int port, struct sockaddr_in* addr)
   opt = optOn;
   if (setsockopt(fd, SOL_SOCKET, SO_REUSEPORT,
                  (SSOType)&opt, sizeof(opt)) < 0) {
-    clog("NET: setsockopt SO_REUSEPORT: %s", strerror(errno));
+    utLog("NET: setsockopt SO_REUSEPORT: %s", strerror(errno));
     close(fd);
     return -1;
   }
@@ -62,7 +63,7 @@ int udpOpen(int port, struct sockaddr_in* addr)
   opt = optOn;
   if (setsockopt(fd, SOL_SOCKET, SO_REUSEADDR,
 				(SSOType)&opt, sizeof(opt)) < 0) {
-    clog("NET: openUDPnetwork: setsockopt SO_REUSEADDR: %s", strerror(errno));
+    utLog("NET: openUDPnetwork: setsockopt SO_REUSEADDR: %s", strerror(errno));
     close(fd);
     return -1;
   }
@@ -70,7 +71,7 @@ int udpOpen(int port, struct sockaddr_in* addr)
 
   /* bind address */
   if (bind(fd, (const struct sockaddr*)addr, sizeof(*addr)) < 0) {
-    clog("NET: openUDPnetwork: bind: %s", strerror(errno));
+    utLog("NET: openUDPnetwork: bind: %s", strerror(errno));
     close(fd);
     return -1;
   }
@@ -109,7 +110,7 @@ int udpRecv(int fd, void* buffer, int bufferLength,
       return 0;
     }
     else {
-      clog("NET: udpRecv: %s", strerror(errno));
+      utLog("NET: udpRecv: %s", strerror(errno));
       return -1;
     }
   }

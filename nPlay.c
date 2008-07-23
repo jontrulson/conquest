@@ -18,6 +18,7 @@
 #include "node.h"
 #include "client.h"
 #include "record.h"
+#include "conqutil.h"
 
 #include "nMenu.h"
 #include "nCP.h"
@@ -100,10 +101,10 @@ static int _newship( int unum, int *snum )
 
   while (TRUE)
     {
-      if ((pkttype = waitForPacket(PKT_FROMSERVER, sockl, PKT_ANYPKT,
+      if ((pkttype = pktWaitForPacket(PKT_FROMSERVER, sockl, PKT_ANYPKT,
 				   buf, PKT_MAXSIZE, 60, NULL)) < 0)
 	{
-	  clog("nPlay: _newship: waitforpacket returned %d", pkttype);
+	  utLog("nPlay: _newship: waitforpacket returned %d", pkttype);
           fatal = TRUE;
 	  return FALSE;
 	}
@@ -137,7 +138,7 @@ static int _newship( int unum, int *snum )
               }
             else
               {
-                clog("nPlay: _newship: invalid CLIENTSTAT");
+                utLog("nPlay: _newship: invalid CLIENTSTAT");
                 return FALSE;
               }
           }
@@ -219,7 +220,7 @@ static int nPlayDisplay(dspConfig_t *dsp)
               i = i + 1;
               c_strcpy( "You are only allowed to fly ", cbuf );
               j = Users[Context.unum].multiple;
-              appint( j, cbuf );
+              utAppendInt( j, cbuf );
               appstr( " ship", cbuf );
               if ( j != 1 )
                 appchr( 's', cbuf );
@@ -228,7 +229,7 @@ static int nPlayDisplay(dspConfig_t *dsp)
               break;
               
             default:
-              clog("nPlayDisplay: _newship: unexpected ack code %d",
+              utLog("nPlayDisplay: _newship: unexpected ack code %d",
                    sack->code);
               break;
             }
@@ -245,7 +246,7 @@ static int nPlayIdle(void)
     {
       Context.entship = TRUE;
       Ships[Context.snum].sdfuse = 0;       /* zero self destruct fuse */
-      grand( &Context.msgrand );            /* initialize message timer */
+      utGrand( &Context.msgrand );            /* initialize message timer */
       Context.leave = FALSE;                /* assume we won't want to bail */
       Context.redraw = TRUE;                /* want redraw first time */
       Context.msgok = TRUE;                 /* ok to get messages */
@@ -255,7 +256,7 @@ static int nPlayIdle(void)
       /* start recording if neccessary */
       if (Context.recmode == RECMODE_STARTING)
         {
-          if (recordInitOutput(Context.unum, getnow(NULL, 0), Context.snum,
+          if (recInitOutput(Context.unum, getnow(NULL, 0), Context.snum,
                                FALSE))
             {
               Context.recmode = RECMODE_ON;

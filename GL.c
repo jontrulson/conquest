@@ -14,6 +14,7 @@
 #include "color.h"
 #include "conqcom.h"
 #include "conqlb.h"
+#include "conqutil.h"
 #include "ibuf.h"
 
 #include <GL/glut.h>
@@ -215,7 +216,7 @@ static int initGLAnimDefs(void)
   int ndx;
   char buffer[CQI_NAMELEN];
 
-  clog("%s: Initializing...", __FUNCTION__);
+  utLog("%s: Initializing...", __FUNCTION__);
 
   /* first, if there's already one present, free it */
 
@@ -235,7 +236,7 @@ static int initGLAnimDefs(void)
   if (!(GLAnimDefs = (GLAnimDef_t *)malloc(sizeof(GLAnimDef_t) * 
                                            cqiNumAnimDefs)))
     {
-      clog("%s: ERROR: malloc(%d) failed.", __FUNCTION__,
+      utLog("%s: ERROR: malloc(%d) failed.", __FUNCTION__,
            sizeof(GLAnimDef_t) * cqiNumAnimDefs);
 
       return FALSE;
@@ -251,7 +252,7 @@ static int initGLAnimDefs(void)
           if ((ndx = findGLTexture(cqiAnimDefs[i].texname)) >= 0)
             GLAnimDefs[i].texid = GLTextures[ndx].id;
           else
-            clog("%s: could not locate texture '%s' for animdef '%s'.", 
+            utLog("%s: could not locate texture '%s' for animdef '%s'.", 
                  __FUNCTION__, cqiAnimDefs[i].texname, cqiAnimDefs[i].name);
 
           /* it may not look pretty, but we will not go fatal here
@@ -272,7 +273,7 @@ static int initGLAnimDefs(void)
             GLAnimDefs[i].itexid = GLTextures[ndx].id;
           else
             {
-              clog("%s: could not locate istate texture '%s' for animdef '%s'.", 
+              utLog("%s: could not locate istate texture '%s' for animdef '%s'.", 
                    __FUNCTION__, cqiAnimDefs[i].itexname, cqiAnimDefs[i].name);
               GLAnimDefs[i].istates &= ~AD_ISTATE_TEX; /* turn it off */
             }
@@ -288,7 +289,7 @@ static int initGLAnimDefs(void)
       if (cqiAnimDefs[i].iangle < 0.0) /* neg is special (random)  */
         GLAnimDefs[i].iangle = cqiAnimDefs[i].iangle;
       else
-        GLAnimDefs[i].iangle = mod360(cqiAnimDefs[i].iangle);
+        GLAnimDefs[i].iangle = utMod360(cqiAnimDefs[i].iangle);
 
       /* animation types */
 
@@ -311,7 +312,7 @@ static int initGLAnimDefs(void)
           if (!(GLAnimDefs[i].tex.tex = 
                 (struct _anim_texture_ent *)malloc(sizeof(struct _anim_texture_ent) * GLAnimDefs[i].tex.stages)))
             {
-              clog("%s: ERROR: _anim_texture_ent malloc(%d) failed.", 
+              utLog("%s: ERROR: _anim_texture_ent malloc(%d) failed.", 
                    __FUNCTION__,
                    sizeof(struct _anim_texture_ent) * GLAnimDefs[i].tex.stages);
 
@@ -353,7 +354,7 @@ static int initGLAnimDefs(void)
                 }
               else
                 {
-                  clog("%s: could not locate texanim texture '%s' for animdef '%s'.", 
+                  utLog("%s: could not locate texanim texture '%s' for animdef '%s'.", 
                        __FUNCTION__, buffer, 
                        cqiAnimDefs[i].name);
                   continue;     /* not fatal, just not going to look good
@@ -415,7 +416,7 @@ static int initGLExplosions(void)
   int i, j;
   animStateRec_t initastate;    /* initial state of an explosion */
 
-  clog("%s: Initializing...", __FUNCTION__);
+  utLog("%s: Initializing...", __FUNCTION__);
 
   /* we only need to do this once.  When we have a properly initted state,
      we will simply copy it into the torpAState array.  */
@@ -444,7 +445,7 @@ static GLint _get_ship_texid(char *name)
   if ((ndx = findGLTexture(name)) >= 0)
     return GLTextures[ndx].id;
   else
-    clog("%s: Could not find texture '%s'", __FUNCTION__, name);
+    utLog("%s: Could not find texture '%s'", __FUNCTION__, name);
 
   return 0;
 }
@@ -461,7 +462,7 @@ static int _get_ship_texcolor(char *name, GLColor_t *col)
         *col = GLTextures[ndx].col;
     }
   else
-    clog("%s: Could not find color '%s'", __FUNCTION__, name);
+    utLog("%s: Could not find color '%s'", __FUNCTION__, name);
 
   return ndx;
 }
@@ -473,7 +474,7 @@ static int initGLShips(void)
   char shipPfx[CQI_NAMELEN];
   char buffer[CQI_NAMELEN];
 
-  clog("%s: Initializing...", __FUNCTION__);
+  utLog("%s: Initializing...", __FUNCTION__);
 
   memset((void *)&GLShips, 0, sizeof(GLShips));
 
@@ -619,7 +620,7 @@ static int _get_glplanet_info(GLPlanet_t *curGLPlanet, int plani)
   
   if (gltndx == -1)
     {
-      clog("%s: ERROR: Unable to locate a texture for planet '%s'.", 
+      utLog("%s: ERROR: Unable to locate a texture for planet '%s'.", 
            __FUNCTION__,
            Planets[plani].name);
       
@@ -675,7 +676,7 @@ static int _get_glplanet_info(GLPlanet_t *curGLPlanet, int plani)
     {                       /* cqi was found, so get it. */
       size = cqiPlanets[plnndx].size * OBJ_PRESCALE;
 #if 0
-      clog("Computed size %f for planet %s\n",
+      utLog("Computed size %f for planet %s\n",
            size, Planets[plani].name);
 #endif
     }
@@ -695,7 +696,7 @@ int uiUpdateTorpDir(int snum, int tnum)
   if (tnum < 0 || tnum >= MAXTORPS)
     return FALSE;
 
-  torpdir[snum][tnum] = angle(0.0, 0.0, 
+  torpdir[snum][tnum] = utAngle(0.0, 0.0, 
                               Ships[snum].torps[tnum].dx, 
                               Ships[snum].torps[tnum].dy);
   return TRUE;
@@ -732,7 +733,7 @@ static int initGLPlanets(void)
   int i;
   GLPlanet_t curGLPlanet;
 
-  clog("%s: Initializing...", __FUNCTION__);
+  utLog("%s: Initializing...", __FUNCTION__);
 
   /* first, if there's already one present, free it */
 
@@ -746,7 +747,7 @@ static int initGLPlanets(void)
 
   if (!(GLPlanets = (GLPlanet_t *)malloc(sizeof(GLPlanet_t) * NUMPLANETS)))
     {
-      clog("%s: ERROR: malloc(%d) failed.", __FUNCTION__,
+      utLog("%s: ERROR: malloc(%d) failed.", __FUNCTION__,
            sizeof(GLPlanet_t) * NUMPLANETS);
 
       return FALSE;
@@ -786,7 +787,7 @@ void drawIconHUDDecal(GLfloat rx, GLfloat ry, GLfloat w, GLfloat h,
   if (!GLShips[0][0].ship)
     if (!initGLShips())
       {
-        clog("%s: initGLShips failed, bailing.", 
+        utLog("%s: initGLShips failed, bailing.", 
              __FUNCTION__);
         norender = TRUE;
         return;                 /* we need to bail here... */
@@ -851,7 +852,7 @@ static void mouse(int b, int state, int x, int y)
   scrNode_t *onode = getTopONode();
 
 #if 0
-  clog("%s: b = %d, state = %d x = %d, y = %d", 
+  utLog("%s: b = %d, state = %d x = %d, y = %d", 
        __FUNCTION__,
        b, state, x, y);
 #endif
@@ -905,7 +906,7 @@ void drawLine(GLfloat x, GLfloat y, GLfloat len, GLfloat lw)
 {
 
 #if 0
-  clog("drawLine: x = %f, y = %f len = %f",
+  utLog("drawLine: x = %f, y = %f len = %f",
        x, y, len);
 #endif
 
@@ -925,7 +926,7 @@ void drawLineBox(GLfloat x, GLfloat y,
 {
 
 #if 0
-  clog("drawLineBox: x = %f, y = %f, w = %f, h = %f",
+  utLog("drawLineBox: x = %f, y = %f, w = %f, h = %f",
        x, y, w, h);
 #endif
 
@@ -982,7 +983,7 @@ void drawTexBox(GLfloat x, GLfloat y, GLfloat z, GLfloat size)
   GLfloat rx, ry;
 
 #ifdef DEBUG
-  clog("%s: x = %f, y = %f\n", __FUNCTION__, x, y);
+  utLog("%s: x = %f, y = %f\n", __FUNCTION__, x, y);
 #endif
 
   rx = x - (size / 2);
@@ -1018,7 +1019,7 @@ void drawExplosion(GLfloat x, GLfloat y, int snum, int torpnum, int scale)
   if (!torpAStates[1][0].anims)
     if (!initGLExplosions())
       {
-        clog("%s: initGLExplosions failed, bailing.", 
+        utLog("%s: initGLExplosions failed, bailing.", 
              __FUNCTION__);
           norender = TRUE;
           return;                 /* we need to bail here... */
@@ -1039,7 +1040,7 @@ void drawExplosion(GLfloat x, GLfloat y, int snum, int torpnum, int scale)
           real ang;
           real dis;
           
-          ang = angle(Ships[Context.snum].x, Ships[Context.snum].y, 
+          ang = utAngle(Ships[Context.snum].x, Ships[Context.snum].y, 
                       Ships[snum].torps[torpnum].x,
                       Ships[snum].torps[torpnum].y);
           dis = dist(Ships[Context.snum].x, Ships[Context.snum].y,
@@ -1139,7 +1140,7 @@ void drawBombing(int snum, int scale)
                 free(bombAState[j].state.private);
               bombAState[1].anims = 0; /* clear 1st so we can retry
                                           again later */
-              clog("%s: malloc(%d) failed", sizeof(struct _rndxy));
+              utLog("%s: malloc(%d) failed", sizeof(struct _rndxy));
               return;
             }
           else
@@ -1231,14 +1232,14 @@ void uiDrawPlanet( GLfloat x, GLfloat y, int pnum, int scale,
     return;
 
 #if 0
-  clog("uiDrawPlanet: pnum = %d, x = %.1f, y = %.1f\n",
+  utLog("uiDrawPlanet: pnum = %d, x = %.1f, y = %.1f\n",
        pnum, x, y);
 #endif
 
   /* sanity */
   if (pnum < 1 || pnum > NUMPLANETS)
     {
-      clog("uiGLdrawPlanet(): invalid pnum = %d", pnum);
+      utLog("uiGLdrawPlanet(): invalid pnum = %d", pnum);
 
       return;
     }
@@ -1247,7 +1248,7 @@ void uiDrawPlanet( GLfloat x, GLfloat y, int pnum, int scale,
   if (!GLPlanets)
     if (!initGLPlanets())
       {
-        clog("%s: initGLPlanets failed, bailing.", 
+        utLog("%s: initGLPlanets failed, bailing.", 
              __FUNCTION__);
         norender = TRUE;
         return;                 /* we need to bail here... */
@@ -1313,12 +1314,12 @@ void uiDrawPlanet( GLfloat x, GLfloat y, int pnum, int scale,
             snprintf(buf, BUFFER_SIZE - 1, "%s", Planets[pnum].name);
 
 
-          glfRender(x, 
+          glfRenderFont(x, 
                     ((scale == SCALE_FAC) ? y - 4.0 : y - 1.0), 
                     TRANZ, /* planet's Z */
                     ((GLfloat)uiCStrlen(buf) * 2.0) / ((scale == SCALE_FAC) ? 1.0 : 2.0), 
-                    TEXT_HEIGHT, fontTinyFixedTxf, buf, textcolor, NULL,
-                    TRUE, TRUE, FALSE);
+                    TEXT_HEIGHT, glfFontFixedTiny, buf, textcolor, NULL,
+                    GLF_FONT_F_SCALEX | GLF_FONT_F_DOCOLOR);
         }
     }
   else
@@ -1352,12 +1353,12 @@ void uiDrawPlanet( GLfloat x, GLfloat y, int pnum, int scale,
                  torpchar,
                  planame);
 
-      glfRender(x, 
+      glfRenderFont(x, 
                 ((scale == SCALE_FAC) ? y - 2.0 : y - 1.0), 
                 TRANZ,  
                 ((GLfloat)uiCStrlen(buf) * 2.0) / ((scale == SCALE_FAC) ? 1.0 : 2.0), 
-                TEXT_HEIGHT, fontTinyFixedTxf, buf, textcolor, NULL,
-                TRUE, TRUE, FALSE);
+                TEXT_HEIGHT, glfFontFixedTiny, buf, textcolor, NULL,
+                GLF_FONT_F_SCALEX | GLF_FONT_F_DOCOLOR);
 
     }
 
@@ -1414,7 +1415,7 @@ int GLcvtcoords(real cenx, real ceny, real x, real y, real scale,
   *ry = ((y-ceny) / rscale) * vscale; 
 
 #if 0
-  clog("GLCVTCOORDS: rscale = %f limit = %f cx = %.2f, cy = %.2f, \n\tx = %.2f, y = %.2f, glx = %.2f,"
+  utLog("GLCVTCOORDS: rscale = %f limit = %f cx = %.2f, cy = %.2f, \n\tx = %.2f, y = %.2f, glx = %.2f,"
        " gly = %.2f \n",
        rscale, limit, cenx, ceny, x, y, *rx, *ry);
 #endif
@@ -1429,28 +1430,6 @@ int GLcvtcoords(real cenx, real ceny, real x, real y, real scale,
     }
 
   return TRUE; 
-}
-
-/* ship currently being viewed during playback */
-void setRecId(char *str)
-{
-  if (str)
-    strcpy(hudData.recId.str, str);
-  else
-    hudData.recId.str[0] = EOS;
-
-  return;
-}
-
-/* ship currently being viewed during playback */
-void setRecTime(char *str)
-{
-  if (str)
-    strcpy(hudData.recTime.str, str);
-  else
-    hudData.recTime.str[0] = EOS;
-
-  return;
 }
 
 #define WARP_UP     0
@@ -1508,7 +1487,7 @@ void setWarp(real warp)
 
   /* figure out where we are heading */
 #if 0
-  clog ("warp = %f, dwarp %f lastwarp %f", warp, dwarp, lastwarp);
+  utLog ("warp = %f, dwarp %f lastwarp %f", warp, dwarp, lastwarp);
 #endif
 
   if (warp == dwarp || warp <= 0.0 || dwarp < 0 || 
@@ -1573,9 +1552,9 @@ void dspInitData(void)
 {
   memset((void *)&dConf, 0, sizeof(dspConfig_t));
 
-  dConf.inited = False;
+  DSPFCLR(DSP_F_INITED);
+  DSPFCLR(DSP_F_FULLSCREEN);
 
-  dConf.fullScreen = FALSE;
   dConf.initWidth = 1024;
   dConf.initHeight = 768;
 
@@ -1584,15 +1563,13 @@ void dspInitData(void)
 
   hudInitData();
 
-  dConf.inited = False;
-
   return;
 }
   
 int uiGLInit(int *argc, char **argv)
 {
 #ifdef DEBUG_GL
-  clog("uiGLInit: ENTER");
+  utLog("uiGLInit: ENTER");
 #endif
 
   glutInit(argc, argv);
@@ -1604,7 +1581,7 @@ int uiGLInit(int *argc, char **argv)
   
   dConf.mainw = glutCreateWindow(CONQUESTGL_NAME);
 
-  if(dConf.fullScreen)
+  if(DSP_FULLSCREEN())
     glutFullScreen();
 
   glutKeyboardFunc       (charInput);
@@ -1722,13 +1699,13 @@ _print_gl_info(void)
   const char *glRenderer = (const char *) glGetString(GL_RENDERER);
   const char *glVersion  = (const char *) glGetString(GL_VERSION);
   
-  clog("graphicsInit: OpenGL Vendor:      %s", glVendor);
-  clog("graphicsInit: OpenGL Renderer:    %s", glRenderer);
-  clog("graphicsInit: OpenGL Version:     %s", glVersion);
+  utLog("graphicsInit: OpenGL Vendor:      %s", glVendor);
+  utLog("graphicsInit: OpenGL Renderer:    %s", glRenderer);
+  utLog("graphicsInit: OpenGL Version:     %s", glVersion);
 
   if (cqDebug)
     {
-      clog("graphicsInit: OpenGL limits:");
+      utLog("graphicsInit: OpenGL limits:");
 
       for (i = 0; limits[i].count; i++) 
         {
@@ -1736,9 +1713,9 @@ _print_gl_info(void)
           if (glGetError() == GL_NONE) 
             {
               if (limits[i].count == 1)
-                clog("    %s = %d", limits[i].name, max[0]);
+                utLog("    %s = %d", limits[i].name, max[0]);
               else /* XXX fix if we ever query something with more than 2 values */
-                clog("    %s = %d, %d", limits[i].name, max[0], max[1]);
+                utLog("    %s = %d, %d", limits[i].name, max[0], max[1]);
             }
         }
     }
@@ -1757,11 +1734,11 @@ void graphicsInit(void)
   _print_gl_info();
 
   if (!loadGLTextures())
-    clog("ERROR: loadGLTextures() failed\n");
+    utLog("ERROR: loadGLTextures() failed\n");
   else
     {
       if (!initGLAnimDefs())
-        clog("ERROR: initGLAnimDefs() failed\n");
+        utLog("ERROR: initGLAnimDefs() failed\n");
     }
 
   return;
@@ -1776,27 +1753,27 @@ resize(int w, int h)
     {
       minit = TRUE;
       graphicsInit();
-      initTexFonts();
+      glfInitFonts();
       GLError();
     }
 
   dConf.wW = (GLfloat)w;
   dConf.wH = (GLfloat)h;
-  dConf.mAspect = (GLfloat)w/(GLfloat)h;
+  dConf.wAspect = (GLfloat)w/(GLfloat)h;
   
   /* calculate the border width */
-  dConf.borderW = ((dConf.wW * 0.01) + (dConf.wH * 0.01)) / 2.0;
+  dConf.wBorderW = ((dConf.wW * 0.01) + (dConf.wH * 0.01)) / 2.0;
   
   /* calculate viewer geometry */
   dConf.vX = dConf.wX + (dConf.wW * 0.30); /* x + 30% */
-  dConf.vY = dConf.wY + dConf.borderW;
-  dConf.vW = (dConf.wW - dConf.vX) - dConf.borderW;
+  dConf.vY = dConf.wY + dConf.wBorderW;
+  dConf.vW = (dConf.wW - dConf.vX) - dConf.wBorderW;
   dConf.vH = (dConf.wH - (dConf.wH * 0.20)); /* y + 20% */
 
   dConf.vAspect = dConf.vW/dConf.vH;
   
 #ifdef DEBUG_GL
-  clog("GL: RESIZE: WIN = %d w = %d h = %d, \n"
+  utLog("GL: RESIZE: WIN = %d w = %d h = %d, \n"
        "    vX = %f, vY = %f, vW = %f, vH = %f",
        glutGetWindow(), w, h, 
        dConf.vX, dConf.vY, dConf.vW, dConf.vH);
@@ -1804,8 +1781,8 @@ resize(int w, int h)
 
   /* we will pretend we have an 80x25 char display for
      the 'text' nodes. we account for the border area too */
-  dConf.ppRow = (dConf.wH - (dConf.borderW * 2.0)) / 25.0;
-  dConf.ppCol = (dConf.wW - (dConf.borderW * 2.0)) / 80.0;
+  dConf.ppRow = (dConf.wH - (dConf.wBorderW * 2.0)) / 25.0;
+  dConf.ppCol = (dConf.wW - (dConf.wBorderW * 2.0)) / 80.0;
   
   glViewport(0, 0, w, h);
   
@@ -1821,7 +1798,7 @@ resize(int w, int h)
   glTranslatef(0.0, -dConf.wH, 0.0);
   
   /* save a copy of this matrix */
-  glGetFloatv(GL_PROJECTION_MATRIX, dConf.hmat);
+  glGetFloatv(GL_PROJECTION_MATRIX, dConf.hudProjection);
 
   /* viewer */
   
@@ -1831,14 +1808,14 @@ resize(int w, int h)
                  1.0, 1000.0);
 
   /* save a copy of this matrix */
-  glGetFloatv(GL_PROJECTION_MATRIX, dConf.vmat);
+  glGetFloatv(GL_PROJECTION_MATRIX, dConf.viewerProjection);
 
-  /* restore hmat */
-  glLoadMatrixf(dConf.hmat);
+  /* restore hudProjection */
+  glLoadMatrixf(dConf.hudProjection);
 
   glMatrixMode(GL_MODELVIEW);
   
-  dConf.inited = True;
+  DSPFSET(DSP_F_INITED);
 
   glutPostRedisplay();
   
@@ -1906,7 +1883,7 @@ static void renderFrame(void)
   int rv = NODE_OK;
 
   /* don't render anything until we are ready */
-  if (!dConf.inited)
+  if (!DSP_INITED())
     return;
 
   /* get FPS */
@@ -1926,7 +1903,7 @@ static void renderFrame(void)
       if (rv == NODE_EXIT)
         {
           conqend();
-          clog("EXITING!");
+          utLog("Exiting...");
           exit(1);
         }
     }
@@ -1934,11 +1911,11 @@ static void renderFrame(void)
   /* if we are playing back a recording, we use the current
      frame delay, else the default throttle */
 
-  if (frameDelay != 0.0)
+  if (recFrameDelay != 0.0)
     {
       if (Context.recmode == RECMODE_PLAYING ||
           Context.recmode == RECMODE_PAUSED)
-        c_sleep(frameDelay);
+        c_sleep(recFrameDelay);
       else
         {
           if (FPS > 75.0)               
@@ -1953,8 +1930,8 @@ static void renderFrame(void)
 
 void uiPrintFixed(GLfloat x, GLfloat y, GLfloat w, GLfloat h, char *str)
 {                               /* this works for non-viewer only */
-  glfRender(x, y, 0.0, w, h, fontFixedTxf, str, NoColor, NULL, 
-            TRUE, TRUE, TRUE);
+  glfRenderFont(x, y, 0.0, w, h, glfFontFixed, str, NoColor, NULL, 
+            GLF_FONT_F_SCALEX | GLF_FONT_F_DOCOLOR | GLF_FONT_F_ORTHO);
 
   return;
 }
@@ -1971,7 +1948,7 @@ void drawTorp(GLfloat x, GLfloat y, char torpchar, int torpcolor,
   if (!GLShips[0][0].ship)
     if (!initGLShips())
       {
-        clog("%s: initGLShips failed.", 
+        utLog("%s: initGLShips failed.", 
              __FUNCTION__);
         return;                 /* we need to bail here... */
       }
@@ -2075,7 +2052,7 @@ drawShip(GLfloat x, GLfloat y, GLfloat angle, char ch, int snum, int color,
   if (!GLShips[0][0].ship)
     if (!initGLShips())
       {
-        clog("%s: initGLShips failed, bailing.", 
+        utLog("%s: initGLShips failed, bailing.", 
              __FUNCTION__);
         norender = TRUE;
         return;                 /* we need to bail here... */
@@ -2193,7 +2170,7 @@ drawShip(GLfloat x, GLfloat y, GLfloat angle, char ch, int snum, int color,
     alpha = 0.4;		/* semi-transparent */
 
 #if 0 && defined( DEBUG_GL )
-  clog("DRAWSHIP(%s) x = %.1f, y = %.1f, ang = %.1f\n", buf, x, y, angle);
+  utLog("DRAWSHIP(%s) x = %.1f, y = %.1f, ang = %.1f\n", buf, x, y, angle);
 #endif
 
   glPushMatrix();
@@ -2243,12 +2220,12 @@ drawShip(GLfloat x, GLfloat y, GLfloat angle, char ch, int snum, int color,
 
   glScalef(scaleFac, scaleFac, 1.0);
 
-  glfRender(x, 
+  glfRenderFont(x, 
             ((scale == SCALE_FAC) ? y - 4.0: y - 1.0), 
             TRANZ,  
             ((GLfloat)strlen(buf) * 2.0) / ((scale == SCALE_FAC) ? 1.0 : 2.0), 
-            TEXT_HEIGHT, fontTinyFixedTxf, buf, color, NULL,
-            TRUE, FALSE, FALSE);
+            TEXT_HEIGHT, glfFontFixedTiny, buf, color, NULL,
+            GLF_FONT_F_SCALEX);
 
   glPopMatrix();
 
@@ -2282,7 +2259,7 @@ void drawDoomsday(GLfloat x, GLfloat y, GLfloat dangle, GLfloat scale)
   dis = dist( Ships[Context.snum].x, Ships[Context.snum].y, 
               Doomsday->x, Doomsday->y );
   
-  ang = angle(Ships[Context.snum].x, Ships[Context.snum].y,  
+  ang = utAngle(Ships[Context.snum].x, Ships[Context.snum].y,  
               Doomsday->x, Doomsday->y); 
 
   /* find the textures if we haven't already */
@@ -2300,7 +2277,7 @@ void drawDoomsday(GLfloat x, GLfloat y, GLfloat dangle, GLfloat scale)
         }
       else
         {
-          clog("%s: Could not find the doomsday texture,  bailing.", 
+          utLog("%s: Could not find the doomsday texture,  bailing.", 
                __FUNCTION__);
           norender = TRUE;
           return;
@@ -2319,7 +2296,7 @@ void drawDoomsday(GLfloat x, GLfloat y, GLfloat dangle, GLfloat scale)
         }
       else
         {
-          clog("%s: Could not find the doombeam texture,  bailing.", 
+          utLog("%s: Could not find the doombeam texture,  bailing.", 
                __FUNCTION__);
           norender = TRUE;
           return;
@@ -2358,7 +2335,7 @@ void drawDoomsday(GLfloat x, GLfloat y, GLfloat dangle, GLfloat scale)
   glEnable(GL_BLEND);
 
 #ifdef DEBUG
-  clog("DRAWDOOMSDAY(%s) x = %.1f, y = %.1f, ang = %.1f\n", buf, x, y, dangle);
+  utLog("DRAWDOOMSDAY(%s) x = %.1f, y = %.1f, ang = %.1f\n", buf, x, y, dangle);
 #endif
 
   /*
@@ -2678,7 +2655,7 @@ void drawNEB(int snum)
                       -NEGENBEND_DIST, NEGENB_DIST, 
                       (SMAP(snum) ? MAP_FAC : SCALE_FAC),
                       &nebX, &nebY);
-          /*           clog("Y TOP VISIBLE"); */
+          /*           utLog("Y TOP VISIBLE"); */
         }
       else
         {
@@ -2687,7 +2664,7 @@ void drawNEB(int snum)
                       -NEGENBEND_DIST, -NEGENBEND_DIST, 
                       (SMAP(snum) ? MAP_FAC : SCALE_FAC),
                       &nebX, &nebY);
-          /*           clog("Y BOTTOM VISIBLE"); */
+          /*           utLog("Y BOTTOM VISIBLE"); */
         }
       
       /* draw the Y neb wall */
@@ -2722,7 +2699,7 @@ void drawNEB(int snum)
                       NEGENB_DIST, -NEGENBEND_DIST, 
                       (SMAP(snum) ? MAP_FAC : SCALE_FAC),
                       &nebX, &nebY);
-          /*           clog("X RIGHT VISIBLE"); */
+          /*           utLog("X RIGHT VISIBLE"); */
         }
       else
         {
@@ -2731,7 +2708,7 @@ void drawNEB(int snum)
                       -NEGENBEND_DIST, -NEGENBEND_DIST, 
                       (SMAP(snum) ? MAP_FAC : SCALE_FAC),
                       &nebX, &nebY);
-          /*           clog("X LEFT VISIBLE"); */
+          /*           utLog("X LEFT VISIBLE"); */
         }
 
       /* draw the X neb wall */
@@ -2915,7 +2892,7 @@ static void procInput(int key, int x, int y)
   scrNode_t *onode = getTopONode();
 
 #if 0
-  clog("GL: procInput: key = %d, x = %d y = %d",
+  utLog("GL: procInput: key = %d, x = %d y = %d",
        key, x, y);
 #endif
 
@@ -2947,7 +2924,7 @@ static void procInput(int key, int x, int y)
   return;
 }
 
-/* get called for arrows, Fkeys, etc... */
+/* gets called for arrows, Fkeys, etc... */
 static void
 input(int key, int x, int y)
 {
@@ -3014,7 +2991,7 @@ static int checkTexture(char *filename, textureImage *texture)
   
   if (GLError() || !param) 
     {
-      clog("%s: ERROR: Texture too big, or non power of two in width or height).", 
+      utLog("%s: ERROR: Texture too big, or non power of two in width or height).", 
            filename);
       return FALSE;
     }
@@ -3043,13 +3020,13 @@ static int LoadTGA(char *filename, textureImage *texture)
 
   if ((file = fopen(filename, "rb")) == NULL)
     {
-      clog("%s: %s", filename, strerror(errno));
+      utLog("%s: %s", filename, strerror(errno));
       return FALSE;
     }
 
   if (cqDebug > 1)
     {
-      clog("%s: Loading texture %s",
+      utLog("%s: Loading texture %s",
            __FUNCTION__, filename);
     }
 
@@ -3057,7 +3034,7 @@ static int LoadTGA(char *filename, textureImage *texture)
   if (fread(TGAHeaderBytes, 1, sizeof(TGAHeaderBytes), file) != 
       sizeof(TGAHeaderBytes))
     {
-      clog("%s: Invalid TGA file: could not read TGA header.", filename);
+      utLog("%s: Invalid TGA file: could not read TGA header.", filename);
       fclose(file);
       return FALSE;
     }
@@ -3076,7 +3053,7 @@ static int LoadTGA(char *filename, textureImage *texture)
     }
   else
     {
-      clog("%s: Invalid TGA file header.", filename);
+      utLog("%s: Invalid TGA file header.", filename);
       fclose(file);
       return FALSE;
     }
@@ -3084,7 +3061,7 @@ static int LoadTGA(char *filename, textureImage *texture)
 
   if (fread(header, 1, sizeof(header), file) != sizeof(header))
     {
-      clog("%s: Invalid TGA image header.", filename);
+      utLog("%s: Invalid TGA image header.", filename);
       fclose(file);
       return FALSE;
     }
@@ -3096,7 +3073,7 @@ static int LoadTGA(char *filename, textureImage *texture)
   if (texture->width <= 0 || texture->height <= 0 ||
      (texture->bpp !=24 && texture->bpp != 32))
     {
-      clog("%s: Invalid file format: must be 24bpp or 32bpp (with alpha)", 
+      utLog("%s: Invalid file format: must be 24bpp or 32bpp (with alpha)", 
            filename);
       fclose(file);
       return FALSE;
@@ -3108,7 +3085,7 @@ static int LoadTGA(char *filename, textureImage *texture)
   
   if (!texture->imageData)
     {
-      clog("%s: Texture alloc (%d bytes) failed.", 
+      utLog("%s: Texture alloc (%d bytes) failed.", 
            imageSize, filename);
       fclose(file);
       return FALSE;
@@ -3120,7 +3097,7 @@ static int LoadTGA(char *filename, textureImage *texture)
 
       if (fread(texture->imageData, 1, imageSize, file) != imageSize)
         {
-          clog("%s: Image data read failed.", filename);
+          utLog("%s: Image data read failed.", filename);
           fclose(file);
           return FALSE;
         }
@@ -3143,7 +3120,7 @@ static int LoadTGA(char *filename, textureImage *texture)
 
       if (!colorbuffer)
         {
-          clog("%s: Colorbuffer alloc (%d bytes) failed.", 
+          utLog("%s: Colorbuffer alloc (%d bytes) failed.", 
                filename, bytesPerPixel);
           fclose(file);
           return FALSE;
@@ -3155,7 +3132,7 @@ static int LoadTGA(char *filename, textureImage *texture)
           
           if(fread(&chunkheader, sizeof(GLubyte), 1, file) == 0)
             {
-              clog("%s: could not read RLE header.", filename);
+              utLog("%s: could not read RLE header.", filename);
               fclose(file);
               return False;
             }
@@ -3174,7 +3151,7 @@ static int LoadTGA(char *filename, textureImage *texture)
                   if(fread(colorbuffer, 1, 
                            bytesPerPixel, file) != bytesPerPixel) 
                     {           /* Try to read 1 pixel */
-                      clog("%s: could not read colorbuffer data.", filename);
+                      utLog("%s: could not read colorbuffer data.", filename);
                       fclose(file);	
                       
                       if(colorbuffer != NULL)
@@ -3201,7 +3178,7 @@ static int LoadTGA(char *filename, textureImage *texture)
                   /* Make sure we havent read too many pixels */
                   if(currentpixel > pixelcount)
                     {
-                      clog("%s: too many pixels read.", filename);
+                      utLog("%s: too many pixels read.", filename);
                       
                       fclose(file);
                       
@@ -3226,7 +3203,7 @@ static int LoadTGA(char *filename, textureImage *texture)
               if(fread(colorbuffer, 1, bytesPerPixel, file) != 
                  bytesPerPixel)
                 {
-                  clog("%s: could not read colorbuffer data.", filename);
+                  utLog("%s: could not read colorbuffer data.", filename);
                   
                   fclose(file);
                   
@@ -3258,7 +3235,7 @@ static int LoadTGA(char *filename, textureImage *texture)
                   /* Make sure we haven't read too many pixels */
                   if(currentpixel > pixelcount)
                     {
-                      clog("%s: too many pixels read.", filename);
+                      utLog("%s: too many pixels read.", filename);
                       
                       fclose(file);
                       
@@ -3337,7 +3314,7 @@ static int loadGLTextures()
 
   if (!cqiNumTextures || !cqiTextures)
     {                           /* we have a problem */
-      clog("%s: ERROR: cqiNumTextures or cqiTextures is 0! No textures loaded.\n",
+      utLog("%s: ERROR: cqiNumTextures or cqiTextures is 0! No textures loaded.\n",
            __FUNCTION__);
       return FALSE;
     }
@@ -3370,7 +3347,7 @@ static int loadGLTextures()
           texh = GLTextures[ndx].h;
 
           if (cqDebug > 1)
-            clog("%s: texture file '%s' already loaded, using existing tid.", 
+            utLog("%s: texture file '%s' already loaded, using existing tid.", 
                  __FUNCTION__, cqiTextures[i].filename);
         }
 
@@ -3380,7 +3357,7 @@ static int loadGLTextures()
           
           if (!texti)
             {
-              clog("loadGLTextures(): memory allocation failed for %d bytes\n",
+              utLog("loadGLTextures(): memory allocation failed for %d bytes\n",
                    sizeof(textureImage));
               return FALSE;
             }
@@ -3462,7 +3439,7 @@ static int loadGLTextures()
           
           if (!texptr)
             {  
-              clog("%s: Could not realloc %d textures, ignoring texture '%s'",
+              utLog("%s: Could not realloc %d textures, ignoring texture '%s'",
                    __FUNCTION__,
                    loadedGLTextures + 1,
                    cqiTextures[i].name);
@@ -3488,7 +3465,7 @@ static int loadGLTextures()
         }
     }
 
-  clog("%s: Successfully loaded %d textures, (%d files).", 
+  utLog("%s: Successfully loaded %d textures, (%d files).", 
        __FUNCTION__, loadedGLTextures, hwtextures);
 
   return TRUE;

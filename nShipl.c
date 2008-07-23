@@ -14,6 +14,7 @@
 #include "conf.h"
 #include "conqcom.h"
 #include "conqlb.h"
+#include "conqutil.h"
 #include "record.h"
 #include "gldisplay.h"
 #include "node.h"
@@ -99,7 +100,7 @@ static int nShiplDisplay(dspConfig_t *dsp)
            ( doall && ( status != SS_OFF || kb != 0 ) ) )
         {
           sbuf[0] = EOS;
-          appship( i, sbuf );
+          utAppendShip( i, sbuf );
           appstr(" ", sbuf);
           appchr(ShipTypes[Ships[i].shiptype].name[0], sbuf);
           
@@ -126,7 +127,7 @@ static int nShiplDisplay(dspConfig_t *dsp)
           if ( doall && kb != 0 )
             {
               appstr( "  ", cbuf);
-              appkb( kb, cbuf );
+              utAppendKilledBy( kb, cbuf );
             }
           
           if (snum > 0 && snum <= MAXSHIPS )
@@ -155,7 +156,7 @@ static int nShiplDisplay(dspConfig_t *dsp)
           if ( doall && status != SS_LIVE )
             {
               cbuf[0] = EOS;
-              appsstatus( status, cbuf );
+              utAppendShipStatus( status, cbuf );
               
               cprintf(lin, col - 2 - strlen( cbuf ), 
                       ALIGN_NONE, "#%d#%s", YellowLevelColor, cbuf);
@@ -179,13 +180,13 @@ static int nShiplIdle(void)
   if (Context.recmode == RECMODE_PLAYING || Context.recmode == RECMODE_PAUSED)
     return NODE_OK;             /* no packet reading here */
 
-  while ((pkttype = waitForPacket(PKT_FROMSERVER, sockl, PKT_ANYPKT,
+  while ((pkttype = pktWaitForPacket(PKT_FROMSERVER, sockl, PKT_ANYPKT,
                                   buf, PKT_MAXSIZE, 0, NULL)) > 0)
     processPacket(buf);
 
   if (pkttype < 0)          /* some error */
     {
-      clog("nShiplIdle: waiForPacket returned %d", pkttype);
+      utLog("nShiplIdle: waiForPacket returned %d", pkttype);
       Ships[Context.snum].status = SS_OFF;
       return NODE_EXIT;
     }
@@ -227,7 +228,7 @@ static int nShiplInput(int ch)
       break;
 
     default:
-      clog("nShiplInput: invalid return node: %d, going to DSP_NODE_MENU",
+      utLog("nShiplInput: invalid return node: %d, going to DSP_NODE_MENU",
            retnode);
       setONode(NULL);
       nMenuInit();

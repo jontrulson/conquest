@@ -9,7 +9,7 @@
 #ifndef CONQCOM_H
 #define CONQCOM_H
 
-#ifdef NOCOMEXTERN
+#ifdef NOEXTERN_CONQCOM
 #define CEXTERN 
 #else
 #define CEXTERN extern 

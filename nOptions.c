@@ -18,6 +18,7 @@
 #include "node.h"
 #include "client.h"
 #include "clientlb.h"
+#include "conqutil.h"
 #include "prm.h"
 #include "nCP.h"
 #include "nMenu.h"
@@ -286,7 +287,7 @@ static void _changeOption(struct Conf *cdata, int init)
     case CTYPE_STRING:
       if (cdata->max > CBUFLEN)
 	{
-	  clog("_changeOption: conf data max exceeds local buffer size.");
+	  utLog("_changeOption: conf data max exceeds local buffer size.");
 	  break;
 	}
 
@@ -353,13 +354,13 @@ static void _dispUserOptsMenu(void)
   if (macroptr == NULL)
     {				/* if this happens, something is
 				   seriously confused */
-      clog("_dispUserOptsMenu(): ERROR: macroptr == NULL, no CTYPE_MACRO found in ConfData");
+      utLog("_dispUserOptsMenu(): ERROR: macroptr == NULL, no CTYPE_MACRO found in ConfData");
     }
 
   if (mouseptr == NULL)
     {				/* if this happens, something is
 				   seriously confused */
-      clog("_dispUserOptsMenu(): ERROR: mouseptr == NULL, no CTYPE_MOUSE found in ConfData");
+      utLog("_dispUserOptsMenu(): ERROR: mouseptr == NULL, no CTYPE_MOUSE found in ConfData");
     }
 
   /* First clear the display. */
@@ -598,7 +599,7 @@ static void _showOptScreen(void)
             }
           
 #ifdef DEBUG_OPTIONS
-          clog("_showOptScreen(): k = %d, dispmac = '%s'", 
+          utLog("_showOptScreen(): k = %d, dispmac = '%s'", 
                k, 
                dispmac);
 #endif
@@ -642,10 +643,10 @@ static void _showOptScreen(void)
             }
           
 #ifdef DEBUG_OPTIONS
-          clog("_showOptScreen(): k = %d, dispmac = '%s'", 
+          utLog("_showOptScreen(): k = %d, dispmac = '%s'", 
                k, 
                dispmac);
-          clog("\t: but = %d, mod = %d", 
+          utLog("\t: but = %d, mod = %d", 
                but, 
                mod);
 #endif
@@ -863,13 +864,13 @@ static int nOptionsIdle(void)
   if ((state == S_SYSMENU) || (state == S_SOPTS))
     return NODE_OK;             /* don't process packets is sys modes */
 
-  while ((pkttype = waitForPacket(PKT_FROMSERVER, sockl, PKT_ANYPKT,
+  while ((pkttype = pktWaitForPacket(PKT_FROMSERVER, sockl, PKT_ANYPKT,
                                   buf, PKT_MAXSIZE, 0, NULL)) > 0)
     processPacket(buf);
 
   if (pkttype < 0)          /* some error */
     {
-      clog("nOptionsIdle: waiForPacket returned %d", pkttype);
+      utLog("nOptionsIdle: waiForPacket returned %d", pkttype);
       Ships[Context.snum].status = SS_OFF;
       return NODE_EXIT;
     }

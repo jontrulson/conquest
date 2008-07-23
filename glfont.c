@@ -17,6 +17,7 @@
 #include "ibuf.h"
 #include "gldisplay.h"
 #include "conf.h"
+#include "conqutil.h"
 
 #include <GL/glut.h>
 #include <GL/gl.h>
@@ -31,75 +32,75 @@
 
 #include <assert.h>
 
-void initTexFonts(void)
+void glfInitFonts(void)
 {
   char fbuf[MID_BUFFER_SIZE];
   int fail = FALSE;
 
 #ifdef DEBUG_GL
-  clog("%s: ENTER...", __FUNCTION__);
+  utLog("%s: ENTER...", __FUNCTION__);
 #endif
 
   sprintf(fbuf, "%s/img/%s", CONQSHARE, "large.txf");
 
-  fontLargeTxf = txfLoadFont(fbuf);
+  glfFontLarge = txfLoadFont(fbuf);
 
-  if (!fontLargeTxf)
+  if (!glfFontLarge)
     {
-      clog("initTexFonts: load %s failed", fbuf);
-      fprintf(stderr, "initTexFonts: load %s failed\n", fbuf);
+      utLog("glfInitFonts: load %s failed", fbuf);
+      fprintf(stderr, "glfInitFonts: load %s failed\n", fbuf);
       fail = TRUE;
     }
 
   sprintf(fbuf, "%s/img/%s", CONQSHARE, "fixed.txf");
-  fontFixedTxf = txfLoadFont(fbuf);
+  glfFontFixed = txfLoadFont(fbuf);
 
-  if (!fontFixedTxf)
+  if (!glfFontFixed)
     {
-      clog("initTexFonts: load %s failed", fbuf);
-      fprintf(stderr, "initTexFonts: load %s failed\n", fbuf);
+      utLog("glfInitFonts: load %s failed", fbuf);
+      fprintf(stderr, "glfInitFonts: load %s failed\n", fbuf);
       fail = TRUE;
     }
 
   sprintf(fbuf, "%s/img/%s", CONQSHARE, "tinyfixed.txf");
-  fontTinyFixedTxf = txfLoadFont(fbuf);
+  glfFontFixedTiny = txfLoadFont(fbuf);
 
-  if (!fontTinyFixedTxf)
+  if (!glfFontFixedTiny)
     {
-      clog("initTexFonts: load %s failed", fbuf);
-      fprintf(stderr, "initTexFonts: load %s failed\n", fbuf);
+      utLog("glfInitFonts: load %s failed", fbuf);
+      fprintf(stderr, "glfInitFonts: load %s failed\n", fbuf);
       fail = TRUE;
     }
 
   sprintf(fbuf, "%s/img/%s", CONQSHARE, "msg.txf");
-  fontMsgTxf = txfLoadFont(fbuf);
+  glfFontMsg = txfLoadFont(fbuf);
 
-  if (!fontMsgTxf)
+  if (!glfFontMsg)
     {
-      clog("initTexFonts: load %s failed", fbuf);
-      fprintf(stderr, "initTexFonts: load %s failed\n", fbuf);
+      utLog("glfInitFonts: load %s failed", fbuf);
+      fprintf(stderr, "glfInitFonts: load %s failed\n", fbuf);
       fail = TRUE;
     }
 
   if (fail)
     exit(1);
 
-  txfEstablishTexture(fontLargeTxf, 0, GL_TRUE);
+  txfEstablishTexture(glfFontLarge, 0, GL_TRUE);
   GLError();
-  txfEstablishTexture(fontFixedTxf, 0, GL_TRUE);
+  txfEstablishTexture(glfFontFixed, 0, GL_TRUE);
   GLError();
-  txfEstablishTexture(fontTinyFixedTxf, 0, GL_TRUE);
+  txfEstablishTexture(glfFontFixedTiny, 0, GL_TRUE);
   GLError();
-  txfEstablishTexture(fontMsgTxf, 0, GL_TRUE);
+  txfEstablishTexture(glfFontMsg, 0, GL_TRUE);
   GLError();
   return;
 }
 
-void glfRender(GLfloat x, GLfloat y, GLfloat z, GLfloat w, GLfloat h,
-               TexFont *font, char *str, int color, GLColor_t *glcol,
-               int scalex, int dofancy, int ortho)
+void glfRenderFont(GLfloat x, GLfloat y, GLfloat z, GLfloat w, GLfloat h,
+                   TexFont *font, char *str, int color, GLColor_t *glcol,
+                   Unsgn32 flags)
 {
-  GLfloat inverty = ((ortho) ? -1.0 : 1.0);
+  GLfloat inverty = ((flags & GLF_FONT_F_ORTHO) ? -1.0 : 1.0);
   int width, ascent, descent;
   GLfloat xs = 1.0, ys = 1.0;
 
@@ -117,14 +118,14 @@ void glfRender(GLfloat x, GLfloat y, GLfloat z, GLfloat w, GLfloat h,
   GLError();
   txfGetStringMetrics( font, str, l, &width, 
                        &ascent, &descent);
-  if (scalex)
+  if (flags & GLF_FONT_F_SCALEX)
     xs = w/(GLfloat)width;
 
   ys = ((2.0 * (h/(ascent + descent))) * 0.70);
 
 
 #if 0
-  clog("glfRender(%s): WINDOW: %d, w = %f h = %f, \n"
+  utLog("glfRenderFont(%s): WINDOW: %d, w = %f h = %f, \n"
        "\twid = %d, asc = %d desc = %d"
        "\ttxf height = %d",
        str, 
@@ -140,7 +141,7 @@ void glfRender(GLfloat x, GLfloat y, GLfloat z, GLfloat w, GLfloat h,
 
   glPushMatrix();
 
-  if (ortho) 
+  if (flags & GLF_FONT_F_ORTHO) 
     {
       glTranslatef( x, y + h, z );
       glScalef(xs, inverty * ys, 1.0);
@@ -161,7 +162,7 @@ void glfRender(GLfloat x, GLfloat y, GLfloat z, GLfloat w, GLfloat h,
   else
     uiPutColor(color);
   
-  if (dofancy)
+  if (flags & GLF_FONT_F_DOCOLOR)
     txfRenderFancyString(font, str, l);
   else
     txfRenderString(font, str, l);

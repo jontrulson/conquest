@@ -10,12 +10,15 @@
  ***********************************************************************/
 
 
-#define NOEXTERN
 
 #include "conqdef.h"
 #include "conqcom.h"
 #include "conqlb.h"
+#include "conqutil.h"
+
+#define NOEXTERN_CONTEXT
 #include "context.h"
+
 #include "conf.h"
 #include "global.h"
 #include "color.h"
@@ -27,9 +30,8 @@
 #include "packet.h"
 #include "udp.h"
 
-#define SERVER_NOEXTERN
+#define NOEXTERN_SERVER
 #include "server.h"
-#undef SERVER_NOEXTERN
 #include "serverpkt.h"
 
 #include "servauth.h"
@@ -95,7 +97,7 @@ int getHostname(int sock, char *buf, int buflen)
   len = sizeof(struct sockaddr_in);
   if (getpeername(sock, (struct sockaddr *) &addr, &len) < 0)
     {
-      clog("getpeername failed: %s\n", strerror(errno));
+      utLog("getpeername failed: %s\n", strerror(errno));
       return FALSE;
     }
   else
@@ -140,7 +142,7 @@ void checkMaster(void)
       ConqInfo->conqservPID = getpid();
       PVUNLOCK(&ConqInfo->lockword);
       sInfo.isMaster = TRUE;
-      clog("NET: master server listening on port %d\n", listenPort);
+      utLog("NET: master server listening on port %d\n", listenPort);
     }
 
   /* get our own host information */
@@ -150,7 +152,7 @@ void checkMaster(void)
 
   if ((hp = gethostbyname(sInfo.localhost)) == NULL) 
     {
-      clog("NET: gethostbyname() failed: %s", strerror(errno));
+      utLog("NET: gethostbyname() failed: %s", strerror(errno));
       exit (1);
     }
   
@@ -166,7 +168,7 @@ void checkMaster(void)
   /* allocate an open socket for incoming connections */
   if (( s = socket(hp->h_addrtype, SOCK_STREAM, 0)) < 0) 
     {
-      clog("NET: socket() failed: %s", strerror(errno));
+      utLog("NET: socket() failed: %s", strerror(errno));
       exit(1);
     }
   
@@ -175,7 +177,7 @@ void checkMaster(void)
   if (setsockopt(s, SOL_SOCKET, SO_REUSEPORT,
                  (SSOType)&opt, sizeof(opt)) < 0) 
     {
-      clog("NET: setsockopt SO_REUSEPORT: %s", strerror(errno));
+      utLog("NET: setsockopt SO_REUSEPORT: %s", strerror(errno));
     }
 
 #endif 
@@ -185,7 +187,7 @@ void checkMaster(void)
   if (setsockopt(s, SOL_SOCKET, SO_REUSEADDR,
                  (SSOType)&opt, sizeof(opt)) < 0) 
     {
-      clog("NET: setsockopt SO_REUSEADDR: %s", 
+      utLog("NET: setsockopt SO_REUSEADDR: %s", 
            strerror(errno));
     }
 #endif
@@ -195,7 +197,7 @@ void checkMaster(void)
    */
   if ( bind( s, (struct sockaddr *)&sa, sizeof ( sa )) < 0 ) 
     {
-      clog("NET: bind() failed: %s", strerror(errno));
+      utLog("NET: bind() failed: %s", strerror(errno));
       exit(1);
     }
   
@@ -221,7 +223,7 @@ void checkMaster(void)
 
       if ((rv = select(s+1, &readfds, NULL, NULL, &tv)) < 0)
         {
-          clog("checkMaster: select failed: %s", strerror(errno));
+          utLog("checkMaster: select failed: %s", strerror(errno));
           exit(1);
         }
 
@@ -239,7 +241,7 @@ void checkMaster(void)
       
           if ( fork() == 0 ) 
             {			/* child - client driver */
-              clog("NET: forked client driver, pid = %d", getpid());
+              utLog("NET: forked client driver, pid = %d", getpid());
               sInfo.sock = t;
 
               memset(sInfo.remotehost, 0, MAXHOSTNAME);
@@ -247,7 +249,7 @@ void checkMaster(void)
               if (!tcpwCheckHostAccess(TCPW_DAEMON_CONQUESTD, 
                                        sInfo.remotehost))
                 {
-                  sendAck(sInfo.sock, PKT_TOCLIENT, PSEV_FATAL, PERR_UNSPEC,
+                  pktSendAck(sInfo.sock, PKT_TOCLIENT, PSEV_FATAL, PERR_UNSPEC,
                           "Access Denied: You are not allowed to connect to this server.");
                   close(t);
                   exit(1);
@@ -356,24 +358,24 @@ int main(int argc, char *argv[])
           exit(1);
         }        
       else
-        clog("INFO: running as user '%s', uid %d.", myuidname, myuid); 
+        utLog("INFO: running as user '%s', uid %d.", myuidname, myuid); 
     }
 
   
 #ifdef DEBUG_CONFIG
-  clog("%s@%d: main() Reading Configuration files.", __FILE__, __LINE__);
+  utLog("%s@%d: main() Reading Configuration files.", __FILE__, __LINE__);
 #endif
   
   if (GetSysConf(FALSE) == ERR)
     {
 #ifdef DEBUG_CONFIG
-      clog("%s@%d: main(): GetSysConf() returned ERR.", __FILE__, __LINE__);
+      utLog("%s@%d: main(): GetSysConf() returned ERR.", __FILE__, __LINE__);
 #endif
     }
 
   if (setgid(ConquestGID) == -1)
     {
-      clog("conquest: setgid(%d): %s",
+      utLog("conquest: setgid(%d): %s",
            ConquestGID,
            strerror(errno));
       fprintf(stderr, "conquest: setgid(): failed\n");
@@ -381,11 +383,11 @@ int main(int argc, char *argv[])
     }
   
 #ifdef DEBUG_FLOW
-  clog("%s@%d: main() *STARTING*", __FILE__, __LINE__);
+  utLog("%s@%d: main() *STARTING*", __FILE__, __LINE__);
 #endif
   
 #ifdef DEBUG_FLOW
-  clog("%s@%d: main() getting semephores - semInit()", __FILE__, __LINE__);
+  utLog("%s@%d: main() getting semephores - semInit()", __FILE__, __LINE__);
 #endif
   
   if (semInit() == ERR)
@@ -395,7 +397,7 @@ int main(int argc, char *argv[])
     }
   
 #ifdef DEBUG_FLOW
-  clog("%s@%d: main() mapping common block.", __FILE__, __LINE__);
+  utLog("%s@%d: main() mapping common block.", __FILE__, __LINE__);
 #endif
 
   map_common();
@@ -409,7 +411,7 @@ int main(int argc, char *argv[])
 
   
 #ifdef DEBUG_FLOW
-  clog("%s@%d: main() starting conqinit().", __FILE__, __LINE__);
+  utLog("%s@%d: main() starting conqinit().", __FILE__, __LINE__);
 #endif
   
   Context.maxlin = 0;		/* not used here */
@@ -426,7 +428,7 @@ int main(int argc, char *argv[])
   if (dodaemon)
     {
       int cpid;
-      clog("INFO: becoming daemon");
+      utLog("INFO: becoming daemon");
       chdir("/");
 
       cpid = fork();
@@ -482,7 +484,7 @@ int main(int argc, char *argv[])
   if (GetSysConf(FALSE) == ERR)
     {
 #ifdef DEBUG_CONFIG
-      clog("%s@%d: main(): GetSysConf() returned ERR.", __FILE__, __LINE__);
+      utLog("%s@%d: main(): GetSysConf() returned ERR.", __FILE__, __LINE__);
 #endif
     }
 
@@ -494,16 +496,16 @@ int main(int argc, char *argv[])
 
   rndini( 0, 0 );		/* initialize random numbers */
   
-  clog("CONNECT: client %s", sInfo.remotehost);
+  utLog("CONNECT: client %s", sInfo.remotehost);
 
   /* now we need to negotiate. */
   if (!hello())
     {
-      clog("conquestd: hello() failed");
+      utLog("conquestd: hello() failed");
       exit(1);
     }
 
-  clog("CONNECT: client %s SUCCESS.", sInfo.remotehost);
+  utLog("CONNECT: client %s SUCCESS.", sInfo.remotehost);
 
   Context.recmode = RECMODE_OFF; /* always */
 
@@ -518,7 +520,7 @@ int main(int argc, char *argv[])
   conqend();			/* machine dependent clean-up */
   
 #ifdef DEBUG_FLOW
-  clog("%s@%d: main() *EXITING*", __FILE__, __LINE__);
+  utLog("%s@%d: main() *EXITING*", __FILE__, __LINE__);
 #endif
   
   exit(0);
@@ -541,7 +543,7 @@ void updateProc(void)
     Unsgn32 millis = clbGetMillis();
     
     if ((millis - lastms) > (int)((1.0 / (real)Context.updsec) * 1000.0))
-      clog("millisdiff = %u(%d)", (millis - lastms), Context.updsec);
+      utLog("millisdiff = %u(%d)", (millis - lastms), Context.updsec);
     lastms = millis;
   }
 #endif
@@ -549,10 +551,10 @@ void updateProc(void)
   /* update client view of the universe */
   updateClient(FALSE);
 
-  recordUpdateFrame();
+  recUpdateFrame();
 
   /* check for and send any new messages */
-  if ( getamsg( Context.snum, &Ships[Context.snum].lastmsg ) )
+  if ( utGetMsg( Context.snum, &Ships[Context.snum].lastmsg ) )
     sendMessage(&(Msgs[Ships[Context.snum].lastmsg]));
 
   /* Schedule for next time. */
@@ -576,7 +578,7 @@ void startUpdate(void)
 
   if (sigaction(SIGALRM, &Sig, NULL) == -1)
     {
-      clog("startUpdater():sigaction(): %s\n", strerror(errno));
+      utLog("startUpdater():sigaction(): %s\n", strerror(errno));
       exit(errno);
     }
   
@@ -698,10 +700,10 @@ int capentry( int snum, int *system )
       /* now we wait for another ENTER command packet with it's detail member
 	 indicating the desired system. */
 
-      if ((pkttype = waitForPacket(PKT_FROMCLIENT, sockl, CP_COMMAND,
+      if ((pkttype = pktWaitForPacket(PKT_FROMCLIENT, sockl, CP_COMMAND,
 				   buf, PKT_MAXSIZE, 1, NULL)) < 0)
         {
-	  clog("conquestd:capentry: waitforpacket returned %d", pkttype); 
+	  utLog("conquestd:capentry: waitforpacket returned %d", pkttype); 
           return FALSE;
         }
 
@@ -712,7 +714,7 @@ int capentry( int snum, int *system )
       ccmd = (cpCommand_t *)buf;
       ccmd->detail = ntohs(ccmd->detail);
 
-      clog("conquestd: capentry: got CP_COMMAND, detail =0x%x", 
+      utLog("conquestd: capentry: got CP_COMMAND, detail =0x%x", 
 	   ccmd->detail);
 
       if (ccmd->cmd != CPCMD_ENTER)
@@ -767,9 +769,9 @@ void dead( int snum, int leave )
   kb = Ships[snum].killedby;
   
   /* Delay while our torps are exploding. */
-  grand( &entertime );
+  utGrand( &entertime );
   i = 0;
-  while ( dgrand( entertime, &now ) < TORPEDOWAIT_GRAND )
+  while ( utDeltaGrand( entertime, &now ) < TORPEDOWAIT_GRAND )
     {
       updateClient(FALSE);
       i = 0;
@@ -785,14 +787,14 @@ void dead( int snum, int leave )
   if ( i > 0 )
     {
       buf[0] = EOS;
-      appship( snum, buf );
-      clog("INFO: dead: %s, detonating torp count is %d.",
+      utAppendShip( snum, buf );
+      utLog("INFO: dead: %s, detonating torp count is %d.",
 	   buf, i);
     }
   
   buf[0] = EOS;
-  appship( snum, buf );
-  clog("INFO: dead: %s was killed by %d.", buf, kb);
+  utAppendShip( snum, buf );
+  utLog("INFO: dead: %s was killed by %d.", buf, kb);
   
   updateClient(FALSE);
   for ( i=0; i<10 && Ships[snum].status == SS_DYING; i++ )
@@ -822,13 +824,13 @@ void dead( int snum, int leave )
           ConqInfo->lastwords[MAXLASTWORDS - 1] = 0;
         }
 
-      clog("conquestd: dead(): sendClientStat failed, fl = 0x%0x\n",
+      utLog("conquestd: dead(): sendClientStat failed, fl = 0x%0x\n",
            flags);
 
       return;
     }
 
-  clog("INFO: dead(): sent sendClientStat, fl = 0x%0x",
+  utLog("INFO: dead(): sent sendClientStat, fl = 0x%0x",
        flags);
 
   /* fix things up */
@@ -842,7 +844,7 @@ void dead( int snum, int leave )
   /* if conquered, wait for the cpMessage_t */
   if (kb == KB_CONQUER)
     {
-      if (waitForPacket(PKT_FROMCLIENT, sockl, CP_MESSAGE, 
+      if (pktWaitForPacket(PKT_FROMCLIENT, sockl, CP_MESSAGE, 
 			buf, PKT_MAXSIZE,
 			(60 * 5), NULL) <= 0)
 	{			/* error or timeout.  gen lastwords */
@@ -1148,7 +1150,7 @@ void handleSimpleCmdPkt(cpCommand_t *ccmd)
       break;
 
     case CPCMD_DISCONNECT:
-      clog("CPCMD_DISCONNECT");
+      utLog("CPCMD_DISCONNECT");
       /* 'fake' signal.  cleans up and exits. */
       handleSignal(0);
       /* NOTREACHED */
@@ -1156,7 +1158,7 @@ void handleSimpleCmdPkt(cpCommand_t *ccmd)
 
     case CPCMD_PING:
       clbBlockAlarm();
-      sendAck(sInfo.sock, PKT_TOCLIENT, PSEV_INFO, PERR_PINGRESP, NULL);
+      pktSendAck(sInfo.sock, PKT_TOCLIENT, PSEV_INFO, PERR_PINGRESP, NULL);
       clbUnblockAlarm();
       break;
 
@@ -1164,7 +1166,7 @@ void handleSimpleCmdPkt(cpCommand_t *ccmd)
       break;
 
     default:
-      clog("conquestd: handleSimpleCmdPkt(): unexpected command code %d",
+      utLog("conquestd: handleSimpleCmdPkt(): unexpected command code %d",
 	   cmd);
       break;
     }
@@ -1221,7 +1223,7 @@ void menu(void)
       Ships[Context.snum].rwar[i] = FALSE;
       Ships[Context.snum].war[i] = Users[Context.unum].war[i];
     }
-  stcpn( Users[Context.unum].alias, Ships[Context.snum].alias, MAXUSERPNAME );
+  utStcpn( Users[Context.unum].alias, Ships[Context.snum].alias, MAXUSERPNAME );
   
   /* Set up some things for the menu display. */
   switchteams = Users[Context.unum].ooptions[OOPT_SWITCHTEAMS];
@@ -1261,7 +1263,7 @@ void menu(void)
 	    lose = TRUE;
 	  else if ( Ships[Context.snum].status != SS_RESERVED )
 	    {
-	      clog( "menu(): Ship %d no longer reserved.", Context.snum );
+	      utLog( "menu(): Ship %d no longer reserved.", Context.snum );
 	      lose = TRUE;
 	    }
 	  else
@@ -1272,18 +1274,18 @@ void menu(void)
 
       if ( lose )				/* again, Jorge? */
 	{
-	  sendAck(sInfo.sock, PKT_TOCLIENT, PSEV_FATAL, PERR_LOSE, NULL);
+	  pktSendAck(sInfo.sock, PKT_TOCLIENT, PSEV_FATAL, PERR_LOSE, NULL);
 	  return;
 	}
       
       /* Reset up the destruct fuse. */
       Ships[Context.snum].sdfuse = -TIMEOUT_PLAYER;
       
-      if ((pkttype = waitForPacket(PKT_FROMCLIENT, sockl, PKT_ANYPKT,
+      if ((pkttype = pktWaitForPacket(PKT_FROMCLIENT, sockl, PKT_ANYPKT,
                                    buf, PKT_MAXSIZE, 0, NULL)) < 0)
 	{
 	  freeship();
-	  clog("conquestd:menu: waitforpacket returned %d", pkttype); 
+	  utLog("conquestd:menu: waitforpacket returned %d", pkttype); 
           handleSignal(0);
           /* not reached */
 
@@ -1342,7 +1344,7 @@ void menu(void)
 
 	default:
           if (cqDebug)
-            clog("conquestd: MENU: got unexp packet type %d", pkttype);
+            utLog("conquestd: MENU: got unexp packet type %d", pkttype);
 	  break;
 	}
       
@@ -1414,7 +1416,7 @@ int newship( int unum, int *snum )
 	  if (!SVACANT(vec[0]))
 	    {		   /* if it's available, we'll take it */
 			   /* ...if it's not already being flown... */
-	      sendAck(sInfo.sock, PKT_TOCLIENT, PSEV_ERROR, PERR_FLYING, NULL);
+	      pktSendAck(sInfo.sock, PKT_TOCLIENT, PSEV_ERROR, PERR_FLYING, NULL);
 	      Ships[*snum].status = SS_RESERVED;
 	      return ( FALSE );
 	    }
@@ -1430,7 +1432,7 @@ int newship( int unum, int *snum )
 		*snum = i;
 		Ships[*snum].pid = Context.pid;
 		Ships[*snum].status = SS_ENTERING;
-		bitClear(Ships[*snum].flags, SHIP_F_VACANT);
+		SFCLR(*snum, SHIP_F_VACANT);
 		break;
 	      }
 	  PVUNLOCK(&ConqInfo->lockword);
@@ -1459,7 +1461,7 @@ int newship( int unum, int *snum )
 	 reincarnate too */
       if ( j >= Users[unum].multiple && numavail == 0)
 	{
-	  sendAck(sInfo.sock, PKT_TOCLIENT, PSEV_ERROR, PERR_TOOMANYSHIPS, 
+	  pktSendAck(sInfo.sock, PKT_TOCLIENT, PSEV_ERROR, PERR_TOOMANYSHIPS, 
 		  NULL);
 	  Ships[*snum].status = SS_RESERVED;
 	  
@@ -1562,20 +1564,20 @@ int play(void)
   /* Can't carry on without a vessel. */
   if ( (rv = newship( Context.unum, &Context.snum )) != TRUE)
     {
-      clog("conquestd:play: newship() returned %d",
+      utLog("conquestd:play: newship() returned %d",
 	   rv);
       return(rv);
     }
   
   drstart();			/* start a driver, if necessary */
   Ships[Context.snum].sdfuse = 0;	/* zero self destruct fuse */
-  grand( &Context.msgrand );		/* initialize message timer */
+  utGrand( &Context.msgrand );		/* initialize message timer */
   Context.leave = FALSE;		/* assume we won't want to bail */
   Context.redraw = TRUE;		/* want redraw first time */
   Context.msgok = TRUE;		/* ok to get messages */
   Context.display = FALSE;		/* ok to get messages */
   stopUpdate();			/* stop the display interrupt */
-  gsecs( &laststat );		/* initialize stat timer */
+  utGetSecs( &laststat );		/* initialize stat timer */
 
   /* send a clientstat packet and a ship packet. */
 
@@ -1618,12 +1620,12 @@ int play(void)
 	break;
 
       didsomething = 0;
-      if ((pkttype = waitForPacket(PKT_FROMCLIENT, sockl, PKT_ANYPKT,
+      if ((pkttype = pktWaitForPacket(PKT_FROMCLIENT, sockl, PKT_ANYPKT,
 				   buf, PKT_MAXSIZE, 0, NULL)) < 0)
 	{
 	  if (errno != EINTR)
 	    {
-	      clog("conquestd:play:waitForPacket: %s", strerror(errno));
+	      utLog("conquestd:play:pktWaitForPacket: %s", strerror(errno));
               handleSignal(0);
               /* NOTREACHED */
 	      return FALSE;
@@ -1664,7 +1666,7 @@ int play(void)
 
 	default:
 	  if (pkttype != 0 && pkttype != -1)
-	    clog("conquestd: play: got unexpected packet type %d", pkttype);
+	    utLog("conquestd: play: got unexpected packet type %d", pkttype);
 	  break;
 	}
 
@@ -1675,11 +1677,11 @@ int play(void)
           clbUnblockAlarm();
         }
 
-      grand( &Context.msgrand );
+      utGrand( &Context.msgrand );
       Context.msgok = TRUE;
       
       /* See if it's time to update the statistics. */
-      if ( dsecs( laststat, &now ) >= 15 )
+      if ( utDeltaSecs( laststat, &now ) >= 15 )
 	{
 	  conqstats( Context.snum );
 	  laststat = now;
@@ -1704,7 +1706,7 @@ int play(void)
   stopUpdate();
   updateClient(FALSE);	/* one last, to be sure. */
   sendConqInfo(sInfo.sock, TRUE);
-  clog("PLAY: ship %d died, calling dead()", Context.snum);
+  utLog("PLAY: ship %d died, calling dead()", Context.snum);
   dead( Context.snum, Context.leave );
   
   return(TRUE);
@@ -1735,14 +1737,14 @@ int welcome( int *unum )
       /* Must be a new player. */
       if ( ConqInfo->closed )
 	{
-	  sendAck(sInfo.sock, PKT_TOCLIENT, PSEV_FATAL, PERR_CLOSED,
+	  pktSendAck(sInfo.sock, PKT_TOCLIENT, PSEV_FATAL, PERR_CLOSED,
                   NULL);
 	  return ( FALSE );
 	}
       team = rndint( 0, NUMPLAYERTEAMS - 1 );
       
       cbuf[0] = EOS;
-      apptitle( team, cbuf );
+      utAppendTitle( team, cbuf );
       appchr( ' ', cbuf );
       i = strlen( cbuf );
       appstr( name, cbuf );
@@ -1750,12 +1752,12 @@ int welcome( int *unum )
 
       if ( ! clbRegister( name, cbuf, team, unum ) )
 	{
-	  sendAck(sInfo.sock, PKT_TOCLIENT, PSEV_FATAL, PERR_REGISTER,
+	  pktSendAck(sInfo.sock, PKT_TOCLIENT, PSEV_FATAL, PERR_REGISTER,
                   NULL);
 	  return ( FALSE );
 	}
 
-      clog("conquestd: clbRegister COMPLETE!!!! unum = %d, team = %d\n", 
+      utLog("conquestd: clbRegister COMPLETE!!!! unum = %d, team = %d\n", 
 	   *unum, team);
 
 				/* copy in the password */
@@ -1769,18 +1771,18 @@ int welcome( int *unum )
   /* Must be special to play when closed. */
   if ( ConqInfo->closed && ! Users[*unum].ooptions[OOPT_PLAYWHENCLOSED] )
     {
-      sendAck(sInfo.sock, PKT_TOCLIENT, PSEV_FATAL, PERR_CLOSED,
+      pktSendAck(sInfo.sock, PKT_TOCLIENT, PSEV_FATAL, PERR_CLOSED,
 	      NULL);
-      clog("conquestd: welcome: game closed\n");
+      utLog("conquestd: welcome: game closed\n");
       return ( FALSE );
     }
 
   /* Can't play without a ship. */
   if ( ! clbFindShip( &Context.snum ) )
     {
-      sendAck(sInfo.sock, PKT_TOCLIENT, PSEV_FATAL, PERR_NOSHIP,
+      pktSendAck(sInfo.sock, PKT_TOCLIENT, PSEV_FATAL, PERR_NOSHIP,
 	      NULL);
-      clog("WELCOME: findship failed");
+      utLog("WELCOME: findship failed");
       return ( FALSE );
     }
 
@@ -1816,7 +1818,7 @@ static int hello(void)
   /* open a UDP socket and bind to it */
   if ((sInfo.usock = udpOpen(listenPort, &usa)) < 0)
     {
-      clog("NET: SERVER hello: udpOpen() failed: %s", strerror(errno));
+      utLog("NET: SERVER hello: udpOpen() failed: %s", strerror(errno));
       sInfo.usock = -1;
       sInfo.tryUDP = FALSE;
     }
@@ -1837,13 +1839,13 @@ static int hello(void)
   if (ConqInfo->closed)
     shello.flags |= SPHELLO_FLAGS_CLOSED;
 
-  if (!writePacket(PKT_TOCLIENT, sInfo.sock, &shello))
+  if (!pktWrite(PKT_TOCLIENT, sInfo.sock, &shello))
     {
-      clog("NET: SERVER: hello: write shello failed\n");
+      utLog("NET: SERVER: hello: write shello failed\n");
       return FALSE;
     }
 
-  clog("NET: SERVER: hello: sent server hello to client");
+  utLog("NET: SERVER: hello: sent server hello to client");
 
   if (sInfo.tryUDP)
     {
@@ -1855,9 +1857,9 @@ static int hello(void)
       if ((rv = select(sInfo.usock+1, &readfds, NULL, NULL, &tv)) <= 0)
         {
           if (rv == 0)
-            clog("NET: SERVER: hello: udp select timed out. No UDP");
+            utLog("NET: SERVER: hello: udp select timed out. No UDP");
           else
-            clog("NET: SERVER: hello: udp select failed: %s", strerror(errno));
+            utLog("NET: SERVER: hello: udp select failed: %s", strerror(errno));
 
           sInfo.tryUDP = FALSE;
         }
@@ -1866,13 +1868,13 @@ static int hello(void)
           if (FD_ISSET(sInfo.usock, &readfds))
             {                       /* get the packet, almost done negotiating udp */
               rv = udpRecv(sInfo.usock, buf, PKT_MAXSIZE, &sInfo.clntaddr);
-              clog("NET: SERVER: hello: got %d UDP bytes from client port %d", rv, 
+              utLog("NET: SERVER: hello: got %d UDP bytes from client port %d", rv, 
                    (int)ntohs(sInfo.clntaddr.sin_port));
               
               if (connect(sInfo.usock, (const struct sockaddr *)&sInfo.clntaddr, 
                           sizeof(sInfo.clntaddr)) < 0)
                 {
-                  clog("NET: SERVER: hello: udp connect() failed: %s", strerror(errno));
+                  utLog("NET: SERVER: hello: udp connect() failed: %s", strerror(errno));
                   sInfo.tryUDP = FALSE;
                 }
             }
@@ -1880,22 +1882,22 @@ static int hello(void)
     }
 
   /* now we want a client hello in response */
-  if ((pkttype = readPacket(PKT_FROMCLIENT, sockl, buf, PKT_MAXSIZE, 60)) < 0)
+  if ((pkttype = pktRead(PKT_FROMCLIENT, sockl, buf, PKT_MAXSIZE, 60)) < 0)
   {
-    clog("NET: SERVER: hello: read client hello failed, pkttype = %d",
+    utLog("NET: SERVER: hello: read client hello failed, pkttype = %d",
          pkttype);
     return FALSE;
   }
 
   if (pkttype == 0)
   {
-    clog("NET: SERVER: hello: read client hello: timeout.\n");
+    utLog("NET: SERVER: hello: read client hello: timeout.\n");
     return FALSE;
   }
 
   if (pkttype != CP_HELLO)
   {
-    clog("NET: SERVER: hello: read client hello: wrong packet type %d\n", pkttype);
+    utLog("NET: SERVER: hello: read client hello: wrong packet type %d\n", pkttype);
     return FALSE;
   }
 
@@ -1908,7 +1910,7 @@ static int hello(void)
   chello.clientname[CONF_SERVER_NAME_SZ - 1] = 0;
   chello.clientver[CONF_SERVER_NAME_SZ - 1] = 0;
 
-  clog("CLIENTID:%s:%s:%d:0x%04hx:%d",
+  utLog("CLIENTID:%s:%s:%d:0x%04hx:%d",
        chello.clientname, 
        chello.clientver,
        chello.updates, 
@@ -1920,8 +1922,8 @@ static int hello(void)
     {
       sprintf(cbuf, "SERVER: Protocol mismatch, server 0x%x, client 0x%x",
 	      PROTOCOL_VERSION, chello.protover);
-      sendAck(sInfo.sock, PKT_TOCLIENT, PSEV_FATAL, PERR_BADPROTO, cbuf);
-      clog("NET: %s", cbuf);
+      pktSendAck(sInfo.sock, PKT_TOCLIENT, PSEV_FATAL, PERR_BADPROTO, cbuf);
+      utLog("NET: %s", cbuf);
       return FALSE;
     }
 
@@ -1929,8 +1931,8 @@ static int hello(void)
     {
       sprintf(cbuf, "SERVER: commonblock mismatch, expected %d, got %d",
 	      COMMONSTAMP, chello.cmnrev);
-      sendAck(sInfo.sock, PKT_TOCLIENT, PSEV_FATAL, PERR_BADCMN, cbuf);
-      clog("NET: %s", cbuf);
+      pktSendAck(sInfo.sock, PKT_TOCLIENT, PSEV_FATAL, PERR_BADCMN, cbuf);
+      utLog("NET: %s", cbuf);
       return FALSE;
     }
 
@@ -1946,20 +1948,20 @@ static int hello(void)
   /* now send the server stats normally */
   if (!sendServerStat(sInfo.sock))
     {
-      clog("NET: SERVER: hello: sendServerStat failed");
+      utLog("NET: SERVER: hello: sendServerStat failed");
       return FALSE;
     }
 
   /* now we want an ack.  If we get it, we're done! */
-  if ((pkttype = readPacket(PKT_FROMCLIENT, sockl, buf, PKT_MAXSIZE, 60)) < 0)
+  if ((pkttype = pktRead(PKT_FROMCLIENT, sockl, buf, PKT_MAXSIZE, 60)) < 0)
     {
-      clog("NET: SERVER: hello: read client Ack failed");
+      utLog("NET: SERVER: hello: read client Ack failed");
       return FALSE;
     }
 
   if (pkttype != CP_ACK)
     {
-      clog("NET: SERVER: hello: got packet type %d, expected CP_ACK", 
+      utLog("NET: SERVER: hello: got packet type %d, expected CP_ACK", 
            pkttype);
       return FALSE;
     }
@@ -1971,7 +1973,7 @@ static int hello(void)
       if (cpack->code == PERR_DOUDP)
         {
           sInfo.doUDP = TRUE;
-          clog("NET: SERVER: hello: Client acknowleged UDP from server. Doing UDP.");
+          utLog("NET: SERVER: hello: Client acknowleged UDP from server. Doing UDP.");
         }
     }
 
@@ -1995,7 +1997,7 @@ void handleSignal(int sig)
   stopUpdate();
 
   if (sig)
-    clog("conquestd: exiting on signal %d", sig);
+    utLog("conquestd: exiting on signal %d", sig);
   
   if (sInfo.state == SVR_STATE_PLAY)
     {
@@ -2047,7 +2049,7 @@ void conqend(void)
       clbStoreMsg(MSG_COMP, MSG_ALL, msgbuf);
     }
   
-  recordCloseOutput();
+  recCloseOutput();
 
   return;
   

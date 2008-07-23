@@ -26,6 +26,7 @@
 #include "cqkeys.h"
 #include "prm.h"
 #include "glmisc.h"
+#include "conqutil.h"
 
 static char *unamep = "Username:";
 static char *pwp = "Password:";
@@ -478,7 +479,7 @@ static int nAuthInput(int ch)
 
               if (rv != PERR_OK)
                 {
-                  clog("conquest: CPAUTH_LOGIN returned %d\n",
+                  utLog("conquest: CPAUTH_LOGIN returned %d\n",
                        rv);
                   return NODE_EXIT;
                 }
@@ -493,7 +494,7 @@ static int nAuthInput(int ch)
 
 
     default:
-      clog("nAuthInput(): Unknown state: %d", state);
+      utLog("nAuthInput(): Unknown state: %d", state);
     }
           
   /* if we get here, something is confused */

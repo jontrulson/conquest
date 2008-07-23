@@ -14,6 +14,7 @@
 #include "conf.h"
 #include "conqcom.h"
 #include "conqlb.h"
+#include "conqutil.h"
 #include "gldisplay.h"
 #include "node.h"
 #include "client.h"
@@ -154,7 +155,7 @@ extern void setWarp(real warp); /* FIXME - GL.c */
 void cp_putmsg(char *str, int lin)
 {
   hudSetPrompt(lin, NULL, NoColor, str, NoColor); 
-  clog("PUTMSG: %s", str); 
+  utLog("PUTMSG: %s", str); 
 }
 #endif
 
@@ -255,7 +256,7 @@ static void _infoship( int snum, int scanner )
     }
 
   cbuf[0] = Context.lasttarg[0] = EOS;
-  appship( snum, cbuf );
+  utAppendShip( snum, cbuf );
   strcpy(Context.lasttarg, cbuf); /* save for hudInfo */
   hudSetInfoTarget(snum);
 
@@ -335,7 +336,7 @@ static void _infoship( int snum, int scanner )
 
   if ( godlike )
     {
-      appsstatus( status, cbuf );
+      utAppendShipStatus( status, cbuf );
       appchr( '.', cbuf );
     }
   else 
@@ -351,7 +352,7 @@ static void _infoship( int snum, int scanner )
   if ( ! SCLOAKED(snum) || Ships[snum].warp != 0.0 )
     {
       Context.lasttdist = round( dis ); /* save these puppies for hud info */
-      Context.lasttang = round( angle( x, y, appx, appy ) );
+      Context.lasttang = round( utAngle( x, y, appx, appy ) );
 
       sprintf( cbuf, "Range %d, direction %d",
 	     Context.lasttdist, Context.lasttang );
@@ -393,7 +394,7 @@ static void _infoship( int snum, int scanner )
 		  oldclose_rate = close_rate;
 
 #ifdef DEBUG_ETA
-		  clog("_infoship: close_rate(%.1f) = diffdis(%.1f) / difftime(%d), avgclose_rate = %.1f",
+		  utLog("_infoship: close_rate(%.1f) = diffdis(%.1f) / difftime(%d), avgclose_rate = %.1f",
 		       close_rate,
 		       diffdis,
 		       difftime,
@@ -416,7 +417,7 @@ static void _infoship( int snum, int scanner )
 		      pwarp = (avgclose_rate / (real) MM_PER_SEC_PER_WARP);
 
 #ifdef DEBUG_ETA
-clog("_infoship:\tdis(%.1f) pwarp(%.1f) = (close_rate(%.1f) / MM_PER_SEC_PER_WARP(%.1f)", dis, pwarp, close_rate, MM_PER_SEC_PER_WARP);
+utLog("_infoship:\tdis(%.1f) pwarp(%.1f) = (close_rate(%.1f) / MM_PER_SEC_PER_WARP(%.1f)", dis, pwarp, close_rate, MM_PER_SEC_PER_WARP);
 #endif
 
 		      sprintf(tmpstr, ", ETA %s",
@@ -460,7 +461,7 @@ clog("_infoship:\tdis(%.1f) pwarp(%.1f) = (close_rate(%.1f) / MM_PER_SEC_PER_WAR
 	appstr( ", ", cbuf );
       appstr( "shields ", cbuf );
       if ( SSHUP(snum) && ! SREPAIR(snum) )
-	appint( round( Ships[snum].shields ), cbuf );
+	utAppendInt( round( Ships[snum].shields ), cbuf );
       else
 	appstr( "DOWN", cbuf );
       i = round( Ships[snum].damage );
@@ -509,7 +510,7 @@ static void _infoplanet( char *str, int pnum, int snum )
     {
       cp_putmsg( "No such planet.", MSG_LIN1 );
       hudClearPrompt(MSG_LIN2);
-      clog("_infoplanet: Called with invalid pnum (%d).",
+      utLog("_infoplanet: Called with invalid pnum (%d).",
 	     pnum );
       return;
     }
@@ -559,7 +560,7 @@ static void _infoplanet( char *str, int pnum, int snum )
     }
   
   Context.lasttdist = round(dist( x, y, Planets[pnum].x, Planets[pnum].y));
-  Context.lasttang = round(angle( x, y, Planets[pnum].x, Planets[pnum].y ));
+  Context.lasttang = round(utAngle( x, y, Planets[pnum].x, Planets[pnum].y ));
 
   if (UserConf.DoETAStats)
     {
@@ -644,7 +645,7 @@ static void _infoplanet( char *str, int pnum, int snum )
 	    {
 	      if ( junk[0] != EOS )
 		appstr( ", ", junk );
-	      appint( j, junk );
+	      utAppendInt( j, junk );
 	      appstr( " minutes until coup time", junk );
 	    }
 	}
@@ -720,7 +721,7 @@ static int _gettarget(char *buf, real cdefault, real *dir, char ch)
   if ( ch == TERM_ABORT )
     return ( FALSE );
   
-  delblanks( buf );
+  utDeleteBlanks( buf );
   fold( buf );
   if ( buf[0] == EOS )
     {
@@ -731,12 +732,12 @@ static int _gettarget(char *buf, real cdefault, real *dir, char ch)
   if ( alldig( buf ) == TRUE )
     {
       i = 0;
-      if ( ! safectoi( &j, buf, i ) )
+      if ( ! utSafeCToI( &j, buf, i ) )
 	return ( FALSE );
-      *dir = mod360( (real) j );
+      *dir = utMod360( (real) j );
       return ( TRUE );
     }
-  if ( arrows( buf, dir ) )
+  if ( utArrowsToDir( buf, dir ) )
     return ( TRUE );
   
   return ( FALSE );
@@ -752,7 +753,7 @@ static void _dophase( real dir )
   /*  Cataboligne - sound code 10.16.6 */
   if ( Ships[Context.snum].pfuse == 0 && 
        clbUseFuel( Context.snum, PHASER_FUEL, TRUE, FALSE ) )
-    cqsEffectPlay(teamEffects[Ships[Context.snum].team].phaser, 0, 0, 0);
+    cqsEffectPlay(cqsTeamEffects[Ships[Context.snum].team].phaser, 0, 0, 0);
  
   cp_putmsg( "Firing phasers...", MSG_LIN2 );
 
@@ -773,9 +774,9 @@ static void _dotorp(real dir, int num)
       /* Cat - torp fired sound */
 
       if (num > 1) 
-        cqsEffectPlay(teamEffects[Ships[Context.snum].team].torp3, 0, 0, 0);
+        cqsEffectPlay(cqsTeamEffects[Ships[Context.snum].team].torp3, 0, 0, 0);
       else
-        cqsEffectPlay(teamEffects[Ships[Context.snum].team].torp, 0, 0, 0);
+        cqsEffectPlay(cqsTeamEffects[Ships[Context.snum].team].torp, 0, 0, 0);
     }
 
   sendFireTorps(num, dir);
@@ -803,7 +804,7 @@ static void _doinfo( char *buf, char ch )
   extra = ( ch == TERM_EXTRA );
   
   /* Default to what we did last time. */
-  delblanks( buf );
+  utDeleteBlanks( buf );
   fold( buf );
   if ( buf[0] == EOS )
     {
@@ -817,7 +818,7 @@ static void _doinfo( char *buf, char ch )
   else
     c_strcpy( buf, Context.lastinfostr );
   
-  if ( special( buf, &what, &token, &count ) )
+  if ( utIsSpecial( buf, &what, &token, &count ) )
     {
       if ( ! clbFindSpecial( snum, token, count, &sorpnum, &xsorpnum ) )
 	what = NEAR_NONE;
@@ -839,22 +840,22 @@ static void _doinfo( char *buf, char ch )
   else if ( buf[0] == 's' && alldig( &buf[1] ) == TRUE )
     {
       i = 1;
-      safectoi( &j, buf, i );		/* ignore status */
+      utSafeCToI( &j, buf, i );		/* ignore status */
       _infoship( j, snum );
     }
   else if ( alldig( buf ) == TRUE )
     {
       i = 0;
-      safectoi( &j, buf, i );		/* ignore status */
+      utSafeCToI( &j, buf, i );		/* ignore status */
       _infoship( j, snum );
     }
   else if ( clbPlanetMatch( buf, &j, FALSE ) )
     _infoplanet( "", j, snum );
-  else if ( stmatch( buf, "time", FALSE ) )
+  else if ( utStringMatch( buf, "time", FALSE ) )
     {
       getnow( now, 0 );
       c_strcpy( "It's ", buf );
-      appnumtim( now, buf );
+      utAppendTime( now, buf );
       appchr( '.', buf );
       cp_putmsg( buf, MSG_LIN1 );
     }
@@ -866,7 +867,7 @@ static void _doinfo( char *buf, char ch )
 
 /* Cataboligne - Spocks viewer sound */
   if (rnd() < 0.4)
-    cqsEffectPlay(teamEffects[Ships[Context.snum].team].info, 0, 0, 0);
+    cqsEffectPlay(cqsTeamEffects[Ships[Context.snum].team].info, 0, 0, 0);
 }
 
 
@@ -962,7 +963,7 @@ static void _doalloc(char *buf, char ch)
 
     case TERM_NORMAL:
       i = 0;
-      safectoi( &alloc, buf, i );			/* ignore status */
+      utSafeCToI( &alloc, buf, i );			/* ignore status */
       if ( alloc != 0 )
 	{
 	  if ( alloc < 30 )
@@ -1124,7 +1125,7 @@ static int _chktow(void)
   if ( Ships[snum].towedby != 0 )
     {
       c_strcpy( "But we are being towed by ", cbuf );
-      appship( Ships[snum].towedby, cbuf );
+      utAppendShip( Ships[snum].towedby, cbuf );
       appchr( '!', cbuf );
       cp_putmsg( cbuf, MSG_LIN2 );
       return FALSE;
@@ -1132,7 +1133,7 @@ static int _chktow(void)
   if ( Ships[snum].towing != 0 )
     {
       c_strcpy( "But we're already towing ", cbuf );
-      appship( Ships[snum].towing, cbuf );
+      utAppendShip( Ships[snum].towing, cbuf );
       appchr( '.', cbuf );
       cp_putmsg( cbuf, MSG_LIN2 );
       return FALSE;
@@ -1147,7 +1148,7 @@ static void _dotow(char *buf, int ch)
   if (ch == TERM_ABORT)
     return;
   i = 0;
-  safectoi( &other, cbuf, i );		/* ignore status */
+  utSafeCToI( &other, cbuf, i );		/* ignore status */
   
   sendCommand(CPCMD_TOW, (Unsgn16)other);
 
@@ -1209,13 +1210,13 @@ static void _domsgto(char *buf, int ch, int terse)
     }
 
   /* Got a target, parse it. */
-  delblanks( tbuf );
+  utDeleteBlanks( tbuf );
   upper( tbuf );
   if ( alldig( tbuf ) == TRUE )
     {
       /* All digits means a ship number. */
       i = 0;
-      safectoi( &j, tbuf, i );		/* ignore status */
+      utSafeCToI( &j, tbuf, i );		/* ignore status */
       if ( j < 1 || j > MAXSHIPS )
 	{
 	  cp_putmsg( "No such ship.", MSG_LIN2 );
@@ -1285,7 +1286,7 @@ static void _domsgto(char *buf, int ch, int terse)
           prompting = FALSE;
 	  return;
 	}
-      appship( to, tbuf );
+      utAppendShip( to, tbuf );
       appchr( ':', tbuf );
     }
   else if ( -to >= 0 && -to < NUMPLAYERTEAMS )
@@ -1468,7 +1469,7 @@ static void _docourse( char *buf, char ch)
   hudClearPrompt(MSG_LIN1);
   hudClearPrompt(MSG_LIN2);
 
-  delblanks( buf );
+  utDeleteBlanks( buf );
   if ( ch == TERM_ABORT || buf[0] == EOS )
     {
       hudClearPrompt(MSG_LIN1);
@@ -1484,10 +1485,10 @@ static void _docourse( char *buf, char ch)
       /* Raw angle. */
       hudClearPrompt( MSG_LIN1 );
       i = 0;
-      if ( safectoi( &j, buf, i ) )
+      if ( utSafeCToI( &j, buf, i ) )
 	{
 	  what = NEAR_DIRECTION;
-	  dir = (real)mod360( (real)( j ) );
+	  dir = (real)utMod360( (real)( j ) );
 	}
     }
   else if ( buf[0] == 's' && alldig( &buf[1] ) == TRUE )
@@ -1495,12 +1496,12 @@ static void _docourse( char *buf, char ch)
       /* Ship. */
 
       i = 1;
-      if ( safectoi( &sorpnum, buf, i ) )
+      if ( utSafeCToI( &sorpnum, buf, i ) )
 	what = NEAR_SHIP;
     }
-  else if ( arrows( buf, &dir ) )
+  else if ( utArrowsToDir( buf, &dir ) )
     what = NEAR_DIRECTION;
-  else if ( special( buf, &i, &token, &count ) )
+  else if ( utIsSpecial( buf, &i, &token, &count ) )
     {
       if ( clbFindSpecial( snum, token, count, &sorpnum, &xsorpnum ) )
 	what = i;
@@ -1539,7 +1540,7 @@ static void _docourse( char *buf, char ch)
       appx = Ships[sorpnum].x;
       appy = Ships[sorpnum].y;
 
-      dir = (real)angle( Ships[snum].x, Ships[snum].y, appx, appy );
+      dir = utAngle( Ships[snum].x, Ships[snum].y, appx, appy );
       
       /* Give info if he used TAB. */
       if ( ch == TERM_EXTRA )
@@ -1548,7 +1549,7 @@ static void _docourse( char *buf, char ch)
         hudClearPrompt(MSG_LIN1);
       break;
     case NEAR_PLANET:
-      dir = angle( Ships[snum].x, Ships[snum].y, Planets[sorpnum].x, Planets[sorpnum].y );
+      dir = utAngle( Ships[snum].x, Ships[snum].y, Planets[sorpnum].x, Planets[sorpnum].y );
       if ( ch == TERM_EXTRA )
 	{
 	  newlock = -sorpnum;
@@ -1616,7 +1617,7 @@ static int _review(void)
     }
   else
     {
-      msg = modp1( msg - 1, MAXMESSAGES );
+      msg = utModPlusOne( msg - 1, MAXMESSAGES );
       if (msg == lastone)
         {
           state = S_NONE;
@@ -1637,7 +1638,7 @@ static void _doreview(void)
   lstmsg = Ships[snum].lastmsg;	/* don't want lstmsg changing while
                                    reading old ones. */
 
-  lastone = modp1( ConqInfo->lastmsg+1, MAXMESSAGES );
+  lastone = utModPlusOne( ConqInfo->lastmsg+1, MAXMESSAGES );
   if ( snum > 0 && snum <= MAXSHIPS )
     {
       if ( Ships[snum].lastmsg == LMSG_NEEDINIT )
@@ -1913,7 +1914,7 @@ static void _dobeam(char *buf, int ch)
     num = beamax;
   else
     {
-      delblanks( buf );
+      utDeleteBlanks( buf );
       if ( alldig( buf ) != TRUE )
 	{
           state = S_NONE;
@@ -1922,7 +1923,7 @@ static void _dobeam(char *buf, int ch)
 	  return;
 	}
       i = 0;
-      safectoi( &num, buf, i );			/* ignore status */
+      utSafeCToI( &num, buf, i );			/* ignore status */
       if ( num < 1 || num > beamax )
 	{
 	  cp_putmsg( abt, MSG_LIN1 );
@@ -1940,11 +1941,11 @@ static void _dobeam(char *buf, int ch)
 
   /* start the effects */
   if (dirup)
-    cqsEffectPlayTracked(teamEffects[Ships[Context.snum].team].beamu, 
+    cqsEffectPlayTracked(cqsTeamEffects[Ships[Context.snum].team].beamu, 
                          &beamHandle,
                          0, 0, 0);
   else
-    cqsEffectPlayTracked(teamEffects[Ships[Context.snum].team].beamd, 
+    cqsEffectPlayTracked(cqsTeamEffects[Ships[Context.snum].team].beamd, 
                          &beamHandle,
                          0, 0, 0);
 
@@ -2322,7 +2323,7 @@ static void command( int ch )
             if (ncpLRMagFactor - 1 >= -5)
               {
                 ncpLRMagFactor--;
-                cqsEffectPlay(teamEffects[Ships[snum].team].mag, 0, 0, 0);
+                cqsEffectPlay(cqsTeamEffects[Ships[snum].team].mag, 0, 0, 0);
               }
             else
               mglBeep(MGL_BEEP_ERR);
@@ -2334,7 +2335,7 @@ static void command( int ch )
             if (ncpSRMagFactor - 1 >= -5)
               {
                 ncpSRMagFactor--;
-                cqsEffectPlay(teamEffects[Ships[snum].team].mag, 0, 0, 0);
+                cqsEffectPlay(cqsTeamEffects[Ships[snum].team].mag, 0, 0, 0);
               }
             else
               mglBeep(MGL_BEEP_ERR);
@@ -2351,7 +2352,7 @@ static void command( int ch )
             if (ncpLRMagFactor + 1 <= 5)
               {
                 ncpLRMagFactor++;
-                cqsEffectPlay(teamEffects[Ships[snum].team].mag, 0, 0, 0);
+                cqsEffectPlay(cqsTeamEffects[Ships[snum].team].mag, 0, 0, 0);
               }
             else
               mglBeep(MGL_BEEP_ERR);
@@ -2363,7 +2364,7 @@ static void command( int ch )
             if (ncpSRMagFactor + 1 <= 5)
               {
                 ncpSRMagFactor++;
-                cqsEffectPlay(teamEffects[Ships[snum].team].mag, 0, 0, 0);
+                cqsEffectPlay(cqsTeamEffects[Ships[snum].team].mag, 0, 0, 0);
               }
             else
               mglBeep(MGL_BEEP_ERR);
@@ -2420,7 +2421,7 @@ static void command( int ch )
 
     case TERM_RELOAD:		/* have server resend current universe */
       sendCommand(CPCMD_RELOAD, 0);
-      clog("client: sent CPCMD_RELOAD");
+      utLog("client: sent CPCMD_RELOAD");
       break;
       
     case -1:			/* really nothing, move along */
@@ -2531,10 +2532,10 @@ static void themes()
       if (atwar)
         {
           warlike = TRUE;
-          mus = teamMusic[Ships[i].team].battle;
+          mus = cqsTeamMusic[Ships[i].team].battle;
         }
       else if (!warlike /*&& Ships[Context.snum].team == Ships[i].team*/)
-        mus = teamMusic[Ships[i].team].approach;
+        mus = cqsTeamMusic[Ships[i].team].approach;
     }
   
   /* now, either we found some theme music to play or we didn't.  If we
@@ -2563,9 +2564,9 @@ static void themes()
   
   /* first choose whether we will play theme or intro music */
   if (rnd() < 0.5)
-    mus = teamMusic[rndint(0, NUMPLAYERTEAMS - 1)].theme;
+    mus = cqsTeamMusic[rndint(0, NUMPLAYERTEAMS - 1)].theme;
   else
-    mus = teamMusic[rndint(0, NUMPLAYERTEAMS - 1)].intro;
+    mus = cqsTeamMusic[rndint(0, NUMPLAYERTEAMS - 1)].intro;
 
   /* now play it */
   cqsMusicPlay(mus, FALSE);
@@ -2598,7 +2599,7 @@ static void doomsday_theme (void)
   /* first sight of doomsday - wait for other themes */
   if (first_doom < 2 && dis < DOOM_INTRODIS && !cqsMusicPlaying())
     {
-      cqsMusicPlay(doomMusic.doomin, FALSE);
+      cqsMusicPlay(cqsDoomsdayMusic.doomin, FALSE);
       first_doom = 2;                                                                     /* intro music only plays once */
     }
   else if (Ships[Context.snum].sdfuse > 0 && 
@@ -2613,12 +2614,12 @@ static void doomsday_theme (void)
         
         fix - we really want to fade any other music instantly - no delays
       */
-      cqsMusicPlay(doomMusic.doomkill, FALSE);
+      cqsMusicPlay(cqsDoomsdayMusic.doomkill, FALSE);
       first_doom = 3;   /* dont restart playing this */
     }
   else if (dis < DOOM_MUSDIS && !cqsMusicPlaying())
     {
-      cqsMusicPlay(doomMusic.doom, FALSE);
+      cqsMusicPlay(cqsDoomsdayMusic.doom, FALSE);
       first_doom = 4;   /* enable kill music if it played once already */
     }
 }
@@ -2657,7 +2658,7 @@ void nCPInit(int istopnode)
   hudClearPrompt(MSG_MSG);
 
   /* flush the input buffer */
-  iBufFlush();
+  ibufFlush();
 
   /* first time through */
   if (!nCPNode.animQue)
@@ -2672,19 +2673,19 @@ void nCPInit(int istopnode)
          only need to be done once at inittime (but for each node
          that wishes to make use of them. */
       if (!animInitState("onesec", &GLBlinkerOneSec, NULL))
-        clog("%s: failed to init animstate for animation 'onesec'",
+        utLog("%s: failed to init animstate for animation 'onesec'",
              __FUNCTION__);
       else
         animQueAdd(nCPNode.animQue, &GLBlinkerOneSec);
 
       if (!animInitState("halfsec", &GLBlinkerHalfSec, NULL))
-        clog("%s: failed to init animstate for animation 'halfsec'",
+        utLog("%s: failed to init animstate for animation 'halfsec'",
              __FUNCTION__);
       else
         animQueAdd(nCPNode.animQue, &GLBlinkerHalfSec);
 
       if (!animInitState("qtrsec", &GLBlinkerQtrSec, NULL))
-        clog("%s: failed to init animstate for animation 'qtrsec'",
+        utLog("%s: failed to init animstate for animation 'qtrsec'",
              __FUNCTION__);
       else
         animQueAdd(nCPNode.animQue, &GLBlinkerQtrSec);
@@ -2698,7 +2699,7 @@ void nCPInit(int istopnode)
                    Teams[i].name[0]);
 
           if (!animInitState(nm, &ncpTorpAnims[i], NULL))
-            clog("%s: failed to init animstate for animation '%s'",
+            utLog("%s: failed to init animstate for animation '%s'",
                  __FUNCTION__, nm);
           else
             animQueAdd(nCPNode.animQue, &ncpTorpAnims[i]);
@@ -2769,7 +2770,7 @@ static int nCPIdle(void)
   int pkttype;
   int now;
   char buf[PKT_MAXSIZE];
-  Unsgn32 difftime = dgrand( Context.msgrand, &now );
+  Unsgn32 difftime = utDeltaGrand( Context.msgrand, &now );
   int sockl[2] = {cInfo.sock, cInfo.usock};
   static Unsgn32 iterstart = 0;
   static Unsgn32 pingtime = 0;
@@ -2794,7 +2795,7 @@ static int nCPIdle(void)
       dietime = iternow;
     }
 
-  while ((pkttype = waitForPacket(PKT_FROMSERVER, sockl, PKT_ANYPKT,
+  while ((pkttype = pktWaitForPacket(PKT_FROMSERVER, sockl, PKT_ANYPKT,
                                   buf, PKT_MAXSIZE, 0, NULL)) > 0)
     {
         switch (pkttype)
@@ -2805,7 +2806,7 @@ static int nCPIdle(void)
               if (sack->code == PERR_PINGRESP)
                 {
                   pingPending = FALSE;
-                  pingAvgMS = (pingAvgMS + (iternow - pingStart)) / 2;
+                  pktPingAvgMS = (pktPingAvgMS + (iternow - pingStart)) / 2;
                   pingStart = 0;
                   continue;
                 }
@@ -2821,7 +2822,7 @@ static int nCPIdle(void)
 
   if (pkttype < 0)          /* some error */
     {
-      clog("nCPIdle: waitForPacket returned %d", pkttype);
+      utLog("nCPIdle: pktWaitForPacket returned %d", pkttype);
       Ships[Context.snum].status = SS_OFF;
       return NODE_EXIT;
     }
@@ -2850,7 +2851,7 @@ static int nCPIdle(void)
       clbTorpDrive(tdelta / 1000.0);
       iterstart = iternow;
       if (Context.recmode == RECMODE_ON)
-        recordGenTorpLoc();
+        recGenTorpLoc();
     }
 
   if (clientFlags & SPCLNTSTAT_FLAG_KILLED)
@@ -2883,7 +2884,7 @@ static int nCPIdle(void)
 
   if (state == S_REFITING)
     {                           /* done refiting? */
-      if (dgrand( entertime, &now ) >= REFIT_GRAND)
+      if (utDeltaGrand( entertime, &now ) >= REFIT_GRAND)
         {
           hudClearPrompt(MSG_LIN1);
           hudClearPrompt(MSG_LIN2);
@@ -2895,7 +2896,7 @@ static int nCPIdle(void)
 
   if (state == S_WARRING)
     {                           
-      if (dgrand( entertime, &now ) >= REARM_GRAND)
+      if (utDeltaGrand( entertime, &now ) >= REARM_GRAND)
         {
           hudClearPrompt(MSG_LIN1);
           hudClearPrompt(MSG_LIN2);
@@ -2913,7 +2914,7 @@ static int nCPIdle(void)
   if (Context.msgok)
     {
       if (difftime >= NEWMSG_GRAND)
-        if ( getamsg(Context.snum, &Ships[Context.snum].lastmsg))
+        if ( utGetMsg(Context.snum, &Ships[Context.snum].lastmsg))
           {
             rmesg(Context.snum, Ships[Context.snum].lastmsg, MSG_MSG);
             if (Msgs[Ships[Context.snum].lastmsg].msgfrom !=
@@ -2929,7 +2930,7 @@ static int nCPIdle(void)
     {
       if ((iternow - rftime) > (int)((1.0 / (real)Context.updsec) * 1000.0))
         {                           /* record a frame */
-          recordUpdateFrame();
+          recUpdateFrame();
           rftime = iternow;
         }
     }
@@ -3015,19 +3016,19 @@ static int nCPInput(int ch)
 
   if (state == S_REFITING && ch) /* if refitting, just que all chars */
     {
-      iBufPutc(ch);
+      ibufPutc(ch);
       return NODE_OK;
     }
 
   if (state == S_WARRING && ch) 
     {
-      iBufPutc(ch);
+      ibufPutc(ch);
       return NODE_OK;
     }
 
   if (state == S_BOMBING && ch)
     {                           /* aborting */
-      iBufPutc(ch);             /* just que it */
+      ibufPutc(ch);             /* just que it */
       cqsEffectStop(bombingHandle, FALSE);
       sendCommand(CPCMD_BOMB, 0);
       state = S_NONE;
@@ -3039,7 +3040,7 @@ static int nCPInput(int ch)
 
   if (state == S_BEAMING && ch)
     {                           /* aborting */
-      iBufPutc(ch);             /* just que it */
+      ibufPutc(ch);             /* just que it */
       cqsEffectStop(beamHandle, FALSE);
       sendCommand(CPCMD_BEAM, 0);
       state = S_NONE;
@@ -3051,17 +3052,17 @@ static int nCPInput(int ch)
 
   if (ch == 0)
     {                           /* check for queued chars */
-      if (iBufCount())
-        ch = iBufGetCh();
+      if (ibufCount())
+        ch = ibufGetc();
       else
         return NODE_OK;
     }
   else
     {
-      if (iBufCount())
+      if (ibufCount())
         {
-          iBufPutc(ch);                 /* que char */
-          ch = iBufGetCh();
+          ibufPutc(ch);                 /* que char */
+          ch = ibufGetc();
         }
     }
 
@@ -3392,7 +3393,7 @@ static int nCPInput(int ch)
                                 "Reprogramming the battle computer, please stand by...",
                                 MSG_LIN2 );
                       
-                      grand( &entertime ); /* gotta wait */
+                      utGrand( &entertime ); /* gotta wait */
                     }
                   else
                     {
@@ -3455,13 +3456,13 @@ static int nCPInput(int ch)
                   hudSetPrompt(prm.index, prm.pbuf, NoColor, prm.buf, NoColor);
                   sendCommand(CPCMD_REFIT, (Unsgn16)refitst);
                   prompting = FALSE;
-                  grand( &entertime );
+                  utGrand( &entertime );
                   state = S_REFITING;
 
                   break;
                   
                 case TERM_EXTRA:
-                  refitst = modp1( refitst + 1, MAXNUMSHIPTYPES );
+                  refitst = utModPlusOne( refitst + 1, MAXNUMSHIPTYPES );
                   sprintf(pbuf, "Refit ship type: %s", 
                           ShipTypes[refitst].name);
                   prm.buf[0] = EOS;
@@ -3487,10 +3488,10 @@ static int nCPInput(int ch)
 	    case '<':
 	    case CQ_KEY_UP:
 	    case CQ_KEY_LEFT:
-	      tmsg = modp1( msg - 1, MAXMESSAGES );
+	      tmsg = utModPlusOne( msg - 1, MAXMESSAGES );
 	      while(!clbCanRead( snum, tmsg ) && tmsg != lastone)
 		{
-		  tmsg = modp1( tmsg - 1, MAXMESSAGES );
+		  tmsg = utModPlusOne( tmsg - 1, MAXMESSAGES );
 		}
 	      if (tmsg == lastone)
 		{
@@ -3502,10 +3503,10 @@ static int nCPInput(int ch)
 	    case '>':
 	    case CQ_KEY_DOWN:
 	    case CQ_KEY_RIGHT:
-	      tmsg =  modp1( msg + 1, MAXMESSAGES );
+	      tmsg =  utModPlusOne( msg + 1, MAXMESSAGES );
 	      while(!clbCanRead( snum, tmsg ) && tmsg != lstmsg + 1 )
 		{
-		  tmsg = modp1( tmsg + 1, MAXMESSAGES );
+		  tmsg = utModPlusOne( tmsg + 1, MAXMESSAGES );
 		}
 	      if (tmsg == (lstmsg + 1))
 		{
@@ -3536,9 +3537,9 @@ static int nCPInput(int ch)
 
           if (CQ_FKEY(cf) && !_KPAngle(cf, &x))
             {                           /* handle macros */
-              if (DoMacro(_xlateFKey(cf)))
+              if (ibufExpandMacro(_xlateFKey(cf)))
                 {
-                  while (iBufCount())
+                  while (ibufCount())
                     nCPInput(0); /* recursion warning */
                   return NODE_OK;
                 }
@@ -3556,7 +3557,7 @@ static int nCPInput(int ch)
 static int nCPMInput(mouseData_t *mdata)
 {
 #if 0
-  clog ("%s: mod = %08x, button = %d state = %d\n", 
+  utLog ("%s: mod = %08x, button = %d state = %d\n", 
         __FUNCTION__,
         mdata->mod,
         mdata->button,
@@ -3571,13 +3572,13 @@ static int nCPMInput(mouseData_t *mdata)
     {
       /* compute an angle relative to center of viewer and do
          the macro thang */
-      real dir = angle((real)(dConf.vX + (dConf.vW / 2.0)), 
+      real dir = utAngle((real)(dConf.vX + (dConf.vW / 2.0)), 
                        (real)(dConf.vY + (dConf.vH / 2.0)), 
                        (real)mdata->x, 
                        (real)(dConf.vY + dConf.vH) - ((real)mdata->y - dConf.vY)
                        );
 
-      DoMouseMacro(mdata->button, mdata->mod, dir);
+      ibufExpandMouseMacro(mdata->button, mdata->mod, dir);
 
       /* clean up the state - stop bombing/beaming if neccessary... */
       if (state == S_BOMBING)

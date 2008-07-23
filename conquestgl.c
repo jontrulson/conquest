@@ -24,10 +24,14 @@
 /*                                                                    */
 /**********************************************************************/
 
-#define NOEXTERN
 #include "conqdef.h"
 #include "conqcom.h"
+
+#include "conqutil.h"
+
+#define NOEXTERN_CONTEXT
 #include "context.h"
+
 #include "conf.h"
 #include "global.h"
 #include "color.h"
@@ -186,7 +190,7 @@ static void _loadRCFiles(int type, char *cqdir, char *suffix)
 
               if (!(ptr = strdup(filenm)))
                 {
-                  clog("%s: Could not strdup %s, ignoring.",
+                  utLog("%s: Could not strdup %s, ignoring.",
                        __FUNCTION__,
                        filenm);
 
@@ -200,7 +204,7 @@ static void _loadRCFiles(int type, char *cqdir, char *suffix)
               
               if (!tmplist)
                 {  
-                  clog("%s: Could not realloc %d files, ignoring '%s'",
+                  utLog("%s: Could not realloc %d files, ignoring '%s'",
                        __FUNCTION__,
                        numfiles + 1,
                        filenm);
@@ -311,7 +315,7 @@ int main(int argc, char *argv[])
   cInfo.isLoggedIn = FALSE;
   cInfo.remoteport = CN_DFLT_PORT;
 
-  setSystemLog(FALSE, TRUE);	/* use $HOME for logfile */
+  utSetLogConfig(FALSE, TRUE);	/* use $HOME for logfile */
   if (!getLocalhost(cInfo.localhost, MAXHOSTNAME))
     return(1);
 
@@ -323,12 +327,12 @@ int main(int argc, char *argv[])
   while ((i = getopt(argc, argv, "fmM:s:r:tP:Bug:Sv")) != EOF)    
     switch (i)
       {
-      case 'B':                 /* Benchmark mode, set frameDelay to 0.0 */
+      case 'B':                 /* Benchmark mode, set recFrameDelay to 0.0 */
         pbSpeed = PB_SPEED_INFINITE;
-        frameDelay = 0.0;
+        recFrameDelay = 0.0;
         break;
       case 'f':
-        dConf.fullScreen = TRUE;
+        DSPFSET(DSP_F_FULLSCREEN);
         break;
       case 'g':                 
         parseGeometry(optarg);
@@ -369,7 +373,7 @@ int main(int argc, char *argv[])
         /* don't want to do this if we've already seen -P */
         if (Context.recmode != RECMODE_PLAYING)
           {
-            if (recordOpenOutput(optarg, FALSE))
+            if (recOpenOutput(optarg, FALSE))
               {			/* we are almost ready... */
                 Context.recmode = RECMODE_STARTING;
                 printf("Recording game to %s...\n", optarg);
@@ -388,7 +392,7 @@ int main(int argc, char *argv[])
         break;
 
       case 'P':
-        rfname = optarg;
+        recFilename = optarg;
         Context.recmode = RECMODE_PLAYING;
         dosound = FALSE;        /* no sound during playback */
         break;
@@ -414,13 +418,13 @@ int main(int argc, char *argv[])
   
   
 #ifdef DEBUG_CONFIG
-  clog("%s@%d: main() Reading Configuration files.", __FILE__, __LINE__);
+  utLog("%s@%d: main() Reading Configuration files.", __FILE__, __LINE__);
 #endif
   
   if (GetConf(0) == ERR)	
     {
 #ifdef DEBUG_CONFIG
-      clog("%s@%d: main(): GetConf() returned ERR.", __FILE__, __LINE__);
+      utLog("%s@%d: main(): GetConf() returned ERR.", __FILE__, __LINE__);
 #endif
 	exit(1);
       }
@@ -433,12 +437,12 @@ int main(int argc, char *argv[])
         printf("-P option specified.  All other options ignored.\n");
 
       serveropt = wantMetaList = FALSE;
-      printf("Scanning file %s...\n", rfname);
-      if (!initReplay(rfname, &totElapsed))
+      printf("Scanning file %s...\n", recFilename);
+      if (!recInitReplay(recFilename, &recTotalElapsed))
         exit(1);
 
       /* now init for real */
-      if (!initReplay(rfname, NULL))
+      if (!recInitReplay(recFilename, NULL))
         exit(1);
 
       Context.unum = MSG_GOD;       /* stow user number */
@@ -475,14 +479,14 @@ int main(int argc, char *argv[])
     cqsSoundAvailable = FALSE;
 
 #ifdef DEBUG_FLOW
-  clog("%s@%d: main() starting conqinit().", __FILE__, __LINE__);
+  utLog("%s@%d: main() starting conqinit().", __FILE__, __LINE__);
 #endif
   
   conqinit();			/* machine dependent initialization */
-  iBufInit();
+  ibufInit();
   
 #ifdef DEBUG_FLOW
-  clog("%s@%d: main() starting cdinit().", __FILE__, __LINE__);
+  utLog("%s@%d: main() starting cdinit().", __FILE__, __LINE__);
 #endif
 
   
@@ -510,7 +514,7 @@ int main(int argc, char *argv[])
     nConsvrInit(cInfo.remotehost, cInfo.remoteport);
 
 #ifdef DEBUG_FLOW
-  clog("%s@%d: main() welcoming player.", __FILE__, __LINE__);
+  utLog("%s@%d: main() welcoming player.", __FILE__, __LINE__);
 #endif
 
   /* start the fun! */
@@ -523,7 +527,7 @@ int main(int argc, char *argv[])
 void catchSignals(void)
 {
 #ifdef DEBUG_SIG
-  clog("catchSignals() ENABLED");
+  utLog("catchSignals() ENABLED");
 #endif
   
   signal(SIGHUP, (void (*)(int))handleSignal);
@@ -539,7 +543,7 @@ void handleSignal(int sig)
 {
   
 #ifdef DEBUG_SIG
-  clog("handleSignal() got SIG %d", sig);
+  utLog("handleSignal() got SIG %d", sig);
 #endif
   
   switch(sig)
@@ -567,7 +571,7 @@ void conqend(void)
 {
   if (cInfo.sock != -1)
     sendCommand(CPCMD_DISCONNECT, 0); /* tell the server */
-  recordCloseOutput();
+  recCloseOutput();
 
   return;
   

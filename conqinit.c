@@ -7,13 +7,16 @@
 
 #include "c_defs.h"
 
-#define NOEXTERN
 #include "conqdef.h"
 #include "conqcom.h"
+
+#define NOEXTERN_CONTEXT
 #include "context.h"
   
 #include "global.h"
 #include "color.h"
+
+#include "conqutil.h"
 
 #include "conqinit.h"
 
@@ -43,7 +46,7 @@ int main(int argc, char **argv)
 
   rndini(0, 0);
   
-  setSystemLog(FALSE, TRUE);    /* log + stderr! :) */
+  utSetLogConfig(FALSE, TRUE);    /* log + stderr! :) */
 
   while ( (ch = getopt( argc, argv, "vdDf:hts" )) != EOF )
     {      switch(ch)

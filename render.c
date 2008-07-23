@@ -290,12 +290,12 @@ void updateIconHudGeo(int snum)
   o.h = dConf.wH;
 
   /* the width of the entire hud info drawing area */
-  o.xstatw = dConf.vX - (dConf.borderW * 2.0);
+  o.xstatw = dConf.vX - (dConf.wBorderW * 2.0);
 
   tx = dConf.vX;
   ty = dConf.vY + dConf.vH;
   /* icon height */
-  o.sb_ih = (dConf.wH - (dConf.borderW * 2.0) - ty) / 4.0;
+  o.sb_ih = (dConf.wH - (dConf.wBorderW * 2.0) - ty) / 4.0;
 
   /* alert border */
   o.alertb.x = dConf.vX - 3.0;
@@ -303,8 +303,8 @@ void updateIconHudGeo(int snum)
   o.alertb.w = dConf.vW + (3.0 * 2.0);
   o.alertb.h = dConf.vH + (3.0 * 2.0);
 
-  tx = dConf.borderW;
-  ty = dConf.borderW;
+  tx = dConf.wBorderW;
+  ty = dConf.wBorderW;
 
   /* the real fun begins. */
 
@@ -523,7 +523,7 @@ void updateIconHudGeo(int snum)
   o.pbitem.h =  (o.sb_ih * 0.7);
 
   /* rectime or stats info */
-  tx = dConf.borderW;
+  tx = dConf.wBorderW;
 
   o.rectime.x = tx;
   o.rectime.y = (ty + (o.sb_ih * 0.2));
@@ -533,17 +533,17 @@ void updateIconHudGeo(int snum)
   /* the 3 prompt/msg lines  */
   o.msg1.x = tx;
   o.msg1.y = ty + (o.sb_ih * 1.0);
-  o.msg1.w = (dConf.wW  - (dConf.borderW * 2.0));
+  o.msg1.w = (dConf.wW  - (dConf.wBorderW * 2.0));
   o.msg1.h = o.sb_ih;
   
   o.msg2.x = tx;
   o.msg2.y = ty + (o.sb_ih * 2.0);
-  o.msg2.w = (dConf.wW  - (dConf.borderW * 2.0));
+  o.msg2.w = (dConf.wW  - (dConf.wBorderW * 2.0));
   o.msg2.h = o.sb_ih;
   
   o.msgmsg.x = tx;
   o.msgmsg.y = ty + (o.sb_ih * 3.0);
-  o.msgmsg.w = (dConf.wW  - (dConf.borderW * 2.0));
+  o.msgmsg.w = (dConf.wW  - (dConf.wBorderW * 2.0));
   o.msgmsg.h = o.sb_ih;
 
   return;
@@ -682,11 +682,11 @@ static void renderPulseMsgs(void)
           animQueAdd(curnode->animQue, &fuelcrit);
         }
       
-      glfRender(o.fuelcritpulse.x, o.fuelcritpulse.y, 0.0, 
-                o.fuelcritpulse.w, o.fuelcritpulse.h, 
-                fontLargeTxf, "Fuel Critical", 
-                0, &fuelcrit.state.col, 
-                TRUE, FALSE, TRUE);
+      glfRenderFont(o.fuelcritpulse.x, o.fuelcritpulse.y, 0.0, 
+                    o.fuelcritpulse.w, o.fuelcritpulse.h, 
+                    glfFontLarge, "Fuel Critical", 
+                    0, &fuelcrit.state.col, 
+                    GLF_FONT_F_SCALEX | GLF_FONT_F_ORTHO);
       
     }      
 
@@ -698,11 +698,11 @@ static void renderPulseMsgs(void)
           animQueAdd(curnode->animQue, &engfail);
         }
       
-      glfRender(o.engfailpulse.x, o.engfailpulse.y, 0.0, 
-                o.engfailpulse.w, o.engfailpulse.h, 
-                fontLargeTxf, "Engines Overloaded", 
-                0, &engfail.state.col, 
-                TRUE, FALSE, TRUE);
+      glfRenderFont(o.engfailpulse.x, o.engfailpulse.y, 0.0, 
+                    o.engfailpulse.w, o.engfailpulse.h, 
+                    glfFontLarge, "Engines Overloaded", 
+                    0, &engfail.state.col, 
+                    GLF_FONT_F_SCALEX | GLF_FONT_F_ORTHO);
     }      
   else if (hudData.etemp.temp > E_CRIT)
     {
@@ -712,11 +712,11 @@ static void renderPulseMsgs(void)
           animQueAdd(curnode->animQue, &engcrit);
         }
       
-      glfRender(o.engfailpulse.x, o.engfailpulse.y, 0.0, 
-                o.engfailpulse.w, o.engfailpulse.h, 
-                fontLargeTxf, "Engines Critical", 
-                0, &engcrit.state.col, 
-                TRUE, FALSE, TRUE);
+      glfRenderFont(o.engfailpulse.x, o.engfailpulse.y, 0.0, 
+                    o.engfailpulse.w, o.engfailpulse.h, 
+                    glfFontLarge, "Engines Critical", 
+                    0, &engcrit.state.col, 
+                    GLF_FONT_F_SCALEX | GLF_FONT_F_ORTHO);
     }      
   
 
@@ -728,11 +728,11 @@ static void renderPulseMsgs(void)
           animQueAdd(curnode->animQue, &wepfail);
         }
 
-      glfRender(o.wepfailpulse.x, o.wepfailpulse.y, 0.0, 
-                o.wepfailpulse.w, o.wepfailpulse.h, 
-                fontLargeTxf, "Weapons Overloaded", 
-                0, &wepfail.state.col, 
-                TRUE, FALSE, TRUE);
+      glfRenderFont(o.wepfailpulse.x, o.wepfailpulse.y, 0.0, 
+                    o.wepfailpulse.w, o.wepfailpulse.h, 
+                    glfFontLarge, "Weapons Overloaded", 
+                    0, &wepfail.state.col, 
+                    GLF_FONT_F_SCALEX | GLF_FONT_F_ORTHO);
 
     }      
   else if (hudData.wtemp.temp > W_CRIT)
@@ -743,11 +743,11 @@ static void renderPulseMsgs(void)
           animQueAdd(curnode->animQue, &wepcrit);
         }
       
-      glfRender(o.wepfailpulse.x, o.wepfailpulse.y, 0.0, 
-                o.wepfailpulse.w, o.wepfailpulse.h, 
-                fontLargeTxf, "Weapons Critical", 
-                0, &wepcrit.state.col, 
-                TRUE, FALSE, TRUE);
+      glfRenderFont(o.wepfailpulse.x, o.wepfailpulse.y, 0.0, 
+                    o.wepfailpulse.w, o.wepfailpulse.h, 
+                    glfFontLarge, "Weapons Critical", 
+                    0, &wepcrit.state.col, 
+                    GLF_FONT_F_SCALEX | GLF_FONT_F_ORTHO);
       
     }      
 
@@ -760,11 +760,11 @@ static void renderPulseMsgs(void)
           animQueAdd(curnode->animQue, &shcrit);
         }
 
-      glfRender(o.shcritpulse.x, o.shcritpulse.y, 0.0, 
-                o.shcritpulse.w, o.shcritpulse.h, 
-                fontLargeTxf, "Shields Critical", 
-                0, &shcrit.state.col, 
-                TRUE, FALSE, TRUE);
+      glfRenderFont(o.shcritpulse.x, o.shcritpulse.y, 0.0, 
+                    o.shcritpulse.w, o.shcritpulse.h, 
+                    glfFontLarge, "Shields Critical", 
+                    0, &shcrit.state.col, 
+                    GLF_FONT_F_SCALEX | GLF_FONT_F_ORTHO);
 
     }      
 
@@ -776,11 +776,11 @@ static void renderPulseMsgs(void)
           animQueAdd(curnode->animQue, &hullcrit);
         }
 
-      glfRender(o.hullcritpulse.x, o.hullcritpulse.y, 0.0, 
-                o.hullcritpulse.w, o.hullcritpulse.h, 
-                fontLargeTxf, "Hull Critical", 
-                0, &hullcrit.state.col, 
-                TRUE, FALSE, TRUE);
+      glfRenderFont(o.hullcritpulse.x, o.hullcritpulse.y, 0.0, 
+                    o.hullcritpulse.w, o.hullcritpulse.h, 
+                    glfFontLarge, "Hull Critical", 
+                    0, &hullcrit.state.col, 
+                    GLF_FONT_F_SCALEX | GLF_FONT_F_ORTHO);
 
     }      
 
@@ -850,16 +850,16 @@ void renderHud(int dostats)
 
   /* update stats data, if needed */
   if (FPS != oldData.oldFPS || 
-      pingAvgMS != oldData.oldPingAvg || rxdiff != oldData.oldRxdiff)
+      pktPingAvgMS != oldData.oldPingAvg || rxdiff != oldData.oldRxdiff)
     {
       oldData.oldFPS = FPS;
-      oldData.oldPingAvg = pingAvgMS;
+      oldData.oldPingAvg = pktPingAvgMS;
       oldData.oldRxdiff = rxdiff;
 
       snprintf(fbuf, 128 - 1, "FPS: %03d", FPS);
 
       snprintf(ibuf, 128 - 1, "%4dms %3.1fKB/s %s",  
-               pingAvgMS, 
+               pktPingAvgMS, 
                ((float)rxdiff / 1000.0),
                fbuf);
     }
@@ -882,9 +882,10 @@ void renderHud(int dostats)
   /* The Icon Hud (TM) in all it's glory... */
 
   /* heading val */
-  glfRender(o.headl.x, o.headl.y, 0.0, o.headl.w, 
-            o.headl.h, fontLargeTxf, hudData.heading.str, 
-            hudData.heading.color, NULL, TRUE, FALSE, TRUE);
+  glfRenderFont(o.headl.x, o.headl.y, 0.0, o.headl.w, 
+                o.headl.h, glfFontLarge, hudData.heading.str, 
+                hudData.heading.color, NULL, 
+                GLF_FONT_F_SCALEX | GLF_FONT_F_ORTHO);
 
   /* warp background */
   /* kindof sucky to do this here, but since we are drawing a quad
@@ -900,10 +901,11 @@ void renderHud(int dostats)
   glDisable(GL_TEXTURE_2D);
 
   /* warp val */
-  glfRender(o.warpl.x, o.warpl.y, 0.0, 
-            o.warpl.w, o.warpl.h,
-            fontLargeTxf, hudData.warp.str, 
-            hudData.warp.color, NULL, TRUE, FALSE, TRUE);
+  glfRenderFont(o.warpl.x, o.warpl.y, 0.0, 
+                o.warpl.w, o.warpl.h,
+                glfFontLarge, hudData.warp.str, 
+                hudData.warp.color, NULL, 
+                GLF_FONT_F_SCALEX | GLF_FONT_F_ORTHO);
   
   /* warp quad indicator color */
   
@@ -921,10 +923,11 @@ void renderHud(int dostats)
                 0, 100, hudData.sh.shields, hudData.sh.color);
   
   /* shields num */
-  glfRender(o.d1shn.x, o.d1shn.y, 0.0, o.d1shn.w, o.d1shn.h, 
-            fontFixedTxf, 
-            hudData.sh.str, hudData.sh.color, 
-            NULL, TRUE, FALSE, TRUE);
+  glfRenderFont(o.d1shn.x, o.d1shn.y, 0.0, o.d1shn.w, o.d1shn.h, 
+                glfFontFixed, 
+                hudData.sh.str, hudData.sh.color, 
+                NULL, 
+                GLF_FONT_F_SCALEX | GLF_FONT_F_ORTHO);
 
   /* shield charging status */
   if (!SSHUP(snum) || SREPAIR(snum))
@@ -936,61 +939,66 @@ void renderHud(int dostats)
               0, 100, hudData.dam.damage, hudData.dam.color);
 
   /* damage num */
-  glfRender(o.d1damn.x, o.d1damn.y, 0.0, o.d1damn.w, o.d1damn.h, 
-            fontFixedTxf, 
-            hudData.dam.str, hudData.dam.color, 
-            NULL, TRUE, FALSE, TRUE);
+  glfRenderFont(o.d1damn.x, o.d1damn.y, 0.0, o.d1damn.w, o.d1damn.h, 
+                glfFontFixed, 
+                hudData.dam.str, hudData.dam.color, 
+                NULL, 
+                GLF_FONT_F_SCALEX | GLF_FONT_F_ORTHO);
 
   /* fuel guage */
   renderScale(o.d2fuelg.x, o.d2fuelg.y, o.d2fuelg.w, o.d2fuelg.h,
               0, 999, hudData.fuel.fuel, hudData.fuel.color);
   
   /* fuel value */
-  glfRender(o.d2fueln.x, o.d2fueln.y, 0.0, o.d2fueln.w, o.d2fueln.h, 
-            fontFixedTxf, 
-            hudData.fuel.str, hudData.fuel.color, 
-            NULL, TRUE, FALSE, TRUE);
+  glfRenderFont(o.d2fueln.x, o.d2fueln.y, 0.0, o.d2fueln.w, o.d2fueln.h, 
+                glfFontFixed, 
+                hudData.fuel.str, hudData.fuel.color, 
+                NULL, 
+                GLF_FONT_F_SCALEX | GLF_FONT_F_ORTHO);
 
   /* etemp guage */
   renderScale(o.d2engtg.x, o.d2engtg.y, o.d2engtg.w, o.d2engtg.h,
               0, 100, hudData.etemp.temp, hudData.etemp.color);
 
   /* etemp value */
-  glfRender(o.d2engtn.x, o.d2engtn.y, 0.0, o.d2engtn.w, o.d2engtn.h, 
-            fontFixedTxf, 
-            hudData.etemp.str, hudData.etemp.color, 
-            NULL, TRUE, FALSE, TRUE);
+  glfRenderFont(o.d2engtn.x, o.d2engtn.y, 0.0, o.d2engtn.w, o.d2engtn.h, 
+                glfFontFixed, 
+                hudData.etemp.str, hudData.etemp.color, 
+                NULL, 
+                GLF_FONT_F_SCALEX | GLF_FONT_F_ORTHO);
 
   /* wtemp gauge */
   renderScale(o.d2weptg.x, o.d2weptg.y, o.d2weptg.w, o.d2weptg.h,
               0, 100, hudData.wtemp.temp, hudData.wtemp.color);
 
   /* wtemp value*/
-  glfRender(o.d2weptn.x, o.d2weptn.y, 0.0, o.d2weptn.w, o.d2weptn.h, 
-            fontFixedTxf, 
-            hudData.wtemp.str, hudData.wtemp.color, 
-            NULL, TRUE, FALSE, TRUE);
+  glfRenderFont(o.d2weptn.x, o.d2weptn.y, 0.0, o.d2weptn.w, o.d2weptn.h, 
+                glfFontFixed, 
+                hudData.wtemp.str, hudData.wtemp.color, 
+                NULL, 
+                GLF_FONT_F_SCALEX | GLF_FONT_F_ORTHO);
 
   /* alloc */
   renderAlloc(o.d2allocg.x, o.d2allocg.y, o.d2allocg.w, o.d2allocg.h,
               &hudData.alloc);
   
   /* alloc value */
-  glfRender(o.d2allocn.x, o.d2allocn.y, 0.0, o.d2allocn.w, o.d2allocn.h, 
-            fontFixedTxf, hudData.alloc.str, hudData.alloc.color, 
-            NULL, TRUE, FALSE, TRUE);
+  glfRenderFont(o.d2allocn.x, o.d2allocn.y, 0.0, o.d2allocn.w, o.d2allocn.h, 
+                glfFontFixed, hudData.alloc.str, hudData.alloc.color, 
+                NULL, 
+                GLF_FONT_F_SCALEX | GLF_FONT_F_ORTHO);
   
   /* BEGIN "stat" box -
      kills, towing/towed by, x armies, CLOAKED/destruct */
 
   /* kills */
 
-  glfRender(o.d2killb.x, o.d2killb.y, 0.0, 
-            o.d2killb.w, 
-            o.d2killb.h, fontFixedTxf, 
-            hudData.kills.str, 
-            hudData.kills.color, NULL,
-            TRUE, TRUE, TRUE);
+  glfRenderFont(o.d2killb.x, o.d2killb.y, 0.0, 
+                o.d2killb.w, 
+                o.d2killb.h, glfFontFixed, 
+                hudData.kills.str, 
+                hudData.kills.color, NULL,
+                GLF_FONT_F_SCALEX | GLF_FONT_F_ORTHO);
 
   magFac = (!SMAP(snum)) ? ncpSRMagFactor : ncpLRMagFactor;
   /* towed-towing/armies/destruct/alert - blended text displayed in viewer */
@@ -1003,41 +1011,45 @@ void renderHud(int dostats)
       glEnable(GL_BLEND);
       
       if (hudData.tow.towstat)
-        glfRender(o.tow.x, o.tow.y, 0.0, 
-                  o.tow.w, o.tow.h, 
-                  fontFixedTxf, hudData.tow.str, 
-                  hudData.tow.color | 0x50000000, 
-                  NULL, TRUE, FALSE, TRUE);
+        glfRenderFont(o.tow.x, o.tow.y, 0.0, 
+                      o.tow.w, o.tow.h, 
+                      glfFontFixed, hudData.tow.str, 
+                      hudData.tow.color | 0x50000000, 
+                      NULL, 
+                      GLF_FONT_F_SCALEX | GLF_FONT_F_ORTHO);
       
       /* army count or robot action - we position the robot action
        *  at the same location as the army count...
        */
       if (SROBOT(snum))
-        glfRender(o.arm.x, o.arm.y, 0.0, 
-                  o.arm.w, o.arm.h, 
-                  fontFixedTxf, 
-                  hudData.raction.str, 
-                  hudData.raction.color | 0x50000000, 
-                  NULL, TRUE, FALSE, TRUE);
+        glfRenderFont(o.arm.x, o.arm.y, 0.0, 
+                      o.arm.w, o.arm.h, 
+                      glfFontFixed, 
+                      hudData.raction.str, 
+                      hudData.raction.color | 0x50000000, 
+                      NULL, 
+                      GLF_FONT_F_SCALEX | GLF_FONT_F_ORTHO);
       else if (hudData.armies.armies)
-        glfRender(o.arm.x, o.arm.y, 0.0, 
-                  o.arm.w, o.arm.h, 
-                  fontFixedTxf, 
-                  hudData.armies.str, 
-                  hudData.armies.color | 0x50000000, 
-                  NULL, TRUE, FALSE, TRUE);
+        glfRenderFont(o.arm.x, o.arm.y, 0.0, 
+                      o.arm.w, o.arm.h, 
+                      glfFontFixed, 
+                      hudData.armies.str, 
+                      hudData.armies.color | 0x50000000, 
+                      NULL, 
+                      GLF_FONT_F_SCALEX | GLF_FONT_F_ORTHO);
         
       /* Destruct msg, centered in the viewer */
       if (hudData.destruct.fuse) /* destructing */
         {
-          glfRender(o.destruct.x, o.destruct.y, 0.0, 
-                    o.destruct.w, o.destruct.h, 
-                    fontMsgTxf, 
-                    hudData.destruct.str, 
-                    (GL_BLINK_ONESEC) ? 
-                    hudData.destruct.color | CQC_A_BOLD | 0x50000000: 
-                    (hudData.destruct.color | 0x50000000) & ~CQC_A_BOLD, 
-                    NULL, TRUE, FALSE, TRUE);
+          glfRenderFont(o.destruct.x, o.destruct.y, 0.0, 
+                        o.destruct.w, o.destruct.h, 
+                        glfFontMsg, 
+                        hudData.destruct.str, 
+                        (GL_BLINK_ONESEC) ? 
+                        hudData.destruct.color | CQC_A_BOLD | 0x50000000: 
+                        (hudData.destruct.color | 0x50000000) & ~CQC_A_BOLD, 
+                        NULL, 
+                        GLF_FONT_F_SCALEX | GLF_FONT_F_ORTHO);
         }
 
       /* alert target */
@@ -1055,10 +1067,11 @@ void renderHud(int dostats)
               break;
             }
           
-          glfRender(o.d1atarg.x, o.d1atarg.y, 0.0, 
-                    o.d1atarg.w, o.d1atarg.h, 
-                    fontLargeTxf, hudData.aStat.str, 
-                    icl | 0x50000000, NULL, TRUE, FALSE, TRUE);
+          glfRenderFont(o.d1atarg.x, o.d1atarg.y, 0.0, 
+                        o.d1atarg.w, o.d1atarg.h, 
+                        glfFontLarge, hudData.aStat.str, 
+                        icl | 0x50000000, NULL, 
+                        GLF_FONT_F_SCALEX | GLF_FONT_F_ORTHO);
         }
 
       /* magnification factor */
@@ -1069,11 +1082,12 @@ void renderHud(int dostats)
           else 
             sprintf(sbuf, "MAG %1d", magFac);
           
-          glfRender(o.magfac.x, o.magfac.y, 0.0,
-                    o.magfac.w, o.magfac.h,
-                    fontFixedTxf, sbuf,
-                    SpecialColor | 0x50000000,
-                    NULL, TRUE, FALSE, TRUE);
+          glfRenderFont(o.magfac.x, o.magfac.y, 0.0,
+                        o.magfac.w, o.magfac.h,
+                        glfFontFixed, sbuf,
+                        SpecialColor | 0x50000000,
+                        NULL, 
+                        GLF_FONT_F_SCALEX | GLF_FONT_F_ORTHO);
         }
 
       glDisable(GL_BLEND);
@@ -1101,7 +1115,7 @@ void renderHud(int dostats)
           if (ack_alert == ALERT_OFF) /* was off */
             {
               ack_alert = ALERT_ON;
-              cqsEffectPlayTracked(teamEffects[Ships[snum].team].alert,
+              cqsEffectPlayTracked(cqsTeamEffects[Ships[snum].team].alert,
                                    &alertHandle, 0.0, 0.0, 0.0);
             }
           else if (ack_alert == ALERT_ON) /* was on - turned off */
@@ -1228,17 +1242,19 @@ void renderHud(int dostats)
   
   /* cloaked or repairing icon indicators */
   if (SCLOAKED(snum)) 
-    glfRender(o.d1icon_clo.x, o.d1icon_clo.y, 
-              0.0, 
-              o.d1icon_clo.w, o.d1icon_clo.h,
-              fontFixedTxf, "CLOAKED", MagentaColor | CQC_A_BOLD, 
-              NULL, TRUE, FALSE, TRUE);
+    glfRenderFont(o.d1icon_clo.x, o.d1icon_clo.y, 
+                  0.0, 
+                  o.d1icon_clo.w, o.d1icon_clo.h,
+                  glfFontFixed, "CLOAKED", MagentaColor | CQC_A_BOLD, 
+                  NULL, 
+                  GLF_FONT_F_SCALEX | GLF_FONT_F_ORTHO);
   else if (SREPAIR(snum)) 
-      glfRender(o.d1icon_rep.x, o.d1icon_rep.y, 
-                0.0, 
-                o.d1icon_rep.w, o.d1icon_rep.h,
-                fontFixedTxf, "REPAIRING", CyanColor | CQC_A_BOLD, 
-                NULL, TRUE, FALSE, TRUE);
+      glfRenderFont(o.d1icon_rep.x, o.d1icon_rep.y, 
+                    0.0, 
+                    o.d1icon_rep.w, o.d1icon_rep.h,
+                    glfFontFixed, "REPAIRING", CyanColor | CQC_A_BOLD, 
+                    NULL, 
+                    GLF_FONT_F_SCALEX | GLF_FONT_F_ORTHO);
 
   /* last firing angle, target angle and distance icon indicators */
 
@@ -1251,19 +1267,21 @@ void renderHud(int dostats)
   if (UserConf.hudInfo)
     {
       /* render fa */
-      glfRender(o.d1icon_fa.x, o.d1icon_fa.y, 
-                0.0, 
-                o.d1icon_fa.w, o.d1icon_fa.h,
-                fontFixedTxf, hudData.info.lastblaststr, NoColor, 
-                NULL, TRUE, TRUE, TRUE);
+      glfRenderFont(o.d1icon_fa.x, o.d1icon_fa.y, 
+                    0.0, 
+                    o.d1icon_fa.w, o.d1icon_fa.h,
+                    glfFontFixed, hudData.info.lastblaststr, NoColor, 
+                    NULL, 
+                    GLF_FONT_F_SCALEX | GLF_FONT_F_DOCOLOR | GLF_FONT_F_ORTHO);
       
       /* render tad */
       if (hudData.info.lasttadstr[0])
-        glfRender(o.d1icon_tad.x, o.d1icon_tad.y, 
-                  0.0, 
-                  o.d1icon_tad.w, o.d1icon_tad.h,
-                  fontFixedTxf, hudData.info.lasttadstr, NoColor, 
-                  NULL, TRUE, TRUE, TRUE);
+        glfRenderFont(o.d1icon_tad.x, o.d1icon_tad.y, 
+                      0.0, 
+                      o.d1icon_tad.w, o.d1icon_tad.h,
+                      glfFontFixed, hudData.info.lasttadstr, NoColor, 
+                      NULL, 
+                      GLF_FONT_F_SCALEX | GLF_FONT_F_DOCOLOR | GLF_FONT_F_ORTHO);
     }
 
   if ((Context.recmode != RECMODE_PLAYING) &&
@@ -1271,26 +1289,29 @@ void renderHud(int dostats)
     {
       if (dostats)
         {
-          glfRender(o.rectime.x, o.rectime.y, 0.0, 
-                    o.rectime.w, o.rectime.h,
-                    fontFixedTxf, ibuf, NoColor | CQC_A_DIM, 
-                    NULL, TRUE, TRUE, TRUE);
+          glfRenderFont(o.rectime.x, o.rectime.y, 0.0, 
+                        o.rectime.w, o.rectime.h,
+                        glfFontFixed, ibuf, NoColor | CQC_A_DIM, 
+                        NULL, 
+                        GLF_FONT_F_SCALEX | GLF_FONT_F_DOCOLOR | GLF_FONT_F_ORTHO);
         }          
     }
   else
     {
       /* for playback, the ship/item we are watching */
-      glfRender(o.pbitem.x, o.pbitem.y, 
-                0.0, 
-                o.pbitem.w, o.pbitem.h,
-                fontFixedTxf, hudData.recId.str, 
-                MagentaColor | CQC_A_BOLD, 
-                NULL, TRUE, TRUE, TRUE);
+      glfRenderFont(o.pbitem.x, o.pbitem.y, 
+                    0.0, 
+                    o.pbitem.w, o.pbitem.h,
+                    glfFontFixed, hudData.recId.str, 
+                    MagentaColor | CQC_A_BOLD, 
+                    NULL, 
+                    GLF_FONT_F_SCALEX | GLF_FONT_F_DOCOLOR | GLF_FONT_F_ORTHO);
       
-      glfRender(o.rectime.x, o.rectime.y, 0.0, 
-                o.rectime.w, o.rectime.h,
-                fontFixedTxf, hudData.recTime.str, NoColor, 
-                NULL, TRUE, TRUE, TRUE);
+      glfRenderFont(o.rectime.x, o.rectime.y, 0.0, 
+                    o.rectime.w, o.rectime.h,
+                    glfFontFixed, hudData.recTime.str, NoColor, 
+                    NULL, 
+                    GLF_FONT_F_SCALEX | GLF_FONT_F_DOCOLOR | GLF_FONT_F_ORTHO);
     }
 
 
@@ -1298,24 +1319,27 @@ void renderHud(int dostats)
 
   /* MSG_LIN1 */
   if (hudData.p1.str[0])
-    glfRender(o.msg1.x, o.msg1.y, 0.0, 
-              o.msg1.w, o.msg1.h,
-              fontFixedTxf, hudData.p1.str, InfoColor, 
-              NULL, TRUE, TRUE, TRUE);
+    glfRenderFont(o.msg1.x, o.msg1.y, 0.0, 
+                  o.msg1.w, o.msg1.h,
+                  glfFontFixed, hudData.p1.str, InfoColor, 
+                  NULL, 
+                  GLF_FONT_F_SCALEX | GLF_FONT_F_DOCOLOR | GLF_FONT_F_ORTHO);
 
   /* MSG_LIN2 */
   if (hudData.p2.str[0])
-    glfRender(o.msg2.x, o.msg2.y, 0.0,
-              o.msg2.w, o.msg2.h,
-              fontFixedTxf, hudData.p2.str, InfoColor, 
-              NULL, TRUE, TRUE, TRUE);
+    glfRenderFont(o.msg2.x, o.msg2.y, 0.0,
+                  o.msg2.w, o.msg2.h,
+                  glfFontFixed, hudData.p2.str, InfoColor, 
+                  NULL, 
+                  GLF_FONT_F_SCALEX | GLF_FONT_F_DOCOLOR | GLF_FONT_F_ORTHO);
 
   /* MSG_MSG */
   if (hudData.msg.str[0])
-    glfRender(o.msgmsg.x, o.msgmsg.y, 0.0, 
-              o.msgmsg.w, o.msgmsg.h,
-              fontMsgTxf, hudData.msg.str, InfoColor, 
-              NULL, TRUE, TRUE, TRUE);
+    glfRenderFont(o.msgmsg.x, o.msgmsg.y, 0.0, 
+                  o.msgmsg.w, o.msgmsg.h,
+                  glfFontMsg, hudData.msg.str, InfoColor, 
+                  NULL, 
+                  GLF_FONT_F_SCALEX | GLF_FONT_F_DOCOLOR | GLF_FONT_F_ORTHO);
 
   /* critical/overload indicators */
   renderPulseMsgs();
@@ -1341,11 +1365,11 @@ void renderViewer(int dovbg, int dobomb)
 {
   /* setup the proper viewport and projection matrix for the viewer */
   glViewport(dConf.vX, 
-             dConf.vY + (dConf.wH - dConf.vH - (dConf.borderW * 2.0)), 
+             dConf.vY + (dConf.wH - dConf.vH - (dConf.wBorderW * 2.0)), 
              dConf.vW, 
              dConf.vH);
   glMatrixMode(GL_PROJECTION);
-  glLoadMatrixf(dConf.vmat);
+  glLoadMatrixf(dConf.viewerProjection);
   glMatrixMode(GL_MODELVIEW);
   
   drawViewerBG(Context.snum, dovbg);
@@ -1375,7 +1399,7 @@ void renderViewer(int dovbg, int dobomb)
                       &gx, &gy);
 
         //        if (i == (nlines - 1))
-        //          clog("nlines: %d gx = %f gx = %f\n", nlines, gx, gy);
+        //          utLog("nlines: %d gx = %f gx = %f\n", nlines, gx, gy);
         
         glBegin(GL_LINES);
 
@@ -1402,7 +1426,7 @@ void renderViewer(int dovbg, int dobomb)
   /* reset for everything else */
   glViewport(0, 0, dConf.wW, dConf.wH);
   glMatrixMode(GL_PROJECTION);
-  glLoadMatrixf(dConf.hmat);
+  glLoadMatrixf(dConf.hudProjection);
   glMatrixMode(GL_MODELVIEW);
 
   return;

@@ -30,6 +30,7 @@
 #include "nOptions.h"
 #include "cqkeys.h"
 #include "cqsound.h"
+#include "conqutil.h"
 
 static char *if1="Suddenly  a  sinister,  wraithlike  figure appears before you";
 static char *if2="seeming to float in the air.  In a low,  sorrowful  voice  he";
@@ -186,10 +187,10 @@ void nMenuInit(void)
       
       /* now look for our ship packet before we get started.  It should be a
          full SP_SHIP packet for this first time */
-      if (waitForPacket(PKT_FROMSERVER, sockl, SP_SHIP, buf, PKT_MAXSIZE,
+      if (pktWaitForPacket(PKT_FROMSERVER, sockl, SP_SHIP, buf, PKT_MAXSIZE,
                         60, NULL) <= 0)
         {
-          clog("nMenuInit: didn't get initial SP_SHIP");
+          utLog("nMenuInit: didn't get initial SP_SHIP");
           fatal = TRUE;
           return;
         }
@@ -289,7 +290,7 @@ static int nMenuIdle(void)
   spAck_t *sack;
   int sockl[2] = {cInfo.sock, cInfo.usock};
 
-  while ((pkttype = waitForPacket(PKT_FROMSERVER, sockl, PKT_ANYPKT,
+  while ((pkttype = pktWaitForPacket(PKT_FROMSERVER, sockl, PKT_ANYPKT,
                                   buf, PKT_MAXSIZE, 0, NULL)) > 0)
     {                       /* proc packets while we get them */
       switch (pkttype)
@@ -303,7 +304,7 @@ static int nMenuIdle(void)
               return NODE_OK;   /* but not for long... */
             }
           else
-            clog("nMenuIdle: got unexp ack code %d", sack->code);
+            utLog("nMenuIdle: got unexp ack code %d", sack->code);
 
           break;
 
@@ -315,7 +316,7 @@ static int nMenuIdle(void)
 
   if (pkttype < 0)          /* some error */
     {
-      clog("nMenuIdle: waiForPacket returned %d", pkttype);
+      utLog("nMenuIdle: waiForPacket returned %d", pkttype);
       Ships[Context.snum].status = SS_OFF;
       return NODE_EXIT;
     }
@@ -469,7 +470,7 @@ static int nMenuInput(int ch)
              overwritten on the next ship update.  Improves perceived
              response time. */
           Ships[Context.snum].team = 
-            modp1( Ships[Context.snum].team+1, NUMPLAYERTEAMS );
+            utModPlusOne( Ships[Context.snum].team+1, NUMPLAYERTEAMS );
           Ships[Context.snum].shiptype = 
             Teams[Ships[Context.snum].team].shiptype;
           Users[Context.unum].team = Ships[Context.snum].team;

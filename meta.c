@@ -14,10 +14,11 @@
 #include "conf.h"
 #include "meta.h"
 #include "conqcom.h"
+#include "conqutil.h"
 #include "protocol.h"
 
 /* convert any pipe chars in a string to underlines */
-void pipe2ul(char *str)
+static void pipe2ul(char *str)
 {
   char *p;
 
@@ -45,7 +46,7 @@ void pipe2ul(char *str)
  * 14 fields
  *
  */
-int str2srec(metaSRec_t *srec, char *buf)
+int metaBuffer2ServerRec(metaSRec_t *srec, char *buf)
 {
   const int numfields = 14;     /* ver 2 */
   char *tbuf;                   /* copy of buf */
@@ -212,7 +213,7 @@ int str2srec(metaSRec_t *srec, char *buf)
 }
 
 /* returns a string in the same format as above. */
-void srec2str(char *buf, metaSRec_t *srec)
+void metaServerRec2Buffer(char *buf, metaSRec_t *srec)
 {
 
   sprintf(buf, "%u|%s|%d|%s|%s|%s|%d|%d|%d|%d|%u|%u|%s|%s|\n",
@@ -316,11 +317,11 @@ int metaUpdateServer(char *remotehost, char *name, int port)
   strncpy(sRec.walltime, tmbuf, META_GEN_STRSIZE - 1);
 
   /* all loaded up, convert it and send it off */
-  srec2str(msg, &sRec);
+  metaServerRec2Buffer(msg, &sRec);
   
   if ((hp = gethostbyname(remotehost)) == NULL) 
     {
-      clog("metaUpdateServer: %s: no such host", remotehost);
+      utLog("metaUpdateServer: %s: no such host", remotehost);
       return FALSE;
     }
 
@@ -333,13 +334,13 @@ int metaUpdateServer(char *remotehost, char *name, int port)
 
   if ((s = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP )) < 0) 
     {
-      clog("metaUpdateServer: socket failed: %s", strerror(errno));
+      utLog("metaUpdateServer: socket failed: %s", strerror(errno));
       return FALSE;
     }
 
   if (sendto(s, msg, strlen(msg), 0, (const struct sockaddr *)&sa, sizeof(struct sockaddr_in)) < 0)
     {
-      clog("metaUpdateServer: sento failed: %s", strerror(errno));
+      utLog("metaUpdateServer: sento failed: %s", strerror(errno));
       return FALSE;
     }
 
@@ -379,7 +380,7 @@ int metaGetServerList(char *remotehost, metaSRec_t **srvlist)
 
   if ((hp = gethostbyname(remotehost)) == NULL) 
     {
-      clog("metaGetServerList: %s: no such host", remotehost);
+      utLog("metaGetServerList: %s: no such host", remotehost);
       return ERR;
     }
 
@@ -392,14 +393,14 @@ int metaGetServerList(char *remotehost, metaSRec_t **srvlist)
 
   if ((s = socket(AF_INET, SOCK_STREAM, 0 )) < 0) 
     {
-      clog("metaGetServerList: socket failed: %s", strerror(errno));
+      utLog("metaGetServerList: socket failed: %s", strerror(errno));
       return ERR;
     }
 
   /* connect to the remote server */
   if ( connect ( s, (const  struct sockaddr *)&sa, sizeof ( sa ) ) < 0 ) 
     {
-      clog("metaGetServerList: connect failed: %s", strerror(errno));
+      utLog("metaGetServerList: connect failed: %s", strerror(errno));
       return ERR;
   }
 
@@ -418,14 +419,14 @@ int metaGetServerList(char *remotehost, metaSRec_t **srvlist)
           /* convert to a metaSRec_t */
           if (nums < META_MAXSERVERS)
             {
-              if (str2srec(&servers[nums], buf))
+              if (metaBuffer2ServerRec(&servers[nums], buf))
                 nums++;
               else
-                clog("metaGetServerList: str2srec(%s) failed, skipping", buf);
+                utLog("metaGetServerList: metaBuffer2ServerRec(%s) failed, skipping", buf);
             }
           else
             {
-              clog("metaGetServerList: num servers exceeds %d, skipping", 
+              utLog("metaGetServerList: num servers exceeds %d, skipping", 
                    META_MAXSERVERS);
             }
             
