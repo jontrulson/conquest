@@ -70,7 +70,7 @@ void uiPutColor(cqColor color)
   return;
 }
 
-/* initialize color variables.  assumes curses has been initialized. */
+/* initialize color variables. */
 void uiInitColors(void)
 {
   /* nothing to do here - we translate in uiPutColor */

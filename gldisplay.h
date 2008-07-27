@@ -79,13 +79,13 @@ typedef struct _gl_box
  (_rect)->w = CLAMP(1.0, (_w), (_rect)->w);    \
  (_rect)->h = CLAMP(1.0, (_h), (_rect)->h);    \
 }
-void display( int snum, int display_info );
+
+void display( int snum );
 
 int uiCStrlen(char *buf);
-void uiPrintFixed(GLfloat x, GLfloat y, GLfloat w, GLfloat h, char *str);
 int uiGLInit(int *argc, char **argv);
-void uiDrawPlanet( GLfloat x, GLfloat y, int pnum, int scale,
-                   int textcolor, int scanned );
+void drawPlanet( GLfloat x, GLfloat y, int pnum, int scale,
+                   int textcolor );
 real cu2GLSize(real size, int scale);
 
 int GLcvtcoords(real cenx, real ceny, real x, real y, real scale,

@@ -1375,7 +1375,7 @@ void renderViewer(int dovbg, int dobomb)
   drawViewerBG(Context.snum, dovbg);
   drawNEB(Context.snum);
 
-  display( Context.snum, FALSE );
+  display( Context.snum );
 
   /* if we're faking it, (nCP.c), do it */
   if (dobomb)

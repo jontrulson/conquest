@@ -1217,8 +1217,8 @@ void drawBombing(int snum, int scale)
   return;
 }
 
-void uiDrawPlanet( GLfloat x, GLfloat y, int pnum, int scale, 
-                  int textcolor, int scanned )
+void drawPlanet( GLfloat x, GLfloat y, int pnum, int scale, 
+                  int textcolor )
 {
   int what;
   GLfloat size;
@@ -1228,11 +1228,12 @@ void uiDrawPlanet( GLfloat x, GLfloat y, int pnum, int scale,
   int showpnams = UserConf.ShowPlanNames;
   static int norender = FALSE;
   GLfloat scaleFac = (scale == SCALE_FAC) ? dConf.vScaleSR : dConf.vScaleLR;
+
   if (norender)
     return;
 
 #if 0
-  utLog("uiDrawPlanet: pnum = %d, x = %.1f, y = %.1f\n",
+  utLog("drawPlanet: pnum = %d, x = %.1f, y = %.1f\n",
        pnum, x, y);
 #endif
 
@@ -1401,7 +1402,7 @@ int GLcvtcoords(real cenx, real ceny, real x, real y, real scale,
     vscale = magscale;
 
   /* determine number of CU's that could be seen vertically in LR or
-     SR. (no magscale scaling) */
+     SR. (no magfactor scaling) */
   rscale = ((GLfloat)DISPLAY_LINS * ascale / (VIEWANGLE * 2.0));
 
   /* we must always scale the limit, regardless of whether X/Y are
@@ -1925,15 +1926,6 @@ static void renderFrame(void)
 
   return;
 
-}
-
-
-void uiPrintFixed(GLfloat x, GLfloat y, GLfloat w, GLfloat h, char *str)
-{                               /* this works for non-viewer only */
-  glfRenderFont(x, y, 0.0, w, h, glfFontFixed, str, NoColor, NULL, 
-            GLF_FONT_F_SCALEX | GLF_FONT_F_DOCOLOR | GLF_FONT_F_ORTHO);
-
-  return;
 }
 
 void drawTorp(GLfloat x, GLfloat y, char torpchar, int torpcolor, 
@@ -2477,7 +2469,7 @@ void drawDoomsday(GLfloat x, GLfloat y, GLfloat dangle, GLfloat scale)
    'corner' of the barrier for example).
 
    We save alot of cycles by not rendering what we don't need to,
-   unlike the original neb rendering, which was done all the time,
+   unlike the original neb rendering which was done all the time
    regardless of barrier visibility.
 */
 void drawNEB(int snum)
@@ -2577,8 +2569,8 @@ void drawNEB(int snum)
      }  
 
 #if 0                           /* debugging test point (murisak) */
-  uiDrawPlanet( tx, ty, 34, (SMAP(snum) ? MAP_FAC : SCALE_FAC), 
-                             MagentaColor, TRUE);
+   drawPlanet( tx, ty, 34, (SMAP(snum) ? MAP_FAC : SCALE_FAC), 
+               MagentaColor);
 #endif
 
   if (!nebYVisible)
@@ -2612,8 +2604,8 @@ void drawNEB(int snum)
         }
     }
 #if 0                           /* debugging test point (murisak) */
-  uiDrawPlanet( tx, ty, 34, (SMAP(snum) ? MAP_FAC : SCALE_FAC), 
-                             MagentaColor, TRUE);
+  drawPlanet( tx, ty, 34, (SMAP(snum) ? MAP_FAC : SCALE_FAC), 
+              MagentaColor);
 #endif
 
   /* nothing to see here */

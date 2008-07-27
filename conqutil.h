@@ -9,7 +9,7 @@
 #define _CONQUTIL_H
 
 real     utAccurateDist( real curvel, real newvel, real acc );
-int      utSafeCToI(int *num, char *buf, int useless);
+int      utSafeCToI(int *num, char *buf, int offset);
 real     utSubAngle( real a1, real a2);
 real     utAngle( real fromx, real fromy, real tox, real toy );
 void     utAppendInt( int i, char *str );

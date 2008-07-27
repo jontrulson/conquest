@@ -47,10 +47,7 @@ static alertLevel_t AlertLevel = GREEN_ALERT;
 extern real LastPhasDist;	/* defined in conqlb.c */
 
 /*  display - do one update of a ships screen */
-/*  SYNOPSIS */
-/*    int snum, display_info */
-/*    display( snum, display_info ) */
-void display( int snum, int display_info )
+void display( int snum )
 {
   int i, j, minenemy, minsenemy;
   char ch;
@@ -152,22 +149,7 @@ void display( int snum, int display_info )
       if (Planets[i].type == PLANET_SUN)
 	palertcol = YellowLevelColor;
 
-      if ( lsmap )
-	{
-	  /* Strategic map. */
-	  /* Can't see moons. */
-	  if ( Planets[i].type == PLANET_MOON )
-	    continue; 
-
-          uiDrawPlanet(glx, gly, i, scale, palertcol, FALSE);
-        }
-      else
-	{
-	  /* Tactical map. */
-          uiDrawPlanet(glx, gly, i, scale, palertcol, 
-                       ((snum > 0) ? 
-                        Planets[i].scanned[Ships[snum].team] : FALSE));
-	}
+      drawPlanet(glx, gly, i, scale, palertcol);
     }
   
   /* Display the planet eater. */

@@ -22,7 +22,16 @@
 #include "gldisplay.h"
 #include "conf.h"
 
+#include <GL/glut.h>
+#include <GL/gl.h>
+#include <GL/glu.h>
+#include <GL/glx.h>
+
+#include "glmisc.h"
+#include "glfont.h"
+
 static char buf[MID_BUFFER_SIZE];
+
 /* 
  * int lin - line if pertinent
  * int col - column if pertinent
@@ -55,7 +64,14 @@ void cprintf(int lin, int col, int align, char *fmt, ...)
       
       y = dConf.ppRow * (GLfloat)lin;
       w = dConf.ppCol * (GLfloat)l;
-      uiPrintFixed(x + dConf.wBorderW, y + dConf.wBorderW, w, dConf.ppRow, buf);
+
+      glfRenderFont(x + dConf.wBorderW, 
+                    y + dConf.wBorderW, 
+                    0.0, 
+                    w, dConf.ppRow, 
+                    glfFontFixed, buf, 
+                    NoColor, NULL, 
+                    GLF_FONT_F_SCALEX | GLF_FONT_F_DOCOLOR | GLF_FONT_F_ORTHO);
     }
 
   return;
