@@ -37,10 +37,6 @@
 #include <GL/glx.h>
 
 
-
-#define DS_LIVE_STR "DS_LIVE"
-#define DS_OFF_STR  "DS_OFF"
-
 /* Global to this module */
 
 static alertLevel_t AlertLevel = GREEN_ALERT;
