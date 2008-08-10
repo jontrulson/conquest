@@ -9,7 +9,145 @@
 
                               Conquest HISTORY
 
-8.3b (devel) 07/21/2008
+8.4 (stable) 08/09/2008
+
+  - 8.4 stable release.
+
+    Here are the main highlights of this release.  Due to the server
+    and client changes, I would recommend an update to this release,
+    but then, that's just me.
+
+    - server changes:
+
+      - correct some nasty off-by-one's (NUMPLANETS) in
+        serverpkt.c:spktPlanetLoc() and spktPlanetLoc2().  Depending
+        on your environment (OS, compiler, etc) your results could
+        vary.  The typical symptoms would be reports of invalid packet
+        types or sizes in the logs (client and/or server), and usually
+        a rapid ship death with a killed-by of "Nothing in
+        particular".
+
+      - dead rework.  Now when you die in the GL client, you still get
+        to watch the activity going on around your exploded ship.
+ 
+        When you die, you can now press [ESC] to return to the main
+        menu, or [TAB] to re-enter a new ship.
+
+    - conquestgl changes:
+
+      - new star textures
+
+      - add support for mipmapping of textures.  Textures can specify
+        the boolean 'mipmap' in their texture definition to specify
+        that mipmaps should be generated for the texture.  This is now
+        done for stars, planets, ships, and the doomsday machine.
+
+        This improves the quality of these textures significantly when
+        viewed at different sizes (scaling and magfactor).
+
+      - nCP.c (cockpit): Fix case where when bombing or beaming, and a
+        mouse macro is used, the relevant sound effects might not stop
+        and proper state restored.
+
+      - bombing graphics, phasers, and moons are now displayed in LR scan.
+
+      - reworked the 'alt_hud' stuff.  When enabled, this would allow
+        certain information (distance, direction) about a ship or
+        planet that was last (i)nfo'd to be displayed.
+
+        This option is now called hud_info, and is enabled by default.
+
+        For the GL client, this data is displayed below the ship's
+        status icon in the hud.  For the curses client, this
+        information is displayed just below the viewer.
+
+        The alt_hud config option is still present but does nothing.
+        In the future it will be used to enable an experimental
+        cockpit (hud/viewer), if one is ever written.
+
+     - fix bug that prevented you from seeing your own torps on LR scan
+       if you were at war with your team.
+
+     - clients now compute orbital position directly rather than using
+       the server's idea of your ship's position in orbit around a
+       planet.  This provides for much smoother movement when you see
+       ships (including your own) that are in orbit around fast moving
+       objects.
+
+     - rework the handling of the hud and it's associated data.
+
+     - CQI:
+
+       - fixup the CQI parser so that sections can be nested up to a
+         depth of 15.  Get rid of the subsection crap^Wstuff - no
+         longer needed.
+
+       - add ability to inline animdefs directly into an animation.
+  
+       - fix a reduce conflict in 'stmt' grammer
+
+       - improve error handling/recovery during parsing of certain
+         sections.
+
+     - General:
+
+       - massive code cleanup - fixups for newer, stricter compilers.
+         Rename/standardize variables/functions and relocate in
+         appropriate source files and headers.  Clean up some of the
+         internal API's.  Probably every src file was touched in some
+         way :)
+
+       - tcpwrap.c: only log successful connections if verbose/debug is
+         specified.  Only 'access denied' events are always logged.
+
+       - add a '-v' verbose option to the clients.  More '-v's
+         increase verbosity.
+      
+       - fix some stupidness in sem.c.
+
+       - sparc/solaris porting.  conquestgl works with OpenGL and
+         sound if the appropriate requirements are met.
+
+       - rework the way the playback speed and time is displayed in
+         both the curses and GL clients.  Now show the percentage into
+         the recording you are currently viewing, and instead of
+         displaying the internal framedelay, show the 'speed' (1x, 2x,
+         -3x, etc).
+
+       - fix UDP error on Solaris (possibly others).  Use write()
+         rather than sendto() when a UDP connection has already been
+         properly established (EISCONN).
+
+       - fix doomsday motion.  Instead of simply stopping when within
+         range of a locked-on planet or ship, continue to stay in
+         range when possible (ie: should the planet/ship move out of
+         range).
+
+     - New SourceForge project page (Conq):
+
+       https://sourceforge.net/projects/conq/    
+
+       SVN URL's
+
+       - current (possibly unstable) development
+
+         https://conq.svn.sourceforge.net/svnroot/conq/trunk 
+
+       - tagged (official) releases
+
+         https://conq.svn.sourceforge.net/svnroot/conq/tags/
+
+  
+  Here are the details of the changes since 8.3 stable:
+
+  8.3c (devel) 07/22/2008
+
+  - okay, another huge code cleanup, function/variable renaming, API
+    cleaning, crap removing load of good fun.
+
+  - can now see moons on LR scan
+
+  8.3b (devel) 07/21/2008
 
   - rework 'dead' handling.
 
@@ -124,7 +262,7 @@
   - minor code cleanups
 
 
-8.3a (devel) 05/10/2008
+  8.3a (devel) 05/10/2008
 
   - correct some nasty off-by-one's (NUMPLANETS) in
     serverpkt.c:spktPlanetLoc() and spktPlanetLoc2().  Depending on
