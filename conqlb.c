@@ -2899,18 +2899,7 @@ void clbAdjOrbitalPosition(int snum)
 #else
 #define GETTIMEOFDAY(_x) gettimeofday(_x, NULL)
 #endif
-#define ADD_TIME(dest, src1, src2) { \
-  if(((dest).tv_usec = \
-    (src1).tv_usec + (src2).tv_usec) >= 1000000) { \
-    (dest).tv_usec -= 1000000; \
-    (dest).tv_sec = (src1).tv_sec + (src2).tv_sec + 1; \
-  } else { \
-    (dest).tv_sec = (src1).tv_sec + (src2).tv_sec; \
-    if(((dest).tv_sec >= 1) && (((dest).tv_usec <0))) { \
-      (dest).tv_sec --;(dest).tv_usec += 1000000; \
-    } \
-  } \
-}
+
 #define TIMEDELTA(dest, src1, src2) { \
   if(((dest).tv_usec = (src1).tv_usec - (src2).tv_usec) < 0) { \
     (dest).tv_usec += 1000000; \
