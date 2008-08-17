@@ -26,10 +26,6 @@
 #include "nPlanetl.h"
 #include "cqkeys.h"
 
-/* from conquestgl */
-extern Unsgn8 clientFlags; 
-extern int lastServerError;
-
 static int team, snum;
 
 static int PlanetOffset;    /* offset into NUMPLANETS for this page */

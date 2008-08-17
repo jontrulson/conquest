@@ -28,10 +28,6 @@
 #include "nPlayBMenu.h"
 #include "nShipl.h"
 
-/* from conquestgl */
-extern Unsgn8 clientFlags; 
-extern int lastServerError;
-
 static char *hd2="ship  name          pseudonym              kills     type";
 static int fship;
 

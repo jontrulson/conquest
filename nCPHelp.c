@@ -23,10 +23,6 @@
 #include "nDead.h"
 #include "nCPHelp.h"
 
-/* from conquestgl */
-extern Unsgn8 clientFlags;
-extern int lastServerError;
-
 static int nCPHelpDisplay(dspConfig_t *);
 static int nCPHelpIdle(void);
 static int nCPHelpInput(int ch);

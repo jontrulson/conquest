@@ -1387,6 +1387,9 @@ int newship( int unum, int *snum )
   int numavail = 0;
   int numvec = 0;
 
+  /* cleanup any unliving ships - this is the first thing we need to do */
+  clbCheckShips(FALSE);
+
   PVLOCK(&ConqInfo->lockword);
   
   Ships[*snum].status = SS_ENTERING;		/* show intent to fly */

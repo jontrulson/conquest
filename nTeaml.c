@@ -26,10 +26,6 @@
 
 static int team;
 
-/* from conquestgl */
-extern Unsgn8 clientFlags; 
-extern int lastServerError;
-
 static int nTeamlDisplay(dspConfig_t *);
 static int nTeamlIdle(void);
 static int nTeamlInput(int ch);

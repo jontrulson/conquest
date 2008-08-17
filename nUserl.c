@@ -25,10 +25,6 @@
 #include "nUserl.h"
 #include "cqkeys.h"
 
-/* from conquestgl */
-extern Unsgn8 clientFlags; 
-extern int lastServerError;
-
 static int snum, godlike;
 static int uvec[MAXUSERS];
 static int nu;

@@ -76,16 +76,14 @@
 #define S_WARRING      26
 #define S_PSEUDO       27       /* name change */
 #define S_GHOST        28       /* died, but still watching */
+#define S_GHOSTING     29       /* died, in the dead node */
+
 static int state;
 
 #define T_PHASER       0        /* S_TARGET */
 #define T_BURST        1
 #define T_TORP         2
 static int desttarg;
-
-/* from conquestgl */
-extern Unsgn8 clientFlags; 
-extern int lastServerError;
 
 /* timer vars */
 static int entertime;
@@ -2651,7 +2649,6 @@ void nCPInit(int istopnode)
       hudSetInfoTargetDist(0);
     }
 
-
   /* clear the prompt lines */
   hudClearPrompt(MSG_LIN1);
   hudClearPrompt(MSG_LIN2);
@@ -2786,7 +2783,6 @@ static int nCPIdle(void)
 
   if (state == S_DEAD)
     {                           /* die for awhile */
-      clientFlags = 0;
       /* also turns off warp/engine sounds */
       /* nDead will stop all other sound effects for us on exit */
       setWarp(0);
@@ -2854,7 +2850,9 @@ static int nCPIdle(void)
         recGenTorpLoc();
     }
 
-  if (clientFlags & SPCLNTSTAT_FLAG_KILLED)
+  /* if we are a ghost then we already know we are dead. */
+  if ( (clientFlags & SPCLNTSTAT_FLAG_KILLED) &&
+       state != S_GHOST && state != S_GHOSTING ) 
     {                           /* we died.  set the state and deal with
                                    it on the next frame */
       state = S_DEAD;
@@ -2907,7 +2905,7 @@ static int nCPIdle(void)
     }
 
   /* the nDead node will finish up with any further input if we are dead */
-  if (state != S_GHOST)
+  if (state != S_GHOST && state != S_GHOSTING)
     nCPInput(0);                   /* handle any queued chars */
 
   /* check for messages */
@@ -2965,6 +2963,9 @@ static int nCPIdle(void)
       beamHandle = CQS_INVHANDLE;
       bombingHandle = CQS_INVHANDLE;
       alertHandle = CQS_INVHANDLE;
+
+      /* in nDead */
+      state = S_GHOSTING; 
 
       nDeadInit();
     }

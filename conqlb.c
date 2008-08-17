@@ -268,17 +268,29 @@ void clbIKill( int snum, int kb )
   
   if ( ! SROBOT(snum) || Ships[snum].pid != 0 )
     {
-      Ships[snum].status = SS_DEAD;
-      Ships[snum].sdfuse = -TIMEOUT_PLAYER;		/* setup dead timeout timer */
+      /* if the ship was vacant at the time, just turn it off, 
+       * freeing the slot immediately. 
+       */
+      if (SVACANT(snum))
+        {
+          Ships[snum].status = SS_OFF;
+        }
+      else
+        {
+          Ships[snum].status = SS_DEAD;
+          Ships[snum].sdfuse = -TIMEOUT_PLAYER; /* setup dead timeout timer */
+        }
     }
   else
     {
 #if defined(DO_EXPLODING_SHIPS)
       Ships[snum].status = SS_DEAD;
-      Ships[snum].sdfuse = -5;          /* setup dead timeout timer,
-				      for robots, that's 5 seconds, this
-				      gives enough time for detonating torps,
-				      just like regular players */
+
+      /* setup dead timeout timer. For robots, that's 5 seconds - this
+       *  gives enough time for detonating torps, just like regular
+       *  players
+       */
+      Ships[snum].sdfuse = -5;  
 #else
 				/* old behavior */
       Ships[snum].status = SS_OFF;   /* turn robots off */
@@ -1370,8 +1382,16 @@ int clbFindOrbit( int snum, int *pnum )
 int clbFindShip( int *snum )
 {
   int i;
+  int vacantShips[MAXSHIPS];    /* MAXSHIPS is '1' based, use 0 based here */
+  int numvacant;
+
+  /* maybe free up some slots... */
+  clbCheckShips(FALSE);
+
   PVLOCK(&ConqInfo->lockword);
   *snum = -1;
+  numvacant = 0;
+
   for ( i = 1; i <= MAXSHIPS; i = i + 1 )
     {
       /* first, look for reserved ships that have no valid pid */
@@ -1380,27 +1400,54 @@ int clbFindShip( int *snum )
           {
             Ships[i].status = SS_OFF; /* no-one there, turn it off */
             utLog("INFO: clbFindShip(): turned off reserved ship %d\n",
-                 i);
+                  i);
           }
+
+      /* if it's vacant, save it for later */
+      if (Ships[i].status == SS_LIVE && SVACANT(i))
+        vacantShips[numvacant++] = i;
 
       /* if it's off, grab it */
       if ( Ships[i].status == SS_OFF )
         {
           *snum = i;
-          clbZeroShip( *snum );
-          Ships[*snum].status = SS_RESERVED;
-          Ships[*snum].lastmsg = LMSG_NEEDINIT;
-          Ships[*snum].sdfuse = -TIMEOUT_PLAYER;
-          Ships[*snum].ctime = 0;
-          Ships[*snum].etime = 0;
-          Ships[*snum].cacc = 0;
-          Ships[*snum].eacc = 0;
           break;
         }
     }
+
+  if (*snum == -1)
+    {
+      /* we didn't find one.  If there were vacant ships, pick one and
+       *  steal it. 
+       */
+      if (numvacant)
+        {
+          if (numvacant == 1)
+            *snum = vacantShips[0];
+          else
+            *snum = vacantShips[rndint(0, numvacant - 1)];
+
+          utLog("INFO: clbFindShip: stealing vacant ship %d", *snum);
+          clbIKill( *snum,  KB_GOD );
+        }
+    }
+
+  if (*snum != -1)
+    {
+      /* we found one, so complete the takeover */
+      clbZeroShip( *snum );
+      Ships[*snum].status = SS_RESERVED;
+      Ships[*snum].lastmsg = LMSG_NEEDINIT;
+      Ships[*snum].sdfuse = -TIMEOUT_PLAYER;
+      Ships[*snum].ctime = 0;
+      Ships[*snum].etime = 0;
+      Ships[*snum].cacc = 0;
+      Ships[*snum].eacc = 0;
+    }
+
   PVUNLOCK(&ConqInfo->lockword);
   
-  return ( *snum != -1 );
+  return ( (*snum != -1) ? TRUE : FALSE );
   
 }
 
@@ -1870,14 +1917,17 @@ void clbInitShip( int snum, int unum )
 {
   int i, j;
   
-  /* sstatus(snum)				# never modified here */
+  /* Ships[snum].status                 # never modified here */
   Ships[snum].killedby = 0;
-  /* suser(snum)				# setup in menu() or newrob() */
-  /* steam(snum)				# setup in menu() or newrob() */
-  /* spid(snum)				# setup in menu() or newrob() */
-  /* shiptype - setup in newship and newrob */
-  Ships[snum].strkills = 0.0;	/* init to 0.0, newrob will init this
-				   for robots to make them stronger, faster.. ;-) */
+  /* Ships[snum].user                   # setup in menu() or newrob() */
+  /* Ships[snum].team                   # setup in menu() or newrob() */
+  /* Ships[snum].pid                    # setup in menu() or newrob() */
+  /* Ships[snum].shiptype               # setup in newship and newrob */
+
+  /* init to 0.0, newrob will init this for robots to make them
+   *   stronger, faster.. ;-) 
+   */
+  Ships[snum].strkills = 0.0;	
   Ships[snum].x = 0.0;
   Ships[snum].y = 0.0;
   Ships[snum].dx = 0.0;
@@ -1887,7 +1937,6 @@ void clbInitShip( int snum, int unum )
   Ships[snum].warp = 0.0;
   Ships[snum].dwarp = 0.0;
   Ships[snum].lock = 0;
-  SFSET(snum, SHIP_F_SHUP);
   Ships[snum].shields = 100.0;
   Ships[snum].kills = 0.0;
   Ships[snum].damage = 0.0;
@@ -1899,18 +1948,16 @@ void clbInitShip( int snum, int unum )
   Ships[snum].weapalloc = 40;
   Ships[snum].engalloc = 100 - Ships[snum].weapalloc;
   Ships[snum].armies = 0;
-  SFCLR(snum, SHIP_F_REPAIR);
-  SFCLR(snum, SHIP_F_CLOAKED);
-  /* soption(snum,i)				# setup in menu() */
+  /* Ships[snum].option                 # setup in menu() */
   for ( i = 0; i < NUMPLAYERTEAMS; i = i + 1 )
     {
-      /* srwar(snum,i)				# setup in menu() or newrob() */
-      /* swar(snum,i)				# setup in menu() or newrob() */
+      /* Ships[snum].rwar               # setup in menu() or newrob() */
+      /* Ships[snum].war                # setup in menu() or newrob() */
       Ships[snum].scanned[i] = 0;
     }
   for ( i = 1; i <= NUMPLANETS; i = i + 1 )
     Ships[snum].srpwar[i] = FALSE;
-  /* ssdfuse(snum)				# setup in clbFindShip() */
+  /* Ships[snum].sdfuse                 # setup in clbFindShip() */
   PVLOCK(&ConqInfo->lockmesg);
   if ( Ships[snum].lastmsg == LMSG_NEEDINIT )
     {
@@ -1918,16 +1965,17 @@ void clbInitShip( int snum, int unum )
       Ships[snum].alastmsg = Ships[snum].lastmsg;
     }
   PVUNLOCK(&ConqInfo->lockmesg);
-  SFCLR(snum, SHIP_F_MAP);
   Ships[snum].towing = 0;
   Ships[snum].towedby = 0;
   Ships[snum].lastblast = 0.0;
   Ships[snum].lastphase = 0.0;
   Ships[snum].pfuse = 0;
-  SFCLR(snum, SHIP_F_TALERT);
-  SFCLR(snum, SHIP_F_ROBOT);
   Ships[snum].action = 0;
-  /* spname(1,snum)				# setup in menu() or newrob() */
+
+  Ships[snum].flags = SHIP_F_NONE;
+  SFSET(snum, SHIP_F_SHUP);
+
+  /* Ships[snum].alias                  # setup in menu() or newrob() */
   
   /* Zero torpedos. */
   for ( i = 0; i < MAXTORPS; i = i + 1 )
@@ -1944,12 +1992,13 @@ void clbInitShip( int snum, int unum )
     }
   
   /* Update user some stats. */
-  Users[unum].lastentry = getnow(NULL, 0);/* time stamp for this entry */
+
+  /* time stamp for this entry */
+  Users[unum].lastentry = getnow(NULL, 0);
 
   Users[unum].stats[USTAT_ENTRIES] += 1;
   Teams[Ships[snum].team].stats[TSTAT_ENTRIES] += 1;
 
-  Ships[snum].flags = SHIP_F_NONE;
   return;
   
 }
@@ -2637,7 +2686,6 @@ void clbZeroShip( int snum )
   Ships[snum].warp = 0.0;
   Ships[snum].dwarp = 0.0;
   Ships[snum].lock = 0;
-  SFSET(snum, SHIP_F_SHUP);
   Ships[snum].shields = 0.0;
   Ships[snum].kills = 0.0;
   Ships[snum].damage = 0.0;
@@ -2649,8 +2697,6 @@ void clbZeroShip( int snum )
   Ships[snum].weapalloc = 0;
   Ships[snum].engalloc = 0;
   Ships[snum].armies = 0;
-  SFCLR(snum, SHIP_F_REPAIR);
-  SFCLR(snum, SHIP_F_CLOAKED);
   Ships[snum].shiptype = ST_SCOUT;
   for ( i = 0; i < NUMPLAYERTEAMS; i = i + 1 )
     {
@@ -2663,14 +2709,11 @@ void clbZeroShip( int snum )
   Ships[snum].sdfuse = 0;
   Ships[snum].lastmsg = 0;
   Ships[snum].alastmsg = 0;
-  SFCLR(snum, SHIP_F_MAP);
   Ships[snum].towing = 0;
   Ships[snum].towedby = 0;
   Ships[snum].lastblast = 0.0;
   Ships[snum].lastphase = 0.0;
   Ships[snum].pfuse = 0;
-  SFCLR(snum, SHIP_F_TALERT);
-  SFCLR(snum, SHIP_F_ROBOT);
   Ships[snum].action = 0;
   for ( i = 0; i < MAXUSERPNAME; i = i + 1 )
     Ships[snum].alias[i] = EOS;
@@ -2679,6 +2722,9 @@ void clbZeroShip( int snum )
   Ships[snum].cacc = 0;
   Ships[snum].eacc = 0;
   
+  Ships[snum].flags = SHIP_F_NONE;
+  SFSET(snum, SHIP_F_SHUP);
+
   for ( i = 0; i < MAXTORPS; i = i + 1 )
     {
       Ships[snum].torps[i].status = TS_OFF;
@@ -2921,6 +2967,50 @@ void clbUnblockAlarm(void)
   sigemptyset(&newmask);
   sigaddset(&newmask, SIGALRM);
   sigprocmask(SIG_UNBLOCK, &newmask, NULL);
+
+  return;
+}
+
+/* may use LOCKING */
+void clbCheckShips(int isDriver)
+{
+  int i;
+
+  /* look for vacant ships that aren't marked vacant */
+  for (i=1; i <= MAXSHIPS; i++)
+    {
+      if (Ships[i].status == SS_LIVE && !SVACANT(i))
+        if (Ships[i].pid > 0 && !checkPID(Ships[i].pid))
+          {
+            utLog("INFO: clbCheckShips(isDriver=%d): marking ship %d as VACANT", 
+                  isDriver, i);
+            SFSET(i, SHIP_F_VACANT);
+          }
+
+      /* if the ship is VACANT, and vacants aren't allowed, kill them. */
+      if (!SysConf.AllowVacant && SVACANT(i) && Ships[i].status == SS_LIVE )
+        {
+          /* when the driver calls this function, and the ship must be
+           *  killed, then we'll do it 'normally' so players can know
+           *  about it.  Otherwise just turn it off.
+           */
+          if (isDriver)
+            {
+              utLog("INFO: clbCheckShips(isDriver=%d): killing VACANT ship %d", 
+                    isDriver, i);
+              clbKillShip( i, KB_LIGHTNING );
+            }
+          else
+            {
+              /* just turn it off and log it */
+              utLog("INFO: clbCheckShips(isDriver=%d): turning off VACANT ship %d", 
+                    isDriver, i);
+              PVLOCK(&ConqInfo->lockword);
+              Ships[i].status = SS_OFF;
+              PVUNLOCK(&ConqInfo->lockword);
+            }
+        }
+    }
 
   return;
 }

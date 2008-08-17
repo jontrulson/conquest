@@ -22,10 +22,6 @@
 #include "nDead.h"
 #include "nHistl.h"
 
-/* from conquestgl */
-extern Unsgn8 clientFlags; 
-extern int lastServerError;
-
 static int nHistlDisplay(dspConfig_t *);
 static int nHistlIdle(void);
 static int nHistlInput(int ch);

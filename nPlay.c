@@ -32,7 +32,7 @@
 
 static int state;
 static int fatal = FALSE;
-static spAck_t *sack = NULL;
+static spAck_t sack = {};
 static spClientStat_t scstat = {};
 static int shipinited = FALSE;   /* whether we've done _newship() yet */
 static int owned[NUMPLAYERTEAMS]; 
@@ -116,7 +116,8 @@ static int _newship( int unum, int *snum )
 	  break;
 	  
 	case SP_ACK:		/* bummer */
-	  sack = (spAck_t *)buf;
+          /* copy it */
+	  sack = *((spAck_t *)buf);
           state = S_NSERR;
 	  
 	  return FALSE;		/* always a failure */
@@ -203,37 +204,39 @@ static int nPlayDisplay(dspConfig_t *dsp)
     }
   else if (state == S_NSERR)
     {
-      if (sack)
+      switch (sack.code)
         {
-          switch (sack->code)
-            {
-            case PERR_FLYING:
-              sprintf(cbuf, "You're already playing on another ship.");
-              cprintf(5,0,ALIGN_CENTER,"#%d#%s",InfoColor, cbuf);
-              Ships[Context.snum].status = SS_RESERVED;
-              break;
-              
-            case PERR_TOOMANYSHIPS:
-              i = MSG_LIN2/2;
-              cprintf(i, 0, ALIGN_CENTER, 
-                      "I'm sorry, but you're playing on too many ships right now.");
-              i = i + 1;
-              c_strcpy( "You are only allowed to fly ", cbuf );
-              j = Users[Context.unum].multiple;
-              utAppendInt( j, cbuf );
-              appstr( " ship", cbuf );
-              if ( j != 1 )
-                appchr( 's', cbuf );
-              appstr( " at one time.", cbuf );
-              cprintf(i, 0, ALIGN_CENTER, cbuf);
-              break;
-              
-            default:
-              utLog("nPlayDisplay: _newship: unexpected ack code %d",
-                   sack->code);
-              break;
-            }
+        case PERR_FLYING:
+          sprintf(cbuf, "You're already playing on another ship.");
+          cprintf(5,0,ALIGN_CENTER,"#%d#%s",InfoColor, cbuf);
+          Ships[Context.snum].status = SS_RESERVED;
+          break;
+          
+        case PERR_TOOMANYSHIPS:
+          i = MSG_LIN2/2;
+          cprintf(i, 0, ALIGN_CENTER, 
+                  "I'm sorry, but you're playing on too many ships right now.");
+          i = i + 1;
+          c_strcpy( "You are only allowed to fly ", cbuf );
+          j = Users[Context.unum].multiple;
+          utAppendInt( j, cbuf );
+          appstr( " ship", cbuf );
+          if ( j != 1 )
+            appchr( 's', cbuf );
+          appstr( " at one time.", cbuf );
+          cprintf(i, 0, ALIGN_CENTER, cbuf);
+          break;
+          
+        default:
+          cprintf(5,0,ALIGN_CENTER,
+                  "#%d#nPlay: _newship: unexpected server ack, code %d",
+                  InfoColor, sack.code);
+          utLog("nPlay: _newship: unexpected server ack, code %d",
+                sack.code);
+          break;
         }
+      /* Press any key... */
+      cprintf(MSG_LIN2, 0, ALIGN_CENTER, MTXT_DONE);
     }
 
 

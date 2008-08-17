@@ -27,8 +27,6 @@
 #include "cqsound.h"
 #include "glmisc.h"
 
-extern Unsgn8 clientFlags;      /* conquestgl.c */
-
 static int snum;
 static int kb;                  /* killed by... */
 string ywkb="You were killed by ";
@@ -50,9 +48,9 @@ static int nDeadInput(int ch);
 static scrNode_t nDeadNode = {
   nDeadDisplay,               /* display */
   nDeadIdle,                  /* idle */
-  nDeadInput,                  /* input */
-  NULL,                         /* minput */
-  NULL                          /* animQue */
+  nDeadInput,                 /* input */
+  NULL,                       /* minput */
+  NULL                        /* animQue */
 };
 
 
@@ -72,6 +70,8 @@ void nDeadInit(void)
 
   if (kb >= 1 && kb <= MAXSHIPS)
     eShip = Ships[kb];        /* get copy of killers ship */
+  else
+    memset((void *)&eShip, 0, sizeof(Ship_t));
 
   if (clientFlags & SPCLNTSTAT_FLAG_CONQUER)
     {

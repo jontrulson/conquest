@@ -81,6 +81,7 @@ void     clbAdjOrbitalPosition(int snum);
 Unsgn32  clbGetMillis(void);
 void     clbBlockAlarm(void);
 void     clbUnblockAlarm(void);
+void     clbCheckShips(int isDriver);
 
 
 #endif /* _CONQLB_H */

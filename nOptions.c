@@ -27,10 +27,6 @@
 #include "cqkeys.h"
 #include "cqsound.h"
 
-/* from conquestgl */
-extern Unsgn8 clientFlags;
-extern int lastServerError;
-
 static int retnode;             /* node to return to */
 static int uopts = FALSE;       /* are we doing user opts? */
 

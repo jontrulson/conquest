@@ -869,17 +869,8 @@ void mindrive(void)
 	Teams[i].couptime = Teams[i].couptime - 1;
     }
 
-  /* look for vacant ships that aren't marked vacant */
-  for (i=1; i <= MAXSHIPS; i++)
-    {
-      if (Ships[i].status == SS_LIVE && !SVACANT(i))
-        if (Ships[i].pid > 0 && !checkPID(Ships[i].pid))
-          SFSET(i, SHIP_F_VACANT);
-
-      /* if the ship is VACANT, and vacants aren't allowed, kill them. */
-      if (!SysConf.AllowVacant && SVACANT(i))
-        clbKillShip( i, KB_LIGHTNING );
-    }
+  /* cleanup any unliving ships */
+  clbCheckShips(TRUE);
 
   for ( i = 1; i <= NUMPLANETS; i = i + 1 )
     {

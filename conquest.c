@@ -3342,7 +3342,7 @@ int welcome( int *unum )
   char * starship_str=" starship.";
   char * prepare_str="Prepare to be beamed aboard...";
   spClientStat_t *scstat = NULL;
-  spAck_t *sack = NULL;
+  spAck_t sack = {};
   int pkttype;
   char buf[PKT_MAXSIZE];
   int sockl[2] = {cInfo.sock, cInfo.usock};
@@ -3384,7 +3384,8 @@ int welcome( int *unum )
 
           break;
         case SP_ACK:
-          sack = (spAck_t *)buf;
+          /* copy it */
+          sack = *((spAck_t *)buf);
           done = TRUE;
           break;
         default:
@@ -3438,7 +3439,7 @@ int welcome( int *unum )
 
   if (pkttype == SP_ACK)	/* some problem was detected */
     {
-      switch (sack->code)
+      switch (sack.code)
 	{
 	case PERR_CLOSED:
 	  cdclear();
@@ -3476,7 +3477,7 @@ int welcome( int *unum )
 	  break;
 
 	default:
-	  utLog("welcome: unexpected ACK code %d\n", sack->code);
+	  utLog("welcome: unexpected ACK code %d\n", sack.code);
 	  return FALSE;
 	  break;
 
