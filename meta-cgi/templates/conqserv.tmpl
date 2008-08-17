@@ -1,0 +1,68 @@
+<HTML>
+
+<head>
+   <title>Active Conquest Servers</title>
+   <META NAME="GENERATOR" CONTENT="emacs (X11; I; Linux) [Emacs]">
+   <meta name="description" content="Conquest is a real-time, curses based, multi-player space warfare game">
+   <meta name="keywords" content="conquest game vax vms telnet vt100 terminal space war real-time multi-player multiplayer warfare free unix c unixware linux freebsd solaris fortran ratfor OpenGL X11 cygwin windows">
+   <meta name="Author" content="jon@radscan.com">
+   <meta name="VersionId" content="$Id: conqserv.tmpl,v 1.5 2005/07/03 22:35:45 jon Exp $">
+   <LINK REL="SHORTCUT ICON" HREF="/conqicon.ico">
+
+</head>
+
+<BODY BGCOLOR="#000000" TEXT="skyblue">
+
+<p align=center>
+<A HREF="/conquest.html"><IMG SRC="/conquest/conqlogo.gif" border=NO align=middle ALT="[Conquest Logo Image]"></a>
+</p>
+
+<p align=center>
+<b><big><FONT COLOR="#3366DE">Active Conquest Servers</FONT></big></b></p>
+
+<table cellpadding="2" cellspacing="2" border="1" width="100%">
+  <tbody>
+    <tr>
+      <th valign="top"><FONT COLOR="cyan">Server</FONT><br>
+      </th>
+      <th valign="top"><FONT COLOR="cyan">Name</FONT><br>
+      </th>
+      <th valign="top"><FONT COLOR="cyan">Status</FONT><br>
+      </th>
+      <th valign="top"><FONT COLOR="cyan">MOTD</FONT><br>
+      </th>
+      <th valign="top"><FONT COLOR="cyan">Flags</FONT><br>
+      </th>
+      <th valign="top"><FONT COLOR="cyan">Version</FONT><br>
+      </th>
+      <th valign="top"><FONT COLOR="cyan">Contact</FONT><br>
+      </th>
+      <th valign="top"><FONT COLOR="cyan">LocalTime</FONT><br>
+      </th>
+    </tr>
+   <TMPL_LOOP NAME="srvlist">
+    <tr>
+      <td valign="top"><FONT COLOR="red"><b><TMPL_VAR NAME="server"></b></FONT><br>
+      </td>
+      <td valign="top"><FONT COLOR="white"><TMPL_VAR NAME="name"></FONT><br>
+      </td>
+      <td valign="top"><TMPL_VAR NAME="status"><br>
+      </td>
+      <td valign="top"><FONT COLOR="#00FF00"><TMPL_VAR NAME="motd"></FONT><br>
+      </td>
+      <td valign="top"><TMPL_VAR NAME="flags"><br>
+      </td>
+      <td valign="top"><TMPL_VAR NAME="vers"><br>
+      </td>
+      <td valign="top"><TMPL_VAR NAME="contact"><br>
+      </td>
+      <td valign="top"><TMPL_VAR NAME="ltime"><br>
+      </td>
+    </tr>
+   </TMPL_LOOP>
+  </tbody>
+</table>
+<br>
+
+</body>
+</html>
