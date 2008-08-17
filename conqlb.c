@@ -2998,7 +2998,7 @@ void clbCheckShips(int isDriver)
             {
               utLog("INFO: clbCheckShips(isDriver=%d): killing VACANT ship %d", 
                     isDriver, i);
-              clbKillShip( i, KB_LIGHTNING );
+              clbKillShip( i, KB_GOD );
             }
           else
             {
@@ -3006,7 +3006,8 @@ void clbCheckShips(int isDriver)
               utLog("INFO: clbCheckShips(isDriver=%d): turning off VACANT ship %d", 
                     isDriver, i);
               PVLOCK(&ConqInfo->lockword);
-              Ships[i].status = SS_OFF;
+              clbIKill( i,  KB_GOD );
+              clbZeroShip( i );
               PVUNLOCK(&ConqInfo->lockword);
             }
         }
