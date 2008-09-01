@@ -8,7 +8,7 @@
 #ifndef _DISPLAY_H
 #define _DISPLAY_H
 
-void display( int snum, int display_info );
+void display( int snum );
 void display_headers(int snum);
 void do_bottomborder(int snum, char *buf, int attrib, int bufattrib);
 void do_border(int snum, int attr);

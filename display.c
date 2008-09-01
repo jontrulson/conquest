@@ -154,7 +154,7 @@ void draw_alertborder(int snum, int alert)
 /*  SYNOPSIS */
 /*    int snum, display_info */
 /*    display( snum, display_info ) */
-void display( int snum, int display_info )
+void display( int snum )
 {
   int i, j, k, l, m, idx, lin, col, dcol, datacol, minenemy, minsenemy;
   int linofs[8] = {0, -1, -1, -1, 0, 1, 1, 1};
@@ -1306,10 +1306,17 @@ void display( int snum, int display_info )
       
     }
   
-  if (snum > 0)			/* a ship */
-    if (display_info)
-      display_headers(snum);
-
+  /* draw the 'header' (ship id) if we should:
+   *
+   * ship is valid AND we are either playing or pausing a recording, OR
+   * Our user number is MSG_GOD whick means we are in conqoper.
+   */
+  if (snum > 0 && 
+       (Context.recmode == RECMODE_PLAYING  || 
+        Context.recmode == RECMODE_PAUSED  ||
+        Context.unum == MSG_GOD) )
+    display_headers(snum);
+  
   cdrefresh();
   Context.redraw = FALSE;
 

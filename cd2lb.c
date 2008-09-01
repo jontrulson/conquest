@@ -58,7 +58,11 @@
 #include "conf.h"
 #include "global.h"
 #include "color.h"
+
+#define NOEXTERN_CD2LB
 #include "cd2lb.h"
+#undef NOEXTERN_CD2LB
+
 #include "cumisc.h"
 #include "iolb.h"
 #include "ui.h"
@@ -220,9 +224,9 @@ void cdend(void)
   endwin();
 
 #if defined (HAVE_TERMIOS_H)
-  tcgetattr(PollInputfd, &term);
+  tcgetattr(iolbStdinFD, &term);
   term.c_cc[VINTR] = Context.intrchar; /* restore INTR */
-  tcsetattr(PollInputfd, TCSANOW, &term);
+  tcsetattr(iolbStdinFD, TCSANOW, &term);
 #endif
   
   return;
@@ -609,8 +613,6 @@ void cdinit(void)
   
   ibufInit();
   
-  PollInputfd = 0;		/* for stdin */
-  
   initscr();
   start_color();
   
@@ -628,45 +630,31 @@ void cdinit(void)
   maxcol = ((COLS > 80) ? 80 : COLS);
   maxlin = LINES;
 
-  /* make sure COLS is >= 80,
-     LINES >= 24 */
+  /* make sure COLS is >= 80, LINES >= 24 */
   
-  if (maxcol < 80 || LINES < 24)
+  if (maxcol < 80 || LINES < 25)
     {
       cdend();
       
-      fprintf(stderr, "Your terminal must have at least 80 columns and 24 lines.\n");
+      fprintf(stderr, 
+              "\nYour terminal must have at least 80 columns and 25 lines.\n");
       
       exit(1);
     }
   
-  /* If you have  25 or more lines, use line 25 to display messages in, else
-     set to regular msg line... */
-
-  if (LINES >= 25)
-    {
-      RMsg_Line = 25;
-    }
-  else
-    {
-      RMsg_Line = MSG_LIN1;
-    }
-
-				/* get the users INTR char if possible
-				   so it can be stuffed into the KB
-				   buffer if a INTR is recieved.  Useful
-				   for unixware systems where DEL is the
-				   default INTR char.  This should allow
-				   DEL to be used for deleting text
-				   for example */
+  /* get the users INTR char if possible so it can be stuffed into the
+   *  KB buffer if a INTR is recieved.  Useful for unixware systems
+   *  where * DEL is the default INTR char.  This should allow DEL
+   *  to be used for deleting text for example 
+   */
 
   Context.intrchar = 0;	/* default - nothing */
 
 #if defined (HAVE_TERMIOS_H)
-  tcgetattr(PollInputfd, &term);
+  tcgetattr(iolbStdinFD, &term);
   Context.intrchar = term.c_cc[VINTR]; /* save it */
   term.c_cc[VINTR] = 0x03;	/* ^C - harmless */
-  tcsetattr(PollInputfd, TCSANOW, &term);
+  tcsetattr(iolbStdinFD, TCSANOW, &term);
 #endif
 
   cdclear();

@@ -87,7 +87,6 @@ void opuedit(void);
 void watch(void);
 int prompt_ship(char buf[], int *snum, int *normal);
 void dowatchhelp(void);
-void setdheader(int show_header);
 void toggle_line(int snum, int old_snum);
 char *build_toggle_str(char snum_str[], int snum);
 void menu_item( char *option, char *msg_line, int lin, int col );
@@ -1241,7 +1240,7 @@ void operate(void)
 	  if ( utDeltaGrand( msgrand, &now ) >= NEWMSG_GRAND )
 	    if ( utGetMsg( MSG_GOD, &ConqInfo->glastmsg ) )
 	      {
-		mcuReadMsg( MSG_GOD, ConqInfo->glastmsg, RMsg_Line );
+		mcuReadMsg( MSG_GOD, ConqInfo->glastmsg, MSG_MSG );
 		
 #if defined(OPER_MSG_BEEP)
 		if (Msgs[ConqInfo->glastmsg].msgfrom != MSG_GOD)
@@ -2941,14 +2940,14 @@ void watch(void)
 		/* set up toggle line display */
 		/* cdclrl( MSG_LIN1, 1 ); */
 		if (toggle_flg)
-			toggle_line(snum,old_snum);
+                  toggle_line(snum,old_snum);
 
 	    /* Try to display a new message. */
 	    readone = FALSE;
 	    if ( utDeltaGrand( msgrand, &now ) >= NEWMSG_GRAND )
 		if ( utGetMsg( MSG_GOD, &ConqInfo->glastmsg ) )
 		  {
-		    mcuReadMsg( MSG_GOD, ConqInfo->glastmsg, RMsg_Line );
+		    mcuReadMsg( MSG_GOD, ConqInfo->glastmsg, MSG_MSG );
 #if defined(OPER_MSG_BEEP)
 		    if (Msgs[ConqInfo->glastmsg].msgfrom != MSG_GOD)
 		      cdbeep();
@@ -2957,18 +2956,10 @@ void watch(void)
 		    readone = TRUE;
 		  }
 
-	      setdheader( TRUE ); /* always true for watching ships and
-				     doomsday.  We may want to turn it off
-				     if we ever add an option for watching
-				     planets though, so we'll keep this
-				     in for now */
-	      
 	      if ( !normal )
 		{
 		  debugdisplay( snum );
 		}
-	      
-	      /* doomdisplay(); */
 	      
 	      /* Un-read message, if there's a chance it got garbaged. */
 	      if ( readone )
@@ -3045,7 +3036,7 @@ void watch(void)
 		      if (normal)
 			{
 			  operStopTimer();
-			  display( Context.snum, headerflag );
+			  display( Context.snum );
 			  operSetTimer();
 			}
 		    }
@@ -3070,7 +3061,7 @@ void watch(void)
 			  if (normal)
 			    {
 			      operStopTimer();
-			      display( Context.snum, headerflag );
+			      display( Context.snum );
 			      operSetTimer();
 			    }
 			}
@@ -3182,7 +3173,7 @@ void watch(void)
 		  if (normal)
 		    {
 		      operStopTimer();
-		      display( Context.snum, headerflag );
+		      display( Context.snum );
 		      operSetTimer();
 		    }
 		  break;
@@ -3260,7 +3251,7 @@ void watch(void)
 		  if (normal)
 		    {
 		      operStopTimer();
-		      display( Context.snum, headerflag );
+		      display( Context.snum );
 		      operSetTimer();
 		    }
 
@@ -3281,13 +3272,6 @@ void watch(void)
   /* NOTREACHED */
   
     }
-
-void setdheader(int show_header)
-{
-
-  headerflag = show_header;
-  return;
-}
 
 int prompt_ship(char buf[], int *snum, int *normal)
 {
@@ -3662,7 +3646,7 @@ void astoperservice(int sig)
   operStopTimer();
   
   /* Perform one ship display update. */
-  display( Context.snum, headerflag );
+  display( Context.snum );
   
   /* Schedule for next time. */
   operSetTimer();

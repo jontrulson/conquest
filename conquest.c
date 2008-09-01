@@ -682,7 +682,7 @@ void command( int ch )
       if ( clbStillAlive( Context.snum ) )
         {
           stopTimer();
-          display( Context.snum, FALSE );
+          display( Context.snum );
           startTimer();
         }
       break;
@@ -694,7 +694,7 @@ void command( int ch )
       if ( clbStillAlive( Context.snum ) )
         {
           stopTimer();
-          display( Context.snum, FALSE );
+          display( Context.snum );
           startTimer();
         }
       break;
@@ -720,7 +720,7 @@ void command( int ch )
       else
 	SFSET(Context.snum, SHIP_F_MAP);
       stopTimer();
-      display( Context.snum, FALSE );
+      display( Context.snum );
       startTimer();
       break;
     case 'N':				/* change pseudonym */
@@ -735,7 +735,7 @@ void command( int ch )
       if ( clbStillAlive( Context.snum ) )
         {
           stopTimer();
-          display( Context.snum, FALSE );
+          display( Context.snum );
           startTimer();
         }
       break;
@@ -782,7 +782,7 @@ void command( int ch )
       if ( clbStillAlive( Context.snum ) )
         {
           stopTimer();
-          display( Context.snum, FALSE );
+          display( Context.snum );
           startTimer();
         }
       break;
@@ -794,7 +794,7 @@ void command( int ch )
       if ( clbStillAlive( Context.snum ) )
         {
           stopTimer();
-          display( Context.snum, FALSE );
+          display( Context.snum );
           startTimer();
         }
       break;
@@ -809,7 +809,7 @@ void command( int ch )
       if ( clbStillAlive( Context.snum ) )
         {
           stopTimer();
-          display( Context.snum, FALSE );
+          display( Context.snum );
           startTimer();
         }
       break;
@@ -819,13 +819,13 @@ void command( int ch )
     case '-':				/* shields down */
       doshields( Context.snum, FALSE );
       stopTimer();
-      display( Context.snum, FALSE );
+      display( Context.snum );
       startTimer();
       break;
     case '+':				/* shields up */
       doshields( Context.snum, TRUE );
       stopTimer();
-      display( Context.snum, FALSE );
+      display( Context.snum );
       startTimer();
       break;
     case '/':				/* player list */
@@ -836,7 +836,7 @@ void command( int ch )
       if ( clbStillAlive( Context.snum ) )
         {
           stopTimer();
-          display( Context.snum, FALSE );
+          display( Context.snum );
           startTimer();
         }
       break;
@@ -848,16 +848,16 @@ void command( int ch )
       if ( clbStillAlive( Context.snum ) )
         {
           stopTimer();
-          display( Context.snum, FALSE );
+          display( Context.snum );
           startTimer();
         }
-	display( Context.snum, FALSE );
+	display( Context.snum );
       break;
     case TERM_REDRAW:			/* clear and redisplay */
       stopTimer();
       cdredo();
       Context.redraw = TRUE;
-      display( Context.snum, FALSE );
+      display( Context.snum );
       startTimer();
       break;
       
@@ -1792,7 +1792,7 @@ void dorefit( int snum, int dodisplay )
 	  {
 	    /* Force an update. */
 	    stopTimer();
-	    display( snum, FALSE );
+	    display( snum );
 	    startTimer();
 	  }
 
@@ -1812,7 +1812,7 @@ void dorefit( int snum, int dodisplay )
 	  {
 	    /* Force an update. */
 	    stopTimer();
-	    display( snum, FALSE );		/* update the display */
+	    display( snum );		/* update the display */
 	    startTimer();
 	  }
 	
@@ -2443,15 +2443,6 @@ void doReviewMsgs( int snum )
   int ch;
   int lstmsg;			/* saved last msg in case new ones come in */
   
-  if (RMsg_Line == MSG_LIN1)
-    {				/* if we don't have an extra msg line,
-				   then make sure new msgs don't come
-				   in while reviewing */
-      
-      Context.msgok = FALSE;		/* don't want to get msgs when reading
-				   old ones.  */
-    }
-
   lstmsg = Ships[snum].lastmsg;	/* don't want lstmsg changing while reading old ones. */
 
   if ( ! mcuReviewMsgs( snum, lstmsg ) )
@@ -2462,11 +2453,6 @@ void doReviewMsgs( int snum )
       while ( ! iogtimed( &ch, 1.0 ) && clbStillAlive( Context.snum ) )
 	;
       cdclrl( MSG_LIN1, 2 );
-    }
-
-  if (RMsg_Line == MSG_LIN1)
-    {
-      Context.msgok = TRUE;		
     }
 
   return;
@@ -2900,9 +2886,9 @@ void menu(void)
       
       FD_ZERO(&readfds);
       FD_SET(cInfo.sock, &readfds);
-      FD_SET(PollInputfd, &readfds);
+      FD_SET(iolbStdinFD, &readfds);
 
-      if ((rv=select((max(cInfo.sock, PollInputfd) + 1), &readfds, NULL, 
+      if ((rv=select((max(cInfo.sock, iolbStdinFD) + 1), &readfds, NULL, 
                      NULL, &timeout)) > 0)
         {                           /* we have activity */
           if (FD_ISSET(cInfo.sock, &readfds))
@@ -2910,7 +2896,7 @@ void menu(void)
               continue;            /* go process them at the top */
             }
 
-          if (FD_ISSET(PollInputfd, &readfds))
+          if (FD_ISSET(iolbStdinFD, &readfds))
             {          /* got a char */
               ch = iogchar();
 
@@ -3217,7 +3203,7 @@ int play()
   cdclear();			/* clear the display */
   cdredo();			/*  (quickly) */
   stopTimer();			/* stop the display interrupt */
-  display( Context.snum, FALSE );	/* update the screen manually */
+  display( Context.snum );	/* update the screen manually */
   Context.display = TRUE;		/* ok to display */
   clientFlags = 0;
   startTimer();			/* setup for next second */
@@ -3251,9 +3237,9 @@ int play()
 
       FD_ZERO(&readfds);
       FD_SET(cInfo.sock, &readfds);
-      FD_SET(PollInputfd, &readfds);
+      FD_SET(iolbStdinFD, &readfds);
 
-      if ((rv=select((max(cInfo.sock, PollInputfd) + 1), &readfds, NULL, 
+      if ((rv=select((max(cInfo.sock, iolbStdinFD) + 1), &readfds, NULL, 
                      NULL, &timeout)) > 0)
         {                       /* we have activity */
           if (FD_ISSET(cInfo.sock,&readfds))
@@ -3266,15 +3252,13 @@ int play()
 
           /* Get a char */
 
-          if (FD_ISSET(PollInputfd, &readfds))
+          if (FD_ISSET(iolbStdinFD, &readfds))
             {
               ch = iogchar();
               /* only process commands if we are live (the server will ignore
                  them anyway) */
               if (Ships[Context.snum].status == SS_LIVE)
                 {
-                  if (RMsg_Line == MSG_LIN1)
-                    Context.msgok = FALSE;      /* off if we  have no msg line */
                   if (ibufExpandMacro(((ch - KEY_F(0)) - 1)) == TRUE)
                     {
                       while (ibufCount())
@@ -3609,20 +3593,13 @@ void astservice(int sig)
   readone = FALSE;
   if ( Context.msgok )
     {
-      if (RMsg_Line != MSG_LIN1)
-	{			/* we have line 25 for msgs */
-	  difftime = utDeltaGrand( RMsggrand, &now );
-	}
-      else
-	{
-	  difftime = utDeltaGrand( Context.msgrand, &now );
-	}
+      difftime = utDeltaGrand( RMsggrand, &now );
 
       if ( difftime >= NEWMSG_GRAND )
 	if ( utGetMsg( Context.snum, &Ships[Context.snum].lastmsg ) )
 	  {
 	    if (mcuReadMsg( Context.snum, Ships[Context.snum].lastmsg, 
-			 RMsg_Line ) == TRUE)
+			 MSG_MSG ) == TRUE)
 	      {
 		if (Msgs[Ships[Context.snum].lastmsg].msgfrom != 
 		    Context.snum)
@@ -3638,15 +3615,9 @@ void astservice(int sig)
     }
 
   /* Perform one ship display update. */
-  display( Context.snum, FALSE );
+  display( Context.snum );
 
   recUpdateFrame();          /* update recording */
-  
-  /* Un-read the message if there's a chance it got garbaged. */
-  if ( readone )
-    if (RMsg_Line == MSG_LIN1)	/* we don't have an extra msg line */
-      if ( iochav() )
-	Ships[Context.snum].lastmsg = utModPlusOne( Ships[Context.snum].lastmsg - 1, MAXMESSAGES );
   
   /* Schedule for next time. */
   startTimer();

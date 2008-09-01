@@ -19,7 +19,11 @@
 #include "global.h"
 #include "conqutil.h"
 #include "ibuf.h"
+
+#define NOEXTERN_IOLB
 #include "iolb.h"
+#undef NOEXTERN_IOLB
+
 #include "cd2lb.h"
 
 /* iochav - test whether a char is available to be read or not */
@@ -65,12 +69,12 @@ int iochav( void )
   
   /* here, we'll just use select */
   FD_ZERO(&readfds);
-  FD_SET(PollInputfd, &readfds);
+  FD_SET(iolbStdinFD, &readfds);
   
   timeout.tv_sec = 0;		/* setting to zero should ret immediately */
   timeout.tv_usec = 0;
   
-  if ((retval = select(PollInputfd+1, &readfds, NULL, NULL, &timeout)) == -1)
+  if ((retval = select(iolbStdinFD+1, &readfds, NULL, NULL, &timeout)) == -1)
     {
       utLog("iochav(): select(): %s", strerror(errno));
       return(FALSE);
@@ -94,7 +98,7 @@ int iochav( void )
   
   flagsp = 0;
   
-  Stdin_pfd.fd = PollInputfd;		/* stdin */
+  Stdin_pfd.fd = iolbStdinFD;		/* stdin */
   Stdin_pfd.events = (POLLIN | POLLRDNORM);
   
   if (poll(&Stdin_pfd, 1, 0) > 0) /* return immediately if a char avail */
@@ -103,7 +107,7 @@ int iochav( void )
       utLog("ALTiochav(): had a char via poll");
 #endif
       
-      if ((retval = getmsg(PollInputfd, &CtlMsg, &DataMsg, 
+      if ((retval = getmsg(iolbStdinFD, &CtlMsg, &DataMsg, 
 			   &flagsp)) == -1)
 	{
 	  utLog("iochav(): getmsg(): failed: %s", strerror(errno));
@@ -277,7 +281,7 @@ int iogtimed ( int *ch, real seconds )
      interrupted.  Don't count on this
      behavior with other unix's... */
   FD_ZERO(&readfds);
-  FD_SET(PollInputfd, &readfds);
+  FD_SET(iolbStdinFD, &readfds);
   
   timeout.tv_sec = secs;
   timeout.tv_usec = usecs;
@@ -303,7 +307,7 @@ int iogtimed ( int *ch, real seconds )
 	 how to get around that... */
       
       FD_ZERO(&readfds);
-      FD_SET(PollInputfd, &readfds);
+      FD_SET(iolbStdinFD, &readfds);
       
       timeout.tv_sec = secs;
       timeout.tv_usec = usecs;
@@ -311,7 +315,7 @@ int iogtimed ( int *ch, real seconds )
       
 #if defined(USE_SELECT)
 
-      if ((retval = select(PollInputfd + 1, &readfds, NULL, NULL, 
+      if ((retval = select(iolbStdinFD + 1, &readfds, NULL, NULL, 
 			   &timeout)) == -1)
 	{			/* timeout or signal? */
 	  if (errno != EINTR)	/* some error */
@@ -349,7 +353,7 @@ int iogtimed ( int *ch, real seconds )
       else if (retval > 0)
 	{
 # if defined(DEBUG_IOGTIMED)
-          if (FD_ISSET(PollInputfd,&readfds))
+          if (FD_ISSET(iolbStdinFD,&readfds))
 	    utLog("After Linux select - FD_ISSET is SET");
           else
 	    utLog("After Linux select - FD_ISSET is NOT SET");
@@ -364,8 +368,8 @@ int iogtimed ( int *ch, real seconds )
 	  *ch = c;
 	  
 # if defined(DEBUG_IOGTIMED)
-	  utLog("iogtimed(): retval = %d, PollInputfd = %d, *ch = %d",
-	       retval,PollInputfd,*ch);
+	  utLog("iogtimed(): retval = %d, iolbStdinFD = %d, *ch = %d",
+	       retval,iolbStdinFD,*ch);
 # endif
 	  
 	  return(TRUE);
@@ -374,8 +378,8 @@ int iogtimed ( int *ch, real seconds )
 	{
 	  *ch = 0;
 # if defined(DEBUG_IOGTIMED)
-	  utLog("iogtimed(): retval = %d, PollInputfd = %d, *ch = %d",
-	       retval,PollInputfd,*ch);
+	  utLog("iogtimed(): retval = %d, iolbStdinFD = %d, *ch = %d",
+	       retval,iolbStdinFD,*ch);
 # endif
 	  cdrefresh();
 	  return(FALSE);

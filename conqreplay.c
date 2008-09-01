@@ -34,7 +34,6 @@ static void replay(void);
 static void watch(void);
 static int prompt_ship(char buf[], int *snum, int *normal);
 static void toggle_line(int snum, int old_snum);
-static void setdheader(int show_header);
 static void dowatchhelp(void);
 static char *build_toggle_str(char *snum_str, int snum);
 
@@ -98,17 +97,12 @@ void displayMsg(Msg_t *themsg)
       appstr( themsg->msgbuf, buf );
       
       uiPutColor(attrib);
-      mcuPutMsg( buf, RMsg_Line );
+      mcuPutMsg( buf, MSG_MSG );
       uiPutColor(0);
-      /* clear second line if sending to MSG_LIN1 */
-      if (RMsg_Line == MSG_LIN1)
-	{
-	  cdclrl( MSG_LIN2, 1 );
-	}
     }
   else
     {				/* just clear the message line */
-      cdclrl( RMsg_Line, 1 );
+      cdclrl( MSG_MSG, 1 );
     }
 
   return;
@@ -239,16 +233,9 @@ static void watch(void)
 	  if (toggle_flg)
 	    toggle_line(snum,old_snum);
 	  
-	  
-	  setdheader( TRUE ); /* always true for watching ships and
-				 doomsday.  We may want to turn it off
-				 if we ever add an option for watching
-				 planets though, so we'll keep this
-				 in for now */
-	  
 	  if (Context.recmode == RECMODE_PLAYING || upddsp)
 	    {
-	      display(Context.snum, headerflag);
+	      display(Context.snum);
 	      displayReplayData();
               if (recMsg.msgbuf[0])
                 displayMsg(&recMsg);
@@ -563,13 +550,6 @@ static void watch(void)
 
   /* NOTREACHED */
   
-}
-
-static void setdheader(int show_header)
-{
-
-  headerflag = show_header;
-  return;
 }
 
 static int prompt_ship(char buf[], int *snum, int *normal)
