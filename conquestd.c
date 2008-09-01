@@ -1930,13 +1930,13 @@ static int hello(void)
       return FALSE;
     }
 
+  /* for now just a mild notification, since this isn't a real problem 
+   *  anymore. 
+   */
   if (chello.cmnrev != COMMONSTAMP)
     {
-      sprintf(cbuf, "SERVER: commonblock mismatch, expected %d, got %d",
-	      COMMONSTAMP, chello.cmnrev);
-      pktSendAck(sInfo.sock, PKT_TOCLIENT, PSEV_FATAL, PERR_BADCMN, cbuf);
-      utLog("NET: %s", cbuf);
-      return FALSE;
+      utLog("NET: INFO: common block mismatch: client %d server %d", 
+            chello.cmnrev, COMMONSTAMP);
     }
 
   if (chello.updates >= 1 && chello.updates <= 10)
