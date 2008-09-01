@@ -116,10 +116,10 @@ void display( int snum )
   for ( i = NUMPLANETS; i > 0; i = i - 1 )
     {
       if ( ! Planets[i].real )
-	continue; /*next;*/
+	continue;
       if ( !GLcvtcoords( cenx, ceny, Planets[i].x, Planets[i].y, -scale, 
                          &glx, &gly ))
-	continue; /* next;*/
+	continue;
 
       palertcol = 0;
 				/* determine alertlevel for object */
