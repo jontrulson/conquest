@@ -3544,7 +3544,6 @@ void astservice(int sig)
 {
   int now;
   int readone;
-  static int RMsggrand = 0;
   int difftime;
   char buf[PKT_MAXSIZE];
   int sockl[2] = {cInfo.sock, cInfo.usock};
@@ -3593,7 +3592,7 @@ void astservice(int sig)
   readone = FALSE;
   if ( Context.msgok )
     {
-      difftime = utDeltaGrand( RMsggrand, &now );
+      difftime = utDeltaGrand( Context.msgrand, &now );
 
       if ( difftime >= NEWMSG_GRAND )
 	if ( utGetMsg( Context.snum, &Ships[Context.snum].lastmsg ) )
@@ -3608,7 +3607,6 @@ void astservice(int sig)
 		/* set both timers, regardless of which
 		   one we're actally concerned with */
 		Context.msgrand = now;
-		RMsggrand = now;
 		readone = TRUE;
 	      }
 	  }
