@@ -9,6 +9,48 @@
 
                               Conquest HISTORY
 
+8.4.1 (stable) 09/13/2008
+
+  - 8.4.1 stable release.
+
+  - fix bug introduced in 8.4 that prevented a conquering player from
+    leaving any 'Last Words'. 
+
+  - make ship slot allocation a little more aggressive when ship slots
+    are in short supply.  This eliminates occasions whereby all of the
+    slots could be taken by vacant ships and no one would be able to
+    login.
+
+    Note, this means vacant ships can be stolen by clbFindShip() when
+    slots are in short supply on servers that allow vacant ships.
+
+  - in the old days, when you entered a new ship, you would enter with
+    your shields up.  This behavior got lost in the distant past,
+    probably when the flags element was added to Ship_t.  Now when you
+    enter a fresh ship, your shields will be up again.
+
+  - Change the server so that if a client connects with a different
+    revision of the common block, just note this in the log and
+    continue, rather than fail (disconnect) the client.
+
+    Since the protocol version is what really matters now, there's no
+    need to bother with a cmnblk revision check anymore.
+
+  - some more cleanups, while we were in there:
+
+    - remove support for 24 line curses displays.  25 is the minimum.
+      Remove alot of crap as a result.
+
+    - add the meta cgi stuff to the repository so it isn't lost.
+
+    - remove unneeded 'headerflag' global.
+
+    - update html versions of the manpages
+
+    - correct some problems in conquestgl in reporting certain errors
+      that could occur when the server could not allocate a ship slot.
+
+
 8.4 (stable) 08/09/2008
 
   - 8.4 stable release.
