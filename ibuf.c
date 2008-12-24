@@ -74,8 +74,10 @@ int ibufCount(void)
 void ibufPut(char *thestr)
 {
   int i;
-  int n = strlen(thestr);
+  int n;
   int c;
+
+  if ( !thestr || ((n = strlen(thestr)) == 0) )
 
   /* cvt to int's and insert into rb */
   for (i=0; i<n; i++)
