@@ -402,6 +402,8 @@ int GetSysConf(int checkonly)
   return(TRUE);
 }
 
+/* can't compile this if there is no GUI */
+#if defined(_CQKEYS_H)
 /* parse a mouse macro mod/but string */
 static int 
 parseMouseModNum(char *str, Unsgn32 *mods, Unsgn32 *button)
@@ -454,6 +456,8 @@ parseMouseModNum(char *str, Unsgn32 *mods, Unsgn32 *button)
 
   return TRUE;
 }
+
+#endif /* _CQKEYS_H */
 				/* get user's configuration */
 int GetConf(int usernum)
 {
@@ -612,6 +616,8 @@ int GetConf(int usernum)
 				
 			break;
 
+                        /* no GL, no mouse */
+#if defined(_CQKEYS_H)
 		      case CTYPE_MOUSE:
                         {
                           Unsgn32 mods;
@@ -644,6 +650,7 @@ int GetConf(int usernum)
                             }
                         }
 			break;
+#endif /* _CQKEYS_H */
 
 		      case CTYPE_NUMERIC:
 			if (alldig(bufptr))
@@ -943,6 +950,8 @@ int MakeConf(char *filename)
       if (ConfData[j].ConfType != CTYPE_NULL)
 	switch (ConfData[j].ConfType)
 	  {
+            /* no opengl, no mouse */
+#if defined(_CQKEYS_H)
 	  case CTYPE_MOUSE:
             {
               int b, m;
@@ -974,6 +983,7 @@ int MakeConf(char *filename)
                 }
             }
 	    break;
+#endif /* _CQKEYS_H */
 
 	  case CTYPE_MACRO:
 	    for (n=0; n < MAX_MACROS; n++)

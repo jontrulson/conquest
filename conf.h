@@ -19,7 +19,10 @@
 #define CONF_H
 
 #include "datatypes.h"
-#include "cqkeys.h"
+
+#if defined(HAVE_GL_GLUT_H)
+# include "cqkeys.h"
+#endif
 
 #define SYSCONFIG_FILE "conquestrc"	/* relative to CONQETC */
 #define CONFIG_FILE "conquestrc"
@@ -27,10 +30,14 @@
 #define CONF_MAXCOMMENTS   50
 
 #define CONF_MAXBUTTONS    32     /* max # of mouse buttons we can handle
-                                   (mouse macros) */
-#define CONF_MAXMODIFIERS  (((CQ_KEY_MOD_SHIFT | CQ_KEY_MOD_ALT | \
-                              CQ_KEY_MOD_CTRL) >> CQ_MODIFIER_SHIFT) + 1)
+                                     (mouse macros) */
 
+#if defined(_CQKEYS_H)          /* cqkey.h successfully included */
+# define CONF_MAXMODIFIERS  (((CQ_KEY_MOD_SHIFT | CQ_KEY_MOD_ALT | \
+                               CQ_KEY_MOD_CTRL) >> CQ_MODIFIER_SHIFT) + 1)
+#else
+# define CONF_MAXMODIFIERS  1   /* something sane */
+#endif
 
 				/* config types */
 #define CTYPE_NULL (0)
