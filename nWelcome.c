@@ -84,7 +84,6 @@ void nWelcomeInit(void)
   spClientStat_t *scstat = NULL;
   int pkttype;
   char buf[PKT_MAXSIZE];
-  int sockl[2] = {cInfo.sock, cInfo.usock};
   int done = FALSE;
 
   setNode(&nWelcomeNode);
@@ -93,7 +92,7 @@ void nWelcomeInit(void)
   while (!done)
     {
       if ((pkttype = 
-           pktRead(PKT_FROMSERVER, sockl, buf, PKT_MAXSIZE, 60)) <= 0)
+           pktRead(buf, PKT_MAXSIZE, 60)) <= 0)
         {
           utLog("nWelcomeInit: read SP_CLIENTSTAT or SP_ACK failed: %d",
                pkttype);
@@ -161,7 +160,6 @@ static int nWelcomeDisplay(dspConfig_t *dsp)
   char buf[PKT_MAXSIZE];
   int team, col = 0;
   time_t t = time(0);
-  int sockl[2] = {cInfo.sock, cInfo.usock};
 
   if (fatal)
     return NODE_EXIT;           /* see ya! */
@@ -248,8 +246,8 @@ static int nWelcomeDisplay(dspConfig_t *dsp)
       break;
 
     case S_DONE:
-      if (pktWaitForPacket(PKT_FROMSERVER, sockl, SP_USER, buf, PKT_MAXSIZE,
-                        60, NULL) <= 0)
+      if (pktWaitForPacket(SP_USER, buf, PKT_MAXSIZE,
+                           60, NULL) <= 0)
         {
           utLog("nWelcomeDisplay: waitforpacket SP_USER returned error");
           return NODE_EXIT;

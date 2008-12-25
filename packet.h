@@ -25,12 +25,12 @@ struct _packetent {
   void     (*handler)();
 };
 
+/* for pktWrite, whether to send via UDP (if available) */
+#define PKT_SENDTCP    0
+#define PKT_SENDUDP    1
 
-/* directions from client/server */
-#define PKT_TOCLIENT 0
-#define PKT_TOSERVER 1
-#define PKT_FROMCLIENT 2
-#define PKT_FROMSERVER 3
+/* special value for pktSetSocketFds to ignore a set */
+#define PKT_SOCKFD_NOCHANGE  (-2)
 
 /* error/severity codes for Acks, should make sure these sync to
    pktSeverity2String(int psev) */
@@ -68,23 +68,24 @@ extern int     pktRXBytes;
 extern Unsgn32 pktPingAvgMS;
 #endif
 
-int   pktSendAck(int sock, int dir, Unsgn8 severity, Unsgn8 code, char *msg);
+void  pktSetClientMode(int isclient);
+void  pktSetSocketFds(int tcpsock, int udpsock);
+
+int   pktSendAck(Unsgn8 severity, Unsgn8 code, char *msg);
 int   pktIsConnDead(void);
 void  pktNotImpl(void *nothing);
-void  pktSetNodelay(int sock);
+void  pktSetNodelay(void);
 char *pktSeverity2String(int psev);
-int   pktInvertDirection(int dir);
 
-int   pktWaitForPacket(int dir, int sockl[], int type, char *buf, int blen, 
-                    int delay, char *nakmsg);
+int   pktWaitForPacket(int type, char *buf, int blen, 
+                       int delay, char *nakmsg);
 
 int   pktClientPacketSize(int type);
 int   pktServerPacketSize(int type);
 
-int   pktIsPacketWaiting(int sock);
-int   pktWrite(int direction, int sock, void *data);
-int   pktRead(int direction, int sockl[], char *buf, int len, 
-                 unsigned int delay);
+int   pktIsWaiting(void);
+int   pktWrite(int socktype, void *data);
+int   pktRead(char *buf, int len, unsigned int delay);
 int   pktIsValid(int pkttype, void *pkt);
 
 #endif /* PACKET_H_INCLUDED */

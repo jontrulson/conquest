@@ -35,6 +35,8 @@ static void handleUDPErr(void)
       sInfo.doUDP = FALSE;
       close(sInfo.usock);
       sInfo.usock = -1;
+      pktSetSocketFds(PKT_SOCKFD_NOCHANGE, sInfo.usock);
+
       utLog("NET: too many UDP send errors to client, switching to TCP");
       clbStoreMsg(MSG_COMP, Context.snum, 
               "SERVER: too many UDP send errors. Switching to TCP");
@@ -61,7 +63,7 @@ int sendClientStat(int sock, Unsgn8 flags, Unsgn8 snum, Unsgn8 team,
   scstat.unum = htons(unum);
   scstat.esystem = esystem;
 
-  if (pktWrite(PKT_TOCLIENT, sock, &scstat) <= 0)
+  if (pktWrite(PKT_SENDTCP, &scstat) <= 0)
     return FALSE;
   else
     return TRUE;
@@ -79,7 +81,7 @@ int sendUser(int sock, Unsgn16 unum)
   /* not really any priv bits, but in case we add some later */
   if ((suser = spktUser(unum)))
     {
-      if (pktWrite(PKT_TOCLIENT, sock, suser) <= 0)
+      if (pktWrite(PKT_SENDTCP, suser) <= 0)
         return FALSE;
 
       if (Context.recmode == RECMODE_ON)
@@ -109,7 +111,7 @@ int sendShip(int sock, Unsgn8 snum)
     }
 
   if ((sship = spktShip(snum, FALSE)))
-    if (pktWrite(PKT_TOCLIENT, sock, sship) <= 0)
+    if (pktWrite(PKT_SENDTCP, sship) <= 0)
       return FALSE;
 
   /* SP_SHIPSML */
@@ -120,7 +122,7 @@ int sendShip(int sock, Unsgn8 snum)
     }
 
   if ((sshipsml = spktShipSml(snum, FALSE)))
-    if (pktWrite(PKT_TOCLIENT, sock, sshipsml) <= 0)
+    if (pktWrite(PKT_SENDTCP, sshipsml) <= 0)
       return FALSE;
 
   /* SP_SHIPLOC */
@@ -133,18 +135,11 @@ int sendShip(int sock, Unsgn8 snum)
   
   if ((sshiploc = spktShipLoc(snum, FALSE)))
     {
-      if (sInfo.doUDP)
+      if (pktWrite(PKT_SENDUDP, sshiploc) <= 0)
         {
-          if (pktWrite(PKT_TOCLIENT, sInfo.usock, sshiploc) <= 0)
-            {
-              handleUDPErr();
-              return FALSE;
-            }
-        }
-      else
-        {
-          if (pktWrite(PKT_TOCLIENT, sock, sshiploc) <= 0)
-            return FALSE;
+          if (sInfo.doUDP)
+            handleUDPErr();
+          return FALSE;
         }
     }
   return TRUE;
@@ -172,7 +167,7 @@ int sendPlanet(int sock, Unsgn8 pnum, int force)
     }
 
   if ((splan = spktPlanet(pnum, FALSE)))
-    if (pktWrite(PKT_TOCLIENT, sock, splan) <= 0)
+    if (pktWrite(PKT_SENDTCP, splan) <= 0)
       return FALSE;
 
   /* SP_PLANETSML */
@@ -183,7 +178,7 @@ int sendPlanet(int sock, Unsgn8 pnum, int force)
     }
 
   if ((splansml = spktPlanetSml(pnum, FALSE)))
-    if (pktWrite(PKT_TOCLIENT, sock, splansml) <= 0)
+    if (pktWrite(PKT_SENDTCP, splansml) <= 0)
       return FALSE;
 
   /* SP_PLANETINFO */
@@ -194,7 +189,7 @@ int sendPlanet(int sock, Unsgn8 pnum, int force)
     }
 
   if ((splaninfo = spktPlanetInfo(pnum, FALSE)))
-    if (pktWrite(PKT_TOCLIENT, sock, splaninfo) <= 0)
+    if (pktWrite(PKT_SENDTCP, splaninfo) <= 0)
       return FALSE;
 
   /* we will do loc packets for recording purposes only.  loc2 is sent
@@ -210,14 +205,14 @@ int sendPlanet(int sock, Unsgn8 pnum, int force)
 
   /* SP_PLANETLOC2 */
   if ((splanloc2 = spktPlanetLoc2(pnum, FALSE, force)))
-    if (pktWrite(PKT_TOCLIENT, sock, splanloc2) <= 0)
+    if (pktWrite(PKT_SENDTCP, splanloc2) <= 0)
       return FALSE;
 
   return TRUE;
 }
 
 /* send a status packet */
-int sendServerStat(int sock)
+int sendServerStat(int socktype)
 {
   int i;
   int numusers = 0;
@@ -272,7 +267,7 @@ int sendServerStat(int sock)
 
   sStat.servertime = (Unsgn32)htonl(getnow(NULL, 0));
   
-  if (!pktWrite(PKT_TOCLIENT, sock, &sStat))
+  if (!pktWrite(socktype, &sStat))
     {
       utLog("sendServerStats: pktWrite failed\n");
       return FALSE;
@@ -313,7 +308,7 @@ int sendTorp(int sock, Unsgn8 tsnum, Unsgn8 tnum)
 
   if ((storpev = spktTorpEvent(tsnum, tnum, FALSE)))
     {
-      if (pktWrite(PKT_TOCLIENT, sock, storpev) <= 0)
+      if (pktWrite(PKT_SENDTCP, storpev) <= 0)
         return FALSE;
     }
 
@@ -396,7 +391,7 @@ int sendMessage(Msg_t *msg)
     if (!(smsg.flags & (MSG_FLAGS_FEEDBACK | MSG_FLAGS_TERSABLE)))
       recWriteEvent(&smsg);
 
-  if (!pktWrite(PKT_TOCLIENT, sInfo.sock, &smsg))
+  if (!pktWrite(PKT_SENDTCP, &smsg))
     {
       utLog("sendMessage: pktWrite failed\n");
       return FALSE;
@@ -420,7 +415,7 @@ int sendTeam(int sock, Unsgn8 team, int force)
     }
 
   if ((steam = spktTeam(team, force, FALSE)))
-    if (pktWrite(PKT_TOCLIENT, sock, steam) <= 0)
+    if (pktWrite(PKT_SENDTCP, steam) <= 0)
       return FALSE;
 
   return TRUE;
@@ -435,7 +430,7 @@ int sendConqInfo(int sock, int force)
 #endif
 
   if ((spci = spktConqInfo(force)))
-    if (pktWrite(PKT_TOCLIENT, sock, spci) <= 0)
+    if (pktWrite(PKT_SENDTCP, spci) <= 0)
       return FALSE;
 
   return TRUE;
@@ -453,7 +448,7 @@ int sendHistory(int sock, int hnum)
 #endif
 
   if ((shist = spktHistory(hnum)))
-    if (pktWrite(PKT_TOCLIENT, sock, shist) <= 0)
+    if (pktWrite(PKT_SENDTCP, shist) <= 0)
       return FALSE;
 
   return TRUE;
@@ -474,7 +469,7 @@ int sendDoomsday(int sock)
     }
 
   if ((dd = spktDoomsday(FALSE)))
-    if (pktWrite(PKT_TOCLIENT, sock, dd) <= 0)
+    if (pktWrite(PKT_SENDTCP, dd) <= 0)
       return FALSE;
 
   return TRUE;
@@ -1517,7 +1512,7 @@ void procBomb(cpCommand_t *cmd)
   /* Check for allowability. */
   if ( Ships[snum].warp >= 0.0 )
     {
-      pktSendAck(sInfo.sock, PKT_TOCLIENT, PSEV_INFO, PERR_CANCELED, NULL);
+      pktSendAck(PSEV_INFO, PERR_CANCELED, NULL);
       sendFeedback("We must be orbiting a planet to bombard it.");
       return;
     }
@@ -1525,20 +1520,20 @@ void procBomb(cpCommand_t *cmd)
   if ( Planets[pnum].type == PLANET_SUN || Planets[pnum].type == PLANET_MOON ||
       Planets[pnum].team == TEAM_NOTEAM || Planets[pnum].armies == 0 )
     {
-      pktSendAck(sInfo.sock, PKT_TOCLIENT, PSEV_INFO, PERR_CANCELED, NULL);
+      pktSendAck(PSEV_INFO, PERR_CANCELED, NULL);
       sendFeedback("There is no one there to bombard.");
       return;
     }
   if ( Planets[pnum].team == Ships[snum].team )
     {
-      pktSendAck(sInfo.sock, PKT_TOCLIENT, PSEV_INFO, PERR_CANCELED, NULL);
+      pktSendAck(PSEV_INFO, PERR_CANCELED, NULL);
       sendFeedback("We can't bomb our own armies!");
       return;
     }
   if ( Planets[pnum].team != TEAM_SELFRULED && Planets[pnum].team != TEAM_GOD )
     if ( ! Ships[snum].war[Planets[pnum].team] )
       {
-	pktSendAck(sInfo.sock, PKT_TOCLIENT, PSEV_INFO, PERR_CANCELED, NULL);
+	pktSendAck(PSEV_INFO, PERR_CANCELED, NULL);
 	sendFeedback("But we are not at war with this planet!");
 	return;
       }
@@ -1556,7 +1551,7 @@ void procBomb(cpCommand_t *cmd)
     {
       sprintf( cbuf, "That was a bad idea, %s...", Ships[snum].alias );
       clbDamage( snum,  rnduni( 50.0, 100.0 ), KB_LIGHTNING );
-      pktSendAck(sInfo.sock, PKT_TOCLIENT, PSEV_INFO, PERR_CANCELED, NULL);
+      pktSendAck(PSEV_INFO, PERR_CANCELED, NULL);
       sendFeedback(cbuf);
       return;
     }
@@ -1578,7 +1573,7 @@ void procBomb(cpCommand_t *cmd)
           SFCLR(snum, SHIP_F_BOMBING);
           return;
         }
-      if ( pktIsPacketWaiting(sInfo.sock) )
+      if ( pktIsWaiting() )
         {
           SFCLR(snum, SHIP_F_BOMBING);
           break;
@@ -1589,7 +1584,7 @@ void procBomb(cpCommand_t *cmd)
 	{
 	  if ( Ships[snum].wfuse > 0 )
 	    {
-	      pktSendAck(sInfo.sock, PKT_TOCLIENT, PSEV_INFO, PERR_CANCELED, 
+	      pktSendAck(PSEV_INFO, PERR_CANCELED, 
 		      NULL);
 	      sendFeedback("Weapons are currently overloaded.");
 	      goto cbrk22; /* break 2;*/
@@ -1597,7 +1592,7 @@ void procBomb(cpCommand_t *cmd)
 	  x = BOMBARD_FUEL * (real)(BOMBARD_GRAND / 1000.0);
 	  if ( ! clbUseFuel( snum, x, TRUE, TRUE ) )
 	    {
-	      pktSendAck(sInfo.sock, PKT_TOCLIENT, PSEV_INFO, PERR_CANCELED, 
+	      pktSendAck(PSEV_INFO, PERR_CANCELED, 
 		      NULL);
 	      sendFeedback("Not enough fuel to bombard.");
 	      goto cbrk22; /* break 2;*/
@@ -1615,7 +1610,7 @@ void procBomb(cpCommand_t *cmd)
 		{
 		  /* No more armies left to bomb. */
 		  PVUNLOCK(&ConqInfo->lockword);
-		  pktSendAck(sInfo.sock, PKT_TOCLIENT, PSEV_INFO, PERR_CANCELED, 
+		  pktSendAck(PSEV_INFO, PERR_CANCELED, 
 			  NULL);
 		  sendFeedback(lastfew);
 		  goto cbrk22; /* break 2;*/
@@ -1633,7 +1628,7 @@ void procBomb(cpCommand_t *cmd)
       if ( Planets[pnum].armies <= MIN_BOMB_ARMIES )
 	{
 	  /* No more armies left to bomb. */
-	  pktSendAck(sInfo.sock, PKT_TOCLIENT, PSEV_INFO, PERR_CANCELED, NULL);
+	  pktSendAck(PSEV_INFO, PERR_CANCELED, NULL);
 	  sendFeedback(lastfew);
 	  break;
 	}
@@ -1711,7 +1706,7 @@ void procBeam(cpCommand_t *cmd)
   /* Check for allowability. */
   if ( Ships[snum].warp >= 0.0 )
     {
-      pktSendAck(sInfo.sock, PKT_TOCLIENT, PSEV_INFO, PERR_CANCELED, NULL);
+      pktSendAck(PSEV_INFO, PERR_CANCELED, NULL);
       sendFeedback("We must be orbiting a planet to use the transporter.");
       return;
     }
@@ -1720,19 +1715,19 @@ void procBeam(cpCommand_t *cmd)
     {
       if ( Planets[pnum].type == PLANET_SUN )
 	{
-	  pktSendAck(sInfo.sock, PKT_TOCLIENT, PSEV_INFO, PERR_CANCELED, NULL);
+	  pktSendAck(PSEV_INFO, PERR_CANCELED, NULL);
 	  sendFeedback("Idiot!  Our armies will fry down there!");
 	  return;
 	}
       else if ( Planets[pnum].type == PLANET_MOON )
 	{
-	  pktSendAck(sInfo.sock, PKT_TOCLIENT, PSEV_INFO, PERR_CANCELED, NULL);
+	  pktSendAck(PSEV_INFO, PERR_CANCELED, NULL);
 	  sendFeedback("Fool!  Our armies will suffocate down there!");
 	  return;
 	}
       else if ( Planets[pnum].team == TEAM_GOD )
 	{
-	  pktSendAck(sInfo.sock, PKT_TOCLIENT, PSEV_INFO, PERR_CANCELED, NULL);
+	  pktSendAck(PSEV_INFO, PERR_CANCELED, NULL);
 	  sendFeedback("GOD->you: YOUR ARMIES AREN'T GOOD ENOUGH FOR THIS PLANET.");
 	  return;
 	}
@@ -1746,7 +1741,7 @@ void procBeam(cpCommand_t *cmd)
       if ( i != 1 )
 	appchr( 's', cbuf );
       appchr( '.', cbuf );
-      pktSendAck(sInfo.sock, PKT_TOCLIENT, PSEV_INFO, PERR_CANCELED, NULL);
+      pktSendAck(PSEV_INFO, PERR_CANCELED, NULL);
       sendFeedback(cbuf);
       return;
     }
@@ -1756,7 +1751,7 @@ void procBeam(cpCommand_t *cmd)
       Planets[pnum].team != TEAM_NOTEAM )
     if ( ! Ships[snum].war[Planets[pnum].team] && Planets[pnum].armies != 0) /* can take empty planets */
       {
-	pktSendAck(sInfo.sock, PKT_TOCLIENT, PSEV_INFO, PERR_CANCELED, NULL);
+	pktSendAck(PSEV_INFO, PERR_CANCELED, NULL);
 	sendFeedback("But we are not at war with this planet!");
 	return;
       }
@@ -1764,7 +1759,7 @@ void procBeam(cpCommand_t *cmd)
   if ( Ships[snum].armies == 0 &&
       Planets[pnum].team == Ships[snum].team && Planets[pnum].armies <= MIN_BEAM_ARMIES )
     {
-      pktSendAck(sInfo.sock, PKT_TOCLIENT, PSEV_INFO, PERR_CANCELED, NULL);
+      pktSendAck(PSEV_INFO, PERR_CANCELED, NULL);
       sendFeedback(lastfew);
       return;
     }
@@ -1773,7 +1768,7 @@ void procBeam(cpCommand_t *cmd)
 
   if ( rkills < (real)1.0 )
     {
-      pktSendAck(sInfo.sock, PKT_TOCLIENT, PSEV_INFO, PERR_CANCELED, NULL);
+      pktSendAck(PSEV_INFO, PERR_CANCELED, NULL);
       sendFeedback("Fleet orders prohibit beaming armies until you have a kill.");
       return;
     }
@@ -1806,7 +1801,7 @@ void procBeam(cpCommand_t *cmd)
 	  else
 	    appstr( "ies are", cbuf );
 	  appstr( " reluctant to beam aboard a pirate vessel.", cbuf );
-	  pktSendAck(sInfo.sock, PKT_TOCLIENT, PSEV_INFO, PERR_CANCELED, NULL);
+	  pktSendAck(PSEV_INFO, PERR_CANCELED, NULL);
 	  sendFeedback(cbuf);
 	  return;
 	}
@@ -1816,7 +1811,7 @@ void procBeam(cpCommand_t *cmd)
   /* Figure out which direction to beam. */
   if ( upmax <= 0 && downmax <= 0 )
     {
-      pktSendAck(sInfo.sock, PKT_TOCLIENT, PSEV_INFO, PERR_CANCELED, NULL);
+      pktSendAck(PSEV_INFO, PERR_CANCELED, NULL);
       sendFeedback("There is no one to beam.");
       return;
     }
@@ -1867,7 +1862,7 @@ void procBeam(cpCommand_t *cmd)
     {
       if ( ! clbStillAlive( Context.snum ) )
 	return;
-      if ( pktIsPacketWaiting(sInfo.sock) )
+      if ( pktIsWaiting() )
 	break;
       
       /* See if it's time to beam again. */
@@ -1881,7 +1876,7 @@ void procBeam(cpCommand_t *cmd)
 	      if ( Planets[pnum].armies <= MIN_BEAM_ARMIES )
 		{
 		  PVUNLOCK(&ConqInfo->lockword);
-		  pktSendAck(sInfo.sock, PKT_TOCLIENT, PSEV_INFO, PERR_CANCELED, 
+		  pktSendAck(PSEV_INFO, PERR_CANCELED, 
 			  NULL);
 		  sendFeedback(lastfew);
 		  break;
@@ -1916,7 +1911,7 @@ void procBeam(cpCommand_t *cmd)
 	  if ( total >= num )
 	    {
 	      /* Done. */
-	      pktSendAck(sInfo.sock, PKT_TOCLIENT, PSEV_INFO, PERR_DONE, 
+	      pktSendAck(PSEV_INFO, PERR_DONE, 
 		      NULL);
               sendFeedback("");
 	      goto cbrk21; 
@@ -2002,7 +1997,7 @@ void procDestruct(cpCommand_t *cmd)
 
   if ( SCLOAKED(snum) )
     {
-      pktSendAck(sInfo.sock, PKT_TOCLIENT, PSEV_INFO, PERR_CANCELED,
+      pktSendAck(PSEV_INFO, PERR_CANCELED,
 	      NULL);
       sendFeedback("The cloaking device is using all available power.");
       return;
@@ -2031,10 +2026,10 @@ void procDestruct(cpCommand_t *cmd)
 	  return;
 	}
 
-      if ( pktIsPacketWaiting(sInfo.sock) )
+      if ( pktIsWaiting() )
 	{
 	  Ships[Context.snum].sdfuse = 0;
-	  pktSendAck(sInfo.sock, PKT_TOCLIENT, PSEV_INFO, PERR_CANCELED,
+	  pktSendAck(PSEV_INFO, PERR_CANCELED,
 		  NULL);
 	  return;
 	}
@@ -2064,7 +2059,7 @@ void procDestruct(cpCommand_t *cmd)
 	clbKillShip( Context.snum, KB_SELF );
     }
   
-  pktSendAck(sInfo.sock, PKT_TOCLIENT, PSEV_INFO, PERR_DONE,
+  pktSendAck(PSEV_INFO, PERR_DONE,
 	  NULL);
   return;
   
@@ -2114,9 +2109,9 @@ void procAutoPilot(cpCommand_t *cmd)
 	  laststat = now;
 	}
 
-      if ( pktIsPacketWaiting(sInfo.sock) ) 
+      if ( pktIsWaiting() ) 
         {
-          pktSendAck(sInfo.sock, PKT_TOCLIENT, PSEV_INFO, PERR_CANCELED,
+          pktSendAck(PSEV_INFO, PERR_CANCELED,
                   NULL);
           break;
         }
@@ -2127,10 +2122,10 @@ void procAutoPilot(cpCommand_t *cmd)
   SFCLR(snum, SHIP_F_ROBOT);
   Ships[snum].action = 0;
   
-  pktSendAck(sInfo.sock, PKT_TOCLIENT, PSEV_INFO, PERR_DONE,
+  pktSendAck(PSEV_INFO, PERR_DONE,
 	  NULL);
+
   return;
-  
 }
 
 void procReload(cpCommand_t *cmd)

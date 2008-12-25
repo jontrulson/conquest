@@ -844,7 +844,6 @@ static int nOptionsIdle(void)
   static int old = 0;
   int pkttype;
   char buf[PKT_MAXSIZE];
-  int sockl[2] = {cInfo.sock, cInfo.usock};
 
   /* 'blink' the cursor */
   if ((gtime - old) > 250)
@@ -860,8 +859,8 @@ static int nOptionsIdle(void)
   if ((state == S_SYSMENU) || (state == S_SOPTS))
     return NODE_OK;             /* don't process packets is sys modes */
 
-  while ((pkttype = pktWaitForPacket(PKT_FROMSERVER, sockl, PKT_ANYPKT,
-                                  buf, PKT_MAXSIZE, 0, NULL)) > 0)
+  while ((pkttype = pktWaitForPacket(PKT_ANYPKT,
+                                     buf, PKT_MAXSIZE, 0, NULL)) > 0)
     processPacket(buf);
 
   if (pkttype < 0)          /* some error */

@@ -300,6 +300,9 @@ int main(int argc, char *argv[])
   int serveropt = FALSE;        /* specified a server with '-s' */
   int dosound = TRUE;
 
+  /* tell the packet routines that we are a client */
+  pktSetClientMode(TRUE);
+
   Context.entship = FALSE;
   Context.recmode = RECMODE_OFF;
   Context.updsec = 10;		/* dflt - 10/sec */
@@ -314,6 +317,8 @@ int main(int argc, char *argv[])
   cInfo.serverDead = TRUE;
   cInfo.isLoggedIn = FALSE;
   cInfo.remoteport = CN_DFLT_PORT;
+
+  pktSetSocketFds(cInfo.sock, cInfo.usock);
 
   utSetLogConfig(FALSE, TRUE);	/* use $HOME for logfile */
   if (!getLocalhost(cInfo.localhost, MAXHOSTNAME))

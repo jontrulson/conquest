@@ -205,6 +205,8 @@ int connectServer(char *remotehost, Unsgn16 remoteport)
           utLog("NET: udpOpen: %s", strerror(errno));
           cInfo.tryUDP = FALSE;
         }
+
+      pktSetSocketFds(PKT_SOCKFD_NOCHANGE, cInfo.usock);
     }
 
   utLog("Connecting to host: %s, port %d\n",
@@ -239,7 +241,10 @@ int connectServer(char *remotehost, Unsgn16 remoteport)
   cInfo.sock = s;
   cInfo.servaddr = sa;
   
-  pktSetNodelay(cInfo.sock);
+  pktSetSocketFds(cInfo.sock, PKT_SOCKFD_NOCHANGE);
+
+  /* FIXME */
+  pktSetNodelay();
 
   return TRUE;
 }
@@ -255,6 +260,9 @@ int main(int argc, char *argv[])
   char *metaServer = META_DFLT_SERVER; 
   metaSRec_t *metaServerList;   /* list of servers */
 
+  /* tell the packet routines that we are a client */
+  pktSetClientMode(TRUE);
+
   Context.entship = FALSE;
   Context.recmode = RECMODE_OFF;
   Context.updsec = 5;		/* dflt - 5/sec */
@@ -262,6 +270,8 @@ int main(int argc, char *argv[])
 
   cInfo.sock = -1;
   cInfo.usock = -1;
+  pktSetSocketFds(cInfo.sock, cInfo.usock);
+
   cInfo.doUDP = FALSE;
   cInfo.tryUDP = TRUE;
 
@@ -2741,7 +2751,7 @@ void menu(void)
   char *if7="reading:";
   char *if8="INITIALIZATION FAILURE";
   char *if9="The darkness becomes all encompassing, and your vision fails.";
-  int sockl[2] = {cInfo.sock, cInfo.usock};  
+
   catchSignals();	/* enable trapping of interesting signals */
   
 
@@ -2767,7 +2777,7 @@ void menu(void)
 
   /* now look for our ship packet before we get started.  It should be a
      full SP_SHIP packet for this first time */
-  if (pktWaitForPacket(PKT_FROMSERVER, sockl, SP_SHIP, buf, PKT_MAXSIZE,
+  if (pktWaitForPacket(SP_SHIP, buf, PKT_MAXSIZE,
 		    60, NULL) <= 0)
     {
       utLog("conquest:menu: didn't get initial SP_SHIP");
@@ -2782,7 +2792,7 @@ void menu(void)
 
       lose = FALSE;
 
-      while ((pkttype = pktWaitForPacket(PKT_FROMSERVER, sockl, PKT_ANYPKT,
+      while ((pkttype = pktWaitForPacket(PKT_ANYPKT,
 				      buf, PKT_MAXSIZE, 0, NULL)) > 0)
 	{			/* proc packets while we get them */
 	  switch (pkttype)
@@ -3070,7 +3080,7 @@ int newship( int unum, int *snum )
   spClientStat_t *scstat;
   int pkttype;
   char buf[PKT_MAXSIZE];
-  int sockl[2] = {cInfo.sock, cInfo.usock};
+
   /* here we will wait for ack's or a clientstat pkt. Acks indicate an
      error.  If the clientstat pkt's esystem is !0, we need to prompt
      for the system to enter and send it in a CP_COMMAND:CPCMD_ENTER
@@ -3079,7 +3089,7 @@ int newship( int unum, int *snum )
 
   while (TRUE)
     {
-      if ((pkttype = pktWaitForPacket(PKT_FROMSERVER, sockl, PKT_ANYPKT,
+      if ((pkttype = pktWaitForPacket(PKT_ANYPKT,
 				   buf, PKT_MAXSIZE, 60, NULL)) < 0)
 	{
 	  utLog("conquest:newship: waitforpacket returned %d", pkttype);
@@ -3329,7 +3339,6 @@ int welcome( int *unum )
   spAck_t sack = {};
   int pkttype;
   char buf[PKT_MAXSIZE];
-  int sockl[2] = {cInfo.sock, cInfo.usock};
   int done = FALSE;
   
   col=0;
@@ -3344,7 +3353,7 @@ int welcome( int *unum )
     {
       /* now look for SP_CLIENTSTAT or SP_ACK */
       if ((pkttype = 
-           pktRead(PKT_FROMSERVER, sockl, buf, PKT_MAXSIZE, 60)) <= 0)
+           pktRead(buf, PKT_MAXSIZE, 60)) <= 0)
         {
           utLog("welcome: read SP_CLIENTSTAT or SP_ACK failed: %d\n", pkttype);
           return FALSE;
@@ -3474,7 +3483,7 @@ int welcome( int *unum )
      for a user packet for this user. */
       
 
-  if (pktWaitForPacket(PKT_FROMSERVER, sockl, SP_USER, buf, PKT_MAXSIZE,
+  if (pktWaitForPacket(SP_USER, buf, PKT_MAXSIZE,
 		    60, NULL) <= 0)
     {
       utLog("conquest:welcome: waitforpacket SP_USER returned error");
@@ -3546,7 +3555,6 @@ void astservice(int sig)
   int readone;
   int difftime;
   char buf[PKT_MAXSIZE];
-  int sockl[2] = {cInfo.sock, cInfo.usock};
   static Unsgn32 iterstart = 0;
   Unsgn32 iternow = clbGetMillis();
   const Unsgn32 iterwait = 50.0; /* ms */
@@ -3558,8 +3566,7 @@ void astservice(int sig)
      doesn't stop when executing various commands */
 
 
-  while (pktRead(PKT_FROMSERVER, sockl,
-		    buf, PKT_MAXSIZE, 0) > 0)
+  while (pktRead(buf, PKT_MAXSIZE, 0) > 0)
     processPacket(buf); /* process them */
 
   /* drive the local universe */

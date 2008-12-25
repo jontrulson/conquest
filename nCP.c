@@ -2768,7 +2768,6 @@ static int nCPIdle(void)
   int now;
   char buf[PKT_MAXSIZE];
   Unsgn32 difftime = utDeltaGrand( Context.msgrand, &now );
-  int sockl[2] = {cInfo.sock, cInfo.usock};
   static Unsgn32 iterstart = 0;
   static Unsgn32 pingtime = 0;
   static Unsgn32 themetime = 0;
@@ -2791,8 +2790,8 @@ static int nCPIdle(void)
       dietime = iternow;
     }
 
-  while ((pkttype = pktWaitForPacket(PKT_FROMSERVER, sockl, PKT_ANYPKT,
-                                  buf, PKT_MAXSIZE, 0, NULL)) > 0)
+  while ((pkttype = pktWaitForPacket(PKT_ANYPKT,
+                                     buf, PKT_MAXSIZE, 0, NULL)) > 0)
     {
         switch (pkttype)
           {

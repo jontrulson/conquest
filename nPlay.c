@@ -91,7 +91,6 @@ static int _newship( int unum, int *snum )
 {
   int pkttype;
   char buf[PKT_MAXSIZE];
-  int sockl[2] = {cInfo.sock, cInfo.usock};
 
   /* here we will wait for ack's or a clientstat pkt. Acks indicate an
      error.  If the clientstat pkt's esystem is !0, we need to prompt
@@ -101,8 +100,8 @@ static int _newship( int unum, int *snum )
 
   while (TRUE)
     {
-      if ((pkttype = pktWaitForPacket(PKT_FROMSERVER, sockl, PKT_ANYPKT,
-				   buf, PKT_MAXSIZE, 60, NULL)) < 0)
+      if ((pkttype = pktWaitForPacket(PKT_ANYPKT,
+                                      buf, PKT_MAXSIZE, 60, NULL)) < 0)
 	{
 	  utLog("nPlay: _newship: waitforpacket returned %d", pkttype);
           fatal = TRUE;

@@ -244,18 +244,20 @@ void checkMaster(void)
               utLog("NET: forked client driver, pid = %d", getpid());
               sInfo.sock = t;
 
+              pktSetSocketFds(sInfo.sock, PKT_SOCKFD_NOCHANGE);
+
               memset(sInfo.remotehost, 0, MAXHOSTNAME);
               getHostname(sInfo.sock, sInfo.remotehost, MAXHOSTNAME - 1); 
               if (!tcpwCheckHostAccess(TCPW_DAEMON_CONQUESTD, 
                                        sInfo.remotehost))
                 {
-                  pktSendAck(sInfo.sock, PKT_TOCLIENT, PSEV_FATAL, PERR_UNSPEC,
+                  pktSendAck(PSEV_FATAL, PERR_UNSPEC,
                           "Access Denied: You are not allowed to connect to this server.");
                   close(t);
                   exit(1);
                 }
 
-              pktSetNodelay(sInfo.sock);
+              pktSetNodelay();
               
               return;
             }
@@ -286,6 +288,8 @@ int main(int argc, char *argv[])
   sInfo.clientDead = TRUE;
   sInfo.isMaster = FALSE;
   sInfo.isLoggedIn = FALSE;
+
+  pktSetSocketFds(sInfo.sock, sInfo.usock);
 
   while ((i = getopt(argc, argv, "dlp:u:mM:N:v")) != EOF)    /* get command args */
     switch (i)
@@ -649,7 +653,6 @@ int capentry( int snum, int *system )
   cpCommand_t *ccmd;
   char buf[PKT_MAXSIZE];
   Unsgn8 esystem = 0;
-  int sockl[2] = {sInfo.sock, sInfo.usock};
   
   /* First figure out which systems we can enter from. */
   for ( i = 0; i < NUMPLAYERTEAMS; i = i + 1 )
@@ -700,7 +703,7 @@ int capentry( int snum, int *system )
       /* now we wait for another ENTER command packet with it's detail member
 	 indicating the desired system. */
 
-      if ((pkttype = pktWaitForPacket(PKT_FROMCLIENT, sockl, CP_COMMAND,
+      if ((pkttype = pktWaitForPacket(CP_COMMAND,
 				   buf, PKT_MAXSIZE, 1, NULL)) < 0)
         {
 	  utLog("conquestd:capentry: waitforpacket returned %d", pkttype); 
@@ -756,7 +759,6 @@ void dead( int snum, int leave )
   int i, j, kb, now, entertime; 
   Unsgn8 flags = SPCLNTSTAT_FLAG_NONE; /* for clientstat msg */
   char buf[PKT_MAXSIZE];	/* gen purpose */
-  int sockl[2] = {sInfo.sock, sInfo.usock};
   
   /* If something is wrong, don't do anything. */
   if ( snum < 1 || snum > MAXSHIPS )
@@ -844,7 +846,7 @@ void dead( int snum, int leave )
   /* if conquered, wait for the cpMessage_t */
   if (kb == KB_CONQUER)
     {
-      if (pktWaitForPacket(PKT_FROMCLIENT, sockl, CP_MESSAGE, 
+      if (pktWaitForPacket(CP_MESSAGE, 
 			buf, PKT_MAXSIZE,
 			(60 * 5), NULL) <= 0)
 	{			/* error or timeout.  gen lastwords */
@@ -1158,7 +1160,7 @@ void handleSimpleCmdPkt(cpCommand_t *ccmd)
 
     case CPCMD_PING:
       clbBlockAlarm();
-      pktSendAck(sInfo.sock, PKT_TOCLIENT, PSEV_INFO, PERR_PINGRESP, NULL);
+      pktSendAck(PSEV_INFO, PERR_PINGRESP, NULL);
       clbUnblockAlarm();
       break;
 
@@ -1198,7 +1200,6 @@ void menu(void)
   char buf[PKT_MAXSIZE];
   cpCommand_t *ccmd;
   static const Unsgn32 sleeplimit = ((1000 * 60) * 5); /* 5 minutes */
-  int sockl[2] = {sInfo.sock, sInfo.usock};
 
   catchSignals();	/* enable trapping of interesting signals */
   
@@ -1274,14 +1275,14 @@ void menu(void)
 
       if ( lose )				/* again, Jorge? */
 	{
-	  pktSendAck(sInfo.sock, PKT_TOCLIENT, PSEV_FATAL, PERR_LOSE, NULL);
+	  pktSendAck(PSEV_FATAL, PERR_LOSE, NULL);
 	  return;
 	}
       
       /* Reset up the destruct fuse. */
       Ships[Context.snum].sdfuse = -TIMEOUT_PLAYER;
       
-      if ((pkttype = pktWaitForPacket(PKT_FROMCLIENT, sockl, PKT_ANYPKT,
+      if ((pkttype = pktWaitForPacket(PKT_ANYPKT,
                                    buf, PKT_MAXSIZE, 0, NULL)) < 0)
 	{
 	  freeship();
@@ -1419,7 +1420,7 @@ int newship( int unum, int *snum )
 	  if (!SVACANT(vec[0]))
 	    {		   /* if it's available, we'll take it */
 			   /* ...if it's not already being flown... */
-	      pktSendAck(sInfo.sock, PKT_TOCLIENT, PSEV_ERROR, PERR_FLYING, NULL);
+	      pktSendAck(PSEV_ERROR, PERR_FLYING, NULL);
 	      Ships[*snum].status = SS_RESERVED;
 	      return ( FALSE );
 	    }
@@ -1464,7 +1465,7 @@ int newship( int unum, int *snum )
 	 reincarnate too */
       if ( j >= Users[unum].multiple && numavail == 0)
 	{
-	  pktSendAck(sInfo.sock, PKT_TOCLIENT, PSEV_ERROR, PERR_TOOMANYSHIPS, 
+	  pktSendAck(PSEV_ERROR, PERR_TOOMANYSHIPS, 
 		  NULL);
 	  Ships[*snum].status = SS_RESERVED;
 	  
@@ -1562,7 +1563,6 @@ int play(void)
   char msgbuf[128];
   int pkttype;
   char buf[PKT_MAXSIZE];
-  int sockl[2] = {sInfo.sock, sInfo.usock};
 
   /* Can't carry on without a vessel. */
   if ( (rv = newship( Context.unum, &Context.snum )) != TRUE)
@@ -1623,7 +1623,7 @@ int play(void)
 	break;
 
       didsomething = 0;
-      if ((pkttype = pktWaitForPacket(PKT_FROMCLIENT, sockl, PKT_ANYPKT,
+      if ((pkttype = pktWaitForPacket(PKT_ANYPKT,
 				   buf, PKT_MAXSIZE, 0, NULL)) < 0)
 	{
 	  if (errno != EINTR)
@@ -1740,7 +1740,7 @@ int welcome( int *unum )
       /* Must be a new player. */
       if ( ConqInfo->closed )
 	{
-	  pktSendAck(sInfo.sock, PKT_TOCLIENT, PSEV_FATAL, PERR_CLOSED,
+	  pktSendAck(PSEV_FATAL, PERR_CLOSED,
                   NULL);
 	  return ( FALSE );
 	}
@@ -1755,7 +1755,7 @@ int welcome( int *unum )
 
       if ( ! clbRegister( name, cbuf, team, unum ) )
 	{
-	  pktSendAck(sInfo.sock, PKT_TOCLIENT, PSEV_FATAL, PERR_REGISTER,
+	  pktSendAck(PSEV_FATAL, PERR_REGISTER,
                   NULL);
 	  return ( FALSE );
 	}
@@ -1774,7 +1774,7 @@ int welcome( int *unum )
   /* Must be special to play when closed. */
   if ( ConqInfo->closed && ! Users[*unum].ooptions[OOPT_PLAYWHENCLOSED] )
     {
-      pktSendAck(sInfo.sock, PKT_TOCLIENT, PSEV_FATAL, PERR_CLOSED,
+      pktSendAck(PSEV_FATAL, PERR_CLOSED,
 	      NULL);
       utLog("conquestd: welcome: game closed\n");
       return ( FALSE );
@@ -1783,7 +1783,7 @@ int welcome( int *unum )
   /* Can't play without a ship. */
   if ( ! clbFindShip( &Context.snum ) )
     {
-      pktSendAck(sInfo.sock, PKT_TOCLIENT, PSEV_FATAL, PERR_NOSHIP,
+      pktSendAck(PSEV_FATAL, PERR_NOSHIP,
 	      NULL);
       utLog("WELCOME: findship failed");
       return ( FALSE );
@@ -1816,7 +1816,6 @@ static int hello(void)
   fd_set readfds;
   struct sockaddr_in usa;	/* internet socket addr. structure - udp */
   cpAck_t *cpack;
-  int sockl[2] = {sInfo.sock, sInfo.usock};
 
   /* open a UDP socket and bind to it */
   if ((sInfo.usock = udpOpen(listenPort, &usa)) < 0)
@@ -1825,6 +1824,7 @@ static int hello(void)
       sInfo.usock = -1;
       sInfo.tryUDP = FALSE;
     }
+  pktSetSocketFds(PKT_SOCKFD_NOCHANGE, sInfo.usock);
 
   /* first loadup and send a server hello */
   shello.type = SP_HELLO;
@@ -1842,7 +1842,7 @@ static int hello(void)
   if (ConqInfo->closed)
     shello.flags |= SPHELLO_FLAGS_CLOSED;
 
-  if (!pktWrite(PKT_TOCLIENT, sInfo.sock, &shello))
+  if (!pktWrite(PKT_SENDTCP, &shello))
     {
       utLog("NET: SERVER: hello: write shello failed\n");
       return FALSE;
@@ -1880,12 +1880,15 @@ static int hello(void)
                   utLog("NET: SERVER: hello: udp connect() failed: %s", strerror(errno));
                   sInfo.tryUDP = FALSE;
                 }
+              else
+                utLog("NET: SERVER: hello: UDP connection to client established.");
+
             }
         }
     }
 
   /* now we want a client hello in response */
-  if ((pkttype = pktRead(PKT_FROMCLIENT, sockl, buf, PKT_MAXSIZE, 60)) < 0)
+  if ((pkttype = pktRead(buf, PKT_MAXSIZE, 60)) < 0)
   {
     utLog("NET: SERVER: hello: read client hello failed, pkttype = %d",
          pkttype);
@@ -1925,7 +1928,7 @@ static int hello(void)
     {
       sprintf(cbuf, "SERVER: Protocol mismatch, server 0x%x, client 0x%x",
 	      PROTOCOL_VERSION, chello.protover);
-      pktSendAck(sInfo.sock, PKT_TOCLIENT, PSEV_FATAL, PERR_BADPROTO, cbuf);
+      pktSendAck(PSEV_FATAL, PERR_BADPROTO, cbuf);
       utLog("NET: %s", cbuf);
       return FALSE;
     }
@@ -1946,17 +1949,17 @@ static int hello(void)
      it, it will acknowlege it in it's ACK packet, which will tell us
      we can do udp. woohoo! */
   if (sInfo.tryUDP)
-    sendServerStat(sInfo.usock);
+    sendServerStat(PKT_SENDUDP);
 
   /* now send the server stats normally */
-  if (!sendServerStat(sInfo.sock))
+  if (!sendServerStat(PKT_SENDTCP))
     {
       utLog("NET: SERVER: hello: sendServerStat failed");
       return FALSE;
     }
 
   /* now we want an ack.  If we get it, we're done! */
-  if ((pkttype = pktRead(PKT_FROMCLIENT, sockl, buf, PKT_MAXSIZE, 60)) < 0)
+  if ((pkttype = pktRead(buf, PKT_MAXSIZE, 60)) < 0)
     {
       utLog("NET: SERVER: hello: read client Ack failed");
       return FALSE;

@@ -20,6 +20,15 @@
 #error "The select() system call is required"
 #endif
 
+/* our tcp/udp sockets */
+static int tcp_sock = -1;
+static int udp_sock = -1;
+
+/* default to 'server' mode.  If true, then we are being used in the
+ * client
+ */
+static int isClient = FALSE;
+
 /* these need to be kept in sync with the protocol numbers in
  *  protocol.h
  */
@@ -220,6 +229,14 @@ static struct _packetent serverPackets[] = {
 
 static int connDead = 0;	/* if we die for some reason */
 
+/* clients call this so these routines know how to validate packets */
+void pktSetClientMode(int isclient)
+{
+  isClient = isclient;
+
+  return;
+}
+
 int pktIsConnDead(void)
 {
   return connDead;
@@ -231,27 +248,43 @@ void pktNotImpl(void *nothing)
   return;
 }
 
-/* sends acks. to/from client/server. The server (TOCLIENT) can add a
-   string message as well. */
+/* initialize the tcp and udp sockets we'll be using in the packet routines */
+void pktSetSocketFds(int tcpsock, int udpsock)
+{
 
-int pktSendAck(int sock, int dir, Unsgn8 severity, Unsgn8 code, char *msg)
+  if (tcpsock != PKT_SOCKFD_NOCHANGE)
+    tcp_sock = tcpsock;
+  if (udpsock != PKT_SOCKFD_NOCHANGE)
+    udp_sock = udpsock;
+
+  return;
+}
+
+
+/* sends acks. to/from client/server. The server can add a
+ * string message as well. We always send acks via TCP.
+ */
+
+int pktSendAck(Unsgn8 severity, Unsgn8 code, char *msg)
 {
   cpAck_t cack;
   spAck_t sack;
   spAckMsg_t sackmsg;
   void *buf;
 
-  switch (dir)
+  if (tcp_sock < 0)
+    return -1;
+
+  if (isClient)
     {
-    case PKT_TOSERVER:
       cack.type = CP_ACK;
       cack.severity = severity;
       cack.code = code;
-
+      
       buf = &cack;
-
-      break;
-    case PKT_TOCLIENT:
+    }
+  else
+    {                           /* server */
       if (msg)
 	{
 	  sackmsg.type = SP_ACKMSG;
@@ -272,17 +305,9 @@ int pktSendAck(int sock, int dir, Unsgn8 severity, Unsgn8 code, char *msg)
 
 	  buf = &sack;
 	}
-      break;
+    }    
 
-    default:
-#if defined(DEBUG_PKT)
-      utLog("pktSendAck: invalid dir = %d\n", dir);
-#endif
-      return -1;
-      break;
-    }
-
-  return(pktWrite(dir, sock, buf));
+  return(pktWrite(PKT_SENDTCP, buf));
 }
 
 char *pktSeverity2String(int psev)
@@ -313,47 +338,21 @@ char *pktSeverity2String(int psev)
   return ("");			/* NOTREACHED */
 }
 
-/* this just inverts the meaning of a packet direction - TOCLIENT becomes
-   FROMCLIENT, etc... */
-int pktInvertDirection(int dir)
-{
-  switch (dir)
-    {
-    case PKT_TOCLIENT:
-      return PKT_FROMCLIENT;
-      break;
-   case PKT_TOSERVER:
-      return PKT_FROMSERVER;
-      break;
-   case PKT_FROMCLIENT:
-      return PKT_TOCLIENT;
-      break;
-   case PKT_FROMSERVER:
-      return PKT_TOSERVER;
-      break;
-   default:
-      return -1;
-      break;
-    }
-  return -1;			/* NOTREACHED */
-}
-
-int pktWaitForPacket(int dir, int sockl[], int type, char *buf, int blen, 
-		  int delay, char *nakmsg)
+int pktWaitForPacket(int type, char *buf, int blen, 
+                     int delay, char *nakmsg)
 {
   int pkttype;
 
   while (TRUE)
     {
       errno = 0;		/* be afraid. */
-      if ((pkttype = pktRead(dir, sockl, buf, blen, delay)) >= 0)
+      if ((pkttype = pktRead(buf, blen, delay)) >= 0)
 	{
 	  if (pkttype == type || type == PKT_ANYPKT || pkttype == 0)
 	    return pkttype;
 
 	  if (pkttype != type && nakmsg) /* we need to use a msg nak */
-	    pktSendAck(sockl[0], pktInvertDirection(dir), PSEV_ERROR, PERR_UNSPEC, 
-                    nakmsg); 
+	    pktSendAck(PSEV_ERROR, PERR_UNSPEC, nakmsg); 
 	}
 
       if (pkttype < 0)
@@ -361,7 +360,7 @@ int pktWaitForPacket(int dir, int sockl[], int type, char *buf, int blen,
 	  if (errno != EINTR)
             {
 #if defined(DEBUG_PKT)
-              utLog("pktWaitForPacket(dir=%d): read error %s\n", dir, strerror(errno));
+              utLog("pktWaitForPacket: read error %s\n", strerror(errno));
 #endif
               return -1;
             }
@@ -404,27 +403,38 @@ int pktClientPacketSize(int type)
 
 /* like iochav(), but for the network connection.  return true if there
    is packet data ready */
-int pktIsPacketWaiting(int sock)
+int pktIsWaiting(void)
 {
   struct timeval timeout;
   fd_set readfds;
+  int maxfd;
   
+  /* sanity check */
+  if (tcp_sock < 0 && udp_sock < 0)
+    return FALSE;
+
   timeout.tv_sec = 0;		/* no wait */
   timeout.tv_usec = 0;
 
   FD_ZERO(&readfds);
-  FD_SET(sock, &readfds);
 
-  if (select(sock+1, &readfds, NULL, NULL, &timeout) > 0)
+  if (tcp_sock >= 0)
+    FD_SET(tcp_sock, &readfds);
+
+  if (udp_sock >= 0)
+    FD_SET(udp_sock, &readfds);
+
+  maxfd = max(tcp_sock, udp_sock);
+  if (select(maxfd + 1, &readfds, NULL, NULL, &timeout) > 0)
     return TRUE;
   else
     return FALSE;
+
 }
 
 
-/* sockl[0] is expected tcp socket, sockl[1] is for udp */
-int pktRead(int direction, int sockl[], char *buf, int blen, 
-	       unsigned int delay)
+/* read a udp or tcp socket for packets. */
+int pktRead(char *buf, int blen, unsigned int delay)
 {
   Unsgn8 type;
   int len, rlen, left, rv;
@@ -434,26 +444,33 @@ int pktRead(int direction, int sockl[], char *buf, int blen,
   int gotudp = FALSE;           
   int vartype;                  /* variable type (SP/CP) */
 
-  if (connDead || direction == -1) 
+  if (connDead) 
+    return -1;
+
+  /* sanity check */
+  if (tcp_sock < 0 && udp_sock < 0)
     return -1;
 
   timeout.tv_sec = delay;		/* timeout for intial read */
   timeout.tv_usec = 0;
 
   FD_ZERO(&readfds);
-  FD_SET(sockl[0], &readfds);
-  maxfd = sockl[0];
-  if (sockl[1] >= 0)
+  if (tcp_sock >= 0)
     {
-      FD_SET(sockl[1], &readfds);
-      maxfd = max(sockl[0], sockl[1]);
+      FD_SET(tcp_sock, &readfds);
+      maxfd = tcp_sock;
+    }
+  if (udp_sock >= 0)
+    {
+      FD_SET(udp_sock, &readfds);
+      maxfd = max(tcp_sock, udp_sock);
     }
 
   if ((rv=select(maxfd+1, &readfds, NULL, NULL, &timeout)) > 0)
     {				/* we have a byte */
-      if (FD_ISSET(sockl[0], &readfds))
+      if (FD_ISSET(tcp_sock, &readfds))
 	{
-	  if ((rv = read(sockl[0], &type, 1)) <= 0)
+	  if ((rv = read(tcp_sock, &type, 1)) <= 0)
 	    {
 	      *buf = 0;
               utLog("ERROR: pktRead(): TCP read(header type): %s",
@@ -461,9 +478,9 @@ int pktRead(int direction, int sockl[], char *buf, int blen,
 	      return -1;
 	    }
 	}
-      else if (sockl[1] >= 0 && FD_ISSET(sockl[1], &readfds))
+      else if (udp_sock >= 0 && FD_ISSET(udp_sock, &readfds))
         {                     /* got a udp, read the whole thing */
-          if ((rv = read(sockl[1], buf, blen)) <= 0)
+          if ((rv = read(udp_sock, buf, blen)) <= 0)
             {
               *buf = 0;
               utLog("ERROR: pktRead(): UDP read(header type): %s",
@@ -493,20 +510,15 @@ int pktRead(int direction, int sockl[], char *buf, int blen,
       return -1;
     }
 
-  switch(direction)
+  if (isClient)
     {
-    case PKT_FROMSERVER:
       len = pktServerPacketSize(type);
       vartype = SP_VARIABLE;    /* possible variable */
-      break;
-    case PKT_FROMCLIENT:
+    }
+  else
+    {
       len = pktClientPacketSize(type);
       vartype = CP_VARIABLE;      /* possible variable */
-      break;
-    default:
-      utLog("pktRead: Invalid dir code %s", direction);
-      return -1;
-      break;
     }
 
   pktRXBytes += len;
@@ -549,11 +561,12 @@ int pktRead(int direction, int sockl[], char *buf, int blen,
 	  timeout.tv_usec = 0;
       
 	  FD_ZERO(&readfds);
-	  FD_SET(sockl[0], &readfds);
+	  FD_SET(tcp_sock, &readfds);
 	  
-	  if ((rv=select(sockl[0]+1, &readfds, NULL, NULL, &timeout)) > 0)
+	  if ((rv=select(tcp_sock+1, &readfds, NULL, NULL, &timeout)) > 0)
 	    {			/* some data avail */
-	      if ((rlen = read(sockl[0], ((buf + 1) + (len - left)), left)) > 0)
+	      if ((rlen = read(tcp_sock, 
+                               ((buf + 1) + (len - left)), left)) > 0)
 		{
 		  /* do we have enough? */
 		  if ((left - rlen) > 0 /*len != rlen*/)
@@ -573,7 +586,7 @@ int pktRead(int direction, int sockl[], char *buf, int blen,
                       pktVariable_t *vpkt = (pktVariable_t *)buf;
 
                       /* read the first byte (type) of new pkt */
-                      if ((rv = read(sockl[0], &type, 1)) <= 0)
+                      if ((rv = read(tcp_sock, &type, 1)) <= 0)
                         {
                           *buf = 0;
                           utLog("ERROR: pktRead(): VARTYPE read(header type): %s",
@@ -635,33 +648,28 @@ int pktRead(int direction, int sockl[], char *buf, int blen,
 }
 
 
-int pktWrite(int direction, int sock, void *data)
+int pktWrite(int socktype, void *data)
 {
   int len, wlen, left;
   Unsgn8 type;
   char *packet = (char *)data;
+  int sock;
 
   type = (Unsgn8)*packet;	/* first byte is ALWAYS pkt type */
 
   if (connDead) 
     return -1;
+  
+  if (socktype == PKT_SENDUDP && udp_sock >= 0)
+    sock = udp_sock;
+  else
+    sock = tcp_sock;
 
-  switch(direction)
-    {
-    case PKT_TOSERVER:
-      len = pktClientPacketSize(type);
-      break;
-    case PKT_TOCLIENT:
-      len = pktServerPacketSize(type);
-      break;
-    default:
-#if defined(DEBUG_PKT)
-      utLog("pktWrite: Invalid dir code %s\n", direction);
-#endif
-      return -1;
-      break;
-    }
-
+  if (isClient)
+    len = pktClientPacketSize(type);
+  else
+    len = pktServerPacketSize(type);
+    
   if (len)
     {
       left = len;
@@ -725,22 +733,28 @@ int pktIsValid(int pkttype, void *pkt)
   return TRUE;
 }
 
-void pktSetNodelay(int sock)
+void pktSetNodelay(void)
 {
   /* turn off TCP delay. */
   int on = 1;
   struct protoent *p = getprotobyname("tcp");
 
-  if (!p)
+  if (tcp_sock < 0)
     {
-      utLog("INFO: getprotobyname(tcp) == NULL");
+      utLog("INFO: pktSetNodelay: tcp_sock is invalid (%d)", tcp_sock);
       return;
     }
 
-  if (setsockopt(sock, 
+  if (!p)
+    {
+      utLog("INFO: pktSetNodelay: getprotobyname(tcp) == NULL");
+      return;
+    }
+
+  if (setsockopt(tcp_sock, 
                  p->p_proto, TCP_NODELAY, (void *)&on, sizeof(on)) <  0) 
     {
-      utLog("INFO: setsockopt(TCP_NODELAY) failed: %s",
+      utLog("INFO: pktSetNodelay: setsockopt(TCP_NODELAY) failed: %s",
            strerror(errno));
     }
   

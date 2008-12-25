@@ -52,7 +52,7 @@ int sendClientStat(int sock, Unsgn8 flags, Unsgn8 snum, Unsgn8 team,
 int sendUser(int sock, Unsgn16 unum);
 int sendShip(int sock, Unsgn8 snum);
 int sendPlanet(int sock, Unsgn8 pnum, int force);
-int sendServerStat(int sock);
+int sendServerStat(int socktype);
 int sendTorp(int sock, Unsgn8 snum, Unsgn8 tnum);
 int sendFeedBack(char *msg);
 int sendMessage(Msg_t *msg);

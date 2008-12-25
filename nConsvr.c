@@ -144,6 +144,7 @@ static int nConsvrIdle(void)
           utLog("NET: udpOpen: %s", strerror(errno));
           cInfo.tryUDP = FALSE;
         }
+      pktSetSocketFds(PKT_SOCKFD_NOCHANGE, cInfo.usock);
     }
 
   utLog("Connecting to host: %s, port %d\n",
@@ -169,7 +170,8 @@ static int nConsvrIdle(void)
   cInfo.sock = s;
   cInfo.servaddr = sa;
 
-  pktSetNodelay(cInfo.sock);
+  pktSetSocketFds(cInfo.sock, PKT_SOCKFD_NOCHANGE);
+  pktSetNodelay();
 
   if (!clientHello(CLIENTNAME))
     {

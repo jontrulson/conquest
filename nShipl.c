@@ -171,13 +171,12 @@ static int nShiplIdle(void)
 {
   int pkttype;
   char buf[PKT_MAXSIZE];
-  int sockl[2] = {cInfo.sock, cInfo.usock};
 
   if (Context.recmode == RECMODE_PLAYING || Context.recmode == RECMODE_PAUSED)
     return NODE_OK;             /* no packet reading here */
 
-  while ((pkttype = pktWaitForPacket(PKT_FROMSERVER, sockl, PKT_ANYPKT,
-                                  buf, PKT_MAXSIZE, 0, NULL)) > 0)
+  while ((pkttype = pktWaitForPacket(PKT_ANYPKT,
+                                     buf, PKT_MAXSIZE, 0, NULL)) > 0)
     processPacket(buf);
 
   if (pkttype < 0)          /* some error */

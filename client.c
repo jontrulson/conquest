@@ -37,7 +37,6 @@ int sendAuth(int sock, Unsgn8 flag, char *login, char *pw)
   int rv;
   spAck_t *sack;
   cpAuthenticate_t cauth;
-  int sockl[2] = {cInfo.sock, cInfo.usock};
 
   memset((void *)&cauth, 0, sizeof(cauth));
 
@@ -54,7 +53,7 @@ int sendAuth(int sock, Unsgn8 flag, char *login, char *pw)
        login, pw);
 #endif
 
-  if ((rv = pktWrite(PKT_TOSERVER, cInfo.sock, &cauth)) <= 0)
+  if ((rv = pktWrite(PKT_SENDTCP, &cauth)) <= 0)
     {
       utLog("sendAuth: pktWrite returned %d\n", rv);
       return rv;
@@ -65,8 +64,8 @@ int sendAuth(int sock, Unsgn8 flag, char *login, char *pw)
   if (flag == CPAUTH_CHGPWD)
     return PERR_OK;
 
-  rv = pktWaitForPacket(PKT_FROMSERVER, sockl, SP_ACK, buf, PKT_MAXSIZE, 
-		     60, NULL);
+  rv = pktWaitForPacket(SP_ACK, buf, PKT_MAXSIZE, 
+                        60, NULL);
 
   if (rv <= 0)			/* error or timeout (0) */
     {
@@ -91,7 +90,7 @@ int sendSetCourse(int sock, Sgn8 lock, real head)
   csc.lock = lock;
   csc.head = (Unsgn16)htons((Unsgn16)(head * 100.0));
 
-  if (pktWrite(PKT_TOSERVER, sock, &csc) <= 0)
+  if (pktWrite(PKT_SENDTCP, &csc) <= 0)
     return FALSE;
   else
     return TRUE;
@@ -681,7 +680,7 @@ int sendSetName(char *name)
   sname.type = CP_SETNAME;
   strncpy((char *)sname.alias, name, MAXUSERPNAME - 1);
 
-  if (pktWrite(PKT_TOSERVER, cInfo.sock, &sname) <= 0)
+  if (pktWrite(PKT_SENDTCP, &sname) <= 0)
     return FALSE;
   else 
     return TRUE;
@@ -698,13 +697,13 @@ int sendCommand(Unsgn8 cmd, Unsgn16 detail)
 
   if (cmd == CPCMD_KEEPALIVE && cInfo.usock != -1)
     {
-      pktWrite(PKT_TOSERVER, cInfo.usock, &ccmd);
+      pktWrite(PKT_SENDUDP, &ccmd);
       return TRUE;
     }
   else
     {
 
-      if (pktWrite(PKT_TOSERVER, cInfo.sock, &ccmd) <= 0)
+      if (pktWrite(PKT_SENDTCP, &ccmd) <= 0)
         return FALSE;
       else 
         return TRUE;
@@ -721,7 +720,7 @@ int sendFireTorps(int num, real dir)
   ftorps.num = (Unsgn8)num;
   ftorps.dir = htons((Unsgn16)(dir * 100.0));
 
-  if (pktWrite(PKT_TOSERVER, cInfo.sock, &ftorps) <= 0)
+  if (pktWrite(PKT_SENDTCP, &ftorps) <= 0)
     return FALSE;
   else 
     return TRUE;
@@ -741,7 +740,7 @@ int sendMessage(int to, char *msg)
   cmsg.to = (Sgn16)htons(to);
   strncpy((char *)cmsg.msg, msg, MESSAGE_SIZE - 1);
 
-  if (pktWrite(PKT_TOSERVER, cInfo.sock, &cmsg) <= 0)
+  if (pktWrite(PKT_SENDTCP, &cmsg) <= 0)
     return FALSE;
   else 
     return TRUE;
@@ -757,11 +756,9 @@ int clientHello(char *clientname)
   int rv;
   struct timeval tv;
   fd_set readfds;
-  int sockl[2] = {cInfo.sock, cInfo.usock};
 
   /* there should be a server hello waiting for us */
-  if ((pkttype = pktRead(PKT_FROMSERVER, sockl, 
-			    buf, PKT_MAXSIZE, 60)) < 0)
+  if ((pkttype = pktRead(buf, PKT_MAXSIZE, 60)) < 0)
   {
     utLog("clientHello: read server hello failed\n");
     return FALSE;
@@ -843,7 +840,7 @@ int clientHello(char *clientname)
   strncat((char *)chello.clientver, ConquestDate, 
 	  (CONF_SERVER_NAME_SZ - strlen(ConquestVersion)) - 2);
 
-  if (!pktWrite(PKT_TOSERVER, cInfo.sock, &chello))
+  if (!pktWrite(PKT_SENDTCP, &chello))
     {
       utLog("clientHello: write client hello failed\n");
       return FALSE;
@@ -880,8 +877,7 @@ int clientHello(char *clientname)
     }
   /* now we need a server stat or a Nak */
 
-  if ((pkttype = pktRead(PKT_FROMSERVER, sockl, 
-			    buf, PKT_MAXSIZE, 60)) < 0)
+  if ((pkttype = pktRead(buf, PKT_MAXSIZE, 60)) < 0)
   {
     utLog("clientHello: read of SP_ACK or SP_SERVERSTAT failed\n");
     return FALSE;
@@ -927,9 +923,9 @@ int clientHello(char *clientname)
     }
 
   if (cInfo.doUDP)
-    pktSendAck(cInfo.sock, PKT_TOSERVER, PSEV_INFO, PERR_DOUDP, NULL);
+    pktSendAck(PSEV_INFO, PERR_DOUDP, NULL);
   else
-    pktSendAck(cInfo.sock, PKT_TOSERVER, PSEV_INFO, PERR_OK, NULL);
+    pktSendAck(PSEV_INFO, PERR_OK, NULL);
 
   return TRUE;
 }

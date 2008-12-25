@@ -165,7 +165,6 @@ void nMenuInit(void)
 {
   char buf[PKT_MAXSIZE];
   static int inited = FALSE;
-  int sockl[2] = {cInfo.sock, cInfo.usock};
 
   state = S_NONE;
   prompting = FALSE;
@@ -187,8 +186,8 @@ void nMenuInit(void)
       
       /* now look for our ship packet before we get started.  It should be a
          full SP_SHIP packet for this first time */
-      if (pktWaitForPacket(PKT_FROMSERVER, sockl, SP_SHIP, buf, PKT_MAXSIZE,
-                        60, NULL) <= 0)
+      if (pktWaitForPacket(SP_SHIP, buf, PKT_MAXSIZE,
+                           60, NULL) <= 0)
         {
           utLog("nMenuInit: didn't get initial SP_SHIP");
           fatal = TRUE;
@@ -288,10 +287,9 @@ static int nMenuIdle(void)
   int pkttype;
   char buf[PKT_MAXSIZE];
   spAck_t *sack;
-  int sockl[2] = {cInfo.sock, cInfo.usock};
 
-  while ((pkttype = pktWaitForPacket(PKT_FROMSERVER, sockl, PKT_ANYPKT,
-                                  buf, PKT_MAXSIZE, 0, NULL)) > 0)
+  while ((pkttype = pktWaitForPacket(PKT_ANYPKT,
+                                     buf, PKT_MAXSIZE, 0, NULL)) > 0)
     {                       /* proc packets while we get them */
       switch (pkttype)
         {

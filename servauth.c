@@ -79,7 +79,6 @@ int Authenticate(char *username, char *password)
   int done, rv;
   char epw[MAXUSERNAME];
   int logcount = 3;
-  int sockl[2] = {sInfo.sock, sInfo.usock};
 
   expire_users();		/* now is a good time to expire users */
 
@@ -91,8 +90,8 @@ int Authenticate(char *username, char *password)
 
   while (!done)
     {
-      rv = pktWaitForPacket(PKT_FROMCLIENT, sockl, CP_AUTHENTICATE, 
-			 buf, PKT_MAXSIZE, (60 * 10), "Waiting for Auth");
+      rv = pktWaitForPacket(CP_AUTHENTICATE, buf, 
+                            PKT_MAXSIZE, (60 * 10), "Waiting for Auth");
 
       if (rv <= 0)
 	{
@@ -106,8 +105,8 @@ int Authenticate(char *username, char *password)
 
       if (checkuname((char *)cauth->login) == FALSE)
 	{
-	  pktSendAck(sInfo.sock, PKT_TOCLIENT, PSEV_ERROR, PERR_INVUSER,
-		  NULL);
+	  pktSendAck(PSEV_ERROR, PERR_INVUSER,
+                     NULL);
 	  continue;
 	}
 
@@ -117,13 +116,13 @@ int Authenticate(char *username, char *password)
 
 	  if (clbGetUserNum( &unum, (char *)cauth->login, 0 ) == TRUE)
 	    {			/* user exits */
-	      pktSendAck(sInfo.sock, PKT_TOCLIENT, PSEV_INFO, PERR_OK,
-		      NULL);
+	      pktSendAck(PSEV_INFO, PERR_OK,
+                         NULL);
 	    }
 	  else
 	    {
-	      pktSendAck(sInfo.sock, PKT_TOCLIENT, PSEV_ERROR, PERR_NOUSER,
-		      NULL);
+	      pktSendAck(PSEV_ERROR, PERR_NOUSER,
+                         NULL);
 	    }
 
 	  break;
@@ -132,7 +131,7 @@ int Authenticate(char *username, char *password)
 
 	  if (logcount <= 0)	/* too many tries, fail */
 	    {
-	      pktSendAck(sInfo.sock, PKT_TOCLIENT, PSEV_FATAL, PERR_BADPWD,
+	      pktSendAck(PSEV_FATAL, PERR_BADPWD,
                       NULL);
 	      return FALSE;
 	    }
@@ -140,14 +139,14 @@ int Authenticate(char *username, char *password)
 	  if ((rv = doLogin((char *)cauth->login, (char *)cauth->pw, 
                             epw)) != PERR_OK)
 	    {			/* somethings wrong, bad/inv pw, etc */
-	      pktSendAck(sInfo.sock, PKT_TOCLIENT, PSEV_ERROR, rv,
+	      pktSendAck(PSEV_ERROR, rv,
 		      NULL);
 	      logcount--;
 	    }
 	  else
 	    {			/* login successful */
 	      done = TRUE;
-	      pktSendAck(sInfo.sock, PKT_TOCLIENT, PSEV_INFO, PERR_OK,
+	      pktSendAck(PSEV_INFO, PERR_OK,
                       NULL);
 	    }
 

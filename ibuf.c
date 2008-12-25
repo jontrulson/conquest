@@ -77,7 +77,10 @@ void ibufPut(char *thestr)
   int n;
   int c;
 
-  if ( !thestr || ((n = strlen(thestr)) == 0) )
+  if (!thestr)
+    return;
+
+  n = strlen(thestr);
 
   /* cvt to int's and insert into rb */
   for (i=0; i<n; i++)
@@ -126,7 +129,7 @@ int ibufExpandMacro(int fkey)
   ibufPut(UserConf.MacrosF[fkey]);	
 
 #ifdef DEBUG_MACROS
-  utLog("ibufExpandMacro(): got an FKey: %d", ch);
+  utLog("ibufExpandMacro(): got an FKey: %d", fkey);
 #endif
   
   return(TRUE);
@@ -139,6 +142,9 @@ int ibufExpandMouseMacro(int but, Unsgn32 mods, real mangle)
   char *s;
   static char buf[MAX_MACRO_LEN];
 
+#if defined(DEBUG_MACROS)
+  utLog("ibufExpandMouseMacro(): mod %08x but %d", mods, but);
+#endif
   
   if (but < 0 || but >= CONF_MAXBUTTONS)
     return(FALSE);
