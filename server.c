@@ -267,7 +267,7 @@ int sendServerStat(int socktype)
 
   sStat.servertime = (Unsgn32)htonl(getnow(NULL, 0));
   
-  if (!pktWrite(socktype, &sStat))
+  if (pktWrite(socktype, &sStat) <= 0)
     {
       utLog("sendServerStats: pktWrite failed\n");
       return FALSE;
@@ -386,12 +386,12 @@ int sendMessage(Msg_t *msg)
   
   strncpy((char *)smsg.msg, msg->msgbuf, MESSAGE_SIZE - 1);
 
-  /* don't record feeback or tersable msgs */
+  /* don't record feedback or tersable msgs */
   if (Context.recmode == RECMODE_ON)
     if (!(smsg.flags & (MSG_FLAGS_FEEDBACK | MSG_FLAGS_TERSABLE)))
       recWriteEvent(&smsg);
 
-  if (!pktWrite(PKT_SENDTCP, &smsg))
+  if (pktWrite(PKT_SENDTCP, &smsg) <= 0)
     {
       utLog("sendMessage: pktWrite failed\n");
       return FALSE;
@@ -1573,7 +1573,7 @@ void procBomb(cpCommand_t *cmd)
           SFCLR(snum, SHIP_F_BOMBING);
           return;
         }
-      if ( pktIsWaiting() )
+      if ( pktSocketHasData() )
         {
           SFCLR(snum, SHIP_F_BOMBING);
           break;
@@ -1862,7 +1862,7 @@ void procBeam(cpCommand_t *cmd)
     {
       if ( ! clbStillAlive( Context.snum ) )
 	return;
-      if ( pktIsWaiting() )
+      if ( pktSocketHasData() )
 	break;
       
       /* See if it's time to beam again. */
@@ -2026,11 +2026,10 @@ void procDestruct(cpCommand_t *cmd)
 	  return;
 	}
 
-      if ( pktIsWaiting() )
+      if ( pktSocketHasData() )
 	{
 	  Ships[Context.snum].sdfuse = 0;
-	  pktSendAck(PSEV_INFO, PERR_CANCELED,
-		  NULL);
+	  pktSendAck(PSEV_INFO, PERR_CANCELED, NULL);
 	  return;
 	}
       
@@ -2092,8 +2091,8 @@ void procAutoPilot(cpCommand_t *cmd)
       return;
     }
 
- sendFeedback("Autopilot activated.");
- SFSET(snum, SHIP_F_ROBOT);
+  sendFeedback("Autopilot activated.");
+  SFSET(snum, SHIP_F_ROBOT);
 
   utGetSecs( &laststat );			/* initialize stat timer */
   while ( clbStillAlive( Context.snum ) )
@@ -2109,10 +2108,9 @@ void procAutoPilot(cpCommand_t *cmd)
 	  laststat = now;
 	}
 
-      if ( pktIsWaiting() ) 
+      if ( pktSocketHasData() ) 
         {
-          pktSendAck(PSEV_INFO, PERR_CANCELED,
-                  NULL);
+          pktSendAck(PSEV_INFO, PERR_CANCELED, NULL);
           break;
         }
       

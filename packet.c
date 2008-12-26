@@ -439,17 +439,6 @@ int pktWaitForPacket(int type, char *buf, int blen,
 
 }
 
-
-int pktPacketSize(int type)
-{
-  /* clients always get server pkts, servers always get client pkts */
-  if (isClient)
-    return pktServerPacketSize(type);
-  else
-    return pktClientPacketSize(type);
-}
-
-
 int pktServerPacketSize(int type)
 {
   if (type <= 0 || type >= SERVERPKTMAX)
@@ -479,8 +468,8 @@ int pktClientPacketSize(int type)
 }
 
 /* like iochav(), but for the network connection.  return true if there
-   is packet data ready */
-int pktIsWaiting(void)
+   is data ready on the socket(s) to be read. */
+int pktSocketHasData(void)
 {
   struct timeval timeout;
   fd_set readfds;
@@ -511,6 +500,7 @@ int pktIsWaiting(void)
 
 /* get a packet from a ringbuffer.  If there's no data, or not
  * enough data, return 0, else return the packet type (and data)  
+ * this function is only suitable when reading data from a remote host.
  */
 static Unsgn8 _pktGetRB(ringBuffer_t *RB, void *buf, int blen)
 {
@@ -525,7 +515,11 @@ static Unsgn8 _pktGetRB(ringBuffer_t *RB, void *buf, int blen)
       /* get the first character */
       rbGet(RB, &type, 1, FALSE);
       
-      len = pktPacketSize(type);
+      /* clients always read server pkts, and vice versa */
+      if (isClient)
+        len = pktServerPacketSize(type);
+      else
+        len = pktClientPacketSize(type);
 
       if (!len)
         {
@@ -542,7 +536,7 @@ static Unsgn8 _pktGetRB(ringBuffer_t *RB, void *buf, int blen)
           /* last sanity check */
           if (len > blen)
             {
-              utLog("%s: return buffer too small, need %d, only have %d\n",
+              utLog("ERROR: %s: return buffer too small, need %d, only have %d\n",
                     __FUNCTION__, len, blen);
               return 0;
             }
@@ -584,8 +578,11 @@ static int _pktReadSocket(int sock, ringBuffer_t *RB, void *buf, int blen)
         {
           type = (Unsgn8)packet[0];
           
-          len = pktPacketSize(type);
-          
+          if (isClient)
+            len = pktServerPacketSize(type);
+          else
+            len = pktClientPacketSize(type);
+
           if (len && rv >= len)
             {
               /* then we got enough to satify the request.
@@ -598,11 +595,9 @@ static int _pktReadSocket(int sock, ringBuffer_t *RB, void *buf, int blen)
               return type;
             }
         }
-      else
-        {
-          /* just put it all into the RB */
-          rbPut(RB, buf, rv);
-        }
+
+      /* otherwise just put what we got into the RB */
+      rbPut(RB, buf, rv);
     }
 
   return 0;
@@ -677,13 +672,13 @@ int pktRead(char *buf, int blen, unsigned int delay)
 
       /* now try for any UDP */
       if (udp_sock >= 0 && FD_ISSET(udp_sock, &readfds))
-        {                     /* got a udp, read the whole thing */
+        {
           if ((type = _pktReadSocket(udp_sock, RB_UDPIn, buf, blen)) < 0)
             {
               /* an error */
 	      *buf = 0;
               utLog("%s: pktReadSocket UDP: failed", __FUNCTION__);
-	      return -1;
+	      return type;
             }              
 
           if (type)
@@ -699,8 +694,8 @@ int pktRead(char *buf, int blen, unsigned int delay)
     }
   else if (rv < 0)		/* error */
     {
-      utLog("ERROR: pktRead(): select(): %s", strerror(errno));
-      return -1;
+      utLog("ERROR: %s: select(): %s", __FUNCTION__, strerror(errno));
+      return rv;
     }
 
   /* if we're here, we try one more time on the RB's, in case some data
@@ -737,7 +732,14 @@ static int _pktDrainRB(int sock, ringBuffer_t *RB)
   if ((len = rbGet(RB, (void *)buf, PKT_MAXSIZE, FALSE)))
     {
       if ((wlen = _pktWriteSocket(sock, buf, len)) <= 0)
-        return wlen;
+        {
+          /* log errors */
+          if (wlen < 0)
+            utLog("ERROR: %s: _pktWriteSocket failed: %s\n",
+                  __FUNCTION__, strerror(stderr));
+          
+          return wlen;
+        }
 
       /* remove the data for good, but don't copy it again */
       rbGet(RB, NULL, wlen, TRUE);
@@ -779,15 +781,16 @@ int pktWrite(int socktype, void *data)
     
   /* try to drain the RB if needed */
   if ((rv = _pktDrainRB(sock, RB)) < 0)
-    return FALSE;
+    return rv;
 
   /* if there is already data in the RB, just add the data to it. */
   if (rbBytesUsed(RB))
     {
       if (rbBytesFree(RB) < len)
         {
-          utLog("%s: FATAL: output ringbuffer full.\n");
-          return FALSE;
+          utLog("FATAL: %s@%d: output ringbuffer (%d) full, can't add %d bytes\n",
+                __FUNCTION__, __LINE__, socktype, len);
+          return 0;
         }
       
       rbPut(RB, data, len);
@@ -796,28 +799,28 @@ int pktWrite(int socktype, void *data)
     {
       /* try to write the data directly, and put any leftovers into the RB */
       if ((rv = _pktWriteSocket(sock, data, len)) < 0)
-        return FALSE;
+        return rv;
 
       if (len != rv)
         {
-          /* there's some data left over */
+          /* there's some (or all) data left over */
           ptr = &packet[rv];
           
           if (rbPut(RB, (void *)ptr, len - rv) != (len - rv))
             {
-              utLog("%s: FATAL: output ringbuffer full.\n");
-              return FALSE;
+              utLog("FATAL: %s@%d: output ringbuffer (%d) full, can't add %d bytes\n",
+                    __FUNCTION__, __LINE__, socktype, len);
+              return 0;
             }
         }
     }            
 
-  /* one last drain for old times sake */
+  /* one last drain for old time's sake */
   if ((rv = _pktDrainRB(sock, RB)) < 0)
-    return FALSE;
+    return rv;
 
-  return TRUE;
+  return len;
 }  
-
 
 /* Simply check pkt for non-NULL, and compare pkttype with packet's type */
 int pktIsValid(int pkttype, void *pkt)

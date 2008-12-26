@@ -94,8 +94,6 @@ unsigned int rbPut(ringBuffer_t *RB, Unsgn8 *buf, unsigned int len)
   if (!RB || !rptr) 
     return 0;
 
-/*   utLog("%s: len %d", __FUNCTION__, len); */
-
   left = rbBytesFree(RB); /* max space available */
 
   if (wlen > left)
@@ -130,8 +128,6 @@ unsigned int rbGet(ringBuffer_t *RB, Unsgn8 *buf, unsigned int len, int update)
     rlen = ndata;
 
   tlen = rlen;
-
-/*   utLog("%s: len %d rlen %d", __FUNCTION__, len, rlen); */
 
   while (rlen--)
     {

@@ -689,25 +689,20 @@ int sendSetName(char *name)
 int sendCommand(Unsgn8 cmd, Unsgn16 detail)
 {
   cpCommand_t ccmd;
-
+  int socktype = PKT_SENDTCP;
   memset((void *)&ccmd, 0, sizeof(cpCommand_t));
   ccmd.type = CP_COMMAND;
   ccmd.cmd = cmd;
   ccmd.detail = htons(detail);
 
+  /* send these via UDP if possible */
   if (cmd == CPCMD_KEEPALIVE && cInfo.usock != -1)
-    {
-      pktWrite(PKT_SENDUDP, &ccmd);
-      return TRUE;
-    }
-  else
-    {
+    socktype = PKT_SENDUDP;
 
-      if (pktWrite(PKT_SENDTCP, &ccmd) <= 0)
-        return FALSE;
-      else 
-        return TRUE;
-    }
+  if (pktWrite(socktype, &ccmd) <= 0)
+    return FALSE;
+  else 
+    return TRUE;
 }
 
 int sendFireTorps(int num, real dir)
@@ -840,7 +835,7 @@ int clientHello(char *clientname)
   strncat((char *)chello.clientver, ConquestDate, 
 	  (CONF_SERVER_NAME_SZ - strlen(ConquestVersion)) - 2);
 
-  if (!pktWrite(PKT_SENDTCP, &chello))
+  if (pktWrite(PKT_SENDTCP, &chello) <= 0)
     {
       utLog("clientHello: write client hello failed\n");
       return FALSE;

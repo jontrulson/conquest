@@ -90,10 +90,9 @@ int   pktWaitForPacket(int type, char *buf, int blen,
 int   pktClientPacketSize(int type);
 int   pktServerPacketSize(int type);
 
-int   pktIsWaiting(void);
+int   pktSocketHasData(void);
 int   pktWrite(int socktype, void *data);
 int   pktRead(char *buf, int len, unsigned int delay);
 int   pktIsValid(int pkttype, void *pkt);
-int   pktPacketSize(int type);
 
 #endif /* PACKET_H_INCLUDED */

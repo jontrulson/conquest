@@ -1848,7 +1848,7 @@ static int hello(void)
   if (ConqInfo->closed)
     shello.flags |= SPHELLO_FLAGS_CLOSED;
 
-  if (!pktWrite(PKT_SENDTCP, &shello))
+  if (pktWrite(PKT_SENDTCP, &shello) <= 0)
     {
       utLog("NET: SERVER: hello: write shello failed\n");
       return FALSE;
