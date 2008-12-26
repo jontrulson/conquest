@@ -205,8 +205,6 @@ int connectServer(char *remotehost, Unsgn16 remoteport)
           utLog("NET: udpOpen: %s", strerror(errno));
           cInfo.tryUDP = FALSE;
         }
-
-      pktSetSocketFds(PKT_SOCKFD_NOCHANGE, cInfo.usock);
     }
 
   utLog("Connecting to host: %s, port %d\n",
@@ -242,8 +240,7 @@ int connectServer(char *remotehost, Unsgn16 remoteport)
   cInfo.servaddr = sa;
   
   pktSetSocketFds(cInfo.sock, PKT_SOCKFD_NOCHANGE);
-
-  /* FIXME */
+  /* we won't setup the udp fd until we've negotiated successfully */
   pktSetNodelay();
 
   return TRUE;
@@ -270,7 +267,8 @@ int main(int argc, char *argv[])
 
   cInfo.sock = -1;
   cInfo.usock = -1;
-  pktSetSocketFds(cInfo.sock, cInfo.usock);
+
+  utSetLogConfig(FALSE, FALSE);	/* use $HOME for logfile */
 
   cInfo.doUDP = FALSE;
   cInfo.tryUDP = TRUE;
@@ -280,7 +278,6 @@ int main(int argc, char *argv[])
   cInfo.isLoggedIn = FALSE;
   cInfo.remoteport = CN_DFLT_PORT;
 
-  utSetLogConfig(FALSE, FALSE);	/* use $HOME for logfile */
   if (!getLocalhost((char *)cInfo.localhost, MAXHOSTNAME))
     return(1);
 
@@ -366,6 +363,13 @@ int main(int argc, char *argv[])
       }
 
   rndini( 0, 0 );		/* initialize random numbers */
+
+  if (!pktInit())
+    {
+      fprintf(stderr, "pktInit failed, exiting\n");
+      utLog("pktInit failed, exiting");
+    }
+  pktSetSocketFds(cInfo.sock, cInfo.usock);
   
   cqiLoadRC(CQI_FILE_CONQINITRC, NULL, 1, 0);
 

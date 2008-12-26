@@ -144,7 +144,6 @@ static int nConsvrIdle(void)
           utLog("NET: udpOpen: %s", strerror(errno));
           cInfo.tryUDP = FALSE;
         }
-      pktSetSocketFds(PKT_SOCKFD_NOCHANGE, cInfo.usock);
     }
 
   utLog("Connecting to host: %s, port %d\n",

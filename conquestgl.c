@@ -318,8 +318,6 @@ int main(int argc, char *argv[])
   cInfo.isLoggedIn = FALSE;
   cInfo.remoteport = CN_DFLT_PORT;
 
-  pktSetSocketFds(cInfo.sock, cInfo.usock);
-
   utSetLogConfig(FALSE, TRUE);	/* use $HOME for logfile */
   if (!getLocalhost(cInfo.localhost, MAXHOSTNAME))
     return(1);
@@ -421,6 +419,12 @@ int main(int argc, char *argv[])
 
   rndini( 0, 0 );		/* initialize random numbers */
   
+  if (!pktInit())
+    {
+      fprintf(stderr, "pktInit failed, exiting\n");
+      utLog("pktInit failed, exiting");
+    }
+  pktSetSocketFds(cInfo.sock, cInfo.usock);
   
 #ifdef DEBUG_CONFIG
   utLog("%s@%d: main() Reading Configuration files.", __FILE__, __LINE__);

@@ -25,6 +25,12 @@ struct _packetent {
   void     (*handler)();
 };
 
+/* input/output ring buffer sizes. TCP RB's are larger to handle cases
+ * where UDP is not available and the TCP RB is used instead.
+ */
+#define PKT_UDP_RB_MAX    (PKT_MAXSIZE * 64)
+#define PKT_TCP_RB_MAX    (PKT_UDP_RB_MAX * 2) 
+
 /* for pktWrite, whether to send via UDP (if available) */
 #define PKT_SENDTCP    0
 #define PKT_SENDUDP    1
@@ -68,6 +74,7 @@ extern int     pktRXBytes;
 extern Unsgn32 pktPingAvgMS;
 #endif
 
+int   pktInit(void);
 void  pktSetClientMode(int isclient);
 void  pktSetSocketFds(int tcpsock, int udpsock);
 
@@ -87,5 +94,6 @@ int   pktIsWaiting(void);
 int   pktWrite(int socktype, void *data);
 int   pktRead(char *buf, int len, unsigned int delay);
 int   pktIsValid(int pkttype, void *pkt);
+int   pktPacketSize(int type);
 
 #endif /* PACKET_H_INCLUDED */

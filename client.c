@@ -871,10 +871,12 @@ int clientHello(char *clientname)
                 {
                   utLog("NET: got (%d) UDP bytes from server, will ACK for server UDP", rv);
                   cInfo.doUDP = TRUE;
+                  pktSetSocketFds(PKT_SOCKFD_NOCHANGE, cInfo.usock);
                 }
             }
         }
     }
+
   /* now we need a server stat or a Nak */
 
   if ((pkttype = pktRead(buf, PKT_MAXSIZE, 60)) < 0)

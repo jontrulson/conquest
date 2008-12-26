@@ -230,7 +230,7 @@ static int nPlayDisplay(dspConfig_t *dsp)
           cprintf(5,0,ALIGN_CENTER,
                   "#%d#nPlay: _newship: unexpected server ack, code %d",
                   InfoColor, sack.code);
-          utLog("nPlay: _newship: unexpected server ack, code %d",
+          utLog("nPlay: unexpected server ack, code %d",
                 sack.code);
           break;
         }

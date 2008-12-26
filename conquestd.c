@@ -289,7 +289,6 @@ int main(int argc, char *argv[])
   sInfo.isMaster = FALSE;
   sInfo.isLoggedIn = FALSE;
 
-  pktSetSocketFds(sInfo.sock, sInfo.usock);
 
   while ((i = getopt(argc, argv, "dlp:u:mM:N:v")) != EOF)    /* get command args */
     switch (i)
@@ -331,6 +330,13 @@ int main(int argc, char *argv[])
 	exit(1);
       }
 
+
+  if (!pktInit())
+    {
+      fprintf(stderr, "pktInit failed, exiting\n");
+      utLog("pktInit failed, exiting");
+    }
+  pktSetSocketFds(sInfo.sock, sInfo.usock);
 
   /* clear out our stored packets */
   spktInit();
@@ -1823,8 +1829,8 @@ static int hello(void)
       utLog("NET: SERVER hello: udpOpen() failed: %s", strerror(errno));
       sInfo.usock = -1;
       sInfo.tryUDP = FALSE;
+      pktSetSocketFds(PKT_SOCKFD_NOCHANGE, sInfo.usock);
     }
-  pktSetSocketFds(PKT_SOCKFD_NOCHANGE, sInfo.usock);
 
   /* first loadup and send a server hello */
   shello.type = SP_HELLO;
@@ -1945,11 +1951,13 @@ static int hello(void)
   if (chello.updates >= 1 && chello.updates <= 10)
     Context.updsec = chello.updates;
 
-  /* send a server stat to the udp client socket.  If the client gets
-     it, it will acknowlege it in it's ACK packet, which will tell us
-     we can do udp. woohoo! */
+  /* send data to the client udp socket.  If the client gets it, it
+     will acknowlege it in it's ACK packet, which will tell us we can
+     do udp. woohoo! */
   if (sInfo.tryUDP)
-    sendServerStat(PKT_SENDUDP);
+    {
+      write(sInfo.usock, "Open Me", 7);
+    }
 
   /* now send the server stats normally */
   if (!sendServerStat(PKT_SENDTCP))
@@ -1980,6 +1988,7 @@ static int hello(void)
         {
           sInfo.doUDP = TRUE;
           utLog("NET: SERVER: hello: Client acknowleged UDP from server. Doing UDP.");
+          pktSetSocketFds(PKT_SOCKFD_NOCHANGE, sInfo.usock);
         }
     }
 
