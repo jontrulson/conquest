@@ -2801,7 +2801,7 @@ static int nCPIdle(void)
               if (sack->code == PERR_PINGRESP)
                 {
                   pingPending = FALSE;
-                  pktPingAvgMS = (pktPingAvgMS + (iternow - pingStart)) / 2;
+                  pktStats.pingAvg = (pktStats.pingAvg + (iternow - pingStart)) / 2;
                   pingStart = 0;
                   continue;
                 }

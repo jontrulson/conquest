@@ -148,11 +148,13 @@ static struct _packetent serverPackets[] = {
   { SP_PLANET, 
     sizeof(spPlanet_t), 
     "SP_PLANET", 
-    pktNotImpl },
+    pktNotImpl 
+  },
   { SP_PLANETSML, 
     sizeof(spPlanetSml_t), 
     "SP_PLANETSML", 
-    pktNotImpl },
+    pktNotImpl 
+  },
   { SP_PLANETLOC, 
     sizeof(spPlanetLoc_t), 
     "SP_PLANETLOC", 
@@ -502,7 +504,7 @@ int pktSocketHasData(void)
  * enough data, return 0, else return the packet type (and data)  
  * this function is only suitable when reading data from a remote host.
  */
-static Unsgn8 _pktGetRB(ringBuffer_t *RB, void *buf, int blen)
+static Unsgn8 _pktReadGetRB(ringBuffer_t *RB, void *buf, int blen)
 {
   int bu, len;
   Unsgn8 type = 0;
@@ -568,7 +570,7 @@ static int _pktReadSocket(int sock, ringBuffer_t *RB, void *buf, int blen)
   
   if (rv)
     {
-      pktRXBytes += rv;         /* update the counter */
+      pktStats.rxBytes += rv;         /* update the counter */
 
       /* if we read enough to return a packet, and there's
        * nothing in the rb, extract it and copy any leftovers into
@@ -623,10 +625,10 @@ int pktRead(char *buf, int blen, unsigned int delay)
    * get it and return it
    */
 
-  if ((type = _pktGetRB(RB_TCPIn, buf, blen)))
+  if ((type = _pktReadGetRB(RB_TCPIn, buf, blen)))
     return type;
 
-  if ((type = _pktGetRB(RB_UDPIn, buf, blen)))
+  if ((type = _pktReadGetRB(RB_UDPIn, buf, blen)))
     return type;
 
   /* if we're here, then either there was no RB data, or there wasn't
@@ -640,15 +642,11 @@ int pktRead(char *buf, int blen, unsigned int delay)
 
   FD_ZERO(&readfds);
   if (tcp_sock >= 0)
-    {
-      FD_SET(tcp_sock, &readfds);
-      maxfd = tcp_sock;
-    }
+    FD_SET(tcp_sock, &readfds);
   if (udp_sock >= 0)
-    {
-      FD_SET(udp_sock, &readfds);
-      maxfd = max(tcp_sock, udp_sock);
-    }
+    FD_SET(udp_sock, &readfds);
+
+  maxfd = max(tcp_sock, udp_sock);
 
   if ((rv=select(maxfd+1, &readfds, NULL, NULL, &timeout)) > 0)
     {
@@ -701,10 +699,10 @@ int pktRead(char *buf, int blen, unsigned int delay)
   /* if we're here, we try one more time on the RB's, in case some data
    * was recently read 
    */
-  if ((type = _pktGetRB(RB_TCPIn, buf, blen)))
+  if ((type = _pktReadGetRB(RB_TCPIn, buf, blen)))
     return type;
 
-  if ((type = _pktGetRB(RB_UDPIn, buf, blen)))
+  if ((type = _pktReadGetRB(RB_UDPIn, buf, blen)))
     return type;
 
   return 0;
@@ -713,8 +711,15 @@ int pktRead(char *buf, int blen, unsigned int delay)
 /* write to actual sockets */
 static int _pktWriteSocket(int sock, void *data, int len)
 {
-  return write(sock, data, len);
-  
+  int rv;
+
+  if (!data || !len)
+    return 0;
+
+  if ((rv = write(sock, data, len)) > 0)
+    pktStats.txBytes += rv;       /* update the counter */
+
+  return rv;
 }
 
 /* try to write out data in a ringbuffer */
@@ -765,12 +770,12 @@ int pktWrite(int socktype, void *data)
   
   if (socktype == PKT_SENDUDP && udp_sock >= 0)
     {
-      RB = RB_UDPOut;
+      RB   = RB_UDPOut;
       sock = udp_sock;
     }
   else
     {
-      RB = RB_TCPOut;
+      RB   = RB_TCPOut;
       sock = tcp_sock;
     }
 

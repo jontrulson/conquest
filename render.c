@@ -843,23 +843,23 @@ void renderHud(int dostats)
 
   if ((frameTime - rxtime) > 1000)
     {
-      rxdiff = pktRXBytes - oldrx;
-      oldrx = pktRXBytes;
+      rxdiff = pktStats.rxBytes - oldrx;
+      oldrx = pktStats.rxBytes;
       rxtime = frameTime;
     }
 
   /* update stats data, if needed */
   if (FPS != oldData.oldFPS || 
-      pktPingAvgMS != oldData.oldPingAvg || rxdiff != oldData.oldRxdiff)
+      pktStats.pingAvg != oldData.oldPingAvg || rxdiff != oldData.oldRxdiff)
     {
       oldData.oldFPS = FPS;
-      oldData.oldPingAvg = pktPingAvgMS;
+      oldData.oldPingAvg = pktStats.pingAvg;
       oldData.oldRxdiff = rxdiff;
 
       snprintf(fbuf, 128 - 1, "FPS: %03d", FPS);
 
       snprintf(ibuf, 128 - 1, "%4dms %3.1fKB/s %s",  
-               pktPingAvgMS, 
+               pktStats.pingAvg, 
                ((float)rxdiff / 1000.0),
                fbuf);
     }

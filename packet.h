@@ -66,12 +66,16 @@ struct _packetent {
 #define PERR_DOUDP        16	/* used in hello to tell server udp is ok */
 #define PERR_PINGRESP     17	/* a ping reponse for nCP */
 
+typedef struct _pkt_stats {
+  unsigned int  rxBytes;        /* tx/rx byte counts */
+  unsigned int  txBytes;
+  unsigned int  pingAvg;        /* in ms */
+} pktStats_t;
+
 #ifdef NOEXTERN_PACKET
-int            pktRXBytes = 0;
-Unsgn32        pktPingAvgMS = 0;
+pktStats_t        pktStats = {};
 #else
-extern int     pktRXBytes;
-extern Unsgn32 pktPingAvgMS;
+extern pktStats_t pktStats;
 #endif
 
 int   pktInit(void);
