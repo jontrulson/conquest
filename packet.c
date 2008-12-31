@@ -741,7 +741,7 @@ static int _pktDrainRB(int sock, ringBuffer_t *RB)
           /* log errors */
           if (wlen < 0)
             utLog("ERROR: %s: _pktWriteSocket failed: %s\n",
-                  __FUNCTION__, strerror(stderr));
+                  __FUNCTION__, strerror(errno));
           
           return wlen;
         }
