@@ -1,0 +1,18 @@
+For the record, here is an improved AWK script that accepts some
+variables via the command line.
+
+I use it like this in my crontab:
+
+@hourly    ~/bin/scripts/conquest-metaserver-monitor -v email=matt,tamarella
+
+But you can also specify an optional metaserver name & port number
+using additional -v arguments.
+
+
+Hope someone finds this useful,
+
+Matt
+
+
+[Jon - note, this script required GNU AWK (gawk)]
+
