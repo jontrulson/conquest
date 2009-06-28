@@ -2077,8 +2077,7 @@ drawShip(GLfloat x, GLfloat y, GLfloat angle, char ch, int snum, int color,
   /* phasers - we draw this before the ship */
   if (Ships[snum].pfuse > 0) /* phaser action */
     {
-      GLfloat phaserwidth = 1.5;
-      phaserwidth = ((scale == SCALE_FAC) ? 1.5 : 0.5);
+      GLfloat phaserwidth = ((scale == SCALE_FAC) ? 1.5 : 0.5);
 
       glPushMatrix();
       glLoadIdentity();
@@ -2203,6 +2202,7 @@ drawShip(GLfloat x, GLfloat y, GLfloat angle, char ch, int snum, int color,
   glBlendFunc(GL_ONE, GL_ONE);
 
   /* highlight enemy ships... */
+  /* FIXME - should pass Z to drawLineBox and it should use it */
   if (UserConf.EnemyShipBox)
     if (color == RedLevelColor || color == RedColor)
       drawLineBox(-sizeh, -sizeh, size, size, RedColor, 1.0);
