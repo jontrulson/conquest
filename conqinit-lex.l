@@ -128,6 +128,8 @@ music                  {return ( MUSIC );}
 texarea                {return ( TEXAREA );}
 mipmap                 {return ( MIPMAP );}
 
+luminance              {return ( TEX_LUMINANCE );}
+
 {number}		{ 
                           yylval.num = atoi( yytext );
                           return NUMBER;

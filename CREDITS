@@ -25,5 +25,45 @@ Credit where credit is due.
   http://www.gimp.org
 
 - Xserver, Summit Platinum from Xi Graphics (www.xig.com). There is no
-  substitute.  :)
+  substitute. 
 
+  Update:  7/20/2009 
+
+           Well, since I don't work for XiG anymore, the Nvidia driver
+           is pretty ****ing good too :)
+
+- 7/20/2009
+
+  Orion Scout and Cruiser textures.  These were created by
+  painting/texturing 3D meshes in blender.  These meshes came from
+  ShareCG.com.  
+
+  I imported these into blender (blender.com), and after much learning
+  (and swearing), painted/textured them so they could be rendered as
+  a ship texture for Conquest.  Keeping in mind, blender is not real
+  good at 'importing' foreign formats. :) See img/src/blender/ for the
+  .blender src files I'm using, and a README.
+
+  Specifically:
+
+    - Orion Scout:
+
+      Aaron
+
+      http://www.sharecg.com/v/35694/3D-Model/Scout-ship
+
+      I really like the 'cammo' texture he supplied, and use it on
+      both the Scout, and Cruiser models.  
+
+    - Orion Cruiser:
+
+      A3DLover
+
+      http://www.sharecg.com/v/35514/3D-Model/Stargate-Daedalus
+
+      Same general color scheme I used for the scout.  Stargate fans
+      may recognize this ship :)
+
+    
+
+$Id$

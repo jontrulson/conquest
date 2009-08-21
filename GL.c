@@ -196,12 +196,12 @@ static int findGLTextureByFile(char *texfile, Unsgn32 flags)
   if (!loadedGLTextures || !GLTextures || !cqiNumTextures || !cqiTextures)
     return -1;
 
-  /* we check both the filename and the mipmap flag */
+  /* we check both the filename and flags */
   for (i=0; i<loadedGLTextures; i++)
     {
       if (!strncmp(cqiTextures[GLTextures[i].cqiIndex].filename, 
                    texfile, CQI_NAMELEN) && 
-          ( (flags & CQITEX_F_GEN_MIPMAPS) == (cqiTextures[GLTextures[i].cqiIndex].flags & CQITEX_F_GEN_MIPMAPS) ) )
+          (flags == cqiTextures[GLTextures[i].cqiIndex].flags) )
         {
           return i;
         }
@@ -506,9 +506,15 @@ static int initGLShips(void)
                    ShipTypes[j].name[0], ShipTypes[j].name[1]);
           GLShips[i][j].ico = _get_ship_texid(buffer);
           
+#if 0
+          /* FIXME, there must be a better way to do this (and shields
+             in general). for now disable since it won't work with the
+             new texture mapping and ico-ship generation stuff without
+             generating new ico-sh textures. */
           snprintf(buffer, CQI_NAMELEN - 1, "%s%c%c-ico-sh", shipPfx, 
                    ShipTypes[j].name[0], ShipTypes[j].name[1]);
           GLShips[i][j].ico_sh = _get_ship_texid(buffer);
+#endif
           
           snprintf(buffer, CQI_NAMELEN - 1, "%s-ico-decal1", shipPfx);
           GLShips[i][j].decal1 = _get_ship_texid(buffer);
@@ -828,16 +834,21 @@ void drawIconHUDDecal(GLfloat rx, GLfloat ry, GLfloat w, GLfloat h,
 
   glBegin(GL_POLYGON);
 
-  glTexCoord2f(0.0f, 0.0f);
-  glVertex2f(rx, ry);
-
-  glTexCoord2f(1.0f, 0.0f);
-  glVertex2f(rx + w, ry);
-
-  glTexCoord2f(1.0f, 1.0f);
-  glVertex2f(rx + w, ry + h);
+  /* The HUD elements are drawn in an orthographic projection, in
+   *  which y is inverted.  So we map the tex coordinates here to
+   *  specificly 're-invert' the texture's y coords so all looks right.
+   */
 
   glTexCoord2f(0.0f, 1.0f);
+  glVertex2f(rx, ry);
+  
+  glTexCoord2f(1.0f, 1.0f);
+  glVertex2f(rx + w, ry);
+  
+  glTexCoord2f(1.0f, 0.0f);
+  glVertex2f(rx + w, ry + h);
+  
+  glTexCoord2f(0.0f, 0.0f);
   glVertex2f(rx, ry + h);
 
   glEnd();
@@ -920,24 +931,24 @@ void drawLine(GLfloat x, GLfloat y, GLfloat len, GLfloat lw)
   return;
 }
 
-void drawLineBox(GLfloat x, GLfloat y, 
+void drawLineBox(GLfloat x, GLfloat y, GLfloat z,
                  GLfloat w, GLfloat h, int color, 
                  GLfloat lw)
 {
 
 #if 0
-  utLog("drawLineBox: x = %f, y = %f, w = %f, h = %f",
-       x, y, w, h);
+  utLog("drawLineBox: x = %f, y = %f, z = %f, w = %f, h = %f",
+        x, y, z, w, h);
 #endif
 
   glLineWidth(lw);
 
   glBegin(GL_LINE_LOOP);
   uiPutColor(color);
-  glVertex3f(x, y, 0.0); /* ul */
-  glVertex3f(x + w, y, 0.0); /* ur */
-  glVertex3f(x + w, y + h, 0.0); /* lr */
-  glVertex3f(x, y + h, 0.0); /* ll */
+  glVertex3f(x, y, z);          /* ul */
+  glVertex3f(x + w, y, z);      /* ur */
+  glVertex3f(x + w, y + h, z);  /* lr */
+  glVertex3f(x, y + h, z);      /* ll */
   glEnd();
 
   return;
@@ -946,30 +957,51 @@ void drawLineBox(GLfloat x, GLfloat y,
 void drawQuad(GLfloat x, GLfloat y, GLfloat w, GLfloat h, GLfloat z)
 {
   glBegin(GL_POLYGON);
-  glVertex3f(x, y, z); /* ll */
-  glVertex3f(x + w, y, z); /* lr */
-  glVertex3f(x + w, y + h, z); /* ur */
-  glVertex3f(x, y + h, z); /* ul */
+  glVertex3f(x, y, z);          /* ll */
+  glVertex3f(x + w, y, z);      /* lr */
+  glVertex3f(x + w, y + h, z);  /* ur */
+  glVertex3f(x, y + h, z);      /* ul */
   glEnd();
 
   return;
 }
 
-void drawTexQuad(GLfloat x, GLfloat y, GLfloat w, GLfloat h, GLfloat z)
+void drawTexQuad(GLfloat x, GLfloat y, GLfloat w, GLfloat h, GLfloat z,
+                 int ortho)
 {
+  static const GLfloat tc_perspective[4][2] = {
+    { 0.0f, 0.0f },
+    { 1.0f, 0.0f },
+    { 1.0f, 1.0f },
+    { 0.0f, 1.0f }
+  };
+  /* ortho inverts Y, so we need to invert texture T to compensate */
+  static const GLfloat tc_ortho[4][2] = {
+    { 0.0f, 1.0f },
+    { 1.0f, 1.0f },
+    { 1.0f, 0.0f },
+    { 0.0f, 0.0f }
+  };
+  GLfloat *tc;
+
+  if (ortho)
+    tc = (GLfloat *)&tc_ortho;
+  else
+    tc = (GLfloat *)&tc_perspective;
+
   glBegin(GL_POLYGON);
 
-  glTexCoord2f(0.0f, 0.0f);
-  glVertex3f(x, y, z); /* ll */
+  glTexCoord2fv(tc + 0);
+  glVertex3f(x, y, z);          /* ll */
 
-  glTexCoord2f(1.0f, 0.0f);
-  glVertex3f(x + w, y, z); /* lr */
+  glTexCoord2fv(tc + 2);
+  glVertex3f(x + w, y, z);      /* lr */
 
-  glTexCoord2f(1.0f, 1.0f);
-  glVertex3f(x + w, y + h, z); /* ur */
+  glTexCoord2fv(tc + 4);
+  glVertex3f(x + w, y + h, z);  /* ur */
 
-  glTexCoord2f(0.0f, 1.0f);
-  glVertex3f(x, y + h, z); /* ul */
+  glTexCoord2fv(tc + 6);
+  glVertex3f(x, y + h, z);      /* ul */
 
   glEnd();
 
@@ -977,7 +1009,7 @@ void drawTexQuad(GLfloat x, GLfloat y, GLfloat w, GLfloat h, GLfloat z)
 }
 
 
-void drawTexBox(GLfloat x, GLfloat y, GLfloat z, GLfloat size)
+void drawTexBoxCentered(GLfloat x, GLfloat y, GLfloat z, GLfloat size)
 {				/* draw textured square centered on x,y
 				   USE BETWEEN glBegin/End pair! */
   GLfloat rx, ry;
@@ -989,16 +1021,16 @@ void drawTexBox(GLfloat x, GLfloat y, GLfloat z, GLfloat size)
   rx = x - (size / 2);
   ry = y - (size / 2);
 
-  glTexCoord2f(0.0f, 1.0f);
-  glVertex3f(rx, ry, z); /* ll */
-
-  glTexCoord2f(1.0f, 1.0f);
-  glVertex3f(rx + size, ry, z); /* lr */
+  glTexCoord2f(0.0f, 0.0f);
+  glVertex3f(rx, ry, z);        /* ll */
 
   glTexCoord2f(1.0f, 0.0f);
+  glVertex3f(rx + size, ry, z); /* lr */
+
+  glTexCoord2f(1.0f, 1.0f);
   glVertex3f(rx + size, ry + size, z); /* ur */
 
-  glTexCoord2f(0.0f, 0.0f);
+  glTexCoord2f(0.0f, 1.0f);
   glVertex3f(rx, ry + size, z); /* ul */
 
   return;
@@ -1087,7 +1119,7 @@ void drawExplosion(GLfloat x, GLfloat y, int snum, int torpnum, int scale)
             torpAStates[snum][torpnum].state.col.a);
 
   glBegin(GL_POLYGON);
-  drawTexBox(0.0, 0.0, 0.0, size);
+  drawTexBoxCentered(0.0, 0.0, 0.0, size);
   glEnd();
 
   glDisable(GL_TEXTURE_2D); 
@@ -1206,7 +1238,7 @@ void drawBombing(int snum, int scale)
             bombAState[snum].state.col.a);
 
   glBegin(GL_POLYGON);
-  drawTexBox(0.0, 0.0, 0.0, size);
+  drawTexBoxCentered(0.0, 0.0, 0.0, size);
   glEnd();
 
   glDisable(GL_TEXTURE_2D); 
@@ -1279,7 +1311,7 @@ void drawPlanet( GLfloat x, GLfloat y, int pnum, int scale,
   if (scale == MAP_FAC)
     size *= 2.0;
     
-  drawTexBox(x, y, TRANZ, size);
+  drawTexBoxCentered(x, y, TRANZ, size);
   
   glEnd();
   
@@ -1731,6 +1763,7 @@ void graphicsInit(void)
 
   glShadeModel(GL_SMOOTH);
   glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
+  glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
 
   _print_gl_info();
 
@@ -1979,17 +2012,7 @@ void drawTorp(GLfloat x, GLfloat y, char torpchar, int torpcolor,
 
   uiPutColor(torpcolor |CQC_A_BOLD);
 
-  glTexCoord2f(1.0f, 1.0f);
-  glVertex3f(-sizeh, -sizeh, z); /* ll */
-
-  glTexCoord2f(1.0f, 0.0f);
-  glVertex3f(sizeh, -sizeh, z); /* lr */
-
-  glTexCoord2f(0.0f, 0.0f);
-  glVertex3f(sizeh, sizeh, z); /* ur */
-
-  glTexCoord2f(0.0f, 1.0f);
-  glVertex3f(-sizeh, sizeh, z); /* ul */
+  drawTexBoxCentered(0.0, 0.0, z, size);
 
   glEnd();
 
@@ -2029,7 +2052,6 @@ drawShip(GLfloat x, GLfloat y, GLfloat angle, char ch, int snum, int color,
   GLfloat alpha = 1.0;
   static const GLfloat z = 1.0;
   GLfloat size;
-  GLfloat sizeh;
   static GLfloat shipsizeSR, shipsizeLR;
   static int norender = FALSE;
   int steam = Ships[snum].team, stype = Ships[snum].shiptype;
@@ -2069,8 +2091,6 @@ drawShip(GLfloat x, GLfloat y, GLfloat angle, char ch, int snum, int color,
   if (scale == MAP_FAC) 
     size = size * 2.0; 
 
-  sizeh = size / 2.0;
-
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
   glEnable(GL_BLEND);
 
@@ -2094,19 +2114,25 @@ drawShip(GLfloat x, GLfloat y, GLfloat angle, char ch, int snum, int color,
       glBindTexture(GL_TEXTURE_2D, GLShips[steam][stype].phas);
       glBegin(GL_POLYGON);
       
+      /* can't use drawTexBoxCentered here since we need to change
+       *  color (alpha) halfway through, and tweak the vertex coords
+       *  properly for beams
+       */
       glTexCoord2f(1.0f, 0.0f);
       glVertex3f(-phaserwidth, 0.0, -1.0); /* ll */
       
       glTexCoord2f(1.0f, 1.0f);
       glVertex3f(phaserwidth, 0.0, -1.0); /* lr */
       
+      /* increase transparency at the end of the beam */
       glColor4f(1.0, 1.0, 1.0, 0.3);
+
       glTexCoord2f(0.0f, 1.0f);
       glVertex3f(phaserwidth, phaserRadius, -1.0); /* ur */
       
       glTexCoord2f(0.0f, 0.0f);
       glVertex3f(-phaserwidth, phaserRadius, -1.0); /* ul */
-      
+
       glEnd();
       
       glDisable(GL_TEXTURE_2D);   
@@ -2136,17 +2162,8 @@ drawShip(GLfloat x, GLfloat y, GLfloat angle, char ch, int snum, int color,
       uiPutColor(_get_sh_color(Ships[snum].shields));
       glBegin(GL_POLYGON);
       
-      glTexCoord2f(1.0f, 0.0f);
-      glVertex3f(-size, -size, z); /* ll */
-      
-      glTexCoord2f(1.0f, 1.0f);
-      glVertex3f(size, -size, z); /* lr */
-      
-      glTexCoord2f(0.0f, 1.0f);
-      glVertex3f(size, size, z); /* ur */
-      
-      glTexCoord2f(0.0f, 0.0f);
-      glVertex3f(-size, size, z); /* ul */
+      /* draw the shields at twice the size of the ship */
+      drawTexBoxCentered(0.0, 0.0, z, size * 2.0);
       
       glEnd();
 
@@ -2170,30 +2187,19 @@ drawShip(GLfloat x, GLfloat y, GLfloat angle, char ch, int snum, int color,
   glEnable(GL_TEXTURE_2D); 
 
   glBindTexture(GL_TEXTURE_2D, GLShips[steam][stype].ship);
-  
+
   glScalef(scaleFac, scaleFac, 1.0);
 
   /* translate to correct position, */
   glTranslatef(x , y , TRANZ);
 
-  /* THEN rotate ;-) */
   glRotatef(angle, 0.0, 0.0, z);
 
   glColor4f(1.0, 1.0, 1.0, alpha);	
 
   glBegin(GL_POLYGON);
 
-  glTexCoord2f(1.0f, 1.0f);
-  glVertex3f(-sizeh, -sizeh, z); /* ll */
-
-  glTexCoord2f(1.0f, 0.0f);
-  glVertex3f(sizeh, -sizeh, z); /* lr */
-
-  glTexCoord2f(0.0f, 0.0f);
-  glVertex3f(sizeh, sizeh, z); /* ur */
-
-  glTexCoord2f(0.0f, 1.0f);
-  glVertex3f(-sizeh, sizeh, z); /* ul */
+  drawTexBoxCentered(0.0, 0.0, z, size);
 
   glEnd();
 
@@ -2202,12 +2208,15 @@ drawShip(GLfloat x, GLfloat y, GLfloat angle, char ch, int snum, int color,
   glBlendFunc(GL_ONE, GL_ONE);
 
   /* highlight enemy ships... */
-  /* FIXME - should pass Z to drawLineBox and it should use it */
   if (UserConf.EnemyShipBox)
-    if (color == RedLevelColor || color == RedColor)
-      drawLineBox(-sizeh, -sizeh, size, size, RedColor, 1.0);
+    {
+      if (color == RedLevelColor || color == RedColor)
+        drawLineBox(-(size / 2.0), -(size / 2.0), z, size, size, 
+                    RedColor, 1.0);
+    }
 
   /* reset the matrix for the text */
+
   glLoadIdentity();
 
   glScalef(scaleFac, scaleFac, 1.0);
@@ -2231,7 +2240,6 @@ void drawDoomsday(GLfloat x, GLfloat y, GLfloat dangle, GLfloat scale)
   static const GLfloat z = 1.0;
   static GLfloat doomsizeSR, doomsizeLR;
   GLfloat size;  
-  GLfloat sizeh;
   static GLfloat beamradius;
   static int norender = FALSE;  /* if no tex, no point... */
   static real ox = 0.0, oy = 0.0; /* for doomsday weapon antiproton beam */
@@ -2321,8 +2329,6 @@ void drawDoomsday(GLfloat x, GLfloat y, GLfloat dangle, GLfloat scale)
   if (scale == MAP_FAC)
     size = size * 2.0;
 
-  sizeh = size / 2.0;
-
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
   glEnable(GL_BLEND);
 
@@ -2372,6 +2378,10 @@ void drawDoomsday(GLfloat x, GLfloat y, GLfloat dangle, GLfloat scale)
       
       glBegin(GL_POLYGON);
       
+      /* can't use drawTexBoxCentered here since we need to change
+       *  color (alpha) halfway through, and tweak the vertex coords
+       *  properly for beams
+       */
       glTexCoord2f(1.0f, 0.0f);
       glVertex3f(-beamwidth, 0.0, -1.0); /* ll */
       
@@ -2422,17 +2432,7 @@ void drawDoomsday(GLfloat x, GLfloat y, GLfloat dangle, GLfloat scale)
 
   glBegin(GL_POLYGON);
 
-  glTexCoord2f(1.0f, 0.0f);
-  glVertex3f(-sizeh, -sizeh, z); /* ll */
-
-  glTexCoord2f(1.0f, 1.0f);
-  glVertex3f(sizeh, -sizeh, z); /* lr */
-
-  glTexCoord2f(0.0f, 1.0f);
-  glVertex3f(sizeh, sizeh, z); /* ur */
-
-  glTexCoord2f(0.0f, 0.0f);
-  glVertex3f(-sizeh, sizeh, z); /* ul */
+  drawTexBoxCentered(0.0, 0.0, z, size);
 
   glEnd();
 
@@ -3376,12 +3376,19 @@ static int loadGLTextures()
               if (texti->bpp == 32)
                 {
                   type = GL_RGBA;
-                  components = 4;
+                  if (cqiTextures[i].flags & CQITEX_F_IS_LUMINANCE)
+                    components = GL_LUMINANCE_ALPHA;
+                  else
+                    components = GL_RGBA;
                 }
               else
                 {
+                  /* no alpha component */
                   type = GL_RGB;
-                  components = 3;
+                  if (cqiTextures[i].flags & CQITEX_F_IS_LUMINANCE)
+                    components = GL_LUMINANCE;
+                  else
+                    components = GL_RGB;
                 }
 
               /* use linear filtering */

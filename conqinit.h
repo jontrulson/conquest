@@ -71,6 +71,9 @@ typedef struct _cqi_planet_init {
 #define CQITEX_F_GEN_MIPMAPS      0x00000002 /* Generate mipmaps for this
                                                 texture */
 
+#define CQITEX_F_IS_LUMINANCE     0x00000004 /* gen tex as a luminance
+                                                texture */
+
 typedef struct _cqi_texture_area {
   char name[CQI_NAMELEN];       /* WKN of area */
   real x, y;                    /* X/Y coord of lower left of area as

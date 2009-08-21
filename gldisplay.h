@@ -102,11 +102,12 @@ void drawNEB(int snum);
 float getFPS(void);
 
 void drawLine(GLfloat x, GLfloat y, GLfloat len, GLfloat lw);
-void drawLineBox(GLfloat x, GLfloat y, 
+void drawLineBox(GLfloat x, GLfloat y, GLfloat z,
                  GLfloat w, GLfloat h, int color, 
                  GLfloat lw);
 void drawQuad(GLfloat x, GLfloat y, GLfloat w, GLfloat h, GLfloat z);
-void drawTexQuad(GLfloat x, GLfloat y, GLfloat w, GLfloat h, GLfloat z);
+void drawTexQuad(GLfloat x, GLfloat y, GLfloat w, GLfloat h, GLfloat z,
+                 int ortho);
 void drawExplosion(GLfloat x, GLfloat y, int snum, int torpnum, int scale);
 void drawBombing(int snum, int scale);
 

@@ -139,7 +139,7 @@ static int parsebool(char *str);
 %token <num> EFFECT FADEINMS FADEOUTMS LIMIT FRAMELIMIT
 %token <num> MUSIC
 %token <num> DELTAT SCOORD TCOORD WIDTH HEIGHT TEXAREA
-%token <num> MIPMAP
+%token <num> MIPMAP TEX_LUMINANCE
 
 %token <ptr>  STRING 
 %token <rnum> RATIONAL
@@ -639,6 +639,10 @@ stmt            : PLANETMAX number
                 | HEIGHT rational
                    {
                         cfgSectionf(HEIGHT, $2);
+                   }                      
+                | TEX_LUMINANCE string
+                   {
+                        cfgSectionb(TEX_LUMINANCE, $2);
                    }                      
                 | error closesect
                 ;
@@ -2983,6 +2987,14 @@ static void cfgSectionb(int item, char *val)
               currTexture.flags |= CQITEX_F_GEN_MIPMAPS;
             else
               currTexture.flags &= ~CQITEX_F_GEN_MIPMAPS;
+              
+            break;
+
+          case TEX_LUMINANCE:
+            if (bval)
+              currTexture.flags |= CQITEX_F_IS_LUMINANCE;
+            else
+              currTexture.flags &= ~CQITEX_F_IS_LUMINANCE;
               
             break;
           }

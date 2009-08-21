@@ -115,7 +115,7 @@ void mglConqLogo(dspConfig_t *dsp, bool mult)
                colors[Ships[Context.snum].team].b,
                colors[Ships[Context.snum].team].a);
 
-      drawTexQuad(x, y, w, h, 0.0);
+      drawTexQuad(x, y, w, h, 0.0, TRUE);
       
       glDisable(GL_TEXTURE_2D);
       glDisable(GL_BLEND);
@@ -126,7 +126,7 @@ void mglConqLogo(dspConfig_t *dsp, bool mult)
                 NULL, GLF_FONT_F_SCALEX | GLF_FONT_F_ORTHO);
     }
   
-  drawLineBox(x, y + (h / 20.0),
+  drawLineBox(x, y + (h / 20.0), 0.0,
               w,
               h,
               NoColor,

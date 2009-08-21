@@ -1,0 +1,24 @@
+
+This dir contains the blender source files used to render the ships
+(well, some of them anyway).  To rerender a ship (re create a ship
+texture), load it into blender, Press F12 to render the scene, then F3
+to save the rendering.  Make sure the rendering (F10) setup specifies
+that renders are to be saved in .tga (Targa) format.
+
+You may need to re load the tga in gimp and resave it to ensure that
+RLE compression is used, and that the Origin is specified as the lower
+left. 
+
+I am really a *very* beginning blender user.  When you load up one of
+these, you will find the ship model, a camera and a light source.  
+
+If you look at the ship models, you'll note I only painted/textured
+the top half of the models, as that is all you can see in conquestgl
+anyway :)
+
+Ideally, all of the ship textures in conquest would be rendered this
+way.  In time I will move over to doing this.  The orion and romulan
+ships need the most love.  The feds seem to be in the best shape,
+though I imagine there are some models out there somewhere that could
+be used to re-render them for 'completeness' :)
+

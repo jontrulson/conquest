@@ -413,6 +413,7 @@ CONTENTS:
             color        "ffe6e6e6"              # optional
 
             mipmap       "yes"                   # optional
+            luminance    "yes"                   # optional
 
             texarea {                            # optional
               name       "somerect_in_texture"
@@ -464,10 +465,16 @@ CONTENTS:
                       requiring more texture memory and rendering
                       work. The default is "no".
 
+          luminance:  BOOL
+
+                      optional.  If set to yes, then instantiate this texture
+                      as a luminance texture (greyscale) instead of a
+                      normal RGB[A] texture.
+
           texarea:    SUBSECTION
                       optional. A texarea subsection is used to
                       describe a named rectangle within the texture.
-                      These can be looked up by the gme and used to
+                      These can be looked up by the game and used to
                       describe and position areas within a texture.
 
                       The x, y, w, and h parameters describe a
@@ -1210,8 +1217,7 @@ CONTENTS:
    
    For Conquest's textures, I use The Gimp (www.gimp.org) under linux.
    It can save in compressed ARGB/RGB TGA format.  For the 'Save'
-   options dialog, select 'RLE Compressed' and de-select 'Origin in
-   lower left'.
+   options dialog, select 'RLE Compressed' and 'Origin in lower left'.
 
 
 

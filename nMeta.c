@@ -145,7 +145,7 @@ static void dispServerInfo(dspConfig_t *dsp, metaSRec_t *metaServerList,
   cprintf(tlin, hcol, ALIGN_NONE, pbuf7);
   cprintf(tlin++, icol, ALIGN_NONE, buf7, metaServerList[num].walltime);
 
-  drawLineBox(x, y, w, h, CyanColor, 2.0);
+  drawLineBox(x, y, 0.0, w, h, CyanColor, 2.0);
 
   return;
 }

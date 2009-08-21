@@ -246,17 +246,23 @@ texture {
 
 texture {
   name         "shipFSc-ico"
-  filename     "TOS-fico_s"
+  filename     "TOSfsc"
+
+  luminance    "yes"
 }
 
 texture {
   name         "shipFDe-ico"
-  filename     "TOS-fico"
+  filename     "TOSfde"
+
+  luminance    "yes"
 }
 
 texture {
   name         "shipFCr-ico"
-  filename     "TOS-fico_c"
+  filename     "TOSfcr"
+
+  luminance    "yes"
 }
 
 texture {
@@ -567,17 +573,23 @@ texture {
 
 texture {
   name         "shipRSc-ico"
-  filename     "TOS-rico_s"
+  filename     "TOSrsc"
+
+  luminance    "yes"
 }
 
 texture {
   name         "shipRDe-ico"
-  filename     "TOS-rico"
+  filename     "TOSrde"
+
+  luminance    "yes"
 }
 
 texture {
   name         "shipRCr-ico"
-  filename     "TOS-rico_c"
+  filename     "TOSrcr"
+
+  luminance    "yes"
 }
 
 texture {
@@ -889,17 +901,23 @@ texture {
 
 texture {
   name         "shipKSc-ico"
-  filename     "TOS-kico_s"
+  filename     "TOSksc"
+
+  luminance    "yes"
 }
 
 texture {
   name         "shipKDe-ico"
-  filename     "TOS-kico"
+  filename     "TOSkde"
+
+  luminance    "yes"
 }
 
 texture {
   name         "shipKCr-ico"
-  filename     "TOS-kico_c"
+  filename     "TOSkcr"
+
+  luminance    "yes"
 }
 
 texture {
@@ -1199,17 +1217,23 @@ texture {
 
 texture {
   name         "shipOSc-ico"
-  filename     "TOS-oico_s"
+  filename     "TOSosc"
+
+  luminance    "yes"
 }
 
 texture {
   name         "shipODe-ico"
-  filename     "TOS-oico"
+  filename     "TOSode"
+
+  luminance    "yes"
 }
 
 texture {
   name         "shipOCr-ico"
-  filename     "TOS-oico_c"
+  filename     "TOSocr"
+
+  luminance    "yes"
 }
 
 texture {
