@@ -332,17 +332,17 @@ texture {
   # iconic ship location
   texarea {
     name       "icon"
-    x          4.0
-    y          56.0
-    w          191.0
-    h          154.0
+    x          72.0
+    y          66.0
+    w          124.0
+    h          124.0
   }
 
   ## "Cloaked" indicator position within "icon" area
   texarea {
     name       "icon-cloaked"
     x          104.0
-    y          66.0
+    y          56.0
     w          84.0
     h          10.0
   }
@@ -351,7 +351,7 @@ texture {
   texarea {
     name       "icon-repairing"
     x          104.0
-    y          66.0
+    y          56.0
     w          84.0
     h          10.0
   }
@@ -387,7 +387,7 @@ texture {
   # phaser charge
   texarea {
     name       "phaserchrg"
-    x          235.0
+    x          234.0
     y          61.0
     w          10.0
     h          144.0
@@ -659,17 +659,17 @@ texture {
   # iconic ship location
   texarea {
     name       "icon"
-    x          4.0
-    y          56.0
-    w          191.0
-    h          154.0
+    x          72.0
+    y          66.0
+    w          124.0
+    h          124.0
   }
 
   ## "Cloaked" indicator position within "icon" area
   texarea {
     name       "icon-cloaked"
     x          104.0
-    y          66.0
+    y          56.0
     w          84.0
     h          10.0
   }
@@ -678,7 +678,7 @@ texture {
   texarea {
     name       "icon-repairing"
     x          104.0
-    y          66.0
+    y          56.0
     w          84.0
     h          10.0
   }
@@ -714,7 +714,7 @@ texture {
   # phaser charge
   texarea {
     name       "phaserchrg"
-    x          235.0
+    x          234.0
     y          61.0
     w          10.0
     h          144.0
@@ -987,17 +987,17 @@ texture {
   # iconic ship location
   texarea {
     name       "icon"
-    x          4.0
-    y          56.0
-    w          191.0
-    h          154.0
+    x          72.0
+    y          66.0
+    w          124.0
+    h          124.0
   }
 
   ## "Cloaked" indicator position within "icon" area
   texarea {
     name       "icon-cloaked"
     x          104.0
-    y          66.0
+    y          56.0
     w          84.0
     h          10.0
   }
@@ -1006,7 +1006,7 @@ texture {
   texarea {
     name       "icon-repairing"
     x          104.0
-    y          66.0
+    y          56.0
     w          84.0
     h          10.0
   }
@@ -1042,7 +1042,7 @@ texture {
   # phaser charge
   texarea {
     name       "phaserchrg"
-    x          235.0
+    x          234.0
     y          61.0
     w          10.0
     h          144.0
@@ -1303,17 +1303,17 @@ texture {
   # iconic ship location
   texarea {
     name       "icon"
-    x          4.0
-    y          56.0
-    w          191.0
-    h          154.0
+    x          72.0
+    y          66.0
+    w          124.0
+    h          124.0
   }
 
   ## "Cloaked" indicator position within "icon" area
   texarea {
     name       "icon-cloaked"
     x          104.0
-    y          66.0
+    y          56.0
     w          84.0
     h          10.0
   }
@@ -1322,7 +1322,7 @@ texture {
   texarea {
     name       "icon-repairing"
     x          104.0
-    y          66.0
+    y          56.0
     w          84.0
     h          10.0
   }
@@ -1358,7 +1358,7 @@ texture {
   # phaser charge
   texarea {
     name       "phaserchrg"
-    x          235.0
+    x          234.0
     y          61.0
     w          10.0
     h          144.0

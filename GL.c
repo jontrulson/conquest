@@ -1961,7 +1961,7 @@ static void renderFrame(void)
 
 }
 
-void drawTorp(GLfloat x, GLfloat y, char torpchar, int torpcolor, 
+void drawTorp(GLfloat x, GLfloat y, 
               int scale, int snum, int torpnum)
 {
   static const GLfloat z = 1.0;
@@ -2010,7 +2010,7 @@ void drawTorp(GLfloat x, GLfloat y, char torpchar, int torpcolor,
 
   glBegin(GL_POLYGON);		
 
-  uiPutColor(torpcolor |CQC_A_BOLD);
+  glColor3f(0.8, 0.8, 0.8);
 
   drawTexBoxCentered(0.0, 0.0, z, size);
 

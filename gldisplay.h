@@ -91,7 +91,7 @@ real cu2GLSize(real size, int scale);
 int GLcvtcoords(real cenx, real ceny, real x, real y, real scale,
 		 GLfloat *rx, GLfloat *ry );
 
-void drawTorp(GLfloat x, GLfloat y, char torpchar, int color, int scale,
+void drawTorp(GLfloat x, GLfloat y, int scale,
               int snum, int torpnum);
 void drawShip(GLfloat x, GLfloat y, GLfloat angle, char ch, int i, 
 	      int color, GLfloat scale);

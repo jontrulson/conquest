@@ -171,16 +171,6 @@ void display( int snum )
                                  (Ships[snum].war[Ships[i].team] == FALSE &&
                                   Ships[i].war[Ships[snum].team] == FALSE)) )
 		  {
-                    
-                    if (i == snum) /* if it's your torps you're a ship */
-                      color = 0;
-                    else if (i != snum && satwar(i, snum))
-                      color = RedLevelColor;
-                    else if (Ships[i].team == Ships[snum].team)
-                      color = GreenLevelColor;
-                    else
-                      color = YellowLevelColor;
-                    
 		    for ( j = 0; j < MAXTORPS; j = j + 1 )
 		      if ( Ships[i].torps[j].status == TS_LIVE 
 			  || Ships[i].torps[j].status == TS_DETONATE )
@@ -188,8 +178,7 @@ void display( int snum )
 					 Ships[i].torps[j].y, -scale, 
 					 &glx, &gly ) )
 			  {
-			    drawTorp(glx, gly, Teams[Ships[i].team].torpchar, 
-				     color, scale, i, j);			    
+			    drawTorp(glx, gly, scale, i, j);			    
 			  }
 		  }
 	      }
@@ -323,29 +312,13 @@ void display( int snum )
       if ( ! lsmap ) 
 	{
 	  /* Now display the live torps. */
-	  if (snum > 0)
-	    {			/* a ship */
-
-              if (i == snum) /* if it's your torps you're a ship */
-                color = 0;
-              else if (i != snum && satwar(i, snum))
-                color = RedLevelColor;
-              else if (Ships[i].team == Ships[snum].team)
-                color = GreenLevelColor;
-              else
-                color = YellowLevelColor;
-	    }
-	  else		/* a special */
-	    color = YellowLevelColor;
-	  
 	  for ( j = 0; j < MAXTORPS; j = j + 1 )
 	    if ( Ships[i].status != SS_DYING && Ships[i].status != SS_DEAD && 
 		 (Ships[i].torps[j].status == TS_LIVE || Ships[i].torps[j].status == TS_DETONATE) )
 	      if (GLcvtcoords( cenx, ceny, Ships[i].torps[j].x, 
                                Ships[i].torps[j].y, -scale, &glx, &gly))
 		{
-		  drawTorp(glx, gly, Teams[Ships[i].team].torpchar, color,
-                           scale, i, j);
+		  drawTorp(glx, gly, scale, i, j);
 		}
 	}
     }
