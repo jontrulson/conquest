@@ -81,7 +81,7 @@ void display( int snum )
   else
     lsmap = FALSE;
   
-  /* adjust the ships obital position if neccessary */
+  /* adjust the ships orbital position if neccessary */
   clbAdjOrbitalPosition(snum);
 
   if ( lsmap )

@@ -100,7 +100,8 @@ int getLocalhost(char *buf, int len)
   gethostname ( buf, len );
   if ((hp = gethostbyname(buf)) == NULL) 
     {
-      fprintf(stderr, "conquest: gethostbyname(): cannot get localhost info.\n");
+      if (buf)
+        fprintf(stderr, "conquestgl: gethostbyname('%s'): cannot get localhost info.\n", buf);
       return FALSE;
     }
 

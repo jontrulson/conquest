@@ -11,8 +11,11 @@
 #include "conqinit.h"
 #include "color.h"
 
-typedef struct _GLcolor {
-  GLfloat a, r, g, b;
+typedef union _GLcolor {
+  GLfloat vec[4];
+  struct {
+    GLfloat r, g, b, a;
+  };
 } GLColor_t;
 
 typedef struct _GLtexture {

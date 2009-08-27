@@ -1113,10 +1113,7 @@ void drawExplosion(GLfloat x, GLfloat y, int snum, int torpnum, int scale)
   glEnable(GL_TEXTURE_2D);
   glBindTexture(GL_TEXTURE_2D, torpAStates[snum][torpnum].state.id);
   
-  glColor4f(torpAStates[snum][torpnum].state.col.r, 
-            torpAStates[snum][torpnum].state.col.g,
-            torpAStates[snum][torpnum].state.col.b, 
-            torpAStates[snum][torpnum].state.col.a);
+  glColor4fv(torpAStates[snum][torpnum].state.col.vec);
 
   glBegin(GL_POLYGON);
   drawTexBoxCentered(0.0, 0.0, 0.0, size);
@@ -1232,10 +1229,7 @@ void drawBombing(int snum, int scale)
   glEnable(GL_TEXTURE_2D);
   glBindTexture(GL_TEXTURE_2D, bombAState[snum].state.id);
   
-  glColor4f(bombAState[snum].state.col.r,
-            bombAState[snum].state.col.g,
-            bombAState[snum].state.col.b,
-            bombAState[snum].state.col.a);
+  glColor4fv(bombAState[snum].state.col.vec);
 
   glBegin(GL_POLYGON);
   drawTexBoxCentered(0.0, 0.0, 0.0, size);
@@ -1302,8 +1296,7 @@ void drawPlanet( GLfloat x, GLfloat y, int pnum, int scale,
   
   glBegin(GL_POLYGON);
   
-  glColor4f(GLPlanets[pnum - 1].col.r, GLPlanets[pnum - 1].col.g,
-            GLPlanets[pnum - 1].col.b, GLPlanets[pnum - 1].col.a);	
+  glColor4fv(GLPlanets[pnum - 1].col.vec);
 
   size = cu2GLSize(GLPlanets[pnum - 1].size, -scale);
 
@@ -2371,10 +2364,7 @@ void drawDoomsday(GLfloat x, GLfloat y, GLfloat dangle, GLfloat scale)
       glEnable(GL_TEXTURE_2D);
       glBindTexture(GL_TEXTURE_2D, GLDoomsday.beamid);
       
-      glColor4f(GLDoomsday.beamcol.r, 
-                GLDoomsday.beamcol.g,
-                GLDoomsday.beamcol.b,
-                GLDoomsday.beamcol.a);
+      glColor4fv(GLDoomsday.beamcol.vec);
       
       glBegin(GL_POLYGON);
       
@@ -2427,8 +2417,7 @@ void drawDoomsday(GLfloat x, GLfloat y, GLfloat dangle, GLfloat scale)
   glTranslatef(x , y , TRANZ);
   glRotatef(dangle, 0.0, 0.0, z);
 
-  glColor4f(GLDoomsday.col.r, GLDoomsday.col.g, 
-            GLDoomsday.col.b, GLDoomsday.col.a);	
+  glColor4fv(GLDoomsday.col.vec);
 
   glBegin(GL_POLYGON);
 
@@ -2633,10 +2622,7 @@ void drawNEB(int snum)
   nebWidth = (SMAP(snum) ? nebWidthLR : nebWidthSR);
   nebHeight = (SMAP(snum) ? nebHeightLR : nebHeightSR);
 
-  glColor4f(nebastate.state.col.r,
-            nebastate.state.col.g,
-            nebastate.state.col.b,
-            nebastate.state.col.a);
+  glColor4fv(nebastate.state.col.vec);
 
   if (nebYVisible)
     {
