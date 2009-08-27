@@ -35,20 +35,20 @@ extern animStateRec_t GLBlinkerQtrSec;
 /* storage for ship textures, colors, other GL related things, indexed by
    team/shiptype */
 typedef struct _glship {
-  GLint     ship;             /* main ship texture */
-  GLint     sh;               /* main ship shield texture */
-  GLint     tac;              /* team tactical grid */
-  GLint     phas;             /* phaser */
-  GLint     ico;              /* ship icon */
-  GLint     ico_sh;           /* icon shields id */
-  GLint     decal1;           /* sh/hull gauges */
-  GLint     decal2;           /* fuel/w/e/alloc/kills gauges */
-  GLint     dial;             /* ships astrogator dial */
-  GLint     dialp;            /* astrogator pointer */
-  GLint     warp;             /* id of warp gauge */
-  GLint     warp2;            /* id of warp gauge background*/
-  GLColor_t warpq_col;        /* the color of the warp indicator quad */
-  GLint     ico_torp;         /* torpedo icon(s) */
+  GLTexture_t *ship;             /* main ship texture */
+  GLTexture_t *sh;               /* main ship shield texture */
+  GLTexture_t *tac;              /* team tactical grid */
+  GLTexture_t *phas;             /* phaser */
+  GLTexture_t *ico;              /* ship icon */
+  GLTexture_t *ico_sh;           /* icon shields id */
+  GLTexture_t *decal1;           /* sh/hull gauges */
+  GLTexture_t *decal2;           /* fuel/w/e/alloc/kills gauges */
+  GLTexture_t *dial;             /* ships astrogator dial */
+  GLTexture_t *dialp;            /* astrogator pointer */
+  GLTexture_t *warp;             /* warp gauge */
+  GLTexture_t *warp2;            /* warp gauge background*/
+  GLTexture_t *warpq_col;        /* warp indicator quad (color only) */
+  GLTexture_t *ico_torp;         /* torpedo icon(s) */
 } GLShip_t;
 
 #if defined(NOEXTERN_GL)
@@ -86,11 +86,14 @@ GLfloat scaleFactorsSR[10] = {
   3.25
 };
 
+GLTexture_t defaultTexture;
+
 #else
 extern GLShip_t GLShips[NUMPLAYERTEAMS][MAXNUMSHIPTYPES]; 
 
 extern GLfloat  scaleFactorsLR[10];
 extern GLfloat  scaleFactorsSR[10];
+extern const GLTexture_t defaultTexture;
 #endif
 
 #endif /* _C_GL_H */

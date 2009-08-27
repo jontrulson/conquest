@@ -36,9 +36,16 @@ extern GLTexture_t *GLTextures;
 #endif
 
 int findGLTexture(char *texname);
+GLTexture_t *getGLTexture(char *texname);
+
 
 /* helpers */
 #define HAS_GLCOLOR(x) ((x)->a || (x)->r || (x)->g || (x)->b)
+
+#define GLTEX_COLOR(x)    ((x)->col)
+#define GLTEX_ID(x)       ((x)->id)
+#define GLTEX_WIDTH(x)    ((x)->w)
+#define GLTEX_HEIGHT(x)   ((x)->h)
 
 /* ico texture identifiers for drawIconHUDDecal() */
 #define TEX_HUD_ICO        0

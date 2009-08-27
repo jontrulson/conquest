@@ -74,6 +74,9 @@ typedef struct _cqi_planet_init {
 #define CQITEX_F_IS_LUMINANCE     0x00000004 /* gen tex as a luminance
                                                 texture */
 
+#define CQITEX_F_HAS_COLOR        0x00000008 /* tex specified a color */
+
+
 typedef struct _cqi_texture_area {
   char name[CQI_NAMELEN];       /* WKN of area */
   real x, y;                    /* X/Y coord of lower left of area as

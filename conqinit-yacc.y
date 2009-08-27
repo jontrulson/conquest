@@ -2112,7 +2112,7 @@ static void endSection(void)
             goto endsection;
           }
         
-        /* if the texture was overrided by a later definition
+        /* if the texture was overridden by a later definition
            just copy the new definition over it */
         exists = _cqiFindTexture(currTexture.name);
         
@@ -2148,6 +2148,15 @@ static void endSection(void)
             _cqiTextures = texptr;
             _cqiTextures[numTextures] = currTexture;
             numTextures++;
+
+            /* warn if the texture did not specify a color (will be
+             *  black and transparent) 
+             */
+
+            if (!(currTexture.flags & CQITEX_F_HAS_COLOR))
+              utLog("CQI: warning, texture '%s' does not specify a color", 
+                    currTexture.name);
+
           }
         fileNumTextures++;
       }
@@ -2877,6 +2886,7 @@ void cfgSections(int item, char *val)
               strncpy(currTexture.filename, val, CQI_NAMELEN - 1);
             break;
           case COLOR:
+            currTexture.flags |= CQITEX_F_HAS_COLOR;
             currTexture.color = hex2color(val);
             break;
           }            

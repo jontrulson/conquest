@@ -6,25 +6,28 @@
 texture {
   name         "star"
 
+  color        "ffe6e6e6"
   mipmap       "yes"
 }
 
 texture {
   name         "classm"
 
+  color        "ffe6e6e6"
   mipmap       "yes"
 }
 
 texture {
   name         "classd"
 
+  color        "ffe6e6e6"
   mipmap       "yes"
 }
 
 texture {
   name         "doomsday"
-  color        "ffffffff"
 
+  color        "ffffffff"
   mipmap       "yes"
 }
 
@@ -35,17 +38,22 @@ texture {
 
 texture {
   name         "vbg"
+
+  color        "ffe6e6e6"
 # uncomment below for a sparser vbg
 # filename     "TOS-vbg"
 }
 
 texture {
   name         "torp"
+
+  color        "ffe6e6e6"
 }
 
 texture {
   name         "luna"
 
+  color        "ffe6e6e6"
   mipmap       "yes"
 }
 
@@ -175,6 +183,8 @@ texture {
 
 texture {
   name         "ico-torp"
+
+  color        "ffffffff"
 }
 
 # Federation ships
@@ -186,6 +196,7 @@ texture {
   name         "shipFSc"
   filename     "TOSfsc"
 
+  color        "ffffffff"
   mipmap       "yes"
 }
 
@@ -193,61 +204,80 @@ texture {
 texture {
   name         "shipFSc-sh"
   filename     "TOSf-sh"
+
+  color        "ffffffff"
 }
 
 texture {
   name         "shipFDe"
   filename     "TOSfde"
 
+  color        "ffffffff"
   mipmap       "yes"
 }
 
 texture {
   name         "shipFDe-sh"
   filename     "TOSf-sh"
+
+  color        "ffffffff"
 }
 
 texture {
   name         "shipFCr"
   filename     "TOSfcr"
 
+  color        "ffffffff"
   mipmap       "yes"
 }
 
 texture {
   name         "shipFCr-sh"
   filename     "TOSf-sh"
+
+  color        "ffffffff"
 }
 
 texture {
   name         "shipF-tac"
   filename     "TOS-ftac"
+
+  color        "ffffffff"
 }
 
 texture {
   name         "shipF-phaser"
   filename     "TOS-fph"
+
+  color        "ffffffff"
 }
 
 texture {
   name         "shipF-torp0"
   filename     "TOS-ftorp1"
+
+  color        "ffffffff"
 }
 
 texture {
   name         "shipF-torp1"
   filename     "TOS-ftorp2"
+
+  color        "ffffffff"
 }
 
 texture {
   name         "shipF-torp2"
   filename     "TOS-ftorp3"
+
+  color        "ffffffff"
 }
 
 texture {
   name         "shipFSc-ico"
   filename     "TOSfsc"
 
+  color        "ffffffff"
   luminance    "yes"
 }
 
@@ -255,6 +285,7 @@ texture {
   name         "shipFDe-ico"
   filename     "TOSfde"
 
+  color        "ffffffff"
   luminance    "yes"
 }
 
@@ -262,27 +293,36 @@ texture {
   name         "shipFCr-ico"
   filename     "TOSfcr"
 
+  color        "ffffffff"
   luminance    "yes"
 }
 
 texture {
   name         "shipFSc-ico-sh"
   filename     "TOS-fish_s"
+
+  color        "ffffffff"
 }
 
 texture {
   name         "shipFDe-ico-sh"
   filename     "TOS-fish"
+
+  color        "ffffffff"
 }
 
 texture {
   name         "shipFCr-ico-sh"
   filename     "TOS-fish_c"
+
+  color        "ffffffff"
 }
 
 texture {
   name         "shipF-ico-decal1"
   filename     "hud-decal1"
+
+  color        "ffffffff"
 
   # shield gauge location
   texarea {
@@ -398,6 +438,8 @@ texture {
   name         "shipF-ico-decal2"
   filename     "hud-decal2"
 
+  color        "ffffffff"
+
   # fuel gauge location
   texarea {
     name       "fuelg"
@@ -483,21 +525,29 @@ texture {
 texture {
   name         "shipF-dial"
   filename     "TOS-fihd"
+
+  color        "ffffffff"
 }
 
 texture {
   name         "shipF-dialp"
   filename     "TOS-fihp"
+
+  color        "ffffffff"
 }
 
 texture {
   name         "shipF-warp"
   filename     "TOS-fwarp"
+
+  color        "ffffffff"
 }
 
 texture {
   name         "shipF-warp2"
   filename     "TOS-fwarp2"
+
+  color        "ffffffff"
 }
 
 texture {
@@ -514,67 +564,87 @@ texture {
   name         "shipRSc"
   filename     "TOSrsc"
 
+  color        "ffffffff"
   mipmap       "yes"
 }
 
 texture {
   name         "shipRSc-sh"
   filename     "TOSr-sh"
+
+  color        "ffffffff"
 }
 
 texture {
   name         "shipRDe"
   filename     "TOSrde"
 
+  color        "ffffffff"
   mipmap       "yes"
 }
 
 texture {
   name         "shipRDe-sh"
   filename     "TOSr-sh"
+
+  color        "ffffffff"
 }
 
 texture {
   name         "shipRCr"
   filename     "TOSrcr"
 
+  color        "ffffffff"
   mipmap       "yes"
 }
 
 texture {
   name         "shipRCr-sh"
   filename     "TOSr-sh"
+
+  color        "ffffffff"
 }
 
 texture {
   name         "shipR-tac"
   filename     "TOS-rtac"
+
+  color        "ffffffff"
 }
 
 texture {
   name         "shipR-phaser"
   filename     "TOS-rph"
+
+  color        "ffffffff"
 }
 
 texture {
   name         "shipR-torp0"
   filename     "TOS-rtorp1"
+
+  color        "ffffffff"
 }
 
 texture {
   name         "shipR-torp1"
   filename     "TOS-rtorp3"
+
+  color        "ffffffff"
 }
 
 texture {
   name         "shipR-torp2"
   filename     "TOS-rtorp3"
+
+  color        "ffffffff"
 }
 
 texture {
   name         "shipRSc-ico"
   filename     "TOSrsc"
 
+  color        "ffffffff"
   luminance    "yes"
 }
 
@@ -582,6 +652,7 @@ texture {
   name         "shipRDe-ico"
   filename     "TOSrde"
 
+  color        "ffffffff"
   luminance    "yes"
 }
 
@@ -589,27 +660,36 @@ texture {
   name         "shipRCr-ico"
   filename     "TOSrcr"
 
+  color        "ffffffff"
   luminance    "yes"
 }
 
 texture {
   name         "shipRSc-ico-sh"
   filename     "TOS-rish_s"
+
+  color        "ffffffff"
 }
 
 texture {
   name         "shipRDe-ico-sh"
   filename     "TOS-rish"
+
+  color        "ffffffff"
 }
 
 texture {
   name         "shipRCr-ico-sh"
   filename     "TOS-rish_c"
+
+  color        "ffffffff"
 }
 
 texture {
   name         "shipR-ico-decal1"
   filename     "hud-decal1"
+
+  color        "ffffffff"
 
   # shield gauge location
   texarea {
@@ -725,6 +805,8 @@ texture {
   name         "shipR-ico-decal2"
   filename     "hud-decal2"
 
+  color        "ffffffff"
+
   # fuel gauge location
   texarea {
     name       "fuelg"
@@ -810,26 +892,35 @@ texture {
 texture {
   name         "shipR-dial"
   filename     "TOS-rihd"
+
+  color        "ffffffff"
 }
 
 texture {
   name         "shipR-dialp"
   filename     "TOS-rihp"
+
+  color        "ffffffff"
 }
 
 texture {
   name         "shipR-warp"
   filename     "TOS-rwarp"
+
+  color        "ffffffff"
 }
 
 texture {
   name         "shipR-warp2"
   filename     "TOS-rwarp2"
+
+  color        "ffffffff"
 }
 
 texture {
   name         "shipR-warp-col"
   filename     ""  # we are only using this to store a color
+
   color        "ff47b6a4"
 }
 
@@ -842,67 +933,87 @@ texture {
   name         "shipKSc"
   filename     "TOSksc"
 
+  color        "ffffffff"
   mipmap       "yes"
 }
 
 texture {
   name         "shipKSc-sh"
   filename     "TOSk-sh"
+
+  color        "ffffffff"
 }
 
 texture {
   name         "shipKDe"
   filename     "TOSkde"
 
+  color        "ffffffff"
   mipmap       "yes"
 }
 
 texture {
   name         "shipKDe-sh"
   filename     "TOSk-sh"
+
+  color        "ffffffff"
 }
 
 texture {
   name         "shipKCr"
   filename     "TOSkcr"
 
+  color        "ffffffff"
   mipmap       "yes"
 }
 
 texture {
   name         "shipKCr-sh"
   filename     "TOSk-sh"
+
+  color        "ffffffff"
 }
 
 texture {
   name         "shipK-tac"
   filename     "TOS-ktac"
+
+  color        "ffffffff"
 }
 
 texture {
   name         "shipK-phaser"
   filename     "TOS-kph"
+
+  color        "ffffffff"
 }
 
 texture {
   name         "shipK-torp0"
   filename     "TOS-ktorp1"
+
+  color        "ffffffff"
 }
 
 texture {
   name         "shipK-torp1"
   filename     "TOS-ktorp2"
+
+  color        "ffffffff"
 }
 
 texture {
   name         "shipK-torp2"
   filename     "TOS-ktorp3"
+
+  color        "ffffffff"
 }
 
 texture {
   name         "shipKSc-ico"
   filename     "TOSksc"
 
+  color        "ffffffff"
   luminance    "yes"
 }
 
@@ -910,6 +1021,7 @@ texture {
   name         "shipKDe-ico"
   filename     "TOSkde"
 
+  color        "ffffffff"
   luminance    "yes"
 }
 
@@ -917,27 +1029,36 @@ texture {
   name         "shipKCr-ico"
   filename     "TOSkcr"
 
+  color        "ffffffff"
   luminance    "yes"
 }
 
 texture {
   name         "shipKSc-ico-sh"
   filename     "TOS-kish_s"
+
+  color        "ffffffff"
 }
 
 texture {
   name         "shipKDe-ico-sh"
   filename     "TOS-kish"
+
+  color        "ffffffff"
 }
 
 texture {
   name         "shipKCr-ico-sh"
   filename     "TOS-kish_c"
+
+  color        "ffffffff"
 }
 
 texture {
   name         "shipK-ico-decal1"
   filename     "hud-decal1"
+
+  color        "ffffffff"
 
   # shield gauge location
   texarea {
@@ -1053,6 +1174,8 @@ texture {
   name         "shipK-ico-decal2"
   filename     "hud-decal2"
 
+  color        "ffffffff"
+
   # fuel gauge location
   texarea {
     name       "fuelg"
@@ -1138,27 +1261,37 @@ texture {
 texture {
   name         "shipK-dial"
   filename     "TOS-kihd"
+
+  color        "ffffffff"
 }
 
 texture {
   name         "shipK-dialp"
   filename     "TOS-kihp"
+
+  color        "ffffffff"
 }
 
 texture {
   name         "shipK-warp"
   filename     "TOS-kwarp"
+
+  color        "ffffffff"
 }
 
 texture {
   name         "shipK-warp2"
   filename     "TOS-kwarp2"
+
+  color        "ffffffff"
 }
 
 texture {
   name         "shipK-warp-col"
   filename     ""  # we are only using this to store a color
   color        "ffd72d00"
+
+  color        "ffffffff"
 }
 
 
@@ -1170,6 +1303,7 @@ texture {
   name         "shipOSc"
   filename     "TOSosc"
 
+  color        "ffffffff"
   mipmap       "yes"
 }
 
@@ -1178,47 +1312,60 @@ texture {
 texture {
   name         "shipOSc-sh"
   filename     "TOSr-sh"
+
+  color        "ffffffff"
 }
 
 texture {
   name         "shipODe"
   filename     "TOSode"
 
+  color        "ffffffff"
   mipmap       "yes"
 }
 
 texture {
   name         "shipODe-sh"
   filename     "TOSf-sh"
+
+  color        "ffffffff"
 }
 
 texture {
   name         "shipOCr"
   filename     "TOSocr"
 
+  color        "ffffffff"
   mipmap       "yes"
 }
 
 texture {
   name         "shipOCr-sh"
   filename     "TOSf-sh"
+
+  color        "ffffffff"
 }
 
 texture {
   name         "shipO-tac"
   filename     "TOS-otac"
+
+  color        "ffffffff"
 }
 
 texture {
   name         "shipO-phaser"
   # guess we just use the default phaser
   filename     "phaser"
+
+  color        "ffffffff"
 }
 
 texture {
   name         "shipOSc-ico"
   filename     "TOSosc"
 
+  color        "ffffffff"
   luminance    "yes"
 }
 
@@ -1226,6 +1373,7 @@ texture {
   name         "shipODe-ico"
   filename     "TOSode"
 
+  color        "ffffffff"
   luminance    "yes"
 }
 
@@ -1233,27 +1381,36 @@ texture {
   name         "shipOCr-ico"
   filename     "TOSocr"
 
+  color        "ffffffff"
   luminance    "yes"
 }
 
 texture {
   name         "shipOSc-ico-sh"
   filename     "TOS-oish_s"
+
+  color        "ffffffff"
 }
 
 texture {
   name         "shipODe-ico-sh"
   filename     "TOS-oish"
+
+  color        "ffffffff"
 }
 
 texture {
   name         "shipOCr-ico-sh"
   filename     "TOS-oish_c"
+
+  color        "ffffffff"
 }
 
 texture {
   name         "shipO-ico-decal1"
   filename     "hud-decal1"
+
+  color        "ffffffff"
 
   # shield gauge location
   texarea {
@@ -1369,6 +1526,8 @@ texture {
   name         "shipO-ico-decal2"
   filename     "hud-decal2"
 
+  color        "ffffffff"
+
   # fuel gauge location
   texarea {
     name       "fuelg"
@@ -1454,26 +1613,35 @@ texture {
 texture {
   name         "shipO-dial"
   filename     "TOS-oihd"
+
+  color        "ffffffff"
 }
 
 texture {
   name         "shipO-dialp"
   filename     "TOS-oihp"
+
+  color        "ffffffff"
 }
 
 texture {
   name         "shipO-warp"
   filename     "TOS-owarp"
+
+  color        "ffffffff"
 }
 
 texture {
   name         "shipO-warp2"
   filename     "TOS-owarp2"
+
+  color        "ffffffff"
 }
 
 texture {
   name         "shipO-warp-col"
   filename     ""  # we are only using this to store a color
+
   color        "ff0f395a"
 }
 

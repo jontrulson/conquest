@@ -31,8 +31,6 @@
 #include "GL.h"
 #include "hud.h"
 
-#define GLCOLOR4F(glcol) glColor4f(glcol.r, glcol.g, glcol.b, glcol.a) 
-
 /*
  Cataboligne - 11.20.6
  ack alert klaxon with <ESC>
@@ -821,6 +819,7 @@ void renderHud(int dostats)
   real warp = Ships[Context.snum].warp;
   real maxwarp = ShipTypes[Ships[Context.snum].shiptype].warplim;
   int steam = Ships[Context.snum].team;
+  int stype = Ships[Context.snum].shiptype;
   int snum = Context.snum;
   static int oldteam = -1;
   static int rxtime = 0;
@@ -909,7 +908,7 @@ void renderHud(int dostats)
   
   /* warp quad indicator color */
   
-  GLCOLOR4F(GLShips[Ships[snum].team][Ships[snum].shiptype].warpq_col);
+  glColor4fv(GLTEX_COLOR(GLShips[steam][stype].warpq_col).vec);
 
   /* warp indicator quad */
   if (warp >= 0.1)
@@ -1115,7 +1114,7 @@ void renderHud(int dostats)
           if (ack_alert == ALERT_OFF) /* was off */
             {
               ack_alert = ALERT_ON;
-              cqsEffectPlayTracked(cqsTeamEffects[Ships[snum].team].alert,
+              cqsEffectPlayTracked(cqsTeamEffects[steam].alert,
                                    &alertHandle, 0.0, 0.0, 0.0);
             }
           else if (ack_alert == ALERT_ON) /* was on - turned off */
@@ -1213,7 +1212,7 @@ void renderHud(int dostats)
   if (snum > 0 && snum <= MAXSHIPS)
     {
       glBindTexture(GL_TEXTURE_2D, 
-                    GLShips[Ships[snum].team][Ships[snum].shiptype].ico_torp);
+                    GLTEX_ID(GLShips[steam][stype].ico_torp));
       
       for (i=0; i < MAXTORPS; i++)
         {

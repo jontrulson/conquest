@@ -71,7 +71,7 @@ static animStateRec_t torpAStates[MAXSHIPS + 1][MAXTORPS] = {};
 /* bomb (torp) animation state */
 static animStateRec_t bombAState[MAXSHIPS + 1] = {};
  
-int frame=0, timebase=0;
+static int frame=0, timebase=0;
 static float FPS = 0.0;
 
 /* a 'prescaling factor for certain objects, so they are drawn a
@@ -85,20 +85,16 @@ extern animStateRec_t ncpTorpAnims[NUMPLAYERTEAMS];
 
 /* global tables for looking up textures quickly */
 typedef struct _gl_planet {
-  GLTexture_t  *gltex;          /* pointer to the proper GLTexture entry */
-  GLint        id;              /* copy of gltex texture id */
-  GLColor_t    col;             /* the desired color */
-  GLfloat      size;            /* the prefered size, in prescaled CU's*/
+  GLTexture_t  *tex;          /* pointer to the proper GLTexture entry */
+  GLfloat      size;          /* the prefered size, in prescaled CU's*/
 } GLPlanet_t;
 
 static GLPlanet_t *GLPlanets = NULL;
 
 /* storage for doomsday tex */
 static struct {
-  GLint id;                     /* of the machine */
-  GLint beamid;                 /* of the anti-proton beam. Oh yes. */
-  GLColor_t col;
-  GLColor_t beamcol;
+  GLTexture_t *doom;            /* doomsday */
+  GLTexture_t *beam;            /* doomsday AP beam */
 } GLDoomsday = {};
 
 
@@ -167,6 +163,17 @@ int findGLTexture(char *texname)
     }
   
   return -1;
+}
+
+/* search texture list and return pointer to GLTexture.  NULL if not found. */
+GLTexture_t *getGLTexture(char *texname)
+{
+  int i;
+
+  if ((i = findGLTexture(texname)) == -1)
+    return NULL;
+  else
+    return &GLTextures[i];
 }
 
 /* search the cqi animations, and return it's animdef index */
@@ -250,7 +257,7 @@ static int initGLAnimDefs(void)
       if (cqiAnimDefs[i].texname[0] && !(cqiAnimDefs[i].anims & CQI_ANIMS_TEX))
         {
           if ((ndx = findGLTexture(cqiAnimDefs[i].texname)) >= 0)
-            GLAnimDefs[i].texid = GLTextures[ndx].id;
+            GLAnimDefs[i].texid = GLTEX_ID(&GLTextures[ndx]);
           else
             utLog("%s: could not locate texture '%s' for animdef '%s'.", 
                  __FUNCTION__, cqiAnimDefs[i].texname, cqiAnimDefs[i].name);
@@ -270,7 +277,7 @@ static int initGLAnimDefs(void)
       if (GLAnimDefs[i].istates & AD_ISTATE_TEX)
         {                       /* an initial texture was specified. */
           if ((ndx = findGLTexture(cqiAnimDefs[i].itexname)) >= 0)
-            GLAnimDefs[i].itexid = GLTextures[ndx].id;
+            GLAnimDefs[i].itexid = GLTEX_ID(&GLTextures[ndx]);
           else
             {
               utLog("%s: could not locate istate texture '%s' for animdef '%s'.", 
@@ -341,7 +348,8 @@ static int initGLAnimDefs(void)
 
               if ((ndx = findGLTexture(buffer)) >= 0)
                 {
-                  GLAnimDefs[i].tex.tex[j].id = GLTextures[ndx].id;
+                  GLTEX_ID(&GLAnimDefs[i].tex.tex[j]) = 
+                    GLTEX_ID(&GLTextures[ndx]);
 
                   if (HAS_GLCOLOR(&GLAnimDefs[i].tex.color))
                     {           /* override per-tex colors */
@@ -434,37 +442,19 @@ static int initGLExplosions(void)
   return TRUE;
 }
 
-/* utility functions for initGLShips */
-static GLint _get_ship_texid(char *name)
+static GLTexture_t *_get_ship_tex(char *name)
 {
-  int ndx;
+  GLTexture_t *tex;
 
-  if (!name)
-    return 0;
+  if (!name)                    /* should never happen, but... */
+    return &defaultTexture;
 
-  if ((ndx = findGLTexture(name)) >= 0)
-    return GLTextures[ndx].id;
+  if ((tex = getGLTexture(name)))
+    return tex;
   else
     utLog("%s: Could not find texture '%s'", __FUNCTION__, name);
 
-  return 0;
-}
-static int _get_ship_texcolor(char *name, GLColor_t *col)
-{
-  int ndx;
-
-  if (!name)
-    return -1;
-
-  if ((ndx = findGLTexture(name)) >= 0)
-    {
-      if (col)
-        *col = GLTextures[ndx].col;
-    }
-  else
-    utLog("%s: Could not find color '%s'", __FUNCTION__, name);
-
-  return ndx;
+  return &defaultTexture;
 }
 
 /* initialize the GLShips array */
@@ -490,21 +480,21 @@ static int initGLShips(void)
         {
           snprintf(buffer, CQI_NAMELEN - 1, "%s%c%c", shipPfx, 
                    ShipTypes[j].name[0], ShipTypes[j].name[1]);
-          GLShips[i][j].ship = _get_ship_texid(buffer);
+          GLShips[i][j].ship = _get_ship_tex(buffer);
           
           snprintf(buffer, CQI_NAMELEN - 1, "%s%c%c-sh", shipPfx, 
                    ShipTypes[j].name[0], ShipTypes[j].name[1]);
-          GLShips[i][j].sh = _get_ship_texid(buffer);
+          GLShips[i][j].sh = _get_ship_tex(buffer);
           
           snprintf(buffer, CQI_NAMELEN - 1, "%s-tac", shipPfx);
-          GLShips[i][j].tac = _get_ship_texid(buffer);
+          GLShips[i][j].tac = _get_ship_tex(buffer);
           
           snprintf(buffer, CQI_NAMELEN - 1, "%s-phaser", shipPfx);
-          GLShips[i][j].phas = _get_ship_texid(buffer);
+          GLShips[i][j].phas = _get_ship_tex(buffer);
 
           snprintf(buffer, CQI_NAMELEN - 1, "%s%c%c-ico", shipPfx, 
                    ShipTypes[j].name[0], ShipTypes[j].name[1]);
-          GLShips[i][j].ico = _get_ship_texid(buffer);
+          GLShips[i][j].ico = _get_ship_tex(buffer);
           
 #if 0
           /* FIXME, there must be a better way to do this (and shields
@@ -513,35 +503,32 @@ static int initGLShips(void)
              generating new ico-sh textures. */
           snprintf(buffer, CQI_NAMELEN - 1, "%s%c%c-ico-sh", shipPfx, 
                    ShipTypes[j].name[0], ShipTypes[j].name[1]);
-          GLShips[i][j].ico_sh = _get_ship_texid(buffer);
+          GLShips[i][j].ico_sh = _get_ship_tex(buffer);
 #endif
           
           snprintf(buffer, CQI_NAMELEN - 1, "%s-ico-decal1", shipPfx);
-          GLShips[i][j].decal1 = _get_ship_texid(buffer);
+          GLShips[i][j].decal1 = _get_ship_tex(buffer);
           
           snprintf(buffer, CQI_NAMELEN - 1, "%s-ico-decal2", shipPfx);
-          GLShips[i][j].decal2 = _get_ship_texid(buffer);
+          GLShips[i][j].decal2 = _get_ship_tex(buffer);
           
           snprintf(buffer, CQI_NAMELEN - 1, "%s-dial", shipPfx);
-          GLShips[i][j].dial = _get_ship_texid(buffer);
+          GLShips[i][j].dial = _get_ship_tex(buffer);
           
           snprintf(buffer, CQI_NAMELEN - 1, "%s-dialp", shipPfx);
-          GLShips[i][j].dialp = _get_ship_texid(buffer);
+          GLShips[i][j].dialp = _get_ship_tex(buffer);
           
           snprintf(buffer, CQI_NAMELEN - 1, "%s-warp", shipPfx);
-          GLShips[i][j].warp = _get_ship_texid(buffer);
+          GLShips[i][j].warp = _get_ship_tex(buffer);
 
           snprintf(buffer, CQI_NAMELEN - 1, "%s-warp2", shipPfx);
-          GLShips[i][j].warp2 = _get_ship_texid(buffer);
+          GLShips[i][j].warp2 = _get_ship_tex(buffer);
 
-          /* here we just want the color */
+          /* here we just want the color, but we get a whole tex anyway */
           snprintf(buffer, CQI_NAMELEN - 1, "%s-warp-col", shipPfx);
-          if (_get_ship_texcolor(buffer, &GLShips[i][j].warpq_col) < 0)
-            {                   /* do something sane */
-              hex2GLColor(0xffeeeeee, &GLShips[i][j].warpq_col);
-            }
+          GLShips[i][j].warpq_col = _get_ship_tex(buffer);
 
-          GLShips[i][j].ico_torp = _get_ship_texid("ico-torp");
+          GLShips[i][j].ico_torp = _get_ship_tex("ico-torp");
           
           /* if we failed to find some of them, you'll see soon enough. */
         }
@@ -633,28 +620,9 @@ static int _get_glplanet_info(GLPlanet_t *curGLPlanet, int plani)
       return FALSE;
     }
   
-  /* now we are set, setup initial state for the glplanet */
+  /* now we are set, get the GLTexture */
   
-  curGLPlanet->gltex = &GLTextures[gltndx];
-  curGLPlanet->id = curGLPlanet->gltex->id; /* a copy of the texid */
-  
-  /* choose the base color */
-  
-  /* if the texture has specified a color, use that */
-  if (HAS_GLCOLOR(&(curGLPlanet->gltex->col)))
-    curGLPlanet->col = curGLPlanet->gltex->col;
-  else
-    {                       /* we choose a default */
-      switch (Planets[plani].type)
-        {
-        case PLANET_SUN:    /* default to red for unknown suns */
-          hex2GLColor(0xffcc0000, &(curGLPlanet->col)); 
-          break;
-        default:            /* off white for everything else */
-          hex2GLColor(0xffe6e6e6, &(curGLPlanet->col)); 
-          break;
-        }
-    }
+  curGLPlanet->tex = &GLTextures[gltndx];
   
   /* size - should use server values if available someday, for now use
      cqi, and if not that, the standard defaults */
@@ -783,7 +751,7 @@ void drawIconHUDDecal(GLfloat rx, GLfloat ry, GLfloat w, GLfloat h,
 {
   int steam = Ships[Context.snum].team, stype = Ships[Context.snum].shiptype;
   static int norender = FALSE;
-  GLint id = 0;
+  GLTexture_t *tex = &defaultTexture;
 
   if (norender)
     return;
@@ -802,34 +770,34 @@ void drawIconHUDDecal(GLfloat rx, GLfloat ry, GLfloat w, GLfloat h,
   switch (imgp)
     {
     case TEX_HUD_ICO:
-      id = GLShips[steam][stype].ico;
+      tex = GLShips[steam][stype].ico;
       break;
     case TEX_HUD_SHI:
-      id = GLShips[steam][stype].ico_sh;
+      tex = GLShips[steam][stype].ico_sh;
       break;
     case TEX_HUD_DECAL1:
-      id = GLShips[steam][stype].decal1;
+      tex = GLShips[steam][stype].decal1;
       break;
     case TEX_HUD_DECAL2:
-      id = GLShips[steam][stype].decal2;
+      tex = GLShips[steam][stype].decal2;
       break;
     case TEX_HUD_HEAD:
-      id = GLShips[steam][stype].dial;
+      tex = GLShips[steam][stype].dial;
       break;
     case TEX_HUD_HDP:    
-      id = GLShips[steam][stype].dialp;
+      tex = GLShips[steam][stype].dialp;
       break;
     case TEX_HUD_WARP:   
-      id = GLShips[steam][stype].warp;
+      tex = GLShips[steam][stype].warp;
       break;
     case TEX_HUD_WARP2:   
-      id = GLShips[steam][stype].warp2;
+      tex = GLShips[steam][stype].warp2;
       break;
     default:
       break;
     }
   
-  glBindTexture(GL_TEXTURE_2D, id);
+  glBindTexture(GL_TEXTURE_2D, GLTEX_ID(tex));
   uiPutColor(icol);
 
   glBegin(GL_POLYGON);
@@ -1290,13 +1258,13 @@ void drawPlanet( GLfloat x, GLfloat y, int pnum, int scale,
   
   glEnable(GL_TEXTURE_2D); 
 
-  glBindTexture(GL_TEXTURE_2D, GLPlanets[pnum - 1].id);
+  glBindTexture(GL_TEXTURE_2D, GLTEX_ID(GLPlanets[pnum - 1].tex));
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
   glEnable(GL_BLEND);
   
   glBegin(GL_POLYGON);
   
-  glColor4fv(GLPlanets[pnum - 1].col.vec);
+  glColor4fv(GLTEX_COLOR(GLPlanets[pnum - 1].tex).vec);
 
   size = cu2GLSize(GLPlanets[pnum - 1].size, -scale);
 
@@ -2101,10 +2069,10 @@ drawShip(GLfloat x, GLfloat y, GLfloat angle, char ch, int snum, int color,
       glTranslatef(x , y , TRANZ);
       glRotatef(Ships[snum].lastphase - 90.0, 0.0, 0.0, z);
 
-      glColor4f(1.0, 1.0, 1.0, 1.0);
+      glColor4fv(GLTEX_COLOR(GLShips[steam][stype].phas).vec);
       glEnable(GL_TEXTURE_2D); 
 
-      glBindTexture(GL_TEXTURE_2D, GLShips[steam][stype].phas);
+      glBindTexture(GL_TEXTURE_2D, GLTEX_ID(GLShips[steam][stype].phas));
       glBegin(GL_POLYGON);
       
       /* can't use drawTexBoxCentered here since we need to change
@@ -2118,7 +2086,10 @@ drawShip(GLfloat x, GLfloat y, GLfloat angle, char ch, int snum, int color,
       glVertex3f(phaserwidth, 0.0, -1.0); /* lr */
       
       /* increase transparency at the end of the beam */
-      glColor4f(1.0, 1.0, 1.0, 0.3);
+      glColor4f(GLTEX_COLOR(GLShips[steam][stype].phas).r,
+                GLTEX_COLOR(GLShips[steam][stype].phas).g,
+                GLTEX_COLOR(GLShips[steam][stype].phas).b,
+                0.3);	
 
       glTexCoord2f(0.0f, 1.0f);
       glVertex3f(phaserwidth, phaserRadius, -1.0); /* ur */
@@ -2148,8 +2119,7 @@ drawShip(GLfloat x, GLfloat y, GLfloat angle, char ch, int snum, int color,
       
       glEnable(GL_TEXTURE_2D);
       
-      glBindTexture(GL_TEXTURE_2D, GLShips[steam][stype].sh);
-
+      glBindTexture(GL_TEXTURE_2D, GLTEX_ID(GLShips[steam][stype].sh));
 
       /* standard sh graphic */
       uiPutColor(_get_sh_color(Ships[snum].shields));
@@ -2179,7 +2149,7 @@ drawShip(GLfloat x, GLfloat y, GLfloat angle, char ch, int snum, int color,
 
   glEnable(GL_TEXTURE_2D); 
 
-  glBindTexture(GL_TEXTURE_2D, GLShips[steam][stype].ship);
+  glBindTexture(GL_TEXTURE_2D, GLTEX_ID(GLShips[steam][stype].ship));
 
   glScalef(scaleFac, scaleFac, 1.0);
 
@@ -2188,7 +2158,10 @@ drawShip(GLfloat x, GLfloat y, GLfloat angle, char ch, int snum, int color,
 
   glRotatef(angle, 0.0, 0.0, z);
 
-  glColor4f(1.0, 1.0, 1.0, alpha);	
+  glColor4f(GLTEX_COLOR(GLShips[steam][stype].ship).r,
+            GLTEX_COLOR(GLShips[steam][stype].ship).g,
+            GLTEX_COLOR(GLShips[steam][stype].ship).b,
+            alpha);	
 
   glBegin(GL_POLYGON);
 
@@ -2253,22 +2226,12 @@ void drawDoomsday(GLfloat x, GLfloat y, GLfloat dangle, GLfloat scale)
               Doomsday->x, Doomsday->y );
   
   ang = utAngle(Ships[Context.snum].x, Ships[Context.snum].y,  
-              Doomsday->x, Doomsday->y); 
+                Doomsday->x, Doomsday->y); 
 
   /* find the textures if we haven't already */
-  if (!GLDoomsday.id)
+  if (!GLDoomsday.doom)
     {                           /* init first time around */
-      int ndx = findGLTexture("doomsday");
-
-      if (ndx >= 0)
-        {
-          GLDoomsday.id = GLTextures[ndx].id;
-          if (HAS_GLCOLOR(&GLTextures[ndx].col))
-            GLDoomsday.col = GLTextures[ndx].col;
-          else
-            hex2GLColor(0xffffffff, &GLDoomsday.col);
-        }
-      else
+      if ( !(GLDoomsday.doom = getGLTexture("doomsday")) )
         {
           utLog("%s: Could not find the doomsday texture,  bailing.", 
                __FUNCTION__);
@@ -2277,17 +2240,7 @@ void drawDoomsday(GLfloat x, GLfloat y, GLfloat dangle, GLfloat scale)
         }
 
       /* find the AP beam */
-      ndx = findGLTexture("doombeam");
-      if (ndx >= 0)
-        {
-          GLDoomsday.beamid = GLTextures[ndx].id;
-          
-          if (HAS_GLCOLOR(&GLTextures[ndx].col))
-            GLDoomsday.beamcol = GLTextures[ndx].col;
-          else
-            hex2GLColor(0xffffffff, &GLDoomsday.beamcol);
-        }
-      else
+      if ( !(GLDoomsday.beam = getGLTexture("doombeam")) )
         {
           utLog("%s: Could not find the doombeam texture,  bailing.", 
                __FUNCTION__);
@@ -2362,9 +2315,9 @@ void drawDoomsday(GLfloat x, GLfloat y, GLfloat dangle, GLfloat scale)
       glRotatef(Doomsday->heading - 90.0, 0.0, 0.0, z);
       
       glEnable(GL_TEXTURE_2D);
-      glBindTexture(GL_TEXTURE_2D, GLDoomsday.beamid);
-      
-      glColor4fv(GLDoomsday.beamcol.vec);
+      glBindTexture(GL_TEXTURE_2D, GLTEX_ID(GLDoomsday.beam));
+                    
+      glColor4fv(GLTEX_COLOR(GLDoomsday.beam).vec);
       
       glBegin(GL_POLYGON);
       
@@ -2378,10 +2331,10 @@ void drawDoomsday(GLfloat x, GLfloat y, GLfloat dangle, GLfloat scale)
       glTexCoord2f(1.0f, 1.0f);
       glVertex3f(beamwidth, 0.0, -1.0); /* lr */
       
-      glColor4f(GLDoomsday.beamcol.r, 
-                GLDoomsday.beamcol.g,
-                GLDoomsday.beamcol.b,
-                GLDoomsday.beamcol.a * 0.1);
+      glColor4f(GLTEX_COLOR(GLDoomsday.beam).r, 
+                GLTEX_COLOR(GLDoomsday.beam).g,
+                GLTEX_COLOR(GLDoomsday.beam).b,
+                GLTEX_COLOR(GLDoomsday.beam).a * 0.1);
       
       glTexCoord2f(0.0f, 1.0f);
       glVertex3f(beamwidth / 2.0, beamradius, -1.0); /* ur */
@@ -2412,12 +2365,12 @@ void drawDoomsday(GLfloat x, GLfloat y, GLfloat dangle, GLfloat scale)
 
   glEnable(GL_TEXTURE_2D); 
 
-  glBindTexture(GL_TEXTURE_2D, GLDoomsday.id);
+  glBindTexture(GL_TEXTURE_2D, GLTEX_ID(GLDoomsday.doom));
   
   glTranslatef(x , y , TRANZ);
   glRotatef(dangle, 0.0, 0.0, z);
 
-  glColor4fv(GLDoomsday.col.vec);
+  glColor4fv(GLTEX_COLOR(GLDoomsday.doom).vec);
 
   glBegin(GL_POLYGON);
 
@@ -2750,7 +2703,7 @@ void drawViewerBG(int snum, int dovbg)
       int ndx;
 
       if ((ndx = findGLTexture("vbg")) >= 0)
-        texid_vbg = GLTextures[ndx].id;
+        texid_vbg = GLTEX_ID(&GLTextures[ndx]);
       else
         {
           texid_vbg = 0;
@@ -2828,7 +2781,7 @@ void drawViewerBG(int snum, int dovbg)
       sizeb = 0.990;
       
       glBindTexture(GL_TEXTURE_2D, 
-                    GLShips[Ships[snum].team][Ships[snum].shiptype].tac);
+                    GLTEX_ID(GLShips[Ships[snum].team][Ships[snum].shiptype].tac));
 
       glColor4f(1.0, 1.0, 1.0, UserConf.DoTacShade/100.0);
 
@@ -2934,6 +2887,35 @@ static void charInput(unsigned char key, int x, int y)
     jmod |= CQ_KEY_MOD_ALT;
 
   procInput((key & CQ_CHAR_MASK) | jmod, x, y);
+  return;
+}
+
+/* create the 'default' GLTexture (defaultTexture) */
+static void createDefaultTexture(void)
+{
+  /* 2x2 checkerboard-like (with interpolation :) */
+  static GLint GL_defaultTexImage[4] = {0x000000ff, 0xffffffff,
+                                        0xffffffff, 0x000000ff};
+  defaultTexture.w = 2;
+  defaultTexture.h = 2;
+
+  defaultTexture.col.r = 1.0;
+  defaultTexture.col.g = 1.0;
+  defaultTexture.col.b = 1.0;
+  defaultTexture.col.a = 1.0;
+
+  /* create the texture */
+  glGenTextures(1, (GLuint *)&defaultTexture.id); 
+  glBindTexture(GL_TEXTURE_2D, defaultTexture.id);
+  GLError();
+                
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, 
+                  GL_LINEAR);
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 
+               defaultTexture.w, defaultTexture.h, 0,
+               GL_RGBA, GL_UNSIGNED_BYTE, GL_defaultTexImage);
+  GLError();
+
   return;
 }
 
@@ -3297,6 +3279,9 @@ static int loadGLTextures()
       return FALSE;
     }
 
+  /* first, setup the 'default' texture */
+  createDefaultTexture();
+
   /* now try to load each texture and setup the proper data */
   for (i=0; i<cqiNumTextures; i++)
     {
@@ -3320,9 +3305,9 @@ static int loadGLTextures()
                                      cqiTextures[i].flags )) >= 0)
         {                       /* the same hw texture was previously loaded
                                    just save it's texture id and w/h */
-          texid = GLTextures[ndx].id;
-          texw = GLTextures[ndx].w;
-          texh = GLTextures[ndx].h;
+          texid = GLTEX_ID(&GLTextures[ndx]);
+          texw  = GLTEX_WIDTH(&GLTextures[ndx]);
+          texh  = GLTEX_HEIGHT(&GLTextures[ndx]);
 
           if (cqDebug > 1)
             utLog("%s: texture file '%s' already loaded, using existing tid.", 
