@@ -410,7 +410,7 @@ CONTENTS:
           texture {
             name         "conqlogoF"
             filename     "conq-fed"              # optional
-            color        "ffe6e6e6"              # optional
+            color        "ffe6e6e6"
 
             mipmap       "yes"                   # optional
             luminance    "yes"                   # optional
@@ -451,10 +451,12 @@ CONTENTS:
                       when loading the texture.
 
           color:      COLOR
-                      optional. Specifies the base color of the
-                      texture used when it is rendered.  If not
-                      specified, the default depends on how the
-                      texture is being used in conquest.
+                      Specifies the base vertex color of the texture
+                      used when it is rendered.  If it's not
+                      specified, a CQI warning will be issued to
+                      stderr and the logfile, since a texture with no
+                      color would usually be drawn black and
+                      transparent, making it a bit hard to see :) 
 
           mipmap:     BOOL
                       optional.  If set to yes, generate mipmaps for

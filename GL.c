@@ -747,7 +747,7 @@ static int initGLPlanets(void)
 
 /* render a 'decal' for renderHud()  */
 void drawIconHUDDecal(GLfloat rx, GLfloat ry, GLfloat w, GLfloat h, 
-                  int imgp, cqColor icol)
+                      int imgp, cqColor icol)
 {
   int steam = Ships[Context.snum].team, stype = Ships[Context.snum].shiptype;
   static int norender = FALSE;
@@ -1971,7 +1971,7 @@ void drawTorp(GLfloat x, GLfloat y,
 
   glBegin(GL_POLYGON);		
 
-  glColor3f(0.8, 0.8, 0.8);
+  glColor4fv(ncpTorpAnims[steam].state.col.vec);
 
   drawTexBoxCentered(0.0, 0.0, z, size);
 

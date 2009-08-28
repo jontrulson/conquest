@@ -1839,6 +1839,9 @@ animation {
     istate {
       size       110         # in CU's
       angle      -1.0        # random
+      # need to specify color istate as we are not using a texanim, which
+      #  would normally contain one.
+      color      "e8e8e8f0"
     }
 
     geoanim {

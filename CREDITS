@@ -34,9 +34,8 @@ Credit where credit is due.
 
 - 7/20/2009
 
-  Orion Scout and Cruiser textures.  These were created by
-  painting/texturing 3D meshes in blender.  These meshes came from
-  ShareCG.com.  
+  Orion textures.  These were created by painting/texturing 3D meshes
+  in blender.  These meshes came from ShareCG.com.
 
   I imported these into blender (blender.com), and after much learning
   (and swearing), painted/textured them so they could be rendered as
@@ -53,7 +52,13 @@ Credit where credit is due.
       http://www.sharecg.com/v/35694/3D-Model/Scout-ship
 
       I really like the 'cammo' texture he supplied, and use it on
-      both the Scout, and Cruiser models.  
+      all of the Orion models.  
+
+    - Orion Destroyer:
+
+      A3DLover
+
+      http://www.sharecg.com/v/35442/3D-Model/Spaceship
 
     - Orion Cruiser:
 
