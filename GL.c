@@ -3180,7 +3180,7 @@ static int LoadTGA(char *filename, textureImage *texture)
               for (counter=0; counter<chunkheader; counter++)
                 {
                   texture->imageData[currentbyte] = colorbuffer[2];
-                  /* switch R and B bytes areound while copying */
+                  /* switch R and B bytes around while copying */
                   texture->imageData[currentbyte + 1] = colorbuffer[1];
                   texture->imageData[currentbyte + 2] = colorbuffer[0];
                   

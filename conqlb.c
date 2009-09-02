@@ -266,42 +266,18 @@ void clbIKill( int snum, int kb )
       Teams[team].stats[TSTAT_LOSSES] += 1;
     }
   
-  if ( ! SROBOT(snum) || Ships[snum].pid != 0 )
-    {
-      /* if the ship was vacant at the time, just turn it off, 
-       * freeing the slot immediately. 
-       */
-      if (SVACANT(snum))
-        {
-          Ships[snum].status = SS_OFF;
-        }
-      else
-        {
-          Ships[snum].status = SS_DEAD;
-          Ships[snum].sdfuse = -TIMEOUT_PLAYER; /* setup dead timeout timer */
-        }
-    }
+  /* set the ship dead-like :) */
+  Ships[snum].status = SS_DEAD;
+
+  /* setup dead timeout timer. For robots and vacant ships, that's 5
+   *  seconds - this gives enough time for detonating torps, just like
+   *  regular players
+   */
+  if (SROBOT(snum) || SVACANT(snum))
+    Ships[snum].sdfuse = -5; 
   else
-    {
-#if defined(DO_EXPLODING_SHIPS)
-      Ships[snum].status = SS_DEAD;
-
-      /* setup dead timeout timer. For robots, that's 5 seconds - this
-       *  gives enough time for detonating torps, just like regular
-       *  players
-       */
-      Ships[snum].sdfuse = -5;  
-#else
-				/* old behavior */
-      Ships[snum].status = SS_OFF;   /* turn robots off */
-#endif
-
-      /* We'd like to remove this next line so that you could */
-      /* use conqoper to see what killed him, but then robots */
-      /* show up on the debugging playlist... */
-      /*      Ships[snum].killedby = 0;*/
-    }
-  
+    Ships[snum].sdfuse = -TIMEOUT_PLAYER; 
+    
   return;
   
 }
