@@ -203,9 +203,11 @@ texture {
 # scout shield
 texture {
   name         "shipFSc-sh"
-  filename     "TOSf-sh"
+  filename     "TOS-fish_s"
 
   color        "ffffffff"
+  luminance    "yes"
+  mipmap       "yes"
 }
 
 texture {
@@ -218,9 +220,11 @@ texture {
 
 texture {
   name         "shipFDe-sh"
-  filename     "TOSf-sh"
+  filename     "TOS-fish"
 
   color        "ffffffff"
+  luminance    "yes"
+  mipmap       "yes"
 }
 
 texture {
@@ -233,9 +237,13 @@ texture {
 
 texture {
   name         "shipFCr-sh"
-  filename     "TOSf-sh"
+  filename     "TOS-fish_c"
+
+#  filename     "TOSf-sh"
 
   color        "ffffffff"
+  luminance    "yes"
+  mipmap       "yes"
 }
 
 texture {
@@ -574,9 +582,11 @@ texture {
 
 texture {
   name         "shipRSc-sh"
-  filename     "TOSr-sh"
+  filename     "TOS-rish_s"
 
   color        "ffffffff"
+  luminance    "yes"
+  mipmap       "yes"
 }
 
 texture {
@@ -589,9 +599,11 @@ texture {
 
 texture {
   name         "shipRDe-sh"
-  filename     "TOSr-sh"
+  filename     "TOS-rish"
 
   color        "ffffffff"
+  luminance    "yes"
+  mipmap       "yes"
 }
 
 texture {
@@ -604,9 +616,11 @@ texture {
 
 texture {
   name         "shipRCr-sh"
-  filename     "TOSr-sh"
+  filename     "TOS-rish_c"
 
   color        "ffffffff"
+  luminance    "yes"
+  mipmap       "yes"
 }
 
 texture {
@@ -946,9 +960,11 @@ texture {
 
 texture {
   name         "shipKSc-sh"
-  filename     "TOSk-sh"
+  filename     "TOS-kish_s"
 
   color        "ffffffff"
+  luminance    "yes"
+  mipmap       "yes"
 }
 
 texture {
@@ -961,9 +977,11 @@ texture {
 
 texture {
   name         "shipKDe-sh"
-  filename     "TOSk-sh"
+  filename     "TOS-kish"
 
   color        "ffffffff"
+  luminance    "yes"
+  mipmap       "yes"
 }
 
 texture {
@@ -976,9 +994,11 @@ texture {
 
 texture {
   name         "shipKCr-sh"
-  filename     "TOSk-sh"
+  filename     "TOS-kish_c"
 
   color        "ffffffff"
+  luminance    "yes"
+  mipmap       "yes"
 }
 
 texture {
@@ -1316,13 +1336,13 @@ texture {
   mipmap       "yes"
 }
 
-# we use fed shield image by default
-# ...but use the romulan one for the scout, due to it's different shape.
 texture {
   name         "shipOSc-sh"
-  filename     "TOSr-sh"
+  filename     "TOS-oish_s"
 
   color        "ffffffff"
+  luminance    "yes"
+  mipmap       "yes"
 }
 
 texture {
@@ -1335,9 +1355,11 @@ texture {
 
 texture {
   name         "shipODe-sh"
-  filename     "TOSf-sh"
+  filename     "TOS-oish"
 
   color        "ffffffff"
+  luminance    "yes"
+  mipmap       "yes"
 }
 
 texture {
@@ -1350,9 +1372,11 @@ texture {
 
 texture {
   name         "shipOCr-sh"
-  filename     "TOSf-sh"
+  filename     "TOS-oish_c"
 
   color        "ffffffff"
+  luminance    "yes"
+  mipmap       "yes"
 }
 
 texture {
