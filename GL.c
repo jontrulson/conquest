@@ -496,15 +496,9 @@ static int initGLShips(void)
                    ShipTypes[j].name[0], ShipTypes[j].name[1]);
           GLShips[i][j].ico = _get_ship_tex(buffer);
           
-#if 0
-          /* FIXME, there must be a better way to do this (and shields
-             in general). for now disable since it won't work with the
-             new texture mapping and ico-ship generation stuff without
-             generating new ico-sh textures. */
           snprintf(buffer, CQI_NAMELEN - 1, "%s%c%c-ico-sh", shipPfx, 
                    ShipTypes[j].name[0], ShipTypes[j].name[1]);
           GLShips[i][j].ico_sh = _get_ship_tex(buffer);
-#endif
           
           snprintf(buffer, CQI_NAMELEN - 1, "%s-ico-decal1", shipPfx);
           GLShips[i][j].decal1 = _get_ship_tex(buffer);

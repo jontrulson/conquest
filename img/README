@@ -1,0 +1,58 @@
+Various notes related to the images.
+
+
+Steps to create the ico shield texture using a ship texture and gimp.
+
+Oh, what fun that was.
+
+- load ship texture into gimp.
+
+- Colors -> Brightness/Contrast
+
+  lower both to their lowest (-127) and apply.  Your ship is now a dim
+  featureless gray blob.
+
+- Select -> By Color
+
+  click on your grey ship so it is selected.
+
+- Filters -> Alpha to Logo -> Alien Glow
+
+  Set the Glow size pixels to 250 (I am using 512x512 textures for the ships)
+
+  Set the glow color to white
+
+- Now your alpha/background is screwed up.  Neat :)
+
+  - in the Layers/Channels/Path window, select the background layer,
+    (it should be the one that is all black) and delete it.
+
+  - Image -> Merge visible layers
+
+    select default (expanded as neccessary).  This should not change
+    your textures size/resolution.  If it does then try one of the
+    other options :)
+
+- Now you've got a glowing black ship.  Next step is to delete the
+  ship (hopefully leaving the glow).
+
+  - Select -> By Color
+
+    Check that the main gimp tool window is setup to 'select by
+    color'.  de-select 'Select Transparent areas', and set
+    the threshhold to something large (I was using 172.0).
+
+    Click in a darker area of the ship.
+
+    The whole ship should be selected, and the 'glow' should be
+    unmolested.
+
+- Edit - Cut
+
+This should remove the ship leaving a 'hollow' ship-shaped hole
+surrounded by a white, alpha-blended glow.
+
+Save it as a new tga, and try it (modifying texturesrc to reference it
+if neccessary).
+
+

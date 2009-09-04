@@ -302,6 +302,7 @@ texture {
   filename     "TOS-fish_s"
 
   color        "ffffffff"
+  luminance    "yes"
 }
 
 texture {
@@ -309,6 +310,7 @@ texture {
   filename     "TOS-fish"
 
   color        "ffffffff"
+  luminance    "yes"
 }
 
 texture {
@@ -316,6 +318,7 @@ texture {
   filename     "TOS-fish_c"
 
   color        "ffffffff"
+  luminance    "yes"
 }
 
 texture {
@@ -553,6 +556,7 @@ texture {
 texture {
   name         "shipF-warp-col"
   filename     ""  # we are only using this to store a color
+
   color        "ffd72d00"
 }
 
@@ -669,6 +673,7 @@ texture {
   filename     "TOS-rish_s"
 
   color        "ffffffff"
+  luminance    "yes"
 }
 
 texture {
@@ -676,6 +681,7 @@ texture {
   filename     "TOS-rish"
 
   color        "ffffffff"
+  luminance    "yes"
 }
 
 texture {
@@ -683,6 +689,7 @@ texture {
   filename     "TOS-rish_c"
 
   color        "ffffffff"
+  luminance    "yes"
 }
 
 texture {
@@ -1038,6 +1045,7 @@ texture {
   filename     "TOS-kish_s"
 
   color        "ffffffff"
+  luminance    "yes"
 }
 
 texture {
@@ -1045,6 +1053,7 @@ texture {
   filename     "TOS-kish"
 
   color        "ffffffff"
+  luminance    "yes"
 }
 
 texture {
@@ -1052,6 +1061,7 @@ texture {
   filename     "TOS-kish_c"
 
   color        "ffffffff"
+  luminance    "yes"
 }
 
 texture {
@@ -1289,9 +1299,8 @@ texture {
 texture {
   name         "shipK-warp-col"
   filename     ""  # we are only using this to store a color
-  color        "ffd72d00"
 
-  color        "ffffffff"
+  color        "ffd72d00"
 }
 
 
@@ -1390,6 +1399,7 @@ texture {
   filename     "TOS-oish_s"
 
   color        "ffffffff"
+  luminance    "yes"
 }
 
 texture {
@@ -1397,6 +1407,7 @@ texture {
   filename     "TOS-oish"
 
   color        "ffffffff"
+  luminance    "yes"
 }
 
 texture {
@@ -1404,6 +1415,7 @@ texture {
   filename     "TOS-oish_c"
 
   color        "ffffffff"
+  luminance    "yes"
 }
 
 texture {

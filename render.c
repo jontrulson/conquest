@@ -1143,9 +1143,6 @@ void renderHud(int dostats)
   glEnable(GL_TEXTURE_2D);
   
   /* icon shield decal */
-#if 0
-  /* FIXME, there must be a better way to do this (and shields
-     in general). See similair cooment in GL.c. */
   if (hudData.sh.shields > 0.0)
     {
       if (SCLOAKED(snum)) 
@@ -1156,7 +1153,7 @@ void renderHud(int dostats)
       drawIconHUDDecal(o.d1icon.x, o.d1icon.y, o.d1icon.w, o.d1icon.h, 
                        TEX_HUD_SHI, icl);
     }
-#endif
+
   
   /* ship icon decal */
   if (SCLOAKED(snum)) 
