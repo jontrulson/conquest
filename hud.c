@@ -271,11 +271,11 @@ void hudSetDamage(int snum, real *lastdamage)
   if ( r != hudData.dam.damage )
     {
       i = round(r);
-      if (i >= 0 && i <= 10)
+      if (i <= HUD_HULL_ALRT)
         hudData.dam.color = GreenLevelColor;
-      else if (i >= 11 && i <= 65)
+      else if (i <= HUD_HULL_WARN)
         hudData.dam.color = YellowLevelColor;
-      else if (i >= 66)
+      else 
         hudData.dam.color = RedLevelColor;
 
       snprintf( hudData.dam.str, HUD_STR_SZ - 1, "%3d",
@@ -296,13 +296,14 @@ void hudSetFuel(int snum)
   if ( r != hudData.fuel.fuel )
     {
       i = round( r );
-      if (i >= 0 && i <= 200)
-        hudData.fuel.color = RedLevelColor;
-      else if (i >= 201 && i <= 500)
-        hudData.fuel.color = YellowLevelColor;
-      else if (i >= 501)
+
+      if (i >= HUD_F_ALRT)
         hudData.fuel.color = GreenLevelColor;
-      
+      else if (i >= HUD_F_WARN)
+        hudData.fuel.color = YellowLevelColor;
+      else
+        hudData.fuel.color = RedLevelColor;
+
       snprintf( hudData.fuel.str, HUD_STR_SZ - 1, "%3d",
                 (i < 0) ? 0 : i );
       hudData.fuel.str[HUD_STR_SZ - 1] = 0;
@@ -373,12 +374,12 @@ void hudSetTemps(int snum)
     {
       i = round( etemp );
 
-      if (i >= 0 && i <= 50)
-        hudData.etemp.color = GreenLevelColor;
-      else if (i >=51 && i <=80)
-        hudData.etemp.color = YellowLevelColor;
-      else if (i >= 81)
+      if (i >= HUD_E_WARN)
         hudData.etemp.color = RedLevelColor;
+      else if (i >= HUD_E_ALRT)
+        hudData.etemp.color = YellowLevelColor;
+      else
+        hudData.etemp.color = GreenLevelColor;
 
       snprintf( hudData.etemp.str, HUD_STR_SZ - 1, "%3d",
                 (i < 0) ? 0 : i );
@@ -392,12 +393,12 @@ void hudSetTemps(int snum)
     {
       i = round( wtemp );
 
-      if (i >= 0 && i <= 50)
-        hudData.wtemp.color = GreenLevelColor;
-      else if (i >=51 && i <=80)
-        hudData.wtemp.color = YellowLevelColor;
-      else if (i >= 81)
+      if (i >= HUD_W_WARN)
         hudData.wtemp.color = RedLevelColor;
+      else if (i >= HUD_W_ALRT)
+        hudData.wtemp.color = YellowLevelColor;
+      else
+        hudData.wtemp.color = GreenLevelColor;
 
       snprintf( hudData.wtemp.str, HUD_STR_SZ - 1, "%3d",
                 (i < 0) ? 0 : i );

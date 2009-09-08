@@ -24,6 +24,28 @@ typedef enum {
   PHASER_ALERT,               /* close enough to be in phaser range */
 } alertLevel_t;
 
+/* alert/warning/critical limits */
+
+#define HUD_E_ALRT     50
+#define HUD_E_WARN     80
+#define HUD_E_CRIT     80
+
+#define HUD_W_ALRT     50
+#define HUD_W_WARN     80
+#define HUD_W_CRIT     80
+
+#define HUD_SH_CRIT    20
+
+#define HUD_F_ALRT     500
+#define HUD_F_WARN     200
+#define HUD_F_CRIT     100
+
+#define HUD_HULL_ALRT  10
+#define HUD_HULL_WARN  65
+#define HUD_HULL_CRIT  75
+
+
+
 struct _warp {
   real     warp;
   cqColor  color;

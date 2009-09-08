@@ -503,6 +503,21 @@ static int initGLShips(void)
           snprintf(buffer, CQI_NAMELEN - 1, "%s-ico-decal1", shipPfx);
           GLShips[i][j].decal1 = _get_ship_tex(buffer);
           
+          snprintf(buffer, CQI_NAMELEN - 1, "%s-ico-decal1-lamp-sh", shipPfx);
+          GLShips[i][j].decal1_lamp_sh = _get_ship_tex(buffer);
+          
+          snprintf(buffer, CQI_NAMELEN - 1, "%s-ico-decal1-lamp-hull", shipPfx);
+          GLShips[i][j].decal1_lamp_hull = _get_ship_tex(buffer);
+          
+          snprintf(buffer, CQI_NAMELEN - 1, "%s-ico-decal1-lamp-fuel", shipPfx);
+          GLShips[i][j].decal1_lamp_fuel = _get_ship_tex(buffer);
+          
+          snprintf(buffer, CQI_NAMELEN - 1, "%s-ico-decal1-lamp-eng", shipPfx);
+          GLShips[i][j].decal1_lamp_eng = _get_ship_tex(buffer);
+          
+          snprintf(buffer, CQI_NAMELEN - 1, "%s-ico-decal1-lamp-wep", shipPfx);
+          GLShips[i][j].decal1_lamp_wep = _get_ship_tex(buffer);
+          
           snprintf(buffer, CQI_NAMELEN - 1, "%s-ico-decal2", shipPfx);
           GLShips[i][j].decal2 = _get_ship_tex(buffer);
           
@@ -772,6 +787,21 @@ void drawIconHUDDecal(GLfloat rx, GLfloat ry, GLfloat w, GLfloat h,
     case TEX_HUD_DECAL1:
       tex = GLShips[steam][stype].decal1;
       break;
+    case TEX_HUD_DECAL1_LAMP_SH:
+      tex = GLShips[steam][stype].decal1_lamp_sh;
+      break;
+    case TEX_HUD_DECAL1_LAMP_HULL:
+      tex = GLShips[steam][stype].decal1_lamp_hull;
+      break;
+    case TEX_HUD_DECAL1_LAMP_FUEL:
+      tex = GLShips[steam][stype].decal1_lamp_fuel;
+      break;
+    case TEX_HUD_DECAL1_LAMP_ENG:
+      tex = GLShips[steam][stype].decal1_lamp_eng;
+      break;
+    case TEX_HUD_DECAL1_LAMP_WEP:
+      tex = GLShips[steam][stype].decal1_lamp_wep;
+      break;
     case TEX_HUD_DECAL2:
       tex = GLShips[steam][stype].decal2;
       break;
@@ -792,7 +822,10 @@ void drawIconHUDDecal(GLfloat rx, GLfloat ry, GLfloat w, GLfloat h,
     }
   
   glBindTexture(GL_TEXTURE_2D, GLTEX_ID(tex));
-  uiPutColor(icol);
+  if (icol)
+    uiPutColor(icol);
+  else                          /* if 0, do a faint grey */
+    glColor4f(0.1, 0.1, 0.1, 1.0);
 
   glBegin(GL_POLYGON);
 

@@ -104,7 +104,7 @@ texture {
 
 texture {
   name         "exp7"
-  color        "ffff9980"
+  color        "ffff9970"
 }
 
 texture {
@@ -119,7 +119,7 @@ texture {
 
 texture {
   name         "exp10"
-  color        "ffff804c"
+  color        "ffff8040"
 }
 
 texture {
@@ -134,17 +134,17 @@ texture {
 
 texture {
   name         "exp13"
-  color        "ffff8019"
+  color        "ffff8010"
 }
 
 texture {
   name         "exp14"
-  color        "ffff8019"
+  color        "ffff8005"
 }
 
 texture {
   name         "exp15"
-  color        "ffff8000"
+  color        "ffff8002"
 }
 
 
@@ -238,8 +238,6 @@ texture {
 texture {
   name         "shipFCr-sh"
   filename     "TOS-fish_c"
-
-#  filename     "TOSf-sh"
 
   color        "ffffffff"
   luminance    "yes"
@@ -443,6 +441,47 @@ texture {
     w          10.0
     h          144.0
   }
+}
+
+# Alert lamps overlayed on decal1
+texture {
+  name         "shipF-ico-decal1-lamp-sh"
+  filename     "hud-decal1-lamp-sh"
+
+  color        "ffffffff"
+  luminance    "yes"
+}
+
+texture {
+  name         "shipF-ico-decal1-lamp-hull"
+  filename     "hud-decal1-lamp-hull"
+
+  color        "ffffffff"
+  luminance    "yes"
+}
+
+texture {
+  name         "shipF-ico-decal1-lamp-fuel"
+  filename     "hud-decal1-lamp-fuel"
+
+  color        "ffffffff"
+  luminance    "yes"
+}
+
+texture {
+  name         "shipF-ico-decal1-lamp-eng"
+  filename     "hud-decal1-lamp-eng"
+
+  color        "ffffffff"
+  luminance    "yes"
+}
+
+texture {
+  name         "shipF-ico-decal1-lamp-wep"
+  filename     "hud-decal1-lamp-wep"
+
+  color        "ffffffff"
+  luminance    "yes"
 }
 
 texture {
@@ -820,6 +859,47 @@ texture {
     w          10.0
     h          144.0
   }
+}
+
+# Alert lamps overlayed on decal1
+texture {
+  name         "shipR-ico-decal1-lamp-sh"
+  filename     "hud-decal1-lamp-sh"
+
+  color        "ffffffff"
+  luminance    "yes"
+}
+
+texture {
+  name         "shipR-ico-decal1-lamp-hull"
+  filename     "hud-decal1-lamp-hull"
+
+  color        "ffffffff"
+  luminance    "yes"
+}
+
+texture {
+  name         "shipR-ico-decal1-lamp-fuel"
+  filename     "hud-decal1-lamp-fuel"
+
+  color        "ffffffff"
+  luminance    "yes"
+}
+
+texture {
+  name         "shipR-ico-decal1-lamp-eng"
+  filename     "hud-decal1-lamp-eng"
+
+  color        "ffffffff"
+  luminance    "yes"
+}
+
+texture {
+  name         "shipR-ico-decal1-lamp-wep"
+  filename     "hud-decal1-lamp-wep"
+
+  color        "ffffffff"
+  luminance    "yes"
 }
 
 texture {
@@ -1200,6 +1280,47 @@ texture {
   }
 }
 
+# Alert lamps overlayed on decal1
+texture {
+  name         "shipK-ico-decal1-lamp-sh"
+  filename     "hud-decal1-lamp-sh"
+
+  color        "ffffffff"
+  luminance    "yes"
+}
+
+texture {
+  name         "shipK-ico-decal1-lamp-hull"
+  filename     "hud-decal1-lamp-hull"
+
+  color        "ffffffff"
+  luminance    "yes"
+}
+
+texture {
+  name         "shipK-ico-decal1-lamp-fuel"
+  filename     "hud-decal1-lamp-fuel"
+
+  color        "ffffffff"
+  luminance    "yes"
+}
+
+texture {
+  name         "shipK-ico-decal1-lamp-eng"
+  filename     "hud-decal1-lamp-eng"
+
+  color        "ffffffff"
+  luminance    "yes"
+}
+
+texture {
+  name         "shipK-ico-decal1-lamp-wep"
+  filename     "hud-decal1-lamp-wep"
+
+  color        "ffffffff"
+  luminance    "yes"
+}
+
 texture {
   name         "shipK-ico-decal2"
   filename     "hud-decal2"
@@ -1556,6 +1677,47 @@ texture {
     w          10.0
     h          144.0
   }
+}
+
+# Alert lamps overlayed on decal1
+texture {
+  name         "shipO-ico-decal1-lamp-sh"
+  filename     "hud-decal1-lamp-sh"
+
+  color        "ffffffff"
+  luminance    "yes"
+}
+
+texture {
+  name         "shipO-ico-decal1-lamp-hull"
+  filename     "hud-decal1-lamp-hull"
+
+  color        "ffffffff"
+  luminance    "yes"
+}
+
+texture {
+  name         "shipO-ico-decal1-lamp-fuel"
+  filename     "hud-decal1-lamp-fuel"
+
+  color        "ffffffff"
+  luminance    "yes"
+}
+
+texture {
+  name         "shipO-ico-decal1-lamp-eng"
+  filename     "hud-decal1-lamp-eng"
+
+  color        "ffffffff"
+  luminance    "yes"
+}
+
+texture {
+  name         "shipO-ico-decal1-lamp-wep"
+  filename     "hud-decal1-lamp-wep"
+
+  color        "ffffffff"
+  luminance    "yes"
 }
 
 texture {

@@ -43,21 +43,6 @@
 
 cqsHandle alertHandle = CQS_INVHANDLE;
 
-/* critical limits */
-
-/*   shields  < 20
- *   eng temp > 80 or overloaded
- *   wep temp > 80 or overloaded
- *   hull dmg >= 70
- *   fuel < 100 critical
-*/
-
-#define E_CRIT     80
-#define W_CRIT     80
-#define F_CRIT     100
-#define SH_CRIT    20
-#define HULL_CRIT  75
-
 /* we store geometry here that should only need to be recomputed
    when the screen is resized, not every single frame :) */
 
@@ -659,11 +644,11 @@ static void renderPulseMsgs(void)
     }
 
   if (testlamps || hudData.alloc.ealloc <= 0 || hudData.alloc.walloc <= 0 ||
-      hudData.etemp.temp > E_CRIT  || hudData.wtemp.temp > W_CRIT ||
-      hudData.fuel.fuel < F_CRIT || 
-      (hudData.sh.shields <= SH_CRIT && 
+      hudData.etemp.temp > HUD_E_CRIT  || hudData.wtemp.temp > HUD_W_CRIT ||
+      hudData.fuel.fuel < HUD_F_CRIT || 
+      (hudData.sh.shields <= HUD_SH_CRIT && 
        SSHUP(Context.snum) && !SREPAIR(Context.snum)) ||
-      hudData.dam.damage >= HULL_CRIT)
+      hudData.dam.damage >= HUD_HULL_CRIT)
     drawing = TRUE;
 
   if (!drawing)
@@ -672,7 +657,7 @@ static void renderPulseMsgs(void)
   glBlendFunc(GL_SRC_ALPHA, GL_ONE);
   glEnable(GL_BLEND);
  
-  if (testlamps || hudData.fuel.fuel < F_CRIT)
+  if (testlamps || hudData.fuel.fuel < HUD_F_CRIT)
     {
       if (ANIM_EXPIRED(&fuelcrit))
         {
@@ -702,7 +687,7 @@ static void renderPulseMsgs(void)
                     0, &engfail.state.col, 
                     GLF_FONT_F_SCALEX | GLF_FONT_F_ORTHO);
     }      
-  else if (hudData.etemp.temp > E_CRIT)
+  else if (hudData.etemp.temp > HUD_E_CRIT)
     {
       if (ANIM_EXPIRED(&engcrit))
         {
@@ -733,7 +718,7 @@ static void renderPulseMsgs(void)
                     GLF_FONT_F_SCALEX | GLF_FONT_F_ORTHO);
 
     }      
-  else if (hudData.wtemp.temp > W_CRIT)
+  else if (hudData.wtemp.temp > HUD_W_CRIT)
     {
       if (ANIM_EXPIRED(&wepcrit))
         {
@@ -749,7 +734,7 @@ static void renderPulseMsgs(void)
       
     }      
 
-  if (testlamps || (hudData.sh.shields < SH_CRIT && SSHUP(Context.snum) && 
+  if (testlamps || (hudData.sh.shields < HUD_SH_CRIT && SSHUP(Context.snum) && 
        !SREPAIR(Context.snum)))
     {
       if (ANIM_EXPIRED(&shcrit))
@@ -766,7 +751,7 @@ static void renderPulseMsgs(void)
 
     }      
 
-  if (testlamps || hudData.dam.damage >= HULL_CRIT)
+  if (testlamps || hudData.dam.damage >= HUD_HULL_CRIT)
     {
       if (ANIM_EXPIRED(&hullcrit))
         {
@@ -1203,6 +1188,81 @@ void renderHud(int dostats)
                    TEX_HUD_DECAL1, icl);
   drawIconHUDDecal(o.decal2.x, o.decal2.y, o.decal2.w, o.decal2.h, 
                    TEX_HUD_DECAL2, icl);
+
+
+  /* ico lamps */
+  /* shields */
+  icl = 0;
+  if (SSHUP(snum))
+    {
+      if (hudData.sh.shields <= HUD_SH_CRIT)
+        icl = (GL_BLINK_QTRSEC) ? hudData.sh.color : 0;
+      else
+        icl = hudData.sh.color;
+    }
+
+  drawIconHUDDecal(o.decal1.x, o.decal1.y, o.decal1.w, o.decal1.h, 
+                   TEX_HUD_DECAL1_LAMP_SH, icl);
+
+  /* hull */
+  icl = 0;
+  if (hudData.dam.damage > HUD_HULL_WARN)
+    {
+      if (hudData.dam.damage > HUD_HULL_CRIT)
+        icl = (GL_BLINK_QTRSEC) ? hudData.dam.color : 0;
+      else
+        icl = hudData.dam.color;
+    }        
+
+  drawIconHUDDecal(o.decal1.x, o.decal1.y, o.decal1.w, o.decal1.h, 
+                   TEX_HUD_DECAL1_LAMP_HULL, icl);
+
+
+  /* fuel */
+  icl = 0;
+  if (hudData.fuel.fuel < HUD_F_ALRT)
+    {
+      if (hudData.fuel.fuel < HUD_F_CRIT)
+        icl = (GL_BLINK_QTRSEC) ? hudData.fuel.color : 0;
+      else
+        icl = hudData.fuel.color;
+    }
+
+  drawIconHUDDecal(o.decal1.x, o.decal1.y, o.decal1.w, o.decal1.h, 
+                   TEX_HUD_DECAL1_LAMP_FUEL, icl);
+
+  /* engines */
+  icl = 0;
+
+  if (hudData.etemp.overl || hudData.etemp.temp > HUD_E_ALRT)
+    {
+      if (hudData.etemp.overl)
+        icl = (GL_BLINK_QTRSEC) ? hudData.etemp.color : 0;
+      else if (hudData.etemp.temp > HUD_E_CRIT)
+        icl = (GL_BLINK_HALFSEC) ? hudData.etemp.color : 0;
+      else
+        icl = hudData.etemp.color;
+    }        
+
+  drawIconHUDDecal(o.decal1.x, o.decal1.y, o.decal1.w, o.decal1.h, 
+                   TEX_HUD_DECAL1_LAMP_ENG, icl);
+
+
+  /* weapons */
+  icl = 0;
+
+  if (hudData.wtemp.overl || hudData.wtemp.temp > HUD_W_ALRT)
+    {
+      if (hudData.wtemp.overl)
+        icl = (GL_BLINK_QTRSEC) ? hudData.wtemp.color : 0;
+      else if (hudData.wtemp.temp > HUD_W_CRIT)
+        icl = (GL_BLINK_HALFSEC) ? hudData.wtemp.color : 0;
+      else
+        icl = hudData.wtemp.color;
+    }        
+
+  drawIconHUDDecal(o.decal1.x, o.decal1.y, o.decal1.w, o.decal1.h, 
+                   TEX_HUD_DECAL1_LAMP_WEP, icl);
 
 
   /* torp pips */
