@@ -346,7 +346,7 @@ void display( int snum )
 	    {
 	      /* Nearby torpedos. */
 	      minenemy = 0;			/* disable nearby enemy code */
-              cqsEffectPlay(talertfx, 0, 0, 0);
+              cqsEffectPlay(talertfx, NULL, 0, 0, 0);
 
 	      AlertLevel = TORP_ALERT;
 	      dobeep = TRUE;
@@ -411,7 +411,7 @@ void display( int snum )
       if ( Ships[snum].damage > prevdam )
         {
           if ( (Ships[snum].damage - prevdam) > 5.0 )
-            cqsEffectPlay(cqsTeamEffects[Ships[snum].team].hit, 0, 0, 0);
+            cqsEffectPlay(cqsTeamEffects[Ships[snum].team].hit, NULL, 0, 0, 0);
           
           dobeep = TRUE;
         }

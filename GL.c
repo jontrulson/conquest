@@ -1073,7 +1073,7 @@ void drawExplosion(GLfloat x, GLfloat y, int snum, int torpnum, int scale)
           dis = dist(Ships[Context.snum].x, Ships[Context.snum].y,
                      Ships[snum].torps[torpnum].x,
                      Ships[snum].torps[torpnum].y);
-          cqsEffectPlay(explodefx, YELLOW_DIST, dis, ang);
+          cqsEffectPlay(explodefx, NULL, YELLOW_DIST, dis, ang);
         }
 
       if (curnode->animQue)
@@ -1493,7 +1493,7 @@ void setWarp(real warp)
     {
       if (engineHandle == CQS_INVHANDLE)
         {                       /* start it */
-          cqsEffectPlayTracked(enginefx, &engineHandle, 0.0, 0.0, 0.0);
+          cqsEffectPlay(enginefx, &engineHandle, 0.0, 0.0, 0.0);
         }
     }
   else
@@ -1547,9 +1547,9 @@ void setWarp(real warp)
           warpHandle = CQS_INVHANDLE;
           
           if (warpdir == WARP_UP)
-            cqsEffectPlayTracked(warpufx, &warpHandle, 0.0, 0.0, 0.0);
+            cqsEffectPlay(warpufx, &warpHandle, 0.0, 0.0, 0.0);
           else if (warpdir == WARP_DOWN)
-            cqsEffectPlayTracked(warpdfx, &warpHandle, 0.0, 0.0, 0.0);
+            cqsEffectPlay(warpdfx, &warpHandle, 0.0, 0.0, 0.0);
 
           lastwarpdir = warpdir;
         }
@@ -1559,9 +1559,9 @@ void setWarp(real warp)
   else
     {                           /* we need to start one */
       if (warpdir == WARP_UP)
-        cqsEffectPlayTracked(warpufx, &warpHandle, 0.0, 0.0, 0.0);
+        cqsEffectPlay(warpufx, &warpHandle, 0.0, 0.0, 0.0);
       else if (warpdir == WARP_DOWN)
-        cqsEffectPlayTracked(warpdfx, &warpHandle, 0.0, 0.0, 0.0);
+        cqsEffectPlay(warpdfx, &warpHandle, 0.0, 0.0, 0.0);
       
       lastwarpdir = warpdir;
     }
@@ -2379,7 +2379,7 @@ void drawDoomsday(GLfloat x, GLfloat y, GLfloat dangle, GLfloat scale)
       */
       if (dis < YELLOW_DIST && ((frameTime - lastbeam) > beamfx_delay))
         {
-          cqsEffectPlay(beamfx, YELLOW_DIST * 2, dis, ang);
+          cqsEffectPlay(beamfx, NULL, YELLOW_DIST * 2, dis, ang);
           lastbeam = frameTime;
         }
   }  /* drawAPBeam */

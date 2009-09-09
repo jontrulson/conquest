@@ -150,7 +150,7 @@ effect {
   fadeinms     0
   fadeoutms    0
   loops        1
-  limit        3
+  limit        1
   delayms      100
 }
 

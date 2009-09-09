@@ -161,14 +161,14 @@ void mglBeep(int type)
         case MGL_BEEP_ERR:
           if (i != olderr)
             {
-              cqsEffectPlay(beep_errfx, 0, 0, 0);
+              cqsEffectPlay(beep_errfx, NULL, 0, 0, 0);
               olderr = i;
             }
           break;
         case MGL_BEEP_MSG:
           if (i != oldmsg)
             {
-              cqsEffectPlay(beep_msgfx, 0, 0, 0);
+              cqsEffectPlay(beep_msgfx, NULL, 0, 0, 0);
               oldmsg = i;
             }
           break;
@@ -176,7 +176,7 @@ void mglBeep(int type)
         default:
           if (i != old)
             {
-              cqsEffectPlay(beep_alertfx, 0, 0, 0);
+              cqsEffectPlay(beep_alertfx, NULL, 0, 0, 0);
               old = i;
             }
           break;

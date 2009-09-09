@@ -115,8 +115,7 @@ extern doomMus_t     cqsDoomsdayMusic;
 #define cqsFindMusic(x)                     (-1)
 #define cqsMusicPlay(x, y)                  do {;} while (0)
 #define cqsMusicStop(x)                     do {;} while (0)
-#define cqsEffectPlay(x, y, z, a)           do {;} while (0)
-#define cqsEffectPlayTracked(x, y, z, a, b) do {;} while (0)
+#define cqsEffectPlay(x, y, z, a, b)        do {;} while (0)
 #define cqsEffectStop(x, y)                 do {;} while (0)
 #define cqsUpdateVolume()                   
 #define cqsMusicPlaying()                   (0)
@@ -128,9 +127,8 @@ int  cqsFindEffect(char *name);
 int  cqsFindMusic(char *name);
 int  cqsMusicPlay(int musidx, int halt);
 int  cqsMusicStop(int halt);
-int  cqsEffectPlay(int fxidx, real maxdist, real dist, real ang);
-int  cqsEffectPlayTracked(int fxidx, cqsHandle *handle, real maxdist, 
-                         real dist, real ang);
+int  cqsEffectPlay(int fxidx, cqsHandle *handle, real maxdist, 
+                   real dist, real ang);
 int  cqsEffectStop(cqsHandle handle, int halt);
 void cqsUpdateVolume(void);
 int  cqsMusicPlaying(void);

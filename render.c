@@ -1099,8 +1099,8 @@ void renderHud(int dostats)
           if (ack_alert == ALERT_OFF) /* was off */
             {
               ack_alert = ALERT_ON;
-              cqsEffectPlayTracked(cqsTeamEffects[steam].alert,
-                                   &alertHandle, 0.0, 0.0, 0.0);
+              cqsEffectPlay(cqsTeamEffects[steam].alert,
+                            &alertHandle, 0.0, 0.0, 0.0);
             }
           else if (ack_alert == ALERT_ON) /* was on - turned off */
             {
@@ -1189,9 +1189,12 @@ void renderHud(int dostats)
   drawIconHUDDecal(o.decal2.x, o.decal2.y, o.decal2.w, o.decal2.h, 
                    TEX_HUD_DECAL2, icl);
 
-
   /* ico lamps */
-  /* shields */
+
+  /* shields 
+   *  during repair, if your shields are up, this will blink green.  Just so
+   *  you know :)
+   */
   icl = 0;
   if (SSHUP(snum))
     {
@@ -1206,7 +1209,7 @@ void renderHud(int dostats)
 
   /* hull */
   icl = 0;
-  if (hudData.dam.damage > HUD_HULL_WARN)
+  if (hudData.dam.damage > HUD_HULL_ALRT)
     {
       if (hudData.dam.damage > HUD_HULL_CRIT)
         icl = (GL_BLINK_QTRSEC) ? hudData.dam.color : 0;
@@ -1216,7 +1219,6 @@ void renderHud(int dostats)
 
   drawIconHUDDecal(o.decal1.x, o.decal1.y, o.decal1.w, o.decal1.h, 
                    TEX_HUD_DECAL1_LAMP_HULL, icl);
-
 
   /* fuel */
   icl = 0;
@@ -1247,7 +1249,6 @@ void renderHud(int dostats)
   drawIconHUDDecal(o.decal1.x, o.decal1.y, o.decal1.w, o.decal1.h, 
                    TEX_HUD_DECAL1_LAMP_ENG, icl);
 
-
   /* weapons */
   icl = 0;
 
@@ -1263,7 +1264,6 @@ void renderHud(int dostats)
 
   drawIconHUDDecal(o.decal1.x, o.decal1.y, o.decal1.w, o.decal1.h, 
                    TEX_HUD_DECAL1_LAMP_WEP, icl);
-
 
   /* torp pips */
   if (snum > 0 && snum <= MAXSHIPS)

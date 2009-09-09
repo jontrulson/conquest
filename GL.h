@@ -43,10 +43,10 @@ typedef struct _glship {
   GLTexture_t *ico_sh;           /* icon shields id */
   GLTexture_t *decal1;           /* sh/hull gauges */
   GLTexture_t *decal1_lamp_sh;   /* sh lamp */
-  GLTexture_t *decal1_lamp_hull; /* sh lamp */
-  GLTexture_t *decal1_lamp_fuel; /* sh lamp */
-  GLTexture_t *decal1_lamp_eng;  /* sh lamp */
-  GLTexture_t *decal1_lamp_wep;  /* sh lamp */
+  GLTexture_t *decal1_lamp_hull; /* hull lamp */
+  GLTexture_t *decal1_lamp_fuel; /* fuel lamp */
+  GLTexture_t *decal1_lamp_eng;  /* eng lamp */
+  GLTexture_t *decal1_lamp_wep;  /* wep lamp */
   GLTexture_t *decal2;           /* fuel/w/e/alloc/kills gauges */
   GLTexture_t *dial;             /* ships astrogator dial */
   GLTexture_t *dialp;            /* astrogator pointer */

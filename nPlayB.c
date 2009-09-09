@@ -623,7 +623,6 @@ static int nPlayBInput(int ch)
             if (ncpLRMagFactor - 1 >= -5)
               {
                 ncpLRMagFactor--;
-                cqsEffectPlay(cqsTeamEffects[Ships[snum].team].mag, 0, 0, 0);
               }
             else
               mglBeep(MGL_BEEP_ERR);
@@ -635,7 +634,6 @@ static int nPlayBInput(int ch)
             if (ncpSRMagFactor - 1 >= -5)
               {
                 ncpSRMagFactor--;
-                cqsEffectPlay(cqsTeamEffects[Ships[snum].team].mag, 0, 0, 0);
               }
             else
               mglBeep(MGL_BEEP_ERR);
@@ -652,7 +650,6 @@ static int nPlayBInput(int ch)
             if (ncpLRMagFactor + 1 <= 5)
               {
                 ncpLRMagFactor++;
-                cqsEffectPlay(cqsTeamEffects[Ships[snum].team].mag, 0, 0, 0);
               }
             else
               mglBeep(MGL_BEEP_ERR);
@@ -664,7 +661,6 @@ static int nPlayBInput(int ch)
             if (ncpSRMagFactor + 1 <= 5)
               {
                 ncpSRMagFactor++;
-                cqsEffectPlay(cqsTeamEffects[Ships[snum].team].mag, 0, 0, 0);
               }
             else
               mglBeep(MGL_BEEP_ERR);

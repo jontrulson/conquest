@@ -617,14 +617,9 @@ int cqsMusicStop(int halt)
   return TRUE;
 }
 
-/* a 'tracked' effect is any effect that the programmer
- * may want to manipulate in some fashion after the effect has started 
- * (fadeout, explicitely stop, etc).  Any effects that have a non-0 limit
- * associated with it are also tracked, even if cqsEffectPlay() (the
- * non-tracked version) is used.
- */
-int cqsEffectPlayTracked(int fxidx, cqsHandle *handle, real maxdist, 
-                         real dist, real ang)
+/* play an effect, returning the cqsHandle if handle is non-NULL */
+int cqsEffectPlay(int fxidx, cqsHandle *handle, real maxdist, 
+                  real dist, real ang)
 {
   int i;
   int empty = -1;             /* empty slot we might use */
@@ -741,101 +736,6 @@ int cqsEffectPlayTracked(int fxidx, cqsHandle *handle, real maxdist,
   return TRUE;
 }
 
-
-/* 'simple' effect play, no tracking (unless a limit exists) */
-int cqsEffectPlay(int fxidx, real maxdist, real dist, real ang)
-{
-  int channel;
-
-  if (!CQS_ISENABLED(CQS_EFFECTS) || fxidx < 0 || fxidx >= cqsNumEffects)
-    return FALSE;
-
-#if defined(DEBUG_SOUND)
-  utLog("%s: playing %d (%s) loops %d vol = %d pan = %d - %f %f %f", 
-       __FUNCTION__,
-        fxidx, cqiSoundEffects[cqsEffects[fxidx].cqiIndex].name,
-       cqsEffects[fxidx].loops, cqsEffects[fxidx].vol,
-       cqsEffects[fxidx].pan, maxdist, dist, ang);
-#endif
-
-  dist = CLAMP(0.0, maxdist, dist);
-
-  /* check the delay limit if any */
-  /* we make sure that lasttime is non-zero so it will always play
-     the first time without delay */
-  if (cqsEffects[fxidx].lasttime && cqsEffects[fxidx].delayms && 
-      ((frameTime - cqsEffects[fxidx].lasttime) < cqsEffects[fxidx].delayms))
-      {
-        return FALSE;
-      }
-
-  /* see if there is a concurrency limit.  If so, then we have to go
-     the complicated route (Tracked) */
-  if (cqsEffects[fxidx].limit)
-    {                           /* yep */
-      return cqsEffectPlayTracked(fxidx, NULL, maxdist, dist, ang);
-    }
-
-  /* see if there's a framelimit */
-  if (cqsEffects[fxidx].framelimit)
-    {
-      if (frameTime != cqsEffects[fxidx].lastframe)
-        {
-          cqsEffects[fxidx].lastframe = frameTime;
-          cqsEffects[fxidx].framecount = 1;
-        }
-      else
-        cqsEffects[fxidx].framecount++;
-      
-      if (cqsEffects[fxidx].framecount > cqsEffects[fxidx].framelimit)
-        return FALSE;        /* hit the limit */
-    }
-
-  /* else, fire-and-forget */
-  if ((channel = Mix_PlayChannel(-1, cqsEffects[fxidx].chunk, 
-                                 cqsEffects[fxidx].loops)) == -1)
-    {                           /* some failure */
-#ifdef DEBUG_SOUND
-      utLog("%s: could not play '%s'", __FUNCTION__,
-           cqiSoundEffects[cqsEffects[fxidx].cqiIndex].name);
-#endif
-      
-      return FALSE;
-    }
-
-  cqsEffects[fxidx].lasttime = frameTime;
-
-  /* set default pan if no angle specified */
-  if (!ang)
-    {
-      /* if no panning required, make sure no pan effects are registered */
-      if (!cqiSoundEffects[cqsEffects[fxidx].cqiIndex].pan)
-        Mix_SetPanning(channel, 255, 255);
-      else
-        Mix_SetPanning(channel, 
-                       cqsEffects[fxidx].pan,
-                       254 - cqsEffects[fxidx].pan);
-    }
-
-  Mix_Volume(channel, EFFECT_VOL(cqsEffects[fxidx].vol));
-
-  /* if dist and maxdist specified, then set it with angle (if specified) */
-  if (dist && maxdist)
-    {
-      Uint8 mdist = (Uint8)(255.0 * (dist / maxdist));
-      Sint16 mangle;
-
-      if (!ang)
-        mangle = 0;             /* directly in front */
-      else
-        mangle = (Sint16)utMod360(fabs(360.0 - ang) + 90.0);
-
-      Mix_SetPosition(channel, mangle, mdist);
-    }
-      
-  return TRUE;
-}
-      
 int cqsEffectStop(cqsHandle handle, int halt)
 {
   if (!cqsSoundAvailable) 

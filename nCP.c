@@ -751,7 +751,8 @@ static void _dophase( real dir )
   /*  Cataboligne - sound code 10.16.6 */
   if ( Ships[Context.snum].pfuse == 0 && 
        clbUseFuel( Context.snum, PHASER_FUEL, TRUE, FALSE ) )
-    cqsEffectPlay(cqsTeamEffects[Ships[Context.snum].team].phaser, 0, 0, 0);
+    cqsEffectPlay(cqsTeamEffects[Ships[Context.snum].team].phaser, NULL, 
+                  0, 0, 0);
  
   cp_putmsg( "Firing phasers...", MSG_LIN2 );
 
@@ -772,9 +773,11 @@ static void _dotorp(real dir, int num)
       /* Cat - torp fired sound */
 
       if (num > 1) 
-        cqsEffectPlay(cqsTeamEffects[Ships[Context.snum].team].torp3, 0, 0, 0);
+        cqsEffectPlay(cqsTeamEffects[Ships[Context.snum].team].torp3, NULL, 
+                      0, 0, 0);
       else
-        cqsEffectPlay(cqsTeamEffects[Ships[Context.snum].team].torp, 0, 0, 0);
+        cqsEffectPlay(cqsTeamEffects[Ships[Context.snum].team].torp, NULL, 
+                      0, 0, 0);
     }
 
   sendFireTorps(num, dir);
@@ -864,8 +867,9 @@ static void _doinfo( char *buf, char ch )
     }
 
 /* Cataboligne - Spocks viewer sound */
-  if (rnd() < 0.4)
-    cqsEffectPlay(cqsTeamEffects[Ships[Context.snum].team].info, 0, 0, 0);
+  if (rnd() < 0.3)
+    cqsEffectPlay(cqsTeamEffects[Ships[Context.snum].team].info, NULL, 
+                  0, 0, 0);
 }
 
 
@@ -1939,13 +1943,13 @@ static void _dobeam(char *buf, int ch)
 
   /* start the effects */
   if (dirup)
-    cqsEffectPlayTracked(cqsTeamEffects[Ships[Context.snum].team].beamu, 
-                         &beamHandle,
-                         0, 0, 0);
+    cqsEffectPlay(cqsTeamEffects[Ships[Context.snum].team].beamu, 
+                  &beamHandle,
+                  0, 0, 0);
   else
-    cqsEffectPlayTracked(cqsTeamEffects[Ships[Context.snum].team].beamd, 
-                         &beamHandle,
-                         0, 0, 0);
+    cqsEffectPlay(cqsTeamEffects[Ships[Context.snum].team].beamd, 
+                  &beamHandle,
+                  0, 0, 0);
 
   sendCommand(CPCMD_BEAM, 
 	      (dirup) ? (Unsgn16)(num & 0x00ff): 
@@ -2321,7 +2325,8 @@ static void command( int ch )
             if (ncpLRMagFactor - 1 >= -5)
               {
                 ncpLRMagFactor--;
-                cqsEffectPlay(cqsTeamEffects[Ships[snum].team].mag, 0, 0, 0);
+                cqsEffectPlay(cqsTeamEffects[Ships[snum].team].mag, NULL, 
+                              0, 0, 0);
               }
             else
               mglBeep(MGL_BEEP_ERR);
@@ -2333,7 +2338,8 @@ static void command( int ch )
             if (ncpSRMagFactor - 1 >= -5)
               {
                 ncpSRMagFactor--;
-                cqsEffectPlay(cqsTeamEffects[Ships[snum].team].mag, 0, 0, 0);
+                cqsEffectPlay(cqsTeamEffects[Ships[snum].team].mag, NULL,
+                              0, 0, 0);
               }
             else
               mglBeep(MGL_BEEP_ERR);
@@ -2350,7 +2356,8 @@ static void command( int ch )
             if (ncpLRMagFactor + 1 <= 5)
               {
                 ncpLRMagFactor++;
-                cqsEffectPlay(cqsTeamEffects[Ships[snum].team].mag, 0, 0, 0);
+                cqsEffectPlay(cqsTeamEffects[Ships[snum].team].mag, NULL,
+                              0, 0, 0);
               }
             else
               mglBeep(MGL_BEEP_ERR);
@@ -2362,7 +2369,8 @@ static void command( int ch )
             if (ncpSRMagFactor + 1 <= 5)
               {
                 ncpSRMagFactor++;
-                cqsEffectPlay(cqsTeamEffects[Ships[snum].team].mag, 0, 0, 0);
+                cqsEffectPlay(cqsTeamEffects[Ships[snum].team].mag, NULL, 
+                              0, 0, 0);
               }
             else
               mglBeep(MGL_BEEP_ERR);
@@ -3283,7 +3291,7 @@ static int nCPInput(int ch)
               state = S_BOMBING;
               prompting = FALSE;
 
-              cqsEffectPlayTracked(bombingfx, &bombingHandle, 0.0, 0.0, 0.0);
+              cqsEffectPlay(bombingfx, &bombingHandle, 0.0, 0.0, 0.0);
               hudClearPrompt(MSG_LIN1);
             }
           else
