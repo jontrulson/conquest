@@ -1,9 +1,13 @@
 Various notes related to the images.
 
+### CREATING SHIELD TEXTURES FOR THE SHIPS
 
-Steps to create the ico shield texture using a ship texture and gimp.
+Steps to create the ico shield texture and the regular viewer shield
+textures using a ship texture and gimp.
 
 Oh, what fun that was.
+
+## step one - to create the ico-sh texture for a ship.
 
 - load ship texture into gimp.
 
@@ -20,12 +24,13 @@ Oh, what fun that was.
 
   Set the Glow size pixels to 250 (I am using 512x512 textures for the ships)
 
-  Set the glow color to white
+  Set the glow color to white (#ffffff)
 
 - Now your alpha/background is screwed up.  Neat :)
 
   - in the Layers/Channels/Path window, select the background layer,
-    (it should be the one that is all black) and delete it.
+    (it should be the one that is all black, and labeled,
+    convieniently enough: 'background') and delete it.
 
   - Image -> Merge visible layers
 
@@ -54,5 +59,38 @@ surrounded by a white, alpha-blended glow.
 
 Save it as a new tga, and try it (modifying texturesrc to reference it
 if neccessary).
+
+## for the viewer texture:
+
+   Using the texture created in the above step yields a texture that
+   looks great in ico-sh, but hard to see in the viewer.  So we need
+   to use a seperate texture for these, created in basically the same
+   way above but with a few changes.
+
+  - as before, start with a ship texture (or a copy of one to be
+    safe).  The first thing to do however is reduce it's size by half.
+
+    The view renderer will draw shield textures at twice the ship's
+    texture size since we want the viewer sh textures to look more
+    'fluffy' without introducing scaling issues.
+
+  - 'rescale' the image in gimp:
+
+    assuming a 512x512 texture: Image -> Scale image.  Set size to
+    256x256
+
+  - CTL-A to select the entire image, then Edit->Cut
+
+  - Image->Scale image - this time back up to 512x512.
+
+  - Then paste the image you previously cut, back in (Edit->Paste). 
+
+  After that the steps for creating the shield tex are identical to
+  those used to create the ico-sh texture with one exception: for the
+  Alien Glow size, set to 500 rather than the 250 used for the ico-sh
+  display.  This will 'fluff' out the shields some.  Looks much better
+  in the viewer :)
+
+  That's it.
 
 

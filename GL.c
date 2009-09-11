@@ -2151,8 +2151,8 @@ drawShip(GLfloat x, GLfloat y, GLfloat angle, char ch, int snum, int color,
       /* standard sh graphic */
       uiPutColor(_get_sh_color(Ships[snum].shields));
       glBegin(GL_POLYGON);
-      
-      drawTexBoxCentered(0.0, 0.0, z, size);
+      /* draw the shield textures at twice the ship size */
+      drawTexBoxCentered(0.0, 0.0, z, size * 2.0);
       
       glEnd();
 

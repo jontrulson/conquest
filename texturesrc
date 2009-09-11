@@ -203,7 +203,7 @@ texture {
 # scout shield
 texture {
   name         "shipFSc-sh"
-  filename     "TOS-fish_s"
+  filename     "TOSfsc-sh"
 
   color        "ffffffff"
   luminance    "yes"
@@ -220,7 +220,7 @@ texture {
 
 texture {
   name         "shipFDe-sh"
-  filename     "TOS-fish"
+  filename     "TOSfde-sh"
 
   color        "ffffffff"
   luminance    "yes"
@@ -237,7 +237,7 @@ texture {
 
 texture {
   name         "shipFCr-sh"
-  filename     "TOS-fish_c"
+  filename     "TOSfcr-sh"
 
   color        "ffffffff"
   luminance    "yes"
@@ -621,7 +621,7 @@ texture {
 
 texture {
   name         "shipRSc-sh"
-  filename     "TOS-rish_s"
+  filename     "TOSrsc-sh"
 
   color        "ffffffff"
   luminance    "yes"
@@ -638,7 +638,7 @@ texture {
 
 texture {
   name         "shipRDe-sh"
-  filename     "TOS-rish"
+  filename     "TOSrde-sh"
 
   color        "ffffffff"
   luminance    "yes"
@@ -655,7 +655,7 @@ texture {
 
 texture {
   name         "shipRCr-sh"
-  filename     "TOS-rish_c"
+  filename     "TOSrcr-sh"
 
   color        "ffffffff"
   luminance    "yes"
@@ -1040,7 +1040,7 @@ texture {
 
 texture {
   name         "shipKSc-sh"
-  filename     "TOS-kish_s"
+  filename     "TOSksc-sh"
 
   color        "ffffffff"
   luminance    "yes"
@@ -1057,7 +1057,7 @@ texture {
 
 texture {
   name         "shipKDe-sh"
-  filename     "TOS-kish"
+  filename     "TOSkde-sh"
 
   color        "ffffffff"
   luminance    "yes"
@@ -1074,7 +1074,7 @@ texture {
 
 texture {
   name         "shipKCr-sh"
-  filename     "TOS-kish_c"
+  filename     "TOSkcr-sh"
 
   color        "ffffffff"
   luminance    "yes"
@@ -1459,7 +1459,7 @@ texture {
 
 texture {
   name         "shipOSc-sh"
-  filename     "TOS-oish_s"
+  filename     "TOSosc-sh"
 
   color        "ffffffff"
   luminance    "yes"
@@ -1476,7 +1476,7 @@ texture {
 
 texture {
   name         "shipODe-sh"
-  filename     "TOS-oish"
+  filename     "TOSode-sh"
 
   color        "ffffffff"
   luminance    "yes"
@@ -1493,7 +1493,7 @@ texture {
 
 texture {
   name         "shipOCr-sh"
-  filename     "TOS-oish_c"
+  filename     "TOSocr-sh"
 
   color        "ffffffff"
   luminance    "yes"
