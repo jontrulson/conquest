@@ -1837,7 +1837,7 @@ resize(int w, int h)
   
   glMatrixMode(GL_PROJECTION);
   glLoadIdentity();
-  gluPerspective(VIEWANGLE, dConf.wAspect, 
+  gluPerspective(VIEWANGLE, dConf.vAspect, 
                  1.0, 1000.0);
 
   /* save a copy of this matrix */
