@@ -1408,7 +1408,7 @@ int GLcvtcoords(real cenx, real ceny, real x, real y, real scale,
   static const GLfloat fuzz = 1.3; /* 'fuzz' factor to pad the limit
                                       a little */
   int ascale = abs(scale);
-  GLfloat limit;
+  GLfloat limitx, limity;
   GLfloat vscale;
   GLfloat magscale; 
 
@@ -1426,11 +1426,12 @@ int GLcvtcoords(real cenx, real ceny, real x, real y, real scale,
   rscale = ((GLfloat)DISPLAY_LINS * ascale / (VIEWANGLE * 2.0));
 
   /* we must always scale the limit, regardless of whether X/Y are
-     being scaled by vscale.  We multiply the VIEWANGLE with fuzz to
+     being scaled by vscale.  We multiply limity with fuzz to
      allow a little leeyway to the limit, so objects are less likely
      to just appear/disappear at the edges of the viewer, at the cost
      of potentially rendering an object that can't be seen. */
-  limit = ((VIEWANGLE * fuzz) * (1.0 / magscale)); 
+  limity = (VIEWANGLE * (1.0 / magscale)) * fuzz; 
+  limitx = limity * dConf.vAspect; /* account for the viewer's aspect ratio */
 
   *rx = ((x-cenx) / rscale) * vscale; 
   *ry = ((y-ceny) / rscale) * vscale; 
@@ -1441,11 +1442,11 @@ int GLcvtcoords(real cenx, real ceny, real x, real y, real scale,
        rscale, limit, cenx, ceny, x, y, *rx, *ry);
 #endif
 
-  if (*rx < -limit || *rx > limit)
+  if (*rx < -limitx|| *rx > limitx)
     {
       return FALSE;
     }
-  if (*ry < -limit || *ry > limit)
+  if (*ry < -limity || *ry > limity)
     {
       return FALSE;
     }
@@ -1770,6 +1771,7 @@ static void
 resize(int w, int h)
 {
   static int minit = FALSE;
+  real aspectCorrection;
 
   if (!minit)
     {
@@ -1783,11 +1785,20 @@ resize(int w, int h)
   dConf.wH = (GLfloat)h;
   dConf.wAspect = (GLfloat)w/(GLfloat)h;
   
+  /* for aspects less than 1.4 (actually 1.333 for 4:3) use 30% for
+   *  the hud width, else use 25% - better for widescreen monitors.
+   */
+
+  if (dConf.wAspect > 1.4)
+    aspectCorrection = 0.25;
+  else
+    aspectCorrection = 0.30;
+
   /* calculate the border width */
   dConf.wBorderW = ((dConf.wW * 0.01) + (dConf.wH * 0.01)) / 2.0;
   
   /* calculate viewer geometry */
-  dConf.vX = dConf.wX + (dConf.wW * 0.30); /* x + 30% */
+  dConf.vX = dConf.wX + (dConf.wW * aspectCorrection); 
   dConf.vY = dConf.wY + dConf.wBorderW;
   dConf.vW = (dConf.wW - dConf.vX) - dConf.wBorderW;
   dConf.vH = (dConf.wH - (dConf.wH * 0.20)); /* y + 20% */
@@ -2612,7 +2623,9 @@ void drawNEB(int snum)
                       -NEGENBEND_DIST, NEGENB_DIST, 
                       (SMAP(snum) ? MAP_FAC : SCALE_FAC),
                       &nebX, &nebY);
-          /*           utLog("Y TOP VISIBLE"); */
+#if 0
+          utLog("Y TOP VISIBLE"); 
+#endif
         }
       else
         {
@@ -2621,7 +2634,9 @@ void drawNEB(int snum)
                       -NEGENBEND_DIST, -NEGENBEND_DIST, 
                       (SMAP(snum) ? MAP_FAC : SCALE_FAC),
                       &nebX, &nebY);
-          /*           utLog("Y BOTTOM VISIBLE"); */
+#if 0
+          utLog("Y BOTTOM VISIBLE");
+#endif
         }
       
       /* draw the Y neb wall */
@@ -2656,7 +2671,9 @@ void drawNEB(int snum)
                       NEGENB_DIST, -NEGENBEND_DIST, 
                       (SMAP(snum) ? MAP_FAC : SCALE_FAC),
                       &nebX, &nebY);
-          /*           utLog("X RIGHT VISIBLE"); */
+#if 0
+          utLog("X RIGHT VISIBLE");
+#endif
         }
       else
         {
@@ -2665,7 +2682,9 @@ void drawNEB(int snum)
                       -NEGENBEND_DIST, -NEGENBEND_DIST, 
                       (SMAP(snum) ? MAP_FAC : SCALE_FAC),
                       &nebX, &nebY);
-          /*           utLog("X LEFT VISIBLE"); */
+#if 0
+          utLog("X LEFT VISIBLE"); 
+#endif
         }
 
       /* draw the X neb wall */
