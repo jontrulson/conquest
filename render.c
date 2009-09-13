@@ -102,8 +102,6 @@ static struct {
   GLRect_t d1damg;              /* damage */
   GLRect_t d1damn;           
   GLRect_t d1icon;              /* the ship icon area */
-  GLRect_t d1icon_rep;          /* the ship icon "cloaked" indicator */
-  GLRect_t d1icon_clo;          /* the ship icon "repairing" indicator */
   GLRect_t d1icon_fa;           /* the ship icon firing angle indicator */
   GLRect_t d1icon_tad;          /* last target, angle, dist indicator */
   GLRect_t d1torps;             /* location of the torp pip area */
@@ -171,8 +169,6 @@ void updateIconHudGeo(int snum)
   static cqiTextureAreaPtr_t d1torps = NULL; /* d1 torp icon area */
   static cqiTextureAreaPtr_t d1phaserchrg = NULL; /* d1 phaser charge */
   static cqiTextureAreaPtr_t d1icon = NULL; /* d1 ship icon area */
-  static cqiTextureAreaPtr_t d1icon_rep = NULL; /* d1 ship icon "repairing" */
-  static cqiTextureAreaPtr_t d1icon_clo = NULL; /* d1 ship icon "cloaked" */
   static cqiTextureAreaPtr_t d1icon_fa = NULL;  /* d1 ship icon firing ang */
   static cqiTextureAreaPtr_t d1icon_tad = NULL; /* d1 ship icon target data */
 
@@ -222,10 +218,6 @@ void updateIconHudGeo(int snum)
       CLAMPRECT(decal1_sz.w, decal1_sz.h, d1damn);
       d1icon    = cqiFindTexArea(buffer, "icon", &defaultTA);
       CLAMPRECT(decal1_sz.w, decal1_sz.h, d1icon);
-      d1icon_rep = cqiFindTexArea(buffer, "icon-repairing", &defaultTA);
-      CLAMPRECT(decal1_sz.w, decal1_sz.h, d1icon_rep);
-      d1icon_clo = cqiFindTexArea(buffer, "icon-cloaked", &defaultTA);
-      CLAMPRECT(decal1_sz.w, decal1_sz.h, d1icon_clo);
       d1icon_fa = cqiFindTexArea(buffer, "icon-fangle", &defaultTA);
       CLAMPRECT(decal1_sz.w, decal1_sz.h, d1icon_fa);
       d1icon_tad = cqiFindTexArea(buffer, "icon-tad", &defaultTA);
@@ -379,10 +371,6 @@ void updateIconHudGeo(int snum)
 
   /* position the ship icon area within decal 1 */
   MAPAREA(&decal1_sz, d1icon, &o.d1icon);
-
-  /* position the 'cloaked' and 'repairing' indicator areas */
-  MAPAREA(&decal1_sz, d1icon_clo, &o.d1icon_clo);
-  MAPAREA(&decal1_sz, d1icon_rep, &o.d1icon_rep);
 
   /* position the 'firing angle' and 'target, ang, distance' indicators */
   MAPAREA(&decal1_sz, d1icon_fa, &o.d1icon_fa);
@@ -1265,6 +1253,33 @@ void renderHud(int dostats)
   drawIconHUDDecal(o.decal1.x, o.decal1.y, o.decal1.w, o.decal1.h, 
                    TEX_HUD_DECAL1_LAMP_WEP, icl);
 
+  /* cloaking */
+  icl = 0;
+
+  if (SCLOAKED(snum)) 
+    icl = (GL_BLINK_ONESEC) ? MagentaColor : MagentaColor | CQC_A_DIM;
+
+  drawIconHUDDecal(o.decal1.x, o.decal1.y, o.decal1.w, o.decal1.h, 
+                   TEX_HUD_DECAL1_LAMP_CLOAK, icl);
+
+  /* repairing */
+  icl = 0;
+
+  if (SREPAIR(snum))
+    icl = (GL_BLINK_ONESEC) ? CyanColor : CyanColor | CQC_A_DIM;
+
+  drawIconHUDDecal(o.decal1.x, o.decal1.y, o.decal1.w, o.decal1.h, 
+                   TEX_HUD_DECAL1_LAMP_REP, icl);
+
+  /* towing/towedby */
+  icl = 0;
+
+  if (hudData.tow.towstat)
+    icl = (GL_BLINK_ONESEC) ? CyanColor : CyanColor | CQC_A_DIM;
+
+  drawIconHUDDecal(o.decal1.x, o.decal1.y, o.decal1.w, o.decal1.h, 
+                   TEX_HUD_DECAL1_LAMP_TOW, icl);
+
   /* torp pips */
   if (snum > 0 && snum <= MAXSHIPS)
     {
@@ -1300,22 +1315,6 @@ void renderHud(int dostats)
 
   /* END stat box */
   
-  /* cloaked or repairing icon indicators */
-  if (SCLOAKED(snum)) 
-    glfRenderFont(o.d1icon_clo.x, o.d1icon_clo.y, 
-                  0.0, 
-                  o.d1icon_clo.w, o.d1icon_clo.h,
-                  glfFontFixed, "CLOAKED", MagentaColor | CQC_A_BOLD, 
-                  NULL, 
-                  GLF_FONT_F_SCALEX | GLF_FONT_F_ORTHO);
-  else if (SREPAIR(snum)) 
-      glfRenderFont(o.d1icon_rep.x, o.d1icon_rep.y, 
-                    0.0, 
-                    o.d1icon_rep.w, o.d1icon_rep.h,
-                    glfFontFixed, "REPAIRING", CyanColor | CQC_A_BOLD, 
-                    NULL, 
-                    GLF_FONT_F_SCALEX | GLF_FONT_F_ORTHO);
-
   /* last firing angle, target angle and distance icon indicators */
 
   /* first update the data if neccessary */

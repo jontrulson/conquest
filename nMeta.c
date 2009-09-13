@@ -15,6 +15,7 @@
 #include "color.h"
 #include "conf.h"
 #include "gldisplay.h"
+#include "GL.h"
 #include "node.h"
 #include "client.h"
 #include "clientlb.h"

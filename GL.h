@@ -47,6 +47,9 @@ typedef struct _glship {
   GLTexture_t *decal1_lamp_fuel; /* fuel lamp */
   GLTexture_t *decal1_lamp_eng;  /* eng lamp */
   GLTexture_t *decal1_lamp_wep;  /* wep lamp */
+  GLTexture_t *decal1_lamp_rep;  /* repairing lamp */
+  GLTexture_t *decal1_lamp_cloak;/* cloaking lamp */
+  GLTexture_t *decal1_lamp_tow;  /* towing/towedby lamp */
   GLTexture_t *decal2;           /* fuel/w/e/alloc/kills gauges */
   GLTexture_t *dial;             /* ships astrogator dial */
   GLTexture_t *dialp;            /* astrogator pointer */
@@ -100,6 +103,39 @@ extern GLfloat  scaleFactorsLR[10];
 extern GLfloat  scaleFactorsSR[10];
 extern const GLTexture_t defaultTexture;
 #endif
+
+void drawPlanet( GLfloat x, GLfloat y, int pnum, int scale,
+                   int textcolor );
+real cu2GLSize(real size, int scale);
+
+int GLcvtcoords(real cenx, real ceny, real x, real y, real scale,
+		 GLfloat *rx, GLfloat *ry );
+
+void drawTorp(GLfloat x, GLfloat y, int scale,
+              int snum, int torpnum);
+void drawShip(GLfloat x, GLfloat y, GLfloat angle, char ch, int i, 
+	      int color, GLfloat scale);
+void drawDoomsday(GLfloat x, GLfloat y, GLfloat angle, GLfloat scale);
+void drawViewerBG(int snum, int dovbg);
+void drawNEB(int snum);
+float getFPS(void);
+
+void drawLine(GLfloat x, GLfloat y, GLfloat len, GLfloat lw);
+void drawLineBox(GLfloat x, GLfloat y, GLfloat z,
+                 GLfloat w, GLfloat h, int color, 
+                 GLfloat lw);
+void drawQuad(GLfloat x, GLfloat y, GLfloat w, GLfloat h, GLfloat z);
+void drawTexQuad(GLfloat x, GLfloat y, GLfloat w, GLfloat h, GLfloat z,
+                 int ortho);
+void drawExplosion(GLfloat x, GLfloat y, int snum, int torpnum, int scale);
+void drawBombing(int snum, int scale);
+
+void dspInitData(void);
+
+void drawIconHUDDecal(GLfloat rx, GLfloat ry, GLfloat w, GLfloat h, 
+                  int imgp, cqColor icol);
+void hex2GLColor(Unsgn32 hcol, GLColor_t *col);
+void setViewerScaling(int scale, int isLR);
 
 #endif /* _C_GL_H */
 

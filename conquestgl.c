@@ -38,6 +38,7 @@
 #include "record.h"
 #include "ibuf.h"
 #include "gldisplay.h"
+#include "GL.h"
 #include "conqnet.h"
 #include "packet.h"
 #include "client.h"

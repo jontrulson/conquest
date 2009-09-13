@@ -518,6 +518,16 @@ static int initGLShips(void)
           snprintf(buffer, CQI_NAMELEN - 1, "%s-ico-decal1-lamp-wep", shipPfx);
           GLShips[i][j].decal1_lamp_wep = _get_ship_tex(buffer);
           
+          snprintf(buffer, CQI_NAMELEN - 1, "%s-ico-decal1-lamp-rep", shipPfx);
+          GLShips[i][j].decal1_lamp_rep = _get_ship_tex(buffer);
+          
+          snprintf(buffer, CQI_NAMELEN - 1, "%s-ico-decal1-lamp-cloak", 
+                   shipPfx);
+          GLShips[i][j].decal1_lamp_cloak = _get_ship_tex(buffer);
+          
+          snprintf(buffer, CQI_NAMELEN - 1, "%s-ico-decal1-lamp-tow", shipPfx);
+          GLShips[i][j].decal1_lamp_tow = _get_ship_tex(buffer);
+          
           snprintf(buffer, CQI_NAMELEN - 1, "%s-ico-decal2", shipPfx);
           GLShips[i][j].decal2 = _get_ship_tex(buffer);
           
@@ -801,6 +811,15 @@ void drawIconHUDDecal(GLfloat rx, GLfloat ry, GLfloat w, GLfloat h,
       break;
     case TEX_HUD_DECAL1_LAMP_WEP:
       tex = GLShips[steam][stype].decal1_lamp_wep;
+      break;
+    case TEX_HUD_DECAL1_LAMP_REP:
+      tex = GLShips[steam][stype].decal1_lamp_rep;
+      break;
+    case TEX_HUD_DECAL1_LAMP_CLOAK:
+      tex = GLShips[steam][stype].decal1_lamp_cloak;
+      break;
+    case TEX_HUD_DECAL1_LAMP_TOW:
+      tex = GLShips[steam][stype].decal1_lamp_tow;
       break;
     case TEX_HUD_DECAL2:
       tex = GLShips[steam][stype].decal2;

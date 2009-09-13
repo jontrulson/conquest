@@ -23,6 +23,7 @@
 #include "color.h"
 
 #include "gldisplay.h"
+#include "GL.h"
 #include "glmisc.h"
 #include "conqlb.h"
 

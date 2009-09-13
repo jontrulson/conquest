@@ -656,7 +656,7 @@ void procAlloc(cpCommand_t *cmd)
 void procCloak(cpCommand_t *cmd)
 {
   int snum = Context.snum;		/* we always use our own ship */
-  string nofuel="Not enough fuel to engage cloaking device.";
+  static string nofuel="Not enough fuel to engage cloaking device.";
 
   if (!pktIsValid(CP_COMMAND, cmd))
     return;

@@ -387,29 +387,11 @@ texture {
     h          124.0
   }
 
-  ## "Cloaked" indicator position within "icon" area
-  texarea {
-    name       "icon-cloaked"
-    x          104.0
-    y          56.0
-    w          84.0
-    h          10.0
-  }
-
-  ## "Repairing" indicator position within "icon" area
-  texarea {
-    name       "icon-repairing"
-    x          104.0
-    y          56.0
-    w          84.0
-    h          10.0
-  }
-
   ## "FA:%d" firing angle indicator position within "icon" area
   texarea {
     name       "icon-fangle"
     x          7.0
-    y          190.0
+    y          56.0
     w          40.0
     h          10.0
   }
@@ -419,7 +401,7 @@ texture {
   texarea {
     name       "icon-tad"
     x          60.0
-    y          190.0
+    y          56.0
     w          132.0
     h          10.0
   }
@@ -479,6 +461,30 @@ texture {
 texture {
   name         "shipF-ico-decal1-lamp-wep"
   filename     "hud-decal1-lamp-wep"
+
+  color        "ffffffff"
+  luminance    "yes"
+}
+
+texture {
+  name         "shipF-ico-decal1-lamp-rep"
+  filename     "hud-decal1-lamp-rep"
+
+  color        "ffffffff"
+  luminance    "yes"
+}
+
+texture {
+  name         "shipF-ico-decal1-lamp-cloak"
+  filename     "hud-decal1-lamp-cloak"
+
+  color        "ffffffff"
+  luminance    "yes"
+}
+
+texture {
+  name         "shipF-ico-decal1-lamp-tow"
+  filename     "hud-decal1-lamp-tow"
 
   color        "ffffffff"
   luminance    "yes"
@@ -805,29 +811,11 @@ texture {
     h          124.0
   }
 
-  ## "Cloaked" indicator position within "icon" area
-  texarea {
-    name       "icon-cloaked"
-    x          104.0
-    y          56.0
-    w          84.0
-    h          10.0
-  }
-
-  ## "Repairing" indicator position within "icon" area
-  texarea {
-    name       "icon-repairing"
-    x          104.0
-    y          56.0
-    w          84.0
-    h          10.0
-  }
-
   ## "FA:%d" firing angle indicator position within "icon" area
   texarea {
     name       "icon-fangle"
     x          7.0
-    y          190.0
+    y          56.0
     w          40.0
     h          10.0
   }
@@ -837,7 +825,7 @@ texture {
   texarea {
     name       "icon-tad"
     x          60.0
-    y          190.0
+    y          56.0
     w          132.0
     h          10.0
   }
@@ -897,6 +885,30 @@ texture {
 texture {
   name         "shipR-ico-decal1-lamp-wep"
   filename     "hud-decal1-lamp-wep"
+
+  color        "ffffffff"
+  luminance    "yes"
+}
+
+texture {
+  name         "shipR-ico-decal1-lamp-rep"
+  filename     "hud-decal1-lamp-rep"
+
+  color        "ffffffff"
+  luminance    "yes"
+}
+
+texture {
+  name         "shipR-ico-decal1-lamp-cloak"
+  filename     "hud-decal1-lamp-cloak"
+
+  color        "ffffffff"
+  luminance    "yes"
+}
+
+texture {
+  name         "shipR-ico-decal1-lamp-tow"
+  filename     "hud-decal1-lamp-tow"
 
   color        "ffffffff"
   luminance    "yes"
@@ -1224,29 +1236,11 @@ texture {
     h          124.0
   }
 
-  ## "Cloaked" indicator position within "icon" area
-  texarea {
-    name       "icon-cloaked"
-    x          104.0
-    y          56.0
-    w          84.0
-    h          10.0
-  }
-
-  ## "Repairing" indicator position within "icon" area
-  texarea {
-    name       "icon-repairing"
-    x          104.0
-    y          56.0
-    w          84.0
-    h          10.0
-  }
-
   ## "FA:%d" firing angle indicator position within "icon" area
   texarea {
     name       "icon-fangle"
     x          7.0
-    y          190.0
+    y          56.0
     w          40.0
     h          10.0
   }
@@ -1256,7 +1250,7 @@ texture {
   texarea {
     name       "icon-tad"
     x          60.0
-    y          190.0
+    y          56.0
     w          132.0
     h          10.0
   }
@@ -1316,6 +1310,30 @@ texture {
 texture {
   name         "shipK-ico-decal1-lamp-wep"
   filename     "hud-decal1-lamp-wep"
+
+  color        "ffffffff"
+  luminance    "yes"
+}
+
+texture {
+  name         "shipK-ico-decal1-lamp-rep"
+  filename     "hud-decal1-lamp-rep"
+
+  color        "ffffffff"
+  luminance    "yes"
+}
+
+texture {
+  name         "shipK-ico-decal1-lamp-cloak"
+  filename     "hud-decal1-lamp-cloak"
+
+  color        "ffffffff"
+  luminance    "yes"
+}
+
+texture {
+  name         "shipK-ico-decal1-lamp-tow"
+  filename     "hud-decal1-lamp-tow"
 
   color        "ffffffff"
   luminance    "yes"
@@ -1609,7 +1627,7 @@ texture {
   texarea {
     name       "damagen"
     x          208.0
-    y          215.0
+<    y          215.0
     w          38.0
     h          30.0
   }
@@ -1623,29 +1641,11 @@ texture {
     h          124.0
   }
 
-  ## "Cloaked" indicator position within "icon" area
-  texarea {
-    name       "icon-cloaked"
-    x          104.0
-    y          56.0
-    w          84.0
-    h          10.0
-  }
-
-  ## "Repairing" indicator position within "icon" area
-  texarea {
-    name       "icon-repairing"
-    x          104.0
-    y          56.0
-    w          84.0
-    h          10.0
-  }
-
   ## "FA:%d" firing angle indicator position within "icon" area
   texarea {
     name       "icon-fangle"
     x          7.0
-    y          190.0
+    y          56.0
     w          40.0
     h          10.0
   }
@@ -1655,7 +1655,7 @@ texture {
   texarea {
     name       "icon-tad"
     x          60.0
-    y          190.0
+    y          56.0
     w          132.0
     h          10.0
   }
@@ -1715,6 +1715,30 @@ texture {
 texture {
   name         "shipO-ico-decal1-lamp-wep"
   filename     "hud-decal1-lamp-wep"
+
+  color        "ffffffff"
+  luminance    "yes"
+}
+
+texture {
+  name         "shipO-ico-decal1-lamp-rep"
+  filename     "hud-decal1-lamp-rep"
+
+  color        "ffffffff"
+  luminance    "yes"
+}
+
+texture {
+  name         "shipO-ico-decal1-lamp-cloak"
+  filename     "hud-decal1-lamp-cloak"
+
+  color        "ffffffff"
+  luminance    "yes"
+}
+
+texture {
+  name         "shipO-ico-decal1-lamp-tow"
+  filename     "hud-decal1-lamp-tow"
 
   color        "ffffffff"
   luminance    "yes"

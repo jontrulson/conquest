@@ -84,35 +84,5 @@ void display( int snum );
 
 int uiCStrlen(char *buf);
 int uiGLInit(int *argc, char **argv);
-void drawPlanet( GLfloat x, GLfloat y, int pnum, int scale,
-                   int textcolor );
-real cu2GLSize(real size, int scale);
-
-int GLcvtcoords(real cenx, real ceny, real x, real y, real scale,
-		 GLfloat *rx, GLfloat *ry );
-
-void drawTorp(GLfloat x, GLfloat y, int scale,
-              int snum, int torpnum);
-void drawShip(GLfloat x, GLfloat y, GLfloat angle, char ch, int i, 
-	      int color, GLfloat scale);
-void drawDoomsday(GLfloat x, GLfloat y, GLfloat angle, GLfloat scale);
-void drawViewerBG(int snum, int dovbg);
-void drawNEB(int snum);
-
-float getFPS(void);
-
-void drawLine(GLfloat x, GLfloat y, GLfloat len, GLfloat lw);
-void drawLineBox(GLfloat x, GLfloat y, GLfloat z,
-                 GLfloat w, GLfloat h, int color, 
-                 GLfloat lw);
-void drawQuad(GLfloat x, GLfloat y, GLfloat w, GLfloat h, GLfloat z);
-void drawTexQuad(GLfloat x, GLfloat y, GLfloat w, GLfloat h, GLfloat z,
-                 int ortho);
-void drawExplosion(GLfloat x, GLfloat y, int snum, int torpnum, int scale);
-void drawBombing(int snum, int scale);
-
-void dspInitData(void);
-void hex2GLColor(Unsgn32 hcol, GLColor_t *col);
-void setViewerScaling(int scale, int isLR);
 
 #endif /* _GLDISPLAY_H */

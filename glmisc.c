@@ -28,6 +28,7 @@
 
 #include "glfont.h"
 #include "glmisc.h"
+#include "GL.h"
 #include "gldisplay.h"
 #include "textures.h"
 

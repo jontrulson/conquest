@@ -47,7 +47,7 @@ GLTexture_t *getGLTexture(char *texname);
 #define GLTEX_WIDTH(x)    ((x)->w)
 #define GLTEX_HEIGHT(x)   ((x)->h)
 
-/* ico texture identifiers for drawIconHUDDecal() */
+/* ico texture identifiers for drawIconHUDDecal() (GL.c) */
 #define TEX_HUD_ICO                   0
 #define TEX_HUD_SHI                   1
 #define TEX_HUD_DECAL1                2
@@ -62,11 +62,10 @@ GLTexture_t *getGLTexture(char *texname);
 #define TEX_HUD_DECAL1_LAMP_FUEL      10
 #define TEX_HUD_DECAL1_LAMP_ENG       11
 #define TEX_HUD_DECAL1_LAMP_WEP       12
+#define TEX_HUD_DECAL1_LAMP_REP       13
+#define TEX_HUD_DECAL1_LAMP_CLOAK     14
+#define TEX_HUD_DECAL1_LAMP_TOW       15
 
 #define TEX_HUD_ITORPIN               21
-
-void drawIconHUDDecal(GLfloat rx, GLfloat ry, GLfloat w, GLfloat h, 
-                  int imgp, cqColor icol);
-
 
 #endif /* _TEXTURES_H */
