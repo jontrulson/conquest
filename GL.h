@@ -41,6 +41,7 @@ typedef struct _glship {
   GLTexture_t *phas;             /* phaser */
   GLTexture_t *ico;              /* ship icon */
   GLTexture_t *ico_sh;           /* icon shields id */
+  GLTexture_t *ico_torp;         /* torp pip */
   GLTexture_t *decal1;           /* sh/hull gauges */
   GLTexture_t *decal1_lamp_sh;   /* sh lamp */
   GLTexture_t *decal1_lamp_hull; /* hull lamp */
@@ -56,7 +57,6 @@ typedef struct _glship {
   GLTexture_t *warp;             /* warp gauge */
   GLTexture_t *warp2;            /* warp gauge background*/
   GLTexture_t *warpq_col;        /* warp indicator quad (color only) */
-  GLTexture_t *ico_torp;         /* torpedo icon(s) */
 } GLShip_t;
 
 #if defined(NOEXTERN_GL)
@@ -126,7 +126,7 @@ void drawLineBox(GLfloat x, GLfloat y, GLfloat z,
                  GLfloat lw);
 void drawQuad(GLfloat x, GLfloat y, GLfloat w, GLfloat h, GLfloat z);
 void drawTexQuad(GLfloat x, GLfloat y, GLfloat w, GLfloat h, GLfloat z,
-                 int ortho);
+                 int ortho, int rot90);
 void drawExplosion(GLfloat x, GLfloat y, int snum, int torpnum, int scale);
 void drawBombing(int snum, int scale);
 

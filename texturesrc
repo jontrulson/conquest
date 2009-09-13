@@ -177,16 +177,6 @@ texture {
 }
 
 
-# Icon torp 
-#
-###########
-
-texture {
-  name         "ico-torp"
-
-  color        "ffffffff"
-}
-
 # Federation ships
 #
 ##################
@@ -322,6 +312,15 @@ texture {
 texture {
   name         "shipFCr-ico-sh"
   filename     "TOS-fish_c"
+
+  color        "ffffffff"
+  luminance    "yes"
+}
+
+# team's ico-torp texture
+texture {
+  name         "shipF-ico-torp"
+  filename     "TOS-ftorp1"
 
   color        "ffffffff"
   luminance    "yes"
@@ -746,6 +745,15 @@ texture {
 texture {
   name         "shipRCr-ico-sh"
   filename     "TOS-rish_c"
+
+  color        "ffffffff"
+  luminance    "yes"
+}
+
+# team's ico-torp texture
+texture {
+  name         "shipR-ico-torp"
+  filename     "TOS-rtorp1"
 
   color        "ffffffff"
   luminance    "yes"
@@ -1176,6 +1184,15 @@ texture {
   luminance    "yes"
 }
 
+# team's ico-torp texture
+texture {
+  name         "shipK-ico-torp"
+  filename     "TOS-ktorp1"
+
+  color        "ffffffff"
+  luminance    "yes"
+}
+
 texture {
   name         "shipK-ico-decal1"
   filename     "hud-decal1"
@@ -1576,6 +1593,15 @@ texture {
 texture {
   name         "shipOCr-ico-sh"
   filename     "TOS-oish_c"
+
+  color        "ffffffff"
+  luminance    "yes"
+}
+
+# team's ico-torp texture
+texture {
+  name         "shipO-ico-torp"
+  filename     "torp"
 
   color        "ffffffff"
   luminance    "yes"

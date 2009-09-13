@@ -116,7 +116,7 @@ void mglConqLogo(dspConfig_t *dsp, bool mult)
                colors[Ships[Context.snum].team].b,
                colors[Ships[Context.snum].team].a);
 
-      drawTexQuad(x, y, w, h, 0.0, TRUE);
+      drawTexQuad(x, y, w, h, 0.0, TRUE, FALSE);
       
       glDisable(GL_TEXTURE_2D);
       glDisable(GL_BLEND);

@@ -1305,13 +1305,45 @@ void renderHud(int dostats)
                       o.d1torppips[i].y, 
                       o.d1torppips[i].w, 
                       o.d1torppips[i].h, 
-                      0.0, TRUE);
+                      0.0, TRUE, FALSE);
         }
+    }
+
+  /* phaser recharge status */
+  if (snum > 0 && snum <= MAXSHIPS)
+    {
+      GLfloat phasH;
+
+      /* draw the ship's phaser */
+      glBindTexture(GL_TEXTURE_2D, 
+                    GLTEX_ID(GLShips[steam][stype].phas));
+
+      glColor4fv(GLTEX_COLOR(GLShips[steam][stype].phas).vec);
+
+
+      phasH = (Ships[snum].pfuse <= 0) ? o.d1phcharge.h :
+        (o.d1phcharge.h - (o.d1phcharge.h / 10.0) * 
+         (real)Ships[snum].pfuse);
+      
+      drawTexQuad(o.d1phcharge.x, o.d1phcharge.y, o.d1phcharge.w, phasH,
+                  0.0, TRUE, TRUE);
     }
 
   /* GL */
   glDisable(GL_TEXTURE_2D);
   glDisable(GL_BLEND);
+
+  /* if phasers are recharging, draw a box around the recharge indicator */
+
+  if (snum > 0 && snum <= MAXSHIPS)
+    {
+      if (Ships[snum].pfuse > 0)
+        drawLineBox(o.d1phcharge.x, o.d1phcharge.y, 0.0,
+                    o.d1phcharge.w,
+                    o.d1phcharge.h,
+                    RedColor,
+                    1.0);
+    }
 
   /* END stat box */
   
@@ -1402,20 +1434,6 @@ void renderHud(int dostats)
 
   /* critical/overload indicators */
   renderPulseMsgs();
-
-  /* phaser recharge status */
-  if (snum > 0 && snum <= MAXSHIPS)
-    {
-      if (Ships[snum].pfuse <= 0)
-        uiPutColor(GreenColor);
-      else
-        uiPutColor(RedColor);
-        
-      drawQuad(o.d1phcharge.x, o.d1phcharge.y, o.d1phcharge.w, 
-               (Ships[snum].pfuse <= 0) ? o.d1phcharge.h :
-               (o.d1phcharge.h - (o.d1phcharge.h / 10.0) * 
-                (real)Ships[snum].pfuse), 0.0);
-    }
 
   return;
 }

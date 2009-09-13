@@ -500,6 +500,9 @@ static int initGLShips(void)
                    ShipTypes[j].name[0], ShipTypes[j].name[1]);
           GLShips[i][j].ico_sh = _get_ship_tex(buffer);
           
+          snprintf(buffer, CQI_NAMELEN - 1, "%s-ico-torp", shipPfx);
+          GLShips[i][j].ico_torp = _get_ship_tex(buffer);
+          
           snprintf(buffer, CQI_NAMELEN - 1, "%s-ico-decal1", shipPfx);
           GLShips[i][j].decal1 = _get_ship_tex(buffer);
           
@@ -547,8 +550,6 @@ static int initGLShips(void)
           snprintf(buffer, CQI_NAMELEN - 1, "%s-warp-col", shipPfx);
           GLShips[i][j].warpq_col = _get_ship_tex(buffer);
 
-          GLShips[i][j].ico_torp = _get_ship_tex("ico-torp");
-          
           /* if we failed to find some of them, you'll see soon enough. */
         }
     }
@@ -981,13 +982,21 @@ void drawQuad(GLfloat x, GLfloat y, GLfloat w, GLfloat h, GLfloat z)
 }
 
 void drawTexQuad(GLfloat x, GLfloat y, GLfloat w, GLfloat h, GLfloat z,
-                 int ortho)
+                 int ortho, int rot90)
 {
+  /* perspective */
   static const GLfloat tc_perspective[4][2] = {
     { 0.0f, 0.0f },
     { 1.0f, 0.0f },
     { 1.0f, 1.0f },
     { 0.0f, 1.0f }
+  };
+  /* perspective, tex coords rotated 90 degrees */
+  static const GLfloat tc_perspective90[4][2] = {
+    { 0.0f, 1.0f },
+    { 0.0f, 0.0f },
+    { 1.0f, 0.0f },
+    { 1.0f, 1.0f }
   };
   /* ortho inverts Y, so we need to invert texture T to compensate */
   static const GLfloat tc_ortho[4][2] = {
@@ -996,12 +1005,30 @@ void drawTexQuad(GLfloat x, GLfloat y, GLfloat w, GLfloat h, GLfloat z,
     { 1.0f, 0.0f },
     { 0.0f, 0.0f }
   };
+  /* ortho, tex coords rotated 90 degrees */
+  static const GLfloat tc_ortho90[4][2] = {
+    { 0.0f, 0.0f },
+    { 0.0f, 1.0f },
+    { 1.0f, 1.0f },
+    { 1.0f, 0.0f }
+  };
+
   GLfloat *tc;
 
   if (ortho)
-    tc = (GLfloat *)&tc_ortho;
+    {
+      if (rot90)
+        tc = (GLfloat *)&tc_ortho90;
+      else
+        tc = (GLfloat *)&tc_ortho;
+    }
   else
-    tc = (GLfloat *)&tc_perspective;
+    {
+      if (rot90)
+        tc = (GLfloat *)&tc_perspective90;
+      else
+        tc = (GLfloat *)&tc_perspective;
+    }
 
   glBegin(GL_POLYGON);
 
