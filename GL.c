@@ -981,7 +981,7 @@ void drawQuad(GLfloat x, GLfloat y, GLfloat w, GLfloat h, GLfloat z)
   return;
 }
 
-void drawTexQuad(GLfloat x, GLfloat y, GLfloat w, GLfloat h, GLfloat z,
+void drawTexQuad(GLfloat x, GLfloat y, GLfloat z, GLfloat w, GLfloat h,
                  int ortho, int rot90)
 {
   /* perspective */
@@ -1030,7 +1030,7 @@ void drawTexQuad(GLfloat x, GLfloat y, GLfloat w, GLfloat h, GLfloat z,
         tc = (GLfloat *)&tc_perspective;
     }
 
-  glBegin(GL_POLYGON);
+  glBegin(GL_QUADS);
 
   glTexCoord2fv(tc + 0);
   glVertex3f(x, y, z);          /* ll */
@@ -1049,30 +1049,13 @@ void drawTexQuad(GLfloat x, GLfloat y, GLfloat w, GLfloat h, GLfloat z,
   return;
 }
 
-
-void drawTexBoxCentered(GLfloat x, GLfloat y, GLfloat z, GLfloat size)
-{				/* draw textured square centered on x,y
-				   USE BETWEEN glBegin/End pair! */
-  GLfloat rx, ry;
-
-#ifdef DEBUG
-  utLog("%s: x = %f, y = %f\n", __FUNCTION__, x, y);
-#endif
-
-  rx = x - (size / 2);
-  ry = y - (size / 2);
-
-  glTexCoord2f(0.0f, 0.0f);
-  glVertex3f(rx, ry, z);        /* ll */
-
-  glTexCoord2f(1.0f, 0.0f);
-  glVertex3f(rx + size, ry, z); /* lr */
-
-  glTexCoord2f(1.0f, 1.0f);
-  glVertex3f(rx + size, ry + size, z); /* ur */
-
-  glTexCoord2f(0.0f, 1.0f);
-  glVertex3f(rx, ry + size, z); /* ul */
+/* draw textured square centered on x,y */
+void drawTexBoxCentered(GLfloat x, GLfloat y, GLfloat z, GLfloat size,
+                        int ortho, int rot90)
+{
+  drawTexQuad(x - (size / 2), 
+              y - (size / 2), 
+              z, size, size, ortho, rot90);
 
   return;
 }
@@ -1156,9 +1139,7 @@ void drawExplosion(GLfloat x, GLfloat y, int snum, int torpnum, int scale)
   
   glColor4fv(torpAStates[snum][torpnum].state.col.vec);
 
-  glBegin(GL_POLYGON);
-  drawTexBoxCentered(0.0, 0.0, 0.0, size);
-  glEnd();
+  drawTexBoxCentered(0.0, 0.0, 0.0, size, FALSE, FALSE);
 
   glDisable(GL_TEXTURE_2D); 
   glDisable(GL_BLEND);
@@ -1210,7 +1191,8 @@ void drawBombing(int snum, int scale)
                 free(bombAState[j].state.private);
               bombAState[1].anims = 0; /* clear 1st so we can retry
                                           again later */
-              utLog("%s: malloc(%d) failed", sizeof(struct _rndxy));
+              utLog("%s: malloc(%d) failed", __FUNCTION__,
+                    sizeof(struct _rndxy));
               return;
             }
           else
@@ -1272,9 +1254,7 @@ void drawBombing(int snum, int scale)
   
   glColor4fv(bombAState[snum].state.col.vec);
 
-  glBegin(GL_POLYGON);
-  drawTexBoxCentered(0.0, 0.0, 0.0, size);
-  glEnd();
+  drawTexBoxCentered(0.0, 0.0, 0.0, size, FALSE, FALSE);
 
   glDisable(GL_TEXTURE_2D); 
   glDisable(GL_BLEND);
@@ -1335,8 +1315,6 @@ void drawPlanet( GLfloat x, GLfloat y, int pnum, int scale,
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
   glEnable(GL_BLEND);
   
-  glBegin(GL_POLYGON);
-  
   glColor4fv(GLTEX_COLOR(GLPlanets[pnum - 1].tex).vec);
 
   size = cu2GLSize(GLPlanets[pnum - 1].size, -scale);
@@ -1345,9 +1323,7 @@ void drawPlanet( GLfloat x, GLfloat y, int pnum, int scale,
   if (scale == MAP_FAC)
     size *= 2.0;
     
-  drawTexBoxCentered(x, y, TRANZ, size);
-  
-  glEnd();
+  drawTexBoxCentered(x, y, TRANZ, size, FALSE, FALSE);
   
   glDisable(GL_TEXTURE_2D); 
 
@@ -2053,13 +2029,9 @@ void drawTorp(GLfloat x, GLfloat y,
   glEnable(GL_TEXTURE_2D); 
   glBindTexture(GL_TEXTURE_2D, ncpTorpAnims[steam].state.id); 
 
-  glBegin(GL_POLYGON);		
-
   glColor4fv(ncpTorpAnims[steam].state.col.vec);
 
-  drawTexBoxCentered(0.0, 0.0, z, size);
-
-  glEnd();
+  drawTexBoxCentered(0.0, 0.0, z, size, FALSE, FALSE);
 
   glDisable(GL_TEXTURE_2D); 
   glDisable(GL_BLEND);
@@ -2207,12 +2179,9 @@ drawShip(GLfloat x, GLfloat y, GLfloat angle, char ch, int snum, int color,
 
       /* standard sh graphic */
       uiPutColor(_get_sh_color(Ships[snum].shields));
-      glBegin(GL_POLYGON);
       /* draw the shield textures at twice the ship size */
-      drawTexBoxCentered(0.0, 0.0, z, size * 2.0);
+      drawTexBoxCentered(0.0, 0.0, z, size * 2.0, FALSE, FALSE);
       
-      glEnd();
-
       glDisable(GL_TEXTURE_2D);
       glPopMatrix();
     }
@@ -2246,11 +2215,7 @@ drawShip(GLfloat x, GLfloat y, GLfloat angle, char ch, int snum, int color,
             GLTEX_COLOR(GLShips[steam][stype].ship).b,
             alpha);	
 
-  glBegin(GL_POLYGON);
-
-  drawTexBoxCentered(0.0, 0.0, z, size);
-
-  glEnd();
+  drawTexBoxCentered(0.0, 0.0, z, size, FALSE, FALSE);
 
   glDisable(GL_TEXTURE_2D);   
   
@@ -2455,11 +2420,7 @@ void drawDoomsday(GLfloat x, GLfloat y, GLfloat dangle, GLfloat scale)
 
   glColor4fv(GLTEX_COLOR(GLDoomsday.doom).vec);
 
-  glBegin(GL_POLYGON);
-
-  drawTexBoxCentered(0.0, 0.0, z, size);
-
-  glEnd();
+  drawTexBoxCentered(0.0, 0.0, z, size, FALSE, FALSE);
 
   glDisable(GL_TEXTURE_2D);   
 
@@ -3136,8 +3097,8 @@ static int LoadTGA(char *filename, textureImage *texture)
   
   if (!texture->imageData)
     {
-      utLog("%s: Texture alloc (%d bytes) failed.", 
-           imageSize, filename);
+      utLog("%s: Texture alloc (%s, %d bytes) failed.", 
+            __FUNCTION__, filename, imageSize);
       fclose(file);
       return FALSE;
     }
@@ -3171,8 +3132,8 @@ static int LoadTGA(char *filename, textureImage *texture)
 
       if (!colorbuffer)
         {
-          utLog("%s: Colorbuffer alloc (%d bytes) failed.", 
-               filename, bytesPerPixel);
+          utLog("%s: Colorbuffer alloc (%s, %d bytes) failed.", 
+                __FUNCTION__, filename, bytesPerPixel);
           fclose(file);
           return FALSE;
         }
@@ -3411,8 +3372,8 @@ static int loadGLTextures()
           
           if (!texti)
             {
-              utLog("loadGLTextures(): memory allocation failed for %d bytes\n",
-                   sizeof(textureImage));
+              utLog("%s: texti malloc(%d) failed\n",
+                    __FUNCTION__, sizeof(textureImage));
               return FALSE;
             }
           

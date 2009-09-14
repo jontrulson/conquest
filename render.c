@@ -1303,9 +1303,10 @@ void renderHud(int dostats)
           
           drawTexQuad(o.d1torppips[i].x, 
                       o.d1torppips[i].y, 
+                      0.0,
                       o.d1torppips[i].w, 
                       o.d1torppips[i].h, 
-                      0.0, TRUE, FALSE);
+                      TRUE, FALSE);
         }
     }
 
@@ -1325,8 +1326,8 @@ void renderHud(int dostats)
         (o.d1phcharge.h - (o.d1phcharge.h / 10.0) * 
          (real)Ships[snum].pfuse);
       
-      drawTexQuad(o.d1phcharge.x, o.d1phcharge.y, o.d1phcharge.w, phasH,
-                  0.0, TRUE, TRUE);
+      drawTexQuad(o.d1phcharge.x, o.d1phcharge.y, 0.0, o.d1phcharge.w, phasH,
+                  TRUE, TRUE);
     }
 
   /* GL */

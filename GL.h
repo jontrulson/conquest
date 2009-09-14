@@ -125,8 +125,10 @@ void drawLineBox(GLfloat x, GLfloat y, GLfloat z,
                  GLfloat w, GLfloat h, int color, 
                  GLfloat lw);
 void drawQuad(GLfloat x, GLfloat y, GLfloat w, GLfloat h, GLfloat z);
-void drawTexQuad(GLfloat x, GLfloat y, GLfloat w, GLfloat h, GLfloat z,
+void drawTexQuad(GLfloat x, GLfloat y, GLfloat z, GLfloat w, GLfloat h,
                  int ortho, int rot90);
+void drawTexBoxCentered(GLfloat x, GLfloat y, GLfloat z, GLfloat size,
+                        int ortho, int rot90);
 void drawExplosion(GLfloat x, GLfloat y, int snum, int torpnum, int scale);
 void drawBombing(int snum, int scale);
 
