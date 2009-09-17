@@ -29,6 +29,7 @@
 #include "textures.h"
 #include "anim.h"
 #include "GL.h"
+#include "blinker.h"
 #include "hud.h"
 
 /*
@@ -1017,7 +1018,7 @@ void renderHud(int dostats)
                         o.destruct.w, o.destruct.h, 
                         glfFontMsg, 
                         hudData.destruct.str, 
-                        (GL_BLINK_ONESEC) ? 
+                        (BLINK_ONESEC) ? 
                         hudData.destruct.color | CQC_A_BOLD | 0x50000000: 
                         (hudData.destruct.color | 0x50000000) & ~CQC_A_BOLD, 
                         NULL, 
@@ -1031,7 +1032,7 @@ void renderHud(int dostats)
             {                               /* need to blink these */
             case PHASER_ALERT:               /* red alert (not Alert) */
             case YELLOW_ALERT:               /* yellow alert (not Prox) */
-              icl = (GL_BLINK_HALFSEC) ? hudData.aStat.color & ~CQC_A_BOLD : 
+              icl = (BLINK_HALFSEC) ? hudData.aStat.color & ~CQC_A_BOLD : 
                 hudData.aStat.color | CQC_A_BOLD;
               break;
             default:
@@ -1187,7 +1188,7 @@ void renderHud(int dostats)
   if (SSHUP(snum))
     {
       if (hudData.sh.shields <= HUD_SH_CRIT)
-        icl = (GL_BLINK_QTRSEC) ? hudData.sh.color : 0;
+        icl = (BLINK_QTRSEC) ? hudData.sh.color : 0;
       else
         icl = hudData.sh.color;
     }
@@ -1200,7 +1201,7 @@ void renderHud(int dostats)
   if (hudData.dam.damage > HUD_HULL_ALRT)
     {
       if (hudData.dam.damage > HUD_HULL_CRIT)
-        icl = (GL_BLINK_QTRSEC) ? hudData.dam.color : 0;
+        icl = (BLINK_QTRSEC) ? hudData.dam.color : 0;
       else
         icl = hudData.dam.color;
     }        
@@ -1213,7 +1214,7 @@ void renderHud(int dostats)
   if (hudData.fuel.fuel < HUD_F_ALRT)
     {
       if (hudData.fuel.fuel < HUD_F_CRIT)
-        icl = (GL_BLINK_QTRSEC) ? hudData.fuel.color : 0;
+        icl = (BLINK_QTRSEC) ? hudData.fuel.color : 0;
       else
         icl = hudData.fuel.color;
     }
@@ -1227,9 +1228,9 @@ void renderHud(int dostats)
   if (hudData.etemp.overl || hudData.etemp.temp > HUD_E_ALRT)
     {
       if (hudData.etemp.overl)
-        icl = (GL_BLINK_QTRSEC) ? hudData.etemp.color : 0;
+        icl = (BLINK_QTRSEC) ? hudData.etemp.color : 0;
       else if (hudData.etemp.temp > HUD_E_CRIT)
-        icl = (GL_BLINK_HALFSEC) ? hudData.etemp.color : 0;
+        icl = (BLINK_HALFSEC) ? hudData.etemp.color : 0;
       else
         icl = hudData.etemp.color;
     }        
@@ -1243,9 +1244,9 @@ void renderHud(int dostats)
   if (hudData.wtemp.overl || hudData.wtemp.temp > HUD_W_ALRT)
     {
       if (hudData.wtemp.overl)
-        icl = (GL_BLINK_QTRSEC) ? hudData.wtemp.color : 0;
+        icl = (BLINK_QTRSEC) ? hudData.wtemp.color : 0;
       else if (hudData.wtemp.temp > HUD_W_CRIT)
-        icl = (GL_BLINK_HALFSEC) ? hudData.wtemp.color : 0;
+        icl = (BLINK_HALFSEC) ? hudData.wtemp.color : 0;
       else
         icl = hudData.wtemp.color;
     }        
@@ -1257,7 +1258,7 @@ void renderHud(int dostats)
   icl = 0;
 
   if (SCLOAKED(snum)) 
-    icl = (GL_BLINK_ONESEC) ? MagentaColor : MagentaColor | CQC_A_DIM;
+    icl = (BLINK_ONESEC) ? MagentaColor : MagentaColor | CQC_A_DIM;
 
   drawIconHUDDecal(o.decal1.x, o.decal1.y, o.decal1.w, o.decal1.h, 
                    TEX_HUD_DECAL1_LAMP_CLOAK, icl);
@@ -1266,7 +1267,7 @@ void renderHud(int dostats)
   icl = 0;
 
   if (SREPAIR(snum))
-    icl = (GL_BLINK_ONESEC) ? CyanColor : CyanColor | CQC_A_DIM;
+    icl = (BLINK_ONESEC) ? CyanColor : CyanColor | CQC_A_DIM;
 
   drawIconHUDDecal(o.decal1.x, o.decal1.y, o.decal1.w, o.decal1.h, 
                    TEX_HUD_DECAL1_LAMP_REP, icl);
@@ -1275,7 +1276,7 @@ void renderHud(int dostats)
   icl = 0;
 
   if (hudData.tow.towstat)
-    icl = (GL_BLINK_ONESEC) ? CyanColor : CyanColor | CQC_A_DIM;
+    icl = (BLINK_ONESEC) ? CyanColor : CyanColor | CQC_A_DIM;
 
   drawIconHUDDecal(o.decal1.x, o.decal1.y, o.decal1.w, o.decal1.h, 
                    TEX_HUD_DECAL1_LAMP_TOW, icl);

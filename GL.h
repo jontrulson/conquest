@@ -15,23 +15,6 @@
 
 #include "anim.h"
 
-/* Blinker animdefs useful to other modules */
-
-#if defined(NOEXTERN_GL)
-animStateRec_t        GLBlinkerOneSec = {};
-animStateRec_t        GLBlinkerHalfSec = {};
-animStateRec_t        GLBlinkerQtrSec = {};
-#else
-extern animStateRec_t GLBlinkerOneSec;
-extern animStateRec_t GLBlinkerHalfSec;
-extern animStateRec_t GLBlinkerQtrSec;
-#endif
-
-/* easier macros */
-#define GL_BLINK_ONESEC      (GLBlinkerOneSec.state.armed)
-#define GL_BLINK_HALFSEC     (GLBlinkerHalfSec.state.armed)
-#define GL_BLINK_QTRSEC      (GLBlinkerQtrSec.state.armed)
-
 /* storage for ship textures, colors, other GL related things, indexed by
    team/shiptype */
 typedef struct _glship {

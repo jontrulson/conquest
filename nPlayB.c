@@ -187,28 +187,7 @@ void nPlayBInit(void)
       nPlayBNode.animQue = &animQue;
       animQueInit(nPlayBNode.animQue);
 
-      /* now setup the blinkers */
-      /* these are toggle animations that never expire, so they
-         only need to be done once at inittime */
-      if (!animInitState("onesec", &GLBlinkerOneSec, NULL))
-        utLog("%s: failed to init animstate for animation 'onesec'",
-             __FUNCTION__);
-      else
-        animQueAdd(nPlayBNode.animQue, &GLBlinkerOneSec);
-
-      if (!animInitState("halfsec", &GLBlinkerHalfSec, NULL))
-        utLog("%s: failed to init animstate for animation 'halfsec'",
-             __FUNCTION__);
-      else
-        animQueAdd(nPlayBNode.animQue, &GLBlinkerHalfSec);
-
-      if (!animInitState("qtrsec", &GLBlinkerQtrSec, NULL))
-        utLog("%s: failed to init animstate for animation 'qtrsec'",
-             __FUNCTION__);
-      else
-        animQueAdd(nPlayBNode.animQue, &GLBlinkerQtrSec);
-
-      /* now setup the team torp animators */
+      /* setup the team torp animators */
       for (i=0; i<NUMPLAYERTEAMS; i++)
         {
           char nm[CQI_NAMELEN];

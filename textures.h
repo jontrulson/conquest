@@ -66,6 +66,4 @@ GLTexture_t *getGLTexture(char *texname);
 #define TEX_HUD_DECAL1_LAMP_CLOAK     14
 #define TEX_HUD_DECAL1_LAMP_TOW       15
 
-#define TEX_HUD_ITORPIN               21
-
 #endif /* _TEXTURES_H */

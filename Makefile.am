@@ -72,7 +72,7 @@ libconqserv_la_SOURCES = servauth.c server.c servauth.h server.h serverpkt.c \
 
 libconqserv_la_LDFLAGS = -version-info 1:0:0
 
-libUi_la_SOURCES = ui.h uimisc.c
+libUi_la_SOURCES = ui.h uimisc.c 
 
 libUi_la_LDFLAGS = -version-info 1:0:0
 
@@ -85,7 +85,7 @@ libUiGL_la_SOURCES = GL.c texfont.c glfont.c glfont.h \
 	gldisplay.h gldisplay.c disputil.h render.h render.c \
 	nPlayBMenu.h nPlayBMenu.c nPlayB.h nPlayB.c nPlayBHelp.h \
 	nPlayBHelp.c nOptions.h nOptions.c colorGL.c ui.h anim.c anim.h \
-	GL.h hud.h hud.c
+	GL.h hud.h hud.c blinker.h blinker.c
 
 libUiGL_la_LDFLAGS = -version-info 1:0:0
 

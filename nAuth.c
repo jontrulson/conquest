@@ -28,6 +28,9 @@
 #include "glmisc.h"
 #include "conqutil.h"
 
+#include "GL.h"
+#include "blinker.h"
+
 static char *unamep = "Username:";
 static char *pwp = "Password:";
 static char *rpwp = "Retype Password:";
@@ -173,18 +176,7 @@ void nAuthInit(void)
 /* all we do here is 'blink' the cursor ;-) */
 static int nAuthIdle(void)
 {
-  int gtime = clbGetMillis();
-  static int old = 0;
-
-  if ((gtime - old) > 250)
-    {
-      if (cursor == ' ')
-        cursor = '_';
-      else
-        cursor = ' ';
-
-      old = gtime;
-    }
+  cursor = (BLINK_QTRSEC) ? '_' : ' ';
 
   return NODE_OK;
 }

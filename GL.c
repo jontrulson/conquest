@@ -33,6 +33,8 @@
 #include "anim.h"
 #undef NOEXTERN_GLANIM
 
+#include "blinker.h"
+
 #include "node.h"
 #include "client.h"
 #include "conf.h"
@@ -1786,6 +1788,9 @@ void graphicsInit(void)
         utLog("ERROR: initGLAnimDefs() failed\n");
     }
 
+  /* init the blinkers */
+  blinkerInit();
+
   return;
 }
 
@@ -1882,6 +1887,9 @@ static int renderNode(void)
   scrNode_t *node = getTopNode();
   scrNode_t *onode = getTopONode();
   int rv;
+
+  /* always iter the blinker que */
+  animQueRun(&blinkerQue);
 
   if (node)
     {
