@@ -314,7 +314,7 @@ static int nMenuIdle(void)
 
   if (pkttype < 0)          /* some error */
     {
-      utLog("nMenuIdle: waiForPacket returned %d", pkttype);
+      utLog("nMenuIdle: waitForPacket returned %d", pkttype);
       Ships[Context.snum].status = SS_OFF;
       return NODE_EXIT;
     }
