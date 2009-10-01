@@ -9,6 +9,205 @@
 
                               Conquest HISTORY
 
+8.4.1d (devel) 10/01/2009
+
+  - a devel release, some highlights:
+
+  - fix server bug that would cause vacant ships, when destroyed, to
+    fail to explode properly, leaving some stationary torps behind.
+
+  - Visible changes:
+
+    - some changes to work better with wide-screen display formats
+
+    - new orion ship textures (yay!)
+
+    - rework (centering, shrinking, etc) all of the ship textures, and
+      fixing a couple of issues with some of the planet textures.
+
+    - new ship shield textures (both for the icon-ship display and the
+      main viewer).
+
+    - in conquestgl, torps are no longer colored according to their
+      'danger' level.  
+
+    - rework of the icon-ship display:
+
+      - now use a luminence variant of the main ship texture as the
+        ico-ship rather than a seperate texture.
+
+      - implement 'lamps' rather than the text (cloaking, repair,
+        shields, etc)
+
+      - make the ico-ship drawing area square to avoid stretching
+        issues
+
+      - use actual ship's torp texture for the torp-pips
+
+      - use ship's phaser texture for the phaser recharge indicator
+
+   - non-visible changes
+
+     - rework of the texture represnetation and color representation
+       in conquestgl
+
+     - rework of the packet handling functions.
+
+  ## Detailed changes (svn log, basically) since 8.4.1.  Read if you
+     *really* want the details :):
+
+  - prevent cores if NULL passed to ibufPut()
+
+  - allow conquest to build if GL/glut is not available.  Of course,
+    you only get the currses client...
+
+  - cleanup packet handling API in packet.[hc]:
+
+    - get rid of the need to specify the socket fd(s) to the pkt*()
+      routines.
+
+    - get rid of the 'direction' (TOSERVER/FROMSERVER/etc) arguments
+      to the pkt*() functions - not needed anymore.
+
+  - rework the packet handling to use the new ringbuffers in
+    preparation for non-blocking socket io.
+
+  - New textures for Orion Scouts, Destroyers, and Cruisers. 
+
+    The .blend files used to create these textures are in the src repo
+    in img/src/blender/ .  See the README for more details.  These
+    files will not be made a part of a Conquest src release since they
+    are large, and it's unlikely a 'regular' user would want to mess
+    with them.  They are available in the src tree via svn though.
+
+    The new textures were created by using freely available meshes
+    from ShareCG.com, and importing them (as best I could) into
+    blender, painting/texturing/lighting them, then rendering the
+    'scene' to create a texture for Conquest.
+
+    I'd love to do this for all of the ships in Conquest, as it looks
+    really nice.  Maybe someday if Conquest ever goes 3D then these
+    models would be used as the ships themselves :)
+
+  - While adding the new ship textures, decided to redo texture
+    mapping so that it is consistant within Conquest without various
+    hacks.  As a result, all textures have been modified:
+
+       - Always force the TGA origin to be in the Lower left.
+         Previously it was the upper right.  In gimp, if saving a
+         texture, just make sure you specify 'Origin in lower left'
+         when saving.  Texture mapping code in Conquest will always
+         assume this from now on.
+
+       - 0 degrees is 'east' in conquest, so now it is this way in the
+         textures too.  All textures rotated 90 deg so that the
+         'front' of an object always points east, rather than north
+         like it used to.
+
+  - Enemy ship box now draws the alert box at the ship's depth plane to
+    avoid perspective issues.
+
+  - CQI Textures can now be loaded as a luminance texture by
+    specifying
+
+               luminance "yes"
+
+    in the texture definition.
+
+    This allows a grey scale (luminance) image to be created based on
+    an RGB[A] texture.  These greyscale images are now used to
+    generate textures for all of the ico-ship displays in the hud.
+    Therefore, the seperate ico-ship textures (12) have been removed.
+    This looks alot nicer as well as not requiring the creation of
+    extra textures when adding a new ship texture :)
+
+  - drawLineBox now supports a Z component.
+
+  - drawTexQuad now can properly support both perspective and
+    orthographic projections with regard to proper texture coordinate
+    mapping.
+
+  - fix up the icon-ship area so that the icon ship is always drawn within
+    a square to prevent 'stretching' issues.
+
+  - do not color torps according to their 'danger' level (green,
+    yellow, red) anymore, instead just use whatever the torp texure
+    provides.  It's up to you, as the ships captain, to know whether
+    an approaching torp is dangerous or not.  When in doubt, raise
+    shields. :)
+
+  - in line with above, add some 'purple-ness' to the orion torps
+    (instead of pure white).  The Orions really dig purple.
+
+  - make GLColor_t a union, containing both the individual color
+    components and a vector pointing toward them, suitable for use
+    with glColor*v() calls.
+
+  - make getLocalhost() more informative during failures.
+
+  - switch to using a new GLTexture_t definition in as many places as
+    possible, rather than keeping copies of colors, texture id's, etc
+    in various structs (GLShips, GLPlanets, etc).
+
+    This simplifies a variety of things, in addition to being more
+    readable and wasting less memory.
+
+  - remove as many hardcoded glColor*() calls by always using the
+    texture's color specification.  CQI will now warn when a texture
+    is defined that is missing a color specification.  Since it will
+    be black and transparent, it might be somewhat hard to see :)
+
+  - to avoid potential NULL pointer dereferences, create a 'default'
+    checkerboard texture to use in certain cases where a texture
+    *must* be present, like ships.
+
+  - use the new GLTEX_ID and GLTEX_COLOR helpers whereever possible.
+
+  - GLShips, GLPlanets, and Doomsday now use GLTexture pointers rather
+    than copies of texid's and colors.
+
+  - color specifications added to all texture definitions in
+    texturesrc that were missing them.
+
+  - add new 'lamp' textures (for the ico-ship area) and relevant code.
+    Think of the lamps as a 'check engine' light on your car :)
+
+    Lamps are displayed for hull, shields, engine temp, weapon temp,
+    and fuel - should they experience a condition you should know
+    about (critical/failure).
+
+  - clean up the CRIT defines and use them rather than hardcoding the
+    relevant thresholds in the code.
+
+  - remove cqsEffectPlayTracked() and move it's functionality into
+    cqsEffectPlay - there's no point in having two play functions that
+    are virtually identical.
+
+  - modify drawTexQuad so that textures can be mapped rotated 90
+    degrees from their normal mapping.
+
+  - clean up the classd (mars), uranus, and luna textures (shrink if
+    neccessary so as not to affect texture border, remove 'slutty'
+    pixels :)
+
+  - rewrite drawTexBoxCentered to use drawTexQuad
+
+  - re-order drawTexQuad to use x, y, and z as the first 3 args.  Use
+    GL_QUADS rather than GL_POLYGON
+
+  - fix up some utLog error messages that could core if ever called :(
+
+  - add a seperate blinkerQue for blinker animdefs and set them up in
+    blinker.[hc]. Blinkers can be used in a variety of places in
+    conquestgl, so no need to confine them to the CP and PlayB nodes
+    via GL.c.  They are initted as part of graphicsInit(), after CQI
+    has loaded all of the textures and animdefs, so they can now be
+    used in any node without 'headaches' or special code - just
+    include blinker.h and have fun.
+
+  - get rid of TEX_HUD_ITORPIN, not used anywhere.
+
+
 8.4.1 (stable) 09/13/2008
 
   - 8.4.1 stable release.
