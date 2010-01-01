@@ -693,8 +693,8 @@ int uiUpdateTorpDir(int snum, int tnum)
     return FALSE;
 
   torpdir[snum][tnum] = utAngle(0.0, 0.0, 
-                              Ships[snum].torps[tnum].dx, 
-                              Ships[snum].torps[tnum].dy);
+                                Ships[snum].torps[tnum].dx, 
+                                Ships[snum].torps[tnum].dy);
   return TRUE;
 }
 
@@ -1608,6 +1608,7 @@ void dspInitData(void)
   dConf.vScaleLR = dConf.vScaleSR = 1.0;
 
   hudInitData();
+  GLGeoChange = 1;
 
   return;
 }
@@ -1877,6 +1878,7 @@ resize(int w, int h)
   
   DSPFSET(DSP_F_INITED);
 
+  GLGeoChange++;
   glutPostRedisplay();
   
   return;
@@ -2081,8 +2083,9 @@ drawShip(GLfloat x, GLfloat y, GLfloat angle, char ch, int snum, int color,
   static int norender = FALSE;
   int steam = Ships[snum].team, stype = Ships[snum].shiptype;
   GLfloat scaleFac = (scale == SCALE_FAC) ? dConf.vScaleSR : dConf.vScaleLR;
-  static int firsttime = TRUE;
-  static GLfloat phaserRadiusSR, phaserRadiusLR, phaserRadius;
+  static Unsgn32 geoChangeCount = 0;
+  static GLfloat phaserRadiusSR, phaserRadiusLR;
+  GLfloat phaserRadius;
 
   if (norender)
     return;
@@ -2097,9 +2100,9 @@ drawShip(GLfloat x, GLfloat y, GLfloat angle, char ch, int snum, int color,
         return;                 /* we need to bail here... */
       }
 
-  if (firsttime)
-    {                         /* firsttime things */
-      firsttime = FALSE;
+  if (geoChangeCount != GLGeoChange)
+    {
+      geoChangeCount = GLGeoChange;
       /* setup the ship sizes - ships are SHIPSIZE CU's. */
       shipsizeSR = cu2GLSize(SHIPSIZE * OBJ_PRESCALE, -SCALE_FAC);
       shipsizeLR = cu2GLSize(SHIPSIZE * OBJ_PRESCALE, -MAP_FAC);
@@ -2110,7 +2113,6 @@ drawShip(GLfloat x, GLfloat y, GLfloat angle, char ch, int snum, int color,
 
   size = ((scale == SCALE_FAC) ? shipsizeSR : shipsizeLR);
   phaserRadius = ((scale == SCALE_FAC) ? phaserRadiusSR : phaserRadiusLR);
-
 
   /* make a little more visible in LR */
   if (scale == MAP_FAC) 
@@ -2262,7 +2264,7 @@ void drawDoomsday(GLfloat x, GLfloat y, GLfloat dangle, GLfloat scale)
   static const GLfloat z = 1.0;
   static GLfloat doomsizeSR, doomsizeLR;
   GLfloat size;  
-  static GLfloat beamradius;
+  static GLfloat beamRadius;
   static int norender = FALSE;  /* if no tex, no point... */
   static real ox = 0.0, oy = 0.0; /* for doomsday weapon antiproton beam */
   static int drawAPBeam = TRUE;
@@ -2273,7 +2275,7 @@ void drawDoomsday(GLfloat x, GLfloat y, GLfloat dangle, GLfloat scale)
   static Unsgn32 lastbeam = 0;
   real dis, ang;
   GLfloat scaleFac = (scale == SCALE_FAC) ? dConf.vScaleSR : dConf.vScaleLR;
-  static int firsttime = TRUE;
+  static Unsgn32 geoChangeCount = 0;
 
   if (norender)
     return;
@@ -2315,15 +2317,15 @@ void drawDoomsday(GLfloat x, GLfloat y, GLfloat dangle, GLfloat scale)
         beamfx = cqsFindEffect("doomsday-beam");
     }        
 
-  if (firsttime)
+  if (geoChangeCount != GLGeoChange)
     {
-      firsttime = FALSE;
+      geoChangeCount = GLGeoChange;
 
-      /* doomsday is DOOMSIZE CU's in size */
+     /* doomsday is DOOMSIZE CU's in size */
       doomsizeSR = cu2GLSize(DOOMSIZE * OBJ_PRESCALE, -SCALE_FAC);
       doomsizeLR = cu2GLSize(DOOMSIZE * OBJ_PRESCALE, -MAP_FAC);
 
-      beamradius = cu2GLSize(PHASER_DIST * 1.333, -SCALE_FAC);
+      beamRadius = cu2GLSize(DOOMSDAY_DIST, -SCALE_FAC);
     }
 
   size = ((scale == SCALE_FAC) ? doomsizeSR : doomsizeLR);
@@ -2358,7 +2360,7 @@ void drawDoomsday(GLfloat x, GLfloat y, GLfloat dangle, GLfloat scale)
     }
 
   /* if it's time to draw the beam, then let her rip */
-  if ( drawAPBeam && (scale == SCALE_FAC))
+  if ( drawAPBeam && (scale == SCALE_FAC) )
     {
       static const GLfloat beamwidth = 3.0;
 
@@ -2393,26 +2395,27 @@ void drawDoomsday(GLfloat x, GLfloat y, GLfloat dangle, GLfloat scale)
                 GLTEX_COLOR(GLDoomsday.beam).a * 0.1);
       
       glTexCoord2f(0.0f, 1.0f);
-      glVertex3f(beamwidth / 2.0, beamradius, -1.0); /* ur */
+      glVertex3f(beamwidth / 2.0, beamRadius, -1.0); /* ur */
       
       glTexCoord2f(0.0f, 0.0f);
-      glVertex3f(-(beamwidth / 2.0), beamradius, -1.0); /* ul */
+      glVertex3f(-(beamwidth / 2.0), beamRadius, -1.0); /* ul */
       
       glEnd();
       
       glDisable(GL_TEXTURE_2D);
       glPopMatrix();
 
-      /*
-        Cataboligne - sound code 11.16.6
-        play doombeam sound
-      */
-      if (dis < YELLOW_DIST && ((frameTime - lastbeam) > beamfx_delay))
-        {
-          cqsEffectPlay(beamfx, NULL, YELLOW_DIST * 2, dis, ang);
-          lastbeam = frameTime;
-        }
   }  /* drawAPBeam */
+
+  /* Cataboligne - sound code 11.16.6
+   * play doombeam sound
+   */
+  if (drawAPBeam && dis < YELLOW_DIST && 
+      ((frameTime - lastbeam) > beamfx_delay))
+    {
+      cqsEffectPlay(beamfx, NULL, YELLOW_DIST * 2, dis, ang);
+      lastbeam = frameTime;
+    }
 
   glPushMatrix();
   glLoadIdentity();
@@ -2475,13 +2478,13 @@ void drawNEB(int snum)
   real nearx, neary;
   GLfloat tx, ty;
   GLfloat nebWidth, nebHeight;
-  GLfloat nebWidthSR, nebHeightSR;
-  GLfloat nebWidthLR, nebHeightLR;
+  static GLfloat nebWidthSR, nebHeightSR;
+  static GLfloat nebWidthLR, nebHeightLR;
   GLfloat nebX, nebY;
   static int norender = FALSE;
   /* our wall animation state */
   static animStateRec_t nebastate;    /* initial state of neb texture */
-
+  static Unsgn32 geoChangeCount = 0;
 
   if (norender)
     return;
@@ -2499,17 +2502,24 @@ void drawNEB(int snum)
     }
 
   /* figure out appropriate width/height of neb quad in SR/LR */
-  /* width/height SR */
-  GLcvtcoords(0.0, 0.0, NEGENBEND_DIST * 2.0, 
-              (NEGENBEND_DIST - NEGENB_DIST), 
-              SCALE_FAC,
-              &nebWidthSR, &nebHeightSR);
-  
-  /* width/height LR */
-  GLcvtcoords(0.0, 0.0, NEGENBEND_DIST * 2.0, 
-              (NEGENBEND_DIST - NEGENB_DIST), 
-              MAP_FAC,
-              &nebWidthLR, &nebHeightLR);
+
+  if (geoChangeCount != GLGeoChange)
+    {
+      geoChangeCount = GLGeoChange;
+
+      /* width/height SR */
+      GLcvtcoords(0.0, 0.0, NEGENBEND_DIST * 2.0, 
+                  (NEGENBEND_DIST - NEGENB_DIST), 
+                  SCALE_FAC,
+                  &nebWidthSR, &nebHeightSR);
+      
+      /* width/height LR */
+      GLcvtcoords(0.0, 0.0, NEGENBEND_DIST * 2.0, 
+                  (NEGENBEND_DIST - NEGENB_DIST), 
+                  MAP_FAC,
+                  &nebWidthLR, &nebHeightLR);
+
+    }
 
   /* see if a neb wall is actually visible.  If not, we can save alot of
      cycles... */
@@ -2520,7 +2530,7 @@ void drawNEB(int snum)
   if (SMAP(snum) && !UserConf.DoLocalLRScan)
     return;
 
-  /* if we are inside the barrier. of course we
+  /* if we are inside the barrier, of course we
      can see it */
    if (fabs( Ships[snum].x ) >= NEGENB_DIST && 
        fabs( Ships[snum].x ) <= NEGENBEND_DIST)
@@ -3535,5 +3545,7 @@ void setViewerScaling(int scale, int isLR)
         }
      }
   
+  GLGeoChange++;
+
   return;
 }

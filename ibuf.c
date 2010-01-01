@@ -156,6 +156,10 @@ int ibufExpandMouseMacro(int but, Unsgn32 mods, real mangle)
 
   s = UserConf.Mouse[but][mods];
 
+  /* return FALSE for empty/undeclared macros */
+  if (!s || !*s)
+    return FALSE;
+
 #if defined(DEBUG_MACROS)
   utLog("ibufExpandMouseMacro(): got MOUSE Macro Key: %d, mod %d string = '%s'", but,
        mods, s);

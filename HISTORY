@@ -33,7 +33,7 @@
 
     - rework of the icon-ship display:
 
-      - now use a luminence variant of the main ship texture as the
+      - now use a luminance variant of the main ship texture as the
         ico-ship rather than a seperate texture.
 
       - implement 'lamps' rather than the text (cloaking, repair,
@@ -48,8 +48,7 @@
 
    - non-visible changes
 
-     - rework of the texture represnetation and color representation
-       in conquestgl
+     - rework of texture and color representation in conquestgl
 
      - rework of the packet handling functions.
 

@@ -66,9 +66,13 @@ SOUNDS="sound/*.ogg"
 MANPAGES="*.man"
 TRC="*.trc"
 
+CONTRIB_FILES = "contrib/README.conquest-metaserver-monitor 
+                 contrib/conquest-metaserver-monitor.awk"
+
 mkdir $CONQVER 2>/dev/null
 mkdir $CONQVER/img
 mkdir $CONQVER/sound
+mkdir $CONQVER/contrib
 
 cp -p $FILELIST $CONQVER/
 cp -p conquest.txt $CONQVER/$CONQVER.txt
@@ -77,6 +81,8 @@ cp -p $SOUNDS $CONQVER/sound/
 cp -p $IMAGES $CONQVER/img/
 cp -p $MANPAGES $CONQVER/
 cp -p $TRC $CONQVER/
+
+cp -p $CONTRIB_FILES $CONQVER/contrib
 
 # now the terminfo files
 mkdir $CONQVER/ti
@@ -87,12 +93,14 @@ chmod 644 $CONQVER/ti/*
 chmod 644 $CONQVER/img/*
 chmod 644 $CONQVER/sound/*
 chmod 644 $CONQVER/*.trc
+chmod 644 $CONQVER/contrib/*
 
 chmod 644 $CONQVER/*
 
 chmod 755 $CONQVER/ti
 chmod 755 $CONQVER/img
 chmod 755 $CONQVER/sound
+chmod 755 $CONQVER/contrib
 chmod 755 $CONQVER/configure $CONQVER/config.guess $CONQVER/config.sub 
 chmod 755 $CONQVER/install-sh $CONQVER/ylwrap
 

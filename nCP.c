@@ -3543,7 +3543,7 @@ static int nCPInput(int ch)
 static int nCPMInput(mouseData_t *mdata)
 {
 #if 0
-  utLog ("%s: mod = %08x, button = %d state = %d\n", 
+  utLog("%s: mod = %08x, button = %d state = %d\n", 
         __FUNCTION__,
         mdata->mod,
         mdata->button,
@@ -3559,30 +3559,33 @@ static int nCPMInput(mouseData_t *mdata)
       /* compute an angle relative to center of viewer and do
          the macro thang */
       real dir = utAngle((real)(dConf.vX + (dConf.vW / 2.0)), 
-                       (real)(dConf.vY + (dConf.vH / 2.0)), 
-                       (real)mdata->x, 
-                       (real)(dConf.vY + dConf.vH) - ((real)mdata->y - dConf.vY)
-                       );
+                         (real)(dConf.vY + (dConf.vH / 2.0)), 
+                         (real)mdata->x, 
+                         (real)(dConf.vY + dConf.vH) - ((real)mdata->y - dConf.vY)
+                         );
 
-      ibufExpandMouseMacro(mdata->button, mdata->mod, dir);
+      if (ibufExpandMouseMacro(mdata->button, mdata->mod, dir))
+        {
+          /* Valid macros only */
 
-      /* clean up the state - stop bombing/beaming if neccessary... */
-      if (state == S_BOMBING)
-        {
-          cqsEffectStop(bombingHandle, FALSE);
-          sendCommand(CPCMD_BOMB, 0); /* to be sure */
-          state = S_NONE;
-          prompting = FALSE;
-          hudClearPrompt(MSG_LIN2);
-        }
-      
-      if (state == S_BEAMING)
-        {
-          cqsEffectStop(beamHandle, FALSE);
-          sendCommand(CPCMD_BEAM, 0); /* to be sure */
-          state = S_NONE;
-          prompting = FALSE;
-          hudClearPrompt(MSG_LIN2);
+          /* clean up the state - stop bombing/beaming if neccessary... */
+          if (state == S_BOMBING)
+            {
+              cqsEffectStop(bombingHandle, FALSE);
+              sendCommand(CPCMD_BOMB, 0); /* to be sure */
+              state = S_NONE;
+              prompting = FALSE;
+              hudClearPrompt(MSG_LIN2);
+            }
+          
+          if (state == S_BEAMING)
+            {
+              cqsEffectStop(beamHandle, FALSE);
+              sendCommand(CPCMD_BEAM, 0); /* to be sure */
+              state = S_NONE;
+              prompting = FALSE;
+              hudClearPrompt(MSG_LIN2);
+            }
         }
     }
 

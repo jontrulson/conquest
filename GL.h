@@ -79,12 +79,18 @@ GLfloat scaleFactorsSR[10] = {
 
 GLTexture_t defaultTexture;
 
+/* count resize/scale change events so functions that care, can detect
+ * them and do the right thing.
+ */
+Unsgn32 GLGeoChange = 0;
+
 #else
 extern GLShip_t GLShips[NUMPLAYERTEAMS][MAXNUMSHIPTYPES]; 
 
 extern GLfloat  scaleFactorsLR[10];
 extern GLfloat  scaleFactorsSR[10];
 extern const GLTexture_t defaultTexture;
+extern const Unsgn32 GLGeoChange;
 #endif
 
 void drawPlanet( GLfloat x, GLfloat y, int pnum, int scale,
