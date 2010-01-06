@@ -2321,7 +2321,7 @@ void drawDoomsday(GLfloat x, GLfloat y, GLfloat dangle, GLfloat scale)
     {
       geoChangeCount = GLGeoChange;
 
-     /* doomsday is DOOMSIZE CU's in size */
+      /* doomsday is DOOMSIZE CU's in size */
       doomsizeSR = cu2GLSize(DOOMSIZE * OBJ_PRESCALE, -SCALE_FAC);
       doomsizeLR = cu2GLSize(DOOMSIZE * OBJ_PRESCALE, -MAP_FAC);
 

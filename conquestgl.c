@@ -77,7 +77,6 @@ void printUsage()
   printf("                      recfile will be in compressed format\n");
   printf("                      if conquest was compiled with libz\n");
   printf("                      support\n");
-  printf("    -t               telnet mode (no user conf load/save)\n");
   
   printf("    -M metaserver    specify alternate <metaserver> to contact.\n");
   printf("                      default: %s\n", META_DFLT_SERVER);
@@ -390,10 +389,6 @@ int main(int argc, char *argv[])
                 exit(1);
               }
           }
-        break;
-
-      case 't':
-        confSetTelnetClientMode(TRUE);
         break;
 
       case 'P':

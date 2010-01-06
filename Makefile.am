@@ -27,7 +27,7 @@ TCPW_H = tcpwrap.h
 TCPW_C = tcpwrap.c
 
 man6_MANS = conqdriv.man conqmetad.man conqoper.man conquest.man \
-	conquestd.man conquestsh.man conqai.man conqstrat.man \
+	conquestd.man conqai.man conqstrat.man \
 	conqinit.man conquestgl.man
 
 XLIBS = @X_LIBS@ @X_EXTRA_LIBS@ -lglut -lGL -lGLU -lXt $(SDL_LIBS) @X_PRE_LIBS@ -lXext -lXi -lX11 -lXmu  
@@ -35,7 +35,6 @@ XLIBS = @X_LIBS@ @X_EXTRA_LIBS@ -lglut -lGL -lGLU -lXt $(SDL_LIBS) @X_PRE_LIBS@ 
 INCLUDES = -DCONQUEST_GROUP=\"$(CONQGROUP)\" \
 	-DCONQSTATE=\"$(CONQLOCALSTATEDIR)\" -DCONQLIBEXEC=\"$(CONQLIBEXECDIR)\" \
 	-DCONQSHARE=\"$(CONQDATADIR)\" -DCONQETC=\"$(CONQSYSCONFDIR)\" \
-	-DCONQUESTSH_EXEC=\"$(DESTDIR)$(bindir)/conquest$(EXEEXT)\" \
 	-DCONQDOCDIR=\"$(CONQDATADIR)\" \
 	@X_CFLAGS@
 
@@ -105,10 +104,10 @@ libcqsound_la_LDFLAGS = -version-info 1:0:0
 
 if GLCLIENT
 bin_PROGRAMS = conquest conquestgl conqai conqoper conqstrat \
-	conquestd conquestsh conqmetad conqinit
+	conquestd conqmetad conqinit
 else
 bin_PROGRAMS = conquest conqai conqoper conqstrat \
-	conquestd conquestsh conqmetad conqinit
+	conquestd conqmetad conqinit
 endif
 
 libexec_PROGRAMS = conqdriv
@@ -147,8 +146,6 @@ conqstrat_LDADD = libconquest.la $(LEXLIB) $(YACCLIB)
 
 conqinit_SOURCES = conqinit.c conqinit.h 
 conqinit_LDADD = libconquest.la libconqinit.la $(LEXLIB) $(YACCLIB) 
-
-conquestsh_SOURCES = conquestsh.c
 
 if TCPW
 conqmetad_SOURCES = conqmetad.c meta.h $(TCPW_H) $(TCPW_C) 

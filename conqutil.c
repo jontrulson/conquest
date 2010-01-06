@@ -591,14 +591,10 @@ void utLog(char *fmt, ...)
 
               if (!nowarn)
                 {
-                  /* don't tell telnet users about logfile
-                     creation failures */
-                  if (!confGetTelnetClientMode())
-                    fprintf(stderr, "utLog(): creat(%s): %s\n",
-                            errfile,
-                            strerror(errno));
-                  else
-                    nowarn = TRUE;
+                  fprintf(stderr, "utLog(): creat(%s): %s\n",
+                          errfile,
+                          strerror(errno));
+                  nowarn = TRUE;
                 }
 	      
               if (!systemlog)

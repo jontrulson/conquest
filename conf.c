@@ -32,22 +32,6 @@
 
 #define HOME_BUFSZ 1024
 
-/* if this is set, then the conquest client is running as the shell on
-   a telnet based server.  In this case, we will never try to load or save
-   the user config file.   GetConf() will only set the defaults. */
-static int telnetClient = FALSE;
-
-void confSetTelnetClientMode(int telnetc)
-{
-  telnetClient = telnetc;
-  return;
-}
-
-int confGetTelnetClientMode(void)
-{
-  return telnetClient;
-}
-
 /* set default sys config */
 static void setSysConfDefaults(void)
 {
@@ -86,10 +70,7 @@ void setUserConfDefaults(void)
   UserConf.NoColor = FALSE;
   UserConf.NoRobotMsgs = FALSE;
 
-  if (telnetClient)             /* 5/sec for telneters, 10 for everyone else */
-    UserConf.UpdatesPerSecond = 5;
-  else
-    UserConf.UpdatesPerSecond = 10;
+  UserConf.UpdatesPerSecond = 10;
 
   UserConf.DistressToFriendly = FALSE;
   UserConf.AltHUD = FALSE;
@@ -140,9 +121,6 @@ static void checkCreateUserConfDir(void)
   char buffer[BUFFER_SIZE];
   struct stat sbuf;
   char *home;
-  
-  if (telnetClient)             /* ...except for telnet users */
-    return;
   
   if ((home = getenv("HOME")) == NULL)
     {
@@ -475,10 +453,6 @@ int GetConf(int usernum)
 
   /* check for the user config dir */
   checkCreateUserConfDir();
-
-  /* a telnet client leaves here after the defaults are set */
-  if (telnetClient)
-    return TRUE;
 
   /* start building the filename */
   if ((homevar = getenv("HOME")) == NULL)
@@ -905,11 +879,6 @@ int MakeConf(char *filename)
 {
   FILE *conf_fd;
   int i, j, n;
-
-
-  /* a telnet client should never get here, but... */
-  if (telnetClient)
-    return TRUE;
 
   unlink(filename);
 

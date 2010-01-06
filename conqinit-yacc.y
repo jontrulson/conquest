@@ -70,32 +70,33 @@ static cqiSoundConfPtr_t       _cqiSoundConf;
 static cqiSoundPtr_t           _cqiSoundEffects;
 static cqiSoundPtr_t           _cqiSoundMusic;
 
-static int globalRead   = FALSE;
-static int numShiptypes = 0;
-static int numPlanets   = 0;
-static int numTextures  = 0;
-static int numAnimations= 0;
-static int numAnimDefs  = 0;
+static int globalRead        = FALSE;
+static int numShiptypes      = 0;
+static int numPlanets        = 0;
+static int numTextures       = 0;
+static int numAnimations     = 0;
+static int numAnimDefs       = 0;
 static int numSoundEffects   = 0;
 static int numSoundMusic     = 0;
 
-static int fileNumTextures = 0; /* # of textures loaded per file */
+/* # loaded per file */
+static int fileNumTextures   = 0;
 static int fileNumAnimations = 0;
-static int fileNumAnimDefs = 0;
-static int fileNumEffects = 0;
-static int fileNumMusic = 0;
+static int fileNumAnimDefs   = 0;
+static int fileNumEffects    = 0;
+static int fileNumMusic      = 0;
 
-static cqiPlanetInitRec_t  currPlanet;
-static cqiTextureInitRec_t currTexture;
+static cqiPlanetInitRec_t      currPlanet;
+static cqiTextureInitRec_t     currTexture;
 
 static cqiAnimationInitRec_t   currAnimation;
 static cqiAnimDefInitRec_t     currAnimDef;
 
 static cqiTextureAreaRec_t     currTexArea;
-static int numTexAreas = 0;
-static cqiTextureAreaPtr_t     currTexAreas = NULL;
+static int numTexAreas       = 0;
+static cqiTextureAreaPtr_t currTexAreas = NULL;
 
-static cqiSoundRec_t currSound;
+static cqiSoundRec_t           currSound;
 
 static void startSection(int section);
 static void endSection(void);

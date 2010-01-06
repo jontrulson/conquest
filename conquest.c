@@ -129,7 +129,6 @@ void printUsage()
   printf("                      recfile will be in compressed format\n");
   printf("                      if conquest was compiled with libz\n");
   printf("                      support\n");
-  printf("    -t              telnet mode (no user conf load/save)\n");
   printf("    -M metaserver   specify alternate <metaserver> to contact.\n");
   printf("                     default: %s\n", META_DFLT_SERVER);
   printf("    -P <cqr file>   Play back a Conquest recording (.cqr)\n");
@@ -285,7 +284,7 @@ int main(int argc, char *argv[])
   cInfo.remotehost = strdup("localhost"); /* default to your own server */
 
   /* check options */
-  while ((i = getopt(argc, argv, "mM:s:r:tP:Buv")) != EOF)    /* get command args */
+  while ((i = getopt(argc, argv, "mM:s:r:P:Buv")) != EOF)    /* get command args */
     switch (i)
       {
       case 'B':                 /* Benchmark mode, set recFrameDelay to 0.0 */
@@ -339,10 +338,6 @@ int main(int argc, char *argv[])
                 exit(1);
               }
           }
-        break;
-
-      case 't':
-        confSetTelnetClientMode(TRUE);
         break;
 
       case 'P':

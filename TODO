@@ -1,20 +1,103 @@
 
-- BUGS
+- PROTOCOL
 
-  - protocol
-
-    - Sgn16 (x100) 'rating' in _sp_user is wrong.  either needs to be
-      expanded (Sgn32) or re-scaled (x10).  ratings over 327.0
-      will be wrong otherwise...
+  - Sgn16 (x100) 'rating' in _sp_user is wrong.  either needs to be
+    expanded (Sgn32) or re-scaled (x10).  ratings over 327.0 will be
+    wrong otherwise...
 
   - send dwarp in ship packet so sounds can work better.
 
-- improved configure support
+  - new server flag? NoKillTeam - determines whether a ship can
+    set war with it's own team, or maybe more of a 'Friendly Fire' flag?
 
-  - detect when vital things are missing (bison, flex, glut.h, etc.)
+  - add pads to those structures not having them?  
 
-  - add a BUILD REQUIREMENTS section somewhere - web page, README, build
-    docs etc.  
+  - better UDP negotiation.  Option to enable/disable from within the
+    game. 
+
+  - for packets with strings, standardize string len (align 32b) -
+    same for meta proto?  increase MOTD, etc...?
+
+  - protocol versioning improvment... use major == incompat, minor ==
+    compat...
+
+  - revamp so there is eough info provided to the client to create the
+    common block(s) from scratch, rather than relying on compiled-in
+    definitions, sizes, names, etc.  
+
+  - send planet size with planet packets (needs to be added to CB)
+
+  - doomsday, add attacking flag (so we know when to draw the APB
+    conclusively rather that trying to 'detect' it in the client)
+  
+  - ships
+
+    - look into 'dead reckoning' for client display of ship motion.
+
+    - look at some way of allowing triangulation of cloaked ships,
+      like in the pre client/se3rver days.  The trick is to be able to
+      do this without out making it possible to cheat by modifying the
+      client.
+
+    - add a Z component for the future?
+
+  - support downloading of textures from server?
+
+  - meta
+
+    - detect/highlight closed/private servers.  make 'dimmer' sorted
+      last? 
+
+
+  - provide a mechanism to support older protocol(s?), mainly to allow
+    playback/conversion of older recordings (which may be using an
+    older protocol).
+
+- COMMON BLOCK
+
+  - add 'size' (in CU's) to planets.
+
+  - resignation - preserve history data.
+
+  - add 'conqinit' CQI info (global, shiptypes, etc) to CB.  Will also
+    need protocol support.
+
+  - use flags for planets/ships rather than just the int booleans now
+    in use (for example, 'core' and 'visible' items.
+
+    add 'homeplanet' flag so that the hardcoded conquest game values
+    are not needed for a teams homeplanet.  Also would need something
+    like 'capitalplanet' to indicate the 'primary' planet in the home
+    system (that new ships are automatically set course for when
+    entering the game).
+
+    add a Z component for the future for objects (ships/planets/etc)?
+
+  - generalize doomsday into a 'eater type' so that other eaters can
+    be created (space ameobe, nomad, etc)?
+
+  - come up with some way to export/import CB data into a text file
+    for backup, exchange to other machines/architectures, and to
+    facilitate upgrading of an existing CB to a new one without
+    losing much (any?) data.
+
+  - switch to using 16byte alignment on intel systems, like we use on
+    all other non-intel platforms (CB_ALIGN()).
+
+  - think about seperate CB's for ships, planets, and users with '.cb'
+    extension. 
+
+    - Would require protocol changes.  Want to keep cqr's compatible
+      as well.
+
+      conversion to a new cmnblk format should be possible without
+      losing existing data.
+
+    - would allow more dynamic creation of games (for example adding a
+      new team, increasing the number of ships, planets, etc).
+
+    - allow definiton of new ship types/capabilities/limits?  
+
 
 - GENERAL
 
@@ -24,23 +107,6 @@
     - how to handle/sync orbiting, tow, etc...
 
   - observer support?  Can see viewer view only (no hud).
-
-  - new server flag? NoKillTeam - determines whether a ship can
-    set war with it's own team.
-
-  - split up common block
-
-    - ship, user, game/admin common, planets, teams, etc.  Would
-      require protocol changes.  Want to keep cqr's compatible as
-      well.
-
-      conversion to a new cmnblk format should be possible without
-      losing existing data.
-
-    - would allow more dynamic creation of games (for example adding a
-      new team, increasing the number of ships, planets, etc).
-
-    - allow definiton of new ship types/capabilities/limits?  
 
   - provide 'game config' dir containing config files that specify
     things like number of ships allowed, planet definitions (for custom
@@ -62,13 +128,10 @@
     - maybe if conquest was run with '-m', then when the users quits
       from the main menu, you go back to the meta list?  
 
-  - resignation - preserve history data.
-
-  - prevent team killing (NoTK flag, on by default)
+  - might be getting time to get rid of the curses client and rename
+    conquestgl to conquest?
 
 - IP restrictions?
-
-  - how to handle telnet servers?
 
   - would need new 'client driver' common block, NUMSHIPS structures
     with IP, PID, interclient-event broadcast flags, etc.
@@ -78,81 +141,21 @@
   - default server restriction of two ships (conquestrc configurable)
     per IP.
 
-    - consider enabling/re-implementing the multiple ships per user stuff?
-
-
 - OpenGL
-
-  - individual textures for each planet
-
-  - more flexible color specification for suns, etc rather than being
-    limited to primary colors like red, blue, green, yellow etc.
 
   - asynchronous server connection handling, so client isn't 'stuck'
     while establishing a connection to a server.
 
-  - SDL backend?
-
-  - have doomsday 'beam' rendered when it's attacking it's target.
-
-    - have server send an attacking flag, and client is responsible
-      for drawing it.
+  - SDL OpenGL backend?  remove glut?
 
   - bigger messages area.
 
-  - enemy kills box bigger
-
   - indicate team war stat below icon?  Use 'team' icons?
 
-  - add option to disable the 'pulse' messages.
-
-  - texcoord {} subsection within a texture {} subsection, so some of
-    Cat's missing stuff could be supported.
-
-- PROTOCOL
-
-  - add pads to those structures not having them?
-
-  - better UDP negotiation.  Option to enable/disable from within the
-    game. 
-
-  - for packets with strings, standardize string len (align 32b) -
-    same for meta proto?  increase MOTD, etc...?
-
-  - versioning improvment... use major == incompat, minor == compat...
-
-  - revamp so there is eough info provided to the client to create the
-    common block(s) from scratch, rather than relying on compiled-in
-    definitions, sizes, names, etc.
-
-  - UDP improvements.  allow to negotiate while playing.  if client
-    gets udp error, send packet (TCP) to server telling it to switch
-    to TCP only.
-
-  - planets
- 
-    - add size, color items.
-
-    - doomsday, add attacking flag (so we know when to draw the APB
-      conclusively rather that trying to 'detect' it in the client)
-  
-  - ships
-
-    - look into 'dead reckoning' for client display of ship motion.
-
-    - look at some way of allowing triangulation of cloaked ships.
-
-  - support downloading of textures from server?
-
-  - meta
-
-    - detect/highlight closed/private servers.  make 'dimmer' sorted
-      last? 
-
+  - add option to disable the 'pulse' messages. Or just rewrk them in
+    some way.
 
 - Blue Sky
-
-  - sound?  SDL?
 
   - different game types:
 

@@ -25,7 +25,6 @@ CONTENTS:
          ## running a normal server
          ## notifying the metaserver
          ## firewall considerations
-         ## providing telnet access to your server (optional)
 	 ## Expiring users
 	    # Disabling expiration of users
          ## Examples
@@ -137,7 +136,7 @@ CONTENTS:
       http://radscan.com/cgi-bin/conqmeta.pl
 
    If you want to be primitive, you can see the current list of
-   servers in raw format by simply:
+   servers in raw (pipe-delimited) format by simply:
 
       telnet conquest.radscan.com 1700
 
@@ -167,82 +166,6 @@ CONTENTS:
 
       1700/udp - if you want your own server to be able to announce
       it's availability to the metaserver at conquest.radscan.com.
-
-## providing telnet access to your server (optional)
-
-   In addition to the normal way of connecting to a Conquest server,
-   some server operators also like to provide a telnet'able interface.
-   I do this myself for those who do not want to download the client
-   and build Conquest, or for those who are on non-unix computers and
-   can't run the client even if they wanted to.
-
-   NOTE: You still need to setup a normal server as described above in
-   addition to the instructions below.
-
-   To run a telnet'able server, you need to create an account on your
-   machine that people will log into when they telnet to your machine.
-
-   I recommend user 'conquest' with a password of 'conquest'.
-
-   In a nutshell:
-
-   1. Compile and install Conquest as per the BUILDING section in the
-      INSTALL file.  Make sure it runs normally by starting a server,
-      and typing 'conquest' and goofing off for a little while.
-
-   2. Create the 'conquest' account on your system using whatever
-      means are appropriate for your system.  On UnixWare and newer
-      Linux's, I use something like 'useradd conquest'.
-
-   3. Set the 'conquest' user's shell to be '/full/path/to/conquestsh'.
-      Doing this insures that when someone logs into 'conquest' they
-      are sent directly into the game's login screen.  Also, if
-      Conquest should ever crash (which has never happened to my
-      knowledge ;-), the user will be automatically logged out of the
-      system.  There is no way I'm aware of that a Conquest player
-      could ever get to a command shell if you set it up this way
-      (since conquest itself is the user's shell).
-
-      On UnixWare I can do something like 'usermod -s
-      /opt/bin/conquestsh conquest' to do this. 
-
-      NOTE: You can edit and recompile conquestsh.c on your system if
-      you wish to change the default options it will pass to conquest.
-      It's a very simple program.
-
-      By default, conquestsh will exec '/full/path/to/conquest -t -s
-      localhost' when run.
-
-   4. set the password for the 'conquest' account.  I recommend that
-      you either:
-
-          A) set no password (the user goes straight in after typing
-             the username at the 'login:' prompt).
-
-          B) Set the password to empty (so a user enters [RETURN] at
-             the 'password:' prompt), or
-
-          C) set the password to 'conquest'
-
-      In that order... After all you want to make it easy for people
-      to get into the game, right?
-
-    5. Test it out.  Try 'telnet localhost', login as 'conquest', and
-       enter whatever password you defined in step 4.  You should wind
-       up at the Conquest login screen.  Here you choose a username
-       (if you don't have one already), give a password, and you
-       should be at the Conquest main menu.  Enter the game and blow
-       up some things ;-)
-
-
-   NOTE: although telnet users will be able to change their options
-   from the conquest Options menu, they will not be able to save them.
-   Sorry.  Use a client instead.
-
-   If you want others to know about your telnet'able server, let me
-   know the particulars and I'll stick it in the 'Conquest Servers'
-   section of the Conquest webpage, since the meta server has no way
-   of knowing whether your server is reachable via a telnet interface.
 
 ## Expiring users
 
