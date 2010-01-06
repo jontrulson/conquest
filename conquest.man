@@ -74,12 +74,6 @@ Record the game to <record file>.
 Connect to server running on \fIserver\fP port \fIport\fP.  The default
 port is 1701.
 .TP 8
-.B \-t  
-Telnet mode.  Curses client only.  When running in telnet mode, user
-configuration files are never loaded nor stored, and the server update
-rate defaults to 5 per second.  This is only of use when running a
-telnetable server.  
-.TP 8
 .B \-P <record file> 
 Play back a previously recorded game.
 .TP 8
