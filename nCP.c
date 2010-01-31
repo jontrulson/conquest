@@ -2779,26 +2779,29 @@ static int nCPIdle(void)
   while ((pkttype = pktWaitForPacket(PKT_ANYPKT,
                                      buf, PKT_MAXSIZE, 0, NULL)) > 0)
     {
-        switch (pkttype)
-          {
-            case SP_ACK: 
-              sack = (spAck_t *)buf;
-                                /* see if it's a ping resp */
-              if (sack->code == PERR_PINGRESP)
-                {
-                  pingPending = FALSE;
-                  pktStats.pingAvg = (pktStats.pingAvg + (iternow - pingStart)) / 2;
-                  pingStart = 0;
-                  continue;
-                }
-              else
-                processPacket(buf);
-
-              break;
-          default:
+      switch (pkttype)
+        {
+          /* FIXME: pings/keepalives should be handled at the
+           *  renderNode() level, not here!  Next protocol rev. 
+           */
+        case SP_ACK: 
+          sack = (spAck_t *)buf;
+          /* see if it's a ping resp */
+          if (sack->code == PERR_PINGRESP)
+            {
+              pingPending = FALSE;
+              pktStats.pingAvg = (pktStats.pingAvg + (iternow - pingStart)) / 2;
+              pingStart = 0;
+              continue;
+            }
+          else
             processPacket(buf);
-            break;
-          }
+          
+          break;
+        default:
+          processPacket(buf);
+          break;
+        }
     }
 
   if (pkttype < 0)          /* some error */
@@ -2812,7 +2815,13 @@ static int nCPIdle(void)
   if (!pingPending && ((iternow - pingtime) > pingwait))
     {                           /* send a ping request */
       /* only send this if we aren't doing things that this packet would end
-         up cancelling... */
+       *  up canceling... 
+       */
+
+      /* FIXME: pings/keepalives should be handled at the renderNode()
+       *  level, not here!  The server should handle these
+       *  transparently without this crap.  Next protocol rev.
+       */
       if (state != S_REFITING && state != S_BOMBING && 
           state != S_BEAMING  && state != S_DESTRUCTING &&
           state != S_WARRING && state != S_AUTOPILOT)
@@ -3564,10 +3573,9 @@ static int nCPMInput(mouseData_t *mdata)
                          (real)(dConf.vY + dConf.vH) - ((real)mdata->y - dConf.vY)
                          );
 
+      /* Valid macros only */
       if (ibufExpandMouseMacro(mdata->button, mdata->mod, dir))
         {
-          /* Valid macros only */
-
           /* clean up the state - stop bombing/beaming if neccessary... */
           if (state == S_BOMBING)
             {

@@ -94,8 +94,9 @@ int   pktWaitForPacket(int type, char *buf, int blen,
 int   pktClientPacketSize(int type);
 int   pktServerPacketSize(int type);
 
-int   pktSocketHasData(void);
+int   pktSocketHasData(int sock);
 int   pktWrite(int socktype, void *data);
+int   pktReadPacketReady(void);
 int   pktRead(char *buf, int len, unsigned int delay);
 int   pktIsValid(int pkttype, void *pkt);
 

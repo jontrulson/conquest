@@ -30,6 +30,11 @@
   - doomsday, add attacking flag (so we know when to draw the APB
     conclusively rather that trying to 'detect' it in the client)
   
+   - rework ping/keepalive handling so that they are handled at the
+     renderNode level.  Ideally, most (if not all) packet handling
+     should be handled here so that node's don't need to owrry about
+     it in their Idle routines.
+
   - ships
 
     - look into 'dead reckoning' for client display of ship motion.
@@ -47,7 +52,6 @@
 
     - detect/highlight closed/private servers.  make 'dimmer' sorted
       last? 
-
 
   - provide a mechanism to support older protocol(s?), mainly to allow
     playback/conversion of older recordings (which may be using an

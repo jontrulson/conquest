@@ -121,6 +121,9 @@ unsigned int rbGet(ringBuffer_t *RB, Unsgn8 *buf, unsigned int len, int update)
   Unsgn8 *wptr = buf, *rptr;
   unsigned int rlen = len, tlen, ndata;
 
+  if (!len)
+    return 0;
+
   rptr  = RB->rp;
   ndata = RB->ndata;
 

@@ -1009,7 +1009,7 @@ CONTENTS:
                       This specifies the filename (basename only, no
                       extension) that contains the audio samples.  The
                       sound loader can handle .WAV or .OGG files
-                      only.  Only .OGG files are shipp with conquest. 
+                      only.  Only .OGG files are shipped with conquest. 
 
          volume:      NUMBER
                       0 to 100. Specifies the volume of the effect or
@@ -1041,7 +1041,7 @@ CONTENTS:
                       can be running concurrently.  Attempts to play
                       this effect after the limit is hit are ignored.
                       Music can never run at the same time as another
-                      music file, so this option is only of use will
+                      music file, so this option is only of use with
                       effects.  
 
          framelimit:  NUMBER
@@ -1063,21 +1063,20 @@ CONTENTS:
 
       There is a new executable called conqinit provided.  conqinit
       can be used to test the parser, perform syntax checking on
-      conqinitrc and texturesrc files, as well as to generate a
-      texdata.h file based on texturesrc data, or an initdata.h file
-      based on conqinitrc data.
+      conqinitrc and texturesrc files, as well as to generate an
+      initdata.h file based on conqinitrc data.
 
-      These (pre-generated) initdata.h and texdata.h files contain
-      defaults for the planets and textures, compiled directly into
-      conquest, in the event the respective conquestrc and texturesrc
-      file could not be found or successfully read on startup.
+      This (pre-generated) initdata.h file contains defaults for the
+      'global' and 'planet' sections, compiled directly into conquest,
+      in the event the respective conquestrc file could not be found
+      or successfully read on startup.
 
-      If you are modifying the conquestrc or texturesrc system files
-      used by conquest, you should at least run conqinit on them to
-      check for syntax or other validation errors.  If conquest (or
-      conquestd) fails to properly load and parse the file at
-      runtime, the built in internal defaults will be used and a warning
-      message will be logged.
+      If you are modifying the conquestrc system file used by
+      conquest, you should at least run conqinit on it to check for
+      syntax or other validation errors.  If conquest (or conquestd)
+      fails to properly load and parse the file at runtime, the built
+      in internal defaults will be used and a warning message will be
+      logged.
 
       examples:
 
@@ -1096,7 +1095,7 @@ CONTENTS:
 
       $ conqinit -t
 
-        parses the default texturesrc file and exits, reporting any
+        parses the global texturesrc file and exits, reporting any
         errors/warnings.
 
       $ conqinit -t -f <file>
@@ -1127,10 +1126,10 @@ CONTENTS:
         default conqinitrc for a system.
 
         If you do this, you will almost certainly want to edit the
-        file and at least change the colors of the suns, and the sun's
-        randomized army counts.  Since this data is not currently
-        stored in the common block, conqinit tries to choose
-        reasonable defaults for them.  Make sure it actually did :)
+        file and at least change the sun's randomized army counts.
+        Since this data is not currently stored in the common block,
+        conqinit tries to choose reasonable defaults for them.  Make
+        sure it actually did :)
 
         This capability is useful if you init the universe, then use
         conqoper to edit and or create new planets and arrange them
@@ -1141,8 +1140,8 @@ CONTENTS:
         Then copy that file over the system's conqinitrc file.  From
         then on, whenever the planets are initialized (due to a
         successful conquer, or the actions of an oper in conqoper),
-        your definitions will be used as the default planet
-        configuration. 
+        your definitions will be used as the default universe
+        configuration.
 
 
 ## example of a user overriding a system defined texture.
@@ -1211,6 +1210,7 @@ CONTENTS:
    characteristics: 
 
    - uncompressed or RLE compressed TGA
+   - image origin in Lower Left
    - 24 bit RGB or 32bit ARGB pixel data
    - be a power of two in their width and height, 256x128 is okay,
      3x27 is not. :)

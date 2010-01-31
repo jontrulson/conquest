@@ -1573,7 +1573,8 @@ void procBomb(cpCommand_t *cmd)
           SFCLR(snum, SHIP_F_BOMBING);
           return;
         }
-      if ( pktSocketHasData() )
+
+      if ( pktReadPacketReady() )
         {
           SFCLR(snum, SHIP_F_BOMBING);
           break;
@@ -1862,7 +1863,7 @@ void procBeam(cpCommand_t *cmd)
     {
       if ( ! clbStillAlive( Context.snum ) )
 	return;
-      if ( pktSocketHasData() )
+      if ( pktReadPacketReady() )
 	break;
       
       /* See if it's time to beam again. */
@@ -2026,7 +2027,7 @@ void procDestruct(cpCommand_t *cmd)
 	  return;
 	}
 
-      if ( pktSocketHasData() )
+      if ( pktReadPacketReady() )
 	{
 	  Ships[Context.snum].sdfuse = 0;
 	  pktSendAck(PSEV_INFO, PERR_CANCELED, NULL);
@@ -2108,7 +2109,7 @@ void procAutoPilot(cpCommand_t *cmd)
 	  laststat = now;
 	}
 
-      if ( pktSocketHasData() ) 
+      if ( pktReadPacketReady() ) 
         {
           pktSendAck(PSEV_INFO, PERR_CANCELED, NULL);
           break;

@@ -422,7 +422,9 @@ int pktWaitForPacket(int type, char *buf, int blen,
 	    return pkttype;
 
 	  if (pkttype != type && nakmsg) /* we need to use a msg nak */
-	    pktSendAck(PSEV_ERROR, PERR_UNSPEC, nakmsg); 
+            pktSendAck(PSEV_ERROR, PERR_UNSPEC, nakmsg); 
+
+          return 0;
 	}
 
       if (pkttype < 0)
@@ -470,15 +472,13 @@ int pktClientPacketSize(int type)
 }
 
 /* like iochav(), but for the network connection.  return true if there
-   is data ready on the socket(s) to be read. */
-int pktSocketHasData(void)
+   is data ready on the socket to be read. */
+int pktSocketHasData(int sock)
 {
   struct timeval timeout;
   fd_set readfds;
-  int maxfd;
   
-  /* sanity check */
-  if (tcp_sock < 0 && udp_sock < 0)
+  if (sock < 0)
     return FALSE;
 
   timeout.tv_sec = 0;		/* no wait */
@@ -486,14 +486,9 @@ int pktSocketHasData(void)
 
   FD_ZERO(&readfds);
 
-  if (tcp_sock >= 0)
-    FD_SET(tcp_sock, &readfds);
+  FD_SET(sock, &readfds);
 
-  if (udp_sock >= 0)
-    FD_SET(udp_sock, &readfds);
-
-  maxfd = max(tcp_sock, udp_sock);
-  if (select(maxfd + 1, &readfds, NULL, NULL, &timeout) > 0)
+  if (select(sock + 1, &readfds, NULL, NULL, &timeout) > 0)
     return TRUE;
   else
     return FALSE;
@@ -503,14 +498,24 @@ int pktSocketHasData(void)
 /* get a packet from a ringbuffer.  If there's no data, or not
  * enough data, return 0, else return the packet type (and data)  
  * this function is only suitable when reading data from a remote host.
+ * 
+ * If update is FALSE, then we do not actually remove the data from
+ * the RB.
  */
-static Unsgn8 _pktReadGetRB(ringBuffer_t *RB, void *buf, int blen)
+static Unsgn8 _pktReadGetRB(ringBuffer_t *RB, void *buf, int blen, int update)
 {
   int bu, len;
   Unsgn8 type = 0;
+  char tmppacket[PKT_MAXSIZE];
+  char *packet;
 
-  if (!buf || !blen)
+  if (!blen)
     return 0;
+
+  if (buf)
+    packet = (char *)buf;
+  else
+    packet = tmppacket;
 
   if ((bu = rbBytesUsed(RB)))
     {
@@ -543,8 +548,34 @@ static Unsgn8 _pktReadGetRB(ringBuffer_t *RB, void *buf, int blen)
               return 0;
             }
 
-          /* now get it for real */
-          rbGet(RB, buf, len, TRUE);
+          /* now get the whole packet, removing it from the RB if
+           *  update == TRUE
+           */
+          rbGet(RB, (Unsgn8 *)packet, len, update);
+
+          /* we check for CP_COMMAND->CPCMD_KEEPALIVE (server-side
+           * only) packets here.  If found, we remove it and just
+           * return 0, indicating that no valid packet (that we
+           * actually care about) is available.  Make no mistake, this
+           * is a hack that should be removed at the next proto rev.
+           */
+          if (!isClient)
+            {                   /* server-side */
+              if ( (type == CP_COMMAND) && 
+                   (CPCMD_KEEPALIVE == (((cpCommand_t *)packet)->cmd)) ) 
+                {
+                  /* (FIXME - this sucks.  next proto rev )
+                   */
+
+                  /* if it had not already been removed from the RB
+                   * above, then do it now. 
+                   */
+                  if (!update)
+                    rbGet(RB, NULL, len, TRUE);
+                  return 0;
+                }
+            }
+
           return type;
         }
     }
@@ -557,11 +588,20 @@ static int _pktReadSocket(int sock, ringBuffer_t *RB, void *buf, int blen)
 {
   int rv, len, rlen;
   int type;
-  char *packet = (char *)buf;
+  char tmppacket[PKT_MAXSIZE];
+  char *packet;
+
+  /* if buf is NULL, we are not interested in returning the packet,
+   *  just put it in the RB
+   */
+  if (buf)
+    packet = (char *)buf;
+  else
+    packet = tmppacket;
 
   rlen = min(blen, rbBytesFree(RB));
   
-  if ((rv = read(sock, buf, rlen)) < 0)
+  if ((rv = read(sock, packet, rlen)) < 0)
     {
       *packet = 0;
       utLog("%s: read(%d): %s", __FUNCTION__, rlen, strerror(errno));
@@ -572,11 +612,17 @@ static int _pktReadSocket(int sock, ringBuffer_t *RB, void *buf, int blen)
     {
       pktStats.rxBytes += rv;         /* update the counter */
 
+      /* if buf was NULL, then we just want to put whatever we read
+       * into the RB and leave.  Otherwise, we optimize by putting the
+       * appropriate data in the caller's read buffer directly and
+       * whatever is left over in the RB.
+       */
+
       /* if we read enough to return a packet, and there's
        * nothing in the rb, extract it and copy any leftovers into
        * the RB.
        */
-      if (!rbBytesUsed(RB))
+      if (buf && !rbBytesUsed(RB))
         {
           type = (Unsgn8)packet[0];
           
@@ -592,15 +638,67 @@ static int _pktReadSocket(int sock, ringBuffer_t *RB, void *buf, int blen)
                * just put the rest in the RB :)
                */
               if ((rv - len) > 0)
-                rbPut(RB, (void *)&packet[len], rv - len);
+                rbPut(RB, (Unsgn8 *)&packet[len], rv - len);
               
               return type;
             }
         }
 
       /* otherwise just put what we got into the RB */
-      rbPut(RB, buf, rv);
+      rbPut(RB, (Unsgn8 *)packet, rv);
     }
+
+  return 0;
+}
+
+/* check to see if there is a packet ready.  Do a read from the
+ * socket(s) first, but do not remove any packets from the RB(s)
+ * (assuming one is actually there).
+ *
+ * FIXME Right now, this function is used only in the server to detect
+ * when certain operations need to be cancelled, like destruct, bomb,
+ * beam, and autopilot.  As of the current rev (808) client UDP
+ * KEEPALIVE's are improperly terminating these operations, though we
+ * can't simply disable KEEPALIVE's during these operations since some
+ * firewalls require periodic outbound activity on UDP connections in
+ * order to keep the link active.  So, we need a function like this to
+ * prevent that from happening, until the next protocol revison deals
+ * with these cases in a better way..
+ * 
+ */
+int pktReadPacketReady(void)
+{
+  int type;
+  
+  /* KEEPALIVE packets (server-side) will be filtered out by
+   * _pktReadGetRB(), but we will still need check the UDP RB here so that
+   * it gets the chance.
+   *
+   * FIXME.  This whole KEEPALIVE/PING stuff is a kludge.  Needs to be
+   * reworked in the next proto rev so that this kind of 'special'
+   * casing isn't required.
+   */
+
+  /* sanity check */
+  if (tcp_sock < 0 && udp_sock < 0)
+    return 0;
+
+  /* do socket read(s) if possible */
+  if (pktSocketHasData(tcp_sock))
+    _pktReadSocket(tcp_sock, RB_TCPIn, NULL, PKT_MAXSIZE);
+  
+  if (pktSocketHasData(udp_sock))
+    _pktReadSocket(udp_sock, RB_UDPIn, NULL, PKT_MAXSIZE);
+  
+  /* Check the ringbuffers, TCP first.  If there's a packet waiting
+   * return it's type (>0).
+   */
+
+  if ((type = _pktReadGetRB(RB_TCPIn, NULL, PKT_MAXSIZE, FALSE)))
+    return type;
+
+  if ((type = _pktReadGetRB(RB_UDPIn, NULL, PKT_MAXSIZE, FALSE)))
+    return type;
 
   return 0;
 }
@@ -625,10 +723,10 @@ int pktRead(char *buf, int blen, unsigned int delay)
    * get it and return it
    */
 
-  if ((type = _pktReadGetRB(RB_TCPIn, buf, blen)))
+  if ((type = _pktReadGetRB(RB_TCPIn, buf, blen, TRUE)))
     return type;
 
-  if ((type = _pktReadGetRB(RB_UDPIn, buf, blen)))
+  if ((type = _pktReadGetRB(RB_UDPIn, buf, blen, TRUE)))
     return type;
 
   /* if we're here, then either there was no RB data, or there wasn't
@@ -699,10 +797,10 @@ int pktRead(char *buf, int blen, unsigned int delay)
   /* if we're here, we try one more time on the RB's, in case some data
    * was recently read 
    */
-  if ((type = _pktReadGetRB(RB_TCPIn, buf, blen)))
+  if ((type = _pktReadGetRB(RB_TCPIn, buf, blen, TRUE)))
     return type;
 
-  if ((type = _pktReadGetRB(RB_UDPIn, buf, blen)))
+  if ((type = _pktReadGetRB(RB_UDPIn, buf, blen, TRUE)))
     return type;
 
   return 0;
@@ -795,7 +893,7 @@ int pktWrite(int socktype, void *data)
         {
           utLog("FATAL: %s@%d: output ringbuffer (%d) full, can't add %d bytes\n",
                 __FUNCTION__, __LINE__, socktype, len);
-          return 0;
+          return -1;
         }
       
       rbPut(RB, data, len);
@@ -815,7 +913,7 @@ int pktWrite(int socktype, void *data)
             {
               utLog("FATAL: %s@%d: output ringbuffer (%d) full, can't add %d bytes\n",
                     __FUNCTION__, __LINE__, socktype, len);
-              return 0;
+              return -1;
             }
         }
     }            

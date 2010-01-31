@@ -1930,6 +1930,12 @@ static int renderNode(void)
         }
 
       /* send a udp keep alive if it's time */
+
+      /* FIXME: pings (tcp) should be handled here as well rather than
+       *  in nCP.  Pings should also be doable over both TCP and UDP,
+       *  doing away with UDP KEEPALIVE's altogether.  Next protocol
+       *  rev.
+       */
       sendUDPKeepAlive(frameTime);
 
       if (onode && onode->idle)
