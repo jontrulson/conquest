@@ -41,7 +41,7 @@ FILELIST="ratfor.c cd2lb.h cd2lb.c iolb.h iolb.c conqlb.c
         clientlb.c server.h server.c packet.h packet.c protocol.h
         conqnet.h datatypes.h userauth.h servauth.h clntauth.h 
         clntauth.c servauth.c conquestd.c serverpkt.c serverpkt.h 
-        servercmd.h servercmd.c conquestsh.c
+        servercmd.h servercmd.c 
         conqmetad.c meta.c meta.h acinclude.m4 snprintf.h snprintf.c 
         README.cygwin texfont.c TexFont.h 
         cprintf.h cprintf.c glfont.h glfont.c
@@ -66,8 +66,8 @@ SOUNDS="sound/*.ogg"
 MANPAGES="*.man"
 TRC="*.trc"
 
-CONTRIB_FILES = "contrib/README.conquest-metaserver-monitor 
-                 contrib/conquest-metaserver-monitor.awk"
+CONTRIB_FILES="contrib/README.conquest-metaserver-monitor 
+               contrib/conquest-metaserver-monitor.awk"
 
 mkdir $CONQVER 2>/dev/null
 mkdir $CONQVER/img
