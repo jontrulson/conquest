@@ -423,8 +423,6 @@ int pktWaitForPacket(int type, char *buf, int blen,
 
 	  if (pkttype != type && nakmsg) /* we need to use a msg nak */
             pktSendAck(PSEV_ERROR, PERR_UNSPEC, nakmsg); 
-
-          return 0;
 	}
 
       if (pkttype < 0)

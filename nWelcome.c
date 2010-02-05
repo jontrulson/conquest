@@ -24,7 +24,7 @@
 #define S_GREETINGS    1        /* GREETINGS - new user */
 #define S_ERROR        2        /* some problem */
 
-static int state;
+static int state = S_ERROR;
 
 static int fatal = FALSE;
 static int serror = FALSE;
