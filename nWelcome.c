@@ -24,7 +24,7 @@
 #define S_GREETINGS    1        /* GREETINGS - new user */
 #define S_ERROR        2        /* some problem */
 
-static int state = S_ERROR;
+static int state;
 
 static int fatal = FALSE;
 static int serror = FALSE;
@@ -86,6 +86,7 @@ void nWelcomeInit(void)
   char buf[PKT_MAXSIZE];
   int done = FALSE;
 
+  state = S_ERROR;
   setNode(&nWelcomeNode);
 
   /* now look for SP_CLIENTSTAT or SP_ACK */
