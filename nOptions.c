@@ -373,7 +373,15 @@ static void _dispUserOptsMenu(void)
       lin++;
     }
   
-  lin = 19;
+  lin = 17;
+  cprintf(lin, col, ALIGN_NONE, "#%d#Server Name:   #%d# %s#%d#", LabelColor,
+          InfoColor, sHello.servername,
+          NoColor);
+  lin++;
+  cprintf(lin, col, ALIGN_NONE, "#%d#Server Version: #%d#%s#%d#", LabelColor,
+          InfoColor, sHello.serverver,
+          NoColor);
+  lin++;
   cprintf(lin, col, ALIGN_NONE, "#%d#UDP:  #%d# %s#%d#", LabelColor,
           InfoColor, (cInfo.doUDP) ? "On" : "Off",
           NoColor);
