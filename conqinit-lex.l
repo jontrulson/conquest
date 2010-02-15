@@ -25,6 +25,8 @@ extern int cqiDebugl;                       /* from conqinit-yacc.y */
 
 %}
 
+%option noyywrap
+
 whtspc	 [ \t]+
 string   \"([^"]|\\.)*\"
 number   [0-9]+
