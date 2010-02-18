@@ -139,7 +139,7 @@ AC_SUBST(CONQGROUP)
 
 if test -n "$GCC"
 then
-	CONQ_CFLAGS="$CFLAGS -D__NO_MATH_INLINES -Wall -fPIC -fno-builtin -DNDEBUG"
+	CONQ_CFLAGS="$CFLAGS -D__NO_MATH_INLINES -Wall -fno-builtin -DNDEBUG"
 else
 	CONQ_CFLAGS="$CFLAGS -DNDEBUG"
 fi
