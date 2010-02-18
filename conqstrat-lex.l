@@ -52,6 +52,8 @@ extern int yylval;
 
 %}
 
+%option noyywrap
+
 whtspc	[ \t]+
 
 %%
