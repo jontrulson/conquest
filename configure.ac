@@ -4,7 +4,7 @@ dnl
 dnl $Id$
 dnl
 
-AC_INIT([conquest],[8.3],[jon@radscan.com])
+AC_INIT([conquest],[8],[jon@radscan.com])
 AC_CONFIG_HEADER(config.h)
 
 dnl disable static libs by default
@@ -63,6 +63,11 @@ case "$uname" in
 	AC_DEFINE(LINUX, 1, [Linux])    
 
 	AC_MSG_RESULT(Linux)
+	;;
+  Darwin*)
+	AC_DEFINE(DARWIN, 1, [Darwin])    
+
+	AC_MSG_RESULT(Darwin)
 	;;
   FreeBSD*)
 	AC_DEFINE(FREEBSD, 1, [FreeBSD])

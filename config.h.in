@@ -3,6 +3,9 @@
 /* Cygwin */
 #undef CYGWIN
 
+/* Darwin */
+#undef DARWIN
+
 /* FreeBSD */
 #undef FREEBSD
 
