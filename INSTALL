@@ -164,7 +164,7 @@ CONTENTS:
     should be fine.  If your porting this to something else, good
     luck...But if you do succeed in a port to a new platform, please
     let me know so I can incorporate it into the distribution.  The
-    autoconf source file 'configure.in' is supplied for this purpose
+    autoconf source file 'configure.ac' is supplied for this purpose
     ;-)
 
     As root, intialize the system-wide conquestrc file
