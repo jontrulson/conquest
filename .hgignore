@@ -31,4 +31,8 @@ conquest
 conquestd
 conquestgl
 
+autom4te.cache
+**.gz
+cscope.out
+
 
