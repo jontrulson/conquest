@@ -197,14 +197,21 @@ CONTENTS:
 
 ### OTHER USEFUL INFORMATION
 
-# GENERAL TERMINAL NOTE: Conquest depends on a properly configured
-terminfo entry for your terminal in order to make use of Fkey's, the
-arrow keys, the keypad, and color.  The standard at386 terminfo entry
-on Unixware for example, does not define the SHIFT-Fkeys, nor the
-Keypad keys (upperright, lowerleft, etc).  Some modification to your
-terminfo entry may be required to use these extended features.
+# GENERAL TERMINAL NOTE: 
+
+        Conquest depends on a properly configured terminfo entry for
+your terminal in order to make use of Fkey's, the arrow keys, the
+keypad, and color.  The standard at386 terminfo entry on Unixware for
+example, does not define the SHIFT-Fkeys, nor the Keypad keys
+(upperright, lowerleft, etc).  Some modification to your terminfo
+entry may be required to use these extended features.
 
 # TERMINFO ENTRIES
+
+[ Edit 3/3/2010: While these entries are still available in the source
+  code repository, they are no longer shipped in the Conquest source
+  distribution anymore, as I seriously doubt anyone uses or needs them
+  anymore. ]
 
 	I recieved permission from SCO to supply my modified terminfo
 entries for Unixware.  Thanks SCO!  The modified entries are located
