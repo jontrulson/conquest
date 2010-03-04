@@ -67,22 +67,6 @@ static void DisplayCompileOptions(void)
 #endif /* HAVE_SETITIMER */
     },
 
-    {"USE_COMMONMLOCK", "can lock common block in memory", CTYPE_BOOL, 
-#ifdef USE_COMMONMLOCK
-     (void *)TRUE
-#else
-     (void *)FALSE
-#endif /* USE_COMMONMLOCK */
-    },
-
-    {"SET_PRIORITY", "can raise process priority", CTYPE_BOOL, 
-#ifdef SET_PRIORITY
-     (void *)TRUE
-#else
-     (void *)FALSE
-#endif /* SET_PRIORITY */
-    },
-
     {"WARP0CLOAK", "can't be seen when cloaked at warp 0", CTYPE_BOOL,
 #ifdef WARP0CLOAK
      (void *)TRUE

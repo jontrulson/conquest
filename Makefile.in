@@ -287,7 +287,6 @@ EGREP = @EGREP@
 EXEEXT = @EXEEXT@
 F77 = @F77@
 FFLAGS = @FFLAGS@
-FILEPRIV = @FILEPRIV@
 GREP = @GREP@
 INSTALL = @INSTALL@
 INSTALL_DATA = @INSTALL_DATA@
@@ -1224,9 +1223,6 @@ install-exec-hook:
 	-$(bindir)/conqoper$(EXEEXT) -C
 	chmod 775 $(DESTDIR)$(CONQLOCALSTATEDIR)
 	-chown root:$(CONQGROUP) $(DESTDIR)$(CONQLOCALSTATEDIR)
-	$(FILEPRIV) $(DESTDIR)$(bindir)/conqoper$(EXEEXT) \
-		$(DESTDIR)$(libexecdir)/conqdriv$(EXEEXT) \
-		$(DESTDIR)$(bindir)/conquestd$(EXEEXT)
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
 .NOEXPORT:

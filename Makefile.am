@@ -198,7 +198,4 @@ install-exec-hook:
 	-$(bindir)/conqoper$(EXEEXT) -C
 	chmod 775 $(DESTDIR)$(CONQLOCALSTATEDIR)
 	-chown root:$(CONQGROUP) $(DESTDIR)$(CONQLOCALSTATEDIR)
-	$(FILEPRIV) $(DESTDIR)$(bindir)/conqoper$(EXEEXT) \
-		$(DESTDIR)$(libexecdir)/conqdriv$(EXEEXT) \
-		$(DESTDIR)$(bindir)/conquestd$(EXEEXT)
 

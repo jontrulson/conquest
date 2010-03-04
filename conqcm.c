@@ -209,25 +209,6 @@ char *mymalloc(int size)
     return(ptr);
   }
 
-#if defined(USE_COMMONMLOCK)
-void lock_common(void)
-{
-				/* Lock it in memory.  this requires the
-				   PLOCK privilege on Unixware. if we
-				   fail, we'll complain to the logfile
-				   and continue... */
-  if (fakeCommon)
-    return;
-
-  if (memcntl((caddr_t)cBasePtr, SIZEOF_COMMONBLOCK,
-	     MC_LOCK, (caddr_t)0, 0, 0) == -1)
-    {
-      utLog("map_common(): couldn't lock the common block: %s, continuing...",
-	   strerror(errno));
-    }
-}
-#endif
-
 void map_common(void)
 {
   int cmn_fd;
@@ -266,11 +247,6 @@ void map_common(void)
 				        /* now map the variables into the
 					   common block */
   map_vars();
-
-				/* now lets lock it */
-#if defined(USE_COMMONMLOCK)
-  lock_common();
-#endif
 
   return;
 }

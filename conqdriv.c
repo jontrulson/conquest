@@ -98,23 +98,6 @@ int main(int argc, char *argv[])
   if ( *CBlockRevision != COMMONSTAMP )
     utLog("conqdriv:ERROR:common block mismatch");
   
-#ifdef SET_PRIORITY
-  /* Increase our priority a bit */
-  
-  if (nice(CONQDRIV_PRI) == -1)
-    {
-      utLog("conqdriv: main(): nice(CONQDRIV_PRI (%d)): failed: %s",
-	   CONQDRIV_PRI,
-	   strerror(errno));
-    }
-#if defined(DEBUG_FLOW)
-  else
-    utLog("conqdriv: main(): nice(CONQDRIV_PRI (%d)): succeeded.",
-	 CONQDRIV_PRI);
-#endif
-
-#endif
-  
   initstats( &ctime, &etime );
   cacc = 0;
   eacc = 0;

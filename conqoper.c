@@ -271,25 +271,6 @@ int main(int argc, char *argv[])
   
   /* load conqinitrc */
   cqiLoadRC(CQI_FILE_CONQINITRC, NULL, 0, 0);
-
-
-#ifdef SET_PRIORITY
-  /* Increase our priority a bit */
-  
-  if (nice(CONQUEST_PRI) == -1)
-    {
-      utLog("conqoper: main(): nice(CONQUEST_PRI (%d)): failed: %s",
-	   CONQUEST_PRI,
-	   strerror(errno));
-    }
-#if defined(DEBUG_FLOW)
-  else
-    utLog("conqoper: main(): nice(CONQUEST_PRI (%d)): succeeded.",
-	 CONQUEST_PRI);
-#endif 
-
-#endif
-  
   
   map_common();			/* Map the conquest universe common block */
   cdinit();			/* initialize display environment */

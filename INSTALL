@@ -17,7 +17,6 @@ CONTENTS:
 	### OTHER USEFUL INFORMATION
             # GENERAL TERMINAL NOTE
             # TERMINFO ENTRIES
-            ## UNIXWARE NOTE
 	    ## CONQUEST GROUP
 
 ### REQUIREMENTS
@@ -242,39 +241,13 @@ and function keys may not work... There are just no real standard
 definitions for these, since the original vt100 didn't support
 function keys, or a keypad like the standard PC-AT keyboard.
 
-## UNIXWARE NOTE
-
-	Unixware understands the notion of providing specific
-privileges to an executable, without requiring suid root programs.
-
-	By default, when installing the Unixware binary package or
-doing a 'gmake install' on a Unixware system, the Makefile will use
-the 'filepriv(1m)' command to give Conquest the ability to raise it's
-priority and lock the common block (256KB) into memory via the TSHAR
-and the PLOCK privileges.  If you don't like this, either don't set
-the priveleges, OR comment out '#define USE_COMMONMLOCK' and '#define
-SET_PRIORITY' in defs.h and recompile.  
-
-	Conquest will complain in the /opt/conquest/etc/conquest.log
-file if you simply remove the privileges, but it will still run.  If
-your not building or running this on Unixware this doesn't apply to
-you.  Unfortunately the only way to provide these services on other
-Unixen besides Unixware is to give Conquest suid root privileges,
-which I consider extremely unwise.  There's something to be said about
-giving processes only those privileges they really need...
-
-	Once again, DO NOT run Conquest suid root on any machine.
-(currently the only way to get priority privs on Linux).  Conquest was
-not designed to run suid root (or suid at all) and I take *no*
-responsibility for the consequences if you try to do so.  Actually, I
-take no responsibiliy for anything regarding the use of this software
-;-)
-
 ## CONQUEST GROUP
 
-	Conquest's binaries *do* have to run setgid to 'conquest' to
-prevent unscrupulous tampering/cheating.  Installing the Unixware
-binary package will add the Conquest group id to your system.
+	Some of Conquest's binaries (notably conquestd, conqdriv, and
+conqoper) do have to run setgid to 'conquest' to prevent
+unscrupulous tampering/cheating.
+
+        The Conquest clients do not require any special privileges.
 
 	If you're using the source package, you'll need to be sure to
 create the conquest group before building.

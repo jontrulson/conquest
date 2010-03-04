@@ -44,15 +44,6 @@
 #define C_CONQ_INITRC    "conqinitrc"
 
 /* 
- * USE_COMMONMLOCK - Lock the common block into memory via memctl(). 
- *  Requires the PLOCK privilege (unixware).
- */
-
-#if defined(UNIXWARE)
-# define USE_COMMONMLOCK 
-#endif
-
-/* 
  * WARP0CLOAK - Although the code made it difficult to scan a ship that was
  *  cloaked at warp 0, it was still possible to scan such a ship if it was
  *  within alert range.  Defining this means you CANNOT be detected (even by 
@@ -68,20 +59,6 @@
  *  so. 
  */
 #define DO_EXPLODING_SHIPS
-
-/* 
- * SET_PRIORITY - increase our priority a bit, increase the driver's a bit 
- * more.  Requires the TSHAR privilege (unixware).
- */
-
-#if defined(UNIXWARE)
-# define SET_PRIORITY
-#endif
-				/* Priorities, if we're using them */
-#ifdef SET_PRIORITY
-# define CONQUEST_PRI (-4)
-# define CONQDRIV_PRI (-7)
-#endif
 
 /*
  * Macro defines

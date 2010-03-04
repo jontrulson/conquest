@@ -56,8 +56,6 @@ uname=`uname -s`
 urev=`uname -r`
 uvers=`uname -v`
 
-FILEPRIV="@-echo filepriv"
-
 case "$uname" in
   Linux*)
 	AC_DEFINE(LINUX, 1, [Linux])    
@@ -86,7 +84,6 @@ case "$uname" in
   UNIX_SV*|UnixWare)
 	AC_DEFINE(UNIXWARE, 1, [UnixWare])
 
-	FILEPRIV="/sbin/filepriv -f plock,tshar,core"
 	AC_MSG_RESULT(UnixWare)
 	;;
   OSF1*)
@@ -125,7 +122,6 @@ case "$uname" in
 	;;
 esac
 
-AC_SUBST(FILEPRIV)
 AC_PROG_CC
 AC_PROG_LIBTOOL
 

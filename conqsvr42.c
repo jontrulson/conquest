@@ -104,24 +104,6 @@ void conqinit(void)
   if ( *CBlockRevision != COMMONSTAMP )
     error( "conquest: Common block ident mismatch.  \nInitialize the Universe via conqoper." );
   
-  
-#ifdef SET_PRIORITY
-  /* Increase our priority a bit */
-  
-  if (nice(CONQUEST_PRI) == -1)
-    {
-      utLog("conqinit(): nice(CONQUEST_PRI (%d)): failed: %s",
-	   CONQUEST_PRI,
-	   strerror(errno));
-    }
-
-#if defined(DEBUG_FLOW)
-    utLog("conqinit(): nice(CONQUEST_PRI (%d)): succeeded.",
-	 CONQUEST_PRI);
-#endif
-
-#endif
-  
   /* Set up game environment. */
   
   /* Other house keeping. */
