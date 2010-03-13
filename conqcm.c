@@ -108,14 +108,16 @@ void flush_common(void)
   if (fakeCommon)
     return;
 
+#if !defined(MINGW)
 				/* fbsd doesn't like MS_SYNC       */
 				/* which is prefered, but oh well */
-#if defined(FREEBSD)
+# if defined(FREEBSD)
   if (msync((caddr_t)cBasePtr, SIZEOF_COMMONBLOCK, 0) == -1)
-#else
+# else
   if (msync((caddr_t)cBasePtr, SIZEOF_COMMONBLOCK, MS_SYNC) == -1)
-#endif
+# endif
     utLog("flush_common(): msync(): %s", strerror(errno));
+#endif
 
   return;
 }
@@ -211,12 +213,18 @@ char *mymalloc(int size)
 
 void map_common(void)
 {
+#if !defined(MINGW)
   int cmn_fd;
   static char cmnfile[MID_BUFFER_SIZE];
+#endif
 
   if (fakeCommon)
     return;
 
+#if defined(MINGW)
+  fprintf(stderr, "%s: Only fake common blocks are supported under MINGW\n");
+  exit(1);
+#else  /* MINGW */
   sprintf(cmnfile, "%s/%s", CONQSTATE, C_CONQ_COMMONBLK);
 
 				/* verify it's validity */
@@ -232,9 +240,9 @@ void map_common(void)
   
   /* Now lets map it */
 
-#ifndef MAP_FILE
-# define MAP_FILE 0		/* some arch's don't def this */
-#endif
+# ifndef MAP_FILE
+#  define MAP_FILE 0		/* some arch's don't def this */
+# endif
 
   if ((cBasePtr = mmap((caddr_t) 0, (size_t) SIZEOF_COMMONBLOCK, 
                        PROT_READ | PROT_WRITE, MAP_SHARED | MAP_FILE, 
@@ -243,6 +251,7 @@ void map_common(void)
       perror("map_common():mmap()");
       exit(1);
     }
+#endif  /* MINGW */
 
 				        /* now map the variables into the
 					   common block */

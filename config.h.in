@@ -153,6 +153,9 @@
 /* Linux */
 #undef LINUX
 
+/* MinGW */
+#undef MINGW
+
 /* OSF */
 #undef OSF
 

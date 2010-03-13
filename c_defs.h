@@ -99,13 +99,14 @@
 #endif
 
 /* if we have curses, we'll use it, else ncurses */
-
-#if defined(HAVE_CURSES_H)
-# include <curses.h>
-#elif defined(HAVE_NCURSES_H)
-# include <ncurses.h>
-#else
-# error "You need the System V curses or ncurses library and headers."
+#if !defined(MINGW)
+# if defined(HAVE_CURSES_H)
+#  include <curses.h>
+# elif defined(HAVE_NCURSES_H)
+#  include <ncurses.h>
+# else
+#  error "You need the System V curses or ncurses library and headers."
+# endif
 #endif
 
 #if defined(HAVE_TERMIO_H)
@@ -119,10 +120,12 @@
 #include <memory.h>
 #include <sys/ioctl.h>
 
-#if defined(HAVE_MMAP)
-# include <sys/mman.h>
-#else
-# error "You need mman.h - mmap()"
+#if !defined(MINGW)
+# if defined(HAVE_MMAP)
+#  include <sys/mman.h>
+# else
+#  error "You need mman.h - mmap()"
+# endif
 #endif
 
 #include <sys/stat.h>
@@ -137,18 +140,20 @@
 # include <sys/time.h>
 #endif
 
+#if !defined(MINGW)
 /* We'll use select by default if it's there */
-#if defined(HAVE_SELECT)
-# if defined(HAVE_SYS_SELECT_H)
-#  include <sys/select.h>
+# if defined(HAVE_SELECT)
+#  if defined(HAVE_SYS_SELECT_H)
+#   include <sys/select.h>
+#  endif
+#  define USE_SELECT
+# elif defined(HAVE_POLL) && defined(HAVE_POLL_H)
+#  include <stropts.h>
+#  include <poll.h>
+#  undef USE_SELECT
+# else
+#  error "Must have select() or poll()"
 # endif
-# define USE_SELECT
-#elif defined(HAVE_POLL) && defined(HAVE_POLL_H)
-# include <stropts.h>
-# include <poll.h>
-# undef USE_SELECT
-#else
-# error "Must have select() or poll()"
 #endif
 
 #if !defined(HAVE_SPRINTF) || defined(PREFER_PORTABLE_SNPRINTF)

@@ -27,6 +27,7 @@ dnl Checks for programs.
 dnl get the system type and set accordingly.  first init some defaults.
 
 GLCLIENT=""
+ISMINGW=""
 conquest_group=""
 
 AC_ARG_WITH(conquest-group,
@@ -56,40 +57,49 @@ uname=`uname -s`
 urev=`uname -r`
 uvers=`uname -v`
 
-case "$uname" in
-  Linux*)
+case "$host" in
+  *linux*)
 	AC_DEFINE(LINUX, 1, [Linux])    
 
 	AC_MSG_RESULT(Linux)
 	;;
-  Darwin*)
+  *darwin*)
 	AC_DEFINE(DARWIN, 1, [Darwin])    
+        ocflags="$CFLAGS"
+        CFLAGS="$ocflags -I/usr/X11/include"
 
 	AC_MSG_RESULT(Darwin)
 	;;
-  FreeBSD*)
+  *freebsd*)
 	AC_DEFINE(FREEBSD, 1, [FreeBSD])
 
 	LIBS="$LIBS -lcompat"
 
 	AC_MSG_RESULT(FreeBSD)
 	;;
-  SunOS*)
+  *solaris*)
 	AC_DEFINE(SOLARIS, 1, [Solaris])
 
 	LIBS="$LIBS -lsocket -lnsl"
 
 	AC_MSG_RESULT(Solaris)
 	;;
-  UNIX_SV*|UnixWare)
+  *sysv4.2uw*)
 	AC_DEFINE(UNIXWARE, 1, [UnixWare])
 
 	AC_MSG_RESULT(UnixWare)
 	;;
-  OSF1*)
+  *mingw*)
+        # for MinGW systems - we only want to build the GL client (only)
+	AC_DEFINE(MINGW, 1, [MinGW])
+        IS_MINGW="yes"
+
+	AC_MSG_RESULT(MinGW)
+	;;
+  *dec-osf1*)
 
 	case "$uvers" in
-		V4.*)	
+		?4.*)	
 			true
 			;;
 		*)
@@ -103,7 +113,7 @@ case "$uname" in
 	AC_MSG_RESULT(Digital Unix 4.x+)
 	;;
 
-  CYGWIN*)
+  *cygwin*)
         AC_DEFINE(CYGWIN, 1, [Cygwin])
 
         if test ! -n "$conquest_group"
@@ -258,6 +268,7 @@ AC_CHECK_LIB(SDL_mixer, Mix_OpenAudio, CONQ_CFLAGS="$CONQ_CFLAGS -DHAVE_SDL_MIXE
 fi
 
 AM_CONDITIONAL(GLCLIENT, test $GLCLIENT)
+AM_CONDITIONAL(ISMINGW, test $ISMINGW)
 AM_CONDITIONAL(SNDCLIENT, test $SNDCLIENT)
 AM_CONDITIONAL(TCPW, test $TCPW)
 

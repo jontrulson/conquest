@@ -16,7 +16,7 @@
 #define NOEXTERN_PACKET
 #include "packet.h"
 #undef NOEXTERN_PACKET
-#ifndef HAVE_SELECT
+#if !defined(MINGW) && !defined(HAVE_SELECT)
 #error "The select() system call is required"
 #endif
 
