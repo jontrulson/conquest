@@ -222,6 +222,11 @@ void c_sleep(real sleeptime)
   if (sleeptime == 0.0)
     return;
 
+  /* For windows (and eventually, maybe everyone else, use usleep */
+#if defined(MINGW)
+  usleep((useconds_t)sleeptime * 1000000);
+#else
+
   /* Here I use poll to provide a msec */
   /* granularity sleep.  Actually it's */
   /* limited to 0.1 sec, but that's close */
@@ -234,6 +239,7 @@ void c_sleep(real sleeptime)
 	utLog("csleep(): poll() failed: %s",
 	     strerror(errno));
     }
+#endif  /* MINGW */
 
 #endif
 

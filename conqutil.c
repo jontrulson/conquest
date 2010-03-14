@@ -628,8 +628,10 @@ void utLog(char *fmt, ...)
 	  fclose(errfd);
 	}
       
+#if !defined(MINGW)
       if (systemlog)
 	chown(errfile, 0, ConquestGID);
+#endif
 
       if ((errfd = fopen(errfile, "a+")) == NULL)
 	{

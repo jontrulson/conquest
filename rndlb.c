@@ -109,9 +109,14 @@ void rndini ( int seed1, int seed2 )
        seed1, seed2, value1, value2);
 #endif
   
+  /* rand() isn't all that great, but for a client on mingw, should be ok */
   
   /*  srand48((long)(value1 * value2)); */
+#if !defined(MINGW)
   srand48((long) time(0));
+#else
+  srand((unsigned int) time(0));
+#endif
   return;
 }
 
@@ -124,7 +129,13 @@ real rnd ( void )		/* use 48bit linear congruential */
 {
   real rc;
   
+  /* rand() isn't all that great, but for a client on mingw, should be ok */
+#if !defined(MINGW)
   rc = (real) drand48();
+#else
+  rc = (real)rand() / (real)RAND_MAX;
+#endif
+
 #ifdef DEBUG_RANDOM
   utLog("rnd(): drand48() = %f", rc);
 #endif
