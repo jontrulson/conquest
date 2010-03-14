@@ -423,7 +423,7 @@ static int nMenuInput(int ch)
 
     case 'N':
       state = S_PSEUDO;
-      prm.preinit = False;
+      prm.preinit = FALSE;
       prm.buf = cbuf;
       prm.buflen = MAXUSERPNAME;
       prm.terms = TERMS;
@@ -449,7 +449,7 @@ static int nMenuInput(int ch)
           else
             {
               state = S_RESIGN;
-              prm.preinit = False;
+              prm.preinit = FALSE;
               prm.buf = cbuf;
               prm.buflen = MAXUSERPNAME;
               prm.terms = TERMS;
@@ -501,7 +501,7 @@ static int nMenuInput(int ch)
 
       state = S_WAR;
       prompting = TRUE;
-      prm.preinit = False;
+      prm.preinit = FALSE;
       prm.buf = cbuf;
       prm.buflen = 5;
       prm.pbuf = clbWarPrompt(Context.snum, twar);

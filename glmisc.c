@@ -23,6 +23,10 @@
 #include <GL/gl.h>
 #include <GL/glu.h>
 
+#if !defined(MINGW)
+#include <GL/glx.h>
+#endif
+
 #include "ui.h"
 
 #include "glfont.h"
@@ -135,9 +139,15 @@ void mglConqLogo(dspConfig_t *dsp, bool mult)
   return;
 }
 
+/* For mingw, we cannot use X11 bell obviously, so we do not use a bell 
+ * at all for these systems
+ */
+
 void mglBeep(int type)
 {
+#if !defined(MINGW)
   static Display *dpy = NULL;
+#endif
   time_t i;
   static time_t old = 0, oldmsg = 0, olderr = 0;
   static int beep_alertfx = -1;
@@ -182,6 +192,7 @@ void mglBeep(int type)
           break;
         }
     }
+#if !defined(MINGW)
   else if (old != i)
     {
       /* this is cheesy, but glut does not provide a bell. */
@@ -197,6 +208,7 @@ void mglBeep(int type)
           XFlush(dpy);
         }
     }
+#endif
 
   return;
 }

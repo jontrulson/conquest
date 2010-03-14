@@ -40,6 +40,7 @@ then
   SNDCLIENT=""
 fi
 
+AC_CANONICAL_SYSTEM
 AC_MSG_CHECKING(system type)
 uname=`uname -s`
 urev=`uname -r`

@@ -280,7 +280,7 @@ static int nPlayBInput(int ch)
           if (ch == TERM_ABORT)
             {
               state = S_NONE;
-              prompting = False;
+              prompting = FALSE;
 
               return NODE_OK;
             }
@@ -295,7 +295,7 @@ static int nPlayBInput(int ch)
               if ( alldig( prm.buf ) != TRUE )
                 {
                   state = S_NONE;
-                  prompting = False;
+                  prompting = FALSE;
 
                   nss = "No such ship.";
                   return NODE_OK; 
@@ -307,7 +307,7 @@ static int nPlayBInput(int ch)
                tmpsnum != DISPLAY_DOOMSDAY )
             {
               state = S_NONE;
-              prompting = False;
+              prompting = FALSE;
 
               nss = "No such ship.";
               return NODE_OK;
@@ -416,13 +416,13 @@ static int nPlayBInput(int ch)
       if (recFileHeader.snum == 0)
         {
           cbuf[0] = EOS;
-          prm.preinit = False;
+          prm.preinit = FALSE;
 
         }
       else
         {
           sprintf(cbuf, "%d", recFileHeader.snum);
-          prm.preinit = True;
+          prm.preinit = TRUE;
         }
 
       prm.buf = cbuf;

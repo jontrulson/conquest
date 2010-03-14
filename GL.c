@@ -3169,7 +3169,7 @@ static int LoadTGA(char *filename, textureImage *texture)
             {
               utLog("%s: could not read RLE header.", filename);
               fclose(file);
-              return False;
+              return FALSE;
             }
           
           if(chunkheader < 128)
@@ -3338,7 +3338,7 @@ static char *_getTexFile(char *tfilenm)
 
 static int loadGLTextures()   
 {
-  Bool status;
+  int status;
   int rv = FALSE;
   textureImage *texti;
   int i, type, components;         /* for RGBA */

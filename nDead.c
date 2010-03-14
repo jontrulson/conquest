@@ -77,7 +77,7 @@ void nDeadInit(void)
     {
       state = S_LASTWORDS;
 
-      prm.preinit = False;
+      prm.preinit = FALSE;
       prm.buf = lastwords;
       prm.buflen = MAXLASTWORDS - 1;
       prm.terms = TERMS;

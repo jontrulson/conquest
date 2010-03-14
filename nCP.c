@@ -1325,7 +1325,7 @@ static void _domsgto(char *buf, int ch, int terse)
   msgto = to;                   /* set global */
 
   state = S_MSG;
-  prm.preinit = False;
+  prm.preinit = FALSE;
   prm.buf = cbuf;
   prm.buflen = MESSAGE_SIZE;
   strcpy(pbuf, "> ");
@@ -1714,7 +1714,7 @@ static void _dobomb(void)
            Planets[pnum].name, Planets[pnum].armies );
 
   state = S_BOMB;
-  prm.preinit = False;
+  prm.preinit = FALSE;
   prm.buf = cbuf;
   prm.buf[0] = EOS;
   prm.buflen = MSGMAXLINE;
@@ -1864,7 +1864,7 @@ static void _initbeam()
   else
     {                           /* need to ask beam dir... */
       state = S_BEAMDIR;
-      prm.preinit = False;
+      prm.preinit = FALSE;
       prm.buf = cbuf;
       prm.buflen = 10;
       prm.pbuf = "Beam [up or down] ";
@@ -1888,7 +1888,7 @@ static void _initbeam()
   sprintf( pbuf, "Beam %s [1-%d] ", (dirup) ? "up" : "down", beamax );
 
   state = S_BEAMNUM;
-  prm.preinit = False;
+  prm.preinit = FALSE;
   prm.buf = cbuf;
   prm.buflen = 10;
   prm.pbuf = pbuf;
@@ -2008,7 +2008,7 @@ static void command( int ch )
       if ( Users[Ships[Context.snum].unum].ooptions[ OOPT_AUTOPILOT] )
 	{
           state = S_DOAUTOPILOT;
-          prm.preinit = False;
+          prm.preinit = FALSE;
           prm.buf = cbuf;
           prm.buflen = MSGMAXLINE;
           prm.pbuf = "Press [TAB] to engage autopilot: ";
@@ -2026,7 +2026,7 @@ static void command( int ch )
       break;
     case 'A':				/* change allocation */
       state = S_ALLOC;
-      prm.preinit = False;
+      prm.preinit = FALSE;
       prm.buf = cbuf;
       prm.buflen = MSGMAXLINE;
       prm.pbuf = "New weapons allocation: (30-70) ";
@@ -2046,7 +2046,7 @@ static void command( int ch )
       if (_chkcloak())
         {
           state = S_CLOAK;
-          prm.preinit = False;
+          prm.preinit = FALSE;
           prm.buf = cbuf;
           prm.buflen = MSGMAXLINE;
           prm.pbuf = "Press [TAB] to engage cloaking device: ";
@@ -2066,7 +2066,7 @@ static void command( int ch )
       break;
     case 'E':				/* emergency distress call */
       state = S_DISTRESS;
-      prm.preinit = False;
+      prm.preinit = FALSE;
       prm.buf = cbuf;
       prm.buflen = MSGMAXLINE;
       prm.pbuf = "Press [TAB] to send an emergency distress call: ";
@@ -2081,7 +2081,7 @@ static void command( int ch )
       {
         state = S_TARGET;
         desttarg = T_PHASER;
-        prm.preinit = False;
+        prm.preinit = FALSE;
         prm.buf = cbuf;
         prm.buflen = MSGMAXLINE;
         prm.pbuf = "Fire phasers: ";
@@ -2103,7 +2103,7 @@ static void command( int ch )
       break;
     case 'i':				/* information */
       state = S_DOINFO;
-      prm.preinit = False;
+      prm.preinit = FALSE;
       prm.buf = cbuf;
       prm.buflen = MSGMAXLINE;
       prm.pbuf = "Information on: ";
@@ -2116,7 +2116,7 @@ static void command( int ch )
       break;
     case 'k':				/* set course */
       state = S_COURSE;
-      prm.preinit = False;
+      prm.preinit = FALSE;
       prm.buf = cbuf;
       prm.buflen = MSGMAXLINE;
       prm.pbuf = "Come to course: ";
@@ -2130,7 +2130,7 @@ static void command( int ch )
       if (_chkcoup())
         {
           state = S_COUP;
-          prm.preinit = False;
+          prm.preinit = FALSE;
           prm.buf = cbuf;
           prm.buflen = MSGMAXLINE;
           prm.pbuf = "Press [TAB] to try it: ";
@@ -2146,7 +2146,7 @@ static void command( int ch )
       break;
     case 'm':				/* send a message */
       state = S_MSGTO;
-      prm.preinit = False;
+      prm.preinit = FALSE;
       prm.buf = cbuf;
       prm.buflen = MSGMAXLINE;
       strcpy(pbuf, "Message to: ");
@@ -2168,7 +2168,7 @@ static void command( int ch )
       appstr( Ships[Context.snum].alias, pbuf );
       cp_putmsg(pbuf, MSG_LIN1);
       state = S_PSEUDO;
-      prm.preinit = False;
+      prm.preinit = FALSE;
       prm.buf = cbuf;
       prm.buflen = MAXUSERPNAME;
       prm.pbuf = "Enter a new pseudonym: ";
@@ -2191,7 +2191,7 @@ static void command( int ch )
       {
         state = S_TARGET;
         desttarg = T_BURST;
-        prm.preinit = False;
+        prm.preinit = FALSE;
         prm.buf = cbuf;
         prm.buflen = MSGMAXLINE;
         prm.pbuf = "Torpedo burst: ";
@@ -2206,7 +2206,7 @@ static void command( int ch )
       {
         state = S_TARGET;
         desttarg = T_TORP;
-        prm.preinit = False;
+        prm.preinit = FALSE;
         prm.buf = cbuf;
         prm.buflen = MSGMAXLINE;
         prm.pbuf = "Launch torpedo: ";
@@ -2226,7 +2226,7 @@ static void command( int ch )
       else
         {
           state = S_DESTRUCT;
-          prm.preinit = False;
+          prm.preinit = FALSE;
           prm.buf = cbuf;
           prm.buflen = MSGMAXLINE;
           prm.pbuf = "Press [TAB] to initiate self-destruct sequence: ";
@@ -2243,7 +2243,7 @@ static void command( int ch )
           if (_chkrefit())
             {
               state = S_REFIT;
-              prm.preinit = False;
+              prm.preinit = FALSE;
               prm.buf = cbuf;
               prm.buflen = MSGMAXLINE;
               refitst = Ships[Context.snum].shiptype;
@@ -2268,7 +2268,7 @@ static void command( int ch )
       if (_chktow())
         {
           state = S_TOW;
-          prm.preinit = False;
+          prm.preinit = FALSE;
           prm.buf = cbuf;
           prm.buflen = MSGMAXLINE;
           prm.pbuf = "Tow which ship? ";
@@ -2297,7 +2297,7 @@ static void command( int ch )
 
       state = S_WAR;
       prompting = TRUE;
-      prm.preinit = False;
+      prm.preinit = FALSE;
       prm.buf = cbuf;
       prm.buflen = 5;
       prm.pbuf = clbWarPrompt(Context.snum, twar);
@@ -3323,7 +3323,7 @@ static int nCPInput(int ch)
               sprintf( pbuf, "Beam %s [1-%d] ", (dirup) ? "up" : "down", 
                        beamax );
               state = S_BEAMNUM;
-              prm.preinit = False;
+              prm.preinit = FALSE;
               prm.buf = cbuf;
               prm.buflen = 10;
               prm.pbuf = pbuf;

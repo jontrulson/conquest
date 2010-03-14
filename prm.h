@@ -17,7 +17,7 @@
 
 
 typedef struct _prompt {
-  Bool  preinit;                /* pre-initing the prompt resp? */
+  int  preinit;                /* pre-initing the prompt resp? */
   char *buf;                    /* response */
   int   buflen;
   char *pbuf;                   /* the prompt */

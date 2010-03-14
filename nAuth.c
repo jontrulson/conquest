@@ -51,7 +51,7 @@ static char nm[MAXUSERNAME], pw[MAXUSERNAME], pwr[MAXUSERNAME];
 
 static char *statlin = NULL;
 static char *errlin = NULL;
-static Bool newuser = False;    /* a new user? */
+static int  newuser = FALSE;    /* a new user? */
 
 /* the current state */
 #define S_DONE         0
@@ -160,7 +160,7 @@ void nAuthInit(void)
   ynbuf[0] = pw[0] = pwr[0] = nm[0] = 0;
 
   state = S_GETUNAME;           /* initial state */
-  prm.preinit = False;
+  prm.preinit = FALSE;
   prm.buf = nm;
   prm.buflen = MAX_USERLEN;
   prm.pbuf = unamep;
@@ -315,7 +315,7 @@ static int nAuthInput(int ch)
 
               ynbuf[0] = EOS;
 
-              prm.preinit = False;
+              prm.preinit = FALSE;
               prm.buf = ynbuf;
               prm.buflen = MAXUSERNAME;
               prm.pbuf = newuserp;
@@ -329,7 +329,7 @@ static int nAuthInput(int ch)
               state = S_GETPW;
 
               /* setup for the new prompt */
-              prm.preinit = False;
+              prm.preinit = FALSE;
               prm.buf = pw;
               prm.buflen = MAX_USERLEN;
               prm.pbuf = pwp;
@@ -352,7 +352,7 @@ static int nAuthInput(int ch)
               state = S_GETPW;
 
               /* setup for the new prompt */
-              prm.preinit = False;
+              prm.preinit = FALSE;
               prm.buf = pw;
               prm.buflen = MAX_USERLEN;
               prm.pbuf = pwp;
@@ -360,13 +360,13 @@ static int nAuthInput(int ch)
 
               statlin = phelper;
               errlin = NULL;
-              newuser = True;
+              newuser = TRUE;
             }
           else
             {                   /* oops */
               state = S_GETUNAME;  
 
-              prm.preinit = True;
+              prm.preinit = TRUE;
               prm.buf = nm;
               prm.buflen = MAX_USERLEN;
               prm.pbuf = unamep;
@@ -374,7 +374,7 @@ static int nAuthInput(int ch)
 
               statlin = uhelper;
               errlin = NULL;
-              newuser = False;
+              newuser = FALSE;
             }
         }
 
@@ -392,7 +392,7 @@ static int nAuthInput(int ch)
               state = S_GETRPW;
 
               /* setup for the new prompt */
-              prm.preinit = False;
+              prm.preinit = FALSE;
               prm.buf = pwr;
               prm.buflen = MAX_USERLEN;
               prm.pbuf = rpwp;
@@ -414,7 +414,7 @@ static int nAuthInput(int ch)
               pw[0] = EOS;
               state = S_GETUNAME;           /* initial state */
 
-              prm.preinit = True;
+              prm.preinit = TRUE;
               prm.buf = nm;
               prm.buflen = MAX_USERLEN;
               prm.pbuf = unamep;
@@ -451,7 +451,7 @@ static int nAuthInput(int ch)
               errlin = "Passwords don't match.";
               /* go back to username prompt */
               state = S_GETUNAME;           /* initial state */
-              prm.preinit = True;
+              prm.preinit = TRUE;
               prm.buf = nm;
               prm.buflen = MAX_USERLEN;
               prm.pbuf = unamep;
