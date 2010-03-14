@@ -2399,7 +2399,6 @@ static void command( int ch )
       break;
       
     case TERM_NORMAL:		/* Have [ENTER] act like 'I[ENTER]'  */
-    case KEY_ENTER:
     case '\n':
       cbuf[0] = EOS;
       _doinfo(cbuf, TERM_NORMAL);

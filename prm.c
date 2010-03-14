@@ -36,7 +36,7 @@ int prmProcInput(prm_t *prm, int ch)
     }
       
   /* editing */
-  if ( ch == '\b' || ch == 0x7f || ch == KEY_BACKSPACE )
+  if ( ch == '\b' || ch == 0x7f )
     {
       if ( clen > 0 )
         {
