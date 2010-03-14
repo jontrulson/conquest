@@ -36,6 +36,8 @@
 
 #if defined(HAVE_CRYPT_H)
 # include <crypt.h>
+#else
+extern char *crypt(char *, char *);
 #endif 
 
 #if defined(STDC_HEADERS)

@@ -191,8 +191,10 @@ int check_cblock(char *fname, int fmode, int sizeofcb)
   
   close(ffd);			/* everything ok.. */
 
+#if !defined(MINGW)
 				/* set ownership */
   chown(fname, 0, -1);
+#endif
 
   return(TRUE);			/* everything there, and right size */
 }

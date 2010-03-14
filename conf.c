@@ -210,7 +210,6 @@ int GetSysConf(int checkonly)
 		  strerror(err));
 	  
 	  fprintf(stderr, "'conqoper -C' needs to be run. Using internal defaults.\n");
-	  sleep(4);
 	}
 
       return(ERR);
@@ -354,7 +353,6 @@ int GetSysConf(int checkonly)
 	  fprintf(stderr, "The %s file needs to be updated by an operator with\n",
 		  conf_name);
 	  fprintf(stderr, "  'conqoper -C'\n");
-	  sleep(4);
 	}
     }
   else
@@ -373,7 +371,6 @@ int GetSysConf(int checkonly)
 		    fprintf(stderr, "The %s file needs to be updated by an operator with\n",
 			    conf_name);
 		    fprintf(stderr, "  'conqoper -C'\n");
-		    sleep(4);
 		  }
 
 		break;		

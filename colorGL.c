@@ -25,7 +25,6 @@
 #include <GL/glut.h>
 #include <GL/gl.h>
 #include <GL/glu.h>
-#include <GL/glx.h>
 
 void uiPutColor(cqColor color)
 {

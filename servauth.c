@@ -1,5 +1,5 @@
 /* 
- * userauth.c - user stuff
+ * servauth.c - user stuff
  *
  * $Id$
  *
@@ -15,9 +15,6 @@
 #include "context.h"
 #include "conf.h"
 #include "color.h"
-
-#include <pwd.h>
-#include <sys/types.h>
 
 #include "server.h"
 #include "packet.h"

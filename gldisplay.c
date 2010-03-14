@@ -33,10 +33,6 @@
 
 #include "hud.h"
 
-#include <GL/gl.h>
-#include <GL/glu.h>
-#include <GL/glx.h>
-
 
 /* Global to this module */
 

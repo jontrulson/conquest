@@ -36,119 +36,119 @@ opensect  \{
 closesect \}
 %%
 
-name                   {return( NAME );}
+name                   {return( TOK_NAME );}
 
-global                 {return( GLOBAL );}
-planetmax              {return( PLANETMAX );}
-shipmax                {return( SHIPMAX );}
-usermax                {return( USERMAX );}
-msgmax                 {return( MSGMAX );}
-histmax                {return( HISTMAX );}
+global                 {return( TOK_GLOBAL );}
+planetmax              {return( TOK_PLANETMAX );}
+shipmax                {return( TOK_SHIPMAX );}
+usermax                {return( TOK_USERMAX );}
+msgmax                 {return( TOK_MSGMAX );}
+histmax                {return( TOK_HISTMAX );}
 
-shiptype               {return( SHIPTYPE );} 
-engfac                 {return( ENGFAC );} 
-weafac                 {return( WEAFAC );} 
-accelfac               {return( ACCELFAC );} 
-torpwarp               {return( TORPWARP );} 
-warpmax                {return( WARPMAX );} 
-armymax                {return( ARMYMAX );} 
-shmax                  {return( SHMAX );} 
-dammax                 {return( DAMMAX );} 
-torpmax                {return( TORPMAX );} 
-fuelmax                {return( FUELMAX );} 
+shiptype               {return( TOK_SHIPTYPE );} 
+engfac                 {return( TOK_ENGFAC );} 
+weafac                 {return( TOK_WEAFAC );} 
+accelfac               {return( TOK_ACCELFAC );} 
+torpwarp               {return( TOK_TORPWARP );} 
+warpmax                {return( TOK_WARPMAX );} 
+armymax                {return( TOK_ARMYMAX );} 
+shmax                  {return( TOK_SHMAX );} 
+dammax                 {return( TOK_DAMMAX );} 
+torpmax                {return( TOK_TORPMAX );} 
+fuelmax                {return( TOK_FUELMAX );} 
 
-planet                 {return ( PLANET );}
-primary                {return ( PRIMARY );}
-angle                  {return ( ANGLE );}
-velocity               {return ( VELOCITY );}
-radius                 {return ( RADIUS );}
-ptype                  {return ( PTYPE );}
-pteam                  {return ( PTEAM );}
-armies                 {return ( ARMIES );}
-visible                {return ( VISIBLE );}
-core                   {return ( CORE );}
-xcoord                 {return ( XCOORD );}
-{whtspc}x{whtspc}      {return ( XCOORD );}
-ycoord                 {return ( YCOORD );}
-{whtspc}y{whtspc}      {return ( YCOORD );}
-texname                {return ( TEXNAME );}
-color                  {return ( COLOR );}
-size                   {return ( SIZE );}
-homeplanet             {return ( HOMEPLANET );}
+planet                 {return ( TOK_PLANET );}
+primary                {return ( TOK_PRIMARY );}
+angle                  {return ( TOK_ANGLE );}
+velocity               {return ( TOK_VELOCITY );}
+radius                 {return ( TOK_RADIUS );}
+ptype                  {return ( TOK_PTYPE );}
+pteam                  {return ( TOK_PTEAM );}
+armies                 {return ( TOK_ARMIES );}
+visible                {return ( TOK_VISIBLE );}
+core                   {return ( TOK_CORE );}
+xcoord                 {return ( TOK_XCOORD );}
+{whtspc}x{whtspc}      {return ( TOK_XCOORD );}
+ycoord                 {return ( TOK_YCOORD );}
+{whtspc}y{whtspc}      {return ( TOK_YCOORD );}
+texname                {return ( TOK_TEXNAME );}
+color                  {return ( TOK_COLOR );}
+size                   {return ( TOK_SIZE );}
+homeplanet             {return ( TOK_HOMEPLANET );}
 
-filename               {return ( FILENAME );}
-texture                {return ( TEXTURE );}
+filename               {return ( TOK_FILENAME );}
+texture                {return ( TOK_TEXTURE );}
 
-animation              {return ( ANIMATION );}
-animdef                {return ( ANIMDEF );}
+animation              {return ( TOK_ANIMATION );}
+animdef                {return ( TOK_ANIMDEF );}
 
-stages                 {return ( STAGES );}
-loops                  {return ( LOOPS );}
-delayms                {return ( DELAYMS );}
-looptype               {return ( LOOPTYPE );}
+stages                 {return ( TOK_STAGES );}
+loops                  {return ( TOK_LOOPS );}
+delayms                {return ( TOK_DELAYMS );}
+looptype               {return ( TOK_LOOPTYPE );}
 
-timelimit              {return ( TIMELIMIT );}
+timelimit              {return ( TOK_TIMELIMIT );}
 
-texanim                {return ( TEXANIM );}
-colanim                {return ( COLANIM );}
-geoanim                {return ( GEOANIM );}
-toganim                {return ( TOGANIM );}
-istate                 {return ( ISTATE );}
+texanim                {return ( TOK_TEXANIM );}
+colanim                {return ( TOK_COLANIM );}
+geoanim                {return ( TOK_GEOANIM );}
+toganim                {return ( TOK_TOGANIM );}
+istate                 {return ( TOK_ISTATE );}
 
-deltaa                 {return ( DELTAA );}
-deltar                 {return ( DELTAR );}
-deltag                 {return ( DELTAG );}
-deltab                 {return ( DELTAB );}
-deltax                 {return ( DELTAX );}
-deltay                 {return ( DELTAY );}
-deltaz                 {return ( DELTAZ );}
-deltas                 {return ( DELTAS );}
-deltat                 {return ( DELTAT );}
+deltaa                 {return ( TOK_DELTAA );}
+deltar                 {return ( TOK_DELTAR );}
+deltag                 {return ( TOK_DELTAG );}
+deltab                 {return ( TOK_DELTAB );}
+deltax                 {return ( TOK_DELTAX );}
+deltay                 {return ( TOK_DELTAY );}
+deltaz                 {return ( TOK_DELTAZ );}
+deltas                 {return ( TOK_DELTAS );}
+deltat                 {return ( TOK_DELTAT );}
 
-soundconf              {return ( SOUNDCONF );}
-samplerate             {return ( SAMPLERATE );}
-volume                 {return ( VOLUME );}
-pan                    {return ( PAN );}
-stereo                 {return ( STEREO );}
-fxchannels             {return ( FXCHANNELS );}
-chunksize              {return ( CHUNKSIZE );}
+soundconf              {return ( TOK_SOUNDCONF );}
+samplerate             {return ( TOK_SAMPLERATE );}
+volume                 {return ( TOK_VOLUME );}
+pan                    {return ( TOK_PAN );}
+stereo                 {return ( TOK_STEREO );}
+fxchannels             {return ( TOK_FXCHANNELS );}
+chunksize              {return ( TOK_CHUNKSIZE );}
 
-effect                 {return ( EFFECT );}
-fadeinms               {return ( FADEINMS );}
-fadeoutms              {return ( FADEOUTMS );}
-framelimit             {return ( FRAMELIMIT );}
-limit                  {return ( LIMIT );}
+effect                 {return ( TOK_EFFECT );}
+fadeinms               {return ( TOK_FADEINMS );}
+fadeoutms              {return ( TOK_FADEOUTMS );}
+framelimit             {return ( TOK_FRAMELIMIT );}
+limit                  {return ( TOK_LIMIT );}
 
-music                  {return ( MUSIC );}
+music                  {return ( TOK_MUSIC );}
 
-{whtspc}s{whtspc}      {return ( SCOORD );}
-{whtspc}t{whtspc}      {return ( SCOORD );}
+{whtspc}s{whtspc}      {return ( TOK_SCOORD );}
+{whtspc}t{whtspc}      {return ( TOK_SCOORD );}
 
-{whtspc}w{whtspc}      {return ( WIDTH );}
-{whtspc}h{whtspc}      {return ( HEIGHT );}
+{whtspc}w{whtspc}      {return ( TOK_WIDTH );}
+{whtspc}h{whtspc}      {return ( TOK_HEIGHT );}
 
-texarea                {return ( TEXAREA );}
-mipmap                 {return ( MIPMAP );}
+texarea                {return ( TOK_TEXAREA );}
+mipmap                 {return ( TOK_MIPMAP );}
 
-luminance              {return ( TEX_LUMINANCE );}
+luminance              {return ( TOK_TEX_LUMINANCE );}
 
 {number}		{ 
                           yylval.num = atoi( yytext );
-                          return NUMBER;
+                          return TOK_NUMBER;
                         }
 {string}                { 
                           yylval.ptr = (char *)yytext;
-                          return STRING; 
+                          return TOK_STRING; 
                         }
 
 {rational}              { 
                           yylval.rnum = atof( yytext );
-                          return RATIONAL;
+                          return TOK_RATIONAL;
                         }
 
-{opensect}              {return( OPENSECT );}
+{opensect}              {return( TOK_OPENSECT );}
 
-{closesect}             {return( CLOSESECT );}
+{closesect}             {return( TOK_CLOSESECT );}
 
 #+.*			/* eat comments */
 

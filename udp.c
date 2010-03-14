@@ -12,6 +12,10 @@
  * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  */
 
+#include <windef.h>
+#include <windows.h>
+#include <winsock2.h>
+
 #include "c_defs.h"
 #include "conqnet.h"
 #include "udp.h"
@@ -19,7 +23,8 @@
 
 #ifndef BOOL
 #warning "FIXME - BOOL"
-# define BOOL unsigned char
+/* where is this supposed to be defined??? */
+# define BOOL int
 #endif
 
 int udpOpen(int port, struct sockaddr_in* addr)
@@ -109,15 +114,20 @@ int udpRecv(int fd, void* buffer, int bufferLength,
   AddrLen fromLength = sizeof(from);
   
   int byteCount = recvfrom(fd, (char*)buffer, bufferLength, 0,
-                           (struct sockaddr*)&from, (socklen_t*) &fromLength);
-  if (byteCount < 0) {
-    if (errno == EWOULDBLOCK) {
-      return 0;
-    }
-    else {
-      utLog("NET: udpRecv: %s", strerror(errno));
-      return -1;
-    }
+                           (struct sockaddr*)&from, (AddrLen*) &fromLength);
+  if (byteCount < 0) 
+    {
+#if !defined(MINGW)
+      if (errno == EWOULDBLOCK) 
+        {
+          return 0;
+        }
+      else 
+#endif  /* MINGW */
+        {
+          utLog("NET: udpRecv: %s", strerror(errno));
+          return -1;
+        }
   }
   if (addr) 
     *addr = from;

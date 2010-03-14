@@ -19,7 +19,6 @@
 #include <GL/glut.h>
 #include <GL/gl.h>
 #include <GL/glu.h>
-#include <GL/glx.h>
 
 #include "textures.h"
 #include "gldisplay.h"

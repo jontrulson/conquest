@@ -20,7 +20,6 @@
 #include <GL/glut.h>
 #include <GL/gl.h>
 #include <GL/glu.h>
-#include <GL/glx.h>
 
 #define NOEXTERN_GLTEXTURES
 #include "textures.h"

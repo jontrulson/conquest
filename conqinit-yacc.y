@@ -124,26 +124,33 @@ static int parsebool(char *str);
   real rnum;
 };
 
-%token <num> OPENSECT CLOSESECT NUMBER 
-%token <num> GLOBAL PLANETMAX SHIPMAX USERMAX MSGMAX HISTMAX
-%token <num> SHIPTYPE ENGFAC WEAFAC ACCELFAC TORPWARP WARPMAX
-%token <num> ARMYMAX SHMAX DAMMAX TORPMAX FUELMAX NAME SIZE
-%token <num> PLANET PRIMARY ANGLE VELOCITY RADIUS PTYPE PTEAM
-%token <num> ARMIES VISIBLE CORE XCOORD YCOORD TEXNAME COLOR
-%token <num> HOMEPLANET TEXTURE FILENAME
-%token <num> ANIMATION ANIMDEF 
-%token <num> STAGES LOOPS DELAYMS LOOPTYPE TIMELIMIT
-%token <num> TEXANIM COLANIM GEOANIM TOGANIM ISTATE
-%token <num> DELTAA DELTAR DELTAG DELTAB DELTAX DELTAY DELTAZ DELTAS 
+%token <num> TOK_OPENSECT TOK_CLOSESECT TOK_NUMBER 
+%token <num> TOK_GLOBAL TOK_PLANETMAX TOK_SHIPMAX TOK_USERMAX TOK_MSGMAX 
+%token <num> TOK_HISTMAX
+%token <num> TOK_SHIPTYPE TOK_ENGFAC TOK_WEAFAC TOK_ACCELFAC TOK_TORPWARP 
+%token <num> TOK_WARPMAX
+%token <num> TOK_ARMYMAX TOK_SHMAX TOK_DAMMAX TOK_TORPMAX TOK_FUELMAX 
+%token <num> TOK_NAME TOK_SIZE
+%token <num> TOK_PLANET TOK_PRIMARY TOK_ANGLE TOK_VELOCITY TOK_RADIUS 
+%token <num> TOK_PTYPE TOK_PTEAM
+%token <num> TOK_ARMIES TOK_VISIBLE TOK_CORE TOK_XCOORD TOK_YCOORD 
+%token <num> TOK_TEXNAME TOK_COLOR
+%token <num> TOK_HOMEPLANET TOK_TEXTURE TOK_FILENAME
+%token <num> TOK_ANIMATION TOK_ANIMDEF 
+%token <num> TOK_STAGES TOK_LOOPS TOK_DELAYMS TOK_LOOPTYPE TOK_TIMELIMIT
+%token <num> TOK_TEXANIM TOK_COLANIM TOK_GEOANIM TOK_TOGANIM TOK_ISTATE
+%token <num> TOK_DELTAA TOK_DELTAR TOK_DELTAG TOK_DELTAB TOK_DELTAX 
+%token <num> TOK_DELTAY TOK_DELTAZ TOK_DELTAS 
 
-%token <num> SOUNDCONF SAMPLERATE VOLUME PAN STEREO FXCHANNELS CHUNKSIZE
-%token <num> EFFECT FADEINMS FADEOUTMS LIMIT FRAMELIMIT
-%token <num> MUSIC
-%token <num> DELTAT SCOORD TCOORD WIDTH HEIGHT TEXAREA
-%token <num> MIPMAP TEX_LUMINANCE
+%token <num> TOK_SOUNDCONF TOK_SAMPLERATE TOK_VOLUME TOK_PAN TOK_STEREO 
+%token <num> TOK_FXCHANNELS TOK_CHUNKSIZE
+%token <num> TOK_EFFECT TOK_FADEINMS TOK_FADEOUTMS TOK_LIMIT TOK_FRAMELIMIT
+%token <num> TOK_MUSIC
+%token <num> TOK_DELTAT TOK_SCOORD TOK_TCOORD TOK_WIDTH TOK_HEIGHT TOK_TEXAREA
+%token <num> TOK_MIPMAP TOK_TEX_LUMINANCE
 
-%token <ptr>  STRING 
-%token <rnum> RATIONAL
+%token <ptr>  TOK_STRING 
+%token <rnum> TOK_RATIONAL
 
 %type <ptr>  string
 %type <num>  number
@@ -175,11 +182,11 @@ globalconfig    : startglobal stmts closesect
 
 startglobal     : globalword opensect
                 {
-                   startSection(GLOBAL);
+                   startSection(TOK_GLOBAL);
                 }
                 ;
 
-globalword      : GLOBAL
+globalword      : TOK_GLOBAL
                 {;}
                 ;
 
@@ -188,11 +195,11 @@ shiptypeconfig  : startshiptype stmts closesect
 
 startshiptype   : shiptypeword opensect
                 {
-                   startSection(SHIPTYPE);
+                   startSection(TOK_SHIPTYPE);
                 }
                 ;
 
-shiptypeword    : SHIPTYPE
+shiptypeword    : TOK_SHIPTYPE
                 {;}
                 ;
 
@@ -201,11 +208,11 @@ planetconfig    : startplanet stmts closesect
 
 startplanet     : planetword opensect
                 {
-                   startSection(PLANET);
+                   startSection(TOK_PLANET);
                 }
                 ;
 
-planetword      : PLANET
+planetword      : TOK_PLANET
                 {;}
                 ;                
 
@@ -214,11 +221,11 @@ textureconfig   : starttexture stmts closesect
 
 starttexture    : textureword opensect
                 {
-                   startSection(TEXTURE);
+                   startSection(TOK_TEXTURE);
                 }
                 ;
 
-textureword     : TEXTURE
+textureword     : TOK_TEXTURE
                 {;}
                 ;                
 
@@ -227,11 +234,11 @@ animationconfig : startanimation stmts closesect
 
 startanimation  : animationword opensect
                 {
-                   startSection(ANIMATION);
+                   startSection(TOK_ANIMATION);
                 }
                 ;
 
-animationword   : ANIMATION
+animationword   : TOK_ANIMATION
                 {;}
                 ;
 
@@ -241,11 +248,11 @@ animdefconfig   : startanimdef stmts closesect
 
 startanimdef    : animdefword opensect
                 {
-                    startSection(ANIMDEF);
+                    startSection(TOK_ANIMDEF);
                 }
                 ;
 
-animdefword     : ANIMDEF
+animdefword     : TOK_ANIMDEF
                 {;}
                 ;
 
@@ -254,11 +261,11 @@ texanimconfig   : starttexanim stmts closesect
 
 starttexanim    : texanimword opensect
                 {
-                    startSection(TEXANIM);
+                    startSection(TOK_TEXANIM);
                 }
                 ;
 
-texanimword     : TEXANIM
+texanimword     : TOK_TEXANIM
                 {;}
                 ;
 
@@ -267,11 +274,11 @@ colanimconfig   : startcolanim stmts closesect
 
 startcolanim    : colanimword opensect
                 {
-                    startSection(COLANIM);
+                    startSection(TOK_COLANIM);
                 }
                 ;
 
-colanimword     : COLANIM
+colanimword     : TOK_COLANIM
                 {;}
                 ;
 
@@ -280,11 +287,11 @@ geoanimconfig   : startgeoanim stmts closesect
 
 startgeoanim    : geoanimword opensect
                 {
-                    startSection(GEOANIM);
+                    startSection(TOK_GEOANIM);
                 }
                 ;
 
-geoanimword     : GEOANIM
+geoanimword     : TOK_GEOANIM
                 {;}
                 ;
 
@@ -293,11 +300,11 @@ toganimconfig   : starttoganim stmts closesect
 
 starttoganim    : toganimword opensect
                 {
-                    startSection(TOGANIM);
+                    startSection(TOK_TOGANIM);
                 }
                 ;
 
-toganimword     : TOGANIM
+toganimword     : TOK_TOGANIM
                 {;}
                 ;
 
@@ -306,11 +313,11 @@ istateconfig    : startistate stmts closesect
 
 startistate     : istateword opensect
                 {
-                    startSection(ISTATE);
+                    startSection(TOK_ISTATE);
                 }
                 ;
 
-istateword     : ISTATE
+istateword     : TOK_ISTATE
                 {;}
                 ;
 
@@ -320,11 +327,11 @@ texareaconfig  : starttexarea stmts closesect
 
 starttexarea   : texareaword opensect
                 {
-                    startSection(TEXAREA);
+                    startSection(TOK_TEXAREA);
                 }
                 ;
 
-texareaword     : TEXAREA
+texareaword     : TOK_TEXAREA
                 {;}
                 ;
 
@@ -333,11 +340,11 @@ soundconfconfig    : startsoundconf stmts closesect
 
 startsoundconf     : soundconfword opensect
                    {
-                      startSection(SOUNDCONF);
+                      startSection(TOK_SOUNDCONF);
                    }
                    ;
 
-soundconfword      : SOUNDCONF
+soundconfword      : TOK_SOUNDCONF
                    {;}
                    ;
 
@@ -346,11 +353,11 @@ effectconfig   : starteffect stmts closesect
 
 starteffect    : effectword opensect
                {
-                  startSection(EFFECT);
+                  startSection(TOK_EFFECT);
                }
                ;
 
-effectword     : EFFECT
+effectword     : TOK_EFFECT
                {;}
                ;
 
@@ -360,20 +367,20 @@ musicconfig    : startmusic stmts closesect
 
 startmusic     : musicword opensect
                {
-                  startSection(MUSIC);
+                  startSection(TOK_MUSIC);
                }
                ;
 
-musicword      : MUSIC
+musicword      : TOK_MUSIC
                {;}
                ;
 
 
-opensect        : OPENSECT
+opensect        : TOK_OPENSECT
                 {;}
                 ;
 
-closesect       : CLOSESECT
+closesect       : TOK_CLOSESECT
                 {endSection();}
                 ;
 
@@ -388,267 +395,267 @@ stmts           : /* empty */
                 | stmts animdefconfig
                 ;
 
-stmt            : PLANETMAX number
+stmt            : TOK_PLANETMAX number
                    {
-                        cfgSectioni(PLANETMAX, $2);
+                        cfgSectioni(TOK_PLANETMAX, $2);
                    }                      
-                | SHIPMAX number
+                | TOK_SHIPMAX number
                    {
-                        cfgSectioni(SHIPMAX, $2);
+                        cfgSectioni(TOK_SHIPMAX, $2);
                    }                      
-                | USERMAX number
+                | TOK_USERMAX number
                    {
-                        cfgSectioni(USERMAX, $2);
+                        cfgSectioni(TOK_USERMAX, $2);
                    }                      
-                | HISTMAX number
+                | TOK_HISTMAX number
                    {
-                        cfgSectioni(HISTMAX, $2);
+                        cfgSectioni(TOK_HISTMAX, $2);
                    }                      
-                | MSGMAX number
+                | TOK_MSGMAX number
                    {
-                        cfgSectioni(MSGMAX, $2);
+                        cfgSectioni(TOK_MSGMAX, $2);
                    }                      
-                | NAME string
+                | TOK_NAME string
                    {
-                        cfgSections(NAME, $2);
+                        cfgSections(TOK_NAME, $2);
                    }                      
-                | ENGFAC rational
+                | TOK_ENGFAC rational
                    {
-                        cfgSectionf(ENGFAC, $2);
+                        cfgSectionf(TOK_ENGFAC, $2);
                    }                      
-                | WEAFAC rational
+                | TOK_WEAFAC rational
                    {
-                        cfgSectionf(WEAFAC, $2);
+                        cfgSectionf(TOK_WEAFAC, $2);
                    }                      
-                | ACCELFAC rational
+                | TOK_ACCELFAC rational
                    {
-                        cfgSectionf(ACCELFAC, $2);
+                        cfgSectionf(TOK_ACCELFAC, $2);
                    }                      
-                | TORPWARP number
+                | TOK_TORPWARP number
                    {
-                        cfgSectioni(TORPWARP, $2);
+                        cfgSectioni(TOK_TORPWARP, $2);
                    }                      
-                | WARPMAX number
+                | TOK_WARPMAX number
                    {
-                        cfgSectioni(WARPMAX, $2);
+                        cfgSectioni(TOK_WARPMAX, $2);
                    }                      
-                | ARMYMAX number
+                | TOK_ARMYMAX number
                    {
-                        cfgSectioni(ARMYMAX, $2);
+                        cfgSectioni(TOK_ARMYMAX, $2);
                    }                      
-                | SHMAX number
+                | TOK_SHMAX number
                    {
-                        cfgSectioni(SHMAX, $2);
+                        cfgSectioni(TOK_SHMAX, $2);
                    }                      
-                | DAMMAX number
+                | TOK_DAMMAX number
                    {
-                        cfgSectioni(DAMMAX, $2);
+                        cfgSectioni(TOK_DAMMAX, $2);
                    }                      
-                | TORPMAX number
+                | TOK_TORPMAX number
                    {
-                        cfgSectioni(TORPMAX, $2);
+                        cfgSectioni(TOK_TORPMAX, $2);
                    }                      
-                | FUELMAX number
+                | TOK_FUELMAX number
                    {
-                        cfgSectioni(FUELMAX, $2);
+                        cfgSectioni(TOK_FUELMAX, $2);
                    }                      
-                | SIZE number
+                | TOK_SIZE number
                    {
-                        cfgSectioni(SIZE, $2);
+                        cfgSectioni(TOK_SIZE, $2);
                    }                      
-                | HOMEPLANET string
+                | TOK_HOMEPLANET string
                    {
-                        cfgSectionb(HOMEPLANET, $2);
+                        cfgSectionb(TOK_HOMEPLANET, $2);
                    }                      
-                | PRIMARY string
+                | TOK_PRIMARY string
                    {
-                        cfgSections(PRIMARY, $2);
+                        cfgSections(TOK_PRIMARY, $2);
                    }                      
-                | ANGLE rational
+                | TOK_ANGLE rational
                    {
-                        cfgSectionf(ANGLE, $2);
+                        cfgSectionf(TOK_ANGLE, $2);
                    }                      
-                | VELOCITY rational
+                | TOK_VELOCITY rational
                    {
-                        cfgSectionf(VELOCITY, $2);
+                        cfgSectionf(TOK_VELOCITY, $2);
                    }                      
-                | RADIUS rational
+                | TOK_RADIUS rational
                    {
-                        cfgSectionf(RADIUS, $2);
+                        cfgSectionf(TOK_RADIUS, $2);
                    }                      
-                | PTYPE string
+                | TOK_PTYPE string
                    {
-                        cfgSections(PTYPE, $2);
+                        cfgSections(TOK_PTYPE, $2);
                    }                      
-                | PTEAM string
+                | TOK_PTEAM string
                    {
-                        cfgSections(PTEAM, $2);
+                        cfgSections(TOK_PTEAM, $2);
                    }                      
-                | ARMIES number number
+                | TOK_ARMIES number number
                    {
-                        cfgSectionil(ARMIES, $2, $3);
+                        cfgSectionil(TOK_ARMIES, $2, $3);
                    }                      
-                | ARMIES number
+                | TOK_ARMIES number
                    {
-                        cfgSectioni(ARMIES, $2);
+                        cfgSectioni(TOK_ARMIES, $2);
                    }                      
-                | VISIBLE string
+                | TOK_VISIBLE string
                    {
-                        cfgSectionb(VISIBLE, $2);
+                        cfgSectionb(TOK_VISIBLE, $2);
                    }                      
-                | CORE string
+                | TOK_CORE string
                    {
-                        cfgSectionb(CORE, $2);
+                        cfgSectionb(TOK_CORE, $2);
                    }                      
-                | MIPMAP string
+                | TOK_MIPMAP string
                    {
-                        cfgSectionb(MIPMAP, $2);
+                        cfgSectionb(TOK_MIPMAP, $2);
                    }                      
-                | XCOORD rational
+                | TOK_XCOORD rational
                    {
-                        cfgSectionf(XCOORD, $2);
+                        cfgSectionf(TOK_XCOORD, $2);
                    }                      
-                | YCOORD rational
+                | TOK_YCOORD rational
                    {
-                        cfgSectionf(YCOORD, $2);
+                        cfgSectionf(TOK_YCOORD, $2);
                    }                      
-                | TEXNAME string
+                | TOK_TEXNAME string
                    {
-                        cfgSections(TEXNAME, $2);
+                        cfgSections(TOK_TEXNAME, $2);
                    }                      
-                | COLOR string
+                | TOK_COLOR string
                    {
-                        cfgSections(COLOR, $2);
+                        cfgSections(TOK_COLOR, $2);
                    }                      
-                | FILENAME string
+                | TOK_FILENAME string
                    {
-                        cfgSections(FILENAME, $2);
+                        cfgSections(TOK_FILENAME, $2);
                    }                      
-                | ANIMDEF string
+                | TOK_ANIMDEF string
                    {            /* in this form, it's a statement
                                    rather than a section */
-                        cfgSections(ANIMDEF, $2);
+                        cfgSections(TOK_ANIMDEF, $2);
                    }                      
-                | STAGES number
+                | TOK_STAGES number
                    {
-                        cfgSectioni(STAGES, $2);
+                        cfgSectioni(TOK_STAGES, $2);
                    }                      
-                | LOOPS number
+                | TOK_LOOPS number
                    {
-                        cfgSectioni(LOOPS, $2);
+                        cfgSectioni(TOK_LOOPS, $2);
                    }                      
-                | DELAYMS number
+                | TOK_DELAYMS number
                    {
-                        cfgSectioni(DELAYMS, $2);
+                        cfgSectioni(TOK_DELAYMS, $2);
                    }                      
-                | LOOPTYPE number
+                | TOK_LOOPTYPE number
                    {
-                        cfgSectioni(LOOPTYPE, $2);
+                        cfgSectioni(TOK_LOOPTYPE, $2);
                    }                      
-                | DELTAA rational
+                | TOK_DELTAA rational
                    {
-                        cfgSectionf(DELTAA, $2);
+                        cfgSectionf(TOK_DELTAA, $2);
                    }                      
-                | DELTAR rational
+                | TOK_DELTAR rational
                    {
-                        cfgSectionf(DELTAR, $2);
+                        cfgSectionf(TOK_DELTAR, $2);
                    }                      
-                | DELTAG rational
+                | TOK_DELTAG rational
                    {
-                        cfgSectionf(DELTAG, $2);
+                        cfgSectionf(TOK_DELTAG, $2);
                    }                      
-                | DELTAB rational
+                | TOK_DELTAB rational
                    {
-                        cfgSectionf(DELTAB, $2);
+                        cfgSectionf(TOK_DELTAB, $2);
                    }                      
-                | DELTAX rational
+                | TOK_DELTAX rational
                    {
-                        cfgSectionf(DELTAX, $2);
+                        cfgSectionf(TOK_DELTAX, $2);
                    }                      
-                | DELTAY rational
+                | TOK_DELTAY rational
                    {
-                        cfgSectionf(DELTAY, $2);
+                        cfgSectionf(TOK_DELTAY, $2);
                    }                      
-                | DELTAZ rational
+                | TOK_DELTAZ rational
                    {
-                        cfgSectionf(DELTAZ, $2);
+                        cfgSectionf(TOK_DELTAZ, $2);
                    }                      
-                | DELTAS rational
+                | TOK_DELTAS rational
                    {
-                        cfgSectionf(DELTAS, $2);
+                        cfgSectionf(TOK_DELTAS, $2);
                    }                      
-                | TIMELIMIT number
+                | TOK_TIMELIMIT number
                    {
-                        cfgSectioni(TIMELIMIT, $2);
+                        cfgSectioni(TOK_TIMELIMIT, $2);
                    }                      
-                | SAMPLERATE number
+                | TOK_SAMPLERATE number
                    {
-                        cfgSectioni(SAMPLERATE, $2);
+                        cfgSectioni(TOK_SAMPLERATE, $2);
                    }                      
-                | VOLUME number
+                | TOK_VOLUME number
                    {
-                        cfgSectioni(VOLUME, $2);
+                        cfgSectioni(TOK_VOLUME, $2);
                    }                      
-                | PAN number
+                | TOK_PAN number
                    {
-                        cfgSectioni(PAN, $2);
+                        cfgSectioni(TOK_PAN, $2);
                    }                      
-                | STEREO string
+                | TOK_STEREO string
                    {
-                        cfgSectionb(STEREO, $2);
+                        cfgSectionb(TOK_STEREO, $2);
                    }                      
-                | FXCHANNELS number
+                | TOK_FXCHANNELS number
                    {
-                        cfgSectioni(FXCHANNELS, $2);
+                        cfgSectioni(TOK_FXCHANNELS, $2);
                    }                      
-                | CHUNKSIZE number
+                | TOK_CHUNKSIZE number
                    {
-                        cfgSectioni(CHUNKSIZE, $2);
+                        cfgSectioni(TOK_CHUNKSIZE, $2);
                    }                      
-                | FADEINMS number
+                | TOK_FADEINMS number
                    {
-                        cfgSectioni(FADEINMS, $2);
+                        cfgSectioni(TOK_FADEINMS, $2);
                    }                      
-                | FADEOUTMS number
+                | TOK_FADEOUTMS number
                    {
-                        cfgSectioni(FADEOUTMS, $2);
+                        cfgSectioni(TOK_FADEOUTMS, $2);
                    }                      
-                | FRAMELIMIT number
+                | TOK_FRAMELIMIT number
                    {
-                        cfgSectioni(FRAMELIMIT, $2);
+                        cfgSectioni(TOK_FRAMELIMIT, $2);
                    }                      
-                | LIMIT number
+                | TOK_LIMIT number
                    {
-                        cfgSectioni(LIMIT, $2);
+                        cfgSectioni(TOK_LIMIT, $2);
                    }                      
-                | SCOORD rational
+                | TOK_SCOORD rational
                    {
-                        cfgSectionf(SCOORD, $2);
+                        cfgSectionf(TOK_SCOORD, $2);
                    }                      
-                | TCOORD rational
+                | TOK_TCOORD rational
                    {
-                        cfgSectionf(TCOORD, $2);
+                        cfgSectionf(TOK_TCOORD, $2);
                    }                      
-                | DELTAT rational
+                | TOK_DELTAT rational
                    {
-                        cfgSectionf(DELTAT, $2);
+                        cfgSectionf(TOK_DELTAT, $2);
                    }                      
-                | WIDTH rational
+                | TOK_WIDTH rational
                    {
-                        cfgSectionf(WIDTH, $2);
+                        cfgSectionf(TOK_WIDTH, $2);
                    }                      
-                | HEIGHT rational
+                | TOK_HEIGHT rational
                    {
-                        cfgSectionf(HEIGHT, $2);
+                        cfgSectionf(TOK_HEIGHT, $2);
                    }                      
-                | TEX_LUMINANCE string
+                | TOK_TEX_LUMINANCE string
                    {
-                        cfgSectionb(TEX_LUMINANCE, $2);
+                        cfgSectionb(TOK_TEX_LUMINANCE, $2);
                    }                      
                 | error closesect
                 ;
 
-string		: STRING
+string		: TOK_STRING
                   { 
                     ptr = (char *)strdup($1);
                     if (ptr)
@@ -656,9 +663,9 @@ string		: STRING
                     $$ = ptr;
                   }
                 ;
-number		: NUMBER		{ $$ = $1; }
+number		: TOK_NUMBER		{ $$ = $1; }
 		;
-rational	: RATIONAL		{ $$ = $1; }
+rational	: TOK_RATIONAL		{ $$ = $1; }
 		;
 
 %%
@@ -1752,7 +1759,7 @@ static void startSection(int section)
 
   switch (section)
     {
-    case GLOBAL:    
+    case TOK_GLOBAL:    
       {
         if (globalRead)
           {
@@ -1775,7 +1782,7 @@ static void startSection(int section)
       }
       break;
 
-    case SHIPTYPE:    
+    case TOK_SHIPTYPE:    
       {
         if (!globalRead)
           {
@@ -1786,7 +1793,7 @@ static void startSection(int section)
           }
       }
       break;
-    case PLANET:    
+    case TOK_PLANET:    
       {
         if (!globalRead)
           {
@@ -1803,7 +1810,7 @@ static void startSection(int section)
       }
       break;
 
-    case TEXTURE:
+    case TOK_TEXTURE:
       {
         memset((void *)&currTexture, 0, sizeof(cqiTextureInitRec_t));
         currTexAreas = NULL;
@@ -1811,16 +1818,16 @@ static void startSection(int section)
       }
       break;
 
-    case ANIMATION:
+    case TOK_ANIMATION:
       {
         memset((void *)&currAnimation, 0, sizeof(cqiAnimationInitRec_t));
         currAnimation.adIndex = -1;
       }
       break;
 
-    case ANIMDEF:
+    case TOK_ANIMDEF:
       {
-        if (PREVSECTION() == ANIMATION) /* an inlined animdef */
+        if (PREVSECTION() == TOK_ANIMATION) /* an inlined animdef */
           { 
             int _adndx = -1;
             char tmpname[CQI_NAMELEN];
@@ -1896,7 +1903,7 @@ static void startSection(int section)
       }
       break;
 
-    case SOUNDCONF:    
+    case TOK_SOUNDCONF:    
       {
         if (!_cqiSoundConf)
           {                     /* starting fresh */
@@ -1918,8 +1925,8 @@ static void startSection(int section)
       }
       break;
 
-    case EFFECT:
-    case MUSIC:
+    case TOK_EFFECT:
+    case TOK_MUSIC:
       {
         memset((void *)&currSound, 0, sizeof(cqiSoundRec_t));
         
@@ -1950,7 +1957,7 @@ static void endSection(void)
   
   switch (CURSECTION())
     {
-    case GLOBAL:    
+    case TOK_GLOBAL:    
       {                         /* make sure everything is specified, alloc
                                    new planet/shiptype arrays, reset counts
                                 */ 
@@ -1985,10 +1992,10 @@ static void endSection(void)
       }
       break;
       
-    case SHIPTYPE:    
+    case TOK_SHIPTYPE:    
       break;
 
-    case TEXANIM:
+    case TOK_TEXANIM:
       {
         /* stage == 0 means to disable the anim type */
         if (currAnimDef.texanim.stages) 
@@ -1999,7 +2006,7 @@ static void endSection(void)
       }
       break;
 
-    case COLANIM:
+    case TOK_COLANIM:
       {
         /* stage == 0 means to disable the anim type */
         if (currAnimDef.colanim.stages)
@@ -2009,7 +2016,7 @@ static void endSection(void)
       }
       break;
 
-    case GEOANIM:
+    case TOK_GEOANIM:
       {
         /* stage == 0 means to disable the anim type */
         if (currAnimDef.geoanim.stages)
@@ -2019,7 +2026,7 @@ static void endSection(void)
       }
       break;
 
-    case TOGANIM:
+    case TOK_TOGANIM:
       {
         /* delayms on a toganim == 0 means to disable the anim type */
         if (currAnimDef.toganim.delayms)
@@ -2029,9 +2036,9 @@ static void endSection(void)
       }
       break;
       
-    case TEXAREA:
+    case TOK_TEXAREA:
       /* this is only valid from within a texture definition */
-      if (PREVSECTION() == TEXTURE)
+      if (PREVSECTION() == TOK_TEXTURE)
         {
           cqiTextureAreaPtr_t taptr;
           
@@ -2071,7 +2078,7 @@ static void endSection(void)
         }
       break;
 
-    case PLANET:    
+    case TOK_PLANET:    
       {
         /* check some basic things */
         if (!currPlanet.name[0] || !currPlanet.primname[0])
@@ -2099,7 +2106,7 @@ static void endSection(void)
       
       break;
       
-    case TEXTURE:
+    case TOK_TEXTURE:
       {
         cqiTextureInitPtr_t texptr;
         int exists = -1;
@@ -2163,7 +2170,7 @@ static void endSection(void)
       }
       break;
 
-    case ANIMATION:
+    case TOK_ANIMATION:
       {
         cqiAnimationInitPtr_t animptr;
         int exists = -1;
@@ -2218,7 +2225,7 @@ static void endSection(void)
       }        
       break;
       
-    case ANIMDEF:
+    case TOK_ANIMDEF:
       {
         cqiAnimDefInitPtr_t animptr;
         int exists = -1;
@@ -2272,7 +2279,7 @@ static void endSection(void)
       }        
       break;
       
-    case SOUNDCONF:    
+    case TOK_SOUNDCONF:    
       {                         /* make sure everything is specified */
 
         if (!_cqiSoundConf->samplerate)
@@ -2289,7 +2296,7 @@ static void endSection(void)
       break;
 
 
-    case EFFECT:
+    case TOK_EFFECT:
       {
         cqiSoundPtr_t sndptr;
         int exists = -1;
@@ -2343,7 +2350,7 @@ static void endSection(void)
       }
       break;
 
-    case MUSIC:
+    case TOK_MUSIC:
       {
         cqiSoundPtr_t sndptr;
         int exists = -1;
@@ -2420,61 +2427,61 @@ static void cfgSectioni(int item, int val)
   
   switch (CURSECTION())
     {
-    case GLOBAL:    
+    case TOK_GLOBAL:    
       {
         switch (item)
           {
-          case PLANETMAX:
+          case TOK_PLANETMAX:
             _cqiGlobal->maxplanets = abs(val);
             break;
-          case SHIPMAX: 
+          case TOK_SHIPMAX: 
             _cqiGlobal->maxships = abs(val);
             break;
-          case USERMAX: 
+          case TOK_USERMAX: 
             _cqiGlobal->maxusers = abs(val);
             break;
-          case HISTMAX: 
+          case TOK_HISTMAX: 
             _cqiGlobal->maxhist = abs(val);
             break;
-          case MSGMAX: 
+          case TOK_MSGMAX: 
             _cqiGlobal->maxmsgs = abs(val);
             break;
           }            
       }
 
       break;
-    case SHIPTYPE:    
+    case TOK_SHIPTYPE:    
       break;
-    case PLANET:    
+    case TOK_PLANET:    
       {
         switch(item)
           {
-          case ARMIES:
+          case TOK_ARMIES:
             currPlanet.armies = abs(val);
             break;
-          case SIZE:
+          case TOK_SIZE:
             currPlanet.size = fabs((real)val);
             break;
           }
       }
       break;
-    case ANIMDEF:
+    case TOK_ANIMDEF:
       {
         currAnimDef.timelimit = abs(val);
       }
       break;
 
-    case SOUNDCONF:    
+    case TOK_SOUNDCONF:    
       {
         switch (item)
           {
-          case SAMPLERATE:
+          case TOK_SAMPLERATE:
             _cqiSoundConf->samplerate = CLAMP(8192, 44100, abs(val));
             break;
-          case FXCHANNELS:
+          case TOK_FXCHANNELS:
             _cqiSoundConf->fxchannels = CLAMP(2, 64, abs(val));
             break;
-          case CHUNKSIZE:
+          case TOK_CHUNKSIZE:
             _cqiSoundConf->chunksize = CLAMP(256, 8192, abs(val));
             break;
           default:
@@ -2482,115 +2489,115 @@ static void cfgSectioni(int item, int val)
           }
       }
 
-    case EFFECT:
-    case MUSIC:
+    case TOK_EFFECT:
+    case TOK_MUSIC:
       {
         switch(item)
           {
-          case VOLUME:
+          case TOK_VOLUME:
             currSound.volume = CLAMP(0, 100, abs(val));
             break;
-          case PAN:
+          case TOK_PAN:
             currSound.pan = CLAMP(-128, 128, abs(val));
             break;
-          case FADEINMS:
+          case TOK_FADEINMS:
             currSound.fadeinms = CLAMP(0, 10000, abs(val));
             break;
-          case FADEOUTMS:
+          case TOK_FADEOUTMS:
             currSound.fadeoutms = CLAMP(0, 10000, abs(val));
             break;
-          case LOOPS:
+          case TOK_LOOPS:
             currSound.loops = abs(val);
             break;
-          case LIMIT:
+          case TOK_LIMIT:
             currSound.limit = abs(val);
             break;
-          case FRAMELIMIT:
+          case TOK_FRAMELIMIT:
             currSound.framelimit = abs(val);
             break;
-          case DELAYMS:
+          case TOK_DELAYMS:
             currSound.delayms = abs(val);
             break;
           }
 
       }
 
-    case TEXANIM:
+    case TOK_TEXANIM:
       {
         switch(item)
           {
-          case STAGES:
+          case TOK_STAGES:
             currAnimDef.texanim.stages = abs(val);
             break;
-          case LOOPS:
+          case TOK_LOOPS:
             currAnimDef.texanim.loops = abs(val);
             break;
-          case DELAYMS:
+          case TOK_DELAYMS:
             currAnimDef.texanim.delayms = abs(val);
             break;
-          case LOOPTYPE:
+          case TOK_LOOPTYPE:
             currAnimDef.texanim.looptype = abs(val);
             break;
           }
       }
       break;
       
-    case COLANIM:
+    case TOK_COLANIM:
       {
         switch(item)
           {
-          case STAGES:
+          case TOK_STAGES:
             currAnimDef.colanim.stages = abs(val);
             break;
-          case LOOPS:
+          case TOK_LOOPS:
             currAnimDef.colanim.loops = abs(val);
             break;
-          case DELAYMS:
+          case TOK_DELAYMS:
             currAnimDef.colanim.delayms = abs(val);
             break;
-          case LOOPTYPE:
+          case TOK_LOOPTYPE:
             currAnimDef.colanim.looptype = abs(val);
             break;
           }
       }
       break;
       
-    case GEOANIM:
+    case TOK_GEOANIM:
       {
         switch(item)
           {
-          case STAGES:
+          case TOK_STAGES:
             currAnimDef.geoanim.stages = abs(val);
             break;
-          case LOOPS:
+          case TOK_LOOPS:
             currAnimDef.geoanim.loops = abs(val);
             break;
-          case DELAYMS:
+          case TOK_DELAYMS:
             currAnimDef.geoanim.delayms = abs(val);
             break;
-          case LOOPTYPE:
+          case TOK_LOOPTYPE:
             currAnimDef.geoanim.looptype = abs(val);
             break;
           }
       }
       break;
       
-    case TOGANIM:
+    case TOK_TOGANIM:
       {
         switch(item)
           {
-          case DELAYMS:
+          case TOK_DELAYMS:
             currAnimDef.toganim.delayms = abs(val);
             break;
           }
       }
       break;
       
-    case ISTATE:
+    case TOK_ISTATE:
       {
         switch(item)
           {
-          case SIZE:
+          case TOK_SIZE:
             currAnimDef.isize = fabs((real)val);
             currAnimDef.istates |= AD_ISTATE_SZ;
             break;
@@ -2614,11 +2621,11 @@ void cfgSectionil(int item, int val1, int val2)
 
   switch (CURSECTION())
     {
-    case PLANET:    
+    case TOK_PLANET:    
       {
         switch (item)
           {
-          case ARMIES:
+          case TOK_ARMIES:
             {
               /* if we got a pair, randomly init one */
               /* make sure it's valid of course... */
@@ -2656,27 +2663,27 @@ static void cfgSectionf(int item, real val)
 
   switch (CURSECTION())
     {
-    case GLOBAL:    
+    case TOK_GLOBAL:    
       break;
-    case SHIPTYPE:    
+    case TOK_SHIPTYPE:    
       break;
-    case PLANET:    
+    case TOK_PLANET:    
       {
         switch (item)
           {
-          case ANGLE:
+          case TOK_ANGLE:
             currPlanet.angle = val;
             break;
-          case VELOCITY:
+          case TOK_VELOCITY:
             currPlanet.velocity = val;
             break;
-          case RADIUS:
+          case TOK_RADIUS:
             currPlanet.radius = val;
             break;
-          case XCOORD:
+          case TOK_XCOORD:
             currPlanet.xcoord = val;
             break;
-          case YCOORD:
+          case TOK_YCOORD:
             currPlanet.ycoord = val;
             break;
           }
@@ -2684,67 +2691,67 @@ static void cfgSectionf(int item, real val)
 
       break;
 
-    case TEXANIM:
+    case TOK_TEXANIM:
       {
         switch(item)
           {
-          case DELTAS:
+          case TOK_DELTAS:
             currAnimDef.texanim.deltas = val;
             break;
-          case DELTAT:
+          case TOK_DELTAT:
             currAnimDef.texanim.deltat = val;
             break;
           }
       }
       break;
-    case COLANIM:
+    case TOK_COLANIM:
       {
         switch(item)
           {
-          case DELTAA:
+          case TOK_DELTAA:
             currAnimDef.colanim.deltaa = val;
             break;
-          case DELTAR: /* red */
+          case TOK_DELTAR: /* red */
             currAnimDef.colanim.deltar = val;
             break;
-          case DELTAG:
+          case TOK_DELTAG:
             currAnimDef.colanim.deltag = val;
             break;
-          case DELTAB:
+          case TOK_DELTAB:
             currAnimDef.colanim.deltab = val;
             break;
           }
       }
       break;
       
-    case GEOANIM:
+    case TOK_GEOANIM:
       {
         switch(item)
           {
-          case DELTAX:
+          case TOK_DELTAX:
             currAnimDef.geoanim.deltax = val;
             break;
-          case DELTAY:
+          case TOK_DELTAY:
             currAnimDef.geoanim.deltay = val;
             break;
-          case DELTAZ:
+          case TOK_DELTAZ:
             currAnimDef.geoanim.deltaz = val;
             break;
-          case DELTAR: /* rotation */
+          case TOK_DELTAR: /* rotation */
             currAnimDef.geoanim.deltar = val;
             break;
-          case DELTAS: /* size */
+          case TOK_DELTAS: /* size */
             currAnimDef.geoanim.deltas = val;
             break;
           }
       }
       break;
       
-    case ISTATE:
+    case TOK_ISTATE:
       {
         switch(item)
           {
-          case ANGLE:
+          case TOK_ANGLE:
             currAnimDef.iangle = val;
             currAnimDef.istates |= AD_ISTATE_ANG;
             break;
@@ -2752,20 +2759,20 @@ static void cfgSectionf(int item, real val)
       }
       break;
 
-    case TEXAREA:
+    case TOK_TEXAREA:
       {
         switch(item)
           {
-          case XCOORD:
+          case TOK_XCOORD:
             currTexArea.x = fabs(val);
             break;
-          case YCOORD:
+          case TOK_YCOORD:
             currTexArea.y = fabs(val);
             break;
-          case WIDTH:
+          case TOK_WIDTH:
             currTexArea.w = fabs(val);
             break;
-          case HEIGHT:
+          case TOK_HEIGHT:
             currTexArea.h = fabs(val);
             break;
           }
@@ -2791,51 +2798,51 @@ void cfgSections(int item, char *val)
 
   switch (CURSECTION())
     {
-    case GLOBAL:    
+    case TOK_GLOBAL:    
       break;
-    case SHIPTYPE:    
+    case TOK_SHIPTYPE:    
       break;
-    case TEXAREA:
+    case TOK_TEXAREA:
       {
         switch (item)
           {
-          case NAME:
+          case TOK_NAME:
             strncpy(currTexArea.name, val, CQI_NAMELEN - 1);
             break;
           }
       }
       break;
-    case TEXANIM:
+    case TOK_TEXANIM:
       {
         switch(item)
           {
-          case COLOR:
+          case TOK_COLOR:
             currAnimDef.texanim.color = hex2color(val);
             break;
           }
       }
       break;
       
-    case COLANIM:
+    case TOK_COLANIM:
       {
         switch(item)
           {
-          case COLOR:
+          case TOK_COLOR:
             currAnimDef.colanim.color = hex2color(val);
             break;
           }
       }
       break;
       
-    case ISTATE:
+    case TOK_ISTATE:
       {
         switch(item)
           {
-          case COLOR:
+          case TOK_COLOR:
             currAnimDef.icolor = hex2color(val);
             currAnimDef.istates |= AD_ISTATE_COL;
             break;
-          case TEXNAME:
+          case TOK_TEXNAME:
             strncpy(currAnimDef.itexname, val, CQI_NAMELEN - 1);
             currAnimDef.istates |= AD_ISTATE_TEX;
             break;
@@ -2843,26 +2850,26 @@ void cfgSections(int item, char *val)
       }
       break;
       
-    case PLANET:    
+    case TOK_PLANET:    
       {
         switch (item)
           {
-          case NAME:
+          case TOK_NAME:
             strncpy(currPlanet.name, val, MAXPLANETNAME - 1);
             break;
-          case PRIMARY:
+          case TOK_PRIMARY:
             strncpy(currPlanet.primname, val, MAXPLANETNAME - 1);
             break;
-          case PTYPE:
+          case TOK_PTYPE:
             currPlanet.ptype = str2ptype(val);
             break;
-          case PTEAM:
+          case TOK_PTEAM:
             currPlanet.pteam = str2team(val);
             break;
-          case TEXNAME:
+          case TOK_TEXNAME:
             strncpy(currPlanet.texname, val, CQI_NAMELEN - 1);
             break;
-          case COLOR:
+          case TOK_COLOR:
             /* this used to be allowed, so for now just warn if 
              * verbose is on 
              */
@@ -2873,20 +2880,20 @@ void cfgSections(int item, char *val)
       }
       break;
 
-    case TEXTURE:
+    case TOK_TEXTURE:
       {
         switch(item)
           {
-          case NAME:
+          case TOK_NAME:
             strncpy(currTexture.name, val, CQI_NAMELEN - 1);
             break;
-          case FILENAME:
+          case TOK_FILENAME:
             if (val[0] == 0)    /* empty filename means only color matters */
               currTexture.flags |= CQITEX_F_COLOR_SPEC;
             else
               strncpy(currTexture.filename, val, CQI_NAMELEN - 1);
             break;
-          case COLOR:
+          case TOK_COLOR:
             currTexture.flags |= CQITEX_F_HAS_COLOR;
             currTexture.color = hex2color(val);
             break;
@@ -2894,26 +2901,26 @@ void cfgSections(int item, char *val)
       }
       break;
       
-    case ANIMATION:
+    case TOK_ANIMATION:
        {
         switch(item)
           {
-          case NAME:
+          case TOK_NAME:
             strncpy(currAnimation.name, val, CQI_NAMELEN - 1);
             break;
-          case ANIMDEF:
+          case TOK_ANIMDEF:
             strncpy(currAnimation.animdef, val, CQI_NAMELEN - 1);
             break;
           }
       }
       break;
 
-    case ANIMDEF:
+    case TOK_ANIMDEF:
        {
         switch(item)
           {
-          case NAME:
-            if (PREVSECTION() == ANIMATION)
+          case TOK_NAME:
+            if (PREVSECTION() == TOK_ANIMATION)
               {
                 /* not allowed to set a name on inlined animdefs - it's
                  * already been done for you.
@@ -2923,22 +2930,22 @@ void cfgSections(int item, char *val)
             else
               strncpy(currAnimDef.name, val, CQI_NAMELEN - 1);
             break;
-          case TEXNAME:
+          case TOK_TEXNAME:
             strncpy(currAnimDef.texname, val, CQI_NAMELEN - 1);
             break;
           }
       }
       break;
 
-    case EFFECT:
-    case MUSIC:
+    case TOK_EFFECT:
+    case TOK_MUSIC:
       {
         switch(item)
           {
-          case NAME:
+          case TOK_NAME:
             strncpy(currSound.name, val, CQI_NAMELEN - 1);
             break;
-          case FILENAME:
+          case TOK_FILENAME:
             strncpy(currSound.filename, val, CQI_NAMELEN - 1);
           }
       }
@@ -2968,32 +2975,32 @@ static void cfgSectionb(int item, char *val)
   
   switch (CURSECTION())
     {
-    case GLOBAL:    
+    case TOK_GLOBAL:    
       break;
-    case SHIPTYPE:    
+    case TOK_SHIPTYPE:    
       break;
-    case PLANET:    
+    case TOK_PLANET:    
       {
         switch(item) 
           {
-          case VISIBLE:
+          case TOK_VISIBLE:
             currPlanet.visible = bval;
             break;
-          case CORE:
+          case TOK_CORE:
             currPlanet.core = bval;
             break;
-          case HOMEPLANET:
+          case TOK_HOMEPLANET:
             currPlanet.homeplanet = bval;
             break;
           }
       }
       break;
 
-    case TEXTURE:
+    case TOK_TEXTURE:
       {
         switch(item) 
           {
-          case MIPMAP:
+          case TOK_MIPMAP:
             if (bval)
               currTexture.flags |= CQITEX_F_GEN_MIPMAPS;
             else
@@ -3001,7 +3008,7 @@ static void cfgSectionb(int item, char *val)
               
             break;
 
-          case TEX_LUMINANCE:
+          case TOK_TEX_LUMINANCE:
             if (bval)
               currTexture.flags |= CQITEX_F_IS_LUMINANCE;
             else
@@ -3012,11 +3019,11 @@ static void cfgSectionb(int item, char *val)
       }
       break;
 
-    case SOUNDCONF:    
+    case TOK_SOUNDCONF:    
       {
         switch (item)
           {
-          case STEREO:
+          case TOK_STEREO:
             _cqiSoundConf->stereo = bval;
             break;
           }
@@ -3034,57 +3041,57 @@ static char *sect2str(int section)
 {
   switch (section)
     {
-    case GLOBAL:
+    case TOK_GLOBAL:
       return "GLOBAL";
       break;
-    case SHIPTYPE:
+    case TOK_SHIPTYPE:
       return "SHIPTYPE";
       break;
-    case PLANET:
+    case TOK_PLANET:
       return "PLANET";
       break;
-    case TEXTURE:
+    case TOK_TEXTURE:
       return "TEXTURE";
       break;
-    case ANIMATION:
+    case TOK_ANIMATION:
       return "ANIMATION";
       break;
-    case ANIMDEF:
+    case TOK_ANIMDEF:
       return "ANIMDEF";
       break;
-    case SOUNDCONF:
+    case TOK_SOUNDCONF:
       return "SOUNDCONF";
       break;
-    case EFFECT:
+    case TOK_EFFECT:
       return "EFFECT";
       break;
-    case MUSIC:
+    case TOK_MUSIC:
       return "MUSIC";
       break;
-    case LIMIT:
+    case TOK_LIMIT:
       return "LIMIT";
       break;
-    case FRAMELIMIT:
+    case TOK_FRAMELIMIT:
       return "FRAMELIMIT";
       break;
 
       /* nested sections */
-    case TEXANIM:
+    case TOK_TEXANIM:
       return "TEXANIM";
       break;
-    case COLANIM:
+    case TOK_COLANIM:
       return "COLANIM";
       break;
-    case GEOANIM:
+    case TOK_GEOANIM:
       return "GEOANIM";
       break;
-    case TOGANIM:
+    case TOK_TOGANIM:
       return "TOGANIM";
       break;
-    case ISTATE:
+    case TOK_ISTATE:
       return "ISTATE";
       break;
-    case TEXAREA:
+    case TOK_TEXAREA:
       return "TEXAREA";
       break;
     }
@@ -3096,188 +3103,188 @@ static char *item2str(int item)
 {
   switch (item)
     {
-    case PLANETMAX:
+    case TOK_PLANETMAX:
       return "PLANETMAX";
       break;
-    case SHIPMAX:
+    case TOK_SHIPMAX:
       return "SHIPMAX";
       break;
-    case USERMAX:
+    case TOK_USERMAX:
       return "USERMAX";
       break;
-    case HISTMAX:
+    case TOK_HISTMAX:
       return "HISTMAX";
       break;
-    case MSGMAX:
+    case TOK_MSGMAX:
       return "MSGMAX";
       break;
-    case NAME:
+    case TOK_NAME:
       return "NAME";
       break;
-    case ENGFAC:
+    case TOK_ENGFAC:
       return "ENGFAC";
       break;
-    case WEAFAC:
+    case TOK_WEAFAC:
       return "WEAFAC";
       break;
-    case ACCELFAC:
+    case TOK_ACCELFAC:
       return "ACCELFAC";
       break;
-    case TORPWARP:
+    case TOK_TORPWARP:
       return "TORPWARP";
       break;
-    case WARPMAX:
+    case TOK_WARPMAX:
       return "WARPMAX";
       break;
-    case ARMYMAX:
+    case TOK_ARMYMAX:
       return "ARMYMAX";
       break;
-    case SHMAX:
+    case TOK_SHMAX:
       return "SHMAX";
       break;
-    case DAMMAX:
+    case TOK_DAMMAX:
       return "DAMMAX";
       break;
-    case TORPMAX:
+    case TOK_TORPMAX:
       return "TORPMAX";
       break;
-    case SIZE:
+    case TOK_SIZE:
       return "SIZE";
       break;
-    case FUELMAX:
+    case TOK_FUELMAX:
       return "FUELMAX";
       break;
-    case PRIMARY:
+    case TOK_PRIMARY:
       return "PRIMARY";
       break;
-    case ANGLE:
+    case TOK_ANGLE:
       return "ANGLE";
       break;
-    case VELOCITY:
+    case TOK_VELOCITY:
       return "VELOCITY";
       break;
-    case RADIUS:
+    case TOK_RADIUS:
       return "RADIUS";
       break;
-    case PTYPE:
+    case TOK_PTYPE:
       return "PTYPE";
       break;
-    case PTEAM:
+    case TOK_PTEAM:
       return "PTEAM";
       break;
-    case ARMIES:
+    case TOK_ARMIES:
       return "ARMIES";
       break;
-    case VISIBLE:
+    case TOK_VISIBLE:
       return "VISIBLE";
       break;
-    case CORE:
+    case TOK_CORE:
       return "CORE";
       break;
-    case XCOORD:
+    case TOK_XCOORD:
       return "XCOORD";
       break;
-    case YCOORD:
+    case TOK_YCOORD:
       return "YCOORD";
       break;
-    case SCOORD:
+    case TOK_SCOORD:
       return "SCOORD";
       break;
-    case TCOORD:
+    case TOK_TCOORD:
       return "TCOORD";
       break;
-    case TEXNAME:
+    case TOK_TEXNAME:
       return "TEXNAME";
       break;
-    case COLOR:
+    case TOK_COLOR:
       return "COLOR";
       break;
-    case HOMEPLANET:
+    case TOK_HOMEPLANET:
       return "HOMEPLANET";
       break;
-    case FILENAME:
+    case TOK_FILENAME:
       return "FILENAME";
       break;
-    case ANIMDEF:
+    case TOK_ANIMDEF:
       return "ANIMDEF";
       break;
-    case TIMELIMIT:
+    case TOK_TIMELIMIT:
       return "TIMELIMIT";
       break;
-    case STAGES:
+    case TOK_STAGES:
       return "STAGES";
       break;
-    case LOOPS:
+    case TOK_LOOPS:
       return "LOOPS";
       break;
-    case DELAYMS:
+    case TOK_DELAYMS:
       return "DELAYMS";
       break;
-    case LOOPTYPE:
+    case TOK_LOOPTYPE:
       return "LOOPTYPE";
       break;
-    case DELTAA:
+    case TOK_DELTAA:
       return "DELTAA";
       break;
-    case DELTAR:
+    case TOK_DELTAR:
       return "DELTAR";
       break;
-    case DELTAG:
+    case TOK_DELTAG:
       return "DELTAG";
       break;
-    case DELTAB:
+    case TOK_DELTAB:
       return "DELTAB";
       break;
-    case DELTAX:
+    case TOK_DELTAX:
       return "DELTAX";
       break;
-    case DELTAY:
+    case TOK_DELTAY:
       return "DELTAY";
       break;
-    case DELTAZ:
+    case TOK_DELTAZ:
       return "DELTAZ";
       break;
-    case DELTAS:
+    case TOK_DELTAS:
       return "DELTAS";
       break;
-    case DELTAT:
+    case TOK_DELTAT:
       return "DELTAT";
       break;
-    case WIDTH:
+    case TOK_WIDTH:
       return "WIDTH";
       break;
-    case HEIGHT:
+    case TOK_HEIGHT:
       return "HEIGHT";
       break;
-    case MIPMAP:
+    case TOK_MIPMAP:
       return "MIPMAP";
       break;
 
-    case SAMPLERATE:
+    case TOK_SAMPLERATE:
       return "SAMPLERATE";
       break;
-    case VOLUME:
+    case TOK_VOLUME:
       return "VOLUME";
       break;
-    case PAN:
+    case TOK_PAN:
       return "PAN";
       break;
-    case STEREO:
+    case TOK_STEREO:
       return "STEREO";
       break;
-    case FXCHANNELS:
+    case TOK_FXCHANNELS:
       return "FXCHANNELS";
       break;
-    case CHUNKSIZE:
+    case TOK_CHUNKSIZE:
       return "CHUNKSIZE";
       break;
-    case FADEINMS:
+    case TOK_FADEINMS:
       return "FADEINMS";
       break;
-    case FADEOUTMS:
+    case TOK_FADEOUTMS:
       return "FADEOUTMS";
       break;
-    case LIMIT:
+    case TOK_LIMIT:
       return "LIMIT";
       break;
     }
