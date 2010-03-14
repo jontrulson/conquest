@@ -150,7 +150,11 @@ static void checkCreateUserConfDir(void)
     }
   
   /* try to create it */
+#if defined(MINGW)
+  if (mkdir(buffer) < 0)
+#else
   if (mkdir(buffer, (S_IRUSR | S_IWUSR | S_IXUSR |S_IRGRP | S_IXGRP)) < 0)
+#endif
     {                             /* not happy */
       utLog("checkCreateUserConfDir(): mkdir(%s) failed: %s.",
            buffer, strerror(errno));

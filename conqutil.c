@@ -612,6 +612,7 @@ void utLog(char *fmt, ...)
 	    {
 	      close(tmp);
 
+#if !defined(MINGW)
 	      if (systemlog)
 		if (chmod(errfile, 
 			  (S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP)) == -1)
@@ -619,6 +620,7 @@ void utLog(char *fmt, ...)
 		    perror("utLog():chmod()");
 		    exit(1);
 		  }
+#endif
 	    }
 	}
       else

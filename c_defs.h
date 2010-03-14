@@ -51,6 +51,7 @@
 #define SIGCLD SIGCHLD
 #endif 
 
+#if !defined(MINGW)
 /* JET - need checks here? */
 #include <sys/ioctl.h>
 #include <sys/socket.h>
@@ -59,6 +60,9 @@
 #include <arpa/inet.h>
 #include <netdb.h>
 #include <fcntl.h>
+#else
+#include <winsock2.h>
+#endif
 
 #ifdef HAVE_DIRENT_H
 #include <dirent.h>
@@ -118,7 +122,6 @@
 #endif
 
 #include <memory.h>
-#include <sys/ioctl.h>
 
 #if !defined(MINGW)
 # if defined(HAVE_MMAP)
@@ -130,8 +133,10 @@
 
 #include <sys/stat.h>
 
+#if !defined(MINGW)
 #include <pwd.h>
 #include <grp.h>
+#endif
 
 #include "defs.h"		/* conquest behavior modification */
 #include "conqdef.h"
@@ -215,8 +220,12 @@ typedef double real;
 			    y[yyzi++] = x; \
 			    y[yyzi] = '\0'; \
 			 }
+#ifndef min
 #define min(x, y) (((x) < (y)) ? (x) : (y))
+#endif
+#ifndef max
 #define max(x, y) (((x) > (y)) ? (x) : (y))
+#endif
 #define fold(x) /* Who knows what this does... */
 #define ifix(x) ((int) (x))
 #define rfix(x) ((real) (x))

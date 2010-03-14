@@ -7,18 +7,6 @@ dnl
 AC_INIT([conquest],[8],[jon@radscan.com])
 AC_CONFIG_HEADER(config.h)
 
-dnl disable static libs by default
-AM_DISABLE_STATIC
-
-AM_INIT_AUTOMAKE
-AC_PROG_LIBTOOL
-AC_PROG_YACC
-AC_PROG_LEX
-AC_PATH_X
-AC_PATH_XTRA
-
-AC_PREFIX_DEFAULT(/opt)
-
 
 
 dnl checks the system
@@ -92,7 +80,9 @@ case "$host" in
   *mingw*)
         # for MinGW systems - we only want to build the GL client (only)
 	AC_DEFINE(MINGW, 1, [MinGW])
-        IS_MINGW="yes"
+        ISMINGW="yes"
+
+        echo "### ISMINGW"
 
 	AC_MSG_RESULT(MinGW)
 	;;
@@ -131,6 +121,27 @@ case "$host" in
 	AC_MSG_RESULT(UNKNOWN)
 	;;
 esac
+
+dnl disable static libs by default (except for mingw)
+if test ! -n "$ISMINGW"
+then
+AM_DISABLE_STATIC
+else
+AM_DISABLE_SHARED
+fi
+
+AM_INIT_AUTOMAKE
+AC_PROG_LIBTOOL
+AC_PROG_YACC
+AC_PROG_LEX
+
+AC_PREFIX_DEFAULT(/opt)
+
+if test ! -n "$ISMINGW"
+then
+AC_PATH_X
+AC_PATH_XTRA
+fi
 
 AC_PROG_CC
 AC_PROG_LIBTOOL

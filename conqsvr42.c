@@ -37,6 +37,10 @@
 /* int getUID(void) - return a User ID */
 int getUID(char *name)
 {
+#if defined(MINGW)
+  return 0;
+#else
+
   struct passwd *conq_pwd;
   char *myusername = clbGetUserLogname();
   char *chkname;
@@ -61,12 +65,16 @@ int getUID(char *name)
     }
   
   return(conq_pwd->pw_uid);
+#endif  /* MINGW */
 }
 
 
 /* int getConquestGID(void) - return conquest's Group ID */
 int getConquestGID(void)
 {
+#if defined(MINGW)
+  return 0;
+#else
   struct group *conq_grp;
   
   if ((conq_grp = getgrnam(CONQUEST_GROUP)) == NULL)
@@ -79,6 +87,7 @@ int getConquestGID(void)
     }
   
   return(conq_grp->gr_gid);
+#endif
 }
 
 
@@ -181,6 +190,9 @@ void conqstats( int snum )
 /*    drcheck */
 void drcheck(void)
 {
+#if defined(MINGW)
+  return;
+#else
   int ppid;
   
   /* If we haven't been getting cpu time in recent history, do no-thing. */
@@ -218,7 +230,7 @@ void drcheck(void)
   drstart();
   
   return;
-  
+#endif  /* MINGW */
 }
 
 
@@ -227,6 +239,9 @@ void drcheck(void)
 /*    drcreate */
 void drcreate(void)
 {
+#if defined(MINGW)
+  return;
+#else
   int pid;
   char drivcmd[BUFFER_SIZE];
 
@@ -259,7 +274,7 @@ void drcreate(void)
     }
   
   return;
-  
+#endif  
 }
 
 
@@ -268,6 +283,7 @@ void drcreate(void)
 /*    drkill */
 void drkill(void)
 {
+#if !defined(MINGW)
   if ( Context.childpid != 0 )
     if ( Context.childpid == Driver->drivpid && Driver->drivstat == DRS_RUNNING )
       {
@@ -276,7 +292,7 @@ void drkill(void)
 	  Driver->drivstat = DRS_KAMIKAZE;
 	PVUNLOCK(&ConqInfo->lockword);
       }
-  
+#endif  /* MINGW */
   return;
   
 }
@@ -287,7 +303,9 @@ void drkill(void)
 /*    drpexit */
 void drpexit(void)
 {
-  
+#if defined(MINGW)
+  return;
+#else
   int i;
   
   if ( Context.childpid != 0 )
@@ -301,7 +319,7 @@ void drpexit(void)
     }
   
   return;
-  
+#endif  /* MINGW */
 }
 
 
@@ -310,7 +328,7 @@ void drpexit(void)
 /*    drstart */
 void drstart(void)
 {
-  
+#if !defined(MINGW)  
   if ( Driver->drivstat == DRS_OFF )
     {
       PVLOCK(&ConqInfo->lockword);
@@ -318,6 +336,7 @@ void drstart(void)
 	drcreate();
       PVUNLOCK(&ConqInfo->lockword);
     }
+#endif  /* MINGW */
   return;
   
 }
@@ -335,7 +354,9 @@ void gcputime( int *cpu )
   *cpu = 0;
   return;
 #else
+
   static struct tms Ptimes;
+
 # ifndef CLK_TCK
 #  ifdef LINUX
    extern long int __sysconf (int);
@@ -386,7 +407,7 @@ void initstats( int *ctemp, int *etemp )
 /*    flag = isagod() */
 
 /* For cygwin, everybody is a god for non-user num checks. */
-#if defined(CYGWIN)
+#if defined(CYGWIN) || defined(MINGW)
 int isagod( int unum )
 {
   if (unum == -1)               /* get god status for current user */
@@ -538,6 +559,9 @@ void upstats( int *ctemp, int *etemp, int *caccum, int *eaccum, int *ctime, int 
 /* return true if a process is alive, else false... */
 int checkPID(int pidnum)
 {
+#if defined(MINGW)
+  return FALSE;
+#else
   int rv;
 
   if (pidnum == 0)
@@ -558,4 +582,5 @@ int checkPID(int pidnum)
     }
   else 
     return(TRUE);
+#endif  /* MINGW */
 }

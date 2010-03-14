@@ -40,13 +40,20 @@ INCLUDES = -DCONQUEST_GROUP=\"$(CONQGROUP)\" \
 
 AM_YFLAGS = -d
 
+if ISMINGW
+lib_LTLIBRARIES = libconquest.la libconqclnt.la libconqserv.la \
+	libconqinit.la libUi.la libUiGL.la libcqsound.la
+else !ISMINGW
+
 if GLCLIENT
 lib_LTLIBRARIES = libconquest.la libconqclnt.la libconqserv.la \
-	libconqinit.la libUi.la libUiGL.la libUiCU.la libcqsound.la
-else
+	libconqinit.la libUi.la libUiGL.la libcqsound.la
+else !GLCLIENT
 lib_LTLIBRARIES = libconquest.la libconqclnt.la libconqserv.la \
 	libconqinit.la libUi.la libUiCU.la
-endif
+endif !GLCLIENT
+
+endif !ISMINGW
 
 libconquest_la_SOURCES = conqai.c ratfor.c  \
 	conqlb.h conqlb.c rndlb.c conqutil.c conqutil.h conqcm.c \
@@ -102,15 +109,28 @@ libcqsound_la_SOURCES = cqsound.c cqsound.h
 
 libcqsound_la_LDFLAGS = -version-info 1:0:0
 
-if GLCLIENT
-bin_PROGRAMS = conquest conquestgl conqai conqoper conqstrat \
-	conquestd conqmetad conqinit
-else
-bin_PROGRAMS = conquest conqai conqoper conqstrat \
-	conquestd conqmetad conqinit
-endif
+# for now, conquestgl is the only program we build for windows
+
+if ISMINGW
+
+bin_PROGRAMS = conquestgl 
+
+else !ISMINGW
 
 libexec_PROGRAMS = conqdriv
+
+if GLCLIENT
+
+bin_PROGRAMS = conquestgl conquest conqoper conqai conqstrat \
+	conquestd conqmetad conqinit
+else !GLCLIENT
+
+bin_PROGRAMS = conquest conqoper conqai conqstrat \
+	conquestd conqmetad conqinit
+
+endif !GLCLIENT
+
+endif !ISMINGW
 
 conquest_SOURCES = conquest.c c_defs.h defs.h conqdef.h conqcom.h context.h \
 	conqreplay.c

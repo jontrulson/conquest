@@ -14,9 +14,6 @@
 #include "conf.h"
 #include "color.h"
 
-#include <pwd.h>
-#include <sys/types.h>
-
 #include "userauth.h"
 
 #define MAX_USERLEN 10		/* only 10 chars for users */

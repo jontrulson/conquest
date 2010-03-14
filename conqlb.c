@@ -2718,6 +2718,17 @@ void clbZeroShip( int snum )
   
 }
 
+/* for MINGW - we are only building the client, so the 'username' is
+ * irrelevant, so return something useless :)
+ */
+#if defined(MINGW)
+char *clbGetUserLogname(void)
+{
+  return "MinGW";
+}
+#else
+
+
 /* get the current username.  We really only need to look it up once
    per session... returns a pointer to a static string. */
 char *clbGetUserLogname(void)
@@ -2744,6 +2755,7 @@ char *clbGetUserLogname(void)
 
   return pwname;
 }
+#endif  /* MINGW */
 
 /*  planetdrive - move the planets based on interval */
 /*  SYNOPSIS */
@@ -2913,7 +2925,16 @@ Unsgn32 clbGetMillis(void)
 }
 
   
-
+#if defined(MINGW)
+void clbBlockAlarm(void)
+{
+  return;
+}
+void clbUnblockAlarm(void)
+{
+  return;
+}
+#else
 void clbBlockAlarm(void)
 {
   sigset_t newmask;
@@ -2935,6 +2956,8 @@ void clbUnblockAlarm(void)
 
   return;
 }
+
+#endif  /* MINGW */
 
 /* may use LOCKING */
 void clbCheckShips(int isDriver)

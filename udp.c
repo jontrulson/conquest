@@ -17,6 +17,11 @@
 #include "udp.h"
 #include "conqutil.h"
 
+#ifndef BOOL
+#warning "FIXME - BOOL"
+# define BOOL unsigned char
+#endif
+
 int udpOpen(int port, struct sockaddr_in* addr)
 {
 #if defined(_WIN32)

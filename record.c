@@ -125,7 +125,9 @@ int recOpenOutput(char *fname, int logit)
       return(FALSE);
     }
 
+#if !defined(MINGW)
   chmod(fname, (S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH));
+#endif
 
 #ifdef HAVE_LIBZ
   if ((rdata_wfdz = gzdopen(rdata_wfd, "wb")) == NULL)

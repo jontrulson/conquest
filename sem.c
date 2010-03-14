@@ -17,9 +17,11 @@
 /*                                                                    */
 /**********************************************************************/
 
+#if !defined(MINGW)
 #include <sys/ipc.h>
 #include <sys/sem.h>
 #include <sys/signal.h>
+#endif
 
 #include "defs.h"
 #include "global.h"
@@ -31,8 +33,11 @@
 #define CONQSEMPERMS (00664)
 #define CONQNUMSEMS  (2)
 
+/* These semops should never be called by the clients, and used in MINGW */
+#if !defined(MINGW)
 static key_t ConquestSemID = -1; 
 static struct sembuf semops[CONQNUMSEMS];
+#endif
 
 char *semGetName(int what)
 {
@@ -45,8 +50,12 @@ char *semGetName(int what)
     return(LCMNTXT);
 }
 
+
 int semInit(void)
 {
+#if defined(MINGW)
+  return ERR;
+#else
   int semflags;
 
 				/* try to create first */
@@ -88,12 +97,14 @@ int semInit(void)
 #endif
   
   return(TRUE);
+#endif  /* MINGW */
 }
 
 
 /* Lock() - lock part of the common block by attempting to inc a semaphore. */
 void Lock(int what)
 {
+#if !defined(MINGW)
   static int Done;
 
   if (ConquestSemID == -1)
@@ -151,12 +162,14 @@ void Lock(int what)
        semGetName(what));
 #endif
 
+#endif  /* MINGW */
   return;
 }
 
 /* Unlock() - unlock part of the common block (dec a semaphore to 0) */
 void Unlock(int what)
 {
+#if !defined(MINGW)
   int err = 0, retval;
   ushort semvals[25];
   union semun {
@@ -237,12 +250,16 @@ void Unlock(int what)
   /* allow alarms again */
   clbUnblockAlarm();
 
+#endif  /* MINGW */
   return;
 }
 
 
 char *semGetStatusStr(void)
 {
+#if defined(MINGW)
+  return "MINGW: no stats";
+#else
   struct semid_ds SemDS;
   ushort semvals[25];
   static char buf[80];
@@ -338,5 +355,6 @@ char *semGetStatusStr(void)
 	  newtime);
 
   return(buf);
+#endif  /* MINGW */
 }
 

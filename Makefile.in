@@ -34,15 +34,23 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-@GLCLIENT_FALSE@bin_PROGRAMS = conquest$(EXEEXT) conqai$(EXEEXT) \
-@GLCLIENT_FALSE@	conqoper$(EXEEXT) conqstrat$(EXEEXT) \
-@GLCLIENT_FALSE@	conquestd$(EXEEXT) conqmetad$(EXEEXT) \
-@GLCLIENT_FALSE@	conqinit$(EXEEXT)
-@GLCLIENT_TRUE@bin_PROGRAMS = conquest$(EXEEXT) conquestgl$(EXEEXT) \
-@GLCLIENT_TRUE@	conqai$(EXEEXT) conqoper$(EXEEXT) \
-@GLCLIENT_TRUE@	conqstrat$(EXEEXT) conquestd$(EXEEXT) \
-@GLCLIENT_TRUE@	conqmetad$(EXEEXT) conqinit$(EXEEXT)
-libexec_PROGRAMS = conqdriv$(EXEEXT)
+@GLCLIENT_FALSE@@ISMINGW_FALSE@bin_PROGRAMS = conquest$(EXEEXT) \
+@GLCLIENT_FALSE@@ISMINGW_FALSE@	conqoper$(EXEEXT) \
+@GLCLIENT_FALSE@@ISMINGW_FALSE@	conqai$(EXEEXT) \
+@GLCLIENT_FALSE@@ISMINGW_FALSE@	conqstrat$(EXEEXT) \
+@GLCLIENT_FALSE@@ISMINGW_FALSE@	conquestd$(EXEEXT) \
+@GLCLIENT_FALSE@@ISMINGW_FALSE@	conqmetad$(EXEEXT) \
+@GLCLIENT_FALSE@@ISMINGW_FALSE@	conqinit$(EXEEXT)
+@GLCLIENT_TRUE@@ISMINGW_FALSE@bin_PROGRAMS = conquestgl$(EXEEXT) \
+@GLCLIENT_TRUE@@ISMINGW_FALSE@	conquest$(EXEEXT) \
+@GLCLIENT_TRUE@@ISMINGW_FALSE@	conqoper$(EXEEXT) \
+@GLCLIENT_TRUE@@ISMINGW_FALSE@	conqai$(EXEEXT) \
+@GLCLIENT_TRUE@@ISMINGW_FALSE@	conqstrat$(EXEEXT) \
+@GLCLIENT_TRUE@@ISMINGW_FALSE@	conquestd$(EXEEXT) \
+@GLCLIENT_TRUE@@ISMINGW_FALSE@	conqmetad$(EXEEXT) \
+@GLCLIENT_TRUE@@ISMINGW_FALSE@	conqinit$(EXEEXT)
+@ISMINGW_TRUE@bin_PROGRAMS = conquestgl$(EXEEXT)
+@ISMINGW_FALSE@libexec_PROGRAMS = conqdriv$(EXEEXT)
 subdir = .
 DIST_COMMON = README $(am__configure_deps) $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in $(srcdir)/config.h.in \
@@ -77,8 +85,9 @@ libUi_la_OBJECTS = $(am_libUi_la_OBJECTS)
 libUi_la_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	--mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(libUi_la_LDFLAGS) \
 	$(LDFLAGS) -o $@
-@GLCLIENT_FALSE@am_libUi_la_rpath = -rpath $(libdir)
-@GLCLIENT_TRUE@am_libUi_la_rpath = -rpath $(libdir)
+@GLCLIENT_FALSE@@ISMINGW_FALSE@am_libUi_la_rpath = -rpath $(libdir)
+@GLCLIENT_TRUE@@ISMINGW_FALSE@am_libUi_la_rpath = -rpath $(libdir)
+@ISMINGW_TRUE@am_libUi_la_rpath = -rpath $(libdir)
 libUiCU_la_LIBADD =
 am_libUiCU_la_OBJECTS = display.lo cprintf.lo colorCU.lo cd2lb.lo \
 	iolb.lo cumisc.lo cuclient.lo options.lo clntauth.lo
@@ -86,8 +95,7 @@ libUiCU_la_OBJECTS = $(am_libUiCU_la_OBJECTS)
 libUiCU_la_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
 	$(libUiCU_la_LDFLAGS) $(LDFLAGS) -o $@
-@GLCLIENT_FALSE@am_libUiCU_la_rpath = -rpath $(libdir)
-@GLCLIENT_TRUE@am_libUiCU_la_rpath = -rpath $(libdir)
+@GLCLIENT_FALSE@@ISMINGW_FALSE@am_libUiCU_la_rpath = -rpath $(libdir)
 libUiGL_la_LIBADD =
 am_libUiGL_la_OBJECTS = GL.lo texfont.lo glfont.lo glmisc.lo \
 	nConsvr.lo nMeta.lo prm.lo nAuth.lo nWelcome.lo nMenu.lo \
@@ -99,15 +107,19 @@ libUiGL_la_OBJECTS = $(am_libUiGL_la_OBJECTS)
 libUiGL_la_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
 	$(libUiGL_la_LDFLAGS) $(LDFLAGS) -o $@
-@GLCLIENT_TRUE@am_libUiGL_la_rpath = -rpath $(libdir)
+@GLCLIENT_TRUE@@ISMINGW_FALSE@am_libUiGL_la_rpath = -rpath $(libdir)
+@ISMINGW_TRUE@am_libUiGL_la_rpath = -rpath $(libdir)
 libconqclnt_la_LIBADD =
 am_libconqclnt_la_OBJECTS = client.lo clientlb.lo playback.lo
 libconqclnt_la_OBJECTS = $(am_libconqclnt_la_OBJECTS)
 libconqclnt_la_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
 	$(libconqclnt_la_LDFLAGS) $(LDFLAGS) -o $@
-@GLCLIENT_FALSE@am_libconqclnt_la_rpath = -rpath $(libdir)
-@GLCLIENT_TRUE@am_libconqclnt_la_rpath = -rpath $(libdir)
+@GLCLIENT_FALSE@@ISMINGW_FALSE@am_libconqclnt_la_rpath = -rpath \
+@GLCLIENT_FALSE@@ISMINGW_FALSE@	$(libdir)
+@GLCLIENT_TRUE@@ISMINGW_FALSE@am_libconqclnt_la_rpath = -rpath \
+@GLCLIENT_TRUE@@ISMINGW_FALSE@	$(libdir)
+@ISMINGW_TRUE@am_libconqclnt_la_rpath = -rpath $(libdir)
 libconqinit_la_LIBADD =
 am_libconqinit_la_OBJECTS = conqinit-yacc.lo conqinit-lex.lo \
 	planinit.lo
@@ -115,8 +127,11 @@ libconqinit_la_OBJECTS = $(am_libconqinit_la_OBJECTS)
 libconqinit_la_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
 	$(libconqinit_la_LDFLAGS) $(LDFLAGS) -o $@
-@GLCLIENT_FALSE@am_libconqinit_la_rpath = -rpath $(libdir)
-@GLCLIENT_TRUE@am_libconqinit_la_rpath = -rpath $(libdir)
+@GLCLIENT_FALSE@@ISMINGW_FALSE@am_libconqinit_la_rpath = -rpath \
+@GLCLIENT_FALSE@@ISMINGW_FALSE@	$(libdir)
+@GLCLIENT_TRUE@@ISMINGW_FALSE@am_libconqinit_la_rpath = -rpath \
+@GLCLIENT_TRUE@@ISMINGW_FALSE@	$(libdir)
+@ISMINGW_TRUE@am_libconqinit_la_rpath = -rpath $(libdir)
 libconqserv_la_LIBADD =
 am_libconqserv_la_OBJECTS = servauth.lo server.lo serverpkt.lo \
 	servercmd.lo
@@ -124,8 +139,11 @@ libconqserv_la_OBJECTS = $(am_libconqserv_la_OBJECTS)
 libconqserv_la_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
 	$(libconqserv_la_LDFLAGS) $(LDFLAGS) -o $@
-@GLCLIENT_FALSE@am_libconqserv_la_rpath = -rpath $(libdir)
-@GLCLIENT_TRUE@am_libconqserv_la_rpath = -rpath $(libdir)
+@GLCLIENT_FALSE@@ISMINGW_FALSE@am_libconqserv_la_rpath = -rpath \
+@GLCLIENT_FALSE@@ISMINGW_FALSE@	$(libdir)
+@GLCLIENT_TRUE@@ISMINGW_FALSE@am_libconqserv_la_rpath = -rpath \
+@GLCLIENT_TRUE@@ISMINGW_FALSE@	$(libdir)
+@ISMINGW_TRUE@am_libconqserv_la_rpath = -rpath $(libdir)
 libconquest_la_DEPENDENCIES = @LTLIBOBJS@
 am_libconquest_la_OBJECTS = conqai.lo ratfor.lo conqlb.lo rndlb.lo \
 	conqutil.lo conqcm.lo conqsvr42.lo global.lo ibuf.lo \
@@ -135,15 +153,20 @@ libconquest_la_OBJECTS = $(am_libconquest_la_OBJECTS)
 libconquest_la_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
 	$(libconquest_la_LDFLAGS) $(LDFLAGS) -o $@
-@GLCLIENT_FALSE@am_libconquest_la_rpath = -rpath $(libdir)
-@GLCLIENT_TRUE@am_libconquest_la_rpath = -rpath $(libdir)
+@GLCLIENT_FALSE@@ISMINGW_FALSE@am_libconquest_la_rpath = -rpath \
+@GLCLIENT_FALSE@@ISMINGW_FALSE@	$(libdir)
+@GLCLIENT_TRUE@@ISMINGW_FALSE@am_libconquest_la_rpath = -rpath \
+@GLCLIENT_TRUE@@ISMINGW_FALSE@	$(libdir)
+@ISMINGW_TRUE@am_libconquest_la_rpath = -rpath $(libdir)
 libcqsound_la_LIBADD =
 am_libcqsound_la_OBJECTS = cqsound.lo
 libcqsound_la_OBJECTS = $(am_libcqsound_la_OBJECTS)
 libcqsound_la_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
 	$(libcqsound_la_LDFLAGS) $(LDFLAGS) -o $@
-@GLCLIENT_TRUE@am_libcqsound_la_rpath = -rpath $(libdir)
+@GLCLIENT_TRUE@@ISMINGW_FALSE@am_libcqsound_la_rpath = -rpath \
+@GLCLIENT_TRUE@@ISMINGW_FALSE@	$(libdir)
+@ISMINGW_TRUE@am_libcqsound_la_rpath = -rpath $(libdir)
 binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
 libexecPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
 PROGRAMS = $(bin_PROGRAMS) $(libexec_PROGRAMS)
@@ -413,11 +436,14 @@ INCLUDES = -DCONQUEST_GROUP=\"$(CONQGROUP)\" \
 	@X_CFLAGS@
 
 AM_YFLAGS = -d
-@GLCLIENT_FALSE@lib_LTLIBRARIES = libconquest.la libconqclnt.la libconqserv.la \
-@GLCLIENT_FALSE@	libconqinit.la libUi.la libUiCU.la
+@GLCLIENT_FALSE@@ISMINGW_FALSE@lib_LTLIBRARIES = libconquest.la libconqclnt.la libconqserv.la \
+@GLCLIENT_FALSE@@ISMINGW_FALSE@	libconqinit.la libUi.la libUiCU.la
 
-@GLCLIENT_TRUE@lib_LTLIBRARIES = libconquest.la libconqclnt.la libconqserv.la \
-@GLCLIENT_TRUE@	libconqinit.la libUi.la libUiGL.la libUiCU.la libcqsound.la
+@GLCLIENT_TRUE@@ISMINGW_FALSE@lib_LTLIBRARIES = libconquest.la libconqclnt.la libconqserv.la \
+@GLCLIENT_TRUE@@ISMINGW_FALSE@	libconqinit.la libUi.la libUiGL.la libcqsound.la
+
+@ISMINGW_TRUE@lib_LTLIBRARIES = libconquest.la libconqclnt.la libconqserv.la \
+@ISMINGW_TRUE@	libconqinit.la libUi.la libUiGL.la libcqsound.la
 
 libconquest_la_SOURCES = conqai.c ratfor.c  \
 	conqlb.h conqlb.c rndlb.c conqutil.c conqutil.h conqcm.c \
