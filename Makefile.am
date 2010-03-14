@@ -30,7 +30,15 @@ man6_MANS = conqdriv.man conqmetad.man conqoper.man conquest.man \
 	conquestd.man conqai.man conqstrat.man \
 	conqinit.man conquestgl.man
 
+if ISMINGW
+
+XLIBS = -lfreeglut -lopengl32 -lglu32 $(SDL_LIBS) -lwsock32 
+
+else !ISMINGW
+
 XLIBS = @X_LIBS@ @X_EXTRA_LIBS@ -lglut -lGL -lGLU -lXt $(SDL_LIBS) @X_PRE_LIBS@ -lXext -lXi -lX11 -lXmu  
+
+endif !ISMINGW
 
 INCLUDES = -DCONQUEST_GROUP=\"$(CONQGROUP)\" \
 	-DCONQSTATE=\"$(CONQLOCALSTATEDIR)\" -DCONQLIBEXEC=\"$(CONQLIBEXECDIR)\" \

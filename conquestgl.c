@@ -535,13 +535,13 @@ void catchSignals(void)
 #ifdef DEBUG_SIG
   utLog("catchSignals() ENABLED");
 #endif
-  
+#if !defined(MINGW)  
   signal(SIGHUP, (void (*)(int))handleSignal);
   /*  signal(SIGTSTP, SIG_IGN);*/
   signal(SIGTERM, (void (*)(int))handleSignal);  
   signal(SIGINT, SIG_IGN);
   signal(SIGQUIT, (void (*)(int))handleSignal);
-  
+#endif  /* MINGW */
   return;
 }
 
@@ -551,6 +551,10 @@ void handleSignal(int sig)
 #ifdef DEBUG_SIG
   utLog("handleSignal() got SIG %d", sig);
 #endif
+#if defined(MINGW)
+  utLog("handleSignal() (MINGW) got a signal??? %d", sig);
+  exit(1);
+#else
   
   switch(sig)
     {
@@ -567,6 +571,7 @@ void handleSignal(int sig)
     }
 
   catchSignals();	/* reset */
+#endif                  /* MINGW */
   return;
 }
 

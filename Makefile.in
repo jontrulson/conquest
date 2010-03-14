@@ -223,7 +223,8 @@ conquestd_OBJECTS = $(am_conquestd_OBJECTS)
 @TCPW_TRUE@	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
 am_conquestgl_OBJECTS = conquestgl.$(OBJEXT)
 conquestgl_OBJECTS = $(am_conquestgl_OBJECTS)
-am__DEPENDENCIES_2 = $(am__DEPENDENCIES_1)
+@ISMINGW_FALSE@am__DEPENDENCIES_2 = $(am__DEPENDENCIES_1)
+@ISMINGW_TRUE@am__DEPENDENCIES_2 = $(am__DEPENDENCIES_1)
 conquestgl_DEPENDENCIES = libUiGL.la libUi.la libconqclnt.la \
 	libconquest.la libcqsound.la libconqinit.la \
 	$(am__DEPENDENCIES_2) $(am__DEPENDENCIES_1)
@@ -433,7 +434,8 @@ man6_MANS = conqdriv.man conqmetad.man conqoper.man conquest.man \
 	conquestd.man conqai.man conqstrat.man \
 	conqinit.man conquestgl.man
 
-XLIBS = @X_LIBS@ @X_EXTRA_LIBS@ -lglut -lGL -lGLU -lXt $(SDL_LIBS) @X_PRE_LIBS@ -lXext -lXi -lX11 -lXmu  
+@ISMINGW_FALSE@XLIBS = @X_LIBS@ @X_EXTRA_LIBS@ -lglut -lGL -lGLU -lXt $(SDL_LIBS) @X_PRE_LIBS@ -lXext -lXi -lX11 -lXmu  
+@ISMINGW_TRUE@XLIBS = -lfreeglut -lopengl32 -lglu32 $(SDL_LIBS) -lwsock32 
 INCLUDES = -DCONQUEST_GROUP=\"$(CONQGROUP)\" \
 	-DCONQSTATE=\"$(CONQLOCALSTATEDIR)\" -DCONQLIBEXEC=\"$(CONQLIBEXECDIR)\" \
 	-DCONQSHARE=\"$(CONQDATADIR)\" -DCONQETC=\"$(CONQSYSCONFDIR)\" \
