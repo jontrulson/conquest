@@ -108,7 +108,7 @@ int procUser(char *buf)
   unum = (int)((Unsgn16)ntohs(suser->unum));
 
 #if defined(DEBUG_CLIENTPROC)
-  utLog("PROC USER: unum = %d", unum);
+  utLog("%s: unum = %d", __FUNCTION__, unum);
 #endif
 
   if (unum < 0 || unum >= MAXUSERS)
@@ -138,6 +138,10 @@ int procUser(char *buf)
   strncpy(Users[unum].username, (char *)suser->username, MAXUSERNAME - 1);
   strncpy(Users[unum].alias, (char *)suser->alias, MAXUSERPNAME - 1);
  
+#if defined(DEBUG_CLIENTPROC)
+  utLog("\t%s: name: %s (%s)", __FUNCTION__, Users[unum].username, Users[unum].alias);
+#endif
+
   return TRUE;
 }
   

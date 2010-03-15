@@ -50,7 +50,12 @@ int recOpenInput(char *fname)
 {
   rdata_rfd = -1;
 
-  if ((rdata_rfd = open(fname, O_RDONLY)) == -1)
+  /* mingw */
+#if !defined(O_BINARY)
+#define O_BINARY (0)
+#endif
+
+  if ((rdata_rfd = open(fname, O_RDONLY | O_BINARY)) == -1)
     {
       printf("recOpenInput: open(%s) failed: %s\n", fname, 
 	     strerror(errno));
@@ -328,11 +333,15 @@ int recReadPkt(char *buf, int blen)
   int pkttype;
 
   if (rdata_rfd == -1)
-    return(SP_NULL);
+    {
+      return(SP_NULL);
+    }
 
   if (!buf || !blen)
-    return(SP_NULL);
-
+    {
+      return(SP_NULL);
+    }
+      
   /* first read in the first byte to get the packet type */
 #ifdef HAVE_LIBZ
   if ((rv = gzread(rdata_rfdz, (char *)buf, 1)) != 1)
@@ -341,8 +350,8 @@ int recReadPkt(char *buf, int blen)
 #endif
     {
 #ifdef DEBUG_REC
-      utLog("recReadPkt: could not read pkt type, returned %d\n",
-              rv);
+      utLog("%s: could not read pkt type, returned (rv = %d)\n",
+            __FUNCTION__, rv);
 #endif
 
       return(SP_NULL);
@@ -383,8 +392,10 @@ int recReadPkt(char *buf, int blen)
       {
 #ifdef DEBUG_REC
          fprintf(stderr, 
-	         "recReadPkt: could not read data packet, returned %d\n",
-	         rv);
+	         "%s: could not read data packet, returned %d\n",
+	         __FUNCTION__, rv);
+         utLog("%s: could not read data packet, returned %d",
+               __FUNCTION__, rv);
 #endif
       
          return(SP_NULL);
@@ -393,8 +404,7 @@ int recReadPkt(char *buf, int blen)
     }
 
 #ifdef DEBUG_REC
-     utLog("recReadPkt: read pkttype  = %d\n",
-          pkttype);
+  utLog("%s: read pkttype  = %d", __FUNCTION__, pkttype);
 #endif
 
   return(pkttype);

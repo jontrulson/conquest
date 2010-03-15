@@ -104,7 +104,7 @@
 #undef DEBUG_CLIENTSEND         /* client send* routines */
 #undef DEBUG_META               /* meta server debugging */
 #undef DEBUG_PKT                /* debug packet handling */
-#undef DEBUG_GL                 /* debug misc GL stuff */
+#define DEBUG_GL                 /* debug misc GL stuff */
 #undef DEBUG_SOUND             /* debug sound */
 
 #endif /* _DEFS_H */

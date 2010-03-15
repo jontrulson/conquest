@@ -250,7 +250,9 @@ static int nPlayBIdle(void)
   if (Context.recmode != RECMODE_PAUSED)
     if (Context.recmode == RECMODE_PLAYING)
       if ((ptype = pbProcessIter()) == SP_NULL)
-        nPlayBMenuInit();
+        {
+          nPlayBMenuInit();
+        }
 
   return NODE_OK;
 }

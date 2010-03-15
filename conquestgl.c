@@ -450,8 +450,14 @@ int main(int argc, char *argv[])
 
       serveropt = wantMetaList = FALSE;
       printf("Scanning file %s...\n", recFilename);
+
+#warning "PLEASE FIXME! horribly slow on vbox/xp HACK WARNING"
+#if defined(MINGW)
+      recTotalElapsed = (time(0) + 100000);
+#else
       if (!recInitReplay(recFilename, &recTotalElapsed))
         exit(1);
+#endif
 
       /* now init for real */
       if (!recInitReplay(recFilename, NULL))

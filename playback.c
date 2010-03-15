@@ -37,7 +37,7 @@ int pbProcessPackets(void)
   spMessage_t *smsg;
 
 #if defined(DEBUG_REC)
-  utLog("conqreply: processPacket ENTER");
+  utLog("%s: ENTER", __FUNCTION__);
 #endif
 
   if ((pkttype = recReadPkt(buf, PKT_MAXSIZE)) != SP_NULL)
