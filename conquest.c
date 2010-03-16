@@ -55,8 +55,7 @@
 #include "meta.h"
 #include "conqinit.h"
 #include "playback.h"
-
-#define CLIENTNAME "Conquest"	/* our client name */
+#include "conquest.h"
 
 struct _srvvec {
   Unsgn16 vers;
@@ -504,7 +503,7 @@ int main(int argc, char *argv[])
     }
   
   /* now we need to negotiate. */
-  if (!clientHello(CLIENTNAME))
+  if (!clientHello(CONQUEST_NAME))
     {
       cdend();
       utLog("conquest: clientHello() failed\n");

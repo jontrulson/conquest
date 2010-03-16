@@ -20,9 +20,7 @@
 #include "udp.h"
 #include "glmisc.h"
 #include "conqutil.h"
-
-
-#define CLIENTNAME "ConquestGL"
+#include "conquest.h"
 
 static char *rhost = NULL;
 static Unsgn16 rport;
@@ -172,7 +170,7 @@ static int nConsvrIdle(void)
   pktSetSocketFds(cInfo.sock, PKT_SOCKFD_NOCHANGE);
   pktSetNodelay();
 
-  if (!clientHello(CLIENTNAME))
+  if (!clientHello(CONQUESTGL_NAME))
     {
       utLog("conquestgl: hello() failed\n");
       printf("conquestgl: hello() failed, check log\n");

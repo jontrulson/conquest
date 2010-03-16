@@ -9,6 +9,16 @@
 #ifndef CONQUEST_H
 #define CONQUEST_H
 
-#define CONQUESTGL_NAME "ConquestGL"
+#include "config.h"
+
+#if defined(MINGW)
+#warning "HI!"
+#define CONQUESTGL_NAME "ConquestGL (Windows)"
+#else
+#define CONQUESTGL_NAME "ConquestGL (Unix)"
+#endif
+
+/* soon to be retired curses client */
+#define CONQUEST_NAME "Conquest"
 
 #endif
