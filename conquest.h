@@ -12,7 +12,6 @@
 #include "config.h"
 
 #if defined(MINGW)
-#warning "HI!"
 #define CONQUESTGL_NAME "ConquestGL (Windows)"
 #else
 #define CONQUESTGL_NAME "ConquestGL (Unix)"
