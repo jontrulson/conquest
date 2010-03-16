@@ -438,6 +438,15 @@ int main(int argc, char *argv[])
 
   Context.updsec = UserConf.UpdatesPerSecond;
   
+  /* For windows, if no -P, -m, or -s was specified, enable -m.  There
+   * is no server available under windows, so no need to default to
+   * trying to connect to localhost. 
+   */
+#if defined(MINGW)
+  if (!serveropt && !wantMetaList && Context.recmode != RECMODE_PLAYING)
+    wantMetaList = TRUE;
+#endif
+
   if (Context.recmode == RECMODE_PLAYING) 
     {
       if (serveropt || wantMetaList)
