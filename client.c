@@ -822,7 +822,11 @@ int clientHello(char *clientname)
           /* see if this will succeed in setting up a NAT tunnel
              to the server */
           utLog("NET: clientHello: send udp to server.");
-          write(cInfo.usock, "Open Me", 7);
+#if defined(MINGW)
+          send(cInfo.usock, "Open Me", 7, 0);
+#else
+          write(cInfo.usock, "Open Me", 7); */
+#endif
         }
     }
 

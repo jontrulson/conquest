@@ -25344,6 +25344,8 @@ _ACEOF
 
 fi
 
+if test ! -n "$ISMINGW"
+then
 
 
 for ac_func in snprintf vsnprintf
@@ -25611,6 +25613,7 @@ cat >>confdefs.h <<\_ACEOF
 #define PREFER_PORTABLE_SNPRINTF 1
 _ACEOF
 
+fi
 fi
 
 

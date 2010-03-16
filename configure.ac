@@ -244,7 +244,10 @@ AC_CHECK_FUNCS(select strstr fileno setpgrp daemon)
 AC_CHECK_FUNCS(getmsg poll setitimer strerror)
 
 AC_FUNC_SETPGRP
+if test ! -n "$ISMINGW"
+then
 AC_FUNC_SNPRINTF
+fi
 
 dnl check for sys_errlist decl
 

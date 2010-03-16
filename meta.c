@@ -406,7 +406,11 @@ int metaGetServerList(char *remotehost, metaSRec_t **srvlist)
 
 
   off = 0;
+#if defined(MINGW)
+  while (recv(s, &c, 1, 0) > 0)
+#else
   while (read(s, &c, 1) > 0)
+#endif
     {
       if (c != '\n' && off < (SERVER_BUFSIZE - 1))
         {

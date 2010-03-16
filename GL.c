@@ -1639,7 +1639,14 @@ int uiGLInit(int *argc, char **argv)
   glutIdleFunc           (renderFrame);
   glutReshapeFunc        (resize);
   glutEntryFunc          (NULL);
+
+  /* under windows, this results in a black cursor (at least running
+   * under VirtualBox), so don't do this with mingw 
+   */
+
+#if !defined(MINGW)
   glutSetCursor          (GLUT_CURSOR_CROSSHAIR);
+#endif
 
   return 0;             
 }

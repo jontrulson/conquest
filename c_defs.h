@@ -63,7 +63,8 @@ extern char *crypt(char *, char *);
 #include <netdb.h>
 #include <fcntl.h>
 #else
-#include <winsock2.h>
+#define __USE_W32_SOCKETS 1
+#include <windows.h>
 #endif
 
 #ifdef HAVE_DIRENT_H

@@ -14,19 +14,6 @@
 
 #include "c_defs.h"
 
-#if defined(MINGW)
-#include <windef.h>
-#include <windows.h>
-#include <winsock2.h>
-
-#ifndef BOOL
-#warning "FIXME - BOOL"
-/* where is this supposed to be defined??? */
-# define BOOL int
-#endif
-
-#endif  /* MINGW */
-
 #include "conqnet.h"
 #include "udp.h"
 #include "conqutil.h"

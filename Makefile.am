@@ -32,7 +32,8 @@ man6_MANS = conqdriv.man conqmetad.man conqoper.man conquest.man \
 
 if ISMINGW
 
-XLIBS = -lfreeglut -lopengl32 -lglu32 $(SDL_LIBS) -lwsock32 
+XLIBS = -lfreeglut -lopengl32 -lglu32 $(SDL_LIBS) -lws2_32 
+#-lwsock32 
 
 else !ISMINGW
 

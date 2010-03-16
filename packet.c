@@ -599,7 +599,11 @@ static int _pktReadSocket(int sock, ringBuffer_t *RB, void *buf, int blen)
 
   rlen = min(blen, rbBytesFree(RB));
   
+#if defined(MINGW)
+  if ((rv = recv(sock, packet, rlen, 0)) < 0)
+#else
   if ((rv = read(sock, packet, rlen)) < 0)
+#endif
     {
       *packet = 0;
       utLog("%s: read(%d): %s", __FUNCTION__, rlen, strerror(errno));
@@ -812,7 +816,11 @@ static int _pktWriteSocket(int sock, void *data, int len)
   if (!data || !len)
     return 0;
 
+#if defined(MINGW)
+  if ((rv = send(sock, data, len, 0)) > 0)
+#else
   if ((rv = write(sock, data, len)) > 0)
+#endif
     pktStats.txBytes += rv;       /* update the counter */
 
   return rv;
