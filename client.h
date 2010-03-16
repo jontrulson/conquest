@@ -34,7 +34,6 @@ typedef struct {
   Unsgn32  state;		/* current state */
   Unsgn32  serverDead;		/* is the client dead/ */
   Unsgn32  isLoggedIn;		/* is the client logged in? */
-  char     localhost[MAXHOSTNAME];
   char    *remotehost;          /* self evident */
   Unsgn16  remoteport;
   char     metaServer[MAXHOSTNAME]; /* the metaserver we are using */

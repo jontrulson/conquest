@@ -321,14 +321,6 @@ int main(int argc, char *argv[])
 
   utSetLogConfig(FALSE, TRUE);	/* use $HOME for logfile */
 
-#if !defined(MINGW)
-
-  if (!getLocalhost(cInfo.localhost, MAXHOSTNAME))
-    return(1);
-#else
-#warning "FIXME?"
-#endif
-
   cInfo.remotehost = strdup("localhost"); /* default to your own server */
 
   dspInitData();

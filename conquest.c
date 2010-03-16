@@ -278,9 +278,6 @@ int main(int argc, char *argv[])
   cInfo.isLoggedIn = FALSE;
   cInfo.remoteport = CN_DFLT_PORT;
 
-  if (!getLocalhost((char *)cInfo.localhost, MAXHOSTNAME))
-    return(1);
-
   cInfo.remotehost = strdup("localhost"); /* default to your own server */
 
   /* check options */

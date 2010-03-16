@@ -145,17 +145,6 @@ void checkMaster(void)
       utLog("NET: master server listening on port %d\n", listenPort);
     }
 
-  /* get our own host information */
-  memset(sInfo.localhost, 0, MAXHOSTNAME);
-
-  gethostname ( sInfo.localhost, MAXHOSTNAME - 1 );
-
-  if ((hp = gethostbyname(sInfo.localhost)) == NULL) 
-    {
-      utLog("NET: gethostbyname() failed: %s", strerror(errno));
-      exit (1);
-    }
-  
   sa.sin_port = htons(listenPort);
 
   if (localOnly)

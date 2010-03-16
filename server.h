@@ -35,7 +35,6 @@ typedef struct {
   Unsgn32 isMaster;		/* is the Maseter server? */
   Unsgn32 isLoggedIn;		/* is the client logged in? */
   char    remotehost[MAXHOSTNAME]; /* self evident */
-  char    localhost[MAXHOSTNAME]; /* self evident */
 } ServerInfo_t;
 
 
