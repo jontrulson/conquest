@@ -83,8 +83,6 @@ case "$host" in
 	AC_DEFINE(MINGW, 1, [MinGW])
         ISMINGW="yes"
 
-        echo "### ISMINGW"
-
 	AC_MSG_RESULT(MinGW)
 	;;
   *dec-osf1*)
@@ -243,10 +241,9 @@ AC_FUNC_VPRINTF
 AC_CHECK_FUNCS(select strstr fileno setpgrp daemon)
 AC_CHECK_FUNCS(getmsg poll setitimer strerror)
 
-AC_FUNC_SETPGRP
 if test ! -n "$ISMINGW"
 then
-AC_FUNC_SNPRINTF
+AC_FUNC_SETPGRP
 fi
 
 dnl check for sys_errlist decl

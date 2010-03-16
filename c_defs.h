@@ -162,12 +162,7 @@ extern char *crypt(char *, char *);
 # else
 #  error "Must have select() or poll()"
 # endif
-#endif
-
-#if !defined(HAVE_SPRINTF) || defined(PREFER_PORTABLE_SNPRINTF)
-# include "snprintf.h"
-#endif
-
+#endif  /* MINGW */
 
 /* externs */
 extern int errno;
