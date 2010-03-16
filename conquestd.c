@@ -127,7 +127,6 @@ void checkMaster(void)
   int rv;			/* general purpose integer */
   socklen_t sockln;
   struct sockaddr_in sa, isa;	/* internet socket addr. structure */
-  struct hostent *hp;		/* result of host name lookup */
   struct timeval tv;
   fd_set readfds;
   static const int optOn = 1;
@@ -152,10 +151,10 @@ void checkMaster(void)
   else
     sa.sin_addr.s_addr = htonl(INADDR_ANY); /* Bind to all addresses.
                                                -Werewolf */
-  sa.sin_family = hp->h_addrtype;
+  sa.sin_family = AF_INET;
   
   /* allocate an open socket for incoming connections */
-  if (( s = socket(hp->h_addrtype, SOCK_STREAM, 0)) < 0) 
+  if (( s = socket(AF_INET, SOCK_STREAM, 0)) < 0) 
     {
       utLog("NET: socket() failed: %s", strerror(errno));
       exit(1);

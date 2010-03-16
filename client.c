@@ -825,7 +825,7 @@ int clientHello(char *clientname)
 #if defined(MINGW)
           send(cInfo.usock, "Open Me", 7, 0);
 #else
-          write(cInfo.usock, "Open Me", 7); */
+          write(cInfo.usock, "Open Me", 7);
 #endif
         }
     }

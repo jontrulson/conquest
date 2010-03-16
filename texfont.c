@@ -26,6 +26,8 @@
 #include <GL/glu.h>
 #include "TexFont.h"
 
+#include "conqutil.h"
+
 #if 0
 /* Uncomment to debug various scenarios. */
 #undef GL_VERSION_1_1
