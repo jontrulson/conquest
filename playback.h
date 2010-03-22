@@ -16,6 +16,12 @@ extern int pbSpeed;
 #include "conqdef.h"
 #include "conqcom.h"
 
+/* First 2 bytes of a gzipped archive.  We use this to detect when an
+ * attempt is made to playback a compressed cqr file, but gzip support
+ * is not compiled in */
+#define GZIPPED_BYTE_1     0x1f
+#define GZIPPED_BYTE_2     0x8b
+
 /* minimum/maximum playback speed (-PB_SPEED_MAX_TIMESx to
  *  PB_SPEED_MAX_TIMESx). 
  */ 

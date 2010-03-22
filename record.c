@@ -27,6 +27,8 @@
 #include "record.h"
 #undef NOEXTERN_RECORD
 
+#include "playback.h"
+
 extern char *ConquestVersion;
 extern char *ConquestDate;
 
@@ -193,6 +195,25 @@ int recReadHeader(fileHeader_t *fhdr)
        rv);
 #endif
 
+#if !defined(HAVE_LIBZ)
+  /* we will look at the first two bytes, and see if it's gzip format */
+  {
+    unsigned char *cptr = (unsigned char *)fhdr;
+
+    if (cptr[0] == GZIPPED_BYTE_1 && cptr[1] == GZIPPED_BYTE_2)
+      {
+        /* it is, tell the user to gunzip it */
+        fprintf(stderr, 
+                "CQR file is gzip compressed, but gzip support is not\n");
+        fprintf(stderr, 
+                "compiled in.  Please decompress the file with gunzip first.\n");
+
+        return(FALSE);
+      }
+  }
+#endif  /* !HAVE_LIBZ */
+
+
   /* now de-endianize the data */
 
   fhdr->vers = (Unsgn32)ntohl(fhdr->vers);
@@ -200,7 +221,7 @@ int recReadHeader(fileHeader_t *fhdr)
   fhdr->cmnrev = (Unsgn32)ntohl(fhdr->cmnrev);
   fhdr->flags = (Unsgn32)ntohl(fhdr->flags);
 
-#ifdef DEBUG_REC
+#if defined(DEBUG_REC)
   utLog("recReadHeader: vers = %d, rectime = %d, cmnrev = %d\n",
        fhdr->vers, fhdr->rectime, fhdr->cmnrev);
 #endif
