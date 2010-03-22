@@ -222,9 +222,9 @@ void c_sleep(real sleeptime)
   if (sleeptime == 0.0)
     return;
 
-  /* For windows (and eventually, maybe everyone else, use usleep */
+  /* For windows, use WINAPI Sleep(millis) */
 #if defined(MINGW)
-  usleep((useconds_t)sleeptime * 1000000);
+  Sleep((DWORD)(sleeptime * 1000));
 #else
 
   /* Here I use poll to provide a msec */
