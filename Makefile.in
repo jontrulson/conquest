@@ -60,7 +60,8 @@ DIST_COMMON = README $(am__configure_deps) $(srcdir)/Makefile.am \
 	conqstrat-yacc.c conqstrat-yacc.h depcomp install-sh ltmain.sh \
 	missing mkinstalldirs ylwrap
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
-am__aclocal_m4_deps = $(top_srcdir)/acinclude.m4 \
+am__aclocal_m4_deps = $(top_srcdir)/m4/libtool.m4 \
+	$(top_srcdir)/m4/sdl.m4 $(top_srcdir)/acinclude.m4 \
 	$(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
@@ -413,6 +414,7 @@ top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 AUTOMAKE_OPTIONS = foreign
+ACLOCAL_AMFLAGS = -I m4 --install
 CONQLOCALSTATEDIR = @localstatedir@/conquest
 CONQLIBEXECDIR = @libexecdir@
 CONQDATADIR = @datadir@
