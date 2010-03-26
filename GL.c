@@ -1625,7 +1625,7 @@ int uiGLInit(int *argc, char **argv)
 
   glutInitWindowSize(dConf.initWidth, dConf.initHeight);
   
-  dConf.mainw = glutCreateWindow(CONQUESTGL_NAME);
+  dConf.mainw = glutCreateWindow(CONQUEST_NAME);
 
   if(DSP_FULLSCREEN())
     glutFullScreen();
