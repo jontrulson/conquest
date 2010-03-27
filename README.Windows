@@ -1,0 +1,93 @@
+This document will try to explain how to install a precompiled
+Conquest .zip archive on a Windows system.
+
+The precompiled Conquest .zip package only contains the conquestgl
+client application and required datafiles.  If you want to run a
+Conquest server or any of the other Conquest utilities, you'll need to
+either use a unix system, or recompile Conquest yourself under the
+Cgywin environment.  I would not advise trying to run a Cygwin
+compiled conquestgl client, since there will be no hardware video
+acceleration and it will be unusably slooooow.
+
+I only have access to Windows XP (via a VirtualBox VM), so I have no
+idea if any of this will run under Windows 7.  If not, please let me
+know, though without W7, I probably can't do much about it - though I
+can at least warn others.
+
+Installing the Conquest OpenGL client basically involves the following
+steps:
+
+  - Unpack the .zip file somewhere warm and safe.
+
+  - Add one environment variable (CONQUEST_ROOT), and modify another
+    (Path).  
+
+As an example:
+
+1. Unpack the .zip file in c:\
+
+   This will create a Conquest directory, and other sub dirs and files
+   beneath it.
+
+2. Next, right-click on your 'My Computer' Icon, and select
+   'Properties'.
+
+   Select the 'Advanced' tab.
+
+   On the 'Advanced' tab, select 'Environment Variables'.
+
+   Select 'New'.
+
+   For the 'Variable Name', enter: 
+
+       CONQUEST_ROOT
+
+   For the 'Variable Value', enter:
+
+       C:\Conquest
+
+   Select 'OK'.
+
+3. Next, on the same screen, scroll around and find the 'Path'
+   variable in the 'System Variables' list.  Click on it so it is
+   highlighted, then select the 'Edit' button.
+
+   At the end of the 'Variable Value' field, add:
+
+      ;C:\Conquest\bin
+
+   Hit OK, OK, etc.
+
+4. At this point you should be able to open an MSDOS command window,
+   and simply run:
+
+      conquestgl
+
+   By default, conquestgl will contact the metaserver at
+   conquest.radscan.com and present you with a list of servers to
+   connect to.
+
+   You can pass the '-f' option to conquestgl to run in full screen
+   mode. ie:
+
+      conquestgl -f
+
+   Maybe fullscreen should be the default under windows - windows
+   geeks: you tell me.   
+
+   See http://radscan.com/conquest/conquest.6.html for a list of
+   other options you can specify to conquestgl.  
+
+5. If there are any windows programmers out there who can enlighten me
+   on the methods to properly handle all of this automatically, I'm
+   all ears. I also accept patches. :)
+
+   It would also be cool if there was a way to provide a simple
+   Conquest icon on the desktop (or an entry in the Start->All
+   Programs->... list.) 
+
+
+$Id$
+
+
+
