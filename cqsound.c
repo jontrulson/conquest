@@ -177,7 +177,7 @@ static char *_getSoundFile(char *filenm)
   /* if we are here, look for the system one */
   /* first ogg, then wav */
   snprintf(buffer, sizeof(buffer) - 1, "%s/sound/%s.ogg", 
-           CONQSHARE, filenm);
+           utGetPath(CONQSHARE), filenm);
   
   
   if ((fd = fopen(buffer, "r")))
@@ -187,7 +187,7 @@ static char *_getSoundFile(char *filenm)
     }
 
   snprintf(buffer, sizeof(buffer) - 1, "%s/sound/%s.wav", 
-           CONQSHARE, filenm);
+           utGetPath(CONQSHARE), filenm);
   
   
   if ((fd = fopen(buffer, "r")))

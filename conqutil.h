@@ -38,5 +38,6 @@ int      utModPlusOne( int i, int modulus );
 int      utIsSpecial( char *str, int *what, int *token, int *count );
 void     utStcpn( char *from, char *to, int tosize );
 int      utStringMatch( char *str1, char *str2, int casesensitive );
+char     *utGetPath(const char *thepath);
 
 #endif /* _CONQUTIL_H */

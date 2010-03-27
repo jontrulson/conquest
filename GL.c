@@ -3062,7 +3062,7 @@ static int LoadTGA(char *filename, textureImage *texture)
 
   if ((file = fopen(filename, "rb")) == NULL)
     {
-      utLog("%s: %s", filename, strerror(errno));
+      utLog("%s: %s: %s", __FUNCTION__, filename, strerror(errno));
       return FALSE;
     }
 
@@ -3071,7 +3071,6 @@ static int LoadTGA(char *filename, textureImage *texture)
       utLog("%s: Loading texture %s",
            __FUNCTION__, filename);
     }
-
 
   if (fread(TGAHeaderBytes, 1, sizeof(TGAHeaderBytes), file) != 
       sizeof(TGAHeaderBytes))
@@ -3332,7 +3331,7 @@ static char *_getTexFile(char *tfilenm)
 
   /* if we are here, look for the system one */
   snprintf(buffer, sizeof(buffer) - 1, "%s/img/%s.tga", 
-           CONQSHARE, tfilenm);
+           utGetPath(CONQSHARE), tfilenm);
 
   if ((fd = fopen(buffer, "r")))
     {                       /* found one */

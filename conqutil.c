@@ -1190,3 +1190,59 @@ real utSubAngle( real a1, real a2 )
   
 }
 
+/* Under windows, we play a few more games to figure out where
+ * system-related stuff can be found, like souncd/img/etc... For non
+ * windows (!MINGW) systems we simply return the path arg that was
+ * passed in.
+ * 
+ * For windows, we will look for an env var: CONQUEST_ROOT, which if
+ * present will be used to locate the other dirs.  If this env var is
+ * not set, we will use Windows $COMMONPROGRAMFILES/Conquest/.  If
+ * that fails, we will use just '/Conquest'.
+ *
+ * At present, we only care about CONQETC and CONQSHARE.
+ */
+
+char *utGetPath(const char *thepath)
+{
+#if !defined(MINGW)
+  /* the non-windows case just returns thepath. */
+  return thepath;
+#else
+
+  char *theroot = NULL;
+  static char retpath[PATH_MAX];
+  char *defaultConq = "";
+
+  if (!(theroot = getenv("CONQUEST_ROOT")))
+    {
+      /* next check COMMONPROGRAMFILES */
+      if (!(theroot = getenv("COMMONPROGRAMFILES")))
+        {
+          theroot = "/Conquest";
+        }
+      else
+        {                       /* Add /Conquest to COMMONPROGRAMFILES */
+          defaultConq = "/Conquest";
+        }
+    }
+
+  /* now determine the path requested and do our magic. */
+
+  if (!strcmp(thepath, CONQETC))
+    {                           /* etc */
+      snprintf(retpath, PATH_MAX - 1, "%s%s/etc", theroot, defaultConq);
+    }
+  else if (!strcmp(thepath, CONQSHARE))
+    {                           /* share */
+      snprintf(retpath, PATH_MAX - 1, "%s%s", theroot, defaultConq);
+    }
+  else
+    {                           /* default, just return original path */
+      snprintf(retpath, PATH_MAX - 1, "%s", thepath);
+    }
+
+  return retpath;
+
+#endif  /* MINGW */
+}

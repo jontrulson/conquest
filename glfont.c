@@ -40,7 +40,7 @@ void glfInitFonts(void)
   utLog("%s: ENTER...", __FUNCTION__);
 #endif
 
-  sprintf(fbuf, "%s/img/%s", CONQSHARE, "large.txf");
+  sprintf(fbuf, "%s/img/%s", utGetPath(CONQSHARE), "large.txf");
 
   glfFontLarge = txfLoadFont(fbuf);
 
@@ -51,7 +51,7 @@ void glfInitFonts(void)
       fail = TRUE;
     }
 
-  sprintf(fbuf, "%s/img/%s", CONQSHARE, "fixed.txf");
+  sprintf(fbuf, "%s/img/%s", utGetPath(CONQSHARE), "fixed.txf");
   glfFontFixed = txfLoadFont(fbuf);
 
   if (!glfFontFixed)
@@ -61,7 +61,7 @@ void glfInitFonts(void)
       fail = TRUE;
     }
 
-  sprintf(fbuf, "%s/img/%s", CONQSHARE, "tinyfixed.txf");
+  sprintf(fbuf, "%s/img/%s", utGetPath(CONQSHARE), "tinyfixed.txf");
   glfFontFixedTiny = txfLoadFont(fbuf);
 
   if (!glfFontFixedTiny)
@@ -71,7 +71,7 @@ void glfInitFonts(void)
       fail = TRUE;
     }
 
-  sprintf(fbuf, "%s/img/%s", CONQSHARE, "msg.txf");
+  sprintf(fbuf, "%s/img/%s", utGetPath(CONQSHARE), "msg.txf");
   glfFontMsg = txfLoadFont(fbuf);
 
   if (!glfFontMsg)

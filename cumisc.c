@@ -2127,7 +2127,7 @@ void mcuHelpLesson(void)
   char buf[MSGMAXLINE];
   char helpfile[BUFFER_SIZE];
   
-  sprintf(helpfile, "%s/%s", CONQSHARE, C_CONQ_HELPFILE);
+  sprintf(helpfile, "%s/%s", utGetPath(CONQSHARE), C_CONQ_HELPFILE);
   sprintf( buf, "%s: Can't open.", helpfile );
   mcuPageFile( helpfile, buf);
   
@@ -2142,7 +2142,7 @@ void mcuNews(void)
 {
   char newsfile[BUFFER_SIZE];
   
-  sprintf(newsfile, "%s/%s", CONQSHARE, C_CONQ_NEWSFILE);
+  sprintf(newsfile, "%s/%s", utGetPath(CONQSHARE), C_CONQ_NEWSFILE);
   
   mcuPageFile( newsfile, "No news is good news.");
   

@@ -191,7 +191,8 @@ int GetSysConf(int checkonly)
   setSysConfDefaults();
 	
   /* start building the filename */
-  snprintf(conf_name, sizeof(conf_name)-1, "%s/%s", CONQETC, SYSCONFIG_FILE);
+  snprintf(conf_name, sizeof(conf_name)-1, "%s/%s", 
+           utGetPath(CONQETC), SYSCONFIG_FILE);
 
   if ((conf_fd = fopen(conf_name, "r")) == NULL)
     {
@@ -1009,7 +1010,8 @@ int MakeSysConf()
   char conf_name[BUFFER_SIZE];
   int i, j, n;
 
-  snprintf(conf_name, sizeof(conf_name)-1, "%s/%s", CONQETC, SYSCONFIG_FILE);
+  snprintf(conf_name, sizeof(conf_name)-1, "%s/%s", utGetPath(CONQETC), 
+           SYSCONFIG_FILE);
   umask(002);
   unlink(conf_name);
 

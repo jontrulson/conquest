@@ -1097,21 +1097,24 @@ int cqiLoadRC(int rcid, char *filename, int verbosity, int debugl)
       if (filename)
         strncpy(buffer, filename, BUFFER_SIZE - 1);
       else
-        snprintf(buffer, sizeof(buffer)-1, "%s/%s", CONQETC, "conqinitrc");
+        snprintf(buffer, sizeof(buffer)-1, "%s/%s", utGetPath(CONQETC), 
+                 "conqinitrc");
       break;
     case CQI_FILE_TEXTURESRC:
     case CQI_FILE_TEXTURESRC_ADD: 
       if (filename)
         strncpy(buffer, filename, BUFFER_SIZE - 1);
       else
-        snprintf(buffer, sizeof(buffer)-1, "%s/%s", CONQETC, "texturesrc");
+        snprintf(buffer, sizeof(buffer)-1, "%s/%s", utGetPath(CONQETC), 
+                 "texturesrc");
       break;
     case CQI_FILE_SOUNDRC:
     case CQI_FILE_SOUNDRC_ADD: 
       if (filename)
         strncpy(buffer, filename, BUFFER_SIZE - 1);
       else
-        snprintf(buffer, sizeof(buffer)-1, "%s/%s", CONQETC, "soundrc");
+        snprintf(buffer, sizeof(buffer)-1, "%s/%s", utGetPath(CONQETC), 
+                 "soundrc");
       break;
     default:                    /* programmer error */
       utLog("%s: invalid rcid %d, bailing.", __FUNCTION__, rcid);

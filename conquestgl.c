@@ -254,7 +254,7 @@ void loadTextureRCFiles()
       exit(1);
 
   /* now load any .trc files in there (CONQETC) */
-  _loadRCFiles(CQI_FILE_TEXTURESRC_ADD, CONQETC, ".trc");
+  _loadRCFiles(CQI_FILE_TEXTURESRC_ADD, utGetPath(CONQETC), ".trc");
 
   /* now load any in the users own ~/.conquest/ dir */
   if ((homevar = getenv(CQ_USERHOMEDIR)) == NULL)
@@ -277,7 +277,7 @@ void loadSoundRCFiles()
   cqiLoadRC(CQI_FILE_SOUNDRC, NULL, 1, 0);
 
   /* now load any .src files in there (CONQETC) */
-  _loadRCFiles(CQI_FILE_SOUNDRC_ADD, CONQETC, ".src");
+  _loadRCFiles(CQI_FILE_SOUNDRC_ADD, utGetPath(CONQETC), ".src");
 
   /* now load any in the users own ~/.conquest/ dir */
   if ((homevar = getenv(CQ_USERHOMEDIR)) == NULL)
