@@ -9,6 +9,159 @@
 
                               Conquest HISTORY
 
+8.4.1i (devel) 03/27/2010
+
+  - unless there is a big problem, a 'stable' official release will be
+    up next.  
+
+  - Switch to using Mercurial (hg) for source code control.  I totally
+    love it compared to svn.
+
+  - MAC OS X (Darwin) support.  Note this support is still a little
+    fuzzy, in regards to counquest group creation, etc.  I do not have
+    direct access to a Darwin system, so this port was accomplished by
+    back-and-forth with a friend who does.  Once you can get it built,
+    OpenGL and sound is fully functional.
+
+  - Windows (XP) native support via MinGW cross-compiler toolchain :)
+    See README.Windows for installation instructions (or INSTALL.TXT
+    if you download the .zip package).  Full HW acceleration and
+    sound.  Oh yes.
+
+    I will build a binary .zip package for Windows XP systems and make
+    it available on sourceforge.  Only the conquestgl executable and
+    required config/data files will be provided.
+
+    I do not have access to Windows 7, so I have no idea if it would
+    work on those systems.
+  
+    The zip file will contain an INSTALL.TXT file for instructions on
+    installation. 
+
+  - Allow various GL functions to be able to detect when geometry is
+    changed so they can compensate.
+
+  - Fix problem where using undefined mouse macros could inadvertantly
+    cancel beaming or bombing.
+
+  - Fix problem wereby the doomsday AP beam was being drawn with
+    length PHASER_DIST rather than DOOMSDAY_DIST.
+
+  - add missing contrib/ dir to src dist.
+
+  - remove 'telnet' support.  None of these servers have been in
+    operation for years, so there's no need for 'telnet' server hacks.
+    Remove conquestsh, and conquestsh.man.  Update SERVER.TXT and
+    conquest.man
+
+  - change Conquest licensing from Artistic v1 to Artistic v2.  Based
+    on stumbling across:
+
+    http://www.linux-archive.org/fedora-games/140611-good-candidate-packaging-conquest.html
+
+    Really - if any dist has issues with Conquest's license, I can't
+    do squat about it if I don't know about it.
+
+  - correct a server problem with UDP keepalive packets.  UDP
+    keepalive packets are sent to the server by the client on a
+    periodic basis to convince some firewalls that the UDP link is
+    still active.
+
+    During certain operations (like beaming, bombing, self destruct,
+    etc) these packets could improperly terminate these activities on
+    the server, leaving the client to believe these activities were
+    still in progress.
+
+    Now, the lower level packet handling routines filter out these
+    packets, preventing them from accidentally affecting the game's
+    state.
+
+  - since nWelcome can be called multiple times, init the state in the
+    Init routine.
+
+  - add server name and version to (O)ptions display.
+
+  - add '%option noyywrap' to the yacc parser.  Do not need it, and this
+    is required for macosx, apparently.
+
+  - Remove Unixware specific privilege support.
+
+    In the old days, when I was running Conquest on i386/i486 hardware
+    under Unixware, being able to escalate the drivers process
+    priority and lock the commonblock into memory was a good win for
+    performance.
+
+    These days, the hardware is so fast, and memory so expansive, it
+    makes no sense to do this anymore :) Also, I haven't run unixware
+    in over 10 years, so....
+
+  - Remove terminfo src files (ti/*) from the source distribution.
+
+    While these files will still be available in the source code repo,
+    they will no longer be supplied in the src distribution tarballs.
+
+  - get rid of portable snprintf implementation - used as a fallback
+    if the target OS does not support it.  All target OS's do support
+    it, and the fallback implementation could not handle floats
+    without crapping on itself anyway.
+
+  - Get rid of localhost data and checks.  Totally uneccessary.  Buh
+    bye.
+
+  - Fix a memory leak when dealing with cInfo.remotehost
+
+  - Under windows, default to -m if no server (-s) explicitly
+    specified. 
+
+  - Fix up the 'CLIENTID' (client type) stuff.  Differentiate between
+    'Unix' and 'Windows' systems. 
+
+  - Add check for gzipped .cqr files and no LIBZ support.  Emit a more
+    useful error if you attempt to replay a compressed game recording
+    (.cqr) but your client was not built with libz support.
+
+  - Add sdl.m4 and libtool.m4 autoconf files in m4/, in case the
+    target build system does not have it
+
+  - Update several of the autoconf scripts (ltmain.sh, yylwrap, etc)
+    to more current versions.
+
+  - Use CONQUEST_NAME for the Window title (GL client)
+
+  - On Windows(MINGW), use $APPDATA/Conquest to store per-user
+    settings and config.
+
+  - Provide a mechanism when running under windows to locate the
+    various files conquesgl needs to run (etc/, img/, sound/)
+
+    Under Windows, CONQETC/CONQSHARE don't really mean much.  So, we
+    add a new funtion, utGetPATH() that will attempt to locate the
+    various directories conquestgl needs at runtime.  These are: etc/
+    (for global configuration), img/ (for textures) and sound/ (for
+    the sound files).
+
+    First, if there is an env variable CONQUEST_ROOT set to some path,
+    this will be used to find the other directories.
+
+    If this env var is not present, then the 'standard' Windows
+    %COMMONPROGRAMFILES%/Conquest/ will be used to locate these
+    directories.
+
+    Otherwise we will default to /Conquest.
+
+    For example, if you download a conquestgl .zip file, and unpack it
+    under C:\ , you will want to set CONQUEST_ROOT equal to
+    "C:\Conquest", and add "C:\Conquest\bin" to your Path, and all
+    will be well.
+
+  - Add a makewinzippkg script for building the windows binary zip
+    package, add the DLL's neccessary for packaging under windows
+    (windlls/).
+
+  - a variety of other misc stuff.  See 'hg log' (if you have the hg
+    repo cloned) for any missing details.
+
+
 8.4.1d (devel) 10/01/2009
 
   - a devel release, some highlights:
