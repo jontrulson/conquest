@@ -1,0 +1,76 @@
+#!/bin/bash
+#
+# makesrcpkg - make a Windows .zip archive
+#
+# Jon Trulson - 3/26/2010
+#
+# $Id$
+#
+##############################################################################
+# set -x
+
+umask 022
+
+VERSION=`grep ConquestVersion version.c`
+VERSION=`echo $VERSION |tr -d '$;"' |cut -d' ' -f6 |tr -d " "`
+
+CONQVER="conquest-$VERSION/Conquest"
+
+PACKDIR="conquest-$VERSION/"
+ARCFILE="$(echo conquest-$VERSION | tr '.' '_').zip"
+
+rm -f ${ARCFILE}
+rm -rf $CONQVER
+echo Archive name: $ARCFILE
+
+EXEFILE="conquestgl.exe"
+
+IMAGES="img/*.tga img/*.txf"
+SOUNDS="sound/*.ogg"
+RCS="*.trc conqinitrc soundrc texturesrc"
+
+mkdir -p $CONQVER 2>/dev/null
+mkdir $CONQVER/img
+mkdir $CONQVER/sound
+mkdir $CONQVER/bin
+mkdir $CONQVER/etc
+
+cp -p $EXEFILE $CONQVER/bin/
+cp -p windlls/*.dll $CONQVER/bin/
+
+sed 's/$'"/`echo \\\r`/" README > $CONQVER/README.TXT
+sed 's/$'"/`echo \\\r`/" README.Windows > $CONQVER/INSTALL.TXT
+
+cp -p $SOUNDS $CONQVER/sound/
+cp -p $IMAGES $CONQVER/img/
+cp -p $RCS $CONQVER/etc/
+
+chmod 644 $CONQVER/img/*
+chmod 644 $CONQVER/sound/*
+chmod 644 $CONQVER/etc/*
+
+chmod 644 $CONQVER/README*
+
+chmod 755 $CONQVER/img
+chmod 755 $CONQVER/sound
+chmod 755 $CONQVER/etc
+chmod 755 $CONQVER/bin
+
+cd $PACKDIR
+echo "### curdir `pwd`"
+zip -r -v ../${ARCFILE} Conquest
+
+cd ..
+
+rm -rf conquest-${VERSION}
+
+set -x 
+if [ -e ~/tx/conquest/ ]
+then
+    cp -f ${ARCFILE} ~/tx/conquest/
+    chmod 644 ~/tx/conquest/${ARCFILE}
+fi
+
+exit
+	
+
