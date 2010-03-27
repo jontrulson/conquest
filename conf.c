@@ -122,15 +122,15 @@ static void checkCreateUserConfDir(void)
   struct stat sbuf;
   char *home;
   
-  if ((home = getenv("HOME")) == NULL)
+  if ((home = getenv(CQ_USERHOMEDIR)) == NULL)
     {
-      utLog("checkCreateUserConfDir(): getenv(HOME) failed");
+      utLog("checkCreateUserConfDir(): getenv(%s) failed", CQ_USERHOMEDIR);
       
       return;
     }
   
   /* start building the filename */
-  snprintf(buffer, sizeof(buffer) - 1, "%s/.conquest", home);
+  snprintf(buffer, sizeof(buffer) - 1, "%s/%s", home, CQ_USERCONFDIR);
   
   if (stat(buffer, &sbuf) >= 0)
     {
@@ -456,16 +456,17 @@ int GetConf(int usernum)
   checkCreateUserConfDir();
 
   /* start building the filename */
-  if ((homevar = getenv("HOME")) == NULL)
+  if ((homevar = getenv(CQ_USERHOMEDIR)) == NULL)
     {
-      utLog("GetConf(): getenv(HOME) failed");
+      utLog("GetConf(): getenv(%s) failed", CQ_USERHOMEDIR);
 
-      fprintf(stderr, "Can't get HOME environment variable. Exiting\n");
+      fprintf(stderr, "Can't get %s environment variable. Exiting\n",
+              CQ_USERHOMEDIR);
       return(ERR);
     }
 
-  snprintf(conf_name, sizeof(conf_name)-1, "%s/.conquest/%s", 
-           homevar, CONFIG_FILE);
+  snprintf(conf_name, sizeof(conf_name)-1, "%s/%s/%s", 
+           homevar, CQ_USERCONFDIR, CONFIG_FILE);
 
   if ((conf_fd = fopen(conf_name, "r")) == NULL)
     {
@@ -704,16 +705,18 @@ int SaveUserConfig(void)
   char *homevar;
 
 				/* start building the filename */
-  if ((homevar = getenv("HOME")) == NULL)
+  if ((homevar = getenv(CQ_USERHOMEDIR)) == NULL)
     {
-      utLog("SaveUserConfig(): getenv(HOME) failed");
+      utLog("SaveUserConfig(): getenv(%s) failed", CQ_USERHOMEDIR);
 
-      fprintf(stderr, "SaveUserConfig(): Can't get HOME environment variable. Exiting\n");
+      fprintf(stderr, 
+              "SaveUserConfig(): Can't get %s environment variable. Exiting\n",
+              CQ_USERHOMEDIR);
       return(ERR);
     }
 
-  snprintf(conf_name, sizeof(conf_name)-1, "%s/.conquest/%s", 
-           homevar, CONFIG_FILE);
+  snprintf(conf_name, sizeof(conf_name)-1, "%s/%s/%s", 
+           homevar, CQ_USERCONFDIR, CONFIG_FILE);
 
 #ifdef DEBUG_OPTIONS
   utLog("SaveUserConfig(): saving user config: conf_name = '%s'", conf_name);

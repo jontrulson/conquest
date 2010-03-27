@@ -575,10 +575,10 @@ void utLog(char *fmt, ...)
 	}
       else
 	{			/* local logfile */
-	  if ((homevar = getenv("HOME")) != NULL)
+	  if ((homevar = getenv(CQ_USERHOMEDIR)) != NULL)
             {
-              snprintf(errfile, sizeof(errfile) - 1, "%s/.conquest/%s", 
-                       homevar, C_CONQ_ERRLOG);
+              snprintf(errfile, sizeof(errfile) - 1, "%s/%s/%s", 
+                       homevar, CQ_USERCONFDIR, C_CONQ_ERRLOG);
             }
 	  else
 	    snprintf(errfile, sizeof(errfile) - 1, "%s", C_CONQ_ERRLOG);

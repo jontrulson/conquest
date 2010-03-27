@@ -152,11 +152,11 @@ static char *_getSoundFile(char *filenm)
   static char buffer[BUFFER_SIZE];
   
   /* look for a user sounds */
-  if ((homevar = getenv("HOME")))
+  if ((homevar = getenv(CQ_USERHOMEDIR)))
     {
       /* try OGG first, then wav */
-      snprintf(buffer, sizeof(buffer)-1, "%s/.conquest/sound/%s.ogg", 
-               homevar, filenm);
+      snprintf(buffer, sizeof(buffer)-1, "%s/%s/sound/%s.ogg", 
+               homevar, CQ_USERCONFDIR, filenm);
 
       if ((fd = fopen(buffer, "r")))
         {                       /* found one */
@@ -164,8 +164,9 @@ static char *_getSoundFile(char *filenm)
           return buffer;
         }
 
-      snprintf(buffer, sizeof(buffer)-1, "%s/.conquest/sound/%s.wav", 
-               homevar, filenm);
+      snprintf(buffer, sizeof(buffer)-1, "%s/%s/sound/%s.wav", 
+               homevar, CQ_USERCONFDIR, filenm);
+
       if ((fd = fopen(buffer, "r")))
         {                       /* found one */
           fclose(fd);

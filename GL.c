@@ -3318,10 +3318,10 @@ static char *_getTexFile(char *tfilenm)
   static char buffer[BUFFER_SIZE];
   
   /* look for a user image */
-  if ((homevar = getenv("HOME")))
+  if ((homevar = getenv(CQ_USERHOMEDIR)))
     {
-      snprintf(buffer, sizeof(buffer)-1, "%s/.conquest/img/%s.tga", 
-               homevar, tfilenm);
+      snprintf(buffer, sizeof(buffer)-1, "%s/%s/img/%s.tga", 
+               homevar, CQ_USERCONFDIR, tfilenm);
 
       if ((fd = fopen(buffer, "r")))
         {                       /* found one */

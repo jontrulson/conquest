@@ -35,4 +35,14 @@ extern int ConquestGID;         /* Conquest's GID */
 extern int cqDebug;
 #endif
 
+/* Home dir/appdir env variable(s) */
+#if defined(MINGW)
+# define CQ_USERHOMEDIR  "APPDATA"
+# define CQ_USERCONFDIR  "Conquest"
+#else
+# define CQ_USERHOMEDIR  "HOME"
+# define CQ_USERCONFDIR  ".conquest"
+#endif
+
+
 #endif /* GLOBAL_H */

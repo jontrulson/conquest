@@ -257,11 +257,11 @@ void loadTextureRCFiles()
   _loadRCFiles(CQI_FILE_TEXTURESRC_ADD, CONQETC, ".trc");
 
   /* now load any in the users own ~/.conquest/ dir */
-  if ((homevar = getenv("HOME")) == NULL)
+  if ((homevar = getenv(CQ_USERHOMEDIR)) == NULL)
     return;
 
-  snprintf(cqdir, sizeof(cqdir)-1, "%s/.conquest", 
-           homevar);
+  snprintf(cqdir, sizeof(cqdir)-1, "%s/%s", 
+           homevar, CQ_USERCONFDIR);
 
   _loadRCFiles(CQI_FILE_TEXTURESRC_ADD, cqdir, ".trc");
 
@@ -280,11 +280,11 @@ void loadSoundRCFiles()
   _loadRCFiles(CQI_FILE_SOUNDRC_ADD, CONQETC, ".src");
 
   /* now load any in the users own ~/.conquest/ dir */
-  if ((homevar = getenv("HOME")) == NULL)
+  if ((homevar = getenv(CQ_USERHOMEDIR)) == NULL)
     return;
 
-  snprintf(cqdir, sizeof(cqdir)-1, "%s/.conquest", 
-           homevar);
+  snprintf(cqdir, sizeof(cqdir)-1, "%s/%s", 
+           homevar, CQ_USERCONFDIR);
 
   _loadRCFiles(CQI_FILE_SOUNDRC_ADD, cqdir, ".src");
 
@@ -319,7 +319,7 @@ int main(int argc, char *argv[])
   cInfo.isLoggedIn = FALSE;
   cInfo.remoteport = CN_DFLT_PORT;
 
-  utSetLogConfig(FALSE, TRUE);	/* use $HOME for logfile */
+  utSetLogConfig(FALSE, TRUE);	/* use CQ_USERHOMEDIR for logfile */
 
   cInfo.remotehost = "localhost"; /* default to your own server */
 
