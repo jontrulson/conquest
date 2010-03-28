@@ -277,7 +277,7 @@ int main(int argc, char *argv[])
   cInfo.isLoggedIn = FALSE;
   cInfo.remoteport = CN_DFLT_PORT;
 
-  cInfo.remotehost = "localhost"; /* default to your own server */
+  cInfo.remotehost = strdup("localhost"); /* default to your own server */
 
   /* check options */
   while ((i = getopt(argc, argv, "mM:s:r:P:Buv")) != EOF)    /* get command args */
@@ -294,6 +294,7 @@ int main(int argc, char *argv[])
         metaServer = optarg;
         break;
       case 's':                 /* [host[:port]] */
+        free(cInfo.remotehost);
 	cInfo.remotehost = strdup(optarg);
         if (!cInfo.remotehost)
           {
@@ -312,7 +313,7 @@ int main(int argc, char *argv[])
             if (strlen(cInfo.remotehost) == 0)
               {
                 free(cInfo.remotehost);
-                cInfo.remotehost = "localhost";
+                cInfo.remotehost = strdup("localhost");
               }
           }
         else

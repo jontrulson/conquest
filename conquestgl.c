@@ -321,7 +321,7 @@ int main(int argc, char *argv[])
 
   utSetLogConfig(FALSE, TRUE);	/* use CQ_USERHOMEDIR for logfile */
 
-  cInfo.remotehost = "localhost"; /* default to your own server */
+  cInfo.remotehost = strdup("localhost"); /* default to your own server */
 
   dspInitData();
 
@@ -347,6 +347,7 @@ int main(int argc, char *argv[])
 
         break;
       case 's':                 /* [host[:port]] */
+        free(cInfo.remotehost);
 	cInfo.remotehost = strdup(optarg);
         if (!cInfo.remotehost)
           {
@@ -365,7 +366,7 @@ int main(int argc, char *argv[])
             if (strlen(cInfo.remotehost) == 0)
               {
                 free(cInfo.remotehost);
-                cInfo.remotehost = "localhost";
+                cInfo.remotehost = strdup("localhost");
               }
           }
         else
