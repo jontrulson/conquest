@@ -1,5 +1,10 @@
-This document will try to explain how to install a precompiled
-Conquest .zip archive on a Windows system.
+CONTENTS:
+
+ ## Installation
+ ## Trouble shooting
+
+
+## Installation
 
 The precompiled Conquest .zip package only contains the conquestgl
 client application and required datafiles.  If you want to run a
@@ -85,6 +90,31 @@ As an example:
    It would also be cool if there was a way to provide a simple
    Conquest icon on the desktop (or an entry in the Start->All
    Programs->... list.) 
+
+
+
+## Trouble shooting
+
+If you run into problems running the client, you can look in a couple
+of places for clues.
+
+Assuming that Conquest is installed in C:\Conquest:
+
+In C:\Conquest\bin, you should find a file called stderr.txt, and
+possibly stdout.txt.  These files contain whatever the client would
+have printed out on a unix system, and may provide some clues as to
+the cause of failure.
+
+In addition, Conquest will keep a log file which can be found in
+$APPDATA/Conquest/conquest.log.  $APPDATA (or %APPDATA% in windows
+environment variable syntax) is where per-user data is stored, and
+will typically be something like 
+
+     C:\Documents and Settings\yourusername\Application Data\
+
+When requesting help via email, please include a description of the
+problem, the conquest.log file, and any stderr.txt and stdout.txt
+files. 
 
 
 $Id$
