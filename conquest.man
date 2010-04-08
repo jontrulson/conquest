@@ -298,8 +298,8 @@ Dvorak keyboard, you are in trouble):
                      /|\\
                     Z X C
 
-You can use them singly, e.g. 'd'  would  be  0  degrees,
-'q'  would  be  135,  etc.  You  can  also  use  them  in
+You can use them singly, e.g. 'd'  would  be  0  degrees, 'q'
+would  be  135,  etc.  You  can  also  use  them  in
 combination: "ed" would be halfway between 'e'  and  'd',
 which  is  22.5  degrees; "edd" is like 'e' + 'd' + 'd' /
 3, or 15 degrees.
