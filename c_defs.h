@@ -37,7 +37,10 @@
 #if defined(HAVE_CRYPT_H)
 # include <crypt.h>
 #else
+# if !defined(DARWIN)
+/* DARWIN does not need this, crypt is in unistd.h */
 extern char *crypt(char *, char *);
+# endif
 #endif 
 
 #if defined(STDC_HEADERS)
