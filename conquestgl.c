@@ -32,8 +32,12 @@
 #define NOEXTERN_CONTEXT
 #include "context.h"
 
+#define NOEXTERN_CONF
 #include "conf.h"
+
+#define NOEXTERN_GLOBALS
 #include "global.h"
+
 #include "color.h"
 #include "record.h"
 #include "ibuf.h"

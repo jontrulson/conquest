@@ -13,7 +13,12 @@
 #define NOEXTERN_CONTEXT
 #include "context.h"
   
+#define NOEXTERN_GLOBALS
 #include "global.h"
+
+#define NOEXTERN_CONF
+#include "conf.h"
+
 #include "color.h"
 
 #include "conqutil.h"

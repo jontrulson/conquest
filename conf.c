@@ -25,7 +25,6 @@
 #include "conqnet.h"
 #include "conqutil.h"
 
-#define NOEXTERN_CONF
 #include "conf.h"
 
 #include "protocol.h"

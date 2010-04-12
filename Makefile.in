@@ -148,9 +148,9 @@ libconqserv_la_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
 @ISMINGW_TRUE@am_libconqserv_la_rpath = -rpath $(libdir)
 libconquest_la_DEPENDENCIES = @LTLIBOBJS@
 am_libconquest_la_OBJECTS = conqai.lo ratfor.lo conqlb.lo rndlb.lo \
-	conqutil.lo conqcm.lo conqsvr42.lo global.lo ibuf.lo \
-	version.lo conf.lo sem.lo color.lo userauth.lo record.lo \
-	packet.lo meta.lo udp.lo rb.lo
+	conqutil.lo conqcm.lo conqsvr42.lo ibuf.lo version.lo conf.lo \
+	sem.lo color.lo userauth.lo record.lo packet.lo meta.lo udp.lo \
+	rb.lo
 libconquest_la_OBJECTS = $(am_libconquest_la_OBJECTS)
 libconquest_la_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
@@ -457,7 +457,7 @@ AM_YFLAGS = -d
 
 libconquest_la_SOURCES = conqai.c ratfor.c  \
 	conqlb.h conqlb.c rndlb.c conqutil.c conqutil.h conqcm.c \
-	conqsvr42.c global.c ibuf.c version.c conf.c sem.c color.c \
+	conqsvr42.c ibuf.c version.c conf.c sem.c color.c \
 	userauth.c record.c color.h user.h shiptype.h \
 	ship.h planet.h team.h msg.h doomsday.h driver.h conqinfo.h \
 	history.h robot.h global.h torp.h ibuf.h conf.h  display.h \
@@ -768,7 +768,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gldisplay.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/glfont.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/glmisc.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/global.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/hud.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ibuf.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/iolb.Plo@am__quote@

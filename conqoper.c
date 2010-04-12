@@ -24,8 +24,12 @@
 /*                                                                    */
 /**********************************************************************/
 
+#define NOEXTERN_GLOBALS
 #include "global.h"
+
+#define NOEXTERN_CONF
 #include "conf.h"
+
 #include "conqdef.h"
 #include "conqcom.h"
 #include "conqlb.h"

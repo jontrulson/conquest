@@ -9,14 +9,20 @@
  * Copyright 2004 Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
  ***********************************************************************/
 
+#define NOEXTERN_GLOBALS
 #include "global.h"
+
 #include "conqcom.h"
+
 #define NOEXTERN_CONTEXT
 #include "context.h"
-#undef NOEXTERN_CONTEXT
+
 #include "conqdef.h"
 #include "conqnet.h"
+
+#define NOEXTERN_CONF
 #include "conf.h"
+
 #include "conqutil.h"
 
 #include "meta.h"

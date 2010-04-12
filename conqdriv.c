@@ -24,6 +24,12 @@
 /*    representations about the suitability of this software for any */
 /*    purpose. It is provided "as is" without express or implied warranty. */
 
+#define NOEXTERN_GLOBALS
+#include "global.h"
+
+#define NOEXTERN_CONF
+#include "conf.h"
+
 #include "conqdef.h"
 #include "conqcom.h"
 #include "conqlb.h"
@@ -32,8 +38,6 @@
 #define NOEXTERN_CONTEXT
 #include "context.h"
 
-#include "conf.h"
-#include "global.h"
 #include "sem.h"
 
 #define SUBMIN_SECONDS 5 	/* seconds between planet movement */

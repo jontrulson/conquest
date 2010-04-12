@@ -9,7 +9,11 @@
  * Copyright 2003 Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
  ***********************************************************************/
 
+#define NOEXTERN_GLOBALS
+#include "global.h"
 
+#define NOEXTERN_CONF
+#include "conf.h"
 
 #include "conqdef.h"
 #include "conqcom.h"
@@ -19,8 +23,6 @@
 #define NOEXTERN_CONTEXT
 #include "context.h"
 
-#include "conf.h"
-#include "global.h"
 #include "color.h"
 #include "record.h"
 #include "ibuf.h"

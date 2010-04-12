@@ -24,6 +24,12 @@
 /*                                                                    */
 /**********************************************************************/
 
+#define NOEXTERN_GLOBALS
+#include "global.h"
+
+#define NOEXTERN_CONF
+#include "conf.h"
+
 #include "conqdef.h"
 #include "conqcom.h"
 #include "conqlb.h"
@@ -32,9 +38,7 @@
 #define NOEXTERN_CONTEXT
 #include "context.h"
 
-#include "conf.h"
 
-#include "global.h"
 #include "color.h"
 #include "ui.h"
 #include "options.h"

@@ -30,9 +30,14 @@
 #define NOEXTERN_CONTEXT
 #include "context.h"
 
+#define NOEXTERN_GLOBALS
 #include "global.h"
+
 #include "user.h"
+
+#define NOEXTERN_CONF
 #include "conf.h"
+
 #include "sem.h"
 
 static int debug; 
