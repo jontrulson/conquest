@@ -24,6 +24,7 @@ rm -rf $CONQVER
 echo Archive name: $ARCFILE
 
 EXEFILE="conquestgl.exe"
+ICOFILE="conquest-icon.ico"
 
 IMAGES="img/*.tga img/*.txf"
 SOUNDS="sound/*.ogg"
@@ -36,6 +37,7 @@ mkdir $CONQVER/bin
 mkdir $CONQVER/etc
 
 cp -p $EXEFILE $CONQVER/bin/
+cp -p icon/$ICOFILE $CONQVER/bin/
 cp -p windlls/*.dll $CONQVER/bin/
 
 sed 's/$'"/`echo \\\r`/" README > $CONQVER/README.TXT
