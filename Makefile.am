@@ -4,6 +4,9 @@ ACLOCAL_AMFLAGS = -I m4 --install
 
 # User defineable options
 
+.rc.o:
+	@target@-windres $^ -o $@
+
 CFLAGS = @CONQ_CFLAGS@ $(SDL_CFLAGS)
 CONQGROUP = @CONQGROUP@
 CONQLOCALSTATEDIR = @localstatedir@/conquest

@@ -225,7 +225,8 @@ conquestd_OBJECTS = $(am_conquestd_OBJECTS)
 am__conquestgl_SOURCES_DIST = conquestgl.c c_defs.h defs.h conqdef.h \
 	conqcom.h context.h icon.rc
 @ISMINGW_FALSE@am_conquestgl_OBJECTS = conquestgl.$(OBJEXT)
-@ISMINGW_TRUE@am_conquestgl_OBJECTS = conquestgl.$(OBJEXT)
+@ISMINGW_TRUE@am_conquestgl_OBJECTS = conquestgl.$(OBJEXT) \
+@ISMINGW_TRUE@	icon.$(OBJEXT)
 conquestgl_OBJECTS = $(am_conquestgl_OBJECTS)
 @ISMINGW_FALSE@am__DEPENDENCIES_2 = $(am__DEPENDENCIES_1)
 @ISMINGW_TRUE@am__DEPENDENCIES_2 = $(am__DEPENDENCIES_1)
@@ -293,8 +294,6 @@ AUTOMAKE = @AUTOMAKE@
 AWK = @AWK@
 CC = @CC@
 CCDEPMODE = @CCDEPMODE@
-
-# User defineable options
 CFLAGS = @CONQ_CFLAGS@ $(SDL_CFLAGS)
 CONQGROUP = @CONQGROUP@
 CONQ_CFLAGS = @CONQ_CFLAGS@
@@ -542,7 +541,7 @@ all: config.h
 	$(MAKE) $(AM_MAKEFLAGS) all-am
 
 .SUFFIXES:
-.SUFFIXES: .c .l .lo .o .obj .y
+.SUFFIXES: .c .l .lo .o .obj .rc .y
 am--refresh:
 	@:
 $(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
@@ -1225,6 +1224,11 @@ uninstall-man: uninstall-man6
 	uninstall-libexecPROGRAMS uninstall-man uninstall-man6 \
 	uninstall-sysconfDATA
 
+
+# User defineable options
+
+.rc.o:
+	@target@-windres $^ -o $@
 
 install-exec-hook:
 	$(mkinstalldirs) -m 755 $(DESTDIR) $(DESTDIR)$(localstatedir) \
