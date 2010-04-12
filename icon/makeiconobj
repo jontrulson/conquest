@@ -1,0 +1,1 @@
+i686-pc-mingw32-windres icon.rc -o icon.o

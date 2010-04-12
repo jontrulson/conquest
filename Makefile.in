@@ -222,7 +222,10 @@ conquestd_OBJECTS = $(am_conquestd_OBJECTS)
 @TCPW_TRUE@conquestd_DEPENDENCIES = libconqserv.la libconquest.la \
 @TCPW_TRUE@	libconqinit.la $(am__DEPENDENCIES_1) \
 @TCPW_TRUE@	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
-am_conquestgl_OBJECTS = conquestgl.$(OBJEXT)
+am__conquestgl_SOURCES_DIST = conquestgl.c c_defs.h defs.h conqdef.h \
+	conqcom.h context.h icon.rc
+@ISMINGW_FALSE@am_conquestgl_OBJECTS = conquestgl.$(OBJEXT)
+@ISMINGW_TRUE@am_conquestgl_OBJECTS = conquestgl.$(OBJEXT)
 conquestgl_OBJECTS = $(am_conquestgl_OBJECTS)
 @ISMINGW_FALSE@am__DEPENDENCIES_2 = $(am__DEPENDENCIES_1)
 @ISMINGW_TRUE@am__DEPENDENCIES_2 = $(am__DEPENDENCIES_1)
@@ -262,7 +265,7 @@ DIST_SOURCES = $(libUi_la_SOURCES) $(libUiCU_la_SOURCES) \
 	$(conqai_SOURCES) $(conqdriv_SOURCES) $(conqinit_SOURCES) \
 	$(am__conqmetad_SOURCES_DIST) $(conqoper_SOURCES) \
 	$(conqstrat_SOURCES) $(conquest_SOURCES) \
-	$(am__conquestd_SOURCES_DIST) $(conquestgl_SOURCES)
+	$(am__conquestd_SOURCES_DIST) $(am__conquestgl_SOURCES_DIST)
 man6dir = $(mandir)/man6
 NROFF = nroff
 MANS = $(man6_MANS)
@@ -501,7 +504,10 @@ conquest_SOURCES = conquest.c c_defs.h defs.h conqdef.h conqcom.h context.h \
 	conqreplay.c
 
 conquest_LDADD = libUiCU.la libUi.la libconqclnt.la libconquest.la libconqinit.la $(LEXLIB) $(YACCLIB)
-conquestgl_SOURCES = conquestgl.c c_defs.h defs.h conqdef.h conqcom.h context.h
+@ISMINGW_FALSE@conquestgl_SOURCES = conquestgl.c c_defs.h defs.h conqdef.h conqcom.h context.h
+@ISMINGW_TRUE@conquestgl_SOURCES = conquestgl.c c_defs.h defs.h conqdef.h conqcom.h \
+@ISMINGW_TRUE@	context.h icon.rc
+
 conquestgl_LDADD = libUiGL.la libUi.la libconqclnt.la libconquest.la libcqsound.la libconqinit.la $(XLIBS) $(LEXLIB) $(YACCLIB)
 @TCPW_FALSE@conquestd_SOURCES = conquestd.c c_defs.h defs.h conqdef.h conqcom.h \
 @TCPW_FALSE@	context.h conqnet.h $(TCPW_H) 

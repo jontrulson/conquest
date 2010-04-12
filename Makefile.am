@@ -148,7 +148,13 @@ conquest_SOURCES = conquest.c c_defs.h defs.h conqdef.h conqcom.h context.h \
 
 conquest_LDADD = libUiCU.la libUi.la libconqclnt.la libconquest.la libconqinit.la $(LEXLIB) $(YACCLIB)
 
+if ISMINGW
+conquestgl_SOURCES = conquestgl.c c_defs.h defs.h conqdef.h conqcom.h \
+	context.h icon.rc
+else !ISMINGW
 conquestgl_SOURCES = conquestgl.c c_defs.h defs.h conqdef.h conqcom.h context.h
+endif !ISMINGW
+
 conquestgl_LDADD = libUiGL.la libUi.la libconqclnt.la libconquest.la libcqsound.la libconqinit.la $(XLIBS) $(LEXLIB) $(YACCLIB)
 
 if TCPW
