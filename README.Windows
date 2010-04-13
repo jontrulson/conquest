@@ -14,10 +14,9 @@ Cgywin environment.  I would not advise trying to run a Cygwin
 compiled conquestgl client, since there will be no hardware video
 acceleration and it will be unusably slooooow.
 
-I only have access to Windows XP (via a VirtualBox VM), so I have no
-idea if any of this will run under Windows 7.  If not, please let me
-know, though without W7, I probably can't do much about it - though I
-can at least warn others.
+I only have access to Windows XP and Windows 7 (via a VirtualBox VM),
+so I have no idea if any of this will run under any other version of
+windows (Vista, for example). 
 
 Installing the Conquest OpenGL client basically involves the following
 steps:

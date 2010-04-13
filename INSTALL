@@ -14,6 +14,8 @@ CONTENTS:
 	### DISTRIBUTION
         ### REQUIREMENTS
 	### BUILDING
+            # Under MAC OSX (Darwin)
+            # Under Windows with MinGW
 	### OTHER USEFUL INFORMATION
             # GENERAL TERMINAL NOTE
             # TERMINFO ENTRIES
@@ -194,6 +196,55 @@ CONTENTS:
     Read the conquest.doc and the HISTORY files to get info on
     what conquest is and how to play it.
 
+
+# Under MAC OSX (Darwin)
+
+  Building under MAC OSX is similiar to the standard unix method
+  described above, however, you will likely need to get (or build)
+  SDL, SDL_mixer with OGG Vorbis support.  GLUT seems to be included
+  by default.
+
+  In addition, after checking out the source code repo, or unpacking
+  the src tarball, you will most likely need to run:
+
+  $ autoreconf -fvi
+
+  before attempting a ./configure and a make.  There is some issue
+  with the autoconf macros supplied with Conquest that are not
+  compatible with the MAC OS X installation.  As I do not have such a
+  system, I cannot explore the issue in detail.  
+
+  But, the 'autoreconf' command above does seem to resolve it, and
+  afterward, the method of compiling is the same as a standard unix
+  build. 
+
+
+# Under Windows with MinGW
+
+  For a Windows build, I use a MinGW cross-compiler environment under
+  Linux - I have not tried to actually build it under windows itself
+  using MSYS/MinGW.  In theory, it should work just fine as long as
+  you have the prequisite environment setup, including the development
+  packages for SDL, SDL_mixer, libz, and GLUT.
+
+  See the MINGW_BUILD.sh file that I use to compile it on my linux
+  system - you would most likely need to tweak it for your own
+  environment. 
+
+  Mote, a Windows build only compiles the code neccessary to build the
+  OpenGL client (conquestgl).  None of the other binaries are
+  compiled. 
+
+  If you want to run your own conquest server, or other conquest
+  binaries and utilities, you will either need to compile and run them
+  under the Cygwin environment, or under a unix/linux host.
+
+  I would not advise attempting to use the OpenGL client (conquestgl)
+  under Cygwin as there will be no hardware acceleration, and you
+  would need to run the xorg X server.
+
+  See README.cygwin for information on compiling/using conquest under
+  the cygwin environment.
 
 ### OTHER USEFUL INFORMATION
 
