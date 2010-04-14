@@ -1020,7 +1020,7 @@ CONTENTS:
       
          pan:         NUMBER
                       -127 to 127. The default pan of the effect when
-                      created.  If it is a positional affect
+                      created.  If it is a positional effect
                       (explosion for example), this value will have
                       no effect.
 
