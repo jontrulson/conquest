@@ -9,7 +9,126 @@
 
                               Conquest HISTORY
 
-8.4.1i (devel) 03/27/2010
+
+8.5 (stable) 04/20/2010
+
+  - A new stable release, at long last.
+
+  - Major highlights of this release, compared to the last stable
+    release (8.4.1 09/13/2008):
+
+    - General:
+
+      - MAC OSX (Darwin) support
+
+      - Native Windows XP/Windows 7 support for the OpenGL client
+        (conquestgl) using the MinGW cross-compiler enviroment.  Full
+        sound and hardware accelerated OpenGL is supported.  A zip
+        file will be available on sourceforge containing a
+        pre-compiled conquestgl binary, and support files.  See
+        README.Windows (or Conquest\INSTALL.TXT in the ZIP file) for
+        more information on installtion and use.
+
+      - a re-work of packet handling.  The original goal was to
+        eventually support non-blocking socket IO, however some
+        significant (and incompatible) protocol changes will be
+        required to do this properly.  Next major release will tackle
+        this. 
+
+      - rework of texture and color representation internally.
+
+      - remove telnet (-t) support from the clients.  Nobody runs
+        telnet'able conquest servers anymore.
+
+      - switched to Mercurial (hg) for source code control.
+
+        I will 'hg tag' each devel release.  For stable releases, a
+        branch name will be created instead of a tag.  Current
+        development will always happen at the tip, in the 'default'
+        branch, and may therefore be unstable.
+
+        Bug fixes and enhancements made to 8.5 will occur in the
+        conquest-8.5 branch.
+
+        A command like (all on one line):
+
+          hg clone -u conquest-8.5 \
+             http://conq.hg.sourceforge.net/hgroot/conq/conq conquest
+
+          can be used to check out the stable branch for version 8.5.
+          Omit the '-u conquest-8.5' if you want the current state of
+          development.
+
+    - Client fixes (primarily the OpenGL client, conquestgl):
+
+      - New Orion ship textures (thanks to blender and the fine
+        contributors at ShareGC.com).  See the CREDITS file.
+
+      - some changes to work better with wide-screen display formats
+
+      - new ship shield textures, both for the icon-ship display and
+        the main viewer.
+
+      - in conquestgl, torps are no longer colored according to their
+        'danger' level.  It's up to you, as the ship's Captain, to
+        know when a torp may kill you.  When in doubt, raise
+        shields and run like the coward you are. :)
+
+      - rework of the icon-ship display:
+
+        - now use a luminance variant of the main ship texture as the
+          ico-ship rather than a seperate texture.
+
+        - implement 'lamps' rather than the text (cloaking, repair,
+          shields, etc)
+
+        - make the ico-ship drawing area square to avoid stretching
+          issues
+
+        - use ship's torp texture for the torp-pips
+
+        - use ship's phaser texture for the phaser recharge indicator
+
+      - fix bug that could cause the use of undefined mouse macros to
+        improperly terminate certain operations (beaming, bombing,
+        etc). 
+
+    - Server fixes:
+
+      - fix server bug that would cause vacant ships, when destroyed,
+        to fail to explode properly, leaving some stationary torps
+        behind.
+      
+      - correct a server problem with UDP keepalive packets.  During
+        certain operations (like beaming, bombing, self destruct, etc)
+        these packets could improperly terminate these activities on
+        the server, leaving the client to believe these activities
+        were still in progress, causing great angst in the land.
+
+  - changes from the last devel release:
+
+    - Fix up some documentation for Windows systems.  Conquestgl has
+      been tested on Windows 7, seems to work great.
+
+    - fix up stupidness in handling cInfo.remotehost data (caused
+      invalid free()'s, depending on options specified).
+
+    - Do not declare a crypt prototype on DARWIN systems
+
+    - Move 'q' from beginning of line in conquest.man, lintian error
+      reported by Jonathon (new debian maintainer)
+
+    - Remove global.c, instantiate global.h and conf.h within all of
+      the <main>.c files.  Needed by Darwin systems to avoid linker
+      errors when building conqstrat and conqinit executables.
+
+    - Add some icon pngs and a .ico for windows
+
+
+  ## The following are the devel release notes for more detail.  Use 'hg
+     log -v' for even more detail if you care.
+
+  8.4.1i (devel) 03/27/2010
 
   - unless there is a big problem, a 'stable' official release will be
     up next.  
@@ -162,7 +281,7 @@
     repo cloned) for any missing details.
 
 
-8.4.1d (devel) 10/01/2009
+  8.4.1d (devel) 10/01/2009
 
   - a devel release, some highlights:
 
