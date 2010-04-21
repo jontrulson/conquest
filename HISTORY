@@ -19,7 +19,10 @@
 
     - General:
 
-      - MAC OSX (Darwin) support
+      - MAC OSX (Darwin) support.  Full sound and hardware accelerated
+        OpenGL is supported.  Note, you will probably need to get SDL
+        and SDL_mixer, as well as libogg and lib vorbis in order to
+        build.  
 
       - Native Windows XP/Windows 7 support for the OpenGL client
         (conquestgl) using the MinGW cross-compiler enviroment.  Full
@@ -38,14 +41,15 @@
       - rework of texture and color representation internally.
 
       - remove telnet (-t) support from the clients.  Nobody runs
-        telnet'able conquest servers anymore.
+        telnet conquest games anymore.
 
       - switched to Mercurial (hg) for source code control.
 
-        I will 'hg tag' each devel release.  For stable releases, a
-        branch name will be created instead of a tag.  Current
-        development will always happen at the tip, in the 'default'
-        branch, and may therefore be unstable.
+        I will 'hg tag' each devel release.  For stable releases (like
+        this one), a branch name will be created instead of a tag.
+
+        Current development will always happen at the tip, in the
+        'default' branch, and may therefore be unstable.
 
         Bug fixes and enhancements made to 8.5 will occur in the
         conquest-8.5 branch.
@@ -58,6 +62,18 @@
           can be used to check out the stable branch for version 8.5.
           Omit the '-u conquest-8.5' if you want the current state of
           development.
+
+    - Server fixes:
+
+      - fix server bug that would cause vacant ships, when destroyed,
+        to fail to explode properly, leaving some stationary torps
+        behind.
+      
+      - correct a server problem with UDP keepalive packets.  During
+        certain operations (like beaming, bombing, self destruct, etc)
+        these packets could improperly terminate these activities on
+        the server, leaving the client to believe these activities
+        were still in progress, causing great angst in the land.
 
     - Client fixes (primarily the OpenGL client, conquestgl):
 
@@ -93,19 +109,7 @@
         improperly terminate certain operations (beaming, bombing,
         etc). 
 
-    - Server fixes:
-
-      - fix server bug that would cause vacant ships, when destroyed,
-        to fail to explode properly, leaving some stationary torps
-        behind.
-      
-      - correct a server problem with UDP keepalive packets.  During
-        certain operations (like beaming, bombing, self destruct, etc)
-        these packets could improperly terminate these activities on
-        the server, leaving the client to believe these activities
-        were still in progress, causing great angst in the land.
-
-  - changes from the last devel release:
+  - changes from the last devel (8.4.1i) release:
 
     - Fix up some documentation for Windows systems.  Conquestgl has
       been tested on Windows 7, seems to work great.
@@ -125,8 +129,8 @@
     - Add some icon pngs and a .ico for windows
 
 
-  ## The following are the devel release notes for more detail.  Use 'hg
-     log -v' for even more detail if you care.
+  ## The following are the devel release notes for more detail.  Use
+     'hg log -v' on the repository for even more detail if you care.
 
   8.4.1i (devel) 03/27/2010
 
