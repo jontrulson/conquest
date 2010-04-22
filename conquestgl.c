@@ -304,6 +304,11 @@ int main(int argc, char *argv[])
   int wantMetaList = FALSE;     /* wants to see a list from metaserver */
   int serveropt = FALSE;        /* specified a server with '-s' */
   int dosound = TRUE;
+#if defined(MINGW)
+  WSADATA wsaData;
+  int rv;
+#endif
+
 
   /* tell the packet routines that we are a client */
   pktSetClientMode(TRUE);
@@ -328,6 +333,17 @@ int main(int argc, char *argv[])
   cInfo.remotehost = strdup("localhost"); /* default to your own server */
 
   dspInitData();
+
+
+#if defined(MINGW)
+  /* init windows sockets (version 2.0) */
+  rv = WSAStartup(MAKEWORD(2, 0), &wsaData);
+  if (rv != 0) {
+    fprintf(stderr, "main: WSAStartup failed: %d\n", rv);
+    utLog("main: WSAStartup failed: %d\n", rv);
+    return 1;
+  }
+#endif
 
   /* check options */
   while ((i = getopt(argc, argv, "fmM:s:r:tP:Bug:Sv")) != EOF)    
