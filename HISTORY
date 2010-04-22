@@ -10,6 +10,11 @@
                               Conquest HISTORY
 
 
+8.5.1 (stable, windows only) 4/22/2010
+
+  - add a call the WSAStartup() to conquestgl so socket i/o can
+    *consistently* work :)
+
 8.5 (stable) 04/20/2010
 
   - A new stable release, at long last.
