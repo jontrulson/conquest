@@ -1,0 +1,6 @@
+This directory and files are used to generate the html for the man
+pages used on the website.  They are not distributed with the src
+dist.
+
+Run 'makeme' to create the man page html's.  Ignore the error you will
+get when processing conquestgl.  

@@ -205,8 +205,7 @@ server.
 Jon Trulson
 .SH "SEE ALSO"
 .PP
-conquest(6), conquestd(6), conqoper(6), conqdriv(6), conquestsh(6),
-conqmetad(6) 
+conquest(6), conquestd(6), conqoper(6), conqdriv(6), conqmetad(6) 
 .PP
 See README in the conquest distribution (usually installed in
 <conquest install prefix>/etc/) for information and tips on how to

@@ -461,8 +461,7 @@ Here is a quick command reference.
 Jon Trulson, Jeff Poskanzer
 .SH "SEE ALSO"
 .PP
-conquestd(6), conqoper(6), conqdriv(6), conquestsh(6),
-conqmetad(6), conqinit(6)
+conquestd(6), conqoper(6), conqdriv(6), conqmetad(6), conqinit(6)
 .PP
 See README in the conquest distribution (usually installed in
 <conquest install prefix>/etc/) for information and tips on how to

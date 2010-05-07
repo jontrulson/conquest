@@ -84,8 +84,7 @@ Dump the current universe to stdout in conqinitrc format.
 Jon Trulson
 .SH "SEE ALSO"
 .PP
-conquestd(6), conqoper(6), conqdriv(6), conquestsh(6),
-conqmetad(6) 
+conquestd(6), conqoper(6), conqdriv(6), conqmetad(6) 
 .PP
 See the CONQINIT.TXT file in the src distribution (or on the conquest
 web page) for detailed information on the syntax of the files parsed

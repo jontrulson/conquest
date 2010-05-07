@@ -7,7 +7,7 @@ for i in ../*.man
 do
         bname=$(basename $i .man)
 #        rman -f HTML -S ../$bname.man >$bname.6.html
-        man2html -r ../$bname.man >$bname.6.html
+        man2html -r ../$bname.man |sed -e 's|../man6/|../conquest/|g' >$bname.6.html
 done
 
 rm -f conquestgl.6.html
