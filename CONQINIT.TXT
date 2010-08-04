@@ -231,8 +231,8 @@ CONTENTS:
             visible     "yes"
             core        "yes"
             homeplanet  "yes"
-            x          -9655.250220
-            y          9577.226313
+            x           -9655.250220
+            y           9577.226313
             size        300
             texname     "kling"                  # optional
           }
