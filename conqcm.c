@@ -270,6 +270,8 @@ static void map_vars(void)
   
   map1d(CBlockRevision, int, 1);	/* this *must* be the first var */
 
+  map1d(CBGlobal, CBGlobal_t, 1);
+
   map1d(ConqInfo, ConqInfo_t, 1);
 
   map1d(Users, User_t, MAXUSERS);

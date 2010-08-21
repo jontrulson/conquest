@@ -26,6 +26,7 @@
 #include "conqinfo.h"
 #include "history.h"
 #include "robot.h"
+#include "cbglobal.h"
 
 #define CMN_MODE 0660		/* mode of a new common block */
 
@@ -49,6 +50,8 @@ void map_lcommon(void);
 /* Special data items - these must be at the very beginning. */
 				/* This must be the first var */
 CEXTERN int *CBlockRevision;	/* common block rev number */
+
+CEXTERN CBGlobal_t *CBGlobal;   /* global limits from CQI */
 
 CEXTERN ConqInfo_t *ConqInfo;	/* misc game info */
 

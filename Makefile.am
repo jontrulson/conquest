@@ -76,7 +76,7 @@ libconquest_la_SOURCES = conqai.c ratfor.c  \
 	ship.h planet.h team.h msg.h doomsday.h driver.h conqinfo.h \
 	history.h robot.h global.h torp.h ibuf.h conf.h  display.h \
 	protocol.h packet.h packet.c userauth.h meta.c meta.h udp.c udp.h \
-	rb.h rb.c
+	rb.h rb.c cbglobal.h
 
 libconquest_la_LIBADD = @LTLIBOBJS@
 
