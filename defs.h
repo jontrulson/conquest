@@ -36,7 +36,7 @@
  */
 
 #define C_CONQ_CONQDRIV  "conqdriv"
-#define C_CONQ_COMMONBLK "conquest_common.img"
+#define C_CONQ_COMMONBLK "conquest.cb"
 #define C_CONQ_ERRLOG    "conquest.log"
 #define C_CONQ_NEWSFILE  "HISTORY"
 #define C_CONQ_HELPFILE  "conquest.doc"
