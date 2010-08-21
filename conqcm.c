@@ -42,19 +42,11 @@ static int fakeCommon = FALSE;	/* for the clients */
 
 /* Some (most) architectures do not like unaligned accesses (like
  *  sparc) so we need to ensure proper alignment of the structures
- *  contained within the common block.  
- *
- * We should do this on all architectures, but I'm not ready to break
- * CB compatibility on x86 yet, so for now only do this on non x86
- * platforms.
+ *  contained within the common block.  We will use 16-byte alignment.
  */
 
-
-#if defined(__i386__) || defined(__x86_64__) || defined(__amd64__)
-# define CB_ALIGN(_off, _x)  ( _off )
-#else
-# define CB_ALIGN(_off, _x)  ( ((_off) + (_x)) & ~((_x) - 1) )
-#endif 
+#define CB_ALIGNMENT            (16)
+#define CB_ALIGN(_off, _align)  ( ((_off) + (_align)) & ~((_align) - 1) )
 
 /* On those platforms where we want proper alignment, align everything
  * to 16 bytes.
@@ -62,7 +54,7 @@ static int fakeCommon = FALSE;	/* for the clients */
 #define map1d(thevarp, thetype, size) {            \
     thevarp = (thetype *) (cBasePtr + coff);       \
     coff += (sizeof(thetype) * (size));            \
-    coff = CB_ALIGN(coff, 16);                     \
+    coff = CB_ALIGN(coff, CB_ALIGNMENT);           \
 }
 
 
