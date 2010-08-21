@@ -1689,8 +1689,8 @@ void dumpUniverse(void)
       printf("  ptype       \"%s\"\n", ptype2str(Planets[i].type));
       printf("  pteam       \"%s\"\n", team2str(Planets[i].team));
       printf("  armies      %d\n", Planets[i].armies);
-      printf("  visible     \"%s\"\n", (Planets[i].real) ? "yes" : "no");
-      if (i <= NUM_BASEPLANETS && Planets[i].real && 
+      printf("  visible     \"%s\"\n", PVISIBLE(i) ? "yes" : "no");
+      if (i <= NUM_BASEPLANETS && PVISIBLE(i) && 
           (Planets[i].type != PLANET_MOON && Planets[i].type != PLANET_SUN &&
            Planets[i].type != PLANET_GHOST))
         printf("  core        \"yes\"\n");

@@ -762,7 +762,7 @@ void debugplan(void)
 		      uninhab, 
 		      junk );
 	      
-	      if ( ! Planets[k].real )
+	      if ( ! PVISIBLE(k) )
 		cprintf(lin,col-2,ALIGN_NONE, "#%d#%c", SpecialColor, '-');
 	      
 	      lin++;
@@ -1837,7 +1837,7 @@ void oppedit(void)
 		InfoColor, Planets[pnum].uninhabtime );
       
       lin++;
-      if ( Planets[pnum].real )
+      if ( PVISIBLE(pnum) )
 		  cprintf(lin,col,ALIGN_NONE,sfmt, "-", "  Visible\n");
       else
 		  cprintf(lin,col,ALIGN_NONE,sfmt, "+", "  Hidden\n");
@@ -2005,11 +2005,11 @@ void oppedit(void)
 	  break;
 	case '+':
 	  /* Now you see it... */
-	  Planets[pnum].real = TRUE;
+          PFSET(pnum, PLAN_F_VISIBLE);
 	  break;
 	case '-':
 	  /* Now you don't */
-	  Planets[pnum].real = FALSE;
+          PFCLR(pnum, PLAN_F_VISIBLE);
 	  break;
 	case '>': /* forward rotate planet number - dwp */
 	case KEY_RIGHT:

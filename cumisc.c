@@ -986,7 +986,7 @@ void mcuPlanetList( int team, int snum )
 		}
 	      
 	      /* Don't display unless it's real. */
-	      if ( ! Planets[pnum].real )
+	      if ( ! PVISIBLE(pnum) )
 		continue; 
 	      
 	      /* I want everything if it's real */

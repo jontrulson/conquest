@@ -816,7 +816,7 @@ int clbTakePlanet( int pnum, int snum )
 
       for ( i = 1; i <= NUMPLANETS; i = i + 1 )
         {
-          if ( Planets[i].real && (Planets[i].team == oteam) 
+          if ( PVISIBLE(i) && (Planets[i].team == oteam) 
                && Planets[i].armies > 0)
             {
               didgeno = 0;
@@ -851,7 +851,7 @@ int clbTakePlanet( int pnum, int snum )
   /* Check whether the universe has been conquered. */
   for ( i = 1; i <= NUMCONPLANETS; i = i + 1 )
     if ( Planets[i].type == PLANET_CLASSM || Planets[i].type == PLANET_DEAD )
-      if ( Planets[i].team != Ships[snum].team || ! Planets[i].real )
+      if ( Planets[i].team != Ships[snum].team || ! PVISIBLE(i) )
 	{
 	  /* No. */
 	  clbStoreMsg( -pnum, -Ships[snum].team, buf );
@@ -1080,7 +1080,7 @@ int clbZeroPlanet( int pnum, int snum )
       /* Check whether that was the last planet owned by the vanquished. */
       for ( i = 1; i <= NUMPLANETS; i = i + 1 )
         {
-          if ( Planets[i].real && (Planets[i].team == oteam) && 
+          if ( PVISIBLE(i) && (Planets[i].team == oteam) && 
                Planets[i].armies > 0)
             {
               didgeno = FALSE;
@@ -1276,7 +1276,7 @@ void clbDoomFind(void)
   Doomsday->lock = -PNUM_MURISAK;
   
   for ( i = 1; i <= NUMPLANETS; i = i + 1 )
-    if ( Planets[i].real )
+    if ( PVISIBLE(i) )
       if ( Planets[i].armies > 0 && Planets[i].team != TEAM_NOTEAM )
 	{
 	  taste = Planets[i].armies * BOMBARD_KILLS / dist(Doomsday->x, Doomsday->y, Planets[i].x, Planets[i].y);
@@ -1337,7 +1337,7 @@ int clbFindOrbit( int snum, int *pnum )
   int i;
   
   for ( i = 1; i <= NUMPLANETS; i = i + 1 )
-    if ( Planets[i].real &&
+    if ( PVISIBLE(i) &&
 	( dist( Ships[snum].x, Ships[snum].y, Planets[i].x, Planets[i].y ) <= ORBIT_DIST ) )
       {
 	*pnum = i;
@@ -1523,7 +1523,7 @@ int clbFindSpecial( int snum, int token, int count, int *sorpnum, int *xsorpnum 
       for ( i = 1; i <= NUMPLANETS; i = i + 1 )
 	{
 	  /* Only can look for "real" planets. */
-	  if ( ! Planets[i].real )
+	  if ( ! PVISIBLE(i) )
 	    continue; /* jet next;*/
 	  /* Ignore suns and moons. */
 	  if ( Planets[i].type == PLANET_SUN || Planets[i].type == PLANET_MOON )
@@ -1591,7 +1591,7 @@ int clbFindSpecial( int snum, int token, int count, int *sorpnum, int *xsorpnum 
       for ( i = 1; i <= NUMPLANETS; i = i + 1 )
 	{
 	  /* Only can look for "real" planets. */
-	  if ( ! Planets[i].real )
+	  if ( ! PVISIBLE(i) )
 	    continue; 
 	  /* Ignore suns and moons. */
 	  if ( Planets[i].type == PLANET_SUN || Planets[i].type == PLANET_MOON )
@@ -2099,9 +2099,9 @@ void clbIntrude( int snum, int pnum )
   string atta=" attacking";
   string armeq=", armies=";
   
-  if ( Planets[pnum].real &&
-      Planets[pnum].team != TEAM_SELFRULED &&
-      Planets[pnum].team != TEAM_NOTEAM )
+  if ( PVISIBLE(pnum) &&
+       Planets[pnum].team != TEAM_SELFRULED &&
+       Planets[pnum].team != TEAM_NOTEAM )
     {
       if ( snum == MSG_DOOM )
 	{
@@ -2190,14 +2190,14 @@ int clbPhoon( int pnum )
     return ( PHOON_NO );
   
   /* Your primary must be a non-sun that is real. */
-  if ( Planets[i].type == PLANET_SUN || ! Planets[i].real )
+  if ( Planets[i].type == PLANET_SUN || ! PVISIBLE(i) )
     return ( PHOON_NO );
   
   /* Your primary has to orbit a (real) sun to have a phase. */
   j = Planets[i].primary;
   if ( j == 0 )
     return ( PHOON_NO );
-  if ( Planets[j].type != PLANET_SUN || ! Planets[j].real )
+  if ( Planets[j].type != PLANET_SUN || ! PVISIBLE(j) )
     return ( PHOON_NO );
   
   /* Things are cool, now calculate the phase. */
@@ -2238,7 +2238,7 @@ int clbPlanetMatch( char *str, int *pnum, int godlike )
   else
     {
       for ( *pnum = 1; *pnum <= NUMPLANETS; *pnum = *pnum + 1 )
-	if ( Planets[*pnum].real )
+	if ( PVISIBLE(*pnum) )
 	  if ( utStringMatch( str, Planets[*pnum].name, FALSE ) )
 	    return ( TRUE );
     }
@@ -2427,7 +2427,7 @@ int clbSPWar( int snum, int pnum )
 {
   
   
-  if ( ! Planets[pnum].real )
+  if ( ! PVISIBLE(pnum) )
     return ( FALSE );		/* can't be at war unless it's real */
   else if ( Planets[pnum].type == PLANET_SUN )
     return ( TRUE );		/* always at war with suns */

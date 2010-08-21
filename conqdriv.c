@@ -390,7 +390,7 @@ void iterdrive( int *ship )
 	      if ( j > 0)
 		{
 		  /* Make sure the planet is still real. */
-		  if ( ! Planets[j].real )
+		  if ( ! PVISIBLE(j) )
 		    Ships[i].lock = 0;
 		  else if ( Ships[i].warp >= 0.0 )
 		    {
@@ -575,7 +575,7 @@ void secdrive( int *ship )
       
       /* Ships, planets and suns scans. */
       for ( j = 1; j <= NUMPLANETS; j = j + 1 )
-	if ( Planets[j].real )
+	if ( PVISIBLE(j) )
 	  {
 	    /* Do we scan the planet? */
 	    dis = dist( Ships[i].x, Ships[i].y, Planets[j].x, Planets[j].y );

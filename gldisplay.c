@@ -112,7 +112,7 @@ void display( int snum )
   /* Display the planets and suns. */
   for ( i = NUMPLANETS; i > 0; i = i - 1 )
     {
-      if ( ! Planets[i].real )
+      if ( ! PVISIBLE(i) )
 	continue;
       if ( !GLcvtcoords( cenx, ceny, Planets[i].x, Planets[i].y, -scale, 
                          &glx, &gly ))

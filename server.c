@@ -961,7 +961,7 @@ void procCoup(cpCommand_t *cmd)
       return;
     }
   for ( i = 1; i <= NUMPLANETS; i = i + 1 )
-    if ( Planets[i].real && (Planets[i].team == Ships[snum].team) && 
+    if ( PVISIBLE(i) && (Planets[i].team == Ships[snum].team) && 
          (Planets[i].armies > 0) )
       {
 	 sendFeedback("We don't need to coup, we still have armies left!");

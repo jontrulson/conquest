@@ -57,7 +57,10 @@ void cqiInitPlanets(void)
 
       Planets[i].type = cqiPlanets[i - 1].ptype;
       Planets[i].primary = cqiPlanets[i - 1].primary + 1;
-      Planets[i].real = cqiPlanets[i - 1].visible;
+      if (cqiPlanets[i - 1].visible)
+        PFSET(i, PLAN_F_VISIBLE);
+      else
+        PFCLR(i, PLAN_F_VISIBLE);
       Planets[i].team = cqiPlanets[i - 1].pteam;
 
       /* for armies, we use what is specified */

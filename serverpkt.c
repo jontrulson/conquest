@@ -1014,7 +1014,8 @@ spPlanetInfo_t *spktPlanetInfo(Unsgn8 pnum, int rec)
   splaninfo.type = SP_PLANETINFO;
   splaninfo.pnum = pnum;
 
-  if (Planets[pnum].real)
+  /* FIXME for new protocol, send the flags directly */
+  if (PVISIBLE(pnum))
     splaninfo.flags |= SPPLANETINFO_FLAGS_REAL;
 
   splaninfo.primary = (Unsgn8)Planets[pnum].primary;

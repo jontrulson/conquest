@@ -409,13 +409,16 @@ int procPlanetInfo(char *buf)
      work we check to see if SPPLANETINFO_FLAGS_FVALID is set.  If so,
      _then_ we pay attn to any other flags present. Else we ignore
      them. */
+
+  /* FIXME - with new CB, and later, new protocol, we will send these
+     flags directly.  Right? */
   if (splaninfo->flags & SPPLANETINFO_FLAGS_FVALID)
     {                           /* we have valid flags */
 
       if (splaninfo->flags & SPPLANETINFO_FLAGS_REAL)
-        Planets[pnum].real = TRUE;
+        PFSET(pnum, PLAN_F_VISIBLE);
       else
-        Planets[pnum].real = FALSE;
+        PFCLR(pnum, PLAN_F_VISIBLE);
     }
 
   Planets[pnum].primary = primary;
