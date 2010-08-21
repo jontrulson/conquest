@@ -1795,6 +1795,10 @@ void oppedit(void)
       cprintf( lin,datacol,ALIGN_NONE, "#%d#%.1f", InfoColor, Planets[pnum].orbang );
       
       lin++;
+      cprintf(lin,col,ALIGN_NONE,sfmt, "S", "  Size:\n");
+      cprintf( lin,datacol,ALIGN_NONE, "#%d#%.1f", InfoColor, Planets[pnum].size );
+      
+      lin++;
       i = Planets[pnum].type;
       cprintf(lin,col,ALIGN_NONE,sfmt, "t", "  Type:\n");
       cprintf( lin, datacol, ALIGN_NONE, 
@@ -1917,6 +1921,23 @@ void oppedit(void)
 
 	  Planets[pnum].orbvel = ctor( buf );
 	  break;
+	case 'S':
+	  /* Size. */
+	  ch = mcuGetCX( "New size? ", MSG_LIN1, 0,
+		     TERMS, buf, MSGMAXLINE );
+	  if ( ch == TERM_ABORT || buf[0] == EOS )
+	    continue;	/* next */
+	  utDeleteBlanks( buf );
+	  i = 0;
+	  if ( ! utSafeCToI( &j, buf, i ) )
+	    continue;	/* next */
+
+	  x = ctor( buf);
+	  if ( x < 1.0 )
+	    continue;	/* next */
+	  Planets[pnum].size = x;
+	  break;
+
 	case 'T':
 	  /* Rotate owner team. */
 	  if ( pnum > NUMCONPLANETS )

@@ -71,7 +71,6 @@ void cqiInitPlanets(void)
       for ( j = 0; j < NUMPLAYERTEAMS; j++ )
 	Planets[i].scanned[j] = FALSE;
 
-
       /* we will need to defer setting up planet's team scan until
          we have identified the team's homeplanets... */
       for ( j = 0; j < NUMPLAYERTEAMS; j++ )
@@ -80,6 +79,7 @@ void cqiInitPlanets(void)
           Teams[j].coupinfo = FALSE; /* don't know coup time */
         }
 
+      Planets[i].size = cqiPlanets[i - 1].size;
       Planets[i].x = cqiPlanets[i - 1].xcoord;
       Planets[i].y = cqiPlanets[i - 1].ycoord;
       Planets[i].orbrad = cqiPlanets[i - 1].radius;

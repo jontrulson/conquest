@@ -1809,7 +1809,7 @@ static void startSection(int section)
         memset((void *)&currPlanet, 0, sizeof(cqiPlanetInitRec_t));
 
         currPlanet.primary = -1;
-        currPlanet.size = 300;  /* ### */
+        currPlanet.size = 300;  /* default */
       }
       break;
 
