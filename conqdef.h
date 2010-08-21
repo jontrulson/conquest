@@ -60,11 +60,8 @@
 /*#define COMMONSTAMP 980628 		 stardate? */
 /*#define COMMONSTAMP 990124 		 stardate? */
 /*#define COMMONSTAMP 20001231 		 stardate? */
-#define COMMONSTAMP 20030829
-
-
-/* Copyright notice string. */
-#define COPYRIGHT "(C) 1983-1986 by Jef Poskanzer and Craig Leres"
+/*#define COMMONSTAMP 20030829 */
+#define COMMONSTAMP 20100820
 
 #ifndef PI
 # define PI 3.141592654
