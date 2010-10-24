@@ -82,8 +82,8 @@ libconquest_la_LIBADD = @LTLIBOBJS@
 
 libconquest_la_LDFLAGS = -version-info 1:0:0
 
-libconqclnt_la_SOURCES = client.c client.h clientlb.c clientlb.h \
-	playback.h playback.c
+libconqclnt_la_SOURCES = client.c client.h cproc.h cproc.c clientlb.c \
+	clientlb.h playback.h playback.c
 
 libconqclnt_la_LDFLAGS = -version-info 1:0:0
 

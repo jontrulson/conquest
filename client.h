@@ -15,6 +15,8 @@
 #include "protocol.h"
 #include "packet.h"
 
+#include "cproc.h"
+
 /* client state */
 #define CLT_STATE_NONE      0x00000000	
 #define CLT_STATE_PREINIT   0x00000001	/* local init */
@@ -56,34 +58,12 @@ extern Unsgn8         clientFlags;
 int             sendAuth(int sock, Unsgn8 flag, char *login, char *pw);
 int             sendSetCourse(int sock, Sgn8 lock, real head);
 
-/* packet proc routines */
-int             procUser(char *buf);
-int             procShip(char *buf);
-int             procShipSml(char *buf);
-int             procShipLoc(char *buf);
-int             procPlanet(char *buf);
-int             procPlanetSml(char *buf);
-int             procPlanetLoc(char *buf);
-int             procPlanetLoc2(char *buf);
-int             procPlanetInfo(char *buf);
-int             procTorp(char *buf);
-int             procTorpLoc(char *buf);
-int             procTorpEvent(char *buf);
-int             procTeam(char *buf);
-int             procMessage(char *buf);
-int             procServerStat(char *buf);
-int             procConqInfo(char *buf);
-int             procHistory(char *buf);
-int             procDoomsday(char *buf);
-
 int             sendSetName(char *name);
 int             sendCommand(Unsgn8 cmd, Unsgn16 detail);
 int             sendFireTorps(int num, real dir);
 int             sendMessage(int to, char *msg);
 
 int             clientHello(char *clientname);
-
-void            processPacket(char *buf);
 
 void            sendUDPKeepAlive(Unsgn32 timebase);
 
