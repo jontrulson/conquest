@@ -59,6 +59,9 @@
 
 - COMMON BLOCK
 
+  - add field to store IP address of client in ships array.
+    For future limiting of concurrent connections from a single IP.
+
   - add 'size' (in CU's) to planets.
 
   - resignation - preserve history data.
