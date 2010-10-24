@@ -112,7 +112,7 @@ libUiGL_la_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
 @GLCLIENT_TRUE@@ISMINGW_FALSE@am_libUiGL_la_rpath = -rpath $(libdir)
 @ISMINGW_TRUE@am_libUiGL_la_rpath = -rpath $(libdir)
 libconqclnt_la_LIBADD =
-am_libconqclnt_la_OBJECTS = client.lo clientlb.lo playback.lo
+am_libconqclnt_la_OBJECTS = client.lo cproc.lo clientlb.lo playback.lo
 libconqclnt_la_OBJECTS = $(am_libconqclnt_la_OBJECTS)
 libconqclnt_la_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
@@ -468,8 +468,8 @@ libconquest_la_SOURCES = conqai.c ratfor.c  \
 
 libconquest_la_LIBADD = @LTLIBOBJS@
 libconquest_la_LDFLAGS = -version-info 1:0:0
-libconqclnt_la_SOURCES = client.c client.h clientlb.c clientlb.h \
-	playback.h playback.c
+libconqclnt_la_SOURCES = client.c client.h cproc.h cproc.c clientlb.c \
+	clientlb.h playback.h playback.c
 
 libconqclnt_la_LDFLAGS = -version-info 1:0:0
 libconqserv_la_SOURCES = servauth.c server.c servauth.h server.h serverpkt.c \
@@ -765,6 +765,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/conquestgl.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/conqutil.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cprintf.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cproc.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cqsound.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cuclient.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cumisc.Plo@am__quote@
