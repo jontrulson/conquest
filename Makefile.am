@@ -88,7 +88,7 @@ libconqclnt_la_SOURCES = client.c client.h cproc.h cproc.c clientlb.c \
 libconqclnt_la_LDFLAGS = -version-info 1:0:0
 
 libconqserv_la_SOURCES = servauth.c server.c servauth.h server.h serverpkt.c \
-	serverpkt.h servercmd.h servercmd.c
+	serverpkt.h servercmd.h servercmd.c sproc.h sproc.c
 
 libconqserv_la_LDFLAGS = -version-info 1:0:0
 

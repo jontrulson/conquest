@@ -1,5 +1,5 @@
 /* 
- * client packaet proc routines (from server)
+ * client packet proc routines (from server)
  *
  * $Id$
  *

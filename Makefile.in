@@ -136,7 +136,7 @@ libconqinit_la_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
 @ISMINGW_TRUE@am_libconqinit_la_rpath = -rpath $(libdir)
 libconqserv_la_LIBADD =
 am_libconqserv_la_OBJECTS = servauth.lo server.lo serverpkt.lo \
-	servercmd.lo
+	servercmd.lo sproc.lo
 libconqserv_la_OBJECTS = $(am_libconqserv_la_OBJECTS)
 libconqserv_la_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
@@ -473,7 +473,7 @@ libconqclnt_la_SOURCES = client.c client.h cproc.h cproc.c clientlb.c \
 
 libconqclnt_la_LDFLAGS = -version-info 1:0:0
 libconqserv_la_SOURCES = servauth.c server.c servauth.h server.h serverpkt.c \
-	serverpkt.h servercmd.h servercmd.c
+	serverpkt.h servercmd.h servercmd.c sproc.h sproc.c
 
 libconqserv_la_LDFLAGS = -version-info 1:0:0
 libUi_la_SOURCES = ui.h uimisc.c 
@@ -812,6 +812,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/server.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/servercmd.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/serverpkt.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sproc.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tcpwrap.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/texfont.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/udp.Plo@am__quote@

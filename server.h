@@ -15,6 +15,8 @@
 #include "protocol.h"
 #include "packet.h"
 
+#include "sproc.h"
+
 #define SVR_STATE_NONE      0x00000000	/* local init */
 #define SVR_STATE_PREINIT   0x00000001	/* local init */
 #define SVR_STATE_INIT      0x00000002	/* negotiate with client/login */
@@ -59,35 +61,6 @@ int sendTeam(int sock, Unsgn8 team, int force);
 int sendConqInfo(int sock, int force);
 int sendHistory(int sock, int hnum);
 int sendDoomsday(int sock);
-
-void procSetName(char *buf);
-void procSetCourse(char *buf);
-
-void procSetWarp(cpCommand_t *swarp);
-void procSetShields(cpCommand_t *cmd);
-void procAlloc(cpCommand_t *cmd);
-void procCloak(cpCommand_t *cmd);
-void procDetSelf(cpCommand_t *cmd);
-void procDetEnemy(cpCommand_t *cmd);
-void procDistress(cpCommand_t *cmd);
-void procFirePhaser(cpCommand_t *cmd);
-void procOrbit(cpCommand_t *cmd);
-void procRepair(cpCommand_t *cmd);
-void procSetWar(cpCommand_t *cmd);
-void procRefit(cpCommand_t *cmd);
-void procSetRate(cpCommand_t *cmd);
-void procTow(cpCommand_t *cmd);
-void procUnTow(cpCommand_t *cmd);
-void procCoup(cpCommand_t *cmd);
-void procBomb(cpCommand_t *cmd);
-void procBeam(cpCommand_t *cmd);
-void procDestruct(cpCommand_t *cmd);
-void procAutoPilot(cpCommand_t *cmd);
-
-void procFireTorps(char *buf);
-void procMessage(char *buf);
-void procChangePassword(char *buf);
-void procReload(cpCommand_t *cmd);
 
 int checkOperExec(int from, int to, char *msg);
 
