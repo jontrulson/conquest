@@ -25,12 +25,13 @@
 				/* file header */
 #define SZ_FILEHEADER (256)
 #define FHEADER_PAD (SZ_FILEHEADER - (sizeof(Unsgn32) + \
-                                       sizeof(Unsgn8) + \
-                                       sizeof(Unsgn32) + \
-                                       MAXUSERNAME + \
-                                       sizeof(Unsgn32) + \
-                                       sizeof(Unsgn8) + \
-                                       sizeof(Unsgn32)))
+                                      sizeof(Unsgn8) +   \
+                                      sizeof(Unsgn32) +  \
+                                      MAXUSERNAME +      \
+                                      sizeof(Unsgn32) +  \
+                                      sizeof(Unsgn8) +   \
+                                      sizeof(Unsgn32)))
+
 #pragma pack(1)
 typedef struct _fheader {	
   Unsgn32 vers;                 /* version of this file */
