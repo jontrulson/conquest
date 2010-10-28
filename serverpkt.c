@@ -960,6 +960,9 @@ spHistory_t *spktHistory(int hnum)
   hist.elapsed = (Unsgn32)htonl((Unsgn32)History[hnum].elapsed);
   hist.histlog = (Unsgn32)htonl((Unsgn32)History[hnum].histlog);
 
+  /* FIXME:  after new proto, send hist.username */
+
+
   if (memcmp((void *)&hist, (void *)&pktHistory[hnum], sizeof(spHistory_t)))
     {
       pktHistory[hnum] = hist;

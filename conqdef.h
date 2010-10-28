@@ -61,7 +61,7 @@
 /*#define COMMONSTAMP 990124 		 stardate? */
 /*#define COMMONSTAMP 20001231 		 stardate? */
 /*#define COMMONSTAMP 20030829 */
-#define COMMONSTAMP 20100820
+#define COMMONSTAMP 20101027
 
 #ifndef PI
 # define PI 3.141592654

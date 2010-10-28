@@ -5,7 +5,7 @@
     expanded (Sgn32) or re-scaled (x10).  ratings over 327.0 will be
     wrong otherwise...
 
-  - send dwarp in ship packet so sounds can work better.
+  - send dwarp in shiploc packet so sounds can work better.
 
   - new server flag? NoKillTeam - determines whether a ship can
     set war with it's own team, or maybe more of a 'Friendly Fire' flag?

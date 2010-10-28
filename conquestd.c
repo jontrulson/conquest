@@ -972,6 +972,9 @@ int updateClient(int force)
     {
       for (i=0; i<MAXHISTLOG; i++)
         {
+          /* FIXME - don't need the sendUser below once
+             protocol modified to send hist.username, since hist
+             entries are no longer dependant on unum with new CB. */
           if (History[i].histunum >= 0)
             sendUser(sInfo.sock, History[i].histunum);
           

@@ -767,10 +767,7 @@ void clbResign( int unum, int isoper )
 
       for ( i = 0; i < MAXHISTLOG; i = i + 1 )
 	if ( unum == History[i].histunum )
-	  {
-	    History[i].histunum = -1;
-	    History[i].histlog = 0;
-	  }
+          History[i].histunum = -1;
     }
   PVUNLOCK(&ConqInfo->lockword);
 
@@ -2072,6 +2069,7 @@ void clbInitUniverse(void)
     {
       History[i].histunum = -1;
       History[i].histlog = 0;
+      History[i].username[0] = 0;
     }
   
   /* Un-twiddle the lockword. */
@@ -2143,6 +2141,9 @@ int clbLogHist( int unum )
   History[ConqInfo->histptr].histlog = getnow(NULL, 0 );	
   History[ConqInfo->histptr].elapsed = (time_t)0;
   History[ConqInfo->histptr].histunum = unum;
+  strncpy(History[ConqInfo->histptr].username, 
+          Users[unum].username, 
+          MAXUSERNAME - 1);
   hnum = ConqInfo->histptr;
 
   PVUNLOCK(&ConqInfo->lockword);

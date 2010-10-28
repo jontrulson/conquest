@@ -60,6 +60,8 @@ void mcuHistList( int godlike )
       i = thistptr + 1;
       for ( j = 0; j < MAXHISTLOG; j++ )
 	{
+          /* FIXME:  after new proto, extract username and flag
+             resigned users (has username and -1 hist unum) */
 	  i = utModPlusOne( i - 1, MAXHISTLOG );
 	  unum = History[i].histunum;
 	  

@@ -587,6 +587,9 @@ int procHistory(char *buf)
   History[hnum].elapsed = (time_t)ntohl((Unsgn32)hist->elapsed);
   History[hnum].histlog = (time_t)ntohl((Unsgn32)hist->histlog);
 
+  /* FIXME: need to extract username from hist packet when
+     new protocol. */
+
   return TRUE;
 }
 

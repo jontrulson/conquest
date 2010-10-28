@@ -12,9 +12,13 @@
 #include "conqdef.h"
 
 typedef struct {
-  int    histunum;              /* user number */
+  int    histunum;              /* user number, if -1, and username is
+                                 *  not empty, then this marks a resigned
+                                 *  user. 
+                                 */
   time_t histlog;		/* date of entry */
   time_t elapsed;		/* elapsed time of this entry */
+  char   username[MAXUSERNAME]; /* username */
 } History_t;
 
 #endif /* HISTORY_H_INCLUDED */
