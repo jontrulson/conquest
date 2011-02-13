@@ -1205,13 +1205,17 @@ real utSubAngle( real a1, real a2 )
 
 char *utGetPath(const char *thepath)
 {
+  static char retpath[PATH_MAX];
+
 #if !defined(MINGW)
-  /* the non-windows case just returns thepath. */
-  return thepath;
+  /* the non-windows case just returns thepath, but we copy it
+   * to avoid an annoying compiler warning regarding const. 
+   */
+  strncpy(retpath, thepath, PATH_MAX - 1);
+  return retpath;
 #else
 
   char *theroot = NULL;
-  static char retpath[PATH_MAX];
   char *defaultConq = "";
 
   if (!(theroot = getenv("CONQUEST_ROOT")))
