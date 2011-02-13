@@ -56,6 +56,7 @@ int sendPlanet(int sock, Unsgn8 pnum, int force);
 int sendServerStat(int socktype);
 int sendTorp(int sock, Unsgn8 snum, Unsgn8 tnum);
 int sendFeedBack(char *msg);
+void sendFeedback(char *msg);
 int sendMessage(Msg_t *msg);
 int sendTeam(int sock, Unsgn8 team, int force);
 int sendConqInfo(int sock, int force);
