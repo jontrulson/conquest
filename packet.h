@@ -87,6 +87,9 @@ extern packetEnt_t *serverPackets;
 extern int serverPktMax;
 #endif
 
+#define PKT_PROCSP(_pkt) \
+  (*serverPackets[((Unsgn8)(_pkt)[0])].dispatch)((_pkt))
+
 int   pktInit(void);
 void  pktSetClientMode(int isclient);
 int   pktSetClientProtocolVersion(Unsgn16 vers);

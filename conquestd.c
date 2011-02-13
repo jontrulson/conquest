@@ -328,6 +328,9 @@ int main(int argc, char *argv[])
     }
   pktSetSocketFds(sInfo.sock, sInfo.usock);
 
+  /* need to make sure that the serverPackets array is setup */
+  pktSetClientProtocolVersion(PROTOCOL_VERSION);
+
   /* clear out our stored packets */
   spktInit();
 

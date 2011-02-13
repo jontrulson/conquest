@@ -25,9 +25,7 @@
 /* disptach init */
 int procDispatchInit(Unsgn16 vers, packetEnt_t *pktList, int numpkts)
 {
-  /* nothing for now, since we do not worry about compatibility 
-   * with older clients
-   */
+  /* nothing since we only allow the server to deal with the latest proto */
   return TRUE;
 }
 

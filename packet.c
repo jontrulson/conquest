@@ -434,10 +434,6 @@ int pktInit(void)
   if (cqDebug)
     utLog("%s: initialized packet ring buffers", __FUNCTION__);
 
-  /* init serverPacke array to current protocol */
-  serverPackets = serverPackets_current;
-  serverPktMax  = SERVERPKTMAX_CURRENT;
-
   return TRUE;
 }
 
@@ -473,6 +469,9 @@ int pktSetClientProtocolVersion(Unsgn16 vers)
     }
 
   clientProtoVers = vers;
+
+  if (cqDebug)
+    utLog("%s: setting version %h", __FUNCTION__, vers);
 
   return procDispatchInit(vers, serverPackets, serverPktMax);
 }

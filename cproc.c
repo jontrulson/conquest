@@ -652,120 +652,88 @@ int procDoomsday(char *buf)
   return TRUE;
 }
 
+int procAck(char *buf)
+{
+  spAck_t *sack;
+  spAckMsg_t *sackm;
+
+  if (pktIsValid(SP_ACK, buf))
+    {
+      sack = (spAck_t *)buf;
+      lastServerError = sack->code;
+      
+      return TRUE;
+    }
+
+  if (pktIsValid(SP_ACKMSG, buf))
+    {
+      sackm = (spAckMsg_t *)buf;
+      lastServerError = sackm->code;
+      
+      return TRUE;
+    }
+
+  return FALSE;
+}
+
+int procClientStat(char *buf)
+{
+  spClientStat_t *scstat;
+
+  if ((scstat = chkClientStat(buf)))
+    {
+      Context.snum = scstat->snum;
+      Context.unum = scstat->unum;
+      Ships[Context.snum].team = scstat->team;
+      clientFlags = scstat->flags;
+
+      return TRUE;
+    }
+  
+  return FALSE;
+}
+
+int procFrame(char *buf)
+{
+  spFrame_t *frame;
+
+  if (pktIsValid(SP_FRAME, buf))
+    {
+      frame = (spFrame_t *)buf;
+      /* endian correction*/
+      frame->time = (Unsgn32)ntohl(frame->time);
+      frame->frame = (Unsgn32)ntohl(frame->frame);
+      
+      if (recStartTime == (time_t)0)
+        recStartTime = (time_t)frame->time;
+      recCurrentTime = (time_t)frame->time;
+      
+      recFrameCount = (Unsgn32)frame->frame;
+
+      return TRUE;
+    }
+
+  return FALSE;
+}
+
 void processPacket(char *buf)
 {
   int pkttype;
-  spClientStat_t *scstat;
-  spAck_t *sack;
-  spAckMsg_t *sackm;
-  spFrame_t *frame;
 
   if (!buf)
     return;
 
   pkttype = (int)buf[0];
 
-  switch (pkttype)
+  if (pkttype < 0 || pkttype >= serverPktMax)
     {
-    case SP_ACK:
-      sack = (spAck_t *)buf;
-      lastServerError = sack->code;
-      break;
-    case SP_ACKMSG:
-      sackm = (spAckMsg_t *)buf;
-      sackm->txt[MESSAGE_SIZE - 1] = 0;
-      lastServerError = sackm->code;
-      break;
-    case SP_SHIP:
-      procShip(buf);
-      break;
-    case SP_SHIPSML:
-      procShipSml(buf);
-      break;
-    case SP_SHIPLOC:
-      procShipLoc(buf);
-      break;
-    case SP_USER:
-      procUser(buf);
-      break;
-    case SP_PLANET:
-      procPlanet(buf);
-      break;
-    case SP_PLANETSML:
-      procPlanetSml(buf);
-      break;
-    case SP_PLANETLOC:
-      procPlanetLoc(buf);
-      break;
-    case SP_PLANETLOC2:
-      procPlanetLoc2(buf);
-      break;
-    case SP_PLANETINFO:
-      procPlanetInfo(buf);
-      break;
-    case SP_TORP:
-      procTorp(buf);
-      break;
-    case SP_TORPLOC:
-      procTorpLoc(buf);
-      break;
-
-    case SP_TORPEVENT:
-      procTorpEvent(buf);
-      break;
-
-    case SP_TEAM:
-      procTeam(buf);
-      break;
-
-    case SP_CLIENTSTAT:
-      if ((scstat = chkClientStat(buf)))
-        {
-          Context.snum = scstat->snum;
-          Context.unum = scstat->unum;
-          Ships[Context.snum].team = scstat->team;
-          clientFlags = scstat->flags;
-        }
-      break;
-
-    case SP_MESSAGE:
-      procMessage(buf);
-      break;
-      
-    case SP_SERVERSTAT:
-      procServerStat(buf);
-      break;
-
-    case SP_CONQINFO:
-      procConqInfo(buf);
-      break;
-
-    case SP_HISTORY:
-      procHistory(buf);
-      break;
-
-    case SP_DOOMSDAY:
-      procDoomsday(buf);
-      break;
-
-    case SP_FRAME:              /* playback */
-      frame = (spFrame_t *)buf;
-      /* endian correction*/
-      frame->time = (Unsgn32)ntohl(frame->time);
-      frame->frame = (Unsgn32)ntohl(frame->frame);
-
-      if (recStartTime == (time_t)0)
-        recStartTime = (time_t)frame->time;
-      recCurrentTime = (time_t)frame->time;
-
-      recFrameCount = (Unsgn32)frame->frame;
-
-      break;
-
-    default:
-      utLog("conquest:processPacket: got unexpected packet type %d",
-	   pkttype);
-      break;
+      utLog("%s: got invalid packet type %d",
+            pkttype);
+    }
+  else
+    {
+      /* dispatch it */
+      PKT_PROCSP(buf);
     }
 
   return;

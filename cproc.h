@@ -34,16 +34,20 @@ int             procServerStat(char *buf);
 int             procConqInfo(char *buf);
 int             procHistory(char *buf);
 int             procDoomsday(char *buf);
+int             procAck(char *buf); /* handles ACK and ACKMSG */
+int             procClientStat(char *buf);
+int             procFrame(char *buf);
 
 void            processPacket(char *buf);
 
 #ifdef NOEXTERN_CPROC
+/* version 0x0006 protocol */
 static dispatchProc_t cprocDispatchTable_0006[] = {
   pktNotImpl,                   /* SP_NULL */
   pktNotImpl,                   /* SP_HELLO */
-  pktNotImpl,                   /* SP_ACK */
+  procAck,                      /* SP_ACK */
   procServerStat,               /* SP_SERVERSTAT */
-  pktNotImpl,                   /* SP_CLIENTSTAT */
+  procClientStat,               /* SP_CLIENTSTAT */
   procShip,                     /* SP_SHIP */
   procShipSml,                  /* SP_SHIPSML */
   procShipLoc,                  /* SP_SHIPLOC */
@@ -53,11 +57,11 @@ static dispatchProc_t cprocDispatchTable_0006[] = {
   procMessage,                  /* SP_MESSAGE */
   procUser,                     /* SP_USER */
   procTorp,                     /* SP_TORP */
-  pktNotImpl,                   /* SP_ACKMSG */
+  procAck,                      /* SP_ACKMSG */
   procTeam,                     /* SP_TEAM */
   procTorpLoc,                  /* SP_TORPLOC */
   procConqInfo,                 /* SP_CONQINFO */
-  pktNotImpl,                   /* SP_FRAME */
+  procFrame,                    /* SP_FRAME */
   procHistory,                  /* SP_HISTORY */
   procDoomsday,                 /* SP_DOOMSDAY */
   procPlanetInfo,               /* SP_PLANETINFO */
