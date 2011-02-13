@@ -35,10 +35,6 @@ void     clbStatline( int unum, char *buf );
 int      clbZeroPlanet( int pnum, int snum );
 char    *clbWarPrompt(int snum, int twar[]);
 
-/* FIXME: these two belong in a new conqutil.h header file  */
-void     utAppendKilledBy( int kb, char *buf );
-void     utAppendShip( int snum, char *str );
-
 int      clbCanRead( int snum, int msgnum );
 void     clbClearShips(void);
 int      clbCVTCoords( real cenx, real ceny, real x, real y, real scale,
