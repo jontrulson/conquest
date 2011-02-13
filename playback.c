@@ -143,20 +143,6 @@ int pbProcessPackets(void)
     {
       if (pkttype < 0 || pkttype >= serverPktMax)
         fprintf(stderr, "%s:: Invalid rtype %d\n", __FUNCTION__, pkttype);
-      else if (pkttype == SP_MESSAGE)
-        {
-          smsg = (spMessage_t *)buf;
-          /* if we aren't interested in robot msgs, skip it */
-          if (!(smsg->flags & MSG_FLAGS_ROBOT) ||
-              ((smsg->flags & MSG_FLAGS_ROBOT) && !UserConf.NoRobotMsgs))
-            {
-              memset((void *)&recMsg, 0, sizeof(Msg_t));
-              strncpy(recMsg.msgbuf, (char *)smsg->msg, MESSAGE_SIZE);
-              recMsg.msgfrom = (int)((Sgn16)ntohs(smsg->from));
-              recMsg.msgto = (int)((Sgn16)ntohs(smsg->to));
-              recMsg.flags = smsg->flags;
-            }
-        }
       else
         PKT_PROCSP(buf);
     }
