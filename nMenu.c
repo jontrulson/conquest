@@ -286,7 +286,6 @@ static int nMenuIdle(void)
 {
   int pkttype;
   char buf[PKT_MAXSIZE];
-  spAck_t *sack;
 
   while ((pkttype = pktWaitForPacket(PKT_ANYPKT,
                                      buf, PKT_MAXSIZE, 0, NULL)) > 0)
@@ -294,15 +293,15 @@ static int nMenuIdle(void)
       switch (pkttype)
         {
         case SP_ACK:
-          sack = (spAck_t *)buf;
-          if (sack->code == PERR_LOSE)
+          PKT_PROCSP(buf);
+          if (sAckMsg.code == PERR_LOSE)
             {
               lose = TRUE;
               state = S_LOSE;
               return NODE_OK;   /* but not for long... */
             }
           else
-            utLog("nMenuIdle: got unexp ack code %d", sack->code);
+            utLog("nMenuIdle: got unexp ack code %d", sAckMsg.code);
 
           break;
 

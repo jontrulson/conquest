@@ -512,7 +512,26 @@ int procMessage(char *buf)
   if (!pktIsValid(SP_MESSAGE, buf))
     return FALSE;
 
+
   smsg->msg[MESSAGE_SIZE - 1] = 0;
+  smsg->from = (int)((Sgn16)ntohs(smsg->from));
+  smsg->to = (int)((Sgn16)ntohs(smsg->to));
+
+  /* special handling when playing back a recording */
+  if (Context.recmode == RECMODE_PLAYING)
+    {
+      /* if we aren't interested in robot msgs, skip it */
+      if (!(smsg->flags & MSG_FLAGS_ROBOT) ||
+          ((smsg->flags & MSG_FLAGS_ROBOT) && !UserConf.NoRobotMsgs))
+        {
+          memset((void *)&recMsg, 0, sizeof(Msg_t));
+          strncpy(recMsg.msgbuf, (char *)smsg->msg, MESSAGE_SIZE);
+          recMsg.msgfrom = (int)smsg->from;
+          recMsg.msgto = (int)smsg->to;
+          recMsg.flags = smsg->flags;
+        }
+      return TRUE;
+    }
 
   /* terse? */
   if (UserConf.Terse && (smsg->flags & MSG_FLAGS_TERSABLE))
@@ -662,6 +681,12 @@ int procAck(char *buf)
       sack = (spAck_t *)buf;
       lastServerError = sack->code;
       
+      /* set the global variants.  We save both Ack and AckMsgs here */
+      sAckMsg.type = sack->type;
+      sAckMsg.severity = sack->severity;
+      sAckMsg.code = sack->code;
+      sAckMsg.txt[0] = 0;
+
       return TRUE;
     }
 
@@ -670,6 +695,13 @@ int procAck(char *buf)
       sackm = (spAckMsg_t *)buf;
       lastServerError = sackm->code;
       
+      /* save a copy in the global variant. We save both Ack and AckMsgs here */
+      sAckMsg.type = sackm->type;
+      sAckMsg.severity = sackm->severity;
+      sAckMsg.code = sackm->code;
+      memset((void*)sAckMsg.txt, 0,  MESSAGE_SIZE);
+      strncpy((char *)sAckMsg.txt, (char *)sackm->txt, MESSAGE_SIZE - 1);
+
       return TRUE;
     }
 
@@ -680,12 +712,21 @@ int procClientStat(char *buf)
 {
   spClientStat_t *scstat;
 
+  /* chkClientStat will handle the endian conversion(s) */
   if ((scstat = chkClientStat(buf)))
     {
       Context.snum = scstat->snum;
       Context.unum = scstat->unum;
       Ships[Context.snum].team = scstat->team;
       clientFlags = scstat->flags;
+
+      /* save a copy in the global variant */
+      sClientStat.type = scstat->type;
+      sClientStat.flags = scstat->flags;
+      sClientStat.snum = scstat->snum;
+      sClientStat.team = scstat->team;
+      sClientStat.unum = scstat->unum;
+      sClientStat.esystem = scstat->esystem;
 
       return TRUE;
     }
@@ -709,6 +750,11 @@ int procFrame(char *buf)
       recCurrentTime = (time_t)frame->time;
       
       recFrameCount = (Unsgn32)frame->frame;
+
+      /* save a copy in the global variant */
+      sFrame.type = frame->type;
+      sFrame.frame = frame->frame;
+      sFrame.time = frame->time;
 
       return TRUE;
     }

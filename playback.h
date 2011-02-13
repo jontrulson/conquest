@@ -29,6 +29,7 @@ extern int pbSpeed;
 /* the fastest you can go - recFrameDelay set to 0.0 */
 #define PB_SPEED_INFINITE  (PB_SPEED_MAX_TIMES + 1)   
 
+int  pbInitReplay(char *fname, time_t *elapsed);
 void pbFileSeek(time_t newtime);
 int  pbProcessIter(void);
 int  pbProcessPackets(void);

@@ -478,11 +478,11 @@ int main(int argc, char *argv[])
       printf("Scanning file %s...\n", recFilename);
 
       /* On windows, over a shared folder in VBox, this will be way slow */
-      if (!recInitReplay(recFilename, &recTotalElapsed))
+      if (!pbInitReplay(recFilename, &recTotalElapsed))
         exit(1);
 
       /* now init for real */
-      if (!recInitReplay(recFilename, NULL))
+      if (!pbInitReplay(recFilename, NULL))
         exit(1);
 
       Context.unum = MSG_GOD;       /* stow user number */

@@ -32,8 +32,6 @@
 
 static int state;
 static int fatal = FALSE;
-static spAck_t sack = {};
-static spClientStat_t scstat = {};
 static int shipinited = FALSE;   /* whether we've done _newship() yet */
 static int owned[NUMPLAYERTEAMS]; 
 
@@ -115,8 +113,7 @@ static int _newship( int unum, int *snum )
 	  break;
 	  
 	case SP_ACK:		/* bummer */
-          /* copy it */
-	  sack = *((spAck_t *)buf);
+          PKT_PROCSP(buf);
           state = S_NSERR;
 	  
 	  return FALSE;		/* always a failure */
@@ -124,16 +121,8 @@ static int _newship( int unum, int *snum )
 	  
 	case SP_CLIENTSTAT:
           {
-            spClientStat_t *scstatp;
-
-            if ((scstatp = chkClientStat(buf)))
+            if (PKT_PROCSP(buf))
               {
-                scstat = *scstatp; /* make a copy */
-                /* first things first */
-                Context.unum = scstat.unum;
-                Context.snum = scstat.snum;
-                Ships[Context.snum].team = scstat.team;
-                
                 return TRUE;
               }
             else
@@ -191,19 +180,19 @@ static int nPlayDisplay(dspConfig_t *dsp)
             }
         }
           
-      if (!scstat.esystem)
+      if (!sClientStat.esystem)
         {                       /* we are ready  */
           state = S_DONE;
           return NODE_OK;
         }
       else
         {                       /* need to display/get a selection */
-          selectentry(scstat.esystem);
+          selectentry(sClientStat.esystem);
         }
     }
   else if (state == S_NSERR)
     {
-      switch (sack.code)
+      switch (sAckMsg.code)
         {
         case PERR_FLYING:
           sprintf(cbuf, "You're already playing on another ship.");
@@ -229,9 +218,9 @@ static int nPlayDisplay(dspConfig_t *dsp)
         default:
           cprintf(5,0,ALIGN_CENTER,
                   "#%d#nPlay: _newship: unexpected server ack, code %d",
-                  InfoColor, sack.code);
+                  InfoColor, sAckMsg.code);
           utLog("nPlay: unexpected server ack, code %d",
-                sack.code);
+                sAckMsg.code);
           break;
         }
       /* Press any key... */

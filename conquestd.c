@@ -1762,7 +1762,7 @@ int welcome( int *unum )
 	  return ( FALSE );
 	}
 
-      utLog("conquestd: clbRegister COMPLETE!!!! unum = %d, team = %d\n", 
+      utLog("conquestd: clbRegister complete: unum = %d, team = %d\n", 
 	   *unum, team);
 
 				/* copy in the password */

@@ -17,6 +17,7 @@
 #include "datatypes.h"
 #include "protocol.h"
 #include "packet.h"
+#include "conqutil.h"
 
 #include "protocol.h"
 #include "client.h"
@@ -26,13 +27,111 @@
 #include "playback.h"
 #undef NOEXTERN_PLAYBACK
 
+/* open, create/load our cmb, and get ready for action if elapsed == NULL
+   otherwise, we read the entire file to determine the elapsed time of
+   the game and return it */
+int pbInitReplay(char *fname, time_t *elapsed)
+{
+  int pkttype;
+  time_t starttm = 0;
+  time_t curTS = 0;
+  char buf[PKT_MAXSIZE];
+
+  if (!recOpenInput(fname))
+    {
+      printf("pbInitReplay: recOpenInput(%s) failed\n", fname);
+      return(FALSE);
+    }
+
+  /* don't bother mapping for just a count */
+  if (!elapsed)
+    map_lcommon();
+
+  /* now lets read in the file header and check a few things. */
+
+  if (!recReadHeader(&recFileHeader))
+    return(FALSE);
+
+  /* version check */
+  switch (recFileHeader.vers)
+    {
+    case RECVERSION:            /* no problems here */
+      break;
+
+    case RECVERSION_20031004:
+      {
+        /* in this version we differentiated server/client recordings
+           by looking at snum.  If snum == 0, then it was a server
+           recording, else it was a client.  the 'flags' member did not
+           exist.  So here we massage it so it will work ok. */
+
+        if (recFileHeader.snum == 0)     /* it was a server recording */
+          recFileHeader.flags |= RECORD_F_SERVER;
+      }
+      break;
+
+    default:
+      {
+        utLog("pbInitReplay: version mismatch.  got %d, need %d\n",
+             recFileHeader.vers,
+             RECVERSION);
+        printf("pbInitReplay: version mismatch.  got %d, need %d\n",
+               recFileHeader.vers,
+               RECVERSION);
+        return FALSE;
+      }
+      break;
+    }
+
+  /* if we are looking for the elapsed time, scan the whole file
+     looking for timestamps. */
+  if (elapsed)			/* we want elapsed time */
+    {
+      int done = FALSE;
+
+      starttm = recFileHeader.rectime;
+
+      curTS = 0;
+      /* read through the entire file, looking for timestamps. */
+      
+#if defined(DEBUG_REC)
+      utLog("conqreplay: pbInitReplay: reading elapsed time");
+#endif
+
+      while (!done)
+	{
+          if ((pkttype = recReadPkt(buf, PKT_MAXSIZE)) == SP_FRAME)
+            {
+              PKT_PROCSP(buf);
+              curTS = sFrame.time;
+            }
+
+	  if (pkttype == SP_NULL)
+	    done = TRUE;	/* we're done */
+	}
+
+      if (curTS != 0)
+	*elapsed = (curTS - starttm);
+      else
+	*elapsed = 0;
+
+      /* now close the file so that the next call of pbInitReplay can
+	 get a fresh start. */
+      recCloseInput();
+    }
+
+  /* now we are ready to start running packets */
+  
+  return(TRUE);
+}
+
+
 /* read in a header/data packet pair, and add them to our cmb.  return
    the packet type processed or RDATA_NONE if there is no more data or
    other error. */
 int pbProcessPackets(void)
 {
   char buf[PKT_MAXSIZE];
-  spFrame_t *frame;
   int pkttype;
   spMessage_t *smsg;
 
@@ -42,48 +141,10 @@ int pbProcessPackets(void)
 
   if ((pkttype = recReadPkt(buf, PKT_MAXSIZE)) != SP_NULL)
     {
-      switch(pkttype)
+      if (pkttype < 0 || pkttype >= serverPktMax)
+        fprintf(stderr, "%s:: Invalid rtype %d\n", __FUNCTION__, pkttype);
+      else if (pkttype == SP_MESSAGE)
         {
-        case SP_SHIP:
-          procShip(buf);
-          break;
-        case SP_SHIPSML:
-          procShipSml(buf);
-          break;
-        case SP_SHIPLOC:
-          procShipLoc(buf);
-          break;
-        case SP_USER:
-          procUser(buf);
-          break;
-        case SP_PLANET:
-          procPlanet(buf);
-          break;
-        case SP_PLANETSML:
-          procPlanetSml(buf);
-          break;
-        case SP_PLANETLOC:
-          procPlanetLoc(buf);
-          break;
-        case SP_PLANETLOC2:
-          procPlanetLoc2(buf);
-          break;
-        case SP_PLANETINFO:
-          procPlanetInfo(buf);
-          break;
-        case SP_TORPEVENT:
-          procTorpEvent(buf);
-          break;
-        case SP_TORP:
-          procTorp(buf);
-          break;
-        case SP_TORPLOC:
-          procTorpLoc(buf);
-          break;
-        case SP_TEAM:
-          procTeam(buf);
-          break;
-        case SP_MESSAGE:
           smsg = (spMessage_t *)buf;
           /* if we aren't interested in robot msgs, skip it */
           if (!(smsg->flags & MSG_FLAGS_ROBOT) ||
@@ -95,33 +156,9 @@ int pbProcessPackets(void)
               recMsg.msgto = (int)((Sgn16)ntohs(smsg->to));
               recMsg.flags = smsg->flags;
             }
-
-          break;
-
-        case SP_FRAME:
-          frame = (spFrame_t *)buf;
-          /* endian correction*/
-          frame->time = (Unsgn32)ntohl(frame->time);
-          frame->frame = (Unsgn32)ntohl(frame->frame);
-
-          if (recStartTime == (time_t)0)
-            recStartTime = (time_t)frame->time;
-          recCurrentTime = (time_t)frame->time;
-
-          recFrameCount = (Unsgn32)frame->frame;
-
-          break;
-          
-        case SP_DOOMSDAY:
-          procDoomsday(buf);
-          break;
-
-        default:
-#ifdef DEBUG_REC
-          fprintf(stderr, "processPacket: Invalid rtype %d\n", pkttype);
-#endif
-          break;          
         }
+      else
+        PKT_PROCSP(buf);
     }
 
   return pkttype;
@@ -140,7 +177,7 @@ void pbFileSeek(time_t newtime)
 
       recCloseInput();
 
-      if (!recInitReplay(recFilename, NULL))
+      if (!pbInitReplay(recFilename, NULL))
 	return;			/* bummer */
       
       recCurrentTime = recStartTime;

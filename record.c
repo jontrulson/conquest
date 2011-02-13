@@ -21,8 +21,6 @@
 #include "protocol.h"
 #include "packet.h"
 
-#include "client.h"
-
 #define NOEXTERN_RECORD
 #include "record.h"
 #undef NOEXTERN_RECORD
@@ -430,117 +428,6 @@ int recReadPkt(char *buf, int blen)
 
   return(pkttype);
 }
-
-/* open, create/load our cmb, and get ready for action if elapsed == NULL
-   otherwise, we read the entire file to determine the elapsed time of
-   the game and return it */
-int recInitReplay(char *fname, time_t *elapsed)
-{
-  int pkttype;
-  time_t starttm = 0;
-  time_t curTS = 0;
-  char buf[PKT_MAXSIZE];
-
-  if (!recOpenInput(fname))
-    {
-      printf("recInitReplay: recOpenInput(%s) failed\n", fname);
-      return(FALSE);
-    }
-
-  /* don't bother mapping for just a count */
-  if (!elapsed)
-    map_lcommon();
-
-  /* now lets read in the file header and check a few things. */
-
-  if (!recReadHeader(&recFileHeader))
-    return(FALSE);
-      
-
-  /* version check */
-  switch (recFileHeader.vers)
-    {
-    case RECVERSION:            /* no problems here */
-      break;
-
-    case RECVERSION_20031004:
-      {
-        /* in this version we differentiated server/client recordings
-           by looking at snum.  If snum == 0, then it was a server
-           recording, else it was a client.  the 'flags' member did not
-           exist.  So here we massage it so it will work ok. */
-
-        if (recFileHeader.snum == 0)     /* it was a server recording */
-          recFileHeader.flags |= RECORD_F_SERVER;
-      }
-      break;
-
-    default:
-      {
-        utLog("recInitReplay: version mismatch.  got %d, need %d\n",
-             recFileHeader.vers,
-             RECVERSION);
-        printf("recInitReplay: version mismatch.  got %d, need %d\n",
-               recFileHeader.vers,
-               RECVERSION);
-        return FALSE;
-      }
-      break;
-    }
-
-  if ( recFileHeader.cmnrev != COMMONSTAMP )
-    {
-      utLog("recInitReplay: CONQUEST COMMON BLOCK MISMATCH %d != %d",
-             recFileHeader.cmnrev, COMMONSTAMP );
-      printf("recInitReplay: CONQUEST COMMON BLOCK MISMATCH %d != %d",
-             recFileHeader.cmnrev, COMMONSTAMP );
-      return FALSE;
-    }
-
-  /* if we are looking for the elapsed time, scan the whole file
-     looking for timestamps. */
-  if (elapsed)			/* we want elapsed time */
-    {
-      int done = FALSE;
-
-      starttm = recFileHeader.rectime;
-
-      curTS = 0;
-      /* read through the entire file, looking for timestamps. */
-      
-#if defined(DEBUG_REC)
-      utLog("conqreplay: recInitReplay: reading elapsed time");
-#endif
-
-      while (!done)
-	{
-          if ((pkttype = recReadPkt(buf, PKT_MAXSIZE)) == SP_FRAME)
-            {
-              spFrame_t *frame = (spFrame_t *)buf;
-              
-              /* fix up the endianizational interface for the time */
-              curTS = (time_t)ntohl(frame->time);
-            }
-
-	  if (pkttype == SP_NULL)
-	    done = TRUE;	/* we're done */
-	}
-
-      if (curTS != 0)
-	*elapsed = (curTS - starttm);
-      else
-	*elapsed = 0;
-
-      /* now close the file so that the next call of recInitReplay can
-	 get a fresh start. */
-      recCloseInput();
-    }
-
-  /* now we are ready to start running packets */
-  
-  return(TRUE);
-}
-
 
 /* generate torploc packets for client recording purposes 
    no more than once every ITER_SECONDS */

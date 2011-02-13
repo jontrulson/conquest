@@ -35,7 +35,6 @@ int sendAuth(int sock, Unsgn8 flag, char *login, char *pw)
 {
   char buf[PKT_MAXSIZE];
   int rv;
-  spAck_t *sack;
   cpAuthenticate_t cauth;
 
   memset((void *)&cauth, 0, sizeof(cauth));
@@ -73,11 +72,11 @@ int sendAuth(int sock, Unsgn8 flag, char *login, char *pw)
       return -1;
     }
 
+  PKT_PROCSP(buf);
+
   /* now we should have our ACK... */
 
-  sack = (spAck_t *)buf;
-
-  return sack->code;
+  return sAckMsg.code;
 }
 
 int sendSetCourse(int sock, Sgn8 lock, real head)
@@ -172,7 +171,6 @@ int sendMessage(int to, char *msg)
 int clientHello(char *clientname)
 {
   cpHello_t chello;
-  spAckMsg_t *sackmsg;
   char buf[PKT_MAXSIZE];
   int pkttype;
   extern char *ConquestVersion, *ConquestDate;
@@ -196,16 +194,11 @@ int clientHello(char *clientname)
   /* we only get this if there's problem (server denied access, usually) */
   if (pkttype == SP_ACKMSG || pkttype == SP_ACK)
     {
-      if (pkttype == SP_ACKMSG)
-        {
-          sackmsg = (spAckMsg_t *)buf;
-          if (sackmsg->txt)
-            {
-              utLog("clientHello: %s '%s'",
-                   pktSeverity2String(sackmsg->severity),
-                   sackmsg->txt);
-            }
-        }
+      if (PKT_PROCSP(buf))
+        utLog("clientHello: %s '%s'",
+              pktSeverity2String(sAckMsg.severity),
+              sAckMsg.txt);
+
       return FALSE;
     }
 
@@ -314,19 +307,15 @@ int clientHello(char *clientname)
 
   if (pkttype == SP_ACKMSG || pkttype == SP_ACK)/* we only get this if problem */
     {
-      if (pkttype == SP_ACKMSG)
+      if (PKT_PROCSP(buf))
 	{
-	  sackmsg = (spAckMsg_t *)buf;
-	  if (sackmsg->txt)
-	    {
-	      utLog("clientHello: %s '%s'\n", 
-		   pktSeverity2String(sackmsg->severity), 
-		   sackmsg->txt);
-	      printf("clientHello: %s '%s'\n", 
-		   pktSeverity2String(sackmsg->severity), 
-		   sackmsg->txt);
-
-	    }
+          utLog("clientHello: %s '%s'\n", 
+                pktSeverity2String(sAckMsg.severity), 
+                sAckMsg.txt);
+          printf("clientHello: %s '%s'\n", 
+                 pktSeverity2String(sAckMsg.severity), 
+                 sAckMsg.txt);
+          
 	}
       return FALSE;
     }

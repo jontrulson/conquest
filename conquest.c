@@ -85,7 +85,7 @@ extern void conquestReplay(void);
 
 /* conquest.c */
 
-int welcome( int *unum );
+int welcome(void);
 void doalloc( int snum);
 void doautopilot( int snum );
 void dobeam( int snum );
@@ -396,11 +396,11 @@ int main(int argc, char *argv[])
 
       serveropt = wantMetaList = FALSE;
       printf("Scanning file %s...\n", recFilename);
-      if (!recInitReplay(recFilename, &recTotalElapsed))
+      if (!pbInitReplay(recFilename, &recTotalElapsed))
         exit(1);
 
       /* now init for real */
-      if (!recInitReplay(recFilename, NULL))
+      if (!pbInitReplay(recFilename, NULL))
         exit(1);
 
       Context.unum = MSG_GOD;       /* stow user number */
@@ -521,7 +521,7 @@ int main(int argc, char *argv[])
   utLog("%s@%d: main() welcoming player.", __FILE__, __LINE__);
 #endif
   
-  if ( welcome( &Context.unum ) )
+  if ( welcome() )
     {
       menu();
     }
@@ -2746,7 +2746,6 @@ void menu(void)
   struct timeval timeout;
   fd_set readfds;
   char buf[PKT_MAXSIZE];
-  spAck_t *sack;
   char *if1="Suddenly  a  sinister,  wraithlike  figure appears before you";
   char *if2="seeming to float in the air.  In a low,  sorrowful  voice  he";
   char *if3="says, \"Alas, the very nature of the universe has changed, and";
@@ -2803,11 +2802,11 @@ void menu(void)
 	  switch (pkttype)
 	    {
 	    case SP_ACK:
-	      sack = (spAck_t *)buf;
-	      if (sack->code == PERR_LOSE)
+              PKT_PROCSP(buf);
+	      if (sAckMsg.code == PERR_LOSE)
 		lose = TRUE;
 	      else
-		utLog("conquest:menu: got unexp ack code %d", sack->code);
+		utLog("conquest:menu: got unexp ack code %d", sAckMsg.code);
 
 	      break;
 
@@ -3081,8 +3080,6 @@ int newship( int unum, int *snum )
 {
   int i, j;
   char cbuf[MSGMAXLINE];
-  spAck_t *sack;
-  spClientStat_t *scstat;
   int pkttype;
   char buf[PKT_MAXSIZE];
 
@@ -3108,8 +3105,8 @@ int newship( int unum, int *snum )
 	  break;
 	  
 	case SP_ACK:		/* bummer */
-	  sack = (spAck_t *)buf;
-	  switch (sack->code)
+          PKT_PROCSP(buf);
+	  switch (sAckMsg.code)
 	    {
 	    case PERR_FLYING:
 	      cdclear();
@@ -3147,7 +3144,7 @@ int newship( int unum, int *snum )
 	      
 	    default:
 	      utLog("newship: unexpected ack code %d",
-		   sack->code);
+		   sAckMsg.code);
 	      break;
 	    }
 	  
@@ -3155,18 +3152,15 @@ int newship( int unum, int *snum )
 	  break;
 	  
 	case SP_CLIENTSTAT:
-          if ((scstat = chkClientStat(buf)))  
+          if (PKT_PROCSP(buf))
             {
-              /* first things first */
-              Context.unum = scstat->unum;
-              Context.snum = scstat->snum;
-              Ships[Context.snum].team = scstat->team;
+              /* Context.snum,unum & team will be set by the dispatch routine */
               
-              if (scstat->esystem == 0)	/* we are done */
+              if (sClientStat.esystem == 0)	/* we are done */
                 return TRUE;
               
               /* otherwise, need to prompt for system to enter */
-              if (selectentry(scstat->esystem))
+              if (selectentry(sClientStat.esystem))
                 return TRUE;		/* done */
               else
                 return FALSE;
@@ -3330,7 +3324,7 @@ int play()
 /*    int flag, welcome */
 /*    int unum */
 /*    flag = welcome( unum ) */
-int welcome( int *unum )
+int welcome(void)
 {
   int i, team, col; 
   char name[MAXUSERNAME];
@@ -3340,8 +3334,6 @@ int welcome( int *unum )
   char * selected_str="You have been selected to command a";
   char * starship_str=" starship.";
   char * prepare_str="Prepare to be beamed aboard...";
-  spClientStat_t *scstat = NULL;
-  spAck_t sack = {};
   int pkttype;
   char buf[PKT_MAXSIZE];
   int done = FALSE;
@@ -3367,11 +3359,9 @@ int welcome( int *unum )
       switch (pkttype)
         {
         case SP_CLIENTSTAT:
-          if ((scstat = chkClientStat(buf)))
+          if (PKT_PROCSP(buf))
             {
-              *unum = scstat->unum;
-              Context.snum = scstat->snum;
-              Ships[Context.snum].team = scstat->team;
+              /* Context.snum,unum & team will be set by the dispatch routine */
               done = TRUE;
             }
           else
@@ -3382,8 +3372,7 @@ int welcome( int *unum )
 
           break;
         case SP_ACK:
-          /* copy it */
-          sack = *((spAck_t *)buf);
+          PKT_PROCSP(buf);
           done = TRUE;
           break;
         default:
@@ -3394,7 +3383,7 @@ int welcome( int *unum )
         }
     }
 
-  if ( pkttype == SP_CLIENTSTAT && (scstat->flags & SPCLNTSTAT_FLAG_NEW) )
+  if ( pkttype == SP_CLIENTSTAT && (sClientStat.flags & SPCLNTSTAT_FLAG_NEW) )
     {				
       /* Must be a new player. */
       cdclear();
@@ -3409,7 +3398,7 @@ int welcome( int *unum )
 	  c_sleep( 2.0 );
 	  return ( FALSE );
 	}
-      team = scstat->team;
+      team = sClientStat.team;
       cbuf[0] = EOS;
       utAppendTitle( team, cbuf );
       appchr( ' ', cbuf );
@@ -3437,7 +3426,7 @@ int welcome( int *unum )
 
   if (pkttype == SP_ACK)	/* some problem was detected */
     {
-      switch (sack.code)
+      switch (sAckMsg.code)
 	{
 	case PERR_CLOSED:
 	  cdclear();
@@ -3475,7 +3464,7 @@ int welcome( int *unum )
 	  break;
 
 	default:
-	  utLog("welcome: unexpected ACK code %d\n", sack.code);
+	  utLog("welcome: unexpected ACK code %d\n", sAckMsg.code);
 	  return FALSE;
 	  break;
 

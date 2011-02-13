@@ -29,7 +29,6 @@ static int state;
 static int fatal = FALSE;
 static int serror = FALSE;
 static int newuser = FALSE;
-static spAck_t sack;
 static time_t snooze = (time_t)0;          /* sleep time */
 
 static string sorry1="I'm sorry, but the game is closed for repairs right now.";
@@ -81,7 +80,6 @@ static void gretds()
 
 void nWelcomeInit(void)
 {
-  spClientStat_t *scstat = NULL;
   int pkttype;
   char buf[PKT_MAXSIZE];
   int done = FALSE;
@@ -105,11 +103,8 @@ void nWelcomeInit(void)
       switch (pkttype)
         {
         case SP_CLIENTSTAT:
-          if ((scstat = chkClientStat(buf)))
+          if (PKT_PROCSP(buf))
             {
-              Context.unum = scstat->unum;
-              Context.snum = scstat->snum;
-              Ships[Context.snum].team = scstat->team;
               done = TRUE;
             }
           else
@@ -121,7 +116,7 @@ void nWelcomeInit(void)
             }
           break;
         case SP_ACK:
-          sack = *(spAck_t *)buf;
+          PKT_PROCSP(buf);
           state = S_ERROR;
           serror = TRUE;
           done = TRUE;
@@ -136,7 +131,7 @@ void nWelcomeInit(void)
         }
     }
 
-  if (pkttype == SP_CLIENTSTAT && (scstat->flags & SPCLNTSTAT_FLAG_NEW))
+  if (pkttype == SP_CLIENTSTAT && (sClientStat.flags & SPCLNTSTAT_FLAG_NEW))
     {
       newuser = TRUE;
       state = S_GREETINGS;
@@ -219,7 +214,7 @@ static int nWelcomeDisplay(dspConfig_t *dsp)
       break;
 
     case S_ERROR:
-      switch (sack.code)
+      switch (sAckMsg.code)
         {
         case PERR_CLOSED:
           cprintf(MSG_LIN2/2,col,ALIGN_CENTER,"#%d#%s", InfoColor, sorry1 );
@@ -239,7 +234,7 @@ static int nWelcomeDisplay(dspConfig_t *dsp)
           break;
 
         default:
-          utLog("nWelcomeDisplay: unexpected ACK code %d\n", sack.code);
+          utLog("nWelcomeDisplay: unexpected ACK code %d\n", sAckMsg.code);
           break;
         }
 

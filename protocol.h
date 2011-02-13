@@ -159,7 +159,7 @@ typedef struct {
 
 typedef struct {
   Unsgn8  type;			/* SP_CLIENTSTAT */
-  Unsgn8  flags;			/* LR/SR, live, dead, etc. */
+  Unsgn8  flags;                /* LR/SR, live, dead, etc. */
   Unsgn8  snum;			/* your ship number */
   Unsgn8  team;			/* your team number */
 

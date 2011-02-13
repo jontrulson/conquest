@@ -2748,7 +2748,6 @@ static int nCPDisplay(dspConfig_t *dsp)
   
 static int nCPIdle(void)
 {
-  spAck_t *sack;
   int pkttype;
   int now;
   char buf[PKT_MAXSIZE];
@@ -2784,9 +2783,9 @@ static int nCPIdle(void)
            *  renderNode() level, not here!  Next protocol rev. 
            */
         case SP_ACK: 
-          sack = (spAck_t *)buf;
+          PKT_PROCSP(buf);
           /* see if it's a ping resp */
-          if (sack->code == PERR_PINGRESP)
+          if (sAckMsg.code == PERR_PINGRESP)
             {
               pingPending = FALSE;
               pktStats.pingAvg = (pktStats.pingAvg + (iternow - pingStart)) / 2;

@@ -47,12 +47,25 @@ spHello_t             sHello;   /* some server info we want to keep */
 spServerStat_t        sStat;    /* server status info */
 int                   lastServerError = 0; /* set by an ACK from server */
 Unsgn8                clientFlags = 0; /* set according to CLIENTSTAT packets */
+
+/* we need global versions of these around so we can use the dispatch
+ * table routines to load them, yet allow special code to check the values
+ * afterwards (like Auth, Welcome, etc...
+ */
+
+spAckMsg_t            sAckMsg;  /* hold Ack or AckMsg pkt */
+spClientStat_t        sClientStat;
+spFrame_t             sFrame;
 #else
 extern ClientInfo_t   cInfo;
 extern spHello_t      sHello;   /* some server info we want to keep */
 extern spServerStat_t sStat;    /* server status info */
 extern int            lastServerError;
 extern Unsgn8         clientFlags;    
+
+extern spAckMsg_t     sAckMsg;  /* hold Ack or AckMsg pkt */
+extern spClientStat_t sClientStat;
+extern spFrame_t      sFrame;
 #endif
 
 int             sendAuth(int sock, Unsgn8 flag, char *login, char *pw);
