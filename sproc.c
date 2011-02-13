@@ -22,6 +22,15 @@
 
 #include "sproc.h"
 
+/* disptach init */
+int procDispatchInit(Unsgn16 vers, packetEnt_t *pktList, int numpkts)
+{
+  /* nothing for now, since we do not worry about compatibility 
+   * with older clients
+   */
+  return TRUE;
+}
+
 void procSetName(char *buf)
 {
   cpSetName_t *cpsetn = (cpSetName_t *)buf;

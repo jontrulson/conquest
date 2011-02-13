@@ -38,10 +38,18 @@ static int udp_sock = -1;
  */
 static int isClient = FALSE;
 
+/* default protocol version that a client will be expecting.  This can
+ * be changed, for example, to connect to an older (but supported
+ * server) or to playback a cqr file recorded in an older (but
+ * supported) protocol.
+ */
+
+static Unsgn16 clientProtoVers = PROTOCOL_VERSION;
+
 /* these need to be kept in sync with the protocol numbers in
  *  protocol.h
  */
-static struct _packetent clientPackets[] = {
+static packetEnt_t clientPackets[] = {
   { CP_NULL,                    /* pktid */
     sizeof(cpNull_t),           /* size */
     "CP_NULL",                  /* name */
@@ -104,7 +112,9 @@ static struct _packetent clientPackets[] = {
   }
 };
 
-static struct _packetent serverPackets[] = {
+#define CLIENTPKTMAX (sizeof(clientPackets) / sizeof(packetEnt_t))
+
+static packetEnt_t serverPackets_0006[] = {
   { SP_NULL,                    /* pktid */
     sizeof(spNull_t),           /* size */
     "SP_NULL",                  /* name */
@@ -232,9 +242,137 @@ static struct _packetent serverPackets[] = {
   }
 };
 
-#define CLIENTPKTMAX (sizeof(clientPackets) / sizeof(struct _packetent))
-#define SERVERPKTMAX (sizeof(serverPackets) / sizeof(struct _packetent))
+#define SERVERPKTMAX_0006 (sizeof(serverPackets_0006) / sizeof(packetEnt_t))
 
+static packetEnt_t serverPackets_current[] = {
+  { SP_NULL,                    /* pktid */
+    sizeof(spNull_t),           /* size */
+    "SP_NULL",                  /* name */
+    pktNotImpl                  /* handler */
+  },	/* never used */
+  { SP_HELLO, 
+    sizeof(spHello_t), 
+    "SP_HELLO", 
+    pktNotImpl 
+  },
+  { SP_ACK, 
+    sizeof(spAck_t), 
+    "SP_ACK", 
+    pktNotImpl 
+  },
+  { SP_SERVERSTAT, 
+    sizeof(spServerStat_t), 
+    "SP_SERVERSTAT", 
+    pktNotImpl 
+  },
+  { SP_CLIENTSTAT, 
+    sizeof(spClientStat_t), 
+    "SP_CLIENTSTAT", 
+    pktNotImpl 
+  },
+  { SP_SHIP, 
+    sizeof(spShip_t), 
+    "SP_SHIP", 
+    pktNotImpl 
+  },
+  { SP_SHIPSML, 
+    sizeof(spShipSml_t), 
+    "SP_SHIPSML", 
+    pktNotImpl 
+  },
+  { SP_SHIPLOC, 
+    sizeof(spShipLoc_t), 
+    "SP_SHIPLOC", 
+    pktNotImpl 
+  },
+  { SP_PLANET, 
+    sizeof(spPlanet_t), 
+    "SP_PLANET", 
+    pktNotImpl 
+  },
+  { SP_PLANETSML, 
+    sizeof(spPlanetSml_t), 
+    "SP_PLANETSML", 
+    pktNotImpl 
+  },
+  { SP_PLANETLOC, 
+    sizeof(spPlanetLoc_t), 
+    "SP_PLANETLOC", 
+    pktNotImpl 
+  },
+  { SP_MESSAGE, 
+    sizeof(spMessage_t), 
+    "SP_MESSAGE", 
+    pktNotImpl 
+  },
+  { SP_USER, 
+    sizeof(spUser_t), 
+    "SP_USER", 
+    pktNotImpl 
+  },
+  { SP_TORP, 
+    sizeof(spTorp_t), 
+    "SP_TORP", 
+    pktNotImpl 
+  },
+  { SP_ACKMSG, 
+    sizeof(spAckMsg_t), 
+    "SP_ACKMSG", 
+    pktNotImpl 
+  },
+  { SP_TEAM, 
+    sizeof(spTeam_t), 
+    "SP_TEAM", 
+    pktNotImpl 
+  },
+  { SP_TORPLOC, 
+    sizeof(spTorpLoc_t), 
+    "SP_TORPLOC", 
+    pktNotImpl 
+  },
+  { SP_CONQINFO, 
+    sizeof(spConqInfo_t), 
+    "SP_CONQINFO", 
+    pktNotImpl 
+  },
+  { SP_FRAME, 
+    sizeof(spFrame_t), 
+    "SP_FRAME", 
+    pktNotImpl 
+  },
+  { SP_HISTORY, 
+    sizeof(spHistory_t), 
+    "SP_HISTORY", 
+    pktNotImpl 
+  },
+  { SP_DOOMSDAY, 
+    sizeof(spDoomsday_t), 
+    "SP_DOOMSDAY", 
+    pktNotImpl 
+  },
+  { SP_PLANETINFO, 
+    sizeof(spPlanetInfo_t), 
+    "SP_PLANETINFO", 
+    pktNotImpl 
+  },
+  { SP_PLANETLOC2, 
+    sizeof(spPlanetLoc2_t), 
+    "SP_PLANETLOC2", 
+    pktNotImpl 
+  },
+  { SP_TORPEVENT, 
+    sizeof(spTorpEvent_t), 
+    "SP_TORPEVENT", 
+    pktNotImpl 
+  },
+  { SP_VARIABLE, 
+    0,                          /* these are special */
+    "SP_VARIABLE", 
+    pktNotImpl 
+  }
+};
+
+#define SERVERPKTMAX_CURRENT (sizeof(serverPackets_current) / sizeof(packetEnt_t))
 
 #define SOCK_TMOUT 15		/* 15 seconds to complete packet */
 
@@ -296,6 +434,10 @@ int pktInit(void)
   if (cqDebug)
     utLog("%s: initialized packet ring buffers", __FUNCTION__);
 
+  /* init serverPacke array to current protocol */
+  serverPackets = serverPackets_current;
+  serverPktMax  = SERVERPKTMAX_CURRENT;
+
   return TRUE;
 }
 
@@ -308,15 +450,44 @@ void pktSetClientMode(int isclient)
   return;
 }
 
+/* set the desired protocol version compatibility for the client */
+int pktSetClientProtocolVersion(Unsgn16 vers)
+{
+  switch (vers)
+    {
+    case 0x0006:
+      /* FIXME: setup the server packet array pointer here */
+      serverPackets = serverPackets_0006;
+      serverPktMax = SERVERPKTMAX_0006;
+      break;
+#warning "FIXME"
+#if 0                           /* FIXME - when bump to new rev */
+    case PROTOCOL_VERSION:      /* current protocol, nothing to do */
+      serverPackets = serverPackets_0007;
+      serverPktMax = SERVERPKTMAX_0007;
+      break;
+#endif
+    default:
+      utLog("%s: Unsupported protocol version: %h", __FUNCTION__, vers);
+      return FALSE;
+    }
+
+  clientProtoVers = vers;
+
+  return procDispatchInit(vers, serverPackets, serverPktMax);
+}
+
+
 int pktIsConnDead(void)
 {
   return connDead;
 }
 
-void pktNotImpl(void *nothing)
+/* should never actually be called in normal operation */
+int pktNotImpl(char *nothing)
 {
-  utLog("packet: NULL/Not Implemented\n");
-  return;
+  utLog("%s: ERROR: Packet Not Implemented", __FUNCTION__);
+  return FALSE;
 }
 
 /* initialize the tcp and udp sockets we'll be using in the packet routines */
@@ -443,7 +614,7 @@ int pktWaitForPacket(int type, char *buf, int blen,
 
 int pktServerPacketSize(int type)
 {
-  if (type <= 0 || type >= SERVERPKTMAX)
+  if (type <= 0 || type >= serverPktMax)
     {
       utLog("pktServerPacketSize: invalid packet type %d\n",
 	   type);

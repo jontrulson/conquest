@@ -16,14 +16,19 @@
 
 #define PKT_MAXSIZE     1024	/* no packet should ever be this large. gulp.*/
 
-void pktNotImpl(void *);	/* a no-show */
+typedef int (*dispatchProc_t)(char *);
 
-struct _packetent {
-  Unsgn32  pktid;
-  Unsgn32  size;
-  char    *name;
-  void     (*handler)();
-};
+typedef struct _packetent {
+  Unsgn32        pktid;
+  Unsgn32        size;
+  char           *name;
+  dispatchProc_t dispatch;
+} packetEnt_t;
+
+/* this will be implemented in cproc.c and sproc.c to initialize the
+ *  (*dispatch) member of the server/clientPackets[] arrays in packet.c
+ */
+int procDispatchInit(Unsgn16 vers, packetEnt_t *pktList, int numpkts);
 
 /* input/output ring buffer sizes. TCP RB's are larger to handle cases
  * where UDP is not available and the TCP RB is used instead.
@@ -73,18 +78,23 @@ typedef struct _pkt_stats {
 } pktStats_t;
 
 #ifdef NOEXTERN_PACKET
-pktStats_t        pktStats = {};
+pktStats_t         pktStats = {};
+packetEnt_t *serverPackets = NULL;
+int serverPktMax = 0;
 #else
 extern pktStats_t pktStats;
+extern packetEnt_t *serverPackets;
+extern int serverPktMax;
 #endif
 
 int   pktInit(void);
 void  pktSetClientMode(int isclient);
+int   pktSetClientProtocolVersion(Unsgn16 vers);
 void  pktSetSocketFds(int tcpsock, int udpsock);
 
 int   pktSendAck(Unsgn8 severity, Unsgn8 code, char *msg);
 int   pktIsConnDead(void);
-void  pktNotImpl(void *nothing);
+int   pktNotImpl(char *nothing);
 void  pktSetNodelay(void);
 char *pktSeverity2String(int psev);
 

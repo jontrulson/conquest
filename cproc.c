@@ -14,7 +14,10 @@
 #include "protocol.h"
 #include "packet.h"
 
+#define NOEXTERN_CPROC
 #include "cproc.h"
+#undef NOEXTERN_CPROC
+
 #include "client.h"
 
 #include "conqlb.h"
@@ -28,7 +31,47 @@
 #include "color.h"
 #include "ui.h"
 
+/* disptach init */
+int procDispatchInit(Unsgn16 vers, packetEnt_t *pktList, int numpkts)
+{
+  int i;
+  dispatchProc_t *procs = NULL;
+  int numprocs = 0;
 
+  switch (vers)
+    {
+    case 0x0006:
+      procs = cprocDispatchTable_0006;
+      numprocs = CPROCDISPATCHTABLENUM_0006;
+      break;
+    default:
+      return FALSE;
+    }
+
+  if (procs == NULL || numprocs == 0)
+    {
+      utLog("%s: Could not find dispatch table for vers %h.", 
+            __FUNCTION__, vers);
+      return FALSE;
+    }
+
+  if (numprocs != numpkts)
+    {
+      utLog("%s: numprocs does not equal numpkts for vers %h.", 
+            __FUNCTION__, vers);
+      return FALSE;
+    }
+  
+  /* now init the dispatch entries */
+  for (i=0; i < numpkts; i++)
+    pktList[i].dispatch = procs[i];
+
+  return TRUE;
+}
+
+int             procDispatch(void *pkt);
+
+/* packet processing for current protocol */
 int procUser(char *buf)
 {
   int i;

@@ -262,6 +262,7 @@ int main(int argc, char *argv[])
 
   /* tell the packet routines that we are a client */
   pktSetClientMode(TRUE);
+  pktSetClientProtocolVersion(PROTOCOL_VERSION);
 
   Context.entship = FALSE;
   Context.recmode = RECMODE_OFF;

@@ -34,6 +34,7 @@
 #include "record.h"
 
 #include "server.h"
+
 /* int getUID(void) - return a User ID */
 int getUID(char *name)
 {
