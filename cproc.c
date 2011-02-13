@@ -69,8 +69,6 @@ int procDispatchInit(Unsgn16 vers, packetEnt_t *pktList, int numpkts)
   return TRUE;
 }
 
-int             procDispatch(void *pkt);
-
 /* packet processing for current protocol */
 int procUser(char *buf)
 {

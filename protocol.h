@@ -74,18 +74,16 @@
    with protocol compatibility in the future. Both server and 
    client use the same format */
 
-struct _generic_var {
+typedef struct {
   Unsgn8 type;                  /* SP_VARIABLE | CP_VARIABLE */
   Unsgn8 len;
   Unsgn16 pad1;
 
   /* the actual data would be written following this */
-};
-
-typedef struct _generic_var pktVariable_t;
+} pktVariable_t;
 
 /* server -> client packets */
-typedef struct _sp_null {
+typedef struct {
   Unsgn8 type;			/* SP_NULL */
   Unsgn8 pad1;
   Unsgn8 pad2;
@@ -94,7 +92,7 @@ typedef struct _sp_null {
 
 #define SPHELLO_FLAGS_NONE         0x00
 #define SPHELLO_FLAGS_CLOSED       0x01	/* game closed */
-typedef struct _sp_hello {
+typedef struct {
   Unsgn8  type;			/* SP_HELLO */
   Unsgn8  flags;                /* closed, etc... */
   Unsgn16 protover;		/* protocol rev */
@@ -112,7 +110,7 @@ typedef struct _sp_hello {
 } spHello_t;
 
 /* ACK without message text */
-typedef struct _sp_ack {
+typedef struct {
   Unsgn8 type;			/* SP_ACK */
   Unsgn8 severity;		/* none, info, warning, etc */
   Unsgn8 code;			/* ack code */
@@ -121,7 +119,7 @@ typedef struct _sp_ack {
 } spAck_t;
 
 /* ACK with message text */
-typedef struct _sp_ackmsg {
+typedef struct {
   Unsgn8 type;			/* SP_ACKMSG */
   Unsgn8 severity;		/* none, info, warning, etc */
   Unsgn8 code;			/* ack code */
@@ -138,7 +136,7 @@ typedef struct _sp_ackmsg {
 #define SPSSTAT_FLAGS_KILLBOTS    0x00000010 /* robots have randomized kills? */
 #define SPSSTAT_FLAGS_SWITCHTEAM  0x00000020 /* allowed to switch teams? */
 
-typedef struct _sp_serverstat {
+typedef struct {
   Unsgn8  type;                 /* SP_SERVSTAT */
   Unsgn8  numactive;		/* active ships */
   Unsgn8  numvacant;		/* vacant ships */
@@ -159,7 +157,7 @@ typedef struct _sp_serverstat {
 					message (lastwords) */
 #define SPCLNTSTAT_FLAG_KILLED  0x04 /* you were killed by something */
 
-typedef struct _sp_clientstat {
+typedef struct {
   Unsgn8  type;			/* SP_CLIENTSTAT */
   Unsgn8  flags;			/* LR/SR, live, dead, etc. */
   Unsgn8  snum;			/* your ship number */
@@ -172,7 +170,7 @@ typedef struct _sp_clientstat {
   Unsgn8  pad2;
 } spClientStat_t;
 
-typedef struct _sp_ship {	/* 'large' ship data */
+typedef struct {	/* 'large' ship data */
   Unsgn8  type;			/* SP_SHIP */
   Unsgn8  status;		/* one of the SS_ values */
   Unsgn8  snum;			/* ship num */
@@ -199,7 +197,7 @@ typedef struct _sp_ship {	/* 'large' ship data */
   Unsgn8  alias[MAXUSERPNAME];
 } spShip_t;
 
-typedef struct _sp_shipsml {	/* 'short' ship packets */
+typedef struct {	/* 'short' ship packets */
   Unsgn8  type;			/* SP_SHIPSML */
   Unsgn8  snum;			/* ship num */
   Unsgn8  action;               /* ROB_* for robot/autopilot */
@@ -225,7 +223,7 @@ typedef struct _sp_shipsml {	/* 'short' ship packets */
   Unsgn16 lastblast;
 } spShipSml_t;
 
-typedef struct _sp_shiploc {	/* ship location packets */
+typedef struct {	/* ship location packets */
   Unsgn8  type;			/* SP_SHIPLOC */
   Unsgn8  snum;			/* ship num */
   Unsgn16 head;			/* x10 */
@@ -240,7 +238,7 @@ typedef struct _sp_shiploc {	/* ship location packets */
   Sgn32  y;			/* x1000 */
 } spShipLoc_t;
 
-typedef struct _sp_planet {
+typedef struct {
   Unsgn8  type;			/* SP_PLANET */
   Unsgn8  pnum;			/* planet number */
   Unsgn8  ptype;                /* planet type */
@@ -249,14 +247,14 @@ typedef struct _sp_planet {
   Unsgn8  name[MAXPLANETNAME];
 } spPlanet_t;
 
-typedef struct _sp_planetsml {
+typedef struct {
   Unsgn8  type;			/* SP_PLANETSML */
   Unsgn8  pnum;			/* planet number */
   Unsgn8  scanned;		/* bitmask of teams that have scanned */
   Unsgn8  uninhabtime;
 } spPlanetSml_t;
 
-typedef struct _sp_planetloc {
+typedef struct {
   Unsgn8  type;                 /* SP_PLANETLOC */
   Unsgn8  pnum;
   Sgn16   armies;
@@ -266,7 +264,7 @@ typedef struct _sp_planetloc {
   Sgn32   y;			/* x1000 */
 } spPlanetLoc_t;
 
-typedef struct _sp_planetloc2 {
+typedef struct {
   Unsgn8  type;                  /* SP_PLANETLOC2 */
   Unsgn8  pnum;
   Sgn16   armies;
@@ -284,7 +282,7 @@ typedef struct _sp_planetloc2 {
 #define SPPLANETINFO_FLAGS_FVALID     0x01 /* flags are valid */
 #define SPPLANETINFO_FLAGS_REAL       0x02 /* planet is real (visible) */
 
-typedef struct _sp_planetinfo {
+typedef struct {
   Unsgn8  type;			/* SP_PLANETINFO */
   Unsgn8  pnum;			/* planet number */
   Unsgn8  primary;
@@ -295,7 +293,7 @@ typedef struct _sp_planetinfo {
   Sgn32   orbvel;               /* x100 */
 } spPlanetInfo_t;
 
-typedef struct _sp_message {
+typedef struct {
   Unsgn8  type;                 /* SP_MESSAGE */
   Unsgn8  flags;                /* see msg.h */
   Unsgn8  pad2;
@@ -309,7 +307,7 @@ typedef struct _sp_message {
 
 #define SPUSER_FLAGS_NONE     0x00
 #define SPUSER_FLAGS_LIVE     0x01
-typedef struct _sp_user {
+typedef struct {
   Unsgn8  type;			/* SP_USER */
   Unsgn8  team;
   Unsgn16 unum;			/* user num */
@@ -329,14 +327,14 @@ typedef struct _sp_user {
   Unsgn8  alias[MAXUSERPNAME];
 } spUser_t;
 
-typedef struct _sp_torp {
+typedef struct {
   Unsgn8  type;			/* SP_TORP */
   Unsgn8  snum;			/* ship num */
   Unsgn8  tnum;			/* torp num */
   Unsgn8  status;		/* one of the TS_* values */
 } spTorp_t;
 
-typedef struct _sp_torploc {
+typedef struct {
   Unsgn8  type;                 /* SP_TORPLOC */
   Unsgn8  snum;                 /* ship num */
   Unsgn8  tnum;                 /* torp num */
@@ -347,7 +345,7 @@ typedef struct _sp_torploc {
   Sgn32   y;			/* x1000 */
 } spTorpLoc_t;
 
-typedef struct _sp_torpevent {
+typedef struct {
   Unsgn8  type;                 /* SP_TORPEVENT */
   Unsgn8  snum;                 /* ship num */
   Unsgn8  tnum;                 /* torp num */
@@ -371,7 +369,7 @@ typedef struct _sp_torpevent {
 
 #define SPTEAM_FLAGS_NONE         0x00
 #define SPTEAM_FLAGS_COUPINFO     0x01
-typedef struct _sp_team {
+typedef struct {
   Unsgn8  type;                 /* SP_TEAM */
   Unsgn8  team;
   Unsgn8  homesun;
@@ -389,7 +387,7 @@ typedef struct _sp_team {
   Unsgn8  name[MAXTEAMNAME]; 
 } spTeam_t;
 
-typedef struct _sp_conqinfo {
+typedef struct {
   Unsgn8  type;                 /* SP_CONQINFO */
   Unsgn8  pad1;
   Unsgn8  pad2;
@@ -402,7 +400,7 @@ typedef struct _sp_conqinfo {
 } spConqInfo_t;
 
 /* only stored in recordings (.cqr) files */
-typedef struct _sp_frame {
+typedef struct {
   Unsgn8  type;			/* SP_FRAME */
   Unsgn8  pad1;
   Unsgn8  pad2;
@@ -414,7 +412,7 @@ typedef struct _sp_frame {
 
 } spFrame_t;
 
-typedef struct _sp_history {
+typedef struct {
   Unsgn8  type;			/* SP_HISTORY */
   Unsgn8  histptr;              /* current hist ptr */
   Unsgn8  hnum;
@@ -428,7 +426,7 @@ typedef struct _sp_history {
   Unsgn32 histlog;
 } spHistory_t;
 
-typedef struct _sp_doomsday {
+typedef struct {
   Unsgn8  type;			/* SP_DOOMSDAY */
   Unsgn8  status;               /* DS_* */
   Unsgn16 heading;              /* x10 */
@@ -439,14 +437,14 @@ typedef struct _sp_doomsday {
 
 
 /* client -> server packets */
-typedef struct _cp_null {	/* never used */
+typedef struct {	/* never used */
   Unsgn8  type;			/* CP_NULL */
   Unsgn8  pad1;
   Unsgn8  pad2;
   Unsgn8  pad3;
 } cpNull_t;
 
-typedef struct _cp_hello {
+typedef struct {
   Unsgn8  type;			/* CP_HELLO */
   Unsgn8  updates;		/* desired updates per sec */
   Unsgn16 protover;		/* protocol rev */
@@ -458,7 +456,7 @@ typedef struct _cp_hello {
   Unsgn8  clientver[CONF_SERVER_NAME_SZ];	/* version, misc info */
 } cpHello_t;
 
-typedef struct _cp_ack {
+typedef struct {
   Unsgn8  type;			/* CP_ACK */
   Unsgn8  severity;		/* none, info, warning, etc */
   Unsgn8  code;			/* ack code */
@@ -499,25 +497,25 @@ typedef struct _cp_ack {
 
 #define CPCMD_LAST         29
 
-typedef struct _cp_command {
+typedef struct {
   Unsgn8  type;			/* CP_COMMAND */
   Unsgn8  cmd;			/* one of CPCMD_* */
   Unsgn16 detail;		/* command specific */
 } cpCommand_t;
 
-typedef struct _cp_firetorps {
+typedef struct {
   Unsgn8  type;			/* CP_FIRETORPS */
   Unsgn8  num;			/* number to fire */
   Unsgn16 dir;			/* x100 */
 } cpFireTorps_t;
 
 #define CP_SINFOMAX  15
-typedef struct _cp_getsinfo {
+typedef struct {
   Unsgn8  type;			/* CP_GETSINFO */
   Unsgn8  info[CP_SINFOMAX];
 } cpGetSInfo_t;
 
-typedef struct _cp_sendmsg {
+typedef struct {
   Unsgn8  type;			/* CP_SENDMSG */
   Unsgn8  pad1;
   Sgn16   to;
@@ -525,7 +523,7 @@ typedef struct _cp_sendmsg {
   Unsgn8  msg[MESSAGE_SIZE];
 } cpSendMsg_t;
 
-typedef struct _cp_setname {
+typedef struct {
   Unsgn8  type;			/* CP_SETNAME */
   Unsgn8  alias[MAXUSERPNAME];
 } cpSetName_t;
@@ -534,7 +532,7 @@ typedef struct _cp_setname {
 #define CPAUTH_CHECKUSER  0
 #define CPAUTH_LOGIN      1
 #define CPAUTH_CHGPWD     2
-typedef struct _cp_authenticate {
+typedef struct {
   Unsgn8  type;			/* CP_AUTHENTICATE */
   Unsgn8  flag;			/* CPAUTH_* */
   Unsgn8  pad2;
@@ -544,13 +542,13 @@ typedef struct _cp_authenticate {
   Unsgn8  pw[MAXUSERNAME];
 } cpAuthenticate_t;
 
-typedef struct _cp_setcourse{
+typedef struct {
   Unsgn8  type;			/* CP_SETCOURSE */
   Sgn8    lock;			/* lockon */
   Unsgn16 head;			/* x100 */
 } cpSetCourse_t;
 
-typedef struct _cp_message {
+typedef struct {
   Unsgn8  type;                 /* CP_MESSAGE */
   Unsgn8  pad1;
   Sgn16   to;
