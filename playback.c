@@ -126,14 +126,11 @@ int pbInitReplay(char *fname, time_t *elapsed)
 }
 
 
-/* read in a header/data packet pair, and add them to our cmb.  return
-   the packet type processed or RDATA_NONE if there is no more data or
-   other error. */
+/* read a packet and dispatch it. */
 int pbProcessPackets(void)
 {
   char buf[PKT_MAXSIZE];
   int pkttype;
-  spMessage_t *smsg;
 
 #if defined(DEBUG_REC)
   utLog("%s: ENTER", __FUNCTION__);
@@ -142,7 +139,7 @@ int pbProcessPackets(void)
   if ((pkttype = recReadPkt(buf, PKT_MAXSIZE)) != SP_NULL)
     {
       if (pkttype < 0 || pkttype >= serverPktMax)
-        fprintf(stderr, "%s:: Invalid rtype %d\n", __FUNCTION__, pkttype);
+        fprintf(stderr, "%s: Invalid pkttype %d\n", __FUNCTION__, pkttype);
       else
         PKT_PROCSP(buf);
     }
