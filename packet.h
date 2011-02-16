@@ -88,7 +88,7 @@ extern int serverPktMax;
 #endif
 
 #define PKT_PROCSP(_pkt) \
-  (*serverPackets[((Unsgn8)(_pkt)[0])].dispatch)((_pkt))
+  ( (*serverPackets[((Unsgn8)(_pkt)[0])].dispatch)((_pkt)) )
 
 int   pktInit(void);
 void  pktSetClientMode(int isclient);
