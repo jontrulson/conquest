@@ -50,7 +50,7 @@ Unsgn8                clientFlags = 0; /* set according to CLIENTSTAT packets */
 
 /* we need global versions of these around so we can use the dispatch
  * table routines to load them, yet allow special code to check the values
- * afterwards (like Auth, Welcome, etc...
+ * afterwards (like Auth, Welcome, etc)...
  */
 
 spAckMsg_t            sAckMsg;  /* hold Ack or AckMsg pkt */
