@@ -78,13 +78,13 @@ typedef struct _pkt_stats {
 } pktStats_t;
 
 #ifdef NOEXTERN_PACKET
-pktStats_t         pktStats = {};
-packetEnt_t *serverPackets = NULL;
-int serverPktMax = 0;
+pktStats_t          pktStats = {};
+packetEnt_t         *serverPackets = NULL;
+int                 serverPktMax = 0;
 #else
-extern pktStats_t pktStats;
-extern packetEnt_t *serverPackets;
-extern int serverPktMax;
+extern pktStats_t   pktStats;
+extern packetEnt_t  *serverPackets;
+extern int          serverPktMax;
 #endif
 
 #define PKT_PROCSP(_pkt) \
