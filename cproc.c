@@ -773,7 +773,7 @@ void processPacket(char *buf)
 
   if (pkttype < 0 || pkttype >= serverPktMax)
     {
-      utLog("%s: got invalid packet type %d",
+      utLog("%s: got invalid packet type %d", __FUNCTION__,
             pkttype);
     }
   else
