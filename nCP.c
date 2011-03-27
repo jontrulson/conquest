@@ -2783,7 +2783,8 @@ static int nCPIdle(void)
            *  renderNode() level, not here!  Next protocol rev. 
            */
         case SP_ACK: 
-          PKT_PROCSP(buf);
+          sAckMsg.code = 0;     /* reset */
+          processPacket(buf);
           /* see if it's a ping resp */
           if (sAckMsg.code == PERR_PINGRESP)
             {
@@ -2792,8 +2793,6 @@ static int nCPIdle(void)
               pingStart = 0;
               continue;
             }
-          else
-            processPacket(buf);
           
           break;
         default:
