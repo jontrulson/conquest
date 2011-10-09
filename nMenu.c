@@ -107,7 +107,6 @@ static void _conqds(dspConfig_t *dsp)
   lin++;
   cprintf(lin,0,ALIGN_CENTER,"#%d#%s", MagentaColor, CONQ_HTTP);
   lin++;
-  cprintf(lin,0,ALIGN_CENTER,"#%d#%s", MagentaColor, CONQ_MLIST);
   lin++;
   lin++;
   cprintf(lin,0,ALIGN_CENTER,"#%d#%s",NoColor, "Options:");
