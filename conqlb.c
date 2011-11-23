@@ -1163,11 +1163,9 @@ char *clbWarPrompt(int snum, int twar[])
 int clbCanRead( int snum, int msgnum )
 {
   int from, to;
-  unsigned char flags;
   
   from = Msgs[msgnum].msgfrom;
   to = Msgs[msgnum].msgto;
-  flags = Msgs[msgnum].flags;
   
   if (from == 0 && to == 0)
     {				/* uninitialized msgs */
@@ -1376,8 +1374,10 @@ int clbFindShip( int *snum )
                   i);
           }
 
-      /* if it's vacant, save it for later */
-      if (Ships[i].status == SS_LIVE && SVACANT(i))
+      /* if it's vacant and not an oper, save it for later */
+      if (Ships[i].status == SS_LIVE && 
+          SVACANT(i) && 
+          !Users[Ships[i].unum].ooptions[OOPT_OPER])
         vacantShips[numvacant++] = i;
 
       /* if it's off, grab it */
