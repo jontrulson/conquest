@@ -121,7 +121,7 @@ CONTENTS:
 
        ## global
 
-          The global section describe the various limits for
+          The global section describes the various limits for
           conquest.  Currently, you should never change this, until
           the common block (and therefore compatibility) is changed to
           support them.  For now, leave these alone :).  
@@ -616,15 +616,14 @@ CONTENTS:
           Here is an example of the most complicated animdef currently
           provided.  Although this example incorporates components
           that are not really used for the 'explode' animdef, all
-          possible options are listed here anyway for compleness and
+          possible options are listed here anyway for completeness and
           documentation purposes.  
 
 
           animdef {
             name         "explode"               # required for
-                                                 # non-inlined (global)
-                                                 # animdefs, otherwise 
-                                                 # ignored
+                                                 # global animdefs, 
+                                                 # otherwise ignored
                                                       
             texname      "exp"                   # semi-optional
             timelimit    3000                    # optional
@@ -677,9 +676,7 @@ CONTENTS:
                       animdefs.  An inlined animdef is an animdef
                       defined within an animation section. 
 
-                      'name' is ignored for inlined animdefs, and
-                      should not be specified for them, as these are
-                      internally generated when they are created.
+                      'name' is ignored for inlined animdefs.
 
           texname:    STRING 
                       semi-optional.  Specifies the WKN of a texture
@@ -959,7 +956,7 @@ CONTENTS:
          chunksize:   NUMBER 
                       This value determines the chunksize the mixer
                       will use.  A slow CPU might need a larger
-                      chunksize, but will intorduce latency.  256 is
+                      chunksize, but will introduce latency.  256 is
                       the minimum, 8192 is the maximum.  512 (the
                       default) is a good balance for low latency.
 
@@ -967,16 +964,16 @@ CONTENTS:
       ## effect
       ## music
 
-         The effect section describes an effect for conquest.  Effects
+         The effect sections describe an effect for conquest.  Effects
          include engine rumble, phasers, explosions, beaming, bombing,
-         etc... Effects can be modified or overriden by user in a .src
-         file. 
+         etc... Effects can be modified or overriden by the user in a
+         .src file.
 
          Effect and Music files have the same information associated
          with them, so we will only use an effect section below to
-         describe it's parts.  A music definition look the same,
-         though some options probably do not make sense for music.  A
-         music section for the intro music is shown below.
+         describe it's parts.  A music definition looks the same,
+         though some options do not make sense for music.  A music
+         section for the intro music is shown below.
 
          music {
            name         "intro"  
