@@ -89,7 +89,7 @@ int main(int argc, char *argv[])
   
   debug = FALSE;
   
-  while ((arg = getopt(argc, argv, "d")) != EOF)
+  while ((arg = getopt(argc, argv, "dr")) != EOF)
     {
       switch (arg)
 	{
