@@ -180,7 +180,7 @@ int metaBuffer2ServerRec(metaSRec_t *srec, char *buf)
         fieldno++;
         break;
 
-      case 13:                  /* contact (email/http/whatever) */
+      case 13:                  /* server localtime */
         *ch = 0;
         strncpy(srec->walltime, chs, META_GEN_STRSIZE - 1);
 
