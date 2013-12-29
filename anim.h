@@ -1,9 +1,7 @@
 /* 
  * anim.h - animation
  * 
- * $Id$
- *
- * Copyright 1999-2006 Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
+ * Copyright Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
  */
 
 #ifndef _ANIM_H

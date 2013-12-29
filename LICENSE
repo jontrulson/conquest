@@ -1,9 +1,9 @@
+Copyright 1996-2014 Jon Trulson under the Artistic License v2.
 
-	The following LICENSE text was obtained from
+The following LICENSE text was obtained from
 http://www.opensource.org/licenses/artistic-license-2.0.php, and
-applies to the Conquest distribution as of 2010.  Previous versions of
-Conquest were distributed by me under Artistic v1, which some dists
-(Fedora) seem to have a problem with (see EOF).
+applies to the complete Conquest distribution.
+
 
 -=-=-=-
 
@@ -181,15 +181,5 @@ HOLDER OR CONTRIBUTOR WILL BE LIABLE FOR ANY DIRECT, INDIRECT,
 INCIDENTAL, OR CONSEQUENTIAL DAMAGES ARISING IN ANY WAY OUT OF THE USE
 OF THE PACKAGE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-
-[Jon: Note, it would have been nice if Fedora had sent me an email
- concerning the issues with Artistic License v1, rather than blunder
- across it in
-
- http://www.linux-archive.org/fedora-games/140611-good-candidate-packaging-conquest.html
-
- on the internet one day - ie: v1 Artistic licenses are not allowed in
- Fedora.  Please, in the future, let me know if any distribution has
- any issues with Conquest Licensing.  I am willing to work with them.] 
 
 

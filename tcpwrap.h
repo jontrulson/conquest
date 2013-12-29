@@ -1,9 +1,7 @@
 /* 
  * TCP Wrappers support
  *
- * $Id$
- *
- * Copyright 2007 Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
+ * Copyright Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
  */
 
 

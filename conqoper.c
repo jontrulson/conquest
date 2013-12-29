@@ -1,10 +1,7 @@
 #include "c_defs.h"
 
 /************************************************************************
- *
- * $Id$
- *
- * Copyright 1999-2004 Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
+ * Copyright Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
  ***********************************************************************/
 
 /*                               C O N Q O P E R */
@@ -15,14 +12,6 @@
 /*    supporting documentation. Jef Poskanzer and Craig Leres make no */
 /*    representations about the suitability of this software for any */
 /*    purpose. It is provided "as is" without express or implied warranty. */
-
-/**********************************************************************/
-/* Unix/C specific porting and supporting code Copyright (C)1994-1996 */
-/* by Jon Trulson <jon@radscan.com> under the same terms and          */
-/* conditions of the original copyright by Jef Poskanzer and Craig    */
-/* Leres.                                                             */
-/*                                                                    */
-/**********************************************************************/
 
 #define NOEXTERN_GLOBALS
 #include "global.h"

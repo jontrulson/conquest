@@ -1,10 +1,6 @@
 /* GL.c - OpenGL rendering for Conquest
  *
- * Jon Trulson, 1/2003
- *
- * $Id$
- *
- * Copyright 2003 Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
+ * Copyright Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
  */
 
 #include "c_defs.h"

@@ -1,28 +1,11 @@
 #include "c_defs.h"
 
 /************************************************************************
+ * The OpenGL client
  *
- * $Id$
- *
- * Copyright 1999-2004 Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
+ * Copyright Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
  ***********************************************************************/
 
-/*                               C O N Q U E S T */
-/*            Copyright (C)1983-1986 by Jef Poskanzer and Craig Leres */
-/*    Permission to use, copy, modify, and distribute this software and */
-/*    its documentation for any purpose and without fee is hereby granted, */
-/*    provided that this copyright notice appear in all copies and in all */
-/*    supporting documentation. Jef Poskanzer and Craig Leres mak2003 */
-/*    representations about the suitability of this software for any */
-/*    purpose. It is provided "as is" without express or implied warranty. */
-
-/**********************************************************************/
-/* Unix/C specific porting and supporting code Copyright (C)1994-1996 */
-/* by Jon Trulson <jon@radscan.com> under the same terms and          */
-/* conditions of the original copyright by Jef Poskanzer and Craig    */
-/* Leres.                                                             */
-/*                                                                    */
-/**********************************************************************/
 
 #include "conqdef.h"
 #include "conqcom.h"

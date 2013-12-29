@@ -3,9 +3,7 @@
  * 
  * Some ideas borrowed from netrek.
  *
- * $Id$
- *
- * Copyright 2003 Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
+ * Copyright Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
  */
 
 #ifndef PACKET_H_INCLUDED

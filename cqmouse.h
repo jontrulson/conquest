@@ -1,9 +1,7 @@
 /* 
  * Conquest mouse data
  *
- * $Id$
- *
- * Copyright 1999-2006 Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
+ * Copyright Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
  */
 
 #ifndef _CQMOUSE_H

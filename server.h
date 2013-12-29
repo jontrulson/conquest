@@ -1,9 +1,7 @@
 /* 
  * Per server (conquestd) info
  *
- * $Id$
- *
- * Copyright 2003 Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
+ * Copyright Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
  */
 
 #ifndef SERVER_H_INCLUDED

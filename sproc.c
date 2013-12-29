@@ -4,8 +4,6 @@
  *
  * server specific proc routines (from client)
  *
- * $Id$
- *
  * Copyright Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
  ***********************************************************************/
 

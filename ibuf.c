@@ -3,20 +3,9 @@
 /************************************************************************
  *
  * ibuf.c - input buffering to support Function key macros
- * Jon Trulson 3/30/96
  *
- * $Id$
- *
- * Copyright 1999-2004 Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
+ * Copyright Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
  **********************************************************************/
-
-/**********************************************************************/
-/* Unix/C specific porting and supporting code Copyright (C)1994-1996 */
-/* by Jon Trulson <jon@radscan.com> under the same terms and          */
-/* conditions of the original copyright by Jef Poskanzer and Craig    */
-/* Leres.                                                             */
-/*                                                                    */
-/**********************************************************************/
 
 #include "conf.h"
 #include "global.h"

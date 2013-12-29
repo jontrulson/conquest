@@ -3,9 +3,7 @@
  *
  * can NODE_EXIT
  *
- * $Id$
- *
- * Copyright 1999-2004 Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
+ * Copyright Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
  */
 
 #include "c_defs.h"

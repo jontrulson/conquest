@@ -1,9 +1,7 @@
 /* 
  * server connect node
  *
- * $Id$
- *
- * Copyright 1999-2004 Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
+ * Copyright Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
  */
 
 #ifndef _NCONSVR_H

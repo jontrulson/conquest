@@ -1,8 +1,6 @@
 /* 
  * client packet proc routines (from server)
  *
- * $Id$
- *
  * Copyright Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
  */
 

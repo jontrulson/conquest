@@ -1,9 +1,7 @@
 /* 
  * anim.c - animator, anim API and animQue maintenance
  * 
- * $Id$
- *
- * Copyright 1999-2006 Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
+ * Copyright Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
  */
 
 #include "c_defs.h"

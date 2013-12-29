@@ -1,8 +1,7 @@
 /*
  * conqinit - utility program
  *
- * $Id$
- *
+ * Copyright Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
  */
 
 #include "c_defs.h"

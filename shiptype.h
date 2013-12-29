@@ -1,9 +1,7 @@
 /* 
- * Ship information, dependant on Type 
+ * Ship information, dependent on Type 
  *
- * $Id$
- *
- * Copyright 2000 Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
+ * Copyright Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
  */
 
 #ifndef SHIPTYPE_H_INCLUDED

@@ -1,13 +1,9 @@
 /* GL.h - OpenGL rendering for Conquest.  Exported GL.c interfaces.  In
  *  general, I'd like to keep this stuff localized to GL.c, but for
  *  various reasons (performance mainly), some of it needs to be directly
- *  accessable to other modules.
+ *  accessible to other modules.
  *
- * Jon Trulson, 1/2006
- *
- * $Id$
- *
- * Copyright 2003 Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
+ * Copyright Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
  */
 
 #ifndef _C_GL_H

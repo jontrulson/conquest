@@ -3,8 +3,6 @@
 /* 
  * conqinit - lexical scanner for conqinit
  *
- * $Id$
- *
  */
 
 #include "c_defs.h"

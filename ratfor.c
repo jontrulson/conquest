@@ -1,19 +1,8 @@
-/* Functions that appear to be intrinsic to RATFOR */
 /************************************************************************
- *
- * $Id$
- *
- * Copyright 1999-2004 Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
+ * Functions that appear to be intrinsic to RATFOR
+ * 
+ * Copyright Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
  ***********************************************************************/
-
-/**********************************************************************/
-/* Unix/C specific porting and supporting code Copyright (C)1994-1996 */
-/* by Jon Trulson <jon@radscan.com> under the same terms and          */
-/* conditions of the original copyright by Jef Poskanzer and Craig    */
-/* Leres.                                                             */
-/*                                                                    */
-/**********************************************************************/
-
 
 #include "c_defs.h"		/* includes everthing else */
 #include "conqutil.h"

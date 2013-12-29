@@ -1,8 +1,5 @@
 /************************************************************************
- *
- * $Id$
- *
- * Copyright 2003 Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
+ * Copyright Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
  ***********************************************************************/
 
 /* shared prototypes for common display related things... */

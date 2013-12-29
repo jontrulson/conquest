@@ -1,10 +1,7 @@
 /************************************************************************
- *
- * $Id$
- *
  * This file contains the common block version of the CQI 'global' section.
  *
- * Copyright 1999-2010 Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
+ * Copyright Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
  ***********************************************************************/
 
 #include "datatypes.h"

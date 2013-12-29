@@ -1,10 +1,6 @@
 /* misc gl funcs
  *
- * Jon Trulson, 2/2004
- *
- * $Id$
- *
- * Copyright 2004 Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
+ * Copyright Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
  */
 
 #include "c_defs.h"

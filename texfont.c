@@ -2,7 +2,6 @@
 /* Copyright (c) Mark J. Kilgard, 1997. */
 
 /* JET - I've modified it a little, but it works nicely. */
-/* $Id$ */
 /* This program is freely distributable without licensing fees  and is
    provided without guarantee or warrantee expressed or  implied. This
    program is -not- in the public domain. */

@@ -1,11 +1,9 @@
 /* 
  * cqsound.c
  * 
- * $Id$
+ * Copyright Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
  *
- * Copyright 1999-2006 Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
- *
- * Sound for Conquest, curtesy of Cataboligne
+ * Sound for Conquest, courtesy of Cataboligne for the concept
  *
  */
 

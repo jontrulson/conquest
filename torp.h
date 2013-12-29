@@ -1,9 +1,7 @@
 /* 
  * Torpedo structure for Ships[].torps
  *
- * $Id$
- *
- * Copyright 1999-2004 Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
+ * Copyright Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
  */
 
 #ifndef TORP_H_INCLUDED
