@@ -36,6 +36,9 @@ static int udp_sock = -1;
  */
 static int isClient = FALSE;
 
+/* non-blocking i/o in effect flag */
+static int nonBlocking = FALSE;
+
 /* default protocol version that a client will be expecting.  This can
  * be changed, for example, to connect to an older (but supported
  * server) or to playback a cqr file recorded in an older (but
@@ -1133,3 +1136,9 @@ void pktSetNodelay(void)
   return;
 }
 
+void pktSetNonBlocking(int enable)
+{
+  nonBlocking = enable;
+
+  return;
+}
