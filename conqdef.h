@@ -56,7 +56,7 @@
 # define PI 3.141592654
 #endif
 
-#define CONQ_HTTP   "http://radscan.com/conquest.html"
+#define CONQ_HTTP   "https://sourceforge.net/projects/conq/"
 
 #define MAXSHIPS 20 		/* number of available ships */
 
