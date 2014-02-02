@@ -96,7 +96,10 @@ void  pktSetSocketFds(int tcpsock, int udpsock);
 int   pktSendAck(Unsgn8 severity, Unsgn8 code, char *msg);
 int   pktIsConnDead(void);
 int   pktNotImpl(char *nothing);
+
 void  pktSetNodelay(void);
+void  pktSetNonBlocking(int enable);
+
 char *pktSeverity2String(int psev);
 
 int   pktWaitForPacket(int type, char *buf, int blen, 
