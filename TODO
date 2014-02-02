@@ -138,6 +138,8 @@
   - might be getting time to get rid of the curses client and rename
     conquestgl to conquest?
 
+  - use syslog, if available, for logging.
+
 - IP restrictions?
 
   - would need new 'client driver' common block, NUMSHIPS structures
