@@ -42,8 +42,6 @@ int procDispatchInit(Unsgn16 vers, packetEnt_t *pktList, int numpkts)
       procs = cprocDispatchTable_0006;
       numprocs = CPROCDISPATCHTABLENUM_0006;
       break;
-    default:
-      return FALSE;
     }
 
   if (procs == NULL || numprocs == 0)
