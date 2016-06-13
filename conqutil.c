@@ -620,7 +620,11 @@ void utLog(char *fmt, ...)
       
 #if !defined(MINGW)
       if (systemlog)
-	chown(errfile, 0, ConquestGID);
+	if (chown(errfile, 0, ConquestGID) == -1)
+          {
+            perror("utLog():chown()");
+            exit(1);
+          }
 #endif
 
       if ((errfd = fopen(errfile, "a+")) == NULL)
