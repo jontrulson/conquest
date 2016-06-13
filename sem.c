@@ -160,7 +160,7 @@ void Lock(int what)
 void Unlock(int what)
 {
 #if !defined(MINGW)
-  int err = 0, retval;
+  int retval;
   ushort semvals[25];
   union semun {
     int val;
