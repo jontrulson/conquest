@@ -156,7 +156,17 @@ int check_cblock(char *fname, int fmode, int sizeofcb)
 	      cBasePtr = (char *) mymalloc(sizeofcb); /* this exits if malloc fails */
               memset(cBasePtr, 0, sizeofcb);
 
-	      write(ffd, cBasePtr, sizeofcb);
+	      if (write(ffd, cBasePtr, sizeofcb) <= 0)
+                {
+                  printf("check_cblock(): write() failed: %s\n",
+                         strerror(errno));
+
+                  close(ffd);
+                  free(cBasePtr);
+                  cBasePtr = NULL;
+                  return FALSE;
+                }
+
 	      close(ffd);
 	      free(cBasePtr);
 	      cBasePtr = NULL;
@@ -175,7 +185,13 @@ int check_cblock(char *fname, int fmode, int sizeofcb)
 
 #if !defined(MINGW)
 				/* set ownership */
-  chown(fname, 0, -1);
+  if (chown(fname, 0, -1) == -1)
+    {
+      printf("check_cblock(): chown() failed: %s\n",
+             strerror(errno));
+
+      return(FALSE);
+    }
 #endif
 
   return(TRUE);			/* everything there, and right size */
