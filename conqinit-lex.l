@@ -20,7 +20,7 @@ extern int cqiDebugl;                       /* from conqinit-yacc.y */
 /* try to short-circuit ECHO redef warnings from compiler.. */
 #undef ECHO
 #define ECHO { if (cqiDebugl) (void)fprintf(yyout, "Unrecognized input: '%s', ignored.\n", yytext); }
-
+#define YY_NO_INPUT
 %}
 
 %option noyywrap

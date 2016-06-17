@@ -55,7 +55,7 @@ extern int lineNum;
 extern int goterror;
 extern void yyerror(char *s);
 
-int yylex(void);
+extern int yylex(void);
 
 static cqiGlobalInitPtr_t      _cqiGlobal;
 static cqiShiptypeInitPtr_t    _cqiShiptypes;

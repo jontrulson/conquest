@@ -3534,7 +3534,6 @@ void handleSignal(int sig)
 void astservice(int sig)
 {
   int now;
-  int readone;
   int difftime;
   char buf[PKT_MAXSIZE];
   static Unsgn32 iterstart = 0;
@@ -3578,7 +3577,6 @@ void astservice(int sig)
 				   interval will have to pass after issuing
 				   any command before a new msg will disp
 				   12/28/98 */
-  readone = FALSE;
   if ( Context.msgok )
     {
       difftime = utDeltaGrand( Context.msgrand, &now );
@@ -3596,7 +3594,6 @@ void astservice(int sig)
 		/* set both timers, regardless of which
 		   one we're actally concerned with */
 		Context.msgrand = now;
-		readone = TRUE;
 	      }
 	  }
     }

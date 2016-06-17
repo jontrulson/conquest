@@ -174,7 +174,8 @@ void metaProcList(int sock, char *hostbuf)
   for (i=0; i<nm; i++)
     {
       metaServerRec2Buffer(tbuf, &metaServerList[mvec[i]]);
-      write(sock, tbuf, strlen(tbuf));
+      if (write(sock, tbuf, strlen(tbuf)) <= 0)
+        utLog("META: write failed to %s", hostbuf);
     }
 
   utLog("META: server query from %s", hostbuf);
@@ -242,7 +243,6 @@ void metaListen(void)
   struct sockaddr_in sa, isa;	/* internet socket addr. structure UDP */
   struct sockaddr_in tsa, tisa;	/* internet socket addr. structure TCP */
   struct timeval tv;
-  socklen_t len;
   struct hostent *hp;
   int rv, rlen;
   socklen_t sockln;
@@ -360,9 +360,6 @@ void metaListen(void)
           rlen = recvfrom(s, rbuf, BUFFERSZ, 0, 
                           (struct sockaddr *)&isa, &alen);
 
-          
-          len = sizeof(struct sockaddr_in);
-
           if ((hp = gethostbyaddr((char *) &isa.sin_addr.s_addr,
                                   sizeof(unsigned long),
                                   AF_INET)) == NULL)
@@ -478,7 +475,13 @@ int main(int argc, char *argv[])
     {
       int cpid;
       utLog("INFO: becoming daemon");
-      chdir("/");
+      if (chdir("/") == -1)
+        {
+          utLog("chdir(/) failed: %s", strerror(errno));
+          exit(1);
+        }
+          
+
 
       cpid = fork();
       switch (cpid) 
@@ -487,7 +490,12 @@ int main(int argc, char *argv[])
           /* child */
 
 #if defined(HAVE_DAEMON)
-          daemon(0, 0);
+          if (daemon(0, 0) == -1)
+            {
+              utLog("daemon() failed: %s", strerror(errno));
+              exit(1);
+            }
+
 #else
 # if defined(HAVE_SETPGRP)
 #  if defined(SETPGRP_VOID)

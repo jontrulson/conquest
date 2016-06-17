@@ -623,7 +623,7 @@ void utLog(char *fmt, ...)
 	if (chown(errfile, 0, ConquestGID) == -1)
           {
             perror("utLog():chown()");
-            exit(1);
+            //            exit(1);
           }
 #endif
 

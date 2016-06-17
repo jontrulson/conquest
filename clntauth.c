@@ -252,7 +252,6 @@ void ChangePassword(int unum, int isoper)
   static char *header = "Change Password";
   char pw[MAXUSERNAME], pwr[MAXUSERNAME], epw[MAXUSERNAME];
   char salt[3];
-  int ch;
   int lin = 0, col = 0;
 
   if (isoper == FALSE)
@@ -274,16 +273,16 @@ void ChangePassword(int unum, int isoper)
   cdclrl( MSG_LIN1, 2  );
   cdputs("Use any printable characters.", MSG_LIN2, 1);
 
-  ch = cdgetx( "New Password: ", MSG_LIN1, 1, 
-	       TERMS, pw, MAXUSERNAME - 1, FALSE );
+  cdgetx( "New Password: ", MSG_LIN1, 1, 
+          TERMS, pw, MAXUSERNAME - 1, FALSE );
 
   if (isoper == FALSE)
     {
       pwr[0] = EOS;
       cdclrl( MSG_LIN1, 2  );
       cdputs("Use any printable characters.", MSG_LIN2, 1);
-      ch = cdgetx( "Retype Password: ", MSG_LIN1, 1, 
-		   TERMS, pwr, MAXUSERNAME - 1, FALSE );
+      cdgetx( "Retype Password: ", MSG_LIN1, 1, 
+              TERMS, pwr, MAXUSERNAME - 1, FALSE );
       
       if (strcmp(pw, pwr) != 0)
 	{			/* pw's don't match, start over */

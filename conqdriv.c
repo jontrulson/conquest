@@ -500,9 +500,9 @@ void iterdrive( int *ship )
 /*    secdrive( ship ) */
 void secdrive( int *ship )
 {
-  int s, t, i, j, k, pnum;
+  int s, t, i, j, k;
   real dis, repair, inc, dec;
-  real x, warp;
+  real x;
   int talert[MAXSHIPS + 1];
   
   for ( s = 1; s <= MAXSHIPS; s = s + 1 )
@@ -553,10 +553,6 @@ void secdrive( int *ship )
 	if ( ! ConqInfo->externrobots )
 	  robotai( i );
       
-      /* Ship movement again. */
-      warp = Ships[i].warp;
-      pnum = -Ships[i].lock;
-
       /* Ships - Teams. */
       for ( j = 0; j <  NUMPLAYERTEAMS; j = j + 1 )
 	if ( Ships[i].scanned[j] > 0 )

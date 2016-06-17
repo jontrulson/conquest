@@ -211,6 +211,10 @@ void Unlock(int what)
   semops[0].sem_op = -1;
   semops[0].sem_flg = 0;
 
+#ifdef DEBUG_SEM
+  int err = 0;
+#endif
+
   if (semop(ConquestSemID, semops, 1) == -1)
     {
       if (errno != EINTR)
@@ -226,7 +230,9 @@ void Unlock(int what)
       else
 	{
 	  utLog("Unlock(%s): semop(): interrupted. continuing...", semGetName(what));
+#ifdef DEBUG_SEM
 	  err = EINTR;
+#endif
 	}
     }
 

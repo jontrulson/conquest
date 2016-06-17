@@ -3417,12 +3417,10 @@ void toggle_line(int snum, int old_snum)
 char *build_toggle_str(char *snum_str, int snum)
 {
   
-  char buf[MSGMAXLINE];
   static char *doomsday_str = "DM";
   static char *deathstar_str = "DS";
   static char *unknown_str = "n/a";
   
-  buf[0] = EOS;
   if (snum > 0 && snum <= MAXSHIPS)
     {          /* ship */
       sprintf(snum_str,"%c%d", Teams[Ships[snum].team].teamchar, snum);

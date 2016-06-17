@@ -124,7 +124,6 @@ void conquestReplay(void)
 
 static void replay(void)
 {
-  int lin;
   static int FirstTime = TRUE;
   static char sfmt[MSGMAXLINE * 2];
   static char cfmt[MSGMAXLINE * 2];
@@ -150,8 +149,6 @@ static void replay(void)
   
   do 
     {
-      lin = 1;
-
       dspReplayMenu();      
       cdclrl( MSG_LIN1, 2 );
 
@@ -658,13 +655,10 @@ static void toggle_line(int snum, int old_snum)
 
 static char *build_toggle_str(char *snum_str, int snum)
 {
-  
-  char buf[MSGMAXLINE];
   static char *doomsday_str = "DM";
   static char *deathstar_str = "DS";
   static char *unknown_str = "n/a";
   
-  buf[0] = EOS;
   if (snum > 0 && snum <= MAXSHIPS)
     {          /* ship */
       sprintf(snum_str,"%c%d", Teams[Ships[snum].team].teamchar, snum);

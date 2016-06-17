@@ -50,7 +50,8 @@ static int ChangedSomething = FALSE;
 static void DisplayCompileOptions(void)
 {
   const int settingcol = 60;
-  int i,j, vattrib;
+  int i, vattrib;
+  long j = 0;
   int lin = 0, col = 0;
   static char *header = "Compile Time Options";
   static char *prompt = MTXT_DONE;
@@ -106,9 +107,9 @@ static void DisplayCompileOptions(void)
       switch(CompileOptions[i].type)
 	{
 	case CTYPE_BOOL:
-	  j = (int) CompileOptions[i].value;
+	  j = (long)CompileOptions[i].value;
 
-	  if (j == TRUE)
+	  if (j == (long)TRUE)
 	    vattrib = GreenLevelColor;
 	  else
 	    vattrib = RedLevelColor;
@@ -455,7 +456,7 @@ static int ViewEditOptions(struct Conf ConfigData[], int ConfSize,
   static char *eprompt2 = "Type '?' for help on an item.";
   int Done = FALSE;
   int ch;
-  int lin = 0, col = 0, flin, llin, clin, maxllin;
+  int lin = 0, col = 0, flin, llin, clin;
   const int settingcol = 65;
   int vattrib;
 #define MAXOPTCOLS 128
@@ -472,7 +473,11 @@ static int ViewEditOptions(struct Conf ConfigData[], int ConfSize,
   cdclear();			/* First clear the display. */
 
   flin = 4;			/* first option line */
-  maxllin = MSG_LIN1 - 2;	/* max last option line */
+
+#ifdef DEBUG_OPTIONS
+  int maxllin = MSG_LIN1 - 2;	/* max last option line */
+#endif
+
   llin = 0;			/* last option line */
   clin = 0;			/* current option line (also idx into cvec) */
 

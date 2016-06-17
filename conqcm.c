@@ -190,7 +190,7 @@ int check_cblock(char *fname, int fmode, int sizeofcb)
       printf("check_cblock(): chown() failed: %s\n",
              strerror(errno));
 
-      return(FALSE);
+      //      return(FALSE);
     }
 #endif
 

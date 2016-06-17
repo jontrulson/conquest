@@ -430,7 +430,11 @@ int main(int argc, char *argv[])
     {
       int cpid;
       utLog("INFO: becoming daemon");
-      chdir("/");
+      if (chdir("/") == -1)
+        {
+          fprintf(stderr,"chdir(/) failed: %s\n", strerror(errno));
+          exit(1);
+        }
 
       cpid = fork();
       switch (cpid) 
@@ -439,7 +443,11 @@ int main(int argc, char *argv[])
           /* child */
 
 #if defined(HAVE_DAEMON)
-          daemon(0, 0);
+          if (daemon(0, 0) == -1)
+            {
+              fprintf(stderr,"daemon(0, )) failed: %s\n", strerror(errno));
+              exit(1);
+            }
 #else
 # if defined(HAVE_SETPGRP)
 #  if defined(SETPGRP_VOID)
@@ -1194,7 +1202,7 @@ void menu(void)
 {
   int i;
   Unsgn32 sleepy;
-  int lose, oclosed, switchteams, multiple, redraw;
+  int lose;
   int playrv;
   int pkttype;
   char buf[PKT_MAXSIZE];
@@ -1227,11 +1235,7 @@ void menu(void)
   utStcpn( Users[Context.unum].alias, Ships[Context.snum].alias, MAXUSERPNAME );
   
   /* Set up some things for the menu display. */
-  switchteams = Users[Context.unum].ooptions[OOPT_SWITCHTEAMS];
-  multiple = Users[Context.unum].ooptions[OOPT_MULTIPLE];
-  oclosed = ConqInfo->closed;
   Context.leave = FALSE;
-  redraw = TRUE;
   sleepy = clbGetMillis();
   playrv = FALSE;
 
@@ -1950,7 +1954,7 @@ static int hello(void)
      do udp. woohoo! */
   if (sInfo.tryUDP)
     {
-      write(sInfo.usock, "Open Me", 7);
+      send(sInfo.usock, "Open Me", 7, 0);
     }
 
   /* now send the server stats normally */

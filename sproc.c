@@ -493,7 +493,6 @@ void procCoup(cpCommand_t *cmd)
   real failprob;
   string nhp="We must be orbiting our home planet to attempt a coup.";
   char cbuf[128];
-  int rv = -1;
 
   if (!pktIsValid(CP_COMMAND, cmd))
     return;
@@ -588,7 +587,7 @@ void procCoup(cpCommand_t *cmd)
       return;
     }
   
-  rv = clbTakePlanet( pnum, snum );
+  clbTakePlanet( pnum, snum );
 
   /* Make the planet not scanned. */
   for ( i = 0; i < NUMPLAYERTEAMS; i = i + 1 )
@@ -1228,7 +1227,6 @@ void procBeam(cpCommand_t *cmd)
   char cbuf[BUFFER_SIZE];
   real rkills;
   string lastfew="Fleet orders prohibit removing the last three armies.";
-  int rv = -1;
 
   if (!pktIsValid(CP_COMMAND, cmd))
     return;
@@ -1442,7 +1440,7 @@ void procBeam(cpCommand_t *cmd)
 	      Ships[snum].armies = Ships[snum].armies - 1;
 	      if ( Planets[pnum].team == TEAM_NOTEAM || Planets[pnum].armies == 0 )
 		{
-		  rv = clbTakePlanet( pnum, snum );
+		  clbTakePlanet( pnum, snum );
 		  conqed = TRUE;
 		}
 	      else if ( Planets[pnum].team != Ships[snum].team )
@@ -1450,7 +1448,7 @@ void procBeam(cpCommand_t *cmd)
 		  Planets[pnum].armies = Planets[pnum].armies - 1;
 		  if ( Planets[pnum].armies == 0 )
 		    {
-		      rv = clbZeroPlanet( pnum, snum );
+		      clbZeroPlanet( pnum, snum );
 		      zeroed = TRUE;
 		    }
 		}
