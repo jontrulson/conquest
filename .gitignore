@@ -29,6 +29,19 @@ conquestgl
 
 libtool
 autom4te.cache
+Makefile.in
+compile
+config.guess
+config.sub
+configure
+depcomp
+install-sh
+m4/
+missing
+ylwrap
+aclocal.m4
+ltmain.sh
+
 *.gz
 cscope.out
 
