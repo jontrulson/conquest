@@ -787,7 +787,7 @@ void dead( int snum, int leave )
 	  i = i + 1;
       if ( i <= 0 )
 	break;
-      c_sleep( (1.0 / (real)Context.updsec) );
+      utSleep( (1.0 / (real)Context.updsec) );
     }
   
   /* There aren't supposed to be any torps left. */
@@ -806,7 +806,7 @@ void dead( int snum, int leave )
   updateClient(FALSE);
   for ( i=0; i<10 && Ships[snum].status == SS_DYING; i++ )
     {
-      c_sleep( (1.0 / (real)Context.updsec) );
+      utSleep( (1.0 / (real)Context.updsec) );
       updateClient(FALSE);
     }
 
@@ -1305,7 +1305,7 @@ void menu(void)
           if ((clbGetMillis() - sleepy) > sleeplimit)
 	    break;
           else
-            c_sleep(0.05);
+            utSleep(0.05);
 
 	  continue; 
 	}
@@ -1702,7 +1702,7 @@ int play(void)
       if (didsomething)         
         continue;               /* see if there is another pkt */
 
-      c_sleep(0.05);
+      utSleep(0.05);
     }
   
   conqstats( Context.snum );

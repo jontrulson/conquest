@@ -592,7 +592,7 @@ static int prompt_ship(char buf[], int *snum, int *normal)
 	  cdputs( nss, MSG_LIN2, 1 );
 	  cdmove( 1, 1 );
 	  cdrefresh();
-	  c_sleep( 1.0 );
+	  utSleep( 1.0 );
 	  return(FALSE); /* dwp */
 	}
       utSafeCToI( &tmpsnum, buf, 0 );	/* ignore return status */
@@ -603,7 +603,7 @@ static int prompt_ship(char buf[], int *snum, int *normal)
       cdputs( nss, MSG_LIN2, 1 );
       cdmove( 1, 1 );
       cdrefresh();
-      c_sleep( 1.0 );
+      utSleep( 1.0 );
       return(FALSE); /* dwp */
     }
 

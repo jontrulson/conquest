@@ -303,7 +303,7 @@ void drpexit(void)
       /* We may well have started the driver. */
       drkill();
       for ( i = 1; Context.childpid == Driver->drivpid && i <= 50; i = i + 1 )
-	c_sleep( 0.1 );
+	utSleep( 0.1 );
       if ( Context.childpid == Driver->drivpid )
 	utLog("drpexit(): Driver didn't exit; pid = %08x", Context.childpid );
     }

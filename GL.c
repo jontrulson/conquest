@@ -1988,11 +1988,11 @@ static void renderFrame(void)
     {
       if (Context.recmode == RECMODE_PLAYING ||
           Context.recmode == RECMODE_PAUSED)
-        c_sleep(recFrameDelay);
+        utSleep(recFrameDelay);
       else
         {
           if (FPS > 75.0)               
-            c_sleep(0.01);
+            utSleep(0.01);
         }
     }
 

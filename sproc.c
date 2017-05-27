@@ -565,7 +565,7 @@ void procCoup(cpCommand_t *cmd)
 	return;
       
       /* Sleep */
-      c_sleep( ITER_SECONDS );
+      utSleep( ITER_SECONDS );
     }
   
   PVLOCK(&ConqInfo->lockword);
@@ -763,7 +763,7 @@ void procSetWar(cpCommand_t *cmd)
 	    return;
 	  
 	  /* Sleep */
-	  c_sleep( ITER_SECONDS );
+	  utSleep( ITER_SECONDS );
 	}
     }
 
@@ -822,7 +822,7 @@ void procRefit(cpCommand_t *cmd)
 	return;
       
       /* Sleep */
-      c_sleep( ITER_SECONDS );
+      utSleep( ITER_SECONDS );
     }
   
   /* set it */
@@ -957,7 +957,7 @@ void procUnTow(cpCommand_t *cmd)
 	      if ( ! clbStillAlive( Context.snum ) )
 		return;
 	      
-	      c_sleep( ITER_SECONDS );
+	      utSleep( ITER_SECONDS );
 	      
 	    }
 	}
@@ -1199,7 +1199,7 @@ void procBomb(cpCommand_t *cmd)
 	  ototal = total;
 	}
       
-      c_sleep( ITER_SECONDS );
+      utSleep( ITER_SECONDS );
       
     } /* while */
  cbrk22:
@@ -1503,7 +1503,7 @@ void procBeam(cpCommand_t *cmd)
 	  break;
 	}
       
-      c_sleep( ITER_SECONDS );
+      utSleep( ITER_SECONDS );
       
     }
  cbrk21:
@@ -1583,7 +1583,7 @@ void procDestruct(cpCommand_t *cmd)
 	  return;
 	}
       
-      c_sleep( ITER_SECONDS );
+      utSleep( ITER_SECONDS );
       
     } /* end while */
 
@@ -1664,7 +1664,7 @@ void procAutoPilot(cpCommand_t *cmd)
           break;
         }
       
-      c_sleep(ITER_SECONDS);
+      utSleep(ITER_SECONDS);
     }
 
   SFCLR(snum, SHIP_F_ROBOT);

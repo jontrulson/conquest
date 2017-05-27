@@ -1244,3 +1244,29 @@ char *utGetPath(const char *thepath)
 
 #endif  /* MINGW */
 }
+
+void utSleep(real seconds)
+{
+    // convert to integer milliseconds
+    int msecs = (int)(seconds * 1000.0f);
+
+#if defined(LINUX)
+
+    struct timespec delay_time;
+
+    delay_time.tv_sec  = msecs / 1000;
+    delay_time.tv_nsec = (msecs % 1000) * 1000000;
+    // here we spin until the delay is complete - detecting signals
+    // and continuing where we left off
+    while (nanosleep(&delay_time, &delay_time) && errno == EINTR)
+        ; // loop
+
+#elif defined(MINGW)
+
+    /* For windows, use WINAPI Sleep(millis) */
+    Sleep((DWORD)(msecs));
+
+#else
+# error "Need an implementation of utSleep()"
+#endif
+}

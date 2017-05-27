@@ -1178,7 +1178,7 @@ void dead( int snum, int leave )
 
   if (clientFlags & SPCLNTSTAT_FLAG_CONQUER)
     {
-      c_sleep(4.0);
+      utSleep(4.0);
       do
 	{
 	  cdclear();
@@ -1570,7 +1570,7 @@ void dobeam( int snum )
 	  break;
 	}
 
-      c_sleep( ITER_SECONDS );
+      utSleep( ITER_SECONDS );
     }
   
   /* Try to display the last beaming message. */
@@ -1657,7 +1657,7 @@ void dobomb( int snum )
 	  break;
 	}
 
-      c_sleep( ITER_SECONDS );
+      utSleep( ITER_SECONDS );
     }
   
   cdrefresh();
@@ -1849,7 +1849,7 @@ void dorefit( int snum, int dodisplay )
 	return;
       
       /* Sleep */
-      c_sleep( ITER_SECONDS );
+      utSleep( ITER_SECONDS );
     }
   
   cdclrl( MSG_LIN1, 1 );
@@ -2523,7 +2523,7 @@ void doselfdest(int snum)
         }
 
 
-      c_sleep( ITER_SECONDS );
+      utSleep( ITER_SECONDS );
     } /* end while */
 
   return;
@@ -3125,7 +3125,7 @@ int newship( int unum, int *snum )
 	      appstr( " at one time.", cbuf );
 	      cdputc( cbuf, i );
 	      cdrefresh();
-	      c_sleep( 2.0 );
+	      utSleep( 2.0 );
 	      Ships[*snum].status = SS_RESERVED;
 	      
 	      break;
@@ -3299,7 +3299,7 @@ int play()
   /* Asts are still enabled, simply cancel the next screen update. */
   stopTimer();
 
-  c_sleep( 1.0 );
+  utSleep( 1.0 );
   dead( Context.snum, Context.leave );
   
   return(TRUE);
@@ -3383,7 +3383,7 @@ int welcome(void)
 	  cprintf(MSG_LIN2/2+1,col,ALIGN_CENTER,"#%d#%s", InfoColor, sorryn );
 	  cdmove( 1, 1 );
 	  cdrefresh();
-	  c_sleep( 2.0 );
+	  utSleep( 2.0 );
 	  return ( FALSE );
 	}
       team = sClientStat.team;
@@ -3408,7 +3408,7 @@ int welcome(void)
 	      InfoColor, prepare_str );
       cdmove( 1, 1 );
       cdrefresh();
-      c_sleep( 3.0 );
+      utSleep( 3.0 );
     }
 
 
@@ -3423,7 +3423,7 @@ int welcome(void)
 	  cprintf(MSG_LIN2/2+1,col,ALIGN_CENTER,"#%d#%s", InfoColor, sorryn );
 	  cdmove( 1, 1 );
 	  cdrefresh();
-	  c_sleep( 2.0 );
+	  utSleep( 2.0 );
 	  return ( FALSE );
 
 	  break;
@@ -3433,7 +3433,7 @@ int welcome(void)
           cprintf(MSG_LIN2/2+1,col,ALIGN_CENTER,"#%d#%s", InfoColor, sorryn );
           cdmove( 1, 1 );
           cdrefresh();
-          c_sleep( 2.0 );
+          utSleep( 2.0 );
           return ( FALSE );
 
 	  break;
@@ -3446,7 +3446,7 @@ int welcome(void)
 	  cdputc( sorryn, MSG_LIN2/2+1 );
 	  cdmove( 1, 1 );
 	  cdrefresh();
-	  c_sleep( 2.0 );
+	  utSleep( 2.0 );
 	  return ( FALSE );
 
 	  break;

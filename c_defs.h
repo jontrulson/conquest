@@ -73,6 +73,11 @@ extern char *crypt(char *, char *);
 # include <strings.h>
 #endif 
 
+#ifndef _POSIX_C_SOURCE
+// We need at least 199309L for nanosleep()
+# define _POSIX_C_SOURCE 200809L
+#endif
+
 #if defined(TIME_WITH_SYS_TIME)
 # include <sys/time.h>
 # include <time.h>
@@ -232,7 +237,6 @@ void upper(char *buf);
 time_t getnow (int now[NOWSIZE], time_t thetime);
 int wkday (void);
 int lib_ffs(int start, int len, int bits, int *rule);
-void c_sleep(real sleeptime);
 real ctor(char *buf);
 void error(char *str);
 

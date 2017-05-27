@@ -669,7 +669,7 @@ void robotloop(void)
 	      conqstats( s );
 	    }
       /* Sleep for awhile. */
-      c_sleep( 1.0 );
+      utSleep( 1.0 );
     }
   
   /*    return; NOTREACHED */

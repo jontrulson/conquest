@@ -137,7 +137,7 @@ int main(int argc, char *argv[])
 	  i = TIMEOUT_DRIVER * ITER_TENTHS;
 	  while ( Driver->drivstat != DRS_OFF && i > 0 )
 	    {
-	      c_sleep( ITER_SECONDS );
+	      utSleep( ITER_SECONDS );
 	      i = i - ITER_TENTHS;
 	    }
 	}
@@ -240,7 +240,7 @@ int main(int argc, char *argv[])
           clbPlanetDrive(0.1);
           iterdrive( ship );
         }
-      c_sleep( ITER_SECONDS );
+      utSleep( ITER_SECONDS );
       drivtenths = drivtenths + ITER_TENTHS;
     }
   

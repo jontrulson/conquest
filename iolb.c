@@ -186,7 +186,7 @@ int iogchar ( void )
   
   if (!ibufCount())
     {
-      c_sleep(0.1);
+      utSleep(0.1);
       thechar = wgetch(stdscr);
     }
   else

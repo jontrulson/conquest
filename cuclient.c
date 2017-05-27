@@ -118,7 +118,7 @@ void cucDoWar( int snum )
 		    return;
 		  
 		  /* Sleep */
- 		  c_sleep( ITER_SECONDS );
+ 		  utSleep( ITER_SECONDS );
 		}
 	    }
 	  break;

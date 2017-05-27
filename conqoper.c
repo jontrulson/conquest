@@ -2089,7 +2089,7 @@ void opresign(void)
       cdputs( "No such user.", MSG_LIN2, 1 );
       cdmove( 1, 1 );
       cdrefresh();
-      c_sleep( 1.0 );
+      utSleep( 1.0 );
     }
   else if ( mcuConfirm() )
     {
@@ -2423,7 +2423,7 @@ void opuadd(void)
       cdputs( "That user is already enrolled.", MSG_LIN2, 1 );
       cdmove( 1, 1 );
       cdrefresh();
-      c_sleep( 1.0 );
+      utSleep( 1.0 );
       cdclrl( MSG_LIN1, 2 );
       return;
     }
@@ -2471,7 +2471,7 @@ void opuadd(void)
       cdputs( "Error adding new user.", MSG_LIN2, 1 );
       cdmove( 0, 0 );
       cdrefresh();
-      c_sleep( 1.0 );
+      utSleep( 1.0 );
     }
   else		
     {
@@ -2523,7 +2523,7 @@ void opuedit(void)
 	  uiPutColor(0);
       cdmove( 1, 1 );
       cdrefresh();
-      c_sleep( 1.0 );
+      utSleep( 1.0 );
       return;
     }
   cdclear();
@@ -2841,7 +2841,7 @@ void opuedit(void)
 			   MSG_LIN2 );
 		    cdmove( 1, 1 );
 		    cdrefresh();
-		    c_sleep( 1.0 );
+		    utSleep( 1.0 );
 		  }
 	      }
 	    }
@@ -3308,7 +3308,7 @@ int prompt_ship(char buf[], int *snum, int *normal)
 	  cdputs( nss, MSG_LIN2, 1 );
 	  cdmove( 1, 1 );
 	  cdrefresh();
-	  c_sleep( 1.0 );
+	  utSleep( 1.0 );
 	  return(FALSE); /* dwp */
 	}
       utSafeCToI( &tmpsnum, buf, 0 );	/* ignore return status */
@@ -3319,7 +3319,7 @@ int prompt_ship(char buf[], int *snum, int *normal)
       cdputs( nss, MSG_LIN2, 1 );
       cdmove( 1, 1 );
       cdrefresh();
-      c_sleep( 1.0 );
+      utSleep( 1.0 );
       return(FALSE); /* dwp */
     }
 
