@@ -164,16 +164,6 @@ extern char *crypt(char *, char *);
 # endif
 #endif  /* MINGW */
 
-/* externs */
-extern int errno;
-
-#ifndef HAVE_STRERROR
-# if !defined(SYS_ERRLIST_DECLARED)
-extern char *sys_errlist[];
-# endif
-# define strerror(X) sys_errlist[(X)]
-#endif
-
 #define DIGIT   0
 #define LETTER  1
 
