@@ -8,7 +8,7 @@
 #define CPROC_H_INCLUDED
 
 #include "conqdef.h"
-#include "datatypes.h"
+
 #include "conqnet.h"
 #include "protocol.h"
 #include "packet.h"

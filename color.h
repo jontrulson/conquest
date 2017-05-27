@@ -5,7 +5,7 @@
 #ifndef _COLOR_H
 #define _COLOR_H
 
-#include "datatypes.h"
+
 
 #define CQC_FG_MASK      (0x000000ff)
 #define CQC_BG_MASK      (0x0000ff00)
@@ -47,7 +47,7 @@
    ff = forground color
 */
 
-typedef Unsgn32 cqColor;
+typedef uint32_t cqColor;
 
 # ifdef NOEXPORT_COLORS
 /* make them here */

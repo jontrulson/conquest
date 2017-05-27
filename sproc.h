@@ -9,7 +9,7 @@
 
 #include "conqdef.h"
 #include "conqnet.h"
-#include "datatypes.h"
+
 #include "protocol.h"
 #include "packet.h"
 

@@ -41,7 +41,7 @@ static int lib_ffs(int start, int len, int bits, int *rule)
   *rule = -1;
   for (i = start; i < len; i++)
     {				/* check the bits */
-      if ((bits & ( 1 << i)) != 0)
+      if ((bits & (1 << i)) != 0)
 	{			/* bit is set */
 	  *rule = i;
 	  break;

@@ -8,7 +8,7 @@
 #include "context.h"
 #include "global.h"
 #include "conqcom.h"
-#include "datatypes.h"
+
 #include "color.h"
 #include "conf.h"
 #include "gldisplay.h"
@@ -321,7 +321,7 @@ static int nMenuIdle(void)
 static int nMenuInput(int ch)
 {
   int i, irv;
-  Unsgn16 cwar;
+  uint16_t cwar;
 
   ch = CQ_CHAR(ch);
 
@@ -381,7 +381,7 @@ static int nMenuInput(int ch)
                       Ships[Context.snum].war[i] = twar[i];
                     }
 
-                  sendCommand(CPCMD_SETWAR, (Unsgn16)cwar);
+                  sendCommand(CPCMD_SETWAR, (uint16_t)cwar);
                   return NODE_OK;
                 }
 
@@ -471,7 +471,7 @@ static int nMenuInput(int ch)
           Ships[Context.snum].war[Ships[Context.snum].team] = FALSE;
           Users[Context.unum].war[Users[Context.unum].team] = FALSE;
           
-          sendCommand(CPCMD_SWITCHTEAM, (Unsgn16)Ships[Context.snum].team);
+          sendCommand(CPCMD_SWITCHTEAM, (uint16_t)Ships[Context.snum].team);
         }
       break;
 

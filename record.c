@@ -15,7 +15,7 @@
 #include "conf.h"
 #include "global.h"
 #include "color.h"
-#include "datatypes.h"
+
 #include "protocol.h"
 #include "packet.h"
 
@@ -36,7 +36,7 @@ extern char *ConquestDate;
 static int rdata_wfd = -1;	/* the currently open file for writing */
 static int rdata_rfd = -1;	/* ... reading */
 
-static Unsgn32 recordFrameCount = 0;
+static uint32_t recordFrameCount = 0;
 
 #ifdef HAVE_LIBZ
 static gzFile rdata_wfdz = NULL; /* for compressed files */
@@ -212,10 +212,10 @@ int recReadHeader(fileHeader_t *fhdr)
 
   /* now de-endianize the data */
 
-  fhdr->vers = (Unsgn32)ntohl(fhdr->vers);
-  fhdr->rectime = (Unsgn32)ntohl(fhdr->rectime);
-  fhdr->cmnrev = (Unsgn32)ntohl(fhdr->cmnrev);
-  fhdr->flags = (Unsgn32)ntohl(fhdr->flags);
+  fhdr->vers = (uint32_t)ntohl(fhdr->vers);
+  fhdr->rectime = (uint32_t)ntohl(fhdr->rectime);
+  fhdr->cmnrev = (uint32_t)ntohl(fhdr->cmnrev);
+  fhdr->flags = (uint32_t)ntohl(fhdr->flags);
 
 #if defined(DEBUG_REC)
   utLog("recReadHeader: vers = %d, rectime = %d, cmnrev = %d\n",
@@ -244,16 +244,16 @@ int recInitOutput(int unum, time_t thetime, int snum, int isserver)
   if (isserver)                 /* this is a server recording */
     fhdr.flags |= RECORD_F_SERVER;
 
-  fhdr.vers = (Unsgn32)htonl(RECVERSION);
+  fhdr.vers = (uint32_t)htonl(RECVERSION);
 
-  fhdr.samplerate = (Unsgn8)Context.updsec;
+  fhdr.samplerate = (uint8_t)Context.updsec;
 
-  fhdr.rectime = (Unsgn32)htonl((Unsgn32)thetime);
+  fhdr.rectime = (uint32_t)htonl((uint32_t)thetime);
   strncpy((char*)fhdr.user, Users[unum].username, MAXUSERNAME - 1);
 
-  fhdr.cmnrev = (Unsgn32)htonl((Unsgn32)COMMONSTAMP);
+  fhdr.cmnrev = (uint32_t)htonl((uint32_t)COMMONSTAMP);
   fhdr.snum = snum;
-  fhdr.flags = (Unsgn32)htonl((Unsgn32)fhdr.flags);
+  fhdr.flags = (uint32_t)htonl((uint32_t)fhdr.flags);
 
   if (!recWriteBuf(&fhdr, sizeof(fileHeader_t)))
     return(FALSE);
@@ -269,7 +269,7 @@ int recInitOutput(int unum, time_t thetime, int snum, int isserver)
 void recWriteEvent(void *data)
 {
   char *buf = (char *)data;
-  Unsgn8 pkttype;
+  uint8_t pkttype;
   int len;
 
   if (Context.recmode != RECMODE_ON)
@@ -278,7 +278,7 @@ void recWriteEvent(void *data)
   if (!buf)
     return;
 
-  pkttype = (Unsgn8)*buf;
+  pkttype = (uint8_t)*buf;
   
   len = pktServerPacketSize(pkttype);
   if (!len)
@@ -308,8 +308,8 @@ void recUpdateFrame(void)
   memset((void *)&frame, 0, sizeof(spFrame_t));
 
   frame.type = SP_FRAME;
-  frame.frame = (Unsgn32)htonl(recordFrameCount);
-  frame.time = (Unsgn32)htonl((Unsgn32)getnow(NULL, 0));
+  frame.frame = (uint32_t)htonl(recordFrameCount);
+  frame.time = (uint32_t)htonl((uint32_t)getnow(NULL, 0));
 
   recWriteEvent(&frame);
 
@@ -398,7 +398,7 @@ int recReadPkt(char *buf, int blen)
     }
   else
     {
-      len = len - sizeof(Unsgn8);
+      len = len - sizeof(uint8_t);
 
   /* so now read in the rest of the packet */
 #ifdef HAVE_LIBZ
@@ -438,9 +438,9 @@ void recGenTorpLoc(void)
   static spTorpLoc_t pktTorpLoc[MAXSHIPS + 1][MAXTORPS] = {};
   real dis;
   real x, y;
-  static Unsgn32 iterstart = 0;
-  Unsgn32 iternow = clbGetMillis();
-  const Unsgn32 iterwait = 100.0; /* ms */
+  static uint32_t iterstart = 0;
+  uint32_t iternow = clbGetMillis();
+  const uint32_t iterwait = 100.0; /* ms */
   real tdelta = (real)iternow - (real)iterstart;
 
   if (Context.recmode != RECMODE_ON)
@@ -481,8 +481,8 @@ void recGenTorpLoc(void)
                         }
                     }
 
-                    storploc.x = (Sgn32)htonl((Sgn32)(x * 1000.0));
-                    storploc.y = (Sgn32)htonl((Sgn32)(y * 1000.0));
+                    storploc.x = (int32_t)htonl((int32_t)(x * 1000.0));
+                    storploc.y = (int32_t)htonl((int32_t)(y * 1000.0));
 
                     /* only send 'war' status as it relates to our team */
                     if (Ships[i].torps[j].war[team])

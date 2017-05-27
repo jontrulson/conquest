@@ -121,7 +121,7 @@ float getFPS(void)
 
 /* convert an unsigned int color spec (hexcolor in AARRGGBB format) into a
    GLColor */
-void hex2GLColor(Unsgn32 hcol, GLColor_t *col)
+void hex2GLColor(uint32_t hcol, GLColor_t *col)
 {
   if (!col)
     return;
@@ -193,7 +193,7 @@ int findGLAnimDef(char *animname)
 }
 
 /* search texture list (by filename) and return index if found */
-static int findGLTextureByFile(char *texfile, Unsgn32 flags)
+static int findGLTextureByFile(char *texfile, uint32_t flags)
 {
   int i;
 
@@ -869,7 +869,7 @@ void drawIconHUDDecal(GLfloat rx, GLfloat ry, GLfloat w, GLfloat h,
 static void mouse(int b, int state, int x, int y)
 {
   static mouseData_t mdata;
-  Unsgn32 kmod = glutGetModifiers();
+  uint32_t kmod = glutGetModifiers();
   int rv = NODE_OK;
   scrNode_t *node = getTopNode();
   scrNode_t *onode = getTopONode();
@@ -2060,14 +2060,14 @@ void drawTorp(GLfloat x, GLfloat y,
 }
 
 /* utility func for converting a shield level into a color */
-static inline Unsgn32 _get_sh_color(real sh)
+static inline uint32_t _get_sh_color(real sh)
 {
-  Unsgn32 color;
-  Unsgn8 alpha;
+  uint32_t color;
+  uint8_t alpha;
 
   if (sh >= 0.0 && sh < 50.0)
     {
-      alpha = (Unsgn8)(256.0 * (sh/50.0)); 
+      alpha = (uint8_t)(256.0 * (sh/50.0)); 
       color = RedLevelColor | (alpha << CQC_ALPHA_SHIFT);
     }
   else if (sh >= 50.0 && sh <= 80.0)
@@ -2091,7 +2091,7 @@ drawShip(GLfloat x, GLfloat y, GLfloat angle, char ch, int snum, int color,
   static int norender = FALSE;
   int steam = Ships[snum].team, stype = Ships[snum].shiptype;
   GLfloat scaleFac = (scale == SCALE_FAC) ? dConf.vScaleSR : dConf.vScaleLR;
-  static Unsgn32 geoChangeCount = 0;
+  static uint32_t geoChangeCount = 0;
   static GLfloat phaserRadiusSR, phaserRadiusLR;
   GLfloat phaserRadius;
 
@@ -2279,11 +2279,11 @@ void drawDoomsday(GLfloat x, GLfloat y, GLfloat dangle, GLfloat scale)
   static animStateRec_t doomapfire = {}; /* animdef state for ap firing */
   static int last_apstate;      /* toggle this when it expires */
   static int beamfx = -1;       /* Cataboligne - beam sound */
-  static const Unsgn32 beamfx_delay = 1000; /* 1 second */
-  static Unsgn32 lastbeam = 0;
+  static const uint32_t beamfx_delay = 1000; /* 1 second */
+  static uint32_t lastbeam = 0;
   real dis, ang;
   GLfloat scaleFac = (scale == SCALE_FAC) ? dConf.vScaleSR : dConf.vScaleLR;
-  static Unsgn32 geoChangeCount = 0;
+  static uint32_t geoChangeCount = 0;
 
   if (norender)
     return;
@@ -2492,7 +2492,7 @@ void drawNEB(int snum)
   static int norender = FALSE;
   /* our wall animation state */
   static animStateRec_t nebastate;    /* initial state of neb texture */
-  static Unsgn32 geoChangeCount = 0;
+  static uint32_t geoChangeCount = 0;
 
   if (norender)
     return;
@@ -2937,8 +2937,8 @@ static void procInput(int key, int x, int y)
 static void
 input(int key, int x, int y)
 {
-  Unsgn32 kmod = glutGetModifiers();
-  Unsgn32 jmod = 0;
+  uint32_t kmod = glutGetModifiers();
+  uint32_t jmod = 0;
 
   if (kmod & GLUT_ACTIVE_SHIFT)
     jmod |= CQ_KEY_MOD_SHIFT;
@@ -2954,8 +2954,8 @@ input(int key, int x, int y)
 /* for 'normal' keys */
 static void charInput(unsigned char key, int x, int y)
 {
-  Unsgn32 kmod = glutGetModifiers();
-  Unsgn32 jmod = 0;
+  uint32_t kmod = glutGetModifiers();
+  uint32_t jmod = 0;
 
   if (kmod & GLUT_ACTIVE_SHIFT)
     jmod |= CQ_KEY_MOD_SHIFT;

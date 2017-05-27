@@ -7,7 +7,7 @@
 #ifndef _ANIM_H
 #define _ANIM_H 
 
-#include "datatypes.h"
+
 #include "conqinit.h"
 
 /* basic draw state used/modified by an animator */
@@ -39,7 +39,7 @@ typedef struct _anim_state {
   /* ##### public */
 
   /* flags (global for state) */
-  Unsgn32            flags;
+  uint32_t            flags;
 
   /* volatile (current) draw state */
   animDrawStateRec_t state;
@@ -47,9 +47,9 @@ typedef struct _anim_state {
   /* initial draw state - used to reset state on init */
   animDrawStateRec_t istate;
 
-  Unsgn32            expired; /* anim types that have expired (ANIM_TYPE_) */
+  uint32_t            expired; /* anim types that have expired (ANIM_TYPE_) */
 
-  Unsgn32            anims;     /* bitmask of animation types present
+  uint32_t            anims;     /* bitmask of animation types present
                                    ANIM_TYPE_* */
 
   /* ##### private - should only be accessed by animator and API */
@@ -57,32 +57,32 @@ typedef struct _anim_state {
   int                adIndex; /* index into GLAnimDefs that specifies the
                                  animdef responsible for running this
                                  state. */
-  Unsgn32            starttime; /* time of last reset */
+  uint32_t            starttime; /* time of last reset */
 
   struct {
-    Unsgn32 flags;
-    Unsgn32 lasttime;
-    Unsgn32 curstage;
-    Unsgn32 curloop;
+    uint32_t flags;
+    uint32_t lasttime;
+    uint32_t curstage;
+    uint32_t curloop;
   } tex;
 
   struct {
-    Unsgn32 flags;
-    Unsgn32 lasttime;
-    Unsgn32 curstage;
-    Unsgn32 curloop;
+    uint32_t flags;
+    uint32_t lasttime;
+    uint32_t curstage;
+    uint32_t curloop;
   } col;
 
   struct {
-    Unsgn32 flags;
-    Unsgn32 lasttime;
-    Unsgn32 curstage;
-    Unsgn32 curloop;
+    uint32_t flags;
+    uint32_t lasttime;
+    uint32_t curstage;
+    uint32_t curloop;
   } geo;
 
   struct {
-    Unsgn32 flags;
-    Unsgn32 lasttime;
+    uint32_t flags;
+    uint32_t lasttime;
   } tog;
 } animStateRec_t, *animStatePtr_t;
 
@@ -109,11 +109,11 @@ typedef struct _gl_animdef {
                                    used to init the state.id at init
                                    time if non 0. */
 
-  Unsgn32    timelimit;         /* max run time in ms */
-  Unsgn32    anims;             /* animation types present (CQI_ANIMS_*) */
+  uint32_t    timelimit;         /* max run time in ms */
+  uint32_t    anims;             /* animation types present (CQI_ANIMS_*) */
 
   /* istate */
-  Unsgn32    istates;           /* AD_ISTATE_* */
+  uint32_t    istates;           /* AD_ISTATE_* */
   GLint      itexid;
   GLColor_t  icolor;
   real       iangle;
@@ -122,10 +122,10 @@ typedef struct _gl_animdef {
   struct {
     /* these are copies of the relevant cqi data */
     GLColor_t color;            /* starting color, if specified */
-    Unsgn32   stages;           /* number of stages (textures) */
-    Unsgn32   loops;            /* number of loops, 0 = inf */
-    Unsgn32   delayms;          /* delay per-stage in ms */
-    Unsgn32   looptype;  /* the type of loop (asc/dec/pingpong/etc) */
+    uint32_t   stages;           /* number of stages (textures) */
+    uint32_t   loops;            /* number of loops, 0 = inf */
+    uint32_t   delayms;          /* delay per-stage in ms */
+    uint32_t   looptype;  /* the type of loop (asc/dec/pingpong/etc) */
 
     GLfloat   deltas;
     GLfloat   deltat;
@@ -136,10 +136,10 @@ typedef struct _gl_animdef {
   struct {
     GLColor_t color;            /* starting color, if specified */
     
-    Unsgn32   stages;           /* number of stages (delta ops)) 0 = inf*/
-    Unsgn32   delayms;          /* delay per-stage in ms */
-    Unsgn32   loops;            /* number of loops, 0 = inf */
-    Unsgn32   looptype;         /* the type of loop (asc/dec//pingpong/etc) */
+    uint32_t   stages;           /* number of stages (delta ops)) 0 = inf*/
+    uint32_t   delayms;          /* delay per-stage in ms */
+    uint32_t   loops;            /* number of loops, 0 = inf */
+    uint32_t   looptype;         /* the type of loop (asc/dec//pingpong/etc) */
     
     real      deltaa;           /* deltas to appliy to ARGB components */
     real      deltar;
@@ -148,10 +148,10 @@ typedef struct _gl_animdef {
   } col;
 
   struct {
-    Unsgn32   stages;           /* number of stages (delta ops)) 0 = inf*/
-    Unsgn32   delayms;          /* delay per-stage in ms */
-    Unsgn32   loops;            /* number of loops, 0 = inf */
-    Unsgn32   looptype;         /* the type of loop (asc/dec//pingpong/etc) */
+    uint32_t   stages;           /* number of stages (delta ops)) 0 = inf*/
+    uint32_t   delayms;          /* delay per-stage in ms */
+    uint32_t   loops;            /* number of loops, 0 = inf */
+    uint32_t   looptype;         /* the type of loop (asc/dec//pingpong/etc) */
 
     real      deltax;           /* x y and z deltas */
     real      deltay;
@@ -161,7 +161,7 @@ typedef struct _gl_animdef {
   } geo;
 
   struct {
-    Unsgn32   delayms;          /* delay per-stage in ms */
+    uint32_t   delayms;          /* delay per-stage in ms */
   } tog;
 
 } GLAnimDef_t;
@@ -186,7 +186,7 @@ extern GLAnimDef_t *GLAnimDefs;
 int  findGLAnimDef(char *animname); /* GL.c */
 int  animInitState(char *animname, animStatePtr_t astate, 
                   animDrawStatePtr_t istate);
-void animResetState(animStatePtr_t astate, Unsgn32 lasttime);
+void animResetState(animStatePtr_t astate, uint32_t lasttime);
 
 int  animIterState(animStatePtr_t astate);
 

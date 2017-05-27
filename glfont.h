@@ -33,7 +33,7 @@ extern TexFont *glfFontMsg;
 
 void glfRenderFont(GLfloat x, GLfloat y, GLfloat z, GLfloat w, GLfloat h,
                    TexFont *font, char *str, int color, GLColor_t *col,
-                   Unsgn32 flags);
+                   uint32_t flags);
 void glfInitFonts(void);
 
 

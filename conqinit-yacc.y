@@ -800,9 +800,9 @@ int cqiFindMusic(char *name)
   return -1;
 }
 
-static Unsgn32 hex2color(char *str)
+static uint32_t hex2color(char *str)
 {
-  Unsgn32 v;
+  uint32_t v;
 
   /* default to 0 (black/transparent) */
 

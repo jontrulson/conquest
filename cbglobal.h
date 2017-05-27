@@ -4,7 +4,7 @@
  * Copyright Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
  ***********************************************************************/
 
-#include "datatypes.h"
+
 #include "defs.h"
 
 #ifndef _CBGLOBAL_H

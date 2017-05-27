@@ -7,7 +7,7 @@
 #ifndef SHIP_H_INCLUDED
 #define SHIP_H_INCLUDED
 
-#include "datatypes.h"
+
 #include "conqdef.h"
 #include "torp.h"
 
@@ -91,8 +91,8 @@ typedef struct {
   int eacc;			/* accumulated elapsed time */
   real strkills;		/* 'extra' randomized kills used for robots */
   Torp_t torps[MAXTORPS];	/* Torpedos */
-  Unsgn16 flags;		/* SHIP_F_ */
-  Unsgn16 pad1;			/* PAD */
+  uint16_t flags;		/* SHIP_F_ */
+  uint16_t pad1;			/* PAD */
   char alias[MAXUSERPNAME];	/* user's pseudonym, copy of Users[].alias */
 } Ship_t;
 

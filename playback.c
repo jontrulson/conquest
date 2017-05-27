@@ -12,7 +12,7 @@
 #include "conf.h"
 #include "global.h"
 #include "color.h"
-#include "datatypes.h"
+
 #include "protocol.h"
 #include "packet.h"
 #include "conqutil.h"

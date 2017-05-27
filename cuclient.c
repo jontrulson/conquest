@@ -60,7 +60,7 @@ void cucPseudo( int unum, int snum )
 void cucDoWar( int snum )
 {
   int i, entertime, now; 
-  Unsgn8 war;
+  uint8_t war;
   int twar[NUMPLAYERTEAMS], dowait;
   int ch;
   
@@ -100,7 +100,7 @@ void cucDoWar( int snum )
 	      Ships[snum].war[i] = twar[i];
 	    }
 	  
-	  sendCommand(CPCMD_SETWAR, (Unsgn16)war);
+	  sendCommand(CPCMD_SETWAR, (uint16_t)war);
 
 	  /* Only check for computer delay when flying. */
 	  if ( Ships[snum].status != SS_RESERVED && dowait )

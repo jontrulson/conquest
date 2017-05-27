@@ -30,7 +30,7 @@
 #define LISTEN_BACKLOG 5 /* # of requests we're willing to to queue */
 
 metaSRec_t metaServerList[META_MAXSERVERS];
-static Unsgn16 listenPort = META_DFLT_PORT;
+static uint16_t listenPort = META_DFLT_PORT;
 static char *progName;
 static int localOnly = FALSE;   /* whether to only listen on loopback */
 static int maxSlot = 0;         /* the max slot we've ever used */
@@ -408,7 +408,7 @@ int main(int argc, char *argv[])
         break; 
 
       case 'p':
-	listenPort = (Unsgn16)atoi(optarg);
+	listenPort = (uint16_t)atoi(optarg);
 	break;
 
       case 'l':                 /* local conn only */

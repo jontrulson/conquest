@@ -82,7 +82,7 @@ int metaBuffer2ServerRec(metaSRec_t *srec, char *buf)
 
       case 2:                   /* server port */
         *ch = 0;
-        srec->port = (Unsgn16)atoi(chs);
+        srec->port = (uint16_t)atoi(chs);
 
         chs = ch + 1;
         fieldno++;
@@ -116,7 +116,7 @@ int metaBuffer2ServerRec(metaSRec_t *srec, char *buf)
       case 6:                   /* total ships */
         *ch = 0;
 
-        srec->numtotal = (Unsgn8)atoi(chs);
+        srec->numtotal = (uint8_t)atoi(chs);
 
         chs = ch + 1;
         fieldno++;
@@ -125,7 +125,7 @@ int metaBuffer2ServerRec(metaSRec_t *srec, char *buf)
       case 7:                   /* active ships */
         *ch = 0;
 
-        srec->numactive = (Unsgn8)atoi(chs);
+        srec->numactive = (uint8_t)atoi(chs);
 
         chs = ch + 1;
         fieldno++;
@@ -134,7 +134,7 @@ int metaBuffer2ServerRec(metaSRec_t *srec, char *buf)
       case 8:                   /* vacant */
         *ch = 0;
 
-        srec->numvacant = (Unsgn8)atoi(chs);
+        srec->numvacant = (uint8_t)atoi(chs);
 
         chs = ch + 1;
         fieldno++;
@@ -143,7 +143,7 @@ int metaBuffer2ServerRec(metaSRec_t *srec, char *buf)
       case 9:                   /* robot */
         *ch = 0;
 
-        srec->numrobot = (Unsgn8)atoi(chs);
+        srec->numrobot = (uint8_t)atoi(chs);
 
         chs = ch + 1;
         fieldno++;
@@ -153,7 +153,7 @@ int metaBuffer2ServerRec(metaSRec_t *srec, char *buf)
       case 10:                   /* flags */
         *ch = 0;
 
-        srec->flags = (Unsgn32)atol(chs);
+        srec->flags = (uint32_t)atol(chs);
 
         chs = ch + 1;
         fieldno++;
@@ -163,7 +163,7 @@ int metaBuffer2ServerRec(metaSRec_t *srec, char *buf)
         /* meta version 0x0002+ */
       case 11:                  /* server protocol version */
         *ch = 0;
-        srec->protovers = (Unsgn16)atoi(chs);
+        srec->protovers = (uint16_t)atoi(chs);
 
         chs = ch + 1;
         fieldno++;

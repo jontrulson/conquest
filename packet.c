@@ -7,7 +7,7 @@
  * Copyright Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
  ***********************************************************************/
 
-#include "datatypes.h"
+
 #include "conf.h"
 #include "protocol.h"
 #include "conqutil.h"
@@ -45,7 +45,7 @@ static int nonBlocking = FALSE;
  * supported) protocol.
  */
 
-static Unsgn16 clientProtoVers = PROTOCOL_VERSION;
+static uint16_t clientProtoVers = PROTOCOL_VERSION;
 
 /* these need to be kept in sync with the protocol numbers in
  *  protocol.h
@@ -448,7 +448,7 @@ void pktSetClientMode(int isclient)
 }
 
 /* set the desired protocol version compatibility for the client */
-int pktSetClientProtocolVersion(Unsgn16 vers)
+int pktSetClientProtocolVersion(uint16_t vers)
 {
   switch (vers)
     {
@@ -506,7 +506,7 @@ void pktSetSocketFds(int tcpsock, int udpsock)
  * string message as well. We always send acks via TCP.
  */
 
-int pktSendAck(Unsgn8 severity, Unsgn8 code, char *msg)
+int pktSendAck(uint8_t severity, uint8_t code, char *msg)
 {
   cpAck_t cack;
   spAck_t sack;
@@ -671,10 +671,10 @@ int pktSocketHasData(int sock)
  * If update is FALSE, then we do not actually remove the data from
  * the RB.
  */
-static Unsgn8 _pktReadGetRB(ringBuffer_t *RB, void *buf, int blen, int update)
+static uint8_t _pktReadGetRB(ringBuffer_t *RB, void *buf, int blen, int update)
 {
   int bu, len;
-  Unsgn8 type = 0;
+  uint8_t type = 0;
   char tmppacket[PKT_MAXSIZE];
   char *packet;
 
@@ -720,7 +720,7 @@ static Unsgn8 _pktReadGetRB(ringBuffer_t *RB, void *buf, int blen, int update)
           /* now get the whole packet, removing it from the RB if
            *  update == TRUE
            */
-          rbGet(RB, (Unsgn8 *)packet, len, update);
+          rbGet(RB, (uint8_t *)packet, len, update);
 
           /* we check for CP_COMMAND->CPCMD_KEEPALIVE (server-side
            * only) packets here.  If found, we remove it and just
@@ -793,7 +793,7 @@ static int _pktReadSocket(int sock, ringBuffer_t *RB, void *buf, int blen)
        */
       if (buf && !rbBytesUsed(RB))
         {
-          type = (Unsgn8)packet[0];
+          type = (uint8_t)packet[0];
           
           if (isClient)
             len = pktServerPacketSize(type);
@@ -807,14 +807,14 @@ static int _pktReadSocket(int sock, ringBuffer_t *RB, void *buf, int blen)
                * just put the rest in the RB :)
                */
               if ((rv - len) > 0)
-                rbPut(RB, (Unsgn8 *)&packet[len], rv - len);
+                rbPut(RB, (uint8_t *)&packet[len], rv - len);
               
               return type;
             }
         }
 
       /* otherwise just put what we got into the RB */
-      rbPut(RB, (Unsgn8 *)packet, rv);
+      rbPut(RB, (uint8_t *)packet, rv);
     }
 
   return 0;
@@ -1023,14 +1023,14 @@ static int _pktDrainRB(int sock, ringBuffer_t *RB)
 int pktWrite(int socktype, void *data)
 {
   int len;
-  Unsgn8 type;
+  uint8_t type;
   int rv;
   char *packet = (char *)data;
   char *ptr;
   int sock;
   ringBuffer_t *RB;
 
-  type = (Unsgn8)*packet;	/* first byte is ALWAYS pkt type */
+  type = (uint8_t)*packet;	/* first byte is ALWAYS pkt type */
 
   if (connDead) 
     return -1;
@@ -1097,12 +1097,12 @@ int pktWrite(int socktype, void *data)
 /* Simply check pkt for non-NULL, and compare pkttype with packet's type */
 int pktIsValid(int pkttype, void *pkt)
 {
-  Unsgn8 *p = (Unsgn8 *)pkt;
+  uint8_t *p = (uint8_t *)pkt;
 
   if (!p)
     return FALSE;
 
-  if (((Unsgn8) *p) != pkttype)
+  if (((uint8_t) *p) != pkttype)
     return FALSE;
 
   return TRUE;

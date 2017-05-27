@@ -9,7 +9,7 @@
 #include "c_defs.h"
 #include "context.h"
 #include "global.h"
-#include "datatypes.h"
+
 #include "color.h"
 #include "conf.h"
 #include "gldisplay.h"

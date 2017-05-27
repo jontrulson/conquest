@@ -6,7 +6,7 @@
 
 #include "c_defs.h"
 #include "global.h"
-#include "datatypes.h"
+
 #include "color.h"
 #include "gldisplay.h"
 #include "glmisc.h"

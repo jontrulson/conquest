@@ -21,7 +21,7 @@
 #include "record.h"
 #include "playback.h"
 #include "conf.h"
-#include "datatypes.h"
+
 #include "protocol.h"
 #include "packet.h"
 #include "client.h"

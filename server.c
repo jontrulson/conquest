@@ -42,8 +42,8 @@ static void handleUDPErr(void)
   return;
 }
 
-int sendClientStat(int sock, Unsgn8 flags, Unsgn8 snum, Unsgn8 team, 
-		   Unsgn16 unum, Unsgn8 esystem)
+int sendClientStat(int sock, uint8_t flags, uint8_t snum, uint8_t team, 
+		   uint16_t unum, uint8_t esystem)
 {
   spClientStat_t scstat;
 
@@ -67,7 +67,7 @@ int sendClientStat(int sock, Unsgn8 flags, Unsgn8 snum, Unsgn8 team,
     return TRUE;
 }
 
-int sendUser(int sock, Unsgn16 unum)
+int sendUser(int sock, uint16_t unum)
 {
   spUser_t *suser;
 
@@ -90,7 +90,7 @@ int sendUser(int sock, Unsgn16 unum)
 }
 
 /* we have the potential to send a few packets here. */
-int sendShip(int sock, Unsgn8 snum)
+int sendShip(int sock, uint8_t snum)
 {
   spShip_t *sship;
   spShipSml_t *sshipsml;
@@ -144,7 +144,7 @@ int sendShip(int sock, Unsgn8 snum)
 }
 
 /* we have the potential to send 3 packets here. */
-int sendPlanet(int sock, Unsgn8 pnum, int force)
+int sendPlanet(int sock, uint8_t pnum, int force)
 {
   spPlanet_t *splan;
   spPlanetSml_t *splansml;
@@ -261,9 +261,9 @@ int sendServerStat(int socktype)
   /* send out the current flags */
   sStat.flags = getServerFlags();
 
-  sStat.flags = (Unsgn32)htonl(sStat.flags);
+  sStat.flags = (uint32_t)htonl(sStat.flags);
 
-  sStat.servertime = (Unsgn32)htonl(getnow(NULL, 0));
+  sStat.servertime = (uint32_t)htonl(getnow(NULL, 0));
   
   if (pktWrite(socktype, &sStat) <= 0)
     {
@@ -274,7 +274,7 @@ int sendServerStat(int socktype)
   return TRUE;
 }
 
-int sendTorp(int sock, Unsgn8 tsnum, Unsgn8 tnum)
+int sendTorp(int sock, uint8_t tsnum, uint8_t tnum)
 {
   spTorp_t *storp;
   spTorpLoc_t *storploc;
@@ -378,8 +378,8 @@ int sendMessage(Msg_t *msg)
 
   smsg.type = SP_MESSAGE;
   
-  smsg.from = (Sgn16)htons(msg->msgfrom);
-  smsg.to = (Sgn16)htons(msg->msgto);
+  smsg.from = (int16_t)htons(msg->msgfrom);
+  smsg.to = (int16_t)htons(msg->msgto);
   smsg.flags = msg->flags;
   
   strncpy((char *)smsg.msg, msg->msgbuf, MESSAGE_SIZE - 1);
@@ -398,7 +398,7 @@ int sendMessage(Msg_t *msg)
   return TRUE;
 }
 
-int sendTeam(int sock, Unsgn8 team, int force)
+int sendTeam(int sock, uint8_t team, int force)
 {
   spTeam_t *steam;
 

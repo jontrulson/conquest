@@ -8,7 +8,7 @@
  */
 
 #include "c_defs.h"
-#include "datatypes.h"
+
 #include "conqdef.h"
 #include "conqcom.h"
 #include "context.h"
@@ -41,7 +41,7 @@ static int _mus_idx = -1;       /* current music index */
 /* need to start an new song when the current one fades out */
 static int _mus_que = -1;
 
-extern Unsgn32 frameTime;
+extern uint32_t frameTime;
 
 /* called when music finishes */
 static void _music_finished(void)

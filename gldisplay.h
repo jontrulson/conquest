@@ -47,17 +47,17 @@ typedef struct _dspConfig {
   GLfloat      hudProjection[16]; /* hud proj matrix */
   GLfloat      viewerProjection[16]; /* viewer proj matrix */
 
-  Unsgn32      flags; 
+  uint32_t      flags; 
 
   int          initWidth, initHeight; /* initial wxh geometry */
 } dspConfig_t;
 
 #ifdef NOEXTERN_DCONF
 dspConfig_t dConf;
-Unsgn32     frameTime;
+uint32_t     frameTime;
 #else
 extern dspConfig_t dConf;
-extern Unsgn32     frameTime;
+extern uint32_t     frameTime;
 #endif
 
 

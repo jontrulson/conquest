@@ -51,7 +51,7 @@
 #include "conquest.h"
 
 struct _srvvec {
-  Unsgn16 vers;
+  uint16_t vers;
   char hostname[MAXHOSTNAME + 10];
 };
 
@@ -146,7 +146,7 @@ int getLocalhost(char *buf, int len)
   return TRUE;
 }
 
-int connectServer(char *remotehost, Unsgn16 remoteport)
+int connectServer(char *remotehost, uint16_t remoteport)
 {
   int s;
   struct sockaddr_in sa;
@@ -532,7 +532,7 @@ int main(int argc, char *argv[])
 /*    int flag, capentry */
 /*    int capentry, snum, system */
 /*    system = capentry( snum, system ) */
-int selectentry( Unsgn8 esystem )
+int selectentry( uint8_t esystem )
 {
   int i; 
   int ch; 
@@ -578,7 +578,7 @@ int selectentry( Unsgn8 esystem )
 	  break;
 	case TERM_EXTRA:
 	  /* Enter the home system. */
-	  sendCommand(CPCMD_ENTER, (Unsgn16)(1 << Ships[Context.snum].team));
+	  sendCommand(CPCMD_ENTER, (uint16_t)(1 << Ships[Context.snum].team));
 	  return ( TRUE );
 	  break;
 	default:
@@ -586,7 +586,7 @@ int selectentry( Unsgn8 esystem )
 	    if ( Teams[i].teamchar == (char)toupper( ch ) && owned[i] )
 	      {
 		/* Found a good one. */
-		sendCommand(CPCMD_ENTER, (Unsgn16)(1 << i));
+		sendCommand(CPCMD_ENTER, (uint16_t)(1 << i));
 		return ( TRUE );
 	      }
 	  /* Didn't get a good one; complain and try again. */
@@ -1271,7 +1271,7 @@ void doalloc( int snum )
       return;
     }
 
-  sendCommand(CPCMD_ALLOC, (Unsgn16)dwalloc);
+  sendCommand(CPCMD_ALLOC, (uint16_t)dwalloc);
 
   cdclrl( MSG_LIN1, 1 );
   
@@ -1549,8 +1549,8 @@ void dobeam( int snum )
   /* detail is (armies & 0x00ff), 0x8000 set if beaming down */
 
   sendCommand(CPCMD_BEAM, 
-	      (dirup) ? (Unsgn16)(num & 0x00ff): 
-	      (Unsgn16)((num & 0x00ff) | 0x8000));
+	      (dirup) ? (uint16_t)(num & 0x00ff): 
+	      (uint16_t)((num & 0x00ff) | 0x8000));
 
   while(TRUE)			/* repeat infloop */
     {
@@ -1839,7 +1839,7 @@ void dorefit( int snum, int dodisplay )
   cdclrl( MSG_LIN1, 1 );
   cdclrl( MSG_LIN2, 1 );
   mcuPutMsg( "Refitting ship...", MSG_LIN1 );
-  sendCommand(CPCMD_REFIT, (Unsgn16)stype);
+  sendCommand(CPCMD_REFIT, (uint16_t)stype);
   cdrefresh();
   utGrand( &entertime );
   while ( utDeltaGrand( entertime, &now ) < REFIT_GRAND )
@@ -2097,7 +2097,7 @@ void dodistress( int snum )
   cbuf[0] = EOS;
   if ( cdgetx( pmt, MSG_LIN1, 1, TERMS, cbuf, MSGMAXLINE,
 	       TRUE) == TERM_EXTRA )
-    sendCommand(CPCMD_DISTRESS, (Unsgn16)UserConf.DistressToFriendly);
+    sendCommand(CPCMD_DISTRESS, (uint16_t)UserConf.DistressToFriendly);
   
   cdclrl( MSG_LIN1, 1 );
   
@@ -2334,7 +2334,7 @@ void dolastphase( int snum )
 {
   cdclrl( MSG_LIN1, 1 );
   
-  sendCommand(CPCMD_FIREPHASER, (Unsgn16)(Ships[snum].lastphase * 100.0));
+  sendCommand(CPCMD_FIREPHASER, (uint16_t)(Ships[snum].lastphase * 100.0));
   cdclrl( MSG_LIN2, 1 );
   
   return;
@@ -2408,7 +2408,7 @@ void dophase( int snum )
   if ( mcuGetTarget( "Fire phasers: ", MSG_LIN1, 1, &dir, Ships[snum].lastblast ) )
     {
       mcuPutMsg( "Firing phasers...", MSG_LIN2 );
-      sendCommand(CPCMD_FIREPHASER, (Unsgn16)(dir * 100.0));
+      sendCommand(CPCMD_FIREPHASER, (uint16_t)(dir * 100.0));
     }
   else
     {
@@ -2539,7 +2539,7 @@ void doselfdest(int snum)
 void doshields( int snum, int up )
 {
 
-  if (!sendCommand(CPCMD_SETSHIELDS, (Unsgn16)up))
+  if (!sendCommand(CPCMD_SETSHIELDS, (uint16_t)up))
     return;
 
   if ( up )
@@ -2660,7 +2660,7 @@ void dotow( int snum )
   i = 0;
   utSafeCToI( &other, cbuf, i );		/* ignore status */
 
-  sendCommand(CPCMD_TOW, (Unsgn16)other);
+  sendCommand(CPCMD_TOW, (uint16_t)other);
 
   return;
   
@@ -2679,7 +2679,7 @@ void dowarp( int snum, real warp )
   /* Handle ship limitations. */
   
   warp = min( warp, ShipTypes[Ships[snum].shiptype].warplim );
-  if (!sendCommand(CPCMD_SETWARP, (Unsgn16)warp))
+  if (!sendCommand(CPCMD_SETWARP, (uint16_t)warp))
     return;
   
   sprintf( cbuf, "Warp %d.", (int) warp );
@@ -2991,7 +2991,7 @@ void menu(void)
                       Ships[Context.snum].war[Ships[Context.snum].team] = FALSE;
                       Users[Context.unum].war[Users[Context.unum].team] = FALSE;
                       
-                      sendCommand(CPCMD_SWITCHTEAM, (Unsgn16)Ships[Context.snum].team);
+                      sendCommand(CPCMD_SWITCHTEAM, (uint16_t)Ships[Context.snum].team);
                     }
                   break;
                 case 'S':
@@ -3536,9 +3536,9 @@ void astservice(int sig)
   int now;
   int difftime;
   char buf[PKT_MAXSIZE];
-  static Unsgn32 iterstart = 0;
-  Unsgn32 iternow = clbGetMillis();
-  const Unsgn32 iterwait = 50.0; /* ms */
+  static uint32_t iterstart = 0;
+  uint32_t iternow = clbGetMillis();
+  const uint32_t iterwait = 50.0; /* ms */
   real tdelta = (real)iternow - (real)iterstart;
 
   stopTimer();

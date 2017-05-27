@@ -5,7 +5,7 @@
 #ifndef _TEXTURES_H
 #define _TEXTURES_H 
 
-#include "datatypes.h"
+
 #include "conqinit.h"
 #include "color.h"
 
@@ -20,7 +20,7 @@ typedef struct _GLtexture {
   int cqiIndex;                 /* index into cqiTextures[] */
   GLint id;                     /* GL texture id */
   GLColor_t col;                /* default texture color */
-  Unsgn32 w, h;                 /* width/height of texture */
+  uint32_t w, h;                 /* width/height of texture */
 } GLTexture_t;  
 
 typedef struct _GLtexcoord {

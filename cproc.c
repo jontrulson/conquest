@@ -30,7 +30,7 @@
 #include "ui.h"
 
 /* disptach init */
-int procDispatchInit(Unsgn16 vers, packetEnt_t *pktList, int numpkts)
+int procDispatchInit(uint16_t vers, packetEnt_t *pktList, int numpkts)
 {
   int i;
   dispatchProc_t *procs = NULL;
@@ -75,7 +75,7 @@ int procUser(char *buf)
   if (!pktIsValid(SP_USER, buf))
     return FALSE;
 
-  unum = (int)((Unsgn16)ntohs(suser->unum));
+  unum = (int)((uint16_t)ntohs(suser->unum));
 
 #if defined(DEBUG_CLIENTPROC)
   utLog("%s: unum = %d", __FUNCTION__, unum);
@@ -96,14 +96,14 @@ int procUser(char *buf)
     if ((suser->war & (1 << i)))
       Users[unum].war[i] = TRUE;
 
-  Users[unum].rating = (real)((real)((Sgn16)ntohs(suser->rating)) / 100.0);
+  Users[unum].rating = (real)((real)((int16_t)ntohs(suser->rating)) / 100.0);
   Users[unum].lastentry = (time_t)ntohl(suser->lastentry);
 
   for (i=0; i<OOPT_TOTALOOPTION; i++)
-    Users[unum].ooptions[i] = (Sgn32)ntohl(suser->ooptions[i]);
+    Users[unum].ooptions[i] = (int32_t)ntohl(suser->ooptions[i]);
 
   for (i=0; i<USTAT_TOTALSTATS; i++)
-    Users[unum].stats[i] = (Sgn32)ntohl(suser->stats[i]);
+    Users[unum].stats[i] = (int32_t)ntohl(suser->stats[i]);
 
   strncpy(Users[unum].username, (char *)suser->username, MAXUSERNAME - 1);
   strncpy(Users[unum].alias, (char *)suser->alias, MAXUSERPNAME - 1);
@@ -153,7 +153,7 @@ int procShip(char *buf)
     else
       Ships[snum].rwar[i] = FALSE;
 
-  Ships[snum].killedby = (int)((Sgn16)ntohs(sship->killedby));
+  Ships[snum].killedby = (int)((int16_t)ntohs(sship->killedby));
   Ships[snum].kills = (real)((real)ntohl(sship->kills) / 10.0);
 
   for (i=1; i<=NUMPLANETS; i++)
@@ -189,13 +189,13 @@ int procShipSml(char *buf)
     recWriteEvent(buf);
 
   /* we need to mask out map since it's always local */
-  Ships[snum].flags = ((((Unsgn16)ntohs(sshipsml->flags)) & ~SHIP_F_MAP) | SMAP(snum));
+  Ships[snum].flags = ((((uint16_t)ntohs(sshipsml->flags)) & ~SHIP_F_MAP) | SMAP(snum));
 
   Ships[snum].action = sshipsml->action;
   Ships[snum].shields = sshipsml->shields;
   Ships[snum].damage = sshipsml->damage;
   Ships[snum].armies = sshipsml->armies;
-  Ships[snum].sdfuse = (int)((Sgn16)ntohs(sshipsml->sdfuse));
+  Ships[snum].sdfuse = (int)((int16_t)ntohs(sshipsml->sdfuse));
 
   Ships[snum].wfuse = (int)sshipsml->wfuse;
   Ships[snum].efuse = (int)sshipsml->efuse;
@@ -207,10 +207,10 @@ int procShipSml(char *buf)
 
   Ships[snum].etemp = (real)sshipsml->etemp;
   Ships[snum].wtemp = (real)sshipsml->wtemp;
-  Ships[snum].fuel = (real)((Unsgn16)ntohs(sshipsml->fuel));
-  Ships[snum].lock = (int)((Sgn16)ntohs(sshipsml->lock));
-  Ships[snum].lastphase = (real)((Unsgn16)ntohs(sshipsml->lastphase)) / 100.0;
-  Ships[snum].lastblast = (real)((Unsgn16)ntohs(sshipsml->lastblast)) / 100.0;
+  Ships[snum].fuel = (real)((uint16_t)ntohs(sshipsml->fuel));
+  Ships[snum].lock = (int)((int16_t)ntohs(sshipsml->lock));
+  Ships[snum].lastphase = (real)((uint16_t)ntohs(sshipsml->lastphase)) / 100.0;
+  Ships[snum].lastblast = (real)((uint16_t)ntohs(sshipsml->lastblast)) / 100.0;
 
   return TRUE;
 }
@@ -238,8 +238,8 @@ int procShipLoc(char *buf)
   Ships[snum].head = (real)((real)ntohs(sshiploc->head) / 10.0);
   Ships[snum].warp = (real)((real)sshiploc->warp / 10.0);
 
-  Ships[snum].x = (real)((real)((Sgn32)ntohl(sshiploc->x)) / 1000.0);
-  Ships[snum].y = (real)((real)((Sgn32)ntohl(sshiploc->y)) / 1000.0);
+  Ships[snum].x = (real)((real)((int32_t)ntohl(sshiploc->x)) / 1000.0);
+  Ships[snum].y = (real)((real)((int32_t)ntohl(sshiploc->y)) / 1000.0);
 
   return TRUE;
 }
@@ -319,9 +319,9 @@ int procPlanetLoc(char *buf)
   if (Context.recmode == RECMODE_ON)
     recWriteEvent(buf);
 
-  Planets[pnum].armies = (int)((Sgn16)ntohs(splanloc->armies));
-  Planets[pnum].x = (real)((real)((Sgn32)ntohl(splanloc->x)) / 1000.0);
-  Planets[pnum].y = (real)((real)((Sgn32)ntohl(splanloc->y)) / 1000.0);
+  Planets[pnum].armies = (int)((int16_t)ntohs(splanloc->armies));
+  Planets[pnum].x = (real)((real)((int32_t)ntohl(splanloc->x)) / 1000.0);
+  Planets[pnum].y = (real)((real)((int32_t)ntohl(splanloc->y)) / 1000.0);
 
   return TRUE;
 }
@@ -342,10 +342,10 @@ int procPlanetLoc2(char *buf)
   if (Context.recmode == RECMODE_ON)
     recWriteEvent(buf);
 
-  Planets[pnum].armies = (int)((Sgn16)ntohs(splanloc2->armies));
-  Planets[pnum].x = (real)((real)((Sgn32)ntohl(splanloc2->x)) / 1000.0);
-  Planets[pnum].y = (real)((real)((Sgn32)ntohl(splanloc2->y)) / 1000.0);
-  Planets[pnum].orbang = (real)((real)((Unsgn16)ntohs(splanloc2->orbang)) / 100.0);
+  Planets[pnum].armies = (int)((int16_t)ntohs(splanloc2->armies));
+  Planets[pnum].x = (real)((real)((int32_t)ntohl(splanloc2->x)) / 1000.0);
+  Planets[pnum].y = (real)((real)((int32_t)ntohl(splanloc2->y)) / 1000.0);
+  Planets[pnum].orbang = (real)((real)((uint16_t)ntohs(splanloc2->orbang)) / 100.0);
 
   return TRUE;
 }
@@ -392,8 +392,8 @@ int procPlanetInfo(char *buf)
     }
 
   Planets[pnum].primary = primary;
-  Planets[pnum].orbrad = (real)((real)((Unsgn32)ntohl(splaninfo->orbrad)) / 10.0);
-  Planets[pnum].orbvel = (real)((real)((Sgn32)ntohl(splaninfo->orbvel)) / 100.0);
+  Planets[pnum].orbrad = (real)((real)((uint32_t)ntohl(splaninfo->orbrad)) / 10.0);
+  Planets[pnum].orbvel = (real)((real)((int32_t)ntohl(splaninfo->orbvel)) / 100.0);
 
   return TRUE;
 }
@@ -450,8 +450,8 @@ int procTorpLoc(char *buf)
     else 
       Ships[snum].torps[tnum].war[i] = FALSE;
   
-  Ships[snum].torps[tnum].x = (real)((real)((Sgn32)ntohl(storploc->x)) / 1000.0);
-  Ships[snum].torps[tnum].y = (real)((real)((Sgn32)ntohl(storploc->y)) / 1000.0);
+  Ships[snum].torps[tnum].x = (real)((real)((int32_t)ntohl(storploc->x)) / 1000.0);
+  Ships[snum].torps[tnum].y = (real)((real)((int32_t)ntohl(storploc->y)) / 1000.0);
 
   return TRUE;
 }
@@ -486,14 +486,14 @@ int procTorpEvent(char *buf)
       Ships[snum].torps[tnum].war[i] = FALSE;
   
   Ships[snum].torps[tnum].x = 
-    (real)((real)((Sgn32)ntohl(storpev->x)) / 1000.0);
+    (real)((real)((int32_t)ntohl(storpev->x)) / 1000.0);
   Ships[snum].torps[tnum].y = 
-    (real)((real)((Sgn32)ntohl(storpev->y)) / 1000.0);
+    (real)((real)((int32_t)ntohl(storpev->y)) / 1000.0);
 
   Ships[snum].torps[tnum].dx = 
-    (real)((real)((Sgn32)ntohl(storpev->dx)) / 1000.0);
+    (real)((real)((int32_t)ntohl(storpev->dx)) / 1000.0);
   Ships[snum].torps[tnum].dy = 
-    (real)((real)((Sgn32)ntohl(storpev->dy)) / 1000.0);
+    (real)((real)((int32_t)ntohl(storpev->dy)) / 1000.0);
 
   uiUpdateTorpDir(snum, tnum);
 
@@ -510,8 +510,8 @@ int procMessage(char *buf)
 
 
   smsg->msg[MESSAGE_SIZE - 1] = 0;
-  smsg->from = (int)((Sgn16)ntohs(smsg->from));
-  smsg->to = (int)((Sgn16)ntohs(smsg->to));
+  smsg->from = (int)((int16_t)ntohs(smsg->from));
+  smsg->to = (int)((int16_t)ntohs(smsg->to));
 
   /* special handling when playing back a recording */
   if (Context.recmode == RECMODE_PLAYING)
@@ -640,8 +640,8 @@ int procHistory(char *buf)
   ConqInfo->histptr = hist->histptr;
   History[hnum].histunum = (int)ntohs(hist->unum);
 
-  History[hnum].elapsed = (time_t)ntohl((Unsgn32)hist->elapsed);
-  History[hnum].histlog = (time_t)ntohl((Unsgn32)hist->histlog);
+  History[hnum].elapsed = (time_t)ntohl((uint32_t)hist->elapsed);
+  History[hnum].histlog = (time_t)ntohl((uint32_t)hist->histlog);
 
   /* FIXME: need to extract username from hist packet when
      new protocol. */
@@ -661,8 +661,8 @@ int procDoomsday(char *buf)
 
   Doomsday->status = dd->status;
   Doomsday->heading =(real)((real)ntohs(dd->heading) / 10.0);
-  Doomsday->x = (real)((real)((Sgn32)ntohl(dd->x)) / 1000.0);
-  Doomsday->y = (real)((real)((Sgn32)ntohl(dd->y)) / 1000.0);
+  Doomsday->x = (real)((real)((int32_t)ntohl(dd->x)) / 1000.0);
+  Doomsday->y = (real)((real)((int32_t)ntohl(dd->y)) / 1000.0);
 
   return TRUE;
 }
@@ -738,14 +738,14 @@ int procFrame(char *buf)
     {
       frame = (spFrame_t *)buf;
       /* endian correction*/
-      frame->time = (Unsgn32)ntohl(frame->time);
-      frame->frame = (Unsgn32)ntohl(frame->frame);
+      frame->time = (uint32_t)ntohl(frame->time);
+      frame->frame = (uint32_t)ntohl(frame->frame);
       
       if (recStartTime == (time_t)0)
         recStartTime = (time_t)frame->time;
       recCurrentTime = (time_t)frame->time;
       
-      recFrameCount = (Unsgn32)frame->frame;
+      recFrameCount = (uint32_t)frame->frame;
 
       /* save a copy in the global variant */
       sFrame.type = frame->type;

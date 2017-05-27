@@ -22,7 +22,7 @@
 
 #if defined(HAVE_UNISTD_H)
 # include <unistd.h>
-#endif 
+#endif
 
 #if defined(HAVE_CRYPT_H)
 # include <crypt.h>
@@ -31,7 +31,7 @@
 /* DARWIN does not need this, crypt is in unistd.h */
 extern char *crypt(char *, char *);
 # endif
-#endif 
+#endif
 
 #if defined(STDC_HEADERS)
 # include <stdlib.h>
@@ -40,11 +40,13 @@ extern char *crypt(char *, char *);
 # include <errno.h>
 # include <signal.h>
 # include <stdarg.h>
-#endif 
+# include <stdbool.h>
+# include <stdint.h>
+#endif
 
-#ifndef SIGCLD                                                     
+#ifndef SIGCLD
 #define SIGCLD SIGCHLD
-#endif 
+#endif
 
 #if !defined(MINGW)
 /* JET - need checks here? */
@@ -67,11 +69,11 @@ extern char *crypt(char *, char *);
 
 #if defined(HAVE_STRING_H)
 # include <string.h>
-#endif 
+#endif
 
 #if defined(HAVE_STRINGS_H)
 # include <strings.h>
-#endif 
+#endif
 
 #ifndef _POSIX_C_SOURCE
 // We need at least 199309L for nanosleep()
@@ -287,4 +289,3 @@ int rndbin ( int trials, real prob );
 int rndpoi ( real mean );
 
 #endif /* _C_DEFS_H */
-

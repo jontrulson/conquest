@@ -23,7 +23,7 @@ rm -rf $CONQVER
 echo Arcive name: $ARCFILE
 
 FILELIST="ratfor.c cd2lb.h cd2lb.c iolb.h iolb.c conqlb.c
-	rndlb.c cumisc.h cumisc.c conqcm.c conqsvr42.c  
+	rndlb.c cumisc.h cumisc.c conqcm.c conqsvr42.c
 	ibuf.c ibuf.h version.c conf.c sem.c conquest.c conqoper.c conqdriv.c
 	conqai.c c_defs.h color.h conqcom.h conqdata.h defs.h sem.h
 	conf.h context.h conqdef.h global.h color.c userauth.c options.h
@@ -31,27 +31,27 @@ FILELIST="ratfor.c cd2lb.h cd2lb.c iolb.h iolb.c conqlb.c
 	ship.h user.h planet.h team.h torp.h msg.h doomsday.h
 	driver.h conqinfo.h robot.h history.h shiptype.h
 	HISTORY configure.ac configure
-	config.h.in config.guess config.sub Makefile.in README  
-	conqstrat.h conqstrat-lex.l conqstrat-yacc.y 
+	config.h.in config.guess config.sub Makefile.in README
+	conqstrat.h conqstrat-lex.l conqstrat-yacc.y
         conqrule Makefile.am aclocal.m4 depcomp install-sh ltmain.sh
         mkinstalldirs missing conqai_main.c conqrule.easy
-        record.h record.c conqreplay.c 
+        record.h record.c conqreplay.c
 	COPYRIGHT LICENSE INSTALL  CREDITS display.h
-        conquest.h display.c disputil.h client.h client.c clientlb.h 
+        conquest.h display.c disputil.h client.h client.c clientlb.h
         clientlb.c server.h server.c packet.h packet.c protocol.h
-        conqnet.h datatypes.h userauth.h servauth.h clntauth.h 
-        clntauth.c servauth.c conquestd.c serverpkt.c serverpkt.h 
-        servercmd.h servercmd.c 
-        conqmetad.c meta.c meta.h acinclude.m4 
-        README.cygwin texfont.c TexFont.h 
+        conqnet.h userauth.h servauth.h clntauth.h
+        clntauth.c servauth.c conquestd.c serverpkt.c serverpkt.h
+        servercmd.h servercmd.c
+        conqmetad.c meta.c meta.h acinclude.m4
+        README.cygwin texfont.c TexFont.h
         cprintf.h cprintf.c glfont.h glfont.c
-        glmisc.h glmisc.c nMeta.c nMeta.h cqkeys.h 
+        glmisc.h glmisc.c nMeta.c nMeta.h cqkeys.h
         prm.c prm.h nAuth.h nAuth.c GL.c GL.h
         nCP.c nCP.h nConsvr.c nConsvr.h nMenu.c nMenu.h nPlay.c nPlay.h
-        nWelcome.c nWelcome.h nDead.h nDead.c nCPHelp.h nCPHelp.c 
-        nShipl.h nShipl.c node.c node.h nPlanetl.h nPlanetl.c 
+        nWelcome.c nWelcome.h nDead.h nDead.c nCPHelp.h nCPHelp.c
+        nShipl.h nShipl.c node.c node.h nPlanetl.h nPlanetl.c
         nTeaml.h nTeaml.c nUserl.h nUserl.c nHistl.h nHistl.c
-        gldisplay.h gldisplay.c glcprintf.c conquestgl.c 
+        gldisplay.h gldisplay.c glcprintf.c conquestgl.c
         render.h render.c nPlayBMenu.h nPlayBMenu.c playback.h
         playback.c nPlayB.h nPlayB.c nPlayBHelp.h nPlayBHelp.c
         nOptions.h nOptions.c colorGL.c colorCU.c cuclient.c ui.h uimisc.c
@@ -59,8 +59,8 @@ FILELIST="ratfor.c cd2lb.h cd2lb.c iolb.h iolb.c conqlb.c
         planinit.c textures.h conqinit.h conqinit.c conqinit-lex.l
         conqinitrc texturesrc anim.h anim.c CONQINIT.TXT cqmouse.h
         cqsound.h cqsound.c sounddata.h soundrc tcpwrap.h tcpwrap.c
-        rb.h rb.c hud.c hud.h conqutil.c conqutil.h blinker.h blinker.c 
-        cproc.h cproc.c sproc.h sproc.c"  
+        rb.h rb.c hud.c hud.h conqutil.c conqutil.h blinker.h blinker.c
+        cproc.h cproc.c sproc.h sproc.c"
 
 IMAGES="img/*.tga img/*.txf"
 SOUNDS="sound/*.ogg"
@@ -69,7 +69,7 @@ TRC="*.trc"
 M4="m4/*.m4"
 ICON="icon/*.png icon/*.ico"
 
-CONTRIB_FILES="contrib/README.conquest-metaserver-monitor 
+CONTRIB_FILES="contrib/README.conquest-metaserver-monitor
                contrib/conquest-metaserver-monitor.awk"
 
 mkdir $CONQVER 2>/dev/null
@@ -103,7 +103,7 @@ chmod 644 $CONQVER/*
 chmod 755 $CONQVER/img
 chmod 755 $CONQVER/sound
 chmod 755 $CONQVER/contrib
-chmod 755 $CONQVER/configure $CONQVER/config.guess $CONQVER/config.sub 
+chmod 755 $CONQVER/configure $CONQVER/config.guess $CONQVER/config.sub
 chmod 755 $CONQVER/install-sh $CONQVER/ylwrap
 chmod 755 $CONQVER/m4
 chmod 755 $CONQVER/icon
@@ -112,7 +112,7 @@ tar cvf ${ARCFILE} $CONQVER
 gzip --best -v $ARCFILE
 rm -rf $CONQVER
 
-set -x 
+set -x
 if [ -e ~/tx/conquest/ ]
 then
     cp -f ${ARCFILE}.gz ~/tx/conquest/
@@ -120,5 +120,3 @@ then
 fi
 
 exit
-	
-

@@ -108,7 +108,7 @@ int animInitState(char *animname, animStatePtr_t astate,
 /* reset's an anim state.  Hopefully you called animInitState() at least once
    on the state first, before calling this function. 
    When complete, the state is suitable to be run. */
-void animResetState(animStatePtr_t astate, Unsgn32 thetime)
+void animResetState(animStatePtr_t astate, uint32_t thetime)
 {
   int ndx;
 

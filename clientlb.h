@@ -8,11 +8,11 @@
 #define CLIENTLB_H_INCLUDED
 
 #include "conqdef.h"
-#include "datatypes.h"
+
 #include "protocol.h"
 
 void  clntStoreMessage(spMessage_t *msg);
 void  clntDisplayFeedback(char *msg);
-char *clntServerFlagsStr(Unsgn32 flags);
+char *clntServerFlagsStr(uint32_t flags);
 
 #endif /* CLIENTLB_H_INCLUDED */

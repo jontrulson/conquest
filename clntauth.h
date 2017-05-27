@@ -8,7 +8,7 @@
 #define CLNTAUTH_H_INCLUDED
 
 #include "conqdef.h"
-#include "datatypes.h"
+
 #include "protocol.h"
 
 int  Logon(char *username);

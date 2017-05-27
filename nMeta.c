@@ -9,7 +9,7 @@
 #include "c_defs.h"
 #include "context.h"
 #include "global.h"
-#include "datatypes.h"
+
 #include "color.h"
 #include "conf.h"
 #include "gldisplay.h"
@@ -34,7 +34,7 @@ static const int servers_per_page = 8;
 static int flin, llin, clin, pages, curpage;
 
 struct _srvvec {
-  Unsgn16 vers;
+  uint16_t vers;
   char hostname[MAXHOSTNAME + 10];
 };
 

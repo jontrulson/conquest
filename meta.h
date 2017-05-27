@@ -8,11 +8,11 @@
 #define META_H_INCLUDED
 
 #include "conqdef.h"
-#include "datatypes.h"
+
 
 #define META_VERMAJ 0
 #define META_VERMIN 2
-#define META_VERSION  (Unsgn16)((META_VERMAJ << 8) | META_VERMIN)
+#define META_VERSION  (uint16_t)((META_VERMAJ << 8) | META_VERMIN)
 
 #define META_MAXSERVERS   1000  /* max number of servers we will track */
 #define BUFFERSZ          (1024 * 64)
@@ -22,14 +22,14 @@
 /* internal representation of a server record for the meta server */
 typedef struct _meta_srec {
   int     valid;
-  Unsgn16 version;
-  Unsgn8  numactive;
-  Unsgn8  numvacant;
-  Unsgn8  numrobot;
-  Unsgn8  numtotal;
+  uint16_t version;
+  uint8_t  numactive;
+  uint8_t  numvacant;
+  uint8_t  numrobot;
+  uint8_t  numtotal;
   time_t  lasttime;             /* last contact time */
-  Unsgn32 flags;                /* same as spServerStat_t */
-  Unsgn16 port;
+  uint32_t flags;                /* same as spServerStat_t */
+  uint16_t port;
   char    addr[CONF_SERVER_NAME_SZ]; /* server's detected address */
   char    altaddr[CONF_SERVER_NAME_SZ]; /* specified real address */
   char    servername[CONF_SERVER_NAME_SZ];
@@ -37,7 +37,7 @@ typedef struct _meta_srec {
   char    motd[CONF_SERVER_MOTD_SZ];
 
   /* Version 0x0002 */
-  Unsgn16 protovers;
+  uint16_t protovers;
   char    contact[META_GEN_STRSIZE];
   char    walltime[META_GEN_STRSIZE];
 

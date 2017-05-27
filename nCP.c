@@ -7,7 +7,7 @@
 #include "c_defs.h"
 #include "context.h"
 #include "global.h"
-#include "datatypes.h"
+
 #include "color.h"
 #include "conf.h"
 #include "conqcom.h"
@@ -124,7 +124,7 @@ static int dostats = FALSE;     /* whether to display rendering stats */
 extern hudData_t hudData;
 
 /* Ping status */
-static Unsgn32 pingStart = 0;
+static uint32_t pingStart = 0;
 static int pingPending = FALSE;
 
 /* bombing effect */
@@ -696,7 +696,7 @@ static void _dowarp( int snum, real warp )
   /* Handle ship limitations. */
   
   warp = min( warp, ShipTypes[Ships[snum].shiptype].warplim );
-  if (!sendCommand(CPCMD_SETWARP, (Unsgn16)warp))
+  if (!sendCommand(CPCMD_SETWARP, (uint16_t)warp))
     return;
   
   sprintf( cbuf, "Warp %d.", (int) warp );
@@ -754,7 +754,7 @@ static void _dophase( real dir )
  
   cp_putmsg( "Firing phasers...", MSG_LIN2 );
 
-  sendCommand(CPCMD_FIREPHASER, (Unsgn16)(dir * 100.0));
+  sendCommand(CPCMD_FIREPHASER, (uint16_t)(dir * 100.0));
 
   return;
   
@@ -900,7 +900,7 @@ static void _domydet(void)
 static void _doshields( int snum, int up )
 {
 
-  if (!sendCommand(CPCMD_SETSHIELDS, (Unsgn16)up))
+  if (!sendCommand(CPCMD_SETSHIELDS, (uint16_t)up))
     return;
 
   if ( up )
@@ -984,7 +984,7 @@ static void _doalloc(char *buf, char ch)
       return;
     }
 
-  sendCommand(CPCMD_ALLOC, (Unsgn16)dwalloc);
+  sendCommand(CPCMD_ALLOC, (uint16_t)dwalloc);
 
   hudClearPrompt(MSG_LIN1);
   
@@ -1019,7 +1019,7 @@ static void _dodistress(char *buf, char ch)
   hudClearPrompt(MSG_LIN2);
 
   if (ch == TERM_EXTRA)
-    sendCommand(CPCMD_DISTRESS, (Unsgn16)UserConf.DistressToFriendly);
+    sendCommand(CPCMD_DISTRESS, (uint16_t)UserConf.DistressToFriendly);
   
   hudClearPrompt(MSG_LIN1);
   
@@ -1150,7 +1150,7 @@ static void _dotow(char *buf, int ch)
   i = 0;
   utSafeCToI( &other, cbuf, i );		/* ignore status */
   
-  sendCommand(CPCMD_TOW, (Unsgn16)other);
+  sendCommand(CPCMD_TOW, (uint16_t)other);
 
   return;
 }
@@ -1950,8 +1950,8 @@ static void _dobeam(char *buf, int ch)
                   0, 0, 0);
 
   sendCommand(CPCMD_BEAM, 
-	      (dirup) ? (Unsgn16)(num & 0x00ff): 
-	      (Unsgn16)((num & 0x00ff) | 0x8000));
+	      (dirup) ? (uint16_t)(num & 0x00ff): 
+	      (uint16_t)((num & 0x00ff) | 0x8000));
 
   state = S_BEAMING;
   prompting = FALSE;
@@ -2749,16 +2749,16 @@ static int nCPIdle(void)
   int pkttype;
   int now;
   char buf[PKT_MAXSIZE];
-  Unsgn32 difftime = utDeltaGrand( Context.msgrand, &now );
-  static Unsgn32 iterstart = 0;
-  static Unsgn32 pingtime = 0;
-  static Unsgn32 themetime = 0;
-  static Unsgn32 dietime = 0;
-  Unsgn32 iternow = clbGetMillis();
-  static const Unsgn32 iterwait = 50;   /* ms */
-  static const Unsgn32 pingwait = 2000; /* ms (2 seconds) */
-  static const Unsgn32 themewait = 5000; /* ms (5 seconds) */
-  static const Unsgn32 dyingwait = 5000; /* watching yourself die */
+  uint32_t difftime = utDeltaGrand( Context.msgrand, &now );
+  static uint32_t iterstart = 0;
+  static uint32_t pingtime = 0;
+  static uint32_t themetime = 0;
+  static uint32_t dietime = 0;
+  uint32_t iternow = clbGetMillis();
+  static const uint32_t iterwait = 50;   /* ms */
+  static const uint32_t pingwait = 2000; /* ms (2 seconds) */
+  static const uint32_t themewait = 5000; /* ms (5 seconds) */
+  static const uint32_t dyingwait = 5000; /* watching yourself die */
   real tdelta = (real)iternow - (real)iterstart;
 
 
@@ -3356,7 +3356,7 @@ static int nCPInput(int ch)
               if (ch == TERM_EXTRA) /* accepted */
                 {
                   int dowait = FALSE;
-                  Unsgn16 cwar; 
+                  uint16_t cwar; 
 
                   cwar = 0;
                   for ( i = 0; i < NUMPLAYERTEAMS; i = i + 1 )
@@ -3391,7 +3391,7 @@ static int nCPInput(int ch)
                       prompting = FALSE;
                     }
 
-                  sendCommand(CPCMD_SETWAR, (Unsgn16)cwar);
+                  sendCommand(CPCMD_SETWAR, (uint16_t)cwar);
                   return NODE_OK;
                 }
 
@@ -3444,7 +3444,7 @@ static int nCPInput(int ch)
                   hudClearPrompt(MSG_LIN2);
                   prm.pbuf = "Refitting ship...";
                   hudSetPrompt(prm.index, prm.pbuf, NoColor, prm.buf, NoColor);
-                  sendCommand(CPCMD_REFIT, (Unsgn16)refitst);
+                  sendCommand(CPCMD_REFIT, (uint16_t)refitst);
                   prompting = FALSE;
                   utGrand( &entertime );
                   state = S_REFITING;

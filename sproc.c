@@ -21,7 +21,7 @@
 #include "sproc.h"
 
 /* disptach init */
-int procDispatchInit(Unsgn16 vers, packetEnt_t *pktList, int numpkts)
+int procDispatchInit(uint16_t vers, packetEnt_t *pktList, int numpkts)
 {
   /* nothing since we only allow the server to deal with the latest proto */
   return TRUE;
@@ -671,7 +671,7 @@ void procMessage(char *buf)
   if (!pktIsValid(CP_MESSAGE, cmsg))
     return;
 
-  to = (Sgn16)ntohs(cmsg->to);
+  to = (int16_t)ntohs(cmsg->to);
   cmsg->msg[MESSAGE_SIZE - 1] = 0;
 
 #if defined(DEBUG_SERVERPROC)
@@ -720,7 +720,7 @@ void procSetWar(cpCommand_t *cmd)
   int snum = Context.snum;		/* we always use our own ship */
   int unum = Context.unum;
   int dowait = FALSE, entertime, now, i;
-  Unsgn8 war;
+  uint8_t war;
 
   if (!pktIsValid(CP_COMMAND, cmd))
     return;
@@ -728,7 +728,7 @@ void procSetWar(cpCommand_t *cmd)
   if (cmd->cmd != CPCMD_SETWAR)
     return;
 
-  war = (Unsgn8)ntohs(cmd->detail);
+  war = (uint8_t)ntohs(cmd->detail);
 
 #if defined(DEBUG_SERVERPROC)
   utLog("PROC SETWAR war = 0x%02x", war);

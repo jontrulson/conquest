@@ -44,7 +44,7 @@
 
 #define LISTEN_BACKLOG 5 /* # of requests we're willing to to queue */
 
-static Unsgn16 listenPort = CN_DFLT_PORT;
+static uint16_t listenPort = CN_DFLT_PORT;
 
 static char cbuf[MID_BUFFER_SIZE]; /* general purpose buffer */
 static char *progName;
@@ -286,7 +286,7 @@ int main(int argc, char *argv[])
         break; 
 
       case 'p':
-	listenPort = (Unsgn16)atoi(optarg);
+	listenPort = (uint16_t)atoi(optarg);
 	break;
 
       case 'l':                 /* local conn only */
@@ -548,8 +548,8 @@ void updateProc(void)
 #if 0
   {
     /* debugging code to see update latencies */
-    static Unsgn32 lastms = 0;
-    Unsgn32 millis = clbGetMillis();
+    static uint32_t lastms = 0;
+    uint32_t millis = clbGetMillis();
     
     if ((millis - lastms) > (int)((1.0 / (real)Context.updsec) * 1000.0))
       utLog("millisdiff = %u(%d)", (millis - lastms), Context.updsec);
@@ -657,7 +657,7 @@ int capentry( int snum, int *system )
   int pkttype;
   cpCommand_t *ccmd;
   char buf[PKT_MAXSIZE];
-  Unsgn8 esystem = 0;
+  uint8_t esystem = 0;
   
   /* First figure out which systems we can enter from. */
   for ( i = 0; i < NUMPLAYERTEAMS; i = i + 1 )
@@ -735,7 +735,7 @@ int capentry( int snum, int *system )
 	return FALSE;
 
       /* else we'll use the first set bit */
-      esystem &= (Unsgn8)(ccmd->detail & 0x00ff);
+      esystem &= (uint8_t)(ccmd->detail & 0x00ff);
 
       for ( i = 0; i < NUMPLAYERTEAMS; i++ )
 	if (esystem & (1 << i))
@@ -762,7 +762,7 @@ int capentry( int snum, int *system )
 void dead( int snum, int leave )
 {
   int i, j, kb, now, entertime; 
-  Unsgn8 flags = SPCLNTSTAT_FLAG_NONE; /* for clientstat msg */
+  uint8_t flags = SPCLNTSTAT_FLAG_NONE; /* for clientstat msg */
   char buf[PKT_MAXSIZE];	/* gen purpose */
   
   /* If something is wrong, don't do anything. */
@@ -1013,7 +1013,7 @@ void handleSimpleCmdPkt(cpCommand_t *ccmd)
     case CPCMD_SWITCHTEAM:	
       if (sInfo.state == SVR_STATE_MAINMENU)
 	{
-	  int team = (int)((Unsgn16)ntohs(ccmd->detail));
+	  int team = (int)((uint16_t)ntohs(ccmd->detail));
 
 	  if (team >= 0 && team < NUMPLAYERTEAMS)
 	    {
@@ -1201,13 +1201,13 @@ void freeship(void)
 void menu(void)
 {
   int i;
-  Unsgn32 sleepy;
+  uint32_t sleepy;
   int lose;
   int playrv;
   int pkttype;
   char buf[PKT_MAXSIZE];
   cpCommand_t *ccmd;
-  static const Unsgn32 sleeplimit = ((1000 * 60) * 5); /* 5 minutes */
+  static const uint32_t sleeplimit = ((1000 * 60) * 5); /* 5 minutes */
 
   catchSignals();	/* enable trapping of interesting signals */
   
@@ -1731,7 +1731,7 @@ int welcome( int *unum )
   int i, team; 
   char name[MAXUSERNAME];
   char password[MAXUSERNAME];	/* encrypted pw, "" if local */
-  Unsgn8 flags = SPCLNTSTAT_FLAG_NONE;
+  uint8_t flags = SPCLNTSTAT_FLAG_NONE;
 
   if (!Authenticate(name, password))
     return FALSE;
@@ -1832,9 +1832,9 @@ static int hello(void)
 
   /* first loadup and send a server hello */
   shello.type = SP_HELLO;
-  shello.protover = (Unsgn16)htons(PROTOCOL_VERSION);
+  shello.protover = (uint16_t)htons(PROTOCOL_VERSION);
 
-  shello.cmnrev = (Unsgn32)htonl(COMMONSTAMP);
+  shello.cmnrev = (uint32_t)htonl(COMMONSTAMP);
   strncpy((char *)shello.servername, SysConf.ServerName, CONF_SERVER_NAME_SZ);
   strncpy((char *)shello.serverver, ConquestVersion, CONF_SERVER_NAME_SZ);
   strcat((char *)shello.serverver, " ");

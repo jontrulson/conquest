@@ -9,7 +9,7 @@
 
 #include "conqdef.h"
 #include "conqnet.h"
-#include "datatypes.h"
+
 #include "protocol.h"
 #include "packet.h"
 
@@ -30,10 +30,10 @@ typedef struct {
   struct  sockaddr_in clntaddr; /* client's saddrin struct */
   int     doUDP;                /* send udp? */
   int     tryUDP;               /* try udp? */
-  Unsgn32 state;		/* current state */
-  Unsgn32 clientDead;		/* is the client dead/ */
-  Unsgn32 isMaster;		/* is the Maseter server? */
-  Unsgn32 isLoggedIn;		/* is the client logged in? */
+  uint32_t state;		/* current state */
+  uint32_t clientDead;		/* is the client dead/ */
+  uint32_t isMaster;		/* is the Maseter server? */
+  uint32_t isLoggedIn;		/* is the client logged in? */
   char    remotehost[MAXHOSTNAME]; /* self evident */
 } ServerInfo_t;
 
@@ -46,17 +46,17 @@ ServerInfo_t sInfo;
 extern ServerInfo_t sInfo;
 #endif
 
-int sendClientStat(int sock, Unsgn8 flags, Unsgn8 snum, Unsgn8 team, 
-		   Unsgn16 unum, Unsgn8 esystem);
-int sendUser(int sock, Unsgn16 unum);
-int sendShip(int sock, Unsgn8 snum);
-int sendPlanet(int sock, Unsgn8 pnum, int force);
+int sendClientStat(int sock, uint8_t flags, uint8_t snum, uint8_t team, 
+		   uint16_t unum, uint8_t esystem);
+int sendUser(int sock, uint16_t unum);
+int sendShip(int sock, uint8_t snum);
+int sendPlanet(int sock, uint8_t pnum, int force);
 int sendServerStat(int socktype);
-int sendTorp(int sock, Unsgn8 snum, Unsgn8 tnum);
+int sendTorp(int sock, uint8_t snum, uint8_t tnum);
 int sendFeedBack(char *msg);
 void sendFeedback(char *msg);
 int sendMessage(Msg_t *msg);
-int sendTeam(int sock, Unsgn8 team, int force);
+int sendTeam(int sock, uint8_t team, int force);
 int sendConqInfo(int sock, int force);
 int sendHistory(int sock, int hnum);
 int sendDoomsday(int sock);

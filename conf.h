@@ -8,7 +8,7 @@
 #ifndef CONF_H
 #define CONF_H
 
-#include "datatypes.h"
+
 
 #if defined(HAVE_GL_GLUT_H)
 # include "cqkeys.h"
@@ -219,7 +219,7 @@ char *Macro2Str(char *str);
 char *process_macrostr(char *str);
 int process_bool(char *bufptr);
 int MakeConf(char *filename);
-Unsgn32 getServerFlags(void);
+uint32_t getServerFlags(void);
 
 				/* Initialize the system configurables */
 #ifndef NOEXTERN_CONF

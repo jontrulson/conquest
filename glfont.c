@@ -93,7 +93,7 @@ void glfInitFonts(void)
 
 void glfRenderFont(GLfloat x, GLfloat y, GLfloat z, GLfloat w, GLfloat h,
                    TexFont *font, char *str, int color, GLColor_t *glcol,
-                   Unsgn32 flags)
+                   uint32_t flags)
 {
   GLfloat inverty = ((flags & GLF_FONT_F_ORTHO) ? -1.0 : 1.0);
   int width, ascent, descent;

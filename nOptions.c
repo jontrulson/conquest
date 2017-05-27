@@ -7,7 +7,7 @@
 #include "c_defs.h"
 #include "context.h"
 #include "global.h"
-#include "datatypes.h"
+
 #include "color.h"
 #include "conf.h"
 #include "conqcom.h"
@@ -218,7 +218,7 @@ static void _changeMacro(int macronum, int init)
 static void _changeMouse(int mousevec, int init)
 {
   int lin;
-  Unsgn32 mod, but;
+  uint32_t mod, but;
   static char prmpt[BUFFER_SIZE];
   static char modstr[16];
   lin = MSG_LIN1;
@@ -618,7 +618,7 @@ static void _showOptScreen(void)
       if (state == S_MOUSE)
         {
           static char modstr[16];
-          Unsgn32 mod, but;
+          uint32_t mod, but;
 
           /* get the mouse macro number for this line */
           k = (curpage * items_per_page) + i; 
@@ -785,7 +785,7 @@ scrNode_t *nOptionsInit(int what, int setnode, int rnode)
 
       if (mouseptr)
         {
-          Unsgn32 but, mod;
+          uint32_t but, mod;
 
           for (i=0; i < MAX_MOUSE; i++)
             {

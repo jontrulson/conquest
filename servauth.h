@@ -8,7 +8,7 @@
 #define SERVAUTH_H_INCLUDED
 
 #include "conqdef.h"
-#include "datatypes.h"
+
 #include "protocol.h"
 
 int Authenticate(char *name, char *password);

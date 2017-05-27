@@ -29,7 +29,7 @@
 
 /* send an auth packet and wait for a response (if not CHPWD).
    returns the error code from the ack, or error from write/read */
-int sendAuth(int sock, Unsgn8 flag, char *login, char *pw)
+int sendAuth(int sock, uint8_t flag, char *login, char *pw)
 {
   char buf[PKT_MAXSIZE];
   int rv;
@@ -77,7 +77,7 @@ int sendAuth(int sock, Unsgn8 flag, char *login, char *pw)
   return sAckMsg.code;
 }
 
-int sendSetCourse(int sock, Sgn8 lock, real head)
+int sendSetCourse(int sock, int8_t lock, real head)
 {
   cpSetCourse_t csc;
 
@@ -85,7 +85,7 @@ int sendSetCourse(int sock, Sgn8 lock, real head)
 
   csc.type = CP_SETCOURSE;
   csc.lock = lock;
-  csc.head = (Unsgn16)htons((Unsgn16)(head * 100.0));
+  csc.head = (uint16_t)htons((uint16_t)(head * 100.0));
 
   if (pktWrite(PKT_SENDTCP, &csc) <= 0)
     return FALSE;
@@ -111,7 +111,7 @@ int sendSetName(char *name)
     return TRUE;
 }
 
-int sendCommand(Unsgn8 cmd, Unsgn16 detail)
+int sendCommand(uint8_t cmd, uint16_t detail)
 {
   cpCommand_t ccmd;
   int socktype = PKT_SENDTCP;
@@ -137,8 +137,8 @@ int sendFireTorps(int num, real dir)
   memset((void *)&ftorps, 0, sizeof(cpFireTorps_t));
 
   ftorps.type = CP_FIRETORPS;
-  ftorps.num = (Unsgn8)num;
-  ftorps.dir = htons((Unsgn16)(dir * 100.0));
+  ftorps.num = (uint8_t)num;
+  ftorps.dir = htons((uint16_t)(dir * 100.0));
 
   if (pktWrite(PKT_SENDTCP, &ftorps) <= 0)
     return FALSE;
@@ -157,7 +157,7 @@ int sendMessage(int to, char *msg)
 
   memset((void *)&cmsg, 0, sizeof(cpMessage_t));
   cmsg.type = CP_MESSAGE;
-  cmsg.to = (Sgn16)htons(to);
+  cmsg.to = (int16_t)htons(to);
   strncpy((char *)cmsg.msg, msg, MESSAGE_SIZE - 1);
 
   if (pktWrite(PKT_SENDTCP, &cmsg) <= 0)
@@ -209,8 +209,8 @@ int clientHello(char *clientname)
   sHello = *(spHello_t *)buf;
 
   /* fix up byte ordering */
-  sHello.protover = (Unsgn16)ntohs(sHello.protover);
-  sHello.cmnrev = (Unsgn32)ntohl(sHello.cmnrev);
+  sHello.protover = (uint16_t)ntohs(sHello.protover);
+  sHello.cmnrev = (uint32_t)ntohl(sHello.cmnrev);
 
   sHello.servername[CONF_SERVER_NAME_SZ - 1] = 0;
   sHello.serverver[CONF_SERVER_NAME_SZ - 1] = 0;
@@ -348,11 +348,11 @@ int clientHello(char *clientname)
  * game.  This routine will send a CPCMD_KEEPALIVE packet every 60 seconds
  * if a UDP connection is enabled.  Seems to solve clute's problem.
  */
-void sendUDPKeepAlive(Unsgn32 timebase)
+void sendUDPKeepAlive(uint32_t timebase)
 {
-  static Unsgn32 katime = 0;     /* UDP keepalive packets */
-  static const Unsgn32 kawait = 30000;  /* ms (30 seconds) */
-  Unsgn32 iternow;
+  static uint32_t katime = 0;     /* UDP keepalive packets */
+  static const uint32_t kawait = 30000;  /* ms (30 seconds) */
+  uint32_t iternow;
 
   if (!cInfo.doUDP)
     return;                     /* no point */
@@ -387,7 +387,7 @@ spClientStat_t *chkClientStat(char *buf)
 
   scstat = *(spClientStat_t *)buf;
   
-  scstat.unum = (Unsgn16)ntohs(scstat.unum);
+  scstat.unum = (uint16_t)ntohs(scstat.unum);
 
   if (scstat.unum >= MAXUSERS)
     {

@@ -7,7 +7,7 @@
 #include "c_defs.h"
 #include "context.h"
 #include "global.h"
-#include "datatypes.h"
+
 #include "color.h"
 #include "conf.h"
 #include "conqcom.h"
@@ -801,7 +801,7 @@ void renderHud(int dostats)
   static int ack_alert = 0;
   static struct {
     real oldFPS;
-    Unsgn32 oldPingAvg;
+    uint32_t oldPingAvg;
     real oldRxdiff;
   } oldData = {};
   int magFac;

@@ -6,7 +6,7 @@
 #define _CONQLB_H
 
 #include "conqdef.h"
-#include "datatypes.h"
+
 #include "conf.h"
 #include "protocol.h"
 
@@ -71,7 +71,7 @@ char    *clbGetUserLogname(void);
 void     clbPlanetDrive(real itersec);
 void     clbTorpDrive(real itersec);
 void     clbAdjOrbitalPosition(int snum);
-Unsgn32  clbGetMillis(void);
+uint32_t  clbGetMillis(void);
 void     clbBlockAlarm(void);
 void     clbUnblockAlarm(void);
 void     clbCheckShips(int isDriver);

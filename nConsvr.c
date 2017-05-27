@@ -7,7 +7,7 @@
 #include "c_defs.h"
 #include "context.h"
 #include "global.h"
-#include "datatypes.h"
+
 #include "color.h"
 #include "conf.h"
 #include "gldisplay.h"
@@ -21,7 +21,7 @@
 #include "conquest.h"
 
 static char *rhost = NULL;
-static Unsgn16 rport;
+static uint16_t rport;
 
 static int err = FALSE;
 
@@ -42,7 +42,7 @@ static scrNode_t nConsvrNode = {
 };
 
 
-void nConsvrInit(char *remotehost, Unsgn16 remoteport)
+void nConsvrInit(char *remotehost, uint16_t remoteport)
 {
   rhost = remotehost;
   rport = remoteport;

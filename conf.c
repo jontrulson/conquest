@@ -12,7 +12,7 @@
 #include "conqcom.h"
 #include "color.h"
 #include "ui.h"
-#include "datatypes.h"
+
 #include "conqnet.h"
 #include "conqutil.h"
 
@@ -376,7 +376,7 @@ int GetSysConf(int checkonly)
 #if defined(_CQKEYS_H)
 /* parse a mouse macro mod/but string */
 static int 
-parseMouseModNum(char *str, Unsgn32 *mods, Unsgn32 *button)
+parseMouseModNum(char *str, uint32_t *mods, uint32_t *button)
 {
   int done = FALSE;
   if (!mods || !button || !str)
@@ -587,8 +587,8 @@ int GetConf(int usernum)
 #if defined(_CQKEYS_H)
 		      case CTYPE_MOUSE:
                         {
-                          Unsgn32 mods;
-                          Unsgn32 button;
+                          uint32_t mods;
+                          uint32_t button;
 
                           /* need to parse out mods/button #. */
                           cptr = strchr(bufptr, '=');
@@ -1089,9 +1089,9 @@ int MakeSysConf()
   return(TRUE);
 }
 
-Unsgn32 getServerFlags(void)
+uint32_t getServerFlags(void)
 {
-  Unsgn32 f;
+  uint32_t f;
 
   /* get the current flags */
   f = SPSSTAT_FLAGS_NONE;

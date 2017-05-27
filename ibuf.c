@@ -76,7 +76,7 @@ void ibufPut(char *thestr)
     {
       c = thestr[i] & 0xff;
       /* hopefully there is enough room, or... */
-      rbPut(ibufRB, (Unsgn8 *)&c, I2RB_LEN(1));
+      rbPut(ibufRB, (uint8_t *)&c, I2RB_LEN(1));
     }
 
   return;
@@ -86,7 +86,7 @@ void ibufPut(char *thestr)
 
 void ibufPutc(unsigned int thechar)
 {
-  rbPut(ibufRB, (Unsgn8 *)&thechar, I2RB_LEN(1));
+  rbPut(ibufRB, (uint8_t *)&thechar, I2RB_LEN(1));
 
   return;
 }
@@ -103,7 +103,7 @@ unsigned int ibufGetc(void)
       return 0;
     }
 
-  rbGet(ibufRB, (Unsgn8 *)&c, I2RB_LEN(1), TRUE);
+  rbGet(ibufRB, (uint8_t *)&c, I2RB_LEN(1), TRUE);
 
   return c;
 }
@@ -125,7 +125,7 @@ int ibufExpandMacro(int fkey)
 
 }
       
-int ibufExpandMouseMacro(int but, Unsgn32 mods, real mangle)
+int ibufExpandMouseMacro(int but, uint32_t mods, real mangle)
 {
   int myangle = ((mangle < 0.0) ? 0 : (int)utMod360(mangle));
   char *s;

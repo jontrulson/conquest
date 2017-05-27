@@ -10,7 +10,7 @@
 #ifndef _CQSOUND_H
 #define _CQSOUND_H 
 
-#include "datatypes.h"
+
 #include "conqinit.h"
 
 typedef struct _cqs_channel {
@@ -20,22 +20,22 @@ typedef struct _cqs_channel {
 } cqsChannelRec_t, *cqsChannelPtr_t;
 
 typedef struct _cqs_sound {
-  Unsgn32  cqiIndex;            /* index to cqi sound entry */
+  uint32_t  cqiIndex;            /* index to cqi sound entry */
   void    *chunk;               /* ptr to mix/music chunk */
   int      vol;                 /* SDL volume */
   int      pan;                 /* SDL pan */
-  Unsgn32  lasttime;            /* last time this sample was played */
+  uint32_t  lasttime;            /* last time this sample was played */
   int      fadeinms;            /* copies of cqi data */
   int      fadeoutms;
   int      loops;
   int      limit;
-  Unsgn32  framelimit;
-  Unsgn32  lastframe;
-  Unsgn32  framecount;
-  Unsgn32  delayms;
+  uint32_t  framelimit;
+  uint32_t  lastframe;
+  uint32_t  framecount;
+  uint32_t  delayms;
 } cqsSoundRec_t, *cqsSoundPtr_t;
 
-typedef Unsgn32 cqsHandle;      /* sound handle used for some
+typedef uint32_t cqsHandle;      /* sound handle used for some
                                    functions */
 
 /* an 'invalid' handle */
@@ -83,7 +83,7 @@ typedef struct _doom_mus {
 #define CQS_SOUND_DISABLED()    (!cqsSoundAvailable || ((cqsSoundEnables & CQS_ENABLE_MASK) == 0))
 
 #ifdef NOEXTERN_CQSOUND
-Unsgn32              cqsSoundEnables  = 0;
+uint32_t              cqsSoundEnables  = 0;
 int                  cqsSoundAvailable    = FALSE;
 cqsSoundPtr_t        cqsMusic   = NULL;
 cqsSoundPtr_t        cqsEffects = NULL;
@@ -93,7 +93,7 @@ teamFX_t             cqsTeamEffects[NUMPLAYERTEAMS] = {};
 teamMus_t            cqsTeamMusic[NUMPLAYERTEAMS] = {};
 doomMus_t            cqsDoomsdayMusic = {};
 #else
-extern Unsgn32       cqsSoundEnables;
+extern uint32_t       cqsSoundEnables;
 extern int           cqsSoundAvailable;
 extern cqsSoundPtr_t cqsMusic;
 extern cqsSoundPtr_t cqsEffects;

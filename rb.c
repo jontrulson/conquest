@@ -83,10 +83,10 @@ unsigned int rbBytesFree(ringBuffer_t *RB)
 }
 
 /* put data into a ring buffer */
-unsigned int rbPut(ringBuffer_t *RB, Unsgn8 *buf, unsigned int len)
+unsigned int rbPut(ringBuffer_t *RB, uint8_t *buf, unsigned int len)
 {
   unsigned int left, wlen = len, i;
-  Unsgn8 *rptr = buf;
+  uint8_t *rptr = buf;
 
   if (!RB || !rptr) 
     return 0;
@@ -113,9 +113,9 @@ unsigned int rbPut(ringBuffer_t *RB, Unsgn8 *buf, unsigned int len)
 }
 
 /* get and/or remove data from a ring buffer */
-unsigned int rbGet(ringBuffer_t *RB, Unsgn8 *buf, unsigned int len, int update)
+unsigned int rbGet(ringBuffer_t *RB, uint8_t *buf, unsigned int len, int update)
 {
-  Unsgn8 *wptr = buf, *rptr;
+  uint8_t *wptr = buf, *rptr;
   unsigned int rlen = len, tlen, ndata;
 
   if (!len)

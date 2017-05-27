@@ -2888,12 +2888,12 @@ void clbAdjOrbitalPosition(int snum)
 }
 
 /* return time in milliseconds */
-Unsgn32 clbGetMillis(void)
+uint32_t clbGetMillis(void)
 {
   static int firsttime = TRUE;
   static struct timeval start;
   struct timeval elapsed, now;
-  Unsgn32 elapse;
+  uint32_t elapse;
 
   if (firsttime)
     {
@@ -2905,7 +2905,7 @@ Unsgn32 clbGetMillis(void)
   GETTIMEOFDAY(&now);
   TIMEDELTA(elapsed, now, start);
   /* Return elapsed milliseconds. */
-  elapse = (Unsgn32) ((elapsed.tv_sec * 1000) + (elapsed.tv_usec / 1000));
+  elapse = (uint32_t) ((elapsed.tv_sec * 1000) + (elapsed.tv_usec / 1000));
 
   /* don't return 0 */
   if (elapse == 0)

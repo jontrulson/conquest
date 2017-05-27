@@ -7,7 +7,7 @@
 #include "c_defs.h"
 #include "context.h"
 #include "global.h"
-#include "datatypes.h"
+
 #include "color.h"
 #include "conf.h"
 #include "conqcom.h"
@@ -46,7 +46,7 @@ static scrNode_t nPlayNode = {
 };
 
 /* select a system to enter */
-static void selectentry( Unsgn8 esystem )
+static void selectentry( uint8_t esystem )
 {
   int i; 
   char cbuf[BUFFER_SIZE];
@@ -285,7 +285,7 @@ static int nPlayInput(int ch)
             break;
           case TERM_EXTRA:
             /* Enter the home system. */
-            sendCommand(CPCMD_ENTER, (Unsgn16)(1 << Ships[Context.snum].team));
+            sendCommand(CPCMD_ENTER, (uint16_t)(1 << Ships[Context.snum].team));
             state = S_DONE;
             return NODE_OK;
             break;
@@ -294,7 +294,7 @@ static int nPlayInput(int ch)
               if ( Teams[i].teamchar == (char)toupper(c) && owned[i] )
                 {
                   /* Found a good one. */
-                  sendCommand(CPCMD_ENTER, (Unsgn16)(1 << i));
+                  sendCommand(CPCMD_ENTER, (uint16_t)(1 << i));
                   state = S_DONE;
                   return NODE_OK;
                 }

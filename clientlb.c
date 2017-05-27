@@ -58,7 +58,7 @@ void clntDisplayFeedback(char *msg)
 }
 
 /* return a static string containing the server's stringified  flags */
-char *clntServerFlagsStr(Unsgn32 flags)
+char *clntServerFlagsStr(uint32_t flags)
 {
   static char serverflags[256];
 

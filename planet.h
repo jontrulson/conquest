@@ -7,7 +7,7 @@
 #ifndef PLANET_H_INCLUDED
 #define PLANET_H_INCLUDED
 
-#include "datatypes.h"
+
 #include "conqdef.h"
 
 /* flags for planets.  Of the planets with HOMEPLANET set, the first
@@ -35,7 +35,7 @@ typedef struct {
   real orbvel;                  /* velocity of the orbit in deg/min */
   real orbang;                  /* current angle of the orbit */
   real size;                    /* size of planet in CU's */
-  Unsgn32 flags;                /* flags for this planet */
+  uint32_t flags;                /* flags for this planet */
   int  primary;                 /* planet this planet orbits */
   int  type;                    /* type of planet - M, dead, sun */
   int  team;                    /* which team owns the planet */

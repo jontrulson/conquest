@@ -9,7 +9,7 @@
 #ifndef PACKET_H_INCLUDED
 #define PACKET_H_INCLUDED
 
-#include "datatypes.h"
+
 #include "protocol.h"
 
 #define PKT_MAXSIZE     1024	/* no packet should ever be this large. gulp.*/
@@ -17,8 +17,8 @@
 typedef int (*dispatchProc_t)(char *);
 
 typedef struct _packetent {
-  Unsgn32        pktid;
-  Unsgn32        size;
+  uint32_t        pktid;
+  uint32_t        size;
   char           *name;
   dispatchProc_t dispatch;
 } packetEnt_t;
@@ -26,7 +26,7 @@ typedef struct _packetent {
 /* this will be implemented in cproc.c and sproc.c to initialize the
  *  (*dispatch) member of the server/clientPackets[] arrays in packet.c
  */
-int procDispatchInit(Unsgn16 vers, packetEnt_t *pktList, int numpkts);
+int procDispatchInit(uint16_t vers, packetEnt_t *pktList, int numpkts);
 
 /* input/output ring buffer sizes. TCP RB's are larger to handle cases
  * where UDP is not available and the TCP RB is used instead.
@@ -86,14 +86,14 @@ extern int          serverPktMax;
 #endif
 
 #define PKT_PROCSP(_pkt) \
-  ( (*serverPackets[((Unsgn8)(_pkt)[0])].dispatch)((_pkt)) )
+  ( (*serverPackets[((uint8_t)(_pkt)[0])].dispatch)((_pkt)) )
 
 int   pktInit(void);
 void  pktSetClientMode(int isclient);
-int   pktSetClientProtocolVersion(Unsgn16 vers);
+int   pktSetClientProtocolVersion(uint16_t vers);
 void  pktSetSocketFds(int tcpsock, int udpsock);
 
-int   pktSendAck(Unsgn8 severity, Unsgn8 code, char *msg);
+int   pktSendAck(uint8_t severity, uint8_t code, char *msg);
 int   pktIsConnDead(void);
 int   pktNotImpl(char *nothing);
 

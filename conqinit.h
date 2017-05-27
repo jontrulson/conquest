@@ -5,7 +5,7 @@
 #ifndef _CONQINIT_H
 #define _CONQINIT_H 
 
-#include "datatypes.h"
+
 
 #define CQI_NAMELEN 64           /* maximum length of a WKN or filename (no
                                     path) */
@@ -87,8 +87,8 @@ typedef struct _cqi_texture_area {
 typedef struct _cqi_texture_init {
   char                 name[CQI_NAMELEN]; /* texid */
   char                 filename[CQI_NAMELEN]; /* if different from texid */
-  Unsgn32              flags; /* flags for this cqi texture (CQITEX_F_*)*/
-  Unsgn32              color;  /* hex encoded color (AARRGGBB) */
+  uint32_t              flags; /* flags for this cqi texture (CQITEX_F_*)*/
+  uint32_t              color;  /* hex encoded color (AARRGGBB) */
   int                  numTexAreas; /* number of texture areas */
   cqiTextureAreaPtr_t  texareas; /* optional texture areas */
 } cqiTextureInitRec_t, *cqiTextureInitPtr_t ;
@@ -134,25 +134,25 @@ typedef struct _cqi_animdef_init {
   char     name[CQI_NAMELEN];   /* animation definition name */
   char     texname[CQI_NAMELEN]; /* base texture if specified. */
 
-  Unsgn32  timelimit;            /* expire anim after this long (ms) 0=inf */
-  Unsgn32  anims;                /* bitmask of animation types that
+  uint32_t  timelimit;            /* expire anim after this long (ms) 0=inf */
+  uint32_t  anims;                /* bitmask of animation types that
                                     were specified (CQI_ANIMS_*) */
 
   /* initial state values (istate) specifically defined in the
      animdef definition */
-  Unsgn32  istates;              /* AD_ISTATE_* */
+  uint32_t  istates;              /* AD_ISTATE_* */
   char     itexname[CQI_NAMELEN];
-  Unsgn32  icolor;
+  uint32_t  icolor;
   real     iangle;
   real     isize;
 
   /* texture animations */
   struct {
-    Unsgn32 color;              /* will override per-tex colors */
-    Unsgn32 stages;             /* number of stages (textures) */
-    Unsgn32 delayms;            /* delay per-stage in ms */
-    Unsgn32 loops;              /* number of loops, 0 = inf */
-    Unsgn32 looptype;           /* the type of loop (asc/dec/pingpong/etc) */
+    uint32_t color;              /* will override per-tex colors */
+    uint32_t stages;             /* number of stages (textures) */
+    uint32_t delayms;            /* delay per-stage in ms */
+    uint32_t loops;              /* number of loops, 0 = inf */
+    uint32_t looptype;           /* the type of loop (asc/dec/pingpong/etc) */
 
     /* texcoord anims */
     real    deltas;             /* s and t deltas */
@@ -161,12 +161,12 @@ typedef struct _cqi_animdef_init {
 
   /* color animations */
   struct {
-    Unsgn32 color;              /* starting color, if specified */
+    uint32_t color;              /* starting color, if specified */
     
-    Unsgn32 stages;             /* number of stages (delta ops)) 0 = inf*/
-    Unsgn32 delayms;            /* delay per-stage in ms */
-    Unsgn32 loops;              /* number of loops, 0 = inf */
-    Unsgn32 looptype;           /* the type of loop (asc/dec//pingpong/etc) */
+    uint32_t stages;             /* number of stages (delta ops)) 0 = inf*/
+    uint32_t delayms;            /* delay per-stage in ms */
+    uint32_t loops;              /* number of loops, 0 = inf */
+    uint32_t looptype;           /* the type of loop (asc/dec//pingpong/etc) */
 
     real    deltaa;          /* deltas to appliy to ARGB components */
     real    deltar;
@@ -176,10 +176,10 @@ typedef struct _cqi_animdef_init {
 
   /* geometry animations */
   struct {
-    Unsgn32 stages;             /* number of stages (delta ops)) 0 = inf*/
-    Unsgn32 delayms;            /* delay per-stage in ms */
-    Unsgn32 loops;              /* number of loops, 0 = inf */
-    Unsgn32 looptype;           /* the type of loop (asc/dec//pingpong/etc) */
+    uint32_t stages;             /* number of stages (delta ops)) 0 = inf*/
+    uint32_t delayms;            /* delay per-stage in ms */
+    uint32_t loops;              /* number of loops, 0 = inf */
+    uint32_t looptype;           /* the type of loop (asc/dec//pingpong/etc) */
 
     real    deltax;             /* x y and z deltas */
     real    deltay;
@@ -190,7 +190,7 @@ typedef struct _cqi_animdef_init {
 
   /* toggle animations (blinkers) */
   struct {
-    Unsgn32 delayms;            /* delay per-stage in ms */
+    uint32_t delayms;            /* delay per-stage in ms */
   } toganim;
 
 } cqiAnimDefInitRec_t, *cqiAnimDefInitPtr_t ;
@@ -215,7 +215,7 @@ typedef struct _cqi_sound {
   int     limit;                /* max # running at one time */
   int     framelimit;           /* max number to run per frame, ignored if
                                    limit is specified */
-  Unsgn32 delayms;              /* minimum delay for multiple instances */
+  uint32_t delayms;              /* minimum delay for multiple instances */
 } cqiSoundRec_t, *cqiSoundPtr_t;
 
 #ifdef NOEXTERN_CONQINIT

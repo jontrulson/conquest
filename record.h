@@ -22,24 +22,24 @@
 
 				/* file header */
 #define SZ_FILEHEADER (256)
-#define FHEADER_PAD (SZ_FILEHEADER - (sizeof(Unsgn32) + \
-                                      sizeof(Unsgn8) +   \
-                                      sizeof(Unsgn32) +  \
+#define FHEADER_PAD (SZ_FILEHEADER - (sizeof(uint32_t) + \
+                                      sizeof(uint8_t) +   \
+                                      sizeof(uint32_t) +  \
                                       MAXUSERNAME +      \
-                                      sizeof(Unsgn32) +  \
-                                      sizeof(Unsgn8) +   \
-                                      sizeof(Unsgn32)))
+                                      sizeof(uint32_t) +  \
+                                      sizeof(uint8_t) +   \
+                                      sizeof(uint32_t)))
 
 #pragma pack(1)
 typedef struct _fheader {	
-  Unsgn32 vers;                 /* version of this file */
-  Unsgn8 samplerate;            /* recorded at samples per sec */
-  Unsgn32 rectime;		/* time recorded */
-  Unsgn8 user[MAXUSERNAME];	/* user that made recording */
-  Unsgn32 cmnrev;               /* common block rev */
-  Unsgn8 snum;                  /* ship that made rec.  0 == server record */
-  Unsgn32 flags;                /* flags. duh. */
-  Unsgn8 pad[FHEADER_PAD];	/* padding */
+  uint32_t vers;                 /* version of this file */
+  uint8_t samplerate;            /* recorded at samples per sec */
+  uint32_t rectime;		/* time recorded */
+  uint8_t user[MAXUSERNAME];	/* user that made recording */
+  uint32_t cmnrev;               /* common block rev */
+  uint8_t snum;                  /* ship that made rec.  0 == server record */
+  uint32_t flags;                /* flags. duh. */
+  uint8_t pad[FHEADER_PAD];	/* padding */
 } fileHeader_t;
 #pragma pack()
 
@@ -55,7 +55,7 @@ time_t          recCurrentTime  = 0;
 char           *recFilename     = NULL; /* recording filename for playback */
 fileHeader_t    recFileHeader   = {};
 real            recFrameDelay   = -1.0; /* delaytime between frames */
-Unsgn32         recFrameCount   = 0;
+uint32_t         recFrameCount   = 0;
 Msg_t           recMsg          = {}; /* current message */
 #else
 extern time_t   recTotalElapsed;
@@ -64,7 +64,7 @@ extern time_t   recCurrentTime;
 extern char    *recFilename;
 extern fileHeader_t recFileHeader;
 extern real     recFrameDelay;
-extern Unsgn32  recFrameCount;
+extern uint32_t  recFrameCount;
 extern Msg_t    recMsg;
 #endif
 
