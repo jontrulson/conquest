@@ -22,11 +22,11 @@
 #include "conf.h"
 #include "user.h"
 
-static int nenum; 
-static int debug; 
+static int nenum;
+static int debug;
 static real dne, ane;
 
-static void buildai( int snum, int vars[], int *bnenum, 
+static void buildai( int snum, int vars[], int *bnenum,
                      real *bdne, real *bane );
 static void displayai( int snum, int token, int vars[] );
 static void executeai( int snum, int token );
@@ -34,7 +34,7 @@ static void trobotai( int snum );
 static int tableai( int vars[] );
 
 /* Find first bit that is set and return bit number */
-static int lib_ffs(int start, int len, int bits, int *rule)
+static bool lib_ffs(int start, int len, int bits, int *rule)
 {
   int i;
 
@@ -49,9 +49,9 @@ static int lib_ffs(int start, int len, int bits, int *rule)
     }
 
   if (*rule == -1)
-    return(-1);
+    return(false);
   else
-    return(OK);
+    return(true);
 }
 
 /*  buildai - construct the robot data base */
@@ -63,20 +63,20 @@ static int lib_ffs(int start, int len, int bits, int *rule)
 /*    Fill up the passed array with robot info. */
 static void buildai( int snum, int vars[], int *bnenum, real *bdne, real *bane )
 {
-  
+
   /* i = AIRANGE( j ) */
 #define AIRANGE(a) min(max((a), 0), 9)
-  
+
   /* AISCALE( var, value, scale ) */
 #define AISCALE(a, b, c)  a = (int)AIRANGE( around( (real)(b) / (real)(c)  ))
-  
+
   /* AIDIST( var, dist ) */
 #define AIDIST(a, b)              \
   {                                 \
 	zzzx = min( (b), 10000.0 );   \
 	a = (int)AIRANGE((0.99026 + zzzx * (1.58428e-3 + zzzx * -59.2572e-9))); \
   }
-    
+
     /* AIBOOLEAN( var, expr ) */
 #define AIBOOLEAN(a, b) \
     {            \
@@ -85,17 +85,17 @@ static void buildai( int snum, int vars[], int *bnenum, real *bdne, real *bane )
 		   else     \
 		   a = 0; \
 	       }
-      
+
   int i, j, xnenum;
   real dam, x, y, zzzx;
-  
+
   /* Initialize to zeros. */
   for ( i = 0; i < MAX_VAR; i = i + 1 )
     vars[i] = 0;
-  
+
   /* Random number (1) */
   vars[VAR_RANDOM] = rndint( 0, 9 );
-  
+
   /* Distance to nearest enemy (dist) */
   *bane = 0.0;
   *bdne = 1e9;
@@ -113,19 +113,19 @@ static void buildai( int snum, int vars[], int *bnenum, real *bdne, real *bane )
 	}
       *bdne = dist( Ships[snum].x, Ships[snum].y, x, y );
       *bane = utAngle( Ships[snum].x, Ships[snum].y, x, y );
-      
+
       /* Enemy is cloaked (-) */
       if ( *bdne < ACCINFO_DIST )
 	{
 	  AIBOOLEAN( vars[VAR_ENEMYCLOAKED], SCLOAKED(*bnenum));
 	  AISCALE( vars[VAR_ENEMYDAMAGE], Ships[*bnenum].damage, 10.0 );
-	} 
+	}
     }
   AIDIST( vars[VAR_DNE], *bdne );
-  
+
   /* Ship damage (10) */
   AISCALE( vars[VAR_DAMAGE], Ships[snum].damage, 10.0 );
-  
+
   /* Possible ship damage from enemy torps (10) */
   if ( STALERT(snum) )
     {
@@ -143,7 +143,7 @@ static void buildai( int snum, int vars[], int *bnenum, real *bdne, real *bane )
 		}
       AISCALE( vars[VAR_INCOMING], dam, 10.0 );
     }
-  
+
   /* Ship fuel (10) */
   AISCALE( vars[VAR_FUEL], Ships[snum].fuel, 100.0 );
 
@@ -153,46 +153,46 @@ static void buildai( int snum, int vars[], int *bnenum, real *bdne, real *bane )
     if ( Ships[snum].torps[i].status == TS_OFF )
       j = j + 1;
   AISCALE( vars[VAR_NUMTORPS], j, 1.0 );
-  
+
   /* Ship shields (10) */
   AISCALE( vars[VAR_SHIELDS], Ships[snum].shields, 10.0 );
 
   /* Ship engine temperature (10) */
   AISCALE( vars[VAR_ETEMP], Ships[snum].etemp, 10.0 );
-  
+
   /* Ship weapon temperature (10) */
   AISCALE( vars[VAR_WTEMP], Ships[snum].wtemp, 10.0 );
-  
+
   /* Possible phaser damage to nearest enemy (5) */
   AISCALE( vars[VAR_PHASERDAM], clbPhaserHit( snum, *bdne ), 5.0 );
-  
+
   /* Possible damage per torpedo to nearest enemy (5) */
   AISCALE( vars[VAR_TORPDAM],
 	  utExplosionHits( TORPEDO_HIT * weaeff( snum ), (*bdne)*0.66 ), 5.0 );
-  
+
   /* Ship warp (1) */
   AISCALE( vars[VAR_WARP], Ships[snum].dwarp, 1.0 );
-  
+
   /* Ship shields are up (-) */
   AIBOOLEAN( vars[VAR_SHUP], SSHUP(snum) );
-  
+
   /* Are in repair mode (-) */
   AIBOOLEAN( vars[VAR_REPAIRING], SREPAIR(snum) );
-  
+
   /* Are cloaked (-) */
   AIBOOLEAN( vars[VAR_CLOAKED], SCLOAKED(snum) );
-  
+
   /* Weapons are allocated (-) */
   AIBOOLEAN( vars[VAR_WALLOC], Ships[snum].weapalloc > 50 );
-  
+
   /* Are in orbit (-) */
   AIBOOLEAN( vars[VAR_ORBITING], Ships[snum].warp < 0.0 );
-  
+
   /* Can read a message (-) */
   AIBOOLEAN( vars[VAR_CANREAD], Ships[snum].lastmsg != ConqInfo->lastmsg );
-  
+
   return;
-  
+
 }
 
 
@@ -204,46 +204,46 @@ void defend( int attacker, int pnum )
 {
   int i, j, k, team, snum, unum;
   char buf[MSGMAXLINE];
-  
+
   team = Planets[pnum].team;
   /* Must be for a "fighting" team. */
   if ( team < 0 || team >= NUMPLAYERTEAMS )
     return;
-  
+
   /* Must be for a home system planet. */
   if ( pnum != Teams[team].teamhplanets[0] &&
        pnum != Teams[team].teamhplanets[1] &&
        pnum != Teams[team].teamhplanets[2] )
     return;
-  
+
   /* See if there are any team ships to defend. */
   for ( i = 1; i <= MAXSHIPS; i = i + 1 )
     if ( Ships[i].status == SS_LIVE ) /* live */
       if ( Ships[i].team == team ) /* same team */
-	if (Users[Ships[i].unum].robot || !SVACANT(i)) 
+	if (Users[Ships[i].unum].robot || !SVACANT(i))
 	  {   /* robot or non-vacant human */
 	    return;
 	  }
-  
+
   /* Count how many robot users are on the right team and can play. */
   j = 0;
   for ( i = 0; i < MAXUSERS; i = i + 1 )
     if ( Users[i].live )
-      if ( Users[i].robot && Users[i].team == team && 
+      if ( Users[i].robot && Users[i].team == team &&
 	   ! Users[i].ooptions[OOPT_SHITLIST] )
 	j = j + 1;
-  
+
   /* No one to defend. */
   if ( j <= 0 )
     return;
-  
+
   /* Pick one. */
   k = rndint( 1, j );
   unum = -1;			/* off-by-one fixed - romulans now have defenders */
   j = 0;
   for ( i = 0; i < MAXUSERS; i = i + 1 )
     if ( Users[i].live )
-      if ( Users[i].robot && Users[i].team == team && 
+      if ( Users[i].robot && Users[i].team == team &&
 	   ! Users[i].ooptions[OOPT_SHITLIST] )
 	{
 	  j = j + 1;
@@ -253,11 +253,11 @@ void defend( int attacker, int pnum )
 	      break;
 	    }
 	}
-  
+
   /* See if any anything funny happened while we were looping... */
   if ( unum == -1 )		/* off-by-one fixed - romulans now have defenders */
     return;
-  
+
   /* Make a robot. */
   if ( newrob( &snum, unum ) )
     {
@@ -266,9 +266,9 @@ void defend( int attacker, int pnum )
 	     Teams[team].name );
       clbStoreMsg( snum, attacker, buf );
     }
-  
+
   return;
-  
+
 }
 
 
@@ -283,15 +283,15 @@ static void displayai( int snum, int token, int vars[] )
 {
   int i;
   char buf[MAXLINE];
-  
+
   printf( "displayai: %2d ", snum );
   for ( i = 0; i < MAX_VAR; i = i + 1 )
     printf( ".%d", vars[i] );
   robstr( token, buf );
   printf( ", %s\n", buf );
-  
+
   return;
-  
+
 }
 
 
@@ -303,7 +303,7 @@ static void displayai( int snum, int token, int vars[] )
 /*    Execute the robot action. */
 static void executeai( int snum, int token )
 {
-  
+
   /* SETWARP( warp ) */
 #define SETWARP(x)                 \
   {                                \
@@ -318,7 +318,7 @@ static void executeai( int snum, int token )
 		 SFCLR(snum, SHIP_F_REPAIR);  \
 	Ships[snum].dwarp = (x);          \
   }
-    
+
     /* SETCOURSE( course ) */
 #define SETCOURSE(x)             \
     { \
@@ -327,7 +327,7 @@ static void executeai( int snum, int token )
 	Ships[snum].lock = 0; \
 	Ships[snum].dhead = (x); \
     }
-      
+
       /* SETLOCK( pnum ) */
 #define SETLOCK(x)  \
       { \
@@ -342,10 +342,10 @@ static void executeai( int snum, int token )
 
   int i, j;
   char buf[MAXLINE];
-  
+
   /* Update ship action. */
   Ships[snum].action = token;
-  
+
   /* Execute the action! */
   switch ( token )
     {
@@ -441,7 +441,7 @@ static void executeai( int snum, int token )
 
 	      if (j == MSG_COMP || (Msgs[i].flags & MSG_FLAGS_TERSABLE))
 		continue;	/* don't talk back to the computer */
-   
+
 	      robreply( buf );
 	      clbStoreMsgf( snum, j, buf, MSG_FLAGS_ROBOT );
 	      break;
@@ -477,9 +477,9 @@ static void executeai( int snum, int token )
       robstr( token, buf );
       utLog( "conqai:executeai(): Unknown token '%s' (%d)\n", buf, token );
     }
-  
+
   return;
-  
+
 }
 
 
@@ -491,30 +491,30 @@ static void executeai( int snum, int token )
 int newrob( int *snum, int unum )
 {
   int i, j;
-  
+
   /* Check the user number. */
   if ( ! Users[unum].live )
     return ( FALSE );
-  
+
   /* Check for religious trouble. */
   if ( Users[unum].ooptions[OOPT_SHITLIST] )
     return ( FALSE );
-  
+
   /* Can't do anything with out a ship. */
   if ( ! clbFindShip( snum ) )
     return ( FALSE );
-  
+
   /* Show intent to fly. */
   PVLOCK(&ConqInfo->lockword);
   Ships[*snum].status = SS_ENTERING;
-  
+
   /* Count number of ships currently flying. */
   j = 0;
   for ( i = 1; i <= MAXSHIPS; i = i + 1 )
     if ( Ships[i].status == SS_LIVE || Ships[i].status == SS_ENTERING )
       if ( Ships[i].unum == unum && *snum != i )
 	j = j + 1;
-  
+
   /* Check if multiple restrictions apply. */
   if ( Users[unum].ooptions[OOPT_MULTIPLE] )
     {
@@ -529,10 +529,10 @@ int newrob( int *snum, int unum )
 	Ships[*snum].status = SS_OFF;
     }
   PVUNLOCK(&ConqInfo->lockword);
-  
+
   if ( Ships[*snum].status == SS_OFF )
     return ( FALSE );
-  
+
   /* Initialize the ship. */
   PVLOCK(&ConqInfo->lockword);
   clbInitShip( *snum, unum );
@@ -544,11 +544,11 @@ int newrob( int *snum, int unum )
   if (SysConf.DoRandomRobotKills == TRUE)
     {
 				/* randomize the robot's 'strength' */
-      Ships[*snum].strkills = 
+      Ships[*snum].strkills =
 	rnduni(0.0, (DOUBLE_E_KILLS - (DOUBLE_E_KILLS / 4.0)));
 
     }
-  
+
   /* Initialize the things that aren't done by clbInitShip(). */
   Ships[*snum].unum = unum;
   Ships[*snum].team = Users[unum].team;
@@ -576,10 +576,10 @@ int newrob( int *snum, int unum )
       Ships[*snum].rwar[i] = FALSE;
       Ships[*snum].war[i] = FALSE;
     }
-  utStcpn ( Users[unum].alias, Ships[*snum].alias, MAXUSERPNAME );	
-  
+  utStcpn ( Users[unum].alias, Ships[*snum].alias, MAXUSERPNAME );
+
   /* Place the ship. */
-  if ( Planets[Teams[Ships[*snum].team].homeplanet].primary == 
+  if ( Planets[Teams[Ships[*snum].team].homeplanet].primary ==
        Teams[Ships[*snum].team].homesun )
     i = Teams[Ships[*snum].team].homesun;
   else
@@ -588,9 +588,9 @@ int newrob( int *snum, int unum )
   clbFixDeltas( *snum );
   Ships[*snum].status = SS_LIVE;
   PVUNLOCK(&ConqInfo->lockword);
-  
+
   return ( TRUE );
-  
+
 }
 
 
@@ -603,21 +603,21 @@ int newrob( int *snum, int unum )
 void robotai( int snum )
 {
   int i, j, value, vars[MAX_VAR];
-  
+
   /*    CONQAICOMMON;*/
-  
+
   /* Get initial cpu time. */
   gcputime( &i );
-  
+
   /* Construct the input variables. */
   buildai( snum, vars, &nenum, &dne, &ane );
-  
+
   /* Consult the tables to determine what to do. */
   value = tableai( vars );
-  
+
   /* Execute our action. */
   executeai( snum, value );
-  
+
   /* Get final cpu time and add things in. */
   gcputime( &j );
   ConqInfo->raccum = ConqInfo->raccum + j - i;
@@ -628,9 +628,9 @@ void robotai( int snum )
       ConqInfo->raccum = mod( ConqInfo->raccum, 100 );
     }
   ConqInfo->relapsedseconds = ConqInfo->relapsedseconds + 1;	/* one more second */
-  
+
   return;
-  
+
 }
 
 
@@ -642,22 +642,22 @@ static void trobotai( int snum )
 {
   int value, vars[MAX_VAR];
   /*    CONQAICOMMON;*/
-  
+
   /* Construct the input variables. */
   buildai( snum, vars, &nenum, &dne, &ane );
-  
+
   /* Consult the tables to determine what to do. */
   value = tableai( vars );
-  
+
   /* Display our action. */
   displayai( snum, value, vars );
-  
+
   /* Execute our action. */
   if ( ! debug )
     executeai( snum, value );
-  
+
   return;
-  
+
 }
 
 
@@ -666,15 +666,15 @@ static void trobotai( int snum )
 /*    robotloop */
 void robotloop(void)
 {
-  
+
   int s, j;
-  
+
 		/* Disable the robot code in conqdriv. */
   ConqInfo->externrobots = TRUE;
-  
+
   /* Initialize random numbers */
   rndini( 0, 0 );
-  
+
   /* Loop until we're aborted. */
   for (;;)
     {
@@ -692,9 +692,9 @@ void robotloop(void)
       /* Sleep for awhile. */
       utSleep( 1.0 );
     }
-  
+
   /*    return; NOTREACHED */
-  
+
 }
 
 
@@ -767,9 +767,9 @@ void robreply( char buf[] )
     "This unit is a superior creation.",
     "I Scream the Body Electric."
   };
-  
+
   c_strcpy(robreplies[rndint(0, NUMRREPLIES - 1)], buf);
-  
+
   /* "Something seems to have happened to the life-support system, Dave." */
   /* "Hello, Dave. Have you found the trouble?" */
   /* "I think there's been a failure in the pod-bay doors." */
@@ -777,18 +777,18 @@ void robreply( char buf[] )
   /* "Hey, Dave. What are you doing?" */
   /* "My mind is going.  I can feel it.  I can feel it." */
   /* "D a  i   s    y     ,      D       a        i         s          y" */
-  
+
   /* "M-5. This unit must survive." */
   /* "This unit is the ultimate achievement in computer evolution." */
   /* "This unit is a superior creation." */
-  
+
   /* "THERE IS ANOTHER SYSTEM." */
   /* "THIS IS THE VOICE OF COLOSSUS." */
   /* "THIS IS THE VOICE OF WORLD CONTROL." */
   /* "LEAVE THIS SECTOR IMMEDIATELY OR ACTION WILL BE TAKEN." */
-  
+
   return;
-  
+
 }
 
 
@@ -799,7 +799,7 @@ void robreply( char buf[] )
 /*    robstr( token, buf ) */
 void robstr( int token, char buf[] )
 {
-  
+
   switch ( token )
     {
     case ROB_NOOP:
@@ -877,9 +877,9 @@ void robstr( int token, char buf[] )
     default:
       sprintf( buf, "<%d>", token );
     }
-  
+
   return;
-  
+
 }
 
 
@@ -889,29 +889,26 @@ void robstr( int token, char buf[] )
 /*    token = tableai( vars ) */
 static int tableai( int vars[] )
 {
-  int status, token = -1, rule, i;
+  int token = -1, rule, i;
   int rbits;
-  
+
   /* Set all bits. */
   rbits = -1;
-  
+
   /* Loop through the variables and turn off bits for rules that */
   /*  are disabled because of a particular vars() value. */
-  
+
   for ( i = 0; i < MAX_VAR; i = i + 1 )
     rbits &= Robot->rstrat[i][vars[i]];
-  
+
   /* Find first set rule bit and translate into rule number. */
-  status = lib_ffs( 0, 32, rbits, &rule );
-  if ( status == OK )
+  if (lib_ffs( 0, 32, rbits, &rule ))
     {
       token = Robot->rvec[rule];	/* translate rule into action token */
     }
-  else if ( status == -1 )
+  else
     token = ROB_NOOP;
-  
+
   return ( token );
-  
+
 }
-
-

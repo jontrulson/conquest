@@ -73,14 +73,14 @@ static int maxcol;                              /* maximum column */
 /*    This routine draws a box defined by the two points. */
 void cdbox ( int lin1, int col1, int lin2, int col2 )
 {
-  
+
   cdline ( lin1, col1, lin1, col2 );	/* right */
   cdline ( lin1, col2, lin2, col2 );	/* down */
   cdline ( lin2, col2, lin2, col1 );	/* left */
   cdline ( lin1, col1, lin2, col1 );	/* up */
-  
+
   /* Now the corners */
-  
+
   cdmove(lin1, col1);	/* Upper left corner */
   addch(ACS_ULCORNER);
   cdmove(lin1, col2); /* upper right corner */
@@ -89,9 +89,9 @@ void cdbox ( int lin1, int col1, int lin2, int col2 )
   addch(ACS_LLCORNER);
   cdmove(lin2, col2); /* lower right corner */
   addch(ACS_LRCORNER);
-  
+
   return;
-  
+
 }
 
 
@@ -102,11 +102,11 @@ void cdbox ( int lin1, int col1, int lin2, int col2 )
 /*       f - font for character */
 void cdcput ( char ch )
 {
-  
+
   addch(ch);
-  
+
   return;
-  
+
 }
 
 
@@ -117,7 +117,7 @@ void cdclear(void)
 {
   clear();
   return;
-  
+
 }
 
 
@@ -133,22 +133,22 @@ void cdclra ( int l1, int c1, int l2, int c2 )
 {
   int i, j, rfc, rlc, rfl, rll;
   static char tmpstr[256];
-  
+
   rfc = max ( 0, min ( c1, c2 ) );
-  
+
   /*    rlc = min ( maxcol - 1, max ( c1, c2 ) );*/
-  
+
   rlc = min ( maxcol, max ( c1, c2 ) );
-  
+
   /* Calculate length. */
   j = rlc - rfc + 1;
-  
+
   rfl = max ( 0, min ( l1, l2 ) );
-  
+
   /*    rll = min ( maxlin - 1, max ( l1, l2 ) );*/
-  
+
   rll = min ( maxlin, max ( l1, l2 ) );
-  
+
   cdfill(' ', tmpstr, j);
   tmpstr[j] = '\0';
 
@@ -166,9 +166,9 @@ void cdclra ( int l1, int c1, int l2, int c2 )
       else
 	addstr(tmpstr);
     }
-  
+
   return;
-  
+
 }
 
 
@@ -179,13 +179,13 @@ void cdclra ( int l1, int c1, int l2, int c2 )
 void cdclrl ( int f, int n )
 {
   int i;
-  
+
   i = f + n - 1;
   if ( i > 0 )
     cdclra ( f, 1, i, maxcol );
-  
+
   return;
-  
+
 }
 
 
@@ -196,7 +196,7 @@ void cdclrl ( int f, int n )
 int cdcols ( void )
 {
   return ( maxcol );
-  
+
 }
 
 /* cdend - end display environment */
@@ -217,7 +217,7 @@ void cdend(void)
   term.c_cc[VINTR] = Context.intrchar; /* restore INTR */
   tcsetattr(iolbStdinFD, TCSANOW, &term);
 #endif
-  
+
   return;
 }
 
@@ -232,10 +232,10 @@ void cdend(void)
 void cdfill ( char ch, char *buf, int count )
 {
   register int i;
-  
+
   for ( i = 0; i < count; i++ )
     buf[i] = ch;
-  
+
 }
 
 /* cdgetn - read a number from the terminal */
@@ -244,24 +244,24 @@ void cdfill ( char ch, char *buf, int count )
 /*    int status, cdgetn, num, lin, col */
 /*    status = cdgetn ( pmt, lin, col, num ) */
 /*       num - number read */
-/*       status - OK if a number was read, else -1 */
+/*       status - 0 if a number was read, else -1 */
 int cdgetn ( char pmt[], int lin, int col, int *num )
 {
   char buf[MSGMAXLINE];
 
   cdfill('\0', buf, MSGMAXLINE);
   if ( cdgets ( pmt, lin, col, buf, MSGMAXLINE ) == -1 )
-    return ( -1 );
-  
+    return -1;
+
   if (strlen(buf) == 0)
-    return(-1);
+    return -1;
 
   if (!alldig(buf))
-    return(-1);
+    return -1;
 
   *num = atoi ( buf );
-  return ( OK );
-  
+  return 0;
+
 }
 
 
@@ -283,13 +283,11 @@ int cdgets ( char pmt[], int lin, int col, char str[], int maxlen )
 {
 
   cdgetx ( pmt, lin, col, "\r\n", str, maxlen, TRUE );
-  
+
   if ( strlen ( str ) == 0 )
     return(-1);
   else
-    return(OK);
-  
-  
+    return(0);
 }
 
 
@@ -313,13 +311,13 @@ int cdgets ( char pmt[], int lin, int col, char str[], int maxlen )
 /*    the last word with control-w. You can redisplay the screen with */
 /*    control-l. */
 /*    The terminating char is returned as value. */
-int cdgetx ( char pmt[], int lin, int col, char terms[], char str[], 
+int cdgetx ( char pmt[], int lin, int col, char terms[], char str[],
 	    int maxlen, int doecho )
 {
   int append_flg = FALSE;
   int do_append_flg = FALSE;
   return ( cdgetp ( pmt, lin, col, terms, str, maxlen, &append_flg, do_append_flg, doecho ) );
-  
+
 }
 
 
@@ -336,7 +334,7 @@ int cdgetx ( char pmt[], int lin, int col, char terms[], char str[],
 /*    and initial contents of ``str'' and displayed and then input is read */
 /*    and the result is returned in ``str''. This means that a default value */
 /*    of str can be provided. This routine is otherwise similar to cdgetx(). */
-int cdgetp ( char pmt[], int lin, int col, char terms[], char str[], 
+int cdgetp ( char pmt[], int lin, int col, char terms[], char str[],
 	    int maxlen, int *append_flg, int do_append_flg, int doecho )
 {
   int i, len, icol, scol, imaxlen;
@@ -368,15 +366,15 @@ int cdgetp ( char pmt[], int lin, int col, char terms[], char str[],
   uiPutColor(NoColor);
   len = strlen ( str );
   icol = scol + len;
-  
+
   imaxlen = min ( maxlen, maxcol - scol + 1 );
-  
+
   while (TRUE)
     {
       str[ min ( len+1, imaxlen ) ] = 0;
       cdmove ( lin, icol );
       cdrefresh ();
-	  
+
       ch = iogchar();
 
       if ( terms[0] != 0 )
@@ -415,8 +413,8 @@ int cdgetp ( char pmt[], int lin, int col, char terms[], char str[],
 	    StrInit = FALSE;
 	    cdrefresh();
 	  }
-	    
-	    
+
+
 
       if ( ch == '\b' || ch == 0x7f || ch == KEY_BACKSPACE )
 	{
@@ -444,7 +442,7 @@ int cdgetp ( char pmt[], int lin, int col, char terms[], char str[],
 		  }
 		else
 		  break;
-	      
+
 	      /* Back up over non-blanks. */
 	      while ( len >= 0 )
 		if ( str[len] == ' ' )
@@ -514,9 +512,9 @@ int cdgetp ( char pmt[], int lin, int col, char terms[], char str[],
 	  cdbeep(); /* exceeded max. allowable characters. */
 	  if (do_append_flg == TRUE) {
 	    /*
-	     * Push (if char != ' ') last word back into buffer which will be 
-	     * inserted back into the msg buffer when cdgetp() is called again.  
-	     * Replace pushed back chars with "append" symbol and blanks.  
+	     * Push (if char != ' ') last word back into buffer which will be
+	     * inserted back into the msg buffer when cdgetp() is called again.
+	     * Replace pushed back chars with "append" symbol and blanks.
 	     * Set the flag to come on back and then return from whence we came.
 	     */
 	    cdclra ( lin, scol, lin, maxlen+1);
@@ -530,9 +528,9 @@ int cdgetp ( char pmt[], int lin, int col, char terms[], char str[],
 	      i=0;
 	    max_size = strlen(&str[i]) + strlen(append_str);
 	    diff = max_size - (maxlen - 2);
-	    
-	    /* 
-	     * Assume the word is too big to reinsert (just repeating the line). 
+
+	    /*
+	     * Assume the word is too big to reinsert (just repeating the line).
 	     * Save last char entered and go on.
 	     */
 	    if (diff > 0) {
@@ -542,7 +540,7 @@ int cdgetp ( char pmt[], int lin, int col, char terms[], char str[],
 	    }
 	    else {
 	      if (str[maxlen-2] != ' ') { /* Save last word plus last char entered */
-		strcpy(sbuf,&str[i]); 
+		strcpy(sbuf,&str[i]);
 		str[i] = (int)'-';
 		sprintf(mbuf, append_fmt1, append_str, sbuf, ch);
 		for (i=i+1;i<len;i++)
@@ -554,34 +552,34 @@ int cdgetp ( char pmt[], int lin, int col, char terms[], char str[],
 		for (i=i+1;i<len;i++)
 		  str[i] = ' ';
 	      }
-	    } 
+	    }
 	    ibufPut(mbuf);
 	    *append_flg = TRUE;
 	    break;
 	  } /* end if do_append_flg */
 	}
     }
-  
+
   str[ min ( len+1, imaxlen ) ] = 0;
-  
+
   uiPutColor(0);
   return ( ch );
-  
+
 }
 
 void cdbeep(void)
 {
   time_t i;
   static time_t old = 0;
-  
+
   i = time(0);
-      
+
   if (i != old)
     {
       old = i;
       beep();
     }
-  
+
   return;
 }
 
@@ -599,42 +597,42 @@ void cdinit(void)
 #endif
 
   /* Initialize screen library (this MUST be done first). */
-  
+
   ibufInit();
-  
+
   initscr();
   start_color();
-  
+
   uiInitColors();
-  
-  nonl(); 
+
+  nonl();
   typeahead(-1);		/* no typeahead checking */
   keypad(stdscr, TRUE);
   cbreak();
   notimeout(stdscr, TRUE);		/* JET 2/11/96 - this NEEDS to be set */
   intrflush(stdscr, TRUE);
-  
+
   noecho();
-  
+
   maxcol = ((COLS > 80) ? 80 : COLS);
   maxlin = LINES;
 
   /* make sure COLS is >= 80, LINES >= 24 */
-  
+
   if (maxcol < 80 || LINES < 25)
     {
       cdend();
-      
-      fprintf(stderr, 
+
+      fprintf(stderr,
               "\nYour terminal must have at least 80 columns and 25 lines.\n");
-      
+
       exit(1);
     }
-  
+
   /* get the users INTR char if possible so it can be stuffed into the
    *  KB buffer if a INTR is recieved.  Useful for unixware systems
    *  where * DEL is the default INTR char.  This should allow DEL
-   *  to be used for deleting text for example 
+   *  to be used for deleting text for example
    */
 
   Context.intrchar = 0;	/* default - nothing */
@@ -649,7 +647,7 @@ void cdinit(void)
   cdclear();
 
   return;
-  
+
 }
 
 
@@ -694,9 +692,9 @@ void cdline ( int lin1, int col1, int lin2, int col2 )
 	  vline(0, lin1 - lin2);
 	}
     }
-  
+
   return;
-  
+
 }
 
 
@@ -707,7 +705,7 @@ void cdline ( int lin1, int col1, int lin2, int col2 )
 int cdlins ( void )
 {
   return ( maxlin );
-  
+
 }
 
 /* cdmove - move position of cursor in desired image */
@@ -716,7 +714,7 @@ int cdlins ( void )
 /*    cdmove ( lin, col ) */
 void cdmove ( int lin, int col )
 {
-  
+
   /* ratfor sclib addresses screen */
   /* coordinates starting at 1, curses */
   /* always starts with 0, regardless */
@@ -725,16 +723,16 @@ void cdmove ( int lin, int col )
     lin--;
   if (col != 0)
     col--;
-  
+
   lin = (lin > (maxlin - 1)) ? maxlin - 1 : lin; /* make sure we're */
   col = (col > (maxcol - 1)) ? maxcol - 1 : col; /* within screen */
   /* boundries */
-  
+
   /* do it hard and fast (we hope)*/
   move(lin, col);
-  
+
   return;
-  
+
 }
 
 
@@ -762,14 +760,14 @@ void cdrefresh ( void )
 void cdput ( char ch, int lin, int col )
 {
   char tmpstr[2];
-  
+
   tmpstr[0] = ch;
   tmpstr[1] = '\0';
-  
+
   cdputs(tmpstr, lin, col);
-  
+
   return;
-  
+
 }
 
 
@@ -781,7 +779,7 @@ void cdput ( char ch, int lin, int col )
 void cdputc ( char str[], int lin )
 {
   cdputs ( str, lin, (int)(cdcols() - strlen(str)) / (int)2 );
-  
+
   return;
 }
 
@@ -793,11 +791,11 @@ void cdputc ( char str[], int lin )
 void cdputn ( int iint, int wid, int lin, int col )
 {
   char fmt[20], buf[MSGMAXLINE];
-  
+
   sprintf ( fmt, "%%%dd", wid );
   sprintf ( buf, fmt, iint );
   cdputs ( buf, lin, col );
-  
+
   return;
 }
 
@@ -810,13 +808,13 @@ void cdputn ( int iint, int wid, int lin, int col )
 void cdputr ( real x, int wid, int lin, int col )
 {
   char fmt[20], buf[MSGMAXLINE];
-  
+
   sprintf ( fmt, "%%%dg", wid );
   sprintf ( buf, fmt, x);
   cdputs ( buf, lin, col );
-  
+
   return;
-  
+
 }
 
 
@@ -833,20 +831,20 @@ void cdputs ( char str[], int lin, int col )
 {
   int len, slen;
   static char tmpstr[128];
-  
+
   strcpy(tmpstr, str);
-  
+
   len = Context.maxcol - col; /* max str that will fit on screen */
   slen = strlen(tmpstr);
-  
+
   len = (len >= 0) ? len : 0;
-  
+
   if (slen >= len )
     tmpstr[len] = '\0';
-  
+
   cdmove(lin, col);
-  
-  addstr(tmpstr);	
+
+  addstr(tmpstr);
   return;
 }
 
@@ -863,5 +861,3 @@ void cdredo(void)
 
   return;
 }
-
-
