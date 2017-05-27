@@ -1031,9 +1031,9 @@ static int _chkrefit(void)
 {
   int snum = Context.snum;
   int pnum;
-  static string ntp="We must be orbiting a team owned planet to refit.";
-  static string nek="You must have at least one kill to refit.";
-  static string cararm="You cannot refit while carrying armies";
+  static char *ntp="We must be orbiting a team owned planet to refit.";
+  static char *nek="You must have at least one kill to refit.";
+  static char *cararm="You cannot refit while carrying armies";
   
   hudClearPrompt(MSG_LIN2);
   
@@ -1065,7 +1065,7 @@ static int _chkcoup(void)
 {
   int snum = Context.snum;
   int i, pnum;
-  string nhp="We must be orbiting our home planet to attempt a coup.";
+  char *nhp="We must be orbiting our home planet to attempt a coup.";
   
   hudClearPrompt(MSG_LIN2);
   
@@ -1160,8 +1160,8 @@ static void _domsgto(char *buf, int ch, int terse)
 {
   int i, j; 
   static char tbuf[MESSAGE_SIZE];
-  string nf="Not found.";
-  string huh="I don't understand.";
+  char *nf="Not found.";
+  char *huh="I don't understand.";
   int editing;
   static int to = MSG_NOONE;
   
@@ -1733,7 +1733,7 @@ static void _initbeam()
   int snum = Context.snum;
   int pnum, capacity, i;
   real rkills;
-  string lastfew="Fleet orders prohibit removing the last three armies.";
+  char *lastfew="Fleet orders prohibit removing the last three armies.";
   
   hudClearPrompt(MSG_LIN1);
   hudClearPrompt(MSG_LIN2);

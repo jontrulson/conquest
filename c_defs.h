@@ -180,7 +180,6 @@ extern char *crypt(char *, char *);
 
 /* Type Fakes */
 
-typedef char * string;
 typedef double real;
 
 /* Function Fakes */

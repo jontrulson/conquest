@@ -151,7 +151,7 @@ void display( int snum )
   int colofs[8] = {1, 1, 0, -1, -1, -1, 0, 1};
   cqColor outattr = 0;
   static int OldAlert = 0;
-  static string dirch="-/|\\-/|\\";
+  static char *dirch="-/|\\-/|\\";
   char ch, buf[MSGMAXLINE];
   int dobeep, lsmap;
   cqColor palertcol;

@@ -637,7 +637,7 @@ void debugplan(void)
   char junk[10], uninhab[20];
   char hd0[MSGMAXLINE*4];
   char *hd1="D E B U G G I N G  P L A N E T   L I S T";
-  string hd2="planet        C T arm uih scan        planet        C T arm uih scan";
+  char *hd2="planet        C T arm uih scan        planet        C T arm uih scan";
   char hd3[BUFFER_SIZE];
   int FirstTime = TRUE;
   int PlanetOffset;             /* offset into NUMPLANETS for this page */
@@ -1404,8 +1404,8 @@ void opinfo( int snum )
 {
   int i, j, now[NOWSIZE];
   char ch;
-  string pmt="Information on: ";
-  string huh="I don't understand.";
+  char *pmt="Information on: ";
+  char *huh="I don't understand.";
   
   cdclrl( MSG_LIN1, 2 );
   
@@ -1467,7 +1467,7 @@ void opinit(void)
   
   int i, lin, col, icol;
   char ch, buf[MSGMAXLINE];
-  string pmt="Initialize what: ";
+  char *pmt="Initialize what: ";
   
   
   cdclear();
@@ -2231,9 +2231,9 @@ void opstats(void)
   char buf[MSGMAXLINE], junk[MSGMAXLINE*2], timbuf[32];
   int ch;
   real x;
-  string sfmt="#%d#%32s #%d#%12s\n";
-  string tfmt="#%d#%32s #%d#%20s\n";
-  string pfmt="#%d#%32s #%d#%11.1f%%\n";
+  char *sfmt="#%d#%32s #%d#%12s\n";
+  char *tfmt="#%d#%32s #%d#%20s\n";
+  char *pfmt="#%d#%32s #%d#%11.1f%%\n";
   
   col = 8;
   cdclear();
@@ -3272,8 +3272,8 @@ int prompt_ship(char buf[], int *snum, int *normal)
 {
   int tch;
   int tmpsnum = 0;
-  string pmt="Watch which ship (<cr> for doomsday)? ";
-  string nss="No such ship.";
+  char *pmt="Watch which ship (<cr> for doomsday)? ";
+  char *nss="No such ship.";
 
   tmpsnum = *snum;
 

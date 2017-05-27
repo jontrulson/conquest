@@ -464,7 +464,7 @@ int utArrowsToDir( char *str, real *dir )
 {
   int i, n, idx;
   real thedir, ndir, ndir1, ndir2;
-  string arrs="*dewqazxc";	/* the '*' is to fill arrs[0] - JET */
+  char *arrs="*dewqazxc";	/* the '*' is to fill arrs[0] - JET */
 
   /* Special hack preventing "ea" and "da" from being recognized as arrows. */
   /* "ea" is reserved for Earth and "da" for Dakel. */

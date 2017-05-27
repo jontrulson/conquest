@@ -155,9 +155,9 @@ void cucSendMsg( int from, int terse, int remote )
   char buf[MSGMAXLINE] = "", msg[MESSAGE_SIZE] = "";
   int ch;
   int editing; 
-  string mto="Message to: ";
-  string nf="Not found.";
-  string huh="I don't understand.";
+  char *mto="Message to: ";
+  char *nf="Not found.";
+  char *huh="I don't understand.";
 
   int append_flg;  /* when user types to the limit. */
   int do_append_flg;

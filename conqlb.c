@@ -2083,8 +2083,8 @@ void clbInitUniverse(void)
 void clbIntrude( int snum, int pnum )
 {
   char buf[MSGMAXLINE];
-  string atta=" attacking";
-  string armeq=", armies=";
+  char *atta=" attacking";
+  char *armeq=", armies=";
   
   if ( PVISIBLE(pnum) &&
        Planets[pnum].team != TEAM_SELFRULED &&

@@ -551,8 +551,8 @@ static int prompt_ship(char buf[], int *snum, int *normal)
 {
   int tch;
   int tmpsnum = 0;
-  string pmt="Watch which ship (<cr> for doomsday)? ";
-  string nss="No such ship.";
+  char *pmt="Watch which ship (<cr> for doomsday)? ";
+  char *nss="No such ship.";
 
   tmpsnum = *snum;
 

@@ -255,8 +255,8 @@ void displayrun(FILE *filefd)
 {
     int i, j;
     char buf[MAXLINE];
-    string strat="trstrat";
-    string vec="trvec";
+    char *strat="trstrat";
+    char *vec="trvec";
 
     utFormatTime( buf, 0 );
 

@@ -323,11 +323,11 @@ int mcuKP2DirKey(int *ch)
 int mcuConqLogo(void)
 {
   int col, lin, lenc1;
-  string c1=" CCC    OOO   N   N   QQQ   U   U  EEEEE   SSSS  TTTTT";
-  string c2="C   C  O   O  NN  N  Q   Q  U   U  E      S        T";
-  string c3="C      O   O  N N N  Q   Q  U   U  EEE     SSS     T";
-  string c4="C   C  O   O  N  NN  Q  Q   U   U  E          S    T";
-  string c5=" CCC    OOO   N   N   QQ Q   UUU   EEEEE  SSSS     T";
+  char *c1=" CCC    OOO   N   N   QQQ   U   U  EEEEE   SSSS  TTTTT";
+  char *c2="C   C  O   O  NN  N  Q   Q  U   U  E      S        T";
+  char *c3="C      O   O  N N N  Q   Q  U   U  EEE     SSS     T";
+  char *c4="C   C  O   O  N  NN  Q  Q   U   U  E          S    T";
+  char *c5=" CCC    OOO   N   N   QQ Q   UUU   EEEEE  SSSS     T";
   
   /* First clear the display. */
   cdclear();
@@ -846,7 +846,7 @@ void mcuPlanetList( int team, int snum )
   char ch, junk[10], coreflag;
   char *hd0="P L A N E T   L I S T   ";
   char *hd1="' = must take to conquer the Universe)";
-  string hd2="planet      type team armies          planet      type team armies";
+  char *hd2="planet      type team armies          planet      type team armies";
   char hd3[BUFFER_SIZE];
   int outattr;
   int col2;
@@ -864,7 +864,7 @@ void mcuPlanetList( int team, int snum )
     {
       FirstTime = FALSE;
 
-				/* build header fmt string */
+				/* build header fmt char **/
       sprintf(pd0,
 	      "#%d#%s#%d#%s#%d#%s#%d#%s" ,
 	      LabelColor,
@@ -1390,7 +1390,7 @@ void mcuTeamList( int team )
   int godlike;
   char buf[MSGMAXLINE], timbuf[5][DATESIZE];
   real x[5];
-  string sfmt="%15s %11s %11s %11s %11s %11s";
+  char *sfmt="%15s %11s %11s %11s %11s %11s";
   char *stats="Statistics since: ";
   char *last_conquered="Universe last conquered at: ";
 
@@ -1998,7 +1998,7 @@ int mcuGetTarget( char *pmt, int lin, int col, real *dir, real cdefault )
 int mcuMore( char *pmt )
 {
   int ch = 0; 
-  string pml=MTXT_MORE;
+  char *pml=MTXT_MORE;
   
   if ( pmt[0] != 0 )
     mcuPutPrompt( pmt, MSG_LIN2 );
@@ -2022,7 +2022,7 @@ void mcuPageFile( char *file, char *errmsg )
   
   int plins = 1;
   FILE *pfd;
-  string sdone="--- press any key to return ---";
+  char *sdone="--- press any key to return ---";
   char buffer[BUFFER_SIZE];
   int buflen;
   

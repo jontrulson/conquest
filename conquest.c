@@ -1005,7 +1005,7 @@ void dead( int snum, int leave )
 {
   int i, kb;
   int ch;
-  string ywkb="You were killed by ";
+  char *ywkb="You were killed by ";
   char buf[128], junk[128];
 
   /* (Quickly) clear the screen. */
@@ -1236,7 +1236,7 @@ void doalloc( int snum )
   char ch;
   int i, alloc;
   int dwalloc = 0;
-  string pmt="New weapons allocation: (30-70) ";
+  char *pmt="New weapons allocation: (30-70) ";
 
   cdclrl( MSG_LIN1, 2 );
   cbuf[0] = 0;
@@ -1287,7 +1287,7 @@ void doalloc( int snum )
 void doautopilot( int snum )
 {
   int ch;
-  string conf="Press [TAB] to engage autopilot:";
+  char *conf="Press [TAB] to engage autopilot:";
 
   cdclrl( MSG_LIN1, 2 );
   cbuf[0] = 0;
@@ -1348,8 +1348,8 @@ void dobeam( int snum )
   char buf[MSGMAXLINE];
   real rkills;
   int done = FALSE;
-  string lastfew="Fleet orders prohibit removing the last three armies.";
-  string abt="...aborted...";
+  char *lastfew="Fleet orders prohibit removing the last three armies.";
+  char *abt="...aborted...";
 
   cdclrl( MSG_LIN1, 2 );
 
@@ -1589,7 +1589,7 @@ void dobomb( int snum )
 {
   int pnum;
   char  buf[MSGMAXLINE];
-  string abt="...aborted...";
+  char *abt="...aborted...";
 
   SFCLR(snum, SHIP_F_REPAIR);;
 
@@ -1699,7 +1699,7 @@ void doburst( int snum )
 /*    docloak( snum ) */
 void docloak( int snum )
 {
-  string pmt="Press [TAB] to engage cloaking device: ";
+  char *pmt="Press [TAB] to engage cloaking device: ";
 
   cdclrl( MSG_LIN1, 1 );
   cdclrl( MSG_LIN2, 1 );
@@ -1732,10 +1732,10 @@ void dorefit( int snum, int dodisplay )
   int ch, pnum, now, entertime, leave;
   char buf1[128];
   int oldstype = 0, stype = 0;
-  string ntp="We must be orbiting a team owned planet to refit.";
-  string nek="You must have at least one kill to refit.";
-  string conf="Press [TAB] to change, [ENTER] to accept: ";
-  string cararm="You cannot refit while carrying armies";
+  char *ntp="We must be orbiting a team owned planet to refit.";
+  char *nek="You must have at least one kill to refit.";
+  char *conf="Press [TAB] to change, [ENTER] to accept: ";
+  char *cararm="You cannot refit while carrying armies";
 
   cdclrl( MSG_LIN2, 1 );
 
@@ -1866,8 +1866,8 @@ void dorefit( int snum, int dodisplay )
 void docoup( int snum )
 {
   int i, pnum;
-  string nhp="We must be orbiting our home planet to attempt a coup.";
-  string conf="Press [TAB] to try it: ";
+  char *nhp="We must be orbiting our home planet to attempt a coup.";
+  char *conf="Press [TAB] to try it: ";
 
   cdclrl( MSG_LIN2, 1 );
 
@@ -2090,7 +2090,7 @@ void dodet( int snum )
 /*    dodistress( snum ) */
 void dodistress( int snum )
 {
-  string pmt="Press [TAB] to send an emergency distress call: ";
+  char *pmt="Press [TAB] to send an emergency distress call: ";
 
   cdclrl( MSG_LIN1, 2 );
 
@@ -2468,7 +2468,7 @@ void doReviewMsgs( int snum )
 /*    doselfdest */
 void doselfdest(int snum)
 {
-  string pmt="Press [TAB] to initiate self-destruct sequence: ";
+  char *pmt="Press [TAB] to initiate self-destruct sequence: ";
 
   cdclrl( MSG_LIN1, 2 );
 
@@ -2696,11 +2696,11 @@ void gretds()
 {
 
   int col,lin;
-  string g1=" GGG   RRRR   EEEEE  EEEEE  TTTTT   III   N   N   GGG    SSSS";
-  string g2="G   G  R   R  E      E        T      I    NN  N  G   G  S";
-  string g3="G      RRRR   EEE    EEE      T      I    N N N  G       SSS";
-  string g4="G  GG  R  R   E      E        T      I    N  NN  G  GG      S  ..  ..  ..";
-  string g5=" GGG   R   R  EEEEE  EEEEE    T     III   N   N   GGG   SSSS   ..  ..  ..";
+  char *g1=" GGG   RRRR   EEEEE  EEEEE  TTTTT   III   N   N   GGG    SSSS";
+  char *g2="G   G  R   R  E      E        T      I    NN  N  G   G  S";
+  char *g3="G      RRRR   EEE    EEE      T      I    N N N  G       SSS";
+  char *g4="G  GG  R  R   E      E        T      I    N  NN  G  GG      S  ..  ..  ..";
+  char *g5=" GGG   R   R  EEEEE  EEEEE    T     III   N   N   GGG   SSSS   ..  ..  ..";
 
   col = (int)(Context.maxcol - strlen(g5)) / (int)2;
   lin = 1;
@@ -3316,9 +3316,9 @@ int welcome(void)
 {
   int i, team, col;
   char name[MAXUSERNAME];
-  string sorry1="I'm sorry, but the game is closed for repairs right now.";
-  string sorry2="I'm sorry, but there is no room for a new player right now.";
-  string sorryn="Please try again some other time.  Thank you.";
+  char *sorry1="I'm sorry, but the game is closed for repairs right now.";
+  char *sorry2="I'm sorry, but there is no room for a new player right now.";
+  char *sorryn="Please try again some other time.  Thank you.";
   char * selected_str="You have been selected to command a";
   char * starship_str=" starship.";
   char * prepare_str="Prepare to be beamed aboard...";

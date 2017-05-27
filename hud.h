@@ -139,7 +139,7 @@ struct _info {
   int  lasttarget;
 
   char lastblaststr[HUD_INFO_STR_SZ];  /* last "FA:" blast (firing) angle */
-  char lasttargetstr[HUD_INFO_STR_SZ]; /* last target in string form */
+  char lasttargetstr[HUD_INFO_STR_SZ]; /* last target in char *form */
   char lasttadstr[HUD_INFO_STR_SZ];    /* full "TA/D" target:ang/dist str */
 };
 

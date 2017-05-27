@@ -29,12 +29,12 @@ static int serror = FALSE;
 static int newuser = FALSE;
 static time_t snooze = (time_t)0;          /* sleep time */
 
-static string sorry1="I'm sorry, but the game is closed for repairs right now.";
-static string sorry2="I'm sorry, but there is no room for a new player right now.";
-static string sorryn="Please try again some other time.  Thank you.";
-static string selected_str="You have been selected to command a";
-static string starship_str=" starship.";
-static string prepare_str="Prepare to be beamed aboard...";
+static char *sorry1="I'm sorry, but the game is closed for repairs right now.";
+static char *sorry2="I'm sorry, but there is no room for a new player right now.";
+static char *sorryn="Please try again some other time.  Thank you.";
+static char *selected_str="You have been selected to command a";
+static char *starship_str=" starship.";
+static char *prepare_str="Prepare to be beamed aboard...";
 
 
 
@@ -54,11 +54,11 @@ static scrNode_t nWelcomeNode = {
 static void gretds()
 {
   int col,lin;
-  string g1=" GGG   RRRR   EEEEE  EEEEE  TTTTT   III   N   N   GGG    SSSS";
-  string g2="G   G  R   R  E      E        T      I    NN  N  G   G  S";
-  string g3="G      RRRR   EEE    EEE      T      I    N N N  G       SSS";
-  string g4="G  GG  R  R   E      E        T      I    N  NN  G  GG      S  ..  ..  ..";
-  string g5=" GGG   R   R  EEEEE  EEEEE    T     III   N   N   GGG   SSSS   ..  ..  ..";
+  char *g1=" GGG   RRRR   EEEEE  EEEEE  TTTTT   III   N   N   GGG    SSSS";
+  char *g2="G   G  R   R  E      E        T      I    NN  N  G   G  S";
+  char *g3="G      RRRR   EEE    EEE      T      I    N N N  G       SSS";
+  char *g4="G  GG  R  R   E      E        T      I    N  NN  G  GG      S  ..  ..  ..";
+  char *g5=" GGG   R   R  EEEEE  EEEEE    T     III   N   N   GGG   SSSS   ..  ..  ..";
   
   col = (int)(Context.maxcol - strlen(g5)) / (int)2;
   lin = 1;

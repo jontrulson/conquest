@@ -56,7 +56,7 @@ static int nTeamlDisplay(dspConfig_t *dsp)
   int godlike;
   char buf[MSGMAXLINE], timbuf[5][DATESIZE];
   real x[5];
-  static string sfmt="%15s %11s %11s %11s %11s %11s";
+  static char *sfmt="%15s %11s %11s %11s %11s %11s";
   static char *stats="Statistics since: ";
   static char *last_conquered="Universe last conquered at: ";
 
