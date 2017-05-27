@@ -845,8 +845,15 @@ char *Macro2Str(char *str)
 
 int process_bool(char *bufptr)
 {
-  lower(bufptr);
-  
+  // lower case the string
+  char *s = bufptr;
+
+  while(*s)
+    {
+      *s = (char)tolower(*s);
+      s++;
+    }
+
   if ((strstr("false", bufptr) != NULL) || 
       (strstr("no", bufptr) != NULL)    ||
       (strstr("off", bufptr) != NULL))

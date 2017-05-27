@@ -27,20 +27,6 @@ int c_index(char *buf, char ch)
   return(-1);			/* No match */
 }
 
-/* void lower(char *buf) - lowercase a string */
-void lower(char *buf)
-{
-  char *s;
-
-  s = buf;
-
-  while(*s)
-    {
-      *s = (char)tolower(*s);
-      s++;
-    }
-}
-
 /* void upper(char *buf) - upcase a string */
 void upper(char *buf)
 {

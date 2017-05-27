@@ -208,7 +208,6 @@ typedef double real;
 /* Function prototypes for ratfor.c */
 
 int c_index(char *buf, char ch);
-void lower(char *buf);
 void upper(char *buf);
 time_t getnow (int now[NOWSIZE], time_t thetime);
 int wkday (void);
