@@ -23,14 +23,6 @@ int alldig(char *buf)
   return(TRUE);
 }
 
-/* void concat(char str1[], char str2[], char buf[]) - concatenate str1
-   and str2 into buf */
-void concat(char str1[], char str2[], char buf[])
-{
-  strcat(buf, str1);
-  strcat(buf, str2);
-}
-
 /* c_index(char *, char) - get the index of ch in *buf */
 int c_index(char *buf, char ch)
 {

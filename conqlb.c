@@ -2301,7 +2301,8 @@ int clbFmtMsg(int to, int from, char *buf)
       c_strcpy( "GOD", buf );
       break;
     case MSG_DOOM:
-      concat( "The ", Doomsday->name, buf );
+      strcat(buf, "The ");
+      strcat(buf, Doomsday->name);
       break;
     case MSG_OUTSIDE:
       buf[0] = 0;
