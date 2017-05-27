@@ -158,7 +158,7 @@ static int nPlayBMenuInput(int ch)
       state = S_WATCH;
       if (recFileHeader.snum == 0)
         {
-          cbuf[0] = EOS;
+          cbuf[0] = 0;
           prm.preinit = FALSE;
 
         }

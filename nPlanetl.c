@@ -99,7 +99,7 @@ static int nPlanetlDisplay(dspConfig_t *dsp)
 
       strcpy( hd3, hd2 );
       
-      for ( i = 0; hd3[i] != EOS; i++ )
+      for ( i = 0; hd3[i] != 0; i++ )
         if ( hd3[i] != ' ' )
           hd3[i] = '-';
     }
@@ -214,15 +214,15 @@ static int nPlanetlDisplay(dspConfig_t *dsp)
           /* Don't display armies for suns unless we're special. */
           if ( Planets[pnum].type == PLANET_SUN )
             if ( team != TEAM_NOTEAM )
-              junk[0] = EOS;
+              junk[0] = 0;
           
           /* Moons aren't supposed to have armies. */
           if ( Planets[pnum].type == PLANET_MOON )
             {
               if ( team != TEAM_NOTEAM )
-                junk[0] = EOS;
+                junk[0] = 0;
               else if ( Planets[pnum].armies == 0 )
-                junk[0] = EOS;
+                junk[0] = 0;
             }
           
           coreflag = ' ';

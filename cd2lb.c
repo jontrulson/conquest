@@ -351,7 +351,7 @@ int cdgetp ( char pmt[], int lin, int col, char terms[], char str[],
   char *append_str = "- ";
   int max_size, diff;
 
-  if (str[0] != EOS)
+  if (str[0] != 0)
     {				/* theres a value there */
       StrInit = TRUE;
     }
@@ -373,13 +373,13 @@ int cdgetp ( char pmt[], int lin, int col, char terms[], char str[],
   
   while (TRUE)
     {
-      str[ min ( len+1, imaxlen ) ] = EOS;
+      str[ min ( len+1, imaxlen ) ] = 0;
       cdmove ( lin, icol );
       cdrefresh ();
 	  
       ch = iogchar();
 
-      if ( terms[0] != EOS )
+      if ( terms[0] != 0 )
 	{
 	  if ( c_index ( terms, ch ) != ERR )
 	    break;
@@ -395,7 +395,7 @@ int cdgetp ( char pmt[], int lin, int col, char terms[], char str[],
 	  isprint(ch & 0xff))
 	{			/* clear out the preload */
 	  str[0] = ch;
-	  str[1] = EOS;
+	  str[1] = 0;
 	  len = 1;
 	  icol = scol + len;
 	  cdclra ( lin, icol, lin, cdcols() );
@@ -459,7 +459,7 @@ int cdgetp ( char pmt[], int lin, int col, char terms[], char str[],
 		{
 		  len = 0;
 		}
-	      str[len] = EOS;
+	      str[len] = 0;
 
 	      /* Clear things in the actual image, if necessary. */
 	      if ( icol < i )
@@ -481,7 +481,7 @@ int cdgetp ( char pmt[], int lin, int col, char terms[], char str[],
 	      cdclra ( lin, scol, lin, icol - 1 );
 	      icol = scol;
 	      len = 0;
-	      str[0] = EOS;
+	      str[0] = 0;
 	    }
 	}
       else if ( ch == TERM_REDRAW )
@@ -520,9 +520,9 @@ int cdgetp ( char pmt[], int lin, int col, char terms[], char str[],
 	     * Set the flag to come on back and then return from whence we came.
 	     */
 	    cdclra ( lin, scol, lin, maxlen+1);
-	    mbuf[0] = EOS;
-	    sbuf[0] = EOS;
-	    str[len] = EOS;
+	    mbuf[0] = 0;
+	    sbuf[0] = 0;
+	    str[len] = 0;
 	    for (i=len; i>=0 && str[i] != ' '; i--)
 	      ;
 	    i++;
@@ -562,7 +562,7 @@ int cdgetp ( char pmt[], int lin, int col, char terms[], char str[],
 	}
     }
   
-  str[ min ( len+1, imaxlen ) ] = EOS;
+  str[ min ( len+1, imaxlen ) ] = 0;
   
   uiPutColor(0);
   return ( ch );

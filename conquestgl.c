@@ -524,7 +524,7 @@ int main(int argc, char *argv[])
   Context.lasttang = Context.lasttdist = 0;
 
   Context.lasttdist = Context.lasttang = 0;
-  Context.lasttarg[0] = EOS;
+  Context.lasttarg[0] = 0;
   catchSignals();       /* enable trapping of interesting signals */
 
   /* which node to start from... */

@@ -79,12 +79,12 @@ void setUserConfDefaults(void)
   UserConf.effectsVol = 100;
 
   for (i=0; i<MAX_MACROS; i++)
-    UserConf.MacrosF[i][0] = EOS;
+    UserConf.MacrosF[i][0] = 0;
 
   for (i=0; i<CONF_MAXBUTTONS; i++)
     {
       for (j=0; j<CONF_MAXMODIFIERS; j++)
-        UserConf.Mouse[i][j][0] = EOS;
+        UserConf.Mouse[i][j][0] = 0;
 
       /* set up default mouse macros, '\a' mean 'angle' substitution */
 
@@ -225,7 +225,7 @@ int GetSysConf(int checkonly)
 	continue;		/* shouldn't happen...but the universe is
 				   mysterious... */
 
-      buffer[buflen - 1] = EOS;	/* remove trailing LF */
+      buffer[buflen - 1] = 0;	/* remove trailing LF */
       buflen--;
 
 	  
@@ -505,7 +505,7 @@ int GetConf(int usernum)
 	continue;		/* shouldn't happen...but the universe is
 				   mysterious... */
 
-      buffer[buflen - 1] = EOS;	/* remove trailing LF */
+      buffer[buflen - 1] = 0;	/* remove trailing LF */
       buflen--;
 
 #ifdef DEBUG_CONFIG
@@ -735,7 +735,7 @@ char *Str2Macro(char *str)
 
   i = 0;
   s = str;
-  retstr[0] = EOS;
+  retstr[0] = 0;
 
   while (*s && i < (BUFFER_SIZE - 1))
     {
@@ -779,7 +779,7 @@ char *Str2Macro(char *str)
 	}
     }
       
-  retstr[i] = EOS;
+  retstr[i] = 0;
 
   return(retstr);
 }
@@ -793,7 +793,7 @@ char *Macro2Str(char *str)
 
   i = 0;
   s = str;
-  retstr[0] = EOS;
+  retstr[0] = 0;
 
 #if defined(DEBUG_CONFIG)
   if (str != NULL )
@@ -835,7 +835,7 @@ char *Macro2Str(char *str)
 	}
     }
 
-  retstr[i] = EOS;
+  retstr[i] = 0;
   
   return(retstr);
 }

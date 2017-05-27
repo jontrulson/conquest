@@ -688,7 +688,7 @@ void hudSetRecId(char *str)
   if (str)
     strcpy(hudData.recId.str, str);
   else
-    hudData.recId.str[0] = EOS;
+    hudData.recId.str[0] = 0;
 
   return;
 }
@@ -699,7 +699,7 @@ void hudSetRecTime(char *str)
   if (str)
     strcpy(hudData.recTime.str, str);
   else
-    hudData.recTime.str[0] = EOS;
+    hudData.recTime.str[0] = 0;
 
   return;
 }

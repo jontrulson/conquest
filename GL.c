@@ -1369,10 +1369,10 @@ void drawPlanet( GLfloat x, GLfloat y, int pnum, int scale,
           planame[0] = Planets[pnum].name[0];
           planame[1] = Planets[pnum].name[1];
           planame[2] = Planets[pnum].name[2];
-          planame[3] = EOS;
+          planame[3] = 0;
         }
       else
-        planame[0] = EOS;
+        planame[0] = 0;
 
       if (UserConf.DoNumMap && (torpchar != ' '))
         snprintf(buf, BUFFER_SIZE - 1, "#%d#%c#%d#%d#%d#%c%s", 

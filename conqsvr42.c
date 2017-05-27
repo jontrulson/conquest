@@ -116,7 +116,7 @@ void conqinit(void)
   Context.drchklastime = 0;
   
   /* Haven't scanned anything yet. */
-  Context.lastinfostr[0] = EOS;
+  Context.lastinfostr[0] = 0;
 
   return;
   
@@ -426,7 +426,7 @@ int isagod( int unum )
   if (unum == -1)		/* get god status for current user */
     {
       strncpy(myname, clbGetUserLogname(), BUFFER_SIZE);
-      myname[BUFFER_SIZE - 1] = EOS;
+      myname[BUFFER_SIZE - 1] = 0;
     }
   else
     {				/* else a user number passed in */

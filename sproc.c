@@ -701,15 +701,15 @@ void procChangePassword(char *buf)
   utLog("PROC ChangePassword");
 #endif
  
-  salt[0] = (Users[unum].username[0] != EOS) ? Users[unum].username[0] :
+  salt[0] = (Users[unum].username[0] != 0) ? Users[unum].username[0] :
     'J';
-  salt[1] = (Users[unum].username[1] != EOS) ? Users[unum].username[1] :
+  salt[1] = (Users[unum].username[1] != 0) ? Users[unum].username[1] :
     'T';
-  salt[2] = EOS;
+  salt[2] = 0;
 
   strncpy(Users[unum].pw, (char *)crypt((char *)cauth->pw, salt), 
           MAXUSERNAME - 2);
-  Users[unum].pw[MAXUSERNAME - 1] = EOS;
+  Users[unum].pw[MAXUSERNAME - 1] = 0;
 
   return;
 }

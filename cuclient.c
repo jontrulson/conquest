@@ -28,7 +28,7 @@ void cucPseudo( int unum, int snum )
 {
   char ch, buf[MSGMAXLINE];
   
-  buf[0] = EOS;
+  buf[0] = 0;
 
   cdclrl( MSG_LIN1, 2 );
   c_strcpy( "Old pseudonym: ", buf );
@@ -39,7 +39,7 @@ void cucPseudo( int unum, int snum )
   cdputc( buf, MSG_LIN1 );
   ch = mcuGetCX( "Enter a new pseudonym: ",
 	     MSG_LIN2, -4, TERMS, buf, MAXUSERPNAME );
-  if ( ch == TERM_ABORT || buf[0] == EOS)
+  if ( ch == TERM_ABORT || buf[0] == 0)
     {
       cdclrl( MSG_LIN1, 2 );
       return;
@@ -166,7 +166,7 @@ void cucSendMsg( int from, int terse, int remote )
   
   /* First, find out who we're sending to. */
   cdclrl( MSG_LIN1, 2 );
-  buf[0] = EOS;
+  buf[0] = 0;
   ch = cdgetx( mto, MSG_LIN1, 1, TERMS, buf, MSGMAXLINE, TRUE );
   if ( ch == TERM_ABORT )
     {
@@ -175,7 +175,7 @@ void cucSendMsg( int from, int terse, int remote )
     }
   
   /* TAB or ENTER means use the target from the last message. */
-  editing = ( (ch == TERM_EXTRA || ch == TERM_NORMAL) && buf[0] == EOS );
+  editing = ( (ch == TERM_EXTRA || ch == TERM_NORMAL) && buf[0] == 0 );
   if ( editing )
     {
       /* Make up a default string using the last target. */
@@ -198,7 +198,7 @@ void cucSendMsg( int from, int terse, int remote )
 	  c_strcpy( "Friend", buf );
 	  break;
 	default:
-	  buf[0] = EOS;
+	  buf[0] = 0;
 	  break;
 	}
       
@@ -304,7 +304,7 @@ void cucSendMsg( int from, int terse, int remote )
   cdclrl( MSG_LIN2, 1 );
   
   if ( ! editing )
-    msg[0] = EOS;
+    msg[0] = 0;
   
   if ( to == MSG_IMPLEMENTORS )
     i = MSGMAXLINE;
@@ -315,7 +315,7 @@ void cucSendMsg( int from, int terse, int remote )
   while (append_flg == TRUE) {
   append_flg = FALSE;
   do_append_flg = TRUE;
-  msg[0] = EOS;
+  msg[0] = 0;
   if ( cdgetp( ">", MSG_LIN2, 1, TERMS, msg, i, 
 	       &append_flg, do_append_flg, TRUE ) != TERM_ABORT )
     {

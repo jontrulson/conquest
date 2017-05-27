@@ -421,7 +421,7 @@ int main(int argc, char *argv[])
   Context.snum = 0;
   Context.histslot = ERR;
   Context.lasttang = Context.lasttdist = 0;
-  Context.lasttarg[0] = EOS;
+  Context.lasttarg[0] = 0;
   Context.updsec = 10;		/* 10 per second default update rate */
 
 
@@ -793,13 +793,13 @@ void dead( int snum, int leave )
   /* There aren't supposed to be any torps left. */
   if ( i > 0 )
     {
-      buf[0] = EOS;
+      buf[0] = 0;
       utAppendShip( snum, buf );
       utLog("INFO: dead: %s, detonating torp count is %d.",
 	   buf, i);
     }
   
-  buf[0] = EOS;
+  buf[0] = 0;
   utAppendShip( snum, buf );
   utLog("INFO: dead: %s was killed by %d.", buf, kb);
   
@@ -1750,7 +1750,7 @@ int welcome( int *unum )
 	}
       team = rndint( 0, NUMPLAYERTEAMS - 1 );
       
-      cbuf[0] = EOS;
+      cbuf[0] = 0;
       utAppendTitle( team, cbuf );
       appchr( ' ', cbuf );
       i = strlen( cbuf );

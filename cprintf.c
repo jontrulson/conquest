@@ -37,9 +37,9 @@ void cprintf(int lin, int col, int align, char *fmt, ...)
   static char color_code[BUFFER_SIZE] = "";
 
   vcol = col;
-  buf[0] = EOS;
-  xbuf[0] = EOS;
-  color_code[0] = EOS;
+  buf[0] = 0;
+  xbuf[0] = 0;
+  color_code[0] = 0;
   
   /* use vsprintf */
   va_start(ap, fmt);
@@ -52,8 +52,8 @@ void cprintf(int lin, int col, int align, char *fmt, ...)
   while (TRUE)
     {
       i=0;j=0;
-      xbuf[0]=EOS;
-      while (buf[i] != EOS && i < MID_BUFFER_SIZE)
+      xbuf[0]=0;
+      while (buf[i] != 0 && i < MID_BUFFER_SIZE)
 	{
 	  if ( buf[i] == '#' )   /* color code warning */
 	    {
@@ -64,7 +64,7 @@ void cprintf(int lin, int col, int align, char *fmt, ...)
 		}
 	      /* test for phrase to output */
 
-	      xbuf[j] = EOS;
+	      xbuf[j] = 0;
 	      if ( !two_passes ) 
 		if ( strlen(xbuf) > 0 && i > 0 )
 		  { 
@@ -74,17 +74,17 @@ void cprintf(int lin, int col, int align, char *fmt, ...)
 		  }
 
 	      k=0;
-	      color_code[0] = EOS;
+	      color_code[0] = 0;
 	      if ( buf[i] == '#' ) 
 		i++;                /* advance past '#' */
 	      /* get color code */
 
-	      while ( buf[i] != EOS && isdigit(buf[i]) ) 
+	      while ( buf[i] != 0 && isdigit(buf[i]) ) 
 		{  
 		  if ( !two_passes ) 
 		    {
 		      color_code[k++] = buf[i++];
-		      color_code[k] = EOS;
+		      color_code[k] = 0;
 		    }
 		  else
 		    i++;
@@ -101,7 +101,7 @@ void cprintf(int lin, int col, int align, char *fmt, ...)
 	    } /* end if color code start*/
 	  xbuf[j++] = buf[i++];  /* save char to output xbuf */
 	} /* end outer while */	
-      xbuf[j] = EOS;
+      xbuf[j] = 0;
 
       len = strlen(xbuf);
       /* display the last part of the line. */

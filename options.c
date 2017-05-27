@@ -430,7 +430,7 @@ static void ChangeMacro(int macronum)
     }
       
   strncpy(UserConf.MacrosF[macronum - 1], Str2Macro(buf), MAX_MACRO_LEN);
-  UserConf.MacrosF[macronum - 1][MAX_MACRO_LEN - 1] = EOS;
+  UserConf.MacrosF[macronum - 1][MAX_MACRO_LEN - 1] = 0;
   
   ChangedSomething = TRUE;
 
@@ -710,7 +710,7 @@ static int ViewEditMacros(struct Conf *ConfigData)
 				/* get the macro number for this line */
 	  k = (curpage * macros_per_page) + i; 
 
-	  if (macrovec[k][0] == EOS)
+	  if (macrovec[k][0] == 0)
 	    {			/* not defined */
 	      dispmac = nodef;
 	      vattrib = RedLevelColor;
@@ -866,7 +866,7 @@ static void DisplayHelpScreen(struct Conf *confitem)
 
   while (confitem->ConfComment[i] != NULL)
     {
-      if (confitem->ConfComment[i][0] != EOS)
+      if (confitem->ConfComment[i][0] != 0)
 	{
 	  cdputs(&(confitem->ConfComment[i][1]), lin, col);
 	  lin++;

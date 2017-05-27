@@ -397,7 +397,7 @@ int main(int argc, char *argv[])
       Context.entship = FALSE;      /* never entered a ship */
       Context.histslot = ERR;       /* useless as an op */
       Context.lasttdist = Context.lasttang = 0;
-      Context.lasttarg[0] = EOS;
+      Context.lasttarg[0] = 0;
 
       /* turn off annoying beeps */
       UserConf.DoAlarms = FALSE;
@@ -454,7 +454,7 @@ int main(int argc, char *argv[])
   Context.snum = 0;		/* force menu to get a new ship */
   Context.histslot = ERR;
   Context.lasttang = Context.lasttdist = 0;
-  Context.lasttarg[0] = EOS;
+  Context.lasttarg[0] = 0;
 
   /* If we are playing back a recording (-P)... */
   if (Context.recmode == RECMODE_PLAYING)
@@ -1077,9 +1077,9 @@ void dead( int snum, int leave )
       break;
     default:
       
-	  cbuf[0] = EOS;
-	  buf[0] = EOS;
-	  junk[0] = EOS;
+	  cbuf[0] = 0;
+	  buf[0] = 0;
+	  junk[0] = 0;
       if ( kb > 0 && kb <= MAXSHIPS )
 	{
 	  utAppendShip( kb, cbuf );
@@ -1108,7 +1108,7 @@ void dead( int snum, int leave )
       else
 	{
 	  /* We were unable to determine the cause of death. */
-	  buf[0] = EOS;
+	  buf[0] = 0;
 	  utAppendShip( snum, buf );
 	  sprintf(cbuf, "dead: %s was killed by %d.", buf, kb);
 	  utError( cbuf );
@@ -1133,7 +1133,7 @@ void dead( int snum, int leave )
       i = Ships[snum].armies;
       if ( i > 0 )
 	{
-	  junk[0] = EOS; 
+	  junk[0] = 0; 
 	  if ( i == 1 )
 	    strcpy( cbuf, "army" );
 	  else
@@ -1183,7 +1183,7 @@ void dead( int snum, int leave )
 	{
 	  cdclear();
 	  cdredo();
-	  buf[0] = EOS;
+	  buf[0] = 0;
 
 	  ch = cdgetx( "Any last words? ",
 		       14, 1, TERMS, buf, MAXLASTWORDS, TRUE );
@@ -1191,7 +1191,7 @@ void dead( int snum, int leave )
 	  cdclear();
 	  cdredo();
 
-	  if ( buf[0] != EOS )
+	  if ( buf[0] != 0 )
 	    {
 	      cprintf( 13,0,ALIGN_CENTER, "#%d#%s", 
 			InfoColor, "You last words are entered as:");
@@ -1239,7 +1239,7 @@ void doalloc( int snum )
   string pmt="New weapons allocation: (30-70) ";
   
   cdclrl( MSG_LIN1, 2 );
-  cbuf[0] = EOS;
+  cbuf[0] = 0;
   ch = (char)cdgetx( pmt, MSG_LIN1, 1, TERMS, cbuf, MSGMAXLINE, TRUE );
 
   switch (ch)
@@ -1290,7 +1290,7 @@ void doautopilot( int snum )
   string conf="Press [TAB] to engage autopilot:";
   
   cdclrl( MSG_LIN1, 2 );
-  cbuf[0] = EOS;
+  cbuf[0] = 0;
   if ( cdgetx( conf, MSG_LIN1, 1, TERMS, cbuf, MSGMAXLINE, 
 	       TRUE ) != TERM_EXTRA )
     {
@@ -1516,14 +1516,14 @@ void dobeam( int snum )
     c_strcpy( "down", buf );
   sprintf( cbuf, "Beam %s [1-%d] ", buf, beamax );
   cdclrl( MSG_LIN1, 1 );
-  buf[0] = EOS;
+  buf[0] = 0;
   ch = cdgetx( cbuf, MSG_LIN1, 1, TERMS, buf, MSGMAXLINE, TRUE );
   if ( ch == TERM_ABORT )
     {
       mcuPutMsg( abt, MSG_LIN1 );
       return;
     }
-  else if ( ch == TERM_EXTRA && buf[0] == EOS )
+  else if ( ch == TERM_EXTRA && buf[0] == 0 )
     num = beamax;
   else
     {
@@ -1626,7 +1626,7 @@ void dobomb( int snum )
 	 Planets[pnum].name, Planets[pnum].armies );
   cdclrl( MSG_LIN1, 1 );
   cdclrl( MSG_LIN2, 1 );
-  buf[0] = EOS;
+  buf[0] = 0;
   if ( cdgetx( cbuf, MSG_LIN1, 1, TERMS, buf, MSGMAXLINE,
 	       TRUE) != TERM_EXTRA )
     {
@@ -1711,7 +1711,7 @@ void docloak( int snum )
     }
   
   cdclrl( MSG_LIN1, 1 );
-  cbuf[0] = EOS;
+  cbuf[0] = 0;
   if ( cdgetx( pmt, MSG_LIN1, 1, TERMS, cbuf, MSGMAXLINE,
 	       TRUE) == TERM_EXTRA )
     {
@@ -1920,7 +1920,7 @@ void docoup( int snum )
 
   /* Confirm. */
   cdclrl( MSG_LIN1, 1 );
-  cbuf[0] = EOS;
+  cbuf[0] = 0;
   if ( cdgetx( conf, MSG_LIN1, 1, TERMS, cbuf, MSGMAXLINE,
 	       TRUE) != TERM_EXTRA )
     {
@@ -1948,10 +1948,10 @@ void docourse( int snum )
   
   cdclrl( MSG_LIN1, 2 );
 
-  cbuf[0] = EOS;
+  cbuf[0] = 0;
   ch = cdgetx( "Come to course: ", MSG_LIN1, 1, TERMS, cbuf, MSGMAXLINE, TRUE );
   utDeleteBlanks( cbuf );
-  if ( ch == TERM_ABORT || cbuf[0] == EOS )
+  if ( ch == TERM_ABORT || cbuf[0] == 0 )
     {
       cdclrl( MSG_LIN1, 1 );
       return;
@@ -2094,7 +2094,7 @@ void dodistress( int snum )
   
   cdclrl( MSG_LIN1, 2 );
 
-  cbuf[0] = EOS;
+  cbuf[0] = 0;
   if ( cdgetx( pmt, MSG_LIN1, 1, TERMS, cbuf, MSGMAXLINE,
 	       TRUE) == TERM_EXTRA )
     sendCommand(CPCMD_DISTRESS, (uint16_t)UserConf.DistressToFriendly);
@@ -2248,7 +2248,7 @@ void doinfo( int snum )
   
   cdclrl( MSG_LIN1, 2 );
   
-  cbuf[0] = EOS;
+  cbuf[0] = 0;
   ch = (char)cdgetx( "Information on: ", MSG_LIN1, 1, TERMS, cbuf, MSGMAXLINE,
 		     TRUE);
   if ( ch == TERM_ABORT )
@@ -2261,10 +2261,10 @@ void doinfo( int snum )
   /* Default to what we did last time. */
   utDeleteBlanks( cbuf );
   fold( cbuf );
-  if ( cbuf[0] == EOS )
+  if ( cbuf[0] == 0 )
     {
       c_strcpy( Context.lastinfostr, cbuf );
-      if ( cbuf[0] == EOS )
+      if ( cbuf[0] == 0 )
 	{
 	  cdclrl( MSG_LIN1, 1 );
 	  return;
@@ -2479,7 +2479,7 @@ void doselfdest(int snum)
       return;
     }
 
-  cbuf[0] = EOS;
+  cbuf[0] = 0;
   if ( cdgetx( pmt, MSG_LIN1, 1, TERMS, cbuf, MSGMAXLINE,
 	       TRUE) != TERM_EXTRA )
     {
@@ -2650,7 +2650,7 @@ void dotow( int snum )
       mcuPutMsg( cbuf, MSG_LIN2 );
       return;
     }
-  cbuf[0] = EOS;
+  cbuf[0] = 0;
   ch = (char)cdgetx( "Tow which ship? ", MSG_LIN1, 1, TERMS, cbuf, MSGMAXLINE,
 		     TRUE);
   cdclrl( MSG_LIN1, 1 );
@@ -3387,7 +3387,7 @@ int welcome(void)
 	  return ( FALSE );
 	}
       team = sClientStat.team;
-      cbuf[0] = EOS;
+      cbuf[0] = 0;
       utAppendTitle( team, cbuf );
       appchr( ' ', cbuf );
       i = strlen( cbuf );

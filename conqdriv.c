@@ -199,7 +199,7 @@ int main(int argc, char *argv[])
 	    {
 	      Driver->drivpid = 0;
 	      Driver->drivstat = DRS_OFF;
-	      Driver->drivowner[0] = EOS;
+	      Driver->drivowner[0] = 0;
 	      upchuck();
 	      utLog("conqdriv:player timeout: utDeltaSecs(Driver->playtime, &(Driver->drivtime)) = %d\n", utDeltaSecs(Driver->playtime, &(Driver->drivtime)));
 	      break;
@@ -249,7 +249,7 @@ int main(int argc, char *argv[])
     {
       Driver->drivpid = 0;
       Driver->drivstat = DRS_OFF;
-      Driver->drivowner[0] = EOS;
+      Driver->drivowner[0] = 0;
       utLog( "conqdriv:DRS_KAMIKAZE: Driver->drivstat = %d\n", Driver->drivstat);
     }
   

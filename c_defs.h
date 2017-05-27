@@ -178,8 +178,6 @@ extern char *crypt(char *, char *);
 # define OK      TRUE
 #endif
 
-#define EOS	'\0'
-
 #define FILENAMESIZE 512
 #define MAXLINE 78
 #define ARGBUFSIZE 512

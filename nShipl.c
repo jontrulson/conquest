@@ -73,7 +73,7 @@ static int nShiplDisplay(dspConfig_t *dsp)
   lin = 2;
   cprintf(lin, col, ALIGN_NONE, "#%d#%s", LabelColor, cbuf);
   
-  for ( i = 0; cbuf[i] != EOS; i = i + 1 )
+  for ( i = 0; cbuf[i] != 0; i = i + 1 )
     if ( cbuf[i] != ' ' )
       cbuf[i] = '-';
   lin = lin + 1;
@@ -93,7 +93,7 @@ static int nShiplDisplay(dspConfig_t *dsp)
       if ( status == SS_LIVE ||
            ( doall && ( status != SS_OFF || kb != 0 ) ) )
         {
-          sbuf[0] = EOS;
+          sbuf[0] = 0;
           utAppendShip( i, sbuf );
           appstr(" ", sbuf);
           appchr(ShipTypes[Ships[i].shiptype].name[0], sbuf);
@@ -149,7 +149,7 @@ static int nShiplDisplay(dspConfig_t *dsp)
           
           if ( doall && status != SS_LIVE )
             {
-              cbuf[0] = EOS;
+              cbuf[0] = 0;
               utAppendShipStatus( status, cbuf );
               
               cprintf(lin, col - 2 - strlen( cbuf ), 

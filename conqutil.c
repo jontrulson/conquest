@@ -73,7 +73,7 @@ void utAppendInt( int i, char *str )
 {
   char buf[BUFFER_SIZE];
 
-  buf[0] = EOS;
+  buf[0] = 0;
   sprintf(buf, "%d", i);
   appstr( buf, str );
 
@@ -475,7 +475,7 @@ int utArrowsToDir( char *str, real *dir )
 
   thedir = 0.0;
 
-  for ( i = 0; str[i] != EOS; i = i + 1 )
+  for ( i = 0; str[i] != 0; i = i + 1 )
     {
       n = i + 1;
       idx = c_index( arrs, (char)tolower(str[i]) );
@@ -662,9 +662,9 @@ void utDeleteBlanks( char *str )
 {
   int i, j;
 
-  for ( i = 0; str[i] != EOS; )
+  for ( i = 0; str[i] != 0; )
     if ( str[i] == ' ' )
-      for ( j = i; str[j] != EOS; j = j + 1 )
+      for ( j = i; str[j] != 0; j = j + 1 )
 	str[j] = str[j+1];
     else
       i = i + 1;
@@ -1005,7 +1005,7 @@ int utSafeCToI( int *num, char *buf, int offset )
   int retval;
 
   retval = FALSE;
-  if (buf[offset] == EOS)
+  if (buf[offset] == 0)
     {
       *num = 0;
       retval = FALSE;
@@ -1050,10 +1050,10 @@ int utIsSpecial( char *str, int *what, int *token, int *count )
   utStcpn( str, buf, 20 );			/* need a private copy */
 
   /* Find threshold count; cleverly, the default will be zero when using ctoi. */
-  for (i = 0; buf[i] != EOS && !isdigit(buf[i]); i++)
+  for (i = 0; buf[i] != 0 && !isdigit(buf[i]); i++)
       ;
 
-  buf[i] = EOS;				/* ditch numeric part */
+  buf[i] = 0;				/* ditch numeric part */
   utSafeCToI( count, str, i );		/* ignore status */
 
   if ( utStringMatch( buf, "nes", FALSE ) )	/* this one must be first */
@@ -1144,22 +1144,22 @@ int utStringMatch( char *str1, char *str2, int casesensitive )
   int i;
 
   if ( casesensitive )
-    for ( i = 0; str1[i] == str2[i] && str1[i] != EOS; i = i + 1 )
+    for ( i = 0; str1[i] == str2[i] && str1[i] != 0; i = i + 1 )
       ;
   else
     for ( i = 0;
-	 (char)tolower(str1[i]) == (char)tolower(str2[i]) && str1[i] != EOS;
+	 (char)tolower(str1[i]) == (char)tolower(str2[i]) && str1[i] != 0;
 	 i = i + 1 )
       ;
 
   if ( i == 0 )
     {
-      if ( str1[0] == EOS && str2[0] == EOS )
+      if ( str1[0] == 0 && str2[0] == 0 )
 	return ( TRUE );
       else
 	return ( FALSE );
     }
-  else if ( str1[i] == EOS || str2[i] == EOS )
+  else if ( str1[i] == 0 || str2[i] == 0 )
     return ( TRUE );
 
   return ( FALSE );

@@ -79,7 +79,7 @@ void nDeadInit(void)
       prm.buf = lastwords;
       prm.buflen = MAXLASTWORDS - 1;
       prm.terms = TERMS;
-      prm.buf[0] = EOS;
+      prm.buf[0] = 0;
     }
 
 
@@ -147,9 +147,9 @@ static int nDeadDisplay(dspConfig_t *dsp)
       
       break;
     default:
-      cbuf[0] = EOS;
-      buf[0] = EOS;
-      junk[0] = EOS;
+      cbuf[0] = 0;
+      buf[0] = 0;
+      junk[0] = 0;
       if ( kb > 0 && kb <= MAXSHIPS )
 	{
 	  utAppendShip( kb, cbuf );
@@ -178,7 +178,7 @@ static int nDeadDisplay(dspConfig_t *dsp)
       else
 	{
 	  /* We were unable to determine the cause of death. */
-	  buf[0] = EOS;
+	  buf[0] = 0;
 	  utAppendShip( snum, buf );
 	  sprintf(cbuf, "dead: %s was killed by %d.", buf, kb);
 	  utError( cbuf );
@@ -201,7 +201,7 @@ static int nDeadDisplay(dspConfig_t *dsp)
       i = Ships[snum].armies;
       if ( i > 0 )
 	{
-	  junk[0] = EOS; 
+	  junk[0] = 0; 
 	  if ( i == 1 )
 	    strcpy( cbuf, "army" );
 	  else
@@ -253,7 +253,7 @@ static int nDeadDisplay(dspConfig_t *dsp)
         }
       if (state == S_LASTWCONF)
         {
-          if (prm.buf[0] != EOS)
+          if (prm.buf[0] != 0)
             {
               cprintf( 13,0,ALIGN_CENTER, "#%d#%s",
                        InfoColor, "Your last words are entered as:");
@@ -325,7 +325,7 @@ static int nDeadInput(int ch)
       else
         {                       /* back to the drawing board */
           state = S_LASTWORDS;
-          prm.buf[0] = EOS;
+          prm.buf[0] = 0;
         }
 
       break;

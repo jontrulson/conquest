@@ -559,7 +559,7 @@ static int prompt_ship(char buf[], int *snum, int *normal)
   cdclrl( MSG_LIN1, 2 );
 
   if (recFileHeader.snum == 0)
-    buf[0] = EOS;
+    buf[0] = 0;
   else
     sprintf(buf, "%d", recFileHeader.snum);
 

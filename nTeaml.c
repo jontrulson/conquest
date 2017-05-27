@@ -132,7 +132,7 @@ static int nTeamlDisplay(dspConfig_t *dsp)
   col=0;  /* put col back to 0 for rest of display */
   lin = lin + 1;
 
-  if ( ConqInfo->lastwords[0] != EOS )
+  if ( ConqInfo->lastwords[0] != 0 )
     {
       sprintf(tmpfmt, "#%d#%%c%%s%%c", YellowLevelColor);
       cprintf(lin, 0, ALIGN_CENTER, tmpfmt, '"', ConqInfo->lastwords, '"' );
@@ -145,7 +145,7 @@ static int nTeamlDisplay(dspConfig_t *dsp)
 	 Teams[0].name, Teams[1].name, Teams[2].name, Teams[3].name, "Totals" );
   
   lin++;
-  for ( i = 0; buf[i] != EOS; i++ )
+  for ( i = 0; buf[i] != 0; i++ )
     if ( buf[i] != ' ' )
       buf[i] = '-';
 
@@ -267,7 +267,7 @@ static int nTeamlDisplay(dspConfig_t *dsp)
   
   for ( i = 0; i < 4; i++ )
     if ( Teams[i].couptime == 0 )
-      timbuf[i][0] = EOS;
+      timbuf[i][0] = 0;
     else
       sprintf( timbuf[i], "%d", Teams[i].couptime );
   
@@ -276,11 +276,11 @@ static int nTeamlDisplay(dspConfig_t *dsp)
       for ( i = 0; i < 4; i++ )
 	if ( team != i )
 	  c_strcpy( "-", timbuf[i] );
-	else if ( ! Teams[i].coupinfo && timbuf[i][0] != EOS )
+	else if ( ! Teams[i].coupinfo && timbuf[i][0] != 0 )
 	  c_strcpy( "?", timbuf[i] );
     }
   
-  timbuf[4][0] = EOS;
+  timbuf[4][0] = 0;
   
   lin++;
   cprintf( lin,col,0, sfmt3, "Coup time",

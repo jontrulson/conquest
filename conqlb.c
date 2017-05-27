@@ -846,7 +846,7 @@ int clbTakePlanet( int pnum, int snum )
   /* Yes! */
   utFormatTime( ConqInfo->conqtime, 0 );
   utStcpn( Ships[snum].alias, ConqInfo->conqueror, MAXUSERPNAME );
-  ConqInfo->lastwords[0] = EOS;
+  ConqInfo->lastwords[0] = 0;
   Users[Ships[snum].unum].stats[USTAT_CONQUERS] += 1;
   Teams[Ships[snum].team].stats[TSTAT_CONQUERS] += 1;
   utStcpn( Teams[Ships[snum].team].name, ConqInfo->conqteam, MAXTEAMNAME );
@@ -894,7 +894,7 @@ void clbUserline( int unum, int snum, char *buf, int showgods, int showteam )
     }
   if ( ! Users[unum].live )
     {
-      buf[0] = EOS;
+      buf[0] = 0;
       return;
     }
   
@@ -923,7 +923,7 @@ void clbUserline( int unum, int snum, char *buf, int showgods, int showteam )
     ch = Teams[team].teamchar;
 
   strncpy(tname, Users[unum].username, MAXUSERNAME - 1);
-  tname[MAXUSERNAME - 1] = EOS;
+  tname[MAXUSERNAME - 1] = 0;
 
   sprintf( junk, "%-12.12s %c%-21.21s %c %6.1f",
 	   tname,
@@ -962,12 +962,12 @@ void clbStatline( int unum, char *buf )
 
   if ( unum < 0 || unum >= MAXUSERS )
     {
-      buf[0] = EOS;
+      buf[0] = 0;
       return;
     }
   if ( ! Users[unum].live )
     {
-      buf[0] = EOS;
+      buf[0] = 0;
       return;
     }
   
@@ -997,12 +997,12 @@ void clbStatline( int unum, char *buf )
 	 Users[unum].stats[USTAT_TORPS] );
   
   /* Convert zero counts to dashes. */
-  ch = EOS;
-  for ( i = 9; buf[i] != EOS; i = i + 1 )
+  ch = 0;
+  for ( i = 9; buf[i] != 0; i = i + 1 )
     {
       if ( buf[i] == '0' )
 	if ( ch == ' ' )
-	  if ( buf[i+1] == ' ' || buf[i+1] == EOS )
+	  if ( buf[i+1] == ' ' || buf[i+1] == 0 )
 	    buf[i] = '-';
       ch = buf[i];
     }
@@ -1027,7 +1027,7 @@ void clbStatline( int unum, char *buf )
 	{
 	  morejunk[j++] = junk[i];
 	}
-      morejunk[j] = EOS;
+      morejunk[j] = 0;
       
       appstr( morejunk, buf );
     }
@@ -1815,7 +1815,7 @@ void clbInitMsgs(void)
   /* Zero the message buffer. */
   for ( i = 0; i < MAXMESSAGES; i = i + 1 )
     {
-      Msgs[i].msgbuf[0] = EOS;
+      Msgs[i].msgbuf[0] = 0;
       Msgs[i].msgfrom = 0;
       Msgs[i].msgto = 0;
     }
@@ -2050,7 +2050,7 @@ void clbInitUniverse(void)
   
   /* Initialize driver variables. */
   Driver->drivcnt = 0;
-  Driver->drivowner[0] = EOS;
+  Driver->drivowner[0] = 0;
   
   /* Initialize user history stuff. */
   ConqInfo->histptr = 0;
@@ -2304,7 +2304,7 @@ int clbFmtMsg(int to, int from, char *buf)
       concat( "The ", Doomsday->name, buf );
       break;
     case MSG_OUTSIDE:
-      buf[0] = EOS;
+      buf[0] = 0;
       break;
     case MSG_COMP:
       c_strcpy( "Comp", buf );
@@ -2682,7 +2682,7 @@ void clbZeroShip( int snum )
   Ships[snum].pfuse = 0;
   Ships[snum].action = 0;
   for ( i = 0; i < MAXUSERPNAME; i = i + 1 )
-    Ships[snum].alias[i] = EOS;
+    Ships[snum].alias[i] = 0;
   Ships[snum].ctime = 0;
   Ships[snum].etime = 0;
   Ships[snum].cacc = 0;

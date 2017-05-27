@@ -330,7 +330,7 @@ void map_lcommon(void)
   ConqInfo->closed = FALSE;
   Driver->drivstat = DRS_OFF;
   Driver->drivpid = 0;
-  Driver->drivowner[0] = EOS;
+  Driver->drivowner[0] = 0;
   
   return;
 }

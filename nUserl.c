@@ -106,7 +106,7 @@ static int nUserlDisplay(dspConfig_t *dsp)
       cprintf(lin, 0, ALIGN_NONE, "#%d#%s", LabelColor, cbuf);
     }
   
-  for ( j = 0; cbuf[j] != EOS; j = j + 1 )
+  for ( j = 0; cbuf[j] != 0; j = j + 1 )
     if ( cbuf[j] != ' ' )
       cbuf[j] = '-';
 

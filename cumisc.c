@@ -385,7 +385,7 @@ void mcuInfoPlanet( char *str, int pnum, int snum )
   godlike = ( snum < 1 || snum > MAXSHIPS );
   
   /* In some cases, report hostilities. */
-  junk[0] = EOS;
+  junk[0] = 0;
   if ( Planets[pnum].type == PLANET_CLASSM || Planets[pnum].type == PLANET_DEAD )
     if ( ! godlike )
       if ( Planets[pnum].scanned[Ships[snum].team] && clbSPWar( snum, pnum ) )
@@ -463,14 +463,14 @@ void mcuInfoPlanet( char *str, int pnum, int snum )
   
   /* save for hudInfo */
   strncpy(Context.lasttarg, Planets[pnum].name, 3);
-  Context.lasttarg[3] = EOS;
+  Context.lasttarg[3] = 0;
 
   if ( godlike )
     canscan = TRUE;
   else
     canscan = Planets[pnum].scanned[Ships[snum].team];
   
-  junk[0] = EOS;
+  junk[0] = 0;
   if ( Planets[pnum].type != PLANET_SUN && Planets[pnum].type != PLANET_MOON )
     {
       if ( ! canscan )
@@ -508,7 +508,7 @@ void mcuInfoPlanet( char *str, int pnum, int snum )
 	  j = Teams[Ships[snum].team].couptime;
 	  if ( j > 0 )
 	    {
-	      if ( junk[0] != EOS )
+	      if ( junk[0] != 0 )
 		appstr( ", ", junk );
 	      utAppendInt( j, junk );
 	      appstr( " minutes until coup time", junk );
@@ -516,7 +516,7 @@ void mcuInfoPlanet( char *str, int pnum, int snum )
 	}
     }
   
-  if ( junk[0] == EOS )
+  if ( junk[0] == 0 )
     {
       appchr( '.', buf );
     }
@@ -535,7 +535,7 @@ void mcuInfoPlanet( char *str, int pnum, int snum )
     {
       /* The first part is small enough. */
       mcuPutMsg( buf, MSG_LIN1 );
-      if ( junk[0] != EOS )
+      if ( junk[0] != 0 )
 	mcuPutMsg( junk, MSG_LIN2 );
       else
 	cdclrl( MSG_LIN2, 1 );
@@ -548,7 +548,7 @@ void mcuInfoPlanet( char *str, int pnum, int snum )
 	i = i - 1;
       appchr( ' ', buf );
       appstr( junk, buf );
-      buf[i] = EOS;				/* terminate at blank */
+      buf[i] = 0;				/* terminate at blank */
       mcuPutMsg( buf, MSG_LIN1 );
       mcuPutMsg( &buf[i+1], MSG_LIN2 );
     }
@@ -592,7 +592,7 @@ void mcuInfoShip( int snum, int scanner )
       return;
     }
 
-  cbuf[0] = Context.lasttarg[0] = EOS;
+  cbuf[0] = Context.lasttarg[0] = 0;
   utAppendShip( snum, cbuf );
   strcpy(Context.lasttarg, cbuf); /* save for hudInfo */
 
@@ -646,7 +646,7 @@ void mcuInfoShip( int snum, int scanner )
     }
   
   appstr( ": ", cbuf );
-  if ( Ships[snum].alias[0] != EOS )
+  if ( Ships[snum].alias[0] != 0 )
     {
       appstr( Ships[snum].alias, cbuf );
       appstr( ", ", cbuf );
@@ -789,12 +789,12 @@ utLog("infoship:\tdis(%.1f) pwarp(%.1f) = (close_rate(%.1f) / MM_PER_SEC_PER_WAR
   else				/* else cloaked and at w0 */
     {
       Context.lasttdist = Context.lasttang = 0;
-      cbuf[0] = EOS;
+      cbuf[0] = 0;
     }
   
   if ( canscan )
     {
-      if ( cbuf[0] != EOS )
+      if ( cbuf[0] != 0 )
 	appstr( ", ", cbuf );
       appstr( "shields ", cbuf );
       if ( SSHUP(snum) && ! SREPAIR(snum) )
@@ -804,7 +804,7 @@ utLog("infoship:\tdis(%.1f) pwarp(%.1f) = (close_rate(%.1f) / MM_PER_SEC_PER_WAR
       i = round( Ships[snum].damage );
       if ( i > 0 )
 	{
-	  if ( cbuf[0] != EOS )
+	  if ( cbuf[0] != 0 )
 	    appstr( ", ", cbuf );
 	  sprintf( junk, "damage %d", i );
 	  appstr( junk, cbuf );
@@ -822,7 +822,7 @@ utLog("infoship:\tdis(%.1f) pwarp(%.1f) = (close_rate(%.1f) / MM_PER_SEC_PER_WAR
 	    appstr( "ies", cbuf );
 	}
     }
-  if ( cbuf[0] != EOS )
+  if ( cbuf[0] != 0 )
     {
       cbuf[0] = (char)toupper( cbuf[0] );
       appchr( '.', cbuf );
@@ -884,7 +884,7 @@ void mcuPlanetList( int team, int snum )
     }
 
   strcpy( hd3, hd2 );
-  for ( i = 0; hd3[i] != EOS; i++ )
+  for ( i = 0; hd3[i] != 0; i++ )
     if ( hd3[i] != ' ' )
       hd3[i] = '-';
   
@@ -1011,15 +1011,15 @@ void mcuPlanetList( int team, int snum )
 	      /* Don't display armies for suns unless we're special. */
 	      if ( Planets[pnum].type == PLANET_SUN )
 		if ( team != TEAM_NOTEAM )
-		  junk[0] = EOS;
+		  junk[0] = 0;
 	      
 	      /* Moons aren't supposed to have armies. */
 	      if ( Planets[pnum].type == PLANET_MOON )
 		{
 		  if ( team != TEAM_NOTEAM )
-		    junk[0] = EOS;
+		    junk[0] = 0;
 		  else if ( Planets[pnum].armies == 0 )
-		    junk[0] = EOS;
+		    junk[0] = 0;
 		}
 	      
 	      coreflag = ' ';
@@ -1147,7 +1147,7 @@ void mcuPlayList( int godlike, int doall, int snum )
   lin = 2;
   cdputs( cbuf, lin, col );
   
-  for ( i = 0; cbuf[i] != EOS; i = i + 1 )
+  for ( i = 0; cbuf[i] != 0; i = i + 1 )
     if ( cbuf[i] != ' ' )
       cbuf[i] = '-';
   lin = lin + 1;
@@ -1174,7 +1174,7 @@ void mcuPlayList( int godlike, int doall, int snum )
 	  if ( status == SS_LIVE ||
 	      ( doall && ( status != SS_OFF || kb != 0 ) ) )
 	    {
-	      sbuf[0] = EOS;
+	      sbuf[0] = 0;
 	      utAppendShip( i, sbuf );
 	      appstr(" ", sbuf);
 	      appchr(ShipTypes[Ships[i].shiptype].name[0], sbuf);
@@ -1240,7 +1240,7 @@ void mcuPlayList( int godlike, int doall, int snum )
 	      uiPutColor(0);
 	      if ( doall && status != SS_LIVE )
 		{
-		  cbuf[0] = EOS;
+		  cbuf[0] = 0;
 		  utAppendShipStatus( status, cbuf );
 		  
 		  uiPutColor(YellowLevelColor);  
@@ -1466,7 +1466,7 @@ void mcuTeamList( int team )
   col=0;  /* put col back to 0 for rest of display */
   lin = lin + 1;
   cdclrl( lin, 1 );
-  if ( ConqInfo->lastwords[0] != EOS )
+  if ( ConqInfo->lastwords[0] != 0 )
     {
       sprintf(tmpfmt, "#%d#%%c%%s%%c", YellowLevelColor);
       cprintf(lin, 0, ALIGN_CENTER, tmpfmt, '"', ConqInfo->lastwords, '"' );
@@ -1479,7 +1479,7 @@ void mcuTeamList( int team )
 	 Teams[0].name, Teams[1].name, Teams[2].name, Teams[3].name, "Totals" );
   
   lin++;
-  for ( i = 0; buf[i] != EOS; i++ )
+  for ( i = 0; buf[i] != 0; i++ )
     if ( buf[i] != ' ' )
       buf[i] = '-';
   uiPutColor(LabelColor);
@@ -1602,7 +1602,7 @@ void mcuTeamList( int team )
   
   for ( i = 0; i < 4; i++ )
     if ( Teams[i].couptime == 0 )
-      timbuf[i][0] = EOS;
+      timbuf[i][0] = 0;
     else
       sprintf( timbuf[i], "%d", Teams[i].couptime );
   
@@ -1611,11 +1611,11 @@ void mcuTeamList( int team )
       for ( i = 0; i < 4; i++ )
 	if ( team != i )
 	  c_strcpy( "-", timbuf[i] );
-	else if ( ! Teams[i].coupinfo && timbuf[i][0] != EOS )
+	else if ( ! Teams[i].coupinfo && timbuf[i][0] != 0 )
 	  c_strcpy( "?", timbuf[i] );
     }
   
-  timbuf[4][0] = EOS;
+  timbuf[4][0] = 0;
   
   lin++;
   cprintf( lin,col,0, sfmt3, "Coup time",
@@ -1653,7 +1653,7 @@ void mcuUserList( int godlike, int snum )
   clbUserline( -1, -1, cbuf, FALSE, FALSE );
   cdputs( cbuf, lin, 1 );
   
-  for ( j = 0; cbuf[j] != EOS; j = j + 1 )
+  for ( j = 0; cbuf[j] != 0; j = j + 1 )
     if ( cbuf[j] != ' ' )
       cbuf[j] = '-';
   lin = lin + 1;
@@ -1785,7 +1785,7 @@ void mcuUserStats( int godlike , int snum )
   lin = lin + 1;
   cdputs( cbuf, lin, 1 );
   
-  for ( j = 0; cbuf[j] != EOS; j = j + 1 )
+  for ( j = 0; cbuf[j] != 0; j = j + 1 )
     if ( cbuf[j] != ' ' )
       cbuf[j] = '-';
   lin = lin + 1;
@@ -1912,7 +1912,7 @@ int mcuAskYN(char *question, int lin, int col)
   
   cdclrl( MSG_LIN2, 1 );
   uiPutColor(InfoColor);
-  buf[0] = EOS;
+  buf[0] = 0;
   ch = cdgetx( question, lin, col, TERMS, buf, MSGMAXLINE - 1, TRUE);
   uiPutColor(0);
   cdclrl( lin, 1 );
@@ -1942,7 +1942,7 @@ char mcuGetCX( char *pmt, int lin, int offset, char *terms, char *buf, int len )
     i = 1;
   move(lin, 0);
   clrtoeol();
-  buf[0] = EOS;
+  buf[0] = 0;
   return ( cdgetx( pmt, lin, i, terms, buf, len, TRUE ) );
   
 }
@@ -1962,14 +1962,14 @@ int mcuGetTarget( char *pmt, int lin, int col, real *dir, real cdefault )
   char ch, buf[MSGMAXLINE];
   
   cdclrl( lin, 1 );
-  buf[0] = EOS;
+  buf[0] = 0;
   ch = (char)cdgetx( pmt, lin, col, TERMS, buf, MSGMAXLINE, TRUE );
   if ( ch == TERM_ABORT )
     return ( FALSE );
   
   utDeleteBlanks( buf );
   fold( buf );
-  if ( buf[0] == EOS )
+  if ( buf[0] == 0 )
     {
       /* Default. */
       *dir = cdefault;
@@ -2000,7 +2000,7 @@ int mcuMore( char *pmt )
   int ch = 0; 
   string pml=MTXT_MORE;
   
-  if ( pmt[0] != EOS )
+  if ( pmt[0] != 0 )
     mcuPutPrompt( pmt, MSG_LIN2 );
   else
     mcuPutPrompt( pml, MSG_LIN2 );
@@ -2051,7 +2051,7 @@ void mcuPageFile( char *file, char *errmsg )
       /* get one at a time */
       buflen = strlen(buffer);
       
-      buffer[buflen - 1] = EOS; /* remove trailing LF */
+      buffer[buflen - 1] = 0; /* remove trailing LF */
       buflen--;
       
       if (buffer[0] == 0x0c)	/* formfeed */

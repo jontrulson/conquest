@@ -39,7 +39,7 @@ int prmProcInput(prm_t *prm, int ch)
       if ( clen > 0 )
         {
           clen--;
-          prm->buf[clen] = EOS;
+          prm->buf[clen] = 0;
 
           return PRM_OK;
         }
@@ -68,7 +68,7 @@ int prmProcInput(prm_t *prm, int ch)
               clen = 0;
             }
 
-          prm->buf[clen] = EOS;
+          prm->buf[clen] = 0;
         }
     }
   else if ( ch == 0x15 || ch == 0x18 ) /* ^U || ^X  - clear line */
@@ -76,7 +76,7 @@ int prmProcInput(prm_t *prm, int ch)
       if ( clen > 0 )
         {
           clen = 0;
-          prm->buf[clen] = EOS;
+          prm->buf[clen] = 0;
         }
     }
   else if (!isprint(c))
@@ -84,7 +84,7 @@ int prmProcInput(prm_t *prm, int ch)
   else 
     {
       prm->buf[clen] = c;
-      prm->buf[clen + 1] = EOS;
+      prm->buf[clen + 1] = 0;
     }
 
   return PRM_OK;

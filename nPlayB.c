@@ -100,8 +100,8 @@ static void set_header(int snum)
   static char hbuf[MSGMAXLINE];
   char ssbuf[MSGMAXLINE];
   
-  hbuf[0] = EOS;
-  ssbuf[0] = EOS;
+  hbuf[0] = 0;
+  ssbuf[0] = 0;
   
   appstr( ", ", ssbuf );
   utAppendShipStatus( Ships[snum].status, ssbuf);
@@ -415,7 +415,7 @@ static int nPlayBInput(int ch)
       state = S_WATCH;
       if (recFileHeader.snum == 0)
         {
-          cbuf[0] = EOS;
+          cbuf[0] = 0;
           prm.preinit = FALSE;
 
         }

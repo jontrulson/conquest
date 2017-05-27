@@ -44,7 +44,7 @@ void do_bottomborder(int snum, char *buf, int attrib, int bufattr)
   uiPutColor(0);
 
   /* now the buffer, if there */
-  if ( buf && buf[0] != EOS )
+  if ( buf && buf[0] != 0 )
     {
       if (UserConf.hudInfo)
 	col = Context.maxcol - (strlen(buf) + 1);
@@ -622,8 +622,8 @@ void display( int snum )
   
   /* Construct alert status line. */
   if ( Context.redraw )
-    zzbuf[0] = EOS;
-  buf[0] = EOS;
+    zzbuf[0] = 0;
+  buf[0] = 0;
 
   if (snum > 0)
     {				/* if a ship view */
@@ -906,7 +906,7 @@ void display( int snum )
     if ( i != zzsweapons || j != zzsengines )
       {
 	cdclra( lin, datacol, lin, STAT_COLS-1 );
-	buf[0] = EOS;
+	buf[0] = 0;
 	if ( i == 0 )
 	  appstr( "**", buf );
 	else
@@ -947,7 +947,7 @@ void display( int snum )
 	cdclra( lin, datacol, lin, STAT_COLS-1 );
 	if ( i != 0 || j != 0 )
 	  {
-	    buf[0] = EOS;
+	    buf[0] = 0;
 	    
 	    if ( i >= 100 )
 	      strcpy(wtbuf, "**");
@@ -1117,7 +1117,7 @@ void display( int snum )
       {
 	cdclra( lin, col, lin, datacol-1 );
 	if ( i == 0 )
-	  buf[0] = EOS;
+	  buf[0] = 0;
 	else if ( i < 0 )
 	  {
 	    c_strcpy( "towing ", buf );
@@ -1256,7 +1256,7 @@ void display( int snum )
       
 	  for (i=0;i<MAXPLANETNAME;i++)
 	    zbuf[i] = ' ';
-	  zbuf[MAXPLANETNAME-1] = EOS;
+	  zbuf[MAXPLANETNAME-1] = 0;
 	  cdputs( zbuf, lin, dcol );	/* clean up status line */
       
 	  i = Doomsday->lock;
@@ -1272,7 +1272,7 @@ void display( int snum )
 	    }
 	  else if ( i > 0 && i <= MAXSHIPS )
 	    {
-	      buf[0] = EOS;
+	      buf[0] = 0;
 	      utAppendShip( i, buf );
 	      uiPutColor(RedLevelColor);
 	      cdputs( buf, lin, dcol );
@@ -1325,8 +1325,8 @@ void display_headers(int snum)
   char hbuf[MSGMAXLINE];
   char ssbuf[MSGMAXLINE];
   
-  hbuf[0] = EOS;
-  ssbuf[0] = EOS;
+  hbuf[0] = 0;
+  ssbuf[0] = 0;
   
   appstr( ", ", ssbuf );
   utAppendShipStatus( Ships[snum].status, ssbuf);

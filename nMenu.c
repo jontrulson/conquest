@@ -337,7 +337,7 @@ static int nMenuInput(int ch)
         case S_PSEUDO:
           if (irv > 0)
             {
-              if (ch != TERM_ABORT && prm.buf[0] != EOS)
+              if (ch != TERM_ABORT && prm.buf[0] != 0)
                 sendSetName(prm.buf);
               prompting = FALSE;
               state = S_NONE;
@@ -388,7 +388,7 @@ static int nMenuInput(int ch)
             }
           else
             {
-              prm.buf[0] = EOS;
+              prm.buf[0] = 0;
               for ( i = 0; i < NUMPLAYERTEAMS; i = i + 1 )
                 if ( ch == (char)tolower( Teams[i].teamchar ) )
                   {
@@ -424,7 +424,7 @@ static int nMenuInput(int ch)
       prm.buflen = MAXUSERPNAME;
       prm.terms = TERMS;
       prm.index = 20;
-      prm.buf[0] = EOS;
+      prm.buf[0] = 0;
       prompting = TRUE;
 
       break;
@@ -450,7 +450,7 @@ static int nMenuInput(int ch)
               prm.buflen = MAXUSERPNAME;
               prm.terms = TERMS;
               prm.index = 20;
-              prm.buf[0] = EOS;
+              prm.buf[0] = 0;
               prompting = TRUE;
             }
         }
@@ -503,7 +503,7 @@ static int nMenuInput(int ch)
       prm.pbuf = clbWarPrompt(Context.snum, twar);
       prm.terms = TERMS;
       prm.index = 20;
-      prm.buf[0] = EOS;
+      prm.buf[0] = 0;
 
       break;
     case '/':

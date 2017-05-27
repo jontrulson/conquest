@@ -108,7 +108,7 @@ int Logon(char *username)
       lin += 7;
       slin = lin;
 
-      nm[0] = EOS;
+      nm[0] = 0;
 
       cdrefresh();
 
@@ -132,7 +132,7 @@ int Logon(char *username)
 	  if (ch == TERM_EXTRA )
 	    break;		/* redraw stats and things */
 
-	  if (ch == TERM_ABORT || nm[0] == EOS)
+	  if (ch == TERM_ABORT || nm[0] == 0)
 	    {			/* if empty user, or abort char, leave */
 	      cdend();
 	      sleep(1);
@@ -145,7 +145,7 @@ int Logon(char *username)
 	      uiPutColor(RedLevelColor);
 	      cdputs("Invalid character in username.", MSG_LIN2, 1);
 	      uiPutColor(NoColor);
-	      nm[0] = EOS;
+	      nm[0] = 0;
 	      continue;
 	    }
 
@@ -157,14 +157,14 @@ int Logon(char *username)
 	      slin++;
 	      if (mcuAskYN("User doesn't exist. Is this a new user? ", slin, 1))
 		{			/* yep */
-		  pw[0] = EOS;
+		  pw[0] = 0;
 		  cdclrl( MSG_LIN1, 2  );
 		  cdputs("Use any printable characters.", MSG_LIN1, 1);
 		  ch = cdgetx( "Password: ", slin, 1, 
 			       TERMS, pw, MAXUSERNAME - 1, FALSE );
 	      
 		  slin++;
-		  pwr[0] = EOS;
+		  pwr[0] = 0;
 		  cdclrl( MSG_LIN1, 2  );
 		  cdputs("Use any printable characters.", MSG_LIN1, 1);
 		  ch = cdgetx( "Retype Password: ", slin, 1, 
@@ -208,7 +208,7 @@ int Logon(char *username)
 	  else
 	    {			/* exists, verify that the pw is valid */
 	      slin++;
-	      pw[0] = EOS;
+	      pw[0] = 0;
 	      cdclrl( MSG_LIN1, 2  );
 	      cdputs("Use any printable characters.", MSG_LIN1, 1);
 	      ch = cdgetx( "Password: ", slin, 1, 
@@ -269,7 +269,7 @@ void ChangePassword(int unum, int isoper)
       cprintf(lin, col, ALIGN_NONE, "#%d#%s", NoColor, header);
     } /* ! isoper */
 				/* get and recheck new passwd */
-  pw[0] = EOS;
+  pw[0] = 0;
   cdclrl( MSG_LIN1, 2  );
   cdputs("Use any printable characters.", MSG_LIN2, 1);
 
@@ -278,7 +278,7 @@ void ChangePassword(int unum, int isoper)
 
   if (isoper == FALSE)
     {
-      pwr[0] = EOS;
+      pwr[0] = 0;
       cdclrl( MSG_LIN1, 2  );
       cdputs("Use any printable characters.", MSG_LIN2, 1);
       cdgetx( "Retype Password: ", MSG_LIN1, 1, 
@@ -301,12 +301,12 @@ void ChangePassword(int unum, int isoper)
 
   if (isoper)
     {				/* do it locally */
-      salt[0] = (Users[unum].username[0] != EOS) ? Users[unum].username[0] : 'J';
-      salt[1] = (Users[unum].username[1] != EOS) ? Users[unum].username[1] : 'T';
-      salt[2] = EOS;
+      salt[0] = (Users[unum].username[0] != 0) ? Users[unum].username[0] : 'J';
+      salt[1] = (Users[unum].username[1] != 0) ? Users[unum].username[1] : 'T';
+      salt[2] = 0;
       
       strncpy(epw, (char *)crypt(pw, salt), MAXUSERNAME - 2);
-      epw[MAXUSERNAME - 1] = EOS;
+      epw[MAXUSERNAME - 1] = 0;
       
       strncpy(Users[unum].pw, epw, MAXUSERNAME);
     }

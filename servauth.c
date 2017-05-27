@@ -32,12 +32,12 @@ static int doLogin(char *login, char *pw, char *epw)
     {				/* user exists */
 				/* ENCRYPT and compare here... */
 
-      salt[0] = (login[0] != EOS) ? login[0] : 'J';
-      salt[1] = (login[1] != EOS) ? login[1] : 'T';
-      salt[2] = EOS;
+      salt[0] = (login[0] != 0) ? login[0] : 'J';
+      salt[1] = (login[1] != 0) ? login[1] : 'T';
+      salt[2] = 0;
       
       strncpy(epw, (char *)crypt(pw, salt), MAXUSERNAME - 2);
-      epw[MAXUSERNAME - 1] = EOS;
+      epw[MAXUSERNAME - 1] = 0;
       
       if (strcmp(epw, Users[unum].pw) != 0)
 	{			/* invalid pw */
@@ -51,12 +51,12 @@ static int doLogin(char *login, char *pw, char *epw)
 
   /* if we're here, it's a new user.  encrypt pw for welcome. */
 
-  salt[0] = (login[0] != EOS) ? login[0] : 'J';
-  salt[1] = (login[1] != EOS) ? login[1] : 'T';
-  salt[2] = EOS;
+  salt[0] = (login[0] != 0) ? login[0] : 'J';
+  salt[1] = (login[1] != 0) ? login[1] : 'T';
+  salt[2] = 0;
   
   strncpy(epw, (char *)crypt(pw, salt), MAXUSERNAME - 2);
-  epw[MAXUSERNAME - 1] = EOS;
+  epw[MAXUSERNAME - 1] = 0;
 
   utLog("INFO: New user '%s' logged in", login);
   

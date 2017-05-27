@@ -209,7 +209,7 @@ int main(int argc, char *argv[])
 	  PVUNLOCK(&ConqInfo->lockmesg);
 	  Driver->drivstat = DRS_OFF;
 	  Driver->drivpid = 0;
-	  Driver->drivowner[0] = EOS;
+	  Driver->drivowner[0] = 0;
 	  fprintf(stdout, "Game enabled.\n");
 	}
 
@@ -273,7 +273,7 @@ int main(int argc, char *argv[])
   Context.entship = FALSE;	/* never entered a ship */
   Context.histslot = ERR;	/* useless as an op */
   Context.lasttang = Context.lasttdist = 0;
-  Context.lasttarg[0] = EOS;
+  Context.lasttarg[0] = 0;
   Context.display = TRUE;
   Context.maxlin = cdlins();	/* number of lines */
   
@@ -367,7 +367,7 @@ void debugdisplay( int snum )
   tcol = 1;
   dcol = tcol + 10;
   cprintf(lin,tcol,ALIGN_NONE,"#%d#%s",LabelColor, "    ship:");
-  buf[0] = EOS;
+  buf[0] = 0;
   utAppendShip( snum, buf );
   if ( SROBOT(snum) )
     appstr( " (ROBOT)", buf );
@@ -414,15 +414,15 @@ void debugdisplay( int snum )
   tcol = 23;
   dcol = tcol + 12;
   cprintf(lin,tcol,ALIGN_NONE,"#%d#%s",LabelColor, "      name:");
-  if ( Ships[snum].alias != EOS )
+  if ( Ships[snum].alias != 0 )
   	cprintf(lin,dcol,ALIGN_NONE,"#%d#%s",InfoColor, Ships[snum].alias);
   lin++;
   cprintf(lin,tcol,ALIGN_NONE,"#%d#%s",LabelColor, "  username:");
-  buf[0] = EOS;
+  buf[0] = 0;
   if ( unum >= 0 && unum < MAXUSERS )
     {
       c_strcpy( Users[unum].username, buf );
-      if ( buf[0] != EOS )
+      if ( buf[0] != 0 )
 	appchr( ' ', buf );
     }
   appchr( '(', buf );
@@ -463,7 +463,7 @@ void debugdisplay( int snum )
   lin++;
   cprintf(lin,tcol,ALIGN_NONE,"#%d#%s",LabelColor, "   ssdfuse:");
   i = Ships[snum].sdfuse;
-  buf[0] = EOS;
+  buf[0] = 0;
   if ( i != 0 )
     {
       sprintf( buf, "%d ", i );
@@ -490,7 +490,7 @@ void debugdisplay( int snum )
   tcol = 57;
   dcol = tcol + 12;
   cprintf(lin,tcol,ALIGN_NONE,"#%d#%s",LabelColor, "   sstatus:");
-  buf[0] = EOS;
+  buf[0] = 0;
   utAppendShipStatus( Ships[snum].status, buf );
   cprintf(lin,dcol,ALIGN_NONE,"#%d#%s",InfoColor, buf);
   lin++;
@@ -498,7 +498,7 @@ void debugdisplay( int snum )
   i = Ships[snum].killedby;
   if ( i != 0 )
     {
-      buf[0] = EOS;
+      buf[0] = 0;
       utAppendKilledBy( Ships[snum].killedby, buf );
 	  cprintf(lin,dcol,ALIGN_NONE,"#%d#%s",InfoColor, buf);
     }
@@ -519,7 +519,7 @@ void debugdisplay( int snum )
   i = Ships[snum].towedby;
   if ( i != 0 )
     {
-      buf[0] = EOS;
+      buf[0] = 0;
       utAppendShip( i, buf );
   	  cprintf(lin,dcol,ALIGN_NONE,"#%d#%s",InfoColor, buf);
     }
@@ -528,7 +528,7 @@ void debugdisplay( int snum )
   i = Ships[snum].towing;
   if ( i != 0 )
     {
-      buf[0] = EOS;
+      buf[0] = 0;
       utAppendShip( i, buf );
   	  cprintf(lin,dcol,ALIGN_NONE,"#%d#%s",InfoColor, buf);
     }
@@ -541,7 +541,7 @@ void debugdisplay( int snum )
     else
       buf[i+1] = '-';
   buf[NUMPLAYERTEAMS+1] = ')';
-  buf[NUMPLAYERTEAMS+2] = EOS;
+  buf[NUMPLAYERTEAMS+2] = 0;
   fold( buf );
   cprintf(lin,dcol,ALIGN_NONE,"#%d#%s",InfoColor, buf);
   
@@ -554,7 +554,7 @@ void debugdisplay( int snum )
     else
       buf[i+1] = '-';
   buf[NUMPLAYERTEAMS+1] = ')';
-  buf[NUMPLAYERTEAMS+2] = EOS;
+  buf[NUMPLAYERTEAMS+2] = 0;
   cprintf(lin,dcol,ALIGN_NONE,"#%d#%s",InfoColor, buf);
   
   lin ++;
@@ -612,7 +612,7 @@ void debugdisplay( int snum )
 	    else
 	      buf[j+1] = '-';
 	  buf[NUMPLAYERTEAMS+1] = ')';
-	  buf[NUMPLAYERTEAMS+2] = EOS;
+	  buf[NUMPLAYERTEAMS+2] = 0;
 	  cprintf(lin,67,ALIGN_NONE,"#%d#%s",InfoColor, buf);
 	}
     }
@@ -665,7 +665,7 @@ void debugplan(void)
     }
   
   strcpy( hd3, hd2 );
-  for ( i = 0; hd3[i] != EOS; i++ )
+  for ( i = 0; hd3[i] != 0; i++ )
     if ( hd3[i] != ' ' )
       hd3[i] = '-';
 
@@ -710,12 +710,12 @@ void debugplan(void)
 		  junk[j] = Teams[j].teamchar;
 		else
 		  junk[j] = '-';
-	      junk[j] = EOS;
+	      junk[j] = 0;
 	      j = Planets[k].uninhabtime;
 	      if ( j != 0 )
 		sprintf( uninhab, "%d", j );
 	      else
-		uninhab[0] = EOS;
+		uninhab[0] = 0;
 	      
 	      switch(Planets[k].type)
 		{
@@ -851,7 +851,7 @@ void kiss(int snum, int prompt_flg)
     {
       cdclrl( MSG_LIN1, 2 );
       if (snum == 0)
-	buf[0] = EOS;
+	buf[0] = 0;
       else
 	sprintf(buf, "%d", snum);
 
@@ -874,7 +874,7 @@ void kiss(int snum, int prompt_flg)
     }
   
   /* Kill the driver? */
-  if ( buf[0] == EOS )
+  if ( buf[0] == 0 )
     {
       cdclrl( MSG_LIN1, 1 ); 
       sprintf(mbuf,"%s", kill_driver_str);
@@ -897,7 +897,7 @@ void kiss(int snum, int prompt_flg)
 	cdputs( no_ship_str, MSG_LIN2, 1 );
       else if ( Ships[snum].status != SS_LIVE ) {
 	cdclrl( MSG_LIN1, 1 );
-	ssbuf[0] = EOS; 
+	ssbuf[0] = 0; 
 	utAppendShipStatus( Ships[snum].status, ssbuf);
 	sprintf(mbuf, cant_kill_ship_str,
 		Teams[Ships[snum].team].teamchar, 
@@ -1282,7 +1282,7 @@ void operate(void)
 	      PVUNLOCK(&ConqInfo->lockmesg);
 	      Driver->drivstat = DRS_OFF;
 	      Driver->drivpid = 0;
-	      Driver->drivowner[0] = EOS;
+	      Driver->drivowner[0] = 0;
 	      
 	      utLog("OPER: %s has enabled the game",
 		   operName);
@@ -1382,7 +1382,7 @@ void operate(void)
 	  break;
 	case ' ':
 	case TERM_NORMAL:
-	case EOS:
+	case 0:
 	  /* do nothing */
 	default:
 	  cdbeep();
@@ -1409,7 +1409,7 @@ void opinfo( int snum )
   
   cdclrl( MSG_LIN1, 2 );
   
-  cbuf[0] = EOS;
+  cbuf[0] = 0;
   ch = (char)cdgetx( pmt, MSG_LIN1, 1, TERMS, cbuf, MSGMAXLINE, TRUE );
   if ( ch == TERM_ABORT )
     {
@@ -1419,7 +1419,7 @@ void opinfo( int snum )
   
   utDeleteBlanks( cbuf );
   fold( cbuf );
-  if ( cbuf[0] == EOS )
+  if ( cbuf[0] == 0 )
     {
       cdclrl( MSG_LIN1, 1 );
       return;
@@ -1582,13 +1582,13 @@ void opinit(void)
       col = 30;
       cdclrl( lin, 1 );
       uiPutColor(InfoColor);
-      buf[0] = EOS;
+      buf[0] = 0;
       ch = (char)cdgetx( pmt, lin, col, TERMS, buf, MSGMAXLINE, TRUE );
       cdclrl( lin, 1 );
       cdputs( pmt, lin, col );
   	  uiPutColor(0);
       col = col + strlen( pmt );
-      if ( ch == TERM_ABORT || buf[0] == EOS )
+      if ( ch == TERM_ABORT || buf[0] == 0 )
 	break;
       switch ( buf[0] )
 	{
@@ -1855,7 +1855,7 @@ void oppedit(void)
 	  /* Angle. */
 	  ch = mcuGetCX( "New angle? ", MSG_LIN1, 0,
 		     TERMS, buf, MSGMAXLINE );
-	  if ( ch == TERM_ABORT || buf[0] == EOS )
+	  if ( ch == TERM_ABORT || buf[0] == 0 )
 	    continue;	/* next */
 	  utDeleteBlanks( buf );
 	  i = 0;
@@ -1871,7 +1871,7 @@ void oppedit(void)
 	  /* Armies. */
 	  ch = mcuGetCX( "New number of armies? ",
 		     MSG_LIN1, 0, TERMS, buf, MSGMAXLINE );
-	  if ( ch == TERM_ABORT || buf[0] == EOS )
+	  if ( ch == TERM_ABORT || buf[0] == 0 )
 	    continue;
 	  utDeleteBlanks( buf );
 	  i = 0;
@@ -1883,16 +1883,16 @@ void oppedit(void)
 	  /* New planet name. */
 	  ch = mcuGetCX( "New name for this planet? ",
 		     MSG_LIN1, 0, TERMS, buf, MAXPLANETNAME );
-	  if ( ch != TERM_ABORT && ( ch == TERM_EXTRA || buf[0] != EOS ) )
+	  if ( ch != TERM_ABORT && ( ch == TERM_EXTRA || buf[0] != 0 ) )
 	    utStcpn( buf, Planets[pnum].name, MAXPLANETNAME );
 	  break;
 	case 'o':
 	  /* New primary. */
 	  ch = mcuGetCX( "New planet to orbit? ",
 		     MSG_LIN1, 0, TERMS, buf, MAXPLANETNAME );
-	  if ( ch == TERM_ABORT || buf[0] == EOS )
+	  if ( ch == TERM_ABORT || buf[0] == 0 )
 	    continue;	/* next */
-	  if ( buf[1] == '0' && buf[2] == EOS )
+	  if ( buf[1] == '0' && buf[2] == 0 )
 	    Planets[pnum].primary = 0;
 	  else if ( opPlanetMatch( buf, &i ) )
 	    Planets[pnum].primary = i;
@@ -1901,7 +1901,7 @@ void oppedit(void)
 	  /* Velocity. */
 	  ch = mcuGetCX( "New velocity? ",
 		     MSG_LIN1, 0, TERMS, buf, MSGMAXLINE );
-	  if ( ch == TERM_ABORT || buf[0] == EOS )
+	  if ( ch == TERM_ABORT || buf[0] == 0 )
 	    continue;	/* next */
 	  utDeleteBlanks( buf );
 	  i = 0;
@@ -1914,7 +1914,7 @@ void oppedit(void)
 	  /* Size. */
 	  ch = mcuGetCX( "New size? ", MSG_LIN1, 0,
 		     TERMS, buf, MSGMAXLINE );
-	  if ( ch == TERM_ABORT || buf[0] == EOS )
+	  if ( ch == TERM_ABORT || buf[0] == 0 )
 	    continue;	/* next */
 	  utDeleteBlanks( buf );
 	  i = 0;
@@ -1944,7 +1944,7 @@ void oppedit(void)
 	  /* X coordinate. */
 	  ch = mcuGetCX( "New X coordinate? ",
 		     MSG_LIN1, 0, TERMS, buf, MSGMAXLINE );
-	  if ( ch == TERM_ABORT || buf[0] == EOS )
+	  if ( ch == TERM_ABORT || buf[0] == 0 )
 	    continue;	/* next */
 	  utDeleteBlanks( buf );
 	  i = 0;
@@ -1958,7 +1958,7 @@ void oppedit(void)
 	  /* Y coordinate. */
 	  ch = mcuGetCX( "New Y coordinate? ",
 		     MSG_LIN1, 0, TERMS, buf, MSGMAXLINE );
-	  if ( ch == TERM_ABORT || buf[0] == EOS )
+	  if ( ch == TERM_ABORT || buf[0] == 0 )
 	    continue;	/* next */
 	  utDeleteBlanks( buf );
 	  i = 0;
@@ -1984,7 +1984,7 @@ void oppedit(void)
 	case 'u':
 	  ch = mcuGetCX( "New uninhabitable minutes? ",
 		     MSG_LIN1, 0, TERMS, buf, MSGMAXLINE );
-	  if ( ch == TERM_ABORT || buf[0] == EOS )
+	  if ( ch == TERM_ABORT || buf[0] == 0 )
 	    continue;
 	  utDeleteBlanks( buf );
 	  i = 0;
@@ -1995,7 +1995,7 @@ void oppedit(void)
 	case 'p':
 	  ch = mcuGetCX( "New planet to edit? ",
 		     MSG_LIN1, 0, TERMS, buf, MAXPLANETNAME );
-	  if ( ch == TERM_ABORT || buf[0] == EOS )
+	  if ( ch == TERM_ABORT || buf[0] == 0 )
 	    continue;	/* next */
 	  if ( opPlanetMatch( buf, &i ) )
 	    pnum = i;
@@ -2004,7 +2004,7 @@ void oppedit(void)
 	  /* Radius. */
 	  ch = mcuGetCX( "New radius? ",
 		     MSG_LIN1, 0, TERMS, buf, MSGMAXLINE );
-	  if ( ch == TERM_ABORT || buf[0] == EOS )
+	  if ( ch == TERM_ABORT || buf[0] == 0 )
 	    continue;	/* next */
 	  utDeleteBlanks( buf );
 	  i = 0;
@@ -2075,7 +2075,7 @@ void opresign(void)
   char ch, buf[MSGMAXLINE];
   
   cdclrl( MSG_LIN1, 2 );
-  buf[0] = EOS;
+  buf[0] = 0;
   ch = (char)cdgetx( "Resign user: ", MSG_LIN1, 1, TERMS, buf, MSGMAXLINE,
 		     TRUE);
   if ( ch == TERM_ABORT )
@@ -2119,10 +2119,10 @@ void oprobot(void)
   char xbuf[MSGMAXLINE];
   
   cdclrl( MSG_LIN1, 2 );
-  buf[0] = EOS;
+  buf[0] = 0;
   ch = (char)cdgetx( "Enter username for new robot (Orion, Federation, etc): ",
 	      MSG_LIN1, 1, TERMS, buf, MAXUSERNAME, TRUE );
-  if ( ch == TERM_ABORT || buf[0] == EOS )
+  if ( ch == TERM_ABORT || buf[0] == 0 )
     {
       cdclrl( MSG_LIN1, 1 );
       return;
@@ -2132,7 +2132,7 @@ void oprobot(void)
   j = strlen(xbuf);
   buf[0] = (char)toupper(xbuf[0]);
   if (j>1)
-  	for (i=1;i<j && xbuf[i] != EOS;i++)
+  	for (i=1;i<j && xbuf[i] != 0;i++)
 		buf[i] = (char)tolower(xbuf[i]);
 
   if ( ! clbGetUserNum( &unum, buf, -1 ) )
@@ -2156,7 +2156,7 @@ void oprobot(void)
   
   if ( ch == TERM_EXTRA )
     {
-      buf[0] = EOS;
+      buf[0] = 0;
       ch = (char)cdgetx( "Enter number desired ([TAB] for warlike): ",
 		  MSG_LIN2, 1, TERMS, buf, MAXUSERNAME, TRUE );
       if ( ch == TERM_ABORT )
@@ -2324,16 +2324,16 @@ void opstats(void)
 		LabelColor, "Current time:", InfoColor, timbuf);
       
       lin+=2;
-      if ( Driver->drivowner[0] != EOS )
+      if ( Driver->drivowner[0] != 0 )
 	sprintf( junk, "%d #%d#(#%d#%s#%d#)", 
 		 Driver->drivpid, LabelColor, SpecialColor, 
 		 Driver->drivowner, LabelColor );
       else if ( Driver->drivpid != 0 )
 	sprintf( junk, "%d", Driver->drivpid );
       else
-	junk[0] = EOS;
+	junk[0] = 0;
 
-      if (junk[0] == EOS)
+      if (junk[0] == 0)
 	cprintf( lin,col,ALIGN_NONE, 
 		 "#%d#drivsecs = #%d#%03d#%d#, drivcnt = #%d#%d\n",
 		 LabelColor, InfoColor, 
@@ -2404,7 +2404,7 @@ void opuadd(void)
   char *nameptr;
 
   cdclrl( MSG_LIN1, 2 );
-  name[0] = EOS;
+  name[0] = 0;
   ch = (char)cdgetx( "Add user: ", MSG_LIN1, 1, TERMS, name, MAXUSERNAME,
 		     TRUE);
   /*  utDeleteBlanks( name );*/
@@ -2413,7 +2413,7 @@ void opuadd(void)
   if (*nameptr == '@')
     nameptr++;			/* in case we're adding a remote user */
 
-  if ( ch == TERM_ABORT || nameptr[0] == EOS )
+  if ( ch == TERM_ABORT || nameptr[0] == 0 )
     {
       cdclrl( MSG_LIN1, 1 );
       return;
@@ -2436,14 +2436,14 @@ void opuadd(void)
 	     Teams[TEAM_ORION].teamchar);
       
       cdclrl( MSG_LIN1, 1 );
-      buf[0] = EOS;
+      buf[0] = 0;
       ch = (char)cdgetx( junk, MSG_LIN1, 1, TERMS, buf, MSGMAXLINE, TRUE );
       if ( ch == TERM_ABORT )
 	{
 	  cdclrl( MSG_LIN1, 1 );
 	  return;
 	}
-      else if ( ch == TERM_EXTRA && buf[0] == EOS )
+      else if ( ch == TERM_EXTRA && buf[0] == 0 )
 	team = rndint( 0, NUMPLAYERTEAMS - 1);
       else
 	{
@@ -2458,14 +2458,14 @@ void opuadd(void)
     }
   
   
-  buf[0] = EOS;
+  buf[0] = 0;
   utAppendTitle( team, buf );
   appchr( ' ', buf );
   i = strlen( buf );
 
   appstr( nameptr, buf );
   buf[i] = (char)toupper( buf[i] );
-  buf[MAXUSERPNAME] = EOS;
+  buf[MAXUSERPNAME] = 0;
   if ( ! clbRegister( nameptr, buf, team, &unum ) )
     {
       cdputs( "Error adding new user.", MSG_LIN2, 1 );
@@ -2568,7 +2568,7 @@ void opuedit(void)
 	else
 	  buf[i+1] = '-';
       buf[NUMPLAYERTEAMS+1] = ')';
-      buf[NUMPLAYERTEAMS+2] = EOS;
+      buf[NUMPLAYERTEAMS+2] = 0;
       cprintf(lin,dcol,ALIGN_NONE,"#%d#%s",InfoColor, buf);
       
       lin++;
@@ -2820,7 +2820,7 @@ void opuedit(void)
 	      ch = mcuGetCX( "Enter a new pseudonym: ",
 			 MSG_LIN2, 0, TERMS, buf, MAXUSERPNAME );
 	      if ( ch != TERM_ABORT &&
-		  ( buf[0] != EOS || ch == TERM_EXTRA ) )
+		  ( buf[0] != 0 || ch == TERM_EXTRA ) )
 		utStcpn( buf, Users[unum].alias, MAXUSERPNAME ); /* -[] */
 	    }
 	  else if ( ! left && row == 1 )
@@ -2829,7 +2829,7 @@ void opuedit(void)
 	      cdclrl( MSG_LIN2, 1 );
 	      ch = mcuGetCX( "Enter a new username: ",
 			 MSG_LIN2, 0, TERMS, buf, MAXUSERNAME );
-	      if ( ch != TERM_ABORT && buf[0] != EOS)
+	      if ( ch != TERM_ABORT && buf[0] != 0)
 	      {
 		utDeleteBlanks( buf );
 		if ( ! clbGetUserNum( &i, buf, -1 ) )
@@ -2856,7 +2856,7 @@ void opuedit(void)
 	      cdclrl( MSG_LIN2, 1 );
 	      ch = mcuGetCX( "Enter new multiple count: ",
 			 MSG_LIN2, 0, TERMS, buf, MSGMAXLINE );
-	      if ( ch != TERM_ABORT && buf[0] != EOS )
+	      if ( ch != TERM_ABORT && buf[0] != 0 )
 		{
 		  utDeleteBlanks( buf );
 		  i = 0;
@@ -3278,7 +3278,7 @@ int prompt_ship(char buf[], int *snum, int *normal)
   tmpsnum = *snum;
 
   cdclrl( MSG_LIN1, 2 );
-  buf[0] = EOS;
+  buf[0] = 0;
   tch = cdgetx( pmt, MSG_LIN1, 1, TERMS, buf, MSGMAXLINE, TRUE );
   cdclrl( MSG_LIN1, 1 );
 

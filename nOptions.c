@@ -140,7 +140,7 @@ static void _changePasswd(int init)
   if (init)
     {                           /* start prompting */
       prm.pbuf = pwp;
-      pw[0] = EOS;
+      pw[0] = 0;
       prm.buf = pw;
 
       prm.preinit = FALSE;
@@ -155,7 +155,7 @@ static void _changePasswd(int init)
         {                       /* got the pw, set up for the retry */
           state = S_GETRPW;
           prm.pbuf = rpwp;
-          rpw[0] = EOS;
+          rpw[0] = 0;
           prm.buf = rpw;
 
           prm.preinit = FALSE;
@@ -209,7 +209,7 @@ static void _changeMacro(int macronum, int init)
     {                           /* change it for real */
       strncpy(UserConf.MacrosF[macronum - 1], Str2Macro(prm.buf), 
               MAX_MACRO_LEN);
-      UserConf.MacrosF[macronum - 1][MAX_MACRO_LEN - 1] = EOS;
+      UserConf.MacrosF[macronum - 1][MAX_MACRO_LEN - 1] = 0;
     }
 
   return;
@@ -227,7 +227,7 @@ static void _changeMouse(int mousevec, int init)
 
   if (init)
     {                           /* start prompting */
-      modstr[0] = EOS;
+      modstr[0] = 0;
 
       if (mod & (CQ_KEY_MOD_CTRL  >> CQ_MODIFIER_SHIFT))
         strcat(modstr, "c");
@@ -252,7 +252,7 @@ static void _changeMouse(int mousevec, int init)
     {                           /* change it for real */
       strncpy(UserConf.Mouse[but][mod], Str2Macro(prm.buf), 
               MAX_MACRO_LEN);
-      UserConf.Mouse[but][mod][MAX_MACRO_LEN - 1] = EOS;
+      UserConf.Mouse[but][mod][MAX_MACRO_LEN - 1] = 0;
     }
 
   return;
@@ -289,7 +289,7 @@ static void _changeOption(struct Conf *cdata, int init)
         {
           prm.preinit = TRUE;
           strncpy(cbuf, ((char *)cdata->ConfValue), CBUFLEN);
-          cbuf[CBUFLEN - 1] = EOS;
+          cbuf[CBUFLEN - 1] = 0;
           prm.buf = cbuf;
           prm.buflen = cdata->max - 1;
           prm.pbuf = "Value: ";
@@ -300,7 +300,7 @@ static void _changeOption(struct Conf *cdata, int init)
       else
         {
           strncpy((char *)cdata->ConfValue, prm.buf, cdata->max);
-          ((char *)cdata->ConfValue)[cdata->max - 1] = EOS;
+          ((char *)cdata->ConfValue)[cdata->max - 1] = 0;
         }
 
       break;
@@ -485,7 +485,7 @@ static void _dispHelpScreen(void)
 
   while (confitem->ConfComment[i] != NULL)
     {
-      if (confitem->ConfComment[i][0] != EOS)
+      if (confitem->ConfComment[i][0] != 0)
 	{
           cprintf(lin, col, ALIGN_NONE, "#%d#%s",
                   InfoColor,
@@ -589,7 +589,7 @@ static void _showOptScreen(void)
           /* get the macro number for this line */
           k = (curpage * items_per_page) + i; 
           
-          if (macrovec[k][0] == EOS)
+          if (macrovec[k][0] == 0)
             {			/* not defined */
               dispmac = nodef;
               vattrib = RedLevelColor;
@@ -624,7 +624,7 @@ static void _showOptScreen(void)
           k = (curpage * items_per_page) + i; 
           
           VEC2MOUSE(k, but, mod);
-          modstr[0] = EOS;
+          modstr[0] = 0;
           
           if (mod & (CQ_KEY_MOD_CTRL  >> CQ_MODIFIER_SHIFT))
             strcat(modstr, "c");
@@ -633,7 +633,7 @@ static void _showOptScreen(void)
           if (mod & (CQ_KEY_MOD_ALT   >> CQ_MODIFIER_SHIFT))
             strcat(modstr, "a");
 
-          if (mousevec[k][0] == EOS)
+          if (mousevec[k][0] == 0)
             {			/* not defined */
               dispmac = nodef;
               vattrib = RedLevelColor;

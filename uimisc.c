@@ -44,11 +44,11 @@ void dspReplayMenu(void)
               LabelColor);
 
       strncpy(recordedon, ctime(&recon), MSGMAXLINE - 1);
-      recordedon[MSGMAXLINE - 1] = EOS;
+      recordedon[MSGMAXLINE - 1] = 0;
 
       for (i=0; i < strlen(recordedon); i++)
         if (recordedon[i] == '\n')
-          recordedon[i] = EOS;
+          recordedon[i] = 0;
     }
 
 

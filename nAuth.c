@@ -289,7 +289,7 @@ static int nAuthInput(int ch)
       if (irv > 0)
         {                       /* a terminator */
           /* we wish to leave. chicken... */
-          if (irv == TERM_ABORT || prm.buf[0] == EOS)
+          if (irv == TERM_ABORT || prm.buf[0] == 0)
             return NODE_EXIT;
 
           /* check validity */
@@ -297,7 +297,7 @@ static int nAuthInput(int ch)
             {                   /* invalid username */
               mglBeep(MGL_BEEP_ERR);
               errlin = "Invalid character in username.";
-              prm.buf[0] = EOS;
+              prm.buf[0] = 0;
               return NODE_OK;
             }
 
@@ -311,7 +311,7 @@ static int nAuthInput(int ch)
               /* for a new user, we will want confirmation */
               state = S_CONFIRMNEW;
 
-              ynbuf[0] = EOS;
+              ynbuf[0] = 0;
 
               prm.preinit = FALSE;
               prm.buf = ynbuf;
@@ -409,7 +409,7 @@ static int nAuthInput(int ch)
           if (rv != PERR_OK)
             {                   /* invalid pw */
               /* clear it out and return to  P_GETUNAME state) */
-              pw[0] = EOS;
+              pw[0] = 0;
               state = S_GETUNAME;           /* initial state */
 
               prm.preinit = TRUE;
@@ -418,8 +418,8 @@ static int nAuthInput(int ch)
               prm.pbuf = unamep;
               prm.terms = TERMS;
 
-              pw[0] = EOS;
-              pwr[0] = EOS;
+              pw[0] = 0;
+              pwr[0] = 0;
 
               statlin = uhelper;
 
@@ -455,8 +455,8 @@ static int nAuthInput(int ch)
               prm.pbuf = unamep;
               prm.terms = TERMS;
 
-              pw[0] = EOS;
-              pwr[0] = EOS;
+              pw[0] = 0;
+              pwr[0] = 0;
 
               statlin = uhelper;
             }
