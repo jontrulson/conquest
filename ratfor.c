@@ -1,6 +1,6 @@
 /************************************************************************
  * Functions that appear to be intrinsic to RATFOR
- * 
+ *
  * Copyright Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
  ***********************************************************************/
 
@@ -11,7 +11,7 @@
 int alldig(char *buf)
 {
   char *s;
-  
+
   s = buf;
   while (*s)
     {
@@ -19,24 +19,11 @@ int alldig(char *buf)
 	return(FALSE);
       s++;
     }
-  
+
   return(TRUE);
 }
 
-/* c_type(char) - returns LETTER or DIGIT if letter or digit, returns ERR 
-   otherwise */
-int c_type(char c)
-{
-
-  if (isdigit(c))
-    return(DIGIT);
-  else if (isalpha(c))
-    return(LETTER);
-
-  return(ERR);
-}
-
-/* void concat(char str1[], char str2[], char buf[]) - concatenate str1 
+/* void concat(char str1[], char str2[], char buf[]) - concatenate str1
    and str2 into buf */
 void concat(char str1[], char str2[], char buf[])
 {
@@ -57,7 +44,7 @@ int c_index(char *buf, char ch)
     {
       if (*s == ch)
 	return(count);
-      s++; 
+      s++;
       count++;
     }
 
@@ -92,9 +79,9 @@ void upper(char *buf)
     }
 }
 
-/* load the now[] array with the current time - make sure it's 
-   decl [NOWSIZE] 
-   always returns the current time in time_t format. 
+/* load the now[] array with the current time - make sure it's
+   decl [NOWSIZE]
+   always returns the current time in time_t format.
 */
 time_t getnow (int now[NOWSIZE], time_t thetime)
 {
@@ -102,10 +89,10 @@ time_t getnow (int now[NOWSIZE], time_t thetime)
   time_t thetimet, curtime;
 
   curtime = time(0);
-  
-  if (thetime == 0)	
+
+  if (thetime == 0)
     thetimet = curtime;		/* wants current time */
-  else		
+  else
     thetimet = thetime;		/* wants supplied time conversion */
 
   if (now != NULL)		/* want to actually fill now[] */
@@ -135,13 +122,13 @@ int wkday (void)
 
   return(thetm->tm_wday + 1);
 }
-    
+
 				/* output an error and exit */
 void error(char str[])
 {
   printf("%s\n", str);
   fflush(stdout);
-  
+
   exit(1);
 }
 
@@ -155,6 +142,3 @@ real ctor(char *buf)
   r = (real) f;
   return(r);
 }
-
-
-

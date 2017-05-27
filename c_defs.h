@@ -164,9 +164,6 @@ extern char *crypt(char *, char *);
 # endif
 #endif  /* MINGW */
 
-#define DIGIT   0
-#define LETTER  1
-
 #ifndef FALSE
 # define FALSE   (0)
 #endif
@@ -221,7 +218,6 @@ typedef double real;
 /* Function prototypes for ratfor.c */
 
 int alldig(char *buf);
-int c_type(char c);
 void concat(char str1[], char str2[], char buf[]);
 int c_index(char *buf, char ch);
 void lower(char *buf);

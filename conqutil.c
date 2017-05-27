@@ -46,7 +46,7 @@ real utAccurateDist( real curvel, real newvel, real acc )
   /*    way the driver moves ships) is as follows: */
   t = ( curvel - newvel ) / acc;
   return ( ( curvel * t - 0.5 * acc * t * t ) * MM_PER_SEC_PER_WARP );
-  
+
 }
 
 
@@ -58,9 +58,9 @@ real utAngle( real fromx, real fromy, real tox, real toy )
 {
   if ( fromx == tox && fromy == toy )
     return ( 0.0 );
-  
+
   return ( utMod360( rtod( atan2( toy - fromy, tox - fromx ) ) ) );
-  
+
 }
 
 
@@ -72,13 +72,13 @@ real utAngle( real fromx, real fromy, real tox, real toy )
 void utAppendInt( int i, char *str )
 {
   char buf[BUFFER_SIZE];
-  
+
   buf[0] = EOS;
   sprintf(buf, "%d", i);
   appstr( buf, str );
-  
+
   return;
-  
+
 }
 
 
@@ -91,7 +91,7 @@ void utAppendInt( int i, char *str )
 void utAppendNumWord( int num, char *buf )
 {
   int i, j;
-  
+
   i = num;
   if ( i >= 100 )
     {
@@ -136,7 +136,7 @@ void utAppendNumWord( int num, char *buf )
 	return;
       appchr( '-', buf );
     }
-  
+
   switch ( i )
     {
     case 0:
@@ -200,9 +200,9 @@ void utAppendNumWord( int num, char *buf )
       appstr( "nineteen", buf );
       break;
     }
-  
+
   return;
-  
+
 }
 
 
@@ -213,7 +213,7 @@ void utAppendTime( int now[], char *buf )
 {
   int hour;
   int am;
-  
+
   am = TRUE;				/* assume morning */
   hour = now[4];
   if ( hour == 0 )
@@ -314,9 +314,9 @@ void utAppendTime( int now[], char *buf )
   else
     appstr( "post", buf );
   appstr( " meridiem", buf );
-  
+
   return;
-  
+
 }
 
 /*  utAppendKilledBy - append killed by string */
@@ -326,7 +326,7 @@ void utAppendTime( int now[], char *buf )
 /*    utAppendKilledBy( kb, buf ) */
 void utAppendKilledBy( int kb, char *buf )
 {
-  
+
   switch ( kb )
     {
     case KB_SELF:
@@ -365,9 +365,9 @@ void utAppendKilledBy( int kb, char *buf )
 	utAppendInt( kb, buf );
       break;
     }
-  
+
   return;
-  
+
 }
 
 /*  utAppendShip - append a ship number to a string */
@@ -379,7 +379,7 @@ void utAppendShip( int snum, char *str )
 {
   int i;
   char ch;
-  
+
   ch = 'S';
   if ( snum > 0 && snum <= MAXSHIPS )
     {
@@ -387,10 +387,10 @@ void utAppendShip( int snum, char *str )
       if ( i >= 0 && i < NUMPLAYERTEAMS )
 	ch = Teams[i].teamchar;
     }
-  
+
   appchr( ch, str );
   utAppendInt( snum, str );
-  
+
   return;
 }
 
@@ -427,7 +427,7 @@ void utAppendShipStatus( int status, char *buf )
       break;
     }
   return;
-  
+
 }
 
 
@@ -453,52 +453,52 @@ void utAppendTitle( int team, char *buf )
       appstr( "Kommander", buf );
       break;
     }
-  
+
   return;
-  
+
 }
 
 
 /*  utArrowsToDir - interpret arrow keys */
 int utArrowsToDir( char *str, real *dir )
 {
-  int i, n, idx; 
+  int i, n, idx;
   real thedir, ndir, ndir1, ndir2;
   string arrs="*dewqazxc";	/* the '*' is to fill arrs[0] - JET */
-  
+
   /* Special hack preventing "ea" and "da" from being recognized as arrows. */
   /* "ea" is reserved for Earth and "da" for Dakel. */
   if ( (char)tolower(str[0]) == 'e' && (char)tolower(str[1]) == 'a' )
     return ( FALSE );
   if ( (char)tolower(str[0]) == 'd' && (char)tolower(str[1]) == 'a' )
     return ( FALSE );
-  
+
   thedir = 0.0;
-  
+
   for ( i = 0; str[i] != EOS; i = i + 1 )
     {
       n = i + 1;
       idx = c_index( arrs, (char)tolower(str[i]) );
       if ( idx == ERR || idx == 0)
 	return ( FALSE );
-      
+
       ndir1 = ((real)idx - 1.0) * 45.0;
       ndir2 = (real)ndir1 - 360.0;
-      
+
       if ( (real)fabs( thedir - ndir1 ) < (real)fabs( thedir - ndir2 ) )
 	ndir = ndir1;
       else
 	ndir = ndir2;
-      
+
       thedir = (((thedir*((real)n - 1)) + ndir ) / (real)n);
-      
+
     }
-  
-  
+
+
   *dir = utMod360( thedir );
-  
+
   return ( TRUE );
-  
+
 }
 
 void utSetLogConfig(int usesys, int echostderr)
@@ -513,7 +513,7 @@ void utSetLogConfig(int usesys, int echostderr)
       systemlog = FALSE;
       echo2stderr = echostderr;
     }
- 
+
   return;
 }
 
@@ -523,16 +523,16 @@ void utError(char *fmt, ...)
 {
   va_list ap;
   char buf[BIG_BUFFER_SIZE];
-  
+
   va_start(ap, fmt);
   (void)vsnprintf(buf, sizeof(buf) - 1, fmt, ap);
-  
+
   va_end(ap);
-  
+
   clbStoreMsg( MSG_OUTSIDE, MSG_GOD, buf );
-  
+
   return;
-  
+
 }
 
 void utLog(char *fmt, ...)
@@ -547,12 +547,12 @@ void utLog(char *fmt, ...)
 
   va_start(ap, fmt);
   (void)vsnprintf(buf, sizeof(buf) - 1, fmt, ap);
-  
+
   va_end(ap);
 
   if (errfd == NULL)
     {
-      
+
       if (systemlog)
 	{
 	  umask(007);
@@ -567,7 +567,7 @@ void utLog(char *fmt, ...)
 	{			/* local logfile */
 	  if ((homevar = getenv(CQ_USERHOMEDIR)) != NULL)
             {
-              snprintf(errfile, sizeof(errfile) - 1, "%s/%s/%s", 
+              snprintf(errfile, sizeof(errfile) - 1, "%s/%s/%s",
                        homevar, CQ_USERCONFDIR, C_CONQ_ERRLOG);
             }
 	  else
@@ -586,7 +586,7 @@ void utLog(char *fmt, ...)
                           strerror(errno));
                   nowarn = TRUE;
                 }
-	      
+
               if (!systemlog)
                 {
                   /* if the logfile could not be created for a user,
@@ -604,7 +604,7 @@ void utLog(char *fmt, ...)
 
 #if !defined(MINGW)
 	      if (systemlog)
-		if (chmod(errfile, 
+		if (chmod(errfile,
 			  (S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP)) == -1)
 		  {
 		    perror("utLog():chmod()");
@@ -617,7 +617,7 @@ void utLog(char *fmt, ...)
 	{
 	  fclose(errfd);
 	}
-      
+
 #if !defined(MINGW)
       if (systemlog)
 	if (chown(errfile, 0, ConquestGID) == -1)
@@ -632,7 +632,7 @@ void utLog(char *fmt, ...)
 	  perror("utLog(): can't open logfile");
 	}
     }
-  
+
   if (errfd != NULL)
     {
       fprintf(errfd, "%ld:%d:%s\n", time(0), (int)getpid(), buf);
@@ -645,9 +645,9 @@ void utLog(char *fmt, ...)
       fflush(stderr);
     }
 
-  
+
   return;
-  
+
 }
 
 
@@ -661,16 +661,16 @@ void utLog(char *fmt, ...)
 void utDeleteBlanks( char *str )
 {
   int i, j;
-  
+
   for ( i = 0; str[i] != EOS; )
     if ( str[i] == ' ' )
       for ( j = i; str[j] != EOS; j = j + 1 )
 	str[j] = str[j+1];
     else
       i = i + 1;
-  
+
   return;
-  
+
 }
 
 
@@ -681,20 +681,20 @@ void utDeleteBlanks( char *str )
 int utDeltaGrand( int s, int *n )
 {
   int tn, ts;
-  
+
   /* Save s in case it and n are the same variable. */
   ts = s;
-  
+
   /* Get thousands since midnight. */
   utGrand( &tn );
   *n = tn;
-  
+
   /* Calculate the difference. */
   if ( tn < ts )
     tn = tn + 24 * 60 * 60 * 1000;		/* crossed midnight */
-  
+
   return ( tn - ts );
-  
+
 }
 
 
@@ -706,20 +706,20 @@ int utDeltaGrand( int s, int *n )
 int utDeltaSecs( int s, int *n )
 {
   int tn, ts;
-  
+
   /* Save s in case it and n are the same variable. */
   ts = s;
-  
+
   /* Get seconds since midnight. */
   utGetSecs( &tn );
   *n = tn;
-  
+
   /* Calculate the difference. */
   if ( tn < ts )
     tn = tn + ((24 * 60) * 60);		/* crossed midnight */
-  
+
   return ( tn - ts );
-  
+
 }
 
 
@@ -732,10 +732,10 @@ real utExplosionHits( real basehits, real dis )
   if ( dis > PHASER_DIST )
     return ( 0.0 );
   return ( basehits / ( ( EXPLOSION_FALLOFF - 1.0 ) *
-			max( dis - EXPLOSION_RADIUS, 
+			max( dis - EXPLOSION_RADIUS,
 			     0.0 ) / PHASER_DIST + 1.0 ) -
 	   basehits / EXPLOSION_FALLOFF * dis / PHASER_DIST );
-  
+
 }
 
 
@@ -747,7 +747,7 @@ void utFormatMinutes( int itime, char *buf )
   int i, days, hours, minutes;
   char junk[32];
   int minus;
-  
+
   if ( itime < 0 )
     {
       minus = TRUE;
@@ -758,12 +758,12 @@ void utFormatMinutes( int itime, char *buf )
       minus = FALSE;
       i = itime;
     }
-  
+
   minutes = mod( i, 60 );		/* minutes */
   i = i / 60;
   hours = mod( i, 24 );		/* hours */
   days = i / 24;			/* days */
-  
+
   if ( minus )
     {
       if ( days > 0 )
@@ -773,20 +773,20 @@ void utFormatMinutes( int itime, char *buf )
       else
 	minutes = -minutes;
     }
-  
+
   /* Format time. */
   sprintf( junk, "%d %2d:%02d", days, hours, minutes );
-  
+
   /* Skip the junk and find the beginning. */
   for ( i = 0; junk[i] == ' ' || junk[i] == ':' || junk[i] == '0'; i = i + 1 )
     ;
-  
+
   /* Store in return buffer. */
   /*    scopy( junk, i, buf, 1 );*/
   strcpy(buf, &junk[i]);
-  
+
   return;
-  
+
 }
 
 
@@ -798,7 +798,7 @@ void utFormatSeconds( int itime, char *buf )
   int i, days, hours, minutes, seconds;
   char junk[BUFFER_SIZE];
   int minus;
-  
+
   if ( itime < 0 )
     {
       minus = TRUE;
@@ -809,14 +809,14 @@ void utFormatSeconds( int itime, char *buf )
       minus = FALSE;
       i = itime;
     }
-  
+
   seconds = mod( i, 60 );		/* seconds */
   i = i / 60;
   minutes = mod( i, 60 );		/* minutes */
   i = i / 60;
   hours = mod( i, 24 );		/* hours */
   days = i / 24;			/* days */
-  
+
   if ( minus )
     {
       if ( days > 0 )
@@ -828,14 +828,14 @@ void utFormatSeconds( int itime, char *buf )
       else
 	seconds = -seconds;
     }
-  
+
   /* Format time. */
   sprintf( junk, "%d %2d:%02d:%02d", days, hours, minutes, seconds );
-  
+
   strcpy(buf, junk);
-  
+
   return;
-  
+
 }
 
 
@@ -854,7 +854,7 @@ int utGetMsg( int snum, int *msg )
 
     }
   return ( FALSE );
-  
+
 }
 
 
@@ -866,7 +866,7 @@ void utFormatTime( char *buf, time_t thetime )
 {
   int now[NOWSIZE];
   char junk[5];
-  
+
   getnow( now, thetime );
   switch ( now[2] )
     {
@@ -912,9 +912,9 @@ void utFormatTime( char *buf, time_t thetime )
     }
   sprintf( buf, "%2d:%02d:%02d %02d%s%02d",
 	 now[4], now[5], now[6], now[3], junk, mod( now[1], 100 ) );
-  
+
   return;
-  
+
 }
 
 
@@ -925,12 +925,12 @@ void utFormatTime( char *buf, time_t thetime )
 void utGrand( int *h )
 {
   int now[NOWSIZE];
-  
+
   getnow( now, 0 );
   *h = ( ( ( now[4] * 60 ) + now[5] ) * 60 + now[6] ) * 1000 + now[7];
-  
+
   return;
-  
+
 }
 
 
@@ -941,12 +941,12 @@ void utGrand( int *h )
 void utGetSecs( int *s )
 {
   int now[NOWSIZE];
-  
+
   getnow( now, 0 );
   *s = ( ( now[4] * 60 ) + now[5] ) * 60 + now[6];
-  
+
   return;
-  
+
 }
 
 
@@ -957,14 +957,14 @@ void utGetSecs( int *s )
 real utMod360( real r )
 {
   real mr;
-  
+
   mr = r;
-  
+
   while ( mr < 0.0 )
     mr += 360.0;
-  
+
   return((real) fmod(mr, 360.0));
-  
+
 }
 
 
@@ -975,20 +975,20 @@ real utMod360( real r )
 int utModPlusOne( int i, int modulus )
 {
   int m, n;
-  
+
   m = i;
-  
+
   while ( m < 0 )
     m += modulus;
-  
+
   n = mod(--m, modulus) + 1;
   return((n >= modulus) ? 0 : n);
-  
+
   /*    return((n == 0) ? 1 : n);*/
-  
+
   /*    while ( m < 1 )
 	m = m + modulus;
-	
+
 	return ( mod( m-1, modulus ) + 1 );
 	*/
 }
@@ -1006,7 +1006,7 @@ int utSafeCToI( int *num, char *buf, int offset )
 
   retval = FALSE;
   if (buf[offset] == EOS)
-    {		
+    {
       *num = 0;
       retval = FALSE;
     }
@@ -1016,15 +1016,15 @@ int utSafeCToI( int *num, char *buf, int offset )
 
   /* If the number is the same size as the biggest integer, */
   /*  assume that it is too big. */
-  
+
   if ( *num >= INT_MAX )
     {
       *num = INT_MAX;
       retval = FALSE;
     }
-  
+
   return ( retval );
-  
+
 }
 
 
@@ -1036,25 +1036,26 @@ int utSafeCToI( int *num, char *buf, int offset )
 /*    flag = utIsSpecial( str, what, token, count ) */
 int utIsSpecial( char *str, int *what, int *token, int *count )
 {
-  int i; 
+  int i;
   char buf[20];
-  
+
   *what = NEAR_ERROR;
   *token = SPECIAL_NOTSPECIAL;
   *count = 0;
-  
+
   /* Reject obvious losers. */
   if ( str[0] != 'n' && str[0] != 'w' && str[0] != 'h' )
     return ( FALSE );
-  
+
   utStcpn( str, buf, 20 );			/* need a private copy */
-  
+
   /* Find threshold count; cleverly, the default will be zero when using ctoi. */
-  for ( i = 0; buf[i] != EOS && c_type( buf[i] ) != DIGIT; i = i + 1 )
-    ;
+  for (i = 0; buf[i] != EOS && !isdigit(buf[i]); i++)
+      ;
+
   buf[i] = EOS;				/* ditch numeric part */
   utSafeCToI( count, str, i );		/* ignore status */
-  
+
   if ( utStringMatch( buf, "nes", FALSE ) )	/* this one must be first */
     {
       *what = NEAR_SHIP;
@@ -1114,9 +1115,9 @@ int utIsSpecial( char *str, int *what, int *token, int *count )
     }
   else
     return ( FALSE );		/* string simply isn't special */
-  
+
   return ( TRUE );
-  
+
 }
 
 
@@ -1129,7 +1130,7 @@ void utStcpn( char *from, char *to, int tosize )
 {
   strncpy(to, from, tosize);
   to[tosize - 1] = '\0';
-  
+
 }
 
 
@@ -1141,7 +1142,7 @@ void utStcpn( char *from, char *to, int tosize )
 int utStringMatch( char *str1, char *str2, int casesensitive )
 {
   int i;
-  
+
   if ( casesensitive )
     for ( i = 0; str1[i] == str2[i] && str1[i] != EOS; i = i + 1 )
       ;
@@ -1150,7 +1151,7 @@ int utStringMatch( char *str1, char *str2, int casesensitive )
 	 (char)tolower(str1[i]) == (char)tolower(str2[i]) && str1[i] != EOS;
 	 i = i + 1 )
       ;
-  
+
   if ( i == 0 )
     {
       if ( str1[0] == EOS && str2[0] == EOS )
@@ -1160,9 +1161,9 @@ int utStringMatch( char *str1, char *str2, int casesensitive )
     }
   else if ( str1[i] == EOS || str2[i] == EOS )
     return ( TRUE );
-  
+
   return ( FALSE );
-  
+
 }
 
 
@@ -1173,22 +1174,22 @@ int utStringMatch( char *str1, char *str2, int casesensitive )
 real utSubAngle( real a1, real a2 )
 {
   real x;
-  
+
   x = a1 - a2;
   while ( x > 180.0 )
     x = x - 360.0;
   while ( x < -180.0 )
     x = x + 360.0;
-  
+
   return ( x );
-  
+
 }
 
 /* Under windows, we play a few more games to figure out where
  * system-related stuff can be found, like souncd/img/etc... For non
  * windows (!MINGW) systems we simply return the path arg that was
  * passed in.
- * 
+ *
  * For windows, we will look for an env var: CONQUEST_ROOT, which if
  * present will be used to locate the other dirs.  If this env var is
  * not set, we will use Windows $COMMONPROGRAMFILES/Conquest/.  If
@@ -1203,7 +1204,7 @@ char *utGetPath(const char *thepath)
 
 #if !defined(MINGW)
   /* the non-windows case just returns thepath, but we copy it
-   * to avoid an annoying compiler warning regarding const. 
+   * to avoid an annoying compiler warning regarding const.
    */
   strncpy(retpath, thepath, PATH_MAX - 1);
   return retpath;
