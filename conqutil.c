@@ -1251,8 +1251,13 @@ void utSleep(real seconds)
     // convert to integer milliseconds
     int msecs = (int)(seconds * 1000.0f);
 
-#if defined(LINUX)
+#if defined(MINGW)
 
+    /* For windows, use WINAPI Sleep(millis) */
+    Sleep((DWORD)(msecs));
+
+#else
+    // hope you have nanosleep()
     struct timespec delay_time;
 
     delay_time.tv_sec  = msecs / 1000;
@@ -1261,14 +1266,6 @@ void utSleep(real seconds)
     // and continuing where we left off
     while (nanosleep(&delay_time, &delay_time) && errno == EINTR)
         ; // loop
-
-#elif defined(MINGW)
-
-    /* For windows, use WINAPI Sleep(millis) */
-    Sleep((DWORD)(msecs));
-
-#else
-# error "Need an implementation of utSleep()"
 #endif
 }
 
