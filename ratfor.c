@@ -136,31 +136,6 @@ int wkday (void)
   return(thetm->tm_wday + 1);
 }
     
-/* Find first bit that is set and return bit number */
-int lib_ffs(int start, int len, int bits, int *rule)
-{
-  register int i;
-
-  *rule = -1;
-  for (i = start; i < len; i++)
-    {				/* check the bits */
-      if ((bits & ( 1 << i)) != 0)
-	{			/* bit is set */
-	  *rule = i;
-	  break;
-	}
-    }
-
-#ifdef DEBUG_AI
-    utLog("bits = %8X, rule = %d", bits, *rule);
-#endif
-
-  if (*rule == -1)
-    return(ERR);
-  else
-    return(OK);
-}
-
 				/* output an error and exit */
 void error(char str[])
 {

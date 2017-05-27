@@ -236,7 +236,6 @@ void lower(char *buf);
 void upper(char *buf);
 time_t getnow (int now[NOWSIZE], time_t thetime);
 int wkday (void);
-int lib_ffs(int start, int len, int bits, int *rule);
 real ctor(char *buf);
 void error(char *str);
 

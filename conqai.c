@@ -33,6 +33,27 @@ static void executeai( int snum, int token );
 static void trobotai( int snum );
 static int tableai( int vars[] );
 
+/* Find first bit that is set and return bit number */
+static int lib_ffs(int start, int len, int bits, int *rule)
+{
+  int i;
+
+  *rule = -1;
+  for (i = start; i < len; i++)
+    {				/* check the bits */
+      if ((bits & ( 1 << i)) != 0)
+	{			/* bit is set */
+	  *rule = i;
+	  break;
+	}
+    }
+
+  if (*rule == -1)
+    return(ERR);
+  else
+    return(OK);
+}
+
 /*  buildai - construct the robot data base */
 /*  SYNOPSIS */
 /*    int snum, vars(MAX_VAR), nenum */
