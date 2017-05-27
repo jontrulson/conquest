@@ -203,7 +203,7 @@ int GetSysConf(int checkonly)
 	  fprintf(stderr, "'conqoper -C' needs to be run. Using internal defaults.\n");
 	}
 
-      return(ERR);
+      return(-1);
     }
 
 #ifdef DEBUG_CONFIG
@@ -270,7 +270,7 @@ int GetSysConf(int checkonly)
 		      
 		      case CTYPE_BOOL:
 			i = process_bool(bufptr);
-			if (i != ERR)
+			if (i != -1)
 			  {
 			    *((int *) SysConfData[j].ConfValue) = i;
 			    SysConfData[j].Found = TRUE;
@@ -322,7 +322,7 @@ int GetSysConf(int checkonly)
 	      strerror(errno));
       fclose(conf_fd);
       
-      return(ERR);
+      return(-1);
     }
 
   fclose(conf_fd);
@@ -453,7 +453,7 @@ int GetConf(int usernum)
 
       fprintf(stderr, "Can't get %s environment variable. Exiting\n",
               CQ_USERHOMEDIR);
-      return(ERR);
+      return(-1);
     }
 
   snprintf(conf_name, sizeof(conf_name)-1, "%s/%s/%s", 
@@ -471,15 +471,15 @@ int GetConf(int usernum)
 		  conf_name,
 		  strerror(errno));
 
-	  return(ERR);
+	  return(-1);
 	}
 
 #ifdef DEBUG_CONFIG
       utLog("GetConf(): No config file.");
 #endif
       
-      if (MakeConf(conf_name) == ERR)
-	return(ERR);
+      if (MakeConf(conf_name) == -1)
+	return(-1);
 
       return(FALSE);		/* no config file */
     }
@@ -546,7 +546,7 @@ int GetConf(int usernum)
 			
 		      case CTYPE_BOOL:
 			i = process_bool(bufptr);
-			if (i != ERR)
+			if (i != -1)
 			  {
 			    *((int *) ConfData[j].ConfValue) = i;
 			    ConfData[j].Found = TRUE;
@@ -651,7 +651,7 @@ int GetConf(int usernum)
 	      strerror(errno));
       fclose(conf_fd);
       
-      return(ERR);
+      return(-1);
     }
 
   fclose(conf_fd);
@@ -703,7 +703,7 @@ int SaveUserConfig(void)
       fprintf(stderr, 
               "SaveUserConfig(): Can't get %s environment variable. Exiting\n",
               CQ_USERHOMEDIR);
-      return(ERR);
+      return(-1);
     }
 
   snprintf(conf_name, sizeof(conf_name)-1, "%s/%s/%s", 
@@ -864,7 +864,7 @@ int process_bool(char *bufptr)
       fprintf(stderr, "process_bool(): error parsing '%s', \n\t%s\n",
 	      bufptr,
 	      "Value must be yes or no or true or false.");
-      return(ERR);
+      return(-1);
     }
 }
 
@@ -887,7 +887,7 @@ int MakeConf(char *filename)
 	      filename,
 	      strerror(errno));
 
-      return(ERR);
+      return(-1);
     }
 
 
@@ -1014,7 +1014,7 @@ int MakeSysConf()
       fprintf(stderr, "Error creating %s: %s\n",
 	      conf_name,
 	      strerror(errno));
-      return(ERR);
+      return(-1);
     }
 
   utLog("OPER: Updating %s file...", conf_name);

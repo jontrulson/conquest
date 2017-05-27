@@ -17,7 +17,7 @@ int prmProcInput(prm_t *prm, int ch)
   char c = (ch & 0xff);         /* 8bit equiv */
   int clen = strlen(prm->buf);
 
-  if (c_index ( prm->terms, ch ) != ERR)
+  if (c_index ( prm->terms, ch ) != -1)
     return ch;                  /* you're terminated */
 
   if ((clen >= (prm->buflen - 1)) && isprint(c))

@@ -49,7 +49,7 @@ static int lib_ffs(int start, int len, int bits, int *rule)
     }
 
   if (*rule == -1)
-    return(ERR);
+    return(-1);
   else
     return(OK);
 }
@@ -889,7 +889,7 @@ void robstr( int token, char buf[] )
 /*    token = tableai( vars ) */
 static int tableai( int vars[] )
 {
-  int status, token = ERR, rule, i;
+  int status, token = -1, rule, i;
   int rbits;
   
   /* Set all bits. */
@@ -907,7 +907,7 @@ static int tableai( int vars[] )
     {
       token = Robot->rvec[rule];	/* translate rule into action token */
     }
-  else if ( status == ERR )
+  else if ( status == -1 )
     token = ROB_NOOP;
   
   return ( token );

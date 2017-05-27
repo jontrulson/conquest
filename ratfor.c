@@ -48,7 +48,7 @@ int c_index(char *buf, char ch)
       count++;
     }
 
-  return(ERR);			/* No match */
+  return(-1);			/* No match */
 }
 
 /* void lower(char *buf) - lowercase a string */

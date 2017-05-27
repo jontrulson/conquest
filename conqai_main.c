@@ -41,16 +41,16 @@ int main(int argc, char *argv[])
   
   /* First things first. */
   
-  if ((ConquestGID = getConquestGID()) == ERR)
+  if ((ConquestGID = getConquestGID()) == -1)
     {
       fprintf(stderr, "conqai: getConquestGID() failed\n");
       exit(1);
     }
   
-  if (GetSysConf(FALSE) == ERR)
+  if (GetSysConf(FALSE) == -1)
     {
 #ifdef DEBUG_CONFIG
-      utLog("%s@%d: main(): GetSysConf() returned ERR.", __FILE__, __LINE__);
+      utLog("%s@%d: main(): GetSysConf() returned -1.", __FILE__, __LINE__);
 #endif
 /*      exit(1);*/
     }
@@ -64,7 +64,7 @@ int main(int argc, char *argv[])
       exit(1);
     }
   
-  if (semInit() == ERR)
+  if (semInit() == -1)
     {
       fprintf(stderr, "semInit() failed to get semaphores. exiting.\n");
       exit(1);

@@ -51,7 +51,7 @@ int getUID(char *name)
 	      chkname,
 	      strerror(errno));
       
-      return(ERR);
+      return(-1);
     }
   
   return(conq_pwd->pw_uid);
@@ -73,7 +73,7 @@ int getConquestGID(void)
 	      CONQUEST_GROUP,
 	      strerror(errno));
       
-      return(ERR);
+      return(-1);
     }
   
   return(conq_grp->gr_gid);
@@ -151,7 +151,7 @@ void conqstats( int snum )
 				/* update elapsed time in History[] 
 				   for this user */
 
-      if (Context.histslot != ERR && History[Context.histslot].histunum == unum)
+      if (Context.histslot != -1 && History[Context.histslot].histunum == unum)
 	{
 	  difftime = getnow(NULL, 0) - History[Context.histslot].histlog;
 	  if (difftime < (time_t)0)

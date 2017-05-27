@@ -244,20 +244,20 @@ void cdfill ( char ch, char *buf, int count )
 /*    int status, cdgetn, num, lin, col */
 /*    status = cdgetn ( pmt, lin, col, num ) */
 /*       num - number read */
-/*       status - OK if a number was read, else ERR */
+/*       status - OK if a number was read, else -1 */
 int cdgetn ( char pmt[], int lin, int col, int *num )
 {
   char buf[MSGMAXLINE];
 
   cdfill('\0', buf, MSGMAXLINE);
-  if ( cdgets ( pmt, lin, col, buf, MSGMAXLINE ) == ERR )
-    return ( ERR );
+  if ( cdgets ( pmt, lin, col, buf, MSGMAXLINE ) == -1 )
+    return ( -1 );
   
   if (strlen(buf) == 0)
-    return(ERR);
+    return(-1);
 
   if (!alldig(buf))
-    return(ERR);
+    return(-1);
 
   *num = atoi ( buf );
   return ( OK );
@@ -285,7 +285,7 @@ int cdgets ( char pmt[], int lin, int col, char str[], int maxlen )
   cdgetx ( pmt, lin, col, "\r\n", str, maxlen, TRUE );
   
   if ( strlen ( str ) == 0 )
-    return(ERR);
+    return(-1);
   else
     return(OK);
   
@@ -381,7 +381,7 @@ int cdgetp ( char pmt[], int lin, int col, char terms[], char str[],
 
       if ( terms[0] != 0 )
 	{
-	  if ( c_index ( terms, ch ) != ERR )
+	  if ( c_index ( terms, ch ) != -1 )
 	    break;
 	  else if ( ch == TERM_NORMAL )
 	    break;

@@ -70,7 +70,7 @@ static void selectentry( uint8_t esystem )
       }
   /* Change first comma to a colon. */
   i = c_index( cbuf, ',' );
-  if ( i != ERR )
+  if ( i != -1 )
     cbuf[i] = ':';
   
   cprintf(12, 0, ALIGN_CENTER, cbuf);

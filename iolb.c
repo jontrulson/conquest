@@ -192,7 +192,7 @@ int iogchar ( void )
   else
     thechar = ibufGetc();
   
-  if (thechar == ERR)
+  if (thechar == -1)
     {
 #ifdef DEBUG_IO
       utLog("iogchar() thechar == ERR, errno = %d", errno);

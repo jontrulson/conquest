@@ -370,7 +370,7 @@ static void ChangeOption(struct Conf *cdata, int lin)
       buf[CBUFLEN - 1] = 0;
       rv = cdgets("Value: ", lin, 1, buf, cdata->max - 1);
 
-      if (rv != ERR)
+      if (rv != -1)
 	{
 	  strncpy((char *)cdata->ConfValue, buf, cdata->max);
 	  ((char *)cdata->ConfValue)[cdata->max - 1] = 0;
@@ -384,7 +384,7 @@ static void ChangeOption(struct Conf *cdata, int lin)
       cdclrl(lin, 1);
       rv = cdgetn("Enter a number: ", lin, 1, &j);
 
-      if (rv != ERR)
+      if (rv != -1)
 	{
 	  if (j >= cdata->min && j <= cdata->max)
 	    {

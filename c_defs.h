@@ -171,9 +171,6 @@ extern char *crypt(char *, char *);
 # define TRUE    (1)
 #endif
 
-#ifndef ERR
-# define ERR     (-1)
-#endif
 #ifndef OK
 # define OK      TRUE
 #endif

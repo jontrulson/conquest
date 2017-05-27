@@ -332,7 +332,7 @@ int main(int argc, char *argv[])
   /* clear out our stored packets */
   spktInit();
 
-  if ((ConquestGID = getConquestGID()) == ERR)
+  if ((ConquestGID = getConquestGID()) == -1)
     {
       fprintf(stderr, "%s: getConquestGID() failed\n", progName);
       exit(1);
@@ -346,7 +346,7 @@ int main(int argc, char *argv[])
     {
       int myuid;
 
-      if ((myuid = getUID(myuidname)) == ERR)
+      if ((myuid = getUID(myuidname)) == -1)
         {
           fprintf(stderr, "%s: getUID(%s) failed\n", progName, myuidname);
           exit(1);
@@ -367,10 +367,10 @@ int main(int argc, char *argv[])
   utLog("%s@%d: main() Reading Configuration files.", __FILE__, __LINE__);
 #endif
   
-  if (GetSysConf(FALSE) == ERR)
+  if (GetSysConf(FALSE) == -1)
     {
 #ifdef DEBUG_CONFIG
-      utLog("%s@%d: main(): GetSysConf() returned ERR.", __FILE__, __LINE__);
+      utLog("%s@%d: main(): GetSysConf() returned -1.", __FILE__, __LINE__);
 #endif
     }
 
@@ -391,7 +391,7 @@ int main(int argc, char *argv[])
   utLog("%s@%d: main() getting semephores - semInit()", __FILE__, __LINE__);
 #endif
   
-  if (semInit() == ERR)
+  if (semInit() == -1)
     {
       fprintf(stderr, "semInit() failed to get semaphores. exiting.\n");
       exit(1);
@@ -419,7 +419,7 @@ int main(int argc, char *argv[])
   Context.maxcol = 0;		/* not used here */
   
   Context.snum = 0;
-  Context.histslot = ERR;
+  Context.histslot = -1;
   Context.lasttang = Context.lasttdist = 0;
   Context.lasttarg[0] = 0;
   Context.updsec = 10;		/* 10 per second default update rate */
@@ -490,10 +490,10 @@ int main(int argc, char *argv[])
   sInfo.state = SVR_STATE_INIT;
 
   /* re-read sys conf here for indivulual client drivers... */
-  if (GetSysConf(FALSE) == ERR)
+  if (GetSysConf(FALSE) == -1)
     {
 #ifdef DEBUG_CONFIG
-      utLog("%s@%d: main(): GetSysConf() returned ERR.", __FILE__, __LINE__);
+      utLog("%s@%d: main(): GetSysConf() returned -1.", __FILE__, __LINE__);
 #endif
     }
 
@@ -1493,7 +1493,7 @@ int newship( int unum, int *snum )
       if ( ! capentry( *snum, &system ) )
 	{
 	  Ships[*snum].status = SS_RESERVED;
-	  return ( ERR );
+	  return ( -1 );
 	}
     }
   else

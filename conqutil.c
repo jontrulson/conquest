@@ -479,7 +479,7 @@ int utArrowsToDir( char *str, real *dir )
     {
       n = i + 1;
       idx = c_index( arrs, (char)tolower(str[i]) );
-      if ( idx == ERR || idx == 0)
+      if ( idx == -1 || idx == 0)
 	return ( FALSE );
 
       ndir1 = ((real)idx - 1.0) * 45.0;
@@ -559,7 +559,7 @@ void utLog(char *fmt, ...)
 	  sprintf(errfile, "%s/%s", CONQSTATE, C_CONQ_ERRLOG);
 	  if (ConquestGID == ERR)
 	    {
-	      fprintf(stderr, "conqutil: utLog():  ConquestGID == ERR!\n");
+	      fprintf(stderr, "conqutil: utLog():  ConquestGID == -1!\n");
 	      exit(1);
 	    }
 	}

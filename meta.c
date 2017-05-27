@@ -350,7 +350,7 @@ int metaUpdateServer(char *remotehost, char *name, int port)
 
 /* contact a meta server, and return a pointer to a static array of
    metaSRec_t's coresponding to the server list.  returns number
-   of servers found, or ERR if error */
+   of servers found, or -1 if error */
 #define SERVER_BUFSIZE 1024
 
 int metaGetServerList(char *remotehost, metaSRec_t **srvlist)
@@ -368,7 +368,7 @@ int metaGetServerList(char *remotehost, metaSRec_t **srvlist)
   nums = 0;
 
   if (!remotehost || !srvlist)
-    return ERR;
+    return -1;
 
   if (firsttime)
     {
@@ -379,7 +379,7 @@ int metaGetServerList(char *remotehost, metaSRec_t **srvlist)
   if ((hp = gethostbyname(remotehost)) == NULL) 
     {
       utLog("metaGetServerList: %s: no such host", remotehost);
-      return ERR;
+      return -1;
     }
 
   /* put host's address and address type into socket structure */
@@ -392,14 +392,14 @@ int metaGetServerList(char *remotehost, metaSRec_t **srvlist)
   if ((s = socket(AF_INET, SOCK_STREAM, 0 )) < 0) 
     {
       utLog("metaGetServerList: socket failed: %s", strerror(errno));
-      return ERR;
+      return -1;
     }
 
   /* connect to the remote server */
   if ( connect ( s, (const  struct sockaddr *)&sa, sizeof ( sa ) ) < 0 ) 
     {
       utLog("metaGetServerList: connect failed: %s", strerror(errno));
-      return ERR;
+      return -1;
   }
 
 

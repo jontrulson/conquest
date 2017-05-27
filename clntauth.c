@@ -1,4 +1,4 @@
-/* 
+/*
  * clntauth.c - user stuff
  *
  * Copyright Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
@@ -39,12 +39,12 @@ static void PrintStatus(int lin)
       sprintf(buf1, "#%d#Server: #%d#  %%s", MagentaColor, NoColor);
       sprintf(buf2, "#%d#Version: #%d# %%s", MagentaColor, NoColor);
       sprintf(buf3, "#%d#Time: #%d#    %%s", MagentaColor, NoColor);
-      sprintf(buf4, 
+      sprintf(buf4,
               "#%d#Status: #%d#  Users #%d#%%d, #%d#Ships #%d#%%d/%%d #%d#"
               "(#%d#%%d #%d#active, #%d#%%d #%d#vacant, "
               "#%d#%%d #%d#robot)",
               MagentaColor, NoColor, CyanColor, NoColor, CyanColor, NoColor,
-              CyanColor, NoColor, CyanColor, NoColor, 
+              CyanColor, NoColor, CyanColor, NoColor,
               CyanColor, NoColor);
       sprintf(buf5, "#%d#Flags: #%d#   %%s", MagentaColor, NoColor);
       sprintf(buf6, "#%d#MOTD: #%d#    %%s", MagentaColor, NoColor);
@@ -60,7 +60,7 @@ static void PrintStatus(int lin)
   cprintf(lin++, 0, ALIGN_NONE, buf3, ctime(&servtm));
 
   cprintf(lin++, 0, ALIGN_NONE, buf4,
-	  sStat.numusers, sStat.numtotal, MAXSHIPS, sStat.numactive, 
+	  sStat.numusers, sStat.numtotal, MAXSHIPS, sStat.numactive,
 	  sStat.numvacant, sStat.numrobot);
 
   cprintf(lin++, 0, ALIGN_NONE, buf5, clntServerFlagsStr(sStat.flags));
@@ -96,7 +96,7 @@ int Logon(char *username)
 	  cdrefresh();
 	}
       else
-	cprintf( lin, 1, ALIGN_CENTER, "#%d#Welcome to #%d#Conquest#%d# %s (%s)", 
+	cprintf( lin, 1, ALIGN_CENTER, "#%d#Welcome to #%d#Conquest#%d# %s (%s)",
 		 YellowLevelColor,
 		 RedLevelColor,
 		 YellowLevelColor,
@@ -122,11 +122,11 @@ int Logon(char *username)
 	  cprintf( slin - 2, 1, ALIGN_LEFT,
 		   "#%dPlease login. Press [ENTER] to exit.",
 		   SpecialColor);
-	  
+
 	  cprintf( slin - 1, 1, ALIGN_LEFT,
 		   "#%d(New Users: Just pick a username)",
 		   SpecialColor);
-	  
+
 	  ch = cdgetx( "Username: ", slin, 1, TERMS, nm, MAX_USERLEN, TRUE );
 
 	  if (ch == TERM_EXTRA )
@@ -160,16 +160,16 @@ int Logon(char *username)
 		  pw[0] = 0;
 		  cdclrl( MSG_LIN1, 2  );
 		  cdputs("Use any printable characters.", MSG_LIN1, 1);
-		  ch = cdgetx( "Password: ", slin, 1, 
+		  ch = cdgetx( "Password: ", slin, 1,
 			       TERMS, pw, MAXUSERNAME - 1, FALSE );
-	      
+
 		  slin++;
 		  pwr[0] = 0;
 		  cdclrl( MSG_LIN1, 2  );
 		  cdputs("Use any printable characters.", MSG_LIN1, 1);
-		  ch = cdgetx( "Retype Password: ", slin, 1, 
+		  ch = cdgetx( "Retype Password: ", slin, 1,
 			       TERMS, pwr, MAXUSERNAME - 1, FALSE );
-	      
+
 		  if (strcmp(pw, pwr) != 0)
 		    {			/* pw's don't match, start over */
 		      cdbeep();
@@ -185,7 +185,7 @@ int Logon(char *username)
 		     and password (new user) - time
 		     to rock. */
 
-		  if ((rv = sendAuth(cInfo.sock, CPAUTH_LOGIN, 
+		  if ((rv = sendAuth(cInfo.sock, CPAUTH_LOGIN,
 				     nm, pw)) < 0)
 		    return FALSE;
 
@@ -211,14 +211,14 @@ int Logon(char *username)
 	      pw[0] = 0;
 	      cdclrl( MSG_LIN1, 2  );
 	      cdputs("Use any printable characters.", MSG_LIN1, 1);
-	      ch = cdgetx( "Password: ", slin, 1, 
+	      ch = cdgetx( "Password: ", slin, 1,
 			   TERMS, pw, MAXUSERNAME - 1, FALSE );
 
-	      if ((rv = sendAuth(cInfo.sock, CPAUTH_LOGIN, 
+	      if ((rv = sendAuth(cInfo.sock, CPAUTH_LOGIN,
 				 nm, pw)) < 0)
 		return FALSE;
 
-	      
+
 
 	      if (rv != PERR_OK)
 		{			/* invalid pw */
@@ -232,7 +232,7 @@ int Logon(char *username)
 		  sleep(2);
 		  continue;
 		}
-	  
+
 	      /* good pw - go for the gusto */
 	      done = TRUE;
 	      utLog("clntauth:INFO: user '%s' logged in", nm);
@@ -265,7 +265,7 @@ void ChangePassword(int unum, int isoper)
     {
       lin = 1;
       col = ((Context.maxcol / 2) - (strlen(header) / 2));
-      
+
       cprintf(lin, col, ALIGN_NONE, "#%d#%s", NoColor, header);
     } /* ! isoper */
 				/* get and recheck new passwd */
@@ -273,7 +273,7 @@ void ChangePassword(int unum, int isoper)
   cdclrl( MSG_LIN1, 2  );
   cdputs("Use any printable characters.", MSG_LIN2, 1);
 
-  cdgetx( "New Password: ", MSG_LIN1, 1, 
+  cdgetx( "New Password: ", MSG_LIN1, 1,
           TERMS, pw, MAXUSERNAME - 1, FALSE );
 
   if (isoper == FALSE)
@@ -281,9 +281,9 @@ void ChangePassword(int unum, int isoper)
       pwr[0] = 0;
       cdclrl( MSG_LIN1, 2  );
       cdputs("Use any printable characters.", MSG_LIN2, 1);
-      cdgetx( "Retype Password: ", MSG_LIN1, 1, 
+      cdgetx( "Retype Password: ", MSG_LIN1, 1,
               TERMS, pwr, MAXUSERNAME - 1, FALSE );
-      
+
       if (strcmp(pw, pwr) != 0)
 	{			/* pw's don't match, start over */
 	  cdbeep();
@@ -304,10 +304,10 @@ void ChangePassword(int unum, int isoper)
       salt[0] = (Users[unum].username[0] != 0) ? Users[unum].username[0] : 'J';
       salt[1] = (Users[unum].username[1] != 0) ? Users[unum].username[1] : 'T';
       salt[2] = 0;
-      
+
       strncpy(epw, (char *)crypt(pw, salt), MAXUSERNAME - 2);
       epw[MAXUSERNAME - 1] = 0;
-      
+
       strncpy(Users[unum].pw, epw, MAXUSERNAME);
     }
   else				/* send a packet */
@@ -316,4 +316,4 @@ void ChangePassword(int unum, int isoper)
   cdclrl(MSG_LIN1, 2);
 
   return;
-}  
+}

@@ -428,7 +428,7 @@ int main(int argc, char *argv[])
 	exit(1);
       }
 
-  if ((ConquestGID = getConquestGID()) == ERR)
+  if ((ConquestGID = getConquestGID()) == -1)
     {
       fprintf(stderr, "%s: getConquestGID() failed\n", progName);
       exit(1);
@@ -442,7 +442,7 @@ int main(int argc, char *argv[])
     {
       int myuid;
 
-      if ((myuid = getUID(myuidname)) == ERR)
+      if ((myuid = getUID(myuidname)) == -1)
         {
           fprintf(stderr, "%s: getUID(%s) failed\n", progName, myuidname);
           exit(1);
@@ -463,10 +463,10 @@ int main(int argc, char *argv[])
   utLog("%s@%d: main() Reading Configuration files.", __FILE__, __LINE__);
 #endif
   
-  if (GetSysConf(FALSE) == ERR)
+  if (GetSysConf(FALSE) == -1)
     {
 #ifdef DEBUG_CONFIG
-      utLog("%s@%d: main(): GetSysConf() returned ERR.", __FILE__, __LINE__);
+      utLog("%s@%d: main(): GetSysConf() returned -1.", __FILE__, __LINE__);
 #endif
     }
 

@@ -152,7 +152,7 @@ int main(int argc, char *argv[])
 	break;
       }
 
-  if ((ConquestGID = getConquestGID()) == ERR)
+  if ((ConquestGID = getConquestGID()) == -1)
     {
       fprintf(stderr, "conqoper: getConquestGID() failed\n");
       exit(1);
@@ -168,7 +168,7 @@ int main(int argc, char *argv[])
 	  exit(1);
 	}
 
-      if (semInit() == ERR)
+      if (semInit() == -1)
 	{
 	  fprintf(stderr, "semInit() failed to get semaphores. exiting.\n");
 	  exit(1);
@@ -184,7 +184,7 @@ int main(int argc, char *argv[])
 				/* regen sysconf file? */
       if ((OptionAction & OP_REGENSYSCONF) != 0)
 	{
-	  if (MakeSysConf() == ERR)
+	  if (MakeSysConf() == -1)
 	    exit(1);
 
 	}
@@ -225,10 +225,10 @@ int main(int argc, char *argv[])
 
     }
 
-  if (GetSysConf(FALSE) == ERR)
+  if (GetSysConf(FALSE) == -1)
     {
 #ifdef DEBUG_CONFIG
-      utLog("%s@%d: main(): GetSysConf() returned ERR.", __FILE__, __LINE__);
+      utLog("%s@%d: main(): GetSysConf() returned -1.", __FILE__, __LINE__);
 #endif
       /* */
       ;
@@ -236,12 +236,12 @@ int main(int argc, char *argv[])
 
   Context.updsec = 2;		/* default upd per sec */
 
-  if (GetConf(0) == ERR)	/* use one if there, else defaults
+  if (GetConf(0) == -1)	/* use one if there, else defaults
 				   A missing or out-of-date conquestrc file
 				   will be ignored */
     {
 #ifdef DEBUG_CONFIG
-      utLog("%s@%d: main(): GetSysConf() returned ERR.", __FILE__, __LINE__);
+      utLog("%s@%d: main(): GetSysConf() returned -1.", __FILE__, __LINE__);
 #endif
       /* */
       ;
@@ -256,7 +256,7 @@ int main(int argc, char *argv[])
       exit(1);
     }
   
-  if (semInit() == ERR)
+  if (semInit() == -1)
     {
       fprintf(stderr, "semInit() failed to get semaphores. exiting.\n");
       exit(1);
@@ -269,9 +269,9 @@ int main(int argc, char *argv[])
   cdinit();			/* initialize display environment */
   
   Context.unum = MSG_GOD;	/* stow user number */
-  Context.snum = ERR;		/* don't display in cdgetp - JET */
+  Context.snum = -1;		/* don't display in cdgetp - JET */
   Context.entship = FALSE;	/* never entered a ship */
-  Context.histslot = ERR;	/* useless as an op */
+  Context.histslot = -1;	/* useless as an op */
   Context.lasttang = Context.lasttdist = 0;
   Context.lasttarg[0] = 0;
   Context.display = TRUE;

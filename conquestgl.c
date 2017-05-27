@@ -433,10 +433,10 @@ int main(int argc, char *argv[])
   utLog("%s@%d: main() Reading Configuration files.", __FILE__, __LINE__);
 #endif
   
-  if (GetConf(0) == ERR)	
+  if (GetConf(0) == -1)	
     {
 #ifdef DEBUG_CONFIG
-      utLog("%s@%d: main(): GetConf() returned ERR.", __FILE__, __LINE__);
+      utLog("%s@%d: main(): GetConf() returned -1.", __FILE__, __LINE__);
 #endif
 	exit(1);
       }
@@ -520,7 +520,7 @@ int main(int argc, char *argv[])
   Context.maxlin = 25;
   Context.maxcol = 80;
   Context.snum = 0;		/* force menu to get a new ship */
-  Context.histslot = ERR;
+  Context.histslot = -1;
   Context.lasttang = Context.lasttdist = 0;
 
   Context.lasttdist = Context.lasttang = 0;

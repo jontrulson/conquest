@@ -44,7 +44,7 @@ char *semGetName(int what)
 int semInit(void)
 {
 #if defined(MINGW)
-  return ERR;
+  return -1;
 #else
   int semflags;
 
@@ -74,7 +74,7 @@ int semInit(void)
 	  fprintf(stderr, "semInit(): can't get semaphore: %s",
 		  strerror(errno));
 
-	  return(ERR);
+	  return(-1);
 	}
     }
 
