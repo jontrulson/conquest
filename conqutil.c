@@ -1271,3 +1271,17 @@ void utSleep(real seconds)
 # error "Need an implementation of utSleep()"
 #endif
 }
+
+bool utIsDigits(const char *buf)
+{
+  char *s = buf;
+
+  while (*s)
+    {
+      if (!isdigit(*s))
+	return false;
+      s++;
+    }
+
+  return true;
+}

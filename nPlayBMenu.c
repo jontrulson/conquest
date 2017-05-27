@@ -112,7 +112,7 @@ static int nPlayBMenuInput(int ch)
             }
           else
             {
-              if ( alldig( prm.buf ) != TRUE )
+              if (!utIsDigits(prm.buf))
                 {
                   state = S_NONE;
                   prompting = FALSE;

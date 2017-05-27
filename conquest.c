@@ -1528,7 +1528,7 @@ void dobeam( int snum )
   else
     {
       utDeleteBlanks( buf );
-      if ( alldig( buf ) != TRUE )
+      if (!utIsDigits(buf))
 	{
 	  mcuPutMsg( abt, MSG_LIN1 );
 	  return;
@@ -1961,7 +1961,7 @@ void docourse( int snum )
   fold( cbuf );
 
   what = NEAR_ERROR;
-  if ( alldig( cbuf ) == TRUE )
+  if (utIsDigits(cbuf))
     {
       /* Raw angle. */
       cdclrl( MSG_LIN1, 1 );
@@ -1972,7 +1972,7 @@ void docourse( int snum )
 	  dir = (real)utMod360( (real)( j ) );
 	}
     }
-  else if ( cbuf[0] == 's' && alldig( &cbuf[1] ) == TRUE )
+  else if ( cbuf[0] == 's' && utIsDigits(&cbuf[1]) )
     {
       /* Ship. */
 
@@ -2292,13 +2292,13 @@ void doinfo( int snum )
       else
 	mcuPutMsg( "Not found.", MSG_LIN2 );
     }
-  else if ( cbuf[0] == 's' && alldig( &cbuf[1] ) == TRUE )
+  else if ( cbuf[0] == 's' && utIsDigits(&cbuf[1]) )
     {
       i = 1;
       utSafeCToI( &j, cbuf, i );		/* ignore status */
       mcuInfoShip( j, snum );
     }
-  else if ( alldig( cbuf ) == TRUE )
+  else if (utIsDigits(cbuf))
     {
       i = 0;
       utSafeCToI( &j, cbuf, i );		/* ignore status */

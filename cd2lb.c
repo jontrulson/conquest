@@ -256,7 +256,7 @@ int cdgetn ( char pmt[], int lin, int col, int *num )
   if (strlen(buf) == 0)
     return -1;
 
-  if (!alldig(buf))
+  if (!utIsDigits(buf))
     return -1;
 
   *num = atoi ( buf );

@@ -725,7 +725,7 @@ static int _gettarget(char *buf, real cdefault, real *dir, char ch)
       *dir = cdefault;
       return ( TRUE );
     }
-  if ( alldig( buf ) == TRUE )
+  if (utIsDigits(buf))
     {
       i = 0;
       if ( ! utSafeCToI( &j, buf, i ) )
@@ -836,13 +836,13 @@ static void _doinfo( char *buf, char ch )
       else
 	cp_putmsg( "Not found.", MSG_LIN2 );
     }
-  else if ( buf[0] == 's' && alldig( &buf[1] ) == TRUE )
+  else if ( buf[0] == 's' && utIsDigits(&buf[1]) )
     {
       i = 1;
       utSafeCToI( &j, buf, i );		/* ignore status */
       _infoship( j, snum );
     }
-  else if ( alldig( buf ) == TRUE )
+  else if (utIsDigits(buf))
     {
       i = 0;
       utSafeCToI( &j, buf, i );		/* ignore status */
@@ -1212,7 +1212,7 @@ static void _domsgto(char *buf, int ch, int terse)
   /* Got a target, parse it. */
   utDeleteBlanks( tbuf );
   upper( tbuf );
-  if ( alldig( tbuf ) == TRUE )
+  if (utIsDigits(tbuf))
     {
       /* All digits means a ship number. */
       i = 0;
@@ -1480,7 +1480,7 @@ static void _docourse( char *buf, char ch)
   fold( buf );
   
   what = NEAR_ERROR;
-  if ( alldig( buf ) == TRUE )
+  if (utIsDigits(buf))
     {
       /* Raw angle. */
       hudClearPrompt( MSG_LIN1 );
@@ -1491,7 +1491,7 @@ static void _docourse( char *buf, char ch)
 	  dir = (real)utMod360( (real)( j ) );
 	}
     }
-  else if ( buf[0] == 's' && alldig( &buf[1] ) == TRUE )
+  else if ( buf[0] == 's' && utIsDigits(&buf[1]) )
     {
       /* Ship. */
 
@@ -1915,7 +1915,7 @@ static void _dobeam(char *buf, int ch)
   else
     {
       utDeleteBlanks( buf );
-      if ( alldig( buf ) != TRUE )
+      if (!utIsDigits(buf))
 	{
           state = S_NONE;
           prompting = FALSE;

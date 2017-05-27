@@ -7,22 +7,6 @@
 #include "c_defs.h"		/* includes everthing else */
 #include "conqutil.h"
 
-/* alldig(char *) - returns YES if all chars in str are digits, else NO */
-int alldig(char *buf)
-{
-  char *s;
-
-  s = buf;
-  while (*s)
-    {
-      if (!isdigit(*s))
-	return(FALSE);
-      s++;
-    }
-
-  return(TRUE);
-}
-
 /* c_index(char *, char) - get the index of ch in *buf */
 int c_index(char *buf, char ch)
 {

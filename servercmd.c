@@ -202,7 +202,7 @@ static void Murder(int from, char *what)
   char ssbuf[MSGMAXLINE], mbuf[MSGMAXLINE];
 
   /* first see if it's a number (indicating a ship) */
-  if (alldig(what))
+  if (utIsDigits(what))
     {                           /* yes */
       snum = atoi(what);
       if ( snum < 1 || snum > MAXSHIPS )

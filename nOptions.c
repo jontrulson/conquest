@@ -319,7 +319,7 @@ static void _changeOption(struct Conf *cdata, int init)
         }
       else
         {
-          if (alldig(prm.buf))
+          if (utIsDigits(prm.buf))
             {
               int j = atoi(prm.buf);
               if (j >= cdata->min && j <= cdata->max)

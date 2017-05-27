@@ -1975,7 +1975,7 @@ int mcuGetTarget( char *pmt, int lin, int col, real *dir, real cdefault )
       *dir = cdefault;
       return ( TRUE );
     }
-  if ( alldig( buf ) == TRUE )
+  if (utIsDigits(buf))
     {
       i = 0;
       if ( ! utSafeCToI( &j, buf, i ) )

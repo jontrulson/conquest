@@ -279,7 +279,7 @@ int GetSysConf(int checkonly)
 			break;
 			
 		      case CTYPE_NUMERIC:
-			if (alldig(bufptr))
+			if (utIsDigits(bufptr))
 			  {
                             int *n = ((int *) SysConfData[j].ConfValue);
 
@@ -620,7 +620,7 @@ int GetConf(int usernum)
 #endif /* _CQKEYS_H */
 
 		      case CTYPE_NUMERIC:
-			if (alldig(bufptr))
+			if (utIsDigits(bufptr))
 			  {
                             int *n = ((int *) ConfData[j].ConfValue);
 

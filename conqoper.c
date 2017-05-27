@@ -811,7 +811,7 @@ int opPlanetMatch( char str[], int *pnum )
 {
   int i;
   
-  if ( alldig( str ) == TRUE )
+  if ( utIsDigits( str ) )
     {
       i = 0;
       if ( ! utSafeCToI( pnum, str, i ) )
@@ -889,7 +889,7 @@ void kiss(int snum, int prompt_flg)
     }
   
   /* Kill a ship? */
-  if ( alldig( buf ) == TRUE )
+  if ( utIsDigits( buf ) )
     {
       i = 0;
       utSafeCToI( &snum, buf, i );		/* ignore status */
@@ -1425,13 +1425,13 @@ void opinfo( int snum )
       return;
     }
   
-  if ( cbuf[0] == 's' && alldig( &cbuf[1] ) == TRUE )
+  if ( cbuf[0] == 's' && utIsDigits( &cbuf[1] ) )
     {
       i = 0;
       utSafeCToI( &j, &cbuf[1], i );		/* ignore status */
       mcuInfoShip( j, snum );
     }
-  else if ( alldig( cbuf ) == TRUE )
+  else if ( utIsDigits( cbuf ) )
     {
       i = 0;
       utSafeCToI( &j, cbuf, i );		/* ignore status */
@@ -3303,7 +3303,7 @@ int prompt_ship(char buf[], int *snum, int *normal)
     }
   else
     {
-      if ( alldig( buf ) != TRUE )
+      if ( !utIsDigits( buf ) )
 	{
 	  cdputs( nss, MSG_LIN2, 1 );
 	  cdmove( 1, 1 );

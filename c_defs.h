@@ -207,7 +207,6 @@ typedef double real;
 
 /* Function prototypes for ratfor.c */
 
-int alldig(char *buf);
 int c_index(char *buf, char ch);
 void lower(char *buf);
 void upper(char *buf);

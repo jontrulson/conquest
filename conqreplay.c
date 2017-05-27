@@ -587,7 +587,7 @@ static int prompt_ship(char buf[], int *snum, int *normal)
     }
   else
     {
-      if ( alldig( buf ) != TRUE )
+      if (!utIsDigits(buf))
 	{
 	  cdputs( nss, MSG_LIN2, 1 );
 	  cdmove( 1, 1 );
