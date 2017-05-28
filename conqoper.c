@@ -1853,7 +1853,7 @@ void oppedit(void)
 	  if ( ! utSafeCToI( &j, buf, i ) )
 	    continue;	/* next */
 
-	  x = ctor( buf);
+	  x = atof( buf);
 	  if ( x < 0.0 || x > 360.0 )
 	    continue;	/* next */
 	  Planets[pnum].orbang = x;
@@ -1899,7 +1899,7 @@ void oppedit(void)
 	  if ( ! utSafeCToI( &j, buf, i ) )
 	    continue;	/* next */
 
-	  Planets[pnum].orbvel = ctor( buf );
+	  Planets[pnum].orbvel = atof( buf );
 	  break;
 	case 'S':
 	  /* Size. */
@@ -1912,7 +1912,7 @@ void oppedit(void)
 	  if ( ! utSafeCToI( &j, buf, i ) )
 	    continue;	/* next */
 
-	  x = ctor( buf);
+	  x = atof( buf);
 	  if ( x < 1.0 )
 	    continue;	/* next */
 	  Planets[pnum].size = x;
@@ -1943,7 +1943,7 @@ void oppedit(void)
 	  if ( ! utSafeCToI( &j, buf, i ) )
 	    continue;	/* next */
 
-	  Planets[pnum].x = ctor( buf );
+	  Planets[pnum].x = atof( buf );
 	  break;
 	case 'y':
 	  /* Y coordinate. */
@@ -1956,7 +1956,7 @@ void oppedit(void)
 	  if ( ! utSafeCToI( &j, buf, i ) )
 	    continue;	/* next */
 
-	  Planets[pnum].y = ctor( buf );
+	  Planets[pnum].y = atof( buf );
 	  break;
 	case 's':
 	  /* Scanned. */
@@ -2002,7 +2002,7 @@ void oppedit(void)
 	  if ( ! utSafeCToI( &j, buf, i ) )
 	    continue;	/* next */
 
-	  Planets[pnum].orbrad = ctor( buf );
+	  Planets[pnum].orbrad = atof( buf );
 	  break;
 	case '+':
 	  /* Now you see it... */

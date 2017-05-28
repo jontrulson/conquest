@@ -30,13 +30,3 @@ void error(char str[])
   exit(1);
 }
 
-real ctor(char *buf)
-{
-  static real r;
-  float f;
-
-  sscanf(buf, "%f", &f);
-
-  r = (real) f;
-  return(r);
-}

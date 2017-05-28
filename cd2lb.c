@@ -52,6 +52,7 @@
 #include "cd2lb.h"
 #undef NOEXTERN_CD2LB
 
+#include "conqutil.h"
 #include "cumisc.h"
 #include "iolb.h"
 #include "ui.h"
