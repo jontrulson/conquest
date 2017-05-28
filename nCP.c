@@ -2288,7 +2288,6 @@ static void command( int ch )
             twar[i] = Ships[Context.snum].war[i];
 
         state = S_WAR;
-        prompting = TRUE;
         prm.preinit = FALSE;
         prm.buf = cbuf;
         prm.buflen = 5;

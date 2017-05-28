@@ -2948,8 +2948,18 @@ input(int key, int x, int y)
     if (kmod & GLUT_ACTIVE_ALT)
         jmod |= CQ_KEY_MOD_ALT;
 
+    // we pretty much require freeglut now, and the current version
+    // supports detection of the modifier (and a couple of other) key
+    // presses passed to this function.  We don't use these in
+    // conquest (at least currently) so detect and screen them out.
+
+    // GLUT_KEY_INSERT is highest numbered special key in the "std"
+    // repertoire, so if it's higher than that, we are dealing with
+    // this situation.
+    if (key > GLUT_KEY_INSERT)
+        return;
+
     procInput(((key & CQ_CHAR_MASK) << CQ_FKEY_SHIFT) | jmod, x, y);
-    return;
 }
 
 /* for 'normal' keys */
