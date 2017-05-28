@@ -253,7 +253,7 @@ int utArrowsToDir( char *str, real *dir )
             idx++;
         }
 
-        if (!idx)
+        if (*s == 0) // not found
             return ( FALSE );
 
         ndir1 = (real)(idx - 1) * 45.0;
