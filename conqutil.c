@@ -296,10 +296,10 @@ void utSetLogConfig(int usesys, int echostderr)
 void utError(char *fmt, ...)
 {
     va_list ap;
-    char buf[BIG_BUFFER_SIZE];
+    char buf[MESSAGE_SIZE] = {};
 
     va_start(ap, fmt);
-    (void)vsnprintf(buf, sizeof(buf) - 1, fmt, ap);
+    (void)vsnprintf(buf, MESSAGE_SIZE, fmt, ap);
 
     va_end(ap);
 
@@ -313,14 +313,14 @@ void utLog(char *fmt, ...)
 {
     va_list ap;
     static int nowarn = FALSE;     /* if set, ignore logging */
-    static char buf[BIG_BUFFER_SIZE];
-    static char errfile[MID_BUFFER_SIZE];
+    static char buf[BUFFER_SIZE] = {};
+    static char errfile[PATH_MAX] = {};
     static FILE *errfd = NULL;
     char *homevar;
     int tmp;
 
     va_start(ap, fmt);
-    (void)vsnprintf(buf, sizeof(buf) - 1, fmt, ap);
+    (void)vsnprintf(buf, BUFFER_SIZE, fmt, ap);
 
     va_end(ap);
 
@@ -330,7 +330,7 @@ void utLog(char *fmt, ...)
         if (systemlog)
 	{
             umask(007);
-            sprintf(errfile, "%s/%s", CONQSTATE, C_CONQ_ERRLOG);
+            snprintf(errfile, PATH_MAX, "%s/%s", CONQSTATE, C_CONQ_ERRLOG);
             if (ConquestGID == ERR)
 	    {
                 fprintf(stderr, "conqutil: utLog():  ConquestGID == -1!\n");
@@ -341,11 +341,11 @@ void utLog(char *fmt, ...)
 	{			/* local logfile */
             if ((homevar = getenv(CQ_USERHOMEDIR)) != NULL)
             {
-                snprintf(errfile, sizeof(errfile) - 1, "%s/%s/%s",
+                snprintf(errfile, PATH_MAX, "%s/%s/%s",
                          homevar, CQ_USERCONFDIR, C_CONQ_ERRLOG);
             }
             else
-                snprintf(errfile, sizeof(errfile) - 1, "%s", C_CONQ_ERRLOG);
+                snprintf(errfile, PATH_MAX, "%s", C_CONQ_ERRLOG);
 	}
 
         if ((errfd = fopen(errfile, "a+")) == NULL)
