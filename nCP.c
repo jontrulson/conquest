@@ -719,7 +719,6 @@ static int _gettarget(char *buf, real cdefault, real *dir, char ch)
         return ( FALSE );
 
     utDeleteBlanks( buf );
-    fold( buf );
     if ( buf[0] == 0 )
     {
         /* Default. */
@@ -805,7 +804,6 @@ static void _doinfo( char *buf, char ch )
 
     /* Default to what we did last time. */
     utDeleteBlanks( buf );
-    fold( buf );
     if ( buf[0] == 0 )
     {
         c_strcpy( Context.lastinfostr, buf );
@@ -1470,7 +1468,6 @@ static void _docourse( char *buf, char ch)
     }
 
     newlock = 0;				/* default to no lock */
-    fold( buf );
 
     what = NEAR_ERROR;
     if (utIsDigits(buf))

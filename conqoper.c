@@ -546,7 +546,6 @@ void debugdisplay( int snum )
             buf[i+1] = '-';
     buf[NUMPLAYERTEAMS+1] = ')';
     buf[NUMPLAYERTEAMS+2] = 0;
-    fold( buf );
     cprintf(lin,dcol,ALIGN_NONE,"#%d#%s",InfoColor, buf);
 
     lin++;
@@ -1422,7 +1421,6 @@ void opinfo( int snum )
     }
 
     utDeleteBlanks( cbuf );
-    fold( cbuf );
     if ( cbuf[0] == 0 )
     {
         cdclrl( MSG_LIN1, 1 );

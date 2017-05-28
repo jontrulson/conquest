@@ -1957,7 +1957,6 @@ void docourse( int snum )
     }
 
     newlock = 0;				/* default to no lock */
-    fold( cbuf );
 
     what = NEAR_ERROR;
     if (utIsDigits(cbuf))
@@ -2259,7 +2258,6 @@ void doinfo( int snum )
 
     /* Default to what we did last time. */
     utDeleteBlanks( cbuf );
-    fold( cbuf );
     if ( cbuf[0] == 0 )
     {
         c_strcpy( Context.lastinfostr, cbuf );

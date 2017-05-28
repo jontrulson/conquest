@@ -1969,7 +1969,6 @@ int mcuGetTarget( char *pmt, int lin, int col, real *dir, real cdefault )
         return ( FALSE );
 
     utDeleteBlanks( buf );
-    fold( buf );
     if ( buf[0] == 0 )
     {
         /* Default. */

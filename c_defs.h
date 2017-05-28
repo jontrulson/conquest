@@ -183,7 +183,6 @@ typedef double real;
 
 
 #define mod(x, y) ((x) % (y))
-#define equal(x, y)  ((strcmp(x, y) == 0) ? TRUE : FALSE)
 #define c_strcpy(x, y) strcpy(y, x)
 #define appstr(x, y) strcat(y, x)
 #define appchr(x, y)     {                      \
@@ -198,6 +197,5 @@ typedef double real;
 #ifndef max
 #define max(x, y) (((x) > (y)) ? (x) : (y))
 #endif
-#define fold(x) /* Who knows what this does... */
 
 #endif /* _C_DEFS_H */
