@@ -36,5 +36,6 @@ int      utStringMatch( char *str1, char *str2, int casesensitive );
 char     *utGetPath(const char *thepath);
 void     utSleep(real seconds);
 bool     utIsDigits(const char *buf);
+void     utToUpperCase(char *buf);
 
 #endif /* _CONQUTIL_H */

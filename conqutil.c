@@ -1024,3 +1024,15 @@ bool utIsDigits(const char *buf)
   return true;
 }
 
+void error(char *str);
+
+/* void upper(char *buf) - upcase a string */
+void utToUpperCase(char *buf)
+{
+  char *s = buf;
+  while(*s)
+    {
+      *s = (char)toupper(*s);
+      s++;
+    }
+}

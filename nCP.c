@@ -1203,7 +1203,7 @@ static void _domsgto(char *buf, int ch, int terse)
 
   /* Got a target, parse it. */
   utDeleteBlanks( tbuf );
-  upper( tbuf );
+  utToUpperCase( tbuf );
   if (utIsDigits(tbuf))
     {
       /* All digits means a ship number. */

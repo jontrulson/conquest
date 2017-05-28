@@ -205,11 +205,6 @@ typedef double real;
 #define ifix(x) ((int) (x))
 #define rfix(x) ((real) (x))
 
-/* Function prototypes for ratfor.c */
-
-void upper(char *buf);
-
-
 /* Function prototypes for everything else */
 
 /* conqai.c */

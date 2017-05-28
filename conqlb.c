@@ -2093,7 +2093,7 @@ void clbIntrude( int snum, int pnum )
       if ( snum == MSG_DOOM )
 	{
 	  c_strcpy( Doomsday->name, buf );
-	  upper( Doomsday->name );
+	  utToUpperCase( Doomsday->name );
 	  appstr( atta, buf );
 	  appstr( armeq, buf );
 	  utAppendInt( Planets[pnum].armies, buf );

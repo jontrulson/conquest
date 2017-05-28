@@ -399,7 +399,7 @@ int checkOperExec(int from, int to, char *msg)
 
   /* uppercase only version */
   strncpy(umsg, cmd, MESSAGE_SIZE);
-  upper(umsg);
+  utToUpperCase(umsg);
 
   /* check the simple commands first - look at the upcase version */
 

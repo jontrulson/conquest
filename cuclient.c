@@ -206,7 +206,7 @@ void cucSendMsg( int from, int terse, int remote )
   
   /* Got a target, parse it. */
   utDeleteBlanks( buf );
-  upper( buf );
+  utToUpperCase( buf );
   if (utIsDigits(buf))
     {
       /* All digits means a ship number. */
