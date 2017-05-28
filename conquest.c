@@ -555,10 +555,11 @@ int selectentry( uint8_t esystem )
 	appstr( ", ", cbuf );
 	appstr( Teams[i].name, cbuf );
       }
+
   /* Change first comma to a colon. */
-  i = c_index( cbuf, ',' );
-  if ( i != ERR )
-    cbuf[i] = ':';
+  char *sptr = strchr(cbuf, ',');
+  if (sptr)
+    *sptr = ':';
 
   cdclrl( MSG_LIN1, 2 );
   cdputc( cbuf, MSG_LIN1 );

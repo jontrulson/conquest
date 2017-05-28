@@ -68,11 +68,12 @@ static void selectentry( uint8_t esystem )
 	appstr( ", ", cbuf );
 	appstr( Teams[i].name, cbuf );
       }
+
   /* Change first comma to a colon. */
-  i = c_index( cbuf, ',' );
-  if ( i != -1 )
-    cbuf[i] = ':';
-  
+  char *sptr = strchr(cbuf, ',');
+  if (sptr)
+    *sptr = ':';
+
   cprintf(12, 0, ALIGN_CENTER, cbuf);
 
   return;

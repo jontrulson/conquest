@@ -7,26 +7,6 @@
 #include "c_defs.h"		/* includes everthing else */
 #include "conqutil.h"
 
-/* c_index(char *, char) - get the index of ch in *buf */
-int c_index(char *buf, char ch)
-{
-  char *s;
-  int count;
-
-  s = buf;
-  count = 0;
-
-  while (*s)
-    {
-      if (*s == ch)
-	return(count);
-      s++;
-      count++;
-    }
-
-  return(-1);			/* No match */
-}
-
 /* void upper(char *buf) - upcase a string */
 void upper(char *buf)
 {

@@ -379,7 +379,7 @@ int cdgetp ( char pmt[], int lin, int col, char terms[], char str[],
 
       if ( terms[0] != 0 )
 	{
-	  if ( c_index ( terms, ch ) != -1 )
+          if (strchr(terms, ch))
 	    break;
 	  else if ( ch == TERM_NORMAL )
 	    break;

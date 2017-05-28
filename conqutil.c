@@ -462,9 +462,10 @@ void utAppendTitle( int team, char *buf )
 /*  utArrowsToDir - interpret arrow keys */
 int utArrowsToDir( char *str, real *dir )
 {
-  int i, n, idx;
+  int i, n;
   real thedir, ndir, ndir1, ndir2;
-  char *arrs="*dewqazxc";	/* the '*' is to fill arrs[0] - JET */
+  // the '*' is a placeholder for not found/invalid (0)
+  const char *arrs="*dewqazxc";
 
   /* Special hack preventing "ea" and "da" from being recognized as arrows. */
   /* "ea" is reserved for Earth and "da" for Dakel. */
@@ -477,12 +478,22 @@ int utArrowsToDir( char *str, real *dir )
 
   for ( i = 0; str[i] != 0; i = i + 1 )
     {
-      n = i + 1;
-      idx = c_index( arrs, (char)tolower(str[i]) );
-      if ( idx == -1 || idx == 0)
+      int idx = 0;
+
+      // look for the 'arrow' in the string and return it's index
+      const char *s = arrs;
+      while (*s)
+        {
+          if (*s == tolower(str[i]))
+            break;
+          s++;
+          idx++;
+        }
+
+      if (!idx)
 	return ( FALSE );
 
-      ndir1 = ((real)idx - 1.0) * 45.0;
+      ndir1 = (real)(idx - 1) * 45.0;
       ndir2 = (real)ndir1 - 360.0;
 
       if ( (real)fabs( thedir - ndir1 ) < (real)fabs( thedir - ndir2 ) )
@@ -490,8 +501,8 @@ int utArrowsToDir( char *str, real *dir )
       else
 	ndir = ndir2;
 
+      n = i + 1;
       thedir = (((thedir*((real)n - 1)) + ndir ) / (real)n);
-
     }
 
 
@@ -1271,7 +1282,7 @@ void utSleep(real seconds)
 
 bool utIsDigits(const char *buf)
 {
-  char *s = buf;
+  const char *s = buf;
 
   while (*s)
     {
