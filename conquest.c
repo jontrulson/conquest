@@ -256,7 +256,7 @@ int main(int argc, char *argv[])
   Context.entship = FALSE;
   Context.recmode = RECMODE_OFF;
   Context.updsec = 5;		/* dflt - 5/sec */
-  Context.msgrand = getnow(NULL, 0);
+  Context.msgrand = time(0);
 
   cInfo.sock = -1;
   cInfo.usock = -1;
@@ -2307,15 +2307,6 @@ void doinfo( int snum )
     }
   else if ( clbPlanetMatch( cbuf, &j, FALSE ) )
     mcuInfoPlanet( "", j, snum );
-  else if ( utStringMatch( cbuf, "time", FALSE ) )
-    {
-      getnow( now, 0 );
-      c_strcpy( "It's ", cbuf );
-      utAppendTime( now, cbuf );
-      appchr( '.', cbuf );
-      mcuPutMsg( cbuf, MSG_LIN1 );
-      cdmove( MSG_LIN1, 1 );
-    }
   else
     {
       mcuPutMsg( "I don't understand.", MSG_LIN2 );
@@ -3210,7 +3201,7 @@ int play()
   /* start recording if neccessary */
   if (Context.recmode == RECMODE_STARTING)
     {
-      if (recInitOutput(Context.unum, getnow(NULL, 0), Context.snum,
+      if (recInitOutput(Context.unum, time(0), Context.snum,
                            FALSE))
         {
           Context.recmode = RECMODE_ON;

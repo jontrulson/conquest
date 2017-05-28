@@ -1956,7 +1956,7 @@ void clbInitShip( int snum, int unum )
   /* Update user some stats. */
 
   /* time stamp for this entry */
-  Users[unum].lastentry = getnow(NULL, 0);
+  Users[unum].lastentry = time(0);
 
   Users[unum].stats[USTAT_ENTRIES] += 1;
   Teams[Ships[snum].team].stats[TSTAT_ENTRIES] += 1;
@@ -2127,7 +2127,7 @@ int clbLogHist( int unum )
   PVLOCK(&ConqInfo->lockword);
   ConqInfo->histptr = utModPlusOne( ConqInfo->histptr + 1, MAXHISTLOG );
 				/* time stamp for this entry */
-  History[ConqInfo->histptr].histlog = getnow(NULL, 0 );	
+  History[ConqInfo->histptr].histlog = time(0);
   History[ConqInfo->histptr].elapsed = (time_t)0;
   History[ConqInfo->histptr].histunum = unum;
   strncpy(History[ConqInfo->histptr].username, 

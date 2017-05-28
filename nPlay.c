@@ -246,7 +246,7 @@ static int nPlayIdle(void)
       /* start recording if neccessary */
       if (Context.recmode == RECMODE_STARTING)
         {
-          if (recInitOutput(Context.unum, getnow(NULL, 0), Context.snum,
+          if (recInitOutput(Context.unum, time(0), Context.snum,
                                FALSE))
             {
               Context.recmode = RECMODE_ON;

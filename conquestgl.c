@@ -300,7 +300,7 @@ int main(int argc, char *argv[])
   Context.entship = FALSE;
   Context.recmode = RECMODE_OFF;
   Context.updsec = 10;		/* dflt - 10/sec */
-  Context.msgrand = getnow(NULL, 0);
+  Context.msgrand = time(0);
 
   strncpy(cInfo.metaServer, META_DFLT_SERVER, MAXHOSTNAME - 1);
   cInfo.sock = -1;

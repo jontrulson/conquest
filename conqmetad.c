@@ -80,7 +80,7 @@ void printUsage()
 void ageServers(void)
 {
   int i;
-  time_t now = getnow(NULL, 0);
+  time_t now = time(0);
 
   for (i=0; i<maxSlot; i++)
     {
@@ -211,7 +211,7 @@ void metaProcUpd(char *buf, int rlen, char *hostbuf)
 
   /* init the slot */
   sRec.valid = TRUE;
-  sRec.lasttime = getnow(NULL, 0);
+  sRec.lasttime = time(0);
   if (sRec.port == 0)
     sRec.port = CN_DFLT_PORT;
   metaServerList[slot] = sRec;

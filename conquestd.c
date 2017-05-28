@@ -885,7 +885,7 @@ int updateClient(int force)
   int i,j;
   static int sentallusers = FALSE; /* we will send all user data once. */
   static time_t oldtime = 0;
-  time_t newtime = getnow(NULL, 0);
+  time_t newtime = time(0);
   int seciter = FALSE;
   static time_t histtime = 0;   /* timers that try to save some time() */
   static time_t infotime = 0;
@@ -1535,7 +1535,7 @@ int newship( int unum, int *snum )
       Ships[*snum].alastmsg = Ships[*snum].lastmsg;
       PVUNLOCK(&ConqInfo->lockmesg);
       /* init user's last entry time */
-      Users[Ships[*snum].unum].lastentry = getnow(NULL, 0);
+      Users[Ships[*snum].unum].lastentry = time(0);
     }
       
   SFCLR(*snum, SHIP_F_ROBOT);
@@ -1770,7 +1770,7 @@ int welcome( int *unum )
 				/* copy in the password */
       strcpy(Users[*unum].pw, password);
 				/* set lastentry time for new players */
-      Users[*unum].lastentry = getnow(NULL, 0);
+      Users[*unum].lastentry = time(0);
 
     }
 

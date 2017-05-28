@@ -698,7 +698,7 @@ void mcuInfoShip( int snum, int scanner )
 	{
 	  if (Ships[scanner].warp > 0.0 || Ships[snum].warp > 0.0)
 	    {
-	      curtime = getnow(NULL, 0);
+	      curtime = time(0);
 
 	      if (snum == oldsnum)
 		{		/* then we can get better eta 

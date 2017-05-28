@@ -205,120 +205,6 @@ void utAppendNumWord( int num, char *buf )
 
 }
 
-
-/*  utAppendTime - append English formated time and date */
-/*  SYNOPSIS */
-/*   utAppendTime( now, buf ) */
-void utAppendTime( int now[], char *buf )
-{
-  int hour;
-  int am;
-
-  am = TRUE;				/* assume morning */
-  hour = now[4];
-  if ( hour == 0 )
-    hour = 12;			/* midnight */
-  else if ( hour == 12 )
-    am = FALSE;			/* afternoon */
-  else if ( hour > 12 )
-    {
-      hour = hour - 12;
-      am = FALSE;			/* afternoon */
-    }
-  switch ( wkday() )
-    {
-    case 1:
-      appstr( "Sunday", buf );
-      break;
-    case 2:
-      appstr( "Monday", buf );
-      break;
-    case 3:
-      appstr( "Tuesday", buf );
-      break;
-    case 4:
-      appstr( "Wednesday", buf );
-      break;
-    case 5:
-      appstr( "Thursday", buf );
-      break;
-    case 6:
-      appstr( "Friday", buf );
-      break;
-    case 7:
-      appstr( "Saturday", buf );
-      break;
-    default:
-      appstr( "???", buf );
-      break;
-    }
-  appstr( ", ", buf );
-  switch ( now[2] )
-    {
-    case 1:
-      appstr( "January", buf );
-      break;
-    case 2:
-      appstr( "February", buf );
-      break;
-    case 3:
-      appstr( "March", buf );
-      break;
-    case 4:
-      appstr( "April", buf );
-      break;
-    case 5:
-      appstr( "May", buf );
-      break;
-    case 6:
-      appstr( "June", buf );
-      break;
-    case 7:
-      appstr( "July", buf );
-      break;
-    case 8:
-      appstr( "August", buf );
-      break;
-    case 9:
-      appstr( "September", buf );
-      break;
-    case 10:
-      appstr( "October", buf );
-      break;
-    case 11:
-      appstr( "November", buf );
-      break;
-    case 12:
-      appstr( "December", buf );
-      break;
-    default:
-      appstr( "???", buf );
-      break;
-    }
-  appchr( ' ', buf );
-  utAppendInt( now[3], buf );		/* day of month */
-  appstr( ", at ", buf );
-  utAppendNumWord( hour, buf );		/* hour */
-  appchr( ' ', buf );
-  if ( now[5] == 0 )			/* minute */
-    appstr( "o'clock", buf );
-  else
-    {
-      if ( now[5] < 10 )
-	appstr( "o ", buf );
-      utAppendNumWord( now[5], buf );
-    }
-  appchr( ' ', buf );
-  if ( am )
-    appstr( "ante", buf );
-  else
-    appstr( "post", buf );
-  appstr( " meridiem", buf );
-
-  return;
-
-}
-
 /*  utAppendKilledBy - append killed by string */
 /*  SYNOPSIS */
 /*    int kb */
@@ -875,54 +761,19 @@ int utGetMsg( int snum, int *msg )
 /*    utFormatTime( buf ) */
 void utFormatTime( char *buf, time_t thetime )
 {
-  int now[NOWSIZE];
-  char junk[5];
+  char junk[5] = {};
 
-  getnow( now, thetime );
-  switch ( now[2] )
-    {
-    case 1:
-      c_strcpy( "Jan", junk );
-      break;
-    case 2:
-      c_strcpy( "Feb", junk );
-      break;
-    case 3:
-      c_strcpy( "Mar", junk );
-      break;
-    case 4:
-      c_strcpy( "Apr", junk );
-      break;
-    case 5:
-      c_strcpy( "May", junk );
-      break;
-    case 6:
-      c_strcpy( "Jun", junk );
-      break;
-    case 7:
-      c_strcpy( "Jul", junk );
-      break;
-    case 8:
-      c_strcpy( "Aug", junk );
-      break;
-    case 9:
-      c_strcpy( "Sep", junk );
-      break;
-    case 10:
-      c_strcpy( "Oct", junk );
-      break;
-    case 11:
-      c_strcpy( "Nov", junk );
-      break;
-    case 12:
-      c_strcpy( "Dec", junk );
-      break;
-    default:
-      c_strcpy( "???", junk );
-      break;
-    }
-  sprintf( buf, "%2d:%02d:%02d %02d%s%02d",
-	 now[4], now[5], now[6], now[3], junk, mod( now[1], 100 ) );
+  if (!thetime)
+      thetime = time(0);
+
+  struct tm *thetm = localtime(&thetime);
+
+  strftime(junk, 5, "%b", thetm);
+
+  sprintf(buf, "%2d:%02d:%02d %02d%s%02d",
+          thetm->tm_hour, thetm->tm_min, thetm->tm_min, thetm->tm_mday,
+          junk,
+          mod(thetm->tm_year + 1900, 100));
 
   return;
 
@@ -935,10 +786,12 @@ void utFormatTime( char *buf, time_t thetime )
 /*    utGrand( h ) */
 void utGrand( int *h )
 {
-  int now[NOWSIZE];
+  time_t thetime = time(0);
+  struct tm *thetm = localtime(&thetime);
 
-  getnow( now, 0 );
-  *h = ( ( ( now[4] * 60 ) + now[5] ) * 60 + now[6] ) * 1000 + now[7];
+  *h = ( ( ( thetm->tm_hour * 60 )
+           + thetm->tm_min ) * 60
+         + thetm->tm_sec ) * 1000;
 
   return;
 
@@ -951,10 +804,10 @@ void utGrand( int *h )
 /*    utGetSecs( s ) */
 void utGetSecs( int *s )
 {
-  int now[NOWSIZE];
+  time_t thetime = time(0);
+  struct tm *thetm = localtime(&thetime);
 
-  getnow( now, 0 );
-  *s = ( ( now[4] * 60 ) + now[5] ) * 60 + now[6];
+  *s = ( ( thetm->tm_hour * 60 ) + thetm->tm_min ) * 60 + thetm->tm_sec;
 
   return;
 
@@ -1293,3 +1146,4 @@ bool utIsDigits(const char *buf)
 
   return true;
 }
+

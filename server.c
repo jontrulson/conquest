@@ -263,7 +263,7 @@ int sendServerStat(int socktype)
 
   sStat.flags = (uint32_t)htonl(sStat.flags);
 
-  sStat.servertime = (uint32_t)htonl(getnow(NULL, 0));
+  sStat.servertime = (uint32_t)htonl(time(0));
   
   if (pktWrite(socktype, &sStat) <= 0)
     {

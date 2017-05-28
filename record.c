@@ -309,7 +309,7 @@ void recUpdateFrame(void)
 
   frame.type = SP_FRAME;
   frame.frame = (uint32_t)htonl(recordFrameCount);
-  frame.time = (uint32_t)htonl((uint32_t)getnow(NULL, 0));
+  frame.time = (uint32_t)htonl((uint32_t)time(0));
 
   recWriteEvent(&frame);
 

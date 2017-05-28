@@ -38,7 +38,7 @@ void startRecord(int f)
   /* make a filename.  This will be something like
      CONQSTATE/conquest-rec-MMDDYYYY-HHMM.cpr */
 
-  thetime = getnow(NULL, 0);
+  thetime = time(0);
   tmtime = localtime(&thetime);
 
   strftime(tbuf, 128 - 1, "%m%d%Y-%H%M", tmtime);
@@ -64,7 +64,7 @@ void startRecord(int f)
   /* start recording */
   if (Context.recmode == RECMODE_STARTING)
     {
-      if (recInitOutput(Context.unum, getnow(NULL, 0), Context.snum,
+      if (recInitOutput(Context.unum, time(0), Context.snum,
                            TRUE))
         {
           Context.recmode = RECMODE_ON;

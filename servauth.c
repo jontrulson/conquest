@@ -196,7 +196,7 @@ void expire_users(void)
 
 
 
-      difftime = getnow(NULL, 0) - Users[i].lastentry;
+      difftime = time(0) - Users[i].lastentry;
 
       if (difftime < 0)
 	{			/* screen out negative expirations -
@@ -208,8 +208,8 @@ void expire_users(void)
 	}
 
 #if defined(DEBUG_SERVERAUTH)
-          utLog("expire_users(): getnow(NULL, 0) = %d, Users[%d].lastentry = %d",
-	       getnow(NULL, 0),
+          utLog("expire_users(): time(0) = %d, Users[%d].lastentry = %d",
+	       time(0),
 	       i, Users[i].lastentry);
 #endif
 

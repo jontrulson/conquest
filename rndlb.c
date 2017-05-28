@@ -62,8 +62,9 @@ void rndini ( int seed1, int seed2 )
 {
   
   int idx;
-  int now[NOWSIZE];
-  
+  time_t thetime = time(0);
+  struct tm *thetm = localtime(&thetime);
+
   /* Here are the multipliers, increments, and moduli for the two sequences. */
   /* Do not change these frivously!  They have been very carefully selected, */
   /* using the "spectral test" and various other empirical tests of */
@@ -72,18 +73,18 @@ void rndini ( int seed1, int seed2 )
   mult1 = 1541;	inc1 = 3501;	modu1 = 16384;
   mult2 = 5146;	inc2 = 4100;	modu2 = 19683;
   
-  getnow ( now, 0 );
-
   if ( seed1 != 0 )
     value1 = seed1;
   else
-    value1 = ( ( now[3] * 10 + now[4] ) * 10 + now[5] ) * 10 + now[6];
+    value1 = ( ( thetm->tm_mday * 10 + thetm->tm_hour ) * 10
+               + thetm->tm_min ) * 10 + thetm->tm_sec;
   value1 = mod ( value1, modu1 );
   
   if ( seed2 != 0 )
     value2 = seed2;
   else
-    value2 = ( ( now[6] * 10 + now[5] ) * 10 + now[4] ) * 10 + now[3];
+    value2 = ( ( thetm->tm_sec * 10 + thetm->tm_min ) * 10
+               + thetm->tm_hour ) * 10 + thetm->tm_mday;
   value2 = mod ( value2, modu2 );
   
   for ( idx=0; idx < TABLESIZE; idx=idx+1 )

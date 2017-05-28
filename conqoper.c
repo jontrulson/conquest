@@ -1439,15 +1439,6 @@ void opinfo( int snum )
     }
   else if ( opPlanetMatch( cbuf, &j ) )
     mcuInfoPlanet( "", j, snum );
-  else if ( utStringMatch( cbuf, "time", FALSE ) )
-    {
-      getnow( now, 0 );
-      c_strcpy( "It's ", cbuf );
-      utAppendTime( now, cbuf );
-      appchr( '.', cbuf );
-      mcuPutMsg( cbuf, MSG_LIN1 );
-      cdmove( MSG_LIN1, 1 );
-    }
   else
     {
       cdmove( MSG_LIN2, 1 );

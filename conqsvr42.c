@@ -153,7 +153,7 @@ void conqstats( int snum )
 
       if (Context.histslot != -1 && History[Context.histslot].histunum == unum)
 	{
-	  difftime = getnow(NULL, 0) - History[Context.histslot].histlog;
+	  difftime = time(0) - History[Context.histslot].histlog;
 	  if (difftime < (time_t)0)
 	    difftime = (time_t)0;
 	  History[Context.histslot].elapsed = difftime;

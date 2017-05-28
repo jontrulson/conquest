@@ -357,7 +357,7 @@ static void _infoship( int snum, int scanner )
 	{
 	  if (Ships[scanner].warp > 0.0 || Ships[snum].warp > 0.0)
 	    {
-	      curtime = getnow(NULL, 0);
+	      curtime = time(0);
 
 	      if (snum == oldsnum)
 		{		/* then we can get better eta 
@@ -850,14 +850,6 @@ static void _doinfo( char *buf, char ch )
     }
   else if ( clbPlanetMatch( buf, &j, FALSE ) )
     _infoplanet( "", j, snum );
-  else if ( utStringMatch( buf, "time", FALSE ) )
-    {
-      getnow( now, 0 );
-      c_strcpy( "It's ", buf );
-      utAppendTime( now, buf );
-      appchr( '.', buf );
-      cp_putmsg( buf, MSG_LIN1 );
-    }
   else
     {
       cp_putmsg( "I don't understand.", MSG_LIN2 );
