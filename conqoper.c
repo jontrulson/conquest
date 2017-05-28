@@ -23,6 +23,7 @@
 #include "conqcom.h"
 #include "conqlb.h"
 #include "conqutil.h"
+#include "conqai.h"
 
 #define NOEXTERN_CONTEXT
 #include "context.h"

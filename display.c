@@ -6,6 +6,7 @@
 
 
 #include "conqdef.h"
+#include "conqai.h"
 #include "conqcom.h"
 #include "context.h"
 #include "conf.h"

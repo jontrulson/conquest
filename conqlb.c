@@ -20,6 +20,7 @@
 #include "conqutil.h"
 #define NOEXTERN_CONQDATA
 #include "conqdata.h"
+#include "conqai.h"
 
 #include "conf.h"
 #include "global.h"

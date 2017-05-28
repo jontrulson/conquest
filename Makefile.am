@@ -69,7 +69,7 @@ endif !GLCLIENT
 
 endif !ISMINGW
 
-libconquest_la_SOURCES = conqai.c  \
+libconquest_la_SOURCES = conqai.c conqai.h \
 	conqlb.h conqlb.c rndlb.c conqutil.c conqutil.h conqcm.c \
 	conqsvr42.c ibuf.c version.c conf.c sem.c color.c \
 	userauth.c record.c color.h user.h shiptype.h \

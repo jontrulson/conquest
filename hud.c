@@ -11,6 +11,7 @@
 #include "conqcom.h"
 #include "conqlb.h"
 #include "conqutil.h"
+#include "conqai.h"
 
 extern void setWarp(real warp); /* FIXME, GL.c */
 

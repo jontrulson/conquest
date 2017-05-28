@@ -17,6 +17,7 @@
 #include "servercmd.h"
 #include "conqlb.h"
 #include "conqutil.h"
+#include "conqai.h"
 
 void startRecord(int f)
 {

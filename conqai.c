@@ -21,6 +21,7 @@
 #include "global.h"
 #include "conf.h"
 #include "user.h"
+#include "conqai.h"
 
 static int nenum;
 static int debug;

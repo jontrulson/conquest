@@ -205,14 +205,6 @@ typedef double real;
 
 /* Function prototypes for everything else */
 
-/* conqai.c */
-void defend( int attacker, int pnum );
-int newrob( int *snum, int unum );
-void robotloop(void);
-void robreply( char buf[] );
-void robstr( int token, char buf[] );
-void robotai( int snum );
-
 /* conqsvr42.c */
 
 int getUID(char *name);
