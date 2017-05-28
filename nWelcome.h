@@ -1,4 +1,4 @@
-/* 
+/*
  * The Welcome node.  Hi!
  *
  * Copyright Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).

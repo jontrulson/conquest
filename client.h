@@ -1,4 +1,4 @@
-/* 
+/*
  * Per client (conquest) info
  *
  * Copyright Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
@@ -16,7 +16,7 @@
 #include "cproc.h"
 
 /* client state */
-#define CLT_STATE_NONE      0x00000000	
+#define CLT_STATE_NONE      0x00000000
 #define CLT_STATE_PREINIT   0x00000001	/* local init */
 #define CLT_STATE_INIT      0x00000002	/* negotiate with client/login */
 #define CLT_STATE_MAINMENU  0x00000004	/* in main menu */
@@ -26,17 +26,17 @@
 #define CLT_STATE_TERMINATE 0x00000020	/* terminating */
 
 typedef struct {
-  int  sock;			/* socket to client */
-  int usock;			/* UDP socket to client */
-  int doUDP;                    /* whether we should look for udp packets */
-  int tryUDP;                   /* should we try UDP? */
-  struct sockaddr_in  servaddr;
-  uint32_t  state;		/* current state */
-  uint32_t  serverDead;		/* is the client dead/ */
-  uint32_t  isLoggedIn;		/* is the client logged in? */
-  char    *remotehost;          /* self evident */
-  uint16_t  remoteport;
-  char     metaServer[MAXHOSTNAME]; /* the metaserver we are using */
+    int  sock;			/* socket to client */
+    int usock;			/* UDP socket to client */
+    int doUDP;                    /* whether we should look for udp packets */
+    int tryUDP;                   /* should we try UDP? */
+    struct sockaddr_in  servaddr;
+    uint32_t  state;		/* current state */
+    uint32_t  serverDead;		/* is the client dead/ */
+    uint32_t  isLoggedIn;		/* is the client logged in? */
+    char    *remotehost;          /* self evident */
+    uint16_t  remoteport;
+    char     metaServer[MAXHOSTNAME]; /* the metaserver we are using */
 } ClientInfo_t;
 
 #ifdef NOEXTERN_CLIENT
@@ -59,7 +59,7 @@ extern ClientInfo_t   cInfo;
 extern spHello_t      sHello;   /* some server info we want to keep */
 extern spServerStat_t sStat;    /* server status info */
 extern int            lastServerError;
-extern uint8_t         clientFlags;    
+extern uint8_t         clientFlags;
 
 extern spAckMsg_t     sAckMsg;  /* hold Ack or AckMsg pkt */
 extern spClientStat_t sClientStat;

@@ -1,6 +1,6 @@
-/* 
+/*
  * cqsound.h
- * 
+ *
  * Copyright Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
  *
  * Sound for Conquest, courtesy of Cataboligne for the concept.
@@ -8,67 +8,67 @@
  */
 
 #ifndef _CQSOUND_H
-#define _CQSOUND_H 
+#define _CQSOUND_H
 
 
 #include "conqinit.h"
 
 typedef struct _cqs_channel {
-  int channel;                  /* mixer channel */
-  int active;
-  int idx;                      /* index into Effects/Music array */
+    int channel;                  /* mixer channel */
+    int active;
+    int idx;                      /* index into Effects/Music array */
 } cqsChannelRec_t, *cqsChannelPtr_t;
 
 typedef struct _cqs_sound {
-  uint32_t  cqiIndex;            /* index to cqi sound entry */
-  void    *chunk;               /* ptr to mix/music chunk */
-  int      vol;                 /* SDL volume */
-  int      pan;                 /* SDL pan */
-  uint32_t  lasttime;            /* last time this sample was played */
-  int      fadeinms;            /* copies of cqi data */
-  int      fadeoutms;
-  int      loops;
-  int      limit;
-  uint32_t  framelimit;
-  uint32_t  lastframe;
-  uint32_t  framecount;
-  uint32_t  delayms;
+    uint32_t  cqiIndex;            /* index to cqi sound entry */
+    void    *chunk;               /* ptr to mix/music chunk */
+    int      vol;                 /* SDL volume */
+    int      pan;                 /* SDL pan */
+    uint32_t  lasttime;            /* last time this sample was played */
+    int      fadeinms;            /* copies of cqi data */
+    int      fadeoutms;
+    int      loops;
+    int      limit;
+    uint32_t  framelimit;
+    uint32_t  lastframe;
+    uint32_t  framecount;
+    uint32_t  delayms;
 } cqsSoundRec_t, *cqsSoundPtr_t;
 
 typedef uint32_t cqsHandle;      /* sound handle used for some
-                                   functions */
+                                    functions */
 
 /* an 'invalid' handle */
 #define CQS_INVHANDLE 0xffffffff
 
 /* a struct for holding all of a team's sound indexes */
 typedef struct _team_fx {
-  int phaser;
-  int torp;
-  int torp3;
-  int alert;
-  int beamd;
-  int beamu;
-  int hit;
-  int info;
-  int mag;
-  int warpu;
-  int warpd;
+    int phaser;
+    int torp;
+    int torp3;
+    int alert;
+    int beamd;
+    int beamu;
+    int hit;
+    int info;
+    int mag;
+    int warpu;
+    int warpd;
 } teamFX_t;
 
 /* a struct for the team's musical preferences. */
 typedef struct _team_mus {
-  int intro;
-  int battle;
-  int approach;
-  int theme;
+    int intro;
+    int battle;
+    int approach;
+    int theme;
 } teamMus_t;
 
 /* and another for the doomsday music */
 typedef struct _doom_mus {
-  int doom;
-  int doomin;
-  int doomkill;
+    int doom;
+    int doomin;
+    int doomkill;
 } doomMus_t;
 
 
@@ -108,14 +108,14 @@ extern doomMus_t     cqsDoomsdayMusic;
 #define CQS_NO_SOUND            /* we will not compile with sound support */
 
 /* fake them out */
-#define cqsInitSound()                      
+#define cqsInitSound()
 #define cqsFindEffect(x)                    (-1)
 #define cqsFindMusic(x)                     (-1)
 #define cqsMusicPlay(x, y)                  do {;} while (0)
 #define cqsMusicStop(x)                     do {;} while (0)
 #define cqsEffectPlay(x, y, z, a, b)        do {;} while (0)
 #define cqsEffectStop(x, y)                 do {;} while (0)
-#define cqsUpdateVolume()                   
+#define cqsUpdateVolume()
 #define cqsMusicPlaying()                   (0)
 
 #else  /* !(HAVE_SDL && HAVE_SDL_MIXER) */
@@ -125,12 +125,12 @@ int  cqsFindEffect(char *name);
 int  cqsFindMusic(char *name);
 int  cqsMusicPlay(int musidx, int halt);
 int  cqsMusicStop(int halt);
-int  cqsEffectPlay(int fxidx, cqsHandle *handle, real maxdist, 
+int  cqsEffectPlay(int fxidx, cqsHandle *handle, real maxdist,
                    real dist, real ang);
 int  cqsEffectStop(cqsHandle handle, int halt);
 void cqsUpdateVolume(void);
 int  cqsMusicPlaying(void);
- 
+
 #endif /* !(HAVE_SDL && HAVE_SDL_MIXER) */
 
 #endif /* _CQSOUND_H */

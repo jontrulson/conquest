@@ -16,11 +16,11 @@
 
 
 typedef struct _scr_node {
-  int   (*display)(dspConfig_t *); /* display routine */
-  int   (*idle)(void);          /* idle routine */
-  int   (*input)(int ch);       /* keyboard input routine */
-  int   (*minput)(mouseData_t *mdata); /* mouse input routine */
-  void *animQue;                /* optional animation que. */
+    int   (*display)(dspConfig_t *); /* display routine */
+    int   (*idle)(void);          /* idle routine */
+    int   (*input)(int ch);       /* keyboard input routine */
+    int   (*minput)(mouseData_t *mdata); /* mouse input routine */
+    void *animQue;                /* optional animation que. */
 } scrNode_t;
 
 /* some nodes are called from other, multiple nodes, so we need

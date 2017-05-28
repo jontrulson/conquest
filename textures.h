@@ -1,30 +1,30 @@
-/* 
+/*
  * Copyright Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
  */
 
 #ifndef _TEXTURES_H
-#define _TEXTURES_H 
+#define _TEXTURES_H
 
 
 #include "conqinit.h"
 #include "color.h"
 
 typedef union _GLcolor {
-  GLfloat vec[4];
-  struct {
-    GLfloat r, g, b, a;
-  };
+    GLfloat vec[4];
+    struct {
+        GLfloat r, g, b, a;
+    };
 } GLColor_t;
 
 typedef struct _GLtexture {
-  int cqiIndex;                 /* index into cqiTextures[] */
-  GLint id;                     /* GL texture id */
-  GLColor_t col;                /* default texture color */
-  uint32_t w, h;                 /* width/height of texture */
-} GLTexture_t;  
+    int cqiIndex;                 /* index into cqiTextures[] */
+    GLint id;                     /* GL texture id */
+    GLColor_t col;                /* default texture color */
+    uint32_t w, h;                 /* width/height of texture */
+} GLTexture_t;
 
 typedef struct _GLtexcoord {
-  GLfloat s, t;                 /* texture coordinates or tc offsets */
+    GLfloat s, t;                 /* texture coordinates or tc offsets */
 } GLTexcoord_t;
 
 #ifdef NOEXTERN_GLTEXTURES

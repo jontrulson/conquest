@@ -1,4 +1,4 @@
-/* 
+/*
  * client packet proc routines (from server)
  *
  * Copyright Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
@@ -41,35 +41,35 @@ void            processPacket(char *buf);
 #ifdef NOEXTERN_CPROC
 /* version 0x0006 protocol */
 static dispatchProc_t cprocDispatchTable_0006[] = {
-  pktNotImpl,                   /* SP_NULL */
-  pktNotImpl,                   /* SP_HELLO */
-  procAck,                      /* SP_ACK */
-  procServerStat,               /* SP_SERVERSTAT */
-  procClientStat,               /* SP_CLIENTSTAT */
-  procShip,                     /* SP_SHIP */
-  procShipSml,                  /* SP_SHIPSML */
-  procShipLoc,                  /* SP_SHIPLOC */
-  procPlanet,                   /* SP_PLANET */
-  procPlanetSml,                /* SP_PLANETSML */
-  procPlanetLoc,                /* SP_PLANETLOC */
-  procMessage,                  /* SP_MESSAGE */
-  procUser,                     /* SP_USER */
-  procTorp,                     /* SP_TORP */
-  procAck,                      /* SP_ACKMSG */
-  procTeam,                     /* SP_TEAM */
-  procTorpLoc,                  /* SP_TORPLOC */
-  procConqInfo,                 /* SP_CONQINFO */
-  procFrame,                    /* SP_FRAME */
-  procHistory,                  /* SP_HISTORY */
-  procDoomsday,                 /* SP_DOOMSDAY */
-  procPlanetInfo,               /* SP_PLANETINFO */
-  procPlanetLoc2,               /* SP_PLANETLOC2 */
-  procTorpEvent,                /* SP_TORPEVENT */
-  pktNotImpl                    /* SP_VARIABLE */
+    pktNotImpl,                   /* SP_NULL */
+    pktNotImpl,                   /* SP_HELLO */
+    procAck,                      /* SP_ACK */
+    procServerStat,               /* SP_SERVERSTAT */
+    procClientStat,               /* SP_CLIENTSTAT */
+    procShip,                     /* SP_SHIP */
+    procShipSml,                  /* SP_SHIPSML */
+    procShipLoc,                  /* SP_SHIPLOC */
+    procPlanet,                   /* SP_PLANET */
+    procPlanetSml,                /* SP_PLANETSML */
+    procPlanetLoc,                /* SP_PLANETLOC */
+    procMessage,                  /* SP_MESSAGE */
+    procUser,                     /* SP_USER */
+    procTorp,                     /* SP_TORP */
+    procAck,                      /* SP_ACKMSG */
+    procTeam,                     /* SP_TEAM */
+    procTorpLoc,                  /* SP_TORPLOC */
+    procConqInfo,                 /* SP_CONQINFO */
+    procFrame,                    /* SP_FRAME */
+    procHistory,                  /* SP_HISTORY */
+    procDoomsday,                 /* SP_DOOMSDAY */
+    procPlanetInfo,               /* SP_PLANETINFO */
+    procPlanetLoc2,               /* SP_PLANETLOC2 */
+    procTorpEvent,                /* SP_TORPEVENT */
+    pktNotImpl                    /* SP_VARIABLE */
 };
 
-#define CPROCDISPATCHTABLENUM_0006 \
-  (sizeof(cprocDispatchTable_0006) / sizeof(dispatchProc_t))
+#define CPROCDISPATCHTABLENUM_0006                              \
+    (sizeof(cprocDispatchTable_0006) / sizeof(dispatchProc_t))
 
 #endif /* NOEXTERN_CPROC */
 

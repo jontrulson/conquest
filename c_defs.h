@@ -189,12 +189,12 @@ typedef double real;
 #define equal(x, y)  ((strcmp(x, y) == 0) ? TRUE : FALSE)
 #define c_strcpy(x, y) strcpy(y, x)
 #define appstr(x, y) strcat(y, x)
-#define appchr(x, y)     {\
-			    static int yyzi; \
-			    yyzi = strlen(y); \
-			    y[yyzi++] = x; \
-			    y[yyzi] = '\0'; \
-			 }
+#define appchr(x, y)     {                      \
+        static int yyzi;                        \
+        yyzi = strlen(y);                       \
+        y[yyzi++] = x;                          \
+        y[yyzi] = '\0';                         \
+    }
 #ifndef min
 #define min(x, y) (((x) < (y)) ? (x) : (y))
 #endif

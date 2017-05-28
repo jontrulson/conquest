@@ -1,4 +1,4 @@
-/* 
+/*
  * Conquest mouse data
  *
  * Copyright Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
@@ -13,10 +13,10 @@
 #define CQ_MOUSE_BUP        1
 
 typedef struct m_mouse_data {
-  int     button;               /* button number, starting at 0 */
-  int     state;                /* CQ_MOUSE_B* */
-  uint32_t mod;                  /* key modifiers (CQ_MOD*) */
-  int     x, y;                 /* ortho coords of mouse event
-                                   (topleft = 0,0) */
+    int     button;               /* button number, starting at 0 */
+    int     state;                /* CQ_MOUSE_B* */
+    uint32_t mod;                  /* key modifiers (CQ_MOD*) */
+    int     x, y;                 /* ortho coords of mouse event
+                                     (topleft = 0,0) */
 } mouseData_t;
 #endif /* _CQMOUSE_H */

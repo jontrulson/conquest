@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
  */
 
@@ -7,7 +7,7 @@
 
 #if defined(NOEXTERN_IOLB)
 /* a copy of stdin's fd (0) for poll()/select() (curses) */
-const int iolbStdinFD = 0; 
+const int iolbStdinFD = 0;
 #else
 extern int iolbStdinFD;	/* a copy of stdin's fd for poll()/select() */
 #endif /* NOEXTERN_IOLB */

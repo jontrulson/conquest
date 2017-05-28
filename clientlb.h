@@ -1,4 +1,4 @@
-/* 
+/*
  * Per client (conquest) info
  *
  * Copyright Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).

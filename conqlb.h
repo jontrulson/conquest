@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
  */
 
@@ -26,7 +26,7 @@ int      clbPhaser( int snum, real dir );
 real     clbPhaserHit( int snum, real dis );
 void     clbResign( int unum, int isoper );
 int      clbTakePlanet( int pnum, int snum );
-void     clbUserline( int unum, int snum, char *buf, 
+void     clbUserline( int unum, int snum, char *buf,
                       int showgods, int showteam );
 void     clbStatline( int unum, char *buf );
 int      clbZeroPlanet( int pnum, int snum );

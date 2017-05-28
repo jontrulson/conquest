@@ -70,7 +70,7 @@
 #define SS_DEAD 5 		/* used between kill() and the user menu */
 #define SS_RESERVED 6 		/* reserved for our later use */
 
-  /* Special values for skilledby() */
+/* Special values for skilledby() */
 #define KB_SELF -100 		/* self-destruct */
 #define KB_NEGENB -101 	/* damage from negative energy barrier */
 #define KB_CONQUER -102 	/* you conquered the universe */
@@ -84,7 +84,7 @@
 #define KB_LIGHTNING -110 	/* killed by a lightning bolt from GOD */
 
 #define MAXTORPS 9 		/* maximum torps per ship */
-  /* Values for tstatus() */
+/* Values for tstatus() */
 #define TS_OFF 1 		/* ready for use */
 #define TS_LAUNCHING 2 	/* being created */
 #define TS_LIVE 3 		/* armed and flying */
@@ -101,105 +101,105 @@
 #define REFIT_GRAND 10000       /* hunderths to complete a refit */
 
 #define NUMALLTEAMS 8 		/* total number of teams */
-#define MAXTEAMNAME 12 
+#define MAXTEAMNAME 12
 
 #define TEAM_UPDATE_INTERVAL 60	/* update client team data every x seconds */
-#define CONQINFO_UPDATE_INTERVAL 120 
-#define HISTORY_UPDATE_INTERVAL 60 
+#define CONQINFO_UPDATE_INTERVAL 120
+#define HISTORY_UPDATE_INTERVAL 60
 
 #define TEAM_FEDERATION 0 	/* Feddie Bears */
 #define TEAM_ROMULAN 1 	/* Rom Dogs */
 #define TEAM_KLINGON 2 	/* Klings */
 #define TEAM_ORION 3 		/* Bugs */
 #define NUMPLAYERTEAMS 4 		/* four "real" teams */
-#define TEAM_SELFRULED 4 
-#define TEAM_NOTEAM 5 
-#define TEAM_GOD 6 
+#define TEAM_SELFRULED 4
+#define TEAM_NOTEAM 5
+#define TEAM_GOD 6
 #define TEAM_EMPIRE 7
 
 #define MAXPLANETTYPES 8 	/* number of different planet types */
 #define MAXPTYPENAME 20 		/* maximum size of a planet type's name */
 #define MAXPLANETNAME 12 	/* maximum size of a planet's name */
 #define PLANET_CLASSM 1 	/* "Sensors indicate a Class M planet..." */
-#define PLANET_DEAD 2 
+#define PLANET_DEAD 2
 #define PLANET_SUN 3 		/* a bit of a contradiction... */
 #define PLANET_MOON 4 		/* a bit of fun */
 #define PLANET_GHOST 5 	/* anchor for binary systems */
-#define PLANET_CLASSA 6 
-#define PLANET_CLASSO 7 
-#define PLANET_CLASSZ 0 
+#define PLANET_CLASSA 6
+#define PLANET_CLASSO 7
+#define PLANET_CLASSZ 0
 
-				/* Number of planets with specific
-				   identities within conquest.  This
-				   will always be 40 for posterity */
+/* Number of planets with specific
+   identities within conquest.  This
+   will always be 40 for posterity */
 #define NUM_BASEPLANETS 40
 
-                                /* This is the number of 'extra' planets
-				   to be used for whatever.  None of these
-				   can be core planets, and will be
-				   initialized to invisible, unreal,
-				   with unimaginative names like Extra 1
-				   etc... Eventually, these planets
-				   will be initializable in the sys-wide
-				   config file.  REMEMBER: If you change
-				   this number, change the common block id
-				   (COMMONSTAMP) to reflect the change. Also
-				   make sure you don't choose a number large
-				   enough to overflow the common block
-				   (SIZEOF_COMMONBLOCK) */
+/* This is the number of 'extra' planets
+   to be used for whatever.  None of these
+   can be core planets, and will be
+   initialized to invisible, unreal,
+   with unimaginative names like Extra 1
+   etc... Eventually, these planets
+   will be initializable in the sys-wide
+   config file.  REMEMBER: If you change
+   this number, change the common block id
+   (COMMONSTAMP) to reflect the change. Also
+   make sure you don't choose a number large
+   enough to overflow the common block
+   (SIZEOF_COMMONBLOCK) */
 
 #define NUM_EXTRAPLANETS 20
 
-				/* number of planets */
+/* number of planets */
 #define NUMPLANETS (NUM_BASEPLANETS + NUM_EXTRAPLANETS)
 
-  /* Planet numbers. */
+/* Planet numbers. */
 #define PNUM_EARTH 1
-#define PNUM_ROMULUS 2 
-#define PNUM_KLINGUS 3 
-#define PNUM_ORION 4 
-#define PNUM_REMUS 5 
-#define PNUM_LEUDUS 6 
-#define PNUM_OBERON 7 
-#define PNUM_TELOS 8 
-#define PNUM_TARSUS 9 
-#define PNUM_UMBRIEL 10 
-#define PNUM_OMEGA 11 
-#define PNUM_RHO 12 
-#define PNUM_JANUS 13 
-#define PNUM_ELAS 14 
-#define PNUM_SHERMAN 15 
-#define PNUM_SERITIL 16 
-#define PNUM_CHERON 17 
-#define PNUM_DAKEL 18 
-#define PNUM_SARAC 19 
-#define PNUM_VENAR 20 
-#define PNUM_XIDEX 21 
-#define PNUM_OLDAR 22 
-#define PNUM_EMINIAR 23 
-#define PNUM_DYNEB 24 
-#define PNUM_RIGELB 25 
+#define PNUM_ROMULUS 2
+#define PNUM_KLINGUS 3
+#define PNUM_ORION 4
+#define PNUM_REMUS 5
+#define PNUM_LEUDUS 6
+#define PNUM_OBERON 7
+#define PNUM_TELOS 8
+#define PNUM_TARSUS 9
+#define PNUM_UMBRIEL 10
+#define PNUM_OMEGA 11
+#define PNUM_RHO 12
+#define PNUM_JANUS 13
+#define PNUM_ELAS 14
+#define PNUM_SHERMAN 15
+#define PNUM_SERITIL 16
+#define PNUM_CHERON 17
+#define PNUM_DAKEL 18
+#define PNUM_SARAC 19
+#define PNUM_VENAR 20
+#define PNUM_XIDEX 21
+#define PNUM_OLDAR 22
+#define PNUM_EMINIAR 23
+#define PNUM_DYNEB 24
+#define PNUM_RIGELB 25
 
 #define NUMCONPLANETS 25 	/* last planet need to conquer the universe */
 
-#define PNUM_LUNA 26 
-#define PNUM_ALTAIR 27 
-#define PNUM_HELL 28 
-#define PNUM_JINX 29 
+#define PNUM_LUNA 26
+#define PNUM_ALTAIR 27
+#define PNUM_HELL 28
+#define PNUM_JINX 29
 
-  /* Sun numbers. */
-#define PNUM_SOL 30 
-#define PNUM_SIRIUS 31 
-#define PNUM_KEJELA 32 
-#define PNUM_BETELGEUSE 33 
-#define PNUM_MURISAK 34 
-#define PNUM_SYRINX 35 
+/* Sun numbers. */
+#define PNUM_SOL 30
+#define PNUM_SIRIUS 31
+#define PNUM_KEJELA 32
+#define PNUM_BETELGEUSE 33
+#define PNUM_MURISAK 34
+#define PNUM_SYRINX 35
 
-  /* Ghost numbers. */
-#define PNUM_GHOST1 36 
-#define PNUM_GHOST2 37 
-#define PNUM_GHOST3 38 
-#define PNUM_GHOST4 39 
+/* Ghost numbers. */
+#define PNUM_GHOST1 36
+#define PNUM_GHOST2 37
+#define PNUM_GHOST3 38
+#define PNUM_GHOST4 39
 #define PNUM_GHOST5 40		/* LAST 'base' planet, any after this number
 				   are extra */
 
@@ -210,7 +210,7 @@
 #define MAXLASTWORDS 60	      /* maximum size of conquering remarks */
 #define MAXHISTLOG   40	  /* maximum number of user history entries */
 
-#define MAXTSTATS 20 
+#define MAXTSTATS 20
 #define TSTAT_SECONDS 1 	/* elapsed seconds for each team */
 #define TSTAT_CPUSECONDS 2 	/* cpu seconds used per team */
 #define TSTAT_WINS 3 		/* wins for each team */
@@ -225,7 +225,7 @@
 #define TSTAT_CONQPLANETS 12 	/* number of planets conquered */
 #define TSTAT_GENOCIDE 0 	/* number of genocides completed */
 
-#define MAXUSTATS 20 
+#define MAXUSTATS 20
 #define USTAT_SECONDS 1 	/* elapsed seconds for each user */
 #define USTAT_CPUSECONDS 2 	/* cpu seconds used per user */
 #define USTAT_WINS 3 		/* total kills for each user */
@@ -287,8 +287,8 @@
 #define DRS_KAMIKAZE 5 		/* used to kill a driver */
 
 /* States for the planet eater */
-#define DS_LIVE 1 
-#define DS_OFF 2 
+#define DS_LIVE 1
+#define DS_OFF 2
 
 /* Phases of a moon. */
 #define PHOON_NO -1 		/* doesn't have a phase */
@@ -302,48 +302,48 @@
 #define THING_DEATHSTAR -2 	/* the Empire's new toy */
 
 /* Return values for utIsSpecial(). */
-#define NEAR_SHIP 1 
-#define NEAR_PLANET 2 
-#define NEAR_NONE 3 
-#define NEAR_DIRECTION 4 
-#define NEAR_ERROR 5 
+#define NEAR_SHIP 1
+#define NEAR_PLANET 2
+#define NEAR_NONE 3
+#define NEAR_DIRECTION 4
+#define NEAR_ERROR 5
 
 /* Tokens for utIsSpecial() and clbFindSpecial() */
-#define SPECIAL_NOTSPECIAL 1 
-#define SPECIAL_ENEMYSHIP 2 
-#define SPECIAL_FUELPLANET 3 
-#define SPECIAL_ENEMYPLANET 4 
-#define SPECIAL_SHIP 5 
-#define SPECIAL_PLANET 6 
-#define SPECIAL_TEAMSHIP 7 
-#define SPECIAL_ARMYPLANET 8 
-#define SPECIAL_WEAKPLANET 9 
-#define SPECIAL_TEAMPLANET 10 
-#define SPECIAL_REPAIRPLANET 11 
-#define SPECIAL_HOMEPLANET 12 
+#define SPECIAL_NOTSPECIAL 1
+#define SPECIAL_ENEMYSHIP 2
+#define SPECIAL_FUELPLANET 3
+#define SPECIAL_ENEMYPLANET 4
+#define SPECIAL_SHIP 5
+#define SPECIAL_PLANET 6
+#define SPECIAL_TEAMSHIP 7
+#define SPECIAL_ARMYPLANET 8
+#define SPECIAL_WEAKPLANET 9
+#define SPECIAL_TEAMPLANET 10
+#define SPECIAL_REPAIRPLANET 11
+#define SPECIAL_HOMEPLANET 12
 
 /* Robot variables. */
-#define VAR_FUEL 0 
-#define VAR_SHIELDS 1 
-#define VAR_NUMTORPS 2 
-#define VAR_DAMAGE 3 
-#define VAR_ETEMP 4 
-#define VAR_WTEMP 5 
-#define VAR_WARP 6 
-#define VAR_SHUP 7 
-#define VAR_WALLOC 8 
-#define VAR_ORBITING 9 
-#define VAR_REPAIRING 10 
-#define VAR_CLOAKED 11 
-#define VAR_CANREAD 12 
-#define VAR_RANDOM 13 
-#define VAR_DNE 14 
+#define VAR_FUEL 0
+#define VAR_SHIELDS 1
+#define VAR_NUMTORPS 2
+#define VAR_DAMAGE 3
+#define VAR_ETEMP 4
+#define VAR_WTEMP 5
+#define VAR_WARP 6
+#define VAR_SHUP 7
+#define VAR_WALLOC 8
+#define VAR_ORBITING 9
+#define VAR_REPAIRING 10
+#define VAR_CLOAKED 11
+#define VAR_CANREAD 12
+#define VAR_RANDOM 13
+#define VAR_DNE 14
 #define VAR_ENEMYCLOAKED 15
-#define VAR_ENEMYDAMAGE 16 
-#define VAR_PHASERDAM 17 
-#define VAR_TORPDAM 18 
-#define VAR_INCOMING 19 
-#define MAX_VAR 20 
+#define VAR_ENEMYDAMAGE 16
+#define VAR_PHASERDAM 17
+#define VAR_TORPDAM 18
+#define VAR_INCOMING 19
+#define MAX_VAR 20
 #define REAL_MAX_VAR 32		/* common block max (leaves room for expansion) */
 
 /* Robot action tokens. */
@@ -382,19 +382,19 @@
 #define DOOMSDAY_KILLS 5.0 	/* kills per planet eater eaten */
 
 #define MM_PER_SEC_PER_WARP 18.0 /* mega-meters per second per warp */
-				/*  distance = MM_PER_SEC_PER_WARP * warp * time */
+/*  distance = MM_PER_SEC_PER_WARP * warp * time */
 #define MAX_ORBIT_WARP 2.0 	/* maximum speed for entering orbit */
 #define MAX_TRACTOR_WARP 4.0 	/* maximum speed difference when tractoring */
 
 #define ACCINFO_DIST 3000.0 	/* maximum distance for accurate ship info */
-#define YELLOW_DIST 3000.0 
+#define YELLOW_DIST 3000.0
 #define ALERT_DIST 2000.0 	/* 2/3 of YELLOW_DIST */
 #define SCANNED_FUSE 5 		/* seconds of timeout for sscanned(,) */
 
 #define PLANET_ORBIT_FAC 5.0 	/* planet orbit speed in degrees per minute */
 #define ENTRY_SMEAR_DIST 2500.0	/* standard deviation for rndnor for entry */
-#define ENTRY_ENEMY_DIST ACCINFO_DIST 
-				/* closest entry to an enemy ship */
+#define ENTRY_ENEMY_DIST ACCINFO_DIST
+/* closest entry to an enemy ship */
 
 #define ORBIT_FAC 10.0 		/* orbit speed in degrees per second */
 #define ORBIT_DIST 300.0 	/* distance from planets to enter orbit and orbit */
@@ -503,7 +503,7 @@
 				   ships like the doomsday machine,
 				   deathstar, and any other watchable
 				   non-ship/planet items */
-#define SPECIAL_BASE (MAXSHIPS + NUMPLANETS + 1)   
+#define SPECIAL_BASE (MAXSHIPS + NUMPLANETS + 1)
 #define DISPLAY_DOOMSDAY ((SPECIAL_BASE + 1) * -1)   /* doomsday machine num */
 #define DISPLAY_DEATHSTAR ((SPECIAL_BASE + 2) * -1)
 
@@ -529,7 +529,7 @@
 #define COUP_GRAND 10000 	/* hunderths to attempt a coup */
 #define MIN_REFIT_KILLS 1.0     /* min kill to refit */
 
-#define MSG_LIN1 (DISPLAY_LINS + 2) 
+#define MSG_LIN1 (DISPLAY_LINS + 2)
 #define MSG_LIN2 (MSG_LIN1 + 1)	/* line for messages */
 #define MSG_MSG  (MSG_LIN1 + 2)
 
@@ -555,20 +555,20 @@
 
 #define MAILADDR ""
 
-				/* for clbLaunch() */
+/* for clbLaunch() */
 #define LAUNCH_NORMAL   (0)
 #define LAUNCH_EXPLODE  (1)
 
-				/* exploding ship characteristics */
+/* exploding ship characteristics */
 
-                                /* number of stationary torps 'fired'
-				   when a ship dies */
+/* number of stationary torps 'fired'
+   when a ship dies */
 #define EXPLODESHIP_TORP_COUNT    6
-				/* Maximum distance from ship an 'explode
-				   ship' spread of torps will be located.
-				   ie: This confines the blast radius
-				   for an exploding ship */
-#define EXPLODESHIP_TORP_SPREAD   15.0	
+/* Maximum distance from ship an 'explode
+   ship' spread of torps will be located.
+   ie: This confines the blast radius
+   for an exploding ship */
+#define EXPLODESHIP_TORP_SPREAD   15.0
 
 #define NOWSIZE 8		/* size of now[] arrays */
 #define DEFAULT_USEREXPIRE 120	/* days after which to expire a user */
@@ -577,7 +577,7 @@
 #define MTXT_MORE "--- press [SPACE] to continue, any other key to quit ---"
 #define MTXT_DONE "--- press any key when done ---"
 
-				/* validuser types - not used anymore */
+/* validuser types - not used anymore */
 #define UT_LOCAL (0)
 #define UT_REMOTE (1)
 
@@ -594,18 +594,18 @@
 #define sind(x) (real)sin((real)dtor((x) )) /* sine of angle in degrees */
 #define dist(w,x,y,z) (real) sqrt(pow((real)((y)-(w)), (real) 2.0) + pow((real)((z)-(x)), (real) 2.0))
 
-				/* fast distance */
+/* fast distance */
 #define distf(w,x,y,z) (real)(fabs((real)(y)-(real)(w)) + fabs((real)(z)-(real)(x)))
 #define vowel(x) (x=='a' || x=='e' || x=='i' || x=='o' || x=='u' )
 #define satwar(x,y) (Ships[x].war[Ships[y].team] || Ships[y].war[Ships[x].team])
 #define selfwar(x) Ships[x].war[Ships[x].team]
-#define maxwarp(x) (real)min(ShipTypes[Ships[x].shiptype].warplim, \
+#define maxwarp(x) (real)min(ShipTypes[Ships[x].shiptype].warplim,      \
 			     max(0.0, around(((100.0-Ships[x].damage)/100.0)*12.0)))
-#define engeff(x) (real)(((Ships[x].engalloc +50.0)/100.0) * \
-			 ShipTypes[Ships[x].shiptype].engfac * \
+#define engeff(x) (real)(((Ships[x].engalloc +50.0)/100.0) *            \
+			 ShipTypes[Ships[x].shiptype].engfac *          \
 			 (((Ships[x].kills+Ships[x].strkills)+DOUBLE_E_KILLS)/DOUBLE_E_KILLS))
-#define weaeff(x) (real)(((Ships[x].weapalloc+50.0)/100.0) * \
-			 ShipTypes[Ships[x].shiptype].weafac * \
+#define weaeff(x) (real)(((Ships[x].weapalloc+50.0)/100.0) *            \
+			 ShipTypes[Ships[x].shiptype].weafac *          \
 			 (((Ships[x].kills+Ships[x].strkills)+DOUBLE_E_KILLS)/DOUBLE_E_KILLS))
 
 /* clamp */

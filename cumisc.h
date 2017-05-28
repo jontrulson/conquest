@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
  */
 
@@ -21,7 +21,7 @@ void mcuUserList( int godlike, int snum );
 void mcuUserStats( int godlike , int snum );
 int  mcuConfirm(void);
 int  mcuAskYN(char *question, int lin, int col);
-char mcuGetCX( char *pmt, int lin, int offset, char *terms, 
+char mcuGetCX( char *pmt, int lin, int offset, char *terms,
                char *buf, int len );
 int  mcuGetTarget( char *pmt, int lin, int col, real *dir, real cdefault );
 int  mcuMore( char *pmt );

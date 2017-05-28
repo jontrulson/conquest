@@ -1,4 +1,4 @@
-/* 
+/*
  * Planet structure
  *
  * Copyright Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
@@ -21,29 +21,29 @@
 #define PLAN_F_CORE        0x00000004 /* true if needed to take universe */
 
 /* helpers */
-#define PVISIBLE(x)        ( Planets[(x)].flags & PLAN_F_VISIBLE ) 
-#define PHOMEPLANET(x)     ( Planets[(x)].flags & PLAN_F_HOMEPLANET ) 
-#define PCORE(x)           ( Planets[(x)].flags & PLAN_F_CORE ) 
+#define PVISIBLE(x)        ( Planets[(x)].flags & PLAN_F_VISIBLE )
+#define PHOMEPLANET(x)     ( Planets[(x)].flags & PLAN_F_HOMEPLANET )
+#define PCORE(x)           ( Planets[(x)].flags & PLAN_F_CORE )
 
 #define PFSET(x, b)  ( Planets[(x)].flags |=  (b) )
 #define PFCLR(x, b)  ( Planets[(x)].flags &= ~(b) )
 
 typedef struct {
-  real x;			/* x coordinates of planet */
-  real y;			/* y coordinates of planet */
-  real orbrad;                  /* radius of the orbit */
-  real orbvel;                  /* velocity of the orbit in deg/min */
-  real orbang;                  /* current angle of the orbit */
-  real size;                    /* size of planet in CU's */
-  uint32_t flags;                /* flags for this planet */
-  int  primary;                 /* planet this planet orbits */
-  int  type;                    /* type of planet - M, dead, sun */
-  int  team;                    /* which team owns the planet */
-  int  armies;                  /* how many armies are on the planet */
-  int  uninhabtime;             /* minutes left till inhabitable */
-  int  scanned[NUMPLAYERTEAMS];	/* which planets have been */
-				/* scanned by which teams */
-  char name[MAXPLANETNAME];     /* planet name */
+    real x;			/* x coordinates of planet */
+    real y;			/* y coordinates of planet */
+    real orbrad;                  /* radius of the orbit */
+    real orbvel;                  /* velocity of the orbit in deg/min */
+    real orbang;                  /* current angle of the orbit */
+    real size;                    /* size of planet in CU's */
+    uint32_t flags;                /* flags for this planet */
+    int  primary;                 /* planet this planet orbits */
+    int  type;                    /* type of planet - M, dead, sun */
+    int  team;                    /* which team owns the planet */
+    int  armies;                  /* how many armies are on the planet */
+    int  uninhabtime;             /* minutes left till inhabitable */
+    int  scanned[NUMPLAYERTEAMS]; /* which planets have been */
+    /* scanned by which teams */
+    char name[MAXPLANETNAME];     /* planet name */
 } Planet_t;
 
 #endif /* PLANET_H_INCLUDED */

@@ -1,4 +1,4 @@
-/* 
+/*
  * Per server (conquestd) info
  *
  * Copyright Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
@@ -25,16 +25,16 @@
 #define SVR_STATE_TERMINATE 0x00000020	/* terminating */
 
 typedef struct {
-  int     sock;			/* socket to client */
-  int     usock;                /* udp socket to client */
-  struct  sockaddr_in clntaddr; /* client's saddrin struct */
-  int     doUDP;                /* send udp? */
-  int     tryUDP;               /* try udp? */
-  uint32_t state;		/* current state */
-  uint32_t clientDead;		/* is the client dead/ */
-  uint32_t isMaster;		/* is the Maseter server? */
-  uint32_t isLoggedIn;		/* is the client logged in? */
-  char    remotehost[MAXHOSTNAME]; /* self evident */
+    int     sock;			/* socket to client */
+    int     usock;                /* udp socket to client */
+    struct  sockaddr_in clntaddr; /* client's saddrin struct */
+    int     doUDP;                /* send udp? */
+    int     tryUDP;               /* try udp? */
+    uint32_t state;		/* current state */
+    uint32_t clientDead;		/* is the client dead/ */
+    uint32_t isMaster;		/* is the Maseter server? */
+    uint32_t isLoggedIn;		/* is the client logged in? */
+    char    remotehost[MAXHOSTNAME]; /* self evident */
 } ServerInfo_t;
 
 
@@ -46,7 +46,7 @@ ServerInfo_t sInfo;
 extern ServerInfo_t sInfo;
 #endif
 
-int sendClientStat(int sock, uint8_t flags, uint8_t snum, uint8_t team, 
+int sendClientStat(int sock, uint8_t flags, uint8_t snum, uint8_t team,
 		   uint16_t unum, uint8_t esystem);
 int sendUser(int sock, uint16_t unum);
 int sendShip(int sock, uint8_t snum);

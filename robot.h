@@ -1,4 +1,4 @@
-/* 
+/*
  * Robot Strategy structure
  *
  * Copyright Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
@@ -10,8 +10,8 @@
 #include "conqdef.h"
 
 typedef struct {
-  int rstrat[REAL_MAX_VAR][10];	/* robot strategy table */
-  int rvec[32];			/* robot rule to action token */
+    int rstrat[REAL_MAX_VAR][10];	/* robot strategy table */
+    int rvec[32];			/* robot rule to action token */
 } Robot_t;
 
 #endif /* ROBOT_H_INCLUDED */

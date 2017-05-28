@@ -1,6 +1,6 @@
-/* 
- * conqstrat.h - some defines for the parser 
- * 
+/*
+ * conqstrat.h - some defines for the parser
+ *
  * Copyright Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
  */
 
@@ -13,7 +13,7 @@
 #define OP_GE 104
 #define OP_EQ 105
 #define OP_NE 106
- 
+
 /* prototypes for the parser */
 
 void         initrun(void);

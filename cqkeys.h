@@ -1,5 +1,5 @@
-/* 
- * Conquest 'special' keysyms 
+/*
+ * Conquest 'special' keysyms
  *
  * Copyright Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
  */

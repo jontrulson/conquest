@@ -1,5 +1,5 @@
 /************************************************************************
- * 
+ *
  * defs.h - modify Conquest's behavior - hopefully for the better ;-)
  *
  * Copyright Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
@@ -10,16 +10,16 @@
 #define _DEFS_H
 /* Basic information */
 
-/* 
+/*
  * CONQUEST_GROUP - this is the group that all conquest files are chgrp'd
  *   to... This is also the group that the conquest executables setgid()
- *   to as well.  You should leave it as is... Default: conquest.  
+ *   to as well.  You should leave it as is... Default: conquest.
  */
 #ifndef CONQUEST_GROUP
 # define CONQUEST_GROUP "conquest"
 #endif
 
-/* 
+/*
  * Some variables that used to be in conqfig.c - relative to conquest
  *  installation directories
  */
@@ -32,20 +32,20 @@
 
 #define C_CONQ_INITRC    "conqinitrc"
 
-/* 
+/*
  * WARP0CLOAK - Although the code made it difficult to scan a ship that was
  *  cloaked at warp 0, it was still possible to scan such a ship if it was
- *  within alert range.  Defining this means you CANNOT be detected (even by 
+ *  within alert range.  Defining this means you CANNOT be detected (even by
  *  robots) if you are cloaked and at warp 0.0.  An enemy can fly right over
  *  you and won't even know your there... heeheehee
  */
-#define WARP0CLOAK 
+#define WARP0CLOAK
 
-/* 
+/*
  * DO_EXPLODING_SHIPS - In this mode, ships explode when they die, with
  *  a force equal to the number of torpedos the ship has available, and
  *  only if the ship had the fuel to 'fire' them, were it alive to do
- *  so. 
+ *  so.
  */
 #define DO_EXPLODING_SHIPS
 
@@ -55,13 +55,13 @@
 #define MAX_MACROS 64		/* max number of macros supported */
 #define MAX_MACRO_LEN 70	/* max length of a macro */
 
-/* 
+/*
  * OPER_MSG_BEEP - if defined, beep when a message arrives in conqoper.
  */
 #undef OPER_MSG_BEEP
 
 
-/* 
+/*
  * AUTO_RECORD - have conquestd automatically record all games.
  */
 

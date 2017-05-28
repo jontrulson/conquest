@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
  */
 
@@ -21,11 +21,11 @@ extern int pbSpeed;
 #define GZIPPED_BYTE_2     0x8b
 
 /* minimum/maximum playback speed (-PB_SPEED_MAX_TIMESx to
- *  PB_SPEED_MAX_TIMESx). 
- */ 
-#define PB_SPEED_MAX_TIMES 10   
+ *  PB_SPEED_MAX_TIMESx).
+ */
+#define PB_SPEED_MAX_TIMES 10
 /* the fastest you can go - recFrameDelay set to 0.0 */
-#define PB_SPEED_INFINITE  (PB_SPEED_MAX_TIMES + 1)   
+#define PB_SPEED_INFINITE  (PB_SPEED_MAX_TIMES + 1)
 
 int  pbInitReplay(char *fname, time_t *elapsed);
 void pbFileSeek(time_t newtime);

@@ -7,9 +7,9 @@
 #define CONQCOM_H
 
 #ifdef NOEXTERN_CONQCOM
-#define CEXTERN 
+#define CEXTERN
 #else
-#define CEXTERN extern 
+#define CEXTERN extern
 #endif
 
 #include "user.h"
@@ -42,10 +42,10 @@ void PVUNLOCK(int *);
 void zero_common(void);
 void fake_common(void);
 void map_lcommon(void);
-				/* The Common Block in all it's majesty */
+/* The Common Block in all it's majesty */
 
 /* Special data items - these must be at the very beginning. */
-				/* This must be the first var */
+/* This must be the first var */
 CEXTERN int *CBlockRevision;	/* common block rev number */
 
 CEXTERN CBGlobal_t *CBGlobal;   /* global limits from CQI */

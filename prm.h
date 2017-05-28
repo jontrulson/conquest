@@ -1,4 +1,4 @@
-/* 
+/*
  * prompt utils
  *
  * Copyright Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
@@ -15,12 +15,12 @@
 
 
 typedef struct _prompt {
-  int  preinit;                /* pre-initing the prompt resp? */
-  char *buf;                    /* response */
-  int   buflen;
-  char *pbuf;                   /* the prompt */
-  char *terms;                  /* terminators */
-  int   index;                  /* only used in CP for now */
+    int  preinit;                /* pre-initing the prompt resp? */
+    char *buf;                    /* response */
+    int   buflen;
+    char *pbuf;                   /* the prompt */
+    char *terms;                  /* terminators */
+    int   index;                  /* only used in CP for now */
 } prm_t;
 
 int prmProcInput(prm_t *prm, int ch);

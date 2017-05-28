@@ -13,12 +13,12 @@
 
 /* an enum for the various types of alert conditions one can be in */
 typedef enum {
-  GREEN_ALERT = 0,
-  PROXIMITY_ALERT,
-  YELLOW_ALERT,
-  TORP_ALERT,
-  RED_ALERT,                  /* close enough to be concerned */
-  PHASER_ALERT,               /* close enough to be in phaser range */
+    GREEN_ALERT = 0,
+    PROXIMITY_ALERT,
+    YELLOW_ALERT,
+    TORP_ALERT,
+    RED_ALERT,                  /* close enough to be concerned */
+    PHASER_ALERT,               /* close enough to be in phaser range */
 } alertLevel_t;
 
 /* alert/warning/critical limits */
@@ -44,136 +44,136 @@ typedef enum {
 
 
 struct _warp {
-  real     warp;
-  cqColor  color;
-  char     str[HUD_STR_SZ];
+    real     warp;
+    cqColor  color;
+    char     str[HUD_STR_SZ];
 };
 
 struct _heading {
-  int     head;
-  cqColor color;
-  char    str[HUD_STR_SZ];
+    int     head;
+    cqColor color;
+    char    str[HUD_STR_SZ];
 };
 
 struct _kills {
-  real    kills;
-  cqColor color;
-  char    str[HUD_STR_SZ];
+    real    kills;
+    cqColor color;
+    char    str[HUD_STR_SZ];
 };
 
 struct _alertStatus {
-  alertLevel_t  alertLevel;
-  int           aShip;          /* hostile ship causing the alert, if any */
-  cqColor       color;          /* alert text and alert border color */
-  char          str[HUD_STR_SZ];
+    alertLevel_t  alertLevel;
+    int           aShip;          /* hostile ship causing the alert, if any */
+    cqColor       color;          /* alert text and alert border color */
+    char          str[HUD_STR_SZ];
 };
 
 struct _shields {
-  int     shields;
-  cqColor color;
-  char    str[HUD_STR_SZ];
+    int     shields;
+    cqColor color;
+    char    str[HUD_STR_SZ];
 };
 
 struct _damage {
-  real    damage;
-  cqColor color;
-  char    str[HUD_STR_SZ];
+    real    damage;
+    cqColor color;
+    char    str[HUD_STR_SZ];
 };
 
 struct _fuel {
-  real    fuel;
-  cqColor color;
-  char    str[HUD_STR_SZ];
+    real    fuel;
+    cqColor color;
+    char    str[HUD_STR_SZ];
 };
 
 struct _alloc {
-  int     walloc;
-  int     ealloc;
-  cqColor color;
-  char    str[HUD_STR_SZ];
+    int     walloc;
+    int     ealloc;
+    cqColor color;
+    char    str[HUD_STR_SZ];
 };
 
 struct _temp {
-  real    temp;
-  cqColor color;
-  int     overl;                    /* overloaded */
-  char    str[HUD_STR_SZ];
+    real    temp;
+    cqColor color;
+    int     overl;                    /* overloaded */
+    char    str[HUD_STR_SZ];
 };
 
 struct _tow {
-  int     towstat;              /* 0 = no towing, < 0 towing, > 0 towed by */
-  cqColor color;
-  char    str[HUD_STR_SZ];
+    int     towstat;              /* 0 = no towing, < 0 towing, > 0 towed by */
+    cqColor color;
+    char    str[HUD_STR_SZ];
 };
 
 struct _armies {
-  cqColor color;
-  int     armies;
-  char    str[HUD_STR_SZ];
+    cqColor color;
+    int     armies;
+    char    str[HUD_STR_SZ];
 };
 
 struct _raction {               /* robot action */
-  cqColor color;
-  int     action;
-  char    str[HUD_STR_SZ];
+    cqColor color;
+    int     action;
+    char    str[HUD_STR_SZ];
 };
 
 struct _destruct {              /* destruct msg */
-  cqColor color;
-  int     fuse;
-  char    str[HUD_STR_SZ];
+    cqColor color;
+    int     fuse;
+    char    str[HUD_STR_SZ];
 };
 
 /* prompt areas */
 
 struct _prompt_lin {
-  char str[HUD_PROMPT_SZ];
+    char str[HUD_PROMPT_SZ];
 };
 
 /* data from last info command for the iconic ship */
 struct _info {
-  real lastblast;
+    real lastblast;
 
-  int  lastang;
-  int  lastdist;
-  int  lasttarget;
+    int  lastang;
+    int  lastdist;
+    int  lasttarget;
 
-  char lastblaststr[HUD_INFO_STR_SZ];  /* last "FA:" blast (firing) angle */
-  char lasttargetstr[HUD_INFO_STR_SZ]; /* last target in char *form */
-  char lasttadstr[HUD_INFO_STR_SZ];    /* full "TA/D" target:ang/dist str */
+    char lastblaststr[HUD_INFO_STR_SZ];  /* last "FA:" blast (firing) angle */
+    char lasttargetstr[HUD_INFO_STR_SZ]; /* last target in char *form */
+    char lasttadstr[HUD_INFO_STR_SZ];    /* full "TA/D" target:ang/dist str */
 };
 
 struct _recId {
-  char str[HUD_INFO_STR_SZ];
+    char str[HUD_INFO_STR_SZ];
 };
 
 struct _recTime {
-  char str[HUD_INFO_STR_SZ];
+    char str[HUD_INFO_STR_SZ];
 };
 
 
 /* This holds all of the info for the cockpit display. */
 typedef struct _dspData {
-  struct _warp              warp;
-  struct _heading           heading;
-  struct _kills             kills;
-  struct _alertStatus       aStat;
-  struct _shields           sh;
-  struct _damage            dam;
-  struct _fuel              fuel;
-  struct _alloc             alloc;
-  struct _temp              etemp;
-  struct _temp              wtemp;
-  struct _tow               tow;
-  struct _armies            armies;
-  struct _raction           raction;
-  struct _destruct          destruct;
-  struct _prompt_lin        p1;
-  struct _prompt_lin        p2;
-  struct _prompt_lin        msg;
-  struct _info              info;
-  struct _recId             recId;
-  struct _recTime           recTime;
+    struct _warp              warp;
+    struct _heading           heading;
+    struct _kills             kills;
+    struct _alertStatus       aStat;
+    struct _shields           sh;
+    struct _damage            dam;
+    struct _fuel              fuel;
+    struct _alloc             alloc;
+    struct _temp              etemp;
+    struct _temp              wtemp;
+    struct _tow               tow;
+    struct _armies            armies;
+    struct _raction           raction;
+    struct _destruct          destruct;
+    struct _prompt_lin        p1;
+    struct _prompt_lin        p2;
+    struct _prompt_lin        msg;
+    struct _info              info;
+    struct _recId             recId;
+    struct _recTime           recTime;
 } hudData_t;
 
 
@@ -200,7 +200,7 @@ void hudSetTow(int snum);
 void hudSetArmies(int snum);
 void hudSetRobotAction(int snum);
 void hudSetDestruct(int snum);
-void hudSetPrompt(int line, char *prompt, int pcolor, 
+void hudSetPrompt(int line, char *prompt, int pcolor,
                   char *buf, int color);
 void hudClearPrompt(int line);
 void hudSetInfoFiringAngle(real blastang);

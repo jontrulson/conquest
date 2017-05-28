@@ -3,7 +3,7 @@
  * anywhere within conquest(gl only of course :).  Hence we create a
  * global blinker animQue here (that the node renderer will iterate)
  * and make the blinkers globally available to conquest.
- * 
+ *
  * Copyright Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
  */
 
@@ -35,6 +35,3 @@ extern animQue_t      blinkerQue;
 void blinkerInit(void);
 
 #endif  /* _BLINKER_H */
-
-
-

@@ -1,4 +1,4 @@
-/* 
+/*
  * record.h - recording games in conquest
  *
  * Copyright Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
@@ -13,33 +13,33 @@
 #define RECVERSION          20060409 /* current recording version */
 #define RECVERSION_20031004 20031004 /* older recording version(s) */
 
-				/* recording modes */
+/* recording modes */
 #define RECMODE_OFF      0
 #define RECMODE_STARTING 1
 #define RECMODE_ON       2
 #define RECMODE_PLAYING  3
 #define RECMODE_PAUSED   4
 
-				/* file header */
+/* file header */
 #define SZ_FILEHEADER (256)
-#define FHEADER_PAD (SZ_FILEHEADER - (sizeof(uint32_t) + \
-                                      sizeof(uint8_t) +   \
-                                      sizeof(uint32_t) +  \
-                                      MAXUSERNAME +      \
-                                      sizeof(uint32_t) +  \
-                                      sizeof(uint8_t) +   \
+#define FHEADER_PAD (SZ_FILEHEADER - (sizeof(uint32_t) +        \
+                                      sizeof(uint8_t) +         \
+                                      sizeof(uint32_t) +        \
+                                      MAXUSERNAME +             \
+                                      sizeof(uint32_t) +        \
+                                      sizeof(uint8_t) +         \
                                       sizeof(uint32_t)))
 
 #pragma pack(1)
-typedef struct _fheader {	
-  uint32_t vers;                 /* version of this file */
-  uint8_t samplerate;            /* recorded at samples per sec */
-  uint32_t rectime;		/* time recorded */
-  uint8_t user[MAXUSERNAME];	/* user that made recording */
-  uint32_t cmnrev;               /* common block rev */
-  uint8_t snum;                  /* ship that made rec.  0 == server record */
-  uint32_t flags;                /* flags. duh. */
-  uint8_t pad[FHEADER_PAD];	/* padding */
+typedef struct _fheader {
+    uint32_t vers;                 /* version of this file */
+    uint8_t samplerate;            /* recorded at samples per sec */
+    uint32_t rectime;		/* time recorded */
+    uint8_t user[MAXUSERNAME];	/* user that made recording */
+    uint32_t cmnrev;               /* common block rev */
+    uint8_t snum;                  /* ship that made rec.  0 == server record */
+    uint32_t flags;                /* flags. duh. */
+    uint8_t pad[FHEADER_PAD];	/* padding */
 } fileHeader_t;
 #pragma pack()
 

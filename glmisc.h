@@ -1,4 +1,4 @@
-/* 
+/*
  * misc gl funcs
  *
  * Copyright Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
@@ -21,7 +21,7 @@ int _GLError(const char *funcname, const char *filename, int line);
 #define GLError() _GLError(__FUNCTION__, __FILE__, __LINE__)
 
 void mglConqLogo(dspConfig_t *dsp, int mult);
-void mglBeep(int type);  
+void mglBeep(int type);
 void mglOverlayQuad(void);
 
 #endif /* _MISCGL_H */

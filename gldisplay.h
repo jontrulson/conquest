@@ -24,32 +24,32 @@
 #define DSP_FULLSCREEN()     (dConf.flags & DSP_F_FULLSCREEN)
 
 typedef struct _dspConfig {
-  /* glut win ids */
-  int          mainw;           /* main window */
+    /* glut win ids */
+    int          mainw;           /* main window */
 
-  /* main window */
-  GLfloat      wX, wY;          /* x/y origin */
-  GLfloat      wW, wH;          /* width/height  */
-  GLfloat      wAspect;
+    /* main window */
+    GLfloat      wX, wY;          /* x/y origin */
+    GLfloat      wW, wH;          /* width/height  */
+    GLfloat      wAspect;
 
-  /* viewer window */
-  GLfloat      vX, vY;          /* viewer X/Y */
-  GLfloat      vW, vH;          /* viewer width/height */
-  GLfloat      vAspect;
+    /* viewer window */
+    GLfloat      vX, vY;          /* viewer X/Y */
+    GLfloat      vW, vH;          /* viewer width/height */
+    GLfloat      vAspect;
 
-  /* LR/SR viewer scaling factors (magnification) */
-  GLfloat      vScaleLR, vScaleSR;
+    /* LR/SR viewer scaling factors (magnification) */
+    GLfloat      vScaleLR, vScaleSR;
 
-  GLfloat      ppCol, ppRow;    /* pixels per [Row|Col] */
+    GLfloat      ppCol, ppRow;    /* pixels per [Row|Col] */
 
-  GLfloat      wBorderW;        /* width of outside mainw border */
+    GLfloat      wBorderW;        /* width of outside mainw border */
 
-  GLfloat      hudProjection[16]; /* hud proj matrix */
-  GLfloat      viewerProjection[16]; /* viewer proj matrix */
+    GLfloat      hudProjection[16]; /* hud proj matrix */
+    GLfloat      viewerProjection[16]; /* viewer proj matrix */
 
-  uint32_t      flags; 
+    uint32_t      flags;
 
-  int          initWidth, initHeight; /* initial wxh geometry */
+    int          initWidth, initHeight; /* initial wxh geometry */
 } dspConfig_t;
 
 #ifdef NOEXTERN_DCONF
@@ -64,17 +64,17 @@ extern uint32_t     frameTime;
 /* a generic GL rectangle struct */
 typedef struct _gl_box
 {
-  GLfloat x, y;
-  GLfloat w, h;
+    GLfloat x, y;
+    GLfloat w, h;
 } GLRect_t;
 
 /* a macro for clamping a rectable within a min/max width/height */
-#define CLAMPRECT(_w, _h, _rect) { \
- (_rect)->x = CLAMP(0.0, (_w), (_rect)->x);    \
- (_rect)->y = CLAMP(0.0, (_h), (_rect)->y);    \
- (_rect)->w = CLAMP(1.0, (_w), (_rect)->w);    \
- (_rect)->h = CLAMP(1.0, (_h), (_rect)->h);    \
-}
+#define CLAMPRECT(_w, _h, _rect) {                      \
+        (_rect)->x = CLAMP(0.0, (_w), (_rect)->x);      \
+        (_rect)->y = CLAMP(0.0, (_h), (_rect)->y);      \
+        (_rect)->w = CLAMP(1.0, (_w), (_rect)->w);      \
+        (_rect)->h = CLAMP(1.0, (_h), (_rect)->h);      \
+    }
 
 void display( int snum );
 

@@ -1,4 +1,4 @@
-/* 
+/*
  * server connect node
  *
  * Copyright Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).

@@ -37,10 +37,10 @@
 
 /* colors are formatted like so:
 
-   0xAAaabbff 
+   0xAAaabbff
 
    where
-   
+
    AA = Alpha component
    aa = attrib
    bb = background color
@@ -78,4 +78,3 @@ extern cqColor LabelColor, InfoColor, SpecialColor;
 
 
 #endif /* _COLOR_H */
-

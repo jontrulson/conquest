@@ -1,4 +1,4 @@
-/* 
+/*
  * gl font handling
  *
  * Copyright Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).

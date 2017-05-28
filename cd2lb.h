@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
  */
 
@@ -16,9 +16,9 @@ void cdend(void);
 void cdfill ( char ch, char buf[], int count );
 int  cdgetn ( char pmt[], int lin, int col, int *num );
 int  cdgets ( char pmt[], int lin, int col, char str[], int maxlen );
-int  cdgetx ( char pmt[], int lin, int col, char terms[], char str[], 
+int  cdgetx ( char pmt[], int lin, int col, char terms[], char str[],
               int maxlen, int doecho );
-int  cdgetp ( char pmt[], int lin, int col, char terms[], char str[], 
+int  cdgetp ( char pmt[], int lin, int col, char terms[], char str[],
               int maxlen, int *append_flg, int do_append_flg, int doecho );
 void cdinit(void);
 void cdline ( int lin1, int col1, int lin2, int col2 );

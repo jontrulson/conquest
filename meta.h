@@ -1,4 +1,4 @@
-/* 
+/*
  * Stuff for the meta server
  *
  * Copyright Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
@@ -21,25 +21,25 @@
 
 /* internal representation of a server record for the meta server */
 typedef struct _meta_srec {
-  int     valid;
-  uint16_t version;
-  uint8_t  numactive;
-  uint8_t  numvacant;
-  uint8_t  numrobot;
-  uint8_t  numtotal;
-  time_t  lasttime;             /* last contact time */
-  uint32_t flags;                /* same as spServerStat_t */
-  uint16_t port;
-  char    addr[CONF_SERVER_NAME_SZ]; /* server's detected address */
-  char    altaddr[CONF_SERVER_NAME_SZ]; /* specified real address */
-  char    servername[CONF_SERVER_NAME_SZ];
-  char    serverver[CONF_SERVER_NAME_SZ]; /* server's proto version */
-  char    motd[CONF_SERVER_MOTD_SZ];
+    int     valid;
+    uint16_t version;
+    uint8_t  numactive;
+    uint8_t  numvacant;
+    uint8_t  numrobot;
+    uint8_t  numtotal;
+    time_t  lasttime;             /* last contact time */
+    uint32_t flags;                /* same as spServerStat_t */
+    uint16_t port;
+    char    addr[CONF_SERVER_NAME_SZ]; /* server's detected address */
+    char    altaddr[CONF_SERVER_NAME_SZ]; /* specified real address */
+    char    servername[CONF_SERVER_NAME_SZ];
+    char    serverver[CONF_SERVER_NAME_SZ]; /* server's proto version */
+    char    motd[CONF_SERVER_MOTD_SZ];
 
-  /* Version 0x0002 */
-  uint16_t protovers;
-  char    contact[META_GEN_STRSIZE];
-  char    walltime[META_GEN_STRSIZE];
+    /* Version 0x0002 */
+    uint16_t protovers;
+    char    contact[META_GEN_STRSIZE];
+    char    walltime[META_GEN_STRSIZE];
 
 } metaSRec_t;
 

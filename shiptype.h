@@ -1,5 +1,5 @@
-/* 
- * Ship information, dependent on Type 
+/*
+ * Ship information, dependent on Type
  *
  * Copyright Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
  */
@@ -10,14 +10,14 @@
 #include "conqdef.h"
 
 typedef struct {
-  
-  char name[MAXSTNAME];		/* "Destroyer, Scout, Cruiser" */
-  int armylim;			/* maximum armies this shiptype can carry */
-  real warplim;			/* maximum warp based on shiptype */
-  real engfac;			/* shiptype engine constants */
-  real accelfac;		/* shiptype acceleration constants */
-  real weafac;			/* shiptype weapons constants */
-  real torpwarp;		/* torp speed for shiptype */
+
+    char name[MAXSTNAME];	/* "Destroyer, Scout, Cruiser" */
+    int armylim;		/* maximum armies this shiptype can carry */
+    real warplim;		/* maximum warp based on shiptype */
+    real engfac;		/* shiptype engine constants */
+    real accelfac;		/* shiptype acceleration constants */
+    real weafac;		/* shiptype weapons constants */
+    real torpwarp;		/* torp speed for shiptype */
 } ShipType_t;
 
 #endif /* SHIPTYPE_H_INCLUDED */

@@ -1,4 +1,4 @@
-/* 
+/*
  * cprintf defines.  SHOULD BE UI AGNOSTIC!
  *
  * Copyright Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).

@@ -1,4 +1,4 @@
-/* 
+/*
  * server packet proc routines (from client)
  *
  * Copyright Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).

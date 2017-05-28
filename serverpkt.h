@@ -1,4 +1,4 @@
-/* 
+/*
  * packet test/generation for the server
  *
  * Copyright Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).

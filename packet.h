@@ -1,6 +1,6 @@
-/* 
+/*
  * packet routines
- * 
+ *
  * Some ideas borrowed from netrek.
  *
  * Copyright Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
@@ -17,10 +17,10 @@
 typedef int (*dispatchProc_t)(char *);
 
 typedef struct _packetent {
-  uint32_t        pktid;
-  uint32_t        size;
-  char           *name;
-  dispatchProc_t dispatch;
+    uint32_t        pktid;
+    uint32_t        size;
+    char           *name;
+    dispatchProc_t dispatch;
 } packetEnt_t;
 
 /* this will be implemented in cproc.c and sproc.c to initialize the
@@ -32,7 +32,7 @@ int procDispatchInit(uint16_t vers, packetEnt_t *pktList, int numpkts);
  * where UDP is not available and the TCP RB is used instead.
  */
 #define PKT_UDP_RB_MAX    (PKT_MAXSIZE * 64)
-#define PKT_TCP_RB_MAX    (PKT_UDP_RB_MAX * 2) 
+#define PKT_TCP_RB_MAX    (PKT_UDP_RB_MAX * 2)
 
 /* for pktWrite, whether to send via UDP (if available) */
 #define PKT_SENDTCP    0
@@ -43,7 +43,7 @@ int procDispatchInit(uint16_t vers, packetEnt_t *pktList, int numpkts);
 
 /* error/severity codes for Acks, should make sure these sync to
    pktSeverity2String(int psev) */
-#define PSEV_INFO     0	
+#define PSEV_INFO     0
 #define PSEV_WARN     1
 #define PSEV_ERROR    2
 #define PSEV_FATAL    3
@@ -70,9 +70,9 @@ int procDispatchInit(uint16_t vers, packetEnt_t *pktList, int numpkts);
 #define PERR_PINGRESP     17	/* a ping reponse for nCP */
 
 typedef struct _pkt_stats {
-  unsigned int  rxBytes;        /* tx/rx byte counts */
-  unsigned int  txBytes;
-  unsigned int  pingAvg;        /* in ms */
+    unsigned int  rxBytes;        /* tx/rx byte counts */
+    unsigned int  txBytes;
+    unsigned int  pingAvg;        /* in ms */
 } pktStats_t;
 
 #ifdef NOEXTERN_PACKET
@@ -85,8 +85,8 @@ extern packetEnt_t  *serverPackets;
 extern int          serverPktMax;
 #endif
 
-#define PKT_PROCSP(_pkt) \
-  ( (*serverPackets[((uint8_t)(_pkt)[0])].dispatch)((_pkt)) )
+#define PKT_PROCSP(_pkt)                                        \
+    ( (*serverPackets[((uint8_t)(_pkt)[0])].dispatch)((_pkt)) )
 
 int   pktInit(void);
 void  pktSetClientMode(int isclient);
@@ -102,7 +102,7 @@ void  pktSetNonBlocking(int enable);
 
 char *pktSeverity2String(int psev);
 
-int   pktWaitForPacket(int type, char *buf, int blen, 
+int   pktWaitForPacket(int type, char *buf, int blen,
                        int delay, char *nakmsg);
 
 int   pktClientPacketSize(int type);
