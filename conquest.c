@@ -1134,29 +1134,24 @@ void dead( int snum, int leave )
       i = Ships[snum].armies;
       if ( i > 0 )
 	{
-	  junk[0] = 0;
 	  if ( i == 1 )
 	    strcpy( cbuf, "army" );
 	  else
-	    {
-	      if ( i < 100 )
-			utAppendNumWord( i, junk );
-	      else
-			utAppendInt( i, junk );
 	      strcpy( cbuf, "armies" );
-	    }
+
 	  if ( i == 1 )
 	    strcpy( buf, "was" );
 	  else
 	    strcpy( buf, "were");
+
 	  if ( i == 1 )
 		cprintf(10,0,ALIGN_CENTER,
 		"#%d#The #%d#%s #%d#you were carrying %s not amused.",
 			LabelColor, CQC_A_BOLD, cbuf, LabelColor, buf);
 	  else
 		cprintf(10,0,ALIGN_CENTER,
-		"#%d#The #%d#%s %s #%d#you were carrying %s not amused.",
-			LabelColor, CQC_A_BOLD, junk, cbuf, LabelColor, buf);
+		"#%d#The #%d#%d %s #%d#you were carrying %s not amused.",
+			LabelColor, CQC_A_BOLD, i, cbuf, LabelColor, buf);
 	}
     }
   else if ( kb >= 0 )
