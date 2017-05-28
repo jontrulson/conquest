@@ -1335,7 +1335,8 @@ void procBeam(cpCommand_t *cmd)
     }
   else
     {
-      capacity = min( ifix( rkills ) * 2, ShipTypes[Ships[snum].shiptype].armylim );
+        capacity = min( (int)rkills * 2,
+                        ShipTypes[Ships[snum].shiptype].armylim );
       upmax = min( Planets[pnum].armies - MIN_BEAM_ARMIES, 
 		   capacity - Ships[snum].armies );
     }

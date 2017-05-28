@@ -202,8 +202,6 @@ typedef double real;
 #define max(x, y) (((x) > (y)) ? (x) : (y))
 #endif
 #define fold(x) /* Who knows what this does... */
-#define ifix(x) ((int) (x))
-#define rfix(x) ((real) (x))
 
 /* Function prototypes for everything else */
 

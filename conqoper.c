@@ -2246,7 +2246,7 @@ void opstats(void)
       if ( i == 0 )
 	x = 0.0;
       else
-	x = oneplace( 100.0 * rfix(ConqInfo->ccpuseconds) / rfix(i) );
+          x = oneplace( 100.0 * (real)ConqInfo->ccpuseconds / (real)i );
       cprintf( lin,col,ALIGN_NONE,pfmt, 
 		LabelColor,"Conquest cpu usage:", InfoColor,x);
       
@@ -2265,7 +2265,7 @@ void opstats(void)
       if ( i == 0 )
 	x = 0.0;
       else
-	x = oneplace( 100.0 * rfix(ConqInfo->dcpuseconds) / rfix(i) );
+          x = oneplace( 100.0 * (real)ConqInfo->dcpuseconds / (real)i );
       cprintf( lin,col,ALIGN_NONE,pfmt, 
 		LabelColor,"Conqdriv cpu usage:", InfoColor,x);
       
@@ -2284,7 +2284,7 @@ void opstats(void)
       if ( i == 0 )
 	x = 0.0;
       else
-	x = ( 100.0 * rfix(ConqInfo->rcpuseconds) / rfix(i) );
+          x = ( 100.0 * (real)ConqInfo->rcpuseconds / (real)i );
       cprintf( lin, col, ALIGN_NONE, pfmt, 
 		LabelColor, "Robot cpu usage:", InfoColor, x);
       

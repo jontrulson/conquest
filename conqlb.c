@@ -46,11 +46,12 @@ void clbChalkup( int snum )
   team = Ships[snum].team;
   
   /* Update wins. */
-  Users[unum].stats[USTAT_WINS] += ifix(Ships[snum].kills);
-  Teams[team].stats[TSTAT_WINS] = Teams[team].stats[TSTAT_WINS] + ifix(Ships[snum].kills);
+  Users[unum].stats[USTAT_WINS] += (int)Ships[snum].kills;
+  Teams[team].stats[TSTAT_WINS] = Teams[team].stats[TSTAT_WINS]
+      + (int)Ships[snum].kills;
   
   /* Update max kills. */
-  i = ifix( Ships[snum].kills );
+  i = (int)Ships[snum].kills;
   if ( i > Users[unum].stats[USTAT_MAXKILLS] )
     Users[unum].stats[USTAT_MAXKILLS] = i;
   
@@ -228,9 +229,9 @@ void clbIKill( int snum, int kb )
       else
 	{
 	  /* Have to do some hacking when our killer is dead. */
-	  Users[kunum].stats[USTAT_WINS] -= ifix(Ships[kb].kills);
+            Users[kunum].stats[USTAT_WINS] -= (int)Ships[kb].kills;
 	  Teams[kteam].stats[TSTAT_WINS] =
-	    Teams[kteam].stats[TSTAT_WINS] - ifix(Ships[kb].kills);
+              Teams[kteam].stats[TSTAT_WINS] - (int)Ships[kb].kills;
 	  Ships[kb].kills = Ships[kb].kills + tkills;
 	  clbChalkup( kb );
 	}

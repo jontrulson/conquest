@@ -150,7 +150,7 @@ int rndint ( int ilow, int ihigh )
 {
   int rc;
 
-  rc = ifix ( rnd() * rfix(ihigh-ilow+1.0) ) + ilow;
+  rc = (int)(rnd() * (real)(ihigh - ilow + 1)) + ilow;
 #ifdef DEBUG_RANDOM
   utLog("rndint(): rc = %d", rc);
 #endif
