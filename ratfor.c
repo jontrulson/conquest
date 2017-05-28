@@ -21,18 +21,6 @@ void upper(char *buf)
     }
 }
 
-/* wkday(int, int, int) - all args ignored - returns day num */
-int wkday (void)
-{
-  struct tm *thetm;
-  time_t thetimet;
-
-  thetimet = time(0);
-  thetm = localtime(&thetimet);
-
-  return(thetm->tm_wday + 1);
-}
-
 				/* output an error and exit */
 void error(char str[])
 {

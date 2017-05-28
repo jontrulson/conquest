@@ -208,7 +208,6 @@ typedef double real;
 /* Function prototypes for ratfor.c */
 
 void upper(char *buf);
-int wkday (void);
 real ctor(char *buf);
 void error(char *str);
 
