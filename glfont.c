@@ -29,14 +29,14 @@
 
 void glfInitFonts(void)
 {
-    char fbuf[MID_BUFFER_SIZE];
+    char fbuf[PATH_MAX] = {};
     int fail = FALSE;
 
 #ifdef DEBUG_GL
     utLog("%s: ENTER...", __FUNCTION__);
 #endif
 
-    sprintf(fbuf, "%s/img/%s", utGetPath(CONQSHARE), "large.txf");
+    snprintf(fbuf, PATH_MAX, "%s/img/%s", utGetPath(CONQSHARE), "large.txf");
 
     glfFontLarge = txfLoadFont(fbuf);
 

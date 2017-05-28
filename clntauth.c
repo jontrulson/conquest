@@ -24,12 +24,12 @@
 
 static void PrintStatus(int lin)
 {
-    static char buf1[MID_BUFFER_SIZE];
-    static char buf2[MID_BUFFER_SIZE];
-    static char buf3[MID_BUFFER_SIZE];
-    static char buf4[MID_BUFFER_SIZE];
-    static char buf5[MID_BUFFER_SIZE];
-    static char buf6[MID_BUFFER_SIZE];
+    static char buf1[BUFFER_SIZE_1024];
+    static char buf2[BUFFER_SIZE_1024];
+    static char buf3[BUFFER_SIZE_1024];
+    static char buf4[BUFFER_SIZE_1024];
+    static char buf5[BUFFER_SIZE_1024];
+    static char buf6[BUFFER_SIZE_1024];
     static int inited = FALSE;
     time_t servtm;
 

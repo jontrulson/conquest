@@ -21,12 +21,12 @@
 
 void startRecord(int f)
 {
-    char fname[MID_BUFFER_SIZE];
-    char bname[MID_BUFFER_SIZE];
-    char cbuf[MID_BUFFER_SIZE];
+    char fname[PATH_MAX] = {};
+    char bname[BUFFER_SIZE] = {};
+    char cbuf[MESSAGE_SIZE] = {};
     time_t thetime;
     struct tm *tmtime;
-    char tbuf[128];
+    char tbuf[128] = {};
 
     if (Context.recmode == RECMODE_ON)
     {
@@ -44,9 +44,9 @@ void startRecord(int f)
 
     strftime(tbuf, 128 - 1, "%m%d%Y-%H%M", tmtime);
 
-    sprintf(bname, "conquest-rec-%s.cqr", tbuf);
+    snprintf(bname, BUFFER_SIZE, "conquest-rec-%s.cqr", tbuf);
 
-    sprintf(fname, "%s/%s", CONQSTATE, bname);
+    snprintf(fname, PATH_MAX, "%s/%s", CONQSTATE, bname);
 
     if (recOpenOutput(fname, TRUE))
     {                     /* we are almost ready... */

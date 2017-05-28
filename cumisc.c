@@ -22,7 +22,7 @@
 #include "cumisc.h"
 #include "ui.h"
 
-static char cbuf[MID_BUFFER_SIZE]; /* general purpose buffer */
+static char cbuf[BUFFER_SIZE_1024]; /* general purpose buffer */
 
 /*  histlist - display the last usage list */
 /*  SYNOPSIS */
@@ -855,7 +855,7 @@ void mcuPlanetList( int team, int snum )
     int column_1 = 5;
     int column_2 = 43;
     char xbuf[BUFFER_SIZE];
-    static char pd0[MID_BUFFER_SIZE];
+    static char pd0[BUFFER_SIZE_1024];
     static int FirstTime = TRUE;
     int PlanetOffset;		/* offset into NUMPLANETS for this page */
     int PlanetIdx = 0;

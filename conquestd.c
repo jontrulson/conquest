@@ -49,7 +49,7 @@
 
 static uint16_t listenPort = CN_DFLT_PORT;
 
-static char cbuf[MID_BUFFER_SIZE]; /* general purpose buffer */
+static char cbuf[BUFFER_SIZE_1024]; /* general purpose buffer */
 static char *progName;
 
 static int localOnly = FALSE;   /* whether to only listen on loopback */

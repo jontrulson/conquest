@@ -46,7 +46,7 @@
 #include "display.h"
 #include "conqinit.h"
 
-static char cbuf[MID_BUFFER_SIZE]; /* general purpose buffer */
+static char cbuf[BUFFER_SIZE_1024]; /* general purpose buffer */
 
 /* option masks */
 #define OP_NONE (unsigned int)(0x00000000)

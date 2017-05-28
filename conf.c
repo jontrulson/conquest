@@ -171,8 +171,8 @@ int GetSysConf(int checkonly)
 {
     FILE *conf_fd;
     int i, j;
-    char conf_name[MID_BUFFER_SIZE];
-    char buffer[BUFFER_SIZE];
+    char conf_name[PATH_MAX] = {};
+    char buffer[BUFFER_SIZE] = {};
     int FoundOne = FALSE;
     int buflen;
     char *bufptr;
@@ -181,7 +181,7 @@ int GetSysConf(int checkonly)
     setSysConfDefaults();
 
     /* start building the filename */
-    snprintf(conf_name, sizeof(conf_name)-1, "%s/%s",
+    snprintf(conf_name, PATH_MAX, "%s/%s",
              utGetPath(CONQETC), SYSCONFIG_FILE);
 
     if ((conf_fd = fopen(conf_name, "r")) == NULL)
@@ -433,7 +433,7 @@ int GetConf(int usernum)
 {
     FILE *conf_fd;
     int i, j, n;
-    char conf_name[MID_BUFFER_SIZE];
+    char conf_name[PATH_MAX] = {};
     char *homevar, *cptr;
     char buffer[BUFFER_SIZE];
     int buflen;
@@ -456,7 +456,7 @@ int GetConf(int usernum)
         return(-1);
     }
 
-    snprintf(conf_name, sizeof(conf_name)-1, "%s/%s/%s",
+    snprintf(conf_name, PATH_MAX, "%s/%s/%s",
              homevar, CQ_USERCONFDIR, CONFIG_FILE);
 
     if ((conf_fd = fopen(conf_name, "r")) == NULL)
@@ -692,7 +692,7 @@ int GetConf(int usernum)
 /* SaveUserConfig(int unum) - do what the name implies ;-) */
 int SaveUserConfig(void)
 {
-    char conf_name[MID_BUFFER_SIZE];
+    char conf_name[PATH_MAX] = {};
     char *homevar;
 
     /* start building the filename */
@@ -706,7 +706,7 @@ int SaveUserConfig(void)
         return(-1);
     }
 
-    snprintf(conf_name, sizeof(conf_name)-1, "%s/%s/%s",
+    snprintf(conf_name, PATH_MAX, "%s/%s/%s",
              homevar, CQ_USERCONFDIR, CONFIG_FILE);
 
 #ifdef DEBUG_OPTIONS

@@ -115,8 +115,8 @@ static real lastblast;
 static real lastphase;
 
 /* misc buffers */
-static char cbuf[MID_BUFFER_SIZE];
-static char pbuf[MID_BUFFER_SIZE];
+static char cbuf[BUFFER_SIZE_1024];
+static char pbuf[BUFFER_SIZE_1024];
 
 static char *abt = "...aborted...";
 

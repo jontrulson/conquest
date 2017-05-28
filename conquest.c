@@ -60,7 +60,7 @@ struct _srvvec {
 static struct _srvvec servervec[META_MAXSERVERS] = {};
 
 
-static char cbuf[MID_BUFFER_SIZE]; /* general purpose buffer */
+static char cbuf[BUFFER_SIZE_1024]; /* general purpose buffer */
 
 void catchSignals(void);
 void handleSignal(int sig);
@@ -3703,7 +3703,7 @@ void conqend(void)
 
 void dispServerInfo(int lin, metaSRec_t *metaServerList, int num)
 {
-    char buf[MID_BUFFER_SIZE];
+    char buf[BUFFER_SIZE_1024];
 
     cdline ( lin, 0, lin, Context.maxcol );
     lin++;

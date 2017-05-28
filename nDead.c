@@ -28,7 +28,7 @@
 static int snum;
 static int kb;                  /* killed by... */
 char *ywkb="You were killed by ";
-static char buf[128], junk[128], cbuf[MID_BUFFER_SIZE];
+static char buf[128], junk[128], cbuf[BUFFER_SIZE_1024];
 static char lastwords[MAXLASTWORDS];
 static Ship_t eShip = {}; /* copy of killers ship, if killed by ship */
 

@@ -74,7 +74,7 @@ static int nPlanetlDisplay(dspConfig_t *dsp)
     int column_1 = 5;
     int column_2 = 43;
     char xbuf[BUFFER_SIZE];
-    static char pd0[MID_BUFFER_SIZE];
+    static char pd0[BUFFER_SIZE_1024];
     static int FirstTime = TRUE;
 
     if (FirstTime == TRUE)

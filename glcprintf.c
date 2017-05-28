@@ -19,7 +19,7 @@
 #include "glmisc.h"
 #include "glfont.h"
 
-static char buf[MID_BUFFER_SIZE];
+static char buf[BUFFER_SIZE_1024];
 
 /*
  * int lin - line if pertinent

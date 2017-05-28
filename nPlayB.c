@@ -60,7 +60,7 @@ static prm_t prm;
 static int prompting = FALSE;
 
 /* misc buffers */
-static char cbuf[MID_BUFFER_SIZE];
+static char cbuf[BUFFER_SIZE_1024];
 
 static int live_ships = TRUE;
 static int old_snum = 1;

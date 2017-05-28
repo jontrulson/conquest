@@ -32,9 +32,9 @@ void cprintf(int lin, int col, int align, char *fmt, ...)
     int len, vcol;
     int color_num;
     int two_passes = FALSE;
-    static char buf[MID_BUFFER_SIZE] = "";
-    static char xbuf[MID_BUFFER_SIZE] = "";
-    static char color_code[BUFFER_SIZE] = "";
+    static char buf[BUFFER_SIZE_1024] = {};
+    static char xbuf[BUFFER_SIZE_1024] = {};
+    static char color_code[BUFFER_SIZE] = {};
 
     vcol = col;
     buf[0] = 0;
@@ -43,7 +43,7 @@ void cprintf(int lin, int col, int align, char *fmt, ...)
 
     /* use vsprintf */
     va_start(ap, fmt);
-    (void)vsnprintf(buf, sizeof(buf) - 1, fmt, ap);
+    (void)vsnprintf(buf, BUFFER_SIZE_1024, fmt, ap);
     va_end(ap);
     /* end of it */
 
@@ -53,7 +53,7 @@ void cprintf(int lin, int col, int align, char *fmt, ...)
     {
         i=0;j=0;
         xbuf[0]=0;
-        while (buf[i] != 0 && i < MID_BUFFER_SIZE)
+        while (buf[i] != 0 && i < BUFFER_SIZE_1024)
 	{
             if ( buf[i] == '#' )   /* color code warning */
 	    {

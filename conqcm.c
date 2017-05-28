@@ -216,7 +216,7 @@ void map_common(void)
 {
 #if !defined(MINGW)
     int cmn_fd;
-    static char cmnfile[MID_BUFFER_SIZE];
+    static char cmnfile[PATH_MAX] = {};
 #endif
 
     if (fakeCommon)
@@ -226,7 +226,7 @@ void map_common(void)
     fprintf(stderr, "%s: Only fake common blocks are supported under MINGW\n");
     exit(1);
 #else  /* MINGW */
-    sprintf(cmnfile, "%s/%s", CONQSTATE, C_CONQ_COMMONBLK);
+    snprintf(cmnfile, PATH_MAX, "%s/%s", CONQSTATE, C_CONQ_COMMONBLK);
 
     /* verify it's validity */
     if (check_cblock(cmnfile, CMN_MODE, SIZEOF_COMMONBLOCK) == FALSE)
