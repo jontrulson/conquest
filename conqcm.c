@@ -18,6 +18,7 @@
 #include "conqdef.h"
 #include "conqlb.h"
 #include "conqutil.h"
+#include "conqunix.h"
 
 #define NOEXTERN_CONQCOM
 #include "conqcom.h"		/* common block vars defined here */

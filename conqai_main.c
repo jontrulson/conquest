@@ -20,6 +20,7 @@
 
 #define NOEXTERN_CONTEXT
 #include "context.h"
+#include "conqunix.h"
 
 #define NOEXTERN_GLOBALS
 #include "global.h"

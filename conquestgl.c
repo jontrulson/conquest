@@ -12,6 +12,7 @@
 
 #include "conqutil.h"
 #include "rndlb.h"
+#include "conqunix.h"
 
 #define NOEXTERN_CONTEXT
 #include "context.h"

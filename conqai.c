@@ -22,6 +22,7 @@
 #include "conf.h"
 #include "user.h"
 #include "conqai.h"
+#include "conqunix.h"
 #include "rndlb.h"
 
 static int nenum;

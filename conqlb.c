@@ -18,6 +18,7 @@
 #include "context.h"
 #include "conqlb.h"
 #include "conqutil.h"
+#include "conqunix.h"
 #define NOEXTERN_CONQDATA
 #include "conqdata.h"
 #include "conqai.h"

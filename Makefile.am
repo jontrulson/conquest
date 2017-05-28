@@ -71,7 +71,7 @@ endif !ISMINGW
 
 libconquest_la_SOURCES = conqai.c conqai.h \
 	conqlb.h conqlb.c rndlb.c rndlb.h conqutil.c conqutil.h conqcm.c \
-	conqunix.c ibuf.c version.c conf.c sem.c color.c \
+	conqunix.c conqunix.h ibuf.c version.c conf.c sem.c color.c \
 	userauth.c record.c color.h user.h shiptype.h \
 	ship.h planet.h team.h msg.h doomsday.h driver.h conqinfo.h \
 	history.h robot.h global.h torp.h ibuf.h conf.h  display.h \

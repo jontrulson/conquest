@@ -24,6 +24,8 @@
 
 #include "server.h"
 
+#include "conqunix.h"
+
 /* int getUID(void) - return a User ID */
 int getUID(char *name)
 {

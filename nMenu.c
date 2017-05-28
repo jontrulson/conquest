@@ -8,6 +8,7 @@
 #include "context.h"
 #include "global.h"
 #include "conqcom.h"
+#include "conqunix.h"
 
 #include "color.h"
 #include "conf.h"

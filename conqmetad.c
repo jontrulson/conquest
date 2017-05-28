@@ -17,6 +17,7 @@
 
 #include "conqdef.h"
 #include "conqnet.h"
+#include "conqunix.h"
 
 #define NOEXTERN_CONF
 #include "conf.h"

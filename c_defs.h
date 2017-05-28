@@ -203,26 +203,4 @@ typedef double real;
 #endif
 #define fold(x) /* Who knows what this does... */
 
-/* Function prototypes for everything else */
-
-/* conqsvr42.c */
-
-int getUID(char *name);
-int getConquestGID(void);
-void comsize( unsigned long *size );
-void conqinit(void);
-void conqstats( int snum );
-void drcheck(void);
-void drcreate(void);
-void drkill(void);
-void drpexit(void);
-void drstart(void);
-void gcputime( int *cpu );
-void initstats( int *ctemp, int *etemp );
-int isagod( int unum );
-int mailimps( char *subject, char *msg);
-int checkPID(int pidnum);
-void upchuck(void);
-void upstats( int *ctemp, int *etemp, int *caccum, int *eaccum, int *ctime, int *etime );
-
 #endif /* _C_DEFS_H */

@@ -11,6 +11,7 @@
 #include "conqcom.h"
 #include "conqlb.h"
 #include "conqutil.h"
+#include "conqunix.h"
 #include "conf.h"
 #include "server.h"
 #include "serverpkt.h"
