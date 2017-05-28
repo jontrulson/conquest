@@ -17,6 +17,7 @@
 #include "context.h"
 #include "record.h"
 #include "conqlb.h"
+#include "rndlb.h"
 
 #include "sproc.h"
 

@@ -9,6 +9,7 @@
 #include "context.h"
 #include "conqlb.h"
 #include "conqutil.h"
+#include "rndlb.h"
 
 #include "conf.h"
 #include "global.h"

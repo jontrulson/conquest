@@ -11,6 +11,7 @@
 #include "conqcom.h"
 #include "conqlb.h"
 #include "conqutil.h"
+#include "rndlb.h"
 #include "ibuf.h"
 
 #include <GL/glut.h>

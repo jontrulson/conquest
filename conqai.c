@@ -22,6 +22,7 @@
 #include "conf.h"
 #include "user.h"
 #include "conqai.h"
+#include "rndlb.h"
 
 static int nenum;
 static int debug;

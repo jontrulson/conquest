@@ -21,6 +21,7 @@
 #include "color.h"
 
 #include "conqutil.h"
+#include "rndlb.h"
 
 #include "conqinit.h"
 

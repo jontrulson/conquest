@@ -21,6 +21,7 @@
 #define NOEXTERN_CONQDATA
 #include "conqdata.h"
 #include "conqai.h"
+#include "rndlb.h"
 
 #include "conf.h"
 #include "global.h"

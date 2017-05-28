@@ -16,6 +16,7 @@
 #include "conqinit.h"
 
 #include "conqutil.h"
+#include "rndlb.h"
 
 /* The default initdata */
 #if 1

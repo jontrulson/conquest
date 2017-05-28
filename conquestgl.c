@@ -11,6 +11,7 @@
 #include "conqcom.h"
 
 #include "conqutil.h"
+#include "rndlb.h"
 
 #define NOEXTERN_CONTEXT
 #include "context.h"

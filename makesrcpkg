@@ -23,7 +23,7 @@ rm -rf $CONQVER
 echo Arcive name: $ARCFILE
 
 FILELIST="conqai.h cd2lb.h cd2lb.c iolb.h iolb.c conqlb.c
-	rndlb.c cumisc.h cumisc.c conqcm.c conqsvr42.c
+	rndlb.c rndlb.h cumisc.h cumisc.c conqcm.c conqsvr42.c
 	ibuf.c ibuf.h version.c conf.c sem.c conquest.c conqoper.c conqdriv.c
 	conqai.c c_defs.h color.h conqcom.h conqdata.h defs.h sem.h
 	conf.h context.h conqdef.h global.h color.c userauth.c options.h

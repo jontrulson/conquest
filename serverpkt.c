@@ -14,6 +14,7 @@
 #include "context.h"
 #include "serverpkt.h"
 #include "conqlb.h"
+#include "rndlb.h"
 
 /* Here, we maintain 2 copies of potential packets, privileged and
    unpriveleged.  We fill the packets, and then return a pointer to a static

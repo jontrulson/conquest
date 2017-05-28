@@ -12,6 +12,7 @@
 #include "conf.h"
 #include "conqcom.h"
 #include "conqlb.h"
+#include "rndlb.h"
 #include "conqutil.h"
 #include "gldisplay.h"
 #include "node.h"
