@@ -21,108 +21,108 @@
 int udpOpen(int port, struct sockaddr_in* addr)
 {
 #if defined(_WIN32)
-  const BOOL optOn = TRUE;
-  BOOL opt = optOn;
+    const BOOL optOn = TRUE;
+    BOOL opt = optOn;
 #else
-  const int optOn = 1;
-  int opt = optOn;
+    const int optOn = 1;
+    int opt = optOn;
 #endif
-  int fd;
+    int fd;
 
-  /* check parameters */
-  if (!addr) {
-    utLog("NET: openUDPnetwork: Must supply an address structure!");
-    return -1;
-  }
-  memset(addr, 0, sizeof(*addr));
+    /* check parameters */
+    if (!addr) {
+        utLog("NET: openUDPnetwork: Must supply an address structure!");
+        return -1;
+    }
+    memset(addr, 0, sizeof(*addr));
 
-  /* open socket */
-  fd = socket(AF_INET, SOCK_DGRAM, 0);
-  if (fd < 0) {
-    utLog("NET: openUDPnetwork: socket");
-    return -1;
-  }
+    /* open socket */
+    fd = socket(AF_INET, SOCK_DGRAM, 0);
+    if (fd < 0) {
+        utLog("NET: openUDPnetwork: socket");
+        return -1;
+    }
 
-  /* set address info */
-  addr->sin_family = AF_INET;
-  addr->sin_addr.s_addr = htonl(INADDR_ANY);
-  addr->sin_port = htons(port);
+    /* set address info */
+    addr->sin_family = AF_INET;
+    addr->sin_addr.s_addr = htonl(INADDR_ANY);
+    addr->sin_port = htons(port);
 
 #if defined(SO_REUSEPORT)
-  /* set reuse port */
-  opt = optOn;
-  if (setsockopt(fd, SOL_SOCKET, SO_REUSEPORT,
-                 (SSOType)&opt, sizeof(opt)) < 0) {
-    utLog("NET: setsockopt SO_REUSEPORT: %s", strerror(errno));
-    close(fd);
-    return -1;
-  }
+    /* set reuse port */
+    opt = optOn;
+    if (setsockopt(fd, SOL_SOCKET, SO_REUSEPORT,
+                   (SSOType)&opt, sizeof(opt)) < 0) {
+        utLog("NET: setsockopt SO_REUSEPORT: %s", strerror(errno));
+        close(fd);
+        return -1;
+    }
 #endif
 
 #if defined(SO_REUSEADDR)
-  /* set reuse address */
-  opt = optOn;
-  if (setsockopt(fd, SOL_SOCKET, SO_REUSEADDR,
-				(SSOType)&opt, sizeof(opt)) < 0) {
-    utLog("NET: openUDPnetwork: setsockopt SO_REUSEADDR: %s", strerror(errno));
-    close(fd);
-    return -1;
-  }
+    /* set reuse address */
+    opt = optOn;
+    if (setsockopt(fd, SOL_SOCKET, SO_REUSEADDR,
+                   (SSOType)&opt, sizeof(opt)) < 0) {
+        utLog("NET: openUDPnetwork: setsockopt SO_REUSEADDR: %s", strerror(errno));
+        close(fd);
+        return -1;
+    }
 #endif
 
-  /* bind address */
-  if (bind(fd, (const struct sockaddr*)addr, sizeof(*addr)) < 0) {
-    utLog("NET: openUDPnetwork: bind: %s", strerror(errno));
-    close(fd);
-    return -1;
-  }
+    /* bind address */
+    if (bind(fd, (const struct sockaddr*)addr, sizeof(*addr)) < 0) {
+        utLog("NET: openUDPnetwork: bind: %s", strerror(errno));
+        close(fd);
+        return -1;
+    }
 
-  return fd;
+    return fd;
 }
 
 
 
 int udpClose(int fd)
 {
-  if (fd == -1) 
-    return 0;
-  return close(fd);
+    if (fd == -1)
+        return 0;
+    return close(fd);
 }
 
 
 int udpSend(int fd, const void* buffer,
-                   int bufferLength,
-                   const struct sockaddr_in* addr)
+            int bufferLength,
+            const struct sockaddr_in* addr)
 {
-  return sendto(fd, (const char*)buffer, bufferLength, 0,
-                (const struct sockaddr*)addr, sizeof(*addr));
+    return sendto(fd, (const char*)buffer, bufferLength, 0,
+                  (const struct sockaddr*)addr, sizeof(*addr));
 }
 
 int udpRecv(int fd, void* buffer, int bufferLength,
-                   struct sockaddr_in* addr)
+            struct sockaddr_in* addr)
 {
-  struct sockaddr_in from;
-  AddrLen fromLength = sizeof(from);
-  
-  int byteCount = recvfrom(fd, (char*)buffer, bufferLength, 0,
-                           (struct sockaddr*)&from, (AddrLen*) &fromLength);
-  if (byteCount < 0) 
+    struct sockaddr_in from;
+    AddrLen fromLength = sizeof(from);
+
+    int byteCount = recvfrom(fd, (char*)buffer, bufferLength, 0,
+                             (struct sockaddr*)&from, (AddrLen*) &fromLength);
+    if (byteCount < 0)
     {
 #if !defined(MINGW)
-      if (errno == EWOULDBLOCK) 
+        if (errno == EWOULDBLOCK)
         {
-          return 0;
+            return 0;
         }
-      else 
+        else
 #endif  /* MINGW */
         {
-          utLog("NET: udpRecv: %s", strerror(errno));
-          return -1;
+            utLog("NET: udpRecv: %s", strerror(errno));
+            return -1;
         }
-  }
-  if (addr) 
-    *addr = from;
-  return byteCount;
+    }
+    if (addr)
+        *addr = from;
+    return byteCount;
 }
 
 // ex: shiftwidth=2 tabstop=8

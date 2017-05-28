@@ -25,68 +25,68 @@
 
 /* These semops should never be called by the clients, and used in MINGW */
 #if !defined(MINGW)
-static key_t ConquestSemID = -1; 
+static key_t ConquestSemID = -1;
 static struct sembuf semops[CONQNUMSEMS];
 #endif
 
 char *semGetName(int what)
 {
-  static char *LMSGTXT = "LOCKCOMN";
-  static char *LCMNTXT = "LOCKMESG";
+    static char *LMSGTXT = "LOCKCOMN";
+    static char *LCMNTXT = "LOCKMESG";
 
-  if (what == LOCKMSG)
-    return(LMSGTXT);
-  else
-    return(LCMNTXT);
+    if (what == LOCKMSG)
+        return(LMSGTXT);
+    else
+        return(LCMNTXT);
 }
 
 
 int semInit(void)
 {
 #if defined(MINGW)
-  return -1;
+    return -1;
 #else
-  int semflags;
+    int semflags;
 
-				/* try to create first */
-  semflags = CONQSEMPERMS | IPC_CREAT;
+    /* try to create first */
+    semflags = CONQSEMPERMS | IPC_CREAT;
 
-  ConquestSemID = semget(CONQSEMKEY, CONQNUMSEMS, semflags);
+    ConquestSemID = semget(CONQSEMKEY, CONQNUMSEMS, semflags);
 
-  if (ConquestSemID == -1)
+    if (ConquestSemID == -1)
     {				/* already exists? */
 #ifdef DEBUG_SEM
-      utLog("semInit(): semget(IPC_CREAT): failed: %s",
-	   strerror(errno));
+        utLog("semInit(): semget(IPC_CREAT): failed: %s",
+              strerror(errno));
 #endif
 
-      semflags = CONQSEMPERMS;
+        semflags = CONQSEMPERMS;
 
-      ConquestSemID = semget(CONQSEMKEY, CONQNUMSEMS, semflags);
+        ConquestSemID = semget(CONQSEMKEY, CONQNUMSEMS, semflags);
 
-      if (ConquestSemID == -1)
+        if (ConquestSemID == -1)
 	{
 #ifdef DEBUG_SEM
-	  utLog("semInit(): semget(GET): failed: %s",
-	       strerror(errno));
+            utLog("semInit(): semget(GET): failed: %s",
+                  strerror(errno));
 #endif
 
-	  fprintf(stderr, "semInit(): can't get semaphore: %s",
-		  strerror(errno));
+            fprintf(stderr, "semInit(): can't get semaphore: %s",
+                    strerror(errno));
 
-	  return(-1);
+            return(-1);
 	}
     }
 
-				/* hopefully we have an ID now.. */
+    /* hopefully we have an ID now.. */
 
 
 #if defined(DEBUG_FLOW) || defined(DEBUG_SEM)
-  utLog("semInit(): semget(GET): succeeded, semaphore ID is %d",
-       ConquestSemID);
+    utLog("semInit(): semget(GET): succeeded, semaphore ID is %d",
+          ConquestSemID);
 #endif
-  
-  return(TRUE);
+
+    return(TRUE);
 #endif  /* MINGW */
 }
 
@@ -95,262 +95,261 @@ int semInit(void)
 void Lock(int what)
 {
 #if !defined(MINGW)
-  static int Done;
+    static int Done;
 
-  if (ConquestSemID == -1)
-    return;			/* clients don't use sems... */
+    if (ConquestSemID == -1)
+        return;			/* clients don't use sems... */
 
 #ifdef DEBUG_SEM
-  utLog("Lock(%s): Attempting to aquire a lock.",
-       semGetName(what));
-  utLog("Lock(%s): %s", semGetName(what), semGetStatusStr());
+    utLog("Lock(%s): Attempting to aquire a lock.",
+          semGetName(what));
+    utLog("Lock(%s): %s", semGetName(what), semGetStatusStr());
 #endif
 
-  Done = FALSE;
-				/* Wait for sem to be zero, then inc */
-  semops[0].sem_num = (short)what;
-  semops[0].sem_op = 0;		/* test for 0, if so... */
-  semops[0].sem_flg = 0;
+    Done = FALSE;
+    /* Wait for sem to be zero, then inc */
+    semops[0].sem_num = (short)what;
+    semops[0].sem_op = 0;		/* test for 0, if so... */
+    semops[0].sem_flg = 0;
 
-				/* then increment it. */
-  semops[1].sem_num = (short)what;
-  semops[1].sem_op = 1;
-  semops[1].sem_flg = SEM_UNDO;	/* undo if we die unexpectedly */
-  
-                                /* block ALRM signals */
-  clbBlockAlarm();
+    /* then increment it. */
+    semops[1].sem_num = (short)what;
+    semops[1].sem_op = 1;
+    semops[1].sem_flg = SEM_UNDO;	/* undo if we die unexpectedly */
 
-  while (Done == FALSE)
+    /* block ALRM signals */
+    clbBlockAlarm();
+
+    while (Done == FALSE)
     {
-      if (semop(ConquestSemID, semops, 2) == -1)
-      {
-	if (errno != EINTR)
-	  {
-	    int err;
+        if (semop(ConquestSemID, semops, 2) == -1)
+        {
+            if (errno != EINTR)
+            {
+                int err;
 
-	    err = errno;
-	    utLog("Lock(%s): semop(): failed: %s",
-		 semGetName(what),
-		 strerror(err));
-	    fprintf(stderr, "Lock(%s): semop(): failed: %s\n",
-		 semGetName(what),
-		 strerror(err));
-	    
-	    exit(1);
-	  }
-	else
-	  {
-	    utLog("Lock(%s): semop(): interrupted. Retrying lock attempt.", semGetName(what));
-	  }
-      }
-      else			/* we got a successful lock */
-	Done = TRUE;
+                err = errno;
+                utLog("Lock(%s): semop(): failed: %s",
+                      semGetName(what),
+                      strerror(err));
+                fprintf(stderr, "Lock(%s): semop(): failed: %s\n",
+                        semGetName(what),
+                        strerror(err));
+
+                exit(1);
+            }
+            else
+            {
+                utLog("Lock(%s): semop(): interrupted. Retrying lock attempt.", semGetName(what));
+            }
+        }
+        else			/* we got a successful lock */
+            Done = TRUE;
     }
 
 #ifdef DEBUG_SEM
-  utLog("Lock(%s): semop(): succeeded, got a lock",
-       semGetName(what));
+    utLog("Lock(%s): semop(): succeeded, got a lock",
+          semGetName(what));
 #endif
 
 #endif  /* MINGW */
-  return;
+    return;
 }
 
 /* Unlock() - unlock part of the common block (dec a semaphore to 0) */
 void Unlock(int what)
 {
 #if !defined(MINGW)
-  int retval;
-  ushort semvals[25];
-  union semun {
-    int val;
-    struct semid_ds *buf;
-    ushort *array;
-  } arg;
+    int retval;
+    ushort semvals[25];
+    union semun {
+        int val;
+        struct semid_ds *buf;
+        ushort *array;
+    } arg;
 
-  if (ConquestSemID == -1)
-    return;			/* clients don't use sems... */
+    if (ConquestSemID == -1)
+        return;			/* clients don't use sems... */
 
 
 #ifdef DEBUG_SEM
-  utLog("Unlock(%s): Attempting to free a lock.",
-       semGetName(what));
-  utLog("Unlock(%s): %s", semGetName(what), semGetStatusStr());
+    utLog("Unlock(%s): Attempting to free a lock.",
+          semGetName(what));
+    utLog("Unlock(%s): %s", semGetName(what), semGetStatusStr());
 #endif
 
 
-  /* get the values of the semaphores */
-  arg.array = semvals;
-  retval = semctl(ConquestSemID, 0, GETALL, arg);
-  
-  if (retval != 0)
+    /* get the values of the semaphores */
+    arg.array = semvals;
+    retval = semctl(ConquestSemID, 0, GETALL, arg);
+
+    if (retval != 0)
     {				/* couldn't get semvals */
 #if !defined(CYGWIN)
-      utLog("Unlock(%s): semctl(GETALL) failed: %s",
-	   semGetName(what),
-	   strerror(errno));
+        utLog("Unlock(%s): semctl(GETALL) failed: %s",
+              semGetName(what),
+              strerror(errno));
 #endif
     }
-  else
+    else
     {				/* got semvals... */
 				/* check to see if already unlocked */
-      if (semvals[what] == 0)	/* sem already unlocked - report and continue */
+        if (semvals[what] == 0)	/* sem already unlocked - report and continue */
 	{
-	  utLog("Unlock(%s): semaphore already unlocked.",
-	       semGetName(what));
-	  
-          /* allow alarms again */
-          clbUnblockAlarm();
-	  return;
+            utLog("Unlock(%s): semaphore already unlocked.",
+                  semGetName(what));
+
+            /* allow alarms again */
+            clbUnblockAlarm();
+            return;
 	}
     }
 
 
-				/* Decrement to 0 */
-  semops[0].sem_num = (short)what;
-  semops[0].sem_op = -1;
-  semops[0].sem_flg = 0;
+    /* Decrement to 0 */
+    semops[0].sem_num = (short)what;
+    semops[0].sem_op = -1;
+    semops[0].sem_flg = 0;
 
 #ifdef DEBUG_SEM
-  int err = 0;
+    int err = 0;
 #endif
 
-  if (semop(ConquestSemID, semops, 1) == -1)
+    if (semop(ConquestSemID, semops, 1) == -1)
     {
-      if (errno != EINTR)
+        if (errno != EINTR)
 	{
-	  utLog("Unlock(%s): semop(): failed: %s",
-	       semGetName(what),
-	       strerror(errno));
-	  fprintf(stderr,"Unlock(%s): semop(): failed: %s",
-	       semGetName(what),
-	       strerror(errno));
-	  exit(1);
+            utLog("Unlock(%s): semop(): failed: %s",
+                  semGetName(what),
+                  strerror(errno));
+            fprintf(stderr,"Unlock(%s): semop(): failed: %s",
+                    semGetName(what),
+                    strerror(errno));
+            exit(1);
 	}
-      else
+        else
 	{
-	  utLog("Unlock(%s): semop(): interrupted. continuing...", semGetName(what));
+            utLog("Unlock(%s): semop(): interrupted. continuing...", semGetName(what));
 #ifdef DEBUG_SEM
-	  err = EINTR;
+            err = EINTR;
 #endif
 	}
     }
 
-				/* hopefully we got a lock */
+    /* hopefully we got a lock */
 #ifdef DEBUG_SEM
-  if (!err)
-    utLog("Unlock(%s): semop(): succeeded, removed lock",
-	 semGetName(what));
+    if (!err)
+        utLog("Unlock(%s): semop(): succeeded, removed lock",
+              semGetName(what));
 #endif
 
-  /* allow alarms again */
-  clbUnblockAlarm();
+    /* allow alarms again */
+    clbUnblockAlarm();
 
 #endif  /* MINGW */
-  return;
+    return;
 }
 
 
 char *semGetStatusStr(void)
 {
 #if defined(MINGW)
-  return "MINGW: no stats";
+    return "MINGW: no stats";
 #else
-  struct semid_ds SemDS;
-  ushort semvals[25];
-  static char buf[80];
-  static char stimebuffer[80];
-  static char wordtxt[80];
-  static char mesgtxt[80];
-  static char newtime[80];
-  time_t lastoptime;
-  int retval;
-  int lastcmnpid, cmnzcnt, lastmsgpid, msgzcnt;
-  union semun {
-    int val;
-    struct semid_ds *buf;
-    ushort *array;
-  } arg;
+    struct semid_ds SemDS;
+    ushort semvals[25];
+    static char buf[80];
+    static char stimebuffer[80];
+    static char wordtxt[80];
+    static char mesgtxt[80];
+    static char newtime[80];
+    time_t lastoptime;
+    int retval;
+    int lastcmnpid, cmnzcnt, lastmsgpid, msgzcnt;
+    union semun {
+        int val;
+        struct semid_ds *buf;
+        ushort *array;
+    } arg;
 
 #if defined(CYGWIN)
-  /* apparently not implemented */
-  lastcmnpid = 0;
-  cmnzcnt = 0;
-  lastmsgpid = 0;
-  msgzcnt = 0;
+    /* apparently not implemented */
+    lastcmnpid = 0;
+    cmnzcnt = 0;
+    lastmsgpid = 0;
+    msgzcnt = 0;
 #else /* !CYGWIN */
 
-  lastcmnpid = semctl(ConquestSemID, LOCKCMN, GETPID, arg);
-  cmnzcnt = semctl(ConquestSemID, LOCKCMN, GETZCNT, arg);
-  lastmsgpid = semctl(ConquestSemID, LOCKMSG, GETPID, arg);
-  msgzcnt = semctl(ConquestSemID, LOCKMSG, GETZCNT, arg);
+    lastcmnpid = semctl(ConquestSemID, LOCKCMN, GETPID, arg);
+    cmnzcnt = semctl(ConquestSemID, LOCKCMN, GETZCNT, arg);
+    lastmsgpid = semctl(ConquestSemID, LOCKMSG, GETPID, arg);
+    msgzcnt = semctl(ConquestSemID, LOCKMSG, GETZCNT, arg);
 #endif
 
- 
+
 #if defined(CYGWIN)
-  /* these do not appear to be implemented in cygwin */
-  lastoptime = 0;
-#else /* !CYGWIN */    
+    /* these do not appear to be implemented in cygwin */
+    lastoptime = 0;
+#else /* !CYGWIN */
 
-  /* get latest semop time  */
-  arg.buf = &SemDS;
-  retval = semctl(ConquestSemID, LOCKMSG, IPC_STAT, arg);
+    /* get latest semop time  */
+    arg.buf = &SemDS;
+    retval = semctl(ConquestSemID, LOCKMSG, IPC_STAT, arg);
 
-  if (retval != 0)
+    if (retval != 0)
     {
-      utLog("semGetStatusStr(): %s semctl(IPC_STAT) failed: %s",
-           semGetName(LOCKMSG),
-	   strerror(errno));
+        utLog("semGetStatusStr(): %s semctl(IPC_STAT) failed: %s",
+              semGetName(LOCKMSG),
+              strerror(errno));
     }
 
-  lastoptime = SemDS.sem_otime;
+    lastoptime = SemDS.sem_otime;
 
-  retval = semctl(ConquestSemID, LOCKCMN, IPC_STAT, arg);
+    retval = semctl(ConquestSemID, LOCKCMN, IPC_STAT, arg);
 
-  if (retval != 0)
+    if (retval != 0)
     {
-      utLog("semGetStatusStr(%d): %s semctl(IPC_STAT) failed: %s",
-           semGetName(LOCKCMN),
-	   strerror(errno));
+        utLog("semGetStatusStr(%d): %s semctl(IPC_STAT) failed: %s",
+              semGetName(LOCKCMN),
+              strerror(errno));
     }
 
-  lastoptime = max(lastoptime, SemDS.sem_otime);
+    lastoptime = max(lastoptime, SemDS.sem_otime);
 #endif
 
-  /* get the values of the semaphores */
-  arg.array = semvals;
-  retval = semctl(ConquestSemID, 0, GETALL, arg);
+    /* get the values of the semaphores */
+    arg.array = semvals;
+    retval = semctl(ConquestSemID, 0, GETALL, arg);
 
-  if (retval != 0)
+    if (retval != 0)
     {
-      utLog("semGetStatusStr(): semctl(GETALL) failed: %s",
-	   strerror(errno));
+        utLog("semGetStatusStr(): semctl(GETALL) failed: %s",
+              strerror(errno));
     }
 
 
-  snprintf(mesgtxt, 80 - 1, "%sMesgCnt = %d(%d:%d)", 
-           (semvals[LOCKMSG]) ? "*" : "",
-           ConqInfo->lockmesg, 
-           lastmsgpid, 
-           msgzcnt);
+    snprintf(mesgtxt, 80 - 1, "%sMesgCnt = %d(%d:%d)",
+             (semvals[LOCKMSG]) ? "*" : "",
+             ConqInfo->lockmesg,
+             lastmsgpid,
+             msgzcnt);
 
-  snprintf(wordtxt, 80 - 1, "%sCmnCnt = %d(%d:%d)", 
-           (semvals[LOCKCMN]) ? "*" : "",
-           ConqInfo->lockword, 
-           lastcmnpid, 
-           cmnzcnt);
+    snprintf(wordtxt, 80 - 1, "%sCmnCnt = %d(%d:%d)",
+             (semvals[LOCKCMN]) ? "*" : "",
+             ConqInfo->lockword,
+             lastcmnpid,
+             cmnzcnt);
 
-  strcpy(stimebuffer, ctime(&lastoptime));
-  strncpy(newtime, &stimebuffer[4], 15); /* get the interesting part */
+    strcpy(stimebuffer, ctime(&lastoptime));
+    strncpy(newtime, &stimebuffer[4], 15); /* get the interesting part */
 
-				/* now build the string */
+    /* now build the string */
 
-  snprintf(buf, 80 - 1, "%s %s Last: %s",
-	  mesgtxt,
-	  wordtxt,
-	  newtime);
+    snprintf(buf, 80 - 1, "%s %s Last: %s",
+             mesgtxt,
+             wordtxt,
+             newtime);
 
-  return(buf);
+    return(buf);
 #endif  /* MINGW */
 }
-

@@ -12,4 +12,3 @@
 #include "color.h"		/* instantiate externs here */
 
 /* everything handled by uiColorInit() and uiPutColor() */
-

@@ -31,315 +31,315 @@
    returns the error code from the ack, or error from write/read */
 int sendAuth(int sock, uint8_t flag, char *login, char *pw)
 {
-  char buf[PKT_MAXSIZE];
-  int rv;
-  cpAuthenticate_t cauth;
+    char buf[PKT_MAXSIZE];
+    int rv;
+    cpAuthenticate_t cauth;
 
-  memset((void *)&cauth, 0, sizeof(cauth));
+    memset((void *)&cauth, 0, sizeof(cauth));
 
-  cauth.type = CP_AUTHENTICATE;
-  cauth.flag = flag;
+    cauth.type = CP_AUTHENTICATE;
+    cauth.flag = flag;
 
-  if (login)
-    strncpy((char *)cauth.login, (char *)login, MAXUSERNAME - 1);
-  if (pw)
-    strncpy((char *)cauth.pw, (char *)pw, MAXUSERNAME - 1);
+    if (login)
+        strncpy((char *)cauth.login, (char *)login, MAXUSERNAME - 1);
+    if (pw)
+        strncpy((char *)cauth.pw, (char *)pw, MAXUSERNAME - 1);
 
 #if defined(DEBUG_CLIENTSEND)
-  utLog("sendAuth: LOGIN = '%s' PW = '%s'\n",
-       login, pw);
+    utLog("sendAuth: LOGIN = '%s' PW = '%s'\n",
+          login, pw);
 #endif
 
-  if ((rv = pktWrite(PKT_SENDTCP, &cauth)) <= 0)
+    if ((rv = pktWrite(PKT_SENDTCP, &cauth)) <= 0)
     {
-      utLog("sendAuth: pktWrite returned %d\n", rv);
-      return rv;
+        utLog("sendAuth: pktWrite returned %d\n", rv);
+        return rv;
     }
 
-  /* now look for an SP_ACK, if we're not changeing pw's */
+    /* now look for an SP_ACK, if we're not changeing pw's */
 
-  if (flag == CPAUTH_CHGPWD)
-    return PERR_OK;
+    if (flag == CPAUTH_CHGPWD)
+        return PERR_OK;
 
-  rv = pktWaitForPacket(SP_ACK, buf, PKT_MAXSIZE, 
-                        60, NULL);
+    rv = pktWaitForPacket(SP_ACK, buf, PKT_MAXSIZE,
+                          60, NULL);
 
-  if (rv <= 0)			/* error or timeout (0) */
+    if (rv <= 0)			/* error or timeout (0) */
     {
-      utLog("sendAuth: pktWaitForPacket = %d", rv);
-      return -1;
+        utLog("sendAuth: pktWaitForPacket = %d", rv);
+        return -1;
     }
 
-  PKT_PROCSP(buf);
+    PKT_PROCSP(buf);
 
-  /* now we should have our ACK... */
+    /* now we should have our ACK... */
 
-  return sAckMsg.code;
+    return sAckMsg.code;
 }
 
 int sendSetCourse(int sock, int8_t lock, real head)
 {
-  cpSetCourse_t csc;
+    cpSetCourse_t csc;
 
-  memset((void *)&csc, 0, sizeof(cpSetCourse_t));
+    memset((void *)&csc, 0, sizeof(cpSetCourse_t));
 
-  csc.type = CP_SETCOURSE;
-  csc.lock = lock;
-  csc.head = (uint16_t)htons((uint16_t)(head * 100.0));
+    csc.type = CP_SETCOURSE;
+    csc.lock = lock;
+    csc.head = (uint16_t)htons((uint16_t)(head * 100.0));
 
-  if (pktWrite(PKT_SENDTCP, &csc) <= 0)
-    return FALSE;
-  else
-    return TRUE;
+    if (pktWrite(PKT_SENDTCP, &csc) <= 0)
+        return FALSE;
+    else
+        return TRUE;
 }
 
 /* send a command to server to change name */
 int sendSetName(char *name)
 {
-  cpSetName_t sname;
+    cpSetName_t sname;
 
-  if (!name)
-    return FALSE;
+    if (!name)
+        return FALSE;
 
-  memset((void *)&sname, 0, sizeof(cpSetName_t));
-  sname.type = CP_SETNAME;
-  strncpy((char *)sname.alias, name, MAXUSERPNAME - 1);
+    memset((void *)&sname, 0, sizeof(cpSetName_t));
+    sname.type = CP_SETNAME;
+    strncpy((char *)sname.alias, name, MAXUSERPNAME - 1);
 
-  if (pktWrite(PKT_SENDTCP, &sname) <= 0)
-    return FALSE;
-  else 
-    return TRUE;
+    if (pktWrite(PKT_SENDTCP, &sname) <= 0)
+        return FALSE;
+    else
+        return TRUE;
 }
 
 int sendCommand(uint8_t cmd, uint16_t detail)
 {
-  cpCommand_t ccmd;
-  int socktype = PKT_SENDTCP;
-  memset((void *)&ccmd, 0, sizeof(cpCommand_t));
-  ccmd.type = CP_COMMAND;
-  ccmd.cmd = cmd;
-  ccmd.detail = htons(detail);
+    cpCommand_t ccmd;
+    int socktype = PKT_SENDTCP;
+    memset((void *)&ccmd, 0, sizeof(cpCommand_t));
+    ccmd.type = CP_COMMAND;
+    ccmd.cmd = cmd;
+    ccmd.detail = htons(detail);
 
-  /* send these via UDP if possible */
-  if (cmd == CPCMD_KEEPALIVE && cInfo.usock != -1)
-    socktype = PKT_SENDUDP;
+    /* send these via UDP if possible */
+    if (cmd == CPCMD_KEEPALIVE && cInfo.usock != -1)
+        socktype = PKT_SENDUDP;
 
-  if (pktWrite(socktype, &ccmd) <= 0)
-    return FALSE;
-  else 
-    return TRUE;
+    if (pktWrite(socktype, &ccmd) <= 0)
+        return FALSE;
+    else
+        return TRUE;
 }
 
 int sendFireTorps(int num, real dir)
 {
-  cpFireTorps_t ftorps;
+    cpFireTorps_t ftorps;
 
-  memset((void *)&ftorps, 0, sizeof(cpFireTorps_t));
+    memset((void *)&ftorps, 0, sizeof(cpFireTorps_t));
 
-  ftorps.type = CP_FIRETORPS;
-  ftorps.num = (uint8_t)num;
-  ftorps.dir = htons((uint16_t)(dir * 100.0));
+    ftorps.type = CP_FIRETORPS;
+    ftorps.num = (uint8_t)num;
+    ftorps.dir = htons((uint16_t)(dir * 100.0));
 
-  if (pktWrite(PKT_SENDTCP, &ftorps) <= 0)
-    return FALSE;
-  else 
-    return TRUE;
+    if (pktWrite(PKT_SENDTCP, &ftorps) <= 0)
+        return FALSE;
+    else
+        return TRUE;
 
 }
 
 /* send a message */
 int sendMessage(int to, char *msg)
 {
-  cpMessage_t cmsg;
+    cpMessage_t cmsg;
 
-  if (!msg)
-    return FALSE;
+    if (!msg)
+        return FALSE;
 
-  memset((void *)&cmsg, 0, sizeof(cpMessage_t));
-  cmsg.type = CP_MESSAGE;
-  cmsg.to = (int16_t)htons(to);
-  strncpy((char *)cmsg.msg, msg, MESSAGE_SIZE - 1);
+    memset((void *)&cmsg, 0, sizeof(cpMessage_t));
+    cmsg.type = CP_MESSAGE;
+    cmsg.to = (int16_t)htons(to);
+    strncpy((char *)cmsg.msg, msg, MESSAGE_SIZE - 1);
 
-  if (pktWrite(PKT_SENDTCP, &cmsg) <= 0)
-    return FALSE;
-  else 
-    return TRUE;
+    if (pktWrite(PKT_SENDTCP, &cmsg) <= 0)
+        return FALSE;
+    else
+        return TRUE;
 }
 
 int clientHello(char *clientname)
 {
-  cpHello_t chello;
-  char buf[PKT_MAXSIZE];
-  int pkttype;
-  extern char *ConquestVersion, *ConquestDate;
-  int rv;
-  struct timeval tv;
-  fd_set readfds;
+    cpHello_t chello;
+    char buf[PKT_MAXSIZE];
+    int pkttype;
+    extern char *ConquestVersion, *ConquestDate;
+    int rv;
+    struct timeval tv;
+    fd_set readfds;
 
-  /* there should be a server hello waiting for us */
-  if ((pkttype = pktRead(buf, PKT_MAXSIZE, 60)) < 0)
-  {
-    utLog("clientHello: read server hello failed\n");
-    return FALSE;
-  }
-
-  if (pkttype == 0)
-  {
-    utLog("clientHello: read server hello: timeout.\n");
-    return FALSE;
-  }
-
-  /* we only get this if there's problem (server denied access, usually) */
-  if (pkttype == SP_ACKMSG || pkttype == SP_ACK)
+    /* there should be a server hello waiting for us */
+    if ((pkttype = pktRead(buf, PKT_MAXSIZE, 60)) < 0)
     {
-      if (PKT_PROCSP(buf))
-        utLog("clientHello: %s '%s'",
-              pktSeverity2String(sAckMsg.severity),
-              sAckMsg.txt);
-
-      return FALSE;
+        utLog("clientHello: read server hello failed\n");
+        return FALSE;
     }
 
-  if (pkttype != SP_HELLO)
-  {
-    utLog("clientHello: read server hello: wrong packet type %d\n", pkttype);
-    return FALSE;
-  }
-
-  sHello = *(spHello_t *)buf;
-
-  /* fix up byte ordering */
-  sHello.protover = (uint16_t)ntohs(sHello.protover);
-  sHello.cmnrev = (uint32_t)ntohl(sHello.cmnrev);
-
-  sHello.servername[CONF_SERVER_NAME_SZ - 1] = 0;
-  sHello.serverver[CONF_SERVER_NAME_SZ - 1] = 0;
-  sHello.motd[CONF_SERVER_MOTD_SZ - 1] = 0;
-
-  utLog("SERVERID:%s:%s:0x%04hx:%d:0x%02x:%s",
-       sHello.servername,
-       sHello.serverver,
-       sHello.protover,
-       sHello.cmnrev,
-       sHello.flags,
-       sHello.motd);
-
-  if (cInfo.tryUDP)
+    if (pkttype == 0)
     {
-      if (connect(cInfo.usock, (const struct sockaddr *)&cInfo.servaddr, 
-                  sizeof(cInfo.servaddr)) < 0)
+        utLog("clientHello: read server hello: timeout.\n");
+        return FALSE;
+    }
+
+    /* we only get this if there's problem (server denied access, usually) */
+    if (pkttype == SP_ACKMSG || pkttype == SP_ACK)
+    {
+        if (PKT_PROCSP(buf))
+            utLog("clientHello: %s '%s'",
+                  pktSeverity2String(sAckMsg.severity),
+                  sAckMsg.txt);
+
+        return FALSE;
+    }
+
+    if (pkttype != SP_HELLO)
+    {
+        utLog("clientHello: read server hello: wrong packet type %d\n", pkttype);
+        return FALSE;
+    }
+
+    sHello = *(spHello_t *)buf;
+
+    /* fix up byte ordering */
+    sHello.protover = (uint16_t)ntohs(sHello.protover);
+    sHello.cmnrev = (uint32_t)ntohl(sHello.cmnrev);
+
+    sHello.servername[CONF_SERVER_NAME_SZ - 1] = 0;
+    sHello.serverver[CONF_SERVER_NAME_SZ - 1] = 0;
+    sHello.motd[CONF_SERVER_MOTD_SZ - 1] = 0;
+
+    utLog("SERVERID:%s:%s:0x%04hx:%d:0x%02x:%s",
+          sHello.servername,
+          sHello.serverver,
+          sHello.protover,
+          sHello.cmnrev,
+          sHello.flags,
+          sHello.motd);
+
+    if (cInfo.tryUDP)
+    {
+        if (connect(cInfo.usock, (const struct sockaddr *)&cInfo.servaddr,
+                    sizeof(cInfo.servaddr)) < 0)
         {
-          utLog("NET: clientHello: udp connect() failed: %s", strerror(errno));
-          cInfo.tryUDP = FALSE;
+            utLog("NET: clientHello: udp connect() failed: %s", strerror(errno));
+            cInfo.tryUDP = FALSE;
         }
-      else
+        else
         {
-          /* see if this will succeed in setting up a NAT tunnel
-             to the server */
-          utLog("NET: clientHello: send udp to server.");
-          send(cInfo.usock, "Open Me", 7, 0);
+            /* see if this will succeed in setting up a NAT tunnel
+               to the server */
+            utLog("NET: clientHello: send udp to server.");
+            send(cInfo.usock, "Open Me", 7, 0);
         }
     }
 
-  /* now send a client hello */
-  chello.type = CP_HELLO;
-  chello.updates = Context.updsec;
-  chello.protover = htons(PROTOCOL_VERSION);
-  chello.cmnrev = htonl(COMMONSTAMP);
+    /* now send a client hello */
+    chello.type = CP_HELLO;
+    chello.updates = Context.updsec;
+    chello.protover = htons(PROTOCOL_VERSION);
+    chello.cmnrev = htonl(COMMONSTAMP);
 
-  strncpy((char *)chello.clientname, clientname, CONF_SERVER_NAME_SZ);
-  strncpy((char *)chello.clientver, ConquestVersion, CONF_SERVER_NAME_SZ);
+    strncpy((char *)chello.clientname, clientname, CONF_SERVER_NAME_SZ);
+    strncpy((char *)chello.clientver, ConquestVersion, CONF_SERVER_NAME_SZ);
 
-  strcat((char *)chello.clientver, " ");
-  strncat((char *)chello.clientver, ConquestDate, 
-	  (CONF_SERVER_NAME_SZ - strlen(ConquestVersion)) - 2);
+    strcat((char *)chello.clientver, " ");
+    strncat((char *)chello.clientver, ConquestDate,
+            (CONF_SERVER_NAME_SZ - strlen(ConquestVersion)) - 2);
 
-  if (pktWrite(PKT_SENDTCP, &chello) <= 0)
+    if (pktWrite(PKT_SENDTCP, &chello) <= 0)
     {
-      utLog("clientHello: write client hello failed\n");
-      return FALSE;
+        utLog("clientHello: write client hello failed\n");
+        return FALSE;
     }
 
-  utLog("clientHello: sent hello to server");
+    utLog("clientHello: sent hello to server");
 
-  if (cInfo.tryUDP)
+    if (cInfo.tryUDP)
     {
-      /* see if we get an ack back from the server via udp */
-      /* this is kind of weak and probably needs more work.  As it is, the client needs
-         to receive a udp from the server within 5 seconds, or UDP will not be used.  If the
-         inbound packet gets lost.... Oh well. */
-      tv.tv_sec = 5;            /* 5 secs */
-      tv.tv_usec = 0;
-      FD_ZERO(&readfds);
-      FD_SET(cInfo.usock, &readfds);
-      if ((rv = select(cInfo.usock+1, &readfds, NULL, NULL, &tv)) <= 0)
+        /* see if we get an ack back from the server via udp */
+        /* this is kind of weak and probably needs more work.  As it is, the client needs
+           to receive a udp from the server within 5 seconds, or UDP will not be used.  If the
+           inbound packet gets lost.... Oh well. */
+        tv.tv_sec = 5;            /* 5 secs */
+        tv.tv_usec = 0;
+        FD_ZERO(&readfds);
+        FD_SET(cInfo.usock, &readfds);
+        if ((rv = select(cInfo.usock+1, &readfds, NULL, NULL, &tv)) <= 0)
         {
-          utLog("CLIENT: hello: select udp failed: %s", strerror(errno));
-          cInfo.tryUDP = FALSE;
+            utLog("CLIENT: hello: select udp failed: %s", strerror(errno));
+            cInfo.tryUDP = FALSE;
         }
-      else
+        else
         {
-          if (rv > 0 && FD_ISSET(cInfo.usock, &readfds))
+            if (rv > 0 && FD_ISSET(cInfo.usock, &readfds))
             {
-              if ((rv = udpRecv(cInfo.usock, buf, PKT_MAXSIZE, &cInfo.servaddr)) >= 0 )
+                if ((rv = udpRecv(cInfo.usock, buf, PKT_MAXSIZE, &cInfo.servaddr)) >= 0 )
                 {
-                  utLog("NET: got (%d) UDP bytes from server, will ACK for server UDP", rv);
-                  cInfo.doUDP = TRUE;
-                  pktSetSocketFds(PKT_SOCKFD_NOCHANGE, cInfo.usock);
+                    utLog("NET: got (%d) UDP bytes from server, will ACK for server UDP", rv);
+                    cInfo.doUDP = TRUE;
+                    pktSetSocketFds(PKT_SOCKFD_NOCHANGE, cInfo.usock);
                 }
             }
         }
     }
 
-  /* now we need a server stat or a Nak */
+    /* now we need a server stat or a Nak */
 
-  if ((pkttype = pktRead(buf, PKT_MAXSIZE, 60)) < 0)
-  {
-    utLog("clientHello: read of SP_ACK or SP_SERVERSTAT failed\n");
-    return FALSE;
-  }
-
-  if (pkttype == SP_ACKMSG || pkttype == SP_ACK)/* we only get this if problem */
+    if ((pkttype = pktRead(buf, PKT_MAXSIZE, 60)) < 0)
     {
-      if (PKT_PROCSP(buf))
-	{
-          utLog("clientHello: %s '%s'\n", 
-                pktSeverity2String(sAckMsg.severity), 
-                sAckMsg.txt);
-          printf("clientHello: %s '%s'\n", 
-                 pktSeverity2String(sAckMsg.severity), 
-                 sAckMsg.txt);
-          
-	}
-      return FALSE;
+        utLog("clientHello: read of SP_ACK or SP_SERVERSTAT failed\n");
+        return FALSE;
     }
 
-  if (pkttype == SP_SERVERSTAT)
+    if (pkttype == SP_ACKMSG || pkttype == SP_ACK)/* we only get this if problem */
     {
-      procServerStat(buf);
+        if (PKT_PROCSP(buf))
+	{
+            utLog("clientHello: %s '%s'\n",
+                  pktSeverity2String(sAckMsg.severity),
+                  sAckMsg.txt);
+            printf("clientHello: %s '%s'\n",
+                   pktSeverity2String(sAckMsg.severity),
+                   sAckMsg.txt);
+
+	}
+        return FALSE;
+    }
+
+    if (pkttype == SP_SERVERSTAT)
+    {
+        procServerStat(buf);
 # if defined(DEBUG_CLIENTPROC)
-      utLog("clientHello: recv SP_SERVERSTAT: ships = %d, na = %d, nv = %d, nr = %d\n"
-           " nu = %d flags = 0x%08x",
-	   sStat.numtotal,
-	   sStat.numactive,
-	   sStat.numvacant,
-	   sStat.numrobot,
-	   sStat.numusers,
-	   sStat.flags);
+        utLog("clientHello: recv SP_SERVERSTAT: ships = %d, na = %d, nv = %d, nr = %d\n"
+              " nu = %d flags = 0x%08x",
+              sStat.numtotal,
+              sStat.numactive,
+              sStat.numvacant,
+              sStat.numrobot,
+              sStat.numusers,
+              sStat.flags);
 #endif
     }
-  else
+    else
     {
-      utLog("clientHello: pkttype = %d, was waiting for SP_SERVERSTAT", pkttype);
-      return FALSE;
+        utLog("clientHello: pkttype = %d, was waiting for SP_SERVERSTAT", pkttype);
+        return FALSE;
     }
 
-  if (cInfo.doUDP)
-    pktSendAck(PSEV_INFO, PERR_DOUDP, NULL);
-  else
-    pktSendAck(PSEV_INFO, PERR_OK, NULL);
+    if (cInfo.doUDP)
+        pktSendAck(PSEV_INFO, PERR_DOUDP, NULL);
+    else
+        pktSendAck(PSEV_INFO, PERR_OK, NULL);
 
-  return TRUE;
+    return TRUE;
 }
 
 /* Some routers/firewalls seem to disconnect a UDP conncetion if there haven't
@@ -350,29 +350,29 @@ int clientHello(char *clientname)
  */
 void sendUDPKeepAlive(uint32_t timebase)
 {
-  static uint32_t katime = 0;     /* UDP keepalive packets */
-  static const uint32_t kawait = 30000;  /* ms (30 seconds) */
-  uint32_t iternow;
+    static uint32_t katime = 0;     /* UDP keepalive packets */
+    static const uint32_t kawait = 30000;  /* ms (30 seconds) */
+    uint32_t iternow;
 
-  if (!cInfo.doUDP)
-    return;                     /* no point */
+    if (!cInfo.doUDP)
+        return;                     /* no point */
 
-  if (timebase)                 /* don't query the clock */
-    iternow = timebase;
-  else
-    iternow = clbGetMillis();  
+    if (timebase)                 /* don't query the clock */
+        iternow = timebase;
+    else
+        iternow = clbGetMillis();
 
-  /* send a UDP keepalive packet if it's time */
-  if (((iternow - katime) > kawait) && cInfo.usock != -1)
+    /* send a UDP keepalive packet if it's time */
+    if (((iternow - katime) > kawait) && cInfo.usock != -1)
     {
 #if 0
-      utLog("%s: Sending CPCMD_KEEPALIVE\n", __FUNCTION__);
+        utLog("%s: Sending CPCMD_KEEPALIVE\n", __FUNCTION__);
 #endif
-      sendCommand(CPCMD_KEEPALIVE, 0);
-      katime = iternow;
+        sendCommand(CPCMD_KEEPALIVE, 0);
+        katime = iternow;
     }
 
-  return;
+    return;
 }
 
 /* this function accepts a character buffer representing a clientstat packet
@@ -380,39 +380,38 @@ void sendUDPKeepAlive(uint32_t timebase)
    packet if everything is in order, NULL otherwise. */
 spClientStat_t *chkClientStat(char *buf)
 {
-  static spClientStat_t scstat;
+    static spClientStat_t scstat;
 
-  if (!buf)
-    return NULL;
+    if (!buf)
+        return NULL;
 
-  scstat = *(spClientStat_t *)buf;
-  
-  scstat.unum = (uint16_t)ntohs(scstat.unum);
+    scstat = *(spClientStat_t *)buf;
 
-  if (scstat.unum >= MAXUSERS)
+    scstat.unum = (uint16_t)ntohs(scstat.unum);
+
+    if (scstat.unum >= MAXUSERS)
     {
 #if defined(DEBUG_PKT)
-      utLog("%s: unum not in valid range", __FUNCTION__);
+        utLog("%s: unum not in valid range", __FUNCTION__);
 #endif
-      return NULL;
+        return NULL;
     }
 
-  if (scstat.snum < 1 || scstat.snum > MAXSHIPS)
+    if (scstat.snum < 1 || scstat.snum > MAXSHIPS)
     {
 #if defined(DEBUG_PKT)
-      utLog("%s: snum not in valid range", __FUNCTION__);
+        utLog("%s: snum not in valid range", __FUNCTION__);
 #endif
-      return NULL;
+        return NULL;
     }
 
-  if (scstat.team >= NUMALLTEAMS)
+    if (scstat.team >= NUMALLTEAMS)
     {
 #if defined(DEBUG_PKT)
-      utLog("%s: team not in valid range", __FUNCTION__);
+        utLog("%s: team not in valid range", __FUNCTION__);
 #endif
-      return NULL;
+        return NULL;
     }
 
-  return &scstat;
+    return &scstat;
 }
-  

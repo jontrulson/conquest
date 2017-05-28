@@ -24,16 +24,16 @@
 #include "context.h"
 
 struct compile_options {
-  char *name;
-  char *oneliner;
-  int type;			/* We'll use the CTYPE_*'s from conf.h */
-  void *value;
+    char *name;
+    char *oneliner;
+    int type;			/* We'll use the CTYPE_*'s from conf.h */
+    void *value;
 };
 
 static void ChangeOption(struct Conf *cdata, int lin);
 static void ChangeMacro(int macronum);
 static void DisplayCompileOptions(void);
-static int ViewEditOptions(struct Conf ConfigData[], int ConfSize, 
+static int ViewEditOptions(struct Conf ConfigData[], int ConfSize,
 			   int editable);
 static int ViewEditMacros(struct Conf *ConfigData);
 static void DisplayHelpScreen(struct Conf *confitem);
@@ -49,97 +49,97 @@ static int ChangedSomething = FALSE;
 
 static void DisplayCompileOptions(void)
 {
-  const int settingcol = 60;
-  int i, vattrib;
-  long j = 0;
-  int lin = 0, col = 0;
-  static char *header = "Compile Time Options";
-  static char *prompt = MTXT_DONE;
+    const int settingcol = 60;
+    int i, vattrib;
+    long j = 0;
+    int lin = 0, col = 0;
+    static char *header = "Compile Time Options";
+    static char *prompt = MTXT_DONE;
 
-  static struct compile_options CompileOptions[] = 
-  {
-    {"HAVE_SETITIMER", "can do fastupdates (2 per sec)", CTYPE_BOOL, 
+    static struct compile_options CompileOptions[] =
+        {
+            {"HAVE_SETITIMER", "can do fastupdates (2 per sec)", CTYPE_BOOL,
 #ifdef HAVE_SETITIMER
-     (void *)TRUE
+             (void *)TRUE
 #else
-     (void *)FALSE
+             (void *)FALSE
 #endif /* HAVE_SETITIMER */
-    },
+            },
 
-    {"WARP0CLOAK", "can't be seen when cloaked at warp 0", CTYPE_BOOL,
+            {"WARP0CLOAK", "can't be seen when cloaked at warp 0", CTYPE_BOOL,
 #ifdef WARP0CLOAK
-     (void *)TRUE
+             (void *)TRUE
 #else
-     (void *)FALSE
+             (void *)FALSE
 #endif /* WARP0CLOAK */
-    },
+            },
 
-    {"DO_EXPLODING_SHIPS", "ships explode when they die", CTYPE_BOOL,
+            {"DO_EXPLODING_SHIPS", "ships explode when they die", CTYPE_BOOL,
 #ifdef DO_EXPLODING_SHIPS
-     (void *)TRUE
+             (void *)TRUE
 #else
-     (void *)FALSE
+             (void *)FALSE
 #endif /* DO_EXPLODING_SHIPS */
-    },
+            },
 
-				/* last (NULL) entry */
-    {NULL, NULL, CTYPE_NULL, (void *)NULL}
-  };
+            /* last (NULL) entry */
+            {NULL, NULL, CTYPE_NULL, (void *)NULL}
+        };
 
-  lin = 1;
-  col = ((int)(Context.maxcol - strlen(header)) / 2);
+    lin = 1;
+    col = ((int)(Context.maxcol - strlen(header)) / 2);
 
-  cprintf(lin, col, ALIGN_NONE, "#%d#%s", NoColor, header);
-  
-  lin += 3;
-  col = 2;
+    cprintf(lin, col, ALIGN_NONE, "#%d#%s", NoColor, header);
 
-  i = 0;
+    lin += 3;
+    col = 2;
 
-  while (CompileOptions[i].name != NULL)
+    i = 0;
+
+    while (CompileOptions[i].name != NULL)
     {				/* this won't handle more than one screen */
-      cprintf(lin, col, ALIGN_NONE, "#%d#%s#%d# - %s#%d#",
-	      NoColor, CompileOptions[i].name,
-	      InfoColor, CompileOptions[i].oneliner,
-	      NoColor);
-      
-				/* output the value */
-      switch(CompileOptions[i].type)
+        cprintf(lin, col, ALIGN_NONE, "#%d#%s#%d# - %s#%d#",
+                NoColor, CompileOptions[i].name,
+                InfoColor, CompileOptions[i].oneliner,
+                NoColor);
+
+        /* output the value */
+        switch(CompileOptions[i].type)
 	{
 	case CTYPE_BOOL:
-	  j = (long)CompileOptions[i].value;
+            j = (long)CompileOptions[i].value;
 
-	  if (j == (long)TRUE)
-	    vattrib = GreenLevelColor;
-	  else
-	    vattrib = RedLevelColor;
+            if (j == (long)TRUE)
+                vattrib = GreenLevelColor;
+            else
+                vattrib = RedLevelColor;
 
-	  cprintf(lin, settingcol, ALIGN_NONE, "#%d#%s#%d#",
-		  vattrib, (j == TRUE) ? "True" : "False",
-		  NoColor);
-	  lin++;
+            cprintf(lin, settingcol, ALIGN_NONE, "#%d#%s#%d#",
+                    vattrib, (j == TRUE) ? "True" : "False",
+                    NoColor);
+            lin++;
 
-	  break;
+            break;
 
 	case CTYPE_STRING:
-	  cprintf(lin, settingcol, ALIGN_NONE, "#%d#%s#%d#",
-		  InfoColor, (char *) CompileOptions[i].value,
-                  NoColor);
-	  lin++;
+            cprintf(lin, settingcol, ALIGN_NONE, "#%d#%s#%d#",
+                    InfoColor, (char *) CompileOptions[i].value,
+                    NoColor);
+            lin++;
 
-	  break;
+            break;
 	} /* switch */
 
-      i++;
+        i++;
     }
 
-  cdclrl( MSG_LIN1, 2  );
-  cdputc(prompt, MSG_LIN1);
-  
-  /* Get a char */
-  (void)iogchar();
+    cdclrl( MSG_LIN1, 2  );
+    cdputc(prompt, MSG_LIN1);
 
-return;
+    /* Get a char */
+    (void)iogchar();
+
+    return;
 }
 
 
@@ -151,64 +151,64 @@ return;
 
 void SysOptsMenu(void)
 {
-  static char *header = "System Options Menu";
-  static char *mopts[] = { 
-    "View compile-time Options",
-    "View/Edit System-wide Options"
-  };
-  const int numoptions = 2;	/* don't exceed 9 - one char input is used */
-  
-  static char *prompt = "Enter a number to select an item, any other key to quit.";
-  int lin = 0, col = 0;
+    static char *header = "System Options Menu";
+    static char *mopts[] = {
+        "View compile-time Options",
+        "View/Edit System-wide Options"
+    };
+    const int numoptions = 2;	/* don't exceed 9 - one char input is used */
 
-  int i;
-  int ch;
-  int Done = FALSE;
+    static char *prompt = "Enter a number to select an item, any other key to quit.";
+    int lin = 0, col = 0;
+
+    int i;
+    int ch;
+    int Done = FALSE;
 
 
-  while (Done == FALSE)
+    while (Done == FALSE)
     {
-				/* First clear the display. */
-      cdclear();
-      lin = 1;
-      col = ((int)(Context.maxcol - strlen(header))/ 2);
-      
-      cprintf(lin, col, ALIGN_NONE, "#%d#%s", NoColor, header);
-      
-      lin += 3;
-      col = 5;
-      
-      for (i = 0; i < numoptions; i++)
+        /* First clear the display. */
+        cdclear();
+        lin = 1;
+        col = ((int)(Context.maxcol - strlen(header))/ 2);
+
+        cprintf(lin, col, ALIGN_NONE, "#%d#%s", NoColor, header);
+
+        lin += 3;
+        col = 5;
+
+        for (i = 0; i < numoptions; i++)
 	{
-	  cprintf(lin, col, ALIGN_NONE, "#%d#%d.#%d# %s#%d#", InfoColor, 
-		  i + 1, LabelColor, mopts[i], NoColor);
-	  lin++;
+            cprintf(lin, col, ALIGN_NONE, "#%d#%d.#%d# %s#%d#", InfoColor,
+                    i + 1, LabelColor, mopts[i], NoColor);
+            lin++;
 	}
-      
-      cdclrl( MSG_LIN1, 2  );
-      cdputs(prompt, MSG_LIN1, 1);
-      
-      /* Get a char */
-      ch = iogchar();
-      
-      switch(ch)
+
+        cdclrl( MSG_LIN1, 2  );
+        cdputs(prompt, MSG_LIN1, 1);
+
+        /* Get a char */
+        ch = iogchar();
+
+        switch(ch)
 	{
 	case '1':			/* compile time options */
-	  DisplayCompileOptions();
-	  break;
+            DisplayCompileOptions();
+            break;
 	case '2':			/* sys-wide opts */
-	  ChangedSomething = FALSE;
-	  ViewEditOptions(SysConfData, SysCfEnd, TRUE);
-	  if (ChangedSomething == TRUE)
-	    SaveSysConfig();
-	  break;
+            ChangedSomething = FALSE;
+            ViewEditOptions(SysConfData, SysCfEnd, TRUE);
+            if (ChangedSomething == TRUE)
+                SaveSysConfig();
+            break;
 	default:
-	  Done = TRUE;
-	  break;
+            Done = TRUE;
+            break;
 	}
     }
 
-  return;
+    return;
 }
 
 /*************************************************************************
@@ -219,114 +219,114 @@ void SysOptsMenu(void)
 
 void UserOptsMenu(int unum)
 {
-  static char *header = "User Options Menu";
-  static char *mopts[] = { 
-    "View/Edit Options",
-    "View/Edit Macros",
-    "Change Password"
-  };
-  const int numoptions = 3;	/* don't exceed 9 - one char input is used */
-  static char *prompt = "Enter a number to select an item, any other key to quit.";
-  int lin = 0, col = 0;
-  int i;
-  int ch;
-  int Done = FALSE;
-  struct Conf *macroptr = NULL;	/* points to macro element of ConfData */
+    static char *header = "User Options Menu";
+    static char *mopts[] = {
+        "View/Edit Options",
+        "View/Edit Macros",
+        "Change Password"
+    };
+    const int numoptions = 3;	/* don't exceed 9 - one char input is used */
+    static char *prompt = "Enter a number to select an item, any other key to quit.";
+    int lin = 0, col = 0;
+    int i;
+    int ch;
+    int Done = FALSE;
+    struct Conf *macroptr = NULL;	/* points to macro element of ConfData */
 
-  for (i=0; i < CfEnd; i++)
+    for (i=0; i < CfEnd; i++)
     {
-      if (ConfData[i].ConfType == CTYPE_MACRO)
-	macroptr = &ConfData[i];
+        if (ConfData[i].ConfType == CTYPE_MACRO)
+            macroptr = &ConfData[i];
     }
 
-  if (macroptr == NULL)
+    if (macroptr == NULL)
     {				/* if this happens, something is
 				   seriously confused */
-      utLog("UserOptsMenu(): ERROR: macroptr == NULL, no CTYPE_MACRO found in ConfData");
+        utLog("UserOptsMenu(): ERROR: macroptr == NULL, no CTYPE_MACRO found in ConfData");
     }
 
-  while (Done == FALSE)
+    while (Done == FALSE)
     {
-				/* First clear the display. */
-      cdclear();
-      lin = 1;
-      col = ((Context.maxcol / 2) - (strlen(header) / 2));
-      
-      cprintf(lin, col, ALIGN_NONE, "#%d#%s", NoColor, header);
-      
-      lin += 3;
-      col = 5;
-      
-      for (i = 0; i < numoptions; i++)
+        /* First clear the display. */
+        cdclear();
+        lin = 1;
+        col = ((Context.maxcol / 2) - (strlen(header) / 2));
+
+        cprintf(lin, col, ALIGN_NONE, "#%d#%s", NoColor, header);
+
+        lin += 3;
+        col = 5;
+
+        for (i = 0; i < numoptions; i++)
 	{
-	  cprintf(lin, col, ALIGN_NONE, "#%d#%d.#%d# %s#%d#", InfoColor, 
-		  i + 1, LabelColor, mopts[i], NoColor);
-	  lin++;
+            cprintf(lin, col, ALIGN_NONE, "#%d#%d.#%d# %s#%d#", InfoColor,
+                    i + 1, LabelColor, mopts[i], NoColor);
+            lin++;
 	}
 
-      lin = 17;
-      cprintf(lin, col, ALIGN_NONE, "#%d#Server Name:   #%d# %s#%d#", 
-              LabelColor,
-              InfoColor, sHello.servername,
-              NoColor);
-      lin++;
-      cprintf(lin, col, ALIGN_NONE, "#%d#Server Version: #%d#%s#%d#", 
-              LabelColor,
-              InfoColor, sHello.serverver,
-              NoColor);
-      lin++;
-      cprintf(lin, col, ALIGN_NONE, "#%d#UDP:  #%d# %s#%d#", LabelColor,
-              InfoColor, (cInfo.doUDP) ? "On" : "Off",
-              NoColor);
+        lin = 17;
+        cprintf(lin, col, ALIGN_NONE, "#%d#Server Name:   #%d# %s#%d#",
+                LabelColor,
+                InfoColor, sHello.servername,
+                NoColor);
+        lin++;
+        cprintf(lin, col, ALIGN_NONE, "#%d#Server Version: #%d#%s#%d#",
+                LabelColor,
+                InfoColor, sHello.serverver,
+                NoColor);
+        lin++;
+        cprintf(lin, col, ALIGN_NONE, "#%d#UDP:  #%d# %s#%d#", LabelColor,
+                InfoColor, (cInfo.doUDP) ? "On" : "Off",
+                NoColor);
 
-      lin++;
-      cprintf(lin, col, ALIGN_NONE, "#%d#Flags:#%d# %s#%d#", LabelColor,
-              InfoColor, clntServerFlagsStr(sStat.flags),
-              NoColor);
-      
-      cdclrl( MSG_LIN1, 2  );
-      cdputs(prompt, MSG_LIN1, 1);
-      
-      /* Get a char */
-      ch = iogchar();
-      
-      switch(ch)
+        lin++;
+        cprintf(lin, col, ALIGN_NONE, "#%d#Flags:#%d# %s#%d#", LabelColor,
+                InfoColor, clntServerFlagsStr(sStat.flags),
+                NoColor);
+
+        cdclrl( MSG_LIN1, 2  );
+        cdputs(prompt, MSG_LIN1, 1);
+
+        /* Get a char */
+        ch = iogchar();
+
+        switch(ch)
 	{
 	case '1':			/* user opts */
-	  ChangedSomething = FALSE; 
-	  ViewEditOptions(ConfData, CfEnd, TRUE);
-				/* save and reload the config */
-	  if (ChangedSomething == TRUE)
+            ChangedSomething = FALSE;
+            ViewEditOptions(ConfData, CfEnd, TRUE);
+            /* save and reload the config */
+            if (ChangedSomething == TRUE)
 	    {
-	      SaveUserConfig();
-	      /* set new update rate */
-	      Context.updsec = UserConf.UpdatesPerSecond;
-	      sendCommand(CPCMD_SETRATE, Context.updsec);
+                SaveUserConfig();
+                /* set new update rate */
+                Context.updsec = UserConf.UpdatesPerSecond;
+                sendCommand(CPCMD_SETRATE, Context.updsec);
 	    }
-	  break;
+            break;
 
 	case '2':		/* macros */
-	  if (macroptr != NULL)
+            if (macroptr != NULL)
 	    {
-	      ChangedSomething = FALSE; 
-	      ViewEditMacros(macroptr);
-	      if (ChangedSomething == TRUE)
-		SaveUserConfig();
+                ChangedSomething = FALSE;
+                ViewEditMacros(macroptr);
+                if (ChangedSomething == TRUE)
+                    SaveUserConfig();
 	    }
 
-	  break;
+            break;
 
 	case '3':			/* chg passwd */
-	  ChangePassword(unum, FALSE);
-	  break;
+            ChangePassword(unum, FALSE);
+            break;
 
 	default:
-	  Done = TRUE;
-	  break;
+            Done = TRUE;
+            break;
 	}
     }
 
-  return;
+    return;
 }
 
 /*************************************************************************
@@ -338,66 +338,66 @@ void UserOptsMenu(int unum)
 static void ChangeOption(struct Conf *cdata, int lin)
 {
 #define CBUFLEN 1024
-  int j, rv;
-  char buf[CBUFLEN];
+    int j, rv;
+    char buf[CBUFLEN];
 
-  switch(cdata->ConfType)
+    switch(cdata->ConfType)
     {
     case CTYPE_BOOL:
-      j = *(int *)(cdata->ConfValue);
-      
-      if (j == TRUE)
-	j = FALSE;
-      else
-	j = TRUE;
+        j = *(int *)(cdata->ConfValue);
 
-      *(int *)(cdata->ConfValue) = j;
+        if (j == TRUE)
+            j = FALSE;
+        else
+            j = TRUE;
 
-				/* signal that something has been changed */
-      ChangedSomething = TRUE;
+        *(int *)(cdata->ConfValue) = j;
 
-      break;
+        /* signal that something has been changed */
+        ChangedSomething = TRUE;
 
-				/* these will need prompting on line 'lin' */
+        break;
+
+        /* these will need prompting on line 'lin' */
     case CTYPE_STRING:
-      if (cdata->max > CBUFLEN)
+        if (cdata->max > CBUFLEN)
 	{
-	  utLog("ChangeOption: conf data max exceeds local buffer size.");
-	  break;
+            utLog("ChangeOption: conf data max exceeds local buffer size.");
+            break;
 	}
-      cdclrl(lin, 1);
-      strncpy(buf, ((char *)cdata->ConfValue), CBUFLEN);
-      buf[CBUFLEN - 1] = 0;
-      rv = cdgets("Value: ", lin, 1, buf, cdata->max - 1);
+        cdclrl(lin, 1);
+        strncpy(buf, ((char *)cdata->ConfValue), CBUFLEN);
+        buf[CBUFLEN - 1] = 0;
+        rv = cdgets("Value: ", lin, 1, buf, cdata->max - 1);
 
-      if (rv != -1)
+        if (rv != -1)
 	{
-	  strncpy((char *)cdata->ConfValue, buf, cdata->max);
-	  ((char *)cdata->ConfValue)[cdata->max - 1] = 0;
-				/* signal that something has been changed */
-	  ChangedSomething = TRUE;
+            strncpy((char *)cdata->ConfValue, buf, cdata->max);
+            ((char *)cdata->ConfValue)[cdata->max - 1] = 0;
+            /* signal that something has been changed */
+            ChangedSomething = TRUE;
 	}
 
-      break;
-      
+        break;
+
     case CTYPE_NUMERIC:
-      cdclrl(lin, 1);
-      rv = cdgetn("Enter a number: ", lin, 1, &j);
+        cdclrl(lin, 1);
+        rv = cdgetn("Enter a number: ", lin, 1, &j);
 
-      if (rv != -1)
+        if (rv != -1)
 	{
-	  if (j >= cdata->min && j <= cdata->max)
+            if (j >= cdata->min && j <= cdata->max)
 	    {
-	      *(int *)(cdata->ConfValue) = j;
-	      /* signal that something has been changed */
-	      ChangedSomething = TRUE;
+                *(int *)(cdata->ConfValue) = j;
+                /* signal that something has been changed */
+                ChangedSomething = TRUE;
 	    }
 	}
 
-      break;
+        break;
     }
 
-  return;
+    return;
 }
 
 /*************************************************************************
@@ -408,33 +408,33 @@ static void ChangeOption(struct Conf *cdata, int lin)
 
 static void ChangeMacro(int macronum)
 {
-  int lin;
-  static char *prmpt2 = "Enter Conquest commands.  ([ENTER] = \\r, [TAB] = \\t)";
-  char buf[MAX_MACRO_LEN + 1];
-  char prmpt[BUFFER_SIZE];
-  int ch;
-  lin = MSG_LIN1;
-  
-  
+    int lin;
+    static char *prmpt2 = "Enter Conquest commands.  ([ENTER] = \\r, [TAB] = \\t)";
+    char buf[MAX_MACRO_LEN + 1];
+    char prmpt[BUFFER_SIZE];
+    int ch;
+    lin = MSG_LIN1;
 
-  cdclrl(lin, 2);
-  cdputs(prmpt2, MSG_LIN2, 1);
-  sprintf(prmpt, "f%2d = ", macronum);
 
-  strcpy(buf, Macro2Str(UserConf.MacrosF[macronum - 1]));
-  ch = cdgetx(prmpt, lin, 1, TERMS, buf, MAX_MACRO_LEN - 1, TRUE);
 
-  if (ch == TERM_ABORT)
+    cdclrl(lin, 2);
+    cdputs(prmpt2, MSG_LIN2, 1);
+    sprintf(prmpt, "f%2d = ", macronum);
+
+    strcpy(buf, Macro2Str(UserConf.MacrosF[macronum - 1]));
+    ch = cdgetx(prmpt, lin, 1, TERMS, buf, MAX_MACRO_LEN - 1, TRUE);
+
+    if (ch == TERM_ABORT)
     {
-      return;			/* if abort, cancel */
+        return;			/* if abort, cancel */
     }
-      
-  strncpy(UserConf.MacrosF[macronum - 1], Str2Macro(buf), MAX_MACRO_LEN);
-  UserConf.MacrosF[macronum - 1][MAX_MACRO_LEN - 1] = 0;
-  
-  ChangedSomething = TRUE;
 
-  return;
+    strncpy(UserConf.MacrosF[macronum - 1], Str2Macro(buf), MAX_MACRO_LEN);
+    UserConf.MacrosF[macronum - 1][MAX_MACRO_LEN - 1] = 0;
+
+    ChangedSomething = TRUE;
+
+    return;
 }
 
 
@@ -444,189 +444,189 @@ static void ChangeMacro(int macronum)
  *
  *************************************************************************/
 
-static int ViewEditOptions(struct Conf ConfigData[], int ConfSize, 
+static int ViewEditOptions(struct Conf ConfigData[], int ConfSize,
 			   int editable)
 {
-  int i, j, k;
-  static char *uheader = "User Configurable Options";
-  static char *sheader = "System-wide Configurable Options";
-  static char *header;
-  static char *eprompt = "Arrow keys to select an item, [SPACE] to change, any other key to quit.";
-  static char *vprompt = MTXT_DONE;
-  static char *eprompt2 = "Type '?' for help on an item.";
-  int Done = FALSE;
-  int ch;
-  int lin = 0, col = 0, flin, llin, clin;
-  const int settingcol = 65;
-  int vattrib;
+    int i, j, k;
+    static char *uheader = "User Configurable Options";
+    static char *sheader = "System-wide Configurable Options";
+    static char *header;
+    static char *eprompt = "Arrow keys to select an item, [SPACE] to change, any other key to quit.";
+    static char *vprompt = MTXT_DONE;
+    static char *eprompt2 = "Type '?' for help on an item.";
+    int Done = FALSE;
+    int ch;
+    int lin = 0, col = 0, flin, llin, clin;
+    const int settingcol = 65;
+    int vattrib;
 #define MAXOPTCOLS 128
-  int cvec[MAXOPTCOLS];		/* hopefully big enough */
-  int usingSysOpts;
+    int cvec[MAXOPTCOLS];		/* hopefully big enough */
+    int usingSysOpts;
 
-  usingSysOpts = ((ConfigData == SysConfData) ? TRUE : FALSE);
+    usingSysOpts = ((ConfigData == SysConfData) ? TRUE : FALSE);
 
-  if (usingSysOpts)
-    header = sheader;
-  else
-    header = uheader;
+    if (usingSysOpts)
+        header = sheader;
+    else
+        header = uheader;
 
-  cdclear();			/* First clear the display. */
+    cdclear();			/* First clear the display. */
 
-  flin = 4;			/* first option line */
+    flin = 4;			/* first option line */
 
 #ifdef DEBUG_OPTIONS
-  int maxllin = MSG_LIN1 - 2;	/* max last option line */
+    int maxllin = MSG_LIN1 - 2;	/* max last option line */
 #endif
 
-  llin = 0;			/* last option line */
-  clin = 0;			/* current option line (also idx into cvec) */
+    llin = 0;			/* last option line */
+    clin = 0;			/* current option line (also idx into cvec) */
 
 				/* clear out cvec */
 
-  for (i=0; i < MAXOPTCOLS; i++)
-    cvec[i] = -1;
+    for (i=0; i < MAXOPTCOLS; i++)
+        cvec[i] = -1;
 
-  while (Done == FALSE)
+    while (Done == FALSE)
     {
-      cdclrl( 1, MSG_LIN2);	/* clear screen area */
-      lin = 1;
-      col = ((int)(Context.maxcol - strlen(header))/ 2);
+        cdclrl( 1, MSG_LIN2);	/* clear screen area */
+        lin = 1;
+        col = ((int)(Context.maxcol - strlen(header))/ 2);
 
-      cprintf(lin, col, ALIGN_NONE, "#%d#%s", NoColor, header);
-      
-      lin = flin;
-      col = 1;
-      
-      i = 0;			/* start at index 0 */
-      k = 0;			/* init cvec */
+        cprintf(lin, col, ALIGN_NONE, "#%d#%s", NoColor, header);
 
-      while (i < ConfSize)
+        lin = flin;
+        col = 1;
+
+        i = 0;			/* start at index 0 */
+        k = 0;			/* init cvec */
+
+        while (i < ConfSize)
 	{
 #ifdef DEBUG_OPTIONS
-	  utLog("ViewEditOptions(): ConfSize = %d, i = %d, type = %d, %s", 
-	       ConfSize, i, ConfigData[i].ConfType,  
-	       ConfigData[i].OneLineDesc);	  
+            utLog("ViewEditOptions(): ConfSize = %d, i = %d, type = %d, %s",
+                  ConfSize, i, ConfigData[i].ConfType,
+                  ConfigData[i].OneLineDesc);
 #endif
-	  if (ConfigData[i].ConfType != CTYPE_STRING && 
-	      ConfigData[i].ConfType != CTYPE_BOOL &&
-	      ConfigData[i].ConfType != CTYPE_NUMERIC)
+            if (ConfigData[i].ConfType != CTYPE_STRING &&
+                ConfigData[i].ConfType != CTYPE_BOOL &&
+                ConfigData[i].ConfType != CTYPE_NUMERIC)
 	    {		/* skip special elements */
 #ifdef DEBUG_OPTIONS
-	      utLog("ViewEditOptions():\tSKIPPING");
+                utLog("ViewEditOptions():\tSKIPPING");
 #endif
-	      i++;
-	      continue;
+                i++;
+                continue;
 	    }
 
-	  cvec[k++] = i;
-	  
-	  cprintf(lin, col, ALIGN_NONE, "#%d#%s#%d#",
-		  InfoColor, ConfigData[i].OneLineDesc,
-		  NoColor);
+            cvec[k++] = i;
 
-	  switch(ConfigData[i].ConfType)
+            cprintf(lin, col, ALIGN_NONE, "#%d#%s#%d#",
+                    InfoColor, ConfigData[i].OneLineDesc,
+                    NoColor);
+
+            switch(ConfigData[i].ConfType)
 	    {
 	    case CTYPE_BOOL:
-	      j = *(int *)ConfigData[i].ConfValue;
-	      
-	      if (j == TRUE)
-		vattrib = GreenLevelColor;
-	      else
-		vattrib = RedLevelColor;
-	      
-	      cprintf(lin, settingcol, ALIGN_NONE, "#%d#%s#%d#",
-		      vattrib, (j == TRUE) ? "True" : "False",
-		      NoColor);
-	      break;
-	      
+                j = *(int *)ConfigData[i].ConfValue;
+
+                if (j == TRUE)
+                    vattrib = GreenLevelColor;
+                else
+                    vattrib = RedLevelColor;
+
+                cprintf(lin, settingcol, ALIGN_NONE, "#%d#%s#%d#",
+                        vattrib, (j == TRUE) ? "True" : "False",
+                        NoColor);
+                break;
+
 	    case CTYPE_STRING:
-	      cprintf(lin, settingcol, ALIGN_NONE, "#%d#%13s#%d#",
-		      InfoColor, (char *) ConfigData[i].ConfValue,
-		      NoColor);
-	      break;
+                cprintf(lin, settingcol, ALIGN_NONE, "#%d#%13s#%d#",
+                        InfoColor, (char *) ConfigData[i].ConfValue,
+                        NoColor);
+                break;
 
 	    case CTYPE_NUMERIC:
-	      j = *(int *)ConfigData[i].ConfValue;
-              cprintf(lin, settingcol, ALIGN_NONE, "#%d#%d#%d#",
-                      NoColor, j,
-                      NoColor);
-              break;
+                j = *(int *)ConfigData[i].ConfValue;
+                cprintf(lin, settingcol, ALIGN_NONE, "#%d#%d#%d#",
+                        NoColor, j,
+                        NoColor);
+                break;
 
 
 	    } /* switch */
-	  lin++;
-	  i++;
+            lin++;
+            i++;
 	}
 
-				/* now the editing phase */
-      llin = k - 1;
+        /* now the editing phase */
+        llin = k - 1;
 
 #ifdef DEBUG_OPTIONS
-utLog("ViewEditOptions(): maxllin = %d, llin = %d, k = %d", maxllin, llin, k);
+        utLog("ViewEditOptions(): maxllin = %d, llin = %d, k = %d", maxllin, llin, k);
 #endif
 
-      cdclrl( MSG_LIN1, 2  );
-      if (editable)
+        cdclrl( MSG_LIN1, 2  );
+        if (editable)
 	{
-	  cdputs(eprompt, MSG_LIN1, 1);
-	  cdputs(eprompt2, MSG_LIN2, 1);
-	  cdmove(flin + clin, 1); 
+            cdputs(eprompt, MSG_LIN1, 1);
+            cdputs(eprompt2, MSG_LIN2, 1);
+            cdmove(flin + clin, 1);
 	}
-      else
-	cdputc(vprompt, MSG_LIN1);
-      
-      /* Get a char */
-      ch = iogchar();
-      
-      if (!editable)
+        else
+            cdputc(vprompt, MSG_LIN1);
+
+        /* Get a char */
+        ch = iogchar();
+
+        if (!editable)
 	{
-	  Done = TRUE;
-	  break;		/* exit here after viewing */
+            Done = TRUE;
+            break;		/* exit here after viewing */
 	}
 
-      switch(ch)
+        switch(ch)
 	{
 	case KEY_UP:		/* up */
 	case KEY_LEFT:
 	case 'w':
 	case 'k':
-	  clin--;
-	  if (clin < 0)
+            clin--;
+            if (clin < 0)
 	    {
-	      clin = llin; 
+                clin = llin;
 	    }
-	  break;
+            break;
 
 	case KEY_DOWN:		/* down */
 	case KEY_RIGHT:
 	case 'x':
 	case 'j':
-	  clin++;
-	  if (clin > llin)
+            clin++;
+            if (clin > llin)
 	    {
-	      clin = 0; 
+                clin = 0;
 	    }
-	  break;
+            break;
 
 	case ' ':	/* change something */
-	  ChangeOption(&ConfigData[cvec[clin]], MSG_LIN1);
-	  break;
+            ChangeOption(&ConfigData[cvec[clin]], MSG_LIN1);
+            break;
 
 	case '?':
-	  DisplayHelpScreen(&ConfigData[cvec[clin]]);
-	  break;
+            DisplayHelpScreen(&ConfigData[cvec[clin]]);
+            break;
 
 	default:		/* everything else */
-	  Done = TRUE;
-	  break;
+            Done = TRUE;
+            break;
 	}
 
 #ifdef DEBUG_OPTIONS
-      utLog("ViewEditOptions():###\tllin = %d, clin = %d", llin, clin);
+        utLog("ViewEditOptions():###\tllin = %d, clin = %d", llin, clin);
 #endif
     }
 
-  return TRUE;
+    return TRUE;
 }
 
 /*************************************************************************
@@ -637,211 +637,211 @@ utLog("ViewEditOptions(): maxllin = %d, llin = %d, k = %d", maxllin, llin, k);
 
 static int ViewEditMacros(struct Conf *ConfigData)
 {
-  int i, k;
-  static char *header = "View/Edit Macros";
-  static char *header2fmt = "(Page %d of %d)";
-  static char headerbuf[BUFFER_SIZE];
-  static char header2buf[BUFFER_SIZE];
-  static char *nodef = "<Not Defined>";
-  static char *eprompt = "Arrow keys to select a macro, [SPACE] to change, any other key to quit.";
-  static char *eprompt2 = "Type '?' for help.";
-  int Done = FALSE;
-  int ch, vattrib;
-  char *dispmac;
-  int lin = 0, col = 0, flin, llin, clin, pages, curpage;
-  const int macros_per_page = 18;
-  char *macrovec[MAX_MACROS];
+    int i, k;
+    static char *header = "View/Edit Macros";
+    static char *header2fmt = "(Page %d of %d)";
+    static char headerbuf[BUFFER_SIZE];
+    static char header2buf[BUFFER_SIZE];
+    static char *nodef = "<Not Defined>";
+    static char *eprompt = "Arrow keys to select a macro, [SPACE] to change, any other key to quit.";
+    static char *eprompt2 = "Type '?' for help.";
+    int Done = FALSE;
+    int ch, vattrib;
+    char *dispmac;
+    int lin = 0, col = 0, flin, llin, clin, pages, curpage;
+    const int macros_per_page = 18;
+    char *macrovec[MAX_MACROS];
 
-				/* this is the number of required pages,
-				   though page accesses start at 0 */
-  if (MAX_MACROS >= macros_per_page)
+    /* this is the number of required pages,
+       though page accesses start at 0 */
+    if (MAX_MACROS >= macros_per_page)
     {
-      pages = MAX_MACROS / macros_per_page;
-      if ((MAX_MACROS % macros_per_page) != 0)
-	pages++;		/* for runoff */
+        pages = MAX_MACROS / macros_per_page;
+        if ((MAX_MACROS % macros_per_page) != 0)
+            pages++;		/* for runoff */
     }
-  else
-    pages = 1;
+    else
+        pages = 1;
 
 
-				/* init the macrovec array */
-  for (i=0; i < MAX_MACROS; i++)
-  {
-    macrovec[i] = (char *)(((char *)ConfigData->ConfValue)
-                                        + (i * MAX_MACRO_LEN));
-  }
-
-  curpage = 0;
-
-  cdclear();			/* First clear the display. */
-
-  flin = 4;			/* first macro line */
-  llin = 0;			/* last macro line on this page */
-  clin = 0;			/* current macro line */
-
-
-  while (Done == FALSE)
+    /* init the macrovec array */
+    for (i=0; i < MAX_MACROS; i++)
     {
-      sprintf(header2buf, header2fmt, curpage + 1, pages);
-      sprintf(headerbuf, "%s %s", header, header2buf);
+        macrovec[i] = (char *)(((char *)ConfigData->ConfValue)
+                               + (i * MAX_MACRO_LEN));
+    }
 
-      cdclrl( 1, MSG_LIN2);	/* clear screen area */
-      lin = 1;
-      col = ((int)(Context.maxcol - strlen(headerbuf)) / 2);
+    curpage = 0;
 
-      cprintf(lin, col, ALIGN_NONE, "#%d#%s", NoColor, headerbuf);
-      
-      lin = flin;
-      col = 1;
-      
-      i = 0;			/* start at index 0 */
+    cdclear();			/* First clear the display. */
+
+    flin = 4;			/* first macro line */
+    llin = 0;			/* last macro line on this page */
+    clin = 0;			/* current macro line */
+
+
+    while (Done == FALSE)
+    {
+        sprintf(header2buf, header2fmt, curpage + 1, pages);
+        sprintf(headerbuf, "%s %s", header, header2buf);
+
+        cdclrl( 1, MSG_LIN2);	/* clear screen area */
+        lin = 1;
+        col = ((int)(Context.maxcol - strlen(headerbuf)) / 2);
+
+        cprintf(lin, col, ALIGN_NONE, "#%d#%s", NoColor, headerbuf);
+
+        lin = flin;
+        col = 1;
+
+        i = 0;			/* start at index 0 */
 
 				/* figure out the last editable line on
 				   this page */
 
-      if (curpage == (pages - 1)) /* last page - might be less than full */
-	llin = (MAX_MACROS % macros_per_page);	/* ..or more than empty? ;-) */
-      else
-	llin = macros_per_page;
+        if (curpage == (pages - 1)) /* last page - might be less than full */
+            llin = (MAX_MACROS % macros_per_page);	/* ..or more than empty? ;-) */
+        else
+            llin = macros_per_page;
 
-      i = 0;
-      while (i < llin)
+        i = 0;
+        while (i < llin)
 	{			/* display this page */
 				/* get the macro number for this line */
-	  k = (curpage * macros_per_page) + i; 
+            k = (curpage * macros_per_page) + i;
 
-	  if (macrovec[k][0] == 0)
+            if (macrovec[k][0] == 0)
 	    {			/* not defined */
-	      dispmac = nodef;
-	      vattrib = RedLevelColor;
+                dispmac = nodef;
+                vattrib = RedLevelColor;
 	    }
-	  else
+            else
 	    {
-	      dispmac = Macro2Str(macrovec[k]);
-	      vattrib = GreenLevelColor;
+                dispmac = Macro2Str(macrovec[k]);
+                vattrib = GreenLevelColor;
 	    }
 
 #ifdef DEBUG_OPTIONS
-	  utLog("ViewEditMacros(): k = %d, dispmac = '%s'", 
-	       k, 
-	       dispmac);
+            utLog("ViewEditMacros(): k = %d, dispmac = '%s'",
+                  k,
+                  dispmac);
 #endif
 
-	  cprintf(lin, col, ALIGN_NONE, "#%d#f%2d = #%d#%s#%d#",
-		  InfoColor, k + 1, vattrib, 
-		  dispmac,
-		  NoColor);
+            cprintf(lin, col, ALIGN_NONE, "#%d#f%2d = #%d#%s#%d#",
+                    InfoColor, k + 1, vattrib,
+                    dispmac,
+                    NoColor);
 
-	  lin++;
-	  i++;
+            lin++;
+            i++;
 	}
 
-				/* now the editing phase */
-      cdclrl( MSG_LIN1, 2  );
-      cdputs(eprompt, MSG_LIN1, 1);
-      cdputs(eprompt2, MSG_LIN2, 1);
+        /* now the editing phase */
+        cdclrl( MSG_LIN1, 2  );
+        cdputs(eprompt, MSG_LIN1, 1);
+        cdputs(eprompt2, MSG_LIN2, 1);
 
-      if (clin >= llin)
-	clin = llin - 1;
+        if (clin >= llin)
+            clin = llin - 1;
 
-      cdmove(flin + clin, 1); 
-      
-      /* Get a char */
-      ch = iogchar();
-      
+        cdmove(flin + clin, 1);
 
-      switch(ch)
+        /* Get a char */
+        ch = iogchar();
+
+
+        switch(ch)
 	{
 	case KEY_UP:		/* up */
 	case KEY_LEFT:
 	case 'w':
 	case 'k':
-	  clin--;
-	  if (clin < 0)
+            clin--;
+            if (clin < 0)
 	    {
-	      if (pages != 1)
+                if (pages != 1)
 		{
-		  curpage--;
-		  if (curpage < 0)
+                    curpage--;
+                    if (curpage < 0)
 		    {
-		      curpage = pages - 1;
+                        curpage = pages - 1;
 		    }
 		}
 
-				/* setup llin  for current page */
-	      if (curpage == (pages - 1)) 
-		llin = (MAX_MACROS % macros_per_page);
-	      else
-		llin = macros_per_page;
+                /* setup llin  for current page */
+                if (curpage == (pages - 1))
+                    llin = (MAX_MACROS % macros_per_page);
+                else
+                    llin = macros_per_page;
 
-	      clin = llin - 1; 
+                clin = llin - 1;
 	    }
-	  break;
+            break;
 
 	case KEY_DOWN:		/* down */
 	case KEY_RIGHT:
 	case 'x':
 	case 'j':
-	  clin++;
-	  if (clin >= llin)
+            clin++;
+            if (clin >= llin)
 	    {
-	      if (pages != 1)
+                if (pages != 1)
 		{
-		  curpage++;
-		  if (curpage >= pages)
+                    curpage++;
+                    if (curpage >= pages)
 		    {
-		      curpage = 0;
+                        curpage = 0;
 		    }
 		}
-	      
-	      clin = 0; 
+
+                clin = 0;
 	    }
-	  break;
+            break;
 
 	case KEY_PPAGE:		/* prev page */
-	  if (pages != 1)
+            if (pages != 1)
 	    {
-	      curpage--;
-	      if (curpage < 0)
+                curpage--;
+                if (curpage < 0)
 		{
-		  curpage = pages - 1;
+                    curpage = pages - 1;
 		}
 	    }
 
-	  break;
+            break;
 
 	case KEY_NPAGE:		/* next page */
-	  if (pages != 1)
+            if (pages != 1)
 	    {
-	      curpage++;
-	      if (curpage >= pages)
+                curpage++;
+                if (curpage >= pages)
 		{
-		  curpage = 0;
+                    curpage = 0;
 		}
 	    }
 
-	  break;
+            break;
 
 	case ' ':	/* change something */
-	  ChangeMacro((curpage * macros_per_page) + clin + 1);
-	  break;
+            ChangeMacro((curpage * macros_per_page) + clin + 1);
+            break;
 
 	case '?':
-	  DisplayHelpScreen(ConfigData); /* macro */
-	  break;
+            DisplayHelpScreen(ConfigData); /* macro */
+            break;
 
 	default:		/* everything else */
-	  Done = TRUE;
-	  break;
+            Done = TRUE;
+            break;
 	}
 
 #ifdef DEBUG_OPTIONS
-      utLog("ViewEditMacros():###\tllin = %d, clin = %d, curpage = %d", 
-	   llin, clin, curpage);
+        utLog("ViewEditMacros():###\tllin = %d, clin = %d, curpage = %d",
+              llin, clin, curpage);
 #endif
     }
 
-  return TRUE;
+    return TRUE;
 }
 
 /* DisplayHelpScreen() - display a help (actually the conf item comment)
@@ -849,37 +849,37 @@ static int ViewEditMacros(struct Conf *ConfigData)
  */
 static void DisplayHelpScreen(struct Conf *confitem)
 {
-  int i, col, lin;
+    int i, col, lin;
 
-  cdclear();
+    cdclear();
 
-  lin = 1;
-  col = 0;
+    lin = 1;
+    col = 0;
 
-  cprintf(lin, col, ALIGN_CENTER, "#%d#%s#%d#", 
-	  NoColor, confitem->OneLineDesc, NoColor);
+    cprintf(lin, col, ALIGN_CENTER, "#%d#%s#%d#",
+            NoColor, confitem->OneLineDesc, NoColor);
 
-  lin += 2;
+    lin += 2;
 
-  i = 0;
-  uiPutColor(InfoColor);
+    i = 0;
+    uiPutColor(InfoColor);
 
-  while (confitem->ConfComment[i] != NULL)
+    while (confitem->ConfComment[i] != NULL)
     {
-      if (confitem->ConfComment[i][0] != 0)
+        if (confitem->ConfComment[i][0] != 0)
 	{
-	  cdputs(&(confitem->ConfComment[i][1]), lin, col);
-	  lin++;
+            cdputs(&(confitem->ConfComment[i][1]), lin, col);
+            lin++;
 	}
-      i++;
+        i++;
     }
 
-  uiPutColor(NoColor);
-  cdclrl( MSG_LIN1, 2  );
-  cdputc(MTXT_DONE, MSG_LIN2);
+    uiPutColor(NoColor);
+    cdclrl( MSG_LIN1, 2  );
+    cdputc(MTXT_DONE, MSG_LIN2);
 
-  /* Get a char */
-  (void)iogchar();
+    /* Get a char */
+    (void)iogchar();
 
-  return;
+    return;
 }

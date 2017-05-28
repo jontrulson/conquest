@@ -36,16 +36,16 @@ static int echo2stderr = FALSE;  /* whether to echo utLog to stderr */
 /*    These formulas works for de-acceleration only. */
 real utAccurateDist( real curvel, real newvel, real acc )
 {
-  real t;
-  /*    The following is a box approximation that takes into account */
-  /*    the way the driver moves ships and so gives the *exact* distance. */
-  /*    v = curvel - newvel */
-  /*    n = v / ( ITER_SECONDS * acc ) + 1.0 */
-  /*    d = ( n * ITER_SECONDS + ( v / 2.0 + newvel ) * MM_PER_SEC_PER_WARP ) */
-  /*    A "faster", but less accurate formula (when compared to the */
-  /*    way the driver moves ships) is as follows: */
-  t = ( curvel - newvel ) / acc;
-  return ( ( curvel * t - 0.5 * acc * t * t ) * MM_PER_SEC_PER_WARP );
+    real t;
+    /*    The following is a box approximation that takes into account */
+    /*    the way the driver moves ships and so gives the *exact* distance. */
+    /*    v = curvel - newvel */
+    /*    n = v / ( ITER_SECONDS * acc ) + 1.0 */
+    /*    d = ( n * ITER_SECONDS + ( v / 2.0 + newvel ) * MM_PER_SEC_PER_WARP ) */
+    /*    A "faster", but less accurate formula (when compared to the */
+    /*    way the driver moves ships) is as follows: */
+    t = ( curvel - newvel ) / acc;
+    return ( ( curvel * t - 0.5 * acc * t * t ) * MM_PER_SEC_PER_WARP );
 
 }
 
@@ -56,10 +56,10 @@ real utAccurateDist( real curvel, real newvel, real acc )
 /*    ang = utAngle( fromx, fromy, tox, toy ) */
 real utAngle( real fromx, real fromy, real tox, real toy )
 {
-  if ( fromx == tox && fromy == toy )
-    return ( 0.0 );
+    if ( fromx == tox && fromy == toy )
+        return ( 0.0 );
 
-  return ( utMod360( rtod( atan2( toy - fromy, tox - fromx ) ) ) );
+    return ( utMod360( rtod( atan2( toy - fromy, tox - fromx ) ) ) );
 
 }
 
@@ -71,13 +71,13 @@ real utAngle( real fromx, real fromy, real tox, real toy )
 /*    utAppendInt( i, str ) */
 void utAppendInt( int i, char *str )
 {
-  char buf[BUFFER_SIZE];
+    char buf[BUFFER_SIZE];
 
-  buf[0] = 0;
-  sprintf(buf, "%d", i);
-  appstr( buf, str );
+    buf[0] = 0;
+    sprintf(buf, "%d", i);
+    appstr( buf, str );
 
-  return;
+    return;
 
 }
 
@@ -90,46 +90,46 @@ void utAppendInt( int i, char *str )
 void utAppendKilledBy( int kb, char *buf )
 {
 
-  switch ( kb )
+    switch ( kb )
     {
     case KB_SELF:
-      appstr( "self", buf );
-      break;
+        appstr( "self", buf );
+        break;
     case KB_NEGENB:
-      appstr( "negenb", buf );
-      break;
+        appstr( "negenb", buf );
+        break;
     case KB_CONQUER:
-      appstr( "conquer", buf );
-      break;
+        appstr( "conquer", buf );
+        break;
     case KB_NEWGAME:
-      appstr( "newgame", buf );
-      break;
+        appstr( "newgame", buf );
+        break;
     case KB_EVICT:
-      appstr( "evict", buf );
-      break;
+        appstr( "evict", buf );
+        break;
     case KB_SHIT:
-      appstr( "shit", buf );
-      break;
+        appstr( "shit", buf );
+        break;
     case KB_DOOMSDAY:
-      appstr( "doomsday", buf );
-      break;
+        appstr( "doomsday", buf );
+        break;
     case KB_GOTDOOMSDAY:
-      appstr( "gotdoomsday", buf );
-      break;
+        appstr( "gotdoomsday", buf );
+        break;
     case KB_GOD:
-      appstr( "GOD", buf );
-      break;
+        appstr( "GOD", buf );
+        break;
     default:
-      if ( kb > 0 && kb <= MAXSHIPS )
-	utAppendShip( kb, buf );
-      else if ( -kb > 0 && -kb <= NUMPLANETS )
-	appstr( Planets[-kb].name, buf );
-      else
-	utAppendInt( kb, buf );
-      break;
+        if ( kb > 0 && kb <= MAXSHIPS )
+            utAppendShip( kb, buf );
+        else if ( -kb > 0 && -kb <= NUMPLANETS )
+            appstr( Planets[-kb].name, buf );
+        else
+            utAppendInt( kb, buf );
+        break;
     }
 
-  return;
+    return;
 
 }
 
@@ -140,21 +140,21 @@ void utAppendKilledBy( int kb, char *buf )
 /*    utAppendShip( snum, str ) */
 void utAppendShip( int snum, char *str )
 {
-  int i;
-  char ch;
+    int i;
+    char ch;
 
-  ch = 'S';
-  if ( snum > 0 && snum <= MAXSHIPS )
+    ch = 'S';
+    if ( snum > 0 && snum <= MAXSHIPS )
     {
-      i = Ships[snum].team;
-      if ( i >= 0 && i < NUMPLAYERTEAMS )
-	ch = Teams[i].teamchar;
+        i = Ships[snum].team;
+        if ( i >= 0 && i < NUMPLAYERTEAMS )
+            ch = Teams[i].teamchar;
     }
 
-  appchr( ch, str );
-  utAppendInt( snum, str );
+    appchr( ch, str );
+    utAppendInt( snum, str );
 
-  return;
+    return;
 }
 
 
@@ -165,31 +165,31 @@ void utAppendShip( int snum, char *str )
 /*    utAppendShipStatus( status, buf ) */
 void utAppendShipStatus( int status, char *buf )
 {
-  switch ( status )
+    switch ( status )
     {
     case SS_OFF:
-      appstr( "off", buf );
-      break;
+        appstr( "off", buf );
+        break;
     case SS_ENTERING:
-      appstr( "entering", buf );
-      break;
+        appstr( "entering", buf );
+        break;
     case SS_LIVE:
-      appstr( "live", buf );
-      break;
+        appstr( "live", buf );
+        break;
     case SS_DYING:
-      appstr( "dying", buf );
-      break;
+        appstr( "dying", buf );
+        break;
     case SS_DEAD:
-      appstr( "dead", buf );
-      break;
+        appstr( "dead", buf );
+        break;
     case SS_RESERVED:
-      appstr( "reserved", buf );
-      break;
+        appstr( "reserved", buf );
+        break;
     default:
-      utAppendInt( status, buf );
-      break;
+        utAppendInt( status, buf );
+        break;
     }
-  return;
+    return;
 
 }
 
@@ -201,23 +201,23 @@ void utAppendShipStatus( int status, char *buf )
 /*    utAppendTitle( team, buf ) */
 void utAppendTitle( int team, char *buf )
 {
-  switch ( team )
+    switch ( team )
     {
     case TEAM_FEDERATION:
-      appstr( "Captain", buf );
-      break;
+        appstr( "Captain", buf );
+        break;
     case TEAM_ROMULAN:
-      appstr( "Centurion", buf );
-      break;
+        appstr( "Centurion", buf );
+        break;
     case TEAM_ORION:
-      appstr( "Commander", buf );
-      break;
+        appstr( "Commander", buf );
+        break;
     case TEAM_KLINGON:
-      appstr( "Kommander", buf );
-      break;
+        appstr( "Kommander", buf );
+        break;
     }
 
-  return;
+    return;
 
 }
 
@@ -225,202 +225,202 @@ void utAppendTitle( int team, char *buf )
 /*  utArrowsToDir - interpret arrow keys */
 int utArrowsToDir( char *str, real *dir )
 {
-  int i, n;
-  real thedir, ndir, ndir1, ndir2;
-  // the '*' is a placeholder for not found/invalid (0)
-  const char *arrs="*dewqazxc";
+    int i, n;
+    real thedir, ndir, ndir1, ndir2;
+    // the '*' is a placeholder for not found/invalid (0)
+    const char *arrs="*dewqazxc";
 
-  /* Special hack preventing "ea" and "da" from being recognized as arrows. */
-  /* "ea" is reserved for Earth and "da" for Dakel. */
-  if ( (char)tolower(str[0]) == 'e' && (char)tolower(str[1]) == 'a' )
-    return ( FALSE );
-  if ( (char)tolower(str[0]) == 'd' && (char)tolower(str[1]) == 'a' )
-    return ( FALSE );
+    /* Special hack preventing "ea" and "da" from being recognized as arrows. */
+    /* "ea" is reserved for Earth and "da" for Dakel. */
+    if ( (char)tolower(str[0]) == 'e' && (char)tolower(str[1]) == 'a' )
+        return ( FALSE );
+    if ( (char)tolower(str[0]) == 'd' && (char)tolower(str[1]) == 'a' )
+        return ( FALSE );
 
-  thedir = 0.0;
+    thedir = 0.0;
 
-  for ( i = 0; str[i] != 0; i = i + 1 )
+    for ( i = 0; str[i] != 0; i = i + 1 )
     {
-      int idx = 0;
+        int idx = 0;
 
-      // look for the 'arrow' in the string and return it's index
-      const char *s = arrs;
-      while (*s)
+        // look for the 'arrow' in the string and return it's index
+        const char *s = arrs;
+        while (*s)
         {
-          if (*s == tolower(str[i]))
-            break;
-          s++;
-          idx++;
+            if (*s == tolower(str[i]))
+                break;
+            s++;
+            idx++;
         }
 
-      if (!idx)
-	return ( FALSE );
+        if (!idx)
+            return ( FALSE );
 
-      ndir1 = (real)(idx - 1) * 45.0;
-      ndir2 = (real)ndir1 - 360.0;
+        ndir1 = (real)(idx - 1) * 45.0;
+        ndir2 = (real)ndir1 - 360.0;
 
-      if ( (real)fabs( thedir - ndir1 ) < (real)fabs( thedir - ndir2 ) )
-	ndir = ndir1;
-      else
-	ndir = ndir2;
+        if ( (real)fabs( thedir - ndir1 ) < (real)fabs( thedir - ndir2 ) )
+            ndir = ndir1;
+        else
+            ndir = ndir2;
 
-      n = i + 1;
-      thedir = (((thedir*((real)n - 1)) + ndir ) / (real)n);
+        n = i + 1;
+        thedir = (((thedir*((real)n - 1)) + ndir ) / (real)n);
     }
 
 
-  *dir = utMod360( thedir );
+    *dir = utMod360( thedir );
 
-  return ( TRUE );
+    return ( TRUE );
 
 }
 
 void utSetLogConfig(int usesys, int echostderr)
 {
-  if (usesys)
+    if (usesys)
     {
-      systemlog = TRUE;
-      echo2stderr = FALSE;
+        systemlog = TRUE;
+        echo2stderr = FALSE;
     }
-  else
+    else
     {
-      systemlog = FALSE;
-      echo2stderr = echostderr;
+        systemlog = FALSE;
+        echo2stderr = echostderr;
     }
 
-  return;
+    return;
 }
 
 
 /*  utError - conquest error message to god */
 void utError(char *fmt, ...)
 {
-  va_list ap;
-  char buf[BIG_BUFFER_SIZE];
+    va_list ap;
+    char buf[BIG_BUFFER_SIZE];
 
-  va_start(ap, fmt);
-  (void)vsnprintf(buf, sizeof(buf) - 1, fmt, ap);
+    va_start(ap, fmt);
+    (void)vsnprintf(buf, sizeof(buf) - 1, fmt, ap);
 
-  va_end(ap);
+    va_end(ap);
 
-  clbStoreMsg( MSG_OUTSIDE, MSG_GOD, buf );
+    clbStoreMsg( MSG_OUTSIDE, MSG_GOD, buf );
 
-  return;
+    return;
 
 }
 
 void utLog(char *fmt, ...)
 {
-  va_list ap;
-  static int nowarn = FALSE;     /* if set, ignore logging */
-  static char buf[BIG_BUFFER_SIZE];
-  static char errfile[MID_BUFFER_SIZE];
-  static FILE *errfd = NULL;
-  char *homevar;
-  int tmp;
+    va_list ap;
+    static int nowarn = FALSE;     /* if set, ignore logging */
+    static char buf[BIG_BUFFER_SIZE];
+    static char errfile[MID_BUFFER_SIZE];
+    static FILE *errfd = NULL;
+    char *homevar;
+    int tmp;
 
-  va_start(ap, fmt);
-  (void)vsnprintf(buf, sizeof(buf) - 1, fmt, ap);
+    va_start(ap, fmt);
+    (void)vsnprintf(buf, sizeof(buf) - 1, fmt, ap);
 
-  va_end(ap);
+    va_end(ap);
 
-  if (errfd == NULL)
+    if (errfd == NULL)
     {
 
-      if (systemlog)
+        if (systemlog)
 	{
-	  umask(007);
-	  sprintf(errfile, "%s/%s", CONQSTATE, C_CONQ_ERRLOG);
-	  if (ConquestGID == ERR)
+            umask(007);
+            sprintf(errfile, "%s/%s", CONQSTATE, C_CONQ_ERRLOG);
+            if (ConquestGID == ERR)
 	    {
-	      fprintf(stderr, "conqutil: utLog():  ConquestGID == -1!\n");
-	      exit(1);
-	    }
-	}
-      else
-	{			/* local logfile */
-	  if ((homevar = getenv(CQ_USERHOMEDIR)) != NULL)
-            {
-              snprintf(errfile, sizeof(errfile) - 1, "%s/%s/%s",
-                       homevar, CQ_USERCONFDIR, C_CONQ_ERRLOG);
-            }
-	  else
-	    snprintf(errfile, sizeof(errfile) - 1, "%s", C_CONQ_ERRLOG);
-	}
-
-      if ((errfd = fopen(errfile, "a+")) == NULL)
-	{
-	  if ((tmp = creat(errfile, 0660)) == -1)
-	    {
-
-              if (!nowarn)
-                {
-                  fprintf(stderr, "utLog(): creat(%s): %s\n",
-                          errfile,
-                          strerror(errno));
-                  nowarn = TRUE;
-                }
-
-              if (!systemlog)
-                {
-                  /* if the logfile could not be created for a user,
-                     keep trying (the .conquest/ dir may not exist
-                     yet), but only log an error once. */
-                  nowarn = TRUE;
-                  return;
-                }
-              else
+                fprintf(stderr, "conqutil: utLog():  ConquestGID == -1!\n");
                 exit(1);
 	    }
-	  else
+	}
+        else
+	{			/* local logfile */
+            if ((homevar = getenv(CQ_USERHOMEDIR)) != NULL)
+            {
+                snprintf(errfile, sizeof(errfile) - 1, "%s/%s/%s",
+                         homevar, CQ_USERCONFDIR, C_CONQ_ERRLOG);
+            }
+            else
+                snprintf(errfile, sizeof(errfile) - 1, "%s", C_CONQ_ERRLOG);
+	}
+
+        if ((errfd = fopen(errfile, "a+")) == NULL)
+	{
+            if ((tmp = creat(errfile, 0660)) == -1)
 	    {
-	      close(tmp);
+
+                if (!nowarn)
+                {
+                    fprintf(stderr, "utLog(): creat(%s): %s\n",
+                            errfile,
+                            strerror(errno));
+                    nowarn = TRUE;
+                }
+
+                if (!systemlog)
+                {
+                    /* if the logfile could not be created for a user,
+                       keep trying (the .conquest/ dir may not exist
+                       yet), but only log an error once. */
+                    nowarn = TRUE;
+                    return;
+                }
+                else
+                    exit(1);
+	    }
+            else
+	    {
+                close(tmp);
 
 #if !defined(MINGW)
-	      if (systemlog)
-		if (chmod(errfile,
-			  (S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP)) == -1)
-		  {
-		    perror("utLog():chmod()");
-		    exit(1);
-		  }
+                if (systemlog)
+                    if (chmod(errfile,
+                              (S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP)) == -1)
+                    {
+                        perror("utLog():chmod()");
+                        exit(1);
+                    }
 #endif
 	    }
 	}
-      else
+        else
 	{
-	  fclose(errfd);
+            fclose(errfd);
 	}
 
 #if !defined(MINGW)
-      if (systemlog)
-	if (chown(errfile, 0, ConquestGID) == -1)
-          {
-            perror("utLog():chown()");
-            //            exit(1);
-          }
+        if (systemlog)
+            if (chown(errfile, 0, ConquestGID) == -1)
+            {
+                perror("utLog():chown()");
+                //            exit(1);
+            }
 #endif
 
-      if ((errfd = fopen(errfile, "a+")) == NULL)
+        if ((errfd = fopen(errfile, "a+")) == NULL)
 	{
-	  perror("utLog(): can't open logfile");
+            perror("utLog(): can't open logfile");
 	}
     }
 
-  if (errfd != NULL)
+    if (errfd != NULL)
     {
-      fprintf(errfd, "%ld:%d:%s\n", time(0), (int)getpid(), buf);
-      fflush(errfd);
+        fprintf(errfd, "%ld:%d:%s\n", time(0), (int)getpid(), buf);
+        fflush(errfd);
     }
 
-  if (echo2stderr)
+    if (echo2stderr)
     {
-      fprintf(stderr, "%s\n", buf);
-      fflush(stderr);
+        fprintf(stderr, "%s\n", buf);
+        fflush(stderr);
     }
 
 
-  return;
+    return;
 
 }
 
@@ -434,16 +434,16 @@ void utLog(char *fmt, ...)
 /*    utDeleteBlanks( str ) */
 void utDeleteBlanks( char *str )
 {
-  int i, j;
+    int i, j;
 
-  for ( i = 0; str[i] != 0; )
-    if ( str[i] == ' ' )
-      for ( j = i; str[j] != 0; j = j + 1 )
-	str[j] = str[j+1];
-    else
-      i = i + 1;
+    for ( i = 0; str[i] != 0; )
+        if ( str[i] == ' ' )
+            for ( j = i; str[j] != 0; j = j + 1 )
+                str[j] = str[j+1];
+        else
+            i = i + 1;
 
-  return;
+    return;
 
 }
 
@@ -454,20 +454,20 @@ void utDeleteBlanks( char *str )
 /*    i = utDeltaGrand( s, n ) */
 int utDeltaGrand( int s, int *n )
 {
-  int tn, ts;
+    int tn, ts;
 
-  /* Save s in case it and n are the same variable. */
-  ts = s;
+    /* Save s in case it and n are the same variable. */
+    ts = s;
 
-  /* Get thousands since midnight. */
-  utGrand( &tn );
-  *n = tn;
+    /* Get thousands since midnight. */
+    utGrand( &tn );
+    *n = tn;
 
-  /* Calculate the difference. */
-  if ( tn < ts )
-    tn = tn + 24 * 60 * 60 * 1000;		/* crossed midnight */
+    /* Calculate the difference. */
+    if ( tn < ts )
+        tn = tn + 24 * 60 * 60 * 1000;		/* crossed midnight */
 
-  return ( tn - ts );
+    return ( tn - ts );
 
 }
 
@@ -479,20 +479,20 @@ int utDeltaGrand( int s, int *n )
 
 int utDeltaSecs( int s, int *n )
 {
-  int tn, ts;
+    int tn, ts;
 
-  /* Save s in case it and n are the same variable. */
-  ts = s;
+    /* Save s in case it and n are the same variable. */
+    ts = s;
 
-  /* Get seconds since midnight. */
-  utGetSecs( &tn );
-  *n = tn;
+    /* Get seconds since midnight. */
+    utGetSecs( &tn );
+    *n = tn;
 
-  /* Calculate the difference. */
-  if ( tn < ts )
-    tn = tn + ((24 * 60) * 60);		/* crossed midnight */
+    /* Calculate the difference. */
+    if ( tn < ts )
+        tn = tn + ((24 * 60) * 60);		/* crossed midnight */
 
-  return ( tn - ts );
+    return ( tn - ts );
 
 }
 
@@ -503,12 +503,12 @@ int utDeltaSecs( int s, int *n )
 /*    newhits = utExplosionHits( basehits, dis ) */
 real utExplosionHits( real basehits, real dis )
 {
-  if ( dis > PHASER_DIST )
-    return ( 0.0 );
-  return ( basehits / ( ( EXPLOSION_FALLOFF - 1.0 ) *
-			max( dis - EXPLOSION_RADIUS,
-			     0.0 ) / PHASER_DIST + 1.0 ) -
-	   basehits / EXPLOSION_FALLOFF * dis / PHASER_DIST );
+    if ( dis > PHASER_DIST )
+        return ( 0.0 );
+    return ( basehits / ( ( EXPLOSION_FALLOFF - 1.0 ) *
+                          max( dis - EXPLOSION_RADIUS,
+                               0.0 ) / PHASER_DIST + 1.0 ) -
+             basehits / EXPLOSION_FALLOFF * dis / PHASER_DIST );
 
 }
 
@@ -518,48 +518,48 @@ real utExplosionHits( real basehits, real dis )
 /*   utFormatMinutes( itime, buf ) */
 void utFormatMinutes( int itime, char *buf )
 {
-  int i, days, hours, minutes;
-  char junk[32];
-  int minus;
+    int i, days, hours, minutes;
+    char junk[32];
+    int minus;
 
-  if ( itime < 0 )
+    if ( itime < 0 )
     {
-      minus = TRUE;
-      i = -itime;
+        minus = TRUE;
+        i = -itime;
     }
-  else
+    else
     {
-      minus = FALSE;
-      i = itime;
-    }
-
-  minutes = mod( i, 60 );		/* minutes */
-  i = i / 60;
-  hours = mod( i, 24 );		/* hours */
-  days = i / 24;			/* days */
-
-  if ( minus )
-    {
-      if ( days > 0 )
-	days = -days;
-      else if ( hours > 0 )
-	hours = -hours;
-      else
-	minutes = -minutes;
+        minus = FALSE;
+        i = itime;
     }
 
-  /* Format time. */
-  sprintf( junk, "%d %2d:%02d", days, hours, minutes );
+    minutes = mod( i, 60 );		/* minutes */
+    i = i / 60;
+    hours = mod( i, 24 );		/* hours */
+    days = i / 24;			/* days */
 
-  /* Skip the junk and find the beginning. */
-  for ( i = 0; junk[i] == ' ' || junk[i] == ':' || junk[i] == '0'; i = i + 1 )
-    ;
+    if ( minus )
+    {
+        if ( days > 0 )
+            days = -days;
+        else if ( hours > 0 )
+            hours = -hours;
+        else
+            minutes = -minutes;
+    }
 
-  /* Store in return buffer. */
-  /*    scopy( junk, i, buf, 1 );*/
-  strcpy(buf, &junk[i]);
+    /* Format time. */
+    sprintf( junk, "%d %2d:%02d", days, hours, minutes );
 
-  return;
+    /* Skip the junk and find the beginning. */
+    for ( i = 0; junk[i] == ' ' || junk[i] == ':' || junk[i] == '0'; i = i + 1 )
+        ;
+
+    /* Store in return buffer. */
+    /*    scopy( junk, i, buf, 1 );*/
+    strcpy(buf, &junk[i]);
+
+    return;
 
 }
 
@@ -569,46 +569,46 @@ void utFormatMinutes( int itime, char *buf )
 /*   utFormatSeconds( itime, buf ) */
 void utFormatSeconds( int itime, char *buf )
 {
-  int i, days, hours, minutes, seconds;
-  char junk[BUFFER_SIZE];
-  int minus;
+    int i, days, hours, minutes, seconds;
+    char junk[BUFFER_SIZE];
+    int minus;
 
-  if ( itime < 0 )
+    if ( itime < 0 )
     {
-      minus = TRUE;
-      i = -itime;
+        minus = TRUE;
+        i = -itime;
     }
-  else
+    else
     {
-      minus = FALSE;
-      i = itime;
-    }
-
-  seconds = mod( i, 60 );		/* seconds */
-  i = i / 60;
-  minutes = mod( i, 60 );		/* minutes */
-  i = i / 60;
-  hours = mod( i, 24 );		/* hours */
-  days = i / 24;			/* days */
-
-  if ( minus )
-    {
-      if ( days > 0 )
-	days = -days;
-      else if ( hours > 0 )
-	hours = -hours;
-      else if ( minutes > 0 )
-	minutes = -minutes;
-      else
-	seconds = -seconds;
+        minus = FALSE;
+        i = itime;
     }
 
-  /* Format time. */
-  sprintf( junk, "%d %2d:%02d:%02d", days, hours, minutes, seconds );
+    seconds = mod( i, 60 );		/* seconds */
+    i = i / 60;
+    minutes = mod( i, 60 );		/* minutes */
+    i = i / 60;
+    hours = mod( i, 24 );		/* hours */
+    days = i / 24;			/* days */
 
-  strcpy(buf, junk);
+    if ( minus )
+    {
+        if ( days > 0 )
+            days = -days;
+        else if ( hours > 0 )
+            hours = -hours;
+        else if ( minutes > 0 )
+            minutes = -minutes;
+        else
+            seconds = -seconds;
+    }
 
-  return;
+    /* Format time. */
+    sprintf( junk, "%d %2d:%02d:%02d", days, hours, minutes, seconds );
+
+    strcpy(buf, junk);
+
+    return;
 
 }
 
@@ -620,14 +620,14 @@ void utFormatSeconds( int itime, char *buf )
 /*    gotone = utGetMsg( snum, msg ) */
 int utGetMsg( int snum, int *msg )
 {
-  while ( *msg != ConqInfo->lastmsg )
+    while ( *msg != ConqInfo->lastmsg )
     {
-      *msg = utModPlusOne( *msg + 1, MAXMESSAGES );
-      if ( clbCanRead( snum, *msg ) )
-        return(TRUE);
+        *msg = utModPlusOne( *msg + 1, MAXMESSAGES );
+        if ( clbCanRead( snum, *msg ) )
+            return(TRUE);
 
     }
-  return ( FALSE );
+    return ( FALSE );
 
 }
 
@@ -638,21 +638,21 @@ int utGetMsg( int snum, int *msg )
 /*    utFormatTime( buf ) */
 void utFormatTime( char *buf, time_t thetime )
 {
-  char junk[5] = {};
+    char junk[5] = {};
 
-  if (!thetime)
-      thetime = time(0);
+    if (!thetime)
+        thetime = time(0);
 
-  struct tm *thetm = localtime(&thetime);
+    struct tm *thetm = localtime(&thetime);
 
-  strftime(junk, 5, "%b", thetm);
+    strftime(junk, 5, "%b", thetm);
 
-  sprintf(buf, "%2d:%02d:%02d %02d%s%02d",
-          thetm->tm_hour, thetm->tm_min, thetm->tm_min, thetm->tm_mday,
-          junk,
-          mod(thetm->tm_year + 1900, 100));
+    sprintf(buf, "%2d:%02d:%02d %02d%s%02d",
+            thetm->tm_hour, thetm->tm_min, thetm->tm_min, thetm->tm_mday,
+            junk,
+            mod(thetm->tm_year + 1900, 100));
 
-  return;
+    return;
 
 }
 
@@ -663,14 +663,14 @@ void utFormatTime( char *buf, time_t thetime )
 /*    utGrand( h ) */
 void utGrand( int *h )
 {
-  time_t thetime = time(0);
-  struct tm *thetm = localtime(&thetime);
+    time_t thetime = time(0);
+    struct tm *thetm = localtime(&thetime);
 
-  *h = ( ( ( thetm->tm_hour * 60 )
-           + thetm->tm_min ) * 60
-         + thetm->tm_sec ) * 1000;
+    *h = ( ( ( thetm->tm_hour * 60 )
+             + thetm->tm_min ) * 60
+           + thetm->tm_sec ) * 1000;
 
-  return;
+    return;
 
 }
 
@@ -681,12 +681,12 @@ void utGrand( int *h )
 /*    utGetSecs( s ) */
 void utGetSecs( int *s )
 {
-  time_t thetime = time(0);
-  struct tm *thetm = localtime(&thetime);
+    time_t thetime = time(0);
+    struct tm *thetm = localtime(&thetime);
 
-  *s = ( ( thetm->tm_hour * 60 ) + thetm->tm_min ) * 60 + thetm->tm_sec;
+    *s = ( ( thetm->tm_hour * 60 ) + thetm->tm_min ) * 60 + thetm->tm_sec;
 
-  return;
+    return;
 
 }
 
@@ -697,14 +697,14 @@ void utGetSecs( int *s )
 /*    mr = utMod360( r ) */
 real utMod360( real r )
 {
-  real mr;
+    real mr;
 
-  mr = r;
+    mr = r;
 
-  while ( mr < 0.0 )
-    mr += 360.0;
+    while ( mr < 0.0 )
+        mr += 360.0;
 
-  return((real) fmod(mr, 360.0));
+    return((real) fmod(mr, 360.0));
 
 }
 
@@ -715,23 +715,23 @@ real utMod360( real r )
 /*    mi = utModPlusOne( i, modulus ) */
 int utModPlusOne( int i, int modulus )
 {
-  int m, n;
+    int m, n;
 
-  m = i;
+    m = i;
 
-  while ( m < 0 )
-    m += modulus;
+    while ( m < 0 )
+        m += modulus;
 
-  n = mod(--m, modulus) + 1;
-  return((n >= modulus) ? 0 : n);
+    n = mod(--m, modulus) + 1;
+    return((n >= modulus) ? 0 : n);
 
-  /*    return((n == 0) ? 1 : n);*/
+    /*    return((n == 0) ? 1 : n);*/
 
-  /*    while ( m < 1 )
-	m = m + modulus;
+    /*    while ( m < 1 )
+          m = m + modulus;
 
-	return ( mod( m-1, modulus ) + 1 );
-	*/
+          return ( mod( m-1, modulus ) + 1 );
+    */
 }
 
 
@@ -743,28 +743,28 @@ int utModPlusOne( int i, int modulus )
 /*    flag = utSafeCToI( num, buf ptr ) */
 int utSafeCToI( int *num, char *buf, int offset )
 {
-  int retval;
+    int retval;
 
-  retval = FALSE;
-  if (buf[offset] == 0)
+    retval = FALSE;
+    if (buf[offset] == 0)
     {
-      *num = 0;
-      retval = FALSE;
+        *num = 0;
+        retval = FALSE;
     }
 
-  *num = atoi( &buf[offset]);
-  retval = TRUE;
+    *num = atoi( &buf[offset]);
+    retval = TRUE;
 
-  /* If the number is the same size as the biggest integer, */
-  /*  assume that it is too big. */
+    /* If the number is the same size as the biggest integer, */
+    /*  assume that it is too big. */
 
-  if ( *num >= INT_MAX )
+    if ( *num >= INT_MAX )
     {
-      *num = INT_MAX;
-      retval = FALSE;
+        *num = INT_MAX;
+        retval = FALSE;
     }
 
-  return ( retval );
+    return ( retval );
 
 }
 
@@ -777,87 +777,87 @@ int utSafeCToI( int *num, char *buf, int offset )
 /*    flag = utIsSpecial( str, what, token, count ) */
 int utIsSpecial( char *str, int *what, int *token, int *count )
 {
-  int i;
-  char buf[20];
+    int i;
+    char buf[20];
 
-  *what = NEAR_ERROR;
-  *token = SPECIAL_NOTSPECIAL;
-  *count = 0;
+    *what = NEAR_ERROR;
+    *token = SPECIAL_NOTSPECIAL;
+    *count = 0;
 
-  /* Reject obvious losers. */
-  if ( str[0] != 'n' && str[0] != 'w' && str[0] != 'h' )
-    return ( FALSE );
+    /* Reject obvious losers. */
+    if ( str[0] != 'n' && str[0] != 'w' && str[0] != 'h' )
+        return ( FALSE );
 
-  utStcpn( str, buf, 20 );			/* need a private copy */
+    utStcpn( str, buf, 20 );			/* need a private copy */
 
-  /* Find threshold count; cleverly, the default will be zero when using ctoi. */
-  for (i = 0; buf[i] != 0 && !isdigit(buf[i]); i++)
-      ;
+    /* Find threshold count; cleverly, the default will be zero when using ctoi. */
+    for (i = 0; buf[i] != 0 && !isdigit(buf[i]); i++)
+        ;
 
-  buf[i] = 0;				/* ditch numeric part */
-  utSafeCToI( count, str, i );		/* ignore status */
+    buf[i] = 0;				/* ditch numeric part */
+    utSafeCToI( count, str, i );		/* ignore status */
 
-  if ( utStringMatch( buf, "nes", FALSE ) )	/* this one must be first */
+    if ( utStringMatch( buf, "nes", FALSE ) )	/* this one must be first */
     {
-      *what = NEAR_SHIP;
-      *token = SPECIAL_ENEMYSHIP;
+        *what = NEAR_SHIP;
+        *token = SPECIAL_ENEMYSHIP;
     }
-  else if ( utStringMatch( buf, "nfp", FALSE ) )
+    else if ( utStringMatch( buf, "nfp", FALSE ) )
     {
-      *what = NEAR_PLANET;
-      *token = SPECIAL_FUELPLANET;
+        *what = NEAR_PLANET;
+        *token = SPECIAL_FUELPLANET;
     }
-  else if ( utStringMatch( buf, "nep", FALSE ) )
+    else if ( utStringMatch( buf, "nep", FALSE ) )
     {
-      *what = NEAR_PLANET;
-      *token = SPECIAL_ENEMYPLANET;
+        *what = NEAR_PLANET;
+        *token = SPECIAL_ENEMYPLANET;
     }
-  else if ( utStringMatch( buf, "ns", FALSE ) )
+    else if ( utStringMatch( buf, "ns", FALSE ) )
     {
-      *what = NEAR_SHIP;
-      *token = SPECIAL_SHIP;
+        *what = NEAR_SHIP;
+        *token = SPECIAL_SHIP;
     }
-  else if ( utStringMatch( buf, "np", FALSE ) )
+    else if ( utStringMatch( buf, "np", FALSE ) )
     {
-      *what = NEAR_PLANET;
-      *token = SPECIAL_PLANET;
+        *what = NEAR_PLANET;
+        *token = SPECIAL_PLANET;
     }
-  else if ( utStringMatch( buf, "nts", FALSE ) )
+    else if ( utStringMatch( buf, "nts", FALSE ) )
     {
-      *what = NEAR_SHIP;
-      *token = SPECIAL_TEAMSHIP;
+        *what = NEAR_SHIP;
+        *token = SPECIAL_TEAMSHIP;
     }
-  else if ( utStringMatch( buf, "nap", FALSE ) )
+    else if ( utStringMatch( buf, "nap", FALSE ) )
     {
-      *what = NEAR_PLANET;
-      *token = SPECIAL_ARMYPLANET;
-      if ( *count <= 0 )
-	*count = 1;
+        *what = NEAR_PLANET;
+        *token = SPECIAL_ARMYPLANET;
+        if ( *count <= 0 )
+            *count = 1;
     }
-  else if ( utStringMatch( buf, "wp", FALSE ) )
+    else if ( utStringMatch( buf, "wp", FALSE ) )
     {
-      *what = NEAR_PLANET;
-      *token = SPECIAL_WEAKPLANET;
+        *what = NEAR_PLANET;
+        *token = SPECIAL_WEAKPLANET;
     }
-  else if ( utStringMatch( buf, "ntp", FALSE ) )
+    else if ( utStringMatch( buf, "ntp", FALSE ) )
     {
-      *what = NEAR_PLANET;
-      *token = SPECIAL_TEAMPLANET;
+        *what = NEAR_PLANET;
+        *token = SPECIAL_TEAMPLANET;
     }
-  else if ( utStringMatch( buf, "nrp", FALSE ) )
+    else if ( utStringMatch( buf, "nrp", FALSE ) )
     {
-      *what = NEAR_PLANET;
-      *token = SPECIAL_REPAIRPLANET;
+        *what = NEAR_PLANET;
+        *token = SPECIAL_REPAIRPLANET;
     }
-  else if ( utStringMatch( buf, "hp", FALSE ) )
+    else if ( utStringMatch( buf, "hp", FALSE ) )
     {
-      *what = NEAR_PLANET;
-      *token = SPECIAL_HOMEPLANET;
+        *what = NEAR_PLANET;
+        *token = SPECIAL_HOMEPLANET;
     }
-  else
-    return ( FALSE );		/* string simply isn't special */
+    else
+        return ( FALSE );		/* string simply isn't special */
 
-  return ( TRUE );
+    return ( TRUE );
 
 }
 
@@ -869,8 +869,8 @@ int utIsSpecial( char *str, int *what, int *token, int *count )
 /*    utStcpn( from, to, tosize ) */
 void utStcpn( char *from, char *to, int tosize )
 {
-  strncpy(to, from, tosize);
-  to[tosize - 1] = '\0';
+    strncpy(to, from, tosize);
+    to[tosize - 1] = '\0';
 
 }
 
@@ -882,28 +882,28 @@ void utStcpn( char *from, char *to, int tosize )
 /*    matched = utStringMatch( str1, str2, casesensitive ) */
 int utStringMatch( char *str1, char *str2, int casesensitive )
 {
-  int i;
+    int i;
 
-  if ( casesensitive )
-    for ( i = 0; str1[i] == str2[i] && str1[i] != 0; i = i + 1 )
-      ;
-  else
-    for ( i = 0;
-	 (char)tolower(str1[i]) == (char)tolower(str2[i]) && str1[i] != 0;
-	 i = i + 1 )
-      ;
+    if ( casesensitive )
+        for ( i = 0; str1[i] == str2[i] && str1[i] != 0; i = i + 1 )
+            ;
+    else
+        for ( i = 0;
+              (char)tolower(str1[i]) == (char)tolower(str2[i]) && str1[i] != 0;
+              i = i + 1 )
+            ;
 
-  if ( i == 0 )
+    if ( i == 0 )
     {
-      if ( str1[0] == 0 && str2[0] == 0 )
-	return ( TRUE );
-      else
-	return ( FALSE );
+        if ( str1[0] == 0 && str2[0] == 0 )
+            return ( TRUE );
+        else
+            return ( FALSE );
     }
-  else if ( str1[i] == 0 || str2[i] == 0 )
-    return ( TRUE );
+    else if ( str1[i] == 0 || str2[i] == 0 )
+        return ( TRUE );
 
-  return ( FALSE );
+    return ( FALSE );
 
 }
 
@@ -914,15 +914,15 @@ int utStringMatch( char *str1, char *str2, int casesensitive )
 /*    h = utSubAngle( a1, a2 ) */
 real utSubAngle( real a1, real a2 )
 {
-  real x;
+    real x;
 
-  x = a1 - a2;
-  while ( x > 180.0 )
-    x = x - 360.0;
-  while ( x < -180.0 )
-    x = x + 360.0;
+    x = a1 - a2;
+    while ( x > 180.0 )
+        x = x - 360.0;
+    while ( x < -180.0 )
+        x = x + 360.0;
 
-  return ( x );
+    return ( x );
 
 }
 
@@ -941,48 +941,48 @@ real utSubAngle( real a1, real a2 )
 
 char *utGetPath(const char *thepath)
 {
-  static char retpath[PATH_MAX];
+    static char retpath[PATH_MAX];
 
 #if !defined(MINGW)
-  /* the non-windows case just returns thepath, but we copy it
-   * to avoid an annoying compiler warning regarding const.
-   */
-  strncpy(retpath, thepath, PATH_MAX - 1);
-  return retpath;
+    /* the non-windows case just returns thepath, but we copy it
+     * to avoid an annoying compiler warning regarding const.
+     */
+    strncpy(retpath, thepath, PATH_MAX - 1);
+    return retpath;
 #else
 
-  char *theroot = NULL;
-  char *defaultConq = "";
+    char *theroot = NULL;
+    char *defaultConq = "";
 
-  if (!(theroot = getenv("CONQUEST_ROOT")))
+    if (!(theroot = getenv("CONQUEST_ROOT")))
     {
-      /* next check COMMONPROGRAMFILES */
-      if (!(theroot = getenv("COMMONPROGRAMFILES")))
+        /* next check COMMONPROGRAMFILES */
+        if (!(theroot = getenv("COMMONPROGRAMFILES")))
         {
-          theroot = "/Conquest";
+            theroot = "/Conquest";
         }
-      else
+        else
         {                       /* Add /Conquest to COMMONPROGRAMFILES */
-          defaultConq = "/Conquest";
+            defaultConq = "/Conquest";
         }
     }
 
-  /* now determine the path requested and do our magic. */
+    /* now determine the path requested and do our magic. */
 
-  if (!strcmp(thepath, CONQETC))
+    if (!strcmp(thepath, CONQETC))
     {                           /* etc */
-      snprintf(retpath, PATH_MAX - 1, "%s%s/etc", theroot, defaultConq);
+        snprintf(retpath, PATH_MAX - 1, "%s%s/etc", theroot, defaultConq);
     }
-  else if (!strcmp(thepath, CONQSHARE))
+    else if (!strcmp(thepath, CONQSHARE))
     {                           /* share */
-      snprintf(retpath, PATH_MAX - 1, "%s%s", theroot, defaultConq);
+        snprintf(retpath, PATH_MAX - 1, "%s%s", theroot, defaultConq);
     }
-  else
+    else
     {                           /* default, just return original path */
-      snprintf(retpath, PATH_MAX - 1, "%s", thepath);
+        snprintf(retpath, PATH_MAX - 1, "%s", thepath);
     }
 
-  return retpath;
+    return retpath;
 
 #endif  /* MINGW */
 }
@@ -1012,16 +1012,16 @@ void utSleep(real seconds)
 
 bool utIsDigits(const char *buf)
 {
-  const char *s = buf;
+    const char *s = buf;
 
-  while (*s)
+    while (*s)
     {
-      if (!isdigit(*s))
-	return false;
-      s++;
+        if (!isdigit(*s))
+            return false;
+        s++;
     }
 
-  return true;
+    return true;
 }
 
 void error(char *str);
@@ -1029,10 +1029,10 @@ void error(char *str);
 /* void upper(char *buf) - upcase a string */
 void utToUpperCase(char *buf)
 {
-  char *s = buf;
-  while(*s)
+    char *s = buf;
+    while(*s)
     {
-      *s = (char)toupper(*s);
-      s++;
+        *s = (char)toupper(*s);
+        s++;
     }
 }

@@ -15,32 +15,30 @@ static scrNode_t *currentNodePtr = NULL; /* the currently running node */
 /* can only set the top node */
 void setNode(scrNode_t *node)
 {
-  topNodePtr = node;
+    topNodePtr = node;
 
-  return;
+    return;
 }
 
 /* can only set the top Onode */
 void setONode(scrNode_t *node)
 {
-  topONodePtr = node;
+    topONodePtr = node;
 
-  return;
+    return;
 }
 
 scrNode_t *getTopNode(void)
 {
-  return topNodePtr;
+    return topNodePtr;
 }
 
 scrNode_t *getTopONode(void)
 {
-  return topONodePtr;
+    return topONodePtr;
 }
 
 scrNode_t *getCurrentNode(void)
 {
-  return currentNodePtr;
+    return currentNodePtr;
 }
-
-

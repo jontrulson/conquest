@@ -1,4 +1,4 @@
-/* 
+/*
  * TCP Wrappers support
  *
  * Copyright Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
@@ -8,7 +8,7 @@
 #include "global.h"
 #include "config.h"
 
-#if defined(HAVE_TCPW) && defined(HAVE_TCPD_H) 
+#if defined(HAVE_TCPW) && defined(HAVE_TCPD_H)
 
 #include <setjmp.h>
 
@@ -23,29 +23,28 @@ extern int hosts_ctl(char *daemon, char *client_name, char *client_addr,
 
 int tcpwCheckHostAccess(char *daemon, char *remotehost)
 {
-  int allowed = 0;
+    int allowed = 0;
 
-  if (NOT_INADDR(remotehost))
+    if (NOT_INADDR(remotehost))
     {
-      allowed = hosts_ctl(daemon, remotehost, 
-                          "", STRING_UNKNOWN);
+        allowed = hosts_ctl(daemon, remotehost,
+                            "", STRING_UNKNOWN);
     }
-  else
+    else
     {
-      allowed = hosts_ctl(daemon, "", 
-                          remotehost, STRING_UNKNOWN);
+        allowed = hosts_ctl(daemon, "",
+                            remotehost, STRING_UNKNOWN);
     }
-  
-  if (!allowed)
-    utLog("TCPW: %s: %s: ACCESS DENIED",
-         daemon, remotehost);
-  else if (cqDebug)
-    utLog("TCPW: %s: %s: ACCESS GRANTED",
-         daemon, remotehost);
-      
-  return((allowed) ? TRUE : FALSE);
+
+    if (!allowed)
+        utLog("TCPW: %s: %s: ACCESS DENIED",
+              daemon, remotehost);
+    else if (cqDebug)
+        utLog("TCPW: %s: %s: ACCESS GRANTED",
+              daemon, remotehost);
+
+    return((allowed) ? TRUE : FALSE);
 
 }
- 
-#endif /* HAVE_TCPW && HAVE_TCPD_H */
 
+#endif /* HAVE_TCPW && HAVE_TCPD_H */

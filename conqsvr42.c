@@ -28,33 +28,33 @@
 int getUID(char *name)
 {
 #if defined(MINGW)
-  return 0;
+    return 0;
 #else
 
-  struct passwd *conq_pwd;
-  char *myusername = clbGetUserLogname();
-  char *chkname;
+    struct passwd *conq_pwd;
+    char *myusername = clbGetUserLogname();
+    char *chkname;
 
 #if defined(CYGWIN)
-  /* name root doesn't usually exist, so default to myusername */
-  name = NULL;
+    /* name root doesn't usually exist, so default to myusername */
+    name = NULL;
 #endif
 
-  if (!name)
-    chkname = myusername;
-  else
-    chkname = name;
+    if (!name)
+        chkname = myusername;
+    else
+        chkname = name;
 
-  if ((conq_pwd = getpwnam(chkname)) == NULL)
+    if ((conq_pwd = getpwnam(chkname)) == NULL)
     {
-      fprintf(stderr, "conqsvr42: getUID(%s): can't get user: %s\n",
-	      chkname,
-	      strerror(errno));
-      
-      return(-1);
+        fprintf(stderr, "conqsvr42: getUID(%s): can't get user: %s\n",
+                chkname,
+                strerror(errno));
+
+        return(-1);
     }
-  
-  return(conq_pwd->pw_uid);
+
+    return(conq_pwd->pw_uid);
 #endif  /* MINGW */
 }
 
@@ -63,20 +63,20 @@ int getUID(char *name)
 int getConquestGID(void)
 {
 #if defined(MINGW)
-  return 0;
+    return 0;
 #else
-  struct group *conq_grp;
-  
-  if ((conq_grp = getgrnam(CONQUEST_GROUP)) == NULL)
+    struct group *conq_grp;
+
+    if ((conq_grp = getgrnam(CONQUEST_GROUP)) == NULL)
     {
-      fprintf(stderr, "conqsvr42: getConquestGID(%s): can't get group: %s",
-	      CONQUEST_GROUP,
-	      strerror(errno));
-      
-      return(-1);
+        fprintf(stderr, "conqsvr42: getConquestGID(%s): can't get group: %s",
+                CONQUEST_GROUP,
+                strerror(errno));
+
+        return(-1);
     }
-  
-  return(conq_grp->gr_gid);
+
+    return(conq_grp->gr_gid);
 #endif
 }
 
@@ -87,10 +87,10 @@ int getConquestGID(void)
 /*    comsize( size ) */
 void comsize( unsigned long *size )
 {
-  *size = labs((char *)EndOfCBlock - (char *)CBlockRevision) + sizeof(int);
+    *size = labs((char *)EndOfCBlock - (char *)CBlockRevision) + sizeof(int);
 
-  return;
-  
+    return;
+
 }
 
 
@@ -99,31 +99,31 @@ void comsize( unsigned long *size )
 /*    conqinit */
 void conqinit(void)
 {
-  /* First things first. */
-  if ( *CBlockRevision != COMMONSTAMP )
-  {
-      printf("conquest: Common block ident mismatch.\n"
-             "Initialize the Universe via conqoper.");
-      exit(1);
-  }
-  
-  /* Set up game environment. */
-  
-  /* Other house keeping. */
-  Context.pid = getpid();		
-  Context.hasnewsfile = ( strcmp( C_CONQ_NEWSFILE, "" ) != 0 );
-  
-  /* Zero process id of our child (since we don't have one yet). */
-  Context.childpid = 0;
-  
-  /* Zero last time drcheck() was called. */
-  Context.drchklastime = 0;
-  
-  /* Haven't scanned anything yet. */
-  Context.lastinfostr[0] = 0;
+    /* First things first. */
+    if ( *CBlockRevision != COMMONSTAMP )
+    {
+        printf("conquest: Common block ident mismatch.\n"
+               "Initialize the Universe via conqoper.");
+        exit(1);
+    }
 
-  return;
-  
+    /* Set up game environment. */
+
+    /* Other house keeping. */
+    Context.pid = getpid();
+    Context.hasnewsfile = ( strcmp( C_CONQ_NEWSFILE, "" ) != 0 );
+
+    /* Zero process id of our child (since we don't have one yet). */
+    Context.childpid = 0;
+
+    /* Zero last time drcheck() was called. */
+    Context.drchklastime = 0;
+
+    /* Haven't scanned anything yet. */
+    Context.lastinfostr[0] = 0;
+
+    return;
+
 }
 
 
@@ -133,49 +133,49 @@ void conqinit(void)
 /*    conqstats( snum ) */
 void conqstats( int snum )
 {
-  int unum, team, cadd, eadd;
-  time_t difftime;
-  cadd = 0;
-  eadd = 0;
-  
-  upstats( &Ships[snum].ctime, &Ships[snum].etime, 
-	   &Ships[snum].cacc, &Ships[snum].eacc,
-	   &cadd, &eadd );
-  
-  /* Add in the new amounts. */
-  PVLOCK(&ConqInfo->lockword);
-  if ( Ships[snum].pid != 0 )
+    int unum, team, cadd, eadd;
+    time_t difftime;
+    cadd = 0;
+    eadd = 0;
+
+    upstats( &Ships[snum].ctime, &Ships[snum].etime,
+             &Ships[snum].cacc, &Ships[snum].eacc,
+             &cadd, &eadd );
+
+    /* Add in the new amounts. */
+    PVLOCK(&ConqInfo->lockword);
+    if ( Ships[snum].pid != 0 )
     {
-      /* Update stats for a humanoid ship. */
-      unum = Ships[snum].unum;
+        /* Update stats for a humanoid ship. */
+        unum = Ships[snum].unum;
 
-      Users[unum].stats[USTAT_CPUSECONDS] += cadd;
-      Users[unum].stats[USTAT_SECONDS] += eadd;
+        Users[unum].stats[USTAT_CPUSECONDS] += cadd;
+        Users[unum].stats[USTAT_SECONDS] += eadd;
 
-				/* update elapsed time in History[] 
-				   for this user */
+        /* update elapsed time in History[]
+           for this user */
 
-      if (Context.histslot != -1 && History[Context.histslot].histunum == unum)
+        if (Context.histslot != -1 && History[Context.histslot].histunum == unum)
 	{
-	  difftime = time(0) - History[Context.histslot].histlog;
-	  if (difftime < (time_t)0)
-	    difftime = (time_t)0;
-	  History[Context.histslot].elapsed = difftime;
+            difftime = time(0) - History[Context.histslot].histlog;
+            if (difftime < (time_t)0)
+                difftime = (time_t)0;
+            History[Context.histslot].elapsed = difftime;
 	}
 
-      team = Users[unum].team;
-      Teams[team].stats[TSTAT_CPUSECONDS] += cadd;
-      Teams[team].stats[TSTAT_SECONDS] += eadd;
+        team = Users[unum].team;
+        Teams[team].stats[TSTAT_CPUSECONDS] += cadd;
+        Teams[team].stats[TSTAT_SECONDS] += eadd;
 
-      ConqInfo->ccpuseconds += cadd;
-      ConqInfo->celapsedseconds += eadd;
+        ConqInfo->ccpuseconds += cadd;
+        ConqInfo->celapsedseconds += eadd;
 
 
     }
-  PVUNLOCK(&ConqInfo->lockword);
-  
-  return;
-  
+    PVUNLOCK(&ConqInfo->lockword);
+
+    return;
+
 }
 
 
@@ -185,45 +185,45 @@ void conqstats( int snum )
 void drcheck(void)
 {
 #if defined(MINGW)
-  return;
-#else
-  int ppid;
-  
-  /* If we haven't been getting cpu time in recent history, do no-thing. */
-  if ( utDeltaSecs( Context.drchklastime, &Context.drchklastime ) > TIMEOUT_DRCHECK )
     return;
-  
-  if ( utDeltaSecs( Driver->drivtime, &(Driver->playtime) ) > TIMEOUT_DRIVER )
+#else
+    int ppid;
+
+    /* If we haven't been getting cpu time in recent history, do no-thing. */
+    if ( utDeltaSecs( Context.drchklastime, &Context.drchklastime ) > TIMEOUT_DRCHECK )
+        return;
+
+    if ( utDeltaSecs( Driver->drivtime, &(Driver->playtime) ) > TIMEOUT_DRIVER )
     {
-      if ( Context.childpid != 0 )
+        if ( Context.childpid != 0 )
 	{
-	  /* We own the driver. See if it's still there. */
-	  ppid = Context.childpid;
-	  if ( kill(Context.childpid, 0) != -1 )
+            /* We own the driver. See if it's still there. */
+            ppid = Context.childpid;
+            if ( kill(Context.childpid, 0) != -1 )
 	    {
-	      /* He's still alive and belongs to us. */
-	      utGetSecs( &(Driver->drivtime) );
-	      return;
+                /* He's still alive and belongs to us. */
+                utGetSecs( &(Driver->drivtime) );
+                return;
 	    }
-	  else
-	    utLog( "drcheck(): Wrong ppid %d.", ppid );
-	  
-	  /* If we got here, something was wrong; disown the child. */
-	  Context.childpid = 0;
+            else
+                utLog( "drcheck(): Wrong ppid %d.", ppid );
+
+            /* If we got here, something was wrong; disown the child. */
+            Context.childpid = 0;
 	}
-      
-      PVLOCK(&ConqInfo->lockword);
-      if ( utDeltaSecs( Driver->drivtime, &(Driver->playtime) ) > TIMEOUT_DRIVER )
+
+        PVLOCK(&ConqInfo->lockword);
+        if ( utDeltaSecs( Driver->drivtime, &(Driver->playtime) ) > TIMEOUT_DRIVER )
 	{
-	  drcreate();
-	  Driver->drivcnt = utModPlusOne( Driver->drivcnt + 1, 1000 );
-	  utLog( "Driver timeout #%d.", Driver->drivcnt );
+            drcreate();
+            Driver->drivcnt = utModPlusOne( Driver->drivcnt + 1, 1000 );
+            utLog( "Driver timeout #%d.", Driver->drivcnt );
 	}
-      PVUNLOCK(&ConqInfo->lockword);
+        PVUNLOCK(&ConqInfo->lockword);
     }
-  drstart();
-  
-  return;
+    drstart();
+
+    return;
 #endif  /* MINGW */
 }
 
@@ -234,41 +234,41 @@ void drcheck(void)
 void drcreate(void)
 {
 #if defined(MINGW)
-  return;
+    return;
 #else
-  int pid;
-  char drivcmd[BUFFER_SIZE];
+    int pid;
+    char drivcmd[BUFFER_SIZE];
 
-  
-  utGetSecs( &(Driver->drivtime) );			/* prevent driver timeout */
-  Driver->drivpid = 0;			/* zero current driver pid */
-  Driver->drivstat = DRS_RESTART;		/* driver state to restart */
-  
-  /* fork the child - mmap()'s should remain */
-  /*  intact */
-  if ((pid = fork()) == -1)
+
+    utGetSecs( &(Driver->drivtime) );			/* prevent driver timeout */
+    Driver->drivpid = 0;			/* zero current driver pid */
+    Driver->drivstat = DRS_RESTART;		/* driver state to restart */
+
+    /* fork the child - mmap()'s should remain */
+    /*  intact */
+    if ((pid = fork()) == -1)
     {				/* error */
-      Driver->drivstat = DRS_OFF;
-      utLog( "drcreate(): fork(): %s", strerror(errno));
-      return;
+        Driver->drivstat = DRS_OFF;
+        utLog( "drcreate(): fork(): %s", strerror(errno));
+        return;
     }
-  
-  if (pid == 0)
+
+    if (pid == 0)
     {				/* The child: aka "The Driver" */
-      sprintf(drivcmd, "%s/%s", CONQLIBEXEC, C_CONQ_CONQDRIV);
-      execl(drivcmd, drivcmd, NULL);
-      utLog("drcreate(): exec(): %s", strerror(errno));
-      perror("exec");		/* shouldn't be reached */
-      exit(1);
-      /* NOTREACHED */
+        sprintf(drivcmd, "%s/%s", CONQLIBEXEC, C_CONQ_CONQDRIV);
+        execl(drivcmd, drivcmd, NULL);
+        utLog("drcreate(): exec(): %s", strerror(errno));
+        perror("exec");		/* shouldn't be reached */
+        exit(1);
+        /* NOTREACHED */
     }
-  else
+    else
     {				/* We're the parent, store pid */
-      Context.childpid = pid;	
+        Context.childpid = pid;
     }
-  
-  return;
-#endif  
+
+    return;
+#endif
 }
 
 
@@ -278,17 +278,17 @@ void drcreate(void)
 void drkill(void)
 {
 #if !defined(MINGW)
-  if ( Context.childpid != 0 )
-    if ( Context.childpid == Driver->drivpid && Driver->drivstat == DRS_RUNNING )
-      {
-	PVLOCK(&ConqInfo->lockword);
-	if ( Context.childpid == Driver->drivpid && Driver->drivstat == DRS_RUNNING )
-	  Driver->drivstat = DRS_KAMIKAZE;
-	PVUNLOCK(&ConqInfo->lockword);
-      }
+    if ( Context.childpid != 0 )
+        if ( Context.childpid == Driver->drivpid && Driver->drivstat == DRS_RUNNING )
+        {
+            PVLOCK(&ConqInfo->lockword);
+            if ( Context.childpid == Driver->drivpid && Driver->drivstat == DRS_RUNNING )
+                Driver->drivstat = DRS_KAMIKAZE;
+            PVUNLOCK(&ConqInfo->lockword);
+        }
 #endif  /* MINGW */
-  return;
-  
+    return;
+
 }
 
 
@@ -298,21 +298,21 @@ void drkill(void)
 void drpexit(void)
 {
 #if defined(MINGW)
-  return;
+    return;
 #else
-  int i;
-  
-  if ( Context.childpid != 0 )
+    int i;
+
+    if ( Context.childpid != 0 )
     {
-      /* We may well have started the driver. */
-      drkill();
-      for ( i = 1; Context.childpid == Driver->drivpid && i <= 50; i = i + 1 )
-	utSleep( 0.1 );
-      if ( Context.childpid == Driver->drivpid )
-	utLog("drpexit(): Driver didn't exit; pid = %08x", Context.childpid );
+        /* We may well have started the driver. */
+        drkill();
+        for ( i = 1; Context.childpid == Driver->drivpid && i <= 50; i = i + 1 )
+            utSleep( 0.1 );
+        if ( Context.childpid == Driver->drivpid )
+            utLog("drpexit(): Driver didn't exit; pid = %08x", Context.childpid );
     }
-  
-  return;
+
+    return;
 #endif  /* MINGW */
 }
 
@@ -322,17 +322,17 @@ void drpexit(void)
 /*    drstart */
 void drstart(void)
 {
-#if !defined(MINGW)  
-  if ( Driver->drivstat == DRS_OFF )
+#if !defined(MINGW)
+    if ( Driver->drivstat == DRS_OFF )
     {
-      PVLOCK(&ConqInfo->lockword);
-      if ( Driver->drivstat == DRS_OFF )
-	drcreate();
-      PVUNLOCK(&ConqInfo->lockword);
+        PVLOCK(&ConqInfo->lockword);
+        if ( Driver->drivstat == DRS_OFF )
+            drcreate();
+        PVUNLOCK(&ConqInfo->lockword);
     }
 #endif  /* MINGW */
-  return;
-  
+    return;
+
 }
 
 
@@ -345,34 +345,34 @@ void drstart(void)
 void gcputime( int *cpu )
 {
 #if defined(MINGW)
-  *cpu = 0;
-  return;
+    *cpu = 0;
+    return;
 #else
 
-  static struct tms Ptimes;
+    static struct tms Ptimes;
 
 # ifndef CLK_TCK
 #  ifdef LINUX
-   extern long int __sysconf (int);
+    extern long int __sysconf (int);
 #   define CLK_TCK ((__clock_t) __sysconf (_SC_CLK_TCK))
 #  else
 #   define CLK_TCK CLOCKS_PER_SEC
 #  endif
 # endif
 
-   /* JET - I think this function has outlived it's usefulness. */
-  
-  times(&Ptimes);
-  
-  *cpu = round( ((real)(Ptimes.tms_stime + Ptimes.tms_utime) / 
-		 (real)CLK_TCK) * 
-	       100.0);
-  
-  /* utLog("gcputime() - *cpu = %d", *cpu); */
-  
+    /* JET - I think this function has outlived it's usefulness. */
+
+    times(&Ptimes);
+
+    *cpu = round( ((real)(Ptimes.tms_stime + Ptimes.tms_utime) /
+                   (real)CLK_TCK) *
+                  100.0);
+
+    /* utLog("gcputime() - *cpu = %d", *cpu); */
+
 #endif  /* MINGW */
-  return;
-  
+    return;
+
 }
 
 
@@ -383,12 +383,12 @@ void gcputime( int *cpu )
 /*    initstats( ctemp, etemp ) */
 void initstats( int *ctemp, int *etemp )
 {
-  
-  gcputime( ctemp );
-  utGrand( etemp );
-  
-  return;
-  
+
+    gcputime( ctemp );
+    utGrand( etemp );
+
+    return;
+
 }
 
 
@@ -404,83 +404,83 @@ void initstats( int *ctemp, int *etemp )
 #if defined(CYGWIN) || defined(MINGW)
 int isagod( int unum )
 {
-  if (unum == -1)               /* get god status for current user */
+    if (unum == -1)               /* get god status for current user */
     {
-      return TRUE;
+        return TRUE;
     }
-  else
+    else
     {				/* else a user number passed in */
 				/* just check for OOPT_OPER */
-      if (Users[unum].ooptions[OOPT_OPER])
-	return TRUE;
-      else
-	return FALSE;
+        if (Users[unum].ooptions[OOPT_OPER])
+            return TRUE;
+        else
+            return FALSE;
     }
 }
 #else /* !CGYWIN */
 int isagod( int unum )
 {
-  static struct group *grp = NULL;
-  static int god = FALSE;
-  static char myname[BUFFER_SIZE];
-  int i;
-  
-  god = FALSE;
-  
-  if (unum == -1)		/* get god status for current user */
+    static struct group *grp = NULL;
+    static int god = FALSE;
+    static char myname[BUFFER_SIZE];
+    int i;
+
+    god = FALSE;
+
+    if (unum == -1)		/* get god status for current user */
     {
-      strncpy(myname, clbGetUserLogname(), BUFFER_SIZE);
-      myname[BUFFER_SIZE - 1] = 0;
+        strncpy(myname, clbGetUserLogname(), BUFFER_SIZE);
+        myname[BUFFER_SIZE - 1] = 0;
     }
-  else
+    else
     {				/* else a user number passed in */
 				/* just check for OOPT_OPER */
-      if (Users[unum].ooptions[OOPT_OPER])
-	return TRUE;
-      else
-	return FALSE;
+        if (Users[unum].ooptions[OOPT_OPER])
+            return TRUE;
+        else
+            return FALSE;
     }
-  
-  if (grp == NULL)
+
+    if (grp == NULL)
     {				/* first time */
-      grp = getgrnam(CONQUEST_GROUP);
-      
-      if (grp == NULL)
+        grp = getgrnam(CONQUEST_GROUP);
+
+        if (grp == NULL)
 	{
-	  utLog("isagod(%s): getgrnam(%s) failed: %s",
-	       myname,
-	       CONQUEST_GROUP,
-	       strerror(errno));
-	  
-	  god = FALSE;
-	  return(FALSE);
+            utLog("isagod(%s): getgrnam(%s) failed: %s",
+                  myname,
+                  CONQUEST_GROUP,
+                  strerror(errno));
+
+            god = FALSE;
+            return(FALSE);
 	}
     }
-  
-  /* root is always god */
-  if (strcmp(myname, "root") == 0)
-    god = TRUE;
-  
-  i = 0;
-  
-  if (grp->gr_mem != NULL)
+
+    /* root is always god */
+    if (strcmp(myname, "root") == 0)
+        god = TRUE;
+
+    i = 0;
+
+    if (grp->gr_mem != NULL)
     {
-      while (grp->gr_mem[i] != NULL)
+        while (grp->gr_mem[i] != NULL)
 	{
-	  if (strcmp(myname, grp->gr_mem[i]) == 0)
+            if (strcmp(myname, grp->gr_mem[i]) == 0)
 	    {		/* a match */
-	      god = TRUE;
-	      break;
+                god = TRUE;
+                break;
 	    }
-	  
-	  i++;
+
+            i++;
 	}
     }
-  
-  endgrent();
-  
-  return(god);
-  
+
+    endgrent();
+
+    return(god);
+
 }
 
 #endif /* !CYGWIN */
@@ -494,16 +494,16 @@ int isagod( int unum )
 /*    upchuck */
 void upchuck(void)
 {
-  
-  PVLOCK(&ConqInfo->lockword);
-  
-  utFormatTime( ConqInfo->lastupchuck, 0 );
-  flush_common();
-  
-  PVUNLOCK(&ConqInfo->lockword);
-  
-  return;
-  
+
+    PVLOCK(&ConqInfo->lockword);
+
+    utFormatTime( ConqInfo->lastupchuck, 0 );
+    flush_common();
+
+    PVUNLOCK(&ConqInfo->lockword);
+
+    return;
+
 }
 
 
@@ -513,68 +513,68 @@ void upchuck(void)
 /*    upstats( ctemp, etemp, caccum, eaccum, ctime, etime ) */
 void upstats( int *ctemp, int *etemp, int *caccum, int *eaccum, int *ctime, int *etime )
 {
-  
-  int i, now;
-  
-  /* Update cpu time. */
-  gcputime( &i );
-  
-  if (i >= *ctemp )		/* prevent oddities with timing - JET */
-    {				/* - for multple godlike exits/entries */
-      *caccum = *caccum + (i - *ctemp);
-    }
-  *ctemp = i;			/* if oddity above, this will self-correct */
-  
-  if ( *caccum > 100 )
-    {
-      /* Accumulated a cpu second. */
-      *ctime = *ctime + (*caccum / 100);
-      *caccum = mod( *caccum, 100 );
-    }
-  
-  /* Update elapsed time. */
-  if (*etemp == 0)		/* init etemp if 0 - for VACANT ships */
-    utGrand(etemp);
-  
-  *eaccum = *eaccum + utDeltaGrand( *etemp, &now );
 
-  if ( *eaccum > 1000 )
-    {
-      /* A second elapsed. */
-      *etemp = now;
-      *etime = *etime + (*eaccum / 1000);
-      *eaccum = mod( *eaccum, 1000 );
+    int i, now;
+
+    /* Update cpu time. */
+    gcputime( &i );
+
+    if (i >= *ctemp )		/* prevent oddities with timing - JET */
+    {				/* - for multple godlike exits/entries */
+        *caccum = *caccum + (i - *ctemp);
     }
-  
-  return;
-  
+    *ctemp = i;			/* if oddity above, this will self-correct */
+
+    if ( *caccum > 100 )
+    {
+        /* Accumulated a cpu second. */
+        *ctime = *ctime + (*caccum / 100);
+        *caccum = mod( *caccum, 100 );
+    }
+
+    /* Update elapsed time. */
+    if (*etemp == 0)		/* init etemp if 0 - for VACANT ships */
+        utGrand(etemp);
+
+    *eaccum = *eaccum + utDeltaGrand( *etemp, &now );
+
+    if ( *eaccum > 1000 )
+    {
+        /* A second elapsed. */
+        *etemp = now;
+        *etime = *etime + (*eaccum / 1000);
+        *eaccum = mod( *eaccum, 1000 );
+    }
+
+    return;
+
 }
 
 /* return true if a process is alive, else false... */
 int checkPID(int pidnum)
 {
 #if defined(MINGW)
-  return FALSE;
+    return FALSE;
 #else
-  int rv;
+    int rv;
 
-  if (pidnum == 0)
-    return(FALSE);		/* can re-incarnate to robots */
-  rv = kill(pidnum, 0);
+    if (pidnum == 0)
+        return(FALSE);		/* can re-incarnate to robots */
+    rv = kill(pidnum, 0);
 
-  if (rv == -1)
+    if (rv == -1)
     {
-      switch (errno)
+        switch (errno)
 	{
 	case ESRCH:
-	  return(FALSE);
-	  break;
+            return(FALSE);
+            break;
 	default:
-	  return(TRUE);
-	  break;
+            return(TRUE);
+            break;
 	}
     }
-  else 
-    return(TRUE);
+    else
+        return(TRUE);
 #endif  /* MINGW */
 }

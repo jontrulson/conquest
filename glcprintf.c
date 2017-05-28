@@ -21,7 +21,7 @@
 
 static char buf[MID_BUFFER_SIZE];
 
-/* 
+/*
  * int lin - line if pertinent
  * int col - column if pertinent
  * int align - ALIGN_CENTER 3
@@ -31,37 +31,37 @@ static char buf[MID_BUFFER_SIZE];
  * char *fmt - modified fmt string with color codes embedded
  *             '#' color code
  *             '%' regular format specs
- * ...       - args 
+ * ...       - args
  */
 void cprintf(int lin, int col, int align, char *fmt, ...)
 {
-  va_list ap;
-  int l;
-  GLfloat x, y, w;
-  
-  va_start(ap, fmt);
-  (void)vsnprintf(buf, sizeof(buf) - 1, fmt, ap);
-  va_end(ap);
-  
-  if (DSP_INITED())
-    {
-      l = uiCStrlen(buf);
-      if (align == ALIGN_CENTER)
-        x = dConf.ppCol * ((80.0 / 2.0) - ((GLfloat)l / 2.0));
-      else
-        x = dConf.ppCol * (GLfloat)col;
-      
-      y = dConf.ppRow * (GLfloat)lin;
-      w = dConf.ppCol * (GLfloat)l;
+    va_list ap;
+    int l;
+    GLfloat x, y, w;
 
-      glfRenderFont(x + dConf.wBorderW, 
-                    y + dConf.wBorderW, 
-                    0.0, 
-                    w, dConf.ppRow, 
-                    glfFontFixed, buf, 
-                    NoColor, NULL, 
-                    GLF_FONT_F_SCALEX | GLF_FONT_F_DOCOLOR | GLF_FONT_F_ORTHO);
+    va_start(ap, fmt);
+    (void)vsnprintf(buf, sizeof(buf) - 1, fmt, ap);
+    va_end(ap);
+
+    if (DSP_INITED())
+    {
+        l = uiCStrlen(buf);
+        if (align == ALIGN_CENTER)
+            x = dConf.ppCol * ((80.0 / 2.0) - ((GLfloat)l / 2.0));
+        else
+            x = dConf.ppCol * (GLfloat)col;
+
+        y = dConf.ppRow * (GLfloat)lin;
+        w = dConf.ppCol * (GLfloat)l;
+
+        glfRenderFont(x + dConf.wBorderW,
+                      y + dConf.wBorderW,
+                      0.0,
+                      w, dConf.ppRow,
+                      glfFontFixed, buf,
+                      NoColor, NULL,
+                      GLF_FONT_F_SCALEX | GLF_FONT_F_DOCOLOR | GLF_FONT_F_ORTHO);
     }
 
-  return;
+    return;
 }

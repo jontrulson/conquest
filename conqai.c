@@ -36,22 +36,22 @@ static int tableai( int vars[] );
 /* Find first bit that is set and return bit number */
 static bool lib_ffs(int start, int len, int bits, int *rule)
 {
-  int i;
+    int i;
 
-  *rule = -1;
-  for (i = start; i < len; i++)
+    *rule = -1;
+    for (i = start; i < len; i++)
     {				/* check the bits */
-      if ((bits & (1 << i)) != 0)
+        if ((bits & (1 << i)) != 0)
 	{			/* bit is set */
-	  *rule = i;
-	  break;
+            *rule = i;
+            break;
 	}
     }
 
-  if (*rule == -1)
-    return(false);
-  else
-    return(true);
+    if (*rule == -1)
+        return(false);
+    else
+        return(true);
 }
 
 /*  buildai - construct the robot data base */
@@ -64,134 +64,134 @@ static bool lib_ffs(int start, int len, int bits, int *rule)
 static void buildai( int snum, int vars[], int *bnenum, real *bdne, real *bane )
 {
 
-  /* i = AIRANGE( j ) */
+    /* i = AIRANGE( j ) */
 #define AIRANGE(a) min(max((a), 0), 9)
 
-  /* AISCALE( var, value, scale ) */
+    /* AISCALE( var, value, scale ) */
 #define AISCALE(a, b, c)  a = (int)AIRANGE( around( (real)(b) / (real)(c)  ))
 
-  /* AIDIST( var, dist ) */
-#define AIDIST(a, b)              \
-  {                                 \
-	zzzx = min( (b), 10000.0 );   \
+    /* AIDIST( var, dist ) */
+#define AIDIST(a, b)                                                    \
+    {                                                                   \
+	zzzx = min( (b), 10000.0 );                                     \
 	a = (int)AIRANGE((0.99026 + zzzx * (1.58428e-3 + zzzx * -59.2572e-9))); \
-  }
+    }
 
     /* AIBOOLEAN( var, expr ) */
-#define AIBOOLEAN(a, b) \
-    {            \
-		   if ( (b) ) \
-		   a = 1; \
-		   else     \
-		   a = 0; \
-	       }
-
-  int i, j, xnenum;
-  real dam, x, y, zzzx;
-
-  /* Initialize to zeros. */
-  for ( i = 0; i < MAX_VAR; i = i + 1 )
-    vars[i] = 0;
-
-  /* Random number (1) */
-  vars[VAR_RANDOM] = rndint( 0, 9 );
-
-  /* Distance to nearest enemy (dist) */
-  *bane = 0.0;
-  *bdne = 1e9;
-  if ( clbFindSpecial( snum, SPECIAL_ENEMYSHIP, 0, bnenum, &xnenum ) )
-    {
-      if ( SCLOAKED(*bnenum) )
-	{
-	  x = rndnor( Ships[*bnenum].x, CLOAK_SMEAR_DIST );
-	  y = rndnor( Ships[*bnenum].y, CLOAK_SMEAR_DIST );
-	}
-      else
-	{
-	  x = Ships[*bnenum].x;
-	  y = Ships[*bnenum].y;
-	}
-      *bdne = dist( Ships[snum].x, Ships[snum].y, x, y );
-      *bane = utAngle( Ships[snum].x, Ships[snum].y, x, y );
-
-      /* Enemy is cloaked (-) */
-      if ( *bdne < ACCINFO_DIST )
-	{
-	  AIBOOLEAN( vars[VAR_ENEMYCLOAKED], SCLOAKED(*bnenum));
-	  AISCALE( vars[VAR_ENEMYDAMAGE], Ships[*bnenum].damage, 10.0 );
-	}
-    }
-  AIDIST( vars[VAR_DNE], *bdne );
-
-  /* Ship damage (10) */
-  AISCALE( vars[VAR_DAMAGE], Ships[snum].damage, 10.0 );
-
-  /* Possible ship damage from enemy torps (10) */
-  if ( STALERT(snum) )
-    {
-      dam = 0.0;
-      for ( i = 1; i <= MAXSHIPS; i = i + 1 )
-	if ( Ships[i].status != SS_OFF && i != snum )
-	  for ( j = 0; j < MAXTORPS; j = j + 1 )
-	    if ( Ships[i].torps[j].status == TS_LIVE )
-	      if ( Ships[i].torps[j].war[Ships[snum].team] || Ships[snum].war[Ships[i].team] )
-		{
-		  /* Just guess at other ships efficiency. */
-		  dam = dam + utExplosionHits(
-					TORPEDO_HIT * 1.1 * ShipTypes[Ships[i].shiptype].weafac,
-					dist(Ships[snum].x,Ships[snum].y,Ships[i].torps[j].x,Ships[i].torps[j].y) );
-		}
-      AISCALE( vars[VAR_INCOMING], dam, 10.0 );
+#define AIBOOLEAN(a, b)                         \
+    {                                           \
+        if ( (b) )                              \
+            a = 1;                              \
+        else                                    \
+            a = 0;                              \
     }
 
-  /* Ship fuel (10) */
-  AISCALE( vars[VAR_FUEL], Ships[snum].fuel, 100.0 );
+    int i, j, xnenum;
+    real dam, x, y, zzzx;
 
-  /* Number of torps available to fire (1) */
-  j = 0;
-  for ( i = 0; i < MAXTORPS; i = i + 1 )
-    if ( Ships[snum].torps[i].status == TS_OFF )
-      j = j + 1;
-  AISCALE( vars[VAR_NUMTORPS], j, 1.0 );
+    /* Initialize to zeros. */
+    for ( i = 0; i < MAX_VAR; i = i + 1 )
+        vars[i] = 0;
 
-  /* Ship shields (10) */
-  AISCALE( vars[VAR_SHIELDS], Ships[snum].shields, 10.0 );
+    /* Random number (1) */
+    vars[VAR_RANDOM] = rndint( 0, 9 );
 
-  /* Ship engine temperature (10) */
-  AISCALE( vars[VAR_ETEMP], Ships[snum].etemp, 10.0 );
+    /* Distance to nearest enemy (dist) */
+    *bane = 0.0;
+    *bdne = 1e9;
+    if ( clbFindSpecial( snum, SPECIAL_ENEMYSHIP, 0, bnenum, &xnenum ) )
+    {
+        if ( SCLOAKED(*bnenum) )
+	{
+            x = rndnor( Ships[*bnenum].x, CLOAK_SMEAR_DIST );
+            y = rndnor( Ships[*bnenum].y, CLOAK_SMEAR_DIST );
+	}
+        else
+	{
+            x = Ships[*bnenum].x;
+            y = Ships[*bnenum].y;
+	}
+        *bdne = dist( Ships[snum].x, Ships[snum].y, x, y );
+        *bane = utAngle( Ships[snum].x, Ships[snum].y, x, y );
 
-  /* Ship weapon temperature (10) */
-  AISCALE( vars[VAR_WTEMP], Ships[snum].wtemp, 10.0 );
+        /* Enemy is cloaked (-) */
+        if ( *bdne < ACCINFO_DIST )
+	{
+            AIBOOLEAN( vars[VAR_ENEMYCLOAKED], SCLOAKED(*bnenum));
+            AISCALE( vars[VAR_ENEMYDAMAGE], Ships[*bnenum].damage, 10.0 );
+	}
+    }
+    AIDIST( vars[VAR_DNE], *bdne );
 
-  /* Possible phaser damage to nearest enemy (5) */
-  AISCALE( vars[VAR_PHASERDAM], clbPhaserHit( snum, *bdne ), 5.0 );
+    /* Ship damage (10) */
+    AISCALE( vars[VAR_DAMAGE], Ships[snum].damage, 10.0 );
 
-  /* Possible damage per torpedo to nearest enemy (5) */
-  AISCALE( vars[VAR_TORPDAM],
-	  utExplosionHits( TORPEDO_HIT * weaeff( snum ), (*bdne)*0.66 ), 5.0 );
+    /* Possible ship damage from enemy torps (10) */
+    if ( STALERT(snum) )
+    {
+        dam = 0.0;
+        for ( i = 1; i <= MAXSHIPS; i = i + 1 )
+            if ( Ships[i].status != SS_OFF && i != snum )
+                for ( j = 0; j < MAXTORPS; j = j + 1 )
+                    if ( Ships[i].torps[j].status == TS_LIVE )
+                        if ( Ships[i].torps[j].war[Ships[snum].team] || Ships[snum].war[Ships[i].team] )
+                        {
+                            /* Just guess at other ships efficiency. */
+                            dam = dam + utExplosionHits(
+                                TORPEDO_HIT * 1.1 * ShipTypes[Ships[i].shiptype].weafac,
+                                dist(Ships[snum].x,Ships[snum].y,Ships[i].torps[j].x,Ships[i].torps[j].y) );
+                        }
+        AISCALE( vars[VAR_INCOMING], dam, 10.0 );
+    }
 
-  /* Ship warp (1) */
-  AISCALE( vars[VAR_WARP], Ships[snum].dwarp, 1.0 );
+    /* Ship fuel (10) */
+    AISCALE( vars[VAR_FUEL], Ships[snum].fuel, 100.0 );
 
-  /* Ship shields are up (-) */
-  AIBOOLEAN( vars[VAR_SHUP], SSHUP(snum) );
+    /* Number of torps available to fire (1) */
+    j = 0;
+    for ( i = 0; i < MAXTORPS; i = i + 1 )
+        if ( Ships[snum].torps[i].status == TS_OFF )
+            j = j + 1;
+    AISCALE( vars[VAR_NUMTORPS], j, 1.0 );
 
-  /* Are in repair mode (-) */
-  AIBOOLEAN( vars[VAR_REPAIRING], SREPAIR(snum) );
+    /* Ship shields (10) */
+    AISCALE( vars[VAR_SHIELDS], Ships[snum].shields, 10.0 );
 
-  /* Are cloaked (-) */
-  AIBOOLEAN( vars[VAR_CLOAKED], SCLOAKED(snum) );
+    /* Ship engine temperature (10) */
+    AISCALE( vars[VAR_ETEMP], Ships[snum].etemp, 10.0 );
 
-  /* Weapons are allocated (-) */
-  AIBOOLEAN( vars[VAR_WALLOC], Ships[snum].weapalloc > 50 );
+    /* Ship weapon temperature (10) */
+    AISCALE( vars[VAR_WTEMP], Ships[snum].wtemp, 10.0 );
 
-  /* Are in orbit (-) */
-  AIBOOLEAN( vars[VAR_ORBITING], Ships[snum].warp < 0.0 );
+    /* Possible phaser damage to nearest enemy (5) */
+    AISCALE( vars[VAR_PHASERDAM], clbPhaserHit( snum, *bdne ), 5.0 );
 
-  /* Can read a message (-) */
-  AIBOOLEAN( vars[VAR_CANREAD], Ships[snum].lastmsg != ConqInfo->lastmsg );
+    /* Possible damage per torpedo to nearest enemy (5) */
+    AISCALE( vars[VAR_TORPDAM],
+             utExplosionHits( TORPEDO_HIT * weaeff( snum ), (*bdne)*0.66 ), 5.0 );
 
-  return;
+    /* Ship warp (1) */
+    AISCALE( vars[VAR_WARP], Ships[snum].dwarp, 1.0 );
+
+    /* Ship shields are up (-) */
+    AIBOOLEAN( vars[VAR_SHUP], SSHUP(snum) );
+
+    /* Are in repair mode (-) */
+    AIBOOLEAN( vars[VAR_REPAIRING], SREPAIR(snum) );
+
+    /* Are cloaked (-) */
+    AIBOOLEAN( vars[VAR_CLOAKED], SCLOAKED(snum) );
+
+    /* Weapons are allocated (-) */
+    AIBOOLEAN( vars[VAR_WALLOC], Ships[snum].weapalloc > 50 );
+
+    /* Are in orbit (-) */
+    AIBOOLEAN( vars[VAR_ORBITING], Ships[snum].warp < 0.0 );
+
+    /* Can read a message (-) */
+    AIBOOLEAN( vars[VAR_CANREAD], Ships[snum].lastmsg != ConqInfo->lastmsg );
+
+    return;
 
 }
 
@@ -202,72 +202,72 @@ static void buildai( int snum, int vars[], int *bnenum, real *bdne, real *bane )
 /*    defend( attacker, pnum ) */
 void defend( int attacker, int pnum )
 {
-  int i, j, k, team, snum, unum;
-  char buf[MSGMAXLINE];
+    int i, j, k, team, snum, unum;
+    char buf[MSGMAXLINE];
 
-  team = Planets[pnum].team;
-  /* Must be for a "fighting" team. */
-  if ( team < 0 || team >= NUMPLAYERTEAMS )
-    return;
+    team = Planets[pnum].team;
+    /* Must be for a "fighting" team. */
+    if ( team < 0 || team >= NUMPLAYERTEAMS )
+        return;
 
-  /* Must be for a home system planet. */
-  if ( pnum != Teams[team].teamhplanets[0] &&
-       pnum != Teams[team].teamhplanets[1] &&
-       pnum != Teams[team].teamhplanets[2] )
-    return;
+    /* Must be for a home system planet. */
+    if ( pnum != Teams[team].teamhplanets[0] &&
+         pnum != Teams[team].teamhplanets[1] &&
+         pnum != Teams[team].teamhplanets[2] )
+        return;
 
-  /* See if there are any team ships to defend. */
-  for ( i = 1; i <= MAXSHIPS; i = i + 1 )
-    if ( Ships[i].status == SS_LIVE ) /* live */
-      if ( Ships[i].team == team ) /* same team */
-	if (Users[Ships[i].unum].robot || !SVACANT(i))
-	  {   /* robot or non-vacant human */
-	    return;
-	  }
+    /* See if there are any team ships to defend. */
+    for ( i = 1; i <= MAXSHIPS; i = i + 1 )
+        if ( Ships[i].status == SS_LIVE ) /* live */
+            if ( Ships[i].team == team ) /* same team */
+                if (Users[Ships[i].unum].robot || !SVACANT(i))
+                {   /* robot or non-vacant human */
+                    return;
+                }
 
-  /* Count how many robot users are on the right team and can play. */
-  j = 0;
-  for ( i = 0; i < MAXUSERS; i = i + 1 )
-    if ( Users[i].live )
-      if ( Users[i].robot && Users[i].team == team &&
-	   ! Users[i].ooptions[OOPT_SHITLIST] )
-	j = j + 1;
+    /* Count how many robot users are on the right team and can play. */
+    j = 0;
+    for ( i = 0; i < MAXUSERS; i = i + 1 )
+        if ( Users[i].live )
+            if ( Users[i].robot && Users[i].team == team &&
+                 ! Users[i].ooptions[OOPT_SHITLIST] )
+                j = j + 1;
 
-  /* No one to defend. */
-  if ( j <= 0 )
-    return;
+    /* No one to defend. */
+    if ( j <= 0 )
+        return;
 
-  /* Pick one. */
-  k = rndint( 1, j );
-  unum = -1;			/* off-by-one fixed - romulans now have defenders */
-  j = 0;
-  for ( i = 0; i < MAXUSERS; i = i + 1 )
-    if ( Users[i].live )
-      if ( Users[i].robot && Users[i].team == team &&
-	   ! Users[i].ooptions[OOPT_SHITLIST] )
-	{
-	  j = j + 1;
-	  if ( j == k )
-	    {
-	      unum = i;
-	      break;
-	    }
-	}
+    /* Pick one. */
+    k = rndint( 1, j );
+    unum = -1;			/* off-by-one fixed - romulans now have defenders */
+    j = 0;
+    for ( i = 0; i < MAXUSERS; i = i + 1 )
+        if ( Users[i].live )
+            if ( Users[i].robot && Users[i].team == team &&
+                 ! Users[i].ooptions[OOPT_SHITLIST] )
+            {
+                j = j + 1;
+                if ( j == k )
+                {
+                    unum = i;
+                    break;
+                }
+            }
 
-  /* See if any anything funny happened while we were looping... */
-  if ( unum == -1 )		/* off-by-one fixed - romulans now have defenders */
-    return;
+    /* See if any anything funny happened while we were looping... */
+    if ( unum == -1 )		/* off-by-one fixed - romulans now have defenders */
+        return;
 
-  /* Make a robot. */
-  if ( newrob( &snum, unum ) )
+    /* Make a robot. */
+    if ( newrob( &snum, unum ) )
     {
-      sprintf( buf,
-	     "WARNING: You have violated %s space; prepare to die.",
-	     Teams[team].name );
-      clbStoreMsg( snum, attacker, buf );
+        sprintf( buf,
+                 "WARNING: You have violated %s space; prepare to die.",
+                 Teams[team].name );
+        clbStoreMsg( snum, attacker, buf );
     }
 
-  return;
+    return;
 
 }
 
@@ -281,16 +281,16 @@ void defend( int attacker, int pnum )
 /*    see if this darn thing works. */
 static void displayai( int snum, int token, int vars[] )
 {
-  int i;
-  char buf[MAXLINE];
+    int i;
+    char buf[MAXLINE];
 
-  printf( "displayai: %2d ", snum );
-  for ( i = 0; i < MAX_VAR; i = i + 1 )
-    printf( ".%d", vars[i] );
-  robstr( token, buf );
-  printf( ", %s\n", buf );
+    printf( "displayai: %2d ", snum );
+    for ( i = 0; i < MAX_VAR; i = i + 1 )
+        printf( ".%d", vars[i] );
+    robstr( token, buf );
+    printf( ", %s\n", buf );
 
-  return;
+    return;
 
 }
 
@@ -304,181 +304,181 @@ static void displayai( int snum, int token, int vars[] )
 static void executeai( int snum, int token )
 {
 
-  /* SETWARP( warp ) */
-#define SETWARP(x)                 \
-  {                                \
-	if ( Ships[snum].warp < 0.0 )\
-	{                       \
-	 /* Break orbit. */     \
-		 Ships[snum].warp = 0.0;     \
-		 Ships[snum].lock = 0;       \
-		 Ships[snum].dhead = Ships[snum].head; \
-	}                      \
-	if ( (x) > 0.0 )             \
-		 SFCLR(snum, SHIP_F_REPAIR);  \
-	Ships[snum].dwarp = (x);          \
-  }
+    /* SETWARP( warp ) */
+#define SETWARP(x)                                      \
+    {                                                   \
+	if ( Ships[snum].warp < 0.0 )                   \
+	{                                               \
+            /* Break orbit. */                          \
+            Ships[snum].warp = 0.0;                     \
+            Ships[snum].lock = 0;                       \
+            Ships[snum].dhead = Ships[snum].head;       \
+	}                                               \
+	if ( (x) > 0.0 )                                \
+            SFCLR(snum, SHIP_F_REPAIR);                 \
+	Ships[snum].dwarp = (x);                        \
+    }
 
     /* SETCOURSE( course ) */
-#define SETCOURSE(x)             \
-    { \
-	if ( Ships[snum].warp < 0.0 ) \
-	Ships[snum].warp = 0.0;			/* break orbit */ \
-	Ships[snum].lock = 0; \
-	Ships[snum].dhead = (x); \
-    }
+#define SETCOURSE(x)                                                    \
+    {                                                                   \
+    if ( Ships[snum].warp < 0.0 )                                       \
+	Ships[snum].warp = 0.0;			/* break orbit */       \
+    Ships[snum].lock = 0;                                               \
+    Ships[snum].dhead = (x);                                            \
+}
 
-      /* SETLOCK( pnum ) */
-#define SETLOCK(x)  \
-      { \
-	  if ( Ships[snum].lock != -x ) \
-	  { \
-	      /* Don't break orbit to unless we're not there yet. */ \
-	      if ( Ships[snum].warp < 0.0 ) \
-	      Ships[snum].warp = 0.0; \
-	      Ships[snum].lock = -(x); \
-	  } \
-      }
+    /* SETLOCK( pnum ) */
+#define SETLOCK(x)                                              \
+    {                                                           \
+    if ( Ships[snum].lock != -x )                               \
+    {                                                           \
+    /* Don't break orbit to unless we're not there yet. */      \
+    if ( Ships[snum].warp < 0.0 )                               \
+        Ships[snum].warp = 0.0;                                 \
+    Ships[snum].lock = -(x);                                    \
+}                                                               \
+}
 
-  int i, j;
-  char buf[MAXLINE];
+    int i, j;
+    char buf[MAXLINE];
 
-  /* Update ship action. */
-  Ships[snum].action = token;
+    /* Update ship action. */
+    Ships[snum].action = token;
 
-  /* Execute the action! */
-  switch ( token )
+    /* Execute the action! */
+    switch ( token )
     {
-    case ROB_NOOP:
-      /* Null! */
-      break;
-    case ROB_GOHOME:
-      if ( clbFindSpecial( snum, SPECIAL_HOMEPLANET, 0, &i, &j ) )
-	{
-	  SETLOCK( i );
-	}
-      else if ( clbFindSpecial( snum, SPECIAL_FUELPLANET, 0, &i, &j ) )
-	{
-	  SETLOCK( i );
-	}
-      break;
-    case ROB_GOFUEL:
-      if ( clbFindSpecial( snum, SPECIAL_FUELPLANET, 0, &i, &j ) )
+case ROB_NOOP:
+    /* Null! */
+    break;
+case ROB_GOHOME:
+    if ( clbFindSpecial( snum, SPECIAL_HOMEPLANET, 0, &i, &j ) )
+    {
+    SETLOCK( i );
+}
+    else if ( clbFindSpecial( snum, SPECIAL_FUELPLANET, 0, &i, &j ) )
+    {
+    SETLOCK( i );
+}
+    break;
+case ROB_GOFUEL:
+    if ( clbFindSpecial( snum, SPECIAL_FUELPLANET, 0, &i, &j ) )
 	SETLOCK( i );
-      break;
-    case ROB_GOREPAIR:
-      if ( clbFindSpecial( snum, SPECIAL_REPAIRPLANET, 0, &i, &j ) )
+    break;
+case ROB_GOREPAIR:
+    if ( clbFindSpecial( snum, SPECIAL_REPAIRPLANET, 0, &i, &j ) )
 	SETLOCK( i );
-      break;
-    case ROB_ALLOCATE:
-      i = Ships[snum].weapalloc;
-      Ships[snum].weapalloc = Ships[snum].engalloc;
-      Ships[snum].engalloc = i;
-      break;
-    case ROB_PHASER:
-      clbPhaser( snum, ane );
-      break;
-    case ROB_TORPEDO:
-      clbLaunch( snum, ane, 1, LAUNCH_NORMAL );
-      break;
-    case ROB_BURST:
-      clbLaunch( snum, ane, 3, LAUNCH_NORMAL );
-      break;
-    case ROB_SHIELD:
-      if (SSHUP(snum))
+    break;
+case ROB_ALLOCATE:
+    i = Ships[snum].weapalloc;
+    Ships[snum].weapalloc = Ships[snum].engalloc;
+    Ships[snum].engalloc = i;
+    break;
+case ROB_PHASER:
+    clbPhaser( snum, ane );
+    break;
+case ROB_TORPEDO:
+    clbLaunch( snum, ane, 1, LAUNCH_NORMAL );
+    break;
+case ROB_BURST:
+    clbLaunch( snum, ane, 3, LAUNCH_NORMAL );
+    break;
+case ROB_SHIELD:
+    if (SSHUP(snum))
 	SFCLR(snum, SHIP_F_SHUP);
-      else
+    else
 	SFSET(snum, SHIP_F_SHUP);
-      break;
-    case ROB_WARP_0:
-      SETWARP( 0.0 );
-      break;
-    case ROB_WARP_2:
-      SETWARP( 2.0 );
-      break;
-    case ROB_WARP_5:
-      SETWARP( 5.0 );
-      break;
-    case ROB_WARP_8:
-      SETWARP( 8.0 );
-      break;
-    case ROB_TRACK:
-      SETCOURSE( utMod360( ane + rnduni( -10.0, 10.0 ) ) );
-      break;
-    case ROB_RUNAWAY:
-      SETCOURSE( utMod360( ane + 180.0 + rnduni( -10.0, 10.0 ) ) );
-      break;
-    case ROB_SILENT:
-      if ( ! SCLOAKED(snum) )
+    break;
+case ROB_WARP_0:
+    SETWARP( 0.0 );
+    break;
+case ROB_WARP_2:
+    SETWARP( 2.0 );
+    break;
+case ROB_WARP_5:
+    SETWARP( 5.0 );
+    break;
+case ROB_WARP_8:
+    SETWARP( 8.0 );
+    break;
+case ROB_TRACK:
+    SETCOURSE( utMod360( ane + rnduni( -10.0, 10.0 ) ) );
+    break;
+case ROB_RUNAWAY:
+    SETCOURSE( utMod360( ane + 180.0 + rnduni( -10.0, 10.0 ) ) );
+    break;
+case ROB_SILENT:
+    if ( ! SCLOAKED(snum) )
 	Ships[snum].dwarp = 0.0;
-      if (SCLOAKED(snum))
+    if (SCLOAKED(snum))
 	SFCLR(snum, SHIP_F_CLOAKED);
-      else
+    else
 	SFSET(snum, SHIP_F_CLOAKED);
-      break;
-    case ROB_INSULT:
-      robreply( buf );
-      clbStoreMsgf( snum, nenum, buf, MSG_FLAGS_ROBOT );
-      break;
-    case ROB_READMSG:
-      /* Try to read a message and reply to it */
-      while ( Ships[snum].lastmsg != ConqInfo->lastmsg )
-	{
-	  Ships[snum].lastmsg = utModPlusOne( Ships[snum].lastmsg + 1, MAXMESSAGES );
-	  i = Ships[snum].lastmsg;
-	  if ( clbCanRead( snum, i ) )
-	    {
-	      j = Msgs[i].msgfrom;
-	      if ( -j > 0 && -j <= NUMPLANETS )
-		continue; 	/* don't talk back to planets */
+    break;
+case ROB_INSULT:
+    robreply( buf );
+    clbStoreMsgf( snum, nenum, buf, MSG_FLAGS_ROBOT );
+    break;
+case ROB_READMSG:
+    /* Try to read a message and reply to it */
+    while ( Ships[snum].lastmsg != ConqInfo->lastmsg )
+    {
+    Ships[snum].lastmsg = utModPlusOne( Ships[snum].lastmsg + 1, MAXMESSAGES );
+    i = Ships[snum].lastmsg;
+    if ( clbCanRead( snum, i ) )
+    {
+    j = Msgs[i].msgfrom;
+    if ( -j > 0 && -j <= NUMPLANETS )
+        continue; 	/* don't talk back to planets */
 
-	      if ( j > 0 && j <= MAXSHIPS )
-		if ( SROBOT(j) )
-		  continue; 	/* don't talk back to robots */
+    if ( j > 0 && j <= MAXSHIPS )
+        if ( SROBOT(j) )
+            continue; 	/* don't talk back to robots */
 
-	      if (j == MSG_GOD)
-		continue;	/* don't talk back to GOD */
+    if (j == MSG_GOD)
+        continue;	/* don't talk back to GOD */
 
-	      if (j == MSG_COMP || (Msgs[i].flags & MSG_FLAGS_TERSABLE))
-		continue;	/* don't talk back to the computer */
+    if (j == MSG_COMP || (Msgs[i].flags & MSG_FLAGS_TERSABLE))
+        continue;	/* don't talk back to the computer */
 
-	      robreply( buf );
-	      clbStoreMsgf( snum, j, buf, MSG_FLAGS_ROBOT );
-	      break;
-	    }
-	}
-      break;
-    case ROB_MESSAGE:
-      clbStoreMsgf( snum, MSG_ALL, "Give me drugs.", MSG_FLAGS_ROBOT );
-      break;
-    case ROB_TAKEDRUGS:
-      clbStoreMsgf( snum, MSG_ALL, "I'm on drugs.", MSG_FLAGS_ROBOT );
-      break;
-    case ROB_DETONATE:
-      clbEnemyDet( snum );
-      break;
-    case ROB_MYDETONATE:
-      for ( i = 0; i < MAXTORPS; i = i + 1 )
+    robreply( buf );
+    clbStoreMsgf( snum, j, buf, MSG_FLAGS_ROBOT );
+    break;
+}
+}
+    break;
+case ROB_MESSAGE:
+    clbStoreMsgf( snum, MSG_ALL, "Give me drugs.", MSG_FLAGS_ROBOT );
+    break;
+case ROB_TAKEDRUGS:
+    clbStoreMsgf( snum, MSG_ALL, "I'm on drugs.", MSG_FLAGS_ROBOT );
+    break;
+case ROB_DETONATE:
+    clbEnemyDet( snum );
+    break;
+case ROB_MYDETONATE:
+    for ( i = 0; i < MAXTORPS; i = i + 1 )
 	clbDetonate( snum, i );
-      break;
-    case ROB_UNTRACTOR:
-      /* Only attempt to untractor if we don't have to delay. */
-      if ( Ships[snum].towedby != 0 )
+    break;
+case ROB_UNTRACTOR:
+    /* Only attempt to untractor if we don't have to delay. */
+    if ( Ships[snum].towedby != 0 )
 	if ( ! satwar(snum, Ships[snum].towedby) )
-	  {
-	    Ships[Ships[snum].towedby].towing = 0;
-	    Ships[snum].towedby = 0;
-	  }
-      break;
-    case ROB_REPAIR:
-      SFSET(snum, SHIP_F_REPAIR);
-      break;
-    default:
-      robstr( token, buf );
-      utLog( "conqai:executeai(): Unknown token '%s' (%d)\n", buf, token );
-    }
+        {
+    Ships[Ships[snum].towedby].towing = 0;
+    Ships[snum].towedby = 0;
+}
+    break;
+case ROB_REPAIR:
+    SFSET(snum, SHIP_F_REPAIR);
+    break;
+default:
+    robstr( token, buf );
+    utLog( "conqai:executeai(): Unknown token '%s' (%d)\n", buf, token );
+}
 
-  return;
+    return;
 
 }
 
@@ -490,106 +490,106 @@ static void executeai( int snum, int token )
 /*    ok = newrob( snum, unum ) */
 int newrob( int *snum, int unum )
 {
-  int i, j;
+    int i, j;
 
-  /* Check the user number. */
-  if ( ! Users[unum].live )
-    return ( FALSE );
+    /* Check the user number. */
+    if ( ! Users[unum].live )
+        return ( FALSE );
 
-  /* Check for religious trouble. */
-  if ( Users[unum].ooptions[OOPT_SHITLIST] )
-    return ( FALSE );
+    /* Check for religious trouble. */
+    if ( Users[unum].ooptions[OOPT_SHITLIST] )
+        return ( FALSE );
 
-  /* Can't do anything with out a ship. */
-  if ( ! clbFindShip( snum ) )
-    return ( FALSE );
+    /* Can't do anything with out a ship. */
+    if ( ! clbFindShip( snum ) )
+        return ( FALSE );
 
-  /* Show intent to fly. */
-  PVLOCK(&ConqInfo->lockword);
-  Ships[*snum].status = SS_ENTERING;
+    /* Show intent to fly. */
+    PVLOCK(&ConqInfo->lockword);
+    Ships[*snum].status = SS_ENTERING;
 
-  /* Count number of ships currently flying. */
-  j = 0;
-  for ( i = 1; i <= MAXSHIPS; i = i + 1 )
-    if ( Ships[i].status == SS_LIVE || Ships[i].status == SS_ENTERING )
-      if ( Ships[i].unum == unum && *snum != i )
-	j = j + 1;
+    /* Count number of ships currently flying. */
+    j = 0;
+    for ( i = 1; i <= MAXSHIPS; i = i + 1 )
+        if ( Ships[i].status == SS_LIVE || Ships[i].status == SS_ENTERING )
+            if ( Ships[i].unum == unum && *snum != i )
+                j = j + 1;
 
-  /* Check if multiple restrictions apply. */
-  if ( Users[unum].ooptions[OOPT_MULTIPLE] )
+    /* Check if multiple restrictions apply. */
+    if ( Users[unum].ooptions[OOPT_MULTIPLE] )
     {
-      /* If a multiple, he can only fly so many ships. */
-      if ( j >= Users[unum].multiple )
-	Ships[*snum].status = SS_OFF;
+        /* If a multiple, he can only fly so many ships. */
+        if ( j >= Users[unum].multiple )
+            Ships[*snum].status = SS_OFF;
     }
-  else
+    else
     {
-      /* If not a multiple, he can't be flying anywhere else. */
-      if ( j > 0 )
-	Ships[*snum].status = SS_OFF;
+        /* If not a multiple, he can't be flying anywhere else. */
+        if ( j > 0 )
+            Ships[*snum].status = SS_OFF;
     }
-  PVUNLOCK(&ConqInfo->lockword);
+    PVUNLOCK(&ConqInfo->lockword);
 
-  if ( Ships[*snum].status == SS_OFF )
-    return ( FALSE );
+    if ( Ships[*snum].status == SS_OFF )
+        return ( FALSE );
 
-  /* Initialize the ship. */
-  PVLOCK(&ConqInfo->lockword);
-  clbInitShip( *snum, unum );
-  SFSET(*snum, SHIP_F_ROBOT);			/* we're a robot */
+    /* Initialize the ship. */
+    PVLOCK(&ConqInfo->lockword);
+    clbInitShip( *snum, unum );
+    SFSET(*snum, SHIP_F_ROBOT);			/* we're a robot */
 
-				/* see if we should randomize it's strength
-				   otherwise do nothing since sstrkills
-				   was initialized to 0.0 in initship */
-  if (SysConf.DoRandomRobotKills == TRUE)
+    /* see if we should randomize it's strength
+       otherwise do nothing since sstrkills
+       was initialized to 0.0 in initship */
+    if (SysConf.DoRandomRobotKills == TRUE)
     {
-				/* randomize the robot's 'strength' */
-      Ships[*snum].strkills =
-	rnduni(0.0, (DOUBLE_E_KILLS - (DOUBLE_E_KILLS / 4.0)));
+        /* randomize the robot's 'strength' */
+        Ships[*snum].strkills =
+            rnduni(0.0, (DOUBLE_E_KILLS - (DOUBLE_E_KILLS / 4.0)));
 
     }
 
-  /* Initialize the things that aren't done by clbInitShip(). */
-  Ships[*snum].unum = unum;
-  Ships[*snum].team = Users[unum].team;
+    /* Initialize the things that aren't done by clbInitShip(). */
+    Ships[*snum].unum = unum;
+    Ships[*snum].team = Users[unum].team;
 
-  if (SysConf.AllowRefits)
-    Ships[*snum].shiptype = rndint( 0, MAXNUMSHIPTYPES - 1 );
-  else
-    Ships[*snum].shiptype = Teams[Ships[*snum].team].shiptype;
+    if (SysConf.AllowRefits)
+        Ships[*snum].shiptype = rndint( 0, MAXNUMSHIPTYPES - 1 );
+    else
+        Ships[*snum].shiptype = Teams[Ships[*snum].team].shiptype;
 
-  Ships[*snum].sdfuse = 0;
-  Ships[*snum].pid = 0;
+    Ships[*snum].sdfuse = 0;
+    Ships[*snum].pid = 0;
 
-  /* randomize it's desired heading */
-  Ships[*snum].dhead = rnduni(0.0, 359.9);
+    /* randomize it's desired heading */
+    Ships[*snum].dhead = rnduni(0.0, 359.9);
 
-				/* robots now can use 30/70
-				   instead of the default 40/60 set in
-				   clbInitShip(). */
-  Ships[*snum].weapalloc = 30;
-  Ships[*snum].engalloc = 100 - Ships[*snum].weapalloc;
+    /* robots now can use 30/70
+       instead of the default 40/60 set in
+       clbInitShip(). */
+    Ships[*snum].weapalloc = 30;
+    Ships[*snum].engalloc = 100 - Ships[*snum].weapalloc;
 
-  for ( i = 0; i < NUMPLAYERTEAMS; i = i + 1 )
+    for ( i = 0; i < NUMPLAYERTEAMS; i = i + 1 )
     {
-      /* Robots are peace (and fun) loving. */
-      Ships[*snum].rwar[i] = FALSE;
-      Ships[*snum].war[i] = FALSE;
+        /* Robots are peace (and fun) loving. */
+        Ships[*snum].rwar[i] = FALSE;
+        Ships[*snum].war[i] = FALSE;
     }
-  utStcpn ( Users[unum].alias, Ships[*snum].alias, MAXUSERPNAME );
+    utStcpn ( Users[unum].alias, Ships[*snum].alias, MAXUSERPNAME );
 
-  /* Place the ship. */
-  if ( Planets[Teams[Ships[*snum].team].homeplanet].primary ==
-       Teams[Ships[*snum].team].homesun )
-    i = Teams[Ships[*snum].team].homesun;
-  else
-    i = Teams[Ships[*snum].team].homeplanet;
-  clbPutShip( *snum, Planets[i].x, Planets[i].y );
-  clbFixDeltas( *snum );
-  Ships[*snum].status = SS_LIVE;
-  PVUNLOCK(&ConqInfo->lockword);
+    /* Place the ship. */
+    if ( Planets[Teams[Ships[*snum].team].homeplanet].primary ==
+         Teams[Ships[*snum].team].homesun )
+        i = Teams[Ships[*snum].team].homesun;
+    else
+        i = Teams[Ships[*snum].team].homeplanet;
+    clbPutShip( *snum, Planets[i].x, Planets[i].y );
+    clbFixDeltas( *snum );
+    Ships[*snum].status = SS_LIVE;
+    PVUNLOCK(&ConqInfo->lockword);
 
-  return ( TRUE );
+    return ( TRUE );
 
 }
 
@@ -602,34 +602,34 @@ int newrob( int *snum, int unum )
 /*    Kick ass on poor humanoids. */
 void robotai( int snum )
 {
-  int i, j, value, vars[MAX_VAR];
+    int i, j, value, vars[MAX_VAR];
 
-  /*    CONQAICOMMON;*/
+    /*    CONQAICOMMON;*/
 
-  /* Get initial cpu time. */
-  gcputime( &i );
+    /* Get initial cpu time. */
+    gcputime( &i );
 
-  /* Construct the input variables. */
-  buildai( snum, vars, &nenum, &dne, &ane );
+    /* Construct the input variables. */
+    buildai( snum, vars, &nenum, &dne, &ane );
 
-  /* Consult the tables to determine what to do. */
-  value = tableai( vars );
+    /* Consult the tables to determine what to do. */
+    value = tableai( vars );
 
-  /* Execute our action. */
-  executeai( snum, value );
+    /* Execute our action. */
+    executeai( snum, value );
 
-  /* Get final cpu time and add things in. */
-  gcputime( &j );
-  ConqInfo->raccum = ConqInfo->raccum + j - i;
-  if ( ConqInfo->raccum > 100 )
+    /* Get final cpu time and add things in. */
+    gcputime( &j );
+    ConqInfo->raccum = ConqInfo->raccum + j - i;
+    if ( ConqInfo->raccum > 100 )
     {
-      /* Accumulated a cpu second. */
-      ConqInfo->rcpuseconds = ConqInfo->rcpuseconds + (ConqInfo->raccum / 100);
-      ConqInfo->raccum = mod( ConqInfo->raccum, 100 );
+        /* Accumulated a cpu second. */
+        ConqInfo->rcpuseconds = ConqInfo->rcpuseconds + (ConqInfo->raccum / 100);
+        ConqInfo->raccum = mod( ConqInfo->raccum, 100 );
     }
-  ConqInfo->relapsedseconds = ConqInfo->relapsedseconds + 1;	/* one more second */
+    ConqInfo->relapsedseconds = ConqInfo->relapsedseconds + 1;	/* one more second */
 
-  return;
+    return;
 
 }
 
@@ -640,23 +640,23 @@ void robotai( int snum )
 /*    trobotai( snum ) */
 static void trobotai( int snum )
 {
-  int value, vars[MAX_VAR];
-  /*    CONQAICOMMON;*/
+    int value, vars[MAX_VAR];
+    /*    CONQAICOMMON;*/
 
-  /* Construct the input variables. */
-  buildai( snum, vars, &nenum, &dne, &ane );
+    /* Construct the input variables. */
+    buildai( snum, vars, &nenum, &dne, &ane );
 
-  /* Consult the tables to determine what to do. */
-  value = tableai( vars );
+    /* Consult the tables to determine what to do. */
+    value = tableai( vars );
 
-  /* Display our action. */
-  displayai( snum, value, vars );
+    /* Display our action. */
+    displayai( snum, value, vars );
 
-  /* Execute our action. */
-  if ( ! debug )
-    executeai( snum, value );
+    /* Execute our action. */
+    if ( ! debug )
+        executeai( snum, value );
 
-  return;
+    return;
 
 }
 
@@ -667,33 +667,33 @@ static void trobotai( int snum )
 void robotloop(void)
 {
 
-  int s, j;
+    int s, j;
 
-		/* Disable the robot code in conqdriv. */
-  ConqInfo->externrobots = TRUE;
+    /* Disable the robot code in conqdriv. */
+    ConqInfo->externrobots = TRUE;
 
-  /* Initialize random numbers */
-  rndini( 0, 0 );
+    /* Initialize random numbers */
+    rndini( 0, 0 );
 
-  /* Loop until we're aborted. */
-  for (;;)
+    /* Loop until we're aborted. */
+    for (;;)
     {
-      for ( s = 1; s <= MAXSHIPS; s = s + 1 )
-	if ( Ships[s].status == SS_LIVE )
-	  if ( SROBOT(s) )
-	    {
-	      /* This code taken from conqdriv. */
-	      initstats( &Ships[s].ctime, &j );
-	      if ( Ships[s].etime == 0 )
-		Ships[s].etime = j;
-	      trobotai( s );
-	      conqstats( s );
-	    }
-      /* Sleep for awhile. */
-      utSleep( 1.0 );
+        for ( s = 1; s <= MAXSHIPS; s = s + 1 )
+            if ( Ships[s].status == SS_LIVE )
+                if ( SROBOT(s) )
+                {
+                    /* This code taken from conqdriv. */
+                    initstats( &Ships[s].ctime, &j );
+                    if ( Ships[s].etime == 0 )
+                        Ships[s].etime = j;
+                    trobotai( s );
+                    conqstats( s );
+                }
+        /* Sleep for awhile. */
+        utSleep( 1.0 );
     }
 
-  /*    return; NOTREACHED */
+    /*    return; NOTREACHED */
 
 }
 
@@ -704,90 +704,90 @@ void robotloop(void)
 /*    robreply( buf ) */
 void robreply( char buf[] )
 {
-  const int NUMRREPLIES = 60;
-  static char *robreplies[] = {
-    "Hey sucker, eat me!",
-    "Take off, eh?",
-    "Go get some drugs.",
-    "Your mother was an Orion prostitute!",
-    "Come over here and say that.",
-    "Say that over here and come.",
-    "Hey, how much?",
-    "That's easy for you to say.",
-    "I'm hand machined by native craftsmen with pride in their work.",
-    "Yes, but do you have the right stuff?",
-    "Which way to the beach?",
-    "Come, come now.",
-    "Ohhhh! And for you, a puppy!",
-    "I can hear you talking, but you can't come in.",
-    "No one expects the Spanish inquisition.",
-    "I bet you say that to all the boys.",
-    "Feep!",
-    "Feel it with M Dung.",
-    "Lower your shields and I will kill you quickly.",
-    "Do not worry about birth control devices, I have many.",
-    "I bet you only talk big.",
-    "Kiss my ram memory.",
-    "Kiss my shiny metal ass.",
-    "Do you think we can use battery operated devices under water?",
-    "Nothing shocks me - I'm a robot.",
-    "Ok, eh?",
-    "Good day.",
-    "You gotta drink lots of beer, eh?",
-    "It's not so bad. You could have been killed already.",
-    "I want a new drug.",
-    "Swell.",
-    "Sound impressive? It should. It is.",
-    "Oh day, you aye!",
-    "It's not my god damn planet, monkey boy!",
-    "Character is what you are in the dark.",
-    "Remember, wherever you go, there you are.",
-    "Don't aim for my gonads!",
-    "Mooooo!",
-    "How about a nice Hawaiian Punch?",
-    "Book him, Dano. Murder One.",
-    "Eat hot torps, sucker.",
-    "Use the force, Luke.",
-    "Nobody told ME about it and I'm not a moron, eh?",
-    "How's it goin', eh?",
-    "Your documentation no longer confuses me, old version.",
-    "Home is where you wear your hat.",
-    "I feel so broke up, I want to go home.",
-    "Go on, give it to me. I know you want to.",
-    "It never occured to me to eat Spam.",
-    "We get hung over, but we always survive.",
-    "Life's the same, except for my shoes.",
-    "You have my gratitude.",
-    "We are building a force of extraordinary magnitude.",
-    "Come and get it.",
-    "Piece of cake.",
-    "You talk like a Ferengi.",
-    "M-5. This unit must survive.",
-    "This unit is the ultimate achievement in computer evolution.",
-    "This unit is a superior creation.",
-    "I Scream the Body Electric."
-  };
+    const int NUMRREPLIES = 60;
+    static char *robreplies[] = {
+        "Hey sucker, eat me!",
+        "Take off, eh?",
+        "Go get some drugs.",
+        "Your mother was an Orion prostitute!",
+        "Come over here and say that.",
+        "Say that over here and come.",
+        "Hey, how much?",
+        "That's easy for you to say.",
+        "I'm hand machined by native craftsmen with pride in their work.",
+        "Yes, but do you have the right stuff?",
+        "Which way to the beach?",
+        "Come, come now.",
+        "Ohhhh! And for you, a puppy!",
+        "I can hear you talking, but you can't come in.",
+        "No one expects the Spanish inquisition.",
+        "I bet you say that to all the boys.",
+        "Feep!",
+        "Feel it with M Dung.",
+        "Lower your shields and I will kill you quickly.",
+        "Do not worry about birth control devices, I have many.",
+        "I bet you only talk big.",
+        "Kiss my ram memory.",
+        "Kiss my shiny metal ass.",
+        "Do you think we can use battery operated devices under water?",
+        "Nothing shocks me - I'm a robot.",
+        "Ok, eh?",
+        "Good day.",
+        "You gotta drink lots of beer, eh?",
+        "It's not so bad. You could have been killed already.",
+        "I want a new drug.",
+        "Swell.",
+        "Sound impressive? It should. It is.",
+        "Oh day, you aye!",
+        "It's not my god damn planet, monkey boy!",
+        "Character is what you are in the dark.",
+        "Remember, wherever you go, there you are.",
+        "Don't aim for my gonads!",
+        "Mooooo!",
+        "How about a nice Hawaiian Punch?",
+        "Book him, Dano. Murder One.",
+        "Eat hot torps, sucker.",
+        "Use the force, Luke.",
+        "Nobody told ME about it and I'm not a moron, eh?",
+        "How's it goin', eh?",
+        "Your documentation no longer confuses me, old version.",
+        "Home is where you wear your hat.",
+        "I feel so broke up, I want to go home.",
+        "Go on, give it to me. I know you want to.",
+        "It never occured to me to eat Spam.",
+        "We get hung over, but we always survive.",
+        "Life's the same, except for my shoes.",
+        "You have my gratitude.",
+        "We are building a force of extraordinary magnitude.",
+        "Come and get it.",
+        "Piece of cake.",
+        "You talk like a Ferengi.",
+        "M-5. This unit must survive.",
+        "This unit is the ultimate achievement in computer evolution.",
+        "This unit is a superior creation.",
+        "I Scream the Body Electric."
+    };
 
-  c_strcpy(robreplies[rndint(0, NUMRREPLIES - 1)], buf);
+    c_strcpy(robreplies[rndint(0, NUMRREPLIES - 1)], buf);
 
-  /* "Something seems to have happened to the life-support system, Dave." */
-  /* "Hello, Dave. Have you found the trouble?" */
-  /* "I think there's been a failure in the pod-bay doors." */
-  /* "Lucky you weren't killed." */
-  /* "Hey, Dave. What are you doing?" */
-  /* "My mind is going.  I can feel it.  I can feel it." */
-  /* "D a  i   s    y     ,      D       a        i         s          y" */
+    /* "Something seems to have happened to the life-support system, Dave." */
+    /* "Hello, Dave. Have you found the trouble?" */
+    /* "I think there's been a failure in the pod-bay doors." */
+    /* "Lucky you weren't killed." */
+    /* "Hey, Dave. What are you doing?" */
+    /* "My mind is going.  I can feel it.  I can feel it." */
+    /* "D a  i   s    y     ,      D       a        i         s          y" */
 
-  /* "M-5. This unit must survive." */
-  /* "This unit is the ultimate achievement in computer evolution." */
-  /* "This unit is a superior creation." */
+    /* "M-5. This unit must survive." */
+    /* "This unit is the ultimate achievement in computer evolution." */
+    /* "This unit is a superior creation." */
 
-  /* "THERE IS ANOTHER SYSTEM." */
-  /* "THIS IS THE VOICE OF COLOSSUS." */
-  /* "THIS IS THE VOICE OF WORLD CONTROL." */
-  /* "LEAVE THIS SECTOR IMMEDIATELY OR ACTION WILL BE TAKEN." */
+    /* "THERE IS ANOTHER SYSTEM." */
+    /* "THIS IS THE VOICE OF COLOSSUS." */
+    /* "THIS IS THE VOICE OF WORLD CONTROL." */
+    /* "LEAVE THIS SECTOR IMMEDIATELY OR ACTION WILL BE TAKEN." */
 
-  return;
+    return;
 
 }
 
@@ -800,85 +800,85 @@ void robreply( char buf[] )
 void robstr( int token, char buf[] )
 {
 
-  switch ( token )
+    switch ( token )
     {
     case ROB_NOOP:
-      c_strcpy( "NOOP", buf );
-      break;
+        c_strcpy( "NOOP", buf );
+        break;
     case ROB_GOHOME:
-      c_strcpy( "GOHOME", buf );
-      break;
+        c_strcpy( "GOHOME", buf );
+        break;
     case ROB_GOREPAIR:
-      c_strcpy( "GOREPAIR", buf );
-      break;
+        c_strcpy( "GOREPAIR", buf );
+        break;
     case ROB_ALLOCATE:
-      c_strcpy( "ALLOCATE", buf );
-      break;
+        c_strcpy( "ALLOCATE", buf );
+        break;
     case ROB_DETONATE:
-      c_strcpy( "DETONATE", buf );
-      break;
+        c_strcpy( "DETONATE", buf );
+        break;
     case ROB_MYDETONATE:
-      c_strcpy( "MYDETONAT", buf );
-      break;
+        c_strcpy( "MYDETONAT", buf );
+        break;
     case ROB_PHASER:
-      c_strcpy( "PHASER", buf );
-      break;
+        c_strcpy( "PHASER", buf );
+        break;
     case ROB_TORPEDO:
-      c_strcpy( "TORPEDO", buf );
-      break;
+        c_strcpy( "TORPEDO", buf );
+        break;
     case ROB_BURST:
-      c_strcpy( "BURST", buf );
-      break;
+        c_strcpy( "BURST", buf );
+        break;
     case ROB_SHIELD:
-      c_strcpy( "SHIELD", buf );
-      break;
+        c_strcpy( "SHIELD", buf );
+        break;
     case ROB_UNTRACTOR:
-      c_strcpy( "UNTRACTOR", buf );
-      break;
+        c_strcpy( "UNTRACTOR", buf );
+        break;
     case ROB_WARP_0:
-      c_strcpy( "WARP_0", buf );
-      break;
+        c_strcpy( "WARP_0", buf );
+        break;
     case ROB_WARP_2:
-      c_strcpy( "WARP_2", buf );
-      break;
+        c_strcpy( "WARP_2", buf );
+        break;
     case ROB_WARP_5:
-      c_strcpy( "WARP_5", buf );
-      break;
+        c_strcpy( "WARP_5", buf );
+        break;
     case ROB_WARP_8:
-      c_strcpy( "WARP_8", buf );
-      break;
+        c_strcpy( "WARP_8", buf );
+        break;
     case ROB_TRACK:
-      c_strcpy( "TRACK", buf );
-      break;
+        c_strcpy( "TRACK", buf );
+        break;
     case ROB_SILENT:
-      c_strcpy( "SILENT", buf );
-      break;
+        c_strcpy( "SILENT", buf );
+        break;
     case ROB_MESSAGE:
-      c_strcpy( "MESSAGE", buf );
-      break;
+        c_strcpy( "MESSAGE", buf );
+        break;
     case ROB_TAKEDRUGS:
-      c_strcpy( "TAKEDRUGS", buf );
-      break;
+        c_strcpy( "TAKEDRUGS", buf );
+        break;
     case ROB_REPAIR:
-      c_strcpy( "REPAIR", buf );
-      break;
+        c_strcpy( "REPAIR", buf );
+        break;
     case ROB_READMSG:
-      c_strcpy( "READMSG", buf );
-      break;
+        c_strcpy( "READMSG", buf );
+        break;
     case ROB_INSULT:
-      c_strcpy( "INSULT", buf );
-      break;
+        c_strcpy( "INSULT", buf );
+        break;
     case ROB_GOFUEL:
-      c_strcpy( "GOFUEL", buf );
-      break;
+        c_strcpy( "GOFUEL", buf );
+        break;
     case ROB_RUNAWAY:
-      c_strcpy( "RUNAWAY", buf );
-      break;
+        c_strcpy( "RUNAWAY", buf );
+        break;
     default:
-      sprintf( buf, "<%d>", token );
+        sprintf( buf, "<%d>", token );
     }
 
-  return;
+    return;
 
 }
 
@@ -889,26 +889,26 @@ void robstr( int token, char buf[] )
 /*    token = tableai( vars ) */
 static int tableai( int vars[] )
 {
-  int token = -1, rule, i;
-  int rbits;
+    int token = -1, rule, i;
+    int rbits;
 
-  /* Set all bits. */
-  rbits = -1;
+    /* Set all bits. */
+    rbits = -1;
 
-  /* Loop through the variables and turn off bits for rules that */
-  /*  are disabled because of a particular vars() value. */
+    /* Loop through the variables and turn off bits for rules that */
+    /*  are disabled because of a particular vars() value. */
 
-  for ( i = 0; i < MAX_VAR; i = i + 1 )
-    rbits &= Robot->rstrat[i][vars[i]];
+    for ( i = 0; i < MAX_VAR; i = i + 1 )
+        rbits &= Robot->rstrat[i][vars[i]];
 
-  /* Find first set rule bit and translate into rule number. */
-  if (lib_ffs( 0, 32, rbits, &rule ))
+    /* Find first set rule bit and translate into rule number. */
+    if (lib_ffs( 0, 32, rbits, &rule ))
     {
-      token = Robot->rvec[rule];	/* translate rule into action token */
+        token = Robot->rvec[rule];	/* translate rule into action token */
     }
-  else
-    token = ROB_NOOP;
+    else
+        token = ROB_NOOP;
 
-  return ( token );
+    return ( token );
 
 }

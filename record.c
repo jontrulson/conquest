@@ -1,4 +1,4 @@
-/* 
+/*
  * record.c - recording games in conquest
  *
  * Copyright Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
@@ -46,438 +46,438 @@ static gzFile rdata_rfdz = NULL;
 /* open a recording input file */
 int recOpenInput(char *fname)
 {
-  rdata_rfd = -1;
+    rdata_rfd = -1;
 
-  /* mingw */
+    /* mingw */
 #if !defined(O_BINARY)
 #define O_BINARY (0)
 #endif
 
-  if ((rdata_rfd = open(fname, O_RDONLY | O_BINARY)) == -1)
+    if ((rdata_rfd = open(fname, O_RDONLY | O_BINARY)) == -1)
     {
-      printf("recOpenInput: open(%s) failed: %s\n", fname, 
-	     strerror(errno));
-      return(FALSE);
+        printf("recOpenInput: open(%s) failed: %s\n", fname,
+               strerror(errno));
+        return(FALSE);
     }
-  
+
 #ifdef HAVE_LIBZ
-  if ((rdata_rfdz = gzdopen(rdata_rfd, "rb")) == NULL)
+    if ((rdata_rfdz = gzdopen(rdata_rfd, "rb")) == NULL)
     {
-      printf("recOpenInput: gzdopen failed\n"); /* we use printf here
-						 since utLog maynot be
-						 available */
-      return(FALSE);
+        printf("recOpenInput: gzdopen failed\n"); /* we use printf here
+                                                     since utLog maynot be
+                                                     available */
+        return(FALSE);
     }
 #endif
 
-  return(TRUE);
+    return(TRUE);
 }
 
 void recCloseInput(void)
 {
 #ifdef HAVE_LIBZ
-  if (rdata_rfdz != NULL)
-    gzclose(rdata_rfdz);
-  
-  rdata_rfdz = NULL;
+    if (rdata_rfdz != NULL)
+        gzclose(rdata_rfdz);
+
+    rdata_rfdz = NULL;
 #else
-  if (rdata_rfd != -1)
-    close(rdata_rfd);
+    if (rdata_rfd != -1)
+        close(rdata_rfd);
 #endif
-  
-  rdata_rfd = -1;
-  
-  return;
+
+    rdata_rfd = -1;
+
+    return;
 }
 
 /* create the recording output file. */
 /* runs under user level privs */
 int recOpenOutput(char *fname, int logit)
 {
-  struct stat sbuf;
+    struct stat sbuf;
 
-  rdata_wfd = -1;
+    rdata_wfd = -1;
 #ifdef HAVE_LIBZ
-  rdata_wfdz = NULL;
+    rdata_wfdz = NULL;
 #endif
 
-  /* check to see if the file exists.  If so, it's an error. */
-  if (stat(fname, &sbuf) != -1) 
+    /* check to see if the file exists.  If so, it's an error. */
+    if (stat(fname, &sbuf) != -1)
     {				/* it exists.  issue error and return */
-      if (logit)
-        utLog("%s: file exists.  You cannot record to an existing file\n",
-	     fname);
-      else
-        printf("%s: file exists.  You cannot record to an existing file\n",
-               fname);
-      return(FALSE);
+        if (logit)
+            utLog("%s: file exists.  You cannot record to an existing file\n",
+                  fname);
+        else
+            printf("%s: file exists.  You cannot record to an existing file\n",
+                   fname);
+        return(FALSE);
     }
 
-  /* now create it */
+    /* now create it */
 
-  if ((rdata_wfd = creat(fname, S_IWUSR|S_IRUSR)) == -1)
+    if ((rdata_wfd = creat(fname, S_IWUSR|S_IRUSR)) == -1)
     {
-      if (logit)
-        utLog("recOpenOutput(): creat(%s) failed: %s\n",
-               fname,
-               strerror(errno));
-      else
-        printf("recOpenOutput(): creat(%s) failed: %s\n",
-               fname,
-               strerror(errno));
-      return(FALSE);
+        if (logit)
+            utLog("recOpenOutput(): creat(%s) failed: %s\n",
+                  fname,
+                  strerror(errno));
+        else
+            printf("recOpenOutput(): creat(%s) failed: %s\n",
+                   fname,
+                   strerror(errno));
+        return(FALSE);
     }
 
 #if !defined(MINGW)
-  chmod(fname, (S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH));
+    chmod(fname, (S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH));
 #endif
 
 #ifdef HAVE_LIBZ
-  if ((rdata_wfdz = gzdopen(rdata_wfd, "wb")) == NULL)
+    if ((rdata_wfdz = gzdopen(rdata_wfd, "wb")) == NULL)
     {
-      if (logit)
-        utLog("recInitReplay: gzdopen failed\n");
-      else
-        printf("recInitReplay: gzdopen failed\n");
-      return(FALSE);
+        if (logit)
+            utLog("recInitReplay: gzdopen failed\n");
+        else
+            printf("recInitReplay: gzdopen failed\n");
+        return(FALSE);
     }
 #endif
 
-  return(TRUE);
+    return(TRUE);
 }
 
-/* close the output stream */  
+/* close the output stream */
 void recCloseOutput(void)
 {
-  recUpdateFrame();
+    recUpdateFrame();
 
 #ifdef HAVE_LIBZ
-  if (rdata_wfdz != NULL)
-    gzclose(rdata_wfdz);
+    if (rdata_wfdz != NULL)
+        gzclose(rdata_wfdz);
 
-  rdata_wfdz = NULL;
+    rdata_wfdz = NULL;
 #else
-  if (rdata_wfd != -1)
-    close(rdata_wfd);
+    if (rdata_wfd != -1)
+        close(rdata_wfd);
 #endif
 
-  rdata_wfd = -1;
+    rdata_wfd = -1;
 
-  return;
+    return;
 }
 
 /* read the file header */
 int recReadHeader(fileHeader_t *fhdr)
 {
-  int rv;
+    int rv;
 
-  /* assumes you've already opened the stream */
+    /* assumes you've already opened the stream */
 
-  if (rdata_rfd == -1)
-    return(FALSE);
+    if (rdata_rfd == -1)
+        return(FALSE);
 
 #ifdef HAVE_LIBZ
-  if ((rv = gzread(rdata_rfdz, (char *)fhdr, SZ_FILEHEADER)) != SZ_FILEHEADER)
+    if ((rv = gzread(rdata_rfdz, (char *)fhdr, SZ_FILEHEADER)) != SZ_FILEHEADER)
 #else
-  if ((rv = read(rdata_rfd, (char *)fhdr, SZ_FILEHEADER)) != SZ_FILEHEADER)
+        if ((rv = read(rdata_rfd, (char *)fhdr, SZ_FILEHEADER)) != SZ_FILEHEADER)
 #endif
-    {
-      printf("recReadHeader: could not read a proper header\n");
-      return(FALSE);
-    }
+        {
+            printf("recReadHeader: could not read a proper header\n");
+            return(FALSE);
+        }
 
 #ifdef DEBUG_REC
-  utLog("recReadHeader: read %d bytes\n",
-       rv);
+    utLog("recReadHeader: read %d bytes\n",
+          rv);
 #endif
 
 #if !defined(HAVE_LIBZ)
-  /* we will look at the first two bytes, and see if it's gzip format */
-  {
-    unsigned char *cptr = (unsigned char *)fhdr;
+    /* we will look at the first two bytes, and see if it's gzip format */
+    {
+        unsigned char *cptr = (unsigned char *)fhdr;
 
-    if (cptr[0] == GZIPPED_BYTE_1 && cptr[1] == GZIPPED_BYTE_2)
-      {
-        /* it is, tell the user to gunzip it */
-        fprintf(stderr, 
-                "CQR file is gzip compressed, but gzip support is not\n");
-        fprintf(stderr, 
-                "compiled in.  Please decompress the file with gunzip first.\n");
+        if (cptr[0] == GZIPPED_BYTE_1 && cptr[1] == GZIPPED_BYTE_2)
+        {
+            /* it is, tell the user to gunzip it */
+            fprintf(stderr,
+                    "CQR file is gzip compressed, but gzip support is not\n");
+            fprintf(stderr,
+                    "compiled in.  Please decompress the file with gunzip first.\n");
 
-        return(FALSE);
-      }
-  }
+            return(FALSE);
+        }
+    }
 #endif  /* !HAVE_LIBZ */
 
 
-  /* now de-endianize the data */
+    /* now de-endianize the data */
 
-  fhdr->vers = (uint32_t)ntohl(fhdr->vers);
-  fhdr->rectime = (uint32_t)ntohl(fhdr->rectime);
-  fhdr->cmnrev = (uint32_t)ntohl(fhdr->cmnrev);
-  fhdr->flags = (uint32_t)ntohl(fhdr->flags);
+    fhdr->vers = (uint32_t)ntohl(fhdr->vers);
+    fhdr->rectime = (uint32_t)ntohl(fhdr->rectime);
+    fhdr->cmnrev = (uint32_t)ntohl(fhdr->cmnrev);
+    fhdr->flags = (uint32_t)ntohl(fhdr->flags);
 
 #if defined(DEBUG_REC)
-  utLog("recReadHeader: vers = %d, rectime = %d, cmnrev = %d\n",
-       fhdr->vers, fhdr->rectime, fhdr->cmnrev);
+    utLog("recReadHeader: vers = %d, rectime = %d, cmnrev = %d\n",
+          fhdr->vers, fhdr->rectime, fhdr->cmnrev);
 #endif
 
 
-  return(TRUE);
+    return(TRUE);
 }
 
 /* build and generate a file header
  */
 int recInitOutput(int unum, time_t thetime, int snum, int isserver)
 {
-  fileHeader_t fhdr;
-  
-  if (rdata_wfd == -1)
-    return(FALSE);
+    fileHeader_t fhdr;
 
-  recordFrameCount = 0;
+    if (rdata_wfd == -1)
+        return(FALSE);
 
-  /* now make a file header and write it */
-  memset(&fhdr, 0, sizeof(fhdr));
+    recordFrameCount = 0;
 
-  /* set all neccesary flags here, before endianizing below */
-  if (isserver)                 /* this is a server recording */
-    fhdr.flags |= RECORD_F_SERVER;
+    /* now make a file header and write it */
+    memset(&fhdr, 0, sizeof(fhdr));
 
-  fhdr.vers = (uint32_t)htonl(RECVERSION);
+    /* set all neccesary flags here, before endianizing below */
+    if (isserver)                 /* this is a server recording */
+        fhdr.flags |= RECORD_F_SERVER;
 
-  fhdr.samplerate = (uint8_t)Context.updsec;
+    fhdr.vers = (uint32_t)htonl(RECVERSION);
 
-  fhdr.rectime = (uint32_t)htonl((uint32_t)thetime);
-  strncpy((char*)fhdr.user, Users[unum].username, MAXUSERNAME - 1);
+    fhdr.samplerate = (uint8_t)Context.updsec;
 
-  fhdr.cmnrev = (uint32_t)htonl((uint32_t)COMMONSTAMP);
-  fhdr.snum = snum;
-  fhdr.flags = (uint32_t)htonl((uint32_t)fhdr.flags);
+    fhdr.rectime = (uint32_t)htonl((uint32_t)thetime);
+    strncpy((char*)fhdr.user, Users[unum].username, MAXUSERNAME - 1);
 
-  if (!recWriteBuf(&fhdr, sizeof(fileHeader_t)))
-    return(FALSE);
+    fhdr.cmnrev = (uint32_t)htonl((uint32_t)COMMONSTAMP);
+    fhdr.snum = snum;
+    fhdr.flags = (uint32_t)htonl((uint32_t)fhdr.flags);
 
-  /* add a frame packet */
-  recUpdateFrame();
+    if (!recWriteBuf(&fhdr, sizeof(fileHeader_t)))
+        return(FALSE);
 
-  /* ready to go I hope */
-  return(TRUE);
+    /* add a frame packet */
+    recUpdateFrame();
+
+    /* ready to go I hope */
+    return(TRUE);
 }
 
 /* note, if we get a write error here, we turn off recording */
 void recWriteEvent(void *data)
 {
-  char *buf = (char *)data;
-  uint8_t pkttype;
-  int len;
+    char *buf = (char *)data;
+    uint8_t pkttype;
+    int len;
 
-  if (Context.recmode != RECMODE_ON)
-    return;
+    if (Context.recmode != RECMODE_ON)
+        return;
 
-  if (!buf)
-    return;
+    if (!buf)
+        return;
 
-  pkttype = (uint8_t)*buf;
-  
-  len = pktServerPacketSize(pkttype);
-  if (!len)
+    pkttype = (uint8_t)*buf;
+
+    len = pktServerPacketSize(pkttype);
+    if (!len)
     {
-      utLog("recWriteEvent: invalid packet type %d", pkttype);
-      return;
+        utLog("recWriteEvent: invalid packet type %d", pkttype);
+        return;
     }
 
-  if (!recWriteBuf(buf, len))
+    if (!recWriteBuf(buf, len))
     {
-      utLog("recWriteEvent: write error: %s, recording terminated",
-           strerror(errno));
-      Context.recmode = RECMODE_OFF;
+        utLog("recWriteEvent: write error: %s, recording terminated",
+              strerror(errno));
+        Context.recmode = RECMODE_OFF;
     }
 
-  return;
+    return;
 }
 
 /* write a frame packet and increment recordFrameCount */
 void recUpdateFrame(void)
 {
-  spFrame_t frame;
+    spFrame_t frame;
 
-  if (Context.recmode != RECMODE_ON)
-    return;		/* bail */
-  
-  memset((void *)&frame, 0, sizeof(spFrame_t));
+    if (Context.recmode != RECMODE_ON)
+        return;		/* bail */
 
-  frame.type = SP_FRAME;
-  frame.frame = (uint32_t)htonl(recordFrameCount);
-  frame.time = (uint32_t)htonl((uint32_t)time(0));
+    memset((void *)&frame, 0, sizeof(spFrame_t));
 
-  recWriteEvent(&frame);
+    frame.type = SP_FRAME;
+    frame.frame = (uint32_t)htonl(recordFrameCount);
+    frame.time = (uint32_t)htonl((uint32_t)time(0));
 
-  recordFrameCount++;
+    recWriteEvent(&frame);
 
-  return;
+    recordFrameCount++;
+
+    return;
 }
 
 /* write out a buffer */
 int recWriteBuf(void *buf, int len)
 {
-  if (rdata_wfd == -1)
-    return(FALSE);
-  
+    if (rdata_wfd == -1)
+        return(FALSE);
+
 #ifdef DEBUG_REC
-  utLog("recWriteBuf: len = %d\n", len);
+    utLog("recWriteBuf: len = %d\n", len);
 #endif
 
 #ifdef HAVE_LIBZ
-  if (gzwrite(rdata_wfdz, buf, len) != len)
+    if (gzwrite(rdata_wfdz, buf, len) != len)
 #else
-  if (write(rdata_wfd, buf, len) != len)
+        if (write(rdata_wfd, buf, len) != len)
 #endif
-    {
-      utLog("recWriteBuf: couldn't write buffer of %d bytes\n",
-	   len);
-      return(FALSE);
-    }
+        {
+            utLog("recWriteBuf: couldn't write buffer of %d bytes\n",
+                  len);
+            return(FALSE);
+        }
 
-  return(TRUE);
+    return(TRUE);
 }
 
 
 /* read in a packet, returning the packet type */
 int recReadPkt(char *buf, int blen)
 {
-  int len, rv;
-  int pkttype;
+    int len, rv;
+    int pkttype;
 
-  if (rdata_rfd == -1)
+    if (rdata_rfd == -1)
     {
-      return(SP_NULL);
+        return(SP_NULL);
     }
 
-  if (!buf || !blen)
+    if (!buf || !blen)
     {
-      return(SP_NULL);
+        return(SP_NULL);
     }
-      
-  /* first read in the first byte to get the packet type */
+
+    /* first read in the first byte to get the packet type */
 #ifdef HAVE_LIBZ
-  if ((rv = gzread(rdata_rfdz, (char *)buf, 1)) != 1)
+    if ((rv = gzread(rdata_rfdz, (char *)buf, 1)) != 1)
 #else
-  if ((rv = read(rdata_rfd, (char *)buf, 1)) != 1)
+        if ((rv = read(rdata_rfd, (char *)buf, 1)) != 1)
 #endif
-    {
+        {
 #ifdef DEBUG_REC
-      utLog("%s: could not read pkt type, returned (rv = %d)\n",
-            __FUNCTION__, rv);
+            utLog("%s: could not read pkt type, returned (rv = %d)\n",
+                  __FUNCTION__, rv);
 #endif
 
-      return(SP_NULL);
+            return(SP_NULL);
+        }
+
+    pkttype = (int)buf[0];
+
+    len = pktServerPacketSize(pkttype);
+
+    if (blen < len)
+    {
+        fprintf(stderr,
+                "recReadPkt: buffer too small. got %d, need %d\n",
+                len, blen);
+        return(SP_NULL);
     }
 
-  pkttype = (int)buf[0];
 
-  len = pktServerPacketSize(pkttype);
-
-  if (blen < len)
+    if (!len)
     {
-      fprintf(stderr,
-              "recReadPkt: buffer too small. got %d, need %d\n",
-              len, blen);
-      return(SP_NULL);
-    }
-    
-
-  if (!len)
-    {
-      utLog("recReadPkt: invalid packet %d\n",
+        utLog("recReadPkt: invalid packet %d\n",
               pkttype);
-      fprintf(stderr,
-              "recReadPkt: invalid packet %d\n",
-              pkttype);
-      return(SP_NULL);
+        fprintf(stderr,
+                "recReadPkt: invalid packet %d\n",
+                pkttype);
+        return(SP_NULL);
     }
-  else
+    else
     {
-      len = len - sizeof(uint8_t);
+        len = len - sizeof(uint8_t);
 
-  /* so now read in the rest of the packet */
+        /* so now read in the rest of the packet */
 #ifdef HAVE_LIBZ
-      if ((rv = gzread(rdata_rfdz, (char *)(buf + 1), len)) != len)
+        if ((rv = gzread(rdata_rfdz, (char *)(buf + 1), len)) != len)
 #else
-      if ((rv = read(rdata_rfd, (char *)(buf + 1), len)) != len )
+            if ((rv = read(rdata_rfd, (char *)(buf + 1), len)) != len )
 #endif
-      {
+            {
 #ifdef DEBUG_REC
-         fprintf(stderr, 
-	         "%s: could not read data packet, returned %d\n",
-	         __FUNCTION__, rv);
-         utLog("%s: could not read data packet, returned %d",
-               __FUNCTION__, rv);
+                fprintf(stderr,
+                        "%s: could not read data packet, returned %d\n",
+                        __FUNCTION__, rv);
+                utLog("%s: could not read data packet, returned %d",
+                      __FUNCTION__, rv);
 #endif
-      
-         return(SP_NULL);
-       }
+
+                return(SP_NULL);
+            }
 
     }
 
 #ifdef DEBUG_REC
-  utLog("%s: read pkttype  = %d", __FUNCTION__, pkttype);
+    utLog("%s: read pkttype  = %d", __FUNCTION__, pkttype);
 #endif
 
-  return(pkttype);
+    return(pkttype);
 }
 
-/* generate torploc packets for client recording purposes 
+/* generate torploc packets for client recording purposes
    no more than once every ITER_SECONDS */
 void recGenTorpLoc(void)
 {
-  int i, j;
-  int snum = Context.snum;
-  int team = Ships[snum].team;
-  spTorpLoc_t storploc;
-  static spTorpLoc_t pktTorpLoc[MAXSHIPS + 1][MAXTORPS] = {};
-  real dis;
-  real x, y;
-  static uint32_t iterstart = 0;
-  uint32_t iternow = clbGetMillis();
-  const uint32_t iterwait = 100.0; /* ms */
-  real tdelta = (real)iternow - (real)iterstart;
+    int i, j;
+    int snum = Context.snum;
+    int team = Ships[snum].team;
+    spTorpLoc_t storploc;
+    static spTorpLoc_t pktTorpLoc[MAXSHIPS + 1][MAXTORPS] = {};
+    real dis;
+    real x, y;
+    static uint32_t iterstart = 0;
+    uint32_t iternow = clbGetMillis();
+    const uint32_t iterwait = 100.0; /* ms */
+    real tdelta = (real)iternow - (real)iterstart;
 
-  if (Context.recmode != RECMODE_ON)
-    return;                     /* not recording, no point */
+    if (Context.recmode != RECMODE_ON)
+        return;                     /* not recording, no point */
 
-  if (tdelta < iterwait) 
-    return;                     /* not yet time */
+    if (tdelta < iterwait)
+        return;                     /* not yet time */
 
-  iterstart = iternow;
+    iterstart = iternow;
 
-  for (i=1; i<=MAXSHIPS; i++)
+    for (i=1; i<=MAXSHIPS; i++)
     {
-      if ( Ships[i].status != SS_OFF )
+        if ( Ships[i].status != SS_OFF )
         {
-          for ( j = 0; j < MAXTORPS; j = j + 1 )
+            for ( j = 0; j < MAXTORPS; j = j + 1 )
             {
-              if ( Ships[i].torps[j].status == TS_LIVE )
+                if ( Ships[i].torps[j].status == TS_LIVE )
                 {
-                  memset((void *)&storploc, 0, sizeof(spTorpLoc_t));
-                  storploc.type = SP_TORPLOC;
-                  storploc.snum = i;
-                  storploc.tnum = j;
-                  
-                  x = Ships[i].torps[j].x;
-                  y = Ships[i].torps[j].y;
-                  
-                  if (Ships[i].torps[j].war[team])
+                    memset((void *)&storploc, 0, sizeof(spTorpLoc_t));
+                    storploc.type = SP_TORPLOC;
+                    storploc.snum = i;
+                    storploc.tnum = j;
+
+                    x = Ships[i].torps[j].x;
+                    y = Ships[i].torps[j].y;
+
+                    if (Ships[i].torps[j].war[team])
                     { /* it's at war with us. bastards. */
                       /* see if it's close enough to scan */
-                      dis = (real) dist(Ships[snum].x, Ships[snum].y, 
-                                        Ships[i].torps[j].x, 
-                                        Ships[i].torps[j].y );
-                      
-                      if (dis > ACCINFO_DIST)
+                        dis = (real) dist(Ships[snum].x, Ships[snum].y,
+                                          Ships[i].torps[j].x,
+                                          Ships[i].torps[j].y );
+
+                        if (dis > ACCINFO_DIST)
                         {                       /* in the bermuda triangle */
-                          x = 1e7;
-                          y = 1e7;
+                            x = 1e7;
+                            y = 1e7;
                         }
                     }
 
@@ -486,20 +486,20 @@ void recGenTorpLoc(void)
 
                     /* only send 'war' status as it relates to our team */
                     if (Ships[i].torps[j].war[team])
-                      storploc.war |= (1 << team);
+                        storploc.war |= (1 << team);
 
 
-                    if (memcmp((void *)&storploc, 
+                    if (memcmp((void *)&storploc,
                                (void *)&(pktTorpLoc[i][j]),
                                sizeof(spTorpLoc_t)))
-                      {
+                    {
                         pktTorpLoc[i][j] = storploc;
                         recWriteEvent(&storploc);
-                      }
+                    }
                 }
             }
         }
     }
 
-  return;
+    return;
 }

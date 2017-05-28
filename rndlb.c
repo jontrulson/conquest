@@ -27,10 +27,10 @@
 /*  3.4.1. */
 
 
-#define TABLESIZE 200 
+#define TABLESIZE 200
 
-static int value1, value2, mult1, mult2, inc1, inc2, modu1, modu2, 
-  table[TABLESIZE];
+static int value1, value2, mult1, mult2, inc1, inc2, modu1, modu2,
+    table[TABLESIZE];
 
 
 /*  rndseq - internal routine to compute the next value in a linear */
@@ -41,9 +41,9 @@ static int value1, value2, mult1, mult2, inc1, inc2, modu1, modu2,
 /*  DESCRIPTION */
 void rndseq ( int *value, int multiplier, int increment, int modulus )
 {
-  *value = mod ( *value * multiplier + increment, modulus );
-  
-  return;
+    *value = mod ( *value * multiplier + increment, modulus );
+
+    return;
 }
 
 
@@ -60,53 +60,53 @@ void rndseq ( int *value, int multiplier, int increment, int modulus )
 /*    the current time will be used. */
 void rndini ( int seed1, int seed2 )
 {
-  
-  int idx;
-  time_t thetime = time(0);
-  struct tm *thetm = localtime(&thetime);
 
-  /* Here are the multipliers, increments, and moduli for the two sequences. */
-  /* Do not change these frivously!  They have been very carefully selected, */
-  /* using the "spectral test" and various other empirical tests of */
-  /* randomness.  Each sequence, by itself, is better than most random */
-  /* sequences currently in use.  Together, they are awesome... */
-  mult1 = 1541;	inc1 = 3501;	modu1 = 16384;
-  mult2 = 5146;	inc2 = 4100;	modu2 = 19683;
-  
-  if ( seed1 != 0 )
-    value1 = seed1;
-  else
-    value1 = ( ( thetm->tm_mday * 10 + thetm->tm_hour ) * 10
-               + thetm->tm_min ) * 10 + thetm->tm_sec;
-  value1 = mod ( value1, modu1 );
-  
-  if ( seed2 != 0 )
-    value2 = seed2;
-  else
-    value2 = ( ( thetm->tm_sec * 10 + thetm->tm_min ) * 10
-               + thetm->tm_hour ) * 10 + thetm->tm_mday;
-  value2 = mod ( value2, modu2 );
-  
-  for ( idx=0; idx < TABLESIZE; idx=idx+1 )
+    int idx;
+    time_t thetime = time(0);
+    struct tm *thetm = localtime(&thetime);
+
+    /* Here are the multipliers, increments, and moduli for the two sequences. */
+    /* Do not change these frivously!  They have been very carefully selected, */
+    /* using the "spectral test" and various other empirical tests of */
+    /* randomness.  Each sequence, by itself, is better than most random */
+    /* sequences currently in use.  Together, they are awesome... */
+    mult1 = 1541;	inc1 = 3501;	modu1 = 16384;
+    mult2 = 5146;	inc2 = 4100;	modu2 = 19683;
+
+    if ( seed1 != 0 )
+        value1 = seed1;
+    else
+        value1 = ( ( thetm->tm_mday * 10 + thetm->tm_hour ) * 10
+                   + thetm->tm_min ) * 10 + thetm->tm_sec;
+    value1 = mod ( value1, modu1 );
+
+    if ( seed2 != 0 )
+        value2 = seed2;
+    else
+        value2 = ( ( thetm->tm_sec * 10 + thetm->tm_min ) * 10
+                   + thetm->tm_hour ) * 10 + thetm->tm_mday;
+    value2 = mod ( value2, modu2 );
+
+    for ( idx=0; idx < TABLESIZE; idx=idx+1 )
     {
-      rndseq ( &value2, mult2, inc2, modu2 );
-      table[idx] = value2;
+        rndseq ( &value2, mult2, inc2, modu2 );
+        table[idx] = value2;
     }
-  
+
 #ifdef DEBUG_RANDOM
-  utLog("rndini(): seed1 = %d, seed2  = %d, value1 = %d, value2 = %d",
-       seed1, seed2, value1, value2);
+    utLog("rndini(): seed1 = %d, seed2  = %d, value1 = %d, value2 = %d",
+          seed1, seed2, value1, value2);
 #endif
-  
-  /* rand() isn't all that great, but for a client on mingw, should be ok */
-  
-  /*  srand48((long)(value1 * value2)); */
+
+    /* rand() isn't all that great, but for a client on mingw, should be ok */
+
+    /*  srand48((long)(value1 * value2)); */
 #if !defined(MINGW)
-  srand48((long) time(0));
+    srand48((long) time(0));
 #else
-  srand((unsigned int) time(0));
+    srand((unsigned int) time(0));
 #endif
-  return;
+    return;
 }
 
 
@@ -116,19 +116,19 @@ void rndini ( int seed1, int seed2 )
 /*    r = rnd(0) */
 real rnd ( void )		/* use 48bit linear congruential */
 {
-  real rc;
-  
-  /* rand() isn't all that great, but for a client on mingw, should be ok */
+    real rc;
+
+    /* rand() isn't all that great, but for a client on mingw, should be ok */
 #if !defined(MINGW)
-  rc = (real) drand48();
+    rc = (real) drand48();
 #else
-  rc = (real)rand() / (real)RAND_MAX;
+    rc = (real)rand() / (real)RAND_MAX;
 #endif
 
 #ifdef DEBUG_RANDOM
-  utLog("rnd(): drand48() = %f", rc);
+    utLog("rnd(): drand48() = %f", rc);
 #endif
-  return(rc);
+    return(rc);
 }
 
 /*  rnduni - random real number in the specified range */
@@ -137,8 +137,8 @@ real rnd ( void )		/* use 48bit linear congruential */
 /*    r = rnduni ( rlow, rhigh ) */
 real rnduni ( real rlow, real rhigh )
 {
-  return(rnd() * (rhigh-rlow) + rlow);
-  
+    return(rnd() * (rhigh-rlow) + rlow);
+
 }
 
 
@@ -148,15 +148,15 @@ real rnduni ( real rlow, real rhigh )
 /*    i = rndint ( ilow, ihigh ) */
 int rndint ( int ilow, int ihigh )
 {
-  int rc;
+    int rc;
 
-  rc = (int)(rnd() * (real)(ihigh - ilow + 1)) + ilow;
+    rc = (int)(rnd() * (real)(ihigh - ilow + 1)) + ilow;
 #ifdef DEBUG_RANDOM
-  utLog("rndint(): rc = %d", rc);
+    utLog("rndint(): rc = %d", rc);
 #endif
-  
-  return(rc);
-  
+
+    return(rc);
+
 }
 
 
@@ -166,22 +166,22 @@ int rndint ( int ilow, int ihigh )
 /*    r = rndnor ( mean, stddev ) */
 real rndnor ( real mean, real stddev )
 {
-  real v1, v2, z;
-  
-  do            /* repeat*/
+    real v1, v2, z;
+
+    do            /* repeat*/
     {
-      v1 = ((real) -log((real) 1.0 - rnd()) );
-      v2 = ((real) -log((real) 1.0 - rnd()) );
+        v1 = ((real) -log((real) 1.0 - rnd()) );
+        v2 = ((real) -log((real) 1.0 - rnd()) );
     }
-  while ( 2.0 * v1 < pow((real)(v2-1.0), (real)2) );  
-  
-  if ( rnd() > 0.5 )
-    z = 1.0;
-  else
-    z = -1.0;
-  
-  return(stddev * z * v2 + mean);
-  
+    while ( 2.0 * v1 < pow((real)(v2-1.0), (real)2) );
+
+    if ( rnd() > 0.5 )
+        z = 1.0;
+    else
+        z = -1.0;
+
+    return(stddev * z * v2 + mean);
+
 }
 
 
@@ -191,8 +191,8 @@ real rndnor ( real mean, real stddev )
 /*    r = rndexp ( mean ) */
 real rndexp ( real mean )
 {
-  
-  return(- (real)log( (real) 1.0 - rnd() ) * mean);
+
+    return(- (real)log( (real) 1.0 - rnd() ) * mean);
 }
 
 
@@ -205,20 +205,20 @@ real rndexp ( real mean )
 /*      This distribution is also known as the gamma distribution of order v/2*/
 real rndchi ( int v )
 {
-  int k, x;
-  real RETVAL;
-  
-  k = v / 2;
-  
-  RETVAL = 0.0;
-  for ( x=1; x <= k; x=x+1 )
-    RETVAL = RETVAL + rndexp ( 1.0 );
-  RETVAL = RETVAL * 2.0;
-  
-  if ( (k * 2 + 1) == v )
-    RETVAL = RETVAL + pow((real)rndnor(0.0,1.0), (real) 2);
-  
-  return(RETVAL);
+    int k, x;
+    real RETVAL;
+
+    k = v / 2;
+
+    RETVAL = 0.0;
+    for ( x=1; x <= k; x=x+1 )
+        RETVAL = RETVAL + rndexp ( 1.0 );
+    RETVAL = RETVAL * 2.0;
+
+    if ( (k * 2 + 1) == v )
+        RETVAL = RETVAL + pow((real)rndnor(0.0,1.0), (real) 2);
+
+    return(RETVAL);
 }
 
 
@@ -229,14 +229,14 @@ real rndchi ( int v )
 /*    r = rndbta ( v1, v2 ) */
 real rndbta ( int v1, int v2 )
 {
-  
-  real y1, y2;
-  
-  y1 = rndchi ( v1 );
-  y2 = rndchi ( v2 );
-  
-  return(y1 / (y1+y2));
-  
+
+    real y1, y2;
+
+    y1 = rndchi ( v1 );
+    y2 = rndchi ( v2 );
+
+    return(y1 / (y1+y2));
+
 }
 
 
@@ -249,12 +249,12 @@ real rndbta ( int v1, int v2 )
 /*      This distribution is also known as the variance-ratio distribution. */
 real rndF ( int v1, int v2 )
 {
-  real y1, y2;
-  
-  y1 = rndchi ( v1 );
-  y2 = rndchi ( v2 );
-  return((y1*v2) / (y2*v1));
-  
+    real y1, y2;
+
+    y1 = rndchi ( v1 );
+    y2 = rndchi ( v2 );
+    return((y1*v2) / (y2*v1));
+
 }
 
 
@@ -265,12 +265,12 @@ real rndF ( int v1, int v2 )
 /*    r = rndt ( v ) */
 real rndt ( int v )
 {
-  real y1, y2;
-  
-  y1 = rndnor ( 0.0, 1.0 );
-  y2 = rndchi ( v );
-  return(y1 / sqrt ( y2/v ));
-  
+    real y1, y2;
+
+    y1 = rndnor ( 0.0, 1.0 );
+    y2 = rndchi ( v );
+    return(y1 / sqrt ( y2/v ));
+
 }
 
 /*  rndbin - random int with the binomial distribution */
@@ -287,15 +287,15 @@ real rndt ( int v )
 /*                             n */
 int rndbin ( int trials, real prob )
 {
-  int i;
-  int RET;
-  
-  RET = 0;
-  for ( i=1; i <= trials; i=i+1 )
-    if ( rnd() <= prob )
-      RET = RET + 1;
-  
-  return(RET);
+    int i;
+    int RET;
+
+    RET = 0;
+    for ( i=1; i <= trials; i=i+1 )
+        if ( rnd() <= prob )
+            RET = RET + 1;
+
+    return(RET);
 }
 
 
@@ -315,24 +315,23 @@ int rndbin ( int trials, real prob )
 /*                               e   u  /  n ! */
 int rndpoi ( real mean )
 {
-  
-  real p, q;
-  int RET;
-  
-  p = exp ( -mean );
-  RET = 0;
-  q = 1.0;
-  
-  while (TRUE) /*repeat forever */
-    {
-      q = q * rnd();
-      
-      if ( q < p )
-	break;
-      
-      RET = RET + 1;
-    }
-  
-  return(RET);
-}
 
+    real p, q;
+    int RET;
+
+    p = exp ( -mean );
+    RET = 0;
+    q = 1.0;
+
+    while (TRUE) /*repeat forever */
+    {
+        q = q * rnd();
+
+        if ( q < p )
+            break;
+
+        RET = RET + 1;
+    }
+
+    return(RET);
+}

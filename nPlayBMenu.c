@@ -1,4 +1,4 @@
-/* 
+/*
  * playback menu node
  *
  * Copyright Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
@@ -46,142 +46,141 @@ static int nPlayBMenuInput(int ch);
 static char *nss = NULL;        /* no such ship */
 
 static scrNode_t nPlayBMenuNode = {
-  nPlayBMenuDisplay,            /* display */
-  NULL,                         /* idle */
-  nPlayBMenuInput,              /* input */
-  NULL,                         /* minput */
-  NULL                          /* animQue */
+    nPlayBMenuDisplay,            /* display */
+    NULL,                         /* idle */
+    nPlayBMenuInput,              /* input */
+    NULL,                         /* minput */
+    NULL                          /* animQue */
 
 };
 
 void nPlayBMenuInit(void)
 {
-  state = S_NONE;
-  prompting = FALSE;
+    state = S_NONE;
+    prompting = FALSE;
 
-  /* init recFrameDelay based on samplerate if neccessary */
-  if (recFrameDelay == -1.0)
-    recFrameDelay = 1.0 / (real)recFileHeader.samplerate;
+    /* init recFrameDelay based on samplerate if neccessary */
+    if (recFrameDelay == -1.0)
+        recFrameDelay = 1.0 / (real)recFileHeader.samplerate;
 
-  setNode(&nPlayBMenuNode);
+    setNode(&nPlayBMenuNode);
 
-  return;
+    return;
 }
 
 
 static int nPlayBMenuDisplay(dspConfig_t *dsp)
 {
-  dspReplayMenu();
+    dspReplayMenu();
 
-  if (prompting)
-    cprintf(MSG_LIN1, 1, ALIGN_NONE, "#%d#%s #%d#%s",
-            CyanColor, prm.pbuf, NoColor, prm.buf);
+    if (prompting)
+        cprintf(MSG_LIN1, 1, ALIGN_NONE, "#%d#%s #%d#%s",
+                CyanColor, prm.pbuf, NoColor, prm.buf);
 
-  if (nss)
-    cprintf(MSG_LIN2, 1, ALIGN_NONE, nss);
+    if (nss)
+        cprintf(MSG_LIN2, 1, ALIGN_NONE, nss);
 
-  return NODE_OK;
-}  
+    return NODE_OK;
+}
 
 
 static int nPlayBMenuInput(int ch)
 {
-  int irv;
+    int irv;
 
-  ch = CQ_CHAR(ch);
+    ch = CQ_CHAR(ch);
 
-  if (prompting)
+    if (prompting)
     {
-      int tmpsnum;
-      irv = prmProcInput(&prm, ch);
+        int tmpsnum;
+        irv = prmProcInput(&prm, ch);
 
-      if (irv > 0)
+        if (irv > 0)
         {
-          if (ch == TERM_ABORT)
+            if (ch == TERM_ABORT)
             {
-              state = S_NONE;
-              prompting = FALSE;
+                state = S_NONE;
+                prompting = FALSE;
 
-              return NODE_OK;
+                return NODE_OK;
             }
 
-          utDeleteBlanks( prm.buf );
-          if ( strlen( prm.buf ) == 0 )
+            utDeleteBlanks( prm.buf );
+            if ( strlen( prm.buf ) == 0 )
             {              /* watch doomsday machine */
-              tmpsnum = DISPLAY_DOOMSDAY;
+                tmpsnum = DISPLAY_DOOMSDAY;
             }
-          else
+            else
             {
-              if (!utIsDigits(prm.buf))
+                if (!utIsDigits(prm.buf))
                 {
-                  state = S_NONE;
-                  prompting = FALSE;
+                    state = S_NONE;
+                    prompting = FALSE;
 
-                  nss = "No such ship.";
-                  return NODE_OK; 
+                    nss = "No such ship.";
+                    return NODE_OK;
                 }
-              utSafeCToI( &tmpsnum, prm.buf, 0 );     /* ignore return status */
+                utSafeCToI( &tmpsnum, prm.buf, 0 );     /* ignore return status */
             }
 
-          if ( (tmpsnum < 1 || tmpsnum > MAXSHIPS) && 
-               tmpsnum != DISPLAY_DOOMSDAY )
+            if ( (tmpsnum < 1 || tmpsnum > MAXSHIPS) &&
+                 tmpsnum != DISPLAY_DOOMSDAY )
             {
-              state = S_NONE;
-              prompting = FALSE;
+                state = S_NONE;
+                prompting = FALSE;
 
-              nss = "No such ship.";
-              return NODE_OK;
+                nss = "No such ship.";
+                return NODE_OK;
             }
 
-          Context.snum = tmpsnum;
-          nPlayBInit();         /* start playing */
+            Context.snum = tmpsnum;
+            nPlayBInit();         /* start playing */
         }
-      return NODE_OK;
+        return NODE_OK;
     }
 
-  nss = NULL;
-  switch (ch)
+    nss = NULL;
+    switch (ch)
     {
     case '/':
-      nShiplInit(DSP_NODE_PLAYBMENU, TRUE);
-      break;
+        nShiplInit(DSP_NODE_PLAYBMENU, TRUE);
+        break;
 
     case 'q':
-      return NODE_EXIT;         /* time to leave */
-      break;
+        return NODE_EXIT;         /* time to leave */
+        break;
 
     case 'r':
-      pbFileSeek(recStartTime);
-      break;
+        pbFileSeek(recStartTime);
+        break;
 
     case 'w':
-      state = S_WATCH;
-      if (recFileHeader.snum == 0)
+        state = S_WATCH;
+        if (recFileHeader.snum == 0)
         {
-          cbuf[0] = 0;
-          prm.preinit = FALSE;
+            cbuf[0] = 0;
+            prm.preinit = FALSE;
 
         }
-      else
+        else
         {
-          sprintf(cbuf, "%d", recFileHeader.snum);
-          prm.preinit = TRUE;
+            sprintf(cbuf, "%d", recFileHeader.snum);
+            prm.preinit = TRUE;
         }
 
-      prm.buf = cbuf;
-      prm.buflen = MSGMAXLINE;
-      prm.pbuf = "Watch which ship (<cr> for doomsday)?";
-      prm.terms = TERMS;
-      prm.index = 20;
-      prompting = TRUE;
+        prm.buf = cbuf;
+        prm.buflen = MSGMAXLINE;
+        prm.pbuf = "Watch which ship (<cr> for doomsday)?";
+        prm.terms = TERMS;
+        prm.index = 20;
+        prompting = TRUE;
 
-      break;
+        break;
 
     default:
-      return NODE_OK;
+        return NODE_OK;
     }
 
 
-  return NODE_OK;
+    return NODE_OK;
 }
-

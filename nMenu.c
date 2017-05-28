@@ -1,4 +1,4 @@
-/* 
+/*
  * menu node
  *
  * Copyright Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
@@ -65,469 +65,468 @@ static int nMenuIdle(void);
 static int nMenuInput(int ch);
 
 static scrNode_t nMenuNode = {
-  nMenuDisplay,               /* display */
-  nMenuIdle,                  /* idle */
-  nMenuInput,                  /* input */
-  NULL,                         /* minput */
-  NULL                          /* animQue */
+    nMenuDisplay,               /* display */
+    nMenuIdle,                  /* idle */
+    nMenuInput,                  /* input */
+    NULL,                         /* minput */
+    NULL                          /* animQue */
 };
 
 static void _conqds(dspConfig_t *dsp)
 {
-  int i, col, lin;
-  extern char *ConquestVersion;
-  extern char *ConquestDate;
-  static int FirstTime = TRUE;
-  static char sfmt[MSGMAXLINE * 2];
+    int i, col, lin;
+    extern char *ConquestVersion;
+    extern char *ConquestDate;
+    static int FirstTime = TRUE;
+    static char sfmt[MSGMAXLINE * 2];
 
-  if (FirstTime == TRUE)
+    if (FirstTime == TRUE)
     {
-      FirstTime = FALSE;
-      sprintf(sfmt,
-	      "#%d#(#%d#%%c#%d#) - %%s",
-	      LabelColor,
-	      InfoColor,
-	      LabelColor);
-	}
-  
-  /* Display the logo. */
-  mglConqLogo(dsp, TRUE);
-
-  lin = 7;
-
-  if ( ConqInfo->closed )
-    cprintf(lin,0,ALIGN_CENTER,"#%d#%s",RedLevelColor,"The game is closed.");
-  else
-    cprintf( lin,0,ALIGN_CENTER,"#%d#%s (%s)",YellowLevelColor,
-	   ConquestVersion, ConquestDate);
-  
-  lin++;
-  lin++;
-  cprintf(lin,0,ALIGN_CENTER,"#%d#%s", MagentaColor, CONQ_HTTP);
-  lin++;
-  lin++;
-  lin++;
-  cprintf(lin,0,ALIGN_CENTER,"#%d#%s",NoColor, "Options:");
-  
-  col = 8;
-  lin+=2;
-  i = lin;
-  cprintf(lin,col,ALIGN_NONE,sfmt, 'e', "enter the game");
-  lin++;
-  cprintf(lin,col,ALIGN_NONE,sfmt, 'S', "more user statistics");
-  lin++;
-  cprintf(lin,col,ALIGN_NONE,sfmt, 'T', "team statistics");
-  lin++;
-  cprintf(lin,col,ALIGN_NONE,sfmt, 'U', "user statistics");
-  lin++;
-  cprintf(lin,col,ALIGN_NONE,sfmt, 'N', "change your name");
-  lin++;
-  cprintf(lin,col,ALIGN_NONE,sfmt, 'W', "set war or peace");
-  
-  lin++;
-  cprintf(lin,col,ALIGN_NONE,sfmt, 'O', "options menu");
-
-  col = 48;
-  lin = i;
-
-  if ( ! multiple )
-    {
-      cprintf(lin,col,ALIGN_NONE,sfmt, 'r', "resign your commission");
-      lin++;
-    }
-  if ( multiple || switchteams )
-    {
-
-      cprintf(lin,col,ALIGN_NONE,sfmt, 's', "switch teams");
-      lin++;
+        FirstTime = FALSE;
+        sprintf(sfmt,
+                "#%d#(#%d#%%c#%d#) - %%s",
+                LabelColor,
+                InfoColor,
+                LabelColor);
     }
 
-  cprintf(lin,col,ALIGN_NONE,sfmt, 'H', "user history");
-  lin++;
-  cprintf(lin,col,ALIGN_NONE,sfmt, '/', "player list");
-  lin++;
-  cprintf(lin,col,ALIGN_NONE,sfmt, '?', "planet list");
-  lin++;
-  cprintf(lin,col,ALIGN_NONE,sfmt, 'q', "exit the program");
+    /* Display the logo. */
+    mglConqLogo(dsp, TRUE);
 
-  if (state == S_WAR)
-    cprintf(prm.index, 0, ALIGN_NONE, prm.pbuf);
-  
-  return;
-  
+    lin = 7;
+
+    if ( ConqInfo->closed )
+        cprintf(lin,0,ALIGN_CENTER,"#%d#%s",RedLevelColor,"The game is closed.");
+    else
+        cprintf( lin,0,ALIGN_CENTER,"#%d#%s (%s)",YellowLevelColor,
+                 ConquestVersion, ConquestDate);
+
+    lin++;
+    lin++;
+    cprintf(lin,0,ALIGN_CENTER,"#%d#%s", MagentaColor, CONQ_HTTP);
+    lin++;
+    lin++;
+    lin++;
+    cprintf(lin,0,ALIGN_CENTER,"#%d#%s",NoColor, "Options:");
+
+    col = 8;
+    lin+=2;
+    i = lin;
+    cprintf(lin,col,ALIGN_NONE,sfmt, 'e', "enter the game");
+    lin++;
+    cprintf(lin,col,ALIGN_NONE,sfmt, 'S', "more user statistics");
+    lin++;
+    cprintf(lin,col,ALIGN_NONE,sfmt, 'T', "team statistics");
+    lin++;
+    cprintf(lin,col,ALIGN_NONE,sfmt, 'U', "user statistics");
+    lin++;
+    cprintf(lin,col,ALIGN_NONE,sfmt, 'N', "change your name");
+    lin++;
+    cprintf(lin,col,ALIGN_NONE,sfmt, 'W', "set war or peace");
+
+    lin++;
+    cprintf(lin,col,ALIGN_NONE,sfmt, 'O', "options menu");
+
+    col = 48;
+    lin = i;
+
+    if ( ! multiple )
+    {
+        cprintf(lin,col,ALIGN_NONE,sfmt, 'r', "resign your commission");
+        lin++;
+    }
+    if ( multiple || switchteams )
+    {
+
+        cprintf(lin,col,ALIGN_NONE,sfmt, 's', "switch teams");
+        lin++;
+    }
+
+    cprintf(lin,col,ALIGN_NONE,sfmt, 'H', "user history");
+    lin++;
+    cprintf(lin,col,ALIGN_NONE,sfmt, '/', "player list");
+    lin++;
+    cprintf(lin,col,ALIGN_NONE,sfmt, '?', "planet list");
+    lin++;
+    cprintf(lin,col,ALIGN_NONE,sfmt, 'q', "exit the program");
+
+    if (state == S_WAR)
+        cprintf(prm.index, 0, ALIGN_NONE, prm.pbuf);
+
+    return;
+
 }
 
 
 void nMenuInit(void)
 {
-  char buf[PKT_MAXSIZE];
-  static int inited = FALSE;
+    char buf[PKT_MAXSIZE];
+    static int inited = FALSE;
 
-  state = S_NONE;
-  prompting = FALSE;
+    state = S_NONE;
+    prompting = FALSE;
 
-  if (!inited)
+    if (!inited)
     {
-      inited = TRUE;
-      /* Initialize statistics. */
-      initstats( &Ships[Context.snum].ctime, &Ships[Context.snum].etime );
+        inited = TRUE;
+        /* Initialize statistics. */
+        initstats( &Ships[Context.snum].ctime, &Ships[Context.snum].etime );
 
-      /* Log this entry into the Game. */
-      Context.histslot = clbLogHist( Context.unum );
-      
-      /* Set up some things for the menu display. */
-      switchteams = Users[Context.unum].ooptions[OOPT_SWITCHTEAMS];
-      multiple = Users[Context.unum].ooptions[OOPT_MULTIPLE];
-      oclosed = ConqInfo->closed;
-      Context.leave = FALSE;
-      
-      /* now look for our ship packet before we get started.  It should be a
-         full SP_SHIP packet for this first time */
-      if (pktWaitForPacket(SP_SHIP, buf, PKT_MAXSIZE,
-                           60, NULL) <= 0)
-        {
-          utLog("nMenuInit: didn't get initial SP_SHIP");
-          fatal = TRUE;
-          return;
-        }
-      else
-        procShip(buf);
-      
-      /* Some simple housekeeping. */
-      if ( multiple != Users[Context.unum].ooptions[OOPT_MULTIPLE] )
-        multiple = ! multiple;
-      
-      if ( switchteams != Users[Context.unum].ooptions[OOPT_SWITCHTEAMS])
+        /* Log this entry into the Game. */
+        Context.histslot = clbLogHist( Context.unum );
+
+        /* Set up some things for the menu display. */
         switchteams = Users[Context.unum].ooptions[OOPT_SWITCHTEAMS];
-      if ( oclosed != ConqInfo->closed )
-        oclosed = ! oclosed;
+        multiple = Users[Context.unum].ooptions[OOPT_MULTIPLE];
+        oclosed = ConqInfo->closed;
+        Context.leave = FALSE;
 
-      lose = FALSE;
+        /* now look for our ship packet before we get started.  It should be a
+           full SP_SHIP packet for this first time */
+        if (pktWaitForPacket(SP_SHIP, buf, PKT_MAXSIZE,
+                             60, NULL) <= 0)
+        {
+            utLog("nMenuInit: didn't get initial SP_SHIP");
+            fatal = TRUE;
+            return;
+        }
+        else
+            procShip(buf);
+
+        /* Some simple housekeeping. */
+        if ( multiple != Users[Context.unum].ooptions[OOPT_MULTIPLE] )
+            multiple = ! multiple;
+
+        if ( switchteams != Users[Context.unum].ooptions[OOPT_SWITCHTEAMS])
+            switchteams = Users[Context.unum].ooptions[OOPT_SWITCHTEAMS];
+        if ( oclosed != ConqInfo->closed )
+            oclosed = ! oclosed;
+
+        lose = FALSE;
     }
 
-  setNode(&nMenuNode);
+    setNode(&nMenuNode);
 
-  return;
+    return;
 }
 
 
 static int nMenuDisplay(dspConfig_t *dsp)
 {
-  int lin, col;
-  char cbuf[BUFFER_SIZE];
+    int lin, col;
+    char cbuf[BUFFER_SIZE];
 
-  if (fatal)
-    return NODE_EXIT;
+    if (fatal)
+        return NODE_EXIT;
 
-  _conqds(dsp);
-  clbUserline( -1, -1, cbuf, FALSE, TRUE );
-  cprintf(MSG_LIN1, 1, ALIGN_LEFT, "#%d#%s",
-          LabelColor,
-          cbuf);
-  clbUserline( Context.unum, 0, cbuf, FALSE, TRUE );
-  cprintf(MSG_LIN2, 1, ALIGN_LEFT, "#%d#%s", 
-          NoColor,
-          cbuf);
+    _conqds(dsp);
+    clbUserline( -1, -1, cbuf, FALSE, TRUE );
+    cprintf(MSG_LIN1, 1, ALIGN_LEFT, "#%d#%s",
+            LabelColor,
+            cbuf);
+    clbUserline( Context.unum, 0, cbuf, FALSE, TRUE );
+    cprintf(MSG_LIN2, 1, ALIGN_LEFT, "#%d#%s",
+            NoColor,
+            cbuf);
 
-  if (state == S_PSEUDO)
+    if (state == S_PSEUDO)
     {
-      cprintf(prm.index, 0, ALIGN_NONE, "#%d#Old pseudonym: %s",
-              NoColor, Users[Context.unum].alias);
+        cprintf(prm.index, 0, ALIGN_NONE, "#%d#Old pseudonym: %s",
+                NoColor, Users[Context.unum].alias);
 
-      cprintf(prm.index + 1, 0, ALIGN_NONE, "#%d#Enter a new pseudonym: %s",
-              NoColor, prm.buf);
+        cprintf(prm.index + 1, 0, ALIGN_NONE, "#%d#Enter a new pseudonym: %s",
+                NoColor, prm.buf);
     }
 
-  if (state == S_RESIGN)
+    if (state == S_RESIGN)
     {
-      cprintf(prm.index, 0, ALIGN_CENTER, 
-              "#%d#Press [TAB] to confirm your resignation: ",
-              NoColor);
+        cprintf(prm.index, 0, ALIGN_CENTER,
+                "#%d#Press [TAB] to confirm your resignation: ",
+                NoColor);
     }
 
-  if (state == S_LOSE)
+    if (state == S_LOSE)
     {
-      /* We reincarnated or else something bad happened. */
-      lin = 7;
-      col = 11;
-      cprintf( lin,col,ALIGN_NONE,"#%d#%s", RedLevelColor, if1);
-      lin++;
-      cprintf( lin,col,ALIGN_NONE,"#%d#%s", RedLevelColor, if2);
-      lin++;
-      cprintf( lin,col,ALIGN_NONE,"#%d#%s", RedLevelColor, if3);
-      lin++;
-      cprintf( lin,col,ALIGN_NONE,"#%d#%s", RedLevelColor, if4);
-      lin++;
-      cprintf( lin,col,ALIGN_NONE,"#%d#%s", RedLevelColor, if5);
-      lin++;
-      cprintf( lin,col,ALIGN_NONE,"#%d#%s", RedLevelColor, if6);
-      lin++;
-      cprintf( lin,col,ALIGN_NONE,"#%d#%s", RedLevelColor, if7);
-      lin+=2;
-      cprintf( lin,col,ALIGN_NONE,"#%d#%s", RedLevelColor | CQC_A_BOLD, if8);
-      lin+=2;
-      cprintf( lin,col,ALIGN_NONE,"#%d#%s", RedLevelColor, if9);
+        /* We reincarnated or else something bad happened. */
+        lin = 7;
+        col = 11;
+        cprintf( lin,col,ALIGN_NONE,"#%d#%s", RedLevelColor, if1);
+        lin++;
+        cprintf( lin,col,ALIGN_NONE,"#%d#%s", RedLevelColor, if2);
+        lin++;
+        cprintf( lin,col,ALIGN_NONE,"#%d#%s", RedLevelColor, if3);
+        lin++;
+        cprintf( lin,col,ALIGN_NONE,"#%d#%s", RedLevelColor, if4);
+        lin++;
+        cprintf( lin,col,ALIGN_NONE,"#%d#%s", RedLevelColor, if5);
+        lin++;
+        cprintf( lin,col,ALIGN_NONE,"#%d#%s", RedLevelColor, if6);
+        lin++;
+        cprintf( lin,col,ALIGN_NONE,"#%d#%s", RedLevelColor, if7);
+        lin+=2;
+        cprintf( lin,col,ALIGN_NONE,"#%d#%s", RedLevelColor | CQC_A_BOLD, if8);
+        lin+=2;
+        cprintf( lin,col,ALIGN_NONE,"#%d#%s", RedLevelColor, if9);
 
-      cprintf(20, 0, ALIGN_CENTER, MTXT_DONE);
+        cprintf(20, 0, ALIGN_CENTER, MTXT_DONE);
 
-      return NODE_OK;
+        return NODE_OK;
     }
 
 
 
-  return NODE_OK;
-}  
+    return NODE_OK;
+}
 
-  
+
 static int nMenuIdle(void)
 {
-  int pkttype;
-  char buf[PKT_MAXSIZE];
+    int pkttype;
+    char buf[PKT_MAXSIZE];
 
-  while ((pkttype = pktWaitForPacket(PKT_ANYPKT,
-                                     buf, PKT_MAXSIZE, 0, NULL)) > 0)
+    while ((pkttype = pktWaitForPacket(PKT_ANYPKT,
+                                       buf, PKT_MAXSIZE, 0, NULL)) > 0)
     {                       /* proc packets while we get them */
-      switch (pkttype)
+        switch (pkttype)
         {
         case SP_ACK:
-          PKT_PROCSP(buf);
-          if (sAckMsg.code == PERR_LOSE)
+            PKT_PROCSP(buf);
+            if (sAckMsg.code == PERR_LOSE)
             {
-              lose = TRUE;
-              state = S_LOSE;
-              return NODE_OK;   /* but not for long... */
+                lose = TRUE;
+                state = S_LOSE;
+                return NODE_OK;   /* but not for long... */
             }
-          else
-            utLog("nMenuIdle: got unexp ack code %d", sAckMsg.code);
+            else
+                utLog("nMenuIdle: got unexp ack code %d", sAckMsg.code);
 
-          break;
+            break;
 
         default:
-          processPacket(buf);
-          break;
+            processPacket(buf);
+            break;
         }
     }
 
-  if (pkttype < 0)          /* some error */
+    if (pkttype < 0)          /* some error */
     {
-      utLog("nMenuIdle: waitForPacket returned %d", pkttype);
-      Ships[Context.snum].status = SS_OFF;
-      return NODE_EXIT;
+        utLog("nMenuIdle: waitForPacket returned %d", pkttype);
+        Ships[Context.snum].status = SS_OFF;
+        return NODE_EXIT;
     }
 
-  return NODE_OK;
+    return NODE_OK;
 }
 
 static int nMenuInput(int ch)
 {
-  int i, irv;
-  uint16_t cwar;
+    int i, irv;
+    uint16_t cwar;
 
-  ch = CQ_CHAR(ch);
+    ch = CQ_CHAR(ch);
 
-  if ((state == S_LOSE) && ch != 0)
-    return NODE_EXIT;           /* you lose */
+    if ((state == S_LOSE) && ch != 0)
+        return NODE_EXIT;           /* you lose */
 
-  if (prompting)
+    if (prompting)
     {
-      irv = prmProcInput(&prm, ch);
+        irv = prmProcInput(&prm, ch);
 
-      switch (state)
+        switch (state)
         {
         case S_PSEUDO:
-          if (irv > 0)
+            if (irv > 0)
             {
-              if (ch != TERM_ABORT && prm.buf[0] != 0)
-                sendSetName(prm.buf);
-              prompting = FALSE;
-              state = S_NONE;
+                if (ch != TERM_ABORT && prm.buf[0] != 0)
+                    sendSetName(prm.buf);
+                prompting = FALSE;
+                state = S_NONE;
             }
 
-          break;
+            break;
 
         case S_RESIGN:
-          if (irv > 0 && ch == TERM_EXTRA)
+            if (irv > 0 && ch == TERM_EXTRA)
             {                   /* buhbye kapitan */
-              sendCommand(CPCMD_RESIGN, 0);
-              return NODE_EXIT;
+                sendCommand(CPCMD_RESIGN, 0);
+                return NODE_EXIT;
             }
-          state = S_NONE;
-          prompting = FALSE;
+            state = S_NONE;
+            prompting = FALSE;
 
-          break;
+            break;
 
         case S_WAR:
-          if (irv > 0)
+            if (irv > 0)
             {
-              if (ch == TERM_ABORT || ch == TERM_NORMAL)
+                if (ch == TERM_ABORT || ch == TERM_NORMAL)
                 {
-                  state = S_NONE;
-                  prompting = FALSE;
-                  return NODE_OK;
+                    state = S_NONE;
+                    prompting = FALSE;
+                    return NODE_OK;
                 }
 
-              if (ch == TERM_EXTRA) /* accepted */
+                if (ch == TERM_EXTRA) /* accepted */
                 {
-                  state = S_NONE;
-                  prompting = FALSE;
-                  cwar = 0;
-                  for ( i = 0; i < NUMPLAYERTEAMS; i = i + 1 )
+                    state = S_NONE;
+                    prompting = FALSE;
+                    cwar = 0;
+                    for ( i = 0; i < NUMPLAYERTEAMS; i = i + 1 )
                     {
-                      if (twar[i])
-                        cwar |= (1 << i);
+                        if (twar[i])
+                            cwar |= (1 << i);
 
-                      /* we'll let it happen locally as well... */
-                      Users[Ships[Context.snum].unum].war[i] = twar[i];
-                      Ships[Context.snum].war[i] = twar[i];
+                        /* we'll let it happen locally as well... */
+                        Users[Ships[Context.snum].unum].war[i] = twar[i];
+                        Ships[Context.snum].war[i] = twar[i];
                     }
 
-                  sendCommand(CPCMD_SETWAR, (uint16_t)cwar);
-                  return NODE_OK;
+                    sendCommand(CPCMD_SETWAR, (uint16_t)cwar);
+                    return NODE_OK;
                 }
 
             }
-          else
+            else
             {
-              prm.buf[0] = 0;
-              for ( i = 0; i < NUMPLAYERTEAMS; i = i + 1 )
-                if ( ch == (char)tolower( Teams[i].teamchar ) )
-                  {
-                    if ( ! twar[i] || ! Ships[Context.snum].rwar[i] )
-                      twar[i] = ! twar[i];
-                    prm.pbuf = clbWarPrompt(Context.snum, twar);
-                  }
+                prm.buf[0] = 0;
+                for ( i = 0; i < NUMPLAYERTEAMS; i = i + 1 )
+                    if ( ch == (char)tolower( Teams[i].teamchar ) )
+                    {
+                        if ( ! twar[i] || ! Ships[Context.snum].rwar[i] )
+                            twar[i] = ! twar[i];
+                        prm.pbuf = clbWarPrompt(Context.snum, twar);
+                    }
             }
 
         default:
-          break;
+            break;
         }
 
-      return NODE_OK;
+        return NODE_OK;
     }
 
 
-  switch (ch)
+    switch (ch)
     {
     case 'e':                   /* enter the game */
-      nPlayInit();
-      return NODE_OK;
-      break;
+        nPlayInit();
+        return NODE_OK;
+        break;
 
     case 'H':
-      nHistlInit(DSP_NODE_MENU, TRUE);
-      break;
+        nHistlInit(DSP_NODE_MENU, TRUE);
+        break;
 
     case 'N':
-      state = S_PSEUDO;
-      prm.preinit = FALSE;
-      prm.buf = cbuf;
-      prm.buflen = MAXUSERPNAME;
-      prm.terms = TERMS;
-      prm.index = 20;
-      prm.buf[0] = 0;
-      prompting = TRUE;
+        state = S_PSEUDO;
+        prm.preinit = FALSE;
+        prm.buf = cbuf;
+        prm.buflen = MAXUSERPNAME;
+        prm.terms = TERMS;
+        prm.index = 20;
+        prm.buf[0] = 0;
+        prompting = TRUE;
 
-      break;
+        break;
 
     case 'r':
-      if ( multiple )
-        mglBeep(MGL_BEEP_ERR);
-      else
-        {
-          for ( i = 1; i <= MAXSHIPS; i = i + 1 )
-            if ( Ships[i].status == SS_LIVE ||
-                 Ships[i].status == SS_ENTERING )
-              if ( Ships[i].unum == Context.unum )
-                break;
-
-          if ( i <= MAXSHIPS )
+        if ( multiple )
             mglBeep(MGL_BEEP_ERR);
-          else
+        else
+        {
+            for ( i = 1; i <= MAXSHIPS; i = i + 1 )
+                if ( Ships[i].status == SS_LIVE ||
+                     Ships[i].status == SS_ENTERING )
+                    if ( Ships[i].unum == Context.unum )
+                        break;
+
+            if ( i <= MAXSHIPS )
+                mglBeep(MGL_BEEP_ERR);
+            else
             {
-              state = S_RESIGN;
-              prm.preinit = FALSE;
-              prm.buf = cbuf;
-              prm.buflen = MAXUSERPNAME;
-              prm.terms = TERMS;
-              prm.index = 20;
-              prm.buf[0] = 0;
-              prompting = TRUE;
+                state = S_RESIGN;
+                prm.preinit = FALSE;
+                prm.buf = cbuf;
+                prm.buflen = MAXUSERPNAME;
+                prm.terms = TERMS;
+                prm.index = 20;
+                prm.buf[0] = 0;
+                prompting = TRUE;
             }
         }
-      break;
+        break;
     case 's':
-      if ( ! multiple && ! switchteams )
-        mglBeep(MGL_BEEP_ERR);
-      else
+        if ( ! multiple && ! switchteams )
+            mglBeep(MGL_BEEP_ERR);
+        else
         {
-          /* we'll update local data here anyway, even though it will be
-             overwritten on the next ship update.  Improves perceived
-             response time. */
-          Ships[Context.snum].team = 
-            utModPlusOne( Ships[Context.snum].team+1, NUMPLAYERTEAMS );
-          Ships[Context.snum].shiptype = 
-            Teams[Ships[Context.snum].team].shiptype;
-          Users[Context.unum].team = Ships[Context.snum].team;
-          Ships[Context.snum].war[Ships[Context.snum].team] = FALSE;
-          Users[Context.unum].war[Users[Context.unum].team] = FALSE;
-          
-          sendCommand(CPCMD_SWITCHTEAM, (uint16_t)Ships[Context.snum].team);
+            /* we'll update local data here anyway, even though it will be
+               overwritten on the next ship update.  Improves perceived
+               response time. */
+            Ships[Context.snum].team =
+                utModPlusOne( Ships[Context.snum].team+1, NUMPLAYERTEAMS );
+            Ships[Context.snum].shiptype =
+                Teams[Ships[Context.snum].team].shiptype;
+            Users[Context.unum].team = Ships[Context.snum].team;
+            Ships[Context.snum].war[Ships[Context.snum].team] = FALSE;
+            Users[Context.unum].war[Users[Context.unum].team] = FALSE;
+
+            sendCommand(CPCMD_SWITCHTEAM, (uint16_t)Ships[Context.snum].team);
         }
-      break;
+        break;
 
     case 'O':
-      nOptionsInit(NOPT_USER, TRUE, DSP_NODE_MENU);
-      break;
+        nOptionsInit(NOPT_USER, TRUE, DSP_NODE_MENU);
+        break;
 
     case 'S':
-      nUserlInit(DSP_NODE_MENU, TRUE, Context.snum, FALSE, TRUE);
-      break;
+        nUserlInit(DSP_NODE_MENU, TRUE, Context.snum, FALSE, TRUE);
+        break;
 
     case 'T':
-      nTeamlInit(DSP_NODE_MENU, TRUE, Ships[Context.snum].team);
-      break;
+        nTeamlInit(DSP_NODE_MENU, TRUE, Ships[Context.snum].team);
+        break;
 
     case 'U':
-      nUserlInit(DSP_NODE_MENU, TRUE, Context.snum, FALSE, FALSE);
-      break;
+        nUserlInit(DSP_NODE_MENU, TRUE, Context.snum, FALSE, FALSE);
+        break;
 
     case 'W':
-      for ( i = 0; i < NUMPLAYERTEAMS; i = i + 1 )
-        twar[i] = Ships[Context.snum].war[i];
+        for ( i = 0; i < NUMPLAYERTEAMS; i = i + 1 )
+            twar[i] = Ships[Context.snum].war[i];
 
-      state = S_WAR;
-      prompting = TRUE;
-      prm.preinit = FALSE;
-      prm.buf = cbuf;
-      prm.buflen = 5;
-      prm.pbuf = clbWarPrompt(Context.snum, twar);
-      prm.terms = TERMS;
-      prm.index = 20;
-      prm.buf[0] = 0;
+        state = S_WAR;
+        prompting = TRUE;
+        prm.preinit = FALSE;
+        prm.buf = cbuf;
+        prm.buflen = 5;
+        prm.pbuf = clbWarPrompt(Context.snum, twar);
+        prm.terms = TERMS;
+        prm.index = 20;
+        prm.buf[0] = 0;
 
-      break;
+        break;
     case '/':
-      nShiplInit(DSP_NODE_MENU, TRUE);
-      break;
-     
-    case '?':
-      if (Context.snum > 0 && Context.snum <= MAXSHIPS)
-        nPlanetlInit(DSP_NODE_MENU, TRUE, Context.snum, Ships[Context.snum].team);
-      else          /* then use user team if user doen't have a ship yet */
-        nPlanetlInit(DSP_NODE_MENU, TRUE, Context.snum, Users[Context.unum].team);
-      break;
-     
-    case 'q':
-      /* first stop all music and effects */
-      cqsEffectStop(CQS_INVHANDLE, TRUE);
-      cqsMusicStop(TRUE);
-      
-      return NODE_EXIT;
+        nShiplInit(DSP_NODE_MENU, TRUE);
+        break;
 
-      break;                    /* NOTREACHED */
+    case '?':
+        if (Context.snum > 0 && Context.snum <= MAXSHIPS)
+            nPlanetlInit(DSP_NODE_MENU, TRUE, Context.snum, Ships[Context.snum].team);
+        else          /* then use user team if user doen't have a ship yet */
+            nPlanetlInit(DSP_NODE_MENU, TRUE, Context.snum, Users[Context.unum].team);
+        break;
+
+    case 'q':
+        /* first stop all music and effects */
+        cqsEffectStop(CQS_INVHANDLE, TRUE);
+        cqsMusicStop(TRUE);
+
+        return NODE_EXIT;
+
+        break;                    /* NOTREACHED */
 
     }
 
-  return NODE_OK;
+    return NODE_OK;
 }
-

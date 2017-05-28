@@ -25,22 +25,22 @@
    (Msgs[]).  Pretty much a copy of clbStoreMsg() without the locking */
 void clntStoreMessage(spMessage_t *msg)
 {
-  int nlastmsg;
+    int nlastmsg;
 
-  if (!msg)
+    if (!msg)
+        return;
+
+    nlastmsg = utModPlusOne( ConqInfo->lastmsg + 1, MAXMESSAGES );
+    strncpy(Msgs[nlastmsg].msgbuf, (char *)msg->msg, MESSAGE_SIZE);
+    Msgs[nlastmsg].msgfrom = (int)msg->from;
+    Msgs[nlastmsg].msgto = (int)msg->to;
+    Msgs[nlastmsg].flags = msg->flags;
+    ConqInfo->lastmsg = nlastmsg;
+
+    /* Remove allowable last message restrictions. */
+    Ships[Context.snum].alastmsg = LMSG_READALL;
+
     return;
-
-  nlastmsg = utModPlusOne( ConqInfo->lastmsg + 1, MAXMESSAGES );
-  strncpy(Msgs[nlastmsg].msgbuf, (char *)msg->msg, MESSAGE_SIZE);
-  Msgs[nlastmsg].msgfrom = (int)msg->from;
-  Msgs[nlastmsg].msgto = (int)msg->to;
-  Msgs[nlastmsg].flags = msg->flags;
-  ConqInfo->lastmsg = nlastmsg;
-
-  /* Remove allowable last message restrictions. */
-  Ships[Context.snum].alastmsg = LMSG_READALL;
-
-  return;
 }
 
 
@@ -49,44 +49,41 @@ void clntStoreMessage(spMessage_t *msg)
    as well as being displayed on MSG_LIN1 */
 void clntDisplayFeedback(char *msg)
 {
-  if (!msg)
+    if (!msg)
+        return;
+
+    displayFeedback(msg, MSG_LIN1);
+
     return;
-
-  displayFeedback(msg, MSG_LIN1);
-
-  return;
 }
 
 /* return a static string containing the server's stringified  flags */
 char *clntServerFlagsStr(uint32_t flags)
 {
-  static char serverflags[256];
+    static char serverflags[256];
 
-  if (flags == SPSSTAT_FLAGS_NONE)
-    strcpy(serverflags, "None");
-  else
-    strcpy(serverflags, "");
+    if (flags == SPSSTAT_FLAGS_NONE)
+        strcpy(serverflags, "None");
+    else
+        strcpy(serverflags, "");
 
-  if (flags & SPSSTAT_FLAGS_REFIT)
-    strcat(serverflags, "Refit ");
-  
-  if (flags & SPSSTAT_FLAGS_VACANT)
-    strcat(serverflags, "Vacant ");
-  
-  if (flags & SPSSTAT_FLAGS_SLINGSHOT)
-    strcat(serverflags, "SlingShot ");
-  
-  if (flags & SPSSTAT_FLAGS_NODOOMSDAY)
-    strcat(serverflags, "NoDoomsday ");
-  
-  if (flags & SPSSTAT_FLAGS_KILLBOTS)
-    strcat(serverflags, "Killbots ");
-  
-  if (flags & SPSSTAT_FLAGS_SWITCHTEAM)
-    strcat(serverflags, "SwitchTeam ");
+    if (flags & SPSSTAT_FLAGS_REFIT)
+        strcat(serverflags, "Refit ");
 
-  return serverflags;
+    if (flags & SPSSTAT_FLAGS_VACANT)
+        strcat(serverflags, "Vacant ");
+
+    if (flags & SPSSTAT_FLAGS_SLINGSHOT)
+        strcat(serverflags, "SlingShot ");
+
+    if (flags & SPSSTAT_FLAGS_NODOOMSDAY)
+        strcat(serverflags, "NoDoomsday ");
+
+    if (flags & SPSSTAT_FLAGS_KILLBOTS)
+        strcat(serverflags, "Killbots ");
+
+    if (flags & SPSSTAT_FLAGS_SWITCHTEAM)
+        strcat(serverflags, "SwitchTeam ");
+
+    return serverflags;
 }
-  
-
-

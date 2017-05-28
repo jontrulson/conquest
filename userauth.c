@@ -1,4 +1,4 @@
-/* 
+/*
  * userauth.c - user stuff
  *
  * Copyright Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
@@ -16,21 +16,19 @@
 
 #define MAX_USERLEN 10		/* only 10 chars for users */
 
-/* check the validity of a supplied username */  
+/* check the validity of a supplied username */
 int checkuname(char *username)
 {
-  char *s = username;
+    char *s = username;
 
-  while (*s)
+    while (*s)
     {
-      if (!isalnum(*s) && *s != '-' && *s != '_')
+        if (!isalnum(*s) && *s != '-' && *s != '_')
 	{			/* if invalid character... */
-	  return(FALSE);
+            return(FALSE);
 	}
-      s++;
+        s++;
     }
 
-  return(TRUE);
+    return(TRUE);
 }
-
-

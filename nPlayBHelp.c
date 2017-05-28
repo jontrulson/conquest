@@ -1,4 +1,4 @@
-/* 
+/*
  * nCP help node
  *
  * Copyright Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
@@ -26,41 +26,40 @@ static int nPlayBHelpDisplay(dspConfig_t *);
 static int nPlayBHelpInput(int ch);
 
 static scrNode_t nPlayBHelpNode = {
-  nPlayBHelpDisplay,            /* display */
-  NULL,                         /* idle */
-  nPlayBHelpInput,               /* input */
-  NULL,                         /* minput */
-  NULL                          /* animQue */
+    nPlayBHelpDisplay,            /* display */
+    NULL,                         /* idle */
+    nPlayBHelpInput,               /* input */
+    NULL,                         /* minput */
+    NULL                          /* animQue */
 
 };
 
 
 scrNode_t *nPlayBHelpInit(int setnode)
 {
-  if (setnode)
-    setNode(&nPlayBHelpNode);
+    if (setnode)
+        setNode(&nPlayBHelpNode);
 
-  return(&nPlayBHelpNode);
+    return(&nPlayBHelpNode);
 }
 
 
 static int nPlayBHelpDisplay(dspConfig_t *dsp)
 {
 
-  dspReplayHelp();
+    dspReplayHelp();
 
-  cprintf(MSG_LIN2, 0, ALIGN_CENTER, MTXT_DONE);
-  
-  return NODE_OK;
-}  
+    cprintf(MSG_LIN2, 0, ALIGN_CENTER, MTXT_DONE);
+
+    return NODE_OK;
+}
 
 static int nPlayBHelpInput(int ch)
 {
-  /* go back */
+    /* go back */
 
-  setONode(NULL);
-  nPlayBInit();
+    setONode(NULL);
+    nPlayBInit();
 
-  return NODE_OK;
+    return NODE_OK;
 }
-

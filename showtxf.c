@@ -32,32 +32,32 @@ TexFont *txf;
 void
 reshape(int w, int h)
 {
-  glViewport(0, 0, w, h);
-  glMatrixMode(GL_PROJECTION);
-  glLoadIdentity();
-  gluOrtho2D(0, w, 0, h);
-  glMatrixMode(GL_MODELVIEW);
-  glLoadIdentity();
-  glTranslatef(0, h - imgheight, 0);
-  glRasterPos2i(0, 0);
-  glBitmap(0, 0, 0, 0, ax, -ay, NULL);
+    glViewport(0, 0, w, h);
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    gluOrtho2D(0, w, 0, h);
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+    glTranslatef(0, h - imgheight, 0);
+    glRasterPos2i(0, 0);
+    glBitmap(0, 0, 0, 0, ax, -ay, NULL);
 }
 
 void
 display(void)
 {
-  /* Clear the color buffer. */
-  glClear(GL_COLOR_BUFFER_BIT);
+    /* Clear the color buffer. */
+    glClear(GL_COLOR_BUFFER_BIT);
 
-  /* Re-blit the image. */
-  glDrawPixels(imgwidth, imgheight,
-    GL_LUMINANCE, GL_UNSIGNED_BYTE,
-    txf->teximage);
+    /* Re-blit the image. */
+    glDrawPixels(imgwidth, imgheight,
+                 GL_LUMINANCE, GL_UNSIGNED_BYTE,
+                 txf->teximage);
 
-  /* Swap the buffers if necessary. */
-  if (doubleBuffer) {
-    glutSwapBuffers();
-  }
+    /* Swap the buffers if necessary. */
+    if (doubleBuffer) {
+        glutSwapBuffers();
+    }
 }
 
 static int moving = 0, ox, oy;
@@ -65,92 +65,92 @@ static int moving = 0, ox, oy;
 void
 mouse(int button, int state, int x, int y)
 {
-  if (button == GLUT_LEFT_BUTTON) {
-    if (state == GLUT_DOWN) {
+    if (button == GLUT_LEFT_BUTTON) {
+        if (state == GLUT_DOWN) {
 
-      /* Left mouse button press.  Update last seen mouse position. And set
-         "moving" true since button is pressed. */
-      ox = x;
-      oy = y;
-      moving = 1;
+            /* Left mouse button press.  Update last seen mouse position. And set
+               "moving" true since button is pressed. */
+            ox = x;
+            oy = y;
+            moving = 1;
 
-    } else {
+        } else {
 
-      /* Left mouse button released; unset "moving" since button no longer
-         pressed. */
-      moving = 0;
+            /* Left mouse button released; unset "moving" since button no longer
+               pressed. */
+            moving = 0;
 
+        }
     }
-  }
 }
 
 void
 motion(int x, int y)
 {
-  /* If there is mouse motion with the left button held down... */
-  if (moving) {
+    /* If there is mouse motion with the left button held down... */
+    if (moving) {
 
-    /* Figure out the offset from the last mouse position seen. */
-    ax += (x - ox);
-    ay += (y - oy);
+        /* Figure out the offset from the last mouse position seen. */
+        ax += (x - ox);
+        ay += (y - oy);
 
-    /* Offset the raster position based on the just calculated mouse position
-       delta.  Use a null glBitmap call to offset the raster position in
-       window coordinates. */
-    glBitmap(0, 0, 0, 0, x - ox, oy - y, NULL);
+        /* Offset the raster position based on the just calculated mouse position
+           delta.  Use a null glBitmap call to offset the raster position in
+           window coordinates. */
+        glBitmap(0, 0, 0, 0, x - ox, oy - y, NULL);
 
-    /* Request a window redraw. */
-    glutPostRedisplay();
+        /* Request a window redraw. */
+        glutPostRedisplay();
 
-    /* Update last seen mouse position. */
-    ox = x;
-    oy = y;
-  }
+        /* Update last seen mouse position. */
+        ox = x;
+        oy = y;
+    }
 }
 
 int
 main(int argc, char **argv)
 {
-  int i;
+    int i;
 
-  glutInit(&argc, argv);
-  for (i = 1; i < argc; i++) {
-    if (!strcmp(argv[i], "-sb")) {
-      doubleBuffer = 0;
-    } else if (!strcmp(argv[i], "-v")) {
-      verbose = 1;
-    } else {
-      filename = argv[i];
+    glutInit(&argc, argv);
+    for (i = 1; i < argc; i++) {
+        if (!strcmp(argv[i], "-sb")) {
+            doubleBuffer = 0;
+        } else if (!strcmp(argv[i], "-v")) {
+            verbose = 1;
+        } else {
+            filename = argv[i];
+        }
     }
-  }
-  if (filename == NULL) {
-    fprintf(stderr, "usage: showtxf [GLUT-options] [-sb] [-v] txf-file\n");
-    exit(1);
-  }
+    if (filename == NULL) {
+        fprintf(stderr, "usage: showtxf [GLUT-options] [-sb] [-v] txf-file\n");
+        exit(1);
+    }
 
-  txf = txfLoadFont(filename);
-  if (txf == NULL) {
-    fprintf(stderr, "Problem loading %s\n", filename);
-    exit(1);
-  }
+    txf = txfLoadFont(filename);
+    if (txf == NULL) {
+        fprintf(stderr, "Problem loading %s\n", filename);
+        exit(1);
+    }
 
-  imgwidth = txf->tex_width;
-  imgheight = txf->tex_height;
+    imgwidth = txf->tex_width;
+    imgheight = txf->tex_height;
 
-  if (doubleBuffer) {
-    glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE);
-  } else {
-    glutInitDisplayMode(GLUT_RGB | GLUT_SINGLE);
-  }
-  glutInitWindowSize(imgwidth, imgheight);
-  glutCreateWindow(filename);
-  glutReshapeFunc(reshape);
-  glutDisplayFunc(display);
-  glutMouseFunc(mouse);
-  glutMotionFunc(motion);
-  /* Use a gray background so teximage with black backgrounds will show
-     against showtxf's background. */
-  glClearColor(0.2, 0.2, 0.2, 1.0);
-  glutMainLoop();
-  return 0;             /* ANSI C requires main to return int. */
+    if (doubleBuffer) {
+        glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE);
+    } else {
+        glutInitDisplayMode(GLUT_RGB | GLUT_SINGLE);
+    }
+    glutInitWindowSize(imgwidth, imgheight);
+    glutCreateWindow(filename);
+    glutReshapeFunc(reshape);
+    glutDisplayFunc(display);
+    glutMouseFunc(mouse);
+    glutMotionFunc(motion);
+    /* Use a gray background so teximage with black backgrounds will show
+       against showtxf's background. */
+    glClearColor(0.2, 0.2, 0.2, 1.0);
+    glutMainLoop();
+    return 0;             /* ANSI C requires main to return int. */
 }

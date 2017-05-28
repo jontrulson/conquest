@@ -36,25 +36,25 @@ static ringBuffer_t *ibufRB = NULL;
 
 void ibufInit(void)
 {
-  ibufRB = rbCreate(I2RB_LEN(IBUF_RBMAX));
+    ibufRB = rbCreate(I2RB_LEN(IBUF_RBMAX));
 
-  return;
+    return;
 }
 
 void ibufFlush(void)
 {
-  rbFlush(ibufRB);
+    rbFlush(ibufRB);
 
-  return;
+    return;
 }
 
 
 int ibufCount(void)
 {
-  if (ibufRB)
-    return RB2I_LEN(rbBytesUsed(ibufRB));
-  else
-    return 0;
+    if (ibufRB)
+        return RB2I_LEN(rbBytesUsed(ibufRB));
+    else
+        return 0;
 }
 
 
@@ -62,33 +62,33 @@ int ibufCount(void)
 
 void ibufPut(char *thestr)
 {
-  int i;
-  int n;
-  int c;
+    int i;
+    int n;
+    int c;
 
-  if (!thestr)
-    return;
+    if (!thestr)
+        return;
 
-  n = strlen(thestr);
+    n = strlen(thestr);
 
-  /* cvt to int's and insert into rb */
-  for (i=0; i<n; i++)
+    /* cvt to int's and insert into rb */
+    for (i=0; i<n; i++)
     {
-      c = thestr[i] & 0xff;
-      /* hopefully there is enough room, or... */
-      rbPut(ibufRB, (uint8_t *)&c, I2RB_LEN(1));
+        c = thestr[i] & 0xff;
+        /* hopefully there is enough room, or... */
+        rbPut(ibufRB, (uint8_t *)&c, I2RB_LEN(1));
     }
 
-  return;
+    return;
 }
 
 /* ibufPutc - put a char into the buffer */
 
 void ibufPutc(unsigned int thechar)
 {
-  rbPut(ibufRB, (uint8_t *)&thechar, I2RB_LEN(1));
+    rbPut(ibufRB, (uint8_t *)&thechar, I2RB_LEN(1));
 
-  return;
+    return;
 }
 
 
@@ -96,87 +96,86 @@ void ibufPutc(unsigned int thechar)
 
 unsigned int ibufGetc(void)
 {
-  int c;
+    int c;
 
-  if (!ibufCount())
+    if (!ibufCount())
     {
-      return 0;
+        return 0;
     }
 
-  rbGet(ibufRB, (uint8_t *)&c, I2RB_LEN(1), TRUE);
+    rbGet(ibufRB, (uint8_t *)&c, I2RB_LEN(1), TRUE);
 
-  return c;
+    return c;
 }
-  
+
 /* ibufExpandMacro - stuff the buffer if an fkey pressed */
 
 int ibufExpandMacro(int fkey)
 {
-  if (fkey < 0 || fkey >= MAX_MACROS)
-    return(FALSE);
+    if (fkey < 0 || fkey >= MAX_MACROS)
+        return(FALSE);
 
-  ibufPut(UserConf.MacrosF[fkey]);	
+    ibufPut(UserConf.MacrosF[fkey]);
 
 #ifdef DEBUG_MACROS
-  utLog("ibufExpandMacro(): got an FKey: %d", fkey);
+    utLog("ibufExpandMacro(): got an FKey: %d", fkey);
 #endif
-  
-  return(TRUE);
+
+    return(TRUE);
 
 }
-      
+
 int ibufExpandMouseMacro(int but, uint32_t mods, real mangle)
 {
-  int myangle = ((mangle < 0.0) ? 0 : (int)utMod360(mangle));
-  char *s;
-  static char buf[MAX_MACRO_LEN];
+    int myangle = ((mangle < 0.0) ? 0 : (int)utMod360(mangle));
+    char *s;
+    static char buf[MAX_MACRO_LEN];
 
 #if defined(DEBUG_MACROS)
-  utLog("ibufExpandMouseMacro(): mod %08x but %d", mods, but);
+    utLog("ibufExpandMouseMacro(): mod %08x but %d", mods, but);
 #endif
-  
-  if (but < 0 || but >= CONF_MAXBUTTONS)
-    return(FALSE);
 
-  if (mods < 0 || mods >= CONF_MAXMODIFIERS)
-    return(FALSE);
+    if (but < 0 || but >= CONF_MAXBUTTONS)
+        return(FALSE);
 
-  /* we need to translate any occurances of \a into the mangle (angle) */
+    if (mods < 0 || mods >= CONF_MAXMODIFIERS)
+        return(FALSE);
 
-  s = UserConf.Mouse[but][mods];
+    /* we need to translate any occurances of \a into the mangle (angle) */
 
-  /* return FALSE for empty/undeclared macros */
-  if (!s || !*s)
-    return FALSE;
+    s = UserConf.Mouse[but][mods];
+
+    /* return FALSE for empty/undeclared macros */
+    if (!s || !*s)
+        return FALSE;
 
 #if defined(DEBUG_MACROS)
-  utLog("ibufExpandMouseMacro(): got MOUSE Macro Key: %d, mod %d string = '%s'", but,
-       mods, s);
+    utLog("ibufExpandMouseMacro(): got MOUSE Macro Key: %d, mod %d string = '%s'", but,
+          mods, s);
 #endif
 
-  while (*s)
+    while (*s)
     {
-      if (*s == '\\')
+        if (*s == '\\')
         {
-          s++;
+            s++;
 
-          if (*s == 'a')
+            if (*s == 'a')
             {
-              s++;
-              snprintf(buf, MAX_MACRO_LEN - 1, "%d",
-                       myangle);
-              ibufPut(buf); 
+                s++;
+                snprintf(buf, MAX_MACRO_LEN - 1, "%d",
+                         myangle);
+                ibufPut(buf);
             }
-          else
-            ibufPutc('\\');
+            else
+                ibufPutc('\\');
         }
-      else
+        else
         {
-          ibufPutc((int)*s);
-          s++;
+            ibufPutc((int)*s);
+            s++;
         }
     }
 
-  return(TRUE);
+    return(TRUE);
 }
-      

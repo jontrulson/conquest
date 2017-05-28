@@ -1,4 +1,4 @@
-/* 
+/*
  * play node.  Sets up for the cockpit (CP).
  *
  * Copyright Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
@@ -31,52 +31,52 @@
 static int state;
 static int fatal = FALSE;
 static int shipinited = FALSE;   /* whether we've done _newship() yet */
-static int owned[NUMPLAYERTEAMS]; 
+static int owned[NUMPLAYERTEAMS];
 
 static int nPlayDisplay(dspConfig_t *);
 static int nPlayIdle(void);
 static int nPlayInput(int ch);
 
 static scrNode_t nPlayNode = {
-  nPlayDisplay,               /* display */
-  nPlayIdle,                  /* idle */
-  nPlayInput,                  /* input */
-  NULL,                         /* minput */
-  NULL                          /* animQue */
+    nPlayDisplay,               /* display */
+    nPlayIdle,                  /* idle */
+    nPlayInput,                  /* input */
+    NULL,                         /* minput */
+    NULL                          /* animQue */
 };
 
 /* select a system to enter */
 static void selectentry( uint8_t esystem )
 {
-  int i; 
-  char cbuf[BUFFER_SIZE];
-  
-  /* First figure out which systems we can enter from. */
-  for ( i = 0; i < NUMPLAYERTEAMS; i++ )
-    if (esystem & (1 << i))
-      {
-	owned[i] = TRUE;
-      }
-    else
-      owned[i] = FALSE;
-  
-  /* Prompt for a decision. */
-  c_strcpy( "Enter which system", cbuf );
-  for ( i = 0; i < NUMPLAYERTEAMS; i++ )
-    if ( owned[i] )
-      {
-	appstr( ", ", cbuf );
-	appstr( Teams[i].name, cbuf );
-      }
+    int i;
+    char cbuf[BUFFER_SIZE];
 
-  /* Change first comma to a colon. */
-  char *sptr = strchr(cbuf, ',');
-  if (sptr)
-    *sptr = ':';
+    /* First figure out which systems we can enter from. */
+    for ( i = 0; i < NUMPLAYERTEAMS; i++ )
+        if (esystem & (1 << i))
+        {
+            owned[i] = TRUE;
+        }
+        else
+            owned[i] = FALSE;
 
-  cprintf(12, 0, ALIGN_CENTER, cbuf);
+    /* Prompt for a decision. */
+    c_strcpy( "Enter which system", cbuf );
+    for ( i = 0; i < NUMPLAYERTEAMS; i++ )
+        if ( owned[i] )
+        {
+            appstr( ", ", cbuf );
+            appstr( Teams[i].name, cbuf );
+        }
 
-  return;
+    /* Change first comma to a colon. */
+    char *sptr = strchr(cbuf, ',');
+    if (sptr)
+        *sptr = ':';
+
+    cprintf(12, 0, ALIGN_CENTER, cbuf);
+
+    return;
 }
 
 
@@ -86,235 +86,234 @@ static void selectentry( uint8_t esystem )
 */
 static int _newship( int unum, int *snum )
 {
-  int pkttype;
-  char buf[PKT_MAXSIZE];
+    int pkttype;
+    char buf[PKT_MAXSIZE];
 
-  /* here we will wait for ack's or a clientstat pkt. Acks indicate an
-     error.  If the clientstat pkt's esystem is !0, we need to prompt
-     for the system to enter and send it in a CP_COMMAND:CPCMD_ENTER
-     pkt. */
+    /* here we will wait for ack's or a clientstat pkt. Acks indicate an
+       error.  If the clientstat pkt's esystem is !0, we need to prompt
+       for the system to enter and send it in a CP_COMMAND:CPCMD_ENTER
+       pkt. */
 
 
-  while (TRUE)
+    while (TRUE)
     {
-      if ((pkttype = pktWaitForPacket(PKT_ANYPKT,
-                                      buf, PKT_MAXSIZE, 60, NULL)) < 0)
+        if ((pkttype = pktWaitForPacket(PKT_ANYPKT,
+                                        buf, PKT_MAXSIZE, 60, NULL)) < 0)
 	{
-	  utLog("nPlay: _newship: waitforpacket returned %d", pkttype);
-          fatal = TRUE;
-	  return FALSE;
+            utLog("nPlay: _newship: waitforpacket returned %d", pkttype);
+            fatal = TRUE;
+            return FALSE;
 	}
-      
-      switch (pkttype)
+
+        switch (pkttype)
 	{
 	case 0:			/* timeout */
-	  return FALSE;
-	  break;
-	  
+            return FALSE;
+            break;
+
 	case SP_ACK:		/* bummer */
-          PKT_PROCSP(buf);
-          state = S_NSERR;
-	  
-	  return FALSE;		/* always a failure */
-	  break;
-	  
+            PKT_PROCSP(buf);
+            state = S_NSERR;
+
+            return FALSE;		/* always a failure */
+            break;
+
 	case SP_CLIENTSTAT:
-          {
+        {
             if (PKT_PROCSP(buf))
-              {
+            {
                 return TRUE;
-              }
+            }
             else
-              {
+            {
                 utLog("nPlay: _newship: invalid CLIENTSTAT");
                 return FALSE;
-              }
-          }
-	  break;
-	  
-	  /* we might get other packets too */
+            }
+        }
+        break;
+
+        /* we might get other packets too */
 	default:
-	  processPacket(buf);
-	  break;
+            processPacket(buf);
+            break;
 	}
     }
 
-  /* if we are here, something unexpected happened */
-  return FALSE;			/* NOTREACHED */
+    /* if we are here, something unexpected happened */
+    return FALSE;			/* NOTREACHED */
 
-  
+
 }
 
 void nPlayInit(void)
 {
-  state = S_SELSYS;               /* default */
-  shipinited = FALSE;
-  /* let the server know our intentions */
-  if (!sendCommand(CPCMD_ENTER, 0))
-    fatal = TRUE;
+    state = S_SELSYS;               /* default */
+    shipinited = FALSE;
+    /* let the server know our intentions */
+    if (!sendCommand(CPCMD_ENTER, 0))
+        fatal = TRUE;
 
-  setNode(&nPlayNode);
+    setNode(&nPlayNode);
 
-  return;
+    return;
 }
 
 
 static int nPlayDisplay(dspConfig_t *dsp)
 {
-  char cbuf[BUFFER_SIZE];
-  int i, j;
+    char cbuf[BUFFER_SIZE];
+    int i, j;
 
-  if (fatal)
-    return NODE_EXIT;
+    if (fatal)
+        return NODE_EXIT;
 
-  if (state == S_SELSYS)
-    {                 
-      if (!shipinited)
+    if (state == S_SELSYS)
+    {
+        if (!shipinited)
         {                       /* need to call _newship */
-          shipinited = TRUE;
-          if (!_newship( Context.unum, &Context.snum ))
+            shipinited = TRUE;
+            if (!_newship( Context.unum, &Context.snum ))
             {
-              state = S_NSERR;
-              return NODE_OK;
+                state = S_NSERR;
+                return NODE_OK;
             }
         }
-          
-      if (!sClientStat.esystem)
+
+        if (!sClientStat.esystem)
         {                       /* we are ready  */
-          state = S_DONE;
-          return NODE_OK;
+            state = S_DONE;
+            return NODE_OK;
         }
-      else
+        else
         {                       /* need to display/get a selection */
-          selectentry(sClientStat.esystem);
+            selectentry(sClientStat.esystem);
         }
     }
-  else if (state == S_NSERR)
+    else if (state == S_NSERR)
     {
-      switch (sAckMsg.code)
+        switch (sAckMsg.code)
         {
         case PERR_FLYING:
-          sprintf(cbuf, "You're already playing on another ship.");
-          cprintf(5,0,ALIGN_CENTER,"#%d#%s",InfoColor, cbuf);
-          Ships[Context.snum].status = SS_RESERVED;
-          break;
-          
+            sprintf(cbuf, "You're already playing on another ship.");
+            cprintf(5,0,ALIGN_CENTER,"#%d#%s",InfoColor, cbuf);
+            Ships[Context.snum].status = SS_RESERVED;
+            break;
+
         case PERR_TOOMANYSHIPS:
-          i = MSG_LIN2/2;
-          cprintf(i, 0, ALIGN_CENTER, 
-                  "I'm sorry, but you're playing on too many ships right now.");
-          i = i + 1;
-          c_strcpy( "You are only allowed to fly ", cbuf );
-          j = Users[Context.unum].multiple;
-          utAppendInt( j, cbuf );
-          appstr( " ship", cbuf );
-          if ( j != 1 )
-            appchr( 's', cbuf );
-          appstr( " at one time.", cbuf );
-          cprintf(i, 0, ALIGN_CENTER, cbuf);
-          break;
-          
+            i = MSG_LIN2/2;
+            cprintf(i, 0, ALIGN_CENTER,
+                    "I'm sorry, but you're playing on too many ships right now.");
+            i = i + 1;
+            c_strcpy( "You are only allowed to fly ", cbuf );
+            j = Users[Context.unum].multiple;
+            utAppendInt( j, cbuf );
+            appstr( " ship", cbuf );
+            if ( j != 1 )
+                appchr( 's', cbuf );
+            appstr( " at one time.", cbuf );
+            cprintf(i, 0, ALIGN_CENTER, cbuf);
+            break;
+
         default:
-          cprintf(5,0,ALIGN_CENTER,
-                  "#%d#nPlay: _newship: unexpected server ack, code %d",
-                  InfoColor, sAckMsg.code);
-          utLog("nPlay: unexpected server ack, code %d",
-                sAckMsg.code);
-          break;
+            cprintf(5,0,ALIGN_CENTER,
+                    "#%d#nPlay: _newship: unexpected server ack, code %d",
+                    InfoColor, sAckMsg.code);
+            utLog("nPlay: unexpected server ack, code %d",
+                  sAckMsg.code);
+            break;
         }
-      /* Press any key... */
-      cprintf(MSG_LIN2, 0, ALIGN_CENTER, MTXT_DONE);
+        /* Press any key... */
+        cprintf(MSG_LIN2, 0, ALIGN_CENTER, MTXT_DONE);
     }
 
 
-  return NODE_OK;
-}  
-  
+    return NODE_OK;
+}
+
 static int nPlayIdle(void)
 {
-  if (state == S_DONE)
+    if (state == S_DONE)
     {
-      Context.entship = TRUE;
-      Ships[Context.snum].sdfuse = 0;       /* zero self destruct fuse */
-      utGrand( &Context.msgrand );            /* initialize message timer */
-      Context.leave = FALSE;                /* assume we won't want to bail */
-      Context.redraw = TRUE;                /* want redraw first time */
-      Context.msgok = TRUE;                 /* ok to get messages */
-      
-      Context.display = TRUE;               /* ok to display */
-      
-      /* start recording if neccessary */
-      if (Context.recmode == RECMODE_STARTING)
+        Context.entship = TRUE;
+        Ships[Context.snum].sdfuse = 0;       /* zero self destruct fuse */
+        utGrand( &Context.msgrand );            /* initialize message timer */
+        Context.leave = FALSE;                /* assume we won't want to bail */
+        Context.redraw = TRUE;                /* want redraw first time */
+        Context.msgok = TRUE;                 /* ok to get messages */
+
+        Context.display = TRUE;               /* ok to display */
+
+        /* start recording if neccessary */
+        if (Context.recmode == RECMODE_STARTING)
         {
-          if (recInitOutput(Context.unum, time(0), Context.snum,
-                               FALSE))
+            if (recInitOutput(Context.unum, time(0), Context.snum,
+                              FALSE))
             {
-              Context.recmode = RECMODE_ON;
+                Context.recmode = RECMODE_ON;
             }
-          else
-            Context.recmode = RECMODE_OFF;
+            else
+                Context.recmode = RECMODE_OFF;
         }
-      
-      /* need to tell the server to resend all the crap it already
-         sent in menu - our ship may have chenged */
-      sendCommand(CPCMD_RELOAD, 0);
 
-      nCPInit(TRUE);            /* play */
+        /* need to tell the server to resend all the crap it already
+           sent in menu - our ship may have chenged */
+        sendCommand(CPCMD_RELOAD, 0);
+
+        nCPInit(TRUE);            /* play */
     }
-  else if (state == S_MENU)
-    nMenuInit();
+    else if (state == S_MENU)
+        nMenuInit();
 
-  return NODE_OK;
+    return NODE_OK;
 }
 
 static int nPlayInput(int ch)
 {
-  int i;
-  unsigned char c = CQ_CHAR(ch);
+    int i;
+    unsigned char c = CQ_CHAR(ch);
 
-  switch (state)
+    switch (state)
     {
     case S_SELSYS:              /* we are selecting our system */
-      {
+    {
         switch  ( ch )
-          {
-          case TERM_NORMAL:
-          case TERM_ABORT:	/* doesn't like the choices ;-) */
+        {
+        case TERM_NORMAL:
+        case TERM_ABORT:	/* doesn't like the choices ;-) */
             sendCommand(CPCMD_ENTER, 0);
             state = S_MENU;
             return NODE_OK;
             break;
-          case TERM_EXTRA:
+        case TERM_EXTRA:
             /* Enter the home system. */
             sendCommand(CPCMD_ENTER, (uint16_t)(1 << Ships[Context.snum].team));
             state = S_DONE;
             return NODE_OK;
             break;
-          default:
+        default:
             for ( i = 0; i < NUMPLAYERTEAMS; i++ )
-              if ( Teams[i].teamchar == (char)toupper(c) && owned[i] )
+                if ( Teams[i].teamchar == (char)toupper(c) && owned[i] )
                 {
-                  /* Found a good one. */
-                  sendCommand(CPCMD_ENTER, (uint16_t)(1 << i));
-                  state = S_DONE;
-                  return NODE_OK;
+                    /* Found a good one. */
+                    sendCommand(CPCMD_ENTER, (uint16_t)(1 << i));
+                    state = S_DONE;
+                    return NODE_OK;
                 }
-            
+
             /* Didn't get a good one; complain and try again. */
             mglBeep(MGL_BEEP_ERR);
             break;
-          }
-      }
-      
-      break;
-
-    case S_NSERR:               /* any key to return */
-      nMenuInit();
-
-      return NODE_OK;
-      break;
+        }
     }
 
-  return NODE_OK;
-}
+    break;
 
+    case S_NSERR:               /* any key to return */
+        nMenuInit();
+
+        return NODE_OK;
+        break;
+    }
+
+    return NODE_OK;
+}

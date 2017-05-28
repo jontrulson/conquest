@@ -41,11 +41,11 @@ static int fakeCommon = FALSE;	/* for the clients */
 /* On those platforms where we want proper alignment, align everything
  * to 16 bytes.
  */
-#define map1d(thevarp, thetype, size) {            \
-    thevarp = (thetype *) (cBasePtr + coff);       \
-    coff += (sizeof(thetype) * (size));            \
-    coff = CB_ALIGN(coff, CB_ALIGNMENT);           \
-}
+#define map1d(thevarp, thetype, size) {                 \
+        thevarp = (thetype *) (cBasePtr + coff);        \
+        coff += (sizeof(thetype) * (size));             \
+        coff = CB_ALIGN(coff, CB_ALIGNMENT);            \
+    }
 
 
 static void map_vars(void);
@@ -56,281 +56,281 @@ static void map_vars(void);
 
 void PVLOCK(int *lockptr)
 {
-  int semnum;
-  
-  if (lockptr == &ConqInfo->lockmesg)
-    semnum = LOCKMSG;
-  else
-    semnum = LOCKCMN;
+    int semnum;
 
-  Lock(semnum);
+    if (lockptr == &ConqInfo->lockmesg)
+        semnum = LOCKMSG;
+    else
+        semnum = LOCKCMN;
 
-  (*lockptr)++;
+    Lock(semnum);
 
-  return;
+    (*lockptr)++;
+
+    return;
 }
-    
+
 void PVUNLOCK(int *lockptr)
 {
-  int semnum;
-  
-  if (lockptr == &ConqInfo->lockmesg)
-    semnum = LOCKMSG;
-  else
-    semnum = LOCKCMN;
+    int semnum;
 
-  Unlock(semnum);
+    if (lockptr == &ConqInfo->lockmesg)
+        semnum = LOCKMSG;
+    else
+        semnum = LOCKCMN;
 
-  return;
+    Unlock(semnum);
+
+    return;
 }
-    
+
 /* flush_common() - flush a common block */
 void flush_common(void)
 {
-  if (fakeCommon)
-    return;
+    if (fakeCommon)
+        return;
 
 #if !defined(MINGW)
-				/* fbsd doesn't like MS_SYNC       */
-				/* which is prefered, but oh well */
+    /* fbsd doesn't like MS_SYNC       */
+    /* which is prefered, but oh well */
 # if defined(FREEBSD)
-  if (msync((caddr_t)cBasePtr, SIZEOF_COMMONBLOCK, 0) == -1)
+    if (msync((caddr_t)cBasePtr, SIZEOF_COMMONBLOCK, 0) == -1)
 # else
-  if (msync((caddr_t)cBasePtr, SIZEOF_COMMONBLOCK, MS_SYNC) == -1)
+        if (msync((caddr_t)cBasePtr, SIZEOF_COMMONBLOCK, MS_SYNC) == -1)
 # endif
-    utLog("flush_common(): msync(): %s", strerror(errno));
+            utLog("flush_common(): msync(): %s", strerror(errno));
 #endif
 
-  return;
+    return;
 }
 
 /* check_cblock() - open/verify a common block - init if necc, return TRUE
-    if successful */
+   if successful */
 int check_cblock(char *fname, int fmode, int sizeofcb)
 {
-  int ffd;
-  struct stat sbuf;
+    int ffd;
+    struct stat sbuf;
 
-				/* first stat the file, if it exists
-				   then verify the size.  unlink if size
-				   mismatch */
-  if (stat(fname, &sbuf) != -1)   /* ok if this fails */
+    /* first stat the file, if it exists
+       then verify the size.  unlink if size
+       mismatch */
+    if (stat(fname, &sbuf) != -1)   /* ok if this fails */
     {				/* file exists - verify size */
-      if (sbuf.st_size != sizeofcb)
+        if (sbuf.st_size != sizeofcb)
 	{
-	  printf("%s: File size mismatch (expected %d, was %d), removing.\n", 
-		 fname,
-		 sizeofcb,
-		 (unsigned int)sbuf.st_size);
-	  if (unlink(fname) == -1)
+            printf("%s: File size mismatch (expected %d, was %d), removing.\n",
+                   fname,
+                   sizeofcb,
+                   (unsigned int)sbuf.st_size);
+            if (unlink(fname) == -1)
 	    {
-	      printf("check_cblock(): unlink(%s) failed: %s\n",
-		     fname,
-		     strerror(errno));
-	      return(FALSE);
+                printf("check_cblock(): unlink(%s) failed: %s\n",
+                       fname,
+                       strerror(errno));
+                return(FALSE);
 	    }
 	}
     }
 
 
-				/* ok, either the file exists with the right
-				   size, or it doesn't exist at all -
-				   now open (and create) if necc */
+    /* ok, either the file exists with the right
+       size, or it doesn't exist at all -
+       now open (and create) if necc */
 
-  umask(0);			/* clear umask, just in case... */
+    umask(0);			/* clear umask, just in case... */
 
-  if ((ffd = open(fname, O_RDONLY)) == -1)
+    if ((ffd = open(fname, O_RDONLY)) == -1)
     {				/* Error or not there...  */
-      if (errno == ENOENT)	/* Not There */
+        if (errno == ENOENT)	/* Not There */
 	{			/* create it */
-	  if ((ffd = creat(fname, fmode)) == -1)
+            if ((ffd = creat(fname, fmode)) == -1)
 	    {
-	      printf("check_cblock(): creat(%s) failed: %s\n",
-		     fname,
-		     strerror(errno));
-	      return(FALSE);
+                printf("check_cblock(): creat(%s) failed: %s\n",
+                       fname,
+                       strerror(errno));
+                return(FALSE);
 	    }
-	  else
+            else
 	    {			/* Create it */
-	      printf("Initializing common block: %s\n", fname);
-	      cBasePtr = (char *) mymalloc(sizeofcb); /* this exits if malloc fails */
-              memset(cBasePtr, 0, sizeofcb);
+                printf("Initializing common block: %s\n", fname);
+                cBasePtr = (char *) mymalloc(sizeofcb); /* this exits if malloc fails */
+                memset(cBasePtr, 0, sizeofcb);
 
-	      if (write(ffd, cBasePtr, sizeofcb) <= 0)
+                if (write(ffd, cBasePtr, sizeofcb) <= 0)
                 {
-                  printf("check_cblock(): write() failed: %s\n",
-                         strerror(errno));
+                    printf("check_cblock(): write() failed: %s\n",
+                           strerror(errno));
 
-                  close(ffd);
-                  free(cBasePtr);
-                  cBasePtr = NULL;
-                  return FALSE;
+                    close(ffd);
+                    free(cBasePtr);
+                    cBasePtr = NULL;
+                    return FALSE;
                 }
 
-	      close(ffd);
-	      free(cBasePtr);
-	      cBasePtr = NULL;
+                close(ffd);
+                free(cBasePtr);
+                cBasePtr = NULL;
 	    }
 	}
-      else
+        else
 	{			/* some other error */
-	  printf("check_cblock(): open(%s, O_RDONLY) failed: %s\n",
-		 fname,
-		 strerror(errno));
-	  return(FALSE);
+            printf("check_cblock(): open(%s, O_RDONLY) failed: %s\n",
+                   fname,
+                   strerror(errno));
+            return(FALSE);
 	}
     }
-  
-  close(ffd);			/* everything ok.. */
+
+    close(ffd);			/* everything ok.. */
 
 #if !defined(MINGW)
-				/* set ownership */
-  if (chown(fname, 0, -1) == -1)
+    /* set ownership */
+    if (chown(fname, 0, -1) == -1)
     {
-      printf("check_cblock(): chown() failed: %s\n",
-             strerror(errno));
+        printf("check_cblock(): chown() failed: %s\n",
+               strerror(errno));
 
-      //      return(FALSE);
+        //      return(FALSE);
     }
 #endif
 
-  return(TRUE);			/* everything there, and right size */
+    return(TRUE);			/* everything there, and right size */
 }
 
-				/* my malloc wrapper. used only when mapping
-				   or initializing a commonblock */
-char *mymalloc(int size) 
-  { 
+/* my malloc wrapper. used only when mapping
+   or initializing a commonblock */
+char *mymalloc(int size)
+{
     char *ptr;
 
-    if ((ptr = malloc(size)) == NULL) 
-      { 
-	perror("mymalloc"); 
+    if ((ptr = malloc(size)) == NULL)
+    {
+	perror("mymalloc");
 	exit(1);
-      } 
+    }
     return(ptr);
-  }
+}
 
 void map_common(void)
 {
 #if !defined(MINGW)
-  int cmn_fd;
-  static char cmnfile[MID_BUFFER_SIZE];
+    int cmn_fd;
+    static char cmnfile[MID_BUFFER_SIZE];
 #endif
 
-  if (fakeCommon)
-    return;
+    if (fakeCommon)
+        return;
 
 #if defined(MINGW)
-  fprintf(stderr, "%s: Only fake common blocks are supported under MINGW\n");
-  exit(1);
+    fprintf(stderr, "%s: Only fake common blocks are supported under MINGW\n");
+    exit(1);
 #else  /* MINGW */
-  sprintf(cmnfile, "%s/%s", CONQSTATE, C_CONQ_COMMONBLK);
+    sprintf(cmnfile, "%s/%s", CONQSTATE, C_CONQ_COMMONBLK);
 
-				/* verify it's validity */
-  if (check_cblock(cmnfile, CMN_MODE, SIZEOF_COMMONBLOCK) == FALSE)
-    exit(1);			/* an unrecoverable error */
+    /* verify it's validity */
+    if (check_cblock(cmnfile, CMN_MODE, SIZEOF_COMMONBLOCK) == FALSE)
+        exit(1);			/* an unrecoverable error */
 
-				/* reopen it... */
-  if ((cmn_fd = open(cmnfile, O_RDWR)) == -1)
+    /* reopen it... */
+    if ((cmn_fd = open(cmnfile, O_RDWR)) == -1)
     {
-      perror("map_common:open(O_RDWR)");
-      exit(1);
+        perror("map_common:open(O_RDWR)");
+        exit(1);
     }
-  
-  /* Now lets map it */
+
+    /* Now lets map it */
 
 # ifndef MAP_FILE
 #  define MAP_FILE 0		/* some arch's don't def this */
 # endif
 
-  if ((cBasePtr = mmap((caddr_t) 0, (size_t) SIZEOF_COMMONBLOCK, 
-                       PROT_READ | PROT_WRITE, MAP_SHARED | MAP_FILE, 
-		       cmn_fd, 0)) == MAP_FAILED)
+    if ((cBasePtr = mmap((caddr_t) 0, (size_t) SIZEOF_COMMONBLOCK,
+                         PROT_READ | PROT_WRITE, MAP_SHARED | MAP_FILE,
+                         cmn_fd, 0)) == MAP_FAILED)
     {
-      perror("map_common():mmap()");
-      exit(1);
+        perror("map_common():mmap()");
+        exit(1);
     }
 #endif  /* MINGW */
 
-				        /* now map the variables into the
-					   common block */
-  map_vars();
+    /* now map the variables into the
+       common block */
+    map_vars();
 
-  return;
+    return;
 }
 
 void zero_common(void)
 {				/* zero the common block, called from
 				   init everything */
-  memset(cBasePtr, 0, SIZEOF_COMMONBLOCK);
-  upchuck();			/* flush the commonblock */
+    memset(cBasePtr, 0, SIZEOF_COMMONBLOCK);
+    upchuck();			/* flush the commonblock */
 
-  return;
+    return;
 }
 
 /* maps the actual vars into the common block */
 static void map_vars(void)
 {
-  coff = 0;
-  
-  map1d(CBlockRevision, int, 1);	/* this *must* be the first var */
+    coff = 0;
 
-  map1d(CBGlobal, CBGlobal_t, 1);
+    map1d(CBlockRevision, int, 1);	/* this *must* be the first var */
 
-  map1d(ConqInfo, ConqInfo_t, 1);
+    map1d(CBGlobal, CBGlobal_t, 1);
 
-  map1d(Users, User_t, MAXUSERS);
+    map1d(ConqInfo, ConqInfo_t, 1);
 
-  map1d(Robot, Robot_t, 1);
+    map1d(Users, User_t, MAXUSERS);
 
-  map1d(Planets, Planet_t, NUMPLANETS + 1);
+    map1d(Robot, Robot_t, 1);
 
-  map1d(Teams, Team_t, NUMALLTEAMS);
+    map1d(Planets, Planet_t, NUMPLANETS + 1);
 
-  map1d(Doomsday, Doomsday_t, 1);
+    map1d(Teams, Team_t, NUMALLTEAMS);
 
-  map1d(History, History_t, MAXHISTLOG);
+    map1d(Doomsday, Doomsday_t, 1);
 
-  map1d(Driver, Driver_t, 1);
+    map1d(History, History_t, MAXHISTLOG);
 
-  map1d(Ships, Ship_t, MAXSHIPS + 1);
+    map1d(Driver, Driver_t, 1);
 
-  map1d(ShipTypes, ShipType_t, MAXNUMSHIPTYPES);
+    map1d(Ships, Ship_t, MAXSHIPS + 1);
 
-  map1d(Msgs, Msg_t, MAXMESSAGES);
+    map1d(ShipTypes, ShipType_t, MAXNUMSHIPTYPES);
 
-  map1d(EndOfCBlock, int, 1);
+    map1d(Msgs, Msg_t, MAXMESSAGES);
 
-  return;
+    map1d(EndOfCBlock, int, 1);
+
+    return;
 }
 
 void fake_common(void)
 {
-  fakeCommon = TRUE;
+    fakeCommon = TRUE;
 
-  /* this will exit if it fails */
-  if (!cBasePtr)
-    cBasePtr = mymalloc(SIZEOF_COMMONBLOCK);
+    /* this will exit if it fails */
+    if (!cBasePtr)
+        cBasePtr = mymalloc(SIZEOF_COMMONBLOCK);
 
-  map_vars();
+    map_vars();
 
-  zero_common();
-  return;
+    zero_common();
+    return;
 }
 
 /* short cut */
 void map_lcommon(void)
 {
-  /* a parallel universe, it is */
-  fake_common();
-  clbInitEverything();
-  clbInitMsgs();
-  *CBlockRevision = COMMONSTAMP;
-  ConqInfo->closed = FALSE;
-  Driver->drivstat = DRS_OFF;
-  Driver->drivpid = 0;
-  Driver->drivowner[0] = 0;
-  
-  return;
+    /* a parallel universe, it is */
+    fake_common();
+    clbInitEverything();
+    clbInitMsgs();
+    *CBlockRevision = COMMONSTAMP;
+    ConqInfo->closed = FALSE;
+    Driver->drivstat = DRS_OFF;
+    Driver->drivpid = 0;
+    Driver->drivowner[0] = 0;
+
+    return;
 }
