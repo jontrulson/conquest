@@ -171,7 +171,6 @@ extern char *crypt(char *, char *);
 # define TRUE    (1)
 #endif
 
-#define FILENAMESIZE 512
 #define MAXLINE 78
 #define ARGBUFSIZE 512
 #define BIG_BUFFER_SIZE 4096

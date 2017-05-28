@@ -121,7 +121,7 @@ int main(int argc, char **argv)
 {
   extern char *optarg;
   extern int optind, opterr, optopt;
-  char filename[FILENAMESIZE];
+  char filename[PATH_MAX] = {};
   int ch;
   FILE *filefd;
 
@@ -140,7 +140,7 @@ int main(int argc, char **argv)
 	  debug_scanner = TRUE;
 	  break;
 	case 'o':
-	  strcpy(filename, optarg);
+          strncpy(filename, optarg, PATH_MAX - 1);
 	  filefd = NULL;
 	  break;
 	case 'U':
