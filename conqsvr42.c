@@ -101,7 +101,11 @@ void conqinit(void)
 {
   /* First things first. */
   if ( *CBlockRevision != COMMONSTAMP )
-    error( "conquest: Common block ident mismatch.  \nInitialize the Universe via conqoper." );
+  {
+      printf("conquest: Common block ident mismatch.\n"
+             "Initialize the Universe via conqoper.");
+      exit(1);
+  }
   
   /* Set up game environment. */
   

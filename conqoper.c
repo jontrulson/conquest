@@ -105,8 +105,9 @@ int main(int argc, char *argv[])
 
   if ( ! isagod(-1) )
     {
-      printf( "Poor cretins such as yourself lack the");
-      error( " skills necessary to use this program.\n" );
+      printf("Poor cretins such as yourself lack the "
+             "skills necessary to use this program.\n");
+      exit(1);
     }
 
   rndini( 0, 0 );		/* initialize random numbers */

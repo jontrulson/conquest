@@ -208,7 +208,6 @@ typedef double real;
 /* Function prototypes for ratfor.c */
 
 void upper(char *buf);
-void error(char *str);
 
 
 /* Function prototypes for everything else */

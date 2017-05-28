@@ -20,13 +20,3 @@ void upper(char *buf)
       s++;
     }
 }
-
-				/* output an error and exit */
-void error(char str[])
-{
-  printf("%s\n", str);
-  fflush(stdout);
-
-  exit(1);
-}
-

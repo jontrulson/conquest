@@ -74,7 +74,11 @@ int main(int argc, char *argv[])
   map_common();
   
   if ( *CBlockRevision != COMMONSTAMP )
-    error( "conqai: Common block ident mismatch.  \nInitialize the Universe via conqoper." );
+  {
+    printf("conqai: Common block ident mismatch.\n"
+           "Initialize the Universe via conqoper.\n");
+    exit(1);
+  }
   
   
   debug = FALSE;
