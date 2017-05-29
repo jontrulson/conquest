@@ -95,7 +95,7 @@ static int nShiplDisplay(dspConfig_t *dsp)
         {
             sbuf[0] = 0;
             utAppendShip( i, sbuf );
-            appstr(" ", sbuf);
+            strcat(sbuf, " ") ;
             appchr(ShipTypes[Ships[i].shiptype].name[0], sbuf);
 
             unum = Ships[i].unum;
@@ -120,7 +120,7 @@ static int nShiplDisplay(dspConfig_t *dsp)
                          " ", " ", " ", " " );
             if ( doall && kb != 0 )
             {
-                appstr( "  ", cbuf);
+                strcat(cbuf, "  ") ;
                 utAppendKilledBy( kb, cbuf );
             }
 

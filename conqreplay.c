@@ -91,8 +91,8 @@ void displayMsg(Msg_t *themsg)
     {
         clbFmtMsg(themsg->msgto, themsg->msgfrom, buf);
 
-        appstr( ": ", buf );
-        appstr( themsg->msgbuf, buf );
+        strcat(buf , ": ") ;
+        strcat(buf , themsg->msgbuf) ;
 
         uiPutColor(attrib);
         mcuPutMsg( buf, MSG_MSG );

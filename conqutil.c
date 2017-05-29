@@ -75,7 +75,7 @@ void utAppendInt( int i, char *str )
 
     buf[0] = 0;
     sprintf(buf, "%d", i);
-    appstr( buf, str );
+    strcat(str , buf) ;
 
     return;
 
@@ -93,37 +93,37 @@ void utAppendKilledBy( int kb, char *buf )
     switch ( kb )
     {
     case KB_SELF:
-        appstr( "self", buf );
+        strcat(buf , "self") ;
         break;
     case KB_NEGENB:
-        appstr( "negenb", buf );
+        strcat(buf , "negenb") ;
         break;
     case KB_CONQUER:
-        appstr( "conquer", buf );
+        strcat(buf , "conquer") ;
         break;
     case KB_NEWGAME:
-        appstr( "newgame", buf );
+        strcat(buf , "newgame") ;
         break;
     case KB_EVICT:
-        appstr( "evict", buf );
+        strcat(buf , "evict") ;
         break;
     case KB_SHIT:
-        appstr( "shit", buf );
+        strcat(buf , "shit") ;
         break;
     case KB_DOOMSDAY:
-        appstr( "doomsday", buf );
+        strcat(buf , "doomsday") ;
         break;
     case KB_GOTDOOMSDAY:
-        appstr( "gotdoomsday", buf );
+        strcat(buf , "gotdoomsday") ;
         break;
     case KB_GOD:
-        appstr( "GOD", buf );
+        strcat(buf , "GOD") ;
         break;
     default:
         if ( kb > 0 && kb <= MAXSHIPS )
             utAppendShip( kb, buf );
         else if ( -kb > 0 && -kb <= NUMPLANETS )
-            appstr( Planets[-kb].name, buf );
+            strcat(buf , Planets[-kb].name) ;
         else
             utAppendInt( kb, buf );
         break;
@@ -168,22 +168,22 @@ void utAppendShipStatus( int status, char *buf )
     switch ( status )
     {
     case SS_OFF:
-        appstr( "off", buf );
+        strcat(buf , "off") ;
         break;
     case SS_ENTERING:
-        appstr( "entering", buf );
+        strcat(buf , "entering") ;
         break;
     case SS_LIVE:
-        appstr( "live", buf );
+        strcat(buf , "live") ;
         break;
     case SS_DYING:
-        appstr( "dying", buf );
+        strcat(buf , "dying") ;
         break;
     case SS_DEAD:
-        appstr( "dead", buf );
+        strcat(buf , "dead") ;
         break;
     case SS_RESERVED:
-        appstr( "reserved", buf );
+        strcat(buf , "reserved") ;
         break;
     default:
         utAppendInt( status, buf );
@@ -204,16 +204,16 @@ void utAppendTitle( int team, char *buf )
     switch ( team )
     {
     case TEAM_FEDERATION:
-        appstr( "Captain", buf );
+        strcat(buf , "Captain") ;
         break;
     case TEAM_ROMULAN:
-        appstr( "Centurion", buf );
+        strcat(buf , "Centurion") ;
         break;
     case TEAM_ORION:
-        appstr( "Commander", buf );
+        strcat(buf , "Commander") ;
         break;
     case TEAM_KLINGON:
-        appstr( "Kommander", buf );
+        strcat(buf , "Kommander") ;
         break;
     }
 

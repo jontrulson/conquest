@@ -374,7 +374,7 @@ void debugdisplay( int snum )
     buf[0] = 0;
     utAppendShip( snum, buf );
     if ( SROBOT(snum) )
-        appstr( " (ROBOT)", buf );
+        strcat(buf, " (ROBOT)");
     cprintf( lin, dcol,ALIGN_NONE,"#%d#%s",InfoColor,buf );
     lin++;
     cprintf(lin,tcol,ALIGN_NONE,"#%d#%s",LabelColor, "      sx:");
@@ -453,7 +453,7 @@ void debugdisplay( int snum )
     sprintf( buf, "%d/%d", Ships[snum].weapalloc, Ships[snum].engalloc );
     if ( Ships[snum].wfuse > 0 || Ships[snum].efuse > 0 )
     {
-        appstr( " (", buf );
+        strcat(buf , " (") ;
         utAppendInt( Ships[snum].wfuse, buf );
         appchr( '/', buf );
         utAppendInt( Ships[snum].efuse, buf );
@@ -473,7 +473,7 @@ void debugdisplay( int snum )
         sprintf( buf, "%d ", i );
     }
     if ( SCLOAKED(snum) )
-        appstr( "(CLOAKED)", buf );
+        strcat(buf, "(CLOAKED)");
     cprintf(lin,dcol,ALIGN_NONE,"#%d#%s",LabelColor, buf);
     lin++;
     cprintf(lin,tcol,ALIGN_NONE,"#%d#%s",LabelColor, "      spid:");
@@ -1188,13 +1188,13 @@ void operate(void)
                 c_strcpy( "ON (", buf );
                 i = Doomsday->lock;
                 if ( -i > 0 && -i <= NUMPLANETS )
-                    appstr( Planets[-i].name, buf );
+                    strcat(buf , Planets[-i].name) ;
                 else
                     utAppendShip( i, buf );		/* this will handle funny numbers */
                 appchr( ')', buf );
 	    }
             else
-                appstr( "???", buf );
+                strcat(buf , "???") ;
 
             lin = savelin;
             cdclrl( lin, 1 );
@@ -2200,7 +2200,7 @@ void oprobot(void)
     else
     {
         utAppendInt( anum, buf );
-        appstr( " new ships.", buf );
+        strcat(buf , " new ships.") ;
     }
     cdclrl( MSG_LIN2, 1 );
     i = MSG_LIN1;
@@ -2350,7 +2350,7 @@ void opstats(void)
 	{
             sprintf( junk, " #%d#(binary ident is #%d#%d#%d#)\n",
                      LabelColor,InfoColor,COMMONSTAMP,LabelColor );
-            appstr( junk, buf );
+            strcat(buf , junk) ;
 	}
         cprintf( lin,col,ALIGN_NONE, "%s",buf);
 
@@ -2456,7 +2456,7 @@ void opuadd(void)
     appchr( ' ', buf );
     i = strlen( buf );
 
-    appstr( nameptr, buf );
+    strcat(buf , nameptr) ;
     buf[i] = (char)toupper( buf[i] );
     buf[MAXUSERPNAME] = 0;
     if ( ! clbRegister( nameptr, buf, team, &unum ) )

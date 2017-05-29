@@ -184,7 +184,6 @@ typedef double real;
 
 #define mod(x, y) ((x) % (y))
 #define c_strcpy(x, y) strcpy(y, x)
-#define appstr(x, y) strcat(y, x)
 #define appchr(x, y)     {                      \
         static int yyzi;                        \
         yyzi = strlen(y);                       \

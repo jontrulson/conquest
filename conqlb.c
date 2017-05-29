@@ -408,11 +408,11 @@ void clbKillShip( int snum, int kb )
 
             if ( Planets[-kb].type == PLANET_SUN )
 	    {
-                appstr( "'s solar radiation.", msgbuf );
+                strcat(msgbuf , "'s solar radiation.") ;
 	    }
             else
 	    {
-                appstr( "'s planetary defenses.", msgbuf );
+                strcat(msgbuf , "'s planetary defenses.") ;
 	    }
 	}
     }
@@ -1014,7 +1014,7 @@ void clbStatline( int unum, char *buf )
     if (Users[unum].lastentry == 0) /* never */
     {
         sprintf(junk, " %13.13s", "never");
-        appstr( junk, buf );
+        strcat(buf , junk) ;
     }
     else
     {				/* format it properly */
@@ -1033,7 +1033,7 @@ void clbStatline( int unum, char *buf )
 	}
         morejunk[j] = 0;
 
-        appstr( morejunk, buf );
+        strcat(buf , morejunk) ;
     }
 
     return;
@@ -2098,8 +2098,8 @@ void clbIntrude( int snum, int pnum )
 	{
             c_strcpy( Doomsday->name, buf );
             utToUpperCase( Doomsday->name );
-            appstr( atta, buf );
-            appstr( armeq, buf );
+            strcat(buf , atta) ;
+            strcat(buf , armeq) ;
             utAppendInt( Planets[pnum].armies, buf );
             clbStoreMsgf( -pnum, -Planets[pnum].team, buf, MSG_FLAGS_INTRUDER );
 	}
@@ -2107,8 +2107,8 @@ void clbIntrude( int snum, int pnum )
 	{
             c_strcpy( "INTRUDER ALERT - ", buf );
             utAppendShip( snum, buf );
-            appstr( atta, buf );
-            appstr( armeq, buf );
+            strcat(buf , atta) ;
+            strcat(buf , armeq) ;
             utAppendInt( Planets[pnum].armies, buf );
             clbStoreMsgf( -pnum, -Planets[pnum].team, buf, MSG_FLAGS_INTRUDER );
             defend( snum, pnum );
@@ -2319,7 +2319,7 @@ int clbFmtMsg(int to, int from, char *buf)
              break;
          }
 
-    appstr( "->", buf );
+    strcat(buf , "->") ;
 
     /* Format who the message is to. */
     if ( to > 0 && to <= MAXSHIPS )
@@ -2333,22 +2333,22 @@ int clbFmtMsg(int to, int from, char *buf)
         switch ( to )
 	{
 	case MSG_NOONE:
-            appstr( "nobody", buf );
+            strcat(buf , "nobody") ;
             break;
 	case MSG_GOD:
-            appstr( "GOD", buf );
+            strcat(buf , "GOD") ;
             break;
 	case MSG_ALL:
-            appstr( "ALL", buf );
+            strcat(buf , "ALL") ;
             break;
 	case MSG_IMPLEMENTORS:
-            appstr( "IMPs", buf );
+            strcat(buf , "IMPs") ;
             break;
 	case MSG_FRIENDLY:
-            appstr( "FRIEND", buf );
+            strcat(buf , "FRIEND") ;
             break;
 	default:
-            appstr( "???", buf );
+            strcat(buf , "???") ;
             break;
 	}
     }

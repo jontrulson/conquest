@@ -324,40 +324,40 @@ void procDistress(cpCommand_t *cmd)
     if ( i < 100 )
         utAppendInt( i, cbuf );
     else
-        appstr( "**", cbuf );
+        strcat(cbuf , "**") ;
     appchr( '/', cbuf );
     i = round(Ships[snum].etemp);
     if ( i < 100 )
         utAppendInt( i, cbuf );
     else
-        appstr( "**", cbuf );
+        strcat(cbuf , "**") ;
     i = Ships[snum].armies;
 
     if ( i > 0 )
     {
-        appstr( ", arm=", cbuf );
+        strcat(cbuf,  ", arm=");
         utAppendInt( i, cbuf );
     }
 
     if ( Ships[snum].wfuse > 0 )
-        appstr( ", -weap", cbuf );
+        strcat(cbuf, ", -weap");
 
     if ( Ships[snum].efuse > 0 )
-        appstr( ", -eng", cbuf );
+        strcat(cbuf, ", -eng");
 
     /* warp */
     x = Ships[snum].warp;
     if ( x >= 0.0 )
     {
         sprintf( buf, ", warp=%.1f", x );
-        appstr(buf, cbuf);
+        strcat(cbuf, buf) ;
         isorb = FALSE;
     }
     else
     {
         sprintf( buf, ", orbiting %.3s",
                  Planets[-Ships[snum].lock].name );
-        appstr(buf, cbuf);
+        strcat(cbuf, buf) ;
         isorb = TRUE;
     }
 
@@ -375,7 +375,7 @@ void procDistress(cpCommand_t *cmd)
         else
             sprintf( buf, ", head=%d", i );
 
-        appstr(buf, cbuf);
+        strcat(cbuf, buf) ;
     }
 
     if (tofriendly)
@@ -1350,10 +1350,10 @@ void procBeam(cpCommand_t *cmd)
 	{
             c_strcpy( "The arm", cbuf );
             if ( upmax == 1 )
-                appstr( "y is", cbuf );
+                strcat(cbuf , "y is") ;
             else
-                appstr( "ies are", cbuf );
-            appstr( " reluctant to beam aboard a pirate vessel.", cbuf );
+                strcat(cbuf , "ies are") ;
+            strcat(cbuf , " reluctant to beam aboard a pirate vessel.") ;
             pktSendAck(PSEV_INFO, PERR_CANCELED, NULL);
             sendFeedback(cbuf);
             return;
@@ -1475,27 +1475,27 @@ void procBeam(cpCommand_t *cmd)
 	{
             c_strcpy( "Beaming ", cbuf );
             if ( dirup )
-                appstr( "up from ", cbuf );
+                strcat(cbuf , "up from ") ;
             else
-                appstr( "down to ", cbuf );
-            appstr( Planets[pnum].name, cbuf );
-            appstr( ", ", cbuf );
+                strcat(cbuf , "down to ") ;
+            strcat(cbuf , Planets[pnum].name) ;
+            strcat(cbuf,  ", ");
             if ( total == 0 )
-                appstr( "no", cbuf );
+                strcat(cbuf , "no") ;
             else
                 utAppendInt( total, cbuf );
-            appstr( " arm", cbuf );
+            strcat(cbuf , " arm") ;
             if ( total == 1 )
 	    {
                 appchr( 'y', cbuf );
 	    }
             else
 	    {
-                appstr( "ies", cbuf );
+                strcat(cbuf , "ies") ;
 	    }
-            appstr( " transported, ", cbuf );
+            strcat(cbuf, " transported, ");
             utAppendInt( num - total, cbuf );
-            appstr( " to go.", cbuf );
+            strcat(cbuf , " to go.") ;
             sendFeedback(cbuf);
             ototal = total;
 	}

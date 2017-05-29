@@ -681,7 +681,7 @@ void display( int snum )
 	    {
                 utAppendShip( minenemy, buf );
                 if ( SCLOAKED(minenemy) )
-                    appstr( " (CLOAKED)", buf );
+                    strcat(buf, " (CLOAKED)");
 	    }
 	}
         else
@@ -909,12 +909,12 @@ void display( int snum )
             cdclra( lin, datacol, lin, STAT_COLS-1 );
             buf[0] = 0;
             if ( i == 0 )
-                appstr( "**", buf );
+                strcat(buf , "**") ;
             else
                 utAppendInt( i, buf );
             appchr( '/', buf );
             if ( j == 0 )
-                appstr( "**", buf );
+                strcat(buf , "**") ;
             else
                 utAppendInt( j, buf );
             uiPutColor(InfoColor);
@@ -1185,11 +1185,11 @@ void display( int snum )
             c_strcpy( Doomsday->name, buf );
             /* put dtype in stats, dstatus next to name  - dwp */
             if ( Doomsday->status == DS_LIVE  )
-                appstr( "  (live)", buf);
+                strcat(buf, "  (live)");
             else if ( Doomsday->status == DS_OFF )
-                appstr( "  (off)", buf);
+                strcat(buf, "  (off)");
             else
-                appstr( "  (unknown)", buf);
+                strcat(buf, "  (unknown)");
             cdputs( buf, 1, STAT_COLS +
                     (int)(Context.maxcol - STAT_COLS - (strlen(buf))) / (int)2 + 1);
 
@@ -1329,7 +1329,7 @@ void display_headers(int snum)
     hbuf[0] = 0;
     ssbuf[0] = 0;
 
-    appstr( ", ", ssbuf );
+    strcat(ssbuf, ", ");
     utAppendShipStatus( Ships[snum].status, ssbuf);
 
     if ( ConqInfo->closed)

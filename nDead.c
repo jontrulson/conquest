@@ -154,7 +154,7 @@ static int nDeadDisplay(dspConfig_t *dsp)
 	{
             utAppendShip( kb, cbuf );
             if ( eShip.status != SS_LIVE )
-                appstr( ", who also died.", buf );
+                strcat(buf, ", who also died.");
             else
                 appchr( '.', buf );
             cprintf( 8,0,ALIGN_CENTER,

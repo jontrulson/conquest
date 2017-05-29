@@ -200,7 +200,7 @@ void hudSetAlertStatus(int snum, int asnum, alertLevel_t astatus)
             utAppendShip(asnum, hudData.aStat.str);
 
         if (SCLOAKED(asnum))
-            appstr( " (CLOAKED)", hudData.aStat.str );
+            strcat(hudData.aStat.str, " (CLOAKED)");
 
         hudData.aStat.str[HUD_STR_SZ - 1] = 0;
 
@@ -328,14 +328,14 @@ void hudSetAlloc(int snum)
         hudData.alloc.str[0] = 0;
 
         if ( i == 0 )
-            appstr( "**", hudData.alloc.str );
+            strcat(hudData.alloc.str , "**") ;
         else
             utAppendInt( i, hudData.alloc.str );
 
         appchr( '/', hudData.alloc.str );
 
         if ( j == 0 )
-            appstr( "**", hudData.alloc.str );
+            strcat(hudData.alloc.str , "**") ;
         else
             utAppendInt( j, hudData.alloc.str );
 

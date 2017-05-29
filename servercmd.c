@@ -183,7 +183,7 @@ static void CreateRobots(int from, char *arg1, char *arg2, char *arg3)
     else
     {
         utAppendInt( anum, buf );
-        appstr( " new ships.", buf );
+        strcat(buf , " new ships.") ;
     }
     clbStoreMsg(MSG_GOD, from, buf);
 

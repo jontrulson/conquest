@@ -103,7 +103,7 @@ static void set_header(int snum)
     hbuf[0] = 0;
     ssbuf[0] = 0;
 
-    appstr( ", ", ssbuf );
+    strcat(ssbuf, ", ");
     utAppendShipStatus( Ships[snum].status, ssbuf);
 
     if ( ConqInfo->closed)
@@ -224,8 +224,8 @@ static int nPlayBDisplay(dspConfig_t *dsp)
     if (recMsg.msgbuf[0])
     {
         clbFmtMsg(recMsg.msgto, recMsg.msgfrom, buf);
-        appstr( ": ", buf );
-        appstr( recMsg.msgbuf, buf );
+        strcat(buf , ": ") ;
+        strcat(buf , recMsg.msgbuf) ;
 
         hudSetPrompt(MSG_MSG, NULL, NoColor, buf, CyanColor);
     }

@@ -554,8 +554,8 @@ int selectentry( uint8_t esystem )
     for ( i = 0; i < NUMPLAYERTEAMS; i++ )
         if ( owned[i] )
         {
-            appstr( ", ", cbuf );
-            appstr( Teams[i].name, cbuf );
+            strcat(cbuf,  ", ");
+            strcat(cbuf , Teams[i].name) ;
         }
 
     /* Change first comma to a colon. */
@@ -1087,7 +1087,7 @@ void dead( int snum, int leave )
 	{
             utAppendShip( kb, cbuf );
             if ( Ships[kb].status != SS_LIVE )
-                appstr( ", who also died.", buf );
+                strcat(buf, ", who also died.");
             else
                 appchr( '.', buf );
             cprintf( 8,0,ALIGN_CENTER,
@@ -1452,10 +1452,10 @@ void dobeam( int snum )
 	{
             c_strcpy( "The arm", cbuf );
             if ( upmax == 1 )
-                appstr( "y is", cbuf );
+                strcat(cbuf , "y is") ;
             else
-                appstr( "ies are", cbuf );
-            appstr( " reluctant to beam aboard a pirate vessel.", cbuf );
+                strcat(cbuf , "ies are") ;
+            strcat(cbuf , " reluctant to beam aboard a pirate vessel.") ;
             mcuPutMsg( cbuf, MSG_LIN1 );
             return;
 	}
@@ -1773,8 +1773,8 @@ void dorefit( int snum, int dodisplay )
         cdclrl( MSG_LIN2, 1 );
 
         buf1[0] = '\0';
-        appstr("Refit ship type: ", buf1);
-        appstr(ShipTypes[stype].name, buf1);
+        strcat(buf1, "Refit ship type: ") ;
+        strcat(buf1, ShipTypes[stype].name) ;
 
         mcuPutMsg(buf1, MSG_LIN1);
         mcuPutMsg(conf, MSG_LIN2);
@@ -3107,10 +3107,10 @@ int newship( int unum, int *snum )
                 c_strcpy( "You are only allowed to fly ", cbuf );
                 j = Users[unum].multiple;
                 utAppendInt( j, cbuf );
-                appstr( " ship", cbuf );
+                strcat(cbuf , " ship") ;
                 if ( j != 1 )
                     appchr( 's', cbuf );
-                appstr( " at one time.", cbuf );
+                strcat(cbuf , " at one time.") ;
                 cdputc( cbuf, i );
                 cdrefresh();
                 utSleep( 2.0 );
@@ -3379,7 +3379,7 @@ int welcome(void)
         utAppendTitle( team, cbuf );
         appchr( ' ', cbuf );
         i = strlen( cbuf );
-        appstr( name, cbuf );
+        strcat(cbuf , name) ;
         cbuf[i] = (char)toupper( cbuf[i] );
 
         gretds();			/* 'GREETINGS' */

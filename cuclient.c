@@ -33,9 +33,9 @@ void cucPseudo( int unum, int snum )
     cdclrl( MSG_LIN1, 2 );
     c_strcpy( "Old pseudonym: ", buf );
     if ( snum > 0 && snum <= MAXSHIPS )
-        appstr( Ships[snum].alias, buf );
+        strcat(buf , Ships[snum].alias) ;
     else
-        appstr( Users[unum].alias, buf );
+        strcat(buf , Users[unum].alias) ;
     cdputc( buf, MSG_LIN1 );
     ch = mcuGetCX( "Enter a new pseudonym: ",
                    MSG_LIN2, -4, TERMS, buf, MAXUSERPNAME );
@@ -274,22 +274,22 @@ void cucSendMsg( int from, int terse, int remote )
     }
     else if ( -to >= 0 && -to < NUMPLAYERTEAMS )
     {
-        appstr( Teams[-to].name, buf );
-        appstr( "s:", buf );
+        strcat(buf , Teams[-to].name) ;
+        strcat(buf , "s:") ;
     }
     else switch ( to )
          {
          case MSG_ALL:
-             appstr( "everyone:", buf );
+             strcat(buf , "everyone:") ;
              break;
          case MSG_GOD:
-             appstr( "GOD:", buf );
+             strcat(buf , "GOD:") ;
              break;
          case MSG_IMPLEMENTORS:
-             appstr( "The Implementors:", buf );
+             strcat(buf , "The Implementors:") ;
              break;
          case MSG_FRIENDLY:
-             appstr( "Friend:", buf );
+             strcat(buf , "Friend:") ;
              break;
          default:
              mcuPutMsg( huh, MSG_LIN2 );
@@ -298,7 +298,7 @@ void cucSendMsg( int from, int terse, int remote )
          }
 
     if ( ! terse )
-        appstr( " ([ESC] to abort)", buf );
+        strcat(buf, " ([ESC] to abort)");
 
     mcuPutMsg( buf, MSG_LIN1 );
     cdclrl( MSG_LIN2, 1 );
@@ -332,12 +332,12 @@ void cucSendMsg( int from, int terse, int remote )
                 c_strcpy( "Communique from ", buf );
                 if ( from > 0 && from <= MAXSHIPS )
                 {
-                    appstr( Ships[from].alias, buf );
-                    appstr( " on board ", buf );
+                    strcat(buf , Ships[from].alias) ;
+                    strcat(buf , " on board ") ;
                     utAppendShip( from, buf );
                 }
                 else if ( from == MSG_GOD )
-                    appstr( "GOD", buf );
+                    strcat(buf , "GOD") ;
                 else
                 {
                     appchr( '(', buf );

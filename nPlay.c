@@ -65,8 +65,8 @@ static void selectentry( uint8_t esystem )
     for ( i = 0; i < NUMPLAYERTEAMS; i++ )
         if ( owned[i] )
         {
-            appstr( ", ", cbuf );
-            appstr( Teams[i].name, cbuf );
+            strcat(cbuf, ", ");
+            strcat(cbuf , Teams[i].name) ;
         }
 
     /* Change first comma to a colon. */
@@ -207,10 +207,10 @@ static int nPlayDisplay(dspConfig_t *dsp)
             c_strcpy( "You are only allowed to fly ", cbuf );
             j = Users[Context.unum].multiple;
             utAppendInt( j, cbuf );
-            appstr( " ship", cbuf );
+            strcat(cbuf , " ship") ;
             if ( j != 1 )
                 appchr( 's', cbuf );
-            appstr( " at one time.", cbuf );
+            strcat(cbuf , " at one time.") ;
             cprintf(i, 0, ALIGN_CENTER, cbuf);
             break;
 

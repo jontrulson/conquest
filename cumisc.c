@@ -196,8 +196,8 @@ int mcuReadMsg( int snum, int msgnum, int dsplin )
     }
 
     clbFmtMsg(Msgs[msgnum].msgto, Msgs[msgnum].msgfrom, buf);
-    appstr( ": ", buf );
-    appstr( Msgs[msgnum].msgbuf, buf );
+    strcat(buf , ": ") ;
+    strcat(buf , Msgs[msgnum].msgbuf) ;
 
     uiPutColor(attrib);
     mcuPutMsg( buf, dsplin );
@@ -390,28 +390,28 @@ void mcuInfoPlanet( char *str, int pnum, int snum )
     if ( Planets[pnum].type == PLANET_CLASSM || Planets[pnum].type == PLANET_DEAD )
         if ( ! godlike )
             if ( Planets[pnum].scanned[Ships[snum].team] && clbSPWar( snum, pnum ) )
-                appstr( " (hostile)", junk );
+                strcat(junk, " (hostile)");
 
     /* Things that orbit things that orbit have phases. */
     switch ( clbPhoon( pnum ) )
     {
     case PHOON_FIRST:
-        appstr( " (first quarter)", junk );
+        strcat(junk, " (first quarter)");
         break;
     case PHOON_FULL:
-        appstr( " (full)", junk );
+        strcat(junk, " (full)");
         break;
     case PHOON_LAST:
-        appstr( " (last quarter)", junk );
+        strcat(junk, " (last quarter)");
         break;
     case PHOON_NEW:
-        appstr( " (new)", junk );
+        strcat(junk, " (new)");
         break;
     case PHOON_NO:
         /* Do no-thing. */;
         break;
     default:
-        appstr( " (weird)", junk );
+        strcat(junk, " (weird)");
         break;
     }
 
@@ -492,9 +492,9 @@ void mcuInfoPlanet( char *str, int pnum, int snum )
                 sprintf( junk, "with %d %s arm", i,
                          Teams[Planets[pnum].team].name );
                 if ( i == 1 )
-                    appstr( "y", junk );
+                    strcat(junk , "y") ;
                 else
-                    appstr( "ies", junk );
+                    strcat(junk , "ies") ;
 	    }
 	}
 
@@ -510,9 +510,9 @@ void mcuInfoPlanet( char *str, int pnum, int snum )
             if ( j > 0 )
 	    {
                 if ( junk[0] != 0 )
-                    appstr( ", ", junk );
+                    strcat(junk, ", ");
                 utAppendInt( j, junk );
-                appstr( " minutes until coup time", junk );
+                strcat(junk , " minutes until coup time") ;
 	    }
 	}
     }
@@ -548,7 +548,7 @@ void mcuInfoPlanet( char *str, int pnum, int snum )
         while ( buf[i] != ' ' && i > 1 )
             i = i - 1;
         appchr( ' ', buf );
-        appstr( junk, buf );
+        strcat(buf , junk) ;
         buf[i] = 0;				/* terminate at blank */
         mcuPutMsg( buf, MSG_LIN1 );
         mcuPutMsg( &buf[i+1], MSG_LIN2 );
@@ -600,7 +600,7 @@ void mcuInfoShip( int snum, int scanner )
     if ( snum == scanner )
     {
         /* Silly Captain... */
-        appstr( ": That's us, silly!", cbuf );
+        strcat(cbuf, ": That's us, silly!");
         mcuPutMsg( cbuf, MSG_LIN1 );
         cdmove( MSG_LIN1, 1 );
         return;
@@ -646,31 +646,31 @@ void mcuInfoShip( int snum, int scanner )
                     ( (Ships[snum].scanned[ Ships[scanner].team] > 0) && ! selfwar(scanner) ) );
     }
 
-    appstr( ": ", cbuf );
+    strcat(cbuf , ": ") ;
     if ( Ships[snum].alias[0] != 0 )
     {
-        appstr( Ships[snum].alias, cbuf );
-        appstr( ", ", cbuf );
+        strcat(cbuf , Ships[snum].alias) ;
+        strcat(cbuf, ", ");
     }
     kills = (Ships[snum].kills + Ships[snum].strkills);
     if ( kills == 0.0 )
-        appstr( "no", cbuf );
+        strcat(cbuf , "no") ;
     else
     {
         sprintf( junk, "%.1f", kills );
-        appstr( junk, cbuf );
+        strcat(cbuf , junk) ;
     }
-    appstr( " kill", cbuf );
+    strcat(cbuf , " kill") ;
     if ( kills != 1.0 )
         appchr( 's', cbuf );
     if ( SCLOAKED(snum) && ( godlike || SSCANDIST(snum) ) )
-        appstr( " (CLOAKED) ", cbuf );
+        strcat(cbuf, " (CLOAKED) ");
     else
-        appstr( ", ", cbuf );
+        strcat(cbuf,  ", ");
 
-    appstr("a ", cbuf);
-    appstr(ShipTypes[Ships[snum].shiptype].name, cbuf);
-    appstr(", ", cbuf);
+    strcat(cbuf, "a ") ;
+    strcat(cbuf, ShipTypes[Ships[snum].shiptype].name) ;
+    strcat(cbuf, ", ");
 
     if ( godlike )
     {
@@ -680,9 +680,9 @@ void mcuInfoShip( int snum, int scanner )
     else
     {
         if ( Ships[snum].war[Ships[scanner].team] )
-            appstr( "at WAR.", cbuf );
+            strcat(cbuf , "at WAR.") ;
         else
-            appstr( "at peace.", cbuf );
+            strcat(cbuf , "at peace.") ;
     }
 
     mcuPutMsg( cbuf, MSG_LIN1 );
@@ -744,7 +744,7 @@ void mcuInfoShip( int snum, int scanner )
 				   - can't ever catchup = ETA never */
                         sprintf(tmpstr, ", ETA %s",
                                 clbETAStr(0.0, dis));
-                        appstr(tmpstr, cbuf);
+                        strcat(cbuf, tmpstr) ;
 		    }
                     else
 		    {		/* we are indeed closing... */
@@ -760,7 +760,7 @@ void mcuInfoShip( int snum, int scanner )
 
                         sprintf(tmpstr, ", ETA %s",
                                 clbETAStr(pwarp, dis));
-                        appstr(tmpstr, cbuf);
+                        strcat(cbuf, tmpstr) ;
 		    }
 		}
                 else
@@ -782,7 +782,7 @@ void mcuInfoShip( int snum, int scanner )
 
                     sprintf(tmpstr, ", ETA %s",
                             clbETAStr(pwarp, dis));
-                    appstr(tmpstr, cbuf);
+                    strcat(cbuf, tmpstr) ;
 		}
 	    }
 	} /* if do ETA stats */
@@ -796,31 +796,31 @@ void mcuInfoShip( int snum, int scanner )
     if ( canscan )
     {
         if ( cbuf[0] != 0 )
-            appstr( ", ", cbuf );
-        appstr( "shields ", cbuf );
+            strcat(cbuf,  ", ");
+        strcat(cbuf , "shields ") ;
         if ( SSHUP(snum) && ! SREPAIR(snum) )
             utAppendInt( round( Ships[snum].shields ), cbuf );
         else
-            appstr( "DOWN", cbuf );
+            strcat(cbuf , "DOWN") ;
         i = round( Ships[snum].damage );
         if ( i > 0 )
 	{
             if ( cbuf[0] != 0 )
-                appstr( ", ", cbuf );
+                strcat(cbuf, ", ");
             sprintf( junk, "damage %d", i );
-            appstr( junk, cbuf );
+            strcat(cbuf , junk) ;
 	}
         i = Ships[snum].armies;
         if ( i > 0 )
 	{
             sprintf( junk, ", with %d arm", i );
-            appstr( junk, cbuf );
+            strcat(cbuf , junk) ;
             if ( i == 1 )
 	    {
                 appchr( 'y', cbuf );
 	    }
             else
-                appstr( "ies", cbuf );
+                strcat(cbuf , "ies") ;
 	}
     }
     if ( cbuf[0] != 0 )
@@ -1177,7 +1177,7 @@ void mcuPlayList( int godlike, int doall, int snum )
 	    {
                 sbuf[0] = 0;
                 utAppendShip( i, sbuf );
-                appstr(" ", sbuf);
+                strcat(sbuf, " ") ;
                 appchr(ShipTypes[Ships[i].shiptype].name[0], sbuf);
 
                 unum = Ships[i].unum;
@@ -1207,7 +1207,7 @@ void mcuPlayList( int godlike, int doall, int snum )
                              " ", " ", " ", " " );
                 if ( doall && kb != 0 )
 		{
-                    appstr( "  ", cbuf);
+                    strcat(cbuf, "  ") ;
                     utAppendKilledBy( kb, cbuf );
 		}
 

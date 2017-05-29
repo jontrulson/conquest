@@ -1757,7 +1757,7 @@ int welcome( int *unum )
         utAppendTitle( team, cbuf );
         appchr( ' ', cbuf );
         i = strlen( cbuf );
-        appstr( name, cbuf );
+        strcat(cbuf , name) ;
         cbuf[i] = (char)toupper( cbuf[i] );
 
         if ( ! clbRegister( name, cbuf, team, unum ) )
