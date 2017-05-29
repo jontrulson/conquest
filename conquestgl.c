@@ -143,7 +143,7 @@ static int _cmpfile(void *cmp1, void *cmp2)
 
 static void _loadRCFiles(int type, char *cqdir, char *suffix)
 {
-    char filenm[BUFFER_SIZE];
+    char filenm[BUFFER_SIZE_256];
     DIR *dirp;
     struct dirent *direntp;
     char **filelist = NULL;
@@ -235,7 +235,7 @@ static void _loadRCFiles(int type, char *cqdir, char *suffix)
    load any ~/.conquest/ *.trc files */
 void loadTextureRCFiles()
 {
-    char cqdir[BUFFER_SIZE];
+    char cqdir[BUFFER_SIZE_256];
     char *homevar;
 
     /* load the main texturesrc file first.  It's fatal if this fails. */
@@ -259,7 +259,7 @@ void loadTextureRCFiles()
 
 void loadSoundRCFiles()
 {
-    char cqdir[BUFFER_SIZE];
+    char cqdir[BUFFER_SIZE_256];
     char *homevar;
 
     /* load the main sound file first */

@@ -3750,8 +3750,8 @@ int selectServer(metaSRec_t *metaServerList, int nums)
     int i, k;
     static char *header = "Server List";
     static char *header2fmt = "(Page %d of %d)";
-    static char headerbuf[BUFFER_SIZE];
-    static char header2buf[BUFFER_SIZE];
+    static char headerbuf[BUFFER_SIZE_256];
+    static char header2buf[BUFFER_SIZE_256];
     static char *eprompt = "Arrow keys to select, [TAB] or [ENTER] to accept, any other key to quit.";
     int Done = FALSE;
     int ch;

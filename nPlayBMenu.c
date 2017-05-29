@@ -38,7 +38,7 @@ static int state;
 prm_t prm;
 static int prompting;
 
-static char cbuf[BUFFER_SIZE];
+static char cbuf[BUFFER_SIZE_256];
 
 static int nPlayBMenuDisplay(dspConfig_t *);
 static int nPlayBMenuInput(int ch);

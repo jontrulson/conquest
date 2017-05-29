@@ -49,7 +49,7 @@ static scrNode_t nPlayNode = {
 static void selectentry( uint8_t esystem )
 {
     int i;
-    char cbuf[BUFFER_SIZE];
+    char cbuf[BUFFER_SIZE_256];
 
     /* First figure out which systems we can enter from. */
     for ( i = 0; i < NUMPLAYERTEAMS; i++ )
@@ -161,7 +161,7 @@ void nPlayInit(void)
 
 static int nPlayDisplay(dspConfig_t *dsp)
 {
-    char cbuf[BUFFER_SIZE];
+    char cbuf[BUFFER_SIZE_256];
     int i, j;
 
     if (fatal)

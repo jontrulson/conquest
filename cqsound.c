@@ -147,7 +147,7 @@ static char *_getSoundFile(char *filenm)
 {
     char *homevar;
     FILE *fd;
-    static char buffer[BUFFER_SIZE];
+    static char buffer[BUFFER_SIZE_256];
 
     /* look for a user sounds */
     if ((homevar = getenv(CQ_USERHOMEDIR)))

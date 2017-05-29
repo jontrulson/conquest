@@ -71,7 +71,7 @@ real utAngle( real fromx, real fromy, real tox, real toy )
 /*    utAppendInt(str , i)  */
 void utAppendInt(char *str, int i)
 {
-    char buf[BUFFER_SIZE];
+    char buf[BUFFER_SIZE_256];
 
     buf[0] = 0;
     sprintf(buf, "%d", i);
@@ -313,14 +313,14 @@ void utLog(char *fmt, ...)
 {
     va_list ap;
     static int nowarn = FALSE;     /* if set, ignore logging */
-    static char buf[BUFFER_SIZE] = {};
+    static char buf[BUFFER_SIZE_256] = {};
     static char errfile[PATH_MAX] = {};
     static FILE *errfd = NULL;
     char *homevar;
     int tmp;
 
     va_start(ap, fmt);
-    (void)vsnprintf(buf, BUFFER_SIZE, fmt, ap);
+    (void)vsnprintf(buf, BUFFER_SIZE_256, fmt, ap);
 
     va_end(ap);
 
@@ -566,7 +566,7 @@ void utFormatMinutes( int itime, char *buf )
 void utFormatSeconds( int itime, char *buf )
 {
     int i, days, hours, minutes, seconds;
-    char junk[BUFFER_SIZE];
+    char junk[BUFFER_SIZE_256];
     int minus;
 
     if ( itime < 0 )

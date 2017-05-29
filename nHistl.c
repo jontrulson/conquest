@@ -49,7 +49,7 @@ static int nHistlDisplay(dspConfig_t *dsp)
 {
     int i, j, unum, lin, col, fline, lline, thistptr = 0;
     char *hd0="C O N Q U E S T   U S E R   H I S T O R Y";
-    char connecttm[BUFFER_SIZE];
+    char connecttm[BUFFER_SIZE_256];
     char histentrytm[DATESIZE + 1];
 
     /* Do some screen setup. */

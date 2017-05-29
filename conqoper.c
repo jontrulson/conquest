@@ -641,7 +641,7 @@ void debugplan(void)
     char hd0[MSGMAXLINE*4];
     char *hd1="D E B U G G I N G  P L A N E T   L I S T";
     char *hd2="planet        C T arm uih scan        planet        C T arm uih scan";
-    char hd3[BUFFER_SIZE];
+    char hd3[BUFFER_SIZE_256];
     int FirstTime = TRUE;
     int PlanetOffset;             /* offset into NUMPLANETS for this page */
     int PlanetIdx = 0;

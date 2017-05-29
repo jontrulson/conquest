@@ -58,7 +58,7 @@ static int nShiplDisplay(dspConfig_t *dsp)
 {
     int snum = Context.snum;
     static const int doall = FALSE; /* for now... */
-    static char cbuf[BUFFER_SIZE];
+    static char cbuf[BUFFER_SIZE_256];
     int i, unum, status, kb, lin, col;
     int fline, lline;
     char sbuf[20];

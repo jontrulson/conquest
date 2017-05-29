@@ -34,7 +34,7 @@ void mcuHistList( int godlike )
     int ch;
     char *hd0="C O N Q U E S T   U S E R   H I S T O R Y";
     char puname[MAXUSERNAME + 2]; /* for '\0' and '@' */
-    char connecttm[BUFFER_SIZE];
+    char connecttm[BUFFER_SIZE_256];
     char histentrytm[DATESIZE + 1];
 
     /* Do some screen setup. */
@@ -569,7 +569,7 @@ void mcuInfoShip( int snum, int scanner )
     char junk[MSGMAXLINE];
     real x, y, dis, kills, appx, appy;
     int godlike, canscan;
-    static char tmpstr[BUFFER_SIZE];
+    static char tmpstr[BUFFER_SIZE_256];
     real pwarp, diffdis, close_rate;
     time_t difftime, curtime;
     static time_t oldtime = 0;
@@ -848,13 +848,13 @@ void mcuPlanetList( int team, int snum )
     char *hd0="P L A N E T   L I S T   ";
     char *hd1="' = must take to conquer the Universe)";
     char *hd2="planet      type team armies          planet      type team armies";
-    char hd3[BUFFER_SIZE];
+    char hd3[BUFFER_SIZE_256];
     int outattr;
     int col2;
     int column_h = 7;
     int column_1 = 5;
     int column_2 = 43;
-    char xbuf[BUFFER_SIZE];
+    char xbuf[BUFFER_SIZE_256];
     static char pd0[BUFFER_SIZE_1024];
     static int FirstTime = TRUE;
     int PlanetOffset;		/* offset into NUMPLANETS for this page */
@@ -2023,7 +2023,7 @@ void mcuPageFile( char *file, char *errmsg )
     int plins = 1;
     FILE *pfd;
     char *sdone="--- press any key to return ---";
-    char buffer[BUFFER_SIZE];
+    char buffer[BUFFER_SIZE_256];
     int buflen;
 
     if ((pfd = fopen(file, "r")) == NULL)
@@ -2046,7 +2046,7 @@ void mcuPageFile( char *file, char *errmsg )
 
     plins = 0;
 
-    while (fgets(buffer, BUFFER_SIZE - 1, pfd) != NULL)
+    while (fgets(buffer, BUFFER_SIZE_256 - 1, pfd) != NULL)
     {
         /* get one at a time */
         buflen = strlen(buffer);
@@ -2125,7 +2125,7 @@ void mcuHelpLesson(void)
 {
 
     char buf[MSGMAXLINE];
-    char helpfile[BUFFER_SIZE];
+    char helpfile[BUFFER_SIZE_256];
 
     sprintf(helpfile, "%s/%s", utGetPath(CONQSHARE), C_CONQ_HELPFILE);
     sprintf( buf, "%s: Can't open.", helpfile );
@@ -2140,7 +2140,7 @@ void mcuHelpLesson(void)
 /*    news */
 void mcuNews(void)
 {
-    char newsfile[BUFFER_SIZE];
+    char newsfile[BUFFER_SIZE_256];
 
     sprintf(newsfile, "%s/%s", utGetPath(CONQSHARE), C_CONQ_NEWSFILE);
 

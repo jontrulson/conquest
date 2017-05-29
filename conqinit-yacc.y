@@ -1085,7 +1085,7 @@ int cqiLoadRC(int rcid, char *filename, int verbosity, int debugl)
     FILE *infile;
     extern FILE *yyin;
     int fail = FALSE;
-    char buffer[BUFFER_SIZE];
+    char buffer[BUFFER_SIZE_256];
 
     cqiDebugl = debugl;
     cqiVerbose = verbosity;
@@ -1094,7 +1094,7 @@ int cqiLoadRC(int rcid, char *filename, int verbosity, int debugl)
     {
     case CQI_FILE_CONQINITRC:   /* optional */
         if (filename)
-            strncpy(buffer, filename, BUFFER_SIZE - 1);
+            strncpy(buffer, filename, BUFFER_SIZE_256 - 1);
         else
             snprintf(buffer, sizeof(buffer)-1, "%s/%s", utGetPath(CONQETC),
                      "conqinitrc");
@@ -1102,7 +1102,7 @@ int cqiLoadRC(int rcid, char *filename, int verbosity, int debugl)
     case CQI_FILE_TEXTURESRC:
     case CQI_FILE_TEXTURESRC_ADD:
         if (filename)
-            strncpy(buffer, filename, BUFFER_SIZE - 1);
+            strncpy(buffer, filename, BUFFER_SIZE_256 - 1);
         else
             snprintf(buffer, sizeof(buffer)-1, "%s/%s", utGetPath(CONQETC),
                      "texturesrc");
@@ -1110,7 +1110,7 @@ int cqiLoadRC(int rcid, char *filename, int verbosity, int debugl)
     case CQI_FILE_SOUNDRC:
     case CQI_FILE_SOUNDRC_ADD:
         if (filename)
-            strncpy(buffer, filename, BUFFER_SIZE - 1);
+            strncpy(buffer, filename, BUFFER_SIZE_256 - 1);
         else
             snprintf(buffer, sizeof(buffer)-1, "%s/%s", utGetPath(CONQETC),
                      "soundrc");

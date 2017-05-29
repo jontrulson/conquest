@@ -411,7 +411,7 @@ static void ChangeMacro(int macronum)
     int lin;
     static char *prmpt2 = "Enter Conquest commands.  ([ENTER] = \\r, [TAB] = \\t)";
     char buf[MAX_MACRO_LEN + 1];
-    char prmpt[BUFFER_SIZE];
+    char prmpt[BUFFER_SIZE_256];
     int ch;
     lin = MSG_LIN1;
 
@@ -640,8 +640,8 @@ static int ViewEditMacros(struct Conf *ConfigData)
     int i, k;
     static char *header = "View/Edit Macros";
     static char *header2fmt = "(Page %d of %d)";
-    static char headerbuf[BUFFER_SIZE];
-    static char header2buf[BUFFER_SIZE];
+    static char headerbuf[BUFFER_SIZE_256];
+    static char header2buf[BUFFER_SIZE_256];
     static char *nodef = "<Not Defined>";
     static char *eprompt = "Arrow keys to select a macro, [SPACE] to change, any other key to quit.";
     static char *eprompt2 = "Type '?' for help.";

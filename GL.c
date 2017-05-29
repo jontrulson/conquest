@@ -1267,9 +1267,9 @@ void drawPlanet( GLfloat x, GLfloat y, int pnum, int scale,
 {
     int what;
     GLfloat size;
-    char buf[BUFFER_SIZE];
+    char buf[BUFFER_SIZE_256];
     char torpchar;
-    char planame[BUFFER_SIZE];
+    char planame[BUFFER_SIZE_256];
     int showpnams = UserConf.ShowPlanNames;
     static int norender = FALSE;
     GLfloat scaleFac = (scale == SCALE_FAC) ? dConf.vScaleSR : dConf.vScaleLR;
@@ -1343,7 +1343,7 @@ void drawPlanet( GLfloat x, GLfloat y, int pnum, int scale,
         if (showpnams)
         {
             if (UserConf.DoNumMap && (torpchar != ' '))
-                snprintf(buf, BUFFER_SIZE - 1, "#%d#%c#%d#%d#%d#%c%s",
+                snprintf(buf, BUFFER_SIZE_256 - 1, "#%d#%c#%d#%d#%d#%c%s",
                          textcolor,
                          torpchar,
                          InfoColor,
@@ -1352,7 +1352,7 @@ void drawPlanet( GLfloat x, GLfloat y, int pnum, int scale,
                          torpchar,
                          Planets[pnum].name);
             else
-                snprintf(buf, BUFFER_SIZE - 1, "%s", Planets[pnum].name);
+                snprintf(buf, BUFFER_SIZE_256 - 1, "%s", Planets[pnum].name);
 
 
             glfRenderFont(x,
@@ -1376,7 +1376,7 @@ void drawPlanet( GLfloat x, GLfloat y, int pnum, int scale,
             planame[0] = 0;
 
         if (UserConf.DoNumMap && (torpchar != ' '))
-            snprintf(buf, BUFFER_SIZE - 1, "#%d#%c#%d#%d#%d#%c%s",
+            snprintf(buf, BUFFER_SIZE_256 - 1, "#%d#%c#%d#%d#%d#%c%s",
                      textcolor,
                      torpchar,
                      InfoColor,
@@ -1385,7 +1385,7 @@ void drawPlanet( GLfloat x, GLfloat y, int pnum, int scale,
                      torpchar,
                      planame);
         else
-            snprintf(buf, BUFFER_SIZE - 1, "#%d#%c#%d#%c#%d#%c%s",
+            snprintf(buf, BUFFER_SIZE_256 - 1, "#%d#%c#%d#%c#%d#%c%s",
                      textcolor,
                      torpchar,
                      InfoColor,
@@ -3321,7 +3321,7 @@ static char *_getTexFile(char *tfilenm)
 {
     char *homevar;
     FILE *fd;
-    static char buffer[BUFFER_SIZE];
+    static char buffer[BUFFER_SIZE_256];
 
     /* look for a user image */
     if ((homevar = getenv(CQ_USERHOMEDIR)))

@@ -76,21 +76,21 @@ static scrNode_t nAuthNode = {
 /* basically a copy from nMeta, with extra gleen */
 static void dispServerInfo(int tlin)
 {
-    static char buf1[BUFFER_SIZE];
-    static char buf2[BUFFER_SIZE];
-    static char buf3[BUFFER_SIZE];
-    static char buf4[BUFFER_SIZE];
-    static char buf5[BUFFER_SIZE];
-    static char buf6[BUFFER_SIZE];
-    static char pbuf1[BUFFER_SIZE];
-    static char pbuf2[BUFFER_SIZE];
-    static char pbuf3[BUFFER_SIZE];
-    static char pbuf4[BUFFER_SIZE];
-    static char pbuf5[BUFFER_SIZE];
-    static char pbuf6[BUFFER_SIZE];
+    static char buf1[BUFFER_SIZE_256];
+    static char buf2[BUFFER_SIZE_256];
+    static char buf3[BUFFER_SIZE_256];
+    static char buf4[BUFFER_SIZE_256];
+    static char buf5[BUFFER_SIZE_256];
+    static char buf6[BUFFER_SIZE_256];
+    static char pbuf1[BUFFER_SIZE_256];
+    static char pbuf2[BUFFER_SIZE_256];
+    static char pbuf3[BUFFER_SIZE_256];
+    static char pbuf4[BUFFER_SIZE_256];
+    static char pbuf5[BUFFER_SIZE_256];
+    static char pbuf6[BUFFER_SIZE_256];
     static int inited = FALSE;
     static const int hcol = 1, icol = 11;
-    static char timebuf[BUFFER_SIZE];
+    static char timebuf[BUFFER_SIZE_256];
     time_t servtm;
 
     if (!inited)
@@ -123,7 +123,7 @@ static void dispServerInfo(int tlin)
         sprintf(buf5, "#%d#%%s", NoColor);
 
         servtm = sStat.servertime; /* fix alignment */
-        strncpy(timebuf, ctime(&servtm), BUFFER_SIZE - 1);
+        strncpy(timebuf, ctime(&servtm), BUFFER_SIZE_256 - 1);
         timebuf[strlen(timebuf) - 1] = 0; /* remove the NL */
 
     }

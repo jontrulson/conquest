@@ -29,7 +29,7 @@ typedef struct {
     int  lasttdist;		/* last target distance */
     int  hascolor;                /* do we have color support? */
     int  updsec;			/* updates per second */
-    char lasttarg[BUFFER_SIZE];   /* string of last ship/planet (I)nfo'd */
+    char lasttarg[BUFFER_SIZE_256];   /* string of last ship/planet (I)nfo'd */
     char lastinfostr[MSGMAXLINE]; /* last string used in doinfo() */
     char intrchar;		/* users interrupt char */
 } Context_t;

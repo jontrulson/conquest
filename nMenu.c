@@ -52,7 +52,7 @@ static int state;
 static prm_t prm;
 static int prompting;
 
-static char cbuf[BUFFER_SIZE];
+static char cbuf[BUFFER_SIZE_256];
 
 /* init vars */
 static int lose, oclosed, switchteams, multiple;
@@ -215,7 +215,7 @@ void nMenuInit(void)
 static int nMenuDisplay(dspConfig_t *dsp)
 {
     int lin, col;
-    char cbuf[BUFFER_SIZE];
+    char cbuf[BUFFER_SIZE_256];
 
     if (fatal)
         return NODE_EXIT;

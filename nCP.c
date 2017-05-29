@@ -229,7 +229,7 @@ static void _infoship( int snum, int scanner )
     char junk[MSGMAXLINE];
     real x, y, dis, kills, appx, appy;
     int godlike, canscan;
-    static char tmpstr[BUFFER_SIZE];
+    static char tmpstr[BUFFER_SIZE_256];
     /* ETA related vars */
     real pwarp, diffdis, close_rate;
     time_t difftime, curtime;

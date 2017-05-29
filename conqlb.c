@@ -314,7 +314,7 @@ char *clbETAStr(real warp, real distance)
 void clbKillShip( int snum, int kb )
 {
     int sendmesg = FALSE;
-    char msgbuf[BUFFER_SIZE];
+    char msgbuf[BUFFER_SIZE_256];
 
 #if defined(DO_EXPLODING_SHIPS)
     /* launch all torps - sorta, we'll use 'explode' mode... */
@@ -1111,7 +1111,7 @@ int clbZeroPlanet( int pnum, int snum )
 
 char *clbWarPrompt(int snum, int twar[])
 {
-    static char wbuf[BUFFER_SIZE];
+    static char wbuf[BUFFER_SIZE_256];
     static char *fmt = "Press [TAB] when done, [ESC] to abort:  Peace: %c %c %c %c  War: %c %c %c %c";
     int i;
     char ch, peace[NUMPLAYERTEAMS], war[NUMPLAYERTEAMS];

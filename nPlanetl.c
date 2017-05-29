@@ -31,7 +31,7 @@ static int PlanetIdx;
 static char *hd0="P L A N E T   L I S T   ";
 static char *hd1="' = must take to conquer the Universe)";
 static char *hd2="planet      type team armies          planet      type team armies";
-static char hd3[BUFFER_SIZE];
+static char hd3[BUFFER_SIZE_256];
 
 static int nPlanetlDisplay(dspConfig_t *);
 static int nPlanetlIdle(void);
@@ -73,7 +73,7 @@ static int nPlanetlDisplay(dspConfig_t *dsp)
     int column_h = 7;
     int column_1 = 5;
     int column_2 = 43;
-    char xbuf[BUFFER_SIZE];
+    char xbuf[BUFFER_SIZE_256];
     static char pd0[BUFFER_SIZE_1024];
     static int FirstTime = TRUE;
 

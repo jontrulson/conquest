@@ -173,7 +173,7 @@ extern char *crypt(char *, char *);
 
 #define MAXLINE 78
 #define BUFFER_SIZE_1024 1024
-#define BUFFER_SIZE 256
+#define BUFFER_SIZE_256 256
 
 /* Type Fakes */
 

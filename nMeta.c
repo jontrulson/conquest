@@ -26,8 +26,8 @@
 
 static char *header = "Server List";
 static char *header2fmt = "(Page %d of %d)";
-static char headerbuf[BUFFER_SIZE];
-static char header2buf[BUFFER_SIZE];
+static char headerbuf[BUFFER_SIZE_256];
+static char header2buf[BUFFER_SIZE_256];
 static char *eprompt = "Arrow keys to select, [TAB] or [ENTER] to accept, any other key to quit.";
 
 static const int servers_per_page = 8;
@@ -61,20 +61,20 @@ static scrNode_t nMetaNode = {
 static void dispServerInfo(dspConfig_t *dsp, metaSRec_t *metaServerList,
                            int num)
 {
-    static char buf1[BUFFER_SIZE];
-    static char buf2[BUFFER_SIZE];
-    static char buf3[BUFFER_SIZE];
-    static char buf4[BUFFER_SIZE];
-    static char buf5[BUFFER_SIZE];
-    static char buf6[BUFFER_SIZE];
-    static char buf7[BUFFER_SIZE];
-    static char pbuf1[BUFFER_SIZE];
-    static char pbuf2[BUFFER_SIZE];
-    static char pbuf3[BUFFER_SIZE];
-    static char pbuf4[BUFFER_SIZE];
-    static char pbuf5[BUFFER_SIZE];
-    static char pbuf6[BUFFER_SIZE];
-    static char pbuf7[BUFFER_SIZE];
+    static char buf1[BUFFER_SIZE_256];
+    static char buf2[BUFFER_SIZE_256];
+    static char buf3[BUFFER_SIZE_256];
+    static char buf4[BUFFER_SIZE_256];
+    static char buf5[BUFFER_SIZE_256];
+    static char buf6[BUFFER_SIZE_256];
+    static char buf7[BUFFER_SIZE_256];
+    static char pbuf1[BUFFER_SIZE_256];
+    static char pbuf2[BUFFER_SIZE_256];
+    static char pbuf3[BUFFER_SIZE_256];
+    static char pbuf4[BUFFER_SIZE_256];
+    static char pbuf5[BUFFER_SIZE_256];
+    static char pbuf6[BUFFER_SIZE_256];
+    static char pbuf7[BUFFER_SIZE_256];
     GLfloat x, y, w, h;
     static int inited = FALSE;
     static const int hcol = 2, icol = 11;

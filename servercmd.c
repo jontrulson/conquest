@@ -22,7 +22,7 @@
 void startRecord(int f)
 {
     char fname[PATH_MAX] = {};
-    char bname[BUFFER_SIZE] = {};
+    char bname[BUFFER_SIZE_256] = {};
     char cbuf[MESSAGE_SIZE] = {};
     time_t thetime;
     struct tm *tmtime;
@@ -44,7 +44,7 @@ void startRecord(int f)
 
     strftime(tbuf, 128 - 1, "%m%d%Y-%H%M", tmtime);
 
-    snprintf(bname, BUFFER_SIZE, "conquest-rec-%s.cqr", tbuf);
+    snprintf(bname, BUFFER_SIZE_256, "conquest-rec-%s.cqr", tbuf);
 
     snprintf(fname, PATH_MAX, "%s/%s", CONQSTATE, bname);
 

@@ -108,7 +108,7 @@ void setUserConfDefaults(void)
    doesn't exist */
 static void checkCreateUserConfDir(void)
 {
-    char buffer[BUFFER_SIZE];
+    char buffer[BUFFER_SIZE_256];
     struct stat sbuf;
     char *home;
 
@@ -172,7 +172,7 @@ int GetSysConf(int checkonly)
     FILE *conf_fd;
     int i, j;
     char conf_name[PATH_MAX] = {};
-    char buffer[BUFFER_SIZE] = {};
+    char buffer[BUFFER_SIZE_256] = {};
     int FoundOne = FALSE;
     int buflen;
     char *bufptr;
@@ -211,7 +211,7 @@ int GetSysConf(int checkonly)
 #endif
 
     /* Do it dude... */
-    while (fgets(buffer, BUFFER_SIZE - 1, conf_fd) != NULL)
+    while (fgets(buffer, BUFFER_SIZE_256 - 1, conf_fd) != NULL)
     {				/* get em one at a time */
         buflen = strlen(buffer);
 
@@ -435,7 +435,7 @@ int GetConf(int usernum)
     int i, j, n;
     char conf_name[PATH_MAX] = {};
     char *homevar, *cptr;
-    char buffer[BUFFER_SIZE];
+    char buffer[BUFFER_SIZE_256];
     int buflen;
     char *bufptr;
     int FoundOne = FALSE;
@@ -491,7 +491,7 @@ int GetConf(int usernum)
 
     /* We got it! Now lets process it. */
 
-    while (fgets(buffer, BUFFER_SIZE - 1, conf_fd) != NULL)
+    while (fgets(buffer, BUFFER_SIZE_256 - 1, conf_fd) != NULL)
     {				/* get em one at a time */
         buflen = strlen(buffer);
 
@@ -729,7 +729,7 @@ int SaveSysConfig(void)
 /* process a string value - converts it into a macro string */
 char *Str2Macro(char *str)
 {
-    static char retstr[BUFFER_SIZE];
+    static char retstr[BUFFER_SIZE_256];
     char *s;
     int i;
 
@@ -737,7 +737,7 @@ char *Str2Macro(char *str)
     s = str;
     retstr[0] = 0;
 
-    while (*s && i < (BUFFER_SIZE - 1))
+    while (*s && i < (BUFFER_SIZE_256 - 1))
     {
         if (*s == '\\')
 	{
@@ -787,7 +787,7 @@ char *Str2Macro(char *str)
 /* process a macro value - converts it back into a printable string */
 char *Macro2Str(char *str)
 {
-    static char retstr[BUFFER_SIZE];
+    static char retstr[BUFFER_SIZE_256];
     char *s;
     int i;
 
@@ -802,7 +802,7 @@ char *Macro2Str(char *str)
         utLog("Macro2Str(NULL)");
 #endif
 
-    while (*s && i < (BUFFER_SIZE - 1))
+    while (*s && i < (BUFFER_SIZE_256 - 1))
     {
         switch (*s)
 	{
@@ -1004,7 +1004,7 @@ int MakeConf(char *filename)
 int MakeSysConf()
 {
     FILE *sysconf_fd;
-    char conf_name[BUFFER_SIZE];
+    char conf_name[BUFFER_SIZE_256];
     int i, j, n;
 
     snprintf(conf_name, sizeof(conf_name)-1, "%s/%s", utGetPath(CONQETC),

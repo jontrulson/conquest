@@ -239,7 +239,7 @@ void drcreate(void)
     return;
 #else
     int pid;
-    char drivcmd[BUFFER_SIZE];
+    char drivcmd[BUFFER_SIZE_256];
 
 
     utGetSecs( &(Driver->drivtime) );			/* prevent driver timeout */
@@ -424,15 +424,15 @@ int isagod( int unum )
 {
     static struct group *grp = NULL;
     static int god = FALSE;
-    static char myname[BUFFER_SIZE];
+    static char myname[BUFFER_SIZE_256];
     int i;
 
     god = FALSE;
 
     if (unum == -1)		/* get god status for current user */
     {
-        strncpy(myname, clbGetUserLogname(), BUFFER_SIZE);
-        myname[BUFFER_SIZE - 1] = 0;
+        strncpy(myname, clbGetUserLogname(), BUFFER_SIZE_256);
+        myname[BUFFER_SIZE_256 - 1] = 0;
     }
     else
     {				/* else a user number passed in */

@@ -89,7 +89,7 @@ void procSetCourse(char *buf)
 void procSetWarp(cpCommand_t *swarp)
 {
     int snum = Context.snum;		/* we always use our own ship */
-    char cbuf[BUFFER_SIZE];
+    char cbuf[BUFFER_SIZE_256];
     real warp;
     real mw;
 
@@ -864,7 +864,7 @@ void procTow(cpCommand_t *cmd)
 {
     int snum = Context.snum;
     int other;
-    char cbuf[BUFFER_SIZE];
+    char cbuf[BUFFER_SIZE_256];
 
     if (!pktIsValid(CP_COMMAND, cmd))
         return;
@@ -931,7 +931,7 @@ void procTow(cpCommand_t *cmd)
 void procUnTow(cpCommand_t *cmd)
 {
     int snum = Context.snum;
-    char cbuf[BUFFER_SIZE];
+    char cbuf[BUFFER_SIZE_256];
     int entertime, now;
     int warsome;
 
@@ -1039,7 +1039,7 @@ void procBomb(cpCommand_t *cmd)
     real x, killprob;
     int oldsshup;
     char buf[MSGMAXLINE];
-    char cbuf[BUFFER_SIZE];
+    char cbuf[BUFFER_SIZE_256];
     char *lastfew="The last few armies are eluding us.";
 
 
@@ -1225,7 +1225,7 @@ void procBeam(cpCommand_t *cmd)
     int pnum, total, num, upmax, downmax, capacity, beamax, i;
     int ototal, entertime, now;
     int oldsshup, dirup, zeroed, conqed;
-    char cbuf[BUFFER_SIZE];
+    char cbuf[BUFFER_SIZE_256];
     real rkills;
     char *lastfew="Fleet orders prohibit removing the last three armies.";
 

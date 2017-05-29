@@ -43,7 +43,7 @@ static int state;
 static prm_t prm;
 static int prompting;
 
-static char cbuf[BUFFER_SIZE];
+static char cbuf[BUFFER_SIZE_256];
 
 static char *pwp = "Password: ";
 static char *rpwp = "Retype Password: ";
@@ -188,7 +188,7 @@ static void _changePasswd(int init)
 static void _changeMacro(int macronum, int init)
 {
     int lin;
-    static char prmpt[BUFFER_SIZE];
+    static char prmpt[BUFFER_SIZE_256];
     lin = MSG_LIN1;
 
     if (init)
@@ -219,7 +219,7 @@ static void _changeMouse(int mousevec, int init)
 {
     int lin;
     uint32_t mod, but;
-    static char prmpt[BUFFER_SIZE];
+    static char prmpt[BUFFER_SIZE_256];
     static char modstr[16];
     lin = MSG_LIN1;
 
@@ -504,8 +504,8 @@ static void _showOptScreen(void)
 {
     int i, j, k;
     static char *header2fmt = "(Page %d of %d)";
-    static char headerbuf[BUFFER_SIZE];
-    static char header2buf[BUFFER_SIZE];
+    static char headerbuf[BUFFER_SIZE_256];
+    static char header2buf[BUFFER_SIZE_256];
     static char *header;
     static char *prompt;
     static char *prompt2;

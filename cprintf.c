@@ -34,7 +34,7 @@ void cprintf(int lin, int col, int align, char *fmt, ...)
     int two_passes = FALSE;
     static char buf[BUFFER_SIZE_1024] = {};
     static char xbuf[BUFFER_SIZE_1024] = {};
-    static char color_code[BUFFER_SIZE] = {};
+    static char color_code[BUFFER_SIZE_256] = {};
 
     vcol = col;
     buf[0] = 0;

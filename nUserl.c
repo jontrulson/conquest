@@ -83,7 +83,7 @@ static int nUserlDisplay(dspConfig_t *dsp)
     static char *ehd1="M O R E   U S E R   S T A T S";
     static char *ehd2="name         cpu  conq coup geno  taken bombed/shot  shots  fired   last entry";
     static char *ehd3="planets  armies    phaser  torps";
-    static char cbuf[BUFFER_SIZE];
+    static char cbuf[BUFFER_SIZE_256];
     int color;
 
     /* Do some screen setup. */
