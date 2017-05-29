@@ -325,23 +325,23 @@ static void executeai( int snum, int token )
     /* SETCOURSE( course ) */
 #define SETCOURSE(x)                                                    \
     {                                                                   \
-    if ( Ships[snum].warp < 0.0 )                                       \
-	Ships[snum].warp = 0.0;			/* break orbit */       \
-    Ships[snum].lock = 0;                                               \
-    Ships[snum].dhead = (x);                                            \
-}
+        if ( Ships[snum].warp < 0.0 )                                   \
+            Ships[snum].warp = 0.0;			/* break orbit */ \
+        Ships[snum].lock = 0;                                           \
+        Ships[snum].dhead = (x);                                        \
+    }
 
     /* SETLOCK( pnum ) */
-#define SETLOCK(x)                                              \
-    {                                                           \
-    if ( Ships[snum].lock != -x )                               \
-    {                                                           \
-    /* Don't break orbit to unless we're not there yet. */      \
-    if ( Ships[snum].warp < 0.0 )                               \
-        Ships[snum].warp = 0.0;                                 \
-    Ships[snum].lock = -(x);                                    \
-}                                                               \
-}
+#define SETLOCK(x)                                                      \
+    {                                                                   \
+        if ( Ships[snum].lock != -x )                                   \
+        {                                                               \
+            /* Don't break orbit to unless we're not there yet. */      \
+            if ( Ships[snum].warp < 0.0 )                               \
+                Ships[snum].warp = 0.0;                                 \
+            Ships[snum].lock = -(x);                                    \
+        }                                                               \
+    }
 
     int i, j;
     char buf[MAXLINE];
@@ -352,137 +352,136 @@ static void executeai( int snum, int token )
     /* Execute the action! */
     switch ( token )
     {
-case ROB_NOOP:
-    /* Null! */
-    break;
-case ROB_GOHOME:
-    if ( clbFindSpecial( snum, SPECIAL_HOMEPLANET, 0, &i, &j ) )
-    {
-    SETLOCK( i );
-}
-    else if ( clbFindSpecial( snum, SPECIAL_FUELPLANET, 0, &i, &j ) )
-    {
-    SETLOCK( i );
-}
-    break;
-case ROB_GOFUEL:
-    if ( clbFindSpecial( snum, SPECIAL_FUELPLANET, 0, &i, &j ) )
-	SETLOCK( i );
-    break;
-case ROB_GOREPAIR:
-    if ( clbFindSpecial( snum, SPECIAL_REPAIRPLANET, 0, &i, &j ) )
-	SETLOCK( i );
-    break;
-case ROB_ALLOCATE:
-    i = Ships[snum].weapalloc;
-    Ships[snum].weapalloc = Ships[snum].engalloc;
-    Ships[snum].engalloc = i;
-    break;
-case ROB_PHASER:
-    clbPhaser( snum, ane );
-    break;
-case ROB_TORPEDO:
-    clbLaunch( snum, ane, 1, LAUNCH_NORMAL );
-    break;
-case ROB_BURST:
-    clbLaunch( snum, ane, 3, LAUNCH_NORMAL );
-    break;
-case ROB_SHIELD:
-    if (SSHUP(snum))
-	SFCLR(snum, SHIP_F_SHUP);
-    else
-	SFSET(snum, SHIP_F_SHUP);
-    break;
-case ROB_WARP_0:
-    SETWARP( 0.0 );
-    break;
-case ROB_WARP_2:
-    SETWARP( 2.0 );
-    break;
-case ROB_WARP_5:
-    SETWARP( 5.0 );
-    break;
-case ROB_WARP_8:
-    SETWARP( 8.0 );
-    break;
-case ROB_TRACK:
-    SETCOURSE( utMod360( ane + rnduni( -10.0, 10.0 ) ) );
-    break;
-case ROB_RUNAWAY:
-    SETCOURSE( utMod360( ane + 180.0 + rnduni( -10.0, 10.0 ) ) );
-    break;
-case ROB_SILENT:
-    if ( ! SCLOAKED(snum) )
-	Ships[snum].dwarp = 0.0;
-    if (SCLOAKED(snum))
-	SFCLR(snum, SHIP_F_CLOAKED);
-    else
-	SFSET(snum, SHIP_F_CLOAKED);
-    break;
-case ROB_INSULT:
-    robreply( buf );
-    clbStoreMsgf( snum, nenum, buf, MSG_FLAGS_ROBOT );
-    break;
-case ROB_READMSG:
-    /* Try to read a message and reply to it */
-    while ( Ships[snum].lastmsg != ConqInfo->lastmsg )
-    {
-    Ships[snum].lastmsg = utModPlusOne( Ships[snum].lastmsg + 1, MAXMESSAGES );
-    i = Ships[snum].lastmsg;
-    if ( clbCanRead( snum, i ) )
-    {
-    j = Msgs[i].msgfrom;
-    if ( -j > 0 && -j <= NUMPLANETS )
-        continue; 	/* don't talk back to planets */
-
-    if ( j > 0 && j <= MAXSHIPS )
-        if ( SROBOT(j) )
-            continue; 	/* don't talk back to robots */
-
-    if (j == MSG_GOD)
-        continue;	/* don't talk back to GOD */
-
-    if (j == MSG_COMP || (Msgs[i].flags & MSG_FLAGS_TERSABLE))
-        continue;	/* don't talk back to the computer */
-
-    robreply( buf );
-    clbStoreMsgf( snum, j, buf, MSG_FLAGS_ROBOT );
-    break;
-}
-}
-    break;
-case ROB_MESSAGE:
-    clbStoreMsgf( snum, MSG_ALL, "Give me drugs.", MSG_FLAGS_ROBOT );
-    break;
-case ROB_TAKEDRUGS:
-    clbStoreMsgf( snum, MSG_ALL, "I'm on drugs.", MSG_FLAGS_ROBOT );
-    break;
-case ROB_DETONATE:
-    clbEnemyDet( snum );
-    break;
-case ROB_MYDETONATE:
-    for ( i = 0; i < MAXTORPS; i = i + 1 )
-	clbDetonate( snum, i );
-    break;
-case ROB_UNTRACTOR:
-    /* Only attempt to untractor if we don't have to delay. */
-    if ( Ships[snum].towedby != 0 )
-	if ( ! satwar(snum, Ships[snum].towedby) )
+    case ROB_NOOP:
+        /* Null! */
+        break;
+    case ROB_GOHOME:
+        if ( clbFindSpecial( snum, SPECIAL_HOMEPLANET, 0, &i, &j ) )
         {
-    Ships[Ships[snum].towedby].towing = 0;
-    Ships[snum].towedby = 0;
-}
-    break;
-case ROB_REPAIR:
-    SFSET(snum, SHIP_F_REPAIR);
-    break;
-default:
-    robstr( token, buf );
-    utLog( "conqai:executeai(): Unknown token '%s' (%d)\n", buf, token );
-}
+            SETLOCK( i );
+        }
+        else if ( clbFindSpecial( snum, SPECIAL_FUELPLANET, 0, &i, &j ) )
+        {
+            SETLOCK( i );
+        }
+        break;
+    case ROB_GOFUEL:
+        if ( clbFindSpecial( snum, SPECIAL_FUELPLANET, 0, &i, &j ) )
+            SETLOCK( i );
+        break;
+    case ROB_GOREPAIR:
+        if ( clbFindSpecial( snum, SPECIAL_REPAIRPLANET, 0, &i, &j ) )
+            SETLOCK( i );
+        break;
+    case ROB_ALLOCATE:
+        i = Ships[snum].weapalloc;
+        Ships[snum].weapalloc = Ships[snum].engalloc;
+        Ships[snum].engalloc = i;
+        break;
+    case ROB_PHASER:
+        clbPhaser( snum, ane );
+        break;
+    case ROB_TORPEDO:
+        clbLaunch( snum, ane, 1, LAUNCH_NORMAL );
+        break;
+    case ROB_BURST:
+        clbLaunch( snum, ane, 3, LAUNCH_NORMAL );
+        break;
+    case ROB_SHIELD:
+        if (SSHUP(snum))
+            SFCLR(snum, SHIP_F_SHUP);
+        else
+            SFSET(snum, SHIP_F_SHUP);
+        break;
+    case ROB_WARP_0:
+        SETWARP( 0.0 );
+        break;
+    case ROB_WARP_2:
+        SETWARP( 2.0 );
+        break;
+    case ROB_WARP_5:
+        SETWARP( 5.0 );
+        break;
+    case ROB_WARP_8:
+        SETWARP( 8.0 );
+        break;
+    case ROB_TRACK:
+        SETCOURSE( utMod360( ane + rnduni( -10.0, 10.0 ) ) );
+        break;
+    case ROB_RUNAWAY:
+        SETCOURSE( utMod360( ane + 180.0 + rnduni( -10.0, 10.0 ) ) );
+        break;
+    case ROB_SILENT:
+        if ( ! SCLOAKED(snum) )
+            Ships[snum].dwarp = 0.0;
+        if (SCLOAKED(snum))
+            SFCLR(snum, SHIP_F_CLOAKED);
+        else
+            SFSET(snum, SHIP_F_CLOAKED);
+        break;
+    case ROB_INSULT:
+        robreply( buf );
+        clbStoreMsgf( snum, nenum, buf, MSG_FLAGS_ROBOT );
+        break;
+    case ROB_READMSG:
+        /* Try to read a message and reply to it */
+        while ( Ships[snum].lastmsg != ConqInfo->lastmsg )
+        {
+            Ships[snum].lastmsg = utModPlusOne( Ships[snum].lastmsg + 1, MAXMESSAGES );
+            i = Ships[snum].lastmsg;
+            if ( clbCanRead( snum, i ) )
+            {
+                j = Msgs[i].msgfrom;
+                if ( -j > 0 && -j <= NUMPLANETS )
+                    continue; 	/* don't talk back to planets */
+
+                if ( j > 0 && j <= MAXSHIPS )
+                    if ( SROBOT(j) )
+                        continue; 	/* don't talk back to robots */
+
+                if (j == MSG_GOD)
+                    continue;	/* don't talk back to GOD */
+
+                if (j == MSG_COMP || (Msgs[i].flags & MSG_FLAGS_TERSABLE))
+                    continue;	/* don't talk back to the computer */
+
+                robreply( buf );
+                clbStoreMsgf( snum, j, buf, MSG_FLAGS_ROBOT );
+                break;
+            }
+        }
+        break;
+    case ROB_MESSAGE:
+        clbStoreMsgf( snum, MSG_ALL, "Give me drugs.", MSG_FLAGS_ROBOT );
+        break;
+    case ROB_TAKEDRUGS:
+        clbStoreMsgf( snum, MSG_ALL, "I'm on drugs.", MSG_FLAGS_ROBOT );
+        break;
+    case ROB_DETONATE:
+        clbEnemyDet( snum );
+        break;
+    case ROB_MYDETONATE:
+        for ( i = 0; i < MAXTORPS; i = i + 1 )
+            clbDetonate( snum, i );
+        break;
+    case ROB_UNTRACTOR:
+        /* Only attempt to untractor if we don't have to delay. */
+        if ( Ships[snum].towedby != 0 )
+            if ( ! satwar(snum, Ships[snum].towedby) )
+            {
+                Ships[Ships[snum].towedby].towing = 0;
+                Ships[snum].towedby = 0;
+            }
+        break;
+    case ROB_REPAIR:
+        SFSET(snum, SHIP_F_REPAIR);
+        break;
+    default:
+        robstr( token, buf );
+        utLog( "conqai:executeai(): Unknown token '%s' (%d)\n", buf, token );
+    }
 
     return;
-
 }
 
 
