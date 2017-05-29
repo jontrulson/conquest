@@ -86,8 +86,8 @@ void utAppendInt(char *str, int i)
 /*  SYNOPSIS */
 /*    int kb */
 /*    char buf() */
-/*    utAppendKilledBy( kb, buf ) */
-void utAppendKilledBy( int kb, char *buf )
+/*    utAppendKilledBy(buf , kb)  */
+void utAppendKilledBy(char *buf , int kb) 
 {
 
     switch ( kb )

@@ -1208,7 +1208,7 @@ void mcuPlayList( int godlike, int doall, int snum )
                 if ( doall && kb != 0 )
 		{
                     strcat(cbuf, "  ") ;
-                    utAppendKilledBy( kb, cbuf );
+                    utAppendKilledBy(cbuf , kb) ;
 		}
 
 		if (snum > 0 && snum <= MAXSHIPS )

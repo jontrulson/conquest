@@ -503,7 +503,7 @@ void debugdisplay( int snum )
     if ( i != 0 )
     {
         buf[0] = 0;
-        utAppendKilledBy( Ships[snum].killedby, buf );
+        utAppendKilledBy(buf , Ships[snum].killedby) ;
         cprintf(lin,dcol,ALIGN_NONE,"#%d#%s",InfoColor, buf);
     }
     lin++;

@@ -121,7 +121,7 @@ static int nShiplDisplay(dspConfig_t *dsp)
             if ( doall && kb != 0 )
             {
                 strcat(cbuf, "  ") ;
-                utAppendKilledBy( kb, cbuf );
+                utAppendKilledBy(cbuf , kb) ;
             }
 
             if (snum > 0 && snum <= MAXSHIPS )
