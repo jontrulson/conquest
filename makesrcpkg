@@ -60,7 +60,7 @@ FILELIST="conqai.h cd2lb.h cd2lb.c iolb.h iolb.c conqlb.c
         conqinitrc texturesrc anim.h anim.c CONQINIT.TXT cqmouse.h
         cqsound.h cqsound.c sounddata.h soundrc tcpwrap.h tcpwrap.c
         rb.h rb.c hud.c hud.h conqutil.c conqutil.h blinker.h blinker.c
-        cproc.h cproc.c sproc.h sproc.c"
+        cproc.h cproc.c sproc.h sproc.c autogen.sh"
 
 IMAGES="img/*.tga img/*.txf"
 SOUNDS="sound/*.ogg"
