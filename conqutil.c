@@ -69,7 +69,7 @@ real utAngle( real fromx, real fromy, real tox, real toy )
 /*    int int */
 /*    char str() */
 /*    utAppendInt(str , i)  */
-void utAppendInt(char *str, int i) 
+void utAppendInt(char *str, int i)
 {
     char buf[BUFFER_SIZE];
 
@@ -87,7 +87,7 @@ void utAppendInt(char *str, int i)
 /*    int kb */
 /*    char buf() */
 /*    utAppendKilledBy(buf , kb)  */
-void utAppendKilledBy(char *buf , int kb) 
+void utAppendKilledBy(char *buf, int kb)
 {
 
     switch ( kb )
@@ -121,11 +121,11 @@ void utAppendKilledBy(char *buf , int kb)
         break;
     default:
         if ( kb > 0 && kb <= MAXSHIPS )
-            utAppendShip(buf , kb) ;
+            utAppendShip(buf, kb) ;
         else if ( -kb > 0 && -kb <= NUMPLANETS )
             strcat(buf , Planets[-kb].name) ;
         else
-            utAppendInt(buf , kb) ;
+            utAppendInt(buf, kb) ;
         break;
     }
 
@@ -138,7 +138,7 @@ void utAppendKilledBy(char *buf , int kb)
 /*    int snum */
 /*    char str() */
 /*    utAppendShip(str , snum)  */
-void utAppendShip(char *str , int snum) 
+void utAppendShip(char *str, int snum)
 {
     int i;
     char ch;
@@ -151,8 +151,8 @@ void utAppendShip(char *str , int snum)
             ch = Teams[i].teamchar;
     }
 
-    utAppendChar(str , ch) ;
-    utAppendInt(str , snum) ;
+    utAppendChar(str, ch) ;
+    utAppendInt(str, snum) ;
 
     return;
 }
@@ -186,7 +186,7 @@ void utAppendShipStatus(char *buf, int status)
         strcat(buf , "reserved") ;
         break;
     default:
-        utAppendInt(buf , status) ;
+        utAppendInt(buf, status) ;
         break;
     }
     return;
@@ -199,7 +199,7 @@ void utAppendShipStatus(char *buf, int status)
 /*    int team */
 /*    char buf() */
 /*    utAppendTitle(buf , team)  */
-void utAppendTitle(char *buf , int team)
+void utAppendTitle(char *buf, int team)
 {
     switch ( team )
     {
