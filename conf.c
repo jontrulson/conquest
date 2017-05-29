@@ -419,9 +419,9 @@ parseMouseModNum(char *str, uint32_t *mods, uint32_t *button)
         }
     }
 
-    if (*button < 0 || *button >= CONF_MAXBUTTONS)
+    if (*button >= CONF_MAXBUTTONS)
         return FALSE;
-    if (*mods < 0 || *mods >= CONF_MAXMODIFIERS)
+    if (*mods >= CONF_MAXMODIFIERS)
         return FALSE;
 
     return TRUE;

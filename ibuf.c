@@ -138,7 +138,7 @@ int ibufExpandMouseMacro(int but, uint32_t mods, real mangle)
     if (but < 0 || but >= CONF_MAXBUTTONS)
         return(FALSE);
 
-    if (mods < 0 || mods >= CONF_MAXMODIFIERS)
+    if (mods >= CONF_MAXMODIFIERS)
         return(FALSE);
 
     /* we need to translate any occurances of \a into the mangle (angle) */

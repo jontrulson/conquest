@@ -418,7 +418,7 @@ void debugdisplay( int snum )
     tcol = 23;
     dcol = tcol + 12;
     cprintf(lin,tcol,ALIGN_NONE,"#%d#%s",LabelColor, "      name:");
-    if ( Ships[snum].alias != 0 )
+    if ( Ships[snum].alias[0] != 0 )
   	cprintf(lin,dcol,ALIGN_NONE,"#%d#%s",InfoColor, Ships[snum].alias);
     lin++;
     cprintf(lin,tcol,ALIGN_NONE,"#%d#%s",LabelColor, "  username:");

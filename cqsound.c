@@ -757,7 +757,7 @@ int cqsEffectStop(cqsHandle handle, int halt)
         return FALSE;
     }
 
-    if (handle < 0 || handle >= CQS_MAX_CHANNELS ||
+    if (handle >= CQS_MAX_CHANNELS ||
         !cqsChannels[handle].active || cqsChannels[handle].idx == -1 ||
         cqsChannels[handle].channel == -1)
         return FALSE;
