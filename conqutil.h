@@ -11,7 +11,7 @@ real     utSubAngle( real a1, real a2);
 real     utAngle( real fromx, real fromy, real tox, real toy );
 void     utAppendInt(char *str, int i);
 void     utAppendShipStatus(char *buf, int status);
-void     utAppendTitle( int team, char *buf );
+void     utAppendTitle(char *buf, int team);
 void     utAppendShip( int snum, char *str );
 void     utAppendKilledBy( int kb, char *buf );
 int      utArrowsToDir( char *str, real *dir );

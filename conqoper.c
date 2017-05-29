@@ -2452,7 +2452,7 @@ void opuadd(void)
 
 
     buf[0] = 0;
-    utAppendTitle( team, buf );
+    utAppendTitle(buf , team) ;
     utAppendChar(buf , ' ') ;
     i = strlen( buf );
 

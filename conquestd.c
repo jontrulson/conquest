@@ -1754,7 +1754,7 @@ int welcome( int *unum )
         team = rndint( 0, NUMPLAYERTEAMS - 1 );
 
         cbuf[0] = 0;
-        utAppendTitle( team, cbuf );
+        utAppendTitle(cbuf , team) ;
         utAppendChar(cbuf , ' ') ;
         i = strlen( cbuf );
         strcat(cbuf , name) ;

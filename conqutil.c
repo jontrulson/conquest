@@ -163,7 +163,7 @@ void utAppendShip( int snum, char *str )
 /*    int status */
 /*    char buf() */
 /*    utAppendShipStatus(buf , status)  */
-void utAppendShipStatus(char *buf , int status) 
+void utAppendShipStatus(char *buf, int status)
 {
     switch ( status )
     {
@@ -198,8 +198,8 @@ void utAppendShipStatus(char *buf , int status)
 /*  SYNOPSIS */
 /*    int team */
 /*    char buf() */
-/*    utAppendTitle( team, buf ) */
-void utAppendTitle( int team, char *buf )
+/*    utAppendTitle(buf , team)  */
+void utAppendTitle(char *buf , int team)
 {
     switch ( team )
     {
