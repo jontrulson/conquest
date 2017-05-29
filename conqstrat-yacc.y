@@ -112,83 +112,83 @@ expr		:	TOK_VARIABLE TOK_OPERATOR TOK_NUMBER
 
 void cqiInitPlanets(void)
 {
-  return;
+    return;
 }
 
 
 /* conqstrat - main program */
 int main(int argc, char **argv)
 {
-  extern char *optarg;
-  extern int optind, opterr, optopt;
-  char filename[PATH_MAX] = {};
-  int ch;
-  FILE *filefd;
+    extern char *optarg;
+    extern int optind, opterr, optopt;
+    char filename[PATH_MAX] = {};
+    int ch;
+    FILE *filefd;
 
-  debug_scanner = FALSE;
-  verbose = FALSE;
-  filefd = stdout;
+    debug_scanner = FALSE;
+    verbose = FALSE;
+    filefd = stdout;
 
-  while ( (ch = getopt( argc, argv, "dvo:U" )) != EOF )
+    while ( (ch = getopt( argc, argv, "dvo:U" )) != EOF )
     {
-      switch(ch)
+        switch(ch)
 	{
 	case 'v':
-	  verbose = TRUE;
-	  break;
+            verbose = TRUE;
+            break;
 	case 'd':
-	  debug_scanner = TRUE;
-	  break;
+            debug_scanner = TRUE;
+            break;
 	case 'o':
-          strncpy(filename, optarg, PATH_MAX - 1);
-	  filefd = NULL;
-	  break;
+            strncpy(filename, optarg, PATH_MAX - 1);
+            filefd = NULL;
+            break;
 	case 'U':
-	  UpdateCmnBlock = TRUE;
-	  break;
+            UpdateCmnBlock = TRUE;
+            break;
 	default:
-	  print_usage();
-	  exit(1);
+            print_usage();
+            exit(1);
 	}
     }
 
-  if (filefd == NULL)
+    if (filefd == NULL)
     {
-      if ((filefd = fopen(filename, "w")) == NULL)
+        if ((filefd = fopen(filename, "w")) == NULL)
 	{
-	  fprintf(stderr, "conqstrat: can't open %s: %s\n",
-		  filename,
-		  strerror(errno));
-	  exit(1);
+            fprintf(stderr, "conqstrat: can't open %s: %s\n",
+                    filename,
+                    strerror(errno));
+            exit(1);
 	}
-      else
+        else
 	{
-	  if (verbose)
-	    { 
-	      fprintf(stderr, "conqstrat: sending output to file %s\n", filename);
+            if (verbose)
+	    {
+                fprintf(stderr, "conqstrat: sending output to file %s\n", filename);
 	    }
 	}
     }
-	  
-  initrun();
 
-  if ( yyparse() == ERR )
-    fprintf(stderr, "conqstrat: yyparse() error.\n" );
-  if ( goterror )
+    initrun();
+
+    if ( yyparse() == ERR )
+        fprintf(stderr, "conqstrat: yyparse() error.\n" );
+    if ( goterror )
     {
-      fprintf(stderr,  "conqstrat: got error - aborting.\n" );
-      exit(1);
+        fprintf(stderr,  "conqstrat: got error - aborting.\n" );
+        exit(1);
     }
-  
-  if ( UpdateCmnBlock )
-    dumprun();
-  else
-    displayrun(filefd);
-  
-  if ( filefd != stdin )
-      fclose( filefd );
-  
-  return(0);
+
+    if ( UpdateCmnBlock )
+        dumprun();
+    else
+        displayrun(filefd);
+
+    if ( filefd != stdin )
+        fclose( filefd );
+
+    return(0);
 
 }
 
@@ -222,31 +222,31 @@ void initrun(void)
 void dumprun(void)
 {
 
-  int i, j;
+    int i, j;
 
-  map_common();         /* Map the conquest common block */
+    map_common();         /* Map the conquest common block */
 
 
-  /* This is the only place we include/modify the shared common block. */
-  if ( *CBlockRevision != COMMONSTAMP )
+    /* This is the only place we include/modify the shared common block. */
+    if ( *CBlockRevision != COMMONSTAMP )
     {
-      fprintf(stderr,"conqstrat: Common block ident mismatch.\n" );
-      exit(1);
+        fprintf(stderr,"conqstrat: Common block ident mismatch.\n" );
+        exit(1);
     }
-  
-  /* Copy the strategy table. */
-  for ( i = 0; i < MAX_VAR; i = i + 1 )
-    for ( j = 0; j < 10; j = j + 1 )
-      Robot->rstrat[i][j] = trstrat[i][j];
 
-  /* Copy the action vector. */
-  for ( i = 0; i < 32; i = i + 1 )
-    Robot->rvec[i] = trvec[i];
+    /* Copy the strategy table. */
+    for ( i = 0; i < MAX_VAR; i = i + 1 )
+        for ( j = 0; j < 10; j = j + 1 )
+            Robot->rstrat[i][j] = trstrat[i][j];
 
-  fprintf(stderr, "conqstrat: parsed %d rules.\n", rulenum);
-  fprintf(stderr, "conqstrat: common block updated.\n");
+    /* Copy the action vector. */
+    for ( i = 0; i < 32; i = i + 1 )
+        Robot->rvec[i] = trvec[i];
 
-  return;
+    fprintf(stderr, "conqstrat: parsed %d rules.\n", rulenum);
+    fprintf(stderr, "conqstrat: common block updated.\n");
+
+    return;
 
 }
 
@@ -268,40 +268,40 @@ void displayrun(FILE *filefd)
     fprintf(filefd, "CDHEXTERN int %s[%d][10] = {\n", strat, MAX_VAR);
 
     for ( i = 0; i < MAX_VAR; i = i + 1 )
-      {
+    {
 	fprintf(filefd,"  { ");
 	for ( j = 0; j < 10; j = j + 1 )
-	  {
+        {
 	    if (j != 9)
-	      fprintf(filefd,  "%d, ", trstrat[i][j] );
+                fprintf(filefd,  "%d, ", trstrat[i][j] );
 	    else
-	      fprintf(filefd,  "%d", trstrat[i][j] );
-	    
+                fprintf(filefd,  "%d", trstrat[i][j] );
+
 	    if ( j == 4 )
-	      fprintf(filefd,  "\n     " );
-	  }
+                fprintf(filefd,  "\n     " );
+        }
 	if (i != MAX_VAR - 1)
-	  fprintf(filefd,  "},\n" );	
+            fprintf(filefd,  "},\n" );
 	else
-	  fprintf(filefd, "}\n");
-      }
+            fprintf(filefd, "}\n");
+    }
 
     fprintf(filefd, "};\n\n");
 
     fprintf(filefd,  "CDHEXTERN int %s[32] = {", vec );
     for ( i = 0; i < 32; i = i + 1 )
-      {
+    {
 	if (i != 31)
-	  fprintf(filefd,  "%d, ", trvec[i] );
+            fprintf(filefd,  "%d, ", trvec[i] );
 	else
-	  fprintf(filefd,  "%d ", trvec[i] );
+            fprintf(filefd,  "%d ", trvec[i] );
 	if ( i == 15 )
-	  fprintf(filefd,  "\n\t" );
-      }
+            fprintf(filefd,  "\n\t" );
+    }
     fprintf(filefd, "};\n\n#undef CDHEXTERN /* cleanup */\n\n#endif\n\n");
 
     fprintf(stderr, "conqstrat: parsed %d rules.\n", rulenum);
-    
+
     return;
 
 }
@@ -310,36 +310,36 @@ void displayrun(FILE *filefd)
 /* dumprule - dump the current rule */
 void dumprule( int action )
 {
-  int i, j, tbits;
-  char buf[MAXLINE];
-  
-    /* Store action. */
-  trvec[rulenum] = action;
+    int i, j, tbits;
+    char buf[MAXLINE];
 
-  robstr(action, buf);
-  if (debug_scanner | verbose)
-    fprintf(stderr, "DEBUG: ### dumprule(): rulenum = %d, action = %s\n", rulenum, buf);
+    /* Store action. */
+    trvec[rulenum] = action;
+
+    robstr(action, buf);
+    if (debug_scanner | verbose)
+        fprintf(stderr, "DEBUG: ### dumprule(): rulenum = %d, action = %s\n", rulenum, buf);
 
     /* Check for impossible rules. */
-  for ( i = 0; i < MAX_VAR; i = i + 1 )
+    for ( i = 0; i < MAX_VAR; i = i + 1 )
     {
-      /* There must be at least one value that this variable accepts. */
-      tbits = 0;
-      for ( j = 0; j < 10; j = j + 1 )
-	tbits |= trstrat[i][j];
+        /* There must be at least one value that this variable accepts. */
+        tbits = 0;
+        for ( j = 0; j < 10; j = j + 1 )
+            tbits |= trstrat[i][j];
 
-      if (debug_scanner)
+        if (debug_scanner)
 	{
-	  fprintf(stderr, "\t\tDEBUG:dumprule(): tbits = 0x%08X\n", tbits);
+            fprintf(stderr, "\t\tDEBUG:dumprule(): tbits = 0x%08X\n", tbits);
 	}
 
 	if ( ( tbits & ibset( 0, rulenum ) ) == 0 )
-	    {
-	      valstr( i, buf );
-	      fprintf(stderr, "conqstrat: Rule on line %d can't happen, %s is broken\n",
+        {
+            valstr( i, buf );
+            fprintf(stderr, "conqstrat: Rule on line %d can't happen, %s is broken\n",
 		    Lineno, buf);
-	    }
-	}
+        }
+    }
 
     /* Update rule number. */
     rulenum = rulenum + 1;
@@ -352,78 +352,78 @@ void dumprule( int action )
 /* addrule - add info to the current rule */
 void addrule( int var, int op, int num )
 {
-  int i, rulebits;
-  char svar[32], sop[32];
+    int i, rulebits;
+    char svar[32], sop[32];
 
-  if ( debug_scanner || verbose)
+    if ( debug_scanner || verbose)
     {
-      valstr( var, svar );
-      valstr( op, sop );
-      fprintf( stderr, "DEBUG: addrule(%s, %s, %d)\n", svar, sop, num );
+        valstr( var, svar );
+        valstr( op, sop );
+        fprintf( stderr, "DEBUG: addrule(%s, %s, %d)\n", svar, sop, num );
 
     }
 
-  if ( rulenum >= 32 )
+    if ( rulenum >= 32 )
     {
-      fprintf(stderr, "ERROR: conqstrat: More than 32 rules; line %d\n", Lineno );
-      exit(1);
+        fprintf(stderr, "ERROR: conqstrat: More than 32 rules; line %d\n", Lineno );
+        exit(1);
     }
 
-  if ( num < 0 || num > 9 )
+    if ( num < 0 || num > 9 )
     {
-      fprintf(stderr, "ERROR: addrule: impossible number %d, line %d\n", 
-	      num,
-	      Lineno);
-      exit(1);
+        fprintf(stderr, "ERROR: addrule: impossible number %d, line %d\n",
+                num,
+                Lineno);
+        exit(1);
     }
 
-  if ( var < 0 || num >= MAX_VAR )
+    if ( var < 0 || num >= MAX_VAR )
     {
-      fprintf(stderr, "ERROR: addrule: impossible variable %d, line %d\n", 
-	      var,
-	      Lineno);
-      exit(1);
+        fprintf(stderr, "ERROR: addrule: impossible variable %d, line %d\n",
+                var,
+                Lineno);
+        exit(1);
     }
 
-  rulebits = ~(ibset( 0, rulenum ));
+    rulebits = ~(ibset( 0, rulenum ));
 
-  if (debug_scanner )
-    fprintf(stderr, "DEBUG:\taddrule(): rulebits = 0x%0X rulenum = %d\n", 
-	    rulebits, 
-	    rulenum);
+    if (debug_scanner )
+        fprintf(stderr, "DEBUG:\taddrule(): rulebits = 0x%0X rulenum = %d\n",
+                rulebits,
+                rulenum);
 
-  switch ( op )
+    switch ( op )
     {
     case OP_LT:
-      for ( i = num; i <= 9; i = i + 1 )
-	trstrat[var][i] &= rulebits;
-      break;
+        for ( i = num; i <= 9; i = i + 1 )
+            trstrat[var][i] &= rulebits;
+        break;
     case OP_LE:
-      for ( i = num + 1; i <= 9; i = i + 1 )
-	trstrat[var][i] &= rulebits;
-      break;
+        for ( i = num + 1; i <= 9; i = i + 1 )
+            trstrat[var][i] &= rulebits;
+        break;
     case OP_GT:
-      for ( i = 0; i <= num; i = i + 1 )
-	trstrat[var][i] &= rulebits;
-      break;
+        for ( i = 0; i <= num; i = i + 1 )
+            trstrat[var][i] &= rulebits;
+        break;
     case OP_GE:
-      for ( i = 0; i < num; i = i + 1 )
-	trstrat[var][i] &= rulebits;
-      break;
+        for ( i = 0; i < num; i = i + 1 )
+            trstrat[var][i] &= rulebits;
+        break;
     case OP_EQ:
-      for ( i = 0; i <= 9; i = i + 1 )
-	if ( i != num )
-	  trstrat[var][i] &= rulebits;
-      break;
+        for ( i = 0; i <= 9; i = i + 1 )
+            if ( i != num )
+                trstrat[var][i] &= rulebits;
+        break;
     case OP_NE:
-      trstrat[var][num] &= rulebits;
-      break;
+        trstrat[var][num] &= rulebits;
+        break;
     default:
-      fprintf(stderr, "ERROR: addrule: impossible op %d\n", op );
-      exit(1);
+        fprintf(stderr, "ERROR: addrule: impossible op %d\n", op );
+        exit(1);
     }
-  
-  return;
+
+    return;
 
 }
 
@@ -431,27 +431,27 @@ void addrule( int var, int op, int num )
 /* invertop - invert an operator */
 int invertop( int op )
 {
-  int iop;
+    int iop;
 
-  switch ( op )
+    switch ( op )
     {
     case OP_LT:
-      iop = OP_GE;
-      break;
+        iop = OP_GE;
+        break;
     case OP_LE:
-      iop = OP_GT;
-      break;
+        iop = OP_GT;
+        break;
     case OP_GT:
-      iop = OP_LE;
-      break;
+        iop = OP_LE;
+        break;
     case OP_GE:
-      iop = OP_LT;
-      break;
+        iop = OP_LT;
+        break;
     default:
-      iop = op;
+        iop = op;
     }
 
-  return ( iop );
+    return ( iop );
 
 }
 
@@ -459,153 +459,153 @@ int invertop( int op )
 /* valstr - convert a var/op value to a string */
 void valstr( int value, char *buf )
 {
-  switch ( value )
+    switch ( value )
     {
     case VAR_RANDOM:
-      c_strcpy( "random", buf );
-      break;
+        strcpy(buf , "random") ;
+        break;
     case VAR_DNE:
-      c_strcpy( "dne", buf );
-      break;
+        strcpy(buf , "dne") ;
+        break;
     case VAR_DAMAGE:
-      c_strcpy( "damage", buf );
-      break;
+        strcpy(buf , "damage") ;
+        break;
     case VAR_INCOMING:
-      c_strcpy( "incoming", buf );
-      break;
+        strcpy(buf , "incoming") ;
+        break;
     case VAR_FUEL:
-      c_strcpy( "fuel", buf );
-      break;
+        strcpy(buf , "fuel") ;
+        break;
     case VAR_NUMTORPS:
-      c_strcpy( "numtorps", buf );
-      break;
+        strcpy(buf , "numtorps") ;
+        break;
     case VAR_SHIELDS:
-      c_strcpy( "shields", buf );
-      break;
+        strcpy(buf , "shields") ;
+        break;
     case VAR_ETEMP:
-      c_strcpy( "etemp", buf );
-      break;
+        strcpy(buf , "etemp") ;
+        break;
     case VAR_WTEMP:
-      c_strcpy( "wtemp", buf );
-      break;
+        strcpy(buf , "wtemp") ;
+        break;
     case VAR_PHASERDAM:
-      c_strcpy( "phaserdam", buf );
-      break;
+        strcpy(buf , "phaserdam") ;
+        break;
     case VAR_TORPDAM:
-      c_strcpy( "torpdam", buf );
-      break;
+        strcpy(buf , "torpdam") ;
+        break;
     case VAR_WARP:
-      c_strcpy( "warp", buf );
-      break;
+        strcpy(buf , "warp") ;
+        break;
     case VAR_SHUP:
-      c_strcpy( "shup", buf );
-      break;
+        strcpy(buf , "shup") ;
+        break;
     case VAR_WALLOC:
-      c_strcpy( "walloc", buf );
-      break;
+        strcpy(buf , "walloc") ;
+        break;
     case VAR_ORBITING:
-      c_strcpy( "orbiting", buf );
-      break;
+        strcpy(buf , "orbiting") ;
+        break;
     case VAR_REPAIRING:
-      c_strcpy( "repairing", buf );
-      break;
+        strcpy(buf , "repairing") ;
+        break;
     case VAR_CLOAKED:
-      c_strcpy( "cloaked", buf );
-      break;
+        strcpy(buf , "cloaked") ;
+        break;
     case VAR_ENEMYCLOAKED:
-      c_strcpy( "enemycloaked", buf );
-      break;
+        strcpy(buf , "enemycloaked") ;
+        break;
     case VAR_ENEMYDAMAGE:
-      c_strcpy( "enemydamage", buf );
-      break;
+        strcpy(buf , "enemydamage") ;
+        break;
     case VAR_CANREAD:
-      c_strcpy( "canread", buf );
-      break;
+        strcpy(buf , "canread") ;
+        break;
     case OP_LT:
-      c_strcpy( "lt", buf );
-      break;
+        strcpy(buf , "lt") ;
+        break;
     case OP_LE:
-      c_strcpy( "le", buf );
-      break;
+        strcpy(buf , "le") ;
+        break;
     case OP_GT:
-      c_strcpy( "gt", buf );
-      break;
+        strcpy(buf , "gt") ;
+        break;
     case OP_GE:
-      c_strcpy( "ge", buf );
-      break;
+        strcpy(buf , "ge") ;
+        break;
     case OP_EQ:
-      c_strcpy( "eq", buf );
-      break;
+        strcpy(buf , "eq") ;
+        break;
     case OP_NE:
-      c_strcpy( "ne", buf );
-      break;
+        strcpy(buf , "ne") ;
+        break;
     default:
-      sprintf( buf, "OP_<%d>", value );
+        sprintf( buf, "OP_<%d>", value );
     }
-  
-  return;
+
+    return;
 
 }
 
 /* tokstr - convert a token to a string */
 void tokstr( int token, char *buf )
 {
-  switch ( token )
+    switch ( token )
     {
     case TOK_VARIABLE:
-      c_strcpy( "TOK_VARIABLE", buf );
-      break;
+        strcpy(buf , "TOK_VARIABLE") ;
+        break;
     case TOK_OPERATOR:
-      c_strcpy( "TOK_OPERATOR", buf );
-      break;
+        strcpy(buf , "TOK_OPERATOR") ;
+        break;
     case TOK_NUMBER:
-      c_strcpy( "TOK_NUMBER", buf );
-      break;
+        strcpy(buf , "TOK_NUMBER") ;
+        break;
     case TOK_TERMINATOR:
-      c_strcpy( "TOK_TERMINATOR", buf );
-      break;
+        strcpy(buf , "TOK_TERMINATOR") ;
+        break;
     case TOK_ACTION:
-      c_strcpy( "TOK_ACTION", buf );
-      break;
+        strcpy(buf , "TOK_ACTION") ;
+        break;
     case TOK_AND:
-      c_strcpy( "TOK_AND", buf );
-      break;
+        strcpy(buf , "TOK_AND") ;
+        break;
     case TOK_NOT:
-      c_strcpy( "TOK_NOT", buf );
-      break;
+        strcpy(buf , "TOK_NOT") ;
+        break;
     default:
-      sprintf( buf, "TOK_<%d>", token );
+        sprintf( buf, "TOK_<%d>", token );
     }
 
-  return;
+    return;
 
 }
 
 /* ibset - set a bit for world peace */
 unsigned int ibset(int start, int end)
 {
-  register unsigned int retbits;
+    unsigned int retbits;
 
-  retbits = (start | (1 << end));
+    retbits = (start | (1 << end));
 
-  if (debug_scanner)
-    fprintf(stderr, "#### IBSET() start = %d, end = %d, retbits = 0x%08X Dec(%d)\n", 
-	    start, end, retbits, (int)retbits);
+    if (debug_scanner)
+        fprintf(stderr, "#### IBSET() start = %d, end = %d, retbits = 0x%08X Dec(%d)\n",
+                start, end, retbits, (int)retbits);
 
-  return(retbits);
+    return(retbits);
 
 }
 
 /* print_usage - print usage. Duh. */
 void print_usage()
 {
-  fprintf(stderr, "Usage: conqstrat [-vdU] [ -o file] < conqrule\n");
-  fprintf(stderr, "\t-v            be verbose about everything.\n");
-  fprintf(stderr, "\t-d            turns on *lots* of debugging.\n");
-  fprintf(stderr, "\t-U            update the common block directly.\n");
-  fprintf(stderr, "\t-o file       send generated header file to <file>\n");
-  fprintf(stderr, "\t              (typically conqdata.h). stdout is the default.\n\n");
-  fprintf(stderr, "\t  The default is to read from stdin. conqrule is a file\n");
-  fprintf(stderr, "\t  containing rules for robot strategy.\n\n");
+    fprintf(stderr, "Usage: conqstrat [-vdU] [ -o file] < conqrule\n");
+    fprintf(stderr, "\t-v            be verbose about everything.\n");
+    fprintf(stderr, "\t-d            turns on *lots* of debugging.\n");
+    fprintf(stderr, "\t-U            update the common block directly.\n");
+    fprintf(stderr, "\t-o file       send generated header file to <file>\n");
+    fprintf(stderr, "\t              (typically conqdata.h). stdout is the default.\n\n");
+    fprintf(stderr, "\t  The default is to read from stdin. conqrule is a file\n");
+    fprintf(stderr, "\t  containing rules for robot strategy.\n\n");
 
 }
