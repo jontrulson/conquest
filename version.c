@@ -6,7 +6,7 @@
  * Copyright Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
  ***********************************************************************/
 
-const char *ConquestVersion = "Version 8.5.1a";
-const char *ConquestDate = "10/23/2010";
+const char *ConquestVersion = "Version 8.5.1b";
+const char *ConquestDate = "05/28/2017";
 
 /* That's it! */
