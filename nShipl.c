@@ -150,7 +150,7 @@ static int nShiplDisplay(dspConfig_t *dsp)
             if ( doall && status != SS_LIVE )
             {
                 cbuf[0] = 0;
-                utAppendShipStatus( status, cbuf );
+                utAppendShipStatus(cbuf , status) ;
 
                 cprintf(lin, col - 2 - strlen( cbuf ),
                         ALIGN_NONE, "#%d#%s", YellowLevelColor, cbuf);

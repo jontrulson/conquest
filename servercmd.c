@@ -211,7 +211,7 @@ static void Murder(int from, char *what)
         else if ( Ships[snum].status != SS_LIVE )
         {
             ssbuf[0] = 0;
-            utAppendShipStatus( Ships[snum].status, ssbuf);
+            utAppendShipStatus(ssbuf, Ships[snum].status) ;
             sprintf(mbuf, cant_kill_ship_str,
                     Teams[Ships[snum].team].teamchar,
                     snum,

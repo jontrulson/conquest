@@ -333,7 +333,7 @@ static void _infoship( int snum, int scanner )
 
     if ( godlike )
     {
-        utAppendShipStatus( status, cbuf );
+        utAppendShipStatus(cbuf , status) ;
         utAppendChar(cbuf , '.');
     }
     else

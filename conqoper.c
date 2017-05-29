@@ -495,7 +495,7 @@ void debugdisplay( int snum )
     dcol = tcol + 12;
     cprintf(lin,tcol,ALIGN_NONE,"#%d#%s",LabelColor, "   sstatus:");
     buf[0] = 0;
-    utAppendShipStatus( Ships[snum].status, buf );
+    utAppendShipStatus(buf , Ships[snum].status) ;
     cprintf(lin,dcol,ALIGN_NONE,"#%d#%s",InfoColor, buf);
     lin++;
     cprintf(lin,tcol,ALIGN_NONE,"#%d#%s",LabelColor, " skilledby:");
@@ -901,7 +901,7 @@ void kiss(int snum, int prompt_flg)
         else if ( Ships[snum].status != SS_LIVE ) {
             cdclrl( MSG_LIN1, 1 );
             ssbuf[0] = 0;
-            utAppendShipStatus( Ships[snum].status, ssbuf);
+            utAppendShipStatus(ssbuf, Ships[snum].status) ;
             sprintf(mbuf, cant_kill_ship_str,
                     Teams[Ships[snum].team].teamchar,
                     snum,

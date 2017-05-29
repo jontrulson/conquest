@@ -162,8 +162,8 @@ void utAppendShip( int snum, char *str )
 /*  SYNOPSIS */
 /*    int status */
 /*    char buf() */
-/*    utAppendShipStatus( status, buf ) */
-void utAppendShipStatus( int status, char *buf )
+/*    utAppendShipStatus(buf , status)  */
+void utAppendShipStatus(char *buf , int status) 
 {
     switch ( status )
     {

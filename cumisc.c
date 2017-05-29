@@ -674,7 +674,7 @@ void mcuInfoShip( int snum, int scanner )
 
     if ( godlike )
     {
-        utAppendShipStatus( status, cbuf );
+        utAppendShipStatus(cbuf , status) ;
         utAppendChar(cbuf , '.') ;
     }
     else
@@ -799,7 +799,7 @@ void mcuInfoShip( int snum, int scanner )
             strcat(cbuf,  ", ");
         strcat(cbuf , "shields ") ;
         if ( SSHUP(snum) && ! SREPAIR(snum) )
-            utAppendInt( round( Ships[snum].shields ), cbuf );
+            utAppendInt(cbuf, round( Ships[snum].shields ));
         else
             strcat(cbuf , "DOWN") ;
         i = round( Ships[snum].damage );
@@ -1242,7 +1242,7 @@ void mcuPlayList( int godlike, int doall, int snum )
                 if ( doall && status != SS_LIVE )
 		{
                     cbuf[0] = 0;
-                    utAppendShipStatus( status, cbuf );
+                    utAppendShipStatus(cbuf , status) ;
 
                     uiPutColor(YellowLevelColor);
                     cdputs( cbuf, lin, col - 2 - strlen( cbuf ) );

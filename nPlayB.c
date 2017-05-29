@@ -104,7 +104,7 @@ static void set_header(int snum)
     ssbuf[0] = 0;
 
     strcat(ssbuf, ", ");
-    utAppendShipStatus( Ships[snum].status, ssbuf);
+    utAppendShipStatus(ssbuf, Ships[snum].status) ;
 
     if ( ConqInfo->closed)
     {
