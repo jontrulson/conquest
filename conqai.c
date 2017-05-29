@@ -285,7 +285,7 @@ void defend( int attacker, int pnum )
 static void displayai( int snum, int token, int vars[] )
 {
     int i;
-    char buf[MAXLINE];
+    char buf[BUFFER_SIZE_128];
 
     printf( "displayai: %2d ", snum );
     for ( i = 0; i < MAX_VAR; i = i + 1 )
@@ -344,7 +344,7 @@ static void executeai( int snum, int token )
     }
 
     int i, j;
-    char buf[MAXLINE];
+    char buf[BUFFER_SIZE_128];
 
     /* Update ship action. */
     Ships[snum].action = token;

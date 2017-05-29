@@ -255,7 +255,7 @@ void dumprun(void)
 void displayrun(FILE *filefd)
 {
     int i, j;
-    char buf[MAXLINE];
+    char buf[BUFFER_SIZE_128];
     char *strat="trstrat";
     char *vec="trvec";
 
@@ -311,7 +311,7 @@ void displayrun(FILE *filefd)
 void dumprule( int action )
 {
     int i, j, tbits;
-    char buf[MAXLINE];
+    char buf[BUFFER_SIZE_128];
 
     /* Store action. */
     trvec[rulenum] = action;

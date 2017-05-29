@@ -1407,7 +1407,7 @@ static int str2team(char *str)
 /* this includes soundconf, effects, and music */
 void dumpSoundDataHdr(void)
 {
-    char buf[MAXLINE];
+    char buf[BUFFER_SIZE_128];
     int i;
 
 
@@ -1491,7 +1491,7 @@ void dumpSoundDataHdr(void)
 /* Dump the parsed initdata to stdout in initdata.h format */
 void dumpInitDataHdr(void)
 {
-    char buf[MAXLINE];
+    char buf[BUFFER_SIZE_128];
     int i;
 
     /* preamble */
@@ -1594,7 +1594,7 @@ void dumpInitDataHdr(void)
 /* Dump the current universe to stdout in conqinitrc format */
 void dumpUniverse(void)
 {
-    char buf[MAXLINE];
+    char buf[BUFFER_SIZE_128];
     int i, j;
 
     map_common();
