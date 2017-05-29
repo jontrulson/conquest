@@ -23,7 +23,7 @@ CONTENTS:
 
 ### REQUIREMENTS
 
-    Hopefully Conquest's requirements aren't too arduous.  
+    Hopefully Conquest's requirements aren't too arduous.
 
     At a minimum:
 
@@ -35,6 +35,9 @@ CONTENTS:
     - flex or lex
 
     - a decent curses implementation
+
+    - automake/autoconf/autoincludes/libtool.  You will need the
+      complete autotools packages installed.
 
     For building the OpenGL client 'conquestgl', you will need:
 
@@ -50,7 +53,7 @@ CONTENTS:
       OGG Vorbis support (pretty much standard I think).
 
     - SDL_mixer library and header files
-      ( http://www.libsdl.org/projects/SDL_mixer/ ).  
+      ( http://www.libsdl.org/projects/SDL_mixer/ ).
 
 
 ### QUICKSTART GUIDE
@@ -62,33 +65,36 @@ CONTENTS:
       Windows, see README.cygwin for further information and ignore
       the 'groupadd' commands listed below.)
 
-      # groupadd conquest
+      $ sudo groupadd conquest
       $ tar xzvf conquest-x.y.src.tar.gz
       $ cd conquest-x.y
+      $ sh ./autogen
       $ ./configure
       $ make
-      $ make install
+      $ sudo make install
 
     - to play on your own local server
 
       - Init everything
 
-        $ conqoper -C
-        $ conqoper -Ie -E
+        $ sudo conqoper -C
+        $ sudo conqoper -Ie -E
 
-        $ conqoper
+        $ sudo conqoper
 
           - this runs conqoper in interactive mode.  Go into the
             Options menu and set any flags you want enabled for your
             server.
 
-      - startup a server    
+      - startup a server
 
         $ conquestd -d
 
       - play
 
         $ conquest
+        or, for the GL/sound client:
+        $ conquestgl
 
     - to play on a remote server
 
@@ -118,7 +124,7 @@ CONTENTS:
 
 ### BUILDING
 
-    To build conquest, unpack the src archive.  
+    To build conquest, unpack the src archive.
 
     Create the 'conquest' group.  In Linux this can be done with
     (as root) 'groupadd conquest'.  Don't bother doing this on Cygwin
@@ -134,14 +140,14 @@ CONTENTS:
 
 	Theoretically, all you will need to do is:
 
-	$ ./configure 
+	$ sh ./autogen
+	$ ./configure
 	$ make
 
 	(note: you will not be able to execute many of the binaries
                until you do a make install, then run the installed
                binary)
-	$ su
-	# make install
+	$ sudo make install
 
     Options to configure:
 
@@ -191,7 +197,7 @@ CONTENTS:
     See the README file for more information.
 
     See the SERVER.DOC file for information on running a Conquest
-    server. 
+    server.
 
     Read the conquest.doc and the HISTORY files to get info on
     what conquest is and how to play it.
@@ -201,23 +207,8 @@ CONTENTS:
 
   Building under MAC OSX is similiar to the standard unix method
   described above, however, you will likely need to get (or build)
-  SDL, SDL_mixer with OGG Vorbis support.  GLUT seems to be included
+  SDL and SDL_mixer with OGG Vorbis support.  GLUT seems to be included
   by default.
-
-  In addition, after checking out the source code repo, or unpacking
-  the src tarball, you will most likely need to run:
-
-  $ autoreconf -fvi
-
-  before attempting a ./configure and a make.  There is some issue
-  with the autoconf macros supplied with Conquest that are not
-  compatible with the MAC OS X installation.  As I do not have such a
-  system, I cannot explore the issue in detail.  
-
-  But, the 'autoreconf' command above does seem to resolve it, and
-  afterward, the method of compiling is the same as a standard unix
-  build. 
-
 
 # Under Windows with MinGW
 
@@ -229,15 +220,15 @@ CONTENTS:
 
   See the MINGW_BUILD.sh file that I use to compile it on my linux
   system - you would most likely need to tweak it for your own
-  environment. 
+  environment.
 
   Mote, a Windows build only compiles the code neccessary to build the
   OpenGL client (conquestgl).  None of the other binaries are
-  compiled. 
+  compiled.
 
   If you want to run your own conquest server, or other conquest
   binaries and utilities, you will either need to compile and run them
-  under the Cygwin environment, or under a unix/linux host.
+  under the Cygwin environment, or under a unix/linux host or VM.
 
   I would not advise attempting to use the OpenGL client (conquestgl)
   under Cygwin as there will be no hardware acceleration, and you
@@ -246,70 +237,4 @@ CONTENTS:
   See README.cygwin for information on compiling/using conquest under
   the cygwin environment.
 
-### OTHER USEFUL INFORMATION
-
-# GENERAL TERMINAL NOTE: 
-
-        Conquest depends on a properly configured terminfo entry for
-your terminal in order to make use of Fkey's, the arrow keys, the
-keypad, and color.  The standard at386 terminfo entry on Unixware for
-example, does not define the SHIFT-Fkeys, nor the Keypad keys
-(upperright, lowerleft, etc).  Some modification to your terminfo
-entry may be required to use these extended features.
-
-# TERMINFO ENTRIES
-
-[ Edit 3/3/2010: While these entries are still available in the source
-  code repository, they are no longer shipped in the Conquest source
-  distribution anymore, as I seriously doubt anyone uses or needs them
-  anymore. ]
-
-	I recieved permission from SCO to supply my modified terminfo
-entries for Unixware.  Thanks SCO!  The modified entries are located
-in the ti/ subdirectory of the source distribution along with some
-other entries I've used over the years, and are never installed by the
-install process.  If you wish to use these entries, you will have to
-compile them yourself as root like this:
-
-# tic filename
-
-Here are the ones supplied:
-
-	at386.ti - a replacement for the unixware at386 console
-entry.  This is completely compatible with the default version, but
-adds support for SHIFT-F1 thru F12, and proper entries for the
-keypad. 
-
-	xterm-acs - a replacement for the unixware xterm-acs entry
-that adds support for the keypad (No Shift-Fkeys are possible without
-xmodmap tweaking though).
-
-	linux-cq.ti - linux console replacement, fixing (actually
-working around) some problems described above.  This entry is the same
-as the original 'linux' entry, but ACS, ich/ich1, dch/dch1, il/il1,
-and dl/dl1 capabilities have been removed.
-
-	mskerm.ti - for DOS MS-Kermit
-
-	mskerm-c.ti - for DOS MS-Kermit, adds color
-
-	vt100-c - vt100 entry with color cap added, This will work
-with most PC based vt100 emulations (like telix), though the keypad
-and function keys may not work... There are just no real standard
-definitions for these, since the original vt100 didn't support
-function keys, or a keypad like the standard PC-AT keyboard.
-
-## CONQUEST GROUP
-
-	Some of Conquest's binaries (notably conquestd, conqdriv, and
-conqoper) do have to run setgid to 'conquest' to prevent
-unscrupulous tampering/cheating.
-
-        The Conquest clients do not require any special privileges.
-
-	If you're using the source package, you'll need to be sure to
-create the conquest group before building.
-
-
-$Id$
 

@@ -16,7 +16,7 @@
   specific issues.
 
   See README.cygwin for information on building/using conquest on MS
-  Windows systems. 
+  Windows systems.
 
   See SERVER.TXT for information on how to setup and run a Conquest
   server.
@@ -43,7 +43,7 @@
 
    ### Conquest Synopsis
    ### A Little Background
-   ### General Information 
+   ### General Information
        ## Starting Conquest
        ## Default network ports
        ## Server game flags
@@ -116,7 +116,7 @@
    Here's an extract from the conquest.doc file:
 
           NAME
-               Conquest  -  a multi-player real-time screen-oriented 
+               Conquest  -  a multi-player real-time screen-oriented
                space war game
 
           SYNOPSIS
@@ -146,7 +146,7 @@
 
 ### A Little Background
 
-    A quote from Michael Erskine: 
+    A quote from Michael Erskine:
 
       "We were playing xtrek before there was X...  It was known then
       as Conquest, was written in RATFOR and ran on a VAX...
@@ -177,7 +177,7 @@
     conquestd server to play.
 
     Starting with Version 8.0.1a, a GLUT based OpenGL client,
-    conquestgl, is provided.  
+    conquestgl, is provided.
 
 
 ### General Information
@@ -185,7 +185,7 @@
 ## Starting Conquest
 
    Starting with Conquest 8.0.1a, there are two conquest clients you
-   can use to connect to a game: 
+   can use to connect to a game:
 
    conquestgl                 - the new GLUT/OpenGL client
    conquest                   - original curses based client
@@ -203,7 +203,7 @@
        $ conquestgl
 
        or
-      
+
        $ conquestgl -s localhost
 
    To connect to a conquest server on a remote host:
@@ -230,12 +230,12 @@
 
    This is the list of default network ports Conquest uses:
 
-   1700/udp    - metaserver update port 
+   1700/udp    - metaserver update port
 
                  conquestd sends updates to conqmetad on this port
                  (when run with '-m')
 
-   1700/tcp    - metaserver query port 
+   1700/tcp    - metaserver query port
 
                  When you (or a conquest client) connects to this port
                  on the metaserver host (default:
@@ -244,7 +244,7 @@
 
    1701/tcp    - default game server port
 
-                 conquestd listens on this port for client 
+                 conquestd listens on this port for client
                  connections.
 
    1701/udp    - default game server port for UDP location data
@@ -261,7 +261,7 @@
 
 
    You can use the '-p <portnum>' option to conquestd to have the game
-   run on a different port other than the default of 1701. 
+   run on a different port other than the default of 1701.
 
 ## Server game flags
 
@@ -301,7 +301,7 @@
                                received several emails about it when I
                                inadvertently fixed it in a later
                                version without understanding it's
-                               true significance. 
+                               true significance.
 
                                If you don't know what it does,
                                well... figure it out!  You'll need a
@@ -309,7 +309,7 @@
 
           NoDoomsday         - when set, the doomsday machine is
                                prevented from randomly starting up and
-                               trashing the universe. 
+                               trashing the universe.
 
           Killbots           - when this option is enabled, robots are
                                created with a random kill point
@@ -337,7 +337,7 @@
 ## Meta Server
 
    With Conquest v8.0, a meta server is supported.  There is one
-   running at conquest.radscan.com.  
+   running at conquest.radscan.com.
 
    If you want to see what servers are available, run conquest with
    the '-m' option:
@@ -401,7 +401,7 @@
    play back a recording I make on a lintel machine and vice-versa.
 
    There are two types of recordings possible in Conquest: Server and
-   Client.  
+   Client.
 
    Client recordings are created when a user runs conquest with the '-r
    <recfile>' option, for example:
@@ -416,13 +416,13 @@
 
      server recording files will be saved in:
 
-     INSTALL_PREFIX/var/conquest-rec-<timestamp>.cqr 
+     INSTALL_PREFIX/var/conquest-rec-<timestamp>.cqr
 
      To turn off server recording, send the following to GOD from
      within the game:
 
      /recoff
-    
+
    Aside from how the different recording types are made, the main
    difference between the two are:
 
@@ -457,7 +457,7 @@
        Server recordings are complete (like the old recordings made in
        previous versions of conquest), since the server has full
        access to the common block.
-             
+
        All active ship/planet/etc data is stored in server recordings.
        You can watch any ship during playack with a server recording
        and get all info on the ship (heading, fuel, temps, etc).
@@ -488,7 +488,7 @@
    replay previously recorded games.
 
    This is a much nicer way to save and playback games than using
-   something like script, or Xterm logging.  
+   something like script, or Xterm logging.
 
    The replay allows you to speed up or slowdown the playback, as well
    as giving you the ability to jump forward and backward in a
@@ -504,7 +504,7 @@
    to try one out.
 
    See the section '## Recording Games' for more information.
-   
+
    NOTES:
 
    - Only the messages sent to the player that made the recording are
@@ -585,7 +585,7 @@
     planet, torps, or a Sun, etc.
 
     Don't run around the universe with your shields up all the time.
-    You are just wasting fuel and heat.  
+    You are just wasting fuel and heat.
 
     On the other hand, when an enemy gets close, don't forget to raise
     them :)
@@ -651,7 +651,7 @@
   'take' it.  To take a planet, you must go and get some of your
   team's armies and beam them down.  You will need at least 4.  3 for
   killing the remaining 3 enemy armies, and 1 to claim the planet as
-  your own.  
+  your own.
 
   While bombing, break off and repair when your damage gets around
   50-70%.  As you get more experienced, you can push the line a bit.
@@ -699,7 +699,7 @@
   using (R).  You will repair even faster.
 
   You will also cool down much faster when in orbit about a friendly
-  planet. 
+  planet.
 
 # Cloaking
 
@@ -754,7 +754,7 @@
 
   It is better to detonate torps before they hit you, to limit damage.
   If it is possible for you to simply move out of the way of oncoming
-  torps, then doing so is more efficient than detting them.  
+  torps, then doing so is more efficient than detting them.
 
   If you can move out of the way rather than det them, the enemy ship
   will have wasted fuel and heat firing them, and will then also have
@@ -792,7 +792,7 @@
   effect, and you will just waste fuel and heat using them.
 
   They are *very* effective close up though, so don't abandon them in
-  favor of using torps only.  
+  favor of using torps only.
 
   With the 8.1.2f OpenGL client, you can click the left mouse button
   (by default) in the viewer to fire the phasers in that direction.
@@ -807,7 +807,7 @@
   You get kills by bombing planets, and blowing up enemy ships.
 
   The number of kills you have will affect your ship in the following
-  ways: 
+  ways:
 
   - The more kills you have, the more efficient your weapons and
     engines will be, in terms of fuel consumption and heating.
@@ -836,7 +836,7 @@
   you and come after you.
 
   This is especially good advice if you are not good at fighting
-  robots :)  Avoid them if you can.  
+  robots :)  Avoid them if you can.
 
 ## Planets
 
@@ -898,7 +898,7 @@
 
    The number of kills your ship has will determine how much more
    efficient your weapons and engines are than the base efficiency you
-   started out with.  
+   started out with.
 
    When your kills count reaches DOUBLE_E_KILLS (currently 40), your
    efficiency will be double what you started out with.  It's very
@@ -918,7 +918,7 @@
    Basically, when you enter the game, and join a team, your ship is
    the same type of ship (in terms of weapons and engine performance)
    that is the default for your team - like all previous versions of
-   Conquest.  
+   Conquest.
 
    With Refit capability, once you have at least one kill, and are
    orbiting a team owned planet, you can use the 'r', refit option to
@@ -982,17 +982,17 @@
    player.  With a robot, in time you learn it's strategy, and
    compensate for it.  After you've done it a few hundred times,
    robots aren't too much of a challenge, ...if you don't do anything
-   brave and stupid :-).  
+   brave and stupid :-).
 
    People on the other hand, tend to adapt to your strategies, forcing
-   you to come up with new ones.  
+   you to come up with new ones.
 
    There are various strategies that can be employed effectively
    against your opponent.  A common one we used to use, is the
    'lame-duck maneuver'.  If you take alot of damage, though you have
    plenty of fuel and your weapons are cool, sometimes you can trick an
    enemy into thinking your really hurting... by limping away at warp
-   2 with your shields down for example.  
+   2 with your shields down for example.
 
    He'll do an info on you and see your damaged, or he might think
    you're out of fuel, and therefore, an easy kill.  Sometimes you can
@@ -1029,7 +1029,7 @@
        macro_f1=dP\r
 
        Which makes my F1 key detonate enemy torps (d), and fire a
-       spread of 3 torps in the last direction I fired (P\r).  
+       spread of 3 torps in the last direction I fired (P\r).
 
    The mouse only works when playing the game (in the Cockpit) and the
    cursor is within the viewer window in the GL client.
@@ -1131,7 +1131,7 @@
    servers.
 
 
-## Using conqoper 
+## Using conqoper
 
 # The semaphore status line
 
@@ -1181,15 +1181,15 @@
 ## bin/conquest
 
    The Conquest curses client. type 'conquest -?' to see a list of
-   options.  
+   options.
 
    The curses client can also be used to replay conquest recording
    (.cqr) files using the '-P' option to conquest.
 
 ## bin/conquestgl
 
-   This is the OpenGL version of the conquest client. Type 'conquestgl -?' 
-   to see a list of options.  
+   This is the OpenGL version of the conquest client. Type 'conquestgl -?'
+   to see a list of options.
 
    The OpenGL client can also be used to replay conquest recording
    (.cqr) files using the '-P' option to conquestgl.
@@ -1253,8 +1253,8 @@
 
    If you want to allow specific players to be able to issue certain
    operator commands from within the game, (e)dit them in conqoper and
-   set the 'Conquest Operator' flag.  
-   
+   set the 'Conquest Operator' flag.
+
    Conqoper currently supports the following options, (type conqoper
    -?  to see the various options):
 
@@ -1396,7 +1396,7 @@
 
                  C O N Q U E S T   (VAX/VMS Ratfor)
 
-     Copyright (C)1983-1986 by Jef Poskanzer and Craig Leres 
+     Copyright (C)1983-1986 by Jef Poskanzer and Craig Leres
 
      Permission to use, copy, modify, and distribute this software and
      its documentation for any purpose and without fee is hereby
@@ -1415,5 +1415,3 @@
      the ARTISTIC LICENSE (see the LICENSE file) for Conquest.
 
 $Id$
-
-
