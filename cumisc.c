@@ -511,7 +511,7 @@ void mcuInfoPlanet( char *str, int pnum, int snum )
 	    {
                 if ( junk[0] != 0 )
                     strcat(junk, ", ");
-                utAppendInt( j, junk );
+                utAppendInt(junk , j) ;
                 strcat(junk , " minutes until coup time") ;
 	    }
 	}

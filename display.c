@@ -911,12 +911,12 @@ void display( int snum )
             if ( i == 0 )
                 strcat(buf , "**") ;
             else
-                utAppendInt( i, buf );
+                utAppendInt(buf , i) ;
             utAppendChar(buf , '/') ;
             if ( j == 0 )
                 strcat(buf , "**") ;
             else
-                utAppendInt( j, buf );
+                utAppendInt(buf , j) ;
             uiPutColor(InfoColor);
             cdputs( buf, lin, datacol );
             uiPutColor(0);

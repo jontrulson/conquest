@@ -206,7 +206,7 @@ static int nPlayDisplay(dspConfig_t *dsp)
             i = i + 1;
             strcpy(cbuf , "You are only allowed to fly ") ;
             j = Users[Context.unum].multiple;
-            utAppendInt( j, cbuf );
+            utAppendInt(cbuf , j) ;
             strcat(cbuf , " ship") ;
             if ( j != 1 )
                 utAppendChar(cbuf , 's') ;

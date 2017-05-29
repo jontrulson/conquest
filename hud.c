@@ -330,14 +330,14 @@ void hudSetAlloc(int snum)
         if ( i == 0 )
             strcat(hudData.alloc.str , "**") ;
         else
-            utAppendInt( i, hudData.alloc.str );
+            utAppendInt(hudData.alloc.str , i) ;
 
         utAppendChar(hudData.alloc.str , '/') ;
 
         if ( j == 0 )
             strcat(hudData.alloc.str , "**") ;
         else
-            utAppendInt( j, hudData.alloc.str );
+            utAppendInt(hudData.alloc.str , j) ;
 
         hudData.alloc.walloc  = i;
         hudData.alloc.ealloc  = j;

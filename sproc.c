@@ -322,13 +322,13 @@ void procDistress(cpCommand_t *cmd)
 
     i = round(Ships[snum].wtemp);
     if ( i < 100 )
-        utAppendInt( i, cbuf );
+        utAppendInt(cbuf , i) ;
     else
         strcat(cbuf , "**") ;
     utAppendChar(cbuf , '/') ;
     i = round(Ships[snum].etemp);
     if ( i < 100 )
-        utAppendInt( i, cbuf );
+        utAppendInt(cbuf , i) ;
     else
         strcat(cbuf , "**") ;
     i = Ships[snum].armies;
@@ -336,7 +336,7 @@ void procDistress(cpCommand_t *cmd)
     if ( i > 0 )
     {
         strcat(cbuf,  ", arm=");
-        utAppendInt( i, cbuf );
+        utAppendInt(cbuf , i) ;
     }
 
     if ( Ships[snum].wfuse > 0 )
@@ -1482,7 +1482,7 @@ void procBeam(cpCommand_t *cmd)
             if ( total == 0 )
                 strcat(cbuf , "no") ;
             else
-                utAppendInt( total, cbuf );
+                utAppendInt(cbuf , total) ;
             strcat(cbuf , " arm") ;
             if ( total == 1 )
 	    {
@@ -1493,7 +1493,7 @@ void procBeam(cpCommand_t *cmd)
                 strcat(cbuf , "ies") ;
 	    }
             strcat(cbuf, " transported, ");
-            utAppendInt( num - total, cbuf );
+            utAppendInt(cbuf , num - total) ;
             strcat(cbuf , " to go.") ;
             sendFeedback(cbuf);
             ototal = total;

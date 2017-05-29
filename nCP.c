@@ -458,7 +458,7 @@ static void _infoship( int snum, int scanner )
             strcat(cbuf,  ", ");
         strcat(cbuf , "shields ");
         if ( SSHUP(snum) && ! SREPAIR(snum) )
-            utAppendInt( round( Ships[snum].shields ), cbuf );
+            utAppendInt(cbuf, round( Ships[snum].shields ));
         else
             strcat(cbuf , "DOWN");
         i = round( Ships[snum].damage );
@@ -642,7 +642,7 @@ static void _infoplanet( char *str, int pnum, int snum )
 	    {
                 if ( junk[0] != 0 )
                     strcat(junk, ", ");
-                utAppendInt( j, junk );
+                utAppendInt(junk , j) ;
                 strcat(junk , " minutes until coup time");
 	    }
 	}

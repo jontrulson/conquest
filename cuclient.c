@@ -341,7 +341,7 @@ void cucSendMsg( int from, int terse, int remote )
                 else
                 {
                     utAppendChar(buf , '(') ;
-                    utAppendInt( from, buf );
+                    utAppendInt(buf , from) ;
                     utAppendChar(buf, ')');
                 }
                 if (remote)           /* remotes don't send 'from' */

@@ -68,8 +68,8 @@ real utAngle( real fromx, real fromy, real tox, real toy )
 /*  SYNOPSIS */
 /*    int int */
 /*    char str() */
-/*    utAppendInt( i, str ) */
-void utAppendInt( int i, char *str )
+/*    utAppendInt(str , i)  */
+void utAppendInt(char *str, int i) 
 {
     char buf[BUFFER_SIZE];
 
@@ -125,7 +125,7 @@ void utAppendKilledBy( int kb, char *buf )
         else if ( -kb > 0 && -kb <= NUMPLANETS )
             strcat(buf , Planets[-kb].name) ;
         else
-            utAppendInt( kb, buf );
+            utAppendInt(buf , kb) ;
         break;
     }
 
@@ -152,7 +152,7 @@ void utAppendShip( int snum, char *str )
     }
 
     utAppendChar(str , ch) ;
-    utAppendInt( snum, str );
+    utAppendInt(str , snum) ;
 
     return;
 }
@@ -186,7 +186,7 @@ void utAppendShipStatus( int status, char *buf )
         strcat(buf , "reserved") ;
         break;
     default:
-        utAppendInt( status, buf );
+        utAppendInt(buf , status) ;
         break;
     }
     return;

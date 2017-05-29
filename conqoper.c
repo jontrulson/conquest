@@ -430,7 +430,7 @@ void debugdisplay( int snum )
             utAppendChar(buf , ' ') ;
     }
     utAppendChar(buf , '(') ;
-    utAppendInt( unum, buf );
+    utAppendInt(buf , unum) ;
     utAppendChar(buf, ')');
     cprintf(lin,dcol,ALIGN_NONE,"#%d#%s",InfoColor, buf);
     lin++;
@@ -454,9 +454,9 @@ void debugdisplay( int snum )
     if ( Ships[snum].wfuse > 0 || Ships[snum].efuse > 0 )
     {
         strcat(buf , " (") ;
-        utAppendInt( Ships[snum].wfuse, buf );
+        utAppendInt(buf , Ships[snum].wfuse) ;
         utAppendChar(buf , '/') ;
-        utAppendInt( Ships[snum].efuse, buf );
+        utAppendInt(buf , Ships[snum].efuse) ;
         utAppendChar(buf, ')');
     }
     cprintf(lin,dcol,ALIGN_NONE,"#%d#%s",InfoColor, buf);
@@ -2199,7 +2199,7 @@ void oprobot(void)
         utAppendShip( snum, buf );
     else
     {
-        utAppendInt( anum, buf );
+        utAppendInt(buf , anum) ;
         strcat(buf , " new ships.") ;
     }
     cdclrl( MSG_LIN2, 1 );

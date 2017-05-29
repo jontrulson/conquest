@@ -3106,7 +3106,7 @@ int newship( int unum, int *snum )
                 i = i + 1;
                 strcpy(cbuf , "You are only allowed to fly ") ;
                 j = Users[unum].multiple;
-                utAppendInt( j, cbuf );
+                utAppendInt(cbuf , j) ;
                 strcat(cbuf , " ship") ;
                 if ( j != 1 )
                     utAppendChar(cbuf , 's') ;

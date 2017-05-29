@@ -2100,7 +2100,7 @@ void clbIntrude( int snum, int pnum )
             utToUpperCase( Doomsday->name );
             strcat(buf , atta) ;
             strcat(buf , armeq) ;
-            utAppendInt( Planets[pnum].armies, buf );
+            utAppendInt(buf , Planets[pnum].armies) ;
             clbStoreMsgf( -pnum, -Planets[pnum].team, buf, MSG_FLAGS_INTRUDER );
 	}
         else if ( Ships[snum].war[Planets[pnum].team] )
@@ -2109,7 +2109,7 @@ void clbIntrude( int snum, int pnum )
             utAppendShip( snum, buf );
             strcat(buf , atta) ;
             strcat(buf , armeq) ;
-            utAppendInt( Planets[pnum].armies, buf );
+            utAppendInt(buf , Planets[pnum].armies) ;
             clbStoreMsgf( -pnum, -Planets[pnum].team, buf, MSG_FLAGS_INTRUDER );
             defend( snum, pnum );
 	}
