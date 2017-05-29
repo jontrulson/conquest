@@ -197,7 +197,7 @@ void hudSetAlertStatus(int snum, int asnum, alertLevel_t astatus)
         }
 
         if (asnum)
-            utAppendShip(asnum, hudData.aStat.str);
+            utAppendShip(hudData.aStat.str, asnum) ;
 
         if (SCLOAKED(asnum))
             strcat(hudData.aStat.str, " (CLOAKED)");
@@ -426,12 +426,12 @@ void hudSetTow(int snum)
         else if ( i < 0 )
         {
             strcpy(hudData.tow.str, "towing ");
-            utAppendShip( -i, hudData.tow.str );
+            utAppendShip(hudData.tow.str , -i) ;
         }
         else if ( i > 0 )
         {
             strcpy(hudData.tow.str, "towed by ");
-            utAppendShip( i, hudData.tow.str );
+            utAppendShip(hudData.tow.str , i) ;
         }
 
         hudData.tow.towstat = i;
@@ -641,7 +641,7 @@ void hudSetInfoTarget(int tnum)
         if (tnum)
         {
             if (tnum > 0)
-                utAppendShip( tnum, hudData.info.lasttargetstr );
+                utAppendShip(hudData.info.lasttargetstr , tnum) ;
             else if (tnum < 0)
             {                   /* planet, just need 3 chars */
                 hudData.info.lasttargetstr[0] = Planets[-tnum].name[0];

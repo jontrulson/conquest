@@ -94,7 +94,7 @@ static int nShiplDisplay(dspConfig_t *dsp)
              ( doall && ( status != SS_OFF || kb != 0 ) ) )
         {
             sbuf[0] = 0;
-            utAppendShip( i, sbuf );
+            utAppendShip(sbuf , i) ;
             strcat(sbuf, " ") ;
             utAppendChar(sbuf, ShipTypes[Ships[i].shiptype].name[0]) ;
 

@@ -1085,7 +1085,7 @@ void dead( int snum, int leave )
         junk[0] = 0;
         if ( kb > 0 && kb <= MAXSHIPS )
 	{
-            utAppendShip( kb, cbuf );
+            utAppendShip(cbuf , kb) ;
             if ( Ships[kb].status != SS_LIVE )
                 strcat(buf, ", who also died.");
             else
@@ -1112,7 +1112,7 @@ void dead( int snum, int leave )
 	{
             /* We were unable to determine the cause of death. */
             buf[0] = 0;
-            utAppendShip( snum, buf );
+            utAppendShip(buf , snum) ;
             sprintf(cbuf, "dead: %s was killed by %d.", buf, kb);
             utError( cbuf );
             utLog(cbuf);
@@ -2625,7 +2625,7 @@ void dotow( int snum )
     if ( Ships[snum].towedby != 0 )
     {
         strcpy(cbuf , "But we are being towed by ") ;
-        utAppendShip( Ships[snum].towedby, cbuf );
+        utAppendShip(cbuf , Ships[snum].towedby) ;
         utAppendChar(cbuf , '!') ;
         mcuPutMsg( cbuf, MSG_LIN2 );
         return;
@@ -2633,7 +2633,7 @@ void dotow( int snum )
     if ( Ships[snum].towing != 0 )
     {
         strcpy(cbuf , "But we're already towing ") ;
-        utAppendShip( Ships[snum].towing, cbuf );
+        utAppendShip(cbuf , Ships[snum].towing) ;
         utAppendChar(cbuf , '.') ;
         mcuPutMsg( cbuf, MSG_LIN2 );
         return;

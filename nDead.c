@@ -152,7 +152,7 @@ static int nDeadDisplay(dspConfig_t *dsp)
         junk[0] = 0;
         if ( kb > 0 && kb <= MAXSHIPS )
 	{
-            utAppendShip( kb, cbuf );
+            utAppendShip(cbuf , kb) ;
             if ( eShip.status != SS_LIVE )
                 strcat(buf, ", who also died.");
             else
@@ -179,7 +179,7 @@ static int nDeadDisplay(dspConfig_t *dsp)
 	{
             /* We were unable to determine the cause of death. */
             buf[0] = 0;
-            utAppendShip( snum, buf );
+            utAppendShip(buf , snum) ;
             sprintf(cbuf, "dead: %s was killed by %d.", buf, kb);
             utError( cbuf );
             utLog(cbuf);

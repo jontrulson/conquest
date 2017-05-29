@@ -372,7 +372,7 @@ void debugdisplay( int snum )
     dcol = tcol + 10;
     cprintf(lin,tcol,ALIGN_NONE,"#%d#%s",LabelColor, "    ship:");
     buf[0] = 0;
-    utAppendShip( snum, buf );
+    utAppendShip(buf , snum) ;
     if ( SROBOT(snum) )
         strcat(buf, " (ROBOT)");
     cprintf( lin, dcol,ALIGN_NONE,"#%d#%s",InfoColor,buf );
@@ -524,7 +524,7 @@ void debugdisplay( int snum )
     if ( i != 0 )
     {
         buf[0] = 0;
-        utAppendShip( i, buf );
+        utAppendShip(buf , i) ;
         cprintf(lin,dcol,ALIGN_NONE,"#%d#%s",InfoColor, buf);
     }
     lin++;
@@ -533,7 +533,7 @@ void debugdisplay( int snum )
     if ( i != 0 )
     {
         buf[0] = 0;
-        utAppendShip( i, buf );
+        utAppendShip(buf , i) ;
         cprintf(lin,dcol,ALIGN_NONE,"#%d#%s",InfoColor, buf);
     }
     lin++;
@@ -1190,7 +1190,7 @@ void operate(void)
                 if ( -i > 0 && -i <= NUMPLANETS )
                     strcat(buf , Planets[-i].name) ;
                 else
-                    utAppendShip( i, buf );		/* this will handle funny numbers */
+                    utAppendShip(buf , i) ;		/* this will handle funny numbers */
                 utAppendChar(buf, ')');
 	    }
             else
@@ -2196,7 +2196,7 @@ void oprobot(void)
     sprintf( buf, "Automation %s (%s) is now flying ",
              Users[unum].alias, Users[unum].username );
     if ( anum == 1 )
-        utAppendShip( snum, buf );
+        utAppendShip(buf , snum) ;
     else
     {
         utAppendInt(buf , anum) ;

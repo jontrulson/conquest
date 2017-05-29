@@ -253,7 +253,7 @@ static void _infoship( int snum, int scanner )
     }
 
     cbuf[0] = Context.lasttarg[0] = 0;
-    utAppendShip( snum, cbuf );
+    utAppendShip(cbuf , snum) ;
     strcpy(Context.lasttarg, cbuf); /* save for hudInfo */
     hudSetInfoTarget(snum);
 
@@ -1116,7 +1116,7 @@ static int _chktow(void)
     if ( Ships[snum].towedby != 0 )
     {
         strcpy(cbuf , "But we are being towed by ") ;
-        utAppendShip( Ships[snum].towedby, cbuf );
+        utAppendShip(cbuf , Ships[snum].towedby) ;
         utAppendChar(cbuf , '!');
         cp_putmsg( cbuf, MSG_LIN2 );
         return FALSE;
@@ -1124,7 +1124,7 @@ static int _chktow(void)
     if ( Ships[snum].towing != 0 )
     {
         strcpy(cbuf , "But we're already towing ") ;
-        utAppendShip( Ships[snum].towing, cbuf );
+        utAppendShip(cbuf , Ships[snum].towing) ;
         utAppendChar(cbuf , '.');
         cp_putmsg( cbuf, MSG_LIN2 );
         return FALSE;
@@ -1277,7 +1277,7 @@ static void _domsgto(char *buf, int ch, int terse)
             prompting = FALSE;
             return;
 	}
-        utAppendShip( to, tbuf );
+        utAppendShip(tbuf , to) ;
         utAppendChar(tbuf , ':');
     }
     else if ( -to >= 0 && -to < NUMPLAYERTEAMS )

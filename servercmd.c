@@ -179,7 +179,7 @@ static void CreateRobots(int from, char *arg1, char *arg2, char *arg3)
              (warlike) ? "Warlike " : "",
              Users[unum].alias, Users[unum].username );
     if ( anum == 1 )
-        utAppendShip( snum, buf );
+        utAppendShip(buf , snum) ;
     else
     {
         utAppendInt(buf , anum) ;

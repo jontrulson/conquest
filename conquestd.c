@@ -797,13 +797,13 @@ void dead( int snum, int leave )
     if ( i > 0 )
     {
         buf[0] = 0;
-        utAppendShip( snum, buf );
+        utAppendShip(buf , snum) ;
         utLog("INFO: dead: %s, detonating torp count is %d.",
               buf, i);
     }
 
     buf[0] = 0;
-    utAppendShip( snum, buf );
+    utAppendShip(buf , snum) ;
     utLog("INFO: dead: %s was killed by %d.", buf, kb);
 
     updateClient(FALSE);

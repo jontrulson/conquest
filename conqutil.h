@@ -12,7 +12,7 @@ real     utAngle( real fromx, real fromy, real tox, real toy );
 void     utAppendInt(char *str, int i);
 void     utAppendShipStatus(char *buf, int status);
 void     utAppendTitle(char *buf, int team);
-void     utAppendShip( int snum, char *str );
+void     utAppendShip(char *str, int snum);
 void     utAppendKilledBy( int kb, char *buf );
 int      utArrowsToDir( char *str, real *dir );
 void     utSetLogConfig(int usesys, int echostderr);

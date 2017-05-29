@@ -835,7 +835,7 @@ int clbTakePlanet( int pnum, int snum )
 
     sprintf( buf, "All hail the liberating %s armies.  Thanks, ",
              Teams[Ships[snum].team].name );
-    utAppendShip( snum, buf );
+    utAppendShip(buf , snum) ;
     utAppendChar(buf , '!') ;
 
     /* Check whether the universe has been conquered. */
@@ -2106,7 +2106,7 @@ void clbIntrude( int snum, int pnum )
         else if ( Ships[snum].war[Planets[pnum].team] )
 	{
             strcpy(buf , "INTRUDER ALERT - ") ;
-            utAppendShip( snum, buf );
+            utAppendShip(buf , snum) ;
             strcat(buf , atta) ;
             strcat(buf , armeq) ;
             utAppendInt(buf , Planets[pnum].armies) ;
@@ -2292,7 +2292,7 @@ int clbFmtMsg(int to, int from, char *buf)
     /* Format who the message is from. */
     if ( from > 0 && from <= MAXSHIPS )
     {
-        utAppendShip( from, buf );
+        utAppendShip(buf , from) ;
     }
     else if ( -from > 0 && -from <= NUMPLANETS )
         strcpy(buf , Planets[-from].name) ;
@@ -2323,7 +2323,7 @@ int clbFmtMsg(int to, int from, char *buf)
 
     /* Format who the message is to. */
     if ( to > 0 && to <= MAXSHIPS )
-        utAppendShip( to, buf );
+        utAppendShip(buf , to) ;
     else if ( -to >= 0 && -to < NUMPLAYERTEAMS )
     {
         utAppendChar(buf , Teams[-to].teamchar) ;

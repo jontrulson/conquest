@@ -121,7 +121,7 @@ void utAppendKilledBy( int kb, char *buf )
         break;
     default:
         if ( kb > 0 && kb <= MAXSHIPS )
-            utAppendShip( kb, buf );
+            utAppendShip(buf , kb) ;
         else if ( -kb > 0 && -kb <= NUMPLANETS )
             strcat(buf , Planets[-kb].name) ;
         else
@@ -137,8 +137,8 @@ void utAppendKilledBy( int kb, char *buf )
 /*  SYNOPSIS */
 /*    int snum */
 /*    char str() */
-/*    utAppendShip( snum, str ) */
-void utAppendShip( int snum, char *str )
+/*    utAppendShip(str , snum)  */
+void utAppendShip(char *str , int snum) 
 {
     int i;
     char ch;

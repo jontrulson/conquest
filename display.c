@@ -679,7 +679,7 @@ void display( int snum )
 
             if ( minenemy != 0 )
 	    {
-                utAppendShip( minenemy, buf );
+                utAppendShip(buf , minenemy) ;
                 if ( SCLOAKED(minenemy) )
                     strcat(buf, " (CLOAKED)");
 	    }
@@ -1122,12 +1122,12 @@ void display( int snum )
             else if ( i < 0 )
             {
                 strcpy(buf , "towing ") ;
-                utAppendShip( -i, buf );
+                utAppendShip(buf , -i) ;
             }
             else if ( i > 0 )
             {
                 strcpy(buf , "towed by ") ;
-                utAppendShip( i, buf );
+                utAppendShip(buf , i) ;
             }
             uiPutColor(InfoColor);
             cdputs( buf, lin, col );
@@ -1274,7 +1274,7 @@ void display( int snum )
             else if ( i > 0 && i <= MAXSHIPS )
 	    {
                 buf[0] = 0;
-                utAppendShip( i, buf );
+                utAppendShip(buf , i) ;
                 uiPutColor(RedLevelColor);
                 cdputs( buf, lin, dcol );
                 uiPutColor(0);

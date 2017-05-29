@@ -269,7 +269,7 @@ void cucSendMsg( int from, int terse, int remote )
             mcuPutMsg( nf, MSG_LIN2 );
             return;
 	}
-        utAppendShip( to, buf );
+        utAppendShip(buf , to) ;
         utAppendChar(buf , ':') ;
     }
     else if ( -to >= 0 && -to < NUMPLAYERTEAMS )
@@ -334,7 +334,7 @@ void cucSendMsg( int from, int terse, int remote )
                 {
                     strcat(buf , Ships[from].alias) ;
                     strcat(buf , " on board ") ;
-                    utAppendShip( from, buf );
+                    utAppendShip(buf , from) ;
                 }
                 else if ( from == MSG_GOD )
                     strcat(buf , "GOD") ;

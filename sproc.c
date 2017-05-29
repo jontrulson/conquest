@@ -881,7 +881,7 @@ void procTow(cpCommand_t *cmd)
     if ( Ships[snum].towedby != 0 )
     {
         strcpy(cbuf , "But we are being towed by ") ;
-        utAppendShip( Ships[snum].towedby, cbuf );
+        utAppendShip(cbuf , Ships[snum].towedby) ;
         utAppendChar(cbuf , '!') ;
         sendFeedback(cbuf);
         return;
@@ -889,7 +889,7 @@ void procTow(cpCommand_t *cmd)
     if ( Ships[snum].towing != 0 )
     {
         strcpy(cbuf , "But we're already towing ") ;
-        utAppendShip( Ships[snum].towing, cbuf );
+        utAppendShip(cbuf , Ships[snum].towing) ;
         utAppendChar(cbuf , '.') ;
         sendFeedback(cbuf);
         return;
@@ -967,7 +967,7 @@ void procUnTow(cpCommand_t *cmd)
         else
 	{
             strcpy(cbuf , "Breaking free from ship ") ;
-            utAppendShip( Ships[snum].towedby, cbuf );
+            utAppendShip(cbuf , Ships[snum].towedby) ;
             PVLOCK(&ConqInfo->lockword);
             if ( Ships[snum].towedby != 0 )
 	    {
@@ -997,7 +997,7 @@ void procUnTow(cpCommand_t *cmd)
     else if ( Ships[snum].towing != 0 )
     {
         strcpy(cbuf , "Tow released from ship ") ;
-        utAppendShip( Ships[snum].towing, cbuf );
+        utAppendShip(cbuf , Ships[snum].towing) ;
         PVLOCK(&ConqInfo->lockword);
         if ( Ships[snum].towing != 0 )
 	{
