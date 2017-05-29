@@ -67,7 +67,7 @@ static int nShiplDisplay(dspConfig_t *dsp)
     char ubuf[MAXUSERNAME + 2];
     int color;
 
-    c_strcpy( hd2, cbuf );
+    strcpy(cbuf , hd2) ;
 
     col = (int)(Context.maxcol - strlen( cbuf )) / (int)2;
     lin = 2;

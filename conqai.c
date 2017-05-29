@@ -771,7 +771,7 @@ void robreply( char buf[] )
         "I Scream the Body Electric."
     };
 
-    c_strcpy(robreplies[rndint(0, NUMRREPLIES - 1)], buf);
+    strcpy(buf, robreplies[rndint(0, NUMRREPLIES - 1)]);
 
     /* "Something seems to have happened to the life-support system, Dave." */
     /* "Hello, Dave. Have you found the trouble?" */
@@ -806,76 +806,76 @@ void robstr( int token, char buf[] )
     switch ( token )
     {
     case ROB_NOOP:
-        c_strcpy( "NOOP", buf );
+        strcpy(buf , "NOOP") ;
         break;
     case ROB_GOHOME:
-        c_strcpy( "GOHOME", buf );
+        strcpy(buf , "GOHOME") ;
         break;
     case ROB_GOREPAIR:
-        c_strcpy( "GOREPAIR", buf );
+        strcpy(buf , "GOREPAIR") ;
         break;
     case ROB_ALLOCATE:
-        c_strcpy( "ALLOCATE", buf );
+        strcpy(buf , "ALLOCATE") ;
         break;
     case ROB_DETONATE:
-        c_strcpy( "DETONATE", buf );
+        strcpy(buf , "DETONATE") ;
         break;
     case ROB_MYDETONATE:
-        c_strcpy( "MYDETONAT", buf );
+        strcpy(buf , "MYDETONAT") ;
         break;
     case ROB_PHASER:
-        c_strcpy( "PHASER", buf );
+        strcpy(buf , "PHASER") ;
         break;
     case ROB_TORPEDO:
-        c_strcpy( "TORPEDO", buf );
+        strcpy(buf , "TORPEDO") ;
         break;
     case ROB_BURST:
-        c_strcpy( "BURST", buf );
+        strcpy(buf , "BURST") ;
         break;
     case ROB_SHIELD:
-        c_strcpy( "SHIELD", buf );
+        strcpy(buf , "SHIELD") ;
         break;
     case ROB_UNTRACTOR:
-        c_strcpy( "UNTRACTOR", buf );
+        strcpy(buf , "UNTRACTOR") ;
         break;
     case ROB_WARP_0:
-        c_strcpy( "WARP_0", buf );
+        strcpy(buf , "WARP_0") ;
         break;
     case ROB_WARP_2:
-        c_strcpy( "WARP_2", buf );
+        strcpy(buf , "WARP_2") ;
         break;
     case ROB_WARP_5:
-        c_strcpy( "WARP_5", buf );
+        strcpy(buf , "WARP_5") ;
         break;
     case ROB_WARP_8:
-        c_strcpy( "WARP_8", buf );
+        strcpy(buf , "WARP_8") ;
         break;
     case ROB_TRACK:
-        c_strcpy( "TRACK", buf );
+        strcpy(buf , "TRACK") ;
         break;
     case ROB_SILENT:
-        c_strcpy( "SILENT", buf );
+        strcpy(buf , "SILENT") ;
         break;
     case ROB_MESSAGE:
-        c_strcpy( "MESSAGE", buf );
+        strcpy(buf , "MESSAGE") ;
         break;
     case ROB_TAKEDRUGS:
-        c_strcpy( "TAKEDRUGS", buf );
+        strcpy(buf , "TAKEDRUGS") ;
         break;
     case ROB_REPAIR:
-        c_strcpy( "REPAIR", buf );
+        strcpy(buf , "REPAIR") ;
         break;
     case ROB_READMSG:
-        c_strcpy( "READMSG", buf );
+        strcpy(buf , "READMSG") ;
         break;
     case ROB_INSULT:
-        c_strcpy( "INSULT", buf );
+        strcpy(buf , "INSULT") ;
         break;
     case ROB_GOFUEL:
-        c_strcpy( "GOFUEL", buf );
+        strcpy(buf , "GOFUEL") ;
         break;
     case ROB_RUNAWAY:
-        c_strcpy( "RUNAWAY", buf );
+        strcpy(buf , "RUNAWAY") ;
         break;
     default:
         sprintf( buf, "<%d>", token );

@@ -122,9 +122,9 @@ void mcuPutThing( int what, int lin, int col )
     switch ( what )
     {
     case PLANET_SUN:
-        c_strcpy( " \\|/ ", buf[0] );
-        c_strcpy( "-- --", buf[1] );
-        c_strcpy( " /|\\ ", buf[2] );
+        strcpy(buf[0] , " \\|/ ") ;
+        strcpy(buf[1] , "-- --") ;
+        strcpy(buf[2] , " /|\\ ") ;
         break;
     case PLANET_CLASSM:
     case PLANET_CLASSA:
@@ -132,29 +132,29 @@ void mcuPutThing( int what, int lin, int col )
     case PLANET_CLASSZ:
     case PLANET_DEAD:
     case PLANET_GHOST:
-        c_strcpy( " .-. ", buf[0] );
-        c_strcpy( "(   )", buf[1] );
-        c_strcpy( " `-' ", buf[2] );
+        strcpy(buf[0], " .-. ") ;
+        strcpy(buf[1], "(   )");
+        strcpy(buf[2], " `-' ") ;
         break;
     case PLANET_MOON:
-        c_strcpy( "     ", buf[0] );
-        c_strcpy( " ( ) ", buf[1] );
-        c_strcpy( "     ", buf[2] );
+        strcpy(buf[0], "     ") ;
+        strcpy(buf[1], " ( ) ");
+        strcpy(buf[2], "     ") ;
         break;
     case THING_EXPLOSION:
-        c_strcpy( " %%% ", buf[0] );
-        c_strcpy( "%%%%%", buf[1] );
-        c_strcpy( " %%% ", buf[2] );
+        strcpy(buf[0], " %%% ") ;
+        strcpy(buf[1], "%%%%%") ;
+        strcpy(buf[2], " %%% ") ;
         break;
     case THING_DEATHSTAR:
-        c_strcpy( "/===\\", buf[0] );
-        c_strcpy( "===O=", buf[1] );
-        c_strcpy( "\\===/", buf[2] );
+        strcpy(buf[0], "/===\\") ;
+        strcpy(buf[1], "===O=") ;
+        strcpy(buf[2], "\\===/") ;
         break;
     default:
-        c_strcpy( " ??? ", buf[0] );
-        c_strcpy( "?????", buf[1] );
-        c_strcpy( " ??? ", buf[2] );
+        strcpy(buf[0], " ??? ") ;
+        strcpy(buf[1], "?????") ;
+        strcpy(buf[2], " ??? ") ;
         break;
     }
 
@@ -475,7 +475,7 @@ void mcuInfoPlanet( char *str, int pnum, int snum )
     if ( Planets[pnum].type != PLANET_SUN && Planets[pnum].type != PLANET_MOON )
     {
         if ( ! canscan )
-            c_strcpy( "with unknown occupational forces", junk );
+            strcpy(junk , "with unknown occupational forces") ;
         else
 	{
             i = Planets[pnum].armies;
@@ -485,7 +485,7 @@ void mcuInfoPlanet( char *str, int pnum, int snum )
                 if ( j > 0 )
                     sprintf( junk, "uninhabitable for %d more minutes", j );
                 else
-                    c_strcpy( "with NO armies", junk );
+                    strcpy(junk , "with NO armies") ;
 	    }
             else
 	    {
@@ -1002,7 +1002,7 @@ void mcuPlanetList( int team, int snum )
                     if ( ! Planets[pnum].scanned[team] )
                     {
                         ch = '?';
-                        c_strcpy( "?", junk );
+                        strcpy(junk , "?") ;
                     }
 
                 /* Suns and moons are displayed as unowned. */
@@ -1140,9 +1140,9 @@ void mcuPlayList( int godlike, int doall, int snum )
     uiPutColor(LabelColor);  /* dwp */
 
     if (godlike)
-        c_strcpy( hd1, cbuf );
+        strcpy(cbuf , hd1) ;
     else
-        c_strcpy( hd2, cbuf );
+        strcpy(cbuf , hd2) ;
 
     col = (int)(Context.maxcol - strlen( cbuf )) / (int)2;
     lin = 2;
@@ -1611,9 +1611,9 @@ void mcuTeamList( int team )
     {
         for ( i = 0; i < 4; i++ )
             if ( team != i )
-                c_strcpy( "-", timbuf[i] );
+                strcpy(timbuf[i] , "-") ;
             else if ( ! Teams[i].coupinfo && timbuf[i][0] != 0 )
-                c_strcpy( "?", timbuf[i] );
+                strcpy(timbuf[i] , "?") ;
     }
 
     timbuf[4][0] = 0;
@@ -1782,7 +1782,7 @@ void mcuUserStats( int godlike , int snum )
     lin = lin + 2;
     cdputs( hd3, lin, 34 );
 
-    c_strcpy( hd2, cbuf );
+    strcpy(cbuf , hd2) ;
     lin = lin + 1;
     cdputs( cbuf, lin, 1 );
 

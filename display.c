@@ -635,7 +635,7 @@ void display( int snum )
                 /* Nearest enemy is very close. */
                 outattr = RedColor;
                 AlertLevel = RED_ALERT;
-                c_strcpy( "RED ALERT ", buf );
+                strcpy(buf , "RED ALERT ") ;
                 dobeep = TRUE;
 	    }
             else if ( mindis < ALERT_DIST )
@@ -643,7 +643,7 @@ void display( int snum )
                 /* Nearest enemy is close. */
                 outattr = RedColor;
                 AlertLevel = RED_ALERT;
-                c_strcpy( "Alert ", buf );
+                strcpy(buf , "Alert ") ;
                 dobeep = TRUE;
 	    }
             else if ( STALERT(snum) )
@@ -651,7 +651,7 @@ void display( int snum )
                 /* Nearby torpedos. */
                 outattr = YellowColor;
                 AlertLevel = YELLOW_ALERT;
-                c_strcpy( "Torp alert", buf );
+                strcpy(buf , "Torp alert") ;
                 minenemy = 0;			/* disable nearby enemy code */
                 dobeep = TRUE;
 	    }
@@ -660,7 +660,7 @@ void display( int snum )
                 /* Near an enemy. */
                 outattr = YellowColor;
                 AlertLevel = YELLOW_ALERT;
-                c_strcpy( "Yellow alert ", buf );
+                strcpy(buf , "Yellow alert ") ;
 	    }
             else if ( minsenemy != 0 )
 	    {
@@ -668,7 +668,7 @@ void display( int snum )
                 outattr = YellowColor;
                 minenemy = minsenemy;		/* for cloaking code below */
                 AlertLevel = YELLOW_ALERT;
-                c_strcpy( "Proximity Alert ", buf );
+                strcpy(buf , "Proximity Alert ") ;
 	    }
             else
 	    {
@@ -700,7 +700,7 @@ void display( int snum )
     {
         lin = DISPLAY_LINS + 1;
         do_bottomborder(snum, buf, alertcolor(AlertLevel), outattr);
-        c_strcpy( buf, zzbuf );
+        strcpy(zzbuf , buf) ;
     }
 
     /* Build and display the status info as necessary. */
@@ -1121,12 +1121,12 @@ void display( int snum )
                 buf[0] = 0;
             else if ( i < 0 )
             {
-                c_strcpy( "towing ", buf );
+                strcpy(buf , "towing ") ;
                 utAppendShip( -i, buf );
             }
             else if ( i > 0 )
             {
-                c_strcpy( "towed by ", buf );
+                strcpy(buf , "towed by ") ;
                 utAppendShip( i, buf );
             }
             uiPutColor(InfoColor);
@@ -1182,7 +1182,7 @@ void display( int snum )
 
             cdclra( lin, col, DISPLAY_LINS, STAT_COLS - 1 );
 
-            c_strcpy( Doomsday->name, buf );
+            strcpy(buf , Doomsday->name) ;
             /* put dtype in stats, dstatus next to name  - dwp */
             if ( Doomsday->status == DS_LIVE  )
                 strcat(buf, "  (live)");

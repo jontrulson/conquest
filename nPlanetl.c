@@ -204,7 +204,7 @@ static int nPlanetlDisplay(dspConfig_t *dsp)
                 if ( ! Planets[pnum].scanned[team] )
                 {
                     ch = '?';
-                    c_strcpy( "?", junk );
+                    strcpy(junk , "?") ;
                 }
 
             /* Suns and moons are displayed as unowned. */

@@ -31,7 +31,7 @@ void cucPseudo( int unum, int snum )
     buf[0] = 0;
 
     cdclrl( MSG_LIN1, 2 );
-    c_strcpy( "Old pseudonym: ", buf );
+    strcpy(buf , "Old pseudonym: ") ;
     if ( snum > 0 && snum <= MAXSHIPS )
         strcat(buf , Ships[snum].alias) ;
     else
@@ -182,20 +182,20 @@ void cucSendMsg( int from, int terse, int remote )
         if ( to > 0 && to <= MAXSHIPS )
             sprintf( buf, "%d", to );
         else if ( -to >= 0 && -to < NUMPLAYERTEAMS )
-            c_strcpy( Teams[-to].name, buf );
+            strcpy(buf , Teams[-to].name) ;
         else switch ( to )
              {
              case MSG_ALL:
-                 c_strcpy( "All", buf );
+                 strcpy(buf , "All") ;
                  break;
              case MSG_GOD:
-                 c_strcpy( "GOD", buf );
+                 strcpy(buf , "GOD") ;
                  break;
              case MSG_IMPLEMENTORS:
-                 c_strcpy( "Implementors", buf );
+                 strcpy(buf , "Implementors") ;
                  break;
              case MSG_FRIENDLY:
-                 c_strcpy( "Friend", buf );
+                 strcpy(buf , "Friend") ;
                  break;
              default:
                  buf[0] = 0;
@@ -261,7 +261,7 @@ void cucSendMsg( int from, int terse, int remote )
          }
 
     /* Now, construct a header for the selected target. */
-    c_strcpy( "Message to ", buf );
+    strcpy(buf , "Message to ") ;
     if ( to > 0 && to <= MAXSHIPS )
     {
         if ( Ships[to].status != SS_LIVE )
@@ -329,7 +329,7 @@ void cucSendMsg( int from, int terse, int remote )
             else
             {
                 /* Handle a message to the Implementors. */
-                c_strcpy( "Communique from ", buf );
+                strcpy(buf , "Communique from ") ;
                 if ( from > 0 && from <= MAXSHIPS )
                 {
                     strcat(buf , Ships[from].alias) ;

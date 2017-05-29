@@ -606,7 +606,7 @@ static void _infoplanet( char *str, int pnum, int snum )
     if ( Planets[pnum].type != PLANET_SUN && Planets[pnum].type != PLANET_MOON )
     {
         if ( ! canscan )
-            c_strcpy( "with unknown occupational forces", junk );
+            strcpy(junk , "with unknown occupational forces") ;
         else
 	{
             i = Planets[pnum].armies;
@@ -616,7 +616,7 @@ static void _infoplanet( char *str, int pnum, int snum )
                 if ( j > 0 )
                     sprintf( junk, "uninhabitable for %d more minutes", j );
                 else
-                    c_strcpy( "with NO armies", junk );
+                    strcpy(junk , "with NO armies") ;
 	    }
             else
 	    {
@@ -806,7 +806,7 @@ static void _doinfo( char *buf, char ch )
     utDeleteBlanks( buf );
     if ( buf[0] == 0 )
     {
-        c_strcpy( Context.lastinfostr, buf );
+        strcpy(buf , Context.lastinfostr) ;
         if ( buf[0] == 0 )
 	{
             hudClearPrompt(MSG_LIN1);
@@ -814,7 +814,7 @@ static void _doinfo( char *buf, char ch )
 	}
     }
     else
-        c_strcpy( buf, Context.lastinfostr );
+        strcpy(Context.lastinfostr , buf) ;
 
     if ( utIsSpecial( buf, &what, &token, &count ) )
     {
@@ -1115,7 +1115,7 @@ static int _chktow(void)
 
     if ( Ships[snum].towedby != 0 )
     {
-        c_strcpy( "But we are being towed by ", cbuf );
+        strcpy(cbuf , "But we are being towed by ") ;
         utAppendShip( Ships[snum].towedby, cbuf );
         utAppendChar(cbuf , '!');
         cp_putmsg( cbuf, MSG_LIN2 );
@@ -1123,7 +1123,7 @@ static int _chktow(void)
     }
     if ( Ships[snum].towing != 0 )
     {
-        c_strcpy( "But we're already towing ", cbuf );
+        strcpy(cbuf , "But we're already towing ") ;
         utAppendShip( Ships[snum].towing, cbuf );
         utAppendChar(cbuf , '.');
         cp_putmsg( cbuf, MSG_LIN2 );
@@ -1169,7 +1169,7 @@ static void _domsgto(char *buf, int ch, int terse)
         return;
     }
 
-    c_strcpy( buf, tbuf);
+    strcpy(tbuf, buf) ;
 
     /* TAB or ENTER means use the target from the last message. */
     editing = ( (ch == TERM_EXTRA || ch == TERM_NORMAL) && buf[0] == 0 );
@@ -1179,20 +1179,20 @@ static void _domsgto(char *buf, int ch, int terse)
         if ( to > 0 && to <= MAXSHIPS )
             sprintf( tbuf, "%d", to );
         else if ( -to >= 0 && -to < NUMPLAYERTEAMS )
-            c_strcpy( Teams[-to].name, tbuf );
+            strcpy(tbuf , Teams[-to].name) ;
         else switch ( to )
              {
              case MSG_ALL:
-                 c_strcpy( "All", tbuf );
+                 strcpy(tbuf , "All") ;
                  break;
              case MSG_GOD:
-                 c_strcpy( "GOD", tbuf );
+                 strcpy(tbuf , "GOD") ;
                  break;
              case MSG_IMPLEMENTORS:
-                 c_strcpy( "Implementors", tbuf );
+                 strcpy(tbuf , "Implementors") ;
                  break;
              case MSG_FRIENDLY:
-                 c_strcpy( "Friend", tbuf );
+                 strcpy(tbuf , "Friend") ;
                  break;
              default:
                  tbuf[0] = 0;
@@ -1266,7 +1266,7 @@ static void _domsgto(char *buf, int ch, int terse)
          }
 
     /* Now, construct a header for the selected target. */
-    c_strcpy( "Message to ", tbuf );
+    strcpy(tbuf , "Message to ") ;
     if ( to > 0 && to <= MAXSHIPS )
     {
         if ( Ships[to].status != SS_LIVE )
@@ -1827,7 +1827,7 @@ static void _initbeam()
     {
         if ( downmax <= 0 )
 	{
-            c_strcpy( "The arm", cbuf );
+            strcpy(cbuf , "The arm") ;
             if ( upmax == 1 )
                 strcat(cbuf , "y is");
             else
@@ -2153,7 +2153,7 @@ static void command( int ch )
             SFSET(Context.snum, SHIP_F_MAP);
         break;
     case 'N':				/* change pseudonym */
-        c_strcpy( "Old pseudonym: ", pbuf );
+        strcpy(pbuf , "Old pseudonym: ") ;
         strcat(pbuf , Ships[Context.snum].alias);
         cp_putmsg(pbuf, MSG_LIN1);
         state = S_PSEUDO;

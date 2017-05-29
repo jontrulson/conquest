@@ -275,9 +275,9 @@ static int nTeamlDisplay(dspConfig_t *dsp)
     {
         for ( i = 0; i < 4; i++ )
             if ( team != i )
-                c_strcpy( "-", timbuf[i] );
+                strcpy(timbuf[i] , "-") ;
             else if ( ! Teams[i].coupinfo && timbuf[i][0] != 0 )
-                c_strcpy( "?", timbuf[i] );
+                strcpy(timbuf[i] , "?") ;
     }
 
     timbuf[4][0] = 0;

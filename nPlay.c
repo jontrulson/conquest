@@ -61,7 +61,7 @@ static void selectentry( uint8_t esystem )
             owned[i] = FALSE;
 
     /* Prompt for a decision. */
-    c_strcpy( "Enter which system", cbuf );
+    strcpy(cbuf , "Enter which system") ;
     for ( i = 0; i < NUMPLAYERTEAMS; i++ )
         if ( owned[i] )
         {
@@ -204,7 +204,7 @@ static int nPlayDisplay(dspConfig_t *dsp)
             cprintf(i, 0, ALIGN_CENTER,
                     "I'm sorry, but you're playing on too many ships right now.");
             i = i + 1;
-            c_strcpy( "You are only allowed to fly ", cbuf );
+            strcpy(cbuf , "You are only allowed to fly ") ;
             j = Users[Context.unum].multiple;
             utAppendInt( j, cbuf );
             strcat(cbuf , " ship") ;

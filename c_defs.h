@@ -183,7 +183,6 @@ typedef double real;
 
 
 #define mod(x, y) ((x) % (y))
-#define c_strcpy(x, y) strcpy(y, x)
 #ifndef min
 #define min(x, y) (((x) < (y)) ? (x) : (y))
 #endif

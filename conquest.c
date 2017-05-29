@@ -550,7 +550,7 @@ int selectentry( uint8_t esystem )
             owned[i] = FALSE;
 
     /* Prompt for a decision. */
-    c_strcpy( "Enter which system", cbuf );
+    strcpy(cbuf , "Enter which system") ;
     for ( i = 0; i < NUMPLAYERTEAMS; i++ )
         if ( owned[i] )
         {
@@ -1450,7 +1450,7 @@ void dobeam( int snum )
     {
         if ( downmax <= 0 )
 	{
-            c_strcpy( "The arm", cbuf );
+            strcpy(cbuf , "The arm") ;
             if ( upmax == 1 )
                 strcat(cbuf , "y is") ;
             else
@@ -1510,9 +1510,9 @@ void dobeam( int snum )
 
     /* Figure out how many armies should be beamed. */
     if ( dirup )
-        c_strcpy( "up", buf );
+        strcpy(buf , "up") ;
     else
-        c_strcpy( "down", buf );
+        strcpy(buf , "down") ;
     sprintf( cbuf, "Beam %s [1-%d] ", buf, beamax );
     cdclrl( MSG_LIN1, 1 );
     buf[0] = 0;
@@ -2260,7 +2260,7 @@ void doinfo( int snum )
     utDeleteBlanks( cbuf );
     if ( cbuf[0] == 0 )
     {
-        c_strcpy( Context.lastinfostr, cbuf );
+        strcpy(cbuf , Context.lastinfostr) ;
         if ( cbuf[0] == 0 )
 	{
             cdclrl( MSG_LIN1, 1 );
@@ -2268,7 +2268,7 @@ void doinfo( int snum )
 	}
     }
     else
-        c_strcpy( cbuf, Context.lastinfostr );
+        strcpy(Context.lastinfostr , cbuf) ;
 
     if ( utIsSpecial( cbuf, &what, &token, &count ) )
     {
@@ -2624,7 +2624,7 @@ void dotow( int snum )
     cdclrl( MSG_LIN1, 2 );
     if ( Ships[snum].towedby != 0 )
     {
-        c_strcpy( "But we are being towed by ", cbuf );
+        strcpy(cbuf , "But we are being towed by ") ;
         utAppendShip( Ships[snum].towedby, cbuf );
         utAppendChar(cbuf , '!') ;
         mcuPutMsg( cbuf, MSG_LIN2 );
@@ -2632,7 +2632,7 @@ void dotow( int snum )
     }
     if ( Ships[snum].towing != 0 )
     {
-        c_strcpy( "But we're already towing ", cbuf );
+        strcpy(cbuf , "But we're already towing ") ;
         utAppendShip( Ships[snum].towing, cbuf );
         utAppendChar(cbuf , '.') ;
         mcuPutMsg( cbuf, MSG_LIN2 );
@@ -3104,7 +3104,7 @@ int newship( int unum, int *snum )
                 cdputc(
                     "I'm sorry, but your playing on too many ships right now.", i );
                 i = i + 1;
-                c_strcpy( "You are only allowed to fly ", cbuf );
+                strcpy(cbuf , "You are only allowed to fly ") ;
                 j = Users[unum].multiple;
                 utAppendInt( j, cbuf );
                 strcat(cbuf , " ship") ;

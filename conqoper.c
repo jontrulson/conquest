@@ -425,7 +425,7 @@ void debugdisplay( int snum )
     buf[0] = 0;
     if ( unum >= 0 && unum < MAXUSERS )
     {
-        c_strcpy( Users[unum].username, buf );
+        strcpy(buf , Users[unum].username) ;
         if ( buf[0] != 0 )
             utAppendChar(buf , ' ') ;
     }
@@ -1149,43 +1149,43 @@ void operate(void)
 	{
             /* game status */
             if ( ConqInfo->closed )
-                c_strcpy( "CLOSED", junk );
+                strcpy(junk , "CLOSED") ;
             else
-                c_strcpy( "open", junk );
+                strcpy(junk , "open") ;
 
             /* driver status */
 
             switch ( Driver->drivstat )
 	    {
 	    case DRS_OFF:
-                c_strcpy( "OFF", xbuf );
+                strcpy(xbuf , "OFF") ;
                 break;
 	    case DRS_RESTART:
-                c_strcpy( "RESTART", xbuf );
+                strcpy(xbuf , "RESTART") ;
                 break;
 	    case DRS_STARTING:
-                c_strcpy( "STARTING", xbuf );
+                strcpy(xbuf , "STARTING") ;
                 break;
 	    case DRS_HOLDING:
-                c_strcpy( "HOLDING", xbuf );
+                strcpy(xbuf , "HOLDING") ;
                 break;
 	    case DRS_RUNNING:
-                c_strcpy( "on", xbuf );
+                strcpy(xbuf , "on") ;
                 break;
 	    case DRS_KAMIKAZE:
-                c_strcpy( "KAMIKAZE", xbuf );
+                strcpy(xbuf , "KAMIKAZE") ;
                 break;
 	    default:
-                c_strcpy( "???", xbuf );
+                strcpy(xbuf , "???") ;
 	    }
 
             /* eater status */
             i = Doomsday->status;
             if ( i == DS_OFF )
-                c_strcpy( "off", buf );
+                strcpy(buf , "off") ;
             else if ( i == DS_LIVE )
 	    {
-                c_strcpy( "ON (", buf );
+                strcpy(buf , "ON (") ;
                 i = Doomsday->lock;
                 if ( -i > 0 && -i <= NUMPLANETS )
                     strcat(buf , Planets[-i].name) ;
@@ -1473,7 +1473,7 @@ void opinit(void)
 
     lin+=3;
     col = icol - 2;
-    c_strcpy( "(r)obots", buf );
+    strcpy(buf, "(r)obots");
     i = strlen( buf );
     uiPutColor(InfoColor);
     cdputs( buf, lin, col+1 );
@@ -1483,7 +1483,7 @@ void opinit(void)
     uiPutColor(LabelColor);
     cdputs( "<-", lin, col );
     col = col + 4;
-    c_strcpy( "(e)verything", buf );
+    strcpy(buf, "(e)verything");
     i = strlen( buf );
     uiPutColor(InfoColor);
     cdputs( buf, lin, col+1 );
@@ -1493,7 +1493,7 @@ void opinit(void)
     uiPutColor(LabelColor);
     cdputs( ".", lin, col );
     col = col + 4;
-    c_strcpy( "(z)ero everything", buf );
+    strcpy(buf, "(z)ero everything");
     i = strlen( buf );
     uiPutColor(InfoColor);
     cdputs( buf, lin, col+1 );
@@ -1509,7 +1509,7 @@ void opinit(void)
     lin+=3;
 
     col = icol;
-    c_strcpy( "(s)hips", buf );
+    strcpy(buf, "(s)hips");
     i = strlen( buf );
     uiPutColor(InfoColor);
     cdputs( buf, lin, col+1 );
@@ -1519,7 +1519,7 @@ void opinit(void)
     uiPutColor(LabelColor);
     cdputs( "<-", lin, col );
     col = col + 4;
-    c_strcpy( "(u)niverse", buf );
+    strcpy(buf, "(u)niverse");
     i = strlen( buf );
     uiPutColor(InfoColor);
     cdputs( buf, lin, col+1 );
@@ -1529,7 +1529,7 @@ void opinit(void)
     uiPutColor(LabelColor);
     cdputs( ".", lin, col );
     col = col + 4;
-    c_strcpy( "(g)ame", buf );
+    strcpy(buf, "(g)ame");
     i = strlen( buf );
     uiPutColor(InfoColor);
     cdputs( buf, lin, col+1 );
@@ -1539,7 +1539,7 @@ void opinit(void)
     uiPutColor(LabelColor);
     cdputs( ".", lin, col );
     col = col + 4;
-    c_strcpy( "(p)lanets", buf );
+    strcpy(buf, "(p)lanets");
     i = strlen( buf );
     uiPutColor(InfoColor);
     cdputs( buf, lin, col+1 );
@@ -1555,14 +1555,14 @@ void opinit(void)
     lin+=3;
 
     col = icol + 15;
-    c_strcpy( "(m)essages", buf );
+    strcpy(buf, "(m)essages");
     i = strlen( buf );
     uiPutColor(InfoColor);
     cdputs( buf, lin, col+1 );
     uiPutColor(CQC_A_BOLD);
     cdbox( lin-1, col, lin+1, col+i+1 );
     col = col + i + 8;
-    c_strcpy( "(l)ockwords", buf );
+    strcpy(buf, "(l)ockwords");
     i = strlen( buf );
     uiPutColor(InfoColor);
     cdputs( buf, lin, col+1 );

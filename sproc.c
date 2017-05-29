@@ -880,7 +880,7 @@ void procTow(cpCommand_t *cmd)
 
     if ( Ships[snum].towedby != 0 )
     {
-        c_strcpy( "But we are being towed by ", cbuf );
+        strcpy(cbuf , "But we are being towed by ") ;
         utAppendShip( Ships[snum].towedby, cbuf );
         utAppendChar(cbuf , '!') ;
         sendFeedback(cbuf);
@@ -888,7 +888,7 @@ void procTow(cpCommand_t *cmd)
     }
     if ( Ships[snum].towing != 0 )
     {
-        c_strcpy( "But we're already towing ", cbuf );
+        strcpy(cbuf , "But we're already towing ") ;
         utAppendShip( Ships[snum].towing, cbuf );
         utAppendChar(cbuf , '.') ;
         sendFeedback(cbuf);
@@ -897,29 +897,28 @@ void procTow(cpCommand_t *cmd)
     cbuf[0] = 0;
     PVLOCK(&ConqInfo->lockword);
     if ( other < 1 || other > MAXSHIPS )
-        c_strcpy( "No such ship.", cbuf );
+        strcpy(cbuf , "No such ship.") ;
     else if ( Ships[other].status != SS_LIVE )
-        c_strcpy( "Not found.", cbuf );
+        strcpy(cbuf , "Not found.") ;
     else if ( other == snum )
-        c_strcpy( "We can't tow ourselves!", cbuf );
+        strcpy(cbuf , "We can't tow ourselves!") ;
     else if ( dist( Ships[snum].x, Ships[snum].y, Ships[other].x, Ships[other].y ) > TRACTOR_DIST )
-        c_strcpy( "That ship is out of tractor range.", cbuf );
+        strcpy(cbuf , "That ship is out of tractor range.") ;
     else if ( Ships[other].warp < 0.0 )
-        c_strcpy( "You can't tow a ship out of orbit.", cbuf );
+        strcpy(cbuf , "You can't tow a ship out of orbit.") ;
     else if ( sqrt( pow(( (real) (Ships[snum].dx - Ships[other].dx) ), (real) 2.0) +
                     pow( (real) ( Ships[snum].dy - Ships[other].dy ), (real) 2.0 ) ) /
               ( MM_PER_SEC_PER_WARP * ITER_SECONDS ) > MAX_TRACTOR_WARP )
         sprintf( cbuf, "That ships relative velocity is higher than %2.1f.",
                  MAX_TRACTOR_WARP );
     else if ( Ships[other].towing != 0 || Ships[other].towedby != 0 )
-        c_strcpy(
-            "There seems to be some interference with the tractor beams...",
-            cbuf );
+        strcpy(cbuf,
+               "There seems to be some interference with the tractor beams...");
     else
     {
         Ships[other].towedby = snum;
         Ships[snum].towing = other;
-        c_strcpy("Tractor beams engaged.", cbuf);
+        strcpy(cbuf, "Tractor beams engaged.") ;
     }
     PVUNLOCK(&ConqInfo->lockword);
 
@@ -967,7 +966,7 @@ void procUnTow(cpCommand_t *cmd)
             sendFeedback("Attempt to break free failed.");
         else
 	{
-            c_strcpy( "Breaking free from ship ", cbuf );
+            strcpy(cbuf , "Breaking free from ship ") ;
             utAppendShip( Ships[snum].towedby, cbuf );
             PVLOCK(&ConqInfo->lockword);
             if ( Ships[snum].towedby != 0 )
@@ -997,7 +996,7 @@ void procUnTow(cpCommand_t *cmd)
     }
     else if ( Ships[snum].towing != 0 )
     {
-        c_strcpy( "Tow released from ship ", cbuf );
+        strcpy(cbuf , "Tow released from ship ") ;
         utAppendShip( Ships[snum].towing, cbuf );
         PVLOCK(&ConqInfo->lockword);
         if ( Ships[snum].towing != 0 )
@@ -1191,9 +1190,9 @@ void procBomb(cpCommand_t *cmd)
             /* Either our bomb run total or the population changed. */
             oparmies = Planets[pnum].armies;
             if ( total == 1 )
-                c_strcpy( "y", buf );
+                strcpy(buf , "y") ;
             else
-                c_strcpy( "ies", buf );
+                strcpy(buf , "ies") ;
             sprintf( cbuf, "Bombing %s, %d arm%s killed, %d left.",
                      Planets[pnum].name, total, buf, oparmies );
             sendFeedback(cbuf);
@@ -1348,7 +1347,7 @@ void procBeam(cpCommand_t *cmd)
     {
         if ( downmax <= 0 )
 	{
-            c_strcpy( "The arm", cbuf );
+            strcpy(cbuf , "The arm") ;
             if ( upmax == 1 )
                 strcat(cbuf , "y is") ;
             else
@@ -1473,7 +1472,7 @@ void procBeam(cpCommand_t *cmd)
 
         if ( ototal != total )
 	{
-            c_strcpy( "Beaming ", cbuf );
+            strcpy(cbuf , "Beaming ") ;
             if ( dirup )
                 strcat(cbuf , "up from ") ;
             else

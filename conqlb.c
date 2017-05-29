@@ -893,7 +893,7 @@ void clbUserline( int unum, int snum, char *buf, int showgods, int showteam )
 
     if ( unum < 0 || unum >= MAXUSERS )
     {
-        c_strcpy( hd1, buf );
+        strcpy(buf , hd1) ;
         return;
     }
     if ( ! Users[unum].live )
@@ -910,13 +910,13 @@ void clbUserline( int unum, int snum, char *buf, int showgods, int showteam )
     /* If we were given a valid ship number, use it's information. */
     if ( snum > 0 && snum <= MAXSHIPS )
     {
-        c_strcpy( Ships[snum].alias, name );
+        strcpy(name , Ships[snum].alias) ;
         team = Ships[snum].team;
     }
     else
     {
 
-        c_strcpy( Users[unum].alias, name );
+        strcpy(name , Users[unum].alias) ;
         team = Users[unum].team;
     }
 
@@ -976,7 +976,7 @@ void clbStatline( int unum, char *buf )
     }
 
     if ( Users[unum].stats[USTAT_SECONDS] == 0 )
-        c_strcpy( "- ", percent );
+        strcpy(percent , "- ") ;
     else
     {
         i = 1000 * Users[unum].stats[USTAT_CPUSECONDS] / Users[unum].stats[USTAT_SECONDS];
@@ -2096,7 +2096,7 @@ void clbIntrude( int snum, int pnum )
     {
         if ( snum == MSG_DOOM )
 	{
-            c_strcpy( Doomsday->name, buf );
+            strcpy(buf , Doomsday->name) ;
             utToUpperCase( Doomsday->name );
             strcat(buf , atta) ;
             strcat(buf , armeq) ;
@@ -2105,7 +2105,7 @@ void clbIntrude( int snum, int pnum )
 	}
         else if ( Ships[snum].war[Planets[pnum].team] )
 	{
-            c_strcpy( "INTRUDER ALERT - ", buf );
+            strcpy(buf , "INTRUDER ALERT - ") ;
             utAppendShip( snum, buf );
             strcat(buf , atta) ;
             strcat(buf , armeq) ;
@@ -2295,14 +2295,14 @@ int clbFmtMsg(int to, int from, char *buf)
         utAppendShip( from, buf );
     }
     else if ( -from > 0 && -from <= NUMPLANETS )
-        c_strcpy( Planets[-from].name, buf );
+        strcpy(buf , Planets[-from].name) ;
     else switch ( from )
          {
          case MSG_NOONE:
-             c_strcpy( "nobody", buf );
+             strcpy(buf , "nobody") ;
              break;
          case MSG_GOD:
-             c_strcpy( "GOD", buf );
+             strcpy(buf , "GOD") ;
              break;
          case MSG_DOOM:
              strcat(buf, "The ");
@@ -2312,10 +2312,10 @@ int clbFmtMsg(int to, int from, char *buf)
              buf[0] = 0;
              break;
          case MSG_COMP:
-             c_strcpy( "Comp", buf );
+             strcpy(buf , "Comp") ;
              break;
          default:
-             c_strcpy( "???", buf );
+             strcpy(buf , "???") ;
              break;
          }
 
