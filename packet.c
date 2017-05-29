@@ -457,7 +457,7 @@ int pktSetClientProtocolVersion(uint16_t vers)
         serverPackets = serverPackets_0006;
         serverPktMax = SERVERPKTMAX_0006;
         break;
-#warning "FIXME"
+//#warning "FIXME"
 #if 0                           /* FIXME - when bump to new rev */
     case PROTOCOL_VERSION:      /* current protocol, nothing to do */
         serverPackets = serverPackets_0007;
