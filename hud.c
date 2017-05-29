@@ -332,7 +332,7 @@ void hudSetAlloc(int snum)
         else
             utAppendInt( i, hudData.alloc.str );
 
-        appchr( '/', hudData.alloc.str );
+        utAppendChar(hudData.alloc.str , '/') ;
 
         if ( j == 0 )
             strcat(hudData.alloc.str , "**") ;

@@ -270,7 +270,7 @@ void cucSendMsg( int from, int terse, int remote )
             return;
 	}
         utAppendShip( to, buf );
-        appchr( ':', buf );
+        utAppendChar(buf , ':') ;
     }
     else if ( -to >= 0 && -to < NUMPLAYERTEAMS )
     {
@@ -340,9 +340,9 @@ void cucSendMsg( int from, int terse, int remote )
                     strcat(buf , "GOD") ;
                 else
                 {
-                    appchr( '(', buf );
+                    utAppendChar(buf , '(') ;
                     utAppendInt( from, buf );
-                    appchr( ')', buf );
+                    utAppendChar(buf, ')');
                 }
                 if (remote)           /* remotes don't send 'from' */
                     sendMessage(MSG_IMPLEMENTORS, msg);

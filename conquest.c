@@ -1089,7 +1089,7 @@ void dead( int snum, int leave )
             if ( Ships[kb].status != SS_LIVE )
                 strcat(buf, ", who also died.");
             else
-                appchr( '.', buf );
+                utAppendChar(buf , '.') ;
             cprintf( 8,0,ALIGN_CENTER,
                      "#%d#You were kill number #%d#%.1f #%d#for #%d#%s #%d#(#%d#%s#%d#)%s",
                      InfoColor, CQC_A_BOLD, Ships[kb].kills,
@@ -1394,8 +1394,8 @@ void dobeam( int snum )
         sprintf( cbuf, "This planet is uninhabitable for %d more minute",
                  i );
         if ( i != 1 )
-            appchr( 's', cbuf );
-        appchr( '.', cbuf );
+            utAppendChar(cbuf , 's') ;
+        utAppendChar(cbuf , '.') ;
         mcuPutMsg( cbuf, MSG_LIN1 );
         return;
     }
@@ -2626,7 +2626,7 @@ void dotow( int snum )
     {
         c_strcpy( "But we are being towed by ", cbuf );
         utAppendShip( Ships[snum].towedby, cbuf );
-        appchr( '!', cbuf );
+        utAppendChar(cbuf , '!') ;
         mcuPutMsg( cbuf, MSG_LIN2 );
         return;
     }
@@ -2634,7 +2634,7 @@ void dotow( int snum )
     {
         c_strcpy( "But we're already towing ", cbuf );
         utAppendShip( Ships[snum].towing, cbuf );
-        appchr( '.', cbuf );
+        utAppendChar(cbuf , '.') ;
         mcuPutMsg( cbuf, MSG_LIN2 );
         return;
     }
@@ -3109,7 +3109,7 @@ int newship( int unum, int *snum )
                 utAppendInt( j, cbuf );
                 strcat(cbuf , " ship") ;
                 if ( j != 1 )
-                    appchr( 's', cbuf );
+                    utAppendChar(cbuf , 's') ;
                 strcat(cbuf , " at one time.") ;
                 cdputc( cbuf, i );
                 cdrefresh();
@@ -3377,7 +3377,7 @@ int welcome(void)
         team = sClientStat.team;
         cbuf[0] = 0;
         utAppendTitle( team, cbuf );
-        appchr( ' ', cbuf );
+        utAppendChar(cbuf , ' ') ;
         i = strlen( cbuf );
         strcat(cbuf , name) ;
         cbuf[i] = (char)toupper( cbuf[i] );

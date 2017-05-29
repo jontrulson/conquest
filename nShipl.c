@@ -96,7 +96,7 @@ static int nShiplDisplay(dspConfig_t *dsp)
             sbuf[0] = 0;
             utAppendShip( i, sbuf );
             strcat(sbuf, " ") ;
-            appchr(ShipTypes[Ships[i].shiptype].name[0], sbuf);
+            utAppendChar(sbuf, ShipTypes[Ships[i].shiptype].name[0]) ;
 
             unum = Ships[i].unum;
             if ( unum >= 0 && unum < MAXUSERS )

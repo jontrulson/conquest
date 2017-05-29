@@ -836,7 +836,7 @@ int clbTakePlanet( int pnum, int snum )
     sprintf( buf, "All hail the liberating %s armies.  Thanks, ",
              Teams[Ships[snum].team].name );
     utAppendShip( snum, buf );
-    appchr( '!', buf );
+    utAppendChar(buf , '!') ;
 
     /* Check whether the universe has been conquered. */
     for ( i = 1; i <= NUMCONPLANETS; i = i + 1 )
@@ -2326,7 +2326,7 @@ int clbFmtMsg(int to, int from, char *buf)
         utAppendShip( to, buf );
     else if ( -to >= 0 && -to < NUMPLAYERTEAMS )
     {
-        appchr( Teams[-to].teamchar, buf );
+        utAppendChar(buf , Teams[-to].teamchar) ;
     }
     else
     {

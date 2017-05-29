@@ -519,12 +519,12 @@ void mcuInfoPlanet( char *str, int pnum, int snum )
 
     if ( junk[0] == 0 )
     {
-        appchr( '.', buf );
+        utAppendChar(buf , '.') ;
     }
     else
     {
-        appchr( ',', buf );
-        appchr( '.', junk );
+        utAppendChar(buf, ',');
+        utAppendChar(junk , '.') ;
     }
 
     /* Now output the info. Break the stuff in buf across two lines */
@@ -547,7 +547,7 @@ void mcuInfoPlanet( char *str, int pnum, int snum )
         i = j + 1;
         while ( buf[i] != ' ' && i > 1 )
             i = i - 1;
-        appchr( ' ', buf );
+        utAppendChar(buf , ' ') ;
         strcat(buf , junk) ;
         buf[i] = 0;				/* terminate at blank */
         mcuPutMsg( buf, MSG_LIN1 );
@@ -662,7 +662,7 @@ void mcuInfoShip( int snum, int scanner )
     }
     strcat(cbuf , " kill") ;
     if ( kills != 1.0 )
-        appchr( 's', cbuf );
+        utAppendChar(cbuf , 's') ;
     if ( SCLOAKED(snum) && ( godlike || SSCANDIST(snum) ) )
         strcat(cbuf, " (CLOAKED) ");
     else
@@ -675,7 +675,7 @@ void mcuInfoShip( int snum, int scanner )
     if ( godlike )
     {
         utAppendShipStatus( status, cbuf );
-        appchr( '.', cbuf );
+        utAppendChar(cbuf , '.') ;
     }
     else
     {
@@ -817,7 +817,7 @@ void mcuInfoShip( int snum, int scanner )
             strcat(cbuf , junk) ;
             if ( i == 1 )
 	    {
-                appchr( 'y', cbuf );
+                utAppendChar(cbuf , 'y') ;
 	    }
             else
                 strcat(cbuf , "ies") ;
@@ -826,7 +826,7 @@ void mcuInfoShip( int snum, int scanner )
     if ( cbuf[0] != 0 )
     {
         cbuf[0] = (char)toupper( cbuf[0] );
-        appchr( '.', cbuf );
+        utAppendChar(cbuf , '.') ;
         mcuPutMsg( cbuf, MSG_LIN2 );
     }
 
@@ -1178,7 +1178,7 @@ void mcuPlayList( int godlike, int doall, int snum )
                 sbuf[0] = 0;
                 utAppendShip( i, sbuf );
                 strcat(sbuf, " ") ;
-                appchr(ShipTypes[Ships[i].shiptype].name[0], sbuf);
+                utAppendChar(sbuf, ShipTypes[Ships[i].shiptype].name[0]) ;
 
                 unum = Ships[i].unum;
                 if ( unum >= 0 && unum < MAXUSERS )

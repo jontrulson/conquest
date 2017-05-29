@@ -912,7 +912,7 @@ void display( int snum )
                 strcat(buf , "**") ;
             else
                 utAppendInt( i, buf );
-            appchr( '/', buf );
+            utAppendChar(buf , '/') ;
             if ( j == 0 )
                 strcat(buf , "**") ;
             else

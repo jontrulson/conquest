@@ -37,5 +37,6 @@ char     *utGetPath(const char *thepath);
 void     utSleep(real seconds);
 bool     utIsDigits(const char *buf);
 void     utToUpperCase(char *buf);
+void     utAppendChar(char *buf, char ch);
 
 #endif /* _CONQUTIL_H */

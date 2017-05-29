@@ -1755,7 +1755,7 @@ int welcome( int *unum )
 
         cbuf[0] = 0;
         utAppendTitle( team, cbuf );
-        appchr( ' ', cbuf );
+        utAppendChar(cbuf , ' ') ;
         i = strlen( cbuf );
         strcat(cbuf , name) ;
         cbuf[i] = (char)toupper( cbuf[i] );

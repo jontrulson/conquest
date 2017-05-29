@@ -151,7 +151,7 @@ void utAppendShip( int snum, char *str )
             ch = Teams[i].teamchar;
     }
 
-    appchr( ch, str );
+    utAppendChar(str , ch) ;
     utAppendInt( snum, str );
 
     return;
@@ -423,10 +423,6 @@ void utLog(char *fmt, ...)
     return;
 
 }
-
-
-
-
 
 /*  utDeleteBlanks - remove all blanks from a string */
 /*  SYNOPSIS */
@@ -1024,9 +1020,7 @@ bool utIsDigits(const char *buf)
     return true;
 }
 
-void error(char *str);
-
-/* void upper(char *buf) - upcase a string */
+/* upcase a string */
 void utToUpperCase(char *buf)
 {
     char *s = buf;
@@ -1035,4 +1029,12 @@ void utToUpperCase(char *buf)
         *s = (char)toupper(*s);
         s++;
     }
+}
+
+// append a character to a string
+void utAppendChar(char *buf, char ch)
+{
+    int len = strlen(buf);
+    buf[len++] = ch;
+    buf[len] = 0;
 }

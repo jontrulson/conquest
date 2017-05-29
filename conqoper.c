@@ -427,11 +427,11 @@ void debugdisplay( int snum )
     {
         c_strcpy( Users[unum].username, buf );
         if ( buf[0] != 0 )
-            appchr( ' ', buf );
+            utAppendChar(buf , ' ') ;
     }
-    appchr( '(', buf );
+    utAppendChar(buf , '(') ;
     utAppendInt( unum, buf );
-    appchr( ')', buf );
+    utAppendChar(buf, ')');
     cprintf(lin,dcol,ALIGN_NONE,"#%d#%s",InfoColor, buf);
     lin++;
     cprintf(lin,tcol,ALIGN_NONE,"#%d#%s",LabelColor, "     slock:");
@@ -455,9 +455,9 @@ void debugdisplay( int snum )
     {
         strcat(buf , " (") ;
         utAppendInt( Ships[snum].wfuse, buf );
-        appchr( '/', buf );
+        utAppendChar(buf , '/') ;
         utAppendInt( Ships[snum].efuse, buf );
-        appchr( ')', buf );
+        utAppendChar(buf, ')');
     }
     cprintf(lin,dcol,ALIGN_NONE,"#%d#%s",InfoColor, buf);
     lin++;
@@ -1191,7 +1191,7 @@ void operate(void)
                     strcat(buf , Planets[-i].name) ;
                 else
                     utAppendShip( i, buf );		/* this will handle funny numbers */
-                appchr( ')', buf );
+                utAppendChar(buf, ')');
 	    }
             else
                 strcat(buf , "???") ;
@@ -2453,7 +2453,7 @@ void opuadd(void)
 
     buf[0] = 0;
     utAppendTitle( team, buf );
-    appchr( ' ', buf );
+    utAppendChar(buf , ' ') ;
     i = strlen( buf );
 
     strcat(buf , nameptr) ;

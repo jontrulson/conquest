@@ -325,7 +325,7 @@ void procDistress(cpCommand_t *cmd)
         utAppendInt( i, cbuf );
     else
         strcat(cbuf , "**") ;
-    appchr( '/', cbuf );
+    utAppendChar(cbuf , '/') ;
     i = round(Ships[snum].etemp);
     if ( i < 100 )
         utAppendInt( i, cbuf );
@@ -882,7 +882,7 @@ void procTow(cpCommand_t *cmd)
     {
         c_strcpy( "But we are being towed by ", cbuf );
         utAppendShip( Ships[snum].towedby, cbuf );
-        appchr( '!', cbuf );
+        utAppendChar(cbuf , '!') ;
         sendFeedback(cbuf);
         return;
     }
@@ -890,7 +890,7 @@ void procTow(cpCommand_t *cmd)
     {
         c_strcpy( "But we're already towing ", cbuf );
         utAppendShip( Ships[snum].towing, cbuf );
-        appchr( '.', cbuf );
+        utAppendChar(cbuf , '.') ;
         sendFeedback(cbuf);
         return;
     }
@@ -991,7 +991,7 @@ void procUnTow(cpCommand_t *cmd)
                 Ships[snum].towedby = 0;
 	    }
             PVUNLOCK(&ConqInfo->lockword);
-            appchr( '.', cbuf );
+            utAppendChar(cbuf , '.') ;
             sendFeedback(cbuf);
 	}
     }
@@ -1022,7 +1022,7 @@ void procUnTow(cpCommand_t *cmd)
             Ships[snum].towing = 0;
 	}
         PVUNLOCK(&ConqInfo->lockword);
-        appchr( '.', cbuf );
+        utAppendChar(cbuf , '.') ;
         sendFeedback(cbuf);
     }
     else
@@ -1291,8 +1291,8 @@ void procBeam(cpCommand_t *cmd)
         sprintf( cbuf, "This planet is uninhabitable for %d more minute",
                  i );
         if ( i != 1 )
-            appchr( 's', cbuf );
-        appchr( '.', cbuf );
+            utAppendChar(cbuf , 's') ;
+        utAppendChar(cbuf , '.') ;
         pktSendAck(PSEV_INFO, PERR_CANCELED, NULL);
         sendFeedback(cbuf);
         return;
@@ -1487,7 +1487,7 @@ void procBeam(cpCommand_t *cmd)
             strcat(cbuf , " arm") ;
             if ( total == 1 )
 	    {
-                appchr( 'y', cbuf );
+                utAppendChar(cbuf , 'y') ;
 	    }
             else
 	    {

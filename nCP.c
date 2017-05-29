@@ -305,43 +305,43 @@ static void _infoship( int snum, int scanner )
                     ( (Ships[snum].scanned[ Ships[scanner].team] > 0) && ! selfwar(scanner) ) );
     }
 
-    strcat(cbuf , ": ") ;
+    strcat(cbuf , ": ");
     if ( Ships[snum].alias[0] != 0 )
     {
-        strcat(cbuf , Ships[snum].alias) ;
+        strcat(cbuf , Ships[snum].alias);
         strcat(cbuf, ", ");
     }
     kills = (Ships[snum].kills + Ships[snum].strkills);
     if ( kills == 0.0 )
-        strcat(cbuf , "no") ;
+        strcat(cbuf , "no");
     else
     {
         sprintf( junk, "%.1f", kills );
-        strcat(cbuf , junk) ;
+        strcat(cbuf , junk);
     }
-    strcat(cbuf , " kill") ;
+    strcat(cbuf , " kill");
     if ( kills != 1.0 )
-        appchr( 's', cbuf );
+        utAppendChar(cbuf , 's');
     if ( SCLOAKED(snum) && ( godlike || SSCANDIST(snum) ) )
         strcat(cbuf, " (CLOAKED) ");
     else
         strcat(cbuf, ", ");
 
-    strcat(cbuf, "a ") ;
-    strcat(cbuf, ShipTypes[Ships[snum].shiptype].name) ;
+    strcat(cbuf, "a ");
+    strcat(cbuf, ShipTypes[Ships[snum].shiptype].name);
     strcat(cbuf, ", ");
 
     if ( godlike )
     {
         utAppendShipStatus( status, cbuf );
-        appchr( '.', cbuf );
+        utAppendChar(cbuf , '.');
     }
     else
     {
         if ( Ships[snum].war[Ships[scanner].team] )
-            strcat(cbuf , "at WAR.") ;
+            strcat(cbuf , "at WAR.");
         else
-            strcat(cbuf , "at peace.") ;
+            strcat(cbuf , "at peace.");
     }
 
     cp_putmsg( cbuf, MSG_LIN1 );
@@ -403,7 +403,7 @@ static void _infoship( int snum, int scanner )
 				   - can't ever catchup = ETA never */
                         sprintf(tmpstr, ", ETA %s",
                                 clbETAStr(0.0, dis));
-                        strcat(cbuf, tmpstr) ;
+                        strcat(cbuf, tmpstr);
 		    }
                     else
 		    {		/* we are indeed closing... */
@@ -419,7 +419,7 @@ static void _infoship( int snum, int scanner )
 
                         sprintf(tmpstr, ", ETA %s",
                                 clbETAStr(pwarp, dis));
-                        strcat(cbuf, tmpstr) ;
+                        strcat(cbuf, tmpstr);
 		    }
 		}
                 else
@@ -441,7 +441,7 @@ static void _infoship( int snum, int scanner )
 
                     sprintf(tmpstr, ", ETA %s",
                             clbETAStr(pwarp, dis));
-                    strcat(cbuf, tmpstr) ;
+                    strcat(cbuf, tmpstr);
 		}
 	    }
 	} /* if do ETA stats */
@@ -456,36 +456,36 @@ static void _infoship( int snum, int scanner )
     {
         if ( cbuf[0] != 0 )
             strcat(cbuf,  ", ");
-        strcat(cbuf , "shields ") ;
+        strcat(cbuf , "shields ");
         if ( SSHUP(snum) && ! SREPAIR(snum) )
             utAppendInt( round( Ships[snum].shields ), cbuf );
         else
-            strcat(cbuf , "DOWN") ;
+            strcat(cbuf , "DOWN");
         i = round( Ships[snum].damage );
         if ( i > 0 )
 	{
             if ( cbuf[0] != 0 )
                 strcat(cbuf, ", ");
             sprintf( junk, "damage %d", i );
-            strcat(cbuf , junk) ;
+            strcat(cbuf , junk);
 	}
         i = Ships[snum].armies;
         if ( i > 0 )
 	{
             sprintf( junk, ", with %d arm", i );
-            strcat(cbuf , junk) ;
+            strcat(cbuf , junk);
             if ( i == 1 )
 	    {
-                appchr( 'y', cbuf );
+                utAppendChar(cbuf , 'y');
 	    }
             else
-                strcat(cbuf , "ies") ;
+                strcat(cbuf , "ies");
 	}
     }
     if ( cbuf[0] != 0 )
     {
         cbuf[0] = (char)toupper( cbuf[0] );
-        appchr( '.', cbuf );
+        utAppendChar(cbuf , '.');
         cp_putmsg( cbuf, MSG_LIN2 );
     }
 
@@ -623,9 +623,9 @@ static void _infoplanet( char *str, int pnum, int snum )
                 sprintf( junk, "with %d %s arm", i,
                          Teams[Planets[pnum].team].name );
                 if ( i == 1 )
-                    strcat(junk , "y") ;
+                    strcat(junk , "y");
                 else
-                    strcat(junk , "ies") ;
+                    strcat(junk , "ies");
 	    }
 	}
 
@@ -643,19 +643,19 @@ static void _infoplanet( char *str, int pnum, int snum )
                 if ( junk[0] != 0 )
                     strcat(junk, ", ");
                 utAppendInt( j, junk );
-                strcat(junk , " minutes until coup time") ;
+                strcat(junk , " minutes until coup time");
 	    }
 	}
     }
 
     if ( junk[0] == 0 )
     {
-        appchr( '.', buf );
+        utAppendChar(buf , '.');
     }
     else
     {
-        appchr( ',', buf );
-        appchr( '.', junk );
+        utAppendChar(buf, ',');
+        utAppendChar(junk, '.');
     }
 
     /* Now output the info. Break the stuff in buf across two lines */
@@ -678,8 +678,8 @@ static void _infoplanet( char *str, int pnum, int snum )
         i = j + 1;
         while ( buf[i] != ' ' && i > 1 )
             i = i - 1;
-        appchr( ' ', buf );
-        strcat(buf , junk) ;
+        utAppendChar(buf , ' ');
+        strcat(buf , junk);
         buf[i] = 0;				/* terminate at blank */
         cp_putmsg( buf, MSG_LIN1 );
         cp_putmsg( &buf[i+1], MSG_LIN2 );
@@ -868,8 +868,8 @@ static void rmesg(int snum, int msgnum, int lin)
     char buf[MSGMAXLINE];
 
     clbFmtMsg(Msgs[msgnum].msgto, Msgs[msgnum].msgfrom, buf);
-    strcat(buf , ": ") ;
-    strcat(buf , Msgs[msgnum].msgbuf) ;
+    strcat(buf , ": ");
+    strcat(buf , Msgs[msgnum].msgbuf);
 
     hudSetPrompt(lin, NULL, NoColor, buf, CyanColor);
 
@@ -1117,7 +1117,7 @@ static int _chktow(void)
     {
         c_strcpy( "But we are being towed by ", cbuf );
         utAppendShip( Ships[snum].towedby, cbuf );
-        appchr( '!', cbuf );
+        utAppendChar(cbuf , '!');
         cp_putmsg( cbuf, MSG_LIN2 );
         return FALSE;
     }
@@ -1125,7 +1125,7 @@ static int _chktow(void)
     {
         c_strcpy( "But we're already towing ", cbuf );
         utAppendShip( Ships[snum].towing, cbuf );
-        appchr( '.', cbuf );
+        utAppendChar(cbuf , '.');
         cp_putmsg( cbuf, MSG_LIN2 );
         return FALSE;
     }
@@ -1278,26 +1278,26 @@ static void _domsgto(char *buf, int ch, int terse)
             return;
 	}
         utAppendShip( to, tbuf );
-        appchr( ':', tbuf );
+        utAppendChar(tbuf , ':');
     }
     else if ( -to >= 0 && -to < NUMPLAYERTEAMS )
     {
-        strcat(tbuf , Teams[-to].name) ;
-        strcat(tbuf , "s:") ;
+        strcat(tbuf , Teams[-to].name);
+        strcat(tbuf , "s:");
     }
     else switch ( to )
          {
          case MSG_ALL:
-             strcat(tbuf , "everyone:") ;
+             strcat(tbuf , "everyone:");
              break;
          case MSG_GOD:
-             strcat(tbuf , "GOD:") ;
+             strcat(tbuf , "GOD:");
              break;
          case MSG_IMPLEMENTORS:
-             strcat(tbuf , "The Implementors:") ;
+             strcat(tbuf , "The Implementors:");
              break;
          case MSG_FRIENDLY:
-             strcat(tbuf , "Friend:") ;
+             strcat(tbuf , "Friend:");
              break;
          default:
              cp_putmsg( huh, MSG_LIN2 );
@@ -1771,8 +1771,8 @@ static void _initbeam()
         sprintf( cbuf, "This planet is uninhabitable for %d more minute",
                  i );
         if ( i != 1 )
-            appchr( 's', cbuf );
-        appchr( '.', cbuf );
+            utAppendChar(cbuf , 's');
+        utAppendChar(cbuf , '.');
         cp_putmsg( cbuf, MSG_LIN1 );
         return;
     }
@@ -1829,10 +1829,10 @@ static void _initbeam()
 	{
             c_strcpy( "The arm", cbuf );
             if ( upmax == 1 )
-                strcat(cbuf , "y is") ;
+                strcat(cbuf , "y is");
             else
-                strcat(cbuf , "ies are") ;
-            strcat(cbuf , " reluctant to beam aboard a pirate vessel.") ;
+                strcat(cbuf , "ies are");
+            strcat(cbuf , " reluctant to beam aboard a pirate vessel.");
             cp_putmsg( cbuf, MSG_LIN1 );
             return;
 	}
@@ -2154,7 +2154,7 @@ static void command( int ch )
         break;
     case 'N':				/* change pseudonym */
         c_strcpy( "Old pseudonym: ", pbuf );
-        strcat(pbuf , Ships[Context.snum].alias) ;
+        strcat(pbuf , Ships[Context.snum].alias);
         cp_putmsg(pbuf, MSG_LIN1);
         state = S_PSEUDO;
         prm.preinit = FALSE;

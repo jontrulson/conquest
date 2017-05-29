@@ -209,7 +209,7 @@ static int nPlayDisplay(dspConfig_t *dsp)
             utAppendInt( j, cbuf );
             strcat(cbuf , " ship") ;
             if ( j != 1 )
-                appchr( 's', cbuf );
+                utAppendChar(cbuf , 's') ;
             strcat(cbuf , " at one time.") ;
             cprintf(i, 0, ALIGN_CENTER, cbuf);
             break;

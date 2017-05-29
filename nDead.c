@@ -156,7 +156,7 @@ static int nDeadDisplay(dspConfig_t *dsp)
             if ( eShip.status != SS_LIVE )
                 strcat(buf, ", who also died.");
             else
-                appchr( '.', buf );
+                utAppendChar(buf , '.') ;
             cprintf( 8,0,ALIGN_CENTER,
                      "#%d#You were kill number #%d#%.1f #%d#for #%d#%s #%d#(#%d#%s#%d#)%s",
                      InfoColor, CQC_A_BOLD, eShip.kills,

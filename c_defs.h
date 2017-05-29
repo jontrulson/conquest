@@ -184,12 +184,6 @@ typedef double real;
 
 #define mod(x, y) ((x) % (y))
 #define c_strcpy(x, y) strcpy(y, x)
-#define appchr(x, y)     {                      \
-        static int yyzi;                        \
-        yyzi = strlen(y);                       \
-        y[yyzi++] = x;                          \
-        y[yyzi] = '\0';                         \
-    }
 #ifndef min
 #define min(x, y) (((x) < (y)) ? (x) : (y))
 #endif
