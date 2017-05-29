@@ -44,7 +44,7 @@ static char *ptr;
  * other sections can be defined in it, so PREVSECTION looks only at
  * nesting levels > 1.  Bascause of this, your max available nesting
  * depth is really MAX_NESTING_DEPTH - 1.
- */ 
+ */
 #define MAX_NESTING_DEPTH     16
 static int sections[MAX_NESTING_DEPTH] = {};
 static int curDepth = 0;
@@ -64,7 +64,7 @@ static cqiPlanetInitPtr_t      _cqiPlanets;
 static cqiTextureInitPtr_t     _cqiTextures;
 static cqiAnimationInitPtr_t   _cqiAnimations;
 static cqiAnimDefInitPtr_t     _cqiAnimDefs;
- 
+
 static cqiSoundConfPtr_t       _cqiSoundConf;
 static cqiSoundPtr_t           _cqiSoundEffects;
 static cqiSoundPtr_t           _cqiSoundMusic;
@@ -123,39 +123,39 @@ static int parsebool(char *str);
   real rnum;
 };
 
-%token <num> TOK_OPENSECT TOK_CLOSESECT TOK_NUMBER 
-%token <num> TOK_GLOBAL TOK_PLANETMAX TOK_SHIPMAX TOK_USERMAX TOK_MSGMAX 
+%token <num> TOK_OPENSECT TOK_CLOSESECT TOK_NUMBER
+%token <num> TOK_GLOBAL TOK_PLANETMAX TOK_SHIPMAX TOK_USERMAX TOK_MSGMAX
 %token <num> TOK_HISTMAX
-%token <num> TOK_SHIPTYPE TOK_ENGFAC TOK_WEAFAC TOK_ACCELFAC TOK_TORPWARP 
+%token <num> TOK_SHIPTYPE TOK_ENGFAC TOK_WEAFAC TOK_ACCELFAC TOK_TORPWARP
 %token <num> TOK_WARPMAX
-%token <num> TOK_ARMYMAX TOK_SHMAX TOK_DAMMAX TOK_TORPMAX TOK_FUELMAX 
+%token <num> TOK_ARMYMAX TOK_SHMAX TOK_DAMMAX TOK_TORPMAX TOK_FUELMAX
 %token <num> TOK_NAME TOK_SIZE
-%token <num> TOK_PLANET TOK_PRIMARY TOK_ANGLE TOK_VELOCITY TOK_RADIUS 
+%token <num> TOK_PLANET TOK_PRIMARY TOK_ANGLE TOK_VELOCITY TOK_RADIUS
 %token <num> TOK_PTYPE TOK_PTEAM
-%token <num> TOK_ARMIES TOK_VISIBLE TOK_CORE TOK_XCOORD TOK_YCOORD 
+%token <num> TOK_ARMIES TOK_VISIBLE TOK_CORE TOK_XCOORD TOK_YCOORD
 %token <num> TOK_TEXNAME TOK_COLOR
 %token <num> TOK_HOMEPLANET TOK_TEXTURE TOK_FILENAME
-%token <num> TOK_ANIMATION TOK_ANIMDEF 
+%token <num> TOK_ANIMATION TOK_ANIMDEF
 %token <num> TOK_STAGES TOK_LOOPS TOK_DELAYMS TOK_LOOPTYPE TOK_TIMELIMIT
 %token <num> TOK_TEXANIM TOK_COLANIM TOK_GEOANIM TOK_TOGANIM TOK_ISTATE
-%token <num> TOK_DELTAA TOK_DELTAR TOK_DELTAG TOK_DELTAB TOK_DELTAX 
-%token <num> TOK_DELTAY TOK_DELTAZ TOK_DELTAS 
+%token <num> TOK_DELTAA TOK_DELTAR TOK_DELTAG TOK_DELTAB TOK_DELTAX
+%token <num> TOK_DELTAY TOK_DELTAZ TOK_DELTAS
 
-%token <num> TOK_SOUNDCONF TOK_SAMPLERATE TOK_VOLUME TOK_PAN TOK_STEREO 
+%token <num> TOK_SOUNDCONF TOK_SAMPLERATE TOK_VOLUME TOK_PAN TOK_STEREO
 %token <num> TOK_FXCHANNELS TOK_CHUNKSIZE
 %token <num> TOK_EFFECT TOK_FADEINMS TOK_FADEOUTMS TOK_LIMIT TOK_FRAMELIMIT
 %token <num> TOK_MUSIC
 %token <num> TOK_DELTAT TOK_SCOORD TOK_TCOORD TOK_WIDTH TOK_HEIGHT TOK_TEXAREA
 %token <num> TOK_MIPMAP TOK_TEX_LUMINANCE
 
-%token <ptr>  TOK_STRING 
+%token <ptr>  TOK_STRING
 %token <rnum> TOK_RATIONAL
 
 %type <ptr>  string
 %type <num>  number
 %type <rnum> rational
 
-%start conqinit 
+%start conqinit
 
 %%
 conqinit        : sections
@@ -165,7 +165,7 @@ sections        : /* empty */
                 | sections section
                 ;
 
-section         : globalconfig 
+section         : globalconfig
                 | shiptypeconfig
                 | planetconfig
                 | textureconfig
@@ -213,7 +213,7 @@ startplanet     : planetword opensect
 
 planetword      : TOK_PLANET
                 {;}
-                ;                
+                ;
 
 textureconfig   : starttexture stmts closesect
                 ;
@@ -226,7 +226,7 @@ starttexture    : textureword opensect
 
 textureword     : TOK_TEXTURE
                 {;}
-                ;                
+                ;
 
 animationconfig : startanimation stmts closesect
                 ;
@@ -397,265 +397,265 @@ stmts           : /* empty */
 stmt            : TOK_PLANETMAX number
                    {
                         cfgSectioni(TOK_PLANETMAX, $2);
-                   }                      
+                   }
                 | TOK_SHIPMAX number
                    {
                         cfgSectioni(TOK_SHIPMAX, $2);
-                   }                      
+                   }
                 | TOK_USERMAX number
                    {
                         cfgSectioni(TOK_USERMAX, $2);
-                   }                      
+                   }
                 | TOK_HISTMAX number
                    {
                         cfgSectioni(TOK_HISTMAX, $2);
-                   }                      
+                   }
                 | TOK_MSGMAX number
                    {
                         cfgSectioni(TOK_MSGMAX, $2);
-                   }                      
+                   }
                 | TOK_NAME string
                    {
                         cfgSections(TOK_NAME, $2);
-                   }                      
+                   }
                 | TOK_ENGFAC rational
                    {
                         cfgSectionf(TOK_ENGFAC, $2);
-                   }                      
+                   }
                 | TOK_WEAFAC rational
                    {
                         cfgSectionf(TOK_WEAFAC, $2);
-                   }                      
+                   }
                 | TOK_ACCELFAC rational
                    {
                         cfgSectionf(TOK_ACCELFAC, $2);
-                   }                      
+                   }
                 | TOK_TORPWARP number
                    {
                         cfgSectioni(TOK_TORPWARP, $2);
-                   }                      
+                   }
                 | TOK_WARPMAX number
                    {
                         cfgSectioni(TOK_WARPMAX, $2);
-                   }                      
+                   }
                 | TOK_ARMYMAX number
                    {
                         cfgSectioni(TOK_ARMYMAX, $2);
-                   }                      
+                   }
                 | TOK_SHMAX number
                    {
                         cfgSectioni(TOK_SHMAX, $2);
-                   }                      
+                   }
                 | TOK_DAMMAX number
                    {
                         cfgSectioni(TOK_DAMMAX, $2);
-                   }                      
+                   }
                 | TOK_TORPMAX number
                    {
                         cfgSectioni(TOK_TORPMAX, $2);
-                   }                      
+                   }
                 | TOK_FUELMAX number
                    {
                         cfgSectioni(TOK_FUELMAX, $2);
-                   }                      
+                   }
                 | TOK_SIZE number
                    {
                         cfgSectioni(TOK_SIZE, $2);
-                   }                      
+                   }
                 | TOK_HOMEPLANET string
                    {
                         cfgSectionb(TOK_HOMEPLANET, $2);
-                   }                      
+                   }
                 | TOK_PRIMARY string
                    {
                         cfgSections(TOK_PRIMARY, $2);
-                   }                      
+                   }
                 | TOK_ANGLE rational
                    {
                         cfgSectionf(TOK_ANGLE, $2);
-                   }                      
+                   }
                 | TOK_VELOCITY rational
                    {
                         cfgSectionf(TOK_VELOCITY, $2);
-                   }                      
+                   }
                 | TOK_RADIUS rational
                    {
                         cfgSectionf(TOK_RADIUS, $2);
-                   }                      
+                   }
                 | TOK_PTYPE string
                    {
                         cfgSections(TOK_PTYPE, $2);
-                   }                      
+                   }
                 | TOK_PTEAM string
                    {
                         cfgSections(TOK_PTEAM, $2);
-                   }                      
+                   }
                 | TOK_ARMIES number number
                    {
                         cfgSectionil(TOK_ARMIES, $2, $3);
-                   }                      
+                   }
                 | TOK_ARMIES number
                    {
                         cfgSectioni(TOK_ARMIES, $2);
-                   }                      
+                   }
                 | TOK_VISIBLE string
                    {
                         cfgSectionb(TOK_VISIBLE, $2);
-                   }                      
+                   }
                 | TOK_CORE string
                    {
                         cfgSectionb(TOK_CORE, $2);
-                   }                      
+                   }
                 | TOK_MIPMAP string
                    {
                         cfgSectionb(TOK_MIPMAP, $2);
-                   }                      
+                   }
                 | TOK_XCOORD rational
                    {
                         cfgSectionf(TOK_XCOORD, $2);
-                   }                      
+                   }
                 | TOK_YCOORD rational
                    {
                         cfgSectionf(TOK_YCOORD, $2);
-                   }                      
+                   }
                 | TOK_TEXNAME string
                    {
                         cfgSections(TOK_TEXNAME, $2);
-                   }                      
+                   }
                 | TOK_COLOR string
                    {
                         cfgSections(TOK_COLOR, $2);
-                   }                      
+                   }
                 | TOK_FILENAME string
                    {
                         cfgSections(TOK_FILENAME, $2);
-                   }                      
+                   }
                 | TOK_ANIMDEF string
                    {            /* in this form, it's a statement
                                    rather than a section */
                         cfgSections(TOK_ANIMDEF, $2);
-                   }                      
+                   }
                 | TOK_STAGES number
                    {
                         cfgSectioni(TOK_STAGES, $2);
-                   }                      
+                   }
                 | TOK_LOOPS number
                    {
                         cfgSectioni(TOK_LOOPS, $2);
-                   }                      
+                   }
                 | TOK_DELAYMS number
                    {
                         cfgSectioni(TOK_DELAYMS, $2);
-                   }                      
+                   }
                 | TOK_LOOPTYPE number
                    {
                         cfgSectioni(TOK_LOOPTYPE, $2);
-                   }                      
+                   }
                 | TOK_DELTAA rational
                    {
                         cfgSectionf(TOK_DELTAA, $2);
-                   }                      
+                   }
                 | TOK_DELTAR rational
                    {
                         cfgSectionf(TOK_DELTAR, $2);
-                   }                      
+                   }
                 | TOK_DELTAG rational
                    {
                         cfgSectionf(TOK_DELTAG, $2);
-                   }                      
+                   }
                 | TOK_DELTAB rational
                    {
                         cfgSectionf(TOK_DELTAB, $2);
-                   }                      
+                   }
                 | TOK_DELTAX rational
                    {
                         cfgSectionf(TOK_DELTAX, $2);
-                   }                      
+                   }
                 | TOK_DELTAY rational
                    {
                         cfgSectionf(TOK_DELTAY, $2);
-                   }                      
+                   }
                 | TOK_DELTAZ rational
                    {
                         cfgSectionf(TOK_DELTAZ, $2);
-                   }                      
+                   }
                 | TOK_DELTAS rational
                    {
                         cfgSectionf(TOK_DELTAS, $2);
-                   }                      
+                   }
                 | TOK_TIMELIMIT number
                    {
                         cfgSectioni(TOK_TIMELIMIT, $2);
-                   }                      
+                   }
                 | TOK_SAMPLERATE number
                    {
                         cfgSectioni(TOK_SAMPLERATE, $2);
-                   }                      
+                   }
                 | TOK_VOLUME number
                    {
                         cfgSectioni(TOK_VOLUME, $2);
-                   }                      
+                   }
                 | TOK_PAN number
                    {
                         cfgSectioni(TOK_PAN, $2);
-                   }                      
+                   }
                 | TOK_STEREO string
                    {
                         cfgSectionb(TOK_STEREO, $2);
-                   }                      
+                   }
                 | TOK_FXCHANNELS number
                    {
                         cfgSectioni(TOK_FXCHANNELS, $2);
-                   }                      
+                   }
                 | TOK_CHUNKSIZE number
                    {
                         cfgSectioni(TOK_CHUNKSIZE, $2);
-                   }                      
+                   }
                 | TOK_FADEINMS number
                    {
                         cfgSectioni(TOK_FADEINMS, $2);
-                   }                      
+                   }
                 | TOK_FADEOUTMS number
                    {
                         cfgSectioni(TOK_FADEOUTMS, $2);
-                   }                      
+                   }
                 | TOK_FRAMELIMIT number
                    {
                         cfgSectioni(TOK_FRAMELIMIT, $2);
-                   }                      
+                   }
                 | TOK_LIMIT number
                    {
                         cfgSectioni(TOK_LIMIT, $2);
-                   }                      
+                   }
                 | TOK_SCOORD rational
                    {
                         cfgSectionf(TOK_SCOORD, $2);
-                   }                      
+                   }
                 | TOK_TCOORD rational
                    {
                         cfgSectionf(TOK_TCOORD, $2);
-                   }                      
+                   }
                 | TOK_DELTAT rational
                    {
                         cfgSectionf(TOK_DELTAT, $2);
-                   }                      
+                   }
                 | TOK_WIDTH rational
                    {
                         cfgSectionf(TOK_WIDTH, $2);
-                   }                      
+                   }
                 | TOK_HEIGHT rational
                    {
                         cfgSectionf(TOK_HEIGHT, $2);
-                   }                      
+                   }
                 | TOK_TEX_LUMINANCE string
                    {
                         cfgSectionb(TOK_TEX_LUMINANCE, $2);
-                   }                      
+                   }
                 | error closesect
                 ;
 
 string		: TOK_STRING
-                  { 
+                  {
                     ptr = (char *)strdup($1);
                     if (ptr)
                       checkStr(ptr);
@@ -669,1221 +669,1221 @@ rational	: TOK_RATIONAL		{ $$ = $1; }
 
 %%
 
-/* search the 'public' planet list */
+                  /* search the 'public' planet list */
 int cqiFindPlanet(char *str)
 {
-  int i;
+    int i;
 
-  for (i=0; i < cqiGlobal->maxplanets; i++)
-    if (!strncmp(cqiPlanets[i].name, str, MAXPLANETNAME))
-      return i;
+    for (i=0; i < cqiGlobal->maxplanets; i++)
+        if (!strncmp(cqiPlanets[i].name, str, MAXPLANETNAME))
+            return i;
 
-  return -1;
+    return -1;
 }
 
 /* search internal planet list */
 static int _cqiFindPlanet(char *str)
 {
-  int i;
+    int i;
 
-  for (i=0; i < numPlanets; i++)
-    if (!strncmp(_cqiPlanets[i].name, str, MAXPLANETNAME))
-      return i;
+    for (i=0; i < numPlanets; i++)
+        if (!strncmp(_cqiPlanets[i].name, str, MAXPLANETNAME))
+            return i;
 
-  return -1;
+    return -1;
 }
 
 /* search internal texture list */
 static int _cqiFindTexture(char *texname)
 {
-  int i;
+    int i;
 
-  for (i=0; i<numTextures; i++)
-    if (!strncmp(_cqiTextures[i].name, texname, CQI_NAMELEN))
-      return i;
-  
-  return -1;
+    for (i=0; i<numTextures; i++)
+        if (!strncmp(_cqiTextures[i].name, texname, CQI_NAMELEN))
+            return i;
+
+    return -1;
 }
 
 /* search the public tex area list */
-cqiTextureAreaPtr_t cqiFindTexArea(char *texnm, char *tanm, 
+cqiTextureAreaPtr_t cqiFindTexArea(char *texnm, char *tanm,
                                    cqiTextureAreaPtr_t defaultta)
 {
-  int tidx, i;
+    int tidx, i;
 
-  if (!texnm || !tanm)
+    if (!texnm || !tanm)
     {
-      return defaultta;
+        return defaultta;
     }
 
-  if ((tidx = _cqiFindTexture(texnm)) == -1)
+    if ((tidx = _cqiFindTexture(texnm)) == -1)
     {
-      return defaultta;
+        return defaultta;
     }
 
-  for (i=0; i<_cqiTextures[tidx].numTexAreas; i++)
-    if (!strncmp(_cqiTextures[tidx].texareas[i].name, tanm, MAXPLANETNAME))
-      return &(_cqiTextures[tidx].texareas[i]);
+    for (i=0; i<_cqiTextures[tidx].numTexAreas; i++)
+        if (!strncmp(_cqiTextures[tidx].texareas[i].name, tanm, MAXPLANETNAME))
+            return &(_cqiTextures[tidx].texareas[i]);
 
-  utLog("%s: could not find texarea %s in texture %s",
-       __FUNCTION__,
-       tanm, texnm);
+    utLog("%s: could not find texarea %s in texture %s",
+          __FUNCTION__,
+          tanm, texnm);
 
-  return defaultta;
+    return defaultta;
 }
 
 /* search internal animation list */
 static int _cqiFindAnimation(char *animname)
 {
-  int i;
+    int i;
 
-  for (i=0; i<numAnimations; i++)
-    if (!strncmp(_cqiAnimations[i].name, animname, CQI_NAMELEN))
-      return i;
-  
-  return -1;
+    for (i=0; i<numAnimations; i++)
+        if (!strncmp(_cqiAnimations[i].name, animname, CQI_NAMELEN))
+            return i;
+
+    return -1;
 }
 
 static int _cqiFindAnimDef(char *defname)
 {
-  int i;
+    int i;
 
-  for (i=0; i<numAnimDefs; i++)
-    if (!strncmp(_cqiAnimDefs[i].name, defname, CQI_NAMELEN))
-      return i;
-  
-  return -1;
+    for (i=0; i<numAnimDefs; i++)
+        if (!strncmp(_cqiAnimDefs[i].name, defname, CQI_NAMELEN))
+            return i;
+
+    return -1;
 }
 
 /* search internal effect list */
 static int _cqiFindEffect(char *name)
 {
-  int i;
+    int i;
 
-  for (i=0; i<numSoundEffects; i++)
-    if (!strncmp(_cqiSoundEffects[i].name, name, CQI_NAMELEN))
-      return i;
-  
-  return -1;
+    for (i=0; i<numSoundEffects; i++)
+        if (!strncmp(_cqiSoundEffects[i].name, name, CQI_NAMELEN))
+            return i;
+
+    return -1;
 }
 
 static int _cqiFindMusic(char *name)
 {
-  int i;
+    int i;
 
-  for (i=0; i<numSoundMusic; i++)
-    if (!strncmp(_cqiSoundMusic[i].name, name, CQI_NAMELEN))
-      return i;
-  
-  return -1;
+    for (i=0; i<numSoundMusic; i++)
+        if (!strncmp(_cqiSoundMusic[i].name, name, CQI_NAMELEN))
+            return i;
+
+    return -1;
 }
 
 /* search public effect list */
 int cqiFindEffect(char *name)
 {
-  int i;
+    int i;
 
-  for (i=0; i<cqiNumSoundEffects; i++)
-    if (!strncmp(cqiSoundEffects[i].name, name, CQI_NAMELEN))
-      return i;
-  
-  return -1;
+    for (i=0; i<cqiNumSoundEffects; i++)
+        if (!strncmp(cqiSoundEffects[i].name, name, CQI_NAMELEN))
+            return i;
+
+    return -1;
 }
 
 int cqiFindMusic(char *name)
 {
-  int i;
+    int i;
 
-  for (i=0; i<cqiNumSoundMusic; i++)
-    if (!strncmp(cqiSoundMusic[i].name, name, CQI_NAMELEN))
-      return i;
-  
-  return -1;
+    for (i=0; i<cqiNumSoundMusic; i++)
+        if (!strncmp(cqiSoundMusic[i].name, name, CQI_NAMELEN))
+            return i;
+
+    return -1;
 }
 
 static uint32_t hex2color(char *str)
 {
-  uint32_t v;
+    uint32_t v;
 
-  /* default to 0 (black/transparent) */
+    /* default to 0 (black/transparent) */
 
-  if (!str)
-    return 0;
+    if (!str)
+        return 0;
 
-  if (sscanf(str, "%x", &v) != 1)
+    if (sscanf(str, "%x", &v) != 1)
     {
-      utLog("hex2color(): invalid color specification '%s' at line %d, setting to 0",
-           str, lineNum);
-      v = 0;
+        utLog("hex2color(): invalid color specification '%s' at line %d, setting to 0",
+              str, lineNum);
+        v = 0;
     }
 
-  return v;
+    return v;
 }
-  
+
 
 static int cqiValidateAnimations(void)
 {
-  int i, j;
-  char tbuf[CQI_NAMELEN];
-  int ndx;
+    int i, j;
+    char tbuf[CQI_NAMELEN];
+    int ndx;
 
-  /* if no textures, no point */
-  if (!_cqiTextures)
-    return FALSE;
+    /* if no textures, no point */
+    if (!_cqiTextures)
+        return FALSE;
 
-  if (!numAnimDefs || !numAnimations)
-    return FALSE;
+    if (!numAnimDefs || !numAnimations)
+        return FALSE;
 
-  /* go through each anim def, checking various things */
-  for (i=0; i<numAnimDefs; i++)
+    /* go through each anim def, checking various things */
+    for (i=0; i<numAnimDefs; i++)
     {
-      /* first, if a texname specified, and there is no texanim
-         associated with this animdef, make sure the texname
-         exists. */
-      if (_cqiAnimDefs[i].texname[0] && 
-          !(_cqiAnimDefs[i].anims & CQI_ANIMS_TEX))
-      {                         /* texname and no tex anim */
-        /* make sure the texture exists. */
-        if (_cqiFindTexture(_cqiAnimDefs[i].texname) < 0)
-          {                     /* nope */
-            utLog("%s: animdef %s: texture %s does not exist.",
-                 __FUNCTION__, 
-                 _cqiAnimDefs[i].name,
-                 _cqiAnimDefs[i].texname);
-            return FALSE;
-          }
-      }
+        /* first, if a texname specified, and there is no texanim
+           associated with this animdef, make sure the texname
+           exists. */
+        if (_cqiAnimDefs[i].texname[0] &&
+            !(_cqiAnimDefs[i].anims & CQI_ANIMS_TEX))
+        {                         /* texname and no tex anim */
+            /* make sure the texture exists. */
+            if (_cqiFindTexture(_cqiAnimDefs[i].texname) < 0)
+            {                     /* nope */
+                utLog("%s: animdef %s: texture %s does not exist.",
+                      __FUNCTION__,
+                      _cqiAnimDefs[i].name,
+                      _cqiAnimDefs[i].texname);
+                return FALSE;
+            }
+        }
 
-      /* now check each anim type 
-       *  
-       * stages must be > 0 
-       * a stage == 0 means to disable an anim type, in which case
-       *  the anim type will never have been be enabled (endSection)
-       */
+        /* now check each anim type
+         *
+         * stages must be > 0
+         * a stage == 0 means to disable an anim type, in which case
+         *  the anim type will never have been be enabled (endSection)
+         */
 
-      /* texanim */
-      if (_cqiAnimDefs[i].anims & CQI_ANIMS_TEX)
+        /* texanim */
+        if (_cqiAnimDefs[i].anims & CQI_ANIMS_TEX)
         {
-          if (_cqiAnimDefs[i].texanim.stages <= 0)
+            if (_cqiAnimDefs[i].texanim.stages <= 0)
             {
-              utLog("%s: animdef %s: texanim: stages must greater than zero.",
-                   __FUNCTION__, 
-                   _cqiAnimDefs[i].name);
-              return FALSE;
-            }
-          
-          /* must be a texname */
-          if (!_cqiAnimDefs[i].texname[0])
-            {
-              /* copy the animdef name over */
-              strncpy(_cqiAnimDefs[i].texname, _cqiAnimDefs[i].name, 
-                      CQI_NAMELEN - 1);
+                utLog("%s: animdef %s: texanim: stages must greater than zero.",
+                      __FUNCTION__,
+                      _cqiAnimDefs[i].name);
+                return FALSE;
             }
 
-          /* for each stage, build a texname and make sure it
-             exists */
-          for (j=0; j<_cqiAnimDefs[i].texanim.stages; j++)
+            /* must be a texname */
+            if (!_cqiAnimDefs[i].texname[0])
+            {
+                /* copy the animdef name over */
+                strncpy(_cqiAnimDefs[i].texname, _cqiAnimDefs[i].name,
+                        CQI_NAMELEN - 1);
+            }
+
+            /* for each stage, build a texname and make sure it
+               exists */
+            for (j=0; j<_cqiAnimDefs[i].texanim.stages; j++)
             {
 
-              /* if the texanim only contains a single stage (one texture)
-               * then do not append the stage number to the texname.
-               */
+                /* if the texanim only contains a single stage (one texture)
+                 * then do not append the stage number to the texname.
+                 */
 
-              if (_cqiAnimDefs[i].texanim.stages == 1)
-                snprintf(tbuf, CQI_NAMELEN - 1, "%s",
-                         _cqiAnimDefs[i].texname);
-              else
-                snprintf(tbuf, CQI_NAMELEN - 1, "%s%d",
-                         _cqiAnimDefs[i].texname,
-                         j);
-              
-              /* locate the texture */
-              if (_cqiFindTexture(tbuf) < 0)
+                if (_cqiAnimDefs[i].texanim.stages == 1)
+                    snprintf(tbuf, CQI_NAMELEN - 1, "%s",
+                             _cqiAnimDefs[i].texname);
+                else
+                    snprintf(tbuf, CQI_NAMELEN - 1, "%s%d",
+                             _cqiAnimDefs[i].texname,
+                             j);
+
+                /* locate the texture */
+                if (_cqiFindTexture(tbuf) < 0)
                 {                     /* nope */
-                  utLog("%s: animdef %s: texanim: texture %s does not exist.",
-                       __FUNCTION__, 
-                       _cqiAnimDefs[i].name,
-                       tbuf);
-                  return FALSE;
+                    utLog("%s: animdef %s: texanim: texture %s does not exist.",
+                          __FUNCTION__,
+                          _cqiAnimDefs[i].name,
+                          tbuf);
+                    return FALSE;
                 }
             }
         }
-      
-      /* colanim */
-      if (_cqiAnimDefs[i].anims & CQI_ANIMS_COL)
+
+        /* colanim */
+        if (_cqiAnimDefs[i].anims & CQI_ANIMS_COL)
         {
-          if (_cqiAnimDefs[i].colanim.stages <= 0)
+            if (_cqiAnimDefs[i].colanim.stages <= 0)
             {
-              utLog("%s: animdef %s: colanim: stages must greater than zero.",
-                   __FUNCTION__, 
-                   _cqiAnimDefs[i].name);
-              return FALSE;
+                utLog("%s: animdef %s: colanim: stages must greater than zero.",
+                      __FUNCTION__,
+                      _cqiAnimDefs[i].name);
+                return FALSE;
             }
         }
 
-      /* geoanim */
-      if (_cqiAnimDefs[i].anims & CQI_ANIMS_GEO)
+        /* geoanim */
+        if (_cqiAnimDefs[i].anims & CQI_ANIMS_GEO)
         {
-          /* if stages is 0 (meaning infinite) then loops is meaningless -
-             set to 0 and warn. */
-          if (_cqiAnimDefs[i].geoanim.stages <= 0)
+            /* if stages is 0 (meaning infinite) then loops is meaningless -
+               set to 0 and warn. */
+            if (_cqiAnimDefs[i].geoanim.stages <= 0)
             {
-              utLog("%s: animdef %s: geoanim: stages must greater than zero.",
-                   __FUNCTION__, 
-                   _cqiAnimDefs[i].name);
-              return FALSE;
+                utLog("%s: animdef %s: geoanim: stages must greater than zero.",
+                      __FUNCTION__,
+                      _cqiAnimDefs[i].name);
+                return FALSE;
             }
         }
     } /* for */
 
 
-  /* now, make sure each animation specifies an existing
-     animdef, set up adIndex */
-  for (i=0; i < numAnimations; i++)
+    /* now, make sure each animation specifies an existing
+       animdef, set up adIndex */
+    for (i=0; i < numAnimations; i++)
     {
-      if ((ndx = _cqiFindAnimDef(_cqiAnimations[i].animdef)) < 0)
+        if ((ndx = _cqiFindAnimDef(_cqiAnimations[i].animdef)) < 0)
         {                       /* nope */
-          utLog("%s: animdef %s does not exist for animation %s.",
-               __FUNCTION__, 
-               _cqiAnimations[i].animdef,
-               _cqiAnimations[i].name);
-          return FALSE;
+            utLog("%s: animdef %s does not exist for animation %s.",
+                  __FUNCTION__,
+                  _cqiAnimations[i].animdef,
+                  _cqiAnimations[i].name);
+            return FALSE;
         }
-      else                      /* save the index */
-        _cqiAnimations[i].adIndex = ndx;
+        else                      /* save the index */
+            _cqiAnimations[i].adIndex = ndx;
     }
-          
-  return TRUE;
+
+    return TRUE;
 }
 
 static int cqiValidatePlanets(void)
 {
-  int i;
-  int mur = -1;
-  int homeplan[NUMPLAYERTEAMS];             /* count of home planets */
+    int i;
+    int mur = -1;
+    int homeplan[NUMPLAYERTEAMS];             /* count of home planets */
 
-  /* first things first... If there was no global read, then no
-     point in continuing */
+    /* first things first... If there was no global read, then no
+       point in continuing */
 
-  if (!globalRead)
-    return FALSE;
+    if (!globalRead)
+        return FALSE;
 
-  memset((void *)homeplan, 0, sizeof(int) * NUMPLAYERTEAMS);
+    memset((void *)homeplan, 0, sizeof(int) * NUMPLAYERTEAMS);
 
-  if (mur < 0)
+    if (mur < 0)
     {
-      if ((mur = _cqiFindPlanet("Murisak")) < 0)
+        if ((mur = _cqiFindPlanet("Murisak")) < 0)
         {
-          utLog("%s: cannot find planet Murisak, which must exist",
+            utLog("%s: cannot find planet Murisak, which must exist",
                   __FUNCTION__);
-          mur = 0;
+            mur = 0;
         }
     }
 
-  /* first fill in any empty slots */
-  if (numPlanets < NUMPLANETS)
+    /* first fill in any empty slots */
+    if (numPlanets < NUMPLANETS)
     {
-      for (i = numPlanets; i < _cqiGlobal->maxplanets; i++)
+        for (i = numPlanets; i < _cqiGlobal->maxplanets; i++)
         {
-          /* use the slot number in the name to reduce chance of dup names */
-          snprintf(_cqiPlanets[i].name, MAXPLANETNAME - 1, "ZZExtra %d", 
-                   i);
-          /* FIXME - no hc mur */
-          strcpy(_cqiPlanets[i].primname, "Murisak");
+            /* use the slot number in the name to reduce chance of dup names */
+            snprintf(_cqiPlanets[i].name, MAXPLANETNAME - 1, "ZZExtra %d",
+                     i);
+            /* FIXME - no hc mur */
+            strcpy(_cqiPlanets[i].primname, "Murisak");
 
-          _cqiPlanets[i].primary = mur;
-          _cqiPlanets[i].angle = 0.0;
-          _cqiPlanets[i].velocity = 0.0;
-          _cqiPlanets[i].radius = 0.0;
-          _cqiPlanets[i].ptype = PLANET_GHOST;
-          _cqiPlanets[i].pteam = TEAM_NOTEAM;
-          _cqiPlanets[i].armies = 0;
-          _cqiPlanets[i].visible = FALSE;
-          _cqiPlanets[i].core = FALSE;
-          _cqiPlanets[i].xcoord = 0.0;
-          _cqiPlanets[i].ycoord = 0.0;
-          /* leave texname blank so default rules will fire if neccessary */
+            _cqiPlanets[i].primary = mur;
+            _cqiPlanets[i].angle = 0.0;
+            _cqiPlanets[i].velocity = 0.0;
+            _cqiPlanets[i].radius = 0.0;
+            _cqiPlanets[i].ptype = PLANET_GHOST;
+            _cqiPlanets[i].pteam = TEAM_NOTEAM;
+            _cqiPlanets[i].armies = 0;
+            _cqiPlanets[i].visible = FALSE;
+            _cqiPlanets[i].core = FALSE;
+            _cqiPlanets[i].xcoord = 0.0;
+            _cqiPlanets[i].ycoord = 0.0;
+            /* leave texname blank so default rules will fire if neccessary */
         }
 
-      if (cqiVerbose)
-        utLog("%s: filled %d unspecified planet slots.",
-                __FUNCTION__, NUMPLANETS - numPlanets);
+        if (cqiVerbose)
+            utLog("%s: filled %d unspecified planet slots.",
+                  __FUNCTION__, NUMPLANETS - numPlanets);
     }
 
 
-  for (i=0; i < numPlanets; i++)
+    for (i=0; i < numPlanets; i++)
     {
-      /* see if the primary name == name, if so, orbit mur and vel = 0 */
+        /* see if the primary name == name, if so, orbit mur and vel = 0 */
 
-      if (!strncmp(_cqiPlanets[i].name, _cqiPlanets[i].primname, 
-                   MAXPLANETNAME))
+        if (!strncmp(_cqiPlanets[i].name, _cqiPlanets[i].primname,
+                     MAXPLANETNAME))
         {
-          _cqiPlanets[i].velocity = 0.0;
+            _cqiPlanets[i].velocity = 0.0;
 
-          /* FIXME - need a ghost 0, not harcoded mur */
-          _cqiPlanets[i].primary = mur;
+            /* FIXME - need a ghost 0, not harcoded mur */
+            _cqiPlanets[i].primary = mur;
         }
-      else
+        else
         {                       /* else, find the primary, default to mur */
-          if ((_cqiPlanets[i].primary = _cqiFindPlanet(_cqiPlanets[i].primname)) < 0)
+            if ((_cqiPlanets[i].primary = _cqiFindPlanet(_cqiPlanets[i].primname)) < 0)
             {                   /* couldn't find it */
-              if (cqiVerbose && i != mur)
-                utLog("%s: can't find primary '%s' for planet '%s', defaulting to '%s'",
-                        __FUNCTION__,
-                        _cqiPlanets[i].primname,
-                        _cqiPlanets[i].name,
-                        _cqiPlanets[mur].name);
-              
-              _cqiPlanets[i].primary = mur;
+                if (cqiVerbose && i != mur)
+                    utLog("%s: can't find primary '%s' for planet '%s', defaulting to '%s'",
+                          __FUNCTION__,
+                          _cqiPlanets[i].primname,
+                          _cqiPlanets[i].name,
+                          _cqiPlanets[mur].name);
+
+                _cqiPlanets[i].primary = mur;
             }
         }
 
-      /* count home planets */
+        /* count home planets */
 
-      if (_cqiPlanets[i].homeplanet)
-        switch (_cqiPlanets[i].pteam)
-          {
-          case TEAM_FEDERATION:
-          case TEAM_ROMULAN:
-          case TEAM_KLINGON:
-          case TEAM_ORION:
-            homeplan[_cqiPlanets[i].pteam]++;
-            break;
-          default:
-            break;
-          }
+        if (_cqiPlanets[i].homeplanet)
+            switch (_cqiPlanets[i].pteam)
+            {
+            case TEAM_FEDERATION:
+            case TEAM_ROMULAN:
+            case TEAM_KLINGON:
+            case TEAM_ORION:
+                homeplan[_cqiPlanets[i].pteam]++;
+                break;
+            default:
+                break;
+            }
 
     }
 
 
-  /* make sure 3 homeplanets per 'normal' team have been specified */
-  for (i=0; i < NUMPLAYERTEAMS; i++)
+    /* make sure 3 homeplanets per 'normal' team have been specified */
+    for (i=0; i < NUMPLAYERTEAMS; i++)
     {
-      if (homeplan[i] != 3)
+        if (homeplan[i] != 3)
         {
-          utLog("%s: team %s must have 3 homeplanets. %d were specified.",
+            utLog("%s: team %s must have 3 homeplanets. %d were specified.",
                   __FUNCTION__, team2str(i), homeplan[i]);
-          return FALSE;
+            return FALSE;
         }
     }
 
 
-  if (cqiVerbose)
-    utLog("%s: total planets %d (%d loaded, %d extra)",
-            __FUNCTION__,
-            _cqiGlobal->maxplanets, 
-            numPlanets, 
-            _cqiGlobal->maxplanets - numPlanets);
+    if (cqiVerbose)
+        utLog("%s: total planets %d (%d loaded, %d extra)",
+              __FUNCTION__,
+              _cqiGlobal->maxplanets,
+              numPlanets,
+              _cqiGlobal->maxplanets - numPlanets);
 
 
-  return TRUE;
+    return TRUE;
 }
 
 /* parse a file */
 int cqiLoadRC(int rcid, char *filename, int verbosity, int debugl)
 {
-  FILE *infile;
-  extern FILE *yyin;
-  int fail = FALSE;
-  char buffer[BUFFER_SIZE];
+    FILE *infile;
+    extern FILE *yyin;
+    int fail = FALSE;
+    char buffer[BUFFER_SIZE];
 
-  cqiDebugl = debugl;
-  cqiVerbose = verbosity;
+    cqiDebugl = debugl;
+    cqiVerbose = verbosity;
 
-  switch (rcid)
+    switch (rcid)
     {
     case CQI_FILE_CONQINITRC:   /* optional */
-      if (filename)
-        strncpy(buffer, filename, BUFFER_SIZE - 1);
-      else
-        snprintf(buffer, sizeof(buffer)-1, "%s/%s", utGetPath(CONQETC), 
-                 "conqinitrc");
-      break;
+        if (filename)
+            strncpy(buffer, filename, BUFFER_SIZE - 1);
+        else
+            snprintf(buffer, sizeof(buffer)-1, "%s/%s", utGetPath(CONQETC),
+                     "conqinitrc");
+        break;
     case CQI_FILE_TEXTURESRC:
-    case CQI_FILE_TEXTURESRC_ADD: 
-      if (filename)
-        strncpy(buffer, filename, BUFFER_SIZE - 1);
-      else
-        snprintf(buffer, sizeof(buffer)-1, "%s/%s", utGetPath(CONQETC), 
-                 "texturesrc");
-      break;
+    case CQI_FILE_TEXTURESRC_ADD:
+        if (filename)
+            strncpy(buffer, filename, BUFFER_SIZE - 1);
+        else
+            snprintf(buffer, sizeof(buffer)-1, "%s/%s", utGetPath(CONQETC),
+                     "texturesrc");
+        break;
     case CQI_FILE_SOUNDRC:
-    case CQI_FILE_SOUNDRC_ADD: 
-      if (filename)
-        strncpy(buffer, filename, BUFFER_SIZE - 1);
-      else
-        snprintf(buffer, sizeof(buffer)-1, "%s/%s", utGetPath(CONQETC), 
-                 "soundrc");
-      break;
+    case CQI_FILE_SOUNDRC_ADD:
+        if (filename)
+            strncpy(buffer, filename, BUFFER_SIZE - 1);
+        else
+            snprintf(buffer, sizeof(buffer)-1, "%s/%s", utGetPath(CONQETC),
+                     "soundrc");
+        break;
     default:                    /* programmer error */
-      utLog("%s: invalid rcid %d, bailing.", __FUNCTION__, rcid);
-      return FALSE;
-      break;
+        utLog("%s: invalid rcid %d, bailing.", __FUNCTION__, rcid);
+        return FALSE;
+        break;
     }
 
-  utLog("%s: Loading '%s'...", __FUNCTION__, buffer);
-  if ((infile = fopen(buffer, "r")) == NULL)
+    utLog("%s: Loading '%s'...", __FUNCTION__, buffer);
+    if ((infile = fopen(buffer, "r")) == NULL)
     {
-      utLog("%s: fopen(%s) failed: %s",
-           __FUNCTION__,
-           buffer,
-           strerror(errno));
-      
-      /* a failed CQI_FILE_TEXTURESRC_ADD is no big deal,
-         CQI_FILE_TEXTURESRC/CONQINITRC is another story however... */
+        utLog("%s: fopen(%s) failed: %s",
+              __FUNCTION__,
+              buffer,
+              strerror(errno));
 
-      utLog("%s: using default init tables.", __FUNCTION__);
-      switch(rcid)
+        /* a failed CQI_FILE_TEXTURESRC_ADD is no big deal,
+           CQI_FILE_TEXTURESRC/CONQINITRC is another story however... */
+
+        utLog("%s: using default init tables.", __FUNCTION__);
+        switch(rcid)
         {
         case CQI_FILE_TEXTURESRC:
-          {
+        {
             utLog("%s: FATAL: no textures.", __FUNCTION__);
             return FALSE;
-          }
-          break;
-          
+        }
+        break;
+
         case CQI_FILE_SOUNDRC:
-          {
+        {
             cqiSoundConf = &defaultSoundConf;
             cqiSoundEffects  = defaultSoundEffects;
             cqiNumSoundEffects = defaultNumSoundEffects;
             cqiSoundMusic = defaultSoundMusic;
             cqiNumSoundMusic = defaultNumSoundMusic;
-          }
-          break;
+        }
+        break;
         }
 
-      return FALSE;
+        return FALSE;
     }
 
-  initrun(rcid);
+    initrun(rcid);
 
-  yyin = infile;
+    yyin = infile;
 
-  goterror = FALSE;
-  lineNum = 0;
-  if ( yyparse() == ERR || goterror )
+    goterror = FALSE;
+    lineNum = 0;
+    if ( yyparse() == ERR || goterror )
     {
-      utLog("conqinit: parse error." );
-      fail = TRUE;
+        utLog("conqinit: parse error." );
+        fail = TRUE;
     }
-  
-  fclose(infile);
 
-  /* check textures early */
-  if (rcid == CQI_FILE_TEXTURESRC || 
-      rcid == CQI_FILE_TEXTURESRC_ADD)
+    fclose(infile);
+
+    /* check textures early */
+    if (rcid == CQI_FILE_TEXTURESRC ||
+        rcid == CQI_FILE_TEXTURESRC_ADD)
     {
-      if (fail && rcid == CQI_FILE_TEXTURESRC)
+        if (fail && rcid == CQI_FILE_TEXTURESRC)
         {
-          utLog("%s: FATAL: no textures.", __FUNCTION__);
-          return FALSE;
+            utLog("%s: FATAL: no textures.", __FUNCTION__);
+            return FALSE;
         }
 
-      cqiTextures = _cqiTextures;
-      cqiNumTextures = numTextures;
+        cqiTextures = _cqiTextures;
+        cqiNumTextures = numTextures;
 
-      if (cqiVerbose)
-        utLog("%s: loaded %d texture descriptors.",
-             __FUNCTION__, fileNumTextures);
+        if (cqiVerbose)
+            utLog("%s: loaded %d texture descriptors.",
+                  __FUNCTION__, fileNumTextures);
 
-      /* now validate any animations */
-      if (!cqiValidateAnimations())
+        /* now validate any animations */
+        if (!cqiValidateAnimations())
         {
-          utLog("%s: FATAL: no animations.", __FUNCTION__);
-          return FALSE;
+            utLog("%s: FATAL: no animations.", __FUNCTION__);
+            return FALSE;
         }
 
-      if (cqiVerbose)
+        if (cqiVerbose)
         {
-          utLog("%s: loaded %d Animation descriptors.",
-               __FUNCTION__, fileNumAnimations);
-          utLog("%s: loaded %d Animation definitions.",
-               __FUNCTION__, fileNumAnimDefs);
+            utLog("%s: loaded %d Animation descriptors.",
+                  __FUNCTION__, fileNumAnimations);
+            utLog("%s: loaded %d Animation definitions.",
+                  __FUNCTION__, fileNumAnimDefs);
         }
 
-      cqiAnimations = _cqiAnimations;
-      cqiNumAnimations = numAnimations;
-      cqiAnimDefs = _cqiAnimDefs;
-      cqiNumAnimDefs = numAnimDefs;
+        cqiAnimations = _cqiAnimations;
+        cqiNumAnimations = numAnimations;
+        cqiAnimDefs = _cqiAnimDefs;
+        cqiNumAnimDefs = numAnimDefs;
 
-      return TRUE;
+        return TRUE;
     }
 
-  /* sounds */
-  if (rcid == CQI_FILE_SOUNDRC || rcid == CQI_FILE_SOUNDRC_ADD)
+    /* sounds */
+    if (rcid == CQI_FILE_SOUNDRC || rcid == CQI_FILE_SOUNDRC_ADD)
     {
-      if (fail && rcid == CQI_FILE_SOUNDRC)
+        if (fail && rcid == CQI_FILE_SOUNDRC)
         {
-          utLog("%s: using default sound data.", __FUNCTION__);
-          cqiSoundConf = &defaultSoundConf;
-          cqiSoundEffects  = defaultSoundEffects;
-          cqiNumSoundEffects = defaultNumSoundEffects;
-          cqiSoundMusic = defaultSoundMusic;
-          cqiNumSoundMusic = defaultNumSoundMusic;
+            utLog("%s: using default sound data.", __FUNCTION__);
+            cqiSoundConf = &defaultSoundConf;
+            cqiSoundEffects  = defaultSoundEffects;
+            cqiNumSoundEffects = defaultNumSoundEffects;
+            cqiSoundMusic = defaultSoundMusic;
+            cqiNumSoundMusic = defaultNumSoundMusic;
 
-          return FALSE;
+            return FALSE;
         }
 
-      utLog("%s: loaded %d Music definitions.",
-           __FUNCTION__, fileNumMusic);
-      utLog("%s: loaded %d Effect definitions.",
-           __FUNCTION__, fileNumEffects);
-      cqiSoundConf = _cqiSoundConf;
-      cqiSoundEffects = _cqiSoundEffects;
-      cqiNumSoundEffects = numSoundEffects;
-      cqiSoundMusic = _cqiSoundMusic;
-      cqiNumSoundMusic = numSoundMusic;
+        utLog("%s: loaded %d Music definitions.",
+              __FUNCTION__, fileNumMusic);
+        utLog("%s: loaded %d Effect definitions.",
+              __FUNCTION__, fileNumEffects);
+        cqiSoundConf = _cqiSoundConf;
+        cqiSoundEffects = _cqiSoundEffects;
+        cqiNumSoundEffects = numSoundEffects;
+        cqiSoundMusic = _cqiSoundMusic;
+        cqiNumSoundMusic = numSoundMusic;
 
-      return TRUE;
+        return TRUE;
     }
 
 
-  if (!fail && !cqiValidatePlanets())
+    if (!fail && !cqiValidatePlanets())
     {
-      utLog("%s: cqiValidatePlanets() failed.", __FUNCTION__);
+        utLog("%s: cqiValidatePlanets() failed.", __FUNCTION__);
 
-      cqiGlobal    = &defaultGlobalInit;
-      cqiShiptypes = defaultShiptypes;
-      cqiPlanets   = defaultPlanets;
-      utLog("%s: using default init tables.", __FUNCTION__);
-      return FALSE;
+        cqiGlobal    = &defaultGlobalInit;
+        cqiShiptypes = defaultShiptypes;
+        cqiPlanets   = defaultPlanets;
+        utLog("%s: using default init tables.", __FUNCTION__);
+        return FALSE;
     }
 
-  if (!fail)
+    if (!fail)
     {
-      /* if we were successful, export the new tables */
-      cqiGlobal    = _cqiGlobal;
-      cqiShiptypes = _cqiShiptypes;
-      cqiPlanets   = _cqiPlanets;
+        /* if we were successful, export the new tables */
+        cqiGlobal    = _cqiGlobal;
+        cqiShiptypes = _cqiShiptypes;
+        cqiPlanets   = _cqiPlanets;
     }
-  else
+    else
     {                           /* use the defaults */
-      utLog("%s: using default init tables.", __FUNCTION__);
-      cqiGlobal    = &defaultGlobalInit;
-      cqiShiptypes = defaultShiptypes;
-      cqiPlanets   = defaultPlanets;
+        utLog("%s: using default init tables.", __FUNCTION__);
+        cqiGlobal    = &defaultGlobalInit;
+        cqiShiptypes = defaultShiptypes;
+        cqiPlanets   = defaultPlanets;
     }
 
-  return (fail) ? FALSE: TRUE;
+    return (fail) ? FALSE: TRUE;
 }
 
 static char *ptype2str(int ptype)
 {
-  switch (ptype)
+    switch (ptype)
     {
     case PLANET_CLASSM:
-      return "M";
-      break;
+        return "M";
+        break;
     case PLANET_DEAD:
-      return "D";
-      break;
+        return "D";
+        break;
     case PLANET_SUN:
-      return "S";
-      break;
+        return "S";
+        break;
     case PLANET_MOON:
-      return "m";
-      break;
+        return "m";
+        break;
     case PLANET_GHOST:
-      return "G";
-      break;
+        return "G";
+        break;
     case PLANET_CLASSA:
-      return "A";
-      break;
+        return "A";
+        break;
     case PLANET_CLASSO:
-      return "O";
-      break;
+        return "O";
+        break;
     case PLANET_CLASSZ:
-      return "Z";
-      break;
+        return "Z";
+        break;
     }
-  
-  return "?";
+
+    return "?";
 }
 
 static int str2ptype(char *str)
 {
-  
-  /* we will just look at the first byte  */
-  switch (str[0])
+
+    /* we will just look at the first byte  */
+    switch (str[0])
     {
     case 'M':
-      return PLANET_CLASSM;
-      break;
+        return PLANET_CLASSM;
+        break;
     case 'D':
-      return PLANET_DEAD;
-      break;
+        return PLANET_DEAD;
+        break;
     case 'S':
-      return PLANET_SUN;
-      break;
+        return PLANET_SUN;
+        break;
     case 'm':
-      return PLANET_MOON;
-      break;
+        return PLANET_MOON;
+        break;
     case 'G':
-      return PLANET_GHOST;
-      break;
+        return PLANET_GHOST;
+        break;
     case 'A':
-      return PLANET_CLASSA;
-      break;
+        return PLANET_CLASSA;
+        break;
     case 'O':
-      return PLANET_CLASSO;
-      break;
+        return PLANET_CLASSO;
+        break;
     case 'Z':
-      return PLANET_CLASSZ;
-      break;
+        return PLANET_CLASSZ;
+        break;
     }
-  
-  return PLANET_DEAD;           /* default */
+
+    return PLANET_DEAD;           /* default */
 }
 
 
 static char *team2str(int pteam)
 {
-  switch (pteam)
+    switch (pteam)
     {
     case TEAM_FEDERATION:
-      return "F";
-      break;
+        return "F";
+        break;
     case TEAM_ROMULAN:
-      return "R";
-      break;
+        return "R";
+        break;
     case TEAM_KLINGON:
-      return "K";
-      break;
+        return "K";
+        break;
     case TEAM_ORION:
-      return "O";
-      break;
+        return "O";
+        break;
     case TEAM_SELFRULED:
-      return "S";
-      break;
+        return "S";
+        break;
     case TEAM_NOTEAM:
-      return "N";
-      break;
+        return "N";
+        break;
     case TEAM_GOD:
-      return "G";
-      break;
+        return "G";
+        break;
     case TEAM_EMPIRE:
-      return "E";
-      break;
-    }  
-  
-  return "?";
+        return "E";
+        break;
+    }
+
+    return "?";
 }
 
 static int str2team(char *str)
 {
-  switch (str[0])
+    switch (str[0])
     {
     case 'F':
-      return TEAM_FEDERATION;
-      break;
+        return TEAM_FEDERATION;
+        break;
     case 'R':
-      return TEAM_ROMULAN;
-      break;
+        return TEAM_ROMULAN;
+        break;
     case 'K':
-      return TEAM_KLINGON;
-      break;
+        return TEAM_KLINGON;
+        break;
     case 'O':
-      return TEAM_ORION;
-      break;
+        return TEAM_ORION;
+        break;
     case 'S':
-      return TEAM_SELFRULED;
-      break;
+        return TEAM_SELFRULED;
+        break;
     case 'N':
-      return TEAM_NOTEAM;
-      break;
+        return TEAM_NOTEAM;
+        break;
     case 'G':
-      return TEAM_GOD;
-      break;
+        return TEAM_GOD;
+        break;
     case 'E':
-      return TEAM_EMPIRE;
-      break;
-    }  
-  
-  return TEAM_NOTEAM;           /* default */
+        return TEAM_EMPIRE;
+        break;
+    }
+
+    return TEAM_NOTEAM;           /* default */
 }
 
 /* Dump the parsed soundrc to stdout in sounddata.h format */
 /* this includes soundconf, effects, and music */
 void dumpSoundDataHdr(void)
 {
-  char buf[MAXLINE];
-  int i;
-  
-
-  if (!cqiSoundConf || !cqiNumSoundEffects)
-    return;
-
-  /* preamble */
-  utFormatTime( buf, 0 );
-  printf("/* Generated by conqinit on %s */\n", buf);
-  printf("\n\n");
-
-  printf("#ifndef _SOUNDDATA_H\n");
-  printf("#define _SOUNDDATA_H\n\n");
+    char buf[MAXLINE];
+    int i;
 
 
-  printf("static cqiSoundConfRec_t defaultSoundConf = {\n");
-  printf("  %d,\n", cqiSoundConf->samplerate);
-  printf("  %d,\n", cqiSoundConf->stereo);
-  printf("  %d,\n", cqiSoundConf->fxchannels);
-  printf("  %d\n", cqiSoundConf->chunksize);
-  printf("};\n\n");
-    
+    if (!cqiSoundConf || !cqiNumSoundEffects)
+        return;
 
-  printf("static int defaultNumSoundMusic = %d;\n\n", cqiNumSoundMusic);
+    /* preamble */
+    utFormatTime( buf, 0 );
+    printf("/* Generated by conqinit on %s */\n", buf);
+    printf("\n\n");
 
-  /* if there is no music built in... */
-  if (!cqiNumSoundMusic)
+    printf("#ifndef _SOUNDDATA_H\n");
+    printf("#define _SOUNDDATA_H\n\n");
+
+
+    printf("static cqiSoundConfRec_t defaultSoundConf = {\n");
+    printf("  %d,\n", cqiSoundConf->samplerate);
+    printf("  %d,\n", cqiSoundConf->stereo);
+    printf("  %d,\n", cqiSoundConf->fxchannels);
+    printf("  %d\n", cqiSoundConf->chunksize);
+    printf("};\n\n");
+
+
+    printf("static int defaultNumSoundMusic = %d;\n\n", cqiNumSoundMusic);
+
+    /* if there is no music built in... */
+    if (!cqiNumSoundMusic)
     {
-      printf("static cqiSoundRec_t *defaultSoundMusic = NULL;\n");
-      printf("\n\n");
+        printf("static cqiSoundRec_t *defaultSoundMusic = NULL;\n");
+        printf("\n\n");
     }
-  else
+    else
     {
-      printf("static cqiSoundRec_t defaultSoundMusic[%d] = {\n", 
-             cqiNumSoundMusic);
-      
-      /* music */
-      for (i=0; i<cqiNumSoundMusic; i++)
+        printf("static cqiSoundRec_t defaultSoundMusic[%d] = {\n",
+               cqiNumSoundMusic);
+
+        /* music */
+        for (i=0; i<cqiNumSoundMusic; i++)
+            printf(" { \"%s\", \"%s\", %d, %d, %d, %d, %d, %d, %d, %d },\n",
+                   cqiSoundMusic[i].name,
+                   cqiSoundMusic[i].filename,
+                   cqiSoundMusic[i].volume,
+                   cqiSoundMusic[i].pan,
+                   cqiSoundMusic[i].fadeinms,
+                   cqiSoundMusic[i].fadeoutms,
+                   cqiSoundMusic[i].loops,
+                   cqiSoundMusic[i].limit,
+                   cqiSoundMusic[i].framelimit,
+                   cqiSoundMusic[i].delayms);
+
+        printf("};\n\n");
+    }
+
+    /* effect */
+    printf("static int defaultNumSoundEffects = %d;\n\n", cqiNumSoundEffects);
+    printf("static cqiSoundRec_t defaultSoundEffects[%d] = {\n",
+           cqiNumSoundEffects);
+
+    for (i=0; i<cqiNumSoundEffects; i++)
         printf(" { \"%s\", \"%s\", %d, %d, %d, %d, %d, %d, %d, %d },\n",
-               cqiSoundMusic[i].name,
-               cqiSoundMusic[i].filename,
-               cqiSoundMusic[i].volume,
-               cqiSoundMusic[i].pan,
-               cqiSoundMusic[i].fadeinms,
-               cqiSoundMusic[i].fadeoutms,
-               cqiSoundMusic[i].loops,
-               cqiSoundMusic[i].limit,
-               cqiSoundMusic[i].framelimit,
-               cqiSoundMusic[i].delayms);
-      
-      printf("};\n\n");
-    }
+               cqiSoundEffects[i].name,
+               cqiSoundEffects[i].filename,
+               cqiSoundEffects[i].volume,
+               cqiSoundEffects[i].pan,
+               cqiSoundEffects[i].fadeinms,
+               cqiSoundEffects[i].fadeoutms,
+               cqiSoundEffects[i].loops,
+               cqiSoundEffects[i].limit,
+               cqiSoundEffects[i].framelimit,
+               cqiSoundEffects[i].delayms);
 
-  /* effect */
-  printf("static int defaultNumSoundEffects = %d;\n\n", cqiNumSoundEffects);
-  printf("static cqiSoundRec_t defaultSoundEffects[%d] = {\n", 
-         cqiNumSoundEffects);
+    printf("};\n\n");
 
-  for (i=0; i<cqiNumSoundEffects; i++)
-    printf(" { \"%s\", \"%s\", %d, %d, %d, %d, %d, %d, %d, %d },\n",
-           cqiSoundEffects[i].name,
-           cqiSoundEffects[i].filename,
-           cqiSoundEffects[i].volume,
-           cqiSoundEffects[i].pan,
-           cqiSoundEffects[i].fadeinms,
-           cqiSoundEffects[i].fadeoutms,
-           cqiSoundEffects[i].loops,
-           cqiSoundEffects[i].limit,
-           cqiSoundEffects[i].framelimit,
-           cqiSoundEffects[i].delayms);
-  
-  printf("};\n\n");
+    printf("#endif /* _SOUNDDATA_H */\n\n");
 
-  printf("#endif /* _SOUNDDATA_H */\n\n");
 
-  
-  return;
+    return;
 }
 
 
 /* Dump the parsed initdata to stdout in initdata.h format */
 void dumpInitDataHdr(void)
 {
-  char buf[MAXLINE];
-  int i;
-  
-  /* preamble */
-  utFormatTime( buf, 0 );
-  printf("/* Generated by conqinit on %s */\n", buf);
-  printf("\n\n");
+    char buf[MAXLINE];
+    int i;
 
-  printf("#ifndef _INITDATA_H\n");
-  printf("#define _INITDATA_H\n\n");
+    /* preamble */
+    utFormatTime( buf, 0 );
+    printf("/* Generated by conqinit on %s */\n", buf);
+    printf("\n\n");
 
-  /* FIXME, need to use dynamics when ready */
-  /* globals always first! */  
+    printf("#ifndef _INITDATA_H\n");
+    printf("#define _INITDATA_H\n\n");
 
-  printf("static cqiGlobalInitRec_t defaultGlobalInit = {\n");
-  printf("\t %d,\n", cqiGlobal->maxplanets);
-  printf("\t %d,\n", cqiGlobal->maxships);
-  printf("\t %d,\n", cqiGlobal->maxusers); 
-  printf("\t %d,\n", cqiGlobal->maxhist); 
-  printf("\t %d,\n", cqiGlobal->maxmsgs); 
-  printf("\t %d,\n", cqiGlobal->maxtorps); 
-  printf("\t %d\n", cqiGlobal->maxshiptypes); 
-  printf("};\n\n");
+    /* FIXME, need to use dynamics when ready */
+    /* globals always first! */
 
-  /* shiptypes */
-  
-  printf("/* The shiptype sections are currently ignored. */\n");
+    printf("static cqiGlobalInitRec_t defaultGlobalInit = {\n");
+    printf("\t %d,\n", cqiGlobal->maxplanets);
+    printf("\t %d,\n", cqiGlobal->maxships);
+    printf("\t %d,\n", cqiGlobal->maxusers);
+    printf("\t %d,\n", cqiGlobal->maxhist);
+    printf("\t %d,\n", cqiGlobal->maxmsgs);
+    printf("\t %d,\n", cqiGlobal->maxtorps);
+    printf("\t %d\n", cqiGlobal->maxshiptypes);
+    printf("};\n\n");
 
-  printf("static cqiShiptypeInitRec_t defaultShiptypes[%d] = {\n",
-         cqiGlobal->maxshiptypes); 
-  for (i=0; i < cqiGlobal->maxshiptypes; i++)
+    /* shiptypes */
+
+    printf("/* The shiptype sections are currently ignored. */\n");
+
+    printf("static cqiShiptypeInitRec_t defaultShiptypes[%d] = {\n",
+           cqiGlobal->maxshiptypes);
+    for (i=0; i < cqiGlobal->maxshiptypes; i++)
     {
-      printf(" { \n");
-      printf("   \"%s\",\n", cqiShiptypes[i].name);
-      printf("   %f,\n", cqiShiptypes[i].engfac);
-      printf("   %f,\n", cqiShiptypes[i].weafac);
-      printf("   %f,\n", cqiShiptypes[i].accelfac);
-      printf("   %d,\n", cqiShiptypes[i].torpwarp);
-      printf("   %d,\n", cqiShiptypes[i].warpmax);
-      printf("   %d,\n", cqiShiptypes[i].armymax);
-      printf("   %d,\n", cqiShiptypes[i].shmax);
-      printf("   %d,\n", cqiShiptypes[i].dammax);
-      printf("   %d,\n", cqiShiptypes[i].torpmax);
-      printf("   %d\n", cqiShiptypes[i].fuelmax);
-      printf(" },\n");
+        printf(" { \n");
+        printf("   \"%s\",\n", cqiShiptypes[i].name);
+        printf("   %f,\n", cqiShiptypes[i].engfac);
+        printf("   %f,\n", cqiShiptypes[i].weafac);
+        printf("   %f,\n", cqiShiptypes[i].accelfac);
+        printf("   %d,\n", cqiShiptypes[i].torpwarp);
+        printf("   %d,\n", cqiShiptypes[i].warpmax);
+        printf("   %d,\n", cqiShiptypes[i].armymax);
+        printf("   %d,\n", cqiShiptypes[i].shmax);
+        printf("   %d,\n", cqiShiptypes[i].dammax);
+        printf("   %d,\n", cqiShiptypes[i].torpmax);
+        printf("   %d\n", cqiShiptypes[i].fuelmax);
+        printf(" },\n");
     }
-  printf("};\n\n");
-  
-  /* planets */  
-  printf("static cqiPlanetInitRec_t defaultPlanets[%d] = {\n",
-         cqiGlobal->maxplanets); 
+    printf("};\n\n");
 
-  for (i=0; i < cqiGlobal->maxplanets; i++)
+    /* planets */
+    printf("static cqiPlanetInitRec_t defaultPlanets[%d] = {\n",
+           cqiGlobal->maxplanets);
+
+    for (i=0; i < cqiGlobal->maxplanets; i++)
     {
-      printf(" { \n");
-      printf("   \"%s\",\n", cqiPlanets[i].name);
+        printf(" { \n");
+        printf("   \"%s\",\n", cqiPlanets[i].name);
 
 /* FIXME - planet name == primary indicates stationary */
-      
-      if (cqiPlanets[i].primary)
+
+        if (cqiPlanets[i].primary)
         {
-          printf("   \"%s\",\n", cqiPlanets[cqiPlanets[i].primary].name);
-          printf("   %d,\n", cqiPlanets[i].primary);
+            printf("   \"%s\",\n", cqiPlanets[cqiPlanets[i].primary].name);
+            printf("   %d,\n", cqiPlanets[i].primary);
         }
-      else  
+        else
         {
-          printf("   \"Murisak\",\n");      
-          printf("   0,\n");
+            printf("   \"Murisak\",\n");
+            printf("   0,\n");
         }
 
-      printf("   %f,\n", cqiPlanets[i].angle);
-      printf("   %f,\n", cqiPlanets[i].velocity);
-      printf("   %f,\n", cqiPlanets[i].radius);
-      printf("   %d,\n", cqiPlanets[i].ptype);
-      printf("   %d,\n", cqiPlanets[i].pteam);
-      printf("   %d,\n", cqiPlanets[i].armies);
-      printf("   %d,\n", cqiPlanets[i].visible);
-      printf("   %d,\n", cqiPlanets[i].core);
-      printf("   %d,\n", cqiPlanets[i].homeplanet);
+        printf("   %f,\n", cqiPlanets[i].angle);
+        printf("   %f,\n", cqiPlanets[i].velocity);
+        printf("   %f,\n", cqiPlanets[i].radius);
+        printf("   %d,\n", cqiPlanets[i].ptype);
+        printf("   %d,\n", cqiPlanets[i].pteam);
+        printf("   %d,\n", cqiPlanets[i].armies);
+        printf("   %d,\n", cqiPlanets[i].visible);
+        printf("   %d,\n", cqiPlanets[i].core);
+        printf("   %d,\n", cqiPlanets[i].homeplanet);
 
-      printf("   %f,\n", cqiPlanets[i].xcoord);
-      printf("   %f,\n", cqiPlanets[i].ycoord);
-      
-      printf("   %d,\n", (int)cqiPlanets[i].size);
+        printf("   %f,\n", cqiPlanets[i].xcoord);
+        printf("   %f,\n", cqiPlanets[i].ycoord);
 
-      /* we never write out a planet texture name */
-      printf("   \"\",\n");
+        printf("   %d,\n", (int)cqiPlanets[i].size);
 
-      printf(" },\n");
+        /* we never write out a planet texture name */
+        printf("   \"\",\n");
+
+        printf(" },\n");
 
     }
-  printf("};\n\n");
+    printf("};\n\n");
 
-  printf("#endif /* _INITDATA_H */\n\n");
+    printf("#endif /* _INITDATA_H */\n\n");
 
-  
-  return;
+
+    return;
 }
 
 
 /* Dump the current universe to stdout in conqinitrc format */
 void dumpUniverse(void)
 {
-  char buf[MAXLINE];
-  int i, j;
-  
-  map_common();
+    char buf[MAXLINE];
+    int i, j;
 
-  utFormatTime( buf, 0 );
-  printf("# Generated by conqinit on %s\n", buf);
-  printf("#\n#\n");
-  /* comments */
-  printf("# Valid values for planets->ptype: \n");
-  printf("#     \"M\"               Class M (fuel)\n");
-  printf("#     \"D\"               Class D (dead)\n");
-  printf("#     \"S\"               Sun\n");
-  printf("#     \"m\"               Moon\n");
-  printf("#     \"G\"               Ghost\n");
-  printf("#     \"A\"               Class A\n");
-  printf("#     \"O\"               Class O\n");
-  printf("#     \"Z\"               Class Z\n");
-  printf("#\n#\n");
-  printf("# Valid values for planets->pteam: \n");
-  printf("#     \"F\"               Federation\n");
-  printf("#     \"R\"               Romulan\n");
-  printf("#     \"K\"               Klingon\n");
-  printf("#     \"O\"               Orion\n");
-  printf("#     \"S\"               Self Ruled\n");
-  printf("#     \"N\"               No Team (non)\n");
-  printf("#     \"G\"               God\n");
-  printf("#     \"E\"               Empire\n");
-  printf("#\n");
-  printf("# armies can be specified as a single or pair of numbers.\n");
-  printf("#\n");
-  printf("# armies 50             sets armies to 50\n");
-  printf("# armies 20 100         set armies to random value between 20 and 100\n");
-  printf("#\n");
-  printf("# If the angle specified for a planet is negative, then a random angle\n");
-  printf("# will be chosen\n");
+    map_common();
 
-  printf("#\n\n");
+    utFormatTime( buf, 0 );
+    printf("# Generated by conqinit on %s\n", buf);
+    printf("#\n#\n");
+    /* comments */
+    printf("# Valid values for planets->ptype: \n");
+    printf("#     \"M\"               Class M (fuel)\n");
+    printf("#     \"D\"               Class D (dead)\n");
+    printf("#     \"S\"               Sun\n");
+    printf("#     \"m\"               Moon\n");
+    printf("#     \"G\"               Ghost\n");
+    printf("#     \"A\"               Class A\n");
+    printf("#     \"O\"               Class O\n");
+    printf("#     \"Z\"               Class Z\n");
+    printf("#\n#\n");
+    printf("# Valid values for planets->pteam: \n");
+    printf("#     \"F\"               Federation\n");
+    printf("#     \"R\"               Romulan\n");
+    printf("#     \"K\"               Klingon\n");
+    printf("#     \"O\"               Orion\n");
+    printf("#     \"S\"               Self Ruled\n");
+    printf("#     \"N\"               No Team (non)\n");
+    printf("#     \"G\"               God\n");
+    printf("#     \"E\"               Empire\n");
+    printf("#\n");
+    printf("# armies can be specified as a single or pair of numbers.\n");
+    printf("#\n");
+    printf("# armies 50             sets armies to 50\n");
+    printf("# armies 20 100         set armies to random value between 20 and 100\n");
+    printf("#\n");
+    printf("# If the angle specified for a planet is negative, then a random angle\n");
+    printf("# will be chosen\n");
 
-  /* FIXME, need to use dynamics when ready */
+    printf("#\n\n");
 
-  /* global is always first */  
+    /* FIXME, need to use dynamics when ready */
 
-  printf("# DO NOT CHANGE VALUES IN THE GLOBAL SECTION\n");
-  printf("# Doing so will break compatibility, and we aren't ready\n");
-  printf("# for that yet.\n");
-  printf("global {\n");
-  printf("  planetmax 60\n");
-  printf("  shipmax   20\n");
-  printf("  usermax   500\n");
-  printf("  histmax   40\n");
-  printf("  msgmax    60\n");
-  printf("}\n\n");
-  
-  /* shiptypes */
-  
-  printf("# The shiptype sections are currently ignored.\n");
-  for (i=0; i < MAXNUMSHIPTYPES; i++)
+    /* global is always first */
+
+    printf("# DO NOT CHANGE VALUES IN THE GLOBAL SECTION\n");
+    printf("# Doing so will break compatibility, and we aren't ready\n");
+    printf("# for that yet.\n");
+    printf("global {\n");
+    printf("  planetmax 60\n");
+    printf("  shipmax   20\n");
+    printf("  usermax   500\n");
+    printf("  histmax   40\n");
+    printf("  msgmax    60\n");
+    printf("}\n\n");
+
+    /* shiptypes */
+
+    printf("# The shiptype sections are currently ignored.\n");
+    for (i=0; i < MAXNUMSHIPTYPES; i++)
     {
-      printf("shiptype {\n");
-      printf("  name       \"%s\"\n", ShipTypes[i].name);
-      printf("  engfac     %f\n", ShipTypes[i].engfac);
-      printf("  weafac     %f\n", ShipTypes[i].weafac);
-      printf("  accelfac   %f\n", ShipTypes[i].accelfac);
-      printf("  torpwarp   %d\n", (int)ShipTypes[i].torpwarp);
-      printf("  warpmax    %d\n", (int)ShipTypes[i].warplim);
-      printf("  armymax    %d\n", ShipTypes[i].armylim);
-      printf("  shmax      100\n");
-      printf("  dammax     100\n");
-      printf("  torpmax    9\n");
-      printf("  fuelmax    999\n");
-      printf("}\n\n");
+        printf("shiptype {\n");
+        printf("  name       \"%s\"\n", ShipTypes[i].name);
+        printf("  engfac     %f\n", ShipTypes[i].engfac);
+        printf("  weafac     %f\n", ShipTypes[i].weafac);
+        printf("  accelfac   %f\n", ShipTypes[i].accelfac);
+        printf("  torpwarp   %d\n", (int)ShipTypes[i].torpwarp);
+        printf("  warpmax    %d\n", (int)ShipTypes[i].warplim);
+        printf("  armymax    %d\n", ShipTypes[i].armylim);
+        printf("  shmax      100\n");
+        printf("  dammax     100\n");
+        printf("  torpmax    9\n");
+        printf("  fuelmax    999\n");
+        printf("}\n\n");
     }
-  
-  /* planets */  
-  for (i=1; i <= NUMPLANETS; i++)
+
+    /* planets */
+    for (i=1; i <= NUMPLANETS; i++)
     {
-      printf("planet {\n");
-      printf("  name        \"%s\"\n", Planets[i].name);
+        printf("planet {\n");
+        printf("  name        \"%s\"\n", Planets[i].name);
 
 /* FIXME - planet name == primary indicates stationary */
-      if (Planets[i].primary)
-        printf("  primary     \"%s\"\n", Planets[Planets[i].primary].name);
-      else  
-        printf("  primary     \"\"\n");      
+        if (Planets[i].primary)
+            printf("  primary     \"%s\"\n", Planets[Planets[i].primary].name);
+        else
+            printf("  primary     \"\"\n");
 
-      printf("  angle       %f\n", Planets[i].orbang);
-      printf("  velocity    %f\n", Planets[i].orbvel);
-      printf("  radius      %f\n", Planets[i].orbrad);
-      printf("  ptype       \"%s\"\n", ptype2str(Planets[i].type));
-      printf("  pteam       \"%s\"\n", team2str(Planets[i].team));
-      printf("  armies      %d\n", Planets[i].armies);
-      printf("  visible     \"%s\"\n", PVISIBLE(i) ? "yes" : "no");
-      if (i <= NUM_BASEPLANETS && PVISIBLE(i) && 
-          (Planets[i].type != PLANET_MOON && Planets[i].type != PLANET_SUN &&
-           Planets[i].type != PLANET_GHOST))
-        printf("  core        \"yes\"\n");
-      else
-        printf("  core        \"no\"\n");
-      
-      /* look for homeplanets.  The 'homeplanet' concept should be moved
-         into the planet struct of the cmn block someday. */
-      for (j=0; j<3; j++)
-        if (Teams[Planets[i].team].teamhplanets[j] == i)
-          break;
+        printf("  angle       %f\n", Planets[i].orbang);
+        printf("  velocity    %f\n", Planets[i].orbvel);
+        printf("  radius      %f\n", Planets[i].orbrad);
+        printf("  ptype       \"%s\"\n", ptype2str(Planets[i].type));
+        printf("  pteam       \"%s\"\n", team2str(Planets[i].team));
+        printf("  armies      %d\n", Planets[i].armies);
+        printf("  visible     \"%s\"\n", PVISIBLE(i) ? "yes" : "no");
+        if (i <= NUM_BASEPLANETS && PVISIBLE(i) &&
+            (Planets[i].type != PLANET_MOON && Planets[i].type != PLANET_SUN &&
+             Planets[i].type != PLANET_GHOST))
+            printf("  core        \"yes\"\n");
+        else
+            printf("  core        \"no\"\n");
 
-      if (j >= 3)
-        printf("  homeplanet  \"no\"\n");
-      else
-        printf("  homeplanet  \"yes\"\n");
+        /* look for homeplanets.  The 'homeplanet' concept should be moved
+           into the planet struct of the cmn block someday. */
+        for (j=0; j<3; j++)
+            if (Teams[Planets[i].team].teamhplanets[j] == i)
+                break;
 
-      printf("  x           %f\n", Planets[i].x);
-      printf("  y           %f\n", Planets[i].y);
-      
-      switch(Planets[i].type)
+        if (j >= 3)
+            printf("  homeplanet  \"no\"\n");
+        else
+            printf("  homeplanet  \"yes\"\n");
+
+        printf("  x           %f\n", Planets[i].x);
+        printf("  y           %f\n", Planets[i].y);
+
+        switch(Planets[i].type)
         {
         case PLANET_SUN:
-          printf("  size        1500\n");
-          printf("  texname     \"star\"\n");
-          break;
+            printf("  size        1500\n");
+            printf("  texname     \"star\"\n");
+            break;
         case PLANET_CLASSM:
-          printf("  size        300\n");
-          printf("  texname     \"classm\"\n");
-          break;
+            printf("  size        300\n");
+            printf("  texname     \"classm\"\n");
+            break;
         case PLANET_MOON:
-          printf("  size        160\n");
-          printf("  texname     \"luna\"\n");
-          break;
+            printf("  size        160\n");
+            printf("  texname     \"luna\"\n");
+            break;
         default:
-          printf("  size        300\n");
-          printf("  texname     \"classd\"\n");
-          break;
+            printf("  size        300\n");
+            printf("  texname     \"classd\"\n");
+            break;
         }
 
-      printf("}\n\n");
+        printf("}\n\n");
     }
-  
-  return;
+
+    return;
 }
 
-    
+
 static void startSection(int section)
 {
-  if (cqiDebugl)
-    utLog("%s: [%d] %s", __FUNCTION__, 
-         curDepth + 1,
-         sect2str(section));
-  
-  /* check for overflow */
-  if ((curDepth + 1) >= MAX_NESTING_DEPTH)
+    if (cqiDebugl)
+        utLog("%s: [%d] %s", __FUNCTION__,
+              curDepth + 1,
+              sect2str(section));
+
+    /* check for overflow */
+    if ((curDepth + 1) >= MAX_NESTING_DEPTH)
     {
-      utLog("CQI: %s: maximum nesting depth (%d) exceeded, ignoring "
-           "section %s, near line %d", 
-           __FUNCTION__, MAX_NESTING_DEPTH, sect2str(section),
-           lineNum);
-      goterror++;
-      /* just return here as we haven't changed curDepth yet */
-      return;
+        utLog("CQI: %s: maximum nesting depth (%d) exceeded, ignoring "
+              "section %s, near line %d",
+              __FUNCTION__, MAX_NESTING_DEPTH, sect2str(section),
+              lineNum);
+        goterror++;
+        /* just return here as we haven't changed curDepth yet */
+        return;
     }
 
-  /* add it to the list */
-  sections[++curDepth] = section;
+    /* add it to the list */
+    sections[++curDepth] = section;
 
-  switch (section)
+    switch (section)
     {
-    case TOK_GLOBAL:    
-      {
+    case TOK_GLOBAL:
+    {
         if (globalRead)
-          {
+        {
             utLog("%s: global section already configured\n",
-                 __FUNCTION__);
+                  __FUNCTION__);
             goterror++;
             goto error_return;
-          }
+        }
 
         _cqiGlobal = malloc(sizeof(cqiGlobalInitRec_t));
         if (!_cqiGlobal)
-          {
+        {
             utLog("%s: Could not allocate GlobalInitRec",
-                    __FUNCTION__);
+                  __FUNCTION__);
             goterror++;
             goto error_return;
-          }
+        }
         else
-          memset((void *)_cqiGlobal, 0, sizeof(cqiGlobalInitRec_t));
-      }
-      break;
+            memset((void *)_cqiGlobal, 0, sizeof(cqiGlobalInitRec_t));
+    }
+    break;
 
-    case TOK_SHIPTYPE:    
-      {
+    case TOK_SHIPTYPE:
+    {
         if (!globalRead)
-          {
+        {
             utLog("%s: Have not read the global section (which must always be first). Ignoring SHIPTYPE",
-                    __FUNCTION__);
+                  __FUNCTION__);
             goterror++;
             goto error_return;
-          }
-      }
-      break;
-    case TOK_PLANET:    
-      {
+        }
+    }
+    break;
+    case TOK_PLANET:
+    {
         if (!globalRead)
-          {
+        {
             utLog("%s: Have not read the global section (which must always be first). Ignoring PLANET",
-                    __FUNCTION__);
+                  __FUNCTION__);
             goterror++;
             return;
-          }
+        }
         /* clear and init the planet for parsing */
         memset((void *)&currPlanet, 0, sizeof(cqiPlanetInitRec_t));
 
         currPlanet.primary = -1;
         currPlanet.size = 300;  /* default */
-      }
-      break;
+    }
+    break;
 
     case TOK_TEXTURE:
-      {
+    {
         memset((void *)&currTexture, 0, sizeof(cqiTextureInitRec_t));
         currTexAreas = NULL;
         numTexAreas = 0;
-      }
-      break;
+    }
+    break;
 
     case TOK_ANIMATION:
-      {
+    {
         memset((void *)&currAnimation, 0, sizeof(cqiAnimationInitRec_t));
         currAnimation.adIndex = -1;
-      }
-      break;
+    }
+    break;
 
     case TOK_ANIMDEF:
-      {
+    {
         if (PREVSECTION() == TOK_ANIMATION) /* an inlined animdef */
-          { 
+        {
             int _adndx = -1;
             char tmpname[CQI_NAMELEN];
 
-            /* inlined animdef 
+            /* inlined animdef
              *
              * for inlined animdefs, the animation name it's a part of,
              * must have been specified already.  If not, then
              * something is wrong, declare an error and bail.
              */
             if (!currAnimation.name[0])
-              {
+            {
                 utLog("CQI: can't inline animdef at or near line %d: "
-                     "animation's name has not been specified.", 
-                     lineNum);
+                      "animation's name has not been specified.",
+                      lineNum);
                 goterror++;
                 goto error_return;
-              }
-                
+            }
+
             /* Now, see if an animdef name was specified in the
              * animation.  If so, then we want to derive our new
              * animdef from a previously existing one, which must
              * already have been defined.
              */
             if (currAnimation.animdef[0])
-              {                 
+            {
                 /* it's been specified, look for it and init our new
-                 * animdef with it 
+                 * animdef with it
                  */
                 if ((_adndx = _cqiFindAnimDef(currAnimation.animdef)) < 0)
-                  {
+                {
                     /* couldn't find it, error */
                     utLog("CQI: can't inline animdef at or near line %d: "
-                         "source animdef %s is not defined.", 
-                         lineNum, currAnimation.animdef);
+                          "source animdef %s is not defined.",
+                          lineNum, currAnimation.animdef);
                     goterror++;
                     goto error_return;
-                  }
+                }
 
                 /* initialize it, the new animdef name will be overridden
-                 * below 
+                 * below
                  */
                 currAnimDef = _cqiAnimDefs[_adndx];
-              }
+            }
             else
-              {                 /* just inlining a complete animdef, init */
+            {                 /* just inlining a complete animdef, init */
                 memset((void *)&currAnimDef, 0, sizeof(cqiAnimDefInitRec_t));
-              }
+            }
 
             /* choose a unique name for this animdef.  We prefix it
              * with '.' (since '.' cannot be specified as part of a
              * name in a config file), and add the current (projected)
              * slot number to make it unique.
              */
-            snprintf(tmpname, 
-                     CQI_NAMELEN - 1 - (strlen(".-NNNNNN")), 
+            snprintf(tmpname,
+                     CQI_NAMELEN - 1 - (strlen(".-NNNNNN")),
                      ".%s",
                      currAnimation.name);
             snprintf(currAnimDef.name, CQI_NAMELEN - 1, "%s-%06d",
@@ -1891,299 +1891,299 @@ static void startSection(int section)
 
             /* now, reset the animation's animdef specification
              * (whether or not it had one) to point toward the new
-             * animdef 
+             * animdef
              */
             strncpy(currAnimation.animdef, currAnimDef.name, CQI_NAMELEN - 1);
-          }
+        }
         else
-          {
+        {
             /* a global animdef */
             memset((void *)&currAnimDef, 0, sizeof(cqiAnimDefInitRec_t));
-          }
-      }
-      break;
+        }
+    }
+    break;
 
-    case TOK_SOUNDCONF:    
-      {
+    case TOK_SOUNDCONF:
+    {
         if (!_cqiSoundConf)
-          {                     /* starting fresh */
+        {                     /* starting fresh */
             _cqiSoundConf = malloc(sizeof(cqiSoundConfRec_t));
             if (!_cqiSoundConf)
-              {
+            {
                 utLog("%s: Could not allocate SoundConf",
-                     __FUNCTION__);
+                      __FUNCTION__);
                 goterror++;
                 goto error_return;
-              }
+            }
             else
-              {
+            {
                 memset((void *)_cqiSoundConf, 0, sizeof(cqiSoundConfRec_t));
                 _cqiSoundConf->stereo = TRUE; /* default to stereo */
-              }
-            
-          } /* else we are just overriding */
-      }
-      break;
+            }
+
+        } /* else we are just overriding */
+    }
+    break;
 
     case TOK_EFFECT:
     case TOK_MUSIC:
-      {
+    {
         memset((void *)&currSound, 0, sizeof(cqiSoundRec_t));
-        
+
         currSound.loops = 1;    /* default to 1 loop */
         currSound.volume = 100;
         currSound.pan = 0;
-      }
-      break;
+    }
+    break;
 
     default:
-      break;
+        break;
     }
-  
-  return;
 
-  /* clean things up if there was an error */
- error_return:
-  /* remove the section from the list */
-  sections[curDepth] = 0;
-  curDepth--;
-  return;
+    return;
+
+    /* clean things up if there was an error */
+error_return:
+    /* remove the section from the list */
+    sections[curDepth] = 0;
+    curDepth--;
+    return;
 }
 
 static void endSection(void)
 {
-  if (cqiDebugl)
-    utLog("%s: [%d] %s", __FUNCTION__, curDepth, sect2str(CURSECTION()));
-  
-  switch (CURSECTION())
+    if (cqiDebugl)
+        utLog("%s: [%d] %s", __FUNCTION__, curDepth, sect2str(CURSECTION()));
+
+    switch (CURSECTION())
     {
-    case TOK_GLOBAL:    
-      {                         /* make sure everything is specified, alloc
-                                   new planet/shiptype arrays, reset counts
-                                */ 
-        
+    case TOK_GLOBAL:
+    {                         /* make sure everything is specified, alloc
+                                 new planet/shiptype arrays, reset counts
+                              */
+
         if (!_cqiGlobal->maxplanets || !_cqiGlobal->maxships ||
             !_cqiGlobal->maxusers || !_cqiGlobal->maxhist ||
             !_cqiGlobal->maxmsgs)
-          {                     /* something missing */
+        {                     /* something missing */
             utLog("CQI: GLOBAL section is incomplete, ignoring.");
             globalRead = FALSE; /* redundant I know, but.... */
-          }
+        }
         else
-          globalRead = TRUE;
-        
+            globalRead = TRUE;
+
         if (globalRead)
-          {                     /* alloc new planet array */
+        {                     /* alloc new planet array */
             _cqiPlanets = malloc(sizeof(cqiPlanetInitRec_t) *
                                  _cqiGlobal->maxplanets);
-            
+
             numPlanets = 0;
-            
+
             if (!_cqiPlanets)
-              {
+            {
                 utLog("CQI: could not allocate memory for planets.");
                 globalRead = FALSE; /* redundant I know, but.... */
                 goterror++;
-              }
+            }
             else
-              memset((void *)_cqiPlanets, 0, sizeof(cqiPlanetInitRec_t) *
-                     _cqiGlobal->maxplanets);
-          }
-      }
-      break;
-      
-    case TOK_SHIPTYPE:    
-      break;
+                memset((void *)_cqiPlanets, 0, sizeof(cqiPlanetInitRec_t) *
+                       _cqiGlobal->maxplanets);
+        }
+    }
+    break;
+
+    case TOK_SHIPTYPE:
+        break;
 
     case TOK_TEXANIM:
-      {
+    {
         /* stage == 0 means to disable the anim type */
-        if (currAnimDef.texanim.stages) 
-          currAnimDef.anims |= CQI_ANIMS_TEX; 
+        if (currAnimDef.texanim.stages)
+            currAnimDef.anims |= CQI_ANIMS_TEX;
         else
-          currAnimDef.anims &= ~CQI_ANIMS_TEX; 
-          
-      }
-      break;
+            currAnimDef.anims &= ~CQI_ANIMS_TEX;
+
+    }
+    break;
 
     case TOK_COLANIM:
-      {
+    {
         /* stage == 0 means to disable the anim type */
         if (currAnimDef.colanim.stages)
-          currAnimDef.anims |= CQI_ANIMS_COL; 
+            currAnimDef.anims |= CQI_ANIMS_COL;
         else
-          currAnimDef.anims &= ~CQI_ANIMS_COL; 
-      }
-      break;
+            currAnimDef.anims &= ~CQI_ANIMS_COL;
+    }
+    break;
 
     case TOK_GEOANIM:
-      {
+    {
         /* stage == 0 means to disable the anim type */
         if (currAnimDef.geoanim.stages)
-          currAnimDef.anims |= CQI_ANIMS_GEO;
+            currAnimDef.anims |= CQI_ANIMS_GEO;
         else
-          currAnimDef.anims &= ~CQI_ANIMS_GEO; 
-      }
-      break;
+            currAnimDef.anims &= ~CQI_ANIMS_GEO;
+    }
+    break;
 
     case TOK_TOGANIM:
-      {
+    {
         /* delayms on a toganim == 0 means to disable the anim type */
         if (currAnimDef.toganim.delayms)
-          currAnimDef.anims |= CQI_ANIMS_TOG;
+            currAnimDef.anims |= CQI_ANIMS_TOG;
         else
-          currAnimDef.anims &= ~CQI_ANIMS_TOG; 
-      }
-      break;
-      
+            currAnimDef.anims &= ~CQI_ANIMS_TOG;
+    }
+    break;
+
     case TOK_TEXAREA:
-      /* this is only valid from within a texture definition */
-      if (PREVSECTION() == TOK_TEXTURE)
+        /* this is only valid from within a texture definition */
+        if (PREVSECTION() == TOK_TEXTURE)
         {
-          cqiTextureAreaPtr_t taptr;
-          
-          if (strlen(currTexArea.name))
+            cqiTextureAreaPtr_t taptr;
+
+            if (strlen(currTexArea.name))
             {
-              
-              /* resize the current list and add to it. */
-              
-              taptr = (cqiTextureAreaPtr_t)realloc((void *)currTexAreas, 
-                                                   sizeof(cqiTextureAreaRec_t) * 
-                                                   (numTexAreas + 1));
-              
-              if (!taptr)
-                {  
-                  utLog("CQI: Could not realloc %d texareas for texture %s, "
-                       "ignoring texarea '%s'",
-                       numTexAreas + 1,
-                       currTexture.name,
-                       currTexArea.name);
-                  break;
+
+                /* resize the current list and add to it. */
+
+                taptr = (cqiTextureAreaPtr_t)realloc((void *)currTexAreas,
+                                                     sizeof(cqiTextureAreaRec_t) *
+                                                     (numTexAreas + 1));
+
+                if (!taptr)
+                {
+                    utLog("CQI: Could not realloc %d texareas for texture %s, "
+                          "ignoring texarea '%s'",
+                          numTexAreas + 1,
+                          currTexture.name,
+                          currTexArea.name);
+                    break;
                 }
-              
-              currTexAreas = taptr;
-              currTexAreas[numTexAreas] = currTexArea;
-              numTexAreas++;
-              currTexture.texareas = currTexAreas;
-              currTexture.numTexAreas = numTexAreas;
-              
+
+                currTexAreas = taptr;
+                currTexAreas[numTexAreas] = currTexArea;
+                numTexAreas++;
+                currTexture.texareas = currTexAreas;
+                currTexture.numTexAreas = numTexAreas;
+
             }
-          else
+            else
             {
-              utLog("CQI: texarea name at or near line %d was not specified, "
-                   "ignoring.",
-                   lineNum);
-              goto endsection;
+                utLog("CQI: texarea name at or near line %d was not specified, "
+                      "ignoring.",
+                      lineNum);
+                goto endsection;
             }
         }
-      break;
+        break;
 
-    case TOK_PLANET:    
-      {
+    case TOK_PLANET:
+    {
         /* check some basic things */
         if (!currPlanet.name[0] || !currPlanet.primname[0])
-          {
+        {
             utLog("CQI: planet %d is missing name and/or primary",
-                 numPlanets);
+                  numPlanets);
             goterror++;
             return;
-          }
-        
+        }
+
         if (numPlanets >= _cqiGlobal->maxplanets)
-          {
+        {
             utLog("CQI: planet '%s' (%d) exceeds maxplanets (%d), ignoring.",
-                  currPlanet.name, numPlanets, 
-                 _cqiGlobal->maxplanets);
+                  currPlanet.name, numPlanets,
+                  _cqiGlobal->maxplanets);
             goto endsection;
-          }
-        
+        }
+
         /* need more checks here ? */
-        
+
         /* add it */
         _cqiPlanets[numPlanets] = currPlanet;
         numPlanets++;
-      }
-      
-      break;
-      
+    }
+
+    break;
+
     case TOK_TEXTURE:
-      {
+    {
         cqiTextureInitPtr_t texptr;
         int exists = -1;
-        
+
         /* verify the required info was provided */
         if (!strlen(currTexture.name))
-          {
+        {
             utLog("CQI: texture name at or near line %d was not specified, "
-                 "ignoring.",
-                 lineNum);
+                  "ignoring.",
+                  lineNum);
             goto endsection;
-          }
-        
+        }
+
         /* if the texture was overridden by a later definition
            just copy the new definition over it */
         exists = _cqiFindTexture(currTexture.name);
-        
+
         /* if a filename wasn't specified, and this is not a 'color only'
            texture, then copy in the texname as the default */
-        if (!strlen(currTexture.filename) && 
+        if (!strlen(currTexture.filename) &&
             !(currTexture.flags & CQITEX_F_COLOR_SPEC))
-          strncpy(currTexture.filename, currTexture.name, CQI_NAMELEN - 1);
-        
+            strncpy(currTexture.filename, currTexture.name, CQI_NAMELEN - 1);
+
         if (exists >= 0)
-          {
+        {
             /* overwrite existing texture def */
             _cqiTextures[exists] = currTexture;
             if (cqiDebugl)
-              utLog("CQI: texture '%s' near line %d: overriding already "
-                   "loaded texture.",
-                   currTexture.name, lineNum);
-          }
+                utLog("CQI: texture '%s' near line %d: overriding already "
+                      "loaded texture.",
+                      currTexture.name, lineNum);
+        }
         else
-          {                     /* make a new one */
-            texptr = (cqiTextureInitPtr_t)realloc((void *)_cqiTextures, 
-                                                  sizeof(cqiTextureInitRec_t) * 
+        {                     /* make a new one */
+            texptr = (cqiTextureInitPtr_t)realloc((void *)_cqiTextures,
+                                                  sizeof(cqiTextureInitRec_t) *
                                                   (numTextures + 1));
-            
+
             if (!texptr)
-              {  
+            {
                 utLog("CQI: Could not realloc %d textures, ignoring texture '%s'",
-                     numTextures + 1,
-                     currTexture.name);
+                      numTextures + 1,
+                      currTexture.name);
                 goto endsection;
-              }
+            }
 
             _cqiTextures = texptr;
             _cqiTextures[numTextures] = currTexture;
             numTextures++;
 
             /* warn if the texture did not specify a color (will be
-             *  black and transparent) 
+             *  black and transparent)
              */
 
             if (!(currTexture.flags & CQITEX_F_HAS_COLOR))
-              utLog("CQI: warning, texture '%s' does not specify a color", 
-                    currTexture.name);
+                utLog("CQI: warning, texture '%s' does not specify a color",
+                      currTexture.name);
 
-          }
+        }
         fileNumTextures++;
-      }
-      break;
+    }
+    break;
 
     case TOK_ANIMATION:
-      {
+    {
         cqiAnimationInitPtr_t animptr;
         int exists = -1;
-        
+
         /* verify the required info was provided */
         if (!strlen(currAnimation.name))
-          {
+        {
             utLog("CQI: animation name at or near line %d was not specified, "
-                 "ignoring.",
-                 lineNum);
+                  "ignoring.",
+                  lineNum);
             goto endsection;
-          }
-        
+        }
+
         /* if the animation was overridden by a later definition
            just copy the new definition over it */
 
@@ -2192,123 +2192,123 @@ static void endSection(void)
         /* if a animdef wasn't specified, then copy in the
            name as the default */
         if (!strlen(currAnimation.animdef))
-          strncpy(currAnimation.animdef, currAnimation.name, CQI_NAMELEN - 1);
+            strncpy(currAnimation.animdef, currAnimation.name, CQI_NAMELEN - 1);
 
         if (exists >= 0)
-          {
+        {
             _cqiAnimations[exists] = currAnimation;
             if (cqiDebugl)
-              utLog("CQI: animation '%s' near line %d: overriding already "
-                   "loaded animation.",
-                   currAnimation.name, lineNum);
-          }
+                utLog("CQI: animation '%s' near line %d: overriding already "
+                      "loaded animation.",
+                      currAnimation.name, lineNum);
+        }
         else
-          {                     /* make a new one */
-            animptr = (cqiAnimationInitPtr_t)realloc((void *)_cqiAnimations, 
-                                                  sizeof(cqiAnimationInitRec_t) * 
-                                                  (numAnimations + 1));
-            
+        {                     /* make a new one */
+            animptr = (cqiAnimationInitPtr_t)realloc((void *)_cqiAnimations,
+                                                     sizeof(cqiAnimationInitRec_t) *
+                                                     (numAnimations + 1));
+
             if (!animptr)
-              {  
+            {
                 utLog("CQI: Could not realloc %d animations, ignoring "
-                     "animation '%s'",
-                     numAnimations + 1,
-                     currAnimation.name);
+                      "animation '%s'",
+                      numAnimations + 1,
+                      currAnimation.name);
                 goto endsection;
-              }
-            
+            }
+
             _cqiAnimations = animptr;
             _cqiAnimations[numAnimations] = currAnimation;
             numAnimations++;
-          }
+        }
         fileNumAnimations++;
-      }        
-      break;
-      
+    }
+    break;
+
     case TOK_ANIMDEF:
-      {
+    {
         cqiAnimDefInitPtr_t animptr;
         int exists = -1;
-        
+
         /* verify the required info was provided */
         if (!strlen(currAnimDef.name))
-          {
+        {
             utLog("CQI: animdef name at or near line %d was not specified, "
-                 "ignoring.",
-                 lineNum);
+                  "ignoring.",
+                  lineNum);
             goto endsection;
-          }
-        
+        }
+
         exists = _cqiFindAnimDef(currAnimDef.name);
 
         if (exists >= 0)
-          {
+        {
             _cqiAnimDefs[exists] = currAnimDef;
             if (cqiDebugl)
-              utLog("CQI: animdef '%s' near line %d: overriding already loaded "
-                   "animdef.",
-                   currAnimDef.name, lineNum);
-          }
+                utLog("CQI: animdef '%s' near line %d: overriding already loaded "
+                      "animdef.",
+                      currAnimDef.name, lineNum);
+        }
         else if (!currAnimDef.anims)
-          {                     /* no animation types were declared */
+        {                     /* no animation types were declared */
             utLog("CQI: animdef '%s' near line %d: declared no animation "
-                 "type sections. Ignoring.",
-                 currAnimDef.name, lineNum);
+                  "type sections. Ignoring.",
+                  currAnimDef.name, lineNum);
             goto endsection;
-          }
+        }
         else
-          {                     /* make a new one */
-            animptr = (cqiAnimDefInitPtr_t)realloc((void *)_cqiAnimDefs, 
-                                                  sizeof(cqiAnimDefInitRec_t) * 
-                                                  (numAnimDefs + 1));
-            
+        {                     /* make a new one */
+            animptr = (cqiAnimDefInitPtr_t)realloc((void *)_cqiAnimDefs,
+                                                   sizeof(cqiAnimDefInitRec_t) *
+                                                   (numAnimDefs + 1));
+
             if (!animptr)
-              {  
+            {
                 utLog("CQI: Could not realloc %d animdefs, ignoring "
-                     "animdef '%s'",
-                     numAnimDefs + 1,
-                     currAnimDef.name);
+                      "animdef '%s'",
+                      numAnimDefs + 1,
+                      currAnimDef.name);
                 goto endsection;
-              }
-            
+            }
+
             _cqiAnimDefs = animptr;
             _cqiAnimDefs[numAnimDefs] = currAnimDef;
             numAnimDefs++;
-          }
+        }
         fileNumAnimDefs++;
-      }        
-      break;
-      
-    case TOK_SOUNDCONF:    
-      {                         /* make sure everything is specified */
+    }
+    break;
+
+    case TOK_SOUNDCONF:
+    {                         /* make sure everything is specified */
 
         if (!_cqiSoundConf->samplerate)
-          _cqiSoundConf->samplerate = 22050;
-        
+            _cqiSoundConf->samplerate = 22050;
+
         /* stereo is already enabled by default in startSection() */
 
         if (!_cqiSoundConf->fxchannels)
-          _cqiSoundConf->fxchannels = 16;
+            _cqiSoundConf->fxchannels = 16;
 
         if (!_cqiSoundConf->chunksize)
-          _cqiSoundConf->chunksize = 512;
-      }
-      break;
+            _cqiSoundConf->chunksize = 512;
+    }
+    break;
 
 
     case TOK_EFFECT:
-      {
+    {
         cqiSoundPtr_t sndptr;
         int exists = -1;
-        
+
         /* verify the required info was provided */
         if (!strlen(currSound.name))
-          {
+        {
             utLog("CQI: effect name at or near line %d was not specified, "
-                 "ignoring.",
-                 lineNum);
+                  "ignoring.",
+                  lineNum);
             goto endsection;
-          }
+        }
 
         /* if the effect was overridden by a later definition
            just copy the new definition over it */
@@ -2317,52 +2317,52 @@ static void endSection(void)
         /* if a filename wasn't specified, then copy in the name
            as the default */
         if (!strlen(currSound.filename))
-          strncpy(currSound.filename, currSound.name, CQI_NAMELEN - 1);
+            strncpy(currSound.filename, currSound.name, CQI_NAMELEN - 1);
 
         if (exists >= 0)
-          {
+        {
             /* overwrite existing def */
             _cqiSoundEffects[exists] = currSound;
             if (cqiDebugl)
-              utLog("CQI: effect '%s' near line %d: overriding already "
-                   "loaded effect.",
-                   currSound.name, lineNum);
-          }
+                utLog("CQI: effect '%s' near line %d: overriding already "
+                      "loaded effect.",
+                      currSound.name, lineNum);
+        }
         else
-          {                     /* make a new one */
-            sndptr = (cqiSoundPtr_t)realloc((void *)_cqiSoundEffects, 
-                                                  sizeof(cqiSoundRec_t) * 
-                                                  (numSoundEffects + 1));
-            
+        {                     /* make a new one */
+            sndptr = (cqiSoundPtr_t)realloc((void *)_cqiSoundEffects,
+                                            sizeof(cqiSoundRec_t) *
+                                            (numSoundEffects + 1));
+
             if (!sndptr)
-              {  
+            {
                 utLog("CQI: Could not realloc %d effect, ignoring effect '%s'",
-                     numSoundEffects + 1,
-                     currSound.name);
+                      numSoundEffects + 1,
+                      currSound.name);
                 goto endsection;
-              }
-            
+            }
+
             _cqiSoundEffects = sndptr;
             _cqiSoundEffects[numSoundEffects] = currSound;
             numSoundEffects++;
-          }
+        }
         fileNumEffects++;
-      }
-      break;
+    }
+    break;
 
     case TOK_MUSIC:
-      {
+    {
         cqiSoundPtr_t sndptr;
         int exists = -1;
-        
+
         /* verify the required info was provided */
         if (!strlen(currSound.name))
-          {
+        {
             utLog("CQI: music name at or near line %d was not specified, "
-                 "ignoring.",
-                 lineNum);
+                  "ignoring.",
+                  lineNum);
             goto endsection;
-          }
+        }
 
         /* if the music was overridden by a later definition
            just copy the new definition over it */
@@ -2371,1009 +2371,1009 @@ static void endSection(void)
         /* if a filename wasn't specified, then copy in the name
            as the default */
         if (!strlen(currSound.filename))
-          strncpy(currSound.filename, currSound.name, CQI_NAMELEN - 1);
+            strncpy(currSound.filename, currSound.name, CQI_NAMELEN - 1);
 
         if (exists >= 0)
-          {
+        {
             /* overwrite existing def */
             _cqiSoundMusic[exists] = currSound;
             if (cqiDebugl)
-              utLog("CQI: music '%s' near line %d: overriding already "
-                   "loaded music slot.",
-                   currSound.name, lineNum);
-          }
+                utLog("CQI: music '%s' near line %d: overriding already "
+                      "loaded music slot.",
+                      currSound.name, lineNum);
+        }
         else
-          {                     /* make a new one */
-            sndptr = (cqiSoundPtr_t)realloc((void *)_cqiSoundMusic, 
-                                                  sizeof(cqiSoundRec_t) * 
-                                                  (numSoundMusic + 1));
-            
+        {                     /* make a new one */
+            sndptr = (cqiSoundPtr_t)realloc((void *)_cqiSoundMusic,
+                                            sizeof(cqiSoundRec_t) *
+                                            (numSoundMusic + 1));
+
             if (!sndptr)
-              {  
+            {
                 utLog("CQI: Could not realloc %d music slots, "
-                     "ignoring music '%s'",
-                     numSoundMusic + 1,
-                     currSound.name);
+                      "ignoring music '%s'",
+                      numSoundMusic + 1,
+                      currSound.name);
                 goto endsection;
-              }
-            
+            }
+
             _cqiSoundMusic = sndptr;
             _cqiSoundMusic[numSoundMusic] = currSound;
             numSoundMusic++;
-          }
+        }
         fileNumMusic++;
-      }
-      break;
+    }
+    break;
 
     default:
-      break;
+        break;
     }
 
- endsection:
+endsection:
 
-  sections[curDepth] = 0;
-  if (curDepth > 0)
-    curDepth--;
-  
-  return;
+    sections[curDepth] = 0;
+    if (curDepth > 0)
+        curDepth--;
+
+    return;
 }
 
 /* integers */
 static void cfgSectioni(int item, int val)
 {
-  if (cqiDebugl)
-    utLog(" [%d] section = %s\titem = %s\tvali = %d",
-         curDepth, sect2str(CURSECTION()), item2str(item), val);
-  
-  switch (CURSECTION())
+    if (cqiDebugl)
+        utLog(" [%d] section = %s\titem = %s\tvali = %d",
+              curDepth, sect2str(CURSECTION()), item2str(item), val);
+
+    switch (CURSECTION())
     {
-    case TOK_GLOBAL:    
-      {
+    case TOK_GLOBAL:
+    {
         switch (item)
-          {
-          case TOK_PLANETMAX:
+        {
+        case TOK_PLANETMAX:
             _cqiGlobal->maxplanets = abs(val);
             break;
-          case TOK_SHIPMAX: 
+        case TOK_SHIPMAX:
             _cqiGlobal->maxships = abs(val);
             break;
-          case TOK_USERMAX: 
+        case TOK_USERMAX:
             _cqiGlobal->maxusers = abs(val);
             break;
-          case TOK_HISTMAX: 
+        case TOK_HISTMAX:
             _cqiGlobal->maxhist = abs(val);
             break;
-          case TOK_MSGMAX: 
+        case TOK_MSGMAX:
             _cqiGlobal->maxmsgs = abs(val);
             break;
-          }            
-      }
+        }
+    }
 
-      break;
-    case TOK_SHIPTYPE:    
-      break;
-    case TOK_PLANET:    
-      {
+    break;
+    case TOK_SHIPTYPE:
+        break;
+    case TOK_PLANET:
+    {
         switch(item)
-          {
-          case TOK_ARMIES:
+        {
+        case TOK_ARMIES:
             currPlanet.armies = abs(val);
             break;
-          case TOK_SIZE:
+        case TOK_SIZE:
             currPlanet.size = fabs((real)val);
             break;
-          }
-      }
-      break;
+        }
+    }
+    break;
     case TOK_ANIMDEF:
-      {
+    {
         currAnimDef.timelimit = abs(val);
-      }
-      break;
+    }
+    break;
 
-    case TOK_SOUNDCONF:    
-      {
+    case TOK_SOUNDCONF:
+    {
         switch (item)
-          {
-          case TOK_SAMPLERATE:
+        {
+        case TOK_SAMPLERATE:
             _cqiSoundConf->samplerate = CLAMP(8192, 44100, abs(val));
             break;
-          case TOK_FXCHANNELS:
+        case TOK_FXCHANNELS:
             _cqiSoundConf->fxchannels = CLAMP(2, 64, abs(val));
             break;
-          case TOK_CHUNKSIZE:
+        case TOK_CHUNKSIZE:
             _cqiSoundConf->chunksize = CLAMP(256, 8192, abs(val));
             break;
-          default:
+        default:
             break;
-          }
-      }
+        }
+    }
 
     case TOK_EFFECT:
     case TOK_MUSIC:
-      {
+    {
         switch(item)
-          {
-          case TOK_VOLUME:
+        {
+        case TOK_VOLUME:
             currSound.volume = CLAMP(0, 100, abs(val));
             break;
-          case TOK_PAN:
+        case TOK_PAN:
             currSound.pan = CLAMP(-128, 128, abs(val));
             break;
-          case TOK_FADEINMS:
+        case TOK_FADEINMS:
             currSound.fadeinms = CLAMP(0, 10000, abs(val));
             break;
-          case TOK_FADEOUTMS:
+        case TOK_FADEOUTMS:
             currSound.fadeoutms = CLAMP(0, 10000, abs(val));
             break;
-          case TOK_LOOPS:
+        case TOK_LOOPS:
             currSound.loops = abs(val);
             break;
-          case TOK_LIMIT:
+        case TOK_LIMIT:
             currSound.limit = abs(val);
             break;
-          case TOK_FRAMELIMIT:
+        case TOK_FRAMELIMIT:
             currSound.framelimit = abs(val);
             break;
-          case TOK_DELAYMS:
+        case TOK_DELAYMS:
             currSound.delayms = abs(val);
             break;
-          }
+        }
 
-      }
+    }
 
     case TOK_TEXANIM:
-      {
+    {
         switch(item)
-          {
-          case TOK_STAGES:
+        {
+        case TOK_STAGES:
             currAnimDef.texanim.stages = abs(val);
             break;
-          case TOK_LOOPS:
+        case TOK_LOOPS:
             currAnimDef.texanim.loops = abs(val);
             break;
-          case TOK_DELAYMS:
+        case TOK_DELAYMS:
             currAnimDef.texanim.delayms = abs(val);
             break;
-          case TOK_LOOPTYPE:
+        case TOK_LOOPTYPE:
             currAnimDef.texanim.looptype = abs(val);
             break;
-          }
-      }
-      break;
-      
+        }
+    }
+    break;
+
     case TOK_COLANIM:
-      {
+    {
         switch(item)
-          {
-          case TOK_STAGES:
+        {
+        case TOK_STAGES:
             currAnimDef.colanim.stages = abs(val);
             break;
-          case TOK_LOOPS:
+        case TOK_LOOPS:
             currAnimDef.colanim.loops = abs(val);
             break;
-          case TOK_DELAYMS:
+        case TOK_DELAYMS:
             currAnimDef.colanim.delayms = abs(val);
             break;
-          case TOK_LOOPTYPE:
+        case TOK_LOOPTYPE:
             currAnimDef.colanim.looptype = abs(val);
             break;
-          }
-      }
-      break;
-      
+        }
+    }
+    break;
+
     case TOK_GEOANIM:
-      {
+    {
         switch(item)
-          {
-          case TOK_STAGES:
+        {
+        case TOK_STAGES:
             currAnimDef.geoanim.stages = abs(val);
             break;
-          case TOK_LOOPS:
+        case TOK_LOOPS:
             currAnimDef.geoanim.loops = abs(val);
             break;
-          case TOK_DELAYMS:
+        case TOK_DELAYMS:
             currAnimDef.geoanim.delayms = abs(val);
             break;
-          case TOK_LOOPTYPE:
+        case TOK_LOOPTYPE:
             currAnimDef.geoanim.looptype = abs(val);
             break;
-          }
-      }
-      break;
-      
+        }
+    }
+    break;
+
     case TOK_TOGANIM:
-      {
+    {
         switch(item)
-          {
-          case TOK_DELAYMS:
+        {
+        case TOK_DELAYMS:
             currAnimDef.toganim.delayms = abs(val);
             break;
-          }
-      }
-      break;
-      
+        }
+    }
+    break;
+
     case TOK_ISTATE:
-      {
+    {
         switch(item)
-          {
-          case TOK_SIZE:
+        {
+        case TOK_SIZE:
             currAnimDef.isize = fabs((real)val);
             currAnimDef.istates |= AD_ISTATE_SZ;
             break;
-          }
-      }
-      break;
-      
+        }
+    }
+    break;
+
     default:
-      break;
+        break;
     }
 
-  return;
+    return;
 }
 
 /* integer pair */
 void cfgSectionil(int item, int val1, int val2)
 {
-  if (cqiDebugl)
-    utLog(" [%d] section = %s\titem = %s\tvalil = %d, %d",
-         curDepth, sect2str(CURSECTION()), item2str(item), val1, val2);
+    if (cqiDebugl)
+        utLog(" [%d] section = %s\titem = %s\tvalil = %d, %d",
+              curDepth, sect2str(CURSECTION()), item2str(item), val1, val2);
 
-  switch (CURSECTION())
+    switch (CURSECTION())
     {
-    case TOK_PLANET:    
-      {
+    case TOK_PLANET:
+    {
         switch (item)
-          {
-          case TOK_ARMIES:
+        {
+        case TOK_ARMIES:
+        {
+            /* if we got a pair, randomly init one */
+            /* make sure it's valid of course... */
+            if (val1 >= val2 || val2 <= val1)
             {
-              /* if we got a pair, randomly init one */
-              /* make sure it's valid of course... */
-              if (val1 >= val2 || val2 <= val1)
-                {
-                  utLog("%s: Planet '%s's army min must be less than it's max: min %d max %d is invalid.",
-                       __FUNCTION__,
-                       currPlanet.name,
-                       val1, val2);
-                  currPlanet.armies = 0;
-                }
-              else
+                utLog("%s: Planet '%s's army min must be less than it's max: min %d max %d is invalid.",
+                      __FUNCTION__,
+                      currPlanet.name,
+                      val1, val2);
+                currPlanet.armies = 0;
+            }
+            else
                 currPlanet.armies = rndint(abs(val1), abs(val2));
 
 #if 0
-              utLog("ARMIES got %d %d, rnd = %d\n",
-                   val1, val2, currPlanet.armies);
+            utLog("ARMIES got %d %d, rnd = %d\n",
+                  val1, val2, currPlanet.armies);
 #endif
-            }
-            break;
-          }
-      }
+        }
+        break;
+        }
+    }
     }
 
-  return;
+    return;
 }
 
 
 /* reals */
 static void cfgSectionf(int item, real val)
 {
-  if (cqiDebugl)
-    utLog(" [%d] section = %s\titem = %s\tvalf = %f",
-         curDepth, sect2str(CURSECTION()), item2str(item), val);
+    if (cqiDebugl)
+        utLog(" [%d] section = %s\titem = %s\tvalf = %f",
+              curDepth, sect2str(CURSECTION()), item2str(item), val);
 
-  switch (CURSECTION())
+    switch (CURSECTION())
     {
-    case TOK_GLOBAL:    
-      break;
-    case TOK_SHIPTYPE:    
-      break;
-    case TOK_PLANET:    
-      {
+    case TOK_GLOBAL:
+        break;
+    case TOK_SHIPTYPE:
+        break;
+    case TOK_PLANET:
+    {
         switch (item)
-          {
-          case TOK_ANGLE:
+        {
+        case TOK_ANGLE:
             currPlanet.angle = val;
             break;
-          case TOK_VELOCITY:
+        case TOK_VELOCITY:
             currPlanet.velocity = val;
             break;
-          case TOK_RADIUS:
+        case TOK_RADIUS:
             currPlanet.radius = val;
             break;
-          case TOK_XCOORD:
+        case TOK_XCOORD:
             currPlanet.xcoord = val;
             break;
-          case TOK_YCOORD:
+        case TOK_YCOORD:
             currPlanet.ycoord = val;
             break;
-          }
-      }
+        }
+    }
 
-      break;
+    break;
 
     case TOK_TEXANIM:
-      {
+    {
         switch(item)
-          {
-          case TOK_DELTAS:
+        {
+        case TOK_DELTAS:
             currAnimDef.texanim.deltas = val;
             break;
-          case TOK_DELTAT:
+        case TOK_DELTAT:
             currAnimDef.texanim.deltat = val;
             break;
-          }
-      }
-      break;
+        }
+    }
+    break;
     case TOK_COLANIM:
-      {
+    {
         switch(item)
-          {
-          case TOK_DELTAA:
+        {
+        case TOK_DELTAA:
             currAnimDef.colanim.deltaa = val;
             break;
-          case TOK_DELTAR: /* red */
+        case TOK_DELTAR: /* red */
             currAnimDef.colanim.deltar = val;
             break;
-          case TOK_DELTAG:
+        case TOK_DELTAG:
             currAnimDef.colanim.deltag = val;
             break;
-          case TOK_DELTAB:
+        case TOK_DELTAB:
             currAnimDef.colanim.deltab = val;
             break;
-          }
-      }
-      break;
-      
+        }
+    }
+    break;
+
     case TOK_GEOANIM:
-      {
+    {
         switch(item)
-          {
-          case TOK_DELTAX:
+        {
+        case TOK_DELTAX:
             currAnimDef.geoanim.deltax = val;
             break;
-          case TOK_DELTAY:
+        case TOK_DELTAY:
             currAnimDef.geoanim.deltay = val;
             break;
-          case TOK_DELTAZ:
+        case TOK_DELTAZ:
             currAnimDef.geoanim.deltaz = val;
             break;
-          case TOK_DELTAR: /* rotation */
+        case TOK_DELTAR: /* rotation */
             currAnimDef.geoanim.deltar = val;
             break;
-          case TOK_DELTAS: /* size */
+        case TOK_DELTAS: /* size */
             currAnimDef.geoanim.deltas = val;
             break;
-          }
-      }
-      break;
-      
+        }
+    }
+    break;
+
     case TOK_ISTATE:
-      {
+    {
         switch(item)
-          {
-          case TOK_ANGLE:
+        {
+        case TOK_ANGLE:
             currAnimDef.iangle = val;
             currAnimDef.istates |= AD_ISTATE_ANG;
             break;
-          }
-      }
-      break;
+        }
+    }
+    break;
 
     case TOK_TEXAREA:
-      {
+    {
         switch(item)
-          {
-          case TOK_XCOORD:
+        {
+        case TOK_XCOORD:
             currTexArea.x = fabs(val);
             break;
-          case TOK_YCOORD:
+        case TOK_YCOORD:
             currTexArea.y = fabs(val);
             break;
-          case TOK_WIDTH:
+        case TOK_WIDTH:
             currTexArea.w = fabs(val);
             break;
-          case TOK_HEIGHT:
+        case TOK_HEIGHT:
             currTexArea.h = fabs(val);
             break;
-          }
-      }
-      break;
-      
-    default:
-      break;
+        }
     }
-  return;
+    break;
+
+    default:
+        break;
+    }
+    return;
 }
 
 /* strings */
 void cfgSections(int item, char *val)
 {
-  if (cqiDebugl)
-    utLog(" [%d] section = %s\titem = %s\tvals = '%s'",
-         curDepth, sect2str(CURSECTION()), 
-         item2str(item), (val) ? val : "(NULL)" );
+    if (cqiDebugl)
+        utLog(" [%d] section = %s\titem = %s\tvals = '%s'",
+              curDepth, sect2str(CURSECTION()),
+              item2str(item), (val) ? val : "(NULL)" );
 
-  if (!val)
-    return;
+    if (!val)
+        return;
 
-  switch (CURSECTION())
+    switch (CURSECTION())
     {
-    case TOK_GLOBAL:    
-      break;
-    case TOK_SHIPTYPE:    
-      break;
+    case TOK_GLOBAL:
+        break;
+    case TOK_SHIPTYPE:
+        break;
     case TOK_TEXAREA:
-      {
+    {
         switch (item)
-          {
-          case TOK_NAME:
+        {
+        case TOK_NAME:
             strncpy(currTexArea.name, val, CQI_NAMELEN - 1);
             break;
-          }
-      }
-      break;
+        }
+    }
+    break;
     case TOK_TEXANIM:
-      {
+    {
         switch(item)
-          {
-          case TOK_COLOR:
+        {
+        case TOK_COLOR:
             currAnimDef.texanim.color = hex2color(val);
             break;
-          }
-      }
-      break;
-      
+        }
+    }
+    break;
+
     case TOK_COLANIM:
-      {
+    {
         switch(item)
-          {
-          case TOK_COLOR:
+        {
+        case TOK_COLOR:
             currAnimDef.colanim.color = hex2color(val);
             break;
-          }
-      }
-      break;
-      
+        }
+    }
+    break;
+
     case TOK_ISTATE:
-      {
+    {
         switch(item)
-          {
-          case TOK_COLOR:
+        {
+        case TOK_COLOR:
             currAnimDef.icolor = hex2color(val);
             currAnimDef.istates |= AD_ISTATE_COL;
             break;
-          case TOK_TEXNAME:
+        case TOK_TEXNAME:
             strncpy(currAnimDef.itexname, val, CQI_NAMELEN - 1);
             currAnimDef.istates |= AD_ISTATE_TEX;
             break;
-          }
-      }
-      break;
-      
-    case TOK_PLANET:    
-      {
+        }
+    }
+    break;
+
+    case TOK_PLANET:
+    {
         switch (item)
-          {
-          case TOK_NAME:
+        {
+        case TOK_NAME:
             strncpy(currPlanet.name, val, MAXPLANETNAME - 1);
             break;
-          case TOK_PRIMARY:
+        case TOK_PRIMARY:
             strncpy(currPlanet.primname, val, MAXPLANETNAME - 1);
             break;
-          case TOK_PTYPE:
+        case TOK_PTYPE:
             currPlanet.ptype = str2ptype(val);
             break;
-          case TOK_PTEAM:
+        case TOK_PTEAM:
             currPlanet.pteam = str2team(val);
             break;
-          case TOK_TEXNAME:
+        case TOK_TEXNAME:
             strncpy(currPlanet.texname, val, CQI_NAMELEN - 1);
             break;
-          case TOK_COLOR:
-            /* this used to be allowed, so for now just warn if 
-             * verbose is on 
+        case TOK_COLOR:
+            /* this used to be allowed, so for now just warn if
+             * verbose is on
              */
             if (cqDebug)
-              utLog("CQI: 'color' is no longer valid in planet definitions");
+                utLog("CQI: 'color' is no longer valid in planet definitions");
             break;
-          }
-      }
-      break;
+        }
+    }
+    break;
 
     case TOK_TEXTURE:
-      {
+    {
         switch(item)
-          {
-          case TOK_NAME:
+        {
+        case TOK_NAME:
             strncpy(currTexture.name, val, CQI_NAMELEN - 1);
             break;
-          case TOK_FILENAME:
+        case TOK_FILENAME:
             if (val[0] == 0)    /* empty filename means only color matters */
-              currTexture.flags |= CQITEX_F_COLOR_SPEC;
+                currTexture.flags |= CQITEX_F_COLOR_SPEC;
             else
-              strncpy(currTexture.filename, val, CQI_NAMELEN - 1);
+                strncpy(currTexture.filename, val, CQI_NAMELEN - 1);
             break;
-          case TOK_COLOR:
+        case TOK_COLOR:
             currTexture.flags |= CQITEX_F_HAS_COLOR;
             currTexture.color = hex2color(val);
             break;
-          }            
-      }
-      break;
-      
+        }
+    }
+    break;
+
     case TOK_ANIMATION:
-       {
+    {
         switch(item)
-          {
-          case TOK_NAME:
+        {
+        case TOK_NAME:
             strncpy(currAnimation.name, val, CQI_NAMELEN - 1);
             break;
-          case TOK_ANIMDEF:
+        case TOK_ANIMDEF:
             strncpy(currAnimation.animdef, val, CQI_NAMELEN - 1);
             break;
-          }
-      }
-      break;
+        }
+    }
+    break;
 
     case TOK_ANIMDEF:
-       {
+    {
         switch(item)
-          {
-          case TOK_NAME:
+        {
+        case TOK_NAME:
             if (PREVSECTION() == TOK_ANIMATION)
-              {
+            {
                 /* not allowed to set a name on inlined animdefs - it's
                  * already been done for you.
                  */
-                  utLog("CQI: field 'name' is ignored for inlined animdefs.");
-              }
+                utLog("CQI: field 'name' is ignored for inlined animdefs.");
+            }
             else
-              strncpy(currAnimDef.name, val, CQI_NAMELEN - 1);
+                strncpy(currAnimDef.name, val, CQI_NAMELEN - 1);
             break;
-          case TOK_TEXNAME:
+        case TOK_TEXNAME:
             strncpy(currAnimDef.texname, val, CQI_NAMELEN - 1);
             break;
-          }
-      }
-      break;
+        }
+    }
+    break;
 
     case TOK_EFFECT:
     case TOK_MUSIC:
-      {
+    {
         switch(item)
-          {
-          case TOK_NAME:
+        {
+        case TOK_NAME:
             strncpy(currSound.name, val, CQI_NAMELEN - 1);
             break;
-          case TOK_FILENAME:
+        case TOK_FILENAME:
             strncpy(currSound.filename, val, CQI_NAMELEN - 1);
-          }
-      }
-      break;
+        }
+    }
+    break;
 
     }
 
-  /* be sure to free the value allocated */
-  free(val);
-  return;
+    /* be sure to free the value allocated */
+    free(val);
+    return;
 }
 
 /* booleans */
 static void cfgSectionb(int item, char *val)
 {
-  int bval = parsebool(val);
+    int bval = parsebool(val);
 
-  if (cqiDebugl)
-    utLog(" [%d] section = %s\titem = %s\tvalb = '%s'",
-         curDepth, sect2str(CURSECTION()), item2str(item), 
-         (bval ? "yes" : "no"));
+    if (cqiDebugl)
+        utLog(" [%d] section = %s\titem = %s\tvalb = '%s'",
+              curDepth, sect2str(CURSECTION()), item2str(item),
+              (bval ? "yes" : "no"));
 
-  if (bval == -1)
+    if (bval == -1)
     {                           /* an error, do something sane */
-      bval = 0;
+        bval = 0;
     }
-  
-  switch (CURSECTION())
+
+    switch (CURSECTION())
     {
-    case TOK_GLOBAL:    
-      break;
-    case TOK_SHIPTYPE:    
-      break;
-    case TOK_PLANET:    
-      {
-        switch(item) 
-          {
-          case TOK_VISIBLE:
+    case TOK_GLOBAL:
+        break;
+    case TOK_SHIPTYPE:
+        break;
+    case TOK_PLANET:
+    {
+        switch(item)
+        {
+        case TOK_VISIBLE:
             currPlanet.visible = bval;
             break;
-          case TOK_CORE:
+        case TOK_CORE:
             currPlanet.core = bval;
             break;
-          case TOK_HOMEPLANET:
+        case TOK_HOMEPLANET:
             currPlanet.homeplanet = bval;
             break;
-          }
-      }
-      break;
+        }
+    }
+    break;
 
     case TOK_TEXTURE:
-      {
-        switch(item) 
-          {
-          case TOK_MIPMAP:
+    {
+        switch(item)
+        {
+        case TOK_MIPMAP:
             if (bval)
-              currTexture.flags |= CQITEX_F_GEN_MIPMAPS;
+                currTexture.flags |= CQITEX_F_GEN_MIPMAPS;
             else
-              currTexture.flags &= ~CQITEX_F_GEN_MIPMAPS;
-              
+                currTexture.flags &= ~CQITEX_F_GEN_MIPMAPS;
+
             break;
 
-          case TOK_TEX_LUMINANCE:
+        case TOK_TEX_LUMINANCE:
             if (bval)
-              currTexture.flags |= CQITEX_F_IS_LUMINANCE;
+                currTexture.flags |= CQITEX_F_IS_LUMINANCE;
             else
-              currTexture.flags &= ~CQITEX_F_IS_LUMINANCE;
-              
-            break;
-          }
-      }
-      break;
+                currTexture.flags &= ~CQITEX_F_IS_LUMINANCE;
 
-    case TOK_SOUNDCONF:    
-      {
+            break;
+        }
+    }
+    break;
+
+    case TOK_SOUNDCONF:
+    {
         switch (item)
-          {
-          case TOK_STEREO:
+        {
+        case TOK_STEREO:
             _cqiSoundConf->stereo = bval;
             break;
-          }
-      }
-      break;
-      
-    default:
-      break;
+        }
     }
-  
-  return;
+    break;
+
+    default:
+        break;
+    }
+
+    return;
 }
 
 static char *sect2str(int section)
 {
-  switch (section)
+    switch (section)
     {
     case TOK_GLOBAL:
-      return "GLOBAL";
-      break;
+        return "GLOBAL";
+        break;
     case TOK_SHIPTYPE:
-      return "SHIPTYPE";
-      break;
+        return "SHIPTYPE";
+        break;
     case TOK_PLANET:
-      return "PLANET";
-      break;
+        return "PLANET";
+        break;
     case TOK_TEXTURE:
-      return "TEXTURE";
-      break;
+        return "TEXTURE";
+        break;
     case TOK_ANIMATION:
-      return "ANIMATION";
-      break;
+        return "ANIMATION";
+        break;
     case TOK_ANIMDEF:
-      return "ANIMDEF";
-      break;
+        return "ANIMDEF";
+        break;
     case TOK_SOUNDCONF:
-      return "SOUNDCONF";
-      break;
+        return "SOUNDCONF";
+        break;
     case TOK_EFFECT:
-      return "EFFECT";
-      break;
+        return "EFFECT";
+        break;
     case TOK_MUSIC:
-      return "MUSIC";
-      break;
+        return "MUSIC";
+        break;
     case TOK_LIMIT:
-      return "LIMIT";
-      break;
+        return "LIMIT";
+        break;
     case TOK_FRAMELIMIT:
-      return "FRAMELIMIT";
-      break;
+        return "FRAMELIMIT";
+        break;
 
-      /* nested sections */
+        /* nested sections */
     case TOK_TEXANIM:
-      return "TEXANIM";
-      break;
+        return "TEXANIM";
+        break;
     case TOK_COLANIM:
-      return "COLANIM";
-      break;
+        return "COLANIM";
+        break;
     case TOK_GEOANIM:
-      return "GEOANIM";
-      break;
+        return "GEOANIM";
+        break;
     case TOK_TOGANIM:
-      return "TOGANIM";
-      break;
+        return "TOGANIM";
+        break;
     case TOK_ISTATE:
-      return "ISTATE";
-      break;
+        return "ISTATE";
+        break;
     case TOK_TEXAREA:
-      return "TEXAREA";
-      break;
+        return "TEXAREA";
+        break;
     }
-  
-  return "UNKNOWN";
+
+    return "UNKNOWN";
 }
 
 static char *item2str(int item)
 {
-  switch (item)
+    switch (item)
     {
     case TOK_PLANETMAX:
-      return "PLANETMAX";
-      break;
+        return "PLANETMAX";
+        break;
     case TOK_SHIPMAX:
-      return "SHIPMAX";
-      break;
+        return "SHIPMAX";
+        break;
     case TOK_USERMAX:
-      return "USERMAX";
-      break;
+        return "USERMAX";
+        break;
     case TOK_HISTMAX:
-      return "HISTMAX";
-      break;
+        return "HISTMAX";
+        break;
     case TOK_MSGMAX:
-      return "MSGMAX";
-      break;
+        return "MSGMAX";
+        break;
     case TOK_NAME:
-      return "NAME";
-      break;
+        return "NAME";
+        break;
     case TOK_ENGFAC:
-      return "ENGFAC";
-      break;
+        return "ENGFAC";
+        break;
     case TOK_WEAFAC:
-      return "WEAFAC";
-      break;
+        return "WEAFAC";
+        break;
     case TOK_ACCELFAC:
-      return "ACCELFAC";
-      break;
+        return "ACCELFAC";
+        break;
     case TOK_TORPWARP:
-      return "TORPWARP";
-      break;
+        return "TORPWARP";
+        break;
     case TOK_WARPMAX:
-      return "WARPMAX";
-      break;
+        return "WARPMAX";
+        break;
     case TOK_ARMYMAX:
-      return "ARMYMAX";
-      break;
+        return "ARMYMAX";
+        break;
     case TOK_SHMAX:
-      return "SHMAX";
-      break;
+        return "SHMAX";
+        break;
     case TOK_DAMMAX:
-      return "DAMMAX";
-      break;
+        return "DAMMAX";
+        break;
     case TOK_TORPMAX:
-      return "TORPMAX";
-      break;
+        return "TORPMAX";
+        break;
     case TOK_SIZE:
-      return "SIZE";
-      break;
+        return "SIZE";
+        break;
     case TOK_FUELMAX:
-      return "FUELMAX";
-      break;
+        return "FUELMAX";
+        break;
     case TOK_PRIMARY:
-      return "PRIMARY";
-      break;
+        return "PRIMARY";
+        break;
     case TOK_ANGLE:
-      return "ANGLE";
-      break;
+        return "ANGLE";
+        break;
     case TOK_VELOCITY:
-      return "VELOCITY";
-      break;
+        return "VELOCITY";
+        break;
     case TOK_RADIUS:
-      return "RADIUS";
-      break;
+        return "RADIUS";
+        break;
     case TOK_PTYPE:
-      return "PTYPE";
-      break;
+        return "PTYPE";
+        break;
     case TOK_PTEAM:
-      return "PTEAM";
-      break;
+        return "PTEAM";
+        break;
     case TOK_ARMIES:
-      return "ARMIES";
-      break;
+        return "ARMIES";
+        break;
     case TOK_VISIBLE:
-      return "VISIBLE";
-      break;
+        return "VISIBLE";
+        break;
     case TOK_CORE:
-      return "CORE";
-      break;
+        return "CORE";
+        break;
     case TOK_XCOORD:
-      return "XCOORD";
-      break;
+        return "XCOORD";
+        break;
     case TOK_YCOORD:
-      return "YCOORD";
-      break;
+        return "YCOORD";
+        break;
     case TOK_SCOORD:
-      return "SCOORD";
-      break;
+        return "SCOORD";
+        break;
     case TOK_TCOORD:
-      return "TCOORD";
-      break;
+        return "TCOORD";
+        break;
     case TOK_TEXNAME:
-      return "TEXNAME";
-      break;
+        return "TEXNAME";
+        break;
     case TOK_COLOR:
-      return "COLOR";
-      break;
+        return "COLOR";
+        break;
     case TOK_HOMEPLANET:
-      return "HOMEPLANET";
-      break;
+        return "HOMEPLANET";
+        break;
     case TOK_FILENAME:
-      return "FILENAME";
-      break;
+        return "FILENAME";
+        break;
     case TOK_ANIMDEF:
-      return "ANIMDEF";
-      break;
+        return "ANIMDEF";
+        break;
     case TOK_TIMELIMIT:
-      return "TIMELIMIT";
-      break;
+        return "TIMELIMIT";
+        break;
     case TOK_STAGES:
-      return "STAGES";
-      break;
+        return "STAGES";
+        break;
     case TOK_LOOPS:
-      return "LOOPS";
-      break;
+        return "LOOPS";
+        break;
     case TOK_DELAYMS:
-      return "DELAYMS";
-      break;
+        return "DELAYMS";
+        break;
     case TOK_LOOPTYPE:
-      return "LOOPTYPE";
-      break;
+        return "LOOPTYPE";
+        break;
     case TOK_DELTAA:
-      return "DELTAA";
-      break;
+        return "DELTAA";
+        break;
     case TOK_DELTAR:
-      return "DELTAR";
-      break;
+        return "DELTAR";
+        break;
     case TOK_DELTAG:
-      return "DELTAG";
-      break;
+        return "DELTAG";
+        break;
     case TOK_DELTAB:
-      return "DELTAB";
-      break;
+        return "DELTAB";
+        break;
     case TOK_DELTAX:
-      return "DELTAX";
-      break;
+        return "DELTAX";
+        break;
     case TOK_DELTAY:
-      return "DELTAY";
-      break;
+        return "DELTAY";
+        break;
     case TOK_DELTAZ:
-      return "DELTAZ";
-      break;
+        return "DELTAZ";
+        break;
     case TOK_DELTAS:
-      return "DELTAS";
-      break;
+        return "DELTAS";
+        break;
     case TOK_DELTAT:
-      return "DELTAT";
-      break;
+        return "DELTAT";
+        break;
     case TOK_WIDTH:
-      return "WIDTH";
-      break;
+        return "WIDTH";
+        break;
     case TOK_HEIGHT:
-      return "HEIGHT";
-      break;
+        return "HEIGHT";
+        break;
     case TOK_MIPMAP:
-      return "MIPMAP";
-      break;
+        return "MIPMAP";
+        break;
 
     case TOK_SAMPLERATE:
-      return "SAMPLERATE";
-      break;
+        return "SAMPLERATE";
+        break;
     case TOK_VOLUME:
-      return "VOLUME";
-      break;
+        return "VOLUME";
+        break;
     case TOK_PAN:
-      return "PAN";
-      break;
+        return "PAN";
+        break;
     case TOK_STEREO:
-      return "STEREO";
-      break;
+        return "STEREO";
+        break;
     case TOK_FXCHANNELS:
-      return "FXCHANNELS";
-      break;
+        return "FXCHANNELS";
+        break;
     case TOK_CHUNKSIZE:
-      return "CHUNKSIZE";
-      break;
+        return "CHUNKSIZE";
+        break;
     case TOK_FADEINMS:
-      return "FADEINMS";
-      break;
+        return "FADEINMS";
+        break;
     case TOK_FADEOUTMS:
-      return "FADEOUTMS";
-      break;
+        return "FADEOUTMS";
+        break;
     case TOK_LIMIT:
-      return "LIMIT";
-      break;
+        return "LIMIT";
+        break;
     }
-  
-  return "UNKNOWN";
+
+    return "UNKNOWN";
 }
 
 /* go through the string and convert all '.', '/', '\', and
- * non-printable characters into '_'.  Remove any double quotes. 
+ * non-printable characters into '_'.  Remove any double quotes.
  *
  */
 static void checkStr(char *str)
 {
-  char *s = str, *s2;
-  
-  if (!s)
-    return;
+    char *s = str, *s2;
 
-  while (*s)
+    if (!s)
+        return;
+
+    while (*s)
     {
-      switch (*s)
+        switch (*s)
         {
         case '\\':
         case '/':
         case '.':
         case ' ':
-          *s = '_';
-          s++;
-          break;
+            *s = '_';
+            s++;
+            break;
 
         case '"':               /* copy over it */
-          {
+        {
             s2 = s + 1;
-            do 
-              {
+            do
+            {
                 *(s2 - 1) = *s2;
                 s2++;
-              } while (*(s2 - 1));
-          }
-          /* do not increment s here */
-          break;
-          
+            } while (*(s2 - 1));
+        }
+        /* do not increment s here */
+        break;
+
         default:
-          {
+        {
             if (!isprint((unsigned int)*s))
-              *s = '_';
-          }
-          s++;
-          break;
+                *s = '_';
+        }
+        s++;
+        break;
         }
 
     }
 
-  return;
+    return;
 }
 
 static int parsebool(char *str)
 {
-  char *s;
-  
-  s = str;
-  
-  if (!s)
-    return(-1);
-  
-  while(*s)
+    char *s;
+
+    s = str;
+
+    if (!s)
+        return(-1);
+
+    while(*s)
     {
-      *s = (char)tolower(*s);
-      s++;
+        *s = (char)tolower(*s);
+        s++;
     }
-  
-  if (((char *)strstr("false", str) != NULL) ||
-      ((char *)strstr("no", str) != NULL)    ||
-      ((char *)strstr("off", str) != NULL))
+
+    if (((char *)strstr("false", str) != NULL) ||
+        ((char *)strstr("no", str) != NULL)    ||
+        ((char *)strstr("off", str) != NULL))
     {
-      return(FALSE);
+        return(FALSE);
     }
-  else if (((char *)strstr("true", str) != NULL) ||
-           ((char *)strstr("yes", str) != NULL)  ||
-           ((char *)strstr("on", str) != NULL))
+    else if (((char *)strstr("true", str) != NULL) ||
+             ((char *)strstr("yes", str) != NULL)  ||
+             ((char *)strstr("on", str) != NULL))
     {
-      return(TRUE);
+        return(TRUE);
     }
-  else
+    else
     {
-      utLog("parsebool(): error parsing '%s' line %d, \n\t%s\n",
+        utLog("parsebool(): error parsing '%s' line %d, \n\t%s\n",
               str, lineNum,
               "Boolean value must be 'yes', 'no', 'true', 'false', 'on', or 'off'.");
-      return(-1);
+        return(-1);
     }
 }
 
@@ -3382,112 +3382,110 @@ static int parsebool(char *str)
 static void initrun(int rcid)
 {
 
-  switch (rcid)
+    switch (rcid)
     {
     case CQI_FILE_CONQINITRC:
-      {
+    {
         if (_cqiGlobal)
-          {
+        {
             if (_cqiGlobal != &defaultGlobalInit)
-              free(_cqiGlobal);
+                free(_cqiGlobal);
             _cqiGlobal = NULL;
             globalRead = FALSE;
-          }
-        
+        }
+
         if (_cqiShiptypes)
-          {
+        {
             if (_cqiShiptypes != defaultShiptypes)
-              free(_cqiShiptypes);
+                free(_cqiShiptypes);
             _cqiShiptypes = NULL;
             numShiptypes = 0;
-          }
-        
+        }
+
         if (_cqiPlanets)
-          {
+        {
             if (_cqiPlanets != defaultPlanets)
-              free(_cqiPlanets);
+                free(_cqiPlanets);
             _cqiPlanets = NULL;
             numPlanets = 0;
-          }
-      }
+        }
+    }
 
-      break;
+    break;
 
     case CQI_FILE_SOUNDRC:
     case CQI_FILE_SOUNDRC_ADD:
-      {
+    {
         if (rcid == CQI_FILE_SOUNDRC)
-          {                       /* if we are not adding, re-init */
+        {                       /* if we are not adding, re-init */
             if (_cqiSoundConf)
-              {
+            {
                 if (_cqiSoundConf != &defaultSoundConf)
-                  free(_cqiSoundConf);
+                    free(_cqiSoundConf);
                 _cqiSoundConf = NULL;
-              }              
-            
+            }
+
             if (_cqiSoundEffects)
-              {
+            {
                 if (_cqiSoundEffects != defaultSoundEffects)
-                  free(_cqiSoundEffects);
+                    free(_cqiSoundEffects);
                 _cqiSoundEffects = NULL;
-              }
+            }
             numSoundEffects = 0;
-            
+
             if (_cqiSoundMusic)
-              {
+            {
                 if (_cqiSoundMusic != defaultSoundMusic)
-                  free(_cqiSoundMusic);
+                    free(_cqiSoundMusic);
                 _cqiSoundMusic = NULL;
-              }
+            }
             numSoundMusic = 0;
-          }
-        
+        }
+
         fileNumEffects = 0;
         fileNumMusic = 0;
 
-      }
-      break;
+    }
+    break;
 
     case CQI_FILE_TEXTURESRC:
     case CQI_FILE_TEXTURESRC_ADD:
-      {      /* free/setup textures here */
+    {      /* free/setup textures here */
         if (rcid == CQI_FILE_TEXTURESRC)
-          {                       /* if we are not adding, re-init */
+        {                       /* if we are not adding, re-init */
             if (_cqiTextures)
-              {
+            {
                 free(_cqiTextures);
                 _cqiTextures = NULL;
-              }
+            }
             numTextures = 0;
-            
+
             if (_cqiAnimations)
-              {
+            {
                 free(_cqiAnimations);
                 _cqiAnimations = NULL;
-              }
+            }
             numAnimations = 0;
-            
+
             if (_cqiAnimDefs)
-              {
+            {
                 free(_cqiAnimDefs);
                 _cqiAnimDefs = NULL;
-              }
+            }
             numAnimDefs = 0;
-          }
-        
+        }
+
         fileNumTextures = 0;
         fileNumAnimations = 0;
         fileNumAnimDefs = 0;
-      }
-      break;
+    }
+    break;
 
-   default:
-      utLog("CQI: initrun: unkown rcid %d", rcid);
-      break;
+    default:
+        utLog("CQI: initrun: unkown rcid %d", rcid);
+        break;
     }
 
-  return;
-  
+    return;
+
 }
-
-

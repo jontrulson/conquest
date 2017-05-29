@@ -1,6 +1,6 @@
 %{
 
-/* 
+/*
  * conqinit - lexical scanner for conqinit
  *
  */
@@ -43,17 +43,17 @@ usermax                {return( TOK_USERMAX );}
 msgmax                 {return( TOK_MSGMAX );}
 histmax                {return( TOK_HISTMAX );}
 
-shiptype               {return( TOK_SHIPTYPE );} 
-engfac                 {return( TOK_ENGFAC );} 
-weafac                 {return( TOK_WEAFAC );} 
-accelfac               {return( TOK_ACCELFAC );} 
-torpwarp               {return( TOK_TORPWARP );} 
-warpmax                {return( TOK_WARPMAX );} 
-armymax                {return( TOK_ARMYMAX );} 
-shmax                  {return( TOK_SHMAX );} 
-dammax                 {return( TOK_DAMMAX );} 
-torpmax                {return( TOK_TORPMAX );} 
-fuelmax                {return( TOK_FUELMAX );} 
+shiptype               {return( TOK_SHIPTYPE );}
+engfac                 {return( TOK_ENGFAC );}
+weafac                 {return( TOK_WEAFAC );}
+accelfac               {return( TOK_ACCELFAC );}
+torpwarp               {return( TOK_TORPWARP );}
+warpmax                {return( TOK_WARPMAX );}
+armymax                {return( TOK_ARMYMAX );}
+shmax                  {return( TOK_SHMAX );}
+dammax                 {return( TOK_DAMMAX );}
+torpmax                {return( TOK_TORPMAX );}
+fuelmax                {return( TOK_FUELMAX );}
 
 planet                 {return ( TOK_PLANET );}
 primary                {return ( TOK_PRIMARY );}
@@ -130,16 +130,16 @@ mipmap                 {return ( TOK_MIPMAP );}
 
 luminance              {return ( TOK_TEX_LUMINANCE );}
 
-{number}		{ 
+{number}		{
                           yylval.num = atoi( yytext );
                           return TOK_NUMBER;
                         }
-{string}                { 
+{string}                {
                           yylval.ptr = (char *)yytext;
-                          return TOK_STRING; 
+                          return TOK_STRING;
                         }
 
-{rational}              { 
+{rational}              {
                           yylval.rnum = atof( yytext );
                           return TOK_RATIONAL;
                         }
@@ -160,14 +160,12 @@ luminance              {return ( TOK_TEX_LUMINANCE );}
 /* parser error reporting routine */
 void yyerror(char *s)
 {
-   fprintf(stderr, "conqinit: %s at or near '%s' on line %d.\n", 
-           s,
-           yytext,
-           lineNum);
+    fprintf(stderr, "conqinit: %s at or near '%s' on line %d.\n",
+            s,
+            yytext,
+            lineNum);
 
-   goterror = TRUE;
+    goterror = TRUE;
 
-  return;
+    return;
 }
-
-

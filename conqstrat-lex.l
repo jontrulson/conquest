@@ -1,6 +1,6 @@
 %{
 
-/* 
+/*
  * conqstrat.c.l - lexical scanner for conqstrat
  *
  * $Id$
@@ -45,7 +45,7 @@ int goterror = 0;
 int Lineno = 1; /* current line number of the scanner */
 
 
-extern int yylval; 
+extern int yylval;
 
 #undef ECHO
 #define ECHO (void)fprintf(yyout, "Unrecognized input: '%s', ignored.\n",yytext)
@@ -134,14 +134,12 @@ ROB_RUNAWAY		{yylval = ROB_RUNAWAY; return( TOK_ACTION );}
 /* parser error reporting routine */
 void yyerror(char *s)
 {
-   fprintf(stderr, "conqstrat: %s at or near '%s' on line %d.\n", 
-           s,
-           yytext,
-           Lineno);
+    fprintf(stderr, "conqstrat: %s at or near '%s' on line %d.\n",
+            s,
+            yytext,
+            Lineno);
 
-   goterror = TRUE;
+    goterror = TRUE;
 
-  return;
+    return;
 }
-
-
