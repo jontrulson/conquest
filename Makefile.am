@@ -55,15 +55,15 @@ AM_CPPFLAGS = -DCONQUEST_GROUP=\"$(CONQGROUP)\" \
 AM_YFLAGS = -d
 
 if ISMINGW
-lib_LTLIBRARIES = libconquest.la libconqclnt.la libconqserv.la \
+noinst_LTLIBRARIES = libconquest.la libconqclnt.la libconqserv.la \
 	libconqinit.la libUi.la libUiGL.la libcqsound.la
 else !ISMINGW
 
 if GLCLIENT
-lib_LTLIBRARIES = libconquest.la libconqclnt.la libconqserv.la \
+noinst_LTLIBRARIES = libconquest.la libconqclnt.la libconqserv.la \
 	libconqinit.la libUi.la libUiGL.la libcqsound.la
 else !GLCLIENT
-lib_LTLIBRARIES = libconquest.la libconqclnt.la libconqserv.la \
+noinst_LTLIBRARIES = libconquest.la libconqclnt.la libconqserv.la \
 	libconqinit.la libUi.la libUiCU.la
 endif !GLCLIENT
 
@@ -196,7 +196,6 @@ install-exec-hook:
 		$(DESTDIR)$(CONQSNDDIR) \
 		$(DESTDIR)$(bindir) \
 		$(DESTDIR)$(libexecdir) \
-		$(DESTDIR)$(libdir) \
 		$(DESTDIR)/$(mandir) \
 		$(DESTDIR)/$(mandir)/man6 
 	chmod 775 $(DESTDIR)$(CONQLOCALSTATEDIR) 
