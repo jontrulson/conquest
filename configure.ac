@@ -48,12 +48,12 @@ uvers=`uname -v`
 
 case "$host" in
   *linux*)
-	AC_DEFINE(LINUX, 1, [Linux])    
+	AC_DEFINE(LINUX, 1, [Linux])
 
 	AC_MSG_RESULT(Linux)
 	;;
   *darwin*)
-	AC_DEFINE(DARWIN, 1, [Darwin])    
+	AC_DEFINE(DARWIN, 1, [Darwin])
         ocflags="$CFLAGS"
         CFLAGS="$ocflags -I/usr/X11/include"
 
@@ -88,7 +88,7 @@ case "$host" in
   *dec-osf1*)
 
 	case "$uvers" in
-		?4.*)	
+		?4.*)
 			true
 			;;
 		*)
@@ -96,7 +96,7 @@ case "$host" in
 			AC_MSG_WARN([Assuming OSF V4.x])
 			;;
 	esac
-			
+
 	AC_DEFINE(OSF, 1, [OSF])
 
 	AC_MSG_RESULT(Digital Unix 4.x+)
@@ -109,15 +109,15 @@ case "$host" in
         then
                 conquest_group="Users"
         fi
-        
+
         AC_MSG_RESULT(Cygwin)
         ;;
 
-  *)	
-	# assume something safe...
-	AC_DEFINE(UNKNOWN, 1, [Unknown])     
+  *)
+	# assume something safe, linux
+	AC_DEFINE(LINUX, 1, [Linux])
 
-	AC_MSG_RESULT(UNKNOWN)
+	AC_MSG_RESULT(UNKNOWN defaulting to LINUX)
 	;;
 esac
 
@@ -290,6 +290,3 @@ then
 else
         echo "### TCP Wrappers support is enabled"
 fi
-
-
-
