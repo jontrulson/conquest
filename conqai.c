@@ -675,7 +675,7 @@ void robotloop(void)
     ConqInfo->externrobots = TRUE;
 
     /* Initialize random numbers */
-    rndini( 0, 0 );
+    rndini();
 
     /* Loop until we're aborted. */
     for (;;)

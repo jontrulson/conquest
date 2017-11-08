@@ -49,7 +49,7 @@ int main(int argc, char **argv)
     int doheader = 0;
     char *filenm = NULL;
 
-    rndini(0, 0);
+    rndini();
 
     utSetLogConfig(FALSE, TRUE);    /* log + stderr! :) */
 

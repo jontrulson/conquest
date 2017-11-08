@@ -148,7 +148,7 @@ int main(int argc, char *argv[])
 
 
     Driver->drivstat = DRS_STARTING;		/* show intent of becoming "the" driver */
-    rndini( 0, 0 );			/* init random numbers */
+    rndini();			/* init random numbers */
     pid = getpid(); /* store our pid */
     Driver->drivpid = pid;
 

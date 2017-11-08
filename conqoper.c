@@ -113,7 +113,7 @@ int main(int argc, char *argv[])
         exit(1);
     }
 
-    rndini( 0, 0 );		/* initialize random numbers */
+    rndini();		/* initialize random numbers */
 
     while ((i = getopt(argc, argv, "CDEI:")) != EOF)    /* get command args */
         switch (i)

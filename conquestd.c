@@ -506,7 +506,7 @@ int main(int argc, char *argv[])
     cqiLoadRC(CQI_FILE_CONQINITRC, NULL, 1, 0);
     cqiLoadRC(CQI_FILE_TEXTURESRC, NULL, 1, 0);
 
-    rndini( 0, 0 );		/* initialize random numbers */
+    rndini();		/* initialize random numbers */
 
     utLog("CONNECT: client %s", sInfo.remotehost);
 
