@@ -10,9 +10,7 @@
 #include "conqdef.h"
 
 
-#define PROTOCOL_VERMAJ 0
-#define PROTOCOL_VERMIN 6
-#define PROTOCOL_VERSION  (uint16_t)((PROTOCOL_VERMAJ << 8) | PROTOCOL_VERMIN)
+#define PROTOCOL_VERSION  0x0006
 
 
 /* server -> client packet types */
