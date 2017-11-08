@@ -122,12 +122,7 @@ case "$host" in
 esac
 
 dnl disable static libs by default (except for mingw)
-if test ! -n "$ISMINGW"
-then
-AM_DISABLE_STATIC
-else
 AM_DISABLE_SHARED
-fi
 
 AM_INIT_AUTOMAKE
 AC_PROG_LIBTOOL

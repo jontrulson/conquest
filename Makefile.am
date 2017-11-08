@@ -80,21 +80,13 @@ libconquest_la_SOURCES = conqai.c conqai.h \
 
 libconquest_la_LIBADD = @LTLIBOBJS@
 
-libconquest_la_LDFLAGS = -version-info 1:0:0
-
 libconqclnt_la_SOURCES = client.c client.h cproc.h cproc.c clientlb.c \
 	clientlb.h playback.h playback.c
-
-libconqclnt_la_LDFLAGS = -version-info 1:0:0
 
 libconqserv_la_SOURCES = servauth.c server.c servauth.h server.h serverpkt.c \
 	serverpkt.h servercmd.h servercmd.c sproc.h sproc.c
 
-libconqserv_la_LDFLAGS = -version-info 1:0:0
-
 libUi_la_SOURCES = ui.h uimisc.c 
-
-libUi_la_LDFLAGS = -version-info 1:0:0
 
 libUiGL_la_SOURCES = GL.c texfont.c glfont.c glfont.h \
 	glmisc.c glmisc.h nConsvr.c nConsvr.h nMeta.h nMeta.c cqkeys.h \
@@ -107,21 +99,13 @@ libUiGL_la_SOURCES = GL.c texfont.c glfont.c glfont.h \
 	nPlayBHelp.c nOptions.h nOptions.c colorGL.c ui.h anim.c anim.h \
 	GL.h hud.h hud.c blinker.h blinker.c
 
-libUiGL_la_LDFLAGS = -version-info 1:0:0
-
 libUiCU_la_SOURCES = display.c cprintf.h cprintf.c disputil.h colorCU.c \
 	cd2lb.h cd2lb.c iolb.h iolb.c cumisc.h cumisc.c cuclient.h \
 	cuclient.c options.h options.c clntauth.c ui.h display.h 
 
-libUiCU_la_LDFLAGS = -version-info 1:0:0
-
 libconqinit_la_SOURCES = conqinit-yacc.y conqinit-lex.l conqinit.h initdata.h planinit.c
 
-libconqinit_la_LDFLAGS = -version-info 1:0:0
-
 libcqsound_la_SOURCES = cqsound.c cqsound.h
-
-libcqsound_la_LDFLAGS = -version-info 1:0:0
 
 # for now, conquestgl is the only program we build for windows
 
