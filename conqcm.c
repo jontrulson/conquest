@@ -20,6 +20,10 @@
 #include "conqutil.h"
 #include "conqunix.h"
 
+#if !defined(MINGW)
+# include <sys/mman.h>
+#endif
+
 #define NOEXTERN_CONQCOM
 #include "conqcom.h"		/* common block vars defined here */
 #include "context.h"		/* some extra stuff */

@@ -126,14 +126,6 @@ extern char *crypt(char *, char *);
 
 #include <memory.h>
 
-#if !defined(MINGW)
-# if defined(HAVE_MMAP)
-#  include <sys/mman.h>
-# else
-#  error "You need mman.h - mmap()"
-# endif
-#endif
-
 #include <sys/stat.h>
 
 #if !defined(MINGW)
