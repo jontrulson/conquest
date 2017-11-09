@@ -259,7 +259,6 @@ static int nPlayBInput(int ch)
 {
     int irv;
     int snum = Context.snum;
-    int tmp_snum = 1;
 
     if ((CQ_CHAR(ch) == 'B' || CQ_CHAR(ch) == 'b') &&
         CQ_MODIFIER(ch) & CQ_KEY_MOD_ALT)
@@ -315,6 +314,9 @@ static int nPlayBInput(int ch)
 
             prompting = FALSE;
             state = S_NONE;
+
+            // Save old snum for '`' command...
+            old_snum = Context.snum;
 
             Context.snum = tmpsnum;
             hudClearPrompt(MSG_LIN1);
@@ -437,8 +439,8 @@ static int nPlayBInput(int ch)
     case '`':                 /* toggle between two ships */
         if (old_snum != snum)
         {
+            int tmp_snum = snum;
 
-            tmp_snum = snum;
             snum = old_snum;
             old_snum = tmp_snum;
 
