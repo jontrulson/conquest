@@ -38,9 +38,14 @@ int procDispatchInit(uint16_t vers, packetEnt_t *pktList, int numpkts)
 
     switch (vers)
     {
-    case 0x0006:
+    case 0x0006: // backwards compat for recordings (.cqr files)
         procs = cprocDispatchTable_0006;
         numprocs = CPROCDISPATCHTABLENUM_0006;
+        break;
+
+    case 0x0007: // current
+        procs = cprocDispatchTable_0007;
+        numprocs = CPROCDISPATCHTABLENUM_0007;
         break;
     }
 

@@ -90,6 +90,7 @@ extern int          serverPktMax;
 
 int   pktInit(void);
 void  pktSetClientMode(int isclient);
+uint16_t pktGetClientProtocolVersion();
 int   pktSetClientProtocolVersion(uint16_t vers);
 void  pktSetSocketFds(int tcpsock, int udpsock);
 

@@ -10,10 +10,15 @@
 #include "conqdef.h"
 
 #include "conqnet.h"
+
 #include "protocol.h"
+
 #include "packet.h"
 
-/* packet proc routines */
+// Get definitions for 0006 protocol
+#include "cproc_0006.h"
+
+/* packet proc routines for current protocol */
 int             procUser(char *buf);
 int             procShip(char *buf);
 int             procShipSml(char *buf);
@@ -39,8 +44,8 @@ int             procFrame(char *buf);
 void            processPacket(char *buf);
 
 #ifdef NOEXTERN_CPROC
-/* version 0x0006 protocol */
-static dispatchProc_t cprocDispatchTable_0006[] = {
+/* current version 0x0007 protocol */
+static dispatchProc_t cprocDispatchTable_0007[] = {
     pktNotImpl,                   /* SP_NULL */
     pktNotImpl,                   /* SP_HELLO */
     procAck,                      /* SP_ACK */
@@ -68,8 +73,8 @@ static dispatchProc_t cprocDispatchTable_0006[] = {
     pktNotImpl                    /* SP_VARIABLE */
 };
 
-#define CPROCDISPATCHTABLENUM_0006                              \
-    (sizeof(cprocDispatchTable_0006) / sizeof(dispatchProc_t))
+#define CPROCDISPATCHTABLENUM_0007                              \
+    (sizeof(cprocDispatchTable_0007) / sizeof(dispatchProc_t))
 
 #endif /* NOEXTERN_CPROC */
 

@@ -10,8 +10,9 @@
 #include "conqdef.h"
 #include "conqcom.h"
 
-#define RECVERSION          20060409 /* current recording version */
+#define RECVERSION          20171108 /* current recording version */
 #define RECVERSION_20031004 20031004 /* older recording version(s) */
+#define RECVERSION_20060409 20060409
 
 /* recording modes */
 #define RECMODE_OFF      0
@@ -28,7 +29,8 @@
                                       MAXUSERNAME +             \
                                       sizeof(uint32_t) +        \
                                       sizeof(uint8_t) +         \
-                                      sizeof(uint32_t)))
+                                      sizeof(uint32_t) +        \
+                                      sizeof(uint16_t)))
 
 #pragma pack(1)
 typedef struct _fheader {
@@ -39,6 +41,7 @@ typedef struct _fheader {
     uint32_t cmnrev;               /* common block rev */
     uint8_t snum;                  /* ship that made rec.  0 == server record */
     uint32_t flags;                /* flags. duh. */
+    uint16_t protoVers;             /* network protocol version */
     uint8_t pad[FHEADER_PAD];	/* padding */
 } fileHeader_t;
 #pragma pack()

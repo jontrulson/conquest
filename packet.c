@@ -54,7 +54,8 @@ static packetEnt_t clientPackets[] = {
     { CP_NULL,                    /* pktid */
       sizeof(cpNull_t),           /* size */
       "CP_NULL",                  /* name */
-      pktNotImpl                  /* handler */
+      pktNotImpl                  /* handler, initialized by
+                                   * procDispatchInit() */
     },	/* never used */
     { CP_HELLO,
       sizeof(cpHello_t),
@@ -116,136 +117,137 @@ static packetEnt_t clientPackets[] = {
 #define CLIENTPKTMAX (sizeof(clientPackets) / sizeof(packetEnt_t))
 
 static packetEnt_t serverPackets_0006[] = {
-    { SP_NULL,                    /* pktid */
-      sizeof(spNull_t),           /* size */
-      "SP_NULL",                  /* name */
-      pktNotImpl                  /* handler */
+    { SP_0006_NULL,        /* pktid */
+      sizeof(sp_0006_Null_t),    /* size */
+      "SP_0006_NULL",      /* name */
+      pktNotImpl           /* handler, init'd by procDispatchInit() */
     },	/* never used */
-    { SP_HELLO,
-      sizeof(spHello_t),
-      "SP_HELLO",
+    { SP_0006_HELLO,
+      sizeof(sp_0006_Hello_t),
+      "SP_0006_HELLO",
       pktNotImpl
     },
-    { SP_ACK,
-      sizeof(spAck_t),
-      "SP_ACK",
+    { SP_0006_ACK,
+      sizeof(sp_0006_Ack_t),
+      "SP_0006_ACK",
       pktNotImpl
     },
-    { SP_SERVERSTAT,
-      sizeof(spServerStat_t),
-      "SP_SERVERSTAT",
+    { SP_0006_SERVERSTAT,
+      sizeof(sp_0006_ServerStat_t),
+      "SP_0006_SERVERSTAT",
       pktNotImpl
     },
-    { SP_CLIENTSTAT,
-      sizeof(spClientStat_t),
-      "SP_CLIENTSTAT",
+    { SP_0006_CLIENTSTAT,
+      sizeof(sp_0006_ClientStat_t),
+      "SP_0006_CLIENTSTAT",
       pktNotImpl
     },
-    { SP_SHIP,
-      sizeof(spShip_t),
-      "SP_SHIP",
+    { SP_0006_SHIP,
+      sizeof(sp_0006_Ship_t),
+      "SP_0006_SHIP",
       pktNotImpl
     },
-    { SP_SHIPSML,
-      sizeof(spShipSml_t),
-      "SP_SHIPSML",
+    { SP_0006_SHIPSML,
+      sizeof(sp_0006_ShipSml_t),
+      "SP_0006_SHIPSML",
       pktNotImpl
     },
-    { SP_SHIPLOC,
-      sizeof(spShipLoc_t),
-      "SP_SHIPLOC",
+    { SP_0006_SHIPLOC,
+      sizeof(sp_0006_ShipLoc_t),
+      "SP_0006_SHIPLOC",
       pktNotImpl
     },
-    { SP_PLANET,
-      sizeof(spPlanet_t),
-      "SP_PLANET",
+    { SP_0006_PLANET,
+      sizeof(sp_0006_Planet_t),
+      "SP_0006_PLANET",
       pktNotImpl
     },
-    { SP_PLANETSML,
-      sizeof(spPlanetSml_t),
-      "SP_PLANETSML",
+    { SP_0006_PLANETSML,
+      sizeof(sp_0006_PlanetSml_t),
+      "SP_0006_PLANETSML",
       pktNotImpl
     },
-    { SP_PLANETLOC,
-      sizeof(spPlanetLoc_t),
-      "SP_PLANETLOC",
+    { SP_0006_PLANETLOC,
+      sizeof(sp_0006_PlanetLoc_t),
+      "SP_0006_PLANETLOC",
       pktNotImpl
     },
-    { SP_MESSAGE,
-      sizeof(spMessage_t),
-      "SP_MESSAGE",
+    { SP_0006_MESSAGE,
+      sizeof(sp_0006_Message_t),
+      "SP_0006_MESSAGE",
       pktNotImpl
     },
-    { SP_USER,
-      sizeof(spUser_t),
-      "SP_USER",
+    { SP_0006_USER,
+      sizeof(sp_0006_User_t),
+      "SP_0006_USER",
       pktNotImpl
     },
-    { SP_TORP,
-      sizeof(spTorp_t),
-      "SP_TORP",
+    { SP_0006_TORP,
+      sizeof(sp_0006_Torp_t),
+      "SP_0006_TORP",
       pktNotImpl
     },
-    { SP_ACKMSG,
-      sizeof(spAckMsg_t),
-      "SP_ACKMSG",
+    { SP_0006_ACKMSG,
+      sizeof(sp_0006_AckMsg_t),
+      "SP_0006_ACKMSG",
       pktNotImpl
     },
-    { SP_TEAM,
-      sizeof(spTeam_t),
-      "SP_TEAM",
+    { SP_0006_TEAM,
+      sizeof(sp_0006_Team_t),
+      "SP_0006_TEAM",
       pktNotImpl
     },
-    { SP_TORPLOC,
-      sizeof(spTorpLoc_t),
-      "SP_TORPLOC",
+    { SP_0006_TORPLOC,
+      sizeof(sp_0006_TorpLoc_t),
+      "SP_0006_TORPLOC",
       pktNotImpl
     },
-    { SP_CONQINFO,
-      sizeof(spConqInfo_t),
-      "SP_CONQINFO",
+    { SP_0006_CONQINFO,
+      sizeof(sp_0006_ConqInfo_t),
+      "SP_0006_CONQINFO",
       pktNotImpl
     },
-    { SP_FRAME,
-      sizeof(spFrame_t),
-      "SP_FRAME",
+    { SP_0006_FRAME,
+      sizeof(sp_0006_Frame_t),
+      "SP_0006_FRAME",
       pktNotImpl
     },
-    { SP_HISTORY,
-      sizeof(spHistory_t),
-      "SP_HISTORY",
+    { SP_0006_HISTORY,
+      sizeof(sp_0006_History_t),
+      "SP_0006_HISTORY",
       pktNotImpl
     },
-    { SP_DOOMSDAY,
-      sizeof(spDoomsday_t),
-      "SP_DOOMSDAY",
+    { SP_0006_DOOMSDAY,
+      sizeof(sp_0006_Doomsday_t),
+      "SP_0006_DOOMSDAY",
       pktNotImpl
     },
-    { SP_PLANETINFO,
-      sizeof(spPlanetInfo_t),
-      "SP_PLANETINFO",
+    { SP_0006_PLANETINFO,
+      sizeof(sp_0006_PlanetInfo_t),
+      "SP_0006_PLANETINFO",
       pktNotImpl
     },
-    { SP_PLANETLOC2,
-      sizeof(spPlanetLoc2_t),
-      "SP_PLANETLOC2",
+    { SP_0006_PLANETLOC2,
+      sizeof(sp_0006_PlanetLoc2_t),
+      "SP_0006_PLANETLOC2",
       pktNotImpl
     },
-    { SP_TORPEVENT,
-      sizeof(spTorpEvent_t),
-      "SP_TORPEVENT",
+    { SP_0006_TORPEVENT,
+      sizeof(sp_0006_TorpEvent_t),
+      "SP_0006_TORPEVENT",
       pktNotImpl
     },
-    { SP_VARIABLE,
+    { SP_0006_VARIABLE,
       0,                          /* these are special */
-      "SP_VARIABLE",
+      "SP_0006_VARIABLE",
       pktNotImpl
     }
 };
 
 #define SERVERPKTMAX_0006 (sizeof(serverPackets_0006) / sizeof(packetEnt_t))
 
-static packetEnt_t serverPackets_current[] = {
+// The current protocol version
+static packetEnt_t serverPackets_0007[] = {
     { SP_NULL,                    /* pktid */
       sizeof(spNull_t),           /* size */
       "SP_NULL",                  /* name */
@@ -373,7 +375,7 @@ static packetEnt_t serverPackets_current[] = {
     }
 };
 
-#define SERVERPKTMAX_CURRENT (sizeof(serverPackets_current) / sizeof(packetEnt_t))
+#define SERVERPKTMAX_0007 (sizeof(serverPackets_0007) / sizeof(packetEnt_t))
 
 #define SOCK_TMOUT 15		/* 15 seconds to complete packet */
 
@@ -447,23 +449,26 @@ void pktSetClientMode(int isclient)
     return;
 }
 
+uint16_t pktGetClientProtocolVersion()
+{
+    return clientProtoVers;
+}
+
 /* set the desired protocol version compatibility for the client */
 int pktSetClientProtocolVersion(uint16_t vers)
 {
     switch (vers)
     {
     case 0x0006:
-        /* FIXME: setup the server packet array pointer here */
         serverPackets = serverPackets_0006;
         serverPktMax = SERVERPKTMAX_0006;
         break;
-//#warning "FIXME"
-#if 0                           /* FIXME - when bump to new rev */
-    case PROTOCOL_VERSION:      /* current protocol, nothing to do */
+
+    case PROTOCOL_VERSION:      /* current protocol (0x0007) */
         serverPackets = serverPackets_0007;
         serverPktMax = SERVERPKTMAX_0007;
         break;
-#endif
+
     default:
         utLog("%s: Unsupported protocol version: %h", __FUNCTION__, vers);
         return FALSE;

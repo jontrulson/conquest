@@ -171,6 +171,8 @@ int recReadHeader(fileHeader_t *fhdr)
 {
     int rv;
 
+    memset(fhdr, 0, sizeof(fileHeader_t));
+
     /* assumes you've already opened the stream */
 
     if (rdata_rfd == -1)
@@ -216,6 +218,7 @@ int recReadHeader(fileHeader_t *fhdr)
     fhdr->rectime = (uint32_t)ntohl(fhdr->rectime);
     fhdr->cmnrev = (uint32_t)ntohl(fhdr->cmnrev);
     fhdr->flags = (uint32_t)ntohl(fhdr->flags);
+    fhdr->protoVers = (uint16_t)ntohs(fhdr->protoVers);
 
 #if defined(DEBUG_REC)
     utLog("recReadHeader: vers = %d, rectime = %d, cmnrev = %d\n",
@@ -254,6 +257,8 @@ int recInitOutput(int unum, time_t thetime, int snum, int isserver)
     fhdr.cmnrev = (uint32_t)htonl((uint32_t)COMMONSTAMP);
     fhdr.snum = snum;
     fhdr.flags = (uint32_t)htonl((uint32_t)fhdr.flags);
+    fhdr.protoVers = (uint32_t)htons((uint16_t)PROTOCOL_VERSION);
+
 
     if (!recWriteBuf(&fhdr, sizeof(fileHeader_t)))
         return(FALSE);
@@ -268,7 +273,7 @@ int recInitOutput(int unum, time_t thetime, int snum, int isserver)
 /* note, if we get a write error here, we turn off recording */
 void recWriteEvent(void *data)
 {
-    char *buf = (char *)data;
+   char *buf = (char *)data;
     uint8_t pkttype;
     int len;
 

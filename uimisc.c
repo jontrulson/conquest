@@ -75,17 +75,20 @@ void dspReplayMenu(void)
 
     if (recFileHeader.flags & RECORD_F_SERVER)
     {
-        if (recFileHeader.vers != RECVERSION)
-            sprintf(cbuf, "Server [%d]", recFileHeader.vers);
+        // server recording ship was always 0 in this version
+        if (recFileHeader.vers == RECVERSION_20031004)
+            sprintf(cbuf, "Server [%d, 0x%04x]", recFileHeader.vers,
+                    (int)recFileHeader.protoVers);
         else
-            sprintf(cbuf, "Server (Ship %d)", recFileHeader.snum);
+            sprintf(cbuf, "Server (Ship %d) [%d, 0x%04x]",
+                    recFileHeader.snum, recFileHeader.vers,
+                    (int)recFileHeader.protoVers);
     }
     else
     {
-        if (recFileHeader.vers != RECVERSION)
-            sprintf(cbuf, "Client (Ship %d) [%d]", recFileHeader.snum, recFileHeader.vers);
-        else
-            sprintf(cbuf, "Client (Ship %d)", recFileHeader.snum);
+        sprintf(cbuf, "Client (Ship %d) [%d, 0x%04x]",
+                recFileHeader.snum, recFileHeader.vers,
+                (int)recFileHeader.protoVers);
     }
 
     cprintf(lin,col,ALIGN_NONE,sfmt, "Recording Type     ", cbuf);

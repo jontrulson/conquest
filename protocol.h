@@ -8,9 +8,11 @@
 #define PROTOCOL_H_INCLUDED
 
 #include "conqdef.h"
+// version 0006 protocol defs
+#include "proto_0006.h"
 
-
-#define PROTOCOL_VERSION  0x0006
+// 11/8/17 - PROTOCOL_VERSION  0x0006
+#define PROTOCOL_VERSION  0x0007
 
 
 /* server -> client packet types */

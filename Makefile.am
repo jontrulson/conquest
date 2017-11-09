@@ -76,12 +76,12 @@ libconquest_la_SOURCES = conqai.c conqai.h \
 	ship.h planet.h team.h msg.h doomsday.h driver.h conqinfo.h \
 	history.h robot.h global.h torp.h ibuf.h conf.h  display.h \
 	protocol.h packet.h packet.c userauth.h meta.c meta.h udp.c udp.h \
-	rb.h rb.c cbglobal.h
+	rb.h rb.c cbglobal.h proto_0006.h
 
 libconquest_la_LIBADD = @LTLIBOBJS@
 
 libconqclnt_la_SOURCES = client.c client.h cproc.h cproc.c clientlb.c \
-	clientlb.h playback.h playback.c
+	clientlb.h playback.h playback.c cproc_0006.h cproc_0006.c
 
 libconqserv_la_SOURCES = servauth.c server.c servauth.h server.h serverpkt.c \
 	serverpkt.h servercmd.h servercmd.c sproc.h sproc.c

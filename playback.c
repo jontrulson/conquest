@@ -53,15 +53,29 @@ int pbInitReplay(char *fname, time_t *elapsed)
     /* version check */
     switch (recFileHeader.vers)
     {
-    case RECVERSION:            /* no problems here */
+    case RECVERSION: // from rec version 20171108 onward we use the stored
+                     // protocol version
+        break;
+
+    case RECVERSION_20060409:
+        // we used protocol version 6 in this version, but did not
+        // have an element at the time to record this in the header,
+        // so add it.
+        recFileHeader.protoVers = 0x0006;
         break;
 
     case RECVERSION_20031004:
     {
+        // we used protocol version 6 in this version, but did not
+        // have an element at the time to record this in the header,
+        // so add it.
+        recFileHeader.protoVers = 0x0006;
+
         /* in this version we differentiated server/client recordings
-           by looking at snum.  If snum == 0, then it was a server
-           recording, else it was a client.  the 'flags' member did not
-           exist.  So here we massage it so it will work ok. */
+         *  by looking at snum.  If snum == 0, then it was a server
+         *  recording, else it was a client.  the 'flags' member did
+         *  not exist.  So here we massage it so it will work ok.
+         */
 
         if (recFileHeader.snum == 0)     /* it was a server recording */
             recFileHeader.flags |= RECORD_F_SERVER;
@@ -70,16 +84,17 @@ int pbInitReplay(char *fname, time_t *elapsed)
 
     default:
     {
-        utLog("pbInitReplay: version mismatch.  got %d, need %d\n",
-              recFileHeader.vers,
-              RECVERSION);
-        printf("pbInitReplay: version mismatch.  got %d, need %d\n",
-               recFileHeader.vers,
-               RECVERSION);
+        utLog("pbInitReplay: unknown recording version: %d\n",
+              recFileHeader.vers);
+        printf("pbInitReplay: unknown recording version: %d\n",
+               recFileHeader.vers);
         return FALSE;
     }
     break;
     }
+
+    // set the correct client protocol version depending on above checks.
+    pktSetClientProtocolVersion(recFileHeader.protoVers);
 
     /* if we are looking for the elapsed time, scan the whole file
        looking for timestamps. */
