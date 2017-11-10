@@ -379,24 +379,8 @@ int procPlanetInfo(char *buf)
     if (Context.recmode == RECMODE_ON)
         recWriteEvent(buf);
 
-    /* in protocol 6, we 'forgot' planet realness.  To avoid breaking
-       protocol again, and allow unpatched clients and/or servers to
-       work we check to see if SPPLANETINFO_FLAGS_FVALID is set.  If so,
-       _then_ we pay attn to any other flags present. Else we ignore
-       them. */
-
-    /* FIXME - with new CB, and later, new protocol, we will send these
-       flags directly.  Right? */
-    if (splaninfo->flags & SPPLANETINFO_FLAGS_FVALID)
-    {                           /* we have valid flags */
-
-        if (splaninfo->flags & SPPLANETINFO_FLAGS_REAL)
-            PFSET(pnum, PLAN_F_VISIBLE);
-        else
-            PFCLR(pnum, PLAN_F_VISIBLE);
-    }
-
     Planets[pnum].primary = primary;
+    Planets[pnum].flags = ntohl(splaninfo->flags);
     Planets[pnum].orbrad = (real)((real)((uint32_t)ntohl(splaninfo->orbrad)) / 10.0);
     Planets[pnum].orbvel = (real)((real)((int32_t)ntohl(splaninfo->orbvel)) / 100.0);
 

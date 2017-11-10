@@ -1011,14 +1011,9 @@ spPlanetInfo_t *spktPlanetInfo(uint8_t pnum, int rec)
 
     memset((void *)&splaninfo, 0, sizeof(spPlanetInfo_t));
 
-    splaninfo.flags = SPPLANETINFO_FLAGS_FVALID;
-
     splaninfo.type = SP_PLANETINFO;
     splaninfo.pnum = pnum;
-
-    /* FIXME for new protocol, send the flags directly */
-    if (PVISIBLE(pnum))
-        splaninfo.flags |= SPPLANETINFO_FLAGS_REAL;
+    splaninfo.flags = htonl(Planets[pnum].flags);
 
     splaninfo.primary = (uint8_t)Planets[pnum].primary;
 
