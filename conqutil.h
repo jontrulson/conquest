@@ -13,7 +13,7 @@ void     utAppendInt(char *str, int i);
 void     utAppendShipStatus(char *buf, int status);
 void     utAppendTitle(char *buf, int team);
 void     utAppendShip(char *str, int snum);
-void     utAppendKilledBy(char *buf, int kb);
+void     utAppendKilledBy(char *buf, killedBy_t kb, unsigned int detail);
 int      utArrowsToDir( char *str, real *dir );
 void     utSetLogConfig(int usesys, int echostderr);
 void     utError(char *fmt, ...);

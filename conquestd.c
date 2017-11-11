@@ -764,7 +764,9 @@ int capentry( int snum, int *system )
 /*    dead( snum, leave ) */
 void dead( int snum, int leave )
 {
-    int i, j, kb, now, entertime;
+    int i, j, now, entertime;
+    killedBy_t kb;
+    unsigned int detail;
     uint8_t flags = SPCLNTSTAT_FLAG_NONE; /* for clientstat msg */
     char buf[PKT_MAXSIZE];	/* gen purpose */
 
@@ -776,7 +778,8 @@ void dead( int snum, int leave )
     if ( Ships[snum].pid != Context.pid )
         return;
 
-    kb = Ships[snum].killedby;
+    kb = Ships[snum].killedBy;
+    detail = Ships[snum].killedByDetail;
 
     /* Delay while our torps are exploding. */
     utGrand( &entertime );
@@ -804,7 +807,7 @@ void dead( int snum, int leave )
 
     buf[0] = 0;
     utAppendShip(buf , snum) ;
-    utLog("INFO: dead: %s was killed by %d.", buf, kb);
+    utLog("INFO: dead: %s was killed by %d(%d).", buf, (int)kb, detail);
 
     updateClient(FALSE);
     for ( i=0; i<10 && Ships[snum].status == SS_DYING; i++ )
@@ -1228,7 +1231,8 @@ void menu(void)
     Ships[Context.snum].shiptype = Teams[Ships[Context.snum].team].shiptype;
 
     Ships[Context.snum].pid = Context.pid;
-    Ships[Context.snum].killedby = 0;
+    Ships[Context.snum].killedBy = KB_NONE;
+    Ships[Context.snum].killedByDetail = 0;
 
     for ( i = 0; i < NUMPLAYERTEAMS; i = i + 1 )
     {
@@ -2033,7 +2037,7 @@ void handleSignal(int sig)
         else
         {
             /* so we can detect cowards */
-            clbKillShip( Context.snum, KB_LIGHTNING );
+            clbKillShip( Context.snum, KB_LIGHTNING, 0 );
             /* turn ship off */
             Ships[Context.snum].status = SS_OFF;
         }

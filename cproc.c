@@ -158,7 +158,10 @@ int procShip(char *buf)
         else
             Ships[snum].rwar[i] = FALSE;
 
-    Ships[snum].killedby = (int)((int16_t)ntohs(sship->killedby));
+    Ships[snum].killedBy = (killedBy_t)sship->killedBy;
+    Ships[snum].killedByDetail =
+        (unsigned int)((uint16_t)ntohs(sship->killedByDetail));
+
     Ships[snum].kills = (real)((real)ntohl(sship->kills) / 10.0);
 
     for (i=1; i<=NUMPLANETS; i++)

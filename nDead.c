@@ -26,9 +26,10 @@
 #include "glmisc.h"
 
 static int snum;
-static int kb;                  /* killed by... */
+static killedBy_t kb;                  /* killed by... */
+static unsigned int detail;
 char *ywkb="You were killed by ";
-static char buf[128], junk[128], cbuf[BUFFER_SIZE_1024];
+static char buf[128], cbuf[BUFFER_SIZE_1024];
 static char lastwords[MAXLASTWORDS];
 static Ship_t eShip = {}; /* copy of killers ship, if killed by ship */
 
@@ -64,10 +65,11 @@ void nDeadInit(void)
         nMenuInit();
     }
 
-    kb = Ships[snum].killedby;
+    kb = Ships[snum].killedBy;
+    detail = Ships[snum].killedByDetail;
 
-    if (kb >= 1 && kb <= MAXSHIPS)
-        eShip = Ships[kb];        /* get copy of killers ship */
+    if (kb == KB_SHIP && detail > 0 && detail <= MAXSHIPS)
+        eShip = Ships[detail];        /* get copy of killers ship */
     else
         memset((void *)&eShip, 0, sizeof(Ship_t));
 
@@ -136,23 +138,17 @@ static int nDeadDisplay(dspConfig_t *dsp)
         cprintf(8,0,ALIGN_CENTER,"#%d#%s", RedLevelColor,
                 "You destroyed the doomsday machine!");
         break;
-    case KB_DEATHSTAR:
-        cprintf(8,0,ALIGN_CENTER,"#%d#%s", RedLevelColor,
-                "You were vaporized by the Death Star.");
-
-        break;
     case KB_LIGHTNING:
         cprintf(8,0,ALIGN_CENTER,"#%d#%s", RedLevelColor,
                 "You were destroyed by a lightning bolt.");
 
         break;
-    default:
+    case KB_SHIP:
         cbuf[0] = 0;
         buf[0] = 0;
-        junk[0] = 0;
-        if ( kb > 0 && kb <= MAXSHIPS )
+        if ( detail > 0 && detail <= MAXSHIPS )
 	{
-            utAppendShip(cbuf , kb) ;
+            utAppendShip(cbuf, detail) ;
             if ( eShip.status != SS_LIVE )
                 strcat(buf, ", who also died.");
             else
@@ -164,29 +160,35 @@ static int nDeadDisplay(dspConfig_t *dsp)
                      InfoColor, CQC_A_BOLD, cbuf,
                      InfoColor, buf );
 	}
-        else if ( -kb > 0 && -kb <= NUMPLANETS )
+
+        break;
+    case KB_PLANET:
+        cbuf[0] = 0;
+        buf[0] = 0;
+        if ( detail > 0 && detail <= NUMPLANETS )
 	{
-            if ( Planets[-kb].type == PLANET_SUN )
+            if ( Planets[detail].type == PLANET_SUN )
                 strcpy(cbuf, "solar radiation.");
             else
                 strcpy(cbuf, "planetary defenses.");
 
             cprintf(8,0,ALIGN_CENTER,"#%d#%s#%d#%s%s#%d#%s",
-                    InfoColor, ywkb, CQC_A_BOLD, Planets[-kb].name, "'s ",
+                    InfoColor, ywkb, CQC_A_BOLD, Planets[detail].name, "'s ",
                     InfoColor, cbuf);
 	}
-        else
-	{
-            /* We were unable to determine the cause of death. */
-            buf[0] = 0;
-            utAppendShip(buf , snum) ;
-            sprintf(cbuf, "dead: %s was killed by %d.", buf, kb);
-            utError( cbuf );
-            utLog(cbuf);
 
-            cprintf(8,0,ALIGN_CENTER,"#%d#%s%s",
-                    RedLevelColor, ywkb, "nothing in particular.  (How strange...)");
-	}
+        break;
+    default:
+        cbuf[0] = 0;
+        buf[0] = 0;
+        /* We were unable to determine the cause of death. */
+        utAppendShip(buf, snum);
+        sprintf(cbuf, "dead: %s was killed by %d(%d).", buf, kb, detail);
+        utError( cbuf );
+        utLog(cbuf);
+
+        cprintf(8,0,ALIGN_CENTER,"#%d#%s%s",
+                RedLevelColor, ywkb, "nothing in particular.  (How strange...)");
     }
 
     if ( kb == KB_NEWGAME )
@@ -202,26 +204,24 @@ static int nDeadDisplay(dspConfig_t *dsp)
         if ( i > 0 )
 	{
             if ( i == 1 )
+            {
                 strcpy( cbuf, "army" );
-            else
-                strcpy( cbuf, "armies" );
-
-            if ( i == 1 )
                 strcpy( buf, "was" );
-            else
-                strcpy( buf, "were");
-
-            if ( i == 1 )
 		cprintf(10,0,ALIGN_CENTER,
                         "#%d#The #%d#%s #%d#you were carrying %s not amused.",
 			LabelColor, CQC_A_BOLD, cbuf, LabelColor, buf);
+            }
             else
+            {
+                strcpy( cbuf, "armies" );
+                strcpy( buf, "were");
 		cprintf(10,0,ALIGN_CENTER,
                         "#%d#The #%d#%d %s #%d#you were carrying %s not amused.",
 			LabelColor, CQC_A_BOLD, i, cbuf, LabelColor, buf);
+            }
 	}
     }
-    else if ( kb >= 0 )
+    else if ( kb == KB_SHIP )
     {
         if ( eShip.status == SS_LIVE )
 	{

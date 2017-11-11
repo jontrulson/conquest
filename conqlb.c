@@ -80,13 +80,13 @@ void clbChalkup( int snum )
 /*    int snum, kb */
 /*    real dam */
 /*    clbDamage( snum, dam, kb ) */
-void clbDamage( int snum, real dam, int kb )
+void clbDamage( int snum, real dam, killedBy_t kb, unsigned int detail )
 {
     real mw;
 
     Ships[snum].damage = Ships[snum].damage + dam;
     if ( Ships[snum].damage >= 100.0 )
-        clbKillShip( snum, kb );
+        clbKillShip( snum, kb, detail );
     else
     {
         mw = maxwarp( snum );
@@ -146,7 +146,7 @@ int clbEnemyDet( int snum )
 /*    int snum, kb */
 /*    real ht */
 /*    clbHit( snum, ht, kb ) */
-void clbHit( int snum, real ht, int kb )
+void clbHit( int snum, real ht, killedBy_t kb, unsigned int detail )
 {
     if ( ht > 0.0 )
     {
@@ -154,7 +154,7 @@ void clbHit( int snum, real ht, int kb )
 	{
             if ( ht > Ships[snum].shields )
 	    {
-                clbDamage( snum, ht-Ships[snum].shields, kb );
+                clbDamage( snum, ht-Ships[snum].shields, kb, detail );
                 Ships[snum].shields = 0.0;
 	    }
             else
@@ -164,7 +164,7 @@ void clbHit( int snum, real ht, int kb )
 	}
         else
 	{
-            clbDamage( snum, ht, kb );
+            clbDamage( snum, ht, kb, detail );
 	}
     }
 
@@ -172,12 +172,9 @@ void clbHit( int snum, real ht, int kb )
 }
 
 
-/*  ikill - ikill a ship */
-/*  SYNOPSIS */
-/*    int snum, kb */
-/*    clbIKill( snum, kb ) */
+/*  kill a ship */
 /*  Note: This routines ASSUMES you have the common locked before you it. */
-void clbIKill( int snum, int kb )
+void clbIKill(int snum, killedBy_t kb, unsigned int detail)
 {
     int i, unum, team, kunum, kteam;
     real tkills;
@@ -187,7 +184,8 @@ void clbIKill( int snum, int kb )
         return;
 
     /* The ship is alive; kill it. */
-    Ships[snum].killedby = kb;
+    Ships[snum].killedBy = kb;
+    Ships[snum].killedByDetail = detail;
     Ships[snum].status = SS_DYING;
 
     unum = Ships[snum].unum;
@@ -311,7 +309,7 @@ char *clbETAStr(real warp, real distance)
 /*  SYNOPSIS */
 /*    int snum, kb */
 /*    kill( snum, kb ) */
-void clbKillShip( int snum, int kb )
+void clbKillShip(int snum, killedBy_t kb, unsigned int detail)
 {
     int sendmesg = FALSE;
     char msgbuf[BUFFER_SIZE_256];
@@ -323,7 +321,7 @@ void clbKillShip( int snum, int kb )
 
     /* internal routine. */
     PVLOCK(&ConqInfo->lockword);
-    clbIKill( snum, kb );
+    clbIKill( snum, kb, detail );
     PVUNLOCK(&ConqInfo->lockword);
 
     /* send a msg to all... */
@@ -365,14 +363,6 @@ void clbKillShip( int snum, int kb )
         sendmesg = TRUE;
 
         break;
-    case KB_DEATHSTAR:
-        sprintf(msgbuf, "%c%d (%s) was vaporized by the Death Star.",
-                Teams[Ships[snum].team].teamchar,
-                snum,
-                Ships[snum].alias);
-        sendmesg = TRUE;
-
-        break;
     case KB_LIGHTNING:
         sprintf(msgbuf, "%c%d (%s) was destroyed by a lightning bolt.",
                 Teams[Ships[snum].team].teamchar,
@@ -381,32 +371,35 @@ void clbKillShip( int snum, int kb )
         sendmesg = TRUE;
 
         break;
-    default:
 
-        if ( kb > 0 && kb <= MAXSHIPS )
+    case KB_SHIP:
+        if (detail > 0 && detail <= MAXSHIPS)
 	{
             sprintf(msgbuf, "%c%d (%s) was kill %.1f for %c%d (%s).",
                     Teams[Ships[snum].team].teamchar,
                     snum,
                     Ships[snum].alias,
-                    Ships[kb].kills,
-                    Teams[Ships[kb].team].teamchar,
-                    kb,
-                    Ships[kb].alias);
+                    Ships[detail].kills,
+                    Teams[Ships[detail].team].teamchar,
+                    detail,
+                    Ships[detail].alias);
             sendmesg = TRUE;
 
 	}
-        else if ( -kb > 0 && -kb <= NUMPLANETS )
+        break;
+
+    case KB_PLANET:
+        if (detail > 0 && detail <= NUMPLANETS)
 	{
             sprintf(msgbuf, "%c%d (%s) was destroyed by %s",
                     Teams[Ships[snum].team].teamchar,
                     snum,
                     Ships[snum].alias,
-                    Planets[-kb].name);
+                    Planets[detail].name);
 
             sendmesg = TRUE;
 
-            if ( Planets[-kb].type == PLANET_SUN )
+            if ( Planets[detail].type == PLANET_SUN )
 	    {
                 strcat(msgbuf , "'s solar radiation.") ;
 	    }
@@ -415,6 +408,11 @@ void clbKillShip( int snum, int kb )
                 strcat(msgbuf , "'s planetary defenses.") ;
 	    }
 	}
+        break;
+
+    default:
+        utLog("%s: Invalid killing, snum %d, kb %d, detail %d", __FUNCTION__,
+              kb, detail);
     }
 
     if (sendmesg == TRUE)
@@ -657,7 +655,7 @@ int clbPhaser( int snum, real dir )
                     ang = utAngle( Ships[snum].x, Ships[snum].y, Ships[k].x, Ships[k].y );
                     if ( fabs( dir - ang ) <= PHASER_SPREAD )
                     {
-                        clbHit( k, clbPhaserHit( snum, dis ), snum );
+                        clbHit( k, clbPhaserHit( snum, dis ), KB_SHIP, snum );
                         LastPhasDist = dis;
                     }
                     else
@@ -859,10 +857,10 @@ int clbTakePlanet( int pnum, int snum )
           Users[Ships[snum].unum].username,
           Ships[snum].alias);
 
-    clbIKill( snum, KB_CONQUER );
+    clbIKill( snum, KB_CONQUER, 0 );
     for ( i = 1; i <= MAXSHIPS; i = i + 1 )
         if ( Ships[i].status == SS_LIVE )
-            clbIKill( i, KB_NEWGAME );
+            clbIKill( i, KB_NEWGAME, 0 );
 
     PVUNLOCK(&ConqInfo->lockword);
     clbInitGame();
@@ -1394,7 +1392,7 @@ int clbFindShip( int *snum )
                 *snum = vacantShips[rndint(0, numvacant - 1)];
 
             utLog("INFO: clbFindShip: stealing vacant ship %d", *snum);
-            clbIKill( *snum,  KB_GOD );
+            clbIKill( *snum,  KB_GOD, 0 );
         }
     }
 
@@ -1884,7 +1882,8 @@ void clbInitShip( int snum, int unum )
     int i, j;
 
     /* Ships[snum].status                 # never modified here */
-    Ships[snum].killedby = 0;
+    Ships[snum].killedBy = KB_NONE;
+    Ships[snum].killedByDetail = 0;
     /* Ships[snum].user                   # setup in menu() or newrob() */
     /* Ships[snum].team                   # setup in menu() or newrob() */
     /* Ships[snum].pid                    # setup in menu() or newrob() */
@@ -2464,14 +2463,14 @@ int clbStillAlive( int snum )
     if ( Users[Ships[snum].unum].ooptions[OOPT_SHITLIST] )
     {
         if ( Ships[snum].status == SS_LIVE )
-            clbKillShip( snum, KB_SHIT );
+            clbKillShip( snum, KB_SHIT, 0 );
 
         return ( FALSE );
     }
     if ( ConqInfo->closed && ! Users[Ships[snum].unum].ooptions[OOPT_PLAYWHENCLOSED] )
     {
         if ( Ships[snum].status == SS_LIVE )
-            clbKillShip( snum, KB_EVICT );
+            clbKillShip(snum, KB_EVICT, 0);
 
         return ( FALSE );
     }
@@ -2644,7 +2643,8 @@ void clbZeroShip( int snum )
     int i, j;
 
     Ships[snum].status = SS_OFF;
-    Ships[snum].killedby = 0;
+    Ships[snum].killedBy = KB_NONE;
+    Ships[snum].killedByDetail = 0;
     Ships[snum].unum = 0;
     Ships[snum].team = 0;
     Ships[snum].pid = 0;
@@ -2981,7 +2981,7 @@ void clbCheckShips(int isDriver)
             {
                 utLog("INFO: clbCheckShips(isDriver=%d): killing VACANT ship %d",
                       isDriver, i);
-                clbKillShip( i, KB_GOD );
+                clbKillShip(i, KB_GOD, 0);
             }
             else
             {
@@ -2989,7 +2989,7 @@ void clbCheckShips(int isDriver)
                 utLog("INFO: clbCheckShips(isDriver=%d): turning off VACANT ship %d",
                       isDriver, i);
                 PVLOCK(&ConqInfo->lockword);
-                clbIKill( i,  KB_GOD );
+                clbIKill(i,  KB_GOD, 0);
                 clbZeroShip( i );
                 PVUNLOCK(&ConqInfo->lockword);
             }

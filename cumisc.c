@@ -1125,7 +1125,7 @@ void mcuPlanetList( int team, int snum )
 /*    mcuPlayList( godlike, doall ) */
 void mcuPlayList( int godlike, int doall, int snum )
 {
-    int i, unum, status, kb, lin, col;
+    int i, unum, status, lin, col;
     int fline, lline, fship;
     char sbuf[20];
     char kbuf[20];
@@ -1134,6 +1134,8 @@ void mcuPlayList( int godlike, int doall, int snum )
     int ch;
     char *hd1="ship  name          pseudonym              kills      pid";
     char *hd2="ship  name          pseudonym              kills     type";
+    killedBy_t kb;
+    unsigned int detail;
 
     /* Do some screen setup. */
     cdclear();
@@ -1171,9 +1173,10 @@ void mcuPlayList( int godlike, int doall, int snum )
 	{
             status = Ships[i].status;
 
-            kb = Ships[i].killedby;
+            kb = Ships[i].killedBy;
+            detail = Ships[i].killedByDetail;
             if ( status == SS_LIVE ||
-                 ( doall && ( status != SS_OFF || kb != 0 ) ) )
+                 ( doall && ( status != SS_OFF || kb != KB_NONE ) ) )
 	    {
                 sbuf[0] = 0;
                 utAppendShip(sbuf , i) ;
@@ -1205,10 +1208,10 @@ void mcuPlayList( int godlike, int doall, int snum )
                 else
                     sprintf( cbuf, "%-5s %13s %21s %8s %6s", sbuf,
                              " ", " ", " ", " " );
-                if ( doall && kb != 0 )
+                if ( doall && kb != KB_NONE )
 		{
                     strcat(cbuf, "  ") ;
-                    utAppendKilledBy(cbuf , kb) ;
+                    utAppendKilledBy(cbuf , kb, detail) ;
 		}
 
 		if (snum > 0 && snum <= MAXSHIPS )

@@ -59,7 +59,9 @@ static int nShiplDisplay(dspConfig_t *dsp)
     int snum = Context.snum;
     static const int doall = FALSE; /* for now... */
     static char cbuf[BUFFER_SIZE_256];
-    int i, unum, status, kb, lin, col;
+    int i, unum, status, lin, col;
+    killedBy_t kb;
+    unsigned int detail;
     int fline, lline;
     char sbuf[20];
     char kbuf[20];
@@ -89,9 +91,10 @@ static int nShiplDisplay(dspConfig_t *dsp)
     {
         status = Ships[i].status;
 
-        kb = Ships[i].killedby;
+        kb = Ships[i].killedBy;
+        detail = Ships[i].killedByDetail;
         if ( status == SS_LIVE ||
-             ( doall && ( status != SS_OFF || kb != 0 ) ) )
+             ( doall && ( status != SS_OFF || kb != KB_NONE ) ) )
         {
             sbuf[0] = 0;
             utAppendShip(sbuf , i) ;
@@ -118,10 +121,10 @@ static int nShiplDisplay(dspConfig_t *dsp)
             else
                 sprintf( cbuf, "%-5s %13s %21s %8s %6s", sbuf,
                          " ", " ", " ", " " );
-            if ( doall && kb != 0 )
+            if ( doall && kb != KB_NONE )
             {
                 strcat(cbuf, "  ") ;
-                utAppendKilledBy(cbuf , kb) ;
+                utAppendKilledBy(cbuf, kb, detail) ;
             }
 
             if (snum > 0 && snum <= MAXSHIPS )

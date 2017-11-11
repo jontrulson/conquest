@@ -453,7 +453,7 @@ void iterdrive( int *ship )
                                                             Ships[i].torps[j].y,
                                                             Ships[k].x, Ships[k].y ) );
                                 if ( ht > 0.0 )
-                                    clbHit( k, ht, i );
+                                    clbHit( k, ht, KB_SHIP, i );
                             }
 		    }
 		}
@@ -527,7 +527,8 @@ void secdrive( int *ship )
                     if ( Ships[i].sdfuse == 0 )
 		    {
                         Ships[i].sdfuse = 0;
-                        Ships[i].killedby = 0;
+                        Ships[i].killedBy = KB_NONE;
+                        Ships[i].killedByDetail = 0;
                         Ships[i].status = SS_OFF;
 		    }
 		}
@@ -541,13 +542,13 @@ void secdrive( int *ship )
         /* see if we've been kicked out. */
         if ( Users[Ships[i].unum].ooptions[OOPT_SHITLIST] )
 	{
-            clbKillShip( i, KB_SHIT );
+            clbKillShip( i, KB_SHIT, 0 );
             continue; /* next;*/
 	}
         if ( ConqInfo->closed )
             if ( ! Users[Ships[i].unum].ooptions[OOPT_PLAYWHENCLOSED] )
             {
-                clbKillShip( i, KB_EVICT );
+                clbKillShip( i, KB_EVICT, 0 );
                 continue; /*next;*/
             }
 
@@ -577,7 +578,7 @@ void secdrive( int *ship )
                     if ( clbSPWar( i,j ) )
                         clbHit( i,
                                 rndnor( PLANET_HIT + Planets[j].armies * ARMY_HIT, 1.0 ),
-                                -j );
+                                KB_PLANET, j );
                 }
 
                 /* Does the planet scan us? */
@@ -595,7 +596,7 @@ void secdrive( int *ship )
         if ( Doomsday->status == DS_LIVE )
             if ( dist( Ships[i].x, Ships[i].y, Doomsday->x, Doomsday->y ) <= DOOMSDAY_DIST )
             {
-                clbHit( i, rndnor( DOOMSDAY_HIT, 1.0 ), KB_DOOMSDAY );
+                clbHit( i, rndnor( DOOMSDAY_HIT, 1.0 ), KB_DOOMSDAY, 0 );
             }
 
 
@@ -603,7 +604,7 @@ void secdrive( int *ship )
         if ( fabs( Ships[i].x ) >= NEGENB_DIST || fabs(Ships[i].y) >= NEGENB_DIST )
             if ( fabs( Ships[i].x ) <= NEGENBEND_DIST &&
                  fabs( Ships[i].y ) <= NEGENBEND_DIST )
-                clbHit( i, NEGENB_HIT, KB_NEGENB );
+                clbHit( i, NEGENB_HIT, KB_NEGENB, 0 );
 
         /* Shields. */
         if ( Ships[i].shields < 100.0 )

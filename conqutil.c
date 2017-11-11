@@ -87,7 +87,7 @@ void utAppendInt(char *str, int i)
 /*    int kb */
 /*    char buf() */
 /*    utAppendKilledBy(buf , kb)  */
-void utAppendKilledBy(char *buf, int kb)
+void utAppendKilledBy(char *buf, killedBy_t kb, unsigned int detail)
 {
 
     switch ( kb )
@@ -119,13 +119,16 @@ void utAppendKilledBy(char *buf, int kb)
     case KB_GOD:
         strcat(buf , "GOD") ;
         break;
+    case KB_SHIP:
+        if (detail > 0 && detail <= MAXSHIPS)
+            utAppendShip(buf, detail) ;
+        break;
+    case KB_PLANET:
+        if ( detail > 0 && detail <= NUMPLANETS )
+            strcat(buf , Planets[detail].name) ;
+        break;
     default:
-        if ( kb > 0 && kb <= MAXSHIPS )
-            utAppendShip(buf, kb) ;
-        else if ( -kb > 0 && -kb <= NUMPLANETS )
-            strcat(buf , Planets[-kb].name) ;
-        else
-            utAppendInt(buf, kb) ;
+        utAppendInt(buf, (int)kb) ;
         break;
     }
 

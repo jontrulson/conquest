@@ -113,6 +113,7 @@ static int _newship( int unum, int *snum )
 
 	case SP_ACK:		/* bummer */
             PKT_PROCSP(buf);
+            utLog("%s: got an ack, _newship failed.", __FUNCTION__);
             state = S_NSERR;
 
             return FALSE;		/* always a failure */
@@ -174,6 +175,7 @@ static int nPlayDisplay(dspConfig_t *dsp)
             shipinited = TRUE;
             if (!_newship( Context.unum, &Context.snum ))
             {
+                utLog("%s: _newship failed.", __FUNCTION__);
                 state = S_NSERR;
                 return NODE_OK;
             }
@@ -191,6 +193,10 @@ static int nPlayDisplay(dspConfig_t *dsp)
     }
     else if (state == S_NSERR)
     {
+        // FIXME - this needs to be fail tested! inf loop once when
+        // trying to re-enter the game, but got a ping resp (ack code
+        // 17) instead.  Just ran in loop dumping "nPlay: unexpected
+        // server ack, code 17" to console
         switch (sAckMsg.code)
         {
         case PERR_FLYING:

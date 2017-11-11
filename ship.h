@@ -41,9 +41,21 @@
 
     typedef struct {
         int status;			/* one of the SS_ values */
-        int killedby;			/* one of the KB_ values, or: */
-        /*   >0 means ship number */
-        /*   <0 means -(planet number) */
+
+        killedBy_t killedBy;            /* one of the KB_ values.  Do
+                                         * not exceed 255 for this
+                                         * value (8 bits) since only a
+                                         * uint8_t is sent over the
+                                         * protocol for this
+                                         * member. */
+        unsigned int killedByDetail;    /* if killed by ship or
+                                         * planet, this will hold the
+                                         * ship or planet number.  Do
+                                         * not exceed 16 bits here, as
+                                         * only a uint16_t is sent
+                                         * over the protocol for this
+                                         * member. */
+
         int unum;			/* user number of the ship's captain */
         int team;			/* team of the ship */
         int pid;			/* process id of ships owner process */

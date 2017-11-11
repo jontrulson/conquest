@@ -1006,10 +1006,12 @@ void conqds( int multiple, int switchteams )
 /*    dead( snum, leave ) */
 void dead( int snum, int leave )
 {
-    int i, kb;
+    int i;
+    unsigned int detail;
+    killedBy_t kb;
     int ch;
     char *ywkb="You were killed by ";
-    char buf[128], junk[128];
+    char buf[128];
 
     /* (Quickly) clear the screen. */
     cdclear();
@@ -1023,7 +1025,8 @@ void dead( int snum, int leave )
         return;
     }
 
-    kb = Ships[snum].killedby;
+    kb = Ships[snum].killedBy;
+    detail = Ships[snum].killedByDetail;
 
     /* Figure out why we died. */
     switch ( kb )
@@ -1068,58 +1071,61 @@ void dead( int snum, int leave )
         cprintf(8,0,ALIGN_CENTER,"#%d#%s", RedLevelColor,
                 "You destroyed the doomsday machine!");
         break;
-    case KB_DEATHSTAR:
-        cprintf(8,0,ALIGN_CENTER,"#%d#%s", RedLevelColor,
-                "You were vaporized by the Death Star.");
-
-        break;
     case KB_LIGHTNING:
         cprintf(8,0,ALIGN_CENTER,"#%d#%s", RedLevelColor,
                 "You were destroyed by a lightning bolt.");
 
         break;
-    default:
 
-        cbuf[0] = 0;
-        buf[0] = 0;
-        junk[0] = 0;
-        if ( kb > 0 && kb <= MAXSHIPS )
+    case KB_SHIP:
+        cbuf[0] = buf[0] = 0;
+        if ( detail > 0 && detail <= MAXSHIPS )
 	{
-            utAppendShip(cbuf , kb) ;
-            if ( Ships[kb].status != SS_LIVE )
+            utAppendShip(cbuf, detail) ;
+            if ( Ships[detail].status != SS_LIVE )
                 strcat(buf, ", who also died.");
             else
                 utAppendChar(buf , '.') ;
+
             cprintf( 8,0,ALIGN_CENTER,
                      "#%d#You were kill number #%d#%.1f #%d#for #%d#%s #%d#(#%d#%s#%d#)%s",
-                     InfoColor, CQC_A_BOLD, Ships[kb].kills,
-                     InfoColor, CQC_A_BOLD, Ships[kb].alias,
+                     InfoColor, CQC_A_BOLD, Ships[detail].kills,
+                     InfoColor, CQC_A_BOLD, Ships[detail].alias,
                      InfoColor, CQC_A_BOLD, cbuf,
                      InfoColor, buf );
 	}
-        else if ( -kb > 0 && -kb <= NUMPLANETS )
+
+        break;
+
+    case KB_PLANET:
+        cbuf[0] = buf[0] = 0;
+        if ( detail > 0 && detail <= NUMPLANETS )
 	{
-            if ( Planets[-kb].type == PLANET_SUN )
+            if ( Planets[detail].type == PLANET_SUN )
                 strcpy(cbuf, "solar radiation.");
             else
                 strcpy(cbuf, "planetary defenses.");
+
             cprintf(8,0,ALIGN_CENTER,"#%d#%s#%d#%s%s#%d#%s",
-                    InfoColor, ywkb, CQC_A_BOLD, Planets[-kb].name, "'s ",
+                    InfoColor, ywkb, CQC_A_BOLD, Planets[detail].name, "'s ",
                     InfoColor, cbuf);
-
 	}
-        else
-	{
-            /* We were unable to determine the cause of death. */
-            buf[0] = 0;
-            utAppendShip(buf , snum) ;
-            sprintf(cbuf, "dead: %s was killed by %d.", buf, kb);
-            utError( cbuf );
-            utLog(cbuf);
 
-            cprintf(8,0,ALIGN_CENTER,"#%d#%s%s",
-                    RedLevelColor, ywkb, "nothing in particular.  (How strange...)");
-	}
+        break;
+
+    default:
+        /* We were unable to determine the cause of death. */
+
+        cbuf[0] = 0;
+        buf[0] = 0;
+        utAppendShip(buf , snum) ;
+        sprintf(cbuf, "dead: %s was killed by %d.", buf, kb);
+        utError( cbuf );
+        utLog(cbuf);
+
+        cprintf(8,0,ALIGN_CENTER,"#%d#%s%s",
+                RedLevelColor, ywkb,
+                "nothing in particular.  (How strange...)");
     }
 
 

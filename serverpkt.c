@@ -188,7 +188,8 @@ spShip_t *spktShip(uint8_t snum, int rec)
                 sship.rwar |= (1 << i);
 	}
 
-        sship.killedby = (int16_t)htons(Ships[snum].killedby);
+        sship.killedBy = (uint8_t)Ships[snum].killedBy;
+        sship.killedByDetail = (uint16_t)htons((uint16_t)Ships[snum].killedByDetail);
 
         for (i=1; i<=NUMPLANETS; i++)
             sship.srpwar[i] = (uint8_t)Ships[snum].srpwar[i];

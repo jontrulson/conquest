@@ -1101,7 +1101,7 @@ void procBomb(cpCommand_t *cmd)
     if ( Planets[pnum].team == TEAM_GOD )
     {
         sprintf( cbuf, "That was a bad idea, %s...", Ships[snum].alias );
-        clbDamage( snum,  rnduni( 50.0, 100.0 ), KB_LIGHTNING );
+        clbDamage( snum,  rnduni( 50.0, 100.0 ), KB_LIGHTNING, 0 );
         pktSendAck(PSEV_INFO, PERR_CANCELED, NULL);
         sendFeedback(cbuf);
         return;
@@ -1598,16 +1598,16 @@ void procDestruct(cpCommand_t *cmd)
 	{
             Doomsday->status = DS_OFF;
             clbStoreMsg( MSG_DOOM, MSG_ALL, "AIEEEEEEEE!" );
-            clbKillShip( Context.snum, KB_GOTDOOMSDAY );
+            clbKillShip( Context.snum, KB_GOTDOOMSDAY, 0 );
 	}
         else
             if (clbStillAlive(Context.snum))	/* if we're not dead yet... */
-                clbKillShip( Context.snum, KB_SELF );
+                clbKillShip( Context.snum, KB_SELF, 0 );
     }
     else
     {
         if (clbStillAlive(Context.snum))	/* if we're not dead yet... */
-            clbKillShip( Context.snum, KB_SELF );
+            clbKillShip( Context.snum, KB_SELF, 0 );
     }
 
     pktSendAck(PSEV_INFO, PERR_DONE,

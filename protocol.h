@@ -181,10 +181,12 @@ typedef struct {	/* 'large' ship data */
     uint8_t  towedby;
     uint8_t  war;
     uint8_t  rwar;
-    uint8_t  pad1;
+    uint8_t  killedBy;		/* depends on status - keep together
+                                 * in pkt, along with killedByDetail */
 
-    int16_t   killedby;		/* depends on status - keep together in pkt */
-    int16_t   pad2;
+    uint8_t  pad1;
+    uint8_t  pad2;
+    uint16_t killedByDetail;
 
     uint32_t kills;		/* x10 */
 

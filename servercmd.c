@@ -224,7 +224,7 @@ static void Murder(int from, char *what)
             sprintf(mbuf, kill_ship_str1,
                     Teams[Ships[snum].team].teamchar, snum, Ships[snum].alias);
             clbStoreMsg(MSG_GOD, from, mbuf);
-            clbKillShip( snum, KB_GOD );
+            clbKillShip( snum, KB_GOD, 0 );
         }
 
         return;
@@ -250,7 +250,7 @@ static void Murder(int from, char *what)
                         Ships[snum].alias,
                         what);
                 clbStoreMsg(MSG_GOD, from, mbuf);
-                clbKillShip( snum, KB_GOD );
+                clbKillShip( snum, KB_GOD, 0 );
             }
 
 

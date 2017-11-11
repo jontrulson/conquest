@@ -499,11 +499,11 @@ void debugdisplay( int snum )
     cprintf(lin,dcol,ALIGN_NONE,"#%d#%s",InfoColor, buf);
     lin++;
     cprintf(lin,tcol,ALIGN_NONE,"#%d#%s",LabelColor, " skilledby:");
-    i = Ships[snum].killedby;
-    if ( i != 0 )
+    if ( Ships[snum].killedBy != KB_NONE )
     {
         buf[0] = 0;
-        utAppendKilledBy(buf , Ships[snum].killedby) ;
+        utAppendKilledBy(buf, Ships[snum].killedBy,
+                         Ships[snum].killedByDetail);
         cprintf(lin,dcol,ALIGN_NONE,"#%d#%s",InfoColor, buf);
     }
     lin++;
@@ -916,7 +916,7 @@ void kiss(int snum, int prompt_flg)
             cdputs( mbuf, MSG_LIN1, 1 );
             if ( mcuConfirm() )
             {
-                clbKillShip( snum, KB_GOD );
+                clbKillShip( snum, KB_GOD, 0 );
                 cdclrl( MSG_LIN2, 1 );
                 utLog("OPER: %s killed ship %d",
                       operName, snum);
@@ -945,7 +945,7 @@ void kiss(int snum, int prompt_flg)
                 {
                     utLog("OPER: %s killed ship %d",
                           operName, snum);
-                    clbKillShip( snum, KB_GOD );
+                    clbKillShip( snum, KB_GOD, 0 );
                 }
             }
         if ( didany )
@@ -980,7 +980,7 @@ void kiss(int snum, int prompt_flg)
                 cdputs( mbuf, MSG_LIN1, 1 );
                 if ( mcuConfirm() )
                 {
-                    clbKillShip( snum, KB_GOD );
+                    clbKillShip( snum, KB_GOD, 0 );
                     cdclrl( MSG_LIN2, 1 );
                     utLog("OPER: %s killed ship %d",
                           operName, snum);

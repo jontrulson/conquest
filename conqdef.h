@@ -50,7 +50,8 @@
 /*#define COMMONSTAMP 990124 		 stardate? */
 /*#define COMMONSTAMP 20001231 		 stardate? */
 /*#define COMMONSTAMP 20030829 */
-#define COMMONSTAMP 20101027
+// #define COMMONSTAMP 20101027
+#define COMMONSTAMP 20171110
 
 #ifndef PI
 # define PI 3.141592654
@@ -70,18 +71,26 @@
 #define SS_DEAD 5 		/* used between kill() and the user menu */
 #define SS_RESERVED 6 		/* reserved for our later use */
 
-/* Special values for skilledby() */
-#define KB_SELF -100 		/* self-destruct */
-#define KB_NEGENB -101 	/* damage from negative energy barrier */
-#define KB_CONQUER -102 	/* you conquered the universe */
-#define KB_NEWGAME -103 	/* new game */
-#define KB_EVICT -104 		/* game closed for repairs */
-#define KB_SHIT -105 		/* placed on shit list */
-#define KB_DOOMSDAY -106 	/* the planet eater got you */
-#define KB_GOTDOOMSDAY -107 	/* you got the planet eater */
-#define KB_GOD -108 		/* killed by the Lord */
-#define KB_DEATHSTAR -109 	/* killed by a Lucas device */
-#define KB_LIGHTNING -110 	/* killed by a lightning bolt from GOD */
+/* killedBy values.  The values should never exceed 255 since only a
+ * uint8_t is used in the protocol.
+ */
+typedef enum {
+    KB_NONE           = 0,   /* this must always be the first item, = 0 */
+    KB_SHIP           = 1,   /* killed by a ship of course */
+    KB_PLANET         = 2,   /* killed by a planet or sun */
+    KB_SELF           = 3,   /* self-destruct */
+    KB_NEGENB         = 4,   /* damage from negative energy barrier */
+    KB_CONQUER        = 5,   /* you conquered the universe */
+    KB_NEWGAME        = 6,   /* new game */
+    KB_EVICT          = 7,   /* game closed for repairs */
+    KB_SHIT           = 8,   /* placed on shit list */
+    KB_DOOMSDAY       = 9,   /* the planet eater got you */
+    KB_GOTDOOMSDAY    = 10,  /* you got the planet eater */
+    KB_GOD            = 11,  /* killed by the Lord */
+    KB_LIGHTNING      = 12,  /* killed by a lightning bolt from GOD */
+
+    KB_MAX                   /* maximum KB_* number, must always be last */
+} killedBy_t;
 
 #define MAXTORPS 9 		/* maximum torps per ship */
 /* Values for tstatus() */

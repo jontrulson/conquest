@@ -119,7 +119,9 @@ int proc_0006_Ship(char *buf)
         else
             Ships[snum].rwar[i] = FALSE;
 
-    Ships[snum].killedby = (int)((int16_t)ntohs(sship->killedby));
+    // Don't bother decoding properly for this - not necessary when
+    // just playing back recordings...
+    //    Ships[snum].killedby = (int)((int16_t)ntohs(sship->killedby));
     Ships[snum].kills = (real)((real)ntohl(sship->kills) / 10.0);
 
     for (i=1; i<=(40 + 20) /*NUMPLANETS*/; i++)
