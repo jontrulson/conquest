@@ -1007,7 +1007,7 @@ void conqds( int multiple, int switchteams )
 void dead( int snum, int leave )
 {
     int i;
-    unsigned int detail;
+    uint16_t detail;
     killedBy_t kb;
     int ch;
     char *ywkb="You were killed by ";
@@ -1079,7 +1079,7 @@ void dead( int snum, int leave )
 
     case KB_SHIP:
         cbuf[0] = buf[0] = 0;
-        if ( detail >= 0 && detail < MAXSHIPS )
+        if ( detail < MAXSHIPS )
 	{
             utAppendShip(cbuf, detail) ;
             if ( Ships[detail].status != SS_LIVE )
@@ -1161,14 +1161,15 @@ void dead( int snum, int leave )
 			LabelColor, CQC_A_BOLD, i, cbuf, LabelColor, buf);
 	}
     }
-    else if ( kb >= 0 )
+    else if ( kb == KB_SHIP && detail < MAXSHIPS)
     {
-        if ( Ships[kb].status == SS_LIVE )
+        if ( Ships[detail].status == SS_LIVE )
 	{
             cprintf( 10,0,ALIGN_CENTER,
                      "#%d#He had #%d#%d%% #%d#shields and #%d#%d%% #%d#damage.",
-                     InfoColor, CQC_A_BOLD, round(Ships[kb].shields),
-                     InfoColor, CQC_A_BOLD, round(Ships[kb].damage),InfoColor );
+                     InfoColor, CQC_A_BOLD, round(Ships[detail].shields),
+                     InfoColor, CQC_A_BOLD, round(Ships[detail].damage),
+                     InfoColor );
 	}
     }
     cprintf(12,0,ALIGN_CENTER,

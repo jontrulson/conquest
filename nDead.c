@@ -27,7 +27,7 @@
 
 static int snum;
 static killedBy_t kb;                  /* killed by... */
-static unsigned int detail;
+static uint16_t detail;
 char *ywkb="You were killed by ";
 static char buf[128], cbuf[BUFFER_SIZE_1024];
 static char lastwords[MAXLASTWORDS];
@@ -68,7 +68,7 @@ void nDeadInit(void)
     kb = Ships[snum].killedBy;
     detail = Ships[snum].killedByDetail;
 
-    if (kb == KB_SHIP && detail >= 0 && detail < MAXSHIPS)
+    if (kb == KB_SHIP && detail < MAXSHIPS)
         eShip = Ships[detail];        /* get copy of killers ship */
     else
         memset((void *)&eShip, 0, sizeof(Ship_t));
@@ -146,7 +146,7 @@ static int nDeadDisplay(dspConfig_t *dsp)
     case KB_SHIP:
         cbuf[0] = 0;
         buf[0] = 0;
-        if ( detail >= 0 && detail < MAXSHIPS )
+        if ( detail < MAXSHIPS )
 	{
             utAppendShip(cbuf, detail) ;
             if ( eShip.status != SS_LIVE )
@@ -312,7 +312,7 @@ static int nDeadInput(int ch)
     case S_LASTWCONF:
         if (ch == TERM_EXTRA)
         {                       /* we are done */
-            sendMessage(MSG_FROM_GOD, 0, lastwords);
+            sendMessage(MSG_TO_GOD, 0, lastwords);
             setONode(NULL);
             nMenuInit();
         }

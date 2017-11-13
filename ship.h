@@ -48,13 +48,9 @@
                                          * uint8_t is sent over the
                                          * protocol for this
                                          * member. */
-        unsigned int killedByDetail;    /* if killed by ship or
+        uint16_t killedByDetail;        /* if killed by ship or
                                          * planet, this will hold the
-                                         * ship or planet number.  Do
-                                         * not exceed 16 bits here, as
-                                         * only a uint16_t is sent
-                                         * over the protocol for this
-                                         * member. */
+                                         * ship or planet number.*/
 
         int unum;			/* user number of the ship's captain */
         int team;			/* team of the ship */

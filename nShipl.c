@@ -61,7 +61,7 @@ static int nShiplDisplay(dspConfig_t *dsp)
     static char cbuf[BUFFER_SIZE_256];
     int i, unum, status, lin, col;
     killedBy_t kb;
-    unsigned int detail;
+    uint16_t detail;
     int fline, lline;
     char sbuf[20];
     char kbuf[20];

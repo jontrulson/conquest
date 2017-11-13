@@ -1130,7 +1130,7 @@ void mcuPlayList( int godlike, int doall, int snum )
     char *hd1="ship  name          pseudonym              kills      pid";
     char *hd2="ship  name          pseudonym              kills     type";
     killedBy_t kb;
-    unsigned int detail;
+    uint16_t detail;
 
     /* Do some screen setup. */
     cdclear();

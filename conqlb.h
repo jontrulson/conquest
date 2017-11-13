@@ -14,13 +14,13 @@
 
 int      clbRegister( char *lname, char *rname, int team, int *unum );
 void     clbChalkup( int snum );
-void     clbDamage( int snum, real dam, killedBy_t kb, unsigned int detail );
+void     clbDamage( int snum, real dam, killedBy_t kb, uint16_t detail );
 void     clbDetonate( int snum, int tnum );
 int      clbEnemyDet( int snum );
-void     clbHit( int snum, real ht, killedBy_t kb, unsigned int detail );
-void     clbIKill(int snum, killedBy_t kb, unsigned int detail);
+void     clbHit( int snum, real ht, killedBy_t kb, uint16_t detail );
+void     clbIKill(int snum, killedBy_t kb, uint16_t detail);
 char    *clbETAStr(real warp, real distance);
-void     clbKillShip(int snum, killedBy_t kb, unsigned int detail);
+void     clbKillShip(int snum, killedBy_t kb, uint16_t detail);
 int      clbCheckLaunch( int snum, int number );
 int      clbLaunch( int snum, real dir, int number, int ltype );
 void     clbOrbit( int snum, int pnum );

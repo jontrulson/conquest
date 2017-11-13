@@ -80,7 +80,7 @@ void clbChalkup( int snum )
 /*    int snum, kb */
 /*    real dam */
 /*    clbDamage( snum, dam, kb ) */
-void clbDamage( int snum, real dam, killedBy_t kb, unsigned int detail )
+void clbDamage( int snum, real dam, killedBy_t kb, uint16_t detail )
 {
     real mw;
 
@@ -146,7 +146,7 @@ int clbEnemyDet( int snum )
 /*    int snum, kb */
 /*    real ht */
 /*    clbHit( snum, ht, kb ) */
-void clbHit( int snum, real ht, killedBy_t kb, unsigned int detail )
+void clbHit( int snum, real ht, killedBy_t kb, uint16_t detail )
 {
     if ( ht > 0.0 )
     {
@@ -174,7 +174,7 @@ void clbHit( int snum, real ht, killedBy_t kb, unsigned int detail )
 
 /*  kill a ship */
 /*  Note: This routines ASSUMES you have the common locked before you it. */
-void clbIKill(int snum, killedBy_t kb, unsigned int detail)
+void clbIKill(int snum, killedBy_t kb, uint16_t detail)
 {
     int i, unum, team, kunum, kteam;
     real tkills;
@@ -211,10 +211,10 @@ void clbIKill(int snum, killedBy_t kb, unsigned int detail)
         Ships[snum].kills = Ships[snum].kills + CONQUER_KILLS;
     else if ( kb == KB_GOTDOOMSDAY )
         Ships[snum].kills = Ships[snum].kills + DOOMSDAY_KILLS;
-    else if ( kb >= 0 )				/* if a ship did the killing */
+    else if ( kb == KB_SHIP && detail < MAXSHIPS ) /* if a ship did the killing */
     {
-        kunum = Ships[kb].unum;
-        kteam = Ships[kb].team;
+        kunum = Ships[detail].unum;
+        kteam = Ships[detail].team;
         tkills = 1.0 + ((Ships[snum].kills + Ships[snum].strkills) * KILLS_KILLS);
         if ( Ships[snum].armies > 0 )
 	{
@@ -225,15 +225,15 @@ void clbIKill(int snum, killedBy_t kb, unsigned int detail)
 	}
 
         /* Kills accounting. */
-        if ( Ships[kb].status == SS_LIVE )
-            Ships[kb].kills = Ships[kb].kills + tkills;
+        if ( Ships[detail].status == SS_LIVE )
+            Ships[detail].kills = Ships[detail].kills + tkills;
         else
 	{
             /* Have to do some hacking when our killer is dead. */
-            Users[kunum].stats[USTAT_WINS] -= (int)Ships[kb].kills;
+            Users[kunum].stats[USTAT_WINS] -= (int)Ships[detail].kills;
             Teams[kteam].stats[TSTAT_WINS] =
-                Teams[kteam].stats[TSTAT_WINS] - (int)Ships[kb].kills;
-            Ships[kb].kills = Ships[kb].kills + tkills;
+                Teams[kteam].stats[TSTAT_WINS] - (int)Ships[detail].kills;
+            Ships[detail].kills = Ships[detail].kills + tkills;
             clbChalkup( kb );
 	}
 
@@ -242,8 +242,8 @@ void clbIKill(int snum, killedBy_t kb, unsigned int detail)
 
         if ( ! Ships[snum].war[kteam] )
 	{
-            Ships[kb].war[team] = TRUE;
-            Ships[kb].rwar[team] = TRUE;
+            Ships[detail].war[team] = TRUE;
+            Ships[detail].rwar[team] = TRUE;
 	}
     }
 
@@ -309,7 +309,7 @@ char *clbETAStr(real warp, real distance)
 /*  SYNOPSIS */
 /*    int snum, kb */
 /*    kill( snum, kb ) */
-void clbKillShip(int snum, killedBy_t kb, unsigned int detail)
+void clbKillShip(int snum, killedBy_t kb, uint16_t detail)
 {
     int sendmesg = FALSE;
     char msgbuf[BUFFER_SIZE_256];
@@ -655,7 +655,8 @@ int clbPhaser( int snum, real dir )
                     ang = utAngle( Ships[snum].x, Ships[snum].y, Ships[k].x, Ships[k].y );
                     if ( fabs( dir - ang ) <= PHASER_SPREAD )
                     {
-                        clbHit( k, clbPhaserHit( snum, dis ), KB_SHIP, snum );
+                        clbHit( k, clbPhaserHit( snum, dis ),
+                                KB_SHIP, (uint16_t)snum );
                         LastPhasDist = dis;
                     }
                     else

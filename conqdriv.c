@@ -456,7 +456,7 @@ void iterdrive( int *ship )
                                                             Ships[i].torps[j].y,
                                                             Ships[k].x, Ships[k].y ) );
                                 if ( ht > 0.0 )
-                                    clbHit( k, ht, KB_SHIP, i );
+                                    clbHit( k, ht, KB_SHIP, (uint16_t)i );
                             }
 		    }
 		}
@@ -581,7 +581,7 @@ void secdrive( int *ship )
                     if ( clbSPWar( i,j ) )
                         clbHit( i,
                                 rndnor( PLANET_HIT + Planets[j].armies * ARMY_HIT, 1.0 ),
-                                KB_PLANET, j );
+                                KB_PLANET, (uint16_t)j );
                 }
 
                 /* Does the planet scan us? */
