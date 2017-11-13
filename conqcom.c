@@ -1,6 +1,8 @@
 #include "c_defs.h"
 
 /************************************************************************
+ * Conquest Common Block (aka: The Universe)
+ *
  * Copyright Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
  ***********************************************************************/
 

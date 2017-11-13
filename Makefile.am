@@ -69,14 +69,14 @@ endif !GLCLIENT
 
 endif !ISMINGW
 
-libconquest_la_SOURCES = conqai.c conqai.h conqcm.c conqcom.h \
+libconquest_la_SOURCES = conqai.c conqai.h conqcom.c conqcom.h \
 	conqlb.h conqlb.c rndlb.c rndlb.h conqutil.c conqutil.h \
 	conqunix.c conqunix.h ibuf.c version.c conf.c sem.c color.c \
 	userauth.c record.c color.h user.h shiptype.h \
 	ship.h planet.h team.h msg.h doomsday.h driver.h conqinfo.h \
 	history.h robot.h global.h torp.h ibuf.h conf.h  display.h \
 	protocol.h packet.h packet.c userauth.h meta.c meta.h udp.c udp.h \
-	rb.h rb.c cbglobal.h proto_0006.h conqcom.h
+	rb.h rb.c cbglobal.h proto_0006.h
 
 libconquest_la_LIBADD = @LTLIBOBJS@
 
