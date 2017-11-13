@@ -463,7 +463,7 @@ int proc_0006_Message(char *buf)
     {
         realFrom = MSG_FROM_SHIP;
         realFromDetail = (uint16_t)smsg->from;
-        realFromDetail--; // compensate for 0-based ships[] in current version
+// FIXME       realFromDetail--; // compensate for 0-based ships[] in current version
     }
     else if (smsg->from == 0) // god
     {
