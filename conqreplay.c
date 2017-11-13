@@ -664,14 +664,6 @@ static char *build_toggle_str(char *snum_str, int snum)
     {          /* ship */
         sprintf(snum_str,"%c%d", Teams[Ships[snum].team].teamchar, snum);
     }
-    else if (snum < 0 && -snum <= NUMPLANETS)
-    {  /* planet */
-// FIXME check this logic with new MAXSHIPS 0-based rework
-        sprintf(snum_str, "%c%c%c",
-                Planets[-snum].name[0],
-                Planets[-snum].name[1],
-                Planets[-snum].name[2]);
-    }
     else if (snum == DISPLAY_DOOMSDAY)          /* specials */
         strcpy(snum_str,doomsday_str);
     else if (snum == DISPLAY_DEATHSTAR)
