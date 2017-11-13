@@ -2863,7 +2863,7 @@ void menu(void)
         clbUserline( -1, -1, cbuf, FALSE, TRUE );
         uiPutColor(LabelColor);
         cdputs( cbuf, MSG_LIN1, 1 );
-        clbUserline( Context.unum, 0, cbuf, FALSE, TRUE );
+        clbUserline( Context.unum, -1, cbuf, FALSE, TRUE );
         uiPutColor(CQC_A_BOLD);
         cdputs( cbuf, MSG_LIN2, 1 );
         uiPutColor(0);
@@ -2985,6 +2985,8 @@ void menu(void)
                         Users[Context.unum].war[Users[Context.unum].team] = FALSE;
 
                         sendCommand(CPCMD_SWITCHTEAM, (uint16_t)Ships[Context.snum].team);
+                        redraw = TRUE;
+
                     }
                     break;
                 case 'S':

@@ -225,7 +225,7 @@ static int nMenuDisplay(dspConfig_t *dsp)
     cprintf(MSG_LIN1, 1, ALIGN_LEFT, "#%d#%s",
             LabelColor,
             cbuf);
-    clbUserline( Context.unum, 0, cbuf, FALSE, TRUE );
+    clbUserline( Context.unum, -1, cbuf, FALSE, TRUE );
     cprintf(MSG_LIN2, 1, ALIGN_LEFT, "#%d#%s",
             NoColor,
             cbuf);
