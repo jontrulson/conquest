@@ -666,8 +666,6 @@ static char *build_toggle_str(char *snum_str, int snum)
     }
     else if (snum == DISPLAY_DOOMSDAY)          /* specials */
         strcpy(snum_str,doomsday_str);
-    else if (snum == DISPLAY_DEATHSTAR)
-        strcpy(snum_str,deathstar_str);
     else                                        /* should not get here */
         strcpy(snum_str,unknown_str);
 

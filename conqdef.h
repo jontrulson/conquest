@@ -300,7 +300,6 @@ typedef enum {
 
 /* Tokens for mcuPutThing(), must be negative */
 #define THING_EXPLOSION -1 	/* a torpedo explosion */
-#define THING_DEATHSTAR -2 	/* the Empire's new toy */
 
 /* Return values for utIsSpecial(). */
 #define NEAR_SHIP 1
@@ -500,13 +499,13 @@ typedef enum {
 #define MAX_UNINHAB_MINUTES 120	/* maximum time till inhabitable */
 
 				/* these are used to assign special
-				   ship numbers to represent non
-				   ships like the doomsday machine,
+				   ship numbers to represent non ships
+				   like the doomsday machine,
 				   deathstar, and any other watchable
-				   non-ship/planet items */
-#define SPECIAL_BASE (MAXSHIPS + NUMPLANETS + 1)
-#define DISPLAY_DOOMSDAY ((SPECIAL_BASE + 1) * -1)   /* doomsday machine num */
-#define DISPLAY_DEATHSTAR ((SPECIAL_BASE + 2) * -1)
+				   non-ship/planet items.  We start at
+				   -10 and go down for any new
+				   "devices" (-11, -12, etc). */
+#define DISPLAY_DOOMSDAY (-10)   /* doomsday machine num */
 
 /* JET - these were a bit high, 120 and 240 respectively. */
 #define MIN_COUP_MINUTES 10 	/* minimum time till coup in minutes */

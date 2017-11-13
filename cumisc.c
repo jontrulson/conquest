@@ -146,11 +146,6 @@ void mcuPutThing( int what, int lin, int col )
         strcpy(buf[1], "%%%%%") ;
         strcpy(buf[2], " %%% ") ;
         break;
-    case THING_DEATHSTAR:
-        strcpy(buf[0], "/===\\") ;
-        strcpy(buf[1], "===O=") ;
-        strcpy(buf[2], "\\===/") ;
-        break;
     default:
         strcpy(buf[0], " ??? ") ;
         strcpy(buf[1], "?????") ;
