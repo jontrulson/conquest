@@ -571,7 +571,6 @@ typedef enum {
    for an exploding ship */
 #define EXPLODESHIP_TORP_SPREAD   15.0
 
-#define NOWSIZE 8		/* size of now[] arrays */
 #define DEFAULT_USEREXPIRE 120	/* days after which to expire a user */
 #define SECS_PER_DAY (24 * 3600)
 
