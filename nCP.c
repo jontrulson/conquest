@@ -793,7 +793,7 @@ static void _dotorp(real dir, int num)
 static void _doinfo( char *buf, char ch )
 {
     int snum = Context.snum;
-    int i, j, what, sorpnum, xsorpnum, count, token, now[NOWSIZE];
+    int i, j, what, sorpnum, xsorpnum, count, token;
     int extra;
 
     if ( ch == TERM_ABORT )
@@ -2975,7 +2975,6 @@ static int nCPIdle(void)
 static int nCPInput(int ch)
 {
     int cf = ch;                      /* backup of ch for domacros() */
-    char c;
     int irv, tmsg, i;
     real tdir;
     real x;
@@ -3066,8 +3065,6 @@ static int nCPInput(int ch)
             ch = ibufGetc();
         }
     }
-
-    c = CQ_CHAR(ch);              /* strip off everything but the character */
 
     if (prompting)
     {

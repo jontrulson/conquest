@@ -2246,7 +2246,7 @@ void dohelp( void )
 void doinfo( int snum )
 {
     char ch;
-    int i, j, what, sorpnum, xsorpnum, count, token, now[NOWSIZE];
+    int i, j, what, sorpnum, xsorpnum, count, token;
     int extra;
 
     cdclrl( MSG_LIN1, 2 );

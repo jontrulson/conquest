@@ -1405,7 +1405,7 @@ void operate(void)
 /*    opinfo( snum ) */
 void opinfo( int snum )
 {
-    int i, j, now[NOWSIZE];
+    int i, j;
     char ch;
     char *pmt="Information on: ";
     char *huh="I don't understand.";

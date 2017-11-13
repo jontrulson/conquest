@@ -1822,9 +1822,6 @@ void clbInitGame(void)
 /*    initmsgs */
 void clbInitMsgs(void)
 {
-
-    int i;
-
     /* Zero the message buffer. */
     memset(Msgs, 0, MAXMESSAGES * sizeof(Msg_t));
 

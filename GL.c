@@ -1265,7 +1265,6 @@ void drawBombing(int snum, int scale)
 void drawPlanet( GLfloat x, GLfloat y, int pnum, int scale,
                  int textcolor )
 {
-    int what;
     GLfloat size;
     char buf[BUFFER_SIZE_256];
     char torpchar;
@@ -1299,8 +1298,6 @@ void drawPlanet( GLfloat x, GLfloat y, int pnum, int scale,
             norender = TRUE;
             return;                 /* we need to bail here... */
         }
-
-    what = Planets[pnum].type;
 
     glPushMatrix();
     glLoadIdentity();
@@ -1997,7 +1994,7 @@ void drawTorp(GLfloat x, GLfloat y,
               int scale, int snum, int torpnum)
 {
     static const GLfloat z = 1.0;
-    GLfloat size, sizeh;
+    GLfloat size;
     int steam = Ships[snum].team;
     GLfloat scaleFac = (scale == SCALE_FAC) ? dConf.vScaleSR : dConf.vScaleLR;
 
@@ -2031,8 +2028,6 @@ void drawTorp(GLfloat x, GLfloat y,
     else
         glRotatef((GLfloat)torpdir[snum][torpnum],
                   0.0, 0.0, z);  /* face firing angle */
-
-    sizeh = (size / 2.0);
 
     glBlendFunc(GL_SRC_ALPHA, GL_ONE);
     glEnable(GL_BLEND);
@@ -3343,7 +3338,6 @@ static char *_getTexFile(char *tfilenm)
 
 static int loadGLTextures()
 {
-    int status;
     int rv = FALSE;
     textureImage *texti;
     int i, type, components;         /* for RGBA */
@@ -3414,8 +3408,6 @@ static int loadGLTextures()
             }
             else if ((rv = LoadTGA(filenm, texti)) == TRUE)
             {
-                status = TRUE;
-
                 /* create the texture */
                 glGenTextures(1, (GLuint *)&curTexture.id);
                 glBindTexture(GL_TEXTURE_2D, curTexture.id);
