@@ -470,7 +470,7 @@ int main(int argc, char *argv[])
         if (!pbInitReplay(recFilename, NULL))
             exit(1);
 
-        Context.unum = MSG_GOD;       /* stow user number */
+        Context.unum = -1;       /* stow user number */
 
         /* turn off annoying beeps */
         UserConf.DoAlarms = FALSE;

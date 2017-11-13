@@ -394,7 +394,7 @@ int main(int argc, char *argv[])
         if (!pbInitReplay(recFilename, NULL))
             exit(1);
 
-        Context.unum = MSG_GOD;       /* stow user number */
+        Context.unum = -1;       /* stow user number */
         Context.snum = -1;           /* don't display in cdgetp - JET */
         Context.entship = FALSE;      /* never entered a ship */
         Context.histslot = -1;       /* useless as an op */
@@ -718,7 +718,7 @@ void command( int ch )
         doReviewMsgs( Context.snum );
         break;
     case 'm':				/* send a message */
-        cucSendMsg( Context.snum, UserConf.Terse,
+        cucSendMsg( MSG_FROM_SHIP, Context.snum, UserConf.Terse,
                     TRUE);
         break;
     case 'M':				/* strategic/tactical map */
@@ -1019,9 +1019,9 @@ void dead( int snum, int leave )
     cdrefresh();
 
     /* If something is wrong, don't do anything. */
-    if ( snum < 1 || snum > MAXSHIPS )
+    if ( snum < 0 || snum >= MAXSHIPS )
     {
-        utLog("dead: snum < 1 || snum > MAXSHIPS (%d)", snum);
+        utLog("dead: snum < 0 || snum >= MAXSHIPS (%d)", snum);
         return;
     }
 
@@ -1079,7 +1079,7 @@ void dead( int snum, int leave )
 
     case KB_SHIP:
         cbuf[0] = buf[0] = 0;
-        if ( detail > 0 && detail <= MAXSHIPS )
+        if ( detail >= 0 && detail < MAXSHIPS )
 	{
             utAppendShip(cbuf, detail) ;
             if ( Ships[detail].status != SS_LIVE )
@@ -1120,7 +1120,6 @@ void dead( int snum, int leave )
         buf[0] = 0;
         utAppendShip(buf , snum) ;
         sprintf(cbuf, "dead: %s was killed by %d.", buf, kb);
-        utError( cbuf );
         utLog(cbuf);
 
         cprintf(8,0,ALIGN_CENTER,"#%d#%s%s",
@@ -1211,7 +1210,7 @@ void dead( int snum, int leave )
         while ( ch != TERM_EXTRA ); /* until . while */
 
         /* now we just send a message */
-        sendMessage(MSG_GOD, buf);
+        sendMessage(MSG_TO_GOD, 0, buf);
     }
 
     /* set the ship reserved (locally).  The server has already done this
@@ -1997,7 +1996,7 @@ void docourse( int snum )
     switch ( what )
     {
     case NEAR_SHIP:
-        if ( sorpnum < 1 || sorpnum > MAXSHIPS )
+        if ( sorpnum < 0 || sorpnum >= MAXSHIPS )
 	{
             mcuPutMsg( "No such ship.", MSG_LIN2 );
             return;
@@ -2421,7 +2420,7 @@ void dophase( int snum )
 void doPlanetList( int snum )
 {
 
-    if (snum > 0 && snum <= MAXSHIPS)
+    if (snum >= 0 && snum < MAXSHIPS)
         mcuPlanetList( Ships[snum].team, snum );
     else		/* then use user team if user doen't have a ship yet */
         mcuPlanetList( Users[Context.unum].team, snum );
@@ -2947,12 +2946,12 @@ void menu(void)
                         cdbeep();
                     else
                     {
-                        for ( i = 1; i <= MAXSHIPS; i = i + 1 )
+                        for ( i = 0; i < MAXSHIPS; i++ )
                             if ( Ships[i].status == SS_LIVE ||
                                  Ships[i].status == SS_ENTERING )
                                 if ( Ships[i].unum == Context.unum )
                                     break;
-                        if ( i <= MAXSHIPS )
+                        if ( i < MAXSHIPS )
                             cdbeep();
                         else
                         {
@@ -3578,13 +3577,16 @@ void astservice(int sig)
         if ( difftime >= NEWMSG_GRAND )
             if ( utGetMsg( Context.snum, &Ships[Context.snum].lastmsg ) )
             {
-                if (mcuReadMsg( Context.snum, Ships[Context.snum].lastmsg,
+                if (mcuReadMsg( Ships[Context.snum].lastmsg,
                                 MSG_MSG ) == TRUE)
                 {
-                    if (Msgs[Ships[Context.snum].lastmsg].msgfrom !=
-                        Context.snum)
+                    if (!(Msgs[Ships[Context.snum].lastmsg].from == MSG_FROM_SHIP
+                          && (int)Msgs[Ships[Context.snum].lastmsg].fromDetail == Context.snum) )
+                    {
                         if (UserConf.MessageBell)
                             cdbeep();
+                    }
+
                     /* set both timers, regardless of which
                        one we're actally concerned with */
                     Context.msgrand = now;

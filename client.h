@@ -9,6 +9,8 @@
 
 #include "conqdef.h"
 
+#include "msg.h"
+
 #include "conqnet.h"
 #include "protocol.h"
 #include "packet.h"
@@ -72,7 +74,7 @@ int             sendSetCourse(int sock, int8_t lock, real head);
 int             sendSetName(char *name);
 int             sendCommand(uint8_t cmd, uint16_t detail);
 int             sendFireTorps(int num, real dir);
-int             sendMessage(int to, char *msg);
+int             sendMessage(msgTo_t to, uint16_t toDetail, char *msg);
 
 int             clientHello(char *clientname);
 

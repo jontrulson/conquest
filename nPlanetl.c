@@ -129,7 +129,7 @@ static int nPlanetlDisplay(dspConfig_t *dsp)
             pnum = sv[i];
 
             /* colorize - dwp */
-            if ( snum > 0 && snum <= MAXSHIPS)
+            if ( snum >= 0 && snum < MAXSHIPS)
             {	/* if user has a valid ship */
                 if ( Planets[pnum].team == Ships[snum].team && !selfwar(snum) )
                     outattr = GreenLevelColor;

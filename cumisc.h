@@ -7,7 +7,7 @@
 
 void mcuHistList( int godlike );
 void mcuPutThing( int what, int lin, int col );
-int  mcuReadMsg( int snum, int msgnum, int dsplin );
+int  mcuReadMsg( int msgnum, int dsplin );
 int  mcuKPAngle(int ch, real *angle);
 int  mcuKP2DirKey(int *ch);
 int  mcuConqLogo(void);

@@ -94,7 +94,8 @@ static int rftime;              /* last recording frame */
 static int refitst = 0;         /* currently selected shiptype */
 
 /* msg vars */
-static int msgto = 0;
+static msgTo_t msgto = MSG_TO_NOONE;
+static uint16_t msgtoDetail = 0;
 
 /* review msg vars */
 static int lstmsg;              /* saved last msg */
@@ -237,10 +238,10 @@ static void _infoship( int snum, int scanner )
     static real avgclose_rate, olddis = 0.0, oldclose_rate = 0.0;
     static int oldsnum = 0;
 
-    godlike = ( scanner < 1 || scanner > MAXSHIPS );
+    godlike = ( scanner < 0 || scanner >= MAXSHIPS );
 
     hudClearPrompt(MSG_LIN1);
-    if ( snum < 1 || snum > MAXSHIPS )
+    if ( snum < 0 || snum >= MAXSHIPS )
     {
         cp_putmsg( "No such ship.", MSG_LIN1 );
         return;
@@ -513,7 +514,7 @@ static void _infoplanet( char *str, int pnum, int snum )
     }
 
     /* GOD is too clever. */
-    godlike = ( snum < 1 || snum > MAXSHIPS );
+    godlike = ( snum < 0 || snum >= MAXSHIPS );
 
     /* In some cases, report hostilities. */
     junk[0] = 0;
@@ -867,7 +868,8 @@ static void rmesg(int snum, int msgnum, int lin)
 {
     char buf[MSGMAXLINE];
 
-    clbFmtMsg(Msgs[msgnum].msgto, Msgs[msgnum].msgfrom, buf);
+    clbFmtMsg(Msgs[msgnum].from, Msgs[msgnum].fromDetail,
+              Msgs[msgnum].to, Msgs[msgnum].toDetail, buf);
     strcat(buf , ": ");
     strcat(buf , Msgs[msgnum].msgbuf);
 
@@ -1154,7 +1156,8 @@ static void _domsgto(char *buf, int ch, int terse)
     char *nf="Not found.";
     char *huh="I don't understand.";
     int editing;
-    static int to = MSG_NOONE;
+    static msgTo_t to = MSG_TO_NOONE;
+    static uint16_t toDetail = 0;
 
     /* First, find out who we're sending to. */
     hudClearPrompt(MSG_LIN1);
@@ -1176,22 +1179,22 @@ static void _domsgto(char *buf, int ch, int terse)
     if ( editing )
     {
         /* Make up a default string using the last target. */
-        if ( to > 0 && to <= MAXSHIPS )
+        if ( to == MSG_TO_SHIP && toDetail < MAXSHIPS )
             sprintf( tbuf, "%d", to );
-        else if ( -to >= 0 && -to < NUMPLAYERTEAMS )
-            strcpy(tbuf , Teams[-to].name) ;
+        else if ( to == MSG_TO_TEAM && toDetail < NUMPLAYERTEAMS )
+            strcpy(tbuf , Teams[toDetail].name) ;
         else switch ( to )
              {
-             case MSG_ALL:
+             case MSG_TO_ALL:
                  strcpy(tbuf , "All") ;
                  break;
-             case MSG_GOD:
+             case MSG_TO_GOD:
                  strcpy(tbuf , "GOD") ;
                  break;
-             case MSG_IMPLEMENTORS:
+             case MSG_TO_IMPLEMENTORS:
                  strcpy(tbuf , "Implementors") ;
                  break;
-             case MSG_FRIENDLY:
+             case MSG_TO_FRIENDLY:
                  strcpy(tbuf , "Friend") ;
                  break;
              default:
@@ -1208,7 +1211,7 @@ static void _domsgto(char *buf, int ch, int terse)
         /* All digits means a ship number. */
         i = 0;
         utSafeCToI( &j, tbuf, i );		/* ignore status */
-        if ( j < 1 || j > MAXSHIPS )
+        if ( j < 0 || j >= MAXSHIPS )
 	{
             cp_putmsg( "No such ship.", MSG_LIN2 );
             hudClearPrompt(MSG_LIN1);
@@ -1224,34 +1227,43 @@ static void _domsgto(char *buf, int ch, int terse)
             prompting = FALSE;
             return;
 	}
-        to = j;
+        to = MSG_TO_SHIP;
+        toDetail = j;
     }
-    else switch ( tbuf[0] )
+    else
+    {
+        switch ( tbuf[0] )
          {
          case 'A':
          case 'a':
-             to = MSG_ALL;
+             to = MSG_TO_ALL;
+             toDetail = 0;
              break;
          case 'G':
          case 'g':
-             to = MSG_GOD;
+             to = MSG_TO_GOD;
+             toDetail = 0;
              break;
          case 'I':
          case 'i':
-             to = MSG_IMPLEMENTORS;
+             to = MSG_TO_IMPLEMENTORS;
+             toDetail = 0;
              break;
          default:
              /* check for 'Friend' */
              if (tbuf[0] == 'F' && tbuf[1] == 'R')
              {			/* to friendlies */
-                 to = MSG_FRIENDLY;
+                 to = MSG_TO_FRIENDLY;
+                 toDetail = 0;
              }
              else
              {
                  /* Check for a team character. */
                  for ( i = 0; i < NUMPLAYERTEAMS; i = i + 1 )
-                     if ( tbuf[0] == Teams[i].teamchar || tbuf[0] == (char)tolower(Teams[i].teamchar) )
+                     if ( tbuf[0] == Teams[i].teamchar
+                          || tbuf[0] == (char)tolower(Teams[i].teamchar) )
                          break;
+
                  if ( i >= NUMPLAYERTEAMS )
                  {
                      cp_putmsg( huh, MSG_LIN2 );
@@ -1260,14 +1272,16 @@ static void _domsgto(char *buf, int ch, int terse)
                      prompting = FALSE;
                      return;
                  }
-                 to = -i;
+                 to = MSG_TO_TEAM;
+                 toDetail = i;
              };
              break;
          }
+    }
 
     /* Now, construct a header for the selected target. */
     strcpy(tbuf , "Message to ") ;
-    if ( to > 0 && to <= MAXSHIPS )
+    if ( to == MSG_TO_SHIP && toDetail < MAXSHIPS )
     {
         if ( Ships[to].status != SS_LIVE )
 	{
@@ -1277,26 +1291,28 @@ static void _domsgto(char *buf, int ch, int terse)
             prompting = FALSE;
             return;
 	}
-        utAppendShip(tbuf , to) ;
-        utAppendChar(tbuf , ':');
+        utAppendShip(tbuf, (int)toDetail) ;
+        utAppendChar(tbuf, ':');
     }
-    else if ( -to >= 0 && -to < NUMPLAYERTEAMS )
+    else if ( to == MSG_TO_TEAM && toDetail < NUMPLAYERTEAMS )
     {
-        strcat(tbuf , Teams[-to].name);
+        strcat(tbuf , Teams[toDetail].name);
         strcat(tbuf , "s:");
     }
-    else switch ( to )
+    else
+    {
+        switch ( to )
          {
-         case MSG_ALL:
+         case MSG_TO_ALL:
              strcat(tbuf , "everyone:");
              break;
-         case MSG_GOD:
+         case MSG_TO_GOD:
              strcat(tbuf , "GOD:");
              break;
-         case MSG_IMPLEMENTORS:
+         case MSG_TO_IMPLEMENTORS:
              strcat(tbuf , "The Implementors:");
              break;
-         case MSG_FRIENDLY:
+         case MSG_TO_FRIENDLY:
              strcat(tbuf , "Friend:");
              break;
          default:
@@ -1304,6 +1320,7 @@ static void _domsgto(char *buf, int ch, int terse)
              return;
              break;
          }
+    }
 
     if (!terse)
         strcat(tbuf, " ([ESC] to abort)");
@@ -1312,6 +1329,7 @@ static void _domsgto(char *buf, int ch, int terse)
     hudClearPrompt(MSG_LIN2);
 
     msgto = to;                   /* set global */
+    msgtoDetail = toDetail;
 
     state = S_MSG;
     prm.preinit = FALSE;
@@ -1355,7 +1373,7 @@ static void _domsg(char *msg, int ch, int irv)
             sprintf(prm.buf, "%s%c", cptr, ch);
             hudSetPrompt(prm.index, prm.pbuf, NoColor, prm.buf, CyanColor);
 
-            sendMessage(msgto, mbuf);
+            sendMessage(msgto, msgtoDetail, mbuf);
         }
         else
         {
@@ -1366,7 +1384,7 @@ static void _domsg(char *msg, int ch, int irv)
             prm.buf[0] = ch;
             prm.buf[1] = 0;
             hudSetPrompt(prm.index, prm.pbuf, NoColor, prm.buf, CyanColor);
-            sendMessage(msgto, mbuf);
+            sendMessage(msgto, msgtoDetail, mbuf);
         }
 
         return;
@@ -1374,7 +1392,7 @@ static void _domsg(char *msg, int ch, int irv)
     else
     {                           /* ready or abort */
         if (ch != TERM_ABORT)
-            sendMessage(msgto, msg); /* just send it */
+            sendMessage(msgto, msgtoDetail, msg); /* just send it */
 
         state = S_NONE;
         prompting = FALSE;
@@ -1502,7 +1520,7 @@ static void _docourse( char *buf, char ch)
     switch ( what )
     {
     case NEAR_SHIP:
-        if ( sorpnum < 1 || sorpnum > MAXSHIPS )
+        if ( sorpnum < 0 || sorpnum >= MAXSHIPS )
 	{
             cp_putmsg( "No such ship.", MSG_LIN2 );
             return;
@@ -1629,7 +1647,7 @@ static void _doreview(void)
                                            reading old ones. */
 
     lastone = utModPlusOne( ConqInfo->lastmsg+1, MAXMESSAGES );
-    if ( snum > 0 && snum <= MAXSHIPS )
+    if ( snum >= 0 && snum < MAXSHIPS )
     {
         if ( Ships[snum].lastmsg == LMSG_NEEDINIT )
         {
@@ -2369,7 +2387,7 @@ static void command( int ch )
     break;
 
     case '?':				/* planet list */
-        if (Context.snum > 0 && Context.snum <= MAXSHIPS)
+        if (Context.snum >= 0 && Context.snum < MAXSHIPS)
             setONode(nPlanetlInit(DSP_NODE_CP, FALSE, Context.snum, Ships[Context.snum].team));
         else          /* then use user team if user doen't have a ship yet */
             setONode(nPlanetlInit(DSP_NODE_CP, FALSE, Context.snum, Users[Context.unum].team));
@@ -2478,7 +2496,7 @@ static void themes()
     /* go through each ship. */
 
     warlike = FALSE;
-    for ( i = 1; i <= MAXSHIPS; i++ )
+    for ( i = 0; i < MAXSHIPS; i++ )
     {
         int atwar = satwar(snum, i);
 
@@ -2894,10 +2912,13 @@ static int nCPIdle(void)
             if ( utGetMsg(Context.snum, &Ships[Context.snum].lastmsg))
             {
                 rmesg(Context.snum, Ships[Context.snum].lastmsg, MSG_MSG);
-                if (Msgs[Ships[Context.snum].lastmsg].msgfrom !=
-                    Context.snum)
+                // only beep if the message wasn't from us...
+                if (!(Msgs[Ships[Context.snum].lastmsg].from == MSG_FROM_SHIP
+                      && (int)Msgs[Ships[Context.snum].lastmsg].fromDetail == Context.snum) )
+                {
                     if (UserConf.MessageBell)
                         mglBeep(MGL_BEEP_MSG);
+                }
 
                 Context.msgrand = now;
             }

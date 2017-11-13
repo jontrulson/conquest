@@ -32,7 +32,7 @@ void cucPseudo( int unum, int snum )
 
     cdclrl( MSG_LIN1, 2 );
     strcpy(buf , "Old pseudonym: ") ;
-    if ( snum > 0 && snum <= MAXSHIPS )
+    if ( snum >= 0 && snum < MAXSHIPS )
         strcat(buf , Ships[snum].alias) ;
     else
         strcat(buf , Users[unum].alias) ;
@@ -146,10 +146,9 @@ void cucDoWar( int snum )
 
 }
 
-
 /* compose and send a message. If remote is true, we will use sendMessage,
    else stormsg (for local cb updates) */
-void cucSendMsg( int from, int terse, int remote )
+void cucSendMsg( msgFrom_t from, uint16_t fromDetail, int terse, int remote )
 {
     int i, j;
     char buf[MSGMAXLINE] = "", msg[MESSAGE_SIZE] = "";
@@ -162,7 +161,8 @@ void cucSendMsg( int from, int terse, int remote )
     int append_flg;  /* when user types to the limit. */
     int do_append_flg;
 
-    static int to = MSG_NOONE;
+    static msgTo_t to = MSG_TO_NOONE;
+    static uint16_t toDetail = 0;
 
     /* First, find out who we're sending to. */
     cdclrl( MSG_LIN1, 2 );
@@ -179,28 +179,38 @@ void cucSendMsg( int from, int terse, int remote )
     if ( editing )
     {
         /* Make up a default string using the last target. */
-        if ( to > 0 && to <= MAXSHIPS )
-            sprintf( buf, "%d", to );
-        else if ( -to >= 0 && -to < NUMPLAYERTEAMS )
-            strcpy(buf , Teams[-to].name) ;
-        else switch ( to )
-             {
-             case MSG_ALL:
-                 strcpy(buf , "All") ;
-                 break;
-             case MSG_GOD:
-                 strcpy(buf , "GOD") ;
-                 break;
-             case MSG_IMPLEMENTORS:
-                 strcpy(buf , "Implementors") ;
-                 break;
-             case MSG_FRIENDLY:
-                 strcpy(buf , "Friend") ;
-                 break;
-             default:
-                 buf[0] = 0;
-                 break;
+        if ( to == MSG_TO_SHIP && toDetail < MAXSHIPS )
+        {
+            sprintf( buf, "%d", toDetail );
+        }
+        else if ( to == MSG_TO_TEAM && toDetail >= 0
+                  && toDetail < NUMPLAYERTEAMS )
+        {
+            strcpy(buf , Teams[toDetail].name) ;
+        }
+        else
+        {
+            switch ( to )
+            {
+            case MSG_TO_ALL:
+                strcpy(buf , "All") ;
+                break;
+            case MSG_TO_GOD:
+                strcpy(buf , "GOD") ;
+                break;
+            case MSG_TO_IMPLEMENTORS:
+                strcpy(buf , "Implementors") ;
+                break;
+            case MSG_TO_FRIENDLY:
+                strcpy(buf , "Friend") ;
+                break;
+            default:
+                to = MSG_TO_NOONE;
+                toDetail = 0;
+                buf[0] = 0;
+                break;
              }
+        }
 
     }
 
@@ -212,7 +222,7 @@ void cucSendMsg( int from, int terse, int remote )
         /* All digits means a ship number. */
         i = 0;
         utSafeCToI( &j, buf, i );		/* ignore status */
-        if ( j < 1 || j > MAXSHIPS )
+        if ( j < 0 || j >= MAXSHIPS )
 	{
             mcuPutMsg( "No such ship.", MSG_LIN2 );
             return;
@@ -222,73 +232,84 @@ void cucSendMsg( int from, int terse, int remote )
             mcuPutMsg( nf, MSG_LIN2 );
             return;
 	}
-        to = j;
+        to = MSG_TO_SHIP;
+        toDetail = (uint16_t)j;
     }
-    else switch ( buf[0] )
-         {
-         case 'A':
-         case 'a':
-             to = MSG_ALL;
-             break;
-         case 'G':
-         case 'g':
-             to = MSG_GOD;
-             break;
-         case 'I':
-         case 'i':
-             to = MSG_IMPLEMENTORS;
-             break;
-         default:
-             /* check for 'Friend' */
-             if (buf[0] == 'F' && buf[1] == 'R')
-             {			/* to friendlies */
-                 to = MSG_FRIENDLY;
-             }
-             else
-             {
-                 /* Check for a team character. */
-                 for ( i = 0; i < NUMPLAYERTEAMS; i = i + 1 )
-                     if ( buf[0] == Teams[i].teamchar || buf[0] == (char)tolower(Teams[i].teamchar) )
-                         break;
-                 if ( i >= NUMPLAYERTEAMS )
-                 {
-                     mcuPutMsg( huh, MSG_LIN2 );
-                     return;
-                 }
-                 to = -i;
-             };
-             break;
-         }
+    else
+    {
+        switch ( buf[0] )
+        {
+        case 'A':
+        case 'a':
+            to = MSG_TO_ALL;
+            toDetail = 0;
+            break;
+        case 'G':
+        case 'g':
+            to = MSG_TO_GOD;
+            toDetail = 0;
+            break;
+        case 'I':
+        case 'i':
+            to = MSG_TO_IMPLEMENTORS;
+            toDetail = 0;
+            break;
+        default:
+            /* check for 'Friend' */
+            if (buf[0] == 'F' && buf[1] == 'R')
+            {			/* to friendlies */
+                to = MSG_TO_FRIENDLY;
+                toDetail = 0;
+            }
+            else
+            {
+                /* Check for a team character. */
+                for ( i = 0; i < NUMPLAYERTEAMS; i++ )
+                    if ( buf[0] == Teams[i].teamchar
+                         || buf[0] == (char)tolower(Teams[i].teamchar) )
+                        break;
+
+                if ( i >= NUMPLAYERTEAMS )
+                {
+                    mcuPutMsg( huh, MSG_LIN2 );
+                    return;
+                }
+                to = MSG_TO_TEAM;
+                toDetail = (uint16_t)i;
+            }
+            break;
+        }
+    }
 
     /* Now, construct a header for the selected target. */
     strcpy(buf , "Message to ") ;
-    if ( to > 0 && to <= MAXSHIPS )
+    if ( to == MSG_TO_SHIP && toDetail < MAXSHIPS )
     {
-        if ( Ships[to].status != SS_LIVE )
+        if ( Ships[toDetail].status != SS_LIVE )
 	{
             mcuPutMsg( nf, MSG_LIN2 );
             return;
 	}
-        utAppendShip(buf , to) ;
-        utAppendChar(buf , ':') ;
+        utAppendShip(buf, (int)toDetail) ;
+        utAppendChar(buf, ':') ;
     }
-    else if ( -to >= 0 && -to < NUMPLAYERTEAMS )
+    else if ( to == MSG_TO_TEAM && toDetail < NUMPLAYERTEAMS )
     {
-        strcat(buf , Teams[-to].name) ;
+        strcat(buf , Teams[toDetail].name) ;
         strcat(buf , "s:") ;
     }
     else switch ( to )
          {
-         case MSG_ALL:
+         case MSG_TO_ALL:
              strcat(buf , "everyone:") ;
              break;
-         case MSG_GOD:
+         case MSG_TO_GOD:
              strcat(buf , "GOD:") ;
              break;
-         case MSG_IMPLEMENTORS:
+         case MSG_TO_IMPLEMENTORS:
              strcat(buf , "The Implementors:") ;
              break;
-         case MSG_FRIENDLY:
+         case MSG_TO_FRIENDLY:
              strcat(buf , "Friend:") ;
              break;
          default:
@@ -306,10 +327,7 @@ void cucSendMsg( int from, int terse, int remote )
     if ( ! editing )
         msg[0] = 0;
 
-    if ( to == MSG_IMPLEMENTORS )
-        i = MSGMAXLINE;
-    else
-        i = MESSAGE_SIZE;
+    i = MESSAGE_SIZE;
 
     append_flg = TRUE;
     while (append_flg == TRUE) {
@@ -319,35 +337,37 @@ void cucSendMsg( int from, int terse, int remote )
         if ( cdgetp( ">", MSG_LIN2, 1, TERMS, msg, i,
                      &append_flg, do_append_flg, TRUE ) != TERM_ABORT )
         {
-            if ( to != MSG_IMPLEMENTORS )
+            if ( to != MSG_TO_IMPLEMENTORS )
             {
                 if (remote)		/* remotes don't send 'from' */
-                    sendMessage(to, msg);
-                else
-                    clbStoreMsg( from, to, msg ); /* conqoper */
+                    sendMessage(to, toDetail, msg);
+                else /* conqoper */
+                    clbStoreMsg( from, fromDetail, to, toDetail, msg );
             }
             else
             {
                 /* Handle a message to the Implementors. */
                 strcpy(buf , "Communique from ") ;
-                if ( from > 0 && from <= MAXSHIPS )
+                if ( from == MSG_FROM_SHIP && fromDetail < MAXSHIPS )
                 {
-                    strcat(buf , Ships[from].alias) ;
+                    strcat(buf , Ships[fromDetail].alias) ;
                     strcat(buf , " on board ") ;
-                    utAppendShip(buf , from) ;
+                    utAppendShip(buf , (int)fromDetail) ;
                 }
-                else if ( from == MSG_GOD )
+                else if ( from == MSG_FROM_GOD )
                     strcat(buf , "GOD") ;
                 else
                 {
                     utAppendChar(buf , '(') ;
-                    utAppendInt(buf , from) ;
+                    utAppendInt(buf , fromDetail) ;
                     utAppendChar(buf, ')');
                 }
                 if (remote)           /* remotes don't send 'from' */
-                    sendMessage(MSG_IMPLEMENTORS, msg);
-                else
-                    clbStoreMsg( from, MSG_IMPLEMENTORS, msg ); /* GOD == IMP (conqoper) */
+                    sendMessage(MSG_TO_IMPLEMENTORS, 0, msg);
+                else // GOD == IMP (conqoper) 
+                    clbStoreMsg( from, fromDetail,
+                                 MSG_TO_IMPLEMENTORS, 0, msg );
+
                 /* log it to the logfile too */
                 utLog("MSG: MESSAGE TO IMPLEMENTORS: %s: %s", buf, msg);
             }

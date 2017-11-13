@@ -229,7 +229,7 @@ void expire_users(void)
 #endif
 
             hasship = FALSE;
-            for (j=1; j <= MAXSHIPS; j++)
+            for (j=0; j < MAXSHIPS; j++)
 	    {
                 if (Ships[j].unum == i && Ships[j].status == SS_LIVE)
 		{

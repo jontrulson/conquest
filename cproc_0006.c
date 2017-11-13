@@ -93,7 +93,10 @@ int proc_0006_Ship(char *buf)
         return FALSE;
 
     snum = sship->snum;
-    if (snum <= 0 || snum > MAXSHIPS)
+// FIXME/CHECKME - is this (MAXSHIPS) logic orrect for the new world
+// order?  It will be in a new common block with 0-based MAXSHIP (and
+// eventually planets)...
+    if (snum <= 0 || snum > 20 /*MAXSHIPS*/)
         return FALSE;
 
 #if defined(DEBUG_CLIENTPROC)
@@ -443,8 +446,65 @@ int proc_0006_Message(char *buf)
 
 
     smsg->msg[70 /*MESSAGE_SIZE*/ - 1] = 0;
+
+    msgTo_t   realTo;
+    uint16_t  realToDetail;
+    msgFrom_t realFrom;
+    uint16_t  realFromDetail;
+
     smsg->from = (int)((int16_t)ntohs(smsg->from));
     smsg->to = (int)((int16_t)ntohs(smsg->to));
+
+    // From - convert to new order
+    /* >0: ship the message is from */
+    /* =0: from GOD */
+    /* <0: planet with intruder alert */
+    if (smsg->from > 0) // ship
+    {
+        realFrom = MSG_FROM_SHIP;
+        realFromDetail = (uint16_t)smsg->from;
+        realFromDetail--; // compensate for 0-based ships[] in current version
+    }
+    else if (smsg->from == 0) // god
+    {
+        realFrom = MSG_FROM_GOD;
+        realFromDetail = 0;
+    }
+    else if (smsg->from < 0) // planet
+    {
+        realFrom = MSG_FROM_PLANET;
+        realFromDetail = (uint16_t)(smsg->from * -1);
+        // FIXME, compensate when MAXPLANETS work done
+        // realFromDetail--;
+    }
+    else
+    {
+        // don't know what it is.  log it and ignore it
+        utLog("%s: unrecognized from: (%d)", __FUNCTION__, smsg->from);
+        return TRUE;
+    }
+
+    // To - convert to new order
+    /* >0: ship the message is to */
+    /* <=0: team the message is to */
+
+    if (smsg->to > 0) // ship
+    {
+        realTo = MSG_TO_SHIP;
+        realToDetail = (uint16_t)smsg->to;
+        realToDetail--; // compensate for 0-based MAXSHIPS
+    }
+    else if (smsg->to <= 0) // team
+    {
+        realTo = MSG_TO_TEAM;
+        realToDetail = (uint16_t)(smsg->to * -1);
+    }
+    else
+    {
+        // don't know what it is.  log it and ignore it
+        utLog("%s: unrecognized to: (%d)", __FUNCTION__, smsg->to);
+        return TRUE;
+    }
 
     /* special handling when playing back a recording */
     /* if we aren't interested in robot msgs, skip it */
@@ -452,9 +512,11 @@ int proc_0006_Message(char *buf)
         ((smsg->flags & MSG_FLAGS_ROBOT) && !UserConf.NoRobotMsgs))
     {
         memset((void *)&recMsg, 0, sizeof(Msg_t));
-        strncpy(recMsg.msgbuf, (char *)smsg->msg, MESSAGE_SIZE);
-        recMsg.msgfrom = (int)smsg->from;
-        recMsg.msgto = (int)smsg->to;
+        strncpy(recMsg.msgbuf, (char *)smsg->msg, 70 /*MESSAGE_SIZE*/);
+        recMsg.from = realFrom;
+        recMsg.fromDetail = realFromDetail;
+        recMsg.to = realTo;
+        recMsg.toDetail = realToDetail;
         recMsg.flags = smsg->flags;
     }
     return TRUE;

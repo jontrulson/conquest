@@ -87,7 +87,7 @@ static int nShiplDisplay(dspConfig_t *dsp)
     i = fship;
 
     lin = fline - 1;
-    while ( i <= MAXSHIPS && lin <= lline )
+    while ( i < MAXSHIPS && lin <= lline )
     {
         status = Ships[i].status;
 
@@ -127,7 +127,7 @@ static int nShiplDisplay(dspConfig_t *dsp)
                 utAppendKilledBy(cbuf, kb, detail) ;
             }
 
-            if (snum > 0 && snum <= MAXSHIPS )
+            if (snum >= 0 && snum < MAXSHIPS )
             {		/* a normal ship view */
                 if ( i == snum )    /* it's ours */
                     color = NoColor | CQC_A_BOLD;

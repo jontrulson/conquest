@@ -15,6 +15,7 @@
 #include "conf.h"
 #include "server.h"
 #include "serverpkt.h"
+#include "servercmd.h"
 #include "context.h"
 #include "record.h"
 #include "conqlb.h"
@@ -40,7 +41,7 @@ void procSetName(char *buf)
 
     strncpy(Users[Context.unum].alias, (char *)cpsetn->alias, MAXUSERPNAME);
 
-    if (Context.snum > 0 && Context.snum <= MAXSHIPS)
+    if (Context.snum >= 0 && Context.snum < MAXSHIPS)
         strncpy(Ships[Context.snum].alias, (char *)cpsetn->alias, MAXUSERPNAME);
 
     return;
@@ -379,9 +380,11 @@ void procDistress(cpCommand_t *cmd)
     }
 
     if (tofriendly)
-        clbStoreMsg( snum, MSG_FRIENDLY, cbuf );
+        clbStoreMsg( MSG_FROM_SHIP, (uint16_t)snum, MSG_TO_FRIENDLY, 0,
+                     cbuf );
     else
-        clbStoreMsg( snum, -Ships[snum].team, cbuf );
+        clbStoreMsg( MSG_FROM_SHIP, (uint16_t)snum,
+                     MSG_TO_TEAM, Ships[snum].team, cbuf );
 
     return;
 
@@ -663,9 +666,10 @@ void procFireTorps(char *buf)
 
 void procMessage(char *buf)
 {
-    int snum = Context.snum;		/* we always use our own ship */
+    uint16_t snum = (uint16_t)Context.snum; /* we always use our own ship */
     cpMessage_t *cmsg = (cpMessage_t *)buf;
-    int to;
+    msgTo_t to;
+    uint16_t toDetail;
 
     if (sInfo.state != SVR_STATE_PLAY)
         return;
@@ -673,15 +677,20 @@ void procMessage(char *buf)
     if (!pktIsValid(CP_MESSAGE, cmsg))
         return;
 
-    to = (int16_t)ntohs(cmsg->to);
+    // bogus 'to' enum?
+    if ((int)cmsg->to >= MSG_TO_MAX)
+        return;
+
+    to = (msgTo_t)cmsg->to;
+    toDetail = ntohs(cmsg->toDetail);
     cmsg->msg[MESSAGE_SIZE - 1] = 0;
 
 #if defined(DEBUG_SERVERPROC)
-    utLog("PROC MESSAGE: to %d", to);
+    utLog("PROC MESSAGE: to %d(%d)", to, (int)toDetail);
 #endif
 
-    clbStoreMsg(snum, to, (char *)cmsg->msg);
-    checkOperExec(snum, to, (char *)cmsg->msg);
+    clbStoreMsg(MSG_FROM_SHIP, snum, to, toDetail, (char *)cmsg->msg);
+    checkOperExec(MSG_FROM_SHIP, snum, to, toDetail, (char *)cmsg->msg);
 
     return;
 }
@@ -896,7 +905,7 @@ void procTow(cpCommand_t *cmd)
     }
     cbuf[0] = 0;
     PVLOCK(&ConqInfo->lockword);
-    if ( other < 1 || other > MAXSHIPS )
+    if ( other < 0 || other >= MAXSHIPS )
         strcpy(cbuf , "No such ship.") ;
     else if ( Ships[other].status != SS_LIVE )
         strcpy(cbuf , "Not found.") ;
@@ -1597,7 +1606,7 @@ void procDestruct(cpCommand_t *cmd)
                   Doomsday->x, Doomsday->y) <= DOOMSDAY_KILL_DIST )
 	{
             Doomsday->status = DS_OFF;
-            clbStoreMsg( MSG_DOOM, MSG_ALL, "AIEEEEEEEE!" );
+            clbStoreMsg( MSG_FROM_DOOM, 0, MSG_TO_ALL, 0, "AIEEEEEEEE!" );
             clbKillShip( Context.snum, KB_GOTDOOMSDAY, 0 );
 	}
         else

@@ -223,7 +223,8 @@ static int nPlayBDisplay(dspConfig_t *dsp)
 
     if (recMsg.msgbuf[0])
     {
-        clbFmtMsg(recMsg.msgto, recMsg.msgfrom, buf);
+        clbFmtMsg(recMsg.from, recMsg.fromDetail,
+                  recMsg.to, recMsg.toDetail, buf);
         strcat(buf , ": ") ;
         strcat(buf , recMsg.msgbuf) ;
 
@@ -302,7 +303,7 @@ static int nPlayBInput(int ch)
                 utSafeCToI( &tmpsnum, prm.buf, 0 );     /* ignore return status */
             }
 
-            if ( (tmpsnum < 1 || tmpsnum > MAXSHIPS) &&
+            if ( (tmpsnum < 0 || tmpsnum >= MAXSHIPS) &&
                  tmpsnum != DISPLAY_DOOMSDAY )
             {
                 state = S_NONE;
@@ -470,7 +471,7 @@ static int nPlayBInput(int ch)
                    infinite loop will result... */
                 int foundone = FALSE;
 
-                for (i=1; i <= MAXSHIPS; i++)
+                for (i=0; i < MAXSHIPS; i++)
                 {
                     if (clbStillAlive(i))
                     {
@@ -493,12 +494,12 @@ static int nPlayBInput(int ch)
 
             if (snum == DISPLAY_DOOMSDAY)
             {	  /* doomsday - wrap around to first ship */
-                i = 1;
+                i = 0;
             }
             else
                 i = snum + 1;
 
-            if (i > MAXSHIPS)
+            if (i >= MAXSHIPS)
             {	/* if we're going past
                    now loop thu specials (only doomsday for
                    now... ) */
@@ -510,7 +511,7 @@ static int nPlayBInput(int ch)
             Context.redraw = TRUE;
 
             if (live_ships)
-                if ((snum > 0 && clbStillAlive(snum)) ||
+                if ((snum >= 0 && clbStillAlive(snum)) ||
                     (snum == DISPLAY_DOOMSDAY && Doomsday->status == DS_LIVE))
                 {
                     Context.snum = snum;
@@ -539,7 +540,7 @@ static int nPlayBInput(int ch)
                    infinite loop will result... */
                 int foundone = FALSE;
 
-                for (i=1; i <= MAXSHIPS; i++)
+                for (i=0; i < MAXSHIPS; i++)
                 {
                     if (clbStillAlive(i))
                     {
@@ -563,7 +564,7 @@ static int nPlayBInput(int ch)
 
             if (snum == DISPLAY_DOOMSDAY)
             {	  /* doomsday - wrap around to last ship */
-                i = MAXSHIPS;
+                i = MAXSHIPS - 1;
             }
             else
                 i = snum - 1;
@@ -580,7 +581,7 @@ static int nPlayBInput(int ch)
             Context.redraw = TRUE;
 
             if (live_ships)
-                if ((snum > 0 && clbStillAlive(snum)) ||
+                if ((snum >= 0 && clbStillAlive(snum)) ||
                     (snum == DISPLAY_DOOMSDAY && Doomsday->status == DS_LIVE))
                 {
                     Context.snum = snum;

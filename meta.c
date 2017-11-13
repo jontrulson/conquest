@@ -264,7 +264,7 @@ int metaUpdateServer(char *remotehost, char *name, int port)
     memset((void *)&sRec, 0, sizeof(metaSRec_t));
 
     /* count ships */
-    for ( i = 1; i <= MAXSHIPS; i++ )
+    for ( i = 0; i < MAXSHIPS; i++ )
     {
         if ( Ships[i].status == SS_LIVE )
         {

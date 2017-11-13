@@ -14,6 +14,9 @@
 /*    purpose. It is provided "as is" without express or implied warranty. */
 
 
+#define NOEXTERN_CONQCOM
+#include "conqcom.h"		/* common block vars defined here */
+
 #include "global.h"
 #include "conqdef.h"
 #include "conqlb.h"
@@ -24,8 +27,6 @@
 # include <sys/mman.h>
 #endif
 
-#define NOEXTERN_CONQCOM
-#include "conqcom.h"		/* common block vars defined here */
 #include "context.h"		/* some extra stuff */
 #include "user.h"
 #include "sem.h"
@@ -299,7 +300,7 @@ static void map_vars(void)
 
     map1d(Driver, Driver_t, 1);
 
-    map1d(Ships, Ship_t, MAXSHIPS + 1);
+    map1d(Ships, Ship_t, MAXSHIPS);
 
     map1d(ShipTypes, ShipType_t, MAXNUMSHIPTYPES);
 

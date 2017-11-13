@@ -62,7 +62,7 @@ void display( int snum )
 
     dis = 0;
 
-    if (snum > 0)
+    if (snum >= 0)
         lsmap = SMAP(snum);
     else
         lsmap = FALSE;
@@ -109,15 +109,15 @@ void display( int snum )
 
         palertcol = 0;
         /* determine alertlevel for object */
-        if (snum > 0 && clbSPWar( snum, i ) && Planets[i].scanned[Ships[snum].team])
+        if (snum >= 0 && clbSPWar( snum, i ) && Planets[i].scanned[Ships[snum].team])
 	{
             palertcol = RedLevelColor;
 	}
-        else if (snum > 0 && Planets[i].team == Ships[snum].team && !selfwar(snum))
+        else if (snum >= 0 && Planets[i].team == Ships[snum].team && !selfwar(snum))
 	{
             palertcol = GreenLevelColor;
 	}
-        else if ( snum > 0 && Planets[i].team == TEAM_SELFRULED &&
+        else if ( snum >= 0 && Planets[i].team == TEAM_SELFRULED &&
                   Planets[i].scanned[Ships[snum].team])
             palertcol = CyanColor;
         else
@@ -145,7 +145,7 @@ void display( int snum )
     }
 
     /* Display the ships. */
-    for ( i = 1; i <= MAXSHIPS; i = i + 1 )
+    for ( i = 0; i < MAXSHIPS; i++ )
         if ( Ships[i].status != SS_OFF )
         {
             if (UserConf.DoLRTorpScan)
@@ -153,7 +153,7 @@ void display( int snum )
                 /* Display the torps on a LR scan if it's a friend (or you). */
                 if (lsmap)
                 {
-                    if (snum > 0 && ((snum == i) ||
+                    if (snum >= 0 && ((snum == i) ||
                                      (Ships[snum].war[Ships[i].team] == FALSE &&
                                       Ships[i].war[Ships[snum].team] == FALSE)) )
                     {
@@ -174,7 +174,7 @@ void display( int snum )
             if ( Ships[i].status == SS_LIVE )
             {
                 /* It's alive. */
-                if ( snum > 0)	/* it's a ship view */
+                if ( snum >= 0)	/* it's a ship view */
                 {
                     dis = (real) dist(Ships[snum].x, Ships[snum].y, Ships[i].x, Ships[i].y );
 
@@ -223,7 +223,7 @@ void display( int snum )
                     if (snum != i)
                         clbAdjOrbitalPosition(i);
 
-                }	/* if a ship view (snum > 0) */
+                }	/* if a ship view (snum >= 0) */
 
                 /* There is potential for un-cloaked ships and ourselves. */
                 if ( ! SCLOAKED(i) || i == snum )
@@ -243,18 +243,18 @@ void display( int snum )
                         /*  - He's within accurate scanning range */
 
                         if ( ( ! lsmap && SSCANDIST(i)) ||
-                             ( snum > 0 && !satwar(i, snum) ) ||
-                             ( snum > 0 && Ships[i].scanned[Ships[snum].team] &&
+                             ( snum >= 0 && !satwar(i, snum) ) ||
+                             ( snum >= 0 && Ships[i].scanned[Ships[snum].team] &&
                                !selfwar(snum) ) ||
                              ( dis <= ACCINFO_DIST ) )
                         {
-                            if ( snum > 0 && ( i == snum ) && SCLOAKED(snum) )
+                            if ( snum >= 0 && ( i == snum ) && SCLOAKED(snum) )
                                 ch = CHAR_CLOAKED;
                             else
                                 ch = Teams[Ships[i].team].teamchar;
 
                             /* determine color */
-                            if (snum > 0)
+                            if (snum >= 0)
                             {
                                 if (i == snum)    /* it's ours */
                                     color = CQC_A_BOLD;
@@ -280,10 +280,10 @@ void display( int snum )
 
     /* now the torps for each ship.  we do this after the ships are drawn so
        blending of explosions works on the ships. */
-    for ( i = 1; i <= MAXSHIPS; i = i + 1 )
+    for ( i = 0; i < MAXSHIPS; i++ )
     {
         /* explosions first */
-        if ( snum < 0 || (snum > 0 && UserConf.DoExplode) ) /* dwp */
+        if ( snum < 0 || (snum >= 0 && UserConf.DoExplode) ) /* dwp */
             for ( j = 0; j < MAXTORPS; j = j + 1 )
                 if ( Ships[i].torps[j].status == TS_FIREBALL )
                 {
@@ -312,7 +312,7 @@ void display( int snum )
 
     /* Figure out the ship's current alert status, and the ship causing the
      *  alert, if needed */
-    if (snum > 0)
+    if (snum >= 0)
     {				/* if a ship view */
         if ( minenemy != 0 || STALERT(snum) )
 	{
@@ -364,7 +364,7 @@ void display( int snum )
     hudSetAlertStatus(snum, minenemy, AlertLevel);
 
     /* Build and display the status info as necessary. */
-    if (snum > 0)
+    if (snum >= 0)
     {                           /* we're watching a ship - dwp */
         /* Shields.
          * this will set dobeep if the shields dropped in power since last

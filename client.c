@@ -148,7 +148,7 @@ int sendFireTorps(int num, real dir)
 }
 
 /* send a message */
-int sendMessage(int to, char *msg)
+int sendMessage(msgTo_t to, uint16_t toDetail, char *msg)
 {
     cpMessage_t cmsg;
 
@@ -157,7 +157,8 @@ int sendMessage(int to, char *msg)
 
     memset((void *)&cmsg, 0, sizeof(cpMessage_t));
     cmsg.type = CP_MESSAGE;
-    cmsg.to = (int16_t)htons(to);
+    cmsg.to = (uint8_t)to;
+    cmsg.toDetail = htons(toDetail);
     strncpy((char *)cmsg.msg, msg, MESSAGE_SIZE - 1);
 
     if (pktWrite(PKT_SENDTCP, &cmsg) <= 0)
@@ -397,7 +398,7 @@ spClientStat_t *chkClientStat(char *buf)
         return NULL;
     }
 
-    if (scstat.snum < 1 || scstat.snum > MAXSHIPS)
+    if (scstat.snum < 0 || scstat.snum >= MAXSHIPS)
     {
 #if defined(DEBUG_PKT)
         utLog("%s: snum not in valid range", __FUNCTION__);

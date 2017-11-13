@@ -272,7 +272,7 @@ int main(int argc, char *argv[])
     map_common();			/* Map the conquest universe common block */
     cdinit();			/* initialize display environment */
 
-    Context.unum = MSG_GOD;	/* stow user number */
+    Context.unum = -1;          /* stow user number */
     Context.snum = -1;		/* don't display in cdgetp - JET */
     Context.entship = FALSE;	/* never entered a ship */
     Context.histslot = -1;	/* useless as an op */
@@ -287,7 +287,7 @@ int main(int argc, char *argv[])
     sprintf(msgbuf, "OPER: User %s has entered conqoper.",
             operName);
     utLog(msgbuf);			/* log it too... */
-    clbStoreMsg( MSG_COMP, MSG_GOD, msgbuf );
+    clbStoreMsg( MSG_FROM_COMP, 0, MSG_TO_GOD, 0, msgbuf );
 
     operate();
 
@@ -308,7 +308,7 @@ void bigbang(void)
 
     dir = 0.0;
     cnt = 0;
-    for ( snum = 1; snum <= MAXSHIPS; snum = snum + 1 )
+    for ( snum = 0; snum < MAXSHIPS; snum++ )
         if ( Ships[snum].status == SS_LIVE )
         {
             for ( i = 0; i < MAXTORPS; i = i + 1 )
@@ -896,7 +896,7 @@ void kiss(int snum, int prompt_flg)
     {
         i = 0;
         utSafeCToI( &snum, buf, i );		/* ignore status */
-        if ( snum < 1 || snum > MAXSHIPS )
+        if ( snum < 0 || snum >= MAXSHIPS )
             cdputs( no_ship_str, MSG_LIN2, 1 );
         else if ( Ships[snum].status != SS_LIVE ) {
             cdclrl( MSG_LIN1, 1 );
@@ -931,7 +931,7 @@ void kiss(int snum, int prompt_flg)
     if ( utStringMatch( buf, "all", FALSE ) )
     {
         didany = FALSE;
-        for ( snum = 1; snum <= MAXSHIPS; snum++ )
+        for ( snum = 0; snum < MAXSHIPS; snum++ )
             if ( Ships[snum].status == SS_LIVE )
             {
                 didany = TRUE;
@@ -966,7 +966,7 @@ void kiss(int snum, int prompt_flg)
 
     /* Yes. */
     didany = FALSE;
-    for ( snum = 1; snum <= MAXSHIPS; snum++ )
+    for ( snum = 0; snum < MAXSHIPS; snum++ )
         if ( Ships[snum].status == SS_LIVE )
             if ( Ships[snum].unum == unum )
             {
@@ -1215,9 +1215,9 @@ void operate(void)
             /* Display a new message, if any. */
             readone = FALSE;
             if ( utDeltaGrand( msgrand, &now ) >= NEWMSG_GRAND )
-                if ( utGetMsg( MSG_GOD, &ConqInfo->glastmsg ) )
+                if ( utGetMsg( -1, &ConqInfo->glastmsg ) )
                 {
-                    mcuReadMsg( MSG_GOD, ConqInfo->glastmsg, MSG_MSG );
+                    mcuReadMsg( ConqInfo->glastmsg, MSG_MSG );
 
 #if defined(OPER_MSG_BEEP)
                     if (Msgs[ConqInfo->glastmsg].msgfrom != MSG_GOD)
@@ -1308,7 +1308,7 @@ void operate(void)
             redraw = TRUE;
             break;
 	case 'i':
-            opinfo( MSG_GOD );
+            opinfo( -1 );
             break;
 	case 'I':
             opinit();
@@ -1318,10 +1318,10 @@ void operate(void)
             kiss(0,TRUE);
             break;
 	case 'L':
-            mcuReviewMsgs( MSG_GOD, ConqInfo->glastmsg );
+            mcuReviewMsgs( -1 /*god*/, ConqInfo->glastmsg );
             break;
 	case 'm':
-            cucSendMsg( MSG_GOD, TRUE, FALSE );
+            cucSendMsg( MSG_FROM_GOD, 0, TRUE, FALSE );
             break;
 	case 'O':
             SysOptsMenu();
@@ -2933,9 +2933,9 @@ void watch(void)
 	    /* Try to display a new message. */
 	    readone = FALSE;
 	    if ( utDeltaGrand( msgrand, &now ) >= NEWMSG_GRAND )
-		if ( utGetMsg( MSG_GOD, &ConqInfo->glastmsg ) )
+		if ( utGetMsg( -1, &ConqInfo->glastmsg ) )
                 {
-		    mcuReadMsg( MSG_GOD, ConqInfo->glastmsg, MSG_MSG );
+		    mcuReadMsg( ConqInfo->glastmsg, MSG_MSG );
 #if defined(OPER_MSG_BEEP)
 		    if (Msgs[ConqInfo->glastmsg].msgfrom != MSG_GOD)
                         cdbeep();
@@ -2978,7 +2978,7 @@ void watch(void)
                 operSetTimer();
                 break;
             case 'i':
-                opinfo( MSG_GOD );
+                opinfo( -1 );
                 break;
             case 'k':
                 kiss(Context.snum, TRUE);
@@ -2991,13 +2991,13 @@ void watch(void)
 
                 break;
             case 'm':
-                cucSendMsg( MSG_GOD, TRUE, FALSE );
+                cucSendMsg( MSG_FROM_GOD, 0, TRUE, FALSE );
                 break;
             case 'r':  /* just for fun - dwp */
                 oprobot();
                 break;
             case 'L':
-                mcuReviewMsgs( MSG_GOD, ConqInfo->glastmsg );
+                mcuReviewMsgs( -1 /*god*/, ConqInfo->glastmsg );
                 break;
             case 0x0c:
                 operStopTimer();
@@ -3036,7 +3036,7 @@ void watch(void)
 		    live_ships = TRUE;
                 break;
             case '`':                 /* toggle between two ships */
-                if (normal || (!normal && old_snum > 0))
+                if (normal || (!normal && old_snum >= 0))
                 {
                     if (old_snum != snum)
                     {
@@ -3058,7 +3058,7 @@ void watch(void)
 		    cdbeep();
                 break;
             case '~':                 /* toggle debug display */
-                if (Context.snum > 0)
+                if (Context.snum >= 0)
                 {
                     if (normal)
 			normal = FALSE;
@@ -3101,7 +3101,7 @@ void watch(void)
                            infinite loop will result... */
                         int foundone = FALSE;
 
-                        for (i=1; i <= MAXSHIPS; i++)
+                        for (i=0; i<MAXSHIPS; i++)
                         {
                             if (clbStillAlive(i))
                             {
@@ -3124,19 +3124,19 @@ void watch(void)
 
                     if (snum == DISPLAY_DOOMSDAY)
                     {	  /* doomsday - wrap around to first ship */
-                        i = 1;
+                        i = 0;
                     }
                     else
 			i = snum + 1;
 
-                    if (i > MAXSHIPS)
+                    if (i >= MAXSHIPS)
                     {	/* if we're going past
                            now loop thu specials (only doomsday for
                            now... ) */
                         if (normal)
 			    i = DISPLAY_DOOMSDAY;
                         else
-			    i = 1;
+			    i = 0;
                     }
 
                     snum = i;
@@ -3144,7 +3144,7 @@ void watch(void)
                     Context.redraw = TRUE;
 
                     if (live_ships)
-			if ((snum > 0 && clbStillAlive(snum)) ||
+			if ((snum >= 0 && clbStillAlive(snum)) ||
 			    (snum == DISPLAY_DOOMSDAY && Doomsday->status == DS_LIVE))
                         {
 			    Context.snum = snum;
@@ -3178,7 +3178,7 @@ void watch(void)
                            infinite loop will result... */
                         int foundone = FALSE;
 
-                        for (i=1; i <= MAXSHIPS; i++)
+                        for (i=0; i < MAXSHIPS; i++)
                         {
                             if (clbStillAlive(i))
                             {
@@ -3202,19 +3202,19 @@ void watch(void)
 
                     if (snum == DISPLAY_DOOMSDAY)
                     {	  /* doomsday - wrap around to last ship */
-                        i = MAXSHIPS;
+                        i = MAXSHIPS - 1;
                     }
                     else
 			i = snum - 1;
 
-                    if (i <= 0)
+                    if (i < 0)
                     {	/* if we're going past
                            now loop thu specials (only doomsday for
                            now... )*/
                         if (normal)
 			    i = DISPLAY_DOOMSDAY;
                         else
-			    i = MAXSHIPS;
+			    i = MAXSHIPS - 1;
                     }
 
                     snum = i;
@@ -3222,7 +3222,7 @@ void watch(void)
                     Context.redraw = TRUE;
 
                     if (live_ships)
-			if ((snum > 0 && clbStillAlive(snum)) ||
+			if ((snum >= 0 && clbStillAlive(snum)) ||
 			    (snum == DISPLAY_DOOMSDAY && Doomsday->status == DS_LIVE))
                         {
 			    Context.snum = snum;
@@ -3307,7 +3307,7 @@ int prompt_ship(char buf[], int *snum, int *normal)
         utSafeCToI( &tmpsnum, buf, 0 );	/* ignore return status */
     }
 
-    if ( (tmpsnum < 1 || tmpsnum > MAXSHIPS) && tmpsnum != DISPLAY_DOOMSDAY )
+    if ( (tmpsnum < 0 || tmpsnum >= MAXSHIPS) && tmpsnum != DISPLAY_DOOMSDAY )
     {
         cdputs( nss, MSG_LIN2, 1 );
         cdmove( 1, 1 );
@@ -3414,13 +3414,13 @@ char *build_toggle_str(char *snum_str, int snum)
     static char *deathstar_str = "DS";
     static char *unknown_str = "n/a";
 
-    if (snum > 0 && snum <= MAXSHIPS)
+    if (snum >= 0 && snum < MAXSHIPS)
     {          /* ship */
         sprintf(snum_str,"%c%d", Teams[Ships[snum].team].teamchar, snum);
     }
     else if (snum < 0 && -snum <= NUMPLANETS)
     {  /* planet */
-
+//FIXME - broken logic with MAXSHIPS rework...?
         sprintf(snum_str, "%c%c%c",
                 Planets[-snum].name[0],
                 Planets[-snum].name[1],

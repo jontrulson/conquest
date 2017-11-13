@@ -51,7 +51,7 @@
 /*#define COMMONSTAMP 20001231 		 stardate? */
 /*#define COMMONSTAMP 20030829 */
 // #define COMMONSTAMP 20101027
-#define COMMONSTAMP 20171110
+#define COMMONSTAMP 20171112
 
 #ifndef PI
 # define PI 3.141592654
@@ -109,7 +109,6 @@ typedef enum {
 
 #define REFIT_GRAND 10000       /* hunderths to complete a refit */
 
-#define NUMALLTEAMS 8 		/* total number of teams */
 #define MAXTEAMNAME 12
 
 #define TEAM_UPDATE_INTERVAL 60	/* update client team data every x seconds */
@@ -125,6 +124,8 @@ typedef enum {
 #define TEAM_NOTEAM 5
 #define TEAM_GOD 6
 #define TEAM_EMPIRE 7
+
+#define NUMALLTEAMS 8 		/* total number of teams */
 
 #define MAXPLANETTYPES 8 	/* number of different planet types */
 #define MAXPTYPENAME 20 		/* maximum size of a planet type's name */
@@ -272,16 +273,7 @@ typedef enum {
 
 #define DATESIZE 20 		/* hh:mm:ss ddmmmyy */
 #define MAXMESSAGES 60 		/* maximum number of messages */
-#define MESSAGE_SIZE 70		/* maximum size of messages */
 #define MSGMAXLINE 90 		/* maximum size for formatting messages */
-#define MSG_ALL -100 		/* message to everyone */
-#define MSG_NOONE -101		/* message from/to no one */
-#define MSG_GOD -102 		/* message from/to GOD */
-#define MSG_DOOM -103 		/* message from the planet eater */
-#define MSG_OUTSIDE -104 	/* message from the outside world */
-#define MSG_IMPLEMENTORS -105 	/* message to the implementors */
-#define MSG_COMP -106 		/* message from the ship's computer */
-#define MSG_FRIENDLY -107	/* message to friendly ships */
 
 /* Tokens for slastmsg(), must be negative. */
 #define LMSG_NEEDINIT -1 	/* need to initialize slastmsg */

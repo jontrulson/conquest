@@ -26,17 +26,17 @@
 */
 
 /* packet send */
-static spShip_t pktShip[MAXSHIPS + 1];
-static spShipSml_t pktShipSml[MAXSHIPS + 1];
-static spShipLoc_t pktShipLoc[MAXSHIPS + 1];
+static spShip_t pktShip[MAXSHIPS];
+static spShipSml_t pktShipSml[MAXSHIPS];
+static spShipLoc_t pktShipLoc[MAXSHIPS];
 static spPlanet_t pktPlanet[NUMPLANETS + 1];
 static spPlanetSml_t pktPlanetSml[NUMPLANETS + 1];
 static spPlanetLoc_t pktPlanetLoc[NUMPLANETS + 1];
 static spPlanetLoc2_t pktPlanetLoc2[NUMPLANETS + 1];
 static spUser_t pktUser[MAXUSERS];
-static spTorp_t pktTorp[MAXSHIPS + 1][MAXTORPS];
-static spTorpLoc_t pktTorpLoc[MAXSHIPS + 1][MAXTORPS];
-static spTorpEvent_t pktTorpEvent[MAXSHIPS + 1][MAXTORPS];
+static spTorp_t pktTorp[MAXSHIPS][MAXTORPS];
+static spTorpLoc_t pktTorpLoc[MAXSHIPS][MAXTORPS];
+static spTorpEvent_t pktTorpEvent[MAXSHIPS][MAXTORPS];
 static spTeam_t pktTeam[NUMALLTEAMS];
 static spConqInfo_t pktConqInfo;
 static spHistory_t pktHistory[MAXHISTLOG];
@@ -44,16 +44,16 @@ static spDoomsday_t pktDoomsday;
 static spPlanetInfo_t pktPlanetInfo[NUMPLANETS + 1];
 
 /* recording */
-static spShip_t recShip[MAXSHIPS + 1];
-static spShipSml_t recShipSml[MAXSHIPS + 1];
-static spShipLoc_t recShipLoc[MAXSHIPS + 1];
+static spShip_t recShip[MAXSHIPS];
+static spShipSml_t recShipSml[MAXSHIPS];
+static spShipLoc_t recShipLoc[MAXSHIPS];
 static spPlanet_t recPlanet[NUMPLANETS + 1];
 static spPlanetSml_t recPlanetSml[NUMPLANETS + 1];
 static spPlanetLoc_t recPlanetLoc[NUMPLANETS + 1];
 static spPlanetLoc2_t recPlanetLoc2[NUMPLANETS + 1];
-static spTorp_t recTorp[MAXSHIPS + 1][MAXTORPS];
-static spTorpLoc_t recTorpLoc[MAXSHIPS + 1][MAXTORPS];
-static spTorpEvent_t recTorpEvent[MAXSHIPS + 1][MAXTORPS];
+static spTorp_t recTorp[MAXSHIPS][MAXTORPS];
+static spTorpLoc_t recTorpLoc[MAXSHIPS][MAXTORPS];
+static spTorpEvent_t recTorpEvent[MAXSHIPS][MAXTORPS];
 static spTeam_t recTeam[NUMALLTEAMS];
 static spDoomsday_t recDoomsday;
 static spPlanetInfo_t recPlanetInfo[NUMPLANETS + 1];
@@ -70,19 +70,19 @@ void spktInit(void)
 void spktInitPkt(void)
 {
     /* server pkt */
-    memset((void *)pktShip, 0, sizeof(spShip_t) * (MAXSHIPS + 1));
-    memset((void *)pktShipSml, 0, sizeof(spShipSml_t) * (MAXSHIPS + 1));
-    memset((void *)pktShipLoc, 0, sizeof(spShipLoc_t) * (MAXSHIPS + 1));
+    memset((void *)pktShip, 0, sizeof(spShip_t) * MAXSHIPS);
+    memset((void *)pktShipSml, 0, sizeof(spShipSml_t) * MAXSHIPS);
+    memset((void *)pktShipLoc, 0, sizeof(spShipLoc_t) * MAXSHIPS);
     memset((void *)pktPlanet, 0, sizeof(spPlanet_t) * (NUMPLANETS + 1));
     memset((void *)pktPlanetSml, 0, sizeof(spPlanetSml_t) * (NUMPLANETS + 1));
     memset((void *)pktPlanetLoc, 0, sizeof(spPlanetLoc_t) * (NUMPLANETS + 1));
     memset((void *)pktPlanetLoc2, 0, sizeof(spPlanetLoc2_t) * (NUMPLANETS + 1));
     memset((void *)pktUser, 0, sizeof(spUser_t) * MAXUSERS);
-    memset((void *)pktTorp, 0,  sizeof(spTorp_t) * (MAXSHIPS + 1) * MAXTORPS);
+    memset((void *)pktTorp, 0,  sizeof(spTorp_t) * MAXSHIPS * MAXTORPS);
     memset((void *)pktTorpLoc, 0,
-           sizeof(spTorpLoc_t) * (MAXSHIPS + 1) * MAXTORPS);
+           sizeof(spTorpLoc_t) * MAXSHIPS * MAXTORPS);
     memset((void *)pktTorpEvent, 0,
-           sizeof(spTorpEvent_t) * (MAXSHIPS + 1) * MAXTORPS);
+           sizeof(spTorpEvent_t) * MAXSHIPS * MAXTORPS);
     memset((void *)pktTeam, 0,  sizeof(spTeam_t) * NUMALLTEAMS);
     memset((void *)&pktConqInfo, 0,  sizeof(spConqInfo_t));
     memset((void *)pktHistory, 0,  sizeof(spHistory_t) * MAXHISTLOG);
@@ -94,19 +94,19 @@ void spktInitPkt(void)
 void spktInitRec(void)
 {
     /* recording */
-    memset((void *)recShip, 0, sizeof(spShip_t) * (MAXSHIPS + 1));
-    memset((void *)recShipSml, 0, sizeof(spShipSml_t) * (MAXSHIPS + 1));
-    memset((void *)recShipLoc, 0, sizeof(spShipLoc_t) * (MAXSHIPS + 1));
+    memset((void *)recShip, 0, sizeof(spShip_t) * MAXSHIPS);
+    memset((void *)recShipSml, 0, sizeof(spShipSml_t) * MAXSHIPS);
+    memset((void *)recShipLoc, 0, sizeof(spShipLoc_t) * MAXSHIPS);
     memset((void *)recPlanet, 0, sizeof(spPlanet_t) * (NUMPLANETS + 1));
     memset((void *)recPlanetSml, 0, sizeof(spPlanetSml_t) * (NUMPLANETS + 1));
     memset((void *)recPlanetLoc, 0, sizeof(spPlanetLoc_t) * (NUMPLANETS + 1));
     memset((void *)recPlanetLoc2, 0, sizeof(spPlanetLoc2_t) * (NUMPLANETS + 1));
     memset((void *)recTorp, 0,
-           sizeof(spTorp_t) * (MAXSHIPS + 1) * MAXTORPS);
+           sizeof(spTorp_t) * MAXSHIPS * MAXTORPS);
     memset((void *)recTorpLoc, 0,
-           sizeof(spTorpLoc_t) * (MAXSHIPS + 1) * MAXTORPS);
+           sizeof(spTorpLoc_t) * MAXSHIPS * MAXTORPS);
     memset((void *)recTorpEvent, 0,
-           sizeof(spTorpEvent_t) * (MAXSHIPS + 1) * MAXTORPS);
+           sizeof(spTorpEvent_t) * MAXSHIPS * MAXTORPS);
     memset((void *)recTeam, 0,  sizeof(spTeam_t) * NUMALLTEAMS);
     memset((void *)&recDoomsday, 0, sizeof(spDoomsday_t));
     memset((void *)recPlanetInfo, 0, sizeof(spPlanetInfo_t) * (NUMPLANETS + 1));

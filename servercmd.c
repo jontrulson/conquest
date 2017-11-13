@@ -32,7 +32,8 @@ void startRecord(int f)
     {
         utLog("conquestd: startRecord: already recording.");
         if (f)
-            clbStoreMsg(MSG_GOD, Context.snum, "We are already recording.");
+            clbStoreMsg(MSG_FROM_GOD, 0, MSG_TO_SHIP, Context.snum,
+                        "We are already recording.");
         return;
     }
 
@@ -58,7 +59,7 @@ void startRecord(int f)
         utLog("conquestd: Cannot record to %s", fname);
         sprintf(cbuf, "Cannot record to %s", bname);
         if (f)
-            clbStoreMsg(MSG_GOD, Context.snum, cbuf);
+            clbStoreMsg(MSG_FROM_GOD, 0, MSG_TO_SHIP, Context.snum, cbuf);
         return;
     }
 
@@ -72,7 +73,7 @@ void startRecord(int f)
             utLog("conquestd: Recording to %s", fname);
             sprintf(cbuf, "Recording to %s", bname);
             if (f)
-                clbStoreMsg(MSG_GOD, Context.snum, cbuf);
+                clbStoreMsg(MSG_FROM_GOD, 0, MSG_TO_SHIP, Context.snum, cbuf);
 
             /* now reset the recorded packet cache so we can start
                fresh */
@@ -83,7 +84,7 @@ void startRecord(int f)
             Context.recmode = RECMODE_OFF;
             utLog("conquestd: recInitOutput failed");
             if (f)
-                clbStoreMsg(MSG_GOD, Context.snum,
+                clbStoreMsg(MSG_FROM_GOD, 0, MSG_TO_SHIP, Context.snum,
                             "conquestd: recInitOutput failed");
         }
     }
@@ -96,19 +97,21 @@ static void stopRecord(void)
     if (Context.recmode != RECMODE_ON)
     {
         utLog("conquestd: stopRecord: not recording.");
-        clbStoreMsg(MSG_GOD, Context.snum, "We aren't recording.");
+        clbStoreMsg(MSG_FROM_GOD, 0, MSG_TO_SHIP, Context.snum,
+                    "We aren't recording.");
         return;
     }
 
 
-    utLog("conquestd: stopRecord: recording stopped");
-    clbStoreMsg(MSG_GOD, Context.snum, "Recording stopped");
     recCloseOutput();
+    utLog("conquestd: stopRecord: recording stopped");
+    clbStoreMsg(MSG_FROM_GOD, 0, MSG_TO_SHIP, Context.snum,
+                "Recording stopped");
 
     return;
 }
 
-static void CreateRobots(int from, char *arg1, char *arg2, char *arg3)
+static void CreateRobots(int snumFrom, char *arg1, char *arg2, char *arg3)
 {
     int i, j, num, anum, unum, snum, warlike;
     char buf[MSGMAXLINE];
@@ -123,7 +126,8 @@ static void CreateRobots(int from, char *arg1, char *arg2, char *arg3)
     {
         if ( ! clbGetUserNum( &unum, arg1, -1 ) )
         {
-            clbStoreMsg(MSG_GOD, from, "No such user.");
+            clbStoreMsg(MSG_FROM_GOD, 0, MSG_TO_SHIP, (uint16_t)snumFrom,
+                        "No such user.");
             return;
         }
     }
@@ -152,7 +156,8 @@ static void CreateRobots(int from, char *arg1, char *arg2, char *arg3)
     {
         if ( ! newrob( &snum, unum ) )
 	{
-            clbStoreMsg(MSG_GOD, from, "Failed to create robot ship.");
+            clbStoreMsg(MSG_FROM_GOD, 0, MSG_TO_SHIP, (uint16_t)snumFrom,
+                        "Failed to create robot ship.");
             break;
 	}
 
@@ -185,7 +190,7 @@ static void CreateRobots(int from, char *arg1, char *arg2, char *arg3)
         utAppendInt(buf , anum) ;
         strcat(buf , " new ships.") ;
     }
-    clbStoreMsg(MSG_GOD, from, buf);
+    clbStoreMsg(MSG_FROM_GOD, 0, MSG_TO_SHIP, (uint16_t)snumFrom, buf);
 
     return;
 }
@@ -202,12 +207,14 @@ static void Murder(int from, char *what)
     int snum = -1, unum = -1, didany;
     char ssbuf[MSGMAXLINE], mbuf[MSGMAXLINE];
 
+    uint16_t fromShip = (uint16_t)from;
+
     /* first see if it's a number (indicating a ship) */
     if (utIsDigits(what))
     {                           /* yes */
         snum = atoi(what);
-        if ( snum < 1 || snum > MAXSHIPS )
-            clbStoreMsg(MSG_GOD, from, no_ship_str);
+        if ( snum < 0 || snum >= MAXSHIPS )
+            clbStoreMsg(MSG_FROM_GOD, 0, MSG_TO_SHIP, fromShip, no_ship_str);
         else if ( Ships[snum].status != SS_LIVE )
         {
             ssbuf[0] = 0;
@@ -217,13 +224,13 @@ static void Murder(int from, char *what)
                     snum,
                     Ships[snum].alias,
                     ssbuf);
-            clbStoreMsg(MSG_GOD, from, mbuf);
+            clbStoreMsg(MSG_FROM_GOD, 0, MSG_TO_SHIP, fromShip, mbuf);
         }
         else
         {
             sprintf(mbuf, kill_ship_str1,
                     Teams[Ships[snum].team].teamchar, snum, Ships[snum].alias);
-            clbStoreMsg(MSG_GOD, from, mbuf);
+            clbStoreMsg(MSG_FROM_GOD, 0, MSG_TO_SHIP, fromShip, mbuf);
             clbKillShip( snum, KB_GOD, 0 );
         }
 
@@ -234,12 +241,12 @@ static void Murder(int from, char *what)
     /* Kill a user? */
     if ( ! clbGetUserNum( &unum, what, -1 ) )
     {
-        clbStoreMsg(MSG_GOD, from, no_user_str);
+        clbStoreMsg(MSG_FROM_GOD, 0, MSG_TO_SHIP, fromShip, no_user_str);
         return;
     }
 
     didany = FALSE;
-    for ( snum = 1; snum <= MAXSHIPS; snum++ )
+    for ( snum = 0; snum < MAXSHIPS; snum++ )
         if ( Ships[snum].status == SS_LIVE )
             if ( Ships[snum].unum == unum )
             {
@@ -249,7 +256,7 @@ static void Murder(int from, char *what)
                         snum,
                         Ships[snum].alias,
                         what);
-                clbStoreMsg(MSG_GOD, from, mbuf);
+                clbStoreMsg(MSG_FROM_GOD, 0, MSG_TO_SHIP, fromShip, mbuf);
                 clbKillShip( snum, KB_GOD, 0 );
             }
 
@@ -258,7 +265,7 @@ static void Murder(int from, char *what)
     {
         sprintf(mbuf, not_flying_str, Users[unum].username,
                 Users[unum].alias);
-        clbStoreMsg(MSG_GOD, from, mbuf);
+        clbStoreMsg(MSG_FROM_GOD, 0, MSG_TO_SHIP, fromShip, mbuf);
     }
 
     return;
@@ -348,7 +355,8 @@ static void _parseArgs(char *str, char **cmd, char **arg1,
     return;
 }
 
-int checkOperExec(int from, int to, char *msg)
+int checkOperExec(msgFrom_t from, uint16_t fromDetail,
+                  msgTo_t to, uint16_t toDetail, char *msg)
 {
     char tmsg[MESSAGE_SIZE], umsg[MESSAGE_SIZE];
     char *p;
@@ -356,11 +364,11 @@ int checkOperExec(int from, int to, char *msg)
     char *cmd, *arg1, *arg2, *arg3;
 
     /* first, if the message isn't to GOD, ignore */
-    if (to != MSG_GOD)
+    if (to != MSG_TO_GOD)
         return FALSE;
 
     /* if it's not from a valid ship, ignore */
-    if (from < 1 || from > MAXSHIPS)
+    if (from != MSG_FROM_SHIP || fromDetail >= MAXSHIPS)
         return FALSE;
 
     strncpy(tmsg, msg, MESSAGE_SIZE);
@@ -369,10 +377,12 @@ int checkOperExec(int from, int to, char *msg)
         return FALSE;               /* not for us. */
 
     /* it is for us, now check for allowability */
-    if (!Users[Ships[from].unum].ooptions[OOPT_OPER])
+    if (!Users[Ships[fromDetail].unum].ooptions[OOPT_OPER])
     {                           /* nice try... */
-        clbStoreMsg(MSG_GOD, from, "You are not a Conquest Operator.");
-        utLog("conquestd: EXEC from unprivileged ship: %d, '%s'", from,
+        clbStoreMsg(MSG_FROM_GOD, 0,
+                    MSG_TO_SHIP, fromDetail,
+                    "You are not a Conquest Operator.");
+        utLog("conquestd: EXEC from unprivileged ship: %d, '%s'", fromDetail,
               tmsg);
         return FALSE;
     }
@@ -382,7 +392,7 @@ int checkOperExec(int from, int to, char *msg)
 
     if (!*p)
     {
-        clbStoreMsg(MSG_GOD, from, oerror);
+        clbStoreMsg(MSG_FROM_GOD, 0, MSG_TO_SHIP, fromDetail, oerror);
         return FALSE;
     }
 
@@ -394,7 +404,7 @@ int checkOperExec(int from, int to, char *msg)
 
     if (!cmd)
     {
-        clbStoreMsg(MSG_GOD, from, oerror);
+        clbStoreMsg(MSG_FROM_GOD, 0, MSG_TO_SHIP, fromDetail, oerror);
         return FALSE;
     }
 
@@ -418,15 +428,16 @@ int checkOperExec(int from, int to, char *msg)
         return TRUE;
     }
 
-    /* commands requiring arguements */
+    /* commands requiring arguments */
 
     /* kill something */
     if (cmd[0] == 'K' || cmd[0] == 'k')
     {                           /* fur is murder! */
         if (!arg1)
-            clbStoreMsg(MSG_GOD, from, "Usage: k[ill] <what>");
+            clbStoreMsg(MSG_FROM_GOD, 0, MSG_TO_SHIP, fromDetail,
+                        "Usage: k[ill] <what>");
         else
-            Murder(from, arg1);
+            Murder(fromDetail, arg1);
 
         return TRUE;
     }
@@ -435,10 +446,10 @@ int checkOperExec(int from, int to, char *msg)
     if (cmd[0] == 'R' || cmd[0] == 'r')
     {                           /* little tin men */
         if (!arg1)
-            clbStoreMsg(MSG_GOD, from,
+            clbStoreMsg(MSG_FROM_GOD, 0, MSG_TO_SHIP, fromDetail,
                         "Usage: r[obot] <username> [<number> <warlike if non-null>]");
         else
-            CreateRobots(from, arg1, arg2, arg3);
+            CreateRobots((int)fromDetail, arg1, arg2, arg3);
 
         return TRUE;
     }
@@ -447,6 +458,6 @@ int checkOperExec(int from, int to, char *msg)
 
     /* that's all we understand for now. */
 
-    clbStoreMsg(MSG_GOD, from, oerror);
+    clbStoreMsg(MSG_FROM_GOD, 0, MSG_TO_SHIP, fromDetail, oerror);
     return FALSE;
 }

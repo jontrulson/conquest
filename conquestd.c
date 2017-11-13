@@ -771,7 +771,7 @@ void dead( int snum, int leave )
     char buf[PKT_MAXSIZE];	/* gen purpose */
 
     /* If something is wrong, don't do anything. */
-    if ( snum < 1 || snum > MAXSHIPS )
+    if ( snum < 0 || snum >= MAXSHIPS )
         return;
 
     /* If our ships pid is wrong, we are indeed lost. */
@@ -951,7 +951,7 @@ int updateClient(int force)
                     return FALSE;
     }
 
-    for (i=1; i<=MAXSHIPS; i++)
+    for (i=0; i<MAXSHIPS; i++)
     {
         if (!sendShip(sInfo.sock, i))
             return FALSE;
@@ -1269,7 +1269,7 @@ void menu(void)
         /* Make sure things are proper. */
         if (playrv == ERR)
 	{
-            if ( Context.snum < 1 || Context.snum > MAXSHIPS )
+            if ( Context.snum < 0 || Context.snum >= MAXSHIPS )
                 lose = TRUE;
             else if ( Ships[Context.snum].pid != Context.pid )
                 lose = TRUE;
@@ -1337,7 +1337,7 @@ void menu(void)
 	    }
             else if (ccmd->cmd == CPCMD_RESIGN)
 	    {
-                for ( i = 1; i <= MAXSHIPS; i = i + 1 )
+                for ( i = 0; i < MAXSHIPS; i++ )
                     if ( !((Ships[i].status == SS_LIVE ||
                             Ships[i].status == SS_ENTERING) &&
                            Ships[i].unum == Context.unum))
@@ -1411,7 +1411,7 @@ int newship( int unum, int *snum )
     /* Count number of his ships flying. */
     j = 0;
     numvec = 0;
-    for ( i = 1; i <= MAXSHIPS; i = i + 1 )
+    for ( i = 0; i < MAXSHIPS; i++ )
         if ( Ships[i].status == SS_LIVE || Ships[i].status == SS_ENTERING )
             if ( Ships[i].unum == unum && *snum != i )
             {
@@ -1439,7 +1439,7 @@ int newship( int unum, int *snum )
 
             /* Look for a live ship for us to take. */
             PVLOCK(&ConqInfo->lockword);
-            for ( i = 1; i <= MAXSHIPS; i = i + 1)
+            for (i=0; i<MAXSHIPS; i++)
                 if ( Ships[i].unum == unum && Ships[i].status == SS_LIVE )
                 {
                     fresh = FALSE;
@@ -1460,7 +1460,7 @@ int newship( int unum, int *snum )
         /* Count number of his ships flying. */
         j = 0;
         numvec = 0;
-        for ( i = 1; i <= MAXSHIPS; i = i + 1 )
+        for ( i = 0; i < MAXSHIPS; i++ )
             if ( Ships[i].status == SS_LIVE || Ships[i].status == SS_ENTERING )
                 if ( Ships[i].unum == unum && *snum != i )
                 {
@@ -1614,7 +1614,7 @@ int play(void)
             Context.snum,
             Ships[Context.snum].alias);
 
-    clbStoreMsg(MSG_COMP, MSG_ALL, msgbuf);
+    clbStoreMsg(MSG_FROM_COMP, 0, MSG_TO_ALL, 0, msgbuf);
 
 #if defined(AUTO_RECORD)
     {                             /* automatically record all games */
@@ -2045,7 +2045,7 @@ void handleSignal(int sig)
     else
     {                       /* not playing (main menu, etc) */
         /* if we aren't playing, then just turn it off */
-        if (Context.snum >= 1 && Context.snum <= MAXSHIPS)
+        if (Context.snum >= 0 && Context.snum < MAXSHIPS)
             Ships[Context.snum].status = SS_OFF;
     }
 
@@ -2066,7 +2066,7 @@ void conqend(void)
     {				/* let everyone know we're leaving */
         sprintf(msgbuf, "%s has left the game.",
                 Users[Context.unum].alias);
-        clbStoreMsg(MSG_COMP, MSG_ALL, msgbuf);
+        clbStoreMsg(MSG_FROM_COMP, 0, MSG_TO_ALL, 0, msgbuf);
     }
 
     recCloseOutput();

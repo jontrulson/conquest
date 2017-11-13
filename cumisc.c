@@ -182,7 +182,7 @@ void mcuPutThing( int what, int lin, int col )
 /*  SYNOPSIS */
 /*    int snum, msgnum */
 /*    mcuReadMsg( snum, msgnum ) */
-int mcuReadMsg( int snum, int msgnum, int dsplin )
+int mcuReadMsg( int msgnum, int dsplin )
 {
     char buf[MSGMAXLINE];
     unsigned int attrib = 0;
@@ -195,7 +195,8 @@ int mcuReadMsg( int snum, int msgnum, int dsplin )
         attrib = CyanColor;
     }
 
-    clbFmtMsg(Msgs[msgnum].msgto, Msgs[msgnum].msgfrom, buf);
+    clbFmtMsg(Msgs[msgnum].from, Msgs[msgnum].fromDetail,
+              Msgs[msgnum].to, Msgs[msgnum].toDetail, buf);
     strcat(buf , ": ") ;
     strcat(buf , Msgs[msgnum].msgbuf) ;
 
@@ -377,13 +378,12 @@ void mcuInfoPlanet( char *str, int pnum, int snum )
         mcuPutMsg( "No such planet.", MSG_LIN1 );
         cdclrl( MSG_LIN2, 1 );
         cdmove( MSG_LIN1, 1 );
-        utError("infoplanet: Called with invalid pnum (%d).",
-                pnum );
+        utLog("infoplanet: Called with invalid pnum (%d).", pnum );
         return;
     }
 
     /* GOD is too clever. */
-    godlike = ( snum < 1 || snum > MAXSHIPS );
+    godlike = ( snum < 0 || snum >= MAXSHIPS );
 
     /* In some cases, report hostilities. */
     junk[0] = 0;
@@ -576,10 +576,10 @@ void mcuInfoShip( int snum, int scanner )
     static real avgclose_rate, olddis = 0.0, oldclose_rate = 0.0;
     static int oldsnum = 0;
 
-    godlike = ( scanner < 1 || scanner > MAXSHIPS );
+    godlike = ( scanner < 0 || scanner >= MAXSHIPS );
 
     cdclrl( MSG_LIN1, 2 );
-    if ( snum < 1 || snum > MAXSHIPS )
+    if ( snum < 0 || snum >= MAXSHIPS )
     {
         mcuPutMsg( "No such ship.", MSG_LIN1 );
         cdmove( MSG_LIN1, 1 );
@@ -927,7 +927,7 @@ void mcuPlanetList( int team, int snum )
                 pnum = sv[i];
 
                 /* colorize - dwp */
-                if ( snum > 0 && snum <= MAXSHIPS)
+                if ( snum >= 0 && snum < MAXSHIPS)
 		{	/* if user has a valid ship */
                     if ( Planets[pnum].team == Ships[snum].team && !selfwar(snum) )
                         outattr = GreenLevelColor;
@@ -1104,7 +1104,7 @@ void mcuPlanetList( int team, int snum )
 	    }
 
             /* didn't get a char, update */
-            if (snum > 0 && snum <= MAXSHIPS)
+            if (snum >= 0 && snum < MAXSHIPS)
                 if (!clbStillAlive(snum))
                     Done = TRUE;
 
@@ -1159,7 +1159,7 @@ void mcuPlayList( int godlike, int doall, int snum )
 
     fline = lin + 1;				/* first line to use */
     lline = MSG_LIN1;				/* last line to use */
-    fship = 1;					/* first user in uvec */
+    fship = 0;					/* first user in uvec */
 
     while(TRUE) /* repeat- while */
     {
@@ -1169,7 +1169,7 @@ void mcuPlayList( int godlike, int doall, int snum )
         i = fship;
         cdclrl( fline, lline - fline + 1 );
         lin = fline;
-        while ( i <= MAXSHIPS && lin <= lline )
+        while ( i < MAXSHIPS && lin <= lline )
 	{
             status = Ships[i].status;
 
@@ -1214,7 +1214,7 @@ void mcuPlayList( int godlike, int doall, int snum )
                     utAppendKilledBy(cbuf , kb, detail) ;
 		}
 
-		if (snum > 0 && snum <= MAXSHIPS )
+		if (snum >= 0 && snum < MAXSHIPS )
                 {		/* a normal ship view */
 		    if ( i == snum )    /* it's ours */
                         uiPutColor(CQC_A_BOLD);
@@ -1255,7 +1255,7 @@ void mcuPlayList( int godlike, int doall, int snum )
             i = i + 1;
             lin = lin + 1;
 	}
-        if ( i > MAXSHIPS )
+        if ( i >= MAXSHIPS )
 	{
             /* We're displaying the last page. */
             mcuPutPrompt( MTXT_DONE, MSG_LIN2 );
@@ -1263,7 +1263,7 @@ void mcuPlayList( int godlike, int doall, int snum )
             if ( iogtimed( &ch, 1.0 ) )
 	    {
                 if ( ch == TERM_EXTRA )
-                    fship = 1;			/* move to first page */
+                    fship = 0;			/* move to first page */
                 else
                     break;
 	    }
@@ -1303,7 +1303,7 @@ int mcuReviewMsgs( int snum, int slm )
     Done = FALSE;
 
     lastone = utModPlusOne( ConqInfo->lastmsg+1, MAXMESSAGES );
-    if ( snum > 0 && snum <= MAXSHIPS )
+    if ( snum >= 0 && snum < MAXSHIPS )
     {
         if ( Ships[snum].lastmsg == LMSG_NEEDINIT )
             return ( FALSE );				/* none to read */
@@ -1322,7 +1322,7 @@ int mcuReviewMsgs( int snum, int slm )
     {
         if ( clbCanRead( snum, msg ))
 	{
-            mcuReadMsg( snum, msg, MSG_LIN1 );
+            mcuReadMsg( msg, MSG_LIN1 );
             didany = TRUE;
             mcuPutPrompt( "--- [SPACE] for more, arrows to scroll, any key to quit ---",
                           MSG_LIN2 );
@@ -1692,7 +1692,7 @@ void mcuUserList( int godlike, int snum )
             clbUserline( uvec[i], -1, cbuf, godlike, FALSE );
 
             /* determine color */
-            if ( snum > 0 && snum <= MAXSHIPS ) /* we're a valid ship */
+            if ( snum >= 0 && snum < MAXSHIPS ) /* we're a valid ship */
 	    {
 		if ( strcmp(Users[uvec[i]].username,
 			    Users[Ships[snum].unum].username) == 0 &&
@@ -1823,7 +1823,7 @@ void mcuUserStats( int godlike , int snum )
             clbStatline( uvec[i], cbuf );
 
             /* determine color */
-            if ( snum > 0 && snum <= MAXSHIPS ) /* we're a valid ship */
+            if ( snum >= 0 && snum < MAXSHIPS ) /* we're a valid ship */
             {
                 if ( strcmp(Users[uvec[i]].username,
                             Users[Ships[snum].unum].username) == 0 &&

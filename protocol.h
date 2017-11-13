@@ -8,6 +8,7 @@
 #define PROTOCOL_H_INCLUDED
 
 #include "conqdef.h"
+#include "conqcom.h"
 // version 0006 protocol defs
 #include "proto_0006.h"
 
@@ -292,11 +293,11 @@ typedef struct {
 typedef struct {
     uint8_t  type;                 /* SP_MESSAGE */
     uint8_t  flags;                /* see msg.h */
-    uint8_t  pad2;
-    uint8_t  pad3;
+    uint8_t  from;
+    uint8_t  to;
 
-    int16_t   from;
-    int16_t   to;
+    uint16_t fromDetail;        /* ship/planet/team number, etc */
+    uint16_t toDetail;
 
     uint8_t  msg[MESSAGE_SIZE];
 } spMessage_t;
@@ -540,14 +541,14 @@ typedef struct {
 
 typedef struct {
     uint8_t  type;			/* CP_SETCOURSE */
-    int8_t    lock;			/* lockon */
+    int8_t   lock;			/* lockon */
     uint16_t head;			/* x100 */
 } cpSetCourse_t;
 
 typedef struct {
     uint8_t  type;                 /* CP_MESSAGE */
-    uint8_t  pad1;
-    int16_t   to;
+    uint8_t  to;
+    int16_t  toDetail;
 
     uint8_t  msg[MESSAGE_SIZE];
 } cpMessage_t;

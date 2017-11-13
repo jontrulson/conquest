@@ -1280,7 +1280,7 @@ void renderHud(int dostats)
                      TEX_HUD_DECAL1_LAMP_TOW, icl);
 
     /* torp pips */
-    if (snum > 0 && snum <= MAXSHIPS)
+    if (snum >= 0 && snum < MAXSHIPS)
     {
         glBindTexture(GL_TEXTURE_2D,
                       GLTEX_ID(GLShips[steam][stype].ico_torp));
@@ -1310,7 +1310,7 @@ void renderHud(int dostats)
     }
 
     /* phaser recharge status */
-    if (snum > 0 && snum <= MAXSHIPS)
+    if (snum >= 0 && snum < MAXSHIPS)
     {
         GLfloat phasH;
 
@@ -1335,7 +1335,7 @@ void renderHud(int dostats)
 
     /* if phasers are recharging, draw a box around the recharge indicator */
 
-    if (snum > 0 && snum <= MAXSHIPS)
+    if (snum >= 0 && snum < MAXSHIPS)
     {
         if (Ships[snum].pfuse > 0)
             drawLineBox(o.d1phcharge.x, o.d1phcharge.y, 0.0,
@@ -1350,7 +1350,7 @@ void renderHud(int dostats)
     /* last firing angle, target angle and distance icon indicators */
 
     /* first update the data if neccessary */
-    if (snum > 0)
+    if (snum >= 0)
         hudSetInfoFiringAngle(Ships[snum].lastblast);
     hudSetInfoTargetAngle(Context.lasttang);
     hudSetInfoTargetDist(Context.lasttdist);

@@ -36,7 +36,7 @@ static void handleUDPErr(void)
         pktSetSocketFds(PKT_SOCKFD_NOCHANGE, sInfo.usock);
 
         utLog("NET: too many UDP send errors to client, switching to TCP");
-        clbStoreMsg(MSG_COMP, Context.snum,
+        clbStoreMsg(MSG_FROM_COMP, 0, MSG_TO_SHIP, Context.snum,
                     "SERVER: too many UDP send errors. Switching to TCP");
     }
     return;
@@ -232,7 +232,7 @@ int sendServerStat(int socktype)
             numusers++;
 
     /* count ships */
-    for ( i = 1; i <= MAXSHIPS; i++ )
+    for ( i = 0; i < MAXSHIPS; i++ )
     {
         if ( Ships[i].status == SS_LIVE )
 	{
@@ -284,7 +284,7 @@ int sendTorp(int sock, uint8_t tsnum, uint8_t tnum)
     if (sInfo.state != SVR_STATE_PLAY)
         return TRUE;
 
-    if (tsnum <= 0 || tsnum > MAXSHIPS)
+    if (tsnum < 0 || tsnum >= MAXSHIPS)
         return FALSE;
 
     if (tnum >= MAXTORPS)
@@ -341,8 +341,10 @@ void sendFeedback(char *msg)
     Msg_t themsg;
 
     memset((void *)&themsg, 0, sizeof(Msg_t));
-    themsg.msgto = Context.snum;
-    themsg.msgfrom = MSG_COMP;
+    themsg.to = MSG_TO_SHIP;
+    themsg.toDetail = Context.snum;
+    themsg.from = MSG_FROM_COMP;
+    themsg.fromDetail = 0;
     themsg.flags = MSG_FLAGS_FEEDBACK;
     strncpy(themsg.msgbuf, msg, MESSAGE_SIZE - 1);
 
@@ -350,7 +352,8 @@ void sendFeedback(char *msg)
 
     if (SysConf.LogMessages == TRUE)
     {
-        clbFmtMsg(themsg.msgto, themsg.msgfrom, buf);
+        clbFmtMsg(themsg.from, themsg.fromDetail,
+                  themsg.to, themsg.toDetail, buf);
         utLog("MSG:FEEDBACK: %s: %s",
               buf, themsg.msgbuf);
     }
@@ -369,17 +372,21 @@ int sendMessage(Msg_t *msg)
     if (!msg)
         return TRUE;
 
-    memset((void *)&smsg, 0, sizeof(spMessage_t));
-
 #if defined(DEBUG_SERVERSEND)
-    utLog("sendMessage: to = %d, from = %d, flags = 0x%02x, msg = '%s'",
-          msg->msgto, msg->msgfrom, msg->flags, msg->msgbuf);
+    utLog("sendMessage: to = %d(%d), from = %d(%d), flags = 0x%02x, msg = '%s'",
+          msg->to, msg->toDetail,
+          msg->from, msg->fromDetail,
+          msg->flags, msg->msgbuf);
 #endif
+
+    memset((void *)&smsg, 0, sizeof(spMessage_t));
 
     smsg.type = SP_MESSAGE;
 
-    smsg.from = (int16_t)htons(msg->msgfrom);
-    smsg.to = (int16_t)htons(msg->msgto);
+    smsg.from = msg->from;
+    smsg.fromDetail = htons(msg->fromDetail);
+    smsg.to = msg->to;
+    smsg.toDetail = htons(msg->toDetail);
     smsg.flags = msg->flags;
 
     strncpy((char *)smsg.msg, msg->msgbuf, MESSAGE_SIZE - 1);

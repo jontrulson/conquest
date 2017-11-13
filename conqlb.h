@@ -8,6 +8,8 @@
 #include "conqdef.h"
 
 #include "conf.h"
+#include "conqcom.h"
+
 #include "protocol.h"
 
 int      clbRegister( char *lname, char *rname, int team, int *unum );
@@ -57,13 +59,16 @@ real     clbNewWarp( int snum, real dwarp );
 int      clbPhoon( int pnum );
 int      clbPlanetMatch( char *str, int *pnum, int godlike );
 void     clbPutShip( int snum, real basex, real basey );
-int      clbFmtMsg(int to, int from, char *buf);
+int      clbFmtMsg(msgFrom_t from, uint16_t fromDetail, msgTo_t to,
+                   uint16_t toDetail, char *buf);
 void     clbSortPlanets( int sv[] );
 void     clbSortUsers( int uv[], int numentries );
 int      clbSPWar( int snum, int pnum );
 int      clbStillAlive( int snum );
-void     clbStoreMsg( int from, int to, char *msg );
-void     clbStoreMsgf( int from, int to, char *msg, unsigned char flags );
+void     clbStoreMsg( msgFrom_t from, uint16_t fromDetail, msgTo_t to,
+                      uint16_t toDetail, char *msg );
+void     clbStoreMsgf( msgFrom_t from, uint16_t fromDetail, msgTo_t to,
+                       uint16_t toDetail, char *msg, unsigned char flags );
 int      clbUseFuel( int snum, real fuel, int weapon, int forreal );
 void     clbZeroEverything(void);
 void     clbZeroShip( int snum );

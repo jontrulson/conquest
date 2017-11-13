@@ -69,8 +69,8 @@ void do_bottomborder(int snum, char *buf, int attrib, int bufattr)
     }
 
     /* if hudInfo and we are a ship... */
-    if (UserConf.hudInfo && snum > 0 &&
-        snum <= MAXSHIPS)
+    if (UserConf.hudInfo && snum >= 0 &&
+        snum < MAXSHIPS)
     {				/* some additional info */
         /* current firing angle */
         col = STAT_COLS + 1;
@@ -191,7 +191,7 @@ void display( int snum )
     minsenemy = 0;
     dis = 0.0;
 
-    if (snum > 0)
+    if (snum >= 0)
         lsmap = SMAP(snum);
     else
         lsmap = 0;
@@ -237,11 +237,11 @@ void display( int snum )
 
         palertcol = 0;
         /* determine alertlevel for object */
-        if (snum > 0 && clbSPWar( snum, i ) && Planets[i].scanned[Ships[snum].team])
+        if (snum >= 0 && clbSPWar( snum, i ) && Planets[i].scanned[Ships[snum].team])
 	{
             palertcol = RedLevelColor;
 	}
-        else if (snum > 0 && Planets[i].team == Ships[snum].team && !selfwar(snum))
+        else if (snum >= 0 && Planets[i].team == Ships[snum].team && !selfwar(snum))
 	{
             palertcol = GreenLevelColor;
 	}
@@ -325,7 +325,7 @@ void display( int snum )
 	    }
 
             /* If necessary, display the planet name. */
-            if ( snum < 0 || (snum > 0 &&
+            if ( snum < 0 || (snum >= 0 &&
                               UserConf.ShowPlanNames) ) /* dwp */
 	    {
                 sprintf(buf, "%c%c%c", Planets[i].name[0], Planets[i].name[1], Planets[i].name[2]);
@@ -345,7 +345,7 @@ void display( int snum )
 	    {
                 if (lin <= DISPLAY_LINS && lin > 0 )
 		{
-                    if (snum > 0 && !Planets[i].scanned[Ships[snum].team])
+                    if (snum >= 0 && !Planets[i].scanned[Ships[snum].team])
                         uiPutColor(palertcol);	/* default to yellow for unscanned */
                     else
                         uiPutColor(InfoColor);	/* scanned (known) value */
@@ -356,7 +356,7 @@ void display( int snum )
                     cdput( ConqInfo->chrplanets[Planets[i].type], lin, col + 1);
                     uiPutColor(0);
 		}
-                if ( snum < 0 || (snum > 0 && UserConf.ShowPlanNames) ) /* dwp */
+                if ( snum < 0 || (snum >= 0 && UserConf.ShowPlanNames) ) /* dwp */
                     if ( (lin + 1 <= DISPLAY_LINS) && col + 1< Context.maxcol )
                     {
                         uiPutColor(palertcol);
@@ -393,7 +393,7 @@ void display( int snum )
                     uiPutColor(0);
                 }
             }
-    if ( snum > 0)
+    if ( snum >= 0)
     {
         /* Display phaser graphics. */
         if ( ! lsmap && Ships[snum].pfuse > 0 )
@@ -413,7 +413,7 @@ void display( int snum )
     }
 
     /* Display the ships. */
-    for ( i = 1; i <= MAXSHIPS; i = i + 1 )
+    for ( i = 0; i < MAXSHIPS; i++ )
         if ( Ships[i].status != SS_OFF )
         {
             if (UserConf.DoLRTorpScan)
@@ -421,7 +421,7 @@ void display( int snum )
                 /* Display the torps on a LR scan if it's a friend. */
                 if (lsmap)
                 {
-                    if (snum > 0 && Ships[snum].war[Ships[i].team] == FALSE &&
+                    if (snum >= 0 && Ships[snum].war[Ships[i].team] == FALSE &&
                         Ships[i].war[Ships[snum].team] == FALSE)
                     {
                         if (i == snum) /* if it's your torps - */
@@ -443,7 +443,7 @@ void display( int snum )
             if ( ! lsmap )
             {
                 /* First display exploding torps. */
-                if ( snum < 0 || (snum > 0 && UserConf.DoExplode) ) /* dwp */
+                if ( snum < 0 || (snum >= 0 && UserConf.DoExplode) ) /* dwp */
                     for ( j = 0; j < MAXTORPS; j = j + 1 )
                         if ( Ships[i].torps[j].status == TS_FIREBALL )
                             if ( clbCVTCoords( cenx, ceny, Ships[i].torps[j].x, Ships[i].torps[j].y,
@@ -461,7 +461,7 @@ void display( int snum )
                             }
                 /* Now display the live torps. */
 
-                if (snum > 0)
+                if (snum >= 0)
                 {			/* a ship */
                     if (i == snum) /* if it's your torps and you're a ship */
                         uiPutColor(0);
@@ -487,7 +487,7 @@ void display( int snum )
             if ( Ships[i].status == SS_LIVE )
             {
                 /* It's alive. */
-                if ( snum > 0)	/* it's a ship view */
+                if ( snum >= 0)	/* it's a ship view */
                 {
                     dis = (real) dist(Ships[snum].x, Ships[snum].y, Ships[i].x, Ships[i].y );
 
@@ -535,7 +535,7 @@ void display( int snum )
                     if (snum != i)
                         clbAdjOrbitalPosition(i);
 
-                }	/* if a ship view (snum > 0) */
+                }	/* if a ship view (snum >= 0) */
 
                 /* There is potential for un-cloaked ships and ourselves. */
                 if ( ! SCLOAKED(i) || i == snum )
@@ -554,18 +554,18 @@ void display( int snum )
                         /*  - He's within accurate scanning range */
 
                         if ( ( ! lsmap ) ||
-                             ( snum > 0 && !satwar(i, snum) ) ||
-                             ( snum > 0 && Ships[i].scanned[Ships[snum].team] &&
+                             ( snum >= 0 && !satwar(i, snum) ) ||
+                             ( snum >= 0 && Ships[i].scanned[Ships[snum].team] &&
                                !selfwar(snum) ) ||
                              ( dis <= ACCINFO_DIST ) )
                         {
-                            if ( snum > 0 && ( i == snum ) && SCLOAKED(snum) )
+                            if ( snum >= 0 && ( i == snum ) && SCLOAKED(snum) )
                                 ch = CHAR_CLOAKED;
                             else
                                 ch = Teams[Ships[i].team].teamchar;
 
                             /* determine color */
-                            if (snum > 0)
+                            if (snum >= 0)
                             {
                                 if (i == snum)    /* it's ours */
                                     uiPutColor(CQC_A_BOLD);
@@ -604,7 +604,7 @@ void display( int snum )
                             uiPutColor(0);
                         }
                     }
-                    if ( snum > 0 && snum == i )
+                    if ( snum >= 0 && snum == i )
                     {
                         /* If it's our ship and we're off the screen, fake it. */
                         if ( lin < 1 )
@@ -626,7 +626,7 @@ void display( int snum )
         zzbuf[0] = 0;
     buf[0] = 0;
 
-    if (snum > 0)
+    if (snum >= 0)
     {				/* if a ship view */
         if ( minenemy != 0 || STALERT(snum) )
 	{
@@ -704,7 +704,7 @@ void display( int snum )
     }
 
     /* Build and display the status info as necessary. */
-    if (snum > 0)
+    if (snum >= 0)
     { /* we're watching a ship */  /* dwp */
         lin = 1;
         col = 1;
@@ -1271,7 +1271,7 @@ void display( int snum )
                         0, lin + 1, dcol );
                 uiPutColor(0);
 	    }
-            else if ( i > 0 && i <= MAXSHIPS )
+            else if ( i >= 0 && i < MAXSHIPS )
 	    {
                 buf[0] = 0;
                 utAppendShip(buf , i) ;
@@ -1300,12 +1300,12 @@ void display( int snum )
     /* draw the 'header' (ship id) if we should:
      *
      * ship is valid AND we are either playing or pausing a recording, OR
-     * Our user number is MSG_GOD whick means we are in conqoper.
+     * Our user number is -1 whick means we are in conqoper.
      */
-    if (snum > 0 &&
+    if (snum >= 0 &&
         (Context.recmode == RECMODE_PLAYING  ||
          Context.recmode == RECMODE_PAUSED  ||
-         Context.unum == MSG_GOD) )
+         Context.unum == -1) )
         display_headers(snum);
 
     cdrefresh();

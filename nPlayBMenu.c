@@ -123,7 +123,7 @@ static int nPlayBMenuInput(int ch)
                 utSafeCToI( &tmpsnum, prm.buf, 0 );     /* ignore return status */
             }
 
-            if ( (tmpsnum < 1 || tmpsnum > MAXSHIPS) &&
+            if ( (tmpsnum < 0 || tmpsnum >= MAXSHIPS) &&
                  tmpsnum != DISPLAY_DOOMSDAY )
             {
                 state = S_NONE;

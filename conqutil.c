@@ -120,7 +120,7 @@ void utAppendKilledBy(char *buf, killedBy_t kb, unsigned int detail)
         strcat(buf , "GOD") ;
         break;
     case KB_SHIP:
-        if (detail > 0 && detail <= MAXSHIPS)
+        if (detail >= 0 && detail < MAXSHIPS)
             utAppendShip(buf, detail) ;
         break;
     case KB_PLANET:
@@ -147,7 +147,7 @@ void utAppendShip(char *str, int snum)
     char ch;
 
     ch = 'S';
-    if ( snum > 0 && snum <= MAXSHIPS )
+    if ( snum >= 0 && snum < MAXSHIPS )
     {
         i = Ships[snum].team;
         if ( i >= 0 && i < NUMPLAYERTEAMS )
@@ -292,24 +292,6 @@ void utSetLogConfig(int usesys, int echostderr)
     }
 
     return;
-}
-
-
-/*  utError - conquest error message to god */
-void utError(char *fmt, ...)
-{
-    va_list ap;
-    char buf[MESSAGE_SIZE] = {};
-
-    va_start(ap, fmt);
-    (void)vsnprintf(buf, MESSAGE_SIZE, fmt, ap);
-
-    va_end(ap);
-
-    clbStoreMsg( MSG_OUTSIDE, MSG_GOD, buf );
-
-    return;
-
 }
 
 void utLog(char *fmt, ...)
@@ -627,7 +609,6 @@ int utGetMsg( int snum, int *msg )
 
     }
     return ( FALSE );
-
 }
 
 

@@ -133,7 +133,7 @@ static void buildai( int snum, int vars[], int *bnenum, real *bdne, real *bane )
     if ( STALERT(snum) )
     {
         dam = 0.0;
-        for ( i = 1; i <= MAXSHIPS; i = i + 1 )
+        for ( i = 0; i < MAXSHIPS; i++ )
             if ( Ships[i].status != SS_OFF && i != snum )
                 for ( j = 0; j < MAXTORPS; j = j + 1 )
                     if ( Ships[i].torps[j].status == TS_LIVE )
@@ -220,7 +220,7 @@ void defend( int attacker, int pnum )
         return;
 
     /* See if there are any team ships to defend. */
-    for ( i = 1; i <= MAXSHIPS; i = i + 1 )
+    for ( i = 0; i < MAXSHIPS; i++ )
         if ( Ships[i].status == SS_LIVE ) /* live */
             if ( Ships[i].team == team ) /* same team */
                 if (Users[Ships[i].unum].robot || !SVACANT(i))
@@ -267,7 +267,7 @@ void defend( int attacker, int pnum )
         sprintf( buf,
                  "WARNING: You have violated %s space; prepare to die.",
                  Teams[team].name );
-        clbStoreMsg( snum, attacker, buf );
+        clbStoreMsg( MSG_FROM_SHIP, snum, MSG_TO_SHIP, attacker, buf );
     }
 
     return;
@@ -421,7 +421,8 @@ static void executeai( int snum, int token )
         break;
     case ROB_INSULT:
         robreply( buf );
-        clbStoreMsgf( snum, nenum, buf, MSG_FLAGS_ROBOT );
+        clbStoreMsgf( MSG_FROM_SHIP, snum, MSG_TO_SHIP, nenum,
+                      buf, MSG_FLAGS_ROBOT );
         break;
     case ROB_READMSG:
         /* Try to read a message and reply to it */
@@ -431,31 +432,31 @@ static void executeai( int snum, int token )
             i = Ships[snum].lastmsg;
             if ( clbCanRead( snum, i ) )
             {
-                j = Msgs[i].msgfrom;
-                if ( -j > 0 && -j <= NUMPLANETS )
-                    continue; 	/* don't talk back to planets */
+                msgFrom_t from = Msgs[i].from;
+                uint16_t fromDetail = Msgs[i].fromDetail;
 
-                if ( j > 0 && j <= MAXSHIPS )
-                    if ( SROBOT(j) )
-                        continue; 	/* don't talk back to robots */
-
-                if (j == MSG_GOD)
-                    continue;	/* don't talk back to GOD */
-
-                if (j == MSG_COMP || (Msgs[i].flags & MSG_FLAGS_TERSABLE))
-                    continue;	/* don't talk back to the computer */
-
-                robreply( buf );
-                clbStoreMsgf( snum, j, buf, MSG_FLAGS_ROBOT );
-                break;
+                // we will only ever respond to living ships
+                if (from == MSG_FROM_SHIP && fromDetail < MAXSHIPS &&
+                    !SROBOT(fromDetail))
+                {
+                    robreply( buf );
+                    // send a message back to the sender
+                    clbStoreMsgf( MSG_FROM_SHIP, snum,
+                                  MSG_TO_SHIP, fromDetail,
+                                  buf, MSG_FLAGS_ROBOT );
+                    continue;
+                }
             }
         }
         break;
     case ROB_MESSAGE:
-        clbStoreMsgf( snum, MSG_ALL, "Give me drugs.", MSG_FLAGS_ROBOT );
+        clbStoreMsgf( MSG_FROM_SHIP, snum,
+                      MSG_TO_ALL, 0,
+                      "Give me drugs.", MSG_FLAGS_ROBOT );
         break;
     case ROB_TAKEDRUGS:
-        clbStoreMsgf( snum, MSG_ALL, "I'm on drugs.", MSG_FLAGS_ROBOT );
+        clbStoreMsgf( MSG_FROM_SHIP, snum, MSG_TO_ALL, 0,
+                      "I'm on drugs.", MSG_FLAGS_ROBOT );
         break;
     case ROB_DETONATE:
         clbEnemyDet( snum );
@@ -512,7 +513,7 @@ int newrob( int *snum, int unum )
 
     /* Count number of ships currently flying. */
     j = 0;
-    for ( i = 1; i <= MAXSHIPS; i = i + 1 )
+    for ( i = 0; i < MAXSHIPS; i++ )
         if ( Ships[i].status == SS_LIVE || Ships[i].status == SS_ENTERING )
             if ( Ships[i].unum == unum && *snum != i )
                 j = j + 1;
@@ -680,7 +681,7 @@ void robotloop(void)
     /* Loop until we're aborted. */
     for (;;)
     {
-        for ( s = 1; s <= MAXSHIPS; s = s + 1 )
+        for ( s = 0; s < MAXSHIPS; s++ )
             if ( Ships[s].status == SS_LIVE )
                 if ( SROBOT(s) )
                 {

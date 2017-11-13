@@ -16,7 +16,6 @@ void     utAppendShip(char *str, int snum);
 void     utAppendKilledBy(char *buf, killedBy_t kb, unsigned int detail);
 int      utArrowsToDir( char *str, real *dir );
 void     utSetLogConfig(int usesys, int echostderr);
-void     utError(char *fmt, ...);
 void     utLog(char *fmt, ...);
 void     utDeleteBlanks( char *str );
 int      utDeltaSecs( int s, int *n );

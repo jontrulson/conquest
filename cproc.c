@@ -130,7 +130,7 @@ int procShip(char *buf)
         return FALSE;
 
     snum = sship->snum;
-    if (snum <= 0 || snum > MAXSHIPS)
+    if (snum < 0 || snum >= MAXSHIPS)
         return FALSE;
 
 #if defined(DEBUG_CLIENTPROC)
@@ -186,7 +186,7 @@ int procShipSml(char *buf)
 
     snum = sshipsml->snum;
 
-    if (snum <= 0 || snum > MAXSHIPS)
+    if (snum < 0 || snum >= MAXSHIPS)
         return FALSE;
 
 #if defined(DEBUG_CLIENTPROC)
@@ -233,7 +233,7 @@ int procShipLoc(char *buf)
 
     snum = sshiploc->snum;
 
-    if (snum <= 0 || snum > MAXSHIPS)
+    if (snum < 0 || snum >= MAXSHIPS)
         return FALSE;
 
 #if defined(DEBUG_CLIENTPROC)
@@ -402,7 +402,7 @@ int procTorp(char *buf)
     snum = storp->snum;
     tnum = storp->tnum;
 
-    if (snum <= 0 || snum > MAXSHIPS)
+    if (snum < 0 || snum >= MAXSHIPS)
         return FALSE;
 
     if (tnum < 0 || tnum >= MAXTORPS)
@@ -427,7 +427,7 @@ int procTorpLoc(char *buf)
     snum = storploc->snum;
     tnum = storploc->tnum;
 
-    if (snum <= 0 || snum > MAXSHIPS)
+    if (snum < 0 || snum >= MAXSHIPS)
         return FALSE;
 
     if (tnum < 0 || tnum >= MAXTORPS)
@@ -460,7 +460,7 @@ int procTorpEvent(char *buf)
     snum = storpev->snum;
     tnum = storpev->tnum;
 
-    if (snum <= 0 || snum > MAXSHIPS)
+    if (snum < 0 || snum >= MAXSHIPS)
         return FALSE;
 
     if (tnum < 0 || tnum >= MAXTORPS)
@@ -500,10 +500,9 @@ int procMessage(char *buf)
     if (!pktIsValid(SP_MESSAGE, buf))
         return FALSE;
 
-
     smsg->msg[MESSAGE_SIZE - 1] = 0;
-    smsg->from = (int)((int16_t)ntohs(smsg->from));
-    smsg->to = (int)((int16_t)ntohs(smsg->to));
+    smsg->fromDetail = ntohs(smsg->fromDetail);
+    smsg->toDetail = ntohs(smsg->toDetail);
 
     /* special handling when playing back a recording */
     if (Context.recmode == RECMODE_PLAYING)
@@ -513,9 +512,21 @@ int procMessage(char *buf)
             ((smsg->flags & MSG_FLAGS_ROBOT) && !UserConf.NoRobotMsgs))
         {
             memset((void *)&recMsg, 0, sizeof(Msg_t));
-            strncpy(recMsg.msgbuf, (char *)smsg->msg, MESSAGE_SIZE);
-            recMsg.msgfrom = (int)smsg->from;
-            recMsg.msgto = (int)smsg->to;
+            strncpy(recMsg.msgbuf, (char *)smsg->msg, MESSAGE_SIZE - 1);
+
+            // do a check on the enums...
+            if (smsg->to > MSG_TO_MAX || smsg->from > MSG_FROM_MAX)
+            {
+                // log it and bail
+                utLog("%s: invalid to or from in message: to %d from %d",
+                      __FUNCTION__, (int)smsg->to, (int)smsg->from);
+                return TRUE;
+            }
+
+            recMsg.from = smsg->from;
+            recMsg.fromDetail = smsg->fromDetail;
+            recMsg.to = smsg->to;
+            recMsg.toDetail = smsg->toDetail;
             recMsg.flags = smsg->flags;
         }
         return TRUE;

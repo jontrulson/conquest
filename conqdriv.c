@@ -45,7 +45,7 @@ void SigTerminate(int sig);
 /*  conqdriv - main program (DOES LOCKING) */
 int main(int argc, char *argv[])
 {
-    int s, i, j, pid, drivtenths, ship[MAXSHIPS + 1];
+    int s, i, j, pid, drivtenths, ship[MAXSHIPS];
     int ctime, etime, cacc, eacc;
     int force;
     int arg;
@@ -168,7 +168,6 @@ int main(int argc, char *argv[])
     if ( force )
     {
         utLog( "My Lord, driver %d reporting. I have assumed control.", pid );
-        utError( "My Lord, driver %d reporting. I have assumed control.", pid );
     }
     else
     {
@@ -185,7 +184,7 @@ int main(int argc, char *argv[])
         signal(SIGTERM, (void (*)(int))SigTerminate);
         signal(SIGHUP, (void (*)(int))SigTerminate);
     }
-    for ( s = 1; s <= MAXSHIPS; s = s + 1 )
+    for ( s = 0; s < MAXSHIPS; s++ )
         ship[s] = s;
 
     while ( pid == Driver->drivpid && Driver->drivstat != DRS_KAMIKAZE )
@@ -211,9 +210,9 @@ int main(int argc, char *argv[])
             if ( Driver->drivstat == DRS_RUNNING )
 	    {
                 /* Randomize ship ordering. */
-                for ( s = 1; s <= MAXSHIPS; s = s + 1 )
+                for ( s = 0; s < MAXSHIPS; s = s + 1 )
 		{
-                    i = rndint( 1, MAXSHIPS );
+                    i = rndint( 0, MAXSHIPS - 1 );
                     j = ship[i];
                     ship[i] = ship[s];
                     ship[s] = j;
@@ -277,7 +276,7 @@ void iterdrive( int *ship )
     int pnum;
 
     /* Drive the ships. */
-    for ( s = 1; s <= MAXSHIPS; s = s + 1 )
+    for ( s = 0; s < MAXSHIPS; s++ )
     {
         i = ship[s];
         if ( Ships[i].status == SS_LIVE )
@@ -400,7 +399,9 @@ void iterdrive( int *ship )
                                 sprintf( buf,
                                          "Coming into orbit around %s.",
                                          Planets[j].name );
-                                clbStoreMsgf( MSG_COMP, i, buf, MSG_FLAGS_TERSABLE );
+                                clbStoreMsgf( MSG_FROM_COMP, 0,
+                                              MSG_TO_SHIP, i,
+                                              buf, MSG_FLAGS_TERSABLE );
 			    }
 			}
                         else if ( ( dis - ORBIT_DIST ) <=
@@ -416,7 +417,9 @@ void iterdrive( int *ship )
                                 sprintf( buf,
                                          "Approaching %s - commencing orbital insertion maneuver.",
                                          Planets[j].name );
-                                clbStoreMsgf( MSG_COMP, i, buf, MSG_FLAGS_TERSABLE );
+                                clbStoreMsgf( MSG_FROM_COMP, 0,
+                                              MSG_TO_SHIP, i,
+                                              buf, MSG_FLAGS_TERSABLE );
 			    }
 			}
 		    }
@@ -427,7 +430,7 @@ void iterdrive( int *ship )
 
     /* Drive the torps. */
     clbTorpDrive(ITER_SECONDS);
-    for ( s = 1; s <= MAXSHIPS; s = s + 1 )
+    for ( s = 0; s < MAXSHIPS; s++ )
     {
         i = ship[s];
         if ( Ships[i].status != SS_OFF )
@@ -439,7 +442,7 @@ void iterdrive( int *ship )
                     /* Detonate. */
                     Ships[i].torps[j].fuse = FIREBALL_FUSE;
                     Ships[i].torps[j].status = TS_FIREBALL;
-                    for ( t = 1; t <= MAXSHIPS; t = t + 1 )
+                    for ( t = 0; t < MAXSHIPS; t++ )
 		    {
                         k = ship[t];
 
@@ -506,9 +509,9 @@ void secdrive( int *ship )
     int s, t, i, j, k;
     real dis, repair, inc, dec;
     real x;
-    int talert[MAXSHIPS + 1];
+    int talert[MAXSHIPS];
 
-    for ( s = 1; s <= MAXSHIPS; s = s + 1 )
+    for ( s = 0; s < MAXSHIPS; s++ )
     {
         i = ship[s];
         if ( Ships[i].status == SS_OFF )
@@ -642,7 +645,9 @@ void secdrive( int *ship )
 	{
             Ships[i].wfuse = Ships[i].wfuse - 1;
             if ( Ships[i].wfuse <= 0 )
-                clbStoreMsgf( MSG_COMP, i, "Weapons are back on-line.",
+                clbStoreMsgf( MSG_FROM_COMP, 0,
+                              MSG_TO_SHIP, i,
+                              "Weapons are back on-line.",
                               MSG_FLAGS_TERSABLE);
 	}
         if ( Ships[i].efuse > 0 )
@@ -650,7 +655,9 @@ void secdrive( int *ship )
             Ships[i].efuse = Ships[i].efuse - 1;
             Ships[i].dwarp = 0.0;
             if ( Ships[i].efuse <= 0 )
-                clbStoreMsgf( MSG_COMP, i, "Engine power has been restored.",
+                clbStoreMsgf( MSG_FROM_COMP, 0,
+                              MSG_TO_SHIP, i,
+                              "Engine power has been restored.",
                               MSG_FLAGS_TERSABLE);
 	}
 
@@ -720,9 +727,9 @@ void secdrive( int *ship )
     }
 
     /* Torp alert logic. */
-    for ( i = 1; i <= MAXSHIPS; i = i + 1 )
+    for ( i = 0; i < MAXSHIPS; i++ )
         talert[i] = FALSE;
-    for ( s = 1; s <= MAXSHIPS; s = s + 1 )
+    for ( s = 0; s < MAXSHIPS; s++ )
     {
         i = ship[s];
         if ( Ships[i].status != SS_OFF )
@@ -745,7 +752,7 @@ void secdrive( int *ship )
                         if ( Ships[i].torps[j].status == TS_LIVE )
                         {
                             /* Proximity check. */
-                            for ( t = 1; t <= MAXSHIPS; t = t + 1 )
+                            for ( t = 0; t < MAXSHIPS; t++ )
                             {
                                 k = ship[t];
                                 if ( Ships[k].status == SS_LIVE && k != i )
@@ -779,7 +786,7 @@ void secdrive( int *ship )
 	}
     }
     /* Finish up torp alert logic. */
-    for ( i = 1; i <= MAXSHIPS; i = i + 1 )
+    for ( i = 0; i < MAXSHIPS; i++ )
         if (talert[i])
             SFSET(i, SHIP_F_TALERT);
         else
@@ -795,7 +802,7 @@ void secdrive( int *ship )
 	    {
                 /* Decrement armies. */
                 if ( rnd() <= 0.1 )
-                    clbIntrude( MSG_DOOM, -Doomsday->lock );
+                    clbIntrude( -1 /*doomsday*/, -Doomsday->lock );
                 PVLOCK(&ConqInfo->lockword);
                 Planets[-Doomsday->lock].armies = Planets[-Doomsday->lock].armies - 1;
                 if ( Planets[-Doomsday->lock].armies <= 0 )

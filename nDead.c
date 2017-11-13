@@ -59,16 +59,16 @@ void nDeadInit(void)
     snum = Context.snum;
 
     /* If something is wrong, don't do anything. */
-    if ( snum < 1 || snum > MAXSHIPS )
+    if ( snum < 0 || snum >= MAXSHIPS )
     {
-        utLog("nDead: nDeadInit: snum < 1 || snum > MAXSHIPS (%d)", snum);
+        utLog("nDead: nDeadInit: snum < 0 || snum >= MAXSHIPS (%d)", snum);
         nMenuInit();
     }
 
     kb = Ships[snum].killedBy;
     detail = Ships[snum].killedByDetail;
 
-    if (kb == KB_SHIP && detail > 0 && detail <= MAXSHIPS)
+    if (kb == KB_SHIP && detail >= 0 && detail < MAXSHIPS)
         eShip = Ships[detail];        /* get copy of killers ship */
     else
         memset((void *)&eShip, 0, sizeof(Ship_t));
@@ -146,7 +146,7 @@ static int nDeadDisplay(dspConfig_t *dsp)
     case KB_SHIP:
         cbuf[0] = 0;
         buf[0] = 0;
-        if ( detail > 0 && detail <= MAXSHIPS )
+        if ( detail >= 0 && detail < MAXSHIPS )
 	{
             utAppendShip(cbuf, detail) ;
             if ( eShip.status != SS_LIVE )
@@ -184,7 +184,6 @@ static int nDeadDisplay(dspConfig_t *dsp)
         /* We were unable to determine the cause of death. */
         utAppendShip(buf, snum);
         sprintf(cbuf, "dead: %s was killed by %d(%d).", buf, kb, detail);
-        utError( cbuf );
         utLog(cbuf);
 
         cprintf(8,0,ALIGN_CENTER,"#%d#%s%s",
@@ -313,7 +312,7 @@ static int nDeadInput(int ch)
     case S_LASTWCONF:
         if (ch == TERM_EXTRA)
         {                       /* we are done */
-            sendMessage(MSG_GOD, lastwords);
+            sendMessage(MSG_FROM_GOD, 0, lastwords);
             setONode(NULL);
             nMenuInit();
         }

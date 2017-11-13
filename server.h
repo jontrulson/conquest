@@ -61,6 +61,4 @@ int sendConqInfo(int sock, int force);
 int sendHistory(int sock, int hnum);
 int sendDoomsday(int sock);
 
-int checkOperExec(int from, int to, char *msg);
-
 #endif /* SERVER_H_INCLUDED */

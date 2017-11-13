@@ -440,7 +440,7 @@ void recGenTorpLoc(void)
     int snum = Context.snum;
     int team = Ships[snum].team;
     spTorpLoc_t storploc;
-    static spTorpLoc_t pktTorpLoc[MAXSHIPS + 1][MAXTORPS] = {};
+    static spTorpLoc_t pktTorpLoc[MAXSHIPS][MAXTORPS] = {};
     real dis;
     real x, y;
     static uint32_t iterstart = 0;
@@ -456,7 +456,7 @@ void recGenTorpLoc(void)
 
     iterstart = iternow;
 
-    for (i=1; i<=MAXSHIPS; i++)
+    for (i=0; i<MAXSHIPS; i++)
     {
         if ( Ships[i].status != SS_OFF )
         {

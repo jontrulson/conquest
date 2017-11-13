@@ -58,16 +58,16 @@ extern void conqend(void);
 
 
 /* torp direction tracking */
-static real torpdir[MAXSHIPS + 1][MAXTORPS];
+static real torpdir[MAXSHIPS][MAXTORPS];
 
 /* loaded texture list (the list itself is exported in textures.h) */
 static int loadedGLTextures = 0; /* count of total successful tex loads */
 
 /* torp animation states */
-static animStateRec_t torpAStates[MAXSHIPS + 1][MAXTORPS] = {};
+static animStateRec_t torpAStates[MAXSHIPS][MAXTORPS] = {};
 
 /* bomb (torp) animation state */
-static animStateRec_t bombAState[MAXSHIPS + 1] = {};
+static animStateRec_t bombAState[MAXSHIPS] = {};
 
 static int frame=0, timebase=0;
 static float FPS = 0.0;
@@ -433,7 +433,7 @@ static int initGLExplosions(void)
     initastate.expired = CQI_ANIMS_MASK;
 
     /* init the anim states for them all */
-    for (i=1; i<=MAXSHIPS; i++)
+    for (i=0; i<MAXSHIPS; i++)
         for (j=0; j<MAXTORPS; j++)
             torpAStates[i][j] = initastate;
 
@@ -682,7 +682,7 @@ static int _get_glplanet_info(GLPlanet_t *curGLPlanet, int plani)
 int uiUpdateTorpDir(int snum, int tnum)
 {
 
-    if (snum < 1 || snum > MAXSHIPS)
+    if (snum < 0 || snum >= MAXSHIPS)
         return FALSE;
 
     if (tnum < 0 || tnum >= MAXTORPS)
@@ -1160,7 +1160,7 @@ void drawBombing(int snum, int scale)
         real rndy;                  /* random Y offset from planet */
     } *rnd;
 
-    if (snum < 1 || snum > MAXSHIPS)
+    if (snum < 0 || snum >= MAXSHIPS)
         return;
 
     /* don't bother if we aren't orbiting anything */
@@ -1176,7 +1176,7 @@ void drawBombing(int snum, int scale)
         /* start out expired */
         initastate.expired = CQI_ANIMS_MASK;
 
-        for (i=1; i <= MAXSHIPS; i++)
+        for (i=0; i < MAXSHIPS; i++)
         {
             bombAState[i] = initastate;
 
@@ -2762,7 +2762,7 @@ void drawViewerBG(int snum, int dovbg)
     /* half-width of vbg at TRANZ */
     static const GLfloat vbgrad = NEGENBEND_DIST * 1.2;
 
-    if (snum < 1 || snum > MAXSHIPS)
+    if (snum < 0 || snum >= MAXSHIPS)
         return;
 
     if (!GLTextures || !GLShips[0][0].ship)
