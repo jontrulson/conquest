@@ -173,7 +173,7 @@ void clbHit( int snum, real ht, killedBy_t kb, uint16_t detail )
 
 
 /*  kill a ship */
-/*  Note: This routines ASSUMES you have the common locked before you it. */
+/*  Note: This routines ASSUMES you have the common locked before you use it. */
 void clbIKill(int snum, killedBy_t kb, uint16_t detail)
 {
     int i, unum, team, kunum, kteam;
@@ -211,7 +211,7 @@ void clbIKill(int snum, killedBy_t kb, uint16_t detail)
         Ships[snum].kills = Ships[snum].kills + CONQUER_KILLS;
     else if ( kb == KB_GOTDOOMSDAY )
         Ships[snum].kills = Ships[snum].kills + DOOMSDAY_KILLS;
-    else if ( kb == KB_SHIP && detail < MAXSHIPS ) /* if a ship did the killing */
+    else if ( kb == KB_SHIP && detail < MAXSHIPS ) // if a ship did the killing
     {
         kunum = Ships[detail].unum;
         kteam = Ships[detail].team;
@@ -234,13 +234,13 @@ void clbIKill(int snum, killedBy_t kb, uint16_t detail)
             Teams[kteam].stats[TSTAT_WINS] =
                 Teams[kteam].stats[TSTAT_WINS] - (int)Ships[detail].kills;
             Ships[detail].kills = Ships[detail].kills + tkills;
-            clbChalkup( kb );
+            clbChalkup( detail );
 	}
 
         /* Sticky war logic. */
         /* should set sticky war too. -JET */
 
-        if ( ! Ships[snum].war[kteam] )
+        if ( ! Ships[detail].war[kteam] )
 	{
             Ships[detail].war[team] = TRUE;
             Ships[detail].rwar[team] = TRUE;
@@ -411,8 +411,8 @@ void clbKillShip(int snum, killedBy_t kb, uint16_t detail)
         break;
 
     default:
-        utLog("%s: Invalid killing, snum %d, kb %d, detail %d", __FUNCTION__,
-              kb, detail);
+        utLog("%s: Invalid killedby: snum %d, kb %d, detail %d", __FUNCTION__,
+              snum, (int)kb, (int)detail);
     }
 
     if (sendmesg == TRUE)

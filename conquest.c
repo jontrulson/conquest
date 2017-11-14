@@ -1119,7 +1119,8 @@ void dead( int snum, int leave )
         cbuf[0] = 0;
         buf[0] = 0;
         utAppendShip(buf , snum) ;
-        sprintf(cbuf, "dead: %s was killed by %d.", buf, kb);
+        sprintf(cbuf, "dead: %s was killed by %d(%d).", buf,
+                (int)kb, (int)detail);
         utLog(cbuf);
 
         cprintf(8,0,ALIGN_CENTER,"#%d#%s%s",

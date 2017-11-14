@@ -807,7 +807,7 @@ void dead( int snum, int leave )
 
     buf[0] = 0;
     utAppendShip(buf , snum) ;
-    utLog("INFO: dead: %s was killed by %d(%d).", buf, (int)kb, detail);
+    utLog("INFO: dead: %s was killed by %d(%d).", buf, (int)kb, (int)detail);
 
     updateClient(FALSE);
     for ( i=0; i<10 && Ships[snum].status == SS_DYING; i++ )
@@ -1019,7 +1019,7 @@ void handleSimpleCmdPkt(cpCommand_t *ccmd)
     case CPCMD_SWITCHTEAM:
         if (sInfo.state == SVR_STATE_MAINMENU)
 	{
-            int team = (int)((uint16_t)ntohs(ccmd->detail));
+            int team = (int)ntohs(ccmd->detail);
 
             if (team >= 0 && team < NUMPLAYERTEAMS)
 	    {
