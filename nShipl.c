@@ -86,7 +86,7 @@ static int nShiplDisplay(dspConfig_t *dsp)
 
     i = fship;
 
-    lin = fline - 1;
+    lin = fline;
     while ( i < MAXSHIPS && lin <= lline )
     {
         status = Ships[i].status;
@@ -148,6 +148,7 @@ static int nShiplDisplay(dspConfig_t *dsp)
                 else
                     color = YellowLevelColor;
             }
+
             cprintf(lin, col, ALIGN_NONE, "#%d#%s", color, cbuf);
 
             if ( doall && status != SS_LIVE )
