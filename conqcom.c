@@ -292,7 +292,7 @@ static void map_vars(void)
 
     map1d(Robot, Robot_t, 1);
 
-    map1d(Planets, Planet_t, NUMPLANETS + 1);
+    map1d(Planets, Planet_t, MAXPLANETS + 1);
 
     map1d(Teams, Team_t, NUMALLTEAMS);
 

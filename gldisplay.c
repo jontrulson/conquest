@@ -99,7 +99,7 @@ void display( int snum )
     }
 
     /* Display the planets and suns. */
-    for ( i = NUMPLANETS; i > 0; i = i - 1 )
+    for ( i = MAXPLANETS; i > 0; i = i - 1 )
     {
         if ( ! PVISIBLE(i) )
             continue;

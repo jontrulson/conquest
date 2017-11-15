@@ -51,7 +51,7 @@
 /*#define COMMONSTAMP 20001231 		 stardate? */
 /*#define COMMONSTAMP 20030829 */
 // #define COMMONSTAMP 20101027
-#define COMMONSTAMP 20171113
+#define COMMONSTAMP 20171114
 
 #ifndef PI
 # define PI 3.141592654
@@ -161,9 +161,10 @@ typedef enum {
 #define NUM_EXTRAPLANETS 20
 
 /* number of planets */
-#define NUMPLANETS (NUM_BASEPLANETS + NUM_EXTRAPLANETS)
+#define MAXPLANETS (NUM_BASEPLANETS + NUM_EXTRAPLANETS)
 
 /* Planet numbers. */
+// FIXME - we should be able to get rid of these
 #define PNUM_EARTH 1
 #define PNUM_ROMULUS 2
 #define PNUM_KLINGUS 3

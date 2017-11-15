@@ -127,7 +127,7 @@ int proc_0006_Ship(char *buf)
     //    Ships[snum].killedby = (int)((int16_t)ntohs(sship->killedby));
     Ships[snum].kills = (real)((real)ntohl(sship->kills) / 10.0);
 
-    for (i=1; i<=(40 + 20) /*NUMPLANETS*/; i++)
+    for (i=1; i<=(40 + 20) /*MAXPLANETS*/; i++)
         Ships[snum].srpwar[i] = (int)sship->srpwar[i];
 
     for (i=0; i<4 /*NUMPLAYERTEAMS*/; i++)
@@ -219,7 +219,7 @@ int proc_0006_Planet(char *buf)
 
     pnum = splan->pnum;
 
-    if (pnum <= 0 || pnum > (40 + 20) /*NUMPLANETS*/)
+    if (pnum <= 0 || pnum > (40 + 20) /*MAXPLANETS*/)
         return FALSE;
 
     Planets[pnum].type = splan->ptype;
@@ -244,7 +244,7 @@ int proc_0006_PlanetSml(char *buf)
 
     pnum = splansml->pnum;
 
-    if (pnum <= 0 || pnum > (40 + 20) /*NUMPLANETS*/)
+    if (pnum <= 0 || pnum > (40 + 20) /*MAXPLANETS*/)
         return FALSE;
 
     for (i=0; i<4 /*NUMPLAYERTEAMS*/; i++)
@@ -268,7 +268,7 @@ int proc_0006_PlanetLoc(char *buf)
 
     pnum = splanloc->pnum;
 
-    if (pnum <= 0 || pnum > (40 + 20) /*NUMPLANETS*/)
+    if (pnum <= 0 || pnum > (40 + 20) /*MAXPLANETS*/)
         return FALSE;
 
     Planets[pnum].armies = (int)((int16_t)ntohs(splanloc->armies));
@@ -288,7 +288,7 @@ int proc_0006_PlanetLoc2(char *buf)
 
     pnum = splanloc2->pnum;
 
-    if (pnum <= 0 || pnum > NUMPLANETS)
+    if (pnum <= 0 || pnum > 60 /*MAXPLANETS*/)
         return FALSE;
 
     Planets[pnum].armies = (int)((int16_t)ntohs(splanloc2->armies));
@@ -310,13 +310,13 @@ int proc_0006_PlanetInfo(char *buf)
 
     pnum = splaninfo->pnum;
 
-    if (pnum <= 0 || pnum > (40 + 20) /*NUMPLANETS*/)
+    if (pnum <= 0 || pnum > (40 + 20) /*MAXPLANETS*/)
         return FALSE;
 
     primary = splaninfo->primary;
 
     /* Roy fix - 10/17/2005 - let mur data be sent. */
-    if (primary < 0 || primary > (40 + 20) /*NUMPLANETS*/)
+    if (primary < 0 || primary > (40 + 20) /*MAXPLANETS*/)
         return FALSE;
 
     /* in protocol 6, we 'forgot' planet realness.  To avoid breaking

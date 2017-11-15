@@ -81,7 +81,8 @@
         int war[NUMPLAYERTEAMS];	/* teams s/he is at war with - copy */
         /*  of war */
         int rwar[NUMPLAYERTEAMS];	/* teams s/he is at WAR with */
-        int srpwar[NUMPLANETS + 1];	/* self-ruled planets s/he is at war */
+        // FIXME - how do we handle this via cbGlobal
+        int srpwar[MAXPLANETS + 1];	/* self-ruled planets s/he is at war */
         int sdfuse;			/* self-destruct fuse, 0 normally */
         int lastmsg;			/* last message seen */
         int alastmsg;			/* last message allowed to be seen */
@@ -98,6 +99,7 @@
         int cacc;			/* accumulated cpu time */
         int eacc;			/* accumulated elapsed time */
         real strkills;		/* 'extra' randomized kills used for robots */
+        // FIXME - how do we handle this via cbGlobal
         Torp_t torps[MAXTORPS];	/* Torpedos */
         uint16_t flags;		/* SHIP_F_ */
         uint16_t pad1;			/* PAD */

@@ -1099,7 +1099,7 @@ void dead( int snum, int leave )
 
     case KB_PLANET:
         cbuf[0] = buf[0] = 0;
-        if ( detail > 0 && detail <= NUMPLANETS )
+        if ( detail > 0 && detail <= MAXPLANETS )
 	{
             if ( Planets[detail].type == PLANET_SUN )
                 strcpy(cbuf, "solar radiation.");
@@ -1887,7 +1887,7 @@ void docoup( int snum )
             MSG_LIN1 );
         return;
     }
-    for ( i = 1; i <= NUMPLANETS; i = i + 1 )
+    for ( i = 1; i <= MAXPLANETS; i = i + 1 )
         if ( Planets[i].team == Ships[snum].team && Planets[i].armies > 0 )
         {
             mcuPutMsg( "We don't need to coup, we still have armies left!",

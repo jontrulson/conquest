@@ -26,7 +26,7 @@
 
 static int team, snum;
 
-static int PlanetOffset;    /* offset into NUMPLANETS for this page */
+static int PlanetOffset;    /* offset into MAXPLANETS for this page */
 static int PlanetIdx;
 static char *hd0="P L A N E T   L I S T   ";
 static char *hd1="' = must take to conquer the Universe)";
@@ -66,7 +66,7 @@ scrNode_t *nPlanetlInit(int nodeid, int setnode, int sn, int tn)
 static int nPlanetlDisplay(dspConfig_t *dsp)
 {
     int i, lin, col, olin, pnum;
-    static int sv[NUMPLANETS + 1];
+    static int sv[MAXPLANETS + 1];
     char ch, junk[10], coreflag;
     int outattr;
     int col2;
@@ -93,7 +93,7 @@ static int nPlanetlDisplay(dspConfig_t *dsp)
                 hd1);
 
         /* sort the planets */
-        for ( i = 1; i <= NUMPLANETS; i++ )
+        for ( i = 1; i <= MAXPLANETS; i++ )
             sv[i] = i;
         clbSortPlanets( sv );
 
@@ -120,9 +120,9 @@ static int nPlanetlDisplay(dspConfig_t *dsp)
     col2 = FALSE;
 
     PlanetIdx = 0;
-    if (PlanetOffset <= NUMPLANETS)
+    if (PlanetOffset <= MAXPLANETS)
     {
-        while ((PlanetOffset + PlanetIdx) <= NUMPLANETS)
+        while ((PlanetOffset + PlanetIdx) <= MAXPLANETS)
         {
             i = PlanetOffset + PlanetIdx;
             PlanetIdx++;
@@ -275,12 +275,12 @@ static int nPlanetlDisplay(dspConfig_t *dsp)
 
         } /* while */
 
-        if ((PlanetOffset + PlanetIdx) > NUMPLANETS)
+        if ((PlanetOffset + PlanetIdx) > MAXPLANETS)
             cprintf(MSG_LIN2, 0,  ALIGN_CENTER, "#%d#%s", NoColor, MTXT_DONE);
         else
             cprintf(MSG_LIN2, 0,  ALIGN_CENTER, "#%d#%s", NoColor, MTXT_MORE);
 
-    } /* if PlanetOffset <= NUMPLANETS */
+    } /* if PlanetOffset <= MAXPLANETS */
 
     return NODE_OK;
 }
@@ -321,7 +321,7 @@ static int nPlanetlInput(int ch)
     {
         PlanetOffset += PlanetIdx;
 
-        if (PlanetOffset <= NUMPLANETS)
+        if (PlanetOffset <= MAXPLANETS)
             return NODE_OK;
     }
 

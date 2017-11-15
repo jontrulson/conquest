@@ -124,7 +124,7 @@ void utAppendKilledBy(char *buf, killedBy_t kb, uint16_t detail)
             utAppendShip(buf, detail) ;
         break;
     case KB_PLANET:
-        if ( detail > 0 && detail <= NUMPLANETS )
+        if ( detail > 0 && detail <= MAXPLANETS )
             strcat(buf , Planets[detail].name) ;
         break;
     default:

@@ -228,7 +228,7 @@ void display( int snum )
     }
 
     /* Display the planets and suns. */
-    for ( i = NUMPLANETS; i > 0; i = i - 1 )
+    for ( i = MAXPLANETS; i > 0; i = i - 1 )
     {
         if ( ! PVISIBLE(i) )
             continue; /*next;*/
@@ -836,7 +836,7 @@ void display( int snum )
             cdclra( lin, datacol, lin, STAT_COLS-1 );
 
             uiPutColor(InfoColor);
-            if ( -i > 0 && -i <= NUMPLANETS)
+            if ( -i > 0 && -i <= MAXPLANETS)
                 sprintf( buf, "%.3s", Planets[-i].name );
             else
                 sprintf( buf, "%d", i );
@@ -1261,7 +1261,7 @@ void display( int snum )
             cdputs( zbuf, lin, dcol );	/* clean up status line */
 
             i = Doomsday->lock;
-            if ( -i > 0 && -i <= NUMPLANETS )
+            if ( -i > 0 && -i <= MAXPLANETS )
 	    {
                 uiPutColor(RedLevelColor);
                 cdputs( Planets[-i].name, lin, dcol );	/* -[] */

@@ -340,7 +340,7 @@ void debugdisplay( int snum )
 {
 
     /* The following aren't displayed by this routine... */
-    /* int ssrpwar(snum,NUMPLANETS)	# self-ruled planets s/he is at war */
+    /* int ssrpwar(snum,MAXPLANETS)	# self-ruled planets s/he is at war */
     /* int slastmsg(snum)		# last message seen */
     /* int salastmsg(snum)		# last message allowed to be seen */
     /* int smap(snum)			# strategic map or not */
@@ -437,7 +437,7 @@ void debugdisplay( int snum )
     cprintf(lin,tcol,ALIGN_NONE,"#%d#%s",LabelColor, "     slock:");
     cprintf(lin+1,tcol,ALIGN_NONE,"#%d#%s",LabelColor, "       dtt:");
     i = Ships[snum].lock;
-    if ( -i >= 1 && -i <= NUMPLANETS )
+    if ( -i >= 1 && -i <= MAXPLANETS )
     {
         cprintf(lin,dcol,ALIGN_NONE,"#%d#%s",InfoColor, Planets[-i].name);
         cprintf(lin+1,dcol,ALIGN_NONE,"#%d#%0d",InfoColor,
@@ -636,14 +636,14 @@ void debugplan(void)
 
     int i, j, k, cmd, lin, col, olin;
     int outattr;
-    static int sv[NUMPLANETS + 1];
+    static int sv[MAXPLANETS + 1];
     char junk[10], uninhab[20];
     char hd0[MSGMAXLINE*4];
     char *hd1="D E B U G G I N G  P L A N E T   L I S T";
     char *hd2="planet        C T arm uih scan        planet        C T arm uih scan";
     char hd3[BUFFER_SIZE_256];
     int FirstTime = TRUE;
-    int PlanetOffset;             /* offset into NUMPLANETS for this page */
+    int PlanetOffset;             /* offset into MAXPLANETS for this page */
     int PlanetIdx = 0;
     int Done;
 
@@ -662,7 +662,7 @@ void debugplan(void)
                 InfoColor,
                 "' = hidden)");
 
-        for ( i = 1; i <= NUMPLANETS; i = i + 1 )
+        for ( i = 1; i <= MAXPLANETS; i = i + 1 )
             sv[i] = i;
         clbSortPlanets( sv );
     }
@@ -700,9 +700,9 @@ void debugplan(void)
 
         PlanetIdx = 0;
 
-        if (PlanetOffset <= NUMPLANETS)
+        if (PlanetOffset <= MAXPLANETS)
         {
-            while ((PlanetOffset + PlanetIdx) <= NUMPLANETS)
+            while ((PlanetOffset + PlanetIdx) <= MAXPLANETS)
             {
                 i = PlanetOffset + PlanetIdx;
                 PlanetIdx++;
@@ -768,7 +768,7 @@ void debugplan(void)
                 uiPutColor(0);
 	    } /* while */
 
-            if ((PlanetOffset + PlanetIdx) > NUMPLANETS)
+            if ((PlanetOffset + PlanetIdx) > MAXPLANETS)
                 mcuPutPrompt( MTXT_DONE, MSG_LIN2 ); /* last page? */
             else
                 mcuPutPrompt( MTXT_MORE, MSG_LIN2 );
@@ -785,7 +785,7 @@ void debugplan(void)
                 {               /* some other key... */
                     /* setup for new page */
                     PlanetOffset += PlanetIdx;
-                    if (PlanetOffset > NUMPLANETS)
+                    if (PlanetOffset > MAXPLANETS)
                     {           /* pointless to continue */
                         Done = TRUE;
                     }
@@ -793,9 +793,9 @@ void debugplan(void)
             }
 
             /* didn't get a char, update */
-        } /* if PlanetOffset <= NUMPLANETS */
+        } /* if PlanetOffset <= MAXPLANETS */
         else
-            Done = TRUE;            /* else PlanetOffset > NUMPLANETS */
+            Done = TRUE;            /* else PlanetOffset > MAXPLANETS */
 
     } while(Done != TRUE); /* do */
 
@@ -819,7 +819,7 @@ int opPlanetMatch( char str[], int *pnum )
         i = 0;
         if ( ! utSafeCToI( pnum, str, i ) )
             return ( FALSE );
-        if ( *pnum < 1 || *pnum > NUMPLANETS )
+        if ( *pnum < 1 || *pnum > MAXPLANETS )
             return ( FALSE );
     }
     else
@@ -1187,7 +1187,7 @@ void operate(void)
 	    {
                 strcpy(buf , "ON (") ;
                 i = Doomsday->lock;
-                if ( -i > 0 && -i <= NUMPLANETS )
+                if ( -i > 0 && -i <= MAXPLANETS )
                     strcat(buf , Planets[-i].name) ;
                 else
                     utAppendShip(buf , i) ;		/* this will handle funny numbers */
@@ -2017,15 +2017,15 @@ void oppedit(void)
 	case '>': /* forward rotate planet number - dwp */
 	case KEY_RIGHT:
 	case KEY_UP:
-            pnum = mod( pnum + 1, NUMPLANETS );
-            pnum = (pnum == 0) ? NUMPLANETS : pnum;
+            pnum = mod( pnum + 1, MAXPLANETS );
+            pnum = (pnum == 0) ? MAXPLANETS : pnum;
             break;
 	case '<':  /* reverse rotate planet number - dwp */
 	case KEY_LEFT:
 	case KEY_DOWN:
             pnum = (pnum >= 0) ? -pnum : pnum;
-            pnum = mod( (NUMPLANETS + 1) - (pnum + 1), NUMPLANETS + 1 );
-            pnum = (pnum == 0) ? NUMPLANETS : pnum;
+            pnum = mod( (MAXPLANETS + 1) - (pnum + 1), MAXPLANETS + 1 );
+            pnum = (pnum == 0) ? MAXPLANETS : pnum;
             break;
 	case ' ':
             /* do no-thing */

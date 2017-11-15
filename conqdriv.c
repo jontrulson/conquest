@@ -287,7 +287,7 @@ void iterdrive( int *ship )
 
             warp = Ships[i].warp;
             pnum = -Ships[i].lock;
-            if ( pnum > 0 && pnum <= NUMPLANETS )
+            if ( pnum > 0 && pnum <= MAXPLANETS )
             {
                 if ( warp < 0.0 )
                 {
@@ -566,7 +566,7 @@ void secdrive( int *ship )
                 Ships[i].scanned[j] = Ships[i].scanned[j] - 1;
 
         /* Ships, planets and suns scans. */
-        for ( j = 1; j <= NUMPLANETS; j = j + 1 )
+        for ( j = 1; j <= MAXPLANETS; j = j + 1 )
             if ( PVISIBLE(j) )
             {
                 /* Do we scan the planet? */
@@ -585,7 +585,7 @@ void secdrive( int *ship )
                 }
 
                 /* Does the planet scan us? */
-                if ( j <= NUMPLANETS )
+                if ( j <= MAXPLANETS )
                     if ( dis <= ACCINFO_DIST )
                         if ( ! SCLOAKED(i) )
                         {
@@ -855,7 +855,7 @@ void mindrive(void)
     /* cleanup any unliving ships */
     clbCheckShips(TRUE);
 
-    for ( i = 1; i <= NUMPLANETS; i = i + 1 )
+    for ( i = 1; i <= MAXPLANETS; i = i + 1 )
     {
         /* Decrement puninhabtime(). */
         if ( Planets[i].uninhabtime > 0 )
@@ -886,7 +886,7 @@ void fivemindrive(void)
 
     /* Drive the planets. */
     PVLOCK(&ConqInfo->lockword);
-    for ( i = 1; i <= NUMPLANETS; i = i + 1 )
+    for ( i = 1; i <= MAXPLANETS; i = i + 1 )
         if (Planets[i].type != PLANET_SUN)
         {
             if ( Planets[i].armies > 0 && Planets[i].team != TEAM_GOD )

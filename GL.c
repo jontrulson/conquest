@@ -567,7 +567,7 @@ static int _get_glplanet_info(GLPlanet_t *curGLPlanet, int plani)
     if (!GLPlanets)
         return FALSE;
 
-    if (plani < 1 || plani > NUMPLANETS)
+    if (plani < 1 || plani > MAXPLANETS)
         return FALSE;
 
     /* first find the appropriate texture.  We look for one in this order:
@@ -710,7 +710,7 @@ int uiUpdatePlanet(int plani)
     if (!GLPlanets)
         return FALSE;
 
-    if (plani < 1 || plani > NUMPLANETS)
+    if (plani < 1 || plani > MAXPLANETS)
         return FALSE;
 
     curGLPlanet = &GLPlanets[plani - 1];
@@ -737,17 +737,17 @@ static int initGLPlanets(void)
 
     /* allocate enough space */
 
-    if (!(GLPlanets = (GLPlanet_t *)malloc(sizeof(GLPlanet_t) * NUMPLANETS)))
+    if (!(GLPlanets = (GLPlanet_t *)malloc(sizeof(GLPlanet_t) * MAXPLANETS)))
     {
         utLog("%s: ERROR: malloc(%d) failed.", __FUNCTION__,
-              sizeof(GLPlanet_t) * NUMPLANETS);
+              sizeof(GLPlanet_t) * MAXPLANETS);
 
         return FALSE;
     }
 
     /* now go through each one, setting up the proper values */
     /* GLPlanets is 0 based, as opposed to CB 1 based Planets[].  */
-    for (i=0; i<NUMPLANETS; i++)
+    for (i=0; i<MAXPLANETS; i++)
     {
         int plani = i + 1;        /* cleaner looking instead of +1 crap? */
 
@@ -1282,7 +1282,7 @@ void drawPlanet( GLfloat x, GLfloat y, int pnum, int scale,
 #endif
 
     /* sanity */
-    if (pnum < 1 || pnum > NUMPLANETS)
+    if (pnum < 1 || pnum > MAXPLANETS)
     {
         utLog("uiGLdrawPlanet(): invalid pnum = %d", pnum);
 

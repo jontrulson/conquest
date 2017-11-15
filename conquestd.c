@@ -973,7 +973,7 @@ int updateClient(int force)
         }
     }
 
-    for (i=1; i<=NUMPLANETS; i++)
+    for (i=1; i<=MAXPLANETS; i++)
         sendPlanet(sInfo.sock, i, force);
 
     if (doteam)

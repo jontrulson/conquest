@@ -165,7 +165,7 @@ static int nDeadDisplay(dspConfig_t *dsp)
     case KB_PLANET:
         cbuf[0] = 0;
         buf[0] = 0;
-        if ( detail > 0 && detail <= NUMPLANETS )
+        if ( detail > 0 && detail <= MAXPLANETS )
 	{
             if ( Planets[detail].type == PLANET_SUN )
                 strcpy(cbuf, "solar radiation.");

@@ -113,7 +113,7 @@ void hudSetHeading(int snum)
         i = round( Ships[snum].head );
     if ( i != hudData.heading.head)
     {
-        if ( -i > 0 && -i <= NUMPLANETS)
+        if ( -i > 0 && -i <= MAXPLANETS)
         {                       /* just the first 3 characters if locked */
             hudData.heading.str[0] = Planets[-i].name[0];
             hudData.heading.str[1] = Planets[-i].name[1];

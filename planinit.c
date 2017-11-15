@@ -36,10 +36,10 @@ void cqiInitPlanets(void)
         return;
     }
 
-    if (cqiGlobal->maxplanets != NUMPLANETS)
+    if (cqiGlobal->maxplanets != MAXPLANETS)
     {                           /* bummer - should not happen */
-        utLog("ERROR: cqiInitPlanets: cqiGlobal->maxplanets(%d) != NUMPLANETS(%d)\n",
-              cqiGlobal->maxplanets, NUMPLANETS);
+        utLog("ERROR: cqiInitPlanets: cqiGlobal->maxplanets(%d) != MAXPLANETS(%d)\n",
+              cqiGlobal->maxplanets, MAXPLANETS);
 
         PVUNLOCK(&ConqInfo->lockword);
         return;
@@ -50,7 +50,7 @@ void cqiInitPlanets(void)
     /* planets in the CB are based at 1, whereas the cqi arrays are
        based at 0, hence the +1/-1 crap.  When the CB is redone to
        be 0 based, this -1/+1 stuff can go away.  yaay. */
-    for (i=1; i<=NUMPLANETS; i++)
+    for (i=1; i<=MAXPLANETS; i++)
     {                           /* init all of the planets. */
         strncpy(Planets[i].name, cqiPlanets[i - 1].name, MAXPLANETNAME);
 
@@ -153,7 +153,7 @@ void cqiInitPlanets(void)
 
     /* Place the planets in their proper orbits. */
     /* careful about planets that orbit themselves (planet == primary)  */
-    for ( i = NUMPLANETS; i > 0; i = i - 1 )
+    for ( i = MAXPLANETS; i > 0; i = i - 1 )
     {
         if ( Planets[i].primary != 0 && Planets[i].primary != i )
         {

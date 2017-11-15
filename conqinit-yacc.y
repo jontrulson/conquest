@@ -981,7 +981,7 @@ static int cqiValidatePlanets(void)
     }
 
     /* first fill in any empty slots */
-    if (numPlanets < NUMPLANETS)
+    if (numPlanets < MAXPLANETS)
     {
         for (i = numPlanets; i < _cqiGlobal->maxplanets; i++)
         {
@@ -1007,7 +1007,7 @@ static int cqiValidatePlanets(void)
 
         if (cqiVerbose)
             utLog("%s: filled %d unspecified planet slots.",
-                  __FUNCTION__, NUMPLANETS - numPlanets);
+                  __FUNCTION__, MAXPLANETS - numPlanets);
     }
 
 
@@ -1669,7 +1669,7 @@ void dumpUniverse(void)
     }
 
     /* planets */
-    for (i=1; i <= NUMPLANETS; i++)
+    for (i=1; i <= MAXPLANETS; i++)
     {
         printf("planet {\n");
         printf("  name        \"%s\"\n", Planets[i].name);
