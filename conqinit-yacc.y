@@ -1669,12 +1669,13 @@ void dumpUniverse(void)
     }
 
     /* planets */
-    for (i=1; i <= MAXPLANETS; i++)
+    for (i=0; i < MAXPLANETS; i++)
     {
         printf("planet {\n");
         printf("  name        \"%s\"\n", Planets[i].name);
 
 /* FIXME - planet name == primary indicates stationary */
+        // maybe an empty primary should mean stationary...
         if (Planets[i].primary)
             printf("  primary     \"%s\"\n", Planets[Planets[i].primary].name);
         else

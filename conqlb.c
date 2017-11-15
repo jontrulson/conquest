@@ -389,7 +389,7 @@ void clbKillShip(int snum, killedBy_t kb, uint16_t detail)
         break;
 
     case KB_PLANET:
-        if (detail > 0 && detail <= MAXPLANETS)
+        if (detail >= 0 && detail < MAXPLANETS)
 	{
             sprintf(msgbuf, "%c%d (%s) was destroyed by %s",
                     Teams[Ships[snum].team].teamchar,
@@ -803,7 +803,7 @@ int clbTakePlanet( int pnum, int snum )
 
         didgeno = 1;
 
-        for ( i = 1; i <= MAXPLANETS; i++ )
+        for ( i = 0; i < MAXPLANETS; i++ )
         {
             if ( PVISIBLE(i) && (Planets[i].team == oteam)
                  && Planets[i].armies > 0)
@@ -1068,7 +1068,7 @@ int clbZeroPlanet( int pnum, int snum )
         didgeno = TRUE;
 
         /* Check whether that was the last planet owned by the vanquished. */
-        for ( i = 1; i <= MAXPLANETS; i++ )
+        for ( i = 0; i < MAXPLANETS; i++ )
         {
             if ( PVISIBLE(i) && (Planets[i].team == oteam) &&
                  Planets[i].armies > 0)
@@ -1273,7 +1273,7 @@ void clbDoomFind(void)
     tastiness = 0.0;
     Doomsday->lock = -PNUM_MURISAK;
 
-    for ( i = 1; i <= MAXPLANETS; i++ )
+    for ( i = 0; i < MAXPLANETS; i++ )
         if ( PVISIBLE(i) )
             if ( Planets[i].armies > 0 && Planets[i].team != TEAM_NOTEAM )
             {
@@ -1334,7 +1334,7 @@ int clbFindOrbit( int snum, int *pnum )
 {
     int i;
 
-    for ( i = 1; i <= MAXPLANETS; i++ )
+    for ( i = 0; i < MAXPLANETS; i++ )
         if ( PVISIBLE(i) &&
              ( dist( Ships[snum].x, Ships[snum].y, Planets[i].x, Planets[i].y ) <= ORBIT_DIST ) )
         {
@@ -1520,7 +1520,7 @@ int clbFindSpecial( int snum, int token, int count, int *sorpnum, int *xsorpnum 
         break;
     case SPECIAL_WEAKPLANET:
         /* Weakest non-team planet. */
-        for ( i = 1; i <= MAXPLANETS; i++ )
+        for ( i = 0; i < MAXPLANETS; i++ )
 	{
             /* Only can look for "real" planets. */
             if ( ! PVISIBLE(i) )
@@ -1588,7 +1588,7 @@ int clbFindSpecial( int snum, int token, int count, int *sorpnum, int *xsorpnum 
             }
 
         /* Loop through the planets. */
-        for ( i = 1; i <= MAXPLANETS; i++ )
+        for ( i = 0; i < MAXPLANETS; i++ )
 	{
             /* Only can look for "real" planets. */
             if ( ! PVISIBLE(i) )
@@ -1921,19 +1921,19 @@ void clbInitShip( int snum, int unum )
     /* Ships[snum].option                 # setup in menu() */
     for ( i = 0; i < NUMPLAYERTEAMS; i++ )
     {
-    /* Ships[snum].rwar               # setup in menu() or newrob() */
-    /* Ships[snum].war                # setup in menu() or newrob() */
-    Ships[snum].scanned[i] = 0;
-}
-    for ( i = 1; i <= MAXPLANETS; i++ )
+        /* Ships[snum].rwar               # setup in menu() or newrob() */
+        /* Ships[snum].war                # setup in menu() or newrob() */
+        Ships[snum].scanned[i] = 0;
+    }
+    for ( i = 0; i < MAXPLANETS; i++ )
         Ships[snum].srpwar[i] = FALSE;
     /* Ships[snum].sdfuse                 # setup in clbFindShip() */
     PVLOCK(&ConqInfo->lockmesg);
     if ( Ships[snum].lastmsg == LMSG_NEEDINIT )
     {
-    Ships[snum].lastmsg = ConqInfo->lastmsg;
-    Ships[snum].alastmsg = Ships[snum].lastmsg;
-}
+        Ships[snum].lastmsg = ConqInfo->lastmsg;
+        Ships[snum].alastmsg = Ships[snum].lastmsg;
+    }
     PVUNLOCK(&ConqInfo->lockmesg);
     Ships[snum].towing = 0;
     Ships[snum].towedby = 0;
@@ -1950,16 +1950,16 @@ void clbInitShip( int snum, int unum )
     /* Zero torpedos. */
     for ( i = 0; i < MAXTORPS; i++ )
     {
-    Ships[snum].torps[i].status = TS_OFF;
-    Ships[snum].torps[i].fuse = 0;
-    Ships[snum].torps[i].x = 0.0;
-    Ships[snum].torps[i].y = 0.0;
-    Ships[snum].torps[i].dx = 0.0;
-    Ships[snum].torps[i].dy = 0.0;
-    Ships[snum].torps[i].mult = 0.0;
-    for ( j = 0; j < NUMPLAYERTEAMS; j = j + 1 )
-	Ships[snum].torps[i].war[j] = FALSE;
-}
+        Ships[snum].torps[i].status = TS_OFF;
+        Ships[snum].torps[i].fuse = 0;
+        Ships[snum].torps[i].x = 0.0;
+        Ships[snum].torps[i].y = 0.0;
+        Ships[snum].torps[i].dx = 0.0;
+        Ships[snum].torps[i].dy = 0.0;
+        Ships[snum].torps[i].mult = 0.0;
+        for ( j = 0; j < NUMPLAYERTEAMS; j = j + 1 )
+            Ships[snum].torps[i].war[j] = FALSE;
+    }
 
     /* Update user some stats. */
 
@@ -2233,13 +2233,13 @@ int clbPlanetMatch( char *str, int *pnum, int godlike )
 {
     if ( godlike )
     {
-        for ( *pnum = 1; *pnum <= MAXPLANETS; *pnum = *pnum + 1 )
+        for ( *pnum = 0; *pnum < MAXPLANETS; *pnum = *pnum + 1 )
             if ( utStringMatch( str, Planets[*pnum].name, FALSE ) )
                 return ( TRUE );
     }
     else
     {
-        for ( *pnum = 1; *pnum <= MAXPLANETS; *pnum = *pnum + 1 )
+        for ( *pnum = 0; *pnum < MAXPLANETS; *pnum = *pnum + 1 )
             if ( PVISIBLE(*pnum) )
                 if ( utStringMatch( str, Planets[*pnum].name, FALSE ) )
                     return ( TRUE );
@@ -2303,7 +2303,7 @@ int clbFmtMsg(msgFrom_t from, uint16_t fromDetail, msgTo_t to,
     {
         utAppendShip(buf , (int)fromDetail) ;
     }
-    else if ( from == MSG_FROM_PLANET && fromDetail <= MAXPLANETS )
+    else if ( from == MSG_FROM_PLANET && fromDetail < MAXPLANETS )
         strcpy(buf , Planets[fromDetail].name) ;
     else
     {
@@ -2369,7 +2369,7 @@ int clbFmtMsg(msgFrom_t from, uint16_t fromDetail, msgTo_t to,
 /* cmpplanet - compare planet names based on index passed via qsort() */
 static int cmpplanet(void *cmp1, void *cmp2)
 {
-    register int *icmp1, *icmp2;
+    int *icmp1, *icmp2;
 
     icmp1 = (int *) cmp1;
     icmp2 = (int *) cmp2;
@@ -2386,7 +2386,7 @@ static int cmpplanet(void *cmp1, void *cmp2)
 /* already sorted. */
 void clbSortPlanets( int sv[] )
 {
-    qsort(&sv[1], MAXPLANETS, sizeof(int),
+    qsort(sv, MAXPLANETS, sizeof(int),
           (int (*)(const void *, const void *))cmpplanet);
 
     return;
@@ -2704,7 +2704,7 @@ void clbZeroShip( int snum )
         Ships[snum].war[i] = FALSE;
         Ships[snum].scanned[i] = 0;
     }
-    for ( i = 1; i <= MAXPLANETS; i++ )
+    for ( i = 0; i < MAXPLANETS; i++ )
         Ships[snum].srpwar[i] = FALSE;
     Ships[snum].sdfuse = 0;
     Ships[snum].lastmsg = 0;
@@ -2789,9 +2789,10 @@ void clbPlanetDrive(real itersec)
     int i;
     real speed;
 
-    for ( i = MAXPLANETS; i > 0; i = i - 1 )
+    for ( i = 0; i <= MAXPLANETS; i++ )
     {
         /* Advance porbang(). */
+        // FIXME - verify this logic...
         if ( Planets[i].primary != 0 )
 	{
 
@@ -2866,14 +2867,14 @@ void clbTorpDrive(real itersec)
     return;
 }
 
-/* cmpute a ship's proper position when orbiting */
+/* compute a ship's proper position when orbiting */
 void clbAdjOrbitalPosition(int snum)
 {
     if (snum >= 0 && snum < MAXSHIPS && Ships[snum].warp < 0.0)
     {
         int pnum = -Ships[snum].lock;
 
-        if ( pnum > 0 && pnum <= MAXPLANETS )
+        if ( pnum >= 0 && pnum < MAXPLANETS )
         {
             /* ajust the ship's X/Y based on orbit direction and heading */
             if ( Ships[snum].warp == ORBIT_CW )

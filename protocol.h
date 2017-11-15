@@ -191,7 +191,7 @@ typedef struct {	/* 'large' ship data */
 
     uint32_t kills;		/* x10 */
 
-    uint8_t  srpwar[MAXPLANETS + 1];
+    uint8_t  srpwar[MAXPLANETS];
 
     uint8_t  scanned[NUMPLAYERTEAMS];
 

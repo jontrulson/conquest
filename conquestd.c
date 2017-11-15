@@ -663,11 +663,11 @@ int capentry( int snum, int *system )
     uint8_t esystem = 0;
 
     /* First figure out which systems we can enter from. */
-    for ( i = 0; i < NUMPLAYERTEAMS; i = i + 1 )
+    for ( i = 0; i < NUMPLAYERTEAMS; i++ )
     {
         owned[i] = FALSE;
         /* We must own all three planets in a system. */
-        for ( j = 0; j < 3; j = j + 1 )
+        for ( j = 0; j < 3; j++ )
 	{
             if ( Planets[Teams[i].teamhplanets[j]].team != Ships[snum].team )
                 goto cnext2_1; /* next 2; */
@@ -973,7 +973,7 @@ int updateClient(int force)
         }
     }
 
-    for (i=1; i<=MAXPLANETS; i++)
+    for (i=0; i<MAXPLANETS; i++)
         sendPlanet(sInfo.sock, i, force);
 
     if (doteam)

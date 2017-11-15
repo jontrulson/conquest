@@ -82,7 +82,7 @@
         /*  of war */
         int rwar[NUMPLAYERTEAMS];	/* teams s/he is at WAR with */
         // FIXME - how do we handle this via cbGlobal
-        int srpwar[MAXPLANETS + 1];	/* self-ruled planets s/he is at war */
+        int srpwar[MAXPLANETS];	/* self-ruled planets s/he is at war */
         int sdfuse;			/* self-destruct fuse, 0 normally */
         int lastmsg;			/* last message seen */
         int alastmsg;			/* last message allowed to be seen */

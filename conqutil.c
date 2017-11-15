@@ -120,11 +120,11 @@ void utAppendKilledBy(char *buf, killedBy_t kb, uint16_t detail)
         strcat(buf , "GOD") ;
         break;
     case KB_SHIP:
-        if (detail >= 0 && detail < MAXSHIPS)
+        if (detail < MAXSHIPS)
             utAppendShip(buf, detail) ;
         break;
     case KB_PLANET:
-        if ( detail > 0 && detail <= MAXPLANETS )
+        if (detail < MAXPLANETS )
             strcat(buf , Planets[detail].name) ;
         break;
     default:

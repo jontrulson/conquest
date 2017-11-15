@@ -504,7 +504,7 @@ static void _infoplanet( char *str, int pnum, int snum )
     real x, y;
 
     /* Check range of the passed planet number. */
-    if ( pnum <= 0 || pnum > MAXPLANETS )
+    if ( pnum < 0 || pnum >= MAXPLANETS )
     {
         cp_putmsg( "No such planet.", MSG_LIN1 );
         hudClearPrompt(MSG_LIN2);
@@ -1072,7 +1072,7 @@ static int _chkcoup(void)
             MSG_LIN1 );
         return FALSE;
     }
-    for ( i = 1; i <= MAXPLANETS; i = i + 1 )
+    for ( i = 0; i < MAXPLANETS; i++ )
         if ( Planets[i].team == Ships[snum].team && Planets[i].armies > 0 )
         {
             cp_putmsg( "We don't need to coup, we still have armies left!",

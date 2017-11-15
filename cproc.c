@@ -164,7 +164,7 @@ int procShip(char *buf)
 
     Ships[snum].kills = (real)((real)ntohl(sship->kills) / 10.0);
 
-    for (i=1; i<=MAXPLANETS; i++)
+    for (i=0; i<MAXPLANETS; i++)
         Ships[snum].srpwar[i] = (int)sship->srpwar[i];
 
     for (i=0; i<NUMPLAYERTEAMS; i++)
@@ -262,7 +262,7 @@ int procPlanet(char *buf)
 
     pnum = splan->pnum;
 
-    if (pnum <= 0 || pnum > MAXPLANETS)
+    if (pnum < 0 || pnum >= MAXPLANETS)
         return FALSE;
 
     if (Context.recmode == RECMODE_ON)
@@ -290,7 +290,7 @@ int procPlanetSml(char *buf)
 
     pnum = splansml->pnum;
 
-    if (pnum <= 0 || pnum > MAXPLANETS)
+    if (pnum < 0 || pnum >= MAXPLANETS)
         return FALSE;
 
     if (Context.recmode == RECMODE_ON)
@@ -321,7 +321,7 @@ int procPlanetLoc(char *buf)
 
     pnum = splanloc->pnum;
 
-    if (pnum <= 0 || pnum > MAXPLANETS)
+    if (pnum < 0 || pnum >= MAXPLANETS)
         return FALSE;
 
     if (Context.recmode == RECMODE_ON)
@@ -344,7 +344,7 @@ int procPlanetLoc2(char *buf)
 
     pnum = splanloc2->pnum;
 
-    if (pnum <= 0 || pnum > MAXPLANETS)
+    if (pnum < 0 || pnum >= MAXPLANETS)
         return FALSE;
 
     if (Context.recmode == RECMODE_ON)
@@ -369,13 +369,14 @@ int procPlanetInfo(char *buf)
 
     pnum = splaninfo->pnum;
 
-    if (pnum <= 0 || pnum > MAXPLANETS)
+    if (pnum < 0 || pnum >= MAXPLANETS)
         return FALSE;
 
     primary = splaninfo->primary;
 
     /* Roy fix - 10/17/2005 - let mur data be sent. */
-    if (primary < 0 || primary > MAXPLANETS)
+    // FIXME - verify this logic
+    if (primary < 0 || primary >= MAXPLANETS)
         return FALSE;
 
     /* we will record them if we get them */

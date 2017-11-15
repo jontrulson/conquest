@@ -437,7 +437,7 @@ void debugdisplay( int snum )
     cprintf(lin,tcol,ALIGN_NONE,"#%d#%s",LabelColor, "     slock:");
     cprintf(lin+1,tcol,ALIGN_NONE,"#%d#%s",LabelColor, "       dtt:");
     i = Ships[snum].lock;
-    if ( -i >= 1 && -i <= MAXPLANETS )
+    if ( -i >= 0 && -i < MAXPLANETS )
     {
         cprintf(lin,dcol,ALIGN_NONE,"#%d#%s",InfoColor, Planets[-i].name);
         cprintf(lin+1,dcol,ALIGN_NONE,"#%d#%0d",InfoColor,
@@ -636,7 +636,7 @@ void debugplan(void)
 
     int i, j, k, cmd, lin, col, olin;
     int outattr;
-    static int sv[MAXPLANETS + 1];
+    static int sv[MAXPLANETS];
     char junk[10], uninhab[20];
     char hd0[MSGMAXLINE*4];
     char *hd1="D E B U G G I N G  P L A N E T   L I S T";
@@ -662,7 +662,7 @@ void debugplan(void)
                 InfoColor,
                 "' = hidden)");
 
-        for ( i = 1; i <= MAXPLANETS; i = i + 1 )
+        for ( i = 0; i < MAXPLANETS; i++ )
             sv[i] = i;
         clbSortPlanets( sv );
     }
@@ -700,9 +700,9 @@ void debugplan(void)
 
         PlanetIdx = 0;
 
-        if (PlanetOffset <= MAXPLANETS)
+        if (PlanetOffset < MAXPLANETS)
         {
-            while ((PlanetOffset + PlanetIdx) <= MAXPLANETS)
+            while ((PlanetOffset + PlanetIdx) < MAXPLANETS)
             {
                 i = PlanetOffset + PlanetIdx;
                 PlanetIdx++;
@@ -768,7 +768,7 @@ void debugplan(void)
                 uiPutColor(0);
 	    } /* while */
 
-            if ((PlanetOffset + PlanetIdx) > MAXPLANETS)
+            if ((PlanetOffset + PlanetIdx) >= MAXPLANETS)
                 mcuPutPrompt( MTXT_DONE, MSG_LIN2 ); /* last page? */
             else
                 mcuPutPrompt( MTXT_MORE, MSG_LIN2 );
@@ -785,7 +785,7 @@ void debugplan(void)
                 {               /* some other key... */
                     /* setup for new page */
                     PlanetOffset += PlanetIdx;
-                    if (PlanetOffset > MAXPLANETS)
+                    if (PlanetOffset >= MAXPLANETS)
                     {           /* pointless to continue */
                         Done = TRUE;
                     }
@@ -819,7 +819,7 @@ int opPlanetMatch( char str[], int *pnum )
         i = 0;
         if ( ! utSafeCToI( pnum, str, i ) )
             return ( FALSE );
-        if ( *pnum < 1 || *pnum > MAXPLANETS )
+        if ( *pnum < 0 || *pnum >= MAXPLANETS )
             return ( FALSE );
     }
     else
@@ -1187,7 +1187,7 @@ void operate(void)
 	    {
                 strcpy(buf , "ON (") ;
                 i = Doomsday->lock;
-                if ( -i > 0 && -i <= MAXPLANETS )
+                if ( -i >= 0 && -i < MAXPLANETS )
                     strcat(buf , Planets[-i].name) ;
                 else
                     utAppendShip(buf , i) ;		/* this will handle funny numbers */
@@ -1663,7 +1663,7 @@ void oppedit(void)
 {
 
     int i, j, lin, col, datacol;
-    static int pnum = PNUM_EARTH;
+    static int pnum = 0;
     real x;
     int ch;
     char buf[MSGMAXLINE];
@@ -1885,9 +1885,7 @@ void oppedit(void)
                            MSG_LIN1, 0, TERMS, buf, MAXPLANETNAME );
             if ( ch == TERM_ABORT || buf[0] == 0 )
                 continue;	/* next */
-            if ( buf[1] == '0' && buf[2] == 0 )
-                Planets[pnum].primary = 0;
-            else if ( opPlanetMatch( buf, &i ) )
+            if ( opPlanetMatch( buf, &i ) )
                 Planets[pnum].primary = i;
             break;
 	case 'v':
@@ -2014,18 +2012,17 @@ void oppedit(void)
             /* Now you don't */
             PFCLR(pnum, PLAN_F_VISIBLE);
             break;
+            // FIXME - check this logic...
 	case '>': /* forward rotate planet number - dwp */
 	case KEY_RIGHT:
 	case KEY_UP:
-            pnum = mod( pnum + 1, MAXPLANETS );
-            pnum = (pnum == 0) ? MAXPLANETS : pnum;
+            pnum = mod(pnum + 1, MAXPLANETS);
             break;
 	case '<':  /* reverse rotate planet number - dwp */
 	case KEY_LEFT:
 	case KEY_DOWN:
-            pnum = (pnum >= 0) ? -pnum : pnum;
-            pnum = mod( (MAXPLANETS + 1) - (pnum + 1), MAXPLANETS + 1 );
-            pnum = (pnum == 0) ? MAXPLANETS : pnum;
+            pnum = ((pnum == 0) ? MAXPLANETS - 1 : pnum - 1);
+            pnum = mod(pnum, MAXPLANETS);
             break;
 	case ' ':
             /* do no-thing */

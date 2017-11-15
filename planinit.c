@@ -25,7 +25,7 @@ void cqiInitPlanets(void)
     int homeplan[NUMPLAYERTEAMS][3];             /* ids of home planets */
     int F, K, R, O;               /* homeplanet count per team */
 
-    /* Twiddle the lockword. */
+    /* Hump the lockword. */
     PVUNLOCK(&ConqInfo->lockword);
     PVLOCK(&ConqInfo->lockword);
 
@@ -47,23 +47,20 @@ void cqiInitPlanets(void)
 
     memset((void *)homeplan, 0, sizeof(int) * NUMPLAYERTEAMS * 3);
 
-    /* planets in the CB are based at 1, whereas the cqi arrays are
-       based at 0, hence the +1/-1 crap.  When the CB is redone to
-       be 0 based, this -1/+1 stuff can go away.  yaay. */
-    for (i=1; i<=MAXPLANETS; i++)
+    for (i=0; i<MAXPLANETS; i++)
     {                           /* init all of the planets. */
-        strncpy(Planets[i].name, cqiPlanets[i - 1].name, MAXPLANETNAME);
+        strncpy(Planets[i].name, cqiPlanets[i].name, MAXPLANETNAME);
 
-        Planets[i].type = cqiPlanets[i - 1].ptype;
-        Planets[i].primary = cqiPlanets[i - 1].primary + 1;
-        if (cqiPlanets[i - 1].visible)
+        Planets[i].type = cqiPlanets[i].ptype;
+        Planets[i].primary = cqiPlanets[i].primary;
+        if (cqiPlanets[i].visible)
             PFSET(i, PLAN_F_VISIBLE);
         else
             PFCLR(i, PLAN_F_VISIBLE);
-        Planets[i].team = cqiPlanets[i - 1].pteam;
+        Planets[i].team = cqiPlanets[i].pteam;
 
         /* for armies, we use what is specified */
-        Planets[i].armies = cqiPlanets[i - 1].armies;
+        Planets[i].armies = cqiPlanets[i].armies;
 
         Planets[i].uninhabtime = 0;
 
@@ -78,16 +75,16 @@ void cqiInitPlanets(void)
             Teams[j].coupinfo = FALSE; /* don't know coup time */
         }
 
-        Planets[i].size = cqiPlanets[i - 1].size;
-        Planets[i].x = cqiPlanets[i - 1].xcoord;
-        Planets[i].y = cqiPlanets[i - 1].ycoord;
-        Planets[i].orbrad = cqiPlanets[i - 1].radius;
-        Planets[i].orbvel = cqiPlanets[i - 1].velocity;
+        Planets[i].size = cqiPlanets[i].size;
+        Planets[i].x = cqiPlanets[i].xcoord;
+        Planets[i].y = cqiPlanets[i].ycoord;
+        Planets[i].orbrad = cqiPlanets[i].radius;
+        Planets[i].orbvel = cqiPlanets[i].velocity;
 
-        if (cqiPlanets[i - 1].angle < 0)
+        if (cqiPlanets[i].angle < 0)
             Planets[i].orbang = rnduni( 0.0, 360.0 ); /* randomly choose one */
         else
-            Planets[i].orbang = utMod360(cqiPlanets[i - 1].angle);
+            Planets[i].orbang = utMod360(cqiPlanets[i].angle);
     } /* for */
 
     /* now setup the team-based homeplanets, homeplanet, and homesun */
@@ -132,19 +129,18 @@ void cqiInitPlanets(void)
     }
     else
     {
-        /* set up the team homeplanets (+1 since we are dealing with cqi->CB
-           here) */
+        // set up the team homeplanets 
         for (i=0; i < NUMPLAYERTEAMS; i++)
         {
             Teams[i].teamhplanets[0] =
-                homeplan[i][0] + 1;
+                homeplan[i][0];
             Teams[i].teamhplanets[1] =
-                homeplan[i][1] + 1;
+                homeplan[i][1];
             Teams[i].teamhplanets[2] =
-                homeplan[i][2] + 1;
+                homeplan[i][2];
 
             /* primary homeplanet - 1st one */
-            Teams[i].homeplanet = homeplan[i][0] + 1;
+            Teams[i].homeplanet = homeplan[i][0];
 
             /* setup homesun - primary of 1st one */
             Teams[i].homesun = Planets[Teams[i].teamhplanets[0]].primary;
@@ -153,7 +149,7 @@ void cqiInitPlanets(void)
 
     /* Place the planets in their proper orbits. */
     /* careful about planets that orbit themselves (planet == primary)  */
-    for ( i = MAXPLANETS; i > 0; i = i - 1 )
+    for ( i = MAXPLANETS - 1; i >= 0; i-- )
     {
         if ( Planets[i].primary != 0 && Planets[i].primary != i )
         {

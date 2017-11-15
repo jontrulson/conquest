@@ -108,7 +108,6 @@ void dowarp( int snum, real warp );
 int getoption( char ch, int *tok );
 void menu(void);
 int play(void);
-int capentry( int snum, int *system );
 int newship( int unum, int *snum );
 void dead( int snum, int leave );
 
@@ -1099,7 +1098,7 @@ void dead( int snum, int leave )
 
     case KB_PLANET:
         cbuf[0] = buf[0] = 0;
-        if ( detail > 0 && detail <= MAXPLANETS )
+        if ( detail >= 0 && detail < MAXPLANETS )
 	{
             if ( Planets[detail].type == PLANET_SUN )
                 strcpy(cbuf, "solar radiation.");
@@ -1887,7 +1886,7 @@ void docoup( int snum )
             MSG_LIN1 );
         return;
     }
-    for ( i = 1; i <= MAXPLANETS; i = i + 1 )
+    for ( i = 0; i < MAXPLANETS; i++ )
         if ( Planets[i].team == Ships[snum].team && Planets[i].armies > 0 )
         {
             mcuPutMsg( "We don't need to coup, we still have armies left!",

@@ -368,7 +368,7 @@ void mcuInfoPlanet( char *str, int pnum, int snum )
     real x, y;
 
     /* Check range of the passed planet number. */
-    if ( pnum <= 0 || pnum > MAXPLANETS )
+    if ( pnum < 0 || pnum >= MAXPLANETS )
     {
         mcuPutMsg( "No such planet.", MSG_LIN1 );
         cdclrl( MSG_LIN2, 1 );
@@ -837,7 +837,7 @@ void mcuInfoShip( int snum, int scanner )
 void mcuPlanetList( int team, int snum )
 {
     int i, lin, col, olin, pnum;
-    static int sv[MAXPLANETS + 1];
+    static int sv[MAXPLANETS];
     int cmd;
     char ch, junk[10], coreflag;
     char *hd0="P L A N E T   L I S T   ";
@@ -873,7 +873,7 @@ void mcuPlanetList( int team, int snum )
                 hd1);
 
         /* sort the planets */
-        for ( i = 1; i <= MAXPLANETS; i++ )
+        for ( i = 0; i < MAXPLANETS; i++ )
             sv[i] = i;
         clbSortPlanets( sv );
 
@@ -913,9 +913,9 @@ void mcuPlanetList( int team, int snum )
 
         PlanetIdx = 0;
 
-        if (PlanetOffset <= MAXPLANETS)
+        if (PlanetOffset < MAXPLANETS)
 	{
-            while ((PlanetOffset + PlanetIdx) <= MAXPLANETS)
+            while ((PlanetOffset + PlanetIdx) < MAXPLANETS)
 	    {
                 i = PlanetOffset + PlanetIdx;
                 PlanetIdx++;
@@ -1073,7 +1073,7 @@ void mcuPlanetList( int team, int snum )
 
 	    } /* while */
 
-            if ((PlanetOffset + PlanetIdx) > MAXPLANETS)
+            if ((PlanetOffset + PlanetIdx) >= MAXPLANETS)
                 mcuPutPrompt( MTXT_DONE, MSG_LIN2 );
             else
                 mcuPutPrompt( MTXT_MORE, MSG_LIN2 );
@@ -1090,7 +1090,7 @@ void mcuPlanetList( int team, int snum )
 		{		/* some other key... */
 				/* setup for new page */
                     PlanetOffset += PlanetIdx;
-                    if (PlanetOffset > MAXPLANETS)
+                    if (PlanetOffset >= MAXPLANETS)
 		    {		/* pointless to continue */
                         Done = TRUE;
 		    }

@@ -75,7 +75,7 @@ void procSetCourse(char *buf)
     if (lock > 0)			/* could lock onto ships someday... */
         lock = 0;			/* but not today. */
 
-    if (lock < 0 && (-lock > MAXPLANETS))
+    if (-lock >= MAXPLANETS)
         lock = 0;
 
     /* always applies to our own ship */
@@ -371,7 +371,7 @@ void procDistress(cpCommand_t *cmd)
         if ( i >= 0 || Ships[snum].warp < 0.0)
             i = round( Ships[snum].head );
 
-        if ( -i > 0 && -i <= MAXPLANETS)
+        if ( -i >= 0 && -i < MAXPLANETS)
             sprintf( buf, ", head=%.3s", Planets[-i].name );
         else
             sprintf( buf, ", head=%d", i );
@@ -515,7 +515,7 @@ void procCoup(cpCommand_t *cmd)
         sendFeedback("Fleet orders require three kills before a coup can be attempted.");
         return;
     }
-    for ( i = 1; i <= MAXPLANETS; i = i + 1 )
+    for ( i = 0; i < MAXPLANETS; i++ )
         if ( PVISIBLE(i) && (Planets[i].team == Ships[snum].team) &&
              (Planets[i].armies > 0) )
         {

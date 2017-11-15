@@ -567,7 +567,7 @@ static int _get_glplanet_info(GLPlanet_t *curGLPlanet, int plani)
     if (!GLPlanets)
         return FALSE;
 
-    if (plani < 1 || plani > MAXPLANETS)
+    if (plani < 0 || plani >= MAXPLANETS)
         return FALSE;
 
     /* first find the appropriate texture.  We look for one in this order:
@@ -642,7 +642,7 @@ static int _get_glplanet_info(GLPlanet_t *curGLPlanet, int plani)
 
     curGLPlanet->tex = &GLTextures[gltndx];
 
-    /* size - should use server values if available someday, for now use
+    /* FIXME - size - should use server values if available someday, for now use
        cqi, and if not that, the standard defaults */
 
     if (plnndx == -1)
@@ -710,10 +710,10 @@ int uiUpdatePlanet(int plani)
     if (!GLPlanets)
         return FALSE;
 
-    if (plani < 1 || plani > MAXPLANETS)
+    if (plani < 0 || plani >= MAXPLANETS)
         return FALSE;
 
-    curGLPlanet = &GLPlanets[plani - 1];
+    curGLPlanet = &GLPlanets[plani];
 
     return _get_glplanet_info(curGLPlanet, plani);
 }
@@ -746,14 +746,11 @@ static int initGLPlanets(void)
     }
 
     /* now go through each one, setting up the proper values */
-    /* GLPlanets is 0 based, as opposed to CB 1 based Planets[].  */
     for (i=0; i<MAXPLANETS; i++)
     {
-        int plani = i + 1;        /* cleaner looking instead of +1 crap? */
-
         memset((void *)&curGLPlanet, 0, sizeof(GLPlanet_t));
 
-        if (!_get_glplanet_info(&curGLPlanet, plani))
+        if (!_get_glplanet_info(&curGLPlanet, i))
             return FALSE;
 
         /* we're done, assign it and go on to the next one */
@@ -1282,7 +1279,7 @@ void drawPlanet( GLfloat x, GLfloat y, int pnum, int scale,
 #endif
 
     /* sanity */
-    if (pnum < 1 || pnum > MAXPLANETS)
+    if (pnum < 0 || pnum >= MAXPLANETS)
     {
         utLog("uiGLdrawPlanet(): invalid pnum = %d", pnum);
 
@@ -1306,13 +1303,13 @@ void drawPlanet( GLfloat x, GLfloat y, int pnum, int scale,
 
     glEnable(GL_TEXTURE_2D);
 
-    glBindTexture(GL_TEXTURE_2D, GLTEX_ID(GLPlanets[pnum - 1].tex));
+    glBindTexture(GL_TEXTURE_2D, GLTEX_ID(GLPlanets[pnum].tex));
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glEnable(GL_BLEND);
 
-    glColor4fv(GLTEX_COLOR(GLPlanets[pnum - 1].tex).vec);
+    glColor4fv(GLTEX_COLOR(GLPlanets[pnum].tex).vec);
 
-    size = cu2GLSize(GLPlanets[pnum - 1].size, -scale);
+    size = cu2GLSize(GLPlanets[pnum].size, -scale);
 
     /* so it's more visible... */
     if (scale == MAP_FAC)

@@ -287,7 +287,7 @@ void iterdrive( int *ship )
 
             warp = Ships[i].warp;
             pnum = -Ships[i].lock;
-            if ( pnum > 0 && pnum <= MAXPLANETS )
+            if ( pnum >= 0 && pnum < MAXPLANETS )
             {
                 if ( warp < 0.0 )
                 {
@@ -435,7 +435,7 @@ void iterdrive( int *ship )
         i = ship[s];
         if ( Ships[i].status != SS_OFF )
 	{
-            for ( j = 0; j < MAXTORPS; j = j + 1 )
+            for ( j = 0; j < MAXTORPS; j++ )
 	    {
                 if ( Ships[i].torps[j].status == TS_DETONATE )
 		{
@@ -561,12 +561,12 @@ void secdrive( int *ship )
                 robotai( i );
 
         /* Ships - Teams. */
-        for ( j = 0; j <  NUMPLAYERTEAMS; j = j + 1 )
+        for ( j = 0; j <  NUMPLAYERTEAMS; j++ )
             if ( Ships[i].scanned[j] > 0 )
                 Ships[i].scanned[j] = Ships[i].scanned[j] - 1;
 
         /* Ships, planets and suns scans. */
-        for ( j = 1; j <= MAXPLANETS; j = j + 1 )
+        for ( j = 0; j < MAXPLANETS; j++ )
             if ( PVISIBLE(j) )
             {
                 /* Do we scan the planet? */
@@ -585,14 +585,13 @@ void secdrive( int *ship )
                 }
 
                 /* Does the planet scan us? */
-                if ( j <= MAXPLANETS )
-                    if ( dis <= ACCINFO_DIST )
-                        if ( ! SCLOAKED(i) )
-                        {
-                            k = Planets[j].team;
-                            if ( k >= 0 && k <  NUMPLAYERTEAMS )
-                                Ships[i].scanned[k] = SCANNED_FUSE;
-                        }
+                if ( dis <= ACCINFO_DIST )
+                    if ( ! SCLOAKED(i) )
+                    {
+                        k = Planets[j].team;
+                        if ( k >= 0 && k <  NUMPLAYERTEAMS )
+                            Ships[i].scanned[k] = SCANNED_FUSE;
+                    }
             }
 
         /* Planet eater. */
@@ -735,7 +734,7 @@ void secdrive( int *ship )
         if ( Ships[i].status != SS_OFF )
 	{
             /* Torpedoes. */
-            for ( j = 0; j < MAXTORPS; j = j + 1 )
+            for ( j = 0; j < MAXTORPS; j++ )
                 if ( Ships[i].torps[j].status != TS_OFF )
                 {
                     /* Torpedo fuses. */
@@ -845,7 +844,7 @@ void mindrive(void)
 
     int i;
 
-    for ( i = 0; i < NUMPLAYERTEAMS; i = i + 1 )
+    for ( i = 0; i < NUMPLAYERTEAMS; i++ )
     {
         /* Decrement couptime(). */
         if ( Teams[i].couptime > 0 )
@@ -855,7 +854,7 @@ void mindrive(void)
     /* cleanup any unliving ships */
     clbCheckShips(TRUE);
 
-    for ( i = 1; i <= MAXPLANETS; i = i + 1 )
+    for ( i = 0; i < MAXPLANETS; i++ )
     {
         /* Decrement puninhabtime(). */
         if ( Planets[i].uninhabtime > 0 )
@@ -886,7 +885,7 @@ void fivemindrive(void)
 
     /* Drive the planets. */
     PVLOCK(&ConqInfo->lockword);
-    for ( i = 1; i <= MAXPLANETS; i = i + 1 )
+    for ( i = 0; i < MAXPLANETS; i++ )
         if (Planets[i].type != PLANET_SUN)
         {
             if ( Planets[i].armies > 0 && Planets[i].team != TEAM_GOD )
