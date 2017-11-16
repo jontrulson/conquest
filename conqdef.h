@@ -175,56 +175,8 @@ typedef enum {
 /* number of planets */
 #define MAXPLANETS (NUM_BASEPLANETS + NUM_EXTRAPLANETS)
 
-/* Planet numbers. */
-// FIXME - we should be able to get rid of these
-#define PNUM_EARTH 1
-#define PNUM_ROMULUS 2
-#define PNUM_KLINGUS 3
-#define PNUM_ORION 4
-#define PNUM_REMUS 5
-#define PNUM_LEUDUS 6
-#define PNUM_OBERON 7
-#define PNUM_TELOS 8
-#define PNUM_TARSUS 9
-#define PNUM_UMBRIEL 10
-#define PNUM_OMEGA 11
-#define PNUM_RHO 12
-#define PNUM_JANUS 13
-#define PNUM_ELAS 14
-#define PNUM_SHERMAN 15
-#define PNUM_SERITIL 16
-#define PNUM_CHERON 17
-#define PNUM_DAKEL 18
-#define PNUM_SARAC 19
-#define PNUM_VENAR 20
-#define PNUM_XIDEX 21
-#define PNUM_OLDAR 22
-#define PNUM_EMINIAR 23
-#define PNUM_DYNEB 24
-#define PNUM_RIGELB 25
-
+// FIXME - remove after "core" testing is implemented...
 #define NUMCONPLANETS 25 	/* last planet need to conquer the universe */
-
-#define PNUM_LUNA 26
-#define PNUM_ALTAIR 27
-#define PNUM_HELL 28
-#define PNUM_JINX 29
-
-/* Sun numbers. */
-#define PNUM_SOL 30
-#define PNUM_SIRIUS 31
-#define PNUM_KEJELA 32
-#define PNUM_BETELGEUSE 33
-#define PNUM_MURISAK 34
-#define PNUM_SYRINX 35
-
-/* Ghost numbers. */
-#define PNUM_GHOST1 36
-#define PNUM_GHOST2 37
-#define PNUM_GHOST3 38
-#define PNUM_GHOST4 39
-#define PNUM_GHOST5 40		/* LAST 'base' planet, any after this number
-				   are extra */
 
 
 #define MAXUSERS     500      /* maximum number of registered users */
