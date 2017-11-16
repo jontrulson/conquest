@@ -724,9 +724,17 @@ int utModPlusOne( int i, int modulus )
 int utSafeCToI( int *num, char *buf, int offset )
 {
     int retval;
-
     retval = FALSE;
-    if (buf[offset] == 0)
+
+    if (!buf)
+    {
+        *num = 0;
+        retval = FALSE;
+    }
+
+    int slen = strlen(buf);
+
+    if (offset >= slen)
     {
         *num = 0;
         retval = FALSE;

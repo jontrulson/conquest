@@ -177,7 +177,24 @@ int proc_0006_ShipSml(char *buf)
     Ships[snum].etemp = (real)sshipsml->etemp;
     Ships[snum].wtemp = (real)sshipsml->wtemp;
     Ships[snum].fuel = (real)((uint16_t)ntohs(sshipsml->fuel));
-    Ships[snum].lock = (int)((int16_t)ntohs(sshipsml->lock));
+
+    // fixups for the current CB/protocol:
+    // if lock == 0, no lock, if < 0 planet, if > 0 ship
+    // we do not support ship lockons, especially in this version, so
+    // ignore.
+    int temp = (int)((int16_t)ntohs(sshipsml->lock));
+
+    if (temp == 0)
+    {
+        Ships[snum].lock = LOCK_NONE;
+        Ships[snum].lockDetail = 0;
+    }
+    else if (temp < 0) // planet
+    {
+        Ships[snum].lock = LOCK_PLANET;
+        // FIXME adjust planet number when ready
+        Ships[snum].lockDetail = -temp;
+    }
     Ships[snum].lastphase = (real)((uint16_t)ntohs(sshipsml->lastphase)) / 100.0;
     Ships[snum].lastblast = (real)((uint16_t)ntohs(sshipsml->lastblast)) / 100.0;
 

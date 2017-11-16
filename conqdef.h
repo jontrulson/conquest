@@ -92,6 +92,18 @@ typedef enum {
     KB_MAX                   /* maximum KB_* number, must always be last */
 } killedBy_t;
 
+/* Course lock values.  The values should never exceed 255 since only
+ * a uint8_t is used in the protocol.
+ */
+typedef enum {
+    LOCK_NONE         = 0,
+    LOCK_SHIP         = 1, // locked onto a ship (only doomsday for now)
+    LOCK_PLANET       = 2, // locked onto a planet
+
+    LOCK_MAX
+} courseLock_t;
+
+
 #define MAXTORPS 9 		/* maximum torps per ship */
 /* Values for tstatus() */
 #define TS_OFF 1 		/* ready for use */

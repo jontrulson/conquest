@@ -267,7 +267,8 @@ spShipSml_t *spktShipSml(uint8_t snum, int rec)
         sshipsml.action = (uint8_t)Ships[snum].action;
         sshipsml.lastblast = htons((uint16_t)(Ships[snum].lastblast * 100.0));
         sshipsml.fuel = htons((uint16_t)Ships[snum].fuel);
-        sshipsml.lock = (int16_t)htons((uint16_t)Ships[snum].lock);
+        sshipsml.lock = (uint8_t)Ships[snum].lock;
+        sshipsml.lockDetail = htons(Ships[snum].lockDetail);
         sshipsml.sdfuse = (int16_t)htons((uint16_t)Ships[snum].sdfuse);
         sshipsml.wfuse = (int8_t)Ships[snum].wfuse;
         sshipsml.efuse = (int8_t)Ships[snum].efuse;
@@ -317,7 +318,8 @@ spShipSml_t *spktShipSml(uint8_t snum, int rec)
         sshipsml.armies = Ships[snum].armies;
 
         /* so we can do bombing */
-        sshipsml.lock = (int16_t)htons((uint16_t)Ships[snum].lock);
+        sshipsml.lock = (uint8_t)Ships[snum].lock;
+        sshipsml.lockDetail = htons(Ships[snum].lockDetail);
 
         /* so we can disp phasers in graphical client ;-) */
         sshipsml.lastphase = htons((uint16_t)(Ships[snum].lastphase * 100.0));

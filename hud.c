@@ -107,23 +107,21 @@ void hudSetWarp(int snum)
 
 void hudSetHeading(int snum)
 {
-    int i = Ships[snum].lock;
+    int i = round( Ships[snum].head );
 
-    if ( i >= 0 || Ships[snum].warp < 0.0)
-        i = round( Ships[snum].head );
     if ( i != hudData.heading.head)
     {
-        if ( -i >= 0 && -i < MAXPLANETS)
+        if ( Ships[snum].lock == LOCK_PLANET
+             && Ships[snum].lockDetail < MAXPLANETS)
         {                       /* just the first 3 characters if locked */
-            hudData.heading.str[0] = Planets[-i].name[0];
-            hudData.heading.str[1] = Planets[-i].name[1];
-            hudData.heading.str[2] = Planets[-i].name[2];
+            hudData.heading.str[0] = Planets[Ships[snum].lockDetail].name[0];
+            hudData.heading.str[1] = Planets[Ships[snum].lockDetail].name[1];
+            hudData.heading.str[2] = Planets[Ships[snum].lockDetail].name[2];
             hudData.heading.str[3] = 0;
         }
         else
         {
-            snprintf( hudData.heading.str, HUD_STR_SZ - 1, "%3d", i );
-            hudData.heading.str[HUD_STR_SZ - 1] = 0;
+            snprintf( hudData.heading.str, HUD_STR_SZ, "%3d", i );
         }
 
         hudData.heading.head = i;

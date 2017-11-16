@@ -63,10 +63,10 @@
         real head;			/* direction of motion - [0-359.9] */
         real dhead;			/* desired direction of motion */
         real warp;			/* warp factor: [0-variable] or */
-        /*  <0 for orbiting */
+                                        /*  <0 for orbiting */
         real dwarp;			/* desired warp factor: [0-variable] */
-        int lock;			/* 0 or -planet locked on to; */
-        /*   if swarp<0, orbiting */
+        courseLock_t lock;              /* one of the courseLock_t values */
+        uint16_t lockDetail;            /* ship or planet number locked onto */
         real shields;			/* shield percentage - [0-100] */
         real kills;			/* kills - [0-inf] */
         real damage;			/* damage percentage - [0-100] */
@@ -79,7 +79,7 @@
         int engalloc;			/* engines allocation is 100-sweapons */
         int armies;			/* armies being carried */
         int war[NUMPLAYERTEAMS];	/* teams s/he is at war with - copy */
-        /*  of war */
+                                        /*  of war */
         int rwar[NUMPLAYERTEAMS];	/* teams s/he is at WAR with */
         // FIXME - how do we handle this via cbGlobal
         int srpwar[MAXPLANETS];	/* self-ruled planets s/he is at war */

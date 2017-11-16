@@ -50,13 +50,24 @@ void procSetName(char *buf)
 void procSetCourse(char *buf)
 {
     cpSetCourse_t *csc = (cpSetCourse_t *)buf;
-    int lock;
+    courseLock_t lock;
+    uint16_t lockDetail = 0;
     real dir;
 
     if (!pktIsValid(CP_SETCOURSE, csc))
         return;
 
-    lock = (int)csc->lock;
+    lock = (courseLock_t)csc->lock;
+    lockDetail = ntohs(csc->lockDetail);
+    // if an invalid enum
+    if ((int)lock >= LOCK_MAX)
+    {
+        utLog("%s: invalid courseLock enum %d(%d), ignoring", __FUNCTION__,
+              (int)lock, (int)lockDetail);
+        lock = LOCK_NONE;
+        lockDetail = 0;
+    }
+
     dir = (real)((real)ntohs(csc->head) / 100.0);
 
 #if defined(DEBUG_SERVERPROC)
@@ -72,17 +83,23 @@ void procSetCourse(char *buf)
     if (dir > 359.9)
         dir = 359.9;
 
-    if (lock > 0)			/* could lock onto ships someday... */
-        lock = 0;			/* but not today. */
-
-    if (-lock >= MAXPLANETS)
-        lock = 0;
-
+    if (lock != LOCK_NONE && !(lock == LOCK_PLANET && lockDetail < MAXPLANETS))
+    {
+        // could lock onto ships someday...
+        //  but not today.
+        utLog("%s: unsupported courseLock %d(%d), ignoring", __FUNCTION__,
+              (int)lock, (int)lockDetail);
+        lock = LOCK_NONE;
+        lockDetail = 0;
+    }
     /* always applies to our own ship */
-    if ( Ships[Context.snum].warp < 0.0 )	/* if orbitting */
-        Ships[Context.snum].warp = 0.0;	/* break orbit */
-    Ships[Context.snum].dhead = dir;	/* set direction first to avoid */
-    Ships[Context.snum].lock = lock;	/*  a race in display() */
+    if ( Ships[Context.snum].warp < 0.0 ) /* if orbiting */
+        Ships[Context.snum].warp = 0.0;   /* break orbit */
+
+    Ships[Context.snum].dhead = dir;	// set direction first to
+                                        // avoid a race in display()
+    Ships[Context.snum].lock = lock;
+    Ships[Context.snum].lockDetail = lockDetail;
 
     return;
 }
@@ -129,7 +146,8 @@ void procSetWarp(cpCommand_t *swarp)
     if ( Ships[snum].warp < 0.0 )
     {
         Ships[snum].warp = 0.0;
-        Ships[snum].lock = 0;
+        Ships[snum].lock = LOCK_NONE;
+        Ships[snum].lockDetail = 0;
         Ships[snum].dhead = Ships[snum].head;
     }
 
@@ -357,7 +375,7 @@ void procDistress(cpCommand_t *cmd)
     else
     {
         sprintf( buf, ", orbiting %.3s",
-                 Planets[-Ships[snum].lock].name );
+                 Planets[Ships[snum].lockDetail].name );
         strcat(cbuf, buf) ;
         isorb = TRUE;
     }
@@ -366,15 +384,17 @@ void procDistress(cpCommand_t *cmd)
 
     if (isorb == FALSE)
     {
-        i = Ships[snum].lock;
-
-        if ( i >= 0 || Ships[snum].warp < 0.0)
-            i = round( Ships[snum].head );
-
-        if ( -i >= 0 && -i < MAXPLANETS)
-            sprintf( buf, ", head=%.3s", Planets[-i].name );
+        // locked onto a planet we haven't reached yet
+        if (Ships[snum].lock == LOCK_PLANET
+            && Ships[snum].lockDetail < MAXPLANETS)
+        {
+            sprintf( buf, ", head=%.3s", Planets[Ships[snum].lockDetail].name );
+        }
         else
-            sprintf( buf, ", head=%d", i );
+        {
+            // just the heading ma'am
+            sprintf( buf, ", head=%d", round( Ships[snum].head ));
+        }
 
         strcat(cbuf, buf) ;
     }
@@ -529,7 +549,9 @@ void procCoup(cpCommand_t *cmd)
         return;
     }
 
-    pnum = -Ships[snum].lock;
+    // the assumption if that if you are orbiting (warp < 0) you are
+    // locked onto the planet you are orbiting...
+    pnum = Ships[snum].lockDetail;
     if ( pnum != Teams[Ships[snum].team].homeplanet )
     {
         sendFeedback(nhp);
@@ -787,6 +809,7 @@ void procRefit(cpCommand_t *cmd)
     int entertime, now;
     int stype;
     int pnum;
+    static char *wmbio = "We must be orbiting a team owned planet to refit.";
 
     if (!pktIsValid(CP_COMMAND, cmd))
         return;
@@ -810,11 +833,20 @@ void procRefit(cpCommand_t *cmd)
         return;
     }
 
-    pnum = -Ships[snum].lock;
-
-    if (Planets[pnum].team != Ships[snum].team || Ships[snum].warp >= 0.0)
+    // make sure we are in orbit
+    if (Ships[snum].warp >= 0.0)
     {
-        sendFeedback("We must be orbiting a team owned planet to refit.");
+        sendFeedback(wmbio);
+        return;
+    }
+
+    // assumption here is that we are in orbit, and therefore locked
+    // onto the planet we are orbiting...
+    pnum = Ships[snum].lockDetail;
+
+    if (Planets[pnum].team != Ships[snum].team)
+    {
+        sendFeedback(wmbio);
         return;
     }
 
@@ -836,7 +868,7 @@ void procRefit(cpCommand_t *cmd)
         utSleep( ITER_SECONDS );
     }
 
-    /* set it */
+    /* make it so... */
     Ships[snum].shiptype = stype;
 
     return;
@@ -1076,7 +1108,9 @@ void procBomb(cpCommand_t *cmd)
         sendFeedback("We must be orbiting a planet to bombard it.");
         return;
     }
-    pnum = -Ships[snum].lock;
+
+    // as we are in orbit, we are locked onto the planet
+    pnum = Ships[snum].lockDetail;
     if ( Planets[pnum].type == PLANET_SUN || Planets[pnum].type == PLANET_MOON ||
          Planets[pnum].team == TEAM_NOTEAM || Planets[pnum].armies == 0 )
     {
@@ -1270,7 +1304,9 @@ void procBeam(cpCommand_t *cmd)
         sendFeedback("We must be orbiting a planet to use the transporter.");
         return;
     }
-    pnum = -Ships[snum].lock;
+
+    // if we are orbiting, then we are locked onto a planet
+    pnum = Ships[snum].lockDetail;
     if ( Ships[snum].armies > 0 )
     {
         if ( Planets[pnum].type == PLANET_SUN )

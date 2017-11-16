@@ -582,11 +582,13 @@ void clbOrbit( int snum, int pnum )
 {
     real beer;
 
-    Ships[snum].lock = -pnum;
+    Ships[snum].lock = LOCK_PLANET;
+    Ships[snum].lockDetail = pnum;
     Ships[snum].dwarp = 0.0;
 
     /* Find bearing to planet. */
-    beer = utAngle( Ships[snum].x, Ships[snum].y, Planets[pnum].x, Planets[pnum].y );
+    beer = utAngle( Ships[snum].x, Ships[snum].y,
+                    Planets[pnum].x, Planets[pnum].y );
     if ( Ships[snum].head < ( beer - 180.0 ) )
         beer = beer - 360.0;
 
@@ -1271,7 +1273,8 @@ void clbDoomFind(void)
     real taste, tastiness;
 
     tastiness = 0.0;
-    Doomsday->lock = -PNUM_MURISAK;
+    Doomsday->lock = LOCK_NONE;
+    Doomsday->lockDetail = 0;
 
     for ( i = 0; i < MAXPLANETS; i++ )
         if ( PVISIBLE(i) )
@@ -1281,7 +1284,8 @@ void clbDoomFind(void)
                 if ( taste > tastiness )
                 {
                     tastiness = taste;
-                    Doomsday->lock = -i;
+                    Doomsday->lock = LOCK_PLANET;
+                    Doomsday->lockDetail = i;
                 }
             }
 
@@ -1294,14 +1298,15 @@ void clbDoomFind(void)
             if ( taste > tastiness )
             {
                 tastiness = taste;
-                Doomsday->lock = i;
+                Doomsday->lock = LOCK_SHIP;
+                Doomsday->lockDetail = i;
             }
         }
 
-    if ( Doomsday->lock < 0 )
-        Doomsday->heading = utAngle( Doomsday->x, Doomsday->y, Planets[-Doomsday->lock].x, Planets[-Doomsday->lock].y );
-    else if ( Doomsday->lock > 0 )
-        Doomsday->heading = utAngle( Doomsday->x, Doomsday->y, Ships[Doomsday->lock].x, Ships[Doomsday->lock].y );
+    if ( Doomsday->lock == LOCK_PLANET )
+        Doomsday->heading = utAngle( Doomsday->x, Doomsday->y, Planets[Doomsday->lockDetail].x, Planets[Doomsday->lockDetail].y );
+    else if ( Doomsday->lock == LOCK_SHIP )
+        Doomsday->heading = utAngle( Doomsday->x, Doomsday->y, Ships[Doomsday->lockDetail].x, Ships[Doomsday->lockDetail].y );
 
     return;
 
@@ -1804,7 +1809,8 @@ void clbInitGame(void)
     Doomsday->dx = 0.0;
     Doomsday->dy = 0.0;
     Doomsday->heading = 0.0;
-    Doomsday->lock = 0;
+    Doomsday->lock = LOCK_NONE;
+    Doomsday->lockDetail = 0;
     utStcpn( "Doomsday Machine", Doomsday->name, MAXUSERPNAME );
 
     /* Un-twiddle the lockword. */
@@ -1906,7 +1912,8 @@ void clbInitShip( int snum, int unum )
     Ships[snum].dhead = 0.0;
     Ships[snum].warp = 0.0;
     Ships[snum].dwarp = 0.0;
-    Ships[snum].lock = 0;
+    Ships[snum].lock = LOCK_NONE;
+    Ships[snum].lockDetail = 0;
     Ships[snum].shields = 100.0;
     Ships[snum].kills = 0.0;
     Ships[snum].damage = 0.0;
@@ -2685,7 +2692,8 @@ void clbZeroShip( int snum )
     Ships[snum].dhead = 0.0;
     Ships[snum].warp = 0.0;
     Ships[snum].dwarp = 0.0;
-    Ships[snum].lock = 0;
+    Ships[snum].lock = LOCK_NONE;
+    Ships[snum].lockDetail = 0;
     Ships[snum].shields = 0.0;
     Ships[snum].kills = 0.0;
     Ships[snum].damage = 0.0;
@@ -2870,9 +2878,10 @@ void clbTorpDrive(real itersec)
 /* compute a ship's proper position when orbiting */
 void clbAdjOrbitalPosition(int snum)
 {
-    if (snum >= 0 && snum < MAXSHIPS && Ships[snum].warp < 0.0)
+    if (snum >= 0 && snum < MAXSHIPS && Ships[snum].warp < 0.0
+        && Ships[snum].lock == LOCK_PLANET)
     {
-        int pnum = -Ships[snum].lock;
+        int pnum = Ships[snum].lockDetail;
 
         if ( pnum >= 0 && pnum < MAXPLANETS )
         {

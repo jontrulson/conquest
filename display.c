@@ -828,16 +828,17 @@ void display( int snum )
             uiPutColor(0);
             zzshead = 999;
         }
-        i = Ships[snum].lock;
-        if ( i >= 0 || Ships[snum].warp < 0.0)
-            i = round( Ships[snum].head );
-        if ( -i != zzshead)
+
+        i = round( Ships[snum].head );
+        if ( i != zzshead)
         {
             cdclra( lin, datacol, lin, STAT_COLS-1 );
 
             uiPutColor(InfoColor);
-            if ( -i >= 0 && -i < MAXPLANETS)
-                sprintf( buf, "%.3s", Planets[-i].name );
+            if ( Ships[snum].lock == LOCK_PLANET
+                 && Ships[snum].lockDetail < MAXPLANETS
+                 && Ships[snum].warp >= 0)
+                sprintf( buf, "%.3s", Planets[Ships[snum].lockDetail].name );
             else
                 sprintf( buf, "%d", i );
             cdputs( buf, lin, datacol );
@@ -1260,31 +1261,36 @@ void display( int snum )
             zbuf[MAXPLANETNAME-1] = 0;
             cdputs( zbuf, lin, dcol );	/* clean up status line */
 
-            i = Doomsday->lock;
-            if ( -i >= 0 && -i < MAXPLANETS )
+            if ( Doomsday->lock == LOCK_PLANET
+                 && Doomsday->lockDetail < MAXPLANETS )
 	    {
                 uiPutColor(RedLevelColor);
-                cdputs( Planets[-i].name, lin, dcol );	/* -[] */
+                cdputs( Planets[Doomsday->lockDetail].name, lin, dcol );
                 uiPutColor(0);
                 uiPutColor(InfoColor);
-                cdputn( round( dist( Doomsday->x, Doomsday->y, Planets[-i].x, Planets[-i].y ) ),
+                cdputn( round( dist( Doomsday->x, Doomsday->y,
+                                     Planets[Doomsday->lockDetail].x,
+                                     Planets[Doomsday->lockDetail].y ) ),
                         0, lin + 1, dcol );
                 uiPutColor(0);
 	    }
-            else if ( i >= 0 && i < MAXSHIPS )
+            else if ( Doomsday->lock == LOCK_SHIP
+                      && Doomsday->lockDetail < MAXSHIPS )
 	    {
                 buf[0] = 0;
-                utAppendShip(buf , i) ;
+                utAppendShip(buf , Doomsday->lockDetail) ;
                 uiPutColor(RedLevelColor);
                 cdputs( buf, lin, dcol );
                 uiPutColor(0);
                 uiPutColor(InfoColor);
-                cdputn( round( dist( Doomsday->x, Doomsday->y, Ships[i].x, Ships[i].y ) ),
+                cdputn( round( dist( Doomsday->x, Doomsday->y,
+                                     Ships[Doomsday->lockDetail].x,
+                                     Ships[Doomsday->lockDetail].y ) ),
                         0, lin + 1, dcol );
                 uiPutColor(0);
 	    }
             else
-                cdputn( i, 0, lin + 1, dcol );
+                cdputn( Doomsday->heading, 0, lin + 1, dcol );
 
             uiPutColor(0);
 

@@ -69,7 +69,8 @@ extern spFrame_t      sFrame;
 #endif
 
 int             sendAuth(int sock, uint8_t flag, char *login, char *pw);
-int             sendSetCourse(int sock, int8_t lock, real head);
+int             sendSetCourse(int sock, courseLock_t lock, uint16_t lockDetail,
+                              real head);
 
 int             sendSetName(char *name);
 int             sendCommand(uint8_t cmd, uint16_t detail);

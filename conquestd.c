@@ -1530,8 +1530,9 @@ int newship( int unum, int *snum )
         clbPutShip( *snum, Planets[i].x, Planets[i].y );
         Ships[*snum].dhead = rnduni( 0.0, 359.9 );
         Ships[*snum].head = Ships[*snum].dhead;
-        Ships[*snum].dwarp = (real) rndint( 2, 5 ) ;/* #~~~ this is a kludge*/
-        Ships[*snum].lock = -Teams[system].homeplanet;
+        Ships[*snum].dwarp = (real) rndint( 2, 5 );
+        Ships[*snum].lock = LOCK_PLANET;
+        Ships[*snum].lockDetail = (uint16_t)Teams[system].homeplanet;
     }
     else
     {				/* if we're reincarnating, skip any

@@ -216,7 +216,14 @@ int procShipSml(char *buf)
     Ships[snum].etemp = (real)sshipsml->etemp;
     Ships[snum].wtemp = (real)sshipsml->wtemp;
     Ships[snum].fuel = (real)((uint16_t)ntohs(sshipsml->fuel));
-    Ships[snum].lock = (int)((int16_t)ntohs(sshipsml->lock));
+    // a check...
+    if (sshipsml->lock < LOCK_MAX)
+        Ships[snum].lock = (courseLock_t)sshipsml->lock;
+    else
+        utLog("%s: got invalid courseLock enueration %d, ignoring",
+              __FUNCTION__, (int)sshipsml->lock);
+
+    Ships[snum].lockDetail = ntohs(sshipsml->lockDetail);
     Ships[snum].lastphase = (real)((uint16_t)ntohs(sshipsml->lastphase)) / 100.0;
     Ships[snum].lastblast = (real)((uint16_t)ntohs(sshipsml->lastblast)) / 100.0;
 

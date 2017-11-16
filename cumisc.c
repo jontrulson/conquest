@@ -211,7 +211,7 @@ int mcuReadMsg( int msgnum, int dsplin )
 /* convert a KP key into an angle */
 int mcuKPAngle(int ch, real *angle)
 {
-    int rv;
+    int rv = FALSE;
 
     switch (ch)
     {

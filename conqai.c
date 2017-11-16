@@ -314,7 +314,7 @@ static void executeai( int snum, int token )
 	{                                               \
             /* Break orbit. */                          \
             Ships[snum].warp = 0.0;                     \
-            Ships[snum].lock = 0;                       \
+            Ships[snum].lock = LOCK_NONE;                       \
             Ships[snum].dhead = Ships[snum].head;       \
 	}                                               \
 	if ( (x) > 0.0 )                                \
@@ -326,20 +326,22 @@ static void executeai( int snum, int token )
 #define SETCOURSE(x)                                                    \
     {                                                                   \
         if ( Ships[snum].warp < 0.0 )                                   \
-            Ships[snum].warp = 0.0;			/* break orbit */ \
-        Ships[snum].lock = 0;                                           \
+            Ships[snum].warp = 0.0; /* break orbit */                   \
+        Ships[snum].lock = LOCK_NONE;                                   \
         Ships[snum].dhead = (x);                                        \
     }
 
     /* SETLOCK( pnum ) */
 #define SETLOCK(x)                                                      \
     {                                                                   \
-        if ( Ships[snum].lock != -x )                                   \
+        if ( !(Ships[snum].lock == LOCK_PLANET                          \
+               && Ships[snum].lockDetail == (uint16_t)(x) ) )           \
         {                                                               \
             /* Don't break orbit to unless we're not there yet. */      \
             if ( Ships[snum].warp < 0.0 )                               \
                 Ships[snum].warp = 0.0;                                 \
-            Ships[snum].lock = -(x);                                    \
+            Ships[snum].lock = LOCK_PLANET;                             \
+            Ships[snum].lockDetail = (x);                               \
         }                                                               \
     }
 

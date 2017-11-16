@@ -915,7 +915,8 @@ static void _doorbit( int snum )
     int pnum;
 
     if ( ( Ships[snum].warp == ORBIT_CW ) || ( Ships[snum].warp == ORBIT_CCW ) )
-        _infoplanet( "But we are already orbiting ", -Ships[snum].lock, snum );
+        _infoplanet( "But we are already orbiting ",
+                     Ships[snum].lockDetail, snum );
     else if ( ! clbFindOrbit( snum, &pnum ) )
     {
         sprintf( cbuf, "We are not close enough to orbit, %s.",
@@ -1023,7 +1024,6 @@ static void _dodistress(char *buf, char ch)
 static int _chkrefit(void)
 {
     int snum = Context.snum;
-    int pnum;
     static char *ntp="We must be orbiting a team owned planet to refit.";
     static char *nek="You must have at least one kill to refit.";
     static char *cararm="You cannot refit while carrying armies";
@@ -1037,12 +1037,16 @@ static int _chkrefit(void)
         return FALSE;
     }
 
-    pnum = -Ships[snum].lock;
-
-    if (Planets[pnum].team != Ships[snum].team || Ships[snum].warp >= 0.0)
+    if (Ships[snum].lock == LOCK_PLANET
+        && Ships[snum].lockDetail < MAXPLANETS)
     {
-        cp_putmsg( ntp, MSG_LIN1 );
-        return FALSE;
+        int pnum = Ships[snum].lockDetail;
+
+        if (Planets[pnum].team != Ships[snum].team || Ships[snum].warp >= 0.0)
+        {
+            cp_putmsg( ntp, MSG_LIN1 );
+            return FALSE;
+        }
     }
 
     if (Ships[snum].armies != 0)
@@ -1084,7 +1088,9 @@ static int _chkcoup(void)
         cp_putmsg( nhp, MSG_LIN1 );
         return FALSE;
     }
-    pnum = -Ships[snum].lock;
+    // the assumption is that if warp < 0, we are in orbit and
+    // therefore we are locked onto the planet we are orbiting
+    pnum = (int)Ships[snum].lockDetail;
     if ( pnum != Teams[Ships[snum].team].homeplanet )
     {
         cp_putmsg( nhp, MSG_LIN1 );
@@ -1471,9 +1477,11 @@ static int _xlateFKey(int ch)
 /*    _docourse( snum ) */
 static void _docourse( char *buf, char ch)
 {
-    int i, j, what, sorpnum, xsorpnum, newlock, token, count;
+    int i, j, what, sorpnum, xsorpnum, token, count;
     real dir, appx, appy;
     int snum = Context.snum;
+    courseLock_t newlock = LOCK_NONE;
+    uint16_t newlockDetail = 0;
 
     hudClearPrompt(MSG_LIN1);
     hudClearPrompt(MSG_LIN2);
@@ -1484,8 +1492,6 @@ static void _docourse( char *buf, char ch)
         hudClearPrompt(MSG_LIN1);
         return;
     }
-
-    newlock = 0;				/* default to no lock */
 
     what = NEAR_ERROR;
     if (utIsDigits(buf))
@@ -1560,7 +1566,8 @@ static void _docourse( char *buf, char ch)
         dir = utAngle( Ships[snum].x, Ships[snum].y, Planets[sorpnum].x, Planets[sorpnum].y );
         if ( ch == TERM_EXTRA )
 	{
-            newlock = -sorpnum;
+            newlock = LOCK_PLANET;
+            newlockDetail = sorpnum;
             _infoplanet( "Now locked on to ", sorpnum, snum );
 	}
         else
@@ -1580,7 +1587,7 @@ static void _docourse( char *buf, char ch)
         break;
     }
 
-    sendSetCourse(cInfo.sock, newlock, dir);
+    sendSetCourse(cInfo.sock, newlock, newlockDetail, dir);
 
     return;
 
@@ -1694,7 +1701,7 @@ static void _dobomb(void)
         cp_putmsg( "We must be orbiting a planet to bombard it.", MSG_LIN1 );
         return;
     }
-    pnum = -Ships[snum].lock;
+    pnum = Ships[snum].lockDetail;
     if ( Planets[pnum].type == PLANET_SUN || Planets[pnum].type == PLANET_MOON ||
          Planets[pnum].team == TEAM_NOTEAM || Planets[pnum].armies == 0 )
     {
@@ -1760,7 +1767,7 @@ static void _initbeam()
                    MSG_LIN1 );
         return;
     }
-    pnum = -Ships[snum].lock;
+    pnum = Ships[snum].lockDetail;
     if ( Ships[snum].armies > 0 )
     {
         if ( Planets[pnum].type == PLANET_SUN )
@@ -1985,7 +1992,7 @@ static void command( int ch )
         hudClearPrompt(MSG_LIN1);
         hudClearPrompt(MSG_LIN2);
 
-        sendSetCourse(cInfo.sock, 0, x);
+        sendSetCourse(cInfo.sock, LOCK_NONE, 0, x);
         return;
     }
 

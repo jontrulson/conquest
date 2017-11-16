@@ -436,15 +436,28 @@ void debugdisplay( int snum )
     lin++;
     cprintf(lin,tcol,ALIGN_NONE,"#%d#%s",LabelColor, "     slock:");
     cprintf(lin+1,tcol,ALIGN_NONE,"#%d#%s",LabelColor, "       dtt:");
-    i = Ships[snum].lock;
-    if ( -i >= 0 && -i < MAXPLANETS )
+
+    if (Ships[snum].lock != LOCK_NONE)
     {
-        cprintf(lin,dcol,ALIGN_NONE,"#%d#%s",InfoColor, Planets[-i].name);
-        cprintf(lin+1,dcol,ALIGN_NONE,"#%d#%0d",InfoColor,
-                round( dist( Ships[snum].x, Ships[snum].y, Planets[-i].x, Planets[-i].y ) ));
+        i = (int)Ships[snum].lockDetail;
+        if ( Ships[snum].lock == LOCK_PLANET && i < MAXPLANETS )
+        {
+            cprintf(lin,dcol,ALIGN_NONE,"#%d#%s",InfoColor, Planets[i].name);
+            cprintf(lin+1,dcol,ALIGN_NONE,"#%d#%d",InfoColor,
+                    round( dist( Ships[snum].x, Ships[snum].y, Planets[i].x, Planets[i].y ) ));
+        }
+        else if (Ships[snum].lock == LOCK_SHIP && i < MAXSHIPS)
+        {
+            cprintf(lin,dcol,ALIGN_NONE,"#%d#%d",InfoColor, i);
+        }
+        else
+        {
+            // should never happen unless a new lock type is added
+            cprintf(lin,dcol,ALIGN_NONE,"#%d#%d(%d)",InfoColor,
+                    Ships[snum].lock, (int)Ships[snum].lockDetail);
+        }
     }
-    else if ( i != 0 )
-  	cprintf(lin,dcol,ALIGN_NONE,"#%d#%0d",InfoColor, i);
+
     lin+=2;
     cprintf(lin,tcol,ALIGN_NONE,"#%d#%s",LabelColor, "     sfuel:");
     cprintf(lin,dcol,ALIGN_NONE,"#%d#%0d",InfoColor, round(Ships[snum].fuel));
@@ -1186,11 +1199,15 @@ void operate(void)
             else if ( i == DS_LIVE )
 	    {
                 strcpy(buf , "ON (") ;
-                i = Doomsday->lock;
-                if ( -i >= 0 && -i < MAXPLANETS )
-                    strcat(buf , Planets[-i].name) ;
-                else
-                    utAppendShip(buf , i) ;		/* this will handle funny numbers */
+                if (Doomsday->lock == LOCK_NONE)
+                    strcat(buf , "NONE") ;
+                else if (Doomsday->lock == LOCK_PLANET
+                         && Doomsday->lockDetail < MAXPLANETS)
+                    strcat(buf , Planets[Doomsday->lockDetail].name);
+                else if (Doomsday->lock == LOCK_SHIP
+                         && Doomsday->lockDetail < MAXSHIPS)
+                    utAppendShip(buf, Doomsday->lockDetail);
+
                 utAppendChar(buf, ')');
 	    }
             else

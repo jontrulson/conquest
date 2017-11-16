@@ -616,7 +616,7 @@ void command( int ch )
         cdclrl( MSG_LIN1, 1 );
         cdclrl( MSG_LIN2, 1 );
 
-        sendSetCourse(cInfo.sock, 0, x);
+        sendSetCourse(cInfo.sock, LOCK_NONE, 0, x);
         return;
     }
 
@@ -1371,7 +1371,9 @@ void dobeam( int snum )
                    MSG_LIN1 );
         return;
     }
-    pnum = -Ships[snum].lock;
+    // the assumption here is that if you are orbiting (warp < 0), you
+    // are locked onto a planet...
+    pnum = Ships[snum].lockDetail;
     if ( Ships[snum].armies > 0 )
     {
         if ( Planets[pnum].type == PLANET_SUN )
@@ -1607,7 +1609,7 @@ void dobomb( int snum )
         mcuPutMsg( "We must be orbiting a planet to bombard it.", MSG_LIN1 );
         return;
     }
-    pnum = -Ships[snum].lock;
+    pnum = Ships[snum].lockDetail;
     if ( Planets[pnum].type == PLANET_SUN || Planets[pnum].type == PLANET_MOON ||
          Planets[pnum].team == TEAM_NOTEAM || Planets[pnum].armies == 0 )
     {
@@ -1751,9 +1753,15 @@ void dorefit( int snum, int dodisplay )
         return;
     }
 
-    pnum = -Ships[snum].lock;
+    if (Ships[snum].warp >= 0.0)
+    {
+        mcuPutMsg( ntp, MSG_LIN1 );
+        return;
+    }
 
-    if (Planets[pnum].team != Ships[snum].team || Ships[snum].warp >= 0.0)
+    pnum = Ships[snum].lockDetail;
+
+    if (Planets[pnum].team != Ships[snum].team)
     {
         mcuPutMsg( ntp, MSG_LIN1 );
         return;
@@ -1893,12 +1901,13 @@ void docoup( int snum )
                        MSG_LIN1 );
             return;
         }
-    if ( Ships[snum].warp >= 0.0 )
+    if ( Ships[snum].warp >= 0.0 || Ships[snum].lock != LOCK_PLANET)
     {
         mcuPutMsg( nhp, MSG_LIN1 );
         return;
     }
-    pnum = -Ships[snum].lock;
+
+    pnum = (int)Ships[snum].lockDetail;
     if ( pnum != Teams[Ships[snum].team].homeplanet )
     {
         mcuPutMsg( nhp, MSG_LIN1 );
@@ -1947,9 +1956,11 @@ void docoup( int snum )
 /*    docourse( snum ) */
 void docourse( int snum )
 {
-    int i, j, what, sorpnum, xsorpnum, newlock, token, count;
+    int i, j, what, sorpnum, xsorpnum, token, count;
     real dir, appx, appy;
     int ch;
+    courseLock_t newlock = LOCK_NONE;
+    uint16_t newlockDetail = 0;
 
     cdclrl( MSG_LIN1, 2 );
 
@@ -1961,8 +1972,6 @@ void docourse( int snum )
         cdclrl( MSG_LIN1, 1 );
         return;
     }
-
-    newlock = 0;				/* default to no lock */
 
     what = NEAR_ERROR;
     if (utIsDigits(cbuf))
@@ -2037,7 +2046,8 @@ void docourse( int snum )
         dir = utAngle( Ships[snum].x, Ships[snum].y, Planets[sorpnum].x, Planets[sorpnum].y );
         if ( ch == TERM_EXTRA )
 	{
-            newlock = -sorpnum;
+            newlock = LOCK_PLANET;
+            newlockDetail = sorpnum;
             mcuInfoPlanet( "Now locked on to ", sorpnum, snum );
 	}
         else
@@ -2057,7 +2067,7 @@ void docourse( int snum )
         break;
     }
 
-    sendSetCourse(cInfo.sock, newlock, dir);
+    sendSetCourse(cInfo.sock, newlock, newlockDetail, dir);
 
     return;
 
@@ -2361,7 +2371,7 @@ void doorbit( int snum )
     int pnum;
 
     if ( ( Ships[snum].warp == ORBIT_CW ) || ( Ships[snum].warp == ORBIT_CCW ) )
-        mcuInfoPlanet( "But we are already orbiting ", -Ships[snum].lock, snum );
+        mcuInfoPlanet( "But we are already orbiting ", Ships[snum].lockDetail, snum );
     else if ( ! clbFindOrbit( snum, &pnum ) )
     {
         sprintf( cbuf, "We are not close enough to orbit, %s.",

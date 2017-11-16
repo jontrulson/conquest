@@ -1161,7 +1161,7 @@ void drawBombing(int snum, int scale)
         return;
 
     /* don't bother if we aren't orbiting anything */
-    if (Ships[snum].lock >= 0)
+    if (Ships[snum].lock != LOCK_PLANET)
         return;
 
     /* init - look at first ship */
@@ -1227,8 +1227,8 @@ void drawBombing(int snum, int scale)
     /* calc and translate to correct position */
     GLcvtcoords( Ships[Context.snum].x,
                  Ships[Context.snum].y,
-                 Planets[-Ships[snum].lock].x + rnd->rndx,
-                 Planets[-Ships[snum].lock].y + rnd->rndy,
+                 Planets[Ships[snum].lockDetail].x + rnd->rndx,
+                 Planets[Ships[snum].lockDetail].y + rnd->rndy,
                  -scale,
                  &x,
                  &y);

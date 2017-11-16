@@ -77,15 +77,16 @@ int sendAuth(int sock, uint8_t flag, char *login, char *pw)
     return sAckMsg.code;
 }
 
-int sendSetCourse(int sock, int8_t lock, real head)
+int sendSetCourse(int sock, courseLock_t lock, uint16_t lockDetail, real head)
 {
     cpSetCourse_t csc;
 
     memset((void *)&csc, 0, sizeof(cpSetCourse_t));
 
     csc.type = CP_SETCOURSE;
-    csc.lock = lock;
-    csc.head = (uint16_t)htons((uint16_t)(head * 100.0));
+    csc.lock = (uint8_t)lock;
+    csc.lockDetail = htons(lockDetail);
+    csc.head = htons((uint16_t)(head * 100.0));
 
     if (pktWrite(PKT_SENDTCP, &csc) <= 0)
         return FALSE;

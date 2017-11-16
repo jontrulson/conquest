@@ -16,7 +16,8 @@ typedef struct {
     real dx;			/* x and y increments in mega-meters */
     real dy;
     real heading;			/* heading */
-    int  lock;			/* destination: 0, ship #, or -planet # */
+    courseLock_t lock;      /* one of the courseLock_t values */
+    uint16_t lockDetail;    /* ship or planet number locked onto */
     char name[MAXUSERPNAME];	/* name of doomsday machine */
 } Doomsday_t;
 

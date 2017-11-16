@@ -217,7 +217,12 @@ typedef struct {	/* 'short' ship packets */
     int8_t    wfuse;
     int8_t    efuse;
 
-    int16_t   lock;
+    uint8_t   lock;
+    uint8_t   pad1;
+    uint8_t   pad2;
+    uint8_t   pad3;
+
+    uint16_t  lockDetail;
     int16_t   flags;                /* SHIP_F_* */
 
     uint16_t lastphase;
@@ -541,8 +546,10 @@ typedef struct {
 
 typedef struct {
     uint8_t  type;			/* CP_SETCOURSE */
-    int8_t   lock;			/* lockon */
-    uint16_t head;			/* x100 */
+    uint8_t  lock;			/* lockon */
+    uint16_t lockDetail;
+
+    uint16_t head; 		/* x100 */
 } cpSetCourse_t;
 
 typedef struct {

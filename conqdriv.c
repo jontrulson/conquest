@@ -273,7 +273,6 @@ void iterdrive( int *ship )
     real h, ad, x, dis, ht, z;
     char buf[MSGMAXLINE];
     real warp;
-    int pnum;
 
     /* Drive the ships. */
     for ( s = 0; s < MAXSHIPS; s++ )
@@ -286,9 +285,12 @@ void iterdrive( int *ship )
                 Ships[i].pfuse = max( 0, Ships[i].pfuse - ITER_TENTHS );
 
             warp = Ships[i].warp;
-            pnum = -Ships[i].lock;
-            if ( pnum >= 0 && pnum < MAXPLANETS )
+
+            // If we are locked onto a planet
+            if ( Ships[i].lock == LOCK_PLANET
+                 && Ships[i].lockDetail < MAXPLANETS )
             {
+                int pnum = Ships[i].lockDetail;
                 if ( warp < 0.0 )
                 {
                     /* Orbiting. */
@@ -314,7 +316,10 @@ void iterdrive( int *ship )
                 else
                 {
                     /* Cruising, locked on; update ship's desired heading. */
-                    Ships[i].dhead = (real) utAngle(Ships[i].x, Ships[i].y, Planets[pnum].x, Planets[pnum].y);
+                    Ships[i].dhead = (real) utAngle(Ships[i].x,
+                                                    Ships[i].y,
+                                                    Planets[pnum].x,
+                                                    Planets[pnum].y);
                 }
             }
 
@@ -377,12 +382,13 @@ void iterdrive( int *ship )
 
                 /* If we're locked onto a planet but not orbiting it see if */
                 /* we are close enough to orbit. */
-                j = -Ships[i].lock;
-                if ( j > 0)
+                if ( Ships[i].lock == LOCK_PLANET
+                     && Ships[i].lock < MAXPLANETS)
 		{
+                    j = Ships[i].lockDetail;
                     /* Make sure the planet is still real. */
                     if ( ! PVISIBLE(j) )
-                        Ships[i].lock = 0;
+                        Ships[i].lock = LOCK_NONE;
                     else if ( Ships[i].warp >= 0.0 )
 		    {
                         /* Still moving; if we're going slow enough to orbit, */
@@ -474,20 +480,24 @@ void iterdrive( int *ship )
          */
 
         /* planet lock */
-        if (Doomsday->lock < 0 && (distf( Doomsday->x, Doomsday->y,
-                                          Planets[-Doomsday->lock].x,
-                                          Planets[-Doomsday->lock].y )
-                                   >= DOOMSDAY_DIST) )
+        if (Doomsday->lock == LOCK_PLANET
+            && Doomsday->lockDetail < MAXPLANETS
+            && (distf( Doomsday->x, Doomsday->y,
+                       Planets[Doomsday->lockDetail].x,
+                       Planets[Doomsday->lockDetail].y )
+                >= DOOMSDAY_DIST) )
         {
             Doomsday->x = Doomsday->x + Doomsday->dx;
             Doomsday->y = Doomsday->y + Doomsday->dy;
         }
 
         /* ship lock */
-        if (Doomsday->lock > 0 && (distf( Doomsday->x, Doomsday->y,
-                                          Ships[Doomsday->lock].x,
-                                          Ships[Doomsday->lock].y )
-                                   >= DOOMSDAY_DIST) )
+        if (Doomsday->lock == LOCK_SHIP
+            && Doomsday->lockDetail < MAXSHIPS
+            && (distf( Doomsday->x, Doomsday->y,
+                       Ships[Doomsday->lock].x,
+                       Ships[Doomsday->lock].y )
+                >= DOOMSDAY_DIST) )
         {
             Doomsday->x = Doomsday->x + Doomsday->dx;
             Doomsday->y = Doomsday->y + Doomsday->dy;
@@ -627,10 +637,16 @@ void secdrive( int *ship )
                 Ships[i].dwarp = 0.0;
             repair = repair * RMODE_REPAIR_MULT;
 	}
-        if ( Ships[i].warp < 0.0 )                        /* orbiting */
-            if ( ! clbSPWar( i,-Ships[i].lock ) )              /* a friendly */
-                if ( Planets[-Ships[i].lock].armies > 0 )	/* populated planet */
-                    repair = repair * PLANET_REPAIR_MULT;
+        // orbiting a friendly planet...
+        if ( Ships[i].warp < 0.0
+             && Ships[i].lock == LOCK_PLANET
+             && Ships[i].lockDetail < MAXPLANETS
+             && !clbSPWar(i, Ships[i].lockDetail)
+             && Planets[Ships[i].lockDetail].armies > 0)
+        {
+            repair = repair * PLANET_REPAIR_MULT;
+        }
+
         Ships[i].damage = Ships[i].damage - repair;
         if ( Ships[i].damage < 0.0 )
 	{
@@ -668,9 +684,9 @@ void secdrive( int *ship )
             /* You get fuel for orbiting friendly, populated class M, */
             /*  with shields down. */
             if ( ! SSHUP(i) || SREPAIR(i) )
-                if ( Planets[-Ships[i].lock].type == PLANET_CLASSM )
-                    if ( ! clbSPWar( i,-Ships[i].lock ) )
-                        if ( Planets[-Ships[i].lock].armies > 0 )
+                if ( Planets[Ships[i].lockDetail].type == PLANET_CLASSM )
+                    if ( ! clbSPWar( i, Ships[i].lockDetail ) )
+                        if ( Planets[Ships[i].lockDetail].armies > 0 )
                             inc = inc * MPLANET_FUEL_MULT;
 	}
         else
@@ -712,8 +728,8 @@ void secdrive( int *ship )
             clbUseFuel( i, dec, FALSE, TRUE );
 
         /* Cool-down. */
-        if ( Ships[i].warp < 0.0 && !clbSPWar( i,-Ships[i].lock)
-             &&  Planets[-Ships[i].lock].armies > 0)
+        if ( Ships[i].warp < 0.0 && !clbSPWar(i, Ships[i].lockDetail)
+             &&  Planets[Ships[i].lockDetail].armies > 0)
 	{			    /* orbiting a friendly populated planet */
             Ships[i].wtemp = max( 0.0, Ships[i].wtemp - (WEAPON_COOL_FAC * PLANET_REPAIR_MULT));
             Ships[i].etemp = max( 0.0, Ships[i].etemp - (ENGINE_COOL_FAC * PLANET_REPAIR_MULT));
@@ -773,8 +789,9 @@ void secdrive( int *ship )
                         {
                             /* Proximity check for the doomsday machine. */
                             if ( Doomsday->status == DS_LIVE )
-                                if ( distf( Ships[i].torps[j].x, Ships[i].torps[j].y, Doomsday->x, Doomsday->y ) <=
-                                     (TORPEDO_PROX * 3.0))
+                                if ( distf( Ships[i].torps[j].x,
+                                            Ships[i].torps[j].y,
+                                            Doomsday->x, Doomsday->y ) <= (TORPEDO_PROX * 3.0))
                                 {
                                     clbDetonate( i, j );
                                     break;
@@ -794,42 +811,66 @@ void secdrive( int *ship )
     /* Planet eater. */
     if ( Doomsday->status == DS_LIVE )
     {
-        if ( Doomsday->lock < 0 )
+        if (Doomsday->lock == LOCK_PLANET && Doomsday->lockDetail < MAXPLANETS)
 	{
             /* Planet. */
-            if ( distf( Doomsday->x, Doomsday->y, Planets[-Doomsday->lock].x, Planets[-Doomsday->lock].y ) <= DOOMSDAY_DIST )
+            if ( distf( Doomsday->x, Doomsday->y,
+                        Planets[Doomsday->lockDetail].x,
+                        Planets[Doomsday->lockDetail].y ) <= DOOMSDAY_DIST )
 	    {
                 /* Decrement armies. */
                 if ( rnd() <= 0.1 )
-                    clbIntrude( -1 /*doomsday*/, -Doomsday->lock );
+                    clbIntrude( -1 /*doomsday*/, Doomsday->lockDetail );
                 PVLOCK(&ConqInfo->lockword);
-                Planets[-Doomsday->lock].armies = Planets[-Doomsday->lock].armies - 1;
-                if ( Planets[-Doomsday->lock].armies <= 0 )
+                Planets[Doomsday->lockDetail].armies =
+                    Planets[Doomsday->lockDetail].armies - 1;
+                if ( Planets[Doomsday->lockDetail].armies <= 0 )
 		{
-                    Planets[-Doomsday->lock].uninhabtime = rndint( MIN_UNINHAB_MINUTES,
-                                                                   MAX_UNINHAB_MINUTES );
-                    clbZeroPlanet( -Doomsday->lock, 0 );
+                    Planets[Doomsday->lockDetail].uninhabtime =
+                        rndint( MIN_UNINHAB_MINUTES, MAX_UNINHAB_MINUTES );
+                    clbZeroPlanet( Doomsday->lockDetail, 0 );
                     clbDoomFind();
 		}
                 PVUNLOCK(&ConqInfo->lockword);
 	    }
 	}
-        else if ( Doomsday->lock > 0 )
+        else if ( Doomsday->lock == LOCK_SHIP
+                  && Doomsday->lockDetail < MAXSHIPS)
 	{
             /* Ship. */
-            if ( Ships[Doomsday->lock].status != SS_LIVE )
+            if ( Ships[Doomsday->lockDetail].status != SS_LIVE )
                 clbDoomFind();
-            else if ( distf( Doomsday->x, Doomsday->y, Ships[Doomsday->lock].x, Ships[Doomsday->lock].y ) <= DOOMSDAY_DIST )
-                Ships[Doomsday->lock].warp = 0.0;	/* clever doomsday tractors */
+            else if ( distf( Doomsday->x, Doomsday->y,
+                             Ships[Doomsday->lockDetail].x,
+                             Ships[Doomsday->lockDetail].y ) <= DOOMSDAY_DIST )
+            {
+                /* clever doomsday tractors (was .warp, set .dwarp instead).*/
+                Ships[Doomsday->lockDetail].dwarp = 0.0;
+            }
 	}
 
         /* Update heading. */
-        if ( Doomsday->lock < 0 )
-            Doomsday->heading = utAngle( Doomsday->x, Doomsday->y, Planets[-Doomsday->lock].x, Planets[-Doomsday->lock].y );
-        else if ( Doomsday->lock > 0 )
-            Doomsday->heading = utAngle( Doomsday->x, Doomsday->y, Ships[Doomsday->lock].x, Ships[Doomsday->lock].y );
-        Doomsday->dx = DOOMSDAY_WARP * MM_PER_SEC_PER_WARP * ITER_SECONDS * cosd(Doomsday->heading);
-        Doomsday->dy = DOOMSDAY_WARP * MM_PER_SEC_PER_WARP * ITER_SECONDS * sind(Doomsday->heading);
+        if ( Doomsday->lock == LOCK_PLANET )
+        {
+            Doomsday->heading =
+                utAngle( Doomsday->x, Doomsday->y,
+                         Planets[Doomsday->lockDetail].x,
+                         Planets[Doomsday->lockDetail].y );
+        }
+        else if ( Doomsday->lock == LOCK_SHIP )
+        {
+            Doomsday->heading =
+                utAngle( Doomsday->x, Doomsday->y,
+                         Ships[Doomsday->lockDetail].x,
+                         Ships[Doomsday->lockDetail].y );
+        }
+
+        Doomsday->dx =
+            DOOMSDAY_WARP * MM_PER_SEC_PER_WARP * ITER_SECONDS
+            * cosd(Doomsday->heading);
+        Doomsday->dy =
+            DOOMSDAY_WARP * MM_PER_SEC_PER_WARP * ITER_SECONDS
+            * sind(Doomsday->heading);
     }
 
     return;
