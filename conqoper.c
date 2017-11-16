@@ -1805,7 +1805,7 @@ void oppedit(void)
 
         lin++;
         i = Planets[pnum].team;
-        if ( pnum <= NUMCONPLANETS )
+        if ( pnum < NUMCONPLANETS )
         {
             cprintf(lin,col,ALIGN_NONE,"#%d#%s",LabelColor,"        Owner team:\n");
         }
@@ -1937,7 +1937,7 @@ void oppedit(void)
 
 	case 'T':
             /* Rotate owner team. */
-            if ( pnum > NUMCONPLANETS )
+            if ( pnum >= NUMCONPLANETS )
 	    {
                 Planets[pnum].team = utModPlusOne( Planets[pnum].team + 1, NUMALLTEAMS );
 	    }

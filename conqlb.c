@@ -840,7 +840,7 @@ int clbTakePlanet( int pnum, int snum )
     utAppendChar(buf , '!') ;
 
     /* Check whether the universe has been conquered. */
-    for ( i = 1; i <= NUMCONPLANETS; i++ )
+    for ( i = 0; i < NUMCONPLANETS; i++ )
         if ( Planets[i].type == PLANET_CLASSM || Planets[i].type == PLANET_DEAD )
             if ( Planets[i].team != Ships[snum].team || ! PVISIBLE(i) )
             {

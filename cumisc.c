@@ -1023,7 +1023,7 @@ void mcuPlanetList( int team, int snum )
                 /* flag planets that are required for a conq */
                 if (Planets[pnum].type == PLANET_CLASSM || Planets[pnum].type == PLANET_DEAD)
 		{
-                    if (pnum > NUMCONPLANETS)
+                    if (pnum >= NUMCONPLANETS)
                         coreflag = ' ';
                     else
                         coreflag = '+';
