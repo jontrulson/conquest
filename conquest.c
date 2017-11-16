@@ -2257,7 +2257,7 @@ void dohelp( void )
 void doinfo( int snum )
 {
     char ch;
-    int i, j, what, sorpnum, xsorpnum, count, token;
+    int j, what, sorpnum, xsorpnum, count, token;
     int extra;
 
     cdclrl( MSG_LIN1, 2 );
@@ -2292,7 +2292,7 @@ void doinfo( int snum )
             what = NEAR_NONE;
         else if ( extra )
 	{
-            if ( xsorpnum == 0 )
+            if ( xsorpnum == -1 )
                 what = NEAR_NONE;
             else
                 sorpnum = xsorpnum;
@@ -2307,14 +2307,12 @@ void doinfo( int snum )
     }
     else if ( cbuf[0] == 's' && utIsDigits(&cbuf[1]) )
     {
-        i = 1;
-        utSafeCToI( &j, cbuf, i );		/* ignore status */
+        utSafeCToI( &j, cbuf, 1 );		/* ignore status */
         mcuInfoShip( j, snum );
     }
     else if (utIsDigits(cbuf))
     {
-        i = 0;
-        utSafeCToI( &j, cbuf, i );		/* ignore status */
+        utSafeCToI( &j, cbuf, 0 );		/* ignore status */
         mcuInfoShip( j, snum );
     }
     else if ( clbPlanetMatch( cbuf, &j, FALSE ) )

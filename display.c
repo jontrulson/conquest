@@ -69,8 +69,7 @@ void do_bottomborder(int snum, char *buf, int attrib, int bufattr)
     }
 
     /* if hudInfo and we are a ship... */
-    if (UserConf.hudInfo && snum >= 0 &&
-        snum < MAXSHIPS)
+    if (UserConf.hudInfo && snum >= 0 && snum < MAXSHIPS)
     {				/* some additional info */
         /* current firing angle */
         col = STAT_COLS + 1;

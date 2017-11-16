@@ -256,7 +256,7 @@ static void _infoship( int snum, int scanner )
     cbuf[0] = Context.lasttarg[0] = 0;
     utAppendShip(cbuf , snum) ;
     strcpy(Context.lasttarg, cbuf); /* save for hudInfo */
-    hudSetInfoTarget(snum);
+    hudSetInfoTarget(snum, true);
 
     if ( snum == scanner )
     {
@@ -596,7 +596,7 @@ static void _infoplanet( char *str, int pnum, int snum )
     /* save for the hudInfo */
     strncpy(Context.lasttarg, Planets[pnum].name, 3);
     Context.lasttarg[3] = 0;
-    hudSetInfoTarget(-pnum);
+    hudSetInfoTarget(pnum, false);
 
     if ( godlike )
         canscan = TRUE;
@@ -793,7 +793,7 @@ static void _dotorp(real dir, int num)
 static void _doinfo( char *buf, char ch )
 {
     int snum = Context.snum;
-    int i, j, what, sorpnum, xsorpnum, count, token;
+    int j, what, sorpnum, xsorpnum, count, token;
     int extra;
 
     if ( ch == TERM_ABORT )
@@ -823,7 +823,7 @@ static void _doinfo( char *buf, char ch )
             what = NEAR_NONE;
         else if ( extra )
 	{
-            if ( xsorpnum == 0 )
+            if ( xsorpnum == -1 )
                 what = NEAR_NONE;
             else
                 sorpnum = xsorpnum;
@@ -838,14 +838,12 @@ static void _doinfo( char *buf, char ch )
     }
     else if ( buf[0] == 's' && utIsDigits(&buf[1]) )
     {
-        i = 1;
-        utSafeCToI( &j, buf, i );		/* ignore status */
+        utSafeCToI( &j, buf, 1 );		/* ignore status */
         _infoship( j, snum );
     }
     else if (utIsDigits(buf))
     {
-        i = 0;
-        utSafeCToI( &j, buf, i );		/* ignore status */
+        utSafeCToI( &j, buf, 0 );		/* ignore status */
         _infoship( j, snum );
     }
     else if ( clbPlanetMatch( buf, &j, FALSE ) )
@@ -2664,7 +2662,7 @@ void nCPInit(int istopnode)
     {
         hudInitData();
         hudSetInfoFiringAngle(0);
-        hudSetInfoTarget(0);
+        hudSetInfoTarget(-1, false);
         hudSetInfoTargetAngle(0);
         hudSetInfoTargetDist(0);
     }

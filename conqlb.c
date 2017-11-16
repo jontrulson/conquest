@@ -1444,14 +1444,15 @@ int clbFindSpecial( int snum, int token, int count, int *sorpnum, int *xsorpnum 
     real d, nd, td;
     int valid, peaceful;
 
-    *sorpnum = 0;					/* zero nearest */
-    *xsorpnum = 0;				/* zero second nearest */
+    *sorpnum = -1;					/* zero nearest */
+    *xsorpnum = -1;				/* zero second nearest */
     d = 2e20;					/* distance from nearest */
     nd = 3e20;					/* distance from second nearest */
     a = 20000;					/* armies of nearest */
     na = 30000;					/* armies of second nearest */
     u = 20000;					/* uninhabitable time of nearest */
     nu = 20000;					/* uninhabitable time of next */
+
     switch ( token )
     {
     case SPECIAL_SHIP:
@@ -1459,6 +1460,7 @@ int clbFindSpecial( int snum, int token, int count, int *sorpnum, int *xsorpnum 
     case SPECIAL_TEAMSHIP:
         /* Nearest ship, nearest enemy ship, and nearest team ship. */
         for ( i = 0; i < MAXSHIPS; i++ )
+        {
             if ( i != snum && Ships[i].status == SS_LIVE )
             {
                 switch ( token )
@@ -1502,6 +1504,7 @@ int clbFindSpecial( int snum, int token, int count, int *sorpnum, int *xsorpnum 
                     }
                 }
             }
+        }
         break;
     case SPECIAL_HOMEPLANET:
         /* Home planet. */
@@ -1680,7 +1683,7 @@ int clbFindSpecial( int snum, int token, int count, int *sorpnum, int *xsorpnum 
         return ( FALSE );			/* this can't happen */
     }
 
-    return ( *sorpnum != 0 );
+    return ( *sorpnum != -1 );
 
 }
 

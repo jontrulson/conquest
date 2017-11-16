@@ -612,7 +612,7 @@ void hudSetInfoFiringAngle(real blastang)
  */
 static void _updateTargetInfoString(void)
 {
-    if (!hudData.info.lasttarget)
+    if (hudData.info.lasttarget < 0)
         hudData.info.lasttadstr[0] = 0;
     else
         snprintf(hudData.info.lasttadstr, HUD_INFO_STR_SZ - 1,
@@ -630,17 +630,17 @@ static void _updateTargetInfoString(void)
     return;
 }
 
-void hudSetInfoTarget(int tnum)
+void hudSetInfoTarget(int tnum, bool isShip)
 {
-    /* < 0 = planet number, > 0 ship number, 0 = no target */
+    /* -1 = no target */
     if (tnum != hudData.info.lasttarget)
     {
         hudData.info.lasttargetstr[0] = 0;
-        if (tnum)
+        if (tnum >= 0)
         {
-            if (tnum > 0)
+            if (isShip && tnum < MAXSHIPS)
                 utAppendShip(hudData.info.lasttargetstr , tnum) ;
-            else if (tnum < 0)
+            else if (!isShip && tnum < MAXPLANETS)
             {                   /* planet, just need 3 chars */
                 hudData.info.lasttargetstr[0] = Planets[-tnum].name[0];
                 hudData.info.lasttargetstr[1] = Planets[-tnum].name[1];

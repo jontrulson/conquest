@@ -204,7 +204,7 @@ void hudSetPrompt(int line, char *prompt, int pcolor,
                   char *buf, int color);
 void hudClearPrompt(int line);
 void hudSetInfoFiringAngle(real blastang);
-void hudSetInfoTarget(int tnum);
+void hudSetInfoTarget(int tnum, bool isShip);
 void hudSetInfoTargetAngle(int ang);
 void hudSetInfoTargetDist(int tdist);
 void hudSetRecId(char *str);
