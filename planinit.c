@@ -53,11 +53,24 @@ void cqiInitPlanets(void)
 
         Planets[i].type = cqiPlanets[i].ptype;
         Planets[i].primary = cqiPlanets[i].primary;
+
         if (cqiPlanets[i].visible)
             PFSET(i, PLAN_F_VISIBLE);
         else
             PFCLR(i, PLAN_F_VISIBLE);
+
         Planets[i].team = cqiPlanets[i].pteam;
+
+        // set core and homeplanet flags
+        if (cqiPlanets[i].core)
+            PFSET(i, PLAN_F_CORE);
+        else
+            PFCLR(i, PLAN_F_CORE);
+
+        if (cqiPlanets[i].homeplanet)
+            PFSET(i, PLAN_F_HOMEPLANET);
+        else
+            PFCLR(i, PLAN_F_HOMEPLANET);
 
         /* for armies, we use what is specified */
         Planets[i].armies = cqiPlanets[i].armies;

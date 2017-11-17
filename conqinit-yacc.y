@@ -1688,23 +1688,16 @@ void dumpUniverse(void)
         printf("  pteam       \"%s\"\n", team2str(Planets[i].team));
         printf("  armies      %d\n", Planets[i].armies);
         printf("  visible     \"%s\"\n", PVISIBLE(i) ? "yes" : "no");
-        if (i <= NUM_BASEPLANETS && PVISIBLE(i) &&
-            (Planets[i].type != PLANET_MOON && Planets[i].type != PLANET_SUN &&
-             Planets[i].type != PLANET_GHOST))
-            printf("  core        \"yes\"\n");
-        else
-            printf("  core        \"no\"\n");
+        printf("  core        \"%s\"\n", PCORE(i) ? "yes" : "no");
+        printf("  homeplanet  \"%s\"\n", PHOMEPLANET(i) ? "yes" : "no");
 
+
+        // FIXME - redo this homeplanet stuff...
         /* look for homeplanets.  The 'homeplanet' concept should be moved
            into the planet struct of the cmn block someday. */
         for (j=0; j<3; j++)
             if (Teams[Planets[i].team].teamhplanets[j] == i)
                 break;
-
-        if (j >= 3)
-            printf("  homeplanet  \"no\"\n");
-        else
-            printf("  homeplanet  \"yes\"\n");
 
         printf("  x           %f\n", Planets[i].x);
         printf("  y           %f\n", Planets[i].y);
