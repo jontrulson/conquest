@@ -383,7 +383,7 @@ void iterdrive( int *ship )
                 /* If we're locked onto a planet but not orbiting it see if */
                 /* we are close enough to orbit. */
                 if ( Ships[i].lock == LOCK_PLANET
-                     && Ships[i].lock < MAXPLANETS)
+                     && Ships[i].lockDetail < MAXPLANETS)
 		{
                     j = Ships[i].lockDetail;
                     /* Make sure the planet is still real. */

@@ -127,9 +127,9 @@ int proc_0006_Ship(char *buf)
     //    Ships[snum].killedby = (int)((int16_t)ntohs(sship->killedby));
     Ships[snum].kills = (real)((real)ntohl(sship->kills) / 10.0);
 
-    // FIXME - check logic here... This will be broken I think.
-    for (i=0; i<=(40 + 20)/*MAXPLANETS*/; i++)
-        Ships[snum].srpwar[i] = (int)sship->srpwar[i];
+    // FIXME - check logic here, verify
+    for (i=0; i<(40 + 20)/*MAXPLANETS*/; i++)
+        Ships[snum].srpwar[i] = (int)sship->srpwar[i+1];
 
     for (i=0; i<4 /*NUMPLAYERTEAMS*/; i++)
         Ships[snum].scanned[i] = (int)sship->scanned[i];
