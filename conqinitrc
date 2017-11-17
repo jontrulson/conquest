@@ -767,7 +767,7 @@ planet {
   velocity    0.000000
   radius      12000.000000
   ptype       "G"
-  pteam       "F"
+  pteam       "N"
   armies      0
   visible     "no"
   core        "no"
