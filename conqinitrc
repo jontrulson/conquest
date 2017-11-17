@@ -653,6 +653,7 @@ planet {
 }
 
 planet {
+  # Murisak orbits itself (stationary)
   name        "Murisak"
   primary     "Murisak"
   angle       0.000000

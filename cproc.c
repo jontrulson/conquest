@@ -382,7 +382,6 @@ int procPlanetInfo(char *buf)
     primary = splaninfo->primary;
 
     /* Roy fix - 10/17/2005 - let mur data be sent. */
-    // FIXME - verify this logic
     if (primary < 0 || primary >= MAXPLANETS)
         return FALSE;
 

@@ -344,7 +344,7 @@ int proc_0006_PlanetInfo(char *buf)
        them. */
 
     /* FIXME - with new CB, and later, new protocol, we will send these
-       flags directly.  Right? */
+       flags directly. */
     if (splaninfo->flags & SP_0006_PLANETINFO_FLAGS_FVALID)
     {                           /* we have valid flags */
 

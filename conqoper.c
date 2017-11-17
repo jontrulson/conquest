@@ -1759,7 +1759,7 @@ void oppedit(void)
 
         lin++;
         i = Planets[pnum].primary;
-        if ( i == 0 )
+        if ( i == pnum ) // orbiting itself
 	{
             lin++;
 

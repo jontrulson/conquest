@@ -164,7 +164,7 @@ void cqiInitPlanets(void)
     /* careful about planets that orbit themselves (planet == primary)  */
     for ( i = MAXPLANETS - 1; i >= 0; i-- )
     {
-        if ( Planets[i].primary != 0 && Planets[i].primary != i )
+        if ( Planets[i].primary != i ) // not stationary
         {
             Planets[i].x = Planets[Planets[i].primary].x +
                 Planets[i].orbrad * cosd(Planets[i].orbang);

@@ -959,7 +959,6 @@ static int cqiValidateAnimations(void)
 static int cqiValidatePlanets(void)
 {
     int i;
-    int mur = -1;
     int homeplan[NUMPLAYERTEAMS];             /* count of home planets */
 
     /* first things first... If there was no global read, then no
@@ -970,28 +969,20 @@ static int cqiValidatePlanets(void)
 
     memset((void *)homeplan, 0, sizeof(int) * NUMPLAYERTEAMS);
 
-    if (mur < 0)
-    {
-        if ((mur = _cqiFindPlanet("Murisak")) < 0)
-        {
-            utLog("%s: cannot find planet Murisak, which must exist",
-                  __FUNCTION__);
-            mur = 0;
-        }
-    }
-
     /* first fill in any empty slots */
     if (numPlanets < MAXPLANETS)
     {
         for (i = numPlanets; i < _cqiGlobal->maxplanets; i++)
         {
             /* use the slot number in the name to reduce chance of dup names */
-            snprintf(_cqiPlanets[i].name, MAXPLANETNAME - 1, "ZZExtra %d",
-                     i);
-            /* FIXME - no hc mur */
-            strcpy(_cqiPlanets[i].primname, "Murisak");
+            snprintf(_cqiPlanets[i].name, MAXPLANETNAME - 1, "ZZExtra %d", i);
 
-            _cqiPlanets[i].primary = mur;
+            // these planets are stationary, so set the primary name
+            // to be the same as the planet.
+            strncpy(_cqiPlanets[i].primname, _cqiPlanets[i].name,
+                    MAXPLANETNAME - 1);
+
+            _cqiPlanets[i].primary = i;
             _cqiPlanets[i].angle = 0.0;
             _cqiPlanets[i].velocity = 0.0;
             _cqiPlanets[i].radius = 0.0;
@@ -1013,28 +1004,29 @@ static int cqiValidatePlanets(void)
 
     for (i=0; i < numPlanets; i++)
     {
-        /* see if the primary name == name, if so, orbit mur and vel = 0 */
+        // see if the primary name == name, if so, set velocity = 0,
+        // and primary planet number (itself)
 
         if (!strncmp(_cqiPlanets[i].name, _cqiPlanets[i].primname,
                      MAXPLANETNAME))
         {
             _cqiPlanets[i].velocity = 0.0;
 
-            /* FIXME - need a ghost 0, not harcoded mur */
-            _cqiPlanets[i].primary = mur;
+            _cqiPlanets[i].primary = i; // orbits itself == stationary
         }
         else
         {                       /* else, find the primary, default to mur */
             if ((_cqiPlanets[i].primary = _cqiFindPlanet(_cqiPlanets[i].primname)) < 0)
             {                   /* couldn't find it */
-                if (cqiVerbose && i != mur)
-                    utLog("%s: can't find primary '%s' for planet '%s', defaulting to '%s'",
-                          __FUNCTION__,
-                          _cqiPlanets[i].primname,
-                          _cqiPlanets[i].name,
-                          _cqiPlanets[mur].name);
+                utLog("%s: can't find primary '%s' for planet '%s', defaulting to itself: '%s'",
+                      __FUNCTION__,
+                      _cqiPlanets[i].primname,
+                      _cqiPlanets[i].name,
+                      _cqiPlanets[i].name);
 
-                _cqiPlanets[i].primary = mur;
+                strncpy(_cqiPlanets[i].primname, _cqiPlanets[i].name,
+                        MAXPLANETNAME - 1);
+                _cqiPlanets[i].primary = i;
             }
         }
 
@@ -1548,18 +1540,9 @@ void dumpInitDataHdr(void)
         printf(" { \n");
         printf("   \"%s\",\n", cqiPlanets[i].name);
 
-/* FIXME - planet name == primary indicates stationary */
-
-        if (cqiPlanets[i].primary)
-        {
-            printf("   \"%s\",\n", cqiPlanets[cqiPlanets[i].primary].name);
-            printf("   %d,\n", cqiPlanets[i].primary);
-        }
-        else
-        {
-            printf("   \"Murisak\",\n");
-            printf("   0,\n");
-        }
+        // also handles the case where a planet orbits itself
+        // (stationary)
+        printf("   \"%s\",\n", cqiPlanets[cqiPlanets[i].primary].name);
 
         printf("   %f,\n", cqiPlanets[i].angle);
         printf("   %f,\n", cqiPlanets[i].velocity);
@@ -1674,12 +1657,9 @@ void dumpUniverse(void)
         printf("planet {\n");
         printf("  name        \"%s\"\n", Planets[i].name);
 
-/* FIXME - planet name == primary indicates stationary */
-        // maybe an empty primary should mean stationary...
-        if (Planets[i].primary)
-            printf("  primary     \"%s\"\n", Planets[Planets[i].primary].name);
-        else
-            printf("  primary     \"\"\n");
+        // also handles case of stationary planets where the primary
+        // is the same as the planet
+        printf("  primary     \"%s\"\n", Planets[Planets[i].primary].name);
 
         printf("  angle       %f\n", Planets[i].orbang);
         printf("  velocity    %f\n", Planets[i].orbvel);
