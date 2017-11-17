@@ -56,7 +56,6 @@ void     clbInitUniverse(void);
 void     clbIntrude( int snum, int pnum );
 int      clbLogHist( int unum );
 real     clbNewWarp( int snum, real dwarp );
-int      clbPhoon( int pnum );
 int      clbPlanetMatch( char *str, int *pnum, int godlike );
 void     clbPutShip( int snum, real basex, real basey );
 int      clbFmtMsg(msgFrom_t from, uint16_t fromDetail, msgTo_t to,

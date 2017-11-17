@@ -2184,55 +2184,6 @@ real clbNewWarp( int snum, real dwarp )
 }
 
 
-/*  phoon - calculate the phase of a moon */
-/*  SYNOPSIS */
-/*    int phase, phoon, pnum */
-/*    phase = clbPhoon( pnum ) */
-int clbPhoon( int pnum )
-{
-    int i, j, ph;
-
-    /* Suns simply don't have phases. */
-    if ( Planets[pnum].type == PLANET_SUN )
-        return ( PHOON_NO );
-
-    /* You have to orbit some-thing to have a phase. */
-    i = Planets[pnum].primary;
-    if ( i == 0 )
-        return ( PHOON_NO );
-
-    /* Your primary must be a non-sun that is real. */
-    if ( Planets[i].type == PLANET_SUN || ! PVISIBLE(i) )
-        return ( PHOON_NO );
-
-    /* Your primary has to orbit a (real) sun to have a phase. */
-    j = Planets[i].primary;
-    if ( j == 0 )
-        return ( PHOON_NO );
-    if ( Planets[j].type != PLANET_SUN || ! PVISIBLE(j) )
-        return ( PHOON_NO );
-
-    /* Things are cool, now calculate the phase. */
-    ph = (int) ( utMod360( Planets[pnum].orbang - Planets[i].orbang - 45.0 ) / 90.0 );
-
-    /* The number calculated is in the range 0 to 3, and works fine */
-    /* if the moon is orbiting counter clockwise. If it is orbiting */
-    /* in the other direction, we must swap the first and last quarters. */
-    if ( Planets[pnum].orbvel < 0.0 )
-        switch ( ph )
-        {
-        case PHOON_FIRST:
-            ph = PHOON_LAST;
-            break;
-        case PHOON_LAST:
-            ph = PHOON_FIRST;
-            break;
-        }
-    return ( ph );
-
-}
-
-
 /*  planmatch - check if a string matches a planet name */
 /*  SYNOPSIS */
 /*    int planmatch, pnum, godlike */
@@ -2802,9 +2753,8 @@ void clbPlanetDrive(real itersec)
 
     for ( i = 0; i <= MAXPLANETS; i++ )
     {
-        /* Advance porbang(). */
-        // FIXME - verify this logic...
-        if ( Planets[i].primary != 0 )
+        /* Advance porbang() if planet is not stationary. */
+        if ( Planets[i].primary != i ) // not orbiting itself...
 	{
 
             Planets[i].orbang = utMod360( Planets[i].orbang +

@@ -523,29 +523,6 @@ static void _infoplanet( char *str, int pnum, int snum )
             if ( Planets[pnum].scanned[Ships[snum].team] && clbSPWar( snum, pnum ) )
                 strcat(junk, " (hostile)");
 
-    /* Things that orbit things that orbit have phases. */
-    switch ( clbPhoon( pnum ) )
-    {
-    case PHOON_FIRST:
-        strcat(junk, " (first quarter)");
-        break;
-    case PHOON_FULL:
-        strcat(junk, " (full)");
-        break;
-    case PHOON_LAST:
-        strcat(junk, " (last quarter)");
-        break;
-    case PHOON_NEW:
-        strcat(junk, " (new)");
-        break;
-    case PHOON_NO:
-        /* Do no-thing. */;
-        break;
-    default:
-        strcat(junk, " (weird)");
-        break;
-    }
-
     if ( godlike )
     {
         x = 0.0;
