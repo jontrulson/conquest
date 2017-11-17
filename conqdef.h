@@ -256,13 +256,6 @@ typedef enum {
 #define DS_LIVE 1
 #define DS_OFF 2
 
-/* Phases of a moon. */
-#define PHOON_NO -1 		/* doesn't have a phase */
-#define PHOON_LAST 0 		/* last quarter */
-#define PHOON_NEW 1 		/* new */
-#define PHOON_FIRST 2 		/* first quarter */
-#define PHOON_FULL 3 		/* full */
-
 /* Tokens for mcuPutThing(), must be negative */
 #define THING_EXPLOSION -1 	/* a torpedo explosion */
 
