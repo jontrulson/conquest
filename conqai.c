@@ -199,7 +199,7 @@ static void buildai( int snum, int vars[], int *bnenum, real *bdne, real *bane )
 }
 
 
-/*  defend - create a robot ship to defend the home system */
+/*  defend - create a robot ship to defend a "home" planet */
 /*  SYNOPSIS */
 /*    int snum, pnum */
 /*    defend( attacker, pnum ) */
@@ -213,10 +213,9 @@ void defend( int attacker, int pnum )
     if ( team < 0 || team >= NUMPLAYERTEAMS )
         return;
 
-    /* Must be for a home system planet. */
-    if ( pnum != Teams[team].teamhplanets[0] &&
-         pnum != Teams[team].teamhplanets[1] &&
-         pnum != Teams[team].teamhplanets[2] )
+    // must be a home planet, and the planet's defendteam must equal
+    // the team currently occupying the planet
+    if (!(PHOMEPLANET(pnum) && Planets[pnum].defendteam == team))
         return;
 
     /* See if there are any team ships to defend. */
@@ -230,7 +229,7 @@ void defend( int attacker, int pnum )
 
     /* Count how many robot users are on the right team and can play. */
     j = 0;
-    for ( i = 0; i < MAXUSERS; i = i + 1 )
+    for ( i = 0; i < MAXUSERS; i++ )
         if ( Users[i].live )
             if ( Users[i].robot && Users[i].team == team &&
                  ! Users[i].ooptions[OOPT_SHITLIST] )
@@ -242,9 +241,9 @@ void defend( int attacker, int pnum )
 
     /* Pick one. */
     k = rndint( 1, j );
-    unum = -1;			/* off-by-one fixed - romulans now have defenders */
+    unum = -1;    /* off-by-one fixed - romulans now have defenders */
     j = 0;
-    for ( i = 0; i < MAXUSERS; i = i + 1 )
+    for ( i = 0; i < MAXUSERS; i++ )
         if ( Users[i].live )
             if ( Users[i].robot && Users[i].team == team &&
                  ! Users[i].ooptions[OOPT_SHITLIST] )
@@ -584,10 +583,7 @@ int newrob( int *snum, int unum )
     utStcpn ( Users[unum].alias, Ships[*snum].alias, MAXUSERPNAME );
 
     /* Place the ship. */
-    if ( Planets[Teams[Ships[*snum].team].homeplanet].primary ==
-         Teams[Ships[*snum].team].homesun )
-        i = Teams[Ships[*snum].team].homesun;
-    else
+    if (!clbFindTeamHomeSun(Ships[*snum].team, &i))
         i = Teams[Ships[*snum].team].homeplanet;
     clbPutShip( *snum, Planets[i].x, Planets[i].y );
     clbFixDeltas( *snum );

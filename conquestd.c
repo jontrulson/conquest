@@ -656,32 +656,41 @@ void stopUpdate(void)
 int capentry( int snum, int *system )
 {
     int i, j;
-    int owned[NUMPLAYERTEAMS];
+    bool owned[NUMPLAYERTEAMS] = {};
     int pkttype;
     cpCommand_t *ccmd;
     char buf[PKT_MAXSIZE];
     uint8_t esystem = 0;
 
     /* First figure out which systems we can enter from. */
+
     for ( i = 0; i < NUMPLAYERTEAMS; i++ )
     {
-        owned[i] = FALSE;
-        /* We must own all three planets in a system. */
-        for ( j = 0; j < 3; j++ )
+        /* We must own all home planets of a team (defendteam). */
+        for ( j=0; j<MAXPLANETS; j++ )
 	{
-            if ( Planets[Teams[i].teamhplanets[j]].team != Ships[snum].team )
-                goto cnext2_1; /* next 2; */
+            if (PHOMEPLANET(j) && Planets[j].defendteam == i)
+            {
+                // if we don't own it, bail
+                if (Planets[j].team != Ships[snum].team)
+                    break;
+            }
 	}
-        owned[i] = TRUE;
-    cnext2_1:
-        ;
+
+        if (j < MAXPLANETS)
+            owned[i] = false;
+        else
+            owned[i] = true;
     }
-    owned[Ships[snum].team] = TRUE;		/* always can enter in our system */
+
+    owned[Ships[snum].team] = TRUE;  // we can always enter our own
+                                     // system regardless of who owns
+                                     // it
 
     /* Now count how many systems we can enter from. */
     j = 0;
     esystem = 0;
-    for ( i = 0; i < NUMPLAYERTEAMS; i = i + 1 )
+    for ( i = 0; i < NUMPLAYERTEAMS; i++ )
         if ( owned[i] )
         {
             esystem |= (1 << i);
@@ -1500,7 +1509,7 @@ int newship( int unum, int *snum )
         if ( ! capentry( *snum, &system ) )
 	{
             Ships[*snum].status = SS_RESERVED;
-            return ( -1 );
+            return ( FALSE );
 	}
     }
     else
@@ -1523,14 +1532,17 @@ int newship( int unum, int *snum )
         clbInitShip( *snum, unum );
 
         /* Randomly position the ship near the home sun (or planet). */
-        if ( Planets[Teams[system].homeplanet].primary == Teams[system].homesun )
-            i = Teams[system].homesun;
-        else
+        if (!clbFindTeamHomeSun(system, &i))
+        {
+            // couldn't find a home sun, use homeplanet
             i = Teams[system].homeplanet;
+        }
+        // good to go
         clbPutShip( *snum, Planets[i].x, Planets[i].y );
         Ships[*snum].dhead = rnduni( 0.0, 359.9 );
         Ships[*snum].head = Ships[*snum].dhead;
         Ships[*snum].dwarp = (real) rndint( 2, 5 );
+        // lock onto the homeplanet
         Ships[*snum].lock = LOCK_PLANET;
         Ships[*snum].lockDetail = (uint16_t)Teams[system].homeplanet;
     }

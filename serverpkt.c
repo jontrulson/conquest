@@ -477,6 +477,9 @@ spPlanet_t *spktPlanet(uint8_t pnum, int rec)
     else
         splan.team = TEAM_SELFRULED; /* until we know for sure... */
 
+    // who's homeworld is this (if a homeplanet)?
+    splan.defendteam = Planets[pnum].defendteam;
+
     strncpy((char *)splan.name, Planets[pnum].name, MAXPLANETNAME);
 
     if (rec)
@@ -880,7 +883,7 @@ spTeam_t *spktTeam(uint8_t team, int force, int rec)
 
     steam.type = SP_TEAM;
     steam.team = team;
-    steam.homesun = Teams[team].homesun;
+    steam.homeplanet = (uint8_t)Teams[team].homeplanet;
 
     /* RESTRICT */
     if ((Ships[snum].team == team) || rec)
@@ -890,11 +893,6 @@ spTeam_t *spktTeam(uint8_t team, int force, int rec)
 
         steam.couptime = (uint8_t)Teams[team].couptime;
     }
-
-    for (i=0; i<3; i++)
-        steam.teamhplanets[i] = (uint8_t)Teams[team].teamhplanets[i];
-
-    steam.homeplanet = Teams[team].homeplanet;
 
     for (i=0; i<MAXTSTATS; i++)
         steam.stats[i] = (uint32_t)htonl(Teams[team].stats[i]);

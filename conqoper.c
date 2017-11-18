@@ -1805,13 +1805,9 @@ void oppedit(void)
 
         lin++;
         i = Planets[pnum].team;
-        if ( pnum < NUMCONPLANETS )
-        {
-            cprintf(lin,col,ALIGN_NONE,"#%d#%s",LabelColor,"        Owner team:\n");
-        }
-        else
-            cprintf(lin,col,ALIGN_NONE,sfmt, "T", "  Owner team:\n");
-        cprintf( lin,datacol,ALIGN_NONE, "#%d#%s (%d)", InfoColor,Teams[i].name, i );
+        cprintf(lin,col,ALIGN_NONE,sfmt, "T", "  Owner team:\n");
+        cprintf( lin,datacol,ALIGN_NONE, "#%d#%s (%d)",
+                 InfoColor,Teams[i].name, i );
 
         lin++;
         cprintf(lin,col,ALIGN_NONE,sfmt, "x,y", "Position:\n");
@@ -1937,12 +1933,8 @@ void oppedit(void)
 
 	case 'T':
             /* Rotate owner team. */
-            if ( pnum >= NUMCONPLANETS )
-	    {
-                Planets[pnum].team = utModPlusOne( Planets[pnum].team + 1, NUMALLTEAMS );
-	    }
-            else
-                cdbeep();
+            Planets[pnum].team =
+                utModPlusOne( Planets[pnum].team + 1, NUMALLTEAMS );
             break;
 	case 't':
             /* Rotate planet type. */

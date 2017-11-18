@@ -230,10 +230,10 @@ static int nPlanetlDisplay(dspConfig_t *dsp)
             /* flag planets that are required for a conq */
             if (Planets[pnum].type == PLANET_CLASSM || Planets[pnum].type == PLANET_DEAD)
             {
-                if (pnum >= NUMCONPLANETS)
-                    coreflag = ' ';
-                else
+                if (PCORE(pnum))
                     coreflag = '+';
+                else
+                    coreflag = ' ';
             }
 
             cprintf(lin, col,  ALIGN_NONE, "#%d#%c", SpecialColor,

@@ -810,6 +810,7 @@ int clbTakePlanet( int pnum, int snum )
             if ( PVISIBLE(i) && (Planets[i].team == oteam)
                  && Planets[i].armies > 0)
             {
+                // nope
                 didgeno = 0;
                 break;
             }
@@ -840,9 +841,11 @@ int clbTakePlanet( int pnum, int snum )
     utAppendChar(buf , '!') ;
 
     /* Check whether the universe has been conquered. */
-    for ( i = 0; i < NUMCONPLANETS; i++ )
-        if ( Planets[i].type == PLANET_CLASSM || Planets[i].type == PLANET_DEAD )
-            if ( Planets[i].team != Ships[snum].team || ! PVISIBLE(i) )
+    for ( i = 0; i < MAXPLANETS; i++ )
+        if ( PCORE(i) && PVISIBLE(i)
+             && (Planets[i].type == PLANET_CLASSM
+                 || Planets[i].type == PLANET_DEAD) )
+            if ( Planets[i].team != Ships[snum].team )
             {
                 /* No. */
                 clbStoreMsg( MSG_FROM_PLANET, pnum,
@@ -1508,23 +1511,11 @@ int clbFindSpecial( int snum, int token, int count, int *sorpnum, int *xsorpnum 
         break;
     case SPECIAL_HOMEPLANET:
         /* Home planet. */
-        switch ( Ships[snum].team )
-	{
-	case TEAM_FEDERATION:
-            *sorpnum = Teams[TEAM_FEDERATION].homeplanet;
-            break;
-	case TEAM_ROMULAN:
-            *sorpnum = Teams[TEAM_ROMULAN].homeplanet;
-            break;
-	case TEAM_KLINGON:
-            *sorpnum = Teams[TEAM_KLINGON].homeplanet;
-            break;
-	case TEAM_ORION:
-            *sorpnum = Teams[TEAM_ORION].homeplanet;
-            break;
-	default:
-            return ( FALSE );
-	}
+        if (Ships[snum].team < NUMPLAYERTEAMS) // better be...
+            *sorpnum = Teams[Ships[snum].team].homeplanet;
+        else
+            return FALSE;
+
         break;
     case SPECIAL_WEAKPLANET:
         /* Weakest non-team planet. */
@@ -2990,3 +2981,21 @@ void clbCheckShips(int isDriver)
 
     return;
 }
+
+// Find a team's home sun, if they have one
+bool clbFindTeamHomeSun(int team, int *pnum)
+{
+    if (team < 0 || team >= NUMPLAYERTEAMS || !pnum)
+        return false;
+
+    int primary = Planets[Teams[team].homeplanet].primary;
+    if (Planets[primary].type == PLANET_SUN)
+    {
+        *pnum = primary;
+        return true;
+    }
+
+    // if we're here, we failed.
+    return false;
+}
+

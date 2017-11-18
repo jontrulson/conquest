@@ -277,6 +277,7 @@ int procPlanet(char *buf)
 
     Planets[pnum].type = splan->ptype;
     Planets[pnum].team = splan->team;
+    Planets[pnum].defendteam = splan->defendteam;
 
     splan->name[MAXPLANETNAME - 1] = 0;
     strncpy(Planets[pnum].name, (char *)splan->name, MAXPLANETNAME);
@@ -579,19 +580,14 @@ int procTeam(char *buf)
     if (Context.recmode == RECMODE_ON)
         recWriteEvent(buf);
 
-    Teams[team].homesun = steam->homesun;
-
     if (steam->flags & SPTEAM_FLAGS_COUPINFO)
         Teams[team].coupinfo = TRUE;
     else
         Teams[team].coupinfo = FALSE;
 
+    Teams[team].homeplanet = (int)steam->homeplanet;
+
     Teams[team].couptime = steam->couptime;
-
-    for (i=0; i<3; i++)
-        Teams[team].teamhplanets[i] = steam->teamhplanets[i];
-
-    Teams[team].homeplanet = steam->homeplanet;
 
     for (i=0; i<MAXTSTATS; i++)
         Teams[team].stats[i] = (int)ntohl(steam->stats[i]);

@@ -998,12 +998,13 @@ void mcuPlanetList( int team, int snum )
                 coreflag = ' ';
 
                 /* flag planets that are required for a conq */
-                if (Planets[pnum].type == PLANET_CLASSM || Planets[pnum].type == PLANET_DEAD)
+                if (Planets[pnum].type == PLANET_CLASSM
+                    || Planets[pnum].type == PLANET_DEAD)
 		{
-                    if (pnum >= NUMCONPLANETS)
-                        coreflag = ' ';
-                    else
+                    if (PCORE(pnum))
                         coreflag = '+';
+                    else
+                        coreflag = ' ';
 		}
 
                 sprintf(xbuf,"%c ",coreflag);  /* coreflag */

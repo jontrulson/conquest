@@ -89,6 +89,13 @@ shiptype {
 # Planet definitions
 ####################
 
+# List each team's primary homeplanet first.  This ensures that these
+# are the "primary" homeplanets for each team when entering the system
+# (course lock) and for robot defenders.  These are also the planets
+# needed to coup for each team.
+
+
+# primary home planet of the Federation
 planet {
   name        "Earth"
   primary     "Sol"
@@ -106,6 +113,7 @@ planet {
   size        300
 }
 
+# primary home planet of the Romulan Star Empire
 planet {
   name        "Romulus"
   primary     "Sirius"
@@ -123,6 +131,7 @@ planet {
   size        300
 }
 
+# primary home planet of the Klingon Empire
 planet {
   name        "Klingus"
   primary     "Kejela"
@@ -140,6 +149,7 @@ planet {
   size        300
 }
 
+# primary home planet of the Orions
 planet {
   name        "Orion"
   primary     "Betelgeuse"
@@ -156,6 +166,8 @@ planet {
   y           5946.563049
   size        300
 }
+
+# And the rest of the planets...
 
 planet {
   name        "Remus"

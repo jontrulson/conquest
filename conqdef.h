@@ -51,7 +51,7 @@
 /*#define COMMONSTAMP 20001231 		 stardate? */
 /*#define COMMONSTAMP 20030829 */
 // #define COMMONSTAMP 20101027
-#define COMMONSTAMP 20171115
+#define COMMONSTAMP 20171117
 
 #ifndef PI
 # define PI 3.141592654
@@ -174,10 +174,6 @@ typedef enum {
 
 /* number of planets */
 #define MAXPLANETS (NUM_BASEPLANETS + NUM_EXTRAPLANETS)
-
-// FIXME - remove after "core" testing is implemented...
-#define NUMCONPLANETS 25 	/* last planet need to conquer the universe */
-
 
 #define MAXUSERS     500      /* maximum number of registered users */
 #define MAXUSERNAME  32	     /* maximum size of a user's login name */

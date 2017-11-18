@@ -40,6 +40,10 @@ typedef struct {
     int  primary;                 /* planet this planet orbits */
     int  type;                    /* type of planet - M, dead, sun */
     int  team;                    /* which team owns the planet */
+    int  defendteam;              // for planets marked as homeplanet,
+                                  // this member holds the team
+                                  // responsible for defense (robots or
+                                  // players)
     int  armies;                  /* how many armies are on the planet */
     int  uninhabtime;             /* minutes left till inhabitable */
     int  scanned[NUMPLAYERTEAMS]; /* which planets have been */

@@ -959,15 +959,13 @@ static int cqiValidateAnimations(void)
 static int cqiValidatePlanets(void)
 {
     int i;
-    int homeplan[NUMPLAYERTEAMS];             /* count of home planets */
-
     /* first things first... If there was no global read, then no
        point in continuing */
 
     if (!globalRead)
         return FALSE;
 
-    memset((void *)homeplan, 0, sizeof(int) * NUMPLAYERTEAMS);
+    unsigned int homeplan[NUMPLAYERTEAMS] = {}; /* count of home planets */
 
     /* first fill in any empty slots */
     if (numPlanets < MAXPLANETS)
@@ -1030,7 +1028,7 @@ static int cqiValidatePlanets(void)
             }
         }
 
-        /* count home planets */
+        // count home planets, each team MUST have at least one
 
         if (_cqiPlanets[i].homeplanet)
             switch (_cqiPlanets[i].pteam)
@@ -1044,21 +1042,20 @@ static int cqiValidatePlanets(void)
             default:
                 break;
             }
-
     }
 
 
-    /* make sure 3 homeplanets per 'normal' team have been specified */
+    // make sure at least one is specified per team
     for (i=0; i < NUMPLAYERTEAMS; i++)
     {
-        if (homeplan[i] != 3)
+        if (homeplan[i] < 1)
         {
-            utLog("%s: team %s must have 3 homeplanets. %d were specified.",
+            utLog("%s: team %s must have at least 1 homeplanet. %d were "
+                  "specified.",
                   __FUNCTION__, team2str(i), homeplan[i]);
             return FALSE;
         }
     }
-
 
     if (cqiVerbose)
         utLog("%s: total planets %d (%d loaded, %d extra)",
@@ -1670,14 +1667,6 @@ void dumpUniverse(void)
         printf("  visible     \"%s\"\n", PVISIBLE(i) ? "yes" : "no");
         printf("  core        \"%s\"\n", PCORE(i) ? "yes" : "no");
         printf("  homeplanet  \"%s\"\n", PHOMEPLANET(i) ? "yes" : "no");
-
-
-        // FIXME - redo this homeplanet stuff...
-        /* look for homeplanets.  The 'homeplanet' concept should be moved
-           into the planet struct of the cmn block someday. */
-        for (j=0; j<3; j++)
-            if (Teams[Planets[i].team].teamhplanets[j] == i)
-                break;
 
         printf("  x           %f\n", Planets[i].x);
         printf("  y           %f\n", Planets[i].y);

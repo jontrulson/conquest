@@ -250,6 +250,9 @@ typedef struct {
     uint8_t  ptype;                /* planet type */
     uint8_t  team;			/* team */
 
+    uint8_t  defendteam;        /* original home planet team owner*/
+    uint8_t  pad[3];
+
     uint8_t  name[MAXPLANETNAME];
 } spPlanet_t;
 
@@ -374,15 +377,11 @@ typedef struct {
 typedef struct {
     uint8_t  type;                 /* SP_TEAM */
     uint8_t  team;
-    uint8_t  homesun;
+    uint8_t  couptime;		/* minutes until coup can work */
     uint8_t  flags;                /* coupinfo, etc */
 
-    uint8_t  couptime;		/* minutes until coup can work */
-    uint8_t  teamhplanets[3];
-
     uint8_t  homeplanet;
-    uint8_t  pad1;
-    uint16_t pad2;
+    uint8_t  pad[3];
 
     uint32_t stats[MAXTSTATS];
 

@@ -79,6 +79,7 @@ uint32_t  clbGetMillis(void);
 void     clbBlockAlarm(void);
 void     clbUnblockAlarm(void);
 void     clbCheckShips(int isDriver);
+bool     clbFindTeamHomeSun(int team, int *pnum);
 
 
 #endif /* _CONQLB_H */

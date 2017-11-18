@@ -553,7 +553,8 @@ int proc_0006_Team(char *buf)
     if (team < 0 || team >= 8 /*NUMALLTEAMS*/)
         return FALSE;
 
-    Teams[team].homesun = steam->homesun;
+    // this doesn't exist in current cb
+//    Teams[team].homesun = steam->homesun;
 
     if (steam->flags & SP_0006_TEAM_FLAGS_COUPINFO)
         Teams[team].coupinfo = TRUE;
@@ -562,10 +563,11 @@ int proc_0006_Team(char *buf)
 
     Teams[team].couptime = steam->couptime;
 
-    for (i=0; i<3; i++)
-        Teams[team].teamhplanets[i] = steam->teamhplanets[i];
+    // this doesn't exist in current cb
+//    for (i=0; i<3; i++)
+//        Teams[team].teamhplanets[i] = steam->teamhplanets[i];
 
-    Teams[team].homeplanet = steam->homeplanet;
+    Teams[team].homeplanet = (int)steam->homeplanet;
 
     for (i=0; i<20 /*MAXTSTATS*/; i++)
         Teams[team].stats[i] = (int)ntohl(steam->stats[i]);
