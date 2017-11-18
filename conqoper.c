@@ -2021,7 +2021,6 @@ void oppedit(void)
             /* Now you don't */
             PFCLR(pnum, PLAN_F_VISIBLE);
             break;
-            // FIXME - check this logic...
 	case '>': /* forward rotate planet number - dwp */
 	case KEY_RIGHT:
 	case KEY_UP:
