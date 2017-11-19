@@ -207,9 +207,9 @@ int check_cblock(char *fname, int fmode, int sizeofcb)
 
 /* my malloc wrapper. used only when mapping
    or initializing a commonblock */
-char *mymalloc(int size)
+void *mymalloc(int size)
 {
-    char *ptr;
+    void *ptr;
 
     if ((ptr = malloc(size)) == NULL)
     {
@@ -319,7 +319,7 @@ void fake_common(void)
 
     /* this will exit if it fails */
     if (!cBasePtr)
-        cBasePtr = mymalloc(SIZEOF_COMMONBLOCK);
+        cBasePtr = (char *)mymalloc(SIZEOF_COMMONBLOCK);
 
     map_vars();
 

@@ -29,7 +29,7 @@
 
 
 /* conqcm.c */
-char *mymalloc(int size);
+void *mymalloc(int size);
 void map_common(void);
 void fake_common(void);		/* malloc cmn rather than map */
 void lock_common(void);
