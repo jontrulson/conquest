@@ -1541,6 +1541,7 @@ void dumpInitDataHdr(void)
         // (stationary)
         printf("   \"%s\",\n", cqiPlanets[cqiPlanets[i].primary].name);
 
+        printf("   %d,\n", cqiPlanets[i].primary);
         printf("   %f,\n", cqiPlanets[i].angle);
         printf("   %f,\n", cqiPlanets[i].velocity);
         printf("   %f,\n", cqiPlanets[i].radius);
