@@ -960,8 +960,7 @@ spHistory_t *spktHistory(int hnum)
     hist.elapsed = (uint32_t)htonl((uint32_t)History[hnum].elapsed);
     hist.histlog = (uint32_t)htonl((uint32_t)History[hnum].histlog);
 
-    /* FIXME:  after new proto, send hist.username */
-
+    strncpy(hist.username, History[hnum].username, MAXUSERNAME - 1);
 
     if (memcmp((void *)&hist, (void *)&pktHistory[hnum], sizeof(spHistory_t)))
     {

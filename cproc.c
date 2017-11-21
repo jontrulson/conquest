@@ -644,13 +644,12 @@ int procHistory(char *buf)
     hnum = hist->hnum;
 
     ConqInfo->histptr = hist->histptr;
-    History[hnum].histunum = (int)ntohs(hist->unum);
+    History[hnum].histunum = (int)((int16_t)ntohs(hist->unum));
 
     History[hnum].elapsed = (time_t)ntohl((uint32_t)hist->elapsed);
     History[hnum].histlog = (time_t)ntohl((uint32_t)hist->histlog);
 
-    /* FIXME: need to extract username from hist packet when
-       new protocol. */
+    strncpy(History[hnum].username, hist->username, MAXUSERNAME - 1);
 
     return TRUE;
 }

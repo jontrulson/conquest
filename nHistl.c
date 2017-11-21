@@ -47,10 +47,11 @@ scrNode_t *nHistlInit(int nodeid, int setnode)
 
 static int nHistlDisplay(dspConfig_t *dsp)
 {
-    int i, j, unum, lin, col, fline, lline, thistptr = 0;
+    int i, j, lin, col, fline, lline, thistptr = 0;
     char *hd0="C O N Q U E S T   U S E R   H I S T O R Y";
     char connecttm[BUFFER_SIZE_256];
     char histentrytm[DATESIZE + 1];
+    char puname[MAXUSERNAME];
 
     /* Do some screen setup. */
     fline = 1;
@@ -65,19 +66,22 @@ static int nHistlDisplay(dspConfig_t *dsp)
     i = thistptr + 1;
     for ( j = 0; j < MAXHISTLOG; j++ )
     {
-        /* FIXME:  after new proto, extract username and flag
-           resigned users (has username and -1 hist unum) */
-        i = utModPlusOne( i - 1, MAXHISTLOG );
-        unum = History[i].histunum;
+        bool isResigned = false;
 
-        if ( unum < 0 || unum >= MAXUSERS )
+        // adjust based on histptr being the next available slot.
+        i = utModPlusOne( i - 1, MAXHISTLOG );
+
+        // No username, no entry
+        if (!History[i].username[0])
             continue;
-        if ( ! Users[unum].live )
-            continue;
+
+        if (History[i].histunum < 0) // resigned
+            isResigned = true;
+
+        strncpy(puname, History[i].username, MAXUSERNAME - 1);
 
         /* entry time */
         utFormatTime( histentrytm, History[i].histlog);
-
 
         /* now elapsed time */
         utFormatSeconds((int) History[i].elapsed, connecttm);
@@ -86,8 +90,8 @@ static int nHistlDisplay(dspConfig_t *dsp)
 
         cprintf( lin, col, ALIGN_NONE,
                  "#%d#%-10.10s #%d#%16s#%d#-#%d#%7s",
-                 YellowLevelColor,
-                 Users[unum].username,
+                 (isResigned) ? CyanColor : YellowLevelColor,
+                 puname,
                  GreenLevelColor,
                  histentrytm,
                  NoColor,

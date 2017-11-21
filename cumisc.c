@@ -30,12 +30,12 @@ static char cbuf[BUFFER_SIZE_1024]; /* general purpose buffer */
 /*    mcuHistList( godlike ) */
 void mcuHistList( int godlike )
 {
-    int i, j, unum, lin, col, fline, lline, thistptr = 0;
+    int i, j, lin, col, fline, lline, thistptr = 0;
     int ch;
     char *hd0="C O N Q U E S T   U S E R   H I S T O R Y";
-    char puname[MAXUSERNAME + 2]; /* for '\0' and '@' */
     char connecttm[BUFFER_SIZE_256];
     char histentrytm[DATESIZE + 1];
+    char puname[MAXUSERNAME];
 
     /* Do some screen setup. */
     cdclear();
@@ -59,21 +59,22 @@ void mcuHistList( int godlike )
         i = thistptr + 1;
         for ( j = 0; j < MAXHISTLOG; j++ )
 	{
-            /* FIXME:  after new proto, extract username and flag
-               resigned users (has username and -1 hist unum) */
+            bool isResigned = false;
+
+            // adjust based on histptr being the next available slot.
             i = utModPlusOne( i - 1, MAXHISTLOG );
-            unum = History[i].histunum;
 
-            if ( unum < 0 || unum >= MAXUSERS )
-                continue;
-            if ( ! Users[unum].live )
+            // No username, no entry
+            if (!History[i].username[0])
                 continue;
 
-            strcpy(puname, Users[unum].username);
+            if (History[i].histunum < 0) // resigned
+                isResigned = true;
+
+            strncpy(puname, History[i].username, MAXUSERNAME - 1);
 
             /* entry time */
             utFormatTime( histentrytm, History[i].histlog);
-
 
             /* now elapsed time */
             utFormatSeconds((int) History[i].elapsed, connecttm);
@@ -82,7 +83,7 @@ void mcuHistList( int godlike )
 
             cprintf( lin, col, ALIGN_NONE,
                      "#%d#%-10.10s #%d#%16s#%d#-#%d#%7s",
-                     YellowLevelColor,
+                     (isResigned) ? CyanColor : YellowLevelColor,
                      puname,
                      GreenLevelColor,
                      histentrytm,

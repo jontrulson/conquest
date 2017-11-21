@@ -2067,6 +2067,7 @@ void clbInitUniverse(void)
     {
         History[i].histunum = -1;
         History[i].histlog = 0;
+        History[i].elapsed = 0;
         History[i].username[0] = 0;
     }
 
