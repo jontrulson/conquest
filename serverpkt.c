@@ -135,7 +135,7 @@ spUser_t *spktUser(uint16_t unum)
         if (Users[unum].war[i])
             suser.war |= (1 << i);
 
-    suser.rating = (int16_t)htons((uint16_t)(Users[unum].rating * 100.0));
+    suser.rating = (int16_t)htons((uint16_t)(Users[unum].rating * 10.0));
     suser.lastentry = (uint32_t)htonl((uint32_t)Users[unum].lastentry);
 
     for (i=0; i<OOPT_TOTALOOPTION; i++)

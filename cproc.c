@@ -101,7 +101,7 @@ int procUser(char *buf)
         if ((suser->war & (1 << i)))
             Users[unum].war[i] = TRUE;
 
-    Users[unum].rating = (real)((real)((int16_t)ntohs(suser->rating)) / 100.0);
+    Users[unum].rating = (real)((real)((int16_t)ntohs(suser->rating)) / 10.0);
     Users[unum].lastentry = (time_t)ntohl(suser->lastentry);
 
     for (i=0; i<OOPT_TOTALOOPTION; i++)

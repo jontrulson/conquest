@@ -319,7 +319,7 @@ typedef struct {
 
     uint8_t  flags;                /* hostile, live, etc */
     uint8_t  war;			/* a bit mask (1 << TEAM_*) */
-    int16_t   rating;               /* x100 */
+    int16_t   rating;               /* x10 */
 
     uint32_t lastentry;
 
