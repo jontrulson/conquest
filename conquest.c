@@ -2755,9 +2755,6 @@ void menu(void)
     /* Initialize statistics. */
     initstats( &Ships[Context.snum].ctime, &Ships[Context.snum].etime );
 
-    /* Log this entry into the Game. */
-    Context.histslot = clbLogHist( Context.unum );
-
     /* Set up some things for the menu display. */
     switchteams = Users[Context.unum].ooptions[OOPT_SWITCHTEAMS];
     multiple = Users[Context.unum].ooptions[OOPT_MULTIPLE];
