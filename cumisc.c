@@ -817,7 +817,7 @@ void mcuPlanetList( int team, int snum )
     int i, lin, col, olin, pnum;
     static int sv[MAXPLANETS];
     int cmd;
-    char ch, junk[10], coreflag;
+    char ch, junk[10];
     char *hd0="P L A N E T   L I S T   ";
     char *hd1="' = must take to conquer the Universe)";
     char *hd2="planet      type team armies          planet      type team armies";
@@ -825,8 +825,8 @@ void mcuPlanetList( int team, int snum )
     int outattr;
     int col2;
     int column_h = 7;
-    int column_1 = 5;
-    int column_2 = 43;
+    int column_1 = 3;
+    int column_2 = 41;
     char xbuf[BUFFER_SIZE_256];
     static char pd0[BUFFER_SIZE_1024];
     static int FirstTime = TRUE;
@@ -996,19 +996,23 @@ void mcuPlanetList( int team, int snum )
                         junk[0] = 0;
 		}
 
-                coreflag = ' ';
+                char coreflag = ' ';
+                char homeflag = ' ';
 
                 /* flag planets that are required for a conq */
                 if (Planets[pnum].type == PLANET_CLASSM
                     || Planets[pnum].type == PLANET_DEAD)
 		{
+                    // check for homeplanet
+                    if (PHOMEPLANET(pnum))
+                        homeflag = Teams[Planets[pnum].defendteam].name[0];
+
+                    // core planet - required for conquer
                     if (PCORE(pnum))
                         coreflag = '+';
-                    else
-                        coreflag = ' ';
 		}
 
-                sprintf(xbuf,"%c ",coreflag);  /* coreflag */
+                sprintf(xbuf,"%c %c ", homeflag, coreflag);  // home/core flags
                 uiPutColor(SpecialColor);
                 cdputs( xbuf, lin, col );
 

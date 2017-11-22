@@ -67,12 +67,12 @@ static int nPlanetlDisplay(dspConfig_t *dsp)
 {
     int i, lin, col, olin, pnum;
     static int sv[MAXPLANETS];
-    char ch, junk[10], coreflag;
+    char ch, junk[10];
     int outattr;
     int col2;
     int column_h = 7;
-    int column_1 = 5;
-    int column_2 = 43;
+    int column_1 = 3;
+    int column_2 = 41;
     char xbuf[BUFFER_SIZE_256];
     static char pd0[BUFFER_SIZE_1024];
     static int FirstTime = TRUE;
@@ -225,20 +225,24 @@ static int nPlanetlDisplay(dspConfig_t *dsp)
                     junk[0] = 0;
             }
 
-            coreflag = ' ';
+            char coreflag = ' ';
+            char homeflag = ' ';
 
             /* flag planets that are required for a conq */
             if (Planets[pnum].type == PLANET_CLASSM || Planets[pnum].type == PLANET_DEAD)
             {
+                // check for homeplanet
+                if (PHOMEPLANET(pnum))
+                    homeflag = Teams[Planets[pnum].defendteam].name[0];
+
+                // core planet - required for conquer
                 if (PCORE(pnum))
                     coreflag = '+';
-                else
-                    coreflag = ' ';
             }
 
-            cprintf(lin, col,  ALIGN_NONE, "#%d#%c", SpecialColor,
-                    coreflag);
-            col += 2;
+            cprintf(lin, col,  ALIGN_NONE, "#%d#%c %c", SpecialColor,
+                    homeflag, coreflag);
+            col += 4;
 
             sprintf(xbuf,"%-11s ",Planets[pnum].name);  /* Planets[pnum].name */
             cprintf(lin, col,  ALIGN_NONE, "#%d#%s", outattr, xbuf);
