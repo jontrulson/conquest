@@ -157,9 +157,9 @@ void conqstats( int snum )
         /* update elapsed time in History[]
            for this user */
 
-        if (Context.histslot != -1 && History[Context.histslot].histunum == unum)
+        if (Context.histslot != -1 && History[Context.histslot].unum == unum)
 	{
-            difftime = time(0) - History[Context.histslot].histlog;
+            difftime = time(0) - History[Context.histslot].enterTime;
             if (difftime < (time_t)0)
                 difftime = (time_t)0;
             History[Context.histslot].elapsed = difftime;

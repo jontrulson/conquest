@@ -955,10 +955,10 @@ spHistory_t *spktHistory(int hnum)
 
     hist.histptr = ConqInfo->histptr;
 
-    hist.unum = (uint16_t)htons((uint16_t)History[hnum].histunum);
+    hist.unum = (uint16_t)htons((uint16_t)History[hnum].unum);
 
     hist.elapsed = (uint32_t)htonl((uint32_t)History[hnum].elapsed);
-    hist.histlog = (uint32_t)htonl((uint32_t)History[hnum].histlog);
+    hist.enterTime = (uint32_t)htonl((uint32_t)History[hnum].enterTime);
 
     strncpy(hist.username, History[hnum].username, MAXUSERNAME - 1);
 

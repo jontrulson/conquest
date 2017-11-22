@@ -424,7 +424,7 @@ typedef struct {
 
     uint32_t elapsed;
 
-    uint32_t histlog;
+    uint32_t enterTime;
 
     uint8_t  username[MAXUSERNAME];
 } spHistory_t;

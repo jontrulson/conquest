@@ -75,13 +75,13 @@ static int nHistlDisplay(dspConfig_t *dsp)
         if (!History[i].username[0])
             continue;
 
-        if (History[i].histunum < 0) // resigned
+        if (History[i].unum < 0) // resigned
             isResigned = true;
 
         strncpy(puname, History[i].username, MAXUSERNAME - 1);
 
         /* entry time */
-        utFormatTime( histentrytm, History[i].histlog);
+        utFormatTime( histentrytm, History[i].enterTime);
 
         /* now elapsed time */
         utFormatSeconds((int) History[i].elapsed, connecttm);

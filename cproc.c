@@ -644,10 +644,10 @@ int procHistory(char *buf)
     hnum = hist->hnum;
 
     ConqInfo->histptr = hist->histptr;
-    History[hnum].histunum = (int)((int16_t)ntohs(hist->unum));
+    History[hnum].unum = (int)((int16_t)ntohs(hist->unum));
 
     History[hnum].elapsed = (time_t)ntohl((uint32_t)hist->elapsed);
-    History[hnum].histlog = (time_t)ntohl((uint32_t)hist->histlog);
+    History[hnum].enterTime = (time_t)ntohl((uint32_t)hist->enterTime);
 
     strncpy(History[hnum].username, hist->username, MAXUSERNAME - 1);
 
