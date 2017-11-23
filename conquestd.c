@@ -1027,17 +1027,12 @@ void handleSimpleCmdPkt(cpCommand_t *ccmd)
             if (team >= 0 && team < NUMPLAYERTEAMS)
 	    {
 
-                if (Users[Context.unum].ooptions[OOPT_SWITCHTEAMS] &&
-                    Users[Context.unum].ooptions[OOPT_MULTIPLE] <= 1)
-		{
-                    Ships[Context.snum].team = team;
-                    Ships[Context.snum].shiptype =
-                        Teams[Ships[Context.snum].team].shiptype;
-                    Users[Context.unum].team = Ships[Context.snum].team;
-                    Ships[Context.snum].war[Ships[Context.snum].team] = FALSE;
-                    Users[Context.unum].war[Users[Context.unum].team] = FALSE;
-		}
-
+                Ships[Context.snum].team = team;
+                Ships[Context.snum].shiptype =
+                    Teams[Ships[Context.snum].team].shiptype;
+                Users[Context.unum].team = Ships[Context.snum].team;
+                Ships[Context.snum].war[Ships[Context.snum].team] = FALSE;
+                Users[Context.unum].war[Users[Context.unum].team] = FALSE;
 	    }
 	}
 
@@ -1424,72 +1419,34 @@ int newship( int unum, int *snum )
 
     PVUNLOCK(&ConqInfo->lockword);
 
-    if ( ! Users[unum].ooptions[OOPT_MULTIPLE] )
+    /* see if we need to reincarnate to a vacant ship */
+    if ( j > 0 )
     {
-        /* Isn't a multiple; see if we need to reincarnate. */
-        if ( j > 0 )
-	{
-            /* Need to reincarnate. */
+        /* Need to reincarnate. */
 
-            if (!SVACANT(vec[0]))
-	    {		   /* if it's available, we'll take it */
+        if (!SVACANT(vec[0]))
+        {		   /* if it's available, we'll take it */
 			   /* ...if it's not already being flown... */
-                pktSendAck(PSEV_ERROR, PERR_FLYING, NULL);
-                Ships[*snum].status = SS_RESERVED;
-                return ( FALSE );
-	    }
-
-
-            /* Look for a live ship for us to take. */
-            PVLOCK(&ConqInfo->lockword);
-            for (i=0; i<MAXSHIPS; i++)
-                if ( Ships[i].unum == unum && Ships[i].status == SS_LIVE )
-                {
-                    fresh = FALSE;
-                    Ships[*snum].status = SS_OFF;
-                    *snum = i;
-                    Ships[*snum].pid = Context.pid;
-                    Ships[*snum].status = SS_ENTERING;
-                    SFCLR(*snum, SHIP_F_VACANT);
-                    break;
-                }
-            PVUNLOCK(&ConqInfo->lockword);
-	}
-    }
-    else
-    {				/* a multiple, so see what's available */
-        PVLOCK(&ConqInfo->lockword);
-
-        /* Count number of his ships flying. */
-        j = 0;
-        numvec = 0;
-        for ( i = 0; i < MAXSHIPS; i++ )
-            if ( Ships[i].status == SS_LIVE || Ships[i].status == SS_ENTERING )
-                if ( Ships[i].unum == unum && *snum != i )
-                {
-                    j++;
-                    vec[numvec++] = i;
-                    /* JET maybe we should turn off vacant ships for
-                       multiples? */
-                }
-
-        PVUNLOCK(&ConqInfo->lockword);
-
-        /* Is a multiple, max ships already in and no ships to
-           reincarnate too */
-        if ( j >= Users[unum].multiple && numavail == 0)
-	{
-            pktSendAck(PSEV_ERROR, PERR_TOOMANYSHIPS,
-                       NULL);
+            pktSendAck(PSEV_ERROR, PERR_FLYING, NULL);
             Ships[*snum].status = SS_RESERVED;
-
             return ( FALSE );
-	}
+        }
 
-        /* we can squeeze a new one in. */
 
-        if ( j < Users[unum].multiple)
-	    fresh = TRUE;
+        /* Look for a live ship for us to take. */
+        PVLOCK(&ConqInfo->lockword);
+        for (i=0; i<MAXSHIPS; i++)
+            if ( Ships[i].unum == unum && Ships[i].status == SS_LIVE )
+            {
+                fresh = FALSE;
+                Ships[*snum].status = SS_OFF;
+                *snum = i;
+                Ships[*snum].pid = Context.pid;
+                Ships[*snum].status = SS_ENTERING;
+                SFCLR(*snum, SHIP_F_VACANT);
+                break;
+            }
+        PVUNLOCK(&ConqInfo->lockword);
     }
 
     /* Figure out which system to enter. */

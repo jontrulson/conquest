@@ -215,7 +215,10 @@ typedef enum {
 
 #define MAXOOPTIONS 12 		/* number of operator options */
 #define OOPT_PLAYWHENCLOSED 0 	/* can play when the game is closed */
+
+// FIXME, remove when ready.
 #define OOPT_MULTIPLE 1 	/* can play on more than one terminal */
+// FIXME, remove when ready.
 #define OOPT_SWITCHTEAMS 2 	/* can switch teams */
 #define OOPT_SHITLIST 3 	/* can't play at all */
 #define OOPT_OPER 4 		/* identified as conquest operator */

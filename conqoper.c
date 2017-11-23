@@ -2606,10 +2606,11 @@ void opuedit(void)
             else
                 cprintf(lin+i,dcol,ALIGN_NONE,"#%d#%c", RedLevelColor,'F');
 	}
-        cprintf(lin+OOPT_MULTIPLE,tcol,ALIGN_NONE,"#%d#%s",
-		LabelColor,"         Multiple:");
-        cprintf(lin+OOPT_SWITCHTEAMS,tcol,ALIGN_NONE,"#%d#%s",
-		LabelColor,"     Switch teams:");
+// FIXME - rework this, remove SWITCHTEAMS and multiple, LOSE also?
+//        cprintf(lin+OOPT_MULTIPLE,tcol,ALIGN_NONE,"#%d#%s",
+//		LabelColor,"         Multiple:");
+//        cprintf(lin+OOPT_SWITCHTEAMS,tcol,ALIGN_NONE,"#%d#%s",
+//		LabelColor,"     Switch teams:");
         cprintf(lin+OOPT_PLAYWHENCLOSED,tcol,ALIGN_NONE,"#%d#%s",
 		LabelColor," Play when closed:");
         cprintf(lin+OOPT_SHITLIST,tcol,ALIGN_NONE,"#%d#%s",

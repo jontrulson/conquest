@@ -905,10 +905,7 @@ void command( int ch )
 
 
 /*  conqds - display background for Conquest */
-/*  SYNOPSIS */
-/*    int multiple, switchteams */
-/*    conqds( multiple, switchteams ) */
-void conqds( int multiple, int switchteams )
+void conqds()
 {
     int i, col, lin;
     extern char *ConquestVersion;
@@ -974,12 +971,10 @@ void conqds( int multiple, int switchteams )
     lin++;
     cprintf(lin,col,ALIGN_NONE,sfmt, 'O', "options menu");
 
-    if ( ! multiple )
-    {
-        lin++;
-        cprintf(lin,col,ALIGN_NONE,sfmt, 'r', "resign your commission");
-    }
-    if ( multiple || switchteams )
+    lin++;
+    cprintf(lin,col,ALIGN_NONE,sfmt, 'r', "resign your commission");
+
+    if (sStat.flags & SPSSTAT_FLAGS_SWITCHTEAM)
     {
         lin++;
         cprintf(lin,col,ALIGN_NONE,sfmt, 's', "switch teams");
@@ -2729,7 +2724,7 @@ void menu(void)
 
     int i, lin, col, sleepy, countdown;
     int ch;
-    int lose, oclosed, switchteams, multiple, redraw;
+    int lose, oclosed, redraw;
     int playrv;
     int rv;
     int pkttype;
@@ -2756,8 +2751,6 @@ void menu(void)
     initstats( &Ships[Context.snum].ctime, &Ships[Context.snum].etime );
 
     /* Set up some things for the menu display. */
-    switchteams = Users[Context.unum].ooptions[OOPT_SWITCHTEAMS];
-    multiple = Users[Context.unum].ooptions[OOPT_MULTIPLE];
     oclosed = ConqInfo->closed;
     Context.leave = FALSE;
     redraw = TRUE;
@@ -2842,17 +2835,6 @@ void menu(void)
 	}
 
         /* Some simple housekeeping. */
-        if ( multiple != Users[Context.unum].ooptions[OOPT_MULTIPLE] )
-	{
-            multiple = ! multiple;
-            redraw = TRUE;
-	}
-
-        if ( switchteams != Users[Context.unum].ooptions[OOPT_SWITCHTEAMS])
-	{
-            switchteams = Users[Context.unum].ooptions[OOPT_SWITCHTEAMS];
-            redraw = TRUE;
-	}
         if ( oclosed != ConqInfo->closed )
 	{
             oclosed = ! oclosed;
@@ -2860,7 +2842,7 @@ void menu(void)
 	}
         if ( redraw )
 	{
-            conqds( multiple, switchteams );
+            conqds();
             redraw = FALSE;
 	}
         else
@@ -2948,34 +2930,29 @@ void menu(void)
                     redraw = TRUE;
                     break;
                 case 'r':
-                    if ( multiple )
+                    for ( i = 0; i < MAXSHIPS; i++ )
+                        if ( Ships[i].status == SS_LIVE ||
+                             Ships[i].status == SS_ENTERING )
+                            if ( Ships[i].unum == Context.unum )
+                                break;
+                    if ( i < MAXSHIPS )
                         cdbeep();
                     else
                     {
-                        for ( i = 0; i < MAXSHIPS; i++ )
-                            if ( Ships[i].status == SS_LIVE ||
-                                 Ships[i].status == SS_ENTERING )
-                                if ( Ships[i].unum == Context.unum )
-                                    break;
-                        if ( i < MAXSHIPS )
-                            cdbeep();
-                        else
+                        cdclrl( MSG_LIN1, 2 );
+                        cdrefresh();
+                        if ( mcuConfirm() )
                         {
-                            cdclrl( MSG_LIN1, 2 );
-                            cdrefresh();
-                            if ( mcuConfirm() )
-                            {
-                                /* should exit here */
-                                sendCommand(CPCMD_RESIGN, 0);
-                                cdend();
-                                exit(0);
-                                break;
-                            }
+                            /* should exit here */
+                            sendCommand(CPCMD_RESIGN, 0);
+                            cdend();
+                            exit(0);
+                            break;
                         }
                     }
                     break;
                 case 's':
-                    if ( ! multiple && ! switchteams )
+                    if (!(sStat.flags & SPSSTAT_FLAGS_SWITCHTEAM))
                         cdbeep();
                     else
                     {
@@ -3110,26 +3087,6 @@ int newship( int unum, int *snum )
 
                 break;
 
-	    case PERR_TOOMANYSHIPS:
-                cdclear();
-                cdredo();
-                i = MSG_LIN2/2;
-                cdputc(
-                    "I'm sorry, but your playing on too many ships right now.", i );
-                i = i + 1;
-                strcpy(cbuf , "You are only allowed to fly ") ;
-                j = Users[unum].multiple;
-                utAppendInt(cbuf , j) ;
-                strcat(cbuf , " ship") ;
-                if ( j != 1 )
-                    utAppendChar(cbuf , 's') ;
-                strcat(cbuf , " at one time.") ;
-                cdputc( cbuf, i );
-                cdrefresh();
-                utSleep( 2.0 );
-                Ships[*snum].status = SS_RESERVED;
-
-                break;
 
 	    default:
                 utLog("newship: unexpected ack code %d",

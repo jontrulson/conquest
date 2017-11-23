@@ -55,7 +55,7 @@ static int prompting;
 static char cbuf[BUFFER_SIZE_256];
 
 /* init vars */
-static int lose, oclosed, switchteams, multiple;
+static int lose, oclosed;
 static int fatal = FALSE;
 
 /* war vars */
@@ -131,12 +131,10 @@ static void _conqds(dspConfig_t *dsp)
     col = 48;
     lin = i;
 
-    if ( ! multiple )
-    {
-        cprintf(lin,col,ALIGN_NONE,sfmt, 'r', "resign your commission");
-        lin++;
-    }
-    if ( multiple || switchteams )
+    cprintf(lin,col,ALIGN_NONE,sfmt, 'r', "resign your commission");
+    lin++;
+
+    if ( sStat.flags & SPSSTAT_FLAGS_SWITCHTEAM )
     {
 
         cprintf(lin,col,ALIGN_NONE,sfmt, 's', "switch teams");
@@ -174,8 +172,6 @@ void nMenuInit(void)
         initstats( &Ships[Context.snum].ctime, &Ships[Context.snum].etime );
 
         /* Set up some things for the menu display. */
-        switchteams = Users[Context.unum].ooptions[OOPT_SWITCHTEAMS];
-        multiple = Users[Context.unum].ooptions[OOPT_MULTIPLE];
         oclosed = ConqInfo->closed;
         Context.leave = FALSE;
 
@@ -192,11 +188,6 @@ void nMenuInit(void)
             procShip(buf);
 
         /* Some simple housekeeping. */
-        if ( multiple != Users[Context.unum].ooptions[OOPT_MULTIPLE] )
-            multiple = ! multiple;
-
-        if ( switchteams != Users[Context.unum].ooptions[OOPT_SWITCHTEAMS])
-            switchteams = Users[Context.unum].ooptions[OOPT_SWITCHTEAMS];
         if ( oclosed != ConqInfo->closed )
             oclosed = ! oclosed;
 
@@ -428,33 +419,28 @@ static int nMenuInput(int ch)
         break;
 
     case 'r':
-        if ( multiple )
+        for ( i = 0; i < MAXSHIPS; i++ )
+            if ( Ships[i].status == SS_LIVE ||
+                 Ships[i].status == SS_ENTERING )
+                if ( Ships[i].unum == Context.unum )
+                    break;
+
+        if ( i < MAXSHIPS )
             mglBeep(MGL_BEEP_ERR);
         else
         {
-            for ( i = 0; i < MAXSHIPS; i++ )
-                if ( Ships[i].status == SS_LIVE ||
-                     Ships[i].status == SS_ENTERING )
-                    if ( Ships[i].unum == Context.unum )
-                        break;
-
-            if ( i < MAXSHIPS )
-                mglBeep(MGL_BEEP_ERR);
-            else
-            {
-                state = S_RESIGN;
-                prm.preinit = FALSE;
-                prm.buf = cbuf;
-                prm.buflen = MAXUSERPNAME;
-                prm.terms = TERMS;
-                prm.index = 20;
-                prm.buf[0] = 0;
-                prompting = TRUE;
-            }
+            state = S_RESIGN;
+            prm.preinit = FALSE;
+            prm.buf = cbuf;
+            prm.buflen = MAXUSERPNAME;
+            prm.terms = TERMS;
+            prm.index = 20;
+            prm.buf[0] = 0;
+            prompting = TRUE;
         }
         break;
     case 's':
-        if ( ! multiple && ! switchteams )
+        if ( ! (sStat.flags & SPSSTAT_FLAGS_SWITCHTEAM) )
             mglBeep(MGL_BEEP_ERR);
         else
         {

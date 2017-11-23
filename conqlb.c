@@ -719,14 +719,6 @@ int clbRegister( char *lname, char *rname, int team, int *unum )
             for ( j = 0; j < MAXOOPTIONS; j = j + 1 )
                 Users[i].ooptions[j] = FALSE;
 
-            if (SysConf.AllowSwitchteams == TRUE)
-            {
-                /* allow users to switchteams when dead */
-                Users[i].ooptions[OOPT_SWITCHTEAMS] = TRUE;
-            }
-            else
-                Users[i].ooptions[OOPT_SWITCHTEAMS] = FALSE;
-
             Users[i].lastentry = 0;	/* never */
             utStcpn( lname, Users[i].username, MAXUSERNAME );
             utStcpn( rname, Users[i].alias, MAXUSERPNAME );

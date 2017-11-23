@@ -205,21 +205,6 @@ static int nPlayDisplay(dspConfig_t *dsp)
             Ships[Context.snum].status = SS_RESERVED;
             break;
 
-        case PERR_TOOMANYSHIPS:
-            i = MSG_LIN2/2;
-            cprintf(i, 0, ALIGN_CENTER,
-                    "I'm sorry, but you're playing on too many ships right now.");
-            i = i + 1;
-            strcpy(cbuf , "You are only allowed to fly ") ;
-            j = Users[Context.unum].multiple;
-            utAppendInt(cbuf , j) ;
-            strcat(cbuf , " ship") ;
-            if ( j != 1 )
-                utAppendChar(cbuf , 's') ;
-            strcat(cbuf , " at one time.") ;
-            cprintf(i, 0, ALIGN_CENTER, cbuf);
-            break;
-
         default:
             cprintf(5,0,ALIGN_CENTER,
                     "#%d#nPlay: _newship: unexpected server ack, code %d",
