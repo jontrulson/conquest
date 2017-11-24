@@ -24,7 +24,6 @@ typedef struct {
     int live;			/* alive or not */
     userTypes_t type;           /* type of user */
     int team;			/* user's team */
-    int multiple;		/* ship count def=1, shitlist=0?, >1 = mult? */
     real rating;		/* user's rating */
     int robot;			/* a robot? */
     time_t lastentry;		/* last entry time */

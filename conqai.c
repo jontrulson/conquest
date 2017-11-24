@@ -504,6 +504,10 @@ int newrob( int *snum, int unum )
     if ( Users[unum].ooptions[OOPT_SHITLIST] )
         return ( FALSE );
 
+    /* MAke sure we are a builtin. */
+    if ( Users[unum].type != USERTYPE_BUILTIN )
+        return ( FALSE );
+
     /* Can't do anything with out a ship. */
     if ( ! clbFindShip( snum ) )
         return ( FALSE );
@@ -511,34 +515,15 @@ int newrob( int *snum, int unum )
     /* Show intent to fly. */
     PVLOCK(&ConqInfo->lockword);
     Ships[*snum].status = SS_ENTERING;
-
-    /* Count number of ships currently flying. */
-    j = 0;
-    for ( i = 0; i < MAXSHIPS; i++ )
-        if ( Ships[i].status == SS_LIVE || Ships[i].status == SS_ENTERING )
-            if ( Ships[i].unum == unum && *snum != i )
-                j = j + 1;
-
-    /* Check if multiple restrictions apply. */
-    if ( Users[unum].ooptions[OOPT_MULTIPLE] )
-    {
-        /* If a multiple, he can only fly so many ships. */
-        if ( j >= Users[unum].multiple )
-            Ships[*snum].status = SS_OFF;
-    }
-    else
-    {
-        /* If not a multiple, he can't be flying anywhere else. */
-        if ( j > 0 )
-            Ships[*snum].status = SS_OFF;
-    }
     PVUNLOCK(&ConqInfo->lockword);
 
+    // make sure we got it...
     if ( Ships[*snum].status == SS_OFF )
         return ( FALSE );
 
     /* Initialize the ship. */
     PVLOCK(&ConqInfo->lockword);
+
     clbInitShip( *snum, unum );
     SFSET(*snum, SHIP_F_ROBOT);			/* we're a robot */
 

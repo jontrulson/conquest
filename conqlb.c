@@ -705,7 +705,6 @@ int clbRegister( char *lname, char *rname, int team, int *unum )
             Users[i].rating = 0.0;
             Users[i].team = team;
             Users[i].robot = FALSE;
-            Users[i].multiple = 1;		/* but the option bit is off */
 
             // default to a normal client player
             Users[i].type = USERTYPE_NORMAL;
@@ -924,10 +923,7 @@ void clbUserline( int unum, int snum, char *buf, int showgods, int showteam )
     }
 
     /* Figure out which team he's on. */
-    if ( Users[unum].ooptions[OOPT_MULTIPLE] && ! showteam )
-        ch = 'M';
-    else
-        ch = Teams[team].teamchar;
+    ch = Teams[team].teamchar;
 
     strncpy(tname, Users[unum].username, MAXUSERNAME - 1);
     tname[MAXUSERNAME - 1] = 0;
@@ -1850,8 +1846,6 @@ void clbInitRobots(void)
         else if ( clbRegister( x, y, z, &unum ) )                       \
         {                                                               \
             Users[unum].robot = TRUE;                                   \
-            Users[unum].ooptions[OOPT_MULTIPLE] = TRUE;                 \
-            Users[unum].multiple = MAXSHIPS;                            \
             Users[unum].type = USERTYPE_BUILTIN; /* always builtin */   \
         }                                                               \
     }

@@ -2536,9 +2536,9 @@ void opuedit(void)
         cprintf(lin,dcol,ALIGN_NONE,"#%d#%s", InfoColor, Users[unum].username);
 
         lin++;
-        cprintf(lin,tcol,ALIGN_NONE,"#%d#%s", LabelColor,"   Multiple count:");
-        cprintf(lin,dcol,ALIGN_NONE,"#%d#%0d", InfoColor,
-                Users[unum].multiple);
+        // was multiple count, reuse someday...
+        cprintf(lin,tcol,ALIGN_NONE,"#%d#%s", LabelColor,"                 ");
+        //cprintf(lin,dcol,ALIGN_NONE,"#%d#%0d", InfoColor, 0);
 
         lin++;
         for ( i = 0; i < MAXOOPTIONS; i++ )
@@ -2846,16 +2846,7 @@ void opuedit(void)
 	    }
             else if ( ! left && row == 2 )
 	    {
-                /* Multiple count. */
-                cdclrl( MSG_LIN2, 1 );
-                ch = mcuGetCX( "Enter new multiple count: ",
-                               MSG_LIN2, 0, TERMS, buf, MSGMAXLINE );
-                if ( ch != TERM_ABORT && buf[0] != 0 )
-		{
-                    utDeleteBlanks( buf );
-                    i = 0;
-                    utSafeCToI( &(Users[unum].multiple), buf, i );
-		}
+                /* was Multiple count.  Available for future use... */
 	    }
             else
 	    {
