@@ -1890,7 +1890,7 @@ void oppedit(void)
             ch = mcuGetCX( "New name for this planet? ",
                            MSG_LIN1, 0, TERMS, buf, MAXPLANETNAME );
             if ( ch != TERM_ABORT && ( ch == TERM_EXTRA || buf[0] != 0 ) )
-                utStcpn( buf, Planets[pnum].name, MAXPLANETNAME );
+                utStrncpy( Planets[pnum].name, buf, MAXPLANETNAME );
             break;
 	case 'o':
             /* New primary. */
@@ -2820,7 +2820,7 @@ void opuedit(void)
                                MSG_LIN2, 0, TERMS, buf, MAXUSERPNAME );
                 if ( ch != TERM_ABORT &&
                      ( buf[0] != 0 || ch == TERM_EXTRA ) )
-                    utStcpn( buf, Users[unum].alias, MAXUSERPNAME ); /* -[] */
+                    utStrncpy( Users[unum].alias, buf, MAXUSERPNAME ); /* -[] */
 	    }
             else if ( ! left && row == 1 )
 	    {
@@ -2832,7 +2832,7 @@ void opuedit(void)
                 {
                     utDeleteBlanks( buf );
                     if ( ! clbGetUserNum( &i, buf, -1 ) )
-                        utStcpn( buf, Users[unum].username, MAXUSERNAME );
+                        utStrncpy( Users[unum].username, buf, MAXUSERNAME );
                     else
                     {
                         cdclrl( MSG_LIN1, 2 );

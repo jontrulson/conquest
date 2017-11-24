@@ -580,7 +580,7 @@ int newrob( int *snum, int unum )
         Ships[*snum].rwar[i] = FALSE;
         Ships[*snum].war[i] = FALSE;
     }
-    utStcpn ( Users[unum].alias, Ships[*snum].alias, MAXUSERPNAME );
+    utStrncpy ( Ships[*snum].alias, Users[unum].alias, MAXUSERPNAME );
 
     /* Place the ship. */
     if (!clbFindTeamHomeSun(Ships[*snum].team, &i))

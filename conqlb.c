@@ -720,8 +720,8 @@ int clbRegister( char *lname, char *rname, int team, int *unum )
                 Users[i].ooptions[j] = FALSE;
 
             Users[i].lastentry = 0;	/* never */
-            utStcpn( lname, Users[i].username, MAXUSERNAME );
-            utStcpn( rname, Users[i].alias, MAXUSERPNAME );
+            utStrncpy( Users[i].username, lname, MAXUSERNAME );
+            utStrncpy( Users[i].alias, rname, MAXUSERPNAME );
             *unum = i;
             return ( TRUE );
         }
@@ -846,11 +846,11 @@ int clbTakePlanet( int pnum, int snum )
             }
     /* Yes! */
     utFormatTime( ConqInfo->conqtime, 0 );
-    utStcpn( Ships[snum].alias, ConqInfo->conqueror, MAXUSERPNAME );
+    utStrncpy( ConqInfo->conqueror, Ships[snum].alias, MAXUSERPNAME );
     ConqInfo->lastwords[0] = 0;
     Users[Ships[snum].unum].stats[USTAT_CONQUERS] += 1;
     Teams[Ships[snum].team].stats[TSTAT_CONQUERS] += 1;
-    utStcpn( Teams[Ships[snum].team].name, ConqInfo->conqteam, MAXTEAMNAME );
+    utStrncpy( ConqInfo->conqteam, Teams[Ships[snum].team].name, MAXTEAMNAME );
 
     utLog("INFO: %s (%s) has Conquered the Universe!",
           Users[Ships[snum].unum].username,
@@ -1756,12 +1756,12 @@ void clbInitEverything(void)
     ConqInfo->rcpuseconds = 0;
     ConqInfo->raccum = 0;
 
-    utStcpn( "never", ConqInfo->lastupchuck, DATESIZE );
+    utStrncpy( ConqInfo->lastupchuck, "never", DATESIZE );
     utFormatTime( ConqInfo->inittime, 0 );
     utFormatTime( ConqInfo->conqtime, 0 );
-    utStcpn( "GOD", ConqInfo->conqueror, MAXUSERPNAME );
-    utStcpn( "self ruled", ConqInfo->conqteam, MAXTEAMNAME );
-    utStcpn( "Let there be light...", ConqInfo->lastwords, MAXLASTWORDS );
+    utStrncpy( ConqInfo->conqueror, "GOD", MAXUSERPNAME );
+    utStrncpy( ConqInfo->conqteam, "self ruled", MAXTEAMNAME );
+    utStrncpy( ConqInfo->lastwords, "Let there be light...", MAXLASTWORDS );
 
     /* Un-twiddle the lockwords. */
     PVUNLOCK(&ConqInfo->lockword);
@@ -1797,7 +1797,7 @@ void clbInitGame(void)
     Doomsday->heading = 0.0;
     Doomsday->lock = LOCK_NONE;
     Doomsday->lockDetail = 0;
-    utStcpn( "Doomsday Machine", Doomsday->name, MAXUSERPNAME );
+    utStrncpy( Doomsday->name, "Doomsday Machine", MAXUSERPNAME );
 
     /* Un-twiddle the lockword. */
     PVUNLOCK(&ConqInfo->lockword);
@@ -1837,7 +1837,7 @@ void clbInitRobots(void)
 #define SETROBOT(x, y, z)                                               \
     {                                                                   \
         if ( clbGetUserNum( &unum, x, UT_LOCAL ) )                      \
-            utStcpn( y, Users[unum].alias, MAXUSERPNAME );              \
+            utStrncpy( Users[unum].alias, y, MAXUSERPNAME );            \
         else if ( clbRegister( x, y, z, &unum ) )                       \
         {                                                               \
             Users[unum].robot = TRUE;                                   \
@@ -1979,7 +1979,7 @@ void clbInitUniverse(void)
     PVUNLOCK(&ConqInfo->lockword);
     PVLOCK(&ConqInfo->lockword);
 
-    utStcpn( "Scout", ShipTypes[ST_SCOUT].name, MAXSTNAME );
+    utStrncpy( ShipTypes[ST_SCOUT].name, "Scout", MAXSTNAME );
     ShipTypes[ST_SCOUT].armylim = 7;
     ShipTypes[ST_SCOUT].warplim = 10.0;
     ShipTypes[ST_SCOUT].engfac = 1.2;
@@ -1987,7 +1987,7 @@ void clbInitUniverse(void)
     ShipTypes[ST_SCOUT].weafac = 0.83;
     ShipTypes[ST_SCOUT].torpwarp = 14.0;
 
-    utStcpn( "Destroyer", ShipTypes[ST_DESTROYER].name, MAXSTNAME );
+    utStrncpy( ShipTypes[ST_DESTROYER].name, "Destroyer", MAXSTNAME );
     ShipTypes[ST_DESTROYER].armylim = 9;
     ShipTypes[ST_DESTROYER].warplim = 9.0;
     ShipTypes[ST_DESTROYER].engfac = 1.0;
@@ -1995,7 +1995,7 @@ void clbInitUniverse(void)
     ShipTypes[ST_DESTROYER].weafac = 1.0;
     ShipTypes[ST_DESTROYER].torpwarp = 12.0;
 
-    utStcpn( "Cruiser", ShipTypes[ST_CRUISER].name, MAXSTNAME );
+    utStrncpy( ShipTypes[ST_CRUISER].name, "Cruiser", MAXSTNAME );
     ShipTypes[ST_CRUISER].armylim = 11;
     ShipTypes[ST_CRUISER].warplim = 8.0;
     ShipTypes[ST_CRUISER].engfac = 0.8;
@@ -2008,14 +2008,14 @@ void clbInitUniverse(void)
     Teams[TEAM_ROMULAN].shiptype = ST_CRUISER;
     Teams[TEAM_ORION].shiptype = ST_SCOUT;
 
-    utStcpn( "Federation", Teams[TEAM_FEDERATION].name, MAXTEAMNAME );
-    utStcpn( "Romulan", Teams[TEAM_ROMULAN].name, MAXTEAMNAME );
-    utStcpn( "Klingon", Teams[TEAM_KLINGON].name, MAXTEAMNAME );
-    utStcpn( "Orion", Teams[TEAM_ORION].name, MAXTEAMNAME );
-    utStcpn( "self ruled", Teams[TEAM_SELFRULED].name, MAXTEAMNAME );
-    utStcpn( "non", Teams[TEAM_NOTEAM].name, MAXTEAMNAME );
-    utStcpn( "GOD", Teams[TEAM_GOD].name, MAXTEAMNAME );
-    utStcpn( "Empire", Teams[TEAM_EMPIRE].name, MAXTEAMNAME );
+    utStrncpy( Teams[TEAM_FEDERATION].name, "Federation", MAXTEAMNAME );
+    utStrncpy( Teams[TEAM_ROMULAN].name, "Romulan", MAXTEAMNAME );
+    utStrncpy( Teams[TEAM_KLINGON].name, "Klingon", MAXTEAMNAME );
+    utStrncpy( Teams[TEAM_ORION].name, "Orion", MAXTEAMNAME );
+    utStrncpy( Teams[TEAM_SELFRULED].name, "self ruled", MAXTEAMNAME );
+    utStrncpy( Teams[TEAM_NOTEAM].name, "non", MAXTEAMNAME );
+    utStrncpy( Teams[TEAM_GOD].name, "GOD", MAXTEAMNAME );
+    utStrncpy( Teams[TEAM_EMPIRE].name, "Empire", MAXTEAMNAME );
 
     ConqInfo->chrplanets[PLANET_CLASSM] = 'M';
     ConqInfo->chrplanets[PLANET_DEAD] = 'D';
@@ -2026,14 +2026,18 @@ void clbInitUniverse(void)
     ConqInfo->chrplanets[PLANET_CLASSO] = 'O';
     ConqInfo->chrplanets[PLANET_CLASSZ] = 'Z';
 
-    utStcpn( "class M planet", ConqInfo->ptname[PLANET_CLASSM], MAXPTYPENAME );
-    utStcpn( "dead planet", ConqInfo->ptname[PLANET_DEAD], MAXPTYPENAME );
-    utStcpn( "sun", ConqInfo->ptname[PLANET_SUN], MAXPTYPENAME );
-    utStcpn( "moon", ConqInfo->ptname[PLANET_MOON], MAXPTYPENAME );
-    utStcpn( "ghost planet", ConqInfo->ptname[PLANET_GHOST], MAXPTYPENAME );
-    utStcpn( "class A planet", ConqInfo->ptname[PLANET_CLASSA], MAXPTYPENAME );
-    utStcpn( "class O planet", ConqInfo->ptname[PLANET_CLASSO], MAXPTYPENAME );
-    utStcpn( "class Z planet", ConqInfo->ptname[PLANET_CLASSZ], MAXPTYPENAME );
+    utStrncpy( ConqInfo->ptname[PLANET_CLASSM], "class M planet",
+               MAXPTYPENAME );
+    utStrncpy( ConqInfo->ptname[PLANET_DEAD], "dead planet", MAXPTYPENAME );
+    utStrncpy( ConqInfo->ptname[PLANET_SUN], "sun", MAXPTYPENAME );
+    utStrncpy( ConqInfo->ptname[PLANET_MOON], "moon", MAXPTYPENAME );
+    utStrncpy( ConqInfo->ptname[PLANET_GHOST], "ghost planet", MAXPTYPENAME );
+    utStrncpy( ConqInfo->ptname[PLANET_CLASSA], "class A planet",
+               MAXPTYPENAME );
+    utStrncpy( ConqInfo->ptname[PLANET_CLASSO], "class O planet",
+               MAXPTYPENAME );
+    utStrncpy( ConqInfo->ptname[PLANET_CLASSZ], "class Z planet",
+               MAXPTYPENAME );
 
     Teams[TEAM_FEDERATION].teamchar = 'F';
     Teams[TEAM_ROMULAN].teamchar = 'R';
@@ -2472,7 +2476,7 @@ void clbStoreMsgf( msgFrom_t from, uint16_t fromDetail,
 
     PVLOCK(&ConqInfo->lockmesg);
     nlastmsg = utModPlusOne( ConqInfo->lastmsg + 1, MAXMESSAGES );
-    utStcpn( msg, Msgs[nlastmsg].msgbuf, MESSAGE_SIZE );
+    utStrncpy( Msgs[nlastmsg].msgbuf, msg, MESSAGE_SIZE );
     Msgs[nlastmsg].from = from;
     Msgs[nlastmsg].fromDetail = fromDetail;
     Msgs[nlastmsg].to = to;

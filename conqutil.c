@@ -776,7 +776,7 @@ int utIsSpecial( char *str, int *what, int *token, int *count )
     if ( str[0] != 'n' && str[0] != 'w' && str[0] != 'h' )
         return ( FALSE );
 
-    utStcpn( str, buf, 20 );			/* need a private copy */
+    utStrncpy( buf, str, 20 );			/* need a private copy */
 
     /* Find threshold count; cleverly, the default will be zero when using ctoi. */
     for (i = 0; buf[i] != 0 && !isdigit(buf[i]); i++)
@@ -850,12 +850,9 @@ int utIsSpecial( char *str, int *what, int *token, int *count )
 }
 
 
-/*  utStcpn - copy a string with a size limit */
-/*  SYNOPSIS */
-/*    char from(), to() */
-/*    int tosize */
-/*    utStcpn( from, to, tosize ) */
-void utStcpn( char *from, char *to, int tosize )
+/*  utStrncpy - copy a string with a size limit, ensuring the last
+ *  byte is 0 */
+void utStrncpy( char *to, char *from, unsigned int tosize )
 {
     strncpy(to, from, tosize);
     to[tosize - 1] = '\0';

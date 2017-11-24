@@ -1237,7 +1237,8 @@ void menu(void)
         Ships[Context.snum].rwar[i] = FALSE;
         Ships[Context.snum].war[i] = Users[Context.unum].war[i];
     }
-    utStcpn( Users[Context.unum].alias, Ships[Context.snum].alias, MAXUSERPNAME );
+    utStrncpy( Ships[Context.snum].alias, Users[Context.unum].alias,
+               MAXUSERPNAME );
 
     /* Set up some things for the menu display. */
     Context.leave = FALSE;

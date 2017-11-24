@@ -649,7 +649,7 @@ int procHistory(char *buf)
     History[hnum].elapsed = (time_t)ntohl((uint32_t)hist->elapsed);
     History[hnum].enterTime = (time_t)ntohl((uint32_t)hist->enterTime);
 
-    strncpy(History[hnum].username, hist->username, MAXUSERNAME - 1);
+    strncpy(History[hnum].username, (char *)hist->username, MAXUSERNAME - 1);
 
     return TRUE;
 }

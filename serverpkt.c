@@ -960,7 +960,7 @@ spHistory_t *spktHistory(int hnum)
     hist.elapsed = (uint32_t)htonl((uint32_t)History[hnum].elapsed);
     hist.enterTime = (uint32_t)htonl((uint32_t)History[hnum].enterTime);
 
-    strncpy(hist.username, History[hnum].username, MAXUSERNAME - 1);
+    strncpy((char *)hist.username, History[hnum].username, MAXUSERNAME - 1);
 
     if (memcmp((void *)&hist, (void *)&pktHistory[hnum], sizeof(spHistory_t)))
     {

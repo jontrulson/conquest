@@ -30,7 +30,7 @@ void     utGetSecs( int *s );
 real     utMod360( real r );
 int      utModPlusOne( int i, int modulus );
 int      utIsSpecial( char *str, int *what, int *token, int *count );
-void     utStcpn( char *from, char *to, int tosize );
+void     utStrncpy( char *to, char *from, unsigned int tosize );
 int      utStringMatch( char *str1, char *str2, int casesensitive );
 char     *utGetPath(const char *thepath);
 void     utSleep(real seconds);
