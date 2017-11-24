@@ -410,7 +410,7 @@ static int nMenuInput(int ch)
         state = S_PSEUDO;
         prm.preinit = FALSE;
         prm.buf = cbuf;
-        prm.buflen = MAXUSERPNAME;
+        prm.buflen = MAXUSERALIAS;
         prm.terms = TERMS;
         prm.index = 20;
         prm.buf[0] = 0;
@@ -432,7 +432,7 @@ static int nMenuInput(int ch)
             state = S_RESIGN;
             prm.preinit = FALSE;
             prm.buf = cbuf;
-            prm.buflen = MAXUSERPNAME;
+            prm.buflen = MAXUSERALIAS;
             prm.terms = TERMS;
             prm.index = 20;
             prm.buf[0] = 0;

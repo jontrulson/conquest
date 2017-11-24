@@ -74,7 +74,7 @@ int proc_0006_User(char *buf)
         Users[unum].stats[i] = (int32_t)ntohl(suser->stats[i]);
 
     strncpy(Users[unum].username, (char *)suser->username, 32 /*MAXUSERNAME*/ - 1);
-    strncpy(Users[unum].alias, (char *)suser->alias, 24 /*MAXUSERPNAME*/ - 1);
+    strncpy(Users[unum].alias, (char *)suser->alias, 24 /*MAXUSERALIAS*/ - 1);
 
 #if defined(DEBUG_CLIENTPROC)
     utLog("\t%s: name: %s (%s)", __FUNCTION__, Users[unum].username, Users[unum].alias);
@@ -134,8 +134,8 @@ int proc_0006_Ship(char *buf)
     for (i=0; i<4 /*NUMPLAYERTEAMS*/; i++)
         Ships[snum].scanned[i] = (int)sship->scanned[i];
 
-    sship->alias[24 /*MAXUSERPNAME*/ - 1] = 0;
-    strncpy(Ships[snum].alias, (char *)sship->alias, 24 /*MAXUSERPNAME*/ - 1);
+    sship->alias[24 /*MAXUSERALIAS*/ - 1] = 0;
+    strncpy(Ships[snum].alias, (char *)sship->alias, 24 /*MAXUSERALIAS*/ - 1);
 
     return TRUE;
 }

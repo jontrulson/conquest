@@ -21,7 +21,7 @@ typedef struct {
     int ooptions[MAXOOPTIONS];	/* operator settable options */
     char username[MAXUSERNAME];	/* user's name (login name) */
     char pw[MAXUSERNAME];	/* user's password if server login */
-    char alias[MAXUSERPNAME];	/* user's pseudonym */
+    char alias[MAXUSERALIAS];	/* user's pseudonym */
     time_t lastentry;		/* last entry time */
 } User_t;
 

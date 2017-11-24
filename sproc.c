@@ -37,12 +37,12 @@ void procSetName(char *buf)
     if (!pktIsValid(CP_SETNAME, cpsetn))
         return;
 
-    cpsetn->alias[MAXUSERPNAME - 1] = 0;
+    cpsetn->alias[MAXUSERALIAS - 1] = 0;
 
-    strncpy(Users[Context.unum].alias, (char *)cpsetn->alias, MAXUSERPNAME);
+    strncpy(Users[Context.unum].alias, (char *)cpsetn->alias, MAXUSERALIAS);
 
     if (Context.snum >= 0 && Context.snum < MAXSHIPS)
-        strncpy(Ships[Context.snum].alias, (char *)cpsetn->alias, MAXUSERPNAME);
+        strncpy(Ships[Context.snum].alias, (char *)cpsetn->alias, MAXUSERALIAS);
 
     return;
 }

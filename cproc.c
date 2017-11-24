@@ -111,7 +111,7 @@ int procUser(char *buf)
         Users[unum].stats[i] = (int32_t)ntohl(suser->stats[i]);
 
     strncpy(Users[unum].username, (char *)suser->username, MAXUSERNAME - 1);
-    strncpy(Users[unum].alias, (char *)suser->alias, MAXUSERPNAME - 1);
+    strncpy(Users[unum].alias, (char *)suser->alias, MAXUSERALIAS - 1);
 
 #if defined(DEBUG_CLIENTPROC)
     utLog("\t%s: name: %s (%s)", __FUNCTION__, Users[unum].username, Users[unum].alias);
@@ -170,8 +170,8 @@ int procShip(char *buf)
     for (i=0; i<NUMPLAYERTEAMS; i++)
         Ships[snum].scanned[i] = (int)sship->scanned[i];
 
-    sship->alias[MAXUSERPNAME - 1] = 0;
-    strncpy(Ships[snum].alias, (char *)sship->alias, MAXUSERPNAME - 1);
+    sship->alias[MAXUSERALIAS - 1] = 0;
+    strncpy(Ships[snum].alias, (char *)sship->alias, MAXUSERALIAS - 1);
 
     return TRUE;
 }
@@ -621,8 +621,8 @@ int procConqInfo(char *buf)
     if (!pktIsValid(SP_CONQINFO, buf))
         return FALSE;
 
-    strncpy(ConqInfo->conqueror, (char *)spci->conqueror, MAXUSERPNAME);
-    ConqInfo->conqueror[MAXUSERPNAME - 1] = 0;
+    strncpy(ConqInfo->conqueror, (char *)spci->conqueror, MAXUSERALIAS);
+    ConqInfo->conqueror[MAXUSERALIAS - 1] = 0;
     strncpy(ConqInfo->conqteam, (char *)spci->conqteam, MAXTEAMNAME);
     ConqInfo->conqteam[MAXTEAMNAME - 1] = 0;
     strncpy(ConqInfo->conqtime, (char *)spci->conqtime, DATESIZE);
