@@ -45,7 +45,7 @@ int      clbFindShip( int *snum );
 int      clbFindSpecial( int snum, int token, int count,
                          int *sorpnum, int *xsorpnum );
 void     clbFixDeltas( int snum );
-int      clbGetUserNum( int *unum, char *lname, int ltype );
+int      clbGetUserNum( int *unum, char *lname, userTypes_t ltype );
 void     clbInitEverything(void);
 void     clbInitGame(void);
 void     clbInitMsgs(void);

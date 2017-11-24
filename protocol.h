@@ -319,13 +319,16 @@ typedef struct {
 
     uint8_t  flags;                /* hostile, live, etc */
     uint8_t  war;			/* a bit mask (1 << TEAM_*) */
-    int16_t   rating;               /* x10 */
+    int16_t  rating;               /* x10 */
+
+    uint8_t  userType;          // USERTYPE_* */
+    uint8_t  pad[3];
 
     uint32_t lastentry;
 
-    int32_t   ooptions[OOPT_TOTALOOPTION];
+    int32_t  ooptions[OOPT_TOTALOOPTION];
 
-    int32_t   stats[USTAT_TOTALSTATS];
+    int32_t  stats[USTAT_TOTALSTATS];
 
     uint8_t  username[MAXUSERNAME];
 

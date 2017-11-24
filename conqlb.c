@@ -707,7 +707,8 @@ int clbRegister( char *lname, char *rname, int team, int *unum )
             Users[i].robot = FALSE;
             Users[i].multiple = 1;		/* but the option bit is off */
 
-            Users[i].type = 0;	/* we will use this someday */
+            // default to a normal client player
+            Users[i].type = USERTYPE_NORMAL;
 
             for ( j = 0; j < MAXUSTATS; j = j + 1 )
                 Users[i].stats[j] = 0;
@@ -901,8 +902,13 @@ void clbUserline( int unum, int snum, char *buf, int showgods, int showteam )
 
     ch2 = ' ';
 
-    if ( ch2 != '+' && isagod(unum))
-        ch2 = '+';
+    if (Users[unum].type == USERTYPE_BUILTIN)
+        ch2 = '_'; // mutually exclusive to oper, which implies USERTYPE_NORMAL
+    else
+    {
+        if (isagod(unum))
+            ch2 = '+';
+    }
 
     /* If we were given a valid ship number, use it's information. */
     if ( snum >= 0 && snum < MAXSHIPS )
@@ -1694,7 +1700,7 @@ void clbFixDeltas( int snum )
 /*    int unum */
 /*    char lname() */
 /*    truth = clbGetUserNum( unum, lname ) */
-int clbGetUserNum( int *unum, char *lname, int ltype )
+int clbGetUserNum( int *unum, char *lname, userTypes_t ltype )
 {
     int i;
     char *lptr = lname;
@@ -1702,11 +1708,14 @@ int clbGetUserNum( int *unum, char *lname, int ltype )
     *unum = -1;
     for ( i = 0; i < MAXUSERS; i++ )
         if ( Users[i].live )
-            if ( strcmp( lptr, Users[i].username ) == 0 )
+        {
+            if ( strcmp( lptr, Users[i].username ) == 0
+                 && (ltype == USERTYPE_ANY || Users[i].type == ltype) )
             {
                 *unum = i;
                 return ( TRUE );
             }
+        }
 
     return ( FALSE );
 
@@ -1745,7 +1754,7 @@ void clbInitEverything(void)
     for ( i = 0; i < MAXUSERS; i++ )
     {
         Users[i].live = FALSE;
-        Users[i].type = UT_LOCAL;
+        Users[i].type = USERTYPE_NORMAL;
     }
 
     ConqInfo->celapsedseconds = 0;
@@ -1836,14 +1845,14 @@ void clbInitRobots(void)
     /* SETROBOT( name, pname, team ) */
 #define SETROBOT(x, y, z)                                               \
     {                                                                   \
-        if ( clbGetUserNum( &unum, x, UT_LOCAL ) )                      \
+        if ( clbGetUserNum( &unum, x, USERTYPE_BUILTIN ) )              \
             utStrncpy( Users[unum].alias, y, MAXUSERALIAS );            \
         else if ( clbRegister( x, y, z, &unum ) )                       \
         {                                                               \
             Users[unum].robot = TRUE;                                   \
             Users[unum].ooptions[OOPT_MULTIPLE] = TRUE;                 \
             Users[unum].multiple = MAXSHIPS;                            \
-            Users[unum].type = UT_LOCAL; /* robots are always local */  \
+            Users[unum].type = USERTYPE_BUILTIN; /* always builtin */   \
         }                                                               \
     }
 

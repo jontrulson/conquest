@@ -51,7 +51,7 @@
 /*#define COMMONSTAMP 20001231 		 stardate? */
 /*#define COMMONSTAMP 20030829 */
 // #define COMMONSTAMP 20101027
-#define COMMONSTAMP 20171117
+#define COMMONSTAMP 20171124
 
 #ifndef PI
 # define PI 3.141592654
@@ -532,10 +532,6 @@ typedef enum {
 
 #define MTXT_MORE "--- press [SPACE] to continue, any other key to quit ---"
 #define MTXT_DONE "--- press any key when done ---"
-
-/* validuser types - not used anymore */
-#define UT_LOCAL (0)
-#define UT_REMOTE (1)
 
 /* Macros, here order is important. */
 

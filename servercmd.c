@@ -124,7 +124,7 @@ static void CreateRobots(int snumFrom, char *arg1, char *arg2, char *arg3)
         return;
     else
     {
-        if ( ! clbGetUserNum( &unum, arg1, -1 ) )
+        if ( ! clbGetUserNum( &unum, arg1, USERTYPE_BUILTIN ) )
         {
             clbStoreMsg(MSG_FROM_GOD, 0, MSG_TO_SHIP, (uint16_t)snumFrom,
                         "No such user.");
@@ -239,7 +239,7 @@ static void Murder(int from, char *what)
 
     /* a user? */
     /* Kill a user? */
-    if ( ! clbGetUserNum( &unum, what, -1 ) )
+    if ( ! clbGetUserNum( &unum, what, USERTYPE_ANY ) )
     {
         clbStoreMsg(MSG_FROM_GOD, 0, MSG_TO_SHIP, fromShip, no_user_str);
         return;

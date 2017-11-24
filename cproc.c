@@ -93,6 +93,7 @@ int procUser(char *buf)
         recWriteEvent(buf);
 
     Users[unum].team = suser->team;
+    Users[unum].type = (userTypes_t)suser->userType;
 
     if (suser->flags & SPUSER_FLAGS_LIVE)
         Users[unum].live = TRUE;

@@ -970,7 +970,7 @@ void kiss(int snum, int prompt_flg)
     }
 
     /* Kill a user? */
-    if ( ! clbGetUserNum( &unum, buf, -1 ) )
+    if ( ! clbGetUserNum( &unum, buf, USERTYPE_ANY ) )
     {
         cdputs( no_user_str, MSG_LIN2, 1 );
         cdmove( 0, 0 );
@@ -2082,7 +2082,7 @@ void opresign(void)
         return;
     }
 
-    if ( ! clbGetUserNum( &unum, buf, -1 ) )
+    if ( ! clbGetUserNum( &unum, buf, USERTYPE_ANY ) )
     {
         cdputs( "No such user.", MSG_LIN2, 1 );
         cdmove( 1, 1 );
@@ -2126,14 +2126,14 @@ void oprobot(void)
         return;
     }
     /* catch lowercase, uppercase typos - dwp */
-    strcpy(xbuf,buf);
+    strcpy(xbuf, buf);
     j = strlen(xbuf);
     buf[0] = (char)toupper(xbuf[0]);
     if (j>1)
   	for (i=1;i<j && xbuf[i] != 0;i++)
             buf[i] = (char)tolower(xbuf[i]);
 
-    if ( ! clbGetUserNum( &unum, buf, -1 ) )
+    if ( ! clbGetUserNum( &unum, buf, USERTYPE_BUILTIN ) )
     {
         char *uptr = buf;
         /* un-upper case first char and
@@ -2141,7 +2141,7 @@ void oprobot(void)
         if (*uptr == '@')
             uptr++;
         uptr[0] = (char)tolower(uptr[0]);
-        if ( ! clbGetUserNum( &unum, buf, -1 ) )
+        if ( ! clbGetUserNum( &unum, buf, USERTYPE_BUILTIN ) )
 	{
             cdputs( "No such user.", MSG_LIN2, 1 );
             return;
@@ -2399,7 +2399,6 @@ void opuadd(void)
     int i, unum, team;
     char ch;
     char buf[MSGMAXLINE], junk[MSGMAXLINE], name[MSGMAXLINE];
-    char *nameptr;
 
     cdclrl( MSG_LIN1, 2 );
     name[0] = 0;
@@ -2407,16 +2406,12 @@ void opuadd(void)
                        TRUE);
     /*  utDeleteBlanks( name );*/
 
-    nameptr = name;
-    if (*nameptr == '@')
-        nameptr++;			/* in case we're adding a remote user */
-
-    if ( ch == TERM_ABORT || nameptr[0] == 0 )
+    if ( ch == TERM_ABORT || name[0] == 0 )
     {
         cdclrl( MSG_LIN1, 1 );
         return;
     }
-    if ( clbGetUserNum( &unum, name, -1 ) ) /* don't want to use ptr here */
+    if ( clbGetUserNum( &unum, name, USERTYPE_NORMAL ) )
     {
         cdputs( "That user is already enrolled.", MSG_LIN2, 1 );
         cdmove( 1, 1 );
@@ -2446,7 +2441,7 @@ void opuadd(void)
         else
 	{
             ch = (char)toupper( buf[0] );
-            for ( i = 0; i < NUMPLAYERTEAMS; i = i + 1 )
+            for ( i = 0; i < NUMPLAYERTEAMS; i++ )
                 if ( Teams[i].teamchar == ch )
                 {
                     team = i;
@@ -2461,10 +2456,10 @@ void opuadd(void)
     utAppendChar(buf , ' ') ;
     i = strlen( buf );
 
-    strcat(buf , nameptr) ;
+    strcat(buf, name) ;
     buf[i] = (char)toupper( buf[i] );
-    buf[MAXUSERALIAS] = 0;
-    if ( ! clbRegister( nameptr, buf, team, &unum ) )
+    buf[MAXUSERALIAS - 1] = 0;
+    if ( ! clbRegister( name, buf, team, &unum ) )
     {
         cdputs( "Error adding new user.", MSG_LIN2, 1 );
         cdmove( 0, 0 );
@@ -2514,7 +2509,7 @@ void opuedit(void)
     }
     /*  utDeleteBlanks( buf );*/
 
-    if ( ! clbGetUserNum( &unum, buf, -1 ) )
+    if ( ! clbGetUserNum( &unum, buf, USERTYPE_ANY ) )
     {
         cdclrl( MSG_LIN1, 2 );
         cdputs( "Unknown user.", MSG_LIN1, 1 );
@@ -2831,7 +2826,7 @@ void opuedit(void)
                 if ( ch != TERM_ABORT && buf[0] != 0)
                 {
                     utDeleteBlanks( buf );
-                    if ( ! clbGetUserNum( &i, buf, -1 ) )
+                    if ( ! clbGetUserNum( &i, buf, USERTYPE_ANY ) )
                         utStrncpy( Users[unum].username, buf, MAXUSERNAME );
                     else
                     {

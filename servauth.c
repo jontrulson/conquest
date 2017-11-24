@@ -28,7 +28,7 @@ static int doLogin(char *login, char *pw, char *epw)
     char salt[3];
     int unum;
 
-    if (clbGetUserNum(&unum, login, 0))
+    if (clbGetUserNum(&unum, login, USERTYPE_NORMAL))
     {				/* user exists */
 				/* ENCRYPT and compare here... */
 
@@ -109,7 +109,8 @@ int Authenticate(char *username, char *password)
 	{
 	case CPAUTH_CHECKUSER:
 
-            if (clbGetUserNum( &unum, (char *)cauth->login, 0 ) == TRUE)
+            if (clbGetUserNum( &unum, (char *)cauth->login,
+                               USERTYPE_NORMAL ) == TRUE)
 	    {			/* user exits */
                 pktSendAck(PSEV_INFO, PERR_OK,
                            NULL);

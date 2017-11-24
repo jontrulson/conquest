@@ -127,6 +127,7 @@ spUser_t *spktUser(uint16_t unum)
     suser.type = SP_USER;
     suser.team = (uint8_t)Users[unum].team;
     suser.unum = htons(unum);
+    suser.userType = (uint8_t)Users[unum].type;
 
     if (Users[unum].live)
         suser.flags |= SPUSER_FLAGS_LIVE;
