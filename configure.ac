@@ -7,7 +7,7 @@ dnl
 AC_INIT([conquest],[8],[jon@radscan.com])
 AC_CONFIG_HEADER(config.h)
 
-
+AC_CONFIG_MACRO_DIRS([m4])
 
 dnl checks the system
 dnl AC_CANONICAL_TARGET([])
