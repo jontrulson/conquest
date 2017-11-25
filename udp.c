@@ -102,10 +102,10 @@ int udpRecv(int fd, void* buffer, int bufferLength,
             struct sockaddr_in* addr)
 {
     struct sockaddr_in from;
-    AddrLen fromLength = sizeof(from);
+    socklen_t fromLength = sizeof(from);
 
     int byteCount = recvfrom(fd, (char*)buffer, bufferLength, 0,
-                             (struct sockaddr*)&from, (AddrLen*) &fromLength);
+                             (struct sockaddr*)&from, &fromLength);
     if (byteCount < 0)
     {
 #if !defined(MINGW)
@@ -125,4 +125,3 @@ int udpRecv(int fd, void* buffer, int bufferLength,
     return byteCount;
 }
 
-// ex: shiftwidth=2 tabstop=8
