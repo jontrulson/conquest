@@ -955,7 +955,7 @@ int updateClient(int force)
     {                           /* send all valid user data the first time */
         sentallusers = TRUE;
         for (i=0; i<MAXUSERS; i++)
-            if (Users[i].live)
+            if (ULIVE(i))
                 if (!sendUser(sInfo.sock, i))
                     return FALSE;
     }
@@ -1748,7 +1748,7 @@ int welcome( int *unum )
 
 
     /* Must be special to play when closed. */
-    if ( ConqInfo->closed && ! Users[*unum].ooptions[OOPT_PLAYWHENCLOSED] )
+    if ( ConqInfo->closed && ! UPLAYWHENCLOSED(*unum) )
     {
         pktSendAck(PSEV_FATAL, PERR_CLOSED,
                    NULL);

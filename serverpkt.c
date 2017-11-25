@@ -128,9 +128,8 @@ spUser_t *spktUser(uint16_t unum)
     suser.team = (uint8_t)Users[unum].team;
     suser.unum = htons(unum);
     suser.userType = (uint8_t)Users[unum].type;
-
-    if (Users[unum].live)
-        suser.flags |= SPUSER_FLAGS_LIVE;
+    suser.flags = htons(Users[unum].flags);
+    suser.opFlags = htons(Users[unum].opFlags);
 
     for (i=0; i<NUMPLAYERTEAMS; i++)
         if (Users[unum].war[i])
@@ -138,9 +137,6 @@ spUser_t *spktUser(uint16_t unum)
 
     suser.rating = (int16_t)htons((uint16_t)(Users[unum].rating * 10.0));
     suser.lastentry = (uint32_t)htonl((uint32_t)Users[unum].lastentry);
-
-    for (i=0; i<OOPT_TOTALOOPTION; i++)
-        suser.ooptions[i] = (int32_t)htonl(Users[unum].ooptions[i]);
 
     for (i=0; i<USTAT_TOTALSTATS; i++)
         suser.stats[i] = (int32_t)htonl(Users[unum].stats[i]);

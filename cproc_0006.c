@@ -58,7 +58,7 @@ int proc_0006_User(char *buf)
     Users[unum].team = suser->team;
 
     if (suser->flags & SP_0006_USER_FLAGS_LIVE)
-        Users[unum].live = TRUE;
+        UFSET(unum, USER_F_LIVE);
 
     for (i=0; i<NUMPLAYERTEAMS; i++)
         if ((suser->war & (1 << i)))
@@ -67,8 +67,40 @@ int proc_0006_User(char *buf)
     Users[unum].rating = (real)((real)((int16_t)ntohs(suser->rating)) / 100.0);
     Users[unum].lastentry = (time_t)ntohl(suser->lastentry);
 
-    for (i=0; i<OOPT_TOTALOOPTION; i++)
-        Users[unum].ooptions[i] = (int32_t)ntohl(suser->ooptions[i]);
+    // the ooptions array doesn't exist in CB anymore, so break down
+    // the older options that we care about into the new world order.
+
+    // play when closed - 0
+    int32_t opt = (int32_t)ntohl(suser->ooptions[0]);
+
+    if (opt)
+        UOPSET(unum, USER_OP_PLAYWHENCLOSED);
+    else
+        UOPCLR(unum, USER_OP_PLAYWHENCLOSED);
+
+    // shitlist/banned - 3
+    opt = (int32_t)ntohl(suser->ooptions[3]);
+
+    if (opt)
+        UOPSET(unum, USER_OP_BANNED);
+    else
+        UOPCLR(unum, USER_OP_BANNED);
+
+    // operator privs - 4
+    opt = (int32_t)ntohl(suser->ooptions[4]);
+
+    if (opt)
+        UOPSET(unum, USER_OP_ISOPER);
+    else
+        UOPCLR(unum, USER_OP_ISOPER);
+
+    // autopilot - 6
+    opt = (int32_t)ntohl(suser->ooptions[6]);
+
+    if (opt)
+        UOPSET(unum, USER_OP_AUTOPILOT);
+    else
+        UOPCLR(unum, USER_OP_AUTOPILOT);
 
     for (i=0; i<USTAT_TOTALSTATS; i++)
         Users[unum].stats[i] = (int32_t)ntohl(suser->stats[i]);

@@ -228,7 +228,7 @@ int sendServerStat(int socktype)
 
     /* get total users */
     for ( i = 0; i < MAXUSERS; i++)
-        if ( Users[i].live)
+        if ( ULIVE(i) )
             numusers++;
 
     /* count ships */

@@ -553,13 +553,13 @@ void secdrive( int *ship )
         /* The ship is alive */
 
         /* see if we've been kicked out. */
-        if ( Users[Ships[i].unum].ooptions[OOPT_SHITLIST] )
+        if ( UBANNED(Ships[i].unum) )
 	{
             clbKillShip( i, KB_SHIT, 0 );
             continue; /* next;*/
 	}
         if ( ConqInfo->closed )
-            if ( ! Users[Ships[i].unum].ooptions[OOPT_PLAYWHENCLOSED] )
+            if ( ! UPLAYWHENCLOSED(Ships[i].unum) )
             {
                 clbKillShip( i, KB_EVICT, 0 );
                 continue; /*next;*/

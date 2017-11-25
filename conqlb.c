@@ -698,13 +698,16 @@ int clbRegister( char *lname, char *rname, int team, int *unum )
 
     PVLOCK(&ConqInfo->lockword);
     for ( i = 0; i < MAXUSERS; i++ )
-        if ( ! Users[i].live )
+        if ( !ULIVE(i) )
         {
-            Users[i].live = TRUE;
+            // clear all user flags
+            Users[i].flags = USER_F_LIVE; /* only for now */
+            Users[i].opFlags = USER_OP_NONE;
+
             PVUNLOCK(&ConqInfo->lockword);
+
             Users[i].rating = 0.0;
             Users[i].team = team;
-            Users[i].robot = FALSE;
 
             // default to a normal client player
             Users[i].type = USERTYPE_NORMAL;
@@ -715,9 +718,6 @@ int clbRegister( char *lname, char *rname, int team, int *unum )
             for ( j = 0; j < NUMPLAYERTEAMS; j = j + 1 )
                 Users[i].war[j] = TRUE;
             Users[i].war[Users[i].team] = FALSE;
-
-            for ( j = 0; j < MAXOOPTIONS; j = j + 1 )
-                Users[i].ooptions[j] = FALSE;
 
             Users[i].lastentry = 0;	/* never */
             utStrncpy( Users[i].username, lname, MAXUSERNAME );
@@ -749,7 +749,7 @@ void clbResign( int unum, int isoper )
     PVLOCK(&ConqInfo->lockword);
     if ( unum >= 0 && unum < MAXUSERS )
     {
-        Users[unum].live = FALSE;
+        UFCLR(unum, USER_F_LIVE);
 
         for ( i = 0; i < MAXHISTLOG; i++ )
             if ( unum == History[i].unum )
@@ -893,7 +893,7 @@ void clbUserline( int unum, int snum, char *buf, int showgods, int showteam )
         strcpy(buf , hd1) ;
         return;
     }
-    if ( ! Users[unum].live )
+    if ( !ULIVE(unum) )
     {
         buf[0] = 0;
         return;
@@ -968,7 +968,7 @@ void clbStatline( int unum, char *buf )
         buf[0] = 0;
         return;
     }
-    if ( ! Users[unum].live )
+    if ( !ULIVE(unum) )
     {
         buf[0] = 0;
         return;
@@ -1187,7 +1187,7 @@ int clbCanRead( int snum, int msgnum )
 
     /* if it's to god, or implementors and we are an oper... */
     if ((to == MSG_TO_GOD || to == MSG_TO_IMPLEMENTORS)
-        && Users[Ships[snum].unum].ooptions[OOPT_OPER])
+        && UISOPER(Ships[snum].unum))
         return TRUE;
 
     /* It's to everybody. */
@@ -1382,7 +1382,7 @@ int clbFindShip( int *snum )
         /* if it's vacant and not an oper, save it for later */
         if (Ships[i].status == SS_LIVE &&
             SVACANT(i) &&
-            !Users[Ships[i].unum].ooptions[OOPT_OPER])
+            !UISOPER(Ships[i].unum))
             vacantShips[numvacant++] = i;
 
         /* if it's off, grab it */
@@ -1703,7 +1703,7 @@ int clbGetUserNum( int *unum, char *lname, userTypes_t ltype )
 
     *unum = -1;
     for ( i = 0; i < MAXUSERS; i++ )
-        if ( Users[i].live )
+        if ( ULIVE(i) )
         {
             if ( strcmp( lptr, Users[i].username ) == 0
                  && (ltype == USERTYPE_ANY || Users[i].type == ltype) )
@@ -1749,7 +1749,7 @@ void clbInitEverything(void)
     /* De-register all users. */
     for ( i = 0; i < MAXUSERS; i++ )
     {
-        Users[i].live = FALSE;
+        UFCLR(i, USER_F_LIVE);
         Users[i].type = USERTYPE_NORMAL;
     }
 
@@ -1845,7 +1845,7 @@ void clbInitRobots(void)
             utStrncpy( Users[unum].alias, y, MAXUSERALIAS );            \
         else if ( clbRegister( x, y, z, &unum ) )                       \
         {                                                               \
-            Users[unum].robot = TRUE;                                   \
+            UFSET(unum, USER_F_ROBOT);                                  \
             Users[unum].type = USERTYPE_BUILTIN; /* always builtin */   \
         }                                                               \
     }
@@ -2422,14 +2422,14 @@ int clbStillAlive( int snum )
         return(TRUE);
 
     /* Look for religious trouble or the "closed" sign in the window. */
-    if ( Users[Ships[snum].unum].ooptions[OOPT_SHITLIST] )
+    if ( UBANNED(Ships[snum].unum) )
     {
         if ( Ships[snum].status == SS_LIVE )
             clbKillShip( snum, KB_SHIT, 0 );
 
         return ( FALSE );
     }
-    if ( ConqInfo->closed && ! Users[Ships[snum].unum].ooptions[OOPT_PLAYWHENCLOSED] )
+    if ( ConqInfo->closed && ! UPLAYWHENCLOSED(Ships[snum].unum) )
     {
         if ( Ships[snum].status == SS_LIVE )
             clbKillShip(snum, KB_EVICT, 0);

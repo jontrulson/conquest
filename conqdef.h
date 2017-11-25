@@ -213,28 +213,6 @@ typedef enum {
 #define USTAT_GENOCIDE 0 	/* number of genocides completed */
 #define USTAT_TOTALSTATS 14
 
-#define MAXOOPTIONS 12 		/* number of operator options */
-#define OOPT_PLAYWHENCLOSED 0 	/* can play when the game is closed */
-
-// FIXME, remove when ready.
-#define OOPT_MULTIPLE 1 	/* can play on more than one terminal */
-// FIXME, remove when ready.
-#define OOPT_SWITCHTEAMS 2 	/* can switch teams */
-#define OOPT_SHITLIST 3 	/* can't play at all */
-#define OOPT_OPER 4 		/* identified as conquest operator */
-#define OOPT_LOSE 5 		/* heh, heh, heh... */
-#define OOPT_AUTOPILOT 6 	/* can use the autopilot */
-#define OOPT_TOTALOOPTION 7
-
-#define MAXOPTIONS 12 		/* number of user options */
-#define OPT_PHASERGRAPHICS 0 	/* show phaser shots */
-#define OPT_PLANETNAMES 1 	/* show planet names on the display */
-#define OPT_ALARMBELL 2 	/* beep the bell when interesting things happen */
-#define OPT_INTRUDERALERT 3 	/* show intruder alert messages */
-#define OPT_NUMERICMAP 4 	/* show army counts on map */
-#define OPT_TERSE 5 		/* terse more prompts */
-#define OPT_EXPLOSIONS 6 	/* show torpedo explosions */
-
 #define DATESIZE 20 		/* hh:mm:ss ddmmmyy */
 #define MAXMESSAGES 60 		/* maximum number of messages */
 #define MSGMAXLINE 90 		/* maximum size for formatting messages */

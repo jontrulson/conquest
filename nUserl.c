@@ -61,7 +61,7 @@ scrNode_t *nUserlInit(int nodeid, int setnode, int sn, int gl, int extra)
     /* sort the (living) user list */
     nu = 0;
     for ( unum = 0; unum < MAXUSERS; unum++)
-        if ( Users[unum].live)
+        if ( ULIVE(unum) )
         {
             uvec[nu++] = unum;
         }

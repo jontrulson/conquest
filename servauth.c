@@ -189,8 +189,7 @@ void expire_users(void)
 
     for (i=0; i < MAXUSERS; i++)
     {
-        if (Users[i].live == FALSE || Users[i].robot ||
-            Users[i].ooptions[OOPT_OPER])
+        if (!ULIVE(i) || UROBOT(i) || UISOPER(i))
             continue;		/* only living, human, non godlike users
 				   are subject to expiration.  */
 

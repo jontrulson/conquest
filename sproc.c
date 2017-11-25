@@ -1681,7 +1681,7 @@ void procAutoPilot(cpCommand_t *cmd)
         return;			/* cancelled autopilot */
 
     /* allowed? */
-    if (!Users[Ships[snum].unum].ooptions[OOPT_AUTOPILOT])
+    if (!UAUTOPILOT(Ships[snum].unum))
     {
         utLog("PROC AUTOPILOT: unum = %d, snum = %d: NOT ALLOWED",
               Ships[snum].unum, snum);

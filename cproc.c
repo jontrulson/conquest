@@ -95,8 +95,8 @@ int procUser(char *buf)
     Users[unum].team = suser->team;
     Users[unum].type = (userTypes_t)suser->userType;
 
-    if (suser->flags & SPUSER_FLAGS_LIVE)
-        Users[unum].live = TRUE;
+    Users[unum].flags = ntohs(suser->flags);
+    Users[unum].opFlags = ntohs(suser->opFlags);
 
     for (i=0; i<NUMPLAYERTEAMS; i++)
         if ((suser->war & (1 << i)))
@@ -104,9 +104,6 @@ int procUser(char *buf)
 
     Users[unum].rating = (real)((real)((int16_t)ntohs(suser->rating)) / 10.0);
     Users[unum].lastentry = (time_t)ntohl(suser->lastentry);
-
-    for (i=0; i<OOPT_TOTALOOPTION; i++)
-        Users[unum].ooptions[i] = (int32_t)ntohl(suser->ooptions[i]);
 
     for (i=0; i<USTAT_TOTALSTATS; i++)
         Users[unum].stats[i] = (int32_t)ntohl(suser->stats[i]);

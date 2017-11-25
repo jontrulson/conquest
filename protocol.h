@@ -310,23 +310,19 @@ typedef struct {
     uint8_t  msg[MESSAGE_SIZE];
 } spMessage_t;
 
-#define SPUSER_FLAGS_NONE     0x00
-#define SPUSER_FLAGS_LIVE     0x01
 typedef struct {
     uint8_t  type;			/* SP_USER */
     uint8_t  team;
     uint16_t unum;			/* user num */
 
-    uint8_t  flags;                /* hostile, live, etc */
-    uint8_t  war;			/* a bit mask (1 << TEAM_*) */
+    uint16_t flags;                /* user flags */
     int16_t  rating;               /* x10 */
 
     uint8_t  userType;          // USERTYPE_* */
-    uint8_t  pad[3];
+    uint8_t  war;			/* a bit mask (1 << TEAM_*) */
+    uint16_t opFlags;                   /* operator set flags */
 
     uint32_t lastentry;
-
-    int32_t  ooptions[OOPT_TOTALOOPTION];
 
     int32_t  stats[USTAT_TOTALSTATS];
 

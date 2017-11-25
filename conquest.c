@@ -643,7 +643,7 @@ void command( int ch )
         dowarp( Context.snum, x );
         break;
     case 'a':				/* autopilot */
-        if ( Users[Ships[Context.snum].unum].ooptions[ OOPT_AUTOPILOT] )
+        if ( UAUTOPILOT(Ships[Context.snum].unum) )
 	{
             doautopilot( Context.snum );
 	}

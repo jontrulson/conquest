@@ -377,7 +377,7 @@ int checkOperExec(msgFrom_t from, uint16_t fromDetail,
         return FALSE;               /* not for us. */
 
     /* it is for us, now check for allowability */
-    if (!Users[Ships[fromDetail].unum].ooptions[OOPT_OPER])
+    if (!UISOPER(Ships[fromDetail].unum))
     {                           /* nice try... */
         clbStoreMsg(MSG_FROM_GOD, 0,
                     MSG_TO_SHIP, fromDetail,

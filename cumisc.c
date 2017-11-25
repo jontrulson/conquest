@@ -1656,7 +1656,7 @@ void mcuUserList( int godlike, int snum )
         /* sort the (living) user list */
         nu = 0;
         for ( unum = 0; unum < MAXUSERS; unum++)
-            if ( Users[unum].live)
+            if ( ULIVE(unum) )
             {
                 uvec[nu++] = unum;
             }
@@ -1787,7 +1787,7 @@ void mcuUserStats( int godlike , int snum )
         /* sort the (living) user list */
         nu = 0;
         for ( unum = 0; unum < MAXUSERS; unum++)
-            if ( Users[unum].live)
+            if ( ULIVE(unum) )
             {
                 uvec[nu++] = unum;
             }

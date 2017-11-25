@@ -395,12 +395,6 @@ void initstats( int *ctemp, int *etemp )
 
 
 /*  isagod - determine if a user is a god (oper) or not */
-/*   if a valid user is passed, then the OOPT_OPER priviledge is */
-/*    checked.  Otherwise, the current user must be a member of */
-/*    the 'conquest' group (conqoper, conqdriv, etc */
-/*  SYNOPSIS */
-/*    int flag, isagod */
-/*    flag = isagod() */
 
 /* For cygwin, everybody is a god for non-user num checks. */
 #if defined(CYGWIN) || defined(MINGW)
@@ -412,8 +406,7 @@ int isagod( int unum )
     }
     else
     {				/* else a user number passed in */
-				/* just check for OOPT_OPER */
-        if (Users[unum].ooptions[OOPT_OPER])
+        if (UISOPER(unum))
             return TRUE;
         else
             return FALSE;
@@ -437,7 +430,7 @@ int isagod( int unum )
     else
     {				/* else a user number passed in */
 				/* just check for OOPT_OPER */
-        if (Users[unum].ooptions[OOPT_OPER])
+        if (UISOPER(unum))
             return TRUE;
         else
             return FALSE;

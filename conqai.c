@@ -222,7 +222,7 @@ void defend( int attacker, int pnum )
     for ( i = 0; i < MAXSHIPS; i++ )
         if ( Ships[i].status == SS_LIVE ) /* live */
             if ( Ships[i].team == team ) /* same team */
-                if (Users[Ships[i].unum].robot || !SVACANT(i))
+                if (UROBOT(Ships[i].unum) || !SVACANT(i))
                 {   /* robot or non-vacant human */
                     return;
                 }
@@ -230,10 +230,9 @@ void defend( int attacker, int pnum )
     /* Count how many robot users are on the right team and can play. */
     j = 0;
     for ( i = 0; i < MAXUSERS; i++ )
-        if ( Users[i].live )
-            if ( Users[i].robot && Users[i].team == team &&
-                 ! Users[i].ooptions[OOPT_SHITLIST] )
-                j = j + 1;
+        if ( ULIVE(i) )
+            if ( UROBOT(i) && Users[i].team == team && !UBANNED(i) )
+                j++;
 
     /* No one to defend. */
     if ( j <= 0 )
@@ -244,11 +243,10 @@ void defend( int attacker, int pnum )
     unum = -1;    /* off-by-one fixed - romulans now have defenders */
     j = 0;
     for ( i = 0; i < MAXUSERS; i++ )
-        if ( Users[i].live )
-            if ( Users[i].robot && Users[i].team == team &&
-                 ! Users[i].ooptions[OOPT_SHITLIST] )
+        if ( ULIVE(i) )
+            if ( UROBOT(i) && Users[i].team == team && !UBANNED(i) )
             {
-                j = j + 1;
+                j++;
                 if ( j == k )
                 {
                     unum = i;
@@ -497,11 +495,11 @@ int newrob( int *snum, int unum )
     int i, j;
 
     /* Check the user number. */
-    if ( ! Users[unum].live )
+    if ( !ULIVE(unum) )
         return ( FALSE );
 
     /* Check for religious trouble. */
-    if ( Users[unum].ooptions[OOPT_SHITLIST] )
+    if ( UBANNED(unum) )
         return ( FALSE );
 
     /* MAke sure we are a builtin. */

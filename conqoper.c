@@ -2488,7 +2488,7 @@ void opuadd(void)
 void opuedit(void)
 {
 
-#define MAXUEDITROWS (MAXOPTIONS+2)
+#define MAXUEDITROWS (12+2)
 
     int i, unum, row = 1, lin, olin, tcol, dcol, lcol, rcol;
     char buf[MSGMAXLINE];
@@ -2541,13 +2541,14 @@ void opuedit(void)
         //cprintf(lin,dcol,ALIGN_NONE,"#%d#%0d", InfoColor, 0);
 
         lin++;
-        for ( i = 0; i < MAXOOPTIONS; i++ )
+        // room for 12
+        for ( i = 0; i < 12; i++ )
 	{
             cprintf(lin+i,tcol,ALIGN_NONE,"#%d#%17d:", LabelColor,i);
             cprintf(lin+i,dcol,ALIGN_NONE,"#%d#%c", RedLevelColor,'F');
 	}
 
-        lin+=(MAXOOPTIONS + 1);
+        lin+=(12 + 1);
         cprintf(lin,tcol,ALIGN_NONE,"#%d#%s", LabelColor,"          Urating:");
         cprintf(lin,dcol,ALIGN_NONE,"#%d#%0g",InfoColor,
                 oneplace(Users[unum].rating));
@@ -2566,7 +2567,7 @@ void opuedit(void)
 
         lin++;
         cprintf(lin,tcol,ALIGN_NONE,"#%d#%s", LabelColor,"           Urobot:");
-        if ( Users[unum].robot )
+        if ( UROBOT(unum) )
             cprintf(lin,dcol,ALIGN_NONE,"#%d#%c",GreenLevelColor, 'T');
         else
             cprintf(lin,dcol,ALIGN_NONE,"#%d#%c",RedLevelColor, 'F');
@@ -2592,32 +2593,64 @@ void opuedit(void)
             cprintf(lin,dcol,ALIGN_NONE,"#%d#%s",InfoColor, Teams[i].name);
 
         lin++;
-        for ( i = 0; i < MAXOOPTIONS; i++ )
+        // room for 12 operator options
+        for ( i = 0; i < 12; i++ )
 	{
-            cprintf(lin+i,tcol,ALIGN_NONE,"#%d#%17d:", LabelColor,i);
-
-            if ( Users[unum].ooptions[i] )
-                cprintf(lin+i,dcol,ALIGN_NONE,"#%d#%c", GreenLevelColor,'T');
-            else
-                cprintf(lin+i,dcol,ALIGN_NONE,"#%d#%c", RedLevelColor,'F');
+            switch(i) {
+            case 0: // play when closed
+                if (UPLAYWHENCLOSED(unum))
+                    cprintf(lin+i,dcol,ALIGN_NONE,"#%d#%c",
+                            GreenLevelColor,'T');
+                else
+                    cprintf(lin+i,dcol,ALIGN_NONE,"#%d#%c",
+                            RedLevelColor,'F');
+                break;
+            case 1: // banned
+                if (UBANNED(unum))
+                    cprintf(lin+i,dcol,ALIGN_NONE,"#%d#%c",
+                            GreenLevelColor,'T');
+                else
+                    cprintf(lin+i,dcol,ALIGN_NONE,"#%d#%c",
+                            RedLevelColor,'F');
+                break;
+            case 2: // Operator
+                if (UISOPER(unum))
+                    cprintf(lin+i,dcol,ALIGN_NONE,"#%d#%c",
+                            GreenLevelColor,'T');
+                else
+                    cprintf(lin+i,dcol,ALIGN_NONE,"#%d#%c",
+                            RedLevelColor,'F');
+                break;
+            case 3: // autopilot
+                if (UAUTOPILOT(unum))
+                    cprintf(lin+i,dcol,ALIGN_NONE,"#%d#%c",
+                            GreenLevelColor,'T');
+                else
+                    cprintf(lin+i,dcol,ALIGN_NONE,"#%d#%c",
+                            RedLevelColor,'F');
+                break;
+            default:
+                // do nothing
+                break;
+            }
 	}
-// FIXME - rework this, remove SWITCHTEAMS and multiple, LOSE also?
-//        cprintf(lin+OOPT_MULTIPLE,tcol,ALIGN_NONE,"#%d#%s",
-//		LabelColor,"         Multiple:");
-//        cprintf(lin+OOPT_SWITCHTEAMS,tcol,ALIGN_NONE,"#%d#%s",
-//		LabelColor,"     Switch teams:");
-        cprintf(lin+OOPT_PLAYWHENCLOSED,tcol,ALIGN_NONE,"#%d#%s",
+
+        // operator settable options...
+
+        // line offset 0 - play when closed
+        cprintf(lin+0,tcol,ALIGN_NONE,"#%d#%s",
 		LabelColor," Play when closed:");
-        cprintf(lin+OOPT_SHITLIST,tcol,ALIGN_NONE,"#%d#%s",
-		LabelColor,"          Disable:");
-        cprintf(lin+OOPT_OPER,tcol,ALIGN_NONE,"#%d#%s",
+        // 1 - banned?
+        cprintf(lin+1,tcol,ALIGN_NONE,"#%d#%s",
+		LabelColor,"           Banned:");
+        // 2 - operator
+        cprintf(lin+2,tcol,ALIGN_NONE,"#%d#%s",
 		LabelColor,"Conquest Operator:");
-        cprintf(lin+OOPT_LOSE,tcol,ALIGN_NONE,"#%d#%s",
-		LabelColor,"             Lose:");
-        cprintf(lin+OOPT_AUTOPILOT,tcol,ALIGN_NONE,"#%d#%s",
+        // 3 - autopilot
+        cprintf(lin+3,tcol,ALIGN_NONE,"#%d#%s",
 		LabelColor,"        Autopilot:");
 
-        lin+=(MAXOOPTIONS + 1);
+        lin+=(12 + 1); /* 12 == old maxooptions */
         cprintf(lin,tcol,ALIGN_NONE,"#%d#%s", LabelColor,"       Last entry:");
 
         if (Users[unum].lastentry == 0)
@@ -2850,13 +2883,54 @@ void opuedit(void)
 	    }
             else
 	    {
+                // the options - detect which ones (only the "left"
+                // side for now
                 i = row - 3;
                 if ( left )
-                    if ( i >= 0 && i < MAXOOPTIONS )
-                        Users[unum].ooptions[i] = ! Users[unum].ooptions[i];
-                    else
-                        cdbeep();
-                else
+                {
+                    // 0 - play when closed
+                    if (i == 0)
+                    {
+                        if (UPLAYWHENCLOSED(unum))
+                            UOPCLR(unum, USER_OP_PLAYWHENCLOSED);
+                        else if (!UPLAYWHENCLOSED(unum))
+                            UOPSET(unum, USER_OP_PLAYWHENCLOSED);
+                        break;
+                    }
+
+                    // 1 - banned
+                    if (i == 1)
+                    {
+                        if (UBANNED(unum))
+                            UOPCLR(unum, USER_OP_BANNED);
+                        else if (!UBANNED(unum))
+                            UOPSET(unum, USER_OP_BANNED);
+                        break;
+                    }
+
+                    // 2 - operator
+                    if (i == 2)
+                    {
+                        if (UISOPER(unum))
+                            UOPCLR(unum, USER_OP_ISOPER);
+                        else if (!UISOPER(unum))
+                            UOPSET(unum, USER_OP_ISOPER);
+                        break;
+                    }
+
+                    // 3 - autopilot
+                    if (i == 3)
+                    {
+                        if (UAUTOPILOT(unum))
+                            UOPCLR(unum, USER_OP_AUTOPILOT);
+                        else if (!UAUTOPILOT(unum))
+                            UOPSET(unum, USER_OP_AUTOPILOT);
+                        break;
+                    }
+
+                    cdbeep();
+                }
+                else // not left
                     cdbeep();
 	    }
             break;

@@ -1994,7 +1994,7 @@ static void command( int ch )
         _dowarp( Context.snum, x );
         break;
     case 'a':				/* autopilot */
-        if ( Users[Ships[Context.snum].unum].ooptions[ OOPT_AUTOPILOT] )
+        if ( UAUTOPILOT(Ships[Context.snum].unum) )
 	{
             state = S_DOAUTOPILOT;
             prm.preinit = FALSE;
