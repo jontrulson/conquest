@@ -381,8 +381,10 @@ void utLog(char *fmt, ...)
         if (systemlog)
             if (chown(errfile, 0, ConquestGID) == -1)
             {
-                perror("utLog():chown()");
-                //            exit(1);
+                // don't whine on EPERM.  Many systems don't allow
+                // ordinary users to chown anymore
+                if (errno != EPERM)
+                    perror("utLog():chown()");
             }
 #endif
 

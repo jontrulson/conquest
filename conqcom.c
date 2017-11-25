@@ -195,10 +195,11 @@ int check_cblock(char *fname, int fmode, int sizeofcb)
     /* set ownership */
     if (chown(fname, 0, -1) == -1)
     {
-        printf("check_cblock(): chown() failed: %s\n",
-               strerror(errno));
-
-        //      return(FALSE);
+        // don't whine on EPERM.  Many systems don't allow
+        // ordinary users to chown anymore
+        if (errno != EPERM)
+            printf("check_cblock(): chown() failed: %s\n",
+                   strerror(errno));
     }
 #endif
 
