@@ -2159,7 +2159,7 @@ static void command( int ch )
         state = S_PSEUDO;
         prm.preinit = FALSE;
         prm.buf = cbuf;
-        prm.buflen = MAXUSERALIAS;
+        prm.buflen = MAXUSERNAME;
         prm.pbuf = "Enter a new pseudonym: ";
         prm.terms = TERMS;
         prm.index = MSG_LIN2;

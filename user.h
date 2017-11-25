@@ -48,19 +48,16 @@ typedef enum {
 
 
 typedef struct {
-//    int live;			/* alive or not */
     userTypes_t type;           /* type of user */
     uint16_t flags;             /* bitmask of USER_UF_* values */
     uint16_t opFlags;           /* bitmask of USER_OP_* (operator set) values */
     int team;			/* user's team */
     real rating;		/* user's rating */
-//    int robot;			/* a robot? */
     time_t lastentry;		/* last entry time */
     bool war[NUMPLAYERTEAMS];	/* teams you're at war with */
-//    int ooptions[MAXOOPTIONS];	/* operator settable options */
     char username[MAXUSERNAME];	/* user's name (login name) */
     char pw[MAXUSERNAME];	/* user's password if server login */
-    char alias[MAXUSERALIAS];	/* user's pseudonym */
+    char alias[MAXUSERNAME];	/* user's pseudonym */
     int stats[MAXUSTATS];	/* user's stats */
 } User_t;
 

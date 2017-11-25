@@ -38,7 +38,7 @@ void cucPseudo( int unum, int snum )
         strcat(buf , Users[unum].alias) ;
     cdputc( buf, MSG_LIN1 );
     ch = mcuGetCX( "Enter a new pseudonym: ",
-                   MSG_LIN2, -4, TERMS, buf, MAXUSERALIAS );
+                   MSG_LIN2, -4, TERMS, buf, MAXUSERNAME );
     if ( ch == TERM_ABORT || buf[0] == 0)
     {
         cdclrl( MSG_LIN1, 2 );

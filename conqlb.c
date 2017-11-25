@@ -721,7 +721,7 @@ int clbRegister( char *lname, char *rname, int team, int *unum )
 
             Users[i].lastentry = 0;	/* never */
             utStrncpy( Users[i].username, lname, MAXUSERNAME );
-            utStrncpy( Users[i].alias, rname, MAXUSERALIAS );
+            utStrncpy( Users[i].alias, rname, MAXUSERNAME );
             *unum = i;
             return ( TRUE );
         }
@@ -740,11 +740,11 @@ int clbRegister( char *lname, char *rname, int team, int *unum )
 void clbResign( int unum, int isoper )
 {
     int i;
-    char usrname[MAXUSERNAME], usralias[MAXUSERALIAS];
+    char usrname[MAXUSERNAME], usralias[MAXUSERNAME];
 
     /* make copies */
     strncpy(usrname, Users[unum].username, MAXUSERNAME - 1);
-    strncpy(usralias, Users[unum].alias, MAXUSERALIAS - 1);
+    strncpy(usralias, Users[unum].alias, MAXUSERNAME - 1);
 
     PVLOCK(&ConqInfo->lockword);
     if ( unum >= 0 && unum < MAXUSERS )
@@ -846,7 +846,7 @@ int clbTakePlanet( int pnum, int snum )
             }
     /* Yes! */
     utFormatTime( ConqInfo->conqtime, 0 );
-    utStrncpy( ConqInfo->conqueror, Ships[snum].alias, MAXUSERALIAS );
+    utStrncpy( ConqInfo->conqueror, Ships[snum].alias, MAXUSERNAME );
     ConqInfo->lastwords[0] = 0;
     Users[Ships[snum].unum].stats[USTAT_CONQUERS] += 1;
     Teams[Ships[snum].team].stats[TSTAT_CONQUERS] += 1;
@@ -882,7 +882,7 @@ int clbTakePlanet( int pnum, int snum )
 void clbUserline( int unum, int snum, char *buf, int showgods, int showteam )
 {
     int team;
-    char ch, ch2, junk[MSGMAXLINE], timstr[20], name[MAXUSERALIAS];
+    char ch, ch2, junk[MSGMAXLINE], timstr[20], name[MAXUSERNAME];
 
     char *hd1="name          pseudonym           team skill  wins  loss mxkls  ships     time";
     char tname[MAXUSERNAME + 2];	/* posss '@' and NULL */
@@ -1764,7 +1764,7 @@ void clbInitEverything(void)
     utStrncpy( ConqInfo->lastupchuck, "never", DATESIZE );
     utFormatTime( ConqInfo->inittime, 0 );
     utFormatTime( ConqInfo->conqtime, 0 );
-    utStrncpy( ConqInfo->conqueror, "GOD", MAXUSERALIAS );
+    utStrncpy( ConqInfo->conqueror, "GOD", MAXUSERNAME );
     utStrncpy( ConqInfo->conqteam, "self ruled", MAXTEAMNAME );
     utStrncpy( ConqInfo->lastwords, "Let there be light...", MAXLASTWORDS );
 
@@ -1802,7 +1802,7 @@ void clbInitGame(void)
     Doomsday->heading = 0.0;
     Doomsday->lock = LOCK_NONE;
     Doomsday->lockDetail = 0;
-    utStrncpy( Doomsday->name, "Doomsday Machine", MAXUSERALIAS );
+    utStrncpy( Doomsday->name, "Doomsday Machine", MAXUSERNAME );
 
     /* Un-twiddle the lockword. */
     PVUNLOCK(&ConqInfo->lockword);
@@ -1842,7 +1842,7 @@ void clbInitRobots(void)
 #define SETROBOT(x, y, z)                                               \
     {                                                                   \
         if ( clbGetUserNum( &unum, x, USERTYPE_BUILTIN ) )              \
-            utStrncpy( Users[unum].alias, y, MAXUSERALIAS );            \
+            utStrncpy( Users[unum].alias, y, MAXUSERNAME );            \
         else if ( clbRegister( x, y, z, &unum ) )                       \
         {                                                               \
             UFSET(unum, USER_F_ROBOT);                                  \
@@ -2668,7 +2668,7 @@ void clbZeroShip( int snum )
     Ships[snum].lastphase = 0.0;
     Ships[snum].pfuse = 0;
     Ships[snum].action = 0;
-    for ( i = 0; i < MAXUSERALIAS; i++ )
+    for ( i = 0; i < MAXUSERNAME; i++ )
         Ships[snum].alias[i] = 0;
     Ships[snum].ctime = 0;
     Ships[snum].etime = 0;

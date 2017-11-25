@@ -104,7 +104,7 @@ int sendSetName(char *name)
 
     memset((void *)&sname, 0, sizeof(cpSetName_t));
     sname.type = CP_SETNAME;
-    strncpy((char *)sname.alias, name, MAXUSERALIAS - 1);
+    strncpy((char *)sname.alias, name, MAXUSERNAME - 1);
 
     if (pktWrite(PKT_SENDTCP, &sname) <= 0)
         return FALSE;

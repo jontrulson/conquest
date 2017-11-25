@@ -103,7 +103,7 @@
         Torp_t torps[MAXTORPS];	/* Torpedos */
         uint16_t flags;		/* SHIP_F_ */
         uint16_t pad1;			/* PAD */
-        char alias[MAXUSERALIAS];	/* user's pseudonym, copy of Users[].alias */
+        char alias[MAXUSERNAME];	/* user's pseudonym, copy of Users[].alias */
     } Ship_t;
 
 #endif /* SHIP_H_INCLUDED */

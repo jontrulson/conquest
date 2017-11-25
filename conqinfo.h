@@ -27,7 +27,7 @@ typedef struct {
     char lastupchuck[DATESIZE];	/* last time the common block was updated */
     char ptname[MAXPLANETTYPES][MAXPTYPENAME]; /* planet type names */
     char chrplanets[MAXPLANETTYPES]; /* class M = M, dead = D, sun = S */
-    char conqueror[MAXUSERALIAS]; /* user who last conquered */
+    char conqueror[MAXUSERNAME]; /* user who last conquered */
     char conqteam[MAXTEAMNAME];	/* team s/he was on */
     char conqtime[DATESIZE];	/* time of last conquering */
     char lastwords[MAXLASTWORDS];	/* remarks upon conquering */

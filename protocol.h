@@ -195,7 +195,7 @@ typedef struct {	/* 'large' ship data */
 
     uint8_t  scanned[NUMPLAYERTEAMS];
 
-    uint8_t  alias[MAXUSERALIAS];
+    uint8_t  alias[MAXUSERNAME];
 } spShip_t;
 
 typedef struct {	/* 'short' ship packets */
@@ -328,7 +328,7 @@ typedef struct {
 
     uint8_t  username[MAXUSERNAME];
 
-    uint8_t  alias[MAXUSERALIAS];
+    uint8_t  alias[MAXUSERNAME];
 } spUser_t;
 
 typedef struct {
@@ -393,7 +393,7 @@ typedef struct {
     uint8_t  pad2;
     uint8_t  pad3;
 
-    uint8_t  conqueror[MAXUSERALIAS]; /* user who last conquered */
+    uint8_t  conqueror[MAXUSERNAME]; /* user who last conquered */
     uint8_t  conqteam[MAXTEAMNAME];   /* team s/he was on */
     uint8_t  conqtime[DATESIZE];      /* time of last conquering */
     uint8_t  lastwords[MAXLASTWORDS]; /* remarks upon conquering */
@@ -527,7 +527,7 @@ typedef struct {
 
 typedef struct {
     uint8_t  type;			/* CP_SETNAME */
-    uint8_t  alias[MAXUSERALIAS];
+    uint8_t  alias[MAXUSERNAME];
 } cpSetName_t;
 
 /* authenticate flags */

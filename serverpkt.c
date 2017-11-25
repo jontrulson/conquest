@@ -142,7 +142,7 @@ spUser_t *spktUser(uint16_t unum)
         suser.stats[i] = (int32_t)htonl(Users[unum].stats[i]);
 
     strncpy((char *)suser.username, Users[unum].username, MAXUSERNAME - 1);
-    strncpy((char *)suser.alias, Users[unum].alias, MAXUSERALIAS - 1);
+    strncpy((char *)suser.alias, Users[unum].alias, MAXUSERNAME - 1);
 
     if (memcmp((void *)&suser, (void *)&pktUser[unum], sizeof(spUser_t)))
     {
@@ -214,7 +214,7 @@ spShip_t *spktShip(uint8_t snum, int rec)
     for (i=0; i<NUMPLAYERTEAMS; i++)
         sship.scanned[i] = (uint8_t)Ships[snum].scanned[i];
 
-    strncpy((char *)sship.alias, Ships[snum].alias, MAXUSERALIAS - 1);
+    strncpy((char *)sship.alias, Ships[snum].alias, MAXUSERNAME - 1);
 
     if (rec)
     {
@@ -926,7 +926,7 @@ spConqInfo_t *spktConqInfo(int force)
 
     spci.type = SP_CONQINFO;
 
-    strncpy((char *)spci.conqueror, ConqInfo->conqueror, MAXUSERALIAS - 1);
+    strncpy((char *)spci.conqueror, ConqInfo->conqueror, MAXUSERNAME - 1);
     strncpy((char *)spci.conqteam, ConqInfo->conqteam, MAXTEAMNAME - 1);
     strncpy((char *)spci.conqtime, ConqInfo->conqtime, DATESIZE - 1);
     strncpy((char *)spci.lastwords, ConqInfo->lastwords, MAXLASTWORDS - 1);

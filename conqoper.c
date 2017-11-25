@@ -2458,7 +2458,7 @@ void opuadd(void)
 
     strcat(buf, name) ;
     buf[i] = (char)toupper( buf[i] );
-    buf[MAXUSERALIAS - 1] = 0;
+    buf[MAXUSERNAME - 1] = 0;
     if ( ! clbRegister( name, buf, team, &unum ) )
     {
         cdputs( "Error adding new user.", MSG_LIN2, 1 );
@@ -2845,10 +2845,10 @@ void opuedit(void)
                 /* Pseudonym. */
                 cdclrl( MSG_LIN2, 1 );
                 ch = mcuGetCX( "Enter a new pseudonym: ",
-                               MSG_LIN2, 0, TERMS, buf, MAXUSERALIAS );
+                               MSG_LIN2, 0, TERMS, buf, MAXUSERNAME );
                 if ( ch != TERM_ABORT &&
                      ( buf[0] != 0 || ch == TERM_EXTRA ) )
-                    utStrncpy( Users[unum].alias, buf, MAXUSERALIAS ); /* -[] */
+                    utStrncpy( Users[unum].alias, buf, MAXUSERNAME ); /* -[] */
 	    }
             else if ( ! left && row == 1 )
 	    {
