@@ -569,7 +569,7 @@ static int nPlayBInput(int ch)
             else
                 i = snum - 1;
 
-            if (i <= 0)
+            if (i < 0)
             {	/* if we're going past
                    now loop thu specials (only doomsday for
                    now... )*/

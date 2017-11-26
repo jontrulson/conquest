@@ -277,8 +277,7 @@ int procPlanet(char *buf)
     Planets[pnum].team = splan->team;
     Planets[pnum].defendteam = splan->defendteam;
 
-    splan->name[MAXPLANETNAME - 1] = 0;
-    strncpy(Planets[pnum].name, (char *)splan->name, MAXPLANETNAME);
+    utStrncpy(Planets[pnum].name, (char *)splan->name, MAXPLANETNAME);
 
     uiUpdatePlanet(pnum);
 

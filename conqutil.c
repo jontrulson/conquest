@@ -858,7 +858,6 @@ void utStrncpy( char *to, char *from, unsigned int tosize )
 {
     strncpy(to, from, tosize);
     to[tosize - 1] = '\0';
-
 }
 
 

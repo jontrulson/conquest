@@ -164,7 +164,11 @@ static int nPlayBMenuInput(int ch)
         }
         else
         {
-            sprintf(cbuf, "%d", recFileHeader.snum);
+            // for older protocols, compensate for 0-based Ships[]
+            sprintf(cbuf, "%d",
+                    (recFileHeader.protoVers <= 0x0006) ?
+                    recFileHeader.snum - 1:
+                    recFileHeader.snum);
             prm.preinit = TRUE;
         }
 

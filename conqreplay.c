@@ -562,7 +562,13 @@ static int prompt_ship(char buf[], int *snum, int *normal)
     if (recFileHeader.snum == 0)
         buf[0] = 0;
     else
-        sprintf(buf, "%d", recFileHeader.snum);
+    {
+        // compensate for 0-based Ships[] for older proto versions
+        sprintf(buf, "%d",
+                (recFileHeader.protoVers <= 0x0006) ?
+                recFileHeader.snum - 1:
+                recFileHeader.snum);
+    }
 
     tch = cdgetx( pmt, MSG_LIN1, 1, TERMS, buf, MSGMAXLINE, TRUE );
     cdclrl( MSG_LIN1, 1 );

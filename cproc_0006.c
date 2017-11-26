@@ -62,7 +62,7 @@ int proc_0006_User(char *buf)
 
     for (i=0; i<NUMPLAYERTEAMS; i++)
         if ((suser->war & (1 << i)))
-            Users[unum].war[i] = TRUE;
+            Users[unum].war[i] = true;
 
     Users[unum].rating = (real)((real)((int16_t)ntohs(suser->rating)) / 100.0);
     Users[unum].lastentry = (time_t)ntohl(suser->lastentry);
@@ -105,8 +105,9 @@ int proc_0006_User(char *buf)
     for (i=0; i<USTAT_TOTALSTATS; i++)
         Users[unum].stats[i] = (int32_t)ntohl(suser->stats[i]);
 
-    strncpy(Users[unum].username, (char *)suser->username, 32 /*MAXUSERNAME*/ - 1);
-    strncpy(Users[unum].alias, (char *)suser->alias, 24 /*MAXUSERALIAS*/ - 1);
+    utStrncpy(Users[unum].username, (char *)suser->username,
+              32 /*MAXUSERNAME*/);
+    utStrncpy(Users[unum].alias, (char *)suser->alias, 24 /*MAXUSERALIAS*/);
 
 #if defined(DEBUG_CLIENTPROC)
     utLog("\t%s: name: %s (%s)", __FUNCTION__, Users[unum].username, Users[unum].alias);
@@ -124,11 +125,11 @@ int proc_0006_Ship(char *buf)
     if (!pktIsValid(SP_0006_SHIP, buf))
         return FALSE;
 
-    snum = sship->snum;
-// FIXME/CHECKME - is this (MAXSHIPS) logic orrect for the new world
-// order?  It will be in a new common block with 0-based MAXSHIP (and
-// eventually planets)...
-    if (snum <= 0 || snum > 20 /*MAXSHIPS*/)
+    // we subtract one to compensate for new 0-based Ships[]
+    snum = sship->snum - 1;
+
+
+    if (snum < 0 || snum >= 20 /*MAXSHIPS*/)
         return FALSE;
 
 #if defined(DEBUG_CLIENTPROC)
@@ -144,30 +145,29 @@ int proc_0006_Ship(char *buf)
 
     for (i=0; i<4 /*NUMPLAYERTEAMS*/; i++)
         if (sship->war & (1 << i))
-            Ships[snum].war[i] = TRUE;
+            Ships[snum].war[i] = true;
         else
-            Ships[snum].war[i] = FALSE;
+            Ships[snum].war[i] = false;
 
     for (i=0; i<4 /*NUMPLAYERTEAMS*/; i++)
         if (sship->rwar & (1 << i))
-            Ships[snum].rwar[i] = TRUE;
+            Ships[snum].rwar[i] = true;
         else
-            Ships[snum].rwar[i] = FALSE;
+            Ships[snum].rwar[i] = false;
 
     // Don't bother decoding properly for this - not necessary when
     // just playing back recordings...
     //    Ships[snum].killedby = (int)((int16_t)ntohs(sship->killedby));
     Ships[snum].kills = (real)((real)ntohl(sship->kills) / 10.0);
 
-    // FIXME - check logic here, verify
     for (i=0; i<(40 + 20)/*MAXPLANETS*/; i++)
-        Ships[snum].srpwar[i] = (int)sship->srpwar[i+1];
+        Ships[snum].srpwar[i] = (bool)sship->srpwar[i+1];
 
     for (i=0; i<4 /*NUMPLAYERTEAMS*/; i++)
         Ships[snum].scanned[i] = (int)sship->scanned[i];
 
     sship->alias[24 /*MAXUSERALIAS*/ - 1] = 0;
-    strncpy(Ships[snum].alias, (char *)sship->alias, 24 /*MAXUSERALIAS*/ - 1);
+    utStrncpy(Ships[snum].alias, (char *)sship->alias, 24 /*MAXUSERALIAS*/);
 
     return TRUE;
 }
@@ -180,9 +180,10 @@ int proc_0006_ShipSml(char *buf)
     if (!pktIsValid(SP_0006_SHIPSML, buf))
         return FALSE;
 
-    snum = sshipsml->snum;
+    // compensate for 0-based Ships[]
+    snum = sshipsml->snum - 1;
 
-    if (snum <= 0 || snum > 20 /*MAXSHIPS*/)
+    if (snum < 0 || snum >= 20 /*MAXSHIPS*/)
         return FALSE;
 
 #if defined(DEBUG_CLIENTPROC)
@@ -226,9 +227,13 @@ int proc_0006_ShipSml(char *buf)
         Ships[snum].lock = LOCK_PLANET;
         // FIXME adjust planet number when ready
         Ships[snum].lockDetail = -temp;
+        // Compensate for 0-based Planets[]
+        Ships[snum].lockDetail--;
     }
-    Ships[snum].lastphase = (real)((uint16_t)ntohs(sshipsml->lastphase)) / 100.0;
-    Ships[snum].lastblast = (real)((uint16_t)ntohs(sshipsml->lastblast)) / 100.0;
+    Ships[snum].lastphase =
+        (real)((uint16_t)ntohs(sshipsml->lastphase)) / 100.0;
+    Ships[snum].lastblast =
+        (real)((uint16_t)ntohs(sshipsml->lastblast)) / 100.0;
 
     return TRUE;
 }
@@ -241,9 +246,10 @@ int proc_0006_ShipLoc(char *buf)
     if (!pktIsValid(SP_0006_SHIPLOC, buf))
         return FALSE;
 
-    snum = sshiploc->snum;
+    // compensate for 0-based Ships[]
+    snum = sshiploc->snum - 1;
 
-    if (snum <= 0 || snum > 20 /*MAXSHIPS*/)
+    if (snum < 0 || snum >= 20 /*MAXSHIPS*/)
         return FALSE;
 
 #if defined(DEBUG_CLIENTPROC)
@@ -267,16 +273,16 @@ int proc_0006_Planet(char *buf)
     if (!pktIsValid(SP_0006_PLANET, buf))
         return FALSE;
 
-    pnum = splan->pnum;
+    // compensate for 0-based Planets[]
+    pnum = splan->pnum - 1;
 
-    if (pnum <= 0 || pnum > (40 + 20) /*MAXPLANETS*/)
+    if (pnum < 0 || pnum >= (40 + 20) /*MAXPLANETS*/)
         return FALSE;
 
     Planets[pnum].type = splan->ptype;
     Planets[pnum].team = splan->team;
 
-    splan->name[12 /*MAXPLANETNAME*/ - 1] = 0;
-    strncpy(Planets[pnum].name, (char *)splan->name, 12 /*MAXPLANETNAME*/);
+    utStrncpy(Planets[pnum].name, (char *)splan->name, 12 /*MAXPLANETNAME*/);
 
     uiUpdatePlanet(pnum);
 
@@ -292,16 +298,17 @@ int proc_0006_PlanetSml(char *buf)
     if (!pktIsValid(SP_0006_PLANETSML, buf))
         return FALSE;
 
-    pnum = splansml->pnum;
+    // compensate for 0-based Planets[]
+    pnum = splansml->pnum - 1;
 
-    if (pnum <= 0 || pnum > (40 + 20) /*MAXPLANETS*/)
+    if (pnum < 0 || pnum >= (40 + 20) /*MAXPLANETS*/)
         return FALSE;
 
     for (i=0; i<4 /*NUMPLAYERTEAMS*/; i++)
         if (splansml->scanned & (1 << i))
-            Planets[pnum].scanned[i] = TRUE;
+            Planets[pnum].scanned[i] = true;
         else
-            Planets[pnum].scanned[i] = FALSE;
+            Planets[pnum].scanned[i] = false;
 
     Planets[pnum].uninhabtime = (int)splansml->uninhabtime;
 
@@ -316,9 +323,10 @@ int proc_0006_PlanetLoc(char *buf)
     if (!pktIsValid(SP_0006_PLANETLOC, buf))
         return FALSE;
 
-    pnum = splanloc->pnum;
+    // compensate for 0-based Planets[]
+    pnum = splanloc->pnum - 1;
 
-    if (pnum <= 0 || pnum > (40 + 20) /*MAXPLANETS*/)
+    if (pnum < 0 || pnum >= (40 + 20) /*MAXPLANETS*/)
         return FALSE;
 
     Planets[pnum].armies = (int)((int16_t)ntohs(splanloc->armies));
@@ -336,15 +344,16 @@ int proc_0006_PlanetLoc2(char *buf)
     if (!pktIsValid(SP_0006_PLANETLOC2, buf))
         return FALSE;
 
-    pnum = splanloc2->pnum;
+    // compensate for 0-based Planets[]
+    pnum = splanloc2->pnum - 1;
 
-    if (pnum <= 0 || pnum > 60 /*MAXPLANETS*/)
+    if (pnum < 0 || pnum >= 60 /*MAXPLANETS*/)
         return FALSE;
 
     Planets[pnum].armies = (int)((int16_t)ntohs(splanloc2->armies));
     Planets[pnum].x = (real)((real)((int32_t)ntohl(splanloc2->x)) / 1000.0);
     Planets[pnum].y = (real)((real)((int32_t)ntohl(splanloc2->y)) / 1000.0);
-    Planets[pnum].orbang = (real)((real)((uint16_t)ntohs(splanloc2->orbang)) / 100.0);
+    Planets[pnum].orbang = (real)ntohs(splanloc2->orbang) / 100.0;
 
     return TRUE;
 }
@@ -358,15 +367,23 @@ int proc_0006_PlanetInfo(char *buf)
     if (!pktIsValid(SP_0006_PLANETINFO, buf))
         return FALSE;
 
-    pnum = splaninfo->pnum;
+    // compensate for 0-based Planets[]
+    pnum = splaninfo->pnum - 1;
 
-    if (pnum <= 0 || pnum > (40 + 20) /*MAXPLANETS*/)
+    if (pnum < 0 || pnum >= (40 + 20) /*MAXPLANETS*/)
         return FALSE;
 
     primary = splaninfo->primary;
 
-    /* Roy fix - 10/17/2005 - let mur data be sent. */
-    if (primary < 0 || primary > (40 + 20) /*MAXPLANETS*/)
+    // special case for murisak, which had a primary of 0 (invalid).
+    // In the case that we run across a 0 primary, we'll assign it to
+    // it's own pnum, indicating stationary
+    if (primary == 0)
+        primary = pnum; // already compensated
+    else
+        primary--; // compensate for 0-based Planets[]
+
+    if (primary < 0 || primary >= (40 + 20) /*MAXPLANETS*/)
         return FALSE;
 
     /* in protocol 6, we 'forgot' planet realness.  To avoid breaking
@@ -375,8 +392,6 @@ int proc_0006_PlanetInfo(char *buf)
        _then_ we pay attn to any other flags present. Else we ignore
        them. */
 
-    /* FIXME - with new CB, and later, new protocol, we will send these
-       flags directly. */
     if (splaninfo->flags & SP_0006_PLANETINFO_FLAGS_FVALID)
     {                           /* we have valid flags */
 
@@ -402,10 +417,11 @@ int proc_0006_Torp(char *buf)
     if (!pktIsValid(SP_0006_TORP, buf))
         return FALSE;
 
-    snum = storp->snum;
+    // compensate for 0-based Ships[]
+    snum = storp->snum - 1;
     tnum = storp->tnum;
 
-    if (snum <= 0 || snum > 20 /*MAXSHIPS*/)
+    if (snum < 0 || snum >= 20 /*MAXSHIPS*/)
         return FALSE;
 
     if (tnum < 0 || tnum >= 9 /*MAXTORPS*/)
@@ -424,7 +440,8 @@ int proc_0006_TorpLoc(char *buf)
     if (!pktIsValid(SP_0006_TORPLOC, buf))
         return FALSE;
 
-    snum = storploc->snum;
+    // compensate for 0-based Ships[]
+    snum = storploc->snum - 1;
     tnum = storploc->tnum;
 
     if (snum <= 0 || snum > 20 /*MAXSHIPS*/)
@@ -435,9 +452,9 @@ int proc_0006_TorpLoc(char *buf)
 
     for (i=0; i<4 /*NUMPLAYERTEAMS*/; i++)
         if (storploc->war & (1 << i))
-            Ships[snum].torps[tnum].war[i] = TRUE;
+            Ships[snum].torps[tnum].war[i] = true;
         else
-            Ships[snum].torps[tnum].war[i] = FALSE;
+            Ships[snum].torps[tnum].war[i] = false;
 
     Ships[snum].torps[tnum].x = (real)((real)((int32_t)ntohl(storploc->x)) / 1000.0);
     Ships[snum].torps[tnum].y = (real)((real)((int32_t)ntohl(storploc->y)) / 1000.0);
@@ -454,10 +471,11 @@ int proc_0006_TorpEvent(char *buf)
     if (!pktIsValid(SP_0006_TORPEVENT, buf))
         return FALSE;
 
-    snum = storpev->snum;
+    // compensate for 0-based Ships[]
+    snum = storpev->snum - 1;
     tnum = storpev->tnum;
 
-    if (snum <= 0 || snum > 20 /*MAXSHIPS*/)
+    if (snum < 0 || snum >= 20 /*MAXSHIPS*/)
         return FALSE;
 
     if (tnum < 0 || tnum >= 9 /*MAXTORPS*/)
@@ -467,9 +485,9 @@ int proc_0006_TorpEvent(char *buf)
 
     for (i=0; i<4 /*NUMPLAYERTEAMS*/; i++)
         if (storpev->war & (1 << i))
-            Ships[snum].torps[tnum].war[i] = TRUE;
+            Ships[snum].torps[tnum].war[i] = true;
         else
-            Ships[snum].torps[tnum].war[i] = FALSE;
+            Ships[snum].torps[tnum].war[i] = false;
 
     Ships[snum].torps[tnum].x =
         (real)((real)((int32_t)ntohl(storpev->x)) / 1000.0);
@@ -512,8 +530,8 @@ int proc_0006_Message(char *buf)
     if (smsg->from > 0) // ship
     {
         realFrom = MSG_FROM_SHIP;
-        realFromDetail = (uint16_t)smsg->from;
-// FIXME       realFromDetail--; // compensate for 0-based ships[] in current version
+        // compensate for 0-based Ships[]
+        realFromDetail = (uint16_t)smsg->from - 1;
     }
     else if (smsg->from == 0) // god
     {
@@ -522,10 +540,30 @@ int proc_0006_Message(char *buf)
     }
     else if (smsg->from < 0) // planet
     {
-        realFrom = MSG_FROM_PLANET;
-        realFromDetail = (uint16_t)(smsg->from * -1);
-        // FIXME, compensate when MAXPLANETS work done
-        // realFromDetail--;
+        // here, it's from a planet or one of the old MSG_* defines
+        // try planets first
+
+        if (-smsg->from >= 1 && -smsg->from <= 60)
+        {
+            realFrom = MSG_FROM_PLANET;
+            // compensate for 0-bsed Planets[]
+            realFromDetail = (uint16_t)(smsg->from * -1) - 1;
+        }
+        else if (smsg->from == -102 /*MSG_GOD*/)
+        {
+            realFrom = MSG_FROM_GOD;
+            realFromDetail = 0;
+        }
+        else if (smsg->from == -103 /*MSG_DOOM*/)
+        {
+            realFrom = MSG_FROM_DOOM;
+            realFromDetail = 0;
+        }
+        else if (smsg->from == -106 /*MSG_COMP*/)
+        {
+            realFrom = MSG_FROM_COMP;
+            realFromDetail = 0;
+        }
     }
     else
     {
@@ -546,8 +584,34 @@ int proc_0006_Message(char *buf)
     }
     else if (smsg->to <= 0) // team
     {
-        realTo = MSG_TO_TEAM;
-        realToDetail = (uint16_t)(smsg->to * -1);
+        // here, it's from a team, or one of the special MSG_* in
+        // older versions proto/cb. Try teams first.
+
+        if (-smsg->to >= 0 && -smsg->to < 4 /*NUMPLAYERTEAMS*/)
+        {
+            realTo = MSG_TO_TEAM;
+            realToDetail = (uint16_t)(smsg->to * -1);
+        }
+        else if (smsg->to == -100 /*MSG_ALL*/)
+        {
+            realTo = MSG_TO_ALL;
+            realToDetail = 0;
+        }
+        else if (smsg->to == -102 /*MSG_GOD*/)
+        {
+            realTo = MSG_TO_GOD;
+            realToDetail = 0;
+        }
+        else if (smsg->to == -105 /*MSG_IMPLEMENTORS*/)
+        {
+            realTo = MSG_TO_IMPLEMENTORS;
+            realToDetail = 0;
+        }
+        else if (smsg->to == -107 /*MSG_FRIENDLY*/)
+        {
+            realTo = MSG_TO_FRIENDLY;
+            realToDetail = 0;
+        }
     }
     else
     {
@@ -562,7 +626,7 @@ int proc_0006_Message(char *buf)
         ((smsg->flags & MSG_FLAGS_ROBOT) && !UserConf.NoRobotMsgs))
     {
         memset((void *)&recMsg, 0, sizeof(Msg_t));
-        strncpy(recMsg.msgbuf, (char *)smsg->msg, 70 /*MESSAGE_SIZE*/);
+        utStrncpy(recMsg.msgbuf, (char *)smsg->msg, 70 /*MESSAGE_SIZE*/);
         recMsg.from = realFrom;
         recMsg.fromDetail = realFromDetail;
         recMsg.to = realTo;
@@ -586,25 +650,25 @@ int proc_0006_Team(char *buf)
         return FALSE;
 
     // this doesn't exist in current cb
-//    Teams[team].homesun = steam->homesun;
+    // Teams[team].homesun = steam->homesun;
 
     if (steam->flags & SP_0006_TEAM_FLAGS_COUPINFO)
-        Teams[team].coupinfo = TRUE;
+        Teams[team].coupinfo = true;
     else
-        Teams[team].coupinfo = FALSE;
+        Teams[team].coupinfo = false;
 
     Teams[team].couptime = steam->couptime;
 
     // this doesn't exist in current cb
-//    for (i=0; i<3; i++)
-//        Teams[team].teamhplanets[i] = steam->teamhplanets[i];
+    //    for (i=0; i<3; i++)
+    //        Teams[team].teamhplanets[i] = steam->teamhplanets[i];
 
     Teams[team].homeplanet = (int)steam->homeplanet;
 
     for (i=0; i<20 /*MAXTSTATS*/; i++)
         Teams[team].stats[i] = (int)ntohl(steam->stats[i]);
 
-    strncpy(Teams[team].name, (char *)steam->name, 12 /*MAXTEAMNAME*/ - 1);
+    utStrncpy(Teams[team].name, (char *)steam->name, 12 /*MAXTEAMNAME*/);
 
     return TRUE;
 }
