@@ -53,8 +53,8 @@ This manual page was originally written by Clint Adams
 others).  Permission is granted to copy, distribute and/or modify this
 document under the terms of the GNU GPL. Conquest is
 .PP
-Copyright (C)1994-2006 by Jon Trulson <jon@radscan.com> under the
-Artistic Version 2 License.
+Copyright (C)1994-2017 by Jon Trulson <jon@radscan.com> under the
+MIT License.
 .PP
 Original VAX/VMS Ratfor Conquest:
 .PP

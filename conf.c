@@ -4,7 +4,7 @@
  *
  * conf.c - handle configuration issues, both personal and system wide.
  *
- * Copyright Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
+ * Copyright Jon Trulson under the MIT License. (See LICENSE).
  ***********************************************************************/
 
 

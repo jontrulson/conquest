@@ -1,7 +1,7 @@
 /************************************************************************
  * This file contains the common block version of the CQI 'global' section.
  *
- * Copyright Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
+ * Copyright Jon Trulson under the MIT License. (See LICENSE).
  ***********************************************************************/
 
 

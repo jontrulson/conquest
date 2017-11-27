@@ -1,7 +1,7 @@
 /*
  * Doomsday structure
  *
- * Copyright Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
+ * Copyright Jon Trulson under the MIT License. (See LICENSE).
  */
 
 #ifndef DOOMSDAY_H_INCLUDED

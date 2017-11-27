@@ -1,7 +1,7 @@
 /*
  * Network stuff
  *
- * Copyright Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
+ * Copyright Jon Trulson under the MIT License. (See LICENSE).
  */
 
 #ifndef CONQNET_H_INCLUDED

@@ -1,7 +1,7 @@
 /*
  * The protocol definition for version 0x0006
  *
- * Copyright Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
+ * Copyright Jon Trulson under the MIT License. (See LICENSE).
  */
 
 #ifndef PROTO_0006_H_INCLUDED

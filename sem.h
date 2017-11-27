@@ -2,7 +2,7 @@
  *
  * sem.h - semaphore operations on the common block.
  *
- * Copyright Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
+ * Copyright Jon Trulson under the MIT License. (See LICENSE).
  ***********************************************************************/
 
 #ifndef __SEM_H

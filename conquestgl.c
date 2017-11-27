@@ -3,7 +3,7 @@
 /************************************************************************
  * The OpenGL client
  *
- * Copyright Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
+ * Copyright Jon Trulson under the MIT License. (See LICENSE).
  ***********************************************************************/
 
 

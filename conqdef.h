@@ -1,6 +1,6 @@
 
 /************************************************************************
- * Copyright Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
+ * Copyright Jon Trulson under the MIT License. (See LICENSE).
  ***********************************************************************/
 
 /*                              C O N Q D E F */

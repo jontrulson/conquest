@@ -4,7 +4,7 @@
  *
  * ibuf.c - input buffering to support Function key macros
  *
- * Copyright Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
+ * Copyright Jon Trulson under the MIT License. (See LICENSE).
  **********************************************************************/
 
 #include "conf.h"

@@ -20,8 +20,8 @@
 #         All comments (starting with '#') and whitespace are ignored.
 #
 # Operators:
-#       
-#       <  <=  >  >=  =  ==  !=  <>  !  &	
+#
+#       <  <=  >  >=  =  ==  !=  <>  !  &
 #
 # Variables:
 #	random		dne		damage		incoming
@@ -34,12 +34,12 @@
 #
 # Actions:
 #
-#       ROB_NOOP        ROB_GOHOME	ROB_GOREPAIR	ROB_ALLOCATE	
-#       ROB_DETONATE	ROB_MYDETONATE	ROB_PHASER	ROB_TORPEDO	
-#       ROB_BURST	ROB_SHIELD	ROB_UNTRACTOR	ROB_WARP_0	
-#       ROB_WARP_2	ROB_WARP_5	ROB_WARP_8	ROB_TRACK	
-#       ROB_SLIENT	ROB_MESSAGE	ROB_TAKEDRUGS	ROB_REPAIR	
-#       ROB_READMSG	ROB_INSULT	ROB_GOFUEL	ROB_RUNAWAY	
+#       ROB_NOOP        ROB_GOHOME	ROB_GOREPAIR	ROB_ALLOCATE
+#       ROB_DETONATE	ROB_MYDETONATE	ROB_PHASER	ROB_TORPEDO
+#       ROB_BURST	ROB_SHIELD	ROB_UNTRACTOR	ROB_WARP_0
+#       ROB_WARP_2	ROB_WARP_5	ROB_WARP_8	ROB_TRACK
+#       ROB_SLIENT	ROB_MESSAGE	ROB_TAKEDRUGS	ROB_REPAIR
+#       ROB_READMSG	ROB_INSULT	ROB_GOFUEL	ROB_RUNAWAY
 #
 # Distance Scaling factors:
 #
@@ -81,16 +81,16 @@ fuel > 0 & incoming > 0 & damage < 8 ; ROB_DETONATE
 dne < 3 & numtorps < 3 & wtemp < 8 ; ROB_MYDETONATE
 
 # 12/24/96
-# raise shields if damage, and the threat can't be an enemy. 
-#  this should reduce the number of sun-deaths for robots a bit 
-dne > 3 & incoming == 0 & ! shup & damage > 0 & etemp < 4 & 
+# raise shields if damage, and the threat can't be an enemy.
+#  this should reduce the number of sun-deaths for robots a bit
+dne > 3 & incoming == 0 & ! shup & damage > 0 & etemp < 4 &
 	! repairing ; ROB_SHIELD
 
 # Lower shields when it's safe.
 dne > 3 & incoming == 0 & shup & ! damage; ROB_SHIELD
 
 # Deallocate weapons if we're not going to use them.
-# dne > 3 & walloc ; ROB_ALLOCATE 
+# dne > 3 & walloc ; ROB_ALLOCATE
 
 # Movement rules. Don't set warp if we are orbiting. (But notice that
 #  if we decide to lock on to a new planet, we're no longer orbiting
@@ -109,7 +109,7 @@ dne < 4 & fuel >= 5 & damage < 2 ; ROB_TRACK
 # 12/21/97
 # this rule added to mitigate a logic 'hole' with fuel ranges between
 #  150-350 that caused NOOP's at inoppertune times. This flaw became
-#  apparent when the fuel scaling bug in buildai() was fixed, as robots 
+#  apparent when the fuel scaling bug in buildai() was fixed, as robots
 #  no longer think they always have maximum fuel.
 dne < 5 & fuel >= 3 & fuel < 5 & damage < 4; ROB_TRACK
 
@@ -143,6 +143,6 @@ random == 7 & dne >= 5 & ! orbiting ; ROB_GOHOME
 
 ###############################################################################
 #
-# Copyright 1999-2006 Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
+# Copyright 1999-2017 Jon Trulson under the MIT LICENSE. (See LICENSE).
 #
 #

@@ -4,7 +4,7 @@
  *
  * client specific packet send routines (to server)
  *
- * Copyright Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
+ * Copyright Jon Trulson under the MIT License. (See LICENSE).
  ***********************************************************************/
 
 #include "conf.h"

@@ -1,7 +1,7 @@
 #include "c_defs.h"
 
 /************************************************************************
- * Copyright Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
+ * Copyright Jon Trulson under the MIT License. (See LICENSE).
  ***********************************************************************/
 
 /*            Copyright (C)1983-1986 by Jef Poskanzer and Craig Leres */

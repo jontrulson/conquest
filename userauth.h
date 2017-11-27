@@ -1,7 +1,7 @@
 /* 
  * common auth functions/defines
  *
- * Copyright Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
+ * Copyright Jon Trulson under the MIT License. (See LICENSE).
  */
 
 #ifndef USERAUTH_H_INCLUDED

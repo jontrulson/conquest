@@ -1,7 +1,7 @@
 /*
  * Stuff for the meta server
  *
- * Copyright Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
+ * Copyright Jon Trulson under the MIT License. (See LICENSE).
  */
 
 #ifndef META_H_INCLUDED

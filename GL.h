@@ -3,7 +3,7 @@
  *  various reasons (performance mainly), some of it needs to be directly
  *  accessible to other modules.
  *
- * Copyright Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
+ * Copyright Jon Trulson under the MIT License. (See LICENSE).
  */
 
 #ifndef _C_GL_H

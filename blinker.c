@@ -4,7 +4,7 @@
  * global blinker animQue here (that the node renderer will iterate)
  * and make the blinkers globally available to conquest.
  *
- * Copyright Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
+ * Copyright Jon Trulson under the MIT License. (See LICENSE).
  */
 
 #include "c_defs.h"

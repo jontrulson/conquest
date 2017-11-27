@@ -1,7 +1,7 @@
 /*
  * Ship information, dependent on Type
  *
- * Copyright Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
+ * Copyright Jon Trulson under the MIT License. (See LICENSE).
  */
 
 #ifndef SHIPTYPE_H_INCLUDED

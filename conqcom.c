@@ -3,7 +3,7 @@
 /************************************************************************
  * Conquest Common Block (aka: The Universe)
  *
- * Copyright Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
+ * Copyright Jon Trulson under the MIT License. (See LICENSE).
  ***********************************************************************/
 
 /*                               C O N Q C M */

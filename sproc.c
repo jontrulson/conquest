@@ -4,7 +4,7 @@
  *
  * server specific proc routines (from client)
  *
- * Copyright Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
+ * Copyright Jon Trulson under the MIT License. (See LICENSE).
  ***********************************************************************/
 
 #include "conqdef.h"

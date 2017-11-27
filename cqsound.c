@@ -1,7 +1,7 @@
 /*
  * cqsound.c
  *
- * Copyright Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
+ * Copyright Jon Trulson under the MIT License. (See LICENSE).
  *
  * Sound for Conquest, courtesy of Cataboligne for the concept
  *

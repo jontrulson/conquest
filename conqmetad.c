@@ -4,7 +4,7 @@
  *
  * conqmetad - the Conquest meta server.  Similiar to conquestd no? :)
  *
- * Copyright Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
+ * Copyright Jon Trulson under the MIT License. (See LICENSE).
  ***********************************************************************/
 
 #define NOEXTERN_GLOBALS

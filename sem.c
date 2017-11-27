@@ -4,7 +4,7 @@
  *
  * sem.c - semaphore operations on the common block. Finally.
  *
- * Copyright Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
+ * Copyright Jon Trulson under the MIT License. (See LICENSE).
  ***********************************************************************/
 
 #if !defined(MINGW)

@@ -3,7 +3,7 @@
  * c_defs.h - C macro defines to ease ratfor to C conversion.  Included
  *               in all files.
  *
- * Copyright Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
+ * Copyright Jon Trulson under the MIT License. (See LICENSE).
  ************************************************************************/
 
 #ifndef _C_DEFS_H

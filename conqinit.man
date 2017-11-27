@@ -91,7 +91,7 @@ web page) for detailed information on the syntax of the files parsed
 by \fBconqinit\fP, as well as other information not mentioned here.
 .SH "COPYRIGHT"
 .PP
-Copyright (C)1994-2006 by Jon Trulson <jon@radscan.com> under the
-Artistic Version 2 License.
+Copyright (C)1994-2017 by Jon Trulson <jon@radscan.com> under the MIT
+License.
 
 

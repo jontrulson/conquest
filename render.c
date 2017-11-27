@@ -1,7 +1,7 @@
 /*
  * higher level rendering for the CP
  *
- * Copyright Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
+ * Copyright Jon Trulson under the MIT License. (See LICENSE).
  */
 
 #include "c_defs.h"

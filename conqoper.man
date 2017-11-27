@@ -70,8 +70,8 @@ See CONQINIT.TXT for information on CQI, and the format of the
 conqinitrc and texturesrc files.
 .SH "COPYRIGHT"
 .PP
-Copyright (C)1994-2006 by Jon Trulson <jon@radscan.com> under the
-Artistic Version 2 License.
+Copyright (C)1994-2017 by Jon Trulson <jon@radscan.com> under the
+MIT License.
 .PP
 Original VAX/VMS Ratfor Conquest:
 .PP

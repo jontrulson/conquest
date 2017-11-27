@@ -2,7 +2,7 @@
  *
  * defs.h - modify Conquest's behavior - hopefully for the better ;-)
  *
- * Copyright Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
+ * Copyright Jon Trulson under the MIT License. (See LICENSE).
  ***********************************************************************/
 
 

@@ -1,7 +1,7 @@
 /*
  * Per server (conquestd) info
  *
- * Copyright Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
+ * Copyright Jon Trulson under the MIT License. (See LICENSE).
  */
 
 #ifndef SERVER_H_INCLUDED

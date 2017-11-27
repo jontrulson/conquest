@@ -1,7 +1,7 @@
 /*
  * Ship structure
  *
- * Copyright Jon Trulson under the ARTISTIC LICENSE. (See LICENSE).
+ * Copyright Jon Trulson under the MIT License. (See LICENSE).
  */
 
 #ifndef SHIP_H_INCLUDED
