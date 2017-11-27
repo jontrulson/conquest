@@ -249,12 +249,12 @@ int clientHello(char *clientname)
     chello.protover = htons(PROTOCOL_VERSION);
     chello.cmnrev = htonl(COMMONSTAMP);
 
-    strncpy((char *)chello.clientname, clientname, CONF_SERVER_NAME_SZ);
-    strncpy((char *)chello.clientver, ConquestVersion, CONF_SERVER_NAME_SZ);
+    utStrncpy((char *)chello.clientname, clientname, CONF_SERVER_NAME_SZ);
 
-    strcat((char *)chello.clientver, " ");
-    strncat((char *)chello.clientver, ConquestDate,
-            (CONF_SERVER_NAME_SZ - strlen(ConquestVersion)) - 2);
+    utStrncpy((char *)chello.clientver, ConquestVersion, CONF_SERVER_NAME_SZ);
+    utStrncat((char *)chello.clientver, " ", CONF_SERVER_NAME_SZ);
+    utStrncat((char *)chello.clientver, ConquestDate,
+              CONF_SERVER_NAME_SZ);
 
     if (pktWrite(PKT_SENDTCP, &chello) <= 0)
     {

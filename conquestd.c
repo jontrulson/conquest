@@ -1807,12 +1807,14 @@ static int hello(void)
     shello.protover = (uint16_t)htons(PROTOCOL_VERSION);
 
     shello.cmnrev = (uint32_t)htonl(COMMONSTAMP);
-    strncpy((char *)shello.servername, SysConf.ServerName, CONF_SERVER_NAME_SZ);
-    strncpy((char *)shello.serverver, ConquestVersion, CONF_SERVER_NAME_SZ);
-    strcat((char *)shello.serverver, " ");
-    strncat((char *)shello.serverver, ConquestDate,
-            (CONF_SERVER_NAME_SZ - strlen(ConquestVersion)) - 2);
-    strncpy((char *)shello.motd, SysConf.ServerMotd, CONF_SERVER_MOTD_SZ);
+    utStrncpy((char *)shello.servername, SysConf.ServerName,
+              CONF_SERVER_NAME_SZ);
+
+    utStrncpy((char *)shello.serverver, ConquestVersion, CONF_SERVER_NAME_SZ);
+    utStrncat((char *)shello.serverver, " ", CONF_SERVER_NAME_SZ);
+    utStrncat((char *)shello.serverver, ConquestDate,
+              CONF_SERVER_NAME_SZ);
+    utStrncpy((char *)shello.motd, SysConf.ServerMotd, CONF_SERVER_MOTD_SZ);
     shello.flags = 0;
 
     if (ConqInfo->closed)

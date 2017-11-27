@@ -860,6 +860,14 @@ void utStrncpy( char *to, char *from, unsigned int tosize )
     to[tosize - 1] = '\0';
 }
 
+/*  utStrncpy - copy a string with a size limit, ensuring the last
+ *  byte is 0 */
+void utStrncat( char *to, char *from, unsigned int tosize )
+{
+    strncat(to, from, tosize);
+    to[tosize - 1] = '\0';
+}
+
 
 /*  utStringMatch - check whether two strings match or not */
 /*  SYNOPSIS */
