@@ -10,7 +10,7 @@
 #include "conqdef.h"
 
 typedef struct {
-    int  status;			/* doomsday status; one of the DS_ values */
+    int  status;          /* doomsday status; one of the DS_ values */
     real x;			/* x and y coordinates of doomsday */
     real y;
     real dx;			/* x and y increments in mega-meters */

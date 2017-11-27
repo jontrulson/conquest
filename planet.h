@@ -46,8 +46,8 @@ typedef struct {
                                   // players)
     int  armies;                  /* how many armies are on the planet */
     int  uninhabtime;             /* minutes left till inhabitable */
-    int  scanned[NUMPLAYERTEAMS]; /* which planets have been */
-    /* scanned by which teams */
+    bool scanned[NUMPLAYERTEAMS]; /* which planets have been */
+                                  /* scanned by which teams */
     char name[MAXPLANETNAME];     /* planet name */
 } Planet_t;
 

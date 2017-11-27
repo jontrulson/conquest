@@ -12,7 +12,7 @@
 typedef struct {
 
     char name[MAXSTNAME];	/* "Destroyer, Scout, Cruiser" */
-    int armylim;		/* maximum armies this shiptype can carry */
+    unsigned int armylim; /* maximum armies this shiptype can carry */
     real warplim;		/* maximum warp based on shiptype */
     real engfac;		/* shiptype engine constants */
     real accelfac;		/* shiptype acceleration constants */

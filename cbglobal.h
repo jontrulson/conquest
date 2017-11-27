@@ -19,6 +19,9 @@ typedef struct _cb_global {
 
     int maxtorps;                 /* computed at Universal Init time */
     int maxshiptypes;
+
+    int pad[32];
+
 } CBGlobal_t;
 
 #endif /* _CBGLOBAL_H */

@@ -10,7 +10,7 @@
 #include "conqdef.h"
 
 typedef struct {
-    int  closed;                  /* the game is closed, everybody out */
+    bool  closed;                  /* the game is closed, everybody out */
     int  lockword;                /* exclusionary flag */
     int  lockmesg;                /* exclusive access to the message area */
     int  ccpuseconds;		/* cpu seconds used by conquest */
@@ -22,7 +22,7 @@ typedef struct {
     int  raccum;			/* accumulated cpu hundredths */
     int  histptr;			/* points to most recent usage */
     int  lastmsg;			/* the last message sent */
-    int  externrobots;		/* used to disable internal robot code */
+    bool  externrobots;		/* used to disable internal robot code */
     int  glastmsg;                /* the last message read by God */
     char lastupchuck[DATESIZE];	/* last time the common block was updated */
     char ptname[MAXPLANETTYPES][MAXPTYPENAME]; /* planet type names */
