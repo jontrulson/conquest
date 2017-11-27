@@ -7,7 +7,7 @@
 
 #include "conqdef.h"
 #include "conqai.h"
-#include "conqcom.h"
+#include "cb.h"
 #include "context.h"
 #include "conf.h"
 #include "conqlb.h"

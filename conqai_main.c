@@ -14,7 +14,7 @@
 
 
 #include "conqdef.h"
-#include "conqcom.h"
+#include "cb.h"
 #include "conqutil.h"
 #include "conqai.h"
 
@@ -73,7 +73,7 @@ int main(int argc, char *argv[])
     }
 
 
-    map_common();
+    cbMap();
 
     if ( *CBlockRevision != COMMONSTAMP )
     {

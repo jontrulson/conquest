@@ -8,7 +8,7 @@
  ***********************************************************************/
 
 #include "conqdef.h"
-#include "conqcom.h"
+#include "cb.h"
 #include "conf.h"
 #include "server.h"
 #include "context.h"

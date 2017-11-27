@@ -69,7 +69,7 @@ endif !GLCLIENT
 
 endif !ISMINGW
 
-libconquest_la_SOURCES = conqai.c conqai.h conqcom.c conqcom.h \
+libconquest_la_SOURCES = conqai.c conqai.h cb.c cb.h \
 	conqlb.h conqlb.c rndlb.c rndlb.h conqutil.c conqutil.h \
 	conqunix.c conqunix.h ibuf.c version.c conf.c sem.c color.c \
 	userauth.c record.c color.h user.h shiptype.h \
@@ -130,16 +130,16 @@ endif !GLCLIENT
 
 endif !ISMINGW
 
-conquest_SOURCES = conquest.c c_defs.h defs.h conqdef.h conqcom.h context.h \
+conquest_SOURCES = conquest.c c_defs.h defs.h conqdef.h cb.h context.h \
 	conqreplay.c
 
 conquest_LDADD = libUiCU.la libUi.la libconqclnt.la libconquest.la libconqinit.la $(LEXLIB) $(YACCLIB)
 
 if ISMINGW
-conquestgl_SOURCES = conquestgl.c c_defs.h defs.h conqdef.h conqcom.h \
+conquestgl_SOURCES = conquestgl.c c_defs.h defs.h conqdef.h cb.h \
 	context.h icon.rc
 else !ISMINGW
-conquestgl_SOURCES = conquestgl.c c_defs.h defs.h conqdef.h conqcom.h \
+conquestgl_SOURCES = conquestgl.c c_defs.h defs.h conqdef.h cb.h \
 	context.h
 endif !ISMINGW
 
@@ -147,24 +147,24 @@ conquestgl_LDADD = libUiGL.la libUi.la libconqclnt.la libcqsound.la \
 	libconquest.la libconqinit.la $(XLIBS) $(LEXLIB) $(YACCLIB)
 
 if TCPW
-conquestd_SOURCES = conquestd.c c_defs.h defs.h conqdef.h conqcom.h \
+conquestd_SOURCES = conquestd.c c_defs.h defs.h conqdef.h cb.h \
 	context.h conqnet.h $(TCPW_H) $(TCPW_C) 
 conquestd_LDADD = libconqserv.la libconquest.la libconqinit.la $(LEXLIB) $(YACCLIB) $(TCPWLIB) $(NSLLIB)
 else
-conquestd_SOURCES = conquestd.c c_defs.h defs.h conqdef.h conqcom.h \
+conquestd_SOURCES = conquestd.c c_defs.h defs.h conqdef.h cb.h \
 	context.h conqnet.h $(TCPW_H)
 conquestd_LDADD = libconqserv.la libconquest.la libconqinit.la $(LEXLIB) $(YACCLIB)
 endif
 
-conqai_SOURCES = conqai_main.c c_defs.h defs.h conqdef.h conqcom.h \
+conqai_SOURCES = conqai_main.c c_defs.h defs.h conqdef.h cb.h \
                  context.h conqdata.h
 
 conqai_LDADD = libconquest.la libconqinit.la  $(LEXLIB) $(YACCLIB)
 
-conqoper_SOURCES = conqoper.c c_defs.h defs.h conqdef.h conqcom.h context.h 
+conqoper_SOURCES = conqoper.c c_defs.h defs.h conqdef.h cb.h context.h 
 conqoper_LDADD = libUiCU.la libUi.la libconqclnt.la libconquest.la libconqinit.la $(LEXLIB) $(YACCLIB) 
 
-conqdriv_SOURCES = conqdriv.c c_defs.h defs.h conqdef.h conqcom.h context.h
+conqdriv_SOURCES = conqdriv.c c_defs.h defs.h conqdef.h cb.h context.h
 conqdriv_LDADD = libconquest.la libconqinit.la $(LEXLIB) $(YACCLIB)
 
 conqstrat_SOURCES = conqstrat-yacc.y conqstrat-lex.l conqstrat.h

@@ -10,7 +10,7 @@
 #include "conqinit-yacc.h"
 
 #include "conqdef.h"
-#include "conqcom.h"
+#include "cb.h"
 
 int goterror = 0;
 int lineNum = 1; /* current line number of the scanner */

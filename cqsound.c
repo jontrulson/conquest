@@ -10,7 +10,7 @@
 #include "c_defs.h"
 
 #include "conqdef.h"
-#include "conqcom.h"
+#include "cb.h"
 #include "context.h"
 #include "global.h"
 

@@ -15,7 +15,7 @@
 
 #include "defs.h"
 #include "global.h"
-#include "conqcom.h"
+#include "cb.h"
 #include "conqlb.h"
 #include "conqutil.h"
 
@@ -91,8 +91,8 @@ int semInit(void)
 }
 
 
-/* Lock() - lock part of the common block by attempting to inc a semaphore. */
-void Lock(int what)
+/* semLock() - lock part of the common block by attempting to inc a semaphore. */
+void semLock(int what)
 {
 #if !defined(MINGW)
     static int Done;
@@ -101,9 +101,9 @@ void Lock(int what)
         return;			/* clients don't use sems... */
 
 #ifdef DEBUG_SEM
-    utLog("Lock(%s): Attempting to aquire a lock.",
+    utLog("semLock(%s): Attempting to aquire a lock.",
           semGetName(what));
-    utLog("Lock(%s): %s", semGetName(what), semGetStatusStr());
+    utLog("semLock(%s): %s", semGetName(what), semGetStatusStr());
 #endif
 
     Done = FALSE;
@@ -129,10 +129,10 @@ void Lock(int what)
                 int err;
 
                 err = errno;
-                utLog("Lock(%s): semop(): failed: %s",
+                utLog("semLock(%s): semop(): failed: %s",
                       semGetName(what),
                       strerror(err));
-                fprintf(stderr, "Lock(%s): semop(): failed: %s\n",
+                fprintf(stderr, "semLock(%s): semop(): failed: %s\n",
                         semGetName(what),
                         strerror(err));
 
@@ -140,7 +140,7 @@ void Lock(int what)
             }
             else
             {
-                utLog("Lock(%s): semop(): interrupted. Retrying lock attempt.", semGetName(what));
+                utLog("semLock(%s): semop(): interrupted. Retrying lock attempt.", semGetName(what));
             }
         }
         else			/* we got a successful lock */
@@ -148,7 +148,7 @@ void Lock(int what)
     }
 
 #ifdef DEBUG_SEM
-    utLog("Lock(%s): semop(): succeeded, got a lock",
+    utLog("semLock(%s): semop(): succeeded, got a lock",
           semGetName(what));
 #endif
 
@@ -156,8 +156,8 @@ void Lock(int what)
     return;
 }
 
-/* Unlock() - unlock part of the common block (dec a semaphore to 0) */
-void Unlock(int what)
+/* semUnlock() - unlock part of the common block (dec a semaphore to 0) */
+void semUnlock(int what)
 {
 #if !defined(MINGW)
     int retval;
@@ -173,9 +173,9 @@ void Unlock(int what)
 
 
 #ifdef DEBUG_SEM
-    utLog("Unlock(%s): Attempting to free a lock.",
+    utLog("semUnlock(%s): Attempting to free a lock.",
           semGetName(what));
-    utLog("Unlock(%s): %s", semGetName(what), semGetStatusStr());
+    utLog("semUnlock(%s): %s", semGetName(what), semGetStatusStr());
 #endif
 
 
@@ -186,7 +186,7 @@ void Unlock(int what)
     if (retval != 0)
     {				/* couldn't get semvals */
 #if !defined(CYGWIN)
-        utLog("Unlock(%s): semctl(GETALL) failed: %s",
+        utLog("semUnlock(%s): semctl(GETALL) failed: %s",
               semGetName(what),
               strerror(errno));
 #endif
@@ -196,7 +196,7 @@ void Unlock(int what)
 				/* check to see if already unlocked */
         if (semvals[what] == 0)	/* sem already unlocked - report and continue */
 	{
-            utLog("Unlock(%s): semaphore already unlocked.",
+            utLog("semUnlock(%s): semaphore already unlocked.",
                   semGetName(what));
 
             /* allow alarms again */
@@ -219,17 +219,17 @@ void Unlock(int what)
     {
         if (errno != EINTR)
 	{
-            utLog("Unlock(%s): semop(): failed: %s",
+            utLog("semUnlock(%s): semop(): failed: %s",
                   semGetName(what),
                   strerror(errno));
-            fprintf(stderr,"Unlock(%s): semop(): failed: %s",
+            fprintf(stderr,"semUnlock(%s): semop(): failed: %s",
                     semGetName(what),
                     strerror(errno));
             exit(1);
 	}
         else
 	{
-            utLog("Unlock(%s): semop(): interrupted. continuing...", semGetName(what));
+            utLog("semUnlock(%s): semop(): interrupted. continuing...", semGetName(what));
 #ifdef DEBUG_SEM
             err = EINTR;
 #endif
@@ -239,7 +239,7 @@ void Unlock(int what)
     /* hopefully we got a lock */
 #ifdef DEBUG_SEM
     if (!err)
-        utLog("Unlock(%s): semop(): succeeded, removed lock",
+        utLog("semUnlock(%s): semop(): succeeded, removed lock",
               semGetName(what));
 #endif
 

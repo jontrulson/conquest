@@ -14,7 +14,7 @@
 /*    purpose. It is provided "as is" without express or implied warranty. */
 
 #include "conqdef.h"
-#include "conqcom.h"
+#include "cb.h"
 #include "context.h"
 #include "conqlb.h"
 #include "conqutil.h"
@@ -104,10 +104,10 @@ void clbDamage( int snum, real dam, killedBy_t kb, uint16_t detail )
 void clbDetonate( int snum, int tnum )
 {
 
-    PVLOCK(&ConqInfo->lockword);
+    cbLock(&ConqInfo->lockword);
     if ( Ships[snum].torps[tnum].status == TS_LIVE )
         Ships[snum].torps[tnum].status = TS_DETONATE;
-    PVUNLOCK(&ConqInfo->lockword);
+    cbUnlock(&ConqInfo->lockword);
 
     return;
 
@@ -320,9 +320,9 @@ void clbKillShip(int snum, killedBy_t kb, uint16_t detail)
 #endif
 
     /* internal routine. */
-    PVLOCK(&ConqInfo->lockword);
+    cbLock(&ConqInfo->lockword);
     clbIKill( snum, kb, detail );
-    PVUNLOCK(&ConqInfo->lockword);
+    cbUnlock(&ConqInfo->lockword);
 
     /* send a msg to all... */
     sendmesg = FALSE;
@@ -466,7 +466,7 @@ int clbLaunch( int snum, real dir, int number, int ltype )
     tnum = number;
 
     /* Find free torp(s). */
-    PVLOCK(&ConqInfo->lockword);
+    cbLock(&ConqInfo->lockword);
     for ( i = 0; i < MAXTORPS && tnum != 0; i++ )
         if ( Ships[snum].torps[i].status == TS_OFF )
         {
@@ -475,7 +475,7 @@ int clbLaunch( int snum, real dir, int number, int ltype )
             tslot[numslots++] = i;
             tnum--;
         }
-    PVUNLOCK(&ConqInfo->lockword);
+    cbUnlock(&ConqInfo->lockword);
 
     if (numslots == 0)
     {				/* couldn't find even one */
@@ -555,10 +555,10 @@ int clbLaunch( int snum, real dir, int number, int ltype )
     else
     {				/* torps away! */
         /* Update stats. */
-        PVLOCK(&ConqInfo->lockword);
+        cbLock(&ConqInfo->lockword);
         Users[Ships[snum].unum].stats[USTAT_TORPS] += numfired;
         Teams[Ships[snum].team].stats[TSTAT_TORPS] += numfired;
-        PVUNLOCK(&ConqInfo->lockword);
+        cbUnlock(&ConqInfo->lockword);
 
         if (numfired == number)
 	{			/* fired all requested */
@@ -635,10 +635,10 @@ int clbPhaser( int snum, real dir )
         return ( FALSE );
 
     /* Update stats. */
-    PVLOCK(&ConqInfo->lockword);
+    cbLock(&ConqInfo->lockword);
     Users[Ships[snum].unum].stats[USTAT_PHASERS] += 1;
     Teams[Ships[snum].team].stats[TSTAT_PHASERS] += 1;
-    PVUNLOCK(&ConqInfo->lockword);
+    cbUnlock(&ConqInfo->lockword);
 
     /* Set up last fired direction. */
     Ships[snum].lastphase = dir;
@@ -696,7 +696,7 @@ int clbRegister( char *lname, char *rname, int team, int *unum )
 {
     int i, j;
 
-    PVLOCK(&ConqInfo->lockword);
+    cbLock(&ConqInfo->lockword);
     for ( i = 0; i < MAXUSERS; i++ )
         if ( !ULIVE(i) )
         {
@@ -704,7 +704,7 @@ int clbRegister( char *lname, char *rname, int team, int *unum )
             Users[i].flags = USER_F_LIVE; /* only for now */
             Users[i].opFlags = USER_OP_NONE;
 
-            PVUNLOCK(&ConqInfo->lockword);
+            cbUnlock(&ConqInfo->lockword);
 
             Users[i].rating = 0.0;
             Users[i].team = team;
@@ -726,7 +726,7 @@ int clbRegister( char *lname, char *rname, int team, int *unum )
             return ( TRUE );
         }
 
-    PVUNLOCK(&ConqInfo->lockword);
+    cbUnlock(&ConqInfo->lockword);
 
     return ( FALSE );
 
@@ -746,7 +746,7 @@ void clbResign( int unum, int isoper )
     utStrncpy(usrname, Users[unum].username, MAXUSERNAME);
     utStrncpy(usralias, Users[unum].alias, MAXUSERNAME);
 
-    PVLOCK(&ConqInfo->lockword);
+    cbLock(&ConqInfo->lockword);
     if ( unum >= 0 && unum < MAXUSERS )
     {
         UFCLR(unum, USER_F_LIVE);
@@ -755,7 +755,7 @@ void clbResign( int unum, int isoper )
             if ( unum == History[i].unum )
                 History[i].unum = -1;
     }
-    PVUNLOCK(&ConqInfo->lockword);
+    cbUnlock(&ConqInfo->lockword);
 
     if (isoper != TRUE)
         utLog("INFO: %s (%s) has resigned",
@@ -861,9 +861,9 @@ int clbTakePlanet( int pnum, int snum )
         if ( Ships[i].status == SS_LIVE )
             clbIKill( i, KB_NEWGAME, 0 );
 
-    PVUNLOCK(&ConqInfo->lockword);
+    cbUnlock(&ConqInfo->lockword);
     clbInitGame();
-    PVLOCK(&ConqInfo->lockword);
+    cbLock(&ConqInfo->lockword);
 
     return -1;                    /* doesn't matter if geno happened if
                                      universe was conquered */
@@ -1364,7 +1364,7 @@ int clbFindShip( int *snum )
     /* maybe free up some slots... */
     clbCheckShips(FALSE);
 
-    PVLOCK(&ConqInfo->lockword);
+    cbLock(&ConqInfo->lockword);
     *snum = -1;
     numvacant = 0;
 
@@ -1423,7 +1423,7 @@ int clbFindShip( int *snum )
         Ships[*snum].eacc = 0;
     }
 
-    PVUNLOCK(&ConqInfo->lockword);
+    cbUnlock(&ConqInfo->lockword);
 
     return ( (*snum != -1) ? TRUE : FALSE );
 
@@ -1726,13 +1726,13 @@ void clbInitEverything(void)
     int i, j;
 
     /* Twiddle the lockword. */
-    PVUNLOCK(&ConqInfo->lockword);
-    PVUNLOCK(&ConqInfo->lockmesg);
+    cbUnlock(&ConqInfo->lockword);
+    cbUnlock(&ConqInfo->lockmesg);
 
     /* Zero EVERYTHING. */
     clbZeroEverything();
 
-    PVLOCK(&ConqInfo->lockword);
+    cbLock(&ConqInfo->lockword);
 
     /* Turn off the universe. It will be turned back on in initUniverse() */
     ConqInfo->closed = TRUE;
@@ -1769,8 +1769,8 @@ void clbInitEverything(void)
     utStrncpy( ConqInfo->lastwords, "Let there be light...", MAXLASTWORDS );
 
     /* Un-twiddle the lockwords. */
-    PVUNLOCK(&ConqInfo->lockword);
-    PVUNLOCK(&ConqInfo->lockmesg);
+    cbUnlock(&ConqInfo->lockword);
+    cbUnlock(&ConqInfo->lockmesg);
 
     clbInitRobots();
     clbInitUniverse();
@@ -1786,9 +1786,9 @@ void clbInitEverything(void)
 void clbInitGame(void)
 {
     /* Twiddle the lockword. */
-    PVUNLOCK(&ConqInfo->lockword);
+    cbUnlock(&ConqInfo->lockword);
 
-    PVLOCK(&ConqInfo->lockword);
+    cbLock(&ConqInfo->lockword);
 
     /* Driver. */
     Driver->drivsecs = 0;
@@ -1805,7 +1805,7 @@ void clbInitGame(void)
     utStrncpy( Doomsday->name, "Doomsday Machine", MAXUSERNAME );
 
     /* Un-twiddle the lockword. */
-    PVUNLOCK(&ConqInfo->lockword);
+    cbUnlock(&ConqInfo->lockword);
 
     /* Set up the physical universe. */
     cqiInitPlanets();
@@ -1924,13 +1924,13 @@ void clbInitShip( int snum, int unum )
     for ( i = 0; i < MAXPLANETS; i++ )
         Ships[snum].srpwar[i] = FALSE;
     /* Ships[snum].sdfuse                 # setup in clbFindShip() */
-    PVLOCK(&ConqInfo->lockmesg);
+    cbLock(&ConqInfo->lockmesg);
     if ( Ships[snum].lastmsg == LMSG_NEEDINIT )
     {
         Ships[snum].lastmsg = ConqInfo->lastmsg;
         Ships[snum].alastmsg = Ships[snum].lastmsg;
     }
-    PVUNLOCK(&ConqInfo->lockmesg);
+    cbUnlock(&ConqInfo->lockmesg);
     Ships[snum].towing = 0;
     Ships[snum].towedby = 0;
     Ships[snum].lastblast = 0.0;
@@ -1979,8 +1979,8 @@ void clbInitUniverse(void)
     int i;
 
     /* Twiddle the lockword. */
-    PVUNLOCK(&ConqInfo->lockword);
-    PVLOCK(&ConqInfo->lockword);
+    cbUnlock(&ConqInfo->lockword);
+    cbLock(&ConqInfo->lockword);
 
     utStrncpy( ShipTypes[ST_SCOUT].name, "Scout", MAXSTNAME );
     ShipTypes[ST_SCOUT].armylim = 7;
@@ -2071,7 +2071,7 @@ void clbInitUniverse(void)
     }
 
     /* Un-twiddle the lockword. */
-    PVUNLOCK(&ConqInfo->lockword);
+    cbUnlock(&ConqInfo->lockword);
 
     clbInitGame();
     clbClearShips();
@@ -2137,7 +2137,7 @@ int clbLogHist( int unum )
 {
     int hnum;
 
-    PVLOCK(&ConqInfo->lockword);
+    cbLock(&ConqInfo->lockword);
     ConqInfo->histptr = utModPlusOne( ConqInfo->histptr + 1, MAXHISTLOG );
     /* time stamp for this entry */
     History[ConqInfo->histptr].enterTime = time(0);
@@ -2147,7 +2147,7 @@ int clbLogHist( int unum )
               Users[unum].username, MAXUSERNAME);
     hnum = ConqInfo->histptr;
 
-    PVUNLOCK(&ConqInfo->lockword);
+    cbUnlock(&ConqInfo->lockword);
     return(hnum);
 }
 
@@ -2476,7 +2476,7 @@ void clbStoreMsgf( msgFrom_t from, uint16_t fromDetail,
         if (flags & (MSG_FLAGS_TERSABLE | MSG_FLAGS_FEEDBACK))
             return;
 
-    PVLOCK(&ConqInfo->lockmesg);
+    cbLock(&ConqInfo->lockmesg);
     nlastmsg = utModPlusOne( ConqInfo->lastmsg + 1, MAXMESSAGES );
     utStrncpy( Msgs[nlastmsg].msgbuf, msg, MESSAGE_SIZE );
     Msgs[nlastmsg].from = from;
@@ -2491,7 +2491,7 @@ void clbStoreMsgf( msgFrom_t from, uint16_t fromDetail,
         if ( nlastmsg == Ships[i].alastmsg )
             Ships[i].alastmsg = LMSG_READALL;
 
-    PVUNLOCK(&ConqInfo->lockmesg);
+    cbUnlock(&ConqInfo->lockmesg);
 
     if (SysConf.LogMessages == TRUE || to == MSG_TO_GOD
         || from == MSG_FROM_GOD)
@@ -2607,7 +2607,7 @@ int clbUseFuel( int snum, real fuel, int weapon, int forreal )
 void clbZeroEverything(void)
 {
 
-    zero_common();
+    cbZero();
 
     return;
 
@@ -2970,10 +2970,10 @@ void clbCheckShips(int isDriver)
                 /* just turn it off and log it */
                 utLog("INFO: clbCheckShips(isDriver=%d): turning off VACANT ship %d",
                       isDriver, i);
-                PVLOCK(&ConqInfo->lockword);
+                cbLock(&ConqInfo->lockword);
                 clbIKill(i,  KB_GOD, 0);
                 clbZeroShip( i );
-                PVUNLOCK(&ConqInfo->lockword);
+                cbUnlock(&ConqInfo->lockword);
             }
         }
     }

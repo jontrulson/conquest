@@ -8,7 +8,7 @@
 
 #include "color.h"
 #include "conf.h"
-#include "conqcom.h"
+#include "cb.h"
 #include "gldisplay.h"
 #include "node.h"
 #include "client.h"

@@ -6,18 +6,8 @@
  * Copyright Jon Trulson under the MIT License. (See LICENSE).
  ***********************************************************************/
 
-/*                               C O N Q C M */
-/*            Copyright (C)1983-1986 by Jef Poskanzer and Craig Leres */
-/*    Permission to use, copy, modify, and distribute this software and */
-/*    its documentation for any purpose and without fee is hereby granted, */
-/*    provided that this copyright notice appear in all copies and in all */
-/*    supporting documentation. Jef Poskanzer and Craig Leres make no */
-/*    representations about the suitability of this software for any */
-/*    purpose. It is provided "as is" without express or implied warranty. */
-
-
-#define NOEXTERN_CONQCOM
-#include "conqcom.h"		/* common block vars defined here */
+#define NOEXTERN_CB
+#include "cb.h"                 /* common block vars defined here */
 
 #include "global.h"
 #include "conqdef.h"
@@ -55,231 +45,26 @@ static int fakeCommon = FALSE;	/* for the clients */
         coff = CB_ALIGN(coff, CB_ALIGNMENT);            \
     }
 
+// Static functions...
 
-static void map_vars(void);
+static int _checkCB(char *fname, int fmode, int sizeofcb);
 
-
-/* we'll use a hack to translate the lock[mesg|word] pointers into
-   a semaphore selector */
-
-void PVLOCK(int *lockptr)
-{
-    int semnum;
-
-    if (lockptr == &ConqInfo->lockmesg)
-        semnum = LOCKMSG;
-    else
-        semnum = LOCKCMN;
-
-    Lock(semnum);
-
-    (*lockptr)++;
-
-    return;
-}
-
-void PVUNLOCK(int *lockptr)
-{
-    int semnum;
-
-    if (lockptr == &ConqInfo->lockmesg)
-        semnum = LOCKMSG;
-    else
-        semnum = LOCKCMN;
-
-    Unlock(semnum);
-
-    return;
-}
-
-/* flush_common() - flush a common block */
-void flush_common(void)
-{
-    if (fakeCommon)
-        return;
-
-#if !defined(MINGW)
-    /* fbsd doesn't like MS_SYNC       */
-    /* which is prefered, but oh well */
-# if defined(FREEBSD)
-    if (msync((caddr_t)cBasePtr, SIZEOF_COMMONBLOCK, 0) == -1)
-# else
-        if (msync((caddr_t)cBasePtr, SIZEOF_COMMONBLOCK, MS_SYNC) == -1)
-# endif
-            utLog("flush_common(): msync(): %s", strerror(errno));
-#endif
-
-    return;
-}
-
-/* check_cblock() - open/verify a common block - init if necc, return TRUE
-   if successful */
-int check_cblock(char *fname, int fmode, int sizeofcb)
-{
-    int ffd;
-    struct stat sbuf;
-
-    /* first stat the file, if it exists
-       then verify the size.  unlink if size
-       mismatch */
-    if (stat(fname, &sbuf) != -1)   /* ok if this fails */
-    {				/* file exists - verify size */
-        if (sbuf.st_size != sizeofcb)
-	{
-            printf("%s: File size mismatch (expected %d, was %d), removing.\n",
-                   fname,
-                   sizeofcb,
-                   (unsigned int)sbuf.st_size);
-            if (unlink(fname) == -1)
-	    {
-                printf("check_cblock(): unlink(%s) failed: %s\n",
-                       fname,
-                       strerror(errno));
-                return(FALSE);
-	    }
-	}
-    }
-
-
-    /* ok, either the file exists with the right
-       size, or it doesn't exist at all -
-       now open (and create) if necc */
-
-    umask(0);			/* clear umask, just in case... */
-
-    if ((ffd = open(fname, O_RDONLY)) == -1)
-    {				/* Error or not there...  */
-        if (errno == ENOENT)	/* Not There */
-	{			/* create it */
-            if ((ffd = creat(fname, fmode)) == -1)
-	    {
-                printf("check_cblock(): creat(%s) failed: %s\n",
-                       fname,
-                       strerror(errno));
-                return(FALSE);
-	    }
-            else
-	    {			/* Create it */
-                printf("Initializing common block: %s\n", fname);
-                cBasePtr = (char *) mymalloc(sizeofcb); /* this exits if malloc fails */
-                memset(cBasePtr, 0, sizeofcb);
-
-                if (write(ffd, cBasePtr, sizeofcb) <= 0)
-                {
-                    printf("check_cblock(): write() failed: %s\n",
-                           strerror(errno));
-
-                    close(ffd);
-                    free(cBasePtr);
-                    cBasePtr = NULL;
-                    return FALSE;
-                }
-
-                close(ffd);
-                free(cBasePtr);
-                cBasePtr = NULL;
-	    }
-	}
-        else
-	{			/* some other error */
-            printf("check_cblock(): open(%s, O_RDONLY) failed: %s\n",
-                   fname,
-                   strerror(errno));
-            return(FALSE);
-	}
-    }
-
-    close(ffd);			/* everything ok.. */
-
-#if !defined(MINGW)
-    /* set ownership */
-    if (chown(fname, 0, -1) == -1)
-    {
-        // don't whine on EPERM.  Many systems don't allow
-        // ordinary users to chown anymore
-        if (errno != EPERM)
-            printf("check_cblock(): chown() failed: %s\n",
-                   strerror(errno));
-    }
-#endif
-
-    return(TRUE);			/* everything there, and right size */
-}
-
-/* my malloc wrapper. used only when mapping
-   or initializing a commonblock */
-void *mymalloc(int size)
+/* my malloc wrapper. used only when mapping or initializing a
+   commonblock */
+static void *_mymalloc(size_t size)
 {
     void *ptr;
 
     if ((ptr = malloc(size)) == NULL)
     {
-	perror("mymalloc");
+	perror("_mymalloc");
 	exit(1);
     }
     return(ptr);
 }
 
-void map_common(void)
-{
-#if !defined(MINGW)
-    int cmn_fd;
-    static char cmnfile[PATH_MAX] = {};
-#endif
-
-    if (fakeCommon)
-        return;
-
-#if defined(MINGW)
-    fprintf(stderr, "%s: Only fake common blocks are supported under MINGW\n");
-    exit(1);
-#else  /* MINGW */
-    snprintf(cmnfile, PATH_MAX, "%s/%s", CONQSTATE, C_CONQ_COMMONBLK);
-
-    /* verify it's validity */
-    if (check_cblock(cmnfile, CMN_MODE, SIZEOF_COMMONBLOCK) == FALSE)
-        exit(1);			/* an unrecoverable error */
-
-    /* reopen it... */
-    if ((cmn_fd = open(cmnfile, O_RDWR)) == -1)
-    {
-        perror("map_common:open(O_RDWR)");
-        exit(1);
-    }
-
-    /* Now lets map it */
-
-# ifndef MAP_FILE
-#  define MAP_FILE 0		/* some arch's don't def this */
-# endif
-
-    if ((cBasePtr = mmap((caddr_t) 0, (size_t) SIZEOF_COMMONBLOCK,
-                         PROT_READ | PROT_WRITE, MAP_SHARED | MAP_FILE,
-                         cmn_fd, 0)) == MAP_FAILED)
-    {
-        perror("map_common():mmap()");
-        exit(1);
-    }
-#endif  /* MINGW */
-
-    /* now map the variables into the
-       common block */
-    map_vars();
-
-    return;
-}
-
-void zero_common(void)
-{				/* zero the common block, called from
-				   init everything */
-    memset(cBasePtr, 0, SIZEOF_COMMONBLOCK);
-    upchuck();			/* flush the commonblock */
-
-    return;
-}
-
 /* maps the actual vars into the common block */
-static void map_vars(void)
+static void _mapCBVariables(void)
 {
     coff = 0;
 
@@ -314,25 +99,232 @@ static void map_vars(void)
     return;
 }
 
-void fake_common(void)
+static void _initFakeCB(void)
 {
     fakeCommon = TRUE;
 
     /* this will exit if it fails */
     if (!cBasePtr)
-        cBasePtr = (char *)mymalloc(SIZEOF_COMMONBLOCK);
+        cBasePtr = (char *)_mymalloc(SIZEOF_COMMONBLOCK);
 
-    map_vars();
+    _mapCBVariables();
 
-    zero_common();
+    cbZero();
+    return;
+}
+
+// The good stuff...
+
+/* we'll use a hack to translate the lock[mesg|word] pointers into
+   a semaphore selector */
+
+void cbLock(int *lockptr)
+{
+    int semnum;
+
+    if (lockptr == &ConqInfo->lockmesg)
+        semnum = LOCKMSG;
+    else
+        semnum = LOCKCMN;
+
+    semLock(semnum);
+
+    (*lockptr)++;
+
+    return;
+}
+
+void cbUnlock(int *lockptr)
+{
+    int semnum;
+
+    if (lockptr == &ConqInfo->lockmesg)
+        semnum = LOCKMSG;
+    else
+        semnum = LOCKCMN;
+
+    semUnlock(semnum);
+
+    return;
+}
+
+/* cbFlush() - flush a common block */
+void cbFlush(void)
+{
+    if (fakeCommon)
+        return;
+
+#if !defined(MINGW)
+    /* fbsd doesn't like MS_SYNC       */
+    /* which is prefered, but oh well */
+# if defined(FREEBSD)
+    if (msync((caddr_t)cBasePtr, SIZEOF_COMMONBLOCK, 0) == -1)
+# else
+        if (msync((caddr_t)cBasePtr, SIZEOF_COMMONBLOCK, MS_SYNC) == -1)
+# endif
+            utLog("cbFlush(): msync(): %s", strerror(errno));
+#endif
+
+    return;
+}
+
+/* _checkCB() - open/verify a common block - init if necc, return TRUE
+   if successful */
+static int _checkCB(char *fname, int fmode, int sizeofcb)
+{
+    int ffd;
+    struct stat sbuf;
+
+    /* first stat the file, if it exists
+       then verify the size.  unlink if size
+       mismatch */
+    if (stat(fname, &sbuf) != -1)   /* ok if this fails */
+    {				/* file exists - verify size */
+        if (sbuf.st_size != sizeofcb)
+	{
+            printf("%s: File size mismatch (expected %d, was %d), removing.\n",
+                   fname,
+                   sizeofcb,
+                   (unsigned int)sbuf.st_size);
+            if (unlink(fname) == -1)
+	    {
+                printf("_checkCB(): unlink(%s) failed: %s\n",
+                       fname,
+                       strerror(errno));
+                return(FALSE);
+	    }
+	}
+    }
+
+
+    /* ok, either the file exists with the right
+       size, or it doesn't exist at all -
+       now open (and create) if necc */
+
+    umask(0);			/* clear umask, just in case... */
+
+    if ((ffd = open(fname, O_RDONLY)) == -1)
+    {				/* Error or not there...  */
+        if (errno == ENOENT)	/* Not There */
+	{			/* create it */
+            if ((ffd = creat(fname, fmode)) == -1)
+	    {
+                printf("_checkCB(): creat(%s) failed: %s\n",
+                       fname,
+                       strerror(errno));
+                return(FALSE);
+	    }
+            else
+	    {			/* Create it */
+                printf("Initializing common block: %s\n", fname);
+                cBasePtr = (char *) _mymalloc(sizeofcb); /* this exits if malloc fails */
+                memset(cBasePtr, 0, sizeofcb);
+
+                if (write(ffd, cBasePtr, sizeofcb) <= 0)
+                {
+                    printf("_checkCB(): write() failed: %s\n",
+                           strerror(errno));
+
+                    close(ffd);
+                    free(cBasePtr);
+                    cBasePtr = NULL;
+                    return FALSE;
+                }
+
+                close(ffd);
+                free(cBasePtr);
+                cBasePtr = NULL;
+	    }
+	}
+        else
+	{			/* some other error */
+            printf("_checkCB(): open(%s, O_RDONLY) failed: %s\n",
+                   fname,
+                   strerror(errno));
+            return(FALSE);
+	}
+    }
+
+    close(ffd);			/* everything ok.. */
+
+#if !defined(MINGW)
+    /* set ownership */
+    if (chown(fname, 0, -1) == -1)
+    {
+        // don't whine on EPERM.  Many systems don't allow
+        // ordinary users to chown anymore
+        if (errno != EPERM)
+            printf("_checkCB(): chown() failed: %s\n",
+                   strerror(errno));
+    }
+#endif
+
+    return(TRUE);			/* everything there, and right size */
+}
+
+void cbMap(void)
+{
+#if !defined(MINGW)
+    int cmn_fd;
+    static char cmnfile[PATH_MAX] = {};
+#endif
+
+    if (fakeCommon)
+        return;
+
+#if defined(MINGW)
+    fprintf(stderr, "%s: Only fake common blocks are supported under MINGW\n");
+    exit(1);
+#else  /* MINGW */
+    snprintf(cmnfile, PATH_MAX, "%s/%s", CONQSTATE, C_CONQ_COMMONBLK);
+
+    /* verify it's validity */
+    if (_checkCB(cmnfile, CMN_MODE, SIZEOF_COMMONBLOCK) == FALSE)
+        exit(1);			/* an unrecoverable error */
+
+    /* reopen it... */
+    if ((cmn_fd = open(cmnfile, O_RDWR)) == -1)
+    {
+        perror("cbMap():open(O_RDWR)");
+        exit(1);
+    }
+
+    /* Now lets map it */
+
+# ifndef MAP_FILE
+#  define MAP_FILE 0		/* some arch's don't def this */
+# endif
+
+    if ((cBasePtr = mmap((caddr_t) 0, (size_t) SIZEOF_COMMONBLOCK,
+                         PROT_READ | PROT_WRITE, MAP_SHARED | MAP_FILE,
+                         cmn_fd, 0)) == MAP_FAILED)
+    {
+        perror("cbMap():mmap()");
+        exit(1);
+    }
+#endif  /* MINGW */
+
+    /* now map the variables into the
+       common block */
+    _mapCBVariables();
+
+    return;
+}
+
+void cbZero(void)
+{				/* zero the common block, called from
+				   init everything */
+    memset(cBasePtr, 0, SIZEOF_COMMONBLOCK);
+    upchuck();			/* flush the commonblock */
+
     return;
 }
 
 /* short cut */
-void map_lcommon(void)
+void cbMapLocal(void)
 {
     /* a parallel universe, it is */
-    fake_common();
+    _initFakeCB();
     clbInitEverything();
     clbInitMsgs();
     *CBlockRevision = COMMONSTAMP;

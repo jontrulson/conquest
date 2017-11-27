@@ -15,7 +15,7 @@
 #include "node.h"
 #include "ship.h"
 #include "prm.h"
-#include "conqcom.h"
+#include "cb.h"
 #include "conqlb.h"
 #include "conqutil.h"
 #include "nDead.h"

@@ -8,7 +8,7 @@
 
 
 #include "conqdef.h"
-#include "conqcom.h"
+#include "cb.h"
 
 #include "conqutil.h"
 #include "rndlb.h"
@@ -492,7 +492,7 @@ int main(int argc, char *argv[])
     loadTextureRCFiles();
 
     /* a parallel universe, it is */
-    map_lcommon();
+    cbMapLocal();
 
     /* init and load the sounds */
     if (dosound)

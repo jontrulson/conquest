@@ -9,7 +9,7 @@
 #include "context.h"
 #include "global.h"
 #include "color.h"
-#include "conqcom.h"
+#include "cb.h"
 #include "conqlb.h"
 #include "rndlb.h"
 #include "conqutil.h"

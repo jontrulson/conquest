@@ -10,7 +10,7 @@
 
 #include "color.h"
 #include "conf.h"
-#include "conqcom.h"
+#include "cb.h"
 #include "client.h"
 #include "nWelcome.h"
 #include "nMenu.h"

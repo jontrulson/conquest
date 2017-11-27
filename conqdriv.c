@@ -20,7 +20,7 @@
 #include "conf.h"
 
 #include "conqdef.h"
-#include "conqcom.h"
+#include "cb.h"
 #include "conqlb.h"
 #include "rndlb.h"
 #include "conqutil.h"
@@ -89,7 +89,7 @@ int main(int argc, char *argv[])
     for (i=0; i < FOPEN_MAX; i++)
         close(i);
 
-    map_common();
+    cbMap();
 
     if ( *CBlockRevision != COMMONSTAMP )
         utLog("conqdriv:ERROR:common block mismatch");
@@ -98,7 +98,7 @@ int main(int argc, char *argv[])
     cacc = 0;
     eacc = 0;
 
-    PVLOCK(&ConqInfo->lockword);
+    cbLock(&ConqInfo->lockword);
     utGetSecs( &Driver->drivtime );		/* prevent driver timeouts */
     utGetSecs( &Driver->playtime );
 
@@ -121,13 +121,13 @@ int main(int argc, char *argv[])
         /* Make sure we're supposed to be starting. */
         if ( Driver->drivstat != DRS_RESTART )
 	{
-            PVUNLOCK(&ConqInfo->lockword);
+            cbUnlock(&ConqInfo->lockword);
             utLog("conqdriv: we shouldn't be starting: drivstat = %d\n", Driver->drivstat);
 	}
 
         if ( Driver->drivpid != 0 )
 	{
-            PVUNLOCK(&ConqInfo->lockword);
+            cbUnlock(&ConqInfo->lockword);
             utLog("conqdriv: Driver->drivpid != 0, drivpid = %d", Driver->drivpid);
 	}
     }
@@ -162,7 +162,7 @@ int main(int argc, char *argv[])
 
     Driver->drivstat = DRS_RUNNING;
 
-    PVUNLOCK(&ConqInfo->lockword);
+    cbUnlock(&ConqInfo->lockword);
 
     if ( force )
     {
@@ -532,7 +532,7 @@ void secdrive( int *ship )
             if ( Ships[i].sdfuse < 0 )
 	    {
                 /* This code may be too safe... */
-                PVLOCK(&ConqInfo->lockword);
+                cbLock(&ConqInfo->lockword);
                 if ( Ships[i].status != SS_LIVE && Ships[i].sdfuse < 0 )
 		{
                     Ships[i].sdfuse = Ships[i].sdfuse + 1;
@@ -544,7 +544,7 @@ void secdrive( int *ship )
                         Ships[i].status = SS_OFF;
 		    }
 		}
-                PVUNLOCK(&ConqInfo->lockword);
+                cbUnlock(&ConqInfo->lockword);
                 continue; /* next;*/
 	    }
 	}
@@ -820,7 +820,7 @@ void secdrive( int *ship )
                 /* Decrement armies. */
                 if ( rnd() <= 0.1 )
                     clbIntrude( -1 /*doomsday*/, Doomsday->lockDetail );
-                PVLOCK(&ConqInfo->lockword);
+                cbLock(&ConqInfo->lockword);
                 Planets[Doomsday->lockDetail].armies =
                     Planets[Doomsday->lockDetail].armies - 1;
                 if ( Planets[Doomsday->lockDetail].armies <= 0 )
@@ -830,7 +830,7 @@ void secdrive( int *ship )
                     clbZeroPlanet( Doomsday->lockDetail, 0 );
                     clbDoomFind();
 		}
-                PVUNLOCK(&ConqInfo->lockword);
+                cbUnlock(&ConqInfo->lockword);
 	    }
 	}
         else if ( Doomsday->lock == LOCK_SHIP
@@ -924,7 +924,7 @@ void fivemindrive(void)
     real r;
 
     /* Drive the planets. */
-    PVLOCK(&ConqInfo->lockword);
+    cbLock(&ConqInfo->lockword);
     for ( i = 0; i < MAXPLANETS; i++ )
         if (Planets[i].type != PLANET_SUN)
         {
@@ -958,7 +958,7 @@ void fivemindrive(void)
                 }
             }
         }
-    PVUNLOCK(&ConqInfo->lockword);
+    cbUnlock(&ConqInfo->lockword);
 
     return;
 

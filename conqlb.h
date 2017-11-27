@@ -8,7 +8,7 @@
 #include "conqdef.h"
 
 #include "conf.h"
-#include "conqcom.h"
+#include "cb.h"
 
 #include "protocol.h"
 

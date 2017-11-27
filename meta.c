@@ -11,7 +11,7 @@
 #include "conqnet.h"
 #include "conf.h"
 #include "meta.h"
-#include "conqcom.h"
+#include "cb.h"
 #include "conqutil.h"
 #include "protocol.h"
 

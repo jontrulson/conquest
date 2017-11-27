@@ -9,7 +9,7 @@
 #include "global.h"
 #include "color.h"
 #include "ui.h"
-#include "conqcom.h"
+#include "cb.h"
 #include "ibuf.h"
 #include "gldisplay.h"
 #include "conf.h"

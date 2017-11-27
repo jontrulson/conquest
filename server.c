@@ -8,7 +8,7 @@
  ***********************************************************************/
 
 #include "conqdef.h"
-#include "conqcom.h"
+#include "cb.h"
 #include "conqlb.h"
 #include "conqutil.h"
 #include "conf.h"

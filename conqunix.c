@@ -14,7 +14,7 @@
 /*    purpose. It is provided "as is" without express or implied warranty. */
 
 #include "conqdef.h"
-#include "conqcom.h"
+#include "cb.h"
 #include "context.h"
 #include "conf.h"
 #include "global.h"
@@ -145,7 +145,7 @@ void conqstats( int snum )
              &cadd, &eadd );
 
     /* Add in the new amounts. */
-    PVLOCK(&ConqInfo->lockword);
+    cbLock(&ConqInfo->lockword);
     if ( Ships[snum].pid != 0 )
     {
         /* Update stats for a humanoid ship. */
@@ -174,7 +174,7 @@ void conqstats( int snum )
 
 
     }
-    PVUNLOCK(&ConqInfo->lockword);
+    cbUnlock(&ConqInfo->lockword);
 
     return;
 
@@ -214,14 +214,14 @@ void drcheck(void)
             Context.childpid = 0;
 	}
 
-        PVLOCK(&ConqInfo->lockword);
+        cbLock(&ConqInfo->lockword);
         if ( utDeltaSecs( Driver->drivtime, &(Driver->playtime) ) > TIMEOUT_DRIVER )
 	{
             drcreate();
             Driver->drivcnt = utModPlusOne( Driver->drivcnt + 1, 1000 );
             utLog( "Driver timeout #%d.", Driver->drivcnt );
 	}
-        PVUNLOCK(&ConqInfo->lockword);
+        cbUnlock(&ConqInfo->lockword);
     }
     drstart();
 
@@ -283,10 +283,10 @@ void drkill(void)
     if ( Context.childpid != 0 )
         if ( Context.childpid == Driver->drivpid && Driver->drivstat == DRS_RUNNING )
         {
-            PVLOCK(&ConqInfo->lockword);
+            cbLock(&ConqInfo->lockword);
             if ( Context.childpid == Driver->drivpid && Driver->drivstat == DRS_RUNNING )
                 Driver->drivstat = DRS_KAMIKAZE;
-            PVUNLOCK(&ConqInfo->lockword);
+            cbUnlock(&ConqInfo->lockword);
         }
 #endif  /* MINGW */
     return;
@@ -327,10 +327,10 @@ void drstart(void)
 #if !defined(MINGW)
     if ( Driver->drivstat == DRS_OFF )
     {
-        PVLOCK(&ConqInfo->lockword);
+        cbLock(&ConqInfo->lockword);
         if ( Driver->drivstat == DRS_OFF )
             drcreate();
-        PVUNLOCK(&ConqInfo->lockword);
+        cbUnlock(&ConqInfo->lockword);
     }
 #endif  /* MINGW */
     return;
@@ -489,12 +489,12 @@ int isagod( int unum )
 void upchuck(void)
 {
 
-    PVLOCK(&ConqInfo->lockword);
+    cbLock(&ConqInfo->lockword);
 
     utFormatTime( ConqInfo->lastupchuck, 0 );
-    flush_common();
+    cbFlush();
 
-    PVUNLOCK(&ConqInfo->lockword);
+    cbUnlock(&ConqInfo->lockword);
 
     return;
 

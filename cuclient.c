@@ -18,7 +18,7 @@
 #include "cd2lb.h"
 #include "iolb.h"
 #include "cumisc.h"
-#include "conqcom.h"
+#include "cb.h"
 #include "conqlb.h"
 #include "context.h"
 #include "record.h"

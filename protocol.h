@@ -8,7 +8,7 @@
 #define PROTOCOL_H_INCLUDED
 
 #include "conqdef.h"
-#include "conqcom.h"
+#include "cb.h"
 // version 0006 protocol defs
 #include "proto_0006.h"
 

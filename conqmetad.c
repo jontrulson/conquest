@@ -10,7 +10,7 @@
 #define NOEXTERN_GLOBALS
 #include "global.h"
 
-#include "conqcom.h"
+#include "cb.h"
 
 #define NOEXTERN_CONTEXT
 #include "context.h"

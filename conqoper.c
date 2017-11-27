@@ -20,7 +20,7 @@
 #include "conf.h"
 
 #include "conqdef.h"
-#include "conqcom.h"
+#include "cb.h"
 #include "conqlb.h"
 #include "rndlb.h"
 #include "conqutil.h"
@@ -183,7 +183,7 @@ int main(int argc, char *argv[])
         /* load conqinitrc */
         cqiLoadRC(CQI_FILE_CONQINITRC, NULL, 0, 0);
 
-        map_common();		/* Map the conquest universe common block */
+        cbMap();		/* Map the conquest universe common block */
 
 				/* regen sysconf file? */
         if ((OptionAction & OP_REGENSYSCONF) != 0)
@@ -209,8 +209,8 @@ int main(int argc, char *argv[])
 	{
             ConqInfo->closed = FALSE;
             /* Unlock the lockwords (just in case...) */
-            PVUNLOCK(&ConqInfo->lockword);
-            PVUNLOCK(&ConqInfo->lockmesg);
+            cbUnlock(&ConqInfo->lockword);
+            cbUnlock(&ConqInfo->lockmesg);
             Driver->drivstat = DRS_OFF;
             Driver->drivpid = 0;
             Driver->drivowner[0] = 0;
@@ -269,7 +269,7 @@ int main(int argc, char *argv[])
     /* load conqinitrc */
     cqiLoadRC(CQI_FILE_CONQINITRC, NULL, 0, 0);
 
-    map_common();			/* Map the conquest universe common block */
+    cbMap();			/* Map the conquest universe common block */
     cdinit();			/* initialize display environment */
 
     Context.unum = -1;          /* stow user number */
@@ -1298,8 +1298,8 @@ void operate(void)
 	    {
                 ConqInfo->closed = FALSE;
                 /* Unlock the lockwords (just in case...) */
-                PVUNLOCK(&ConqInfo->lockword);
-                PVUNLOCK(&ConqInfo->lockmesg);
+                cbUnlock(&ConqInfo->lockword);
+                cbUnlock(&ConqInfo->lockmesg);
                 Driver->drivstat = DRS_OFF;
                 Driver->drivpid = 0;
                 Driver->drivowner[0] = 0;
@@ -3593,8 +3593,8 @@ int DoInit(char InitChar, int cmdline)
         break;
 
     case 'l':
-        PVUNLOCK(&ConqInfo->lockword);
-        PVUNLOCK(&ConqInfo->lockmesg);
+        cbUnlock(&ConqInfo->lockword);
+        cbUnlock(&ConqInfo->lockmesg);
         *CBlockRevision = COMMONSTAMP;
 
         if (cmdline == TRUE)

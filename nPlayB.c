@@ -10,7 +10,7 @@
 
 #include "color.h"
 #include "conf.h"
-#include "conqcom.h"
+#include "cb.h"
 #include "conqlb.h"
 #include "conqutil.h"
 #include "gldisplay.h"

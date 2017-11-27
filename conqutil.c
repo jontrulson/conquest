@@ -15,7 +15,7 @@
 
 
 #include "conqdef.h"
-#include "conqcom.h"
+#include "cb.h"
 #include "global.h"
 #include "context.h"
 #include "color.h"

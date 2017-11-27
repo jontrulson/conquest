@@ -20,7 +20,7 @@
 #include "conf.h"
 
 #include "conqdef.h"
-#include "conqcom.h"
+#include "cb.h"
 #include "conqlb.h"
 #include "rndlb.h"
 #include "conqutil.h"
@@ -435,7 +435,7 @@ int main(int argc, char *argv[])
 
 
     /* a parallel universe, it is */
-    map_lcommon();
+    cbMapLocal();
 
 #ifdef DEBUG_FLOW
     utLog("%s@%d: main() starting conqinit().", __FILE__, __LINE__);

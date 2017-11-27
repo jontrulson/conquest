@@ -14,7 +14,7 @@
 #include "conf.h"
 
 #include "conqdef.h"
-#include "conqcom.h"
+#include "cb.h"
 #include "conqlb.h"
 #include "rndlb.h"
 #include "conqutil.h"
@@ -140,9 +140,9 @@ void checkMaster(void)
     if (!checkPID(ConqInfo->conqservPID))
     {				/* see if one is really running */
         /* if we are here, we will be the listener */
-        PVLOCK(&ConqInfo->lockword);
+        cbLock(&ConqInfo->lockword);
         ConqInfo->conqservPID = getpid();
-        PVUNLOCK(&ConqInfo->lockword);
+        cbUnlock(&ConqInfo->lockword);
         sInfo.isMaster = TRUE;
         utLog("NET: master server listening on port %d\n", listenPort);
     }
@@ -404,7 +404,7 @@ int main(int argc, char *argv[])
     utLog("%s@%d: main() mapping common block.", __FILE__, __LINE__);
 #endif
 
-    map_common();
+    cbMap();
 
     if ( *CBlockRevision != COMMONSTAMP )
     {
@@ -1189,10 +1189,10 @@ void handleSimpleCmdPkt(cpCommand_t *ccmd)
 void freeship(void)
 {
     conqstats( Context.snum );
-    PVLOCK(&ConqInfo->lockword);
+    cbLock(&ConqInfo->lockword);
     Ships[Context.snum].sdfuse = 0;
     Ships[Context.snum].status = SS_OFF;
-    PVUNLOCK(&ConqInfo->lockword);
+    cbUnlock(&ConqInfo->lockword);
     return;
 }
 
@@ -1398,7 +1398,7 @@ int newship( int unum, int *snum )
     /* cleanup any unliving ships - this is the first thing we need to do */
     clbCheckShips(FALSE);
 
-    PVLOCK(&ConqInfo->lockword);
+    cbLock(&ConqInfo->lockword);
 
     Ships[*snum].status = SS_ENTERING;		/* show intent to fly */
 
@@ -1415,7 +1415,7 @@ int newship( int unum, int *snum )
                 vec[numvec++] = i;
             }
 
-    PVUNLOCK(&ConqInfo->lockword);
+    cbUnlock(&ConqInfo->lockword);
 
     /* see if we need to reincarnate to a vacant ship */
     if ( j > 0 )
@@ -1432,7 +1432,7 @@ int newship( int unum, int *snum )
 
 
         /* Look for a live ship for us to take. */
-        PVLOCK(&ConqInfo->lockword);
+        cbLock(&ConqInfo->lockword);
         for (i=0; i<MAXSHIPS; i++)
             if ( Ships[i].unum == unum && Ships[i].status == SS_LIVE )
             {
@@ -1444,7 +1444,7 @@ int newship( int unum, int *snum )
                 SFCLR(*snum, SHIP_F_VACANT);
                 break;
             }
-        PVUNLOCK(&ConqInfo->lockword);
+        cbUnlock(&ConqInfo->lockword);
     }
 
     /* Figure out which system to enter. */
@@ -1473,7 +1473,7 @@ int newship( int unum, int *snum )
         Ships[*snum].etime = 0;
     }
 
-    PVLOCK(&ConqInfo->lockword);
+    cbLock(&ConqInfo->lockword);
 
     /* If necessary, initalize the ship */
     if ( fresh )
@@ -1499,10 +1499,10 @@ int newship( int unum, int *snum )
     {				/* if we're reincarnating, skip any
 				   messages that might have been sent
 				   while we were gone */
-        PVLOCK(&ConqInfo->lockmesg);
+        cbLock(&ConqInfo->lockmesg);
         Ships[*snum].lastmsg = ConqInfo->lastmsg;
         Ships[*snum].alastmsg = Ships[*snum].lastmsg;
-        PVUNLOCK(&ConqInfo->lockmesg);
+        cbUnlock(&ConqInfo->lockmesg);
         /* init user's last entry time */
         Users[Ships[*snum].unum].lastentry = time(0);
     }
@@ -1517,7 +1517,7 @@ int newship( int unum, int *snum )
     /* Finally, turn the ship on. */
     Ships[*snum].status = SS_LIVE;
 
-    PVUNLOCK(&ConqInfo->lockword);
+    cbUnlock(&ConqInfo->lockword);
     Context.entship = TRUE;
 
     return ( TRUE );

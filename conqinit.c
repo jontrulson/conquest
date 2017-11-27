@@ -7,7 +7,7 @@
 #include "c_defs.h"
 
 #include "conqdef.h"
-#include "conqcom.h"
+#include "cb.h"
 
 #define NOEXTERN_CONTEXT
 #include "context.h"

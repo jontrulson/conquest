@@ -8,7 +8,7 @@
 #include "context.h"
 #include "color.h"
 #include "cd2lb.h"
-#include "conqcom.h"
+#include "cb.h"
 #include "ibuf.h"
 #include "conf.h"
 #include "ui.h"

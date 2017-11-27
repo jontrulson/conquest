@@ -10,7 +10,7 @@
 #define PACKET_H_INCLUDED
 
 
-#include "conqcom.h"
+#include "cb.h"
 #include "protocol.h"
 
 #define PKT_MAXSIZE     1024	/* no packet should ever be this large. gulp.*/

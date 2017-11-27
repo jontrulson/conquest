@@ -7,7 +7,7 @@
 #include "c_defs.h"
 #include "context.h"
 #include "global.h"
-#include "conqcom.h"
+#include "cb.h"
 
 #include "color.h"
 #include "conf.h"

@@ -7,7 +7,7 @@
 #include "c_defs.h"
 #include "global.h"
 #include "conqdef.h"
-#include "conqcom.h"
+#include "cb.h"
 #include "conqlb.h"
 #include "conqutil.h"
 

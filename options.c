@@ -10,7 +10,7 @@
 
 #include "global.h"
 #include "conqdef.h"
-#include "conqcom.h"
+#include "cb.h"
 #include "color.h"
 #include "ui.h"
 #include "conf.h"

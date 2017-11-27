@@ -12,7 +12,7 @@ extern int pbSpeed;
 #endif /* NOEXTERN_PLAYBACK */
 
 #include "conqdef.h"
-#include "conqcom.h"
+#include "cb.h"
 
 /* First 2 bytes of a gzipped archive.  We use this to detect when an
  * attempt is made to playback a compressed cqr file, but gzip support

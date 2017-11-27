@@ -7,7 +7,7 @@
 #include "global.h"
 #include "context.h"
 #include "color.h"
-#include "conqcom.h"
+#include "cb.h"
 #include "ibuf.h"
 #include "gldisplay.h"
 #include "conf.h"

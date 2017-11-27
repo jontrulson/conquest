@@ -8,7 +8,7 @@
 #define RECORD_H_INCLUDED
 
 #include "conqdef.h"
-#include "conqcom.h"
+#include "cb.h"
 
 #define RECVERSION          20171108 /* current recording version */
 #define RECVERSION_20031004 20031004 /* older recording version(s) */

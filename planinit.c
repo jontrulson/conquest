@@ -5,7 +5,7 @@
  ***********************************************************************/
 
 #include "conqdef.h"
-#include "conqcom.h"
+#include "cb.h"
 #include "context.h"
 #include "conqlb.h"
 #include "conqutil.h"
@@ -24,13 +24,13 @@ void cqiInitPlanets(void)
     int i, j, k;
 
     /* Hump the lockword. */
-    PVUNLOCK(&ConqInfo->lockword);
-    PVLOCK(&ConqInfo->lockword);
+    cbUnlock(&ConqInfo->lockword);
+    cbLock(&ConqInfo->lockword);
 
     if (!cqiGlobal)
     {
         utLog("WARNING: cqiInitPlanets(): cqiGlobal is NULL, can't init planets");
-        PVUNLOCK(&ConqInfo->lockword);
+        cbUnlock(&ConqInfo->lockword);
         return;
     }
 
@@ -39,7 +39,7 @@ void cqiInitPlanets(void)
         utLog("ERROR: cqiInitPlanets: cqiGlobal->maxplanets(%d) != MAXPLANETS(%d)\n",
               cqiGlobal->maxplanets, MAXPLANETS);
 
-        PVUNLOCK(&ConqInfo->lockword);
+        cbUnlock(&ConqInfo->lockword);
         return;
     }
 
@@ -174,7 +174,7 @@ void cqiInitPlanets(void)
     }
 
     /* Un-twiddle the lockword. */
-    PVUNLOCK(&ConqInfo->lockword);
+    cbUnlock(&ConqInfo->lockword);
 
     /* Protect against a system crash here! */
     upchuck();

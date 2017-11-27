@@ -7,7 +7,7 @@
 #include "c_defs.h"
 #include "global.h"
 #include "conqdef.h"
-#include "conqcom.h"
+#include "cb.h"
 #include "context.h"
 #include "conf.h"
 #include "global.h"
@@ -43,7 +43,7 @@ int pbInitReplay(char *fname, time_t *elapsed)
 
     /* don't bother mapping for just a count */
     if (!elapsed)
-        map_lcommon();
+        cbMapLocal();
 
     /* now lets read in the file header and check a few things. */
 

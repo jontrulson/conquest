@@ -7,7 +7,7 @@
 #include "c_defs.h"
 #include "global.h"
 #include "conqdef.h"
-#include "conqcom.h"
+#include "cb.h"
 #include "conqlb.h"
 #include "conqutil.h"
 #include "context.h"
@@ -183,7 +183,7 @@ void expire_users(void)
     }
 
     expire_secs = (SysConf.UserExpiredays * SECS_PER_DAY);
-    PVLOCK(&ConqInfo->lockword);
+    cbLock(&ConqInfo->lockword);
 
     for (i=0; i < MAXUSERS; i++)
     {
@@ -245,7 +245,7 @@ void expire_users(void)
 	    {			/* waste him */
 				/* have to play some trickery here
 				   since resign locks the commonblock */
-                PVUNLOCK(&ConqInfo->lockword);
+                cbUnlock(&ConqInfo->lockword);
 
 #if defined(DEBUG_SERVERAUTH)
                 utLog("expire_users(): calling clbResign(%d, %d)", i, TRUE);
@@ -257,13 +257,13 @@ void expire_users(void)
                       difftime / SECS_PER_DAY,
                       SysConf.UserExpiredays);
                 /* re-aquire the lock */
-                PVLOCK(&ConqInfo->lockword);
+                cbLock(&ConqInfo->lockword);
 	    }
 	}
     }
 
     /* done */
-    PVUNLOCK(&ConqInfo->lockword);
+    cbUnlock(&ConqInfo->lockword);
 
 #if defined(DEBUG_SERVERAUTH)
     utLog("expire_users(): ...Done");

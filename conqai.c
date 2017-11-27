@@ -14,7 +14,7 @@
 
 
 #include "conqdef.h"
-#include "conqcom.h"
+#include "cb.h"
 #include "context.h"
 #include "conqlb.h"
 #include "conqutil.h"
@@ -511,16 +511,16 @@ int newrob( int *snum, int unum )
         return ( FALSE );
 
     /* Show intent to fly. */
-    PVLOCK(&ConqInfo->lockword);
+    cbLock(&ConqInfo->lockword);
     Ships[*snum].status = SS_ENTERING;
-    PVUNLOCK(&ConqInfo->lockword);
+    cbUnlock(&ConqInfo->lockword);
 
     // make sure we got it...
     if ( Ships[*snum].status == SS_OFF )
         return ( FALSE );
 
     /* Initialize the ship. */
-    PVLOCK(&ConqInfo->lockword);
+    cbLock(&ConqInfo->lockword);
 
     clbInitShip( *snum, unum );
     SFSET(*snum, SHIP_F_ROBOT);			/* we're a robot */
@@ -571,7 +571,7 @@ int newrob( int *snum, int unum )
     clbPutShip( *snum, Planets[i].x, Planets[i].y );
     clbFixDeltas( *snum );
     Ships[*snum].status = SS_LIVE;
-    PVUNLOCK(&ConqInfo->lockword);
+    cbUnlock(&ConqInfo->lockword);
 
     return ( TRUE );
 

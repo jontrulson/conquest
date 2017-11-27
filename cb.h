@@ -1,12 +1,13 @@
+// A Unix implementation of a Fortran common block, mostly.
 
 /************************************************************************
  * Copyright Jon Trulson under the MIT License. (See LICENSE).
  ***********************************************************************/
 
-#ifndef CONQCOM_H
-#define CONQCOM_H
+#ifndef CB_H
+#define CB_H
 
-#ifdef NOEXTERN_CONQCOM
+#ifdef NOEXTERN_CB
 #define CEXTERN
 #else
 #define CEXTERN extern
@@ -27,27 +28,20 @@
 
 #define CMN_MODE 0660		/* mode of a new common block */
 
+void cbMap(void);
+void cbFlush(void);
 
-/* conqcm.c */
-void *mymalloc(int size);
-void map_common(void);
-void fake_common(void);		/* malloc cmn rather than map */
-void lock_common(void);
-void flush_common(void);
-int check_cblock(char *fname, int fmode, int sizeofcb);
+void cbLock(int *);
+void cbUnlock(int *);
 
-void PVLOCK(int *);
-void PVUNLOCK(int *);
+void cbZero(void);
+void cbMapLocal(void);
 
-void zero_common(void);
-void fake_common(void);
-void map_lcommon(void);
 /* The Common Block in all it's majesty */
 
-/* Special data items - these must be at the very beginning. */
-/* This must be the first var */
-CEXTERN int *CBlockRevision;	/* common block rev number */
-
+// This must be the first var
+CEXTERN unsigned int *CBlockRevision;	/* common block rev number */
+// This must be the second var
 CEXTERN CBGlobal_t *CBGlobal;   /* global limits from CQI */
 
 CEXTERN ConqInfo_t *ConqInfo;	/* misc game info */
@@ -71,8 +65,8 @@ CEXTERN Ship_t *Ships;		/* Ships. */
 CEXTERN ShipType_t *ShipTypes;		/* Ship types. */
 
 CEXTERN Msg_t *Msgs;		/* Messages. */
-
-CEXTERN int *EndOfCBlock;	/* end of the common block */
+// This must be the last var
+CEXTERN unsigned int *EndOfCBlock;	/* end of the common block */
 
 #undef CEXTERN
-#endif /* CONQCOM_H */
+#endif /* CB_H */

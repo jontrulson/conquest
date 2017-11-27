@@ -19,7 +19,7 @@
 #include "conqlb.h"
 #include "conqutil.h"
 #include "clientlb.h"
-#include "conqcom.h"
+#include "cb.h"
 #include "context.h"
 #include "msg.h"
 #include "record.h"

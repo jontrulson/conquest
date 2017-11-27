@@ -8,7 +8,7 @@
  ***********************************************************************/
 
 #include "conqdef.h"
-#include "conqcom.h"
+#include "cb.h"
 #include "conqlb.h"
 #include "conqutil.h"
 #include "conqunix.h"
@@ -596,10 +596,10 @@ void procCoup(cpCommand_t *cmd)
         utSleep( ITER_SECONDS );
     }
 
-    PVLOCK(&ConqInfo->lockword);
+    cbLock(&ConqInfo->lockword);
     if ( Planets[pnum].team == Ships[snum].team )
     {
-        PVUNLOCK(&ConqInfo->lockword);
+        cbUnlock(&ConqInfo->lockword);
         sendFeedback("Sensors show hostile forces eliminated from the planet.");
         return;
     }
@@ -610,7 +610,7 @@ void procCoup(cpCommand_t *cmd)
     {
         /* Failed; setup new reorganization time. */
         Teams[Ships[snum].team].couptime = rndint( 5, 10 );
-        PVUNLOCK(&ConqInfo->lockword);
+        cbUnlock(&ConqInfo->lockword);
         sendFeedback("Coup unsuccessful.");
         return;
     }
@@ -627,7 +627,7 @@ void procCoup(cpCommand_t *cmd)
     Planets[pnum].armies = rndint( 10, 20 );	/* create token coup force */
     Users[Ships[snum].unum].stats[USTAT_COUPS] += 1;
     Teams[Ships[snum].team].stats[TSTAT_COUPS] += 1;
-    PVUNLOCK(&ConqInfo->lockword);
+    cbUnlock(&ConqInfo->lockword);
 
     sendFeedback("Coup successful!");
 
@@ -937,7 +937,7 @@ void procTow(cpCommand_t *cmd)
         return;
     }
     cbuf[0] = 0;
-    PVLOCK(&ConqInfo->lockword);
+    cbLock(&ConqInfo->lockword);
     if ( other < 0 || other >= MAXSHIPS )
         strcpy(cbuf , "No such ship.") ;
     else if ( Ships[other].status != SS_LIVE )
@@ -962,7 +962,7 @@ void procTow(cpCommand_t *cmd)
         Ships[snum].towing = other;
         strcpy(cbuf, "Tractor beams engaged.") ;
     }
-    PVUNLOCK(&ConqInfo->lockword);
+    cbUnlock(&ConqInfo->lockword);
 
     sendFeedback(cbuf);
 
@@ -1010,7 +1010,7 @@ void procUnTow(cpCommand_t *cmd)
 	{
             strcpy(cbuf , "Breaking free from ship ") ;
             utAppendShip(cbuf , Ships[snum].towedby) ;
-            PVLOCK(&ConqInfo->lockword);
+            cbLock(&ConqInfo->lockword);
             if ( Ships[snum].towedby != 0 )
 	    {
                 /* Coast to a stop. */
@@ -1031,7 +1031,7 @@ void procUnTow(cpCommand_t *cmd)
                     Ships[Ships[snum].towedby].towing = 0;
                 Ships[snum].towedby = 0;
 	    }
-            PVUNLOCK(&ConqInfo->lockword);
+            cbUnlock(&ConqInfo->lockword);
             utAppendChar(cbuf , '.') ;
             sendFeedback(cbuf);
 	}
@@ -1040,7 +1040,7 @@ void procUnTow(cpCommand_t *cmd)
     {
         strcpy(cbuf , "Tow released from ship ") ;
         utAppendShip(cbuf , Ships[snum].towing) ;
-        PVLOCK(&ConqInfo->lockword);
+        cbLock(&ConqInfo->lockword);
         if ( Ships[snum].towing != 0 )
 	{
             /* Set other ship coasting. */
@@ -1062,7 +1062,7 @@ void procUnTow(cpCommand_t *cmd)
                 Ships[Ships[snum].towing].towedby = 0;
             Ships[snum].towing = 0;
 	}
-        PVUNLOCK(&ConqInfo->lockword);
+        cbUnlock(&ConqInfo->lockword);
         utAppendChar(cbuf , '.') ;
         sendFeedback(cbuf);
     }
@@ -1201,11 +1201,11 @@ void procBomb(cpCommand_t *cmd)
 
             if ( rnd() < killprob )
 	    {
-                PVLOCK(&ConqInfo->lockword);
+                cbLock(&ConqInfo->lockword);
                 if ( Planets[pnum].armies <= MIN_BOMB_ARMIES )
 		{
                     /* No more armies left to bomb. */
-                    PVUNLOCK(&ConqInfo->lockword);
+                    cbUnlock(&ConqInfo->lockword);
                     pktSendAck(PSEV_INFO, PERR_CANCELED,
                                NULL);
                     sendFeedback(lastfew);
@@ -1216,7 +1216,7 @@ void procBomb(cpCommand_t *cmd)
                 Ships[snum].kills = Ships[snum].kills + BOMBARD_KILLS;
                 Users[Ships[snum].unum].stats[USTAT_ARMBOMB] += 1;
                 Teams[Ships[snum].team].stats[TSTAT_ARMBOMB] += 1;
-                PVUNLOCK(&ConqInfo->lockword);
+                cbUnlock(&ConqInfo->lockword);
                 total = total + 1;
 	    }
 	} /* while */
@@ -1467,13 +1467,13 @@ void procBeam(cpCommand_t *cmd)
         while ( utDeltaGrand( entertime, &now ) >= BEAM_GRAND )
 	{
             utGrand(&entertime);
-            PVLOCK(&ConqInfo->lockword);
+            cbLock(&ConqInfo->lockword);
             if ( dirup )
 	    {
                 /* Beam up. */
                 if ( Planets[pnum].armies <= MIN_BEAM_ARMIES )
 		{
-                    PVUNLOCK(&ConqInfo->lockword);
+                    cbUnlock(&ConqInfo->lockword);
                     pktSendAck(PSEV_INFO, PERR_CANCELED,
                                NULL);
                     sendFeedback(lastfew);
@@ -1503,7 +1503,7 @@ void procBeam(cpCommand_t *cmd)
                 else
                     Planets[pnum].armies = Planets[pnum].armies + 1;
 	    }
-            PVUNLOCK(&ConqInfo->lockword);
+            cbUnlock(&ConqInfo->lockword);
             total = total + 1;
 
             if ( total >= num )

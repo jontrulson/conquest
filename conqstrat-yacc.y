@@ -28,7 +28,7 @@
 #include "c_defs.h"
 
 #include "conqdef.h"
-#include "conqcom.h"
+#include "cb.h"
 
 #include "conqutil.h"
 #include "conqai.h"
@@ -224,7 +224,7 @@ void dumprun(void)
 
     int i, j;
 
-    map_common();         /* Map the conquest common block */
+    cbMap();         /* Map the conquest common block */
 
 
     /* This is the only place we include/modify the shared common block. */

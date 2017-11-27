@@ -14,7 +14,7 @@
 #include "packet.h"
 #include "client.h"
 #include "clientlb.h"
-#include "conqcom.h"
+#include "cb.h"
 #include "context.h"
 #include "record.h"
 #include "disputil.h"
