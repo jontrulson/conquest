@@ -250,7 +250,6 @@ int metaUpdateServer(char *remotehost, char *name, int port)
     int numshipsrobot = 0;
     struct tm *thetm;
     time_t thetimet = time(0);
-    char tmbuf[META_GEN_STRSIZE];
 
     if (!remotehost)
         return FALSE;
@@ -309,11 +308,7 @@ int metaUpdateServer(char *remotehost, char *name, int port)
     pipe2ul(sRec.altaddr);
 
     thetm = localtime(&thetimet);
-    snprintf(tmbuf, META_GEN_STRSIZE, "%s", asctime(thetm));
-    i = strlen(tmbuf);
-    if (i > 0)
-        tmbuf[i - 1] = 0;
-    utStrncpy(sRec.walltime, tmbuf, META_GEN_STRSIZE);
+    snprintf(sRec.walltime, META_GEN_STRSIZE, "%s", asctime(thetm));
 
     /* all loaded up, convert it and send it off */
     metaServerRec2Buffer(msg, &sRec);

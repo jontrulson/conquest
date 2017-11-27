@@ -144,7 +144,7 @@ static int _cmpfile(void *cmp1, void *cmp2)
 
 static void _loadRCFiles(int type, char *cqdir, char *suffix)
 {
-    char filenm[BUFFER_SIZE_256];
+    char filenm[PATH_MAX];
     DIR *dirp;
     struct dirent *direntp;
     char **filelist = NULL;
@@ -176,8 +176,7 @@ static void _loadRCFiles(int type, char *cqdir, char *suffix)
             {                   /* found one */
                 char *ptr;
 
-                snprintf(filenm, sizeof(filenm)-1, "%s/%s",
-                         cqdir, direntp->d_name);
+                snprintf(filenm, PATH_MAX, "%s/%s", cqdir, direntp->d_name);
 
                 if (!(ptr = strdup(filenm)))
                 {
@@ -236,7 +235,7 @@ static void _loadRCFiles(int type, char *cqdir, char *suffix)
    load any ~/.conquest/ *.trc files */
 void loadTextureRCFiles()
 {
-    char cqdir[BUFFER_SIZE_256];
+    char cqdir[PATH_MAX];
     char *homevar;
 
     /* load the main texturesrc file first.  It's fatal if this fails. */
@@ -250,7 +249,7 @@ void loadTextureRCFiles()
     if ((homevar = getenv(CQ_USERHOMEDIR)) == NULL)
         return;
 
-    snprintf(cqdir, sizeof(cqdir)-1, "%s/%s",
+    snprintf(cqdir, PATH_MAX, "%s/%s",
              homevar, CQ_USERCONFDIR);
 
     _loadRCFiles(CQI_FILE_TEXTURESRC_ADD, cqdir, ".trc");
@@ -260,7 +259,7 @@ void loadTextureRCFiles()
 
 void loadSoundRCFiles()
 {
-    char cqdir[BUFFER_SIZE_256];
+    char cqdir[PATH_MAX];
     char *homevar;
 
     /* load the main sound file first */
@@ -273,7 +272,7 @@ void loadSoundRCFiles()
     if ((homevar = getenv(CQ_USERHOMEDIR)) == NULL)
         return;
 
-    snprintf(cqdir, sizeof(cqdir)-1, "%s/%s",
+    snprintf(cqdir, PATH_MAX, "%s/%s",
              homevar, CQ_USERCONFDIR);
 
     _loadRCFiles(CQI_FILE_SOUNDRC_ADD, cqdir, ".src");

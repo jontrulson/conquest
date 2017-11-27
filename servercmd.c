@@ -22,7 +22,7 @@
 void startRecord(int f)
 {
     char fname[PATH_MAX] = {};
-    char bname[BUFFER_SIZE_256] = {};
+    char bname[PATH_MAX] = {};
     char cbuf[MESSAGE_SIZE] = {};
     time_t thetime;
     struct tm *tmtime;
@@ -45,7 +45,7 @@ void startRecord(int f)
 
     strftime(tbuf, 128 - 1, "%m%d%Y-%H%M", tmtime);
 
-    snprintf(bname, BUFFER_SIZE_256, "conquest-rec-%s.cqr", tbuf);
+    snprintf(bname, PATH_MAX, "conquest-rec-%s.cqr", tbuf);
 
     snprintf(fname, PATH_MAX, "%s/%s", CONQSTATE, bname);
 
@@ -57,7 +57,7 @@ void startRecord(int f)
     {
         Context.recmode = RECMODE_OFF;
         utLog("conquestd: Cannot record to %s", fname);
-        sprintf(cbuf, "Cannot record to %s", bname);
+        snprintf(cbuf, MESSAGE_SIZE, "Cannot record to %s", bname);
         if (f)
             clbStoreMsg(MSG_FROM_GOD, 0, MSG_TO_SHIP, Context.snum, cbuf);
         return;
@@ -71,7 +71,7 @@ void startRecord(int f)
         {
             Context.recmode = RECMODE_ON;
             utLog("conquestd: Recording to %s", fname);
-            sprintf(cbuf, "Recording to %s", bname);
+            snprintf(cbuf, MESSAGE_SIZE, "Recording to %s", bname);
             if (f)
                 clbStoreMsg(MSG_FROM_GOD, 0, MSG_TO_SHIP, Context.snum, cbuf);
 

@@ -890,10 +890,10 @@ static int cqiValidateAnimations(void)
                  */
 
                 if (_cqiAnimDefs[i].texanim.stages == 1)
-                    snprintf(tbuf, CQI_NAMELEN - 1, "%s",
+                    snprintf(tbuf, CQI_NAMELEN, "%s",
                              _cqiAnimDefs[i].texname);
                 else
-                    snprintf(tbuf, CQI_NAMELEN - 1, "%s%d",
+                    snprintf(tbuf, CQI_NAMELEN, "%s%d",
                              _cqiAnimDefs[i].texname,
                              j);
 
@@ -973,7 +973,7 @@ static int cqiValidatePlanets(void)
         for (i = numPlanets; i < _cqiGlobal->maxplanets; i++)
         {
             /* use the slot number in the name to reduce chance of dup names */
-            snprintf(_cqiPlanets[i].name, MAXPLANETNAME - 1, "ZZExtra %d", i);
+            snprintf(_cqiPlanets[i].name, MAXPLANETNAME, "ZZExtra %d", i);
 
             // these planets are stationary, so set the primary name
             // to be the same as the planet.
@@ -1074,7 +1074,7 @@ int cqiLoadRC(int rcid, char *filename, int verbosity, int debugl)
     FILE *infile;
     extern FILE *yyin;
     int fail = FALSE;
-    char buffer[BUFFER_SIZE_256];
+    char buffer[PATH_MAX];
 
     cqiDebugl = debugl;
     cqiVerbose = verbosity;
@@ -1083,25 +1083,25 @@ int cqiLoadRC(int rcid, char *filename, int verbosity, int debugl)
     {
     case CQI_FILE_CONQINITRC:   /* optional */
         if (filename)
-            utStrncpy(buffer, filename, BUFFER_SIZE_256);
+            utStrncpy(buffer, filename, PATH_MAX);
         else
-            snprintf(buffer, sizeof(buffer), "%s/%s", utGetPath(CONQETC),
+            snprintf(buffer, PATH_MAX, "%s/%s", utGetPath(CONQETC),
                      "conqinitrc");
         break;
     case CQI_FILE_TEXTURESRC:
     case CQI_FILE_TEXTURESRC_ADD:
         if (filename)
-            utStrncpy(buffer, filename, BUFFER_SIZE_256);
+            utStrncpy(buffer, filename, PATH_MAX);
         else
-            snprintf(buffer, sizeof(buffer), "%s/%s", utGetPath(CONQETC),
+            snprintf(buffer, PATH_MAX, "%s/%s", utGetPath(CONQETC),
                      "texturesrc");
         break;
     case CQI_FILE_SOUNDRC:
     case CQI_FILE_SOUNDRC_ADD:
         if (filename)
-            utStrncpy(buffer, filename, BUFFER_SIZE_256);
+            utStrncpy(buffer, filename, PATH_MAX);
         else
-            snprintf(buffer, sizeof(buffer), "%s/%s", utGetPath(CONQETC),
+            snprintf(buffer, PATH_MAX, "%s/%s", utGetPath(CONQETC),
                      "soundrc");
         break;
     default:                    /* programmer error */
@@ -1846,11 +1846,9 @@ static void startSection(int section)
              * name in a config file), and add the current (projected)
              * slot number to make it unique.
              */
-            snprintf(tmpname,
-                     CQI_NAMELEN - 1 - (strlen(".-NNNNNN")),
-                     ".%s",
+            snprintf(tmpname, CQI_NAMELEN, ".%s",
                      currAnimation.name);
-            snprintf(currAnimDef.name, CQI_NAMELEN - 1, "%s-%06d",
+            snprintf(currAnimDef.name, CQI_NAMELEN, "%s-%06d",
                      tmpname, numAnimDefs + 1);
 
             /* now, reset the animation's animdef specification

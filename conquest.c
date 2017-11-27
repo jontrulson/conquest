@@ -3753,7 +3753,7 @@ int selectServer(metaSRec_t *metaServerList, int nums)
         else
             servervec[i].vers = PROTOCOL_VERSION; /* always 'compatible' */
 
-        snprintf(servervec[i].hostname, (MAXHOSTNAME + 10) - 1, "%s:%hu",
+        snprintf(servervec[i].hostname, (MAXHOSTNAME + 10), "%s:%hu",
                  metaServerList[i].altaddr,
                  metaServerList[i].port);
     }

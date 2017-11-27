@@ -26,8 +26,8 @@ static uint16_t rport;
 static int err = FALSE;
 
 #define ERR_BUFSZ 128
-static char errbuf1[ERR_BUFSZ];
-static char errbuf2[ERR_BUFSZ];
+static char errbuf1[ERR_BUFSZ] = {};
+static char errbuf2[ERR_BUFSZ] = {};
 
 static int nConsvrDisplay(dspConfig_t *);
 static int nConsvrIdle(void);
@@ -110,7 +110,7 @@ static int nConsvrIdle(void)
     {
         utLog("conquest: %s: no such host\n", rhost);
 
-        snprintf(errbuf1, sizeof(errbuf1) - 1, "%s: no such host",
+        snprintf(errbuf1, ERR_BUFSZ, "%s: no such host",
                  rhost);
         err = TRUE;
 
@@ -126,7 +126,7 @@ static int nConsvrIdle(void)
     if ((s = socket(AF_INET, SOCK_STREAM, 0 )) < 0)
     {
         utLog("socket: %s", strerror(errno));
-        snprintf(errbuf1, sizeof(errbuf1) - 1, "socket: %s", rhost);
+        snprintf(errbuf1, ERR_BUFSZ, "socket: %s", rhost);
         err = TRUE;
 
         return NODE_ERR;
@@ -151,9 +151,9 @@ static int nConsvrIdle(void)
         utLog("connect %s:%d: %s",
               rhost, rport, strerror(errno));
 
-        snprintf(errbuf1, sizeof(errbuf1) - 1, "connect %s:%d: %s",
+        snprintf(errbuf1, ERR_BUFSZ, "connect %s:%d: %s",
                  rhost, rport, strerror(errno));
-        snprintf(errbuf2, sizeof(errbuf2) - 1,
+        snprintf(errbuf2, ERR_BUFSZ,
                  "Is there a conquestd server running there?");
 
         err = TRUE;

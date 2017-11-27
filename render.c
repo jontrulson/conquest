@@ -192,7 +192,7 @@ void updateIconHudGeo(int snum)
         steam = Ships[snum].team;
 
         /* decal 1 */
-        snprintf(buffer, CQI_NAMELEN - 1, "ship%c-ico-decal1",
+        snprintf(buffer, CQI_NAMELEN, "ship%c-ico-decal1",
                  Teams[steam].name[0]);
 
         /* get decal1 size */
@@ -227,7 +227,7 @@ void updateIconHudGeo(int snum)
         CLAMPRECT(decal1_sz.w, decal1_sz.h, d1phaserchrg);
 
         /* decal 2 */
-        snprintf(buffer, CQI_NAMELEN - 1, "ship%c-ico-decal2",
+        snprintf(buffer, CQI_NAMELEN, "ship%c-ico-decal2",
                  Teams[steam].name[0]);
 
         /* get decal2 size */
@@ -783,9 +783,10 @@ static void renderShieldCharge(void)
 /* This is Cat's icon hud */
 void renderHud(int dostats)
 {				/* assumes context is current*/
-    static char sbuf[128];
-    static char ibuf[128];        /* fps, stats, etc */
-    static char fbuf[128];
+    const int bufSize = 128;
+    char sbuf[bufSize];
+    char ibuf[bufSize];        /* fps, stats, etc */
+    char fbuf[bufSize];
     int FPS = (int)getFPS();
     cqColor icl;
     real warp = Ships[Context.snum].warp;
@@ -827,9 +828,9 @@ void renderHud(int dostats)
         oldData.oldPingAvg = pktStats.pingAvg;
         oldData.oldRxdiff = rxdiff;
 
-        snprintf(fbuf, 128 - 1, "FPS: %03d", FPS);
+        snprintf(fbuf, bufSize, "FPS: %03d", FPS);
 
-        snprintf(ibuf, 128 - 1, "%4dms %3.1fKB/s %s",
+        snprintf(ibuf, bufSize, "%4dms %3.1fKB/s %s",
                  pktStats.pingAvg,
                  ((float)rxdiff / 1000.0),
                  fbuf);

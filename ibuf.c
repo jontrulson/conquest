@@ -163,7 +163,7 @@ int ibufExpandMouseMacro(int but, uint32_t mods, real mangle)
             if (*s == 'a')
             {
                 s++;
-                snprintf(buf, MAX_MACRO_LEN - 1, "%d",
+                snprintf(buf, MAX_MACRO_LEN, "%d",
                          myangle);
                 ibufPut(buf);
             }

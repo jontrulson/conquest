@@ -117,7 +117,7 @@ static void checkCreateUserConfDir(void)
     }
 
     /* start building the filename */
-    snprintf(buffer, sizeof(buffer) - 1, "%s/%s", home, CQ_USERCONFDIR);
+    snprintf(buffer, sizeof(buffer), "%s/%s", home, CQ_USERCONFDIR);
 
     if (stat(buffer, &sbuf) >= 0)
     {
@@ -1004,7 +1004,7 @@ int MakeSysConf()
     char conf_name[BUFFER_SIZE_256];
     int i, j, n;
 
-    snprintf(conf_name, sizeof(conf_name)-1, "%s/%s", utGetPath(CONQETC),
+    snprintf(conf_name, BUFFER_SIZE_256, "%s/%s", utGetPath(CONQETC),
              SYSCONFIG_FILE);
     umask(002);
     unlink(conf_name);

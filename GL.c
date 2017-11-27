@@ -338,10 +338,10 @@ static int initGLAnimDefs(void)
                  * then do not append the stage number to the texname.
                  */
                 if (GLAnimDefs[i].tex.stages == 1)
-                    snprintf(buffer, CQI_NAMELEN - 1, "%s",
+                    snprintf(buffer, CQI_NAMELEN, "%s",
                              cqiAnimDefs[i].texname);
                 else
-                    snprintf(buffer, CQI_NAMELEN - 1, "%s%d",
+                    snprintf(buffer, CQI_NAMELEN, "%s%d",
                              cqiAnimDefs[i].texname, j);
 
                 if ((ndx = findGLTexture(buffer)) >= 0)
@@ -471,81 +471,81 @@ static int initGLShips(void)
     for (i=0; i<NUMPLAYERTEAMS; i++)
     {
         /* build the prefix for this ship */
-        snprintf(shipPfx, CQI_NAMELEN - 1, "ship%c",
+        snprintf(shipPfx, CQI_NAMELEN, "ship%c",
                  Teams[i].name[0]);
 
         for (j=0; j<MAXNUMSHIPTYPES; j++)
         {
-            snprintf(buffer, CQI_NAMELEN - 1, "%s%c%c", shipPfx,
+            snprintf(buffer, CQI_NAMELEN, "%s%c%c", shipPfx,
                      ShipTypes[j].name[0], ShipTypes[j].name[1]);
             GLShips[i][j].ship = _get_ship_tex(buffer);
 
-            snprintf(buffer, CQI_NAMELEN - 1, "%s%c%c-sh", shipPfx,
+            snprintf(buffer, CQI_NAMELEN, "%s%c%c-sh", shipPfx,
                      ShipTypes[j].name[0], ShipTypes[j].name[1]);
             GLShips[i][j].sh = _get_ship_tex(buffer);
 
-            snprintf(buffer, CQI_NAMELEN - 1, "%s-tac", shipPfx);
+            snprintf(buffer, CQI_NAMELEN, "%s-tac", shipPfx);
             GLShips[i][j].tac = _get_ship_tex(buffer);
 
-            snprintf(buffer, CQI_NAMELEN - 1, "%s-phaser", shipPfx);
+            snprintf(buffer, CQI_NAMELEN, "%s-phaser", shipPfx);
             GLShips[i][j].phas = _get_ship_tex(buffer);
 
-            snprintf(buffer, CQI_NAMELEN - 1, "%s%c%c-ico", shipPfx,
+            snprintf(buffer, CQI_NAMELEN, "%s%c%c-ico", shipPfx,
                      ShipTypes[j].name[0], ShipTypes[j].name[1]);
             GLShips[i][j].ico = _get_ship_tex(buffer);
 
-            snprintf(buffer, CQI_NAMELEN - 1, "%s%c%c-ico-sh", shipPfx,
+            snprintf(buffer, CQI_NAMELEN, "%s%c%c-ico-sh", shipPfx,
                      ShipTypes[j].name[0], ShipTypes[j].name[1]);
             GLShips[i][j].ico_sh = _get_ship_tex(buffer);
 
-            snprintf(buffer, CQI_NAMELEN - 1, "%s-ico-torp", shipPfx);
+            snprintf(buffer, CQI_NAMELEN, "%s-ico-torp", shipPfx);
             GLShips[i][j].ico_torp = _get_ship_tex(buffer);
 
-            snprintf(buffer, CQI_NAMELEN - 1, "%s-ico-decal1", shipPfx);
+            snprintf(buffer, CQI_NAMELEN, "%s-ico-decal1", shipPfx);
             GLShips[i][j].decal1 = _get_ship_tex(buffer);
 
-            snprintf(buffer, CQI_NAMELEN - 1, "%s-ico-decal1-lamp-sh", shipPfx);
+            snprintf(buffer, CQI_NAMELEN, "%s-ico-decal1-lamp-sh", shipPfx);
             GLShips[i][j].decal1_lamp_sh = _get_ship_tex(buffer);
 
-            snprintf(buffer, CQI_NAMELEN - 1, "%s-ico-decal1-lamp-hull", shipPfx);
+            snprintf(buffer, CQI_NAMELEN, "%s-ico-decal1-lamp-hull", shipPfx);
             GLShips[i][j].decal1_lamp_hull = _get_ship_tex(buffer);
 
-            snprintf(buffer, CQI_NAMELEN - 1, "%s-ico-decal1-lamp-fuel", shipPfx);
+            snprintf(buffer, CQI_NAMELEN, "%s-ico-decal1-lamp-fuel", shipPfx);
             GLShips[i][j].decal1_lamp_fuel = _get_ship_tex(buffer);
 
-            snprintf(buffer, CQI_NAMELEN - 1, "%s-ico-decal1-lamp-eng", shipPfx);
+            snprintf(buffer, CQI_NAMELEN, "%s-ico-decal1-lamp-eng", shipPfx);
             GLShips[i][j].decal1_lamp_eng = _get_ship_tex(buffer);
 
-            snprintf(buffer, CQI_NAMELEN - 1, "%s-ico-decal1-lamp-wep", shipPfx);
+            snprintf(buffer, CQI_NAMELEN, "%s-ico-decal1-lamp-wep", shipPfx);
             GLShips[i][j].decal1_lamp_wep = _get_ship_tex(buffer);
 
-            snprintf(buffer, CQI_NAMELEN - 1, "%s-ico-decal1-lamp-rep", shipPfx);
+            snprintf(buffer, CQI_NAMELEN, "%s-ico-decal1-lamp-rep", shipPfx);
             GLShips[i][j].decal1_lamp_rep = _get_ship_tex(buffer);
 
-            snprintf(buffer, CQI_NAMELEN - 1, "%s-ico-decal1-lamp-cloak",
+            snprintf(buffer, CQI_NAMELEN, "%s-ico-decal1-lamp-cloak",
                      shipPfx);
             GLShips[i][j].decal1_lamp_cloak = _get_ship_tex(buffer);
 
-            snprintf(buffer, CQI_NAMELEN - 1, "%s-ico-decal1-lamp-tow", shipPfx);
+            snprintf(buffer, CQI_NAMELEN, "%s-ico-decal1-lamp-tow", shipPfx);
             GLShips[i][j].decal1_lamp_tow = _get_ship_tex(buffer);
 
-            snprintf(buffer, CQI_NAMELEN - 1, "%s-ico-decal2", shipPfx);
+            snprintf(buffer, CQI_NAMELEN, "%s-ico-decal2", shipPfx);
             GLShips[i][j].decal2 = _get_ship_tex(buffer);
 
-            snprintf(buffer, CQI_NAMELEN - 1, "%s-dial", shipPfx);
+            snprintf(buffer, CQI_NAMELEN, "%s-dial", shipPfx);
             GLShips[i][j].dial = _get_ship_tex(buffer);
 
-            snprintf(buffer, CQI_NAMELEN - 1, "%s-dialp", shipPfx);
+            snprintf(buffer, CQI_NAMELEN, "%s-dialp", shipPfx);
             GLShips[i][j].dialp = _get_ship_tex(buffer);
 
-            snprintf(buffer, CQI_NAMELEN - 1, "%s-warp", shipPfx);
+            snprintf(buffer, CQI_NAMELEN, "%s-warp", shipPfx);
             GLShips[i][j].warp = _get_ship_tex(buffer);
 
-            snprintf(buffer, CQI_NAMELEN - 1, "%s-warp2", shipPfx);
+            snprintf(buffer, CQI_NAMELEN, "%s-warp2", shipPfx);
             GLShips[i][j].warp2 = _get_ship_tex(buffer);
 
             /* here we just want the color, but we get a whole tex anyway */
-            snprintf(buffer, CQI_NAMELEN - 1, "%s-warp-col", shipPfx);
+            snprintf(buffer, CQI_NAMELEN, "%s-warp-col", shipPfx);
             GLShips[i][j].warpq_col = _get_ship_tex(buffer);
 
             /* if we failed to find some of them, you'll see soon enough. */
@@ -1337,7 +1337,7 @@ void drawPlanet( GLfloat x, GLfloat y, int pnum, int scale,
         if (showpnams)
         {
             if (UserConf.DoNumMap && (torpchar != ' '))
-                snprintf(buf, BUFFER_SIZE_256 - 1, "#%d#%c#%d#%d#%d#%c%s",
+                snprintf(buf, BUFFER_SIZE_256, "#%d#%c#%d#%d#%d#%c%s",
                          textcolor,
                          torpchar,
                          InfoColor,
@@ -1346,7 +1346,7 @@ void drawPlanet( GLfloat x, GLfloat y, int pnum, int scale,
                          torpchar,
                          Planets[pnum].name);
             else
-                snprintf(buf, BUFFER_SIZE_256 - 1, "%s", Planets[pnum].name);
+                snprintf(buf, BUFFER_SIZE_256, "%s", Planets[pnum].name);
 
 
             glfRenderFont(x,
@@ -1370,7 +1370,7 @@ void drawPlanet( GLfloat x, GLfloat y, int pnum, int scale,
             planame[0] = 0;
 
         if (UserConf.DoNumMap && (torpchar != ' '))
-            snprintf(buf, BUFFER_SIZE_256 - 1, "#%d#%c#%d#%d#%d#%c%s",
+            snprintf(buf, BUFFER_SIZE_256, "#%d#%c#%d#%d#%d#%c%s",
                      textcolor,
                      torpchar,
                      InfoColor,
@@ -1379,7 +1379,7 @@ void drawPlanet( GLfloat x, GLfloat y, int pnum, int scale,
                      torpchar,
                      planame);
         else
-            snprintf(buf, BUFFER_SIZE_256 - 1, "#%d#%c#%d#%c#%d#%c%s",
+            snprintf(buf, BUFFER_SIZE_256, "#%d#%c#%d#%c#%d#%c%s",
                      textcolor,
                      torpchar,
                      InfoColor,
@@ -1486,14 +1486,14 @@ void setWarp(real warp)
 
     if (warpufx == -1)
     {
-        snprintf(buf, CQI_NAMELEN - 1, "ship%c-warp-up",
+        snprintf(buf, CQI_NAMELEN, "ship%c-warp-up",
                  Teams[Ships[Context.snum].team].name[0]);
         warpufx = cqsFindEffect(buf);
     }
 
     if (warpdfx == -1)
     {
-        snprintf(buf, CQI_NAMELEN - 1, "ship%c-warp-down",
+        snprintf(buf, CQI_NAMELEN, "ship%c-warp-down",
                  Teams[Ships[Context.snum].team].name[0]);
         warpdfx = cqsFindEffect(buf);
     }
@@ -3310,7 +3310,7 @@ static char *_getTexFile(char *tfilenm)
     /* look for a user image */
     if ((homevar = getenv(CQ_USERHOMEDIR)))
     {
-        snprintf(buffer, sizeof(buffer)-1, "%s/%s/img/%s.tga",
+        snprintf(buffer, sizeof(buffer), "%s/%s/img/%s.tga",
                  homevar, CQ_USERCONFDIR, tfilenm);
 
         if ((fd = fopen(buffer, "r")))
@@ -3321,7 +3321,7 @@ static char *_getTexFile(char *tfilenm)
     }
 
     /* if we are here, look for the system one */
-    snprintf(buffer, sizeof(buffer) - 1, "%s/img/%s.tga",
+    snprintf(buffer, sizeof(buffer), "%s/img/%s.tga",
              utGetPath(CONQSHARE), tfilenm);
 
     if ((fd = fopen(buffer, "r")))

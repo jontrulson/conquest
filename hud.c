@@ -215,7 +215,7 @@ void hudSetKills(int snum)
 
     if ( x != hudData.kills.kills )
     {
-        snprintf( hudData.kills.str, HUD_STR_SZ - 1, "%0.1f", oneplace(x) );
+        snprintf( hudData.kills.str, HUD_STR_SZ, "%0.1f", oneplace(x) );
         hudData.kills.kills = x;
     }
 
@@ -249,8 +249,7 @@ void hudSetShields(int snum, int *dobeep)
 
         hudData.sh.shields = i;
 
-        snprintf(hudData.sh.str, HUD_STR_SZ - 1, "%3d", (i < 0) ? 0 : i);
-        hudData.sh.str[HUD_STR_SZ - 1] = 0;
+        snprintf(hudData.sh.str, HUD_STR_SZ, "%3d", (i < 0) ? 0 : i);
     }
 
     return;
@@ -273,9 +272,8 @@ void hudSetDamage(int snum, real *lastdamage)
         else
             hudData.dam.color = RedLevelColor;
 
-        snprintf( hudData.dam.str, HUD_STR_SZ - 1, "%3d",
+        snprintf( hudData.dam.str, HUD_STR_SZ, "%3d",
                   (i < 0) ? 0 : i );
-        hudData.dam.str[HUD_STR_SZ - 1] = 0;
 
         hudData.dam.damage = r;
     }
@@ -299,9 +297,8 @@ void hudSetFuel(int snum)
         else
             hudData.fuel.color = RedLevelColor;
 
-        snprintf( hudData.fuel.str, HUD_STR_SZ - 1, "%3d",
+        snprintf( hudData.fuel.str, HUD_STR_SZ, "%3d",
                   (i < 0) ? 0 : i );
-        hudData.fuel.str[HUD_STR_SZ - 1] = 0;
 
         hudData.fuel.fuel = r;
     }
@@ -376,9 +373,8 @@ void hudSetTemps(int snum)
         else
             hudData.etemp.color = GreenLevelColor;
 
-        snprintf( hudData.etemp.str, HUD_STR_SZ - 1, "%3d",
+        snprintf( hudData.etemp.str, HUD_STR_SZ, "%3d",
                   (i < 0) ? 0 : i );
-        hudData.etemp.str[HUD_STR_SZ - 1] = 0;
 
         hudData.etemp.temp  = etemp;
         hudData.etemp.overl = eOverl;
@@ -395,9 +391,8 @@ void hudSetTemps(int snum)
         else
             hudData.wtemp.color = GreenLevelColor;
 
-        snprintf( hudData.wtemp.str, HUD_STR_SZ - 1, "%3d",
+        snprintf( hudData.wtemp.str, HUD_STR_SZ, "%3d",
                   (i < 0) ? 0 : i );
-        hudData.wtemp.str[HUD_STR_SZ - 1] = 0;
 
         hudData.wtemp.temp  = wtemp;
         hudData.wtemp.overl = wOverl;
@@ -447,10 +442,7 @@ void hudSetArmies(int snum)
         if (i == 0)
             hudData.armies.str[0] = 0;
         else
-        {
-            snprintf( hudData.armies.str, HUD_STR_SZ - 1, "%2d armies", i );
-            hudData.armies.str[HUD_STR_SZ - 1] = 0;
-        }
+            snprintf( hudData.armies.str, HUD_STR_SZ, "%2d armies", i );
 
         hudData.armies.armies = i;
     }
@@ -481,11 +473,8 @@ void hudSetDestruct(int snum)
         if (!i)
             hudData.destruct.str[0] = 0;
         else
-        {
-            snprintf( hudData.destruct.str, HUD_STR_SZ - 1,
+            snprintf( hudData.destruct.str, HUD_STR_SZ,
                       "DESTRUCT MINUS %2d", i );
-            hudData.destruct.str[HUD_STR_SZ - 1] = 0;
-        }
 
         hudData.destruct.fuse = i;
     }
@@ -569,10 +558,9 @@ void hudSetPrompt(int line, char *prompt, int pcolor,
         pstr = prompt;
     }
 
-    snprintf(str, HUD_PROMPT_SZ - 1,
+    snprintf(str, HUD_PROMPT_SZ,
              "#%d#%s#%d#%s%s",
              pcolor, pstr, color, bstr, _padstr(maxwidth - (pl + bl)));
-    str[HUD_PROMPT_SZ - 1] = 0;
 
     return;
 }

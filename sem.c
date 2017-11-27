@@ -328,24 +328,24 @@ char *semGetStatusStr(void)
     }
 
 
-    snprintf(mesgtxt, 80 - 1, "%sMesgCnt = %d(%d:%d)",
+    snprintf(mesgtxt, 80, "%sMesgCnt = %d(%d:%d)",
              (semvals[LOCKMSG]) ? "*" : "",
              ConqInfo->lockmesg,
              lastmsgpid,
              msgzcnt);
 
-    snprintf(wordtxt, 80 - 1, "%sCmnCnt = %d(%d:%d)",
+    snprintf(wordtxt, 80, "%sCmnCnt = %d(%d:%d)",
              (semvals[LOCKCMN]) ? "*" : "",
              ConqInfo->lockword,
              lastcmnpid,
              cmnzcnt);
 
-    strcpy(stimebuffer, ctime(&lastoptime));
-    utStrncpy(newtime, &stimebuffer[4], 15); /* get the interesting part */
+    utStrncpy(stimebuffer, ctime(&lastoptime), 80);
+    utStrncpy(newtime, &stimebuffer[4], 80); /* get the interesting part */
 
     /* now build the string */
 
-    snprintf(buf, 80 - 1, "%s %s Last: %s",
+    snprintf(buf, 80, "%s %s Last: %s",
              mesgtxt,
              wordtxt,
              newtime);

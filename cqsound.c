@@ -147,13 +147,13 @@ static char *_getSoundFile(char *filenm)
 {
     char *homevar;
     FILE *fd;
-    static char buffer[BUFFER_SIZE_256];
+    static char buffer[PATH_MAX];
 
     /* look for a user sounds */
     if ((homevar = getenv(CQ_USERHOMEDIR)))
     {
         /* try OGG first, then wav */
-        snprintf(buffer, sizeof(buffer)-1, "%s/%s/sound/%s.ogg",
+        snprintf(buffer, PATH_MAX, "%s/%s/sound/%s.ogg",
                  homevar, CQ_USERCONFDIR, filenm);
 
         if ((fd = fopen(buffer, "r")))
@@ -162,7 +162,7 @@ static char *_getSoundFile(char *filenm)
             return buffer;
         }
 
-        snprintf(buffer, sizeof(buffer)-1, "%s/%s/sound/%s.wav",
+        snprintf(buffer, PATH_MAX, "%s/%s/sound/%s.wav",
                  homevar, CQ_USERCONFDIR, filenm);
 
         if ((fd = fopen(buffer, "r")))
@@ -174,7 +174,7 @@ static char *_getSoundFile(char *filenm)
 
     /* if we are here, look for the system one */
     /* first ogg, then wav */
-    snprintf(buffer, sizeof(buffer) - 1, "%s/sound/%s.ogg",
+    snprintf(buffer, PATH_MAX, "%s/sound/%s.ogg",
              utGetPath(CONQSHARE), filenm);
 
 
@@ -184,7 +184,7 @@ static char *_getSoundFile(char *filenm)
         return buffer;
     }
 
-    snprintf(buffer, sizeof(buffer) - 1, "%s/sound/%s.wav",
+    snprintf(buffer, PATH_MAX, "%s/sound/%s.wav",
              utGetPath(CONQSHARE), filenm);
 
 
@@ -384,7 +384,8 @@ static int cqsLoadSounds(void)
 void cqsInitSound(void)
 {
     cqsChannelPtr_t chnptr = NULL;
-    char buf[128];
+    const int bufSize = 128;
+    char buf[bufSize];
     int i;
 
     utLog("%s: Initializing...", __FUNCTION__);
@@ -456,61 +457,61 @@ void cqsInitSound(void)
        will all silently fail if no music and/or effects were loaded */
     for (i=0; i<NUMPLAYERTEAMS; i++)
     {
-        snprintf(buf, 128 - 1, "ship%c-phaser", Teams[i].name[0]);
+        snprintf(buf, bufSize, "ship%c-phaser", Teams[i].name[0]);
         cqsTeamEffects[i].phaser = cqsFindEffect(buf);
 
-        snprintf(buf, 128 - 1, "ship%c-torp", Teams[i].name[0]);
+        snprintf(buf, bufSize, "ship%c-torp", Teams[i].name[0]);
         cqsTeamEffects[i].torp = cqsFindEffect(buf);
 
-        snprintf(buf, 128 - 1, "ship%c-torp3", Teams[i].name[0]);
+        snprintf(buf, bufSize, "ship%c-torp3", Teams[i].name[0]);
         cqsTeamEffects[i].torp3 = cqsFindEffect(buf);
 
-        snprintf(buf, 128 - 1, "ship%c-alert", Teams[i].name[0]);
+        snprintf(buf, bufSize, "ship%c-alert", Teams[i].name[0]);
         cqsTeamEffects[i].alert = cqsFindEffect(buf);
 
-        snprintf(buf, 128 - 1, "ship%c-beam-down", Teams[i].name[0]);
+        snprintf(buf, bufSize, "ship%c-beam-down", Teams[i].name[0]);
         cqsTeamEffects[i].beamd = cqsFindEffect(buf);
 
-        snprintf(buf, 128 - 1, "ship%c-beam-up", Teams[i].name[0]);
+        snprintf(buf, bufSize, "ship%c-beam-up", Teams[i].name[0]);
         cqsTeamEffects[i].beamu = cqsFindEffect(buf);
 
-        snprintf(buf, 128 - 1, "ship%c-hit", Teams[i].name[0]);
+        snprintf(buf, bufSize, "ship%c-hit", Teams[i].name[0]);
         cqsTeamEffects[i].hit = cqsFindEffect(buf);
 
-        snprintf(buf, 128 - 1, "ship%c-info", Teams[i].name[0]);
+        snprintf(buf, bufSize, "ship%c-info", Teams[i].name[0]);
         cqsTeamEffects[i].info = cqsFindEffect(buf);
 
-        snprintf(buf, 128 - 1, "ship%c-mag", Teams[i].name[0]);
+        snprintf(buf, bufSize, "ship%c-mag", Teams[i].name[0]);
         cqsTeamEffects[i].mag = cqsFindEffect(buf);
 
-        snprintf(buf, 128 - 1, "ship%c-warp-up", Teams[i].name[0]);
+        snprintf(buf, bufSize, "ship%c-warp-up", Teams[i].name[0]);
         cqsTeamEffects[i].warpu = cqsFindEffect(buf);
 
-        snprintf(buf, 128 - 1, "ship%c-warp-down", Teams[i].name[0]);
+        snprintf(buf, bufSize, "ship%c-warp-down", Teams[i].name[0]);
         cqsTeamEffects[i].warpd = cqsFindEffect(buf);
 
         /* music */
-        snprintf(buf, 128 - 1, "ship%c-intro", Teams[i].name[0]);
+        snprintf(buf, bufSize, "ship%c-intro", Teams[i].name[0]);
         cqsTeamMusic[i].intro = cqsFindMusic(buf);
 
-        snprintf(buf, 128 - 1, "ship%c-battle", Teams[i].name[0]);
+        snprintf(buf, bufSize, "ship%c-battle", Teams[i].name[0]);
         cqsTeamMusic[i].battle = cqsFindMusic(buf);
 
-        snprintf(buf, 128 - 1, "ship%c-approach", Teams[i].name[0]);
+        snprintf(buf, bufSize, "ship%c-approach", Teams[i].name[0]);
         cqsTeamMusic[i].approach = cqsFindMusic(buf);
 
-        snprintf(buf, 128 - 1, "ship%c-theme", Teams[i].name[0]);
+        snprintf(buf, bufSize, "ship%c-theme", Teams[i].name[0]);
         cqsTeamMusic[i].theme = cqsFindMusic(buf);
     }
 
     /* doomsday music */
-    snprintf(buf, 128 - 1, "doomsday");
+    snprintf(buf, bufSize, "doomsday");
     cqsDoomsdayMusic.doom = cqsFindMusic(buf);
 
-    snprintf(buf, 128 - 1, "doomsday-in");
+    snprintf(buf, bufSize, "doomsday-in");
     cqsDoomsdayMusic.doomin = cqsFindMusic(buf);
 
-    snprintf(buf, 128 - 1, "doomsday-kill");
+    snprintf(buf, bufSize, "doomsday-kill");
     cqsDoomsdayMusic.doomkill = cqsFindMusic(buf);
 
     /* now, enable sound */

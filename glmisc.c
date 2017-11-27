@@ -78,7 +78,7 @@ void mglConqLogo(dspConfig_t *dsp, int mult)
         for (i=0; i<NUMPLAYERTEAMS; i++)
         {
             int ndx;
-            snprintf(buffer, CQI_NAMELEN - 1, "conqlogo%c",
+            snprintf(buffer, CQI_NAMELEN, "conqlogo%c",
                      Teams[i].name[0]);
 
             if ((ndx = findGLTexture(buffer)) >= 0)

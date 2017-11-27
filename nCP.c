@@ -2664,7 +2664,7 @@ void nCPInit(int istopnode)
         {
             char nm[CQI_NAMELEN];
 
-            snprintf(nm, CQI_NAMELEN - 1, "ship%c-torp",
+            snprintf(nm, CQI_NAMELEN, "ship%c-torp",
                      Teams[i].name[0]);
 
             if (!animInitState(nm, &ncpTorpAnims[i], NULL))
@@ -2687,7 +2687,7 @@ void nCPInit(int istopnode)
     if (istopnode && !introsPlayed[Ships[Context.snum].team])
     {
         introsPlayed[Ships[Context.snum].team] = TRUE;
-        snprintf(buf, CQI_NAMELEN - 1, "ship%c-intro",
+        snprintf(buf, CQI_NAMELEN, "ship%c-intro",
                  Teams[Ships[Context.snum].team].name[0]);
         cqsMusicPlay(cqsFindMusic(buf), FALSE);
     }
@@ -2695,7 +2695,7 @@ void nCPInit(int istopnode)
     {                           /* play the theme music if
                                    we've already done the intro music
                                    for this team. */
-        snprintf(buf, CQI_NAMELEN - 1, "ship%c-theme",
+        snprintf(buf, CQI_NAMELEN, "ship%c-theme",
                  Teams[Ships[Context.snum].team].name[0]);
         cqsMusicPlay(cqsFindMusic(buf), FALSE);
     }

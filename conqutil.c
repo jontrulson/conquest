@@ -965,15 +965,15 @@ char *utGetPath(const char *thepath)
 
     if (!strcmp(thepath, CONQETC))
     {                           /* etc */
-        snprintf(retpath, PATH_MAX - 1, "%s%s/etc", theroot, defaultConq);
+        snprintf(retpath, PATH_MAX, "%s%s/etc", theroot, defaultConq);
     }
     else if (!strcmp(thepath, CONQSHARE))
     {                           /* share */
-        snprintf(retpath, PATH_MAX - 1, "%s%s", theroot, defaultConq);
+        snprintf(retpath, PATH_MAX, "%s%s", theroot, defaultConq);
     }
     else
     {                           /* default, just return original path */
-        snprintf(retpath, PATH_MAX - 1, "%s", thepath);
+        snprintf(retpath, PATH_MAX, "%s", thepath);
     }
 
     return retpath;
