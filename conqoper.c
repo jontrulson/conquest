@@ -2493,7 +2493,7 @@ void opuedit(void)
     int i, unum, row = 1, lin, olin, tcol, dcol, lcol, rcol;
     char buf[MSGMAXLINE];
     int ch, left = TRUE;
-    char datestr[DATESIZE];
+    char datestr[MAXDATESIZE];
     static char *prompt2 = "any other key to quit.";
     static char *rprompt = "Use arrow keys to position, [SPACE] to modify, [TAB] to change password";
     char *promptptr;

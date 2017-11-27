@@ -366,7 +366,7 @@ typedef struct {
 
     uint8_t  conqueror[24 /*MAXUSERALIAS*/]; /* user who last conquered */
     uint8_t  conqteam[12 /*MAXTEAMNAME*/];   /* team s/he was on */
-    uint8_t  conqtime[20 /*DATESIZE*/];      /* time of last conquering */
+    uint8_t  conqtime[20 /*MAXDATESIZE*/];      /* time of last conquering */
     uint8_t  lastwords[60 /*MAXLASTWORDS*/]; /* remarks upon conquering */
 } sp_0006_ConqInfo_t;
 

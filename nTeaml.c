@@ -54,7 +54,7 @@ static int nTeamlDisplay(dspConfig_t *dsp)
 {
     int i, j, lin, col, ctime, etime;
     int godlike;
-    char buf[MSGMAXLINE], timbuf[5][DATESIZE];
+    char buf[MSGMAXLINE], timbuf[5][MAXDATESIZE];
     real x[5];
     static char *sfmt="%15s %11s %11s %11s %11s %11s";
     static char *stats="Statistics since: ";

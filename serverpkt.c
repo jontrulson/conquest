@@ -929,7 +929,7 @@ spConqInfo_t *spktConqInfo(int force)
 
     utStrncpy((char *)spci.conqueror, ConqInfo->conqueror, MAXUSERNAME);
     utStrncpy((char *)spci.conqteam, ConqInfo->conqteam, MAXTEAMNAME);
-    utStrncpy((char *)spci.conqtime, ConqInfo->conqtime, DATESIZE);
+    utStrncpy((char *)spci.conqtime, ConqInfo->conqtime, MAXDATESIZE);
     utStrncpy((char *)spci.lastwords, ConqInfo->lastwords, MAXLASTWORDS);
 
     if (memcmp((void *)&spci, (void *)&pktConqInfo,

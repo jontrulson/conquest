@@ -221,7 +221,7 @@ typedef enum {
 #define USTAT_GENOCIDE 0 	/* number of genocides completed */
 #define USTAT_TOTALSTATS 14
 
-#define DATESIZE 20 		/* hh:mm:ss ddmmmyy */
+#define MAXDATESIZE 20 		/* hh:mm:ss ddmmmyy */
 #define MAXMESSAGES 60 		/* maximum number of messages */
 #define MSGMAXLINE 90 		/* maximum size for formatting messages */
 

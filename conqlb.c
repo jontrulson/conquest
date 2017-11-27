@@ -960,7 +960,7 @@ void clbStatline( int unum, char *buf )
 {
     int i, j;
     char ch, junk[MSGMAXLINE], percent[MSGMAXLINE], morejunk[MSGMAXLINE];
-    char datestr[DATESIZE];
+    char datestr[MAXDATESIZE];
     char tname[MAXUSERNAME + 2];	/* posss '@' and NULL */
 
     if ( unum < 0 || unum >= MAXUSERS )
@@ -1761,7 +1761,7 @@ void clbInitEverything(void)
     ConqInfo->rcpuseconds = 0;
     ConqInfo->raccum = 0;
 
-    utStrncpy( ConqInfo->lastupchuck, "never", DATESIZE );
+    utStrncpy( ConqInfo->lastupchuck, "never", MAXDATESIZE );
     utFormatTime( ConqInfo->inittime, 0 );
     utFormatTime( ConqInfo->conqtime, 0 );
     utStrncpy( ConqInfo->conqueror, "GOD", MAXUSERNAME );

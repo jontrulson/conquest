@@ -34,7 +34,7 @@ void mcuHistList( int godlike )
     int ch;
     char *hd0="C O N Q U E S T   U S E R   H I S T O R Y";
     char connecttm[BUFFER_SIZE_256];
-    char histentrytm[DATESIZE + 1];
+    char histentrytm[MAXDATESIZE + 1];
     char puname[MAXUSERNAME];
 
     /* Do some screen setup. */
@@ -1369,7 +1369,7 @@ void mcuTeamList( int team )
 {
     int i, j, lin, col, ctime, etime;
     int godlike;
-    char buf[MSGMAXLINE], timbuf[5][DATESIZE];
+    char buf[MSGMAXLINE], timbuf[5][MAXDATESIZE];
     real x[5];
     char *sfmt="%15s %11s %11s %11s %11s %11s";
     char *stats="Statistics since: ";

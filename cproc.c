@@ -620,7 +620,7 @@ int procConqInfo(char *buf)
 
     utStrncpy(ConqInfo->conqueror, (char *)spci->conqueror, MAXUSERNAME);
     utStrncpy(ConqInfo->conqteam, (char *)spci->conqteam, MAXTEAMNAME);
-    utStrncpy(ConqInfo->conqtime, (char *)spci->conqtime, DATESIZE);
+    utStrncpy(ConqInfo->conqtime, (char *)spci->conqtime, MAXDATESIZE);
     utStrncpy(ConqInfo->lastwords, (char *)spci->lastwords, MAXLASTWORDS);
 
     return TRUE;

@@ -24,14 +24,14 @@ typedef struct {
     int  lastmsg;			/* the last message sent */
     bool  externrobots;		/* used to disable internal robot code */
     int  glastmsg;                /* the last message read by God */
-    char lastupchuck[DATESIZE];	/* last time the common block was updated */
+    char lastupchuck[MAXDATESIZE];	/* last time the common block was updated */
     char ptname[MAXPLANETTYPES][MAXPTYPENAME]; /* planet type names */
     char chrplanets[MAXPLANETTYPES]; /* class M = M, dead = D, sun = S */
     char conqueror[MAXUSERNAME]; /* user who last conquered */
     char conqteam[MAXTEAMNAME];	/* team s/he was on */
-    char conqtime[DATESIZE];	/* time of last conquering */
+    char conqtime[MAXDATESIZE];	/* time of last conquering */
     char lastwords[MAXLASTWORDS];	/* remarks upon conquering */
-    char inittime[DATESIZE];	/* time the universe was initialized */
+    char inittime[MAXDATESIZE];	/* time the universe was initialized */
     int  conqservPID;		/* the conqserv pid */
 } ConqInfo_t;
 
