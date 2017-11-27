@@ -36,8 +36,7 @@ static int doLogin(char *login, char *pw, char *epw)
         salt[1] = (login[1] != 0) ? login[1] : 'T';
         salt[2] = 0;
 
-        strncpy(epw, (char *)crypt(pw, salt), MAXUSERNAME - 2);
-        epw[MAXUSERNAME - 1] = 0;
+        utStrncpy(epw, (char *)crypt(pw, salt), MAXUSERNAME);
 
         if (strcmp(epw, Users[unum].pw) != 0)
 	{			/* invalid pw */
@@ -55,8 +54,7 @@ static int doLogin(char *login, char *pw, char *epw)
     salt[1] = (login[1] != 0) ? login[1] : 'T';
     salt[2] = 0;
 
-    strncpy(epw, (char *)crypt(pw, salt), MAXUSERNAME - 2);
-    epw[MAXUSERNAME - 1] = 0;
+    utStrncpy(epw, (char *)crypt(pw, salt), MAXUSERNAME);
 
     utLog("INFO: New user '%s' logged in", login);
 
@@ -155,8 +153,8 @@ int Authenticate(char *username, char *password)
 	}
     }
 
-    strncpy(username, (char *)cauth->login, MAXUSERNAME);
-    strncpy(password, epw, MAXUSERNAME);
+    utStrncpy(username, (char *)cauth->login, MAXUSERNAME);
+    utStrncpy(password, epw, MAXUSERNAME);
 
     return(TRUE);
 }

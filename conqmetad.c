@@ -196,12 +196,12 @@ void metaProcUpd(char *buf, int rlen, char *hostbuf)
         return;
     }
 
-    strncpy(sRec.addr, hostbuf, CONF_SERVER_NAME_SZ - 1);
+    utStrncpy(sRec.addr, hostbuf, CONF_SERVER_NAME_SZ);
 
     /* if altaddr is empty, we copy hostbuf into it. */
 
     if (strlen(sRec.altaddr) == 0)
-        strncpy(sRec.altaddr, sRec.addr, CONF_SERVER_NAME_SZ - 1);
+        utStrncpy(sRec.altaddr, sRec.addr, CONF_SERVER_NAME_SZ);
 
     /* now find a slot for it. */
     if ((slot = findSlot(&sRec, &wasfound)) == -1)
@@ -334,12 +334,12 @@ void metaListen(void)
                                     sizeof(unsigned long),
                                     AF_INET)) == NULL)
             {
-                strncpy(hostbuf, inet_ntoa((struct in_addr)tisa.sin_addr),
-                        CONF_SERVER_NAME_SZ);
+                utStrncpy(hostbuf, inet_ntoa((struct in_addr)tisa.sin_addr),
+                          CONF_SERVER_NAME_SZ);
             }
             else
             {
-                strncpy(hostbuf, hp->h_name, CONF_SERVER_NAME_SZ);
+                utStrncpy(hostbuf, hp->h_name, CONF_SERVER_NAME_SZ);
             }
 
             hostbuf[CONF_SERVER_NAME_SZ - 1] = 0;
@@ -365,12 +365,12 @@ void metaListen(void)
                                     sizeof(unsigned long),
                                     AF_INET)) == NULL)
             {
-                strncpy(hostbuf, inet_ntoa((struct in_addr)isa.sin_addr),
-                        CONF_SERVER_NAME_SZ);
+                utStrncpy(hostbuf, inet_ntoa((struct in_addr)isa.sin_addr),
+                          CONF_SERVER_NAME_SZ);
             }
             else
             {
-                strncpy(hostbuf, hp->h_name, CONF_SERVER_NAME_SZ);
+                utStrncpy(hostbuf, hp->h_name, CONF_SERVER_NAME_SZ);
             }
 
             hostbuf[CONF_SERVER_NAME_SZ - 1] = 0;

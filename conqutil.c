@@ -854,15 +854,15 @@ int utIsSpecial( char *str, int *what, int *token, int *count )
 
 /*  utStrncpy - copy a string with a size limit, ensuring the last
  *  byte is 0 */
-void utStrncpy( char *to, char *from, unsigned int tosize )
+void utStrncpy( char *to, const char *from, unsigned int tosize )
 {
     strncpy(to, from, tosize);
     to[tosize - 1] = '\0';
 }
 
-/*  utStrncpy - copy a string with a size limit, ensuring the last
- *  byte is 0 */
-void utStrncat( char *to, char *from, unsigned int tosize )
+/*  utStrncat - concatenate a string with a size limit, ensuring the
+ *  last byte is 0 */
+void utStrncat( char *to, const char *from, unsigned int tosize )
 {
     strncat(to, from, tosize);
     to[tosize - 1] = '\0';
@@ -941,7 +941,7 @@ char *utGetPath(const char *thepath)
     /* the non-windows case just returns thepath, but we copy it
      * to avoid an annoying compiler warning regarding const.
      */
-    strncpy(retpath, thepath, PATH_MAX - 1);
+    utStrncpy(retpath, thepath, PATH_MAX);
     return retpath;
 #else
 

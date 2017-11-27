@@ -54,6 +54,7 @@
 
 struct _srvvec {
     uint16_t vers;
+    // FIXME - what's with the + 10 here?
     char hostname[MAXHOSTNAME + 10];
 };
 

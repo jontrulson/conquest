@@ -570,9 +570,8 @@ static void _infoplanet( char *str, int pnum, int snum )
                  Context.lasttdist,
                  Context.lasttang);
 
-    /* save for the hudInfo */
-    strncpy(Context.lasttarg, Planets[pnum].name, 3);
-    Context.lasttarg[3] = 0;
+    /* save for the hudInfo, only first 3 characters */
+    utStrncpy(Context.lasttarg, Planets[pnum].name, 4);
     hudSetInfoTarget(pnum, false);
 
     if ( godlike )

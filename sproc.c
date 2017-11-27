@@ -39,10 +39,11 @@ void procSetName(char *buf)
 
     cpsetn->alias[MAXUSERNAME - 1] = 0;
 
-    strncpy(Users[Context.unum].alias, (char *)cpsetn->alias, MAXUSERNAME);
+    utStrncpy(Users[Context.unum].alias, (char *)cpsetn->alias, MAXUSERNAME);
 
     if (Context.snum >= 0 && Context.snum < MAXSHIPS)
-        strncpy(Ships[Context.snum].alias, (char *)cpsetn->alias, MAXUSERNAME);
+        utStrncpy(Ships[Context.snum].alias,
+                  (char *)cpsetn->alias, MAXUSERNAME);
 
     return;
 }
@@ -740,8 +741,8 @@ void procChangePassword(char *buf)
         'T';
     salt[2] = 0;
 
-    strncpy(Users[unum].pw, (char *)crypt((char *)cauth->pw, salt),
-            MAXUSERNAME - 2);
+    utStrncpy(Users[unum].pw, (char *)crypt((char *)cauth->pw, salt),
+              MAXUSERNAME);
     Users[unum].pw[MAXUSERNAME - 1] = 0;
 
     return;

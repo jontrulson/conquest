@@ -366,14 +366,12 @@ static void ChangeOption(struct Conf *cdata, int lin)
             break;
 	}
         cdclrl(lin, 1);
-        strncpy(buf, ((char *)cdata->ConfValue), CBUFLEN);
-        buf[CBUFLEN - 1] = 0;
+        utStrncpy(buf, ((char *)cdata->ConfValue), CBUFLEN);
         rv = cdgets("Value: ", lin, 1, buf, cdata->max - 1);
 
         if (rv != -1)
 	{
-            strncpy((char *)cdata->ConfValue, buf, cdata->max);
-            ((char *)cdata->ConfValue)[cdata->max - 1] = 0;
+            utStrncpy((char *)cdata->ConfValue, buf, cdata->max);
             /* signal that something has been changed */
             ChangedSomething = TRUE;
 	}
@@ -429,8 +427,7 @@ static void ChangeMacro(int macronum)
         return;			/* if abort, cancel */
     }
 
-    strncpy(UserConf.MacrosF[macronum - 1], Str2Macro(buf), MAX_MACRO_LEN);
-    UserConf.MacrosF[macronum - 1][MAX_MACRO_LEN - 1] = 0;
+    utStrncpy(UserConf.MacrosF[macronum - 1], Str2Macro(buf), MAX_MACRO_LEN);
 
     ChangedSomething = TRUE;
 

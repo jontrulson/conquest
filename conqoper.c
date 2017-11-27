@@ -103,7 +103,7 @@ int main(int argc, char *argv[])
 
     OptionAction = OP_NONE;
 
-    strncpy(operName, clbGetUserLogname(), MAXUSERNAME);
+    utStrncpy(operName, clbGetUserLogname(), MAXUSERNAME);
     operName[MAXUSERNAME - 1] = 0;
 
     if ( ! isagod(-1) )

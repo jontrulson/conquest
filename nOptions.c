@@ -207,9 +207,8 @@ static void _changeMacro(int macronum, int init)
     }
     else
     {                           /* change it for real */
-        strncpy(UserConf.MacrosF[macronum - 1], Str2Macro(prm.buf),
-                MAX_MACRO_LEN);
-        UserConf.MacrosF[macronum - 1][MAX_MACRO_LEN - 1] = 0;
+        utStrncpy(UserConf.MacrosF[macronum - 1], Str2Macro(prm.buf),
+                  MAX_MACRO_LEN);
     }
 
     return;
@@ -250,9 +249,8 @@ static void _changeMouse(int mousevec, int init)
     }
     else
     {                           /* change it for real */
-        strncpy(UserConf.Mouse[but][mod], Str2Macro(prm.buf),
-                MAX_MACRO_LEN);
-        UserConf.Mouse[but][mod][MAX_MACRO_LEN - 1] = 0;
+        utStrncpy(UserConf.Mouse[but][mod], Str2Macro(prm.buf),
+                  MAX_MACRO_LEN);
     }
 
     return;
@@ -288,8 +286,7 @@ static void _changeOption(struct Conf *cdata, int init)
         if (init)
         {
             prm.preinit = TRUE;
-            strncpy(cbuf, ((char *)cdata->ConfValue), CBUFLEN);
-            cbuf[CBUFLEN - 1] = 0;
+            utStrncpy(cbuf, ((char *)cdata->ConfValue), CBUFLEN);
             prm.buf = cbuf;
             prm.buflen = cdata->max - 1;
             prm.pbuf = "Value: ";
@@ -299,8 +296,7 @@ static void _changeOption(struct Conf *cdata, int init)
         }
         else
         {
-            strncpy((char *)cdata->ConfValue, prm.buf, cdata->max);
-            ((char *)cdata->ConfValue)[cdata->max - 1] = 0;
+            utStrncpy((char *)cdata->ConfValue, prm.buf, cdata->max);
         }
 
         break;

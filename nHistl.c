@@ -78,7 +78,7 @@ static int nHistlDisplay(dspConfig_t *dsp)
         if (History[i].unum < 0) // resigned
             isResigned = true;
 
-        strncpy(puname, History[i].username, MAXUSERNAME - 1);
+        utStrncpy(puname, History[i].username, MAXUSERNAME);
 
         /* entry time */
         utFormatTime( histentrytm, History[i].enterTime);

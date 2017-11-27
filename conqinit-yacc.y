@@ -876,8 +876,8 @@ static int cqiValidateAnimations(void)
             if (!_cqiAnimDefs[i].texname[0])
             {
                 /* copy the animdef name over */
-                strncpy(_cqiAnimDefs[i].texname, _cqiAnimDefs[i].name,
-                        CQI_NAMELEN - 1);
+                utStrncpy(_cqiAnimDefs[i].texname, _cqiAnimDefs[i].name,
+                          CQI_NAMELEN);
             }
 
             /* for each stage, build a texname and make sure it
@@ -977,8 +977,8 @@ static int cqiValidatePlanets(void)
 
             // these planets are stationary, so set the primary name
             // to be the same as the planet.
-            strncpy(_cqiPlanets[i].primname, _cqiPlanets[i].name,
-                    MAXPLANETNAME - 1);
+            utStrncpy(_cqiPlanets[i].primname, _cqiPlanets[i].name,
+                      MAXPLANETNAME);
 
             _cqiPlanets[i].primary = i;
             _cqiPlanets[i].angle = 0.0;
@@ -1022,8 +1022,8 @@ static int cqiValidatePlanets(void)
                       _cqiPlanets[i].name,
                       _cqiPlanets[i].name);
 
-                strncpy(_cqiPlanets[i].primname, _cqiPlanets[i].name,
-                        MAXPLANETNAME - 1);
+                utStrncpy(_cqiPlanets[i].primname, _cqiPlanets[i].name,
+                          MAXPLANETNAME);
                 _cqiPlanets[i].primary = i;
             }
         }
@@ -1083,25 +1083,25 @@ int cqiLoadRC(int rcid, char *filename, int verbosity, int debugl)
     {
     case CQI_FILE_CONQINITRC:   /* optional */
         if (filename)
-            strncpy(buffer, filename, BUFFER_SIZE_256 - 1);
+            utStrncpy(buffer, filename, BUFFER_SIZE_256);
         else
-            snprintf(buffer, sizeof(buffer)-1, "%s/%s", utGetPath(CONQETC),
+            snprintf(buffer, sizeof(buffer), "%s/%s", utGetPath(CONQETC),
                      "conqinitrc");
         break;
     case CQI_FILE_TEXTURESRC:
     case CQI_FILE_TEXTURESRC_ADD:
         if (filename)
-            strncpy(buffer, filename, BUFFER_SIZE_256 - 1);
+            utStrncpy(buffer, filename, BUFFER_SIZE_256);
         else
-            snprintf(buffer, sizeof(buffer)-1, "%s/%s", utGetPath(CONQETC),
+            snprintf(buffer, sizeof(buffer), "%s/%s", utGetPath(CONQETC),
                      "texturesrc");
         break;
     case CQI_FILE_SOUNDRC:
     case CQI_FILE_SOUNDRC_ADD:
         if (filename)
-            strncpy(buffer, filename, BUFFER_SIZE_256 - 1);
+            utStrncpy(buffer, filename, BUFFER_SIZE_256);
         else
-            snprintf(buffer, sizeof(buffer)-1, "%s/%s", utGetPath(CONQETC),
+            snprintf(buffer, sizeof(buffer), "%s/%s", utGetPath(CONQETC),
                      "soundrc");
         break;
     default:                    /* programmer error */
@@ -1857,7 +1857,7 @@ static void startSection(int section)
              * (whether or not it had one) to point toward the new
              * animdef
              */
-            strncpy(currAnimation.animdef, currAnimDef.name, CQI_NAMELEN - 1);
+            utStrncpy(currAnimation.animdef, currAnimDef.name, CQI_NAMELEN);
         }
         else
         {
@@ -2092,7 +2092,7 @@ static void endSection(void)
            texture, then copy in the texname as the default */
         if (!strlen(currTexture.filename) &&
             !(currTexture.flags & CQITEX_F_COLOR_SPEC))
-            strncpy(currTexture.filename, currTexture.name, CQI_NAMELEN - 1);
+            utStrncpy(currTexture.filename, currTexture.name, CQI_NAMELEN);
 
         if (exists >= 0)
         {
@@ -2156,7 +2156,7 @@ static void endSection(void)
         /* if a animdef wasn't specified, then copy in the
            name as the default */
         if (!strlen(currAnimation.animdef))
-            strncpy(currAnimation.animdef, currAnimation.name, CQI_NAMELEN - 1);
+            utStrncpy(currAnimation.animdef, currAnimation.name, CQI_NAMELEN);
 
         if (exists >= 0)
         {
@@ -2281,7 +2281,7 @@ static void endSection(void)
         /* if a filename wasn't specified, then copy in the name
            as the default */
         if (!strlen(currSound.filename))
-            strncpy(currSound.filename, currSound.name, CQI_NAMELEN - 1);
+            utStrncpy(currSound.filename, currSound.name, CQI_NAMELEN);
 
         if (exists >= 0)
         {
@@ -2335,7 +2335,7 @@ static void endSection(void)
         /* if a filename wasn't specified, then copy in the name
            as the default */
         if (!strlen(currSound.filename))
-            strncpy(currSound.filename, currSound.name, CQI_NAMELEN - 1);
+            utStrncpy(currSound.filename, currSound.name, CQI_NAMELEN);
 
         if (exists >= 0)
         {
@@ -2771,7 +2771,7 @@ void cfgSections(int item, char *val)
         switch (item)
         {
         case TOK_NAME:
-            strncpy(currTexArea.name, val, CQI_NAMELEN - 1);
+            utStrncpy(currTexArea.name, val, CQI_NAMELEN);
             break;
         }
     }
@@ -2807,7 +2807,7 @@ void cfgSections(int item, char *val)
             currAnimDef.istates |= AD_ISTATE_COL;
             break;
         case TOK_TEXNAME:
-            strncpy(currAnimDef.itexname, val, CQI_NAMELEN - 1);
+            utStrncpy(currAnimDef.itexname, val, CQI_NAMELEN);
             currAnimDef.istates |= AD_ISTATE_TEX;
             break;
         }
@@ -2819,10 +2819,10 @@ void cfgSections(int item, char *val)
         switch (item)
         {
         case TOK_NAME:
-            strncpy(currPlanet.name, val, MAXPLANETNAME - 1);
+            utStrncpy(currPlanet.name, val, MAXPLANETNAME);
             break;
         case TOK_PRIMARY:
-            strncpy(currPlanet.primname, val, MAXPLANETNAME - 1);
+            utStrncpy(currPlanet.primname, val, MAXPLANETNAME);
             break;
         case TOK_PTYPE:
             currPlanet.ptype = str2ptype(val);
@@ -2831,7 +2831,7 @@ void cfgSections(int item, char *val)
             currPlanet.pteam = str2team(val);
             break;
         case TOK_TEXNAME:
-            strncpy(currPlanet.texname, val, CQI_NAMELEN - 1);
+            utStrncpy(currPlanet.texname, val, CQI_NAMELEN);
             break;
         case TOK_COLOR:
             /* this used to be allowed, so for now just warn if
@@ -2849,13 +2849,13 @@ void cfgSections(int item, char *val)
         switch(item)
         {
         case TOK_NAME:
-            strncpy(currTexture.name, val, CQI_NAMELEN - 1);
+            utStrncpy(currTexture.name, val, CQI_NAMELEN);
             break;
         case TOK_FILENAME:
             if (val[0] == 0)    /* empty filename means only color matters */
                 currTexture.flags |= CQITEX_F_COLOR_SPEC;
             else
-                strncpy(currTexture.filename, val, CQI_NAMELEN - 1);
+                utStrncpy(currTexture.filename, val, CQI_NAMELEN);
             break;
         case TOK_COLOR:
             currTexture.flags |= CQITEX_F_HAS_COLOR;
@@ -2870,10 +2870,10 @@ void cfgSections(int item, char *val)
         switch(item)
         {
         case TOK_NAME:
-            strncpy(currAnimation.name, val, CQI_NAMELEN - 1);
+            utStrncpy(currAnimation.name, val, CQI_NAMELEN);
             break;
         case TOK_ANIMDEF:
-            strncpy(currAnimation.animdef, val, CQI_NAMELEN - 1);
+            utStrncpy(currAnimation.animdef, val, CQI_NAMELEN);
             break;
         }
     }
@@ -2892,10 +2892,10 @@ void cfgSections(int item, char *val)
                 utLog("CQI: field 'name' is ignored for inlined animdefs.");
             }
             else
-                strncpy(currAnimDef.name, val, CQI_NAMELEN - 1);
+                utStrncpy(currAnimDef.name, val, CQI_NAMELEN);
             break;
         case TOK_TEXNAME:
-            strncpy(currAnimDef.texname, val, CQI_NAMELEN - 1);
+            utStrncpy(currAnimDef.texname, val, CQI_NAMELEN);
             break;
         }
     }
@@ -2907,10 +2907,10 @@ void cfgSections(int item, char *val)
         switch(item)
         {
         case TOK_NAME:
-            strncpy(currSound.name, val, CQI_NAMELEN - 1);
+            utStrncpy(currSound.name, val, CQI_NAMELEN);
             break;
         case TOK_FILENAME:
-            strncpy(currSound.filename, val, CQI_NAMELEN - 1);
+            utStrncpy(currSound.filename, val, CQI_NAMELEN);
         }
     }
     break;

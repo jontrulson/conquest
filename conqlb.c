@@ -743,8 +743,8 @@ void clbResign( int unum, int isoper )
     char usrname[MAXUSERNAME], usralias[MAXUSERNAME];
 
     /* make copies */
-    strncpy(usrname, Users[unum].username, MAXUSERNAME - 1);
-    strncpy(usralias, Users[unum].alias, MAXUSERNAME - 1);
+    utStrncpy(usrname, Users[unum].username, MAXUSERNAME);
+    utStrncpy(usralias, Users[unum].alias, MAXUSERNAME);
 
     PVLOCK(&ConqInfo->lockword);
     if ( unum >= 0 && unum < MAXUSERS )
@@ -925,7 +925,7 @@ void clbUserline( int unum, int snum, char *buf, int showgods, int showteam )
     /* Figure out which team he's on. */
     ch = Teams[team].teamchar;
 
-    strncpy(tname, Users[unum].username, MAXUSERNAME - 1);
+    utStrncpy(tname, Users[unum].username, MAXUSERNAME);
     tname[MAXUSERNAME - 1] = 0;
 
     sprintf( junk, "%-12.12s %c%-21.21s %c %6.1f",
@@ -2143,9 +2143,8 @@ int clbLogHist( int unum )
     History[ConqInfo->histptr].enterTime = time(0);
     History[ConqInfo->histptr].elapsed = (time_t)0;
     History[ConqInfo->histptr].unum = unum;
-    strncpy(History[ConqInfo->histptr].username,
-            Users[unum].username,
-            MAXUSERNAME - 1);
+    utStrncpy(History[ConqInfo->histptr].username,
+              Users[unum].username, MAXUSERNAME);
     hnum = ConqInfo->histptr;
 
     PVUNLOCK(&ConqInfo->lockword);
@@ -2726,7 +2725,7 @@ char *clbGetUserLogname(void)
         else
 	{
             memset(pwname, 0, MAXPWNAME);
-            strncpy(pwname, pwd->pw_name, MAXPWNAME - 1);
+            utStrncpy(pwname, pwd->pw_name, MAXPWNAME);
 	}
     }
 

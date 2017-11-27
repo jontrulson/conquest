@@ -252,7 +252,7 @@ int recInitOutput(int unum, time_t thetime, int snum, int isserver)
     fhdr.samplerate = (uint8_t)Context.updsec;
 
     fhdr.rectime = (uint32_t)htonl((uint32_t)thetime);
-    strncpy((char*)fhdr.user, Users[unum].username, MAXUSERNAME - 1);
+    utStrncpy((char*)fhdr.user, Users[unum].username, MAXUSERNAME);
 
     fhdr.cmnrev = (uint32_t)htonl((uint32_t)COMMONSTAMP);
     fhdr.snum = snum;

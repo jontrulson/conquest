@@ -123,7 +123,7 @@ static void dispServerInfo(int tlin)
         sprintf(buf5, "#%d#%%s", NoColor);
 
         servtm = sStat.servertime; /* fix alignment */
-        strncpy(timebuf, ctime(&servtm), BUFFER_SIZE_256 - 1);
+        utStrncpy(timebuf, ctime(&servtm), BUFFER_SIZE_256);
         timebuf[strlen(timebuf) - 1] = 0; /* remove the NL */
 
     }

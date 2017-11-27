@@ -34,12 +34,12 @@ static void setSysConfDefaults(void)
     SysConf.AllowRefits = TRUE;
     SysConf.AllowSlingShot = FALSE;
 
-    strncpy(SysConf.ServerName, "Generic Conquest Server",
-            CONF_SERVER_NAME_SZ);
-    strncpy(SysConf.ServerMotd, "Keep your shields up in battle.",
-            CONF_SERVER_MOTD_SZ);
-    strncpy(SysConf.ServerContact, "root@localhost",
-            META_GEN_STRSIZE);
+    utStrncpy(SysConf.ServerName, "Generic Conquest Server",
+              CONF_SERVER_NAME_SZ);
+    utStrncpy(SysConf.ServerMotd, "Keep your shields up in battle.",
+              CONF_SERVER_MOTD_SZ);
+    utStrncpy(SysConf.ServerContact, "root@localhost",
+              META_GEN_STRSIZE);
 
     return;
 }
@@ -89,16 +89,13 @@ void setUserConfDefaults(void)
         /* set up default mouse macros, '\a' mean 'angle' substitution */
 
         /* fire phaser (left button (0), no modifiers) */
-        strncpy(UserConf.Mouse[0][0],
-                "f\\a\r", MAX_MACRO_LEN);
+        utStrncpy(UserConf.Mouse[0][0], "f\\a\r", MAX_MACRO_LEN);
 
         /* set course (middle button (1), no modifiers) */
-        strncpy(UserConf.Mouse[1][0],
-                "k\\a\r", MAX_MACRO_LEN);
+        utStrncpy(UserConf.Mouse[1][0], "k\\a\r", MAX_MACRO_LEN);
 
         /* fire torp (right button (2), no modifiers) */
-        strncpy(UserConf.Mouse[2][0],
-                "p\\a\r", MAX_MACRO_LEN);
+        utStrncpy(UserConf.Mouse[2][0], "p\\a\r", MAX_MACRO_LEN);
     }
 
     return;
@@ -299,7 +296,7 @@ int GetSysConf(int checkonly)
                         case CTYPE_STRING:
                             memset((char *)(SysConfData[j].ConfValue), 0,
                                    SysConfData[j].max);
-                            strncpy((char *)(SysConfData[j].ConfValue),
+                            utStrncpy((char *)(SysConfData[j].ConfValue),
                                     bufptr, SysConfData[j].max);
                             ((char *)SysConfData[j].ConfValue)[SysConfData[j].max - 1] = 0;
 
@@ -572,10 +569,10 @@ int GetConf(int usernum)
                                                     + ((n - 1) * MAX_MACRO_LEN)),
                                            0,
                                            MAX_MACRO_LEN);
-                                    strncpy((char *)(((char *)ConfData[j].ConfValue)
-                                                     + ((n - 1) * MAX_MACRO_LEN)),
-                                            Str2Macro((char *)cptr + 1),
-                                            MAX_MACRO_LEN - 1);
+                                    utStrncpy((char *)(((char *)ConfData[j].ConfValue)
+                                                       + ((n - 1) * MAX_MACRO_LEN)),
+                                              Str2Macro((char *)cptr + 1),
+                                              MAX_MACRO_LEN);
                                     ConfData[j].Found = TRUE;
                                     FoundOne = TRUE;
                                 }
@@ -608,9 +605,9 @@ int GetConf(int usernum)
                                     memset(UserConf.Mouse[button][mods],
                                            0,
                                            MAX_MACRO_LEN);
-                                    strncpy(UserConf.Mouse[button][mods],
-                                            Str2Macro((char *)cptr + 1),
-                                            MAX_MACRO_LEN - 1);
+                                    utStrncpy(UserConf.Mouse[button][mods],
+                                              Str2Macro((char *)cptr + 1),
+                                              MAX_MACRO_LEN);
                                     ConfData[j].Found = TRUE;
                                     FoundOne = TRUE;
                                 }

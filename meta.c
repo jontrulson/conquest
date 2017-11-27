@@ -74,7 +74,7 @@ int metaBuffer2ServerRec(metaSRec_t *srec, char *buf)
 
         case 1:                   /* address if specified */
             *ch = 0;
-            strncpy(srec->altaddr, chs, CONF_SERVER_NAME_SZ - 1);
+            utStrncpy(srec->altaddr, chs, CONF_SERVER_NAME_SZ);
 
             chs = ch + 1;
             fieldno++;
@@ -90,7 +90,7 @@ int metaBuffer2ServerRec(metaSRec_t *srec, char *buf)
 
         case 3:                   /* server name */
             *ch = 0;
-            strncpy(srec->servername, chs, CONF_SERVER_NAME_SZ - 1);
+            utStrncpy(srec->servername, chs, CONF_SERVER_NAME_SZ);
 
             chs = ch + 1;
             fieldno++;
@@ -98,7 +98,7 @@ int metaBuffer2ServerRec(metaSRec_t *srec, char *buf)
 
         case 4:                   /* server version */
             *ch = 0;
-            strncpy(srec->serverver, chs, CONF_SERVER_NAME_SZ - 1);
+            utStrncpy(srec->serverver, chs, CONF_SERVER_NAME_SZ);
 
             chs = ch + 1;
             fieldno++;
@@ -107,7 +107,7 @@ int metaBuffer2ServerRec(metaSRec_t *srec, char *buf)
 
         case 5:                   /* motd */
             *ch = 0;
-            strncpy(srec->motd, chs, CONF_SERVER_MOTD_SZ - 1);
+            utStrncpy(srec->motd, chs, CONF_SERVER_MOTD_SZ);
 
             chs = ch + 1;
             fieldno++;
@@ -172,7 +172,7 @@ int metaBuffer2ServerRec(metaSRec_t *srec, char *buf)
 
         case 12:                  /* contact (email/http/whatever) */
             *ch = 0;
-            strncpy(srec->contact, chs, META_GEN_STRSIZE - 1);
+            utStrncpy(srec->contact, chs, META_GEN_STRSIZE);
 
             chs = ch + 1;
             fieldno++;
@@ -180,7 +180,7 @@ int metaBuffer2ServerRec(metaSRec_t *srec, char *buf)
 
         case 13:                  /* server localtime */
             *ch = 0;
-            strncpy(srec->walltime, chs, META_GEN_STRSIZE - 1);
+            utStrncpy(srec->walltime, chs, META_GEN_STRSIZE);
 
             chs = ch + 1;
             fieldno++;
@@ -258,8 +258,7 @@ int metaUpdateServer(char *remotehost, char *name, int port)
     if (!name)
         strcpy(myname, "");
     else
-        strncpy(myname, name, CONF_SERVER_NAME_SZ);
-    myname[CONF_SERVER_NAME_SZ - 1] = 0;
+        utStrncpy(myname, name, CONF_SERVER_NAME_SZ);
 
     memset((void *)&sRec, 0, sizeof(metaSRec_t));
 
@@ -289,12 +288,12 @@ int metaUpdateServer(char *remotehost, char *name, int port)
     sRec.flags = getServerFlags();
     sRec.port = port;
 
-    strncpy(sRec.altaddr, myname, CONF_SERVER_NAME_SZ);
+    utStrncpy(sRec.altaddr, myname, CONF_SERVER_NAME_SZ);
     pipe2ul(sRec.altaddr);
-    strncpy(sRec.servername, SysConf.ServerName, CONF_SERVER_NAME_SZ);
+    utStrncpy(sRec.servername, SysConf.ServerName, CONF_SERVER_NAME_SZ);
     pipe2ul(sRec.servername);
 
-    strncpy(sRec.serverver, ConquestVersion, CONF_SERVER_NAME_SZ);
+    utStrncpy(sRec.serverver, ConquestVersion, CONF_SERVER_NAME_SZ);
     utStrncat((char *)sRec.serverver, " ", CONF_SERVER_NAME_SZ);
     utStrncat((char *)sRec.serverver, ConquestDate,
               CONF_SERVER_NAME_SZ);
@@ -306,15 +305,15 @@ int metaUpdateServer(char *remotehost, char *name, int port)
     /* meta ver 0x0002+ */
     sRec.protovers = PROTOCOL_VERSION;
 
-    strncpy(sRec.contact, SysConf.ServerContact, META_GEN_STRSIZE - 1);
+    utStrncpy(sRec.contact, SysConf.ServerContact, META_GEN_STRSIZE);
     pipe2ul(sRec.altaddr);
 
     thetm = localtime(&thetimet);
-    snprintf(tmbuf, META_GEN_STRSIZE - 1, "%s", asctime(thetm));
+    snprintf(tmbuf, META_GEN_STRSIZE, "%s", asctime(thetm));
     i = strlen(tmbuf);
     if (i > 0)
         tmbuf[i - 1] = 0;
-    strncpy(sRec.walltime, tmbuf, META_GEN_STRSIZE - 1);
+    utStrncpy(sRec.walltime, tmbuf, META_GEN_STRSIZE);
 
     /* all loaded up, convert it and send it off */
     metaServerRec2Buffer(msg, &sRec);

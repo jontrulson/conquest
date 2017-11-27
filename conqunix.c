@@ -424,8 +424,7 @@ int isagod( int unum )
 
     if (unum == -1)		/* get god status for current user */
     {
-        strncpy(myname, clbGetUserLogname(), BUFFER_SIZE_256);
-        myname[BUFFER_SIZE_256 - 1] = 0;
+        utStrncpy(myname, clbGetUserLogname(), BUFFER_SIZE_256);
     }
     else
     {				/* else a user number passed in */

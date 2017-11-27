@@ -102,15 +102,16 @@ int getLocalhost(char *buf, int len)
  */
 static void parseGeometry(char *geom)
 {
-    char geomcpy[32];
+    const int geoSize = 32;
+    char geomcpy[geoSize];
     char *ch;
     int w, h;
 
     if (!geom || !*geom)
         return;
 
-    memset((void *)geomcpy, 0, 32);
-    strncpy(geomcpy, geom, 32 - 1);
+    memset((void *)geomcpy, 0, geoSize);
+    utStrncpy(geomcpy, geom, geoSize);
 
     if ((ch = strchr(geomcpy, 'x')) == NULL)
         return;                     /* invalid */
@@ -304,7 +305,7 @@ int main(int argc, char *argv[])
     Context.updsec = 10;		/* dflt - 10/sec */
     Context.msgrand = time(0);
 
-    strncpy(cInfo.metaServer, META_DFLT_SERVER, MAXHOSTNAME - 1);
+    utStrncpy(cInfo.metaServer, META_DFLT_SERVER, MAXHOSTNAME);
     cInfo.sock = -1;
     cInfo.usock = -1;
     cInfo.doUDP = FALSE;
@@ -349,7 +350,7 @@ int main(int argc, char *argv[])
             wantMetaList = TRUE;
             break;
         case 'M':
-            strncpy(cInfo.metaServer, optarg, MAXHOSTNAME - 1);
+            utStrncpy(cInfo.metaServer, optarg, MAXHOSTNAME);
 
             break;
         case 's':                 /* [host[:port]] */

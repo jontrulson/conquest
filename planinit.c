@@ -45,7 +45,7 @@ void cqiInitPlanets(void)
 
     for (i=0; i<MAXPLANETS; i++)
     {                           /* init all of the planets. */
-        strncpy(Planets[i].name, cqiPlanets[i].name, MAXPLANETNAME);
+        utStrncpy(Planets[i].name, cqiPlanets[i].name, MAXPLANETNAME);
 
         Planets[i].type = cqiPlanets[i].ptype;
         Planets[i].primary = cqiPlanets[i].primary;

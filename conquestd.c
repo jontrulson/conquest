@@ -109,12 +109,12 @@ int getHostname(int sock, char *buf, int buflen)
                                   sizeof(unsigned long),
                                   AF_INET)) == NULL)
 	{
-            strncpy(buf, inet_ntoa((struct in_addr)addr.sin_addr),
-                    buflen);
+            utStrncpy(buf, inet_ntoa((struct in_addr)addr.sin_addr),
+                      buflen);
 	}
         else
         {
-            strncpy(buf, host->h_name, buflen);
+            utStrncpy(buf, host->h_name, buflen);
         }
     }
 
@@ -842,8 +842,7 @@ void dead( int snum, int leave )
         if (kb == KB_CONQUER)
         {
             robreply(buf);
-            strncpy(ConqInfo->lastwords, buf, MAXLASTWORDS - 1);
-            ConqInfo->lastwords[MAXLASTWORDS - 1] = 0;
+            utStrncpy(ConqInfo->lastwords, buf, MAXLASTWORDS);
         }
 
         utLog("conquestd: dead(): sendClientStat failed, fl = 0x%0x\n",
@@ -871,8 +870,7 @@ void dead( int snum, int leave )
                              (60 * 5), NULL) <= 0)
 	{			/* error or timeout.  gen lastwords */
             robreply(buf);
-            strncpy(ConqInfo->lastwords, buf, MAXLASTWORDS);
-            ConqInfo->lastwords[MAXLASTWORDS - 1] = 0;
+            utStrncpy(ConqInfo->lastwords, buf, MAXLASTWORDS);
 
             return;
 	}
@@ -881,8 +879,7 @@ void dead( int snum, int leave )
             cpMessage_t *cmsg = (cpMessage_t *)buf;
 
             /* copy as much of the message as you can. */
-            strncpy(ConqInfo->lastwords, (char *)cmsg->msg, MAXLASTWORDS);
-            ConqInfo->lastwords[MAXLASTWORDS - 1] = 0;
+            utStrncpy(ConqInfo->lastwords, (char *)cmsg->msg, MAXLASTWORDS);
 	}
     }
 

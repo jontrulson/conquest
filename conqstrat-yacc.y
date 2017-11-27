@@ -140,7 +140,7 @@ int main(int argc, char **argv)
             debug_scanner = TRUE;
             break;
 	case 'o':
-            strncpy(filename, optarg, PATH_MAX - 1);
+            utStrncpy(filename, optarg, PATH_MAX);
             filefd = NULL;
             break;
 	case 'U':

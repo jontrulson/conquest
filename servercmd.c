@@ -371,7 +371,7 @@ int checkOperExec(msgFrom_t from, uint16_t fromDetail,
     if (from != MSG_FROM_SHIP || fromDetail >= MAXSHIPS)
         return FALSE;
 
-    strncpy(tmsg, msg, MESSAGE_SIZE);
+    utStrncpy(tmsg, msg, MESSAGE_SIZE);
 
     if (tmsg[0] != '/')
         return FALSE;               /* not for us. */
@@ -409,7 +409,7 @@ int checkOperExec(msgFrom_t from, uint16_t fromDetail,
     }
 
     /* uppercase only version */
-    strncpy(umsg, cmd, MESSAGE_SIZE);
+    utStrncpy(umsg, cmd, MESSAGE_SIZE);
     utToUpperCase(umsg);
 
     /* check the simple commands first - look at the upcase version */

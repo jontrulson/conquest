@@ -71,7 +71,7 @@ void mcuHistList( int godlike )
             if (History[i].unum < 0) // resigned
                 isResigned = true;
 
-            strncpy(puname, History[i].username, MAXUSERNAME - 1);
+            utStrncpy(puname, History[i].username, MAXUSERNAME);
 
             /* entry time */
             utFormatTime( histentrytm, History[i].enterTime);
@@ -435,9 +435,8 @@ void mcuInfoPlanet( char *str, int pnum, int snum )
                  Context.lasttdist,
                  Context.lasttang);
 
-    /* save for hudInfo */
-    strncpy(Context.lasttarg, Planets[pnum].name, 3);
-    Context.lasttarg[3] = 0;
+    /* save for hudInfo (only first 3 chars) */
+    utStrncpy(Context.lasttarg, Planets[pnum].name, 4);
 
     if ( godlike )
         canscan = TRUE;

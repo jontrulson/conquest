@@ -75,7 +75,8 @@ void hudInitData(void)
     hudData.info.lastblast   = -1;
     hudData.info.lastang     = -1;
     hudData.info.lastdist    = -1;
-    hudData.info.lasttarget  = 0;
+    hudData.info.lasttarget  = -1;
+    hudData.info.lasttargetstr[0] = 0;
     hudSetInfoFiringAngle(0);
 
     return;
@@ -90,12 +91,10 @@ void hudSetWarp(int snum)
     {
         hudData.warp.warp = Ships[snum].warp;
         if (hudData.warp.warp >= 0)
-            snprintf(hudData.warp.str, HUD_STR_SZ - 1, "%2.1f",
+            snprintf(hudData.warp.str, HUD_STR_SZ, "%2.1f",
                      hudData.warp.warp );
         else
-            strncpy(hudData.warp.str, "Orbiting", HUD_STR_SZ - 1);
-
-        hudData.warp.str[HUD_STR_SZ - 1] = 0;
+            utStrncpy(hudData.warp.str, "Orbiting", HUD_STR_SZ);
 
         /* set the right sound effects */
         setWarp(hudData.warp.warp);
@@ -593,13 +592,11 @@ void hudSetInfoFiringAngle(real blastang)
 
     if (blastang != hudData.info.lastblast)
     {
-        snprintf(hudData.info.lastblaststr, HUD_INFO_STR_SZ - 1,
+        snprintf(hudData.info.lastblaststr, HUD_INFO_STR_SZ,
                  "#%d#FA:#%d#%3d",
                  MagentaColor,
                  InfoColor,
                  (i >= 0) ? i : 0);
-
-        hudData.info.lastblaststr[HUD_INFO_STR_SZ - 1] = 0;
 
         hudData.info.lastblast = blastang;
     }
@@ -615,7 +612,7 @@ static void _updateTargetInfoString(void)
     if (hudData.info.lasttarget < 0)
         hudData.info.lasttadstr[0] = 0;
     else
-        snprintf(hudData.info.lasttadstr, HUD_INFO_STR_SZ - 1,
+        snprintf(hudData.info.lasttadstr, HUD_INFO_STR_SZ,
                  "#%d#TA/D:#2%d#%3s#%d#:#%d#%3d#%d#/#%d#%5d",
                  MagentaColor,
                  SpecialColor,
@@ -632,7 +629,6 @@ static void _updateTargetInfoString(void)
 
 void hudSetInfoTarget(int tnum, bool isShip)
 {
-    /* -1 = no target */
     if (tnum != hudData.info.lasttarget)
     {
         hudData.info.lasttargetstr[0] = 0;
@@ -642,9 +638,9 @@ void hudSetInfoTarget(int tnum, bool isShip)
                 utAppendShip(hudData.info.lasttargetstr , tnum) ;
             else if (!isShip && tnum < MAXPLANETS)
             {                   /* planet, just need 3 chars */
-                hudData.info.lasttargetstr[0] = Planets[-tnum].name[0];
-                hudData.info.lasttargetstr[1] = Planets[-tnum].name[1];
-                hudData.info.lasttargetstr[2] = Planets[-tnum].name[2];
+                hudData.info.lasttargetstr[0] = Planets[tnum].name[0];
+                hudData.info.lasttargetstr[1] = Planets[tnum].name[1];
+                hudData.info.lasttargetstr[2] = Planets[tnum].name[2];
                 hudData.info.lasttargetstr[3] = 0;
             }
 

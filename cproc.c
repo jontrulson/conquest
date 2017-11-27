@@ -108,8 +108,8 @@ int procUser(char *buf)
     for (i=0; i<USTAT_TOTALSTATS; i++)
         Users[unum].stats[i] = (int32_t)ntohl(suser->stats[i]);
 
-    strncpy(Users[unum].username, (char *)suser->username, MAXUSERNAME - 1);
-    strncpy(Users[unum].alias, (char *)suser->alias, MAXUSERNAME - 1);
+    utStrncpy(Users[unum].username, (char *)suser->username, MAXUSERNAME);
+    utStrncpy(Users[unum].alias, (char *)suser->alias, MAXUSERNAME);
 
 #if defined(DEBUG_CLIENTPROC)
     utLog("\t%s: name: %s (%s)", __FUNCTION__, Users[unum].username, Users[unum].alias);
@@ -169,7 +169,7 @@ int procShip(char *buf)
         Ships[snum].scanned[i] = (int)sship->scanned[i];
 
     sship->alias[MAXUSERNAME - 1] = 0;
-    strncpy(Ships[snum].alias, (char *)sship->alias, MAXUSERNAME - 1);
+    utStrncpy(Ships[snum].alias, (char *)sship->alias, MAXUSERNAME);
 
     return TRUE;
 }
@@ -517,7 +517,7 @@ int procMessage(char *buf)
             ((smsg->flags & MSG_FLAGS_ROBOT) && !UserConf.NoRobotMsgs))
         {
             memset((void *)&recMsg, 0, sizeof(Msg_t));
-            strncpy(recMsg.msgbuf, (char *)smsg->msg, MESSAGE_SIZE - 1);
+            utStrncpy(recMsg.msgbuf, (char *)smsg->msg, MESSAGE_SIZE);
 
             // do a check on the enums...
             if (smsg->to > MSG_TO_MAX || smsg->from > MSG_FROM_MAX)
@@ -589,7 +589,7 @@ int procTeam(char *buf)
     for (i=0; i<MAXTSTATS; i++)
         Teams[team].stats[i] = (int)ntohl(steam->stats[i]);
 
-    strncpy(Teams[team].name, (char *)steam->name, MAXTEAMNAME - 1);
+    utStrncpy(Teams[team].name, (char *)steam->name, MAXTEAMNAME);
 
     return TRUE;
 }
@@ -618,14 +618,10 @@ int procConqInfo(char *buf)
     if (!pktIsValid(SP_CONQINFO, buf))
         return FALSE;
 
-    strncpy(ConqInfo->conqueror, (char *)spci->conqueror, MAXUSERNAME);
-    ConqInfo->conqueror[MAXUSERNAME - 1] = 0;
-    strncpy(ConqInfo->conqteam, (char *)spci->conqteam, MAXTEAMNAME);
-    ConqInfo->conqteam[MAXTEAMNAME - 1] = 0;
-    strncpy(ConqInfo->conqtime, (char *)spci->conqtime, DATESIZE);
-    ConqInfo->conqtime[DATESIZE - 1] = 0;
-    strncpy(ConqInfo->lastwords, (char *)spci->lastwords, MAXLASTWORDS);
-    ConqInfo->lastwords[MAXLASTWORDS - 1] = 0;
+    utStrncpy(ConqInfo->conqueror, (char *)spci->conqueror, MAXUSERNAME);
+    utStrncpy(ConqInfo->conqteam, (char *)spci->conqteam, MAXTEAMNAME);
+    utStrncpy(ConqInfo->conqtime, (char *)spci->conqtime, DATESIZE);
+    utStrncpy(ConqInfo->lastwords, (char *)spci->lastwords, MAXLASTWORDS);
 
     return TRUE;
 }
@@ -646,7 +642,7 @@ int procHistory(char *buf)
     History[hnum].elapsed = (time_t)ntohl((uint32_t)hist->elapsed);
     History[hnum].enterTime = (time_t)ntohl((uint32_t)hist->enterTime);
 
-    strncpy(History[hnum].username, (char *)hist->username, MAXUSERNAME - 1);
+    utStrncpy(History[hnum].username, (char *)hist->username, MAXUSERNAME);
 
     return TRUE;
 }
@@ -698,7 +694,7 @@ int procAck(char *buf)
         sAckMsg.severity = sackm->severity;
         sAckMsg.code = sackm->code;
         memset((void*)sAckMsg.txt, 0,  MESSAGE_SIZE);
-        strncpy((char *)sAckMsg.txt, (char *)sackm->txt, MESSAGE_SIZE - 1);
+        utStrncpy((char *)sAckMsg.txt, (char *)sackm->txt, MESSAGE_SIZE);
 
         return TRUE;
     }

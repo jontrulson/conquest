@@ -43,8 +43,7 @@ void dspReplayMenu(void)
                 InfoColor,
                 LabelColor);
 
-        strncpy(recordedon, ctime(&recon), MSGMAXLINE - 1);
-        recordedon[MSGMAXLINE - 1] = 0;
+        utStrncpy(recordedon, ctime(&recon), MSGMAXLINE);
 
         for (i=0; i < strlen(recordedon); i++)
             if (recordedon[i] == '\n')

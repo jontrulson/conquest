@@ -341,7 +341,7 @@ char *semGetStatusStr(void)
              cmnzcnt);
 
     strcpy(stimebuffer, ctime(&lastoptime));
-    strncpy(newtime, &stimebuffer[4], 15); /* get the interesting part */
+    utStrncpy(newtime, &stimebuffer[4], 15); /* get the interesting part */
 
     /* now build the string */
 

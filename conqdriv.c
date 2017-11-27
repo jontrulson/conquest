@@ -152,8 +152,7 @@ int main(int argc, char *argv[])
     pid = getpid(); /* store our pid */
     Driver->drivpid = pid;
 
-    strncpy(Driver->drivowner, clbGetUserLogname(), MAXUSERNAME);
-    Driver->drivowner[MAXUSERNAME - 1] = 0;
+    utStrncpy(Driver->drivowner, clbGetUserLogname(), MAXUSERNAME);
 
     /* Start within bounds. */
     Driver->drivsecs = utModPlusOne( Driver->drivsecs, FIVEMINUTE_SECONDS );

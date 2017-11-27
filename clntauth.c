@@ -241,7 +241,7 @@ int Logon(char *username)
 	} /* end while */
     }
     /* if we're here, we're legal */
-    strncpy(username, nm, MAXUSERNAME);
+    utStrncpy(username, nm, MAXUSERNAME);
 
     return(TRUE);
 }
@@ -305,10 +305,8 @@ void ChangePassword(int unum, int isoper)
         salt[1] = (Users[unum].username[1] != 0) ? Users[unum].username[1] : 'T';
         salt[2] = 0;
 
-        strncpy(epw, (char *)crypt(pw, salt), MAXUSERNAME - 2);
-        epw[MAXUSERNAME - 1] = 0;
-
-        strncpy(Users[unum].pw, epw, MAXUSERNAME);
+        utStrncpy(epw, (char *)crypt(pw, salt), MAXUSERNAME);
+        utStrncpy(Users[unum].pw, epw, MAXUSERNAME);
     }
     else				/* send a packet */
         sendAuth(cInfo.sock, CPAUTH_CHGPWD, "", pw);

@@ -14,6 +14,7 @@
 #include "context.h"
 #include "serverpkt.h"
 #include "conqlb.h"
+#include "conqutil.h"
 #include "rndlb.h"
 
 /* Here, we maintain 2 copies of potential packets, privileged and
@@ -141,8 +142,8 @@ spUser_t *spktUser(uint16_t unum)
     for (i=0; i<USTAT_TOTALSTATS; i++)
         suser.stats[i] = (int32_t)htonl(Users[unum].stats[i]);
 
-    strncpy((char *)suser.username, Users[unum].username, MAXUSERNAME - 1);
-    strncpy((char *)suser.alias, Users[unum].alias, MAXUSERNAME - 1);
+    utStrncpy((char *)suser.username, Users[unum].username, MAXUSERNAME);
+    utStrncpy((char *)suser.alias, Users[unum].alias, MAXUSERNAME);
 
     if (memcmp((void *)&suser, (void *)&pktUser[unum], sizeof(spUser_t)))
     {
@@ -214,7 +215,7 @@ spShip_t *spktShip(uint8_t snum, int rec)
     for (i=0; i<NUMPLAYERTEAMS; i++)
         sship.scanned[i] = (uint8_t)Ships[snum].scanned[i];
 
-    strncpy((char *)sship.alias, Ships[snum].alias, MAXUSERNAME - 1);
+    utStrncpy((char *)sship.alias, Ships[snum].alias, MAXUSERNAME);
 
     if (rec)
     {
@@ -477,7 +478,7 @@ spPlanet_t *spktPlanet(uint8_t pnum, int rec)
     // who's homeworld is this (if a homeplanet)?
     splan.defendteam = Planets[pnum].defendteam;
 
-    strncpy((char *)splan.name, Planets[pnum].name, MAXPLANETNAME);
+    utStrncpy((char *)splan.name, Planets[pnum].name, MAXPLANETNAME);
 
     if (rec)
     {
@@ -894,7 +895,7 @@ spTeam_t *spktTeam(uint8_t team, int force, int rec)
     for (i=0; i<MAXTSTATS; i++)
         steam.stats[i] = (uint32_t)htonl(Teams[team].stats[i]);
 
-    strncpy((char *)steam.name, Teams[team].name, MAXTEAMNAME - 1);
+    utStrncpy((char *)steam.name, Teams[team].name, MAXTEAMNAME);
 
     if (rec)
     {
@@ -926,10 +927,10 @@ spConqInfo_t *spktConqInfo(int force)
 
     spci.type = SP_CONQINFO;
 
-    strncpy((char *)spci.conqueror, ConqInfo->conqueror, MAXUSERNAME - 1);
-    strncpy((char *)spci.conqteam, ConqInfo->conqteam, MAXTEAMNAME - 1);
-    strncpy((char *)spci.conqtime, ConqInfo->conqtime, DATESIZE - 1);
-    strncpy((char *)spci.lastwords, ConqInfo->lastwords, MAXLASTWORDS - 1);
+    utStrncpy((char *)spci.conqueror, ConqInfo->conqueror, MAXUSERNAME);
+    utStrncpy((char *)spci.conqteam, ConqInfo->conqteam, MAXTEAMNAME);
+    utStrncpy((char *)spci.conqtime, ConqInfo->conqtime, DATESIZE);
+    utStrncpy((char *)spci.lastwords, ConqInfo->lastwords, MAXLASTWORDS);
 
     if (memcmp((void *)&spci, (void *)&pktConqInfo,
                sizeof(spConqInfo_t)) || force)
@@ -957,7 +958,7 @@ spHistory_t *spktHistory(int hnum)
     hist.elapsed = (uint32_t)htonl((uint32_t)History[hnum].elapsed);
     hist.enterTime = (uint32_t)htonl((uint32_t)History[hnum].enterTime);
 
-    strncpy((char *)hist.username, History[hnum].username, MAXUSERNAME - 1);
+    utStrncpy((char *)hist.username, History[hnum].username, MAXUSERNAME);
 
     if (memcmp((void *)&hist, (void *)&pktHistory[hnum], sizeof(spHistory_t)))
     {
