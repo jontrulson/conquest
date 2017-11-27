@@ -54,8 +54,7 @@
 
 struct _srvvec {
     uint16_t vers;
-    // FIXME - what's with the + 10 here?
-    char hostname[MAXHOSTNAME + 10];
+    char hostname[MAXHOSTNAME + MAXPORTNAME];
 };
 
 static struct _srvvec servervec[META_MAXSERVERS] = {};
@@ -3753,7 +3752,7 @@ int selectServer(metaSRec_t *metaServerList, int nums)
         else
             servervec[i].vers = PROTOCOL_VERSION; /* always 'compatible' */
 
-        snprintf(servervec[i].hostname, (MAXHOSTNAME + 10), "%s:%hu",
+        snprintf(servervec[i].hostname, (MAXHOSTNAME + MAXPORTNAME), "%s:%hu",
                  metaServerList[i].altaddr,
                  metaServerList[i].port);
     }

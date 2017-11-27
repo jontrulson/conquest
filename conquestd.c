@@ -238,7 +238,7 @@ void checkMaster(void)
                 pktSetSocketFds(sInfo.sock, PKT_SOCKFD_NOCHANGE);
 
                 memset(sInfo.remotehost, 0, MAXHOSTNAME);
-                getHostname(sInfo.sock, sInfo.remotehost, MAXHOSTNAME - 1);
+                getHostname(sInfo.sock, sInfo.remotehost, MAXHOSTNAME);
                 if (!tcpwCheckHostAccess(TCPW_DAEMON_CONQUESTD,
                                          sInfo.remotehost))
                 {

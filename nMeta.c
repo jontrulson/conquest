@@ -35,7 +35,7 @@ static int flin, llin, clin, pages, curpage;
 
 struct _srvvec {
     uint16_t vers;
-    char hostname[MAXHOSTNAME + 10];
+    char hostname[MAXHOSTNAME + MAXPORTNAME];
 };
 
 static struct _srvvec servervec[META_MAXSERVERS] = {};
@@ -193,7 +193,7 @@ void nMetaInit(void)
         else
             servervec[i].vers = PROTOCOL_VERSION; /* always 'compatible' */
 
-        snprintf(servervec[i].hostname, (MAXHOSTNAME + 10), "%s:%hu",
+        snprintf(servervec[i].hostname, (MAXHOSTNAME + MAXPORTNAME), "%s:%hu",
                  metaServerList[i].altaddr,
                  metaServerList[i].port);
     }

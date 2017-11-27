@@ -13,7 +13,9 @@
 #define META_DFLT_PORT   1700
 #define META_DFLT_SERVER "conquest.radscan.com"
 
-#define MAXHOSTNAME 64
+#define MAXHOSTNAME 255 // According to RFC 1035
+#define MAXPORTNAME 10  // ":<port number or service name>", according
+                        // to The Book of Jon
 
 #if defined(__linux__) && !defined(_old_linux_)
 #define AddrLen         unsigned int
