@@ -102,9 +102,6 @@ static void _mapCBVariables(bool doAssign)
 
     MAP_VARIABLE(cbMsgs, Msg_t, MAXMESSAGES, doAssign);
 
-    // This must be the last var
-    MAP_VARIABLE(EndOfCBlock, int, 1, doAssign);
-
     // if we did actual assignments, save the offset
     if (doAssign)
         _cbSavedSize = _cbOffset;
@@ -144,9 +141,6 @@ static void _unmapCBVariables()
     cbShipTypes = NULL;
 
     cbMsgs = NULL;
-
-    // This must be the last var
-    EndOfCBlock = NULL;
 
     return;
 }

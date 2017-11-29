@@ -80,8 +80,6 @@ CEXTERN Ship_t *cbShips;		/* Ships. */
 CEXTERN ShipType_t *cbShipTypes;  /* Ship types. */
 
 CEXTERN Msg_t *cbMsgs;               /* Messages. */
-// This must be the last var
-CEXTERN unsigned int *EndOfCBlock; /* end of the common block */
 
 #undef CEXTERN
 #endif /* CB_H */
