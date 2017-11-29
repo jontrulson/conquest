@@ -57,7 +57,7 @@ int sendFeedBack(char *msg);
 void sendFeedback(char *msg);
 int sendMessage(Msg_t *msg);
 int sendTeam(int sock, uint8_t team, int force);
-int sendConqInfo(int sock, int force);
+int sendcbConqInfo(int sock, int force);
 int sendHistory(int sock, int hnum);
 int sendDoomsday(int sock);
 

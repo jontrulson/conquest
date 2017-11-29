@@ -301,12 +301,12 @@ void ChangePassword(int unum, int isoper)
 
     if (isoper)
     {				/* do it locally */
-        salt[0] = (Users[unum].username[0] != 0) ? Users[unum].username[0] : 'J';
-        salt[1] = (Users[unum].username[1] != 0) ? Users[unum].username[1] : 'T';
+        salt[0] = (cbUsers[unum].username[0] != 0) ? cbUsers[unum].username[0] : 'J';
+        salt[1] = (cbUsers[unum].username[1] != 0) ? cbUsers[unum].username[1] : 'T';
         salt[2] = 0;
 
         utStrncpy(epw, (char *)crypt(pw, salt), MAXUSERNAME);
-        utStrncpy(Users[unum].pw, epw, MAXUSERNAME);
+        utStrncpy(cbUsers[unum].pw, epw, MAXUSERNAME);
     }
     else				/* send a packet */
         sendAuth(cInfo.sock, CPAUTH_CHGPWD, "", pw);

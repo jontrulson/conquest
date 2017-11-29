@@ -33,9 +33,9 @@ void cucPseudo( int unum, int snum )
     cdclrl( MSG_LIN1, 2 );
     strcpy(buf , "Old pseudonym: ") ;
     if ( snum >= 0 && snum < MAXSHIPS )
-        strcat(buf , Ships[snum].alias) ;
+        strcat(buf , cbShips[snum].alias) ;
     else
-        strcat(buf , Users[unum].alias) ;
+        strcat(buf , cbUsers[unum].alias) ;
     cdputc( buf, MSG_LIN1 );
     ch = mcuGetCX( "Enter a new pseudonym: ",
                    MSG_LIN2, -4, TERMS, buf, MAXUSERNAME );
@@ -65,7 +65,7 @@ void cucDoWar( int snum )
     int ch;
 
     for ( i = 0; i < NUMPLAYERTEAMS; i = i + 1 )
-        twar[i] = Ships[snum].war[i];
+        twar[i] = cbShips[snum].war[i];
 
     cdclrl( MSG_LIN1, 2 );
 
@@ -89,21 +89,21 @@ void cucDoWar( int snum )
             war = 0;
             for ( i = 0; i < NUMPLAYERTEAMS; i = i + 1 )
 	    {
-                if ( twar[i] && ! Ships[snum].war[i] )
+                if ( twar[i] && ! cbShips[snum].war[i] )
                     dowait = TRUE;
 
                 if (twar[i])
                     war |= (1 << i);
 
                 /* we'll let it happen locally as well... */
-                Users[Ships[snum].unum].war[i] = twar[i];
-                Ships[snum].war[i] = twar[i];
+                cbUsers[cbShips[snum].unum].war[i] = twar[i];
+                cbShips[snum].war[i] = twar[i];
 	    }
 
             sendCommand(CPCMD_SETWAR, (uint16_t)war);
 
             /* Only check for computer delay when flying. */
-            if ( Ships[snum].status != SS_RESERVED && dowait )
+            if ( cbShips[snum].status != SS_RESERVED && dowait )
 	    {
                 /* We've set war with at least one team, stall a little. */
                 mcuPutMsg(
@@ -125,9 +125,9 @@ void cucDoWar( int snum )
 	}
 
         for ( i = 0; i < NUMPLAYERTEAMS; i = i + 1 )
-            if ( ch == (char)tolower( Teams[i].teamchar ) )
+            if ( ch == (char)tolower( cbTeams[i].teamchar ) )
             {
-                if ( ! twar[i] || ! Ships[snum].rwar[i] )
+                if ( ! twar[i] || ! cbShips[snum].rwar[i] )
                 {
                     twar[i] = ! twar[i];
                     goto ccont1;	/* next 2  */
@@ -186,7 +186,7 @@ void cucSendMsg( msgFrom_t from, uint16_t fromDetail, int terse, int remote )
         else if ( to == MSG_TO_TEAM && toDetail >= 0
                   && toDetail < NUMPLAYERTEAMS )
         {
-            strcpy(buf , Teams[toDetail].name) ;
+            strcpy(buf , cbTeams[toDetail].name) ;
         }
         else
         {
@@ -227,7 +227,7 @@ void cucSendMsg( msgFrom_t from, uint16_t fromDetail, int terse, int remote )
             mcuPutMsg( "No such ship.", MSG_LIN2 );
             return;
 	}
-        if ( Ships[j].status != SS_LIVE )
+        if ( cbShips[j].status != SS_LIVE )
 	{
             mcuPutMsg( nf, MSG_LIN2 );
             return;
@@ -265,8 +265,8 @@ void cucSendMsg( msgFrom_t from, uint16_t fromDetail, int terse, int remote )
             {
                 /* Check for a team character. */
                 for ( i = 0; i < NUMPLAYERTEAMS; i++ )
-                    if ( buf[0] == Teams[i].teamchar
-                         || buf[0] == (char)tolower(Teams[i].teamchar) )
+                    if ( buf[0] == cbTeams[i].teamchar
+                         || buf[0] == (char)tolower(cbTeams[i].teamchar) )
                         break;
 
                 if ( i >= NUMPLAYERTEAMS )
@@ -285,7 +285,7 @@ void cucSendMsg( msgFrom_t from, uint16_t fromDetail, int terse, int remote )
     strcpy(buf , "Message to ") ;
     if ( to == MSG_TO_SHIP && toDetail < MAXSHIPS )
     {
-        if ( Ships[toDetail].status != SS_LIVE )
+        if ( cbShips[toDetail].status != SS_LIVE )
 	{
             mcuPutMsg( nf, MSG_LIN2 );
             return;
@@ -295,7 +295,7 @@ void cucSendMsg( msgFrom_t from, uint16_t fromDetail, int terse, int remote )
     }
     else if ( to == MSG_TO_TEAM && toDetail < NUMPLAYERTEAMS )
     {
-        strcat(buf , Teams[toDetail].name) ;
+        strcat(buf , cbTeams[toDetail].name) ;
         strcat(buf , "s:") ;
     }
     else switch ( to )
@@ -350,7 +350,7 @@ void cucSendMsg( msgFrom_t from, uint16_t fromDetail, int terse, int remote )
                 strcpy(buf , "Communique from ") ;
                 if ( from == MSG_FROM_SHIP && fromDetail < MAXSHIPS )
                 {
-                    strcat(buf , Ships[fromDetail].alias) ;
+                    strcat(buf , cbShips[fromDetail].alias) ;
                     strcat(buf , " on board ") ;
                     utAppendShip(buf , (int)fromDetail) ;
                 }

@@ -34,7 +34,7 @@ spTorpLoc_t    *spktTorpLoc(uint8_t tsnum, uint8_t tnum, int rec);
 spTorpEvent_t  *spktTorpEvent(uint8_t tsnum, uint8_t tnum, int rec);
 
 spTeam_t       *spktTeam(uint8_t team, int force, int rec);
-spConqInfo_t   *spktConqInfo(int force);
+spcbConqInfo_t   *spktcbConqInfo(int force);
 
 spHistory_t    *spktHistory(int hnum);
 spDoomsday_t   *spktDoomsday(int rec);

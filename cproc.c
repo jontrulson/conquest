@@ -92,27 +92,27 @@ int procUser(char *buf)
     if (Context.recmode == RECMODE_ON)
         recWriteEvent(buf);
 
-    Users[unum].team = suser->team;
-    Users[unum].type = (userTypes_t)suser->userType;
+    cbUsers[unum].team = suser->team;
+    cbUsers[unum].type = (userTypes_t)suser->userType;
 
-    Users[unum].flags = ntohs(suser->flags);
-    Users[unum].opFlags = ntohs(suser->opFlags);
+    cbUsers[unum].flags = ntohs(suser->flags);
+    cbUsers[unum].opFlags = ntohs(suser->opFlags);
 
     for (i=0; i<NUMPLAYERTEAMS; i++)
         if ((suser->war & (1 << i)))
-            Users[unum].war[i] = TRUE;
+            cbUsers[unum].war[i] = TRUE;
 
-    Users[unum].rating = (real)((real)((int16_t)ntohs(suser->rating)) / 10.0);
-    Users[unum].lastentry = (time_t)ntohl(suser->lastentry);
+    cbUsers[unum].rating = (real)((real)((int16_t)ntohs(suser->rating)) / 10.0);
+    cbUsers[unum].lastentry = (time_t)ntohl(suser->lastentry);
 
     for (i=0; i<USTAT_TOTALSTATS; i++)
-        Users[unum].stats[i] = (int32_t)ntohl(suser->stats[i]);
+        cbUsers[unum].stats[i] = (int32_t)ntohl(suser->stats[i]);
 
-    utStrncpy(Users[unum].username, (char *)suser->username, MAXUSERNAME);
-    utStrncpy(Users[unum].alias, (char *)suser->alias, MAXUSERNAME);
+    utStrncpy(cbUsers[unum].username, (char *)suser->username, MAXUSERNAME);
+    utStrncpy(cbUsers[unum].alias, (char *)suser->alias, MAXUSERNAME);
 
 #if defined(DEBUG_CLIENTPROC)
-    utLog("\t%s: name: %s (%s)", __FUNCTION__, Users[unum].username, Users[unum].alias);
+    utLog("\t%s: name: %s (%s)", __FUNCTION__, cbUsers[unum].username, cbUsers[unum].alias);
 #endif
 
     return TRUE;
@@ -137,39 +137,39 @@ int procShip(char *buf)
     if (Context.recmode == RECMODE_ON)
         recWriteEvent(buf);
 
-    Ships[snum].status = sship->status;
-    Ships[snum].team = sship->team;
-    Ships[snum].unum = ntohs(sship->unum);
-    Ships[snum].shiptype = sship->shiptype;
-    Ships[snum].towing = sship->towing;
-    Ships[snum].towedby = sship->towedby;
+    cbShips[snum].status = sship->status;
+    cbShips[snum].team = sship->team;
+    cbShips[snum].unum = ntohs(sship->unum);
+    cbShips[snum].shiptype = sship->shiptype;
+    cbShips[snum].towing = sship->towing;
+    cbShips[snum].towedby = sship->towedby;
 
     for (i=0; i<NUMPLAYERTEAMS; i++)
         if (sship->war & (1 << i))
-            Ships[snum].war[i] = TRUE;
+            cbShips[snum].war[i] = TRUE;
         else
-            Ships[snum].war[i] = FALSE;
+            cbShips[snum].war[i] = FALSE;
 
     for (i=0; i<NUMPLAYERTEAMS; i++)
         if (sship->rwar & (1 << i))
-            Ships[snum].rwar[i] = TRUE;
+            cbShips[snum].rwar[i] = TRUE;
         else
-            Ships[snum].rwar[i] = FALSE;
+            cbShips[snum].rwar[i] = FALSE;
 
-    Ships[snum].killedBy = (killedBy_t)sship->killedBy;
-    Ships[snum].killedByDetail =
+    cbShips[snum].killedBy = (killedBy_t)sship->killedBy;
+    cbShips[snum].killedByDetail =
         (unsigned int)((uint16_t)ntohs(sship->killedByDetail));
 
-    Ships[snum].kills = (real)((real)ntohl(sship->kills) / 10.0);
+    cbShips[snum].kills = (real)((real)ntohl(sship->kills) / 10.0);
 
     for (i=0; i<MAXPLANETS; i++)
-        Ships[snum].srpwar[i] = (int)sship->srpwar[i];
+        cbShips[snum].srpwar[i] = (int)sship->srpwar[i];
 
     for (i=0; i<NUMPLAYERTEAMS; i++)
-        Ships[snum].scanned[i] = (int)sship->scanned[i];
+        cbShips[snum].scanned[i] = (int)sship->scanned[i];
 
     sship->alias[MAXUSERNAME - 1] = 0;
-    utStrncpy(Ships[snum].alias, (char *)sship->alias, MAXUSERNAME);
+    utStrncpy(cbShips[snum].alias, (char *)sship->alias, MAXUSERNAME);
 
     return TRUE;
 }
@@ -195,35 +195,35 @@ int procShipSml(char *buf)
         recWriteEvent(buf);
 
     /* we need to mask out map since it's always local */
-    Ships[snum].flags = ((((uint16_t)ntohs(sshipsml->flags)) & ~SHIP_F_MAP) | SMAP(snum));
+    cbShips[snum].flags = ((((uint16_t)ntohs(sshipsml->flags)) & ~SHIP_F_MAP) | SMAP(snum));
 
-    Ships[snum].action = sshipsml->action;
-    Ships[snum].shields = sshipsml->shields;
-    Ships[snum].damage = sshipsml->damage;
-    Ships[snum].armies = sshipsml->armies;
-    Ships[snum].sdfuse = (int)((int16_t)ntohs(sshipsml->sdfuse));
+    cbShips[snum].action = sshipsml->action;
+    cbShips[snum].shields = sshipsml->shields;
+    cbShips[snum].damage = sshipsml->damage;
+    cbShips[snum].armies = sshipsml->armies;
+    cbShips[snum].sdfuse = (int)((int16_t)ntohs(sshipsml->sdfuse));
 
-    Ships[snum].wfuse = (int)sshipsml->wfuse;
-    Ships[snum].efuse = (int)sshipsml->efuse;
+    cbShips[snum].wfuse = (int)sshipsml->wfuse;
+    cbShips[snum].efuse = (int)sshipsml->efuse;
 
-    Ships[snum].weapalloc = sshipsml->walloc;
-    Ships[snum].engalloc = 100 - Ships[snum].weapalloc;
+    cbShips[snum].weapalloc = sshipsml->walloc;
+    cbShips[snum].engalloc = 100 - cbShips[snum].weapalloc;
 
-    Ships[snum].pfuse = (int)sshipsml->pfuse;
+    cbShips[snum].pfuse = (int)sshipsml->pfuse;
 
-    Ships[snum].etemp = (real)sshipsml->etemp;
-    Ships[snum].wtemp = (real)sshipsml->wtemp;
-    Ships[snum].fuel = (real)((uint16_t)ntohs(sshipsml->fuel));
+    cbShips[snum].etemp = (real)sshipsml->etemp;
+    cbShips[snum].wtemp = (real)sshipsml->wtemp;
+    cbShips[snum].fuel = (real)((uint16_t)ntohs(sshipsml->fuel));
     // a check...
     if (sshipsml->lock < LOCK_MAX)
-        Ships[snum].lock = (courseLock_t)sshipsml->lock;
+        cbShips[snum].lock = (courseLock_t)sshipsml->lock;
     else
         utLog("%s: got invalid courseLock enueration %d, ignoring",
               __FUNCTION__, (int)sshipsml->lock);
 
-    Ships[snum].lockDetail = ntohs(sshipsml->lockDetail);
-    Ships[snum].lastphase = (real)((uint16_t)ntohs(sshipsml->lastphase)) / 100.0;
-    Ships[snum].lastblast = (real)((uint16_t)ntohs(sshipsml->lastblast)) / 100.0;
+    cbShips[snum].lockDetail = ntohs(sshipsml->lockDetail);
+    cbShips[snum].lastphase = (real)((uint16_t)ntohs(sshipsml->lastphase)) / 100.0;
+    cbShips[snum].lastblast = (real)((uint16_t)ntohs(sshipsml->lastblast)) / 100.0;
 
     return TRUE;
 }
@@ -248,11 +248,11 @@ int procShipLoc(char *buf)
     if (Context.recmode == RECMODE_ON)
         recWriteEvent(buf);
 
-    Ships[snum].head = (real)((real)ntohs(sshiploc->head) / 10.0);
-    Ships[snum].warp = (real)((real)sshiploc->warp / 10.0);
+    cbShips[snum].head = (real)((real)ntohs(sshiploc->head) / 10.0);
+    cbShips[snum].warp = (real)((real)sshiploc->warp / 10.0);
 
-    Ships[snum].x = (real)((real)((int32_t)ntohl(sshiploc->x)) / 1000.0);
-    Ships[snum].y = (real)((real)((int32_t)ntohl(sshiploc->y)) / 1000.0);
+    cbShips[snum].x = (real)((real)((int32_t)ntohl(sshiploc->x)) / 1000.0);
+    cbShips[snum].y = (real)((real)((int32_t)ntohl(sshiploc->y)) / 1000.0);
 
     return TRUE;
 }
@@ -273,11 +273,11 @@ int procPlanet(char *buf)
     if (Context.recmode == RECMODE_ON)
         recWriteEvent(buf);
 
-    Planets[pnum].type = splan->ptype;
-    Planets[pnum].team = splan->team;
-    Planets[pnum].defendteam = splan->defendteam;
+    cbPlanets[pnum].type = splan->ptype;
+    cbPlanets[pnum].team = splan->team;
+    cbPlanets[pnum].defendteam = splan->defendteam;
 
-    utStrncpy(Planets[pnum].name, (char *)splan->name, MAXPLANETNAME);
+    utStrncpy(cbPlanets[pnum].name, (char *)splan->name, MAXPLANETNAME);
 
     uiUpdatePlanet(pnum);
 
@@ -303,11 +303,11 @@ int procPlanetSml(char *buf)
 
     for (i=0; i<NUMPLAYERTEAMS; i++)
         if (splansml->scanned & (1 << i))
-            Planets[pnum].scanned[i] = TRUE;
+            cbPlanets[pnum].scanned[i] = TRUE;
         else
-            Planets[pnum].scanned[i] = FALSE;
+            cbPlanets[pnum].scanned[i] = FALSE;
 
-    Planets[pnum].uninhabtime = (int)splansml->uninhabtime;
+    cbPlanets[pnum].uninhabtime = (int)splansml->uninhabtime;
 
 #if 0
     utLog("%s: %d scanned = %x", __FUNCTION__, pnum, splansml->scanned);
@@ -332,9 +332,9 @@ int procPlanetLoc(char *buf)
     if (Context.recmode == RECMODE_ON)
         recWriteEvent(buf);
 
-    Planets[pnum].armies = (int)((int16_t)ntohs(splanloc->armies));
-    Planets[pnum].x = (real)((real)((int32_t)ntohl(splanloc->x)) / 1000.0);
-    Planets[pnum].y = (real)((real)((int32_t)ntohl(splanloc->y)) / 1000.0);
+    cbPlanets[pnum].armies = (int)((int16_t)ntohs(splanloc->armies));
+    cbPlanets[pnum].x = (real)((real)((int32_t)ntohl(splanloc->x)) / 1000.0);
+    cbPlanets[pnum].y = (real)((real)((int32_t)ntohl(splanloc->y)) / 1000.0);
 
     return TRUE;
 }
@@ -355,10 +355,10 @@ int procPlanetLoc2(char *buf)
     if (Context.recmode == RECMODE_ON)
         recWriteEvent(buf);
 
-    Planets[pnum].armies = (int)((int16_t)ntohs(splanloc2->armies));
-    Planets[pnum].x = (real)((real)((int32_t)ntohl(splanloc2->x)) / 1000.0);
-    Planets[pnum].y = (real)((real)((int32_t)ntohl(splanloc2->y)) / 1000.0);
-    Planets[pnum].orbang = (real)((real)((uint16_t)ntohs(splanloc2->orbang)) / 100.0);
+    cbPlanets[pnum].armies = (int)((int16_t)ntohs(splanloc2->armies));
+    cbPlanets[pnum].x = (real)((real)((int32_t)ntohl(splanloc2->x)) / 1000.0);
+    cbPlanets[pnum].y = (real)((real)((int32_t)ntohl(splanloc2->y)) / 1000.0);
+    cbPlanets[pnum].orbang = (real)((real)((uint16_t)ntohs(splanloc2->orbang)) / 100.0);
 
     return TRUE;
 }
@@ -387,10 +387,10 @@ int procPlanetInfo(char *buf)
     if (Context.recmode == RECMODE_ON)
         recWriteEvent(buf);
 
-    Planets[pnum].primary = primary;
-    Planets[pnum].flags = ntohl(splaninfo->flags);
-    Planets[pnum].orbrad = (real)((real)((uint32_t)ntohl(splaninfo->orbrad)) / 10.0);
-    Planets[pnum].orbvel = (real)((real)((int32_t)ntohl(splaninfo->orbvel)) / 100.0);
+    cbPlanets[pnum].primary = primary;
+    cbPlanets[pnum].flags = ntohl(splaninfo->flags);
+    cbPlanets[pnum].orbrad = (real)((real)((uint32_t)ntohl(splaninfo->orbrad)) / 10.0);
+    cbPlanets[pnum].orbvel = (real)((real)((int32_t)ntohl(splaninfo->orbvel)) / 100.0);
 
     return TRUE;
 }
@@ -416,7 +416,7 @@ int procTorp(char *buf)
     if (Context.recmode == RECMODE_ON)
         recWriteEvent(buf);
 
-    Ships[snum].torps[tnum].status = (int)storp->status;
+    cbShips[snum].torps[tnum].status = (int)storp->status;
 
     return TRUE;
 }
@@ -443,12 +443,12 @@ int procTorpLoc(char *buf)
 
     for (i=0; i<NUMPLAYERTEAMS; i++)
         if (storploc->war & (1 << i))
-            Ships[snum].torps[tnum].war[i] = TRUE;
+            cbShips[snum].torps[tnum].war[i] = TRUE;
         else
-            Ships[snum].torps[tnum].war[i] = FALSE;
+            cbShips[snum].torps[tnum].war[i] = FALSE;
 
-    Ships[snum].torps[tnum].x = (real)((real)((int32_t)ntohl(storploc->x)) / 1000.0);
-    Ships[snum].torps[tnum].y = (real)((real)((int32_t)ntohl(storploc->y)) / 1000.0);
+    cbShips[snum].torps[tnum].x = (real)((real)((int32_t)ntohl(storploc->x)) / 1000.0);
+    cbShips[snum].torps[tnum].y = (real)((real)((int32_t)ntohl(storploc->y)) / 1000.0);
 
     return TRUE;
 }
@@ -471,25 +471,25 @@ int procTorpEvent(char *buf)
     if (tnum < 0 || tnum >= MAXTORPS)
         return FALSE;
 
-    Ships[snum].torps[tnum].status = (int)storpev->status;
+    cbShips[snum].torps[tnum].status = (int)storpev->status;
 
     if (Context.recmode == RECMODE_ON)
         recWriteEvent(buf);
 
     for (i=0; i<NUMPLAYERTEAMS; i++)
         if (storpev->war & (1 << i))
-            Ships[snum].torps[tnum].war[i] = TRUE;
+            cbShips[snum].torps[tnum].war[i] = TRUE;
         else
-            Ships[snum].torps[tnum].war[i] = FALSE;
+            cbShips[snum].torps[tnum].war[i] = FALSE;
 
-    Ships[snum].torps[tnum].x =
+    cbShips[snum].torps[tnum].x =
         (real)((real)((int32_t)ntohl(storpev->x)) / 1000.0);
-    Ships[snum].torps[tnum].y =
+    cbShips[snum].torps[tnum].y =
         (real)((real)((int32_t)ntohl(storpev->y)) / 1000.0);
 
-    Ships[snum].torps[tnum].dx =
+    cbShips[snum].torps[tnum].dx =
         (real)((real)((int32_t)ntohl(storpev->dx)) / 1000.0);
-    Ships[snum].torps[tnum].dy =
+    cbShips[snum].torps[tnum].dy =
         (real)((real)((int32_t)ntohl(storpev->dy)) / 1000.0);
 
     uiUpdateTorpDir(snum, tnum);
@@ -578,18 +578,18 @@ int procTeam(char *buf)
         recWriteEvent(buf);
 
     if (steam->flags & SPTEAM_FLAGS_COUPINFO)
-        Teams[team].coupinfo = TRUE;
+        cbTeams[team].coupinfo = TRUE;
     else
-        Teams[team].coupinfo = FALSE;
+        cbTeams[team].coupinfo = FALSE;
 
-    Teams[team].homeplanet = (int)steam->homeplanet;
+    cbTeams[team].homeplanet = (int)steam->homeplanet;
 
-    Teams[team].couptime = steam->couptime;
+    cbTeams[team].couptime = steam->couptime;
 
     for (i=0; i<MAXTSTATS; i++)
-        Teams[team].stats[i] = (int)ntohl(steam->stats[i]);
+        cbTeams[team].stats[i] = (int)ntohl(steam->stats[i]);
 
-    utStrncpy(Teams[team].name, (char *)steam->name, MAXTEAMNAME);
+    utStrncpy(cbTeams[team].name, (char *)steam->name, MAXTEAMNAME);
 
     return TRUE;
 }
@@ -611,17 +611,17 @@ int procServerStat(char *buf)
     return TRUE;
 }
 
-int procConqInfo(char *buf)
+int proccbConqInfo(char *buf)
 {
-    spConqInfo_t *spci = (spConqInfo_t *)buf;
+    spcbConqInfo_t *spci = (spcbConqInfo_t *)buf;
 
     if (!pktIsValid(SP_CONQINFO, buf))
         return FALSE;
 
-    utStrncpy(ConqInfo->conqueror, (char *)spci->conqueror, MAXUSERNAME);
-    utStrncpy(ConqInfo->conqteam, (char *)spci->conqteam, MAXTEAMNAME);
-    utStrncpy(ConqInfo->conqtime, (char *)spci->conqtime, MAXDATESIZE);
-    utStrncpy(ConqInfo->lastwords, (char *)spci->lastwords, MAXLASTWORDS);
+    utStrncpy(cbConqInfo->conqueror, (char *)spci->conqueror, MAXUSERNAME);
+    utStrncpy(cbConqInfo->conqteam, (char *)spci->conqteam, MAXTEAMNAME);
+    utStrncpy(cbConqInfo->conqtime, (char *)spci->conqtime, MAXDATESIZE);
+    utStrncpy(cbConqInfo->lastwords, (char *)spci->lastwords, MAXLASTWORDS);
 
     return TRUE;
 }
@@ -636,13 +636,13 @@ int procHistory(char *buf)
 
     hnum = hist->hnum;
 
-    ConqInfo->histptr = hist->histptr;
-    History[hnum].unum = (int)((int16_t)ntohs(hist->unum));
+    cbConqInfo->histptr = hist->histptr;
+    cbHistory[hnum].unum = (int)((int16_t)ntohs(hist->unum));
 
-    History[hnum].elapsed = (time_t)ntohl((uint32_t)hist->elapsed);
-    History[hnum].enterTime = (time_t)ntohl((uint32_t)hist->enterTime);
+    cbHistory[hnum].elapsed = (time_t)ntohl((uint32_t)hist->elapsed);
+    cbHistory[hnum].enterTime = (time_t)ntohl((uint32_t)hist->enterTime);
 
-    utStrncpy(History[hnum].username, (char *)hist->username, MAXUSERNAME);
+    utStrncpy(cbHistory[hnum].username, (char *)hist->username, MAXUSERNAME);
 
     return TRUE;
 }
@@ -657,10 +657,10 @@ int procDoomsday(char *buf)
     if (Context.recmode == RECMODE_ON)
         recWriteEvent(buf);
 
-    Doomsday->status = dd->status;
-    Doomsday->heading =(real)((real)ntohs(dd->heading) / 10.0);
-    Doomsday->x = (real)((real)((int32_t)ntohl(dd->x)) / 1000.0);
-    Doomsday->y = (real)((real)((int32_t)ntohl(dd->y)) / 1000.0);
+    cbDoomsday->status = dd->status;
+    cbDoomsday->heading =(real)((real)ntohs(dd->heading) / 10.0);
+    cbDoomsday->x = (real)((real)((int32_t)ntohl(dd->x)) / 1000.0);
+    cbDoomsday->y = (real)((real)((int32_t)ntohl(dd->y)) / 1000.0);
 
     return TRUE;
 }
@@ -711,7 +711,7 @@ int procClientStat(char *buf)
     {
         Context.snum = scstat->snum;
         Context.unum = scstat->unum;
-        Ships[Context.snum].team = scstat->team;
+        cbShips[Context.snum].team = scstat->team;
         clientFlags = scstat->flags;
 
         /* save a copy in the global variant */

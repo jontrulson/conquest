@@ -128,13 +128,13 @@ static int nUserlDisplay(dspConfig_t *dsp)
         /* determine color */
         if ( snum >= 0 && snum < MAXSHIPS ) /* we're a valid ship */
         {
-            if ( strcmp(Users[uvec[offset]].username,
-                        Users[Ships[snum].unum].username) == 0 &&
-                 Users[uvec[offset]].type == Users[Ships[snum].unum].type)
+            if ( strcmp(cbUsers[uvec[offset]].username,
+                        cbUsers[cbShips[snum].unum].username) == 0 &&
+                 cbUsers[uvec[offset]].type == cbUsers[cbShips[snum].unum].type)
                 color = NoColor | CQC_A_BOLD; /* it's ours */
-            else if (Ships[snum].war[Users[uvec[offset]].team])
+            else if (cbShips[snum].war[cbUsers[uvec[offset]].team])
                 color = RedLevelColor; /* we're at war with it */
-            else if (Ships[snum].team == Users[uvec[offset]].team && !selfwar(snum))
+            else if (cbShips[snum].team == cbUsers[uvec[offset]].team && !selfwar(snum))
                 color = GreenLevelColor; /* it's a team ship */
             else
                 color = YellowLevelColor;
@@ -143,13 +143,13 @@ static int nUserlDisplay(dspConfig_t *dsp)
             color = YellowLevelColor; /* bland view */
         else			/* we don't have a ship yet */
         {
-            if ( strcmp(Users[uvec[offset]].username,
-                        Users[Context.unum].username) == 0 &&
-                 Users[uvec[offset]].type == Users[Context.unum].type)
+            if ( strcmp(cbUsers[uvec[offset]].username,
+                        cbUsers[Context.unum].username) == 0 &&
+                 cbUsers[uvec[offset]].type == cbUsers[Context.unum].type)
                 color = NoColor | CQC_A_BOLD;    /* it's ours */
-            else if (Users[Context.unum].war[Users[uvec[offset]].team])
+            else if (cbUsers[Context.unum].war[cbUsers[uvec[offset]].team])
                 color = RedLevelColor; /* we're war with them (might be selfwar) */
-            else if (Users[Context.unum].team == Users[uvec[offset]].team)
+            else if (cbUsers[Context.unum].team == cbUsers[uvec[offset]].team)
                 color = GreenLevelColor; /* team ship */
             else
                 color = YellowLevelColor;
@@ -181,7 +181,7 @@ static int nUserlIdle(void)
     if (pkttype < 0)          /* some error */
     {
         utLog("nUserlIdle: waiForPacket returned %d", pkttype);
-        Ships[Context.snum].status = SS_OFF;
+        cbShips[Context.snum].status = SS_OFF;
         return NODE_EXIT;
     }
 

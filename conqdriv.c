@@ -91,16 +91,16 @@ int main(int argc, char *argv[])
 
     cbMap();
 
-    if ( *CBlockRevision != COMMONSTAMP )
+    if ( *cbRevision != COMMONSTAMP )
         utLog("conqdriv:ERROR:common block mismatch");
 
     initstats( &ctime, &etime );
     cacc = 0;
     eacc = 0;
 
-    cbLock(&ConqInfo->lockword);
-    utGetSecs( &Driver->drivtime );		/* prevent driver timeouts */
-    utGetSecs( &Driver->playtime );
+    cbLock(&cbConqInfo->lockword);
+    utGetSecs( &cbDriver->drivtime );		/* prevent driver timeouts */
+    utGetSecs( &cbDriver->playtime );
 
     /* Look for the force flag. */
 
@@ -119,26 +119,26 @@ int main(int argc, char *argv[])
     if ( ! force )
     {
         /* Make sure we're supposed to be starting. */
-        if ( Driver->drivstat != DRS_RESTART )
+        if ( cbDriver->drivstat != DRS_RESTART )
 	{
-            cbUnlock(&ConqInfo->lockword);
-            utLog("conqdriv: we shouldn't be starting: drivstat = %d\n", Driver->drivstat);
+            cbUnlock(&cbConqInfo->lockword);
+            utLog("conqdriv: we shouldn't be starting: drivstat = %d\n", cbDriver->drivstat);
 	}
 
-        if ( Driver->drivpid != 0 )
+        if ( cbDriver->drivpid != 0 )
 	{
-            cbUnlock(&ConqInfo->lockword);
-            utLog("conqdriv: Driver->drivpid != 0, drivpid = %d", Driver->drivpid);
+            cbUnlock(&cbConqInfo->lockword);
+            utLog("conqdriv: cbDriver->drivpid != 0, drivpid = %d", cbDriver->drivpid);
 	}
     }
     else
     {
         /* Kill the other driver. */
-        if ( Driver->drivstat == DRS_RUNNING )
+        if ( cbDriver->drivstat == DRS_RUNNING )
 	{
-            Driver->drivstat = DRS_KAMIKAZE;
+            cbDriver->drivstat = DRS_KAMIKAZE;
             i = TIMEOUT_DRIVER * ITER_TENTHS;
-            while ( Driver->drivstat != DRS_OFF && i > 0 )
+            while ( cbDriver->drivstat != DRS_OFF && i > 0 )
 	    {
                 utSleep( ITER_SECONDS );
                 i = i - ITER_TENTHS;
@@ -147,22 +147,22 @@ int main(int argc, char *argv[])
     }
 
 
-    Driver->drivstat = DRS_STARTING;		/* show intent of becoming "the" driver */
+    cbDriver->drivstat = DRS_STARTING;		/* show intent of becoming "the" driver */
     rndini();			/* init random numbers */
     pid = getpid(); /* store our pid */
-    Driver->drivpid = pid;
+    cbDriver->drivpid = pid;
 
-    utStrncpy(Driver->drivowner, clbGetUserLogname(), MAXUSERNAME);
+    utStrncpy(cbDriver->drivowner, clbGetUserLogname(), MAXUSERNAME);
 
     /* Start within bounds. */
-    Driver->drivsecs = utModPlusOne( Driver->drivsecs, FIVEMINUTE_SECONDS );
+    cbDriver->drivsecs = utModPlusOne( cbDriver->drivsecs, FIVEMINUTE_SECONDS );
 
     /* Special hack to cause the one second fuse to expire upon entry. */
     drivtenths = 10;
 
-    Driver->drivstat = DRS_RUNNING;
+    cbDriver->drivstat = DRS_RUNNING;
 
-    cbUnlock(&ConqInfo->lockword);
+    cbUnlock(&cbConqInfo->lockword);
 
     if ( force )
     {
@@ -186,7 +186,7 @@ int main(int argc, char *argv[])
     for ( s = 0; s < MAXSHIPS; s++ )
         ship[s] = s;
 
-    while ( pid == Driver->drivpid && Driver->drivstat != DRS_KAMIKAZE )
+    while ( pid == cbDriver->drivpid && cbDriver->drivstat != DRS_KAMIKAZE )
     {
 
         if ( drivtenths >= 10 )
@@ -195,18 +195,18 @@ int main(int argc, char *argv[])
             drivtenths = 0;
 
             /* Check for player timeout. */
-            if ( utDeltaSecs( Driver->playtime, &(Driver->drivtime) ) >=
+            if ( utDeltaSecs( cbDriver->playtime, &(cbDriver->drivtime) ) >=
                  TIMEOUT_PLAYER )
 	    {
-                Driver->drivpid = 0;
-                Driver->drivstat = DRS_OFF;
-                Driver->drivowner[0] = 0;
+                cbDriver->drivpid = 0;
+                cbDriver->drivstat = DRS_OFF;
+                cbDriver->drivowner[0] = 0;
                 upchuck();
-                utLog("conqdriv:player timeout: utDeltaSecs(Driver->playtime, &(Driver->drivtime)) = %d\n", utDeltaSecs(Driver->playtime, &(Driver->drivtime)));
+                utLog("conqdriv:player timeout: utDeltaSecs(cbDriver->playtime, &(cbDriver->drivtime)) = %d\n", utDeltaSecs(cbDriver->playtime, &(cbDriver->drivtime)));
                 break;
 	    }
 
-            if ( Driver->drivstat == DRS_RUNNING )
+            if ( cbDriver->drivstat == DRS_RUNNING )
 	    {
                 /* Randomize ship ordering. */
                 for ( s = 0; s < MAXSHIPS; s = s + 1 )
@@ -218,25 +218,25 @@ int main(int argc, char *argv[])
 		}
 
                 /* Do the big things first to sync the small things. */
-                Driver->drivsecs = utModPlusOne( Driver->drivsecs + 1, FIVEMINUTE_SECONDS );
-                if ( mod( Driver->drivsecs, FIVEMINUTE_SECONDS ) == 0 )
+                cbDriver->drivsecs = utModPlusOne( cbDriver->drivsecs + 1, FIVEMINUTE_SECONDS );
+                if ( mod( cbDriver->drivsecs, FIVEMINUTE_SECONDS ) == 0 )
                     fivemindrive();
-                if ( mod( Driver->drivsecs, MINUTE_SECONDS ) == 0 )
+                if ( mod( cbDriver->drivsecs, MINUTE_SECONDS ) == 0 )
                     mindrive();
-                if ( mod( Driver->drivsecs, SUBMIN_SECONDS ) == 0 )
+                if ( mod( cbDriver->drivsecs, SUBMIN_SECONDS ) == 0 )
                 {
                     upstats( &ctime, &etime, &cacc, &eacc,
-                             &ConqInfo->dcpuseconds, &ConqInfo->delapsedseconds );
+                             &cbConqInfo->dcpuseconds, &cbConqInfo->delapsedseconds );
                 }
 
                 secdrive( ship );
 
                 /* Update the common block every minute. */
-                if ( mod( Driver->drivsecs, MINUTE_SECONDS ) == 0 )
+                if ( mod( cbDriver->drivsecs, MINUTE_SECONDS ) == 0 )
                     upchuck();
 	    }
 	}
-        if ( Driver->drivstat == DRS_RUNNING )
+        if ( cbDriver->drivstat == DRS_RUNNING )
         {
             clbPlanetDrive(0.1);
             iterdrive( ship );
@@ -246,17 +246,17 @@ int main(int argc, char *argv[])
     }
 
     /* See if we should turn off. */
-    if ( Driver->drivstat == DRS_KAMIKAZE )
+    if ( cbDriver->drivstat == DRS_KAMIKAZE )
     {
-        Driver->drivpid = 0;
-        Driver->drivstat = DRS_OFF;
-        Driver->drivowner[0] = 0;
-        utLog( "conqdriv:DRS_KAMIKAZE: Driver->drivstat = %d\n", Driver->drivstat);
+        cbDriver->drivpid = 0;
+        cbDriver->drivstat = DRS_OFF;
+        cbDriver->drivowner[0] = 0;
+        utLog( "conqdriv:DRS_KAMIKAZE: cbDriver->drivstat = %d\n", cbDriver->drivstat);
     }
 
     /* Make last minute driver stats update. */
-    upstats( &ctime, &etime, &cacc, &eacc, &ConqInfo->dcpuseconds,
-             &ConqInfo->delapsedseconds );
+    upstats( &ctime, &etime, &cacc, &eacc, &cbConqInfo->dcpuseconds,
+             &cbConqInfo->delapsedseconds );
 
     exit(0);
 }
@@ -277,27 +277,27 @@ void iterdrive( int *ship )
     for ( s = 0; s < MAXSHIPS; s++ )
     {
         i = ship[s];
-        if ( Ships[i].status == SS_LIVE )
+        if ( cbShips[i].status == SS_LIVE )
 	{
             /* Phaser fuses. */
-            if ( Ships[i].pfuse > 0 )
-                Ships[i].pfuse = max( 0, Ships[i].pfuse - ITER_TENTHS );
+            if ( cbShips[i].pfuse > 0 )
+                cbShips[i].pfuse = max( 0, cbShips[i].pfuse - ITER_TENTHS );
 
-            warp = Ships[i].warp;
+            warp = cbShips[i].warp;
 
             // If we are locked onto a planet
-            if ( Ships[i].lock == LOCK_PLANET
-                 && Ships[i].lockDetail < MAXPLANETS )
+            if ( cbShips[i].lock == LOCK_PLANET
+                 && cbShips[i].lockDetail < MAXPLANETS )
             {
-                int pnum = Ships[i].lockDetail;
+                int pnum = cbShips[i].lockDetail;
                 if ( warp < 0.0 )
                 {
                     /* Orbiting. */
                     if ( warp == ORBIT_CW )
                     {
                         /* Orbiting clockwise. */
-                        Ships[i].head =
-                            utMod360( Ships[i].head - (ORBIT_FAC/10.0) );
+                        cbShips[i].head =
+                            utMod360( cbShips[i].head - (ORBIT_FAC/10.0) );
 
                         /* adjust the ships obital position */
                         clbAdjOrbitalPosition(i);
@@ -305,8 +305,8 @@ void iterdrive( int *ship )
                     else if ( warp == ORBIT_CCW )
                     {
                         /* Orbiting counter-clockwise. */
-                        Ships[i].head =
-                            utMod360( Ships[i].head + (ORBIT_FAC/10.0) );
+                        cbShips[i].head =
+                            utMod360( cbShips[i].head + (ORBIT_FAC/10.0) );
 
                         /* adjust the ships obital position */
                         clbAdjOrbitalPosition(i);
@@ -315,86 +315,86 @@ void iterdrive( int *ship )
                 else
                 {
                     /* Cruising, locked on; update ship's desired heading. */
-                    Ships[i].dhead = (real) utAngle(Ships[i].x,
-                                                    Ships[i].y,
-                                                    Planets[pnum].x,
-                                                    Planets[pnum].y);
+                    cbShips[i].dhead = (real) utAngle(cbShips[i].x,
+                                                    cbShips[i].y,
+                                                    cbPlanets[pnum].x,
+                                                    cbPlanets[pnum].y);
                 }
             }
 
             /* Turning. */
-            if ( Ships[i].warp >= 0.0 && Ships[i].dhead != Ships[i].head )
+            if ( cbShips[i].warp >= 0.0 && cbShips[i].dhead != cbShips[i].head )
 	    {
-                h = Ships[i].head;
-                ad = utSubAngle( h, Ships[i].dhead );
-                x = (real)max( 210.0 - ((Ships[i].warp*20.0)/engeff( i )), 2.0 ) * (real)ITER_SECONDS;
+                h = cbShips[i].head;
+                ad = utSubAngle( h, cbShips[i].dhead );
+                x = (real)max( 210.0 - ((cbShips[i].warp*20.0)/engeff( i )), 2.0 ) * (real)ITER_SECONDS;
                 if ( fabs( ad ) <= x )
-                    Ships[i].head = Ships[i].dhead;
+                    cbShips[i].head = cbShips[i].dhead;
                 else if ( ad < 0.0 )
 		{
                     z = h + x;
 
                     if (z > 360.0)
                         z = fabs(z) - 360.0;
-                    Ships[i].head = (real) z;
+                    cbShips[i].head = (real) z;
 		}
                 else
 		{
                     z = h - x;
                     if (z < 0.0)
                         z = 360.0 - fabs(z);
-                    Ships[i].head = (real) z;
+                    cbShips[i].head = (real) z;
 		}
 
                 clbFixDeltas( i );
 	    }
 
             /* Movement. */
-            j = Ships[i].towedby;
+            j = cbShips[i].towedby;
             if ( j != 0 )
 	    {
                 /* Being towed; slowly (grossly?) align with our tower. */
-                Ships[i].warp = 0.0;
-                Ships[i].dwarp = 0.0;
-                h = utAngle( Ships[i].x, Ships[i].y, Ships[j].x, Ships[j].y );
-                ad = utSubAngle( h, Ships[j].head );
+                cbShips[i].warp = 0.0;
+                cbShips[i].dwarp = 0.0;
+                h = utAngle( cbShips[i].x, cbShips[i].y, cbShips[j].x, cbShips[j].y );
+                ad = utSubAngle( h, cbShips[j].head );
                 if ( ad < 0.0 )
                     h = h - max( ad, -10.0*ITER_SECONDS );
                 else
                     h = h - min( ad, +10.0*ITER_SECONDS );
 
-                Ships[i].x = Ships[j].x + TOW_DIST * cosd(h+180.0);
-                Ships[i].y = Ships[j].y + TOW_DIST * sind(h+180.0);
+                cbShips[i].x = cbShips[j].x + TOW_DIST * cosd(h+180.0);
+                cbShips[i].y = cbShips[j].y + TOW_DIST * sind(h+180.0);
 	    }
-            else if ( Ships[i].warp >= 0.0 )
+            else if ( cbShips[i].warp >= 0.0 )
 	    {
                 /* Cruising. */
-                x = min( Ships[i].dwarp, maxwarp( i ) );
-                if ( Ships[i].warp != x )
+                x = min( cbShips[i].dwarp, maxwarp( i ) );
+                if ( cbShips[i].warp != x )
 		{
-                    Ships[i].warp = clbNewWarp( i, x );
+                    cbShips[i].warp = clbNewWarp( i, x );
                     clbFixDeltas( i );
 		}
 
-                Ships[i].x = Ships[i].x + Ships[i].dx;
-                Ships[i].y = Ships[i].y + Ships[i].dy;
+                cbShips[i].x = cbShips[i].x + cbShips[i].dx;
+                cbShips[i].y = cbShips[i].y + cbShips[i].dy;
 
                 /* If we're locked onto a planet but not orbiting it see if */
                 /* we are close enough to orbit. */
-                if ( Ships[i].lock == LOCK_PLANET
-                     && Ships[i].lockDetail < MAXPLANETS)
+                if ( cbShips[i].lock == LOCK_PLANET
+                     && cbShips[i].lockDetail < MAXPLANETS)
 		{
-                    j = Ships[i].lockDetail;
+                    j = cbShips[i].lockDetail;
                     /* Make sure the planet is still real. */
                     if ( ! PVISIBLE(j) )
-                        Ships[i].lock = LOCK_NONE;
-                    else if ( Ships[i].warp >= 0.0 )
+                        cbShips[i].lock = LOCK_NONE;
+                    else if ( cbShips[i].warp >= 0.0 )
 		    {
                         /* Still moving; if we're going slow enough to orbit, */
                         /*  check if we're close enough to do so. Otherwise, */
                         /*  check to see if it's time to slow down yet. */
-                        dis = dist( Ships[i].x, Ships[i].y, Planets[j].x, Planets[j].y );
-                        if ( Ships[i].warp <= MAX_ORBIT_WARP )
+                        dis = dist( cbShips[i].x, cbShips[i].y, cbPlanets[j].x, cbPlanets[j].y );
+                        if ( cbShips[i].warp <= MAX_ORBIT_WARP )
 			{
                             /* Going slow enough to orbit. */
                             if ( dis <= ORBIT_DIST )
@@ -403,25 +403,25 @@ void iterdrive( int *ship )
                                 clbOrbit( i, j );
                                 sprintf( buf,
                                          "Coming into orbit around %s.",
-                                         Planets[j].name );
+                                         cbPlanets[j].name );
                                 clbStoreMsgf( MSG_FROM_COMP, 0,
                                               MSG_TO_SHIP, i,
                                               buf, MSG_FLAGS_TERSABLE );
 			    }
 			}
                         else if ( ( dis - ORBIT_DIST ) <=
-                                  utAccurateDist( Ships[i].warp, MAX_ORBIT_WARP,
-                                                  ShipTypes[Ships[i].shiptype].accelfac *
+                                  utAccurateDist( cbShips[i].warp, MAX_ORBIT_WARP,
+                                                  cbShipTypes[cbShips[i].shiptype].accelfac *
                                                   engeff( i ) ) )
 			{
                             /* Time to slow down. */
-                            if ( Ships[i].dwarp > MAX_ORBIT_WARP )
+                            if ( cbShips[i].dwarp > MAX_ORBIT_WARP )
 			    {
-                                Ships[i].dwarp = MAX_ORBIT_WARP;
+                                cbShips[i].dwarp = MAX_ORBIT_WARP;
                                 /* "WARNING, WILL ROBINSON!!" */
                                 sprintf( buf,
                                          "Approaching %s - commencing orbital insertion maneuver.",
-                                         Planets[j].name );
+                                         cbPlanets[j].name );
                                 clbStoreMsgf( MSG_FROM_COMP, 0,
                                               MSG_TO_SHIP, i,
                                               buf, MSG_FLAGS_TERSABLE );
@@ -438,28 +438,28 @@ void iterdrive( int *ship )
     for ( s = 0; s < MAXSHIPS; s++ )
     {
         i = ship[s];
-        if ( Ships[i].status != SS_OFF )
+        if ( cbShips[i].status != SS_OFF )
 	{
             for ( j = 0; j < MAXTORPS; j++ )
 	    {
-                if ( Ships[i].torps[j].status == TS_DETONATE )
+                if ( cbShips[i].torps[j].status == TS_DETONATE )
 		{
                     /* Detonate. */
-                    Ships[i].torps[j].fuse = FIREBALL_FUSE;
-                    Ships[i].torps[j].status = TS_FIREBALL;
+                    cbShips[i].torps[j].fuse = FIREBALL_FUSE;
+                    cbShips[i].torps[j].status = TS_FIREBALL;
                     for ( t = 0; t < MAXSHIPS; t++ )
 		    {
                         k = ship[t];
 
-                        if ( Ships[k].status == SS_LIVE && k != i )
-                            if ( Ships[i].torps[j].war[Ships[k].team] ||
-                                 Ships[k].war[Ships[i].team] )
+                        if ( cbShips[k].status == SS_LIVE && k != i )
+                            if ( cbShips[i].torps[j].war[cbShips[k].team] ||
+                                 cbShips[k].war[cbShips[i].team] )
                             {
                                 ht = utExplosionHits( (real)(TORPEDO_HIT *
-                                                             Ships[i].torps[j].mult),
-                                                      dist( Ships[i].torps[j].x,
-                                                            Ships[i].torps[j].y,
-                                                            Ships[k].x, Ships[k].y ) );
+                                                             cbShips[i].torps[j].mult),
+                                                      dist( cbShips[i].torps[j].x,
+                                                            cbShips[i].torps[j].y,
+                                                            cbShips[k].x, cbShips[k].y ) );
                                 if ( ht > 0.0 )
                                     clbHit( k, ht, KB_SHIP, (uint16_t)i );
                             }
@@ -470,7 +470,7 @@ void iterdrive( int *ship )
     }
 
     /* Drive the planet eater. */
-    if ( Doomsday->status == DS_LIVE )
+    if ( cbDoomsday->status == DS_LIVE )
     {
 
         /* We want to creep up on our target, without sitting and spinning
@@ -479,27 +479,27 @@ void iterdrive( int *ship )
          */
 
         /* planet lock */
-        if (Doomsday->lock == LOCK_PLANET
-            && Doomsday->lockDetail < MAXPLANETS
-            && (distf( Doomsday->x, Doomsday->y,
-                       Planets[Doomsday->lockDetail].x,
-                       Planets[Doomsday->lockDetail].y )
+        if (cbDoomsday->lock == LOCK_PLANET
+            && cbDoomsday->lockDetail < MAXPLANETS
+            && (distf( cbDoomsday->x, cbDoomsday->y,
+                       cbPlanets[cbDoomsday->lockDetail].x,
+                       cbPlanets[cbDoomsday->lockDetail].y )
                 >= DOOMSDAY_DIST) )
         {
-            Doomsday->x = Doomsday->x + Doomsday->dx;
-            Doomsday->y = Doomsday->y + Doomsday->dy;
+            cbDoomsday->x = cbDoomsday->x + cbDoomsday->dx;
+            cbDoomsday->y = cbDoomsday->y + cbDoomsday->dy;
         }
 
         /* ship lock */
-        if (Doomsday->lock == LOCK_SHIP
-            && Doomsday->lockDetail < MAXSHIPS
-            && (distf( Doomsday->x, Doomsday->y,
-                       Ships[Doomsday->lock].x,
-                       Ships[Doomsday->lock].y )
+        if (cbDoomsday->lock == LOCK_SHIP
+            && cbDoomsday->lockDetail < MAXSHIPS
+            && (distf( cbDoomsday->x, cbDoomsday->y,
+                       cbShips[cbDoomsday->lock].x,
+                       cbShips[cbDoomsday->lock].y )
                 >= DOOMSDAY_DIST) )
         {
-            Doomsday->x = Doomsday->x + Doomsday->dx;
-            Doomsday->y = Doomsday->y + Doomsday->dy;
+            cbDoomsday->x = cbDoomsday->x + cbDoomsday->dx;
+            cbDoomsday->y = cbDoomsday->y + cbDoomsday->dy;
         }
 
     }
@@ -523,28 +523,28 @@ void secdrive( int *ship )
     for ( s = 0; s < MAXSHIPS; s++ )
     {
         i = ship[s];
-        if ( Ships[i].status == SS_OFF )
+        if ( cbShips[i].status == SS_OFF )
             continue; /*next;*/
 
-        if ( Ships[i].status != SS_LIVE )
+        if ( cbShips[i].status != SS_LIVE )
 	{
             /* Turn off timed out ships. */
-            if ( Ships[i].sdfuse < 0 )
+            if ( cbShips[i].sdfuse < 0 )
 	    {
                 /* This code may be too safe... */
-                cbLock(&ConqInfo->lockword);
-                if ( Ships[i].status != SS_LIVE && Ships[i].sdfuse < 0 )
+                cbLock(&cbConqInfo->lockword);
+                if ( cbShips[i].status != SS_LIVE && cbShips[i].sdfuse < 0 )
 		{
-                    Ships[i].sdfuse = Ships[i].sdfuse + 1;
-                    if ( Ships[i].sdfuse == 0 )
+                    cbShips[i].sdfuse = cbShips[i].sdfuse + 1;
+                    if ( cbShips[i].sdfuse == 0 )
 		    {
-                        Ships[i].sdfuse = 0;
-                        Ships[i].killedBy = KB_NONE;
-                        Ships[i].killedByDetail = 0;
-                        Ships[i].status = SS_OFF;
+                        cbShips[i].sdfuse = 0;
+                        cbShips[i].killedBy = KB_NONE;
+                        cbShips[i].killedByDetail = 0;
+                        cbShips[i].status = SS_OFF;
 		    }
 		}
-                cbUnlock(&ConqInfo->lockword);
+                cbUnlock(&cbConqInfo->lockword);
                 continue; /* next;*/
 	    }
 	}
@@ -552,13 +552,13 @@ void secdrive( int *ship )
         /* The ship is alive */
 
         /* see if we've been kicked out. */
-        if ( UBANNED(Ships[i].unum) )
+        if ( UBANNED(cbShips[i].unum) )
 	{
             clbKillShip( i, KB_SHIT, 0 );
             continue; /* next;*/
 	}
-        if ( ConqInfo->closed )
-            if ( ! UPLAYWHENCLOSED(Ships[i].unum) )
+        if ( cbConqInfo->closed )
+            if ( ! UPLAYWHENCLOSED(cbShips[i].unum) )
             {
                 clbKillShip( i, KB_EVICT, 0 );
                 continue; /*next;*/
@@ -566,30 +566,30 @@ void secdrive( int *ship )
 
         /* The ship is still alive. */
         if ( SROBOT(i) )
-            if ( ! ConqInfo->externrobots )
+            if ( ! cbConqInfo->externrobots )
                 robotai( i );
 
         /* Ships - Teams. */
         for ( j = 0; j <  NUMPLAYERTEAMS; j++ )
-            if ( Ships[i].scanned[j] > 0 )
-                Ships[i].scanned[j] = Ships[i].scanned[j] - 1;
+            if ( cbShips[i].scanned[j] > 0 )
+                cbShips[i].scanned[j] = cbShips[i].scanned[j] - 1;
 
         /* Ships, planets and suns scans. */
         for ( j = 0; j < MAXPLANETS; j++ )
             if ( PVISIBLE(j) )
             {
                 /* Do we scan the planet? */
-                dis = dist( Ships[i].x, Ships[i].y, Planets[j].x, Planets[j].y );
+                dis = dist( cbShips[i].x, cbShips[i].y, cbPlanets[j].x, cbPlanets[j].y );
                 if ( dis <= PLANET_DIST )
                 {
-                    k = Ships[i].team;
+                    k = cbShips[i].team;
                     if ( k >= 0 && k < NUMPLAYERTEAMS )
-                        Planets[j].scanned[k] = TRUE;
+                        cbPlanets[j].scanned[k] = TRUE;
 
                     /* Planet armies (and suns) get to do damage here. */
                     if ( clbSPWar( i,j ) )
                         clbHit( i,
-                                rndnor( PLANET_HIT + Planets[j].armies * ARMY_HIT, 1.0 ),
+                                rndnor( PLANET_HIT + cbPlanets[j].armies * ARMY_HIT, 1.0 ),
                                 KB_PLANET, (uint16_t)j );
                 }
 
@@ -597,34 +597,34 @@ void secdrive( int *ship )
                 if ( dis <= ACCINFO_DIST )
                     if ( ! SCLOAKED(i) )
                     {
-                        k = Planets[j].team;
+                        k = cbPlanets[j].team;
                         if ( k >= 0 && k <  NUMPLAYERTEAMS )
-                            Ships[i].scanned[k] = SCANNED_FUSE;
+                            cbShips[i].scanned[k] = SCANNED_FUSE;
                     }
             }
 
         /* Planet eater. */
-        if ( Doomsday->status == DS_LIVE )
-            if ( dist( Ships[i].x, Ships[i].y, Doomsday->x, Doomsday->y ) <= DOOMSDAY_DIST )
+        if ( cbDoomsday->status == DS_LIVE )
+            if ( dist( cbShips[i].x, cbShips[i].y, cbDoomsday->x, cbDoomsday->y ) <= DOOMSDAY_DIST )
             {
                 clbHit( i, rndnor( DOOMSDAY_HIT, 1.0 ), KB_DOOMSDAY, 0 );
             }
 
 
         /* Negative energy barrier. */
-        if ( fabs( Ships[i].x ) >= NEGENB_DIST || fabs(Ships[i].y) >= NEGENB_DIST )
-            if ( fabs( Ships[i].x ) <= NEGENBEND_DIST &&
-                 fabs( Ships[i].y ) <= NEGENBEND_DIST )
+        if ( fabs( cbShips[i].x ) >= NEGENB_DIST || fabs(cbShips[i].y) >= NEGENB_DIST )
+            if ( fabs( cbShips[i].x ) <= NEGENBEND_DIST &&
+                 fabs( cbShips[i].y ) <= NEGENBEND_DIST )
                 clbHit( i, NEGENB_HIT, KB_NEGENB, 0 );
 
         /* Shields. */
-        if ( Ships[i].shields < 100.0 )
+        if ( cbShips[i].shields < 100.0 )
 	{
             /* Shields repair twice as fast when they're down. */
             x = SHIELD_FAC;
             if ( ! SSHUP(i) )
                 x = x * 2.0;
-            Ships[i].shields = min( 100.0, Ships[i].shields + x );
+            cbShips[i].shields = min( 100.0, cbShips[i].shields + x );
 	}
 
         /* Repair. */
@@ -632,43 +632,43 @@ void secdrive( int *ship )
         if ( SREPAIR(i) )
 	{
             SFCLR(i, SHIP_F_CLOAKED);
-            if ( Ships[i].warp >= 0.0 )
-                Ships[i].dwarp = 0.0;
+            if ( cbShips[i].warp >= 0.0 )
+                cbShips[i].dwarp = 0.0;
             repair = repair * RMODE_REPAIR_MULT;
 	}
         // orbiting a friendly planet...
-        if ( Ships[i].warp < 0.0
-             && Ships[i].lock == LOCK_PLANET
-             && Ships[i].lockDetail < MAXPLANETS
-             && !clbSPWar(i, Ships[i].lockDetail)
-             && Planets[Ships[i].lockDetail].armies > 0)
+        if ( cbShips[i].warp < 0.0
+             && cbShips[i].lock == LOCK_PLANET
+             && cbShips[i].lockDetail < MAXPLANETS
+             && !clbSPWar(i, cbShips[i].lockDetail)
+             && cbPlanets[cbShips[i].lockDetail].armies > 0)
         {
             repair = repair * PLANET_REPAIR_MULT;
         }
 
-        Ships[i].damage = Ships[i].damage - repair;
-        if ( Ships[i].damage < 0.0 )
+        cbShips[i].damage = cbShips[i].damage - repair;
+        if ( cbShips[i].damage < 0.0 )
 	{
-            Ships[i].damage = 0.0;
+            cbShips[i].damage = 0.0;
             if ( SREPAIR(i) )
                 SFCLR(i, SHIP_F_REPAIR);
 	}
 
         /* Weapons/engines down fuses. */
-        if ( Ships[i].wfuse > 0 )
+        if ( cbShips[i].wfuse > 0 )
 	{
-            Ships[i].wfuse = Ships[i].wfuse - 1;
-            if ( Ships[i].wfuse <= 0 )
+            cbShips[i].wfuse = cbShips[i].wfuse - 1;
+            if ( cbShips[i].wfuse <= 0 )
                 clbStoreMsgf( MSG_FROM_COMP, 0,
                               MSG_TO_SHIP, i,
                               "Weapons are back on-line.",
                               MSG_FLAGS_TERSABLE);
 	}
-        if ( Ships[i].efuse > 0 )
+        if ( cbShips[i].efuse > 0 )
 	{
-            Ships[i].efuse = Ships[i].efuse - 1;
-            Ships[i].dwarp = 0.0;
-            if ( Ships[i].efuse <= 0 )
+            cbShips[i].efuse = cbShips[i].efuse - 1;
+            cbShips[i].dwarp = 0.0;
+            if ( cbShips[i].efuse <= 0 )
                 clbStoreMsgf( MSG_FROM_COMP, 0,
                               MSG_TO_SHIP, i,
                               "Engine power has been restored.",
@@ -678,14 +678,14 @@ void secdrive( int *ship )
         /* Fuel. */
         inc = FUEL_FAC;
         dec = 0.0;
-        if ( Ships[i].warp < 0.0 )
+        if ( cbShips[i].warp < 0.0 )
 	{
             /* You get fuel for orbiting friendly, populated class M, */
             /*  with shields down. */
             if ( ! SSHUP(i) || SREPAIR(i) )
-                if ( Planets[Ships[i].lockDetail].type == PLANET_CLASSM )
-                    if ( ! clbSPWar( i, Ships[i].lockDetail ) )
-                        if ( Planets[Ships[i].lockDetail].armies > 0 )
+                if ( cbPlanets[cbShips[i].lockDetail].type == PLANET_CLASSM )
+                    if ( ! clbSPWar( i, cbShips[i].lockDetail ) )
+                        if ( cbPlanets[cbShips[i].lockDetail].armies > 0 )
                             inc = inc * MPLANET_FUEL_MULT;
 	}
         else
@@ -698,19 +698,19 @@ void secdrive( int *ship )
              * fast your going, not how fast you *want* to go.
              */
             if ( SSHUP(i) )
-                dec = dec + Ships[i].warp * FUELWARP_FAC * FUELSHIELDS_MULT;
+                dec = dec + cbShips[i].warp * FUELWARP_FAC * FUELSHIELDS_MULT;
             else
-                dec = dec + Ships[i].warp * FUELWARP_FAC;
+                dec = dec + cbShips[i].warp * FUELWARP_FAC;
 
-            dec = dec + Ships[i].warp * Ships[i].armies * FUELWARPARMY_FAC;
+            dec = dec + cbShips[i].warp * cbShips[i].armies * FUELWARPARMY_FAC;
 
-            if ( Ships[i].towing != 0 )
+            if ( cbShips[i].towing != 0 )
 	    {
-                if ( SSHUP(Ships[i].towing) )
-                    dec = dec + Ships[i].warp * FUELWARP_FAC * FUELSHIELDS_MULT;
+                if ( SSHUP(cbShips[i].towing) )
+                    dec = dec + cbShips[i].warp * FUELWARP_FAC * FUELSHIELDS_MULT;
                 else
-                    dec = dec + Ships[i].warp * FUELWARP_FAC;
-                dec = dec + Ships[i].warp * Ships[Ships[i].towing].armies *
+                    dec = dec + cbShips[i].warp * FUELWARP_FAC;
+                dec = dec + cbShips[i].warp * cbShips[cbShips[i].towing].armies *
                     FUELWARPARMY_FAC;
 	    }
 	}
@@ -719,24 +719,24 @@ void secdrive( int *ship )
 	{
             SFCLR(i, SHIP_F_REPAIR);
             dec = dec + CLOAK_FUEL;
-            if ( Ships[i].warp > 0.0 )
-                dec = dec + Ships[i].dwarp * CLOAK_WARP_FUEL;
+            if ( cbShips[i].warp > 0.0 )
+                dec = dec + cbShips[i].dwarp * CLOAK_WARP_FUEL;
 	}
-        Ships[i].fuel = min( 999.0, Ships[i].fuel + inc );
+        cbShips[i].fuel = min( 999.0, cbShips[i].fuel + inc );
         if ( dec > 0.0 )
             clbUseFuel( i, dec, FALSE, TRUE );
 
         /* Cool-down. */
-        if ( Ships[i].warp < 0.0 && !clbSPWar(i, Ships[i].lockDetail)
-             &&  Planets[Ships[i].lockDetail].armies > 0)
+        if ( cbShips[i].warp < 0.0 && !clbSPWar(i, cbShips[i].lockDetail)
+             &&  cbPlanets[cbShips[i].lockDetail].armies > 0)
 	{			    /* orbiting a friendly populated planet */
-            Ships[i].wtemp = max( 0.0, Ships[i].wtemp - (WEAPON_COOL_FAC * PLANET_REPAIR_MULT));
-            Ships[i].etemp = max( 0.0, Ships[i].etemp - (ENGINE_COOL_FAC * PLANET_REPAIR_MULT));
+            cbShips[i].wtemp = max( 0.0, cbShips[i].wtemp - (WEAPON_COOL_FAC * PLANET_REPAIR_MULT));
+            cbShips[i].etemp = max( 0.0, cbShips[i].etemp - (ENGINE_COOL_FAC * PLANET_REPAIR_MULT));
 	}
         else
 	{
-            Ships[i].wtemp = max( 0.0, Ships[i].wtemp - WEAPON_COOL_FAC );
-            Ships[i].etemp = max( 0.0, Ships[i].etemp - ENGINE_COOL_FAC );
+            cbShips[i].wtemp = max( 0.0, cbShips[i].wtemp - WEAPON_COOL_FAC );
+            cbShips[i].etemp = max( 0.0, cbShips[i].etemp - ENGINE_COOL_FAC );
 	}
     }
 
@@ -746,34 +746,34 @@ void secdrive( int *ship )
     for ( s = 0; s < MAXSHIPS; s++ )
     {
         i = ship[s];
-        if ( Ships[i].status != SS_OFF )
+        if ( cbShips[i].status != SS_OFF )
 	{
             /* Torpedoes. */
             for ( j = 0; j < MAXTORPS; j++ )
-                if ( Ships[i].torps[j].status != TS_OFF )
+                if ( cbShips[i].torps[j].status != TS_OFF )
                 {
                     /* Torpedo fuses. */
-                    Ships[i].torps[j].fuse = Ships[i].torps[j].fuse - 1;
-                    if ( Ships[i].torps[j].fuse <= 0 )
+                    cbShips[i].torps[j].fuse = cbShips[i].torps[j].fuse - 1;
+                    if ( cbShips[i].torps[j].fuse <= 0 )
                     {
-                        if ( Ships[i].torps[j].status == TS_LIVE )
+                        if ( cbShips[i].torps[j].status == TS_LIVE )
                             clbDetonate( i, j );
-                        else if ( Ships[i].torps[j].status == TS_FIREBALL )
-                            Ships[i].torps[j].status = TS_OFF;
+                        else if ( cbShips[i].torps[j].status == TS_FIREBALL )
+                            cbShips[i].torps[j].status = TS_OFF;
                     }
                     else
                     {
-                        if ( Ships[i].torps[j].status == TS_LIVE )
+                        if ( cbShips[i].torps[j].status == TS_LIVE )
                         {
                             /* Proximity check. */
                             for ( t = 0; t < MAXSHIPS; t++ )
                             {
                                 k = ship[t];
-                                if ( Ships[k].status == SS_LIVE && k != i )
-                                    if ( Ships[i].torps[j].war[Ships[k].team] || Ships[k].war[Ships[i].team] )
+                                if ( cbShips[k].status == SS_LIVE && k != i )
+                                    if ( cbShips[i].torps[j].war[cbShips[k].team] || cbShips[k].war[cbShips[i].team] )
                                     {
-                                        dis = distf( Ships[i].torps[j].x, Ships[i].torps[j].y,
-                                                     Ships[k].x, Ships[k].y );
+                                        dis = distf( cbShips[i].torps[j].x, cbShips[i].torps[j].y,
+                                                     cbShips[k].x, cbShips[k].y );
                                         if ( dis <= TORPEDO_PROX )
                                         {
                                             clbDetonate( i, j );
@@ -784,13 +784,13 @@ void secdrive( int *ship )
                                     }
                             }
                         }
-                        if ( Ships[i].torps[j].status == TS_LIVE )
+                        if ( cbShips[i].torps[j].status == TS_LIVE )
                         {
                             /* Proximity check for the doomsday machine. */
-                            if ( Doomsday->status == DS_LIVE )
-                                if ( distf( Ships[i].torps[j].x,
-                                            Ships[i].torps[j].y,
-                                            Doomsday->x, Doomsday->y ) <= (TORPEDO_PROX * 3.0))
+                            if ( cbDoomsday->status == DS_LIVE )
+                                if ( distf( cbShips[i].torps[j].x,
+                                            cbShips[i].torps[j].y,
+                                            cbDoomsday->x, cbDoomsday->y ) <= (TORPEDO_PROX * 3.0))
                                 {
                                     clbDetonate( i, j );
                                     break;
@@ -808,68 +808,68 @@ void secdrive( int *ship )
             SFCLR(i, SHIP_F_TALERT);
 
     /* Planet eater. */
-    if ( Doomsday->status == DS_LIVE )
+    if ( cbDoomsday->status == DS_LIVE )
     {
-        if (Doomsday->lock == LOCK_PLANET && Doomsday->lockDetail < MAXPLANETS)
+        if (cbDoomsday->lock == LOCK_PLANET && cbDoomsday->lockDetail < MAXPLANETS)
 	{
             /* Planet. */
-            if ( distf( Doomsday->x, Doomsday->y,
-                        Planets[Doomsday->lockDetail].x,
-                        Planets[Doomsday->lockDetail].y ) <= DOOMSDAY_DIST )
+            if ( distf( cbDoomsday->x, cbDoomsday->y,
+                        cbPlanets[cbDoomsday->lockDetail].x,
+                        cbPlanets[cbDoomsday->lockDetail].y ) <= DOOMSDAY_DIST )
 	    {
                 /* Decrement armies. */
                 if ( rnd() <= 0.1 )
-                    clbIntrude( -1 /*doomsday*/, Doomsday->lockDetail );
-                cbLock(&ConqInfo->lockword);
-                Planets[Doomsday->lockDetail].armies =
-                    Planets[Doomsday->lockDetail].armies - 1;
-                if ( Planets[Doomsday->lockDetail].armies <= 0 )
+                    clbIntrude( -1 /*doomsday*/, cbDoomsday->lockDetail );
+                cbLock(&cbConqInfo->lockword);
+                cbPlanets[cbDoomsday->lockDetail].armies =
+                    cbPlanets[cbDoomsday->lockDetail].armies - 1;
+                if ( cbPlanets[cbDoomsday->lockDetail].armies <= 0 )
 		{
-                    Planets[Doomsday->lockDetail].uninhabtime =
+                    cbPlanets[cbDoomsday->lockDetail].uninhabtime =
                         rndint( MIN_UNINHAB_MINUTES, MAX_UNINHAB_MINUTES );
-                    clbZeroPlanet( Doomsday->lockDetail, 0 );
+                    clbZeroPlanet( cbDoomsday->lockDetail, 0 );
                     clbDoomFind();
 		}
-                cbUnlock(&ConqInfo->lockword);
+                cbUnlock(&cbConqInfo->lockword);
 	    }
 	}
-        else if ( Doomsday->lock == LOCK_SHIP
-                  && Doomsday->lockDetail < MAXSHIPS)
+        else if ( cbDoomsday->lock == LOCK_SHIP
+                  && cbDoomsday->lockDetail < MAXSHIPS)
 	{
             /* Ship. */
-            if ( Ships[Doomsday->lockDetail].status != SS_LIVE )
+            if ( cbShips[cbDoomsday->lockDetail].status != SS_LIVE )
                 clbDoomFind();
-            else if ( distf( Doomsday->x, Doomsday->y,
-                             Ships[Doomsday->lockDetail].x,
-                             Ships[Doomsday->lockDetail].y ) <= DOOMSDAY_DIST )
+            else if ( distf( cbDoomsday->x, cbDoomsday->y,
+                             cbShips[cbDoomsday->lockDetail].x,
+                             cbShips[cbDoomsday->lockDetail].y ) <= DOOMSDAY_DIST )
             {
                 /* clever doomsday tractors (was .warp, set .dwarp instead).*/
-                Ships[Doomsday->lockDetail].dwarp = 0.0;
+                cbShips[cbDoomsday->lockDetail].dwarp = 0.0;
             }
 	}
 
         /* Update heading. */
-        if ( Doomsday->lock == LOCK_PLANET )
+        if ( cbDoomsday->lock == LOCK_PLANET )
         {
-            Doomsday->heading =
-                utAngle( Doomsday->x, Doomsday->y,
-                         Planets[Doomsday->lockDetail].x,
-                         Planets[Doomsday->lockDetail].y );
+            cbDoomsday->heading =
+                utAngle( cbDoomsday->x, cbDoomsday->y,
+                         cbPlanets[cbDoomsday->lockDetail].x,
+                         cbPlanets[cbDoomsday->lockDetail].y );
         }
-        else if ( Doomsday->lock == LOCK_SHIP )
+        else if ( cbDoomsday->lock == LOCK_SHIP )
         {
-            Doomsday->heading =
-                utAngle( Doomsday->x, Doomsday->y,
-                         Ships[Doomsday->lockDetail].x,
-                         Ships[Doomsday->lockDetail].y );
+            cbDoomsday->heading =
+                utAngle( cbDoomsday->x, cbDoomsday->y,
+                         cbShips[cbDoomsday->lockDetail].x,
+                         cbShips[cbDoomsday->lockDetail].y );
         }
 
-        Doomsday->dx =
+        cbDoomsday->dx =
             DOOMSDAY_WARP * MM_PER_SEC_PER_WARP * ITER_SECONDS
-            * cosd(Doomsday->heading);
-        Doomsday->dy =
+            * cosd(cbDoomsday->heading);
+        cbDoomsday->dy =
             DOOMSDAY_WARP * MM_PER_SEC_PER_WARP * ITER_SECONDS
-            * sind(Doomsday->heading);
+            * sind(cbDoomsday->heading);
     }
 
     return;
@@ -887,8 +887,8 @@ void mindrive(void)
     for ( i = 0; i < NUMPLAYERTEAMS; i++ )
     {
         /* Decrement couptime(). */
-        if ( Teams[i].couptime > 0 )
-            Teams[i].couptime = Teams[i].couptime - 1;
+        if ( cbTeams[i].couptime > 0 )
+            cbTeams[i].couptime = cbTeams[i].couptime - 1;
     }
 
     /* cleanup any unliving ships */
@@ -897,12 +897,12 @@ void mindrive(void)
     for ( i = 0; i < MAXPLANETS; i++ )
     {
         /* Decrement puninhabtime(). */
-        if ( Planets[i].uninhabtime > 0 )
-            Planets[i].uninhabtime = Planets[i].uninhabtime - 1;
+        if ( cbPlanets[i].uninhabtime > 0 )
+            cbPlanets[i].uninhabtime = cbPlanets[i].uninhabtime - 1;
     }
 
 
-    if ( Doomsday->status == DS_LIVE )
+    if ( cbDoomsday->status == DS_LIVE )
         clbDoomFind();
     else if ( rnd() < DOOMSDAY_PROB )
     {
@@ -924,41 +924,41 @@ void fivemindrive(void)
     real r;
 
     /* Drive the planets. */
-    cbLock(&ConqInfo->lockword);
+    cbLock(&cbConqInfo->lockword);
     for ( i = 0; i < MAXPLANETS; i++ )
-        if (Planets[i].type != PLANET_SUN)
+        if (cbPlanets[i].type != PLANET_SUN)
         {
-            if ( Planets[i].armies > 0 && Planets[i].team != TEAM_GOD )
+            if ( cbPlanets[i].armies > 0 && cbPlanets[i].team != TEAM_GOD )
             {
-                if ( Planets[i].armies < SPARSE_THRESH )
+                if ( cbPlanets[i].armies < SPARSE_THRESH )
                 {
                     if ( rnd() <= SPARSE_REPOP_PROB )
-                        Planets[i].armies = Planets[i].armies + 1;
+                        cbPlanets[i].armies = cbPlanets[i].armies + 1;
                 }
                 else
                 {
-                    if ( Planets[i].type == PLANET_CLASSM )
+                    if ( cbPlanets[i].type == PLANET_CLASSM )
                         thresh = MALTHUS_M_THRESH;
                     else
                         thresh = MALTHUS_D_THRESH;
 
-                    if ( Planets[i].armies >= thresh && rnd() <= MALTHUS_PROB )
+                    if ( cbPlanets[i].armies >= thresh && rnd() <= MALTHUS_PROB )
                     {
                         r = rnd();	/* save to avoid the unfortunate side effects of
                                            max() bieng a macro (rnd() actually got exc'd
                                            twice, resluting in an occasional 0 return val) */
 
-                        Planets[i].armies = max( round( Planets[i].armies * r ), 1 );
+                        cbPlanets[i].armies = max( round( cbPlanets[i].armies * r ), 1 );
                     }
                     else
                     {
-                        Planets[i].armies = Planets[i].armies +
+                        cbPlanets[i].armies = cbPlanets[i].armies +
                             rndint( REPOP_LOWER_BOUND, REPOP_UPPER_BOUND );
                     }
                 }
             }
         }
-    cbUnlock(&ConqInfo->lockword);
+    cbUnlock(&cbConqInfo->lockword);
 
     return;
 
@@ -966,7 +966,7 @@ void fivemindrive(void)
 
 void SigTerminate(int sig)
 {
-    Driver->drivstat = DRS_KAMIKAZE;
+    cbDriver->drivstat = DRS_KAMIKAZE;
 
     utLog("conqdriv: Terminating on signal %d", sig);
 

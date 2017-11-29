@@ -39,7 +39,7 @@ static spTorp_t pktTorp[MAXSHIPS][MAXTORPS];
 static spTorpLoc_t pktTorpLoc[MAXSHIPS][MAXTORPS];
 static spTorpEvent_t pktTorpEvent[MAXSHIPS][MAXTORPS];
 static spTeam_t pktTeam[NUMALLTEAMS];
-static spConqInfo_t pktConqInfo;
+static spcbConqInfo_t pktcbConqInfo;
 static spHistory_t pktHistory[MAXHISTLOG];
 static spDoomsday_t pktDoomsday;
 static spPlanetInfo_t pktPlanetInfo[MAXPLANETS];
@@ -85,7 +85,7 @@ void spktInitPkt(void)
     memset((void *)pktTorpEvent, 0,
            sizeof(spTorpEvent_t) * MAXSHIPS * MAXTORPS);
     memset((void *)pktTeam, 0,  sizeof(spTeam_t) * NUMALLTEAMS);
-    memset((void *)&pktConqInfo, 0,  sizeof(spConqInfo_t));
+    memset((void *)&pktcbConqInfo, 0,  sizeof(spcbConqInfo_t));
     memset((void *)pktHistory, 0,  sizeof(spHistory_t) * MAXHISTLOG);
     memset((void *)&pktDoomsday, 0,  sizeof(spDoomsday_t));
     memset((void *)pktPlanetInfo, 0, sizeof(spPlanetInfo_t) * MAXPLANETS);
@@ -126,24 +126,24 @@ spUser_t *spktUser(uint16_t unum)
     memset((void *)&suser, 0, sizeof(spUser_t));
 
     suser.type = SP_USER;
-    suser.team = (uint8_t)Users[unum].team;
+    suser.team = (uint8_t)cbUsers[unum].team;
     suser.unum = htons(unum);
-    suser.userType = (uint8_t)Users[unum].type;
-    suser.flags = htons(Users[unum].flags);
-    suser.opFlags = htons(Users[unum].opFlags);
+    suser.userType = (uint8_t)cbUsers[unum].type;
+    suser.flags = htons(cbUsers[unum].flags);
+    suser.opFlags = htons(cbUsers[unum].opFlags);
 
     for (i=0; i<NUMPLAYERTEAMS; i++)
-        if (Users[unum].war[i])
+        if (cbUsers[unum].war[i])
             suser.war |= (1 << i);
 
-    suser.rating = (int16_t)htons((uint16_t)(Users[unum].rating * 10.0));
-    suser.lastentry = (uint32_t)htonl((uint32_t)Users[unum].lastentry);
+    suser.rating = (int16_t)htons((uint16_t)(cbUsers[unum].rating * 10.0));
+    suser.lastentry = (uint32_t)htonl((uint32_t)cbUsers[unum].lastentry);
 
     for (i=0; i<USTAT_TOTALSTATS; i++)
-        suser.stats[i] = (int32_t)htonl(Users[unum].stats[i]);
+        suser.stats[i] = (int32_t)htonl(cbUsers[unum].stats[i]);
 
-    utStrncpy((char *)suser.username, Users[unum].username, MAXUSERNAME);
-    utStrncpy((char *)suser.alias, Users[unum].alias, MAXUSERNAME);
+    utStrncpy((char *)suser.username, cbUsers[unum].username, MAXUSERNAME);
+    utStrncpy((char *)suser.alias, cbUsers[unum].alias, MAXUSERNAME);
 
     if (memcmp((void *)&suser, (void *)&pktUser[unum], sizeof(spUser_t)))
     {
@@ -159,47 +159,47 @@ spShip_t *spktShip(uint8_t snum, int rec)
 {
     int i;
     int mysnum = Context.snum;
-    int myteam = Ships[mysnum].team;
+    int myteam = cbShips[mysnum].team;
     static spShip_t sship;
 
     memset((void *)&sship, 0, sizeof(spShip_t));
 
     sship.type = SP_SHIP;
-    sship.status = Ships[snum].status;
+    sship.status = cbShips[snum].status;
     sship.snum = snum;
-    sship.team = Ships[snum].team;
-    sship.unum = htons(Ships[snum].unum);
-    sship.shiptype = Ships[snum].shiptype;
+    sship.team = cbShips[snum].team;
+    sship.unum = htons(cbShips[snum].unum);
+    sship.shiptype = cbShips[snum].shiptype;
 
     /* RESTRICT */
     /* really only valid for own ship */
     if ((mysnum == snum) || rec)
     {
-        sship.towing = Ships[snum].towing;
-        sship.towedby = Ships[snum].towedby;
+        sship.towing = cbShips[snum].towing;
+        sship.towedby = cbShips[snum].towedby;
 
         for (i=0; i<NUMPLAYERTEAMS; i++)
 	{
-            if (Ships[snum].war[i])
+            if (cbShips[snum].war[i])
                 sship.war |= (1 << i);
-            if (Ships[snum].rwar[i])
+            if (cbShips[snum].rwar[i])
                 sship.rwar |= (1 << i);
 	}
 
-        sship.killedBy = (uint8_t)Ships[snum].killedBy;
-        sship.killedByDetail = (uint16_t)htons((uint16_t)Ships[snum].killedByDetail);
+        sship.killedBy = (uint8_t)cbShips[snum].killedBy;
+        sship.killedByDetail = (uint16_t)htons((uint16_t)cbShips[snum].killedByDetail);
 
         for (i=0; i<MAXPLANETS; i++)
-            sship.srpwar[i] = (uint8_t)Ships[snum].srpwar[i];
+            sship.srpwar[i] = (uint8_t)cbShips[snum].srpwar[i];
     }
     else
     {
         /* RESTRICT */
         /* we only send the war stats relating to our team */
-        if (Ships[snum].war[myteam])
+        if (cbShips[snum].war[myteam])
             sship.war |= (1 << myteam);
 
-        if (Ships[snum].rwar[myteam])
+        if (cbShips[snum].rwar[myteam])
             sship.rwar |= (1 << myteam);
     }
 
@@ -208,14 +208,14 @@ spShip_t *spktShip(uint8_t snum, int rec)
        really need to care whether these are 'real' kills vs. random ones. */
     if (SROBOT(snum))
         sship.kills =
-            htonl((uint32_t)((Ships[snum].kills + Ships[snum].strkills) * 10.0));
+            htonl((uint32_t)((cbShips[snum].kills + cbShips[snum].strkills) * 10.0));
     else
-        sship.kills = htonl((uint32_t)(Ships[snum].kills * 10.0));
+        sship.kills = htonl((uint32_t)(cbShips[snum].kills * 10.0));
 
     for (i=0; i<NUMPLAYERTEAMS; i++)
-        sship.scanned[i] = (uint8_t)Ships[snum].scanned[i];
+        sship.scanned[i] = (uint8_t)cbShips[snum].scanned[i];
 
-    utStrncpy((char *)sship.alias, Ships[snum].alias, MAXUSERNAME);
+    utStrncpy((char *)sship.alias, cbShips[snum].alias, MAXUSERNAME);
 
     if (rec)
     {
@@ -262,30 +262,30 @@ spShipSml_t *spktShipSml(uint8_t snum, int rec)
     {			     /* really only useful for our own ship */
         sflags |= (SHIP_F_REPAIR | SHIP_F_TALERT | SHIP_F_BOMBING);
 
-        sshipsml.action = (uint8_t)Ships[snum].action;
-        sshipsml.lastblast = htons((uint16_t)(Ships[snum].lastblast * 100.0));
-        sshipsml.fuel = htons((uint16_t)Ships[snum].fuel);
-        sshipsml.lock = (uint8_t)Ships[snum].lock;
-        sshipsml.lockDetail = htons(Ships[snum].lockDetail);
-        sshipsml.sdfuse = (int16_t)htons((uint16_t)Ships[snum].sdfuse);
-        sshipsml.wfuse = (int8_t)Ships[snum].wfuse;
-        sshipsml.efuse = (int8_t)Ships[snum].efuse;
-        sshipsml.walloc = Ships[snum].weapalloc;
-        sshipsml.etemp = (uint8_t)Ships[snum].etemp;
-        sshipsml.wtemp = (uint8_t)Ships[snum].wtemp;
+        sshipsml.action = (uint8_t)cbShips[snum].action;
+        sshipsml.lastblast = htons((uint16_t)(cbShips[snum].lastblast * 100.0));
+        sshipsml.fuel = htons((uint16_t)cbShips[snum].fuel);
+        sshipsml.lock = (uint8_t)cbShips[snum].lock;
+        sshipsml.lockDetail = htons(cbShips[snum].lockDetail);
+        sshipsml.sdfuse = (int16_t)htons((uint16_t)cbShips[snum].sdfuse);
+        sshipsml.wfuse = (int8_t)cbShips[snum].wfuse;
+        sshipsml.efuse = (int8_t)cbShips[snum].efuse;
+        sshipsml.walloc = cbShips[snum].weapalloc;
+        sshipsml.etemp = (uint8_t)cbShips[snum].etemp;
+        sshipsml.wtemp = (uint8_t)cbShips[snum].wtemp;
         dis = 0.0;	      /* we are very close to ourselves ;-) */
         canscan = TRUE;	      /* can always scan ourselves */
     }
     else
     {
         if (!SCLOAKED(snum))
-            dis = (real) dist(Ships[mysnum].x, Ships[mysnum].y,
-                              Ships[snum].x,
-                              Ships[snum].y );
+            dis = (real) dist(cbShips[mysnum].x, cbShips[mysnum].y,
+                              cbShips[snum].x,
+                              cbShips[snum].y );
         else
-            dis = (real) dist(Ships[mysnum].x, Ships[mysnum].y,
-                              rndnor(Ships[snum].x, CLOAK_SMEAR_DIST),
-                              rndnor(Ships[snum].y, CLOAK_SMEAR_DIST));
+            dis = (real) dist(cbShips[mysnum].x, cbShips[mysnum].y,
+                              rndnor(cbShips[snum].x, CLOAK_SMEAR_DIST),
+                              rndnor(cbShips[snum].y, CLOAK_SMEAR_DIST));
 
         /* if in accurate scanning distance (regardless of cloak) set the
            SCANDIST flag.  */
@@ -295,14 +295,14 @@ spShipSml_t *spktShipSml(uint8_t snum, int rec)
 
         /* help the driver, set scanned fuse */
         if ( (dis < ACCINFO_DIST && ! SCLOAKED(snum)) && ! selfwar(mysnum) )
-            Ships[snum].scanned[Ships[mysnum].team] = SCANNED_FUSE;
+            cbShips[snum].scanned[cbShips[mysnum].team] = SCANNED_FUSE;
 
         /* if within accurate dist and not cloaked, or
            if ship scanned by my team and not selfwar, or
            if not at war with ship. */
 
         canscan = ( (dis < ACCINFO_DIST && ! SCLOAKED(snum)) ||
-                    ( (Ships[snum].scanned[Ships[mysnum].team] > 0) &&
+                    ( (cbShips[snum].scanned[cbShips[mysnum].team] > 0) &&
                       ! selfwar(mysnum) ) ||
                     !satwar(snum, mysnum));
     }
@@ -311,21 +311,21 @@ spShipSml_t *spktShipSml(uint8_t snum, int rec)
     {				/* if we get all the stats */
         sflags |= SHIP_F_SHUP | SHIP_F_BOMBING | SHIP_F_REPAIR;
 
-        sshipsml.shields = (uint8_t)Ships[snum].shields;
-        sshipsml.damage = (uint8_t)Ships[snum].damage;
-        sshipsml.armies = Ships[snum].armies;
+        sshipsml.shields = (uint8_t)cbShips[snum].shields;
+        sshipsml.damage = (uint8_t)cbShips[snum].damage;
+        sshipsml.armies = cbShips[snum].armies;
 
         /* so we can do bombing */
-        sshipsml.lock = (uint8_t)Ships[snum].lock;
-        sshipsml.lockDetail = htons(Ships[snum].lockDetail);
+        sshipsml.lock = (uint8_t)cbShips[snum].lock;
+        sshipsml.lockDetail = htons(cbShips[snum].lockDetail);
 
         /* so we can disp phasers in graphical client ;-) */
-        sshipsml.lastphase = htons((uint16_t)(Ships[snum].lastphase * 100.0));
-        sshipsml.pfuse = (int8_t)Ships[snum].pfuse;
+        sshipsml.lastphase = htons((uint16_t)(cbShips[snum].lastphase * 100.0));
+        sshipsml.pfuse = (int8_t)cbShips[snum].pfuse;
     }
 
     /* only send those we are allowed to see */
-    sshipsml.flags = (uint16_t)htons(((Ships[snum].flags | scanflag) & sflags));
+    sshipsml.flags = (uint16_t)htons(((cbShips[snum].flags | scanflag) & sflags));
 
     if (rec)
     {
@@ -366,7 +366,7 @@ spShipLoc_t *spktShipLoc(uint8_t snum, int rec)
 
     sshiploc.type = SP_SHIPLOC;
     sshiploc.snum = snum;
-    sshiploc.warp = (int8_t)(Ships[snum].warp * 10.0);
+    sshiploc.warp = (int8_t)(cbShips[snum].warp * 10.0);
 
     /* we need to ensure that if we are doing UDP, and we haven't
        updated a ship in awhile (causing UDP traffic), force an update
@@ -382,41 +382,41 @@ spShipLoc_t *spktShipLoc(uint8_t snum, int rec)
     /* RESTRICT */
     if ((snum == mysnum) || rec)
     {				/* we get everything */
-        sshiploc.head = htons((uint16_t)(Ships[snum].head * 10.0));
-        x = Ships[snum].x;
-        y = Ships[snum].y;
+        sshiploc.head = htons((uint16_t)(cbShips[snum].head * 10.0));
+        x = cbShips[snum].x;
+        y = cbShips[snum].y;
     }
     else
     {
         if (SCLOAKED(snum))
         {
-            if (Ships[snum].warp == 0.0)
+            if (cbShips[snum].warp == 0.0)
             {
                 x = 1e7;
                 y = 1e7;
             }
             else
             { /* if your cloaked, and moving, get smeared x/y */
-                x = rndnor( Ships[snum].x, CLOAK_SMEAR_DIST );
-                y = rndnor( Ships[snum].y, CLOAK_SMEAR_DIST );
+                x = rndnor( cbShips[snum].x, CLOAK_SMEAR_DIST );
+                y = rndnor( cbShips[snum].y, CLOAK_SMEAR_DIST );
             }
         }
         else
 	{			/* not cloaked */
-            dis = (real) dist(Ships[mysnum].x, Ships[mysnum].y,
-                              Ships[snum].x,
-                              Ships[snum].y );
+            dis = (real) dist(cbShips[mysnum].x, cbShips[mysnum].y,
+                              cbShips[snum].x,
+                              cbShips[snum].y );
 
             canscan = ( (dis < ACCINFO_DIST && ! SCLOAKED(snum)) ||
-                        ( (Ships[snum].scanned[Ships[mysnum].team] > 0) &&
+                        ( (cbShips[snum].scanned[cbShips[mysnum].team] > 0) &&
                           ! selfwar(mysnum) ) ||
                         !satwar(snum, mysnum));
 
             if (canscan)		/* close or friendly */
-                sshiploc.head = htons((uint16_t)(Ships[snum].head * 10.0));
+                sshiploc.head = htons((uint16_t)(cbShips[snum].head * 10.0));
 
-            x = Ships[snum].x;
-            y = Ships[snum].y;
+            x = cbShips[snum].x;
+            y = cbShips[snum].y;
 
 	}
     }
@@ -455,7 +455,7 @@ spShipLoc_t *spktShipLoc(uint8_t snum, int rec)
 spPlanet_t *spktPlanet(uint8_t pnum, int rec)
 {
     int snum = Context.snum;
-    int team = Ships[snum].team;
+    int team = cbShips[snum].team;
     static spPlanet_t splan;
 
     memset((void *)&splan, 0, sizeof(spPlanet_t));
@@ -467,18 +467,18 @@ spPlanet_t *spktPlanet(uint8_t pnum, int rec)
 
     splan.type = SP_PLANET;
     splan.pnum = pnum;
-    splan.ptype = Planets[pnum].type;
+    splan.ptype = cbPlanets[pnum].type;
 
     /* RESTRICT */
-    if (Planets[pnum].scanned[team] || rec)
-        splan.team = Planets[pnum].team;
+    if (cbPlanets[pnum].scanned[team] || rec)
+        splan.team = cbPlanets[pnum].team;
     else
         splan.team = TEAM_SELFRULED; /* until we know for sure... */
 
     // who's homeworld is this (if a homeplanet)?
-    splan.defendteam = Planets[pnum].defendteam;
+    splan.defendteam = cbPlanets[pnum].defendteam;
 
-    utStrncpy((char *)splan.name, Planets[pnum].name, MAXPLANETNAME);
+    utStrncpy((char *)splan.name, cbPlanets[pnum].name, MAXPLANETNAME);
 
     if (rec)
     {
@@ -506,7 +506,7 @@ spPlanetSml_t *spktPlanetSml(uint8_t pnum, int rec)
 {
     int i;
     int snum = Context.snum;
-    int team = Ships[snum].team;
+    int team = cbShips[snum].team;
     static spPlanetSml_t splansml;
 
     memset((void *)&splansml, 0, sizeof(spPlanetSml_t));
@@ -518,17 +518,17 @@ spPlanetSml_t *spktPlanetSml(uint8_t pnum, int rec)
     if (rec)
     {
         for (i=0; i < NUMPLAYERTEAMS; i++)
-            if (Planets[pnum].scanned[i])
+            if (cbPlanets[pnum].scanned[i])
                 splansml.scanned |= (1 << i);
 
-        splansml.uninhabtime = (uint8_t)Planets[pnum].uninhabtime;
+        splansml.uninhabtime = (uint8_t)cbPlanets[pnum].uninhabtime;
     }
     else
     {
-        if (Planets[pnum].scanned[team])
+        if (cbPlanets[pnum].scanned[team])
         {
             splansml.scanned |= (1 << team);
-            splansml.uninhabtime = (uint8_t)Planets[pnum].uninhabtime;
+            splansml.uninhabtime = (uint8_t)cbPlanets[pnum].uninhabtime;
         }
     }
 
@@ -557,7 +557,7 @@ spPlanetSml_t *spktPlanetSml(uint8_t pnum, int rec)
 spPlanetLoc_t *spktPlanetLoc(uint8_t pnum, int rec, int force)
 {
     int snum = Context.snum;
-    int team = Ships[snum].team;
+    int team = cbShips[snum].team;
     static spPlanetLoc_t splanloc;
     real dx, dy;
     static real px[MAXPLANETS] = {}; /* saved x/y */
@@ -569,11 +569,11 @@ spPlanetLoc_t *spktPlanetLoc(uint8_t pnum, int rec, int force)
     splanloc.pnum = pnum;
 
     /* RESTRICT */
-    if (Planets[pnum].scanned[team] || rec)
-        splanloc.armies = htons(Planets[pnum].armies);
+    if (cbPlanets[pnum].scanned[team] || rec)
+        splanloc.armies = htons(cbPlanets[pnum].armies);
 
-    dx = (real)fabs(Planets[pnum].x - px[pnum]);
-    dy = (real)fabs(Planets[pnum].y - py[pnum]);
+    dx = (real)fabs(cbPlanets[pnum].x - px[pnum]);
+    dy = (real)fabs(cbPlanets[pnum].y - py[pnum]);
 
 
     /* we try to be clever here by reducing the pkt count.  If armies are
@@ -588,7 +588,7 @@ spPlanetLoc_t *spktPlanetLoc(uint8_t pnum, int rec, int force)
         ((dx + dy) / 2.0) < 3.0)
     {
 #if 0
-        utLog("REJECT: %s dx = %f dy = %f [%f]", Planets[pnum].name,
+        utLog("REJECT: %s dx = %f dy = %f [%f]", cbPlanets[pnum].name,
               dx, dy,
               ((dx + dy) / 2.0));
 #endif
@@ -599,18 +599,18 @@ spPlanetLoc_t *spktPlanetLoc(uint8_t pnum, int rec, int force)
 
     if (!rec)
     {
-        px[pnum] = Planets[pnum].x;
-        py[pnum] = Planets[pnum].y;
+        px[pnum] = cbPlanets[pnum].x;
+        py[pnum] = cbPlanets[pnum].y;
     }
 
 #if 0
-    utLog("%s dx = %f dy = %f [%f]", Planets[pnum].name,
+    utLog("%s dx = %f dy = %f [%f]", cbPlanets[pnum].name,
           dx, dy,
           ((dx + dy) / 2.0));
 #endif
 
-    splanloc.x = (int32_t)htonl((int32_t)(Planets[pnum].x * 1000.0));
-    splanloc.y = (int32_t)htonl((int32_t)(Planets[pnum].y * 1000.0));
+    splanloc.x = (int32_t)htonl((int32_t)(cbPlanets[pnum].x * 1000.0));
+    splanloc.y = (int32_t)htonl((int32_t)(cbPlanets[pnum].y * 1000.0));
 
     if (rec)
     {
@@ -637,7 +637,7 @@ spPlanetLoc_t *spktPlanetLoc(uint8_t pnum, int rec, int force)
 spPlanetLoc2_t *spktPlanetLoc2(uint8_t pnum, int rec, int force)
 {
     int snum = Context.snum;
-    int team = Ships[snum].team;
+    int team = cbShips[snum].team;
     static spPlanetLoc2_t splanloc2;
     uint32_t iternow = clbGetMillis(); /* we send the loc2 packets only every 5 secs */
     const uint32_t iterwait = 5000.0; /* ms */
@@ -659,17 +659,17 @@ spPlanetLoc2_t *spktPlanetLoc2(uint8_t pnum, int rec, int force)
     splanloc2.pnum = pnum;
 
     /* RESTRICT */
-    if (Planets[pnum].scanned[team] || rec)
-        splanloc2.armies = htons(Planets[pnum].armies);
+    if (cbPlanets[pnum].scanned[team] || rec)
+        splanloc2.armies = htons(cbPlanets[pnum].armies);
 
     if (splanloc2.armies == pktPlanetLoc2[pnum].armies && tooearly)
         return NULL;
 
     tstart[pnum] = iternow;
 
-    splanloc2.x = (int32_t)htonl((int32_t)(Planets[pnum].x * 1000.0));
-    splanloc2.y = (int32_t)htonl((int32_t)(Planets[pnum].y * 1000.0));
-    splanloc2.orbang = (uint16_t)htons((uint16_t)(Planets[pnum].orbang * 100.0));
+    splanloc2.x = (int32_t)htonl((int32_t)(cbPlanets[pnum].x * 1000.0));
+    splanloc2.y = (int32_t)htonl((int32_t)(cbPlanets[pnum].y * 1000.0));
+    splanloc2.orbang = (uint16_t)htons((uint16_t)(cbPlanets[pnum].orbang * 100.0));
 
     if (rec)
     {
@@ -705,7 +705,7 @@ spTorp_t *spktTorp(uint8_t tsnum, uint8_t tnum, int rec)
     storp.type = SP_TORP;
     storp.snum = tsnum;
     storp.tnum = tnum;
-    storp.status = (uint8_t)Ships[tsnum].torps[tnum].status;
+    storp.status = (uint8_t)cbShips[tsnum].torps[tnum].status;
 
     if (rec)
     {
@@ -734,7 +734,7 @@ spTorpLoc_t *spktTorpLoc(uint8_t tsnum, uint8_t tnum, int rec)
 {
     int i;
     int snum = Context.snum;
-    int team = Ships[snum].team;
+    int team = cbShips[snum].team;
     static spTorpLoc_t storploc;
     real dis;
     real x, y;
@@ -750,15 +750,15 @@ spTorpLoc_t *spktTorpLoc(uint8_t tsnum, uint8_t tnum, int rec)
        within ACCINFO_DIST of your ship.  torp war stat only applies to
        your ship. */
 
-    x = Ships[tsnum].torps[tnum].x;
-    y = Ships[tsnum].torps[tnum].y;
+    x = cbShips[tsnum].torps[tnum].x;
+    y = cbShips[tsnum].torps[tnum].y;
 
-    if (Ships[tsnum].torps[tnum].war[team] && !rec)
+    if (cbShips[tsnum].torps[tnum].war[team] && !rec)
     {				/* it's at war with us. bastards. */
         /* see if it's close enough to scan */
-        dis = (real) dist(Ships[snum].x, Ships[snum].y,
-                          Ships[tsnum].torps[tnum].x,
-                          Ships[tsnum].torps[tnum].y );
+        dis = (real) dist(cbShips[snum].x, cbShips[snum].y,
+                          cbShips[tsnum].torps[tnum].x,
+                          cbShips[tsnum].torps[tnum].y );
 
         if (dis > ACCINFO_DIST)
         {                       /* in the bermuda triangle */
@@ -773,14 +773,14 @@ spTorpLoc_t *spktTorpLoc(uint8_t tsnum, uint8_t tnum, int rec)
     if (rec)
     {
         for (i=0; i < NUMPLAYERTEAMS; i++)
-            if (Ships[tsnum].torps[tnum].war[i])
+            if (cbShips[tsnum].torps[tnum].war[i])
                 storploc.war |= (1 << i);
     }
     else
     {
         /* RESTRICT */
         /* only send 'war' status as it relates to our team */
-        if (Ships[tsnum].torps[tnum].war[team])
+        if (cbShips[tsnum].torps[tnum].war[team])
             storploc.war |= (1 << team);
     }
 
@@ -811,7 +811,7 @@ spTorpEvent_t *spktTorpEvent(uint8_t tsnum, uint8_t tnum, int rec)
 {
     int i;
     int snum = Context.snum;
-    int team = Ships[snum].team;
+    int team = cbShips[snum].team;
     static spTorpEvent_t storpev;
     real x, y, dx, dy;
 
@@ -820,15 +820,15 @@ spTorpEvent_t *spktTorpEvent(uint8_t tsnum, uint8_t tnum, int rec)
     storpev.type = SP_TORPEVENT;
     storpev.snum = tsnum;
     storpev.tnum = tnum;
-    storpev.status = (uint8_t)Ships[tsnum].torps[tnum].status;
+    storpev.status = (uint8_t)cbShips[tsnum].torps[tnum].status;
 
     /* RESTRICT */
     /* torp war stat only applies to your ship. */
 
-    x = Ships[tsnum].torps[tnum].x;
-    y = Ships[tsnum].torps[tnum].y;
-    dx = Ships[tsnum].torps[tnum].dx;
-    dy = Ships[tsnum].torps[tnum].dy;
+    x = cbShips[tsnum].torps[tnum].x;
+    y = cbShips[tsnum].torps[tnum].y;
+    dx = cbShips[tsnum].torps[tnum].dx;
+    dy = cbShips[tsnum].torps[tnum].dy;
 
     storpev.x = (int32_t)htonl((int32_t)(x * 1000.0));
     storpev.y = (int32_t)htonl((int32_t)(y * 1000.0));
@@ -838,14 +838,14 @@ spTorpEvent_t *spktTorpEvent(uint8_t tsnum, uint8_t tnum, int rec)
     if (rec)
     {
         for (i=0; i < NUMPLAYERTEAMS; i++)
-            if (Ships[tsnum].torps[tnum].war[i])
+            if (cbShips[tsnum].torps[tnum].war[i])
                 storpev.war |= (1 << i);
     }
     else
     {
         /* RESTRICT */
         /* only send 'war' status as it relates to our team */
-        if (Ships[tsnum].torps[tnum].war[team])
+        if (cbShips[tsnum].torps[tnum].war[team])
             storpev.war |= (1 << team);
     }
 
@@ -881,21 +881,21 @@ spTeam_t *spktTeam(uint8_t team, int force, int rec)
 
     steam.type = SP_TEAM;
     steam.team = team;
-    steam.homeplanet = (uint8_t)Teams[team].homeplanet;
+    steam.homeplanet = (uint8_t)cbTeams[team].homeplanet;
 
     /* RESTRICT */
-    if ((Ships[snum].team == team) || rec)
+    if ((cbShips[snum].team == team) || rec)
     {				/* we only send this stuff for our team */
-        if (Teams[team].coupinfo)
+        if (cbTeams[team].coupinfo)
             steam.flags |= SPTEAM_FLAGS_COUPINFO;
 
-        steam.couptime = (uint8_t)Teams[team].couptime;
+        steam.couptime = (uint8_t)cbTeams[team].couptime;
     }
 
     for (i=0; i<MAXTSTATS; i++)
-        steam.stats[i] = (uint32_t)htonl(Teams[team].stats[i]);
+        steam.stats[i] = (uint32_t)htonl(cbTeams[team].stats[i]);
 
-    utStrncpy((char *)steam.name, Teams[team].name, MAXTEAMNAME);
+    utStrncpy((char *)steam.name, cbTeams[team].name, MAXTEAMNAME);
 
     if (rec)
     {
@@ -919,23 +919,23 @@ spTeam_t *spktTeam(uint8_t team, int force, int rec)
     return NULL;
 }
 
-spConqInfo_t *spktConqInfo(int force)
+spcbConqInfo_t *spktcbConqInfo(int force)
 {
-    static spConqInfo_t spci;
+    static spcbConqInfo_t spci;
 
-    memset((void *)&spci, 0, sizeof(spConqInfo_t));
+    memset((void *)&spci, 0, sizeof(spcbConqInfo_t));
 
     spci.type = SP_CONQINFO;
 
-    utStrncpy((char *)spci.conqueror, ConqInfo->conqueror, MAXUSERNAME);
-    utStrncpy((char *)spci.conqteam, ConqInfo->conqteam, MAXTEAMNAME);
-    utStrncpy((char *)spci.conqtime, ConqInfo->conqtime, MAXDATESIZE);
-    utStrncpy((char *)spci.lastwords, ConqInfo->lastwords, MAXLASTWORDS);
+    utStrncpy((char *)spci.conqueror, cbConqInfo->conqueror, MAXUSERNAME);
+    utStrncpy((char *)spci.conqteam, cbConqInfo->conqteam, MAXTEAMNAME);
+    utStrncpy((char *)spci.conqtime, cbConqInfo->conqtime, MAXDATESIZE);
+    utStrncpy((char *)spci.lastwords, cbConqInfo->lastwords, MAXLASTWORDS);
 
-    if (memcmp((void *)&spci, (void *)&pktConqInfo,
-               sizeof(spConqInfo_t)) || force)
+    if (memcmp((void *)&spci, (void *)&pktcbConqInfo,
+               sizeof(spcbConqInfo_t)) || force)
     {
-        pktConqInfo = spci;
+        pktcbConqInfo = spci;
         return &spci;
     }
 
@@ -951,14 +951,14 @@ spHistory_t *spktHistory(int hnum)
     hist.type = SP_HISTORY;
     hist.hnum = hnum;
 
-    hist.histptr = ConqInfo->histptr;
+    hist.histptr = cbConqInfo->histptr;
 
-    hist.unum = (uint16_t)htons((uint16_t)History[hnum].unum);
+    hist.unum = (uint16_t)htons((uint16_t)cbHistory[hnum].unum);
 
-    hist.elapsed = (uint32_t)htonl((uint32_t)History[hnum].elapsed);
-    hist.enterTime = (uint32_t)htonl((uint32_t)History[hnum].enterTime);
+    hist.elapsed = (uint32_t)htonl((uint32_t)cbHistory[hnum].elapsed);
+    hist.enterTime = (uint32_t)htonl((uint32_t)cbHistory[hnum].enterTime);
 
-    utStrncpy((char *)hist.username, History[hnum].username, MAXUSERNAME);
+    utStrncpy((char *)hist.username, cbHistory[hnum].username, MAXUSERNAME);
 
     if (memcmp((void *)&hist, (void *)&pktHistory[hnum], sizeof(spHistory_t)))
     {
@@ -976,10 +976,10 @@ spDoomsday_t *spktDoomsday(int rec)
     memset((void *)&dd, 0, sizeof(spDoomsday_t));
 
     dd.type = SP_DOOMSDAY;
-    dd.status = (uint8_t)Doomsday->status;
-    dd.heading = htons((uint16_t)(Doomsday->heading * 10.0));
-    dd.x = (int32_t)htonl((int32_t)(Doomsday->x * 1000.0));
-    dd.y = (int32_t)htonl((int32_t)(Doomsday->y * 1000.0));
+    dd.status = (uint8_t)cbDoomsday->status;
+    dd.heading = htons((uint16_t)(cbDoomsday->heading * 10.0));
+    dd.x = (int32_t)htonl((int32_t)(cbDoomsday->x * 1000.0));
+    dd.y = (int32_t)htonl((int32_t)(cbDoomsday->y * 1000.0));
 
     if (rec)
     {
@@ -1011,12 +1011,12 @@ spPlanetInfo_t *spktPlanetInfo(uint8_t pnum, int rec)
 
     splaninfo.type = SP_PLANETINFO;
     splaninfo.pnum = pnum;
-    splaninfo.flags = htonl(Planets[pnum].flags);
+    splaninfo.flags = htonl(cbPlanets[pnum].flags);
 
-    splaninfo.primary = (uint8_t)Planets[pnum].primary;
+    splaninfo.primary = (uint8_t)cbPlanets[pnum].primary;
 
-    splaninfo.orbrad = (uint32_t)htonl((uint32_t)(Planets[pnum].orbrad * 10.0));
-    splaninfo.orbvel = (int32_t)htonl((int32_t)(Planets[pnum].orbvel * 100.0));
+    splaninfo.orbrad = (uint32_t)htonl((uint32_t)(cbPlanets[pnum].orbrad * 10.0));
+    splaninfo.orbvel = (int32_t)htonl((int32_t)(cbPlanets[pnum].orbvel * 100.0));
 
     if (rec)
     {

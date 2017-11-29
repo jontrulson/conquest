@@ -472,16 +472,16 @@ static int initGLShips(void)
     {
         /* build the prefix for this ship */
         snprintf(shipPfx, CQI_NAMELEN, "ship%c",
-                 Teams[i].name[0]);
+                 cbTeams[i].name[0]);
 
         for (j=0; j<MAXNUMSHIPTYPES; j++)
         {
             snprintf(buffer, CQI_NAMELEN, "%s%c%c", shipPfx,
-                     ShipTypes[j].name[0], ShipTypes[j].name[1]);
+                     cbShipTypes[j].name[0], cbShipTypes[j].name[1]);
             GLShips[i][j].ship = _get_ship_tex(buffer);
 
             snprintf(buffer, CQI_NAMELEN, "%s%c%c-sh", shipPfx,
-                     ShipTypes[j].name[0], ShipTypes[j].name[1]);
+                     cbShipTypes[j].name[0], cbShipTypes[j].name[1]);
             GLShips[i][j].sh = _get_ship_tex(buffer);
 
             snprintf(buffer, CQI_NAMELEN, "%s-tac", shipPfx);
@@ -491,11 +491,11 @@ static int initGLShips(void)
             GLShips[i][j].phas = _get_ship_tex(buffer);
 
             snprintf(buffer, CQI_NAMELEN, "%s%c%c-ico", shipPfx,
-                     ShipTypes[j].name[0], ShipTypes[j].name[1]);
+                     cbShipTypes[j].name[0], cbShipTypes[j].name[1]);
             GLShips[i][j].ico = _get_ship_tex(buffer);
 
             snprintf(buffer, CQI_NAMELEN, "%s%c%c-ico-sh", shipPfx,
-                     ShipTypes[j].name[0], ShipTypes[j].name[1]);
+                     cbShipTypes[j].name[0], cbShipTypes[j].name[1]);
             GLShips[i][j].ico_sh = _get_ship_tex(buffer);
 
             snprintf(buffer, CQI_NAMELEN, "%s-ico-torp", shipPfx);
@@ -581,7 +581,7 @@ static int _get_glplanet_info(GLPlanet_t *curGLPlanet, int plani)
      *    based on the planet type.
      */
 
-    if ((ndx = cqiFindPlanet(Planets[plani].name)) >= 0)
+    if ((ndx = cqiFindPlanet(cbPlanets[plani].name)) >= 0)
     {                       /* found one. */
         /* save the index for possible color and size setup */
         plnndx = ndx;
@@ -597,14 +597,14 @@ static int _get_glplanet_info(GLPlanet_t *curGLPlanet, int plani)
     if (gltndx == -1)
     {                       /* see if there is a texture available
                                named after the planet */
-        if ((ndx = findGLTexture(Planets[plani].name)) >= 0)
+        if ((ndx = findGLTexture(cbPlanets[plani].name)) >= 0)
             gltndx = ndx;       /* yes */
     }
 
     /* still no luck? What a loser. */
     if (gltndx == -1)
     {                       /* now we just choose a default */
-        switch (Planets[plani].type)
+        switch (cbPlanets[plani].type)
         {
         case PLANET_SUN:
             gltndx = findGLTexture("star");
@@ -633,7 +633,7 @@ static int _get_glplanet_info(GLPlanet_t *curGLPlanet, int plani)
     {
         utLog("%s: ERROR: Unable to locate a texture for planet '%s'.",
               __FUNCTION__,
-              Planets[plani].name);
+              cbPlanets[plani].name);
 
         return FALSE;
     }
@@ -651,7 +651,7 @@ static int _get_glplanet_info(GLPlanet_t *curGLPlanet, int plani)
          * server might send this data :)
          * These are in CU's.
          */
-        switch (Planets[plani].type)
+        switch (cbPlanets[plani].type)
         {
         case PLANET_SUN:
             size = 1500.0;
@@ -669,7 +669,7 @@ static int _get_glplanet_info(GLPlanet_t *curGLPlanet, int plani)
         size = cqiPlanets[plnndx].size * OBJ_PRESCALE;
 #if 0
         utLog("Computed size %f for planet %s\n",
-              size, Planets[plani].name);
+              size, cbPlanets[plani].name);
 #endif
     }
 
@@ -689,8 +689,8 @@ int uiUpdateTorpDir(int snum, int tnum)
         return FALSE;
 
     torpdir[snum][tnum] = utAngle(0.0, 0.0,
-                                  Ships[snum].torps[tnum].dx,
-                                  Ships[snum].torps[tnum].dy);
+                                  cbShips[snum].torps[tnum].dx,
+                                  cbShips[snum].torps[tnum].dy);
     return TRUE;
 }
 
@@ -764,7 +764,7 @@ static int initGLPlanets(void)
 void drawIconHUDDecal(GLfloat rx, GLfloat ry, GLfloat w, GLfloat h,
                       int imgp, cqColor icol)
 {
-    int steam = Ships[Context.snum].team, stype = Ships[Context.snum].shiptype;
+    int steam = cbShips[Context.snum].team, stype = cbShips[Context.snum].shiptype;
     static int norender = FALSE;
     GLTexture_t *tex = &defaultTexture;
 
@@ -1081,8 +1081,8 @@ void drawExplosion(GLfloat x, GLfloat y, int snum, int torpnum, int scale)
 
     /* if it expired and moved, reset and que a new one */
     if (ANIM_EXPIRED(&torpAStates[snum][torpnum]) &&
-        (torpAStates[snum][torpnum].state.x != Ships[snum].torps[torpnum].x &&
-         torpAStates[snum][torpnum].state.y != Ships[snum].torps[torpnum].y))
+        (torpAStates[snum][torpnum].state.x != cbShips[snum].torps[torpnum].x &&
+         torpAStates[snum][torpnum].state.y != cbShips[snum].torps[torpnum].y))
     {
 
         /* start the 'exploding' sound */
@@ -1091,12 +1091,12 @@ void drawExplosion(GLfloat x, GLfloat y, int snum, int torpnum, int scale)
             real ang;
             real dis;
 
-            ang = utAngle(Ships[Context.snum].x, Ships[Context.snum].y,
-                          Ships[snum].torps[torpnum].x,
-                          Ships[snum].torps[torpnum].y);
-            dis = dist(Ships[Context.snum].x, Ships[Context.snum].y,
-                       Ships[snum].torps[torpnum].x,
-                       Ships[snum].torps[torpnum].y);
+            ang = utAngle(cbShips[Context.snum].x, cbShips[Context.snum].y,
+                          cbShips[snum].torps[torpnum].x,
+                          cbShips[snum].torps[torpnum].y);
+            dis = dist(cbShips[Context.snum].x, cbShips[Context.snum].y,
+                       cbShips[snum].torps[torpnum].x,
+                       cbShips[snum].torps[torpnum].y);
             cqsEffectPlay(explodefx, NULL, YELLOW_DIST, dis, ang);
         }
 
@@ -1107,8 +1107,8 @@ void drawExplosion(GLfloat x, GLfloat y, int snum, int torpnum, int scale)
             /* we cheat a little by abusing the animstate's x and
                y as per-state storage. This allows us to detect if
                we really should Reset if expired */
-            torpAStates[snum][torpnum].state.x = Ships[snum].torps[torpnum].x;
-            torpAStates[snum][torpnum].state.y = Ships[snum].torps[torpnum].y;
+            torpAStates[snum][torpnum].state.x = cbShips[snum].torps[torpnum].x;
+            torpAStates[snum][torpnum].state.y = cbShips[snum].torps[torpnum].y;
 
             animQueAdd(curnode->animQue, &torpAStates[snum][torpnum]);
         }
@@ -1161,7 +1161,7 @@ void drawBombing(int snum, int scale)
         return;
 
     /* don't bother if we aren't orbiting anything */
-    if (Ships[snum].lock != LOCK_PLANET)
+    if (cbShips[snum].lock != LOCK_PLANET)
         return;
 
     /* init - look at first ship */
@@ -1225,10 +1225,10 @@ void drawBombing(int snum, int scale)
     glLoadIdentity();
 
     /* calc and translate to correct position */
-    GLcvtcoords( Ships[Context.snum].x,
-                 Ships[Context.snum].y,
-                 Planets[Ships[snum].lockDetail].x + rnd->rndx,
-                 Planets[Ships[snum].lockDetail].y + rnd->rndy,
+    GLcvtcoords( cbShips[Context.snum].x,
+                 cbShips[Context.snum].y,
+                 cbPlanets[cbShips[snum].lockDetail].x + rnd->rndx,
+                 cbPlanets[cbShips[snum].lockDetail].y + rnd->rndy,
                  -scale,
                  &x,
                  &y);
@@ -1322,15 +1322,15 @@ void drawPlanet( GLfloat x, GLfloat y, int pnum, int scale,
     /*  text data... */
     glBlendFunc(GL_ONE, GL_ONE);
 
-    if (Planets[pnum].type == PLANET_SUN || Planets[pnum].type == PLANET_MOON ||
-        !Planets[pnum].scanned[Ships[Context.snum].team] )
+    if (cbPlanets[pnum].type == PLANET_SUN || cbPlanets[pnum].type == PLANET_MOON ||
+        !cbPlanets[pnum].scanned[cbShips[Context.snum].team] )
         torpchar = ' ';
     else
-        if ( Planets[pnum].armies <= 0 || Planets[pnum].team < 0 ||
-             Planets[pnum].team >= NUMPLAYERTEAMS )
+        if ( cbPlanets[pnum].armies <= 0 || cbPlanets[pnum].team < 0 ||
+             cbPlanets[pnum].team >= NUMPLAYERTEAMS )
             torpchar = '-';
         else
-            torpchar = Teams[Planets[pnum].team].torpchar;
+            torpchar = cbTeams[cbPlanets[pnum].team].torpchar;
 
     if (scale == SCALE_FAC)
     {
@@ -1341,12 +1341,12 @@ void drawPlanet( GLfloat x, GLfloat y, int pnum, int scale,
                          textcolor,
                          torpchar,
                          InfoColor,
-                         Planets[pnum].armies,
+                         cbPlanets[pnum].armies,
                          textcolor,
                          torpchar,
-                         Planets[pnum].name);
+                         cbPlanets[pnum].name);
             else
-                snprintf(buf, BUFFER_SIZE_256, "%s", Planets[pnum].name);
+                snprintf(buf, BUFFER_SIZE_256, "%s", cbPlanets[pnum].name);
 
 
             glfRenderFont(x,
@@ -1361,9 +1361,9 @@ void drawPlanet( GLfloat x, GLfloat y, int pnum, int scale,
     {                           /* MAP_FAC */
         if (showpnams)
         {                       /* just want first 3 chars */
-            planame[0] = Planets[pnum].name[0];
-            planame[1] = Planets[pnum].name[1];
-            planame[2] = Planets[pnum].name[2];
+            planame[0] = cbPlanets[pnum].name[0];
+            planame[1] = cbPlanets[pnum].name[1];
+            planame[2] = cbPlanets[pnum].name[2];
             planame[3] = 0;
         }
         else
@@ -1374,7 +1374,7 @@ void drawPlanet( GLfloat x, GLfloat y, int pnum, int scale,
                      textcolor,
                      torpchar,
                      InfoColor,
-                     Planets[pnum].armies,
+                     cbPlanets[pnum].armies,
                      textcolor,
                      torpchar,
                      planame);
@@ -1383,7 +1383,7 @@ void drawPlanet( GLfloat x, GLfloat y, int pnum, int scale,
                      textcolor,
                      torpchar,
                      InfoColor,
-                     ConqInfo->chrplanets[Planets[pnum].type],
+                     cbConqInfo->chrplanets[cbPlanets[pnum].type],
                      textcolor,
                      torpchar,
                      planame);
@@ -1478,7 +1478,7 @@ void setWarp(real warp)
     static int warpufx = -1;
     static int warpdfx = -1;
     static int enginefx = -1;
-    real dwarp = Ships[Context.snum].dwarp;
+    real dwarp = cbShips[Context.snum].dwarp;
     static int lastwarpdir = -1;
     int warpdir;
     static real lastwarp = 0;
@@ -1487,14 +1487,14 @@ void setWarp(real warp)
     if (warpufx == -1)
     {
         snprintf(buf, CQI_NAMELEN, "ship%c-warp-up",
-                 Teams[Ships[Context.snum].team].name[0]);
+                 cbTeams[cbShips[Context.snum].team].name[0]);
         warpufx = cqsFindEffect(buf);
     }
 
     if (warpdfx == -1)
     {
         snprintf(buf, CQI_NAMELEN, "ship%c-warp-down",
-                 Teams[Ships[Context.snum].team].name[0]);
+                 cbTeams[cbShips[Context.snum].team].name[0]);
         warpdfx = cqsFindEffect(buf);
     }
 
@@ -1992,7 +1992,7 @@ void drawTorp(GLfloat x, GLfloat y,
 {
     static const GLfloat z = 1.0;
     GLfloat size;
-    int steam = Ships[snum].team;
+    int steam = cbShips[snum].team;
     GLfloat scaleFac = (scale == SCALE_FAC) ? dConf.vScaleSR : dConf.vScaleLR;
 
     /* these need to exist first... */
@@ -2074,7 +2074,7 @@ drawShip(GLfloat x, GLfloat y, GLfloat angle, char ch, int snum, int color,
     GLfloat size;
     static GLfloat shipsizeSR, shipsizeLR;
     static int norender = FALSE;
-    int steam = Ships[snum].team, stype = Ships[snum].shiptype;
+    int steam = cbShips[snum].team, stype = cbShips[snum].shiptype;
     GLfloat scaleFac = (scale == SCALE_FAC) ? dConf.vScaleSR : dConf.vScaleLR;
     static uint32_t geoChangeCount = 0;
     static GLfloat phaserRadiusSR, phaserRadiusLR;
@@ -2115,7 +2115,7 @@ drawShip(GLfloat x, GLfloat y, GLfloat angle, char ch, int snum, int color,
     glEnable(GL_BLEND);
 
     /* phasers - we draw this before the ship */
-    if (Ships[snum].pfuse > 0) /* phaser action */
+    if (cbShips[snum].pfuse > 0) /* phaser action */
     {
         GLfloat phaserwidth = ((scale == SCALE_FAC) ? 1.5 : 0.5);
 
@@ -2126,7 +2126,7 @@ drawShip(GLfloat x, GLfloat y, GLfloat angle, char ch, int snum, int color,
 
         /* translate to correct position, */
         glTranslatef(x , y , TRANZ);
-        glRotatef(Ships[snum].lastphase - 90.0, 0.0, 0.0, z);
+        glRotatef(cbShips[snum].lastphase - 90.0, 0.0, 0.0, z);
 
         glColor4fv(GLTEX_COLOR(GLShips[steam][stype].phas).vec);
         glEnable(GL_TEXTURE_2D);
@@ -2181,7 +2181,7 @@ drawShip(GLfloat x, GLfloat y, GLfloat angle, char ch, int snum, int color,
         glBindTexture(GL_TEXTURE_2D, GLTEX_ID(GLShips[steam][stype].sh));
 
         /* standard sh graphic */
-        uiPutColor(_get_sh_color(Ships[snum].shields));
+        uiPutColor(_get_sh_color(cbShips[snum].shields));
         /* draw the shield textures at twice the ship size */
         drawTexBoxCentered(0.0, 0.0, z, size * 2.0, FALSE, FALSE);
 
@@ -2273,11 +2273,11 @@ void drawDoomsday(GLfloat x, GLfloat y, GLfloat dangle, GLfloat scale)
     if (norender)
         return;
 
-    dis = dist( Ships[Context.snum].x, Ships[Context.snum].y,
-                Doomsday->x, Doomsday->y );
+    dis = dist( cbShips[Context.snum].x, cbShips[Context.snum].y,
+                cbDoomsday->x, cbDoomsday->y );
 
-    ang = utAngle(Ships[Context.snum].x, Ships[Context.snum].y,
-                  Doomsday->x, Doomsday->y);
+    ang = utAngle(cbShips[Context.snum].x, cbShips[Context.snum].y,
+                  cbDoomsday->x, cbDoomsday->y);
 
     /* find the textures if we haven't already */
     if (!GLDoomsday.doom)
@@ -2342,13 +2342,13 @@ void drawDoomsday(GLfloat x, GLfloat y, GLfloat dangle, GLfloat scale)
         last_apstate = doomapfire.state.armed;
 
         /* we only want to draw it if we think it's stationary */
-        if (ox == Doomsday->x && oy == Doomsday->y)
+        if (ox == cbDoomsday->x && oy == cbDoomsday->y)
             drawAPBeam = !drawAPBeam;
         else
         {
             drawAPBeam = FALSE;
-            ox = Doomsday->x;
-            oy = Doomsday->y;
+            ox = cbDoomsday->x;
+            oy = cbDoomsday->y;
         }
     }
 
@@ -2363,7 +2363,7 @@ void drawDoomsday(GLfloat x, GLfloat y, GLfloat dangle, GLfloat scale)
         glScalef(scaleFac, scaleFac, 1.0);
 
         glTranslatef(x , y , TRANZ);
-        glRotatef(Doomsday->heading - 90.0, 0.0, 0.0, z);
+        glRotatef(cbDoomsday->heading - 90.0, 0.0, 0.0, z);
 
         glEnable(GL_TEXTURE_2D);
         glBindTexture(GL_TEXTURE_2D, GLTEX_ID(GLDoomsday.beam));
@@ -2525,28 +2525,28 @@ void drawNEB(int snum)
 
     /* if we are inside the barrier, of course we
        can see it */
-    if (fabs( Ships[snum].x ) >= NEGENB_DIST &&
-        fabs( Ships[snum].x ) <= NEGENBEND_DIST)
+    if (fabs( cbShips[snum].x ) >= NEGENB_DIST &&
+        fabs( cbShips[snum].x ) <= NEGENBEND_DIST)
         nebXVisible = TRUE;
 
-    if (fabs( Ships[snum].y ) >= NEGENB_DIST &&
-        fabs( Ships[snum].y ) <= NEGENBEND_DIST)
+    if (fabs( cbShips[snum].y ) >= NEGENB_DIST &&
+        fabs( cbShips[snum].y ) <= NEGENBEND_DIST)
         nebYVisible = TRUE;
 
     if (!nebXVisible)
     {
         /* test for x wall */
-        if (Ships[snum].x < 0.0)
+        if (cbShips[snum].x < 0.0)
         {
             /* find out which side of the barrier we are on */
-            if (Ships[snum].x > (-NEGENB_DIST - nebCenter))
+            if (cbShips[snum].x > (-NEGENB_DIST - nebCenter))
                 nearx = -NEGENB_DIST;
             else
                 nearx = -NEGENBEND_DIST;
         }
         else
         {
-            if (Ships[snum].x < (NEGENB_DIST + nebCenter))
+            if (cbShips[snum].x < (NEGENB_DIST + nebCenter))
                 nearx = NEGENB_DIST;
             else
                 nearx = NEGENBEND_DIST;
@@ -2555,9 +2555,9 @@ void drawNEB(int snum)
         /* we check against a mythical Y point aligned on the nearest X
            NEB wall edge to test for visibility. */
 
-        if (GLcvtcoords(Ships[snum].x, Ships[snum].y,
+        if (GLcvtcoords(cbShips[snum].x, cbShips[snum].y,
                         nearx,
-                        CLAMP(-NEGENBEND_DIST, NEGENBEND_DIST, Ships[snum].y),
+                        CLAMP(-NEGENBEND_DIST, NEGENBEND_DIST, cbShips[snum].y),
                         (SMAP(snum) ? MAP_FAC : SCALE_FAC),
                         &tx, &ty))
         {
@@ -2573,16 +2573,16 @@ void drawNEB(int snum)
     if (!nebYVisible)
     {
         /* test for y wall */
-        if (Ships[snum].y < 0.0)
+        if (cbShips[snum].y < 0.0)
         {
-            if (Ships[snum].y > (-NEGENB_DIST - nebCenter))
+            if (cbShips[snum].y > (-NEGENB_DIST - nebCenter))
                 neary = -NEGENB_DIST;
             else
                 neary = -NEGENBEND_DIST;
         }
         else
         {
-            if (Ships[snum].y < (NEGENB_DIST + nebCenter))
+            if (cbShips[snum].y < (NEGENB_DIST + nebCenter))
                 neary = NEGENB_DIST;
             else
                 neary = NEGENBEND_DIST;
@@ -2591,8 +2591,8 @@ void drawNEB(int snum)
         /* we check against a mythical X point aligned on the nearest Y NEB wall
            edge to test for visibility. */
 
-        if (GLcvtcoords(Ships[snum].x, Ships[snum].y,
-                        CLAMP(-NEGENBEND_DIST, NEGENBEND_DIST, Ships[snum].x),
+        if (GLcvtcoords(cbShips[snum].x, cbShips[snum].y,
+                        CLAMP(-NEGENBEND_DIST, NEGENBEND_DIST, cbShips[snum].x),
                         neary,
                         (SMAP(snum) ? MAP_FAC : SCALE_FAC),
                         &tx, &ty))
@@ -2634,10 +2634,10 @@ void drawNEB(int snum)
 
     if (nebYVisible)
     {
-        if (Ships[snum].y > 0.0)
+        if (cbShips[snum].y > 0.0)
         {
             /* top */
-            GLcvtcoords(Ships[snum].x, Ships[snum].y,
+            GLcvtcoords(cbShips[snum].x, cbShips[snum].y,
                         -NEGENBEND_DIST, NEGENB_DIST,
                         (SMAP(snum) ? MAP_FAC : SCALE_FAC),
                         &nebX, &nebY);
@@ -2648,7 +2648,7 @@ void drawNEB(int snum)
         else
         {
             /* bottom */
-            GLcvtcoords(Ships[snum].x, Ships[snum].y,
+            GLcvtcoords(cbShips[snum].x, cbShips[snum].y,
                         -NEGENBEND_DIST, -NEGENBEND_DIST,
                         (SMAP(snum) ? MAP_FAC : SCALE_FAC),
                         &nebX, &nebY);
@@ -2682,10 +2682,10 @@ void drawNEB(int snum)
 
     if (nebXVisible)
     {
-        if (Ships[snum].x > 0.0)
+        if (cbShips[snum].x > 0.0)
         {
             /* right */
-            GLcvtcoords(Ships[snum].x, Ships[snum].y,
+            GLcvtcoords(cbShips[snum].x, cbShips[snum].y,
                         NEGENB_DIST, -NEGENBEND_DIST,
                         (SMAP(snum) ? MAP_FAC : SCALE_FAC),
                         &nebX, &nebY);
@@ -2696,7 +2696,7 @@ void drawNEB(int snum)
         else
         {
             /* left */
-            GLcvtcoords(Ships[snum].x, Ships[snum].y,
+            GLcvtcoords(cbShips[snum].x, cbShips[snum].y,
                         -NEGENBEND_DIST, -NEGENBEND_DIST,
                         (SMAP(snum) ? MAP_FAC : SCALE_FAC),
                         &nebX, &nebY);
@@ -2790,11 +2790,11 @@ void drawViewerBG(int snum, int dovbg)
     }
     else
     {                           /* everything else */
-        GLcvtcoords(Ships[snum].x, Ships[snum].y,
+        GLcvtcoords(cbShips[snum].x, cbShips[snum].y,
                     -vbgrad, -vbgrad,
                     -SFAC(snum),
                     &x, &y);
-        GLcvtcoords(Ships[snum].x, Ships[snum].y,
+        GLcvtcoords(cbShips[snum].x, cbShips[snum].y,
                     vbgrad, vbgrad,
                     -SFAC(snum),
                     &x2, &y2);
@@ -2844,7 +2844,7 @@ void drawViewerBG(int snum, int dovbg)
         sizeb = 0.990;
 
         glBindTexture(GL_TEXTURE_2D,
-                      GLTEX_ID(GLShips[Ships[snum].team][Ships[snum].shiptype].tac));
+                      GLTEX_ID(GLShips[cbShips[snum].team][cbShips[snum].shiptype].tac));
 
         glColor4f(1.0, 1.0, 1.0, UserConf.DoTacShade/100.0);
 

@@ -23,21 +23,21 @@
 #define SHIP_F_BOMBING     0x0100 /* ship is currently bombing */
 
 /* helpers */
-#define SCLOAKED(x)  ( Ships[(x)].flags & SHIP_F_CLOAKED )
-#define SVACANT(x)   ( Ships[(x)].flags & SHIP_F_VACANT )
-#define SSHUP(x)     ( Ships[(x)].flags & SHIP_F_SHUP )
-#define SREPAIR(x)   ( Ships[(x)].flags & SHIP_F_REPAIR )
-#define STALERT(x)   ( Ships[(x)].flags & SHIP_F_TALERT )
-#define SROBOT(x)    ( Ships[(x)].flags & SHIP_F_ROBOT )
-#define SMAP(x)      ( Ships[(x)].flags & SHIP_F_MAP )
-#define SSCANDIST(x) ( Ships[(x)].flags & SHIP_F_SCANDIST )
-#define SBOMBING(x)  ( Ships[(x)].flags & SHIP_F_BOMBING )
+#define SCLOAKED(x)  ( cbShips[(x)].flags & SHIP_F_CLOAKED )
+#define SVACANT(x)   ( cbShips[(x)].flags & SHIP_F_VACANT )
+#define SSHUP(x)     ( cbShips[(x)].flags & SHIP_F_SHUP )
+#define SREPAIR(x)   ( cbShips[(x)].flags & SHIP_F_REPAIR )
+#define STALERT(x)   ( cbShips[(x)].flags & SHIP_F_TALERT )
+#define SROBOT(x)    ( cbShips[(x)].flags & SHIP_F_ROBOT )
+#define SMAP(x)      ( cbShips[(x)].flags & SHIP_F_MAP )
+#define SSCANDIST(x) ( cbShips[(x)].flags & SHIP_F_SCANDIST )
+#define SBOMBING(x)  ( cbShips[(x)].flags & SHIP_F_BOMBING )
 
 /* lookup the proper [SCALE|MAP]_FAC depending on LR/SR status */
 #define SFAC(x)      (SMAP(x) ? MAP_FAC : SCALE_FAC)
 
-#define SFSET(x, b)  ( Ships[(x)].flags |=  (b) )
-#define SFCLR(x, b)  ( Ships[(x)].flags &= ~(b) )
+#define SFSET(x, b)  ( cbShips[(x)].flags |=  (b) )
+#define SFCLR(x, b)  ( cbShips[(x)].flags &= ~(b) )
 
     typedef struct {
         int status;			/* one of the SS_ values */
@@ -103,7 +103,7 @@
         Torp_t torps[ABS_MAXTORPS];	/* Torpedos */
         uint16_t flags;		/* SHIP_F_ */
         uint16_t pad1;			/* PAD */
-        char alias[MAXUSERNAME];	/* copy of Users[].alias */
+        char alias[MAXUSERNAME];	/* copy of cbUsers[].alias */
     } Ship_t;
 
 #endif /* SHIP_H_INCLUDED */

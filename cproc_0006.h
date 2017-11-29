@@ -23,7 +23,7 @@ int             proc_0006_TorpEvent(char *buf);
 int             proc_0006_Team(char *buf);
 int             proc_0006_Message(char *buf);
 int             proc_0006_ServerStat(char *buf);
-int             proc_0006_ConqInfo(char *buf);
+int             proc_0006_cbConqInfo(char *buf);
 int             proc_0006_History(char *buf);
 int             proc_0006_Doomsday(char *buf);
 int             proc_0006_Ack(char *buf); /* handles ACK and ACKMSG */
@@ -51,7 +51,7 @@ static dispatchProc_t cprocDispatchTable_0006[] = {
     proc_0006_Ack,                      /* SP_ACKMSG */
     proc_0006_Team,                     /* SP_TEAM */
     proc_0006_TorpLoc,                  /* SP_TORPLOC */
-    proc_0006_ConqInfo,                 /* SP_CONQINFO */
+    proc_0006_cbConqInfo,                 /* SP_CONQINFO */
     proc_0006_Frame,                    /* SP_FRAME */
     proc_0006_History,                  /* SP_HISTORY */
     proc_0006_Doomsday,                 /* SP_DOOMSDAY */

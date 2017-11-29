@@ -65,11 +65,11 @@ void nDeadInit(void)
         nMenuInit();
     }
 
-    kb = Ships[snum].killedBy;
-    detail = Ships[snum].killedByDetail;
+    kb = cbShips[snum].killedBy;
+    detail = cbShips[snum].killedByDetail;
 
     if (kb == KB_SHIP && detail < MAXSHIPS)
-        eShip = Ships[detail];        /* get copy of killers ship */
+        eShip = cbShips[detail];        /* get copy of killers ship */
     else
         memset((void *)&eShip, 0, sizeof(Ship_t));
 
@@ -167,13 +167,13 @@ static int nDeadDisplay(dspConfig_t *dsp)
         buf[0] = 0;
         if ( detail < MAXPLANETS )
 	{
-            if ( Planets[detail].type == PLANET_SUN )
+            if ( cbPlanets[detail].type == PLANET_SUN )
                 strcpy(cbuf, "solar radiation.");
             else
                 strcpy(cbuf, "planetary defenses.");
 
             cprintf(8,0,ALIGN_CENTER,"#%d#%s#%d#%s%s#%d#%s",
-                    InfoColor, ywkb, CQC_A_BOLD, Planets[detail].name, "'s ",
+                    InfoColor, ywkb, CQC_A_BOLD, cbPlanets[detail].name, "'s ",
                     InfoColor, cbuf);
 	}
 
@@ -195,12 +195,12 @@ static int nDeadDisplay(dspConfig_t *dsp)
     {
         cprintf( 10,0,ALIGN_CENTER,
                  "#%d#Universe conquered by #%d#%s #%d#for the #%d#%s #%d#team.",
-		 InfoColor, CQC_A_BOLD, ConqInfo->conqueror,
-		 InfoColor, CQC_A_BOLD, ConqInfo->conqteam, LabelColor );
+		 InfoColor, CQC_A_BOLD, cbConqInfo->conqueror,
+		 InfoColor, CQC_A_BOLD, cbConqInfo->conqteam, LabelColor );
     }
     else if ( kb == KB_SELF )
     {
-        i = Ships[snum].armies;
+        i = cbShips[snum].armies;
         if ( i > 0 )
 	{
             if ( i == 1 )
@@ -234,7 +234,7 @@ static int nDeadDisplay(dspConfig_t *dsp)
 
     cprintf(12,0,ALIGN_CENTER,
             "#%d#You got #%d#%.1f #%d#this time.",
-            InfoColor, CQC_A_BOLD, oneplace(Ships[snum].kills), InfoColor );
+            InfoColor, CQC_A_BOLD, oneplace(cbShips[snum].kills), InfoColor );
 
     if (state == S_PRESSANY)
         cprintf(MSG_LIN1, 0, ALIGN_CENTER,

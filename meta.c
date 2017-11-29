@@ -264,7 +264,7 @@ int metaUpdateServer(char *remotehost, char *name, int port)
     /* count ships */
     for ( i = 0; i < MAXSHIPS; i++ )
     {
-        if ( Ships[i].status == SS_LIVE )
+        if ( cbShips[i].status == SS_LIVE )
         {
             if (SROBOT(i))
                 numshipsrobot++;

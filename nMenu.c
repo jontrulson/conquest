@@ -96,7 +96,7 @@ static void _conqds(dspConfig_t *dsp)
 
     lin = 7;
 
-    if ( ConqInfo->closed )
+    if ( cbConqInfo->closed )
         cprintf(lin,0,ALIGN_CENTER,"#%d#%s",RedLevelColor,"The game is closed.");
     else
         cprintf( lin,0,ALIGN_CENTER,"#%d#%s (%s)",YellowLevelColor,
@@ -169,10 +169,10 @@ void nMenuInit(void)
     {
         inited = TRUE;
         /* Initialize statistics. */
-        initstats( &Ships[Context.snum].ctime, &Ships[Context.snum].etime );
+        initstats( &cbShips[Context.snum].ctime, &cbShips[Context.snum].etime );
 
         /* Set up some things for the menu display. */
-        oclosed = ConqInfo->closed;
+        oclosed = cbConqInfo->closed;
         Context.leave = FALSE;
 
         /* now look for our ship packet before we get started.  It should be a
@@ -188,7 +188,7 @@ void nMenuInit(void)
             procShip(buf);
 
         /* Some simple housekeeping. */
-        if ( oclosed != ConqInfo->closed )
+        if ( oclosed != cbConqInfo->closed )
             oclosed = ! oclosed;
 
         lose = FALSE;
@@ -221,7 +221,7 @@ static int nMenuDisplay(dspConfig_t *dsp)
     if (state == S_PSEUDO)
     {
         cprintf(prm.index, 0, ALIGN_NONE, "#%d#Old pseudonym: %s",
-                NoColor, Users[Context.unum].alias);
+                NoColor, cbUsers[Context.unum].alias);
 
         cprintf(prm.index + 1, 0, ALIGN_NONE, "#%d#Enter a new pseudonym: %s",
                 NoColor, prm.buf);
@@ -300,7 +300,7 @@ static int nMenuIdle(void)
     if (pkttype < 0)          /* some error */
     {
         utLog("nMenuIdle: waitForPacket returned %d", pkttype);
-        Ships[Context.snum].status = SS_OFF;
+        cbShips[Context.snum].status = SS_OFF;
         return NODE_EXIT;
     }
 
@@ -366,8 +366,8 @@ static int nMenuInput(int ch)
                             cwar |= (1 << i);
 
                         /* we'll let it happen locally as well... */
-                        Users[Ships[Context.snum].unum].war[i] = twar[i];
-                        Ships[Context.snum].war[i] = twar[i];
+                        cbUsers[cbShips[Context.snum].unum].war[i] = twar[i];
+                        cbShips[Context.snum].war[i] = twar[i];
                     }
 
                     sendCommand(CPCMD_SETWAR, (uint16_t)cwar);
@@ -379,9 +379,9 @@ static int nMenuInput(int ch)
             {
                 prm.buf[0] = 0;
                 for ( i = 0; i < NUMPLAYERTEAMS; i = i + 1 )
-                    if ( ch == (char)tolower( Teams[i].teamchar ) )
+                    if ( ch == (char)tolower( cbTeams[i].teamchar ) )
                     {
-                        if ( ! twar[i] || ! Ships[Context.snum].rwar[i] )
+                        if ( ! twar[i] || ! cbShips[Context.snum].rwar[i] )
                             twar[i] = ! twar[i];
                         prm.pbuf = clbWarPrompt(Context.snum, twar);
                     }
@@ -420,9 +420,9 @@ static int nMenuInput(int ch)
 
     case 'r':
         for ( i = 0; i < MAXSHIPS; i++ )
-            if ( Ships[i].status == SS_LIVE ||
-                 Ships[i].status == SS_ENTERING )
-                if ( Ships[i].unum == Context.unum )
+            if ( cbShips[i].status == SS_LIVE ||
+                 cbShips[i].status == SS_ENTERING )
+                if ( cbShips[i].unum == Context.unum )
                     break;
 
         if ( i < MAXSHIPS )
@@ -447,15 +447,15 @@ static int nMenuInput(int ch)
             /* we'll update local data here anyway, even though it will be
                overwritten on the next ship update.  Improves perceived
                response time. */
-            Ships[Context.snum].team =
-                utModPlusOne( Ships[Context.snum].team+1, NUMPLAYERTEAMS );
-            Ships[Context.snum].shiptype =
-                Teams[Ships[Context.snum].team].shiptype;
-            Users[Context.unum].team = Ships[Context.snum].team;
-            Ships[Context.snum].war[Ships[Context.snum].team] = FALSE;
-            Users[Context.unum].war[Users[Context.unum].team] = FALSE;
+            cbShips[Context.snum].team =
+                utModPlusOne( cbShips[Context.snum].team+1, NUMPLAYERTEAMS );
+            cbShips[Context.snum].shiptype =
+                cbTeams[cbShips[Context.snum].team].shiptype;
+            cbUsers[Context.unum].team = cbShips[Context.snum].team;
+            cbShips[Context.snum].war[cbShips[Context.snum].team] = FALSE;
+            cbUsers[Context.unum].war[cbUsers[Context.unum].team] = FALSE;
 
-            sendCommand(CPCMD_SWITCHTEAM, (uint16_t)Ships[Context.snum].team);
+            sendCommand(CPCMD_SWITCHTEAM, (uint16_t)cbShips[Context.snum].team);
         }
         break;
 
@@ -468,7 +468,7 @@ static int nMenuInput(int ch)
         break;
 
     case 'T':
-        nTeamlInit(DSP_NODE_MENU, TRUE, Ships[Context.snum].team);
+        nTeamlInit(DSP_NODE_MENU, TRUE, cbShips[Context.snum].team);
         break;
 
     case 'U':
@@ -477,7 +477,7 @@ static int nMenuInput(int ch)
 
     case 'W':
         for ( i = 0; i < NUMPLAYERTEAMS; i = i + 1 )
-            twar[i] = Ships[Context.snum].war[i];
+            twar[i] = cbShips[Context.snum].war[i];
 
         state = S_WAR;
         prompting = TRUE;
@@ -496,9 +496,9 @@ static int nMenuInput(int ch)
 
     case '?':
         if (Context.snum >= 0 && Context.snum < MAXSHIPS)
-            nPlanetlInit(DSP_NODE_MENU, TRUE, Context.snum, Ships[Context.snum].team);
+            nPlanetlInit(DSP_NODE_MENU, TRUE, Context.snum, cbShips[Context.snum].team);
         else          /* then use user team if user doen't have a ship yet */
-            nPlanetlInit(DSP_NODE_MENU, TRUE, Context.snum, Users[Context.unum].team);
+            nPlanetlInit(DSP_NODE_MENU, TRUE, Context.snum, cbUsers[Context.unum].team);
         break;
 
     case 'q':

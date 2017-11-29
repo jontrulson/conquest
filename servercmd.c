@@ -167,22 +167,22 @@ static void CreateRobots(int snumFrom, char *arg1, char *arg2, char *arg3)
         if ( warlike )
 	{
             for ( j = 0; j < NUMPLAYERTEAMS; j++ )
-                Ships[snum].war[j] = TRUE;
-            Ships[snum].war[Ships[snum].team] = FALSE;
+                cbShips[snum].war[j] = TRUE;
+            cbShips[snum].war[cbShips[snum].team] = FALSE;
 	}
     }
 
     /* Report the good news. */
     utLog("conquestd: %s created %d %s%s (%s) robot(s)",
-          Users[Context.unum].username,
+          cbUsers[Context.unum].username,
           anum,
           (warlike == TRUE) ? "WARLIKE " : "",
-          Users[unum].alias,
-          Users[unum].username);
+          cbUsers[unum].alias,
+          cbUsers[unum].username);
 
     sprintf( buf, "%sAutomation %s (%s) is now flying ",
              (warlike) ? "Warlike " : "",
-             Users[unum].alias, Users[unum].username );
+             cbUsers[unum].alias, cbUsers[unum].username );
     if ( anum == 1 )
         utAppendShip(buf , snum) ;
     else
@@ -215,21 +215,21 @@ static void Murder(int from, char *what)
         snum = atoi(what);
         if ( snum < 0 || snum >= MAXSHIPS )
             clbStoreMsg(MSG_FROM_GOD, 0, MSG_TO_SHIP, fromShip, no_ship_str);
-        else if ( Ships[snum].status != SS_LIVE )
+        else if ( cbShips[snum].status != SS_LIVE )
         {
             ssbuf[0] = 0;
-            utAppendShipStatus(ssbuf, Ships[snum].status) ;
+            utAppendShipStatus(ssbuf, cbShips[snum].status) ;
             sprintf(mbuf, cant_kill_ship_str,
-                    Teams[Ships[snum].team].teamchar,
+                    cbTeams[cbShips[snum].team].teamchar,
                     snum,
-                    Ships[snum].alias,
+                    cbShips[snum].alias,
                     ssbuf);
             clbStoreMsg(MSG_FROM_GOD, 0, MSG_TO_SHIP, fromShip, mbuf);
         }
         else
         {
             sprintf(mbuf, kill_ship_str1,
-                    Teams[Ships[snum].team].teamchar, snum, Ships[snum].alias);
+                    cbTeams[cbShips[snum].team].teamchar, snum, cbShips[snum].alias);
             clbStoreMsg(MSG_FROM_GOD, 0, MSG_TO_SHIP, fromShip, mbuf);
             clbKillShip( snum, KB_GOD, 0 );
         }
@@ -247,14 +247,14 @@ static void Murder(int from, char *what)
 
     didany = FALSE;
     for ( snum = 0; snum < MAXSHIPS; snum++ )
-        if ( Ships[snum].status == SS_LIVE )
-            if ( Ships[snum].unum == unum )
+        if ( cbShips[snum].status == SS_LIVE )
+            if ( cbShips[snum].unum == unum )
             {
                 didany = TRUE;
                 sprintf(mbuf, kill_ship_str2,
-                        Teams[Ships[snum].team].teamchar,
+                        cbTeams[cbShips[snum].team].teamchar,
                         snum,
-                        Ships[snum].alias,
+                        cbShips[snum].alias,
                         what);
                 clbStoreMsg(MSG_FROM_GOD, 0, MSG_TO_SHIP, fromShip, mbuf);
                 clbKillShip( snum, KB_GOD, 0 );
@@ -263,8 +263,8 @@ static void Murder(int from, char *what)
 
     if ( ! didany )
     {
-        sprintf(mbuf, not_flying_str, Users[unum].username,
-                Users[unum].alias);
+        sprintf(mbuf, not_flying_str, cbUsers[unum].username,
+                cbUsers[unum].alias);
         clbStoreMsg(MSG_FROM_GOD, 0, MSG_TO_SHIP, fromShip, mbuf);
     }
 
@@ -377,7 +377,7 @@ int checkOperExec(msgFrom_t from, uint16_t fromDetail,
         return FALSE;               /* not for us. */
 
     /* it is for us, now check for allowability */
-    if (!UISOPER(Ships[fromDetail].unum))
+    if (!UISOPER(cbShips[fromDetail].unum))
     {                           /* nice try... */
         clbStoreMsg(MSG_FROM_GOD, 0,
                     MSG_TO_SHIP, fromDetail,

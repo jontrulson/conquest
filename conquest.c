@@ -554,7 +554,7 @@ int selectentry( uint8_t esystem )
         if ( owned[i] )
         {
             strcat(cbuf,  ", ");
-            strcat(cbuf , Teams[i].name) ;
+            strcat(cbuf , cbTeams[i].name) ;
         }
 
     /* Change first comma to a colon. */
@@ -580,12 +580,12 @@ int selectentry( uint8_t esystem )
             break;
 	case TERM_EXTRA:
             /* Enter the home system. */
-            sendCommand(CPCMD_ENTER, (uint16_t)(1 << Ships[Context.snum].team));
+            sendCommand(CPCMD_ENTER, (uint16_t)(1 << cbShips[Context.snum].team));
             return ( TRUE );
             break;
 	default:
             for ( i = 0; i < NUMPLAYERTEAMS; i++ )
-                if ( Teams[i].teamchar == (char)toupper( ch ) && owned[i] )
+                if ( cbTeams[i].teamchar == (char)toupper( ch ) && owned[i] )
                 {
                     /* Found a good one. */
                     sendCommand(CPCMD_ENTER, (uint16_t)(1 << i));
@@ -643,7 +643,7 @@ void command( int ch )
         dowarp( Context.snum, x );
         break;
     case 'a':				/* autopilot */
-        if ( UAUTOPILOT(Ships[Context.snum].unum) )
+        if ( UAUTOPILOT(cbShips[Context.snum].unum) )
 	{
             doautopilot( Context.snum );
 	}
@@ -795,7 +795,7 @@ void command( int ch )
     case 'T':				/* team list */
         Context.redraw = TRUE;
         Context.display = FALSE;
-        doTeamList( Ships[Context.snum].team );
+        doTeamList( cbShips[Context.snum].team );
         Context.display = TRUE;
         if ( clbStillAlive( Context.snum ) )
         {
@@ -929,7 +929,7 @@ void conqds()
     /* Display the logo. */
     lin = mcuConqLogo();
 
-    if ( ConqInfo->closed )
+    if ( cbConqInfo->closed )
         cprintf(lin,0,ALIGN_CENTER,"#%d#%s",RedLevelColor,"The game is closed.");
     else
         cprintf( lin,0,ALIGN_CENTER,"#%d#%s (%s)",YellowLevelColor,
@@ -1019,8 +1019,8 @@ void dead( int snum, int leave )
         return;
     }
 
-    kb = Ships[snum].killedBy;
-    detail = Ships[snum].killedByDetail;
+    kb = cbShips[snum].killedBy;
+    detail = cbShips[snum].killedByDetail;
 
     /* Figure out why we died. */
     switch ( kb )
@@ -1076,15 +1076,15 @@ void dead( int snum, int leave )
         if ( detail < MAXSHIPS )
 	{
             utAppendShip(cbuf, detail) ;
-            if ( Ships[detail].status != SS_LIVE )
+            if ( cbShips[detail].status != SS_LIVE )
                 strcat(buf, ", who also died.");
             else
                 utAppendChar(buf , '.') ;
 
             cprintf( 8,0,ALIGN_CENTER,
                      "#%d#You were kill number #%d#%.1f #%d#for #%d#%s #%d#(#%d#%s#%d#)%s",
-                     InfoColor, CQC_A_BOLD, Ships[detail].kills,
-                     InfoColor, CQC_A_BOLD, Ships[detail].alias,
+                     InfoColor, CQC_A_BOLD, cbShips[detail].kills,
+                     InfoColor, CQC_A_BOLD, cbShips[detail].alias,
                      InfoColor, CQC_A_BOLD, cbuf,
                      InfoColor, buf );
 	}
@@ -1095,13 +1095,13 @@ void dead( int snum, int leave )
         cbuf[0] = buf[0] = 0;
         if ( detail >= 0 && detail < MAXPLANETS )
 	{
-            if ( Planets[detail].type == PLANET_SUN )
+            if ( cbPlanets[detail].type == PLANET_SUN )
                 strcpy(cbuf, "solar radiation.");
             else
                 strcpy(cbuf, "planetary defenses.");
 
             cprintf(8,0,ALIGN_CENTER,"#%d#%s#%d#%s%s#%d#%s",
-                    InfoColor, ywkb, CQC_A_BOLD, Planets[detail].name, "'s ",
+                    InfoColor, ywkb, CQC_A_BOLD, cbPlanets[detail].name, "'s ",
                     InfoColor, cbuf);
 	}
 
@@ -1128,12 +1128,12 @@ void dead( int snum, int leave )
     {
         cprintf( 10,0,ALIGN_CENTER,
                  "#%d#Universe conquered by #%d#%s #%d#for the #%d#%s #%d#team.",
-		 InfoColor, CQC_A_BOLD, ConqInfo->conqueror,
-		 InfoColor, CQC_A_BOLD, ConqInfo->conqteam, LabelColor );
+		 InfoColor, CQC_A_BOLD, cbConqInfo->conqueror,
+		 InfoColor, CQC_A_BOLD, cbConqInfo->conqteam, LabelColor );
     }
     else if ( kb == KB_SELF )
     {
-        i = Ships[snum].armies;
+        i = cbShips[snum].armies;
         if ( i > 0 )
 	{
             if ( i == 1 )
@@ -1158,18 +1158,18 @@ void dead( int snum, int leave )
     }
     else if ( kb == KB_SHIP && detail < MAXSHIPS)
     {
-        if ( Ships[detail].status == SS_LIVE )
+        if ( cbShips[detail].status == SS_LIVE )
 	{
             cprintf( 10,0,ALIGN_CENTER,
                      "#%d#He had #%d#%d%% #%d#shields and #%d#%d%% #%d#damage.",
-                     InfoColor, CQC_A_BOLD, round(Ships[detail].shields),
-                     InfoColor, CQC_A_BOLD, round(Ships[detail].damage),
+                     InfoColor, CQC_A_BOLD, round(cbShips[detail].shields),
+                     InfoColor, CQC_A_BOLD, round(cbShips[detail].damage),
                      InfoColor );
 	}
     }
     cprintf(12,0,ALIGN_CENTER,
             "#%d#You got #%d#%.1f #%d#this time.",
-            InfoColor, CQC_A_BOLD, oneplace(Ships[snum].kills), InfoColor );
+            InfoColor, CQC_A_BOLD, oneplace(cbShips[snum].kills), InfoColor );
     cdmove( 1, 1 );
     cdrefresh();
 
@@ -1212,7 +1212,7 @@ void dead( int snum, int leave )
     /* set the ship reserved (locally).  The server has already done this
        but we have not processed any packets since we died.  This keeps
        menu() from booting us out of the game. */
-    Ships[Context.snum].status = SS_RESERVED;
+    cbShips[Context.snum].status = SS_RESERVED;
 
     ioeat();
     mcuPutPrompt( MTXT_DONE, MSG_LIN2 );
@@ -1244,7 +1244,7 @@ void doalloc( int snum )
     switch (ch)
     {
     case TERM_EXTRA:
-        dwalloc = Ships[snum].engalloc;
+        dwalloc = cbShips[snum].engalloc;
         break;
 
     case TERM_NORMAL:
@@ -1360,7 +1360,7 @@ void dobeam( int snum )
        could be used by both client and server */
 
     /* Check for allowability. */
-    if ( Ships[snum].warp >= 0.0 )
+    if ( cbShips[snum].warp >= 0.0 )
     {
         mcuPutMsg( "We must be orbiting a planet to use the transporter.",
                    MSG_LIN1 );
@@ -1368,21 +1368,21 @@ void dobeam( int snum )
     }
     // the assumption here is that if you are orbiting (warp < 0), you
     // are locked onto a planet...
-    pnum = Ships[snum].lockDetail;
-    if ( Ships[snum].armies > 0 )
+    pnum = cbShips[snum].lockDetail;
+    if ( cbShips[snum].armies > 0 )
     {
-        if ( Planets[pnum].type == PLANET_SUN )
+        if ( cbPlanets[pnum].type == PLANET_SUN )
 	{
             mcuPutMsg( "Idiot!  Our armies will fry down there!", MSG_LIN1 );
             return;
 	}
-        else if ( Planets[pnum].type == PLANET_MOON )
+        else if ( cbPlanets[pnum].type == PLANET_MOON )
 	{
             mcuPutMsg( "Fool!  Our armies will suffocate down there!",
                        MSG_LIN1 );
             return;
 	}
-        else if ( Planets[pnum].team == TEAM_GOD )
+        else if ( cbPlanets[pnum].team == TEAM_GOD )
 	{
             mcuPutMsg(
                 "GOD->you: YOUR ARMIES AREN'T GOOD ENOUGH FOR THIS PLANET.",
@@ -1391,7 +1391,7 @@ void dobeam( int snum )
 	}
     }
 
-    i = Planets[pnum].uninhabtime;
+    i = cbPlanets[pnum].uninhabtime;
     if ( i > 0 )
     {
         sprintf( cbuf, "This planet is uninhabitable for %d more minute",
@@ -1404,23 +1404,23 @@ void dobeam( int snum )
     }
 
     /* can take empty planets */
-    if ( Planets[pnum].team != Ships[snum].team &&
-         Planets[pnum].team != TEAM_SELFRULED &&
-         Planets[pnum].team != TEAM_NOTEAM )
-        if ( ! Ships[snum].war[Planets[pnum].team] && Planets[pnum].armies != 0)
+    if ( cbPlanets[pnum].team != cbShips[snum].team &&
+         cbPlanets[pnum].team != TEAM_SELFRULED &&
+         cbPlanets[pnum].team != TEAM_NOTEAM )
+        if ( ! cbShips[snum].war[cbPlanets[pnum].team] && cbPlanets[pnum].armies != 0)
         {
             mcuPutMsg( "But we are not at war with this planet!", MSG_LIN1 );
             return;
         }
 
-    if ( Ships[snum].armies == 0 &&
-         Planets[pnum].team == Ships[snum].team && Planets[pnum].armies <= MIN_BEAM_ARMIES )
+    if ( cbShips[snum].armies == 0 &&
+         cbPlanets[pnum].team == cbShips[snum].team && cbPlanets[pnum].armies <= MIN_BEAM_ARMIES )
     {
         mcuPutMsg( lastfew, MSG_LIN1 );
         return;
     }
 
-    rkills = Ships[snum].kills;
+    rkills = cbShips[snum].kills;
 
     if ( rkills < (real)1.0 )
     {
@@ -1431,25 +1431,25 @@ void dobeam( int snum )
     }
 
     /* Figure out what can be beamed. */
-    downmax = Ships[snum].armies;
+    downmax = cbShips[snum].armies;
     if ( clbSPWar(snum,pnum) ||
-         Planets[pnum].team == TEAM_SELFRULED ||
-         Planets[pnum].team == TEAM_NOTEAM ||
-         Planets[pnum].team == TEAM_GOD ||
-         Planets[pnum].armies == 0 )
+         cbPlanets[pnum].team == TEAM_SELFRULED ||
+         cbPlanets[pnum].team == TEAM_NOTEAM ||
+         cbPlanets[pnum].team == TEAM_GOD ||
+         cbPlanets[pnum].armies == 0 )
     {
         upmax = 0;
     }
     else
     {
         capacity = min( (int)rkills * 2,
-                        ShipTypes[Ships[snum].shiptype].armylim );
-        upmax = min( Planets[pnum].armies - MIN_BEAM_ARMIES,
-                     capacity - Ships[snum].armies );
+                        cbShipTypes[cbShips[snum].shiptype].armylim );
+        upmax = min( cbPlanets[pnum].armies - MIN_BEAM_ARMIES,
+                     capacity - cbShips[snum].armies );
     }
 
     /* If there are armies to beam but we're selfwar... */
-    if ( upmax > 0 && selfwar(snum) && Ships[snum].team == Planets[pnum].team )
+    if ( upmax > 0 && selfwar(snum) && cbShips[snum].team == cbPlanets[pnum].team )
     {
         if ( downmax <= 0 )
 	{
@@ -1599,25 +1599,25 @@ void dobomb( int snum )
     cdclrl(MSG_LIN1, 1);
 
     /* Check for allowability. */
-    if ( Ships[snum].warp >= 0.0 )
+    if ( cbShips[snum].warp >= 0.0 )
     {
         mcuPutMsg( "We must be orbiting a planet to bombard it.", MSG_LIN1 );
         return;
     }
-    pnum = Ships[snum].lockDetail;
-    if ( Planets[pnum].type == PLANET_SUN || Planets[pnum].type == PLANET_MOON ||
-         Planets[pnum].team == TEAM_NOTEAM || Planets[pnum].armies == 0 )
+    pnum = cbShips[snum].lockDetail;
+    if ( cbPlanets[pnum].type == PLANET_SUN || cbPlanets[pnum].type == PLANET_MOON ||
+         cbPlanets[pnum].team == TEAM_NOTEAM || cbPlanets[pnum].armies == 0 )
     {
         mcuPutMsg( "There is no one there to bombard.", MSG_LIN1 );
         return;
     }
-    if ( Planets[pnum].team == Ships[snum].team )
+    if ( cbPlanets[pnum].team == cbShips[snum].team )
     {
         mcuPutMsg( "We can't bomb our own armies!", MSG_LIN1 );
         return;
     }
-    if ( Planets[pnum].team != TEAM_SELFRULED && Planets[pnum].team != TEAM_GOD )
-        if ( ! Ships[snum].war[Planets[pnum].team] )
+    if ( cbPlanets[pnum].team != TEAM_SELFRULED && cbPlanets[pnum].team != TEAM_GOD )
+        if ( ! cbShips[snum].war[cbPlanets[pnum].team] )
         {
             mcuPutMsg( "But we are not at war with this planet!", MSG_LIN1 );
             return;
@@ -1625,7 +1625,7 @@ void dobomb( int snum )
 
     /* Confirm. */
     sprintf( cbuf, "Press [TAB] to bombard %s, %d armies:",
-             Planets[pnum].name, Planets[pnum].armies );
+             cbPlanets[pnum].name, cbPlanets[pnum].armies );
     cdclrl( MSG_LIN1, 1 );
     cdclrl( MSG_LIN2, 1 );
     buf[0] = 0;
@@ -1679,7 +1679,7 @@ void doburst( int snum )
 
     cdclrl( MSG_LIN2, 1 );
 
-    if ( mcuGetTarget( "Torpedo burst: ", MSG_LIN1, 1, &dir, Ships[snum].lastblast ) )
+    if ( mcuGetTarget( "Torpedo burst: ", MSG_LIN1, 1, &dir, cbShips[snum].lastblast ) )
     {
         sendFireTorps(3, dir);
         cdclrl( MSG_LIN1, 1 );
@@ -1742,27 +1742,27 @@ void dorefit( int snum, int dodisplay )
     cdclrl( MSG_LIN2, 1 );
 
     /* Check for allowability. */
-    if ( oneplace( Ships[snum].kills ) < MIN_REFIT_KILLS )
+    if ( oneplace( cbShips[snum].kills ) < MIN_REFIT_KILLS )
     {
         mcuPutMsg( nek, MSG_LIN1 );
         return;
     }
 
-    if (Ships[snum].warp >= 0.0)
+    if (cbShips[snum].warp >= 0.0)
     {
         mcuPutMsg( ntp, MSG_LIN1 );
         return;
     }
 
-    pnum = Ships[snum].lockDetail;
+    pnum = cbShips[snum].lockDetail;
 
-    if (Planets[pnum].team != Ships[snum].team)
+    if (cbPlanets[pnum].team != cbShips[snum].team)
     {
         mcuPutMsg( ntp, MSG_LIN1 );
         return;
     }
 
-    if (Ships[snum].armies != 0)
+    if (cbShips[snum].armies != 0)
     {
         mcuPutMsg( cararm, MSG_LIN1 );
         return;
@@ -1771,7 +1771,7 @@ void dorefit( int snum, int dodisplay )
     /* we have at least 1 kill, and are */
     /* orbiting a team owned planet */
 
-    stype = oldstype = Ships[snum].shiptype;
+    stype = oldstype = cbShips[snum].shiptype;
     leave = FALSE;
 
     while ( clbStillAlive( snum ) && !leave)
@@ -1783,7 +1783,7 @@ void dorefit( int snum, int dodisplay )
 
         buf1[0] = '\0';
         strcat(buf1, "Refit ship type: ") ;
-        strcat(buf1, ShipTypes[stype].name) ;
+        strcat(buf1, cbShipTypes[stype].name) ;
 
         mcuPutMsg(buf1, MSG_LIN1);
         mcuPutMsg(conf, MSG_LIN2);
@@ -1882,7 +1882,7 @@ void docoup( int snum )
     /* some checks we will do locally, the rest will have to be handled by
        the server */
     /* Check for allowability. */
-    if ( oneplace( Ships[snum].kills ) < MIN_COUP_KILLS )
+    if ( oneplace( cbShips[snum].kills ) < MIN_COUP_KILLS )
     {
         mcuPutMsg(
             "Fleet orders require three kills before a coup can be attempted.",
@@ -1890,31 +1890,31 @@ void docoup( int snum )
         return;
     }
     for ( i = 0; i < MAXPLANETS; i++ )
-        if ( Planets[i].team == Ships[snum].team && Planets[i].armies > 0 )
+        if ( cbPlanets[i].team == cbShips[snum].team && cbPlanets[i].armies > 0 )
         {
             mcuPutMsg( "We don't need to coup, we still have armies left!",
                        MSG_LIN1 );
             return;
         }
-    if ( Ships[snum].warp >= 0.0 || Ships[snum].lock != LOCK_PLANET)
+    if ( cbShips[snum].warp >= 0.0 || cbShips[snum].lock != LOCK_PLANET)
     {
         mcuPutMsg( nhp, MSG_LIN1 );
         return;
     }
 
-    pnum = (int)Ships[snum].lockDetail;
-    if ( pnum != Teams[Ships[snum].team].homeplanet )
+    pnum = (int)cbShips[snum].lockDetail;
+    if ( pnum != cbTeams[cbShips[snum].team].homeplanet )
     {
         mcuPutMsg( nhp, MSG_LIN1 );
         return;
     }
-    if ( Planets[pnum].armies > MAX_COUP_ENEMY_ARMIES )
+    if ( cbPlanets[pnum].armies > MAX_COUP_ENEMY_ARMIES )
     {
         mcuPutMsg( "The enemy is still too strong to attempt a coup.",
                    MSG_LIN1 );
         return;
     }
-    i = Planets[pnum].uninhabtime;
+    i = cbPlanets[pnum].uninhabtime;
     if ( i > 0 )
     {
         sprintf( cbuf, "This planet is uninhabitable for %d more minutes.",
@@ -2011,7 +2011,7 @@ void docourse( int snum )
             cdclrl( MSG_LIN1, 1 );
             return;
 	}
-        if ( Ships[sorpnum].status != SS_LIVE )
+        if ( cbShips[sorpnum].status != SS_LIVE )
 	{
             mcuPutMsg( "Not found.", MSG_LIN2 );
             return;
@@ -2019,17 +2019,17 @@ void docourse( int snum )
 
         if ( SCLOAKED(sorpnum) )
 	{
-            if ( Ships[sorpnum].warp <= 0.0 )
+            if ( cbShips[sorpnum].warp <= 0.0 )
 	    {
                 mcuPutMsg( "Sensors are unable to lock on.", MSG_LIN2 );
                 return;
 	    }
 	}
 
-        appx = Ships[sorpnum].x;
-        appy = Ships[sorpnum].y;
+        appx = cbShips[sorpnum].x;
+        appy = cbShips[sorpnum].y;
 
-        dir = utAngle( Ships[snum].x, Ships[snum].y, appx, appy );
+        dir = utAngle( cbShips[snum].x, cbShips[snum].y, appx, appy );
 
         /* Give info if he used TAB. */
         if ( ch == TERM_EXTRA )
@@ -2038,7 +2038,7 @@ void docourse( int snum )
             cdclrl( MSG_LIN1, 1 );
         break;
     case NEAR_PLANET:
-        dir = utAngle( Ships[snum].x, Ships[snum].y, Planets[sorpnum].x, Planets[sorpnum].y );
+        dir = utAngle( cbShips[snum].x, cbShips[snum].y, cbPlanets[sorpnum].x, cbPlanets[sorpnum].y );
         if ( ch == TERM_EXTRA )
 	{
             newlock = LOCK_PLANET;
@@ -2077,7 +2077,7 @@ void dodet( int snum )
 {
     cdclrl( MSG_LIN2, 1 );
 
-    if ( Ships[snum].wfuse > 0 )
+    if ( cbShips[snum].wfuse > 0 )
         mcuPutMsg( "Weapons are currently overloaded.", MSG_LIN1 );
     else if ( clbUseFuel( snum, DETONATE_FUEL, TRUE, FALSE ) )
     {				/* we don't really use fuel here on the
@@ -2331,7 +2331,7 @@ void dolastphase( int snum )
 {
     cdclrl( MSG_LIN1, 1 );
 
-    sendCommand(CPCMD_FIREPHASER, (uint16_t)(Ships[snum].lastphase * 100.0));
+    sendCommand(CPCMD_FIREPHASER, (uint16_t)(cbShips[snum].lastphase * 100.0));
     cdclrl( MSG_LIN2, 1 );
 
     return;
@@ -2363,19 +2363,19 @@ void doorbit( int snum )
 {
     int pnum;
 
-    if ( ( Ships[snum].warp == ORBIT_CW ) || ( Ships[snum].warp == ORBIT_CCW ) )
-        mcuInfoPlanet( "But we are already orbiting ", Ships[snum].lockDetail, snum );
+    if ( ( cbShips[snum].warp == ORBIT_CW ) || ( cbShips[snum].warp == ORBIT_CCW ) )
+        mcuInfoPlanet( "But we are already orbiting ", cbShips[snum].lockDetail, snum );
     else if ( ! clbFindOrbit( snum, &pnum ) )
     {
         sprintf( cbuf, "We are not close enough to orbit, %s.",
-                 Ships[snum].alias );
+                 cbShips[snum].alias );
         mcuPutMsg( cbuf, MSG_LIN1 );
         cdclrl( MSG_LIN2, 1 );
     }
-    else if ( Ships[snum].warp > MAX_ORBIT_WARP )
+    else if ( cbShips[snum].warp > MAX_ORBIT_WARP )
     {
         sprintf( cbuf, "We are going too fast to orbit, %s.",
-                 Ships[snum].alias );
+                 cbShips[snum].alias );
         mcuPutMsg( cbuf, MSG_LIN1 );
         sprintf( cbuf, "Maximum orbital insertion velocity is warp %.1f.",
                  oneplace(MAX_ORBIT_WARP) );
@@ -2402,7 +2402,7 @@ void dophase( int snum )
 
     cdclrl( MSG_LIN2, 1 );
 
-    if ( mcuGetTarget( "Fire phasers: ", MSG_LIN1, 1, &dir, Ships[snum].lastblast ) )
+    if ( mcuGetTarget( "Fire phasers: ", MSG_LIN1, 1, &dir, cbShips[snum].lastblast ) )
     {
         mcuPutMsg( "Firing phasers...", MSG_LIN2 );
         sendCommand(CPCMD_FIREPHASER, (uint16_t)(dir * 100.0));
@@ -2425,9 +2425,9 @@ void doPlanetList( int snum )
 {
 
     if (snum >= 0 && snum < MAXSHIPS)
-        mcuPlanetList( Ships[snum].team, snum );
+        mcuPlanetList( cbShips[snum].team, snum );
     else		/* then use user team if user doen't have a ship yet */
-        mcuPlanetList( Users[Context.unum].team, snum );
+        mcuPlanetList( cbUsers[Context.unum].team, snum );
 
     return;
 
@@ -2443,7 +2443,7 @@ void doReviewMsgs( int snum )
     int ch;
     int lstmsg;			/* saved last msg in case new ones come in */
 
-    lstmsg = Ships[snum].lastmsg;	/* don't want lstmsg changing while reading old ones. */
+    lstmsg = cbShips[snum].lastmsg;	/* don't want lstmsg changing while reading old ones. */
 
     if ( ! mcuReviewMsgs( snum, lstmsg ) )
     {
@@ -2592,17 +2592,17 @@ void dotorp( int snum )
                    MSG_LIN1 );
         return;
     }
-    if ( Ships[snum].wfuse > 0 )
+    if ( cbShips[snum].wfuse > 0 )
     {
         mcuPutMsg( "Weapons are currently overloaded.", MSG_LIN1 );
         return;
     }
-    if ( Ships[snum].fuel < TORPEDO_FUEL )
+    if ( cbShips[snum].fuel < TORPEDO_FUEL )
     {
         mcuPutMsg( "Not enough fuel to launch a torpedo.", MSG_LIN1 );
         return;
     }
-    if ( mcuGetTarget( "Launch torpedo: ", MSG_LIN1, 1, &dir, Ships[snum].lastblast ) )
+    if ( mcuGetTarget( "Launch torpedo: ", MSG_LIN1, 1, &dir, cbShips[snum].lastblast ) )
     {
         if ( ! clbCheckLaunch( snum, 1 ) )
             mcuPutMsg( ">TUBES EMPTY<", MSG_LIN2 );
@@ -2631,18 +2631,18 @@ void dotow( int snum )
     int i, other;
 
     cdclrl( MSG_LIN1, 2 );
-    if ( Ships[snum].towedby != 0 )
+    if ( cbShips[snum].towedby != 0 )
     {
         strcpy(cbuf , "But we are being towed by ") ;
-        utAppendShip(cbuf , Ships[snum].towedby) ;
+        utAppendShip(cbuf , cbShips[snum].towedby) ;
         utAppendChar(cbuf , '!') ;
         mcuPutMsg( cbuf, MSG_LIN2 );
         return;
     }
-    if ( Ships[snum].towing != 0 )
+    if ( cbShips[snum].towing != 0 )
     {
         strcpy(cbuf , "But we're already towing ") ;
-        utAppendShip(cbuf , Ships[snum].towing) ;
+        utAppendShip(cbuf , cbShips[snum].towing) ;
         utAppendChar(cbuf , '.') ;
         mcuPutMsg( cbuf, MSG_LIN2 );
         return;
@@ -2675,7 +2675,7 @@ void dowarp( int snum, real warp )
 
     /* Handle ship limitations. */
 
-    warp = min( warp, ShipTypes[Ships[snum].shiptype].warplim );
+    warp = min( warp, cbShipTypes[cbShips[snum].shiptype].warplim );
     if (!sendCommand(CPCMD_SETWARP, (uint16_t)warp))
         return;
 
@@ -2748,10 +2748,10 @@ void menu(void)
        SP_SHIP or NAK packet (if something bad happened) */
 
     /* Initialize statistics. */
-    initstats( &Ships[Context.snum].ctime, &Ships[Context.snum].etime );
+    initstats( &cbShips[Context.snum].ctime, &cbShips[Context.snum].etime );
 
     /* Set up some things for the menu display. */
-    oclosed = ConqInfo->closed;
+    oclosed = cbConqInfo->closed;
     Context.leave = FALSE;
     redraw = TRUE;
     sleepy = 0;
@@ -2799,7 +2799,7 @@ void menu(void)
         if (pkttype < 0)		/* some error */
 	{
             utLog("conquest:menu:waiForPacket returned %d", pkttype);
-            Ships[Context.snum].status = SS_OFF;
+            cbShips[Context.snum].status = SS_OFF;
             return;
 	}
 
@@ -2835,7 +2835,7 @@ void menu(void)
 	}
 
         /* Some simple housekeeping. */
-        if ( oclosed != ConqInfo->closed )
+        if ( oclosed != cbConqInfo->closed )
 	{
             oclosed = ! oclosed;
             redraw = TRUE;
@@ -2931,9 +2931,9 @@ void menu(void)
                     break;
                 case 'r':
                     for ( i = 0; i < MAXSHIPS; i++ )
-                        if ( Ships[i].status == SS_LIVE ||
-                             Ships[i].status == SS_ENTERING )
-                            if ( Ships[i].unum == Context.unum )
+                        if ( cbShips[i].status == SS_LIVE ||
+                             cbShips[i].status == SS_ENTERING )
+                            if ( cbShips[i].unum == Context.unum )
                                 break;
                     if ( i < MAXSHIPS )
                         cdbeep();
@@ -2959,15 +2959,15 @@ void menu(void)
                         /* we'll update local data here anyway, even though it will be
                            overwritten on the next ship update.  Improves perceived
                            response time. */
-                        Ships[Context.snum].team =
-                            utModPlusOne( Ships[Context.snum].team+1, NUMPLAYERTEAMS );
-                        Ships[Context.snum].shiptype =
-                            Teams[Ships[Context.snum].team].shiptype;
-                        Users[Context.unum].team = Ships[Context.snum].team;
-                        Ships[Context.snum].war[Ships[Context.snum].team] = FALSE;
-                        Users[Context.unum].war[Users[Context.unum].team] = FALSE;
+                        cbShips[Context.snum].team =
+                            utModPlusOne( cbShips[Context.snum].team+1, NUMPLAYERTEAMS );
+                        cbShips[Context.snum].shiptype =
+                            cbTeams[cbShips[Context.snum].team].shiptype;
+                        cbUsers[Context.unum].team = cbShips[Context.snum].team;
+                        cbShips[Context.snum].war[cbShips[Context.snum].team] = FALSE;
+                        cbUsers[Context.unum].war[cbUsers[Context.unum].team] = FALSE;
 
-                        sendCommand(CPCMD_SWITCHTEAM, (uint16_t)Ships[Context.snum].team);
+                        sendCommand(CPCMD_SWITCHTEAM, (uint16_t)cbShips[Context.snum].team);
                         redraw = TRUE;
 
                     }
@@ -2977,7 +2977,7 @@ void menu(void)
                     redraw = TRUE;
                     break;
                 case 'T':
-                    doTeamList( Ships[Context.snum].team );
+                    doTeamList( cbShips[Context.snum].team );
                     redraw = TRUE;
                     break;
                 case 'U':
@@ -3079,7 +3079,7 @@ int newship( int unum, int *snum )
                 cdredo();
                 sprintf(cbuf, "You're already playing on another ship.");
                 cprintf(5,0,ALIGN_CENTER,"#%d#%s",InfoColor, cbuf);
-                Ships[*snum].status = SS_RESERVED;
+                cbShips[*snum].status = SS_RESERVED;
                 mcuPutPrompt( "--- press any key ---", MSG_LIN2 );
                 cdrefresh();
 
@@ -3150,7 +3150,7 @@ int play()
     else
         Context.entship = TRUE;
 
-    Ships[Context.snum].sdfuse = 0;	/* zero self destruct fuse */
+    cbShips[Context.snum].sdfuse = 0;	/* zero self destruct fuse */
     utGrand( &Context.msgrand );		/* initialize message timer */
     Context.leave = FALSE;		/* assume we won't want to bail */
     Context.redraw = TRUE;		/* want redraw first time */
@@ -3212,7 +3212,7 @@ int play()
                 ch = iogchar();
                 /* only process commands if we are live (the server will ignore
                    them anyway) */
-                if (Ships[Context.snum].status == SS_LIVE)
+                if (cbShips[Context.snum].status == SS_LIVE)
                 {
                     if (ibufExpandMacro(((ch - KEY_F(0)) - 1)) == TRUE)
                     {
@@ -3334,7 +3334,7 @@ int welcome(void)
         /* Must be a new player. */
         cdclear();
         cdredo();
-        if ( ConqInfo->closed )
+        if ( cbConqInfo->closed )
 	{
             /* Can't enroll if the game is closed. */
             cprintf(MSG_LIN2/2,col,ALIGN_CENTER,"#%d#%s", InfoColor, sorry1 );
@@ -3354,13 +3354,13 @@ int welcome(void)
 
         gretds();			/* 'GREETINGS' */
 
-        if ( vowel( Teams[team].name[0] ) )
+        if ( vowel( cbTeams[team].name[0] ) )
             cprintf(MSG_LIN2/2,0,ALIGN_CENTER,"#%d#%s%c #%d#%s #%d#%s",
-                    InfoColor,selected_str,'n',CQC_A_BOLD,Teams[team].name,
+                    InfoColor,selected_str,'n',CQC_A_BOLD,cbTeams[team].name,
                     InfoColor,starship_str);
         else
             cprintf(MSG_LIN2/2,0,ALIGN_CENTER,"#%d#%s #%d#%s #%d#%s",
-                    InfoColor,selected_str,CQC_A_BOLD,Teams[team].name,
+                    InfoColor,selected_str,CQC_A_BOLD,cbTeams[team].name,
                     InfoColor,starship_str);
         cprintf(MSG_LIN2/2+1,0,ALIGN_CENTER,"#%d#%s",
                 InfoColor, prepare_str );
@@ -3540,13 +3540,13 @@ void astservice(int sig)
         difftime = utDeltaGrand( Context.msgrand, &now );
 
         if ( difftime >= NEWMSG_GRAND )
-            if ( utGetMsg( Context.snum, &Ships[Context.snum].lastmsg ) )
+            if ( utGetMsg( Context.snum, &cbShips[Context.snum].lastmsg ) )
             {
-                if (mcuReadMsg( Ships[Context.snum].lastmsg,
+                if (mcuReadMsg( cbShips[Context.snum].lastmsg,
                                 MSG_MSG ) == TRUE)
                 {
-                    if (!(Msgs[Ships[Context.snum].lastmsg].from == MSG_FROM_SHIP
-                          && (int)Msgs[Ships[Context.snum].lastmsg].fromDetail == Context.snum) )
+                    if (!(cbMsgs[cbShips[Context.snum].lastmsg].from == MSG_FROM_SHIP
+                          && (int)cbMsgs[cbShips[Context.snum].lastmsg].fromDetail == Context.snum) )
                     {
                         if (UserConf.MessageBell)
                             cdbeep();

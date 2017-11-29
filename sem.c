@@ -330,13 +330,13 @@ char *semGetStatusStr(void)
 
     snprintf(mesgtxt, 80, "%sMesgCnt = %d(%d:%d)",
              (semvals[LOCKMSG]) ? "*" : "",
-             ConqInfo->lockmesg,
+             cbConqInfo->lockmesg,
              lastmsgpid,
              msgzcnt);
 
     snprintf(wordtxt, 80, "%sCmnCnt = %d(%d:%d)",
              (semvals[LOCKCMN]) ? "*" : "",
-             ConqInfo->lockword,
+             cbConqInfo->lockword,
              lastcmnpid,
              cmnzcnt);
 

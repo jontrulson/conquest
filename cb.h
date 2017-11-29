@@ -55,33 +55,33 @@ unsigned int cbGetSize();
 /* The Common Block in all it's majesty */
 
 // This must be the first var
-CEXTERN unsigned int *CBlockRevision;	/* common block rev number */
+CEXTERN unsigned int *cbRevision; /* common block rev number */
 // This must be the second var
-CEXTERN CBGlobal_t *CBGlobal;   /* global limits from CQI */
+CEXTERN cbGlobalLimits_t *cbGlobalLimits;   /* global limits from CQI */
 
-CEXTERN ConqInfo_t *ConqInfo;	/* misc game info */
+CEXTERN cbConqInfo_t *cbConqInfo; /* misc game info */
 
-CEXTERN User_t *Users;		/* User statistics. */
+CEXTERN User_t *cbUsers;        /* User statistics. */
 
-CEXTERN Robot_t *Robot;		/* Robots. */
+CEXTERN Robot_t *cbRobot;       /* Robots. */
 
-CEXTERN Planet_t *Planets;	/* Planets. */
+CEXTERN Planet_t *cbPlanets;	/* Planets. */
 
-CEXTERN Team_t *Teams;		/* Teams. */
+CEXTERN Team_t *cbTeams;        /* Teams. */
 
-CEXTERN Doomsday_t *Doomsday;	/* Doomsday machine. */
+CEXTERN Doomsday_t *cbDoomsday;	/* Doomsday machine. */
 
-CEXTERN History_t *History;	/* History */
+CEXTERN History_t *cbHistory;	/* History */
 
-CEXTERN Driver_t *Driver;	/* Driver. */
+CEXTERN Driver_t *cbDriver;	/* Driver. */
 
-CEXTERN Ship_t *Ships;		/* Ships. */
+CEXTERN Ship_t *cbShips;		/* Ships. */
 
-CEXTERN ShipType_t *ShipTypes;		/* Ship types. */
+CEXTERN ShipType_t *cbShipTypes;  /* Ship types. */
 
-CEXTERN Msg_t *Msgs;		/* Messages. */
+CEXTERN Msg_t *cbMsgs;               /* Messages. */
 // This must be the last var
-CEXTERN unsigned int *EndOfCBlock;	/* end of the common block */
+CEXTERN unsigned int *EndOfCBlock; /* end of the common block */
 
 #undef CEXTERN
 #endif /* CB_H */

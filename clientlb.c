@@ -22,7 +22,7 @@
 
 
 /* put a recieved message into the clinet's copy of the message buffer
-   (Msgs[]).  Pretty much a copy of clbStoreMsg() without the locking */
+   (cbMsgs[]).  Pretty much a copy of clbStoreMsg() without the locking */
 void clntStoreMessage(spMessage_t *msg)
 {
     int nlastmsg;
@@ -30,18 +30,18 @@ void clntStoreMessage(spMessage_t *msg)
     if (!msg)
         return;
 
-    nlastmsg = utModPlusOne( ConqInfo->lastmsg + 1, MAXMESSAGES );
-    utStrncpy(Msgs[nlastmsg].msgbuf, (char *)msg->msg, MESSAGE_SIZE);
-    Msgs[nlastmsg].from = msg->from;
-    Msgs[nlastmsg].fromDetail = msg->fromDetail;
-    Msgs[nlastmsg].to = msg->to;
-    Msgs[nlastmsg].toDetail = msg->toDetail;
-    Msgs[nlastmsg].flags = msg->flags;
+    nlastmsg = utModPlusOne( cbConqInfo->lastmsg + 1, MAXMESSAGES );
+    utStrncpy(cbMsgs[nlastmsg].msgbuf, (char *)msg->msg, MESSAGE_SIZE);
+    cbMsgs[nlastmsg].from = msg->from;
+    cbMsgs[nlastmsg].fromDetail = msg->fromDetail;
+    cbMsgs[nlastmsg].to = msg->to;
+    cbMsgs[nlastmsg].toDetail = msg->toDetail;
+    cbMsgs[nlastmsg].flags = msg->flags;
 
-    ConqInfo->lastmsg = nlastmsg;
+    cbConqInfo->lastmsg = nlastmsg;
 
     /* Remove allowable last message restrictions. */
-    Ships[Context.snum].alastmsg = LMSG_READALL;
+    cbShips[Context.snum].alastmsg = LMSG_READALL;
 
     return;
 }

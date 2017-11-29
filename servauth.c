@@ -38,7 +38,7 @@ static int doLogin(char *login, char *pw, char *epw)
 
         utStrncpy(epw, (char *)crypt(pw, salt), MAXUSERNAME);
 
-        if (strcmp(epw, Users[unum].pw) != 0)
+        if (strcmp(epw, cbUsers[unum].pw) != 0)
 	{			/* invalid pw */
             utLog("INFO: Invalid password for user '%s'", login);
             return PERR_BADPWD;
@@ -183,7 +183,7 @@ void expire_users(void)
     }
 
     expire_secs = (SysConf.UserExpiredays * SECS_PER_DAY);
-    cbLock(&ConqInfo->lockword);
+    cbLock(&cbConqInfo->lockword);
 
     for (i=0; i < MAXUSERS; i++)
     {
@@ -194,42 +194,42 @@ void expire_users(void)
 
 
 
-        difftime = time(0) - Users[i].lastentry;
+        difftime = time(0) - cbUsers[i].lastentry;
 
         if (difftime < 0)
 	{			/* screen out negative expirations -
 				   only happens when system clock goes
 				   way back */
             utLog("INFO: expire_users(): difftime (%d) is less than 0, skipping user %s\n",
-                  difftime, Users[i].username);
+                  difftime, cbUsers[i].username);
             continue;
 	}
 
 #if defined(DEBUG_SERVERAUTH)
-        utLog("expire_users(): time(0) = %d, Users[%d].lastentry = %d",
+        utLog("expire_users(): time(0) = %d, cbUsers[%d].lastentry = %d",
               time(0),
-              i, Users[i].lastentry);
+              i, cbUsers[i].lastentry);
 #endif
 
-        if ((unsigned int)Users[i].lastentry != 0 &&
+        if ((unsigned int)cbUsers[i].lastentry != 0 &&
             (unsigned int) difftime > expire_secs)
 	{			/* we have a candidate... */
 				/* loop thru the ships, making sure he
 				   doesn't have one active */
 
 #if defined(DEBUG_SERVERAUTH)
-            utLog("expire_users(): have a candidate: user '%s' (%d), difftime = %d > expire_secs = %d, Users[i].lastentry = %d",
-                  Users[i].username,
+            utLog("expire_users(): have a candidate: user '%s' (%d), difftime = %d > expire_secs = %d, cbUsers[i].lastentry = %d",
+                  cbUsers[i].username,
                   i,
                   difftime,
                   expire_secs,
-                  Users[i].lastentry);
+                  cbUsers[i].lastentry);
 #endif
 
             hasship = FALSE;
             for (j=0; j < MAXSHIPS; j++)
 	    {
-                if (Ships[j].unum == i && Ships[j].status == SS_LIVE)
+                if (cbShips[j].unum == i && cbShips[j].status == SS_LIVE)
 		{
                     hasship = TRUE;
                     break;
@@ -239,13 +239,13 @@ void expire_users(void)
             if (hasship)
 	    {			/* we can't waste him */
                 utLog("INFO: expire_users(): Couldn't expire remote user '%s' due to active ship(s)",
-                      Users[i].username);
+                      cbUsers[i].username);
 	    }
             else
 	    {			/* waste him */
 				/* have to play some trickery here
 				   since resign locks the commonblock */
-                cbUnlock(&ConqInfo->lockword);
+                cbUnlock(&cbConqInfo->lockword);
 
 #if defined(DEBUG_SERVERAUTH)
                 utLog("expire_users(): calling clbResign(%d, %d)", i, TRUE);
@@ -253,17 +253,17 @@ void expire_users(void)
 
                 clbResign(i, TRUE);
                 utLog("INFO: expire_users(): Expired remote user '%s' after %d days of inactivity. (limit %d days)",
-                      Users[i].username,
+                      cbUsers[i].username,
                       difftime / SECS_PER_DAY,
                       SysConf.UserExpiredays);
                 /* re-aquire the lock */
-                cbLock(&ConqInfo->lockword);
+                cbLock(&cbConqInfo->lockword);
 	    }
 	}
     }
 
     /* done */
-    cbUnlock(&ConqInfo->lockword);
+    cbUnlock(&cbConqInfo->lockword);
 
 #if defined(DEBUG_SERVERAUTH)
     utLog("expire_users(): ...Done");

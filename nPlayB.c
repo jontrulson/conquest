@@ -104,39 +104,39 @@ static void set_header(int snum)
     ssbuf[0] = 0;
 
     strcat(ssbuf, ", ");
-    utAppendShipStatus(ssbuf, Ships[snum].status) ;
+    utAppendShipStatus(ssbuf, cbShips[snum].status) ;
 
-    if ( ConqInfo->closed)
+    if ( cbConqInfo->closed)
     {
         sprintf(hbuf, heading_fmt, closed_str1,
-                Teams[Ships[snum].team].teamchar,
+                cbTeams[cbShips[snum].team].teamchar,
                 snum,
-                Ships[snum].alias, ssbuf);
+                cbShips[snum].alias, ssbuf);
     }
     else if ( SROBOT(snum) )
     {
-        if (ConqInfo->externrobots == TRUE)
+        if (cbConqInfo->externrobots == TRUE)
 	{
             sprintf(hbuf, heading_fmt, robo_str1,
-                    Teams[Ships[snum].team].teamchar, snum,
-                    Ships[snum].alias, ssbuf);
+                    cbTeams[cbShips[snum].team].teamchar, snum,
+                    cbShips[snum].alias, ssbuf);
 	}
         else
 	{
             sprintf(hbuf, heading_fmt, robo_str2,
-                    Teams[Ships[snum].team].teamchar, snum,
-                    Ships[snum].alias, ssbuf);
+                    cbTeams[cbShips[snum].team].teamchar, snum,
+                    cbShips[snum].alias, ssbuf);
 	}
     }
     else
     {
         if (snum == DISPLAY_DOOMSDAY)
-            sprintf(hbuf, doom_fmt, Doomsday->name,
-                    (Doomsday->status == DS_LIVE) ? DS_LIVE_STR: DS_OFF_STR);
+            sprintf(hbuf, doom_fmt, cbDoomsday->name,
+                    (cbDoomsday->status == DS_LIVE) ? DS_LIVE_STR: DS_OFF_STR);
         else
-            sprintf(hbuf, heading_fmt, ship_str1, Teams[Ships[snum].team].teamchar,
+            sprintf(hbuf, heading_fmt, ship_str1, cbTeams[cbShips[snum].team].teamchar,
                     snum,
-                    Ships[snum].alias, ssbuf);
+                    cbShips[snum].alias, ssbuf);
     }
 
     hudSetRecId(hbuf);
@@ -191,7 +191,7 @@ void nPlayBInit(void)
             char nm[CQI_NAMELEN];
 
             snprintf(nm, CQI_NAMELEN, "ship%c-torp",
-                     Teams[i].name[0]);
+                     cbTeams[i].name[0]);
 
             if (!animInitState(nm, &ncpTorpAnims[i], NULL))
                 utLog("%s: failed to init animstate for animation '%s'",
@@ -480,7 +480,7 @@ static int nPlayBInput(int ch)
                 }
                 if (foundone == FALSE)
                 {	/* check the doomsday machine */
-                    if (Doomsday->status == DS_LIVE)
+                    if (cbDoomsday->status == DS_LIVE)
                         foundone = TRUE;
                 }
 
@@ -512,7 +512,7 @@ static int nPlayBInput(int ch)
 
             if (live_ships)
                 if ((snum >= 0 && clbStillAlive(snum)) ||
-                    (snum == DISPLAY_DOOMSDAY && Doomsday->status == DS_LIVE))
+                    (snum == DISPLAY_DOOMSDAY && cbDoomsday->status == DS_LIVE))
                 {
                     Context.snum = snum;
                     break;
@@ -549,7 +549,7 @@ static int nPlayBInput(int ch)
                 }
                 if (foundone == FALSE)
                 {	/* check the doomsday machine */
-                    if (Doomsday->status == DS_LIVE)
+                    if (cbDoomsday->status == DS_LIVE)
                         foundone = TRUE;
                 }
 
@@ -582,7 +582,7 @@ static int nPlayBInput(int ch)
 
             if (live_ships)
                 if ((snum >= 0 && clbStillAlive(snum)) ||
-                    (snum == DISPLAY_DOOMSDAY && Doomsday->status == DS_LIVE))
+                    (snum == DISPLAY_DOOMSDAY && cbDoomsday->status == DS_LIVE))
                 {
                     Context.snum = snum;
                     break;

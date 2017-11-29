@@ -406,7 +406,7 @@ static void watch(void)
 			}
                         if (foundone == FALSE)
 			{	/* check the doomsday machine */
-                            if (Doomsday->status == DS_LIVE)
+                            if (cbDoomsday->status == DS_LIVE)
                                 foundone = TRUE;
 			}
 
@@ -441,7 +441,7 @@ static void watch(void)
 
                     if (live_ships)
                         if ((snum >= 0 && clbStillAlive(snum)) ||
-                            (snum == DISPLAY_DOOMSDAY && Doomsday->status == DS_LIVE))
+                            (snum == DISPLAY_DOOMSDAY && cbDoomsday->status == DS_LIVE))
                         {
                             Context.snum = snum;
                             break;
@@ -480,7 +480,7 @@ static void watch(void)
 			}
                         if (foundone == FALSE)
 			{	/* check the doomsday machine */
-                            if (Doomsday->status == DS_LIVE)
+                            if (cbDoomsday->status == DS_LIVE)
                                 foundone = TRUE;
 			}
 
@@ -516,7 +516,7 @@ static void watch(void)
 
                     if (live_ships)
                         if ((snum >= 0 && clbStillAlive(snum)) ||
-                            (snum == DISPLAY_DOOMSDAY && Doomsday->status == DS_LIVE))
+                            (snum == DISPLAY_DOOMSDAY && cbDoomsday->status == DS_LIVE))
                         {
                             Context.snum = snum;
                             break;
@@ -563,7 +563,7 @@ static int prompt_ship(char buf[], int *snum, int *normal)
         buf[0] = 0;
     else
     {
-        // compensate for 0-based Ships[] for older proto versions
+        // compensate for 0-based cbShips[] for older proto versions
         sprintf(buf, "%d",
                 (recFileHeader.protoVers <= 0x0006) ?
                 recFileHeader.snum - 1:
@@ -668,7 +668,7 @@ static char *build_toggle_str(char *snum_str, int snum)
 
     if (snum >= 0 && snum < MAXSHIPS)
     {          /* ship */
-        sprintf(snum_str,"%c%d", Teams[Ships[snum].team].teamchar, snum);
+        sprintf(snum_str,"%c%d", cbTeams[cbShips[snum].team].teamchar, snum);
     }
     else if (snum == DISPLAY_DOOMSDAY)          /* specials */
         strcpy(snum_str,doomsday_str);

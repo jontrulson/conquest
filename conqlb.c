@@ -45,31 +45,31 @@ void clbChalkup( int snum )
     int i, unum, team;
     real x, w, l, m;
 
-    unum = Ships[snum].unum;
-    team = Ships[snum].team;
+    unum = cbShips[snum].unum;
+    team = cbShips[snum].team;
 
     /* Update wins. */
-    Users[unum].stats[USTAT_WINS] += (int)Ships[snum].kills;
-    Teams[team].stats[TSTAT_WINS] = Teams[team].stats[TSTAT_WINS]
-        + (int)Ships[snum].kills;
+    cbUsers[unum].stats[USTAT_WINS] += (int)cbShips[snum].kills;
+    cbTeams[team].stats[TSTAT_WINS] = cbTeams[team].stats[TSTAT_WINS]
+        + (int)cbShips[snum].kills;
 
     /* Update max kills. */
-    i = (int)Ships[snum].kills;
-    if ( i > Users[unum].stats[USTAT_MAXKILLS] )
-        Users[unum].stats[USTAT_MAXKILLS] = i;
+    i = (int)cbShips[snum].kills;
+    if ( i > cbUsers[unum].stats[USTAT_MAXKILLS] )
+        cbUsers[unum].stats[USTAT_MAXKILLS] = i;
 
     /* Update rating. */
-    l = Users[unum].stats[USTAT_LOSSES];
+    l = cbUsers[unum].stats[USTAT_LOSSES];
     if ( l == 0 )
         l = 1;
-    w = Users[unum].stats[USTAT_WINS];
-    m = Users[unum].stats[USTAT_MAXKILLS];
-    Users[unum].rating = ( w / l ) + ( m / 4.0 );
+    w = cbUsers[unum].stats[USTAT_WINS];
+    m = cbUsers[unum].stats[USTAT_MAXKILLS];
+    cbUsers[unum].rating = ( w / l ) + ( m / 4.0 );
     x = w - l;
     if ( x >= 0.0 )
-        Users[unum].rating += pow((real) x, (real) ( 1.0 / 3.0 ));
+        cbUsers[unum].rating += pow((real) x, (real) ( 1.0 / 3.0 ));
     else
-        Users[unum].rating -= pow((real) -x, (real) ( 1.0 / 3.0 ));
+        cbUsers[unum].rating -= pow((real) -x, (real) ( 1.0 / 3.0 ));
 
     return;
 
@@ -84,13 +84,13 @@ void clbDamage( int snum, real dam, killedBy_t kb, uint16_t detail )
 {
     real mw;
 
-    Ships[snum].damage = Ships[snum].damage + dam;
-    if ( Ships[snum].damage >= 100.0 )
+    cbShips[snum].damage = cbShips[snum].damage + dam;
+    if ( cbShips[snum].damage >= 100.0 )
         clbKillShip( snum, kb, detail );
     else
     {
         mw = maxwarp( snum );
-        Ships[snum].dwarp = min( Ships[snum].dwarp, mw );
+        cbShips[snum].dwarp = min( cbShips[snum].dwarp, mw );
     }
 
     return;
@@ -104,10 +104,10 @@ void clbDamage( int snum, real dam, killedBy_t kb, uint16_t detail )
 void clbDetonate( int snum, int tnum )
 {
 
-    cbLock(&ConqInfo->lockword);
-    if ( Ships[snum].torps[tnum].status == TS_LIVE )
-        Ships[snum].torps[tnum].status = TS_DETONATE;
-    cbUnlock(&ConqInfo->lockword);
+    cbLock(&cbConqInfo->lockword);
+    if ( cbShips[snum].torps[tnum].status == TS_LIVE )
+        cbShips[snum].torps[tnum].status = TS_DETONATE;
+    cbUnlock(&cbConqInfo->lockword);
 
     return;
 
@@ -128,11 +128,11 @@ int clbEnemyDet( int snum )
         return ( FALSE );
 
     for ( i = 0; i < MAXSHIPS; i++ )
-        if ( Ships[i].status != SS_OFF && i != snum )
+        if ( cbShips[i].status != SS_OFF && i != snum )
             for ( j = 0; j < MAXTORPS; j = j + 1 )
-                if ( Ships[i].torps[j].status == TS_LIVE )
-                    if ( Ships[i].torps[j].war[Ships[snum].team] || Ships[snum].war[Ships[i].team] )
-                        if ( dist( Ships[snum].x, Ships[snum].y, Ships[i].torps[j].x, Ships[i].torps[j].y ) <=
+                if ( cbShips[i].torps[j].status == TS_LIVE )
+                    if ( cbShips[i].torps[j].war[cbShips[snum].team] || cbShips[snum].war[cbShips[i].team] )
+                        if ( dist( cbShips[snum].x, cbShips[snum].y, cbShips[i].torps[j].x, cbShips[i].torps[j].y ) <=
                              DETONATE_DIST )
                             clbDetonate( i, j );
 
@@ -152,14 +152,14 @@ void clbHit( int snum, real ht, killedBy_t kb, uint16_t detail )
     {
         if ( SSHUP(snum) && ! SREPAIR(snum) )
 	{
-            if ( ht > Ships[snum].shields )
+            if ( ht > cbShips[snum].shields )
 	    {
-                clbDamage( snum, ht-Ships[snum].shields, kb, detail );
-                Ships[snum].shields = 0.0;
+                clbDamage( snum, ht-cbShips[snum].shields, kb, detail );
+                cbShips[snum].shields = 0.0;
 	    }
             else
 	    {
-                Ships[snum].shields = Ships[snum].shields - ht;
+                cbShips[snum].shields = cbShips[snum].shields - ht;
 	    }
 	}
         else
@@ -180,70 +180,70 @@ void clbIKill(int snum, killedBy_t kb, uint16_t detail)
     real tkills;
 
     /* Only procede if the ship is alive */
-    if ( Ships[snum].status != SS_LIVE )
+    if ( cbShips[snum].status != SS_LIVE )
         return;
 
     /* The ship is alive; kill it. */
-    Ships[snum].killedBy = kb;
-    Ships[snum].killedByDetail = detail;
-    Ships[snum].status = SS_DYING;
+    cbShips[snum].killedBy = kb;
+    cbShips[snum].killedByDetail = detail;
+    cbShips[snum].status = SS_DYING;
 
-    unum = Ships[snum].unum;
-    team = Ships[snum].team;
+    unum = cbShips[snum].unum;
+    team = cbShips[snum].team;
 
     /* Detonate all torpedos. */
 
     for ( i = 0; i < MAXTORPS; i++ )
-        if ( Ships[snum].torps[i].status == TS_LIVE )
-            Ships[snum].torps[i].status = TS_DETONATE;
+        if ( cbShips[snum].torps[i].status == TS_LIVE )
+            cbShips[snum].torps[i].status = TS_DETONATE;
 
     /* Release any tows. */
-    if ( Ships[snum].towing != 0 )
-        Ships[Ships[snum].towing].towedby = 0;
-    if ( Ships[snum].towedby != 0 )
-        Ships[Ships[snum].towedby].towing = 0;
+    if ( cbShips[snum].towing != 0 )
+        cbShips[cbShips[snum].towing].towedby = 0;
+    if ( cbShips[snum].towedby != 0 )
+        cbShips[cbShips[snum].towedby].towing = 0;
 
     /* Zero team scan fuses. */
     for ( i = 0; i < NUMPLAYERTEAMS; i++ )
-        Ships[snum].scanned[i] = 0;
+        cbShips[snum].scanned[i] = 0;
 
     if ( kb == KB_CONQUER )
-        Ships[snum].kills = Ships[snum].kills + CONQUER_KILLS;
+        cbShips[snum].kills = cbShips[snum].kills + CONQUER_KILLS;
     else if ( kb == KB_GOTDOOMSDAY )
-        Ships[snum].kills = Ships[snum].kills + DOOMSDAY_KILLS;
+        cbShips[snum].kills = cbShips[snum].kills + DOOMSDAY_KILLS;
     else if ( kb == KB_SHIP && detail < MAXSHIPS ) // if a ship did the killing
     {
-        kunum = Ships[detail].unum;
-        kteam = Ships[detail].team;
-        tkills = 1.0 + ((Ships[snum].kills + Ships[snum].strkills) * KILLS_KILLS);
-        if ( Ships[snum].armies > 0 )
+        kunum = cbShips[detail].unum;
+        kteam = cbShips[detail].team;
+        tkills = 1.0 + ((cbShips[snum].kills + cbShips[snum].strkills) * KILLS_KILLS);
+        if ( cbShips[snum].armies > 0 )
 	{
             /* Keep track of carried armies killed - they are special. */
-            tkills = tkills + Ships[snum].armies * ARMY_KILLS;
-            Users[kunum].stats[USTAT_ARMSHIP] += Ships[snum].armies;
-            Teams[kteam].stats[TSTAT_ARMSHIP] += Ships[snum].armies;
+            tkills = tkills + cbShips[snum].armies * ARMY_KILLS;
+            cbUsers[kunum].stats[USTAT_ARMSHIP] += cbShips[snum].armies;
+            cbTeams[kteam].stats[TSTAT_ARMSHIP] += cbShips[snum].armies;
 	}
 
         /* Kills accounting. */
-        if ( Ships[detail].status == SS_LIVE )
-            Ships[detail].kills = Ships[detail].kills + tkills;
+        if ( cbShips[detail].status == SS_LIVE )
+            cbShips[detail].kills = cbShips[detail].kills + tkills;
         else
 	{
             /* Have to do some hacking when our killer is dead. */
-            Users[kunum].stats[USTAT_WINS] -= (int)Ships[detail].kills;
-            Teams[kteam].stats[TSTAT_WINS] =
-                Teams[kteam].stats[TSTAT_WINS] - (int)Ships[detail].kills;
-            Ships[detail].kills = Ships[detail].kills + tkills;
+            cbUsers[kunum].stats[USTAT_WINS] -= (int)cbShips[detail].kills;
+            cbTeams[kteam].stats[TSTAT_WINS] =
+                cbTeams[kteam].stats[TSTAT_WINS] - (int)cbShips[detail].kills;
+            cbShips[detail].kills = cbShips[detail].kills + tkills;
             clbChalkup( detail );
 	}
 
         /* Sticky war logic. */
         /* should set sticky war too. -JET */
 
-        if ( ! Ships[detail].war[kteam] )
+        if ( ! cbShips[detail].war[kteam] )
 	{
-            Ships[detail].war[team] = TRUE;
-            Ships[detail].rwar[team] = TRUE;
+            cbShips[detail].war[team] = TRUE;
+            cbShips[detail].rwar[team] = TRUE;
 	}
     }
 
@@ -253,21 +253,21 @@ void clbIKill(int snum, killedBy_t kb, uint16_t detail)
          kb != KB_EVICT && kb != KB_SHIT && kb != KB_GOD )
     {
         /* Update losses. */
-        Users[unum].stats[USTAT_LOSSES] += 1;
-        Teams[team].stats[TSTAT_LOSSES] += 1;
+        cbUsers[unum].stats[USTAT_LOSSES] += 1;
+        cbTeams[team].stats[TSTAT_LOSSES] += 1;
     }
 
     /* set the ship dead-like :) */
-    Ships[snum].status = SS_DEAD;
+    cbShips[snum].status = SS_DEAD;
 
     /* setup dead timeout timer. For robots and vacant ships, that's 5
      *  seconds - this gives enough time for detonating torps, just like
      *  regular players
      */
     if (SROBOT(snum) || SVACANT(snum))
-        Ships[snum].sdfuse = -5;
+        cbShips[snum].sdfuse = -5;
     else
-        Ships[snum].sdfuse = -TIMEOUT_PLAYER;
+        cbShips[snum].sdfuse = -TIMEOUT_PLAYER;
 
     return;
 
@@ -320,9 +320,9 @@ void clbKillShip(int snum, killedBy_t kb, uint16_t detail)
 #endif
 
     /* internal routine. */
-    cbLock(&ConqInfo->lockword);
+    cbLock(&cbConqInfo->lockword);
     clbIKill( snum, kb, detail );
-    cbUnlock(&ConqInfo->lockword);
+    cbUnlock(&cbConqInfo->lockword);
 
     /* send a msg to all... */
     sendmesg = FALSE;
@@ -332,42 +332,42 @@ void clbKillShip(int snum, killedBy_t kb, uint16_t detail)
     {
     case KB_SELF:
         sprintf(msgbuf, "%c%d (%s) has self-destructed.",
-                Teams[Ships[snum].team].teamchar,
+                cbTeams[cbShips[snum].team].teamchar,
                 snum,
-                Ships[snum].alias);
+                cbShips[snum].alias);
         sendmesg = TRUE;
 
         break;
     case KB_NEGENB:
         sprintf(msgbuf, "%c%d (%s) was destroyed by the negative energy barrier.",
-                Teams[Ships[snum].team].teamchar,
+                cbTeams[cbShips[snum].team].teamchar,
                 snum,
-                Ships[snum].alias);
+                cbShips[snum].alias);
         sendmesg = TRUE;
 
         break;
 
     case KB_GOD:
         sprintf(msgbuf, "%c%d (%s) was killed by an act of GOD.",
-                Teams[Ships[snum].team].teamchar,
+                cbTeams[cbShips[snum].team].teamchar,
                 snum,
-                Ships[snum].alias);
+                cbShips[snum].alias);
         sendmesg = TRUE;
 
         break;
     case KB_DOOMSDAY:
         sprintf(msgbuf, "%c%d (%s) was eaten by the doomsday machine.",
-                Teams[Ships[snum].team].teamchar,
+                cbTeams[cbShips[snum].team].teamchar,
                 snum,
-                Ships[snum].alias);
+                cbShips[snum].alias);
         sendmesg = TRUE;
 
         break;
     case KB_LIGHTNING:
         sprintf(msgbuf, "%c%d (%s) was destroyed by a lightning bolt.",
-                Teams[Ships[snum].team].teamchar,
+                cbTeams[cbShips[snum].team].teamchar,
                 snum,
-                Ships[snum].alias);
+                cbShips[snum].alias);
         sendmesg = TRUE;
 
         break;
@@ -376,13 +376,13 @@ void clbKillShip(int snum, killedBy_t kb, uint16_t detail)
         if (detail >= 0 && detail < MAXSHIPS)
 	{
             sprintf(msgbuf, "%c%d (%s) was kill %.1f for %c%d (%s).",
-                    Teams[Ships[snum].team].teamchar,
+                    cbTeams[cbShips[snum].team].teamchar,
                     snum,
-                    Ships[snum].alias,
-                    Ships[detail].kills,
-                    Teams[Ships[detail].team].teamchar,
+                    cbShips[snum].alias,
+                    cbShips[detail].kills,
+                    cbTeams[cbShips[detail].team].teamchar,
                     detail,
-                    Ships[detail].alias);
+                    cbShips[detail].alias);
             sendmesg = TRUE;
 
 	}
@@ -392,14 +392,14 @@ void clbKillShip(int snum, killedBy_t kb, uint16_t detail)
         if (detail >= 0 && detail < MAXPLANETS)
 	{
             sprintf(msgbuf, "%c%d (%s) was destroyed by %s",
-                    Teams[Ships[snum].team].teamchar,
+                    cbTeams[cbShips[snum].team].teamchar,
                     snum,
-                    Ships[snum].alias,
-                    Planets[detail].name);
+                    cbShips[snum].alias,
+                    cbPlanets[detail].name);
 
             sendmesg = TRUE;
 
-            if ( Planets[detail].type == PLANET_SUN )
+            if ( cbPlanets[detail].type == PLANET_SUN )
 	    {
                 strcat(msgbuf , "'s solar radiation.") ;
 	    }
@@ -428,14 +428,14 @@ int clbCheckLaunch(int snum, int number)
 {
     int i;
 
-    if (Ships[snum].wfuse > 0)
+    if (cbShips[snum].wfuse > 0)
         return FALSE;               /* weapons overloaded */
 
     if (number == 0)
         return TRUE;
 
     for ( i = 0; i < MAXTORPS; i++ )
-        if ( Ships[snum].torps[i].status == TS_OFF )
+        if ( cbShips[snum].torps[i].status == TS_OFF )
             return TRUE;
 
     return FALSE;
@@ -456,26 +456,26 @@ int clbLaunch( int snum, real dir, int number, int ltype )
     SFCLR(snum, SHIP_F_REPAIR);
 
     /* Remember this important direction. */
-    Ships[snum].lastblast = dir;
+    cbShips[snum].lastblast = dir;
 
     /* Set up last fired phaser direction. */
-    Ships[snum].lastphase = dir;
+    cbShips[snum].lastphase = dir;
 
     numslots = 0;
     numfired = 0;
     tnum = number;
 
     /* Find free torp(s). */
-    cbLock(&ConqInfo->lockword);
+    cbLock(&cbConqInfo->lockword);
     for ( i = 0; i < MAXTORPS && tnum != 0; i++ )
-        if ( Ships[snum].torps[i].status == TS_OFF )
+        if ( cbShips[snum].torps[i].status == TS_OFF )
         {
             /* Found one. */
-            Ships[snum].torps[i].status = TS_LAUNCHING;
+            cbShips[snum].torps[i].status = TS_LAUNCHING;
             tslot[numslots++] = i;
             tnum--;
         }
-    cbUnlock(&ConqInfo->lockword);
+    cbUnlock(&cbConqInfo->lockword);
 
     if (numslots == 0)
     {				/* couldn't find even one */
@@ -487,7 +487,7 @@ int clbLaunch( int snum, real dir, int number, int ltype )
         /* Use fuel. */
         if ( clbUseFuel( snum, TORPEDO_FUEL, TRUE, TRUE ) == FALSE)
 	{
-            Ships[snum].torps[tslot[i]].status = TS_OFF;
+            cbShips[snum].torps[tslot[i]].status = TS_OFF;
             continue;
 	}
         else
@@ -499,18 +499,18 @@ int clbLaunch( int snum, real dir, int number, int ltype )
         if (ltype == LAUNCH_EXPLODE)
 	{			/* special needs for just exploding torps
 				   that shouldn't go anywhere... */
-            Ships[snum].torps[tslot[i]].fuse = 1; /* shouldn't last long */
+            cbShips[snum].torps[tslot[i]].fuse = 1; /* shouldn't last long */
             /* should be close to the ship */
-            Ships[snum].torps[tslot[i]].x =
-                rndnor( Ships[snum].x, EXPLODESHIP_TORP_SPREAD );
-            Ships[snum].torps[tslot[i]].y =
-                rndnor( Ships[snum].y, EXPLODESHIP_TORP_SPREAD );
+            cbShips[snum].torps[tslot[i]].x =
+                rndnor( cbShips[snum].x, EXPLODESHIP_TORP_SPREAD );
+            cbShips[snum].torps[tslot[i]].y =
+                rndnor( cbShips[snum].y, EXPLODESHIP_TORP_SPREAD );
             /* no movement */
             speed = 0.0;
             /* no direction or deltas */
             adir = 0.0;
-            Ships[snum].torps[tslot[i]].dx = 0.0;
-            Ships[snum].torps[tslot[i]].dy = 0.0;
+            cbShips[snum].torps[tslot[i]].dx = 0.0;
+            cbShips[snum].torps[tslot[i]].dy = 0.0;
 
             /* strength of explosion depends on
                the average of engine and weap
@@ -518,20 +518,20 @@ int clbLaunch( int snum, real dir, int number, int ltype )
                from having an explosive adv over
                another, while allowing greater
                kills to matter.  */
-            Ships[snum].torps[tslot[i]].mult = (( (real)engeff(snum) +
+            cbShips[snum].torps[tslot[i]].mult = (( (real)engeff(snum) +
                                                   (real)weaeff(snum) ) / 2.0);
 	}
         else
 	{
-            Ships[snum].torps[tslot[i]].fuse = TORPEDO_FUSE;
-            Ships[snum].torps[tslot[i]].x = rndnor( Ships[snum].x, 100.0 );
-            Ships[snum].torps[tslot[i]].y = rndnor( Ships[snum].y, 100.0 );
-            speed = ShipTypes[Ships[snum].shiptype].torpwarp * MM_PER_SEC_PER_WARP *
+            cbShips[snum].torps[tslot[i]].fuse = TORPEDO_FUSE;
+            cbShips[snum].torps[tslot[i]].x = rndnor( cbShips[snum].x, 100.0 );
+            cbShips[snum].torps[tslot[i]].y = rndnor( cbShips[snum].y, 100.0 );
+            speed = cbShipTypes[cbShips[snum].shiptype].torpwarp * MM_PER_SEC_PER_WARP *
                 ITER_SECONDS;
             adir = rndnor( dir, 2.0 );
-            Ships[snum].torps[tslot[i]].dx = (real) (speed * cosd(adir));
-            Ships[snum].torps[tslot[i]].dy = (real)(speed * sind(adir));
-            Ships[snum].torps[tslot[i]].mult = (real)weaeff( snum );
+            cbShips[snum].torps[tslot[i]].dx = (real) (speed * cosd(adir));
+            cbShips[snum].torps[tslot[i]].dy = (real)(speed * sind(adir));
+            cbShips[snum].torps[tslot[i]].mult = (real)weaeff( snum );
 	}
 
         for ( j = 0; j < NUMPLAYERTEAMS; j = j + 1 )
@@ -539,13 +539,13 @@ int clbLaunch( int snum, real dir, int number, int ltype )
             if (ltype == LAUNCH_EXPLODE)
 	    {			/* if our ship is exploding we're at war
 				   with everything. */
-                Ships[snum].torps[tslot[i]].war[j] = TRUE;
+                cbShips[snum].torps[tslot[i]].war[j] = TRUE;
 	    }
             else
-                Ships[snum].torps[tslot[i]].war[j] = Ships[snum].war[j]; /* just enemies */
+                cbShips[snum].torps[tslot[i]].war[j] = cbShips[snum].war[j]; /* just enemies */
 	}
 
-        Ships[snum].torps[tslot[i]].status = TS_LIVE;
+        cbShips[snum].torps[tslot[i]].status = TS_LIVE;
     }
 
     if (numfired == 0)
@@ -555,10 +555,10 @@ int clbLaunch( int snum, real dir, int number, int ltype )
     else
     {				/* torps away! */
         /* Update stats. */
-        cbLock(&ConqInfo->lockword);
-        Users[Ships[snum].unum].stats[USTAT_TORPS] += numfired;
-        Teams[Ships[snum].team].stats[TSTAT_TORPS] += numfired;
-        cbUnlock(&ConqInfo->lockword);
+        cbLock(&cbConqInfo->lockword);
+        cbUsers[cbShips[snum].unum].stats[USTAT_TORPS] += numfired;
+        cbTeams[cbShips[snum].team].stats[TSTAT_TORPS] += numfired;
+        cbUnlock(&cbConqInfo->lockword);
 
         if (numfired == number)
 	{			/* fired all requested */
@@ -582,26 +582,26 @@ void clbOrbit( int snum, int pnum )
 {
     real beer;
 
-    Ships[snum].lock = LOCK_PLANET;
-    Ships[snum].lockDetail = pnum;
-    Ships[snum].dwarp = 0.0;
+    cbShips[snum].lock = LOCK_PLANET;
+    cbShips[snum].lockDetail = pnum;
+    cbShips[snum].dwarp = 0.0;
 
     /* Find bearing to planet. */
-    beer = utAngle( Ships[snum].x, Ships[snum].y,
-                    Planets[pnum].x, Planets[pnum].y );
-    if ( Ships[snum].head < ( beer - 180.0 ) )
+    beer = utAngle( cbShips[snum].x, cbShips[snum].y,
+                    cbPlanets[pnum].x, cbPlanets[pnum].y );
+    if ( cbShips[snum].head < ( beer - 180.0 ) )
         beer = beer - 360.0;
 
     /* Check beer head to determine orbit direction. */
-    if ( beer <= Ships[snum].head )
+    if ( beer <= cbShips[snum].head )
     {
-        Ships[snum].warp = ORBIT_CW;
-        Ships[snum].head = utMod360( beer + 90.0 );
+        cbShips[snum].warp = ORBIT_CW;
+        cbShips[snum].head = utMod360( beer + 90.0 );
     }
     else
     {
-        Ships[snum].warp = ORBIT_CCW;
-        Ships[snum].head = utMod360( beer - 90.0 );
+        cbShips[snum].warp = ORBIT_CCW;
+        cbShips[snum].head = utMod360( beer - 90.0 );
     }
 
     return;
@@ -621,13 +621,13 @@ int clbPhaser( int snum, real dir )
     real dis, ang;
 
     /* Set up last weapon direction. */
-    Ships[snum].lastblast = dir;
+    cbShips[snum].lastblast = dir;
 
     /* Stop repairing. */
     SFCLR(snum, SHIP_F_REPAIR);
 
     /* See if ok to fire. */
-    if ( Ships[snum].pfuse > 0 )
+    if ( cbShips[snum].pfuse > 0 )
         return ( FALSE );
 
     /* Try to use fuel for this shot. */
@@ -635,26 +635,26 @@ int clbPhaser( int snum, real dir )
         return ( FALSE );
 
     /* Update stats. */
-    cbLock(&ConqInfo->lockword);
-    Users[Ships[snum].unum].stats[USTAT_PHASERS] += 1;
-    Teams[Ships[snum].team].stats[TSTAT_PHASERS] += 1;
-    cbUnlock(&ConqInfo->lockword);
+    cbLock(&cbConqInfo->lockword);
+    cbUsers[cbShips[snum].unum].stats[USTAT_PHASERS] += 1;
+    cbTeams[cbShips[snum].team].stats[TSTAT_PHASERS] += 1;
+    cbUnlock(&cbConqInfo->lockword);
 
     /* Set up last fired direction. */
-    Ships[snum].lastphase = dir;
+    cbShips[snum].lastphase = dir;
 
     /* Start phaser fuse. */
-    Ships[snum].pfuse = PHASER_TENTHS;
+    cbShips[snum].pfuse = PHASER_TENTHS;
 
     /* See what we can hit. */
     for ( k = 0; k < MAXSHIPS; k++ )
-        if ( Ships[k].status == SS_LIVE && k != snum )
+        if ( cbShips[k].status == SS_LIVE && k != snum )
             if ( satwar(snum, k ) )
             {
-                dis = dist( Ships[snum].x, Ships[snum].y, Ships[k].x, Ships[k].y );
+                dis = dist( cbShips[snum].x, cbShips[snum].y, cbShips[k].x, cbShips[k].y );
                 if ( dis <= PHASER_DIST )
                 {
-                    ang = utAngle( Ships[snum].x, Ships[snum].y, Ships[k].x, Ships[k].y );
+                    ang = utAngle( cbShips[snum].x, cbShips[snum].y, cbShips[k].x, cbShips[k].y );
                     if ( fabs( dir - ang ) <= PHASER_SPREAD )
                     {
                         clbHit( k, clbPhaserHit( snum, dis ),
@@ -696,37 +696,37 @@ int clbRegister( char *lname, char *rname, int team, int *unum )
 {
     int i, j;
 
-    cbLock(&ConqInfo->lockword);
+    cbLock(&cbConqInfo->lockword);
     for ( i = 0; i < MAXUSERS; i++ )
         if ( !ULIVE(i) )
         {
             // clear all user flags
-            Users[i].flags = USER_F_LIVE; /* only for now */
-            Users[i].opFlags = USER_OP_NONE;
+            cbUsers[i].flags = USER_F_LIVE; /* only for now */
+            cbUsers[i].opFlags = USER_OP_NONE;
 
-            cbUnlock(&ConqInfo->lockword);
+            cbUnlock(&cbConqInfo->lockword);
 
-            Users[i].rating = 0.0;
-            Users[i].team = team;
+            cbUsers[i].rating = 0.0;
+            cbUsers[i].team = team;
 
             // default to a normal client player
-            Users[i].type = USERTYPE_NORMAL;
+            cbUsers[i].type = USERTYPE_NORMAL;
 
             for ( j = 0; j < MAXUSTATS; j = j + 1 )
-                Users[i].stats[j] = 0;
+                cbUsers[i].stats[j] = 0;
 
             for ( j = 0; j < NUMPLAYERTEAMS; j = j + 1 )
-                Users[i].war[j] = TRUE;
-            Users[i].war[Users[i].team] = FALSE;
+                cbUsers[i].war[j] = TRUE;
+            cbUsers[i].war[cbUsers[i].team] = FALSE;
 
-            Users[i].lastentry = 0;	/* never */
-            utStrncpy( Users[i].username, lname, MAXUSERNAME );
-            utStrncpy( Users[i].alias, rname, MAXUSERNAME );
+            cbUsers[i].lastentry = 0;	/* never */
+            utStrncpy( cbUsers[i].username, lname, MAXUSERNAME );
+            utStrncpy( cbUsers[i].alias, rname, MAXUSERNAME );
             *unum = i;
             return ( TRUE );
         }
 
-    cbUnlock(&ConqInfo->lockword);
+    cbUnlock(&cbConqInfo->lockword);
 
     return ( FALSE );
 
@@ -743,19 +743,19 @@ void clbResign( int unum, int isoper )
     char usrname[MAXUSERNAME], usralias[MAXUSERNAME];
 
     /* make copies */
-    utStrncpy(usrname, Users[unum].username, MAXUSERNAME);
-    utStrncpy(usralias, Users[unum].alias, MAXUSERNAME);
+    utStrncpy(usrname, cbUsers[unum].username, MAXUSERNAME);
+    utStrncpy(usralias, cbUsers[unum].alias, MAXUSERNAME);
 
-    cbLock(&ConqInfo->lockword);
+    cbLock(&cbConqInfo->lockword);
     if ( unum >= 0 && unum < MAXUSERS )
     {
         UFCLR(unum, USER_F_LIVE);
 
         for ( i = 0; i < MAXHISTLOG; i++ )
-            if ( unum == History[i].unum )
-                History[i].unum = -1;
+            if ( unum == cbHistory[i].unum )
+                cbHistory[i].unum = -1;
     }
-    cbUnlock(&ConqInfo->lockword);
+    cbUnlock(&cbConqInfo->lockword);
 
     if (isoper != TRUE)
         utLog("INFO: %s (%s) has resigned",
@@ -781,12 +781,12 @@ int clbTakePlanet( int pnum, int snum )
     int oteam, didgeno;
     int rv = -1;
 
-    oteam = Planets[pnum].team;
-    Planets[pnum].team = Ships[snum].team;
-    Planets[pnum].armies = 1;
-    Ships[snum].kills = Ships[snum].kills + PLANET_KILLS;
-    Users[Ships[snum].unum].stats[USTAT_CONQPLANETS] += 1;
-    Teams[Ships[snum].team].stats[TSTAT_CONQPLANETS] += 1;
+    oteam = cbPlanets[pnum].team;
+    cbPlanets[pnum].team = cbShips[snum].team;
+    cbPlanets[pnum].armies = 1;
+    cbShips[snum].kills = cbShips[snum].kills + PLANET_KILLS;
+    cbUsers[cbShips[snum].unum].stats[USTAT_CONQPLANETS] += 1;
+    cbTeams[cbShips[snum].team].stats[TSTAT_CONQPLANETS] += 1;
 
 
     /* Check here for genocides */
@@ -799,8 +799,8 @@ int clbTakePlanet( int pnum, int snum )
 
         for ( i = 0; i < MAXPLANETS; i++ )
         {
-            if ( PVISIBLE(i) && (Planets[i].team == oteam)
-                 && Planets[i].armies > 0)
+            if ( PVISIBLE(i) && (cbPlanets[i].team == oteam)
+                 && cbPlanets[i].armies > 0)
             {
                 // nope
                 didgeno = 0;
@@ -811,14 +811,14 @@ int clbTakePlanet( int pnum, int snum )
         if ( didgeno && (snum >= 0 && snum < MAXSHIPS) )
         {
             rv = oteam;
-            Users[Ships[snum].unum].stats[USTAT_GENOCIDE] += 1;
-            Teams[Ships[snum].team].stats[TSTAT_GENOCIDE] += 1;
+            cbUsers[cbShips[snum].unum].stats[USTAT_GENOCIDE] += 1;
+            cbTeams[cbShips[snum].team].stats[TSTAT_GENOCIDE] += 1;
 
             sprintf(buf, "%c%d (%s) genocided the %s team!",
-                    Teams[Ships[snum].team].teamchar,
+                    cbTeams[cbShips[snum].team].teamchar,
                     snum,
-                    Ships[snum].alias,
-                    Teams[oteam].name);
+                    cbShips[snum].alias,
+                    cbTeams[oteam].name);
 
             clbStoreMsg(MSG_FROM_COMP, 0, MSG_TO_ALL, 0, buf);
             utLog(buf);
@@ -828,42 +828,42 @@ int clbTakePlanet( int pnum, int snum )
 
 
     sprintf( buf, "All hail the liberating %s armies.  Thanks, ",
-             Teams[Ships[snum].team].name );
+             cbTeams[cbShips[snum].team].name );
     utAppendShip(buf , snum) ;
     utAppendChar(buf , '!') ;
 
     /* Check whether the universe has been conquered. */
     for ( i = 0; i < MAXPLANETS; i++ )
         if ( PCORE(i) && PVISIBLE(i)
-             && (Planets[i].type == PLANET_CLASSM
-                 || Planets[i].type == PLANET_DEAD) )
-            if ( Planets[i].team != Ships[snum].team )
+             && (cbPlanets[i].type == PLANET_CLASSM
+                 || cbPlanets[i].type == PLANET_DEAD) )
+            if ( cbPlanets[i].team != cbShips[snum].team )
             {
                 /* No. */
                 clbStoreMsg( MSG_FROM_PLANET, pnum,
-                             MSG_TO_TEAM, Ships[snum].team, buf );
+                             MSG_TO_TEAM, cbShips[snum].team, buf );
                 return rv;
             }
     /* Yes! */
-    utFormatTime( ConqInfo->conqtime, 0 );
-    utStrncpy( ConqInfo->conqueror, Ships[snum].alias, MAXUSERNAME );
-    ConqInfo->lastwords[0] = 0;
-    Users[Ships[snum].unum].stats[USTAT_CONQUERS] += 1;
-    Teams[Ships[snum].team].stats[TSTAT_CONQUERS] += 1;
-    utStrncpy( ConqInfo->conqteam, Teams[Ships[snum].team].name, MAXTEAMNAME );
+    utFormatTime( cbConqInfo->conqtime, 0 );
+    utStrncpy( cbConqInfo->conqueror, cbShips[snum].alias, MAXUSERNAME );
+    cbConqInfo->lastwords[0] = 0;
+    cbUsers[cbShips[snum].unum].stats[USTAT_CONQUERS] += 1;
+    cbTeams[cbShips[snum].team].stats[TSTAT_CONQUERS] += 1;
+    utStrncpy( cbConqInfo->conqteam, cbTeams[cbShips[snum].team].name, MAXTEAMNAME );
 
     utLog("INFO: %s (%s) has Conquered the Universe!",
-          Users[Ships[snum].unum].username,
-          Ships[snum].alias);
+          cbUsers[cbShips[snum].unum].username,
+          cbShips[snum].alias);
 
     clbIKill( snum, KB_CONQUER, 0 );
     for ( i = 0; i < MAXSHIPS; i++ )
-        if ( Ships[i].status == SS_LIVE )
+        if ( cbShips[i].status == SS_LIVE )
             clbIKill( i, KB_NEWGAME, 0 );
 
-    cbUnlock(&ConqInfo->lockword);
+    cbUnlock(&cbConqInfo->lockword);
     clbInitGame();
-    cbLock(&ConqInfo->lockword);
+    cbLock(&cbConqInfo->lockword);
 
     return -1;                    /* doesn't matter if geno happened if
                                      universe was conquered */
@@ -901,7 +901,7 @@ void clbUserline( int unum, int snum, char *buf, int showgods, int showteam )
 
     ch2 = ' ';
 
-    if (Users[unum].type == USERTYPE_BUILTIN)
+    if (cbUsers[unum].type == USERTYPE_BUILTIN)
         ch2 = '_'; // mutually exclusive to oper, which implies USERTYPE_NORMAL
     else
     {
@@ -912,20 +912,20 @@ void clbUserline( int unum, int snum, char *buf, int showgods, int showteam )
     /* If we were given a valid ship number, use it's information. */
     if ( snum >= 0 && snum < MAXSHIPS )
     {
-        strcpy(name , Ships[snum].alias) ;
-        team = Ships[snum].team;
+        strcpy(name , cbShips[snum].alias) ;
+        team = cbShips[snum].team;
     }
     else
     {
 
-        strcpy(name , Users[unum].alias) ;
-        team = Users[unum].team;
+        strcpy(name , cbUsers[unum].alias) ;
+        team = cbUsers[unum].team;
     }
 
     /* Figure out which team he's on. */
-    ch = Teams[team].teamchar;
+    ch = cbTeams[team].teamchar;
 
-    utStrncpy(tname, Users[unum].username, MAXUSERNAME);
+    utStrncpy(tname, cbUsers[unum].username, MAXUSERNAME);
     tname[MAXUSERNAME - 1] = 0;
 
     sprintf( junk, "%-12.12s %c%-21.21s %c %6.1f",
@@ -933,16 +933,16 @@ void clbUserline( int unum, int snum, char *buf, int showgods, int showteam )
              ch2,
              name,
              ch,
-             Users[unum].rating );
+             cbUsers[unum].rating );
 
-    utFormatMinutes( ( Users[unum].stats[USTAT_SECONDS] + 30 ) / 60, timstr );
+    utFormatMinutes( ( cbUsers[unum].stats[USTAT_SECONDS] + 30 ) / 60, timstr );
 
     sprintf( buf, "%s %5d %5d %5d %5d %9s",
              junk,
-             Users[unum].stats[USTAT_WINS],
-             Users[unum].stats[USTAT_LOSSES],
-             Users[unum].stats[USTAT_MAXKILLS],
-             Users[unum].stats[USTAT_ENTRIES],
+             cbUsers[unum].stats[USTAT_WINS],
+             cbUsers[unum].stats[USTAT_LOSSES],
+             cbUsers[unum].stats[USTAT_MAXKILLS],
+             cbUsers[unum].stats[USTAT_ENTRIES],
              timstr );
 
     return;
@@ -974,30 +974,30 @@ void clbStatline( int unum, char *buf )
         return;
     }
 
-    if ( Users[unum].stats[USTAT_SECONDS] == 0 )
+    if ( cbUsers[unum].stats[USTAT_SECONDS] == 0 )
         strcpy(percent , "- ") ;
     else
     {
-        i = 1000 * Users[unum].stats[USTAT_CPUSECONDS] / Users[unum].stats[USTAT_SECONDS];
+        i = 1000 * cbUsers[unum].stats[USTAT_CPUSECONDS] / cbUsers[unum].stats[USTAT_SECONDS];
         sprintf( percent, "%3d%%", (i + 5) / 10 );
     }
 
-    strcpy(tname, Users[unum].username);
+    strcpy(tname, cbUsers[unum].username);
 
     sprintf( junk, "%-12s %4s %4d %4d %4d",
              tname,
              percent,
-             Users[unum].stats[USTAT_CONQUERS],
-             Users[unum].stats[USTAT_COUPS],
-             Users[unum].stats[USTAT_GENOCIDE] );
+             cbUsers[unum].stats[USTAT_CONQUERS],
+             cbUsers[unum].stats[USTAT_COUPS],
+             cbUsers[unum].stats[USTAT_GENOCIDE] );
 
     sprintf( buf, "%s %6d %6d %4d %6d %5d",
              junk,
-             Users[unum].stats[USTAT_CONQPLANETS],
-             Users[unum].stats[USTAT_ARMBOMB],
-             Users[unum].stats[USTAT_ARMSHIP],
-             Users[unum].stats[USTAT_PHASERS],
-             Users[unum].stats[USTAT_TORPS] );
+             cbUsers[unum].stats[USTAT_CONQPLANETS],
+             cbUsers[unum].stats[USTAT_ARMBOMB],
+             cbUsers[unum].stats[USTAT_ARMSHIP],
+             cbUsers[unum].stats[USTAT_PHASERS],
+             cbUsers[unum].stats[USTAT_TORPS] );
 
     /* Convert zero counts to dashes. */
     ch = 0;
@@ -1010,14 +1010,14 @@ void clbStatline( int unum, char *buf )
         ch = buf[i];
     }
 
-    if (Users[unum].lastentry == 0) /* never */
+    if (cbUsers[unum].lastentry == 0) /* never */
     {
         sprintf(junk, " %13.13s", "never");
         strcat(buf , junk) ;
     }
     else
     {				/* format it properly */
-        utFormatTime(datestr, Users[unum].lastentry);
+        utFormatTime(datestr, cbUsers[unum].lastentry);
 
         sprintf( junk, " %16.16s", datestr );
         j = 0;
@@ -1053,13 +1053,13 @@ int clbZeroPlanet( int pnum, int snum )
     int didgeno = FALSE;
     char buf[MSGMAXLINE];
 
-    oteam = Planets[pnum].team;
-    Planets[pnum].team = TEAM_NOTEAM;
-    Planets[pnum].armies = 0;
+    oteam = cbPlanets[pnum].team;
+    cbPlanets[pnum].team = TEAM_NOTEAM;
+    cbPlanets[pnum].armies = 0;
 
     /* Make the planet not scanned. */
     for ( i = 0; i < NUMPLAYERTEAMS; i++ )
-        Planets[pnum].scanned[i] = FALSE;
+        cbPlanets[pnum].scanned[i] = FALSE;
 
     /* check for genos here */
     if ( oteam != TEAM_SELFRULED && oteam != TEAM_NOTEAM )
@@ -1069,8 +1069,8 @@ int clbZeroPlanet( int pnum, int snum )
         /* Check whether that was the last planet owned by the vanquished. */
         for ( i = 0; i < MAXPLANETS; i++ )
         {
-            if ( PVISIBLE(i) && (Planets[i].team == oteam) &&
-                 Planets[i].armies > 0)
+            if ( PVISIBLE(i) && (cbPlanets[i].team == oteam) &&
+                 cbPlanets[i].armies > 0)
             {
                 didgeno = FALSE;
                 break;
@@ -1080,20 +1080,20 @@ int clbZeroPlanet( int pnum, int snum )
         /* Yes. */
         if (didgeno && (snum >= 0 && snum < MAXSHIPS))
         {
-            Teams[oteam].couptime = rndint( MIN_COUP_MINUTES, MAX_COUP_MINUTES );
-            Teams[oteam].coupinfo = FALSE;		/* lost coup info */
+            cbTeams[oteam].couptime = rndint( MIN_COUP_MINUTES, MAX_COUP_MINUTES );
+            cbTeams[oteam].coupinfo = FALSE;		/* lost coup info */
 
 
             if ( snum >= 0 && snum < MAXSHIPS )
             {
-                Users[Ships[snum].unum].stats[USTAT_GENOCIDE] += 1;
-                Teams[Ships[snum].team].stats[TSTAT_GENOCIDE] += 1;
+                cbUsers[cbShips[snum].unum].stats[USTAT_GENOCIDE] += 1;
+                cbTeams[cbShips[snum].team].stats[TSTAT_GENOCIDE] += 1;
 
                 sprintf(buf, "%c%d (%s) genocided the %s team!",
-                        Teams[Ships[snum].team].teamchar,
+                        cbTeams[cbShips[snum].team].teamchar,
                         snum,
-                        Ships[snum].alias,
-                        Teams[oteam].name);
+                        cbShips[snum].alias,
+                        cbTeams[oteam].name);
 
                 clbStoreMsg(MSG_FROM_COMP, 0, MSG_TO_ALL, 0, buf);
                 utLog(buf);
@@ -1118,17 +1118,17 @@ char *clbWarPrompt(int snum, int twar[])
     for ( i = 0; i < NUMPLAYERTEAMS; i++ )
         if ( twar[i] )
         {
-            if ( Ships[snum].rwar[i] )
-                ch = Teams[i].teamchar;
+            if ( cbShips[snum].rwar[i] )
+                ch = cbTeams[i].teamchar;
             else
-                ch = (char)tolower(Teams[i].teamchar);
+                ch = (char)tolower(cbTeams[i].teamchar);
 
             peace[i] = ' ';
             war[i] = ch;
         }
         else
         {
-            peace[i] = (char)tolower(Teams[i].teamchar);
+            peace[i] = (char)tolower(cbTeams[i].teamchar);
             war[i] = ' ';
         }
 
@@ -1154,10 +1154,10 @@ char *clbWarPrompt(int snum, int twar[])
 /*    ok = clbCanRead( snum, msgnum ) */
 int clbCanRead( int snum, int msgnum )
 {
-    msgFrom_t from = Msgs[msgnum].from;
-    uint16_t fromDetail = Msgs[msgnum].fromDetail;
-    msgTo_t to = Msgs[msgnum].to;
-    uint16_t toDetail = Msgs[msgnum].toDetail;
+    msgFrom_t from = cbMsgs[msgnum].from;
+    uint16_t fromDetail = cbMsgs[msgnum].fromDetail;
+    msgTo_t to = cbMsgs[msgnum].to;
+    uint16_t toDetail = cbMsgs[msgnum].toDetail;
 
     if (from == MSG_FROM_NOONE && to == MSG_TO_NOONE)
     {				/* uninitialized msgs */
@@ -1187,7 +1187,7 @@ int clbCanRead( int snum, int msgnum )
 
     /* if it's to god, or implementors and we are an oper... */
     if ((to == MSG_TO_GOD || to == MSG_TO_IMPLEMENTORS)
-        && UISOPER(Ships[snum].unum))
+        && UISOPER(cbShips[snum].unum))
         return TRUE;
 
     /* It's to everybody. */
@@ -1200,7 +1200,7 @@ int clbCanRead( int snum, int msgnum )
         /* We can only read team messages if we're not self-war. */
         if ( to == MSG_TO_TEAM
              && toDetail < NUMALLTEAMS
-             && ((int)toDetail == Ships[snum].team)
+             && ((int)toDetail == cbShips[snum].team)
              && !selfwar(snum) )
             return ( TRUE );
 
@@ -1211,8 +1211,8 @@ int clbCanRead( int snum, int msgnum )
             && fromDetail >= 0
             && fromDetail < MAXSHIPS)
 	{
-            if (Ships[snum].war[Ships[fromDetail].team] == FALSE &&
-                Ships[fromDetail].war[Ships[snum].team] == FALSE)
+            if (cbShips[snum].war[cbShips[fromDetail].team] == FALSE &&
+                cbShips[fromDetail].war[cbShips[snum].team] == FALSE)
                 return TRUE;
 	}
     }
@@ -1270,40 +1270,40 @@ void clbDoomFind(void)
     real taste, tastiness;
 
     tastiness = 0.0;
-    Doomsday->lock = LOCK_NONE;
-    Doomsday->lockDetail = 0;
+    cbDoomsday->lock = LOCK_NONE;
+    cbDoomsday->lockDetail = 0;
 
     for ( i = 0; i < MAXPLANETS; i++ )
         if ( PVISIBLE(i) )
-            if ( Planets[i].armies > 0 && Planets[i].team != TEAM_NOTEAM )
+            if ( cbPlanets[i].armies > 0 && cbPlanets[i].team != TEAM_NOTEAM )
             {
-                taste = Planets[i].armies * BOMBARD_KILLS / dist(Doomsday->x, Doomsday->y, Planets[i].x, Planets[i].y);
+                taste = cbPlanets[i].armies * BOMBARD_KILLS / dist(cbDoomsday->x, cbDoomsday->y, cbPlanets[i].x, cbPlanets[i].y);
                 if ( taste > tastiness )
                 {
                     tastiness = taste;
-                    Doomsday->lock = LOCK_PLANET;
-                    Doomsday->lockDetail = i;
+                    cbDoomsday->lock = LOCK_PLANET;
+                    cbDoomsday->lockDetail = i;
                 }
             }
 
     for ( i = 0; i < MAXSHIPS; i++ )
-        if ( Ships[i].status == SS_LIVE)
+        if ( cbShips[i].status == SS_LIVE)
         {
             taste = ( 1.0 +
-                      Ships[i].kills * KILLS_KILLS +
-                      Ships[i].armies * ARMY_KILLS ) / dist(Doomsday->x, Doomsday->y, Ships[i].x, Ships[i].y);
+                      cbShips[i].kills * KILLS_KILLS +
+                      cbShips[i].armies * ARMY_KILLS ) / dist(cbDoomsday->x, cbDoomsday->y, cbShips[i].x, cbShips[i].y);
             if ( taste > tastiness )
             {
                 tastiness = taste;
-                Doomsday->lock = LOCK_SHIP;
-                Doomsday->lockDetail = i;
+                cbDoomsday->lock = LOCK_SHIP;
+                cbDoomsday->lockDetail = i;
             }
         }
 
-    if ( Doomsday->lock == LOCK_PLANET )
-        Doomsday->heading = utAngle( Doomsday->x, Doomsday->y, Planets[Doomsday->lockDetail].x, Planets[Doomsday->lockDetail].y );
-    else if ( Doomsday->lock == LOCK_SHIP )
-        Doomsday->heading = utAngle( Doomsday->x, Doomsday->y, Ships[Doomsday->lockDetail].x, Ships[Doomsday->lockDetail].y );
+    if ( cbDoomsday->lock == LOCK_PLANET )
+        cbDoomsday->heading = utAngle( cbDoomsday->x, cbDoomsday->y, cbPlanets[cbDoomsday->lockDetail].x, cbPlanets[cbDoomsday->lockDetail].y );
+    else if ( cbDoomsday->lock == LOCK_SHIP )
+        cbDoomsday->heading = utAngle( cbDoomsday->x, cbDoomsday->y, cbShips[cbDoomsday->lockDetail].x, cbShips[cbDoomsday->lockDetail].y );
 
     return;
 
@@ -1316,11 +1316,11 @@ void clbDoomFind(void)
 void clbDoomsday(void)
 {
 
-    Doomsday->heading = rnduni( 0.0, 360.0 );
-    Doomsday->x = DOOMSDAY_START_DIST * cosd(Doomsday->heading);
-    Doomsday->y = DOOMSDAY_START_DIST * sind(Doomsday->heading);
+    cbDoomsday->heading = rnduni( 0.0, 360.0 );
+    cbDoomsday->x = DOOMSDAY_START_DIST * cosd(cbDoomsday->heading);
+    cbDoomsday->y = DOOMSDAY_START_DIST * sind(cbDoomsday->heading);
     clbDoomFind();
-    Doomsday->status = DS_LIVE;
+    cbDoomsday->status = DS_LIVE;
 
     return;
 
@@ -1338,7 +1338,7 @@ int clbFindOrbit( int snum, int *pnum )
 
     for ( i = 0; i < MAXPLANETS; i++ )
         if ( PVISIBLE(i) &&
-             ( dist( Ships[snum].x, Ships[snum].y, Planets[i].x, Planets[i].y ) <= ORBIT_DIST ) )
+             ( dist( cbShips[snum].x, cbShips[snum].y, cbPlanets[i].x, cbPlanets[i].y ) <= ORBIT_DIST ) )
         {
             *pnum = i;
             return ( TRUE );
@@ -1358,35 +1358,35 @@ int clbFindOrbit( int snum, int *pnum )
 int clbFindShip( int *snum )
 {
     int i;
-    int vacantShips[MAXSHIPS];
+    int vacantcbShips[MAXSHIPS];
     int numvacant;
 
     /* maybe free up some slots... */
     clbCheckShips(FALSE);
 
-    cbLock(&ConqInfo->lockword);
+    cbLock(&cbConqInfo->lockword);
     *snum = -1;
     numvacant = 0;
 
     for ( i = 0; i < MAXSHIPS; i++ )
     {
         /* first, look for reserved ships that have no valid pid */
-        if ( Ships[i].status == SS_RESERVED )
-            if (!checkPID(Ships[i].pid))
+        if ( cbShips[i].status == SS_RESERVED )
+            if (!checkPID(cbShips[i].pid))
             {
-                Ships[i].status = SS_OFF; /* no-one there, turn it off */
+                cbShips[i].status = SS_OFF; /* no-one there, turn it off */
                 utLog("INFO: clbFindShip(): turned off reserved ship %d\n",
                       i);
             }
 
         /* if it's vacant and not an oper, save it for later */
-        if (Ships[i].status == SS_LIVE &&
+        if (cbShips[i].status == SS_LIVE &&
             SVACANT(i) &&
-            !UISOPER(Ships[i].unum))
-            vacantShips[numvacant++] = i;
+            !UISOPER(cbShips[i].unum))
+            vacantcbShips[numvacant++] = i;
 
         /* if it's off, grab it */
-        if ( Ships[i].status == SS_OFF )
+        if ( cbShips[i].status == SS_OFF )
         {
             *snum = i;
             break;
@@ -1401,9 +1401,9 @@ int clbFindShip( int *snum )
         if (numvacant)
         {
             if (numvacant == 1)
-                *snum = vacantShips[0];
+                *snum = vacantcbShips[0];
             else
-                *snum = vacantShips[rndint(0, numvacant - 1)];
+                *snum = vacantcbShips[rndint(0, numvacant - 1)];
 
             utLog("INFO: clbFindShip: stealing vacant ship %d", *snum);
             clbIKill( *snum,  KB_GOD, 0 );
@@ -1414,16 +1414,16 @@ int clbFindShip( int *snum )
     {
         /* we found one, so complete the takeover */
         clbZeroShip( *snum );
-        Ships[*snum].status = SS_RESERVED;
-        Ships[*snum].lastmsg = LMSG_NEEDINIT;
-        Ships[*snum].sdfuse = -TIMEOUT_PLAYER;
-        Ships[*snum].ctime = 0;
-        Ships[*snum].etime = 0;
-        Ships[*snum].cacc = 0;
-        Ships[*snum].eacc = 0;
+        cbShips[*snum].status = SS_RESERVED;
+        cbShips[*snum].lastmsg = LMSG_NEEDINIT;
+        cbShips[*snum].sdfuse = -TIMEOUT_PLAYER;
+        cbShips[*snum].ctime = 0;
+        cbShips[*snum].etime = 0;
+        cbShips[*snum].cacc = 0;
+        cbShips[*snum].eacc = 0;
     }
 
-    cbUnlock(&ConqInfo->lockword);
+    cbUnlock(&cbConqInfo->lockword);
 
     return ( (*snum != -1) ? TRUE : FALSE );
 
@@ -1458,7 +1458,7 @@ int clbFindSpecial( int snum, int token, int count, int *sorpnum, int *xsorpnum 
         /* Nearest ship, nearest enemy ship, and nearest team ship. */
         for ( i = 0; i < MAXSHIPS; i++ )
         {
-            if ( i != snum && Ships[i].status == SS_LIVE )
+            if ( i != snum && cbShips[i].status == SS_LIVE )
             {
                 switch ( token )
                 {
@@ -1469,7 +1469,7 @@ int clbFindSpecial( int snum, int token, int count, int *sorpnum, int *xsorpnum 
                     valid = TRUE;
                     break;
                 case SPECIAL_TEAMSHIP:
-                    valid = ( Ships[i].team == Ships[snum].team &&
+                    valid = ( cbShips[i].team == cbShips[snum].team &&
                               ! satwar(snum, i) );
                     break;
                 default:
@@ -1478,12 +1478,12 @@ int clbFindSpecial( int snum, int token, int count, int *sorpnum, int *xsorpnum 
                 if ( valid )
                 {
 #ifdef WARP0CLOAK
-                    if (SCLOAKED(i) && Ships[i].warp == 0.0 &&
+                    if (SCLOAKED(i) && cbShips[i].warp == 0.0 &&
                         satwar(snum, i) &&
                         SROBOT(snum))
                         continue; /* nobody here but us chickens... */
 #endif /* WARP0CLOAK */
-                    td = dist(Ships[snum].x, Ships[snum].y, Ships[i].x, Ships[i].y);
+                    td = dist(cbShips[snum].x, cbShips[snum].y, cbShips[i].x, cbShips[i].y);
                     if ( td < nd )
                     {
                         if ( td < d )
@@ -1505,8 +1505,8 @@ int clbFindSpecial( int snum, int token, int count, int *sorpnum, int *xsorpnum 
         break;
     case SPECIAL_HOMEPLANET:
         /* Home planet. */
-        if (Ships[snum].team < NUMPLAYERTEAMS) // better be...
-            *sorpnum = Teams[Ships[snum].team].homeplanet;
+        if (cbShips[snum].team < NUMPLAYERTEAMS) // better be...
+            *sorpnum = cbTeams[cbShips[snum].team].homeplanet;
         else
             return FALSE;
 
@@ -1519,21 +1519,21 @@ int clbFindSpecial( int snum, int token, int count, int *sorpnum, int *xsorpnum 
             if ( ! PVISIBLE(i) )
                 continue; /* jet next;*/
             /* Ignore suns and moons. */
-            if ( Planets[i].type == PLANET_SUN || Planets[i].type == PLANET_MOON )
+            if ( cbPlanets[i].type == PLANET_SUN || cbPlanets[i].type == PLANET_MOON )
                 continue;
 
-            valid = ( Planets[i].scanned[Ships[snum].team] &&
-                      Planets[i].team != Ships[snum].team );
+            valid = ( cbPlanets[i].scanned[cbShips[snum].team] &&
+                      cbPlanets[i].team != cbShips[snum].team );
 
             /* Handle army threshold logic. */
             if ( valid )
-                valid = ( Planets[i].armies >= count );
+                valid = ( cbPlanets[i].armies >= count );
 
             if ( valid )
 	    {
-                ta = Planets[i].armies;
-                tu = Planets[i].uninhabtime;
-                td = dist(Ships[snum].x, Ships[snum].y, Planets[i].x, Planets[i].y);
+                ta = cbPlanets[i].armies;
+                tu = cbPlanets[i].uninhabtime;
+                td = dist(cbShips[snum].x, cbShips[snum].y, cbPlanets[i].x, cbPlanets[i].y);
 
                 /* Uninhabitable time is of next importance, */
                 /*  number of armies is of first importantance, and */
@@ -1574,7 +1574,7 @@ int clbFindSpecial( int snum, int token, int count, int *sorpnum, int *xsorpnum 
         /* Determine if we at peace with all teams. */
         peaceful = TRUE;
         for ( i = 0; i < NUMPLAYERTEAMS; i++ )
-            if ( Ships[snum].war[i] )
+            if ( cbShips[snum].war[i] )
             {
                 peaceful = FALSE;
                 break;
@@ -1587,36 +1587,36 @@ int clbFindSpecial( int snum, int token, int count, int *sorpnum, int *xsorpnum 
             if ( ! PVISIBLE(i) )
                 continue;
             /* Ignore suns and moons. */
-            if ( Planets[i].type == PLANET_SUN || Planets[i].type == PLANET_MOON )
+            if ( cbPlanets[i].type == PLANET_SUN || cbPlanets[i].type == PLANET_MOON )
                 continue;
             switch ( token )
 	    {
 	    case SPECIAL_ARMYPLANET:
-                valid = ( Planets[i].team == Ships[snum].team );
+                valid = ( cbPlanets[i].team == cbShips[snum].team );
                 break;
 	    case SPECIAL_ENEMYPLANET:
-                valid = ( ! Planets[i].scanned[Ships[snum].team] ||
-                          ( Planets[i].armies > 0 &&
+                valid = ( ! cbPlanets[i].scanned[cbShips[snum].team] ||
+                          ( cbPlanets[i].armies > 0 &&
                             clbSPWar( snum, i ) &&
-                            Planets[i].type != PLANET_MOON ) );
+                            cbPlanets[i].type != PLANET_MOON ) );
                 break;
 	    case SPECIAL_FUELPLANET:
-                valid = ( ( Planets[i].scanned[Ships[snum].team] || peaceful ) &&
+                valid = ( ( cbPlanets[i].scanned[cbShips[snum].team] || peaceful ) &&
                           ! clbSPWar( snum, i ) &&
-                          Planets[i].armies > 0 &&
-                          Planets[i].type == PLANET_CLASSM );
+                          cbPlanets[i].armies > 0 &&
+                          cbPlanets[i].type == PLANET_CLASSM );
                 break;
 	    case SPECIAL_PLANET:
                 valid = TRUE;
                 break;
 	    case SPECIAL_REPAIRPLANET:
-                valid = ( ( Planets[i].scanned[Ships[snum].team] || peaceful ) &&
+                valid = ( ( cbPlanets[i].scanned[cbShips[snum].team] || peaceful ) &&
                           ! clbSPWar( snum, i ) &&
-                          Planets[i].armies > 0 &&
-                          Planets[i].type != PLANET_MOON );
+                          cbPlanets[i].armies > 0 &&
+                          cbPlanets[i].type != PLANET_MOON );
                 break;
 	    case SPECIAL_TEAMPLANET:
-                valid = ( Planets[i].team == Ships[snum].team );
+                valid = ( cbPlanets[i].team == cbShips[snum].team );
                 break;
 	    default:
                 return ( FALSE );		/* this can't happen */
@@ -1627,17 +1627,17 @@ int clbFindSpecial( int snum, int token, int count, int *sorpnum, int *xsorpnum 
                 switch ( token )
 		{
 		case SPECIAL_ARMYPLANET:
-                    valid = ( ( Planets[i].armies - 3 ) >= count );
+                    valid = ( ( cbPlanets[i].armies - 3 ) >= count );
                     break;
 		case SPECIAL_PLANET:
 		case SPECIAL_ENEMYPLANET:
-                    valid = ( ! Planets[i].scanned[Ships[snum].team] ||
-                              Planets[i].armies >= count );
+                    valid = ( ! cbPlanets[i].scanned[cbShips[snum].team] ||
+                              cbPlanets[i].armies >= count );
                     break;
 		case SPECIAL_FUELPLANET:
 		case SPECIAL_REPAIRPLANET:
 		case SPECIAL_TEAMPLANET:
-                    valid = ( Planets[i].armies >= count );
+                    valid = ( cbPlanets[i].armies >= count );
                     break;
 		default:
                     return ( FALSE );	/* this can't happen */
@@ -1645,7 +1645,7 @@ int clbFindSpecial( int snum, int token, int count, int *sorpnum, int *xsorpnum 
 	    }
             if ( valid )
 	    {
-                td = dist(Ships[snum].x, Ships[snum].y, Planets[i].x, Planets[i].y);
+                td = dist(cbShips[snum].x, cbShips[snum].y, cbPlanets[i].x, cbPlanets[i].y);
                 if ( td < nd )
 		{
                     if ( td < d )
@@ -1681,9 +1681,9 @@ void clbFixDeltas( int snum )
 {
     real speed;
 
-    speed = Ships[snum].warp * MM_PER_SEC_PER_WARP * ITER_SECONDS;
-    Ships[snum].dx = speed * cosd(Ships[snum].head);
-    Ships[snum].dy = speed * sind(Ships[snum].head);
+    speed = cbShips[snum].warp * MM_PER_SEC_PER_WARP * ITER_SECONDS;
+    cbShips[snum].dx = speed * cosd(cbShips[snum].head);
+    cbShips[snum].dy = speed * sind(cbShips[snum].head);
 
     return;
 
@@ -1705,8 +1705,8 @@ int clbGetUserNum( int *unum, char *lname, userTypes_t ltype )
     for ( i = 0; i < MAXUSERS; i++ )
         if ( ULIVE(i) )
         {
-            if ( strcmp( lptr, Users[i].username ) == 0
-                 && (ltype == USERTYPE_ANY || Users[i].type == ltype) )
+            if ( strcmp( lptr, cbUsers[i].username ) == 0
+                 && (ltype == USERTYPE_ANY || cbUsers[i].type == ltype) )
             {
                 *unum = i;
                 return ( TRUE );
@@ -1726,51 +1726,51 @@ void clbInitEverything(void)
     int i, j;
 
     /* Twiddle the lockword. */
-    cbUnlock(&ConqInfo->lockword);
-    cbUnlock(&ConqInfo->lockmesg);
+    cbUnlock(&cbConqInfo->lockword);
+    cbUnlock(&cbConqInfo->lockmesg);
 
     /* Zero EVERYTHING. */
     clbZeroEverything();
 
-    cbLock(&ConqInfo->lockword);
+    cbLock(&cbConqInfo->lockword);
 
     /* Turn off the universe. It will be turned back on in initUniverse() */
-    ConqInfo->closed = TRUE;
+    cbConqInfo->closed = TRUE;
 
     /* reset the lockwords  */
-    ConqInfo->lockword = 0;
-    ConqInfo->lockmesg = 0;
+    cbConqInfo->lockword = 0;
+    cbConqInfo->lockmesg = 0;
 
     /* Zero team stats. */
     for ( i = 0; i < NUMPLAYERTEAMS; i++ )
         for ( j = 0; j < MAXTSTATS; j = j + 1 )
-            Teams[i].stats[j] = 0;
+            cbTeams[i].stats[j] = 0;
 
     /* De-register all users. */
     for ( i = 0; i < MAXUSERS; i++ )
     {
         UFCLR(i, USER_F_LIVE);
-        Users[i].type = USERTYPE_NORMAL;
+        cbUsers[i].type = USERTYPE_NORMAL;
     }
 
-    ConqInfo->celapsedseconds = 0;
-    ConqInfo->ccpuseconds = 0;
-    ConqInfo->delapsedseconds = 0;
-    ConqInfo->dcpuseconds = 0;
-    ConqInfo->relapsedseconds = 0;
-    ConqInfo->rcpuseconds = 0;
-    ConqInfo->raccum = 0;
+    cbConqInfo->celapsedseconds = 0;
+    cbConqInfo->ccpuseconds = 0;
+    cbConqInfo->delapsedseconds = 0;
+    cbConqInfo->dcpuseconds = 0;
+    cbConqInfo->relapsedseconds = 0;
+    cbConqInfo->rcpuseconds = 0;
+    cbConqInfo->raccum = 0;
 
-    utStrncpy( ConqInfo->lastupchuck, "never", MAXDATESIZE );
-    utFormatTime( ConqInfo->inittime, 0 );
-    utFormatTime( ConqInfo->conqtime, 0 );
-    utStrncpy( ConqInfo->conqueror, "GOD", MAXUSERNAME );
-    utStrncpy( ConqInfo->conqteam, "self ruled", MAXTEAMNAME );
-    utStrncpy( ConqInfo->lastwords, "Let there be light...", MAXLASTWORDS );
+    utStrncpy( cbConqInfo->lastupchuck, "never", MAXDATESIZE );
+    utFormatTime( cbConqInfo->inittime, 0 );
+    utFormatTime( cbConqInfo->conqtime, 0 );
+    utStrncpy( cbConqInfo->conqueror, "GOD", MAXUSERNAME );
+    utStrncpy( cbConqInfo->conqteam, "self ruled", MAXTEAMNAME );
+    utStrncpy( cbConqInfo->lastwords, "Let there be light...", MAXLASTWORDS );
 
     /* Un-twiddle the lockwords. */
-    cbUnlock(&ConqInfo->lockword);
-    cbUnlock(&ConqInfo->lockmesg);
+    cbUnlock(&cbConqInfo->lockword);
+    cbUnlock(&cbConqInfo->lockmesg);
 
     clbInitRobots();
     clbInitUniverse();
@@ -1786,26 +1786,26 @@ void clbInitEverything(void)
 void clbInitGame(void)
 {
     /* Twiddle the lockword. */
-    cbUnlock(&ConqInfo->lockword);
+    cbUnlock(&cbConqInfo->lockword);
 
-    cbLock(&ConqInfo->lockword);
+    cbLock(&cbConqInfo->lockword);
 
     /* Driver. */
-    Driver->drivsecs = 0;
+    cbDriver->drivsecs = 0;
 
     /* Doomsday machine. */
-    Doomsday->status = DS_OFF;
-    Doomsday->x = 0.0;
-    Doomsday->y = 0.0;
-    Doomsday->dx = 0.0;
-    Doomsday->dy = 0.0;
-    Doomsday->heading = 0.0;
-    Doomsday->lock = LOCK_NONE;
-    Doomsday->lockDetail = 0;
-    utStrncpy( Doomsday->name, "Doomsday Machine", MAXUSERNAME );
+    cbDoomsday->status = DS_OFF;
+    cbDoomsday->x = 0.0;
+    cbDoomsday->y = 0.0;
+    cbDoomsday->dx = 0.0;
+    cbDoomsday->dy = 0.0;
+    cbDoomsday->heading = 0.0;
+    cbDoomsday->lock = LOCK_NONE;
+    cbDoomsday->lockDetail = 0;
+    utStrncpy( cbDoomsday->name, "Doomsday Machine", MAXUSERNAME );
 
     /* Un-twiddle the lockword. */
-    cbUnlock(&ConqInfo->lockword);
+    cbUnlock(&cbConqInfo->lockword);
 
     /* Set up the physical universe. */
     cqiInitPlanets();
@@ -1821,10 +1821,10 @@ void clbInitGame(void)
 void clbInitMsgs(void)
 {
     /* Zero the message buffer. */
-    memset(Msgs, 0, MAXMESSAGES * sizeof(Msg_t));
+    memset(cbMsgs, 0, MAXMESSAGES * sizeof(Msg_t));
 
-    ConqInfo->lastmsg = 0;
-    ConqInfo->glastmsg = ConqInfo->lastmsg;
+    cbConqInfo->lastmsg = 0;
+    cbConqInfo->glastmsg = cbConqInfo->lastmsg;
 
     return;
 
@@ -1842,11 +1842,11 @@ void clbInitRobots(void)
 #define SETROBOT(x, y, z)                                               \
     {                                                                   \
         if ( clbGetUserNum( &unum, x, USERTYPE_BUILTIN ) )              \
-            utStrncpy( Users[unum].alias, y, MAXUSERNAME );            \
+            utStrncpy( cbUsers[unum].alias, y, MAXUSERNAME );            \
         else if ( clbRegister( x, y, z, &unum ) )                       \
         {                                                               \
             UFSET(unum, USER_F_ROBOT);                                  \
-            Users[unum].type = USERTYPE_BUILTIN; /* always builtin */   \
+            cbUsers[unum].type = USERTYPE_BUILTIN; /* always builtin */   \
         }                                                               \
     }
 
@@ -1859,13 +1859,13 @@ void clbInitRobots(void)
     /* Copy the strategy table. */
     for ( i = 0; i < MAX_VAR; i++ )
         for ( j = 0; j < 10; j = j + 1 )
-            Robot->rstrat[i][j] = trstrat[i][j];
+            cbRobot->rstrat[i][j] = trstrat[i][j];
 
     /* Copy the action vector. */
     for ( i = 0; i < 32; i++ )
-        Robot->rvec[i] = trvec[i];
+        cbRobot->rvec[i] = trvec[i];
 
-    ConqInfo->externrobots = FALSE;	/* XXX temporary */
+    cbConqInfo->externrobots = FALSE;	/* XXX temporary */
 
     return;
 
@@ -1881,89 +1881,89 @@ void clbInitShip( int snum, int unum )
 {
     int i, j;
 
-    /* Ships[snum].status                 # never modified here */
-    Ships[snum].killedBy = KB_NONE;
-    Ships[snum].killedByDetail = 0;
-    /* Ships[snum].user                   # setup in menu() or newrob() */
-    /* Ships[snum].team                   # setup in menu() or newrob() */
-    /* Ships[snum].pid                    # setup in menu() or newrob() */
-    /* Ships[snum].shiptype               # setup in newship and newrob */
+    /* cbShips[snum].status                 # never modified here */
+    cbShips[snum].killedBy = KB_NONE;
+    cbShips[snum].killedByDetail = 0;
+    /* cbShips[snum].user                   # setup in menu() or newrob() */
+    /* cbShips[snum].team                   # setup in menu() or newrob() */
+    /* cbShips[snum].pid                    # setup in menu() or newrob() */
+    /* cbShips[snum].shiptype               # setup in newship and newrob */
 
     /* init to 0.0, newrob will init this for robots to make them
      *   stronger, faster.. ;-)
      */
-    Ships[snum].strkills = 0.0;
-    Ships[snum].x = 0.0;
-    Ships[snum].y = 0.0;
-    Ships[snum].dx = 0.0;
-    Ships[snum].dy = 0.0;
-    Ships[snum].head = 0.0;
-    Ships[snum].dhead = 0.0;
-    Ships[snum].warp = 0.0;
-    Ships[snum].dwarp = 0.0;
-    Ships[snum].lock = LOCK_NONE;
-    Ships[snum].lockDetail = 0;
-    Ships[snum].shields = 100.0;
-    Ships[snum].kills = 0.0;
-    Ships[snum].damage = 0.0;
-    Ships[snum].fuel = 999.0;
-    Ships[snum].wtemp = 0.0;
-    Ships[snum].etemp = 0.0;
-    Ships[snum].wfuse = 0;
-    Ships[snum].efuse = 0;
-    Ships[snum].weapalloc = 40;
-    Ships[snum].engalloc = 100 - Ships[snum].weapalloc;
-    Ships[snum].armies = 0;
-    /* Ships[snum].option                 # setup in menu() */
+    cbShips[snum].strkills = 0.0;
+    cbShips[snum].x = 0.0;
+    cbShips[snum].y = 0.0;
+    cbShips[snum].dx = 0.0;
+    cbShips[snum].dy = 0.0;
+    cbShips[snum].head = 0.0;
+    cbShips[snum].dhead = 0.0;
+    cbShips[snum].warp = 0.0;
+    cbShips[snum].dwarp = 0.0;
+    cbShips[snum].lock = LOCK_NONE;
+    cbShips[snum].lockDetail = 0;
+    cbShips[snum].shields = 100.0;
+    cbShips[snum].kills = 0.0;
+    cbShips[snum].damage = 0.0;
+    cbShips[snum].fuel = 999.0;
+    cbShips[snum].wtemp = 0.0;
+    cbShips[snum].etemp = 0.0;
+    cbShips[snum].wfuse = 0;
+    cbShips[snum].efuse = 0;
+    cbShips[snum].weapalloc = 40;
+    cbShips[snum].engalloc = 100 - cbShips[snum].weapalloc;
+    cbShips[snum].armies = 0;
+    /* cbShips[snum].option                 # setup in menu() */
     for ( i = 0; i < NUMPLAYERTEAMS; i++ )
     {
-        /* Ships[snum].rwar               # setup in menu() or newrob() */
-        /* Ships[snum].war                # setup in menu() or newrob() */
-        Ships[snum].scanned[i] = 0;
+        /* cbShips[snum].rwar               # setup in menu() or newrob() */
+        /* cbShips[snum].war                # setup in menu() or newrob() */
+        cbShips[snum].scanned[i] = 0;
     }
     for ( i = 0; i < MAXPLANETS; i++ )
-        Ships[snum].srpwar[i] = FALSE;
-    /* Ships[snum].sdfuse                 # setup in clbFindShip() */
-    cbLock(&ConqInfo->lockmesg);
-    if ( Ships[snum].lastmsg == LMSG_NEEDINIT )
+        cbShips[snum].srpwar[i] = FALSE;
+    /* cbShips[snum].sdfuse                 # setup in clbFindShip() */
+    cbLock(&cbConqInfo->lockmesg);
+    if ( cbShips[snum].lastmsg == LMSG_NEEDINIT )
     {
-        Ships[snum].lastmsg = ConqInfo->lastmsg;
-        Ships[snum].alastmsg = Ships[snum].lastmsg;
+        cbShips[snum].lastmsg = cbConqInfo->lastmsg;
+        cbShips[snum].alastmsg = cbShips[snum].lastmsg;
     }
-    cbUnlock(&ConqInfo->lockmesg);
-    Ships[snum].towing = 0;
-    Ships[snum].towedby = 0;
-    Ships[snum].lastblast = 0.0;
-    Ships[snum].lastphase = 0.0;
-    Ships[snum].pfuse = 0;
-    Ships[snum].action = 0;
+    cbUnlock(&cbConqInfo->lockmesg);
+    cbShips[snum].towing = 0;
+    cbShips[snum].towedby = 0;
+    cbShips[snum].lastblast = 0.0;
+    cbShips[snum].lastphase = 0.0;
+    cbShips[snum].pfuse = 0;
+    cbShips[snum].action = 0;
 
-    Ships[snum].flags = SHIP_F_NONE;
+    cbShips[snum].flags = SHIP_F_NONE;
     SFSET(snum, SHIP_F_SHUP);
 
-    /* Ships[snum].alias                  # setup in menu() or newrob() */
+    /* cbShips[snum].alias                  # setup in menu() or newrob() */
 
     /* Zero torpedos. */
     for ( i = 0; i < MAXTORPS; i++ )
     {
-        Ships[snum].torps[i].status = TS_OFF;
-        Ships[snum].torps[i].fuse = 0;
-        Ships[snum].torps[i].x = 0.0;
-        Ships[snum].torps[i].y = 0.0;
-        Ships[snum].torps[i].dx = 0.0;
-        Ships[snum].torps[i].dy = 0.0;
-        Ships[snum].torps[i].mult = 0.0;
+        cbShips[snum].torps[i].status = TS_OFF;
+        cbShips[snum].torps[i].fuse = 0;
+        cbShips[snum].torps[i].x = 0.0;
+        cbShips[snum].torps[i].y = 0.0;
+        cbShips[snum].torps[i].dx = 0.0;
+        cbShips[snum].torps[i].dy = 0.0;
+        cbShips[snum].torps[i].mult = 0.0;
         for ( j = 0; j < NUMPLAYERTEAMS; j = j + 1 )
-            Ships[snum].torps[i].war[j] = FALSE;
+            cbShips[snum].torps[i].war[j] = FALSE;
     }
 
     /* Update user some stats. */
 
     /* time stamp for this entry */
-    Users[unum].lastentry = time(0);
+    cbUsers[unum].lastentry = time(0);
 
-    Users[unum].stats[USTAT_ENTRIES] += 1;
-    Teams[Ships[snum].team].stats[TSTAT_ENTRIES] += 1;
+    cbUsers[unum].stats[USTAT_ENTRIES] += 1;
+    cbTeams[cbShips[snum].team].stats[TSTAT_ENTRIES] += 1;
 
     return;
 
@@ -1979,106 +1979,106 @@ void clbInitUniverse(void)
     int i;
 
     /* Twiddle the lockword. */
-    cbUnlock(&ConqInfo->lockword);
-    cbLock(&ConqInfo->lockword);
+    cbUnlock(&cbConqInfo->lockword);
+    cbLock(&cbConqInfo->lockword);
 
-    utStrncpy( ShipTypes[ST_SCOUT].name, "Scout", MAXSTNAME );
-    ShipTypes[ST_SCOUT].armylim = 7;
-    ShipTypes[ST_SCOUT].warplim = 10.0;
-    ShipTypes[ST_SCOUT].engfac = 1.2;
-    ShipTypes[ST_SCOUT].accelfac = 1.6;
-    ShipTypes[ST_SCOUT].weafac = 0.83;
-    ShipTypes[ST_SCOUT].torpwarp = 14.0;
+    utStrncpy( cbShipTypes[ST_SCOUT].name, "Scout", MAXSTNAME );
+    cbShipTypes[ST_SCOUT].armylim = 7;
+    cbShipTypes[ST_SCOUT].warplim = 10.0;
+    cbShipTypes[ST_SCOUT].engfac = 1.2;
+    cbShipTypes[ST_SCOUT].accelfac = 1.6;
+    cbShipTypes[ST_SCOUT].weafac = 0.83;
+    cbShipTypes[ST_SCOUT].torpwarp = 14.0;
 
-    utStrncpy( ShipTypes[ST_DESTROYER].name, "Destroyer", MAXSTNAME );
-    ShipTypes[ST_DESTROYER].armylim = 9;
-    ShipTypes[ST_DESTROYER].warplim = 9.0;
-    ShipTypes[ST_DESTROYER].engfac = 1.0;
-    ShipTypes[ST_DESTROYER].accelfac = 1.0;
-    ShipTypes[ST_DESTROYER].weafac = 1.0;
-    ShipTypes[ST_DESTROYER].torpwarp = 12.0;
+    utStrncpy( cbShipTypes[ST_DESTROYER].name, "Destroyer", MAXSTNAME );
+    cbShipTypes[ST_DESTROYER].armylim = 9;
+    cbShipTypes[ST_DESTROYER].warplim = 9.0;
+    cbShipTypes[ST_DESTROYER].engfac = 1.0;
+    cbShipTypes[ST_DESTROYER].accelfac = 1.0;
+    cbShipTypes[ST_DESTROYER].weafac = 1.0;
+    cbShipTypes[ST_DESTROYER].torpwarp = 12.0;
 
-    utStrncpy( ShipTypes[ST_CRUISER].name, "Cruiser", MAXSTNAME );
-    ShipTypes[ST_CRUISER].armylim = 11;
-    ShipTypes[ST_CRUISER].warplim = 8.0;
-    ShipTypes[ST_CRUISER].engfac = 0.8;
-    ShipTypes[ST_CRUISER].accelfac = 0.8;
-    ShipTypes[ST_CRUISER].weafac = 1.17;
-    ShipTypes[ST_CRUISER].torpwarp = 10.0;
+    utStrncpy( cbShipTypes[ST_CRUISER].name, "Cruiser", MAXSTNAME );
+    cbShipTypes[ST_CRUISER].armylim = 11;
+    cbShipTypes[ST_CRUISER].warplim = 8.0;
+    cbShipTypes[ST_CRUISER].engfac = 0.8;
+    cbShipTypes[ST_CRUISER].accelfac = 0.8;
+    cbShipTypes[ST_CRUISER].weafac = 1.17;
+    cbShipTypes[ST_CRUISER].torpwarp = 10.0;
 
-    Teams[TEAM_FEDERATION].shiptype = ST_DESTROYER;
-    Teams[TEAM_KLINGON].shiptype = ST_DESTROYER;
-    Teams[TEAM_ROMULAN].shiptype = ST_CRUISER;
-    Teams[TEAM_ORION].shiptype = ST_SCOUT;
+    cbTeams[TEAM_FEDERATION].shiptype = ST_DESTROYER;
+    cbTeams[TEAM_KLINGON].shiptype = ST_DESTROYER;
+    cbTeams[TEAM_ROMULAN].shiptype = ST_CRUISER;
+    cbTeams[TEAM_ORION].shiptype = ST_SCOUT;
 
-    utStrncpy( Teams[TEAM_FEDERATION].name, "Federation", MAXTEAMNAME );
-    utStrncpy( Teams[TEAM_ROMULAN].name, "Romulan", MAXTEAMNAME );
-    utStrncpy( Teams[TEAM_KLINGON].name, "Klingon", MAXTEAMNAME );
-    utStrncpy( Teams[TEAM_ORION].name, "Orion", MAXTEAMNAME );
-    utStrncpy( Teams[TEAM_SELFRULED].name, "self ruled", MAXTEAMNAME );
-    utStrncpy( Teams[TEAM_NOTEAM].name, "non", MAXTEAMNAME );
-    utStrncpy( Teams[TEAM_GOD].name, "GOD", MAXTEAMNAME );
-    utStrncpy( Teams[TEAM_EMPIRE].name, "Empire", MAXTEAMNAME );
+    utStrncpy( cbTeams[TEAM_FEDERATION].name, "Federation", MAXTEAMNAME );
+    utStrncpy( cbTeams[TEAM_ROMULAN].name, "Romulan", MAXTEAMNAME );
+    utStrncpy( cbTeams[TEAM_KLINGON].name, "Klingon", MAXTEAMNAME );
+    utStrncpy( cbTeams[TEAM_ORION].name, "Orion", MAXTEAMNAME );
+    utStrncpy( cbTeams[TEAM_SELFRULED].name, "self ruled", MAXTEAMNAME );
+    utStrncpy( cbTeams[TEAM_NOTEAM].name, "non", MAXTEAMNAME );
+    utStrncpy( cbTeams[TEAM_GOD].name, "GOD", MAXTEAMNAME );
+    utStrncpy( cbTeams[TEAM_EMPIRE].name, "Empire", MAXTEAMNAME );
 
-    ConqInfo->chrplanets[PLANET_CLASSM] = 'M';
-    ConqInfo->chrplanets[PLANET_DEAD] = 'D';
-    ConqInfo->chrplanets[PLANET_SUN] = 'S';
-    ConqInfo->chrplanets[PLANET_MOON] = 'm';
-    ConqInfo->chrplanets[PLANET_GHOST] = 'G';
-    ConqInfo->chrplanets[PLANET_CLASSA] = 'A';
-    ConqInfo->chrplanets[PLANET_CLASSO] = 'O';
-    ConqInfo->chrplanets[PLANET_CLASSZ] = 'Z';
+    cbConqInfo->chrplanets[PLANET_CLASSM] = 'M';
+    cbConqInfo->chrplanets[PLANET_DEAD] = 'D';
+    cbConqInfo->chrplanets[PLANET_SUN] = 'S';
+    cbConqInfo->chrplanets[PLANET_MOON] = 'm';
+    cbConqInfo->chrplanets[PLANET_GHOST] = 'G';
+    cbConqInfo->chrplanets[PLANET_CLASSA] = 'A';
+    cbConqInfo->chrplanets[PLANET_CLASSO] = 'O';
+    cbConqInfo->chrplanets[PLANET_CLASSZ] = 'Z';
 
-    utStrncpy( ConqInfo->ptname[PLANET_CLASSM], "class M planet",
+    utStrncpy( cbConqInfo->ptname[PLANET_CLASSM], "class M planet",
                MAXPTYPENAME );
-    utStrncpy( ConqInfo->ptname[PLANET_DEAD], "dead planet", MAXPTYPENAME );
-    utStrncpy( ConqInfo->ptname[PLANET_SUN], "sun", MAXPTYPENAME );
-    utStrncpy( ConqInfo->ptname[PLANET_MOON], "moon", MAXPTYPENAME );
-    utStrncpy( ConqInfo->ptname[PLANET_GHOST], "ghost planet", MAXPTYPENAME );
-    utStrncpy( ConqInfo->ptname[PLANET_CLASSA], "class A planet",
+    utStrncpy( cbConqInfo->ptname[PLANET_DEAD], "dead planet", MAXPTYPENAME );
+    utStrncpy( cbConqInfo->ptname[PLANET_SUN], "sun", MAXPTYPENAME );
+    utStrncpy( cbConqInfo->ptname[PLANET_MOON], "moon", MAXPTYPENAME );
+    utStrncpy( cbConqInfo->ptname[PLANET_GHOST], "ghost planet", MAXPTYPENAME );
+    utStrncpy( cbConqInfo->ptname[PLANET_CLASSA], "class A planet",
                MAXPTYPENAME );
-    utStrncpy( ConqInfo->ptname[PLANET_CLASSO], "class O planet",
+    utStrncpy( cbConqInfo->ptname[PLANET_CLASSO], "class O planet",
                MAXPTYPENAME );
-    utStrncpy( ConqInfo->ptname[PLANET_CLASSZ], "class Z planet",
+    utStrncpy( cbConqInfo->ptname[PLANET_CLASSZ], "class Z planet",
                MAXPTYPENAME );
 
-    Teams[TEAM_FEDERATION].teamchar = 'F';
-    Teams[TEAM_ROMULAN].teamchar = 'R';
-    Teams[TEAM_KLINGON].teamchar = 'K';
-    Teams[TEAM_ORION].teamchar = 'O';
-    Teams[TEAM_SELFRULED].teamchar = '-';
-    Teams[TEAM_NOTEAM].teamchar = ' ';
-    Teams[TEAM_GOD].teamchar = 'G';
-    Teams[TEAM_EMPIRE].teamchar = 'E';
+    cbTeams[TEAM_FEDERATION].teamchar = 'F';
+    cbTeams[TEAM_ROMULAN].teamchar = 'R';
+    cbTeams[TEAM_KLINGON].teamchar = 'K';
+    cbTeams[TEAM_ORION].teamchar = 'O';
+    cbTeams[TEAM_SELFRULED].teamchar = '-';
+    cbTeams[TEAM_NOTEAM].teamchar = ' ';
+    cbTeams[TEAM_GOD].teamchar = 'G';
+    cbTeams[TEAM_EMPIRE].teamchar = 'E';
 
-    Teams[TEAM_FEDERATION].torpchar = '*';
-    Teams[TEAM_ROMULAN].torpchar = '@';
-    Teams[TEAM_KLINGON].torpchar = '+';
-    Teams[TEAM_ORION].torpchar = '.';
+    cbTeams[TEAM_FEDERATION].torpchar = '*';
+    cbTeams[TEAM_ROMULAN].torpchar = '@';
+    cbTeams[TEAM_KLINGON].torpchar = '+';
+    cbTeams[TEAM_ORION].torpchar = '.';
 
     /* Initialize driver variables. */
-    Driver->drivcnt = 0;
-    Driver->drivowner[0] = 0;
+    cbDriver->drivcnt = 0;
+    cbDriver->drivowner[0] = 0;
 
     /* Initialize user history stuff. */
-    ConqInfo->histptr = 0;
+    cbConqInfo->histptr = 0;
     for ( i = 0; i < MAXHISTLOG; i++ )
     {
-        History[i].unum = -1;
-        History[i].enterTime = 0;
-        History[i].elapsed = 0;
-        History[i].username[0] = 0;
+        cbHistory[i].unum = -1;
+        cbHistory[i].enterTime = 0;
+        cbHistory[i].elapsed = 0;
+        cbHistory[i].username[0] = 0;
     }
 
     /* Un-twiddle the lockword. */
-    cbUnlock(&ConqInfo->lockword);
+    cbUnlock(&cbConqInfo->lockword);
 
     clbInitGame();
     clbClearShips();
     clbInitMsgs();
 
     /* Turn the universe back on (turned off in initEverything()). */
-    ConqInfo->closed = FALSE;
+    cbConqInfo->closed = FALSE;
 
     return;
 
@@ -2096,29 +2096,29 @@ void clbIntrude( int snum, int pnum )
     char *armeq=", armies=";
 
     if ( PVISIBLE(pnum) &&
-         Planets[pnum].team != TEAM_SELFRULED &&
-         Planets[pnum].team != TEAM_NOTEAM )
+         cbPlanets[pnum].team != TEAM_SELFRULED &&
+         cbPlanets[pnum].team != TEAM_NOTEAM )
     {
         if ( snum < 0 ) // doomsday
 	{
-            strcpy(buf , Doomsday->name) ;
-            utToUpperCase( Doomsday->name );
+            strcpy(buf , cbDoomsday->name) ;
+            utToUpperCase( cbDoomsday->name );
             strcat(buf , atta) ;
             strcat(buf , armeq) ;
-            utAppendInt(buf , Planets[pnum].armies) ;
+            utAppendInt(buf , cbPlanets[pnum].armies) ;
             clbStoreMsgf( MSG_FROM_PLANET, pnum,
-                          MSG_TO_TEAM, Planets[pnum].team,
+                          MSG_TO_TEAM, cbPlanets[pnum].team,
                           buf, MSG_FLAGS_INTRUDER );
 	}
-        else if ( Ships[snum].war[Planets[pnum].team] ) // ship
+        else if ( cbShips[snum].war[cbPlanets[pnum].team] ) // ship
 	{
             strcpy(buf , "INTRUDER ALERT - ") ;
             utAppendShip(buf , snum) ;
             strcat(buf , atta) ;
             strcat(buf , armeq) ;
-            utAppendInt(buf , Planets[pnum].armies) ;
+            utAppendInt(buf , cbPlanets[pnum].armies) ;
             clbStoreMsgf( MSG_FROM_PLANET, pnum,
-                          MSG_TO_TEAM, Planets[pnum].team,
+                          MSG_TO_TEAM, cbPlanets[pnum].team,
                           buf, MSG_FLAGS_INTRUDER );
             defend( snum, pnum );
 	}
@@ -2137,17 +2137,17 @@ int clbLogHist( int unum )
 {
     int hnum;
 
-    cbLock(&ConqInfo->lockword);
-    ConqInfo->histptr = utModPlusOne( ConqInfo->histptr + 1, MAXHISTLOG );
+    cbLock(&cbConqInfo->lockword);
+    cbConqInfo->histptr = utModPlusOne( cbConqInfo->histptr + 1, MAXHISTLOG );
     /* time stamp for this entry */
-    History[ConqInfo->histptr].enterTime = time(0);
-    History[ConqInfo->histptr].elapsed = (time_t)0;
-    History[ConqInfo->histptr].unum = unum;
-    utStrncpy(History[ConqInfo->histptr].username,
-              Users[unum].username, MAXUSERNAME);
-    hnum = ConqInfo->histptr;
+    cbHistory[cbConqInfo->histptr].enterTime = time(0);
+    cbHistory[cbConqInfo->histptr].elapsed = (time_t)0;
+    cbHistory[cbConqInfo->histptr].unum = unum;
+    utStrncpy(cbHistory[cbConqInfo->histptr].username,
+              cbUsers[unum].username, MAXUSERNAME);
+    hnum = cbConqInfo->histptr;
 
-    cbUnlock(&ConqInfo->lockword);
+    cbUnlock(&cbConqInfo->lockword);
     return(hnum);
 }
 
@@ -2161,15 +2161,15 @@ real clbNewWarp( int snum, real dwarp )
 {
     real x, acc;
 
-    x = dwarp - Ships[snum].warp;
-    acc = (real) ShipTypes[Ships[snum].shiptype].accelfac *
+    x = dwarp - cbShips[snum].warp;
+    acc = (real) cbShipTypes[cbShips[snum].shiptype].accelfac *
         (real) engeff( snum ) * ITER_SECONDS;
     if ( acc >= fabs( x ) )
         return ( dwarp );			/* close enough (or equal) */
     else if ( x < 0.0 )
-        return ( Ships[snum].warp - acc );
+        return ( cbShips[snum].warp - acc );
 
-    return ( Ships[snum].warp + acc );
+    return ( cbShips[snum].warp + acc );
 
 }
 
@@ -2185,14 +2185,14 @@ int clbPlanetMatch( char *str, int *pnum, int godlike )
     if ( godlike )
     {
         for ( *pnum = 0; *pnum < MAXPLANETS; *pnum = *pnum + 1 )
-            if ( utStringMatch( str, Planets[*pnum].name, FALSE ) )
+            if ( utStringMatch( str, cbPlanets[*pnum].name, FALSE ) )
                 return ( TRUE );
     }
     else
     {
         for ( *pnum = 0; *pnum < MAXPLANETS; *pnum = *pnum + 1 )
             if ( PVISIBLE(*pnum) )
-                if ( utStringMatch( str, Planets[*pnum].name, FALSE ) )
+                if ( utStringMatch( str, cbPlanets[*pnum].name, FALSE ) )
                     return ( TRUE );
     }
 
@@ -2218,13 +2218,13 @@ void clbPutShip( int snum, real basex, real basey )
         /* If we're doing poorly, expand the area of entry. */
         if ( mod( j, 16 ) == 0 )
             smear = smear * 1.2;
-        Ships[snum].x = rndnor( basex, smear );
-        Ships[snum].y = rndnor( basey, smear );
+        cbShips[snum].x = rndnor( basex, smear );
+        cbShips[snum].y = rndnor( basey, smear );
         for ( i = 0; i < MAXSHIPS; i++ )
-            if ( Ships[i].status == SS_LIVE )
+            if ( cbShips[i].status == SS_LIVE )
                 if ( satwar( i, snum ) &&
                      i != snum &&
-                     dist( Ships[snum].x, Ships[snum].y, Ships[i].x, Ships[i].y ) <= ENTRY_ENEMY_DIST )
+                     dist( cbShips[snum].x, cbShips[snum].y, cbShips[i].x, cbShips[i].y ) <= ENTRY_ENEMY_DIST )
                     goto clbl1; /* jet next;  2; */
         /* If we got here, then the position isn't near an enemy ship. */
         return;
@@ -2255,7 +2255,7 @@ int clbFmtMsg(msgFrom_t from, uint16_t fromDetail, msgTo_t to,
         utAppendShip(buf , (int)fromDetail) ;
     }
     else if ( from == MSG_FROM_PLANET && fromDetail < MAXPLANETS )
-        strcpy(buf , Planets[fromDetail].name) ;
+        strcpy(buf , cbPlanets[fromDetail].name) ;
     else
     {
         switch ( from )
@@ -2268,7 +2268,7 @@ int clbFmtMsg(msgFrom_t from, uint16_t fromDetail, msgTo_t to,
              break;
          case MSG_FROM_DOOM:
              strcat(buf, "The ");
-             strcat(buf, Doomsday->name);
+             strcat(buf, cbDoomsday->name);
              break;
          case MSG_FROM_COMP:
              strcpy(buf , "Comp") ;
@@ -2286,7 +2286,7 @@ int clbFmtMsg(msgFrom_t from, uint16_t fromDetail, msgTo_t to,
         utAppendShip(buf , (int)toDetail) ;
     else if ( to == MSG_TO_TEAM && toDetail < NUMPLAYERTEAMS )
     {
-        utAppendChar(buf , Teams[toDetail].teamchar) ;
+        utAppendChar(buf , cbTeams[toDetail].teamchar) ;
     }
     else
     {
@@ -2325,7 +2325,7 @@ static int cmpplanet(void *cmp1, void *cmp2)
     icmp1 = (int *) cmp1;
     icmp2 = (int *) cmp2;
 
-    return(strcmp(Planets[*icmp1].name, Planets[*icmp2].name));
+    return(strcmp(cbPlanets[*icmp1].name, cbPlanets[*icmp2].name));
 }
 
 /*  sortplanets - sort planets by name */
@@ -2352,9 +2352,9 @@ static int cmpuser(void *cmp1, void *cmp2)
     icmp1 = (int *) cmp1;
     icmp2 = (int *) cmp2;
 
-    if (Users[*icmp1].rating > Users[*icmp2].rating)
+    if (cbUsers[*icmp1].rating > cbUsers[*icmp2].rating)
         return(-1);
-    else if (Users[*icmp1].rating < Users[*icmp2].rating)
+    else if (cbUsers[*icmp1].rating < cbUsers[*icmp2].rating)
         return(1);
     else
         return(0);
@@ -2384,25 +2384,25 @@ int clbSPWar( int snum, int pnum )
 
     if ( ! PVISIBLE(pnum) )
         return ( FALSE );		/* can't be at war unless it's real */
-    else if ( Planets[pnum].type == PLANET_SUN )
+    else if ( cbPlanets[pnum].type == PLANET_SUN )
         return ( TRUE );		/* always at war with suns */
-    else if ( Planets[pnum].type == PLANET_MOON )
+    else if ( cbPlanets[pnum].type == PLANET_MOON )
         return ( FALSE );		/* never at war with moons */
-    else if ( Planets[pnum].armies <= 0 )
+    else if ( cbPlanets[pnum].armies <= 0 )
         return ( FALSE );		/* can't have war without armies */
-    else switch ( Planets[pnum].team )	/* jet added breaks */
+    else switch ( cbPlanets[pnum].team )	/* jet added breaks */
          {
          case TEAM_FEDERATION:
          case TEAM_ROMULAN:
          case TEAM_KLINGON:
          case TEAM_ORION:
-             if ( Planets[pnum].team == Ships[snum].team )
+             if ( cbPlanets[pnum].team == cbShips[snum].team )
                  return ( FALSE );
              else
-                 return ( Ships[snum].war[Planets[pnum].team] );
+                 return ( cbShips[snum].war[cbPlanets[pnum].team] );
              break;
          default:
-             return ( Ships[snum].srpwar[pnum] );
+             return ( cbShips[snum].srpwar[pnum] );
          }
 
 }
@@ -2421,25 +2421,25 @@ int clbStillAlive( int snum )
         return(TRUE);
 
     /* Look for religious trouble or the "closed" sign in the window. */
-    if ( UBANNED(Ships[snum].unum) )
+    if ( UBANNED(cbShips[snum].unum) )
     {
-        if ( Ships[snum].status == SS_LIVE )
+        if ( cbShips[snum].status == SS_LIVE )
             clbKillShip( snum, KB_SHIT, 0 );
 
         return ( FALSE );
     }
-    if ( ConqInfo->closed && ! UPLAYWHENCLOSED(Ships[snum].unum) )
+    if ( cbConqInfo->closed && ! UPLAYWHENCLOSED(cbShips[snum].unum) )
     {
-        if ( Ships[snum].status == SS_LIVE )
+        if ( cbShips[snum].status == SS_LIVE )
             clbKillShip(snum, KB_EVICT, 0);
 
         return ( FALSE );
     }
 
-    if ( Ships[snum].status == SS_RESERVED || Ships[snum].status == SS_ENTERING )
+    if ( cbShips[snum].status == SS_RESERVED || cbShips[snum].status == SS_ENTERING )
         return ( TRUE );
 
-    return ( Ships[snum].status == SS_LIVE );
+    return ( cbShips[snum].status == SS_LIVE );
 
 }
 
@@ -2460,7 +2460,7 @@ void clbStoreMsgf( msgFrom_t from, uint16_t fromDetail,
     char buf[128];
 
     /* don't do this if invalid common block */
-    if (*CBlockRevision != COMMONSTAMP)
+    if (*cbRevision != COMMONSTAMP)
         return;
 
     // do some basic checks on the to and from
@@ -2476,22 +2476,22 @@ void clbStoreMsgf( msgFrom_t from, uint16_t fromDetail,
         if (flags & (MSG_FLAGS_TERSABLE | MSG_FLAGS_FEEDBACK))
             return;
 
-    cbLock(&ConqInfo->lockmesg);
-    nlastmsg = utModPlusOne( ConqInfo->lastmsg + 1, MAXMESSAGES );
-    utStrncpy( Msgs[nlastmsg].msgbuf, msg, MESSAGE_SIZE );
-    Msgs[nlastmsg].from = from;
-    Msgs[nlastmsg].fromDetail = fromDetail;
-    Msgs[nlastmsg].to = to;
-    Msgs[nlastmsg].toDetail = toDetail;
-    Msgs[nlastmsg].flags = flags;
-    ConqInfo->lastmsg = nlastmsg;
+    cbLock(&cbConqInfo->lockmesg);
+    nlastmsg = utModPlusOne( cbConqInfo->lastmsg + 1, MAXMESSAGES );
+    utStrncpy( cbMsgs[nlastmsg].msgbuf, msg, MESSAGE_SIZE );
+    cbMsgs[nlastmsg].from = from;
+    cbMsgs[nlastmsg].fromDetail = fromDetail;
+    cbMsgs[nlastmsg].to = to;
+    cbMsgs[nlastmsg].toDetail = toDetail;
+    cbMsgs[nlastmsg].flags = flags;
+    cbConqInfo->lastmsg = nlastmsg;
 
     /* Remove allowable last message restrictions. */
     for ( i = 0; i < MAXSHIPS; i++ )
-        if ( nlastmsg == Ships[i].alastmsg )
-            Ships[i].alastmsg = LMSG_READALL;
+        if ( nlastmsg == cbShips[i].alastmsg )
+            cbShips[i].alastmsg = LMSG_READALL;
 
-    cbUnlock(&ConqInfo->lockmesg);
+    cbUnlock(&cbConqInfo->lockmesg);
 
     if (SysConf.LogMessages == TRUE || to == MSG_TO_GOD
         || from == MSG_FROM_GOD)
@@ -2523,37 +2523,37 @@ int clbUseFuel( int snum, real fuel, int weapon, int forreal )
         return ( FALSE );
     if ( weapon )
     {
-        if ( Ships[snum].wfuse > 0 )
+        if ( cbShips[snum].wfuse > 0 )
             return ( FALSE );
     }
     else
     {
-        if ( Ships[snum].efuse > 0 )
+        if ( cbShips[snum].efuse > 0 )
 	{
             if (forreal)
-                Ships[snum].dwarp = 0.0;
+                cbShips[snum].dwarp = 0.0;
             return ( FALSE );
 	}
     }
 
     if (forreal)
-        Ships[snum].fuel = Ships[snum].fuel - fuel;
+        cbShips[snum].fuel = cbShips[snum].fuel - fuel;
 
-    if ( Ships[snum].fuel < 0.0 )
+    if ( cbShips[snum].fuel < 0.0 )
     {
         /* When you're out of gas, you're out of fun... */
         if (forreal)
 	{
-            Ships[snum].fuel = 0.0;
+            cbShips[snum].fuel = 0.0;
             SFCLR(snum, SHIP_F_CLOAKED);
-            Ships[snum].dwarp = 0.0;
+            cbShips[snum].dwarp = 0.0;
 	}
         return ( FALSE );
     }
-    else if ( Ships[snum].fuel > 999.0 )
+    else if ( cbShips[snum].fuel > 999.0 )
     {
         if (forreal)
-            Ships[snum].fuel = 999.0;
+            cbShips[snum].fuel = 999.0;
     }
 
     /* Temperature. */
@@ -2562,13 +2562,13 @@ int clbUseFuel( int snum, real fuel, int weapon, int forreal )
         if (forreal)
 	{
             /* the server will send this message if needed */
-            Ships[snum].wtemp += ((fuel * TEMPFUEL_FAC) / weaeff ( snum ));
-            if ( Ships[snum].wtemp < 0.0 )
-                Ships[snum].wtemp = 0.0;
-            else if ( Ships[snum].wtemp >= 100.0 )
+            cbShips[snum].wtemp += ((fuel * TEMPFUEL_FAC) / weaeff ( snum ));
+            if ( cbShips[snum].wtemp < 0.0 )
+                cbShips[snum].wtemp = 0.0;
+            else if ( cbShips[snum].wtemp >= 100.0 )
                 if ( rnd() < WEAPON_DOWN_PROB )
                 {
-                    Ships[snum].wfuse = rndint( MIN_DOWN_FUSE, MAX_DOWN_FUSE );
+                    cbShips[snum].wfuse = rndint( MIN_DOWN_FUSE, MAX_DOWN_FUSE );
                     clbStoreMsgf( MSG_FROM_COMP, 0,
                                   MSG_TO_SHIP, snum,
                                   "Weapons overload.",
@@ -2581,13 +2581,13 @@ int clbUseFuel( int snum, real fuel, int weapon, int forreal )
         if (forreal)
 	{
             /* the server will send this message if needed */
-            Ships[snum].etemp = Ships[snum].etemp + fuel * TEMPFUEL_FAC / engeff( snum );
-            if ( Ships[snum].etemp < 0.0 )
-                Ships[snum].etemp = 0.0;
-            else if ( Ships[snum].etemp >= 100.0 )
+            cbShips[snum].etemp = cbShips[snum].etemp + fuel * TEMPFUEL_FAC / engeff( snum );
+            if ( cbShips[snum].etemp < 0.0 )
+                cbShips[snum].etemp = 0.0;
+            else if ( cbShips[snum].etemp >= 100.0 )
                 if ( rnd() < ENGINE_DOWN_PROB )
                 {
-                    Ships[snum].efuse = rndint( MIN_DOWN_FUSE, MAX_DOWN_FUSE );
+                    cbShips[snum].efuse = rndint( MIN_DOWN_FUSE, MAX_DOWN_FUSE );
                     clbStoreMsgf( MSG_FROM_COMP, 0,
                                   MSG_TO_SHIP, snum,
                                   "Engines super-heated.",
@@ -2622,72 +2622,72 @@ void clbZeroShip( int snum )
 {
     int i, j;
 
-    Ships[snum].status = SS_OFF;
-    Ships[snum].killedBy = KB_NONE;
-    Ships[snum].killedByDetail = 0;
-    Ships[snum].unum = 0;
-    Ships[snum].team = 0;
-    Ships[snum].pid = 0;
-    Ships[snum].x = 0.0;
-    Ships[snum].y = 0.0;
-    Ships[snum].dx = 0.0;
-    Ships[snum].dy = 0.0;
-    Ships[snum].head = 0.0;
-    Ships[snum].dhead = 0.0;
-    Ships[snum].warp = 0.0;
-    Ships[snum].dwarp = 0.0;
-    Ships[snum].lock = LOCK_NONE;
-    Ships[snum].lockDetail = 0;
-    Ships[snum].shields = 0.0;
-    Ships[snum].kills = 0.0;
-    Ships[snum].damage = 0.0;
-    Ships[snum].fuel = 0.0;
-    Ships[snum].etemp = 0.0;
-    Ships[snum].wtemp = 0.0;
-    Ships[snum].wfuse = 0;
-    Ships[snum].efuse = 0;
-    Ships[snum].weapalloc = 0;
-    Ships[snum].engalloc = 0;
-    Ships[snum].armies = 0;
-    Ships[snum].shiptype = ST_SCOUT;
+    cbShips[snum].status = SS_OFF;
+    cbShips[snum].killedBy = KB_NONE;
+    cbShips[snum].killedByDetail = 0;
+    cbShips[snum].unum = 0;
+    cbShips[snum].team = 0;
+    cbShips[snum].pid = 0;
+    cbShips[snum].x = 0.0;
+    cbShips[snum].y = 0.0;
+    cbShips[snum].dx = 0.0;
+    cbShips[snum].dy = 0.0;
+    cbShips[snum].head = 0.0;
+    cbShips[snum].dhead = 0.0;
+    cbShips[snum].warp = 0.0;
+    cbShips[snum].dwarp = 0.0;
+    cbShips[snum].lock = LOCK_NONE;
+    cbShips[snum].lockDetail = 0;
+    cbShips[snum].shields = 0.0;
+    cbShips[snum].kills = 0.0;
+    cbShips[snum].damage = 0.0;
+    cbShips[snum].fuel = 0.0;
+    cbShips[snum].etemp = 0.0;
+    cbShips[snum].wtemp = 0.0;
+    cbShips[snum].wfuse = 0;
+    cbShips[snum].efuse = 0;
+    cbShips[snum].weapalloc = 0;
+    cbShips[snum].engalloc = 0;
+    cbShips[snum].armies = 0;
+    cbShips[snum].shiptype = ST_SCOUT;
     for ( i = 0; i < NUMPLAYERTEAMS; i++ )
     {
-        Ships[snum].rwar[i] = FALSE;
-        Ships[snum].war[i] = FALSE;
-        Ships[snum].scanned[i] = 0;
+        cbShips[snum].rwar[i] = FALSE;
+        cbShips[snum].war[i] = FALSE;
+        cbShips[snum].scanned[i] = 0;
     }
     for ( i = 0; i < MAXPLANETS; i++ )
-        Ships[snum].srpwar[i] = FALSE;
-    Ships[snum].sdfuse = 0;
-    Ships[snum].lastmsg = 0;
-    Ships[snum].alastmsg = 0;
-    Ships[snum].towing = 0;
-    Ships[snum].towedby = 0;
-    Ships[snum].lastblast = 0.0;
-    Ships[snum].lastphase = 0.0;
-    Ships[snum].pfuse = 0;
-    Ships[snum].action = 0;
+        cbShips[snum].srpwar[i] = FALSE;
+    cbShips[snum].sdfuse = 0;
+    cbShips[snum].lastmsg = 0;
+    cbShips[snum].alastmsg = 0;
+    cbShips[snum].towing = 0;
+    cbShips[snum].towedby = 0;
+    cbShips[snum].lastblast = 0.0;
+    cbShips[snum].lastphase = 0.0;
+    cbShips[snum].pfuse = 0;
+    cbShips[snum].action = 0;
     for ( i = 0; i < MAXUSERNAME; i++ )
-        Ships[snum].alias[i] = 0;
-    Ships[snum].ctime = 0;
-    Ships[snum].etime = 0;
-    Ships[snum].cacc = 0;
-    Ships[snum].eacc = 0;
+        cbShips[snum].alias[i] = 0;
+    cbShips[snum].ctime = 0;
+    cbShips[snum].etime = 0;
+    cbShips[snum].cacc = 0;
+    cbShips[snum].eacc = 0;
 
-    Ships[snum].flags = SHIP_F_NONE;
+    cbShips[snum].flags = SHIP_F_NONE;
     SFSET(snum, SHIP_F_SHUP);
 
     for ( i = 0; i < MAXTORPS; i++ )
     {
-        Ships[snum].torps[i].status = TS_OFF;
-        Ships[snum].torps[i].fuse = 0;
-        Ships[snum].torps[i].x = 0.0;
-        Ships[snum].torps[i].y = 0.0;
-        Ships[snum].torps[i].dx = 0.0;
-        Ships[snum].torps[i].dy = 0.0;
-        Ships[snum].torps[i].mult = 0.0;
+        cbShips[snum].torps[i].status = TS_OFF;
+        cbShips[snum].torps[i].fuse = 0;
+        cbShips[snum].torps[i].x = 0.0;
+        cbShips[snum].torps[i].y = 0.0;
+        cbShips[snum].torps[i].dx = 0.0;
+        cbShips[snum].torps[i].dy = 0.0;
+        cbShips[snum].torps[i].mult = 0.0;
         for ( j = 0; j < NUMPLAYERTEAMS; j = j + 1 )
-            Ships[snum].torps[i].war[j] = FALSE;
+            cbShips[snum].torps[i].war[j] = FALSE;
     }
 
     return;
@@ -2744,25 +2744,25 @@ void clbPlanetDrive(real itersec)
     for ( i = 0; i <= MAXPLANETS; i++ )
     {
         /* Advance porbang() if planet is not stationary. */
-        if ( Planets[i].primary != i ) // not orbiting itself...
+        if ( cbPlanets[i].primary != i ) // not orbiting itself...
 	{
 
-            Planets[i].orbang = utMod360( Planets[i].orbang +
-                                          Planets[i].orbvel *
+            cbPlanets[i].orbang = utMod360( cbPlanets[i].orbang +
+                                          cbPlanets[i].orbvel *
                                           itersec / 60.0 );
 
-            Planets[i].x = Planets[Planets[i].primary].x +
-                Planets[i].orbrad * cosd(Planets[i].orbang);
-            Planets[i].y = Planets[Planets[i].primary].y +
-                Planets[i].orbrad * sind(Planets[i].orbang);
+            cbPlanets[i].x = cbPlanets[cbPlanets[i].primary].x +
+                cbPlanets[i].orbrad * cosd(cbPlanets[i].orbang);
+            cbPlanets[i].y = cbPlanets[cbPlanets[i].primary].y +
+                cbPlanets[i].orbrad * sind(cbPlanets[i].orbang);
 
 	}
-        else if ( Planets[i].orbvel != 0.0 )
+        else if ( cbPlanets[i].orbvel != 0.0 )
 	{
             /* Special hack for planets to move in a straight line. */
-            speed = Planets[i].orbvel * MM_PER_SEC_PER_WARP * itersec;
-            Planets[i].x = Planets[i].x + speed * cosd(Planets[i].orbang);
-            Planets[i].y = Planets[i].y + speed * sind(Planets[i].orbang);
+            speed = cbPlanets[i].orbvel * MM_PER_SEC_PER_WARP * itersec;
+            cbPlanets[i].x = cbPlanets[i].x + speed * cosd(cbPlanets[i].orbang);
+            cbPlanets[i].y = cbPlanets[i].y + speed * sind(cbPlanets[i].orbang);
 	}
     }
 
@@ -2798,17 +2798,17 @@ void clbTorpDrive(real itersec)
     for ( s = 0; s < MAXSHIPS; s++ )
     {
         i = ship[s];
-        if ( Ships[i].status != SS_OFF )
+        if ( cbShips[i].status != SS_OFF )
 	{
             for ( j = 0; j < MAXTORPS; j = j + 1 )
 	    {
-                if ( Ships[i].torps[j].status == TS_LIVE )
+                if ( cbShips[i].torps[j].status == TS_LIVE )
 		{
                     /* Movement. */
-                    Ships[i].torps[j].x = Ships[i].torps[j].x +
-                        (Ships[i].torps[j].dx * (itersec / ITER_SECONDS));
-                    Ships[i].torps[j].y = Ships[i].torps[j].y +
-                        (Ships[i].torps[j].dy * (itersec / ITER_SECONDS));
+                    cbShips[i].torps[j].x = cbShips[i].torps[j].x +
+                        (cbShips[i].torps[j].dx * (itersec / ITER_SECONDS));
+                    cbShips[i].torps[j].y = cbShips[i].torps[j].y +
+                        (cbShips[i].torps[j].dy * (itersec / ITER_SECONDS));
 
 		}
             }
@@ -2821,34 +2821,34 @@ void clbTorpDrive(real itersec)
 /* compute a ship's proper position when orbiting */
 void clbAdjOrbitalPosition(int snum)
 {
-    if (snum >= 0 && snum < MAXSHIPS && Ships[snum].warp < 0.0
-        && Ships[snum].lock == LOCK_PLANET)
+    if (snum >= 0 && snum < MAXSHIPS && cbShips[snum].warp < 0.0
+        && cbShips[snum].lock == LOCK_PLANET)
     {
-        int pnum = Ships[snum].lockDetail;
+        int pnum = cbShips[snum].lockDetail;
 
         if ( pnum >= 0 && pnum < MAXPLANETS )
         {
             /* ajust the ship's X/Y based on orbit direction and heading */
-            if ( Ships[snum].warp == ORBIT_CW )
+            if ( cbShips[snum].warp == ORBIT_CW )
             {
-                Ships[snum].x =
-                    (real)(Planets[pnum].x + (ORBIT_DIST *
-                                              cosd(Ships[snum].head + 90.0)));
+                cbShips[snum].x =
+                    (real)(cbPlanets[pnum].x + (ORBIT_DIST *
+                                              cosd(cbShips[snum].head + 90.0)));
 
-                Ships[snum].y =
-                    (real)(Planets[pnum].y + (ORBIT_DIST *
-                                              sind(Ships[snum].head + 90.0)));
+                cbShips[snum].y =
+                    (real)(cbPlanets[pnum].y + (ORBIT_DIST *
+                                              sind(cbShips[snum].head + 90.0)));
             }
-            else if ( Ships[snum].warp == ORBIT_CCW )
+            else if ( cbShips[snum].warp == ORBIT_CCW )
             {
                 /* Orbiting counter-clockwise. */
-                Ships[snum].x =
-                    (real)(Planets[pnum].x + (ORBIT_DIST *
-                                              cosd(Ships[snum].head - 90.0)));
+                cbShips[snum].x =
+                    (real)(cbPlanets[pnum].x + (ORBIT_DIST *
+                                              cosd(cbShips[snum].head - 90.0)));
 
-                Ships[snum].y =
-                    (real)(Planets[pnum].y + (ORBIT_DIST *
-                                              sind(Ships[snum].head - 90.0)));
+                cbShips[snum].y =
+                    (real)(cbPlanets[pnum].y + (ORBIT_DIST *
+                                              sind(cbShips[snum].head - 90.0)));
 
             }
         }
@@ -2944,8 +2944,8 @@ void clbCheckShips(int isDriver)
     /* look for vacant ships that aren't marked vacant */
     for (i=0; i<MAXSHIPS; i++)
     {
-        if (Ships[i].status == SS_LIVE && !SVACANT(i))
-            if (Ships[i].pid > 0 && !checkPID(Ships[i].pid))
+        if (cbShips[i].status == SS_LIVE && !SVACANT(i))
+            if (cbShips[i].pid > 0 && !checkPID(cbShips[i].pid))
             {
                 utLog("INFO: clbCheckShips(isDriver=%d): marking ship %d as VACANT",
                       isDriver, i);
@@ -2953,7 +2953,7 @@ void clbCheckShips(int isDriver)
             }
 
         /* if the ship is VACANT, and vacants aren't allowed, kill them. */
-        if (!SysConf.AllowVacant && SVACANT(i) && Ships[i].status == SS_LIVE )
+        if (!SysConf.AllowVacant && SVACANT(i) && cbShips[i].status == SS_LIVE )
         {
             /* when the driver calls this function, and the ship must be
              *  killed, then we'll do it 'normally' so players can know
@@ -2970,10 +2970,10 @@ void clbCheckShips(int isDriver)
                 /* just turn it off and log it */
                 utLog("INFO: clbCheckShips(isDriver=%d): turning off VACANT ship %d",
                       isDriver, i);
-                cbLock(&ConqInfo->lockword);
+                cbLock(&cbConqInfo->lockword);
                 clbIKill(i,  KB_GOD, 0);
                 clbZeroShip( i );
-                cbUnlock(&ConqInfo->lockword);
+                cbUnlock(&cbConqInfo->lockword);
             }
         }
     }
@@ -2987,8 +2987,8 @@ bool clbFindTeamHomeSun(int team, int *pnum)
     if (team < 0 || team >= NUMPLAYERTEAMS || !pnum)
         return false;
 
-    int primary = Planets[Teams[team].homeplanet].primary;
-    if (Planets[primary].type == PLANET_SUN)
+    int primary = cbPlanets[cbTeams[team].homeplanet].primary;
+    if (cbPlanets[primary].type == PLANET_SUN)
     {
         *pnum = primary;
         return true;

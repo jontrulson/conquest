@@ -203,7 +203,7 @@ static packetEnt_t serverPackets_0006[] = {
       pktNotImpl
     },
     { SP_0006_CONQINFO,
-      sizeof(sp_0006_ConqInfo_t),
+      sizeof(sp_0006_cbConqInfo_t),
       "SP_0006_CONQINFO",
       pktNotImpl
     },
@@ -334,7 +334,7 @@ static packetEnt_t serverPackets_0007[] = {
       pktNotImpl
     },
     { SP_CONQINFO,
-      sizeof(spConqInfo_t),
+      sizeof(spcbConqInfo_t),
       "SP_CONQINFO",
       pktNotImpl
     },

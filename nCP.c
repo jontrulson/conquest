@@ -246,7 +246,7 @@ static void _infoship( int snum, int scanner )
         cp_putmsg( "No such ship.", MSG_LIN1 );
         return;
     }
-    status = Ships[snum].status;
+    status = cbShips[snum].status;
     if ( ! godlike && status != SS_LIVE )
     {
         cp_putmsg( "Not found.", MSG_LIN1 );
@@ -273,27 +273,27 @@ static void _infoship( int snum, int scanner )
     }
     else
     {
-        x = Ships[scanner].x;
-        y = Ships[scanner].y;
+        x = cbShips[scanner].x;
+        y = cbShips[scanner].y;
     }
     if ( SCLOAKED(snum) )
     {
         if (godlike)
 	{
-            appx = rndnor(Ships[snum].x, CLOAK_SMEAR_DIST);
-            appy = rndnor(Ships[snum].y, CLOAK_SMEAR_DIST);
+            appx = rndnor(cbShips[snum].x, CLOAK_SMEAR_DIST);
+            appy = rndnor(cbShips[snum].y, CLOAK_SMEAR_DIST);
 	}
         else			/* client */
 	{			/* for clients, these have already been
 				   smeared */
-            appx = Ships[snum].x;
-            appy = Ships[snum].y;
+            appx = cbShips[snum].x;
+            appy = cbShips[snum].y;
 	}
     }
     else
     {
-        appx = Ships[snum].x;
-        appy = Ships[snum].y;
+        appx = cbShips[snum].x;
+        appy = cbShips[snum].y;
     }
     dis = dist( x, y, appx, appy );
     if ( godlike )
@@ -303,16 +303,16 @@ static void _infoship( int snum, int scanner )
 
         /* Decide if we can do an acurate scan. */
         canscan = ( (dis < ACCINFO_DIST && ! SCLOAKED(snum)) ||
-                    ( (Ships[snum].scanned[ Ships[scanner].team] > 0) && ! selfwar(scanner) ) );
+                    ( (cbShips[snum].scanned[ cbShips[scanner].team] > 0) && ! selfwar(scanner) ) );
     }
 
     strcat(cbuf , ": ");
-    if ( Ships[snum].alias[0] != 0 )
+    if ( cbShips[snum].alias[0] != 0 )
     {
-        strcat(cbuf , Ships[snum].alias);
+        strcat(cbuf , cbShips[snum].alias);
         strcat(cbuf, ", ");
     }
-    kills = (Ships[snum].kills + Ships[snum].strkills);
+    kills = (cbShips[snum].kills + cbShips[snum].strkills);
     if ( kills == 0.0 )
         strcat(cbuf , "no");
     else
@@ -329,7 +329,7 @@ static void _infoship( int snum, int scanner )
         strcat(cbuf, ", ");
 
     strcat(cbuf, "a ");
-    strcat(cbuf, ShipTypes[Ships[snum].shiptype].name);
+    strcat(cbuf, cbShipTypes[cbShips[snum].shiptype].name);
     strcat(cbuf, ", ");
 
     if ( godlike )
@@ -339,7 +339,7 @@ static void _infoship( int snum, int scanner )
     }
     else
     {
-        if ( Ships[snum].war[Ships[scanner].team] )
+        if ( cbShips[snum].war[cbShips[scanner].team] )
             strcat(cbuf , "at WAR.");
         else
             strcat(cbuf , "at peace.");
@@ -347,7 +347,7 @@ static void _infoship( int snum, int scanner )
 
     cp_putmsg( cbuf, MSG_LIN1 );
 
-    if ( ! SCLOAKED(snum) || Ships[snum].warp != 0.0 )
+    if ( ! SCLOAKED(snum) || cbShips[snum].warp != 0.0 )
     {
         Context.lasttdist = round( dis ); /* save these puppies for hud info */
         Context.lasttang = round( utAngle( x, y, appx, appy ) );
@@ -357,7 +357,7 @@ static void _infoship( int snum, int scanner )
 
         if (UserConf.DoETAStats)
 	{
-            if (Ships[scanner].warp > 0.0 || Ships[snum].warp > 0.0)
+            if (cbShips[scanner].warp > 0.0 || cbShips[snum].warp > 0.0)
 	    {
                 curtime = time(0);
 
@@ -433,11 +433,11 @@ static void _infoship( int snum, int scanner )
                     olddis = dis;
 
                     pwarp =
-                        (((Ships[scanner].warp > 0.0) ?
-                          Ships[scanner].warp :
+                        (((cbShips[scanner].warp > 0.0) ?
+                          cbShips[scanner].warp :
                           0.0) +
-                         ((Ships[snum].warp > 0.0) ?
-                          Ships[snum].warp
+                         ((cbShips[snum].warp > 0.0) ?
+                          cbShips[snum].warp
                           : 0.0));
 
                     sprintf(tmpstr, ", ETA %s",
@@ -459,10 +459,10 @@ static void _infoship( int snum, int scanner )
             strcat(cbuf,  ", ");
         strcat(cbuf , "shields ");
         if ( SSHUP(snum) && ! SREPAIR(snum) )
-            utAppendInt(cbuf, round( Ships[snum].shields ));
+            utAppendInt(cbuf, round( cbShips[snum].shields ));
         else
             strcat(cbuf , "DOWN");
-        i = round( Ships[snum].damage );
+        i = round( cbShips[snum].damage );
         if ( i > 0 )
 	{
             if ( cbuf[0] != 0 )
@@ -470,7 +470,7 @@ static void _infoship( int snum, int scanner )
             sprintf( junk, "damage %d", i );
             strcat(cbuf , junk);
 	}
-        i = Ships[snum].armies;
+        i = cbShips[snum].armies;
         if ( i > 0 )
 	{
             sprintf( junk, ", with %d arm", i );
@@ -518,9 +518,9 @@ static void _infoplanet( char *str, int pnum, int snum )
 
     /* In some cases, report hostilities. */
     junk[0] = 0;
-    if ( Planets[pnum].type == PLANET_CLASSM || Planets[pnum].type == PLANET_DEAD )
+    if ( cbPlanets[pnum].type == PLANET_CLASSM || cbPlanets[pnum].type == PLANET_DEAD )
         if ( ! godlike )
-            if ( Planets[pnum].scanned[Ships[snum].team] && clbSPWar( snum, pnum ) )
+            if ( cbPlanets[pnum].scanned[cbShips[snum].team] && clbSPWar( snum, pnum ) )
                 strcat(junk, " (hostile)");
 
     if ( godlike )
@@ -530,21 +530,21 @@ static void _infoplanet( char *str, int pnum, int snum )
     }
     else
     {
-        x = Ships[snum].x;
-        y = Ships[snum].y;
+        x = cbShips[snum].x;
+        y = cbShips[snum].y;
     }
 
-    Context.lasttdist = round(dist( x, y, Planets[pnum].x, Planets[pnum].y));
-    Context.lasttang = round(utAngle( x, y, Planets[pnum].x, Planets[pnum].y ));
+    Context.lasttdist = round(dist( x, y, cbPlanets[pnum].x, cbPlanets[pnum].y));
+    Context.lasttang = round(utAngle( x, y, cbPlanets[pnum].x, cbPlanets[pnum].y ));
 
     if (UserConf.DoETAStats)
     {
         static char tmpstr[64];
 
-        if (Ships[snum].warp > 0.0)
+        if (cbShips[snum].warp > 0.0)
 	{
             sprintf(tmpstr, ", ETA %s",
-                    clbETAStr(Ships[snum].warp,
+                    clbETAStr(cbShips[snum].warp,
                               Context.lasttdist));
 	}
         else
@@ -552,8 +552,8 @@ static void _infoplanet( char *str, int pnum, int snum )
 
         sprintf( buf, "%s%s, a %s%s, range %d, direction %d%s",
                  str,
-                 Planets[pnum].name,
-                 ConqInfo->ptname[Planets[pnum].type],
+                 cbPlanets[pnum].name,
+                 cbConqInfo->ptname[cbPlanets[pnum].type],
                  junk,
                  Context.lasttdist,
                  Context.lasttang,
@@ -564,32 +564,32 @@ static void _infoplanet( char *str, int pnum, int snum )
     else
         sprintf( buf, "%s%s, a %s%s, range %d, direction %d",
                  str,
-                 Planets[pnum].name,
-                 ConqInfo->ptname[Planets[pnum].type],
+                 cbPlanets[pnum].name,
+                 cbConqInfo->ptname[cbPlanets[pnum].type],
                  junk,
                  Context.lasttdist,
                  Context.lasttang);
 
     /* save for the hudInfo, only first 3 characters */
-    utStrncpy(Context.lasttarg, Planets[pnum].name, 4);
+    utStrncpy(Context.lasttarg, cbPlanets[pnum].name, 4);
     hudSetInfoTarget(pnum, false);
 
     if ( godlike )
         canscan = TRUE;
     else
-        canscan = Planets[pnum].scanned[Ships[snum].team];
+        canscan = cbPlanets[pnum].scanned[cbShips[snum].team];
 
     junk[0] = 0;
-    if ( Planets[pnum].type != PLANET_SUN && Planets[pnum].type != PLANET_MOON )
+    if ( cbPlanets[pnum].type != PLANET_SUN && cbPlanets[pnum].type != PLANET_MOON )
     {
         if ( ! canscan )
             strcpy(junk , "with unknown occupational forces") ;
         else
 	{
-            i = Planets[pnum].armies;
+            i = cbPlanets[pnum].armies;
             if ( i == 0 )
 	    {
-                j = Planets[pnum].uninhabtime;
+                j = cbPlanets[pnum].uninhabtime;
                 if ( j > 0 )
                     sprintf( junk, "uninhabitable for %d more minutes", j );
                 else
@@ -598,7 +598,7 @@ static void _infoplanet( char *str, int pnum, int snum )
             else
 	    {
                 sprintf( junk, "with %d %s arm", i,
-                         Teams[Planets[pnum].team].name );
+                         cbTeams[cbPlanets[pnum].team].name );
                 if ( i == 1 )
                     strcat(junk , "y");
                 else
@@ -610,11 +610,11 @@ static void _infoplanet( char *str, int pnum, int snum )
         if ( godlike )
             canscan = FALSE;	/* GOD can use teaminfo instead */
         else
-            canscan = ( pnum == Teams[Ships[snum].team].homeplanet &&
-                        Teams[Ships[snum].team].coupinfo );
+            canscan = ( pnum == cbTeams[cbShips[snum].team].homeplanet &&
+                        cbTeams[cbShips[snum].team].coupinfo );
         if ( canscan )
 	{
-            j = Teams[Ships[snum].team].couptime;
+            j = cbTeams[cbShips[snum].team].couptime;
             if ( j > 0 )
 	    {
                 if ( junk[0] != 0 )
@@ -673,7 +673,7 @@ static void _dowarp( int snum, real warp )
 
     /* Handle ship limitations. */
 
-    warp = min( warp, ShipTypes[Ships[snum].shiptype].warplim );
+    warp = min( warp, cbShipTypes[cbShips[snum].shiptype].warplim );
     if (!sendCommand(CPCMD_SETWARP, (uint16_t)warp))
         return;
 
@@ -681,7 +681,7 @@ static void _dowarp( int snum, real warp )
     cp_putmsg( cbuf, MSG_LIN1 );
 
     /* we set it locally since the server won't send it to us */
-    Ships[snum].dwarp = warp;
+    cbShips[snum].dwarp = warp;
 
     return;
 
@@ -724,9 +724,9 @@ static void _dophase( real dir )
        of what things look like locally, and let the server deal with it. */
 
     /*  Cataboligne - sound code 10.16.6 */
-    if ( Ships[Context.snum].pfuse == 0 &&
+    if ( cbShips[Context.snum].pfuse == 0 &&
          clbUseFuel( Context.snum, PHASER_FUEL, TRUE, FALSE ) )
-        cqsEffectPlay(cqsTeamEffects[Ships[Context.snum].team].phaser, NULL,
+        cqsEffectPlay(cqsTeamEffects[cbShips[Context.snum].team].phaser, NULL,
                       0, 0, 0);
 
     cp_putmsg( "Firing phasers...", MSG_LIN2 );
@@ -748,10 +748,10 @@ static void _dotorp(real dir, int num)
         /* Cat - torp fired sound */
 
         if (num > 1)
-            cqsEffectPlay(cqsTeamEffects[Ships[Context.snum].team].torp3, NULL,
+            cqsEffectPlay(cqsTeamEffects[cbShips[Context.snum].team].torp3, NULL,
                           0, 0, 0);
         else
-            cqsEffectPlay(cqsTeamEffects[Ships[Context.snum].team].torp, NULL,
+            cqsEffectPlay(cqsTeamEffects[cbShips[Context.snum].team].torp, NULL,
                           0, 0, 0);
     }
 
@@ -832,7 +832,7 @@ static void _doinfo( char *buf, char ch )
 
 /* Cataboligne - Spocks viewer sound */
     if (rnd() < 0.3)
-        cqsEffectPlay(cqsTeamEffects[Ships[Context.snum].team].info, NULL,
+        cqsEffectPlay(cqsTeamEffects[cbShips[Context.snum].team].info, NULL,
                       0, 0, 0);
 }
 
@@ -842,10 +842,10 @@ static void rmesg(int snum, int msgnum, int lin)
 {
     char buf[MSGMAXLINE];
 
-    clbFmtMsg(Msgs[msgnum].from, Msgs[msgnum].fromDetail,
-              Msgs[msgnum].to, Msgs[msgnum].toDetail, buf);
+    clbFmtMsg(cbMsgs[msgnum].from, cbMsgs[msgnum].fromDetail,
+              cbMsgs[msgnum].to, cbMsgs[msgnum].toDetail, buf);
     strcat(buf , ": ");
-    strcat(buf , Msgs[msgnum].msgbuf);
+    strcat(buf , cbMsgs[msgnum].msgbuf);
 
     hudSetPrompt(lin, NULL, NoColor, buf, CyanColor);
 
@@ -888,20 +888,20 @@ static void _doorbit( int snum )
 {
     int pnum;
 
-    if ( ( Ships[snum].warp == ORBIT_CW ) || ( Ships[snum].warp == ORBIT_CCW ) )
+    if ( ( cbShips[snum].warp == ORBIT_CW ) || ( cbShips[snum].warp == ORBIT_CCW ) )
         _infoplanet( "But we are already orbiting ",
-                     Ships[snum].lockDetail, snum );
+                     cbShips[snum].lockDetail, snum );
     else if ( ! clbFindOrbit( snum, &pnum ) )
     {
         sprintf( cbuf, "We are not close enough to orbit, %s.",
-                 Ships[snum].alias );
+                 cbShips[snum].alias );
         cp_putmsg( cbuf, MSG_LIN1 );
         hudClearPrompt(MSG_LIN2);
     }
-    else if ( Ships[snum].warp > MAX_ORBIT_WARP )
+    else if ( cbShips[snum].warp > MAX_ORBIT_WARP )
     {
         sprintf( cbuf, "We are going too fast to orbit, %s.",
-                 Ships[snum].alias );
+                 cbShips[snum].alias );
         cp_putmsg( cbuf, MSG_LIN1 );
         sprintf( cbuf, "Maximum orbital insertion velocity is warp %.1f.",
                  oneplace(MAX_ORBIT_WARP) );
@@ -926,7 +926,7 @@ static void _doalloc(char *buf, char ch)
     switch (ch)
     {
     case TERM_EXTRA:
-        dwalloc = Ships[snum].engalloc;
+        dwalloc = cbShips[snum].engalloc;
         break;
 
     case TERM_NORMAL:
@@ -966,7 +966,7 @@ static void _dodet( void )
 
     hudClearPrompt(MSG_LIN1);
 
-    if ( Ships[snum].wfuse > 0 )
+    if ( cbShips[snum].wfuse > 0 )
         cp_putmsg( "Weapons are currently overloaded.", MSG_LIN1 );
     else if ( clbUseFuel( snum, DETONATE_FUEL, TRUE, FALSE ) )
     {				/* we don't really use fuel here on the
@@ -1005,25 +1005,25 @@ static int _chkrefit(void)
     hudClearPrompt(MSG_LIN2);
 
     /* Check for allowability. */
-    if ( oneplace( Ships[snum].kills ) < MIN_REFIT_KILLS )
+    if ( oneplace( cbShips[snum].kills ) < MIN_REFIT_KILLS )
     {
         cp_putmsg( nek, MSG_LIN1 );
         return FALSE;
     }
 
-    if (Ships[snum].lock == LOCK_PLANET
-        && Ships[snum].lockDetail < MAXPLANETS)
+    if (cbShips[snum].lock == LOCK_PLANET
+        && cbShips[snum].lockDetail < MAXPLANETS)
     {
-        int pnum = Ships[snum].lockDetail;
+        int pnum = cbShips[snum].lockDetail;
 
-        if (Planets[pnum].team != Ships[snum].team || Ships[snum].warp >= 0.0)
+        if (cbPlanets[pnum].team != cbShips[snum].team || cbShips[snum].warp >= 0.0)
         {
             cp_putmsg( ntp, MSG_LIN1 );
             return FALSE;
         }
     }
 
-    if (Ships[snum].armies != 0)
+    if (cbShips[snum].armies != 0)
     {
         cp_putmsg( cararm, MSG_LIN1 );
         return FALSE;
@@ -1043,7 +1043,7 @@ static int _chkcoup(void)
     /* some checks we will do locally, the rest will have to be handled by
        the server */
     /* Check for allowability. */
-    if ( oneplace( Ships[snum].kills ) < MIN_COUP_KILLS )
+    if ( oneplace( cbShips[snum].kills ) < MIN_COUP_KILLS )
     {
         cp_putmsg(
             "Fleet orders require three kills before a coup can be attempted.",
@@ -1051,32 +1051,32 @@ static int _chkcoup(void)
         return FALSE;
     }
     for ( i = 0; i < MAXPLANETS; i++ )
-        if ( Planets[i].team == Ships[snum].team && Planets[i].armies > 0 )
+        if ( cbPlanets[i].team == cbShips[snum].team && cbPlanets[i].armies > 0 )
         {
             cp_putmsg( "We don't need to coup, we still have armies left!",
                        MSG_LIN1 );
             return FALSE;
         }
-    if ( Ships[snum].warp >= 0.0 )
+    if ( cbShips[snum].warp >= 0.0 )
     {
         cp_putmsg( nhp, MSG_LIN1 );
         return FALSE;
     }
     // the assumption is that if warp < 0, we are in orbit and
     // therefore we are locked onto the planet we are orbiting
-    pnum = (int)Ships[snum].lockDetail;
-    if ( pnum != Teams[Ships[snum].team].homeplanet )
+    pnum = (int)cbShips[snum].lockDetail;
+    if ( pnum != cbTeams[cbShips[snum].team].homeplanet )
     {
         cp_putmsg( nhp, MSG_LIN1 );
         return FALSE;
     }
-    if ( Planets[pnum].armies > MAX_COUP_ENEMY_ARMIES )
+    if ( cbPlanets[pnum].armies > MAX_COUP_ENEMY_ARMIES )
     {
         cp_putmsg( "The enemy is still too strong to attempt a coup.",
                    MSG_LIN1 );
         return FALSE;
     }
-    i = Planets[pnum].uninhabtime;
+    i = cbPlanets[pnum].uninhabtime;
     if ( i > 0 )
     {
         sprintf( cbuf, "This planet is uninhabitable for %d more minutes.",
@@ -1095,18 +1095,18 @@ static int _chktow(void)
     hudClearPrompt(MSG_LIN1);
     hudClearPrompt(MSG_LIN2);
 
-    if ( Ships[snum].towedby != 0 )
+    if ( cbShips[snum].towedby != 0 )
     {
         strcpy(cbuf , "But we are being towed by ") ;
-        utAppendShip(cbuf , Ships[snum].towedby) ;
+        utAppendShip(cbuf , cbShips[snum].towedby) ;
         utAppendChar(cbuf , '!');
         cp_putmsg( cbuf, MSG_LIN2 );
         return FALSE;
     }
-    if ( Ships[snum].towing != 0 )
+    if ( cbShips[snum].towing != 0 )
     {
         strcpy(cbuf , "But we're already towing ") ;
-        utAppendShip(cbuf , Ships[snum].towing) ;
+        utAppendShip(cbuf , cbShips[snum].towing) ;
         utAppendChar(cbuf , '.');
         cp_putmsg( cbuf, MSG_LIN2 );
         return FALSE;
@@ -1162,7 +1162,7 @@ static void _domsgto(char *buf, int ch, int terse)
         if ( to == MSG_TO_SHIP && toDetail < MAXSHIPS )
             sprintf( tbuf, "%d", to );
         else if ( to == MSG_TO_TEAM && toDetail < NUMPLAYERTEAMS )
-            strcpy(tbuf , Teams[toDetail].name) ;
+            strcpy(tbuf , cbTeams[toDetail].name) ;
         else switch ( to )
              {
              case MSG_TO_ALL:
@@ -1199,7 +1199,7 @@ static void _domsgto(char *buf, int ch, int terse)
             prompting = FALSE;
             return;
 	}
-        if ( Ships[j].status != SS_LIVE )
+        if ( cbShips[j].status != SS_LIVE )
 	{
             cp_putmsg( nf, MSG_LIN2 );
             hudClearPrompt(MSG_LIN1);
@@ -1240,8 +1240,8 @@ static void _domsgto(char *buf, int ch, int terse)
              {
                  /* Check for a team character. */
                  for ( i = 0; i < NUMPLAYERTEAMS; i = i + 1 )
-                     if ( tbuf[0] == Teams[i].teamchar
-                          || tbuf[0] == (char)tolower(Teams[i].teamchar) )
+                     if ( tbuf[0] == cbTeams[i].teamchar
+                          || tbuf[0] == (char)tolower(cbTeams[i].teamchar) )
                          break;
 
                  if ( i >= NUMPLAYERTEAMS )
@@ -1263,7 +1263,7 @@ static void _domsgto(char *buf, int ch, int terse)
     strcpy(tbuf , "Message to ") ;
     if ( to == MSG_TO_SHIP && toDetail < MAXSHIPS )
     {
-        if ( Ships[to].status != SS_LIVE )
+        if ( cbShips[to].status != SS_LIVE )
 	{
             cp_putmsg( nf, MSG_LIN2 );
             hudClearPrompt(MSG_LIN1);
@@ -1276,7 +1276,7 @@ static void _domsgto(char *buf, int ch, int terse)
     }
     else if ( to == MSG_TO_TEAM && toDetail < NUMPLAYERTEAMS )
     {
-        strcat(tbuf , Teams[toDetail].name);
+        strcat(tbuf , cbTeams[toDetail].name);
         strcat(tbuf , "s:");
     }
     else
@@ -1510,7 +1510,7 @@ static void _docourse( char *buf, char ch)
             hudClearPrompt(MSG_LIN1);
             return;
 	}
-        if ( Ships[sorpnum].status != SS_LIVE )
+        if ( cbShips[sorpnum].status != SS_LIVE )
 	{
             cp_putmsg( "Not found.", MSG_LIN2 );
             return;
@@ -1518,17 +1518,17 @@ static void _docourse( char *buf, char ch)
 
         if ( SCLOAKED(sorpnum) )
 	{
-            if ( Ships[sorpnum].warp <= 0.0 )
+            if ( cbShips[sorpnum].warp <= 0.0 )
 	    {
                 cp_putmsg( "Sensors are unable to lock on.", MSG_LIN2 );
                 return;
 	    }
 	}
 
-        appx = Ships[sorpnum].x;
-        appy = Ships[sorpnum].y;
+        appx = cbShips[sorpnum].x;
+        appy = cbShips[sorpnum].y;
 
-        dir = utAngle( Ships[snum].x, Ships[snum].y, appx, appy );
+        dir = utAngle( cbShips[snum].x, cbShips[snum].y, appx, appy );
 
         /* Give info if he used TAB. */
         if ( ch == TERM_EXTRA )
@@ -1537,7 +1537,7 @@ static void _docourse( char *buf, char ch)
             hudClearPrompt(MSG_LIN1);
         break;
     case NEAR_PLANET:
-        dir = utAngle( Ships[snum].x, Ships[snum].y, Planets[sorpnum].x, Planets[sorpnum].y );
+        dir = utAngle( cbShips[snum].x, cbShips[snum].y, cbPlanets[sorpnum].x, cbPlanets[sorpnum].y );
         if ( ch == TERM_EXTRA )
 	{
             newlock = LOCK_PLANET;
@@ -1624,18 +1624,18 @@ static void _doreview(void)
     int snum = Context.snum;
     int i;
 
-    lstmsg = Ships[snum].lastmsg;	/* don't want lstmsg changing while
+    lstmsg = cbShips[snum].lastmsg;	/* don't want lstmsg changing while
                                            reading old ones. */
 
-    lastone = utModPlusOne( ConqInfo->lastmsg+1, MAXMESSAGES );
+    lastone = utModPlusOne( cbConqInfo->lastmsg+1, MAXMESSAGES );
     if ( snum >= 0 && snum < MAXSHIPS )
     {
-        if ( Ships[snum].lastmsg == LMSG_NEEDINIT )
+        if ( cbShips[snum].lastmsg == LMSG_NEEDINIT )
         {
             cp_putmsg( "There are no old messages.", MSG_LIN1 );
             return;               /* none to read */
         }
-        i = Ships[snum].alastmsg;
+        i = cbShips[snum].alastmsg;
         if ( i != LMSG_READALL )
             lastone = i;
     }
@@ -1670,26 +1670,26 @@ static void _dobomb(void)
     hudClearPrompt(MSG_LIN2);
 
     /* Check for allowability. */
-    if ( Ships[snum].warp >= 0.0 )
+    if ( cbShips[snum].warp >= 0.0 )
     {
         cp_putmsg( "We must be orbiting a planet to bombard it.", MSG_LIN1 );
         return;
     }
-    pnum = Ships[snum].lockDetail;
-    if ( Planets[pnum].type == PLANET_SUN || Planets[pnum].type == PLANET_MOON ||
-         Planets[pnum].team == TEAM_NOTEAM || Planets[pnum].armies == 0 )
+    pnum = cbShips[snum].lockDetail;
+    if ( cbPlanets[pnum].type == PLANET_SUN || cbPlanets[pnum].type == PLANET_MOON ||
+         cbPlanets[pnum].team == TEAM_NOTEAM || cbPlanets[pnum].armies == 0 )
     {
         cp_putmsg( "There is no one there to bombard.", MSG_LIN1 );
         return;
     }
-    if ( Planets[pnum].team == Ships[snum].team )
+    if ( cbPlanets[pnum].team == cbShips[snum].team )
     {
         cp_putmsg( "We can't bomb our own armies!", MSG_LIN1 );
         return;
     }
 
-    if ( Planets[pnum].team != TEAM_SELFRULED && Planets[pnum].team != TEAM_GOD )
-        if ( ! Ships[snum].war[Planets[pnum].team] )
+    if ( cbPlanets[pnum].team != TEAM_SELFRULED && cbPlanets[pnum].team != TEAM_GOD )
+        if ( ! cbShips[snum].war[cbPlanets[pnum].team] )
         {
             cp_putmsg( "But we are not at war with this planet!", MSG_LIN1 );
             return;
@@ -1698,7 +1698,7 @@ static void _dobomb(void)
     /* set up the state, and proceed. */
 
     sprintf( pbuf, "Press [TAB] to bombard %s, %d armies:",
-             Planets[pnum].name, Planets[pnum].armies );
+             cbPlanets[pnum].name, cbPlanets[pnum].armies );
 
     state = S_BOMB;
     prm.preinit = FALSE;
@@ -1735,27 +1735,27 @@ static void _initbeam()
        could be used by both client and server */
 
     /* Check for allowability. */
-    if ( Ships[snum].warp >= 0.0 )
+    if ( cbShips[snum].warp >= 0.0 )
     {
         cp_putmsg( "We must be orbiting a planet to use the transporter.",
                    MSG_LIN1 );
         return;
     }
-    pnum = Ships[snum].lockDetail;
-    if ( Ships[snum].armies > 0 )
+    pnum = cbShips[snum].lockDetail;
+    if ( cbShips[snum].armies > 0 )
     {
-        if ( Planets[pnum].type == PLANET_SUN )
+        if ( cbPlanets[pnum].type == PLANET_SUN )
 	{
             cp_putmsg( "Idiot!  Our armies will fry down there!", MSG_LIN1 );
             return;
 	}
-        else if ( Planets[pnum].type == PLANET_MOON )
+        else if ( cbPlanets[pnum].type == PLANET_MOON )
 	{
             cp_putmsg( "Fool!  Our armies will suffocate down there!",
                        MSG_LIN1 );
             return;
 	}
-        else if ( Planets[pnum].team == TEAM_GOD )
+        else if ( cbPlanets[pnum].team == TEAM_GOD )
 	{
             cp_putmsg(
                 "GOD->you: YOUR ARMIES AREN'T GOOD ENOUGH FOR THIS PLANET.",
@@ -1764,7 +1764,7 @@ static void _initbeam()
 	}
     }
 
-    i = Planets[pnum].uninhabtime;
+    i = cbPlanets[pnum].uninhabtime;
     if ( i > 0 )
     {
         sprintf( cbuf, "This planet is uninhabitable for %d more minute",
@@ -1777,23 +1777,23 @@ static void _initbeam()
     }
 
     /* can take empty planets */
-    if ( Planets[pnum].team != Ships[snum].team &&
-         Planets[pnum].team != TEAM_SELFRULED &&
-         Planets[pnum].team != TEAM_NOTEAM )
-        if ( ! Ships[snum].war[Planets[pnum].team] && Planets[pnum].armies != 0)
+    if ( cbPlanets[pnum].team != cbShips[snum].team &&
+         cbPlanets[pnum].team != TEAM_SELFRULED &&
+         cbPlanets[pnum].team != TEAM_NOTEAM )
+        if ( ! cbShips[snum].war[cbPlanets[pnum].team] && cbPlanets[pnum].armies != 0)
         {
             cp_putmsg( "But we are not at war with this planet!", MSG_LIN1 );
             return;
         }
 
-    if ( Ships[snum].armies == 0 &&
-         Planets[pnum].team == Ships[snum].team && Planets[pnum].armies <= MIN_BEAM_ARMIES )
+    if ( cbShips[snum].armies == 0 &&
+         cbPlanets[pnum].team == cbShips[snum].team && cbPlanets[pnum].armies <= MIN_BEAM_ARMIES )
     {
         cp_putmsg( lastfew, MSG_LIN1 );
         return;
     }
 
-    rkills = Ships[snum].kills;
+    rkills = cbShips[snum].kills;
 
     if ( rkills < (real)1.0 )
     {
@@ -1804,25 +1804,25 @@ static void _initbeam()
     }
 
     /* Figure out what can be beamed. */
-    downmax = Ships[snum].armies;
+    downmax = cbShips[snum].armies;
     if ( clbSPWar(snum,pnum) ||
-         Planets[pnum].team == TEAM_SELFRULED ||
-         Planets[pnum].team == TEAM_NOTEAM ||
-         Planets[pnum].team == TEAM_GOD ||
-         Planets[pnum].armies == 0 )
+         cbPlanets[pnum].team == TEAM_SELFRULED ||
+         cbPlanets[pnum].team == TEAM_NOTEAM ||
+         cbPlanets[pnum].team == TEAM_GOD ||
+         cbPlanets[pnum].armies == 0 )
     {
         upmax = 0;
     }
     else
     {
         capacity = min( (int)rkills * 2,
-                        ShipTypes[Ships[snum].shiptype].armylim );
-        upmax = min( Planets[pnum].armies - MIN_BEAM_ARMIES,
-                     capacity - Ships[snum].armies );
+                        cbShipTypes[cbShips[snum].shiptype].armylim );
+        upmax = min( cbPlanets[pnum].armies - MIN_BEAM_ARMIES,
+                     capacity - cbShips[snum].armies );
     }
 
     /* If there are armies to beam but we're selfwar... */
-    if ( upmax > 0 && selfwar(snum) && Ships[snum].team == Planets[pnum].team )
+    if ( upmax > 0 && selfwar(snum) && cbShips[snum].team == cbPlanets[pnum].team )
     {
         if ( downmax <= 0 )
 	{
@@ -1931,11 +1931,11 @@ static void _dobeam(char *buf, int ch)
 
     /* start the effects */
     if (dirup)
-        cqsEffectPlay(cqsTeamEffects[Ships[Context.snum].team].beamu,
+        cqsEffectPlay(cqsTeamEffects[cbShips[Context.snum].team].beamu,
                       &beamHandle,
                       0, 0, 0);
     else
-        cqsEffectPlay(cqsTeamEffects[Ships[Context.snum].team].beamd,
+        cqsEffectPlay(cqsTeamEffects[cbShips[Context.snum].team].beamd,
                       &beamHandle,
                       0, 0, 0);
 
@@ -1993,7 +1993,7 @@ static void command( int ch )
         _dowarp( Context.snum, x );
         break;
     case 'a':				/* autopilot */
-        if ( UAUTOPILOT(Ships[Context.snum].unum) )
+        if ( UAUTOPILOT(cbShips[Context.snum].unum) )
 	{
             state = S_DOAUTOPILOT;
             prm.preinit = FALSE;
@@ -2153,7 +2153,7 @@ static void command( int ch )
         break;
     case 'N':				/* change pseudonym */
         strcpy(pbuf , "Old pseudonym: ") ;
-        strcat(pbuf , Ships[Context.snum].alias);
+        strcat(pbuf , cbShips[Context.snum].alias);
         cp_putmsg(pbuf, MSG_LIN1);
         state = S_PSEUDO;
         prm.preinit = FALSE;
@@ -2234,8 +2234,8 @@ static void command( int ch )
                 prm.preinit = FALSE;
                 prm.buf = cbuf;
                 prm.buflen = MSGMAXLINE;
-                refitst = Ships[Context.snum].shiptype;
-                sprintf(pbuf, "Refit ship type: %s", ShipTypes[refitst].name);
+                refitst = cbShips[Context.snum].shiptype;
+                sprintf(pbuf, "Refit ship type: %s", cbShipTypes[refitst].name);
                 prm.pbuf = pbuf;
                 prm.terms = TERMS;
                 prm.index = MSG_LIN1;
@@ -2271,7 +2271,7 @@ static void command( int ch )
         setONode(nUserlInit(DSP_NODE_CP, FALSE, Context.snum, FALSE, TRUE));
         break;
     case 'T':				/* team list */
-        setONode(nTeamlInit(DSP_NODE_CP, FALSE, Ships[Context.snum].team));
+        setONode(nTeamlInit(DSP_NODE_CP, FALSE, cbShips[Context.snum].team));
         break;
     case 'u':				/* un-tractor */
         sendCommand(CPCMD_UNTOW, 0);
@@ -2281,7 +2281,7 @@ static void command( int ch )
         break;
     case 'W':				/* war and peace */
         for ( i = 0; i < NUMPLAYERTEAMS; i = i + 1 )
-            twar[i] = Ships[Context.snum].war[i];
+            twar[i] = cbShips[Context.snum].war[i];
 
         state = S_WAR;
         prm.preinit = FALSE;
@@ -2312,7 +2312,7 @@ static void command( int ch )
             if (ncpLRMagFactor - 1 >= -5)
             {
                 ncpLRMagFactor--;
-                cqsEffectPlay(cqsTeamEffects[Ships[snum].team].mag, NULL,
+                cqsEffectPlay(cqsTeamEffects[cbShips[snum].team].mag, NULL,
                               0, 0, 0);
             }
             else
@@ -2325,7 +2325,7 @@ static void command( int ch )
             if (ncpSRMagFactor - 1 >= -5)
             {
                 ncpSRMagFactor--;
-                cqsEffectPlay(cqsTeamEffects[Ships[snum].team].mag, NULL,
+                cqsEffectPlay(cqsTeamEffects[cbShips[snum].team].mag, NULL,
                               0, 0, 0);
             }
             else
@@ -2343,7 +2343,7 @@ static void command( int ch )
             if (ncpLRMagFactor + 1 <= 5)
             {
                 ncpLRMagFactor++;
-                cqsEffectPlay(cqsTeamEffects[Ships[snum].team].mag, NULL,
+                cqsEffectPlay(cqsTeamEffects[cbShips[snum].team].mag, NULL,
                               0, 0, 0);
             }
             else
@@ -2356,7 +2356,7 @@ static void command( int ch )
             if (ncpSRMagFactor + 1 <= 5)
             {
                 ncpSRMagFactor++;
-                cqsEffectPlay(cqsTeamEffects[Ships[snum].team].mag, NULL,
+                cqsEffectPlay(cqsTeamEffects[cbShips[snum].team].mag, NULL,
                               0, 0, 0);
             }
             else
@@ -2369,9 +2369,9 @@ static void command( int ch )
 
     case '?':				/* planet list */
         if (Context.snum >= 0 && Context.snum < MAXSHIPS)
-            setONode(nPlanetlInit(DSP_NODE_CP, FALSE, Context.snum, Ships[Context.snum].team));
+            setONode(nPlanetlInit(DSP_NODE_CP, FALSE, Context.snum, cbShips[Context.snum].team));
         else          /* then use user team if user doen't have a ship yet */
-            setONode(nPlanetlInit(DSP_NODE_CP, FALSE, Context.snum, Users[Context.unum].team));
+            setONode(nPlanetlInit(DSP_NODE_CP, FALSE, Context.snum, cbUsers[Context.unum].team));
         break;
     case TERM_REDRAW:			/* clear all the prompts */
         hudClearPrompt(MSG_LIN1);
@@ -2484,12 +2484,12 @@ static void themes()
         if (i == snum)
             continue;               /* don't care about our ship */
 
-        if ( Ships[i].status != SS_LIVE )
+        if ( cbShips[i].status != SS_LIVE )
             continue;               /* don't care about the non-living */
 
         /* check range */
-        dis = distf( Ships[snum].x, Ships[snum].y,
-                     Ships[i].x, Ships[i].y );
+        dis = distf( cbShips[snum].x, cbShips[snum].y,
+                     cbShips[i].x, cbShips[i].y );
 
         if (atwar && (dis > BATTLE_MAXDIS || dis < BATTLE_MINDIS))
         {
@@ -2524,10 +2524,10 @@ static void themes()
         if (atwar)
         {
             warlike = TRUE;
-            mus = cqsTeamMusic[Ships[i].team].battle;
+            mus = cqsTeamMusic[cbShips[i].team].battle;
         }
-        else if (!warlike /*&& Ships[Context.snum].team == Ships[i].team*/)
-            mus = cqsTeamMusic[Ships[i].team].approach;
+        else if (!warlike /*&& cbShips[Context.snum].team == cbShips[i].team*/)
+            mus = cqsTeamMusic[cbShips[i].team].approach;
     }
 
     /* now, either we found some theme music to play or we didn't.  If we
@@ -2579,11 +2579,11 @@ static void themes()
 
 static void doomsday_theme (void)
 {
-    real dis = dist( Ships[Context.snum].x, Ships[Context.snum].y,
-                     Doomsday->x, Doomsday->y );
+    real dis = dist( cbShips[Context.snum].x, cbShips[Context.snum].y,
+                     cbDoomsday->x, cbDoomsday->y );
     static int first_doom = 0;
 
-    if (Doomsday->status != DS_LIVE)
+    if (cbDoomsday->status != DS_LIVE)
         return;
 
     /* doomsday music theme for ships nearby */
@@ -2594,7 +2594,7 @@ static void doomsday_theme (void)
         cqsMusicPlay(cqsDoomsdayMusic.doomin, FALSE);
         first_doom = 2;                                                                     /* intro music only plays once */
     }
-    else if (Ships[Context.snum].sdfuse > 0 &&
+    else if (cbShips[Context.snum].sdfuse > 0 &&
              dis < DOOM_KILLDIS && first_doom != 3)
     {                           /* self destructing & doom < 1000.0 */
         /*
@@ -2628,8 +2628,8 @@ void nCPInit(int istopnode)
 
     /* init timers */
     rftime = frameTime;
-    lastblast = Ships[Context.snum].lastblast;
-    lastphase = Ships[Context.snum].lastphase;
+    lastblast = cbShips[Context.snum].lastblast;
+    lastphase = cbShips[Context.snum].lastphase;
     pingPending = FALSE;
     pingStart = 0;
 
@@ -2665,7 +2665,7 @@ void nCPInit(int istopnode)
             char nm[CQI_NAMELEN];
 
             snprintf(nm, CQI_NAMELEN, "ship%c-torp",
-                     Teams[i].name[0]);
+                     cbTeams[i].name[0]);
 
             if (!animInitState(nm, &ncpTorpAnims[i], NULL))
                 utLog("%s: failed to init animstate for animation '%s'",
@@ -2684,11 +2684,11 @@ void nCPInit(int istopnode)
 
     /* only if we are running this as a topnode frpm nPlay
        do we want to do this */
-    if (istopnode && !introsPlayed[Ships[Context.snum].team])
+    if (istopnode && !introsPlayed[cbShips[Context.snum].team])
     {
-        introsPlayed[Ships[Context.snum].team] = TRUE;
+        introsPlayed[cbShips[Context.snum].team] = TRUE;
         snprintf(buf, CQI_NAMELEN, "ship%c-intro",
-                 Teams[Ships[Context.snum].team].name[0]);
+                 cbTeams[cbShips[Context.snum].team].name[0]);
         cqsMusicPlay(cqsFindMusic(buf), FALSE);
     }
     else if (istopnode)
@@ -2696,7 +2696,7 @@ void nCPInit(int istopnode)
                                    we've already done the intro music
                                    for this team. */
         snprintf(buf, CQI_NAMELEN, "ship%c-theme",
-                 Teams[Ships[Context.snum].team].name[0]);
+                 cbTeams[cbShips[Context.snum].team].name[0]);
         cqsMusicPlay(cqsFindMusic(buf), FALSE);
     }
     /* else, don't start playing anything */
@@ -2705,7 +2705,7 @@ void nCPInit(int istopnode)
 
     /* init this so the warp effects don't kick in incorrectly */
     if (istopnode)
-        Ships[Context.snum].dwarp = -1;
+        cbShips[Context.snum].dwarp = -1;
 
     return;
 }
@@ -2791,7 +2791,7 @@ static int nCPIdle(void)
     if (pkttype < 0)          /* some error */
     {
         utLog("nCPIdle: pktWaitForPacket returned %d", pkttype);
-        Ships[Context.snum].status = SS_OFF;
+        cbShips[Context.snum].status = SS_OFF;
         return NODE_EXIT;
     }
 
@@ -2890,12 +2890,12 @@ static int nCPIdle(void)
     if (Context.msgok)
     {
         if (difftime >= NEWMSG_GRAND)
-            if ( utGetMsg(Context.snum, &Ships[Context.snum].lastmsg))
+            if ( utGetMsg(Context.snum, &cbShips[Context.snum].lastmsg))
             {
-                rmesg(Context.snum, Ships[Context.snum].lastmsg, MSG_MSG);
+                rmesg(Context.snum, cbShips[Context.snum].lastmsg, MSG_MSG);
                 // only beep if the message wasn't from us...
-                if (!(Msgs[Ships[Context.snum].lastmsg].from == MSG_FROM_SHIP
-                      && (int)Msgs[Ships[Context.snum].lastmsg].fromDetail == Context.snum) )
+                if (!(cbMsgs[cbShips[Context.snum].lastmsg].from == MSG_FROM_SHIP
+                      && (int)cbMsgs[cbShips[Context.snum].lastmsg].fromDetail == Context.snum) )
                 {
                     if (UserConf.MessageBell)
                         mglBeep(MGL_BEEP_MSG);
@@ -3350,15 +3350,15 @@ static int nCPInput(int ch)
                     cwar = 0;
                     for ( i = 0; i < NUMPLAYERTEAMS; i = i + 1 )
                     {
-                        if ( twar[i] && ! Ships[snum].war[i] )
+                        if ( twar[i] && ! cbShips[snum].war[i] )
                             dowait = TRUE;
 
                         if (twar[i])
                             cwar |= (1 << i);
 
                         /* we'll let it happen locally as well... */
-                        Users[Ships[Context.snum].unum].war[i] = twar[i];
-                        Ships[Context.snum].war[i] = twar[i];
+                        cbUsers[cbShips[Context.snum].unum].war[i] = twar[i];
+                        cbShips[Context.snum].war[i] = twar[i];
                     }
 
                     hudClearPrompt(MSG_LIN1);
@@ -3389,9 +3389,9 @@ static int nCPInput(int ch)
             {
                 prm.buf[0] = 0;
                 for ( i = 0; i < NUMPLAYERTEAMS; i = i + 1 )
-                    if ( ch == (char)tolower( Teams[i].teamchar ) )
+                    if ( ch == (char)tolower( cbTeams[i].teamchar ) )
                     {
-                        if ( ! twar[i] || ! Ships[Context.snum].rwar[i] )
+                        if ( ! twar[i] || ! cbShips[Context.snum].rwar[i] )
                             twar[i] = ! twar[i];
                         prm.pbuf = clbWarPrompt(Context.snum, twar);
                         hudSetPrompt(prm.index, prm.pbuf, NoColor, prm.buf, NoColor);
@@ -3443,7 +3443,7 @@ static int nCPInput(int ch)
                 case TERM_EXTRA:
                     refitst = utModPlusOne( refitst + 1, MAXNUMSHIPTYPES );
                     sprintf(pbuf, "Refit ship type: %s",
-                            ShipTypes[refitst].name);
+                            cbShipTypes[refitst].name);
                     prm.buf[0] = 0;
                     hudSetPrompt(prm.index, prm.pbuf, NoColor, prm.buf, NoColor);
 

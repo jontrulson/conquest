@@ -76,8 +76,8 @@ void display( int snum )
 
         if (UserConf.DoLocalLRScan)
 	{
-            cenx = Ships[snum].x;
-            ceny = Ships[snum].y;
+            cenx = cbShips[snum].x;
+            ceny = cbShips[snum].y;
 	}
         else
 	{
@@ -89,12 +89,12 @@ void display( int snum )
     {
         scale = SCALE_FAC;
         if (snum == DISPLAY_DOOMSDAY) { /* dwp */
-            cenx = Doomsday->x;
-            ceny = Doomsday->y;
+            cenx = cbDoomsday->x;
+            ceny = cbDoomsday->y;
         }
         else {
-            cenx = Ships[snum].x;
-            ceny = Ships[snum].y;
+            cenx = cbShips[snum].x;
+            ceny = cbShips[snum].y;
         }
     }
 
@@ -103,50 +103,50 @@ void display( int snum )
     {
         if ( ! PVISIBLE(i) )
             continue;
-        if ( !GLcvtcoords( cenx, ceny, Planets[i].x, Planets[i].y, -scale,
+        if ( !GLcvtcoords( cenx, ceny, cbPlanets[i].x, cbPlanets[i].y, -scale,
                            &glx, &gly ))
             continue;
 
         palertcol = 0;
         /* determine alertlevel for object */
-        if (snum >= 0 && clbSPWar( snum, i ) && Planets[i].scanned[Ships[snum].team])
+        if (snum >= 0 && clbSPWar( snum, i ) && cbPlanets[i].scanned[cbShips[snum].team])
 	{
             palertcol = RedLevelColor;
 	}
-        else if (snum >= 0 && Planets[i].team == Ships[snum].team && !selfwar(snum))
+        else if (snum >= 0 && cbPlanets[i].team == cbShips[snum].team && !selfwar(snum))
 	{
             palertcol = GreenLevelColor;
 	}
-        else if ( snum >= 0 && Planets[i].team == TEAM_SELFRULED &&
-                  Planets[i].scanned[Ships[snum].team])
+        else if ( snum >= 0 && cbPlanets[i].team == TEAM_SELFRULED &&
+                  cbPlanets[i].scanned[cbShips[snum].team])
             palertcol = CyanColor;
         else
         {
-            if (Planets[i].scanned[Ships[snum].team])
+            if (cbPlanets[i].scanned[cbShips[snum].team])
                 palertcol = YellowLevelColor;
             else
                 palertcol = NoColor | CQC_A_DIM;
         }
         /* suns are always yellow level material */
-        if (Planets[i].type == PLANET_SUN)
+        if (cbPlanets[i].type == PLANET_SUN)
             palertcol = YellowLevelColor;
 
         drawPlanet(glx, gly, i, scale, palertcol);
     }
 
     /* Display the planet eater. */
-    if ( Doomsday->status == DS_LIVE )
+    if ( cbDoomsday->status == DS_LIVE )
     {
-        if (GLcvtcoords( cenx, ceny, Doomsday->x, Doomsday->y, -scale,
+        if (GLcvtcoords( cenx, ceny, cbDoomsday->x, cbDoomsday->y, -scale,
                          &glx, &gly ))
 	{
-            drawDoomsday(glx, gly, (GLfloat)Doomsday->heading, scale);
+            drawDoomsday(glx, gly, (GLfloat)cbDoomsday->heading, scale);
 	}
     }
 
     /* Display the ships. */
     for ( i = 0; i < MAXSHIPS; i++ )
-        if ( Ships[i].status != SS_OFF )
+        if ( cbShips[i].status != SS_OFF )
         {
             if (UserConf.DoLRTorpScan)
             {
@@ -154,14 +154,14 @@ void display( int snum )
                 if (lsmap)
                 {
                     if (snum >= 0 && ((snum == i) ||
-                                     (Ships[snum].war[Ships[i].team] == FALSE &&
-                                      Ships[i].war[Ships[snum].team] == FALSE)) )
+                                     (cbShips[snum].war[cbShips[i].team] == FALSE &&
+                                      cbShips[i].war[cbShips[snum].team] == FALSE)) )
                     {
                         for ( j = 0; j < MAXTORPS; j = j + 1 )
-                            if ( Ships[i].torps[j].status == TS_LIVE
-                                 || Ships[i].torps[j].status == TS_DETONATE )
-                                if ( GLcvtcoords( cenx, ceny, Ships[i].torps[j].x,
-                                                  Ships[i].torps[j].y, -scale,
+                            if ( cbShips[i].torps[j].status == TS_LIVE
+                                 || cbShips[i].torps[j].status == TS_DETONATE )
+                                if ( GLcvtcoords( cenx, ceny, cbShips[i].torps[j].x,
+                                                  cbShips[i].torps[j].y, -scale,
                                                   &glx, &gly ) )
                                 {
                                     drawTorp(glx, gly, scale, i, j);
@@ -171,12 +171,12 @@ void display( int snum )
             }
 
             /* Display the ships. */
-            if ( Ships[i].status == SS_LIVE )
+            if ( cbShips[i].status == SS_LIVE )
             {
                 /* It's alive. */
                 if ( snum >= 0)	/* it's a ship view */
                 {
-                    dis = (real) dist(Ships[snum].x, Ships[snum].y, Ships[i].x, Ships[i].y );
+                    dis = (real) dist(cbShips[snum].x, cbShips[snum].y, cbShips[i].x, cbShips[i].y );
 
                     /* Here's where ship to ship accurate information is
                        "gathered". */
@@ -189,7 +189,7 @@ void display( int snum )
                             /* 1/6/94 */
                             /* we want any cloaked ship at warp 0.0 */
                             /* to be invisible. */
-                            if (SCLOAKED(i) && Ships[i].warp == 0.0)
+                            if (SCLOAKED(i) && cbShips[i].warp == 0.0)
                             {
                                 /* skip to next ship. this one isn't here */
                                 /* ;-} */
@@ -205,7 +205,7 @@ void display( int snum )
                             }
                             if ( dis < minsdis )
                                 if ( ! selfwar( snum ) )
-                                    if ( Ships[i].scanned[Ships[snum].team] > 0 )
+                                    if ( cbShips[i].scanned[cbShips[snum].team] > 0 )
                                     {
                                         /* New nearest scanned enemy. */
                                         minsdis = dis;
@@ -230,7 +230,7 @@ void display( int snum )
                 {
                     /* ... especially if he's in the bounds of our current */
                     /*  display (either tactical or strategic map) */
-                    if (GLcvtcoords( cenx, ceny, Ships[i].x, Ships[i].y,
+                    if (GLcvtcoords( cenx, ceny, cbShips[i].x, cbShips[i].y,
                                      -scale, &glx, &gly ))
                     {
                         /* He's on the screen. */
@@ -244,14 +244,14 @@ void display( int snum )
 
                         if ( ( ! lsmap && SSCANDIST(i)) ||
                              ( snum >= 0 && !satwar(i, snum) ) ||
-                             ( snum >= 0 && Ships[i].scanned[Ships[snum].team] &&
+                             ( snum >= 0 && cbShips[i].scanned[cbShips[snum].team] &&
                                !selfwar(snum) ) ||
                              ( dis <= ACCINFO_DIST ) )
                         {
                             if ( snum >= 0 && ( i == snum ) && SCLOAKED(snum) )
                                 ch = CHAR_CLOAKED;
                             else
-                                ch = Teams[Ships[i].team].teamchar;
+                                ch = cbTeams[cbShips[i].team].teamchar;
 
                             /* determine color */
                             if (snum >= 0)
@@ -260,7 +260,7 @@ void display( int snum )
                                     color = CQC_A_BOLD;
                                 else if (satwar(i, snum)) /* we're at war with it */
                                     color = RedLevelColor;
-                                else if (Ships[i].team == Ships[snum].team && !selfwar(snum))
+                                else if (cbShips[i].team == cbShips[snum].team && !selfwar(snum))
                                     color = GreenLevelColor; /* it's a team ship */
                                 else
                                     color = YellowLevelColor;
@@ -268,7 +268,7 @@ void display( int snum )
                             else
                                 color = YellowLevelColor; /* special view */
 
-                            drawShip(glx, gly, Ships[i].head, ch, i, color, scale);
+                            drawShip(glx, gly, cbShips[i].head, ch, i, color, scale);
                             if (SBOMBING(i))
                                 drawBombing(i, scale);
                         }
@@ -285,11 +285,11 @@ void display( int snum )
         /* explosions first */
         if ( snum < 0 || (snum >= 0 && UserConf.DoExplode) ) /* dwp */
             for ( j = 0; j < MAXTORPS; j = j + 1 )
-                if ( Ships[i].torps[j].status == TS_FIREBALL )
+                if ( cbShips[i].torps[j].status == TS_FIREBALL )
                 {
                     /* First display exploding torps. */
-                    if ( GLcvtcoords( cenx, ceny, Ships[i].torps[j].x,
-                                      Ships[i].torps[j].y, -scale, &glx, &gly ))
+                    if ( GLcvtcoords( cenx, ceny, cbShips[i].torps[j].x,
+                                      cbShips[i].torps[j].y, -scale, &glx, &gly ))
                     {
                         drawExplosion(glx, gly, i, j, scale);
                     }
@@ -299,10 +299,10 @@ void display( int snum )
 	{
             /* Now display the live torps. */
             for ( j = 0; j < MAXTORPS; j = j + 1 )
-                if ( Ships[i].status != SS_DYING && Ships[i].status != SS_DEAD &&
-                     (Ships[i].torps[j].status == TS_LIVE || Ships[i].torps[j].status == TS_DETONATE) )
-                    if (GLcvtcoords( cenx, ceny, Ships[i].torps[j].x,
-                                     Ships[i].torps[j].y, -scale, &glx, &gly))
+                if ( cbShips[i].status != SS_DYING && cbShips[i].status != SS_DEAD &&
+                     (cbShips[i].torps[j].status == TS_LIVE || cbShips[i].torps[j].status == TS_DETONATE) )
+                    if (GLcvtcoords( cenx, ceny, cbShips[i].torps[j].x,
+                                     cbShips[i].torps[j].y, -scale, &glx, &gly))
                     {
                         drawTorp(glx, gly, scale, i, j);
                     }
@@ -394,10 +394,10 @@ void display( int snum )
         /* Damage/repair. */
         hudSetDamage(snum, &prevdam);
 
-        if ( Ships[snum].damage > prevdam )
+        if ( cbShips[snum].damage > prevdam )
         {
-            if ( (Ships[snum].damage - prevdam) > 5.0 )
-                cqsEffectPlay(cqsTeamEffects[Ships[snum].team].hit, NULL, 0, 0, 0);
+            if ( (cbShips[snum].damage - prevdam) > 5.0 )
+                cqsEffectPlay(cqsTeamEffects[cbShips[snum].team].hit, NULL, 0, 0, 0);
 
             dobeep = TRUE;
         }

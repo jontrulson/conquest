@@ -106,65 +106,65 @@ static void buildai( int snum, int vars[], int *bnenum, real *bdne, real *bane )
     {
         if ( SCLOAKED(*bnenum) )
 	{
-            x = rndnor( Ships[*bnenum].x, CLOAK_SMEAR_DIST );
-            y = rndnor( Ships[*bnenum].y, CLOAK_SMEAR_DIST );
+            x = rndnor( cbShips[*bnenum].x, CLOAK_SMEAR_DIST );
+            y = rndnor( cbShips[*bnenum].y, CLOAK_SMEAR_DIST );
 	}
         else
 	{
-            x = Ships[*bnenum].x;
-            y = Ships[*bnenum].y;
+            x = cbShips[*bnenum].x;
+            y = cbShips[*bnenum].y;
 	}
-        *bdne = dist( Ships[snum].x, Ships[snum].y, x, y );
-        *bane = utAngle( Ships[snum].x, Ships[snum].y, x, y );
+        *bdne = dist( cbShips[snum].x, cbShips[snum].y, x, y );
+        *bane = utAngle( cbShips[snum].x, cbShips[snum].y, x, y );
 
         /* Enemy is cloaked (-) */
         if ( *bdne < ACCINFO_DIST )
 	{
             AIBOOLEAN( vars[VAR_ENEMYCLOAKED], SCLOAKED(*bnenum));
-            AISCALE( vars[VAR_ENEMYDAMAGE], Ships[*bnenum].damage, 10.0 );
+            AISCALE( vars[VAR_ENEMYDAMAGE], cbShips[*bnenum].damage, 10.0 );
 	}
     }
     AIDIST( vars[VAR_DNE], *bdne );
 
     /* Ship damage (10) */
-    AISCALE( vars[VAR_DAMAGE], Ships[snum].damage, 10.0 );
+    AISCALE( vars[VAR_DAMAGE], cbShips[snum].damage, 10.0 );
 
     /* Possible ship damage from enemy torps (10) */
     if ( STALERT(snum) )
     {
         dam = 0.0;
         for ( i = 0; i < MAXSHIPS; i++ )
-            if ( Ships[i].status != SS_OFF && i != snum )
+            if ( cbShips[i].status != SS_OFF && i != snum )
                 for ( j = 0; j < MAXTORPS; j = j + 1 )
-                    if ( Ships[i].torps[j].status == TS_LIVE )
-                        if ( Ships[i].torps[j].war[Ships[snum].team] || Ships[snum].war[Ships[i].team] )
+                    if ( cbShips[i].torps[j].status == TS_LIVE )
+                        if ( cbShips[i].torps[j].war[cbShips[snum].team] || cbShips[snum].war[cbShips[i].team] )
                         {
                             /* Just guess at other ships efficiency. */
                             dam = dam + utExplosionHits(
-                                TORPEDO_HIT * 1.1 * ShipTypes[Ships[i].shiptype].weafac,
-                                dist(Ships[snum].x,Ships[snum].y,Ships[i].torps[j].x,Ships[i].torps[j].y) );
+                                TORPEDO_HIT * 1.1 * cbShipTypes[cbShips[i].shiptype].weafac,
+                                dist(cbShips[snum].x,cbShips[snum].y,cbShips[i].torps[j].x,cbShips[i].torps[j].y) );
                         }
         AISCALE( vars[VAR_INCOMING], dam, 10.0 );
     }
 
     /* Ship fuel (10) */
-    AISCALE( vars[VAR_FUEL], Ships[snum].fuel, 100.0 );
+    AISCALE( vars[VAR_FUEL], cbShips[snum].fuel, 100.0 );
 
     /* Number of torps available to fire (1) */
     j = 0;
     for ( i = 0; i < MAXTORPS; i = i + 1 )
-        if ( Ships[snum].torps[i].status == TS_OFF )
+        if ( cbShips[snum].torps[i].status == TS_OFF )
             j = j + 1;
     AISCALE( vars[VAR_NUMTORPS], j, 1.0 );
 
     /* Ship shields (10) */
-    AISCALE( vars[VAR_SHIELDS], Ships[snum].shields, 10.0 );
+    AISCALE( vars[VAR_SHIELDS], cbShips[snum].shields, 10.0 );
 
     /* Ship engine temperature (10) */
-    AISCALE( vars[VAR_ETEMP], Ships[snum].etemp, 10.0 );
+    AISCALE( vars[VAR_ETEMP], cbShips[snum].etemp, 10.0 );
 
     /* Ship weapon temperature (10) */
-    AISCALE( vars[VAR_WTEMP], Ships[snum].wtemp, 10.0 );
+    AISCALE( vars[VAR_WTEMP], cbShips[snum].wtemp, 10.0 );
 
     /* Possible phaser damage to nearest enemy (5) */
     AISCALE( vars[VAR_PHASERDAM], clbPhaserHit( snum, *bdne ), 5.0 );
@@ -174,7 +174,7 @@ static void buildai( int snum, int vars[], int *bnenum, real *bdne, real *bane )
              utExplosionHits( TORPEDO_HIT * weaeff( snum ), (*bdne)*0.66 ), 5.0 );
 
     /* Ship warp (1) */
-    AISCALE( vars[VAR_WARP], Ships[snum].dwarp, 1.0 );
+    AISCALE( vars[VAR_WARP], cbShips[snum].dwarp, 1.0 );
 
     /* Ship shields are up (-) */
     AIBOOLEAN( vars[VAR_SHUP], SSHUP(snum) );
@@ -186,13 +186,13 @@ static void buildai( int snum, int vars[], int *bnenum, real *bdne, real *bane )
     AIBOOLEAN( vars[VAR_CLOAKED], SCLOAKED(snum) );
 
     /* Weapons are allocated (-) */
-    AIBOOLEAN( vars[VAR_WALLOC], Ships[snum].weapalloc > 50 );
+    AIBOOLEAN( vars[VAR_WALLOC], cbShips[snum].weapalloc > 50 );
 
     /* Are in orbit (-) */
-    AIBOOLEAN( vars[VAR_ORBITING], Ships[snum].warp < 0.0 );
+    AIBOOLEAN( vars[VAR_ORBITING], cbShips[snum].warp < 0.0 );
 
     /* Can read a message (-) */
-    AIBOOLEAN( vars[VAR_CANREAD], Ships[snum].lastmsg != ConqInfo->lastmsg );
+    AIBOOLEAN( vars[VAR_CANREAD], cbShips[snum].lastmsg != cbConqInfo->lastmsg );
 
     return;
 
@@ -208,21 +208,21 @@ void defend( int attacker, int pnum )
     int i, j, k, team, snum, unum;
     char buf[MSGMAXLINE];
 
-    team = Planets[pnum].team;
+    team = cbPlanets[pnum].team;
     /* Must be for a "fighting" team. */
     if ( team < 0 || team >= NUMPLAYERTEAMS )
         return;
 
     // must be a home planet, and the planet's defendteam must equal
     // the team currently occupying the planet
-    if (!(PHOMEPLANET(pnum) && Planets[pnum].defendteam == team))
+    if (!(PHOMEPLANET(pnum) && cbPlanets[pnum].defendteam == team))
         return;
 
     /* See if there are any team ships to defend. */
     for ( i = 0; i < MAXSHIPS; i++ )
-        if ( Ships[i].status == SS_LIVE ) /* live */
-            if ( Ships[i].team == team ) /* same team */
-                if (UROBOT(Ships[i].unum) || !SVACANT(i))
+        if ( cbShips[i].status == SS_LIVE ) /* live */
+            if ( cbShips[i].team == team ) /* same team */
+                if (UROBOT(cbShips[i].unum) || !SVACANT(i))
                 {   /* robot or non-vacant human */
                     return;
                 }
@@ -231,7 +231,7 @@ void defend( int attacker, int pnum )
     j = 0;
     for ( i = 0; i < MAXUSERS; i++ )
         if ( ULIVE(i) )
-            if ( UROBOT(i) && Users[i].team == team && !UBANNED(i) )
+            if ( UROBOT(i) && cbUsers[i].team == team && !UBANNED(i) )
                 j++;
 
     /* No one to defend. */
@@ -244,7 +244,7 @@ void defend( int attacker, int pnum )
     j = 0;
     for ( i = 0; i < MAXUSERS; i++ )
         if ( ULIVE(i) )
-            if ( UROBOT(i) && Users[i].team == team && !UBANNED(i) )
+            if ( UROBOT(i) && cbUsers[i].team == team && !UBANNED(i) )
             {
                 j++;
                 if ( j == k )
@@ -263,7 +263,7 @@ void defend( int attacker, int pnum )
     {
         sprintf( buf,
                  "WARNING: You have violated %s space; prepare to die.",
-                 Teams[team].name );
+                 cbTeams[team].name );
         clbStoreMsg( MSG_FROM_SHIP, snum, MSG_TO_SHIP, attacker, buf );
     }
 
@@ -307,38 +307,38 @@ static void executeai( int snum, int token )
     /* SETWARP( warp ) */
 #define SETWARP(x)                                      \
     {                                                   \
-	if ( Ships[snum].warp < 0.0 )                   \
+	if ( cbShips[snum].warp < 0.0 )                   \
 	{                                               \
             /* Break orbit. */                          \
-            Ships[snum].warp = 0.0;                     \
-            Ships[snum].lock = LOCK_NONE;                       \
-            Ships[snum].dhead = Ships[snum].head;       \
+            cbShips[snum].warp = 0.0;                     \
+            cbShips[snum].lock = LOCK_NONE;                       \
+            cbShips[snum].dhead = cbShips[snum].head;       \
 	}                                               \
 	if ( (x) > 0.0 )                                \
             SFCLR(snum, SHIP_F_REPAIR);                 \
-	Ships[snum].dwarp = (x);                        \
+	cbShips[snum].dwarp = (x);                        \
     }
 
     /* SETCOURSE( course ) */
 #define SETCOURSE(x)                                                    \
     {                                                                   \
-        if ( Ships[snum].warp < 0.0 )                                   \
-            Ships[snum].warp = 0.0; /* break orbit */                   \
-        Ships[snum].lock = LOCK_NONE;                                   \
-        Ships[snum].dhead = (x);                                        \
+        if ( cbShips[snum].warp < 0.0 )                                   \
+            cbShips[snum].warp = 0.0; /* break orbit */                   \
+        cbShips[snum].lock = LOCK_NONE;                                   \
+        cbShips[snum].dhead = (x);                                        \
     }
 
     /* SETLOCK( pnum ) */
 #define SETLOCK(x)                                                      \
     {                                                                   \
-        if ( !(Ships[snum].lock == LOCK_PLANET                          \
-               && Ships[snum].lockDetail == (uint16_t)(x) ) )           \
+        if ( !(cbShips[snum].lock == LOCK_PLANET                          \
+               && cbShips[snum].lockDetail == (uint16_t)(x) ) )           \
         {                                                               \
             /* Don't break orbit to unless we're not there yet. */      \
-            if ( Ships[snum].warp < 0.0 )                               \
-                Ships[snum].warp = 0.0;                                 \
-            Ships[snum].lock = LOCK_PLANET;                             \
-            Ships[snum].lockDetail = (x);                               \
+            if ( cbShips[snum].warp < 0.0 )                               \
+                cbShips[snum].warp = 0.0;                                 \
+            cbShips[snum].lock = LOCK_PLANET;                             \
+            cbShips[snum].lockDetail = (x);                               \
         }                                                               \
     }
 
@@ -346,7 +346,7 @@ static void executeai( int snum, int token )
     char buf[BUFFER_SIZE_128];
 
     /* Update ship action. */
-    Ships[snum].action = token;
+    cbShips[snum].action = token;
 
     /* Execute the action! */
     switch ( token )
@@ -373,9 +373,9 @@ static void executeai( int snum, int token )
             SETLOCK( i );
         break;
     case ROB_ALLOCATE:
-        i = Ships[snum].weapalloc;
-        Ships[snum].weapalloc = Ships[snum].engalloc;
-        Ships[snum].engalloc = i;
+        i = cbShips[snum].weapalloc;
+        cbShips[snum].weapalloc = cbShips[snum].engalloc;
+        cbShips[snum].engalloc = i;
         break;
     case ROB_PHASER:
         clbPhaser( snum, ane );
@@ -412,7 +412,7 @@ static void executeai( int snum, int token )
         break;
     case ROB_SILENT:
         if ( ! SCLOAKED(snum) )
-            Ships[snum].dwarp = 0.0;
+            cbShips[snum].dwarp = 0.0;
         if (SCLOAKED(snum))
             SFCLR(snum, SHIP_F_CLOAKED);
         else
@@ -425,14 +425,14 @@ static void executeai( int snum, int token )
         break;
     case ROB_READMSG:
         /* Try to read a message and reply to it */
-        while ( Ships[snum].lastmsg != ConqInfo->lastmsg )
+        while ( cbShips[snum].lastmsg != cbConqInfo->lastmsg )
         {
-            Ships[snum].lastmsg = utModPlusOne( Ships[snum].lastmsg + 1, MAXMESSAGES );
-            i = Ships[snum].lastmsg;
+            cbShips[snum].lastmsg = utModPlusOne( cbShips[snum].lastmsg + 1, MAXMESSAGES );
+            i = cbShips[snum].lastmsg;
             if ( clbCanRead( snum, i ) )
             {
-                msgFrom_t from = Msgs[i].from;
-                uint16_t fromDetail = Msgs[i].fromDetail;
+                msgFrom_t from = cbMsgs[i].from;
+                uint16_t fromDetail = cbMsgs[i].fromDetail;
 
                 // we will only ever respond to living ships
                 if (from == MSG_FROM_SHIP && fromDetail < MAXSHIPS &&
@@ -466,11 +466,11 @@ static void executeai( int snum, int token )
         break;
     case ROB_UNTRACTOR:
         /* Only attempt to untractor if we don't have to delay. */
-        if ( Ships[snum].towedby != 0 )
-            if ( ! satwar(snum, Ships[snum].towedby) )
+        if ( cbShips[snum].towedby != 0 )
+            if ( ! satwar(snum, cbShips[snum].towedby) )
             {
-                Ships[Ships[snum].towedby].towing = 0;
-                Ships[snum].towedby = 0;
+                cbShips[cbShips[snum].towedby].towing = 0;
+                cbShips[snum].towedby = 0;
             }
         break;
     case ROB_REPAIR:
@@ -503,7 +503,7 @@ int newrob( int *snum, int unum )
         return ( FALSE );
 
     /* MAke sure we are a builtin. */
-    if ( Users[unum].type != USERTYPE_BUILTIN )
+    if ( cbUsers[unum].type != USERTYPE_BUILTIN )
         return ( FALSE );
 
     /* Can't do anything with out a ship. */
@@ -511,16 +511,16 @@ int newrob( int *snum, int unum )
         return ( FALSE );
 
     /* Show intent to fly. */
-    cbLock(&ConqInfo->lockword);
-    Ships[*snum].status = SS_ENTERING;
-    cbUnlock(&ConqInfo->lockword);
+    cbLock(&cbConqInfo->lockword);
+    cbShips[*snum].status = SS_ENTERING;
+    cbUnlock(&cbConqInfo->lockword);
 
     // make sure we got it...
-    if ( Ships[*snum].status == SS_OFF )
+    if ( cbShips[*snum].status == SS_OFF )
         return ( FALSE );
 
     /* Initialize the ship. */
-    cbLock(&ConqInfo->lockword);
+    cbLock(&cbConqInfo->lockword);
 
     clbInitShip( *snum, unum );
     SFSET(*snum, SHIP_F_ROBOT);			/* we're a robot */
@@ -531,47 +531,47 @@ int newrob( int *snum, int unum )
     if (SysConf.DoRandomRobotKills == TRUE)
     {
         /* randomize the robot's 'strength' */
-        Ships[*snum].strkills =
+        cbShips[*snum].strkills =
             rnduni(0.0, (DOUBLE_E_KILLS - (DOUBLE_E_KILLS / 4.0)));
 
     }
 
     /* Initialize the things that aren't done by clbInitShip(). */
-    Ships[*snum].unum = unum;
-    Ships[*snum].team = Users[unum].team;
+    cbShips[*snum].unum = unum;
+    cbShips[*snum].team = cbUsers[unum].team;
 
     if (SysConf.AllowRefits)
-        Ships[*snum].shiptype = rndint( 0, MAXNUMSHIPTYPES - 1 );
+        cbShips[*snum].shiptype = rndint( 0, MAXNUMSHIPTYPES - 1 );
     else
-        Ships[*snum].shiptype = Teams[Ships[*snum].team].shiptype;
+        cbShips[*snum].shiptype = cbTeams[cbShips[*snum].team].shiptype;
 
-    Ships[*snum].sdfuse = 0;
-    Ships[*snum].pid = 0;
+    cbShips[*snum].sdfuse = 0;
+    cbShips[*snum].pid = 0;
 
     /* randomize it's desired heading */
-    Ships[*snum].dhead = rnduni(0.0, 359.9);
+    cbShips[*snum].dhead = rnduni(0.0, 359.9);
 
     /* robots now can use 30/70
        instead of the default 40/60 set in
        clbInitShip(). */
-    Ships[*snum].weapalloc = 30;
-    Ships[*snum].engalloc = 100 - Ships[*snum].weapalloc;
+    cbShips[*snum].weapalloc = 30;
+    cbShips[*snum].engalloc = 100 - cbShips[*snum].weapalloc;
 
     for ( i = 0; i < NUMPLAYERTEAMS; i = i + 1 )
     {
         /* Robots are peace (and fun) loving. */
-        Ships[*snum].rwar[i] = FALSE;
-        Ships[*snum].war[i] = FALSE;
+        cbShips[*snum].rwar[i] = FALSE;
+        cbShips[*snum].war[i] = FALSE;
     }
-    utStrncpy ( Ships[*snum].alias, Users[unum].alias, MAXUSERNAME );
+    utStrncpy ( cbShips[*snum].alias, cbUsers[unum].alias, MAXUSERNAME );
 
     /* Place the ship. */
-    if (!clbFindTeamHomeSun(Ships[*snum].team, &i))
-        i = Teams[Ships[*snum].team].homeplanet;
-    clbPutShip( *snum, Planets[i].x, Planets[i].y );
+    if (!clbFindTeamHomeSun(cbShips[*snum].team, &i))
+        i = cbTeams[cbShips[*snum].team].homeplanet;
+    clbPutShip( *snum, cbPlanets[i].x, cbPlanets[i].y );
     clbFixDeltas( *snum );
-    Ships[*snum].status = SS_LIVE;
-    cbUnlock(&ConqInfo->lockword);
+    cbShips[*snum].status = SS_LIVE;
+    cbUnlock(&cbConqInfo->lockword);
 
     return ( TRUE );
 
@@ -604,14 +604,14 @@ void robotai( int snum )
 
     /* Get final cpu time and add things in. */
     gcputime( &j );
-    ConqInfo->raccum = ConqInfo->raccum + j - i;
-    if ( ConqInfo->raccum > 100 )
+    cbConqInfo->raccum = cbConqInfo->raccum + j - i;
+    if ( cbConqInfo->raccum > 100 )
     {
         /* Accumulated a cpu second. */
-        ConqInfo->rcpuseconds = ConqInfo->rcpuseconds + (ConqInfo->raccum / 100);
-        ConqInfo->raccum = mod( ConqInfo->raccum, 100 );
+        cbConqInfo->rcpuseconds = cbConqInfo->rcpuseconds + (cbConqInfo->raccum / 100);
+        cbConqInfo->raccum = mod( cbConqInfo->raccum, 100 );
     }
-    ConqInfo->relapsedseconds = ConqInfo->relapsedseconds + 1;	/* one more second */
+    cbConqInfo->relapsedseconds = cbConqInfo->relapsedseconds + 1;	/* one more second */
 
     return;
 
@@ -654,7 +654,7 @@ void robotloop(void)
     int s, j;
 
     /* Disable the robot code in conqdriv. */
-    ConqInfo->externrobots = TRUE;
+    cbConqInfo->externrobots = TRUE;
 
     /* Initialize random numbers */
     rndini();
@@ -663,13 +663,13 @@ void robotloop(void)
     for (;;)
     {
         for ( s = 0; s < MAXSHIPS; s++ )
-            if ( Ships[s].status == SS_LIVE )
+            if ( cbShips[s].status == SS_LIVE )
                 if ( SROBOT(s) )
                 {
                     /* This code taken from conqdriv. */
-                    initstats( &Ships[s].ctime, &j );
-                    if ( Ships[s].etime == 0 )
-                        Ships[s].etime = j;
+                    initstats( &cbShips[s].ctime, &j );
+                    if ( cbShips[s].etime == 0 )
+                        cbShips[s].etime = j;
                     trobotai( s );
                     conqstats( s );
                 }
@@ -883,12 +883,12 @@ static int tableai( int vars[] )
     /*  are disabled because of a particular vars() value. */
 
     for ( i = 0; i < MAX_VAR; i = i + 1 )
-        rbits &= Robot->rstrat[i][vars[i]];
+        rbits &= cbRobot->rstrat[i][vars[i]];
 
     /* Find first set rule bit and translate into rule number. */
     if (lib_ffs( 0, 32, rbits, &rule ))
     {
-        token = Robot->rvec[rule];	/* translate rule into action token */
+        token = cbRobot->rvec[rule];	/* translate rule into action token */
     }
     else
         token = ROB_NOOP;

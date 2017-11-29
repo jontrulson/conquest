@@ -22,6 +22,6 @@ typedef struct _cb_global {
 
     int pad[32];
 
-} CBGlobal_t;
+} cbGlobalLimits_t;
 
 #endif /* _CBGLOBAL_H */

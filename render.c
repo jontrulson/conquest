@@ -185,15 +185,15 @@ void updateIconHudGeo(int snum)
     static cqiTextureAreaRec_t defaultTA = { "NULL", 0.0, 0.0, 1.0, 1.0 };
     char buffer[CQI_NAMELEN];
 
-    if (Ships[snum].team != steam)
+    if (cbShips[snum].team != steam)
     {                           /* we switched teams, reload/remap the
                                    decal texareas */
         int ndx;
-        steam = Ships[snum].team;
+        steam = cbShips[snum].team;
 
         /* decal 1 */
         snprintf(buffer, CQI_NAMELEN, "ship%c-ico-decal1",
-                 Teams[steam].name[0]);
+                 cbTeams[steam].name[0]);
 
         /* get decal1 size */
         memset((void*)&decal1_sz, 0, sizeof(GLRect_t));
@@ -228,7 +228,7 @@ void updateIconHudGeo(int snum)
 
         /* decal 2 */
         snprintf(buffer, CQI_NAMELEN, "ship%c-ico-decal2",
-                 Teams[steam].name[0]);
+                 cbTeams[steam].name[0]);
 
         /* get decal2 size */
         memset((void*)&decal2_sz, 0, sizeof(GLRect_t));
@@ -764,7 +764,7 @@ static void renderShieldCharge(void)
 {
     real val;
 
-    val = CLAMP(0.0, 100.0, Ships[Context.snum].shields);
+    val = CLAMP(0.0, 100.0, cbShips[Context.snum].shields);
 
     if (!val)
         return;
@@ -789,10 +789,10 @@ void renderHud(int dostats)
     char fbuf[bufSize];
     int FPS = (int)getFPS();
     cqColor icl;
-    real warp = Ships[Context.snum].warp;
-    real maxwarp = ShipTypes[Ships[Context.snum].shiptype].warplim;
-    int steam = Ships[Context.snum].team;
-    int stype = Ships[Context.snum].shiptype;
+    real warp = cbShips[Context.snum].warp;
+    real maxwarp = cbShipTypes[cbShips[Context.snum].shiptype].warplim;
+    int steam = cbShips[Context.snum].team;
+    int stype = cbShips[Context.snum].shiptype;
     int snum = Context.snum;
     static int oldteam = -1;
     static int rxtime = 0;
@@ -1150,7 +1150,7 @@ void renderHud(int dostats)
     glPushMatrix();
     glTranslatef(o.head.x + (o.head.w / 2.0),
                  o.head.y + (o.head.h / 2.0), 0.0);
-    glRotatef(Ships[snum].head, 0.0, 0.0, -1.0);
+    glRotatef(cbShips[snum].head, 0.0, 0.0, -1.0);
     drawIconHUDDecal(-(o.head.w / 2.0), -(o.head.h / 2.0),
                      o.head.w, o.head.h,
                      TEX_HUD_HDP, icl);
@@ -1288,7 +1288,7 @@ void renderHud(int dostats)
 
         for (i=0; i < MAXTORPS; i++)
         {
-            switch (Ships[snum].torps[i].status)
+            switch (cbShips[snum].torps[i].status)
             {
             case TS_OFF:
                 uiPutColor(GreenColor);
@@ -1322,9 +1322,9 @@ void renderHud(int dostats)
         glColor4fv(GLTEX_COLOR(GLShips[steam][stype].phas).vec);
 
 
-        phasH = (Ships[snum].pfuse <= 0) ? o.d1phcharge.h :
+        phasH = (cbShips[snum].pfuse <= 0) ? o.d1phcharge.h :
             (o.d1phcharge.h - (o.d1phcharge.h / 10.0) *
-             (real)Ships[snum].pfuse);
+             (real)cbShips[snum].pfuse);
 
         drawTexQuad(o.d1phcharge.x, o.d1phcharge.y, 0.0, o.d1phcharge.w, phasH,
                     TRUE, TRUE);
@@ -1338,7 +1338,7 @@ void renderHud(int dostats)
 
     if (snum >= 0 && snum < MAXSHIPS)
     {
-        if (Ships[snum].pfuse > 0)
+        if (cbShips[snum].pfuse > 0)
             drawLineBox(o.d1phcharge.x, o.d1phcharge.y, 0.0,
                         o.d1phcharge.w,
                         o.d1phcharge.h,
@@ -1352,7 +1352,7 @@ void renderHud(int dostats)
 
     /* first update the data if neccessary */
     if (snum >= 0)
-        hudSetInfoFiringAngle(Ships[snum].lastblast);
+        hudSetInfoFiringAngle(cbShips[snum].lastblast);
     hudSetInfoTargetAngle(Context.lasttang);
     hudSetInfoTargetDist(Context.lasttdist);
 

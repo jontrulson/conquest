@@ -34,7 +34,7 @@ int             procTorpEvent(char *buf);
 int             procTeam(char *buf);
 int             procMessage(char *buf);
 int             procServerStat(char *buf);
-int             procConqInfo(char *buf);
+int             proccbConqInfo(char *buf);
 int             procHistory(char *buf);
 int             procDoomsday(char *buf);
 int             procAck(char *buf); /* handles ACK and ACKMSG */
@@ -63,7 +63,7 @@ static dispatchProc_t cprocDispatchTable_0007[] = {
     procAck,                      /* SP_ACKMSG */
     procTeam,                     /* SP_TEAM */
     procTorpLoc,                  /* SP_TORPLOC */
-    procConqInfo,                 /* SP_CONQINFO */
+    proccbConqInfo,                 /* SP_CONQINFO */
     procFrame,                    /* SP_FRAME */
     procHistory,                  /* SP_HISTORY */
     procDoomsday,                 /* SP_DOOMSDAY */

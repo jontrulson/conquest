@@ -66,7 +66,7 @@ static void selectentry( uint8_t esystem )
         if ( owned[i] )
         {
             strcat(cbuf, ", ");
-            strcat(cbuf , Teams[i].name) ;
+            strcat(cbuf , cbTeams[i].name) ;
         }
 
     /* Change first comma to a colon. */
@@ -202,7 +202,7 @@ static int nPlayDisplay(dspConfig_t *dsp)
         case PERR_FLYING:
             sprintf(cbuf, "You're already playing on another ship.");
             cprintf(5,0,ALIGN_CENTER,"#%d#%s",InfoColor, cbuf);
-            Ships[Context.snum].status = SS_RESERVED;
+            cbShips[Context.snum].status = SS_RESERVED;
             break;
 
         default:
@@ -226,7 +226,7 @@ static int nPlayIdle(void)
     if (state == S_DONE)
     {
         Context.entship = TRUE;
-        Ships[Context.snum].sdfuse = 0;       /* zero self destruct fuse */
+        cbShips[Context.snum].sdfuse = 0;       /* zero self destruct fuse */
         utGrand( &Context.msgrand );            /* initialize message timer */
         Context.leave = FALSE;                /* assume we won't want to bail */
         Context.redraw = TRUE;                /* want redraw first time */
@@ -277,13 +277,13 @@ static int nPlayInput(int ch)
             break;
         case TERM_EXTRA:
             /* Enter the home system. */
-            sendCommand(CPCMD_ENTER, (uint16_t)(1 << Ships[Context.snum].team));
+            sendCommand(CPCMD_ENTER, (uint16_t)(1 << cbShips[Context.snum].team));
             state = S_DONE;
             return NODE_OK;
             break;
         default:
             for ( i = 0; i < NUMPLAYERTEAMS; i++ )
-                if ( Teams[i].teamchar == (char)toupper(c) && owned[i] )
+                if ( cbTeams[i].teamchar == (char)toupper(c) && owned[i] )
                 {
                     /* Found a good one. */
                     sendCommand(CPCMD_ENTER, (uint16_t)(1 << i));

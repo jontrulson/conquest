@@ -79,7 +79,7 @@ void mglConqLogo(dspConfig_t *dsp, int mult)
         {
             int ndx;
             snprintf(buffer, CQI_NAMELEN, "conqlogo%c",
-                     Teams[i].name[0]);
+                     cbTeams[i].name[0]);
 
             if ((ndx = findGLTexture(buffer)) >= 0)
             {
@@ -101,19 +101,19 @@ void mglConqLogo(dspConfig_t *dsp, int mult)
 
     /* Cataboligne - new title set */
 
-    if ( logos[Ships[Context.snum].team] && mult)
+    if ( logos[cbShips[Context.snum].team] && mult)
     {
         glBlendFunc(GL_SRC_ALPHA, GL_ONE);
         glEnable(GL_BLEND);
 
         glEnable(GL_TEXTURE_2D);
 
-        glBindTexture(GL_TEXTURE_2D, logos[Ships[Context.snum].team]);
+        glBindTexture(GL_TEXTURE_2D, logos[cbShips[Context.snum].team]);
 
-        glColor4f(colors[Ships[Context.snum].team].r,
-                  colors[Ships[Context.snum].team].g,
-                  colors[Ships[Context.snum].team].b,
-                  colors[Ships[Context.snum].team].a);
+        glColor4f(colors[cbShips[Context.snum].team].r,
+                  colors[cbShips[Context.snum].team].g,
+                  colors[cbShips[Context.snum].team].b,
+                  colors[cbShips[Context.snum].team].a);
 
         drawTexQuad(x, y, 0.0, w, h, TRUE, FALSE);
 

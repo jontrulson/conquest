@@ -25,11 +25,11 @@ typedef enum {
 #define USER_F_ROBOT         0x0002
 
 // helpers
-#define ULIVE(x)             ( Users[(x)].flags & USER_F_LIVE )
-#define UROBOT(x)            ( Users[(x)].flags & USER_F_ROBOT )
+#define ULIVE(x)             ( cbUsers[(x)].flags & USER_F_LIVE )
+#define UROBOT(x)            ( cbUsers[(x)].flags & USER_F_ROBOT )
 
-#define UFSET(x, b)          ( Users[(x)].flags |=  (b) )
-#define UFCLR(x, b)          ( Users[(x)].flags &= ~(b) )
+#define UFSET(x, b)          ( cbUsers[(x)].flags |=  (b) )
+#define UFCLR(x, b)          ( cbUsers[(x)].flags &= ~(b) )
 
 // Operator set flags
 #define USER_OP_NONE           0x0000
@@ -38,13 +38,13 @@ typedef enum {
 #define USER_OP_ISOPER         0x0004 // conquest operator privilege
 #define USER_OP_AUTOPILOT      0x0008 // Can enable autopilot (robot ai control)
 
-#define UPLAYWHENCLOSED(x)     ( Users[(x)].opFlags & USER_OP_PLAYWHENCLOSED )
-#define UBANNED(x)             ( Users[(x)].opFlags & USER_OP_BANNED )
-#define UISOPER(x)             ( Users[(x)].opFlags & USER_OP_ISOPER )
-#define UAUTOPILOT(x)          ( Users[(x)].opFlags & USER_OP_AUTOPILOT )
+#define UPLAYWHENCLOSED(x)     ( cbUsers[(x)].opFlags & USER_OP_PLAYWHENCLOSED )
+#define UBANNED(x)             ( cbUsers[(x)].opFlags & USER_OP_BANNED )
+#define UISOPER(x)             ( cbUsers[(x)].opFlags & USER_OP_ISOPER )
+#define UAUTOPILOT(x)          ( cbUsers[(x)].opFlags & USER_OP_AUTOPILOT )
 
-#define UOPSET(x, b)           ( Users[(x)].opFlags |=  (b) )
-#define UOPCLR(x, b)           ( Users[(x)].opFlags &= ~(b) )
+#define UOPSET(x, b)           ( cbUsers[(x)].opFlags |=  (b) )
+#define UOPCLR(x, b)           ( cbUsers[(x)].opFlags &= ~(b) )
 
 
 typedef struct {

@@ -1635,13 +1635,13 @@ void dumpUniverse(void)
     for (i=0; i < MAXNUMSHIPTYPES; i++)
     {
         printf("shiptype {\n");
-        printf("  name       \"%s\"\n", ShipTypes[i].name);
-        printf("  engfac     %f\n", ShipTypes[i].engfac);
-        printf("  weafac     %f\n", ShipTypes[i].weafac);
-        printf("  accelfac   %f\n", ShipTypes[i].accelfac);
-        printf("  torpwarp   %d\n", (int)ShipTypes[i].torpwarp);
-        printf("  warpmax    %d\n", (int)ShipTypes[i].warplim);
-        printf("  armymax    %d\n", ShipTypes[i].armylim);
+        printf("  name       \"%s\"\n", cbShipTypes[i].name);
+        printf("  engfac     %f\n", cbShipTypes[i].engfac);
+        printf("  weafac     %f\n", cbShipTypes[i].weafac);
+        printf("  accelfac   %f\n", cbShipTypes[i].accelfac);
+        printf("  torpwarp   %d\n", (int)cbShipTypes[i].torpwarp);
+        printf("  warpmax    %d\n", (int)cbShipTypes[i].warplim);
+        printf("  armymax    %d\n", cbShipTypes[i].armylim);
         printf("  shmax      100\n");
         printf("  dammax     100\n");
         printf("  torpmax    9\n");
@@ -1653,26 +1653,26 @@ void dumpUniverse(void)
     for (i=0; i < MAXPLANETS; i++)
     {
         printf("planet {\n");
-        printf("  name        \"%s\"\n", Planets[i].name);
+        printf("  name        \"%s\"\n", cbPlanets[i].name);
 
         // also handles case of stationary planets where the primary
         // is the same as the planet
-        printf("  primary     \"%s\"\n", Planets[Planets[i].primary].name);
+        printf("  primary     \"%s\"\n", cbPlanets[cbPlanets[i].primary].name);
 
-        printf("  angle       %f\n", Planets[i].orbang);
-        printf("  velocity    %f\n", Planets[i].orbvel);
-        printf("  radius      %f\n", Planets[i].orbrad);
-        printf("  ptype       \"%s\"\n", ptype2str(Planets[i].type));
-        printf("  pteam       \"%s\"\n", team2str(Planets[i].team));
-        printf("  armies      %d\n", Planets[i].armies);
+        printf("  angle       %f\n", cbPlanets[i].orbang);
+        printf("  velocity    %f\n", cbPlanets[i].orbvel);
+        printf("  radius      %f\n", cbPlanets[i].orbrad);
+        printf("  ptype       \"%s\"\n", ptype2str(cbPlanets[i].type));
+        printf("  pteam       \"%s\"\n", team2str(cbPlanets[i].team));
+        printf("  armies      %d\n", cbPlanets[i].armies);
         printf("  visible     \"%s\"\n", PVISIBLE(i) ? "yes" : "no");
         printf("  core        \"%s\"\n", PCORE(i) ? "yes" : "no");
         printf("  homeplanet  \"%s\"\n", PHOMEPLANET(i) ? "yes" : "no");
 
-        printf("  x           %f\n", Planets[i].x);
-        printf("  y           %f\n", Planets[i].y);
+        printf("  x           %f\n", cbPlanets[i].x);
+        printf("  y           %f\n", cbPlanets[i].y);
 
-        switch(Planets[i].type)
+        switch(cbPlanets[i].type)
         {
         case PLANET_SUN:
             printf("  size        1500\n");

@@ -137,12 +137,12 @@ void checkMaster(void)
 
     signal(SIGCLD, SIG_IGN);	/* allow children to die */
 
-    if (!checkPID(ConqInfo->conqservPID))
+    if (!checkPID(cbConqInfo->conqservPID))
     {				/* see if one is really running */
         /* if we are here, we will be the listener */
-        cbLock(&ConqInfo->lockword);
-        ConqInfo->conqservPID = getpid();
-        cbUnlock(&ConqInfo->lockword);
+        cbLock(&cbConqInfo->lockword);
+        cbConqInfo->conqservPID = getpid();
+        cbUnlock(&cbConqInfo->lockword);
         sInfo.isMaster = TRUE;
         utLog("NET: master server listening on port %d\n", listenPort);
     }
@@ -406,7 +406,7 @@ int main(int argc, char *argv[])
 
     cbMap();
 
-    if ( *CBlockRevision != COMMONSTAMP )
+    if ( *cbRevision != COMMONSTAMP )
     {
         fprintf(stderr,"conquestd: Common block ident mismatch.\n" );
         fprintf(stderr,"           You must initialize the universe with conqoper.\n" );
@@ -566,8 +566,8 @@ void updateProc(void)
     recUpdateFrame();
 
     /* check for and send any new messages */
-    if ( utGetMsg( Context.snum, &Ships[Context.snum].lastmsg ) )
-        sendMessage(&(Msgs[Ships[Context.snum].lastmsg]));
+    if ( utGetMsg( Context.snum, &cbShips[Context.snum].lastmsg ) )
+        sendMessage(&(cbMsgs[cbShips[Context.snum].lastmsg]));
 
     /* Schedule for next time. */
     startUpdate();
@@ -669,10 +669,10 @@ int capentry( int snum, int *system )
         /* We must own all home planets of a team (defendteam). */
         for ( j=0; j<MAXPLANETS; j++ )
 	{
-            if (PHOMEPLANET(j) && Planets[j].defendteam == i)
+            if (PHOMEPLANET(j) && cbPlanets[j].defendteam == i)
             {
                 // if we don't own it, bail
-                if (Planets[j].team != Ships[snum].team)
+                if (cbPlanets[j].team != cbShips[snum].team)
                     break;
             }
 	}
@@ -683,7 +683,7 @@ int capentry( int snum, int *system )
             owned[i] = true;
     }
 
-    owned[Ships[snum].team] = TRUE;  // we can always enter our own
+    owned[cbShips[snum].team] = TRUE;  // we can always enter our own
                                      // system regardless of who owns
                                      // it
 
@@ -700,9 +700,9 @@ int capentry( int snum, int *system )
     /* If we can only enter from one, we're done. */
     if ( j <= 1 )
     {
-        *system = Ships[snum].team; /* tell the client */
+        *system = cbShips[snum].team; /* tell the client */
         if (!sendClientStat(sInfo.sock, SPCLNTSTAT_FLAG_NONE, snum,
-                            Ships[snum].team,
+                            cbShips[snum].team,
                             Context.unum, 0))
             return FALSE;
         return TRUE;
@@ -710,7 +710,7 @@ int capentry( int snum, int *system )
 
     /* ask the client - use a clientstat with non-zero esystem */
 
-    if (!sendClientStat(sInfo.sock, SPCLNTSTAT_FLAG_NONE, snum, Ships[snum].team,
+    if (!sendClientStat(sInfo.sock, SPCLNTSTAT_FLAG_NONE, snum, cbShips[snum].team,
                         Context.unum, esystem))
         return FALSE;
 
@@ -739,7 +739,7 @@ int capentry( int snum, int *system )
 
         if (ccmd->cmd != CPCMD_ENTER)
 	{			/* we'll just use the home team */
-            *system = Ships[snum].team;
+            *system = cbShips[snum].team;
             return TRUE;
 	}
 
@@ -757,7 +757,7 @@ int capentry( int snum, int *system )
             }
 
         /* shouldn't happen, but... */
-        *system = Ships[snum].team;
+        *system = cbShips[snum].team;
         return TRUE;
     }
 
@@ -784,11 +784,11 @@ void dead( int snum, int leave )
         return;
 
     /* If our ships pid is wrong, we are indeed lost. */
-    if ( Ships[snum].pid != Context.pid )
+    if ( cbShips[snum].pid != Context.pid )
         return;
 
-    kb = Ships[snum].killedBy;
-    detail = Ships[snum].killedByDetail;
+    kb = cbShips[snum].killedBy;
+    detail = cbShips[snum].killedByDetail;
 
     /* Delay while our torps are exploding. */
     utGrand( &entertime );
@@ -798,7 +798,7 @@ void dead( int snum, int leave )
         updateClient(FALSE);
         i = 0;
         for ( j = 0; j < MAXTORPS; j++ )
-            if ( Ships[snum].torps[j].status == TS_DETONATE )
+            if ( cbShips[snum].torps[j].status == TS_DETONATE )
                 i = i + 1;
         if ( i <= 0 )
             break;
@@ -819,7 +819,7 @@ void dead( int snum, int leave )
     utLog("INFO: dead: %s was killed by %d(%d).", buf, (int)kb, (int)detail);
 
     updateClient(FALSE);
-    for ( i=0; i<10 && Ships[snum].status == SS_DYING; i++ )
+    for ( i=0; i<10 && cbShips[snum].status == SS_DYING; i++ )
     {
         utSleep( (1.0 / (real)Context.updsec) );
         updateClient(FALSE);
@@ -835,14 +835,14 @@ void dead( int snum, int leave )
         flags |= SPCLNTSTAT_FLAG_CONQUER;
 
     /* send the clientstat */
-    if (!sendClientStat(sInfo.sock, flags, Context.snum, Users[Context.unum].team,
+    if (!sendClientStat(sInfo.sock, flags, Context.snum, cbUsers[Context.unum].team,
                         Context.unum, 0))
     {				/* an error, let the ai code choose some
 				   last words and bail */
         if (kb == KB_CONQUER)
         {
             robreply(buf);
-            utStrncpy(ConqInfo->lastwords, buf, MAXLASTWORDS);
+            utStrncpy(cbConqInfo->lastwords, buf, MAXLASTWORDS);
         }
 
         utLog("conquestd: dead(): sendClientStat failed, fl = 0x%0x\n",
@@ -855,9 +855,9 @@ void dead( int snum, int leave )
           flags);
 
     /* fix things up */
-    Ships[snum].status = SS_RESERVED;
-    Ships[snum].sdfuse = -TIMEOUT_PLAYER;
-    /*  Ships[snum].killedby = 0;*/
+    cbShips[snum].status = SS_RESERVED;
+    cbShips[snum].sdfuse = -TIMEOUT_PLAYER;
+    /*  cbShips[snum].killedby = 0;*/
 
     /* let the client know. */
     updateClient(FALSE);
@@ -870,7 +870,7 @@ void dead( int snum, int leave )
                              (60 * 5), NULL) <= 0)
 	{			/* error or timeout.  gen lastwords */
             robreply(buf);
-            utStrncpy(ConqInfo->lastwords, buf, MAXLASTWORDS);
+            utStrncpy(cbConqInfo->lastwords, buf, MAXLASTWORDS);
 
             return;
 	}
@@ -879,13 +879,13 @@ void dead( int snum, int leave )
             cpMessage_t *cmsg = (cpMessage_t *)buf;
 
             /* copy as much of the message as you can. */
-            utStrncpy(ConqInfo->lastwords, (char *)cmsg->msg, MAXLASTWORDS);
+            utStrncpy(cbConqInfo->lastwords, (char *)cmsg->msg, MAXLASTWORDS);
 	}
     }
 
     /* Turn off sticky war so we can change war settings from menu(). */
     for ( i = 0; i < NUMPLAYERTEAMS; i++ )
-        Ships[snum].rwar[i] = FALSE;
+        cbShips[snum].rwar[i] = FALSE;
 
     return;
 
@@ -967,11 +967,11 @@ int updateClient(int force)
                 return FALSE;
 
         /* we only send user data for active ships. */
-        if (Ships[i].status != SS_OFF)
+        if (cbShips[i].status != SS_OFF)
 	{
             if (seciter)
             {
-                if (!sendUser(sInfo.sock, Ships[i].unum))
+                if (!sendUser(sInfo.sock, cbShips[i].unum))
                 {
                     return FALSE;
                 }
@@ -987,7 +987,7 @@ int updateClient(int force)
             sendTeam(sInfo.sock, i, FALSE);
 
     if (doinfo)
-        sendConqInfo(sInfo.sock, FALSE);
+        sendcbConqInfo(sInfo.sock, FALSE);
 
     if (dohist)
     {
@@ -1024,12 +1024,12 @@ void handleSimpleCmdPkt(cpCommand_t *ccmd)
             if (team >= 0 && team < NUMPLAYERTEAMS)
 	    {
 
-                Ships[Context.snum].team = team;
-                Ships[Context.snum].shiptype =
-                    Teams[Ships[Context.snum].team].shiptype;
-                Users[Context.unum].team = Ships[Context.snum].team;
-                Ships[Context.snum].war[Ships[Context.snum].team] = FALSE;
-                Users[Context.unum].war[Users[Context.unum].team] = FALSE;
+                cbShips[Context.snum].team = team;
+                cbShips[Context.snum].shiptype =
+                    cbTeams[cbShips[Context.snum].team].shiptype;
+                cbUsers[Context.unum].team = cbShips[Context.snum].team;
+                cbShips[Context.snum].war[cbShips[Context.snum].team] = FALSE;
+                cbUsers[Context.unum].war[cbUsers[Context.unum].team] = FALSE;
 	    }
 	}
 
@@ -1189,10 +1189,10 @@ void handleSimpleCmdPkt(cpCommand_t *ccmd)
 void freeship(void)
 {
     conqstats( Context.snum );
-    cbLock(&ConqInfo->lockword);
-    Ships[Context.snum].sdfuse = 0;
-    Ships[Context.snum].status = SS_OFF;
-    cbUnlock(&ConqInfo->lockword);
+    cbLock(&cbConqInfo->lockword);
+    cbShips[Context.snum].sdfuse = 0;
+    cbShips[Context.snum].status = SS_OFF;
+    cbUnlock(&cbConqInfo->lockword);
     return;
 }
 
@@ -1215,26 +1215,26 @@ void menu(void)
     /* we'll set some things up,  */
 
     /* Initialize statistics. */
-    initstats( &Ships[Context.snum].ctime, &Ships[Context.snum].etime );
+    initstats( &cbShips[Context.snum].ctime, &cbShips[Context.snum].etime );
 
     /* Log this entry into the Game. */
     Context.histslot = clbLogHist( Context.unum );
 
     /* Set up a few ship characteristics here rather than in clbInitShip(). */
-    Ships[Context.snum].unum = Context.unum;
-    Ships[Context.snum].team = Users[Context.unum].team;
-    Ships[Context.snum].shiptype = Teams[Ships[Context.snum].team].shiptype;
+    cbShips[Context.snum].unum = Context.unum;
+    cbShips[Context.snum].team = cbUsers[Context.unum].team;
+    cbShips[Context.snum].shiptype = cbTeams[cbShips[Context.snum].team].shiptype;
 
-    Ships[Context.snum].pid = Context.pid;
-    Ships[Context.snum].killedBy = KB_NONE;
-    Ships[Context.snum].killedByDetail = 0;
+    cbShips[Context.snum].pid = Context.pid;
+    cbShips[Context.snum].killedBy = KB_NONE;
+    cbShips[Context.snum].killedByDetail = 0;
 
     for ( i = 0; i < NUMPLAYERTEAMS; i = i + 1 )
     {
-        Ships[Context.snum].rwar[i] = FALSE;
-        Ships[Context.snum].war[i] = Users[Context.unum].war[i];
+        cbShips[Context.snum].rwar[i] = FALSE;
+        cbShips[Context.snum].war[i] = cbUsers[Context.unum].war[i];
     }
-    utStrncpy( Ships[Context.snum].alias, Users[Context.unum].alias,
+    utStrncpy( cbShips[Context.snum].alias, cbUsers[Context.unum].alias,
                MAXUSERNAME );
 
     /* Set up some things for the menu display. */
@@ -1247,7 +1247,7 @@ void menu(void)
     if (!sendShip(sInfo.sock, Context.snum))
     {				/* something went wrong */
         /* Make our ship available for others to use. */
-        if ( Ships[Context.snum].status == SS_RESERVED )
+        if ( cbShips[Context.snum].status == SS_RESERVED )
 	{
             freeship();
             return;
@@ -1267,9 +1267,9 @@ void menu(void)
 	{
             if ( Context.snum < 0 || Context.snum >= MAXSHIPS )
                 lose = TRUE;
-            else if ( Ships[Context.snum].pid != Context.pid )
+            else if ( cbShips[Context.snum].pid != Context.pid )
                 lose = TRUE;
-            else if ( Ships[Context.snum].status != SS_RESERVED )
+            else if ( cbShips[Context.snum].status != SS_RESERVED )
 	    {
                 utLog( "menu(): Ship %d no longer reserved.", Context.snum );
                 lose = TRUE;
@@ -1287,7 +1287,7 @@ void menu(void)
 	}
 
         /* Reset up the destruct fuse. */
-        Ships[Context.snum].sdfuse = -TIMEOUT_PLAYER;
+        cbShips[Context.snum].sdfuse = -TIMEOUT_PLAYER;
 
         if ((pkttype = pktWaitForPacket(PKT_ANYPKT,
                                         buf, PKT_MAXSIZE, 0, NULL)) < 0)
@@ -1334,12 +1334,12 @@ void menu(void)
             else if (ccmd->cmd == CPCMD_RESIGN)
 	    {
                 for ( i = 0; i < MAXSHIPS; i++ )
-                    if ( !((Ships[i].status == SS_LIVE ||
-                            Ships[i].status == SS_ENTERING) &&
-                           Ships[i].unum == Context.unum))
+                    if ( !((cbShips[i].status == SS_LIVE ||
+                            cbShips[i].status == SS_ENTERING) &&
+                           cbShips[i].unum == Context.unum))
                     {
                         clbResign( Context.unum, FALSE );
-                        Ships[Context.snum].status = SS_OFF;
+                        cbShips[Context.snum].status = SS_OFF;
                         exit(0);	/* exit here */
                     }
 	    }
@@ -1363,7 +1363,7 @@ void menu(void)
     while ( clbStillAlive( Context.snum ) &&  !Context.leave );
 
     /* Make our ship available for others to use. */
-    if ( Ships[Context.snum].status == SS_RESERVED )
+    if ( cbShips[Context.snum].status == SS_RESERVED )
         freeship();
 
     /* Try to kill the driver if we started one the last time */
@@ -1398,9 +1398,9 @@ int newship( int unum, int *snum )
     /* cleanup any unliving ships - this is the first thing we need to do */
     clbCheckShips(FALSE);
 
-    cbLock(&ConqInfo->lockword);
+    cbLock(&cbConqInfo->lockword);
 
-    Ships[*snum].status = SS_ENTERING;		/* show intent to fly */
+    cbShips[*snum].status = SS_ENTERING;		/* show intent to fly */
 
     fresh = TRUE;				/* assume we want a fresh ship*/
 
@@ -1408,14 +1408,14 @@ int newship( int unum, int *snum )
     j = 0;
     numvec = 0;
     for ( i = 0; i < MAXSHIPS; i++ )
-        if ( Ships[i].status == SS_LIVE || Ships[i].status == SS_ENTERING )
-            if ( Ships[i].unum == unum && *snum != i )
+        if ( cbShips[i].status == SS_LIVE || cbShips[i].status == SS_ENTERING )
+            if ( cbShips[i].unum == unum && *snum != i )
             {
                 j++;
                 vec[numvec++] = i;
             }
 
-    cbUnlock(&ConqInfo->lockword);
+    cbUnlock(&cbConqInfo->lockword);
 
     /* see if we need to reincarnate to a vacant ship */
     if ( j > 0 )
@@ -1426,38 +1426,38 @@ int newship( int unum, int *snum )
         {		   /* if it's available, we'll take it */
 			   /* ...if it's not already being flown... */
             pktSendAck(PSEV_ERROR, PERR_FLYING, NULL);
-            Ships[*snum].status = SS_RESERVED;
+            cbShips[*snum].status = SS_RESERVED;
             return ( FALSE );
         }
 
 
         /* Look for a live ship for us to take. */
-        cbLock(&ConqInfo->lockword);
+        cbLock(&cbConqInfo->lockword);
         for (i=0; i<MAXSHIPS; i++)
-            if ( Ships[i].unum == unum && Ships[i].status == SS_LIVE )
+            if ( cbShips[i].unum == unum && cbShips[i].status == SS_LIVE )
             {
                 fresh = FALSE;
-                Ships[*snum].status = SS_OFF;
+                cbShips[*snum].status = SS_OFF;
                 *snum = i;
-                Ships[*snum].pid = Context.pid;
-                Ships[*snum].status = SS_ENTERING;
+                cbShips[*snum].pid = Context.pid;
+                cbShips[*snum].status = SS_ENTERING;
                 SFCLR(*snum, SHIP_F_VACANT);
                 break;
             }
-        cbUnlock(&ConqInfo->lockword);
+        cbUnlock(&cbConqInfo->lockword);
     }
 
     /* Figure out which system to enter. */
     if ( fresh )
     {
         /* (re)init the ship's team! (bug 1/10/98) */
-        Ships[*snum].team = Users[Context.unum].team;
-        Ships[*snum].shiptype = Teams[Ships[*snum].team].shiptype;
-        system = Ships[*snum].team;
+        cbShips[*snum].team = cbUsers[Context.unum].team;
+        cbShips[*snum].shiptype = cbTeams[cbShips[*snum].team].shiptype;
+        system = cbShips[*snum].team;
 
         if ( ! capentry( *snum, &system ) )
 	{
-            Ships[*snum].status = SS_RESERVED;
+            cbShips[*snum].status = SS_RESERVED;
             return ( FALSE );
 	}
     }
@@ -1469,11 +1469,11 @@ int newship( int unum, int *snum )
            a VACANT ships re-enters Conquest (in
            case the signal handler didn't get a
            chance to run) */
-        Ships[*snum].ctime = 0;
-        Ships[*snum].etime = 0;
+        cbShips[*snum].ctime = 0;
+        cbShips[*snum].etime = 0;
     }
 
-    cbLock(&ConqInfo->lockword);
+    cbLock(&cbConqInfo->lockword);
 
     /* If necessary, initalize the ship */
     if ( fresh )
@@ -1484,40 +1484,40 @@ int newship( int unum, int *snum )
         if (!clbFindTeamHomeSun(system, &i))
         {
             // couldn't find a home sun, use homeplanet
-            i = Teams[system].homeplanet;
+            i = cbTeams[system].homeplanet;
         }
         // good to go
-        clbPutShip( *snum, Planets[i].x, Planets[i].y );
-        Ships[*snum].dhead = rnduni( 0.0, 359.9 );
-        Ships[*snum].head = Ships[*snum].dhead;
-        Ships[*snum].dwarp = (real) rndint( 2, 5 );
+        clbPutShip( *snum, cbPlanets[i].x, cbPlanets[i].y );
+        cbShips[*snum].dhead = rnduni( 0.0, 359.9 );
+        cbShips[*snum].head = cbShips[*snum].dhead;
+        cbShips[*snum].dwarp = (real) rndint( 2, 5 );
         // lock onto the homeplanet
-        Ships[*snum].lock = LOCK_PLANET;
-        Ships[*snum].lockDetail = (uint16_t)Teams[system].homeplanet;
+        cbShips[*snum].lock = LOCK_PLANET;
+        cbShips[*snum].lockDetail = (uint16_t)cbTeams[system].homeplanet;
     }
     else
     {				/* if we're reincarnating, skip any
 				   messages that might have been sent
 				   while we were gone */
-        cbLock(&ConqInfo->lockmesg);
-        Ships[*snum].lastmsg = ConqInfo->lastmsg;
-        Ships[*snum].alastmsg = Ships[*snum].lastmsg;
-        cbUnlock(&ConqInfo->lockmesg);
+        cbLock(&cbConqInfo->lockmesg);
+        cbShips[*snum].lastmsg = cbConqInfo->lastmsg;
+        cbShips[*snum].alastmsg = cbShips[*snum].lastmsg;
+        cbUnlock(&cbConqInfo->lockmesg);
         /* init user's last entry time */
-        Users[Ships[*snum].unum].lastentry = time(0);
+        cbUsers[cbShips[*snum].unum].lastentry = time(0);
     }
 
     SFCLR(*snum, SHIP_F_ROBOT);
-    Ships[*snum].action = 0;
+    cbShips[*snum].action = 0;
 
 
     /* Straighten out the ships deltas. */
     clbFixDeltas( *snum );
 
     /* Finally, turn the ship on. */
-    Ships[*snum].status = SS_LIVE;
+    cbShips[*snum].status = SS_LIVE;
 
-    cbUnlock(&ConqInfo->lockword);
+    cbUnlock(&cbConqInfo->lockword);
     Context.entship = TRUE;
 
     return ( TRUE );
@@ -1546,7 +1546,7 @@ int play(void)
     }
 
     drstart();			/* start a driver, if necessary */
-    Ships[Context.snum].sdfuse = 0;	/* zero self destruct fuse */
+    cbShips[Context.snum].sdfuse = 0;	/* zero self destruct fuse */
     utGrand( &Context.msgrand );		/* initialize message timer */
     Context.leave = FALSE;		/* assume we won't want to bail */
     Context.redraw = TRUE;		/* want redraw first time */
@@ -1558,7 +1558,7 @@ int play(void)
     /* send a clientstat packet and a ship packet. */
 
     if (!sendClientStat(sInfo.sock, SPCLNTSTAT_FLAG_NONE, Context.snum,
-                        Ships[Context.snum].team,
+                        cbShips[Context.snum].team,
                         Context.unum, 0))
         return FALSE;
 
@@ -1572,9 +1572,9 @@ int play(void)
     /* Tell everybody, we're here */
 
     sprintf(msgbuf, "%c%d (%s) has entered the game.",
-            Teams[Ships[Context.snum].team].teamchar,
+            cbTeams[cbShips[Context.snum].team].teamchar,
             Context.snum,
-            Ships[Context.snum].alias);
+            cbShips[Context.snum].alias);
 
     clbStoreMsg(MSG_FROM_COMP, 0, MSG_TO_ALL, 0, msgbuf);
 
@@ -1592,7 +1592,7 @@ int play(void)
     while ( clbStillAlive( Context.snum ) )
     {
         /* Make sure we still control our ship. */
-        if ( Ships[Context.snum].pid != Context.pid )
+        if ( cbShips[Context.snum].pid != Context.pid )
             break;
 
         didsomething = 0;
@@ -1681,7 +1681,7 @@ int play(void)
 
     stopUpdate();
     updateClient(FALSE);	/* one last, to be sure. */
-    sendConqInfo(sInfo.sock, TRUE);
+    sendcbConqInfo(sInfo.sock, TRUE);
     utLog("PLAY: ship %d died, calling dead()", Context.snum);
     dead( Context.snum, Context.leave );
 
@@ -1711,7 +1711,7 @@ int welcome( int *unum )
     {
         flags |= SPCLNTSTAT_FLAG_NEW;
         /* Must be a new player. */
-        if ( ConqInfo->closed )
+        if ( cbConqInfo->closed )
 	{
             pktSendAck(PSEV_FATAL, PERR_CLOSED,
                        NULL);
@@ -1737,15 +1737,15 @@ int welcome( int *unum )
               *unum, team);
 
         /* copy in the password */
-        strcpy(Users[*unum].pw, password);
+        strcpy(cbUsers[*unum].pw, password);
         /* set lastentry time for new players */
-        Users[*unum].lastentry = time(0);
+        cbUsers[*unum].lastentry = time(0);
 
     }
 
 
     /* Must be special to play when closed. */
-    if ( ConqInfo->closed && ! UPLAYWHENCLOSED(*unum) )
+    if ( cbConqInfo->closed && ! UPLAYWHENCLOSED(*unum) )
     {
         pktSendAck(PSEV_FATAL, PERR_CLOSED,
                    NULL);
@@ -1764,7 +1764,7 @@ int welcome( int *unum )
 
     /* send a clntstat packet if everything's ok */
 
-    if (!sendClientStat(sInfo.sock, flags, Context.snum, Users[*unum].team,
+    if (!sendClientStat(sInfo.sock, flags, Context.snum, cbUsers[*unum].team,
                         *unum, 0))
         return FALSE;
 
@@ -1814,7 +1814,7 @@ static int hello(void)
     utStrncpy((char *)shello.motd, SysConf.ServerMotd, CONF_SERVER_MOTD_SZ);
     shello.flags = 0;
 
-    if (ConqInfo->closed)
+    if (cbConqInfo->closed)
         shello.flags |= SPHELLO_FLAGS_CLOSED;
 
     if (pktWrite(PKT_SENDTCP, &shello) <= 0)
@@ -1993,8 +1993,8 @@ void handleSignal(int sig)
                that there won't be a huge addition to the
                Teams/Users/Ships timing stats when a VACANT
                ships re-enters Conquest */
-            Ships[Context.snum].ctime = 0;
-            Ships[Context.snum].etime = 0;
+            cbShips[Context.snum].ctime = 0;
+            cbShips[Context.snum].etime = 0;
 
             SFSET(Context.snum, SHIP_F_VACANT); /* help the driver */
         }
@@ -2003,14 +2003,14 @@ void handleSignal(int sig)
             /* so we can detect cowards */
             clbKillShip( Context.snum, KB_LIGHTNING, 0 );
             /* turn ship off */
-            Ships[Context.snum].status = SS_OFF;
+            cbShips[Context.snum].status = SS_OFF;
         }
     }
     else
     {                       /* not playing (main menu, etc) */
         /* if we aren't playing, then just turn it off */
         if (Context.snum >= 0 && Context.snum < MAXSHIPS)
-            Ships[Context.snum].status = SS_OFF;
+            cbShips[Context.snum].status = SS_OFF;
     }
 
     conqend();
@@ -2029,7 +2029,7 @@ void conqend(void)
     if (Context.entship == TRUE)
     {				/* let everyone know we're leaving */
         sprintf(msgbuf, "%s has left the game.",
-                Users[Context.unum].alias);
+                cbUsers[Context.unum].alias);
         clbStoreMsg(MSG_FROM_COMP, 0, MSG_TO_ALL, 0, msgbuf);
     }
 

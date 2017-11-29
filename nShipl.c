@@ -89,19 +89,19 @@ static int nShiplDisplay(dspConfig_t *dsp)
     lin = fline;
     while ( i < MAXSHIPS && lin <= lline )
     {
-        status = Ships[i].status;
+        status = cbShips[i].status;
 
-        kb = Ships[i].killedBy;
-        detail = Ships[i].killedByDetail;
+        kb = cbShips[i].killedBy;
+        detail = cbShips[i].killedByDetail;
         if ( status == SS_LIVE ||
              ( doall && ( status != SS_OFF || kb != KB_NONE ) ) )
         {
             sbuf[0] = 0;
             utAppendShip(sbuf , i) ;
             strcat(sbuf, " ") ;
-            utAppendChar(sbuf, ShipTypes[Ships[i].shiptype].name[0]) ;
+            utAppendChar(sbuf, cbShipTypes[cbShips[i].shiptype].name[0]) ;
 
-            unum = Ships[i].unum;
+            unum = cbShips[i].unum;
             if ( unum >= 0 && unum < MAXUSERS )
             {
                 if (SROBOT(i)) /* robot */
@@ -111,11 +111,11 @@ static int nShiplDisplay(dspConfig_t *dsp)
                 else
                     strcpy(pidbuf, "  LIVE");
 
-                strcpy(ubuf, Users[unum].username);
+                strcpy(ubuf, cbUsers[unum].username);
 
-                sprintf(kbuf, "%6.1f", (Ships[i].kills + Ships[i].strkills));
+                sprintf(kbuf, "%6.1f", (cbShips[i].kills + cbShips[i].strkills));
                 sprintf( cbuf, "%-5s %-13.13s %-21.21s %-8s %6s",
-                         sbuf, ubuf, Ships[i].alias,
+                         sbuf, ubuf, cbShips[i].alias,
                          kbuf, pidbuf );
             }
             else
@@ -133,17 +133,17 @@ static int nShiplDisplay(dspConfig_t *dsp)
                     color = NoColor | CQC_A_BOLD;
                 else if (satwar(i, snum)) /* we're at war with it */
                     color = RedLevelColor;
-                else if (Ships[i].team == Ships[snum].team && !selfwar(snum))
+                else if (cbShips[i].team == cbShips[snum].team && !selfwar(snum))
                     color = GreenLevelColor; /* it's a team ship */
                 else
                     color = YellowLevelColor;
             }
             else
             { /* not conqoper, and not a valid ship (main menu) */
-                if (Users[Context.unum].war[Ships[i].team])  /* we're at war with ships's
+                if (cbUsers[Context.unum].war[cbShips[i].team])  /* we're at war with ships's
                                                                 team */
                     color = RedLevelColor;
-                else if (Users[Context.unum].team == Ships[i].team)
+                else if (cbUsers[Context.unum].team == cbShips[i].team)
                     color = GreenLevelColor; /* it's a team ship */
                 else
                     color = YellowLevelColor;
@@ -184,7 +184,7 @@ static int nShiplIdle(void)
     if (pkttype < 0)          /* some error */
     {
         utLog("nShiplIdle: waiForPacket returned %d", pkttype);
-        Ships[Context.snum].status = SS_OFF;
+        cbShips[Context.snum].status = SS_OFF;
         return NODE_EXIT;
     }
 

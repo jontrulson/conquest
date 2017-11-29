@@ -397,7 +397,7 @@ typedef struct {
     uint8_t  conqteam[MAXTEAMNAME];   /* team s/he was on */
     uint8_t  conqtime[MAXDATESIZE];      /* time of last conquering */
     uint8_t  lastwords[MAXLASTWORDS]; /* remarks upon conquering */
-} spConqInfo_t;
+} spcbConqInfo_t;
 
 /* only stored in recordings (.cqr) files */
 typedef struct {

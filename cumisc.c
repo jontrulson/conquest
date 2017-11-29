@@ -51,7 +51,7 @@ void mcuHistList( int godlike )
             if ( ! clbStillAlive( Context.snum ) )
                 break;
 
-        thistptr = ConqInfo->histptr;
+        thistptr = cbConqInfo->histptr;
         lin = fline;
         col = 1;
         cdclrl( fline, lline - fline + 1 );
@@ -65,19 +65,19 @@ void mcuHistList( int godlike )
             i = utModPlusOne( i - 1, MAXHISTLOG );
 
             // No username, no entry
-            if (!History[i].username[0])
+            if (!cbHistory[i].username[0])
                 continue;
 
-            if (History[i].unum < 0) // resigned
+            if (cbHistory[i].unum < 0) // resigned
                 isResigned = true;
 
-            utStrncpy(puname, History[i].username, MAXUSERNAME);
+            utStrncpy(puname, cbHistory[i].username, MAXUSERNAME);
 
             /* entry time */
-            utFormatTime( histentrytm, History[i].enterTime);
+            utFormatTime( histentrytm, cbHistory[i].enterTime);
 
             /* now elapsed time */
-            utFormatSeconds((int) History[i].elapsed, connecttm);
+            utFormatSeconds((int) cbHistory[i].elapsed, connecttm);
             /* strip off seconds, or for long times, anything after 7 bytes */
             connecttm[7] = '\0';
 
@@ -191,10 +191,10 @@ int mcuReadMsg( int msgnum, int dsplin )
         attrib = CyanColor;
     }
 
-    clbFmtMsg(Msgs[msgnum].from, Msgs[msgnum].fromDetail,
-              Msgs[msgnum].to, Msgs[msgnum].toDetail, buf);
+    clbFmtMsg(cbMsgs[msgnum].from, cbMsgs[msgnum].fromDetail,
+              cbMsgs[msgnum].to, cbMsgs[msgnum].toDetail, buf);
     strcat(buf , ": ") ;
-    strcat(buf , Msgs[msgnum].msgbuf) ;
+    strcat(buf , cbMsgs[msgnum].msgbuf) ;
 
     uiPutColor(attrib);
     mcuPutMsg( buf, dsplin );
@@ -383,9 +383,9 @@ void mcuInfoPlanet( char *str, int pnum, int snum )
 
     /* In some cases, report hostilities. */
     junk[0] = 0;
-    if ( Planets[pnum].type == PLANET_CLASSM || Planets[pnum].type == PLANET_DEAD )
+    if ( cbPlanets[pnum].type == PLANET_CLASSM || cbPlanets[pnum].type == PLANET_DEAD )
         if ( ! godlike )
-            if ( Planets[pnum].scanned[Ships[snum].team] && clbSPWar( snum, pnum ) )
+            if ( cbPlanets[pnum].scanned[cbShips[snum].team] && clbSPWar( snum, pnum ) )
                 strcat(junk, " (hostile)");
 
     if ( godlike )
@@ -395,21 +395,21 @@ void mcuInfoPlanet( char *str, int pnum, int snum )
     }
     else
     {
-        x = Ships[snum].x;
-        y = Ships[snum].y;
+        x = cbShips[snum].x;
+        y = cbShips[snum].y;
     }
 
-    Context.lasttdist = round(dist( x, y, Planets[pnum].x, Planets[pnum].y));
-    Context.lasttang = round(utAngle( x, y, Planets[pnum].x, Planets[pnum].y ));
+    Context.lasttdist = round(dist( x, y, cbPlanets[pnum].x, cbPlanets[pnum].y));
+    Context.lasttang = round(utAngle( x, y, cbPlanets[pnum].x, cbPlanets[pnum].y ));
 
     if (UserConf.DoETAStats)
     {
         static char tmpstr[64];
 
-        if (Ships[snum].warp > 0.0)
+        if (cbShips[snum].warp > 0.0)
 	{
             sprintf(tmpstr, ", ETA %s",
-                    clbETAStr(Ships[snum].warp,
+                    clbETAStr(cbShips[snum].warp,
                               Context.lasttdist));
 	}
         else
@@ -417,8 +417,8 @@ void mcuInfoPlanet( char *str, int pnum, int snum )
 
         sprintf( buf, "%s%s, a %s%s, range %d, direction %d%s",
                  str,
-                 Planets[pnum].name,
-                 ConqInfo->ptname[Planets[pnum].type],
+                 cbPlanets[pnum].name,
+                 cbConqInfo->ptname[cbPlanets[pnum].type],
                  junk,
                  Context.lasttdist,
                  Context.lasttang,
@@ -429,31 +429,31 @@ void mcuInfoPlanet( char *str, int pnum, int snum )
     else
         sprintf( buf, "%s%s, a %s%s, range %d, direction %d",
                  str,
-                 Planets[pnum].name,
-                 ConqInfo->ptname[Planets[pnum].type],
+                 cbPlanets[pnum].name,
+                 cbConqInfo->ptname[cbPlanets[pnum].type],
                  junk,
                  Context.lasttdist,
                  Context.lasttang);
 
     /* save for hudInfo (only first 3 chars) */
-    utStrncpy(Context.lasttarg, Planets[pnum].name, 4);
+    utStrncpy(Context.lasttarg, cbPlanets[pnum].name, 4);
 
     if ( godlike )
         canscan = TRUE;
     else
-        canscan = Planets[pnum].scanned[Ships[snum].team];
+        canscan = cbPlanets[pnum].scanned[cbShips[snum].team];
 
     junk[0] = 0;
-    if ( Planets[pnum].type != PLANET_SUN && Planets[pnum].type != PLANET_MOON )
+    if ( cbPlanets[pnum].type != PLANET_SUN && cbPlanets[pnum].type != PLANET_MOON )
     {
         if ( ! canscan )
             strcpy(junk , "with unknown occupational forces") ;
         else
 	{
-            i = Planets[pnum].armies;
+            i = cbPlanets[pnum].armies;
             if ( i == 0 )
 	    {
-                j = Planets[pnum].uninhabtime;
+                j = cbPlanets[pnum].uninhabtime;
                 if ( j > 0 )
                     sprintf( junk, "uninhabitable for %d more minutes", j );
                 else
@@ -462,7 +462,7 @@ void mcuInfoPlanet( char *str, int pnum, int snum )
             else
 	    {
                 sprintf( junk, "with %d %s arm", i,
-                         Teams[Planets[pnum].team].name );
+                         cbTeams[cbPlanets[pnum].team].name );
                 if ( i == 1 )
                     strcat(junk , "y") ;
                 else
@@ -474,11 +474,11 @@ void mcuInfoPlanet( char *str, int pnum, int snum )
         if ( godlike )
             canscan = FALSE;	/* GOD can use teaminfo instead */
         else
-            canscan = ( pnum == Teams[Ships[snum].team].homeplanet &&
-                        Teams[Ships[snum].team].coupinfo );
+            canscan = ( pnum == cbTeams[cbShips[snum].team].homeplanet &&
+                        cbTeams[cbShips[snum].team].coupinfo );
         if ( canscan )
 	{
-            j = Teams[Ships[snum].team].couptime;
+            j = cbTeams[cbShips[snum].team].couptime;
             if ( j > 0 )
 	    {
                 if ( junk[0] != 0 )
@@ -557,7 +557,7 @@ void mcuInfoShip( int snum, int scanner )
         cdmove( MSG_LIN1, 1 );
         return;
     }
-    status = Ships[snum].status;
+    status = cbShips[snum].status;
     if ( ! godlike && status != SS_LIVE )
     {
         mcuPutMsg( "Not found.", MSG_LIN1 );
@@ -585,27 +585,27 @@ void mcuInfoShip( int snum, int scanner )
     }
     else
     {
-        x = Ships[scanner].x;
-        y = Ships[scanner].y;
+        x = cbShips[scanner].x;
+        y = cbShips[scanner].y;
     }
     if ( SCLOAKED(snum) )
     {
         if (godlike)
 	{
-            appx = rndnor(Ships[snum].x, CLOAK_SMEAR_DIST);
-            appy = rndnor(Ships[snum].y, CLOAK_SMEAR_DIST);
+            appx = rndnor(cbShips[snum].x, CLOAK_SMEAR_DIST);
+            appy = rndnor(cbShips[snum].y, CLOAK_SMEAR_DIST);
 	}
         else			/* client */
 	{			/* for clients, these have already been
 				   smeared */
-            appx = Ships[snum].x;
-            appy = Ships[snum].y;
+            appx = cbShips[snum].x;
+            appy = cbShips[snum].y;
 	}
     }
     else
     {
-        appx = Ships[snum].x;
-        appy = Ships[snum].y;
+        appx = cbShips[snum].x;
+        appy = cbShips[snum].y;
     }
     dis = dist( x, y, appx, appy );
     if ( godlike )
@@ -615,16 +615,16 @@ void mcuInfoShip( int snum, int scanner )
 
         /* Decide if we can do an acurate scan. */
         canscan = ( (dis < ACCINFO_DIST && ! SCLOAKED(snum)) ||
-                    ( (Ships[snum].scanned[ Ships[scanner].team] > 0) && ! selfwar(scanner) ) );
+                    ( (cbShips[snum].scanned[ cbShips[scanner].team] > 0) && ! selfwar(scanner) ) );
     }
 
     strcat(cbuf , ": ") ;
-    if ( Ships[snum].alias[0] != 0 )
+    if ( cbShips[snum].alias[0] != 0 )
     {
-        strcat(cbuf , Ships[snum].alias) ;
+        strcat(cbuf , cbShips[snum].alias) ;
         strcat(cbuf, ", ");
     }
-    kills = (Ships[snum].kills + Ships[snum].strkills);
+    kills = (cbShips[snum].kills + cbShips[snum].strkills);
     if ( kills == 0.0 )
         strcat(cbuf , "no") ;
     else
@@ -641,7 +641,7 @@ void mcuInfoShip( int snum, int scanner )
         strcat(cbuf,  ", ");
 
     strcat(cbuf, "a ") ;
-    strcat(cbuf, ShipTypes[Ships[snum].shiptype].name) ;
+    strcat(cbuf, cbShipTypes[cbShips[snum].shiptype].name) ;
     strcat(cbuf, ", ");
 
     if ( godlike )
@@ -651,7 +651,7 @@ void mcuInfoShip( int snum, int scanner )
     }
     else
     {
-        if ( Ships[snum].war[Ships[scanner].team] )
+        if ( cbShips[snum].war[cbShips[scanner].team] )
             strcat(cbuf , "at WAR.") ;
         else
             strcat(cbuf , "at peace.") ;
@@ -659,7 +659,7 @@ void mcuInfoShip( int snum, int scanner )
 
     mcuPutMsg( cbuf, MSG_LIN1 );
 
-    if ( ! SCLOAKED(snum) || Ships[snum].warp != 0.0 )
+    if ( ! SCLOAKED(snum) || cbShips[snum].warp != 0.0 )
     {
         Context.lasttdist = round( dis ); /* save these puppies for hudInfo */
         Context.lasttang = round( utAngle( x, y, appx, appy ) );
@@ -669,7 +669,7 @@ void mcuInfoShip( int snum, int scanner )
 
         if (UserConf.DoETAStats)
 	{
-            if (Ships[scanner].warp > 0.0 || Ships[snum].warp > 0.0)
+            if (cbShips[scanner].warp > 0.0 || cbShips[snum].warp > 0.0)
 	    {
                 curtime = time(0);
 
@@ -745,11 +745,11 @@ void mcuInfoShip( int snum, int scanner )
                     olddis = dis;
 
                     pwarp =
-                        (((Ships[scanner].warp > 0.0) ?
-                          Ships[scanner].warp :
+                        (((cbShips[scanner].warp > 0.0) ?
+                          cbShips[scanner].warp :
                           0.0) +
-                         ((Ships[snum].warp > 0.0) ?
-                          Ships[snum].warp
+                         ((cbShips[snum].warp > 0.0) ?
+                          cbShips[snum].warp
                           : 0.0));
 
                     sprintf(tmpstr, ", ETA %s",
@@ -771,10 +771,10 @@ void mcuInfoShip( int snum, int scanner )
             strcat(cbuf,  ", ");
         strcat(cbuf , "shields ") ;
         if ( SSHUP(snum) && ! SREPAIR(snum) )
-            utAppendInt(cbuf, round( Ships[snum].shields ));
+            utAppendInt(cbuf, round( cbShips[snum].shields ));
         else
             strcat(cbuf , "DOWN") ;
-        i = round( Ships[snum].damage );
+        i = round( cbShips[snum].damage );
         if ( i > 0 )
 	{
             if ( cbuf[0] != 0 )
@@ -782,7 +782,7 @@ void mcuInfoShip( int snum, int scanner )
             sprintf( junk, "damage %d", i );
             strcat(cbuf , junk) ;
 	}
-        i = Ships[snum].armies;
+        i = cbShips[snum].armies;
         if ( i > 0 )
 	{
             sprintf( junk, ", with %d arm", i );
@@ -901,10 +901,10 @@ void mcuPlanetList( int team, int snum )
                 /* colorize - dwp */
                 if ( snum >= 0 && snum < MAXSHIPS)
 		{	/* if user has a valid ship */
-                    if ( Planets[pnum].team == Ships[snum].team && !selfwar(snum) )
+                    if ( cbPlanets[pnum].team == cbShips[snum].team && !selfwar(snum) )
                         outattr = GreenLevelColor;
-                    else if ( (clbSPWar(snum,pnum) && Planets[pnum].scanned[Ships[snum].team] ) ||
-                              Planets[pnum].type == PLANET_SUN )
+                    else if ( (clbSPWar(snum,pnum) && cbPlanets[pnum].scanned[cbShips[snum].team] ) ||
+                              cbPlanets[pnum].type == PLANET_SUN )
                         outattr = RedLevelColor;
                     else
                         outattr = YellowLevelColor;
@@ -913,7 +913,7 @@ void mcuPlanetList( int team, int snum )
 		{			/* else, user doesn't have a ship yet */
                     if (team == TEAM_NOTEAM)
 		    {			/* via conqoper */
-                        switch(Planets[pnum].type)
+                        switch(cbPlanets[pnum].type)
 			{
 			case PLANET_SUN:
                             outattr = RedLevelColor;
@@ -939,15 +939,15 @@ void mcuPlanetList( int team, int snum )
 		    }
                     else
 		    {			/* via menu() */
-                        if ( Planets[pnum].team == Users[Context.unum].team &&
-                             !(Users[Context.unum].war[Users[Context.unum].team]))
+                        if ( cbPlanets[pnum].team == cbUsers[Context.unum].team &&
+                             !(cbUsers[Context.unum].war[cbUsers[Context.unum].team]))
 			{
                             outattr = GreenLevelColor;
 			}
-                        else if ( Planets[pnum].type == PLANET_SUN ||
-                                  (Planets[pnum].team < NUMPLAYERTEAMS &&
-                                   Users[Context.unum].war[Planets[pnum].team] &&
-                                   Planets[pnum].scanned[Users[Context.unum].team]) )
+                        else if ( cbPlanets[pnum].type == PLANET_SUN ||
+                                  (cbPlanets[pnum].team < NUMPLAYERTEAMS &&
+                                   cbUsers[Context.unum].war[cbPlanets[pnum].team] &&
+                                   cbPlanets[pnum].scanned[cbUsers[Context.unum].team]) )
 			{
                             outattr = RedLevelColor;
 			}
@@ -965,33 +965,33 @@ void mcuPlanetList( int team, int snum )
                 /* I want everything if it's real */
 
                 /* Figure out who owns it and count armies. */
-                ch =  Teams[Planets[pnum].team].teamchar;
-                sprintf( junk, "%d", Planets[pnum].armies );
+                ch =  cbTeams[cbPlanets[pnum].team].teamchar;
+                sprintf( junk, "%d", cbPlanets[pnum].armies );
 
                 /* Then modify based on scan information. */
 
                 if ( team != TEAM_NOTEAM )
-                    if ( ! Planets[pnum].scanned[team] )
+                    if ( ! cbPlanets[pnum].scanned[team] )
                     {
                         ch = '?';
                         strcpy(junk , "?") ;
                     }
 
                 /* Suns and moons are displayed as unowned. */
-                if ( Planets[pnum].type == PLANET_SUN || Planets[pnum].type == PLANET_MOON )
+                if ( cbPlanets[pnum].type == PLANET_SUN || cbPlanets[pnum].type == PLANET_MOON )
                     ch = ' ';
 
                 /* Don't display armies for suns unless we're special. */
-                if ( Planets[pnum].type == PLANET_SUN )
+                if ( cbPlanets[pnum].type == PLANET_SUN )
                     if ( team != TEAM_NOTEAM )
                         junk[0] = 0;
 
                 /* Moons aren't supposed to have armies. */
-                if ( Planets[pnum].type == PLANET_MOON )
+                if ( cbPlanets[pnum].type == PLANET_MOON )
 		{
                     if ( team != TEAM_NOTEAM )
                         junk[0] = 0;
-                    else if ( Planets[pnum].armies == 0 )
+                    else if ( cbPlanets[pnum].armies == 0 )
                         junk[0] = 0;
 		}
 
@@ -999,12 +999,12 @@ void mcuPlanetList( int team, int snum )
                 char homeflag = ' ';
 
                 /* flag planets that are required for a conq */
-                if (Planets[pnum].type == PLANET_CLASSM
-                    || Planets[pnum].type == PLANET_DEAD)
+                if (cbPlanets[pnum].type == PLANET_CLASSM
+                    || cbPlanets[pnum].type == PLANET_DEAD)
 		{
                     // check for homeplanet
                     if (PHOMEPLANET(pnum))
-                        homeflag = Teams[Planets[pnum].defendteam].name[0];
+                        homeflag = cbTeams[cbPlanets[pnum].defendteam].name[0];
 
                     // core planet - required for conquer
                     if (PCORE(pnum))
@@ -1016,13 +1016,13 @@ void mcuPlanetList( int team, int snum )
                 cdputs( xbuf, lin, col );
 
                 col+=(strlen(xbuf));
-                sprintf(xbuf,"%-11s ",Planets[pnum].name);  /* Planets[pnum].name */
+                sprintf(xbuf,"%-11s ",cbPlanets[pnum].name);  /* cbPlanets[pnum].name */
                 uiPutColor(outattr);
                 cdputs( xbuf, lin, col );
 
                 col+=(strlen(xbuf));
                 sprintf( xbuf, "%-4c %-3c  ",
-                         ConqInfo->chrplanets[Planets[pnum].type], ch);
+                         cbConqInfo->chrplanets[cbPlanets[pnum].type], ch);
                 cdputs( xbuf, lin, col );
 
                 col+=(strlen(xbuf));
@@ -1148,19 +1148,19 @@ void mcuPlayList( int godlike, int doall, int snum )
         lin = fline;
         while ( i < MAXSHIPS && lin <= lline )
 	{
-            status = Ships[i].status;
+            status = cbShips[i].status;
 
-            kb = Ships[i].killedBy;
-            detail = Ships[i].killedByDetail;
+            kb = cbShips[i].killedBy;
+            detail = cbShips[i].killedByDetail;
             if ( status == SS_LIVE ||
                  ( doall && ( status != SS_OFF || kb != KB_NONE ) ) )
 	    {
                 sbuf[0] = 0;
                 utAppendShip(sbuf , i) ;
                 strcat(sbuf, " ") ;
-                utAppendChar(sbuf, ShipTypes[Ships[i].shiptype].name[0]) ;
+                utAppendChar(sbuf, cbShipTypes[cbShips[i].shiptype].name[0]) ;
 
-                unum = Ships[i].unum;
+                unum = cbShips[i].unum;
                 if ( unum >= 0 && unum < MAXUSERS )
 		{
                     if (SROBOT(i)) /* robot */
@@ -1170,16 +1170,16 @@ void mcuPlayList( int godlike, int doall, int snum )
                     else
 		    {
                         if (godlike)
-                            sprintf(pidbuf, "%6d", Ships[i].pid);
+                            sprintf(pidbuf, "%6d", cbShips[i].pid);
                         else
                             strcpy(pidbuf, "  LIVE");
 		    }
 
-                    strcpy(ubuf, Users[unum].username);
+                    strcpy(ubuf, cbUsers[unum].username);
 
-                    sprintf(kbuf, "%6.1f", (Ships[i].kills + Ships[i].strkills));
+                    sprintf(kbuf, "%6.1f", (cbShips[i].kills + cbShips[i].strkills));
                     sprintf( cbuf, "%-5s %-13.13s %-21.21s %-8s %6s",
-                             sbuf, ubuf, Ships[i].alias,
+                             sbuf, ubuf, cbShips[i].alias,
                              kbuf, pidbuf );
 		}
                 else
@@ -1197,7 +1197,7 @@ void mcuPlayList( int godlike, int doall, int snum )
                         uiPutColor(CQC_A_BOLD);
 		    else if (satwar(i, snum)) /* we're at war with it */
                         uiPutColor(RedLevelColor);
-		    else if (Ships[i].team == Ships[snum].team && !selfwar(snum))
+		    else if (cbShips[i].team == cbShips[snum].team && !selfwar(snum))
                         uiPutColor(GreenLevelColor); /* it's a team ship */
 		    else
                         uiPutColor(YellowLevelColor);
@@ -1208,10 +1208,10 @@ void mcuPlayList( int godlike, int doall, int snum )
                 }
 		else
                 { /* not conqoper, and not a valid ship (main menu) */
-		    if (Users[Context.unum].war[Ships[i].team])  /* we're at war with ships's
+		    if (cbUsers[Context.unum].war[cbShips[i].team])  /* we're at war with ships's
                                                                     team */
                         uiPutColor(RedLevelColor);
-		    else if (Users[Context.unum].team == Ships[i].team)
+		    else if (cbUsers[Context.unum].team == cbShips[i].team)
                         uiPutColor(GreenLevelColor); /* it's a team ship */
 		    else
                         uiPutColor(YellowLevelColor);
@@ -1279,12 +1279,12 @@ int mcuReviewMsgs( int snum, int slm )
     didany = FALSE;
     Done = FALSE;
 
-    lastone = utModPlusOne( ConqInfo->lastmsg+1, MAXMESSAGES );
+    lastone = utModPlusOne( cbConqInfo->lastmsg+1, MAXMESSAGES );
     if ( snum >= 0 && snum < MAXSHIPS )
     {
-        if ( Ships[snum].lastmsg == LMSG_NEEDINIT )
+        if ( cbShips[snum].lastmsg == LMSG_NEEDINIT )
             return ( FALSE );				/* none to read */
-        i = Ships[snum].alastmsg;
+        i = cbShips[snum].alastmsg;
         if ( i != LMSG_READALL )
             lastone = i;
     }
@@ -1430,34 +1430,34 @@ void mcuTeamList( int team )
     lin = 1;
     /* team stats and last date conquered */
     sprintf(tmpfmt,"#%d#%%s#%d#%%s",LabelColor,InfoColor);
-    cprintf(lin,0,ALIGN_CENTER, tmpfmt, stats, ConqInfo->inittime);
+    cprintf(lin,0,ALIGN_CENTER, tmpfmt, stats, cbConqInfo->inittime);
     lin++;
 
     /* last conquered */
     cprintf(lin, 0, ALIGN_CENTER, tmpfmt, last_conquered,
-            ConqInfo->conqtime);
+            cbConqInfo->conqtime);
     lin++;
 
     /* last conqueror and conqteam */
     sprintf(tmpfmt,"#%d#by #%d#%%s #%d#for the #%d#%%s #%d#team",
             LabelColor,(int)CQC_A_BOLD,LabelColor,(int)CQC_A_BOLD,LabelColor);
-    cprintf(lin,0,ALIGN_CENTER, tmpfmt, ConqInfo->conqueror,
-            ConqInfo->conqteam);
+    cprintf(lin,0,ALIGN_CENTER, tmpfmt, cbConqInfo->conqueror,
+            cbConqInfo->conqteam);
 
     col=0;  /* put col back to 0 for rest of display */
     lin = lin + 1;
     cdclrl( lin, 1 );
-    if ( ConqInfo->lastwords[0] != 0 )
+    if ( cbConqInfo->lastwords[0] != 0 )
     {
         sprintf(tmpfmt, "#%d#%%c%%s%%c", YellowLevelColor);
-        cprintf(lin, 0, ALIGN_CENTER, tmpfmt, '"', ConqInfo->lastwords, '"' );
+        cprintf(lin, 0, ALIGN_CENTER, tmpfmt, '"', cbConqInfo->lastwords, '"' );
     }
 
     lin+=2;
     sprintf( buf, sfmt, " ",
-             Teams[0].name, Teams[1].name, Teams[2].name, Teams[3].name, "Totals" );
+             cbTeams[0].name, cbTeams[1].name, cbTeams[2].name, cbTeams[3].name, "Totals" );
     cprintf(lin,col,0, sfmt2, " ",
-            Teams[0].name, Teams[1].name, Teams[2].name, Teams[3].name, "Totals" );
+            cbTeams[0].name, cbTeams[1].name, cbTeams[2].name, cbTeams[3].name, "Totals" );
 
     lin++;
     for ( i = 0; buf[i] != 0; i++ )
@@ -1469,50 +1469,50 @@ void mcuTeamList( int team )
 
     lin++;
     cprintf(lin,col,0, dfmt2, "Conquers",
-            Teams[0].stats[TSTAT_CONQUERS], Teams[1].stats[TSTAT_CONQUERS],
-            Teams[2].stats[TSTAT_CONQUERS], Teams[3].stats[TSTAT_CONQUERS],
-            Teams[0].stats[TSTAT_CONQUERS] + Teams[1].stats[TSTAT_CONQUERS] +
-            Teams[2].stats[TSTAT_CONQUERS] + Teams[3].stats[TSTAT_CONQUERS] );
+            cbTeams[0].stats[TSTAT_CONQUERS], cbTeams[1].stats[TSTAT_CONQUERS],
+            cbTeams[2].stats[TSTAT_CONQUERS], cbTeams[3].stats[TSTAT_CONQUERS],
+            cbTeams[0].stats[TSTAT_CONQUERS] + cbTeams[1].stats[TSTAT_CONQUERS] +
+            cbTeams[2].stats[TSTAT_CONQUERS] + cbTeams[3].stats[TSTAT_CONQUERS] );
 
     lin++;
     cprintf(lin,col,0, dfmt2, "Wins",
-            Teams[0].stats[TSTAT_WINS], Teams[1].stats[TSTAT_WINS],
-            Teams[2].stats[TSTAT_WINS], Teams[3].stats[TSTAT_WINS],
-            Teams[0].stats[TSTAT_WINS] + Teams[1].stats[TSTAT_WINS] +
-            Teams[2].stats[TSTAT_WINS] + Teams[3].stats[TSTAT_WINS] );
+            cbTeams[0].stats[TSTAT_WINS], cbTeams[1].stats[TSTAT_WINS],
+            cbTeams[2].stats[TSTAT_WINS], cbTeams[3].stats[TSTAT_WINS],
+            cbTeams[0].stats[TSTAT_WINS] + cbTeams[1].stats[TSTAT_WINS] +
+            cbTeams[2].stats[TSTAT_WINS] + cbTeams[3].stats[TSTAT_WINS] );
 
     lin++;
     cprintf(lin,col,0, dfmt2, "Losses",
-            Teams[0].stats[TSTAT_LOSSES], Teams[1].stats[TSTAT_LOSSES],
-            Teams[2].stats[TSTAT_LOSSES], Teams[3].stats[TSTAT_LOSSES],
-            Teams[0].stats[TSTAT_LOSSES] + Teams[1].stats[TSTAT_LOSSES] +
-            Teams[2].stats[TSTAT_LOSSES] + Teams[3].stats[TSTAT_LOSSES] );
+            cbTeams[0].stats[TSTAT_LOSSES], cbTeams[1].stats[TSTAT_LOSSES],
+            cbTeams[2].stats[TSTAT_LOSSES], cbTeams[3].stats[TSTAT_LOSSES],
+            cbTeams[0].stats[TSTAT_LOSSES] + cbTeams[1].stats[TSTAT_LOSSES] +
+            cbTeams[2].stats[TSTAT_LOSSES] + cbTeams[3].stats[TSTAT_LOSSES] );
 
     lin++;
     cprintf(lin,col,0, dfmt2, "Ships",
-            Teams[0].stats[TSTAT_ENTRIES], Teams[1].stats[TSTAT_ENTRIES],
-            Teams[2].stats[TSTAT_ENTRIES], Teams[3].stats[TSTAT_ENTRIES],
-            Teams[0].stats[TSTAT_ENTRIES] + Teams[1].stats[TSTAT_ENTRIES] +
-            Teams[2].stats[TSTAT_ENTRIES] + Teams[3].stats[TSTAT_ENTRIES] );
+            cbTeams[0].stats[TSTAT_ENTRIES], cbTeams[1].stats[TSTAT_ENTRIES],
+            cbTeams[2].stats[TSTAT_ENTRIES], cbTeams[3].stats[TSTAT_ENTRIES],
+            cbTeams[0].stats[TSTAT_ENTRIES] + cbTeams[1].stats[TSTAT_ENTRIES] +
+            cbTeams[2].stats[TSTAT_ENTRIES] + cbTeams[3].stats[TSTAT_ENTRIES] );
 
     lin++;
-    etime = Teams[0].stats[TSTAT_SECONDS] + Teams[1].stats[TSTAT_SECONDS] +
-        Teams[2].stats[TSTAT_SECONDS] + Teams[3].stats[TSTAT_SECONDS];
-    utFormatSeconds( Teams[0].stats[TSTAT_SECONDS], timbuf[0] );
-    utFormatSeconds( Teams[1].stats[TSTAT_SECONDS], timbuf[1] );
-    utFormatSeconds( Teams[2].stats[TSTAT_SECONDS], timbuf[2] );
-    utFormatSeconds( Teams[3].stats[TSTAT_SECONDS], timbuf[3] );
+    etime = cbTeams[0].stats[TSTAT_SECONDS] + cbTeams[1].stats[TSTAT_SECONDS] +
+        cbTeams[2].stats[TSTAT_SECONDS] + cbTeams[3].stats[TSTAT_SECONDS];
+    utFormatSeconds( cbTeams[0].stats[TSTAT_SECONDS], timbuf[0] );
+    utFormatSeconds( cbTeams[1].stats[TSTAT_SECONDS], timbuf[1] );
+    utFormatSeconds( cbTeams[2].stats[TSTAT_SECONDS], timbuf[2] );
+    utFormatSeconds( cbTeams[3].stats[TSTAT_SECONDS], timbuf[3] );
     utFormatSeconds( etime, timbuf[4] );
     cprintf(lin,col,0, sfmt3, "Time",
             timbuf[0], timbuf[1], timbuf[2], timbuf[3], timbuf[4] );
 
     lin++;
-    ctime = Teams[0].stats[TSTAT_CPUSECONDS] + Teams[1].stats[TSTAT_CPUSECONDS] +
-        Teams[2].stats[TSTAT_CPUSECONDS] + Teams[3].stats[TSTAT_CPUSECONDS];
-    utFormatSeconds( Teams[0].stats[TSTAT_CPUSECONDS], timbuf[0] );
-    utFormatSeconds( Teams[1].stats[TSTAT_CPUSECONDS], timbuf[1] );
-    utFormatSeconds( Teams[2].stats[TSTAT_CPUSECONDS], timbuf[2] );
-    utFormatSeconds( Teams[3].stats[TSTAT_CPUSECONDS], timbuf[3] );
+    ctime = cbTeams[0].stats[TSTAT_CPUSECONDS] + cbTeams[1].stats[TSTAT_CPUSECONDS] +
+        cbTeams[2].stats[TSTAT_CPUSECONDS] + cbTeams[3].stats[TSTAT_CPUSECONDS];
+    utFormatSeconds( cbTeams[0].stats[TSTAT_CPUSECONDS], timbuf[0] );
+    utFormatSeconds( cbTeams[1].stats[TSTAT_CPUSECONDS], timbuf[1] );
+    utFormatSeconds( cbTeams[2].stats[TSTAT_CPUSECONDS], timbuf[2] );
+    utFormatSeconds( cbTeams[3].stats[TSTAT_CPUSECONDS], timbuf[3] );
     utFormatSeconds( ctime, timbuf[4] );
     cprintf( lin,col,0, sfmt3, "Cpu time",
              timbuf[0], timbuf[1], timbuf[2], timbuf[3], timbuf[4] );
@@ -1520,11 +1520,11 @@ void mcuTeamList( int team )
     lin++;
     for ( i = 0; i < 4; i++ )
     {
-        j = Teams[i].stats[TSTAT_SECONDS];
+        j = cbTeams[i].stats[TSTAT_SECONDS];
         if ( j <= 0 )
             x[i] = 0.0;
         else
-            x[i] = 100.0 * ((real) Teams[i].stats[TSTAT_CPUSECONDS] / (real) j);
+            x[i] = 100.0 * ((real) cbTeams[i].stats[TSTAT_CPUSECONDS] / (real) j);
     }
     if ( etime <= 0 )
         x[4] = 0.0;
@@ -1534,65 +1534,65 @@ void mcuTeamList( int team )
 
     lin++;
     cprintf( lin,col,0, dfmt2, "Phaser shots",
-             Teams[0].stats[TSTAT_PHASERS], Teams[1].stats[TSTAT_PHASERS],
-             Teams[2].stats[TSTAT_PHASERS], Teams[3].stats[TSTAT_PHASERS],
-             Teams[0].stats[TSTAT_PHASERS] + Teams[1].stats[TSTAT_PHASERS] +
-             Teams[2].stats[TSTAT_PHASERS] + Teams[3].stats[TSTAT_PHASERS] );
+             cbTeams[0].stats[TSTAT_PHASERS], cbTeams[1].stats[TSTAT_PHASERS],
+             cbTeams[2].stats[TSTAT_PHASERS], cbTeams[3].stats[TSTAT_PHASERS],
+             cbTeams[0].stats[TSTAT_PHASERS] + cbTeams[1].stats[TSTAT_PHASERS] +
+             cbTeams[2].stats[TSTAT_PHASERS] + cbTeams[3].stats[TSTAT_PHASERS] );
 
     lin++;
     cprintf( lin,col,0, dfmt2, "Torps fired",
-             Teams[0].stats[TSTAT_TORPS], Teams[1].stats[TSTAT_TORPS],
-             Teams[2].stats[TSTAT_TORPS], Teams[3].stats[TSTAT_TORPS],
-             Teams[0].stats[TSTAT_TORPS] + Teams[1].stats[TSTAT_TORPS] +
-             Teams[2].stats[TSTAT_TORPS] + Teams[3].stats[TSTAT_TORPS] );
+             cbTeams[0].stats[TSTAT_TORPS], cbTeams[1].stats[TSTAT_TORPS],
+             cbTeams[2].stats[TSTAT_TORPS], cbTeams[3].stats[TSTAT_TORPS],
+             cbTeams[0].stats[TSTAT_TORPS] + cbTeams[1].stats[TSTAT_TORPS] +
+             cbTeams[2].stats[TSTAT_TORPS] + cbTeams[3].stats[TSTAT_TORPS] );
 
     lin++;
     cprintf( lin,col,0, dfmt2, "Armies bombed",
-             Teams[0].stats[TSTAT_ARMBOMB], Teams[1].stats[TSTAT_ARMBOMB],
-             Teams[2].stats[TSTAT_ARMBOMB], Teams[3].stats[TSTAT_ARMBOMB],
-             Teams[0].stats[TSTAT_ARMBOMB] + Teams[1].stats[TSTAT_ARMBOMB] +
-             Teams[2].stats[TSTAT_ARMBOMB] + Teams[3].stats[TSTAT_ARMBOMB] );
+             cbTeams[0].stats[TSTAT_ARMBOMB], cbTeams[1].stats[TSTAT_ARMBOMB],
+             cbTeams[2].stats[TSTAT_ARMBOMB], cbTeams[3].stats[TSTAT_ARMBOMB],
+             cbTeams[0].stats[TSTAT_ARMBOMB] + cbTeams[1].stats[TSTAT_ARMBOMB] +
+             cbTeams[2].stats[TSTAT_ARMBOMB] + cbTeams[3].stats[TSTAT_ARMBOMB] );
 
     lin++;
     cprintf( lin,col,0, dfmt2, "Armies captured",
-             Teams[0].stats[TSTAT_ARMSHIP], Teams[1].stats[TSTAT_ARMSHIP],
-             Teams[2].stats[TSTAT_ARMSHIP], Teams[3].stats[TSTAT_ARMSHIP],
-             Teams[0].stats[TSTAT_ARMSHIP] + Teams[1].stats[TSTAT_ARMSHIP] +
-             Teams[2].stats[TSTAT_ARMSHIP] + Teams[3].stats[TSTAT_ARMSHIP] );
+             cbTeams[0].stats[TSTAT_ARMSHIP], cbTeams[1].stats[TSTAT_ARMSHIP],
+             cbTeams[2].stats[TSTAT_ARMSHIP], cbTeams[3].stats[TSTAT_ARMSHIP],
+             cbTeams[0].stats[TSTAT_ARMSHIP] + cbTeams[1].stats[TSTAT_ARMSHIP] +
+             cbTeams[2].stats[TSTAT_ARMSHIP] + cbTeams[3].stats[TSTAT_ARMSHIP] );
 
     lin++;
     cprintf( lin,col,0, dfmt2, "Planets taken",
-             Teams[0].stats[TSTAT_CONQPLANETS], Teams[1].stats[TSTAT_CONQPLANETS],
-             Teams[2].stats[TSTAT_CONQPLANETS], Teams[3].stats[TSTAT_CONQPLANETS],
-             Teams[0].stats[TSTAT_CONQPLANETS] + Teams[1].stats[TSTAT_CONQPLANETS] +
-             Teams[2].stats[TSTAT_CONQPLANETS] + Teams[3].stats[TSTAT_CONQPLANETS] );
+             cbTeams[0].stats[TSTAT_CONQPLANETS], cbTeams[1].stats[TSTAT_CONQPLANETS],
+             cbTeams[2].stats[TSTAT_CONQPLANETS], cbTeams[3].stats[TSTAT_CONQPLANETS],
+             cbTeams[0].stats[TSTAT_CONQPLANETS] + cbTeams[1].stats[TSTAT_CONQPLANETS] +
+             cbTeams[2].stats[TSTAT_CONQPLANETS] + cbTeams[3].stats[TSTAT_CONQPLANETS] );
 
     lin++;
     cprintf( lin,col,0, dfmt2, "Coups",
-             Teams[0].stats[TSTAT_COUPS], Teams[1].stats[TSTAT_COUPS],
-             Teams[2].stats[TSTAT_COUPS], Teams[3].stats[TSTAT_COUPS],
-             Teams[0].stats[TSTAT_COUPS] + Teams[1].stats[TSTAT_COUPS] +
-             Teams[2].stats[TSTAT_COUPS] + Teams[3].stats[TSTAT_COUPS] );
+             cbTeams[0].stats[TSTAT_COUPS], cbTeams[1].stats[TSTAT_COUPS],
+             cbTeams[2].stats[TSTAT_COUPS], cbTeams[3].stats[TSTAT_COUPS],
+             cbTeams[0].stats[TSTAT_COUPS] + cbTeams[1].stats[TSTAT_COUPS] +
+             cbTeams[2].stats[TSTAT_COUPS] + cbTeams[3].stats[TSTAT_COUPS] );
 
     lin++;
     cprintf( lin,col,0, dfmt2, "Genocides",
-             Teams[0].stats[TSTAT_GENOCIDE], Teams[1].stats[TSTAT_GENOCIDE],
-             Teams[2].stats[TSTAT_GENOCIDE], Teams[3].stats[TSTAT_GENOCIDE],
-             Teams[0].stats[TSTAT_GENOCIDE] + Teams[1].stats[TSTAT_GENOCIDE] +
-             Teams[2].stats[TSTAT_GENOCIDE] + Teams[3].stats[TSTAT_GENOCIDE] );
+             cbTeams[0].stats[TSTAT_GENOCIDE], cbTeams[1].stats[TSTAT_GENOCIDE],
+             cbTeams[2].stats[TSTAT_GENOCIDE], cbTeams[3].stats[TSTAT_GENOCIDE],
+             cbTeams[0].stats[TSTAT_GENOCIDE] + cbTeams[1].stats[TSTAT_GENOCIDE] +
+             cbTeams[2].stats[TSTAT_GENOCIDE] + cbTeams[3].stats[TSTAT_GENOCIDE] );
 
     for ( i = 0; i < 4; i++ )
-        if ( Teams[i].couptime == 0 )
+        if ( cbTeams[i].couptime == 0 )
             timbuf[i][0] = 0;
         else
-            sprintf( timbuf[i], "%d", Teams[i].couptime );
+            sprintf( timbuf[i], "%d", cbTeams[i].couptime );
 
     if ( ! godlike )
     {
         for ( i = 0; i < 4; i++ )
             if ( team != i )
                 strcpy(timbuf[i] , "-") ;
-            else if ( ! Teams[i].coupinfo && timbuf[i][0] != 0 )
+            else if ( ! cbTeams[i].coupinfo && timbuf[i][0] != 0 )
                 strcpy(timbuf[i] , "?") ;
     }
 
@@ -1671,13 +1671,13 @@ void mcuUserList( int godlike, int snum )
             /* determine color */
             if ( snum >= 0 && snum < MAXSHIPS ) /* we're a valid ship */
 	    {
-		if ( strcmp(Users[uvec[i]].username,
-			    Users[Ships[snum].unum].username) == 0 &&
-		     Users[uvec[i]].type == Users[Ships[snum].unum].type)
+		if ( strcmp(cbUsers[uvec[i]].username,
+			    cbUsers[cbShips[snum].unum].username) == 0 &&
+		     cbUsers[uvec[i]].type == cbUsers[cbShips[snum].unum].type)
                     uiPutColor(CQC_A_BOLD);    /* it's ours */
-		else if (Ships[snum].war[Users[uvec[i]].team]) /* we're at war with it */
+		else if (cbShips[snum].war[cbUsers[uvec[i]].team]) /* we're at war with it */
                     uiPutColor(RedLevelColor);
-		else if (Ships[snum].team == Users[uvec[i]].team && !selfwar(snum))
+		else if (cbShips[snum].team == cbUsers[uvec[i]].team && !selfwar(snum))
                     uiPutColor(GreenLevelColor); /* it's a team ship */
 		else
                     uiPutColor(YellowLevelColor);
@@ -1686,13 +1686,13 @@ void mcuUserList( int godlike, int snum )
                 uiPutColor(YellowLevelColor); /* bland view */
             else			/* we don't have a ship yet */
 	    {
-                if ( strcmp(Users[uvec[i]].username,
-                            Users[Context.unum].username) == 0 &&
-                     Users[uvec[i]].type == Users[Context.unum].type)
+                if ( strcmp(cbUsers[uvec[i]].username,
+                            cbUsers[Context.unum].username) == 0 &&
+                     cbUsers[uvec[i]].type == cbUsers[Context.unum].type)
                     uiPutColor(CQC_A_BOLD);    /* it's ours */
-                else if (Users[Context.unum].war[Users[uvec[i]].team]) /* we're war with them */
+                else if (cbUsers[Context.unum].war[cbUsers[uvec[i]].team]) /* we're war with them */
                     uiPutColor(RedLevelColor);	            /* (might be selfwar) */
-                else if (Users[Context.unum].team == Users[uvec[i]].team) /* team ship */
+                else if (cbUsers[Context.unum].team == cbUsers[uvec[i]].team) /* team ship */
                     uiPutColor(GreenLevelColor);
                 else
                     uiPutColor(YellowLevelColor);
@@ -1802,13 +1802,13 @@ void mcuUserStats( int godlike , int snum )
             /* determine color */
             if ( snum >= 0 && snum < MAXSHIPS ) /* we're a valid ship */
             {
-                if ( strcmp(Users[uvec[i]].username,
-                            Users[Ships[snum].unum].username) == 0 &&
-                     Users[uvec[i]].type == Users[Ships[snum].unum].type )
+                if ( strcmp(cbUsers[uvec[i]].username,
+                            cbUsers[cbShips[snum].unum].username) == 0 &&
+                     cbUsers[uvec[i]].type == cbUsers[cbShips[snum].unum].type )
                     uiPutColor(CQC_A_BOLD);	        /* it's ours */
-                else if (Ships[snum].war[Users[uvec[i]].team])
+                else if (cbShips[snum].war[cbUsers[uvec[i]].team])
                     uiPutColor(RedLevelColor);   /* we're at war with it */
-                else if (Ships[snum].team == Users[uvec[i]].team && !selfwar(snum))
+                else if (cbShips[snum].team == cbUsers[uvec[i]].team && !selfwar(snum))
                     uiPutColor(GreenLevelColor); /* it's a team ship */
                 else
                     uiPutColor(YellowLevelColor);
@@ -1819,13 +1819,13 @@ void mcuUserStats( int godlike , int snum )
 	    }
             else
 	    {
-                if ( strcmp(Users[uvec[i]].username,
-                            Users[Context.unum].username) == 0  &&
-                     Users[uvec[i]].type == Users[Context.unum].type )
+                if ( strcmp(cbUsers[uvec[i]].username,
+                            cbUsers[Context.unum].username) == 0  &&
+                     cbUsers[uvec[i]].type == cbUsers[Context.unum].type )
                     uiPutColor(CQC_A_BOLD);	/* it's ours */
-                else if (Users[Context.unum].war[Users[uvec[i]].team])
+                else if (cbUsers[Context.unum].war[cbUsers[uvec[i]].team])
                     uiPutColor(RedLevelColor);  /* we're war with them (poss selfwar) */
-                else if (Users[Context.unum].team == Users[uvec[i]].team)
+                else if (cbUsers[Context.unum].team == cbUsers[uvec[i]].team)
                     uiPutColor(GreenLevelColor);	/* team ship */
                 else
                     uiPutColor(YellowLevelColor);

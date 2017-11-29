@@ -1,5 +1,5 @@
 /* 
- * Torpedo structure for Ships[].torps
+ * Torpedo structure for cbShips[].torps
  *
  * Copyright Jon Trulson under the MIT License. (See LICENSE).
  */

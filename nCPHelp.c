@@ -172,7 +172,7 @@ static int nCPHelpIdle(void)
     if (pkttype < 0)          /* some error */
     {
         utLog("nCPHelpIdle: waiForPacket returned %d", pkttype);
-        Ships[Context.snum].status = SS_OFF;
+        cbShips[Context.snum].status = SS_OFF;
         return NODE_EXIT;
     }
 

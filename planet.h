@@ -21,12 +21,12 @@
 #define PLAN_F_CORE        0x00000004 /* true if needed to take universe */
 
 /* helpers */
-#define PVISIBLE(x)        ( Planets[(x)].flags & PLAN_F_VISIBLE )
-#define PHOMEPLANET(x)     ( Planets[(x)].flags & PLAN_F_HOMEPLANET )
-#define PCORE(x)           ( Planets[(x)].flags & PLAN_F_CORE )
+#define PVISIBLE(x)        ( cbPlanets[(x)].flags & PLAN_F_VISIBLE )
+#define PHOMEPLANET(x)     ( cbPlanets[(x)].flags & PLAN_F_HOMEPLANET )
+#define PCORE(x)           ( cbPlanets[(x)].flags & PLAN_F_CORE )
 
-#define PFSET(x, b)  ( Planets[(x)].flags |=  (b) )
-#define PFCLR(x, b)  ( Planets[(x)].flags &= ~(b) )
+#define PFSET(x, b)  ( cbPlanets[(x)].flags |=  (b) )
+#define PFCLR(x, b)  ( cbPlanets[(x)].flags &= ~(b) )
 
 typedef struct {
     real x;			/* x coordinates of planet */

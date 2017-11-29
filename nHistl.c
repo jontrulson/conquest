@@ -59,7 +59,7 @@ static int nHistlDisplay(dspConfig_t *dsp)
     cprintf(fline,0,ALIGN_CENTER,"#%d#%s",LabelColor, hd0);
     fline = fline + 2;
 
-    thistptr = ConqInfo->histptr;
+    thistptr = cbConqInfo->histptr;
     lin = fline;
     col = 1;
 
@@ -72,19 +72,19 @@ static int nHistlDisplay(dspConfig_t *dsp)
         i = utModPlusOne( i - 1, MAXHISTLOG );
 
         // No username, no entry
-        if (!History[i].username[0])
+        if (!cbHistory[i].username[0])
             continue;
 
-        if (History[i].unum < 0) // resigned
+        if (cbHistory[i].unum < 0) // resigned
             isResigned = true;
 
-        utStrncpy(puname, History[i].username, MAXUSERNAME);
+        utStrncpy(puname, cbHistory[i].username, MAXUSERNAME);
 
         /* entry time */
-        utFormatTime( histentrytm, History[i].enterTime);
+        utFormatTime( histentrytm, cbHistory[i].enterTime);
 
         /* now elapsed time */
-        utFormatSeconds((int) History[i].elapsed, connecttm);
+        utFormatSeconds((int) cbHistory[i].elapsed, connecttm);
         /* strip off seconds, or for long times, anything after 7 bytes */
         connecttm[7] = '\0';
 
@@ -124,7 +124,7 @@ static int nHistlIdle(void)
     if (pkttype < 0)          /* some error */
     {
         utLog("nHistlIdle: waiForPacket returned %d", pkttype);
-        Ships[Context.snum].status = SS_OFF;
+        cbShips[Context.snum].status = SS_OFF;
         return NODE_EXIT;
     }
 

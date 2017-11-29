@@ -252,7 +252,7 @@ int recInitOutput(int unum, time_t thetime, int snum, int isserver)
     fhdr.samplerate = (uint8_t)Context.updsec;
 
     fhdr.rectime = (uint32_t)htonl((uint32_t)thetime);
-    utStrncpy((char*)fhdr.user, Users[unum].username, MAXUSERNAME);
+    utStrncpy((char*)fhdr.user, cbUsers[unum].username, MAXUSERNAME);
 
     fhdr.cmnrev = (uint32_t)htonl((uint32_t)COMMONSTAMP);
     fhdr.snum = snum;
@@ -438,7 +438,7 @@ void recGenTorpLoc(void)
 {
     int i, j;
     int snum = Context.snum;
-    int team = Ships[snum].team;
+    int team = cbShips[snum].team;
     spTorpLoc_t storploc;
     static spTorpLoc_t pktTorpLoc[MAXSHIPS][MAXTORPS] = {};
     real dis;
@@ -458,26 +458,26 @@ void recGenTorpLoc(void)
 
     for (i=0; i<MAXSHIPS; i++)
     {
-        if ( Ships[i].status != SS_OFF )
+        if ( cbShips[i].status != SS_OFF )
         {
             for ( j = 0; j < MAXTORPS; j = j + 1 )
             {
-                if ( Ships[i].torps[j].status == TS_LIVE )
+                if ( cbShips[i].torps[j].status == TS_LIVE )
                 {
                     memset((void *)&storploc, 0, sizeof(spTorpLoc_t));
                     storploc.type = SP_TORPLOC;
                     storploc.snum = i;
                     storploc.tnum = j;
 
-                    x = Ships[i].torps[j].x;
-                    y = Ships[i].torps[j].y;
+                    x = cbShips[i].torps[j].x;
+                    y = cbShips[i].torps[j].y;
 
-                    if (Ships[i].torps[j].war[team])
+                    if (cbShips[i].torps[j].war[team])
                     { /* it's at war with us. bastards. */
                       /* see if it's close enough to scan */
-                        dis = (real) dist(Ships[snum].x, Ships[snum].y,
-                                          Ships[i].torps[j].x,
-                                          Ships[i].torps[j].y );
+                        dis = (real) dist(cbShips[snum].x, cbShips[snum].y,
+                                          cbShips[i].torps[j].x,
+                                          cbShips[i].torps[j].y );
 
                         if (dis > ACCINFO_DIST)
                         {                       /* in the bermuda triangle */
@@ -490,7 +490,7 @@ void recGenTorpLoc(void)
                     storploc.y = (int32_t)htonl((int32_t)(y * 1000.0));
 
                     /* only send 'war' status as it relates to our team */
-                    if (Ships[i].torps[j].war[team])
+                    if (cbShips[i].torps[j].war[team])
                         storploc.war |= (1 << team);
 
 

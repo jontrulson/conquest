@@ -228,7 +228,7 @@ void dumprun(void)
 
 
     /* This is the only place we include/modify the shared common block. */
-    if ( *CBlockRevision != COMMONSTAMP )
+    if ( *cbRevision != COMMONSTAMP )
     {
         fprintf(stderr,"conqstrat: Common block ident mismatch.\n" );
         exit(1);
@@ -237,11 +237,11 @@ void dumprun(void)
     /* Copy the strategy table. */
     for ( i = 0; i < MAX_VAR; i = i + 1 )
         for ( j = 0; j < 10; j = j + 1 )
-            Robot->rstrat[i][j] = trstrat[i][j];
+            cbRobot->rstrat[i][j] = trstrat[i][j];
 
     /* Copy the action vector. */
     for ( i = 0; i < 32; i = i + 1 )
-        Robot->rvec[i] = trvec[i];
+        cbRobot->rvec[i] = trvec[i];
 
     fprintf(stderr, "conqstrat: parsed %d rules.\n", rulenum);
     fprintf(stderr, "conqstrat: common block updated.\n");

@@ -33,6 +33,6 @@ typedef struct {
     char lastwords[MAXLASTWORDS];	/* remarks upon conquering */
     char inittime[MAXDATESIZE];	/* time the universe was initialized */
     int  conqservPID;		/* the conqserv pid */
-} ConqInfo_t;
+} cbConqInfo_t;
 
 #endif /* CONQINFO_H_INCLUDED */

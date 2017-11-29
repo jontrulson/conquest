@@ -55,17 +55,17 @@ int proc_0006_User(char *buf)
     if (unum < 0 || unum >= 500 /*MAXUSERS*/)
         return FALSE;
 
-    Users[unum].team = suser->team;
+    cbUsers[unum].team = suser->team;
 
     if (suser->flags & SP_0006_USER_FLAGS_LIVE)
         UFSET(unum, USER_F_LIVE);
 
     for (i=0; i<NUMPLAYERTEAMS; i++)
         if ((suser->war & (1 << i)))
-            Users[unum].war[i] = true;
+            cbUsers[unum].war[i] = true;
 
-    Users[unum].rating = (real)((real)((int16_t)ntohs(suser->rating)) / 100.0);
-    Users[unum].lastentry = (time_t)ntohl(suser->lastentry);
+    cbUsers[unum].rating = (real)((real)((int16_t)ntohs(suser->rating)) / 100.0);
+    cbUsers[unum].lastentry = (time_t)ntohl(suser->lastentry);
 
     // the ooptions array doesn't exist in CB anymore, so break down
     // the older options that we care about into the new world order.
@@ -103,14 +103,14 @@ int proc_0006_User(char *buf)
         UOPCLR(unum, USER_OP_AUTOPILOT);
 
     for (i=0; i<USTAT_TOTALSTATS; i++)
-        Users[unum].stats[i] = (int32_t)ntohl(suser->stats[i]);
+        cbUsers[unum].stats[i] = (int32_t)ntohl(suser->stats[i]);
 
-    utStrncpy(Users[unum].username, (char *)suser->username,
+    utStrncpy(cbUsers[unum].username, (char *)suser->username,
               32 /*MAXUSERNAME*/);
-    utStrncpy(Users[unum].alias, (char *)suser->alias, 24 /*MAXUSERALIAS*/);
+    utStrncpy(cbUsers[unum].alias, (char *)suser->alias, 24 /*MAXUSERALIAS*/);
 
 #if defined(DEBUG_CLIENTPROC)
-    utLog("\t%s: name: %s (%s)", __FUNCTION__, Users[unum].username, Users[unum].alias);
+    utLog("\t%s: name: %s (%s)", __FUNCTION__, cbUsers[unum].username, cbUsers[unum].alias);
 #endif
 
     return TRUE;
@@ -125,7 +125,7 @@ int proc_0006_Ship(char *buf)
     if (!pktIsValid(SP_0006_SHIP, buf))
         return FALSE;
 
-    // we subtract one to compensate for new 0-based Ships[]
+    // we subtract one to compensate for new 0-based cbShips[]
     snum = sship->snum - 1;
 
 
@@ -136,38 +136,38 @@ int proc_0006_Ship(char *buf)
     utLog("PROC SHIP: snum = %d", snum);
 #endif
 
-    Ships[snum].status = sship->status;
-    Ships[snum].team = sship->team;
-    Ships[snum].unum = ntohs(sship->unum);
-    Ships[snum].shiptype = sship->shiptype;
-    Ships[snum].towing = sship->towing;
-    Ships[snum].towedby = sship->towedby;
+    cbShips[snum].status = sship->status;
+    cbShips[snum].team = sship->team;
+    cbShips[snum].unum = ntohs(sship->unum);
+    cbShips[snum].shiptype = sship->shiptype;
+    cbShips[snum].towing = sship->towing;
+    cbShips[snum].towedby = sship->towedby;
 
     for (i=0; i<4 /*NUMPLAYERTEAMS*/; i++)
         if (sship->war & (1 << i))
-            Ships[snum].war[i] = true;
+            cbShips[snum].war[i] = true;
         else
-            Ships[snum].war[i] = false;
+            cbShips[snum].war[i] = false;
 
     for (i=0; i<4 /*NUMPLAYERTEAMS*/; i++)
         if (sship->rwar & (1 << i))
-            Ships[snum].rwar[i] = true;
+            cbShips[snum].rwar[i] = true;
         else
-            Ships[snum].rwar[i] = false;
+            cbShips[snum].rwar[i] = false;
 
     // Don't bother decoding properly for this - not necessary when
     // just playing back recordings...
-    //    Ships[snum].killedby = (int)((int16_t)ntohs(sship->killedby));
-    Ships[snum].kills = (real)((real)ntohl(sship->kills) / 10.0);
+    //    cbShips[snum].killedby = (int)((int16_t)ntohs(sship->killedby));
+    cbShips[snum].kills = (real)((real)ntohl(sship->kills) / 10.0);
 
     for (i=0; i<(40 + 20)/*MAXPLANETS*/; i++)
-        Ships[snum].srpwar[i] = (bool)sship->srpwar[i+1];
+        cbShips[snum].srpwar[i] = (bool)sship->srpwar[i+1];
 
     for (i=0; i<4 /*NUMPLAYERTEAMS*/; i++)
-        Ships[snum].scanned[i] = (int)sship->scanned[i];
+        cbShips[snum].scanned[i] = (int)sship->scanned[i];
 
     sship->alias[24 /*MAXUSERALIAS*/ - 1] = 0;
-    utStrncpy(Ships[snum].alias, (char *)sship->alias, 24 /*MAXUSERALIAS*/);
+    utStrncpy(cbShips[snum].alias, (char *)sship->alias, 24 /*MAXUSERALIAS*/);
 
     return TRUE;
 }
@@ -180,7 +180,7 @@ int proc_0006_ShipSml(char *buf)
     if (!pktIsValid(SP_0006_SHIPSML, buf))
         return FALSE;
 
-    // compensate for 0-based Ships[]
+    // compensate for 0-based cbShips[]
     snum = sshipsml->snum - 1;
 
     if (snum < 0 || snum >= 20 /*MAXSHIPS*/)
@@ -191,25 +191,25 @@ int proc_0006_ShipSml(char *buf)
 #endif
 
     /* we need to mask out map since it's always local */
-    Ships[snum].flags = ((((uint16_t)ntohs(sshipsml->flags)) & ~0x0040 /*SHIP_F_MAP*/) | SMAP(snum));
+    cbShips[snum].flags = ((((uint16_t)ntohs(sshipsml->flags)) & ~0x0040 /*SHIP_F_MAP*/) | SMAP(snum));
 
-    Ships[snum].action = sshipsml->action;
-    Ships[snum].shields = sshipsml->shields;
-    Ships[snum].damage = sshipsml->damage;
-    Ships[snum].armies = sshipsml->armies;
-    Ships[snum].sdfuse = (int)((int16_t)ntohs(sshipsml->sdfuse));
+    cbShips[snum].action = sshipsml->action;
+    cbShips[snum].shields = sshipsml->shields;
+    cbShips[snum].damage = sshipsml->damage;
+    cbShips[snum].armies = sshipsml->armies;
+    cbShips[snum].sdfuse = (int)((int16_t)ntohs(sshipsml->sdfuse));
 
-    Ships[snum].wfuse = (int)sshipsml->wfuse;
-    Ships[snum].efuse = (int)sshipsml->efuse;
+    cbShips[snum].wfuse = (int)sshipsml->wfuse;
+    cbShips[snum].efuse = (int)sshipsml->efuse;
 
-    Ships[snum].weapalloc = sshipsml->walloc;
-    Ships[snum].engalloc = 100 - Ships[snum].weapalloc;
+    cbShips[snum].weapalloc = sshipsml->walloc;
+    cbShips[snum].engalloc = 100 - cbShips[snum].weapalloc;
 
-    Ships[snum].pfuse = (int)sshipsml->pfuse;
+    cbShips[snum].pfuse = (int)sshipsml->pfuse;
 
-    Ships[snum].etemp = (real)sshipsml->etemp;
-    Ships[snum].wtemp = (real)sshipsml->wtemp;
-    Ships[snum].fuel = (real)((uint16_t)ntohs(sshipsml->fuel));
+    cbShips[snum].etemp = (real)sshipsml->etemp;
+    cbShips[snum].wtemp = (real)sshipsml->wtemp;
+    cbShips[snum].fuel = (real)((uint16_t)ntohs(sshipsml->fuel));
 
     // fixups for the current CB/protocol:
     // if lock == 0, no lock, if < 0 planet, if > 0 ship
@@ -219,20 +219,20 @@ int proc_0006_ShipSml(char *buf)
 
     if (temp == 0)
     {
-        Ships[snum].lock = LOCK_NONE;
-        Ships[snum].lockDetail = 0;
+        cbShips[snum].lock = LOCK_NONE;
+        cbShips[snum].lockDetail = 0;
     }
     else if (temp < 0) // planet
     {
-        Ships[snum].lock = LOCK_PLANET;
+        cbShips[snum].lock = LOCK_PLANET;
         // FIXME adjust planet number when ready
-        Ships[snum].lockDetail = -temp;
-        // Compensate for 0-based Planets[]
-        Ships[snum].lockDetail--;
+        cbShips[snum].lockDetail = -temp;
+        // Compensate for 0-based cbPlanets[]
+        cbShips[snum].lockDetail--;
     }
-    Ships[snum].lastphase =
+    cbShips[snum].lastphase =
         (real)((uint16_t)ntohs(sshipsml->lastphase)) / 100.0;
-    Ships[snum].lastblast =
+    cbShips[snum].lastblast =
         (real)((uint16_t)ntohs(sshipsml->lastblast)) / 100.0;
 
     return TRUE;
@@ -246,7 +246,7 @@ int proc_0006_ShipLoc(char *buf)
     if (!pktIsValid(SP_0006_SHIPLOC, buf))
         return FALSE;
 
-    // compensate for 0-based Ships[]
+    // compensate for 0-based cbShips[]
     snum = sshiploc->snum - 1;
 
     if (snum < 0 || snum >= 20 /*MAXSHIPS*/)
@@ -256,11 +256,11 @@ int proc_0006_ShipLoc(char *buf)
     utLog("PROC SHIPLOC: snum = %d", snum);
 #endif
 
-    Ships[snum].head = (real)((real)ntohs(sshiploc->head) / 10.0);
-    Ships[snum].warp = (real)((real)sshiploc->warp / 10.0);
+    cbShips[snum].head = (real)((real)ntohs(sshiploc->head) / 10.0);
+    cbShips[snum].warp = (real)((real)sshiploc->warp / 10.0);
 
-    Ships[snum].x = (real)((real)((int32_t)ntohl(sshiploc->x)) / 1000.0);
-    Ships[snum].y = (real)((real)((int32_t)ntohl(sshiploc->y)) / 1000.0);
+    cbShips[snum].x = (real)((real)((int32_t)ntohl(sshiploc->x)) / 1000.0);
+    cbShips[snum].y = (real)((real)((int32_t)ntohl(sshiploc->y)) / 1000.0);
 
     return TRUE;
 }
@@ -273,16 +273,16 @@ int proc_0006_Planet(char *buf)
     if (!pktIsValid(SP_0006_PLANET, buf))
         return FALSE;
 
-    // compensate for 0-based Planets[]
+    // compensate for 0-based cbPlanets[]
     pnum = splan->pnum - 1;
 
     if (pnum < 0 || pnum >= (40 + 20) /*MAXPLANETS*/)
         return FALSE;
 
-    Planets[pnum].type = splan->ptype;
-    Planets[pnum].team = splan->team;
+    cbPlanets[pnum].type = splan->ptype;
+    cbPlanets[pnum].team = splan->team;
 
-    utStrncpy(Planets[pnum].name, (char *)splan->name, 12 /*MAXPLANETNAME*/);
+    utStrncpy(cbPlanets[pnum].name, (char *)splan->name, 12 /*MAXPLANETNAME*/);
 
     uiUpdatePlanet(pnum);
 
@@ -298,7 +298,7 @@ int proc_0006_PlanetSml(char *buf)
     if (!pktIsValid(SP_0006_PLANETSML, buf))
         return FALSE;
 
-    // compensate for 0-based Planets[]
+    // compensate for 0-based cbPlanets[]
     pnum = splansml->pnum - 1;
 
     if (pnum < 0 || pnum >= (40 + 20) /*MAXPLANETS*/)
@@ -306,11 +306,11 @@ int proc_0006_PlanetSml(char *buf)
 
     for (i=0; i<4 /*NUMPLAYERTEAMS*/; i++)
         if (splansml->scanned & (1 << i))
-            Planets[pnum].scanned[i] = true;
+            cbPlanets[pnum].scanned[i] = true;
         else
-            Planets[pnum].scanned[i] = false;
+            cbPlanets[pnum].scanned[i] = false;
 
-    Planets[pnum].uninhabtime = (int)splansml->uninhabtime;
+    cbPlanets[pnum].uninhabtime = (int)splansml->uninhabtime;
 
     return TRUE;
 }
@@ -323,15 +323,15 @@ int proc_0006_PlanetLoc(char *buf)
     if (!pktIsValid(SP_0006_PLANETLOC, buf))
         return FALSE;
 
-    // compensate for 0-based Planets[]
+    // compensate for 0-based cbPlanets[]
     pnum = splanloc->pnum - 1;
 
     if (pnum < 0 || pnum >= (40 + 20) /*MAXPLANETS*/)
         return FALSE;
 
-    Planets[pnum].armies = (int)((int16_t)ntohs(splanloc->armies));
-    Planets[pnum].x = (real)((real)((int32_t)ntohl(splanloc->x)) / 1000.0);
-    Planets[pnum].y = (real)((real)((int32_t)ntohl(splanloc->y)) / 1000.0);
+    cbPlanets[pnum].armies = (int)((int16_t)ntohs(splanloc->armies));
+    cbPlanets[pnum].x = (real)((real)((int32_t)ntohl(splanloc->x)) / 1000.0);
+    cbPlanets[pnum].y = (real)((real)((int32_t)ntohl(splanloc->y)) / 1000.0);
 
     return TRUE;
 }
@@ -344,16 +344,16 @@ int proc_0006_PlanetLoc2(char *buf)
     if (!pktIsValid(SP_0006_PLANETLOC2, buf))
         return FALSE;
 
-    // compensate for 0-based Planets[]
+    // compensate for 0-based cbPlanets[]
     pnum = splanloc2->pnum - 1;
 
     if (pnum < 0 || pnum >= 60 /*MAXPLANETS*/)
         return FALSE;
 
-    Planets[pnum].armies = (int)((int16_t)ntohs(splanloc2->armies));
-    Planets[pnum].x = (real)((real)((int32_t)ntohl(splanloc2->x)) / 1000.0);
-    Planets[pnum].y = (real)((real)((int32_t)ntohl(splanloc2->y)) / 1000.0);
-    Planets[pnum].orbang = (real)ntohs(splanloc2->orbang) / 100.0;
+    cbPlanets[pnum].armies = (int)((int16_t)ntohs(splanloc2->armies));
+    cbPlanets[pnum].x = (real)((real)((int32_t)ntohl(splanloc2->x)) / 1000.0);
+    cbPlanets[pnum].y = (real)((real)((int32_t)ntohl(splanloc2->y)) / 1000.0);
+    cbPlanets[pnum].orbang = (real)ntohs(splanloc2->orbang) / 100.0;
 
     return TRUE;
 }
@@ -367,7 +367,7 @@ int proc_0006_PlanetInfo(char *buf)
     if (!pktIsValid(SP_0006_PLANETINFO, buf))
         return FALSE;
 
-    // compensate for 0-based Planets[]
+    // compensate for 0-based cbPlanets[]
     pnum = splaninfo->pnum - 1;
 
     if (pnum < 0 || pnum >= (40 + 20) /*MAXPLANETS*/)
@@ -381,7 +381,7 @@ int proc_0006_PlanetInfo(char *buf)
     if (primary == 0)
         primary = pnum; // already compensated
     else
-        primary--; // compensate for 0-based Planets[]
+        primary--; // compensate for 0-based cbPlanets[]
 
     if (primary < 0 || primary >= (40 + 20) /*MAXPLANETS*/)
         return FALSE;
@@ -401,9 +401,9 @@ int proc_0006_PlanetInfo(char *buf)
             PFCLR(pnum, PLAN_F_VISIBLE);
     }
 
-    Planets[pnum].primary = primary;
-    Planets[pnum].orbrad = (real)((real)((uint32_t)ntohl(splaninfo->orbrad)) / 10.0);
-    Planets[pnum].orbvel = (real)((real)((int32_t)ntohl(splaninfo->orbvel)) / 100.0);
+    cbPlanets[pnum].primary = primary;
+    cbPlanets[pnum].orbrad = (real)((real)((uint32_t)ntohl(splaninfo->orbrad)) / 10.0);
+    cbPlanets[pnum].orbvel = (real)((real)((int32_t)ntohl(splaninfo->orbvel)) / 100.0);
 
     return TRUE;
 }
@@ -417,7 +417,7 @@ int proc_0006_Torp(char *buf)
     if (!pktIsValid(SP_0006_TORP, buf))
         return FALSE;
 
-    // compensate for 0-based Ships[]
+    // compensate for 0-based cbShips[]
     snum = storp->snum - 1;
     tnum = storp->tnum;
 
@@ -427,7 +427,7 @@ int proc_0006_Torp(char *buf)
     if (tnum < 0 || tnum >= 9 /*MAXTORPS*/)
         return FALSE;
 
-    Ships[snum].torps[tnum].status = (int)storp->status;
+    cbShips[snum].torps[tnum].status = (int)storp->status;
 
     return TRUE;
 }
@@ -440,7 +440,7 @@ int proc_0006_TorpLoc(char *buf)
     if (!pktIsValid(SP_0006_TORPLOC, buf))
         return FALSE;
 
-    // compensate for 0-based Ships[]
+    // compensate for 0-based cbShips[]
     snum = storploc->snum - 1;
     tnum = storploc->tnum;
 
@@ -452,12 +452,12 @@ int proc_0006_TorpLoc(char *buf)
 
     for (i=0; i<4 /*NUMPLAYERTEAMS*/; i++)
         if (storploc->war & (1 << i))
-            Ships[snum].torps[tnum].war[i] = true;
+            cbShips[snum].torps[tnum].war[i] = true;
         else
-            Ships[snum].torps[tnum].war[i] = false;
+            cbShips[snum].torps[tnum].war[i] = false;
 
-    Ships[snum].torps[tnum].x = (real)((real)((int32_t)ntohl(storploc->x)) / 1000.0);
-    Ships[snum].torps[tnum].y = (real)((real)((int32_t)ntohl(storploc->y)) / 1000.0);
+    cbShips[snum].torps[tnum].x = (real)((real)((int32_t)ntohl(storploc->x)) / 1000.0);
+    cbShips[snum].torps[tnum].y = (real)((real)((int32_t)ntohl(storploc->y)) / 1000.0);
 
     return TRUE;
 }
@@ -471,7 +471,7 @@ int proc_0006_TorpEvent(char *buf)
     if (!pktIsValid(SP_0006_TORPEVENT, buf))
         return FALSE;
 
-    // compensate for 0-based Ships[]
+    // compensate for 0-based cbShips[]
     snum = storpev->snum - 1;
     tnum = storpev->tnum;
 
@@ -481,22 +481,22 @@ int proc_0006_TorpEvent(char *buf)
     if (tnum < 0 || tnum >= 9 /*MAXTORPS*/)
         return FALSE;
 
-    Ships[snum].torps[tnum].status = (int)storpev->status;
+    cbShips[snum].torps[tnum].status = (int)storpev->status;
 
     for (i=0; i<4 /*NUMPLAYERTEAMS*/; i++)
         if (storpev->war & (1 << i))
-            Ships[snum].torps[tnum].war[i] = true;
+            cbShips[snum].torps[tnum].war[i] = true;
         else
-            Ships[snum].torps[tnum].war[i] = false;
+            cbShips[snum].torps[tnum].war[i] = false;
 
-    Ships[snum].torps[tnum].x =
+    cbShips[snum].torps[tnum].x =
         (real)((real)((int32_t)ntohl(storpev->x)) / 1000.0);
-    Ships[snum].torps[tnum].y =
+    cbShips[snum].torps[tnum].y =
         (real)((real)((int32_t)ntohl(storpev->y)) / 1000.0);
 
-    Ships[snum].torps[tnum].dx =
+    cbShips[snum].torps[tnum].dx =
         (real)((real)((int32_t)ntohl(storpev->dx)) / 1000.0);
-    Ships[snum].torps[tnum].dy =
+    cbShips[snum].torps[tnum].dy =
         (real)((real)((int32_t)ntohl(storpev->dy)) / 1000.0);
 
     uiUpdateTorpDir(snum, tnum);
@@ -530,7 +530,7 @@ int proc_0006_Message(char *buf)
     if (smsg->from > 0) // ship
     {
         realFrom = MSG_FROM_SHIP;
-        // compensate for 0-based Ships[]
+        // compensate for 0-based cbShips[]
         realFromDetail = (uint16_t)smsg->from - 1;
     }
     else if (smsg->from == 0) // god
@@ -546,7 +546,7 @@ int proc_0006_Message(char *buf)
         if (-smsg->from >= 1 && -smsg->from <= 60)
         {
             realFrom = MSG_FROM_PLANET;
-            // compensate for 0-bsed Planets[]
+            // compensate for 0-bsed cbPlanets[]
             realFromDetail = (uint16_t)(smsg->from * -1) - 1;
         }
         else if (smsg->from == -102 /*MSG_GOD*/)
@@ -650,25 +650,25 @@ int proc_0006_Team(char *buf)
         return FALSE;
 
     // this doesn't exist in current cb
-    // Teams[team].homesun = steam->homesun;
+    // cbTeams[team].homesun = steam->homesun;
 
     if (steam->flags & SP_0006_TEAM_FLAGS_COUPINFO)
-        Teams[team].coupinfo = true;
+        cbTeams[team].coupinfo = true;
     else
-        Teams[team].coupinfo = false;
+        cbTeams[team].coupinfo = false;
 
-    Teams[team].couptime = steam->couptime;
+    cbTeams[team].couptime = steam->couptime;
 
     // this doesn't exist in current cb
     //    for (i=0; i<3; i++)
-    //        Teams[team].teamhplanets[i] = steam->teamhplanets[i];
+    //        cbTeams[team].teamhplanets[i] = steam->teamhplanets[i];
 
-    Teams[team].homeplanet = (int)steam->homeplanet;
+    cbTeams[team].homeplanet = (int)steam->homeplanet;
 
     for (i=0; i<20 /*MAXTSTATS*/; i++)
-        Teams[team].stats[i] = (int)ntohl(steam->stats[i]);
+        cbTeams[team].stats[i] = (int)ntohl(steam->stats[i]);
 
-    utStrncpy(Teams[team].name, (char *)steam->name, 12 /*MAXTEAMNAME*/);
+    utStrncpy(cbTeams[team].name, (char *)steam->name, 12 /*MAXTEAMNAME*/);
 
     return TRUE;
 }
@@ -679,7 +679,7 @@ int proc_0006_ServerStat(char *buf)
     return TRUE;
 }
 
-int proc_0006_ConqInfo(char *buf)
+int proc_0006_cbConqInfo(char *buf)
 {
     // no need to do anything here...
     return TRUE;
@@ -698,10 +698,10 @@ int proc_0006_Doomsday(char *buf)
     if (!pktIsValid(SP_0006_DOOMSDAY, buf))
         return FALSE;
 
-    Doomsday->status = dd->status;
-    Doomsday->heading =(real)((real)ntohs(dd->heading) / 10.0);
-    Doomsday->x = (real)((real)((int32_t)ntohl(dd->x)) / 1000.0);
-    Doomsday->y = (real)((real)((int32_t)ntohl(dd->y)) / 1000.0);
+    cbDoomsday->status = dd->status;
+    cbDoomsday->heading =(real)((real)ntohs(dd->heading) / 10.0);
+    cbDoomsday->x = (real)((real)((int32_t)ntohl(dd->x)) / 1000.0);
+    cbDoomsday->y = (real)((real)((int32_t)ntohl(dd->y)) / 1000.0);
 
     return TRUE;
 }

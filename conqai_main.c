@@ -75,7 +75,7 @@ int main(int argc, char *argv[])
 
     cbMap();
 
-    if ( *CBlockRevision != COMMONSTAMP )
+    if ( *cbRevision != COMMONSTAMP )
     {
         printf("conqai: Common block ident mismatch.\n"
                "Initialize the Universe via conqoper.\n");
@@ -114,7 +114,7 @@ int main(int argc, char *argv[])
 static void exitai(void)
 {
 
-    ConqInfo->externrobots = FALSE;
+    cbConqInfo->externrobots = FALSE;
 
     return;
 

@@ -234,7 +234,7 @@ int sendServerStat(int socktype)
     /* count ships */
     for ( i = 0; i < MAXSHIPS; i++ )
     {
-        if ( Ships[i].status == SS_LIVE )
+        if ( cbShips[i].status == SS_LIVE )
 	{
             numships++;
 
@@ -426,15 +426,15 @@ int sendTeam(int sock, uint8_t team, int force)
     return TRUE;
 }
 
-int sendConqInfo(int sock, int force)
+int sendcbConqInfo(int sock, int force)
 {
-    spConqInfo_t *spci;
+    spcbConqInfo_t *spci;
 
 #if defined(DEBUG_SERVERSEND)
-    utLog("sendConqInfo: f = %d", force);
+    utLog("sendcbConqInfo: f = %d", force);
 #endif
 
-    if ((spci = spktConqInfo(force)))
+    if ((spci = spktcbConqInfo(force)))
         if (pktWrite(PKT_SENDTCP, spci) <= 0)
             return FALSE;
 

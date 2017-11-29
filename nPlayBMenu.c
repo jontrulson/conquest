@@ -164,7 +164,7 @@ static int nPlayBMenuInput(int ch)
         }
         else
         {
-            // for older protocols, compensate for 0-based Ships[]
+            // for older protocols, compensate for 0-based cbShips[]
             sprintf(cbuf, "%d",
                     (recFileHeader.protoVers <= 0x0006) ?
                     recFileHeader.snum - 1:

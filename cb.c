@@ -75,32 +75,32 @@ static void _mapCBVariables(bool doAssign)
     _cbOffset = 0;
 
     // This must be the first var
-    MAP_VARIABLE(CBlockRevision, int, 1, doAssign);
+    MAP_VARIABLE(cbRevision, int, 1, doAssign);
 
     // This must be the second var
-    MAP_VARIABLE(CBGlobal, CBGlobal_t, 1, doAssign);
+    MAP_VARIABLE(cbGlobalLimits, cbGlobalLimits_t, 1, doAssign);
 
-    MAP_VARIABLE(ConqInfo, ConqInfo_t, 1, doAssign);
+    MAP_VARIABLE(cbConqInfo, cbConqInfo_t, 1, doAssign);
 
-    MAP_VARIABLE(Users, User_t, MAXUSERS, doAssign);
+    MAP_VARIABLE(cbUsers, User_t, MAXUSERS, doAssign);
 
-    MAP_VARIABLE(Robot, Robot_t, 1, doAssign);
+    MAP_VARIABLE(cbRobot, Robot_t, 1, doAssign);
 
-    MAP_VARIABLE(Planets, Planet_t, MAXPLANETS, doAssign);
+    MAP_VARIABLE(cbPlanets, Planet_t, MAXPLANETS, doAssign);
 
-    MAP_VARIABLE(Teams, Team_t, NUMALLTEAMS, doAssign);
+    MAP_VARIABLE(cbTeams, Team_t, NUMALLTEAMS, doAssign);
 
-    MAP_VARIABLE(Doomsday, Doomsday_t, 1, doAssign);
+    MAP_VARIABLE(cbDoomsday, Doomsday_t, 1, doAssign);
 
-    MAP_VARIABLE(History, History_t, MAXHISTLOG, doAssign);
+    MAP_VARIABLE(cbHistory, History_t, MAXHISTLOG, doAssign);
 
-    MAP_VARIABLE(Driver, Driver_t, 1, doAssign);
+    MAP_VARIABLE(cbDriver, Driver_t, 1, doAssign);
 
-    MAP_VARIABLE(Ships, Ship_t, MAXSHIPS, doAssign);
+    MAP_VARIABLE(cbShips, Ship_t, MAXSHIPS, doAssign);
 
-    MAP_VARIABLE(ShipTypes, ShipType_t, MAXNUMSHIPTYPES, doAssign);
+    MAP_VARIABLE(cbShipTypes, ShipType_t, MAXNUMSHIPTYPES, doAssign);
 
-    MAP_VARIABLE(Msgs, Msg_t, MAXMESSAGES, doAssign);
+    MAP_VARIABLE(cbMsgs, Msg_t, MAXMESSAGES, doAssign);
 
     // This must be the last var
     MAP_VARIABLE(EndOfCBlock, int, 1, doAssign);
@@ -118,32 +118,32 @@ static void _unmapCBVariables()
     // be called by cbUnmap() and cbUnmapLocal()
 
     // This must be the first var
-    CBlockRevision = NULL;
+    cbRevision = NULL;
 
     // This must be the second var
-    CBGlobal = NULL;
+    cbGlobalLimits = NULL;
 
-    ConqInfo = NULL;
+    cbConqInfo = NULL;
 
-    Users = NULL;
+    cbUsers = NULL;
 
-    Robot = NULL;
+    cbRobot = NULL;
 
-    Planets = NULL;
+    cbPlanets = NULL;
 
-    Teams = NULL;
+    cbTeams = NULL;
 
-    Doomsday = NULL;
+    cbDoomsday = NULL;
 
-    History = NULL;
+    cbHistory = NULL;
 
-    Driver = NULL;
+    cbDriver = NULL;
 
-    Ships = NULL;
+    cbShips = NULL;
 
-    ShipTypes = NULL;
+    cbShipTypes = NULL;
 
-    Msgs = NULL;
+    cbMsgs = NULL;
 
     // This must be the last var
     EndOfCBlock = NULL;
@@ -172,7 +172,7 @@ void cbLock(int *lockptr)
 {
     int semnum;
 
-    if (lockptr == &ConqInfo->lockmesg)
+    if (lockptr == &cbConqInfo->lockmesg)
         semnum = LOCKMSG;
     else
         semnum = LOCKCMN;
@@ -188,7 +188,7 @@ void cbUnlock(int *lockptr)
 {
     int semnum;
 
-    if (lockptr == &ConqInfo->lockmesg)
+    if (lockptr == &cbConqInfo->lockmesg)
         semnum = LOCKMSG;
     else
         semnum = LOCKCMN;
@@ -410,11 +410,11 @@ void cbMapLocal(void)
     _initFakeCB();
     clbInitEverything();
     clbInitMsgs();
-    *CBlockRevision = COMMONSTAMP;
-    ConqInfo->closed = FALSE;
-    Driver->drivstat = DRS_OFF;
-    Driver->drivpid = 0;
-    Driver->drivowner[0] = 0;
+    *cbRevision = COMMONSTAMP;
+    cbConqInfo->closed = FALSE;
+    cbDriver->drivstat = DRS_OFF;
+    cbDriver->drivpid = 0;
+    cbDriver->drivowner[0] = 0;
 
     return;
 }

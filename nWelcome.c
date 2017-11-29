@@ -184,7 +184,7 @@ static int nWelcomeDisplay(dspConfig_t *dsp)
     {
     case S_GREETINGS:
         /* Must be a new player. */
-        if ( ConqInfo->closed )
+        if ( cbConqInfo->closed )
         {
             /* Can't enroll if the game is closed. */
             cprintf(MSG_LIN2/2,col,ALIGN_CENTER,"#%d#%s", InfoColor, sorry1 );
@@ -192,16 +192,16 @@ static int nWelcomeDisplay(dspConfig_t *dsp)
         }
         else
         {
-            team = Ships[Context.snum].team;
+            team = cbShips[Context.snum].team;
             gretds();                 /* 'GREETINGS' */
 
-            if ( vowel( Teams[team].name[0] ) )
+            if ( vowel( cbTeams[team].name[0] ) )
                 cprintf(MSG_LIN2/2,0,ALIGN_CENTER,"#%d#%s%c #%d#%s #%d#%s",
-                        InfoColor,selected_str,'n',CQC_A_BOLD,Teams[team].name,
+                        InfoColor,selected_str,'n',CQC_A_BOLD,cbTeams[team].name,
                         InfoColor,starship_str);
             else
                 cprintf(MSG_LIN2/2,0,ALIGN_CENTER,"#%d#%s #%d#%s #%d#%s",
-                        InfoColor,selected_str,CQC_A_BOLD,Teams[team].name,
+                        InfoColor,selected_str,CQC_A_BOLD,cbTeams[team].name,
                         InfoColor,starship_str);
 
             cprintf(MSG_LIN2/2+1,0,ALIGN_CENTER,"#%d#%s",

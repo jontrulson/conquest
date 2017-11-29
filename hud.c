@@ -87,9 +87,9 @@ void hudInitData(void)
 /* set hud warp data to current, if it's changed */
 void hudSetWarp(int snum)
 {
-    if ( Ships[snum].warp != hudData.warp.warp )
+    if ( cbShips[snum].warp != hudData.warp.warp )
     {
-        hudData.warp.warp = Ships[snum].warp;
+        hudData.warp.warp = cbShips[snum].warp;
         if (hudData.warp.warp >= 0)
             snprintf(hudData.warp.str, HUD_STR_SZ, "%2.1f",
                      hudData.warp.warp );
@@ -106,16 +106,16 @@ void hudSetWarp(int snum)
 
 void hudSetHeading(int snum)
 {
-    int i = round( Ships[snum].head );
+    int i = round( cbShips[snum].head );
 
     if ( i != hudData.heading.head)
     {
-        if ( Ships[snum].lock == LOCK_PLANET
-             && Ships[snum].lockDetail < MAXPLANETS)
+        if ( cbShips[snum].lock == LOCK_PLANET
+             && cbShips[snum].lockDetail < MAXPLANETS)
         {                       /* just the first 3 characters if locked */
-            hudData.heading.str[0] = Planets[Ships[snum].lockDetail].name[0];
-            hudData.heading.str[1] = Planets[Ships[snum].lockDetail].name[1];
-            hudData.heading.str[2] = Planets[Ships[snum].lockDetail].name[2];
+            hudData.heading.str[0] = cbPlanets[cbShips[snum].lockDetail].name[0];
+            hudData.heading.str[1] = cbPlanets[cbShips[snum].lockDetail].name[1];
+            hudData.heading.str[2] = cbPlanets[cbShips[snum].lockDetail].name[2];
             hudData.heading.str[3] = 0;
         }
         else
@@ -211,7 +211,7 @@ void hudSetAlertStatus(int snum, int asnum, alertLevel_t astatus)
 
 void hudSetKills(int snum)
 {
-    real x = (Ships[snum].kills + Ships[snum].strkills);
+    real x = (cbShips[snum].kills + cbShips[snum].strkills);
 
     if ( x != hudData.kills.kills )
     {
@@ -227,10 +227,10 @@ void hudSetShields(int snum, int *dobeep)
 {
     int i, k;
 
-    if (Ships[snum].shields < hudData.sh.shields)
+    if (cbShips[snum].shields < hudData.sh.shields)
         *dobeep = TRUE;
 
-    i = k = round( Ships[snum].shields );
+    i = k = round( cbShips[snum].shields );
 
     if ( ! SSHUP(snum) || SREPAIR(snum) )
         i = -1;
@@ -257,7 +257,7 @@ void hudSetShields(int snum, int *dobeep)
 
 void hudSetDamage(int snum, real *lastdamage)
 {
-    real r = Ships[snum].damage;
+    real r = cbShips[snum].damage;
     int i;
 
     *lastdamage = hudData.dam.damage;
@@ -283,7 +283,7 @@ void hudSetDamage(int snum, real *lastdamage)
 
 void hudSetFuel(int snum)
 {
-    real r = Ships[snum].fuel;
+    real r = cbShips[snum].fuel;
     int i;
 
     if ( r != hudData.fuel.fuel )
@@ -309,12 +309,12 @@ void hudSetFuel(int snum)
 
 void hudSetAlloc(int snum)
 {
-    int i = Ships[snum].weapalloc;
-    int j = Ships[snum].engalloc;
+    int i = cbShips[snum].weapalloc;
+    int j = cbShips[snum].engalloc;
 
-    if ( Ships[snum].wfuse > 0 )
+    if ( cbShips[snum].wfuse > 0 )
         i = 0;
-    if ( Ships[snum].efuse > 0 )
+    if ( cbShips[snum].efuse > 0 )
         j = 0;
 
     if ( i != hudData.alloc.walloc || j != hudData.alloc.ealloc )
@@ -342,8 +342,8 @@ void hudSetAlloc(int snum)
 
 void hudSetTemps(int snum)
 {
-    real etemp = Ships[snum].etemp;
-    real wtemp = Ships[snum].wtemp;
+    real etemp = cbShips[snum].etemp;
+    real wtemp = cbShips[snum].wtemp;
     int eOverl, wOverl;
     int i;
 
@@ -352,12 +352,12 @@ void hudSetTemps(int snum)
     if (wtemp > 100.0)
         wtemp = 100.0;
 
-    if (Ships[snum].efuse > 0)
+    if (cbShips[snum].efuse > 0)
         eOverl = TRUE;
     else
         eOverl = FALSE;
 
-    if (Ships[snum].wfuse > 0)
+    if (cbShips[snum].wfuse > 0)
         wOverl = TRUE;
     else
         wOverl = FALSE;
@@ -404,10 +404,10 @@ void hudSetTemps(int snum)
 
 void hudSetTow(int snum)
 {
-    int i = Ships[snum].towedby;
+    int i = cbShips[snum].towedby;
 
     if ( i == 0 )
-        i = -Ships[snum].towing;
+        i = -cbShips[snum].towing;
 
     if (i != hudData.tow.towstat)
     {
@@ -435,7 +435,7 @@ void hudSetTow(int snum)
 
 void hudSetArmies(int snum)
 {
-    int i = Ships[snum].armies;
+    int i = cbShips[snum].armies;
 
     if (i != hudData.armies.armies)
     {
@@ -452,7 +452,7 @@ void hudSetArmies(int snum)
 
 void hudSetRobotAction(int snum)
 {
-    int i = Ships[snum].action;
+    int i = cbShips[snum].action;
 
     if (i != hudData.raction.action)
     {
@@ -466,7 +466,7 @@ void hudSetRobotAction(int snum)
 
 void hudSetDestruct(int snum)
 {
-    int i = max( 0, Ships[snum].sdfuse );
+    int i = max( 0, cbShips[snum].sdfuse );
 
     if (i != hudData.destruct.fuse)
     {
@@ -626,9 +626,9 @@ void hudSetInfoTarget(int tnum, bool isShip)
                 utAppendShip(hudData.info.lasttargetstr , tnum) ;
             else if (!isShip && tnum < MAXPLANETS)
             {                   /* planet, just need 3 chars */
-                hudData.info.lasttargetstr[0] = Planets[tnum].name[0];
-                hudData.info.lasttargetstr[1] = Planets[tnum].name[1];
-                hudData.info.lasttargetstr[2] = Planets[tnum].name[2];
+                hudData.info.lasttargetstr[0] = cbPlanets[tnum].name[0];
+                hudData.info.lasttargetstr[1] = cbPlanets[tnum].name[1];
+                hudData.info.lasttargetstr[2] = cbPlanets[tnum].name[2];
                 hudData.info.lasttargetstr[3] = 0;
             }
 

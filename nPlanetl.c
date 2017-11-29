@@ -131,10 +131,10 @@ static int nPlanetlDisplay(dspConfig_t *dsp)
             /* colorize - dwp */
             if ( snum >= 0 && snum < MAXSHIPS)
             {	/* if user has a valid ship */
-                if ( Planets[pnum].team == Ships[snum].team && !selfwar(snum) )
+                if ( cbPlanets[pnum].team == cbShips[snum].team && !selfwar(snum) )
                     outattr = GreenLevelColor;
-                else if ( (clbSPWar(snum,pnum) && Planets[pnum].scanned[Ships[snum].team] ) ||
-                          Planets[pnum].type == PLANET_SUN )
+                else if ( (clbSPWar(snum,pnum) && cbPlanets[pnum].scanned[cbShips[snum].team] ) ||
+                          cbPlanets[pnum].type == PLANET_SUN )
                     outattr = RedLevelColor;
                 else
                     outattr = YellowLevelColor;
@@ -143,7 +143,7 @@ static int nPlanetlDisplay(dspConfig_t *dsp)
             {			/* else, user doesn't have a ship yet */
                 if (team == TEAM_NOTEAM)
                 {			/* via conqoper */
-                    switch(Planets[pnum].type)
+                    switch(cbPlanets[pnum].type)
                     {
                     case PLANET_SUN:
                         outattr = RedLevelColor;
@@ -169,15 +169,15 @@ static int nPlanetlDisplay(dspConfig_t *dsp)
                 }
                 else
                 {			/* via menu() */
-                    if ( Planets[pnum].team == Users[Context.unum].team &&
-                         !(Users[Context.unum].war[Users[Context.unum].team]))
+                    if ( cbPlanets[pnum].team == cbUsers[Context.unum].team &&
+                         !(cbUsers[Context.unum].war[cbUsers[Context.unum].team]))
                     {
                         outattr = GreenLevelColor;
                     }
-                    else if ( Planets[pnum].type == PLANET_SUN ||
-                              (Planets[pnum].team < NUMPLAYERTEAMS &&
-                               Users[Context.unum].war[Planets[pnum].team] &&
-                               Planets[pnum].scanned[Users[Context.unum].team]) )
+                    else if ( cbPlanets[pnum].type == PLANET_SUN ||
+                              (cbPlanets[pnum].team < NUMPLAYERTEAMS &&
+                               cbUsers[Context.unum].war[cbPlanets[pnum].team] &&
+                               cbPlanets[pnum].scanned[cbUsers[Context.unum].team]) )
                     {
                         outattr = RedLevelColor;
                     }
@@ -195,33 +195,33 @@ static int nPlanetlDisplay(dspConfig_t *dsp)
             /* I want everything if it's real */
 
             /* Figure out who owns it and count armies. */
-            ch =  Teams[Planets[pnum].team].teamchar;
-            sprintf( junk, "%d", Planets[pnum].armies );
+            ch =  cbTeams[cbPlanets[pnum].team].teamchar;
+            sprintf( junk, "%d", cbPlanets[pnum].armies );
 
             /* Then modify based on scan information. */
 
             if ( team != TEAM_NOTEAM )
-                if ( ! Planets[pnum].scanned[team] )
+                if ( ! cbPlanets[pnum].scanned[team] )
                 {
                     ch = '?';
                     strcpy(junk , "?") ;
                 }
 
             /* Suns and moons are displayed as unowned. */
-            if ( Planets[pnum].type == PLANET_SUN || Planets[pnum].type == PLANET_MOON )
+            if ( cbPlanets[pnum].type == PLANET_SUN || cbPlanets[pnum].type == PLANET_MOON )
                 ch = ' ';
 
             /* Don't display armies for suns unless we're special. */
-            if ( Planets[pnum].type == PLANET_SUN )
+            if ( cbPlanets[pnum].type == PLANET_SUN )
                 if ( team != TEAM_NOTEAM )
                     junk[0] = 0;
 
             /* Moons aren't supposed to have armies. */
-            if ( Planets[pnum].type == PLANET_MOON )
+            if ( cbPlanets[pnum].type == PLANET_MOON )
             {
                 if ( team != TEAM_NOTEAM )
                     junk[0] = 0;
-                else if ( Planets[pnum].armies == 0 )
+                else if ( cbPlanets[pnum].armies == 0 )
                     junk[0] = 0;
             }
 
@@ -229,11 +229,11 @@ static int nPlanetlDisplay(dspConfig_t *dsp)
             char homeflag = ' ';
 
             /* flag planets that are required for a conq */
-            if (Planets[pnum].type == PLANET_CLASSM || Planets[pnum].type == PLANET_DEAD)
+            if (cbPlanets[pnum].type == PLANET_CLASSM || cbPlanets[pnum].type == PLANET_DEAD)
             {
                 // check for homeplanet
                 if (PHOMEPLANET(pnum))
-                    homeflag = Teams[Planets[pnum].defendteam].name[0];
+                    homeflag = cbTeams[cbPlanets[pnum].defendteam].name[0];
 
                 // core planet - required for conquer
                 if (PCORE(pnum))
@@ -244,12 +244,12 @@ static int nPlanetlDisplay(dspConfig_t *dsp)
                     homeflag, coreflag);
             col += 4;
 
-            sprintf(xbuf,"%-11s ",Planets[pnum].name);  /* Planets[pnum].name */
+            sprintf(xbuf,"%-11s ",cbPlanets[pnum].name);  /* cbPlanets[pnum].name */
             cprintf(lin, col,  ALIGN_NONE, "#%d#%s", outattr, xbuf);
 
             col+=(strlen(xbuf));
             sprintf( xbuf, "%-4c %-3c  ",
-                     ConqInfo->chrplanets[Planets[pnum].type], ch);
+                     cbConqInfo->chrplanets[cbPlanets[pnum].type], ch);
             cprintf(lin, col,  ALIGN_NONE, "#%d#%s", outattr, xbuf);
 
             col+=(strlen(xbuf));
@@ -301,7 +301,7 @@ static int nPlanetlIdle(void)
     if (pkttype < 0)          /* some error */
     {
         utLog("nPlanetlIdle: waiForPacket returned %d", pkttype);
-        Ships[Context.snum].status = SS_OFF;
+        cbShips[Context.snum].status = SS_OFF;
         return NODE_EXIT;
     }
 

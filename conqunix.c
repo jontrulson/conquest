@@ -89,7 +89,7 @@ int getConquestGID(void)
 void conqinit(void)
 {
     /* First things first. */
-    if ( *CBlockRevision != COMMONSTAMP )
+    if ( *cbRevision != COMMONSTAMP )
     {
         printf("conquest: Common block ident mismatch.\n"
                "Initialize the Universe via conqoper.");
@@ -127,41 +127,41 @@ void conqstats( int snum )
     cadd = 0;
     eadd = 0;
 
-    upstats( &Ships[snum].ctime, &Ships[snum].etime,
-             &Ships[snum].cacc, &Ships[snum].eacc,
+    upstats( &cbShips[snum].ctime, &cbShips[snum].etime,
+             &cbShips[snum].cacc, &cbShips[snum].eacc,
              &cadd, &eadd );
 
     /* Add in the new amounts. */
-    cbLock(&ConqInfo->lockword);
-    if ( Ships[snum].pid != 0 )
+    cbLock(&cbConqInfo->lockword);
+    if ( cbShips[snum].pid != 0 )
     {
         /* Update stats for a humanoid ship. */
-        unum = Ships[snum].unum;
+        unum = cbShips[snum].unum;
 
-        Users[unum].stats[USTAT_CPUSECONDS] += cadd;
-        Users[unum].stats[USTAT_SECONDS] += eadd;
+        cbUsers[unum].stats[USTAT_CPUSECONDS] += cadd;
+        cbUsers[unum].stats[USTAT_SECONDS] += eadd;
 
-        /* update elapsed time in History[]
+        /* update elapsed time in cbHistory[]
            for this user */
 
-        if (Context.histslot != -1 && History[Context.histslot].unum == unum)
+        if (Context.histslot != -1 && cbHistory[Context.histslot].unum == unum)
 	{
-            difftime = time(0) - History[Context.histslot].enterTime;
+            difftime = time(0) - cbHistory[Context.histslot].enterTime;
             if (difftime < (time_t)0)
                 difftime = (time_t)0;
-            History[Context.histslot].elapsed = difftime;
+            cbHistory[Context.histslot].elapsed = difftime;
 	}
 
-        team = Users[unum].team;
-        Teams[team].stats[TSTAT_CPUSECONDS] += cadd;
-        Teams[team].stats[TSTAT_SECONDS] += eadd;
+        team = cbUsers[unum].team;
+        cbTeams[team].stats[TSTAT_CPUSECONDS] += cadd;
+        cbTeams[team].stats[TSTAT_SECONDS] += eadd;
 
-        ConqInfo->ccpuseconds += cadd;
-        ConqInfo->celapsedseconds += eadd;
+        cbConqInfo->ccpuseconds += cadd;
+        cbConqInfo->celapsedseconds += eadd;
 
 
     }
-    cbUnlock(&ConqInfo->lockword);
+    cbUnlock(&cbConqInfo->lockword);
 
     return;
 
@@ -182,7 +182,7 @@ void drcheck(void)
     if ( utDeltaSecs( Context.drchklastime, &Context.drchklastime ) > TIMEOUT_DRCHECK )
         return;
 
-    if ( utDeltaSecs( Driver->drivtime, &(Driver->playtime) ) > TIMEOUT_DRIVER )
+    if ( utDeltaSecs( cbDriver->drivtime, &(cbDriver->playtime) ) > TIMEOUT_DRIVER )
     {
         if ( Context.childpid != 0 )
 	{
@@ -191,7 +191,7 @@ void drcheck(void)
             if ( kill(Context.childpid, 0) != -1 )
 	    {
                 /* He's still alive and belongs to us. */
-                utGetSecs( &(Driver->drivtime) );
+                utGetSecs( &(cbDriver->drivtime) );
                 return;
 	    }
             else
@@ -201,14 +201,14 @@ void drcheck(void)
             Context.childpid = 0;
 	}
 
-        cbLock(&ConqInfo->lockword);
-        if ( utDeltaSecs( Driver->drivtime, &(Driver->playtime) ) > TIMEOUT_DRIVER )
+        cbLock(&cbConqInfo->lockword);
+        if ( utDeltaSecs( cbDriver->drivtime, &(cbDriver->playtime) ) > TIMEOUT_DRIVER )
 	{
             drcreate();
-            Driver->drivcnt = utModPlusOne( Driver->drivcnt + 1, 1000 );
-            utLog( "Driver timeout #%d.", Driver->drivcnt );
+            cbDriver->drivcnt = utModPlusOne( cbDriver->drivcnt + 1, 1000 );
+            utLog( "Driver timeout #%d.", cbDriver->drivcnt );
 	}
-        cbUnlock(&ConqInfo->lockword);
+        cbUnlock(&cbConqInfo->lockword);
     }
     drstart();
 
@@ -229,15 +229,15 @@ void drcreate(void)
     char drivcmd[BUFFER_SIZE_256];
 
 
-    utGetSecs( &(Driver->drivtime) );			/* prevent driver timeout */
-    Driver->drivpid = 0;			/* zero current driver pid */
-    Driver->drivstat = DRS_RESTART;		/* driver state to restart */
+    utGetSecs( &(cbDriver->drivtime) );			/* prevent driver timeout */
+    cbDriver->drivpid = 0;			/* zero current driver pid */
+    cbDriver->drivstat = DRS_RESTART;		/* driver state to restart */
 
     /* fork the child - mmap()'s should remain */
     /*  intact */
     if ((pid = fork()) == -1)
     {				/* error */
-        Driver->drivstat = DRS_OFF;
+        cbDriver->drivstat = DRS_OFF;
         utLog( "drcreate(): fork(): %s", strerror(errno));
         return;
     }
@@ -268,12 +268,12 @@ void drkill(void)
 {
 #if !defined(MINGW)
     if ( Context.childpid != 0 )
-        if ( Context.childpid == Driver->drivpid && Driver->drivstat == DRS_RUNNING )
+        if ( Context.childpid == cbDriver->drivpid && cbDriver->drivstat == DRS_RUNNING )
         {
-            cbLock(&ConqInfo->lockword);
-            if ( Context.childpid == Driver->drivpid && Driver->drivstat == DRS_RUNNING )
-                Driver->drivstat = DRS_KAMIKAZE;
-            cbUnlock(&ConqInfo->lockword);
+            cbLock(&cbConqInfo->lockword);
+            if ( Context.childpid == cbDriver->drivpid && cbDriver->drivstat == DRS_RUNNING )
+                cbDriver->drivstat = DRS_KAMIKAZE;
+            cbUnlock(&cbConqInfo->lockword);
         }
 #endif  /* MINGW */
     return;
@@ -295,9 +295,9 @@ void drpexit(void)
     {
         /* We may well have started the driver. */
         drkill();
-        for ( i = 1; Context.childpid == Driver->drivpid && i <= 50; i = i + 1 )
+        for ( i = 1; Context.childpid == cbDriver->drivpid && i <= 50; i = i + 1 )
             utSleep( 0.1 );
-        if ( Context.childpid == Driver->drivpid )
+        if ( Context.childpid == cbDriver->drivpid )
             utLog("drpexit(): Driver didn't exit; pid = %08x", Context.childpid );
     }
 
@@ -312,12 +312,12 @@ void drpexit(void)
 void drstart(void)
 {
 #if !defined(MINGW)
-    if ( Driver->drivstat == DRS_OFF )
+    if ( cbDriver->drivstat == DRS_OFF )
     {
-        cbLock(&ConqInfo->lockword);
-        if ( Driver->drivstat == DRS_OFF )
+        cbLock(&cbConqInfo->lockword);
+        if ( cbDriver->drivstat == DRS_OFF )
             drcreate();
-        cbUnlock(&ConqInfo->lockword);
+        cbUnlock(&cbConqInfo->lockword);
     }
 #endif  /* MINGW */
     return;
@@ -476,12 +476,12 @@ int isagod( int unum )
 void upchuck(void)
 {
 
-    cbLock(&ConqInfo->lockword);
+    cbLock(&cbConqInfo->lockword);
 
-    utFormatTime( ConqInfo->lastupchuck, 0 );
+    utFormatTime( cbConqInfo->lastupchuck, 0 );
     cbFlush();
 
-    cbUnlock(&ConqInfo->lockword);
+    cbUnlock(&cbConqInfo->lockword);
 
     return;
 

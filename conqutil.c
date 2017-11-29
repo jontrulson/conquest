@@ -125,7 +125,7 @@ void utAppendKilledBy(char *buf, killedBy_t kb, uint16_t detail)
         break;
     case KB_PLANET:
         if (detail < MAXPLANETS )
-            strcat(buf , Planets[detail].name) ;
+            strcat(buf , cbPlanets[detail].name) ;
         break;
     default:
         utAppendInt(buf, (int)kb) ;
@@ -149,9 +149,9 @@ void utAppendShip(char *str, int snum)
     ch = 'S';
     if ( snum >= 0 && snum < MAXSHIPS )
     {
-        i = Ships[snum].team;
+        i = cbShips[snum].team;
         if ( i >= 0 && i < NUMPLAYERTEAMS )
-            ch = Teams[i].teamchar;
+            ch = cbTeams[i].teamchar;
     }
 
     utAppendChar(str, ch) ;
@@ -603,7 +603,7 @@ void utFormatSeconds( int itime, char *buf )
 /*    gotone = utGetMsg( snum, msg ) */
 int utGetMsg( int snum, int *msg )
 {
-    while ( *msg != ConqInfo->lastmsg )
+    while ( *msg != cbConqInfo->lastmsg )
     {
         *msg = utModPlusOne( *msg + 1, MAXMESSAGES );
         if ( clbCanRead( snum, *msg ) )
