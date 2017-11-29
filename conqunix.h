@@ -9,7 +9,6 @@
 
 int getUID(char *name);
 int getConquestGID(void);
-void comsize(unsigned long *size);
 void conqinit(void);
 void conqstats(int snum);
 void drcheck(void);

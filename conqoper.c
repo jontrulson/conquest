@@ -2225,7 +2225,6 @@ void opstats(void)
 {
 
     int i, lin, col;
-    unsigned long size;
     char buf[MSGMAXLINE], junk[MSGMAXLINE*2], timbuf[32];
     int ch;
     real x;
@@ -2343,10 +2342,11 @@ void opstats(void)
                      Driver->drivsecs,LabelColor,InfoColor,Driver->drivcnt);
 
         lin++;
-        comsize( &size );
         cprintf( lin,col,ALIGN_NONE,
-                 "#%d#%u #%d#bytes (out of #%d#%d#%d#) in the common block.\n",
-                 InfoColor,size,LabelColor,InfoColor, SIZEOF_COMMONBLOCK,LabelColor );
+                 "#%d#%u #%d#bytes in the common block.\n",
+                 InfoColor,
+                 cbGetSize(),
+                 LabelColor);
 
         lin++;
         sprintf( buf, "#%d#Common ident is #%d#%d",

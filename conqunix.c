@@ -83,19 +83,6 @@ int getConquestGID(void)
 }
 
 
-/*  comsize - return size of the common block (in bytes) */
-/*  SYNOPSIS */
-/*    int size */
-/*    comsize( size ) */
-void comsize( unsigned long *size )
-{
-    *size = labs((char *)EndOfCBlock - (char *)CBlockRevision) + sizeof(int);
-
-    return;
-
-}
-
-
 /*  conqinit - machine dependent initialization */
 /*  SYNOPSIS */
 /*    conqinit */

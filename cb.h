@@ -28,14 +28,29 @@
 
 #define CMN_MODE 0660		/* mode of a new common block */
 
+// map and unmap a file backed cCB (servers)
 void cbMap(void);
-void cbFlush(void);
+void cbUnmap();
 
+// map and unmap a heap based common block
+void cbMapLocal(void);
+void cbUnmapLocal();
+
+// flush a common block to disk (servers)
+void cbFlush(void);
+// Zero out a common block
+void cbZero(void);
+
+// lock and unlock (via semaphore) access to the common block (servers
+// only)
 void cbLock(int *);
 void cbUnlock(int *);
 
-void cbZero(void);
-void cbMapLocal(void);
+
+// do a "pretend" map of the CB variables and return the total size
+// in bytes that needs to be available to do a real mmap() or
+// malloc().
+unsigned int cbGetSize();
 
 /* The Common Block in all it's majesty */
 

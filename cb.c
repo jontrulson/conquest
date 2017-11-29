@@ -23,26 +23,30 @@
 #include "user.h"
 #include "sem.h"
 
-static char *cBasePtr = NULL;	/* common block ptr */
-static unsigned int coff = 0;   /* offset into common block */
+static char *_cbBasePtr = NULL;	/* common block base ptr */
+static unsigned int _cbOffset = 0; /* offset into common block */
+static unsigned int _cbSavedSize = 0; /* for msync() and friends */
 
 static int fakeCommon = FALSE;	/* for the clients */
 
-/* Some (most) architectures do not like unaligned accesses (like
- *  sparc) so we need to ensure proper alignment of the structures
- *  contained within the common block.  We will use 16-byte alignment.
+/* Some architectures do not like unaligned accesses (like sparc) so
+ * we need to ensure proper alignment of the structures contained
+ * within the common block.  We will use 16-byte alignment, which
+ * should work for everybody.
  */
 
 #define CB_ALIGNMENT            (16)
 #define CB_ALIGN(_off, _align)  ( ((_off) + (_align)) & ~((_align) - 1) )
 
-/* On those platforms where we want proper alignment, align everything
- * to 16 bytes.
- */
-#define map1d(thevarp, thetype, size) {                 \
-        thevarp = (thetype *) (cBasePtr + coff);        \
-        coff += (sizeof(thetype) * (size));             \
-        coff = CB_ALIGN(coff, CB_ALIGNMENT);            \
+// This macro maps a global variable into the memory region starting
+// at _cbBasePtr.  The memory region is either a heap-allocated chunk
+// of memory (in the case of the clients), or a memory mapped file
+// (via mmap()) used for persistent storage (in the server).
+
+#define MAP_VARIABLE(thevarp, thetype, size, doAssign) {                \
+        if (doAssign) { thevarp = (thetype *) (_cbBasePtr + _cbOffset); } \
+        _cbOffset += (sizeof(thetype) * (size));                          \
+        _cbOffset = CB_ALIGN(_cbOffset, CB_ALIGNMENT);                    \
     }
 
 // Static functions...
@@ -57,44 +61,92 @@ static void *_mymalloc(size_t size)
 
     if ((ptr = malloc(size)) == NULL)
     {
-	perror("_mymalloc");
+	perror("_mymalloc()");
 	exit(1);
     }
     return(ptr);
 }
 
-/* maps the actual vars into the common block */
-static void _mapCBVariables(void)
+/* maps the actual vars into the common block, if doAssign is set.
+ * Otherwise, this can be used to determine how many bytes are
+ * required for the CB by only modifying the offset during mapping */
+static void _mapCBVariables(bool doAssign)
 {
-    coff = 0;
+    _cbOffset = 0;
 
-    map1d(CBlockRevision, int, 1);	/* this *must* be the first var */
+    // This must be the first var
+    MAP_VARIABLE(CBlockRevision, int, 1, doAssign);
 
-    map1d(CBGlobal, CBGlobal_t, 1);
+    // This must be the second var
+    MAP_VARIABLE(CBGlobal, CBGlobal_t, 1, doAssign);
 
-    map1d(ConqInfo, ConqInfo_t, 1);
+    MAP_VARIABLE(ConqInfo, ConqInfo_t, 1, doAssign);
 
-    map1d(Users, User_t, MAXUSERS);
+    MAP_VARIABLE(Users, User_t, MAXUSERS, doAssign);
 
-    map1d(Robot, Robot_t, 1);
+    MAP_VARIABLE(Robot, Robot_t, 1, doAssign);
 
-    map1d(Planets, Planet_t, MAXPLANETS);
+    MAP_VARIABLE(Planets, Planet_t, MAXPLANETS, doAssign);
 
-    map1d(Teams, Team_t, NUMALLTEAMS);
+    MAP_VARIABLE(Teams, Team_t, NUMALLTEAMS, doAssign);
 
-    map1d(Doomsday, Doomsday_t, 1);
+    MAP_VARIABLE(Doomsday, Doomsday_t, 1, doAssign);
 
-    map1d(History, History_t, MAXHISTLOG);
+    MAP_VARIABLE(History, History_t, MAXHISTLOG, doAssign);
 
-    map1d(Driver, Driver_t, 1);
+    MAP_VARIABLE(Driver, Driver_t, 1, doAssign);
 
-    map1d(Ships, Ship_t, MAXSHIPS);
+    MAP_VARIABLE(Ships, Ship_t, MAXSHIPS, doAssign);
 
-    map1d(ShipTypes, ShipType_t, MAXNUMSHIPTYPES);
+    MAP_VARIABLE(ShipTypes, ShipType_t, MAXNUMSHIPTYPES, doAssign);
 
-    map1d(Msgs, Msg_t, MAXMESSAGES);
+    MAP_VARIABLE(Msgs, Msg_t, MAXMESSAGES, doAssign);
 
-    map1d(EndOfCBlock, int, 1);
+    // This must be the last var
+    MAP_VARIABLE(EndOfCBlock, int, 1, doAssign);
+
+    // if we did actual assignments, save the offset
+    if (doAssign)
+        _cbSavedSize = _cbOffset;
+
+    return;
+}
+
+static void _unmapCBVariables()
+{
+    // this simply sets all the CB variables to NULL.  It should only
+    // be called by cbUnmap() and cbUnmapLocal()
+
+    // This must be the first var
+    CBlockRevision = NULL;
+
+    // This must be the second var
+    CBGlobal = NULL;
+
+    ConqInfo = NULL;
+
+    Users = NULL;
+
+    Robot = NULL;
+
+    Planets = NULL;
+
+    Teams = NULL;
+
+    Doomsday = NULL;
+
+    History = NULL;
+
+    Driver = NULL;
+
+    Ships = NULL;
+
+    ShipTypes = NULL;
+
+    Msgs = NULL;
+
+    // This must be the last var
+    EndOfCBlock = NULL;
 
     return;
 }
@@ -104,16 +156,14 @@ static void _initFakeCB(void)
     fakeCommon = TRUE;
 
     /* this will exit if it fails */
-    if (!cBasePtr)
-        cBasePtr = (char *)_mymalloc(SIZEOF_COMMONBLOCK);
+    if (!_cbBasePtr)
+        _cbBasePtr = (char *)_mymalloc(cbGetSize());
 
-    _mapCBVariables();
+    _mapCBVariables(true);
 
     cbZero();
     return;
 }
-
-// The good stuff...
 
 /* we'll use a hack to translate the lock[mesg|word] pointers into
    a semaphore selector */
@@ -158,9 +208,9 @@ void cbFlush(void)
     /* fbsd doesn't like MS_SYNC       */
     /* which is prefered, but oh well */
 # if defined(FREEBSD)
-    if (msync((caddr_t)cBasePtr, SIZEOF_COMMONBLOCK, 0) == -1)
+    if (msync((caddr_t)_cbBasePtr, _cbSavedSize, 0) == -1)
 # else
-        if (msync((caddr_t)cBasePtr, SIZEOF_COMMONBLOCK, MS_SYNC) == -1)
+        if (msync((caddr_t)_cbBasePtr, _cbSavedSize, MS_SYNC) == -1)
 # endif
             utLog("cbFlush(): msync(): %s", strerror(errno));
 #endif
@@ -175,22 +225,40 @@ static int _checkCB(char *fname, int fmode, int sizeofcb)
     int ffd;
     struct stat sbuf;
 
-    /* first stat the file, if it exists
-       then verify the size.  unlink if size
-       mismatch */
+    /* first stat the file, if it exists then verify the size.  rename
+       it if a size mismatch */
     if (stat(fname, &sbuf) != -1)   /* ok if this fails */
-    {				/* file exists - verify size */
+    {
+        // file exists - verify size
         if (sbuf.st_size != sizeofcb)
 	{
-            printf("%s: File size mismatch (expected %d, was %d), removing.\n",
-                   fname,
-                   sizeofcb,
-                   (unsigned int)sbuf.st_size);
-            if (unlink(fname) == -1)
+            // we have a problem - we cannot use this CB.  So, try to
+            // rename it to something else so we can create a fresh
+            // new one.  By renaming the old one, we don't risk
+            // throwing away an important CB due to someone fiddling
+            // with the limits in cbGlobal.
+
+            // we create a new file tagged with the unix time
+            char newfile[PATH_MAX] = {};
+            snprintf(newfile, PATH_MAX, "%s/%s-%lu",
+                     CONQSTATE, C_CONQ_COMMONBLK,
+                     time(0));
+
+            utLog("%s: %s: ERROR: File size mismatch (expected %d, was %d), "
+                  "renaming to %s.",
+                  __FUNCTION__,
+                  fname,
+                  sizeofcb,
+                  sbuf.st_size,
+                  newfile);
+
+            if (rename(fname, newfile) == -1)
 	    {
-                printf("_checkCB(): unlink(%s) failed: %s\n",
-                       fname,
-                       strerror(errno));
+                utLog("%s: rename(%s, %s) failed: %s\n",
+                      __FUNCTION__,
+                      fname,
+                      newfile,
+                      strerror(errno));
                 return(FALSE);
 	    }
 	}
@@ -209,38 +277,41 @@ static int _checkCB(char *fname, int fmode, int sizeofcb)
 	{			/* create it */
             if ((ffd = creat(fname, fmode)) == -1)
 	    {
-                printf("_checkCB(): creat(%s) failed: %s\n",
-                       fname,
-                       strerror(errno));
+                utLog("_checkCB(): creat(%s) failed: %s\n",
+                      fname,
+                      strerror(errno));
                 return(FALSE);
 	    }
             else
 	    {			/* Create it */
-                printf("Initializing common block: %s\n", fname);
-                cBasePtr = (char *) _mymalloc(sizeofcb); /* this exits if malloc fails */
-                memset(cBasePtr, 0, sizeofcb);
+                utLog("%s: Initializing new common block: %s\n",
+                      __FUNCTION__, fname);
 
-                if (write(ffd, cBasePtr, sizeofcb) <= 0)
+                // this exits if malloc fails
+                void *memptr = _mymalloc(sizeofcb);
+                memset(memptr, 0, sizeofcb);
+
+                if (write(ffd, memptr, sizeofcb) <= 0)
                 {
-                    printf("_checkCB(): write() failed: %s\n",
-                           strerror(errno));
+                    utLog("_checkCB(): write() failed: %s\n",
+                          strerror(errno));
 
                     close(ffd);
-                    free(cBasePtr);
-                    cBasePtr = NULL;
+                    free(memptr);
+                    memptr = NULL;
                     return FALSE;
                 }
 
                 close(ffd);
-                free(cBasePtr);
-                cBasePtr = NULL;
+                free(_cbBasePtr);
+                _cbBasePtr = NULL;
 	    }
 	}
         else
 	{			/* some other error */
-            printf("_checkCB(): open(%s, O_RDONLY) failed: %s\n",
-                   fname,
-                   strerror(errno));
+            utLog("_checkCB(): open(%s, O_RDONLY) failed: %s\n",
+                  fname,
+                  strerror(errno));
             return(FALSE);
 	}
     }
@@ -254,8 +325,8 @@ static int _checkCB(char *fname, int fmode, int sizeofcb)
         // don't whine on EPERM.  Many systems don't allow
         // ordinary users to chown anymore
         if (errno != EPERM)
-            printf("_checkCB(): chown() failed: %s\n",
-                   strerror(errno));
+            utLog("_checkCB(): chown() failed: %s\n",
+                  strerror(errno));
     }
 #endif
 
@@ -273,19 +344,24 @@ void cbMap(void)
         return;
 
 #if defined(MINGW)
-    fprintf(stderr, "%s: Only fake common blocks are supported under MINGW\n");
+    fprintf(stderr,
+            "%s: Only fake (client) common blocks are supported under MINGW\n");
     exit(1);
 #else  /* MINGW */
+
+    utLog("%s: CB size needed: %u bytes", __FUNCTION__,
+          cbGetSize());
+
     snprintf(cmnfile, PATH_MAX, "%s/%s", CONQSTATE, C_CONQ_COMMONBLK);
 
     /* verify it's validity */
-    if (_checkCB(cmnfile, CMN_MODE, SIZEOF_COMMONBLOCK) == FALSE)
+    if (_checkCB(cmnfile, CMN_MODE, cbGetSize()) == FALSE)
         exit(1);			/* an unrecoverable error */
 
     /* reopen it... */
     if ((cmn_fd = open(cmnfile, O_RDWR)) == -1)
     {
-        perror("cbMap():open(O_RDWR)");
+        utLog("cbMap(): open(O_RDWR) failed: %s", strerror(errno));
         exit(1);
     }
 
@@ -295,18 +371,22 @@ void cbMap(void)
 #  define MAP_FILE 0		/* some arch's don't def this */
 # endif
 
-    if ((cBasePtr = mmap((caddr_t) 0, (size_t) SIZEOF_COMMONBLOCK,
-                         PROT_READ | PROT_WRITE, MAP_SHARED | MAP_FILE,
-                         cmn_fd, 0)) == MAP_FAILED)
+    if ((_cbBasePtr = mmap(NULL, (size_t) cbGetSize(),
+                           PROT_READ | PROT_WRITE, MAP_SHARED | MAP_FILE,
+                           cmn_fd, 0)) == MAP_FAILED)
     {
-        perror("cbMap():mmap()");
+        close(cmn_fd);
+        utLog("cbMap(): mmap() failed: %s", strerror(errno));
         exit(1);
     }
 #endif  /* MINGW */
 
     /* now map the variables into the
        common block */
-    _mapCBVariables();
+    _mapCBVariables(true);
+
+    // go ahead and close the fd, we don't need it anymore.
+    close(cmn_fd);
 
     return;
 }
@@ -314,7 +394,7 @@ void cbMap(void)
 void cbZero(void)
 {				/* zero the common block, called from
 				   init everything */
-    memset(cBasePtr, 0, SIZEOF_COMMONBLOCK);
+    memset(_cbBasePtr, 0, cbGetSize());
     upchuck();			/* flush the commonblock */
 
     return;
@@ -324,6 +404,9 @@ void cbZero(void)
 void cbMapLocal(void)
 {
     /* a parallel universe, it is */
+    utLog("%s: CB size needed: %u bytes", __FUNCTION__,
+          cbGetSize());
+
     _initFakeCB();
     clbInitEverything();
     clbInitMsgs();
@@ -334,4 +417,52 @@ void cbMapLocal(void)
     Driver->drivowner[0] = 0;
 
     return;
+}
+
+unsigned int cbGetSize()
+{
+    // Do a pretend map of the variables (at their current sizes) and
+    // return the offset (_cbOffset).  Note, this number includes
+    // any trailing alignment up to 16 bytes.
+
+    _mapCBVariables(false);
+    return (_cbOffset);
+}
+
+void cbUnmap()
+{
+    if (!_cbBasePtr)
+        return;
+    if (fakeCommon) // only for real file-backed mmapped common blocks
+        return;
+
+    utLog("%s: Unmapping the common block");
+
+    // reset all variables and unmap the common block
+
+    _unmapCBVariables();
+    // not much we can do if this fails...
+    munmap((void *)_cbBasePtr, _cbSavedSize);
+    _cbBasePtr = NULL;
+    _cbOffset = 0;
+    _cbSavedSize = 0;
+}
+
+void cbUnmapLocal()
+{
+    if (!_cbBasePtr)
+        return;
+    if (!fakeCommon) // only for heap allocated "fake" common blocks
+        return;
+
+    utLog("%s: Freeing the common block");
+
+    // reset all variables, free the "fake" common block
+
+    _unmapCBVariables();
+    // not much we can do if this fails...
+    free((void *)_cbBasePtr);
+    _cbBasePtr = NULL;
+    _cbOffset = 0;
+    _cbSavedSize = 0;
 }

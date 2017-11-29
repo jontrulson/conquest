@@ -51,7 +51,7 @@
 /*#define COMMONSTAMP 20001231 		 stardate? */
 /*#define COMMONSTAMP 20030829 */
 // #define COMMONSTAMP 20101027
-#define COMMONSTAMP 20171126
+#define COMMONSTAMP 20171128
 
 // Absolute maximum values for certain arrays.  Changing these will
 // require significant changes everywhere (CB/protocol mostly).  These
@@ -441,11 +441,6 @@ typedef enum {
 
 /* Magic characters */
 #define CHAR_CLOAKED '~' 	/* used to display self-cloaked ship */
-
-/* Actual size of common block */
-//#define SIZEOF_COMMONBLOCK 262144 /* New and Improved! */
-#define SIZEOF_COMMONBLOCK (1 << 20) // Super Ultra New and Improved!
-                                     // 1MB.
 
 #define MAILADDR ""
 
