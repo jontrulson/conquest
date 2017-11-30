@@ -18,6 +18,8 @@ typedef struct {
     real accelfac;		/* shiptype acceleration constants */
     real weafac;		/* shiptype weapons constants */
     real torpwarp;		/* torp speed for shiptype */
+
+    real size;                  /* in CU's */
 } ShipType_t;
 
 #endif /* SHIPTYPE_H_INCLUDED */

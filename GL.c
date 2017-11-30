@@ -2075,6 +2075,7 @@ drawShip(GLfloat x, GLfloat y, GLfloat angle, char ch, int snum, int color,
     static GLfloat shipsizeSR, shipsizeLR;
     static int norender = FALSE;
     int steam = cbShips[snum].team, stype = cbShips[snum].shiptype;
+    real shipSize = cbShipTypes[cbShips[snum].shiptype].size;
     GLfloat scaleFac = (scale == SCALE_FAC) ? dConf.vScaleSR : dConf.vScaleLR;
     static uint32_t geoChangeCount = 0;
     static GLfloat phaserRadiusSR, phaserRadiusLR;
@@ -2096,9 +2097,9 @@ drawShip(GLfloat x, GLfloat y, GLfloat angle, char ch, int snum, int color,
     if (geoChangeCount != GLGeoChange)
     {
         geoChangeCount = GLGeoChange;
-        /* setup the ship sizes - ships are SHIPSIZE CU's. */
-        shipsizeSR = cu2GLSize(SHIPSIZE * OBJ_PRESCALE, -SCALE_FAC);
-        shipsizeLR = cu2GLSize(SHIPSIZE * OBJ_PRESCALE, -MAP_FAC);
+        /* setup the ship sizes */
+        shipsizeSR = cu2GLSize(shipSize * OBJ_PRESCALE, -SCALE_FAC);
+        shipsizeLR = cu2GLSize(shipSize * OBJ_PRESCALE, -MAP_FAC);
 
         phaserRadiusSR = cu2GLSize(PHASER_DIST, -SCALE_FAC);
         phaserRadiusLR = cu2GLSize(PHASER_DIST, -MAP_FAC);

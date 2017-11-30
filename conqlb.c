@@ -1989,6 +1989,7 @@ void clbInitUniverse(void)
     cbShipTypes[ST_SCOUT].accelfac = 1.6;
     cbShipTypes[ST_SCOUT].weafac = 0.83;
     cbShipTypes[ST_SCOUT].torpwarp = 14.0;
+    cbShipTypes[ST_SCOUT].size = 210.0;
 
     utStrncpy( cbShipTypes[ST_DESTROYER].name, "Destroyer", MAXSTNAME );
     cbShipTypes[ST_DESTROYER].armylim = 9;
@@ -1997,6 +1998,7 @@ void clbInitUniverse(void)
     cbShipTypes[ST_DESTROYER].accelfac = 1.0;
     cbShipTypes[ST_DESTROYER].weafac = 1.0;
     cbShipTypes[ST_DESTROYER].torpwarp = 12.0;
+    cbShipTypes[ST_DESTROYER].size = 225.0;
 
     utStrncpy( cbShipTypes[ST_CRUISER].name, "Cruiser", MAXSTNAME );
     cbShipTypes[ST_CRUISER].armylim = 11;
@@ -2005,6 +2007,7 @@ void clbInitUniverse(void)
     cbShipTypes[ST_CRUISER].accelfac = 0.8;
     cbShipTypes[ST_CRUISER].weafac = 1.17;
     cbShipTypes[ST_CRUISER].torpwarp = 10.0;
+    cbShipTypes[ST_CRUISER].size = 240.0;
 
     cbTeams[TEAM_FEDERATION].shiptype = ST_DESTROYER;
     cbTeams[TEAM_KLINGON].shiptype = ST_DESTROYER;

@@ -51,7 +51,7 @@
 /*#define COMMONSTAMP 20001231 		 stardate? */
 /*#define COMMONSTAMP 20030829 */
 // #define COMMONSTAMP 20101027
-#define COMMONSTAMP 20171128
+#define COMMONSTAMP 20171129
 
 // Absolute maximum values for certain arrays.  Changing these will
 // require significant changes everywhere (CB/protocol mostly).  These
@@ -70,7 +70,6 @@
 
 #define MAXSHIPS 20 		/* number of available ships */
 
-#define SHIPSIZE 225            /* base size of a ship in CU's */
 #define DOOMSIZE 900            /* base size of doomsday in CU's */
 /* Values for sstatus() */
 #define SS_OFF 1 		/* available for use */
