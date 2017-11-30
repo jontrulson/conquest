@@ -666,6 +666,7 @@ static int _get_glplanet_info(GLPlanet_t *curGLPlanet, int plani)
     }
     else
     {                       /* cqi was found, so get it. */
+        // FIXME - this should be pulled out of cbPlanets[]
         size = cqiPlanets[plnndx].size * OBJ_PRESCALE;
 #if 0
         utLog("Computed size %f for planet %s\n",
@@ -1067,7 +1068,7 @@ void drawExplosion(GLfloat x, GLfloat y, int snum, int torpnum, int scale)
         return;
 
     /* just check first ship, torp 0 */
-    if (!torpAStates[1][0].anims)
+    if (!torpAStates[0][0].anims)
         if (!initGLExplosions())
         {
             utLog("%s: initGLExplosions failed, bailing.",
@@ -1165,7 +1166,7 @@ void drawBombing(int snum, int scale)
         return;
 
     /* init - look at first ship */
-    if (!bombAState[1].anims)
+    if (!bombAState[0].anims)
     {
         if (!animInitState("bombing", &initastate, NULL))
             return;
@@ -1184,7 +1185,7 @@ void drawBombing(int snum, int scale)
 
                 for (j=1; j < i; j++)
                     free(bombAState[j].state.private);
-                bombAState[1].anims = 0; /* clear 1st so we can retry
+                bombAState[0].anims = 0; /* clear 1st so we can retry
                                             again later */
                 utLog("%s: malloc(%d) failed", __FUNCTION__,
                       sizeof(struct _rndxy));
