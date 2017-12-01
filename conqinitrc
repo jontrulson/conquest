@@ -251,7 +251,7 @@ planet {
   homeplanet  "yes"
   x           -8397.661277
   y           5253.053554
-  size        300
+  size        600
 }
 
 planet {
@@ -268,7 +268,7 @@ planet {
   homeplanet  "yes"
   x           10287.055805
   y           7095.887954
-  size        300
+  size        600
 }
 
 planet {
@@ -302,7 +302,7 @@ planet {
   homeplanet  "yes"
   x           -9974.371169
   y           -6386.513510
-  size        300
+  size        600
 }
 
 planet {
@@ -387,7 +387,7 @@ planet {
   homeplanet  "no"
   x           -1469.062755
   y           -2145.193376
-  size        300
+  size        600
 }
 
 planet {
@@ -489,7 +489,7 @@ planet {
   homeplanet  "no"
   x           -11433.228942
   y           1000.635077
-  size        300
+  size        600
 }
 
 planet {
@@ -506,7 +506,7 @@ planet {
   homeplanet  "no"
   x           -819.850367
   y           12806.439942
-  size        300
+  size        600
 }
 
 planet {

@@ -288,12 +288,13 @@ typedef enum {
 /* closest entry to an enemy ship */
 
 #define ORBIT_FAC 10.0 		/* orbit speed in degrees per second */
-// FIXME - should be computed based on cbPlanets[].size
-#define ORBIT_DIST 300.0 	/* distance from planets to enter orbit and orbit */
+
 #define ORBIT_CW -1.0 		/* warp factor for clockwise orbiting */
 #define ORBIT_CCW -2.0 		/* warp factor for counter-clockwise orbiting */
 // FIXME - should be computed based on cbPlanets[].size
-#define PLANET_DIST 500.0 	/* distance from planets scan, get blasted, etc. */
+#define PLANET_DIST_OFF 200.0 	/* distance from planets (planet size
+                                 * + this offset) to get scanned, get
+                                 * blasted, etc. */
 #define PLANET_HIT 2.5 		/* hits per hostile planet per second */
 #define ARMY_HIT 0.08 		/* extra hits per hostile army per second */
 

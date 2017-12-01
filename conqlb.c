@@ -1338,7 +1338,9 @@ int clbFindOrbit( int snum, int *pnum )
 
     for ( i = 0; i < MAXPLANETS; i++ )
         if ( PVISIBLE(i) &&
-             ( dist( cbShips[snum].x, cbShips[snum].y, cbPlanets[i].x, cbPlanets[i].y ) <= ORBIT_DIST ) )
+             ( dist( cbShips[snum].x, cbShips[snum].y,
+                     cbPlanets[i].x,
+                     cbPlanets[i].y ) <= (real)cbPlanets[i].size ) )
         {
             *pnum = i;
             return ( TRUE );
@@ -2835,22 +2837,22 @@ void clbAdjOrbitalPosition(int snum)
             if ( cbShips[snum].warp == ORBIT_CW )
             {
                 cbShips[snum].x =
-                    (real)(cbPlanets[pnum].x + (ORBIT_DIST *
+                    (real)(cbPlanets[pnum].x + ((real)(cbPlanets[pnum].size / 2)*
                                               cosd(cbShips[snum].head + 90.0)));
 
                 cbShips[snum].y =
-                    (real)(cbPlanets[pnum].y + (ORBIT_DIST *
+                    (real)(cbPlanets[pnum].y + ((real)(cbPlanets[pnum].size / 2)*
                                               sind(cbShips[snum].head + 90.0)));
             }
             else if ( cbShips[snum].warp == ORBIT_CCW )
             {
                 /* Orbiting counter-clockwise. */
                 cbShips[snum].x =
-                    (real)(cbPlanets[pnum].x + (ORBIT_DIST *
+                    (real)(cbPlanets[pnum].x + ((real)(cbPlanets[pnum].size / 2)*
                                               cosd(cbShips[snum].head - 90.0)));
 
                 cbShips[snum].y =
-                    (real)(cbPlanets[pnum].y + (ORBIT_DIST *
+                    (real)(cbPlanets[pnum].y + ((real)(cbPlanets[pnum].size / 2) *
                                               sind(cbShips[snum].head - 90.0)));
 
             }

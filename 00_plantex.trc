@@ -17,6 +17,7 @@ texture {
     color       "ffeeee00"
 
     mipmap      "yes"
+    prescale    1.7
 }
 
 texture {
@@ -25,6 +26,7 @@ texture {
     color       "ff886aea"
 
     mipmap      "yes"
+    prescale    1.7
 }
 
 texture {
@@ -33,6 +35,7 @@ texture {
     color       "ffeeee00"
 
     mipmap      "yes"
+    prescale    1.7
 }
 
 texture {
@@ -41,6 +44,8 @@ texture {
     color       "ffcc0000"
 
     mipmap      "yes"
+    prescale    1.4
+    prescale    1.7
 }
 
 texture {
@@ -49,6 +54,7 @@ texture {
     color       "ff886aea"
 
     mipmap      "yes"
+    prescale    1.7
 }
 
 texture {
@@ -57,6 +63,7 @@ texture {
     color       "ffcc0000"
 
     mipmap      "yes"
+    prescale    1.7
 }
 
 
@@ -76,12 +83,21 @@ texture {
     color       "ffe6e6e6"
 
     mipmap      "yes"
+    prescale    2.0
 }
 
 # Fed D planets
 texture {
     name        "Omega"
-    filename    "jupiter"
+    filename    "neptune"
+    color       "ffe6e6e6"
+
+    mipmap      "yes"
+}
+
+texture {
+    name        "Telos"
+    filename    "mars"
     color       "ffe6e6e6"
 
     mipmap      "yes"
@@ -103,6 +119,7 @@ texture {
     color       "ffe6e6e6"
 
     mipmap      "yes"
+    prescale    2.0
 }
 
 # Orion D planets
@@ -120,6 +137,7 @@ texture {
     color       "ffe6e6e6"
 
     mipmap      "yes"
+    prescale    2.0
 }
 
 # Non Team (Self Ruled) D planets
@@ -169,6 +187,7 @@ texture {
     color       "ffe6e6e6"
 
     mipmap      "yes"
+    prescale    2.0
 }
 
 texture {

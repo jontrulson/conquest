@@ -21,6 +21,7 @@ typedef struct _GLtexture {
     GLint id;                     /* GL texture id */
     GLColor_t col;                /* default texture color */
     uint32_t w, h;                 /* width/height of texture */
+    real prescale;                 /* prescale to apply when computing size */
 } GLTexture_t;
 
 typedef struct _GLtexcoord {
@@ -44,6 +45,7 @@ GLTexture_t *getGLTexture(char *texname);
 #define GLTEX_ID(x)       ((x)->id)
 #define GLTEX_WIDTH(x)    ((x)->w)
 #define GLTEX_HEIGHT(x)   ((x)->h)
+#define GLTEX_PRESCALE(x) ((x)->prescale)
 
 /* ico texture identifiers for drawIconHUDDecal() (GL.c) */
 #define TEX_HUD_ICO                   0

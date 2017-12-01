@@ -393,11 +393,12 @@ void iterdrive( int *ship )
                         /* Still moving; if we're going slow enough to orbit, */
                         /*  check if we're close enough to do so. Otherwise, */
                         /*  check to see if it's time to slow down yet. */
-                        dis = dist( cbShips[i].x, cbShips[i].y, cbPlanets[j].x, cbPlanets[j].y );
+                        dis = dist( cbShips[i].x, cbShips[i].y,
+                                    cbPlanets[j].x, cbPlanets[j].y );
                         if ( cbShips[i].warp <= MAX_ORBIT_WARP )
 			{
                             /* Going slow enough to orbit. */
-                            if ( dis <= ORBIT_DIST )
+                            if ( dis <= (real)(cbPlanets[j].size / 2) )
 			    {
                                 /* Close enough to orbit. */
                                 clbOrbit( i, j );
@@ -409,7 +410,7 @@ void iterdrive( int *ship )
                                               buf, MSG_FLAGS_TERSABLE );
 			    }
 			}
-                        else if ( ( dis - ORBIT_DIST ) <=
+                        else if ( ( dis - (real)(cbPlanets[j].size / 2) ) <=
                                   utAccurateDist( cbShips[i].warp, MAX_ORBIT_WARP,
                                                   cbShipTypes[cbShips[i].shiptype].accelfac *
                                                   engeff( i ) ) )
@@ -580,7 +581,7 @@ void secdrive( int *ship )
             {
                 /* Do we scan the planet? */
                 dis = dist( cbShips[i].x, cbShips[i].y, cbPlanets[j].x, cbPlanets[j].y );
-                if ( dis <= PLANET_DIST )
+                if ( dis <= PLANET_DIST_OFF + ((real)cbPlanets[j].size / 2))
                 {
                     k = cbShips[i].team;
                     if ( k >= 0 && k < NUMPLAYERTEAMS )

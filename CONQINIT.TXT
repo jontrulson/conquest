@@ -415,6 +415,8 @@ CONTENTS:
             mipmap       "yes"                   # optional
             luminance    "yes"                   # optional
 
+            prescale     1.0                     # optional
+
             texarea {                            # optional
               name       "somerect_in_texture"
               x          10.0
@@ -423,7 +425,7 @@ CONTENTS:
               h          10.0
             }
           }
-     
+
           name:       STRING
                       the WKN of the texture.  In the above example,
                       this texture refers the the conquest logo for
@@ -472,6 +474,16 @@ CONTENTS:
                       optional.  If set to yes, then instantiate this texture
                       as a luminance texture (greyscale) instead of a
                       normal RGB[A] texture.
+
+          prescale:   RATIONAL
+
+                      optional.  The default for all textures, if
+                      unspecified, is 1.0.  This variable can be used
+                      to pre-scale the rendered texture size of the
+                      texture during rendering.  Suns tend to need
+                      this to look correct.  This is only implemented
+                      for ships, planets, and the doomsday machine for
+                      now.
 
           texarea:    SUBSECTION
                       optional. A texarea subsection is used to

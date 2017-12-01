@@ -72,9 +72,6 @@ static animStateRec_t bombAState[MAXSHIPS] = {};
 static int frame=0, timebase=0;
 static float FPS = 0.0;
 
-/* a 'prescaling factor for certain objects, so they are drawn a
-   little larger than their 'native' CU size */
-#define OBJ_PRESCALE        1.3
 
 #define TEXT_HEIGHT    ((GLfloat)1.75)   /* 7.0/4.0 - text font height
                                             for viewer */
@@ -642,13 +639,9 @@ static int _get_glplanet_info(GLPlanet_t *curGLPlanet, int plani)
 
     curGLPlanet->tex = &GLTextures[gltndx];
 
-    /* FIXME - size - should use server values if available someday, for now use
-       cqi, and if not that, the standard defaults */
-
     if (plnndx == -1)
     {
-        /* no cqi planet was found so will set a default.  One day the
-         * server might send this data :)
+        /* no cqi planet was found so will set a default.
          * These are in CU's.
          */
         switch (cbPlanets[plani].type)
@@ -666,8 +659,7 @@ static int _get_glplanet_info(GLPlanet_t *curGLPlanet, int plani)
     }
     else
     {                       /* cqi was found, so get it. */
-        // FIXME - this should be pulled out of cbPlanets[]
-        size = cqiPlanets[plnndx].size * OBJ_PRESCALE;
+        size = (real)cbPlanets[plani].size * GLTextures[gltndx].prescale;
 #if 0
         utLog("Computed size %f for planet %s\n",
               size, cbPlanets[plani].name);
@@ -1349,9 +1341,9 @@ void drawPlanet( GLfloat x, GLfloat y, int pnum, int scale,
             else
                 snprintf(buf, BUFFER_SIZE_256, "%s", cbPlanets[pnum].name);
 
-
             glfRenderFont(x,
-                          ((scale == SCALE_FAC) ? y - 4.0 : y - 1.0),
+                          y - cu2GLSize((real)cbPlanets[pnum].size / 2.0,
+                                        -scale),
                           TRANZ, /* planet's Z */
                           ((GLfloat)uiCStrlen(buf) * 2.0) / ((scale == SCALE_FAC) ? 1.0 : 2.0),
                           TEXT_HEIGHT, glfFontFixedTiny, buf, textcolor, NULL,
@@ -1390,7 +1382,8 @@ void drawPlanet( GLfloat x, GLfloat y, int pnum, int scale,
                      planame);
 
         glfRenderFont(x,
-                      ((scale == SCALE_FAC) ? y - 2.0 : y - 1.0),
+                      y - cu2GLSize((real)cbPlanets[pnum].size / 2.0, -scale),
+
                       TRANZ,
                       ((GLfloat)uiCStrlen(buf) * 2.0) / ((scale == SCALE_FAC) ? 1.0 : 2.0),
                       TEXT_HEIGHT, glfFontFixedTiny, buf, textcolor, NULL,
@@ -1420,7 +1413,7 @@ int GLcvtcoords(real cenx, real ceny, real x, real y, real scale,
                 GLfloat *rx, GLfloat *ry )
 {
     GLfloat rscale;
-    static const GLfloat fuzz = 1.3; /* 'fuzz' factor to pad the limit
+    static const GLfloat fuzz = 2.0; /* 'fuzz' factor to pad the limit
                                         a little */
     int ascale = abs(scale);
     GLfloat limitx, limity;
@@ -2099,8 +2092,12 @@ drawShip(GLfloat x, GLfloat y, GLfloat angle, char ch, int snum, int color,
     {
         geoChangeCount = GLGeoChange;
         /* setup the ship sizes */
-        shipsizeSR = cu2GLSize(shipSize * OBJ_PRESCALE, -SCALE_FAC);
-        shipsizeLR = cu2GLSize(shipSize * OBJ_PRESCALE, -MAP_FAC);
+        shipsizeSR = cu2GLSize(shipSize
+                               * GLTEX_PRESCALE(GLShips[steam][stype].ship),
+                               -SCALE_FAC);
+        shipsizeLR = cu2GLSize(shipSize
+                               * GLTEX_PRESCALE(GLShips[steam][stype].ship),
+                               -MAP_FAC);
 
         phaserRadiusSR = cu2GLSize(PHASER_DIST, -SCALE_FAC);
         phaserRadiusLR = cu2GLSize(PHASER_DIST, -MAP_FAC);
@@ -2317,8 +2314,10 @@ void drawDoomsday(GLfloat x, GLfloat y, GLfloat dangle, GLfloat scale)
         geoChangeCount = GLGeoChange;
 
         /* doomsday is DOOMSIZE CU's in size */
-        doomsizeSR = cu2GLSize(DOOMSIZE * OBJ_PRESCALE, -SCALE_FAC);
-        doomsizeLR = cu2GLSize(DOOMSIZE * OBJ_PRESCALE, -MAP_FAC);
+        doomsizeSR = cu2GLSize(DOOMSIZE * GLTEX_PRESCALE(GLDoomsday.doom),
+                               -SCALE_FAC);
+        doomsizeLR = cu2GLSize(DOOMSIZE * GLTEX_PRESCALE(GLDoomsday.doom),
+                               -MAP_FAC);
 
         beamRadius = cu2GLSize(DOOMSDAY_DIST, -SCALE_FAC);
     }
@@ -3499,6 +3498,7 @@ static int loadGLTextures()
             }
 
             curTexture.cqiIndex = i;
+            curTexture.prescale = cqiTextures[i].prescale;
             hex2GLColor(cqiTextures[i].color, &curTexture.col);
 
             GLTextures[loadedGLTextures] = curTexture;

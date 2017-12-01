@@ -783,10 +783,11 @@ static void renderShieldCharge(void)
 /* This is Cat's icon hud */
 void renderHud(int dostats)
 {				/* assumes context is current*/
-    const int bufSize = 128;
-    char sbuf[bufSize];
-    char ibuf[bufSize];        /* fps, stats, etc */
-    char fbuf[bufSize];
+    const int bufSize = 128; // make the same as the size of sbuf,
+                             // ibuf, and fbuf.
+    static char sbuf[128];
+    static char ibuf[128];        /* fps, stats, etc */
+    static char fbuf[128];
     int FPS = (int)getFPS();
     cqColor icl;
     real warp = cbShips[Context.snum].warp;
@@ -1465,7 +1466,8 @@ void renderViewer(int dovbg, int dobomb)
         static const int nlines = 10; /* 30 lines, each side of 0 */
         GLfloat gx, gy;
 
-        uiPutColor(InfoColor);
+//        uiPutColor(InfoColor);
+        glColor4f(0.1, 0.1, 0.1, 0.3);
         for (i = 0; i < nlines; i++)
         {
             if (!i)

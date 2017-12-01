@@ -133,7 +133,7 @@ static int parsebool(char *str);
 %token <num> TOK_PLANET TOK_PRIMARY TOK_ANGLE TOK_VELOCITY TOK_RADIUS
 %token <num> TOK_PTYPE TOK_PTEAM
 %token <num> TOK_ARMIES TOK_VISIBLE TOK_CORE TOK_XCOORD TOK_YCOORD
-%token <num> TOK_TEXNAME TOK_COLOR
+%token <num> TOK_TEXNAME TOK_COLOR TOK_PRESCALE
 %token <num> TOK_HOMEPLANET TOK_TEXTURE TOK_FILENAME
 %token <num> TOK_ANIMATION TOK_ANIMDEF
 %token <num> TOK_STAGES TOK_LOOPS TOK_DELAYMS TOK_LOOPTYPE TOK_TIMELIMIT
@@ -525,6 +525,10 @@ stmt            : TOK_PLANETMAX number
                 | TOK_COLOR string
                    {
                         cfgSections(TOK_COLOR, $2);
+                   }
+                | TOK_PRESCALE rational
+                   {
+                        cfgSectionf(TOK_PRESCALE, $2);
                    }
                 | TOK_FILENAME string
                    {
@@ -1779,6 +1783,8 @@ static void startSection(int section)
         memset((void *)&currTexture, 0, sizeof(cqiTextureInitRec_t));
         currTexAreas = NULL;
         numTexAreas = 0;
+        // default to a prescale of 1.0
+        currTexture.prescale = 1.0;
     }
     break;
 
@@ -2422,7 +2428,8 @@ static void cfgSectioni(int item, int val)
             currPlanet.armies = abs(val);
             break;
         case TOK_SIZE:
-            currPlanet.size = fabs((real)val);
+            // use reasonable defaults that can fit the protocol (uint16_t)
+            currPlanet.size = (uint16_t)CLAMP(10, 65535, abs(val));
             break;
         }
     }
@@ -2629,6 +2636,16 @@ static void cfgSectionf(int item, real val)
         break;
     case TOK_SHIPTYPE:
         break;
+    case TOK_TEXTURE:
+    {
+        switch (item)
+        {
+        case TOK_PRESCALE:
+            currTexture.prescale = fabs(val);
+            break;
+        }
+    }
+    break;
     case TOK_PLANET:
     {
         switch (item)

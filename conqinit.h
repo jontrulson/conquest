@@ -87,8 +87,9 @@ typedef struct _cqi_texture_area {
 typedef struct _cqi_texture_init {
     char                 name[CQI_NAMELEN]; /* texid */
     char                 filename[CQI_NAMELEN]; /* if different from texid */
-    uint32_t              flags; /* flags for this cqi texture (CQITEX_F_*)*/
-    uint32_t              color;  /* hex encoded color (AARRGGBB) */
+    uint32_t             flags; /* flags for this cqi texture (CQITEX_F_*)*/
+    uint32_t             color;  /* hex encoded color (AARRGGBB) */
+    real                 prescale;
     int                  numTexAreas; /* number of texture areas */
     cqiTextureAreaPtr_t  texareas; /* optional texture areas */
 } cqiTextureInitRec_t, *cqiTextureInitPtr_t ;

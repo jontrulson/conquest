@@ -276,6 +276,7 @@ int procPlanet(char *buf)
     cbPlanets[pnum].type = splan->ptype;
     cbPlanets[pnum].team = splan->team;
     cbPlanets[pnum].defendteam = splan->defendteam;
+    cbPlanets[pnum].size = ntohs(splan->size);
 
     utStrncpy(cbPlanets[pnum].name, (char *)splan->name, MAXPLANETNAME);
 

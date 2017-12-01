@@ -1795,7 +1795,7 @@ void oppedit(void)
 
         lin++;
         cprintf(lin,col,ALIGN_NONE,sfmt, "S", "  Size:\n");
-        cprintf( lin,datacol,ALIGN_NONE, "#%d#%.1f", InfoColor, cbPlanets[pnum].size );
+        cprintf( lin,datacol,ALIGN_NONE, "#%d#%hu", InfoColor, cbPlanets[pnum].size );
 
         lin++;
         i = cbPlanets[pnum].type;

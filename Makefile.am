@@ -208,10 +208,8 @@ install-exec-hook:
 	chmod 644 $(DESTDIR)$(CONQSNDDIR)/*.ogg 
 	cp -f $(CONQDOCS) $(DESTDIR)$(CONQDOCDIR)/
 	chmod 644 $(DESTDIR)$(CONQDOCDIR)/*
-	if [ ! -f $(DESTDIR)$(CONQSYSCONFDIR)/conqinitrc ] ; \
-	then \
-		cp conqinitrc $(DESTDIR)$(CONQSYSCONFDIR)/conqinitrc; \
-	fi
+	cp conqinitrc $(DESTDIR)$(CONQSYSCONFDIR)/conqinitrc; \
+	chmod 644 $(DESTDIR)$(CONQSYSCONFDIR)/conqinitrc
 	chgrp $(CONQGROUP) $(TEXTURESRC) $(CONQINITRC) $(SOUNDRC) 
 	chmod 664 $(TEXTURESRC) $(CONQINITRC) $(SOUNDRC)
 	chgrp $(CONQGROUP) $(DESTDIR)$(bindir)/conqoper$(EXEEXT) \

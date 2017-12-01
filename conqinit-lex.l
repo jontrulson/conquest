@@ -71,6 +71,7 @@ ycoord                 {return ( TOK_YCOORD );}
 {whtspc}y{whtspc}      {return ( TOK_YCOORD );}
 texname                {return ( TOK_TEXNAME );}
 color                  {return ( TOK_COLOR );}
+prescale               {return ( TOK_PRESCALE );}
 size                   {return ( TOK_SIZE );}
 homeplanet             {return ( TOK_HOMEPLANET );}
 

@@ -251,7 +251,8 @@ typedef struct {
     uint8_t  team;			/* team */
 
     uint8_t  defendteam;        /* original home planet team owner*/
-    uint8_t  pad[3];
+    uint16_t size;              /* in CU's */
+    uint8_t  pad[1];
 
     uint8_t  name[MAXPLANETNAME];
 } spPlanet_t;

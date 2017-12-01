@@ -478,6 +478,9 @@ spPlanet_t *spktPlanet(uint8_t pnum, int rec)
     // who's homeworld is this (if a homeplanet)?
     splan.defendteam = cbPlanets[pnum].defendteam;
 
+    // how big is it?
+    splan.size = htons(cbPlanets[pnum].size);
+
     utStrncpy((char *)splan.name, cbPlanets[pnum].name, MAXPLANETNAME);
 
     if (rec)
