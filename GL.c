@@ -1149,6 +1149,7 @@ void drawBombing(int snum, int scale)
         real rndx;                  /* random X offset from planet */
         real rndy;                  /* random Y offset from planet */
     } *rnd;
+    int pnum;
 
     if (snum < 0 || snum >= MAXSHIPS)
         return;
@@ -1156,6 +1157,8 @@ void drawBombing(int snum, int scale)
     /* don't bother if we aren't orbiting anything */
     if (cbShips[snum].lock != LOCK_PLANET)
         return;
+
+    pnum = (int)cbShips[snum].lockDetail;
 
     /* init - look at first ship */
     if (!bombAState[0].anims)
@@ -1206,9 +1209,11 @@ void drawBombing(int snum, int scale)
 
             /* choose a psuedorandom offset from planet x/y, and store
                them in the state's private area. */
-            /* FIXME - use the planet size to limit, when available someday */
-            rnd->rndx = rnduni(-100.0, 100.0); /* rnd X */
-            rnd->rndy = rnduni(-100.0, 100.0); /* rnd Y */
+            real psize = (real)cbPlanets[pnum].size / 2.0;
+            // reduce it by 20% to reduce "space" blasts
+            psize *= 0.80;
+            rnd->rndx = rnduni(-psize, psize); /* rnd X */
+            rnd->rndy = rnduni(-psize, psize); /* rnd Y */
             animQueAdd(curnode->animQue, &bombAState[snum]);
         }
 
@@ -1220,8 +1225,8 @@ void drawBombing(int snum, int scale)
     /* calc and translate to correct position */
     GLcvtcoords( cbShips[Context.snum].x,
                  cbShips[Context.snum].y,
-                 cbPlanets[cbShips[snum].lockDetail].x + rnd->rndx,
-                 cbPlanets[cbShips[snum].lockDetail].y + rnd->rndy,
+                 cbPlanets[pnum].x + rnd->rndx,
+                 cbPlanets[pnum].y + rnd->rndy,
                  -scale,
                  &x,
                  &y);
