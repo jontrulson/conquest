@@ -44,7 +44,6 @@ texture {
     color       "ffcc0000"
 
     mipmap      "yes"
-    prescale    1.4
     prescale    1.7
 }
 
@@ -97,7 +96,7 @@ texture {
 
 texture {
     name        "Telos"
-    filename    "mars"
+    filename    "classd"
     color       "ffe6e6e6"
 
     mipmap      "yes"
