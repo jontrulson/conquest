@@ -75,7 +75,7 @@ static void _mapCBVariables(bool doAssign)
     _cbOffset = 0;
 
     // This must be the first var
-    MAP_VARIABLE(cbRevision, int, 1, doAssign);
+    MAP_VARIABLE(cbRevision, unsigned int, 1, doAssign);
 
     // This must be the second var
     MAP_VARIABLE(cbGlobalLimits, cbGlobalLimits_t, 1, doAssign);
