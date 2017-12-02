@@ -733,6 +733,7 @@ static uint8_t _pktReadGetRB(ringBuffer_t *RB, void *buf, int blen, int update)
              * actually care about) is available.  Make no mistake, this
              * is a hack that should be removed at the next proto rev.
              */
+            // FIXME - we need to deal with CPCMD_PING too
             if (!isClient)
             {                   /* server-side */
                 if ( (type == CP_COMMAND) &&

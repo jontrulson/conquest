@@ -2806,14 +2806,19 @@ static int nCPIdle(void)
          *  level, not here!  The server should handle these
          *  transparently without this crap.  Next protocol rev.
          */
+
         if (state != S_REFITING && state != S_BOMBING &&
             state != S_BEAMING  && state != S_DESTRUCTING &&
-            state != S_WARRING && state != S_AUTOPILOT)
+            state != S_WARRING && state != S_AUTOPILOT &&
+            state != S_BOMB)
         {
 
             pingtime = iternow;
             pingStart = iternow;
             pingPending = TRUE;
+            // this is not caught by the filter in _pktReadGetRB(), so
+            // don't send it when we are doing something important.
+            // Fix in next protocol.
             sendCommand(CPCMD_PING, 0);
         }
     }
