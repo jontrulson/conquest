@@ -2810,7 +2810,8 @@ static int nCPIdle(void)
         if (state != S_REFITING && state != S_BOMBING &&
             state != S_BEAMING  && state != S_DESTRUCTING &&
             state != S_WARRING && state != S_AUTOPILOT &&
-            state != S_BOMB)
+            state != S_BOMB && state != S_BEAM && state != S_BEAMNUM &&
+            state !=S_BEAMDIR)
         {
 
             pingtime = iternow;
