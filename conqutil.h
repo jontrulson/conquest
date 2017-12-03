@@ -16,7 +16,7 @@ void     utAppendShip(char *str, int snum);
 void     utAppendKilledBy(char *buf, killedBy_t kb, uint16_t detail);
 int      utArrowsToDir( char *str, real *dir );
 void     utSetLogConfig(int usesys, int echostderr);
-void     utLog(char *fmt, ...);
+void     utLog(const char *fmt, ...);
 void     utDeleteBlanks( char *str );
 int      utDeltaSecs( int s, int *n );
 real     utExplosionHits( real basehits, real dis );
@@ -38,5 +38,6 @@ void     utSleep(real seconds);
 bool     utIsDigits(const char *buf);
 void     utToUpperCase(char *buf);
 void     utAppendChar(char *buf, char ch);
+
 
 #endif /* _CONQUTIL_H */

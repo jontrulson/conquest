@@ -365,9 +365,9 @@ void cbMap(void)
 #  define MAP_FILE 0		/* some arch's don't def this */
 # endif
 
-    if ((_cbBasePtr = mmap(NULL, (size_t) cbGetSize(),
-                           PROT_READ | PROT_WRITE, MAP_SHARED | MAP_FILE,
-                           cmn_fd, 0)) == MAP_FAILED)
+    if ((_cbBasePtr = (char *)mmap(NULL, (size_t) cbGetSize(),
+                                   PROT_READ | PROT_WRITE, MAP_SHARED | MAP_FILE,
+                                   cmn_fd, 0)) == MAP_FAILED)
     {
         close(cmn_fd);
         utLog("cbMap(): mmap() failed: %s", strerror(errno));

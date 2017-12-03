@@ -21,6 +21,7 @@
 #include "conqunix.h"
 #define NOEXTERN_CONQDATA
 #include "conqdata.h"
+
 #include "conqai.h"
 #include "rndlb.h"
 

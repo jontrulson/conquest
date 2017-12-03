@@ -6,6 +6,10 @@
 #define _CONQINIT_H
 
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 
 #define CQI_NAMELEN 64           /* maximum length of a WKN or filename (no
                                     path) */
@@ -279,5 +283,9 @@ void                dumpTexDataHdr(void);
 
 /* planinit.c */
 void                cqiInitPlanets(void);
+
+#ifdef __cplusplus
+} // extern "C"
+#endif
 
 #endif /* _CONQINIT_H */

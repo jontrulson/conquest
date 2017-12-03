@@ -1675,26 +1675,7 @@ void dumpUniverse(void)
 
         printf("  x           %f\n", cbPlanets[i].x);
         printf("  y           %f\n", cbPlanets[i].y);
-
-        switch(cbPlanets[i].type)
-        {
-        case PLANET_SUN:
-            printf("  size        1500\n");
-            printf("  texname     \"star\"\n");
-            break;
-        case PLANET_CLASSM:
-            printf("  size        300\n");
-            printf("  texname     \"classm\"\n");
-            break;
-        case PLANET_MOON:
-            printf("  size        160\n");
-            printf("  texname     \"luna\"\n");
-            break;
-        default:
-            printf("  size        300\n");
-            printf("  texname     \"classd\"\n");
-            break;
-        }
+        printf("  size        %hu\n",cbPlanets[i].size );
 
         printf("}\n\n");
     }
@@ -1737,7 +1718,7 @@ static void startSection(int section)
             goto error_return;
         }
 
-        _cqiGlobal = malloc(sizeof(cqiGlobalInitRec_t));
+        _cqiGlobal = (cqiGlobalInitRec_t *)malloc(sizeof(cqiGlobalInitRec_t));
         if (!_cqiGlobal)
         {
             utLog("%s: Could not allocate GlobalInitRec",
@@ -1875,7 +1856,7 @@ static void startSection(int section)
     {
         if (!_cqiSoundConf)
         {                     /* starting fresh */
-            _cqiSoundConf = malloc(sizeof(cqiSoundConfRec_t));
+            _cqiSoundConf = (cqiSoundConfRec_t *)malloc(sizeof(cqiSoundConfRec_t));
             if (!_cqiSoundConf)
             {
                 utLog("%s: Could not allocate SoundConf",
@@ -1942,7 +1923,7 @@ static void endSection(void)
 
         if (globalRead)
         {                     /* alloc new planet array */
-            _cqiPlanets = malloc(sizeof(cqiPlanetInitRec_t) *
+            _cqiPlanets = (cqiPlanetInitPtr_t)malloc(sizeof(cqiPlanetInitRec_t) *
                                  _cqiGlobal->maxplanets);
 
             numPlanets = 0;

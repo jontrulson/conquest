@@ -58,7 +58,6 @@ static int updateMeta = FALSE;  /* whether to notify meta server */
 static char *myServerName = NULL; /* to meta */
 
 cpHello_t chello;		/* client hello info we want to keep */
-ServerInfo_t sInfo;
 
 static int hello(void);		/* meet and greet the client */
 int updateClient(int force);

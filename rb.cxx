@@ -34,10 +34,10 @@ ringBuffer_t *rbCreate(unsigned int len)
     if (!len)
         return NULL;
 
-    if ( !(RB = malloc(sizeof(ringBuffer_t))) )
+    if ( !(RB = (ringBuffer_t *)malloc(sizeof(ringBuffer_t))) )
         return NULL;
 
-    if ( !(RB->data = malloc(len)) )
+    if ( !(RB->data = (uint8_t *)malloc(len)) )
     {                           /* oops */
         free(RB);
         return NULL;

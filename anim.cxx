@@ -395,7 +395,7 @@ void animQueInit(animQue_t *aque)
     aque->maxentries = 32;
     aque->numentries = 0;
 
-    if (!(aque->que = malloc(aque->maxentries * sizeof(animQue_t *))))
+    if (!(aque->que = (animStatePtr_t *)malloc(aque->maxentries * sizeof(animStatePtr_t *))))
     {
         utLog("%s: malloc(%d) failed.", __FUNCTION__,
               aque->maxentries * sizeof(animQue_t *));

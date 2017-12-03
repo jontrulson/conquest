@@ -143,7 +143,7 @@ real cu2GLSize(real size, int scale)
 
 
 /* search texture list and return index */
-int findGLTexture(char *texname)
+int findGLTexture(const char *texname)
 {
     int i;
 
@@ -161,7 +161,7 @@ int findGLTexture(char *texname)
 }
 
 /* search texture list and return pointer to GLTexture.  NULL if not found. */
-GLTexture_t *getGLTexture(char *texname)
+GLTexture_t *getGLTexture(const char *texname)
 {
     int i;
 
@@ -1174,7 +1174,7 @@ void drawBombing(int snum, int scale)
             bombAState[i] = initastate;
 
             /* setup the private area we'll store with the state */
-            if (!(rnd = malloc(sizeof(struct _rndxy))))
+            if (!(rnd = (struct _rndxy*)malloc(sizeof(struct _rndxy))))
             {                   /* malloc failure, undo everything */
                 int j;
 
@@ -2973,7 +2973,7 @@ static void charInput(unsigned char key, int x, int y)
 static void createDefaultTexture(void)
 {
     /* 2x2 checkerboard-like (with interpolation :) */
-    static GLint GL_defaultTexImage[4] = {0x000000ff, 0xffffffff,
+    static GLuint GL_defaultTexImage[4] = {0x000000ff, 0xffffffff,
                                           0xffffffff, 0x000000ff};
     defaultTexture.w = 2;
     defaultTexture.h = 2;
@@ -3393,7 +3393,7 @@ static int loadGLTextures()
 
         if (!texid && !col_only)
         {
-            texti = malloc(sizeof(textureImage));
+            texti = (textureImage *)malloc(sizeof(textureImage));
 
             if (!texti)
             {

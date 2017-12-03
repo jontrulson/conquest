@@ -5,6 +5,7 @@
 #ifndef _CD2LB_H
 #define _CD2LB_H
 
+
 void cdbeep(void);
 void cdbox ( int lin1, int col1, int lin2, int col2 );
 void cdcput ( char ch );

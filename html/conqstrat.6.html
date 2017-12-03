@@ -16,7 +16,7 @@ conqstrat --- modify Robot strategy tables
 
 <P>
 
-<B>conqstrat</B> [<B>-v</B>]  [<B>-d</B>]  [<B>-U</B>]  [<B>-o </B><I>file</I>]  
+<B>conqstrat</B> [<B>-v</B>]  [<B>-d</B>]  [<B>-o </B><I>file</I>]  
 <A NAME="lbAD">&nbsp;</A>
 <H2>DESCRIPTION </H2>
 
@@ -33,8 +33,7 @@ defined by a file such as <I>conqrule</I>.
 <P>
 
 If you want to modify the robot's AI, you can do so and use
-<B>conqstrat</B> to either update the common block (running game) with
-the new AI directly, or generate a conqdata.h file that can be compiled into
+<B>conqstrat</B> to generate a conqdata.h file that can be compiled into
 Conquest and used as the default when the universe is initialized. 
 <A NAME="lbAE">&nbsp;</A>
 <H2>OPTIONS </H2>
@@ -44,12 +43,6 @@ Conquest and used as the default when the universe is initialized.
 Be verbose about everything. 
 <DT><B>-d</B>         <DD>
 Turn on lots of debugging. 
-<DT><B>-U</B>         <DD>
-Update the common block directly.  This is the most common use for
-non-conquest developers.  NOTE: If you then use <I>conqoper</I> to
-initialize the common block, your AI will be lost and replaced with the
-compiled-in default, so you will need to re-run this command to
-re-install your own AI again.
 <DT><B>-o </B><I>file</I>         <DD>
 Output to <I>file</I>.  Without this 
 option, output will go to stdout.  The normal use of this option is to
@@ -70,8 +63,6 @@ strategies supplied in the conquest distribution, and installed in
 AI (with minor fixes) supplied in the original VAX/VMS conquest
 distribution.  It is also the default AI compiled into Conquest.
 <I>conqrule.easy</I> is an AI that is a bit easier on new players :)
-You can install it in an initialized game with <I>conqstrat -U
-&lt;conqrule.easy</I>. 
 <A NAME="lbAG">&nbsp;</A>
 <H2>AUTHOR </H2>
 
@@ -114,6 +105,6 @@ about the suitability of this software for any purpose. It is provided
 This document was created by
 <A HREF="/cgi-bin/man/man2html">man2html</A>,
 using the manual pages.<BR>
-Time: 00:49:06 GMT, December 03, 2017
+Time: 20:45:13 GMT, December 03, 2017
 </BODY>
 </HTML>

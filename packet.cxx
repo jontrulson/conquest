@@ -1007,7 +1007,7 @@ static int _pktDrainRB(int sock, ringBuffer_t *RB)
         return 0;
 
     /* try to get as much data as possible and write it. */
-    if ((len = rbGet(RB, (void *)buf, PKT_MAXSIZE, FALSE)))
+    if ((len = rbGet(RB, (uint8_t *)buf, PKT_MAXSIZE, FALSE)))
     {
         if ((wlen = _pktWriteSocket(sock, buf, len)) <= 0)
         {
@@ -1071,7 +1071,7 @@ int pktWrite(int socktype, void *data)
             return -1;
         }
 
-        rbPut(RB, data, len);
+        rbPut(RB, (uint8_t *)data, len);
     }
     else
     {
@@ -1084,7 +1084,7 @@ int pktWrite(int socktype, void *data)
             /* there's some (or all) data left over */
             ptr = &packet[rv];
 
-            if (rbPut(RB, (void *)ptr, len - rv) != (len - rv))
+            if (rbPut(RB, (uint8_t *)ptr, len - rv) != (len - rv))
             {
                 utLog("FATAL: %s@%d: output ringbuffer (%d) full, can't add %d bytes\n",
                       __FUNCTION__, __LINE__, socktype, len);

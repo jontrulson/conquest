@@ -43,7 +43,6 @@ static struct _srvvec servervec[META_MAXSERVERS] = {};
 static int nMetaDisplay(dspConfig_t *);
 static int nMetaInput(int ch);
 
-static metaSRec_t *metaServerList;
 static int numMetaServers;   /* number of servers in metaServerList */
 
 static metaSRec_t *metaServerList;   /* list of servers */

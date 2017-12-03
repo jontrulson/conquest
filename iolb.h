@@ -7,7 +7,7 @@
 
 #if defined(NOEXTERN_IOLB)
 /* a copy of stdin's fd (0) for poll()/select() (curses) */
-const int iolbStdinFD = 0;
+int iolbStdinFD = 0;
 #else
 extern int iolbStdinFD;	/* a copy of stdin's fd for poll()/select() */
 #endif /* NOEXTERN_IOLB */

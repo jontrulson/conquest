@@ -5,12 +5,7 @@
 #define CONQDATA_H
 
 #ifdef NOEXTERN_CONQDATA
-# define CDHEXTERN
-#else
-# define CDHEXTERN extern
-#endif
-
-CDHEXTERN int trstrat[20][10] = {
+int trstrat[20][10] = {
   { -1040505, -493585, -493569, -1378305, -1116161, 
      -1181697, -1181697, -1181697, -1181697, -1181697},
   { -4, -4, -1, -1, -1, 
@@ -53,10 +48,14 @@ CDHEXTERN int trstrat[20][10] = {
      -12583681, -12583681, -12583681, -12583681, -12583681}
 };
 
-CDHEXTERN int trvec[32] = {10, 10, 4, 7, 9, 8, 5, 6, 10, 10, 4, 12, 12, 13, 14, 15, 
+int trvec[32] = {10, 10, 4, 7, 9, 8, 5, 6, 10, 10, 4, 12, 12, 13, 14, 15, 
 	16, 16, 16, 24, 23, 3, 20, 20, 22, 21, 2, 1, 1, 1, 1, 1 };
 
-#undef CDHEXTERN /* cleanup */
+#else
+extern int trstrat[20][10];
+extern int trvec[32];
+#endif
+
 
 #endif
 

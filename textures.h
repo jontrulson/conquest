@@ -34,8 +34,8 @@ GLTexture_t *GLTextures = NULL;
 extern GLTexture_t *GLTextures;
 #endif
 
-int findGLTexture(char *texname);
-GLTexture_t *getGLTexture(char *texname);
+int findGLTexture(const char *texname);
+GLTexture_t *getGLTexture(const char *texname);
 
 
 /* helpers */

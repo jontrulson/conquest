@@ -32,9 +32,9 @@ void clntStoreMessage(spMessage_t *msg)
 
     nlastmsg = utModPlusOne( cbConqInfo->lastmsg + 1, MAXMESSAGES );
     utStrncpy(cbMsgs[nlastmsg].msgbuf, (char *)msg->msg, MESSAGE_SIZE);
-    cbMsgs[nlastmsg].from = msg->from;
+    cbMsgs[nlastmsg].from = static_cast<msgFrom_t>(msg->from);
     cbMsgs[nlastmsg].fromDetail = msg->fromDetail;
-    cbMsgs[nlastmsg].to = msg->to;
+    cbMsgs[nlastmsg].to = static_cast<msgTo_t>(msg->to);
     cbMsgs[nlastmsg].toDetail = msg->toDetail;
     cbMsgs[nlastmsg].flags = msg->flags;
 

@@ -28,23 +28,14 @@
 #include "c_defs.h"
 
 #include "conqdef.h"
-#include "cb.h"
+#include "robot.h"
 
-#include "conqutil.h"
 #include "conqai.h"
-
-#define NOEXTERN_CONTEXT
-#include "context.h"
-
-#define NOEXTERN_GLOBALS
-#include "global.h"
-
-#define NOEXTERN_CONF
-#include "conf.h"
 
 #include "conqstrat.h"
 
-int rulenum, trstrat[MAX_VAR][10], trvec[32];
+int rulenum;
+static int trstrat[MAX_VAR][10], trvec[32];
 int debug_scanner, verbose;
 
 static int UpdateCmnBlock = FALSE;
@@ -105,16 +96,115 @@ expr		:	TOK_VARIABLE TOK_OPERATOR TOK_NUMBER
 %%
 
 
-/* this program uses a yacc parser that would conflict with the
-   conqinit parser, so we do not link it here.  However, conqlb references
-   a function it provides (but is not needed in the program, so we make a
-   fake version here. */
-
-void cqiInitPlanets(void)
+// This function is a copy from conqai.cxx. We do not want to link
+// this with any conquest libs due to the fact that a circular
+// dependency then arises.
+static void myrobstr( int token, char buf[] )
 {
+
+    switch ( token )
+    {
+    case ROB_NOOP:
+        strcpy(buf , "NOOP") ;
+        break;
+    case ROB_GOHOME:
+        strcpy(buf , "GOHOME") ;
+        break;
+    case ROB_GOREPAIR:
+        strcpy(buf , "GOREPAIR") ;
+        break;
+    case ROB_ALLOCATE:
+        strcpy(buf , "ALLOCATE") ;
+        break;
+    case ROB_DETONATE:
+        strcpy(buf , "DETONATE") ;
+        break;
+    case ROB_MYDETONATE:
+        strcpy(buf , "MYDETONAT") ;
+        break;
+    case ROB_PHASER:
+        strcpy(buf , "PHASER") ;
+        break;
+    case ROB_TORPEDO:
+        strcpy(buf , "TORPEDO") ;
+        break;
+    case ROB_BURST:
+        strcpy(buf , "BURST") ;
+        break;
+    case ROB_SHIELD:
+        strcpy(buf , "SHIELD") ;
+        break;
+    case ROB_UNTRACTOR:
+        strcpy(buf , "UNTRACTOR") ;
+        break;
+    case ROB_WARP_0:
+        strcpy(buf , "WARP_0") ;
+        break;
+    case ROB_WARP_2:
+        strcpy(buf , "WARP_2") ;
+        break;
+    case ROB_WARP_5:
+        strcpy(buf , "WARP_5") ;
+        break;
+    case ROB_WARP_8:
+        strcpy(buf , "WARP_8") ;
+        break;
+    case ROB_TRACK:
+        strcpy(buf , "TRACK") ;
+        break;
+    case ROB_SILENT:
+        strcpy(buf , "SILENT") ;
+        break;
+    case ROB_MESSAGE:
+        strcpy(buf , "MESSAGE") ;
+        break;
+    case ROB_TAKEDRUGS:
+        strcpy(buf , "TAKEDRUGS") ;
+        break;
+    case ROB_REPAIR:
+        strcpy(buf , "REPAIR") ;
+        break;
+    case ROB_READMSG:
+        strcpy(buf , "READMSG") ;
+        break;
+    case ROB_INSULT:
+        strcpy(buf , "INSULT") ;
+        break;
+    case ROB_GOFUEL:
+        strcpy(buf , "GOFUEL") ;
+        break;
+    case ROB_RUNAWAY:
+        strcpy(buf , "RUNAWAY") ;
+        break;
+    default:
+        sprintf( buf, "<%d>", token );
+    }
+
     return;
+
 }
 
+// A copy from conqutil.cxx - we need this here to avoid needing to
+// link to any conquest libraries which just causes a dependency hell.
+static void myUtFormatTime( char *buf, time_t thetime )
+{
+    char junk[5] = {};
+
+    if (!thetime)
+        thetime = time(0);
+
+    struct tm *thetm = localtime(&thetime);
+
+    strftime(junk, 5, "%b", thetm);
+
+    sprintf(buf, "%2d:%02d:%02d %02d%s%02d",
+            thetm->tm_hour, thetm->tm_min, thetm->tm_min, thetm->tm_mday,
+            junk,
+            mod(thetm->tm_year + 1900, 100));
+
+    return;
+
+}
 
 /* conqstrat - main program */
 int main(int argc, char **argv)
@@ -129,7 +219,8 @@ int main(int argc, char **argv)
     verbose = FALSE;
     filefd = stdout;
 
-    while ( (ch = getopt( argc, argv, "dvo:U" )) != EOF )
+//    while ( (ch = getopt( argc, argv, "dvo:U" )) != EOF )
+    while ( (ch = getopt( argc, argv, "dvo:" )) != EOF )
     {
         switch(ch)
 	{
@@ -140,12 +231,12 @@ int main(int argc, char **argv)
             debug_scanner = TRUE;
             break;
 	case 'o':
-            utStrncpy(filename, optarg, PATH_MAX);
+            strncpy(filename, optarg, PATH_MAX - 1);
             filefd = NULL;
             break;
-	case 'U':
-            UpdateCmnBlock = TRUE;
-            break;
+//	case 'U':
+//            UpdateCmnBlock = TRUE;
+//            break;
 	default:
             print_usage();
             exit(1);
@@ -180,9 +271,9 @@ int main(int argc, char **argv)
         exit(1);
     }
 
-    if ( UpdateCmnBlock )
-        dumprun();
-    else
+//    if ( UpdateCmnBlock )
+//        dumprun();
+//    else
         displayrun(filefd);
 
     if ( filefd != stdin )
@@ -217,7 +308,7 @@ void initrun(void)
 
 }
 
-
+#if 0
 /* dumprun - dump the run into the common block */
 void dumprun(void)
 {
@@ -249,7 +340,7 @@ void dumprun(void)
     return;
 
 }
-
+#endif
 
 /* displayrun - dump the run to filefd */
 void displayrun(FILE *filefd)
@@ -259,7 +350,7 @@ void displayrun(FILE *filefd)
     char *strat="trstrat";
     char *vec="trvec";
 
-    utFormatTime( buf, 0 );
+    myUtFormatTime( buf, 0 );
 
     fprintf(filefd, "/*\n * conqdata.h - robot strategy data generated by conqstrat on %s\n */\n", buf );
 
@@ -316,7 +407,7 @@ void dumprule( int action )
     /* Store action. */
     trvec[rulenum] = action;
 
-    robstr(action, buf);
+    myrobstr(action, buf);
     if (debug_scanner | verbose)
         fprintf(stderr, "DEBUG: ### dumprule(): rulenum = %d, action = %s\n", rulenum, buf);
 
@@ -602,7 +693,7 @@ void print_usage()
     fprintf(stderr, "Usage: conqstrat [-vdU] [ -o file] < conqrule\n");
     fprintf(stderr, "\t-v            be verbose about everything.\n");
     fprintf(stderr, "\t-d            turns on *lots* of debugging.\n");
-    fprintf(stderr, "\t-U            update the common block directly.\n");
+//    fprintf(stderr, "\t-U            update the common block directly.\n");
     fprintf(stderr, "\t-o file       send generated header file to <file>\n");
     fprintf(stderr, "\t              (typically conqdata.h). stdout is the default.\n\n");
     fprintf(stderr, "\t  The default is to read from stdin. conqrule is a file\n");

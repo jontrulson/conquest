@@ -570,11 +570,11 @@ int cqsMusicPlay(int musidx, int halt)
     /* we need to fadein or just start */
     Mix_VolumeMusic(MUSIC_VOL(cqsMusic[musidx].vol));
     if (cqsMusic[musidx].fadeinms)
-        rv = Mix_FadeInMusic(cqsMusic[musidx].chunk,
+        rv = Mix_FadeInMusic((Mix_Music *)cqsMusic[musidx].chunk,
                              cqsMusic[musidx].loops,
                              cqsMusic[musidx].fadeinms);
     else
-        rv = Mix_PlayMusic(cqsMusic[musidx].chunk,
+        rv = Mix_PlayMusic((Mix_Music *)cqsMusic[musidx].chunk,
                            cqsMusic[musidx].loops);
 
     if (rv == -1)
@@ -687,7 +687,7 @@ int cqsEffectPlay(int fxidx, cqsHandle *handle, real maxdist,
         *handle = (cqsHandle)empty;
 
     if ((cqsChannels[empty].channel =
-         Mix_PlayChannel(-1, cqsEffects[fxidx].chunk,
+         Mix_PlayChannel(-1, (Mix_Chunk *)cqsEffects[fxidx].chunk,
                          cqsEffects[fxidx].loops)) == -1)
     {                           /* some failure */
 #ifdef DEBUG_SOUND

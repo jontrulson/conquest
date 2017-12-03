@@ -6,6 +6,7 @@
 #define _NODE_H
 
 #include "cqmouse.h"
+#include "anim.h"
 
 /* node proc return values */
 #define NODE_OK        TRUE
@@ -20,7 +21,7 @@ typedef struct _scr_node {
     int   (*idle)(void);          /* idle routine */
     int   (*input)(int ch);       /* keyboard input routine */
     int   (*minput)(mouseData_t *mdata); /* mouse input routine */
-    void *animQue;                /* optional animation que. */
+    animQue_t *animQue;                /* optional animation que. */
 } scrNode_t;
 
 /* some nodes are called from other, multiple nodes, so we need

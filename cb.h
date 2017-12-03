@@ -82,4 +82,5 @@ CEXTERN ShipType_t *cbShipTypes;  /* Ship types. */
 CEXTERN Msg_t *cbMsgs;               /* Messages. */
 
 #undef CEXTERN
+
 #endif /* CB_H */

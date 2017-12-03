@@ -294,7 +294,7 @@ void utSetLogConfig(int usesys, int echostderr)
     return;
 }
 
-void utLog(char *fmt, ...)
+void utLog(const char *fmt, ...)
 {
     va_list ap;
     static int nowarn = FALSE;     /* if set, ignore logging */

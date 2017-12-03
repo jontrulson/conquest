@@ -343,7 +343,7 @@ void gcputime( int *cpu )
 # ifndef CLK_TCK
 #  ifdef LINUX
     extern long int __sysconf (int);
-#   define CLK_TCK ((__clock_t) __sysconf (_SC_CLK_TCK))
+#   define CLK_TCK (sysconf (_SC_CLK_TCK))
 #  else
 #   define CLK_TCK CLOCKS_PER_SEC
 #  endif

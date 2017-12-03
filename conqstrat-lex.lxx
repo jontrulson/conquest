@@ -28,7 +28,7 @@
 #undef ECHO
 
 #include "c_defs.h"
-#include "conqstrat-yacc.h"
+#include "conqstrat-yacc.hxx"
 
 #include "conqdef.h"
 #include "cb.h"

@@ -7,7 +7,7 @@
 
 #include "c_defs.h"
 #include "conqinit.h"
-#include "conqinit-yacc.h"
+#include "conqinit-yacc.hxx"
 
 #include "conqdef.h"
 #include "cb.h"

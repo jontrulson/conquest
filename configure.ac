@@ -9,6 +9,8 @@ AC_CONFIG_HEADER(config.h)
 
 AC_CONFIG_MACRO_DIRS([m4])
 
+AC_LANG(C++)
+
 dnl checks the system
 dnl AC_CANONICAL_TARGET([])
 dnl Checks for programs.
@@ -137,7 +139,7 @@ AC_PATH_X
 AC_PATH_XTRA
 fi
 
-AC_PROG_CC
+AC_PROG_CXX
 AC_PROG_LIBTOOL
 
 if test ! -n "$conquest_group"
@@ -148,11 +150,11 @@ fi
 CONQGROUP="$conquest_group"
 AC_SUBST(CONQGROUP)
 
-if test -n "$GCC"
+if test -n "$GXX"
 then
-	CONQ_CFLAGS="$CFLAGS -D__NO_MATH_INLINES -fno-builtin -DNDEBUG -fno-strict-aliasing"
+	CONQ_CFLAGS="$CXXFLAGS -std=c++11 -D__NO_MATH_INLINES -fno-builtin -DNDEBUG -fno-strict-aliasing -Wno-write-strings"
 else
-	CONQ_CFLAGS="$CFLAGS -DNDEBUG"
+	CONQ_CFLAGS="$CXXFLAGS -std=c++11 -DNDEBUG -Wno-write-strings"
 fi
 
 AC_SUBST(CONQ_CFLAGS)
@@ -213,7 +215,6 @@ fi
 
 
 dnl Checks for typedefs, structures, and compiler characteristics.
-AC_C_CONST
 AC_TYPE_SIZE_T
 AC_HEADER_TIME
 AC_STRUCT_TM
@@ -227,21 +228,6 @@ then
 AC_FUNC_SETPGRP
 fi
 
-dnl check for sys_errlist decl
-
-AC_MSG_CHECKING(for sys_errlist declaration)
-AC_RUN_IFELSE([AC_LANG_SOURCE([[
-#include <sys/types.h>
-#include <stdio.h>
-
-#include <errno.h>
-main()
-{
-  char *s = sys_errlist[0];
-  exit(0);
-}
-]])],[AC_MSG_RESULT(yes)
-  AC_DEFINE(SYS_ERRLIST_DECLARED, 1, [sys_errlist declared])],[AC_MSG_RESULT(no)],[:])
 
 dnl see if we should check for SLD and friends
 if test -n "$SNDCLIENT"

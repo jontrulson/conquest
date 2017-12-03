@@ -7,7 +7,7 @@ ACLOCAL_AMFLAGS = -I m4 --install
 .rc.o:
 	@target@-windres $^ -o $@
 
-CFLAGS = @CONQ_CFLAGS@ $(SDL_CFLAGS)
+CXXFLAGS = @CONQ_CFLAGS@ $(SDL_CFLAGS)
 CONQGROUP = @CONQGROUP@
 CONQLOCALSTATEDIR = @localstatedir@/conquest
 CONQLIBEXECDIR = @libexecdir@
@@ -29,7 +29,7 @@ TRC = *.trc
 SRC = *.src
 
 TCPW_H = tcpwrap.h
-TCPW_C = tcpwrap.c
+TCPW_C = tcpwrap.cxx
 
 man6_MANS = conqdriv.man conqmetad.man conqoper.man conquest.man \
 	conquestd.man conqai.man conqstrat.man \
@@ -69,43 +69,43 @@ endif !GLCLIENT
 
 endif !ISMINGW
 
-libconquest_la_SOURCES = conqai.c conqai.h cb.c cb.h \
-	conqlb.h conqlb.c rndlb.c rndlb.h conqutil.c conqutil.h \
-	conqunix.c conqunix.h ibuf.c version.c conf.c sem.c color.c \
-	userauth.c record.c color.h user.h shiptype.h \
+libconquest_la_SOURCES = conqai.cxx conqai.h cb.cxx cb.h \
+	conqlb.h conqlb.cxx rndlb.cxx rndlb.h conqutil.cxx conqutil.h \
+	conqunix.cxx conqunix.h ibuf.cxx version.cxx conf.cxx sem.cxx color.cxx \
+	userauth.cxx record.cxx color.h user.h shiptype.h \
 	ship.h planet.h team.h msg.h doomsday.h driver.h conqinfo.h \
 	history.h robot.h global.h torp.h ibuf.h conf.h  display.h \
-	protocol.h packet.h packet.c userauth.h meta.c meta.h udp.c udp.h \
-	rb.h rb.c cbglobal.h proto_0006.h
+	protocol.h packet.h packet.cxx userauth.h meta.cxx meta.h udp.cxx udp.h \
+	rb.h rb.cxx cbglobal.h proto_0006.h
 
 libconquest_la_LIBADD = @LTLIBOBJS@
 
-libconqclnt_la_SOURCES = client.c client.h cproc.h cproc.c clientlb.c \
-	clientlb.h playback.h playback.c cproc_0006.h cproc_0006.c
+libconqclnt_la_SOURCES = client.cxx client.h cproc.h cproc.cxx clientlb.cxx \
+	clientlb.h playback.h playback.cxx cproc_0006.h cproc_0006.cxx
 
-libconqserv_la_SOURCES = servauth.c server.c servauth.h server.h serverpkt.c \
-	serverpkt.h servercmd.h servercmd.c sproc.h sproc.c
+libconqserv_la_SOURCES = servauth.cxx server.cxx servauth.h server.h serverpkt.cxx \
+	serverpkt.h servercmd.h servercmd.cxx sproc.h sproc.cxx
 
-libUi_la_SOURCES = ui.h uimisc.c
+libUi_la_SOURCES = ui.h uimisc.cxx
 
-libUiGL_la_SOURCES = GL.c texfont.c glfont.c glfont.h \
-	glmisc.c glmisc.h nConsvr.c nConsvr.h nMeta.h nMeta.c cqkeys.h \
-        prm.h prm.c nAuth.h nAuth.c nWelcome.h nWelcome.c nMenu.h nMenu.c \
-	nPlay.h nPlay.c nCP.h nCP.c nDead.h nDead.c nCPHelp.h nCPHelp.c \
-	nShipl.h nShipl.c node.h node.c nPlanetl.h nPlanetl.c nTeaml.h \
-	nTeaml.c nUserl.h nUserl.c nHistl.h nHistl.c cprintf.h glcprintf.c \
-	gldisplay.h gldisplay.c disputil.h render.h render.c \
-	nPlayBMenu.h nPlayBMenu.c nPlayB.h nPlayB.c nPlayBHelp.h \
-	nPlayBHelp.c nOptions.h nOptions.c colorGL.c ui.h anim.c anim.h \
-	GL.h hud.h hud.c blinker.h blinker.c
+libUiGL_la_SOURCES = GL.cxx texfont.cxx glfont.cxx glfont.h \
+	glmisc.cxx glmisc.h nConsvr.cxx nConsvr.h nMeta.h nMeta.cxx cqkeys.h \
+        prm.h prm.cxx nAuth.h nAuth.cxx nWelcome.h nWelcome.cxx nMenu.h nMenu.cxx \
+	nPlay.h nPlay.cxx nCP.h nCP.cxx nDead.h nDead.cxx nCPHelp.h nCPHelp.cxx \
+	nShipl.h nShipl.cxx node.h node.cxx nPlanetl.h nPlanetl.cxx nTeaml.h \
+	nTeaml.cxx nUserl.h nUserl.cxx nHistl.h nHistl.cxx cprintf.h glcprintf.cxx \
+	gldisplay.h gldisplay.cxx disputil.h render.h render.cxx \
+	nPlayBMenu.h nPlayBMenu.cxx nPlayB.h nPlayB.cxx nPlayBHelp.h \
+	nPlayBHelp.cxx nOptions.h nOptions.cxx colorGL.cxx ui.h anim.cxx anim.h \
+	GL.h hud.h hud.cxx blinker.h blinker.cxx
 
-libUiCU_la_SOURCES = display.c cprintf.h cprintf.c disputil.h colorCU.c \
-	cd2lb.h cd2lb.c iolb.h iolb.c cumisc.h cumisc.c cuclient.h \
-	cuclient.c options.h options.c clntauth.c ui.h display.h
+libUiCU_la_SOURCES = display.cxx cprintf.h cprintf.cxx disputil.h colorCU.cxx \
+	cd2lb.h cd2lb.cxx iolb.h iolb.cxx cumisc.h cumisc.cxx cuclient.h \
+	cuclient.cxx options.h options.cxx clntauth.cxx ui.h display.h
 
-libconqinit_la_SOURCES = conqinit-yacc.y conqinit-lex.l conqinit.h initdata.h planinit.c
+libconqinit_la_SOURCES = conqinit-yacc.yxx conqinit-lex.lxx conqinit.h initdata.h planinit.cxx
 
-libcqsound_la_SOURCES = cqsound.c cqsound.h
+libcqsound_la_SOURCES = cqsound.cxx cqsound.h
 
 # for now, conquest is the only program we build for windows
 
@@ -131,10 +131,10 @@ endif !GLCLIENT
 endif !ISMINGW
 
 if ISMINGW
-conquest_SOURCES = conquest.c c_defs.h defs.h conqdef.h cb.h \
+conquest_SOURCES = conquest.cxx c_defs.h defs.h conqdef.h cb.h \
 	context.h icon.rc
 else !ISMINGW
-conquest_SOURCES = conquest.c c_defs.h defs.h conqdef.h cb.h \
+conquest_SOURCES = conquest.cxx c_defs.h defs.h conqdef.h cb.h \
 	context.h
 endif !ISMINGW
 
@@ -142,37 +142,39 @@ conquest_LDADD = libUiGL.la libUi.la libconqclnt.la libcqsound.la \
 	libconquest.la libconqinit.la $(XLIBS) $(LEXLIB) $(YACCLIB)
 
 if TCPW
-conquestd_SOURCES = conquestd.c c_defs.h defs.h conqdef.h cb.h \
+conquestd_SOURCES = conquestd.cxx c_defs.h defs.h conqdef.h cb.h \
 	context.h conqnet.h $(TCPW_H) $(TCPW_C)
 conquestd_LDADD = libconqserv.la libconquest.la libconqinit.la $(LEXLIB) $(YACCLIB) $(TCPWLIB) $(NSLLIB)
 else
-conquestd_SOURCES = conquestd.c c_defs.h defs.h conqdef.h cb.h \
+conquestd_SOURCES = conquestd.cxx c_defs.h defs.h conqdef.h cb.h \
 	context.h conqnet.h $(TCPW_H)
 conquestd_LDADD = libconqserv.la libconquest.la libconqinit.la $(LEXLIB) $(YACCLIB)
 endif
 
-conqai_SOURCES = conqai_main.c c_defs.h defs.h conqdef.h cb.h \
+conqai_SOURCES = conqai_main.cxx c_defs.h defs.h conqdef.h cb.h \
                  context.h conqdata.h
 
 conqai_LDADD = libconquest.la libconqinit.la  $(LEXLIB) $(YACCLIB)
 
-conqoper_SOURCES = conqoper.c c_defs.h defs.h conqdef.h cb.h context.h
+conqoper_SOURCES = conqoper.cxx c_defs.h defs.h conqdef.h cb.h context.h
 conqoper_LDADD = libUiCU.la libUi.la libconqclnt.la libconquest.la libconqinit.la $(LEXLIB) $(YACCLIB)
 
-conqdriv_SOURCES = conqdriv.c c_defs.h defs.h conqdef.h cb.h context.h
+conqdriv_SOURCES = conqdriv.cxx c_defs.h defs.h conqdef.h cb.h context.h
 conqdriv_LDADD = libconquest.la libconqinit.la $(LEXLIB) $(YACCLIB)
 
-conqstrat_SOURCES = conqstrat-yacc.y conqstrat-lex.l conqstrat.h
-conqstrat_LDADD = libconquest.la $(LEXLIB) $(YACCLIB)
+# we are very careful here not to depend on or use any conquest
+# libraries with conqstrat.
+conqstrat_SOURCES = conqstrat-yacc.yxx conqstrat-lex.lxx conqstrat.h
+conqstrat_LDADD = $(LEXLIB) $(YACCLIB)
 
-conqinit_SOURCES = conqinit.c conqinit.h
+conqinit_SOURCES = conqinit.cxx conqinit.h
 conqinit_LDADD = libconquest.la libconqinit.la $(LEXLIB) $(YACCLIB)
 
 if TCPW
-conqmetad_SOURCES = conqmetad.c meta.h $(TCPW_H) $(TCPW_C)
+conqmetad_SOURCES = conqmetad.cxx meta.h $(TCPW_H) $(TCPW_C)
 conqmetad_LDADD = libconquest.la libconqinit.la $(LEXLIB) $(YACCLIB) $(TCPWLIB) $(NSLLIB)
 else
-conqmetad_SOURCES = conqmetad.c meta.h $(TCPW_H)
+conqmetad_SOURCES = conqmetad.cxx meta.h $(TCPW_H)
 conqmetad_LDADD = libconquest.la libconqinit.la $(LEXLIB) $(YACCLIB)
 endif
 

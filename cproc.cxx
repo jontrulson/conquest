@@ -529,9 +529,9 @@ int procMessage(char *buf)
                 return TRUE;
             }
 
-            recMsg.from = smsg->from;
+            recMsg.from = static_cast<msgFrom_t>(smsg->from);
             recMsg.fromDetail = smsg->fromDetail;
-            recMsg.to = smsg->to;
+            recMsg.to = static_cast<msgTo_t>(smsg->to);
             recMsg.toDetail = smsg->toDetail;
             recMsg.flags = smsg->flags;
         }
