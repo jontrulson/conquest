@@ -6,13 +6,13 @@ CONTENTS:
 
 ## Installation
 
-The precompiled Conquest .zip package only contains the conquestgl
+The precompiled Conquest .zip package only contains the conquest
 client application and required datafiles.  If you want to run a
 Conquest server or any of the other Conquest utilities, you'll need to
 either use a unix system, or recompile Conquest yourself under the
 Cgywin environment (see README.Cygwin in the source distribution).  
 
-I would not advise trying to run a Cygwin compiled conquestgl client,
+I would not advise trying to run a Cygwin compiled conquest client,
 since there will be no hardware video acceleration and it will be
 unusably slow.
 
@@ -67,22 +67,22 @@ As an example:
 4. At this point you should be able to open an MSDOS command window,
    and simply run:
 
-      conquestgl
+      conquest
 
-   By default, conquestgl will contact the metaserver at
+   By default, conquest will contact the metaserver at
    conquest.radscan.com and present you with a list of servers to
    connect to.
 
-   You can pass the '-f' option to conquestgl to run in full screen
+   You can pass the '-f' option to conquest to run in full screen
    mode. ie:
 
-      conquestgl -f
+      conquest -f
 
    Maybe fullscreen should be the default under windows - windows
    geeks: you tell me.   
 
    See http://radscan.com/conquest/conquest.6.html for a list of
-   other options you can specify to conquestgl.  
+   other options you can specify to conquest.  
 
 5. If there are any windows programmers out there who can enlighten me
    on the methods to properly handle all of this automatically, I'm
@@ -113,15 +113,13 @@ will typically be something like
 
      C:\Documents and Settings\yourusername\Application Data\
 
-You can increase the debugging output of conquestgl by passing '-v' on
+You can increase the debugging output of conquest by passing '-v' on
 the command line.  More '-v's, will increase the debugging level.
 
 When requesting help via email, please include a description of the
 problem, the conquest.log file, and any stderr.txt and stdout.txt
 files. 
 
-
-$Id$
 
 
 

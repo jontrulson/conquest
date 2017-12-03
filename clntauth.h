@@ -1,5 +1,5 @@
 /*
- * Per client (conquest) info
+ * A helper for conqoper
  *
  * Copyright Jon Trulson under the MIT License. (See LICENSE).
  */
@@ -11,7 +11,6 @@
 
 #include "protocol.h"
 
-int  Logon(char *username);
 void ChangePassword(int unum, int isoper);
 
 #endif /* CLNTAUTH_H_INCLUDED */

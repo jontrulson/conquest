@@ -38,13 +38,13 @@ NODES
     In addition to these four functions (described below) is an init
     function that is called by other code to initialize the node and
     transfer rendering control to it.
-    
+
     The init function is defined by the programmer to accept whatever
-    arguements are appropriate to that node.  
+    arguements are appropriate to that node.
 
     Node control is handled by the primary rendering function
     renderFrame() in GL.c.  You should never need to change anything
-    there. 
+    there.
 
     renderFrame() calls renderNode() which is responsible for actually
     executing the current 'Top' node.  Currently there two Top nodes
@@ -62,13 +62,13 @@ NODES
     init(<up to programmer>) - required
 
        sets up whatever state is required for a node and uses
-       setNode(*node) to set the toplevel node to the current node; 
+       setNode(*node) to set the toplevel node to the current node;
 
     display(dspConfig_t *)   - optional
 
        dspConfig_t is defined in gldisplay.h and contains information
        about the screen (width, height, etc).
-       
+
        This node is responsible for rendering the complete frame for
        the node.
 
@@ -112,7 +112,7 @@ NODES
     nCP.c        - cockpit (CP) node (main playing screen)
     nCPHelp.c    - displays CP help screen
     nConsvr.c    - connects to server, displays any relevant
-                   status/errors     
+                   status/errors
     nDead.c      - where you go when you die (dead screen)
     nMenu.c      - main menu
     nMeta.c      - meta server screen
@@ -126,7 +126,7 @@ NODES
     nPlayBMenu.c - playback menu
     nHistl.c     - history list
     nShipl.c
-    nPlanetl.c 
+    nPlanetl.c
     nTeaml.c
     nUserl.c
     nWelcome.c   - "W E L C O M E", etc...
@@ -138,7 +138,7 @@ GL
 
     Most OpenGL rendering is performed by functions in GL.c (drawing
     planets, ships, etc).  You should not need to mess with anything
-    there. 
+    there.
 
     One of the big diffs between OpenGL vs. curses rendering is that
     the complete display is rendered on every frame.  It's an
@@ -154,7 +154,7 @@ GL
     (cqkeys.h). Prompting may seem strange at first.  look at
     prm.[hc]. It's probably easier to just copy existing uses in the
     input() methods used in the various nodes.
-    
+
 
 Other info:
 
@@ -187,7 +187,7 @@ Other info:
     and eliminate some duplicate code.  Big job, so right now I'm
     only doing it if I find myself needing to correct the same problem
     in 2 places :)
-            
+
     Using the PlayB nodes may be good place to start looking as the
     conqoper node(s) should operate in pretty much the identical way
     (diff commands, etc) but functionally equivalent.  In addition,
@@ -207,10 +207,3 @@ Other info:
     from the doomsday perspective etc).
 
     Anyway, here's a brief overview.  Hope you enjoyed it.
-
-
-
-    
-
-
-    

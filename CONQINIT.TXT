@@ -18,7 +18,7 @@ CONTENTS:
         # geoanim subsection
         # toganim subsection
   ## soundrc or user .src files
-     ## soundconf 
+     ## soundconf
      ## music
      ## effect
   ## conqinit utility
@@ -40,7 +40,7 @@ CONTENTS:
        contained therein.
 
        This document is intended for developers, or those who want to
-       modify the characteristics of their conquest experience :) 
+       modify the characteristics of their conquest experience :)
 
        If you are not interested in any of that, there is probably no
        point in reading further :)
@@ -49,10 +49,10 @@ CONTENTS:
        information in Conquest:
 
        - planet data (name, size, type, team, etc).  Used for
-         initializing the Planets in the common block. 
-       - texture data (Well Known Name (WKN)), 
+         initializing the Planets in the common block.
+       - texture data (Well Known Name (WKN)),
          filename, color).  Used for texture drawing.
-       - animation data (WKN, animdef).  Drawing. 
+       - animation data (WKN, animdef).  Drawing.
        - animdef data (name, animation characteristics).  Drawing.
        - sound data (name, music/effect configuration, files, limits,
          etc).
@@ -61,7 +61,7 @@ CONTENTS:
 
        Currently, CQI can be used to parse these types of files:
 
-         - <prefix>/etc/conqinitrc 
+         - <prefix>/etc/conqinitrc
 
            file that decribes certain characteristics of the game,
            such as how many ships can play, detailed descriptions of
@@ -73,7 +73,7 @@ CONTENTS:
          - ~/.conquest/*.trc
 
            These files describe the characteristics of textures,
-           colors, animations, and animdefs used by conquestgl for
+           colors, animations, and animdefs used by conquest for
            rendering.
 
 
@@ -124,7 +124,7 @@ CONTENTS:
           The global section describes the various limits for
           conquest.  Currently, you should never change this, until
           the common block (and therefore compatibility) is changed to
-          support them.  For now, leave these alone :).  
+          support them.  For now, leave these alone :).
 
           global {
             planetmax 60
@@ -136,12 +136,12 @@ CONTENTS:
 
           planetmax:  NUMBER
                       specifies the maximum number of planets in the
-                      universe. 
+                      universe.
 
 
           shipmax:    NUMBER
                       specifies the maximum number of ships that can
-                      play. 
+                      play.
 
           usermax:    NUMBER
                       specifies the maximum number of users the game
@@ -153,7 +153,7 @@ CONTENTS:
 
           msgmax:     NUMBER
                       The maximum number of message slots available.
-          
+
 
        ## shiptype
 
@@ -250,7 +250,7 @@ CONTENTS:
                       The starting angle of the planet relative to
                       it's primary.  If the angle is negative, a
                       random angle is chosen when the planet is
-                      initialized. 
+                      initialized.
 
           velocity:   RATIONAL
                       The velocity of the planet in degrees per
@@ -261,7 +261,7 @@ CONTENTS:
           radius:     RATIONAL
                       The distance of the planet from it's primary (in
                       Conquest Units (CU)).
-                      
+
           ptype:      STRING
                       The planet type.  Valid values are:
                       "M"               Class M (fuel)
@@ -289,7 +289,7 @@ CONTENTS:
                       at init time.  The value can be a single NUMBER,
                       or a pair of NUMBERs.
 
-                      armies  20     
+                      armies  20
                               20 armies placed on planet
 
                       armies  80 180
@@ -323,12 +323,12 @@ CONTENTS:
           x:          RATIONAL
                       starting x coordinate of the planet's location.
                       This value is ignored if the planet is not
-                      stationary. 
+                      stationary.
 
           y:          RATIONAL
                       starting y coordinate of the planet's location.
                       This value is ignored if the planet is not
-                      stationary. 
+                      stationary.
 
           size:       NUMBER
                       size of the planet in CU's.  This only matters
@@ -339,10 +339,10 @@ CONTENTS:
           texname:    STRING
                       optional.  Explicitly specifies the texture to
                       be used to draw the planet.  In general this
-                      option should not be used for planet definitions.  
+                      option should not be used for planet definitions.
 
 
-       Currently in conquestgl, the following steps are made to
+       Currently in conquest, the following steps are made to
        determine the proper texture to use to display a planet:
 
        1. see if one was specified in the conqinitrc entry for
@@ -365,7 +365,7 @@ CONTENTS:
 ## texturesrc or user .trc files
 
        These files contain sections that describe each of the
-       texture, animation, and animdef's used in conquestgl.
+       texture, animation, and animdef's used in conquest.
 
        A texture section specifies a texture by a Well Known Name (WKN),
        the base filename that contains the image data used to draw the
@@ -374,7 +374,7 @@ CONTENTS:
        is described therein (no texture image data is used).
 
        Users can override the system's texture definitions (defined in
-       <prefix>/etc/texturesrc).  After conquestgl parses the main
+       <prefix>/etc/texturesrc).  After conquest parses the main
        texturesrc file, it will then load and parse any *.trc files it
        finds in your ~/.conquest/ directory.  These files have the
        same format as texturesrc.  Texture image (TGA) files can be
@@ -396,11 +396,11 @@ CONTENTS:
 
        The WKN of an entry should never be changed, as these are
        hard-coded into conquest.  The other data related to a WKN can
-       of course be modified. 
+       of course be modified.
 
        The following provides a detailed description of the valid
        texturesrc sections that can appear in the global texturesrc
-       file or a user's ~/.conquest/*.trc files.   
+       file or a user's ~/.conquest/*.trc files.
 
        ## texture
 
@@ -432,7 +432,7 @@ CONTENTS:
                       Federation players, and is composed of the word
                       'conqlogo' followed by the first (case
                       sensitive) character of the team.  This is what
-                      conquestgl will use when looking for the
+                      conquest will use when looking for the
                       Federation Conquest Logo texture.
 
           filename:   STRING
@@ -458,7 +458,7 @@ CONTENTS:
                       specified, a CQI warning will be issued to
                       stderr and the logfile, since a texture with no
                       color would usually be drawn black and
-                      transparent, making it a bit hard to see :) 
+                      transparent, making it a bit hard to see :)
 
           mipmap:     BOOL
                       optional.  If set to yes, generate mipmaps for
@@ -523,7 +523,7 @@ CONTENTS:
           name:       STRING
                       the WKN of the animation.  In the above example,
                       this animation refers to the animation that is
-                      used when something is exploding.  
+                      used when something is exploding.
 
           animdef:    STRING
                       optional. Specifies the name of the animdef
@@ -562,12 +562,12 @@ CONTENTS:
           An animdef section is used to describe the specific
           characteristics of how to 'run' an animation.  It is
           composed of base data, and one or more nested animation
-          types, for each animation type supported.  
+          types, for each animation type supported.
 
           Animdefs are 'compiled' at parse time and represent a series
           of operations to perform on a programmer specified animation
           'state' within conquest at defined intervals.  Animation
-          drawing states are used throughout conquestgl to draw
+          drawing states are used throughout conquest to draw
           explosions, torpedo's, and several other things.
 
           An animation drawing 'state' in conquest is defined as a
@@ -576,7 +576,7 @@ CONTENTS:
           id                              - current texture id
           s, t                            - texture S and T coordinate
                                             offset (defaults to S=0.0
-                                            and T=0.0) 
+                                            and T=0.0)
           color (ARGB)                    - current color
           geometry (size, rotation, x, y) - current geo info
           armed                           - current toggle value (on/off)
@@ -592,7 +592,7 @@ CONTENTS:
 
           Global animdefs can be used by any animation.  Inlining them
           within an animation allows for deriving new animdefs based
-          on previously defined (global) animdefs. 
+          on previously defined (global) animdefs.
 
           Each animdef can contain specifications for up to 4
           different animation types that can be executed to change
@@ -608,7 +608,7 @@ CONTENTS:
           colanim:     Specifies parameters for a color animation.
                        Modfies the state's 'color' values.
                        colanim's can only run if no texanim is
-                       currently executing.  
+                       currently executing.
 
           geoanim:     Specifies parameters for a geometry animation.
                        Modfies the state's 'geometry' values.
@@ -629,14 +629,14 @@ CONTENTS:
           provided.  Although this example incorporates components
           that are not really used for the 'explode' animdef, all
           possible options are listed here anyway for completeness and
-          documentation purposes.  
+          documentation purposes.
 
 
           animdef {
             name         "explode"               # required for
-                                                 # global animdefs, 
+                                                 # global animdefs,
                                                  # otherwise ignored
-                                                      
+
             texname      "exp"                   # semi-optional
             timelimit    3000                    # optional
 
@@ -645,21 +645,21 @@ CONTENTS:
               size       450         # in CU's   # optional
               angle      -1.0        # random    # optional
             }
-    
+
             texanim {                            # optional
-              stages     16 
+              stages     16
               loops      1                       # optional
-              delayms    100                     
+              delayms    100
               deltas     0.02                    # optional
               deltat     0.02                    # optional
             }
 
             # this runs when texanim has expired
             colanim {                            # optional
-              stages     10                      
+              stages     10
               loops      1                       # optional
               delayms    80
-    
+
               deltaa     -0.1                    # optional
               deltar     0.0                     # optional
               deltag     -0.001                  # optional
@@ -678,7 +678,7 @@ CONTENTS:
             toganim {                            # optional
               delayms    250
             }
-          } 
+          }
 
           name:       STRING
                       the name of the animdef, referenced by the WKN
@@ -686,11 +686,11 @@ CONTENTS:
 
                       'name' is required for global (non-inlined)
                       animdefs.  An inlined animdef is an animdef
-                      defined within an animation section. 
+                      defined within an animation section.
 
                       'name' is ignored for inlined animdefs.
 
-          texname:    STRING 
+          texname:    STRING
                       semi-optional.  Specifies the WKN of a texture
                       to use in the default anim state (ie: when an
                       animation state is first initialized).  If a
@@ -709,9 +709,9 @@ CONTENTS:
 
                       If the texanim only specifies 1 stage, then
                       texname is used directly to lookup the texture,
-                      without appending the stage number first. 
+                      without appending the stage number first.
 
-          timelimit   NUMBER 
+          timelimit   NUMBER
                       optional.  Specifies the maximum time in
                       milliseconds this animdef should run on a state.
                       When the timelimit expires, all animation types
@@ -721,19 +721,19 @@ CONTENTS:
           # istate subsection
 
             optional.  This subsection is provided to allow you to
-            specify certain 'starting' conditions to be used when an 
+            specify certain 'starting' conditions to be used when an
             animation state is reset for a run.
 
             size:       NUMBER
                         optional.  Allows you to specify the initial
                         value of the 'size' anim state variable when the
                         animation is reset for a run.  Value is in
-                        CU's.  
+                        CU's.
 
-            angle:      RATIONAL 
+            angle:      RATIONAL
                         optional.  Allows you to specify the initial
                         value of the 'angle' anim state variable when the
-                        animation is reset for a run.  
+                        animation is reset for a run.
 
                         If a negative value is specified as the angle,
                         then a random angle will be chosen every time
@@ -741,7 +741,7 @@ CONTENTS:
 
             color:      STRING
                         optional.  Specify a starting color.
-             
+
 
           # texanim subsection
 
@@ -755,11 +755,11 @@ CONTENTS:
             stages:     NUMBER
                         a non-zero number specifying the number of
                         individual textures that make up the texanim.
-                        
+
                         For texanims that contain only a single stage
                         (texture), the texname specified for the
                         animdef is used directly to lookup the
-                        texture.  
+                        texture.
 
                         Setting stages to 0 disables the anim type.
                         This is useful for derived inline animdefs.
@@ -775,7 +775,7 @@ CONTENTS:
             delayms:    NUMBER
                         The delay, in milliseconds, before advancing
                         onto the next stage.
-                    
+
             deltas:     RATIONAL
                         Specify an offset to be applied to the texture
                         state's S coordinate variable.
@@ -791,11 +791,11 @@ CONTENTS:
             animation type.  A color animation is used to modify 1 or
             more of the Alpha (A), Red (R), Green (G), and/or Blue (B)
             channels of the animdef's color anim state at predefined
-            time intervals.  
+            time intervals.
 
             If a texanim was specified as part of the animdef, then a
             color anim will not run until it (the texanim) has
-            expired. 
+            expired.
 
             All resulting color channels (ARGB) are clamped to a value
             between 0.0 (black) to 1.0 (white) before being placed in
@@ -804,7 +804,7 @@ CONTENTS:
 
             stages:     NUMBER
                         a number specifying the number of iterations
-                        to perform. 
+                        to perform.
 
                         Setting stages to 0 disables the anim type.
                         This is useful for derived inline animdefs.
@@ -817,23 +817,23 @@ CONTENTS:
             delayms:    NUMBER
                         The delay, in milliseconds, before advancing
                         onto the next stage.
-                    
+
             deltaa:     RATIONAL
                         optional.  delta to apply to the anim state's
                         alpha color channel per stage iteration.
-                    
+
             deltar:     RATIONAL
                         optional.  delta to apply to the anim state's
                         red color channel per stage iteration.
-                    
+
             deltag:     RATIONAL
                         optional.  delta to apply to the anim state's
                         green color channel per stage iteration.
-                    
+
             deltab:     RATIONAL
                         optional.  delta to apply to the anim state's
                         blue color channel per stage iteration.
-                    
+
 
           # geoanim subsection
 
@@ -853,7 +853,7 @@ CONTENTS:
 
             stages:     NUMBER
                         a number specifying the number of iterations
-                        to perform. 
+                        to perform.
 
                         Setting stages to 0 disables the anim type.
                         This is useful for derived inline animdefs.
@@ -866,7 +866,7 @@ CONTENTS:
             delayms:    NUMBER
                         The delay, in milliseconds, before advancing
                         onto the next stage.
-                    
+
             deltax:     RATIONAL
                         optional.  delta to apply to the anim state's
                         X geometry variable per stage iteration.
@@ -889,13 +889,13 @@ CONTENTS:
             optional.  This subsection is used to describe a 'toggle'
             animation type.  A toggle animation simply toggles the
             animation state's 'armed' variable on or off at a specified
-            time interval.  
+            time interval.
 
             An animdef composed solely of a toganim always runs
             forever (it never expires).  These types of animdefs are
             refered to as 'blinker' anims in conquest, and are used
             for things like blinking the "SELF DESTRUCT IN XX" message
-            in conquestgl.
+            in conquest.
 
             A toganim combined with another animation type will expire
             as soon as all other specified animation types have expired.
@@ -911,16 +911,16 @@ CONTENTS:
 
       These files contain basic sound configuration support (fx
       channels, samplerate, etc), definitions for sound effects
-      (phaser firing, explosions, etc), and music definitions. 
+      (phaser firing, explosions, etc), and music definitions.
 
       Music definitions and music files are not supplied in the
       conquest src tarball due to their size.  They are supplied in a
       seperate 'music pak' tarball that must be unpacked in your
       ~/.conquest/ directory.  I recommend it for the full experience
-      :) 
+      :)
 
       Users can override the system's sound definitions (defined in
-      <prefix>/etc/soundrc and <prefix>/etc/*.src).  After conquestgl
+      <prefix>/etc/soundrc and <prefix>/etc/*.src).  After conquest
       parses the main soundrc file, it will then load and parse any
       *.src files it finds in your ~/.conquest/ directory.  These
       files have the same format as soundrc.  Sound files (.wav or
@@ -932,7 +932,7 @@ CONTENTS:
       Known Name (WKN) that is hardcoded into conquest.  The WKN's
       should never be modified, however any data associated with them
       can be overridden by the user or the operator.
-      
+
       So, without further ado, here are the valid sections that can be
       present in a soundrc file.  In each section, all possible
       variables and their values will be shown.
@@ -942,7 +942,7 @@ CONTENTS:
          A soundconf section specifies certain parameters for the SDL
          mixer API, which is used to provide sound.  Feel free to
          change these if you'd like, though the defaults should be
-         ok on most modern systems. 
+         ok on most modern systems.
 
          soundconf {
            samplerate   44100
@@ -965,7 +965,7 @@ CONTENTS:
                       effects pool.  This is a decent number.  I doubt
                       you would need more than this.
 
-         chunksize:   NUMBER 
+         chunksize:   NUMBER
                       This value determines the chunksize the mixer
                       will use.  A slow CPU might need a larger
                       chunksize, but will introduce latency.  256 is
@@ -988,7 +988,7 @@ CONTENTS:
          section for the intro music is shown below.
 
          music {
-           name         "intro"  
+           name         "intro"
            filename     "TOS-intro"
 
            fadeinms     0
@@ -997,7 +997,7 @@ CONTENTS:
          }
 
          effect {
-           name         "explosion"  
+           name         "explosion"
            filename     "explosion"
 
            volume       45
@@ -1007,7 +1007,7 @@ CONTENTS:
            framelimit   2
            delayms      100
          }
-         
+
 
          name:        STRING
                       This is the WKN of the music of effect.  It
@@ -1018,15 +1018,15 @@ CONTENTS:
                       This specifies the filename (basename only, no
                       extension) that contains the audio samples.  The
                       sound loader can handle .WAV or .OGG files
-                      only.  Only .OGG files are shipped with conquest. 
+                      only.  Only .OGG files are shipped with conquest.
 
          volume:      NUMBER
                       0 to 100. Specifies the volume of the effect or
                       music sample.  This volume is used when the
                       sound is prepared for playing.  It is used to
                       provide the ability to 'equalize' the various
-                      sound volumes being used, so they are even.  
-      
+                      sound volumes being used, so they are even.
+
          pan:         NUMBER
                       -127 to 127. The default pan of the effect when
                       created.  If it is a positional effect
@@ -1039,7 +1039,7 @@ CONTENTS:
 
          fadeoutms:   NUMBER
                       The number of milliseconds to take to fade out
-                      the effect or music.  
+                      the effect or music.
 
          loops:       NUMBER
                       Number of loops to play the effect of music.  0
@@ -1051,7 +1051,7 @@ CONTENTS:
                       this effect after the limit is hit are ignored.
                       Music can never run at the same time as another
                       music file, so this option is only of use with
-                      effects.  
+                      effects.
 
          framelimit:  NUMBER
                       Specifies the number of times per frame that
@@ -1060,7 +1060,7 @@ CONTENTS:
                       are ignored.  This is useful when there is the
                       potential for a large number of the same effect
                       (like an explosion) being triggered during the
-                      same frame.  
+                      same frame.
 
          delayms:     NUMBER
                       When specified, indicates the minimum number of
@@ -1091,7 +1091,7 @@ CONTENTS:
 
       NOTE: all of these forms support '-v' to enable verbose mode and
             '-d' to enable extremely verbose debugging modes,
-            respectively. 
+            respectively.
 
       $ conqinit
 
@@ -1124,10 +1124,10 @@ CONTENTS:
         found if it can.  A valid initdata.h file is supplied in the
         conquest distribution and should not be modified by end users.
 
-      $ conqinit -D 
+      $ conqinit -D
 
         You must be a conqoper (or have direct read permission on the
-        common block) to use this option. 
+        common block) to use this option.
 
         This option is sort of a hack.  It loads the current state of
         the universe on the local machine and generates a conqinitrc
@@ -1144,7 +1144,7 @@ CONTENTS:
         conqoper to edit and or create new planets and arrange them
         just like you want them.  Then, using the above command, dump
         the universe to a conqinitrc file, edit it if neccessary (to
-        clean up colors, etc).  
+        clean up colors, etc).
 
         Then copy that file over the system's conqinitrc file.  From
         then on, whenever the planets are initialized (due to a
@@ -1179,13 +1179,13 @@ CONTENTS:
      You can override one of conquest's WKN texture definitions by
      adding an appropriate entry into a user .trc file.
 
-     After conquestgl parses the main texturesrc file, it will then
+     After conquest parses the main texturesrc file, it will then
      load and parse any *.trc files it finds in your ~/.conquest/
      directory.
 
      These files have the same format as texturesrc.  They can be used
      to remap a WKN texture to a different texture image filename, or to
-     use a different color. 
+     use a different color.
 
      So for example, if you absolutely hate the Viewer Backgroud
      texture (it's WKN is 'vbg'), you could make it whatever you want
@@ -1201,7 +1201,7 @@ CONTENTS:
          ~/.conquest/img/ directory.
 
          Now when conquest wants to draw the 'vbg' texture, it will
-         use your definition instead.  
+         use your definition instead.
 
          NOTE: I just randomly chose the name 'vbg.trc' for this
          example.  You can name the file to whatever you want, just as
@@ -1211,12 +1211,12 @@ CONTENTS:
 
 ## conquest's texture format
 
-   ConquestGL currently uses Targa (.tga) image format files to
+   Conquest currently uses Targa (.tga) image format files to
    represent textures.  This is a simple and easy to use format,
    though not as good as formats like PNG in terms of compression.
 
    TGA files you use in Conquest must have the following
-   characteristics: 
+   characteristics:
 
    - uncompressed or RLE compressed TGA
    - image origin in Lower Left
@@ -1225,7 +1225,7 @@ CONTENTS:
      3x27 is not. :)
 
    I would limit texture sizes to no more than 512x512.
-   
+
    For Conquest's textures, I use The Gimp (www.gimp.org) under linux.
    It can save in compressed ARGB/RGB TGA format.  For the 'Save'
    options dialog, select 'RLE Compressed' and 'Origin in lower left'.

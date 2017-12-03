@@ -51,7 +51,7 @@ FILELIST="conqai.h cd2lb.h cd2lb.c iolb.h iolb.c conqlb.c
         nWelcome.c nWelcome.h nDead.h nDead.c nCPHelp.h nCPHelp.c
         nShipl.h nShipl.c node.c node.h nPlanetl.h nPlanetl.c
         nTeaml.h nTeaml.c nUserl.h nUserl.c nHistl.h nHistl.c
-        gldisplay.h gldisplay.c glcprintf.c conquestgl.c
+        gldisplay.h gldisplay.c glcprintf.c 
         render.h render.c nPlayBMenu.h nPlayBMenu.c playback.h
         playback.c nPlayB.h nPlayB.c nPlayBHelp.h nPlayBHelp.c
         nOptions.h nOptions.c colorGL.c colorCU.c cuclient.c ui.h uimisc.c

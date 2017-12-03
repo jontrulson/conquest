@@ -24,7 +24,7 @@ SOUNDRC    = $(DESTDIR)$(CONQSYSCONFDIR)/soundrc
 CONQDOCS = HISTORY README CONQINIT.TXT conqrule conqrule.easy
 
 IMAGES = img/*.tga img/*.txf
-SOUNDS = sound/*.ogg 
+SOUNDS = sound/*.ogg
 TRC = *.trc
 SRC = *.src
 
@@ -33,16 +33,16 @@ TCPW_C = tcpwrap.c
 
 man6_MANS = conqdriv.man conqmetad.man conqoper.man conquest.man \
 	conquestd.man conqai.man conqstrat.man \
-	conqinit.man conquestgl.man
+	conqinit.man
 
 if ISMINGW
 
-XLIBS = -lfreeglut -lopengl32 -lglu32 $(SDL_LIBS) -lws2_32 
-#-lwsock32 
+XLIBS = -lfreeglut -lopengl32 -lglu32 $(SDL_LIBS) -lws2_32
+#-lwsock32
 
 else !ISMINGW
 
-XLIBS = @X_LIBS@ @X_EXTRA_LIBS@ -lglut -lGL -lGLU -lXt $(SDL_LIBS) @X_PRE_LIBS@ -lXext -lXi -lX11 -lXmu  
+XLIBS = @X_LIBS@ @X_EXTRA_LIBS@ -lglut -lGL -lGLU -lXt $(SDL_LIBS) @X_PRE_LIBS@ -lXext -lXi -lX11 -lXmu
 
 endif !ISMINGW
 
@@ -86,7 +86,7 @@ libconqclnt_la_SOURCES = client.c client.h cproc.h cproc.c clientlb.c \
 libconqserv_la_SOURCES = servauth.c server.c servauth.h server.h serverpkt.c \
 	serverpkt.h servercmd.h servercmd.c sproc.h sproc.c
 
-libUi_la_SOURCES = ui.h uimisc.c 
+libUi_la_SOURCES = ui.h uimisc.c
 
 libUiGL_la_SOURCES = GL.c texfont.c glfont.c glfont.h \
 	glmisc.c glmisc.h nConsvr.c nConsvr.h nMeta.h nMeta.c cqkeys.h \
@@ -101,17 +101,17 @@ libUiGL_la_SOURCES = GL.c texfont.c glfont.c glfont.h \
 
 libUiCU_la_SOURCES = display.c cprintf.h cprintf.c disputil.h colorCU.c \
 	cd2lb.h cd2lb.c iolb.h iolb.c cumisc.h cumisc.c cuclient.h \
-	cuclient.c options.h options.c clntauth.c ui.h display.h 
+	cuclient.c options.h options.c clntauth.c ui.h display.h
 
 libconqinit_la_SOURCES = conqinit-yacc.y conqinit-lex.l conqinit.h initdata.h planinit.c
 
 libcqsound_la_SOURCES = cqsound.c cqsound.h
 
-# for now, conquestgl is the only program we build for windows
+# for now, conquest is the only program we build for windows
 
 if ISMINGW
 
-bin_PROGRAMS = conquestgl 
+bin_PROGRAMS = conquest
 
 else !ISMINGW
 
@@ -119,36 +119,31 @@ libexec_PROGRAMS = conqdriv
 
 if GLCLIENT
 
-bin_PROGRAMS = conquestgl conquest conqoper conqai conqstrat \
+bin_PROGRAMS = conquest conqoper conqai conqstrat \
 	conquestd conqmetad conqinit
 else !GLCLIENT
 
-bin_PROGRAMS = conquest conqoper conqai conqstrat \
+bin_PROGRAMS = conqoper conqai conqstrat \
 	conquestd conqmetad conqinit
 
 endif !GLCLIENT
 
 endif !ISMINGW
 
-conquest_SOURCES = conquest.c c_defs.h defs.h conqdef.h cb.h context.h \
-	conqreplay.c
-
-conquest_LDADD = libUiCU.la libUi.la libconqclnt.la libconquest.la libconqinit.la $(LEXLIB) $(YACCLIB)
-
 if ISMINGW
-conquestgl_SOURCES = conquestgl.c c_defs.h defs.h conqdef.h cb.h \
+conquest_SOURCES = conquest.c c_defs.h defs.h conqdef.h cb.h \
 	context.h icon.rc
 else !ISMINGW
-conquestgl_SOURCES = conquestgl.c c_defs.h defs.h conqdef.h cb.h \
+conquest_SOURCES = conquest.c c_defs.h defs.h conqdef.h cb.h \
 	context.h
 endif !ISMINGW
 
-conquestgl_LDADD = libUiGL.la libUi.la libconqclnt.la libcqsound.la \
+conquest_LDADD = libUiGL.la libUi.la libconqclnt.la libcqsound.la \
 	libconquest.la libconqinit.la $(XLIBS) $(LEXLIB) $(YACCLIB)
 
 if TCPW
 conquestd_SOURCES = conquestd.c c_defs.h defs.h conqdef.h cb.h \
-	context.h conqnet.h $(TCPW_H) $(TCPW_C) 
+	context.h conqnet.h $(TCPW_H) $(TCPW_C)
 conquestd_LDADD = libconqserv.la libconquest.la libconqinit.la $(LEXLIB) $(YACCLIB) $(TCPWLIB) $(NSLLIB)
 else
 conquestd_SOURCES = conquestd.c c_defs.h defs.h conqdef.h cb.h \
@@ -161,24 +156,24 @@ conqai_SOURCES = conqai_main.c c_defs.h defs.h conqdef.h cb.h \
 
 conqai_LDADD = libconquest.la libconqinit.la  $(LEXLIB) $(YACCLIB)
 
-conqoper_SOURCES = conqoper.c c_defs.h defs.h conqdef.h cb.h context.h 
-conqoper_LDADD = libUiCU.la libUi.la libconqclnt.la libconquest.la libconqinit.la $(LEXLIB) $(YACCLIB) 
+conqoper_SOURCES = conqoper.c c_defs.h defs.h conqdef.h cb.h context.h
+conqoper_LDADD = libUiCU.la libUi.la libconqclnt.la libconquest.la libconqinit.la $(LEXLIB) $(YACCLIB)
 
 conqdriv_SOURCES = conqdriv.c c_defs.h defs.h conqdef.h cb.h context.h
 conqdriv_LDADD = libconquest.la libconqinit.la $(LEXLIB) $(YACCLIB)
 
 conqstrat_SOURCES = conqstrat-yacc.y conqstrat-lex.l conqstrat.h
-conqstrat_LDADD = libconquest.la $(LEXLIB) $(YACCLIB) 
+conqstrat_LDADD = libconquest.la $(LEXLIB) $(YACCLIB)
 
-conqinit_SOURCES = conqinit.c conqinit.h 
-conqinit_LDADD = libconquest.la libconqinit.la $(LEXLIB) $(YACCLIB) 
+conqinit_SOURCES = conqinit.c conqinit.h
+conqinit_LDADD = libconquest.la libconqinit.la $(LEXLIB) $(YACCLIB)
 
 if TCPW
-conqmetad_SOURCES = conqmetad.c meta.h $(TCPW_H) $(TCPW_C) 
+conqmetad_SOURCES = conqmetad.c meta.h $(TCPW_H) $(TCPW_C)
 conqmetad_LDADD = libconquest.la libconqinit.la $(LEXLIB) $(YACCLIB) $(TCPWLIB) $(NSLLIB)
 else
-conqmetad_SOURCES = conqmetad.c meta.h $(TCPW_H) 
-conqmetad_LDADD = libconquest.la libconqinit.la $(LEXLIB) $(YACCLIB) 
+conqmetad_SOURCES = conqmetad.c meta.h $(TCPW_H)
+conqmetad_LDADD = libconquest.la libconqinit.la $(LEXLIB) $(YACCLIB)
 endif
 
 # we install conqinitrc in the intall-exec-hook, so that we only install
@@ -199,18 +194,18 @@ install-exec-hook:
 		$(DESTDIR)$(bindir) \
 		$(DESTDIR)$(libexecdir) \
 		$(DESTDIR)/$(mandir) \
-		$(DESTDIR)/$(mandir)/man6 
-	chmod 775 $(DESTDIR)$(CONQLOCALSTATEDIR) 
+		$(DESTDIR)/$(mandir)/man6
+	chmod 775 $(DESTDIR)$(CONQLOCALSTATEDIR)
 	chgrp $(CONQGROUP) $(DESTDIR)$(CONQLOCALSTATEDIR)
 	cp -f $(IMAGES) $(DESTDIR)$(CONQIMGDIR)/
 	chmod 644 $(DESTDIR)$(CONQIMGDIR)/*.tga $(DESTDIR)$(CONQIMGDIR)/*.txf
 	cp -f $(SOUNDS) $(DESTDIR)$(CONQSNDDIR)/
-	chmod 644 $(DESTDIR)$(CONQSNDDIR)/*.ogg 
+	chmod 644 $(DESTDIR)$(CONQSNDDIR)/*.ogg
 	cp -f $(CONQDOCS) $(DESTDIR)$(CONQDOCDIR)/
 	chmod 644 $(DESTDIR)$(CONQDOCDIR)/*
 	cp conqinitrc $(DESTDIR)$(CONQSYSCONFDIR)/conqinitrc; \
 	chmod 644 $(DESTDIR)$(CONQSYSCONFDIR)/conqinitrc
-	chgrp $(CONQGROUP) $(TEXTURESRC) $(CONQINITRC) $(SOUNDRC) 
+	chgrp $(CONQGROUP) $(TEXTURESRC) $(CONQINITRC) $(SOUNDRC)
 	chmod 664 $(TEXTURESRC) $(CONQINITRC) $(SOUNDRC)
 	chgrp $(CONQGROUP) $(DESTDIR)$(bindir)/conqoper$(EXEEXT) \
 		$(DESTDIR)$(libexecdir)/conqdriv$(EXEEXT) \
@@ -221,4 +216,3 @@ install-exec-hook:
 	-$(bindir)/conqoper$(EXEEXT) -C
 	chmod 775 $(DESTDIR)$(CONQLOCALSTATEDIR)
 	-chown root:$(CONQGROUP) $(DESTDIR)$(CONQLOCALSTATEDIR)
-

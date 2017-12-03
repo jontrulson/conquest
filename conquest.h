@@ -9,12 +9,11 @@
 #include "config.h"
 
 #if defined(MINGW)
-#define CONQUESTGL_NAME "ConquestGL (Windows)"
+#define CONQUEST_NAME "Conquest (Windows)"
+#elif defined(DARWIN)
+#define CONQUEST_NAME "Conquest (MacOS)"
 #else
-#define CONQUESTGL_NAME "ConquestGL (Unix)"
+#define CONQUEST_NAME "Conquest (Unix/Linux)"
 #endif
-
-/* soon to be retired curses client */
-#define CONQUEST_NAME "Conquest"
 
 #endif

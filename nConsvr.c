@@ -168,10 +168,10 @@ static int nConsvrIdle(void)
     pktSetSocketFds(cInfo.sock, PKT_SOCKFD_NOCHANGE);
     pktSetNodelay();
 
-    if (!clientHello(CONQUESTGL_NAME))
+    if (!clientHello(CONQUEST_NAME))
     {
-        utLog("conquestgl: hello() failed\n");
-        printf("conquestgl: hello() failed, check log\n");
+        utLog("%s: hello() failed", __FUNCTION__);
+        printf("%s: hello() failed, check log\n", __FUNCTION__);
 
         cInfo.serverDead = TRUE;
         return NODE_EXIT;

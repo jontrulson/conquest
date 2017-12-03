@@ -23,7 +23,7 @@ rm -f ${ARCFILE}
 rm -rf $CONQVER
 echo Archive name: $ARCFILE
 
-EXEFILE="conquestgl.exe"
+EXEFILE="conquest.exe"
 ICOFILE="conquest-icon.ico"
 
 IMAGES="img/*.tga img/*.txf"

@@ -13,8 +13,8 @@ and sounddata.h header files containing compiled-in defaults.
 .PP
 CQI is a lex/yacc parser that is used by \fBConquest\fP 8.1.2a or
 later for configuration of the planets and other general purpose data,
-and for the GL client \fBconquestgl\fP, for the specification of
-colors, textures, animation definitions, sound, and music.
+and for the specification of colors, textures, animation definitions,
+sound, and music.
 .PP
 These pre\-generated header files (initdata.h, sounddata.h) contain
 defaults compiled directly into conquest, in the event the relevant

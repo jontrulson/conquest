@@ -38,11 +38,10 @@
 #include "cd2lb.h"
 #include "iolb.h"
 #include "cumisc.h"
-#include "cuclient.h"
 #include "record.h"
 #include "clientlb.h"
-#include "clntauth.h"
 #include "cuclient.h"
+#include "clntauth.h"
 #include "display.h"
 #include "conqinit.h"
 

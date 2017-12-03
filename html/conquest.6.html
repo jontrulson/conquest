@@ -10,18 +10,13 @@ Section: Games and Demos (6)<BR>Updated: <BR><A HREF="#index">Index</A>
 <A NAME="lbAB">&nbsp;</A>
 <H2>NAME</H2>
 
-conquestgl,conquest - Conquest game clients
+conquest - Conquest game clients
 <A NAME="lbAC">&nbsp;</A>
 <H2>SYNOPSIS</H2>
 
 <P>
 
-<B>conquestgl</B> and <B>conquest</B> are OpenGL and curses based
-clients, respectively, that are used to connect to a conquest server
-to play. 
-<P>
-
-<B>conquestgl</B> [OPTIONS]...
+<B>conquest</B> is a Freeglut OpenGL based client that is used to connect to a conquest serverto play.
 <P>
 
 <B>conquest</B> [OPTIONS]...
@@ -45,10 +40,10 @@ player who actually took the last planet gets his/her name up in
 lights.
 <P>
 
-The first time <B>conquestgl</B> or <B>conquest</B> is run, a directory
+The first time <B>conquest</B> is run, a directory
 called ~/.conquest/ will be created in your home directory.  This
 directory cantains your 'user options' data as well as the logfile.
-Additionally, with <B>conquestgl</B>, texturesrc (.trc) files and
+Additionally, texturesrc (.trc) files and
 texture image data (in ~/.conquest/img/) can be stored there. See
 CONQINIT.TXT for more information on what <I>texturesrc</I> and
 <I>texture image files</I> are.
@@ -58,9 +53,7 @@ CONQINIT.TXT for more information on what <I>texturesrc</I> and
 
 <P>
 
-<B>conquestgl</B> and <B>conquest</B> each take similiar options.
-Where an option is only suported by a paticular client, this
-difference will be noted.  If the <I>-s</I> or <I>-m</I> options are
+If the <I>-s</I> or <I>-m</I> options are
 not specified, the client will try to connect to a server running on
 your local host at port 1701.
 <DL COMPACT>
@@ -70,16 +63,14 @@ your local host at port 1701.
 Benchmark mode.  When this option is specified, and playback of a
 previously recorded game is specified with <I>-P</I>, then the default
 playback speed will be set to the highest speed possible (no frame
-delay).  This is really only of use for the OpenGL client, but can be
-specified to the curses client (<B>conquest</B>) as well.  
+delay).
 <P>
 It's not really much of a 'benckmark' yet as it does not currently
-emit any rendering statistics on exit.  The will be added in the
-future. 
+emit any rendering statistics on exit.
 <DT><B>-f</B>
 
 <DD>
-Run in fullscreen mode.  OpenGL client only.
+Run in fullscreen mode.
 <DT><B>-g &lt;geometry&gt; </B>
 
 <DD>
@@ -119,9 +110,9 @@ try disabling UDP with this option.
 <DT><B>-S</B>
 
 <DD>
-Disable sound support.  If <B>conquestgl</B> was compiled with sound
+Disable sound support.  If <B>conquest</B> was compiled with sound
 support, then this option will disable the playing of all music and
-effects.  OpenGL client only. 
+effects.
 <P>
 </DL>
 <A NAME="lbAF">&nbsp;</A>
@@ -637,6 +628,6 @@ about the suitability of this software for any purpose. It is provided
 This document was created by
 <A HREF="/cgi-bin/man/man2html">man2html</A>,
 using the manual pages.<BR>
-Time: 06:14:43 GMT, November 27, 2017
+Time: 00:49:06 GMT, December 03, 2017
 </BODY>
 </HTML>

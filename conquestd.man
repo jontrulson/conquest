@@ -7,8 +7,8 @@ conquestd \- a Conquest game server
 \fBconquestd\fP [OPTIONS]
 .SH DESCRIPTION
 .PP
-\fBconquestd\fP is a game server for Conquest.  Clients, such as
-\fBconquestgl\fP and \fBconquest\fP are used to connect to a
+\fBconquestd\fP is a game server for Conquest.  A client, such as
+\fBconquest\fP is used to connect to a
 \fBconquestd\fP server to play the game.
 .SH "OPTIONS"
 .PP
@@ -54,7 +54,7 @@ into making Conquest a true client/server game playable over the
 Internet (or just your local LAN).
 
 Conquest has two main parts, the server component (conquestd) and the
-client (OpenGL version: conquestgl, curses version: conquest).
+client (conquest).
 
 To run a server, you must run the conquestd program.
 
@@ -123,7 +123,7 @@ This way, other people can find out about your server and connect
 to it to play.
 
 The list of currently active servers can be seen in the game by
-running your client (conquestgl or conquest) with the '-m' flag.
+running \fBconquest\fP with the '-m' flag.
 
 You can also point your web browser to:
 

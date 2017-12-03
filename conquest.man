@@ -1,14 +1,10 @@
 .\" $Id$
 .TH "conquest" 6 "" ""
 .SH NAME
-conquestgl,conquest \- Conquest game clients
+conquest \- Conquest game clients
 .SH SYNOPSIS
 .PP
-\fBconquestgl\fP and \fBconquest\fP are OpenGL and curses based
-clients, respectively, that are used to connect to a conquest server
-to play. 
-.PP
-\fBconquestgl\fP [OPTIONS]...
+\fBconquest\fP is a Freeglut OpenGL based client that is used to connect to a conquest serverto play.
 .PP
 \fBconquest\fP [OPTIONS]...
 .SH DESCRIPTION
@@ -26,19 +22,17 @@ planets have been taken, the game ends, a new game begins, and the
 player who actually took the last planet gets his/her name up in
 lights.
 .PP
-The first time \fBconquestgl\fP or \fBconquest\fP is run, a directory
+The first time \fBconquest\fP is run, a directory
 called ~/.conquest/ will be created in your home directory.  This
 directory cantains your 'user options' data as well as the logfile.
-Additionally, with \fBconquestgl\fP, texturesrc (.trc) files and
+Additionally, texturesrc (.trc) files and
 texture image data (in ~/.conquest/img/) can be stored there. See
 CONQINIT.TXT for more information on what \fItexturesrc\fP and
 \fItexture image files\fP are.
 
 .SH "OPTIONS"
 .PP
-\fBconquestgl\fP and \fBconquest\fP each take similiar options.
-Where an option is only suported by a paticular client, this
-difference will be noted.  If the \fI\-s\fP or \fI\-m\fP options are
+If the \fI\-s\fP or \fI\-m\fP options are
 not specified, the client will try to connect to a server running on
 your local host at port 1701.
 .TP 8
@@ -46,15 +40,13 @@ your local host at port 1701.
 Benchmark mode.  When this option is specified, and playback of a
 previously recorded game is specified with \fI\-P\fP, then the default
 playback speed will be set to the highest speed possible (no frame
-delay).  This is really only of use for the OpenGL client, but can be
-specified to the curses client (\fBconquest\fP) as well.  
+delay).
 
 It's not really much of a 'benckmark' yet as it does not currently
-emit any rendering statistics on exit.  The will be added in the
-future. 
+emit any rendering statistics on exit.
 .TP 8
 .B \-f
-Run in fullscreen mode.  OpenGL client only.
+Run in fullscreen mode.
 .TP 8
 .B \-g <geometry> 
 Specify initial window width/height.  OpenGL client only.  Format is
@@ -86,9 +78,9 @@ try disabling UDP with this option.
 
 .TP 8
 .B \-S
-Disable sound support.  If \fBconquestgl\fP was compiled with sound
+Disable sound support.  If \fBconquest\fP was compiled with sound
 support, then this option will disable the playing of all music and
-effects.  OpenGL client only. 
+effects.
 
 .SH "IMPORTANT COMMANDS"
 .PP

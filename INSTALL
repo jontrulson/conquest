@@ -36,10 +36,10 @@ CONTENTS:
 
     - a decent curses implementation
 
-    - automake/autoconf/autoincludes/libtool.  You will need the
-      complete autotools packages installed.
+    - automake/autoconf/autoreconf/autoincludes/libtool.  You will
+      need the complete autotools packages installed.
 
-    For building the OpenGL client 'conquestgl', you will need:
+    For building the client 'conquest', you will need:
 
     - X11 (or xorg) libraries and header files (all of them :)
 
@@ -47,7 +47,7 @@ CONTENTS:
 
     - glut or freeglut libraries and header files.
 
-    For sound support (OpenGL client only) you will need:
+    For sound support you will need:
 
     - SDL libraries and header files ( http://www.libsdl.org/ ), with
       OGG Vorbis support (pretty much standard I think).
@@ -93,8 +93,6 @@ CONTENTS:
       - play
 
         $ conquest
-        or, for the GL/sound client:
-        $ conquestgl
 
     - to play on a remote server
 
@@ -223,14 +221,14 @@ CONTENTS:
   environment.
 
   Mote, a Windows build only compiles the code neccessary to build the
-  OpenGL client (conquestgl).  None of the other binaries are
+  client (conquest).  None of the other binaries are
   compiled.
 
   If you want to run your own conquest server, or other conquest
   binaries and utilities, you will either need to compile and run them
   under the Cygwin environment, or under a unix/linux host or VM.
 
-  I would not advise attempting to use the OpenGL client (conquestgl)
+  I would not advise attempting to use the OpenGL client (conquest)
   under Cygwin as there will be no hardware acceleration, and you
   would need to run the xorg X server.
 

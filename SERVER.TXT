@@ -11,7 +11,7 @@
    to read.
 
    It gives you an overview of how to setup and manage one, as well as
-   other things to keep in mind.  
+   other things to keep in mind.
 
    Before reading this file, you may want to read the README, INSTALL,
    HISTORY, and conquest.doc files so that you have an idea of
@@ -33,14 +33,13 @@ CONTENTS:
 
     With version 8.0 of Conquest, a great deal of work has gone into
     making Conquest a true client/server game playable over the
-    Internet (or just your local LAN).  
+    Internet (or just your local LAN).
 
     Conquest has two main parts, the server component (conquestd) and
-    the client (OpenGL version: conquestgl, curses version: conquest).
-
+    the client: conquest.
 
     Version 8.0.1c or better includes many server performance
-    improvements, including UDP support for motion data. 
+    improvements, including UDP support for motion data.
 
     To run a server, you must run the conquestd program.
 
@@ -83,7 +82,7 @@ CONTENTS:
        It will listen on the default port (1701) for client
        connections, and spawn a new conquestd for each client
        connection.  It will be available to anyone who can connect to
-       TCP port 1701 on your machine.  
+       TCP port 1701 on your machine.
 
     SECURITY NOTE: I would only run a server this way if no one else
     from the Internet will be able to connect (if you are behind a
@@ -109,7 +108,7 @@ CONTENTS:
 
     DO NOT run conquestd as the root user itself.  Although the code
     *should* be safe, don't take my word for it.
-    
+
 ## notifying the metaserver
 
    If you are going to run a server that will be available to the
@@ -129,7 +128,7 @@ CONTENTS:
    to it to play.
 
    The list of currently active servers can be seen in the game by
-   running your client (conquestgl or conquest)' with the '-m' flag.
+   running your client with the '-m' flag.
 
    You can also point your web browser to:
 
@@ -146,9 +145,9 @@ CONTENTS:
 ## firewall considerations
 
    Most people that will run a server will also be using a firewall of
-   some sort to protect their networks. 
+   some sort to protect their networks.
 
-   See the README file for the ports that conquest typically uses.  
+   See the README file for the ports that conquest typically uses.
 
    Inbound access:
 
@@ -172,7 +171,7 @@ CONTENTS:
    By default, whenever a user logs into Conquest, an autoexpire is
    run to locate and 'resign' all inactive remote users.
 
-   A user is expired: 
+   A user is expired:
 
      A) if the user is a non OPER or non robot user - no expiration is
         ever done on these users.
@@ -219,5 +218,3 @@ CONTENTS:
 
 
 $Id$
-	
-

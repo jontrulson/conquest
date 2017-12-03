@@ -11,9 +11,8 @@
             flex
             crypt
 
-
-            For the OpenGL client (conquestgl), you will need the X11
-            (xorg-x11-*), Mesa (opengl), and GLUT packages
+            For the OpenGL client (conquest), you will need the X11
+            (xorg-x11-*), Mesa (opengl), and GLUT (freeglut) packages
             (runtime and development) installed.
 
             xorg-*
@@ -114,7 +113,7 @@
 
         xinit &
 
-        From within X, open up an xterm and just run 'conquestgl' with
+        From within X, open up an xterm and just run 'conquest' with
         appropriate options.
 
         Note, unfortunately the OpenGL rendering available in cygwin
