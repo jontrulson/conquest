@@ -28,7 +28,7 @@ typedef struct _anim_draw_state {
     int          armed;
 
     /* a private area for data storage */
-    void        *private;
+    void        *privptr;
 
 } animDrawStateRec_t, *animDrawStatePtr_t;
 

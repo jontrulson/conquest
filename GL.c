@@ -1179,7 +1179,7 @@ void drawBombing(int snum, int scale)
                 int j;
 
                 for (j=1; j < i; j++)
-                    free(bombAState[j].state.private);
+                    free(bombAState[j].state.privptr);
                 bombAState[0].anims = 0; /* clear 1st so we can retry
                                             again later */
                 utLog("%s: malloc(%d) failed", __FUNCTION__,
@@ -1188,13 +1188,13 @@ void drawBombing(int snum, int scale)
             }
             else
             {
-                bombAState[i].state.private = (void *)rnd;
+                bombAState[i].state.privptr = (void *)rnd;
             }
         }
     }
 
     /* get the state's private area */
-    if (!(rnd = (struct _rndxy *)bombAState[snum].state.private))
+    if (!(rnd = (struct _rndxy *)bombAState[snum].state.privptr))
         return;             /* shouldn't happen */
 
     /* if it's expired, reset for a new one */
