@@ -13,6 +13,6 @@
 #define ALIGN_RIGHT  1
 #define ALIGN_NONE   0
 
-void cprintf(int lin, int col, int align, char *fmt, ...);
+void cprintf(int lin, int col, int align, const char *fmt, ...);
 
 #endif /* _CPRINTF_H */

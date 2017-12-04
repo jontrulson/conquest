@@ -232,7 +232,7 @@ void cdend(void)
 /*       count - fill count */
 void cdfill ( char ch, char *buf, int count )
 {
-    register int i;
+    int i;
 
     for ( i = 0; i < count; i++ )
         buf[i] = ch;

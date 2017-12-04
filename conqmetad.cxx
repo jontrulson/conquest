@@ -42,7 +42,7 @@ void handleSignal(int sig);
 
 static int cmpmeta(void *cmp1, void *cmp2)
 {
-    register int *icmp1, *icmp2;
+    int *icmp1, *icmp2;
 
     icmp1 = (int *) cmp1;
     icmp2 = (int *) cmp2;

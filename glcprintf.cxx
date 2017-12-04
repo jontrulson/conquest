@@ -33,7 +33,7 @@ static char buf[BUFFER_SIZE_1024];
  *             '%' regular format specs
  * ...       - args
  */
-void cprintf(int lin, int col, int align, char *fmt, ...)
+void cprintf(int lin, int col, int align, const char *fmt, ...)
 {
     va_list ap;
     int l;

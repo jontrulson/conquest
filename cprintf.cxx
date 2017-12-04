@@ -25,10 +25,10 @@
  *             '%' regular format specs
  * ...       - args
  */
-void cprintf(int lin, int col, int align, char *fmt, ...)
+void cprintf(int lin, int col, int align, const char *fmt, ...)
 {
     va_list ap;
-    register int i, j, k;
+    int i, j, k;
     int len, vcol;
     int color_num;
     int two_passes = FALSE;

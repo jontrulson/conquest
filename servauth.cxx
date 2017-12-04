@@ -164,7 +164,7 @@ int Authenticate(char *username, char *password)
 /*  (DOES LOCKING) */
 void expire_users(void)
 {
-    register int i, j;
+    int i, j;
     time_t difftime = 0;
     int hasship = FALSE;
     unsigned int expire_secs;

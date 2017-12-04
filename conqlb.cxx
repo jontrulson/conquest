@@ -448,7 +448,7 @@ int clbCheckLaunch(int snum, int number)
 /*    flag = clbLaunch( snum, dir, number_of_torps, launch_type ) */
 int clbLaunch( int snum, real dir, int number, int ltype )
 {
-    register int i, j;
+    int i, j;
     real speed, adir;
     int tnum, numslots, numfired;
     static int tslot[MAXTORPS];
@@ -2353,7 +2353,7 @@ void clbSortPlanets( int sv[] )
 /* cmpuser - compare users based on skill */
 static int cmpuser(void *cmp1, void *cmp2)
 {
-    register int *icmp1, *icmp2;
+    int *icmp1, *icmp2;
 
     icmp1 = (int *) cmp1;
     icmp2 = (int *) cmp2;
