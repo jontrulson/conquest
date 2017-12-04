@@ -57,7 +57,7 @@ void printUsage()
     printf("    -f               run in fullscreen mode\n");
     printf("    -g <geometry>    specify intial window width/height.\n");
     printf("                      Format is WxH (ex: 1024x768).\n");
-    printf("                      Default is 1024x768.\n");
+    printf("                      Default is 1280x720.\n");
     printf("    -m               query the metaserver\n");
     printf("    -s server[:port] connect to <server> at <port>\n");
     printf("                      default: localhost:1701\n");

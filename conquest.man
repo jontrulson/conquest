@@ -50,7 +50,7 @@ Run in fullscreen mode.
 .TP 8
 .B \-g <geometry> 
 Specify initial window width/height.  OpenGL client only.  Format is
-WxH (ex: 1024x768). The default is currently 1024x768.
+WxH (ex: 1024x768). The default is currently 1280x720.
 .TP 8
 .B \-m  
 Query the metaserver and provide a list of servers to choose from.

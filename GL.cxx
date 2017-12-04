@@ -1590,8 +1590,9 @@ void dspInitData(void)
     DSPFCLR(DSP_F_INITED);
     DSPFCLR(DSP_F_FULLSCREEN);
 
-    dConf.initWidth = 1024;
-    dConf.initHeight = 768;
+    // 720p by default
+    dConf.initWidth = 1280;
+    dConf.initHeight = 720;
 
     dConf.wX = dConf.wY = 0;
     dConf.vScaleLR = dConf.vScaleSR = 1.0;
@@ -1611,7 +1612,8 @@ int uiGLInit(int *argc, char **argv)
     glutInit(argc, argv);
     glutInitDisplayMode(/*GLUT_DEPTH |*/ GLUT_DOUBLE | GLUT_RGBA | GLUT_ALPHA);
 
-    glutInitWindowPosition(0,0);
+    // let the window manager decide...
+    glutInitWindowPosition(-1, -1);
 
     glutInitWindowSize(dConf.initWidth, dConf.initHeight);
 
