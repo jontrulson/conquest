@@ -246,7 +246,7 @@ void cdfill ( char ch, char *buf, int count )
 /*    status = cdgetn ( pmt, lin, col, num ) */
 /*       num - number read */
 /*       status - 0 if a number was read, else -1 */
-int cdgetn ( char pmt[], int lin, int col, int *num )
+int cdgetn ( const char pmt[], int lin, int col, int *num )
 {
     char buf[MSGMAXLINE];
 
@@ -280,7 +280,7 @@ int cdgetn ( char pmt[], int lin, int col, int *num )
 /*    erase the line with either control-x or control-u. You can erase */
 /*    the last word with control-w. You can redisplay the screen with */
 /*    control-l. */
-int cdgets ( char pmt[], int lin, int col, char str[], int maxlen )
+int cdgets ( const char pmt[], int lin, int col, char str[], int maxlen )
 {
 
     cdgetx ( pmt, lin, col, "\r\n", str, maxlen, TRUE );
@@ -312,7 +312,7 @@ int cdgets ( char pmt[], int lin, int col, char str[], int maxlen )
 /*    the last word with control-w. You can redisplay the screen with */
 /*    control-l. */
 /*    The terminating char is returned as value. */
-int cdgetx ( char pmt[], int lin, int col, char terms[], char str[],
+int cdgetx ( const char pmt[], int lin, int col, const char terms[], char str[],
              int maxlen, int doecho )
 {
     int append_flg = FALSE;
@@ -335,7 +335,7 @@ int cdgetx ( char pmt[], int lin, int col, char terms[], char str[],
 /*    and initial contents of ``str'' and displayed and then input is read */
 /*    and the result is returned in ``str''. This means that a default value */
 /*    of str can be provided. This routine is otherwise similar to cdgetx(). */
-int cdgetp ( char pmt[], int lin, int col, char terms[], char str[],
+int cdgetp ( const char pmt[], int lin, int col, const char terms[], char str[],
              int maxlen, int *append_flg, int do_append_flg, int doecho )
 {
     int i, len, icol, scol, imaxlen;
@@ -345,9 +345,9 @@ int cdgetp ( char pmt[], int lin, int col, char terms[], char str[],
     char mbuf[MSGMAXLINE];
     char sbuf[MSGMAXLINE];
 
-    char *append_fmt1 = "%s%s%c";
-    char *append_fmt2 = "%s%c";
-    char *append_str = "- ";
+    static const char *append_fmt1 = "%s%s%c";
+    static const char *append_fmt2 = "%s%c";
+    static const char *append_str = "- ";
     int max_size, diff;
 
     if (str[0] != 0)
@@ -777,7 +777,7 @@ void cdput ( char ch, int lin, int col )
 /*    char str() */
 /*    int lin */
 /*    cdputc ( str, lin ) */
-void cdputc ( char str[], int lin )
+void cdputc ( const char str[], int lin )
 {
     cdputs ( str, lin, (int)(cdcols() - strlen(str)) / (int)2 );
 
@@ -828,7 +828,7 @@ void cdputr ( real x, int wid, int lin, int col )
 /*    This routine puts the string into the display buffer starting at */
 /*    the specified position and proceeding to the right. If the string */
 /*    would go past the edge of the screen, it is truncated. */
-void cdputs ( char str[], int lin, int col )
+void cdputs ( const char str[], int lin, int col )
 {
     int len, slen;
     static char tmpstr[128];

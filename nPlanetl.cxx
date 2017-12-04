@@ -28,9 +28,9 @@ static int team, snum;
 
 static int PlanetOffset;    /* offset into MAXPLANETS for this page */
 static int PlanetIdx;
-static char *hd0="P L A N E T   L I S T   ";
-static char *hd1="' = must take to conquer the Universe)";
-static char *hd2="planet      type team armies          planet      type team armies";
+static const char *hd0="P L A N E T   L I S T   ";
+static const char *hd1="' = must take to conquer the Universe)";
+static const char *hd2="planet      type team armies          planet      type team armies";
 static char hd3[BUFFER_SIZE_256];
 
 static int nPlanetlDisplay(dspConfig_t *);

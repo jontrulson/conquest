@@ -45,23 +45,23 @@ static int prompting;
 
 static char cbuf[BUFFER_SIZE_256];
 
-static char *pwp = "Password: ";
-static char *rpwp = "Retype Password: ";
-static char *phelper = "Use any printable characters.";
-static char *nodef = "<Not Defined>";
+static const char *pwp = "Password: ";
+static const char *rpwp = "Retype Password: ";
+static const char *phelper = "Use any printable characters.";
+static const char *nodef = "<Not Defined>";
 
-static char *mheader = "View/Edit Macros";
-static char *mmheader = "View/Edit Mouse Macros";
-static char *mmheader2 = "'a' = Alt, 'c' = Control 's' = Shift";
-static char *uheader = "User Configurable Options";
-static char *sheader = "System-wide Configurable Options";
+static const char *mheader = "View/Edit Macros";
+static const char *mmheader = "View/Edit Mouse Macros";
+static const char *mmheader2 = "'a' = Alt, 'c' = Control 's' = Shift";
+static const char *uheader = "User Configurable Options";
+static const char *sheader = "System-wide Configurable Options";
 
-static char *meprompt = "Enter Conquest commands.  ([ENTER] = \\r, [TAB] = \\t)";
-static char *mmeprompt = "Enter Conquest commands.  ([ENTER] = \\r, [TAB] = \\t <angle> = \\a)";
-static char *eprompt = "Arrow keys to select an item, [SPACE] to change, any other key to quit.";
-static char *eprompt2 = "Type '?' for help on an item.";
-static char *mprompt = "Arrow keys to select a macro, [SPACE] to change, any other key to quit.";
-static char *mprompt2 = "Type '?' for help.";
+static const char *meprompt = "Enter Conquest commands.  ([ENTER] = \\r, [TAB] = \\t)";
+static const char *mmeprompt = "Enter Conquest commands.  ([ENTER] = \\r, [TAB] = \\t <angle> = \\a)";
+static const char *eprompt = "Arrow keys to select an item, [SPACE] to change, any other key to quit.";
+static const char *eprompt2 = "Type '?' for help on an item.";
+static const char *mprompt = "Arrow keys to select a macro, [SPACE] to change, any other key to quit.";
+static const char *mprompt2 = "Type '?' for help.";
 
 static const int settingcol = 65;
 
@@ -91,7 +91,7 @@ static struct Conf *macroptr = NULL; /* points to macro element of ConfData */
 static struct Conf *mouseptr = NULL; /* points to mouse macro element of ConfData */
 static struct Conf *ConfigData = NULL;
 
-static char *oheader = "";
+static const char *oheader = "";
 
 static int oldstate;            /* for returning from help */
 
@@ -330,14 +330,14 @@ static void _changeOption(struct Conf *cdata, int init)
 
 static void _dispUserOptsMenu(void)
 {
-    static char *header = "User Options Menu";
-    static char *mopts[] = {
+    static const char *header = "User Options Menu";
+    static const char *mopts[] = {
         "View/Edit Options",
         "View/Edit Macros",
         "View/Edit Mouse Macros",
         "Change Password"
     };
-    static char *prompt = "Enter a number to select an item, any other key to quit.";
+    static const char *prompt = "Enter a number to select an item, any other key to quit.";
     int lin = 0, col = 0;
     int i;
 
@@ -499,14 +499,14 @@ static void _dispHelpScreen(void)
 static void _showOptScreen(void)
 {
     int i, j, k;
-    static char *header2fmt = "(Page %d of %d)";
+    static const char *header2fmt = "(Page %d of %d)";
     static char headerbuf[BUFFER_SIZE_256];
     static char header2buf[BUFFER_SIZE_256];
-    static char *header;
-    static char *prompt;
-    static char *prompt2;
+    static const char *header;
+    static const char *prompt;
+    static const char *prompt2;
     int vattrib;
-    char *dispmac;
+    const char *dispmac;
     int lin = 0, col = 0;
 
     switch (state)

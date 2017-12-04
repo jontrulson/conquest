@@ -8,7 +8,7 @@
 #ifndef __SEM_H
 #define __SEM_H
 
-char *semGetName(int what);
+const char *semGetName(int what);
 int   semInit(void);
 void  semLock(int what);
 void  semUnlock(int what);

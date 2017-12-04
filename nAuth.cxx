@@ -29,13 +29,13 @@
 #include "GL.h"
 #include "blinker.h"
 
-static char *unamep = "Username:";
-static char *pwp = "Password:";
-static char *rpwp = "Retype Password:";
-static char *newuserp = "User doesn't exist. Is this a new user?";
-static char *pwerr = "Invalid Password.";
-static char *uhelper = "You can use A-Z, a-z, 0-9, '_', or '-'.";
-static char *phelper = "Use any printable characters.";
+static const char *unamep = "Username:";
+static const char *pwp = "Password:";
+static const char *rpwp = "Retype Password:";
+static const char *newuserp = "User doesn't exist. Is this a new user?";
+static const char *pwerr = "Invalid Password.";
+static const char *uhelper = "You can use A-Z, a-z, 0-9, '_', or '-'.";
+static const char *phelper = "Use any printable characters.";
 
 static char cursor = ' ';       /* the cursor */
 
@@ -47,8 +47,8 @@ static char ynbuf[YN_BUFLEN];
 
 static char nm[MAXUSERNAME], pw[MAXUSERNAME], pwr[MAXUSERNAME];
 
-static char *statlin = NULL;
-static char *errlin = NULL;
+static const char *statlin = NULL;
+static const char *errlin = NULL;
 static int  newuser = FALSE;    /* a new user? */
 
 /* the current state */

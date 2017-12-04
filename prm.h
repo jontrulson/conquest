@@ -18,8 +18,8 @@ typedef struct _prompt {
     int  preinit;                /* pre-initing the prompt resp? */
     char *buf;                    /* response */
     int   buflen;
-    char *pbuf;                   /* the prompt */
-    char *terms;                  /* terminators */
+    const char *pbuf;                   /* the prompt */
+    const char *terms;                  /* terminators */
     int   index;                  /* only used in CP for now */
 } prm_t;
 

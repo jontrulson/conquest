@@ -693,7 +693,7 @@ real clbPhaserHit( int snum, real dis )
 /*    int team, unum */
 /*    int flag, register */
 /*    flag = register( lname, rname, team, unum ) */
-int clbRegister( char *lname, char *rname, int team, int *unum )
+int clbRegister( const char *lname, const char *rname, int team, int *unum )
 {
     int i, j;
 
@@ -885,7 +885,7 @@ void clbUserline( int unum, int snum, char *buf, int showgods, int showteam )
     int team;
     char ch, ch2, junk[MSGMAXLINE], timstr[20], name[MAXUSERNAME];
 
-    char *hd1="name          pseudonym           team skill  wins  loss mxkls  ships     time";
+    static const char *hd1="name          pseudonym           team skill  wins  loss mxkls  ships     time";
     char tname[MAXUSERNAME + 2];	/* posss '@' and NULL */
 
 
@@ -1112,7 +1112,7 @@ int clbZeroPlanet( int pnum, int snum )
 char *clbWarPrompt(int snum, int twar[])
 {
     static char wbuf[BUFFER_SIZE_256];
-    static char *fmt = "Press [TAB] when done, [ESC] to abort:  Peace: %c %c %c %c  War: %c %c %c %c";
+    static const char *fmt = "Press [TAB] when done, [ESC] to abort:  Peace: %c %c %c %c  War: %c %c %c %c";
     int i;
     char ch, peace[NUMPLAYERTEAMS], war[NUMPLAYERTEAMS];
 
@@ -1699,10 +1699,10 @@ void clbFixDeltas( int snum )
 /*    int unum */
 /*    char lname() */
 /*    truth = clbGetUserNum( unum, lname ) */
-int clbGetUserNum( int *unum, char *lname, userTypes_t ltype )
+int clbGetUserNum( int *unum, const char *lname, userTypes_t ltype )
 {
     int i;
-    char *lptr = lname;
+    const char *lptr = lname;
 
     *unum = -1;
     for ( i = 0; i < MAXUSERS; i++ )
@@ -2098,8 +2098,8 @@ void clbInitUniverse(void)
 void clbIntrude( int snum, int pnum )
 {
     char buf[MSGMAXLINE];
-    char *atta=" attacking";
-    char *armeq=", armies=";
+    static const char *atta=" attacking";
+    static const char *armeq=", armies=";
 
     if ( PVISIBLE(pnum) &&
          cbPlanets[pnum].team != TEAM_SELFRULED &&
@@ -2451,7 +2451,7 @@ int clbStillAlive( int snum )
 
 /* wrapper for stormsg.  Most routines just use this version. */
 void clbStoreMsg( msgFrom_t from, uint16_t fromDetail,
-                  msgTo_t to, uint16_t toDetail, char *msg )
+                  msgTo_t to, uint16_t toDetail, const char *msg )
 {
     clbStoreMsgf(from, fromDetail, to, toDetail, msg, MSG_FLAGS_NONE);
     return;
@@ -2460,7 +2460,7 @@ void clbStoreMsg( msgFrom_t from, uint16_t fromDetail,
 /*  stormsgf - store a message in the msg buffer with flags (DOES LOCKING) */
 void clbStoreMsgf( msgFrom_t from, uint16_t fromDetail,
                    msgTo_t to, uint16_t toDetail,
-                   char *msg, unsigned char flags )
+                   const char *msg, unsigned char flags )
 {
     int nlastmsg, i;
     char buf[128];

@@ -79,10 +79,10 @@ scrNode_t *nUserlInit(int nodeid, int setnode, int sn, int gl, int extra)
 static int nUserlDisplay(dspConfig_t *dsp)
 {
     int j, fline, lline, lin;
-    static char *hd1="U S E R   L I S T";
-    static char *ehd1="M O R E   U S E R   S T A T S";
-    static char *ehd2="name         cpu  conq coup geno  taken bombed/shot  shots  fired   last entry";
-    static char *ehd3="planets  armies    phaser  torps";
+    static const char *hd1="U S E R   L I S T";
+    static const char *ehd1="M O R E   U S E R   S T A T S";
+    static const char *ehd2="name         cpu  conq coup geno  taken bombed/shot  shots  fired   last entry";
+    static const char *ehd3="planets  armies    phaser  torps";
     static char cbuf[BUFFER_SIZE_256];
     int color;
 

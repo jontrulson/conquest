@@ -28,7 +28,7 @@
 #include "record.h"
 
 /* init an animstate.  can specify an optional istate drawing state */
-int animInitState(char *animname, animStatePtr_t astate,
+int animInitState(const char *animname, animStatePtr_t astate,
                   animDrawStatePtr_t istate)
 {
     int ndx;

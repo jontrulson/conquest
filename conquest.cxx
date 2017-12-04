@@ -141,7 +141,7 @@ static int _cmpfile(void *cmp1, void *cmp2)
     return(strcmp(str1, str2));
 }
 
-static void _loadRCFiles(int type, char *cqdir, char *suffix)
+static void _loadRCFiles(int type, const char *cqdir, const char *suffix)
 {
     char filenm[PATH_MAX];
     DIR *dirp;

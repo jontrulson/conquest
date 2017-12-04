@@ -198,12 +198,12 @@ static void CreateRobots(int snumFrom, char *arg1, char *arg2, char *arg3)
 /* some of this ripped right from conqoper kiss() */
 static void Murder(int from, char *what)
 {
-    char *cant_kill_ship_str = "You can't kill ship %c%d (%s) status (%s).";
-    char *kill_ship_str1 = "Killing ship %c%d (%s).";
-    char *kill_ship_str2 = "Killing ship %c%d (%s) user (%s).";
-    char *no_user_str = "No such user.";
-    char *no_ship_str = "No such ship.";
-    char *not_flying_str = "User %s (%s) isn't flying right now.";
+    static const char *cant_kill_ship_str = "You can't kill ship %c%d (%s) status (%s).";
+    static const char *kill_ship_str1 = "Killing ship %c%d (%s).";
+    static const char *kill_ship_str2 = "Killing ship %c%d (%s) user (%s).";
+    static const char *no_user_str = "No such user.";
+    static const char *no_ship_str = "No such ship.";
+    static const char *not_flying_str = "User %s (%s) isn't flying right now.";
     int snum = -1, unum = -1, didany;
     char ssbuf[MSGMAXLINE], mbuf[MSGMAXLINE];
 
@@ -360,7 +360,7 @@ int checkOperExec(msgFrom_t from, uint16_t fromDetail,
 {
     char tmsg[MESSAGE_SIZE], umsg[MESSAGE_SIZE];
     char *p;
-    char *oerror = "/recon, recoff, r[obot], k[ill]";
+    static const char *oerror = "/recon, recoff, r[obot], k[ill]";
     char *cmd, *arg1, *arg2, *arg3;
 
     /* first, if the message isn't to GOD, ignore */

@@ -229,7 +229,7 @@ void procAlloc(cpCommand_t *cmd)
 void procCloak(cpCommand_t *cmd)
 {
     int snum = Context.snum;		/* we always use our own ship */
-    static char *nofuel="Not enough fuel to engage cloaking device.";
+    static const char *nofuel="Not enough fuel to engage cloaking device.";
 
     if (!pktIsValid(CP_COMMAND, cmd))
         return;
@@ -517,7 +517,8 @@ void procCoup(cpCommand_t *cmd)
     int snum = Context.snum;		/* we always use our own ship */
     int i, pnum, now, entertime;
     real failprob;
-    char *nhp="We must be orbiting our home planet to attempt a coup.";
+    static const char *nhp=
+        "We must be orbiting our home planet to attempt a coup.";
     char cbuf[128];
 
     if (!pktIsValid(CP_COMMAND, cmd))
@@ -810,7 +811,8 @@ void procRefit(cpCommand_t *cmd)
     int entertime, now;
     int stype;
     int pnum;
-    static char *wmbio = "We must be orbiting a team owned planet to refit.";
+    static const char *wmbio =
+        "We must be orbiting a team owned planet to refit.";
 
     if (!pktIsValid(CP_COMMAND, cmd))
         return;
@@ -1082,7 +1084,7 @@ void procBomb(cpCommand_t *cmd)
     int oldsshup;
     char buf[MSGMAXLINE];
     char cbuf[BUFFER_SIZE_256];
-    char *lastfew="The last few armies are eluding us.";
+    static const char *lastfew="The last few armies are eluding us.";
 
 
     if (!pktIsValid(CP_COMMAND, cmd))
@@ -1271,7 +1273,8 @@ void procBeam(cpCommand_t *cmd)
     int oldsshup, dirup, zeroed, conqed;
     char cbuf[BUFFER_SIZE_256];
     real rkills;
-    char *lastfew="Fleet orders prohibit removing the last three armies.";
+    static const char *lastfew =
+        "Fleet orders prohibit removing the last three armies.";
 
     if (!pktIsValid(CP_COMMAND, cmd))
         return;

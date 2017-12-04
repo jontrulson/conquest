@@ -32,7 +32,7 @@ int      utModPlusOne( int i, int modulus );
 int      utIsSpecial( char *str, int *what, int *token, int *count );
 void     utStrncpy( char *to, const char *from, unsigned int tosize );
 void     utStrncat( char *to, const char *from, unsigned int tosize );
-int      utStringMatch( char *str1, char *str2, int casesensitive );
+int      utStringMatch( const char *str1, const char *str2, int casesensitive );
 char     *utGetPath(const char *thepath);
 void     utSleep(real seconds);
 bool     utIsDigits(const char *buf);

@@ -43,7 +43,7 @@ static char cbuf[BUFFER_SIZE_256];
 static int nPlayBMenuDisplay(dspConfig_t *);
 static int nPlayBMenuInput(int ch);
 
-static char *nss = NULL;        /* no such ship */
+static const char *nss = NULL;        /* no such ship */
 
 static scrNode_t nPlayBMenuNode = {
     nPlayBMenuDisplay,            /* display */

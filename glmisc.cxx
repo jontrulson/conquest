@@ -55,7 +55,7 @@ int _GLError(const char *funcname, const char *filename, int line)
 
 void mglConqLogo(dspConfig_t *dsp, int mult)
 {
-    static char *Conquest = "CONQUEST";
+    static const char *Conquest = "CONQUEST";
     GLfloat x, y, w, h;
     static int firstime = TRUE;
     static GLint logos[NUMPLAYERTEAMS]; /* texid for each team */

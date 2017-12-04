@@ -56,21 +56,21 @@ static int nTeamlDisplay(dspConfig_t *dsp)
     int godlike;
     char buf[MSGMAXLINE], timbuf[5][MAXDATESIZE];
     real x[5];
-    static char *sfmt="%15s %11s %11s %11s %11s %11s";
-    static char *stats="Statistics since: ";
-    static char *last_conquered="Universe last conquered at: ";
+    static const char *sfmt="%15s %11s %11s %11s %11s %11s";
+    static const char *stats="Statistics since: ";
+    static const char *last_conquered="Universe last conquered at: ";
 
     char tmpfmt[MSGMAXLINE * 2];
     static char sfmt2[MSGMAXLINE * 2];
     static char sfmt3[MSGMAXLINE * 2];
     static char dfmt2[MSGMAXLINE * 2];
     static char pfmt2[MSGMAXLINE * 2];
-    static int FirstTime = TRUE;	/* Only necc if the colors aren't
+    static bool FirstTime = true;	/* Only necc if the colors aren't
                                            going to change at runtime */
 
     if (FirstTime == TRUE)
     {
-        FirstTime = FALSE;
+        FirstTime = false;
         sprintf(sfmt2,
                 "#%d#%%16s #%d#%%11s #%d#%%11s #%d#%%11s #%d#%%11s #%d#%%11s",
                 LabelColor,

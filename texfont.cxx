@@ -108,9 +108,10 @@ getTCVI(TexFont * txf, int c)
     return NULL;
 }
 
-static char *lastError;
+static const int lastErrorSize = 128;
+static char lastError[lastErrorSize];
 
-char *
+const char *
 txfErrorString(void)
 {
     return lastError;
@@ -132,12 +133,12 @@ txfLoadFont(char *filename)
     txf = NULL;
     file = fopen(filename, "rb");
     if (file == NULL) {
-        lastError = "file open failed.";
+        strncpy(lastError, "file open failed.", lastErrorSize);
         goto error;
     }
     txf = (TexFont *) malloc(sizeof(TexFont));
     if (txf == NULL) {
-        lastError = "out of memory.";
+        strncpy(lastError, "out of memory.", lastErrorSize);
         goto error;
     }
     /* For easy cleanup in error case. */
@@ -151,7 +152,7 @@ txfLoadFont(char *filename)
 
     got = fread(fileid, 1, 4, file);
     if (got != 4 || strncmp(fileid, "\377txf", 4)) {
-        lastError = "not a texture font file.";
+        strncpy(lastError, "not a texture font file.", lastErrorSize);
         goto error;
     }
     /*CONSTANTCONDITION*/
@@ -162,10 +163,11 @@ txfLoadFont(char *filename)
     } else if (got == 1 && endianness == 0x78563412) {
         swap = 1;
     } else {
-        lastError = "not a texture font file.";
+        strncpy(lastError, "not a texture font file.", lastErrorSize);
         goto error;
     }
-#define EXPECT(n) if (got != (unsigned long) n) { lastError = "premature end of file."; goto error; }
+#define EXPECT(n) if (got != (unsigned long) n) {  strncpy(lastError, "premature end of file.", lastErrorSize); goto error; }
+
     got = fread(&format, sizeof(int), 1, file);
     EXPECT(1);
     got = fread(&txf->tex_width, sizeof(int), 1, file);
@@ -189,7 +191,7 @@ txfLoadFont(char *filename)
     }
     txf->tgi = (TexGlyphInfo *) malloc(txf->num_glyphs * sizeof(TexGlyphInfo));
     if (txf->tgi == NULL) {
-        lastError = "out of memory.";
+        strncpy(lastError, "out of memory.", lastErrorSize);
         goto error;
     }
     /*CONSTANTCONDITION*/
@@ -207,7 +209,7 @@ txfLoadFont(char *filename)
     txf->tgvi = (TexGlyphVertexInfo *)
         malloc(txf->num_glyphs * sizeof(TexGlyphVertexInfo));
     if (txf->tgvi == NULL) {
-        lastError = "out of memory.";
+        strncpy(lastError, "out of memory.", lastErrorSize);
         goto error;
     }
     w = txf->tex_width;
@@ -260,7 +262,7 @@ txfLoadFont(char *filename)
     txf->lut = (TexGlyphVertexInfo **)
         calloc(txf->range, sizeof(TexGlyphVertexInfo *));
     if (txf->lut == NULL) {
-        lastError = "out of memory.";
+        strncpy(lastError, "out of memory.", lastErrorSize);
         goto error;
     }
     for (i = 0; i < txf->num_glyphs; i++) {
@@ -274,7 +276,7 @@ txfLoadFont(char *filename)
 
             orig = (unsigned char *) malloc(txf->tex_width * txf->tex_height);
             if (orig == NULL) {
-                lastError = "out of memory.";
+                strncpy(lastError, "out of memory.", lastErrorSize);
                 goto error;
             }
             got = fread(orig, 1, txf->tex_width * txf->tex_height, file);
@@ -282,7 +284,7 @@ txfLoadFont(char *filename)
             txf->teximage = (unsigned char *)
                 malloc(2 * txf->tex_width * txf->tex_height);
             if (txf->teximage == NULL) {
-                lastError = "out of memory.";
+                strncpy(lastError, "out of memory.", lastErrorSize);
                 goto error;
             }
             for (i = 0; i < txf->tex_width * txf->tex_height; i++) {
@@ -294,7 +296,7 @@ txfLoadFont(char *filename)
             txf->teximage = (unsigned char *)
                 malloc(txf->tex_width * txf->tex_height);
             if (txf->teximage == NULL) {
-                lastError = "out of memory.";
+                strncpy(lastError, "out of memory.", lastErrorSize);
                 goto error;
             }
             got = fread(txf->teximage, 1, txf->tex_width * txf->tex_height, file);
@@ -307,7 +309,7 @@ txfLoadFont(char *filename)
         stride = (width + 7) >> 3;
         texbitmap = (unsigned char *) malloc(stride * height);
         if (texbitmap == NULL) {
-            lastError = "out of memory.";
+            strncpy(lastError, "out of memory.", lastErrorSize);
             goto error;
         }
         got = fread(texbitmap, 1, stride * height, file);
@@ -316,7 +318,7 @@ txfLoadFont(char *filename)
         if (useLuminanceAlpha) {
             txf->teximage = (unsigned char *) calloc(width * height * 2, 1);
             if (txf->teximage == NULL) {
-                lastError = "out of memory.";
+                strncpy(lastError, "out of memory.", lastErrorSize);
                 goto error;
             }
             for (i = 0; i < height; i++) {
@@ -330,7 +332,7 @@ txfLoadFont(char *filename)
         } else {
             txf->teximage = (unsigned char *) calloc(width * height, 1);
             if (txf->teximage == NULL) {
-                lastError = "out of memory.";
+                strncpy(lastError, "out of memory.", lastErrorSize);
                 goto error;
             }
             for (i = 0; i < height; i++) {
@@ -489,7 +491,7 @@ txfUnloadFont(
 void
 txfGetStringMetrics(
     TexFont * txf,
-    char *string,
+    const char *string,
     int len,
     int *width,
     int *max_ascent,
@@ -546,7 +548,7 @@ txfRenderGlyph(TexFont * txf, int c)
 void
 txfRenderString(
     TexFont * txf,
-    char *string,
+    const char *string,
     int len)
 {
     int i;
@@ -565,7 +567,7 @@ enum {
 void
 txfRenderFancyString(
     TexFont * txf,
-    char *string,
+    const char *string,
     int len)
 {
     int i;

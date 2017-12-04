@@ -42,8 +42,12 @@ static int UpdateCmnBlock = FALSE;
 
 extern int Lineno;
 extern int goterror;
-extern void yyerror(char *s);
 int yylex(void);
+
+void yyerror (char const *s)
+{
+    fprintf (stderr, "%s\n", s);
+}
 %}
 
 
@@ -347,8 +351,8 @@ void displayrun(FILE *filefd)
 {
     int i, j;
     char buf[BUFFER_SIZE_128];
-    char *strat="trstrat";
-    char *vec="trvec";
+    static const char *strat="trstrat";
+    static const char *vec="trvec";
 
     myUtFormatTime( buf, 0 );
 

@@ -503,13 +503,13 @@ static char *_padstr(int l)
 }
 
 
-void hudSetPrompt(int line, char *prompt, int pcolor,
-                  char *buf, int color)
+void hudSetPrompt(int line, const char *prompt, int pcolor,
+                  const char *buf, int color)
 {
     char *str;
-    char *pstr;
+    const char *pstr;
     int pl;
-    char *bstr;
+    const char *bstr;
     int bl;
     const int maxwidth = 80;
 

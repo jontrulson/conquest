@@ -200,8 +200,8 @@ void hudSetTow(int snum);
 void hudSetArmies(int snum);
 void hudSetRobotAction(int snum);
 void hudSetDestruct(int snum);
-void hudSetPrompt(int line, char *prompt, int pcolor,
-                  char *buf, int color);
+void hudSetPrompt(int line, const char *prompt, int pcolor,
+                  const char *buf, int color);
 void hudClearPrompt(int line);
 void hudSetInfoFiringAngle(real blastang);
 void hudSetInfoTarget(int tnum, bool isShip);

@@ -29,7 +29,7 @@
 
 /* send an auth packet and wait for a response (if not CHPWD).
    returns the error code from the ack, or error from write/read */
-int sendAuth(int sock, uint8_t flag, char *login, char *pw)
+int sendAuth(int sock, uint8_t flag, const char *login, const char *pw)
 {
     char buf[PKT_MAXSIZE];
     int rv;
@@ -168,7 +168,7 @@ int sendMessage(msgTo_t to, uint16_t toDetail, char *msg)
         return TRUE;
 }
 
-int clientHello(char *clientname)
+int clientHello(const char *clientname)
 {
     cpHello_t chello;
     char buf[PKT_MAXSIZE];

@@ -26,7 +26,7 @@
 #include "nPlayBMenu.h"
 #include "nShipl.h"
 
-static char *hd2="ship  name          pseudonym              kills     type";
+static const char *hd2="ship  name          pseudonym              kills     type";
 static int fship;
 
 static int nShiplDisplay(dspConfig_t *);

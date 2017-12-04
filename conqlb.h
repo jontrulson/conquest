@@ -12,7 +12,8 @@
 
 #include "protocol.h"
 
-int      clbRegister( char *lname, char *rname, int team, int *unum );
+int      clbRegister( const char *lname, const char *rname,
+                      int team, int *unum );
 void     clbChalkup( int snum );
 void     clbDamage( int snum, real dam, killedBy_t kb, uint16_t detail );
 void     clbDetonate( int snum, int tnum );
@@ -45,7 +46,7 @@ int      clbFindShip( int *snum );
 int      clbFindSpecial( int snum, int token, int count,
                          int *sorpnum, int *xsorpnum );
 void     clbFixDeltas( int snum );
-int      clbGetUserNum( int *unum, char *lname, userTypes_t ltype );
+int      clbGetUserNum( int *unum, const char *lname, userTypes_t ltype );
 void     clbInitEverything(void);
 void     clbInitGame(void);
 void     clbInitMsgs(void);
@@ -65,9 +66,10 @@ void     clbSortUsers( int uv[], int numentries );
 int      clbSPWar( int snum, int pnum );
 int      clbStillAlive( int snum );
 void     clbStoreMsg( msgFrom_t from, uint16_t fromDetail, msgTo_t to,
-                      uint16_t toDetail, char *msg );
+                      uint16_t toDetail, const char *msg );
 void     clbStoreMsgf( msgFrom_t from, uint16_t fromDetail, msgTo_t to,
-                       uint16_t toDetail, char *msg, unsigned char flags );
+                       uint16_t toDetail, const char *msg,
+                       unsigned char flags );
 int      clbUseFuel( int snum, real fuel, int weapon, int forreal );
 void     clbZeroEverything(void);
 void     clbZeroShip( int snum );

@@ -45,7 +45,7 @@ typedef struct _meta_srec {
 
 int  metaBuffer2ServerRec(metaSRec_t *srec, char *buf);
 void metaServerRec2Buffer(char *buf, metaSRec_t *srec);
-int  metaUpdateServer(char *remotehost, char *name, int port);
-int  metaGetServerList(char *remotehost, metaSRec_t **srvlist);
+int  metaUpdateServer(const char *remotehost, const char *name, int port);
+int  metaGetServerList(const char *remotehost, metaSRec_t **srvlist);
 
 #endif /* META_H_INCLUDED */

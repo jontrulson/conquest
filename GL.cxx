@@ -172,7 +172,7 @@ GLTexture_t *getGLTexture(const char *texname)
 }
 
 /* search the cqi animations, and return it's animdef index */
-int findGLAnimDef(char *animname)
+int findGLAnimDef(const char *animname)
 {
     int i;
 

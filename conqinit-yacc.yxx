@@ -54,7 +54,6 @@ static int curDepth = 0;
 
 extern int lineNum;
 extern int goterror;
-extern void yyerror(char *s);
 
 extern int yylex(void);
 
@@ -105,14 +104,18 @@ static void cfgSectionil(int item, int val1, int val2);
 static void cfgSectionf(int item, real val);
 static void cfgSections(int item, char *val);
 static void cfgSectionb(int item, char *val);
-static char *sect2str(int section);
-static char *item2str(int item);
-static char *team2str(int pteam);
+static const char *sect2str(int section);
+static const char *item2str(int item);
+static const char *team2str(int pteam);
 static int str2team(char *str);
 static void initrun(int rcid);
 static void checkStr(char *str);
 static int parsebool(char *str);
 
+void yyerror (char const *s)
+{
+    fprintf (stderr, "%s\n", s);
+}
 
 %}
 
@@ -673,7 +676,7 @@ rational	: TOK_RATIONAL		{ $$ = $1; }
 
 %%
 
-                  /* search the 'public' planet list */
+/* search the 'public' planet list */
 int cqiFindPlanet(char *str)
 {
     int i;
@@ -710,7 +713,7 @@ static int _cqiFindTexture(char *texname)
 }
 
 /* search the public tex area list */
-cqiTextureAreaPtr_t cqiFindTexArea(char *texnm, char *tanm,
+cqiTextureAreaPtr_t cqiFindTexArea(char *texnm, const char *tanm,
                                    cqiTextureAreaPtr_t defaultta)
 {
     int tidx, i;
@@ -1261,7 +1264,7 @@ int cqiLoadRC(int rcid, char *filename, int verbosity, int debugl)
     return (fail) ? FALSE: TRUE;
 }
 
-static char *ptype2str(int ptype)
+static const char *ptype2str(int ptype)
 {
     switch (ptype)
     {
@@ -1330,7 +1333,7 @@ static int str2ptype(char *str)
 }
 
 
-static char *team2str(int pteam)
+static const char *team2str(int pteam)
 {
     switch (pteam)
     {
@@ -2997,7 +3000,7 @@ static void cfgSectionb(int item, char *val)
     return;
 }
 
-static char *sect2str(int section)
+static const char *sect2str(int section)
 {
     switch (section)
     {
@@ -3059,7 +3062,7 @@ static char *sect2str(int section)
     return "UNKNOWN";
 }
 
-static char *item2str(int item)
+static const char *item2str(int item)
 {
     switch (item)
     {

@@ -91,7 +91,7 @@ static void _effect_finished(int channel)
 }
 
 /* search effect list by filename */
-static int cqsFindEffectByFile(char *name)
+static int cqsFindEffectByFile(const char *name)
 {
     int i;
 
@@ -103,7 +103,7 @@ static int cqsFindEffectByFile(char *name)
     return -1;
 }
 
-static int cqsFindMusicByFile(char *name)
+static int cqsFindMusicByFile(const char *name)
 {
     int i;
 
@@ -115,7 +115,7 @@ static int cqsFindMusicByFile(char *name)
     return -1;
 }
 
-int cqsFindEffect(char *name)
+int cqsFindEffect(const char *name)
 {
     int i;
 
@@ -127,7 +127,7 @@ int cqsFindEffect(char *name)
     return -1;
 }
 
-int cqsFindMusic(char *name)
+int cqsFindMusic(const char *name)
 {
     int i;
 
@@ -143,7 +143,7 @@ int cqsFindMusic(char *name)
    first in the users ~/.conquest/sound/ dir (allowing users to override
    the pre-defined samples), then in CONQSHARE/sound.  Return NULL if not
    found */
-static char *_getSoundFile(char *filenm)
+static char *_getSoundFile(const char *filenm)
 {
     char *homevar;
     FILE *fd;

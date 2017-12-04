@@ -20,7 +20,7 @@ typedef int (*dispatchProc_t)(char *);
 typedef struct _packetent {
     uint32_t        pktid;
     uint32_t        size;
-    char           *name;
+    const char      *name;
     dispatchProc_t dispatch;
 } packetEnt_t;
 
@@ -95,17 +95,17 @@ uint16_t pktGetClientProtocolVersion();
 int   pktSetClientProtocolVersion(uint16_t vers);
 void  pktSetSocketFds(int tcpsock, int udpsock);
 
-int   pktSendAck(uint8_t severity, uint8_t code, char *msg);
+int   pktSendAck(uint8_t severity, uint8_t code, const char *msg);
 int   pktIsConnDead(void);
 int   pktNotImpl(char *nothing);
 
 void  pktSetNodelay(void);
 void  pktSetNonBlocking(int enable);
 
-char *pktSeverity2String(int psev);
+const char *pktSeverity2String(int psev);
 
 int   pktWaitForPacket(int type, char *buf, int blen,
-                       int delay, char *nakmsg);
+                       int delay, const char *nakmsg);
 
 int   pktClientPacketSize(int type);
 int   pktServerPacketSize(int type);

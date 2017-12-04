@@ -874,7 +874,7 @@ void utStrncat( char *to, const char *from, unsigned int tosize )
 /*    int matched, utStringMatch, casesensitive */
 /*    char str1(), str2() */
 /*    matched = utStringMatch( str1, str2, casesensitive ) */
-int utStringMatch( char *str1, char *str2, int casesensitive )
+int utStringMatch( const char *str1, const char *str2, int casesensitive )
 {
     int i;
 

@@ -354,7 +354,7 @@ void debugdisplay( int snum )
     int i, j, unum, lin, tcol, dcol;
     real x;
     char buf[MSGMAXLINE];
-    char *torpstr = "???";
+    const char *torpstr = "???";
 
 #define TOFF "OFF"
 #define TLAUNCHING "LAUNCHING"
@@ -651,8 +651,8 @@ void debugplan(void)
     static int sv[MAXPLANETS];
     char junk[10], uninhab[20];
     char hd0[MSGMAXLINE*4];
-    char *hd1="D E B U G G I N G  P L A N E T   L I S T";
-    char *hd2="planet        C T arm uih scan        planet        C T arm uih scan";
+    const char *hd1="D E B U G G I N G  P L A N E T   L I S T";
+    const char *hd2="planet        C T arm uih scan        planet        C T arm uih scan";
     char hd3[BUFFER_SIZE_256];
     int FirstTime = TRUE;
     int PlanetOffset;             /* offset into MAXPLANETS for this page */
@@ -851,15 +851,15 @@ void kiss(int snum, int prompt_flg)
     int i, unum;
     char ch, buf[MSGMAXLINE], mbuf[MSGMAXLINE], ssbuf[MSGMAXLINE];
     int didany;
-    char *prompt_str = "Kill what (<cr> for driver)? ";
-    char *kill_driver_str = "Killing the driver.";
-    char *cant_kill_ship_str = "You can't kill ship %c%d (%s) status (%s).";
-    char *kill_ship_str1 = "Killing ship %c%d (%s).";
-    char *kill_ship_str2 = "Killing ship %c%d (%s) user (%s).";
-    char *nobody_str = "Nobody here but us GODs.";
-    char *no_user_str = "No such user.";
-    char *no_ship_str = "No such ship.";
-    char *not_flying_str = "User %s (%s) isn't flying right now.";
+    static const char *prompt_str = "Kill what (<cr> for driver)? ";
+    static const char *kill_driver_str = "Killing the driver.";
+    static const char *cant_kill_ship_str = "You can't kill ship %c%d (%s) status (%s).";
+    static const char *kill_ship_str1 = "Killing ship %c%d (%s).";
+    static const char *kill_ship_str2 = "Killing ship %c%d (%s) user (%s).";
+    static const char *nobody_str = "Nobody here but us GODs.";
+    static const char *no_user_str = "No such user.";
+    static const char *no_ship_str = "No such ship.";
+    static const char *not_flying_str = "User %s (%s) isn't flying right now.";
 
     /* Find out what to kill. */
     if (prompt_flg)
@@ -1423,8 +1423,8 @@ void opinfo( int snum )
 {
     int i, j;
     char ch;
-    char *pmt="Information on: ";
-    char *huh="I don't understand.";
+    static const char *pmt="Information on: ";
+    static const char *huh="I don't understand.";
 
     cdclrl( MSG_LIN1, 2 );
 
@@ -1476,7 +1476,7 @@ void opinit(void)
 
     int i, lin, col, icol;
     char ch, buf[MSGMAXLINE];
-    char *pmt="Initialize what: ";
+    static const char *pmt="Initialize what: ";
 
 
     cdclear();
@@ -2227,9 +2227,9 @@ void opstats(void)
     char buf[MSGMAXLINE], junk[MSGMAXLINE*2], timbuf[32];
     int ch;
     real x;
-    char *sfmt="#%d#%32s #%d#%12s\n";
-    char *tfmt="#%d#%32s #%d#%20s\n";
-    char *pfmt="#%d#%32s #%d#%11.1f%%\n";
+    static const char *sfmt="#%d#%32s #%d#%12s\n";
+    static const char *tfmt="#%d#%32s #%d#%20s\n";
+    static const char *pfmt="#%d#%32s #%d#%11.1f%%\n";
 
     col = 8;
     cdclear();
@@ -2493,9 +2493,9 @@ void opuedit(void)
     char buf[MSGMAXLINE];
     int ch, left = TRUE;
     char datestr[MAXDATESIZE];
-    static char *prompt2 = "any other key to quit.";
-    static char *rprompt = "Use arrow keys to position, [SPACE] to modify, [TAB] to change password";
-    char *promptptr;
+    static const char *prompt2 = "any other key to quit.";
+    static const char *rprompt =
+        "Use arrow keys to position, [SPACE] to modify, [TAB] to change password";
 
     cdclrl( MSG_LIN1, 2 );
     uiPutColor(InfoColor);
@@ -2746,10 +2746,8 @@ void opuedit(void)
         cprintf(lin,dcol,ALIGN_NONE,"#%d#%0d",InfoColor,
                 cbUsers[unum].stats[USTAT_ENTRIES]);
 
-        promptptr = rprompt;
-
         cprintf(MSG_LIN1,0,ALIGN_CENTER,"#%d#%s", InfoColor,
-                promptptr);
+                rprompt);
         cprintf(MSG_LIN2,0,ALIGN_CENTER,"#%d#%s", InfoColor,
                 prompt2);
 
@@ -3330,8 +3328,8 @@ int prompt_ship(char buf[], int *snum, int *normal)
 {
     int tch;
     int tmpsnum = 0;
-    char *pmt="Watch which ship (<cr> for doomsday)? ";
-    char *nss="No such ship.";
+    static const char *pmt="Watch which ship (<cr> for doomsday)? ";
+    static const char *nss="No such ship.";
 
     tmpsnum = *snum;
 
@@ -3457,7 +3455,7 @@ void dowatchhelp(void)
 void toggle_line(int snum, int old_snum)
 {
 
-    char *frmt_str = "(') = Toggle %s:%s";
+    static const char *frmt_str = "(') = Toggle %s:%s";
     char snum_str[MSGMAXLINE];
     char old_snum_str[MSGMAXLINE];
     char buf[MSGMAXLINE];
@@ -3475,9 +3473,9 @@ void toggle_line(int snum, int old_snum)
 char *build_toggle_str(char *snum_str, int snum)
 {
 
-    static char *doomsday_str = "DM";
-    static char *deathstar_str = "DS";
-    static char *unknown_str = "n/a";
+    static const char *doomsday_str = "DM";
+    static const char *deathstar_str = "DS";
+    static const char *unknown_str = "n/a";
 
     if (snum >= 0 && snum < MAXSHIPS)
     {          /* ship */

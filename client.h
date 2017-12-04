@@ -68,7 +68,8 @@ extern spClientStat_t sClientStat;
 extern spFrame_t      sFrame;
 #endif
 
-int             sendAuth(int sock, uint8_t flag, char *login, char *pw);
+int             sendAuth(int sock, uint8_t flag, const char *login,
+                         const char *pw);
 int             sendSetCourse(int sock, courseLock_t lock, uint16_t lockDetail,
                               real head);
 
@@ -77,7 +78,7 @@ int             sendCommand(uint8_t cmd, uint16_t detail);
 int             sendFireTorps(int num, real dir);
 int             sendMessage(msgTo_t to, uint16_t toDetail, char *msg);
 
-int             clientHello(char *clientname);
+int             clientHello(const char *clientname);
 
 void            sendUDPKeepAlive(uint32_t timebase);
 

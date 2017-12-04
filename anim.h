@@ -183,8 +183,8 @@ GLAnimDef_t *GLAnimDefs = NULL;
 extern GLAnimDef_t *GLAnimDefs;
 #endif
 
-int  findGLAnimDef(char *animname); /* GL.c */
-int  animInitState(char *animname, animStatePtr_t astate,
+int  findGLAnimDef(const char *animname); /* GL.c */
+int  animInitState(const char *animname, animStatePtr_t astate,
                    animDrawStatePtr_t istate);
 void animResetState(animStatePtr_t astate, uint32_t lasttime);
 

@@ -270,7 +270,7 @@ int                 cqiLoadRC(int rcid, char *filename, int verbosity,
                               int debugl);
 
 int                 cqiFindPlanet(char *str);
-cqiTextureAreaPtr_t cqiFindTexArea(char *texnm, char *tanm,
+cqiTextureAreaPtr_t cqiFindTexArea(char *texnm, const char *tanm,
                                    cqiTextureAreaPtr_t defaultta);
 int                 cqiFindEffect(char *str);
 int                 cqiFindMusic(char *str);

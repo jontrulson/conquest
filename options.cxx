@@ -24,8 +24,8 @@
 #include "context.h"
 
 struct compile_options {
-    char *name;
-    char *oneliner;
+    const char *name;
+    const char *oneliner;
     int type;			/* We'll use the CTYPE_*'s from conf.h */
     void *value;
 };
@@ -53,8 +53,8 @@ static void DisplayCompileOptions(void)
     int i, vattrib;
     long j = 0;
     int lin = 0, col = 0;
-    static char *header = "Compile Time Options";
-    static char *prompt = MTXT_DONE;
+    static const char *header = "Compile Time Options";
+    static const char *prompt = MTXT_DONE;
 
     static struct compile_options CompileOptions[] =
         {
@@ -151,14 +151,14 @@ static void DisplayCompileOptions(void)
 
 void SysOptsMenu(void)
 {
-    static char *header = "System Options Menu";
-    static char *mopts[] = {
+    static const char *header = "System Options Menu";
+    static const char *mopts[] = {
         "View compile-time Options",
         "View/Edit System-wide Options"
     };
     const int numoptions = 2;	/* don't exceed 9 - one char input is used */
 
-    static char *prompt = "Enter a number to select an item, any other key to quit.";
+    static const char *prompt = "Enter a number to select an item, any other key to quit.";
     int lin = 0, col = 0;
 
     int i;
@@ -219,14 +219,14 @@ void SysOptsMenu(void)
 
 void UserOptsMenu(int unum)
 {
-    static char *header = "User Options Menu";
-    static char *mopts[] = {
+    static const char *header = "User Options Menu";
+    static const char *mopts[] = {
         "View/Edit Options",
         "View/Edit Macros",
         "Change Password"
     };
     const int numoptions = 3;	/* don't exceed 9 - one char input is used */
-    static char *prompt = "Enter a number to select an item, any other key to quit.";
+    static const char *prompt = "Enter a number to select an item, any other key to quit.";
     int lin = 0, col = 0;
     int i;
     int ch;
@@ -407,7 +407,7 @@ static void ChangeOption(struct Conf *cdata, int lin)
 static void ChangeMacro(int macronum)
 {
     int lin;
-    static char *prmpt2 = "Enter Conquest commands.  ([ENTER] = \\r, [TAB] = \\t)";
+    static const char *prmpt2 = "Enter Conquest commands.  ([ENTER] = \\r, [TAB] = \\t)";
     char buf[MAX_MACRO_LEN + 1];
     char prmpt[BUFFER_SIZE_256];
     int ch;
@@ -445,12 +445,12 @@ static int ViewEditOptions(struct Conf ConfigData[], int ConfSize,
 			   int editable)
 {
     int i, j, k;
-    static char *uheader = "User Configurable Options";
-    static char *sheader = "System-wide Configurable Options";
-    static char *header;
-    static char *eprompt = "Arrow keys to select an item, [SPACE] to change, any other key to quit.";
-    static char *vprompt = MTXT_DONE;
-    static char *eprompt2 = "Type '?' for help on an item.";
+    static const char *uheader = "User Configurable Options";
+    static const char *sheader = "System-wide Configurable Options";
+    static const char *header;
+    static const char *eprompt = "Arrow keys to select an item, [SPACE] to change, any other key to quit.";
+    static const char *vprompt = MTXT_DONE;
+    static const char *eprompt2 = "Type '?' for help on an item.";
     int Done = FALSE;
     int ch;
     int lin = 0, col = 0, flin, llin, clin;
@@ -635,16 +635,16 @@ static int ViewEditOptions(struct Conf ConfigData[], int ConfSize,
 static int ViewEditMacros(struct Conf *ConfigData)
 {
     int i, k;
-    static char *header = "View/Edit Macros";
-    static char *header2fmt = "(Page %d of %d)";
+    static const char *header = "View/Edit Macros";
+    static const char *header2fmt = "(Page %d of %d)";
     static char headerbuf[BUFFER_SIZE_256];
     static char header2buf[BUFFER_SIZE_256];
-    static char *nodef = "<Not Defined>";
-    static char *eprompt = "Arrow keys to select a macro, [SPACE] to change, any other key to quit.";
-    static char *eprompt2 = "Type '?' for help.";
+    static const char *nodef = "<Not Defined>";
+    static const char *eprompt = "Arrow keys to select a macro, [SPACE] to change, any other key to quit.";
+    static const char *eprompt2 = "Type '?' for help.";
     int Done = FALSE;
     int ch, vattrib;
-    char *dispmac;
+    const char *dispmac;
     int lin = 0, col = 0, flin, llin, clin, pages, curpage;
     const int macros_per_page = 18;
     char *macrovec[MAX_MACROS];

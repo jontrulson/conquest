@@ -29,10 +29,10 @@ static key_t ConquestSemID = -1;
 static struct sembuf semops[CONQNUMSEMS];
 #endif
 
-char *semGetName(int what)
+const char *semGetName(int what)
 {
-    static char *LMSGTXT = "LOCKCOMN";
-    static char *LCMNTXT = "LOCKMESG";
+    static const char *LMSGTXT = "LOCKCOMN";
+    static const char *LCMNTXT = "LOCKMESG";
 
     if (what == LOCKMSG)
         return(LMSGTXT);

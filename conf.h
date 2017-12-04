@@ -47,11 +47,11 @@ struct Conf
 {
     int Found;
     int ConfType;
-    char *ConfName;
+    const char *ConfName;
     void *ConfValue;
     int min, max;			/* for CTYPE_NUMERIC, CTYPE_STRING */
-    char *OneLineDesc;
-    char *ConfComment[CONF_MAXCOMMENTS];
+    const char *OneLineDesc;
+    const char *ConfComment[CONF_MAXCOMMENTS];
 };
 
 /* These *must* be 0 and 1 */

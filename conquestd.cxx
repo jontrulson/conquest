@@ -53,7 +53,7 @@ static char cbuf[BUFFER_SIZE_1024]; /* general purpose buffer */
 static char *progName;
 
 static int localOnly = FALSE;   /* whether to only listen on loopback */
-static char *metaServer = META_DFLT_SERVER; /* meta server hostname */
+static const char *metaServer = META_DFLT_SERVER; /* meta server hostname */
 static int updateMeta = FALSE;  /* whether to notify meta server */
 static char *myServerName = NULL; /* to meta */
 

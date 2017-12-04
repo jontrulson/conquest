@@ -31,15 +31,15 @@
 #include "cqsound.h"
 #include "conqutil.h"
 
-static char *if1="Suddenly  a  sinister,  wraithlike  figure appears before you";
-static char *if2="seeming to float in the air.  In a low,  sorrowful  voice  he";
-static char *if3="says, \"Alas, the very nature of the universe has changed, and";
-static char *if4="your ship cannot be found.  All must now pass away.\"  Raising";
-static char *if5="his  oaken  staff  in  farewell,  he fades into the spreading";
-static char *if6="darkness.  In his place appears a  tastefully  lettered  sign";
-static char *if7="reading:";
-static char *if8="INITIALIZATION FAILURE";
-static char *if9="The darkness becomes all encompassing, and your vision fails.";
+static const char *if1="Suddenly  a  sinister,  wraithlike  figure appears before you";
+static const char *if2="seeming to float in the air.  In a low,  sorrowful  voice  he";
+static const char *if3="says, \"Alas, the very nature of the universe has changed, and";
+static const char *if4="your ship cannot be found.  All must now pass away.\"  Raising";
+static const char *if5="his  oaken  staff  in  farewell,  he fades into the spreading";
+static const char *if6="darkness.  In his place appears a  tastefully  lettered  sign";
+static const char *if7="reading:";
+static const char *if8="INITIALIZATION FAILURE";
+static const char *if9="The darkness becomes all encompassing, and your vision fails.";
 
 
 #define S_NONE          0

@@ -689,7 +689,7 @@ void robotloop(void)
 void robreply( char buf[] )
 {
     const int NUMRREPLIES = 60;
-    static char *robreplies[] = {
+    static const char *robreplies[] = {
         "Hey sucker, eat me!",
         "Take off, eh?",
         "Go get some drugs.",

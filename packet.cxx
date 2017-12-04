@@ -511,7 +511,7 @@ void pktSetSocketFds(int tcpsock, int udpsock)
  * string message as well. We always send acks via TCP.
  */
 
-int pktSendAck(uint8_t severity, uint8_t code, char *msg)
+int pktSendAck(uint8_t severity, uint8_t code, const char *msg)
 {
     cpAck_t cack;
     spAck_t sack;
@@ -556,7 +556,7 @@ int pktSendAck(uint8_t severity, uint8_t code, char *msg)
     return(pktWrite(PKT_SENDTCP, buf));
 }
 
-char *pktSeverity2String(int psev)
+const char *pktSeverity2String(int psev)
 {
     switch (psev)
     {
@@ -585,7 +585,7 @@ char *pktSeverity2String(int psev)
 }
 
 int pktWaitForPacket(int type, char *buf, int blen,
-                     int delay, char *nakmsg)
+                     int delay, const char *nakmsg)
 {
     int pkttype;
 

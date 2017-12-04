@@ -25,7 +25,7 @@
 /* ChangePassword() - change a users password - called from UserOptsMenu() */
 void ChangePassword(int unum, int isoper)
 {
-    static char *header = "Change Password";
+    static const char *header = "Change Password";
     char pw[MAXUSERNAME], pwr[MAXUSERNAME], epw[MAXUSERNAME];
     char salt[3];
     int lin = 0, col = 0;

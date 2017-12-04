@@ -32,7 +32,7 @@ extern TexFont *glfFontMsg;
 #define GLF_FONT_F_ORTHO            0x00000004 /* use an ortho projection */
 
 void glfRenderFont(GLfloat x, GLfloat y, GLfloat z, GLfloat w, GLfloat h,
-                   TexFont *font, char *str, int color, GLColor_t *col,
+                   TexFont *font, const char *str, int color, GLColor_t *col,
                    uint32_t flags);
 void glfInitFonts(void);
 

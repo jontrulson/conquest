@@ -121,8 +121,8 @@ extern doomMus_t     cqsDoomsdayMusic;
 #else  /* !(HAVE_SDL && HAVE_SDL_MIXER) */
 /* the real thing */
 void cqsInitSound(void);
-int  cqsFindEffect(char *name);
-int  cqsFindMusic(char *name);
+int  cqsFindEffect(const char *name);
+int  cqsFindMusic(const char *name);
 int  cqsMusicPlay(int musidx, int halt);
 int  cqsMusicStop(int halt);
 int  cqsEffectPlay(int fxidx, cqsHandle *handle, real maxdist,

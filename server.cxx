@@ -335,7 +335,7 @@ int sendTorp(int sock, uint8_t tsnum, uint8_t tnum)
  * the CB ringbuffer and deal with the associated 'lock-hogging' for a
  * busy server.  We will send these immediately and return.
  */
-void sendFeedback(char *msg)
+void sendFeedback(const char *msg)
 {
     char buf[MESSAGE_SIZE + 64];
     Msg_t themsg;

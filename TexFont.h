@@ -52,7 +52,7 @@ typedef struct {
     TexGlyphVertexInfo **lut;
 } TexFont;
 
-extern char *txfErrorString(void);
+extern const char *txfErrorString(void);
 
 extern TexFont *txfLoadFont(
     char *filename);
@@ -70,7 +70,7 @@ extern void txfBindFontTexture(
 
 extern void txfGetStringMetrics(
     TexFont * txf,
-    char *string,
+    const char *string,
     int len,
     int *width,
     int *max_ascent,
@@ -82,12 +82,12 @@ extern void txfRenderGlyph(
 
 extern void txfRenderString(
     TexFont * txf,
-    char *string,
+    const char *string,
     int len);
 
 extern void txfRenderFancyString(
     TexFont * txf,
-    char *string,
+    const char *string,
     int len);
 
 #endif /* __TEXFONT_H__ */

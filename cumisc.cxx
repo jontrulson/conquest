@@ -32,7 +32,7 @@ void mcuHistList( int godlike )
 {
     int i, j, lin, col, fline, lline, thistptr = 0;
     int ch;
-    char *hd0="C O N Q U E S T   U S E R   H I S T O R Y";
+    static const char *hd0="C O N Q U E S T   U S E R   H I S T O R Y";
     char connecttm[BUFFER_SIZE_256];
     char histentrytm[MAXDATESIZE + 1];
     char puname[MAXUSERNAME];
@@ -317,51 +317,12 @@ int mcuKP2DirKey(int *ch)
 }
 
 
-/* display the conquest logo. returns last line number following */
-int mcuConqLogo(void)
-{
-    int col, lin, lenc1;
-    char *c1=" CCC    OOO   N   N   QQQ   U   U  EEEEE   SSSS  TTTTT";
-    char *c2="C   C  O   O  NN  N  Q   Q  U   U  E      S        T";
-    char *c3="C      O   O  N N N  Q   Q  U   U  EEE     SSS     T";
-    char *c4="C   C  O   O  N  NN  Q  Q   U   U  E          S    T";
-    char *c5=" CCC    OOO   N   N   QQ Q   UUU   EEEEE  SSSS     T";
-
-    /* First clear the display. */
-    cdclear();
-
-    /* Display the logo. */
-    lenc1 = strlen( c1 );
-    col = (Context.maxcol-lenc1) / 2;
-    lin = 2;
-    cprintf( lin,col,ALIGN_NONE,"#%d#%s", RedColor | CQC_A_BOLD, c1);
-    lin++;
-    cprintf( lin,col,ALIGN_NONE,"#%d#%s", RedColor | CQC_A_BOLD, c2);
-    lin++;
-    cprintf( lin,col,ALIGN_NONE,"#%d#%s", RedColor | CQC_A_BOLD, c3);
-    lin++;
-    cprintf( lin,col,ALIGN_NONE,"#%d#%s", RedColor | CQC_A_BOLD, c4);
-    lin++;
-    cprintf( lin,col,ALIGN_NONE,"#%d#%s", RedColor | CQC_A_BOLD, c5);
-
-    /* Draw a box around the logo. */
-    lin++;
-    uiPutColor(CQC_A_BOLD);
-    cdbox( 1, col-2, lin, col+lenc1+1 );
-    uiPutColor(0);
-
-    lin++;
-
-    return lin;
-}
-
-
 /*  infoplanet - write out information about a planet */
 /*  SYNOPSIS */
 /*    char str() */
 /*    int pnum, snum */
 /*    mcuInfoPlanet( str, pnum, snum ) */
-void mcuInfoPlanet( char *str, int pnum, int snum )
+void mcuInfoPlanet( const char *str, int pnum, int snum )
 {
     int i, j;
     int godlike, canscan;
@@ -817,9 +778,9 @@ void mcuPlanetList( int team, int snum )
     static int sv[MAXPLANETS];
     int cmd;
     char ch, junk[10];
-    char *hd0="P L A N E T   L I S T   ";
-    char *hd1="' = must take to conquer the Universe)";
-    char *hd2="planet      type team armies          planet      type team armies";
+    static const char *hd0="P L A N E T   L I S T   ";
+    static const char *hd1="' = must take to conquer the Universe)";
+    static const char *hd2="planet      type team armies          planet      type team armies";
     char hd3[BUFFER_SIZE_256];
     int outattr;
     int col2;
@@ -1109,8 +1070,8 @@ void mcuPlayList( int godlike, int doall, int snum )
     char pidbuf[20];
     char ubuf[MAXUSERNAME + 2];
     int ch;
-    char *hd1="ship  name          pseudonym              kills      pid";
-    char *hd2="ship  name          pseudonym              kills     type";
+    static const char *hd1="ship  name          pseudonym              kills      pid";
+    static const char *hd2="ship  name          pseudonym              kills     type";
     killedBy_t kb;
     uint16_t detail;
 
@@ -1371,9 +1332,9 @@ void mcuTeamList( int team )
     int godlike;
     char buf[MSGMAXLINE], timbuf[5][MAXDATESIZE];
     real x[5];
-    char *sfmt="%15s %11s %11s %11s %11s %11s";
-    char *stats="Statistics since: ";
-    char *last_conquered="Universe last conquered at: ";
+    static const char *sfmt="%15s %11s %11s %11s %11s %11s";
+    static const char *stats="Statistics since: ";
+    static const char *last_conquered="Universe last conquered at: ";
 
     char tmpfmt[MSGMAXLINE * 2];
     static char sfmt2[MSGMAXLINE * 2];
@@ -1617,7 +1578,7 @@ void mcuUserList( int godlike, int snum )
     int i, j, unum, nu, fuser, fline, lline, lin;
     static int uvec[MAXUSERS];
     int ch;
-    char *hd1="U S E R   L I S T";
+    static const char *hd1="U S E R   L I S T";
 
     /* init the user vector */
 
@@ -1746,9 +1707,9 @@ void mcuUserStats( int godlike , int snum )
     int i, j, unum, nu, fuser, fline, lline, lin;
     static int uvec[MAXUSERS];
     int ch;
-    char *hd1="M O R E   U S E R   S T A T S";
-    char *hd2="name         cpu  conq coup geno  taken bombed/shot  shots  fired   last entry";
-    char *hd3="planets  armies    phaser  torps";
+    static const char *hd1="M O R E   U S E R   S T A T S";
+    static const char *hd2="name         cpu  conq coup geno  taken bombed/shot  shots  fired   last entry";
+    static const char *hd3="planets  armies    phaser  torps";
 
     for (i=0; i<MAXUSERS; i++)
         uvec[i] = i;
@@ -1876,7 +1837,7 @@ void mcuUserStats( int godlike , int snum )
 /*    ok = mcuConfirm() */
 int mcuConfirm(void)
 {
-    static char *cprompt = "Are you sure? ";
+    static const char *cprompt = "Are you sure? ";
     int scol = ((Context.maxcol - strlen(cprompt)) / 2);
 
     if (mcuAskYN("Are you sure? ", MSG_LIN2, scol))
@@ -1887,7 +1848,7 @@ int mcuConfirm(void)
 }
 
 /*  askyn - ask the user a yes/no question - return TRUE if yes */
-int mcuAskYN(char *question, int lin, int col)
+int mcuAskYN(const char *question, int lin, int col)
 {
     char ch, buf[MSGMAXLINE];
 
@@ -1914,7 +1875,8 @@ int mcuAskYN(char *question, int lin, int col)
 /*    char terms(), buf() */
 /*    int len */
 /*    tch = mcuGetCX( pmt, lin, offset, terms, buf, len ) */
-char mcuGetCX( char *pmt, int lin, int offset, char *terms, char *buf, int len )
+char mcuGetCX( const char *pmt, int lin, int offset, const char *terms,
+               char *buf, int len )
 {
     int i;
 
@@ -1937,7 +1899,7 @@ char mcuGetCX( char *pmt, int lin, int offset, char *terms, char *buf, int len )
 /*    real dir */
 /*    int flag, gettarget */
 /*    flag = mcuGetTarget( pmt, lin, col, dir ) */
-int mcuGetTarget( char *pmt, int lin, int col, real *dir, real cdefault )
+int mcuGetTarget( const char *pmt, int lin, int col, real *dir, real cdefault )
 {
     int i, j;
     char ch, buf[MSGMAXLINE];
@@ -1975,15 +1937,14 @@ int mcuGetTarget( char *pmt, int lin, int col, real *dir, real cdefault )
 /*    char pmt() */
 /*    int spacetyped, more */
 /*    spacetyped = mcuMore( pmt ) */
-int mcuMore( char *pmt )
+int mcuMore( const char *pmt )
 {
     int ch = 0;
-    char *pml=MTXT_MORE;
 
     if ( pmt[0] != 0 )
         mcuPutPrompt( pmt, MSG_LIN2 );
     else
-        mcuPutPrompt( pml, MSG_LIN2 );
+        mcuPutPrompt( MTXT_MORE, MSG_LIN2 );
 
     cdrefresh();
     ch = iogchar();
@@ -1997,12 +1958,12 @@ int mcuMore( char *pmt )
 /*    char file(), errmsg() */
 /*    int ignorecontroll, eatblanklines */
 /*    mcuPageFile( file, errmsg, ignorecontroll, eatblanklines ) */
-void mcuPageFile( char *file, char *errmsg )
+void mcuPageFile( const char *file, const char *errmsg )
 {
 
     int plins = 1;
     FILE *pfd;
-    char *sdone="--- press any key to return ---";
+    static const char *sdone="--- press any key to return ---";
     char buffer[BUFFER_SIZE_256];
     int buflen;
 
@@ -2068,7 +2029,7 @@ void mcuPageFile( char *file, char *errmsg )
 /*    char msg() */
 /*    int line */
 /*    mcuPutMsg( msg, line ) */
-void mcuPutMsg( char *msg, int line )
+void mcuPutMsg( const char *msg, int line )
 {
     cdclrl( line, 1 );
     cdputs( msg, line, 1 );
@@ -2083,7 +2044,7 @@ void mcuPutMsg( char *msg, int line )
 /*    char pmt() */
 /*    int line */
 /*    mcuPutPrompt( pmt, line ) */
-void mcuPutPrompt( char *pmt, int line )
+void mcuPutPrompt( const char *pmt, int line )
 {
     int i, dcol, pcol;
 

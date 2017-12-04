@@ -151,7 +151,7 @@ void display( int snum )
     int colofs[8] = {1, 1, 0, -1, -1, -1, 0, 1};
     cqColor outattr = 0;
     static int OldAlert = 0;
-    static char *dirch="-/|\\-/|\\";
+    static const char *dirch="-/|\\-/|\\";
     char ch, buf[MSGMAXLINE];
     int dobeep, lsmap;
     cqColor palertcol;
@@ -170,7 +170,7 @@ void display( int snum )
     static cqColor DamageAttrib = 0;
 
     static char zbuf[MSGMAXLINE];
-    static char *dstatstr;
+    static const char *dstatstr;
 
     if ( Context.redraw )
     {
@@ -1323,11 +1323,11 @@ void display( int snum )
 void display_headers(int snum)
 {
 
-    char *heading_fmt = "%s %c%d (%s)%s";
-    char *closed_str1 = "GAME CLOSED -";
-    char *robo_str1 = "ROBOT (external)";
-    char *robo_str2 = "ROBOT";
-    char *ship_str1 = "SHIP";
+    static const char *heading_fmt = "%s %c%d (%s)%s";
+    static const char *closed_str1 = "GAME CLOSED -";
+    static const char *robo_str1 = "ROBOT (external)";
+    static const char *robo_str2 = "ROBOT";
+    static const char *ship_str1 = "SHIP";
     char hbuf[MSGMAXLINE];
     char ssbuf[MSGMAXLINE];
 

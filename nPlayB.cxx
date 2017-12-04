@@ -64,7 +64,7 @@ static char cbuf[BUFFER_SIZE_1024];
 
 static int live_ships = TRUE;
 static int old_snum = 1;
-static char *nss = NULL;        /* no such ship */
+static const char *nss = NULL;        /* no such ship */
 
 extern hudData_t hudData;
 
@@ -91,12 +91,12 @@ extern animStateRec_t ncpTorpAnims[NUMPLAYERTEAMS];
 static void set_header(int snum)
 {
 
-    char *heading_fmt = "%s %c%d (%s)%s";
-    char *doom_fmt = "%s (%s)";
-    char *closed_str1 = "GAME CLOSED -";
-    char *robo_str1 = "ROBOT (external)";
-    char *robo_str2 = "ROBOT";
-    char *ship_str1 = "SHIP";
+    static const char *heading_fmt = "%s %c%d (%s)%s";
+    static const char *doom_fmt = "%s (%s)";
+    static const char *closed_str1 = "GAME CLOSED -";
+    static const char *robo_str1 = "ROBOT (external)";
+    static const char *robo_str2 = "ROBOT";
+    static const char *ship_str1 = "SHIP";
     static char hbuf[MSGMAXLINE];
     char ssbuf[MSGMAXLINE];
 

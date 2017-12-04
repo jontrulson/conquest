@@ -235,7 +235,7 @@ void metaServerRec2Buffer(char *buf, metaSRec_t *srec)
 }
 
 /* update the meta server 'remotehost' */
-int metaUpdateServer(char *remotehost, char *name, int port)
+int metaUpdateServer(const char *remotehost, const char *name, int port)
 {
     metaSRec_t sRec;
     int s;
@@ -349,7 +349,7 @@ int metaUpdateServer(char *remotehost, char *name, int port)
    of servers found, or -1 if error */
 #define SERVER_BUFSIZE 1024
 
-int metaGetServerList(char *remotehost, metaSRec_t **srvlist)
+int metaGetServerList(const char *remotehost, metaSRec_t **srvlist)
 {
     static metaSRec_t servers[META_MAXSERVERS];
     struct sockaddr_in sa;

@@ -24,11 +24,11 @@
 #include "cqkeys.h"
 #include "conqutil.h"
 
-static char *header = "Server List";
-static char *header2fmt = "(Page %d of %d)";
+static const char *header = "Server List";
+static const char *header2fmt = "(Page %d of %d)";
 static char headerbuf[BUFFER_SIZE_256];
 static char header2buf[BUFFER_SIZE_256];
-static char *eprompt = "Arrow keys to select, [TAB] or [ENTER] to accept, any other key to quit.";
+static const char *eprompt = "Arrow keys to select, [TAB] or [ENTER] to accept, any other key to quit.";
 
 static const int servers_per_page = 8;
 static int flin, llin, clin, pages, curpage;

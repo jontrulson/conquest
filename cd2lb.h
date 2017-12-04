@@ -15,11 +15,13 @@ void cdclrl ( int f, int n );
 int  cdcols (void);
 void cdend(void);
 void cdfill ( char ch, char buf[], int count );
-int  cdgetn ( char pmt[], int lin, int col, int *num );
-int  cdgets ( char pmt[], int lin, int col, char str[], int maxlen );
-int  cdgetx ( char pmt[], int lin, int col, char terms[], char str[],
+int  cdgetn ( const char pmt[], int lin, int col, int *num );
+int  cdgets ( const char pmt[], int lin, int col, char str[], int maxlen );
+int  cdgetx ( const char pmt[], int lin, int col, const char terms[],
+              char str[],
               int maxlen, int doecho );
-int  cdgetp ( char pmt[], int lin, int col, char terms[], char str[],
+int  cdgetp ( const char pmt[], int lin, int col, const char terms[],
+              char str[],
               int maxlen, int *append_flg, int do_append_flg, int doecho );
 void cdinit(void);
 void cdline ( int lin1, int col1, int lin2, int col2 );
@@ -28,10 +30,10 @@ void cdmove ( int lin, int col );
 void cdmovtc ( char ibuf[], char obuf[], char trntbl[], int count );
 void cdrefresh ( void );
 void cdput ( char ch, int lin, int col );
-void cdputc ( char str[], int lin );
+void cdputc ( const char str[], int lin );
 void cdputn ( int iint, int wid, int lin, int col );
 void cdputr ( real x, int wid, int lin, int col );
-void cdputs ( char str[], int lin, int col );
+void cdputs ( const char str[], int lin, int col );
 void cdredo(void);
 
 #endif /* _CD2LB_H */

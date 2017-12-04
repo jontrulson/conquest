@@ -119,7 +119,7 @@ static real lastphase;
 static char cbuf[BUFFER_SIZE_1024];
 static char pbuf[BUFFER_SIZE_1024];
 
-static char *abt = "...aborted...";
+static const char *abt = "...aborted...";
 
 static int dostats = FALSE;     /* whether to display rendering stats */
 
@@ -496,7 +496,7 @@ static void _infoship( int snum, int scanner )
 
 
 
-static void _infoplanet( char *str, int pnum, int snum )
+static void _infoplanet( const char *str, int pnum, int snum )
 {
     int i, j;
     int godlike, canscan;
@@ -998,9 +998,9 @@ static void _dodistress(char *buf, char ch)
 static int _chkrefit(void)
 {
     int snum = Context.snum;
-    static char *ntp="We must be orbiting a team owned planet to refit.";
-    static char *nek="You must have at least one kill to refit.";
-    static char *cararm="You cannot refit while carrying armies";
+    static const char *ntp="We must be orbiting a team owned planet to refit.";
+    static const char *nek="You must have at least one kill to refit.";
+    static const char *cararm="You cannot refit while carrying armies";
 
     hudClearPrompt(MSG_LIN2);
 
@@ -1036,7 +1036,7 @@ static int _chkcoup(void)
 {
     int snum = Context.snum;
     int i, pnum;
-    char *nhp="We must be orbiting our home planet to attempt a coup.";
+    const char *nhp="We must be orbiting our home planet to attempt a coup.";
 
     hudClearPrompt(MSG_LIN2);
 
@@ -1133,8 +1133,8 @@ static void _domsgto(char *buf, int ch, int terse)
 {
     int i, j;
     static char tbuf[MESSAGE_SIZE];
-    char *nf="Not found.";
-    char *huh="I don't understand.";
+    const char *nf="Not found.";
+    const char *huh="I don't understand.";
     int editing;
     static msgTo_t to = MSG_TO_NOONE;
     static uint16_t toDetail = 0;
@@ -1330,6 +1330,8 @@ static void _domsgto(char *buf, int ch, int terse)
 static void _domsg(char *msg, int ch, int irv)
 {
     static char mbuf[MSGMAXLINE];
+    static char pbuf[MSGMAXLINE];
+    static char buf[MSGMAXLINE];
     char *cptr;
     int len = strlen(msg);
 
@@ -1349,8 +1351,10 @@ static void _domsg(char *msg, int ch, int irv)
             sprintf(mbuf, "%s -", msg);
 
             cptr++;
-            strcpy(prm.pbuf, "- ");
-            sprintf(prm.buf, "%s%c", cptr, ch);
+            strcpy(pbuf, "- ");
+            sprintf(buf, "%s%c", cptr, ch);
+            prm.pbuf = pbuf;
+            prm.buf = buf;
             hudSetPrompt(prm.index, prm.pbuf, NoColor, prm.buf, CyanColor);
 
             sendMessage(msgto, msgtoDetail, mbuf);
@@ -1360,9 +1364,11 @@ static void _domsg(char *msg, int ch, int irv)
 
             strcpy(mbuf, msg);
 
-            strcpy(prm.pbuf, "- ");
-            prm.buf[0] = ch;
-            prm.buf[1] = 0;
+            strcpy(pbuf, "- ");
+            buf[0] = ch;
+            buf[1] = 0;
+            prm.pbuf = pbuf;
+            prm.buf = buf;
             hudSetPrompt(prm.index, prm.pbuf, NoColor, prm.buf, CyanColor);
             sendMessage(msgto, msgtoDetail, mbuf);
         }
@@ -1722,7 +1728,7 @@ static void _initbeam()
     int snum = Context.snum;
     int pnum, capacity, i;
     real rkills;
-    char *lastfew="Fleet orders prohibit removing the last three armies.";
+    const char *lastfew="Fleet orders prohibit removing the last three armies.";
 
     hudClearPrompt(MSG_LIN1);
     hudClearPrompt(MSG_LIN2);
