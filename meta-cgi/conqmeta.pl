@@ -8,7 +8,7 @@ use IO::Socket::INET;
 use HTML::Template;
 use strict;
 
-my $host = "nomad";
+my $host = "conquest.radscan.com";
 my $port = "1700";
 my $tmpl = new HTML::Template( filename => "$ENV{DOCUMENT_ROOT}/templates/conqserv.tmpl",
                                no_includes => 1 );
