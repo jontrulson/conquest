@@ -1666,7 +1666,7 @@ texture {
   texarea {
     name       "damagen"
     x          208.0
-<    y          215.0
+    y          215.0
     w          38.0
     h          30.0
   }
