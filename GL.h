@@ -106,6 +106,7 @@ void drawNEB(int snum);
 float getFPS(void);
 
 void drawLine(GLfloat x, GLfloat y, GLfloat len, GLfloat lw);
+void drawCircle(float cx, float cy, float r, int num_segments);
 void drawLineBox(GLfloat x, GLfloat y, GLfloat z,
                  GLfloat w, GLfloat h, int color,
                  GLfloat lw);

@@ -12,6 +12,7 @@
 #include "conf.h"
 #include "cb.h"
 #include "conqlb.h"
+#include "conqutil.h"
 #include "gldisplay.h"
 #include "node.h"
 #include "client.h"
@@ -1440,6 +1441,7 @@ void renderHud(int dostats)
     return;
 }
 
+
 void renderViewer(int dovbg, int dobomb)
 {
     /* setup the proper viewport and projection matrix for the viewer */
@@ -1452,13 +1454,60 @@ void renderViewer(int dovbg, int dobomb)
     glMatrixMode(GL_MODELVIEW);
 
     drawViewerBG(Context.snum, dovbg);
+
+    // draw the tactical grid if desired (benether everything else
+    // after the background.
+    if (UserConf.DoTacBkg)
+    {
+        // draw 10 circles at 1000 CU spaced intervals around your
+        // ship (tactical grid)
+
+        float alpha = float(UserConf.DoTacShade) / 100.0;
+
+        glLineWidth(2.0);
+
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        glEnable(GL_BLEND);
+
+        for (int i=1; i<=10; i++)
+        {
+            switch(i)
+            {
+            case 1: // red alert/phaser range, 1000 CU's
+                glColor4f(0.3, 0.0, 0.0, alpha);
+                break;
+            case 2: // yellow, 2000 CU's
+                glColor4f(0.3, 0.3, 0.0, alpha);
+                break;
+            case 3: // green, 3000 CU's
+                glColor4f(0.0, 0.3, 0.0, alpha);
+                break;
+            case 10: // cyan - last ring, 10000 CU's
+                glColor4f(0.0, 0.3, 0.3, alpha);
+                break;
+            default: // grey for rest, every 1000 CU's afterward up to 10000
+                glColor4f(0.2, 0.2, 0.2, alpha);
+                break;
+            }
+
+            drawCircle(0, 0,
+                cu2GLSize(1000 * i, (SMAP(Context.snum) ? MAP_FAC : SCALE_FAC)),
+                100);
+        }
+
+        glDisable(GL_BLEND);
+    }
+
+    // negative energy barrier
     drawNEB(Context.snum);
 
+    // the universe
     display( Context.snum );
 
     /* if we're faking it, (nCP.c), do it */
     if (dobomb)
         drawBombing(Context.snum, (SMAP(Context.snum) ? MAP_FAC : SCALE_FAC));
+
 
 #if 0                           /* TEST GRID */
     {

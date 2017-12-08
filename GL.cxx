@@ -934,6 +934,37 @@ void drawLine(GLfloat x, GLfloat y, GLfloat len, GLfloat lw)
     return;
 }
 
+// Draw a circle.  This algorithm came from:
+//
+// http://slabode.exofire.net/circle_draw.shtml
+//
+// It works well.  I think we could make it way faster if we used
+// a vertex array...
+void drawCircle(float cx, float cy, float r, int num_segments)
+{
+    float theta = 2 * 3.1415926 / float(num_segments);
+    float c = cosf(theta);//precalculate the sine and cosine
+    float s = sinf(theta);
+    float t;
+
+    float x = r;                // we start at angle = 0
+    float y = 0;
+
+    glBegin(GL_LINE_LOOP);
+    for(int ii = 0; ii < num_segments; ii++)
+    {
+        glVertex3f(x + cx, y + cy, TRANZ); // always draw at z = TRANZ
+
+        // apply the rotation matrix
+        t = x;
+        x = c * x - s * y;
+        y = s * t + c * y;
+    }
+    glEnd();
+}
+
+
+
 void drawLineBox(GLfloat x, GLfloat y, GLfloat z,
                  GLfloat w, GLfloat h, int color,
                  GLfloat lw)
@@ -2766,7 +2797,7 @@ void drawViewerBG(int snum, int dovbg)
         }
     }
 
-    if (!dovbg && !(UserConf.DoTacBkg && SMAP(snum)))
+    if (!dovbg)
         return;
 
     if (SMAP(snum) && !UserConf.DoLocalLRScan)
@@ -2821,41 +2852,6 @@ void drawViewerBG(int snum, int dovbg)
 
         glTexCoord2f(0.0f, 0.0f);
         glVertex3f(x, y2, z); /* ul */
-
-        glEnd();
-    }
-
-    if (UserConf.DoTacBkg && SMAP(snum))
-    {                           /* draw tac? */
-        glLoadIdentity();
-
-        glTranslatef(0.0, 0.0, -1.0);
-
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE);
-
-        sizeb = 0.990;
-
-        glBindTexture(GL_TEXTURE_2D,
-                      GLTEX_ID(GLShips[cbShips[snum].team][cbShips[snum].shiptype].tac));
-
-        glColor4f(1.0, 1.0, 1.0, UserConf.DoTacShade/100.0);
-
-
-        glBegin(GL_POLYGON);
-
-        rx = ry = 0.0 - (sizeb / 2.0);
-
-        glTexCoord2f(0.0f, 0.0f);
-        glVertex3f(rx, ry, 0.0);
-
-        glTexCoord2f(1.0f, 0.0f);
-        glVertex3f(rx + sizeb, ry, 0.0);
-
-        glTexCoord2f(1.0f, 1.0f);
-        glVertex3f(rx + sizeb, ry + sizeb, 0.0);
-
-        glTexCoord2f(0.0f, 1.0f);
-        glVertex3f(rx, ry + sizeb, 0.0);
 
         glEnd();
     }
