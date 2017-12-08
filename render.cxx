@@ -782,7 +782,7 @@ static void renderShieldCharge(void)
 
 
 /* This is Cat's icon hud */
-void renderHud(int dostats)
+void renderHud(bool dostats)
 {				/* assumes context is current*/
     const int bufSize = 128; // make the same as the size of sbuf,
                              // ibuf, and fbuf.

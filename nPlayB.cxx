@@ -219,7 +219,7 @@ static int nPlayBDisplay(dspConfig_t *dsp)
     /* Main/Hud */
     set_header(Context.snum);
     set_rectime();
-    renderHud(FALSE);
+    renderHud(false);
 
     if (recMsg.msgbuf[0])
     {

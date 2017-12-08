@@ -121,7 +121,7 @@ static char pbuf[BUFFER_SIZE_1024];
 
 static const char *abt = "...aborted...";
 
-static int dostats = FALSE;     /* whether to display rendering stats */
+static bool _dostats = false;     /* whether to display rendering stats */
 
 extern hudData_t hudData;
 
@@ -2731,7 +2731,7 @@ static int nCPDisplay(dspConfig_t *dsp)
     renderViewer(UserConf.doVBG, dobombing);
 
     /* Main/Hud */
-    renderHud(dostats);
+    renderHud(_dostats);
 
     /* draw the overlay bg if active */
     mglOverlayQuad();
@@ -2973,23 +2973,22 @@ static int nCPInput(int ch)
     real x;
     int snum = Context.snum;
 
-    if ((CQ_CHAR(ch) == 'B' || CQ_CHAR(ch) == 'b') &&
-        CQ_MODIFIER(ch) & CQ_KEY_MOD_ALT)
+    // CTRL-B, background star texture
+    if (CQ_CHAR(ch) == 0x02)
     {
         UserConf.doVBG = !UserConf.doVBG;
         return NODE_OK;
     }
 
-    /* display render/comm stats */
-    if ((CQ_CHAR(ch) == 'S' || CQ_CHAR(ch) == 's') &&
-        CQ_MODIFIER(ch) & CQ_KEY_MOD_ALT)
+    /* CTRL-S, display render/comm stats */
+    if (CQ_CHAR(ch) == 0x13)
     {
-        dostats = !dostats;
+        _dostats = !_dostats;
         return NODE_OK;
     }
 
-    if ((CQ_CHAR(ch) == 'G' || CQ_CHAR(ch) == 'g') &&
-        CQ_MODIFIER(ch) & CQ_KEY_MOD_ALT)
+    /* CTRL-G, toggle tac grid on/off */
+    if (CQ_CHAR(ch) == 0x07)
     {
         UserConf.DoTacBkg = !UserConf.DoTacBkg;
         return NODE_OK;
