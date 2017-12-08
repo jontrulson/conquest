@@ -57,7 +57,6 @@ void setUserConfDefaults(void)
     UserConf.Terse = FALSE;
     UserConf.DoExplode = TRUE;
     UserConf.MessageBell = TRUE;
-    UserConf.NoColor = FALSE;
     UserConf.NoRobotMsgs = FALSE;
 
     UserConf.UpdatesPerSecond = 10;

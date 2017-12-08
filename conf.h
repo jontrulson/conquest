@@ -71,9 +71,6 @@ typedef struct _userConf {
     /* Whether to beep on an incoming message */
     int MessageBell;
 
-    /* Whether or not to disable color */
-    int NoColor;
-
     /* whether or not you want to see robot msgs */
     int NoRobotMsgs;
 
@@ -193,7 +190,7 @@ typedef struct _sysConf {
 #ifdef NOEXTERN_CONF
 // current version of the conquestrc file, just change date for newer
 // versions.
-static const char *CONF_REVISION = "20171207";
+static const char *CONF_REVISION = "20171208";
 
 const char *ConfigVersion = CONF_REVISION;
 /* Config's */
@@ -572,19 +569,6 @@ struct Conf ConfData[] =
         {
             "# define this as 'true' if you want beeps when a message is",
             "#  delivered to your ship.   Default: true",
-            NULL
-        }
-    },
-    {
-        FALSE,
-        CTYPE_BOOL,
-        "no_color=",
-        &UserConf.NoColor,
-        0, 0,			/* mix/max */
-        "Disable color, even if your terminal/terminfo entry supports it",
-        {
-            "# define this as 'true' if you never want to see color,",
-            "#  even if your terminal supports it.  Default: false",
             NULL
         }
     },

@@ -67,7 +67,7 @@ void uiPutColor(cqColor color)
 /* initialize color variables.  assumes curses has been initialized. */
 void uiInitColors(void)
 {
-    if (has_colors() && UserConf.NoColor == FALSE)
+    if (has_colors())
         Context.hascolor = TRUE;
     else
         Context.hascolor = FALSE;
