@@ -111,7 +111,7 @@ typedef struct _userConf {
     /* (I)nfo cmds return ETA data? */
     int DoETAStats;
 
-    /* for the GL client only - draws a red box around enemy ships */
+    /* draws a red box around enemy ships */
     int EnemyShipBox;
 
     /* draw the background in the viewer? */
@@ -644,7 +644,7 @@ struct Conf ConfData[] =
         "do_draw_viewerbg=",
         &UserConf.doVBG,
         0, 0,			/* mix/max */
-        "Draw the background image in the viewer(GL client only)",
+        "Draw the background image in the viewer",
         {
             "# define this as 'true' if you want to see the rather attractive",
             "#  background image displayed in the viewer.  ",
@@ -736,7 +736,6 @@ struct Conf ConfData[] =
         {
             "# Mouse macro definitions.  Same general format as Macros.",
             "# These only work when in the game and you click within the viewer.",
-            "# GL client only.",
             "#",
             "#  'mouse_[s|c|a]N=<string>'",
             "#  s, c, and a are optional modifiers and represent:",
