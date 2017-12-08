@@ -48,7 +48,7 @@ struct Conf
     int Found;
     int ConfType;
     const char *ConfName;
-    void *ConfValue;
+    const void *ConfValue;
     int min, max;			/* for CTYPE_NUMERIC, CTYPE_STRING */
     const char *OneLineDesc;
     const char *ConfComment[CONF_MAXCOMMENTS];
@@ -190,16 +190,17 @@ typedef struct _sysConf {
 } SysConf_t;
 
 
-/* Revision on conquestrc file */
-/* - for updating conquestrc   */
-/*   when something changes */
 #ifdef NOEXTERN_CONF
-char              ConfigVersion[] = "$Revision$";
+// current version of the conquestrc file, just change date for newer
+// versions.
+static const char *CONF_REVISION = "20171207";
+
+const char *ConfigVersion = CONF_REVISION;
 /* Config's */
 UserConf_t        UserConf;
 SysConf_t         SysConf;
 #else
-extern char       ConfigVersion[];
+extern const char ConfigVersion[];
 /* Config's */
 extern UserConf_t UserConf;
 extern SysConf_t  SysConf;
@@ -757,9 +758,13 @@ struct Conf ConfData[] =
         "do_tac_bkg=",
         &UserConf.DoTacBkg,
         0, 0,
-        "Display tactical display background image",
+        "Display circular tactical grid",
         {
-            "# define this as 'true' if you want a tactical LR gauge",
+            "# define this as 'true' if you want a circular tactical grid",
+            "#  super-imposed on your short and long range displays.  It is",
+            "#  drawn as 10 concentric circles, each 1000 CU's apart,",
+            "#  centered on your ship.  It can also be toggled on and off",
+            "#  at any time with ALT-G while playing.",
             "#  Default: false",
             NULL
         }
@@ -770,9 +775,10 @@ struct Conf ConfData[] =
         "do_tac_shade=",
         &UserConf.DoTacShade,
         1, 100,                      /* min/max */
-        "Tactical display background shade (1-100)",
+        "Tactical grid transparency (1-100)",
         {
-            "# If tactical background is true, this will be the shade alpha",
+            "# If tactical background grid is true, this will be the ",
+            "#  transparency (alpha) of the grid.  Lower is more transparent.",
             "#  valid values 1 - 100",
             "#  Default: 50",
             NULL
