@@ -437,7 +437,7 @@ static int initGLExplosions(void)
     return TRUE;
 }
 
-static GLTexture_t *_get_ship_tex(char *name)
+static GLTexture_t *_get_tex(const char *name)
 {
     GLTexture_t *tex;
 
@@ -452,7 +452,7 @@ static GLTexture_t *_get_ship_tex(char *name)
     return &defaultTexture;
 }
 
-/* initialize the GLShips array */
+/* initialize the GLShips array.  We also load the tac ring colors here too. */
 static int initGLShips(void)
 {
     int i, j;
@@ -475,82 +475,87 @@ static int initGLShips(void)
         {
             snprintf(buffer, CQI_NAMELEN, "%s%c%c", shipPfx,
                      cbShipTypes[j].name[0], cbShipTypes[j].name[1]);
-            GLShips[i][j].ship = _get_ship_tex(buffer);
+            GLShips[i][j].ship = _get_tex(buffer);
 
             snprintf(buffer, CQI_NAMELEN, "%s%c%c-sh", shipPfx,
                      cbShipTypes[j].name[0], cbShipTypes[j].name[1]);
-            GLShips[i][j].sh = _get_ship_tex(buffer);
-
-            snprintf(buffer, CQI_NAMELEN, "%s-tac", shipPfx);
-            GLShips[i][j].tac = _get_ship_tex(buffer);
+            GLShips[i][j].sh = _get_tex(buffer);
 
             snprintf(buffer, CQI_NAMELEN, "%s-phaser", shipPfx);
-            GLShips[i][j].phas = _get_ship_tex(buffer);
+            GLShips[i][j].phas = _get_tex(buffer);
 
             snprintf(buffer, CQI_NAMELEN, "%s%c%c-ico", shipPfx,
                      cbShipTypes[j].name[0], cbShipTypes[j].name[1]);
-            GLShips[i][j].ico = _get_ship_tex(buffer);
+            GLShips[i][j].ico = _get_tex(buffer);
 
             snprintf(buffer, CQI_NAMELEN, "%s%c%c-ico-sh", shipPfx,
                      cbShipTypes[j].name[0], cbShipTypes[j].name[1]);
-            GLShips[i][j].ico_sh = _get_ship_tex(buffer);
+            GLShips[i][j].ico_sh = _get_tex(buffer);
 
             snprintf(buffer, CQI_NAMELEN, "%s-ico-torp", shipPfx);
-            GLShips[i][j].ico_torp = _get_ship_tex(buffer);
+            GLShips[i][j].ico_torp = _get_tex(buffer);
 
             snprintf(buffer, CQI_NAMELEN, "%s-ico-decal1", shipPfx);
-            GLShips[i][j].decal1 = _get_ship_tex(buffer);
+            GLShips[i][j].decal1 = _get_tex(buffer);
 
             snprintf(buffer, CQI_NAMELEN, "%s-ico-decal1-lamp-sh", shipPfx);
-            GLShips[i][j].decal1_lamp_sh = _get_ship_tex(buffer);
+            GLShips[i][j].decal1_lamp_sh = _get_tex(buffer);
 
             snprintf(buffer, CQI_NAMELEN, "%s-ico-decal1-lamp-hull", shipPfx);
-            GLShips[i][j].decal1_lamp_hull = _get_ship_tex(buffer);
+            GLShips[i][j].decal1_lamp_hull = _get_tex(buffer);
 
             snprintf(buffer, CQI_NAMELEN, "%s-ico-decal1-lamp-fuel", shipPfx);
-            GLShips[i][j].decal1_lamp_fuel = _get_ship_tex(buffer);
+            GLShips[i][j].decal1_lamp_fuel = _get_tex(buffer);
 
             snprintf(buffer, CQI_NAMELEN, "%s-ico-decal1-lamp-eng", shipPfx);
-            GLShips[i][j].decal1_lamp_eng = _get_ship_tex(buffer);
+            GLShips[i][j].decal1_lamp_eng = _get_tex(buffer);
 
             snprintf(buffer, CQI_NAMELEN, "%s-ico-decal1-lamp-wep", shipPfx);
-            GLShips[i][j].decal1_lamp_wep = _get_ship_tex(buffer);
+            GLShips[i][j].decal1_lamp_wep = _get_tex(buffer);
 
             snprintf(buffer, CQI_NAMELEN, "%s-ico-decal1-lamp-rep", shipPfx);
-            GLShips[i][j].decal1_lamp_rep = _get_ship_tex(buffer);
+            GLShips[i][j].decal1_lamp_rep = _get_tex(buffer);
 
             snprintf(buffer, CQI_NAMELEN, "%s-ico-decal1-lamp-cloak",
                      shipPfx);
-            GLShips[i][j].decal1_lamp_cloak = _get_ship_tex(buffer);
+            GLShips[i][j].decal1_lamp_cloak = _get_tex(buffer);
 
             snprintf(buffer, CQI_NAMELEN, "%s-ico-decal1-lamp-tow", shipPfx);
-            GLShips[i][j].decal1_lamp_tow = _get_ship_tex(buffer);
+            GLShips[i][j].decal1_lamp_tow = _get_tex(buffer);
 
             snprintf(buffer, CQI_NAMELEN, "%s-ico-decal2", shipPfx);
-            GLShips[i][j].decal2 = _get_ship_tex(buffer);
+            GLShips[i][j].decal2 = _get_tex(buffer);
 
             snprintf(buffer, CQI_NAMELEN, "%s-dial", shipPfx);
-            GLShips[i][j].dial = _get_ship_tex(buffer);
+            GLShips[i][j].dial = _get_tex(buffer);
 
             snprintf(buffer, CQI_NAMELEN, "%s-dialp", shipPfx);
-            GLShips[i][j].dialp = _get_ship_tex(buffer);
+            GLShips[i][j].dialp = _get_tex(buffer);
 
             snprintf(buffer, CQI_NAMELEN, "%s-warp", shipPfx);
-            GLShips[i][j].warp = _get_ship_tex(buffer);
+            GLShips[i][j].warp = _get_tex(buffer);
 
             snprintf(buffer, CQI_NAMELEN, "%s-warp2", shipPfx);
-            GLShips[i][j].warp2 = _get_ship_tex(buffer);
+            GLShips[i][j].warp2 = _get_tex(buffer);
 
             /* here we just want the color, but we get a whole tex anyway */
             snprintf(buffer, CQI_NAMELEN, "%s-warp-col", shipPfx);
-            GLShips[i][j].warpq_col = _get_ship_tex(buffer);
+            GLShips[i][j].warpq_col = _get_tex(buffer);
 
             /* if we failed to find some of them, you'll see soon enough. */
         }
     }
 
-    return TRUE;
+    // Load and initialize the tactical ring colors
 
+    // 1K ring
+    tacRing1K = _get_tex("tac-ring1k");
+    tacRing2K = _get_tex("tac-ring2k");
+    tacRing3K = _get_tex("tac-ring3k");
+    tacRingXK = _get_tex("tac-ringxk");
+    tacRing10K = _get_tex("tac-ring10k");
+
+    return TRUE;
 }
 
 /* figure out the texture, color, and size info for a planet */
@@ -940,25 +945,25 @@ void drawLine(GLfloat x, GLfloat y, GLfloat len, GLfloat lw)
 //
 // It works well.  I think we could make it way faster if we used
 // a vertex array...
-void drawCircle(float cx, float cy, float r, int num_segments)
+void drawCircle(float x, float y, float r, int num_segments)
 {
     float theta = 2 * 3.1415926 / float(num_segments);
     float c = cosf(theta);//precalculate the sine and cosine
     float s = sinf(theta);
     float t;
 
-    float x = r;                // we start at angle = 0
-    float y = 0;
+    float xx = r;                // we start at angle = 0
+    float yy = 0;
 
     glBegin(GL_LINE_LOOP);
-    for(int ii = 0; ii < num_segments; ii++)
+    for (int ii = 0; ii < num_segments; ii++)
     {
-        glVertex3f(x + cx, y + cy, TRANZ); // always draw at z = TRANZ
+        glVertex3f(xx + x, yy + y, TRANZ); // always draw at z = TRANZ
 
         // apply the rotation matrix
-        t = x;
-        x = c * x - s * y;
-        y = s * t + c * y;
+        t = xx;
+        xx = c * xx - s * yy;
+        yy = s * t + c * yy;
     }
     glEnd();
 }

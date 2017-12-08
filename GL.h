@@ -16,7 +16,6 @@
 typedef struct _glship {
     GLTexture_t *ship;             /* main ship texture */
     GLTexture_t *sh;               /* main ship shield texture */
-    GLTexture_t *tac;              /* team tactical grid */
     GLTexture_t *phas;             /* phaser */
     GLTexture_t *ico;              /* ship icon */
     GLTexture_t *ico_sh;           /* icon shields id */
@@ -80,6 +79,9 @@ GLTexture_t defaultTexture;
  */
 uint32_t GLGeoChange = 0;
 
+// tactical ring colors
+GLTexture_t *tacRing1K, *tacRing2K, *tacRing3K, *tacRingXK, *tacRing10K;
+
 #else
 extern GLShip_t GLShips[NUMPLAYERTEAMS][MAXNUMSHIPTYPES];
 
@@ -87,6 +89,7 @@ extern GLfloat  scaleFactorsLR[10];
 extern GLfloat  scaleFactorsSR[10];
 extern const GLTexture_t defaultTexture;
 extern const uint32_t GLGeoChange;
+extern GLTexture_t *tacRing1K, *tacRing2K, *tacRing3K, *tacRingXK, *tacRing10K;
 #endif
 
 void drawPlanet( GLfloat x, GLfloat y, int pnum, int scale,
@@ -106,7 +109,7 @@ void drawNEB(int snum);
 float getFPS(void);
 
 void drawLine(GLfloat x, GLfloat y, GLfloat len, GLfloat lw);
-void drawCircle(float cx, float cy, float r, int num_segments);
+void drawCircle(float x, float y, float r, int num_segments);
 void drawLineBox(GLfloat x, GLfloat y, GLfloat z,
                  GLfloat w, GLfloat h, int color,
                  GLfloat lw);

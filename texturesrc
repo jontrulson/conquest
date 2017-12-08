@@ -148,6 +148,49 @@ texture {
   color        "ffff8002"
 }
 
+# Colors for the circular tactical grid
+#
+#######################################
+
+# red alert/phaser range, 1000 CU's
+texture {
+  name         "tac-ring1k"
+  filename     ""  # storing a color only
+
+  color        "ff4c0000"
+}
+
+# yellow, 2000 CU's
+texture {
+  name         "tac-ring2k"
+  filename     ""  # storing a color only
+
+  color        "ff4c4c00"
+}
+
+# green, 3000 CU's
+texture {
+  name         "tac-ring3k"
+  filename     ""  # storing a color only
+
+  color        "ff004c00"
+}
+
+# grey - rings 4-9 (4-9 CU's)
+texture {
+  name         "tac-ringxk"
+  filename     ""  # storing a color only
+
+  color        "ff333333"
+}
+
+# cyan, last ring 10K CU's
+texture {
+  name         "tac-ring10k"
+  filename     ""  # storing a color only
+
+  color        "ff004c4c"
+}
 
 # team specific logos
 #
@@ -236,13 +279,6 @@ texture {
   color        "ffffffff"
   luminance    "yes"
   mipmap       "yes"
-}
-
-texture {
-  name         "shipF-tac"
-  filename     "TOS-ftac"
-
-  color        "ffffffff"
 }
 
 texture {
@@ -672,13 +708,6 @@ texture {
   color        "ffffffff"
   luminance    "yes"
   mipmap       "yes"
-}
-
-texture {
-  name         "shipR-tac"
-  filename     "TOS-rtac"
-
-  color        "ffffffff"
 }
 
 texture {
@@ -1112,13 +1141,6 @@ texture {
 }
 
 texture {
-  name         "shipK-tac"
-  filename     "TOS-ktac"
-
-  color        "ffffffff"
-}
-
-texture {
   name         "shipK-phaser"
   filename     "TOS-kph"
 
@@ -1546,13 +1568,6 @@ texture {
   color        "ffffffff"
   luminance    "yes"
   mipmap       "yes"
-}
-
-texture {
-  name         "shipO-tac"
-  filename     "TOS-otac"
-
-  color        "ffffffff"
 }
 
 texture {

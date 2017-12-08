@@ -1455,9 +1455,10 @@ void renderViewer(int dovbg, int dobomb)
 
     drawViewerBG(Context.snum, dovbg);
 
-    // draw the tactical grid if desired (benether everything else
-    // after the background.
-    if (UserConf.DoTacBkg)
+    // draw the tactical grid if desired (beneath everything else
+    // after the background), but only if the GLShips array has been
+    // initialized (which is when these colors are initialized)...
+    if (UserConf.DoTacBkg && GLShips[0][0].ship)
     {
         // draw 10 circles at 1000 CU spaced intervals around your
         // ship (tactical grid)
@@ -1474,19 +1475,34 @@ void renderViewer(int dovbg, int dobomb)
             switch(i)
             {
             case 1: // red alert/phaser range, 1000 CU's
-                glColor4f(0.3, 0.0, 0.0, alpha);
+                glColor4f(GLTEX_COLOR(tacRing1K).r,
+                          GLTEX_COLOR(tacRing1K).g,
+                          GLTEX_COLOR(tacRing1K).b,
+                          alpha);
                 break;
             case 2: // yellow, 2000 CU's
-                glColor4f(0.3, 0.3, 0.0, alpha);
+                glColor4f(GLTEX_COLOR(tacRing2K).r,
+                          GLTEX_COLOR(tacRing2K).g,
+                          GLTEX_COLOR(tacRing2K).b,
+                          alpha);
                 break;
             case 3: // green, 3000 CU's
-                glColor4f(0.0, 0.3, 0.0, alpha);
+                glColor4f(GLTEX_COLOR(tacRing3K).r,
+                          GLTEX_COLOR(tacRing3K).g,
+                          GLTEX_COLOR(tacRing3K).b,
+                          alpha);
                 break;
             case 10: // cyan - last ring, 10000 CU's
-                glColor4f(0.0, 0.3, 0.3, alpha);
+                glColor4f(GLTEX_COLOR(tacRing10K).r,
+                          GLTEX_COLOR(tacRing10K).g,
+                          GLTEX_COLOR(tacRing10K).b,
+                          alpha);
                 break;
             default: // grey for rest, every 1000 CU's afterward up to 10000
-                glColor4f(0.2, 0.2, 0.2, alpha);
+                glColor4f(GLTEX_COLOR(tacRingXK).r,
+                          GLTEX_COLOR(tacRingXK).g,
+                          GLTEX_COLOR(tacRingXK).b,
+                          alpha);
                 break;
             }
 
@@ -1515,7 +1531,6 @@ void renderViewer(int dovbg, int dobomb)
         static const int nlines = 10; /* 30 lines, each side of 0 */
         GLfloat gx, gy;
 
-//        uiPutColor(InfoColor);
         glColor4f(0.1, 0.1, 0.1, 0.3);
         for (i = 0; i < nlines; i++)
         {
@@ -1526,9 +1541,6 @@ void renderViewer(int dovbg, int dobomb)
                             i * 1000.0, i * 1000.0,
                             (SMAP(Context.snum) ? MAP_FAC : SCALE_FAC),
                             &gx, &gy);
-
-            //        if (i == (nlines - 1))
-            //          utLog("nlines: %d gx = %f gx = %f\n", nlines, gx, gy);
 
             glBegin(GL_LINES);
 
