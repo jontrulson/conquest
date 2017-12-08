@@ -148,25 +148,22 @@ void display( int snum )
     for ( i = 0; i < MAXSHIPS; i++ )
         if ( cbShips[i].status != SS_OFF )
         {
-            if (UserConf.DoLRTorpScan)
+            /* Display the torps on a LR scan if it's a friend (or you). */
+            if (lsmap)
             {
-                /* Display the torps on a LR scan if it's a friend (or you). */
-                if (lsmap)
+                if (snum >= 0 && ((snum == i) ||
+                                  (cbShips[snum].war[cbShips[i].team] == FALSE &&
+                                   cbShips[i].war[cbShips[snum].team] == FALSE)) )
                 {
-                    if (snum >= 0 && ((snum == i) ||
-                                     (cbShips[snum].war[cbShips[i].team] == FALSE &&
-                                      cbShips[i].war[cbShips[snum].team] == FALSE)) )
-                    {
-                        for ( j = 0; j < MAXTORPS; j = j + 1 )
-                            if ( cbShips[i].torps[j].status == TS_LIVE
-                                 || cbShips[i].torps[j].status == TS_DETONATE )
-                                if ( GLcvtcoords( cenx, ceny, cbShips[i].torps[j].x,
-                                                  cbShips[i].torps[j].y, -scale,
-                                                  &glx, &gly ) )
-                                {
-                                    drawTorp(glx, gly, scale, i, j);
-                                }
-                    }
+                    for ( j = 0; j < MAXTORPS; j = j + 1 )
+                        if ( cbShips[i].torps[j].status == TS_LIVE
+                             || cbShips[i].torps[j].status == TS_DETONATE )
+                            if ( GLcvtcoords( cenx, ceny, cbShips[i].torps[j].x,
+                                              cbShips[i].torps[j].y, -scale,
+                                              &glx, &gly ) )
+                            {
+                                drawTorp(glx, gly, scale, i, j);
+                            }
                 }
             }
 
@@ -283,17 +280,16 @@ void display( int snum )
     for ( i = 0; i < MAXSHIPS; i++ )
     {
         /* explosions first */
-        if ( snum < 0 || (snum >= 0 && UserConf.DoExplode) ) /* dwp */
-            for ( j = 0; j < MAXTORPS; j = j + 1 )
-                if ( cbShips[i].torps[j].status == TS_FIREBALL )
+        for ( j = 0; j < MAXTORPS; j = j + 1 )
+            if ( cbShips[i].torps[j].status == TS_FIREBALL )
+            {
+                /* First display exploding torps. */
+                if ( GLcvtcoords( cenx, ceny, cbShips[i].torps[j].x,
+                                  cbShips[i].torps[j].y, -scale, &glx, &gly ))
                 {
-                    /* First display exploding torps. */
-                    if ( GLcvtcoords( cenx, ceny, cbShips[i].torps[j].x,
-                                      cbShips[i].torps[j].y, -scale, &glx, &gly ))
-                    {
-                        drawExplosion(glx, gly, i, j, scale);
-                    }
+                    drawExplosion(glx, gly, i, j, scale);
                 }
+            }
 
         if ( ! lsmap )
 	{

@@ -93,12 +93,6 @@ typedef struct _userConf {
      */
     int hudInfo;
 
-    /* want phaser graphics? */
-    int ShowPhasers;
-
-    /* show planet names? */
-    int ShowPlanNames;
-
     /* want alarm bell? */
     int DoAlarms;
 
@@ -110,12 +104,6 @@ typedef struct _userConf {
 
     /* be terse? */
     int Terse;
-
-    /* show explosions? */
-    int DoExplode;
-
-    /* can see friendly torps on LR scan? */
-    int DoLRTorpScan;
 
     /* (M)ap is actually LongeRange scan? */
     int DoLocalLRScan;
@@ -205,8 +193,6 @@ extern SysConf_t  SysConf;
 
 
 /* local function declarations */
-void confSetTelnetClientMode(int telnetc);
-int confGetTelnetClientMode(void);
 int GetSysConf(int checkonly);
 int GetConf(int usernum);
 int MakeSysConf(void);
@@ -479,33 +465,6 @@ struct Conf ConfData[] =
     {
         FALSE,
         CTYPE_BOOL,
-        "show_phaser_graphics=",
-        &UserConf.ShowPhasers,
-        0, 0,			/* mix/max */
-        "Display phaser graphics",
-        {
-            "# define this as 'true' if you want to see phasers",
-            "# Default: true",
-            NULL
-        }
-    },
-    {
-        FALSE,
-        CTYPE_BOOL,
-        "show_planet_names=",
-        &UserConf.ShowPlanNames,
-        0, 0,			/* mix/max */
-        "Show Planet names on the scanners",
-        {
-            "# define this as 'true' if you want planets labeled with their",
-            "# names on your scanners.",
-            "# Default: true",
-            NULL
-        }
-    },
-    {
-        FALSE,
-        CTYPE_BOOL,
         "do_intruder_alerts=",
         &UserConf.DoIntrudeAlert,
         0, 0,			/* mix/max */
@@ -542,20 +501,6 @@ struct Conf ConfData[] =
             "# define this as 'true' if you don't want to receive certain",
             "# mundane messages like 'Entering orbit', etc...",
             "# Default: false",
-            NULL
-        }
-    },
-    {
-        FALSE,
-        CTYPE_BOOL,
-        "show_explosions=",
-        &UserConf.DoExplode,
-        0, 0,			/* mix/max */
-        "Show torpedo and ship explosions",
-        {
-            "# define this as 'true' if you want to see exploding torps and",
-            "# ships.",
-            "# Default: true",
             NULL
         }
     },
@@ -646,19 +591,6 @@ struct Conf ConfData[] =
             "# This info will be displayed below the HUD iconic ship display.",
             "#  Default: true",
             NULL,
-        }
-    },
-    {
-        FALSE,
-        CTYPE_BOOL,
-        "do_lr_torpscan=",
-        &UserConf.DoLRTorpScan,
-        0, 0,			/* mix/max */
-        "Show friendly torps on a long-range scan",
-        {
-            "# define this as 'true' if you want to be able to see friendly",
-            "#  torps (including yours) on a long-range scan.  Default: true",
-            NULL
         }
     },
     {

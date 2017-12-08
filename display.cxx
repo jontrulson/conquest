@@ -323,15 +323,12 @@ void display( int snum )
 		}
 	    }
 
-            /* If necessary, display the planet name. */
-            if ( snum < 0 || (snum >= 0 &&
-                              UserConf.ShowPlanNames) ) /* dwp */
-	    {
-                sprintf(buf, "%c%c%c", cbPlanets[i].name[0], cbPlanets[i].name[1], cbPlanets[i].name[2]);
-                uiPutColor(palertcol);
-                cdputs( buf, lin, col+2 );
-                uiPutColor(0);
-	    }
+            /* display the planet name. */
+            sprintf(buf, "%c%c%c", cbPlanets[i].name[0],
+                    cbPlanets[i].name[1], cbPlanets[i].name[2]);
+            uiPutColor(palertcol);
+            cdputs( buf, lin, col+2 );
+            uiPutColor(0);
 	}
         else
 	{
@@ -355,13 +352,12 @@ void display( int snum )
                     cdput( cbConqInfo->chrplanets[cbPlanets[i].type], lin, col + 1);
                     uiPutColor(0);
 		}
-                if ( snum < 0 || (snum >= 0 && UserConf.ShowPlanNames) ) /* dwp */
-                    if ( (lin + 1 <= DISPLAY_LINS) && col + 1< Context.maxcol )
-                    {
-                        uiPutColor(palertcol);
-                        cdputs( cbPlanets[i].name, lin + 1, col + 2 );
-                        uiPutColor(0);
-                    }
+                if ( (lin + 1 <= DISPLAY_LINS) && col + 1< Context.maxcol )
+                {
+                    uiPutColor(palertcol);
+                    cdputs( cbPlanets[i].name, lin + 1, col + 2 );
+                    uiPutColor(0);
+                }
 	    }
 	}
     }
@@ -396,68 +392,63 @@ void display( int snum )
     {
         /* Display phaser graphics. */
         if ( ! lsmap && cbShips[snum].pfuse > 0 )
-            if ( UserConf.ShowPhasers )
-            {
-                sd = sind(cbShips[snum].lastphase);
-                cd = cosd(cbShips[snum].lastphase);
-                ch = dirch[mod( (round( cbShips[snum].lastphase + 22.5 ) / 45), 7 )];
-                uiPutColor(InfoColor);
-                for ( fl = 0; fl <= LastPhasDist; fl = fl + 50.0 )
-                    if ( clbCVTCoords( cenx, ceny,
-                                       cbShips[snum].x+fl*cd, cbShips[snum].y+fl*sd,
-                                       scale, &lin, &col ) )
-                        cdput( ch, lin, col );
-                uiPutColor(0);
-            }
+        {
+            sd = sind(cbShips[snum].lastphase);
+            cd = cosd(cbShips[snum].lastphase);
+            ch = dirch[mod( (round( cbShips[snum].lastphase + 22.5 ) / 45), 7 )];
+            uiPutColor(InfoColor);
+            for ( fl = 0; fl <= LastPhasDist; fl = fl + 50.0 )
+                if ( clbCVTCoords( cenx, ceny,
+                                   cbShips[snum].x+fl*cd, cbShips[snum].y+fl*sd,
+                                   scale, &lin, &col ) )
+                    cdput( ch, lin, col );
+            uiPutColor(0);
+        }
     }
 
     /* Display the ships. */
     for ( i = 0; i < MAXSHIPS; i++ )
         if ( cbShips[i].status != SS_OFF )
         {
-            if (UserConf.DoLRTorpScan)
+            /* Display the torps on a LR scan if it's a friend. */
+            if (lsmap)
             {
-                /* Display the torps on a LR scan if it's a friend. */
-                if (lsmap)
+                if (snum >= 0 && cbShips[snum].war[cbShips[i].team] == FALSE &&
+                    cbShips[i].war[cbShips[snum].team] == FALSE)
                 {
-                    if (snum >= 0 && cbShips[snum].war[cbShips[i].team] == FALSE &&
-                        cbShips[i].war[cbShips[snum].team] == FALSE)
-                    {
-                        if (i == snum) /* if it's your torps - */
-                            uiPutColor(CQC_A_BOLD);
-                        else
-                            uiPutColor(YellowLevelColor);
+                    if (i == snum) /* if it's your torps - */
+                        uiPutColor(CQC_A_BOLD);
+                    else
+                        uiPutColor(YellowLevelColor);
 
-                        for ( j = 0; j < MAXTORPS; j = j + 1 )
-                            if ( cbShips[i].torps[j].status == TS_LIVE
-                                 || cbShips[i].torps[j].status == TS_DETONATE )
-                                if ( clbCVTCoords( cenx, ceny, cbShips[i].torps[j].x, cbShips[i].torps[j].y,
-                                                   scale, &lin, &col ) )
-                                    cdput( cbTeams[cbShips[i].team].torpchar, lin, col );
-                        uiPutColor(0);
-                    }
+                    for ( j = 0; j < MAXTORPS; j = j + 1 )
+                        if ( cbShips[i].torps[j].status == TS_LIVE
+                             || cbShips[i].torps[j].status == TS_DETONATE )
+                            if ( clbCVTCoords( cenx, ceny, cbShips[i].torps[j].x, cbShips[i].torps[j].y,
+                                               scale, &lin, &col ) )
+                                cdput( cbTeams[cbShips[i].team].torpchar, lin, col );
+                    uiPutColor(0);
                 }
             }
 
             if ( ! lsmap )
             {
                 /* First display exploding torps. */
-                if ( snum < 0 || (snum >= 0 && UserConf.DoExplode) ) /* dwp */
-                    for ( j = 0; j < MAXTORPS; j = j + 1 )
-                        if ( cbShips[i].torps[j].status == TS_FIREBALL )
-                            if ( clbCVTCoords( cenx, ceny, cbShips[i].torps[j].x, cbShips[i].torps[j].y,
-                                               scale, &lin, &col) )
-                            { /* colorize torp explosions */
-                                if (i != snum &&
-                                    (satwar(i, snum) || cbShips[i].torps[j].war[cbShips[snum].team]))
-                                    uiPutColor(RedLevelColor);
-                                else if (i != snum )
-                                    uiPutColor(GreenLevelColor);
-                                else
-                                    uiPutColor(0);
-                                mcuPutThing( THING_EXPLOSION, lin, col );
+                for ( j = 0; j < MAXTORPS; j = j + 1 )
+                    if ( cbShips[i].torps[j].status == TS_FIREBALL )
+                        if ( clbCVTCoords( cenx, ceny, cbShips[i].torps[j].x, cbShips[i].torps[j].y,
+                                           scale, &lin, &col) )
+                        { /* colorize torp explosions */
+                            if (i != snum &&
+                                (satwar(i, snum) || cbShips[i].torps[j].war[cbShips[snum].team]))
+                                uiPutColor(RedLevelColor);
+                            else if (i != snum )
+                                uiPutColor(GreenLevelColor);
+                            else
                                 uiPutColor(0);
-                            }
+                            mcuPutThing( THING_EXPLOSION, lin, col );
+                            uiPutColor(0);
+                        }
                 /* Now display the live torps. */
 
                 if (snum >= 0)

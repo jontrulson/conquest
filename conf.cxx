@@ -49,13 +49,11 @@ void setUserConfDefaults(void)
 {
     int i, j;
 
+    // conf defaults
     UserConf.DoAlarms = TRUE;
-    UserConf.ShowPhasers = TRUE;
-    UserConf.ShowPlanNames = TRUE;
     UserConf.DoIntrudeAlert = TRUE;
     UserConf.DoNumMap = TRUE;
     UserConf.Terse = FALSE;
-    UserConf.DoExplode = TRUE;
     UserConf.MessageBell = TRUE;
     UserConf.NoRobotMsgs = FALSE;
 
@@ -64,7 +62,6 @@ void setUserConfDefaults(void)
     UserConf.DistressToFriendly = FALSE;
     UserConf.AltHUD = FALSE;
     UserConf.hudInfo = TRUE;
-    UserConf.DoLRTorpScan = TRUE;
     UserConf.DoLocalLRScan = TRUE;
     UserConf.DoETAStats = TRUE;
     UserConf.EnemyShipBox = TRUE;

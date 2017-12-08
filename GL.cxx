@@ -1300,7 +1300,6 @@ void drawPlanet( GLfloat x, GLfloat y, int pnum, int scale,
     char buf[BUFFER_SIZE_256];
     char torpchar;
     char planame[BUFFER_SIZE_256];
-    int showpnams = UserConf.ShowPlanNames;
     static int norender = FALSE;
     GLfloat scaleFac = (scale == SCALE_FAC) ? dConf.vScaleSR : dConf.vScaleLR;
 
@@ -1368,40 +1367,33 @@ void drawPlanet( GLfloat x, GLfloat y, int pnum, int scale,
 
     if (scale == SCALE_FAC)
     {
-        if (showpnams)
-        {
-            if (UserConf.DoNumMap && (torpchar != ' '))
-                snprintf(buf, BUFFER_SIZE_256, "#%d#%c#%d#%d#%d#%c%s",
-                         textcolor,
-                         torpchar,
-                         InfoColor,
-                         cbPlanets[pnum].armies,
-                         textcolor,
-                         torpchar,
-                         cbPlanets[pnum].name);
-            else
-                snprintf(buf, BUFFER_SIZE_256, "%s", cbPlanets[pnum].name);
+        if (UserConf.DoNumMap && (torpchar != ' '))
+            snprintf(buf, BUFFER_SIZE_256, "#%d#%c#%d#%d#%d#%c%s",
+                     textcolor,
+                     torpchar,
+                     InfoColor,
+                     cbPlanets[pnum].armies,
+                     textcolor,
+                     torpchar,
+                     cbPlanets[pnum].name);
+        else
+            snprintf(buf, BUFFER_SIZE_256, "%s", cbPlanets[pnum].name);
 
-            glfRenderFont(x,
-                          y - cu2GLSize((real)cbPlanets[pnum].size / 2.0,
-                                        -scale),
-                          TRANZ, /* planet's Z */
-                          ((GLfloat)uiCStrlen(buf) * 2.0) / ((scale == SCALE_FAC) ? 1.0 : 2.0),
-                          TEXT_HEIGHT, glfFontFixedTiny, buf, textcolor, NULL,
-                          GLF_FONT_F_SCALEX | GLF_FONT_F_DOCOLOR);
-        }
+        glfRenderFont(x,
+                      y - cu2GLSize((real)cbPlanets[pnum].size / 2.0,
+                                    -scale),
+                      TRANZ, /* planet's Z */
+                      ((GLfloat)uiCStrlen(buf) * 2.0) / ((scale == SCALE_FAC) ? 1.0 : 2.0),
+                      TEXT_HEIGHT, glfFontFixedTiny, buf, textcolor, NULL,
+                      GLF_FONT_F_SCALEX | GLF_FONT_F_DOCOLOR);
     }
     else
     {                           /* MAP_FAC */
-        if (showpnams)
-        {                       /* just want first 3 chars */
-            planame[0] = cbPlanets[pnum].name[0];
-            planame[1] = cbPlanets[pnum].name[1];
-            planame[2] = cbPlanets[pnum].name[2];
-            planame[3] = 0;
-        }
-        else
-            planame[0] = 0;
+        /* just want first 3 chars */
+        planame[0] = cbPlanets[pnum].name[0];
+        planame[1] = cbPlanets[pnum].name[1];
+        planame[2] = cbPlanets[pnum].name[2];
+        planame[3] = 0;
 
         if (UserConf.DoNumMap && (torpchar != ' '))
             snprintf(buf, BUFFER_SIZE_256, "#%d#%c#%d#%d#%d#%c%s",
