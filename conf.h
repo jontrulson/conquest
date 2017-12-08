@@ -616,7 +616,7 @@ struct Conf ConfData[] =
             "# define this as the number of updates per second in which to",
             "#  recieve packets and update the display. Number must be between",
             "#  1 and 10 inclusive.",
-            "#  Default: 5",
+            "#  Default: 10",
             NULL
         }
     },
@@ -659,9 +659,7 @@ struct Conf ConfData[] =
             "#  and the target, distance, and angle of the last ship or planet ",
             "#  that was (i)nfo'd in the 'hud'",
             "#",
-            "# For the curses client, this info will displayed below the viewer.",
-            "# For the OpenGL client, this info will be displayed below the ",
-            "#  HUD iconic ship display.",
+            "# This info will be displayed below the HUD iconic ship display.",
             "#  Default: true",
             NULL,
         }
@@ -716,10 +714,10 @@ struct Conf ConfData[] =
         "do_enemyshipbox=",
         &UserConf.EnemyShipBox,
         0, 0,			/* mix/max */
-        "Draw a red box around enemy ships (GL client only)",
+        "Draw a red box around enemy ships",
         {
             "# define this as 'true' if you want a red box drawn around",
-            "#  enemy ships on the viewer.  Valid for GL client only.",
+            "#  enemy ships on the viewer.",
             "#  Default: true",
             NULL
         }
@@ -734,7 +732,7 @@ struct Conf ConfData[] =
         {
             "# define this as 'true' if you want to see the rather attractive",
             "#  background image displayed in the viewer.  ",
-            "#  Valid for GL client only.",
+            "#  You can toggle this in the game with CTRL-B as well.",
             "#  Default: true",
             NULL
         }
@@ -764,7 +762,7 @@ struct Conf ConfData[] =
             "#  super-imposed on your short and long range displays.  It is",
             "#  drawn as 10 concentric circles, each 1000 CU's apart,",
             "#  centered on your ship.  It can also be toggled on and off",
-            "#  at any time with ALT-G while playing.",
+            "#  at any time with CTRL-G while playing.",
             "#  Default: false",
             NULL
         }
