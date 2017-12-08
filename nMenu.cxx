@@ -412,7 +412,7 @@ static int nMenuInput(int ch)
         prm.buf = cbuf;
         prm.buflen = MAXUSERNAME;
         prm.terms = TERMS;
-        prm.index = 20;
+        prm.index = 21;
         prm.buf[0] = 0;
         prompting = TRUE;
 
@@ -434,7 +434,7 @@ static int nMenuInput(int ch)
             prm.buf = cbuf;
             prm.buflen = MAXUSERNAME;
             prm.terms = TERMS;
-            prm.index = 20;
+            prm.index = 21;
             prm.buf[0] = 0;
             prompting = TRUE;
         }
@@ -486,7 +486,7 @@ static int nMenuInput(int ch)
         prm.buflen = 5;
         prm.pbuf = clbWarPrompt(Context.snum, twar);
         prm.terms = TERMS;
-        prm.index = 20;
+        prm.index = 22;
         prm.buf[0] = 0;
 
         break;
