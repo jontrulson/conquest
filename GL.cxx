@@ -1214,7 +1214,7 @@ void drawBombing(int snum, int scale)
             {                   /* malloc failure, undo everything */
                 int j;
 
-                for (j=1; j < i; j++)
+                for (j=0; j < i; j++)
                     free(bombAState[j].state.privptr);
                 bombAState[0].anims = 0; /* clear 1st so we can retry
                                             again later */
