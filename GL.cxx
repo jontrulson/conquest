@@ -2830,28 +2830,25 @@ void drawViewerBG(int snum, int dovbg)
 
     glEnable(GL_TEXTURE_2D);
 
-    if (dovbg)
-    {
-        glBindTexture(GL_TEXTURE_2D, texid_vbg);
+    glBindTexture(GL_TEXTURE_2D, texid_vbg);
 
-        glColor3f(0.8, 0.8, 0.8);
+    glColor3f(0.8, 0.8, 0.8);
 
-        glBegin(GL_POLYGON);
+    glBegin(GL_POLYGON);
 
-        glTexCoord2f(0.0f, 1.0f);
-        glVertex3f(x, y, z); /* ll */
+    glTexCoord2f(0.0f, 1.0f);
+    glVertex3f(x, y, z); /* ll */
 
-        glTexCoord2f(1.0f, 1.0f);
-        glVertex3f(x2, y, z); /* lr */
+    glTexCoord2f(1.0f, 1.0f);
+    glVertex3f(x2, y, z); /* lr */
 
-        glTexCoord2f(1.0f, 0.0f);
-        glVertex3f(x2, y2, z); /* ur */
+    glTexCoord2f(1.0f, 0.0f);
+    glVertex3f(x2, y2, z); /* ur */
 
-        glTexCoord2f(0.0f, 0.0f);
-        glVertex3f(x, y2, z); /* ul */
+    glTexCoord2f(0.0f, 0.0f);
+    glVertex3f(x, y2, z); /* ul */
 
-        glEnd();
-    }
+    glEnd();
 
     glDisable(GL_TEXTURE_2D);
     glDisable(GL_BLEND);
