@@ -57,7 +57,7 @@ case "$host" in
   *darwin*)
 	AC_DEFINE(DARWIN, 1, [Darwin])
         ocflags="$CFLAGS"
-        CFLAGS="$ocflags -I/usr/X11/include"
+        CFLAGS="$ocflags -I/usr/X11/include -I/opt/X11/include"
 
 	AC_MSG_RESULT(Darwin)
 	;;
