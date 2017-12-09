@@ -923,7 +923,7 @@ int updateClient(int force)
     }
 
     /* hist */
-    if ((abs((unsigned int)newtime - (unsigned int)histtime) >
+    if ((abs(int(newtime - histtime)) >
          HISTORY_UPDATE_INTERVAL))
     {
         dohist = TRUE;
@@ -931,7 +931,7 @@ int updateClient(int force)
     }
 
     /* info */
-    if ((abs((unsigned int)newtime - (unsigned int)infotime) >
+    if ((abs(int(newtime - infotime)) >
          CONQINFO_UPDATE_INTERVAL))
     {
         doinfo = TRUE;
@@ -939,7 +939,7 @@ int updateClient(int force)
     }
 
     /* team */
-    if ((abs((unsigned int)newtime - (unsigned int)teamtime) >
+    if ((abs(int(newtime - teamtime)) >
          TEAM_UPDATE_INTERVAL))
     {
         doteam = TRUE;
