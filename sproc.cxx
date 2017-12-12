@@ -1640,12 +1640,12 @@ void procDestruct(cpCommand_t *cmd)
 
     Context.msgok = FALSE;			/* turn off messages */
 
-    if ( cbDoomsday->status == DS_LIVE )
+    if ( DOOM_LIVE() )
     {
         if ( dist(cbShips[Context.snum].x, cbShips[Context.snum].y,
                   cbDoomsday->x, cbDoomsday->y) <= DOOMSDAY_KILL_DIST )
 	{
-            cbDoomsday->status = DS_OFF;
+            DOOMCLR(DOOM_F_LIVE);
             clbStoreMsg( MSG_FROM_DOOM, 0, MSG_TO_ALL, 0, "AIEEEEEEEE!" );
             clbKillShip( Context.snum, KB_GOTDOOMSDAY, 0 );
 	}

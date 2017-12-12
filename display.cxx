@@ -170,7 +170,6 @@ void display( int snum )
     static cqColor DamageAttrib = 0;
 
     static char zbuf[MSGMAXLINE];
-    static const char *dstatstr;
 
     if ( Context.redraw )
     {
@@ -363,7 +362,7 @@ void display( int snum )
     }
 
     /* Display the planet eater. */
-    if ( cbDoomsday->status == DS_LIVE )
+    if ( DOOM_LIVE() )
         if ( ! lsmap )
             if ( clbCVTCoords( cenx, ceny, cbDoomsday->x, cbDoomsday->y, scale, &lin, &col ) )
             {
@@ -372,15 +371,15 @@ void display( int snum )
                 cd = cosd(cbDoomsday->heading);
                 /* Draw the body. */
                 uiPutColor(BlueColor);
-                for ( fl = -DOOMSDAY_LENGTH/2.0;
-                      fl < DOOMSDAY_LENGTH/2.0;
+                for ( fl = -DOOMSIZE/2.0;
+                      fl < DOOMSIZE/2.0;
                       fl = fl + 50.0 )
                     if ( clbCVTCoords( cenx, ceny, cbDoomsday->x+fl*cd, cbDoomsday->y+fl*sd, scale, &lin, &col ) )
                         cdput( '#', lin, col );
                 uiPutColor(0);
                 /* Draw the head. */
-                if ( clbCVTCoords( cenx, ceny, cbDoomsday->x+DOOMSDAY_LENGTH/2.0*cd,
-                                   cbDoomsday->y+DOOMSDAY_LENGTH/2.0*sd,
+                if ( clbCVTCoords( cenx, ceny, cbDoomsday->x+DOOMSIZE/2.0*cd,
+                                   cbDoomsday->y+DOOMSIZE/2.0*sd,
                                    scale, &lin, &col ) )
                 {
                     uiPutColor(RedLevelColor);
@@ -439,7 +438,7 @@ void display( int snum )
                         if ( clbCVTCoords( cenx, ceny, cbShips[i].torps[j].x, cbShips[i].torps[j].y,
                                            scale, &lin, &col) )
                         { /* colorize torp explosions */
-                            if (i != snum &&
+                            if (snum >= 0 && i != snum &&
                                 (satwar(i, snum) || cbShips[i].torps[j].war[cbShips[snum].team]))
                                 uiPutColor(RedLevelColor);
                             else if (i != snum )
@@ -1175,12 +1174,11 @@ void display( int snum )
 
             strcpy(buf , cbDoomsday->name) ;
             /* put dtype in stats, dstatus next to name  - dwp */
-            if ( cbDoomsday->status == DS_LIVE  )
+            if ( DOOM_LIVE() )
                 strcat(buf, "  (live)");
-            else if ( cbDoomsday->status == DS_OFF )
-                strcat(buf, "  (off)");
             else
-                strcat(buf, "  (unknown)");
+                strcat(buf, "  (off)");
+
             cdputs( buf, 1, STAT_COLS +
                     (int)(Context.maxcol - STAT_COLS - (strlen(buf))) / (int)2 + 1);
 
@@ -1188,15 +1186,10 @@ void display( int snum )
             dcol = col + 11;
 
             uiPutColor(LabelColor);
-            cdputs( "  dstatus:", lin, col );
+            cdputs( "  dflags:", lin, col );
             uiPutColor(InfoColor);
-            if ( cbDoomsday->status == DS_LIVE)
-                dstatstr = DS_LIVE_STR;
-            else if (cbDoomsday->status == DS_OFF)
-                dstatstr = DS_OFF_STR;
-            else
-                dstatstr = "";
-            sprintf(buf, "%d (%s)", cbDoomsday->status, dstatstr);
+
+            sprintf(buf, "0x%02x", cbDoomsday->flags);
             cdputs(buf, lin, dcol);
             uiPutColor(0);
 

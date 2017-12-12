@@ -471,7 +471,7 @@ void iterdrive( int *ship )
     }
 
     /* Drive the planet eater. */
-    if ( cbDoomsday->status == DS_LIVE )
+    if ( DOOM_LIVE() )
     {
 
         /* We want to creep up on our target, without sitting and spinning
@@ -487,6 +487,8 @@ void iterdrive( int *ship )
                        cbPlanets[cbDoomsday->lockDetail].y )
                 >= DOOMSDAY_DIST) )
         {
+            // can't be attacking if we aren't in range
+            DOOMCLR(DOOM_F_ATTACKING);
             cbDoomsday->x = cbDoomsday->x + cbDoomsday->dx;
             cbDoomsday->y = cbDoomsday->y + cbDoomsday->dy;
         }
@@ -499,6 +501,8 @@ void iterdrive( int *ship )
                        cbShips[cbDoomsday->lock].y )
                 >= DOOMSDAY_DIST) )
         {
+            // can't be attacking if we aren't in range
+            DOOMCLR(DOOM_F_ATTACKING);
             cbDoomsday->x = cbDoomsday->x + cbDoomsday->dx;
             cbDoomsday->y = cbDoomsday->y + cbDoomsday->dy;
         }
@@ -605,12 +609,14 @@ void secdrive( int *ship )
             }
 
         /* Planet eater. */
-        if ( cbDoomsday->status == DS_LIVE )
-            if ( dist( cbShips[i].x, cbShips[i].y, cbDoomsday->x, cbDoomsday->y ) <= DOOMSDAY_DIST )
+        if ( DOOM_LIVE() )
+        {
+            if ( dist( cbShips[i].x, cbShips[i].y,
+                       cbDoomsday->x, cbDoomsday->y ) <= DOOMSDAY_DIST )
             {
                 clbHit( i, rndnor( DOOMSDAY_HIT, 1.0 ), KB_DOOMSDAY, 0 );
             }
-
+        }
 
         /* Negative energy barrier. */
         if ( fabs( cbShips[i].x ) >= NEGENB_DIST || fabs(cbShips[i].y) >= NEGENB_DIST )
@@ -788,7 +794,7 @@ void secdrive( int *ship )
                         if ( cbShips[i].torps[j].status == TS_LIVE )
                         {
                             /* Proximity check for the doomsday machine. */
-                            if ( cbDoomsday->status == DS_LIVE )
+                            if ( DOOM_LIVE() )
                                 if ( distf( cbShips[i].torps[j].x,
                                             cbShips[i].torps[j].y,
                                             cbDoomsday->x, cbDoomsday->y ) <= (TORPEDO_PROX * 3.0))
@@ -809,7 +815,7 @@ void secdrive( int *ship )
             SFCLR(i, SHIP_F_TALERT);
 
     /* Planet eater. */
-    if ( cbDoomsday->status == DS_LIVE )
+    if ( DOOM_LIVE() )
     {
         if (cbDoomsday->lock == LOCK_PLANET && cbDoomsday->lockDetail < MAXPLANETS)
 	{
@@ -818,6 +824,7 @@ void secdrive( int *ship )
                         cbPlanets[cbDoomsday->lockDetail].x,
                         cbPlanets[cbDoomsday->lockDetail].y ) <= DOOMSDAY_DIST )
 	    {
+                DOOMSET(DOOM_F_ATTACKING);
                 /* Decrement armies. */
                 if ( rnd() <= 0.1 )
                     clbIntrude( -1 /*doomsday*/, cbDoomsday->lockDetail );
@@ -903,7 +910,7 @@ void mindrive(void)
     }
 
 
-    if ( cbDoomsday->status == DS_LIVE )
+    if ( DOOM_LIVE() )
         clbDoomFind();
     else if ( rnd() < DOOMSDAY_PROB )
     {

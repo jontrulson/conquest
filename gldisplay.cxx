@@ -135,7 +135,7 @@ void display( int snum )
     }
 
     /* Display the planet eater. */
-    if ( cbDoomsday->status == DS_LIVE )
+    if ( DOOM_LIVE() )
     {
         if (GLcvtcoords( cenx, ceny, cbDoomsday->x, cbDoomsday->y, -scale,
                          &glx, &gly ))

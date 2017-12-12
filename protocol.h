@@ -430,12 +430,16 @@ typedef struct {
 } spHistory_t;
 
 typedef struct {
-    uint8_t  type;			/* SP_DOOMSDAY */
-    uint8_t  status;               /* DS_* */
-    uint16_t heading;              /* x10 */
+    uint8_t  type;              /* SP_DOOMSDAY */
+    uint8_t  status;            /* DS_* */
+    uint16_t heading;           /* x10 */
 
-    int32_t   x;			/* x1000 */
-    int32_t   y;			/* x1000 */
+    uint8_t  eaterType;
+    uint8_t  flags;
+    uint8_t  pad[2];
+
+    int32_t  x;                 /* x1000 */
+    int32_t  y;                 /* x1000 */
 } spDoomsday_t;
 
 

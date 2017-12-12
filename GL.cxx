@@ -2274,16 +2274,13 @@ void drawDoomsday(GLfloat x, GLfloat y, GLfloat dangle, GLfloat scale)
 {
     static const GLfloat z = 1.0;
     static GLfloat doomsizeSR, doomsizeLR;
-    GLfloat size;
-    static GLfloat beamRadius;
+    GLfloat size, bsize;
+    static GLfloat beamRadiusSR, beamRadiusLR;
     static int norender = FALSE;  /* if no tex, no point... */
-    static real ox = 0.0, oy = 0.0; /* for doomsday weapon antiproton beam */
-    static int drawAPBeam = TRUE;
+    bool drawAPBeam = false;
     static animStateRec_t doomapfire = {}; /* animdef state for ap firing */
-    static int last_apstate;      /* toggle this when it expires */
     static int beamfx = -1;       /* Cataboligne - beam sound */
     static const uint32_t beamfx_delay = 1000; /* 1 second */
-    static uint32_t lastbeam = 0;
     real dis, ang;
     GLfloat scaleFac = (scale == SCALE_FAC) ? dConf.vScaleSR : dConf.vScaleLR;
     static uint32_t geoChangeCount = 0;
@@ -2338,13 +2335,20 @@ void drawDoomsday(GLfloat x, GLfloat y, GLfloat dangle, GLfloat scale)
         doomsizeLR = cu2GLSize(DOOMSIZE * GLTEX_PRESCALE(GLDoomsday.doom),
                                -MAP_FAC);
 
-        beamRadius = cu2GLSize(DOOMSDAY_DIST, -SCALE_FAC);
+        beamRadiusSR = cu2GLSize(DOOMSDAY_DIST * GLTEX_PRESCALE(GLDoomsday.beam),
+                                 -SCALE_FAC);
+        beamRadiusLR = cu2GLSize(DOOMSDAY_DIST * GLTEX_PRESCALE(GLDoomsday.beam),
+                                 -MAP_FAC);
     }
 
     size = ((scale == SCALE_FAC) ? doomsizeSR : doomsizeLR);
+    bsize = ((scale == SCALE_FAC) ? beamRadiusSR : beamRadiusLR);
 
     if (scale == MAP_FAC)
+    {
         size = size * 2.0;
+        bsize *= 2.0;
+    }
 
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glEnable(GL_BLEND);
@@ -2357,25 +2361,17 @@ void drawDoomsday(GLfloat x, GLfloat y, GLfloat dangle, GLfloat scale)
       Cataboligne - fire doomsday antiproton beam!
     */
 
-    if (last_apstate != doomapfire.state.armed)
-    {
-        last_apstate = doomapfire.state.armed;
-
-        /* we only want to draw it if we think it's stationary */
-        if (ox == cbDoomsday->x && oy == cbDoomsday->y)
-            drawAPBeam = !drawAPBeam;
-        else
-        {
-            drawAPBeam = FALSE;
-            ox = cbDoomsday->x;
-            oy = cbDoomsday->y;
-        }
-    }
+    if (DOOM_ATTACKING() && doomapfire.state.armed)
+        drawAPBeam = true;
+    else
+        drawAPBeam = false;
 
     /* if it's time to draw the beam, then let her rip */
-    if ( drawAPBeam && (scale == SCALE_FAC) )
+    if ( drawAPBeam )
     {
-        static const GLfloat beamwidth = 3.0;
+        // FIXME - should be scaled...
+        // 3.0
+        GLfloat beamwidth = cu2GLSize(150, -scale);
 
         glPushMatrix();
         glLoadIdentity();
@@ -2408,10 +2404,10 @@ void drawDoomsday(GLfloat x, GLfloat y, GLfloat dangle, GLfloat scale)
                   GLTEX_COLOR(GLDoomsday.beam).a * 0.1);
 
         glTexCoord2f(0.0f, 1.0f);
-        glVertex3f(beamwidth / 2.0, beamRadius, -1.0); /* ur */
+        glVertex3f(beamwidth / 2.0, bsize, -1.0); /* ur */
 
         glTexCoord2f(0.0f, 0.0f);
-        glVertex3f(-(beamwidth / 2.0), beamRadius, -1.0); /* ul */
+        glVertex3f(-(beamwidth / 2.0), bsize, -1.0); /* ul */
 
         glEnd();
 
@@ -2423,11 +2419,9 @@ void drawDoomsday(GLfloat x, GLfloat y, GLfloat dangle, GLfloat scale)
     /* Cataboligne - sound code 11.16.6
      * play doombeam sound
      */
-    if (drawAPBeam && dis < YELLOW_DIST &&
-        ((frameTime - lastbeam) > beamfx_delay))
+    if (drawAPBeam && dis < YELLOW_DIST)
     {
         cqsEffectPlay(beamfx, NULL, YELLOW_DIST * 2, dis, ang);
-        lastbeam = frameTime;
     }
 
     glPushMatrix();

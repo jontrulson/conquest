@@ -132,7 +132,7 @@ static void set_header(int snum)
     {
         if (snum == DISPLAY_DOOMSDAY)
             sprintf(hbuf, doom_fmt, cbDoomsday->name,
-                    (cbDoomsday->status == DS_LIVE) ? DS_LIVE_STR: DS_OFF_STR);
+                    (DOOM_LIVE()) ? "On": "Off");
         else
             sprintf(hbuf, heading_fmt, ship_str1, cbTeams[cbShips[snum].team].teamchar,
                     snum,
@@ -480,7 +480,7 @@ static int nPlayBInput(int ch)
                 }
                 if (foundone == FALSE)
                 {	/* check the doomsday machine */
-                    if (cbDoomsday->status == DS_LIVE)
+                    if (DOOM_LIVE())
                         foundone = TRUE;
                 }
 
@@ -512,7 +512,7 @@ static int nPlayBInput(int ch)
 
             if (live_ships)
                 if ((snum >= 0 && clbStillAlive(snum)) ||
-                    (snum == DISPLAY_DOOMSDAY && cbDoomsday->status == DS_LIVE))
+                    (snum == DISPLAY_DOOMSDAY && DOOM_LIVE()))
                 {
                     Context.snum = snum;
                     break;
@@ -549,7 +549,7 @@ static int nPlayBInput(int ch)
                 }
                 if (foundone == FALSE)
                 {	/* check the doomsday machine */
-                    if (cbDoomsday->status == DS_LIVE)
+                    if (DOOM_LIVE())
                         foundone = TRUE;
                 }
 
@@ -582,7 +582,7 @@ static int nPlayBInput(int ch)
 
             if (live_ships)
                 if ((snum >= 0 && clbStillAlive(snum)) ||
-                    (snum == DISPLAY_DOOMSDAY && cbDoomsday->status == DS_LIVE))
+                    (snum == DISPLAY_DOOMSDAY && DOOM_LIVE()))
                 {
                     Context.snum = snum;
                     break;

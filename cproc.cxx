@@ -658,10 +658,12 @@ int procDoomsday(char *buf)
     if (Context.recmode == RECMODE_ON)
         recWriteEvent(buf);
 
-    cbDoomsday->status = dd->status;
+    cbDoomsday->flags = dd->flags;
     cbDoomsday->heading =(real)((real)ntohs(dd->heading) / 10.0);
     cbDoomsday->x = (real)((real)((int32_t)ntohl(dd->x)) / 1000.0);
     cbDoomsday->y = (real)((real)((int32_t)ntohl(dd->y)) / 1000.0);
+
+    cbDoomsday->eaterType = static_cast<eaterType_t>(dd->eaterType);
 
     return TRUE;
 }

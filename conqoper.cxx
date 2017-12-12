@@ -1192,11 +1192,11 @@ void operate(void)
 	    }
 
             /* eater status */
-            i = cbDoomsday->status;
-            if ( i == DS_OFF )
+            if ( !DOOM_LIVE() )
                 strcpy(buf , "off") ;
-            else if ( i == DS_LIVE )
+            else
 	    {
+                // it's alive!
                 strcpy(buf , "ON (") ;
                 if (cbDoomsday->lock == LOCK_NONE)
                     strcat(buf , "NONE") ;
@@ -1209,8 +1209,6 @@ void operate(void)
 
                 utAppendChar(buf, ')');
 	    }
-            else
-                strcat(buf , "???") ;
 
             lin = savelin;
             cdclrl( lin, 1 );
@@ -1275,9 +1273,9 @@ void operate(void)
                 bigbang();
             break;
 	case 'd':
-            if ( cbDoomsday->status == DS_LIVE )
+            if ( DOOM_LIVE() )
 	    {
-                cbDoomsday->status = DS_OFF;
+                DOOMCLR(DOOM_F_LIVE);
                 utLog("OPER: %s deactivated the Doomsday machine",
                       operName);
 	    }
@@ -3026,8 +3024,8 @@ void watch(void)
             case 'd':    /* flip the doomsday machine (only from doomsday window) */
                 if (snum == DISPLAY_DOOMSDAY)
                 {
-                    if ( cbDoomsday->status == DS_LIVE )
-			cbDoomsday->status = DS_OFF;
+                    if ( DOOM_LIVE() )
+			DOOMCLR(DOOM_F_LIVE);
                     else
 			clbDoomsday();
                 }
@@ -3173,7 +3171,7 @@ void watch(void)
                         }
                         if (foundone == FALSE)
                         {	/* check the doomsday machine */
-                            if (cbDoomsday->status == DS_LIVE)
+                            if (DOOM_LIVE())
 				foundone = TRUE;
                         }
 
@@ -3208,7 +3206,7 @@ void watch(void)
 
                     if (live_ships)
 			if ((snum >= 0 && clbStillAlive(snum)) ||
-			    (snum == DISPLAY_DOOMSDAY && cbDoomsday->status == DS_LIVE))
+			    (snum == DISPLAY_DOOMSDAY && DOOM_LIVE()))
                         {
 			    Context.snum = snum;
 			    break;
@@ -3250,7 +3248,7 @@ void watch(void)
                         }
                         if (foundone == FALSE)
                         {	/* check the doomsday machine */
-                            if (cbDoomsday->status == DS_LIVE)
+                            if (DOOM_LIVE())
 				foundone = TRUE;
                         }
 
@@ -3286,7 +3284,7 @@ void watch(void)
 
                     if (live_ships)
 			if ((snum >= 0 && clbStillAlive(snum)) ||
-			    (snum == DISPLAY_DOOMSDAY && cbDoomsday->status == DS_LIVE))
+			    (snum == DISPLAY_DOOMSDAY && DOOM_LIVE()))
                         {
 			    Context.snum = snum;
 			    break;

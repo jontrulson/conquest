@@ -2589,7 +2589,7 @@ static void doomsday_theme (void)
                      cbDoomsday->x, cbDoomsday->y );
     static int first_doom = 0;
 
-    if (cbDoomsday->status != DS_LIVE)
+    if (DOOM_LIVE())
         return;
 
     /* doomsday music theme for ships nearby */

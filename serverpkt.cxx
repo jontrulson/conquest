@@ -979,10 +979,12 @@ spDoomsday_t *spktDoomsday(int rec)
     memset((void *)&dd, 0, sizeof(spDoomsday_t));
 
     dd.type = SP_DOOMSDAY;
-    dd.status = (uint8_t)cbDoomsday->status;
     dd.heading = htons((uint16_t)(cbDoomsday->heading * 10.0));
     dd.x = (int32_t)htonl((int32_t)(cbDoomsday->x * 1000.0));
     dd.y = (int32_t)htonl((int32_t)(cbDoomsday->y * 1000.0));
+
+    dd.eaterType = static_cast<uint8_t>(cbDoomsday->eaterType);
+    dd.flags = cbDoomsday->flags;
 
     if (rec)
     {

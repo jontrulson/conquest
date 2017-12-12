@@ -34,7 +34,10 @@ texture {
 
 texture {
   name         "doombeam"
+
   color        "ffffffff"
+  mipmap       "yes"
+  prescale     1.3
 }
 
 texture {
@@ -2175,7 +2178,7 @@ animation {
   # blink the doomsday's AP beam
   animdef {
     toganim {
-      delayms    700
+      delayms    2000
     }
   }
 }

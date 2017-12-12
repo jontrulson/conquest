@@ -698,7 +698,12 @@ int proc_0006_Doomsday(char *buf)
     if (!pktIsValid(SP_0006_DOOMSDAY, buf))
         return FALSE;
 
-    cbDoomsday->status = dd->status;
+    if (dd->status == 1) // live (DS_ON = 1, DS_OFF = 2)
+        DOOMSET(DOOM_F_LIVE);
+    else
+        DOOMCLR(DOOM_F_LIVE);
+
+    cbDoomsday->eaterType = EATER_DOOMSDAY; // always for this version
     cbDoomsday->heading =(real)((real)ntohs(dd->heading) / 10.0);
     cbDoomsday->x = (real)((real)((int32_t)ntohl(dd->x)) / 1000.0);
     cbDoomsday->y = (real)((real)((int32_t)ntohl(dd->y)) / 1000.0);

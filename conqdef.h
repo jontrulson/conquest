@@ -51,7 +51,7 @@
 /*#define COMMONSTAMP 20001231 		 stardate? */
 /*#define COMMONSTAMP 20030829 */
 // #define COMMONSTAMP 20101027
-#define COMMONSTAMP 20171129
+#define COMMONSTAMP 20171211
 
 // Absolute maximum values for certain arrays.  Changing these will
 // require significant changes everywhere (CB/protocol mostly).  These
@@ -70,7 +70,6 @@
 
 #define MAXSHIPS 20 		/* number of available ships */
 
-#define DOOMSIZE 900            /* base size of doomsday in CU's */
 /* Values for sstatus() */
 #define SS_OFF 1 		/* available for use */
 #define SS_ENTERING 2 		/* outfitting the ship in newship() */
@@ -236,10 +235,6 @@ typedef enum {
 #define DRS_HOLDING 4 		/* don't execute by will of GOD */
 #define DRS_KAMIKAZE 5 		/* used to kill a driver */
 
-/* States for the planet eater */
-#define DS_LIVE 1
-#define DS_OFF 2
-
 /* Tokens for mcuPutThing(), must be negative */
 #define THING_EXPLOSION -1 	/* a torpedo explosion */
 
@@ -379,16 +374,6 @@ typedef enum {
 #define BREAKAWAY_PROB 0.3 	/* chance to break free of a hostile tower */
 #define BREAKAWAY_GRAND 1000 	/* hundreths to break free from a hostile tower */
 
-#define DS_LIVE_STR "DS_LIVE"
-#define DS_OFF_STR  "DS_OFF"
-
-#define DOOMSDAY_START_DIST 20000.0 /* distance from the center that it starts at */
-#define DOOMSDAY_LENGTH 800.0 	/* length for display purposes */
-#define DOOMSDAY_WARP 2.0 	/* warp factor of the planet eater */
-#define DOOMSDAY_DIST 1500.0 	/* distance it starts shooting */
-#define DOOMSDAY_KILL_DIST 300.0 /* minimum distance for killing it */
-#define DOOMSDAY_HIT 7.0 	/* blast per second */
-#define DOOMSDAY_PROB 0.0001 	/* probability per minute that it appears */
 #define MIN_UNINHAB_MINUTES 45 	/* minimum time till inhabitable */
 #define MAX_UNINHAB_MINUTES 120	/* maximum time till inhabitable */
 

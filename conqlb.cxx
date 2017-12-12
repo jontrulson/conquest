@@ -1273,6 +1273,8 @@ void clbDoomFind(void)
     tastiness = 0.0;
     cbDoomsday->lock = LOCK_NONE;
     cbDoomsday->lockDetail = 0;
+    DOOMCLR(DOOM_F_ATTACKING); // not attacking while looking for a
+                               // new target
 
     for ( i = 0; i < MAXPLANETS; i++ )
         if ( PVISIBLE(i) )
@@ -1321,7 +1323,7 @@ void clbDoomsday(void)
     cbDoomsday->x = DOOMSDAY_START_DIST * cosd(cbDoomsday->heading);
     cbDoomsday->y = DOOMSDAY_START_DIST * sind(cbDoomsday->heading);
     clbDoomFind();
-    cbDoomsday->status = DS_LIVE;
+    DOOMSET(DOOM_F_LIVE);
 
     return;
 
@@ -1797,7 +1799,7 @@ void clbInitGame(void)
     cbDriver->drivsecs = 0;
 
     /* Doomsday machine. */
-    cbDoomsday->status = DS_OFF;
+    DOOMCLR(DOOM_F_LIVE);
     cbDoomsday->x = 0.0;
     cbDoomsday->y = 0.0;
     cbDoomsday->dx = 0.0;
@@ -1805,6 +1807,7 @@ void clbInitGame(void)
     cbDoomsday->heading = 0.0;
     cbDoomsday->lock = LOCK_NONE;
     cbDoomsday->lockDetail = 0;
+    cbDoomsday->eaterType = EATER_DOOMSDAY;
     utStrncpy( cbDoomsday->name, "Doomsday Machine", MAXUSERNAME );
 
     /* Un-twiddle the lockword. */
