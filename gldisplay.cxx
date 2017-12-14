@@ -107,7 +107,6 @@ void display( int snum )
                            &glx, &gly ))
             continue;
 
-        palertcol = 0;
         /* determine alertlevel for object */
         if (snum >= 0 && clbSPWar( snum, i ) && cbPlanets[i].scanned[cbShips[snum].team])
 	{

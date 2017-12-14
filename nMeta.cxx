@@ -225,17 +225,16 @@ static int nMetaDisplay(dspConfig_t *dsp)
     lin = flin;
     col = 1;
 
-    i = 0;			/* start at index 0 */
-
 				/* figure out the last editable line on
 				   this page */
 
     if (curpage == (pages - 1)) /* last page - might be less than full */
-        llin = (numMetaServers % servers_per_page);	/* ..or more than empty? ;-) */
+        llin = (numMetaServers % servers_per_page); /* ..or more than empty? ;-) */
     else
         llin = servers_per_page;
 
-    i = 0;
+    i = 0;                      /* start at index 0 */
+
     while (i < llin)
     {			/* display this page */
         /* get the server number for this line */

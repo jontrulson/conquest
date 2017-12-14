@@ -24,9 +24,9 @@
 
 static int state;
 
-static int fatal = FALSE;
-static int serror = FALSE;
-static int newuser = FALSE;
+static bool fatal = false;
+static bool serror = false;
+static bool newuser = false;
 static time_t snooze = (time_t)0;          /* sleep time */
 
 static const char *sorry1="I'm sorry, but the game is closed for repairs right now.";
@@ -80,7 +80,7 @@ void nWelcomeInit(void)
 {
     int pkttype;
     char buf[PKT_MAXSIZE];
-    int done = FALSE;
+    bool done = false;
 
     state = S_ERROR;
     setNode(&nWelcomeNode);
@@ -93,8 +93,7 @@ void nWelcomeInit(void)
         {
             utLog("nWelcomeInit: read SP_CLIENTSTAT or SP_ACK failed: %d",
                   pkttype);
-            fatal = TRUE;
-            done = TRUE;
+            fatal = true;
             return;
         }
 
@@ -103,27 +102,26 @@ void nWelcomeInit(void)
         case SP_CLIENTSTAT:
             if (PKT_PROCSP(buf))
             {
-                done = TRUE;
+                done = true;
             }
             else
             {
                 utLog("nWelcomeInit: invalid CLIENTSTAT");
-                fatal = TRUE;
-                done = TRUE;
+                fatal = true;
                 return;
             }
             break;
         case SP_ACK:
             PKT_PROCSP(buf);
             state = S_ERROR;
-            serror = TRUE;
-            done = TRUE;
+            serror = true;
+            done = true;
 
             break;
         default:
             utLog("nWelcomeInit: got unexpected packet type %d. Ignoring.",
                   pkttype);
-            done = FALSE;
+            done = false;
 
             break;
         }
@@ -131,18 +129,17 @@ void nWelcomeInit(void)
 
     if (pkttype == SP_CLIENTSTAT && (sClientStat.flags & SPCLNTSTAT_FLAG_NEW))
     {
-        newuser = TRUE;
+        // new user
         state = S_GREETINGS;
         snooze = (time(0) + 3);
     }
     else
     {
-        newuser = FALSE;
+        // not a new user
         if (!serror)
             state = S_DONE;           /* need to wait for user packet */
         else
             snooze = (time(0) + 4);
-
     }
 
     return;

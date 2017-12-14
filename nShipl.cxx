@@ -57,11 +57,8 @@ scrNode_t *nShiplInit(int nodeid, int setnode)
 static int nShiplDisplay(dspConfig_t *dsp)
 {
     int snum = Context.snum;
-    static const int doall = FALSE; /* for now... */
     static char cbuf[BUFFER_SIZE_256];
     int i, unum, status, lin, col;
-    killedBy_t kb;
-    uint16_t detail;
     int fline, lline;
     char sbuf[20];
     char kbuf[20];
@@ -91,10 +88,7 @@ static int nShiplDisplay(dspConfig_t *dsp)
     {
         status = cbShips[i].status;
 
-        kb = cbShips[i].killedBy;
-        detail = cbShips[i].killedByDetail;
-        if ( status == SS_LIVE ||
-             ( doall && ( status != SS_OFF || kb != KB_NONE ) ) )
+        if ( status == SS_LIVE )
         {
             sbuf[0] = 0;
             utAppendShip(sbuf , i) ;
@@ -121,11 +115,6 @@ static int nShiplDisplay(dspConfig_t *dsp)
             else
                 sprintf( cbuf, "%-5s %13s %21s %8s %6s", sbuf,
                          " ", " ", " ", " " );
-            if ( doall && kb != KB_NONE )
-            {
-                strcat(cbuf, "  ") ;
-                utAppendKilledBy(cbuf, kb, detail) ;
-            }
 
             if (snum >= 0 && snum < MAXSHIPS )
             {		/* a normal ship view */
@@ -150,15 +139,6 @@ static int nShiplDisplay(dspConfig_t *dsp)
             }
 
             cprintf(lin, col, ALIGN_NONE, "#%d#%s", color, cbuf);
-
-            if ( doall && status != SS_LIVE )
-            {
-                cbuf[0] = 0;
-                utAppendShipStatus(cbuf , status) ;
-
-                cprintf(lin, col - 2 - strlen( cbuf ),
-                        ALIGN_NONE, "#%d#%s", YellowLevelColor, cbuf);
-            }
         }
         i = i + 1;
         lin = lin + 1;

@@ -3142,6 +3142,7 @@ static int LoadTGA(char *filename, textureImage *texture)
             {
                 utLog("%s: could not read RLE header.", filename);
                 fclose(file);
+                free(colorbuffer);
                 return FALSE;
             }
 

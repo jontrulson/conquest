@@ -451,9 +451,8 @@ static int ViewEditOptions(struct Conf ConfigData[], int ConfSize,
     static const char *eprompt = "Arrow keys to select an item, [SPACE] to change, any other key to quit.";
     static const char *vprompt = MTXT_DONE;
     static const char *eprompt2 = "Type '?' for help on an item.";
-    int Done = FALSE;
     int ch;
-    int lin = 0, col = 0, flin, llin, clin;
+    int lin = 0, col = 0, flin, llin = 0, clin;
     const int settingcol = 65;
     int vattrib;
 #define MAXOPTCOLS 128
@@ -475,7 +474,6 @@ static int ViewEditOptions(struct Conf ConfigData[], int ConfSize,
     int maxllin = MSG_LIN1 - 2;	/* max last option line */
 #endif
 
-    llin = 0;			/* last option line */
     clin = 0;			/* current option line (also idx into cvec) */
 
 				/* clear out cvec */
@@ -483,7 +481,7 @@ static int ViewEditOptions(struct Conf ConfigData[], int ConfSize,
     for (i=0; i < MAXOPTCOLS; i++)
         cvec[i] = -1;
 
-    while (Done == FALSE)
+    while (true)
     {
         cdclrl( 1, MSG_LIN2);	/* clear screen area */
         lin = 1;
@@ -556,7 +554,7 @@ static int ViewEditOptions(struct Conf ConfigData[], int ConfSize,
 	}
 
         /* now the editing phase */
-        llin = k - 1;
+        llin = k - 1; // last option line
 
 #ifdef DEBUG_OPTIONS
         utLog("ViewEditOptions(): maxllin = %d, llin = %d, k = %d", maxllin, llin, k);
@@ -577,7 +575,6 @@ static int ViewEditOptions(struct Conf ConfigData[], int ConfSize,
 
         if (!editable)
 	{
-            Done = TRUE;
             break;		/* exit here after viewing */
 	}
 
@@ -614,7 +611,6 @@ static int ViewEditOptions(struct Conf ConfigData[], int ConfSize,
             break;
 
 	default:		/* everything else */
-            Done = TRUE;
             break;
 	}
 
@@ -645,7 +641,7 @@ static int ViewEditMacros(struct Conf *ConfigData)
     int Done = FALSE;
     int ch, vattrib;
     const char *dispmac;
-    int lin = 0, col = 0, flin, llin, clin, pages, curpage;
+    int lin = 0, col = 0, flin = 0, llin = 0, clin = 0, pages = 0, curpage = 0;
     const int macros_per_page = 18;
     char *macrovec[MAX_MACROS];
 
@@ -673,7 +669,6 @@ static int ViewEditMacros(struct Conf *ConfigData)
     cdclear();			/* First clear the display. */
 
     flin = 4;			/* first macro line */
-    llin = 0;			/* last macro line on this page */
     clin = 0;			/* current macro line */
 
 
@@ -691,17 +686,17 @@ static int ViewEditMacros(struct Conf *ConfigData)
         lin = flin;
         col = 1;
 
-        i = 0;			/* start at index 0 */
-
 				/* figure out the last editable line on
 				   this page */
 
+        // compute the last macro line on this page (llin)
         if (curpage == (pages - 1)) /* last page - might be less than full */
-            llin = (MAX_MACROS % macros_per_page);	/* ..or more than empty? ;-) */
+            llin = (MAX_MACROS % macros_per_page); /* ..or more than empty? ;-) */
         else
             llin = macros_per_page;
 
-        i = 0;
+        i = 0;			/* start at index 0 */
+
         while (i < llin)
 	{			/* display this page */
 				/* get the macro number for this line */

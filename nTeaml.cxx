@@ -114,34 +114,34 @@ static int nTeamlDisplay(dspConfig_t *dsp)
 
     lin = 1;
     /* team stats and last date conquered */
-    sprintf(tmpfmt,"#%d#%%s#%d#%%s",LabelColor,InfoColor);
-    cprintf(lin,0,ALIGN_CENTER, tmpfmt, stats, cbConqInfo->inittime);
+    sprintf(tmpfmt, "#%d#%%s#%d#%%s", LabelColor, InfoColor);
+    cprintf(lin, col, ALIGN_CENTER, tmpfmt, stats, cbConqInfo->inittime);
     lin++;
 
     /* last conquered */
-    cprintf(lin, 0, ALIGN_CENTER, tmpfmt, last_conquered,
+    cprintf(lin, col, ALIGN_CENTER, tmpfmt, last_conquered,
             cbConqInfo->conqtime);
     lin++;
 
     /* last conqueror and conqteam */
-    sprintf(tmpfmt,"#%d#by #%d#%%s #%d#for the #%d#%%s #%d#team",
-            LabelColor,(int)CQC_A_BOLD,LabelColor,(int)CQC_A_BOLD,LabelColor);
-    cprintf(lin,0,ALIGN_CENTER, tmpfmt, cbConqInfo->conqueror,
+    sprintf(tmpfmt, "#%d#by #%d#%%s #%d#for the #%d#%%s #%d#team",
+            LabelColor, (int)CQC_A_BOLD, LabelColor, (int)CQC_A_BOLD, LabelColor);
+    cprintf(lin,col,ALIGN_CENTER, tmpfmt, cbConqInfo->conqueror,
             cbConqInfo->conqteam);
 
-    col=0;  /* put col back to 0 for rest of display */
     lin = lin + 1;
 
     if ( cbConqInfo->lastwords[0] != 0 )
     {
         sprintf(tmpfmt, "#%d#%%c%%s%%c", YellowLevelColor);
-        cprintf(lin, 0, ALIGN_CENTER, tmpfmt, '"', cbConqInfo->lastwords, '"' );
+        cprintf(lin, col, ALIGN_CENTER, tmpfmt,
+                '"', cbConqInfo->lastwords, '"' );
     }
 
     lin+=2;
     sprintf( buf, sfmt, " ",
              cbTeams[0].name, cbTeams[1].name, cbTeams[2].name, cbTeams[3].name, "Totals" );
-    cprintf(lin,col,0, sfmt2, " ",
+    cprintf(lin, col, 0, sfmt2, " ",
             cbTeams[0].name, cbTeams[1].name, cbTeams[2].name, cbTeams[3].name, "Totals" );
 
     lin++;
@@ -149,31 +149,31 @@ static int nTeamlDisplay(dspConfig_t *dsp)
         if ( buf[i] != ' ' )
             buf[i] = '-';
 
-    cprintf(lin,col, ALIGN_NONE, "#%d#%s", LabelColor, buf);
+    cprintf(lin, col, ALIGN_NONE, "#%d#%s", LabelColor, buf);
 
     lin++;
-    cprintf(lin,col,0, dfmt2, "Conquers",
+    cprintf(lin, col, 0, dfmt2, "Conquers",
             cbTeams[0].stats[TSTAT_CONQUERS], cbTeams[1].stats[TSTAT_CONQUERS],
             cbTeams[2].stats[TSTAT_CONQUERS], cbTeams[3].stats[TSTAT_CONQUERS],
             cbTeams[0].stats[TSTAT_CONQUERS] + cbTeams[1].stats[TSTAT_CONQUERS] +
             cbTeams[2].stats[TSTAT_CONQUERS] + cbTeams[3].stats[TSTAT_CONQUERS] );
 
     lin++;
-    cprintf(lin,col,0, dfmt2, "Wins",
+    cprintf(lin, col, 0, dfmt2, "Wins",
             cbTeams[0].stats[TSTAT_WINS], cbTeams[1].stats[TSTAT_WINS],
             cbTeams[2].stats[TSTAT_WINS], cbTeams[3].stats[TSTAT_WINS],
             cbTeams[0].stats[TSTAT_WINS] + cbTeams[1].stats[TSTAT_WINS] +
             cbTeams[2].stats[TSTAT_WINS] + cbTeams[3].stats[TSTAT_WINS] );
 
     lin++;
-    cprintf(lin,col,0, dfmt2, "Losses",
+    cprintf(lin, col, 0, dfmt2, "Losses",
             cbTeams[0].stats[TSTAT_LOSSES], cbTeams[1].stats[TSTAT_LOSSES],
             cbTeams[2].stats[TSTAT_LOSSES], cbTeams[3].stats[TSTAT_LOSSES],
             cbTeams[0].stats[TSTAT_LOSSES] + cbTeams[1].stats[TSTAT_LOSSES] +
             cbTeams[2].stats[TSTAT_LOSSES] + cbTeams[3].stats[TSTAT_LOSSES] );
 
     lin++;
-    cprintf(lin,col,0, dfmt2, "Ships",
+    cprintf(lin, col, 0, dfmt2, "Ships",
             cbTeams[0].stats[TSTAT_ENTRIES], cbTeams[1].stats[TSTAT_ENTRIES],
             cbTeams[2].stats[TSTAT_ENTRIES], cbTeams[3].stats[TSTAT_ENTRIES],
             cbTeams[0].stats[TSTAT_ENTRIES] + cbTeams[1].stats[TSTAT_ENTRIES] +
@@ -187,7 +187,7 @@ static int nTeamlDisplay(dspConfig_t *dsp)
     utFormatSeconds( cbTeams[2].stats[TSTAT_SECONDS], timbuf[2] );
     utFormatSeconds( cbTeams[3].stats[TSTAT_SECONDS], timbuf[3] );
     utFormatSeconds( etime, timbuf[4] );
-    cprintf(lin,col,0, sfmt3, "Time",
+    cprintf(lin, col, 0, sfmt3, "Time",
             timbuf[0], timbuf[1], timbuf[2], timbuf[3], timbuf[4] );
 
     lin++;
@@ -198,7 +198,7 @@ static int nTeamlDisplay(dspConfig_t *dsp)
     utFormatSeconds( cbTeams[2].stats[TSTAT_CPUSECONDS], timbuf[2] );
     utFormatSeconds( cbTeams[3].stats[TSTAT_CPUSECONDS], timbuf[3] );
     utFormatSeconds( ctime, timbuf[4] );
-    cprintf( lin,col,0, sfmt3, "Cpu time",
+    cprintf(lin, col, 0, sfmt3, "Cpu time",
              timbuf[0], timbuf[1], timbuf[2], timbuf[3], timbuf[4] );
 
     lin++;
@@ -214,56 +214,56 @@ static int nTeamlDisplay(dspConfig_t *dsp)
         x[4] = 0.0;
     else
         x[4] = 100.0 * (real) ctime / (real)etime;
-    cprintf( lin,col,0, pfmt2, "Cpu usage", x[0], x[1], x[2], x[3], x[4] );
+    cprintf(lin, col, 0, pfmt2, "Cpu usage", x[0], x[1], x[2], x[3], x[4] );
 
     lin++;
-    cprintf( lin,col,0, dfmt2, "Phaser shots",
-             cbTeams[0].stats[TSTAT_PHASERS], cbTeams[1].stats[TSTAT_PHASERS],
-             cbTeams[2].stats[TSTAT_PHASERS], cbTeams[3].stats[TSTAT_PHASERS],
-             cbTeams[0].stats[TSTAT_PHASERS] + cbTeams[1].stats[TSTAT_PHASERS] +
-             cbTeams[2].stats[TSTAT_PHASERS] + cbTeams[3].stats[TSTAT_PHASERS] );
+    cprintf(lin, col, 0, dfmt2, "Phaser shots",
+            cbTeams[0].stats[TSTAT_PHASERS], cbTeams[1].stats[TSTAT_PHASERS],
+            cbTeams[2].stats[TSTAT_PHASERS], cbTeams[3].stats[TSTAT_PHASERS],
+            cbTeams[0].stats[TSTAT_PHASERS] + cbTeams[1].stats[TSTAT_PHASERS] +
+            cbTeams[2].stats[TSTAT_PHASERS] + cbTeams[3].stats[TSTAT_PHASERS] );
 
     lin++;
-    cprintf( lin,col,0, dfmt2, "Torps fired",
-             cbTeams[0].stats[TSTAT_TORPS], cbTeams[1].stats[TSTAT_TORPS],
-             cbTeams[2].stats[TSTAT_TORPS], cbTeams[3].stats[TSTAT_TORPS],
-             cbTeams[0].stats[TSTAT_TORPS] + cbTeams[1].stats[TSTAT_TORPS] +
-             cbTeams[2].stats[TSTAT_TORPS] + cbTeams[3].stats[TSTAT_TORPS] );
+    cprintf(lin, col, 0, dfmt2, "Torps fired",
+            cbTeams[0].stats[TSTAT_TORPS], cbTeams[1].stats[TSTAT_TORPS],
+            cbTeams[2].stats[TSTAT_TORPS], cbTeams[3].stats[TSTAT_TORPS],
+            cbTeams[0].stats[TSTAT_TORPS] + cbTeams[1].stats[TSTAT_TORPS] +
+            cbTeams[2].stats[TSTAT_TORPS] + cbTeams[3].stats[TSTAT_TORPS] );
 
     lin++;
-    cprintf( lin,col,0, dfmt2, "Armies bombed",
-             cbTeams[0].stats[TSTAT_ARMBOMB], cbTeams[1].stats[TSTAT_ARMBOMB],
-             cbTeams[2].stats[TSTAT_ARMBOMB], cbTeams[3].stats[TSTAT_ARMBOMB],
-             cbTeams[0].stats[TSTAT_ARMBOMB] + cbTeams[1].stats[TSTAT_ARMBOMB] +
-             cbTeams[2].stats[TSTAT_ARMBOMB] + cbTeams[3].stats[TSTAT_ARMBOMB] );
+    cprintf(lin, col, 0, dfmt2, "Armies bombed",
+            cbTeams[0].stats[TSTAT_ARMBOMB], cbTeams[1].stats[TSTAT_ARMBOMB],
+            cbTeams[2].stats[TSTAT_ARMBOMB], cbTeams[3].stats[TSTAT_ARMBOMB],
+            cbTeams[0].stats[TSTAT_ARMBOMB] + cbTeams[1].stats[TSTAT_ARMBOMB] +
+            cbTeams[2].stats[TSTAT_ARMBOMB] + cbTeams[3].stats[TSTAT_ARMBOMB] );
 
     lin++;
-    cprintf( lin,col,0, dfmt2, "Armies captured",
-             cbTeams[0].stats[TSTAT_ARMSHIP], cbTeams[1].stats[TSTAT_ARMSHIP],
-             cbTeams[2].stats[TSTAT_ARMSHIP], cbTeams[3].stats[TSTAT_ARMSHIP],
-             cbTeams[0].stats[TSTAT_ARMSHIP] + cbTeams[1].stats[TSTAT_ARMSHIP] +
-             cbTeams[2].stats[TSTAT_ARMSHIP] + cbTeams[3].stats[TSTAT_ARMSHIP] );
+    cprintf(lin, col, 0, dfmt2, "Armies captured",
+            cbTeams[0].stats[TSTAT_ARMSHIP], cbTeams[1].stats[TSTAT_ARMSHIP],
+            cbTeams[2].stats[TSTAT_ARMSHIP], cbTeams[3].stats[TSTAT_ARMSHIP],
+            cbTeams[0].stats[TSTAT_ARMSHIP] + cbTeams[1].stats[TSTAT_ARMSHIP] +
+            cbTeams[2].stats[TSTAT_ARMSHIP] + cbTeams[3].stats[TSTAT_ARMSHIP] );
 
     lin++;
-    cprintf( lin,col,0, dfmt2, "Planets taken",
-             cbTeams[0].stats[TSTAT_CONQPLANETS], cbTeams[1].stats[TSTAT_CONQPLANETS],
-             cbTeams[2].stats[TSTAT_CONQPLANETS], cbTeams[3].stats[TSTAT_CONQPLANETS],
-             cbTeams[0].stats[TSTAT_CONQPLANETS] + cbTeams[1].stats[TSTAT_CONQPLANETS] +
-             cbTeams[2].stats[TSTAT_CONQPLANETS] + cbTeams[3].stats[TSTAT_CONQPLANETS] );
+    cprintf(lin, col, 0, dfmt2, "Planets taken",
+            cbTeams[0].stats[TSTAT_CONQPLANETS], cbTeams[1].stats[TSTAT_CONQPLANETS],
+            cbTeams[2].stats[TSTAT_CONQPLANETS], cbTeams[3].stats[TSTAT_CONQPLANETS],
+            cbTeams[0].stats[TSTAT_CONQPLANETS] + cbTeams[1].stats[TSTAT_CONQPLANETS] +
+            cbTeams[2].stats[TSTAT_CONQPLANETS] + cbTeams[3].stats[TSTAT_CONQPLANETS] );
 
     lin++;
-    cprintf( lin,col,0, dfmt2, "Coups",
-             cbTeams[0].stats[TSTAT_COUPS], cbTeams[1].stats[TSTAT_COUPS],
-             cbTeams[2].stats[TSTAT_COUPS], cbTeams[3].stats[TSTAT_COUPS],
-             cbTeams[0].stats[TSTAT_COUPS] + cbTeams[1].stats[TSTAT_COUPS] +
-             cbTeams[2].stats[TSTAT_COUPS] + cbTeams[3].stats[TSTAT_COUPS] );
+    cprintf(lin, col, 0, dfmt2, "Coups",
+            cbTeams[0].stats[TSTAT_COUPS], cbTeams[1].stats[TSTAT_COUPS],
+            cbTeams[2].stats[TSTAT_COUPS], cbTeams[3].stats[TSTAT_COUPS],
+            cbTeams[0].stats[TSTAT_COUPS] + cbTeams[1].stats[TSTAT_COUPS] +
+            cbTeams[2].stats[TSTAT_COUPS] + cbTeams[3].stats[TSTAT_COUPS] );
 
     lin++;
-    cprintf( lin,col,0, dfmt2, "Genocides",
-             cbTeams[0].stats[TSTAT_GENOCIDE], cbTeams[1].stats[TSTAT_GENOCIDE],
-             cbTeams[2].stats[TSTAT_GENOCIDE], cbTeams[3].stats[TSTAT_GENOCIDE],
-             cbTeams[0].stats[TSTAT_GENOCIDE] + cbTeams[1].stats[TSTAT_GENOCIDE] +
-             cbTeams[2].stats[TSTAT_GENOCIDE] + cbTeams[3].stats[TSTAT_GENOCIDE] );
+    cprintf(lin, col, 0, dfmt2, "Genocides",
+            cbTeams[0].stats[TSTAT_GENOCIDE], cbTeams[1].stats[TSTAT_GENOCIDE],
+            cbTeams[2].stats[TSTAT_GENOCIDE], cbTeams[3].stats[TSTAT_GENOCIDE],
+            cbTeams[0].stats[TSTAT_GENOCIDE] + cbTeams[1].stats[TSTAT_GENOCIDE] +
+            cbTeams[2].stats[TSTAT_GENOCIDE] + cbTeams[3].stats[TSTAT_GENOCIDE] );
 
     for ( i = 0; i < 4; i++ )
         if ( cbTeams[i].couptime == 0 )
@@ -283,8 +283,8 @@ static int nTeamlDisplay(dspConfig_t *dsp)
     timbuf[4][0] = 0;
 
     lin++;
-    cprintf( lin,col,0, sfmt3, "Coup time",
-             timbuf[0], timbuf[1], timbuf[2], timbuf[3], timbuf[4] );
+    cprintf(lin, col, 0, sfmt3, "Coup time",
+            timbuf[0], timbuf[1], timbuf[2], timbuf[3], timbuf[4] );
 
     cprintf( MSG_LIN2, 0, ALIGN_CENTER, "#%d#%s", NoColor, MTXT_DONE);
 

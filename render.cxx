@@ -157,6 +157,7 @@ void updateIconHudGeo(int snum)
     GLfloat tx, ty, th, tw, decaly;
     int i;
     static int steam = -1;
+    static bool firstTime = true;
     /* these two rects will just be used to store the texture size (in
        hw pixels) of each of the 2 decal areas (in w and h).  */
     static GLRect_t decal1_sz, decal2_sz;
@@ -186,9 +187,16 @@ void updateIconHudGeo(int snum)
     static cqiTextureAreaRec_t defaultTA = { "NULL", 0.0, 0.0, 1.0, 1.0 };
     char buffer[CQI_NAMELEN];
 
-    if (cbShips[snum].team != steam)
-    {                           /* we switched teams, reload/remap the
-                                   decal texareas */
+    if (cbShips[snum].team != steam || firstTime)
+    {
+        // we switched teams, or this is our first time though here.
+        // reload/remap the decal texareas
+
+        // The firstTime check here is a little superfluous, but a
+        // static analyzer can't know that a valid team will never be
+        // -1, so...
+        firstTime = false;
+
         int ndx;
         steam = cbShips[snum].team;
 
@@ -267,7 +275,6 @@ void updateIconHudGeo(int snum)
     /* the width of the entire hud info drawing area */
     o.xstatw = dConf.vX - (dConf.wBorderW * 2.0);
 
-    tx = dConf.vX;
     ty = dConf.vY + dConf.vH;
     /* icon height */
     o.sb_ih = (dConf.wH - (dConf.wBorderW * 2.0) - ty) / 4.0;

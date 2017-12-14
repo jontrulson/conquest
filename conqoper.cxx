@@ -654,15 +654,15 @@ void debugplan(void)
     const char *hd1="D E B U G G I N G  P L A N E T   L I S T";
     const char *hd2="planet        C T arm uih scan        planet        C T arm uih scan";
     char hd3[BUFFER_SIZE_256];
-    int FirstTime = TRUE;
+    static bool firstTime = true;
     int PlanetOffset;             /* offset into MAXPLANETS for this page */
     int PlanetIdx = 0;
-    int Done;
+    bool Done;
 
 
-    if (FirstTime == TRUE)
+    if (firstTime)
     {
-        FirstTime = FALSE;
+        firstTime = false;
         sprintf(hd0,
                 "#%d#%s#%d#%s#%d#%s#%d#%s",
                 LabelColor,
@@ -684,22 +684,15 @@ void debugplan(void)
         if ( hd3[i] != ' ' )
             hd3[i] = '-';
 
-    PlanetIdx = 0;
-
     PlanetOffset = 1;
     cdclear();
-    Done = FALSE;
 
-    cdclear();
-
-    Done = FALSE;
+    Done = false;
     do
     {
         cdclra(0, 0, MSG_LIN1 + 2, Context.maxcol - 1);
-        PlanetIdx = 0;
 
         lin = 1;
-
         cprintf(lin,0,ALIGN_CENTER,"%s", hd0 );
 
         lin++;
@@ -791,7 +784,7 @@ void debugplan(void)
             {                   /* got a char */
                 if (cmd != ' ')
                 {               /* quit */
-                    Done = TRUE;
+                    Done = true;
                 }
                 else
                 {               /* some other key... */
@@ -799,7 +792,7 @@ void debugplan(void)
                     PlanetOffset += PlanetIdx;
                     if (PlanetOffset >= MAXPLANETS)
                     {           /* pointless to continue */
-                        Done = TRUE;
+                        Done = true;
                     }
                 }
             }
@@ -807,9 +800,9 @@ void debugplan(void)
             /* didn't get a char, update */
         } /* if PlanetOffset <= MAXPLANETS */
         else
-            Done = TRUE;            /* else PlanetOffset > MAXPLANETS */
+            Done = true;            /* else PlanetOffset > MAXPLANETS */
 
-    } while(Done != TRUE); /* do */
+    } while(!Done); /* do */
 
     return;
 
@@ -1023,12 +1016,12 @@ void opback( int lastrev, int *savelin )
     extern char *ConquestVersion;
     extern char *ConquestDate;
 
-    int FirstTime = TRUE;
+    static bool firstTime = true;
     static char sfmt[MSGMAXLINE * 2];
 
-    if (FirstTime == TRUE)
+    if (firstTime)
     {
-        FirstTime = FALSE;
+        firstTime = false;
         sprintf(sfmt,
                 "#%d#(#%d#%%c#%d#) - %%s",
                 LabelColor,
@@ -1683,12 +1676,12 @@ void oppedit(void)
     char buf[MSGMAXLINE];
     int attrib;
 
-    int FirstTime = TRUE;
+    static bool firstTime = true;
     static char sfmt[MSGMAXLINE * 2];
 
-    if (FirstTime == TRUE)
+    if (firstTime)
     {
-        FirstTime = FALSE;
+        firstTime = false;
         sprintf(sfmt,
                 "#%d#(#%d#%%s#%d#)   %%s",
                 LabelColor,
@@ -3078,7 +3071,6 @@ void watch(void)
                     if (tmp_snum != snum)
                     {
                         old_snum = tmp_snum;
-                        tmp_snum = snum;
                         Context.redraw = TRUE;
                     }
                     Context.snum = snum;
@@ -3325,11 +3317,9 @@ void watch(void)
 int prompt_ship(char buf[], int *snum, int *normal)
 {
     int tch;
-    int tmpsnum = 0;
+    int tmpsnum = -1;
     static const char *pmt="Watch which ship (<cr> for doomsday)? ";
     static const char *nss="No such ship.";
-
-    tmpsnum = *snum;
 
     cdclrl( MSG_LIN1, 2 );
     buf[0] = 0;
@@ -3390,12 +3380,12 @@ void dowatchhelp(void)
 {
     int lin, col, tlin;
     int ch;
-    int FirstTime = TRUE;
+    static bool firstTime = true;
     static char sfmt[MSGMAXLINE * 2];
 
-    if (FirstTime == TRUE)
+    if (firstTime)
     {
-        FirstTime = FALSE;
+        firstTime = false;
         sprintf(sfmt,
                 "#%d#%%-9s#%d#%%s",
                 InfoColor,

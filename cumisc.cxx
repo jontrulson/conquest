@@ -44,7 +44,6 @@ void mcuHistList( int godlike )
     cprintf(fline,0,ALIGN_CENTER,"#%d#%s",LabelColor, hd0);
     fline = fline + 2;
 
-    thistptr = -1;		/* force an update the first time */
     while (TRUE) /* repeat */
     {
         if ( ! godlike )
@@ -822,8 +821,6 @@ void mcuPlanetList( int team, int snum )
         if ( hd3[i] != ' ' )
             hd3[i] = '-';
 
-    PlanetIdx = 0;
-
     PlanetOffset = 1;
     cdclear();
     Done = FALSE;
@@ -831,9 +828,7 @@ void mcuPlanetList( int team, int snum )
     {
 
         cdclra(0, 0, MSG_LIN1 + 2, Context.maxcol - 1);
-        PlanetIdx = 0;
         lin = 1;
-        col = column_h;
 
         cprintf(lin, column_h, ALIGN_NONE, pd0);
 
@@ -1328,7 +1323,7 @@ int mcuReviewMsgs( int snum, int slm )
 /*    mcuTeamList( team ) */
 void mcuTeamList( int team )
 {
-    int i, j, lin, col, ctime, etime;
+    int i, j, lin, col = 0, ctime, etime;
     int godlike;
     char buf[MSGMAXLINE], timbuf[5][MAXDATESIZE];
     real x[5];
@@ -1386,7 +1381,6 @@ void mcuTeamList( int team )
     } /* FIRST_TIME */
 
     godlike = ( team < 0 || team >= NUMPLAYERTEAMS );
-    col = 0; /*1*/
 
     lin = 1;
     /* team stats and last date conquered */
@@ -1405,7 +1399,7 @@ void mcuTeamList( int team )
     cprintf(lin,0,ALIGN_CENTER, tmpfmt, cbConqInfo->conqueror,
             cbConqInfo->conqteam);
 
-    col=0;  /* put col back to 0 for rest of display */
+    col = 0;  /* put col back to 0 for rest of display */
     lin = lin + 1;
     cdclrl( lin, 1 );
     if ( cbConqInfo->lastwords[0] != 0 )

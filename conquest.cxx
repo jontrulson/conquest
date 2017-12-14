@@ -224,7 +224,6 @@ static void _loadRCFiles(int type, const char *cqdir, const char *suffix)
         }
         free(filelist);
         filelist = NULL;
-        numfiles = 0;
     }
 
     return;

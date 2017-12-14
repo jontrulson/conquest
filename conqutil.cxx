@@ -725,25 +725,18 @@ int utModPlusOne( int i, int modulus )
 /*    flag = utSafeCToI( num, buf ptr ) */
 int utSafeCToI( int *num, char *buf, int offset )
 {
-    int retval;
-    retval = FALSE;
-
-    if (!buf)
-    {
-        *num = 0;
-        retval = FALSE;
-    }
+    if (!buf || !num)
+        return FALSE;
 
     int slen = strlen(buf);
 
     if (offset >= slen)
     {
         *num = 0;
-        retval = FALSE;
+        return FALSE;
     }
 
     *num = atoi( &buf[offset]);
-    retval = TRUE;
 
     /* If the number is the same size as the biggest integer, */
     /*  assume that it is too big. */
@@ -751,11 +744,10 @@ int utSafeCToI( int *num, char *buf, int offset )
     if ( *num >= INT_MAX )
     {
         *num = INT_MAX;
-        retval = FALSE;
+        return FALSE;
     }
 
-    return ( retval );
-
+    return ( TRUE );
 }
 
 

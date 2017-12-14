@@ -449,7 +449,7 @@ int clbCheckLaunch(int snum, int number)
 int clbLaunch( int snum, real dir, int number, int ltype )
 {
     int i, j;
-    real speed, adir;
+    real speed = 0.0, adir = 0.0;
     int tnum, numslots, numfired;
     static int tslot[MAXTORPS];
 
@@ -506,19 +506,14 @@ int clbLaunch( int snum, real dir, int number, int ltype )
                 rndnor( cbShips[snum].x, EXPLODESHIP_TORP_SPREAD );
             cbShips[snum].torps[tslot[i]].y =
                 rndnor( cbShips[snum].y, EXPLODESHIP_TORP_SPREAD );
-            /* no movement */
-            speed = 0.0;
-            /* no direction or deltas */
-            adir = 0.0;
+            /* no movement, direction, or deltas */
             cbShips[snum].torps[tslot[i]].dx = 0.0;
             cbShips[snum].torps[tslot[i]].dy = 0.0;
 
-            /* strength of explosion depends on
-               the average of engine and weap
-               efficiency.  This prevents one side
-               from having an explosive adv over
-               another, while allowing greater
-               kills to matter.  */
+            /* strength of explosion depends on the average of engine
+               and weap efficiency.  This prevents one side from
+               having an explosive adv over another, while allowing
+               greater kills to matter.  */
             cbShips[snum].torps[tslot[i]].mult = (( (real)engeff(snum) +
                                                   (real)weaeff(snum) ) / 2.0);
 	}

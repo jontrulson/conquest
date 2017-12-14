@@ -273,7 +273,6 @@ spShipSml_t *spktShipSml(uint8_t snum, int rec)
         sshipsml.walloc = cbShips[snum].weapalloc;
         sshipsml.etemp = (uint8_t)cbShips[snum].etemp;
         sshipsml.wtemp = (uint8_t)cbShips[snum].wtemp;
-        dis = 0.0;	      /* we are very close to ourselves ;-) */
         canscan = TRUE;	      /* can always scan ourselves */
     }
     else

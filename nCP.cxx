@@ -3287,19 +3287,16 @@ static int nCPInput(int ch)
             break;
 
         case S_BEAMDIR:
-            i = 0;
             switch (ch)
             {
             case 'u':
             case 'U':
                 dirup = TRUE;
-                i = TRUE;
                 break;
             case 'd':
             case 'D':
             case TERM_EXTRA:
                 dirup = FALSE;
-                i = TRUE;
                 break;
             default:
                 cp_putmsg( abt, MSG_LIN1 );
@@ -3308,26 +3305,24 @@ static int nCPInput(int ch)
                 return NODE_OK;
             }
 
-            if (i)
-            {                   /* time to ask how many */
-                if ( dirup )
-                    beamax = upmax;
-                else
-                    beamax = downmax;
+            /* time to ask how many */
+            if ( dirup )
+                beamax = upmax;
+            else
+                beamax = downmax;
 
-                sprintf( pbuf, "Beam %s [1-%d] ", (dirup) ? "up" : "down",
-                         beamax );
-                state = S_BEAMNUM;
-                prm.preinit = FALSE;
-                prm.buf = cbuf;
-                prm.buflen = 10;
-                prm.pbuf = pbuf;
-                prm.terms = TERMS;
-                prm.index = MSG_LIN1;
-                prm.buf[0] = 0;
-                hudSetPrompt(prm.index, prm.pbuf, NoColor, prm.buf, NoColor);
-                prompting = TRUE;
-            }
+            sprintf( pbuf, "Beam %s [1-%d] ", (dirup) ? "up" : "down",
+                     beamax );
+            state = S_BEAMNUM;
+            prm.preinit = FALSE;
+            prm.buf = cbuf;
+            prm.buflen = 10;
+            prm.pbuf = pbuf;
+            prm.terms = TERMS;
+            prm.index = MSG_LIN1;
+            prm.buf[0] = 0;
+            hudSetPrompt(prm.index, prm.pbuf, NoColor, prm.buf, NoColor);
+            prompting = TRUE;
 
             break;
 

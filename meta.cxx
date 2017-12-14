@@ -356,7 +356,7 @@ int metaGetServerList(const char *remotehost, metaSRec_t **srvlist)
     struct hostent *hp;
     char buf[SERVER_BUFSIZE];               /* server buffer */
     int off;
-    int firsttime = TRUE;
+    static bool firstTime = true;
     int s;                        /* socket */
     int nums;                     /* number of servers found */
     char c;
@@ -366,9 +366,9 @@ int metaGetServerList(const char *remotehost, metaSRec_t **srvlist)
     if (!remotehost || !srvlist)
         return -1;
 
-    if (firsttime)
+    if (firstTime)
     {
-        firsttime = FALSE;
+        firstTime = false;
         memset((void *)&servers, 0, (sizeof(metaSRec_t) * META_MAXSERVERS));
     }
 

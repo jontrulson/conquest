@@ -70,9 +70,9 @@ static int nPlanetlDisplay(dspConfig_t *dsp)
     char ch, junk[10];
     int outattr;
     int col2;
-    int column_h = 7;
-    int column_1 = 3;
-    int column_2 = 41;
+    const int column_h = 7;
+    const int column_1 = 3;
+    const int column_2 = 41;
     char xbuf[BUFFER_SIZE_256];
     static char pd0[BUFFER_SIZE_1024];
     static int FirstTime = TRUE;
@@ -105,7 +105,6 @@ static int nPlanetlDisplay(dspConfig_t *dsp)
     }
 
     lin = 1;
-    col = column_h;
 
     cprintf(lin, column_h, ALIGN_NONE, pd0);
 

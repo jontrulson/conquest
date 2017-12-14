@@ -515,10 +515,10 @@ int proc_0006_Message(char *buf)
 
     smsg->msg[70 /*MESSAGE_SIZE*/ - 1] = 0;
 
-    msgTo_t   realTo;
-    uint16_t  realToDetail;
-    msgFrom_t realFrom;
-    uint16_t  realFromDetail;
+    msgTo_t   realTo = MSG_TO_NOONE;
+    uint16_t  realToDetail = 0;
+    msgFrom_t realFrom = MSG_FROM_NOONE;
+    uint16_t  realFromDetail = 0;
 
     smsg->from = (int)((int16_t)ntohs(smsg->from));
     smsg->to = (int)((int16_t)ntohs(smsg->to));

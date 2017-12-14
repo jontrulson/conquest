@@ -233,7 +233,6 @@ void display( int snum )
         if ( ! clbCVTCoords( cenx, ceny, cbPlanets[i].x, cbPlanets[i].y, scale, &lin, &col ) )
             continue; /* next;*/
 
-        palertcol = 0;
         /* determine alertlevel for object */
         if (snum >= 0 && clbSPWar( snum, i ) && cbPlanets[i].scanned[cbShips[snum].team])
 	{
