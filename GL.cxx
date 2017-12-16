@@ -3002,7 +3002,7 @@ static int checkTexture(const char *filename, textureImage *texture)
     }
     else
     {
-        utLog("%s: y%s: ERROR: Unsupported number of components: %d",
+        utLog("%s: %s: ERROR: Unsupported number of components: %d",
               __FUNCTION__, filename, texture->components);
         return FALSE;
     }
@@ -3194,7 +3194,8 @@ static int loadGLTextures()
                 }
                 else
                 {
-                    /* components 3, no alpha component */
+                    // fallback, assume components == 3 (RGB), can't
+                    // be anything else at this point
                     type = GL_RGB;
                     if (cqiTextures[i].flags & CQITEX_F_IS_LUMINANCE)
                         components = GL_LUMINANCE8;
