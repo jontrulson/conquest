@@ -12,7 +12,6 @@ texture {
 
 texture {
   name         "classm"
-  filename     "classm.png"
 
   color        "ffe6e6e6"
   mipmap       "yes"

@@ -3272,8 +3272,7 @@ static void checkStr(char *str)
         {
         case '\\':
         case '/':
-// FIXME - needed to comment out for .png specification
-//        case '.':
+        case '.':
         case ' ':
             *s = '_';
             s++;

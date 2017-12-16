@@ -2988,16 +2988,21 @@ static int checkTexture(const char *filename, textureImage *texture)
     if (texture->components == 4)
     {
         type = GL_RGBA;
-        components = 4;
+        components = GL_RGBA8;
     }
     else if (texture->components == 3)
     {
         type = GL_RGB;
-        components = 3;
+        components = GL_RGB8;
+    }
+    else if (texture->components == 2)
+    {
+        type = GL_LUMINANCE_ALPHA;
+        components = GL_LUMINANCE8_ALPHA8;
     }
     else
     {
-        utLog("%s: %s: ERROR: Unsupported number of components: %d",
+        utLog("%s: y%s: ERROR: Unsupported number of components: %d",
               __FUNCTION__, filename, texture->components);
         return FALSE;
     }
@@ -3066,19 +3071,12 @@ static char *_getTexFile(char *tfilenm)
     char *homevar;
     FILE *fd;
     static char buffer[BUFFER_SIZE_256];
-    bool needsExt = true;
-
-    // if there's a '.', then we assume an extension was specified and
-    // we add nothing, otherwise we add ".tga" by default.
-    if (strchr(tfilenm, '.'))
-        needsExt = false;
 
     /* look for a user image */
     if ((homevar = getenv(CQ_USERHOMEDIR)))
     {
-        snprintf(buffer, sizeof(buffer), "%s/%s/img/%s%s",
-                 homevar, CQ_USERCONFDIR, tfilenm,
-                 (needsExt) ? ".tga" : "");
+        snprintf(buffer, sizeof(buffer), "%s/%s/img/%s.png",
+                 homevar, CQ_USERCONFDIR, tfilenm);
 
         if ((fd = fopen(buffer, "r")))
         {                       /* found one */
@@ -3088,9 +3086,8 @@ static char *_getTexFile(char *tfilenm)
     }
 
     /* if we are here, look for the system one */
-    snprintf(buffer, sizeof(buffer), "%s/img/%s%s",
-             utGetPath(CONQSHARE), tfilenm,
-        (needsExt) ? ".tga" : "");
+    snprintf(buffer, sizeof(buffer), "%s/img/%s.png",
+             utGetPath(CONQSHARE), tfilenm);
 
     if ((fd = fopen(buffer, "r")))
     {                       /* found one */
@@ -3185,18 +3182,24 @@ static int loadGLTextures()
                 {
                     type = GL_RGBA;
                     if (cqiTextures[i].flags & CQITEX_F_IS_LUMINANCE)
-                        components = GL_LUMINANCE_ALPHA;
+                        components = GL_LUMINANCE8_ALPHA8;
                     else
-                        components = GL_RGBA;
+                        components = GL_RGBA8;
+                }
+                else if (texti->components == 2)
+                {
+                    // Always a luminance (with alpha) texture
+                    type = GL_LUMINANCE_ALPHA;
+                    components = GL_LUMINANCE8_ALPHA8;
                 }
                 else
                 {
-                    /* no alpha component */
+                    /* components 3, no alpha component */
                     type = GL_RGB;
                     if (cqiTextures[i].flags & CQITEX_F_IS_LUMINANCE)
-                        components = GL_LUMINANCE;
+                        components = GL_LUMINANCE8;
                     else
-                        components = GL_RGB;
+                        components = GL_RGB8;
                 }
 
                 /* use linear filtering */

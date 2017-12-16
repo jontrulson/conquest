@@ -23,7 +23,7 @@ SOUNDRC    = $(DESTDIR)$(CONQSYSCONFDIR)/soundrc
 
 CONQDOCS = HISTORY README CONQINIT.TXT conqrule conqrule.easy
 
-IMAGES = img/*.tga img/*.png img/*.txf
+IMAGES = img/*.png img/*.txf
 SOUNDS = sound/*.ogg
 TRC = *.trc
 SRC = *.src
@@ -200,7 +200,7 @@ install-exec-hook:
 	chmod 775 $(DESTDIR)$(CONQLOCALSTATEDIR)
 	chgrp $(CONQGROUP) $(DESTDIR)$(CONQLOCALSTATEDIR)
 	cp -f $(IMAGES) $(DESTDIR)$(CONQIMGDIR)/
-	chmod 644 $(DESTDIR)$(CONQIMGDIR)/*.tga $(DESTDIR)$(CONQIMGDIR)/*.txf
+	chmod 644 $(DESTDIR)$(CONQIMGDIR)/*.png $(DESTDIR)$(CONQIMGDIR)/*.txf
 	cp -f $(SOUNDS) $(DESTDIR)$(CONQSNDDIR)/
 	chmod 644 $(DESTDIR)$(CONQSNDDIR)/*.ogg
 	cp -f $(CONQDOCS) $(DESTDIR)$(CONQDOCDIR)/
