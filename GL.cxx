@@ -29,6 +29,11 @@
 #include "anim.h"
 #undef NOEXTERN_GLANIM
 
+// Try out the STB image loader
+#define STB_IMAGE_IMPLEMENTATION
+# include "stb_image.h"
+#undef STB_IMAGE_IMPLEMENTATION
+
 #include "blinker.h"
 
 #include "node.h"
@@ -96,11 +101,12 @@ static struct {
 /* raw TGA texture data */
 typedef struct
 {
-    GLubyte	*imageData;
-    GLuint	bpp;
-    GLuint	width;
-    GLuint	height;
-    GLuint	texID;
+    // stb_image
+    unsigned char *imageData;
+    int           components;
+    int           width;
+    int           height;
+    GLuint texID;
 } textureImage;
 
 static void resize(int w, int h);
@@ -2970,7 +2976,7 @@ static void createDefaultTexture(void)
 
 /* try to instantiate a texture using a PROXY_TEXTURE_2D to see if the
    implementation can handle it. */
-static int checkTexture(char *filename, textureImage *texture)
+static int checkTexture(const char *filename, textureImage *texture)
 {
     GLint type, components, param;
 
@@ -2979,15 +2985,21 @@ static int checkTexture(char *filename, textureImage *texture)
                                      then the error occured prior to calling
                                      this function.  Look there :) */
 
-    if (texture->bpp == 32)
+    if (texture->components == 4)
     {
         type = GL_RGBA;
         components = 4;
     }
-    else
+    else if (texture->components == 3)
     {
         type = GL_RGB;
         components = 3;
+    }
+    else
+    {
+        utLog("%s: %s: ERROR: Unsupported number of components: %d",
+              __FUNCTION__, filename, texture->components);
+        return FALSE;
     }
 
     glTexImage2D(GL_PROXY_TEXTURE_2D, 0, components,
@@ -3008,268 +3020,39 @@ static int checkTexture(char *filename, textureImage *texture)
     return TRUE;
 }
 
-/* load a tga file into texture.  Supports RLE compressed as well
-   as uncompressed TGA files. */
-static int LoadTGA(char *filename, textureImage *texture)
+// load an image file into a raw "pre-texture".  Pretty simple with
+// stb_image :)
+static bool loadImageFile(const char *filename, textureImage *texture)
 {
-    /* TGA headers */
-    static GLubyte TGAUncompressedHDR[12] =
-        {0,0,2,0,0,0,0,0,0,0,0,0}; /* Uncompressed header */
-    static GLubyte TGACompressedHDR[12] =
-        {0,0,10,0,0,0,0,0,0,0,0,0}; /* Compressed header */
+    if (!filename || !texture)
+        return false;
 
-    GLubyte TGAHeaderBytes[12]; /* Used To Compare TGA Header */
-    GLubyte header[6]; /* First 6 Useful Bytes From The Header */
-    GLuint bytesPerPixel;
-    GLuint imageSize;
-    GLuint temp;
-    FILE *file;
-    int i;
-    int compressed = FALSE;
-
-    if ((file = fopen(filename, "rb")) == NULL)
-    {
-        utLog("%s: %s: %s", __FUNCTION__, filename, strerror(errno));
-        return FALSE;
-    }
-
-    if (cqDebug > 1)
-    {
-        utLog("%s: Loading texture %s",
-              __FUNCTION__, filename);
-    }
-
-    if (fread(TGAHeaderBytes, 1, sizeof(TGAHeaderBytes), file) !=
-        sizeof(TGAHeaderBytes))
-    {
-        utLog("%s: Invalid TGA file: could not read TGA header.", filename);
-        fclose(file);
-        return FALSE;
-    }
-
-    if (!memcmp(TGAUncompressedHDR,
-                TGAHeaderBytes,
-                sizeof(TGAUncompressedHDR)))
-    {
-        compressed = FALSE;
-    }
-    else if (!memcmp(TGACompressedHDR,
-                     TGAHeaderBytes,
-                     sizeof(TGAUncompressedHDR)))
-    {
-        compressed = TRUE;
-    }
-    else
-    {
-        utLog("%s: Invalid TGA file header.", filename);
-        fclose(file);
-        return FALSE;
-    }
-
-
-    if (fread(header, 1, sizeof(header), file) != sizeof(header))
-    {
-        utLog("%s: Invalid TGA image header.", filename);
-        fclose(file);
-        return FALSE;
-    }
-
-    texture->width = header[1] * 256 + header[0];
-    texture->height = header[3] * 256 + header[2];
-    texture->bpp	= header[4];
-
-    if (texture->width <= 0 || texture->height <= 0 ||
-        (texture->bpp !=24 && texture->bpp != 32))
-    {
-        utLog("%s: Invalid file format: must be 24bpp or 32bpp (with alpha)",
-              filename);
-        fclose(file);
-        return FALSE;
-    }
-
-    bytesPerPixel	= texture->bpp / 8;
-    imageSize = texture->width * texture->height * bytesPerPixel;
-    texture->imageData = (GLubyte *)malloc(imageSize);
-
+    stbi_set_flip_vertically_on_load(true);
+    texture->imageData = stbi_load(filename,
+                                   &(texture->width),
+                                   &(texture->height),
+                                   &(texture->components),
+                                   0);
     if (!texture->imageData)
     {
-        utLog("%s: Texture alloc (%s, %d bytes) failed.",
-              __FUNCTION__, filename, imageSize);
-        fclose(file);
-        return FALSE;
+        utLog("%s: failed to load texture %s", __FUNCTION__,
+              filename);
+        return false;
     }
 
-
-    if (!compressed)
-    {                           /* non-compressed texture data */
-
-        if (fread(texture->imageData, 1, imageSize, file) != imageSize)
-        {
-            utLog("%s: Image data read failed.", filename);
-            fclose(file);
-            return FALSE;
-        }
-
-        /* swap B and R */
-        for(i=0; i<imageSize; i+=bytesPerPixel)
-        {
-            temp=texture->imageData[i];
-            texture->imageData[i] = texture->imageData[i + 2];
-            texture->imageData[i + 2] = temp;
-        }
-    }
-    else
-    {                           /* RLE compressed image data */
-        GLuint pixelcount	= texture->height * texture->width;
-        GLuint currentpixel	= 0; /* Current pixel being read */
-        GLuint currentbyte	= 0; /* Current byte */
-        /* Storage for 1 pixel */
-        GLubyte *colorbuffer = (GLubyte *)malloc(bytesPerPixel);
-
-        if (!colorbuffer)
-        {
-            utLog("%s: Colorbuffer alloc (%s, %d bytes) failed.",
-                  __FUNCTION__, filename, bytesPerPixel);
-            fclose(file);
-            return FALSE;
-        }
-
-        do
-        {
-            GLubyte chunkheader = 0; /* Storage for "chunk" header */
-
-            if(fread(&chunkheader, sizeof(GLubyte), 1, file) == 0)
-            {
-                utLog("%s: could not read RLE header.", filename);
-                fclose(file);
-                free(colorbuffer);
-                return FALSE;
-            }
-
-            if(chunkheader < 128)
-            {
-                /* If the chunkheader is < 128, it means that that is the
-                   number of RAW color packets minus 1 that
-                   follow the header */
-                short counter;
-                chunkheader++; /* add 1 to get number of following
-                                  color values */
-
-                for(counter = 0; counter < chunkheader; counter++)
-                {               /* Read RAW color values */
-                    if(fread(colorbuffer, 1,
-                             bytesPerPixel, file) != bytesPerPixel)
-                    {           /* Try to read 1 pixel */
-                        utLog("%s: could not read colorbuffer data.", filename);
-                        fclose(file);
-
-                        if(colorbuffer != NULL)
-                        {
-                            free(colorbuffer);
-                        }
-
-                        return FALSE;
-                    }
-
-                    texture->imageData[currentbyte] = colorbuffer[2];
-                    /* Flip R and B vcolor values around in the process */
-                    texture->imageData[currentbyte + 1] = colorbuffer[1];
-                    texture->imageData[currentbyte + 2] = colorbuffer[0];
-
-                    if(bytesPerPixel == 4)
-                    {           /* if its a 32 bpp image copy the 4th byte */
-                        texture->imageData[currentbyte + 3] = colorbuffer[3];
-                    }
-
-                    currentbyte += bytesPerPixel;
-                    currentpixel++;
-
-                    /* Make sure we havent read too many pixels */
-                    if(currentpixel > pixelcount)
-                    {
-                        utLog("%s: too many pixels read.", filename);
-
-                        fclose(file);
-
-                        if(colorbuffer != NULL)
-                        {
-                            free(colorbuffer);
-                        }
-
-                        return FALSE;
-                    }
-                }
-            }
-            else
-            {
-                /* chunkheader > 128 RLE data, next color
-                   repeated chunkheader - 127 times */
-                short counter;
-                /* Subteact 127 to get rid of the ID bit */
-                chunkheader -= 127;
-
-                /* Attempt to read following color values */
-                if(fread(colorbuffer, 1, bytesPerPixel, file) !=
-                   bytesPerPixel)
-                {
-                    utLog("%s: could not read colorbuffer data.", filename);
-
-                    fclose(file);
-
-                    if(colorbuffer != NULL)
-                    {
-                        free(colorbuffer);
-                    }
-
-                    return FALSE;
-                }
-
-                /* copy the color into the image data as many times as
-                   dictated */
-                for (counter=0; counter<chunkheader; counter++)
-                {
-                    texture->imageData[currentbyte] = colorbuffer[2];
-                    /* switch R and B bytes around while copying */
-                    texture->imageData[currentbyte + 1] = colorbuffer[1];
-                    texture->imageData[currentbyte + 2] = colorbuffer[0];
-
-                    if(bytesPerPixel == 4)
-                    {
-                        texture->imageData[currentbyte + 3] = colorbuffer[3];
-                    }
-
-                    currentbyte += bytesPerPixel;
-                    currentpixel++;
-
-                    /* Make sure we haven't read too many pixels */
-                    if(currentpixel > pixelcount)
-                    {
-                        utLog("%s: too many pixels read.", filename);
-
-                        fclose(file);
-
-                        if(colorbuffer != NULL)
-                        {
-                            free(colorbuffer);
-                        }
-
-                        return FALSE;
-                    }
-                }
-            }
-        }
-        while (currentpixel < pixelcount);
-    } /* compressed tga */
+    if (cqDebug)
+        utLog("%s: %s: x %d, y %d, components %d",
+              __FUNCTION__, filename, texture->width,
+              texture->height, texture->components);
 
     /* now test to see if the implementation can handle the texture */
 
     if (!checkTexture(filename, texture))
     {
-        fclose(file);
+        stbi_image_free(texture->imageData);
+        texture->imageData = NULL;
         return FALSE;
     }
-
-    fclose (file);
 
     return TRUE;
 }
@@ -3283,12 +3066,19 @@ static char *_getTexFile(char *tfilenm)
     char *homevar;
     FILE *fd;
     static char buffer[BUFFER_SIZE_256];
+    bool needsExt = true;
+
+    // if there's a '.', then we assume an extension was specified and
+    // we add nothing, otherwise we add ".tga" by default.
+    if (strchr(tfilenm, '.'))
+        needsExt = false;
 
     /* look for a user image */
     if ((homevar = getenv(CQ_USERHOMEDIR)))
     {
-        snprintf(buffer, sizeof(buffer), "%s/%s/img/%s.tga",
-                 homevar, CQ_USERCONFDIR, tfilenm);
+        snprintf(buffer, sizeof(buffer), "%s/%s/img/%s%s",
+                 homevar, CQ_USERCONFDIR, tfilenm,
+                 (needsExt) ? ".tga" : "");
 
         if ((fd = fopen(buffer, "r")))
         {                       /* found one */
@@ -3298,8 +3088,9 @@ static char *_getTexFile(char *tfilenm)
     }
 
     /* if we are here, look for the system one */
-    snprintf(buffer, sizeof(buffer), "%s/img/%s.tga",
-             utGetPath(CONQSHARE), tfilenm);
+    snprintf(buffer, sizeof(buffer), "%s/img/%s%s",
+             utGetPath(CONQSHARE), tfilenm,
+        (needsExt) ? ".tga" : "");
 
     if ((fd = fopen(buffer, "r")))
     {                       /* found one */
@@ -3380,7 +3171,7 @@ static int loadGLTextures()
             {
                 rv = FALSE;
             }
-            else if ((rv = LoadTGA(filenm, texti)) == TRUE)
+            else if ((rv = loadImageFile(filenm, texti)))
             {
                 /* create the texture */
                 glGenTextures(1, (GLuint *)&curTexture.id);
@@ -3390,7 +3181,7 @@ static int loadGLTextures()
                 curTexture.w = texti->width;
                 curTexture.h = texti->height;
 
-                if (texti->bpp == 32)
+                if (texti->components == 4)
                 {
                     type = GL_RGBA;
                     if (cqiTextures[i].flags & CQITEX_F_IS_LUMINANCE)
@@ -3438,11 +3229,13 @@ static int loadGLTextures()
             GLError();
 
             /* be free! */
-            if (texti)
+            if (texti && rv)
             {
-                if (texti->imageData && rv == TRUE)
-                    free(texti->imageData);
+                if (texti->imageData)
+                    stbi_image_free(texti->imageData);
+
                 free(texti);
+                texti = NULL;
             }
         }
 

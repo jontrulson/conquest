@@ -23,7 +23,7 @@ SOUNDRC    = $(DESTDIR)$(CONQSYSCONFDIR)/soundrc
 
 CONQDOCS = HISTORY README CONQINIT.TXT conqrule conqrule.easy
 
-IMAGES = img/*.tga img/*.txf
+IMAGES = img/*.tga img/*.png img/*.txf
 SOUNDS = sound/*.ogg
 TRC = *.trc
 SRC = *.src
