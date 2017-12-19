@@ -20,8 +20,6 @@
 
 #include "protocol.h"
 
-#define HOME_BUFSZ 1024
-
 /* set default sys config */
 static void setSysConfDefaults(void)
 {
@@ -33,6 +31,8 @@ static void setSysConfDefaults(void)
     SysConf.LogMessages = FALSE;
     SysConf.AllowRefits = TRUE;
     SysConf.AllowSlingShot = FALSE;
+    SysConf.NoTeamWar = FALSE;
+    SysConf.NoDrift = FALSE;
 
     utStrncpy(SysConf.ServerName, "Generic Conquest Server",
               CONF_SERVER_NAME_SZ);
@@ -101,7 +101,7 @@ void setUserConfDefaults(void)
    doesn't exist */
 static void checkCreateUserConfDir(void)
 {
-    char buffer[BUFFER_SIZE_256];
+    char buffer[PATH_MAX];
     struct stat sbuf;
     char *home;
 
@@ -113,7 +113,7 @@ static void checkCreateUserConfDir(void)
     }
 
     /* start building the filename */
-    snprintf(buffer, sizeof(buffer), "%s/%s", home, CQ_USERCONFDIR);
+    snprintf(buffer, PATH_MAX, "%s/%s", home, CQ_USERCONFDIR);
 
     if (stat(buffer, &sbuf) >= 0)
     {
@@ -1091,28 +1091,32 @@ int MakeSysConf()
 
 uint32_t getServerFlags(void)
 {
-    uint32_t f;
+    uint32_t f = SERVER_F_NONE;
 
     /* get the current flags */
-    f = SPSSTAT_FLAGS_NONE;
-
     if (SysConf.AllowRefits)
-        f |= SPSSTAT_FLAGS_REFIT;
+        f |= SERVER_F_REFIT;
 
     if (SysConf.AllowVacant)
-        f |= SPSSTAT_FLAGS_VACANT;
+        f |= SERVER_F_VACANT;
 
     if (SysConf.AllowSlingShot)
-        f |= SPSSTAT_FLAGS_SLINGSHOT;
+        f |= SERVER_F_SLINGSHOT;
 
     if (SysConf.NoDoomsday)
-        f |= SPSSTAT_FLAGS_NODOOMSDAY;
+        f |= SERVER_F_NODOOMSDAY;
 
     if (SysConf.DoRandomRobotKills)
-        f |= SPSSTAT_FLAGS_KILLBOTS;
+        f |= SERVER_F_KILLBOTS;
 
     if (SysConf.AllowSwitchteams)
-        f |= SPSSTAT_FLAGS_SWITCHTEAM;
+        f |= SERVER_F_SWITCHTEAM;
+
+    if (SysConf.NoTeamWar)
+        f |= SERVER_F_NOTEAMWAR;
+
+    if (SysConf.NoDrift)
+        f |= SERVER_F_NODRIFT;
 
     return f;
 }

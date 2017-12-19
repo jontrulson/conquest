@@ -63,30 +63,37 @@ void clntDisplayFeedback(char *msg)
 /* return a static string containing the server's stringified  flags */
 char *clntServerFlagsStr(uint32_t flags)
 {
-    static char serverflags[256];
+    static const int maxFlagsLen = 256;
+    static char serverflags[maxFlagsLen];
 
-    if (flags == SPSSTAT_FLAGS_NONE)
-        strcpy(serverflags, "None");
+    if (flags == SERVER_F_NONE)
+        utStrncpy(serverflags, "None", maxFlagsLen);
     else
-        strcpy(serverflags, "");
+        utStrncpy(serverflags, "", maxFlagsLen);
 
-    if (flags & SPSSTAT_FLAGS_REFIT)
-        strcat(serverflags, "Refit ");
+    if (flags & SERVER_F_REFIT)
+        utStrncat(serverflags, "Refit ", maxFlagsLen);
 
-    if (flags & SPSSTAT_FLAGS_VACANT)
-        strcat(serverflags, "Vacant ");
+    if (flags & SERVER_F_VACANT)
+        utStrncat(serverflags, "Vacant ", maxFlagsLen);
 
-    if (flags & SPSSTAT_FLAGS_SLINGSHOT)
-        strcat(serverflags, "SlingShot ");
+    if (flags & SERVER_F_SLINGSHOT)
+        utStrncat(serverflags, "SlingShot ", maxFlagsLen);
 
-    if (flags & SPSSTAT_FLAGS_NODOOMSDAY)
-        strcat(serverflags, "NoDoomsday ");
+    if (flags & SERVER_F_NODOOMSDAY)
+        utStrncat(serverflags, "NoDoomsday ", maxFlagsLen);
 
-    if (flags & SPSSTAT_FLAGS_KILLBOTS)
-        strcat(serverflags, "Killbots ");
+    if (flags & SERVER_F_KILLBOTS)
+        utStrncat(serverflags, "Killbots ", maxFlagsLen);
 
-    if (flags & SPSSTAT_FLAGS_SWITCHTEAM)
-        strcat(serverflags, "SwitchTeam ");
+    if (flags & SERVER_F_SWITCHTEAM)
+        utStrncat(serverflags, "SwitchTeam ", maxFlagsLen);
+
+    if (flags & SERVER_F_NOTEAMWAR)
+        utStrncat(serverflags, "NoTeamWar ", maxFlagsLen);
+
+    if (flags & SERVER_F_NODRIFT)
+        utStrncat(serverflags, "NoDrift ", maxFlagsLen);
 
     return serverflags;
 }

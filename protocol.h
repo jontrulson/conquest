@@ -127,16 +127,8 @@ typedef struct {
     uint8_t txt[MESSAGE_SIZE];	/* text */
 } spAckMsg_t;
 
-#define SPSSTAT_FLAGS_NONE        0x00000000
-#define SPSSTAT_FLAGS_REFIT       0x00000001 /* allow refits? */
-#define SPSSTAT_FLAGS_VACANT      0x00000002 /* allow vacant ships? */
-#define SPSSTAT_FLAGS_SLINGSHOT   0x00000004 /* 'slingshot' bug enabled? */
-#define SPSSTAT_FLAGS_NODOOMSDAY  0x00000008 /* no doomsday allowed? */
-#define SPSSTAT_FLAGS_KILLBOTS    0x00000010 /* robots have randomized kills? */
-#define SPSSTAT_FLAGS_SWITCHTEAM  0x00000020 /* allowed to switch teams? */
-
 typedef struct {
-    uint8_t  type;                 /* SP_SERVSTAT */
+    uint8_t  type;              /* SP_SERVSTAT */
     uint8_t  numactive;		/* active ships */
     uint8_t  numvacant;		/* vacant ships */
     uint8_t  numrobot;		/* robots active */
@@ -145,9 +137,9 @@ typedef struct {
     uint8_t  pad1;
     uint16_t numusers;		/* total number of users */
 
-    uint32_t flags;		/* certain operating modes/options */
+    uint32_t serverFlags;       /* server flags (serverflags.h) */
 
-    uint32_t servertime;		/* the server's time */
+    uint32_t servertime;        /* the server's time */
 } spServerStat_t;
 
 #define SPCLNTSTAT_FLAG_NONE    0x00

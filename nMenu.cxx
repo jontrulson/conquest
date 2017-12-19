@@ -134,7 +134,7 @@ static void _conqds(dspConfig_t *dsp)
     cprintf(lin,col,ALIGN_NONE,sfmt, 'r', "resign your commission");
     lin++;
 
-    if ( sStat.flags & SPSSTAT_FLAGS_SWITCHTEAM )
+    if ( sStat.serverFlags & SERVER_F_SWITCHTEAM )
     {
 
         cprintf(lin,col,ALIGN_NONE,sfmt, 's', "switch teams");
@@ -378,13 +378,27 @@ static int nMenuInput(int ch)
             else
             {
                 prm.buf[0] = 0;
-                for ( i = 0; i < NUMPLAYERTEAMS; i = i + 1 )
-                    if ( ch == (char)tolower( cbTeams[i].teamchar ) )
+                for (i=0; i < NUMPLAYERTEAMS; i++)
+                {
+                    if ( (sStat.serverFlags & SERVER_F_NOTEAMWAR)
+                         && i == cbShips[Context.snum].team
+                         && ch == (char)tolower(cbTeams[i].teamchar))
                     {
-                        if ( ! twar[i] || ! cbShips[Context.snum].rwar[i] )
-                            twar[i] = ! twar[i];
-                        prm.pbuf = clbWarPrompt(Context.snum, twar);
+                        // not allowed, make sure war status is
+                        // cleared, then beep
+                        cbShips[Context.snum].war[cbShips[Context.snum].team] = FALSE;
+                        mglBeep(MGL_BEEP_ERR);
                     }
+                    else
+                    {
+                        if ( ch == (char)tolower( cbTeams[i].teamchar ) )
+                        {
+                            if ( ! twar[i] || ! cbShips[Context.snum].rwar[i] )
+                                twar[i] = ! twar[i];
+                            prm.pbuf = clbWarPrompt(Context.snum, twar);
+                        }
+                    }
+                }
             }
 
         default:
@@ -440,7 +454,7 @@ static int nMenuInput(int ch)
         }
         break;
     case 's':
-        if ( ! (sStat.flags & SPSSTAT_FLAGS_SWITCHTEAM) )
+        if ( ! (sStat.serverFlags & SERVER_F_SWITCHTEAM) )
             mglBeep(MGL_BEEP_ERR);
         else
         {

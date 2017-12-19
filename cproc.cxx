@@ -606,7 +606,7 @@ int procServerStat(char *buf)
 
     /* now fixup the byte order */
     sStat.numusers = ntohs(sStat.numusers);
-    sStat.flags = ntohl(sStat.flags);
+    sStat.serverFlags = ntohl(sStat.serverFlags);
     sStat.servertime = ntohl(sStat.servertime);
 
     return TRUE;

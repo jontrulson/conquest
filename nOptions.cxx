@@ -381,7 +381,7 @@ static void _dispUserOptsMenu(void)
             NoColor);
     lin++;
     cprintf(lin, col, ALIGN_NONE, "#%d#Flags:#%d# %s#%d#", LabelColor,
-            InfoColor, clntServerFlagsStr(sStat.flags),
+            InfoColor, clntServerFlagsStr(sStat.serverFlags),
             NoColor);
 
     if (!prompting)

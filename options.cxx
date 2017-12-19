@@ -211,123 +211,6 @@ void SysOptsMenu(void)
     return;
 }
 
-/*************************************************************************
- * UserOptsMenu() - display user options menu
- *
- *
- *************************************************************************/
-
-void UserOptsMenu(int unum)
-{
-    static const char *header = "User Options Menu";
-    static const char *mopts[] = {
-        "View/Edit Options",
-        "View/Edit Macros",
-        "Change Password"
-    };
-    const int numoptions = 3;	/* don't exceed 9 - one char input is used */
-    static const char *prompt = "Enter a number to select an item, any other key to quit.";
-    int lin = 0, col = 0;
-    int i;
-    int ch;
-    int Done = FALSE;
-    struct Conf *macroptr = NULL;	/* points to macro element of ConfData */
-
-    for (i=0; i < CfEnd; i++)
-    {
-        if (ConfData[i].ConfType == CTYPE_MACRO)
-            macroptr = &ConfData[i];
-    }
-
-    if (macroptr == NULL)
-    {				/* if this happens, something is
-				   seriously confused */
-        utLog("UserOptsMenu(): ERROR: macroptr == NULL, no CTYPE_MACRO found in ConfData");
-    }
-
-    while (Done == FALSE)
-    {
-        /* First clear the display. */
-        cdclear();
-        lin = 1;
-        col = ((Context.maxcol / 2) - (strlen(header) / 2));
-
-        cprintf(lin, col, ALIGN_NONE, "#%d#%s", NoColor, header);
-
-        lin += 3;
-        col = 5;
-
-        for (i = 0; i < numoptions; i++)
-	{
-            cprintf(lin, col, ALIGN_NONE, "#%d#%d.#%d# %s#%d#", InfoColor,
-                    i + 1, LabelColor, mopts[i], NoColor);
-            lin++;
-	}
-
-        lin = 17;
-        cprintf(lin, col, ALIGN_NONE, "#%d#Server Name:   #%d# %s#%d#",
-                LabelColor,
-                InfoColor, sHello.servername,
-                NoColor);
-        lin++;
-        cprintf(lin, col, ALIGN_NONE, "#%d#Server Version: #%d#%s#%d#",
-                LabelColor,
-                InfoColor, sHello.serverver,
-                NoColor);
-        lin++;
-        cprintf(lin, col, ALIGN_NONE, "#%d#UDP:  #%d# %s#%d#", LabelColor,
-                InfoColor, (cInfo.doUDP) ? "On" : "Off",
-                NoColor);
-
-        lin++;
-        cprintf(lin, col, ALIGN_NONE, "#%d#Flags:#%d# %s#%d#", LabelColor,
-                InfoColor, clntServerFlagsStr(sStat.flags),
-                NoColor);
-
-        cdclrl( MSG_LIN1, 2  );
-        cdputs(prompt, MSG_LIN1, 1);
-
-        /* Get a char */
-        ch = iogchar();
-
-        switch(ch)
-	{
-	case '1':			/* user opts */
-            ChangedSomething = FALSE;
-            ViewEditOptions(ConfData, CfEnd, TRUE);
-            /* save and reload the config */
-            if (ChangedSomething == TRUE)
-	    {
-                SaveUserConfig();
-                /* set new update rate */
-                Context.updsec = UserConf.UpdatesPerSecond;
-                sendCommand(CPCMD_SETRATE, Context.updsec);
-	    }
-            break;
-
-	case '2':		/* macros */
-            if (macroptr != NULL)
-	    {
-                ChangedSomething = FALSE;
-                ViewEditMacros(macroptr);
-                if (ChangedSomething == TRUE)
-                    SaveUserConfig();
-	    }
-
-            break;
-
-	case '3':			/* chg passwd */
-            ChangePassword(unum, FALSE);
-            break;
-
-	default:
-            Done = TRUE;
-            break;
-	}
-    }
-
-    return;
-}
 
 /*************************************************************************
  * ChangeOption() - change an option (or prompt for new value)
@@ -481,7 +364,8 @@ static int ViewEditOptions(struct Conf ConfigData[], int ConfSize,
     for (i=0; i < MAXOPTCOLS; i++)
         cvec[i] = -1;
 
-    while (true)
+    bool done = false;
+    while (!done)
     {
         cdclrl( 1, MSG_LIN2);	/* clear screen area */
         lin = 1;
@@ -611,6 +495,7 @@ static int ViewEditOptions(struct Conf ConfigData[], int ConfSize,
             break;
 
 	default:		/* everything else */
+            done = true;
             break;
 	}
 

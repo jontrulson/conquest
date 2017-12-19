@@ -2232,7 +2232,7 @@ static void command( int ch )
         }
         break;
     case 'r':				/* refit */
-        if (sStat.flags & SPSSTAT_FLAGS_REFIT)
+        if (sStat.serverFlags & SERVER_F_REFIT)
         {
             if (_chkrefit())
             {
@@ -3394,14 +3394,28 @@ static int nCPInput(int ch)
             else
             {
                 prm.buf[0] = 0;
-                for ( i = 0; i < NUMPLAYERTEAMS; i = i + 1 )
-                    if ( ch == (char)tolower( cbTeams[i].teamchar ) )
+                for ( i = 0; i < NUMPLAYERTEAMS; i++ )
+                {
+                    if ( (sStat.serverFlags & SERVER_F_NOTEAMWAR)
+                         && i == cbShips[Context.snum].team
+                         && ch == (char)tolower(cbTeams[i].teamchar))
                     {
-                        if ( ! twar[i] || ! cbShips[Context.snum].rwar[i] )
-                            twar[i] = ! twar[i];
-                        prm.pbuf = clbWarPrompt(Context.snum, twar);
-                        hudSetPrompt(prm.index, prm.pbuf, NoColor, prm.buf, NoColor);
+                        // not allowed, make sure war status is
+                        // cleared, then beep
+                        cbShips[Context.snum].war[cbShips[Context.snum].team] = FALSE;
+                        mglBeep(MGL_BEEP_ERR);
                     }
+                    else
+                    {
+                        if ( ch == (char)tolower( cbTeams[i].teamchar ) )
+                        {
+                            if ( ! twar[i] || ! cbShips[Context.snum].rwar[i] )
+                                twar[i] = ! twar[i];
+                            prm.pbuf = clbWarPrompt(Context.snum, twar);
+                            hudSetPrompt(prm.index, prm.pbuf, NoColor, prm.buf, NoColor);
+                        }
+                    }
+                }
             }
 
             break;

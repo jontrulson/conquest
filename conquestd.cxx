@@ -1233,6 +1233,11 @@ void menu(void)
         cbShips[Context.snum].rwar[i] = FALSE;
         cbShips[Context.snum].war[i] = cbUsers[Context.unum].war[i];
     }
+
+    // if NoTeamWar is set, clear war with own team regardless of settings
+    if (SysConf.NoTeamWar)
+        cbShips[Context.snum].war[cbShips[Context.snum].team] = FALSE;
+
     utStrncpy( cbShips[Context.snum].alias, cbUsers[Context.unum].alias,
                MAXUSERNAME );
 
@@ -1383,8 +1388,6 @@ void menu(void)
     indicated by a non-zero esystems member of the clnt stat pkt */
 
 /*  SYNOPSIS */
-/*    int status, newship, unum, snum */
-/*    int flag, newship */
 /*    flag = newship( unum, snum ) */
 int newship( int unum, int *snum )
 {

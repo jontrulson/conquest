@@ -144,7 +144,7 @@ static void dispServerInfo(int tlin)
 
     cprintf(tlin, hcol, ALIGN_NONE, pbuf4);
     cprintf(tlin++, icol, ALIGN_NONE, buf4,
-            clntServerFlagsStr(sStat.flags));
+            clntServerFlagsStr(sStat.serverFlags));
 
     cprintf(tlin, hcol, ALIGN_NONE, pbuf5);
     cprintf(tlin++, icol, ALIGN_NONE, buf5, sHello.motd);

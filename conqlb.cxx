@@ -600,6 +600,13 @@ void clbOrbit( int snum, int pnum )
         cbShips[snum].head = utMod360( beer - 90.0 );
     }
 
+    if (SysConf.NoDrift)
+    {
+        // be sure to clear deltas
+        cbShips[snum].dx = 0.0;
+        cbShips[snum].dy = 0.0;
+    }
+
     return;
 
 }

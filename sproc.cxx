@@ -773,13 +773,21 @@ void procSetWar(cpCommand_t *cmd)
     {
         if (war & (1 << i))
 	{
-            if (!cbShips[Context.snum].war[i]) /* if not at war, we will delay */
-                dowait = TRUE;
+            // we need to see if team war is disabled.  If so, we want
+            // to make sure any attempt to set war with your ship's
+            // team is ignored.
+            if ( !(SysConf.NoTeamWar && i == cbShips[snum].team ) )
+            {
+                // if not at war, we will delay
+                if (!cbShips[Context.snum].war[i])
+                    dowait = TRUE;
 
-            cbShips[snum].war[i] = TRUE;
-	}
+                cbShips[snum].war[i] = TRUE;
+            }
+        }
         else
 	{
+            // always ok to declare peace
             cbShips[snum].war[i] = FALSE;
 	}
 

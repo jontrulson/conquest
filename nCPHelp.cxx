@@ -119,7 +119,7 @@ static int nCPHelpDisplay(dspConfig_t *dsp)
     tlin++;
     cprintf(tlin,col,ALIGN_NONE,sfmt, "Q", "initiate self-destruct");
     tlin++;
-    if (sStat.flags & SPSSTAT_FLAGS_REFIT)
+    if (sStat.serverFlags & SERVER_F_REFIT)
     {
         cprintf(tlin,col,ALIGN_NONE,sfmt, "r", "refit ship to new type");
         tlin++;

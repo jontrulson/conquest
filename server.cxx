@@ -259,9 +259,7 @@ int sendServerStat(int socktype)
     sStat.numusers = htons(numusers);
 
     /* send out the current flags */
-    sStat.flags = getServerFlags();
-
-    sStat.flags = (uint32_t)htonl(sStat.flags);
+    sStat.serverFlags = htonl(getServerFlags());
 
     sStat.servertime = (uint32_t)htonl(time(0));
 

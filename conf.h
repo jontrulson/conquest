@@ -8,7 +8,7 @@
 #ifndef CONF_H
 #define CONF_H
 
-
+#include "serverflags.h"
 
 #if defined(HAVE_GL_GLUT_H)
 # include "cqkeys.h"
@@ -163,6 +163,12 @@ typedef struct _sysConf {
     /* slingshot bug enabled? */
     int AllowSlingShot;
 
+    /* prevent users from warring with their own team? */
+    int NoTeamWar;
+
+    /* Allow drift bug? */
+    int NoDrift;
+
     /* server name */
     char ServerName[CONF_SERVER_NAME_SZ];
 
@@ -178,7 +184,7 @@ typedef struct _sysConf {
 #ifdef NOEXTERN_CONF
 // current version of the conquestrc file, just change date for newer
 // versions.
-static const char *CONF_REVISION = "20171208";
+static const char *CONF_REVISION = "20171218";
 
 const char *ConfigVersion = CONF_REVISION;
 /* Config's */
@@ -358,10 +364,38 @@ struct Conf SysConfData[] =
         "allow_slingshot=",
         &SysConf.AllowSlingShot,
         0, 0,			/* mix/max */
-        "Enable the Slingshot bug.",
+        "Enable the Slingshot bug",
         {
             "# Whether or not to enable the slingshot bug.",
             "#  This is a towing bug in the original conquest. Good fun!",
+            "#  Default: false",
+            NULL
+        }
+    },
+    {
+        FALSE,
+        CTYPE_BOOL,
+        "no_teamwar=",
+        &SysConf.NoTeamWar,
+        0, 0,			/* mix/max */
+        "Prevent ships from declaring war on their own team",
+        {
+            "# Set this to true to prevent ships from declaring war with their",
+            "#  own team.",
+            "#  Default: false",
+            NULL
+        }
+    },
+    {
+        FALSE,
+        CTYPE_BOOL,
+        "no_drift=",
+        &SysConf.NoDrift,
+        0, 0,			/* mix/max */
+        "Disable the Drift bug",
+        {
+            "# Whether or not to enable the drift bug.",
+            "#  This is a ship motion bug in the original conquest.",
             "#  Default: false",
             NULL
         }

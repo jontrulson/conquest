@@ -7,6 +7,5 @@
 
 /* options.c */
 void SysOptsMenu(void);
-void UserOptsMenu(int unum);
 
 #endif /* _OPTIONS_H */
