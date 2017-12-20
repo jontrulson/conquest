@@ -160,7 +160,7 @@ void display( int snum )
     static char zzbuf[MSGMAXLINE];
     static int zzsshields, zzcshields, zzshead, zzsfuel, zzcfuel;
     static int zzsweapons, zzsengines, zzsdamage, zzcdamage, zzsarmies;
-    static int zzsetemp, zzswtemp, zzctemp, zzstowedby, zzssdfuse;
+    static int zzsetemp, zzswtemp, zzctemp, zzssdfuse;
     static real prevsh = 0.0 , prevdam = 100.0 ;
 
     static cqColor ShieldAttrib = 0;
@@ -1098,30 +1098,30 @@ void display( int snum )
 
         /* Tractor beams. */
         lin = lin + 2;
-        if ( Context.redraw )
-            zzstowedby = 0;
-        i = cbShips[snum].towedby;
-        if ( i == 0 )
-            i = -cbShips[snum].towing;
-        if ( i != zzstowedby )
+
+        cdclra( lin, col, lin, datacol-1 );
+        if (STOWING(snum) || STOWEDBY(snum))
         {
-            cdclra( lin, col, lin, datacol-1 );
-            if ( i == 0 )
-                buf[0] = 0;
-            else if ( i < 0 )
+            buf[0] = 0;
+
+            if (STOWING(snum))
             {
-                strcpy(buf , "towing ") ;
-                utAppendShip(buf , -i) ;
+                utStrncpy(buf, "towing ", MSGMAXLINE);
+                utAppendShip(buf, cbShips[snum].towing);
             }
-            else if ( i > 0 )
+
+            if (STOWEDBY(snum))
             {
-                strcpy(buf , "towed by ") ;
-                utAppendShip(buf , i) ;
+                if (STOWING(snum))
+                    utStrncat(buf, ", ", MSGMAXLINE);
+
+                utStrncat(buf, "towedby ", MSGMAXLINE);
+                utAppendShip(buf, cbShips[snum].towedby);
             }
+
             uiPutColor(InfoColor);
             cdputs( buf, lin, col );
             uiPutColor(0);
-            zzstowedby = i;
         }
 
         /* Self destruct fuse. */

@@ -18,7 +18,7 @@
 
 /* server -> client packet types */
 
-#define SP_NULL           0	/* never used */
+#define SP_NULL           0     /* never used */
 #define SP_HELLO          1
 #define SP_ACK            2
 #define SP_SERVERSTAT     3
@@ -50,12 +50,12 @@
 
 /* client -> server packet types */
 
-#define CP_NULL           0	/* never used */
+#define CP_NULL           0     /* never used */
 #define CP_HELLO          1
 #define CP_ACK            2
-#define CP_COMMAND        3	/* most commands handled by this */
+#define CP_COMMAND        3     /* most commands handled by this */
 #define CP_FIRETORPS      4
-#define CP_GETSINFO       5	/* get special ship info ('ne', 'ns', etc)*/
+#define CP_GETSINFO       5     /* get special ship info ('ne', 'ns', etc)*/
 #define CP_SENDMSG        6
 #define CP_SETNAME        7
 #define CP_AUTHENTICATE   8
@@ -83,20 +83,20 @@ typedef struct {
 
 /* server -> client packets */
 typedef struct {
-    uint8_t type;			/* SP_NULL */
+    uint8_t type;                       /* SP_NULL */
     uint8_t pad1;
     uint8_t pad2;
     uint8_t pad3;
 } spNull_t;
 
 #define SPHELLO_FLAGS_NONE         0x00
-#define SPHELLO_FLAGS_CLOSED       0x01	/* game closed */
+#define SPHELLO_FLAGS_CLOSED       0x01 /* game closed */
 typedef struct {
-    uint8_t  type;			/* SP_HELLO */
+    uint8_t  type;                      /* SP_HELLO */
     uint8_t  flags;                /* closed, etc... */
-    uint16_t protover;		/* protocol rev */
+    uint16_t protover;          /* protocol rev */
 
-    uint32_t cmnrev;		/* common block version */
+    uint32_t cmnrev;            /* common block version */
 
     uint32_t pad1;
 
@@ -105,37 +105,37 @@ typedef struct {
 
     uint8_t  serverver[CONF_SERVER_NAME_SZ]; /* server's version */
 
-    uint8_t  motd[CONF_SERVER_MOTD_SZ];	/* MOTD... */
+    uint8_t  motd[CONF_SERVER_MOTD_SZ]; /* MOTD... */
 } spHello_t;
 
 /* ACK without message text */
 typedef struct {
-    uint8_t type;			/* SP_ACK */
-    uint8_t severity;		/* none, info, warning, etc */
-    uint8_t code;			/* ack code */
+    uint8_t type;                       /* SP_ACK */
+    uint8_t severity;           /* none, info, warning, etc */
+    uint8_t code;                       /* ack code */
     uint8_t pad1;
 
 } spAck_t;
 
 /* ACK with message text */
 typedef struct {
-    uint8_t type;			/* SP_ACKMSG */
-    uint8_t severity;		/* none, info, warning, etc */
-    uint8_t code;			/* ack code */
+    uint8_t type;                       /* SP_ACKMSG */
+    uint8_t severity;           /* none, info, warning, etc */
+    uint8_t code;                       /* ack code */
     uint8_t pad1;
 
-    uint8_t txt[MESSAGE_SIZE];	/* text */
+    uint8_t txt[MESSAGE_SIZE];  /* text */
 } spAckMsg_t;
 
 typedef struct {
     uint8_t  type;              /* SP_SERVSTAT */
-    uint8_t  numactive;		/* active ships */
-    uint8_t  numvacant;		/* vacant ships */
-    uint8_t  numrobot;		/* robots active */
+    uint8_t  numactive;         /* active ships */
+    uint8_t  numvacant;         /* vacant ships */
+    uint8_t  numrobot;          /* robots active */
 
-    uint8_t  numtotal;		/* total number of ships */
+    uint8_t  numtotal;          /* total number of ships */
     uint8_t  pad1;
-    uint16_t numusers;		/* total number of users */
+    uint16_t numusers;          /* total number of users */
 
     uint32_t serverFlags;       /* server flags (serverflags.h) */
 
@@ -145,43 +145,43 @@ typedef struct {
 #define SPCLNTSTAT_FLAG_NONE    0x00
 #define SPCLNTSTAT_FLAG_NEW     0x01
 #define SPCLNTSTAT_FLAG_CONQUER 0x02 /* you conquered the universe. send a
-					message (lastwords) */
+                                        message (lastwords) */
 #define SPCLNTSTAT_FLAG_KILLED  0x04 /* you were killed by something */
 
 typedef struct {
-    uint8_t  type;			/* SP_CLIENTSTAT */
+    uint8_t  type;                      /* SP_CLIENTSTAT */
     uint8_t  flags;                /* LR/SR, live, dead, etc. */
-    uint8_t  snum;			/* your ship number */
-    uint8_t  team;			/* your team number */
+    uint8_t  snum;                      /* your ship number */
+    uint8_t  team;                      /* your team number */
 
-    uint16_t unum;			/* your user number */
-    uint8_t  esystem;		/* team bitmask of systems
-				   you can enter from when entering
-				   the game. 0 if only one available */
+    uint16_t unum;                      /* your user number */
+    uint8_t  esystem;           /* team bitmask of systems
+                                   you can enter from when entering
+                                   the game. 0 if only one available */
     uint8_t  pad2;
 } spClientStat_t;
 
-typedef struct {	/* 'large' ship data */
-    uint8_t  type;			/* SP_SHIP */
-    uint8_t  status;		/* one of the SS_ values */
-    uint8_t  snum;			/* ship num */
+typedef struct {        /* 'large' ship data */
+    uint8_t  type;                      /* SP_SHIP */
+    uint8_t  status;            /* one of the SS_ values */
+    uint8_t  snum;                      /* ship num */
     uint8_t  team;
 
-    uint16_t unum;			/* user num */
+    uint16_t unum;                      /* user num */
     uint8_t  shiptype;
-    uint8_t  towing;
+    uint8_t  pad1;
 
-    uint8_t  towedby;
+    uint8_t  pad2;
     uint8_t  war;
     uint8_t  rwar;
-    uint8_t  killedBy;		/* depends on status - keep together
+    uint8_t  killedBy;          /* depends on status - keep together
                                  * in pkt, along with killedByDetail */
 
-    uint8_t  pad1;
-    uint8_t  pad2;
+    uint8_t  pad3;
+    uint8_t  pad4;
     uint16_t killedByDetail;
 
-    uint32_t kills;		/* x10 */
+    uint32_t kills;             /* x10 */
 
     uint8_t  srpwar[MAXPLANETS];
 
@@ -190,57 +190,59 @@ typedef struct {	/* 'large' ship data */
     uint8_t  alias[MAXUSERNAME];
 } spShip_t;
 
-typedef struct {	/* 'short' ship packets */
-    uint8_t  type;			/* SP_SHIPSML */
-    uint8_t  snum;			/* ship num */
-    uint8_t  action;               /* ROB_* for robot/autopilot */
-    uint8_t  shields;		/* 0-100 */
+typedef struct {                /* 'short' ship packets */
+    uint8_t  type;              /* SP_SHIPSML */
+    uint8_t  snum;              /* ship num */
+    uint8_t  action;            /* ROB_* for robot/autopilot */
+    uint8_t  shields;           /* 0-100 */
 
-    uint8_t  damage;		/* 0-100 */
+    uint8_t  damage;            /* 0-100 */
     uint8_t  armies;
     uint8_t  walloc;
-    int8_t    pfuse;
+    int8_t   pfuse;
 
     uint8_t  etemp;
     uint8_t  wtemp;
     uint16_t fuel;
 
-    int16_t   sdfuse;
-    int8_t    wfuse;
-    int8_t    efuse;
+    int16_t  sdfuse;
+    int8_t   wfuse;
+    int8_t   efuse;
 
-    uint8_t   lock;
-    uint8_t   pad1;
-    uint8_t   pad2;
-    uint8_t   pad3;
+    uint8_t  lock;
+    uint8_t  towing;
+    uint8_t  towedby;
+    uint8_t  pad1;
 
-    uint16_t  lockDetail;
-    int16_t   flags;                /* SHIP_F_* */
+    uint16_t lockDetail;
+    uint16_t pad2;
+
+    uint32_t flags;             /* SHIP_F_* */
 
     uint16_t lastphase;
     uint16_t lastblast;
 } spShipSml_t;
 
-typedef struct {	/* ship location packets */
-    uint8_t  type;			/* SP_SHIPLOC */
-    uint8_t  snum;			/* ship num */
-    uint16_t head;			/* x10 */
+typedef struct {                /* ship location packets */
+    uint8_t  type;              /* SP_SHIPLOC */
+    uint8_t  snum;              /* ship num */
+    uint16_t head;              /* x10 */
 
-    int8_t   warp;			/* x10 */
+    int8_t   warp;              /* x10 */
     uint8_t pad1;
     uint8_t pad2;
     uint8_t pad3;
 
-    int32_t  x;			/* x1000 */
+    int32_t  x;                 /* x1000 */
 
-    int32_t  y;			/* x1000 */
+    int32_t  y;                 /* x1000 */
 } spShipLoc_t;
 
 typedef struct {
-    uint8_t  type;			/* SP_PLANET */
-    uint8_t  pnum;			/* planet number */
-    uint8_t  ptype;                /* planet type */
-    uint8_t  team;			/* team */
+    uint8_t  type;              /* SP_PLANET */
+    uint8_t  pnum;              /* planet number */
+    uint8_t  ptype;             /* planet type */
+    uint8_t  team;              /* team */
 
     uint8_t  defendteam;        /* original home planet team owner*/
     uint16_t size;              /* in CU's */
@@ -250,9 +252,9 @@ typedef struct {
 } spPlanet_t;
 
 typedef struct {
-    uint8_t  type;			/* SP_PLANETSML */
-    uint8_t  pnum;			/* planet number */
-    uint8_t  scanned;		/* bitmask of teams that have scanned */
+    uint8_t  type;                      /* SP_PLANETSML */
+    uint8_t  pnum;                      /* planet number */
+    uint8_t  scanned;           /* bitmask of teams that have scanned */
     uint8_t  uninhabtime;
 } spPlanetSml_t;
 
@@ -261,9 +263,9 @@ typedef struct {
     uint8_t  pnum;
     int16_t   armies;
 
-    int32_t   x;			/* x1000 */
+    int32_t   x;                        /* x1000 */
 
-    int32_t   y;			/* x1000 */
+    int32_t   y;                        /* x1000 */
 } spPlanetLoc_t;
 
 typedef struct {
@@ -271,17 +273,17 @@ typedef struct {
     uint8_t  pnum;
     int16_t   armies;
 
-    int32_t   x;			/* x1000 */
+    int32_t   x;                        /* x1000 */
 
-    int32_t   y;			/* x1000 */
+    int32_t   y;                        /* x1000 */
 
     uint16_t orbang;               /* x100 */
 
 } spPlanetLoc2_t;
 
 typedef struct {
-    uint8_t  type;			/* SP_PLANETINFO */
-    uint8_t  pnum;			/* planet number */
+    uint8_t  type;                      /* SP_PLANETINFO */
+    uint8_t  pnum;                      /* planet number */
     uint8_t  primary;
     uint8_t  pad;
 
@@ -304,15 +306,15 @@ typedef struct {
 } spMessage_t;
 
 typedef struct {
-    uint8_t  type;			/* SP_USER */
+    uint8_t  type;                      /* SP_USER */
     uint8_t  team;
-    uint16_t unum;			/* user num */
+    uint16_t unum;                      /* user num */
 
     uint16_t flags;                /* user flags */
     int16_t  rating;               /* x10 */
 
     uint8_t  userType;          // USERTYPE_* */
-    uint8_t  war;			/* a bit mask (1 << TEAM_*) */
+    uint8_t  war;                       /* a bit mask (1 << TEAM_*) */
     uint16_t opFlags;                   /* operator set flags */
 
     uint32_t lastentry;
@@ -325,10 +327,10 @@ typedef struct {
 } spUser_t;
 
 typedef struct {
-    uint8_t  type;			/* SP_TORP */
-    uint8_t  snum;			/* ship num */
-    uint8_t  tnum;			/* torp num */
-    uint8_t  status;		/* one of the TS_* values */
+    uint8_t  type;                      /* SP_TORP */
+    uint8_t  snum;                      /* ship num */
+    uint8_t  tnum;                      /* torp num */
+    uint8_t  status;            /* one of the TS_* values */
 } spTorp_t;
 
 typedef struct {
@@ -337,9 +339,9 @@ typedef struct {
     uint8_t  tnum;                 /* torp num */
     uint8_t  war;                  /* war. what is it good for. */
 
-    int32_t   x;			/* x1000 */
+    int32_t   x;                        /* x1000 */
 
-    int32_t   y;			/* x1000 */
+    int32_t   y;                        /* x1000 */
 } spTorpLoc_t;
 
 typedef struct {
@@ -348,16 +350,16 @@ typedef struct {
     uint8_t  tnum;                 /* torp num */
     uint8_t  war;                  /* war. what is it good for. */
 
-    int32_t   x;			/* x1000 */
+    int32_t   x;                        /* x1000 */
 
-    int32_t   y;			/* x1000 */
+    int32_t   y;                        /* x1000 */
 
-    int32_t   dx;			/* x1000 */
+    int32_t   dx;                       /* x1000 */
 
-    int32_t   dy;			/* x1000 */
+    int32_t   dy;                       /* x1000 */
 
 
-    uint8_t  status;		/* one of the TS_* values */
+    uint8_t  status;            /* one of the TS_* values */
     uint8_t  pad1;
     uint8_t  pad2;
     uint8_t  pad3;
@@ -369,7 +371,7 @@ typedef struct {
 typedef struct {
     uint8_t  type;                 /* SP_TEAM */
     uint8_t  team;
-    uint8_t  couptime;		/* minutes until coup can work */
+    uint8_t  couptime;          /* minutes until coup can work */
     uint8_t  flags;                /* coupinfo, etc */
 
     uint8_t  homeplanet;
@@ -394,7 +396,7 @@ typedef struct {
 
 /* only stored in recordings (.cqr) files */
 typedef struct {
-    uint8_t  type;			/* SP_FRAME */
+    uint8_t  type;                      /* SP_FRAME */
     uint8_t  pad1;
     uint8_t  pad2;
     uint8_t  pad3;
@@ -406,7 +408,7 @@ typedef struct {
 } spFrame_t;
 
 typedef struct {
-    uint8_t  type;			/* SP_HISTORY */
+    uint8_t  type;                      /* SP_HISTORY */
     uint8_t  histptr;              /* current hist ptr */
     uint8_t  hnum;
     uint8_t  pad1;
@@ -436,34 +438,34 @@ typedef struct {
 
 
 /* client -> server packets */
-typedef struct {	/* never used */
-    uint8_t  type;			/* CP_NULL */
+typedef struct {        /* never used */
+    uint8_t  type;                      /* CP_NULL */
     uint8_t  pad1;
     uint8_t  pad2;
     uint8_t  pad3;
 } cpNull_t;
 
 typedef struct {
-    uint8_t  type;			/* CP_HELLO */
-    uint8_t  updates;		/* desired updates per sec */
-    uint16_t protover;		/* protocol rev */
+    uint8_t  type;                      /* CP_HELLO */
+    uint8_t  updates;           /* desired updates per sec */
+    uint16_t protover;          /* protocol rev */
 
-    uint32_t cmnrev;		/* common block version */
+    uint32_t cmnrev;            /* common block version */
 
     uint8_t  clientname[CONF_SERVER_NAME_SZ]; /* "ConquestGL", etc */
 
-    uint8_t  clientver[CONF_SERVER_NAME_SZ];	/* version, misc info */
+    uint8_t  clientver[CONF_SERVER_NAME_SZ];    /* version, misc info */
 } cpHello_t;
 
 typedef struct {
-    uint8_t  type;			/* CP_ACK */
-    uint8_t  severity;		/* none, info, warning, etc */
-    uint8_t  code;			/* ack code */
+    uint8_t  type;                      /* CP_ACK */
+    uint8_t  severity;          /* none, info, warning, etc */
+    uint8_t  code;                      /* ack code */
     uint8_t  pad1;
 } cpAck_t;
 
 /* cmd values */
-#define CPCMD_NULL         0	/* never used */
+#define CPCMD_NULL         0    /* never used */
 #define CPCMD_SETRATE      1
 #define CPCMD_SETWARP      2
 #define CPCMD_ALLOC        3
@@ -497,25 +499,25 @@ typedef struct {
 #define CPCMD_LAST         29
 
 typedef struct {
-    uint8_t  type;			/* CP_COMMAND */
-    uint8_t  cmd;			/* one of CPCMD_* */
-    uint16_t detail;		/* command specific */
+    uint8_t  type;                      /* CP_COMMAND */
+    uint8_t  cmd;                       /* one of CPCMD_* */
+    uint16_t detail;            /* command specific */
 } cpCommand_t;
 
 typedef struct {
-    uint8_t  type;			/* CP_FIRETORPS */
-    uint8_t  num;			/* number to fire */
-    uint16_t dir;			/* x100 */
+    uint8_t  type;                      /* CP_FIRETORPS */
+    uint8_t  num;                       /* number to fire */
+    uint16_t dir;                       /* x100 */
 } cpFireTorps_t;
 
 #define CP_SINFOMAX  15
 typedef struct {
-    uint8_t  type;			/* CP_GETSINFO */
+    uint8_t  type;                      /* CP_GETSINFO */
     uint8_t  info[CP_SINFOMAX];
 } cpGetSInfo_t;
 
 typedef struct {
-    uint8_t  type;			/* CP_SENDMSG */
+    uint8_t  type;                      /* CP_SENDMSG */
     uint8_t  pad1;
     int16_t   to;
 
@@ -523,7 +525,7 @@ typedef struct {
 } cpSendMsg_t;
 
 typedef struct {
-    uint8_t  type;			/* CP_SETNAME */
+    uint8_t  type;                      /* CP_SETNAME */
     uint8_t  alias[MAXUSERNAME];
 } cpSetName_t;
 
@@ -532,8 +534,8 @@ typedef struct {
 #define CPAUTH_LOGIN      1
 #define CPAUTH_CHGPWD     2
 typedef struct {
-    uint8_t  type;			/* CP_AUTHENTICATE */
-    uint8_t  flag;			/* CPAUTH_* */
+    uint8_t  type;                      /* CP_AUTHENTICATE */
+    uint8_t  flag;                      /* CPAUTH_* */
     uint8_t  pad2;
     uint8_t  pad3;
 
@@ -542,11 +544,11 @@ typedef struct {
 } cpAuthenticate_t;
 
 typedef struct {
-    uint8_t  type;			/* CP_SETCOURSE */
-    uint8_t  lock;			/* lockon */
+    uint8_t  type;                      /* CP_SETCOURSE */
+    uint8_t  lock;                      /* lockon */
     uint16_t lockDetail;
 
-    uint16_t head; 		/* x100 */
+    uint16_t head;              /* x100 */
 } cpSetCourse_t;
 
 typedef struct {

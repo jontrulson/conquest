@@ -930,7 +930,7 @@ void procTow(cpCommand_t *cmd)
 
     other = (int)ntohs(cmd->detail);
 
-    if ( cbShips[snum].towedby != 0 )
+    if ( STOWEDBY(snum) )
     {
         strcpy(cbuf , "But we are being towed by ") ;
         utAppendShip(cbuf , cbShips[snum].towedby) ;
@@ -938,7 +938,7 @@ void procTow(cpCommand_t *cmd)
         sendFeedback(cbuf);
         return;
     }
-    if ( cbShips[snum].towing != 0 )
+    if ( STOWING(snum) )
     {
         strcpy(cbuf , "But we're already towing ") ;
         utAppendShip(cbuf , cbShips[snum].towing) ;
@@ -946,6 +946,7 @@ void procTow(cpCommand_t *cmd)
         sendFeedback(cbuf);
         return;
     }
+
     cbuf[0] = 0;
     cbLock(&cbConqInfo->lockword);
     if ( other < 0 || other >= MAXSHIPS )
@@ -958,17 +959,21 @@ void procTow(cpCommand_t *cmd)
         strcpy(cbuf , "That ship is out of tractor range.") ;
     else if ( cbShips[other].warp < 0.0 )
         strcpy(cbuf , "You can't tow a ship out of orbit.") ;
-    else if ( sqrt( pow(( (real) (cbShips[snum].dx - cbShips[other].dx) ), (real) 2.0) +
-                    pow( (real) ( cbShips[snum].dy - cbShips[other].dy ), (real) 2.0 ) ) /
+    else if ( sqrt( pow(( (real) (cbShips[snum].dx - cbShips[other].dx) ),
+                        (real) 2.0) +
+                    pow( (real) ( cbShips[snum].dy - cbShips[other].dy ),
+                         (real) 2.0 ) ) /
               ( MM_PER_SEC_PER_WARP * ITER_SECONDS ) > MAX_TRACTOR_WARP )
         sprintf( cbuf, "That ships relative velocity is higher than %2.1f.",
                  MAX_TRACTOR_WARP );
-    else if ( cbShips[other].towing != 0 || cbShips[other].towedby != 0 )
-        strcpy(cbuf,
+    else if ( STOWING(other) || STOWEDBY(other) )
+              strcpy(cbuf,
                "There seems to be some interference with the tractor beams...");
     else
     {
+        SFSET(other, SHIP_F_TOWEDBY);
         cbShips[other].towedby = snum;
+        SFSET(snum, SHIP_F_TOWING);
         cbShips[snum].towing = other;
         strcpy(cbuf, "Tractor beams engaged.") ;
     }
@@ -997,7 +1002,7 @@ void procUnTow(cpCommand_t *cmd)
     utLog("PROC UNTOW: snum = %d", snum);
 #endif
 
-    if ( cbShips[snum].towedby != 0 )
+    if ( STOWEDBY(snum) )
     {
         /* If we're at war with him or he's at war with us, make it */
         /*  hard to break free. */
@@ -1021,7 +1026,7 @@ void procUnTow(cpCommand_t *cmd)
             strcpy(cbuf , "Breaking free from ship ") ;
             utAppendShip(cbuf , cbShips[snum].towedby) ;
             cbLock(&cbConqInfo->lockword);
-            if ( cbShips[snum].towedby != 0 )
+            if ( STOWEDBY(snum) )
 	    {
                 /* Coast to a stop. */
                 cbShips[snum].head = cbShips[cbShips[snum].towedby].head;
@@ -1037,21 +1042,22 @@ void procUnTow(cpCommand_t *cmd)
                     cbShips[snum].warp = cbShips[cbShips[snum].towedby].warp;
 
                 /* Release the tow. */
-                if ( cbShips[cbShips[snum].towedby].towing != 0 )
-                    cbShips[cbShips[snum].towedby].towing = 0;
-                cbShips[snum].towedby = 0;
+                if ( STOWING(cbShips[snum].towedby) )
+                    SFCLR(cbShips[snum].towedby, SHIP_F_TOWING);
+
+                SFCLR(snum, SHIP_F_TOWEDBY);
 	    }
             cbUnlock(&cbConqInfo->lockword);
             utAppendChar(cbuf , '.') ;
             sendFeedback(cbuf);
 	}
     }
-    else if ( cbShips[snum].towing != 0 )
+    else if ( STOWING(snum) )
     {
         strcpy(cbuf , "Tow released from ship ") ;
         utAppendShip(cbuf , cbShips[snum].towing) ;
         cbLock(&cbConqInfo->lockword);
-        if ( cbShips[snum].towing != 0 )
+        if ( STOWING(snum) )
 	{
             /* Set other ship coasting. */
             cbShips[cbShips[snum].towing].head = cbShips[snum].head;
@@ -1068,9 +1074,10 @@ void procUnTow(cpCommand_t *cmd)
                 cbShips[cbShips[snum].towing].warp = cbShips[snum].warp;
 
             /* Release the tow. */
-            if ( cbShips[cbShips[snum].towing].towedby != 0 )
-                cbShips[cbShips[snum].towing].towedby = 0;
-            cbShips[snum].towing = 0;
+            if ( STOWEDBY(cbShips[snum].towing) )
+                SFCLR(cbShips[snum].towing, SHIP_F_TOWEDBY);
+
+            SFCLR(snum, SHIP_F_TOWING);
 	}
         cbUnlock(&cbConqInfo->lockword);
         utAppendChar(cbuf , '.') ;

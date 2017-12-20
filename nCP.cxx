@@ -1095,15 +1095,15 @@ static int _chktow(void)
     hudClearPrompt(MSG_LIN1);
     hudClearPrompt(MSG_LIN2);
 
-    if ( cbShips[snum].towedby != 0 )
+    if ( STOWEDBY(snum) )
     {
         strcpy(cbuf , "But we are being towed by ") ;
-        utAppendShip(cbuf , cbShips[snum].towedby) ;
-        utAppendChar(cbuf , '!');
-        cp_putmsg( cbuf, MSG_LIN2 );
+        utAppendShip(cbuf, cbShips[snum].towedby) ;
+        utAppendChar(cbuf, '!');
+        cp_putmsg(cbuf, MSG_LIN2 );
         return FALSE;
     }
-    if ( cbShips[snum].towing != 0 )
+    if ( STOWING(snum) )
     {
         strcpy(cbuf , "But we're already towing ") ;
         utAppendShip(cbuf , cbShips[snum].towing) ;

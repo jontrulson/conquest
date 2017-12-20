@@ -101,7 +101,7 @@ struct _temp {
 };
 
 struct _tow {
-    int     towstat;              /* 0 = no towing, < 0 towing, > 0 towed by */
+    bool     towstat;              /* true if towing/towedby */
     cqColor color;
     char    str[HUD_STR_SZ];
 };

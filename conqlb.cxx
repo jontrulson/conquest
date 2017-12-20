@@ -199,10 +199,17 @@ void clbIKill(int snum, killedBy_t kb, uint16_t detail)
             cbShips[snum].torps[i].status = TS_DETONATE;
 
     /* Release any tows. */
-    if ( cbShips[snum].towing != 0 )
-        cbShips[cbShips[snum].towing].towedby = 0;
-    if ( cbShips[snum].towedby != 0 )
-        cbShips[cbShips[snum].towedby].towing = 0;
+    if ( STOWING(snum) )
+    {
+        SFCLR(cbShips[snum].towing, SHIP_F_TOWEDBY);
+        SFCLR(snum, SHIP_F_TOWING);
+    }
+
+    if ( STOWEDBY(snum) )
+    {
+        SFCLR(cbShips[snum].towedby, SHIP_F_TOWING);
+        SFCLR(snum, SHIP_F_TOWEDBY);
+    }
 
     /* Zero team scan fuses. */
     for ( i = 0; i < NUMPLAYERTEAMS; i++ )
@@ -1939,8 +1946,12 @@ void clbInitShip( int snum, int unum )
         cbShips[snum].alastmsg = cbShips[snum].lastmsg;
     }
     cbUnlock(&cbConqInfo->lockmesg);
-    cbShips[snum].towing = 0;
+
+    SFCLR(snum, SHIP_F_TOWING);
+    SFCLR(snum, SHIP_F_TOWEDBY);
+    cbShips[snum].towing = 0; // unnecessary, but...
     cbShips[snum].towedby = 0;
+
     cbShips[snum].lastblast = 0.0;
     cbShips[snum].lastphase = 0.0;
     cbShips[snum].pfuse = 0;

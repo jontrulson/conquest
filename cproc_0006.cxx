@@ -140,20 +140,45 @@ int proc_0006_Ship(char *buf)
     cbShips[snum].team = sship->team;
     cbShips[snum].unum = ntohs(sship->unum);
     cbShips[snum].shiptype = sship->shiptype;
-    cbShips[snum].towing = sship->towing;
-    cbShips[snum].towedby = sship->towedby;
+
+    // these are handled differently in the new protocol.  In v6,
+    // towing/towedby being 0 means that nothing is being towed or
+    // towed by.  Now we use flags to determine this (since
+    // towed/towedby == 0 is valid in v7+).  We also adjust the
+    // towed/towedby values (-1) if non-zero to compensate for new
+    // 0-based cbShips[].
+    if (sship->towing > 0)
+    {
+        cbShips[snum].towing = sship->towing - 1;
+        SFSET(snum, SHIP_F_TOWING);
+    }
+    else
+    {
+        SFCLR(snum, SHIP_F_TOWING);
+    }
+
+    if (sship->towedby > 0)
+    {
+        cbShips[snum].towedby = sship->towedby - 1;
+        SFSET(snum, SHIP_F_TOWEDBY);
+    }
+    else
+    {
+        SFCLR(snum, SHIP_F_TOWEDBY);
+    }
 
     for (i=0; i<4 /*NUMPLAYERTEAMS*/; i++)
+    {
         if (sship->war & (1 << i))
             cbShips[snum].war[i] = true;
         else
             cbShips[snum].war[i] = false;
 
-    for (i=0; i<4 /*NUMPLAYERTEAMS*/; i++)
         if (sship->rwar & (1 << i))
             cbShips[snum].rwar[i] = true;
         else
             cbShips[snum].rwar[i] = false;
+    }
 
     // Don't bother decoding properly for this - not necessary when
     // just playing back recordings...
@@ -190,8 +215,16 @@ int proc_0006_ShipSml(char *buf)
     utLog("PROC SHIPSML: snum = %d", snum);
 #endif
 
-    /* we need to mask out map since it's always local */
-    cbShips[snum].flags = ((((uint16_t)ntohs(sshipsml->flags)) & ~0x0040 /*SHIP_F_MAP*/) | SMAP(snum));
+    // we need to mask out map since it's always local.  We've also
+    // made the ships flags member 32b instead of 16b in the new
+    // protocol, and added a couple new flags, so we want to preserve
+    // those.
+    uint32_t sflags =
+        (uint32_t)(((ntohs(sshipsml->flags)) & ~0x0040 /*SHIP_F_MAP*/)
+                   | SMAP(snum));
+    // now filter out only those flags valid for this protocol (6).
+    sflags &= 0x000001ff; // SHIP_F_BOMBING and lower (last supported by v6)
+    cbShips[snum].flags |= sflags;
 
     cbShips[snum].action = sshipsml->action;
     cbShips[snum].shields = sshipsml->shields;

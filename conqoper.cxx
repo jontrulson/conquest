@@ -532,22 +532,23 @@ void debugdisplay( int snum )
   	cprintf(lin,dcol+5,ALIGN_NONE,"#%d#%c",InfoColor, 'R');
     lin++;
     cprintf(lin,tcol,ALIGN_NONE,"#%d#%s",LabelColor, "  stowedby:");
-    i = cbShips[snum].towedby;
-    if ( i != 0 )
+
+    if ( STOWEDBY(snum) )
     {
         buf[0] = 0;
-        utAppendShip(buf , i) ;
+        utAppendShip(buf, cbShips[snum].towedby) ;
         cprintf(lin,dcol,ALIGN_NONE,"#%d#%s",InfoColor, buf);
     }
     lin++;
     cprintf(lin,tcol,ALIGN_NONE,"#%d#%s",LabelColor, "   stowing:");
-    i = cbShips[snum].towing;
-    if ( i != 0 )
+
+    if ( STOWING(snum) )
     {
         buf[0] = 0;
-        utAppendShip(buf , i) ;
+        utAppendShip(buf, cbShips[snum].towing);
         cprintf(lin,dcol,ALIGN_NONE,"#%d#%s",InfoColor, buf);
     }
+
     lin++;
     cprintf(lin,tcol,ALIGN_NONE,"#%d#%s",LabelColor, "      swar:");
     buf[0] = '(';

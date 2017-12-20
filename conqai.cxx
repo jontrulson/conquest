@@ -466,11 +466,11 @@ static void executeai( int snum, int token )
         break;
     case ROB_UNTRACTOR:
         /* Only attempt to untractor if we don't have to delay. */
-        if ( cbShips[snum].towedby != 0 )
+        if ( STOWEDBY(snum) )
             if ( ! satwar(snum, cbShips[snum].towedby) )
             {
-                cbShips[cbShips[snum].towedby].towing = 0;
-                cbShips[snum].towedby = 0;
+                SFCLR(cbShips[snum].towedby, SHIP_F_TOWING);
+                SFCLR(snum, SHIP_F_TOWEDBY);
             }
         break;
     case ROB_REPAIR:

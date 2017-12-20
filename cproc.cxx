@@ -141,20 +141,19 @@ int procShip(char *buf)
     cbShips[snum].team = sship->team;
     cbShips[snum].unum = ntohs(sship->unum);
     cbShips[snum].shiptype = sship->shiptype;
-    cbShips[snum].towing = sship->towing;
-    cbShips[snum].towedby = sship->towedby;
 
     for (i=0; i<NUMPLAYERTEAMS; i++)
+    {
         if (sship->war & (1 << i))
             cbShips[snum].war[i] = TRUE;
         else
             cbShips[snum].war[i] = FALSE;
 
-    for (i=0; i<NUMPLAYERTEAMS; i++)
         if (sship->rwar & (1 << i))
             cbShips[snum].rwar[i] = TRUE;
         else
             cbShips[snum].rwar[i] = FALSE;
+    }
 
     cbShips[snum].killedBy = (killedBy_t)sship->killedBy;
     cbShips[snum].killedByDetail =
@@ -195,7 +194,8 @@ int procShipSml(char *buf)
         recWriteEvent(buf);
 
     /* we need to mask out map since it's always local */
-    cbShips[snum].flags = ((((uint16_t)ntohs(sshipsml->flags)) & ~SHIP_F_MAP) | SMAP(snum));
+    cbShips[snum].flags =
+        (ntohl(sshipsml->flags) & ~SHIP_F_MAP) | SMAP(snum);
 
     cbShips[snum].action = sshipsml->action;
     cbShips[snum].shields = sshipsml->shields;
@@ -205,6 +205,9 @@ int procShipSml(char *buf)
 
     cbShips[snum].wfuse = (int)sshipsml->wfuse;
     cbShips[snum].efuse = (int)sshipsml->efuse;
+
+    cbShips[snum].towing = sshipsml->towing;
+    cbShips[snum].towedby = sshipsml->towedby;
 
     cbShips[snum].weapalloc = sshipsml->walloc;
     cbShips[snum].engalloc = 100 - cbShips[snum].weapalloc;

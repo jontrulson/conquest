@@ -175,9 +175,6 @@ spShip_t *spktShip(uint8_t snum, int rec)
     /* really only valid for own ship */
     if ((mysnum == snum) || rec)
     {
-        sship.towing = cbShips[snum].towing;
-        sship.towedby = cbShips[snum].towedby;
-
         for (i=0; i<NUMPLAYERTEAMS; i++)
 	{
             if (cbShips[snum].war[i])
@@ -187,7 +184,7 @@ spShip_t *spktShip(uint8_t snum, int rec)
 	}
 
         sship.killedBy = (uint8_t)cbShips[snum].killedBy;
-        sship.killedByDetail = (uint16_t)htons((uint16_t)cbShips[snum].killedByDetail);
+        sship.killedByDetail = htons(cbShips[snum].killedByDetail);
 
         for (i=0; i<MAXPLANETS; i++)
             sship.srpwar[i] = (uint8_t)cbShips[snum].srpwar[i];
@@ -260,7 +257,11 @@ spShipSml_t *spktShipSml(uint8_t snum, int rec)
 
     if ((snum == mysnum) || rec)
     {			     /* really only useful for our own ship */
-        sflags |= (SHIP_F_REPAIR | SHIP_F_TALERT | SHIP_F_BOMBING);
+        sflags |= (SHIP_F_REPAIR | SHIP_F_TALERT | SHIP_F_BOMBING
+                   | SHIP_F_TOWEDBY | SHIP_F_TOWING);
+
+        sshipsml.towing = cbShips[snum].towing;
+        sshipsml.towedby = cbShips[snum].towedby;
 
         sshipsml.action = (uint8_t)cbShips[snum].action;
         sshipsml.lastblast = htons((uint16_t)(cbShips[snum].lastblast * 100.0));
@@ -287,7 +288,7 @@ spShipSml_t *spktShipSml(uint8_t snum, int rec)
                               rndnor(cbShips[snum].y, CLOAK_SMEAR_DIST));
 
         /* if in accurate scanning distance (regardless of cloak) set the
-           SCANDIST flag.  */
+           SCANDIST flag. */
 
         if (dis < ACCINFO_DIST)
             scanflag = SHIP_F_SCANDIST;
@@ -324,7 +325,7 @@ spShipSml_t *spktShipSml(uint8_t snum, int rec)
     }
 
     /* only send those we are allowed to see */
-    sshipsml.flags = (uint16_t)htons(((cbShips[snum].flags | scanflag) & sflags));
+    sshipsml.flags = htonl(((cbShips[snum].flags | scanflag) & sflags));
 
     if (rec)
     {

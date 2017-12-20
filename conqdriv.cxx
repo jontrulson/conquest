@@ -268,7 +268,7 @@ int main(int argc, char *argv[])
 /*    iterdrive( ship ) */
 void iterdrive( int *ship )
 {
-    int s, t, i, j, k;
+    int s, t, i, k;
     real h, ad, x, dis, ht, z;
     char buf[MSGMAXLINE];
     real warp;
@@ -350,13 +350,15 @@ void iterdrive( int *ship )
 	    }
 
             /* Movement. */
-            j = cbShips[i].towedby;
-            if ( j != 0 )
+            if ( STOWEDBY(i) )
 	    {
                 /* Being towed; slowly (grossly?) align with our tower. */
+                int j = cbShips[i].towedby;
+
                 cbShips[i].warp = 0.0;
                 cbShips[i].dwarp = 0.0;
-                h = utAngle( cbShips[i].x, cbShips[i].y, cbShips[j].x, cbShips[j].y );
+                h = utAngle( cbShips[i].x, cbShips[i].y,
+                             cbShips[j].x, cbShips[j].y );
                 ad = utSubAngle( h, cbShips[j].head );
                 if ( ad < 0.0 )
                     h = h - max( ad, -10.0*ITER_SECONDS );
@@ -384,7 +386,7 @@ void iterdrive( int *ship )
                 if ( cbShips[i].lock == LOCK_PLANET
                      && cbShips[i].lockDetail < MAXPLANETS)
 		{
-                    j = cbShips[i].lockDetail;
+                    int j = cbShips[i].lockDetail;
                     /* Make sure the planet is still real. */
                     if ( ! PVISIBLE(j) )
                         cbShips[i].lock = LOCK_NONE;
@@ -441,7 +443,7 @@ void iterdrive( int *ship )
         i = ship[s];
         if ( cbShips[i].status != SS_OFF )
 	{
-            for ( j = 0; j < MAXTORPS; j++ )
+            for ( int j=0; j < MAXTORPS; j++ )
 	    {
                 if ( cbShips[i].torps[j].status == TS_DETONATE )
 		{

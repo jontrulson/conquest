@@ -60,7 +60,7 @@ void hudInitData(void)
     hudData.wtemp.color      = GreenLevelColor;
     hudData.wtemp.overl      = FALSE;
 
-    hudData.tow.towstat      = 0;
+    hudData.tow.towstat      = false;
     hudData.tow.color        = MagentaColor;
 
     hudData.armies.armies    = -1701;
@@ -404,29 +404,30 @@ void hudSetTemps(int snum)
 
 void hudSetTow(int snum)
 {
-    int i = cbShips[snum].towedby;
-
-    if ( i == 0 )
-        i = -cbShips[snum].towing;
-
-    if (i != hudData.tow.towstat)
+    if (STOWING(snum) || STOWEDBY(snum))
     {
-        if ( i == 0 )
+        hudData.tow.str[0] = 0;
+
+        if (STOWING(snum))
         {
-            hudData.tow.str[0] = 0;
-        }
-        else if ( i < 0 )
-        {
-            strcpy(hudData.tow.str, "towing ");
-            utAppendShip(hudData.tow.str , -i) ;
-        }
-        else if ( i > 0 )
-        {
-            strcpy(hudData.tow.str, "towed by ");
-            utAppendShip(hudData.tow.str , i) ;
+            utStrncpy(hudData.tow.str, "towing ", HUD_STR_SZ);
+            utAppendShip(hudData.tow.str, cbShips[snum].towing);
         }
 
-        hudData.tow.towstat = i;
+        if (STOWEDBY(snum))
+        {
+            if (STOWING(snum))
+                utStrncat(hudData.tow.str, ", ", HUD_STR_SZ);
+
+            utStrncat(hudData.tow.str, "towedby ", HUD_STR_SZ);
+            utAppendShip(hudData.tow.str, cbShips[snum].towedby);
+        }
+
+        hudData.tow.towstat = true;
+    }
+    else
+    {
+        hudData.tow.towstat = false;
     }
 
     return;
