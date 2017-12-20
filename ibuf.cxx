@@ -103,7 +103,7 @@ unsigned int ibufGetc(void)
         return 0;
     }
 
-    rbGet(ibufRB, (uint8_t *)&c, I2RB_LEN(1), TRUE);
+    rbGet(ibufRB, (uint8_t *)&c, I2RB_LEN(1), true);
 
     return c;
 }
@@ -113,7 +113,7 @@ unsigned int ibufGetc(void)
 int ibufExpandMacro(int fkey)
 {
     if (fkey < 0 || fkey >= MAX_MACROS)
-        return(FALSE);
+        return(false);
 
     ibufPut(UserConf.MacrosF[fkey]);
 
@@ -121,7 +121,7 @@ int ibufExpandMacro(int fkey)
     utLog("ibufExpandMacro(): got an FKey: %d", fkey);
 #endif
 
-    return(TRUE);
+    return(true);
 
 }
 
@@ -136,18 +136,18 @@ int ibufExpandMouseMacro(int but, uint32_t mods, real mangle)
 #endif
 
     if (but < 0 || but >= CONF_MAXBUTTONS)
-        return(FALSE);
+        return(false);
 
     if (mods >= CONF_MAXMODIFIERS)
-        return(FALSE);
+        return(false);
 
     /* we need to translate any occurances of \a into the mangle (angle) */
 
     s = UserConf.Mouse[but][mods];
 
-    /* return FALSE for empty/undeclared macros */
+    /* return false for empty/undeclared macros */
     if (!s || !*s)
-        return FALSE;
+        return false;
 
 #if defined(DEBUG_MACROS)
     utLog("ibufExpandMouseMacro(): got MOUSE Macro Key: %d, mod %d string = '%s'", but,
@@ -177,5 +177,5 @@ int ibufExpandMouseMacro(int but, uint32_t mods, real mangle)
         }
     }
 
-    return(TRUE);
+    return(true);
 }

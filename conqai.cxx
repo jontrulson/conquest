@@ -496,19 +496,19 @@ int newrob( int *snum, int unum )
 
     /* Check the user number. */
     if ( !ULIVE(unum) )
-        return ( FALSE );
+        return ( false );
 
     /* Check for religious trouble. */
     if ( UBANNED(unum) )
-        return ( FALSE );
+        return ( false );
 
     /* MAke sure we are a builtin. */
     if ( cbUsers[unum].type != USERTYPE_BUILTIN )
-        return ( FALSE );
+        return ( false );
 
     /* Can't do anything with out a ship. */
     if ( ! clbFindShip( snum ) )
-        return ( FALSE );
+        return ( false );
 
     /* Show intent to fly. */
     cbLock(&cbConqInfo->lockword);
@@ -517,7 +517,7 @@ int newrob( int *snum, int unum )
 
     // make sure we got it...
     if ( cbShips[*snum].status == SS_OFF )
-        return ( FALSE );
+        return ( false );
 
     /* Initialize the ship. */
     cbLock(&cbConqInfo->lockword);
@@ -528,7 +528,7 @@ int newrob( int *snum, int unum )
     /* see if we should randomize it's strength
        otherwise do nothing since sstrkills
        was initialized to 0.0 in initship */
-    if (SysConf.DoRandomRobotKills == TRUE)
+    if (SysConf.DoRandomRobotKills == true)
     {
         /* randomize the robot's 'strength' */
         cbShips[*snum].strkills =
@@ -560,8 +560,8 @@ int newrob( int *snum, int unum )
     for ( i = 0; i < NUMPLAYERTEAMS; i = i + 1 )
     {
         /* Robots are peace (and fun) loving. */
-        cbShips[*snum].rwar[i] = FALSE;
-        cbShips[*snum].war[i] = FALSE;
+        cbShips[*snum].rwar[i] = false;
+        cbShips[*snum].war[i] = false;
     }
     utStrncpy ( cbShips[*snum].alias, cbUsers[unum].alias, MAXUSERNAME );
 
@@ -573,7 +573,7 @@ int newrob( int *snum, int unum )
     cbShips[*snum].status = SS_LIVE;
     cbUnlock(&cbConqInfo->lockword);
 
-    return ( TRUE );
+    return ( true );
 
 }
 
@@ -654,7 +654,7 @@ void robotloop(void)
     int s, j;
 
     /* Disable the robot code in conqdriv. */
-    cbConqInfo->externrobots = TRUE;
+    cbConqInfo->externrobots = true;
 
     /* Initialize random numbers */
     rndini();

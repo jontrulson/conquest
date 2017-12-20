@@ -49,7 +49,7 @@ int main(int argc, char *argv[])
         exit(1);
     }
 
-    if (GetSysConf(FALSE) == -1)
+    if (GetSysConf(false) == -1)
     {
 #ifdef DEBUG_CONFIG
         utLog("%s@%d: main(): GetSysConf() returned -1.", __FILE__, __LINE__);
@@ -83,7 +83,7 @@ int main(int argc, char *argv[])
     }
 
 
-    debug = FALSE;
+    debug = false;
 
     while ((arg = getopt(argc, argv, "dr")) != EOF)
     {
@@ -95,7 +95,7 @@ int main(int argc, char *argv[])
             exit(0);
             break;		/* NOTREACHED */
 	case 'd':
-            debug = TRUE;
+            debug = true;
             break;
 	default:
             printf("Options: -d = debugging, -r = return robot control to driver\n");
@@ -114,7 +114,7 @@ int main(int argc, char *argv[])
 static void exitai(void)
 {
 
-    cbConqInfo->externrobots = FALSE;
+    cbConqInfo->externrobots = false;
 
     return;
 

@@ -166,7 +166,7 @@ void yyerror(char *s)
             yytext,
             lineNum);
 
-    goterror = TRUE;
+    goterror = true;
 
     return;
 }

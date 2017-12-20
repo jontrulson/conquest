@@ -20,18 +20,18 @@ void dspReplayMenu(void)
     char *c;
     int i;
     char cbuf[MSGMAXLINE];
-    static int FirstTime = TRUE;
+    static bool FirstTime = true;
     static char sfmt[MSGMAXLINE * 2];
     static char cfmt[MSGMAXLINE * 2];
     static char recordedon[MSGMAXLINE];
     extern char *ConquestVersion;
     extern char *ConquestDate;
 
-    if (FirstTime == TRUE)
+    if (FirstTime)
     {
         time_t recon = (time_t)recFileHeader.rectime;
 
-        FirstTime = FALSE;
+        FirstTime = false;
         sprintf(sfmt,
                 "#%d#%%s#%d#: %%s",
                 InfoColor,
@@ -138,12 +138,12 @@ void dspReplayMenu(void)
 void dspReplayHelp(void)
 {
     int lin, col, tlin;
-    static int FirstTime = TRUE;
+    static bool FirstTime = true;
     static char sfmt[MSGMAXLINE * 2];
 
-    if (FirstTime == TRUE)
+    if (FirstTime)
     {
-        FirstTime = FALSE;
+        FirstTime = false;
         sprintf(sfmt,
                 "#%d#%%-9s#%d#%%s",
                 InfoColor,

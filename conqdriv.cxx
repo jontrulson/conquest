@@ -59,7 +59,7 @@ int main(int argc, char *argv[])
     }
 
 
-    if (GetSysConf(FALSE) == -1)
+    if (GetSysConf(false) == -1)
     {
 #ifdef DEBUG_CONFIG
         utLog("%s@%d: main(): GetSysConf() returned -1.", __FILE__, __LINE__);
@@ -104,7 +104,7 @@ int main(int argc, char *argv[])
 
     /* Look for the force flag. */
 
-    force = FALSE;
+    force = false;
 
     while ((arg = getopt(argc, argv, "f")) != EOF)
     {
@@ -591,7 +591,7 @@ void secdrive( int *ship )
                 {
                     k = cbShips[i].team;
                     if ( k >= 0 && k < NUMPLAYERTEAMS )
-                        cbPlanets[j].scanned[k] = TRUE;
+                        cbPlanets[j].scanned[k] = true;
 
                     /* Planet armies (and suns) get to do damage here. */
                     if ( clbSPWar( i,j ) )
@@ -733,7 +733,7 @@ void secdrive( int *ship )
 	}
         cbShips[i].fuel = min( 999.0, cbShips[i].fuel + inc );
         if ( dec > 0.0 )
-            clbUseFuel( i, dec, FALSE, TRUE );
+            clbUseFuel( i, dec, false, true );
 
         /* Cool-down. */
         if ( cbShips[i].warp < 0.0 && !clbSPWar(i, cbShips[i].lockDetail)
@@ -751,7 +751,7 @@ void secdrive( int *ship )
 
     /* Torp alert logic. */
     for ( i = 0; i < MAXSHIPS; i++ )
-        talert[i] = FALSE;
+        talert[i] = false;
     for ( s = 0; s < MAXSHIPS; s++ )
     {
         i = ship[s];
@@ -789,7 +789,7 @@ void secdrive( int *ship )
                                             break;
                                         }
                                         else if ( dis <= ALERT_DIST )
-                                            talert[k] = TRUE;
+                                            talert[k] = true;
                                     }
                             }
                         }
@@ -902,7 +902,7 @@ void mindrive(void)
     }
 
     /* cleanup any unliving ships */
-    clbCheckShips(TRUE);
+    clbCheckShips(true);
 
     for ( i = 0; i < MAXPLANETS; i++ )
     {
@@ -916,7 +916,7 @@ void mindrive(void)
         clbDoomFind();
     else if ( rnd() < DOOMSDAY_PROB )
     {
-        if (SysConf.NoDoomsday == FALSE)
+        if (SysConf.NoDoomsday == false)
             clbDoomsday();
     }
 

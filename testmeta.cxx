@@ -41,7 +41,7 @@ int main(int argc, char *argv[])
     if ((hp = gethostbyname(remotehost)) == NULL)
     {
         fprintf(stderr, "testmeta: %s: no such host\n", remotehost);
-        return FALSE;
+        return false;
     }
 
     /* put host's address and address type into socket structure */
@@ -54,7 +54,7 @@ int main(int argc, char *argv[])
     if ((s = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP )) < 0)
     {
         perror("socket");
-        return FALSE;
+        return false;
     }
 
     printf("Connecting to host: %s, udp port %d ...\n",

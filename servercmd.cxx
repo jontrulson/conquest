@@ -49,7 +49,7 @@ void startRecord(int f)
 
     snprintf(fname, PATH_MAX, "%s/%s", CONQSTATE, bname);
 
-    if (recOpenOutput(fname, TRUE))
+    if (recOpenOutput(fname, true))
     {                     /* we are almost ready... */
         Context.recmode = RECMODE_STARTING;
     }
@@ -67,7 +67,7 @@ void startRecord(int f)
     if (Context.recmode == RECMODE_STARTING)
     {
         if (recInitOutput(Context.unum, time(0), Context.snum,
-                          TRUE))
+                          true))
         {
             Context.recmode = RECMODE_ON;
             utLog("conquestd: Recording to %s", fname);
@@ -145,9 +145,9 @@ static void CreateRobots(int snumFrom, char *arg1, char *arg2, char *arg3)
 
     /* warlike - if there was an arg3, it's warlike */
     if (arg3)
-        warlike = TRUE;
+        warlike = true;
     else
-        warlike = FALSE;
+        warlike = false;
 
     /* now create them. */
 
@@ -167,8 +167,8 @@ static void CreateRobots(int snumFrom, char *arg1, char *arg2, char *arg3)
         if ( warlike )
 	{
             for ( j = 0; j < NUMPLAYERTEAMS; j++ )
-                cbShips[snum].war[j] = TRUE;
-            cbShips[snum].war[cbShips[snum].team] = FALSE;
+                cbShips[snum].war[j] = true;
+            cbShips[snum].war[cbShips[snum].team] = false;
 	}
     }
 
@@ -176,7 +176,7 @@ static void CreateRobots(int snumFrom, char *arg1, char *arg2, char *arg3)
     utLog("conquestd: %s created %d %s%s (%s) robot(s)",
           cbUsers[Context.unum].username,
           anum,
-          (warlike == TRUE) ? "WARLIKE " : "",
+          (warlike == true) ? "WARLIKE " : "",
           cbUsers[unum].alias,
           cbUsers[unum].username);
 
@@ -245,12 +245,12 @@ static void Murder(int from, char *what)
         return;
     }
 
-    didany = FALSE;
+    didany = false;
     for ( snum = 0; snum < MAXSHIPS; snum++ )
         if ( cbShips[snum].status == SS_LIVE )
             if ( cbShips[snum].unum == unum )
             {
-                didany = TRUE;
+                didany = true;
                 sprintf(mbuf, kill_ship_str2,
                         cbTeams[cbShips[snum].team].teamchar,
                         snum,
@@ -365,16 +365,16 @@ int checkOperExec(msgFrom_t from, uint16_t fromDetail,
 
     /* first, if the message isn't to GOD, ignore */
     if (to != MSG_TO_GOD)
-        return FALSE;
+        return false;
 
     /* if it's not from a valid ship, ignore */
     if (from != MSG_FROM_SHIP || fromDetail >= MAXSHIPS)
-        return FALSE;
+        return false;
 
     utStrncpy(tmsg, msg, MESSAGE_SIZE);
 
     if (tmsg[0] != '/')
-        return FALSE;               /* not for us. */
+        return false;               /* not for us. */
 
     /* it is for us, now check for allowability */
     if (!UISOPER(cbShips[fromDetail].unum))
@@ -384,7 +384,7 @@ int checkOperExec(msgFrom_t from, uint16_t fromDetail,
                     "You are not a Conquest Operator.");
         utLog("conquestd: EXEC from unprivileged ship: %d, '%s'", fromDetail,
               tmsg);
-        return FALSE;
+        return false;
     }
 
     /* ok, let's see what is up. */
@@ -393,7 +393,7 @@ int checkOperExec(msgFrom_t from, uint16_t fromDetail,
     if (!*p)
     {
         clbStoreMsg(MSG_FROM_GOD, 0, MSG_TO_SHIP, fromDetail, oerror);
-        return FALSE;
+        return false;
     }
 
     /* check commands requiring args (no upper-case) */
@@ -405,7 +405,7 @@ int checkOperExec(msgFrom_t from, uint16_t fromDetail,
     if (!cmd)
     {
         clbStoreMsg(MSG_FROM_GOD, 0, MSG_TO_SHIP, fromDetail, oerror);
-        return FALSE;
+        return false;
     }
 
     /* uppercase only version */
@@ -417,15 +417,15 @@ int checkOperExec(msgFrom_t from, uint16_t fromDetail,
     /* recording */
     if (!strncmp(umsg, "RECON", 5))
     {
-        startRecord(TRUE);
-        return TRUE;
+        startRecord(true);
+        return true;
     }
 
     if (!strncmp(umsg, "RECOFF", 6))
     {
         stopRecord();
         Context.recmode = RECMODE_OFF;
-        return TRUE;
+        return true;
     }
 
     /* commands requiring arguments */
@@ -439,7 +439,7 @@ int checkOperExec(msgFrom_t from, uint16_t fromDetail,
         else
             Murder(fromDetail, arg1);
 
-        return TRUE;
+        return true;
     }
 
     /* create robots */
@@ -451,7 +451,7 @@ int checkOperExec(msgFrom_t from, uint16_t fromDetail,
         else
             CreateRobots((int)fromDetail, arg1, arg2, arg3);
 
-        return TRUE;
+        return true;
     }
 
 
@@ -459,5 +459,5 @@ int checkOperExec(msgFrom_t from, uint16_t fromDetail,
     /* that's all we understand for now. */
 
     clbStoreMsg(MSG_FROM_GOD, 0, MSG_TO_SHIP, fromDetail, oerror);
-    return FALSE;
+    return false;
 }

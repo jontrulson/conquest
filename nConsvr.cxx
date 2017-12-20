@@ -23,7 +23,7 @@
 static char *rhost = NULL;
 static uint16_t rport;
 
-static int err = FALSE;
+static int err = false;
 
 #define ERR_BUFSZ 128
 static char errbuf1[ERR_BUFSZ] = {};
@@ -48,7 +48,7 @@ void nConsvrInit(char *remotehost, uint16_t remoteport)
     rport = remoteport;
     errbuf1[0] = 0;
     errbuf2[0] = 0;
-    err = FALSE;
+    err = false;
 
     setNode(&nConsvrNode);
 
@@ -63,7 +63,7 @@ static int nConsvrDisplay(dspConfig_t *dsp)
         return NODE_EXIT;
 
     /* display the logo */
-    mglConqLogo(dsp, FALSE);
+    mglConqLogo(dsp, false);
 
     lin = 12;
 
@@ -112,7 +112,7 @@ static int nConsvrIdle(void)
 
         snprintf(errbuf1, ERR_BUFSZ, "%s: no such host",
                  rhost);
-        err = TRUE;
+        err = true;
 
         return NODE_ERR;
     }
@@ -127,7 +127,7 @@ static int nConsvrIdle(void)
     {
         utLog("socket: %s", strerror(errno));
         snprintf(errbuf1, ERR_BUFSZ, "socket: %s", rhost);
-        err = TRUE;
+        err = true;
 
         return NODE_ERR;
     }
@@ -138,7 +138,7 @@ static int nConsvrIdle(void)
         if ((cInfo.usock = udpOpen(0, &cInfo.servaddr)) < 0)
         {
             utLog("NET: udpOpen: %s", strerror(errno));
-            cInfo.tryUDP = FALSE;
+            cInfo.tryUDP = false;
         }
     }
 
@@ -156,12 +156,12 @@ static int nConsvrIdle(void)
         snprintf(errbuf2, ERR_BUFSZ,
                  "Is there a conquestd server running there?");
 
-        err = TRUE;
+        err = true;
 
         return NODE_ERR;
     }
 
-    cInfo.serverDead = FALSE;
+    cInfo.serverDead = false;
     cInfo.sock = s;
     cInfo.servaddr = sa;
 
@@ -173,13 +173,13 @@ static int nConsvrIdle(void)
         utLog("%s: hello() failed", __FUNCTION__);
         printf("%s: hello() failed, check log\n", __FUNCTION__);
 
-        cInfo.serverDead = TRUE;
+        cInfo.serverDead = true;
         return NODE_EXIT;
     }
 
     nAuthInit();                  /* transfer to Auth */
 
-    return TRUE;
+    return true;
 }
 
 static int nConsvrInput(int ch)

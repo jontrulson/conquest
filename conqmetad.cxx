@@ -33,7 +33,7 @@
 metaSRec_t metaServerList[META_MAXSERVERS];
 static uint16_t listenPort = META_DFLT_PORT;
 static char *progName;
-static int localOnly = FALSE;   /* whether to only listen on loopback */
+static int localOnly = false;   /* whether to only listen on loopback */
 static int maxSlot = 0;         /* the max slot we've ever used */
 const int expireSeconds = (60 * 5); /* 5 minutes */
 
@@ -92,7 +92,7 @@ void ageServers(void)
                       metaServerList[i].altaddr,
                       metaServerList[i].port,
                       metaServerList[i].addr);
-                metaServerList[i].valid = FALSE;
+                metaServerList[i].valid = false;
             }
     }
 
@@ -107,10 +107,10 @@ int findSlot(metaSRec_t *srec, int *isupdate)
     int i, found;
     int rv = 0;
 
-    *isupdate = FALSE;
+    *isupdate = false;
 
     /* first look for it */
-    found = FALSE;
+    found = false;
     for (i=0; i<maxSlot; i++)
     {
         if ((!strcmp(metaServerList[i].addr, srec->addr)) &&
@@ -118,8 +118,8 @@ int findSlot(metaSRec_t *srec, int *isupdate)
             metaServerList[i].valid && (metaServerList[i].port == srec->port))
         {
             rv = i;
-            found = TRUE;
-            *isupdate = TRUE;
+            found = true;
+            *isupdate = true;
             break;
         }
     }
@@ -132,7 +132,7 @@ int findSlot(metaSRec_t *srec, int *isupdate)
                 rv = i;
                 if (rv >= maxSlot)
                     maxSlot = rv + 1;
-                found = TRUE;
+                found = true;
                 break;
             }
     }
@@ -151,7 +151,7 @@ void initServerList()
     memset((void *)&metaServerList, 0, sizeof(metaSRec_t) * META_MAXSERVERS);
 
     for (i=0; i<META_MAXSERVERS; i++)
-        metaServerList[i].valid = FALSE;
+        metaServerList[i].valid = false;
 
     return;
 }
@@ -211,7 +211,7 @@ void metaProcUpd(char *buf, int rlen, char *hostbuf)
     }
 
     /* init the slot */
-    sRec.valid = TRUE;
+    sRec.valid = true;
     sRec.lasttime = time(0);
     if (sRec.port == 0)
         sRec.port = CN_DFLT_PORT;
@@ -306,7 +306,7 @@ void metaListen(void)
     utLog("NET: meta server listening on TCP and UDP port %d\n", listenPort);
 
     /* go into infinite loop waiting for new connections */
-    while (TRUE)
+    while (true)
     {
         tv.tv_sec = 30;           /* age servers every 30 secs */
         tv.tv_usec = 0;
@@ -397,7 +397,7 @@ int main(int argc, char *argv[])
 {
     int i;
     char *myuidname = NULL;              /* what user do I run under? */
-    int dodaemon = FALSE;
+    int dodaemon = false;
 
     progName = argv[0];
 
@@ -405,7 +405,7 @@ int main(int argc, char *argv[])
         switch (i)
         {
         case 'd':
-            dodaemon = TRUE;
+            dodaemon = true;
             break;
 
         case 'p':
@@ -413,7 +413,7 @@ int main(int argc, char *argv[])
             break;
 
         case 'l':                 /* local conn only */
-            localOnly = TRUE;
+            localOnly = true;
             break;
 
         case 'u':
@@ -464,7 +464,7 @@ int main(int argc, char *argv[])
     utLog("%s@%d: main() Reading Configuration files.", __FILE__, __LINE__);
 #endif
 
-    if (GetSysConf(FALSE) == -1)
+    if (GetSysConf(false) == -1)
     {
 #ifdef DEBUG_CONFIG
         utLog("%s@%d: main(): GetSysConf() returned -1.", __FILE__, __LINE__);

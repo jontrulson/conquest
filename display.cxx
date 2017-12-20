@@ -182,7 +182,7 @@ void display( int snum )
         cdclra( 1, STAT_COLS  + 1, DISPLAY_LINS, Context.maxcol + 1 );
     }
 
-    dobeep = FALSE;
+    dobeep = false;
     mindis = 1.0e6;
     minsdis = 1.0e6;
     minenemy = 0;
@@ -365,7 +365,7 @@ void display( int snum )
         if ( ! lsmap )
             if ( clbCVTCoords( cenx, ceny, cbDoomsday->x, cbDoomsday->y, scale, &lin, &col ) )
             {
-                dobeep = TRUE;
+                dobeep = true;
                 sd = sind(cbDoomsday->heading);
                 cd = cosd(cbDoomsday->heading);
                 /* Draw the body. */
@@ -411,8 +411,8 @@ void display( int snum )
             /* Display the torps on a LR scan if it's a friend. */
             if (lsmap)
             {
-                if (snum >= 0 && cbShips[snum].war[cbShips[i].team] == FALSE &&
-                    cbShips[i].war[cbShips[snum].team] == FALSE)
+                if (snum >= 0 && cbShips[snum].war[cbShips[i].team] == false &&
+                    cbShips[i].war[cbShips[snum].team] == false)
                 {
                     if (i == snum) /* if it's your torps - */
                         uiPutColor(CQC_A_BOLD);
@@ -624,7 +624,7 @@ void display( int snum )
                 outattr = RedColor;
                 AlertLevel = RED_ALERT;
                 strcpy(buf , "RED ALERT ") ;
-                dobeep = TRUE;
+                dobeep = true;
 	    }
             else if ( mindis < ALERT_DIST )
 	    {
@@ -632,7 +632,7 @@ void display( int snum )
                 outattr = RedColor;
                 AlertLevel = RED_ALERT;
                 strcpy(buf , "Alert ") ;
-                dobeep = TRUE;
+                dobeep = true;
 	    }
             else if ( STALERT(snum) )
 	    {
@@ -641,7 +641,7 @@ void display( int snum )
                 AlertLevel = YELLOW_ALERT;
                 strcpy(buf , "Torp alert") ;
                 minenemy = 0;			/* disable nearby enemy code */
-                dobeep = TRUE;
+                dobeep = true;
 	    }
             else if ( mindis < YELLOW_DIST )
 	    {
@@ -700,7 +700,7 @@ void display( int snum )
 
         /* Shields. */
         if ( cbShips[snum].shields < prevsh )
-            dobeep = TRUE;
+            dobeep = true;
         prevsh = cbShips[snum].shields;
 
         if ( Context.redraw )
@@ -1006,7 +1006,7 @@ void display( int snum )
 
         /* Damage/repair. */
         if ( cbShips[snum].damage > prevdam )
-            dobeep = TRUE;
+            dobeep = true;
         prevdam = cbShips[snum].damage;
 
         lin = lin + 2;
@@ -1297,7 +1297,7 @@ void display( int snum )
         display_headers(snum);
 
     cdrefresh();
-    Context.redraw = FALSE;
+    Context.redraw = false;
 
     return;
 
@@ -1333,7 +1333,7 @@ void display_headers(int snum)
     }
     else if ( SROBOT(snum) )
     {
-        if (cbConqInfo->externrobots == TRUE)
+        if (cbConqInfo->externrobots == true)
 	{
             sprintf(hbuf, heading_fmt, robo_str1,
                     cbTeams[cbShips[snum].team].teamchar, snum,

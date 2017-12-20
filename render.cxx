@@ -588,18 +588,18 @@ static void renderPulseMsgs(void)
     static animStateRec_t fuelcrit = {};
     static animStateRec_t shcrit = {};
     static animStateRec_t hullcrit = {};
-    static int firsttime = TRUE;
+    static bool firsttime = true;
     static const int testlamps = 0; /* set to non-zero to see them all
                                        at once (for testing) */
     scrNode_t *curnode = getTopNode();
-    int drawing = FALSE;
+    int drawing = false;
 
     if (firsttime)
     {
         if (!curnode->animQue)
             return;                 /* mmaybe we'll get one next time */
 
-        firsttime = FALSE;
+        firsttime = false;
 
         /* init the anims */
         if (animInitState("overload-pulse", &engfail, NULL))
@@ -644,7 +644,7 @@ static void renderPulseMsgs(void)
         (hudData.sh.shields <= HUD_SH_CRIT &&
          SSHUP(Context.snum) && !SREPAIR(Context.snum)) ||
         hudData.dam.damage >= HUD_HULL_CRIT)
-        drawing = TRUE;
+        drawing = true;
 
     if (!drawing)
         return;
@@ -1113,7 +1113,7 @@ void renderHud(bool dostats)
 
         if (alertHandle != CQS_INVHANDLE)
         {
-            cqsEffectStop(alertHandle, FALSE);
+            cqsEffectStop(alertHandle, false);
             alertHandle = CQS_INVHANDLE;
         }
         ack_alert = ALERT_OFF;
@@ -1315,7 +1315,7 @@ void renderHud(bool dostats)
                         0.0,
                         o.d1torppips[i].w,
                         o.d1torppips[i].h,
-                        TRUE, FALSE);
+                        true, false);
         }
     }
 
@@ -1336,7 +1336,7 @@ void renderHud(bool dostats)
              (real)cbShips[snum].pfuse);
 
         drawTexQuad(o.d1phcharge.x, o.d1phcharge.y, 0.0, o.d1phcharge.w, phasH,
-                    TRUE, TRUE);
+                    true, true);
     }
 
     /* GL */

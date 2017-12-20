@@ -34,14 +34,14 @@ int animInitState(const char *animname, animStatePtr_t astate,
     int ndx;
 
     if (!animname || !astate)
-        return FALSE;
+        return false;
 
     /* first get the animdef index */
     if ((ndx = findGLAnimDef(animname)) < 0)
     {
         utLog("%s: could not find animdef for animation '%s'",
               __FUNCTION__, animname);
-        return FALSE;
+        return false;
     }
 
     memset((void *)astate, 0, sizeof(animStateRec_t));
@@ -103,7 +103,7 @@ int animInitState(const char *animname, animStatePtr_t astate,
 
     animResetState(astate, frameTime);
 
-    return TRUE;
+    return true;
 }
 
 /* reset's an anim state.  Hopefully you called animInitState() at least once
@@ -189,7 +189,7 @@ int animIterState(animStatePtr_t astate)
     GLAnimDef_t *glad;
 
     if (!astate)                  /* shouldn't happen */
-        return FALSE;
+        return false;
 
     glad = &GLAnimDefs[astate->adIndex];
 
@@ -380,7 +380,7 @@ int animIterState(animStatePtr_t astate)
     }
 
     /* indicate whether we expired */
-    return (ANIM_EXPIRED(astate) ? TRUE : FALSE);
+    return (ANIM_EXPIRED(astate) ? true : false);
 }
 
 /* Per node Que handling */

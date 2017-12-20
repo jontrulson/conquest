@@ -57,7 +57,7 @@ int recOpenInput(char *fname)
     {
         printf("recOpenInput: open(%s) failed: %s\n", fname,
                strerror(errno));
-        return(FALSE);
+        return(false);
     }
 
 #ifdef HAVE_LIBZ
@@ -66,11 +66,11 @@ int recOpenInput(char *fname)
         printf("recOpenInput: gzdopen failed\n"); /* we use printf here
                                                      since utLog maynot be
                                                      available */
-        return(FALSE);
+        return(false);
     }
 #endif
 
-    return(TRUE);
+    return(true);
 }
 
 void recCloseInput(void)
@@ -110,7 +110,7 @@ int recOpenOutput(char *fname, int logit)
         else
             printf("%s: file exists.  You cannot record to an existing file\n",
                    fname);
-        return(FALSE);
+        return(false);
     }
 
     /* now create it */
@@ -125,7 +125,7 @@ int recOpenOutput(char *fname, int logit)
             printf("recOpenOutput(): creat(%s) failed: %s\n",
                    fname,
                    strerror(errno));
-        return(FALSE);
+        return(false);
     }
 
 #if !defined(MINGW)
@@ -139,11 +139,11 @@ int recOpenOutput(char *fname, int logit)
             utLog("recInitReplay: gzdopen failed\n");
         else
             printf("recInitReplay: gzdopen failed\n");
-        return(FALSE);
+        return(false);
     }
 #endif
 
-    return(TRUE);
+    return(true);
 }
 
 /* close the output stream */
@@ -176,7 +176,7 @@ int recReadHeader(fileHeader_t *fhdr)
     /* assumes you've already opened the stream */
 
     if (rdata_rfd == -1)
-        return(FALSE);
+        return(false);
 
 #ifdef HAVE_LIBZ
     if ((rv = gzread(rdata_rfdz, (char *)fhdr, SZ_FILEHEADER)) != SZ_FILEHEADER)
@@ -185,7 +185,7 @@ int recReadHeader(fileHeader_t *fhdr)
 #endif
         {
             printf("recReadHeader: could not read a proper header\n");
-            return(FALSE);
+            return(false);
         }
 
 #ifdef DEBUG_REC
@@ -206,7 +206,7 @@ int recReadHeader(fileHeader_t *fhdr)
             fprintf(stderr,
                     "compiled in.  Please decompress the file with gunzip first.\n");
 
-            return(FALSE);
+            return(false);
         }
     }
 #endif  /* !HAVE_LIBZ */
@@ -226,7 +226,7 @@ int recReadHeader(fileHeader_t *fhdr)
 #endif
 
 
-    return(TRUE);
+    return(true);
 }
 
 /* build and generate a file header
@@ -236,7 +236,7 @@ int recInitOutput(int unum, time_t thetime, int snum, int isserver)
     fileHeader_t fhdr;
 
     if (rdata_wfd == -1)
-        return(FALSE);
+        return(false);
 
     recordFrameCount = 0;
 
@@ -261,13 +261,13 @@ int recInitOutput(int unum, time_t thetime, int snum, int isserver)
 
 
     if (!recWriteBuf(&fhdr, sizeof(fileHeader_t)))
-        return(FALSE);
+        return(false);
 
     /* add a frame packet */
     recUpdateFrame();
 
     /* ready to go I hope */
-    return(TRUE);
+    return(true);
 }
 
 /* note, if we get a write error here, we turn off recording */
@@ -327,7 +327,7 @@ void recUpdateFrame(void)
 int recWriteBuf(void *buf, int len)
 {
     if (rdata_wfd == -1)
-        return(FALSE);
+        return(false);
 
 #ifdef DEBUG_REC
     utLog("recWriteBuf: len = %d\n", len);
@@ -341,10 +341,10 @@ int recWriteBuf(void *buf, int len)
         {
             utLog("recWriteBuf: couldn't write buffer of %d bytes\n",
                   len);
-            return(FALSE);
+            return(false);
         }
 
-    return(TRUE);
+    return(true);
 }
 
 

@@ -52,9 +52,9 @@ static uint16_t listenPort = CN_DFLT_PORT;
 static char cbuf[BUFFER_SIZE_1024]; /* general purpose buffer */
 static char *progName;
 
-static int localOnly = FALSE;   /* whether to only listen on loopback */
+static int localOnly = false;   /* whether to only listen on loopback */
 static const char *metaServer = META_DFLT_SERVER; /* meta server hostname */
-static int updateMeta = FALSE;  /* whether to notify meta server */
+static int updateMeta = false;  /* whether to notify meta server */
 static char *myServerName = NULL; /* to meta */
 
 cpHello_t chello;		/* client hello info we want to keep */
@@ -100,7 +100,7 @@ int getHostname(int sock, char *buf, int buflen)
     if (getpeername(sock, (struct sockaddr *) &addr, &len) < 0)
     {
         utLog("getpeername failed: %s\n", strerror(errno));
-        return FALSE;
+        return false;
     }
     else
     {
@@ -117,7 +117,7 @@ int getHostname(int sock, char *buf, int buflen)
         }
     }
 
-    return TRUE;
+    return true;
 }
 
 
@@ -142,7 +142,7 @@ void checkMaster(void)
         cbLock(&cbConqInfo->lockword);
         cbConqInfo->conqservPID = getpid();
         cbUnlock(&cbConqInfo->lockword);
-        sInfo.isMaster = TRUE;
+        sInfo.isMaster = true;
         utLog("NET: master server listening on port %d\n", listenPort);
     }
 
@@ -196,13 +196,13 @@ void checkMaster(void)
 
 
     /* go into infinite loop waiting for new connections */
-    while (TRUE)
+    while (true)
     {
         if (updateMeta)
         {
             /* get any changes to sysconf so that meta updates are
                up to date */
-            GetSysConf(TRUE);
+            GetSysConf(true);
             metaUpdateServer(metaServer, myServerName, listenPort);
         }
 
@@ -267,24 +267,24 @@ int main(int argc, char *argv[])
 {
     int i;
     char *myuidname = NULL;              /* what user do I run under? */
-    int dodaemon = FALSE;
+    int dodaemon = false;
 
     progName = argv[0];
     sInfo.state = SVR_STATE_PREINIT;
     sInfo.sock = -1;
     sInfo.usock = -1;
-    sInfo.doUDP = FALSE;
-    sInfo.tryUDP = TRUE;
-    sInfo.clientDead = TRUE;
-    sInfo.isMaster = FALSE;
-    sInfo.isLoggedIn = FALSE;
+    sInfo.doUDP = false;
+    sInfo.tryUDP = true;
+    sInfo.clientDead = true;
+    sInfo.isMaster = false;
+    sInfo.isLoggedIn = false;
 
 
     while ((i = getopt(argc, argv, "dlp:u:mM:N:v")) != EOF)    /* get command args */
         switch (i)
         {
         case 'd':
-            dodaemon = TRUE;
+            dodaemon = true;
             break;
 
         case 'p':
@@ -292,7 +292,7 @@ int main(int argc, char *argv[])
             break;
 
         case 'l':                 /* local conn only */
-            localOnly = TRUE;
+            localOnly = true;
             break;
 
         case 'u':
@@ -300,7 +300,7 @@ int main(int argc, char *argv[])
             break;
 
         case 'm':
-            updateMeta = TRUE;
+            updateMeta = true;
             break;
 
         case 'M':
@@ -369,7 +369,7 @@ int main(int argc, char *argv[])
     utLog("%s@%d: main() Reading Configuration files.", __FILE__, __LINE__);
 #endif
 
-    if (GetSysConf(FALSE) == -1)
+    if (GetSysConf(false) == -1)
     {
 #ifdef DEBUG_CONFIG
         utLog("%s@%d: main(): GetSysConf() returned -1.", __FILE__, __LINE__);
@@ -492,7 +492,7 @@ int main(int argc, char *argv[])
     sInfo.state = SVR_STATE_INIT;
 
     /* re-read sys conf here for indivulual client drivers... */
-    if (GetSysConf(FALSE) == -1)
+    if (GetSysConf(false) == -1)
     {
 #ifdef DEBUG_CONFIG
         utLog("%s@%d: main(): GetSysConf() returned -1.", __FILE__, __LINE__);
@@ -560,7 +560,7 @@ void updateProc(void)
 #endif
 
     /* update client view of the universe */
-    updateClient(FALSE);
+    updateClient(false);
 
     recUpdateFrame();
 
@@ -682,7 +682,7 @@ int capentry( int snum, int *system )
             owned[i] = true;
     }
 
-    owned[cbShips[snum].team] = TRUE;  // we can always enter our own
+    owned[cbShips[snum].team] = true;  // we can always enter our own
                                      // system regardless of who owns
                                      // it
 
@@ -703,15 +703,15 @@ int capentry( int snum, int *system )
         if (!sendClientStat(sInfo.sock, SPCLNTSTAT_FLAG_NONE, snum,
                             cbShips[snum].team,
                             Context.unum, 0))
-            return FALSE;
-        return TRUE;
+            return false;
+        return true;
     }
 
     /* ask the client - use a clientstat with non-zero esystem */
 
     if (!sendClientStat(sInfo.sock, SPCLNTSTAT_FLAG_NONE, snum, cbShips[snum].team,
                         Context.unum, esystem))
-        return FALSE;
+        return false;
 
     while ( clbStillAlive( Context.snum ) )
     {
@@ -723,7 +723,7 @@ int capentry( int snum, int *system )
                                         buf, PKT_MAXSIZE, 1, NULL)) < 0)
         {
             utLog("conquestd:capentry: waitforpacket returned %d", pkttype);
-            return FALSE;
+            return false;
         }
 
 
@@ -739,11 +739,11 @@ int capentry( int snum, int *system )
         if (ccmd->cmd != CPCMD_ENTER)
 	{			/* we'll just use the home team */
             *system = cbShips[snum].team;
-            return TRUE;
+            return true;
 	}
 
         if (ccmd->detail == 0)	/* didn't want to select one */
-            return FALSE;
+            return false;
 
         /* else we'll use the first set bit */
         esystem &= (uint8_t)(ccmd->detail & 0x00ff);
@@ -752,15 +752,15 @@ int capentry( int snum, int *system )
             if (esystem & (1 << i))
             {
                 *system = i;
-                return TRUE;
+                return true;
             }
 
         /* shouldn't happen, but... */
         *system = cbShips[snum].team;
-        return TRUE;
+        return true;
     }
 
-    return FALSE;	    /* can get here because of clbStillAlive() */
+    return false;	    /* can get here because of clbStillAlive() */
 
 }
 
@@ -794,7 +794,7 @@ void dead( int snum, int leave )
     i = 0;
     while ( utDeltaGrand( entertime, &now ) < TORPEDOWAIT_GRAND )
     {
-        updateClient(FALSE);
+        updateClient(false);
         i = 0;
         for ( j = 0; j < MAXTORPS; j++ )
             if ( cbShips[snum].torps[j].status == TS_DETONATE )
@@ -817,11 +817,11 @@ void dead( int snum, int leave )
     utAppendShip(buf , snum) ;
     utLog("INFO: dead: %s was killed by %d(%d).", buf, (int)kb, (int)detail);
 
-    updateClient(FALSE);
+    updateClient(false);
     for ( i=0; i<10 && cbShips[snum].status == SS_DYING; i++ )
     {
         utSleep( (1.0 / (real)Context.updsec) );
-        updateClient(FALSE);
+        updateClient(false);
     }
 
     /* if you conquered the universe, let the client know, and wait for
@@ -859,7 +859,7 @@ void dead( int snum, int leave )
     /*  cbShips[snum].killedby = 0;*/
 
     /* let the client know. */
-    updateClient(FALSE);
+    updateClient(false);
 
     /* if conquered, wait for the cpMessage_t */
     if (kb == KB_CONQUER)
@@ -884,7 +884,7 @@ void dead( int snum, int leave )
 
     /* Turn off sticky war so we can change war settings from menu(). */
     for ( i = 0; i < NUMPLAYERTEAMS; i++ )
-        cbShips[snum].rwar[i] = FALSE;
+        cbShips[snum].rwar[i] = false;
 
     return;
 
@@ -894,16 +894,16 @@ void dead( int snum, int leave )
 int updateClient(int force)
 {
     int i,j;
-    static int sentallusers = FALSE; /* we will send all user data once. */
+    static int sentallusers = false; /* we will send all user data once. */
     static time_t oldtime = 0;
     time_t newtime = time(0);
-    int seciter = FALSE;
+    int seciter = false;
     static time_t histtime = 0;   /* timers that try to save some time() */
     static time_t infotime = 0;
     static time_t teamtime = 0;
-    int dohist = FALSE;
-    int doinfo = FALSE;
-    int doteam = FALSE;
+    int dohist = false;
+    int doinfo = false;
+    int doteam = false;
 
     if (force)
     {                           /* we need to reload everything */
@@ -911,14 +911,14 @@ int updateClient(int force)
         histtime = 0;
         infotime = 0;
         teamtime = 0;
-        sentallusers = FALSE;
+        sentallusers = false;
     }
 
 
     /* some things really should not be checked every update iter */
     if (oldtime != newtime)
     {
-        seciter = TRUE;
+        seciter = true;
         oldtime = newtime;
     }
 
@@ -926,7 +926,7 @@ int updateClient(int force)
     if ((abs(int(newtime - histtime)) >
          HISTORY_UPDATE_INTERVAL))
     {
-        dohist = TRUE;
+        dohist = true;
         histtime = newtime;
     }
 
@@ -934,7 +934,7 @@ int updateClient(int force)
     if ((abs(int(newtime - infotime)) >
          CONQINFO_UPDATE_INTERVAL))
     {
-        doinfo = TRUE;
+        doinfo = true;
         infotime = newtime;
     }
 
@@ -942,28 +942,28 @@ int updateClient(int force)
     if ((abs(int(newtime - teamtime)) >
          TEAM_UPDATE_INTERVAL))
     {
-        doteam = TRUE;
+        doteam = true;
         teamtime = newtime;
     }
 
 
     if (!sentallusers)
     {                           /* send all valid user data the first time */
-        sentallusers = TRUE;
+        sentallusers = true;
         for (i=0; i<MAXUSERS; i++)
             if (ULIVE(i))
                 if (!sendUser(sInfo.sock, i))
-                    return FALSE;
+                    return false;
     }
 
     for (i=0; i<MAXSHIPS; i++)
     {
         if (!sendShip(sInfo.sock, i))
-            return FALSE;
+            return false;
 
         for (j=0; j<MAXTORPS; j++)
             if (!sendTorp(sInfo.sock, i, j))
-                return FALSE;
+                return false;
 
         /* we only send user data for active ships. */
         if (cbShips[i].status != SS_OFF)
@@ -972,7 +972,7 @@ int updateClient(int force)
             {
                 if (!sendUser(sInfo.sock, cbShips[i].unum))
                 {
-                    return FALSE;
+                    return false;
                 }
             }
         }
@@ -983,10 +983,10 @@ int updateClient(int force)
 
     if (doteam)
         for (i=0; i<NUMALLTEAMS; i++)
-            sendTeam(sInfo.sock, i, FALSE);
+            sendTeam(sInfo.sock, i, false);
 
     if (doinfo)
-        sendcbConqInfo(sInfo.sock, FALSE);
+        sendcbConqInfo(sInfo.sock, false);
 
     if (dohist)
     {
@@ -998,7 +998,7 @@ int updateClient(int force)
 
     sendDoomsday(sInfo.sock);
 
-    return TRUE;
+    return true;
 }
 
 
@@ -1027,8 +1027,8 @@ void handleSimpleCmdPkt(cpCommand_t *ccmd)
                 cbShips[Context.snum].shiptype =
                     cbTeams[cbShips[Context.snum].team].shiptype;
                 cbUsers[Context.unum].team = cbShips[Context.snum].team;
-                cbShips[Context.snum].war[cbShips[Context.snum].team] = FALSE;
-                cbUsers[Context.unum].war[cbUsers[Context.unum].team] = FALSE;
+                cbShips[Context.snum].war[cbShips[Context.snum].team] = false;
+                cbUsers[Context.unum].war[cbUsers[Context.unum].team] = false;
 	    }
 	}
 
@@ -1154,7 +1154,7 @@ void handleSimpleCmdPkt(cpCommand_t *ccmd)
     case CPCMD_RELOAD:
         clbBlockAlarm();
         procReload(ccmd);
-        updateClient(TRUE);
+        updateClient(true);
         clbUnblockAlarm();
 
         break;
@@ -1230,21 +1230,21 @@ void menu(void)
 
     for ( i = 0; i < NUMPLAYERTEAMS; i = i + 1 )
     {
-        cbShips[Context.snum].rwar[i] = FALSE;
+        cbShips[Context.snum].rwar[i] = false;
         cbShips[Context.snum].war[i] = cbUsers[Context.unum].war[i];
     }
 
     // if NoTeamWar is set, clear war with own team regardless of settings
     if (SysConf.NoTeamWar)
-        cbShips[Context.snum].war[cbShips[Context.snum].team] = FALSE;
+        cbShips[Context.snum].war[cbShips[Context.snum].team] = false;
 
     utStrncpy( cbShips[Context.snum].alias, cbUsers[Context.unum].alias,
                MAXUSERNAME );
 
     /* Set up some things for the menu display. */
-    Context.leave = FALSE;
+    Context.leave = false;
     sleepy = clbGetMillis();
-    playrv = FALSE;
+    playrv = false;
 
     /* send a ship packet for our ship.  Since this is the first ship packet,
        an SP_SHIP should get sent. */
@@ -1260,7 +1260,7 @@ void menu(void)
 
     do
     {
-        if (!updateClient(FALSE))	/* sends packets */
+        if (!updateClient(false))	/* sends packets */
 	{
             freeship();
             return;
@@ -1270,19 +1270,19 @@ void menu(void)
         if (playrv == ERR)
 	{
             if ( Context.snum < 0 || Context.snum >= MAXSHIPS )
-                lose = TRUE;
+                lose = true;
             else if ( cbShips[Context.snum].pid != Context.pid )
-                lose = TRUE;
+                lose = true;
             else if ( cbShips[Context.snum].status != SS_RESERVED )
 	    {
                 utLog( "menu(): Ship %d no longer reserved.", Context.snum );
-                lose = TRUE;
+                lose = true;
 	    }
             else
-                lose = FALSE;
+                lose = false;
 	}
         else
-            lose = FALSE;
+            lose = false;
 
         if ( lose )				/* again, Jorge? */
 	{
@@ -1342,7 +1342,7 @@ void menu(void)
                             cbShips[i].status == SS_ENTERING) &&
                            cbShips[i].unum == Context.unum))
                     {
-                        clbResign( Context.unum, FALSE );
+                        clbResign( Context.unum, false );
                         cbShips[Context.snum].status = SS_OFF;
                         exit(0);	/* exit here */
                     }
@@ -1398,13 +1398,13 @@ int newship( int unum, int *snum )
     int numvec = 0;
 
     /* cleanup any unliving ships - this is the first thing we need to do */
-    clbCheckShips(FALSE);
+    clbCheckShips(false);
 
     cbLock(&cbConqInfo->lockword);
 
     cbShips[*snum].status = SS_ENTERING;		/* show intent to fly */
 
-    fresh = TRUE;				/* assume we want a fresh ship*/
+    fresh = true;				/* assume we want a fresh ship*/
 
     /* Count number of his ships flying. */
     j = 0;
@@ -1429,7 +1429,7 @@ int newship( int unum, int *snum )
 			   /* ...if it's not already being flown... */
             pktSendAck(PSEV_ERROR, PERR_FLYING, NULL);
             cbShips[*snum].status = SS_RESERVED;
-            return ( FALSE );
+            return ( false );
         }
 
 
@@ -1438,7 +1438,7 @@ int newship( int unum, int *snum )
         for (i=0; i<MAXSHIPS; i++)
             if ( cbShips[i].unum == unum && cbShips[i].status == SS_LIVE )
             {
-                fresh = FALSE;
+                fresh = false;
                 cbShips[*snum].status = SS_OFF;
                 *snum = i;
                 cbShips[*snum].pid = Context.pid;
@@ -1460,7 +1460,7 @@ int newship( int unum, int *snum )
         if ( ! capentry( *snum, &system ) )
 	{
             cbShips[*snum].status = SS_RESERVED;
-            return ( FALSE );
+            return ( false );
 	}
     }
     else
@@ -1520,9 +1520,9 @@ int newship( int unum, int *snum )
     cbShips[*snum].status = SS_LIVE;
 
     cbUnlock(&cbConqInfo->lockword);
-    Context.entship = TRUE;
+    Context.entship = true;
 
-    return ( TRUE );
+    return ( true );
 
 }
 
@@ -1540,7 +1540,7 @@ int play(void)
     char buf[PKT_MAXSIZE];
 
     /* Can't carry on without a vessel. */
-    if ( (rv = newship( Context.unum, &Context.snum )) != TRUE)
+    if ( (rv = newship( Context.unum, &Context.snum )) != true)
     {
         utLog("conquestd:play: newship() returned %d",
               rv);
@@ -1550,10 +1550,10 @@ int play(void)
     drstart();			/* start a driver, if necessary */
     cbShips[Context.snum].sdfuse = 0;	/* zero self destruct fuse */
     utGrand( &Context.msgrand );		/* initialize message timer */
-    Context.leave = FALSE;		/* assume we won't want to bail */
-    Context.redraw = TRUE;		/* want redraw first time */
-    Context.msgok = TRUE;		/* ok to get messages */
-    Context.display = FALSE;		/* ok to get messages */
+    Context.leave = false;		/* assume we won't want to bail */
+    Context.redraw = true;		/* want redraw first time */
+    Context.msgok = true;		/* ok to get messages */
+    Context.display = false;		/* ok to get messages */
     stopUpdate();			/* stop the display interrupt */
     utGetSecs( &laststat );		/* initialize stat timer */
 
@@ -1562,10 +1562,10 @@ int play(void)
     if (!sendClientStat(sInfo.sock, SPCLNTSTAT_FLAG_NONE, Context.snum,
                         cbShips[Context.snum].team,
                         Context.unum, 0))
-        return FALSE;
+        return false;
 
     if (!sendShip(sInfo.sock, Context.snum))
-        return FALSE;
+        return false;
 
     sInfo.state = SVR_STATE_PLAY;
 
@@ -1585,7 +1585,7 @@ int play(void)
         extern void startRecord(int);
 
         if (Context.recmode != RECMODE_ON)
-            startRecord(FALSE);
+            startRecord(false);
     }
 #endif
 
@@ -1606,7 +1606,7 @@ int play(void)
                 utLog("conquestd:play:pktWaitForPacket: %s", strerror(errno));
                 handleSignal(0);
                 /* NOTREACHED */
-                return FALSE;
+                return false;
 	    }
 	}
 
@@ -1651,12 +1651,12 @@ int play(void)
         if (didsomething)         /* update immediately if we did something */
         {
             clbBlockAlarm();
-            updateClient(FALSE);
+            updateClient(false);
             clbUnblockAlarm();
         }
 
         utGrand( &Context.msgrand );
-        Context.msgok = TRUE;
+        Context.msgok = true;
 
         /* See if it's time to update the statistics. */
         if ( utDeltaSecs( laststat, &now ) >= 15 )
@@ -1682,12 +1682,12 @@ int play(void)
     /* Asts are still enabled, simply cancel the next screen update. */
 
     stopUpdate();
-    updateClient(FALSE);	/* one last, to be sure. */
-    sendcbConqInfo(sInfo.sock, TRUE);
+    updateClient(false);	/* one last, to be sure. */
+    sendcbConqInfo(sInfo.sock, true);
     utLog("PLAY: ship %d died, calling dead()", Context.snum);
     dead( Context.snum, Context.leave );
 
-    return(TRUE);
+    return(true);
 
 }
 
@@ -1705,9 +1705,9 @@ int welcome( int *unum )
     uint8_t flags = SPCLNTSTAT_FLAG_NONE;
 
     if (!Authenticate(name, password))
-        return FALSE;
+        return false;
 
-    sInfo.isLoggedIn = TRUE;
+    sInfo.isLoggedIn = true;
 
     if ( ! clbGetUserNum( unum, name, USERTYPE_NORMAL ) )
     {
@@ -1717,7 +1717,7 @@ int welcome( int *unum )
 	{
             pktSendAck(PSEV_FATAL, PERR_CLOSED,
                        NULL);
-            return ( FALSE );
+            return ( false );
 	}
         team = rndint( 0, NUMPLAYERTEAMS - 1 );
 
@@ -1732,7 +1732,7 @@ int welcome( int *unum )
 	{
             pktSendAck(PSEV_FATAL, PERR_REGISTER,
                        NULL);
-            return ( FALSE );
+            return ( false );
 	}
 
         utLog("conquestd: clbRegister complete: unum = %d, team = %d\n",
@@ -1752,7 +1752,7 @@ int welcome( int *unum )
         pktSendAck(PSEV_FATAL, PERR_CLOSED,
                    NULL);
         utLog("conquestd: welcome: game closed\n");
-        return ( FALSE );
+        return ( false );
     }
 
     /* Can't play without a ship. */
@@ -1761,20 +1761,20 @@ int welcome( int *unum )
         pktSendAck(PSEV_FATAL, PERR_NOSHIP,
                    NULL);
         utLog("WELCOME: findship failed");
-        return ( FALSE );
+        return ( false );
     }
 
     /* send a clntstat packet if everything's ok */
 
     if (!sendClientStat(sInfo.sock, flags, Context.snum, cbUsers[*unum].team,
                         *unum, 0))
-        return FALSE;
+        return false;
 
     /* send a user packet for the user as well. */
     if (sendUser(sInfo.sock, *unum) <= 0)
-        return FALSE;
+        return false;
 
-    return ( TRUE );
+    return ( true );
 
 }
 
@@ -1797,7 +1797,7 @@ static int hello(void)
     {
         utLog("NET: SERVER hello: udpOpen() failed: %s", strerror(errno));
         sInfo.usock = -1;
-        sInfo.tryUDP = FALSE;
+        sInfo.tryUDP = false;
         pktSetSocketFds(PKT_SOCKFD_NOCHANGE, sInfo.usock);
     }
 
@@ -1822,7 +1822,7 @@ static int hello(void)
     if (pktWrite(PKT_SENDTCP, &shello) <= 0)
     {
         utLog("NET: SERVER: hello: write shello failed\n");
-        return FALSE;
+        return false;
     }
 
     utLog("NET: SERVER: hello: sent server hello to client");
@@ -1841,7 +1841,7 @@ static int hello(void)
             else
                 utLog("NET: SERVER: hello: udp select failed: %s", strerror(errno));
 
-            sInfo.tryUDP = FALSE;
+            sInfo.tryUDP = false;
         }
         else
         {
@@ -1855,7 +1855,7 @@ static int hello(void)
                             sizeof(sInfo.clntaddr)) < 0)
                 {
                     utLog("NET: SERVER: hello: udp connect() failed: %s", strerror(errno));
-                    sInfo.tryUDP = FALSE;
+                    sInfo.tryUDP = false;
                 }
                 else
                     utLog("NET: SERVER: hello: UDP connection to client established.");
@@ -1869,19 +1869,19 @@ static int hello(void)
     {
         utLog("NET: SERVER: hello: read client hello failed, pkttype = %d",
               pkttype);
-        return FALSE;
+        return false;
     }
 
     if (pkttype == 0)
     {
         utLog("NET: SERVER: hello: read client hello: timeout.\n");
-        return FALSE;
+        return false;
     }
 
     if (pkttype != CP_HELLO)
     {
         utLog("NET: SERVER: hello: read client hello: wrong packet type %d\n", pkttype);
-        return FALSE;
+        return false;
     }
 
     chello = *(cpHello_t *)buf;
@@ -1907,7 +1907,7 @@ static int hello(void)
                 PROTOCOL_VERSION, chello.protover);
         pktSendAck(PSEV_FATAL, PERR_BADPROTO, cbuf);
         utLog("NET: %s", cbuf);
-        return FALSE;
+        return false;
     }
 
     /* for now just a mild notification, since this isn't a real problem
@@ -1934,21 +1934,21 @@ static int hello(void)
     if (!sendServerStat(PKT_SENDTCP))
     {
         utLog("NET: SERVER: hello: sendServerStat failed");
-        return FALSE;
+        return false;
     }
 
     /* now we want an ack.  If we get it, we're done! */
     if ((pkttype = pktRead(buf, PKT_MAXSIZE, 60)) < 0)
     {
         utLog("NET: SERVER: hello: read client Ack failed");
-        return FALSE;
+        return false;
     }
 
     if (pkttype != CP_ACK)
     {
         utLog("NET: SERVER: hello: got packet type %d, expected CP_ACK",
               pkttype);
-        return FALSE;
+        return false;
     }
 
     if (sInfo.tryUDP)
@@ -1957,13 +1957,13 @@ static int hello(void)
         cpack = (cpAck_t *)buf;
         if (cpack->code == PERR_DOUDP)
         {
-            sInfo.doUDP = TRUE;
+            sInfo.doUDP = true;
             utLog("NET: SERVER: hello: Client acknowleged UDP from server. Doing UDP.");
             pktSetSocketFds(PKT_SOCKFD_NOCHANGE, sInfo.usock);
         }
     }
 
-    return TRUE;
+    return true;
 }
 
 void catchSignals(void)
@@ -2028,7 +2028,7 @@ void conqend(void)
 
     char msgbuf[128];
 
-    if (Context.entship == TRUE)
+    if (Context.entship == true)
     {				/* let everyone know we're leaving */
         sprintf(msgbuf, "%s has left the game.",
                 cbUsers[Context.unum].alias);

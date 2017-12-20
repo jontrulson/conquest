@@ -102,7 +102,7 @@ static int nUserlDisplay(dspConfig_t *dsp)
     {
         cprintf(lin, 0, ALIGN_CENTER, "#%d#%s", LabelColor, hd1);
         lin = lin + 3;        /* FIXME - hardcoded??? - dwp */
-        clbUserline( -1, -1, cbuf, FALSE, FALSE );
+        clbUserline( -1, -1, cbuf, false, false );
         cprintf(lin, 0, ALIGN_NONE, "#%d#%s", LabelColor, cbuf);
     }
 
@@ -123,7 +123,7 @@ static int nUserlDisplay(dspConfig_t *dsp)
         if (extrast)
             clbStatline( uvec[offset], cbuf );
         else
-            clbUserline( uvec[offset], -1, cbuf, godlike, FALSE );
+            clbUserline( uvec[offset], -1, cbuf, godlike, false );
 
         /* determine color */
         if ( snum >= 0 && snum < MAXSHIPS ) /* we're a valid ship */
@@ -221,7 +221,7 @@ static int nUserlInput(int ch)
     {
     case DSP_NODE_CP:
         setONode(NULL);
-        nCPInit(FALSE);
+        nCPInit(false);
         break;
     case DSP_NODE_MENU:
         setONode(NULL);

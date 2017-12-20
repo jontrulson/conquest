@@ -27,7 +27,7 @@ static char *_cbBasePtr = NULL;	/* common block base ptr */
 static unsigned int _cbOffset = 0; /* offset into common block */
 static unsigned int _cbSavedSize = 0; /* for msync() and friends */
 
-static int fakeCommon = FALSE;	/* for the clients */
+static int fakeCommon = false;	/* for the clients */
 
 /* Some architectures do not like unaligned accesses (like sparc) so
  * we need to ensure proper alignment of the structures contained
@@ -147,7 +147,7 @@ static void _unmapCBVariables()
 
 static void _initFakeCB(void)
 {
-    fakeCommon = TRUE;
+    fakeCommon = true;
 
     /* this will exit if it fails */
     if (!_cbBasePtr)
@@ -212,7 +212,7 @@ void cbFlush(void)
     return;
 }
 
-/* _checkCB() - open/verify a common block - init if necc, return TRUE
+/* _checkCB() - open/verify a common block - init if necc, return true
    if successful */
 static int _checkCB(char *fname, int fmode, int sizeofcb)
 {
@@ -253,7 +253,7 @@ static int _checkCB(char *fname, int fmode, int sizeofcb)
                       fname,
                       newfile,
                       strerror(errno));
-                return(FALSE);
+                return(false);
 	    }
 	}
     }
@@ -274,7 +274,7 @@ static int _checkCB(char *fname, int fmode, int sizeofcb)
                 utLog("_checkCB(): creat(%s) failed: %s\n",
                       fname,
                       strerror(errno));
-                return(FALSE);
+                return(false);
 	    }
             else
 	    {			/* Create it */
@@ -293,7 +293,7 @@ static int _checkCB(char *fname, int fmode, int sizeofcb)
                     close(ffd);
                     free(memptr);
                     memptr = NULL;
-                    return FALSE;
+                    return false;
                 }
 
                 close(ffd);
@@ -306,7 +306,7 @@ static int _checkCB(char *fname, int fmode, int sizeofcb)
             utLog("_checkCB(): open(%s, O_RDONLY) failed: %s\n",
                   fname,
                   strerror(errno));
-            return(FALSE);
+            return(false);
 	}
     }
 
@@ -324,7 +324,7 @@ static int _checkCB(char *fname, int fmode, int sizeofcb)
     }
 #endif
 
-    return(TRUE);			/* everything there, and right size */
+    return(true);			/* everything there, and right size */
 }
 
 void cbMap(void)
@@ -349,7 +349,7 @@ void cbMap(void)
     snprintf(cmnfile, PATH_MAX, "%s/%s", CONQSTATE, C_CONQ_COMMONBLK);
 
     /* verify it's validity */
-    if (_checkCB(cmnfile, CMN_MODE, cbGetSize()) == FALSE)
+    if (_checkCB(cmnfile, CMN_MODE, cbGetSize()) == false)
         exit(1);			/* an unrecoverable error */
 
     /* reopen it... */
@@ -405,7 +405,7 @@ void cbMapLocal(void)
     clbInitEverything();
     clbInitMsgs();
     *cbRevision = COMMONSTAMP;
-    cbConqInfo->closed = FALSE;
+    cbConqInfo->closed = false;
     cbDriver->drivstat = DRS_OFF;
     cbDriver->drivpid = 0;
     cbDriver->drivowner[0] = 0;

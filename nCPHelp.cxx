@@ -47,12 +47,12 @@ scrNode_t *nCPHelpInit(int setnode)
 static int nCPHelpDisplay(dspConfig_t *dsp)
 {
     int lin, col, tlin;
-    static int FirstTime = TRUE;
+    static bool FirstTime = true;
     static char sfmt[MSGMAXLINE * 2];
 
-    if (FirstTime == TRUE)
+    if (FirstTime)
     {
-        FirstTime = FALSE;
+        FirstTime = false;
         sprintf(sfmt,
                 "#%d#%%-9s#%d#%%s",
                 InfoColor,
@@ -193,7 +193,7 @@ static int nCPHelpInput(int ch)
     /* go back */
 
     setONode(NULL);
-    nCPInit(FALSE);
+    nCPInit(false);
 
     return NODE_OK;
 }

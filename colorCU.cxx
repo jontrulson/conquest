@@ -68,9 +68,9 @@ void uiPutColor(cqColor color)
 void uiInitColors(void)
 {
     if (has_colors())
-        Context.hascolor = TRUE;
+        Context.hascolor = true;
     else
-        Context.hascolor = FALSE;
+        Context.hascolor = false;
 
     if (Context.hascolor)
     {

@@ -77,7 +77,7 @@ void nDeadInit(void)
     {
         state = S_LASTWORDS;
 
-        prm.preinit = FALSE;
+        prm.preinit = false;
         prm.buf = lastwords;
         prm.buflen = MAXLASTWORDS - 1;
         prm.terms = TERMS;
@@ -284,7 +284,7 @@ static int nDeadInput(int ch)
         {
             setONode(NULL);
             /* turn off any running effects */
-            cqsEffectStop(CQS_INVHANDLE, TRUE);
+            cqsEffectStop(CQS_INVHANDLE, true);
 
             switch (ch)
             {

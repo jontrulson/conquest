@@ -80,14 +80,14 @@ void cqiInitPlanets(void)
         cbPlanets[i].uninhabtime = 0;
 
         for ( j = 0; j < NUMPLAYERTEAMS; j++ )
-            cbPlanets[i].scanned[j] = FALSE;
+            cbPlanets[i].scanned[j] = false;
 
         /* we will need to defer setting up planet's team scan until
            we have identified the team's homeplanets... */
         for ( j = 0; j < NUMPLAYERTEAMS; j++ )
         {
             cbTeams[j].couptime = 0; /* time left to coup starts at zero. */
-            cbTeams[j].coupinfo = FALSE; /* don't know coup time */
+            cbTeams[j].coupinfo = false; /* don't know coup time */
         }
 
         cbPlanets[i].size = cqiPlanets[i].size;
@@ -170,7 +170,7 @@ void cqiInitPlanets(void)
     for ( k = 0; k < MAXPLANETS; k++ )
     {
         if (PHOMEPLANET(k) && cbPlanets[k].team < NUMPLAYERTEAMS)
-            cbPlanets[k].scanned[cbPlanets[k].team] = TRUE;
+            cbPlanets[k].scanned[cbPlanets[k].team] = true;
     }
 
     /* Un-twiddle the lockword. */

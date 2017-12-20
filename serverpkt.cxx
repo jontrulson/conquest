@@ -239,7 +239,7 @@ spShipSml_t *spktShipSml(uint8_t snum, int rec)
 {
     int mysnum = Context.snum;
     static spShipSml_t sshipsml;
-    int canscan = FALSE;
+    int canscan = false;
     real dis;
     uint16_t sflags = 0;		/* ship flags we are allowed to see */
     uint16_t scanflag = 0;         /* set to SHIP_F_SCANDIST if < ACCINFO_DIST */
@@ -274,7 +274,7 @@ spShipSml_t *spktShipSml(uint8_t snum, int rec)
         sshipsml.walloc = cbShips[snum].weapalloc;
         sshipsml.etemp = (uint8_t)cbShips[snum].etemp;
         sshipsml.wtemp = (uint8_t)cbShips[snum].wtemp;
-        canscan = TRUE;	      /* can always scan ourselves */
+        canscan = true;	      /* can always scan ourselves */
     }
     else
     {
@@ -355,12 +355,12 @@ spShipLoc_t *spktShipLoc(uint8_t snum, int rec)
     int mysnum = Context.snum;
     static spShipLoc_t sshiploc;
     real x, y;
-    int canscan = FALSE;
+    int canscan = false;
     real dis;
     static const uint32_t maxtime = 5000;  /* 5 seconds */
     static uint32_t lasttime = 0;
     uint32_t thetime = clbGetMillis();
-    static int forceMyShip = TRUE;
+    static int forceMyShip = true;
 
     memset((void *)&sshiploc, 0, sizeof(spShipLoc_t));
 
@@ -376,7 +376,7 @@ spShipLoc_t *spktShipLoc(uint8_t snum, int rec)
     if (sInfo.doUDP && (snum == mysnum) && ((thetime - lasttime) > maxtime))
     {
         lasttime = thetime;
-        forceMyShip = TRUE;
+        forceMyShip = true;
     }
 
     /* RESTRICT */
@@ -444,7 +444,7 @@ spShipLoc_t *spktShipLoc(uint8_t snum, int rec)
                not need one now :) */
             if (sInfo.doUDP)
                 lasttime = thetime;
-            forceMyShip = FALSE;
+            forceMyShip = false;
             return &sshiploc;
         }
     }
@@ -645,7 +645,7 @@ spPlanetLoc2_t *spktPlanetLoc2(uint8_t pnum, int rec, int force)
     uint32_t iternow = clbGetMillis(); /* we send the loc2 packets only every 5 secs */
     const uint32_t iterwait = 5000.0; /* ms */
     static uint32_t tstart[MAXPLANETS] = {}; /* saved time deltas */
-    int tooearly = FALSE;
+    int tooearly = false;
 
     /*
      * We have to handle the case where a planet has just been freshly
@@ -654,7 +654,7 @@ spPlanetLoc2_t *spktPlanetLoc2(uint8_t pnum, int rec, int force)
      */
 
     if (!force && (tstart[pnum] != 0 && ((iternow - tstart[pnum]) < iterwait)))
-        tooearly = TRUE;
+        tooearly = true;
 
     memset((void *)&splanloc2, 0, sizeof(spPlanetLoc2_t));
 

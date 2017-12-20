@@ -27,7 +27,7 @@
 int procDispatchInit(uint16_t vers, packetEnt_t *pktList, int numpkts)
 {
     /* nothing since we only allow the server to deal with the latest proto */
-    return TRUE;
+    return true;
 }
 
 void procSetName(char *buf)
@@ -133,7 +133,7 @@ void procSetWarp(cpCommand_t *swarp)
             return;
 	}
         /* No charge if already warp 0. */
-        if ( clbUseFuel( snum, ENGINES_ON_FUEL, FALSE, TRUE ) == FALSE)
+        if ( clbUseFuel( snum, ENGINES_ON_FUEL, false, true ) == false)
 	{
             sendFeedback("We don't have enough fuel.");
             return;
@@ -178,7 +178,7 @@ void procSetShields(cpCommand_t *cmd)
     if (cmd->cmd != CPCMD_SETSHIELDS)
         return;
 
-    shup = (((int)ntohs(cmd->detail)) ? TRUE : FALSE);
+    shup = (((int)ntohs(cmd->detail)) ? true : false);
 
 #if defined(DEBUG_SERVERPROC)
     utLog("PROC SETSHIELDS: sh = %d", shup);
@@ -260,7 +260,7 @@ void procCloak(cpCommand_t *cmd)
     }
 
     SFCLR(snum, SHIP_F_REPAIR);
-    if ( ! clbUseFuel( snum, CLOAK_ON_FUEL, FALSE, TRUE ) )
+    if ( ! clbUseFuel( snum, CLOAK_ON_FUEL, false, true ) )
     {
         sendFeedback(nofuel);
         return;
@@ -318,7 +318,7 @@ void procDistress(cpCommand_t *cmd)
     int snum = Context.snum;		/* we always use our own ship */
     char buf[128], cbuf[128];
     real x;
-    int i, isorb = FALSE;
+    int i, isorb = false;
     int tofriendly;
 
     if (!pktIsValid(CP_COMMAND, cmd))
@@ -371,19 +371,19 @@ void procDistress(cpCommand_t *cmd)
     {
         sprintf( buf, ", warp=%.1f", x );
         strcat(cbuf, buf) ;
-        isorb = FALSE;
+        isorb = false;
     }
     else
     {
         sprintf( buf, ", orbiting %.3s",
                  cbPlanets[cbShips[snum].lockDetail].name );
         strcat(cbuf, buf) ;
-        isorb = TRUE;
+        isorb = true;
     }
 
     /* heading */
 
-    if (isorb == FALSE)
+    if (isorb == false)
     {
         // locked onto a planet we haven't reached yet
         if (cbShips[snum].lock == LOCK_PLANET
@@ -574,7 +574,7 @@ void procCoup(cpCommand_t *cmd)
     }
 
     /* Now our team can tell coup time for free. */
-    cbTeams[cbShips[snum].team].coupinfo = TRUE;
+    cbTeams[cbShips[snum].team].coupinfo = true;
 
     i = cbTeams[cbShips[snum].team].couptime;
     if ( i > 0 )
@@ -620,10 +620,10 @@ void procCoup(cpCommand_t *cmd)
 
     /* Make the planet not scanned. */
     for ( i = 0; i < NUMPLAYERTEAMS; i = i + 1 )
-        cbPlanets[pnum].scanned[i] = FALSE;
+        cbPlanets[pnum].scanned[i] = false;
 
     /* ...except by us */
-    cbPlanets[pnum].scanned[cbShips[snum].team] = TRUE;
+    cbPlanets[pnum].scanned[cbShips[snum].team] = true;
 
     cbPlanets[pnum].armies = rndint( 10, 20 );	/* create token coup force */
     cbUsers[cbShips[snum].unum].stats[USTAT_COUPS] += 1;
@@ -633,7 +633,7 @@ void procCoup(cpCommand_t *cmd)
     sendFeedback("Coup successful!");
 
     /* force a team update for this ship */
-    sendTeam(sInfo.sock, cbShips[snum].team, TRUE);
+    sendTeam(sInfo.sock, cbShips[snum].team, true);
 
     return;
 }
@@ -754,7 +754,7 @@ void procSetWar(cpCommand_t *cmd)
 {
     int snum = Context.snum;		/* we always use our own ship */
     int unum = Context.unum;
-    int dowait = FALSE, entertime, now, i;
+    int dowait = false, entertime, now, i;
     uint8_t war;
 
     if (!pktIsValid(CP_COMMAND, cmd))
@@ -780,15 +780,15 @@ void procSetWar(cpCommand_t *cmd)
             {
                 // if not at war, we will delay
                 if (!cbShips[Context.snum].war[i])
-                    dowait = TRUE;
+                    dowait = true;
 
-                cbShips[snum].war[i] = TRUE;
+                cbShips[snum].war[i] = true;
             }
         }
         else
 	{
             // always ok to declare peace
-            cbShips[snum].war[i] = FALSE;
+            cbShips[snum].war[i] = false;
 	}
 
         cbUsers[unum].war[i] = cbShips[snum].war[i];
@@ -1151,11 +1151,11 @@ void procBomb(cpCommand_t *cmd)
         }
 
     /* Handle war logic. */
-    cbShips[snum].srpwar[pnum] = TRUE;
+    cbShips[snum].srpwar[pnum] = true;
     if ( cbPlanets[pnum].team >= 0 && cbPlanets[pnum].team < NUMPLAYERTEAMS )
     {
         /* For a team planet make the war sticky and send an intruder alert. */
-        cbShips[snum].rwar[cbPlanets[pnum].team] = TRUE;
+        cbShips[snum].rwar[cbPlanets[pnum].team] = true;
         clbIntrude( snum, pnum );
     }
     /* Planets owned by GOD have a special defense system. */
@@ -1178,7 +1178,7 @@ void procBomb(cpCommand_t *cmd)
     oparmies = -1;
     utGrand( &entertime );		/* get start time */
     SFSET(snum, SHIP_F_BOMBING);
-    while(TRUE)
+    while(true)
     {
         if ( ! clbStillAlive( Context.snum ) )
         {
@@ -1203,7 +1203,7 @@ void procBomb(cpCommand_t *cmd)
                 goto cbrk22; /* break 2;*/
 	    }
             x = BOMBARD_FUEL * (real)(BOMBARD_GRAND / 1000.0);
-            if ( ! clbUseFuel( snum, x, TRUE, TRUE ) )
+            if ( ! clbUseFuel( snum, x, true, true ) )
 	    {
                 pktSendAck(PSEV_INFO, PERR_CANCELED,
                            NULL);
@@ -1305,9 +1305,9 @@ void procBeam(cpCommand_t *cmd)
         return;			/* stop beaming */
 
     if (ntohs(cmd->detail) & 0x8000)
-        beamup = FALSE;		/* beaming down */
+        beamup = false;		/* beaming down */
     else
-        beamup = TRUE;		/* beaming up */
+        beamup = true;		/* beaming up */
 
 #if defined(DEBUG_SERVERPROC)
     utLog("PROC BEAM: snum = %d, detail = 0x%04x, beamup = %d, beam = %d",
@@ -1432,9 +1432,9 @@ void procBeam(cpCommand_t *cmd)
         return;
     }
     if ( upmax <= 0 )
-        dirup = FALSE;
+        dirup = false;
     else if ( downmax <= 0 )
-        dirup = TRUE;
+        dirup = true;
     else
         dirup = beamup;
 
@@ -1452,12 +1452,12 @@ void procBeam(cpCommand_t *cmd)
     if ( cbPlanets[pnum].team >= NUMPLAYERTEAMS )
     {
         /* If the planet is not race owned, make it war with us. */
-        cbShips[snum].srpwar[pnum] = TRUE;
+        cbShips[snum].srpwar[pnum] = true;
     }
     else if ( cbPlanets[pnum].team != cbShips[snum].team )
     {
         /* For a team planet make the war sticky and send an intruder alert. */
-        cbShips[snum].rwar[cbPlanets[pnum].team] = TRUE;
+        cbShips[snum].rwar[cbPlanets[pnum].team] = true;
 
         /* Chance to create a robot here. */
         clbIntrude( snum, pnum );
@@ -1470,11 +1470,11 @@ void procBeam(cpCommand_t *cmd)
     /* Beam. */
     total = 0;
     ototal = -1;				/* force an update the first time */
-    zeroed = FALSE;
-    conqed = FALSE;
+    zeroed = false;
+    conqed = false;
 
     utGrand( &entertime );
-    while(TRUE)
+    while(true)
     {
         if ( ! clbStillAlive( Context.snum ) )
             return;
@@ -1507,7 +1507,7 @@ void procBeam(cpCommand_t *cmd)
                 if ( cbPlanets[pnum].team == TEAM_NOTEAM || cbPlanets[pnum].armies == 0 )
 		{
                     clbTakePlanet( pnum, snum );
-                    conqed = TRUE;
+                    conqed = true;
 		}
                 else if ( cbPlanets[pnum].team != cbShips[snum].team )
 		{
@@ -1515,7 +1515,7 @@ void procBeam(cpCommand_t *cmd)
                     if ( cbPlanets[pnum].armies == 0 )
 		    {
                         clbZeroPlanet( pnum, snum );
-                        zeroed = TRUE;
+                        zeroed = true;
 		    }
 		}
                 else
@@ -1625,7 +1625,7 @@ void procDestruct(cpCommand_t *cmd)
     utGetSecs( &entertime );
 
 
-    Context.msgok = TRUE;			/* messages are ok in the beginning */
+    Context.msgok = true;			/* messages are ok in the beginning */
     while ( cbShips[Context.snum].sdfuse > 0 )
     {
         cbShips[Context.snum].sdfuse = SELFDESTRUCT_FUSE - utDeltaSecs ( entertime, &now );
@@ -1633,7 +1633,7 @@ void procDestruct(cpCommand_t *cmd)
         /* Display new messages until T-minus 3 seconds. */
 
         if ( cbShips[Context.snum].sdfuse < 3 )
-            Context.msgok = FALSE;
+            Context.msgok = false;
 
         if ( ! clbStillAlive( Context.snum ) )
 	{
@@ -1653,7 +1653,7 @@ void procDestruct(cpCommand_t *cmd)
 
     } /* end while */
 
-    Context.msgok = FALSE;			/* turn off messages */
+    Context.msgok = false;			/* turn off messages */
 
     if ( DOOM_LIVE() )
     {

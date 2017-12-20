@@ -38,7 +38,7 @@ int rulenum;
 static int trstrat[MAX_VAR][10], trvec[32];
 int debug_scanner, verbose;
 
-static int UpdateCmnBlock = FALSE;
+static bool UpdateCmnBlock = false;
 
 extern int Lineno;
 extern int goterror;
@@ -219,8 +219,8 @@ int main(int argc, char **argv)
     int ch;
     FILE *filefd;
 
-    debug_scanner = FALSE;
-    verbose = FALSE;
+    debug_scanner = false;
+    verbose = false;
     filefd = stdout;
 
 //    while ( (ch = getopt( argc, argv, "dvo:U" )) != EOF )
@@ -229,17 +229,17 @@ int main(int argc, char **argv)
         switch(ch)
 	{
 	case 'v':
-            verbose = TRUE;
+            verbose = true;
             break;
 	case 'd':
-            debug_scanner = TRUE;
+            debug_scanner = true;
             break;
 	case 'o':
             strncpy(filename, optarg, PATH_MAX - 1);
             filefd = NULL;
             break;
 //	case 'U':
-//            UpdateCmnBlock = TRUE;
+//            UpdateCmnBlock = true;
 //            break;
 	default:
             print_usage();
@@ -297,7 +297,7 @@ void initrun(void)
     /* Initialize random stuff. */
 
     rulenum = 0;
-    goterror = FALSE;
+    goterror = false;
 
     /* Initialize the strategy table to accept everything. */
     for ( i = 0; i < MAX_VAR; i = i + 1 )

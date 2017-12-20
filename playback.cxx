@@ -38,7 +38,7 @@ int pbInitReplay(char *fname, time_t *elapsed)
     if (!recOpenInput(fname))
     {
         printf("pbInitReplay: recOpenInput(%s) failed\n", fname);
-        return(FALSE);
+        return(false);
     }
 
     /* don't bother mapping for just a count */
@@ -48,7 +48,7 @@ int pbInitReplay(char *fname, time_t *elapsed)
     /* now lets read in the file header and check a few things. */
 
     if (!recReadHeader(&recFileHeader))
-        return(FALSE);
+        return(false);
 
     /* version check */
     switch (recFileHeader.vers)
@@ -88,7 +88,7 @@ int pbInitReplay(char *fname, time_t *elapsed)
               recFileHeader.vers);
         printf("pbInitReplay: unknown recording version: %d\n",
                recFileHeader.vers);
-        return FALSE;
+        return false;
     }
     break;
     }
@@ -100,7 +100,7 @@ int pbInitReplay(char *fname, time_t *elapsed)
        looking for timestamps. */
     if (elapsed)			/* we want elapsed time */
     {
-        int done = FALSE;
+        int done = false;
 
         starttm = recFileHeader.rectime;
 
@@ -120,7 +120,7 @@ int pbInitReplay(char *fname, time_t *elapsed)
             }
 
             if (pkttype == SP_NULL)
-                done = TRUE;	/* we're done */
+                done = true;	/* we're done */
 	}
 
         if (curTS != 0)
@@ -135,7 +135,7 @@ int pbInitReplay(char *fname, time_t *elapsed)
 
     /* now we are ready to start running packets */
 
-    return(TRUE);
+    return(true);
 }
 
 
@@ -183,13 +183,13 @@ void pbFileSeek(time_t newtime)
 
     /* just read packets until 1. recCurrentTime exceeds newtime, or 2. no
        data is left */
-    Context.display = FALSE; /* don't display things while looking */
+    Context.display = false; /* don't display things while looking */
 
     while (recCurrentTime < newtime)
         if ((pbProcessPackets() == SP_NULL))
             break;		/* no more data */
 
-    Context.display = TRUE;
+    Context.display = true;
 
     return;
 }

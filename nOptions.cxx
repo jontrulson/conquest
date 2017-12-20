@@ -26,7 +26,7 @@
 #include "cqsound.h"
 
 static int retnode;             /* node to return to */
-static int uopts = FALSE;       /* are we doing user opts? */
+static int uopts = false;       /* are we doing user opts? */
 
 #define S_NONE          0
 #define S_USRMENU       1
@@ -122,7 +122,7 @@ static void quitNode(void)
     {
     case DSP_NODE_CP:
         setONode(NULL);
-        nCPInit(FALSE);
+        nCPInit(false);
         break;
     case DSP_NODE_MENU:
     default:
@@ -143,11 +143,11 @@ static void _changePasswd(int init)
         pw[0] = 0;
         prm.buf = pw;
 
-        prm.preinit = FALSE;
+        prm.preinit = false;
         prm.buflen = MAXUSERNAME - 1;
         prm.terms = TERMS;
         prm.index = MSG_LIN1;
-        prompting = TRUE;
+        prompting = true;
     }
     else
     {
@@ -158,11 +158,11 @@ static void _changePasswd(int init)
             rpw[0] = 0;
             prm.buf = rpw;
 
-            prm.preinit = FALSE;
+            prm.preinit = false;
             prm.buflen = MAXUSERNAME - 1;
             prm.terms = TERMS;
             prm.index = MSG_LIN1;
-            prompting = TRUE;
+            prompting = true;
         }
         else
         {                       /* done. do a compare and send new pw
@@ -176,7 +176,7 @@ static void _changePasswd(int init)
             else
                 sendAuth(cInfo.sock, CPAUTH_CHGPWD, "", pw);
 
-            prompting = FALSE;
+            prompting = false;
             state = S_USRMENU;
         }
 
@@ -196,13 +196,13 @@ static void _changeMacro(int macronum, int init)
         sprintf(prmpt, "f%2d = ", macronum);
         strcpy(cbuf, Macro2Str(UserConf.MacrosF[macronum - 1]));
 
-        prm.preinit = TRUE;
+        prm.preinit = true;
         prm.buf = cbuf;
         prm.buflen = MAX_MACRO_LEN - 1;
         prm.pbuf = prmpt;
         prm.terms = TERMS;
         prm.index = lin;
-        prompting = TRUE;
+        prompting = true;
 
     }
     else
@@ -238,13 +238,13 @@ static void _changeMouse(int mousevec, int init)
         sprintf(prmpt, "%3s%2d = ", modstr, but);
         strcpy(cbuf, Macro2Str(UserConf.Mouse[but][mod]));
 
-        prm.preinit = TRUE;
+        prm.preinit = true;
         prm.buf = cbuf;
         prm.buflen = MAX_MACRO_LEN - 1;
         prm.pbuf = prmpt;
         prm.terms = TERMS;
         prm.index = lin;
-        prompting = TRUE;
+        prompting = true;
 
     }
     else
@@ -266,10 +266,10 @@ static void _changeOption(struct Conf *cdata, int init)
     case CTYPE_BOOL:
         j = *(int *)(cdata->ConfValue);
 
-        if (j == TRUE)
-            j = FALSE;
+        if (j == true)
+            j = false;
         else
-            j = TRUE;
+            j = true;
 
         *(int *)(cdata->ConfValue) = j;
 
@@ -285,14 +285,14 @@ static void _changeOption(struct Conf *cdata, int init)
 
         if (init)
         {
-            prm.preinit = TRUE;
+            prm.preinit = true;
             utStrncpy(cbuf, ((char *)cdata->ConfValue), CBUFLEN);
             prm.buf = cbuf;
             prm.buflen = cdata->max - 1;
             prm.pbuf = "Value: ";
             prm.terms = TERMS;
             prm.index = MSG_LIN1;
-            prompting = TRUE;
+            prompting = true;
         }
         else
         {
@@ -304,14 +304,14 @@ static void _changeOption(struct Conf *cdata, int init)
     case CTYPE_NUMERIC:
         if (init)
         {
-            prm.preinit = TRUE;
+            prm.preinit = true;
             sprintf(cbuf, "%d", *(int *)(cdata->ConfValue));
             prm.buf = cbuf;
             prm.buflen = 20;
             prm.pbuf = "Enter a number: ";
             prm.terms = TERMS;
             prm.index = MSG_LIN1;
-            prompting = TRUE;
+            prompting = true;
         }
         else
         {
@@ -673,13 +673,13 @@ static void _showOptScreen(void)
             case CTYPE_BOOL:
                 j = *(int *)ConfigData[cvec[k]].ConfValue;
 
-                if (j == TRUE)
+                if (j == true)
                     vattrib = GreenLevelColor;
                 else
                     vattrib = RedLevelColor;
 
                 cprintf(lin, settingcol, ALIGN_NONE, "#%d#%s#%d#",
-                        vattrib, (j == TRUE) ? "True" : "False",
+                        vattrib, (j == true) ? "True" : "False",
                         NoColor);
                 break;
 
@@ -723,8 +723,8 @@ scrNode_t *nOptionsInit(int what, int setnode, int rnode)
     int i, k;
     struct Conf *ConfigData;
 
-    uopts = (what == NOPT_USER) ? TRUE : FALSE;
-    prompting = FALSE;
+    uopts = (what == NOPT_USER) ? true : false;
+    prompting = false;
 
     if (uopts)
     {
@@ -899,9 +899,9 @@ static int nOptionsInput(int ch)
             if (irv > 0)
             {
                 if (irv != TERM_ABORT)
-                    _changeMacro((curpage * items_per_page) + clin + 1, FALSE);
+                    _changeMacro((curpage * items_per_page) + clin + 1, false);
 
-                prompting = FALSE;
+                prompting = false;
             }
             break;
 
@@ -909,9 +909,9 @@ static int nOptionsInput(int ch)
             if (irv > 0)
             {
                 if (irv != TERM_ABORT)
-                    _changeMouse((curpage * items_per_page) + clin, FALSE);
+                    _changeMouse((curpage * items_per_page) + clin, false);
 
-                prompting = FALSE;
+                prompting = false;
             }
             break;
 
@@ -919,9 +919,9 @@ static int nOptionsInput(int ch)
             if (irv > 0)
             {
                 if (irv != TERM_ABORT)
-                    _changeOption(&ConfigData[cvec[(curpage * items_per_page) + clin]], FALSE);
+                    _changeOption(&ConfigData[cvec[(curpage * items_per_page) + clin]], false);
 
-                prompting = FALSE;
+                prompting = false;
             }
             break;
 
@@ -931,11 +931,11 @@ static int nOptionsInput(int ch)
             {
                 if (irv != TERM_ABORT)
                 {
-                    _changePasswd(FALSE);
+                    _changePasswd(false);
                 }
                 else
                 {
-                    prompting = FALSE;
+                    prompting = false;
                     state = S_USRMENU;
                 }
             }
@@ -969,7 +969,7 @@ static int nOptionsInput(int ch)
 
         case '4':
             state = S_GETPW;
-            _changePasswd(TRUE);
+            _changePasswd(true);
             break;
 
         default:
@@ -1079,11 +1079,11 @@ static int nOptionsInput(int ch)
 
 	case ' ':	/* change something */
             if (state == S_MACROS)
-                _changeMacro((curpage * items_per_page) + clin + 1, TRUE);
+                _changeMacro((curpage * items_per_page) + clin + 1, true);
             else if (state == S_MOUSE)
-                _changeMouse((curpage * items_per_page) + clin, TRUE);
+                _changeMouse((curpage * items_per_page) + clin, true);
             else if (state == S_UOPTS)
-                _changeOption(&ConfigData[cvec[(curpage * items_per_page) + clin]], TRUE);
+                _changeOption(&ConfigData[cvec[(curpage * items_per_page) + clin]], true);
             break;
 
 	case '?':

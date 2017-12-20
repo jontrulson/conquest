@@ -389,25 +389,25 @@ int isagod( int unum )
 {
     if (unum == -1)               /* get god status for current user */
     {
-        return TRUE;
+        return true;
     }
     else
     {				/* else a user number passed in */
         if (UISOPER(unum))
-            return TRUE;
+            return true;
         else
-            return FALSE;
+            return false;
     }
 }
 #else /* !CGYWIN */
 int isagod( int unum )
 {
     static struct group *grp = NULL;
-    static int god = FALSE;
+    static int god = false;
     static char myname[BUFFER_SIZE_256];
     int i;
 
-    god = FALSE;
+    god = false;
 
     if (unum == -1)		/* get god status for current user */
     {
@@ -417,9 +417,9 @@ int isagod( int unum )
     {				/* else a user number passed in */
 				/* just check for OOPT_OPER */
         if (UISOPER(unum))
-            return TRUE;
+            return true;
         else
-            return FALSE;
+            return false;
     }
 
     if (grp == NULL)
@@ -433,14 +433,14 @@ int isagod( int unum )
                   CONQUEST_GROUP,
                   strerror(errno));
 
-            god = FALSE;
-            return(FALSE);
+            god = false;
+            return(false);
 	}
     }
 
     /* root is always god */
     if (strcmp(myname, "root") == 0)
-        god = TRUE;
+        god = true;
 
     i = 0;
 
@@ -450,7 +450,7 @@ int isagod( int unum )
 	{
             if (strcmp(myname, grp->gr_mem[i]) == 0)
 	    {		/* a match */
-                god = TRUE;
+                god = true;
                 break;
 	    }
 
@@ -535,12 +535,12 @@ void upstats( int *ctemp, int *etemp, int *caccum, int *eaccum, int *ctime, int 
 int checkPID(int pidnum)
 {
 #if defined(MINGW)
-    return FALSE;
+    return false;
 #else
     int rv;
 
     if (pidnum == 0)
-        return(FALSE);		/* can re-incarnate to robots */
+        return(false);		/* can re-incarnate to robots */
     rv = kill(pidnum, 0);
 
     if (rv == -1)
@@ -548,14 +548,14 @@ int checkPID(int pidnum)
         switch (errno)
 	{
 	case ESRCH:
-            return(FALSE);
+            return(false);
             break;
 	default:
-            return(TRUE);
+            return(true);
             break;
 	}
     }
     else
-        return(TRUE);
+        return(true);
 #endif  /* MINGW */
 }

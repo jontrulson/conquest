@@ -9,8 +9,8 @@
 #include "anim.h"
 
 /* node proc return values */
-#define NODE_OK        TRUE
-#define NODE_EXIT      FALSE
+#define NODE_OK        true
+#define NODE_EXIT      false
 #define NODE_ERR       ERR
 
 /* menu/screen node */

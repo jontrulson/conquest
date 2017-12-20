@@ -44,7 +44,7 @@ void mcuHistList( int godlike )
     cprintf(fline,0,ALIGN_CENTER,"#%d#%s",LabelColor, hd0);
     fline = fline + 2;
 
-    while (TRUE) /* repeat */
+    while (true) /* repeat */
     {
         if ( ! godlike )
             if ( ! clbStillAlive( Context.snum ) )
@@ -204,55 +204,55 @@ int mcuReadMsg( int msgnum, int dsplin )
         cdclrl( MSG_LIN2, 1 );
     }
 
-    return(TRUE);
+    return(true);
 
 }
 
 /* convert a KP key into an angle */
 int mcuKPAngle(int ch, real *angle)
 {
-    int rv = FALSE;
+    int rv = false;
 
     switch (ch)
     {
     case KEY_HOME:
     case KEY_A1:		/* KP upper left */
         *angle = 135.0;
-        rv = TRUE;
+        rv = true;
         break;
     case KEY_PPAGE:
     case KEY_A3:		/* KP upper right */
         *angle = 45.0;
-        rv = TRUE;
+        rv = true;
         break;
     case KEY_END:
     case KEY_C1:		/* KP lower left */
         *angle = 225.0;
-        rv = TRUE;
+        rv = true;
         break;
     case KEY_NPAGE:
     case KEY_C3:		/* KP lower right */
         *angle = 315.0;
-        rv = TRUE;
+        rv = true;
         break;
     case KEY_UP:		/* up arrow */
         *angle = 90.0;
-        rv = TRUE;
+        rv = true;
         break;
     case KEY_DOWN:		/* down arrow */
         *angle = 270.0;
-        rv = TRUE;
+        rv = true;
         break;
     case KEY_LEFT:		/* left arrow */
         *angle = 180.0;
-        rv = TRUE;
+        rv = true;
         break;
     case KEY_RIGHT:		/* right arrow */
         *angle = 0.0;
-        rv = TRUE;
+        rv = true;
         break;
     default:
-        rv = FALSE;
+        rv = false;
         break;
     }
 
@@ -270,42 +270,42 @@ int mcuKP2DirKey(int *ch)
     case KEY_HOME:
     case KEY_A1:		/* KP upper left */
         cch = 'q';
-        rv = TRUE;
+        rv = true;
         break;
     case KEY_PPAGE:
     case KEY_A3:		/* KP upper right */
         cch = 'e';
-        rv = TRUE;
+        rv = true;
         break;
     case KEY_END:
     case KEY_C1:		/* KP lower left */
         cch = 'z';
-        rv = TRUE;
+        rv = true;
         break;
     case KEY_NPAGE:
     case KEY_C3:		/* KP lower right */
         cch = 'c';
-        rv = TRUE;
+        rv = true;
         break;
     case KEY_UP:		/* up arrow */
         cch = 'w';
-        rv = TRUE;
+        rv = true;
         break;
     case KEY_DOWN:		/* down arrow */
         cch = 'x';
-        rv = TRUE;
+        rv = true;
         break;
     case KEY_LEFT:		/* left arrow */
         cch = 'a';
-        rv = TRUE;
+        rv = true;
         break;
     case KEY_RIGHT:		/* right arrow */
         cch = 'd';
-        rv = TRUE;
+        rv = true;
         break;
     default:
         cch = (char)0;
-        rv = FALSE;
+        rv = false;
         break;
     }
 
@@ -399,7 +399,7 @@ void mcuInfoPlanet( const char *str, int pnum, int snum )
     utStrncpy(Context.lasttarg, cbPlanets[pnum].name, 4);
 
     if ( godlike )
-        canscan = TRUE;
+        canscan = true;
     else
         canscan = cbPlanets[pnum].scanned[cbShips[snum].team];
 
@@ -432,7 +432,7 @@ void mcuInfoPlanet( const char *str, int pnum, int snum )
 
         /* Now see if we can tell about coup time. */
         if ( godlike )
-            canscan = FALSE;	/* GOD can use teaminfo instead */
+            canscan = false;	/* GOD can use teaminfo instead */
         else
             canscan = ( pnum == cbTeams[cbShips[snum].team].homeplanet &&
                         cbTeams[cbShips[snum].team].coupinfo );
@@ -569,7 +569,7 @@ void mcuInfoShip( int snum, int scanner )
     }
     dis = dist( x, y, appx, appy );
     if ( godlike )
-        canscan = TRUE;
+        canscan = true;
     else
     {
 
@@ -788,14 +788,14 @@ void mcuPlanetList( int team, int snum )
     int column_2 = 41;
     char xbuf[BUFFER_SIZE_256];
     static char pd0[BUFFER_SIZE_1024];
-    static int FirstTime = TRUE;
+    static bool FirstTime = true;
     int PlanetOffset;		/* offset into MAXPLANETS for this page */
     int PlanetIdx = 0;
     int Done;
 
-    if (FirstTime == TRUE)
+    if (FirstTime)
     {
-        FirstTime = FALSE;
+        FirstTime = false;
 
         /* build header fmt char **/
         sprintf(pd0,
@@ -823,7 +823,7 @@ void mcuPlanetList( int team, int snum )
 
     PlanetOffset = 1;
     cdclear();
-    Done = FALSE;
+    Done = false;
     do
     {
 
@@ -842,7 +842,7 @@ void mcuPlanetList( int team, int snum )
         lin++;
         olin = lin;
         col = column_1;
-        col2 = FALSE;
+        col2 = false;
 
         PlanetIdx = 0;
 
@@ -1000,7 +1000,7 @@ void mcuPlanetList( int team, int snum )
                     else
 		    {
                         lin = olin;
-                        col2 = TRUE;
+                        col2 = true;
 		    }
 		}
 
@@ -1022,7 +1022,7 @@ void mcuPlanetList( int team, int snum )
 	    {			/* got a char */
                 if (cmd == 'q' || cmd == 'Q' || cmd == TERM_ABORT)
 		{		/* quit */
-                    Done = TRUE;
+                    Done = true;
 		}
                 else
 		{		/* some other key... */
@@ -1030,7 +1030,7 @@ void mcuPlanetList( int team, int snum )
                     PlanetOffset += PlanetIdx;
                     if (PlanetOffset >= MAXPLANETS)
 		    {		/* pointless to continue */
-                        Done = TRUE;
+                        Done = true;
 		    }
 
 		}
@@ -1039,13 +1039,13 @@ void mcuPlanetList( int team, int snum )
             /* didn't get a char, update */
             if (snum >= 0 && snum < MAXSHIPS)
                 if (!clbStillAlive(snum))
-                    Done = TRUE;
+                    Done = true;
 
 	} /* if PlanetOffset <= MAXPLANETS */
         else
-            Done = TRUE;		/* else PlanetOffset > MAXPLANETS */
+            Done = true;		/* else PlanetOffset > MAXPLANETS */
 
-    } while(Done != TRUE); /* do */
+    } while(Done != true); /* do */
 
     return;
 
@@ -1094,7 +1094,7 @@ void mcuPlayList( int godlike, int doall, int snum )
     lline = MSG_LIN1;				/* last line to use */
     fship = 0;					/* first user in uvec */
 
-    while(TRUE) /* repeat- while */
+    while(true) /* repeat- while */
     {
         if ( ! godlike )
             if ( ! clbStillAlive( Context.snum ) )
@@ -1232,14 +1232,14 @@ int mcuReviewMsgs( int snum, int slm )
     int ch, Done, i, msg, tmsg, lastone;
     int didany;
 
-    didany = FALSE;
-    Done = FALSE;
+    didany = false;
+    Done = false;
 
     lastone = utModPlusOne( cbConqInfo->lastmsg+1, MAXMESSAGES );
     if ( snum >= 0 && snum < MAXSHIPS )
     {
         if ( cbShips[snum].lastmsg == LMSG_NEEDINIT )
-            return ( FALSE );				/* none to read */
+            return ( false );				/* none to read */
         i = cbShips[snum].alastmsg;
         if ( i != LMSG_READALL )
             lastone = i;
@@ -1256,7 +1256,7 @@ int mcuReviewMsgs( int snum, int slm )
         if ( clbCanRead( snum, msg ))
 	{
             mcuReadMsg( msg, MSG_LIN1 );
-            didany = TRUE;
+            didany = true;
             mcuPutPrompt( "--- [SPACE] for more, arrows to scroll, any key to quit ---",
                           MSG_LIN2 );
             cdrefresh();
@@ -1297,7 +1297,7 @@ int mcuReviewMsgs( int snum, int slm )
 
                 break;
 	    default:
-                Done = TRUE;
+                Done = true;
                 break;
 	    }
 	}
@@ -1305,10 +1305,10 @@ int mcuReviewMsgs( int snum, int slm )
 	{
             msg = utModPlusOne( msg - 1, MAXMESSAGES );
             if (msg == lastone)
-                Done = TRUE;
+                Done = true;
 	}
 
-    } while (Done == FALSE);
+    } while (Done == false);
 
     cdclrl( MSG_LIN1, 2 );
 
@@ -1336,12 +1336,12 @@ void mcuTeamList( int team )
     static char sfmt3[MSGMAXLINE * 2];
     static char dfmt2[MSGMAXLINE * 2];
     static char pfmt2[MSGMAXLINE * 2];
-    static int FirstTime = TRUE;	/* Only necc if the colors aren't
+    static bool FirstTime = true;	/* Only necc if the colors aren't
                                            going to change at runtime */
 
-    if (FirstTime == TRUE)
+    if (FirstTime)
     {
-        FirstTime = FALSE;
+        FirstTime = false;
         sprintf(sfmt2,
                 "#%d#%%16s #%d#%%11s #%d#%%11s #%d#%%11s #%d#%%11s #%d#%%11s",
                 LabelColor,
@@ -1586,7 +1586,7 @@ void mcuUserList( int godlike, int snum )
     cdputc( hd1, lin );
 
     lin = lin + 3;        /* FIXME - hardcoded??? - dwp */
-    clbUserline( -1, -1, cbuf, FALSE, FALSE );
+    clbUserline( -1, -1, cbuf, false, false );
     cdputs( cbuf, lin, 1 );
 
     for ( j = 0; cbuf[j] != 0; j = j + 1 )
@@ -1600,7 +1600,7 @@ void mcuUserList( int godlike, int snum )
     lline = MSG_LIN1;				/* last line to use */
     fuser = 0;					/* first user in uvec */
 
-    while (TRUE) /* repeat-while */
+    while (true) /* repeat-while */
     {
 
         if ( ! godlike )
@@ -1621,7 +1621,7 @@ void mcuUserList( int godlike, int snum )
         lin = fline;
         while ( i < nu && lin <= lline )
 	{
-            clbUserline( uvec[i], -1, cbuf, godlike, FALSE );
+            clbUserline( uvec[i], -1, cbuf, godlike, false );
 
             /* determine color */
             if ( snum >= 0 && snum < MAXSHIPS ) /* we're a valid ship */
@@ -1732,7 +1732,7 @@ void mcuUserStats( int godlike , int snum )
     lline = MSG_LIN1;				/* last line to use */
     fuser = 0;					/* first user in uvec */
 
-    while (TRUE) /* repeat-while */
+    while (true) /* repeat-while */
     {
         if ( ! godlike )
             if ( ! clbStillAlive( Context.snum ) )
@@ -1835,13 +1835,13 @@ int mcuConfirm(void)
     int scol = ((Context.maxcol - strlen(cprompt)) / 2);
 
     if (mcuAskYN("Are you sure? ", MSG_LIN2, scol))
-        return(TRUE);
+        return(true);
     else
-        return (FALSE);
+        return (false);
 
 }
 
-/*  askyn - ask the user a yes/no question - return TRUE if yes */
+/*  askyn - ask the user a yes/no question - return true if yes */
 int mcuAskYN(const char *question, int lin, int col)
 {
     char ch, buf[MSGMAXLINE];
@@ -1849,16 +1849,16 @@ int mcuAskYN(const char *question, int lin, int col)
     cdclrl( MSG_LIN2, 1 );
     uiPutColor(InfoColor);
     buf[0] = 0;
-    ch = cdgetx( question, lin, col, TERMS, buf, MSGMAXLINE - 1, TRUE);
+    ch = cdgetx( question, lin, col, TERMS, buf, MSGMAXLINE - 1, true);
     uiPutColor(0);
     cdclrl( lin, 1 );
     cdrefresh();
     if ( ch == TERM_ABORT )
-        return ( FALSE );
+        return ( false );
     if ( buf[0] == 'y' || buf[0] == 'Y' )
-        return ( TRUE );
+        return ( true );
 
-    return ( FALSE );
+    return ( false );
 
 }
 
@@ -1880,7 +1880,7 @@ char mcuGetCX( const char *pmt, int lin, int offset, const char *terms,
     move(lin, 0);
     clrtoeol();
     buf[0] = 0;
-    return ( cdgetx( pmt, lin, i, terms, buf, len, TRUE ) );
+    return ( cdgetx( pmt, lin, i, terms, buf, len, true ) );
 
 }
 
@@ -1900,29 +1900,29 @@ int mcuGetTarget( const char *pmt, int lin, int col, real *dir, real cdefault )
 
     cdclrl( lin, 1 );
     buf[0] = 0;
-    ch = (char)cdgetx( pmt, lin, col, TERMS, buf, MSGMAXLINE, TRUE );
+    ch = (char)cdgetx( pmt, lin, col, TERMS, buf, MSGMAXLINE, true );
     if ( ch == TERM_ABORT )
-        return ( FALSE );
+        return ( false );
 
     utDeleteBlanks( buf );
     if ( buf[0] == 0 )
     {
         /* Default. */
         *dir = cdefault;
-        return ( TRUE );
+        return ( true );
     }
     if (utIsDigits(buf))
     {
         i = 0;
         if ( ! utSafeCToI( &j, buf, i ) )
-            return ( FALSE );
+            return ( false );
         *dir = utMod360( (real) j );
-        return ( TRUE );
+        return ( true );
     }
     if ( utArrowsToDir( buf, dir ) )
-        return ( TRUE );
+        return ( true );
 
-    return ( FALSE );
+    return ( false );
 
 }
 
@@ -2091,10 +2091,10 @@ void mcuNews(void)
 
 int uiUpdatePlanet(int pnum)
 {
-    return TRUE;                  /* NOOP */
+    return true;                  /* NOOP */
 }
 /* update the direction of the torp (GL only) */
 int uiUpdateTorpDir(int snum, int tnum)
 {
-    return TRUE;
+    return true;
 }

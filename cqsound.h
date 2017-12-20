@@ -84,7 +84,7 @@ typedef struct _doom_mus {
 
 #ifdef NOEXTERN_CQSOUND
 uint32_t              cqsSoundEnables  = 0;
-int                  cqsSoundAvailable    = FALSE;
+int                  cqsSoundAvailable    = false;
 cqsSoundPtr_t        cqsMusic   = NULL;
 cqsSoundPtr_t        cqsEffects = NULL;
 int                  cqsNumMusic = 0;

@@ -109,7 +109,7 @@ static int twar[NUMPLAYERTEAMS];
 
 /* the current prompt */
 static prm_t prm;
-static int prompting = FALSE;
+static int prompting = false;
 
 /* save lastblast and always use a local copy for both torp and phasering */
 static real lastblast;
@@ -127,7 +127,7 @@ extern hudData_t hudData;
 
 /* Ping status */
 static uint32_t pingStart = 0;
-static int pingPending = FALSE;
+static int pingPending = false;
 
 /* bombing effect */
 static int bombingfx;
@@ -184,38 +184,38 @@ static int _KPAngle(int ch, real *angle)
     {
     case CQ_KEY_HOME:                /* KP upper left */
         *angle = 135.0;
-        rv = TRUE;
+        rv = true;
         break;
     case CQ_KEY_PAGE_UP:                /* KP upper right */
         *angle = 45.0;
-        rv = TRUE;
+        rv = true;
         break;
     case CQ_KEY_END:                /* KP lower left */
         *angle = 225.0;
-        rv = TRUE;
+        rv = true;
         break;
     case CQ_KEY_PAGE_DOWN:                /* KP lower right */
         *angle = 315.0;
-        rv = TRUE;
+        rv = true;
         break;
     case CQ_KEY_UP:                /* up arrow */
         *angle = 90.0;
-        rv = TRUE;
+        rv = true;
         break;
     case CQ_KEY_DOWN:              /* down arrow */
         *angle = 270.0;
-        rv = TRUE;
+        rv = true;
         break;
     case CQ_KEY_LEFT:              /* left arrow */
         *angle = 180.0;
-        rv = TRUE;
+        rv = true;
         break;
     case CQ_KEY_RIGHT:             /* right arrow */
         *angle = 0.0;
-        rv = TRUE;
+        rv = true;
         break;
     default:
-        rv = FALSE;
+        rv = false;
         break;
     }
 
@@ -297,7 +297,7 @@ static void _infoship( int snum, int scanner )
     }
     dis = dist( x, y, appx, appy );
     if ( godlike )
-        canscan = TRUE;
+        canscan = true;
     else
     {
 
@@ -575,7 +575,7 @@ static void _infoplanet( const char *str, int pnum, int snum )
     hudSetInfoTarget(pnum, false);
 
     if ( godlike )
-        canscan = TRUE;
+        canscan = true;
     else
         canscan = cbPlanets[pnum].scanned[cbShips[snum].team];
 
@@ -608,7 +608,7 @@ static void _infoplanet( const char *str, int pnum, int snum )
 
         /* Now see if we can tell about coup time. */
         if ( godlike )
-            canscan = FALSE;	/* GOD can use teaminfo instead */
+            canscan = false;	/* GOD can use teaminfo instead */
         else
             canscan = ( pnum == cbTeams[cbShips[snum].team].homeplanet &&
                         cbTeams[cbShips[snum].team].coupinfo );
@@ -693,27 +693,27 @@ static int _gettarget(char *buf, real cdefault, real *dir, char ch)
     int i, j;
 
     if ( ch == TERM_ABORT )
-        return ( FALSE );
+        return ( false );
 
     utDeleteBlanks( buf );
     if ( buf[0] == 0 )
     {
         /* Default. */
         *dir = cdefault;
-        return ( TRUE );
+        return ( true );
     }
     if (utIsDigits(buf))
     {
         i = 0;
         if ( ! utSafeCToI( &j, buf, i ) )
-            return ( FALSE );
+            return ( false );
         *dir = utMod360( (real) j );
-        return ( TRUE );
+        return ( true );
     }
     if ( utArrowsToDir( buf, dir ) )
-        return ( TRUE );
+        return ( true );
 
-    return ( FALSE );
+    return ( false );
 
 }
 
@@ -725,7 +725,7 @@ static void _dophase( real dir )
 
     /*  Cataboligne - sound code 10.16.6 */
     if ( cbShips[Context.snum].pfuse == 0 &&
-         clbUseFuel( Context.snum, PHASER_FUEL, TRUE, FALSE ) )
+         clbUseFuel( Context.snum, PHASER_FUEL, true, false ) )
         cqsEffectPlay(cqsTeamEffects[cbShips[Context.snum].team].phaser, NULL,
                       0, 0, 0);
 
@@ -822,7 +822,7 @@ static void _doinfo( char *buf, char ch )
         utSafeCToI( &j, buf, 0 );		/* ignore status */
         _infoship( j, snum );
     }
-    else if ( clbPlanetMatch( buf, &j, FALSE ) )
+    else if ( clbPlanetMatch( buf, &j, false ) )
         _infoplanet( "", j, snum );
     else
     {
@@ -968,7 +968,7 @@ static void _dodet( void )
 
     if ( cbShips[snum].wfuse > 0 )
         cp_putmsg( "Weapons are currently overloaded.", MSG_LIN1 );
-    else if ( clbUseFuel( snum, DETONATE_FUEL, TRUE, FALSE ) )
+    else if ( clbUseFuel( snum, DETONATE_FUEL, true, false ) )
     {				/* we don't really use fuel here on the
 				   client*/
         cp_putmsg( "detonating...", MSG_LIN1 );
@@ -1008,7 +1008,7 @@ static int _chkrefit(void)
     if ( oneplace( cbShips[snum].kills ) < MIN_REFIT_KILLS )
     {
         cp_putmsg( nek, MSG_LIN1 );
-        return FALSE;
+        return false;
     }
 
     if (cbShips[snum].lock == LOCK_PLANET
@@ -1019,17 +1019,17 @@ static int _chkrefit(void)
         if (cbPlanets[pnum].team != cbShips[snum].team || cbShips[snum].warp >= 0.0)
         {
             cp_putmsg( ntp, MSG_LIN1 );
-            return FALSE;
+            return false;
         }
     }
 
     if (cbShips[snum].armies != 0)
     {
         cp_putmsg( cararm, MSG_LIN1 );
-        return FALSE;
+        return false;
     }
 
-    return TRUE;
+    return true;
 }
 
 static int _chkcoup(void)
@@ -1048,19 +1048,19 @@ static int _chkcoup(void)
         cp_putmsg(
             "Fleet orders require three kills before a coup can be attempted.",
             MSG_LIN1 );
-        return FALSE;
+        return false;
     }
     for ( i = 0; i < MAXPLANETS; i++ )
         if ( cbPlanets[i].team == cbShips[snum].team && cbPlanets[i].armies > 0 )
         {
             cp_putmsg( "We don't need to coup, we still have armies left!",
                        MSG_LIN1 );
-            return FALSE;
+            return false;
         }
     if ( cbShips[snum].warp >= 0.0 )
     {
         cp_putmsg( nhp, MSG_LIN1 );
-        return FALSE;
+        return false;
     }
     // the assumption is that if warp < 0, we are in orbit and
     // therefore we are locked onto the planet we are orbiting
@@ -1068,13 +1068,13 @@ static int _chkcoup(void)
     if ( pnum != cbTeams[cbShips[snum].team].homeplanet )
     {
         cp_putmsg( nhp, MSG_LIN1 );
-        return FALSE;
+        return false;
     }
     if ( cbPlanets[pnum].armies > MAX_COUP_ENEMY_ARMIES )
     {
         cp_putmsg( "The enemy is still too strong to attempt a coup.",
                    MSG_LIN1 );
-        return FALSE;
+        return false;
     }
     i = cbPlanets[pnum].uninhabtime;
     if ( i > 0 )
@@ -1082,10 +1082,10 @@ static int _chkcoup(void)
         sprintf( cbuf, "This planet is uninhabitable for %d more minutes.",
                  i );
         cp_putmsg( cbuf, MSG_LIN1 );
-        return FALSE;
+        return false;
     }
 
-    return TRUE;
+    return true;
 }
 
 static int _chktow(void)
@@ -1101,7 +1101,7 @@ static int _chktow(void)
         utAppendShip(cbuf, cbShips[snum].towedby) ;
         utAppendChar(cbuf, '!');
         cp_putmsg(cbuf, MSG_LIN2 );
-        return FALSE;
+        return false;
     }
     if ( STOWING(snum) )
     {
@@ -1109,10 +1109,10 @@ static int _chktow(void)
         utAppendShip(cbuf , cbShips[snum].towing) ;
         utAppendChar(cbuf , '.');
         cp_putmsg( cbuf, MSG_LIN2 );
-        return FALSE;
+        return false;
     }
 
-    return TRUE;
+    return true;
 }
 
 static void _dotow(char *buf, int ch)
@@ -1147,7 +1147,7 @@ static void _domsgto(char *buf, int ch, int terse)
     {
         hudClearPrompt(MSG_LIN1);
         state = S_NONE;
-        prompting = FALSE;
+        prompting = false;
 
         return;
     }
@@ -1196,7 +1196,7 @@ static void _domsgto(char *buf, int ch, int terse)
             cp_putmsg( "No such ship.", MSG_LIN2 );
             hudClearPrompt(MSG_LIN1);
             state = S_NONE;
-            prompting = FALSE;
+            prompting = false;
             return;
 	}
         if ( cbShips[j].status != SS_LIVE )
@@ -1204,7 +1204,7 @@ static void _domsgto(char *buf, int ch, int terse)
             cp_putmsg( nf, MSG_LIN2 );
             hudClearPrompt(MSG_LIN1);
             state = S_NONE;
-            prompting = FALSE;
+            prompting = false;
             return;
 	}
         to = MSG_TO_SHIP;
@@ -1249,7 +1249,7 @@ static void _domsgto(char *buf, int ch, int terse)
                      cp_putmsg( huh, MSG_LIN2 );
                      hudClearPrompt(MSG_LIN1);
                      state = S_NONE;
-                     prompting = FALSE;
+                     prompting = false;
                      return;
                  }
                  to = MSG_TO_TEAM;
@@ -1268,7 +1268,7 @@ static void _domsgto(char *buf, int ch, int terse)
             cp_putmsg( nf, MSG_LIN2 );
             hudClearPrompt(MSG_LIN1);
             state = S_NONE;
-            prompting = FALSE;
+            prompting = false;
             return;
 	}
         utAppendShip(tbuf, (int)toDetail) ;
@@ -1312,7 +1312,7 @@ static void _domsgto(char *buf, int ch, int terse)
     msgtoDetail = toDetail;
 
     state = S_MSG;
-    prm.preinit = FALSE;
+    prm.preinit = false;
     prm.buf = cbuf;
     prm.buflen = MESSAGE_SIZE;
     strcpy(pbuf, "> ");
@@ -1321,7 +1321,7 @@ static void _domsgto(char *buf, int ch, int terse)
     prm.index = MSG_LIN2;
     prm.buf[0] = 0;
     hudSetPrompt(prm.index, prm.pbuf, NoColor, prm.buf, NoColor);
-    prompting = TRUE;
+    prompting = true;
 
     return;
 }
@@ -1381,7 +1381,7 @@ static void _domsg(char *msg, int ch, int irv)
             sendMessage(msgto, msgtoDetail, msg); /* just send it */
 
         state = S_NONE;
-        prompting = FALSE;
+        prompting = false;
         hudClearPrompt(MSG_LIN1);
         hudClearPrompt(MSG_LIN2);
     }
@@ -1500,7 +1500,7 @@ static void _docourse( char *buf, char ch)
         if ( clbFindSpecial( snum, token, count, &sorpnum, &xsorpnum ) )
             what = i;
     }
-    else if ( clbPlanetMatch( buf, &sorpnum, FALSE ) )
+    else if ( clbPlanetMatch( buf, &sorpnum, false ) )
         what = NEAR_PLANET;
 
     switch ( what )
@@ -1583,10 +1583,10 @@ static int _chkcloak(void)
     {
         sendCommand(CPCMD_CLOAK, 0);
         cp_putmsg( "Cloaking device disengaged.", MSG_LIN1 );
-        return FALSE;
+        return false;
     }
 
-    return TRUE;
+    return true;
 }
 
 static void _docloak( char *buf, char ch)
@@ -1616,11 +1616,11 @@ static int _review(void)
         if (msg == lastone)
         {
             state = S_NONE;
-            return FALSE;
+            return false;
         }
     }
 
-    return TRUE;
+    return true;
 
 }
 
@@ -1707,7 +1707,7 @@ static void _dobomb(void)
              cbPlanets[pnum].name, cbPlanets[pnum].armies );
 
     state = S_BOMB;
-    prm.preinit = FALSE;
+    prm.preinit = false;
     prm.buf = cbuf;
     prm.buf[0] = 0;
     prm.buflen = MSGMAXLINE;
@@ -1715,7 +1715,7 @@ static void _dobomb(void)
     prm.terms = TERMS;
     prm.index = MSG_LIN1;
     hudSetPrompt(prm.index, prm.pbuf, NoColor, prm.buf, NoColor);
-    prompting = TRUE;
+    prompting = true;
 
     lastServerError = 0;          /* so the server can tell us to stop */
 
@@ -1852,13 +1852,13 @@ static void _initbeam()
     }
 
     if ( upmax <= 0 )
-        dirup = FALSE;
+        dirup = false;
     else if ( downmax <= 0 )
-        dirup = TRUE;
+        dirup = true;
     else
     {                           /* need to ask beam dir... */
         state = S_BEAMDIR;
-        prm.preinit = FALSE;
+        prm.preinit = false;
         prm.buf = cbuf;
         prm.buflen = 10;
         prm.pbuf = "Beam [up or down] ";
@@ -1866,7 +1866,7 @@ static void _initbeam()
         prm.index = MSG_LIN1;
         prm.buf[0] = 0;
         hudSetPrompt(prm.index, prm.pbuf, NoColor, prm.buf, NoColor);
-        prompting = TRUE;
+        prompting = true;
 
         return;
     }
@@ -1882,7 +1882,7 @@ static void _initbeam()
     sprintf( pbuf, "Beam %s [1-%d] ", (dirup) ? "up" : "down", beamax );
 
     state = S_BEAMNUM;
-    prm.preinit = FALSE;
+    prm.preinit = false;
     prm.buf = cbuf;
     prm.buflen = 10;
     prm.pbuf = pbuf;
@@ -1890,7 +1890,7 @@ static void _initbeam()
     prm.index = MSG_LIN1;
     prm.buf[0] = 0;
     hudSetPrompt(prm.index, prm.pbuf, NoColor, prm.buf, NoColor);
-    prompting = TRUE;
+    prompting = true;
 
     return;
 }
@@ -1902,7 +1902,7 @@ static void _dobeam(char *buf, int ch)
     if ( ch == TERM_ABORT )
     {
         state = S_NONE;
-        prompting = FALSE;
+        prompting = false;
         cp_putmsg( abt, MSG_LIN1 );
         return;
     }
@@ -1914,7 +1914,7 @@ static void _dobeam(char *buf, int ch)
         if (!utIsDigits(buf))
 	{
             state = S_NONE;
-            prompting = FALSE;
+            prompting = false;
             cp_putmsg( abt, MSG_LIN1 );
             return;
 	}
@@ -1924,7 +1924,7 @@ static void _dobeam(char *buf, int ch)
 	{
             cp_putmsg( abt, MSG_LIN1 );
             state = S_NONE;
-            prompting = FALSE;
+            prompting = false;
             return;
 	}
     }
@@ -1950,7 +1950,7 @@ static void _dobeam(char *buf, int ch)
                 (uint16_t)((num & 0x00ff) | 0x8000));
 
     state = S_BEAMING;
-    prompting = FALSE;
+    prompting = false;
 
     return;
 
@@ -2002,7 +2002,7 @@ static void command( int ch )
         if ( UAUTOPILOT(cbShips[Context.snum].unum) )
 	{
             state = S_DOAUTOPILOT;
-            prm.preinit = FALSE;
+            prm.preinit = false;
             prm.buf = cbuf;
             prm.buflen = MSGMAXLINE;
             prm.pbuf = "Press [TAB] to engage autopilot: ";
@@ -2010,7 +2010,7 @@ static void command( int ch )
             prm.index = MSG_LIN1;
             prm.buf[0] = 0;
             hudSetPrompt(prm.index, prm.pbuf, NoColor, prm.buf, NoColor);
-            prompting = TRUE;
+            prompting = true;
 	}
         else
 	{
@@ -2020,7 +2020,7 @@ static void command( int ch )
         break;
     case 'A':				/* change allocation */
         state = S_ALLOC;
-        prm.preinit = FALSE;
+        prm.preinit = false;
         prm.buf = cbuf;
         prm.buflen = MSGMAXLINE;
         prm.pbuf = "New weapons allocation: (30-70) ";
@@ -2028,7 +2028,7 @@ static void command( int ch )
         prm.index = MSG_LIN1;
         prm.buf[0] = 0;
         hudSetPrompt(prm.index, prm.pbuf, NoColor, prm.buf, NoColor);
-        prompting = TRUE;
+        prompting = true;
         break;
     case 'b':				/* beam armies */
         _initbeam();
@@ -2040,7 +2040,7 @@ static void command( int ch )
         if (_chkcloak())
         {
             state = S_CLOAK;
-            prm.preinit = FALSE;
+            prm.preinit = false;
             prm.buf = cbuf;
             prm.buflen = MSGMAXLINE;
             prm.pbuf = "Press [TAB] to engage cloaking device: ";
@@ -2048,7 +2048,7 @@ static void command( int ch )
             prm.index = MSG_LIN1;
             prm.buf[0] = 0;
             hudSetPrompt(prm.index, prm.pbuf, NoColor, prm.buf, NoColor);
-            prompting = TRUE;
+            prompting = true;
         }
         break;
     case 'd':				/* detonate enemy torps */
@@ -2060,7 +2060,7 @@ static void command( int ch )
         break;
     case 'E':				/* emergency distress call */
         state = S_DISTRESS;
-        prm.preinit = FALSE;
+        prm.preinit = false;
         prm.buf = cbuf;
         prm.buflen = MSGMAXLINE;
         prm.pbuf = "Press [TAB] to send an emergency distress call: ";
@@ -2069,13 +2069,13 @@ static void command( int ch )
         prm.buf[0] = 0;
         hudSetPrompt(prm.index, prm.pbuf, NoColor, prm.buf, NoColor);
 
-        prompting = TRUE;
+        prompting = true;
         break;
     case 'f':				/* phasers */
     {
         state = S_TARGET;
         desttarg = T_PHASER;
-        prm.preinit = FALSE;
+        prm.preinit = false;
         prm.buf = cbuf;
         prm.buflen = MSGMAXLINE;
         prm.pbuf = "Fire phasers: ";
@@ -2083,21 +2083,21 @@ static void command( int ch )
         prm.index = MSG_LIN1;
         prm.buf[0] = 0;
         hudSetPrompt(prm.index, prm.pbuf, NoColor, prm.buf, NoColor);
-        prompting = TRUE;
+        prompting = true;
     }
     break;
     case 'F':				/* phasers, same direction */
         _dophase(lastphase);
         break;
     case 'h':
-        setONode(nCPHelpInit(FALSE));
+        setONode(nCPHelpInit(false));
         break;
     case 'H':
-        setONode(nHistlInit(DSP_NODE_CP, FALSE));
+        setONode(nHistlInit(DSP_NODE_CP, false));
         break;
     case 'i':				/* information */
         state = S_DOINFO;
-        prm.preinit = FALSE;
+        prm.preinit = false;
         prm.buf = cbuf;
         prm.buflen = MSGMAXLINE;
         prm.pbuf = "Information on: ";
@@ -2106,11 +2106,11 @@ static void command( int ch )
         prm.buf[0] = 0;
         hudSetPrompt(prm.index, prm.pbuf, NoColor, prm.buf, NoColor);
 
-        prompting = TRUE;
+        prompting = true;
         break;
     case 'k':				/* set course */
         state = S_COURSE;
-        prm.preinit = FALSE;
+        prm.preinit = false;
         prm.buf = cbuf;
         prm.buflen = MSGMAXLINE;
         prm.pbuf = "Come to course: ";
@@ -2118,13 +2118,13 @@ static void command( int ch )
         prm.index = MSG_LIN1;
         prm.buf[0] = 0;
         hudSetPrompt(prm.index, prm.pbuf, NoColor, prm.buf, NoColor);
-        prompting = TRUE;
+        prompting = true;
         break;
     case 'K':				/* coup */
         if (_chkcoup())
         {
             state = S_COUP;
-            prm.preinit = FALSE;
+            prm.preinit = false;
             prm.buf = cbuf;
             prm.buflen = MSGMAXLINE;
             prm.pbuf = "Press [TAB] to try it: ";
@@ -2132,7 +2132,7 @@ static void command( int ch )
             prm.index = MSG_LIN1;
             prm.buf[0] = 0;
             hudSetPrompt(prm.index, prm.pbuf, NoColor, prm.buf, NoColor);
-            prompting = TRUE;
+            prompting = true;
         }
         break;
     case 'L':                   /* review old messages */
@@ -2140,7 +2140,7 @@ static void command( int ch )
         break;
     case 'm':				/* send a message */
         state = S_MSGTO;
-        prm.preinit = FALSE;
+        prm.preinit = false;
         prm.buf = cbuf;
         prm.buflen = MSGMAXLINE;
         strcpy(pbuf, "Message to: ");
@@ -2149,7 +2149,7 @@ static void command( int ch )
         prm.index = MSG_LIN1;
         prm.buf[0] = 0;
         hudSetPrompt(prm.index, prm.pbuf, NoColor, prm.buf, NoColor);
-        prompting = TRUE;
+        prompting = true;
         break;
     case 'M':				/* strategic/tactical map */
         if (SMAP(Context.snum))
@@ -2162,7 +2162,7 @@ static void command( int ch )
         strcat(pbuf , cbShips[Context.snum].alias);
         cp_putmsg(pbuf, MSG_LIN1);
         state = S_PSEUDO;
-        prm.preinit = FALSE;
+        prm.preinit = false;
         prm.buf = cbuf;
         prm.buflen = MAXUSERNAME;
         prm.pbuf = "Enter a new pseudonym: ";
@@ -2170,12 +2170,12 @@ static void command( int ch )
         prm.index = MSG_LIN2;
         prm.buf[0] = 0;
         hudSetPrompt(prm.index, prm.pbuf, NoColor, prm.buf, NoColor);
-        prompting = TRUE;
+        prompting = true;
 
         break;
 
     case 'O':
-        setONode(nOptionsInit(NOPT_USER, FALSE, DSP_NODE_CP));
+        setONode(nOptionsInit(NOPT_USER, false, DSP_NODE_CP));
         break;
 
     case 'o':				/* orbit nearby planet */
@@ -2185,7 +2185,7 @@ static void command( int ch )
     {
         state = S_TARGET;
         desttarg = T_BURST;
-        prm.preinit = FALSE;
+        prm.preinit = false;
         prm.buf = cbuf;
         prm.buflen = MSGMAXLINE;
         prm.pbuf = "Torpedo burst: ";
@@ -2193,14 +2193,14 @@ static void command( int ch )
         prm.index = MSG_LIN1;
         prm.buf[0] = 0;
         hudSetPrompt(prm.index, prm.pbuf, NoColor, prm.buf, NoColor);
-        prompting = TRUE;
+        prompting = true;
     }
     break;
     case 'p':				/* photon torpedoes */
     {
         state = S_TARGET;
         desttarg = T_TORP;
-        prm.preinit = FALSE;
+        prm.preinit = false;
         prm.buf = cbuf;
         prm.buflen = MSGMAXLINE;
         prm.pbuf = "Launch torpedo: ";
@@ -2208,7 +2208,7 @@ static void command( int ch )
         prm.index = MSG_LIN1;
         prm.buf[0] = 0;
         hudSetPrompt(prm.index, prm.pbuf, NoColor, prm.buf, NoColor);
-        prompting = TRUE;
+        prompting = true;
     }
     break;
     case 'Q':				/* self destruct */
@@ -2220,7 +2220,7 @@ static void command( int ch )
         else
         {
             state = S_DESTRUCT;
-            prm.preinit = FALSE;
+            prm.preinit = false;
             prm.buf = cbuf;
             prm.buflen = MSGMAXLINE;
             prm.pbuf = "Press [TAB] to initiate self-destruct sequence: ";
@@ -2228,7 +2228,7 @@ static void command( int ch )
             prm.index = MSG_LIN1;
             prm.buf[0] = 0;
             hudSetPrompt(prm.index, prm.pbuf, NoColor, prm.buf, NoColor);
-            prompting = TRUE;
+            prompting = true;
         }
         break;
     case 'r':				/* refit */
@@ -2237,7 +2237,7 @@ static void command( int ch )
             if (_chkrefit())
             {
                 state = S_REFIT;
-                prm.preinit = FALSE;
+                prm.preinit = false;
                 prm.buf = cbuf;
                 prm.buflen = MSGMAXLINE;
                 refitst = cbShips[Context.snum].shiptype;
@@ -2248,7 +2248,7 @@ static void command( int ch )
                 prm.buf[0] = 0;
                 hudSetPrompt(prm.index, prm.pbuf, NoColor, prm.buf, NoColor);
                 cp_putmsg("Press [TAB] to change, [ENTER] to accept: ", MSG_LIN2);
-                prompting = TRUE;
+                prompting = true;
             }
         }
         else
@@ -2262,7 +2262,7 @@ static void command( int ch )
         if (_chktow())
         {
             state = S_TOW;
-            prm.preinit = FALSE;
+            prm.preinit = false;
             prm.buf = cbuf;
             prm.buflen = MSGMAXLINE;
             prm.pbuf = "Tow which ship? ";
@@ -2270,27 +2270,27 @@ static void command( int ch )
             prm.index = MSG_LIN1;
             prm.buf[0] = 0;
             hudSetPrompt(prm.index, prm.pbuf, NoColor, prm.buf, NoColor);
-            prompting = TRUE;
+            prompting = true;
         }
         break;
     case 'S':				/* more user stats */
-        setONode(nUserlInit(DSP_NODE_CP, FALSE, Context.snum, FALSE, TRUE));
+        setONode(nUserlInit(DSP_NODE_CP, false, Context.snum, false, true));
         break;
     case 'T':				/* team list */
-        setONode(nTeamlInit(DSP_NODE_CP, FALSE, cbShips[Context.snum].team));
+        setONode(nTeamlInit(DSP_NODE_CP, false, cbShips[Context.snum].team));
         break;
     case 'u':				/* un-tractor */
         sendCommand(CPCMD_UNTOW, 0);
         break;
     case 'U':				/* user stats */
-        setONode(nUserlInit(DSP_NODE_CP, FALSE, Context.snum, FALSE, FALSE));
+        setONode(nUserlInit(DSP_NODE_CP, false, Context.snum, false, false));
         break;
     case 'W':				/* war and peace */
         for ( i = 0; i < NUMPLAYERTEAMS; i = i + 1 )
             twar[i] = cbShips[Context.snum].war[i];
 
         state = S_WAR;
-        prm.preinit = FALSE;
+        prm.preinit = false;
         prm.buf = cbuf;
         prm.buflen = 5;
         prm.pbuf = clbWarPrompt(Context.snum, twar);
@@ -2298,17 +2298,17 @@ static void command( int ch )
         prm.index = MSG_LIN1;
         prm.buf[0] = 0;
         hudSetPrompt(prm.index, prm.pbuf, NoColor, prm.buf, NoColor);
-        prompting = TRUE;
+        prompting = true;
 
         break;
     case '-':				/* shields down */
-        _doshields( Context.snum, FALSE );
+        _doshields( Context.snum, false );
         break;
     case '+':				/* shields up */
-        _doshields( Context.snum, TRUE );
+        _doshields( Context.snum, true );
         break;
     case '/':				/* player list */
-        setONode(nShiplInit(DSP_NODE_CP, FALSE));  /* shipl node */
+        setONode(nShiplInit(DSP_NODE_CP, false));  /* shipl node */
         break;
 
     case '[':                   /* zoom out */
@@ -2324,7 +2324,7 @@ static void command( int ch )
             else
                 mglBeep(MGL_BEEP_ERR);
 
-            setViewerScaling(ncpLRMagFactor, TRUE);
+            setViewerScaling(ncpLRMagFactor, true);
         }
         else
         {
@@ -2337,7 +2337,7 @@ static void command( int ch )
             else
                 mglBeep(MGL_BEEP_ERR);
 
-            setViewerScaling(ncpSRMagFactor, FALSE);
+            setViewerScaling(ncpSRMagFactor, false);
         }
     }
     break;
@@ -2355,7 +2355,7 @@ static void command( int ch )
             else
                 mglBeep(MGL_BEEP_ERR);
 
-            setViewerScaling(ncpLRMagFactor, TRUE);
+            setViewerScaling(ncpLRMagFactor, true);
         }
         else
         {
@@ -2368,16 +2368,16 @@ static void command( int ch )
             else
                 mglBeep(MGL_BEEP_ERR);
 
-            setViewerScaling(ncpSRMagFactor, FALSE);
+            setViewerScaling(ncpSRMagFactor, false);
         }
     }
     break;
 
     case '?':				/* planet list */
         if (Context.snum >= 0 && Context.snum < MAXSHIPS)
-            setONode(nPlanetlInit(DSP_NODE_CP, FALSE, Context.snum, cbShips[Context.snum].team));
+            setONode(nPlanetlInit(DSP_NODE_CP, false, Context.snum, cbShips[Context.snum].team));
         else          /* then use user team if user doen't have a ship yet */
-            setONode(nPlanetlInit(DSP_NODE_CP, FALSE, Context.snum, cbUsers[Context.unum].team));
+            setONode(nPlanetlInit(DSP_NODE_CP, false, Context.snum, cbUsers[Context.unum].team));
         break;
     case TERM_REDRAW:			/* clear all the prompts */
         hudClearPrompt(MSG_LIN1);
@@ -2386,8 +2386,8 @@ static void command( int ch )
 
         /* reset the scaling factors */
         ncpLRMagFactor = ncpSRMagFactor = 0;
-        setViewerScaling(ncpLRMagFactor, TRUE);
-        setViewerScaling(ncpSRMagFactor, FALSE);
+        setViewerScaling(ncpLRMagFactor, true);
+        setViewerScaling(ncpSRMagFactor, false);
 
         break;
 
@@ -2402,7 +2402,7 @@ static void command( int ch )
     case TERM_ABORT:
         if (alertHandle != CQS_INVHANDLE)
         {
-            cqsEffectStop(alertHandle, FALSE);
+            cqsEffectStop(alertHandle, false);
             alertHandle = CQS_INVHANDLE;
         }
         break;
@@ -2482,7 +2482,7 @@ static void themes()
 
     /* go through each ship. */
 
-    warlike = FALSE;
+    warlike = false;
     for ( i = 0; i < MAXSHIPS; i++ )
     {
         int atwar = satwar(snum, i);
@@ -2529,7 +2529,7 @@ static void themes()
 
         if (atwar)
         {
-            warlike = TRUE;
+            warlike = true;
             mus = cqsTeamMusic[cbShips[i].team].battle;
         }
         else if (!warlike /*&& cbShips[Context.snum].team == cbShips[i].team*/)
@@ -2548,7 +2548,7 @@ static void themes()
             return;
 
         /* play it */
-        cqsMusicPlay(mus, FALSE);
+        cqsMusicPlay(mus, false);
         return;
     }
 
@@ -2567,7 +2567,7 @@ static void themes()
         mus = cqsTeamMusic[rndint(0, NUMPLAYERTEAMS - 1)].intro;
 
     /* now play it */
-    cqsMusicPlay(mus, FALSE);
+    cqsMusicPlay(mus, false);
 
     /* done */
     return;
@@ -2597,7 +2597,7 @@ static void doomsday_theme (void)
     /* first sight of doomsday - wait for other themes */
     if (first_doom < 2 && dis < DOOM_INTRODIS && !cqsMusicPlaying())
     {
-        cqsMusicPlay(cqsDoomsdayMusic.doomin, FALSE);
+        cqsMusicPlay(cqsDoomsdayMusic.doomin, false);
         first_doom = 2;                                                                     /* intro music only plays once */
     }
     else if (cbShips[Context.snum].sdfuse > 0 &&
@@ -2612,12 +2612,12 @@ static void doomsday_theme (void)
 
           fix - we really want to fade any other music instantly - no delays
         */
-        cqsMusicPlay(cqsDoomsdayMusic.doomkill, FALSE);
+        cqsMusicPlay(cqsDoomsdayMusic.doomkill, false);
         first_doom = 3;   /* dont restart playing this */
     }
     else if (dis < DOOM_MUSDIS && !cqsMusicPlaying())
     {
-        cqsMusicPlay(cqsDoomsdayMusic.doom, FALSE);
+        cqsMusicPlay(cqsDoomsdayMusic.doom, false);
         first_doom = 4;   /* enable kill music if it played once already */
     }
 }
@@ -2628,7 +2628,7 @@ void nCPInit(int istopnode)
     static int introsPlayed[NUMPLAYERTEAMS];
     char buf[CQI_NAMELEN];
 
-    prompting = FALSE;
+    prompting = false;
     state = S_NONE;
     clientFlags = 0;
 
@@ -2636,7 +2636,7 @@ void nCPInit(int istopnode)
     rftime = frameTime;
     lastblast = cbShips[Context.snum].lastblast;
     lastphase = cbShips[Context.snum].lastphase;
-    pingPending = FALSE;
+    pingPending = false;
     pingStart = 0;
 
     /* init the hud when starting a fresh ship. */
@@ -2683,7 +2683,7 @@ void nCPInit(int istopnode)
         /* init the intro music array.  We want to ensure that we play
            a team-specific intro only once */
         for (i=0; i<NUMPLAYERTEAMS; i++)
-            introsPlayed[i] = FALSE;
+            introsPlayed[i] = false;
 
         bombingfx = cqsFindEffect("bombing");
     }
@@ -2692,10 +2692,10 @@ void nCPInit(int istopnode)
        do we want to do this */
     if (istopnode && !introsPlayed[cbShips[Context.snum].team])
     {
-        introsPlayed[cbShips[Context.snum].team] = TRUE;
+        introsPlayed[cbShips[Context.snum].team] = true;
         snprintf(buf, CQI_NAMELEN, "ship%c-intro",
                  cbTeams[cbShips[Context.snum].team].name[0]);
-        cqsMusicPlay(cqsFindMusic(buf), FALSE);
+        cqsMusicPlay(cqsFindMusic(buf), false);
     }
     else if (istopnode)
     {                           /* play the theme music if
@@ -2703,7 +2703,7 @@ void nCPInit(int istopnode)
                                    for this team. */
         snprintf(buf, CQI_NAMELEN, "ship%c-theme",
                  cbTeams[cbShips[Context.snum].team].name[0]);
-        cqsMusicPlay(cqsFindMusic(buf), FALSE);
+        cqsMusicPlay(cqsFindMusic(buf), false);
     }
     /* else, don't start playing anything */
 
@@ -2781,7 +2781,7 @@ static int nCPIdle(void)
             /* see if it's a ping resp */
             if (sAckMsg.code == PERR_PINGRESP)
             {
-                pingPending = FALSE;
+                pingPending = false;
                 pktStats.pingAvg = (pktStats.pingAvg + (iternow - pingStart)) / 2;
                 pingStart = 0;
                 continue;
@@ -2822,7 +2822,7 @@ static int nCPIdle(void)
 
             pingtime = iternow;
             pingStart = iternow;
-            pingPending = TRUE;
+            pingPending = true;
             // this is not caught by the filter in _pktReadGetRB(), so
             // don't send it when we are doing something important.
             // Fix in next protocol.
@@ -2846,26 +2846,26 @@ static int nCPIdle(void)
     {                           /* we died.  set the state and deal with
                                    it on the next frame */
         state = S_DEAD;
-        prompting = FALSE;        /* doesn't really matter */
+        prompting = false;        /* doesn't really matter */
         return NODE_OK;
     }
 
     if (state == S_BOMBING && lastServerError)
     {                           /* the server stopped bombing for us */
-        cqsEffectStop(bombingHandle, FALSE);
+        cqsEffectStop(bombingHandle, false);
         sendCommand(CPCMD_BOMB, 0); /* to be sure */
         state = S_NONE;
-        prompting = FALSE;
+        prompting = false;
         hudClearPrompt(MSG_LIN2);
         return NODE_OK;           /* next iter will process the char */
     }
 
     if (state == S_BEAMING && lastServerError)
     {                           /* the server stopped beaming for us */
-        cqsEffectStop(beamHandle, FALSE);
+        cqsEffectStop(beamHandle, false);
         sendCommand(CPCMD_BEAM, 0); /* to be sure */
         state = S_NONE;
-        prompting = FALSE;
+        prompting = false;
         hudClearPrompt(MSG_LIN2);
         return NODE_OK;           /* next iter will process the char */
     }
@@ -2949,9 +2949,9 @@ static int nCPIdle(void)
     {
         /* we've died long enough, time to go home :( */
         /* stop any effects we care about */
-        cqsEffectStop(bombingHandle, FALSE);
-        cqsEffectStop(beamHandle, FALSE);
-        cqsEffectStop(alertHandle, FALSE);
+        cqsEffectStop(bombingHandle, false);
+        cqsEffectStop(beamHandle, false);
+        cqsEffectStop(alertHandle, false);
 
         beamHandle = CQS_INVHANDLE;
         bombingHandle = CQS_INVHANDLE;
@@ -3000,8 +3000,8 @@ static int nCPInput(int ch)
     if (ch == 0x1c)
     {
         /* first stop all music and effects */
-        cqsEffectStop(CQS_INVHANDLE, TRUE);
-        cqsMusicStop(TRUE);
+        cqsEffectStop(CQS_INVHANDLE, true);
+        cqsMusicStop(true);
 
         return NODE_EXIT;
     }
@@ -3021,10 +3021,10 @@ static int nCPInput(int ch)
     if (state == S_BOMBING && ch)
     {                           /* aborting */
         ibufPutc(ch);             /* just que it */
-        cqsEffectStop(bombingHandle, FALSE);
+        cqsEffectStop(bombingHandle, false);
         sendCommand(CPCMD_BOMB, 0);
         state = S_NONE;
-        prompting = FALSE;
+        prompting = false;
         cp_putmsg( abt, MSG_LIN1 );
         hudClearPrompt(MSG_LIN2);
         return NODE_OK;           /* next iter will process the char */
@@ -3033,10 +3033,10 @@ static int nCPInput(int ch)
     if (state == S_BEAMING && ch)
     {                           /* aborting */
         ibufPutc(ch);             /* just que it */
-        cqsEffectStop(beamHandle, FALSE);
+        cqsEffectStop(beamHandle, false);
         sendCommand(CPCMD_BEAM, 0);
         state = S_NONE;
-        prompting = FALSE;
+        prompting = false;
         cp_putmsg( abt, MSG_LIN1 );
         hudClearPrompt(MSG_LIN2);
         return NODE_OK;           /* next iter will process the char */
@@ -3068,7 +3068,7 @@ static int nCPInput(int ch)
             if (irv > 0)
             {
                 _docourse(prm.buf, ch);
-                prompting = FALSE;
+                prompting = false;
                 state = S_NONE;
             }
             else
@@ -3080,7 +3080,7 @@ static int nCPInput(int ch)
             if (irv > 0)
             {
                 _doinfo(prm.buf, ch);
-                prompting = FALSE;
+                prompting = false;
                 state = S_NONE;
             }
             else
@@ -3113,7 +3113,7 @@ static int nCPInput(int ch)
                 else
                     cp_putmsg( "Invalid targeting information.", MSG_LIN1 );
 
-                prompting = FALSE;
+                prompting = false;
                 state = S_NONE;
             }
             else
@@ -3125,7 +3125,7 @@ static int nCPInput(int ch)
             if (irv > 0)
             {
                 _docloak(prm.buf, ch);
-                prompting = FALSE;
+                prompting = false;
                 state = S_NONE;
             }
 
@@ -3135,7 +3135,7 @@ static int nCPInput(int ch)
             if (irv > 0)
             {
                 _doalloc(prm.buf, ch);
-                prompting = FALSE;
+                prompting = false;
                 state = S_NONE;
             }
             else
@@ -3147,7 +3147,7 @@ static int nCPInput(int ch)
             if (irv > 0)
             {
                 _dodistress(prm.buf, ch);
-                prompting = FALSE;
+                prompting = false;
                 state = S_NONE;
             }
 
@@ -3164,7 +3164,7 @@ static int nCPInput(int ch)
                 else
                     cp_putmsg( abt, MSG_LIN1 );
 
-                prompting = FALSE;
+                prompting = false;
                 state = S_NONE;
             }
 
@@ -3174,7 +3174,7 @@ static int nCPInput(int ch)
             if (irv > 0)
             {
                 _dotow(prm.buf, ch);
-                prompting = FALSE;
+                prompting = false;
                 state = S_NONE;
             }
             else
@@ -3193,7 +3193,7 @@ static int nCPInput(int ch)
                 else
                 {
                     hudClearPrompt(MSG_LIN1);
-                    prompting = FALSE;
+                    prompting = false;
                     state = S_NONE;
                 }
             }
@@ -3205,7 +3205,7 @@ static int nCPInput(int ch)
             {
                 sendCommand(CPCMD_AUTOPILOT, 0);
                 hudClearPrompt(MSG_LIN1);
-                prompting = FALSE;
+                prompting = false;
                 state = S_NONE;
             }
             else
@@ -3238,7 +3238,7 @@ static int nCPInput(int ch)
             else
             {                   /* chicken */
                 state = S_NONE;
-                prompting = FALSE;
+                prompting = false;
                 hudClearPrompt(MSG_LIN1);
                 hudClearPrompt(MSG_LIN2);
             }
@@ -3250,7 +3250,7 @@ static int nCPInput(int ch)
             {
                 sendCommand(CPCMD_DESTRUCT, 0); /* just kidding */
                 state = S_NONE;
-                prompting = FALSE;
+                prompting = false;
                 hudClearPrompt(MSG_LIN1);
                 hudClearPrompt(MSG_LIN2);
                 cp_putmsg( "Self destruct has been cancelled.", MSG_LIN1 );
@@ -3271,7 +3271,7 @@ static int nCPInput(int ch)
             {
                 sendCommand(CPCMD_BOMB, 1);   /* start the bombing */
                 state = S_BOMBING;
-                prompting = FALSE;
+                prompting = false;
 
                 cqsEffectPlay(bombingfx, &bombingHandle, 0.0, 0.0, 0.0);
                 hudClearPrompt(MSG_LIN1);
@@ -3279,7 +3279,7 @@ static int nCPInput(int ch)
             else
             {                   /* weak human */
                 state = S_NONE;
-                prompting = FALSE;
+                prompting = false;
                 cp_putmsg( abt, MSG_LIN1 );
                 hudClearPrompt(MSG_LIN2);
             }
@@ -3291,17 +3291,17 @@ static int nCPInput(int ch)
             {
             case 'u':
             case 'U':
-                dirup = TRUE;
+                dirup = true;
                 break;
             case 'd':
             case 'D':
             case TERM_EXTRA:
-                dirup = FALSE;
+                dirup = false;
                 break;
             default:
                 cp_putmsg( abt, MSG_LIN1 );
                 state = S_NONE;
-                prompting = FALSE;
+                prompting = false;
                 return NODE_OK;
             }
 
@@ -3314,7 +3314,7 @@ static int nCPInput(int ch)
             sprintf( pbuf, "Beam %s [1-%d] ", (dirup) ? "up" : "down",
                      beamax );
             state = S_BEAMNUM;
-            prm.preinit = FALSE;
+            prm.preinit = false;
             prm.buf = cbuf;
             prm.buflen = 10;
             prm.pbuf = pbuf;
@@ -3322,7 +3322,7 @@ static int nCPInput(int ch)
             prm.index = MSG_LIN1;
             prm.buf[0] = 0;
             hudSetPrompt(prm.index, prm.pbuf, NoColor, prm.buf, NoColor);
-            prompting = TRUE;
+            prompting = true;
 
             break;
 
@@ -3342,7 +3342,7 @@ static int nCPInput(int ch)
                 if (ch == TERM_ABORT || ch == TERM_NORMAL)
                 {
                     state = S_NONE;
-                    prompting = FALSE;
+                    prompting = false;
                     hudClearPrompt(MSG_LIN1);
                     hudClearPrompt(MSG_LIN2);
                     return NODE_OK;
@@ -3350,14 +3350,14 @@ static int nCPInput(int ch)
 
                 if (ch == TERM_EXTRA) /* accepted */
                 {
-                    int dowait = FALSE;
+                    int dowait = false;
                     uint16_t cwar;
 
                     cwar = 0;
                     for ( i = 0; i < NUMPLAYERTEAMS; i = i + 1 )
                     {
                         if ( twar[i] && ! cbShips[snum].war[i] )
-                            dowait = TRUE;
+                            dowait = true;
 
                         if (twar[i])
                             cwar |= (1 << i);
@@ -3373,7 +3373,7 @@ static int nCPInput(int ch)
                     if (dowait)
                     {
                         state = S_WARRING;
-                        prompting = FALSE;
+                        prompting = false;
                         cp_putmsg(
                             "Reprogramming the battle computer, please stand by...",
                             MSG_LIN2 );
@@ -3383,7 +3383,7 @@ static int nCPInput(int ch)
                     else
                     {
                         state = S_NONE;
-                        prompting = FALSE;
+                        prompting = false;
                     }
 
                     sendCommand(CPCMD_SETWAR, (uint16_t)cwar);
@@ -3402,7 +3402,7 @@ static int nCPInput(int ch)
                     {
                         // not allowed, make sure war status is
                         // cleared, then beep
-                        cbShips[Context.snum].war[cbShips[Context.snum].team] = FALSE;
+                        cbShips[Context.snum].war[cbShips[Context.snum].team] = false;
                         mglBeep(MGL_BEEP_ERR);
                     }
                     else
@@ -3425,7 +3425,7 @@ static int nCPInput(int ch)
             {
                 if (ch != TERM_ABORT && prm.buf[0] != 0)
                     sendSetName(prm.buf);
-                prompting = FALSE;
+                prompting = false;
                 state = S_NONE;
                 hudClearPrompt(MSG_LIN1);
                 hudClearPrompt(MSG_LIN2);
@@ -3442,7 +3442,7 @@ static int nCPInput(int ch)
                 {
                 case TERM_ABORT: /* cancelled */
                     state = S_NONE;
-                    prompting = FALSE;
+                    prompting = false;
                     hudClearPrompt(MSG_LIN1);
                     hudClearPrompt(MSG_LIN2);
 
@@ -3454,7 +3454,7 @@ static int nCPInput(int ch)
                     prm.pbuf = "Refitting ship...";
                     hudSetPrompt(prm.index, prm.pbuf, NoColor, prm.buf, NoColor);
                     sendCommand(CPCMD_REFIT, (uint16_t)refitst);
-                    prompting = FALSE;
+                    prompting = false;
                     utGrand( &entertime );
                     state = S_REFITING;
 
@@ -3583,19 +3583,19 @@ static int nCPMInput(mouseData_t *mdata)
             /* clean up the state - stop bombing/beaming if neccessary... */
             if (state == S_BOMBING)
             {
-                cqsEffectStop(bombingHandle, FALSE);
+                cqsEffectStop(bombingHandle, false);
                 sendCommand(CPCMD_BOMB, 0); /* to be sure */
                 state = S_NONE;
-                prompting = FALSE;
+                prompting = false;
                 hudClearPrompt(MSG_LIN2);
             }
 
             if (state == S_BEAMING)
             {
-                cqsEffectStop(beamHandle, FALSE);
+                cqsEffectStop(beamHandle, false);
                 sendCommand(CPCMD_BEAM, 0); /* to be sure */
                 state = S_NONE;
-                prompting = FALSE;
+                prompting = false;
                 hudClearPrompt(MSG_LIN2);
             }
         }

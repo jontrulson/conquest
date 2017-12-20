@@ -43,7 +43,7 @@ int tcpwCheckHostAccess(char *daemon, char *remotehost)
         utLog("TCPW: %s: %s: ACCESS GRANTED",
               daemon, remotehost);
 
-    return((allowed) ? TRUE : FALSE);
+    return((allowed) ? true : false);
 
 }
 

@@ -44,7 +44,7 @@ int proc_0006_User(char *buf)
     sp_0006_User_t *suser = (sp_0006_User_t *)buf;
 
     if (!pktIsValid(SP_0006_USER, buf))
-        return FALSE;
+        return false;
 
     unum = (int)((uint16_t)ntohs(suser->unum));
 
@@ -53,7 +53,7 @@ int proc_0006_User(char *buf)
 #endif
 
     if (unum < 0 || unum >= 500 /*MAXUSERS*/)
-        return FALSE;
+        return false;
 
     cbUsers[unum].team = suser->team;
 
@@ -113,7 +113,7 @@ int proc_0006_User(char *buf)
     utLog("\t%s: name: %s (%s)", __FUNCTION__, cbUsers[unum].username, cbUsers[unum].alias);
 #endif
 
-    return TRUE;
+    return true;
 }
 
 int proc_0006_Ship(char *buf)
@@ -123,14 +123,14 @@ int proc_0006_Ship(char *buf)
     int snum;
 
     if (!pktIsValid(SP_0006_SHIP, buf))
-        return FALSE;
+        return false;
 
     // we subtract one to compensate for new 0-based cbShips[]
     snum = sship->snum - 1;
 
 
     if (snum < 0 || snum >= 20 /*MAXSHIPS*/)
-        return FALSE;
+        return false;
 
 #if defined(DEBUG_CLIENTPROC)
     utLog("PROC SHIP: snum = %d", snum);
@@ -194,7 +194,7 @@ int proc_0006_Ship(char *buf)
     sship->alias[24 /*MAXUSERALIAS*/ - 1] = 0;
     utStrncpy(cbShips[snum].alias, (char *)sship->alias, 24 /*MAXUSERALIAS*/);
 
-    return TRUE;
+    return true;
 }
 
 int proc_0006_ShipSml(char *buf)
@@ -203,13 +203,13 @@ int proc_0006_ShipSml(char *buf)
     sp_0006_ShipSml_t *sshipsml = (sp_0006_ShipSml_t *)buf;
 
     if (!pktIsValid(SP_0006_SHIPSML, buf))
-        return FALSE;
+        return false;
 
     // compensate for 0-based cbShips[]
     snum = sshipsml->snum - 1;
 
     if (snum < 0 || snum >= 20 /*MAXSHIPS*/)
-        return FALSE;
+        return false;
 
 #if defined(DEBUG_CLIENTPROC)
     utLog("PROC SHIPSML: snum = %d", snum);
@@ -268,7 +268,7 @@ int proc_0006_ShipSml(char *buf)
     cbShips[snum].lastblast =
         (real)((uint16_t)ntohs(sshipsml->lastblast)) / 100.0;
 
-    return TRUE;
+    return true;
 }
 
 int proc_0006_ShipLoc(char *buf)
@@ -277,13 +277,13 @@ int proc_0006_ShipLoc(char *buf)
     sp_0006_ShipLoc_t *sshiploc = (sp_0006_ShipLoc_t *)buf;
 
     if (!pktIsValid(SP_0006_SHIPLOC, buf))
-        return FALSE;
+        return false;
 
     // compensate for 0-based cbShips[]
     snum = sshiploc->snum - 1;
 
     if (snum < 0 || snum >= 20 /*MAXSHIPS*/)
-        return FALSE;
+        return false;
 
 #if defined(DEBUG_CLIENTPROC)
     utLog("PROC SHIPLOC: snum = %d", snum);
@@ -295,7 +295,7 @@ int proc_0006_ShipLoc(char *buf)
     cbShips[snum].x = (real)((real)((int32_t)ntohl(sshiploc->x)) / 1000.0);
     cbShips[snum].y = (real)((real)((int32_t)ntohl(sshiploc->y)) / 1000.0);
 
-    return TRUE;
+    return true;
 }
 
 int proc_0006_Planet(char *buf)
@@ -304,13 +304,13 @@ int proc_0006_Planet(char *buf)
     int pnum;
 
     if (!pktIsValid(SP_0006_PLANET, buf))
-        return FALSE;
+        return false;
 
     // compensate for 0-based cbPlanets[]
     pnum = splan->pnum - 1;
 
     if (pnum < 0 || pnum >= (40 + 20) /*MAXPLANETS*/)
-        return FALSE;
+        return false;
 
     cbPlanets[pnum].type = splan->ptype;
     cbPlanets[pnum].team = splan->team;
@@ -319,7 +319,7 @@ int proc_0006_Planet(char *buf)
 
     uiUpdatePlanet(pnum);
 
-    return TRUE;
+    return true;
 }
 
 int proc_0006_PlanetSml(char *buf)
@@ -329,13 +329,13 @@ int proc_0006_PlanetSml(char *buf)
     int pnum;
 
     if (!pktIsValid(SP_0006_PLANETSML, buf))
-        return FALSE;
+        return false;
 
     // compensate for 0-based cbPlanets[]
     pnum = splansml->pnum - 1;
 
     if (pnum < 0 || pnum >= (40 + 20) /*MAXPLANETS*/)
-        return FALSE;
+        return false;
 
     for (i=0; i<4 /*NUMPLAYERTEAMS*/; i++)
         if (splansml->scanned & (1 << i))
@@ -345,7 +345,7 @@ int proc_0006_PlanetSml(char *buf)
 
     cbPlanets[pnum].uninhabtime = (int)splansml->uninhabtime;
 
-    return TRUE;
+    return true;
 }
 
 int proc_0006_PlanetLoc(char *buf)
@@ -354,19 +354,19 @@ int proc_0006_PlanetLoc(char *buf)
     int pnum;
 
     if (!pktIsValid(SP_0006_PLANETLOC, buf))
-        return FALSE;
+        return false;
 
     // compensate for 0-based cbPlanets[]
     pnum = splanloc->pnum - 1;
 
     if (pnum < 0 || pnum >= (40 + 20) /*MAXPLANETS*/)
-        return FALSE;
+        return false;
 
     cbPlanets[pnum].armies = (int)((int16_t)ntohs(splanloc->armies));
     cbPlanets[pnum].x = (real)((real)((int32_t)ntohl(splanloc->x)) / 1000.0);
     cbPlanets[pnum].y = (real)((real)((int32_t)ntohl(splanloc->y)) / 1000.0);
 
-    return TRUE;
+    return true;
 }
 
 int proc_0006_PlanetLoc2(char *buf)
@@ -375,20 +375,20 @@ int proc_0006_PlanetLoc2(char *buf)
     int pnum;
 
     if (!pktIsValid(SP_0006_PLANETLOC2, buf))
-        return FALSE;
+        return false;
 
     // compensate for 0-based cbPlanets[]
     pnum = splanloc2->pnum - 1;
 
     if (pnum < 0 || pnum >= 60 /*MAXPLANETS*/)
-        return FALSE;
+        return false;
 
     cbPlanets[pnum].armies = (int)((int16_t)ntohs(splanloc2->armies));
     cbPlanets[pnum].x = (real)((real)((int32_t)ntohl(splanloc2->x)) / 1000.0);
     cbPlanets[pnum].y = (real)((real)((int32_t)ntohl(splanloc2->y)) / 1000.0);
     cbPlanets[pnum].orbang = (real)ntohs(splanloc2->orbang) / 100.0;
 
-    return TRUE;
+    return true;
 }
 
 int proc_0006_PlanetInfo(char *buf)
@@ -398,13 +398,13 @@ int proc_0006_PlanetInfo(char *buf)
     int primary;
 
     if (!pktIsValid(SP_0006_PLANETINFO, buf))
-        return FALSE;
+        return false;
 
     // compensate for 0-based cbPlanets[]
     pnum = splaninfo->pnum - 1;
 
     if (pnum < 0 || pnum >= (40 + 20) /*MAXPLANETS*/)
-        return FALSE;
+        return false;
 
     primary = splaninfo->primary;
 
@@ -417,7 +417,7 @@ int proc_0006_PlanetInfo(char *buf)
         primary--; // compensate for 0-based cbPlanets[]
 
     if (primary < 0 || primary >= (40 + 20) /*MAXPLANETS*/)
-        return FALSE;
+        return false;
 
     /* in protocol 6, we 'forgot' planet realness.  To avoid breaking
        protocol again, and allow unpatched clients and/or servers to
@@ -438,7 +438,7 @@ int proc_0006_PlanetInfo(char *buf)
     cbPlanets[pnum].orbrad = (real)((real)((uint32_t)ntohl(splaninfo->orbrad)) / 10.0);
     cbPlanets[pnum].orbvel = (real)((real)((int32_t)ntohl(splaninfo->orbvel)) / 100.0);
 
-    return TRUE;
+    return true;
 }
 
 
@@ -448,21 +448,21 @@ int proc_0006_Torp(char *buf)
     sp_0006_Torp_t *storp = (sp_0006_Torp_t *)buf;
 
     if (!pktIsValid(SP_0006_TORP, buf))
-        return FALSE;
+        return false;
 
     // compensate for 0-based cbShips[]
     snum = storp->snum - 1;
     tnum = storp->tnum;
 
     if (snum < 0 || snum >= 20 /*MAXSHIPS*/)
-        return FALSE;
+        return false;
 
     if (tnum < 0 || tnum >= 9 /*MAXTORPS*/)
-        return FALSE;
+        return false;
 
     cbShips[snum].torps[tnum].status = (int)storp->status;
 
-    return TRUE;
+    return true;
 }
 
 int proc_0006_TorpLoc(char *buf)
@@ -471,17 +471,17 @@ int proc_0006_TorpLoc(char *buf)
     sp_0006_TorpLoc_t *storploc = (sp_0006_TorpLoc_t *)buf;
 
     if (!pktIsValid(SP_0006_TORPLOC, buf))
-        return FALSE;
+        return false;
 
     // compensate for 0-based cbShips[]
     snum = storploc->snum - 1;
     tnum = storploc->tnum;
 
     if (snum <= 0 || snum > 20 /*MAXSHIPS*/)
-        return FALSE;
+        return false;
 
     if (tnum < 0 || tnum >= 12 /*MAXTORPS*/)
-        return FALSE;
+        return false;
 
     for (i=0; i<4 /*NUMPLAYERTEAMS*/; i++)
         if (storploc->war & (1 << i))
@@ -492,7 +492,7 @@ int proc_0006_TorpLoc(char *buf)
     cbShips[snum].torps[tnum].x = (real)((real)((int32_t)ntohl(storploc->x)) / 1000.0);
     cbShips[snum].torps[tnum].y = (real)((real)((int32_t)ntohl(storploc->y)) / 1000.0);
 
-    return TRUE;
+    return true;
 }
 
 
@@ -502,17 +502,17 @@ int proc_0006_TorpEvent(char *buf)
     sp_0006_TorpEvent_t *storpev = (sp_0006_TorpEvent_t *)buf;
 
     if (!pktIsValid(SP_0006_TORPEVENT, buf))
-        return FALSE;
+        return false;
 
     // compensate for 0-based cbShips[]
     snum = storpev->snum - 1;
     tnum = storpev->tnum;
 
     if (snum < 0 || snum >= 20 /*MAXSHIPS*/)
-        return FALSE;
+        return false;
 
     if (tnum < 0 || tnum >= 9 /*MAXTORPS*/)
-        return FALSE;
+        return false;
 
     cbShips[snum].torps[tnum].status = (int)storpev->status;
 
@@ -534,7 +534,7 @@ int proc_0006_TorpEvent(char *buf)
 
     uiUpdateTorpDir(snum, tnum);
 
-    return TRUE;
+    return true;
 }
 
 
@@ -543,7 +543,7 @@ int proc_0006_Message(char *buf)
     sp_0006_Message_t *smsg = (sp_0006_Message_t *)buf;
 
     if (!pktIsValid(SP_0006_MESSAGE, buf))
-        return FALSE;
+        return false;
 
 
     smsg->msg[70 /*MESSAGE_SIZE*/ - 1] = 0;
@@ -602,7 +602,7 @@ int proc_0006_Message(char *buf)
     {
         // don't know what it is.  log it and ignore it
         utLog("%s: unrecognized from: (%d)", __FUNCTION__, smsg->from);
-        return TRUE;
+        return true;
     }
 
     // To - convert to new order
@@ -650,7 +650,7 @@ int proc_0006_Message(char *buf)
     {
         // don't know what it is.  log it and ignore it
         utLog("%s: unrecognized to: (%d)", __FUNCTION__, smsg->to);
-        return TRUE;
+        return true;
     }
 
     /* special handling when playing back a recording */
@@ -666,7 +666,7 @@ int proc_0006_Message(char *buf)
         recMsg.toDetail = realToDetail;
         recMsg.flags = smsg->flags;
     }
-    return TRUE;
+    return true;
 }
 
 int proc_0006_Team(char *buf)
@@ -675,12 +675,12 @@ int proc_0006_Team(char *buf)
     sp_0006_Team_t *steam = (sp_0006_Team_t *)buf;
 
     if (!pktIsValid(SP_0006_TEAM, buf))
-        return FALSE;
+        return false;
 
     team = steam->team;
 
     if (team < 0 || team >= 8 /*NUMALLTEAMS*/)
-        return FALSE;
+        return false;
 
     // this doesn't exist in current cb
     // cbTeams[team].homesun = steam->homesun;
@@ -703,25 +703,25 @@ int proc_0006_Team(char *buf)
 
     utStrncpy(cbTeams[team].name, (char *)steam->name, 12 /*MAXTEAMNAME*/);
 
-    return TRUE;
+    return true;
 }
 
 int proc_0006_ServerStat(char *buf)
 {
     // no need to do anything here...
-    return TRUE;
+    return true;
 }
 
 int proc_0006_cbConqInfo(char *buf)
 {
     // no need to do anything here...
-    return TRUE;
+    return true;
 }
 
 int proc_0006_History(char *buf)
 {
     // There's nothing to do here...
-    return TRUE;
+    return true;
 }
 
 int proc_0006_Doomsday(char *buf)
@@ -729,7 +729,7 @@ int proc_0006_Doomsday(char *buf)
     sp_0006_Doomsday_t *dd = (sp_0006_Doomsday_t *)buf;
 
     if (!pktIsValid(SP_0006_DOOMSDAY, buf))
-        return FALSE;
+        return false;
 
     if (dd->status == 1) // live (DS_ON = 1, DS_OFF = 2)
         DOOMSET(DOOM_F_LIVE);
@@ -741,19 +741,19 @@ int proc_0006_Doomsday(char *buf)
     cbDoomsday->x = (real)((real)((int32_t)ntohl(dd->x)) / 1000.0);
     cbDoomsday->y = (real)((real)((int32_t)ntohl(dd->y)) / 1000.0);
 
-    return TRUE;
+    return true;
 }
 
 int proc_0006_Ack(char *buf)
 {
     // There's nothing to do here...
-    return TRUE;
+    return true;
 }
 
 int proc_0006_ClientStat(char *buf)
 {
     // There's nothing to do here...
-    return TRUE;
+    return true;
 }
 
 int proc_0006_Frame(char *buf)
@@ -778,9 +778,9 @@ int proc_0006_Frame(char *buf)
         sFrame.frame = frame->frame;
         sFrame.time = frame->time;
 
-        return TRUE;
+        return true;
     }
 
-    return FALSE;
+    return false;
 }
 

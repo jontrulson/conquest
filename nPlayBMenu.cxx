@@ -57,7 +57,7 @@ static scrNode_t nPlayBMenuNode = {
 void nPlayBMenuInit(void)
 {
     state = S_NONE;
-    prompting = FALSE;
+    prompting = false;
 
     /* init recFrameDelay based on samplerate if neccessary */
     if (recFrameDelay == -1.0)
@@ -100,7 +100,7 @@ static int nPlayBMenuInput(int ch)
             if (ch == TERM_ABORT)
             {
                 state = S_NONE;
-                prompting = FALSE;
+                prompting = false;
 
                 return NODE_OK;
             }
@@ -115,7 +115,7 @@ static int nPlayBMenuInput(int ch)
                 if (!utIsDigits(prm.buf))
                 {
                     state = S_NONE;
-                    prompting = FALSE;
+                    prompting = false;
 
                     nss = "No such ship.";
                     return NODE_OK;
@@ -127,7 +127,7 @@ static int nPlayBMenuInput(int ch)
                  tmpsnum != DISPLAY_DOOMSDAY )
             {
                 state = S_NONE;
-                prompting = FALSE;
+                prompting = false;
 
                 nss = "No such ship.";
                 return NODE_OK;
@@ -143,7 +143,7 @@ static int nPlayBMenuInput(int ch)
     switch (ch)
     {
     case '/':
-        nShiplInit(DSP_NODE_PLAYBMENU, TRUE);
+        nShiplInit(DSP_NODE_PLAYBMENU, true);
         break;
 
     case 'q':
@@ -159,7 +159,7 @@ static int nPlayBMenuInput(int ch)
         if (recFileHeader.snum == 0)
         {
             cbuf[0] = 0;
-            prm.preinit = FALSE;
+            prm.preinit = false;
 
         }
         else
@@ -169,7 +169,7 @@ static int nPlayBMenuInput(int ch)
                     (recFileHeader.protoVers <= 0x0006) ?
                     recFileHeader.snum - 1:
                     recFileHeader.snum);
-            prm.preinit = TRUE;
+            prm.preinit = true;
         }
 
         prm.buf = cbuf;
@@ -177,7 +177,7 @@ static int nPlayBMenuInput(int ch)
         prm.pbuf = "Watch which ship (<cr> for doomsday)?";
         prm.terms = TERMS;
         prm.index = 20;
-        prompting = TRUE;
+        prompting = true;
 
         break;
 

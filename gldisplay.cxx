@@ -49,12 +49,12 @@ void display( int snum )
     {
         AlertLevel = GREEN_ALERT;
         hudInitData();
-        Context.redraw = FALSE;
+        Context.redraw = false;
     }
 
     hudSetAlertStatus(snum, 0, AlertLevel);
 
-    dobeep = FALSE;
+    dobeep = false;
     mindis = 1.0e6;
     minsdis = 1.0e6;
     minenemy = 0;
@@ -65,7 +65,7 @@ void display( int snum )
     if (snum >= 0)
         lsmap = SMAP(snum);
     else
-        lsmap = FALSE;
+        lsmap = false;
 
     /* adjust the ships orbital position if neccessary */
     clbAdjOrbitalPosition(snum);
@@ -151,8 +151,8 @@ void display( int snum )
             if (lsmap)
             {
                 if (snum >= 0 && ((snum == i) ||
-                                  (cbShips[snum].war[cbShips[i].team] == FALSE &&
-                                   cbShips[i].war[cbShips[snum].team] == FALSE)) )
+                                  (cbShips[snum].war[cbShips[i].team] == false &&
+                                   cbShips[i].war[cbShips[snum].team] == false)) )
                 {
                     for ( j = 0; j < MAXTORPS; j = j + 1 )
                         if ( cbShips[i].torps[j].status == TS_LIVE
@@ -315,13 +315,13 @@ void display( int snum )
 	    {
                 /* Nearest enemy is very close. */
                 AlertLevel = PHASER_ALERT;
-                dobeep = TRUE;
+                dobeep = true;
 	    }
             else if ( mindis < ALERT_DIST )
 	    {
                 /* Nearest enemy is close. */
                 AlertLevel = RED_ALERT;
-                dobeep = TRUE;
+                dobeep = true;
 	    }
             else if ( STALERT(snum) )
 	    {
@@ -330,7 +330,7 @@ void display( int snum )
                 cqsEffectPlay(talertfx, NULL, 0, 0, 0);
 
                 AlertLevel = TORP_ALERT;
-                dobeep = TRUE;
+                dobeep = true;
 	    }
             else if ( mindis < YELLOW_DIST )
 	    {
@@ -394,7 +394,7 @@ void display( int snum )
             if ( (cbShips[snum].damage - prevdam) > 5.0 )
                 cqsEffectPlay(cqsTeamEffects[cbShips[snum].team].hit, NULL, 0, 0, 0);
 
-            dobeep = TRUE;
+            dobeep = true;
         }
 
         /* Armies/Robot action. */

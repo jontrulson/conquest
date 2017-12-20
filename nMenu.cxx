@@ -56,7 +56,7 @@ static char cbuf[BUFFER_SIZE_256];
 
 /* init vars */
 static int lose, oclosed;
-static int fatal = FALSE;
+static int fatal = false;
 
 /* war vars */
 static int twar[NUMPLAYERTEAMS];
@@ -78,12 +78,12 @@ static void _conqds(dspConfig_t *dsp)
     int i, col, lin;
     extern char *ConquestVersion;
     extern char *ConquestDate;
-    static int FirstTime = TRUE;
+    static bool FirstTime = true;
     static char sfmt[MSGMAXLINE * 2];
 
-    if (FirstTime == TRUE)
+    if (FirstTime)
     {
-        FirstTime = FALSE;
+        FirstTime = false;
         sprintf(sfmt,
                 "#%d#(#%d#%%c#%d#) - %%s",
                 LabelColor,
@@ -92,7 +92,7 @@ static void _conqds(dspConfig_t *dsp)
     }
 
     /* Display the logo. */
-    mglConqLogo(dsp, TRUE);
+    mglConqLogo(dsp, true);
 
     lin = 7;
 
@@ -160,20 +160,20 @@ static void _conqds(dspConfig_t *dsp)
 void nMenuInit(void)
 {
     char buf[PKT_MAXSIZE];
-    static int inited = FALSE;
+    static int inited = false;
 
     state = S_NONE;
-    prompting = FALSE;
+    prompting = false;
 
     if (!inited)
     {
-        inited = TRUE;
+        inited = true;
         /* Initialize statistics. */
         initstats( &cbShips[Context.snum].ctime, &cbShips[Context.snum].etime );
 
         /* Set up some things for the menu display. */
         oclosed = cbConqInfo->closed;
-        Context.leave = FALSE;
+        Context.leave = false;
 
         /* now look for our ship packet before we get started.  It should be a
            full SP_SHIP packet for this first time */
@@ -181,7 +181,7 @@ void nMenuInit(void)
                              60, NULL) <= 0)
         {
             utLog("nMenuInit: didn't get initial SP_SHIP");
-            fatal = TRUE;
+            fatal = true;
             return;
         }
         else
@@ -191,7 +191,7 @@ void nMenuInit(void)
         if ( oclosed != cbConqInfo->closed )
             oclosed = ! oclosed;
 
-        lose = FALSE;
+        lose = false;
     }
 
     setNode(&nMenuNode);
@@ -209,11 +209,11 @@ static int nMenuDisplay(dspConfig_t *dsp)
         return NODE_EXIT;
 
     _conqds(dsp);
-    clbUserline( -1, -1, cbuf, FALSE, TRUE );
+    clbUserline( -1, -1, cbuf, false, true );
     cprintf(MSG_LIN1, 1, ALIGN_LEFT, "#%d#%s",
             LabelColor,
             cbuf);
-    clbUserline( Context.unum, -1, cbuf, FALSE, TRUE );
+    clbUserline( Context.unum, -1, cbuf, false, true );
     cprintf(MSG_LIN2, 1, ALIGN_LEFT, "#%d#%s",
             NoColor,
             cbuf);
@@ -282,7 +282,7 @@ static int nMenuIdle(void)
             PKT_PROCSP(buf);
             if (sAckMsg.code == PERR_LOSE)
             {
-                lose = TRUE;
+                lose = true;
                 state = S_LOSE;
                 return NODE_OK;   /* but not for long... */
             }
@@ -328,7 +328,7 @@ static int nMenuInput(int ch)
             {
                 if (ch != TERM_ABORT && prm.buf[0] != 0)
                     sendSetName(prm.buf);
-                prompting = FALSE;
+                prompting = false;
                 state = S_NONE;
             }
 
@@ -341,7 +341,7 @@ static int nMenuInput(int ch)
                 return NODE_EXIT;
             }
             state = S_NONE;
-            prompting = FALSE;
+            prompting = false;
 
             break;
 
@@ -351,14 +351,14 @@ static int nMenuInput(int ch)
                 if (ch == TERM_ABORT || ch == TERM_NORMAL)
                 {
                     state = S_NONE;
-                    prompting = FALSE;
+                    prompting = false;
                     return NODE_OK;
                 }
 
                 if (ch == TERM_EXTRA) /* accepted */
                 {
                     state = S_NONE;
-                    prompting = FALSE;
+                    prompting = false;
                     cwar = 0;
                     for ( i = 0; i < NUMPLAYERTEAMS; i = i + 1 )
                     {
@@ -386,7 +386,7 @@ static int nMenuInput(int ch)
                     {
                         // not allowed, make sure war status is
                         // cleared, then beep
-                        cbShips[Context.snum].war[cbShips[Context.snum].team] = FALSE;
+                        cbShips[Context.snum].war[cbShips[Context.snum].team] = false;
                         mglBeep(MGL_BEEP_ERR);
                     }
                     else
@@ -417,18 +417,18 @@ static int nMenuInput(int ch)
         break;
 
     case 'H':
-        nHistlInit(DSP_NODE_MENU, TRUE);
+        nHistlInit(DSP_NODE_MENU, true);
         break;
 
     case 'N':
         state = S_PSEUDO;
-        prm.preinit = FALSE;
+        prm.preinit = false;
         prm.buf = cbuf;
         prm.buflen = MAXUSERNAME;
         prm.terms = TERMS;
         prm.index = 21;
         prm.buf[0] = 0;
-        prompting = TRUE;
+        prompting = true;
 
         break;
 
@@ -444,13 +444,13 @@ static int nMenuInput(int ch)
         else
         {
             state = S_RESIGN;
-            prm.preinit = FALSE;
+            prm.preinit = false;
             prm.buf = cbuf;
             prm.buflen = MAXUSERNAME;
             prm.terms = TERMS;
             prm.index = 21;
             prm.buf[0] = 0;
-            prompting = TRUE;
+            prompting = true;
         }
         break;
     case 's':
@@ -466,27 +466,27 @@ static int nMenuInput(int ch)
             cbShips[Context.snum].shiptype =
                 cbTeams[cbShips[Context.snum].team].shiptype;
             cbUsers[Context.unum].team = cbShips[Context.snum].team;
-            cbShips[Context.snum].war[cbShips[Context.snum].team] = FALSE;
-            cbUsers[Context.unum].war[cbUsers[Context.unum].team] = FALSE;
+            cbShips[Context.snum].war[cbShips[Context.snum].team] = false;
+            cbUsers[Context.unum].war[cbUsers[Context.unum].team] = false;
 
             sendCommand(CPCMD_SWITCHTEAM, (uint16_t)cbShips[Context.snum].team);
         }
         break;
 
     case 'O':
-        nOptionsInit(NOPT_USER, TRUE, DSP_NODE_MENU);
+        nOptionsInit(NOPT_USER, true, DSP_NODE_MENU);
         break;
 
     case 'S':
-        nUserlInit(DSP_NODE_MENU, TRUE, Context.snum, FALSE, TRUE);
+        nUserlInit(DSP_NODE_MENU, true, Context.snum, false, true);
         break;
 
     case 'T':
-        nTeamlInit(DSP_NODE_MENU, TRUE, cbShips[Context.snum].team);
+        nTeamlInit(DSP_NODE_MENU, true, cbShips[Context.snum].team);
         break;
 
     case 'U':
-        nUserlInit(DSP_NODE_MENU, TRUE, Context.snum, FALSE, FALSE);
+        nUserlInit(DSP_NODE_MENU, true, Context.snum, false, false);
         break;
 
     case 'W':
@@ -494,8 +494,8 @@ static int nMenuInput(int ch)
             twar[i] = cbShips[Context.snum].war[i];
 
         state = S_WAR;
-        prompting = TRUE;
-        prm.preinit = FALSE;
+        prompting = true;
+        prm.preinit = false;
         prm.buf = cbuf;
         prm.buflen = 5;
         prm.pbuf = clbWarPrompt(Context.snum, twar);
@@ -505,20 +505,20 @@ static int nMenuInput(int ch)
 
         break;
     case '/':
-        nShiplInit(DSP_NODE_MENU, TRUE);
+        nShiplInit(DSP_NODE_MENU, true);
         break;
 
     case '?':
         if (Context.snum >= 0 && Context.snum < MAXSHIPS)
-            nPlanetlInit(DSP_NODE_MENU, TRUE, Context.snum, cbShips[Context.snum].team);
+            nPlanetlInit(DSP_NODE_MENU, true, Context.snum, cbShips[Context.snum].team);
         else          /* then use user team if user doen't have a ship yet */
-            nPlanetlInit(DSP_NODE_MENU, TRUE, Context.snum, cbUsers[Context.unum].team);
+            nPlanetlInit(DSP_NODE_MENU, true, Context.snum, cbUsers[Context.unum].team);
         break;
 
     case 'q':
         /* first stop all music and effects */
-        cqsEffectStop(CQS_INVHANDLE, TRUE);
-        cqsMusicStop(TRUE);
+        cqsEffectStop(CQS_INVHANDLE, true);
+        cqsMusicStop(true);
 
         return NODE_EXIT;
 

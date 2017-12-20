@@ -53,7 +53,7 @@ int iochav( void )
 
     if (ibufCount())
     {
-        return(TRUE);
+        return(true);
     }
 
 #if defined(USE_SELECT)
@@ -68,16 +68,16 @@ int iochav( void )
     if ((retval = select(iolbStdinFD+1, &readfds, NULL, NULL, &timeout)) == -1)
     {
         utLog("iochav(): select(): %s", strerror(errno));
-        return(FALSE);
+        return(false);
     }
 
     if (retval == 0)		/* nothing there */
     {
-        return(FALSE);
+        return(false);
     }
     else
     {				/* something avail */
-        return(TRUE);
+        return(true);
     }
 
 #else  /* use poll() */
@@ -115,27 +115,27 @@ int iochav( void )
             if (DataMsg.len <= 0 && retval > 0)
 	    {
 #ifdef DEBUG_IO
-                utLog("iochav(): getmsg(): DataMsg.len <= 0 retval = %d - TRUE",
+                utLog("iochav(): getmsg(): DataMsg.len <= 0 retval = %d - true",
                       DataMsg.len,
                       retval);
 #endif
 
-                return(TRUE);
+                return(true);
 	    }
 
             if (DataMsg.len <= 0 && CtlMsg.len <= 0)
 	    {
 #ifdef DEBUG_IO
-                utLog("iochav(): getmsg(): DataMsg.len & CtlMsg.len <= 0 ret FALSE");
+                utLog("iochav(): getmsg(): DataMsg.len & CtlMsg.len <= 0 ret false");
 #endif
-                return(FALSE);
+                return(false);
 	    }
             else
 	    {
 #ifdef DEBUG_IO
-                utLog("iochav(): getmsg(): DataMsg.len | CtlMsg.len > 0 ret TRUE");
+                utLog("iochav(): getmsg(): DataMsg.len | CtlMsg.len > 0 ret true");
 #endif
-                return(TRUE);
+                return(true);
 	    }
 	}
     }
@@ -144,7 +144,7 @@ int iochav( void )
 #ifdef DEBUG_IO
         utLog("ALTiochav(): NO char via poll");
 #endif
-        return(FALSE);
+        return(false);
     }
 
 #endif /* !USE_SELECT */
@@ -245,7 +245,7 @@ int iogtimed ( int *ch, real seconds )
     if (ibufCount())
     {
         *ch = ibufGetc();
-        return(TRUE);
+        return(true);
     }
 
 
@@ -287,7 +287,7 @@ int iogtimed ( int *ch, real seconds )
     starttime = time(0);
 #endif
 
-    while (TRUE)
+    while (true)
     {
         errno = 0;			/* reset errno */
 
@@ -314,7 +314,7 @@ int iogtimed ( int *ch, real seconds )
                 *ch = 0;
                 utLog("iogtimed(): select() failed: %s", strerror(errno));
                 cdrefresh();
-                return(FALSE);
+                return(false);
 	    }
 
             else
@@ -332,7 +332,7 @@ int iogtimed ( int *ch, real seconds )
                 if (curtime >= (starttime + secs))
 		{
                     *ch = 0;
-                    return(FALSE);
+                    return(false);
 		}
                 else
 		{
@@ -363,7 +363,7 @@ int iogtimed ( int *ch, real seconds )
                   retval,iolbStdinFD,*ch);
 # endif
 
-            return(TRUE);
+            return(true);
 	}
         else
 	{
@@ -373,7 +373,7 @@ int iogtimed ( int *ch, real seconds )
                   retval,iolbStdinFD,*ch);
 # endif
             cdrefresh();
-            return(FALSE);
+            return(false);
 	}
 
 #else

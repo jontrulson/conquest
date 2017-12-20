@@ -125,8 +125,8 @@ int clbEnemyDet( int snum )
     /* Stop repairing. */
     SFCLR(snum, SHIP_F_REPAIR);
 
-    if ( ! clbUseFuel( snum, DETONATE_FUEL, TRUE, TRUE ) )
-        return ( FALSE );
+    if ( ! clbUseFuel( snum, DETONATE_FUEL, true, true ) )
+        return ( false );
 
     for ( i = 0; i < MAXSHIPS; i++ )
         if ( cbShips[i].status != SS_OFF && i != snum )
@@ -137,7 +137,7 @@ int clbEnemyDet( int snum )
                              DETONATE_DIST )
                             clbDetonate( i, j );
 
-    return ( TRUE );
+    return ( true );
 
 }
 
@@ -250,8 +250,8 @@ void clbIKill(int snum, killedBy_t kb, uint16_t detail)
 
         if ( ! cbShips[detail].war[kteam] )
 	{
-            cbShips[detail].war[team] = TRUE;
-            cbShips[detail].rwar[team] = TRUE;
+            cbShips[detail].war[team] = true;
+            cbShips[detail].rwar[team] = true;
 	}
     }
 
@@ -319,7 +319,7 @@ char *clbETAStr(real warp, real distance)
 /*    kill( snum, kb ) */
 void clbKillShip(int snum, killedBy_t kb, uint16_t detail)
 {
-    int sendmesg = FALSE;
+    int sendmesg = false;
     char msgbuf[BUFFER_SIZE_256];
 
 #if defined(DO_EXPLODING_SHIPS)
@@ -333,7 +333,7 @@ void clbKillShip(int snum, killedBy_t kb, uint16_t detail)
     cbUnlock(&cbConqInfo->lockword);
 
     /* send a msg to all... */
-    sendmesg = FALSE;
+    sendmesg = false;
 
     /* Figure out why we died. */
     switch ( kb )
@@ -343,7 +343,7 @@ void clbKillShip(int snum, killedBy_t kb, uint16_t detail)
                 cbTeams[cbShips[snum].team].teamchar,
                 snum,
                 cbShips[snum].alias);
-        sendmesg = TRUE;
+        sendmesg = true;
 
         break;
     case KB_NEGENB:
@@ -351,7 +351,7 @@ void clbKillShip(int snum, killedBy_t kb, uint16_t detail)
                 cbTeams[cbShips[snum].team].teamchar,
                 snum,
                 cbShips[snum].alias);
-        sendmesg = TRUE;
+        sendmesg = true;
 
         break;
 
@@ -360,7 +360,7 @@ void clbKillShip(int snum, killedBy_t kb, uint16_t detail)
                 cbTeams[cbShips[snum].team].teamchar,
                 snum,
                 cbShips[snum].alias);
-        sendmesg = TRUE;
+        sendmesg = true;
 
         break;
     case KB_DOOMSDAY:
@@ -368,7 +368,7 @@ void clbKillShip(int snum, killedBy_t kb, uint16_t detail)
                 cbTeams[cbShips[snum].team].teamchar,
                 snum,
                 cbShips[snum].alias);
-        sendmesg = TRUE;
+        sendmesg = true;
 
         break;
     case KB_LIGHTNING:
@@ -376,7 +376,7 @@ void clbKillShip(int snum, killedBy_t kb, uint16_t detail)
                 cbTeams[cbShips[snum].team].teamchar,
                 snum,
                 cbShips[snum].alias);
-        sendmesg = TRUE;
+        sendmesg = true;
 
         break;
 
@@ -391,7 +391,7 @@ void clbKillShip(int snum, killedBy_t kb, uint16_t detail)
                     cbTeams[cbShips[detail].team].teamchar,
                     detail,
                     cbShips[detail].alias);
-            sendmesg = TRUE;
+            sendmesg = true;
 
 	}
         break;
@@ -405,7 +405,7 @@ void clbKillShip(int snum, killedBy_t kb, uint16_t detail)
                     cbShips[snum].alias,
                     cbPlanets[detail].name);
 
-            sendmesg = TRUE;
+            sendmesg = true;
 
             if ( cbPlanets[detail].type == PLANET_SUN )
 	    {
@@ -423,7 +423,7 @@ void clbKillShip(int snum, killedBy_t kb, uint16_t detail)
               snum, (int)kb, (int)detail);
     }
 
-    if (sendmesg == TRUE)
+    if (sendmesg == true)
         clbStoreMsg(MSG_FROM_COMP, 0, MSG_TO_ALL, 0, msgbuf);
 
     return;
@@ -437,16 +437,16 @@ int clbCheckLaunch(int snum, int number)
     int i;
 
     if (cbShips[snum].wfuse > 0)
-        return FALSE;               /* weapons overloaded */
+        return false;               /* weapons overloaded */
 
     if (number == 0)
-        return TRUE;
+        return true;
 
     for ( i = 0; i < MAXTORPS; i++ )
         if ( cbShips[snum].torps[i].status == TS_OFF )
-            return TRUE;
+            return true;
 
-    return FALSE;
+    return false;
 }
 
 
@@ -487,13 +487,13 @@ int clbLaunch( int snum, real dir, int number, int ltype )
 
     if (numslots == 0)
     {				/* couldn't find even one */
-        return(FALSE);
+        return(false);
     }
 
     for (i=0; i<numslots; i++)
     {
         /* Use fuel. */
-        if ( clbUseFuel( snum, TORPEDO_FUEL, TRUE, TRUE ) == FALSE)
+        if ( clbUseFuel( snum, TORPEDO_FUEL, true, true ) == false)
 	{
             cbShips[snum].torps[tslot[i]].status = TS_OFF;
             continue;
@@ -542,7 +542,7 @@ int clbLaunch( int snum, real dir, int number, int ltype )
             if (ltype == LAUNCH_EXPLODE)
 	    {			/* if our ship is exploding we're at war
 				   with everything. */
-                cbShips[snum].torps[tslot[i]].war[j] = TRUE;
+                cbShips[snum].torps[tslot[i]].war[j] = true;
 	    }
             else
                 cbShips[snum].torps[tslot[i]].war[j] = cbShips[snum].war[j]; /* just enemies */
@@ -553,7 +553,7 @@ int clbLaunch( int snum, real dir, int number, int ltype )
 
     if (numfired == 0)
     {				/* couldn't fire any. bummer dude. */
-        return(FALSE);
+        return(false);
     }
     else
     {				/* torps away! */
@@ -565,12 +565,12 @@ int clbLaunch( int snum, real dir, int number, int ltype )
 
         if (numfired == number)
 	{			/* fired all requested */
-            return ( TRUE );
+            return ( true );
 	}
         else
 	{
             /* fired some, but not all */
-            return(FALSE);
+            return(false);
 	}
     }
 
@@ -638,11 +638,11 @@ int clbPhaser( int snum, real dir )
 
     /* See if ok to fire. */
     if ( cbShips[snum].pfuse > 0 )
-        return ( FALSE );
+        return ( false );
 
     /* Try to use fuel for this shot. */
-    if ( ! clbUseFuel( snum, PHASER_FUEL, TRUE, TRUE ) )
-        return ( FALSE );
+    if ( ! clbUseFuel( snum, PHASER_FUEL, true, true ) )
+        return ( false );
 
     /* Update stats. */
     cbLock(&cbConqInfo->lockword);
@@ -678,7 +678,7 @@ int clbPhaser( int snum, real dir )
                     LastPhasDist = PHASER_DIST;
             }
 
-    return ( TRUE );
+    return ( true );
 
 }
 
@@ -726,19 +726,19 @@ int clbRegister( const char *lname, const char *rname, int team, int *unum )
                 cbUsers[i].stats[j] = 0;
 
             for ( j = 0; j < NUMPLAYERTEAMS; j = j + 1 )
-                cbUsers[i].war[j] = TRUE;
-            cbUsers[i].war[cbUsers[i].team] = FALSE;
+                cbUsers[i].war[j] = true;
+            cbUsers[i].war[cbUsers[i].team] = false;
 
             cbUsers[i].lastentry = 0;	/* never */
             utStrncpy( cbUsers[i].username, lname, MAXUSERNAME );
             utStrncpy( cbUsers[i].alias, rname, MAXUSERNAME );
             *unum = i;
-            return ( TRUE );
+            return ( true );
         }
 
     cbUnlock(&cbConqInfo->lockword);
 
-    return ( FALSE );
+    return ( false );
 
 }
 
@@ -767,7 +767,7 @@ void clbResign( int unum, int isoper )
     }
     cbUnlock(&cbConqInfo->lockword);
 
-    if (isoper != TRUE)
+    if (isoper != true)
         utLog("INFO: %s (%s) has resigned",
               usrname, usralias);
 
@@ -1060,7 +1060,7 @@ void clbStatline( int unum, char *buf )
 int clbZeroPlanet( int pnum, int snum )
 {
     int oteam, i;
-    int didgeno = FALSE;
+    int didgeno = false;
     char buf[MSGMAXLINE];
 
     oteam = cbPlanets[pnum].team;
@@ -1069,12 +1069,12 @@ int clbZeroPlanet( int pnum, int snum )
 
     /* Make the planet not scanned. */
     for ( i = 0; i < NUMPLAYERTEAMS; i++ )
-        cbPlanets[pnum].scanned[i] = FALSE;
+        cbPlanets[pnum].scanned[i] = false;
 
     /* check for genos here */
     if ( oteam != TEAM_SELFRULED && oteam != TEAM_NOTEAM )
     {
-        didgeno = TRUE;
+        didgeno = true;
 
         /* Check whether that was the last planet owned by the vanquished. */
         for ( i = 0; i < MAXPLANETS; i++ )
@@ -1082,7 +1082,7 @@ int clbZeroPlanet( int pnum, int snum )
             if ( PVISIBLE(i) && (cbPlanets[i].team == oteam) &&
                  cbPlanets[i].armies > 0)
             {
-                didgeno = FALSE;
+                didgeno = false;
                 break;
             }
         }
@@ -1091,7 +1091,7 @@ int clbZeroPlanet( int pnum, int snum )
         if (didgeno && (snum >= 0 && snum < MAXSHIPS))
         {
             cbTeams[oteam].couptime = rndint( MIN_COUP_MINUTES, MAX_COUP_MINUTES );
-            cbTeams[oteam].coupinfo = FALSE;		/* lost coup info */
+            cbTeams[oteam].coupinfo = false;		/* lost coup info */
 
 
             if ( snum >= 0 && snum < MAXSHIPS )
@@ -1171,7 +1171,7 @@ int clbCanRead( int snum, int msgnum )
 
     if (from == MSG_FROM_NOONE && to == MSG_TO_NOONE)
     {				/* uninitialized msgs */
-        return(FALSE);		/* no point in reading it */
+        return(false);		/* no point in reading it */
     }
 
     /* If we're GOD, we can read it. unless it's a COMP MSG*/
@@ -1179,30 +1179,30 @@ int clbCanRead( int snum, int msgnum )
     {
         if (from != MSG_FROM_COMP)
         {
-            return ( TRUE );
+            return ( true );
         }
         else
-            return FALSE;
+            return false;
     }
 
     // snum should never be <0 at this point
 
     /* It's to us. */
     if ( to == MSG_TO_SHIP && (int)toDetail == snum )
-        return(TRUE);
+        return(true);
 
     /* It's from us */
     if (from == MSG_FROM_SHIP && (int)fromDetail == snum)
-        return(TRUE);
+        return(true);
 
     /* if it's to god, or implementors and we are an oper... */
     if ((to == MSG_TO_GOD || to == MSG_TO_IMPLEMENTORS)
         && UISOPER(cbShips[snum].unum))
-        return TRUE;
+        return true;
 
     /* It's to everybody. */
     if ( to == MSG_TO_ALL )
-        return(TRUE);
+        return(true);
 
     /* Only check these if we're a ship. */
     if ( snum >= 0 && snum < MAXSHIPS )
@@ -1212,7 +1212,7 @@ int clbCanRead( int snum, int msgnum )
              && toDetail < NUMALLTEAMS
              && ((int)toDetail == cbShips[snum].team)
              && !selfwar(snum) )
-            return ( TRUE );
+            return ( true );
 
         /* see if it's a message to friendly ships from another ship */
 
@@ -1221,14 +1221,14 @@ int clbCanRead( int snum, int msgnum )
             && fromDetail >= 0
             && fromDetail < MAXSHIPS)
 	{
-            if (cbShips[snum].war[cbShips[fromDetail].team] == FALSE &&
-                cbShips[fromDetail].war[cbShips[snum].team] == FALSE)
-                return TRUE;
+            if (cbShips[snum].war[cbShips[fromDetail].team] == false &&
+                cbShips[fromDetail].war[cbShips[snum].team] == false)
+                return true;
 	}
     }
 
     /* If we got here, we can't read it. */
-    return ( FALSE );
+    return ( false );
 
 }
 
@@ -1263,9 +1263,9 @@ int clbCVTCoords( real cenx, real ceny, real x, real y, real scale,
 
     *lin = round( (DISPLAY_LINS/2+1) - (y-ceny) / scale );
     if ( *lin < 0 || *lin > DISPLAY_LINS || *col <= STAT_COLS || *col > Context.maxcol )
-        return ( FALSE );
+        return ( false );
 
-    return ( TRUE );
+    return ( true );
 
 }
 
@@ -1355,11 +1355,11 @@ int clbFindOrbit( int snum, int *pnum )
                      cbPlanets[i].y ) <= (real)cbPlanets[i].size ) )
         {
             *pnum = i;
-            return ( TRUE );
+            return ( true );
         }
     /* Didn't find one. */
     /*    *pnum = 0;*/
-    return ( FALSE );
+    return ( false );
 
 }
 
@@ -1376,7 +1376,7 @@ int clbFindShip( int *snum )
     int numvacant;
 
     /* maybe free up some slots... */
-    clbCheckShips(FALSE);
+    clbCheckShips(false);
 
     cbLock(&cbConqInfo->lockword);
     *snum = -1;
@@ -1439,7 +1439,7 @@ int clbFindShip( int *snum )
 
     cbUnlock(&cbConqInfo->lockword);
 
-    return ( (*snum != -1) ? TRUE : FALSE );
+    return ( (*snum != -1) ? true : false );
 
 }
 
@@ -1480,14 +1480,14 @@ int clbFindSpecial( int snum, int token, int count, int *sorpnum, int *xsorpnum 
                     valid = satwar(snum, i);
                     break;
                 case SPECIAL_SHIP:
-                    valid = TRUE;
+                    valid = true;
                     break;
                 case SPECIAL_TEAMSHIP:
                     valid = ( cbShips[i].team == cbShips[snum].team &&
                               ! satwar(snum, i) );
                     break;
                 default:
-                    return ( FALSE );		/* this can't happen */
+                    return ( false );		/* this can't happen */
                 }
                 if ( valid )
                 {
@@ -1522,7 +1522,7 @@ int clbFindSpecial( int snum, int token, int count, int *sorpnum, int *xsorpnum 
         if (cbShips[snum].team < NUMPLAYERTEAMS) // better be...
             *sorpnum = cbTeams[cbShips[snum].team].homeplanet;
         else
-            return FALSE;
+            return false;
 
         break;
     case SPECIAL_WEAKPLANET:
@@ -1586,11 +1586,11 @@ int clbFindSpecial( int snum, int token, int count, int *sorpnum, int *xsorpnum 
     case SPECIAL_TEAMPLANET:
 
         /* Determine if we at peace with all teams. */
-        peaceful = TRUE;
+        peaceful = true;
         for ( i = 0; i < NUMPLAYERTEAMS; i++ )
             if ( cbShips[snum].war[i] )
             {
-                peaceful = FALSE;
+                peaceful = false;
                 break;
             }
 
@@ -1621,7 +1621,7 @@ int clbFindSpecial( int snum, int token, int count, int *sorpnum, int *xsorpnum 
                           cbPlanets[i].type == PLANET_CLASSM );
                 break;
 	    case SPECIAL_PLANET:
-                valid = TRUE;
+                valid = true;
                 break;
 	    case SPECIAL_REPAIRPLANET:
                 valid = ( ( cbPlanets[i].scanned[cbShips[snum].team] || peaceful ) &&
@@ -1633,7 +1633,7 @@ int clbFindSpecial( int snum, int token, int count, int *sorpnum, int *xsorpnum 
                 valid = ( cbPlanets[i].team == cbShips[snum].team );
                 break;
 	    default:
-                return ( FALSE );		/* this can't happen */
+                return ( false );		/* this can't happen */
 	    }
             /* Handle army threshold logic. */
             if ( valid )
@@ -1654,7 +1654,7 @@ int clbFindSpecial( int snum, int token, int count, int *sorpnum, int *xsorpnum 
                     valid = ( cbPlanets[i].armies >= count );
                     break;
 		default:
-                    return ( FALSE );	/* this can't happen */
+                    return ( false );	/* this can't happen */
 		}
 	    }
             if ( valid )
@@ -1679,7 +1679,7 @@ int clbFindSpecial( int snum, int token, int count, int *sorpnum, int *xsorpnum 
 	}
         break;
     default:
-        return ( FALSE );			/* this can't happen */
+        return ( false );			/* this can't happen */
     }
 
     return ( *sorpnum != -1 );
@@ -1723,11 +1723,11 @@ int clbGetUserNum( int *unum, const char *lname, userTypes_t ltype )
                  && (ltype == USERTYPE_ANY || cbUsers[i].type == ltype) )
             {
                 *unum = i;
-                return ( TRUE );
+                return ( true );
             }
         }
 
-    return ( FALSE );
+    return ( false );
 
 }
 
@@ -1749,7 +1749,7 @@ void clbInitEverything(void)
     cbLock(&cbConqInfo->lockword);
 
     /* Turn off the universe. It will be turned back on in initUniverse() */
-    cbConqInfo->closed = TRUE;
+    cbConqInfo->closed = true;
 
     /* reset the lockwords  */
     cbConqInfo->lockword = 0;
@@ -1880,7 +1880,7 @@ void clbInitRobots(void)
     for ( i = 0; i < 32; i++ )
         cbRobot->rvec[i] = trvec[i];
 
-    cbConqInfo->externrobots = FALSE;	/* XXX temporary */
+    cbConqInfo->externrobots = false;	/* XXX temporary */
 
     return;
 
@@ -1937,7 +1937,7 @@ void clbInitShip( int snum, int unum )
         cbShips[snum].scanned[i] = 0;
     }
     for ( i = 0; i < MAXPLANETS; i++ )
-        cbShips[snum].srpwar[i] = FALSE;
+        cbShips[snum].srpwar[i] = false;
     /* cbShips[snum].sdfuse                 # setup in clbFindShip() */
     cbLock(&cbConqInfo->lockmesg);
     if ( cbShips[snum].lastmsg == LMSG_NEEDINIT )
@@ -1973,7 +1973,7 @@ void clbInitShip( int snum, int unum )
         cbShips[snum].torps[i].dy = 0.0;
         cbShips[snum].torps[i].mult = 0.0;
         for ( j = 0; j < NUMPLAYERTEAMS; j = j + 1 )
-            cbShips[snum].torps[i].war[j] = FALSE;
+            cbShips[snum].torps[i].war[j] = false;
     }
 
     /* Update user some stats. */
@@ -2100,7 +2100,7 @@ void clbInitUniverse(void)
     clbInitMsgs();
 
     /* Turn the universe back on (turned off in initEverything()). */
-    cbConqInfo->closed = FALSE;
+    cbConqInfo->closed = false;
 
     return;
 
@@ -2207,18 +2207,18 @@ int clbPlanetMatch( char *str, int *pnum, int godlike )
     if ( godlike )
     {
         for ( *pnum = 0; *pnum < MAXPLANETS; *pnum = *pnum + 1 )
-            if ( utStringMatch( str, cbPlanets[*pnum].name, FALSE ) )
-                return ( TRUE );
+            if ( utStringMatch( str, cbPlanets[*pnum].name, false ) )
+                return ( true );
     }
     else
     {
         for ( *pnum = 0; *pnum < MAXPLANETS; *pnum = *pnum + 1 )
             if ( PVISIBLE(*pnum) )
-                if ( utStringMatch( str, cbPlanets[*pnum].name, FALSE ) )
-                    return ( TRUE );
+                if ( utStringMatch( str, cbPlanets[*pnum].name, false ) )
+                    return ( true );
     }
 
-    return ( FALSE );
+    return ( false );
 
 }
 
@@ -2335,7 +2335,7 @@ int clbFmtMsg(msgFrom_t from, uint16_t fromDetail, msgTo_t to,
 	}
     }
 
-    return(TRUE);
+    return(true);
 }
 
 
@@ -2405,13 +2405,13 @@ int clbSPWar( int snum, int pnum )
 
 
     if ( ! PVISIBLE(pnum) )
-        return ( FALSE );		/* can't be at war unless it's real */
+        return ( false );		/* can't be at war unless it's real */
     else if ( cbPlanets[pnum].type == PLANET_SUN )
-        return ( TRUE );		/* always at war with suns */
+        return ( true );		/* always at war with suns */
     else if ( cbPlanets[pnum].type == PLANET_MOON )
-        return ( FALSE );		/* never at war with moons */
+        return ( false );		/* never at war with moons */
     else if ( cbPlanets[pnum].armies <= 0 )
-        return ( FALSE );		/* can't have war without armies */
+        return ( false );		/* can't have war without armies */
     else switch ( cbPlanets[pnum].team )	/* jet added breaks */
          {
          case TEAM_FEDERATION:
@@ -2419,7 +2419,7 @@ int clbSPWar( int snum, int pnum )
          case TEAM_KLINGON:
          case TEAM_ORION:
              if ( cbPlanets[pnum].team == cbShips[snum].team )
-                 return ( FALSE );
+                 return ( false );
              else
                  return ( cbShips[snum].war[cbPlanets[pnum].team] );
              break;
@@ -2440,7 +2440,7 @@ int clbStillAlive( int snum )
 
 
     if (snum < 0 || snum >= MAXSHIPS)
-        return(TRUE);
+        return(true);
 
     /* Look for religious trouble or the "closed" sign in the window. */
     if ( UBANNED(cbShips[snum].unum) )
@@ -2448,18 +2448,18 @@ int clbStillAlive( int snum )
         if ( cbShips[snum].status == SS_LIVE )
             clbKillShip( snum, KB_SHIT, 0 );
 
-        return ( FALSE );
+        return ( false );
     }
     if ( cbConqInfo->closed && ! UPLAYWHENCLOSED(cbShips[snum].unum) )
     {
         if ( cbShips[snum].status == SS_LIVE )
             clbKillShip(snum, KB_EVICT, 0);
 
-        return ( FALSE );
+        return ( false );
     }
 
     if ( cbShips[snum].status == SS_RESERVED || cbShips[snum].status == SS_ENTERING )
-        return ( TRUE );
+        return ( true );
 
     return ( cbShips[snum].status == SS_LIVE );
 
@@ -2515,7 +2515,7 @@ void clbStoreMsgf( msgFrom_t from, uint16_t fromDetail,
 
     cbUnlock(&cbConqInfo->lockmesg);
 
-    if (SysConf.LogMessages == TRUE || to == MSG_TO_GOD
+    if (SysConf.LogMessages == true || to == MSG_TO_GOD
         || from == MSG_FROM_GOD)
     {
         clbFmtMsg(from, fromDetail, to, toDetail, buf);
@@ -2542,11 +2542,11 @@ int clbUseFuel( int snum, real fuel, int weapon, int forreal )
        ignored anyway if you don't have the fuel).  */
 
     if ( fuel <= 0.0 )
-        return ( FALSE );
+        return ( false );
     if ( weapon )
     {
         if ( cbShips[snum].wfuse > 0 )
-            return ( FALSE );
+            return ( false );
     }
     else
     {
@@ -2554,7 +2554,7 @@ int clbUseFuel( int snum, real fuel, int weapon, int forreal )
 	{
             if (forreal)
                 cbShips[snum].dwarp = 0.0;
-            return ( FALSE );
+            return ( false );
 	}
     }
 
@@ -2570,7 +2570,7 @@ int clbUseFuel( int snum, real fuel, int weapon, int forreal )
             SFCLR(snum, SHIP_F_CLOAKED);
             cbShips[snum].dwarp = 0.0;
 	}
-        return ( FALSE );
+        return ( false );
     }
     else if ( cbShips[snum].fuel > 999.0 )
     {
@@ -2618,7 +2618,7 @@ int clbUseFuel( int snum, real fuel, int weapon, int forreal )
 	}
     }
 
-    return ( TRUE );
+    return ( true );
 
 }
 
@@ -2674,12 +2674,12 @@ void clbZeroShip( int snum )
     cbShips[snum].shiptype = ST_SCOUT;
     for ( i = 0; i < NUMPLAYERTEAMS; i++ )
     {
-        cbShips[snum].rwar[i] = FALSE;
-        cbShips[snum].war[i] = FALSE;
+        cbShips[snum].rwar[i] = false;
+        cbShips[snum].war[i] = false;
         cbShips[snum].scanned[i] = 0;
     }
     for ( i = 0; i < MAXPLANETS; i++ )
-        cbShips[snum].srpwar[i] = FALSE;
+        cbShips[snum].srpwar[i] = false;
     cbShips[snum].sdfuse = 0;
     cbShips[snum].lastmsg = 0;
     cbShips[snum].alastmsg = 0;
@@ -2709,7 +2709,7 @@ void clbZeroShip( int snum )
         cbShips[snum].torps[i].dy = 0.0;
         cbShips[snum].torps[i].mult = 0.0;
         for ( j = 0; j < NUMPLAYERTEAMS; j = j + 1 )
-            cbShips[snum].torps[i].war[j] = FALSE;
+            cbShips[snum].torps[i].war[j] = false;
     }
 
     return;
@@ -2797,11 +2797,11 @@ void clbTorpDrive(real itersec)
 {
     int s, i, j;
     static int ship[MAXSHIPS];
-    static int FirstTime = TRUE;
+    static bool FirstTime = true;
 
     if (FirstTime)
     {
-        FirstTime = FALSE;
+        FirstTime = false;
         /* Randomize ship ordering. */
 
         for ( s = 0; s < MAXSHIPS; s++ )
@@ -2899,14 +2899,14 @@ void clbAdjOrbitalPosition(int snum)
 /* return time in milliseconds */
 uint32_t clbGetMillis(void)
 {
-    static int firsttime = TRUE;
+    static bool firsttime = true;
     static struct timeval start;
     struct timeval elapsed, now;
     uint32_t elapse;
 
     if (firsttime)
     {
-        firsttime = FALSE;
+        firsttime = false;
 
         GETTIMEOFDAY(&start);
     }

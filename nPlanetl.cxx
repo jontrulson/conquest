@@ -75,11 +75,11 @@ static int nPlanetlDisplay(dspConfig_t *dsp)
     const int column_2 = 41;
     char xbuf[BUFFER_SIZE_256];
     static char pd0[BUFFER_SIZE_1024];
-    static int FirstTime = TRUE;
+    static bool FirstTime = true;
 
-    if (FirstTime == TRUE)
+    if (FirstTime)
     {
-        FirstTime = FALSE;
+        FirstTime = false;
         /* build header fmt string */
         sprintf(pd0,
                 "#%d#%s#%d#%s#%d#%s#%d#%s" ,
@@ -116,7 +116,7 @@ static int nPlanetlDisplay(dspConfig_t *dsp)
     lin++;
     olin = lin;
     col = column_1;
-    col2 = FALSE;
+    col2 = false;
 
     PlanetIdx = 0;
     if (PlanetOffset < MAXPLANETS)
@@ -267,7 +267,7 @@ static int nPlanetlDisplay(dspConfig_t *dsp)
                 else
                 {
                     lin = olin;
-                    col2 = TRUE;
+                    col2 = true;
                 }
             }
 
@@ -333,7 +333,7 @@ static int nPlanetlInput(int ch)
     {
     case DSP_NODE_CP:
         setONode(NULL);
-        nCPInit(FALSE);
+        nCPInit(false);
         break;
     case DSP_NODE_MENU:
         setONode(NULL);

@@ -34,10 +34,10 @@ static int udp_sock = -1;
 /* default to 'server' mode.  If true, then we are being used in the
  * client
  */
-static int isClient = FALSE;
+static int isClient = false;
 
 /* non-blocking i/o in effect flag */
-static int nonBlocking = FALSE;
+static int nonBlocking = false;
 
 /* default protocol version that a client will be expecting.  This can
  * be changed, for example, to connect to an older (but supported
@@ -410,34 +410,34 @@ int pktInit(void)
     {
         utLog("%s: rbCreate(PKT_UDP_RB_MAX=%d) failed.",
               __FUNCTION__, PKT_UDP_RB_MAX);
-        return FALSE;             /* this is fatal */
+        return false;             /* this is fatal */
     }
 
     if (!(RB_TCPIn = rbCreate(PKT_TCP_RB_MAX)))
     {
         utLog("%s: rbCreate(PKT_TCP_RB_MAX=%d) failed.",
               __FUNCTION__, PKT_TCP_RB_MAX);
-        return FALSE;             /* this is fatal */
+        return false;             /* this is fatal */
     }
 
     if (!(RB_UDPOut = rbCreate(PKT_UDP_RB_MAX)))
     {
         utLog("%s: rbCreate(PKT_UDP_RB_MAX=%d) failed.",
               __FUNCTION__, PKT_UDP_RB_MAX);
-        return FALSE;             /* this is fatal */
+        return false;             /* this is fatal */
     }
 
     if (!(RB_TCPOut = rbCreate(PKT_TCP_RB_MAX)))
     {
         utLog("%s: rbCreate(PKT_TCP_RB_MAX=%d) failed.",
               __FUNCTION__, PKT_TCP_RB_MAX);
-        return FALSE;             /* this is fatal */
+        return false;             /* this is fatal */
     }
 
     if (cqDebug)
         utLog("%s: initialized packet ring buffers", __FUNCTION__);
 
-    return TRUE;
+    return true;
 }
 
 
@@ -471,7 +471,7 @@ int pktSetClientProtocolVersion(uint16_t vers)
 
     default:
         utLog("%s: Unsupported protocol version: %h", __FUNCTION__, vers);
-        return FALSE;
+        return false;
     }
 
     clientProtoVers = vers;
@@ -492,7 +492,7 @@ int pktIsConnDead(void)
 int pktNotImpl(char *nothing)
 {
     utLog("%s: ERROR: Packet Not Implemented", __FUNCTION__);
-    return FALSE;
+    return false;
 }
 
 /* initialize the tcp and udp sockets we'll be using in the packet routines */
@@ -589,7 +589,7 @@ int pktWaitForPacket(int type, char *buf, int blen,
 {
     int pkttype;
 
-    while (TRUE)
+    while (true)
     {
         errno = 0;		/* be afraid. */
         if ((pkttype = pktRead(buf, blen, delay)) >= 0)
@@ -653,7 +653,7 @@ int pktSocketHasData(int sock)
     fd_set readfds;
 
     if (sock < 0)
-        return FALSE;
+        return false;
 
     timeout.tv_sec = 0;		/* no wait */
     timeout.tv_usec = 0;
@@ -663,9 +663,9 @@ int pktSocketHasData(int sock)
     FD_SET(sock, &readfds);
 
     if (select(sock + 1, &readfds, NULL, NULL, &timeout) > 0)
-        return TRUE;
+        return true;
     else
-        return FALSE;
+        return false;
 
 }
 
@@ -673,7 +673,7 @@ int pktSocketHasData(int sock)
  * enough data, return 0, else return the packet type (and data)
  * this function is only suitable when reading data from a remote host.
  *
- * If update is FALSE, then we do not actually remove the data from
+ * If update is false, then we do not actually remove the data from
  * the RB.
  */
 static uint8_t _pktReadGetRB(ringBuffer_t *RB, void *buf, int blen, int update)
@@ -694,7 +694,7 @@ static uint8_t _pktReadGetRB(ringBuffer_t *RB, void *buf, int blen, int update)
     if ((bu = rbBytesUsed(RB)))
     {
         /* get the first character */
-        rbGet(RB, &type, 1, FALSE);
+        rbGet(RB, &type, 1, false);
 
         /* clients always read server pkts, and vice versa */
         if (isClient)
@@ -705,7 +705,7 @@ static uint8_t _pktReadGetRB(ringBuffer_t *RB, void *buf, int blen, int update)
         if (!len)
         {
             /* it's invalid, we are probably screwed, but dump it anyway */
-            rbGet(RB, NULL, 1, TRUE);
+            rbGet(RB, NULL, 1, true);
             utLog("%s: invalid packet type read %d, dumping\n",
                   __FUNCTION__, (int)type);
             return 0;
@@ -723,7 +723,7 @@ static uint8_t _pktReadGetRB(ringBuffer_t *RB, void *buf, int blen, int update)
             }
 
             /* now get the whole packet, removing it from the RB if
-             *  update == TRUE
+             *  update == true
              */
             rbGet(RB, (uint8_t *)packet, len, update);
 
@@ -746,7 +746,7 @@ static uint8_t _pktReadGetRB(ringBuffer_t *RB, void *buf, int blen, int update)
                      * above, then do it now.
                      */
                     if (!update)
-                        rbGet(RB, NULL, len, TRUE);
+                        rbGet(RB, NULL, len, true);
                     return 0;
                 }
             }
@@ -869,10 +869,10 @@ int pktReadPacketReady(void)
      * return it's type (>0).
      */
 
-    if ((type = _pktReadGetRB(RB_TCPIn, NULL, PKT_MAXSIZE, FALSE)))
+    if ((type = _pktReadGetRB(RB_TCPIn, NULL, PKT_MAXSIZE, false)))
         return type;
 
-    if ((type = _pktReadGetRB(RB_UDPIn, NULL, PKT_MAXSIZE, FALSE)))
+    if ((type = _pktReadGetRB(RB_UDPIn, NULL, PKT_MAXSIZE, false)))
         return type;
 
     return 0;
@@ -898,10 +898,10 @@ int pktRead(char *buf, int blen, unsigned int delay)
      * get it and return it
      */
 
-    if ((type = _pktReadGetRB(RB_TCPIn, buf, blen, TRUE)))
+    if ((type = _pktReadGetRB(RB_TCPIn, buf, blen, true)))
         return type;
 
-    if ((type = _pktReadGetRB(RB_UDPIn, buf, blen, TRUE)))
+    if ((type = _pktReadGetRB(RB_UDPIn, buf, blen, true)))
         return type;
 
     /* if we're here, then either there was no RB data, or there wasn't
@@ -972,10 +972,10 @@ int pktRead(char *buf, int blen, unsigned int delay)
     /* if we're here, we try one more time on the RB's, in case some data
      * was recently read
      */
-    if ((type = _pktReadGetRB(RB_TCPIn, buf, blen, TRUE)))
+    if ((type = _pktReadGetRB(RB_TCPIn, buf, blen, true)))
         return type;
 
-    if ((type = _pktReadGetRB(RB_UDPIn, buf, blen, TRUE)))
+    if ((type = _pktReadGetRB(RB_UDPIn, buf, blen, true)))
         return type;
 
     return 0;
@@ -1007,7 +1007,7 @@ static int _pktDrainRB(int sock, ringBuffer_t *RB)
         return 0;
 
     /* try to get as much data as possible and write it. */
-    if ((len = rbGet(RB, (uint8_t *)buf, PKT_MAXSIZE, FALSE)))
+    if ((len = rbGet(RB, (uint8_t *)buf, PKT_MAXSIZE, false)))
     {
         if ((wlen = _pktWriteSocket(sock, buf, len)) <= 0)
         {
@@ -1020,7 +1020,7 @@ static int _pktDrainRB(int sock, ringBuffer_t *RB)
         }
 
         /* remove the data for good, but don't copy it again */
-        rbGet(RB, NULL, wlen, TRUE);
+        rbGet(RB, NULL, wlen, true);
     }
 
     return wlen;
@@ -1106,12 +1106,12 @@ int pktIsValid(int pkttype, void *pkt)
     uint8_t *p = (uint8_t *)pkt;
 
     if (!p)
-        return FALSE;
+        return false;
 
     if (((uint8_t) *p) != pkttype)
-        return FALSE;
+        return false;
 
-    return TRUE;
+    return true;
 }
 
 void pktSetNodelay(void)

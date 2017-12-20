@@ -68,7 +68,7 @@ static int nTeamlDisplay(dspConfig_t *dsp)
     static bool FirstTime = true;	/* Only necc if the colors aren't
                                            going to change at runtime */
 
-    if (FirstTime == TRUE)
+    if (FirstTime)
     {
         FirstTime = false;
         sprintf(sfmt2,
@@ -326,7 +326,7 @@ static int nTeamlInput(int ch)
     {
     case DSP_NODE_CP:
         setONode(NULL);
-        nCPInit(FALSE);
+        nCPInit(false);
         break;
     case DSP_NODE_MENU:
         setONode(NULL);

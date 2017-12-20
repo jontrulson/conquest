@@ -68,7 +68,7 @@ static cqiSoundConfPtr_t       _cqiSoundConf;
 static cqiSoundPtr_t           _cqiSoundEffects;
 static cqiSoundPtr_t           _cqiSoundMusic;
 
-static int globalRead        = FALSE;
+static int globalRead        = false;
 static int numShiptypes      = 0;
 static int numPlanets        = 0;
 static int numTextures       = 0;
@@ -836,10 +836,10 @@ static int cqiValidateAnimations(void)
 
     /* if no textures, no point */
     if (!_cqiTextures)
-        return FALSE;
+        return false;
 
     if (!numAnimDefs || !numAnimations)
-        return FALSE;
+        return false;
 
     /* go through each anim def, checking various things */
     for (i=0; i<numAnimDefs; i++)
@@ -857,7 +857,7 @@ static int cqiValidateAnimations(void)
                       __FUNCTION__,
                       _cqiAnimDefs[i].name,
                       _cqiAnimDefs[i].texname);
-                return FALSE;
+                return false;
             }
         }
 
@@ -876,7 +876,7 @@ static int cqiValidateAnimations(void)
                 utLog("%s: animdef %s: texanim: stages must greater than zero.",
                       __FUNCTION__,
                       _cqiAnimDefs[i].name);
-                return FALSE;
+                return false;
             }
 
             /* must be a texname */
@@ -911,7 +911,7 @@ static int cqiValidateAnimations(void)
                           __FUNCTION__,
                           _cqiAnimDefs[i].name,
                           tbuf);
-                    return FALSE;
+                    return false;
                 }
             }
         }
@@ -924,7 +924,7 @@ static int cqiValidateAnimations(void)
                 utLog("%s: animdef %s: colanim: stages must greater than zero.",
                       __FUNCTION__,
                       _cqiAnimDefs[i].name);
-                return FALSE;
+                return false;
             }
         }
 
@@ -938,7 +938,7 @@ static int cqiValidateAnimations(void)
                 utLog("%s: animdef %s: geoanim: stages must greater than zero.",
                       __FUNCTION__,
                       _cqiAnimDefs[i].name);
-                return FALSE;
+                return false;
             }
         }
     } /* for */
@@ -954,13 +954,13 @@ static int cqiValidateAnimations(void)
                   __FUNCTION__,
                   _cqiAnimations[i].animdef,
                   _cqiAnimations[i].name);
-            return FALSE;
+            return false;
         }
         else                      /* save the index */
             _cqiAnimations[i].adIndex = ndx;
     }
 
-    return TRUE;
+    return true;
 }
 
 static int cqiValidatePlanets(void)
@@ -970,7 +970,7 @@ static int cqiValidatePlanets(void)
        point in continuing */
 
     if (!globalRead)
-        return FALSE;
+        return false;
 
     unsigned int homeplan[NUMPLAYERTEAMS] = {}; /* count of home planets */
 
@@ -994,8 +994,8 @@ static int cqiValidatePlanets(void)
             _cqiPlanets[i].ptype = PLANET_GHOST;
             _cqiPlanets[i].pteam = TEAM_NOTEAM;
             _cqiPlanets[i].armies = 0;
-            _cqiPlanets[i].visible = FALSE;
-            _cqiPlanets[i].core = FALSE;
+            _cqiPlanets[i].visible = false;
+            _cqiPlanets[i].core = false;
             _cqiPlanets[i].xcoord = 0.0;
             _cqiPlanets[i].ycoord = 0.0;
             /* leave texname blank so default rules will fire if neccessary */
@@ -1060,7 +1060,7 @@ static int cqiValidatePlanets(void)
             utLog("%s: team %s must have at least 1 homeplanet. %d were "
                   "specified.",
                   __FUNCTION__, team2str(i), homeplan[i]);
-            return FALSE;
+            return false;
         }
     }
 
@@ -1072,7 +1072,7 @@ static int cqiValidatePlanets(void)
               _cqiGlobal->maxplanets - numPlanets);
 
 
-    return TRUE;
+    return true;
 }
 
 /* parse a file */
@@ -1080,7 +1080,7 @@ int cqiLoadRC(int rcid, char *filename, int verbosity, int debugl)
 {
     FILE *infile;
     extern FILE *yyin;
-    int fail = FALSE;
+    int fail = false;
     char buffer[PATH_MAX];
 
     cqiDebugl = debugl;
@@ -1113,7 +1113,7 @@ int cqiLoadRC(int rcid, char *filename, int verbosity, int debugl)
         break;
     default:                    /* programmer error */
         utLog("%s: invalid rcid %d, bailing.", __FUNCTION__, rcid);
-        return FALSE;
+        return false;
         break;
     }
 
@@ -1134,7 +1134,7 @@ int cqiLoadRC(int rcid, char *filename, int verbosity, int debugl)
         case CQI_FILE_TEXTURESRC:
         {
             utLog("%s: FATAL: no textures.", __FUNCTION__);
-            return FALSE;
+            return false;
         }
         break;
 
@@ -1149,19 +1149,19 @@ int cqiLoadRC(int rcid, char *filename, int verbosity, int debugl)
         break;
         }
 
-        return FALSE;
+        return false;
     }
 
     initrun(rcid);
 
     yyin = infile;
 
-    goterror = FALSE;
+    goterror = false;
     lineNum = 0;
     if ( yyparse() == ERR || goterror )
     {
         utLog("conqinit: parse error." );
-        fail = TRUE;
+        fail = true;
     }
 
     fclose(infile);
@@ -1173,7 +1173,7 @@ int cqiLoadRC(int rcid, char *filename, int verbosity, int debugl)
         if (fail && rcid == CQI_FILE_TEXTURESRC)
         {
             utLog("%s: FATAL: no textures.", __FUNCTION__);
-            return FALSE;
+            return false;
         }
 
         cqiTextures = _cqiTextures;
@@ -1187,7 +1187,7 @@ int cqiLoadRC(int rcid, char *filename, int verbosity, int debugl)
         if (!cqiValidateAnimations())
         {
             utLog("%s: FATAL: no animations.", __FUNCTION__);
-            return FALSE;
+            return false;
         }
 
         if (cqiVerbose)
@@ -1203,7 +1203,7 @@ int cqiLoadRC(int rcid, char *filename, int verbosity, int debugl)
         cqiAnimDefs = _cqiAnimDefs;
         cqiNumAnimDefs = numAnimDefs;
 
-        return TRUE;
+        return true;
     }
 
     /* sounds */
@@ -1218,7 +1218,7 @@ int cqiLoadRC(int rcid, char *filename, int verbosity, int debugl)
             cqiSoundMusic = defaultSoundMusic;
             cqiNumSoundMusic = defaultNumSoundMusic;
 
-            return FALSE;
+            return false;
         }
 
         utLog("%s: loaded %d Music definitions.",
@@ -1231,7 +1231,7 @@ int cqiLoadRC(int rcid, char *filename, int verbosity, int debugl)
         cqiSoundMusic = _cqiSoundMusic;
         cqiNumSoundMusic = numSoundMusic;
 
-        return TRUE;
+        return true;
     }
 
 
@@ -1243,7 +1243,7 @@ int cqiLoadRC(int rcid, char *filename, int verbosity, int debugl)
         cqiShiptypes = defaultShiptypes;
         cqiPlanets   = defaultPlanets;
         utLog("%s: using default init tables.", __FUNCTION__);
-        return FALSE;
+        return false;
     }
 
     if (!fail)
@@ -1261,7 +1261,7 @@ int cqiLoadRC(int rcid, char *filename, int verbosity, int debugl)
         cqiPlanets   = defaultPlanets;
     }
 
-    return (fail) ? FALSE: TRUE;
+    return (fail) ? false: true;
 }
 
 static const char *ptype2str(int ptype)
@@ -1870,7 +1870,7 @@ static void startSection(int section)
             else
             {
                 memset((void *)_cqiSoundConf, 0, sizeof(cqiSoundConfRec_t));
-                _cqiSoundConf->stereo = TRUE; /* default to stereo */
+                _cqiSoundConf->stereo = true; /* default to stereo */
             }
 
         } /* else we are just overriding */
@@ -1919,10 +1919,10 @@ static void endSection(void)
             !_cqiGlobal->maxmsgs)
         {                     /* something missing */
             utLog("CQI: GLOBAL section is incomplete, ignoring.");
-            globalRead = FALSE; /* redundant I know, but.... */
+            globalRead = false; /* redundant I know, but.... */
         }
         else
-            globalRead = TRUE;
+            globalRead = true;
 
         if (globalRead)
         {                     /* alloc new planet array */
@@ -1934,7 +1934,7 @@ static void endSection(void)
             if (!_cqiPlanets)
             {
                 utLog("CQI: could not allocate memory for planets.");
-                globalRead = FALSE; /* redundant I know, but.... */
+                globalRead = false; /* redundant I know, but.... */
                 goterror++;
             }
             else
@@ -3323,13 +3323,13 @@ static int parsebool(char *str)
         ((char *)strstr("no", str) != NULL)    ||
         ((char *)strstr("off", str) != NULL))
     {
-        return(FALSE);
+        return(false);
     }
     else if (((char *)strstr("true", str) != NULL) ||
              ((char *)strstr("yes", str) != NULL)  ||
              ((char *)strstr("on", str) != NULL))
     {
-        return(TRUE);
+        return(true);
     }
     else
     {
@@ -3354,7 +3354,7 @@ static void initrun(int rcid)
             if (_cqiGlobal != &defaultGlobalInit)
                 free(_cqiGlobal);
             _cqiGlobal = NULL;
-            globalRead = FALSE;
+            globalRead = false;
         }
 
         if (_cqiShiptypes)

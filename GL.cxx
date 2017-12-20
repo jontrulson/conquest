@@ -247,7 +247,7 @@ static int initGLAnimDefs(void)
         utLog("%s: ERROR: malloc(%d) failed.", __FUNCTION__,
               sizeof(GLAnimDef_t) * cqiNumAnimDefs);
 
-        return FALSE;
+        return false;
     }
 
     memset((void *)GLAnimDefs, 0, sizeof(GLAnimDef_t) * cqiNumAnimDefs);
@@ -325,7 +325,7 @@ static int initGLAnimDefs(void)
                       sizeof(struct _anim_texture_ent) * GLAnimDefs[i].tex.stages);
 
                 /* this is fatal */
-                return FALSE;
+                return false;
             }
 
             memset((void *)GLAnimDefs[i].tex.tex,
@@ -414,7 +414,7 @@ static int initGLAnimDefs(void)
 
     } /* for */
 
-    return TRUE;
+    return true;
 }
 
 
@@ -430,7 +430,7 @@ static int initGLExplosions(void)
     /* we only need to do this once.  When we have a properly initted state,
        we will simply copy it into the torpAState array.  */
     if (!animInitState("explosion", &initastate, NULL))
-        return FALSE;
+        return false;
 
     /* we start out expired of course :) */
     initastate.expired = CQI_ANIMS_MASK;
@@ -440,7 +440,7 @@ static int initGLExplosions(void)
         for (j=0; j<MAXTORPS; j++)
             torpAStates[i][j] = initastate;
 
-    return TRUE;
+    return true;
 }
 
 static GLTexture_t *_get_tex(const char *name)
@@ -561,7 +561,7 @@ static int initGLShips(void)
     tacRingXK = _get_tex("tac-ringxk");
     tacRing10K = _get_tex("tac-ring10k");
 
-    return TRUE;
+    return true;
 }
 
 /* figure out the texture, color, and size info for a planet */
@@ -573,10 +573,10 @@ static int _get_glplanet_info(GLPlanet_t *curGLPlanet, int plani)
     int plnndx = -1;
 
     if (!GLPlanets)
-        return FALSE;
+        return false;
 
     if (plani < 0 || plani >= MAXPLANETS)
-        return FALSE;
+        return false;
 
     /* first find the appropriate texture.  We look for one in this order:
      *
@@ -643,7 +643,7 @@ static int _get_glplanet_info(GLPlanet_t *curGLPlanet, int plani)
               __FUNCTION__,
               cbPlanets[plani].name);
 
-        return FALSE;
+        return false;
     }
 
     /* now we are set, get the GLTexture */
@@ -679,7 +679,7 @@ static int _get_glplanet_info(GLPlanet_t *curGLPlanet, int plani)
 
     curGLPlanet->size = size;
 
-    return TRUE;
+    return true;
 }
 
 /* Ala Cataboligne, we will 'directionalize' all torp angles.  */
@@ -687,15 +687,15 @@ int uiUpdateTorpDir(int snum, int tnum)
 {
 
     if (snum < 0 || snum >= MAXSHIPS)
-        return FALSE;
+        return false;
 
     if (tnum < 0 || tnum >= MAXTORPS)
-        return FALSE;
+        return false;
 
     torpdir[snum][tnum] = utAngle(0.0, 0.0,
                                   cbShips[snum].torps[tnum].dx,
                                   cbShips[snum].torps[tnum].dy);
-    return TRUE;
+    return true;
 }
 
 
@@ -712,10 +712,10 @@ int uiUpdatePlanet(int plani)
     GLPlanet_t *curGLPlanet = NULL;
 
     if (!GLPlanets)
-        return FALSE;
+        return false;
 
     if (plani < 0 || plani >= MAXPLANETS)
-        return FALSE;
+        return false;
 
     curGLPlanet = &GLPlanets[plani];
 
@@ -746,7 +746,7 @@ static int initGLPlanets(void)
         utLog("%s: ERROR: malloc(%d) failed.", __FUNCTION__,
               sizeof(GLPlanet_t) * MAXPLANETS);
 
-        return FALSE;
+        return false;
     }
 
     /* now go through each one, setting up the proper values */
@@ -755,13 +755,13 @@ static int initGLPlanets(void)
         memset((void *)&curGLPlanet, 0, sizeof(GLPlanet_t));
 
         if (!_get_glplanet_info(&curGLPlanet, i))
-            return FALSE;
+            return false;
 
         /* we're done, assign it and go on to the next one */
         GLPlanets[i] = curGLPlanet;
     }
 
-    return TRUE;
+    return true;
 }
 
 /* render a 'decal' for renderHud()  */
@@ -769,7 +769,7 @@ void drawIconHUDDecal(GLfloat rx, GLfloat ry, GLfloat w, GLfloat h,
                       int imgp, cqColor icol)
 {
     int steam = cbShips[Context.snum].team, stype = cbShips[Context.snum].shiptype;
-    static int norender = FALSE;
+    static int norender = false;
     GLTexture_t *tex = &defaultTexture;
 
     if (norender)
@@ -782,7 +782,7 @@ void drawIconHUDDecal(GLfloat rx, GLfloat ry, GLfloat w, GLfloat h,
         {
             utLog("%s: initGLShips failed, bailing.",
                   __FUNCTION__);
-            norender = TRUE;
+            norender = true;
             return;                 /* we need to bail here... */
         }
 
@@ -1092,7 +1092,7 @@ void drawTexBoxCentered(GLfloat x, GLfloat y, GLfloat z, GLfloat size,
 
 void drawExplosion(GLfloat x, GLfloat y, int snum, int torpnum, int scale)
 {
-    static int norender = FALSE;
+    static int norender = false;
     scrNode_t *curnode = getTopNode();
     static int explodefx = -1;
     GLfloat scaleFac = (scale == SCALE_FAC) ? dConf.vScaleSR : dConf.vScaleLR;
@@ -1107,7 +1107,7 @@ void drawExplosion(GLfloat x, GLfloat y, int snum, int torpnum, int scale)
         {
             utLog("%s: initGLExplosions failed, bailing.",
                   __FUNCTION__);
-            norender = TRUE;
+            norender = true;
             return;                 /* we need to bail here... */
         }
 
@@ -1169,7 +1169,7 @@ void drawExplosion(GLfloat x, GLfloat y, int snum, int torpnum, int scale)
 
     glColor4fv(torpAStates[snum][torpnum].state.col.vec);
 
-    drawTexBoxCentered(0.0, 0.0, 0.0, size, FALSE, FALSE);
+    drawTexBoxCentered(0.0, 0.0, 0.0, size, false, false);
 
     glDisable(GL_TEXTURE_2D);
     glDisable(GL_BLEND);
@@ -1289,7 +1289,7 @@ void drawBombing(int snum, int scale)
 
     glColor4fv(bombAState[snum].state.col.vec);
 
-    drawTexBoxCentered(0.0, 0.0, 0.0, size, FALSE, FALSE);
+    drawTexBoxCentered(0.0, 0.0, 0.0, size, false, false);
 
     glDisable(GL_TEXTURE_2D);
     glDisable(GL_BLEND);
@@ -1306,7 +1306,7 @@ void drawPlanet( GLfloat x, GLfloat y, int pnum, int scale,
     char buf[BUFFER_SIZE_256];
     char torpchar;
     char planame[BUFFER_SIZE_256];
-    static int norender = FALSE;
+    static int norender = false;
     GLfloat scaleFac = (scale == SCALE_FAC) ? dConf.vScaleSR : dConf.vScaleLR;
 
     if (norender)
@@ -1331,7 +1331,7 @@ void drawPlanet( GLfloat x, GLfloat y, int pnum, int scale,
         {
             utLog("%s: initGLPlanets failed, bailing.",
                   __FUNCTION__);
-            norender = TRUE;
+            norender = true;
             return;                 /* we need to bail here... */
         }
 
@@ -1354,7 +1354,7 @@ void drawPlanet( GLfloat x, GLfloat y, int pnum, int scale,
     if (scale == MAP_FAC)
         size *= 2.0;
 
-    drawTexBoxCentered(x, y, TRANZ, size, FALSE, FALSE);
+    drawTexBoxCentered(x, y, TRANZ, size, false, false);
 
     glDisable(GL_TEXTURE_2D);
 
@@ -1491,14 +1491,14 @@ int GLcvtcoords(real cenx, real ceny, real x, real y, real scale,
 
     if (*rx < -limitx|| *rx > limitx)
     {
-        return FALSE;
+        return false;
     }
     if (*ry < -limity || *ry > limity)
     {
-        return FALSE;
+        return false;
     }
 
-    return TRUE;
+    return true;
 }
 
 #define WARP_UP     0
@@ -1548,7 +1548,7 @@ void setWarp(real warp)
     {                           /* stop it */
         if (engineHandle != CQS_INVHANDLE)
         {
-            cqsEffectStop(engineHandle, FALSE);
+            cqsEffectStop(engineHandle, false);
             engineHandle = CQS_INVHANDLE;
         }
     }
@@ -1563,7 +1563,7 @@ void setWarp(real warp)
         warp == maxwarp(Context.snum))
     {                           /* we are where we want to be */
         if (warpHandle != CQS_INVHANDLE)
-            cqsEffectStop(warpHandle, FALSE);
+            cqsEffectStop(warpHandle, false);
         warpHandle = CQS_INVHANDLE;
         lastwarpdir = -1;
         lastwarp = warp;
@@ -1591,7 +1591,7 @@ void setWarp(real warp)
 
         if (warpdir != lastwarpdir)
         {
-            cqsEffectStop(warpHandle, FALSE);
+            cqsEffectStop(warpHandle, false);
             warpHandle = CQS_INVHANDLE;
 
             if (warpdir == WARP_UP)
@@ -1822,12 +1822,12 @@ void graphicsInit(void)
 static void
 resize(int w, int h)
 {
-    static int minit = FALSE;
+    static int minit = false;
     real aspectCorrection;
 
     if (!minit)
     {
-        minit = TRUE;
+        minit = true;
         graphicsInit();
         glfInitFonts();
         GLError();
@@ -2069,7 +2069,7 @@ void drawTorp(GLfloat x, GLfloat y,
 
     glColor4fv(ncpTorpAnims[steam].state.col.vec);
 
-    drawTexBoxCentered(0.0, 0.0, z, size, FALSE, FALSE);
+    drawTexBoxCentered(0.0, 0.0, z, size, false, false);
 
     glDisable(GL_TEXTURE_2D);
     glDisable(GL_BLEND);
@@ -2107,7 +2107,7 @@ drawShip(GLfloat x, GLfloat y, GLfloat angle, char ch, int snum, int color,
     GLfloat alpha = 1.0;
     static const GLfloat z = 1.0;
     GLfloat size;
-    static int norender = FALSE;
+    static int norender = false;
     int steam = cbShips[snum].team, stype = cbShips[snum].shiptype;
     real shipSize = cbShipTypes[cbShips[snum].shiptype].size;
     GLfloat scaleFac = (scale == SCALE_FAC) ? dConf.vScaleSR : dConf.vScaleLR;
@@ -2122,7 +2122,7 @@ drawShip(GLfloat x, GLfloat y, GLfloat angle, char ch, int snum, int color,
         {
             utLog("%s: initGLShips failed, bailing.",
                   __FUNCTION__);
-            norender = TRUE;
+            norender = true;
             return;                 /* we need to bail here... */
         }
 
@@ -2207,7 +2207,7 @@ drawShip(GLfloat x, GLfloat y, GLfloat angle, char ch, int snum, int color,
         /* standard sh graphic */
         uiPutColor(_get_sh_color(cbShips[snum].shields));
         /* draw the shield textures at twice the ship size */
-        drawTexBoxCentered(0.0, 0.0, z, size * 2.0, FALSE, FALSE);
+        drawTexBoxCentered(0.0, 0.0, z, size * 2.0, false, false);
 
         glDisable(GL_TEXTURE_2D);
         glPopMatrix();
@@ -2242,7 +2242,7 @@ drawShip(GLfloat x, GLfloat y, GLfloat angle, char ch, int snum, int color,
               GLTEX_COLOR(GLShips[steam][stype].ship).b,
               alpha);
 
-    drawTexBoxCentered(0.0, 0.0, z, size, FALSE, FALSE);
+    drawTexBoxCentered(0.0, 0.0, z, size, false, false);
 
     glDisable(GL_TEXTURE_2D);
 
@@ -2282,7 +2282,7 @@ void drawDoomsday(GLfloat x, GLfloat y, GLfloat dangle, GLfloat scale)
     static GLfloat doomsizeSR, doomsizeLR;
     GLfloat size, bsize;
     static GLfloat beamRadiusSR, beamRadiusLR;
-    static int norender = FALSE;  /* if no tex, no point... */
+    static int norender = false;  /* if no tex, no point... */
     bool drawAPBeam = false;
     static animStateRec_t doomapfire = {}; /* animdef state for ap firing */
     static int beamfx = -1;       /* Cataboligne - beam sound */
@@ -2307,7 +2307,7 @@ void drawDoomsday(GLfloat x, GLfloat y, GLfloat dangle, GLfloat scale)
         {
             utLog("%s: Could not find the doomsday texture,  bailing.",
                   __FUNCTION__);
-            norender = TRUE;
+            norender = true;
             return;
         }
 
@@ -2316,7 +2316,7 @@ void drawDoomsday(GLfloat x, GLfloat y, GLfloat dangle, GLfloat scale)
         {
             utLog("%s: Could not find the doombeam texture,  bailing.",
                   __FUNCTION__);
-            norender = TRUE;
+            norender = true;
             return;
         }
 
@@ -2444,7 +2444,7 @@ void drawDoomsday(GLfloat x, GLfloat y, GLfloat dangle, GLfloat scale)
 
     glColor4fv(GLTEX_COLOR(GLDoomsday.doom).vec);
 
-    drawTexBoxCentered(0.0, 0.0, z, size, FALSE, FALSE);
+    drawTexBoxCentered(0.0, 0.0, z, size, false, false);
 
     glDisable(GL_TEXTURE_2D);
 
@@ -2484,9 +2484,9 @@ void drawDoomsday(GLfloat x, GLfloat y, GLfloat dangle, GLfloat scale)
 */
 void drawNEB(int snum)
 {
-    int nebXVisible = FALSE;
-    int nebYVisible = FALSE;
-    static int inited = FALSE;
+    int nebXVisible = false;
+    int nebYVisible = false;
+    static int inited = false;
     static const GLfloat nebCenter = ((NEGENBEND_DIST - NEGENB_DIST) / 2.0);
     real nearx, neary;
     GLfloat tx, ty;
@@ -2494,7 +2494,7 @@ void drawNEB(int snum)
     static GLfloat nebWidthSR, nebHeightSR;
     static GLfloat nebWidthLR, nebHeightLR;
     GLfloat nebX, nebY;
-    static int norender = FALSE;
+    static int norender = false;
     /* our wall animation state */
     static animStateRec_t nebastate;    /* initial state of neb texture */
     static uint32_t geoChangeCount = 0;
@@ -2504,12 +2504,12 @@ void drawNEB(int snum)
 
     if (!inited)
     {
-        inited = TRUE;
+        inited = true;
 
         /* get our anim */
         if (!animInitState("neb", &nebastate, NULL))
         {
-            norender = TRUE;
+            norender = true;
             return;
         }
     }
@@ -2547,11 +2547,11 @@ void drawNEB(int snum)
        can see it */
     if (fabs( cbShips[snum].x ) >= NEGENB_DIST &&
         fabs( cbShips[snum].x ) <= NEGENBEND_DIST)
-        nebXVisible = TRUE;
+        nebXVisible = true;
 
     if (fabs( cbShips[snum].y ) >= NEGENB_DIST &&
         fabs( cbShips[snum].y ) <= NEGENBEND_DIST)
-        nebYVisible = TRUE;
+        nebYVisible = true;
 
     if (!nebXVisible)
     {
@@ -2581,7 +2581,7 @@ void drawNEB(int snum)
                         (SMAP(snum) ? MAP_FAC : SCALE_FAC),
                         &tx, &ty))
         {
-            nebXVisible = TRUE;
+            nebXVisible = true;
         }
     }
 
@@ -2617,7 +2617,7 @@ void drawNEB(int snum)
                         (SMAP(snum) ? MAP_FAC : SCALE_FAC),
                         &tx, &ty))
         {
-            nebYVisible = TRUE;
+            nebYVisible = true;
         }
     }
 #if 0                           /* debugging test point (murisak) */
@@ -3004,7 +3004,7 @@ static int checkTexture(const char *filename, textureImage *texture)
     {
         utLog("%s: %s: ERROR: Unsupported number of components: %d",
               __FUNCTION__, filename, texture->components);
-        return FALSE;
+        return false;
     }
 
     glTexImage2D(GL_PROXY_TEXTURE_2D, 0, components,
@@ -3019,10 +3019,10 @@ static int checkTexture(const char *filename, textureImage *texture)
     {
         utLog("%s: ERROR: Texture too big, or non power of two in width or height).",
               filename);
-        return FALSE;
+        return false;
     }
 
-    return TRUE;
+    return true;
 }
 
 // load an image file into a raw "pre-texture".  Pretty simple with
@@ -3056,10 +3056,10 @@ static bool loadImageFile(const char *filename, textureImage *texture)
     {
         stbi_image_free(texture->imageData);
         texture->imageData = NULL;
-        return FALSE;
+        return false;
     }
 
-    return TRUE;
+    return true;
 }
 
 /* look for a texture file and return a file name.  We look
@@ -3100,7 +3100,7 @@ static char *_getTexFile(char *tfilenm)
 
 static int loadGLTextures()
 {
-    int rv = FALSE;
+    int rv = false;
     textureImage *texti;
     int i, type, components;         /* for RGBA */
     char *filenm;
@@ -3112,7 +3112,7 @@ static int loadGLTextures()
     {                           /* we have a problem */
         utLog("%s: ERROR: cqiNumTextures or cqiTextures is 0! No textures loaded.\n",
               __FUNCTION__);
-        return FALSE;
+        return false;
     }
 
     /* first, setup the 'default' texture */
@@ -3123,15 +3123,15 @@ static int loadGLTextures()
     {
         int texid = 0, texw = 0, texh = 0;
         int ndx = -1;
-        int col_only = FALSE;     /* color-only texture? */
+        int col_only = false;     /* color-only texture? */
 
         memset((void *)&curTexture, 0, sizeof(GLTexture_t));
         texid = 0;
         texw = texh = 0;          /* default width/height */
-        rv = FALSE;
+        rv = false;
 
         if (cqiTextures[i].flags & CQITEX_F_COLOR_SPEC)
-            col_only = TRUE;
+            col_only = true;
 
         /* first see if a texture with the same filename was already loaded.
            if so, no need to do it again, just copy the previously loaded
@@ -3158,7 +3158,7 @@ static int loadGLTextures()
             {
                 utLog("%s: texti malloc(%d) failed\n",
                       __FUNCTION__, sizeof(textureImage));
-                return FALSE;
+                return false;
             }
 
             memset((void *)texti, 0, sizeof(textureImage));
@@ -3166,7 +3166,7 @@ static int loadGLTextures()
             /* look for a suitable file */
             if (!(filenm = _getTexFile(cqiTextures[i].filename)))
             {
-                rv = FALSE;
+                rv = false;
             }
             else if ((rv = loadImageFile(filenm, texti)))
             {
@@ -3256,7 +3256,7 @@ static int loadGLTextures()
                       __FUNCTION__,
                       loadedGLTextures + 1,
                       cqiTextures[i].name);
-                return FALSE;
+                return false;
             }
 
             GLTextures = texptr;
@@ -3282,7 +3282,7 @@ static int loadGLTextures()
     utLog("%s: Successfully loaded %d textures, (%d files).",
           __FUNCTION__, loadedGLTextures, hwtextures);
 
-    return TRUE;
+    return true;
 }
 
 /* scale can be between -5 and 5.  negative means zoom out */

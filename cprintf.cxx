@@ -31,7 +31,7 @@ void cprintf(int lin, int col, int align, const char *fmt, ...)
     int i, j, k;
     int len, vcol;
     int color_num;
-    int two_passes = FALSE;
+    int two_passes = false;
     static char buf[BUFFER_SIZE_1024] = {};
     static char xbuf[BUFFER_SIZE_1024] = {};
     static char color_code[BUFFER_SIZE_256] = {};
@@ -48,8 +48,8 @@ void cprintf(int lin, int col, int align, const char *fmt, ...)
     /* end of it */
 
     if ( align == ALIGN_CENTER )
-        two_passes = TRUE;
-    while (TRUE)
+        two_passes = true;
+    while (true)
     {
         i=0;j=0;
         xbuf[0]=0;
@@ -113,12 +113,12 @@ void cprintf(int lin, int col, int align, const char *fmt, ...)
         if ( two_passes )
 	{
             vcol = ((Context.maxcol / 2) - (len / 2));
-            two_passes = FALSE;
+            two_passes = false;
 	}
         else
             break; /* one pass and we're done. */
 
-    } /* end while (TRUE) */
+    } /* end while (true) */
 
     uiPutColor(0);
 

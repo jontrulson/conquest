@@ -90,10 +90,10 @@ int getLocalhost(char *buf, int len)
     {
         if (buf)
             fprintf(stderr, "conquest: gethostbyname('%s'): cannot get localhost info.\n", buf);
-        return FALSE;
+        return false;
     }
 
-    return TRUE;
+    return true;
 }
 
 /* parse the geometry arg.  Ensure that dConf init w/h are only
@@ -284,9 +284,9 @@ int main(int argc, char *argv[])
 {
     int i;
     char *ch;
-    int wantMetaList = FALSE;     /* wants to see a list from metaserver */
-    int serveropt = FALSE;        /* specified a server with '-s' */
-    int dosound = TRUE;
+    int wantMetaList = false;     /* wants to see a list from metaserver */
+    int serveropt = false;        /* specified a server with '-s' */
+    int dosound = true;
 #if defined(MINGW)
     WSADATA wsaData;
     int rv;
@@ -294,10 +294,10 @@ int main(int argc, char *argv[])
 
 
     /* tell the packet routines that we are a client */
-    pktSetClientMode(TRUE);
+    pktSetClientMode(true);
     pktSetClientProtocolVersion(PROTOCOL_VERSION);
 
-    Context.entship = FALSE;
+    Context.entship = false;
     Context.recmode = RECMODE_OFF;
     Context.updsec = 10;		/* dflt - 10/sec */
     Context.msgrand = time(0);
@@ -305,14 +305,14 @@ int main(int argc, char *argv[])
     utStrncpy(cInfo.metaServer, META_DFLT_SERVER, MAXHOSTNAME);
     cInfo.sock = -1;
     cInfo.usock = -1;
-    cInfo.doUDP = FALSE;
-    cInfo.tryUDP = TRUE;
+    cInfo.doUDP = false;
+    cInfo.tryUDP = true;
     cInfo.state = CLT_STATE_PREINIT;
-    cInfo.serverDead = TRUE;
-    cInfo.isLoggedIn = FALSE;
+    cInfo.serverDead = true;
+    cInfo.isLoggedIn = false;
     cInfo.remoteport = CN_DFLT_PORT;
 
-    utSetLogConfig(FALSE, TRUE);	/* use CQ_USERHOMEDIR for logfile */
+    utSetLogConfig(false, true);	/* use CQ_USERHOMEDIR for logfile */
 
     cInfo.remotehost = strdup("localhost"); /* default to your own server */
 
@@ -344,7 +344,7 @@ int main(int argc, char *argv[])
             parseGeometry(optarg);
             break;
         case 'm':
-            wantMetaList = TRUE;
+            wantMetaList = true;
             break;
         case 'M':
             utStrncpy(cInfo.metaServer, optarg, MAXHOSTNAME);
@@ -376,14 +376,14 @@ int main(int argc, char *argv[])
             else
                 cInfo.remoteport = CN_DFLT_PORT;
 
-            serveropt = TRUE;
+            serveropt = true;
 
             break;
         case 'r':
             /* don't want to do this if we've already seen -P */
             if (Context.recmode != RECMODE_PLAYING)
             {
-                if (recOpenOutput(optarg, FALSE))
+                if (recOpenOutput(optarg, false))
                 {			/* we are almost ready... */
                     Context.recmode = RECMODE_STARTING;
                     printf("Recording game to %s...\n", optarg);
@@ -400,15 +400,15 @@ int main(int argc, char *argv[])
         case 'P':
             recFilename = optarg;
             Context.recmode = RECMODE_PLAYING;
-            dosound = FALSE;        /* no sound during playback */
+            dosound = false;        /* no sound during playback */
             break;
 
         case 'u':
-            cInfo.tryUDP = FALSE;
+            cInfo.tryUDP = false;
             break;
 
         case 'S':
-            dosound = FALSE;
+            dosound = false;
             break;
 
         case 'v':
@@ -449,7 +449,7 @@ int main(int argc, char *argv[])
      */
 #if defined(MINGW)
     if (!serveropt && !wantMetaList && Context.recmode != RECMODE_PLAYING)
-        wantMetaList = TRUE;
+        wantMetaList = true;
 #endif
 
     if (Context.recmode == RECMODE_PLAYING)
@@ -457,7 +457,7 @@ int main(int argc, char *argv[])
         if (serveropt || wantMetaList)
             printf("-P option specified.  All other options ignored.\n");
 
-        serveropt = wantMetaList = FALSE;
+        serveropt = wantMetaList = false;
         printf("Scanning file %s...\n", recFilename);
 
         /* On windows, over a shared folder in VBox, this will be way slow */
@@ -471,15 +471,15 @@ int main(int argc, char *argv[])
         Context.unum = -1;       /* stow user number */
 
         /* turn off annoying beeps */
-        UserConf.DoAlarms = FALSE;
+        UserConf.DoAlarms = false;
         /* turn off hudInfo */
-        UserConf.hudInfo = FALSE;
+        UserConf.hudInfo = false;
     }
 
     if (serveropt && wantMetaList)
     {
         printf("-m ignored, since -s was specified\n");
-        wantMetaList = FALSE;
+        wantMetaList = false;
     }
 
     /* load the globals/planets, etc */
@@ -499,7 +499,7 @@ int main(int argc, char *argv[])
         cqsInitSound();
     }
     else
-        cqsSoundAvailable = FALSE;
+        cqsSoundAvailable = false;
 
 #ifdef DEBUG_FLOW
     utLog("%s@%d: main() starting conqinit().", __FILE__, __LINE__);
@@ -515,7 +515,7 @@ int main(int argc, char *argv[])
 
     uiGLInit(&argc, argv);
 
-    cqsMusicPlay(cqsFindMusic("intro"), FALSE);
+    cqsMusicPlay(cqsFindMusic("intro"), false);
 
     Context.maxlin = 25;
     Context.maxcol = 80;

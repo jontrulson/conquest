@@ -23,10 +23,10 @@
 #include "conqutil.h"
 
 /* if set, utLog uses the system log, else it is created in HOME */
-static int systemlog   = TRUE;
-static int echo2stderr = FALSE;  /* whether to echo utLog to stderr */
+static int systemlog   = true;
+static int echo2stderr = false;  /* whether to echo utLog to stderr */
                                  /* this will be ignored if systemlog is
-                                    TRUE */
+                                    true */
 
 /*  utAccurateDist - figure distance traveled while changing velocities */
 /*  SYNOPSIS */
@@ -236,9 +236,9 @@ int utArrowsToDir( char *str, real *dir )
     /* Special hack preventing "ea" and "da" from being recognized as arrows. */
     /* "ea" is reserved for Earth and "da" for Dakel. */
     if ( (char)tolower(str[0]) == 'e' && (char)tolower(str[1]) == 'a' )
-        return ( FALSE );
+        return ( false );
     if ( (char)tolower(str[0]) == 'd' && (char)tolower(str[1]) == 'a' )
-        return ( FALSE );
+        return ( false );
 
     thedir = 0.0;
 
@@ -257,7 +257,7 @@ int utArrowsToDir( char *str, real *dir )
         }
 
         if (*s == 0) // not found
-            return ( FALSE );
+            return ( false );
 
         ndir1 = (real)(idx - 1) * 45.0;
         ndir2 = (real)ndir1 - 360.0;
@@ -274,7 +274,7 @@ int utArrowsToDir( char *str, real *dir )
 
     *dir = utMod360( thedir );
 
-    return ( TRUE );
+    return ( true );
 
 }
 
@@ -282,12 +282,12 @@ void utSetLogConfig(int usesys, int echostderr)
 {
     if (usesys)
     {
-        systemlog = TRUE;
-        echo2stderr = FALSE;
+        systemlog = true;
+        echo2stderr = false;
     }
     else
     {
-        systemlog = FALSE;
+        systemlog = false;
         echo2stderr = echostderr;
     }
 
@@ -297,7 +297,7 @@ void utSetLogConfig(int usesys, int echostderr)
 void utLog(const char *fmt, ...)
 {
     va_list ap;
-    static int nowarn = FALSE;     /* if set, ignore logging */
+    static int nowarn = false;     /* if set, ignore logging */
     static char buf[BUFFER_SIZE_256] = {};
     static char errfile[PATH_MAX] = {};
     static FILE *errfd = NULL;
@@ -343,7 +343,7 @@ void utLog(const char *fmt, ...)
                     fprintf(stderr, "utLog(): creat(%s): %s\n",
                             errfile,
                             strerror(errno));
-                    nowarn = TRUE;
+                    nowarn = true;
                 }
 
                 if (!systemlog)
@@ -351,7 +351,7 @@ void utLog(const char *fmt, ...)
                     /* if the logfile could not be created for a user,
                        keep trying (the .conquest/ dir may not exist
                        yet), but only log an error once. */
-                    nowarn = TRUE;
+                    nowarn = true;
                     return;
                 }
                 else
@@ -507,12 +507,12 @@ void utFormatMinutes( int itime, char *buf )
 
     if ( itime < 0 )
     {
-        minus = TRUE;
+        minus = true;
         i = -itime;
     }
     else
     {
-        minus = FALSE;
+        minus = false;
         i = itime;
     }
 
@@ -558,12 +558,12 @@ void utFormatSeconds( int itime, char *buf )
 
     if ( itime < 0 )
     {
-        minus = TRUE;
+        minus = true;
         i = -itime;
     }
     else
     {
-        minus = FALSE;
+        minus = false;
         i = itime;
     }
 
@@ -607,10 +607,10 @@ int utGetMsg( int snum, int *msg )
     {
         *msg = utModPlusOne( *msg + 1, MAXMESSAGES );
         if ( clbCanRead( snum, *msg ) )
-            return(TRUE);
+            return(true);
 
     }
-    return ( FALSE );
+    return ( false );
 }
 
 
@@ -726,14 +726,14 @@ int utModPlusOne( int i, int modulus )
 int utSafeCToI( int *num, char *buf, int offset )
 {
     if (!buf || !num)
-        return FALSE;
+        return false;
 
     int slen = strlen(buf);
 
     if (offset >= slen)
     {
         *num = 0;
-        return FALSE;
+        return false;
     }
 
     *num = atoi( &buf[offset]);
@@ -744,10 +744,10 @@ int utSafeCToI( int *num, char *buf, int offset )
     if ( *num >= INT_MAX )
     {
         *num = INT_MAX;
-        return FALSE;
+        return false;
     }
 
-    return ( TRUE );
+    return ( true );
 }
 
 
@@ -768,7 +768,7 @@ int utIsSpecial( char *str, int *what, int *token, int *count )
 
     /* Reject obvious losers. */
     if ( str[0] != 'n' && str[0] != 'w' && str[0] != 'h' )
-        return ( FALSE );
+        return ( false );
 
     utStrncpy( buf, str, 20 );			/* need a private copy */
 
@@ -779,67 +779,67 @@ int utIsSpecial( char *str, int *what, int *token, int *count )
     buf[i] = 0;				/* ditch numeric part */
     utSafeCToI( count, str, i );		/* ignore status */
 
-    if ( utStringMatch( buf, "nes", FALSE ) )	/* this one must be first */
+    if ( utStringMatch( buf, "nes", false ) )	/* this one must be first */
     {
         *what = NEAR_SHIP;
         *token = SPECIAL_ENEMYSHIP;
     }
-    else if ( utStringMatch( buf, "nfp", FALSE ) )
+    else if ( utStringMatch( buf, "nfp", false ) )
     {
         *what = NEAR_PLANET;
         *token = SPECIAL_FUELPLANET;
     }
-    else if ( utStringMatch( buf, "nep", FALSE ) )
+    else if ( utStringMatch( buf, "nep", false ) )
     {
         *what = NEAR_PLANET;
         *token = SPECIAL_ENEMYPLANET;
     }
-    else if ( utStringMatch( buf, "ns", FALSE ) )
+    else if ( utStringMatch( buf, "ns", false ) )
     {
         *what = NEAR_SHIP;
         *token = SPECIAL_SHIP;
     }
-    else if ( utStringMatch( buf, "np", FALSE ) )
+    else if ( utStringMatch( buf, "np", false ) )
     {
         *what = NEAR_PLANET;
         *token = SPECIAL_PLANET;
     }
-    else if ( utStringMatch( buf, "nts", FALSE ) )
+    else if ( utStringMatch( buf, "nts", false ) )
     {
         *what = NEAR_SHIP;
         *token = SPECIAL_TEAMSHIP;
     }
-    else if ( utStringMatch( buf, "nap", FALSE ) )
+    else if ( utStringMatch( buf, "nap", false ) )
     {
         *what = NEAR_PLANET;
         *token = SPECIAL_ARMYPLANET;
         if ( *count <= 0 )
             *count = 1;
     }
-    else if ( utStringMatch( buf, "wp", FALSE ) )
+    else if ( utStringMatch( buf, "wp", false ) )
     {
         *what = NEAR_PLANET;
         *token = SPECIAL_WEAKPLANET;
     }
-    else if ( utStringMatch( buf, "ntp", FALSE ) )
+    else if ( utStringMatch( buf, "ntp", false ) )
     {
         *what = NEAR_PLANET;
         *token = SPECIAL_TEAMPLANET;
     }
-    else if ( utStringMatch( buf, "nrp", FALSE ) )
+    else if ( utStringMatch( buf, "nrp", false ) )
     {
         *what = NEAR_PLANET;
         *token = SPECIAL_REPAIRPLANET;
     }
-    else if ( utStringMatch( buf, "hp", FALSE ) )
+    else if ( utStringMatch( buf, "hp", false ) )
     {
         *what = NEAR_PLANET;
         *token = SPECIAL_HOMEPLANET;
     }
     else
-        return ( FALSE );		/* string simply isn't special */
+        return ( false );		/* string simply isn't special */
 
-    return ( TRUE );
+    return ( true );
 
 }
 
@@ -882,14 +882,14 @@ int utStringMatch( const char *str1, const char *str2, int casesensitive )
     if ( i == 0 )
     {
         if ( str1[0] == 0 && str2[0] == 0 )
-            return ( TRUE );
+            return ( true );
         else
-            return ( FALSE );
+            return ( false );
     }
     else if ( str1[i] == 0 || str2[i] == 0 )
-        return ( TRUE );
+        return ( true );
 
-    return ( FALSE );
+    return ( false );
 
 }
 

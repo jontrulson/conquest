@@ -65,7 +65,7 @@ static void _music_finished(void)
     if (curque >= 0)
     {
         _mus_que = -1;               /* turn off the que */
-        cqsMusicPlay(curque, FALSE); /* and play it */
+        cqsMusicPlay(curque, false); /* and play it */
     }
 
     return;
@@ -82,7 +82,7 @@ static void _effect_finished(int channel)
         if (cqsChannels[i].channel == channel)
         {                       /* turn it off */
             cqsChannels[i].channel = -1;
-            cqsChannels[i].active = FALSE;
+            cqsChannels[i].active = false;
             cqsChannels[i].idx = -1;
         }
     }
@@ -376,7 +376,7 @@ static int cqsLoadSounds(void)
     utLog("%s: Loaded %d Music files.", __FUNCTION__, nummus);
     utLog("%s: Loaded %d Effect files.", __FUNCTION__, numfx);
 
-    return TRUE;
+    return true;
 }
 
 
@@ -389,7 +389,7 @@ void cqsInitSound(void)
     int i;
 
     utLog("%s: Initializing...", __FUNCTION__);
-    cqsSoundAvailable = FALSE;
+    cqsSoundAvailable = false;
     CQS_DISABLE(CQS_EFFECTS | CQS_MUSIC);
 
     if (!cqiSoundConf || (!cqiSoundEffects && !cqiSoundMusic))
@@ -440,7 +440,7 @@ void cqsInitSound(void)
 
     for (i=0; i<CQS_MAX_CHANNELS; i++)
     {
-        cqsChannels[i].active = FALSE;
+        cqsChannels[i].active = false;
         cqsChannels[i].channel = -1;
         cqsChannels[i].idx = -1;
     }
@@ -517,7 +517,7 @@ void cqsInitSound(void)
     /* now, enable sound */
     if (cqsNumEffects || cqsNumMusic)
     {
-        cqsSoundAvailable = TRUE;
+        cqsSoundAvailable = true;
 
         if (cqsNumEffects)
             CQS_ENABLE(CQS_EFFECTS);
@@ -539,7 +539,7 @@ int cqsMusicPlay(int musidx, int halt)
     int rv;
 
     if (!CQS_ISENABLED(CQS_MUSIC) || musidx < 0 || musidx >= cqsNumMusic)
-        return FALSE;
+        return false;
 
 #if defined(DEBUG_SOUND)
     utLog("%s: playing %d (%s)", __FUNCTION__,
@@ -558,7 +558,7 @@ int cqsMusicPlay(int musidx, int halt)
             _mus_que = musidx;
             Mix_HookMusicFinished(_music_finished);
             Mix_FadeOutMusic(cqsMusic[_mus_idx].fadeoutms);
-            return TRUE;
+            return true;
         }
         else
         {
@@ -582,20 +582,20 @@ int cqsMusicPlay(int musidx, int halt)
         utLog("%s: PlayMusic/FadeInMusic failed: %s", __FUNCTION__,
               Mix_GetError());
         _mus_idx = -1;
-        return FALSE;
+        return false;
     }
     else
     {
         _mus_idx = musidx;
     }
 
-    return TRUE;
+    return true;
 }
 
 int cqsMusicStop(int halt)
 {
     if (!cqsSoundAvailable)
-        return FALSE;
+        return false;
 
 #if defined(DEBUG_SOUND)
     utLog("%s: stopping music halt = %d idx %d (fade %d)", __FUNCTION__,
@@ -614,7 +614,7 @@ int cqsMusicStop(int halt)
 
     _mus_idx = -1;
 
-    return TRUE;
+    return true;
 }
 
 /* play an effect, returning the cqsHandle if handle is non-NULL */
@@ -626,7 +626,7 @@ int cqsEffectPlay(int fxidx, cqsHandle *handle, real maxdist,
     int limit = 0;              /* limit we found if effect is limited */
 
     if (!CQS_ISENABLED(CQS_EFFECTS) || fxidx < 0 || fxidx >= cqsNumEffects)
-        return FALSE;
+        return false;
 
 #if defined(DEBUG_SOUND)
     utLog("%s: playing %d (%s) loops %d vol = %d pan = %d  - %f %f %f",
@@ -651,10 +651,10 @@ int cqsEffectPlay(int fxidx, cqsHandle *handle, real maxdist,
     }
 
     if (empty < 0)
-        return FALSE;               /* no hope */
+        return false;               /* no hope */
 
     if (cqsEffects[fxidx].limit && limit >= cqsEffects[fxidx].limit)
-        return FALSE;               /* already playing the limit */
+        return false;               /* already playing the limit */
 
     /* check the delay limit if any */
     /* we make sure that lasttime is non-zero so it will always play
@@ -662,7 +662,7 @@ int cqsEffectPlay(int fxidx, cqsHandle *handle, real maxdist,
     if (cqsEffects[fxidx].lasttime && cqsEffects[fxidx].delayms &&
         ((frameTime - cqsEffects[fxidx].lasttime) < cqsEffects[fxidx].delayms))
     {
-        return FALSE;
+        return false;
     }
 
     /* see if there's a framelimit */
@@ -677,7 +677,7 @@ int cqsEffectPlay(int fxidx, cqsHandle *handle, real maxdist,
             cqsEffects[fxidx].framecount++;
 
         if (cqsEffects[fxidx].framecount > cqsEffects[fxidx].framelimit)
-            return FALSE;        /* hit the limit */
+            return false;        /* hit the limit */
     }
 
     /* ok, we are good to go.  Init the channel slot, que the effect
@@ -695,10 +695,10 @@ int cqsEffectPlay(int fxidx, cqsHandle *handle, real maxdist,
               cqiSoundEffects[cqsEffects[fxidx].cqiIndex].name);
 #endif
 
-        return FALSE;
+        return false;
     }
 
-    cqsChannels[empty].active = TRUE;
+    cqsChannels[empty].active = true;
     cqsChannels[empty].idx = fxidx;
 
     cqsEffects[fxidx].lasttime = frameTime;
@@ -733,13 +733,13 @@ int cqsEffectPlay(int fxidx, cqsHandle *handle, real maxdist,
         Mix_SetPosition(cqsChannels[empty].channel, mangle, mdist);
     }
 
-    return TRUE;
+    return true;
 }
 
 int cqsEffectStop(cqsHandle handle, int halt)
 {
     if (!cqsSoundAvailable)
-        return FALSE;
+        return false;
 
 #if defined(DEBUG_SOUND)
     utLog("%s: stopping effects halt = %d (hndl %d)", __FUNCTION__,
@@ -752,16 +752,16 @@ int cqsEffectStop(cqsHandle handle, int halt)
         {                           /* this is a special case, meaning to
                                        immediately halt all channels */
             Mix_HaltChannel(-1);
-            return TRUE;
+            return true;
         }
 
-        return FALSE;
+        return false;
     }
 
     if (handle >= CQS_MAX_CHANNELS ||
         !cqsChannels[handle].active || cqsChannels[handle].idx == -1 ||
         cqsChannels[handle].channel == -1)
-        return FALSE;
+        return false;
 
     if (halt || !cqsEffects[cqsChannels[handle].idx].fadeoutms)
         Mix_HaltChannel(cqsChannels[handle].channel);
@@ -773,7 +773,7 @@ int cqsEffectStop(cqsHandle handle, int halt)
        stop/fadeout should result in cqsChannels being cleaned up when
        finished if it was a tracked effect */
 
-    return TRUE;
+    return true;
 }
 
 /* set one (or both) of the volumes */
@@ -790,7 +790,7 @@ void cqsUpdateVolume(void)
     {
         if (CQS_ISENABLED(CQS_MUSIC))
         {
-            cqsMusicStop(TRUE);
+            cqsMusicStop(true);
             CQS_DISABLE(CQS_MUSIC);
         }
     }
@@ -804,7 +804,7 @@ void cqsUpdateVolume(void)
     {
         if (CQS_ISENABLED(CQS_EFFECTS))
         {
-            cqsEffectStop(CQS_INVHANDLE, TRUE);
+            cqsEffectStop(CQS_INVHANDLE, true);
             CQS_DISABLE(CQS_EFFECTS);
         }
     }
@@ -833,7 +833,7 @@ void cqsUpdateVolume(void)
 
 int cqsMusicPlaying(void)
 {
-    return ((cqsNumMusic && Mix_PlayingMusic()) ? TRUE : FALSE);
+    return ((cqsNumMusic && Mix_PlayingMusic()) ? true : false);
 }
 
 #endif /* !CQS_NO_SOUND */

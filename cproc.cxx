@@ -53,21 +53,21 @@ int procDispatchInit(uint16_t vers, packetEnt_t *pktList, int numpkts)
     {
         utLog("%s: Could not find dispatch table for vers %h.",
               __FUNCTION__, vers);
-        return FALSE;
+        return false;
     }
 
     if (numprocs != numpkts)
     {
         utLog("%s: numprocs does not equal numpkts for vers %h.",
               __FUNCTION__, vers);
-        return FALSE;
+        return false;
     }
 
     /* now init the dispatch entries */
     for (i=0; i < numpkts; i++)
         pktList[i].dispatch = procs[i];
 
-    return TRUE;
+    return true;
 }
 
 /* packet processing for current protocol */
@@ -78,7 +78,7 @@ int procUser(char *buf)
     spUser_t *suser = (spUser_t *)buf;
 
     if (!pktIsValid(SP_USER, buf))
-        return FALSE;
+        return false;
 
     unum = (int)((uint16_t)ntohs(suser->unum));
 
@@ -87,7 +87,7 @@ int procUser(char *buf)
 #endif
 
     if (unum < 0 || unum >= MAXUSERS)
-        return FALSE;
+        return false;
 
     if (Context.recmode == RECMODE_ON)
         recWriteEvent(buf);
@@ -100,7 +100,7 @@ int procUser(char *buf)
 
     for (i=0; i<NUMPLAYERTEAMS; i++)
         if ((suser->war & (1 << i)))
-            cbUsers[unum].war[i] = TRUE;
+            cbUsers[unum].war[i] = true;
 
     cbUsers[unum].rating = (real)((real)((int16_t)ntohs(suser->rating)) / 10.0);
     cbUsers[unum].lastentry = (time_t)ntohl(suser->lastentry);
@@ -115,7 +115,7 @@ int procUser(char *buf)
     utLog("\t%s: name: %s (%s)", __FUNCTION__, cbUsers[unum].username, cbUsers[unum].alias);
 #endif
 
-    return TRUE;
+    return true;
 }
 
 int procShip(char *buf)
@@ -125,11 +125,11 @@ int procShip(char *buf)
     int snum;
 
     if (!pktIsValid(SP_SHIP, buf))
-        return FALSE;
+        return false;
 
     snum = sship->snum;
     if (snum < 0 || snum >= MAXSHIPS)
-        return FALSE;
+        return false;
 
 #if defined(DEBUG_CLIENTPROC)
     utLog("PROC SHIP: snum = %d", snum);
@@ -145,14 +145,14 @@ int procShip(char *buf)
     for (i=0; i<NUMPLAYERTEAMS; i++)
     {
         if (sship->war & (1 << i))
-            cbShips[snum].war[i] = TRUE;
+            cbShips[snum].war[i] = true;
         else
-            cbShips[snum].war[i] = FALSE;
+            cbShips[snum].war[i] = false;
 
         if (sship->rwar & (1 << i))
-            cbShips[snum].rwar[i] = TRUE;
+            cbShips[snum].rwar[i] = true;
         else
-            cbShips[snum].rwar[i] = FALSE;
+            cbShips[snum].rwar[i] = false;
     }
 
     cbShips[snum].killedBy = (killedBy_t)sship->killedBy;
@@ -170,7 +170,7 @@ int procShip(char *buf)
     sship->alias[MAXUSERNAME - 1] = 0;
     utStrncpy(cbShips[snum].alias, (char *)sship->alias, MAXUSERNAME);
 
-    return TRUE;
+    return true;
 }
 
 int procShipSml(char *buf)
@@ -179,12 +179,12 @@ int procShipSml(char *buf)
     spShipSml_t *sshipsml = (spShipSml_t *)buf;
 
     if (!pktIsValid(SP_SHIPSML, buf))
-        return FALSE;
+        return false;
 
     snum = sshipsml->snum;
 
     if (snum < 0 || snum >= MAXSHIPS)
-        return FALSE;
+        return false;
 
 #if defined(DEBUG_CLIENTPROC)
     utLog("PROC SHIPSML: snum = %d", snum);
@@ -228,7 +228,7 @@ int procShipSml(char *buf)
     cbShips[snum].lastphase = (real)((uint16_t)ntohs(sshipsml->lastphase)) / 100.0;
     cbShips[snum].lastblast = (real)((uint16_t)ntohs(sshipsml->lastblast)) / 100.0;
 
-    return TRUE;
+    return true;
 }
 
 int procShipLoc(char *buf)
@@ -237,12 +237,12 @@ int procShipLoc(char *buf)
     spShipLoc_t *sshiploc = (spShipLoc_t *)buf;
 
     if (!pktIsValid(SP_SHIPLOC, buf))
-        return FALSE;
+        return false;
 
     snum = sshiploc->snum;
 
     if (snum < 0 || snum >= MAXSHIPS)
-        return FALSE;
+        return false;
 
 #if defined(DEBUG_CLIENTPROC)
     utLog("PROC SHIPLOC: snum = %d", snum);
@@ -257,7 +257,7 @@ int procShipLoc(char *buf)
     cbShips[snum].x = (real)((real)((int32_t)ntohl(sshiploc->x)) / 1000.0);
     cbShips[snum].y = (real)((real)((int32_t)ntohl(sshiploc->y)) / 1000.0);
 
-    return TRUE;
+    return true;
 }
 
 int procPlanet(char *buf)
@@ -266,12 +266,12 @@ int procPlanet(char *buf)
     int pnum;
 
     if (!pktIsValid(SP_PLANET, buf))
-        return FALSE;
+        return false;
 
     pnum = splan->pnum;
 
     if (pnum < 0 || pnum >= MAXPLANETS)
-        return FALSE;
+        return false;
 
     if (Context.recmode == RECMODE_ON)
         recWriteEvent(buf);
@@ -285,7 +285,7 @@ int procPlanet(char *buf)
 
     uiUpdatePlanet(pnum);
 
-    return TRUE;
+    return true;
 }
 
 int procPlanetSml(char *buf)
@@ -295,21 +295,21 @@ int procPlanetSml(char *buf)
     int pnum;
 
     if (!pktIsValid(SP_PLANETSML, buf))
-        return FALSE;
+        return false;
 
     pnum = splansml->pnum;
 
     if (pnum < 0 || pnum >= MAXPLANETS)
-        return FALSE;
+        return false;
 
     if (Context.recmode == RECMODE_ON)
         recWriteEvent(buf);
 
     for (i=0; i<NUMPLAYERTEAMS; i++)
         if (splansml->scanned & (1 << i))
-            cbPlanets[pnum].scanned[i] = TRUE;
+            cbPlanets[pnum].scanned[i] = true;
         else
-            cbPlanets[pnum].scanned[i] = FALSE;
+            cbPlanets[pnum].scanned[i] = false;
 
     cbPlanets[pnum].uninhabtime = (int)splansml->uninhabtime;
 
@@ -317,7 +317,7 @@ int procPlanetSml(char *buf)
     utLog("%s: %d scanned = %x", __FUNCTION__, pnum, splansml->scanned);
 #endif
 
-    return TRUE;
+    return true;
 }
 
 int procPlanetLoc(char *buf)
@@ -326,12 +326,12 @@ int procPlanetLoc(char *buf)
     int pnum;
 
     if (!pktIsValid(SP_PLANETLOC, buf))
-        return FALSE;
+        return false;
 
     pnum = splanloc->pnum;
 
     if (pnum < 0 || pnum >= MAXPLANETS)
-        return FALSE;
+        return false;
 
     if (Context.recmode == RECMODE_ON)
         recWriteEvent(buf);
@@ -340,7 +340,7 @@ int procPlanetLoc(char *buf)
     cbPlanets[pnum].x = (real)((real)((int32_t)ntohl(splanloc->x)) / 1000.0);
     cbPlanets[pnum].y = (real)((real)((int32_t)ntohl(splanloc->y)) / 1000.0);
 
-    return TRUE;
+    return true;
 }
 
 int procPlanetLoc2(char *buf)
@@ -349,12 +349,12 @@ int procPlanetLoc2(char *buf)
     int pnum;
 
     if (!pktIsValid(SP_PLANETLOC2, buf))
-        return FALSE;
+        return false;
 
     pnum = splanloc2->pnum;
 
     if (pnum < 0 || pnum >= MAXPLANETS)
-        return FALSE;
+        return false;
 
     if (Context.recmode == RECMODE_ON)
         recWriteEvent(buf);
@@ -364,7 +364,7 @@ int procPlanetLoc2(char *buf)
     cbPlanets[pnum].y = (real)((real)((int32_t)ntohl(splanloc2->y)) / 1000.0);
     cbPlanets[pnum].orbang = (real)((real)((uint16_t)ntohs(splanloc2->orbang)) / 100.0);
 
-    return TRUE;
+    return true;
 }
 
 int procPlanetInfo(char *buf)
@@ -374,18 +374,18 @@ int procPlanetInfo(char *buf)
     int primary;
 
     if (!pktIsValid(SP_PLANETINFO, buf))
-        return FALSE;
+        return false;
 
     pnum = splaninfo->pnum;
 
     if (pnum < 0 || pnum >= MAXPLANETS)
-        return FALSE;
+        return false;
 
     primary = splaninfo->primary;
 
     /* Roy fix - 10/17/2005 - let mur data be sent. */
     if (primary < 0 || primary >= MAXPLANETS)
-        return FALSE;
+        return false;
 
     /* we will record them if we get them */
     if (Context.recmode == RECMODE_ON)
@@ -396,7 +396,7 @@ int procPlanetInfo(char *buf)
     cbPlanets[pnum].orbrad = (real)((real)((uint32_t)ntohl(splaninfo->orbrad)) / 10.0);
     cbPlanets[pnum].orbvel = (real)((real)((int32_t)ntohl(splaninfo->orbvel)) / 100.0);
 
-    return TRUE;
+    return true;
 }
 
 
@@ -406,23 +406,23 @@ int procTorp(char *buf)
     spTorp_t *storp = (spTorp_t *)buf;
 
     if (!pktIsValid(SP_TORP, buf))
-        return FALSE;
+        return false;
 
     snum = storp->snum;
     tnum = storp->tnum;
 
     if (snum < 0 || snum >= MAXSHIPS)
-        return FALSE;
+        return false;
 
     if (tnum < 0 || tnum >= MAXTORPS)
-        return FALSE;
+        return false;
 
     if (Context.recmode == RECMODE_ON)
         recWriteEvent(buf);
 
     cbShips[snum].torps[tnum].status = (int)storp->status;
 
-    return TRUE;
+    return true;
 }
 
 int procTorpLoc(char *buf)
@@ -431,30 +431,30 @@ int procTorpLoc(char *buf)
     spTorpLoc_t *storploc = (spTorpLoc_t *)buf;
 
     if (!pktIsValid(SP_TORPLOC, buf))
-        return FALSE;
+        return false;
 
     snum = storploc->snum;
     tnum = storploc->tnum;
 
     if (snum < 0 || snum >= MAXSHIPS)
-        return FALSE;
+        return false;
 
     if (tnum < 0 || tnum >= MAXTORPS)
-        return FALSE;
+        return false;
 
     if (Context.recmode == RECMODE_ON)
         recWriteEvent(buf);
 
     for (i=0; i<NUMPLAYERTEAMS; i++)
         if (storploc->war & (1 << i))
-            cbShips[snum].torps[tnum].war[i] = TRUE;
+            cbShips[snum].torps[tnum].war[i] = true;
         else
-            cbShips[snum].torps[tnum].war[i] = FALSE;
+            cbShips[snum].torps[tnum].war[i] = false;
 
     cbShips[snum].torps[tnum].x = (real)((real)((int32_t)ntohl(storploc->x)) / 1000.0);
     cbShips[snum].torps[tnum].y = (real)((real)((int32_t)ntohl(storploc->y)) / 1000.0);
 
-    return TRUE;
+    return true;
 }
 
 
@@ -464,16 +464,16 @@ int procTorpEvent(char *buf)
     spTorpEvent_t *storpev = (spTorpEvent_t *)buf;
 
     if (!pktIsValid(SP_TORPEVENT, buf))
-        return FALSE;
+        return false;
 
     snum = storpev->snum;
     tnum = storpev->tnum;
 
     if (snum < 0 || snum >= MAXSHIPS)
-        return FALSE;
+        return false;
 
     if (tnum < 0 || tnum >= MAXTORPS)
-        return FALSE;
+        return false;
 
     cbShips[snum].torps[tnum].status = (int)storpev->status;
 
@@ -482,9 +482,9 @@ int procTorpEvent(char *buf)
 
     for (i=0; i<NUMPLAYERTEAMS; i++)
         if (storpev->war & (1 << i))
-            cbShips[snum].torps[tnum].war[i] = TRUE;
+            cbShips[snum].torps[tnum].war[i] = true;
         else
-            cbShips[snum].torps[tnum].war[i] = FALSE;
+            cbShips[snum].torps[tnum].war[i] = false;
 
     cbShips[snum].torps[tnum].x =
         (real)((real)((int32_t)ntohl(storpev->x)) / 1000.0);
@@ -498,7 +498,7 @@ int procTorpEvent(char *buf)
 
     uiUpdateTorpDir(snum, tnum);
 
-    return TRUE;
+    return true;
 }
 
 
@@ -507,7 +507,7 @@ int procMessage(char *buf)
     spMessage_t *smsg = (spMessage_t *)buf;
 
     if (!pktIsValid(SP_MESSAGE, buf))
-        return FALSE;
+        return false;
 
     smsg->msg[MESSAGE_SIZE - 1] = 0;
     smsg->fromDetail = ntohs(smsg->fromDetail);
@@ -529,7 +529,7 @@ int procMessage(char *buf)
                 // log it and bail
                 utLog("%s: invalid to or from in message: to %d from %d",
                       __FUNCTION__, (int)smsg->to, (int)smsg->from);
-                return TRUE;
+                return true;
             }
 
             recMsg.from = static_cast<msgFrom_t>(smsg->from);
@@ -538,20 +538,20 @@ int procMessage(char *buf)
             recMsg.toDetail = smsg->toDetail;
             recMsg.flags = smsg->flags;
         }
-        return TRUE;
+        return true;
     }
 
     /* terse? */
     if (UserConf.Terse && (smsg->flags & MSG_FLAGS_TERSABLE))
-        return TRUE;
+        return true;
 
     /* robot response/insult? */
     if (UserConf.NoRobotMsgs && (smsg->flags & MSG_FLAGS_ROBOT))
-        return TRUE;
+        return true;
 
     /* intruder alert? */
     if (!UserConf.DoIntrudeAlert && (smsg->flags & MSG_FLAGS_INTRUDER))
-        return TRUE;
+        return true;
 
     /* don't record feedbacks */
     if ((Context.recmode == RECMODE_ON) && !(smsg->flags & MSG_FLAGS_FEEDBACK) )
@@ -562,7 +562,7 @@ int procMessage(char *buf)
     else
         clntStoreMessage(smsg);
 
-    return TRUE;
+    return true;
 }
 
 int procTeam(char *buf)
@@ -571,20 +571,20 @@ int procTeam(char *buf)
     spTeam_t *steam = (spTeam_t *)buf;
 
     if (!pktIsValid(SP_TEAM, buf))
-        return FALSE;
+        return false;
 
     team = steam->team;
 
     if (team < 0 || team >= NUMALLTEAMS)
-        return FALSE;
+        return false;
 
     if (Context.recmode == RECMODE_ON)
         recWriteEvent(buf);
 
     if (steam->flags & SPTEAM_FLAGS_COUPINFO)
-        cbTeams[team].coupinfo = TRUE;
+        cbTeams[team].coupinfo = true;
     else
-        cbTeams[team].coupinfo = FALSE;
+        cbTeams[team].coupinfo = false;
 
     cbTeams[team].homeplanet = (int)steam->homeplanet;
 
@@ -595,7 +595,7 @@ int procTeam(char *buf)
 
     utStrncpy(cbTeams[team].name, (char *)steam->name, MAXTEAMNAME);
 
-    return TRUE;
+    return true;
 }
 
 int procServerStat(char *buf)
@@ -603,7 +603,7 @@ int procServerStat(char *buf)
     spServerStat_t *sstat = (spServerStat_t *)buf;
 
     if (!pktIsValid(SP_SERVERSTAT, buf))
-        return FALSE;
+        return false;
 
     sStat = *sstat;               /* client.h - clients keep a copy. */
 
@@ -612,7 +612,7 @@ int procServerStat(char *buf)
     sStat.serverFlags = ntohl(sStat.serverFlags);
     sStat.servertime = ntohl(sStat.servertime);
 
-    return TRUE;
+    return true;
 }
 
 int proccbConqInfo(char *buf)
@@ -620,14 +620,14 @@ int proccbConqInfo(char *buf)
     spcbConqInfo_t *spci = (spcbConqInfo_t *)buf;
 
     if (!pktIsValid(SP_CONQINFO, buf))
-        return FALSE;
+        return false;
 
     utStrncpy(cbConqInfo->conqueror, (char *)spci->conqueror, MAXUSERNAME);
     utStrncpy(cbConqInfo->conqteam, (char *)spci->conqteam, MAXTEAMNAME);
     utStrncpy(cbConqInfo->conqtime, (char *)spci->conqtime, MAXDATESIZE);
     utStrncpy(cbConqInfo->lastwords, (char *)spci->lastwords, MAXLASTWORDS);
 
-    return TRUE;
+    return true;
 }
 
 int procHistory(char *buf)
@@ -636,7 +636,7 @@ int procHistory(char *buf)
     int hnum;
 
     if (!pktIsValid(SP_HISTORY, buf))
-        return FALSE;
+        return false;
 
     hnum = hist->hnum;
 
@@ -648,7 +648,7 @@ int procHistory(char *buf)
 
     utStrncpy(cbHistory[hnum].username, (char *)hist->username, MAXUSERNAME);
 
-    return TRUE;
+    return true;
 }
 
 int procDoomsday(char *buf)
@@ -656,7 +656,7 @@ int procDoomsday(char *buf)
     spDoomsday_t *dd = (spDoomsday_t *)buf;
 
     if (!pktIsValid(SP_DOOMSDAY, buf))
-        return FALSE;
+        return false;
 
     if (Context.recmode == RECMODE_ON)
         recWriteEvent(buf);
@@ -668,7 +668,7 @@ int procDoomsday(char *buf)
 
     cbDoomsday->eaterType = static_cast<eaterType_t>(dd->eaterType);
 
-    return TRUE;
+    return true;
 }
 
 int procAck(char *buf)
@@ -687,7 +687,7 @@ int procAck(char *buf)
         sAckMsg.code = sack->code;
         sAckMsg.txt[0] = 0;
 
-        return TRUE;
+        return true;
     }
 
     if (pktIsValid(SP_ACKMSG, buf))
@@ -702,10 +702,10 @@ int procAck(char *buf)
         memset((void*)sAckMsg.txt, 0,  MESSAGE_SIZE);
         utStrncpy((char *)sAckMsg.txt, (char *)sackm->txt, MESSAGE_SIZE);
 
-        return TRUE;
+        return true;
     }
 
-    return FALSE;
+    return false;
 }
 
 int procClientStat(char *buf)
@@ -728,10 +728,10 @@ int procClientStat(char *buf)
         sClientStat.unum = scstat->unum;
         sClientStat.esystem = scstat->esystem;
 
-        return TRUE;
+        return true;
     }
 
-    return FALSE;
+    return false;
 }
 
 int procFrame(char *buf)
@@ -756,10 +756,10 @@ int procFrame(char *buf)
         sFrame.frame = frame->frame;
         sFrame.time = frame->time;
 
-        return TRUE;
+        return true;
     }
 
-    return FALSE;
+    return false;
 }
 
 void processPacket(char *buf)

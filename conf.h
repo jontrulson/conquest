@@ -218,7 +218,7 @@ extern struct Conf SysConfData[];
 struct Conf SysConfData[] =
 {
     {			/* The current conquestrc (conquest) version */
-        FALSE,
+        false,
         CTYPE_NULL,
         "SysConqfigVersion=",
         ConfigVersion,
@@ -229,7 +229,7 @@ struct Conf SysConfData[] =
         }
     },
     {
-        TRUE,			/* always found the header */
+        true,			/* always found the header */
         CTYPE_NULL,
         NULL,
         NULL,
@@ -253,7 +253,7 @@ struct Conf SysConfData[] =
         }
     },
     {
-        FALSE,
+        false,
         CTYPE_BOOL,
         "no_doomsday=",
         &SysConf.NoDoomsday,
@@ -266,7 +266,7 @@ struct Conf SysConfData[] =
         }
     },
     {
-        FALSE,
+        false,
         CTYPE_BOOL,
         "do_random_robotkills=",
         &SysConf.DoRandomRobotKills,
@@ -287,7 +287,7 @@ struct Conf SysConfData[] =
         }
     },
     {
-        FALSE,
+        false,
         CTYPE_BOOL,
         "allow_vacant=",
         &SysConf.AllowVacant,
@@ -303,7 +303,7 @@ struct Conf SysConfData[] =
         }
     },
     {
-        FALSE,
+        false,
         CTYPE_BOOL,
         "allow_switchteams=",
         &SysConf.AllowSwitchteams,
@@ -317,7 +317,7 @@ struct Conf SysConfData[] =
         }
     },
     {
-        FALSE,
+        false,
         CTYPE_NUMERIC,
         "user_expiredays=",
         &SysConf.UserExpiredays,
@@ -331,7 +331,7 @@ struct Conf SysConfData[] =
         }
     },
     {
-        FALSE,
+        false,
         CTYPE_BOOL,
         "log_messages=",
         &SysConf.LogMessages,
@@ -344,7 +344,7 @@ struct Conf SysConfData[] =
         }
     },
     {
-        FALSE,
+        false,
         CTYPE_BOOL,
         "allow_refits=",
         &SysConf.AllowRefits,
@@ -359,7 +359,7 @@ struct Conf SysConfData[] =
         }
     },
     {
-        FALSE,
+        false,
         CTYPE_BOOL,
         "allow_slingshot=",
         &SysConf.AllowSlingShot,
@@ -373,7 +373,7 @@ struct Conf SysConfData[] =
         }
     },
     {
-        FALSE,
+        false,
         CTYPE_BOOL,
         "no_teamwar=",
         &SysConf.NoTeamWar,
@@ -387,7 +387,7 @@ struct Conf SysConfData[] =
         }
     },
     {
-        FALSE,
+        false,
         CTYPE_BOOL,
         "no_drift=",
         &SysConf.NoDrift,
@@ -401,7 +401,7 @@ struct Conf SysConfData[] =
         }
     },
     {
-        FALSE,
+        false,
         CTYPE_STRING,
         "server_name=",
         SysConf.ServerName,
@@ -415,7 +415,7 @@ struct Conf SysConfData[] =
         }
     },
     {
-        FALSE,
+        false,
         CTYPE_STRING,
         "server_motd=",
         SysConf.ServerMotd,
@@ -428,7 +428,7 @@ struct Conf SysConfData[] =
         }
     },
     {
-        FALSE,
+        false,
         CTYPE_STRING,
         "server_contact=",
         SysConf.ServerContact,
@@ -449,7 +449,7 @@ extern struct Conf ConfData[];
 struct Conf ConfData[] =
 {
     {				/* The current conquestrc (conf.h) version */
-        FALSE,
+        false,
         CTYPE_NULL,
         "ConqfigVersion=",
         ConfigVersion,
@@ -460,7 +460,7 @@ struct Conf ConfData[] =
         }
     },
     {
-        TRUE,			/* always found the header */
+        true,			/* always found the header */
         CTYPE_NULL,
         NULL,
         NULL,
@@ -483,7 +483,7 @@ struct Conf ConfData[] =
         }
     },
     {
-        FALSE,
+        false,
         CTYPE_BOOL,
         "do_alarm_bell=",
         &UserConf.DoAlarms,
@@ -497,7 +497,7 @@ struct Conf ConfData[] =
         }
     },
     {
-        FALSE,
+        false,
         CTYPE_BOOL,
         "do_intruder_alerts=",
         &UserConf.DoIntrudeAlert,
@@ -511,7 +511,7 @@ struct Conf ConfData[] =
         }
     },
     {
-        FALSE,
+        false,
         CTYPE_BOOL,
         "numeric_planet_map=",
         &UserConf.DoNumMap,
@@ -525,7 +525,7 @@ struct Conf ConfData[] =
         }
     },
     {
-        FALSE,
+        false,
         CTYPE_BOOL,
         "terse=",
         &UserConf.Terse,
@@ -539,7 +539,7 @@ struct Conf ConfData[] =
         }
     },
     {
-        FALSE,
+        false,
         CTYPE_BOOL,
         "do_msg_alarm=",
         &UserConf.MessageBell,
@@ -552,7 +552,7 @@ struct Conf ConfData[] =
         }
     },
     {
-        FALSE,
+        false,
         CTYPE_BOOL,
         "no_robot_msgs=",
         &UserConf.NoRobotMsgs,
@@ -569,7 +569,7 @@ struct Conf ConfData[] =
         }
     },
     {
-        FALSE,
+        false,
         CTYPE_NUMERIC,
         "updates_per_sec=",
         &UserConf.UpdatesPerSecond,
@@ -584,7 +584,7 @@ struct Conf ConfData[] =
         }
     },
     {
-        FALSE,
+        false,
         CTYPE_BOOL,
         "distress_to_friendly=",
         &UserConf.DistressToFriendly,
@@ -598,7 +598,7 @@ struct Conf ConfData[] =
         }
     },
     {
-        FALSE,
+        false,
         CTYPE_BOOL,
         "alt_hud=",
         &UserConf.AltHUD,
@@ -611,7 +611,7 @@ struct Conf ConfData[] =
         }
     },
     {
-        FALSE,
+        false,
         CTYPE_BOOL,
         "hud_info=",
         &UserConf.hudInfo,
@@ -628,7 +628,7 @@ struct Conf ConfData[] =
         }
     },
     {
-        FALSE,
+        false,
         CTYPE_BOOL,
         "do_local_lrscan=",
         &UserConf.DoLocalLRScan,
@@ -645,7 +645,7 @@ struct Conf ConfData[] =
         }
     },
     {
-        FALSE,
+        false,
         CTYPE_BOOL,
         "do_etastats=",
         &UserConf.DoETAStats,
@@ -659,7 +659,7 @@ struct Conf ConfData[] =
         }
     },
     {
-        TRUE,
+        true,
         CTYPE_BOOL,
         "do_enemyshipbox=",
         &UserConf.EnemyShipBox,
@@ -673,7 +673,7 @@ struct Conf ConfData[] =
         }
     },
     {
-        TRUE,
+        true,
         CTYPE_BOOL,
         "do_draw_viewerbg=",
         &UserConf.doVBG,
@@ -688,7 +688,7 @@ struct Conf ConfData[] =
         }
     },
     {
-        FALSE,
+        false,
         CTYPE_BOOL,
         "do_shields=",
         &UserConf.DoShields,
@@ -701,7 +701,7 @@ struct Conf ConfData[] =
         }
     },
     {
-        FALSE,
+        false,
         CTYPE_BOOL,
         "do_tac_bkg=",
         &UserConf.DoTacBkg,
@@ -718,7 +718,7 @@ struct Conf ConfData[] =
         }
     },
     {
-        FALSE,
+        false,
         CTYPE_NUMERIC,
         "do_tac_shade=",
         &UserConf.DoTacShade,
@@ -733,7 +733,7 @@ struct Conf ConfData[] =
         }
     },
     {
-        FALSE,
+        false,
         CTYPE_NUMERIC,
         "music_vol=",
         &UserConf.musicVol,
@@ -747,7 +747,7 @@ struct Conf ConfData[] =
         }
     },
     {
-        FALSE,
+        false,
         CTYPE_NUMERIC,
         "effects_vol=",
         &UserConf.effectsVol,
@@ -761,7 +761,7 @@ struct Conf ConfData[] =
         }
     },
     {				/* mouse macros */
-        FALSE,
+        false,
         CTYPE_MOUSE,
         "mouse_",
         &UserConf.Mouse,
@@ -800,7 +800,7 @@ struct Conf ConfData[] =
         }
     },
     {				/* Macros are special - these should be last */
-        FALSE,
+        false,
         CTYPE_MACRO,
         "macro_f",
         UserConf.MacrosF,

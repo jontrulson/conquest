@@ -28,7 +28,7 @@ int prmProcInput(prm_t *prm, int ch)
     {
         prm->buf[0] = c;
         prm->buf[1] = 0;
-        prm->preinit = FALSE;
+        prm->preinit = false;
 
         return PRM_OK;
     }

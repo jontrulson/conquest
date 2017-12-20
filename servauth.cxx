@@ -79,7 +79,7 @@ int Authenticate(char *username, char *password)
     utLog("INFO: Authenticate ENTERING\n");
 #endif
 
-    done = FALSE;
+    done = false;
 
     while (!done)
     {
@@ -89,14 +89,14 @@ int Authenticate(char *username, char *password)
         if (rv <= 0)
 	{
             utLog("conquestd:Authenticate: waitforpacket returned %d", rv);
-            return FALSE;
+            return false;
 	}
 
         cauth = (cpAuthenticate_t *)buf;
         cauth->login[MAXUSERNAME - 1] = 0;
         cauth->pw[MAXUSERNAME - 1] = 0;
 
-        if (checkuname((char *)cauth->login) == FALSE)
+        if (checkuname((char *)cauth->login) == false)
 	{
             pktSendAck(PSEV_ERROR, PERR_INVUSER,
                        NULL);
@@ -108,7 +108,7 @@ int Authenticate(char *username, char *password)
 	case CPAUTH_CHECKUSER:
 
             if (clbGetUserNum( &unum, (char *)cauth->login,
-                               USERTYPE_NORMAL ) == TRUE)
+                               USERTYPE_NORMAL ) == true)
 	    {			/* user exits */
                 pktSendAck(PSEV_INFO, PERR_OK,
                            NULL);
@@ -127,7 +127,7 @@ int Authenticate(char *username, char *password)
 	    {
                 pktSendAck(PSEV_FATAL, PERR_BADPWD,
                            NULL);
-                return FALSE;
+                return false;
 	    }
 
             if ((rv = doLogin((char *)cauth->login, (char *)cauth->pw,
@@ -139,7 +139,7 @@ int Authenticate(char *username, char *password)
 	    }
             else
 	    {			/* login successful */
-                done = TRUE;
+                done = true;
                 pktSendAck(PSEV_INFO, PERR_OK,
                            NULL);
 	    }
@@ -156,7 +156,7 @@ int Authenticate(char *username, char *password)
     utStrncpy(username, (char *)cauth->login, MAXUSERNAME);
     utStrncpy(password, epw, MAXUSERNAME);
 
-    return(TRUE);
+    return(true);
 }
 
 
@@ -166,7 +166,7 @@ void expire_users(void)
 {
     int i, j;
     time_t difftime = 0;
-    int hasship = FALSE;
+    int hasship = false;
     unsigned int expire_secs;
 
 #if defined(DEBUG_SERVERAUTH)
@@ -226,12 +226,12 @@ void expire_users(void)
                   cbUsers[i].lastentry);
 #endif
 
-            hasship = FALSE;
+            hasship = false;
             for (j=0; j < MAXSHIPS; j++)
 	    {
                 if (cbShips[j].unum == i && cbShips[j].status == SS_LIVE)
 		{
-                    hasship = TRUE;
+                    hasship = true;
                     break;
 		}
 	    }
@@ -248,10 +248,10 @@ void expire_users(void)
                 cbUnlock(&cbConqInfo->lockword);
 
 #if defined(DEBUG_SERVERAUTH)
-                utLog("expire_users(): calling clbResign(%d, %d)", i, TRUE);
+                utLog("expire_users(): calling clbResign(%d, %d)", i, true);
 #endif
 
-                clbResign(i, TRUE);
+                clbResign(i, true);
                 utLog("INFO: expire_users(): Expired remote user '%s' after %d days of inactivity. (limit %d days)",
                       cbUsers[i].username,
                       difftime / SECS_PER_DAY,

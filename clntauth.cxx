@@ -30,14 +30,14 @@ void ChangePassword(int unum, int isoper)
     char salt[3];
     int lin = 0, col = 0;
 
-    if (isoper == FALSE)
+    if (isoper == false)
         cdclear();
     else
     {
         cdclrl(MSG_LIN1, 2);
     }
 
-    if (isoper == FALSE)
+    if (isoper == false)
     {
         lin = 1;
         col = ((Context.maxcol / 2) - (strlen(header) / 2));
@@ -50,15 +50,15 @@ void ChangePassword(int unum, int isoper)
     cdputs("Use any printable characters.", MSG_LIN2, 1);
 
     cdgetx( "New Password: ", MSG_LIN1, 1,
-            TERMS, pw, MAXUSERNAME - 1, FALSE );
+            TERMS, pw, MAXUSERNAME - 1, false );
 
-    if (isoper == FALSE)
+    if (isoper == false)
     {
         pwr[0] = 0;
         cdclrl( MSG_LIN1, 2  );
         cdputs("Use any printable characters.", MSG_LIN2, 1);
         cdgetx( "Retype Password: ", MSG_LIN1, 1,
-                TERMS, pwr, MAXUSERNAME - 1, FALSE );
+                TERMS, pwr, MAXUSERNAME - 1, false );
 
         if (strcmp(pw, pwr) != 0)
 	{			/* pw's don't match, start over */

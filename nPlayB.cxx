@@ -57,12 +57,12 @@ static int state;
 
 /* the current prompt */
 static prm_t prm;
-static int prompting = FALSE;
+static int prompting = false;
 
 /* misc buffers */
 static char cbuf[BUFFER_SIZE_1024];
 
-static int live_ships = TRUE;
+static int live_ships = true;
 static int old_snum = 1;
 static const char *nss = NULL;        /* no such ship */
 
@@ -115,7 +115,7 @@ static void set_header(int snum)
     }
     else if ( SROBOT(snum) )
     {
-        if (cbConqInfo->externrobots == TRUE)
+        if (cbConqInfo->externrobots == true)
 	{
             sprintf(hbuf, heading_fmt, robo_str1,
                     cbTeams[cbShips[snum].team].teamchar, snum,
@@ -175,7 +175,7 @@ void set_rectime(void)
 
 void nPlayBInit(void)
 {
-    prompting = FALSE;
+    prompting = false;
     state = S_NONE;
 
     if (!nPlayBNode.animQue)
@@ -202,7 +202,7 @@ void nPlayBInit(void)
         }
     }
 
-    Context.redraw = TRUE;
+    Context.redraw = true;
     setNode(&nPlayBNode);
 
     return;
@@ -214,7 +214,7 @@ static int nPlayBDisplay(dspConfig_t *dsp)
     char buf[MSGMAXLINE];
 
     /* Viewer */
-    renderViewer(UserConf.doVBG, FALSE);
+    renderViewer(UserConf.doVBG, false);
 
     /* Main/Hud */
     set_header(Context.snum);
@@ -280,7 +280,7 @@ static int nPlayBInput(int ch)
             if (ch == TERM_ABORT)
             {
                 state = S_NONE;
-                prompting = FALSE;
+                prompting = false;
 
                 return NODE_OK;
             }
@@ -295,7 +295,7 @@ static int nPlayBInput(int ch)
                 if (!utIsDigits(prm.buf))
                 {
                     state = S_NONE;
-                    prompting = FALSE;
+                    prompting = false;
 
                     nss = "No such ship.";
                     return NODE_OK;
@@ -307,13 +307,13 @@ static int nPlayBInput(int ch)
                  tmpsnum != DISPLAY_DOOMSDAY )
             {
                 state = S_NONE;
-                prompting = FALSE;
+                prompting = false;
 
                 nss = "No such ship.";
                 return NODE_OK;
             }
 
-            prompting = FALSE;
+            prompting = false;
             state = S_NONE;
 
             // Save old snum for '`' command...
@@ -341,18 +341,18 @@ static int nPlayBInput(int ch)
         return NODE_OK;
         break;
     case 'h':
-        setONode(nPlayBHelpInit(FALSE));
+        setONode(nPlayBHelpInit(false));
         break;
     case 'f':	/* move forward 30 seconds */
         cp_putmsg(NULL, MSG_LIN1);
         pbFileSeek(recCurrentTime + 30);
-        Context.redraw = TRUE;
+        Context.redraw = true;
         break;
 
     case 'F':	/* move forward 2 minutes */
         cp_putmsg(NULL, MSG_LIN1);
         pbFileSeek(recCurrentTime + (2 * 60));
-        Context.redraw = TRUE;
+        Context.redraw = true;
         break;
 
     case 'M':	/* toggle lr/sr */
@@ -366,21 +366,21 @@ static int nPlayBInput(int ch)
         cp_putmsg("Rewinding...", MSG_LIN1);
         pbFileSeek(recCurrentTime - 30);
         cp_putmsg(NULL, MSG_LIN1);
-        Context.redraw = TRUE;
+        Context.redraw = true;
         break;
 
     case 'B':	/* move backward 2 minutes */
         cp_putmsg("Rewinding...", MSG_LIN1);
         pbFileSeek(recCurrentTime - (2 * 60));
         cp_putmsg(NULL, MSG_LIN1);
-        Context.redraw = TRUE;
+        Context.redraw = true;
         break;
 
     case 'r':	/* reset to beginning */
         cp_putmsg("Rewinding...", MSG_LIN1);
         pbFileSeek(recStartTime);
         cp_putmsg(NULL, MSG_LIN1);
-        Context.redraw = TRUE;
+        Context.redraw = true;
         break;
 
     case ' ':	/* pause/resume playback */
@@ -419,13 +419,13 @@ static int nPlayBInput(int ch)
         if (recFileHeader.snum == 0)
         {
             cbuf[0] = 0;
-            prm.preinit = FALSE;
+            prm.preinit = false;
 
         }
         else
         {
             sprintf(cbuf, "%d", recFileHeader.snum);
-            prm.preinit = TRUE;
+            prm.preinit = true;
         }
 
         prm.buf = cbuf;
@@ -433,7 +433,7 @@ static int nPlayBInput(int ch)
         prm.pbuf = "Watch which ship (<cr> for doomsday)? ";
         prm.terms = TERMS;
         prm.index = MSG_LIN1;
-        prompting = TRUE;
+        prompting = true;
 
         break;
 
@@ -446,7 +446,7 @@ static int nPlayBInput(int ch)
             old_snum = tmp_snum;
 
             Context.snum = snum;
-            Context.redraw = TRUE;
+            Context.redraw = true;
         }
         else
             mglBeep(MGL_BEEP_ERR);
@@ -454,14 +454,14 @@ static int nPlayBInput(int ch)
         break;
 
     case '/':
-        setONode(nShiplInit(DSP_NODE_PLAYB, FALSE));
+        setONode(nShiplInit(DSP_NODE_PLAYB, false));
         return NODE_OK;
         break;
 
     case '>':  /* forward rotate ship numbers (including doomsday) - dwp */
     case CQ_KEY_RIGHT:
     case CQ_KEY_UP:
-        while (TRUE)
+        while (true)
         {
             int i;
 
@@ -469,22 +469,22 @@ static int nPlayBInput(int ch)
             {	/* we need to make sure that there is
                    actually something alive or an
                    infinite loop will result... */
-                int foundone = FALSE;
+                int foundone = false;
 
                 for (i=0; i < MAXSHIPS; i++)
                 {
                     if (clbStillAlive(i))
                     {
-                        foundone = TRUE;
+                        foundone = true;
                     }
                 }
-                if (foundone == FALSE)
+                if (foundone == false)
                 {	/* check the doomsday machine */
                     if (DOOM_LIVE())
-                        foundone = TRUE;
+                        foundone = true;
                 }
 
-                if (foundone == FALSE)
+                if (foundone == false)
                 {
                     mglBeep(MGL_BEEP_ERR);
                     break; /* didn't find one, beep, leave everything
@@ -508,7 +508,7 @@ static int nPlayBInput(int ch)
 
             snum = i;
 
-            Context.redraw = TRUE;
+            Context.redraw = true;
 
             if (live_ships)
                 if ((snum >= 0 && clbStillAlive(snum)) ||
@@ -530,7 +530,7 @@ static int nPlayBInput(int ch)
     case '<':  /* reverse rotate ship numbers (including doomsday)  - dwp */
     case CQ_KEY_LEFT:
     case CQ_KEY_DOWN:
-        while (TRUE)
+        while (true)
         {
             int i;
 
@@ -538,22 +538,22 @@ static int nPlayBInput(int ch)
             {	/* we need to make sure that there is
                    actually something alive or an
                    infinite loop will result... */
-                int foundone = FALSE;
+                int foundone = false;
 
                 for (i=0; i < MAXSHIPS; i++)
                 {
                     if (clbStillAlive(i))
                     {
-                        foundone = TRUE;
+                        foundone = true;
                     }
                 }
-                if (foundone == FALSE)
+                if (foundone == false)
                 {	/* check the doomsday machine */
                     if (DOOM_LIVE())
-                        foundone = TRUE;
+                        foundone = true;
                 }
 
-                if (foundone == FALSE)
+                if (foundone == false)
                 {
                     mglBeep(MGL_BEEP_ERR);
                     break; /* didn't find one, beep, leave everything
@@ -578,7 +578,7 @@ static int nPlayBInput(int ch)
 
             snum = i;
 
-            Context.redraw = TRUE;
+            Context.redraw = true;
 
             if (live_ships)
                 if ((snum >= 0 && clbStillAlive(snum)) ||
@@ -609,7 +609,7 @@ static int nPlayBInput(int ch)
             else
                 mglBeep(MGL_BEEP_ERR);
 
-            setViewerScaling(ncpLRMagFactor, TRUE);
+            setViewerScaling(ncpLRMagFactor, true);
         }
         else
         {
@@ -620,7 +620,7 @@ static int nPlayBInput(int ch)
             else
                 mglBeep(MGL_BEEP_ERR);
 
-            setViewerScaling(ncpSRMagFactor, FALSE);
+            setViewerScaling(ncpSRMagFactor, false);
         }
     }
     break;
@@ -636,7 +636,7 @@ static int nPlayBInput(int ch)
             else
                 mglBeep(MGL_BEEP_ERR);
 
-            setViewerScaling(ncpLRMagFactor, TRUE);
+            setViewerScaling(ncpLRMagFactor, true);
         }
         else
         {
@@ -647,7 +647,7 @@ static int nPlayBInput(int ch)
             else
                 mglBeep(MGL_BEEP_ERR);
 
-            setViewerScaling(ncpSRMagFactor, FALSE);
+            setViewerScaling(ncpSRMagFactor, false);
         }
     }
     break;
@@ -659,8 +659,8 @@ static int nPlayBInput(int ch)
 
         /* reset the scaling factors */
         ncpLRMagFactor = ncpSRMagFactor = 0;
-        setViewerScaling(ncpLRMagFactor, TRUE);
-        setViewerScaling(ncpSRMagFactor, FALSE);
+        setViewerScaling(ncpLRMagFactor, true);
+        setViewerScaling(ncpSRMagFactor, false);
 
         break;
 

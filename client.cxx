@@ -89,9 +89,9 @@ int sendSetCourse(int sock, courseLock_t lock, uint16_t lockDetail, real head)
     csc.head = htons((uint16_t)(head * 100.0));
 
     if (pktWrite(PKT_SENDTCP, &csc) <= 0)
-        return FALSE;
+        return false;
     else
-        return TRUE;
+        return true;
 }
 
 /* send a command to server to change name */
@@ -100,16 +100,16 @@ int sendSetName(char *name)
     cpSetName_t sname;
 
     if (!name)
-        return FALSE;
+        return false;
 
     memset((void *)&sname, 0, sizeof(cpSetName_t));
     sname.type = CP_SETNAME;
     utStrncpy((char *)sname.alias, name, MAXUSERNAME);
 
     if (pktWrite(PKT_SENDTCP, &sname) <= 0)
-        return FALSE;
+        return false;
     else
-        return TRUE;
+        return true;
 }
 
 int sendCommand(uint8_t cmd, uint16_t detail)
@@ -126,9 +126,9 @@ int sendCommand(uint8_t cmd, uint16_t detail)
         socktype = PKT_SENDUDP;
 
     if (pktWrite(socktype, &ccmd) <= 0)
-        return FALSE;
+        return false;
     else
-        return TRUE;
+        return true;
 }
 
 int sendFireTorps(int num, real dir)
@@ -142,9 +142,9 @@ int sendFireTorps(int num, real dir)
     ftorps.dir = htons((uint16_t)(dir * 100.0));
 
     if (pktWrite(PKT_SENDTCP, &ftorps) <= 0)
-        return FALSE;
+        return false;
     else
-        return TRUE;
+        return true;
 
 }
 
@@ -154,7 +154,7 @@ int sendMessage(msgTo_t to, uint16_t toDetail, char *msg)
     cpMessage_t cmsg;
 
     if (!msg)
-        return FALSE;
+        return false;
 
     memset((void *)&cmsg, 0, sizeof(cpMessage_t));
     cmsg.type = CP_MESSAGE;
@@ -163,9 +163,9 @@ int sendMessage(msgTo_t to, uint16_t toDetail, char *msg)
     utStrncpy((char *)cmsg.msg, msg, MESSAGE_SIZE);
 
     if (pktWrite(PKT_SENDTCP, &cmsg) <= 0)
-        return FALSE;
+        return false;
     else
-        return TRUE;
+        return true;
 }
 
 int clientHello(const char *clientname)
@@ -182,13 +182,13 @@ int clientHello(const char *clientname)
     if ((pkttype = pktRead(buf, PKT_MAXSIZE, 60)) < 0)
     {
         utLog("clientHello: read server hello failed\n");
-        return FALSE;
+        return false;
     }
 
     if (pkttype == 0)
     {
         utLog("clientHello: read server hello: timeout.\n");
-        return FALSE;
+        return false;
     }
 
     /* we only get this if there's problem (server denied access, usually) */
@@ -199,13 +199,13 @@ int clientHello(const char *clientname)
                   pktSeverity2String(sAckMsg.severity),
                   sAckMsg.txt);
 
-        return FALSE;
+        return false;
     }
 
     if (pkttype != SP_HELLO)
     {
         utLog("clientHello: read server hello: wrong packet type %d\n", pkttype);
-        return FALSE;
+        return false;
     }
 
     sHello = *(spHello_t *)buf;
@@ -232,7 +232,7 @@ int clientHello(const char *clientname)
                     sizeof(cInfo.servaddr)) < 0)
         {
             utLog("NET: clientHello: udp connect() failed: %s", strerror(errno));
-            cInfo.tryUDP = FALSE;
+            cInfo.tryUDP = false;
         }
         else
         {
@@ -259,7 +259,7 @@ int clientHello(const char *clientname)
     if (pktWrite(PKT_SENDTCP, &chello) <= 0)
     {
         utLog("clientHello: write client hello failed\n");
-        return FALSE;
+        return false;
     }
 
     utLog("clientHello: sent hello to server");
@@ -277,7 +277,7 @@ int clientHello(const char *clientname)
         if ((rv = select(cInfo.usock+1, &readfds, NULL, NULL, &tv)) <= 0)
         {
             utLog("CLIENT: hello: select udp failed: %s", strerror(errno));
-            cInfo.tryUDP = FALSE;
+            cInfo.tryUDP = false;
         }
         else
         {
@@ -286,7 +286,7 @@ int clientHello(const char *clientname)
                 if ((rv = udpRecv(cInfo.usock, buf, PKT_MAXSIZE, &cInfo.servaddr)) >= 0 )
                 {
                     utLog("NET: got (%d) UDP bytes from server, will ACK for server UDP", rv);
-                    cInfo.doUDP = TRUE;
+                    cInfo.doUDP = true;
                     pktSetSocketFds(PKT_SOCKFD_NOCHANGE, cInfo.usock);
                 }
             }
@@ -298,7 +298,7 @@ int clientHello(const char *clientname)
     if ((pkttype = pktRead(buf, PKT_MAXSIZE, 60)) < 0)
     {
         utLog("clientHello: read of SP_ACK or SP_SERVERSTAT failed\n");
-        return FALSE;
+        return false;
     }
 
     if (pkttype == SP_ACKMSG || pkttype == SP_ACK)/* we only get this if problem */
@@ -313,7 +313,7 @@ int clientHello(const char *clientname)
                    sAckMsg.txt);
 
 	}
-        return FALSE;
+        return false;
     }
 
     if (pkttype == SP_SERVERSTAT)
@@ -333,7 +333,7 @@ int clientHello(const char *clientname)
     else
     {
         utLog("clientHello: pkttype = %d, was waiting for SP_SERVERSTAT", pkttype);
-        return FALSE;
+        return false;
     }
 
     if (cInfo.doUDP)
@@ -341,7 +341,7 @@ int clientHello(const char *clientname)
     else
         pktSendAck(PSEV_INFO, PERR_OK, NULL);
 
-    return TRUE;
+    return true;
 }
 
 /* Some routers/firewalls seem to disconnect a UDP conncetion if there haven't

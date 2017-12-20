@@ -21,7 +21,7 @@
 int udpOpen(int port, struct sockaddr_in* addr)
 {
 #if defined(_WIN32)
-    const BOOL optOn = TRUE;
+    const BOOL optOn = true;
     BOOL opt = optOn;
 #else
     const int optOn = 1;

@@ -29,8 +29,8 @@
 #define S_MENU       3          /* go back to menu */
 
 static int state;
-static int fatal = FALSE;
-static int shipinited = FALSE;   /* whether we've done _newship() yet */
+static int fatal = false;
+static int shipinited = false;   /* whether we've done _newship() yet */
 static int owned[NUMPLAYERTEAMS];
 
 static int nPlayDisplay(dspConfig_t *);
@@ -55,10 +55,10 @@ static void selectentry( uint8_t esystem )
     for ( i = 0; i < NUMPLAYERTEAMS; i++ )
         if (esystem & (1 << i))
         {
-            owned[i] = TRUE;
+            owned[i] = true;
         }
         else
-            owned[i] = FALSE;
+            owned[i] = false;
 
     /* Prompt for a decision. */
     strcpy(cbuf , "Enter which system") ;
@@ -95,20 +95,20 @@ static int _newship( int unum, int *snum )
        pkt. */
 
 
-    while (TRUE)
+    while (true)
     {
         if ((pkttype = pktWaitForPacket(PKT_ANYPKT,
                                         buf, PKT_MAXSIZE, 60, NULL)) < 0)
 	{
             utLog("nPlay: _newship: waitforpacket returned %d", pkttype);
-            fatal = TRUE;
-            return FALSE;
+            fatal = true;
+            return false;
 	}
 
         switch (pkttype)
 	{
 	case 0:			/* timeout */
-            return FALSE;
+            return false;
             break;
 
 	case SP_ACK:		/* bummer */
@@ -116,19 +116,19 @@ static int _newship( int unum, int *snum )
             utLog("%s: got an ack, _newship failed.", __FUNCTION__);
             state = S_NSERR;
 
-            return FALSE;		/* always a failure */
+            return false;		/* always a failure */
             break;
 
 	case SP_CLIENTSTAT:
         {
             if (PKT_PROCSP(buf))
             {
-                return TRUE;
+                return true;
             }
             else
             {
                 utLog("nPlay: _newship: invalid CLIENTSTAT");
-                return FALSE;
+                return false;
             }
         }
         break;
@@ -141,7 +141,7 @@ static int _newship( int unum, int *snum )
     }
 
     /* if we are here, something unexpected happened */
-    return FALSE;			/* NOTREACHED */
+    return false;			/* NOTREACHED */
 
 
 }
@@ -149,10 +149,10 @@ static int _newship( int unum, int *snum )
 void nPlayInit(void)
 {
     state = S_SELSYS;               /* default */
-    shipinited = FALSE;
+    shipinited = false;
     /* let the server know our intentions */
     if (!sendCommand(CPCMD_ENTER, 0))
-        fatal = TRUE;
+        fatal = true;
 
     setNode(&nPlayNode);
 
@@ -172,7 +172,7 @@ static int nPlayDisplay(dspConfig_t *dsp)
     {
         if (!shipinited)
         {                       /* need to call _newship */
-            shipinited = TRUE;
+            shipinited = true;
             if (!_newship( Context.unum, &Context.snum ))
             {
                 utLog("%s: _newship failed.", __FUNCTION__);
@@ -225,20 +225,20 @@ static int nPlayIdle(void)
 {
     if (state == S_DONE)
     {
-        Context.entship = TRUE;
+        Context.entship = true;
         cbShips[Context.snum].sdfuse = 0;       /* zero self destruct fuse */
         utGrand( &Context.msgrand );            /* initialize message timer */
-        Context.leave = FALSE;                /* assume we won't want to bail */
-        Context.redraw = TRUE;                /* want redraw first time */
-        Context.msgok = TRUE;                 /* ok to get messages */
+        Context.leave = false;                /* assume we won't want to bail */
+        Context.redraw = true;                /* want redraw first time */
+        Context.msgok = true;                 /* ok to get messages */
 
-        Context.display = TRUE;               /* ok to display */
+        Context.display = true;               /* ok to display */
 
         /* start recording if neccessary */
         if (Context.recmode == RECMODE_STARTING)
         {
             if (recInitOutput(Context.unum, time(0), Context.snum,
-                              FALSE))
+                              false))
             {
                 Context.recmode = RECMODE_ON;
             }
@@ -250,7 +250,7 @@ static int nPlayIdle(void)
            sent in menu - our ship may have chenged */
         sendCommand(CPCMD_RELOAD, 0);
 
-        nCPInit(TRUE);            /* play */
+        nCPInit(true);            /* play */
     }
     else if (state == S_MENU)
         nMenuInit();

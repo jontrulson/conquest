@@ -283,7 +283,7 @@ int cdgetn ( const char pmt[], int lin, int col, int *num )
 int cdgets ( const char pmt[], int lin, int col, char str[], int maxlen )
 {
 
-    cdgetx ( pmt, lin, col, "\r\n", str, maxlen, TRUE );
+    cdgetx ( pmt, lin, col, "\r\n", str, maxlen, true );
 
     if ( strlen ( str ) == 0 )
         return(-1);
@@ -315,8 +315,8 @@ int cdgets ( const char pmt[], int lin, int col, char str[], int maxlen )
 int cdgetx ( const char pmt[], int lin, int col, const char terms[], char str[],
              int maxlen, int doecho )
 {
-    int append_flg = FALSE;
-    int do_append_flg = FALSE;
+    int append_flg = false;
+    int do_append_flg = false;
     return ( cdgetp ( pmt, lin, col, terms, str, maxlen, &append_flg, do_append_flg, doecho ) );
 
 }
@@ -352,11 +352,11 @@ int cdgetp ( const char pmt[], int lin, int col, const char terms[], char str[],
 
     if (str[0] != 0)
     {				/* theres a value there */
-        StrInit = TRUE;
+        StrInit = true;
     }
     else
     {
-        StrInit = FALSE;
+        StrInit = false;
     }
 
     uiPutColor(InfoColor);           /* colorize prompt string */
@@ -370,7 +370,7 @@ int cdgetp ( const char pmt[], int lin, int col, const char terms[], char str[],
 
     imaxlen = min ( maxlen, maxcol - scol + 1 );
 
-    while (TRUE)
+    while (true)
     {
         str[ min ( len+1, imaxlen ) ] = 0;
         cdmove ( lin, icol );
@@ -390,7 +390,7 @@ int cdgetp ( const char pmt[], int lin, int col, const char terms[], char str[],
            into 'direction' keys. */
         (void)mcuKP2DirKey(&ch);
 
-        if (ch != TERM_NORMAL && ch != TERM_EXTRA && StrInit == TRUE &&
+        if (ch != TERM_NORMAL && ch != TERM_EXTRA && StrInit == true &&
             isprint(ch & 0xff))
 	{			/* clear out the preload */
             str[0] = ch;
@@ -401,7 +401,7 @@ int cdgetp ( const char pmt[], int lin, int col, const char terms[], char str[],
             if (doecho)
                 cdputs ( str, lin, scol );
 
-            StrInit = FALSE;
+            StrInit = false;
             continue;
 	}
         else
@@ -411,7 +411,7 @@ int cdgetp ( const char pmt[], int lin, int col, const char terms[], char str[],
                 cdclra ( lin, icol, lin, cdcols() );
                 if (doecho)
                     cdputs ( str, lin, scol );
-                StrInit = FALSE;
+                StrInit = false;
                 cdrefresh();
             }
 
@@ -500,7 +500,7 @@ int cdgetp ( const char pmt[], int lin, int col, const char terms[], char str[],
             len = len + 1;
             str[len] = '\0';
 
-            if (doecho == TRUE)
+            if (doecho == true)
                 cdput ( ch, lin, icol );
             cdrefresh();
             icol = icol + 1;
@@ -511,7 +511,7 @@ int cdgetp ( const char pmt[], int lin, int col, const char terms[], char str[],
             utLog("cdgetp2:Got a strange char: '%c' = ascii %d", ch, ch);
 #endif
             cdbeep(); /* exceeded max. allowable characters. */
-            if (do_append_flg == TRUE) {
+            if (do_append_flg == true) {
                 /*
                  * Push (if char != ' ') last word back into buffer which will be
                  * inserted back into the msg buffer when cdgetp() is called again.
@@ -555,7 +555,7 @@ int cdgetp ( const char pmt[], int lin, int col, const char terms[], char str[],
                     }
                 }
                 ibufPut(mbuf);
-                *append_flg = TRUE;
+                *append_flg = true;
                 break;
             } /* end if do_append_flg */
 	}
@@ -608,10 +608,10 @@ void cdinit(void)
 
     nonl();
     typeahead(-1);		/* no typeahead checking */
-    keypad(stdscr, TRUE);
+    keypad(stdscr, true);
     cbreak();
-    notimeout(stdscr, TRUE);		/* JET 2/11/96 - this NEEDS to be set */
-    intrflush(stdscr, TRUE);
+    notimeout(stdscr, true);		/* JET 2/11/96 - this NEEDS to be set */
+    intrflush(stdscr, true);
 
     noecho();
 

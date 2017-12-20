@@ -86,7 +86,7 @@ int semInit(void)
           ConquestSemID);
 #endif
 
-    return(TRUE);
+    return(true);
 #endif  /* MINGW */
 }
 
@@ -106,7 +106,7 @@ void semLock(int what)
     utLog("semLock(%s): %s", semGetName(what), semGetStatusStr());
 #endif
 
-    Done = FALSE;
+    Done = false;
     /* Wait for sem to be zero, then inc */
     semops[0].sem_num = (short)what;
     semops[0].sem_op = 0;		/* test for 0, if so... */
@@ -120,7 +120,7 @@ void semLock(int what)
     /* block ALRM signals */
     clbBlockAlarm();
 
-    while (Done == FALSE)
+    while (Done == false)
     {
         if (semop(ConquestSemID, semops, 2) == -1)
         {
@@ -144,7 +144,7 @@ void semLock(int what)
             }
         }
         else			/* we got a successful lock */
-            Done = TRUE;
+            Done = true;
     }
 
 #ifdef DEBUG_SEM

@@ -30,7 +30,7 @@
 void glfInitFonts(void)
 {
     char fbuf[PATH_MAX] = {};
-    int fail = FALSE;
+    int fail = false;
 
 #ifdef DEBUG_GL
     utLog("%s: ENTER...", __FUNCTION__);
@@ -44,7 +44,7 @@ void glfInitFonts(void)
     {
         utLog("glfInitFonts: load %s failed", fbuf);
         fprintf(stderr, "glfInitFonts: load %s failed\n", fbuf);
-        fail = TRUE;
+        fail = true;
     }
 
     sprintf(fbuf, "%s/img/%s", utGetPath(CONQSHARE), "fixed.txf");
@@ -54,7 +54,7 @@ void glfInitFonts(void)
     {
         utLog("glfInitFonts: load %s failed", fbuf);
         fprintf(stderr, "glfInitFonts: load %s failed\n", fbuf);
-        fail = TRUE;
+        fail = true;
     }
 
     sprintf(fbuf, "%s/img/%s", utGetPath(CONQSHARE), "tinyfixed.txf");
@@ -64,7 +64,7 @@ void glfInitFonts(void)
     {
         utLog("glfInitFonts: load %s failed", fbuf);
         fprintf(stderr, "glfInitFonts: load %s failed\n", fbuf);
-        fail = TRUE;
+        fail = true;
     }
 
     sprintf(fbuf, "%s/img/%s", utGetPath(CONQSHARE), "msg.txf");
@@ -74,7 +74,7 @@ void glfInitFonts(void)
     {
         utLog("glfInitFonts: load %s failed", fbuf);
         fprintf(stderr, "glfInitFonts: load %s failed\n", fbuf);
-        fail = TRUE;
+        fail = true;
     }
 
     if (fail)

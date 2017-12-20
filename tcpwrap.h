@@ -14,7 +14,7 @@
 #if defined(HAVE_TCPW) && defined(HAVE_TCPD_H)
 int tcpwCheckHostAccess(char *daemon, char *remotehost);
 #else
-#define tcpwCheckHostAccess(x, y)  (TRUE)
+#define tcpwCheckHostAccess(x, y)  (true)
 #endif
 
 #endif /* _TCPWRAP_H */

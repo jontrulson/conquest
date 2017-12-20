@@ -52,10 +52,10 @@ int metaBuffer2ServerRec(metaSRec_t *srec, char *buf)
     int fieldno;
 
     if (!buf)
-        return FALSE;
+        return false;
 
     if ((tbuf = strdup(buf)) == NULL)
-        return FALSE;
+        return false;
 
     memset((void *)srec, 0, sizeof(metaSRec_t));
 
@@ -195,19 +195,19 @@ int metaBuffer2ServerRec(metaSRec_t *srec, char *buf)
     {
     case 1:
         if (fieldno < 11)
-            return FALSE;             /* something went wrong */
+            return false;             /* something went wrong */
         break;
 
     case 2:
         if (fieldno != 14)
-            return FALSE;             /* something went wrong */
+            return false;             /* something went wrong */
         break;
 
     default:
-        return FALSE;
+        return false;
     }
 
-    return TRUE;
+    return true;
 }
 
 /* returns a string in the same format as above. */
@@ -252,7 +252,7 @@ int metaUpdateServer(const char *remotehost, const char *name, int port)
     time_t thetimet = time(0);
 
     if (!remotehost)
-        return FALSE;
+        return false;
 
     if (!name)
         strcpy(myname, "");
@@ -316,7 +316,7 @@ int metaUpdateServer(const char *remotehost, const char *name, int port)
     if ((hp = gethostbyname(remotehost)) == NULL)
     {
         utLog("metaUpdateServer: %s: no such host", remotehost);
-        return FALSE;
+        return false;
     }
 
     /* put host's address and address type into socket structure */
@@ -329,18 +329,18 @@ int metaUpdateServer(const char *remotehost, const char *name, int port)
     if ((s = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP )) < 0)
     {
         utLog("metaUpdateServer: socket failed: %s", strerror(errno));
-        return FALSE;
+        return false;
     }
 
     if (sendto(s, msg, strlen(msg), 0, (const struct sockaddr *)&sa, sizeof(struct sockaddr_in)) < 0)
     {
         utLog("metaUpdateServer: sento failed: %s", strerror(errno));
-        return FALSE;
+        return false;
     }
 
     close(s);
 
-    return TRUE;
+    return true;
 }
 
 

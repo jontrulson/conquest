@@ -75,7 +75,7 @@ static void dispServerInfo(dspConfig_t *dsp, metaSRec_t *metaServerList,
     static char pbuf6[BUFFER_SIZE_256];
     static char pbuf7[BUFFER_SIZE_256];
     GLfloat x, y, w, h;
-    static int inited = FALSE;
+    static int inited = false;
     static const int hcol = 2, icol = 11;
     int tlin = 3;
 
@@ -87,7 +87,7 @@ static void dispServerInfo(dspConfig_t *dsp, metaSRec_t *metaServerList,
 
     if (!inited)
     {
-        inited = TRUE;
+        inited = true;
         sprintf(pbuf1, "#%d#Server: ", MagentaColor);
         sprintf(buf1, "#%d#%%s", NoColor);
 

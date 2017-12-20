@@ -38,7 +38,7 @@ static int ViewEditOptions(struct Conf ConfigData[], int ConfSize,
 static int ViewEditMacros(struct Conf *ConfigData);
 static void DisplayHelpScreen(struct Conf *confitem);
 
-static int ChangedSomething = FALSE;
+static int ChangedSomething = false;
 
 
 /*************************************************************************
@@ -60,25 +60,25 @@ static void DisplayCompileOptions(void)
         {
             {"HAVE_SETITIMER", "can do fastupdates (2 per sec)", CTYPE_BOOL,
 #ifdef HAVE_SETITIMER
-             (void *)TRUE
+             (void *)true
 #else
-             (void *)FALSE
+             (void *)false
 #endif /* HAVE_SETITIMER */
             },
 
             {"WARP0CLOAK", "can't be seen when cloaked at warp 0", CTYPE_BOOL,
 #ifdef WARP0CLOAK
-             (void *)TRUE
+             (void *)true
 #else
-             (void *)FALSE
+             (void *)false
 #endif /* WARP0CLOAK */
             },
 
             {"DO_EXPLODING_SHIPS", "ships explode when they die", CTYPE_BOOL,
 #ifdef DO_EXPLODING_SHIPS
-             (void *)TRUE
+             (void *)true
 #else
-             (void *)FALSE
+             (void *)false
 #endif /* DO_EXPLODING_SHIPS */
             },
 
@@ -109,13 +109,13 @@ static void DisplayCompileOptions(void)
 	case CTYPE_BOOL:
             j = (long)CompileOptions[i].value;
 
-            if (j == (long)TRUE)
+            if (j == (long)true)
                 vattrib = GreenLevelColor;
             else
                 vattrib = RedLevelColor;
 
             cprintf(lin, settingcol, ALIGN_NONE, "#%d#%s#%d#",
-                    vattrib, (j == TRUE) ? "True" : "False",
+                    vattrib, (j == true) ? "True" : "False",
                     NoColor);
             lin++;
 
@@ -163,10 +163,10 @@ void SysOptsMenu(void)
 
     int i;
     int ch;
-    int Done = FALSE;
+    int Done = false;
 
 
-    while (Done == FALSE)
+    while (Done == false)
     {
         /* First clear the display. */
         cdclear();
@@ -197,13 +197,13 @@ void SysOptsMenu(void)
             DisplayCompileOptions();
             break;
 	case '2':			/* sys-wide opts */
-            ChangedSomething = FALSE;
-            ViewEditOptions(SysConfData, SysCfEnd, TRUE);
-            if (ChangedSomething == TRUE)
+            ChangedSomething = false;
+            ViewEditOptions(SysConfData, SysCfEnd, true);
+            if (ChangedSomething == true)
                 SaveSysConfig();
             break;
 	default:
-            Done = TRUE;
+            Done = true;
             break;
 	}
     }
@@ -229,15 +229,15 @@ static void ChangeOption(struct Conf *cdata, int lin)
     case CTYPE_BOOL:
         j = *(int *)(cdata->ConfValue);
 
-        if (j == TRUE)
-            j = FALSE;
+        if (j == true)
+            j = false;
         else
-            j = TRUE;
+            j = true;
 
         *(int *)(cdata->ConfValue) = j;
 
         /* signal that something has been changed */
-        ChangedSomething = TRUE;
+        ChangedSomething = true;
 
         break;
 
@@ -256,7 +256,7 @@ static void ChangeOption(struct Conf *cdata, int lin)
 	{
             utStrncpy((char *)cdata->ConfValue, buf, cdata->max);
             /* signal that something has been changed */
-            ChangedSomething = TRUE;
+            ChangedSomething = true;
 	}
 
         break;
@@ -271,7 +271,7 @@ static void ChangeOption(struct Conf *cdata, int lin)
 	    {
                 *(int *)(cdata->ConfValue) = j;
                 /* signal that something has been changed */
-                ChangedSomething = TRUE;
+                ChangedSomething = true;
 	    }
 	}
 
@@ -303,7 +303,7 @@ static void ChangeMacro(int macronum)
     sprintf(prmpt, "f%2d = ", macronum);
 
     strcpy(buf, Macro2Str(UserConf.MacrosF[macronum - 1]));
-    ch = cdgetx(prmpt, lin, 1, TERMS, buf, MAX_MACRO_LEN - 1, TRUE);
+    ch = cdgetx(prmpt, lin, 1, TERMS, buf, MAX_MACRO_LEN - 1, true);
 
     if (ch == TERM_ABORT)
     {
@@ -312,7 +312,7 @@ static void ChangeMacro(int macronum)
 
     utStrncpy(UserConf.MacrosF[macronum - 1], Str2Macro(buf), MAX_MACRO_LEN);
 
-    ChangedSomething = TRUE;
+    ChangedSomething = true;
 
     return;
 }
@@ -342,7 +342,7 @@ static int ViewEditOptions(struct Conf ConfigData[], int ConfSize,
     int cvec[MAXOPTCOLS];		/* hopefully big enough */
     int usingSysOpts;
 
-    usingSysOpts = ((ConfigData == SysConfData) ? TRUE : FALSE);
+    usingSysOpts = ((ConfigData == SysConfData) ? true : false);
 
     if (usingSysOpts)
         header = sheader;
@@ -408,13 +408,13 @@ static int ViewEditOptions(struct Conf ConfigData[], int ConfSize,
 	    case CTYPE_BOOL:
                 j = *(int *)ConfigData[i].ConfValue;
 
-                if (j == TRUE)
+                if (j == true)
                     vattrib = GreenLevelColor;
                 else
                     vattrib = RedLevelColor;
 
                 cprintf(lin, settingcol, ALIGN_NONE, "#%d#%s#%d#",
-                        vattrib, (j == TRUE) ? "True" : "False",
+                        vattrib, (j == true) ? "True" : "False",
                         NoColor);
                 break;
 
@@ -504,7 +504,7 @@ static int ViewEditOptions(struct Conf ConfigData[], int ConfSize,
 #endif
     }
 
-    return TRUE;
+    return true;
 }
 
 /*************************************************************************
@@ -523,7 +523,7 @@ static int ViewEditMacros(struct Conf *ConfigData)
     static const char *nodef = "<Not Defined>";
     static const char *eprompt = "Arrow keys to select a macro, [SPACE] to change, any other key to quit.";
     static const char *eprompt2 = "Type '?' for help.";
-    int Done = FALSE;
+    int Done = false;
     int ch, vattrib;
     const char *dispmac;
     int lin = 0, col = 0, flin = 0, llin = 0, clin = 0, pages = 0, curpage = 0;
@@ -557,7 +557,7 @@ static int ViewEditMacros(struct Conf *ConfigData)
     clin = 0;			/* current macro line */
 
 
-    while (Done == FALSE)
+    while (Done == false)
     {
         sprintf(header2buf, header2fmt, curpage + 1, pages);
         sprintf(headerbuf, "%s %s", header, header2buf);
@@ -708,7 +708,7 @@ static int ViewEditMacros(struct Conf *ConfigData)
             break;
 
 	default:		/* everything else */
-            Done = TRUE;
+            Done = true;
             break;
 	}
 
@@ -718,7 +718,7 @@ static int ViewEditMacros(struct Conf *ConfigData)
 #endif
     }
 
-    return TRUE;
+    return true;
 }
 
 /* DisplayHelpScreen() - display a help (actually the conf item comment)

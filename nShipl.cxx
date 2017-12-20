@@ -187,7 +187,7 @@ static int nShiplInput(int ch)
     {
     case DSP_NODE_CP:
         setONode(NULL);
-        nCPInit(FALSE);
+        nCPInit(false);
         break;
     case DSP_NODE_MENU:
         setONode(NULL);

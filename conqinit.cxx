@@ -51,19 +51,19 @@ int main(int argc, char **argv)
 
     rndini();
 
-    utSetLogConfig(FALSE, TRUE);    /* log + stderr! :) */
+    utSetLogConfig(false, true);    /* log + stderr! :) */
 
     while ( (ch = getopt( argc, argv, "vdDf:hts" )) != EOF )
     {      switch(ch)
 	{
 	case 'v':
-            verbosity = TRUE;
+            verbosity = true;
             break;
         case 'd':
             debuglevel++;
             break;
         case 'h':
-            doheader = TRUE;
+            doheader = true;
             break;
         case 'D':
             dumpUniverse();

@@ -177,7 +177,7 @@ int main(int argc, char *argv[])
             exit(1);
 	}
 
-        GetSysConf(TRUE);		/* init defaults... */
+        GetSysConf(true);		/* init defaults... */
 
         /* load conqinitrc */
         cqiLoadRC(CQI_FILE_CONQINITRC, NULL, 0, 0);
@@ -197,7 +197,7 @@ int main(int argc, char *argv[])
 	{
             int rv;
 
-            rv = DoInit(InitStuffChar, TRUE);
+            rv = DoInit(InitStuffChar, true);
 
             if (rv != 0)
                 exit(1);
@@ -206,7 +206,7 @@ int main(int argc, char *argv[])
         /* turn the game on */
         if ((OptionAction & OP_ENABLEGAME) != 0)
 	{
-            cbConqInfo->closed = FALSE;
+            cbConqInfo->closed = false;
             /* Unlock the lockwords (just in case...) */
             cbUnlock(&cbConqInfo->lockword);
             cbUnlock(&cbConqInfo->lockmesg);
@@ -219,7 +219,7 @@ int main(int argc, char *argv[])
         /* turn the game off */
         if ((OptionAction & OP_DISABLEGAME) != 0)
 	{
-            cbConqInfo->closed = TRUE;
+            cbConqInfo->closed = true;
             fprintf(stdout, "Game disabled.\n");
 	}
 
@@ -228,7 +228,7 @@ int main(int argc, char *argv[])
 
     }
 
-    if (GetSysConf(FALSE) == -1)
+    if (GetSysConf(false) == -1)
     {
 #ifdef DEBUG_CONFIG
         utLog("%s@%d: main(): GetSysConf() returned -1.", __FILE__, __LINE__);
@@ -273,11 +273,11 @@ int main(int argc, char *argv[])
 
     Context.unum = -1;          /* stow user number */
     Context.snum = -1;		/* don't display in cdgetp - JET */
-    Context.entship = FALSE;	/* never entered a ship */
+    Context.entship = false;	/* never entered a ship */
     Context.histslot = -1;	/* useless as an op */
     Context.lasttang = Context.lasttdist = 0;
     Context.lasttarg[0] = 0;
-    Context.display = TRUE;
+    Context.display = true;
     Context.maxlin = cdlins();	/* number of lines */
 
     Context.maxcol = cdcols();	/* number of columns */
@@ -824,14 +824,14 @@ int opPlanetMatch( char str[], int *pnum )
     {
         i = 0;
         if ( ! utSafeCToI( pnum, str, i ) )
-            return ( FALSE );
+            return ( false );
         if ( *pnum < 0 || *pnum >= MAXPLANETS )
-            return ( FALSE );
+            return ( false );
     }
     else
-        return ( clbPlanetMatch( str, pnum, TRUE ) );
+        return ( clbPlanetMatch( str, pnum, true ) );
 
-    return ( TRUE );
+    return ( true );
 
 }
 
@@ -865,7 +865,7 @@ void kiss(int snum, int prompt_flg)
             sprintf(buf, "%d", snum);
 
         ch = (char)cdgetx( prompt_str, MSG_LIN1, 1, TERMS, buf, MSGMAXLINE,
-                           TRUE);
+                           true);
         if ( ch == TERM_ABORT )
 	{
             cdclrl( MSG_LIN1, 1 );
@@ -934,13 +934,13 @@ void kiss(int snum, int prompt_flg)
     }
 
     /* Kill EVERYBODY? */
-    if ( utStringMatch( buf, "all", FALSE ) )
+    if ( utStringMatch( buf, "all", false ) )
     {
-        didany = FALSE;
+        didany = false;
         for ( snum = 0; snum < MAXSHIPS; snum++ )
             if ( cbShips[snum].status == SS_LIVE )
             {
-                didany = TRUE;
+                didany = true;
                 cdclrl( MSG_LIN1, 1 );
                 sprintf(buf, kill_ship_str1,
                         cbTeams[cbShips[snum].team].teamchar,
@@ -971,12 +971,12 @@ void kiss(int snum, int prompt_flg)
     }
 
     /* Yes. */
-    didany = FALSE;
+    didany = false;
     for ( snum = 0; snum < MAXSHIPS; snum++ )
         if ( cbShips[snum].status == SS_LIVE )
             if ( cbShips[snum].unum == unum )
             {
-                didany = TRUE;
+                didany = true;
                 cdclrl( MSG_LIN1, 1 );
                 sprintf(mbuf, kill_ship_str2,
                         cbTeams[cbShips[snum].team].teamchar,
@@ -1140,14 +1140,14 @@ void operate(void)
     lastrev = *cbRevision;
     utGrand( &msgrand );
 
-    redraw = TRUE;
-    while (TRUE)      /* repeat */
+    redraw = true;
+    while (true)      /* repeat */
     {
         if ( redraw || lastrev != *cbRevision )
 	{
             lastrev = *cbRevision;
             opback( lastrev, &savelin );
-            redraw = FALSE;
+            redraw = false;
 	}
         /* Line 1. */
 
@@ -1221,7 +1221,7 @@ void operate(void)
 
 
             /* Display a new message, if any. */
-            readone = FALSE;
+            readone = false;
             if ( utDeltaGrand( msgrand, &now ) >= NEWMSG_GRAND )
                 if ( utGetMsg( -1, &cbConqInfo->glastmsg ) )
                 {
@@ -1231,7 +1231,7 @@ void operate(void)
                     if (cbMsgs[cbConqInfo->glastmsg].msgfrom != MSG_GOD)
                         cdbeep();
 #endif
-                    readone = TRUE;
+                    readone = true;
                     msgrand = now;
                 }
             cdmove( 1, 1 );
@@ -1260,7 +1260,7 @@ void operate(void)
 	{
 	case 'a':
             opuadd();
-            redraw = TRUE;
+            redraw = true;
             break;
 	case 'b':
             if ( mcuConfirm() )
@@ -1282,12 +1282,12 @@ void operate(void)
             break;
 	case 'e':
             opuedit();
-            redraw = TRUE;
+            redraw = true;
             break;
 	case 'f':
             if ( cbConqInfo->closed )
 	    {
-                cbConqInfo->closed = FALSE;
+                cbConqInfo->closed = false;
                 /* Unlock the lockwords (just in case...) */
                 cbUnlock(&cbConqInfo->lockword);
                 cbUnlock(&cbConqInfo->lockmesg);
@@ -1300,7 +1300,7 @@ void operate(void)
 	    }
             else if ( mcuConfirm() )
 	    {
-                cbConqInfo->closed = TRUE;
+                cbConqInfo->closed = true;
                 utLog("OPER: %s has disabled the game",
                       operName);
 	    }
@@ -1312,32 +1312,32 @@ void operate(void)
                 cbDriver->drivstat = DRS_HOLDING;
             break;
 	case 'H':
-            mcuHistList( TRUE );
-            redraw = TRUE;
+            mcuHistList( true );
+            redraw = true;
             break;
 	case 'i':
             opinfo( -1 );
             break;
 	case 'I':
             opinit();
-            redraw = TRUE;
+            redraw = true;
             break;
 	case 'k':
-            kiss(0,TRUE);
+            kiss(0,true);
             break;
 	case 'L':
             mcuReviewMsgs( -1 /*god*/, cbConqInfo->glastmsg );
             break;
 	case 'm':
-            cucSendMsg( MSG_FROM_GOD, 0, TRUE, FALSE );
+            cucSendMsg( MSG_FROM_GOD, 0, true, false );
             break;
 	case 'O':
             SysOptsMenu();
-            redraw = TRUE;
+            redraw = true;
             break;
 	case 'p':
             oppedit();
-            redraw = TRUE;
+            redraw = true;
             break;
 	case 'q':
 	case 'Q':
@@ -1348,48 +1348,48 @@ void operate(void)
             break;
 	case 'R':
             opresign();
-            redraw = TRUE;
+            redraw = true;
             break;
 	case 's':
             opstats();
-            redraw = TRUE;
+            redraw = true;
             break;
 	case 'S':
-            mcuUserStats( TRUE , 0 ); /* we're always neutral ;-) - dwp */
-            redraw = TRUE;
+            mcuUserStats( true , 0 ); /* we're always neutral ;-) - dwp */
+            redraw = true;
             break;
 	case 'T':
             opTeamList();
-            redraw = TRUE;
+            redraw = true;
             break;
 	case 'U':
-            mcuUserList( TRUE, 0 );
-            redraw = TRUE;
+            mcuUserList( true, 0 );
+            redraw = true;
             break;
 	case 'w':
             watch();
             operStopTimer();		/* to be sure */
-            redraw = TRUE;
+            redraw = true;
             break;
 	case '/':
-            mcuPlayList( TRUE, FALSE, 0 );
-            redraw = TRUE;
+            mcuPlayList( true, false, 0 );
+            redraw = true;
             break;
 	case '\\':
-            mcuPlayList( TRUE, TRUE, 0 );
-            redraw = TRUE;
+            mcuPlayList( true, true, 0 );
+            redraw = true;
             break;
 	case '?':
             opPlanetList();
-            redraw = TRUE;
+            redraw = true;
             break;
 	case '$':
             debugplan();
-            redraw = TRUE;
+            redraw = true;
             break;
 	case 0x0c:
             cdredo();
-            redraw = TRUE;
+            redraw = true;
             break;
 	case ' ':
 	case TERM_NORMAL:
@@ -1421,7 +1421,7 @@ void opinfo( int snum )
     cdclrl( MSG_LIN1, 2 );
 
     cbuf[0] = 0;
-    ch = (char)cdgetx( pmt, MSG_LIN1, 1, TERMS, cbuf, MSGMAXLINE, TRUE );
+    ch = (char)cdgetx( pmt, MSG_LIN1, 1, TERMS, cbuf, MSGMAXLINE, true );
     if ( ch == TERM_ABORT )
     {
         cdclrl( MSG_LIN1, 1 );
@@ -1577,14 +1577,14 @@ void opinit(void)
     uiPutColor(CQC_A_BOLD);
     cdbox( lin-1, col, lin+1, col+i+1 );
 
-    while (TRUE)  /*repeat */
+    while (true)  /*repeat */
     {
         lin = MSG_LIN1;
         col = 30;
         cdclrl( lin, 1 );
         uiPutColor(InfoColor);
         buf[0] = 0;
-        ch = (char)cdgetx( pmt, lin, col, TERMS, buf, MSGMAXLINE, TRUE );
+        ch = (char)cdgetx( pmt, lin, col, TERMS, buf, MSGMAXLINE, true );
         cdclrl( lin, 1 );
         cdputs( pmt, lin, col );
         uiPutColor(0);
@@ -1597,61 +1597,61 @@ void opinit(void)
             cdputs( "everything", lin, col );
             if ( mcuConfirm() )
 	    {
-                DoInit('e', FALSE);
+                DoInit('e', false);
 	    }
             break;
 	case 'z':
             cdputs( "zero everything", lin, col );
             if ( mcuConfirm() )
-                DoInit('z', FALSE);
+                DoInit('z', false);
             break;
 	case 'u':
             cdputs( "universe", lin, col );
             if ( mcuConfirm() )
 	    {
-                DoInit('u', FALSE);
+                DoInit('u', false);
 	    }
             break;
 	case 'g':
             cdputs( "game", lin, col );
             if ( mcuConfirm() )
 	    {
-                DoInit('g', FALSE);
+                DoInit('g', false);
 	    }
             break;
 	case 'p':
             cdputs( "planets", lin, col );
             if ( mcuConfirm() )
 	    {
-                DoInit('p', FALSE);
+                DoInit('p', false);
 	    }
             break;
 	case 's':
             cdputs( "ships", lin, col );
             if ( mcuConfirm() )
 	    {
-                DoInit('s', FALSE);
+                DoInit('s', false);
 	    }
             break;
 	case 'm':
             cdputs( "messages", lin, col );
             if ( mcuConfirm() )
 	    {
-                DoInit('m', FALSE);
+                DoInit('m', false);
 	    }
             break;
 	case 'l':
             cdputs( "lockwords", lin, col );
             if ( mcuConfirm() )
 	    {
-                DoInit('l', FALSE);
+                DoInit('l', false);
 	    }
             break;
 	case 'r':
             cdputs( "robots", lin, col );
             if ( mcuConfirm() )
 	    {
-                DoInit('r', FALSE);
+                DoInit('r', false);
 	    }
             break;
 	default:
@@ -1696,7 +1696,7 @@ void oppedit(void)
 
     cdredo();
     cdclear();
-    while (TRUE) /*repeat*/
+    while (true) /*repeat*/
     {
 
         /* Display the planet. */
@@ -2038,7 +2038,7 @@ void oppedit(void)
 	default:
             cdbeep();
 	}
-    }/* while (TRUE) */
+    }/* while (true) */
 
     /* NOTREACHED */
 
@@ -2066,7 +2066,7 @@ void opresign(void)
     cdclrl( MSG_LIN1, 2 );
     buf[0] = 0;
     ch = (char)cdgetx( "Resign user: ", MSG_LIN1, 1, TERMS, buf, MSGMAXLINE,
-                       TRUE);
+                       true);
     if ( ch == TERM_ABORT )
     {
         cdclrl( MSG_LIN1, 1 );
@@ -2087,7 +2087,7 @@ void opresign(void)
               cbUsers[unum].username,
               cbUsers[unum].alias);
 
-        clbResign( unum, TRUE );
+        clbResign( unum, true );
     }
     cdclrl( MSG_LIN1, 2 );
 
@@ -2110,7 +2110,7 @@ void oprobot(void)
     cdclrl( MSG_LIN1, 2 );
     buf[0] = 0;
     ch = (char)cdgetx( "Enter username for new robot (Orion, Federation, etc): ",
-                       MSG_LIN1, 1, TERMS, buf, MAXUSERNAME, TRUE );
+                       MSG_LIN1, 1, TERMS, buf, MAXUSERNAME, true );
     if ( ch == TERM_ABORT || buf[0] == 0 )
     {
         cdclrl( MSG_LIN1, 1 );
@@ -2141,13 +2141,13 @@ void oprobot(void)
 
     /* Defaults. */
     num = 1;
-    warlike = FALSE;
+    warlike = false;
 
     if ( ch == TERM_EXTRA )
     {
         buf[0] = 0;
         ch = (char)cdgetx( "Enter number desired ([TAB] for warlike): ",
-                           MSG_LIN2, 1, TERMS, buf, MAXUSERNAME, TRUE );
+                           MSG_LIN2, 1, TERMS, buf, MAXUSERNAME, true );
         if ( ch == TERM_ABORT )
 	{
             cdclrl( MSG_LIN1, 2 );
@@ -2176,8 +2176,8 @@ void oprobot(void)
         if ( warlike )
 	{
             for ( j = 0; j < NUMPLAYERTEAMS; j = j + 1 )
-                cbShips[snum].war[j] = TRUE;
-            cbShips[snum].war[cbShips[snum].team] = FALSE;
+                cbShips[snum].war[j] = true;
+            cbShips[snum].war[cbShips[snum].team] = false;
 	}
     }
 
@@ -2185,7 +2185,7 @@ void oprobot(void)
     utLog("OPER: %s created %d %s%s (%s) robot(s)",
           operName,
           anum,
-          (warlike == TRUE) ? "WARLIKE " : "",
+          (warlike == true) ? "WARLIKE " : "",
           cbUsers[unum].alias,
           cbUsers[unum].username);
 
@@ -2394,7 +2394,7 @@ void opuadd(void)
     cdclrl( MSG_LIN1, 2 );
     name[0] = 0;
     ch = (char)cdgetx( "Add user: ", MSG_LIN1, 1, TERMS, name, MAXUSERNAME,
-                       TRUE);
+                       true);
     /*  utDeleteBlanks( name );*/
 
     if ( ch == TERM_ABORT || name[0] == 0 )
@@ -2421,7 +2421,7 @@ void opuadd(void)
 
         cdclrl( MSG_LIN1, 1 );
         buf[0] = 0;
-        ch = (char)cdgetx( junk, MSG_LIN1, 1, TERMS, buf, MSGMAXLINE, TRUE );
+        ch = (char)cdgetx( junk, MSG_LIN1, 1, TERMS, buf, MSGMAXLINE, true );
         if ( ch == TERM_ABORT )
 	{
             cdclrl( MSG_LIN1, 1 );
@@ -2466,7 +2466,7 @@ void opuadd(void)
     cdclrl( MSG_LIN1, 2 );
 
 
-    ChangePassword(unum, TRUE);
+    ChangePassword(unum, true);
 
     return;
 
@@ -2483,7 +2483,7 @@ void opuedit(void)
 
     int i, unum, row = 1, lin, olin, tcol, dcol, lcol, rcol;
     char buf[MSGMAXLINE];
-    int ch, left = TRUE;
+    int ch, left = true;
     char datestr[MAXDATESIZE];
     static const char *prompt2 = "any other key to quit.";
     static const char *rprompt =
@@ -2513,7 +2513,7 @@ void opuedit(void)
     cdclear();
     cdclrl( MSG_LIN1, 2 );
 
-    while (TRUE) /* repeat */
+    while (true) /* repeat */
     {
         /* Do the right side first. */
         cdclrl( 1, MSG_LIN1 -1 );
@@ -2763,7 +2763,7 @@ void opuedit(void)
 	case 'H':
 	case KEY_LEFT:
             /* Left. */
-            left = TRUE;
+            left = true;
             break;
 	case 'd':
 	case 'D':
@@ -2771,7 +2771,7 @@ void opuedit(void)
 	case 'L':
 	case KEY_RIGHT:
             /* Right. */
-            left = FALSE;
+            left = false;
             break;
 	case 'w':
 	case 'W':
@@ -2794,7 +2794,7 @@ void opuedit(void)
 	case KEY_A1:
 	case KEY_HOME:
             /* Up and left. */
-            left = TRUE;
+            left = true;
             row = max( row - 1, 1 );
             break;
 	case 'e':
@@ -2804,7 +2804,7 @@ void opuedit(void)
 	case KEY_PPAGE:
 	case KEY_A3:
             /* Up and right. */
-            left = FALSE;
+            left = false;
             row = max( row - 1, 1 );
             break;
 	case 'z':
@@ -2814,7 +2814,7 @@ void opuedit(void)
 	case KEY_END:
 	case KEY_C1:
             /* Down and left. */
-            left = TRUE;
+            left = true;
             row = min( row + 1, MAXUEDITROWS );
             break;
 	case 'c':
@@ -2824,7 +2824,7 @@ void opuedit(void)
 	case KEY_NPAGE:
 	case KEY_C3:
             /* Down and right. */
-            left = FALSE;
+            left = false;
             row = min( row + 1, MAXUEDITROWS );
             break;
 	case ' ':
@@ -2925,7 +2925,7 @@ void opuedit(void)
             break;
 
 	case TERM_EXTRA:	/* change passwd */
-            ChangePassword(unum, TRUE);
+            ChangePassword(unum, true);
             break;
 
 	case 0x0c:
@@ -2955,17 +2955,17 @@ void watch(void)
     int ch, normal;
     int msgrand, readone, now;
     char buf[MSGMAXLINE];
-    int live_ships = TRUE;
-    int toggle_flg = FALSE;   /* jon no like the toggle line ... :-) */
+    int live_ships = true;
+    int toggle_flg = false;   /* jon no like the toggle line ... :-) */
 
-    normal = TRUE;
+    normal = true;
 
     if (!prompt_ship(buf, &snum, &normal))
         return;
     else
     {
         old_snum = tmp_snum = snum;
-        Context.redraw = TRUE;
+        Context.redraw = true;
         cdclear();
         cdredo();
         utGrand( &msgrand );
@@ -2973,12 +2973,12 @@ void watch(void)
         Context.snum = snum;		/* so display knows what to display */
         operSetTimer();
 
-        while (TRUE)	/* repeat */
+        while (true)	/* repeat */
         {
             if (!normal)
-		Context.display = FALSE; /* can't use it to display debugging */
+		Context.display = false; /* can't use it to display debugging */
             else
-		Context.display = TRUE;
+		Context.display = true;
 
             /* set up toggle line display */
             /* cdclrl( MSG_LIN1, 1 ); */
@@ -2986,7 +2986,7 @@ void watch(void)
                 toggle_line(snum,old_snum);
 
 	    /* Try to display a new message. */
-	    readone = FALSE;
+	    readone = false;
 	    if ( utDeltaGrand( msgrand, &now ) >= NEWMSG_GRAND )
 		if ( utGetMsg( -1, &cbConqInfo->glastmsg ) )
                 {
@@ -2996,7 +2996,7 @@ void watch(void)
                         cdbeep();
 #endif
 		    msgrand = now;
-		    readone = TRUE;
+		    readone = true;
                 }
 
             if ( !normal )
@@ -3029,14 +3029,14 @@ void watch(void)
             case 'h':
                 operStopTimer();
                 dowatchhelp();
-                Context.redraw = TRUE;
+                Context.redraw = true;
                 operSetTimer();
                 break;
             case 'i':
                 opinfo( -1 );
                 break;
             case 'k':
-                kiss(Context.snum, TRUE);
+                kiss(Context.snum, true);
                 break;
             case 'M':		/* strategic/tactical map */
                 if (SMAP(Context.snum))
@@ -3046,7 +3046,7 @@ void watch(void)
 
                 break;
             case 'm':
-                cucSendMsg( MSG_FROM_GOD, 0, TRUE, FALSE );
+                cucSendMsg( MSG_FROM_GOD, 0, true, false );
                 break;
             case 'r':  /* just for fun - dwp */
                 oprobot();
@@ -3057,7 +3057,7 @@ void watch(void)
             case 0x0c:
                 operStopTimer();
                 cdredo();
-                Context.redraw = TRUE;
+                Context.redraw = true;
                 operSetTimer();
                 break;
             case 'q':
@@ -3072,7 +3072,7 @@ void watch(void)
                     if (tmp_snum != snum)
                     {
                         old_snum = tmp_snum;
-                        Context.redraw = TRUE;
+                        Context.redraw = true;
                     }
                     Context.snum = snum;
                     if (normal)
@@ -3085,9 +3085,9 @@ void watch(void)
                 break;
             case 'W': /* toggle live_ships flag */
                 if (live_ships)
-		    live_ships = FALSE;
+		    live_ships = false;
                 else
-		    live_ships = TRUE;
+		    live_ships = true;
                 break;
             case '`':                 /* toggle between two ships */
                 if (normal || (!normal && old_snum >= 0))
@@ -3099,7 +3099,7 @@ void watch(void)
                         old_snum = tmp_snum;
 
                         Context.snum = snum;
-                        Context.redraw = TRUE;
+                        Context.redraw = true;
                         if (normal)
                         {
                             operStopTimer();
@@ -3115,10 +3115,10 @@ void watch(void)
                 if (Context.snum >= 0)
                 {
                     if (normal)
-			normal = FALSE;
+			normal = false;
                     else
-			normal = TRUE;
-                    Context.redraw = TRUE;
+			normal = true;
+                    Context.redraw = true;
                     cdclear();
                 }
                 else
@@ -3126,26 +3126,26 @@ void watch(void)
                 break;
             case '/':                /* ship list - dwp */
                 operStopTimer();
-                mcuPlayList( TRUE, FALSE, 0 );
-                Context.redraw = TRUE;
+                mcuPlayList( true, false, 0 );
+                Context.redraw = true;
                 operSetTimer();
                 break;
             case '\\':               /* big ship list - dwp */
                 operStopTimer();
-                mcuPlayList( TRUE, TRUE, 0 );
-                Context.redraw = TRUE;
+                mcuPlayList( true, true, 0 );
+                Context.redraw = true;
                 operSetTimer();
                 break;
             case '!':
                 if (toggle_flg)
-                    toggle_flg = FALSE;
+                    toggle_flg = false;
                 else
-                    toggle_flg = TRUE;
+                    toggle_flg = true;
                 break;
             case '>':  /* forward rotate ship numbers (including doomsday) - dwp */
             case KEY_RIGHT:
             case KEY_UP:
-                while (TRUE)
+                while (true)
                 {
                     int i;
 
@@ -3153,22 +3153,22 @@ void watch(void)
                     {	/* we need to make sure that there is
                            actually something alive or an
                            infinite loop will result... */
-                        int foundone = FALSE;
+                        int foundone = false;
 
                         for (i=0; i<MAXSHIPS; i++)
                         {
                             if (clbStillAlive(i))
                             {
-                                foundone = TRUE;
+                                foundone = true;
                             }
                         }
-                        if (foundone == FALSE)
+                        if (foundone == false)
                         {	/* check the doomsday machine */
                             if (DOOM_LIVE())
-				foundone = TRUE;
+				foundone = true;
                         }
 
-                        if (foundone == FALSE)
+                        if (foundone == false)
                         {
                             cdbeep();
                             break; /* didn't find one, beep, leave everything
@@ -3195,7 +3195,7 @@ void watch(void)
 
                     snum = i;
 
-                    Context.redraw = TRUE;
+                    Context.redraw = true;
 
                     if (live_ships)
 			if ((snum >= 0 && clbStillAlive(snum)) ||
@@ -3222,7 +3222,7 @@ void watch(void)
             case '<':  /* reverse rotate ship numbers (including doomsday)  - dwp */
             case KEY_LEFT:
             case KEY_DOWN:
-                while (TRUE)
+                while (true)
                 {
                     int i;
 
@@ -3230,22 +3230,22 @@ void watch(void)
                     {	/* we need to make sure that there is
                            actually something alive or an
                            infinite loop will result... */
-                        int foundone = FALSE;
+                        int foundone = false;
 
                         for (i=0; i < MAXSHIPS; i++)
                         {
                             if (clbStillAlive(i))
                             {
-                                foundone = TRUE;
+                                foundone = true;
                             }
                         }
-                        if (foundone == FALSE)
+                        if (foundone == false)
                         {	/* check the doomsday machine */
                             if (DOOM_LIVE())
-				foundone = TRUE;
+				foundone = true;
                         }
 
-                        if (foundone == FALSE)
+                        if (foundone == false)
                         {
                             cdbeep();
                             break; /* didn't find one, beep, leave everything
@@ -3273,7 +3273,7 @@ void watch(void)
 
                     snum = i;
 
-                    Context.redraw = TRUE;
+                    Context.redraw = true;
 
                     if (live_ships)
 			if ((snum >= 0 && clbStillAlive(snum)) ||
@@ -3324,12 +3324,12 @@ int prompt_ship(char buf[], int *snum, int *normal)
 
     cdclrl( MSG_LIN1, 2 );
     buf[0] = 0;
-    tch = cdgetx( pmt, MSG_LIN1, 1, TERMS, buf, MSGMAXLINE, TRUE );
+    tch = cdgetx( pmt, MSG_LIN1, 1, TERMS, buf, MSGMAXLINE, true );
     cdclrl( MSG_LIN1, 1 );
 
     if ( tch == TERM_ABORT )
     {
-        return(FALSE); /* dwp */
+        return(false); /* dwp */
     }
 
     /*
@@ -3344,7 +3344,7 @@ int prompt_ship(char buf[], int *snum, int *normal)
     if ( strlen( buf ) == 0 )
     {              /* watch doomsday machine */
         tmpsnum = DISPLAY_DOOMSDAY;
-        *normal = TRUE;		/* doomsday doesn't have a debugging view */
+        *normal = true;		/* doomsday doesn't have a debugging view */
     }
     else
     {
@@ -3354,7 +3354,7 @@ int prompt_ship(char buf[], int *snum, int *normal)
             cdmove( 1, 1 );
             cdrefresh();
             utSleep( 1.0 );
-            return(FALSE); /* dwp */
+            return(false); /* dwp */
 	}
         utSafeCToI( &tmpsnum, buf, 0 );	/* ignore return status */
     }
@@ -3365,11 +3365,11 @@ int prompt_ship(char buf[], int *snum, int *normal)
         cdmove( 1, 1 );
         cdrefresh();
         utSleep( 1.0 );
-        return(FALSE); /* dwp */
+        return(false); /* dwp */
     }
 
     *snum = tmpsnum;
-    return(TRUE);
+    return(true);
 
 } /* end prompt_ship() */
 
@@ -3480,13 +3480,13 @@ char *build_toggle_str(char *snum_str, int snum)
 }
 
 /* DoInit(InitChar, cmdline) - Based on InitChar, init something (like in
- *   the (I)nitialize screen).  if cmdline is TRUE, output status on stdout.
+ *   the (I)nitialize screen).  if cmdline is true, output status on stdout.
  */
 
 int DoInit(char InitChar, int cmdline)
 {
 
-    if (cmdline == TRUE)
+    if (cmdline == true)
     {
         fprintf(stdout, "Initialized ");
         fflush(stdout);
@@ -3499,7 +3499,7 @@ int DoInit(char InitChar, int cmdline)
         clbInitEverything();
         *cbRevision = COMMONSTAMP;
 
-        if (cmdline == TRUE)
+        if (cmdline == true)
 	{
             fprintf(stdout, "everything.\n");
             fflush(stdout);
@@ -3510,7 +3510,7 @@ int DoInit(char InitChar, int cmdline)
     case 'z':
         clbZeroEverything();
 
-        if (cmdline == TRUE)
+        if (cmdline == true)
 	{
             fprintf(stdout, "common block (zeroed).\n");
             fflush(stdout);
@@ -3522,7 +3522,7 @@ int DoInit(char InitChar, int cmdline)
         clbInitUniverse();
         *cbRevision = COMMONSTAMP;
 
-        if (cmdline == TRUE)
+        if (cmdline == true)
 	{
             fprintf(stdout, "universe.\n");
             fflush(stdout);
@@ -3534,7 +3534,7 @@ int DoInit(char InitChar, int cmdline)
         clbInitGame();
         *cbRevision = COMMONSTAMP;
 
-        if (cmdline == TRUE)
+        if (cmdline == true)
 	{
             fprintf(stdout, "game.\n");
             fflush(stdout);
@@ -3546,7 +3546,7 @@ int DoInit(char InitChar, int cmdline)
         cqiInitPlanets();
         *cbRevision = COMMONSTAMP;
 
-        if (cmdline == TRUE)
+        if (cmdline == true)
 	{
             fprintf(stdout, "planets.\n");
             fflush(stdout);
@@ -3558,7 +3558,7 @@ int DoInit(char InitChar, int cmdline)
         clbClearShips();
         *cbRevision = COMMONSTAMP;
 
-        if (cmdline == TRUE)
+        if (cmdline == true)
 	{
             fprintf(stdout, "ships.\n");
             fflush(stdout);
@@ -3570,7 +3570,7 @@ int DoInit(char InitChar, int cmdline)
         clbInitMsgs();
         *cbRevision = COMMONSTAMP;
 
-        if (cmdline == TRUE)
+        if (cmdline == true)
 	{
             fprintf(stdout, "messages.\n");
             fflush(stdout);
@@ -3583,7 +3583,7 @@ int DoInit(char InitChar, int cmdline)
         cbUnlock(&cbConqInfo->lockmesg);
         *cbRevision = COMMONSTAMP;
 
-        if (cmdline == TRUE)
+        if (cmdline == true)
 	{
             fprintf(stdout, "lockwords.\n");
             fflush(stdout);
@@ -3595,7 +3595,7 @@ int DoInit(char InitChar, int cmdline)
         clbInitRobots();
         *cbRevision = COMMONSTAMP;
 
-        if (cmdline == TRUE)
+        if (cmdline == true)
 	{
             fprintf(stdout, "robots.\n");
             fflush(stdout);
@@ -3604,7 +3604,7 @@ int DoInit(char InitChar, int cmdline)
         break;
 
     default:
-        if (cmdline == TRUE)
+        if (cmdline == true)
 	{
             fprintf(stdout, "nothing. '%c' unrecognized.\n", InitChar);
             fflush(stdout);
@@ -3615,7 +3615,7 @@ int DoInit(char InitChar, int cmdline)
     utLog("OPER: %s initialized '%c'",
           operName, InitChar);
 
-    return TRUE;
+    return true;
 }
 
 void EnableConqoperSignalHandler(void)
@@ -3746,7 +3746,7 @@ void operStopTimer(void)
     struct itimerval itimer;
 #endif
 
-    Context.display = FALSE;
+    Context.display = false;
 
 
     signal(SIGALRM, SIG_IGN);
@@ -3761,7 +3761,7 @@ void operStopTimer(void)
 #endif
 
 
-    Context.display = TRUE;
+    Context.display = true;
 
     return;
 

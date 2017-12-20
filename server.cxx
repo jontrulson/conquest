@@ -29,8 +29,8 @@ static void handleUDPErr(void)
 
     if (sudperrs > MAXUDPERRS)
     {
-        sInfo.tryUDP = FALSE;
-        sInfo.doUDP = FALSE;
+        sInfo.tryUDP = false;
+        sInfo.doUDP = false;
         close(sInfo.usock);
         sInfo.usock = -1;
         pktSetSocketFds(PKT_SOCKFD_NOCHANGE, sInfo.usock);
@@ -62,9 +62,9 @@ int sendClientStat(int sock, uint8_t flags, uint8_t snum, uint8_t team,
     scstat.esystem = esystem;
 
     if (pktWrite(PKT_SENDTCP, &scstat) <= 0)
-        return FALSE;
+        return false;
     else
-        return TRUE;
+        return true;
 }
 
 int sendUser(int sock, uint16_t unum)
@@ -80,13 +80,13 @@ int sendUser(int sock, uint16_t unum)
     if ((suser = spktUser(unum)))
     {
         if (pktWrite(PKT_SENDTCP, suser) <= 0)
-            return FALSE;
+            return false;
 
         if (Context.recmode == RECMODE_ON)
             recWriteEvent(suser);
     }
 
-    return TRUE;
+    return true;
 }
 
 /* we have the potential to send a few packets here. */
@@ -104,43 +104,43 @@ int sendShip(int sock, uint8_t snum)
     /* SP_SHIP */
     if (Context.recmode == RECMODE_ON)
     {
-        if ((sship = spktShip(snum, TRUE)))
+        if ((sship = spktShip(snum, true)))
             recWriteEvent(sship);
     }
 
-    if ((sship = spktShip(snum, FALSE)))
+    if ((sship = spktShip(snum, false)))
         if (pktWrite(PKT_SENDTCP, sship) <= 0)
-            return FALSE;
+            return false;
 
     /* SP_SHIPSML */
     if (Context.recmode == RECMODE_ON)
     {
-        if ((sshipsml = spktShipSml(snum, TRUE)))
+        if ((sshipsml = spktShipSml(snum, true)))
             recWriteEvent(sshipsml);
     }
 
-    if ((sshipsml = spktShipSml(snum, FALSE)))
+    if ((sshipsml = spktShipSml(snum, false)))
         if (pktWrite(PKT_SENDTCP, sshipsml) <= 0)
-            return FALSE;
+            return false;
 
     /* SP_SHIPLOC */
 
     if (Context.recmode == RECMODE_ON)
     {
-        if ((sshiploc = spktShipLoc(snum, TRUE)))
+        if ((sshiploc = spktShipLoc(snum, true)))
             recWriteEvent(sshiploc);
     }
 
-    if ((sshiploc = spktShipLoc(snum, FALSE)))
+    if ((sshiploc = spktShipLoc(snum, false)))
     {
         if (pktWrite(PKT_SENDUDP, sshiploc) <= 0)
         {
             if (sInfo.doUDP)
                 handleUDPErr();
-            return FALSE;
+            return false;
         }
     }
-    return TRUE;
+    return true;
 }
 
 /* we have the potential to send 3 packets here. */
@@ -160,35 +160,35 @@ int sendPlanet(int sock, uint8_t pnum, int force)
     /* SP_PLANET */
     if (Context.recmode == RECMODE_ON)
     {
-        if ((splan = spktPlanet(pnum, TRUE)))
+        if ((splan = spktPlanet(pnum, true)))
             recWriteEvent(splan);
     }
 
-    if ((splan = spktPlanet(pnum, FALSE)))
+    if ((splan = spktPlanet(pnum, false)))
         if (pktWrite(PKT_SENDTCP, splan) <= 0)
-            return FALSE;
+            return false;
 
     /* SP_PLANETSML */
     if (Context.recmode == RECMODE_ON)
     {
-        if ((splansml = spktPlanetSml(pnum, TRUE)))
+        if ((splansml = spktPlanetSml(pnum, true)))
             recWriteEvent(splansml);
     }
 
-    if ((splansml = spktPlanetSml(pnum, FALSE)))
+    if ((splansml = spktPlanetSml(pnum, false)))
         if (pktWrite(PKT_SENDTCP, splansml) <= 0)
-            return FALSE;
+            return false;
 
     /* SP_PLANETINFO */
     if (Context.recmode == RECMODE_ON)
     {
-        if ((splaninfo = spktPlanetInfo(pnum, TRUE)))
+        if ((splaninfo = spktPlanetInfo(pnum, true)))
             recWriteEvent(splaninfo);
     }
 
-    if ((splaninfo = spktPlanetInfo(pnum, FALSE)))
+    if ((splaninfo = spktPlanetInfo(pnum, false)))
         if (pktWrite(PKT_SENDTCP, splaninfo) <= 0)
-            return FALSE;
+            return false;
 
     /* we will do loc packets for recording purposes only.  loc2 is sent
        to clients, but not recorded (server-side), since the clients
@@ -197,16 +197,16 @@ int sendPlanet(int sock, uint8_t pnum, int force)
     /* SP_PLANETLOC */
     if (Context.recmode == RECMODE_ON)
     {
-        if ((splanloc = spktPlanetLoc(pnum, TRUE, force)))
+        if ((splanloc = spktPlanetLoc(pnum, true, force)))
             recWriteEvent(splanloc);
     }
 
     /* SP_PLANETLOC2 */
-    if ((splanloc2 = spktPlanetLoc2(pnum, FALSE, force)))
+    if ((splanloc2 = spktPlanetLoc2(pnum, false, force)))
         if (pktWrite(PKT_SENDTCP, splanloc2) <= 0)
-            return FALSE;
+            return false;
 
-    return TRUE;
+    return true;
 }
 
 /* send a status packet */
@@ -266,10 +266,10 @@ int sendServerStat(int socktype)
     if (pktWrite(socktype, &sStat) <= 0)
     {
         utLog("sendServerStats: pktWrite failed\n");
-        return FALSE;
+        return false;
     }
 
-    return TRUE;
+    return true;
 }
 
 int sendTorp(int sock, uint8_t tsnum, uint8_t tnum)
@@ -280,13 +280,13 @@ int sendTorp(int sock, uint8_t tsnum, uint8_t tnum)
 
     /* no point in sending torp data if we're not playing */
     if (sInfo.state != SVR_STATE_PLAY)
-        return TRUE;
+        return true;
 
     if (tsnum < 0 || tsnum >= MAXSHIPS)
-        return FALSE;
+        return false;
 
     if (tnum >= MAXTORPS)
-        return FALSE;
+        return false;
 
 #if defined(DEBUG_SERVERSEND)
     utLog("sendTorp: %d %d", tsnum, tnum);
@@ -296,23 +296,23 @@ int sendTorp(int sock, uint8_t tsnum, uint8_t tnum)
     /* SP_TORPEVENT */
     if (Context.recmode == RECMODE_ON)
     {
-        if ((storpev = spktTorpEvent(tsnum, tnum, TRUE)))
+        if ((storpev = spktTorpEvent(tsnum, tnum, true)))
         {
             recWriteEvent(storpev);
         }
     }
 
-    if ((storpev = spktTorpEvent(tsnum, tnum, FALSE)))
+    if ((storpev = spktTorpEvent(tsnum, tnum, false)))
     {
         if (pktWrite(PKT_SENDTCP, storpev) <= 0)
-            return FALSE;
+            return false;
     }
 
     /* SP_TORP */
     /* we only record these */
     if (Context.recmode == RECMODE_ON)
     {
-        if ((storp = spktTorp(tsnum, tnum, TRUE)))
+        if ((storp = spktTorp(tsnum, tnum, true)))
             recWriteEvent(storp);
     }
 
@@ -321,11 +321,11 @@ int sendTorp(int sock, uint8_t tsnum, uint8_t tnum)
     /* we only record these */
     if (Context.recmode == RECMODE_ON)
     {
-        if ((storploc = spktTorpLoc(tsnum, tnum, TRUE)))
+        if ((storploc = spktTorpLoc(tsnum, tnum, true)))
             recWriteEvent(storploc);
     }
 
-    return TRUE;
+    return true;
 }
 
 /* send a Feedback (MSG_FLAGS_FEEDBACK) message to the client.
@@ -348,7 +348,7 @@ void sendFeedback(const char *msg)
 
     sendMessage(&themsg);
 
-    if (SysConf.LogMessages == TRUE)
+    if (SysConf.LogMessages == true)
     {
         clbFmtMsg(themsg.from, themsg.fromDetail,
                   themsg.to, themsg.toDetail, buf);
@@ -365,10 +365,10 @@ int sendMessage(Msg_t *msg)
     spMessage_t smsg;
 
     if (sInfo.state != SVR_STATE_PLAY)
-        return TRUE;
+        return true;
 
     if (!msg)
-        return TRUE;
+        return true;
 
 #if defined(DEBUG_SERVERSEND)
     utLog("sendMessage: to = %d(%d), from = %d(%d), flags = 0x%02x, msg = '%s'",
@@ -397,10 +397,10 @@ int sendMessage(Msg_t *msg)
     if (pktWrite(PKT_SENDTCP, &smsg) <= 0)
     {
         utLog("sendMessage: pktWrite failed\n");
-        return FALSE;
+        return false;
     }
 
-    return TRUE;
+    return true;
 }
 
 int sendTeam(int sock, uint8_t team, int force)
@@ -413,15 +413,15 @@ int sendTeam(int sock, uint8_t team, int force)
 
     if (Context.recmode == RECMODE_ON)
     {
-        if ((steam = spktTeam(team, force, TRUE)))
+        if ((steam = spktTeam(team, force, true)))
             recWriteEvent(steam);
     }
 
-    if ((steam = spktTeam(team, force, FALSE)))
+    if ((steam = spktTeam(team, force, false)))
         if (pktWrite(PKT_SENDTCP, steam) <= 0)
-            return FALSE;
+            return false;
 
-    return TRUE;
+    return true;
 }
 
 int sendcbConqInfo(int sock, int force)
@@ -434,9 +434,9 @@ int sendcbConqInfo(int sock, int force)
 
     if ((spci = spktcbConqInfo(force)))
         if (pktWrite(PKT_SENDTCP, spci) <= 0)
-            return FALSE;
+            return false;
 
-    return TRUE;
+    return true;
 }
 
 int sendHistory(int sock, int hnum)
@@ -444,7 +444,7 @@ int sendHistory(int sock, int hnum)
     spHistory_t *shist;
 
     if (hnum < 0 || hnum > MAXHISTLOG)
-        return FALSE;
+        return false;
 
 #if defined(DEBUG_SERVERSEND)
     utLog("sendHistory: hnum = %d", hnum);
@@ -452,9 +452,9 @@ int sendHistory(int sock, int hnum)
 
     if ((shist = spktHistory(hnum)))
         if (pktWrite(PKT_SENDTCP, shist) <= 0)
-            return FALSE;
+            return false;
 
-    return TRUE;
+    return true;
 }
 
 int sendDoomsday(int sock)
@@ -467,13 +467,13 @@ int sendDoomsday(int sock)
 
     if (Context.recmode == RECMODE_ON)
     {
-        if ((dd = spktDoomsday(TRUE)))
+        if ((dd = spktDoomsday(true)))
             recWriteEvent(dd);
     }
 
-    if ((dd = spktDoomsday(FALSE)))
+    if ((dd = spktDoomsday(false)))
         if (pktWrite(PKT_SENDTCP, dd) <= 0)
-            return FALSE;
+            return false;
 
-    return TRUE;
+    return true;
 }

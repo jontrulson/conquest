@@ -49,7 +49,7 @@ static char nm[MAXUSERNAME], pw[MAXUSERNAME], pwr[MAXUSERNAME];
 
 static const char *statlin = NULL;
 static const char *errlin = NULL;
-static int  newuser = FALSE;    /* a new user? */
+static int  newuser = false;    /* a new user? */
 
 /* the current state */
 #define S_DONE         0
@@ -88,14 +88,14 @@ static void dispServerInfo(int tlin)
     static char pbuf4[BUFFER_SIZE_256];
     static char pbuf5[BUFFER_SIZE_256];
     static char pbuf6[BUFFER_SIZE_256];
-    static int inited = FALSE;
+    static int inited = false;
     static const int hcol = 1, icol = 11;
     static char timebuf[BUFFER_SIZE_256];
     time_t servtm;
 
     if (!inited)
     {
-        inited = TRUE;
+        inited = true;
         sprintf(pbuf1, "#%d#Server: ", MagentaColor);
         sprintf(buf1, "#%d#%%s", NoColor);
 
@@ -158,7 +158,7 @@ void nAuthInit(void)
     ynbuf[0] = pw[0] = pwr[0] = nm[0] = 0;
 
     state = S_GETUNAME;           /* initial state */
-    prm.preinit = FALSE;
+    prm.preinit = false;
     prm.buf = nm;
     prm.buflen = MAX_USERLEN;
     prm.pbuf = unamep;
@@ -191,7 +191,7 @@ static int nAuthDisplay(dspConfig_t *dsp)
     extern char *ConquestDate;
 
     /* display the logo */
-    mglConqLogo(dsp, FALSE);
+    mglConqLogo(dsp, false);
 
     lin = 7;
 
@@ -293,7 +293,7 @@ static int nAuthInput(int ch)
                 return NODE_EXIT;
 
             /* check validity */
-            if (checkuname(prm.buf) == FALSE)
+            if (checkuname(prm.buf) == false)
             {                   /* invalid username */
                 mglBeep(MGL_BEEP_ERR);
                 errlin = "Invalid character in username.";
@@ -313,7 +313,7 @@ static int nAuthInput(int ch)
 
                 ynbuf[0] = 0;
 
-                prm.preinit = FALSE;
+                prm.preinit = false;
                 prm.buf = ynbuf;
                 prm.buflen = MAXUSERNAME;
                 prm.pbuf = newuserp;
@@ -327,7 +327,7 @@ static int nAuthInput(int ch)
                 state = S_GETPW;
 
                 /* setup for the new prompt */
-                prm.preinit = FALSE;
+                prm.preinit = false;
                 prm.buf = pw;
                 prm.buflen = MAX_USERLEN;
                 prm.pbuf = pwp;
@@ -350,7 +350,7 @@ static int nAuthInput(int ch)
                 state = S_GETPW;
 
                 /* setup for the new prompt */
-                prm.preinit = FALSE;
+                prm.preinit = false;
                 prm.buf = pw;
                 prm.buflen = MAX_USERLEN;
                 prm.pbuf = pwp;
@@ -358,13 +358,13 @@ static int nAuthInput(int ch)
 
                 statlin = phelper;
                 errlin = NULL;
-                newuser = TRUE;
+                newuser = true;
             }
             else
             {                   /* oops */
                 state = S_GETUNAME;
 
-                prm.preinit = TRUE;
+                prm.preinit = true;
                 prm.buf = nm;
                 prm.buflen = MAX_USERLEN;
                 prm.pbuf = unamep;
@@ -372,7 +372,7 @@ static int nAuthInput(int ch)
 
                 statlin = uhelper;
                 errlin = NULL;
-                newuser = FALSE;
+                newuser = false;
             }
         }
 
@@ -390,7 +390,7 @@ static int nAuthInput(int ch)
                 state = S_GETRPW;
 
                 /* setup for the new prompt */
-                prm.preinit = FALSE;
+                prm.preinit = false;
                 prm.buf = pwr;
                 prm.buflen = MAX_USERLEN;
                 prm.pbuf = rpwp;
@@ -412,7 +412,7 @@ static int nAuthInput(int ch)
                 pw[0] = 0;
                 state = S_GETUNAME;           /* initial state */
 
-                prm.preinit = TRUE;
+                prm.preinit = true;
                 prm.buf = nm;
                 prm.buflen = MAX_USERLEN;
                 prm.pbuf = unamep;
@@ -449,7 +449,7 @@ static int nAuthInput(int ch)
                 errlin = "Passwords don't match.";
                 /* go back to username prompt */
                 state = S_GETUNAME;           /* initial state */
-                prm.preinit = TRUE;
+                prm.preinit = true;
                 prm.buf = nm;
                 prm.buflen = MAX_USERLEN;
                 prm.pbuf = unamep;

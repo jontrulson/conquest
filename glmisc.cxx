@@ -37,7 +37,7 @@
 int _GLError(const char *funcname, const char *filename, int line)
 {
     int i;
-    int rv = FALSE;
+    int rv = false;
 
     while ((i = glGetError()) != GL_NO_ERROR)
     {
@@ -57,7 +57,7 @@ void mglConqLogo(dspConfig_t *dsp, int mult)
 {
     static const char *Conquest = "CONQUEST";
     GLfloat x, y, w, h;
-    static int firstime = TRUE;
+    static int firstime = true;
     static GLint logos[NUMPLAYERTEAMS]; /* texid for each team */
     static GLColor_t colors[NUMPLAYERTEAMS]; /* colors for each */
 
@@ -73,7 +73,7 @@ void mglConqLogo(dspConfig_t *dsp, int mult)
         int i;
         char buffer[CQI_NAMELEN];
 
-        firstime = FALSE;
+        firstime = false;
 
         for (i=0; i<NUMPLAYERTEAMS; i++)
         {
@@ -115,7 +115,7 @@ void mglConqLogo(dspConfig_t *dsp, int mult)
                   colors[cbShips[Context.snum].team].b,
                   colors[cbShips[Context.snum].team].a);
 
-        drawTexQuad(x, y, 0.0, w, h, TRUE, FALSE);
+        drawTexQuad(x, y, 0.0, w, h, true, false);
 
         glDisable(GL_TEXTURE_2D);
         glDisable(GL_BLEND);

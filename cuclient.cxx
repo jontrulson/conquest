@@ -74,7 +74,7 @@ void cucDoWar( int snum )
         cdputs(clbWarPrompt(Context.snum, twar), MSG_LIN1, 1);
 
         cdrefresh();
-        if ( iogtimed( &ch, 1.0 ) == FALSE )
+        if ( iogtimed( &ch, 1.0 ) == false )
 	{
             continue; /* next; */
 	}
@@ -85,12 +85,12 @@ void cucDoWar( int snum )
         if ( ch == TERM_EXTRA )
 	{
             /* Now update the war settings. */
-            dowait = FALSE;
+            dowait = false;
             war = 0;
             for ( i = 0; i < NUMPLAYERTEAMS; i = i + 1 )
 	    {
                 if ( twar[i] && ! cbShips[snum].war[i] )
-                    dowait = TRUE;
+                    dowait = true;
 
                 if (twar[i])
                     war |= (1 << i);
@@ -167,7 +167,7 @@ void cucSendMsg( msgFrom_t from, uint16_t fromDetail, int terse, int remote )
     /* First, find out who we're sending to. */
     cdclrl( MSG_LIN1, 2 );
     buf[0] = 0;
-    ch = cdgetx( mto, MSG_LIN1, 1, TERMS, buf, MSGMAXLINE, TRUE );
+    ch = cdgetx( mto, MSG_LIN1, 1, TERMS, buf, MSGMAXLINE, true );
     if ( ch == TERM_ABORT )
     {
         cdclrl( MSG_LIN1, 1 );
@@ -329,13 +329,13 @@ void cucSendMsg( msgFrom_t from, uint16_t fromDetail, int terse, int remote )
 
     i = MESSAGE_SIZE;
 
-    append_flg = TRUE;
-    while (append_flg == TRUE) {
-        append_flg = FALSE;
-        do_append_flg = TRUE;
+    append_flg = true;
+    while (append_flg == true) {
+        append_flg = false;
+        do_append_flg = true;
         msg[0] = 0;
         if ( cdgetp( ">", MSG_LIN2, 1, TERMS, msg, i,
-                     &append_flg, do_append_flg, TRUE ) != TERM_ABORT )
+                     &append_flg, do_append_flg, true ) != TERM_ABORT )
         {
             if ( to != MSG_TO_IMPLEMENTORS )
             {

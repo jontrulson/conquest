@@ -156,13 +156,6 @@ extern char *crypt(char *, char *);
 # endif
 #endif  /* MINGW */
 
-#ifndef FALSE
-# define FALSE   (0)
-#endif
-#ifndef TRUE
-# define TRUE    (1)
-#endif
-
 #define BUFFER_SIZE_1024 1024
 #define BUFFER_SIZE_256  256
 #define BUFFER_SIZE_128  128

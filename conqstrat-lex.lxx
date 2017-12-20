@@ -139,7 +139,7 @@ void yyerror(char *s)
             yytext,
             Lineno);
 
-    goterror = TRUE;
+    goterror = true;
 
     return;
 }

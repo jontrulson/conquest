@@ -23,16 +23,16 @@
 /* set default sys config */
 static void setSysConfDefaults(void)
 {
-    SysConf.NoDoomsday = FALSE;
-    SysConf.DoRandomRobotKills = FALSE;
-    SysConf.AllowVacant = FALSE;
-    SysConf.AllowSwitchteams = TRUE;
+    SysConf.NoDoomsday = false;
+    SysConf.DoRandomRobotKills = false;
+    SysConf.AllowVacant = false;
+    SysConf.AllowSwitchteams = true;
     SysConf.UserExpiredays = DEFAULT_USEREXPIRE;
-    SysConf.LogMessages = FALSE;
-    SysConf.AllowRefits = TRUE;
-    SysConf.AllowSlingShot = FALSE;
-    SysConf.NoTeamWar = FALSE;
-    SysConf.NoDrift = FALSE;
+    SysConf.LogMessages = false;
+    SysConf.AllowRefits = true;
+    SysConf.AllowSlingShot = false;
+    SysConf.NoTeamWar = false;
+    SysConf.NoDrift = false;
 
     utStrncpy(SysConf.ServerName, "Generic Conquest Server",
               CONF_SERVER_NAME_SZ);
@@ -50,25 +50,25 @@ void setUserConfDefaults(void)
     int i, j;
 
     // conf defaults
-    UserConf.DoAlarms = TRUE;
-    UserConf.DoIntrudeAlert = TRUE;
-    UserConf.DoNumMap = TRUE;
-    UserConf.Terse = FALSE;
-    UserConf.MessageBell = TRUE;
-    UserConf.NoRobotMsgs = FALSE;
+    UserConf.DoAlarms = true;
+    UserConf.DoIntrudeAlert = true;
+    UserConf.DoNumMap = true;
+    UserConf.Terse = false;
+    UserConf.MessageBell = true;
+    UserConf.NoRobotMsgs = false;
 
     UserConf.UpdatesPerSecond = 10;
 
-    UserConf.DistressToFriendly = FALSE;
-    UserConf.AltHUD = FALSE;
-    UserConf.hudInfo = TRUE;
-    UserConf.DoLocalLRScan = TRUE;
-    UserConf.DoETAStats = TRUE;
-    UserConf.EnemyShipBox = TRUE;
-    UserConf.doVBG = TRUE;
+    UserConf.DistressToFriendly = false;
+    UserConf.AltHUD = false;
+    UserConf.hudInfo = true;
+    UserConf.DoLocalLRScan = true;
+    UserConf.DoETAStats = true;
+    UserConf.EnemyShipBox = true;
+    UserConf.doVBG = true;
 
-    UserConf.DoShields = TRUE;
-    UserConf.DoTacBkg = FALSE;
+    UserConf.DoShields = true;
+    UserConf.DoTacBkg = false;
     UserConf.DoTacShade = 50;
 
     UserConf.musicVol = 100;
@@ -155,9 +155,9 @@ static void checkCreateUserConfDir(void)
 }
 
 /* GetSysConf(int checkonly) - load system-wide configuration values */
-/*  If checkonly is TRUE, then just load internel defaults, and the existing
+/*  If checkonly is true, then just load internel defaults, and the existing
     conquesrtc file, if there.  Don't output errmsgs since this will
-    only be TRUE when 'priming the pump' in conqoper -C, before writing a
+    only be true when 'priming the pump' in conqoper -C, before writing a
     new conquestrc file (preserving existing settings if possible).
 */
 int GetSysConf(int checkonly)
@@ -166,7 +166,7 @@ int GetSysConf(int checkonly)
     int i, j;
     char conf_name[PATH_MAX] = {};
     char buffer[BUFFER_SIZE_256] = {};
-    int FoundOne = FALSE;
+    int FoundOne = false;
     int buflen;
     char *bufptr;
 
@@ -187,7 +187,7 @@ int GetSysConf(int checkonly)
               conf_name,
               strerror(err));
 
-        if (checkonly != TRUE)
+        if (checkonly != true)
 	{
             fprintf(stderr, "Error opening system-wide config file: %s: %s\n",
                     conf_name,
@@ -228,9 +228,9 @@ int GetSysConf(int checkonly)
 
         /* check for everything else */
 
-        FoundOne = FALSE;
+        FoundOne = false;
 
-        for (j = 0; (j < SysCfEnd) && (FoundOne == FALSE); j++)
+        for (j = 0; (j < SysCfEnd) && (FoundOne == false); j++)
 	{
             if (SysConfData[j].ConfName != NULL)
                 if (strncmp(SysConfData[j].ConfName,
@@ -252,7 +252,7 @@ int GetSysConf(int checkonly)
                                            bufptr,
                                            strlen((char *)SysConfData[j].ConfValue)) == 0)
                                 {
-                                    SysConfData[j].Found = TRUE;
+                                    SysConfData[j].Found = true;
 #ifdef DEBUG_CONFIG
                                     utLog("GetSysConf(): got correct version = '%s'", buffer);
 #endif
@@ -266,8 +266,8 @@ int GetSysConf(int checkonly)
                             if (i != -1)
                             {
                                 *((int *) SysConfData[j].ConfValue) = i;
-                                SysConfData[j].Found = TRUE;
-                                FoundOne = TRUE;
+                                SysConfData[j].Found = true;
+                                FoundOne = true;
                             }
                             break;
 
@@ -284,8 +284,8 @@ int GetSysConf(int checkonly)
                                 if (*n > SysConfData[j].max)
                                     *n = SysConfData[j].max;
 
-                                SysConfData[j].Found = TRUE;
-                                FoundOne = TRUE;
+                                SysConfData[j].Found = true;
+                                FoundOne = true;
                             }
                             break;
 
@@ -296,8 +296,8 @@ int GetSysConf(int checkonly)
                                     bufptr, SysConfData[j].max);
                             ((char *)SysConfData[j].ConfValue)[SysConfData[j].max - 1] = 0;
 
-                            SysConfData[j].Found = TRUE;
-                            FoundOne = TRUE;
+                            SysConfData[j].Found = true;
+                            FoundOne = true;
                             break;
 
 
@@ -326,13 +326,13 @@ int GetSysConf(int checkonly)
        needs to run conqoper -C . */
 
     /* see if we found the version */
-    if (SysConfData[SYSCF_VERSION].Found == FALSE)
+    if (SysConfData[SYSCF_VERSION].Found == false)
     {				/* conquestrc version not found */
 #ifdef DEBUG_CONFIG
         utLog("GetSysConf(): Incorrect version found.  Update needed.");
 #endif
 
-        if (checkonly != TRUE)
+        if (checkonly != true)
 	{
             fprintf(stderr, "The %s file needs to be updated by an operator with\n",
                     conf_name);
@@ -344,13 +344,13 @@ int GetSysConf(int checkonly)
         for (i=0; i<SysCfEnd; i++)
 	{
             if (SysConfData[i].ConfType != CTYPE_NULL)
-                if (SysConfData[i].Found != TRUE)
+                if (SysConfData[i].Found != true)
                 {
 #ifdef DEBUG_CONFIG
                     utLog("GetSysConf(): option '%s' not found - Update needed.",
                           SysConfData[i].ConfName);
 #endif
-                    if (checkonly != TRUE)
+                    if (checkonly != true)
                     {
                         fprintf(stderr, "The %s file needs to be updated by an operator with\n",
                                 conf_name);
@@ -362,7 +362,7 @@ int GetSysConf(int checkonly)
 	}
     }
 
-    return(TRUE);
+    return(true);
 }
 
 /* can't compile this if there is no GUI */
@@ -371,12 +371,12 @@ int GetSysConf(int checkonly)
 static int
 parseMouseModNum(char *str, uint32_t *mods, uint32_t *button)
 {
-    int done = FALSE;
+    int done = false;
     if (!mods || !button || !str)
-        return FALSE;
+        return false;
 
     if (!*str)
-        return FALSE;
+        return false;
 
     *mods = 0;
     *button = 0;
@@ -400,7 +400,7 @@ parseMouseModNum(char *str, uint32_t *mods, uint32_t *button)
             default:
                 utLog("parseMouseModNum: Invalid modifier char '%c'",
                       *str);
-                return FALSE;
+                return false;
                 break;
             }
             str++;
@@ -408,16 +408,16 @@ parseMouseModNum(char *str, uint32_t *mods, uint32_t *button)
         else                      /* the mouse button number, always last */
         {
             *button = atoi(str);
-            done = TRUE;
+            done = true;
         }
     }
 
     if (*button >= CONF_MAXBUTTONS)
-        return FALSE;
+        return false;
     if (*mods >= CONF_MAXMODIFIERS)
-        return FALSE;
+        return false;
 
-    return TRUE;
+    return true;
 }
 
 #endif /* _CQKEYS_H */
@@ -431,7 +431,7 @@ int GetConf(int usernum)
     char buffer[BUFFER_SIZE_256];
     int buflen;
     char *bufptr;
-    int FoundOne = FALSE;
+    int FoundOne = false;
 
     /* init some defaults */
     setUserConfDefaults();
@@ -474,7 +474,7 @@ int GetConf(int usernum)
         if (MakeConf(conf_name) == -1)
             return(-1);
 
-        return(FALSE);		/* no config file */
+        return(false);		/* no config file */
     }
 
 #ifdef DEBUG_CONFIG
@@ -505,9 +505,9 @@ int GetConf(int usernum)
         utLog("GetConf(): got '%s'", buffer);
 #endif
 
-        FoundOne = FALSE;
+        FoundOne = false;
 
-        for (j = 0; (j < CfEnd) && (FoundOne == FALSE); j++)
+        for (j = 0; (j < CfEnd) && (FoundOne == false); j++)
 	{
             if (ConfData[j].ConfName != NULL)
                 if(strncmp(ConfData[j].ConfName,
@@ -528,8 +528,8 @@ int GetConf(int usernum)
                                            bufptr,
                                            strlen((char *)ConfData[j].ConfValue)) == 0)
                                 {
-                                    ConfData[j].Found = TRUE;
-                                    FoundOne = TRUE;
+                                    ConfData[j].Found = true;
+                                    FoundOne = true;
 #ifdef DEBUG_CONFIG
                                     utLog("GetConf(): got correct version = '%s'", buffer);
 #endif
@@ -542,8 +542,8 @@ int GetConf(int usernum)
                             if (i != -1)
                             {
                                 *((int *) ConfData[j].ConfValue) = i;
-                                ConfData[j].Found = TRUE;
-                                FoundOne = TRUE;
+                                ConfData[j].Found = true;
+                                FoundOne = true;
                             }
                             break;
 
@@ -569,8 +569,8 @@ int GetConf(int usernum)
                                                        + ((n - 1) * MAX_MACRO_LEN)),
                                               Str2Macro((char *)cptr + 1),
                                               MAX_MACRO_LEN);
-                                    ConfData[j].Found = TRUE;
-                                    FoundOne = TRUE;
+                                    ConfData[j].Found = true;
+                                    FoundOne = true;
                                 }
                             }
 
@@ -604,8 +604,8 @@ int GetConf(int usernum)
                                     utStrncpy(UserConf.Mouse[button][mods],
                                               Str2Macro((char *)cptr + 1),
                                               MAX_MACRO_LEN);
-                                    ConfData[j].Found = TRUE;
-                                    FoundOne = TRUE;
+                                    ConfData[j].Found = true;
+                                    FoundOne = true;
                                 }
                             }
                         }
@@ -625,8 +625,8 @@ int GetConf(int usernum)
                                 if (*n > ConfData[j].max)
                                     *n = ConfData[j].max;
 
-                                ConfData[j].Found = TRUE;
-                                FoundOne = TRUE;
+                                ConfData[j].Found = true;
+                                FoundOne = true;
                             }
                             break;
 
@@ -654,7 +654,7 @@ int GetConf(int usernum)
     /* is found, re-write the config file. */
 
     /* see if we found the version */
-    if (ConfData[CF_VERSION].Found == FALSE)
+    if (ConfData[CF_VERSION].Found == false)
     {				/* conquestrc version not found */
 #ifdef DEBUG_CONFIG
         utLog("GetConf(): Incorrect version found. - rebuilding");
@@ -668,7 +668,7 @@ int GetConf(int usernum)
             if (ConfData[i].ConfType != CTYPE_NULL &&
                 ConfData[i].ConfType != CTYPE_MACRO &&
                 ConfData[i].ConfType != CTYPE_MOUSE )
-                if (ConfData[i].Found != TRUE)
+                if (ConfData[i].Found != true)
                 {
 #ifdef DEBUG_CONFIG
                     utLog("GetConf(): option '%s' not found - rebuilding.",
@@ -679,7 +679,7 @@ int GetConf(int usernum)
                 }
 	}
     }
-    return(TRUE);
+    return(true);
 }
 
 /* SaveUserConfig(int unum) - do what the name implies ;-) */
@@ -851,13 +851,13 @@ int process_bool(char *bufptr)
         (strstr("no", bufptr) != NULL)    ||
         (strstr("off", bufptr) != NULL))
     {
-        return(FALSE);
+        return(false);
     }
     else if ((strstr("true", bufptr) != NULL) ||
              (strstr("yes", bufptr) != NULL)  ||
              (strstr("on", bufptr) != NULL))
     {
-        return(TRUE);
+        return(true);
     }
     else
     {
@@ -967,7 +967,7 @@ int MakeConf(char *filename)
             case CTYPE_BOOL:
                 fprintf(conf_fd, "%s%s\n",
                         ConfData[j].ConfName,
-                        (*((int *)ConfData[j].ConfValue) == TRUE) ? "true" : "false");
+                        (*((int *)ConfData[j].ConfValue) == true) ? "true" : "false");
                 break;
 
             case CTYPE_NUMERIC:
@@ -988,7 +988,7 @@ int MakeConf(char *filename)
 #endif
 
     /* that's it! */
-    return(TRUE);
+    return(true);
 }
 
 
@@ -1064,7 +1064,7 @@ int MakeSysConf()
             case CTYPE_BOOL:
                 fprintf(sysconf_fd, "%s%s\n",
                         SysConfData[j].ConfName,
-                        (*((int *)SysConfData[j].ConfValue) == TRUE) ? "true" : "false");
+                        (*((int *)SysConfData[j].ConfValue) == true) ? "true" : "false");
                 break;
 
             case CTYPE_NUMERIC:
@@ -1086,7 +1086,7 @@ int MakeSysConf()
     fprintf(stderr, "Done.\n");
 
     /* that's it! */
-    return(TRUE);
+    return(true);
 }
 
 uint32_t getServerFlags(void)

@@ -25,10 +25,10 @@ int checkuname(char *username)
     {
         if (!isalnum(*s) && *s != '-' && *s != '_')
 	{			/* if invalid character... */
-            return(FALSE);
+            return(false);
 	}
         s++;
     }
 
-    return(TRUE);
+    return(true);
 }

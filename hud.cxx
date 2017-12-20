@@ -54,11 +54,11 @@ void hudInitData(void)
 
     hudData.etemp.temp       = -1.0;
     hudData.etemp.color      = GreenLevelColor;
-    hudData.etemp.overl      = FALSE;
+    hudData.etemp.overl      = false;
 
     hudData.wtemp.temp       = -1.0;
     hudData.wtemp.color      = GreenLevelColor;
-    hudData.wtemp.overl      = FALSE;
+    hudData.wtemp.overl      = false;
 
     hudData.tow.towstat      = false;
     hudData.tow.color        = MagentaColor;
@@ -228,7 +228,7 @@ void hudSetShields(int snum, int *dobeep)
     int i, k;
 
     if (cbShips[snum].shields < hudData.sh.shields)
-        *dobeep = TRUE;
+        *dobeep = true;
 
     i = k = round( cbShips[snum].shields );
 
@@ -353,14 +353,14 @@ void hudSetTemps(int snum)
         wtemp = 100.0;
 
     if (cbShips[snum].efuse > 0)
-        eOverl = TRUE;
+        eOverl = true;
     else
-        eOverl = FALSE;
+        eOverl = false;
 
     if (cbShips[snum].wfuse > 0)
-        wOverl = TRUE;
+        wOverl = true;
     else
-        wOverl = FALSE;
+        wOverl = false;
 
     if (etemp != hudData.etemp.temp || eOverl != hudData.etemp.overl)
     {
