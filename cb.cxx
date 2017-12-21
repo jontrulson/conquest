@@ -337,6 +337,7 @@ void cbMap(void)
     if (fakeCommon)
         return;
 
+    utLog("%s: Mapping the common block", __FUNCTION__);
 #if defined(MINGW)
     fprintf(stderr,
             "%s: Only fake (client) common blocks are supported under MINGW\n");
@@ -400,6 +401,7 @@ void cbMapLocal(void)
     /* a parallel universe, it is */
     utLog("%s: CB size needed: %u bytes", __FUNCTION__,
           cbGetSize());
+    utLog("%s: Mapping the common block", __FUNCTION__);
 
     _initFakeCB();
     clbInitEverything();
@@ -430,7 +432,7 @@ void cbUnmap()
     if (fakeCommon) // only for real file-backed mmapped common blocks
         return;
 
-    utLog("%s: Unmapping the common block");
+    utLog("%s: Unmapping the common block", __FUNCTION__);
 
     // reset all variables and unmap the common block
 

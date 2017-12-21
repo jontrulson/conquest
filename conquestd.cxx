@@ -321,6 +321,8 @@ int main(int argc, char *argv[])
         }
 
 
+    rndini();		/* initialize random numbers */
+
     if (!pktInit())
     {
         fprintf(stderr, "pktInit failed, exiting\n");
@@ -402,6 +404,9 @@ int main(int argc, char *argv[])
 #ifdef DEBUG_FLOW
     utLog("%s@%d: main() mapping common block.", __FILE__, __LINE__);
 #endif
+
+    // load the globals/planets (conqinitrc), before we map...
+    cqiLoadRC(CQI_FILE_CONQINITRC, NULL, 1, 0);
 
     cbMap();
 
@@ -491,7 +496,7 @@ int main(int argc, char *argv[])
     /* if we are here, then we are a client driver, with an active socket */
     sInfo.state = SVR_STATE_INIT;
 
-    /* re-read sys conf here for indivulual client drivers... */
+    /* re-read sys conf here for individual client drivers... */
     if (GetSysConf(false) == -1)
     {
 #ifdef DEBUG_CONFIG
@@ -499,13 +504,8 @@ int main(int argc, char *argv[])
 #endif
     }
 
-    conqinit();			/* machine dependent initialization */
-
-    /* load the globals/planets/textures, for each client */
-    cqiLoadRC(CQI_FILE_CONQINITRC, NULL, 1, 0);
-    cqiLoadRC(CQI_FILE_TEXTURESRC, NULL, 1, 0);
-
-    rndini();		/* initialize random numbers */
+    conqinit();                 /* basic client Context initialization */
+    Context.recmode = RECMODE_OFF; /* always */
 
     utLog("CONNECT: client %s", sInfo.remotehost);
 
@@ -517,8 +517,6 @@ int main(int argc, char *argv[])
     }
 
     utLog("CONNECT: client %s SUCCESS.", sInfo.remotehost);
-
-    Context.recmode = RECMODE_OFF; /* always */
 
     if ( welcome( &Context.unum ) )
     {

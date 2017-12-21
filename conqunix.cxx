@@ -93,6 +93,8 @@ void conqinit(void)
     {
         printf("conquest: Common block ident mismatch.\n"
                "Initialize the Universe via conqoper.");
+        utLog("%s: Common block ident mismatch.\n"
+              "Initialize the Universe via conqoper.", __FUNCTION__);
         exit(1);
     }
 
