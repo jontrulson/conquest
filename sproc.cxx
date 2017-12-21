@@ -928,24 +928,44 @@ void procTow(cpCommand_t *cmd)
     utLog("PROC TOW: snum = %d", snum);
 #endif
 
-    other = (int)ntohs(cmd->detail);
-
-    if ( STOWEDBY(snum) )
-    {
-        strcpy(cbuf , "But we are being towed by ") ;
-        utAppendShip(cbuf , cbShips[snum].towedby) ;
-        utAppendChar(cbuf , '!') ;
-        sendFeedback(cbuf);
-        return;
-    }
+    // if we're already towing a ship, stop towing it
     if ( STOWING(snum) )
     {
-        strcpy(cbuf , "But we're already towing ") ;
+        strcpy(cbuf , "Tow released from ship ") ;
         utAppendShip(cbuf , cbShips[snum].towing) ;
+        cbLock(&cbConqInfo->lockword);
+        // verify with the lock held...
+        if ( STOWING(snum) )
+	{
+            /* Set other ship coasting. */
+            cbShips[cbShips[snum].towing].head = cbShips[snum].head;
+
+
+            if (!SysConf.AllowSlingShot)
+            {               /* only set warp if valid JET - 9/15/97 */
+                if (cbShips[snum].warp >= 0.0)
+                    cbShips[cbShips[snum].towing].warp = cbShips[snum].warp;
+                else
+                    cbShips[cbShips[snum].towing].warp = 2.0;
+            }
+            else
+                cbShips[cbShips[snum].towing].warp = cbShips[snum].warp;
+
+            /* Release the tow. */
+            if ( STOWEDBY(cbShips[snum].towing) )
+                SFCLR(cbShips[snum].towing, SHIP_F_TOWEDBY);
+
+            SFCLR(snum, SHIP_F_TOWING);
+	}
+        cbUnlock(&cbConqInfo->lockword);
         utAppendChar(cbuf , '.') ;
         sendFeedback(cbuf);
+
         return;
     }
+
+    // else, we want to start towing 'other'
+    other = (int)ntohs(cmd->detail);
 
     cbuf[0] = 0;
     cbLock(&cbConqInfo->lockword);
@@ -966,9 +986,14 @@ void procTow(cpCommand_t *cmd)
               ( MM_PER_SEC_PER_WARP * ITER_SECONDS ) > MAX_TRACTOR_WARP )
         sprintf( cbuf, "That ships relative velocity is higher than %2.1f.",
                  MAX_TRACTOR_WARP );
-    else if ( STOWING(other) || STOWEDBY(other) )
-              strcpy(cbuf,
+    else if ( STOWEDBY(other)
+              || (STOWING(other) && cbShips[other].towing == snum) )
+    {
+        // can't tow somebody who's already being towed, and you can't
+        // tow a ship that's currently towing you.
+        strcpy(cbuf,
                "There seems to be some interference with the tractor beams...");
+    }
     else
     {
         SFSET(other, SHIP_F_TOWEDBY);
@@ -1051,37 +1076,6 @@ void procUnTow(cpCommand_t *cmd)
             utAppendChar(cbuf , '.') ;
             sendFeedback(cbuf);
 	}
-    }
-    else if ( STOWING(snum) )
-    {
-        strcpy(cbuf , "Tow released from ship ") ;
-        utAppendShip(cbuf , cbShips[snum].towing) ;
-        cbLock(&cbConqInfo->lockword);
-        if ( STOWING(snum) )
-	{
-            /* Set other ship coasting. */
-            cbShips[cbShips[snum].towing].head = cbShips[snum].head;
-
-
-            if (!SysConf.AllowSlingShot)
-            {               /* only set warp if valid JET - 9/15/97 */
-                if (cbShips[snum].warp >= 0.0)
-                    cbShips[cbShips[snum].towing].warp = cbShips[snum].warp;
-                else
-                    cbShips[cbShips[snum].towing].warp = 2.0;
-            }
-            else
-                cbShips[cbShips[snum].towing].warp = cbShips[snum].warp;
-
-            /* Release the tow. */
-            if ( STOWEDBY(cbShips[snum].towing) )
-                SFCLR(cbShips[snum].towing, SHIP_F_TOWEDBY);
-
-            SFCLR(snum, SHIP_F_TOWING);
-	}
-        cbUnlock(&cbConqInfo->lockword);
-        utAppendChar(cbuf , '.') ;
-        sendFeedback(cbuf);
     }
     else
         sendFeedback("No tractor beam activity detected.");

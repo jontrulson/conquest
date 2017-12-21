@@ -997,7 +997,7 @@ void renderHud(bool dostats)
                           glfFontFixed, hudData.tow.str,
                           hudData.tow.color | 0x50000000,
                           NULL,
-                          GLF_FONT_F_SCALEX | GLF_FONT_F_ORTHO);
+                          GLF_FONT_F_ORTHO);
 
         /* army count or robot action - we position the robot action
          *  at the same location as the army count...

@@ -1099,7 +1099,7 @@ void display( int snum )
         /* Tractor beams. */
         lin = lin + 2;
 
-        cdclra( lin, col, lin, datacol-1 );
+        cdclra( lin, col, lin, datacol + 8 ); // right to edge of viewer
         if (STOWING(snum) || STOWEDBY(snum))
         {
             buf[0] = 0;

@@ -128,11 +128,11 @@ static int nCPHelpDisplay(dspConfig_t *dsp)
     tlin++;
     cprintf(tlin,col,ALIGN_NONE,sfmt, "S", "more user statistics");
     tlin++;
-    cprintf(tlin,col,ALIGN_NONE,sfmt, "t", "engage tractor beams");
+    cprintf(tlin,col,ALIGN_NONE,sfmt, "t", "tractor/untractor a ship");
     tlin++;
     cprintf(tlin,col,ALIGN_NONE,sfmt, "T", "team list");
     tlin++;
-    cprintf(tlin,col,ALIGN_NONE,sfmt, "u", "un-engage tractor beams");
+    cprintf(tlin,col,ALIGN_NONE,sfmt, "u", "untractor from other ships");
     tlin++;
     cprintf(tlin,col,ALIGN_NONE,sfmt, "U", "user statistics");
     tlin++;

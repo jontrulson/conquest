@@ -1088,33 +1088,6 @@ static int _chkcoup(void)
     return true;
 }
 
-static int _chktow(void)
-{
-    int snum = Context.snum;
-
-    hudClearPrompt(MSG_LIN1);
-    hudClearPrompt(MSG_LIN2);
-
-    if ( STOWEDBY(snum) )
-    {
-        strcpy(cbuf , "But we are being towed by ") ;
-        utAppendShip(cbuf, cbShips[snum].towedby) ;
-        utAppendChar(cbuf, '!');
-        cp_putmsg(cbuf, MSG_LIN2 );
-        return false;
-    }
-    if ( STOWING(snum) )
-    {
-        strcpy(cbuf , "But we're already towing ") ;
-        utAppendShip(cbuf , cbShips[snum].towing) ;
-        utAppendChar(cbuf , '.');
-        cp_putmsg( cbuf, MSG_LIN2 );
-        return false;
-    }
-
-    return true;
-}
-
 static void _dotow(char *buf, int ch)
 {
     int i, other;
@@ -2259,7 +2232,9 @@ static void command( int ch )
         sendCommand(CPCMD_REPAIR, 0);
         break;
     case 't':
-        if (_chktow())
+        hudClearPrompt(MSG_LIN1);
+        hudClearPrompt(MSG_LIN2);
+        if (!STOWING(Context.snum))
         {
             state = S_TOW;
             prm.preinit = false;
@@ -2271,6 +2246,11 @@ static void command( int ch )
             prm.buf[0] = 0;
             hudSetPrompt(prm.index, prm.pbuf, NoColor, prm.buf, NoColor);
             prompting = true;
+        }
+        else if (STOWING(Context.snum))
+        {
+            // send another tow command, which will cancel our current tow
+            sendCommand(CPCMD_TOW, cbShips[Context.snum].towing);
         }
         break;
     case 'S':				/* more user stats */
