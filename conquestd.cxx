@@ -481,6 +481,7 @@ int main(int argc, char *argv[])
         case -1:
             /* error */
             fprintf(stderr, "daemon fork failed: %s\n", strerror(errno));
+            exit(1);
             break;
 
         default:
