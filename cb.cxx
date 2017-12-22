@@ -23,7 +23,7 @@
 #include "user.h"
 #include "sem.h"
 
-static char *_cbBasePtr = NULL;	/* common block base ptr */
+static char *_cbBasePtr = NULL;	/* common block base ptr, the Universe. */
 static unsigned int _cbOffset = 0; /* offset into common block */
 static unsigned int _cbSavedSize = 0; /* for msync() and friends */
 
@@ -41,7 +41,9 @@ static int fakeCommon = false;	/* for the clients */
 // This macro maps a global variable into the memory region starting
 // at _cbBasePtr.  The memory region is either a heap-allocated chunk
 // of memory (in the case of the clients), or a memory mapped file
-// (via mmap()) used for persistent storage (in the server).
+// (via mmap()) used for persistent storage (on the server only).  This
+// emulation of a Fortran "Common Block" is used to hold the state of
+// the Universe.  Be careful with it.
 
 #define MAP_VARIABLE(thevarp, thetype, size, doAssign) {                \
         if (doAssign) { thevarp = (thetype *) (_cbBasePtr + _cbOffset); } \
@@ -461,4 +463,9 @@ void cbUnmapLocal()
     _cbBasePtr = NULL;
     _cbOffset = 0;
     _cbSavedSize = 0;
+}
+
+bool cbIsMapped()
+{
+    return ( (_cbBasePtr) ? true : false );
 }

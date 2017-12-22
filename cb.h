@@ -46,6 +46,8 @@ void cbZero(void);
 void cbLock(int *);
 void cbUnlock(int *);
 
+// is the common block mapped?
+bool cbIsMapped();
 
 // do a "pretend" map of the CB variables and return the total size
 // in bytes that needs to be available to do a real mmap() or
