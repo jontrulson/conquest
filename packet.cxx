@@ -965,7 +965,9 @@ int pktRead(char *buf, int blen, unsigned int delay)
     }
     else if (rv < 0)		/* error */
     {
-        utLog("ERROR: %s: select(): %s", __FUNCTION__, strerror(errno));
+        if (errno != EINTR)
+            utLog("ERROR: %s: select(): %s", __FUNCTION__, strerror(errno));
+
         return rv;
     }
 
