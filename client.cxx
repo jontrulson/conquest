@@ -192,6 +192,9 @@ int clientHello(const char *clientname)
     }
 
     /* we only get this if there's problem (server denied access, usually) */
+
+    // FIXME - we should simply add a 'ACCESS_DENIED' flag to spHello
+    // so no need to handle ACK/NACKs here.
     if (pkttype == SP_ACKMSG || pkttype == SP_ACK)
     {
         if (PKT_PROCSP(buf))
@@ -263,6 +266,18 @@ int clientHello(const char *clientname)
     }
 
     utLog("clientHello: sent hello to server");
+
+    // FIXME - this is probably where we need to get the GlobalLimit
+    // (maxplanets, maxships etc), the remap the universe before doing
+    // anything else....
+
+    // maybe a better idea, incorporate that info into the initial
+    // spHello packet!?
+
+    // Oh, and the UDP below should be redone in a better way (maybe
+    // via a protocol request to server).
+
+
 
     if (cInfo.tryUDP)
     {
