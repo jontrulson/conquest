@@ -8,8 +8,6 @@
 #ifndef _CBMAXLIMITS_H
 #define _CBMAXLIMITS_H
 
-#include <stdint.h>
-
 class cbMaxLimits {
 
 public:
@@ -20,60 +18,79 @@ public:
         m_maxusers = 0;
         m_maxhist = 0;
         m_maxmsgs = 0;
+        // This is hardcoded to 9 for now.  Someday when we complete
+        // the shiptypes work, we can then allow this one to be
+        // dynamic too.
+        m_maxtorps = 9;
     }
 
     // getters
-    const int maxPlanets() const
+    const unsigned int maxPlanets() const
     {
         return m_maxplanets;
     }
-    const int maxShips() const
+    const unsigned int maxShips() const
     {
         return m_maxships;
     }
-    const int maxUsers() const
+    const unsigned int maxUsers() const
     {
         return m_maxusers;
     }
-    const int maxHist() const
+    const unsigned int maxHist() const
     {
         return m_maxhist;
     }
-    const int maxMsgs() const
+    const unsigned int maxMsgs() const
     {
         return m_maxmsgs;
     }
+    const unsigned int maxTorps() const
+    {
+        // This is hardcoded to 9 for now.  Someday when we complete
+        // the shiptypes work, we can then allow this one to be
+        // dynamic too.
+        return 9;
+    }
 
     // setters
-    void setMaxPlanets(int max)
+    void setMaxPlanets(unsigned int max)
     {
         m_maxplanets = max;
     }
-    void setMaxShips(int max)
+    void setMaxShips(unsigned int max)
     {
         m_maxships = max;
     }
-    void setMaxUsers(int max)
+    void setMaxUsers(unsigned int max)
     {
         m_maxusers = max;
     }
-    void setMaxHist(int max)
+    void setMaxHist(unsigned int max)
     {
         m_maxhist = max;
     }
-    void setMaxMsgs(int max)
+    void setMaxMsgs(unsigned int max)
     {
         m_maxmsgs = max;
+    }
+    void setMaxTorps(unsigned int max)
+    {
+        // This is hardcoded to 9 for now.  Someday when we complete
+        // the shiptypes work, we can then allow this one to be
+        // dynamic too.
+        m_maxtorps = 9;
     }
 
 private:
 
     // current limits for Universe building (CB array maximums)
-    uint8_t m_maxplanets;
-    uint8_t m_maxships;
-    uint8_t m_maxusers;
-    uint8_t m_maxhist;
-    uint8_t m_maxmsgs;
+    unsigned int m_maxplanets;
+    unsigned int m_maxships;
+    unsigned int m_maxusers;
+    unsigned int m_maxhist;
+    unsigned int m_maxmsgs;
+    unsigned int m_maxtorps;
 };
 
 #endif // _CBMAXLIMITS_H

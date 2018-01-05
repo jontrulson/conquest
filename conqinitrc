@@ -36,14 +36,15 @@
 # these values will require a new common block (Universe) to be
 # created and initialized via conqoper.  If you already have a common
 # block, and it's limits don't match the ones below, it will be
-# renamed and a new one created in it's place.
+# renamed and a new (uninitialized) one created in it's place.
 
 # Any planet sections specified in this file that exceeds maxplanets
 # will be ignored.  If the number of planet sections specified in this
 # file is less than maxplanets, invisible planets will be created to
 # fill the empty slots.
 
-# The current maximum limit for each of the max values below is 256.
+# The current absolute maximum limit for each of the max values below
+# (except usermax) is 256.  usermax is limited to 65536.
 
 global {
   planetmax 60

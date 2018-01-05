@@ -13,10 +13,10 @@
 #include "protocol.h"
 #include "packet.h"
 
-
-void           spktInit(void);
-void           spktInitPkt(void);
-void           spktInitRec(void);
+// false == success, true == failure
+bool           spktInit(void);
+bool           spktInitPkt(void);
+bool           spktInitRec(void);
 
 spUser_t       *spktUser(uint16_t unum);
 

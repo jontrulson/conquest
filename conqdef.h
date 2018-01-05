@@ -55,12 +55,15 @@
 
 // Absolute maximum values for certain arrays.  Changing these will
 // require significant changes everywhere (CB/protocol mostly).  These
-// are items that can be changed in the cbGlobal, but only up to
-// these values as an absolute maximum.
+// are items that can be changed in the global {} section of
+// conqinitrc, but only up to these values as an absolute maximum.
 
 #define ABS_MAXPLANETS             (256)
 #define ABS_MAXSHIPS               (256)
 #define ABS_MAXTORPS               (256)
+#define ABS_MAXHIST                (256)
+#define ABS_MAXMSGS                (256)
+#define ABS_MAXUSERS               (65536)
 
 #ifndef PI
 # define PI 3.141592654

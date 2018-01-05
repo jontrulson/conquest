@@ -333,9 +333,6 @@ int main(int argc, char *argv[])
     /* need to make sure that the serverPackets array is setup */
     pktSetClientProtocolVersion(PROTOCOL_VERSION);
 
-    /* clear out our stored packets */
-    spktInit();
-
     if ((ConquestGID = getConquestGID()) == -1)
     {
         fprintf(stderr, "%s: getConquestGID() failed\n", progName);
@@ -407,7 +404,6 @@ int main(int argc, char *argv[])
 
     // load the globals/planets (conqinitrc), before we map...
     cqiLoadRC(CQI_FILE_CONQINITRC, NULL, 1, 0);
-
     cbMap();
 
     if ( *cbRevision != COMMONSTAMP )
@@ -417,6 +413,13 @@ int main(int argc, char *argv[])
         exit(1);
     }
 
+
+    /* clear out our stored packets */
+    if (spktInit())
+    {
+        fprintf(stderr,"conquestd: spktInit() memory allocation failed.\n" );
+        exit(1);
+    }
 
 #ifdef DEBUG_FLOW
     utLog("%s@%d: main() starting conqinit().", __FILE__, __LINE__);

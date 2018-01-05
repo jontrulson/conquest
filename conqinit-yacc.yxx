@@ -1088,8 +1088,8 @@ int cqiLoadRC(int rcid, char *filename, int verbosity, int debugl)
 
     switch (rcid)
     {
-    case CQI_FILE_CONQINITRC:   /* optional */
-        if (filename)
+    case CQI_FILE_CONQINITRC:
+        if (filename)   /* optional */
             utStrncpy(buffer, filename, PATH_MAX);
         else
             snprintf(buffer, PATH_MAX, "%s/%s", utGetPath(CONQETC),
@@ -1238,12 +1238,7 @@ int cqiLoadRC(int rcid, char *filename, int verbosity, int debugl)
     if (!fail && !cqiValidatePlanets())
     {
         utLog("%s: cqiValidatePlanets() failed.", __FUNCTION__);
-
-        cqiGlobal    = &defaultGlobalInit;
-        cqiShiptypes = defaultShiptypes;
-        cqiPlanets   = defaultPlanets;
-        utLog("%s: using default init tables.", __FUNCTION__);
-        return false;
+        fail = true;
     }
 
     if (!fail)
@@ -1259,6 +1254,25 @@ int cqiLoadRC(int rcid, char *filename, int verbosity, int debugl)
         cqiGlobal    = &defaultGlobalInit;
         cqiShiptypes = defaultShiptypes;
         cqiPlanets   = defaultPlanets;
+    }
+
+    // If we were reading the conqinitrc file, update the limits here
+    // regardless of failure
+    if (rcid == CQI_FILE_CONQINITRC)
+    {
+        cbLimits.setMaxPlanets(cqiGlobal->maxplanets);
+        cbLimits.setMaxShips(cqiGlobal->maxships);
+        cbLimits.setMaxUsers(cqiGlobal->maxusers);
+        cbLimits.setMaxHist(cqiGlobal->maxhist);
+        cbLimits.setMaxMsgs(cqiGlobal->maxmsgs);
+
+        utLog("%s: cbLimits: planets: %d ships: %d users: %d hist: %d msgs: %d",
+              __FUNCTION__,
+              cbLimits.maxPlanets(),
+              cbLimits.maxShips(),
+              cbLimits.maxUsers(),
+              cbLimits.maxHist(),
+              cbLimits.maxMsgs());
     }
 
     return (fail) ? false: true;
@@ -2381,19 +2395,19 @@ static void cfgSectioni(int item, int val)
         switch (item)
         {
         case TOK_PLANETMAX:
-            _cqiGlobal->maxplanets = abs(val);
+            _cqiGlobal->maxplanets = CLAMP(0, ABS_MAXPLANETS, abs(val));
             break;
         case TOK_SHIPMAX:
-            _cqiGlobal->maxships = abs(val);
+            _cqiGlobal->maxships = CLAMP(0, ABS_MAXSHIPS, abs(val));
             break;
         case TOK_USERMAX:
-            _cqiGlobal->maxusers = abs(val);
+            _cqiGlobal->maxusers = CLAMP(0, ABS_MAXUSERS, abs(val));
             break;
         case TOK_HISTMAX:
-            _cqiGlobal->maxhist = abs(val);
+            _cqiGlobal->maxhist = CLAMP(0, ABS_MAXHIST, abs(val));
             break;
         case TOK_MSGMAX:
-            _cqiGlobal->maxmsgs = abs(val);
+            _cqiGlobal->maxmsgs = CLAMP(0, ABS_MAXMSGS, abs(val));
             break;
         }
     }
