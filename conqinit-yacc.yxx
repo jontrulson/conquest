@@ -1564,9 +1564,6 @@ void dumpInitDataHdr(void)
 
         printf("   %d,\n", (int)cqiPlanets[i].size);
 
-        /* we never write out a planet texture name */
-        printf("   \"\",\n");
-
         printf(" },\n");
 
     }
@@ -2828,9 +2825,6 @@ void cfgSections(int item, char *val)
             break;
         case TOK_PTEAM:
             currPlanet.pteam = str2team(val);
-            break;
-        case TOK_TEXNAME:
-            utStrncpy(currPlanet.texname, val, CQI_NAMELEN);
             break;
         case TOK_COLOR:
             /* this used to be allowed, so for now just warn if

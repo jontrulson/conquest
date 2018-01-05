@@ -62,7 +62,6 @@ typedef struct _cqi_planet_init {
     real xcoord;
     real ycoord;
     real size;                    /* in CU's (Conquest Units (mega meters))  */
-    char texname[CQI_NAMELEN];     /* texid */
 } cqiPlanetInitRec_t, *cqiPlanetInitPtr_t;
 
 /* texture flags */
