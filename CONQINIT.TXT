@@ -234,7 +234,6 @@ CONTENTS:
             x           -9655.250220
             y           9577.226313
             size        300
-            texname     "kling"                  # optional
           }
 
           name:       STRING
@@ -336,30 +335,20 @@ CONTENTS:
                       value will be stored with the planet into the
                       common block, and propagated out to clients.
 
-          texname:    STRING
-                      optional.  Explicitly specifies the texture to
-                      be used to draw the planet.  In general this
-                      option should not be used for planet definitions.
-
 
        Currently in conquest, the following steps are made to
        determine the proper texture to use to display a planet:
 
-       1. see if one was specified in the conqinitrc entry for
-          the planet, if so, use it.  This should usually not be done
-          except in special cases.
-
-       2. see if a texture exists with the same name (case sensitive)
+       1. see if a texture exists with the same name (case sensitive)
           as the planet, if so use it.
 
-       3. if all else fails, use the default textures 'classm',
+       2. if all else fails, use the default textures 'classm',
           classd', 'star' etc.
 
-       So in general, you never really need to specify a texture for a
-       planet in conqinitrc.  If you want a specific texture to be
-       displayed for a planet, just create a texture definition with
-       the same name as the planet and add an entry for it in the
-       texturesrc (or a user .trc) file.
+       If you want a specific texture to be displayed for a planet,
+       just create a texture definition with the same name as the
+       planet and add an entry for it in the texturesrc (or a user
+       .trc) file.
 
 
 ## texturesrc or user .trc files

@@ -455,52 +455,58 @@ void cqsInitSound(void)
 
     /* init all of the team effects and music structures, of course these
        will all silently fail if no music and/or effects were loaded */
+
+    // We hardcode the team name characters here to avoid needing to
+    // access the CB, which may not be mapped yet.  This is ok, since
+    // these teams, and their "numbers" will never change.
+    static const char teams[NUMPLAYERTEAMS] = { 'F', 'R', 'K', 'O'};
+
     for (i=0; i<NUMPLAYERTEAMS; i++)
     {
-        snprintf(buf, bufSize, "ship%c-phaser", cbTeams[i].name[0]);
+        snprintf(buf, bufSize, "ship%c-phaser", teams[i]);
         cqsTeamEffects[i].phaser = cqsFindEffect(buf);
 
-        snprintf(buf, bufSize, "ship%c-torp", cbTeams[i].name[0]);
+        snprintf(buf, bufSize, "ship%c-torp", teams[i]);
         cqsTeamEffects[i].torp = cqsFindEffect(buf);
 
-        snprintf(buf, bufSize, "ship%c-torp3", cbTeams[i].name[0]);
+        snprintf(buf, bufSize, "ship%c-torp3", teams[i]);
         cqsTeamEffects[i].torp3 = cqsFindEffect(buf);
 
-        snprintf(buf, bufSize, "ship%c-alert", cbTeams[i].name[0]);
+        snprintf(buf, bufSize, "ship%c-alert", teams[i]);
         cqsTeamEffects[i].alert = cqsFindEffect(buf);
 
-        snprintf(buf, bufSize, "ship%c-beam-down", cbTeams[i].name[0]);
+        snprintf(buf, bufSize, "ship%c-beam-down", teams[i]);
         cqsTeamEffects[i].beamd = cqsFindEffect(buf);
 
-        snprintf(buf, bufSize, "ship%c-beam-up", cbTeams[i].name[0]);
+        snprintf(buf, bufSize, "ship%c-beam-up", teams[i]);
         cqsTeamEffects[i].beamu = cqsFindEffect(buf);
 
-        snprintf(buf, bufSize, "ship%c-hit", cbTeams[i].name[0]);
+        snprintf(buf, bufSize, "ship%c-hit", teams[i]);
         cqsTeamEffects[i].hit = cqsFindEffect(buf);
 
-        snprintf(buf, bufSize, "ship%c-info", cbTeams[i].name[0]);
+        snprintf(buf, bufSize, "ship%c-info", teams[i]);
         cqsTeamEffects[i].info = cqsFindEffect(buf);
 
-        snprintf(buf, bufSize, "ship%c-mag", cbTeams[i].name[0]);
+        snprintf(buf, bufSize, "ship%c-mag", teams[i]);
         cqsTeamEffects[i].mag = cqsFindEffect(buf);
 
-        snprintf(buf, bufSize, "ship%c-warp-up", cbTeams[i].name[0]);
+        snprintf(buf, bufSize, "ship%c-warp-up", teams[i]);
         cqsTeamEffects[i].warpu = cqsFindEffect(buf);
 
-        snprintf(buf, bufSize, "ship%c-warp-down", cbTeams[i].name[0]);
+        snprintf(buf, bufSize, "ship%c-warp-down", teams[i]);
         cqsTeamEffects[i].warpd = cqsFindEffect(buf);
 
         /* music */
-        snprintf(buf, bufSize, "ship%c-intro", cbTeams[i].name[0]);
+        snprintf(buf, bufSize, "ship%c-intro", teams[i]);
         cqsTeamMusic[i].intro = cqsFindMusic(buf);
 
-        snprintf(buf, bufSize, "ship%c-battle", cbTeams[i].name[0]);
+        snprintf(buf, bufSize, "ship%c-battle", teams[i]);
         cqsTeamMusic[i].battle = cqsFindMusic(buf);
 
-        snprintf(buf, bufSize, "ship%c-approach", cbTeams[i].name[0]);
+        snprintf(buf, bufSize, "ship%c-approach", teams[i]);
         cqsTeamMusic[i].approach = cqsFindMusic(buf);
 
-        snprintf(buf, bufSize, "ship%c-theme", cbTeams[i].name[0]);
+        snprintf(buf, bufSize, "ship%c-theme", teams[i]);
         cqsTeamMusic[i].theme = cqsFindMusic(buf);
     }
 

@@ -580,26 +580,11 @@ static int _get_glplanet_info(GLPlanet_t *curGLPlanet, int plani)
 
     /* first find the appropriate texture.  We look for one in this order:
      *
-     * 1. look for a cqiPlanets entry for the planet.  If so, and it
-     *    specifies a texture, try to use it if present.
-     * 2. If no cqiPlanets[] entry for the planet, (or the specified
-     *    texture was not available) look for a texture named
-     *    the same as the planet.  If available, use it.
-     * 3. All else failing, then select a default texture (classm, etc)
+     * 1. Look for a texture named the same as the planet.  If
+     *    available, use it.
+     * 2. All else failing, then select a default texture (classm, etc)
      *    based on the planet type.
      */
-
-    if ((ndx = cqiFindPlanet(cbPlanets[plani].name)) >= 0)
-    {                       /* found one. */
-        /* save the index for possible color and size setup */
-        plnndx = ndx;
-
-        /* see if it specified a texture */
-
-        if (strlen(cqiPlanets[ndx].texname))
-            if ((ndx = findGLTexture(cqiPlanets[ndx].texname)) >= 0)
-                gltndx = ndx;     /* yes, and it is present */
-    }
 
     /* still no texture? */
     if (gltndx == -1)
@@ -650,32 +635,12 @@ static int _get_glplanet_info(GLPlanet_t *curGLPlanet, int plani)
 
     curGLPlanet->tex = &GLTextures[gltndx];
 
-    if (plnndx == -1)
-    {
-        /* no cqi planet was found so will set a default.
-         * These are in CU's.
-         */
-        switch (cbPlanets[plani].type)
-        {
-        case PLANET_SUN:
-            size = 1500.0;
-            break;
-        case PLANET_MOON:
-            size = 160.0;
-            break;
-        default:
-            size = 300.0;
-            break;
-        }
-    }
-    else
-    {                       /* cqi was found, so get it. */
-        size = (real)cbPlanets[plani].size * GLTextures[gltndx].prescale;
+    size = (real)cbPlanets[plani].size * GLTextures[gltndx].prescale;
+
 #if 0
-        utLog("Computed size %f for planet %s\n",
-              size, cbPlanets[plani].name);
+    utLog("Computed size %f for planet %s\n",
+          size, cbPlanets[plani].name);
 #endif
-    }
 
     curGLPlanet->size = size;
 
