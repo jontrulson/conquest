@@ -27,7 +27,7 @@ static char *_cbBasePtr = NULL;	/* common block base ptr, the Universe. */
 static unsigned int _cbOffset = 0; /* offset into common block */
 static unsigned int _cbSavedSize = 0; /* for msync() and friends */
 
-static int fakeCommon = false;	/* for the clients */
+static bool fakeCommon = false;	/* for the clients */
 
 /* Some architectures do not like unaligned accesses (like sparc) so
  * we need to ensure proper alignment of the structures contained
@@ -79,30 +79,27 @@ static void _mapCBVariables(bool doAssign)
     // This must be the first var
     MAP_VARIABLE(cbRevision, unsigned int, 1, doAssign);
 
-    // This must be the second var
-    MAP_VARIABLE(cbGlobalLimits, cbGlobalLimits_t, 1, doAssign);
-
     MAP_VARIABLE(cbConqInfo, cbConqInfo_t, 1, doAssign);
 
-    MAP_VARIABLE(cbUsers, User_t, MAXUSERS, doAssign);
+    MAP_VARIABLE(cbUsers, User_t, cbLimits.maxUsers(), doAssign);
 
     MAP_VARIABLE(cbRobot, Robot_t, 1, doAssign);
 
-    MAP_VARIABLE(cbPlanets, Planet_t, MAXPLANETS, doAssign);
+    MAP_VARIABLE(cbPlanets, Planet_t, cbLimits.maxPlanets(), doAssign);
 
     MAP_VARIABLE(cbTeams, Team_t, NUMALLTEAMS, doAssign);
 
     MAP_VARIABLE(cbDoomsday, Doomsday_t, 1, doAssign);
 
-    MAP_VARIABLE(cbHistory, History_t, MAXHISTLOG, doAssign);
+    MAP_VARIABLE(cbHistory, History_t, cbLimits.maxHist(), doAssign);
 
     MAP_VARIABLE(cbDriver, Driver_t, 1, doAssign);
 
-    MAP_VARIABLE(cbShips, Ship_t, MAXSHIPS, doAssign);
+    MAP_VARIABLE(cbShips, Ship_t, cbLimits.maxShips(), doAssign);
 
     MAP_VARIABLE(cbShipTypes, ShipType_t, MAXNUMSHIPTYPES, doAssign);
 
-    MAP_VARIABLE(cbMsgs, Msg_t, MAXMESSAGES, doAssign);
+    MAP_VARIABLE(cbMsgs, Msg_t, cbLimits.maxMsgs(), doAssign);
 
     // if we did actual assignments, save the offset
     if (doAssign)
@@ -118,9 +115,6 @@ static void _unmapCBVariables()
 
     // This must be the first var
     cbRevision = NULL;
-
-    // This must be the second var
-    cbGlobalLimits = NULL;
 
     cbConqInfo = NULL;
 
@@ -302,7 +296,7 @@ static int _checkCB(char *fname, int fmode, int sizeofcb)
                 free(_cbBasePtr);
                 _cbBasePtr = NULL;
 	    }
-	}
+        }
         else
 	{			/* some other error */
             utLog("_checkCB(): open(%s, O_RDONLY) failed: %s\n",
@@ -342,11 +336,12 @@ void cbMap(void)
     utLog("%s: Mapping the common block", __FUNCTION__);
 #if defined(MINGW)
     fprintf(stderr,
-            "%s: Only fake (client) common blocks are supported under MINGW\n");
+            "%s: Only fake (client) common blocks are supported under MINGW\n",
+        __FUNCTION__);
     exit(1);
 #else  /* MINGW */
 
-    utLog("%s: CB size needed: %u bytes", __FUNCTION__,
+    utLog("%s: CB size: %u bytes", __FUNCTION__,
           cbGetSize());
 
     snprintf(cmnfile, PATH_MAX, "%s/%s", CONQSTATE, C_CONQ_COMMONBLK);

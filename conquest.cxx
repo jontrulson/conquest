@@ -483,14 +483,11 @@ int main(int argc, char *argv[])
     }
 
     /* load the globals/planets, etc */
-    cqiLoadRC(CQI_FILE_CONQINITRC, NULL, 1, 0);
+// FIXME   cqiLoadRC(CQI_FILE_CONQINITRC, NULL, 1, 0);
 
     /* load the main texturesrc file and any user supplied ~/.conquest/ *.trc
        files */
     loadTextureRCFiles();
-
-    /* a parallel universe, it is */
-    cbMapLocal();
 
     /* init and load the sounds */
     if (dosound)
@@ -528,6 +525,20 @@ int main(int argc, char *argv[])
     catchSignals();       /* enable trapping of interesting signals */
 
     /* which node to start from... */
+    /* a parallel universe, it is */
+    // For now, we hardcode cb limits to the minimum.  We will end up
+    // unmapping and remapping based on limits received from the
+    // server later on anyway.
+
+    // FIXME - we should not need the CB until we are connected to a
+    // server and getting ready to play. 
+    cbLimits.setMaxPlanets(60);
+    cbLimits.setMaxShips(20);
+    cbLimits.setMaxUsers(500);
+    cbLimits.setMaxHist(40);
+    cbLimits.setMaxMsgs(60);
+    cbMapLocal();
+
 
     if (Context.recmode == RECMODE_PLAYING)
         nPlayBMenuInit();

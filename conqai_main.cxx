@@ -31,6 +31,7 @@
 #include "conf.h"
 
 #include "sem.h"
+#include "conqinit.h"
 
 static int debug;
 static void exitai(void);
@@ -72,17 +73,6 @@ int main(int argc, char *argv[])
         exit(1);
     }
 
-
-    cbMap();
-
-    if ( *cbRevision != COMMONSTAMP )
-    {
-        printf("conqai: Common block ident mismatch.\n"
-               "Initialize the Universe via conqoper.\n");
-        exit(1);
-    }
-
-
     debug = false;
 
     while ((arg = getopt(argc, argv, "dr")) != EOF)
@@ -102,6 +92,19 @@ int main(int argc, char *argv[])
             exit(1);
 	}
     }
+
+    // load the globals/planets (conqinitrc), before we map...
+    cqiLoadRC(CQI_FILE_CONQINITRC, NULL, 1, debug);
+    cbMap();
+
+    if ( *cbRevision != COMMONSTAMP )
+    {
+        fprintf(stderr, "conquestd: Common block ident mismatch.\n" );
+        fprintf(stderr, "           You must initialize the universe with conqoper.\n" );
+        exit(1);
+    }
+
+
     robotloop();
 
     exit(0);

@@ -32,6 +32,8 @@
 
 #include "sem.h"
 
+#include "conqinit.h"
+
 #define SUBMIN_SECONDS 5 	/* seconds between planet movement */
 #define MINUTE_SECONDS 60
 #define FIVEMINUTE_SECONDS 300
@@ -89,10 +91,17 @@ int main(int argc, char *argv[])
     for (i=0; i < FOPEN_MAX; i++)
         close(i);
 
+    // load the globals/planets (conqinitrc), before we map...
+    cqiLoadRC(CQI_FILE_CONQINITRC, NULL, 1, 0);
+
     cbMap();
 
     if ( *cbRevision != COMMONSTAMP )
-        utLog("conqdriv:ERROR:common block mismatch");
+    {
+        // don't even bother
+        utLog("conqdriv: ERROR: common block mismatch, exiting");
+        exit(1);
+    }
 
     initstats( &ctime, &etime );
     cacc = 0;

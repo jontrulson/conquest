@@ -24,7 +24,7 @@
 #include "conqinfo.h"
 #include "history.h"
 #include "robot.h"
-#include "cbglobal.h"
+#include "cbMaxLimits.h"
 
 #define CMN_MODE 0660		/* mode of a new common block */
 
@@ -54,12 +54,13 @@ bool cbIsMapped();
 // malloc().
 unsigned int cbGetSize();
 
+// Common block dynamic limits
+CEXTERN cbMaxLimits cbLimits;
+
 /* The Common Block in all it's majesty */
 
 // This must be the first var
 CEXTERN unsigned int *cbRevision; /* common block rev number */
-// This must be the second var
-CEXTERN cbGlobalLimits_t *cbGlobalLimits;   /* global limits from CQI */
 
 CEXTERN cbConqInfo_t *cbConqInfo; /* misc game info */
 

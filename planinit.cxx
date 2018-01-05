@@ -23,25 +23,24 @@ void cqiInitPlanets(void)
 {
     int i, j, k;
 
-    /* Hump the lockword. */
-    cbUnlock(&cbConqInfo->lockword);
-    cbLock(&cbConqInfo->lockword);
-
     if (!cqiGlobal)
     {
         utLog("WARNING: cqiInitPlanets(): cqiGlobal is NULL, can't init planets");
-        cbUnlock(&cbConqInfo->lockword);
         return;
     }
 
+    // FIXME - rm when ready
     if (cqiGlobal->maxplanets != MAXPLANETS)
     {                           /* bummer - should not happen */
         utLog("ERROR: cqiInitPlanets: cqiGlobal->maxplanets(%d) != MAXPLANETS(%d)\n",
               cqiGlobal->maxplanets, MAXPLANETS);
 
-        cbUnlock(&cbConqInfo->lockword);
         return;
     }
+
+    /* Hump the lockword. */
+    cbUnlock(&cbConqInfo->lockword);
+    cbLock(&cbConqInfo->lockword);
 
     for (i=0; i<MAXPLANETS; i++)
     {                           /* init all of the planets. */

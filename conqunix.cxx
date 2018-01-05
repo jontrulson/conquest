@@ -88,17 +88,7 @@ int getConquestGID(void)
 /*    conqinit */
 void conqinit(void)
 {
-    /* First things first. */
-    if ( *cbRevision != COMMONSTAMP )
-    {
-        printf("conquest: Common block ident mismatch.\n"
-               "Initialize the Universe via conqoper.");
-        utLog("%s: Common block ident mismatch.\n"
-              "Initialize the Universe via conqoper.", __FUNCTION__);
-        exit(1);
-    }
-
-    /* Set up game environment. */
+    /* Set up game context. */
 
     /* Other house keeping. */
     Context.pid = getpid();
