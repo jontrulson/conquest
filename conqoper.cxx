@@ -422,7 +422,7 @@ void debugdisplay( int snum )
     lin++;
     cprintf(lin,tcol,ALIGN_NONE,"#%d#%s",LabelColor, "  username:");
     buf[0] = 0;
-    if ( unum >= 0 && unum < MAXUSERS )
+    if ( unum >= 0 && unum < cbLimits.maxUsers() )
     {
         strcpy(buf , cbUsers[unum].username) ;
         if ( buf[0] != 0 )

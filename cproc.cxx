@@ -86,7 +86,7 @@ int procUser(char *buf)
     utLog("%s: unum = %d", __FUNCTION__, unum);
 #endif
 
-    if (unum < 0 || unum >= MAXUSERS)
+    if (unum < 0 || unum >= cbLimits.maxUsers())
         return false;
 
     if (Context.recmode == RECMODE_ON)

@@ -707,7 +707,7 @@ int clbRegister( const char *lname, const char *rname, int team, int *unum )
     int i, j;
 
     cbLock(&cbConqInfo->lockword);
-    for ( i = 0; i < MAXUSERS; i++ )
+    for ( i = 0; i < cbLimits.maxUsers(); i++ )
         if ( !ULIVE(i) )
         {
             // clear all user flags
@@ -757,7 +757,7 @@ void clbResign( int unum, int isoper )
     utStrncpy(usralias, cbUsers[unum].alias, MAXUSERNAME);
 
     cbLock(&cbConqInfo->lockword);
-    if ( unum >= 0 && unum < MAXUSERS )
+    if ( unum >= 0 && unum < cbLimits.maxUsers() )
     {
         UFCLR(unum, USER_F_LIVE);
 
@@ -898,7 +898,7 @@ void clbUserline( int unum, int snum, char *buf, int showgods, int showteam )
     char tname[MAXUSERNAME + 2];	/* posss '@' and NULL */
 
 
-    if ( unum < 0 || unum >= MAXUSERS )
+    if ( unum < 0 || unum >= cbLimits.maxUsers() )
     {
         strcpy(buf , hd1) ;
         return;
@@ -973,7 +973,7 @@ void clbStatline( int unum, char *buf )
     char datestr[MAXDATESIZE];
     char tname[MAXUSERNAME + 2];	/* posss '@' and NULL */
 
-    if ( unum < 0 || unum >= MAXUSERS )
+    if ( unum < 0 || unum >= cbLimits.maxUsers() )
     {
         buf[0] = 0;
         return;
@@ -1716,7 +1716,7 @@ int clbGetUserNum( int *unum, const char *lname, userTypes_t ltype )
     const char *lptr = lname;
 
     *unum = -1;
-    for ( i = 0; i < MAXUSERS; i++ )
+    for ( i = 0; i < cbLimits.maxUsers(); i++ )
         if ( ULIVE(i) )
         {
             if ( strcmp( lptr, cbUsers[i].username ) == 0
@@ -1761,7 +1761,7 @@ void clbInitEverything(void)
             cbTeams[i].stats[j] = 0;
 
     /* De-register all users. */
-    for ( i = 0; i < MAXUSERS; i++ )
+    for ( i = 0; i < cbLimits.maxUsers(); i++ )
     {
         UFCLR(i, USER_F_LIVE);
         cbUsers[i].type = USERTYPE_NORMAL;

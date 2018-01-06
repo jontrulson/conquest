@@ -952,7 +952,7 @@ int updateClient(int force)
     if (!sentallusers)
     {                           /* send all valid user data the first time */
         sentallusers = true;
-        for (i=0; i<MAXUSERS; i++)
+        for (i=0; i<cbLimits.maxUsers(); i++)
             if (ULIVE(i))
                 if (!sendUser(sInfo.sock, i))
                     return false;

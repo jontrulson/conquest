@@ -96,7 +96,7 @@ static int nShiplDisplay(dspConfig_t *dsp)
             utAppendChar(sbuf, cbShipTypes[cbShips[i].shiptype].name[0]) ;
 
             unum = cbShips[i].unum;
-            if ( unum >= 0 && unum < MAXUSERS )
+            if ( unum >= 0 && unum < cbLimits.maxUsers() )
             {
                 if (SROBOT(i)) /* robot */
                     strcpy(pidbuf, " ROBOT");

@@ -406,7 +406,7 @@ spClientStat_t *chkClientStat(char *buf)
 
     scstat.unum = (uint16_t)ntohs(scstat.unum);
 
-    if (scstat.unum >= MAXUSERS)
+    if (scstat.unum >= cbLimits.maxUsers())
     {
 #if defined(DEBUG_PKT)
         utLog("%s: unum not in valid range", __FUNCTION__);

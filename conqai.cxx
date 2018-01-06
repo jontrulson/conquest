@@ -229,7 +229,7 @@ void defend( int attacker, int pnum )
 
     /* Count how many robot users are on the right team and can play. */
     j = 0;
-    for ( i = 0; i < MAXUSERS; i++ )
+    for ( i = 0; i < cbLimits.maxUsers(); i++ )
         if ( ULIVE(i) )
             if ( UROBOT(i) && cbUsers[i].team == team && !UBANNED(i) )
                 j++;
@@ -242,7 +242,7 @@ void defend( int attacker, int pnum )
     k = rndint( 1, j );
     unum = -1;    /* off-by-one fixed - romulans now have defenders */
     j = 0;
-    for ( i = 0; i < MAXUSERS; i++ )
+    for ( i = 0; i < cbLimits.maxUsers(); i++ )
         if ( ULIVE(i) )
             if ( UROBOT(i) && cbUsers[i].team == team && !UBANNED(i) )
             {

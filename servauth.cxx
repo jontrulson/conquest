@@ -185,7 +185,7 @@ void expire_users(void)
     expire_secs = (SysConf.UserExpiredays * SECS_PER_DAY);
     cbLock(&cbConqInfo->lockword);
 
-    for (i=0; i < MAXUSERS; i++)
+    for (i=0; i < cbLimits.maxUsers(); i++)
     {
         if (!ULIVE(i) || UROBOT(i) || UISOPER(i))
             continue;		/* only living, human, non godlike users

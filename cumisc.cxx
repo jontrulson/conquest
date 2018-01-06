@@ -1116,7 +1116,7 @@ void mcuPlayList( int godlike, int doall, int snum )
                 utAppendChar(sbuf, cbShipTypes[cbShips[i].shiptype].name[0]) ;
 
                 unum = cbShips[i].unum;
-                if ( unum >= 0 && unum < MAXUSERS )
+                if ( unum >= 0 && unum < cbLimits.maxUsers() )
 		{
                     if (SROBOT(i)) /* robot */
                         strcpy(pidbuf, " ROBOT");
@@ -1567,13 +1567,13 @@ void mcuTeamList( int team )
 void mcuUserList( int godlike, int snum )
 {
     int i, j, unum, nu, fuser, fline, lline, lin;
-    static int uvec[MAXUSERS];
+    int uvec[cbLimits.maxUsers()];
     int ch;
     static const char *hd1="U S E R   L I S T";
 
     /* init the user vector */
 
-    for (i=0; i<MAXUSERS; i++)
+    for (i=0; i<cbLimits.maxUsers(); i++)
         uvec[i] = i;
 
     /* Do some screen setup. */
@@ -1606,7 +1606,7 @@ void mcuUserList( int godlike, int snum )
 
         /* sort the (living) user list */
         nu = 0;
-        for ( unum = 0; unum < MAXUSERS; unum++)
+        for ( unum = 0; unum < cbLimits.maxUsers(); unum++)
             if ( ULIVE(unum) )
             {
                 uvec[nu++] = unum;
@@ -1696,13 +1696,13 @@ void mcuUserList( int godlike, int snum )
 void mcuUserStats( int godlike , int snum )
 {
     int i, j, unum, nu, fuser, fline, lline, lin;
-    static int uvec[MAXUSERS];
+    int uvec[cbLimits.maxUsers()];
     int ch;
     static const char *hd1="M O R E   U S E R   S T A T S";
     static const char *hd2="name         cpu  conq coup geno  taken bombed/shot  shots  fired   last entry";
     static const char *hd3="planets  armies    phaser  torps";
 
-    for (i=0; i<MAXUSERS; i++)
+    for (i=0; i<cbLimits.maxUsers(); i++)
         uvec[i] = i;
 
     /* Do some screen setup. */
@@ -1737,7 +1737,7 @@ void mcuUserStats( int godlike , int snum )
 
         /* sort the (living) user list */
         nu = 0;
-        for ( unum = 0; unum < MAXUSERS; unum++)
+        for ( unum = 0; unum < cbLimits.maxUsers(); unum++)
             if ( ULIVE(unum) )
             {
                 uvec[nu++] = unum;

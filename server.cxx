@@ -227,7 +227,7 @@ int sendServerStat(int socktype)
 #endif
 
     /* get total users */
-    for ( i = 0; i < MAXUSERS; i++)
+    for ( i = 0; i < cbLimits.maxUsers(); i++)
         if ( ULIVE(i) )
             numusers++;
 

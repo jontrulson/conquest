@@ -161,7 +161,6 @@ typedef enum {
 #define PLANET_CLASSO 7
 #define PLANET_CLASSZ 0
 
-#define MAXUSERS     500      /* maximum number of registered users */
 #define MAXUSERNAME  32	     /* maximum size of a user's login name */
 #define MAXLASTWORDS 60	      /* maximum size of conquering remarks */
 

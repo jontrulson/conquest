@@ -23,12 +23,15 @@
 #include "cqkeys.h"
 
 static int snum, godlike;
-static int uvec[MAXUSERS];
 static int nu;
 static int fuser;
 static int offset;
 
 static int extrast;             /* normal, or extra stats? */
+
+// for the sorted list
+static int *uvec = NULL;
+
 
 static int nUserlDisplay(dspConfig_t *);
 static int nUserlIdle(void);
@@ -53,14 +56,25 @@ scrNode_t *nUserlInit(int nodeid, int setnode, int sn, int gl, int extra)
     godlike = gl;
     extrast = extra;
 
-    /* init the user vector */
+    // init the user vector, free it if it already exists
+    if (uvec)
+        free(uvec);
 
-    for (i=0; i<MAXUSERS; i++)
+    // Create it fresh
+    if (!(uvec = (int *)malloc(cbLimits.maxUsers() * sizeof(int))))
+    {
+        utLog("%s: malloc(%d) failed", __FUNCTION__,
+              cbLimits.maxUsers() * sizeof(int));
+        fprintf(stderr, "%s: malloc(%d) failed\n", __FUNCTION__,
+                cbLimits.maxUsers() * sizeof(int));
+    }
+
+    for (i=0; i<cbLimits.maxUsers(); i++)
         uvec[i] = i;
 
     /* sort the (living) user list */
     nu = 0;
-    for ( unum = 0; unum < MAXUSERS; unum++)
+    for ( unum = 0; unum < cbLimits.maxUsers(); unum++)
         if ( ULIVE(unum) )
         {
             uvec[nu++] = unum;
@@ -85,6 +99,10 @@ static int nUserlDisplay(dspConfig_t *dsp)
     static const char *ehd3="planets  armies    phaser  torps";
     static char cbuf[BUFFER_SIZE_256];
     int color;
+
+    // bail if there was init problems (uvec allocation)
+    if (!uvec)
+        return NODE_EXIT;
 
     /* Do some screen setup. */
     lin = 0;
@@ -200,6 +218,10 @@ static int nUserlIdle(void)
 static int nUserlInput(int ch)
 {
     ch = CQ_CHAR(ch);
+
+    // bail if there was init problems (uvec allocation)
+    if (!uvec)
+        return NODE_EXIT;
 
     if (ch == TERM_EXTRA)
     {
