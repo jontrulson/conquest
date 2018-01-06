@@ -161,6 +161,10 @@ typedef struct {
     uint8_t  pad2;
 } spClientStat_t;
 
+// we compact srpwar information into an array of uint32_t's containing
+// bits, one bit for each possible planet (ABS_MAXPLANETS).  This
+// requires 8 uint32_t's. (ABS_MAXPLANETS / 8 / 4)
+#define PROTO_SRPWAR_BIT_WORDS      (8)
 typedef struct {        /* 'large' ship data */
     uint8_t  type;                      /* SP_SHIP */
     uint8_t  status;            /* one of the SS_ values */
@@ -183,7 +187,12 @@ typedef struct {        /* 'large' ship data */
 
     uint32_t kills;             /* x10 */
 
-    uint8_t  srpwar[MAXPLANETS];
+    // For space reasons, we encode all war states as an array of
+    // bits, themselves organized into 8 32b words.  This assumes that a
+    // uint32_t is actually 32 bits/4 bytes.  If this is not correct
+    // for your system, you have larger problems and this will fail
+    // horribly.
+    uint32_t srpwar[PROTO_SRPWAR_BIT_WORDS]; // 8 32b words
 
     uint8_t  scanned[NUMPLAYERTEAMS];
 

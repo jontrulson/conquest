@@ -161,8 +161,21 @@ int procShip(char *buf)
 
     cbShips[snum].kills = (real)((real)ntohl(sship->kills) / 10.0);
 
+    // srpwar - convert to host order
+    for (i=0; i<PROTO_SRPWAR_BIT_WORDS; i++)
+        sship->srpwar[i] = ntohl(sship->srpwar[i]);
+
+    // decode the bit encoded representation
     for (i=0; i<MAXPLANETS; i++)
-        cbShips[snum].srpwar[i] = (int)sship->srpwar[i];
+    {
+        int word = i / sizeof(uint32_t);
+        int bit = i % sizeof(uint32_t);
+
+        if (sship->srpwar[word] & (1 << bit))
+            cbShips[snum].srpwar[i] = true;
+        else
+            cbShips[snum].srpwar[i] = false;
+    }
 
     for (i=0; i<NUMPLAYERTEAMS; i++)
         cbShips[snum].scanned[i] = (int)sship->scanned[i];

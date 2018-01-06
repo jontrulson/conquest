@@ -539,7 +539,6 @@ int main(int argc, char *argv[])
     cbLimits.setMaxMsgs(60);
     cbMapLocal();
 
-
     if (Context.recmode == RECMODE_PLAYING)
         nPlayBMenuInit();
     else if (wantMetaList)

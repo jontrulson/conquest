@@ -223,8 +223,22 @@ spShip_t *spktShip(uint8_t snum, int rec)
         sship.killedBy = (uint8_t)cbShips[snum].killedBy;
         sship.killedByDetail = htons(cbShips[snum].killedByDetail);
 
+        // encode the srpwar (Self Ruled Planet War) bits
         for (i=0; i<MAXPLANETS; i++)
-            sship.srpwar[i] = (uint8_t)cbShips[snum].srpwar[i];
+        {
+            if (cbShips[snum].srpwar[i])
+            {
+                int word = i / sizeof(uint32_t);
+                int bit = i % sizeof(uint32_t);
+
+                sship.srpwar[word] |= (1 << bit);
+            }
+        }
+
+        // Now reformat for network transmission
+        for (i=0; i<PROTO_SRPWAR_BIT_WORDS; i++)
+            sship.srpwar[i] = htonl(sship.srpwar[i]);
+
     }
     else
     {
