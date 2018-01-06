@@ -84,7 +84,7 @@ static int nShiplDisplay(dspConfig_t *dsp)
     i = fship;
 
     lin = fline;
-    while ( i < MAXSHIPS && lin <= lline )
+    while ( i < cbLimits.maxShips() && lin <= lline )
     {
         status = cbShips[i].status;
 
@@ -116,7 +116,7 @@ static int nShiplDisplay(dspConfig_t *dsp)
                 sprintf( cbuf, "%-5s %13s %21s %8s %6s", sbuf,
                          " ", " ", " ", " " );
 
-            if (snum >= 0 && snum < MAXSHIPS )
+            if (snum >= 0 && snum < cbLimits.maxShips() )
             {		/* a normal ship view */
                 if ( i == snum )    /* it's ours */
                     color = NoColor | CQC_A_BOLD;

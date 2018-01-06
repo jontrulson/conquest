@@ -32,7 +32,7 @@ void cucPseudo( int unum, int snum )
 
     cdclrl( MSG_LIN1, 2 );
     strcpy(buf , "Old pseudonym: ") ;
-    if ( snum >= 0 && snum < MAXSHIPS )
+    if ( snum >= 0 && snum < cbLimits.maxShips() )
         strcat(buf , cbShips[snum].alias) ;
     else
         strcat(buf , cbUsers[unum].alias) ;
@@ -179,7 +179,7 @@ void cucSendMsg( msgFrom_t from, uint16_t fromDetail, int terse, int remote )
     if ( editing )
     {
         /* Make up a default string using the last target. */
-        if ( to == MSG_TO_SHIP && toDetail < MAXSHIPS )
+        if ( to == MSG_TO_SHIP && toDetail < cbLimits.maxShips() )
         {
             sprintf( buf, "%d", toDetail );
         }
@@ -222,7 +222,7 @@ void cucSendMsg( msgFrom_t from, uint16_t fromDetail, int terse, int remote )
         /* All digits means a ship number. */
         i = 0;
         utSafeCToI( &j, buf, i );		/* ignore status */
-        if ( j < 0 || j >= MAXSHIPS )
+        if ( j < 0 || j >= cbLimits.maxShips() )
 	{
             mcuPutMsg( "No such ship.", MSG_LIN2 );
             return;
@@ -283,7 +283,7 @@ void cucSendMsg( msgFrom_t from, uint16_t fromDetail, int terse, int remote )
 
     /* Now, construct a header for the selected target. */
     strcpy(buf , "Message to ") ;
-    if ( to == MSG_TO_SHIP && toDetail < MAXSHIPS )
+    if ( to == MSG_TO_SHIP && toDetail < cbLimits.maxShips() )
     {
         if ( cbShips[toDetail].status != SS_LIVE )
 	{
@@ -348,7 +348,7 @@ void cucSendMsg( msgFrom_t from, uint16_t fromDetail, int terse, int remote )
             {
                 /* Handle a message to the Implementors. */
                 strcpy(buf , "Communique from ") ;
-                if ( from == MSG_FROM_SHIP && fromDetail < MAXSHIPS )
+                if ( from == MSG_FROM_SHIP && fromDetail < cbLimits.maxShips() )
                 {
                     strcat(buf , cbShips[fromDetail].alias) ;
                     strcat(buf , " on board ") ;

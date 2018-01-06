@@ -144,7 +144,7 @@ void display( int snum )
     }
 
     /* Display the ships. */
-    for ( i = 0; i < MAXSHIPS; i++ )
+    for ( i = 0; i < cbLimits.maxShips(); i++ )
         if ( cbShips[i].status != SS_OFF )
         {
             /* Display the torps on a LR scan if it's a friend (or you). */
@@ -276,7 +276,7 @@ void display( int snum )
 
     /* now the torps for each ship.  we do this after the ships are drawn so
        blending of explosions works on the ships. */
-    for ( i = 0; i < MAXSHIPS; i++ )
+    for ( i = 0; i < cbLimits.maxShips(); i++ )
     {
         /* explosions first */
         for ( j = 0; j < MAXTORPS; j = j + 1 )

@@ -623,7 +623,7 @@ void hudSetInfoTarget(int tnum, bool isShip)
         hudData.info.lasttargetstr[0] = 0;
         if (tnum >= 0)
         {
-            if (isShip && tnum < MAXSHIPS)
+            if (isShip && tnum < cbLimits.maxShips())
                 utAppendShip(hudData.info.lasttargetstr , tnum) ;
             else if (!isShip && tnum < cbLimits.maxPlanets())
             {                   /* planet, just need 3 chars */

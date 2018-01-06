@@ -238,10 +238,10 @@ static void _infoship( int snum, int scanner )
     static real avgclose_rate, olddis = 0.0, oldclose_rate = 0.0;
     static int oldsnum = 0;
 
-    godlike = ( scanner < 0 || scanner >= MAXSHIPS );
+    godlike = ( scanner < 0 || scanner >= cbLimits.maxShips() );
 
     hudClearPrompt(MSG_LIN1);
-    if ( snum < 0 || snum >= MAXSHIPS )
+    if ( snum < 0 || snum >= cbLimits.maxShips() )
     {
         cp_putmsg( "No such ship.", MSG_LIN1 );
         return;
@@ -514,7 +514,7 @@ static void _infoplanet( const char *str, int pnum, int snum )
     }
 
     /* GOD is too clever. */
-    godlike = ( snum < 0 || snum >= MAXSHIPS );
+    godlike = ( snum < 0 || snum >= cbLimits.maxShips() );
 
     /* In some cases, report hostilities. */
     junk[0] = 0;
@@ -1132,7 +1132,7 @@ static void _domsgto(char *buf, int ch, int terse)
     if ( editing )
     {
         /* Make up a default string using the last target. */
-        if ( to == MSG_TO_SHIP && toDetail < MAXSHIPS )
+        if ( to == MSG_TO_SHIP && toDetail < cbLimits.maxShips() )
             sprintf( tbuf, "%d", to );
         else if ( to == MSG_TO_TEAM && toDetail < NUMPLAYERTEAMS )
             strcpy(tbuf , cbTeams[toDetail].name) ;
@@ -1164,7 +1164,7 @@ static void _domsgto(char *buf, int ch, int terse)
         /* All digits means a ship number. */
         i = 0;
         utSafeCToI( &j, tbuf, i );		/* ignore status */
-        if ( j < 0 || j >= MAXSHIPS )
+        if ( j < 0 || j >= cbLimits.maxShips() )
 	{
             cp_putmsg( "No such ship.", MSG_LIN2 );
             hudClearPrompt(MSG_LIN1);
@@ -1234,7 +1234,7 @@ static void _domsgto(char *buf, int ch, int terse)
 
     /* Now, construct a header for the selected target. */
     strcpy(tbuf , "Message to ") ;
-    if ( to == MSG_TO_SHIP && toDetail < MAXSHIPS )
+    if ( to == MSG_TO_SHIP && toDetail < cbLimits.maxShips() )
     {
         if ( cbShips[to].status != SS_LIVE )
 	{
@@ -1479,7 +1479,7 @@ static void _docourse( char *buf, char ch)
     switch ( what )
     {
     case NEAR_SHIP:
-        if ( sorpnum < 0 || sorpnum >= MAXSHIPS )
+        if ( sorpnum < 0 || sorpnum >= cbLimits.maxShips() )
 	{
             cp_putmsg( "No such ship.", MSG_LIN2 );
             return;
@@ -1607,7 +1607,7 @@ static void _doreview(void)
                                            reading old ones. */
 
     lastone = utModPlusOne( cbConqInfo->lastmsg+1, cbLimits.maxMsgs() );
-    if ( snum >= 0 && snum < MAXSHIPS )
+    if ( snum >= 0 && snum < cbLimits.maxShips() )
     {
         if ( cbShips[snum].lastmsg == LMSG_NEEDINIT )
         {
@@ -2354,7 +2354,7 @@ static void command( int ch )
     break;
 
     case '?':				/* planet list */
-        if (Context.snum >= 0 && Context.snum < MAXSHIPS)
+        if (Context.snum >= 0 && Context.snum < cbLimits.maxShips())
             setONode(nPlanetlInit(DSP_NODE_CP, false, Context.snum, cbShips[Context.snum].team));
         else          /* then use user team if user doen't have a ship yet */
             setONode(nPlanetlInit(DSP_NODE_CP, false, Context.snum, cbUsers[Context.unum].team));
@@ -2463,7 +2463,7 @@ static void themes()
     /* go through each ship. */
 
     warlike = false;
-    for ( i = 0; i < MAXSHIPS; i++ )
+    for ( i = 0; i < cbLimits.maxShips(); i++ )
     {
         int atwar = satwar(snum, i);
 

@@ -128,7 +128,7 @@ int procShip(char *buf)
         return false;
 
     snum = sship->snum;
-    if (snum < 0 || snum >= MAXSHIPS)
+    if (snum < 0 || snum >= cbLimits.maxShips())
         return false;
 
 #if defined(DEBUG_CLIENTPROC)
@@ -196,7 +196,7 @@ int procShipSml(char *buf)
 
     snum = sshipsml->snum;
 
-    if (snum < 0 || snum >= MAXSHIPS)
+    if (snum < 0 || snum >= cbLimits.maxShips())
         return false;
 
 #if defined(DEBUG_CLIENTPROC)
@@ -254,7 +254,7 @@ int procShipLoc(char *buf)
 
     snum = sshiploc->snum;
 
-    if (snum < 0 || snum >= MAXSHIPS)
+    if (snum < 0 || snum >= cbLimits.maxShips())
         return false;
 
 #if defined(DEBUG_CLIENTPROC)
@@ -424,7 +424,7 @@ int procTorp(char *buf)
     snum = storp->snum;
     tnum = storp->tnum;
 
-    if (snum < 0 || snum >= MAXSHIPS)
+    if (snum < 0 || snum >= cbLimits.maxShips())
         return false;
 
     if (tnum < 0 || tnum >= MAXTORPS)
@@ -449,7 +449,7 @@ int procTorpLoc(char *buf)
     snum = storploc->snum;
     tnum = storploc->tnum;
 
-    if (snum < 0 || snum >= MAXSHIPS)
+    if (snum < 0 || snum >= cbLimits.maxShips())
         return false;
 
     if (tnum < 0 || tnum >= MAXTORPS)
@@ -482,7 +482,7 @@ int procTorpEvent(char *buf)
     snum = storpev->snum;
     tnum = storpev->tnum;
 
-    if (snum < 0 || snum >= MAXSHIPS)
+    if (snum < 0 || snum >= cbLimits.maxShips())
         return false;
 
     if (tnum < 0 || tnum >= MAXTORPS)

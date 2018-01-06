@@ -65,11 +65,11 @@ extern void conqend(void);
 /* loaded texture list (the list itself is exported in textures.h) */
 static int loadedGLTextures = 0; /* count of total successful tex loads */
 
-/* torp animation states */
-static animStateRec_t torpAStates[MAXSHIPS][MAXTORPS] = {};
+/* torp animation states per torp per ship */
+static animStateRec_t **torpAStates = NULL;
 
-/* bomb (torp) animation state */
-static animStateRec_t bombAState[MAXSHIPS] = {};
+/* bomb (torp) animation state per ship */
+static animStateRec_t *bombAState = NULL;
 
 static int frame=0, timebase=0;
 static float FPS = 0.0;
@@ -417,27 +417,33 @@ static int initGLAnimDefs(void)
 
 
 /* init the explosion animation states. */
-static int initGLExplosions(void)
+static bool initGLExplosions(void)
 {
     int i, j;
     animStateRec_t initastate;    /* initial state of an explosion */
 
     utLog("%s: Initializing...", __FUNCTION__);
 
+    // first, allocate the array
+    MALLOC_TWOD(torpAStates, animStateRec_t,
+                cbLimits.maxShips(), cbLimits.maxTorps());
+    if (!torpAStates) // :(
+        return true;
+
     /* we only need to do this once.  When we have a properly initted state,
        we will simply copy it into the torpAState array.  */
     if (!animInitState("explosion", &initastate, NULL))
-        return false;
+        return true;
 
     /* we start out expired of course :) */
     initastate.expired = CQI_ANIMS_MASK;
 
     /* init the anim states for them all */
-    for (i=0; i<MAXSHIPS; i++)
-        for (j=0; j<MAXTORPS; j++)
+    for (i=0; i<cbLimits.maxShips(); i++)
+        for (j=0; j<cbLimits.maxTorps(); j++)
             torpAStates[i][j] = initastate;
 
-    return true;
+    return false;
 }
 
 static GLTexture_t *_get_tex(const char *name)
@@ -1046,15 +1052,17 @@ void drawExplosion(GLfloat x, GLfloat y, int snum, int torpnum, int scale)
     if (norender)
         return;
 
-    /* just check first ship, torp 0 */
-    if (!torpAStates[0][0].anims)
-        if (!initGLExplosions())
+    // see if it was properly allocated
+    if (!torpAStates)
+    {
+        if (initGLExplosions())
         {
             utLog("%s: initGLExplosions failed, bailing.",
                   __FUNCTION__);
             norender = true;
             return;                 /* we need to bail here... */
         }
+    }
 
     if (explodefx == -1)
         explodefx = cqsFindEffect("explosion");
@@ -1138,7 +1146,7 @@ void drawBombing(int snum, int scale)
     } *rnd;
     int pnum;
 
-    if (snum < 0 || snum >= MAXSHIPS)
+    if (snum < 0 || snum >= cbLimits.maxShips())
         return;
 
     /* don't bother if we aren't orbiting anything */
@@ -1147,16 +1155,25 @@ void drawBombing(int snum, int scale)
 
     pnum = (int)cbShips[snum].lockDetail;
 
-    /* init - look at first ship */
-    if (!bombAState[0].anims)
+    // init bombing animation storage and states
+    if (!bombAState)
     {
+        // allocate the array
+        MALLOC_ONED(bombAState, animStateRec_t, cbLimits.maxShips());
+
+        if (!bombAState)
+        {
+            utLog("%s: malloc failure allocating bombAState", __FUNCTION__);
+            return;
+        }
+
         if (!animInitState("bombing", &initastate, NULL))
             return;
 
         /* start out expired */
         initastate.expired = CQI_ANIMS_MASK;
 
-        for (i=0; i < MAXSHIPS; i++)
+        for (i=0; i < cbLimits.maxShips(); i++)
         {
             bombAState[i] = initastate;
 
@@ -1167,8 +1184,9 @@ void drawBombing(int snum, int scale)
 
                 for (j=0; j < i; j++)
                     free(bombAState[j].state.privptr);
-                bombAState[0].anims = 0; /* clear 1st so we can retry
-                                            again later */
+                // free bombAState so we can retry again later */
+                free(bombAState);
+                bombAState = NULL;
                 utLog("%s: malloc(%d) failed", __FUNCTION__,
                       sizeof(struct _rndxy));
                 return;
@@ -1197,7 +1215,7 @@ void drawBombing(int snum, int scale)
             /* choose a psuedorandom offset from planet x/y, and store
                them in the state's private area. */
             real psize = (real)cbPlanets[pnum].size / 2.0;
-            // reduce it by 20% to reduce "space" blasts
+            // reduce it by 20% to reduce "space" blasts in the "corners"
             psize *= 0.80;
             rnd->rndx = rnduni(-psize, psize); /* rnd X */
             rnd->rndy = rnduni(-psize, psize); /* rnd Y */
@@ -2722,7 +2740,7 @@ void drawViewerBG(int snum, int dovbg)
     /* half-width of vbg at TRANZ */
     static const GLfloat vbgrad = NEGENBEND_DIST * 1.2;
 
-    if (snum < 0 || snum >= MAXSHIPS)
+    if (snum < 0 || snum >= cbLimits.maxShips())
         return;
 
     if (!GLTextures || !GLShips[0][0].ship)

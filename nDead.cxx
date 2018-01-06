@@ -59,16 +59,16 @@ void nDeadInit(void)
     snum = Context.snum;
 
     /* If something is wrong, don't do anything. */
-    if ( snum < 0 || snum >= MAXSHIPS )
+    if ( snum < 0 || snum >= cbLimits.maxShips() )
     {
-        utLog("nDead: nDeadInit: snum < 0 || snum >= MAXSHIPS (%d)", snum);
+        utLog("nDead: nDeadInit: snum < 0 || snum >= cbLimits.maxShips() (%d)", snum);
         nMenuInit();
     }
 
     kb = cbShips[snum].killedBy;
     detail = cbShips[snum].killedByDetail;
 
-    if (kb == KB_SHIP && detail < MAXSHIPS)
+    if (kb == KB_SHIP && detail < cbLimits.maxShips())
         eShip = cbShips[detail];        /* get copy of killers ship */
     else
         memset((void *)&eShip, 0, sizeof(Ship_t));
@@ -146,7 +146,7 @@ static int nDeadDisplay(dspConfig_t *dsp)
     case KB_SHIP:
         cbuf[0] = 0;
         buf[0] = 0;
-        if ( detail < MAXSHIPS )
+        if ( detail < cbLimits.maxShips() )
 	{
             utAppendShip(cbuf, detail) ;
             if ( eShip.status != SS_LIVE )

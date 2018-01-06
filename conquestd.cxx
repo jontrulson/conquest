@@ -781,7 +781,7 @@ void dead( int snum, int leave )
     char buf[PKT_MAXSIZE];	/* gen purpose */
 
     /* If something is wrong, don't do anything. */
-    if ( snum < 0 || snum >= MAXSHIPS )
+    if ( snum < 0 || snum >= cbLimits.maxShips() )
         return;
 
     /* If our ships pid is wrong, we are indeed lost. */
@@ -958,7 +958,7 @@ int updateClient(int force)
                     return false;
     }
 
-    for (i=0; i<MAXSHIPS; i++)
+    for (i=0; i<cbLimits.maxShips(); i++)
     {
         if (!sendShip(sInfo.sock, i))
             return false;
@@ -1271,7 +1271,7 @@ void menu(void)
         /* Make sure things are proper. */
         if (playrv == ERR)
 	{
-            if ( Context.snum < 0 || Context.snum >= MAXSHIPS )
+            if ( Context.snum < 0 || Context.snum >= cbLimits.maxShips() )
                 lose = true;
             else if ( cbShips[Context.snum].pid != Context.pid )
                 lose = true;
@@ -1339,7 +1339,7 @@ void menu(void)
 	    }
             else if (ccmd->cmd == CPCMD_RESIGN)
 	    {
-                for ( i = 0; i < MAXSHIPS; i++ )
+                for ( i = 0; i < cbLimits.maxShips(); i++ )
                     if ( !((cbShips[i].status == SS_LIVE ||
                             cbShips[i].status == SS_ENTERING) &&
                            cbShips[i].unum == Context.unum))
@@ -1393,11 +1393,9 @@ void menu(void)
 /*    flag = newship( unum, snum ) */
 int newship( int unum, int *snum )
 {
-    int i, j, system;
+    int i, system;
     int fresh;
-    int vec[MAXSHIPS];
     int numavail = 0;
-    int numvec = 0;
 
     /* cleanup any unliving ships - this is the first thing we need to do */
     clbCheckShips(false);
@@ -1408,25 +1406,24 @@ int newship( int unum, int *snum )
 
     fresh = true;				/* assume we want a fresh ship*/
 
-    /* Count number of his ships flying. */
-    j = 0;
-    numvec = 0;
-    for ( i = 0; i < MAXSHIPS; i++ )
+    /* See if she is already flying at least one ship. */
+    int j = -1;
+    for ( i = 0; i < cbLimits.maxShips(); i++ )
         if ( cbShips[i].status == SS_LIVE || cbShips[i].status == SS_ENTERING )
             if ( cbShips[i].unum == unum && *snum != i )
             {
-                j++;
-                vec[numvec++] = i;
+                j = i;
+                break;
             }
 
     cbUnlock(&cbConqInfo->lockword);
 
     /* see if we need to reincarnate to a vacant ship */
-    if ( j > 0 )
+    if ( j >= 0 )
     {
         /* Need to reincarnate. */
 
-        if (!SVACANT(vec[0]))
+        if (!SVACANT(j))
         {		   /* if it's available, we'll take it */
 			   /* ...if it's not already being flown... */
             pktSendAck(PSEV_ERROR, PERR_FLYING, NULL);
@@ -1437,7 +1434,7 @@ int newship( int unum, int *snum )
 
         /* Look for a live ship for us to take. */
         cbLock(&cbConqInfo->lockword);
-        for (i=0; i<MAXSHIPS; i++)
+        for (i=0; i<cbLimits.maxShips(); i++)
             if ( cbShips[i].unum == unum && cbShips[i].status == SS_LIVE )
             {
                 fresh = false;
@@ -2013,7 +2010,7 @@ void handleSignal(int sig)
     else
     {                       /* not playing (main menu, etc) */
         /* if we aren't playing, then just turn it off */
-        if (Context.snum >= 0 && Context.snum < MAXSHIPS)
+        if (Context.snum >= 0 && Context.snum < cbLimits.maxShips())
             cbShips[Context.snum].status = SS_OFF;
     }
 

@@ -227,7 +227,7 @@ void expire_users(void)
 #endif
 
             hasship = false;
-            for (j=0; j < MAXSHIPS; j++)
+            for (j=0; j < cbLimits.maxShips(); j++)
 	    {
                 if (cbShips[j].unum == i && cbShips[j].status == SS_LIVE)
 		{

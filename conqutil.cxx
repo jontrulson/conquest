@@ -120,7 +120,7 @@ void utAppendKilledBy(char *buf, killedBy_t kb, uint16_t detail)
         strcat(buf , "GOD") ;
         break;
     case KB_SHIP:
-        if (detail < MAXSHIPS)
+        if (detail < cbLimits.maxShips())
             utAppendShip(buf, detail) ;
         break;
     case KB_PLANET:
@@ -147,7 +147,7 @@ void utAppendShip(char *str, int snum)
     char ch;
 
     ch = 'S';
-    if ( snum >= 0 && snum < MAXSHIPS )
+    if ( snum >= 0 && snum < cbLimits.maxShips() )
     {
         i = cbShips[snum].team;
         if ( i >= 0 && i < NUMPLAYERTEAMS )

@@ -71,8 +71,6 @@
 
 #define CONQ_HTTP   "https://sourceforge.net/projects/conq/"
 
-#define MAXSHIPS 20 		/* number of available ships */
-
 /* Values for sstatus() */
 #define SS_OFF 1 		/* available for use */
 #define SS_ENTERING 2 		/* outfitting the ship in newship() */
@@ -458,5 +456,32 @@ typedef enum {
 /* clamp */
 #undef CLAMP
 #define CLAMP(_min, _max, _val) (((_val) < (_min)) ? (_min) : (((_val) > (_max)) ? (_max) : (_val)))
+
+// helpers for allocating and initializing 1d and 2d arrays.
+#define MALLOC_ONED(_var, _type, _size)                         \
+    {                                                           \
+        if ( (_var = (_type *)malloc(sizeof(_type) * _size )) ) \
+            memset((void *)(_var), 0, sizeof(_type) * _size);   \
+    }
+
+#define MALLOC_TWOD(_var, _type, _size1, _size2)                        \
+    {                                                                   \
+        if ( (_var = (_type **)malloc(sizeof(_type *) * _size1 )) )     \
+        {                                                               \
+            for (int i=0; i<_size1; i++)                                \
+            {                                                           \
+                if ( (_var[i] = (_type *)malloc(sizeof(_type) * _size2 )) ) \
+                    memset((void *)_var[i], 0, sizeof(_type) * _size2); \
+                else                                                    \
+                {                                                       \
+                    for (int j=0; j<i; j++)                             \
+                        free(_var[j]);                                  \
+                    free(_var);                                         \
+                    _var = NULL;                                        \
+                    break;                                              \
+                }                                                       \
+            }                                                           \
+        }                                                               \
+    }
 
 #endif /*  CONQDEF_H_INCLUDED */

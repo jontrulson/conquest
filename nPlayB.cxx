@@ -303,7 +303,7 @@ static int nPlayBInput(int ch)
                 utSafeCToI( &tmpsnum, prm.buf, 0 );     /* ignore return status */
             }
 
-            if ( (tmpsnum < 0 || tmpsnum >= MAXSHIPS) &&
+            if ( (tmpsnum < 0 || tmpsnum >= cbLimits.maxShips()) &&
                  tmpsnum != DISPLAY_DOOMSDAY )
             {
                 state = S_NONE;
@@ -471,7 +471,7 @@ static int nPlayBInput(int ch)
                    infinite loop will result... */
                 int foundone = false;
 
-                for (i=0; i < MAXSHIPS; i++)
+                for (i=0; i < cbLimits.maxShips(); i++)
                 {
                     if (clbStillAlive(i))
                     {
@@ -499,7 +499,7 @@ static int nPlayBInput(int ch)
             else
                 i = snum + 1;
 
-            if (i >= MAXSHIPS)
+            if (i >= cbLimits.maxShips())
             {	/* if we're going past
                    now loop thu specials (only doomsday for
                    now... ) */
@@ -540,7 +540,7 @@ static int nPlayBInput(int ch)
                    infinite loop will result... */
                 int foundone = false;
 
-                for (i=0; i < MAXSHIPS; i++)
+                for (i=0; i < cbLimits.maxShips(); i++)
                 {
                     if (clbStillAlive(i))
                     {
@@ -564,7 +564,7 @@ static int nPlayBInput(int ch)
 
             if (snum == DISPLAY_DOOMSDAY)
             {	  /* doomsday - wrap around to last ship */
-                i = MAXSHIPS - 1;
+                i = cbLimits.maxShips() - 1;
             }
             else
                 i = snum - 1;

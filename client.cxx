@@ -414,7 +414,7 @@ spClientStat_t *chkClientStat(char *buf)
         return NULL;
     }
 
-    if (scstat.snum < 0 || scstat.snum >= MAXSHIPS)
+    if (scstat.snum < 0 || scstat.snum >= cbLimits.maxShips())
     {
 #if defined(DEBUG_PKT)
         utLog("%s: snum not in valid range", __FUNCTION__);

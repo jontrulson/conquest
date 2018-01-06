@@ -307,7 +307,7 @@ void bigbang(void)
 
     dir = 0.0;
     cnt = 0;
-    for ( snum = 0; snum < MAXSHIPS; snum++ )
+    for ( snum = 0; snum < cbLimits.maxShips(); snum++ )
         if ( cbShips[snum].status == SS_LIVE )
         {
             for ( i = 0; i < MAXTORPS; i = i + 1 )
@@ -445,7 +445,7 @@ void debugdisplay( int snum )
             cprintf(lin+1,dcol,ALIGN_NONE,"#%d#%d",InfoColor,
                     round( dist( cbShips[snum].x, cbShips[snum].y, cbPlanets[i].x, cbPlanets[i].y ) ));
         }
-        else if (cbShips[snum].lock == LOCK_SHIP && i < MAXSHIPS)
+        else if (cbShips[snum].lock == LOCK_SHIP && i < cbLimits.maxShips())
         {
             cprintf(lin,dcol,ALIGN_NONE,"#%d#%d",InfoColor, i);
         }
@@ -904,7 +904,7 @@ void kiss(int snum, int prompt_flg)
     {
         i = 0;
         utSafeCToI( &snum, buf, i );		/* ignore status */
-        if ( snum < 0 || snum >= MAXSHIPS )
+        if ( snum < 0 || snum >= cbLimits.maxShips() )
             cdputs( no_ship_str, MSG_LIN2, 1 );
         else if ( cbShips[snum].status != SS_LIVE ) {
             cdclrl( MSG_LIN1, 1 );
@@ -939,7 +939,7 @@ void kiss(int snum, int prompt_flg)
     if ( utStringMatch( buf, "all", false ) )
     {
         didany = false;
-        for ( snum = 0; snum < MAXSHIPS; snum++ )
+        for ( snum = 0; snum < cbLimits.maxShips(); snum++ )
             if ( cbShips[snum].status == SS_LIVE )
             {
                 didany = true;
@@ -974,7 +974,7 @@ void kiss(int snum, int prompt_flg)
 
     /* Yes. */
     didany = false;
-    for ( snum = 0; snum < MAXSHIPS; snum++ )
+    for ( snum = 0; snum < cbLimits.maxShips(); snum++ )
         if ( cbShips[snum].status == SS_LIVE )
             if ( cbShips[snum].unum == unum )
             {
@@ -1200,7 +1200,7 @@ void operate(void)
                          && cbDoomsday->lockDetail < cbLimits.maxPlanets())
                     strcat(buf , cbPlanets[cbDoomsday->lockDetail].name);
                 else if (cbDoomsday->lock == LOCK_SHIP
-                         && cbDoomsday->lockDetail < MAXSHIPS)
+                         && cbDoomsday->lockDetail < cbLimits.maxShips())
                     utAppendShip(buf, cbDoomsday->lockDetail);
 
                 utAppendChar(buf, ')');
@@ -3157,7 +3157,7 @@ void watch(void)
                            infinite loop will result... */
                         int foundone = false;
 
-                        for (i=0; i<MAXSHIPS; i++)
+                        for (i=0; i<cbLimits.maxShips(); i++)
                         {
                             if (clbStillAlive(i))
                             {
@@ -3185,7 +3185,7 @@ void watch(void)
                     else
 			i = snum + 1;
 
-                    if (i >= MAXSHIPS)
+                    if (i >= cbLimits.maxShips())
                     {	/* if we're going past
                            now loop thu specials (only doomsday for
                            now... ) */
@@ -3234,7 +3234,7 @@ void watch(void)
                            infinite loop will result... */
                         int foundone = false;
 
-                        for (i=0; i < MAXSHIPS; i++)
+                        for (i=0; i < cbLimits.maxShips(); i++)
                         {
                             if (clbStillAlive(i))
                             {
@@ -3258,7 +3258,7 @@ void watch(void)
 
                     if (snum == DISPLAY_DOOMSDAY)
                     {	  /* doomsday - wrap around to last ship */
-                        i = MAXSHIPS - 1;
+                        i = cbLimits.maxShips() - 1;
                     }
                     else
 			i = snum - 1;
@@ -3270,7 +3270,7 @@ void watch(void)
                         if (normal)
 			    i = DISPLAY_DOOMSDAY;
                         else
-			    i = MAXSHIPS - 1;
+			    i = cbLimits.maxShips() - 1;
                     }
 
                     snum = i;
@@ -3361,7 +3361,7 @@ int prompt_ship(char buf[], int *snum, int *normal)
         utSafeCToI( &tmpsnum, buf, 0 );	/* ignore return status */
     }
 
-    if ( (tmpsnum < 0 || tmpsnum >= MAXSHIPS) && tmpsnum != DISPLAY_DOOMSDAY )
+    if ( (tmpsnum < 0 || tmpsnum >= cbLimits.maxShips()) && tmpsnum != DISPLAY_DOOMSDAY )
     {
         cdputs( nss, MSG_LIN2, 1 );
         cdmove( 1, 1 );
@@ -3468,7 +3468,7 @@ char *build_toggle_str(char *snum_str, int snum)
     static const char *deathstar_str = "DS";
     static const char *unknown_str = "n/a";
 
-    if (snum >= 0 && snum < MAXSHIPS)
+    if (snum >= 0 && snum < cbLimits.maxShips())
     {          /* ship */
         sprintf(snum_str,"%c%d", cbTeams[cbShips[snum].team].teamchar, snum);
     }

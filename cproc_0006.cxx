@@ -477,10 +477,10 @@ int proc_0006_TorpLoc(char *buf)
     snum = storploc->snum - 1;
     tnum = storploc->tnum;
 
-    if (snum <= 0 || snum > 20 /*MAXSHIPS*/)
+    if (snum < 0 || snum >= 20 /*MAXSHIPS*/)
         return false;
 
-    if (tnum < 0 || tnum >= 12 /*MAXTORPS*/)
+    if (tnum < 0 || tnum >= 9 /*MAXTORPS*/)
         return false;
 
     for (i=0; i<4 /*NUMPLAYERTEAMS*/; i++)

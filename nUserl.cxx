@@ -144,7 +144,7 @@ static int nUserlDisplay(dspConfig_t *dsp)
             clbUserline( uvec[offset], -1, cbuf, godlike, false );
 
         /* determine color */
-        if ( snum >= 0 && snum < MAXSHIPS ) /* we're a valid ship */
+        if ( snum >= 0 && snum < cbLimits.maxShips() ) /* we're a valid ship */
         {
             if ( strcmp(cbUsers[uvec[offset]].username,
                         cbUsers[cbShips[snum].unum].username) == 0 &&

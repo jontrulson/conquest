@@ -232,7 +232,7 @@ int sendServerStat(int socktype)
             numusers++;
 
     /* count ships */
-    for ( i = 0; i < MAXSHIPS; i++ )
+    for ( i = 0; i < cbLimits.maxShips(); i++ )
     {
         if ( cbShips[i].status == SS_LIVE )
 	{
@@ -282,7 +282,7 @@ int sendTorp(int sock, uint8_t tsnum, uint8_t tnum)
     if (sInfo.state != SVR_STATE_PLAY)
         return true;
 
-    if (tsnum < 0 || tsnum >= MAXSHIPS)
+    if (tsnum < 0 || tsnum >= cbLimits.maxShips())
         return false;
 
     if (tnum >= MAXTORPS)

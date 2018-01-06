@@ -47,7 +47,7 @@ void SigTerminate(int sig);
 /*  conqdriv - main program (DOES LOCKING) */
 int main(int argc, char *argv[])
 {
-    int s, i, j, pid, drivtenths, ship[MAXSHIPS];
+    int s, i, j, pid, drivtenths;
     int ctime, etime, cacc, eacc;
     int force;
     int arg;
@@ -102,6 +102,11 @@ int main(int argc, char *argv[])
         utLog("conqdriv: ERROR: common block mismatch, exiting");
         exit(1);
     }
+
+    // init the ship[] array, used to randomize the order in which
+    // ships are serviced.  This must be done only after conqinitrc is
+    // read and the CB mapped (and therefore cbLimits is valid).
+    int ship[cbLimits.maxShips()];
 
     initstats( &ctime, &etime );
     cacc = 0;
@@ -192,7 +197,7 @@ int main(int argc, char *argv[])
         signal(SIGTERM, (void (*)(int))SigTerminate);
         signal(SIGHUP, (void (*)(int))SigTerminate);
     }
-    for ( s = 0; s < MAXSHIPS; s++ )
+    for ( s = 0; s < cbLimits.maxShips(); s++ )
         ship[s] = s;
 
     while ( pid == cbDriver->drivpid && cbDriver->drivstat != DRS_KAMIKAZE )
@@ -218,9 +223,9 @@ int main(int argc, char *argv[])
             if ( cbDriver->drivstat == DRS_RUNNING )
 	    {
                 /* Randomize ship ordering. */
-                for ( s = 0; s < MAXSHIPS; s = s + 1 )
+                for ( s = 0; s < cbLimits.maxShips(); s = s + 1 )
 		{
-                    i = rndint( 0, MAXSHIPS - 1 );
+                    i = rndint( 0, cbLimits.maxShips() - 1 );
                     j = ship[i];
                     ship[i] = ship[s];
                     ship[s] = j;
@@ -273,7 +278,7 @@ int main(int argc, char *argv[])
 
 /*  iterdrive - drive the universe one iteration */
 /*  SYNOPSIS */
-/*    int ship(MAXSHIPS) */
+/*    int ship(cbLimits.maxShips()) */
 /*    iterdrive( ship ) */
 void iterdrive( int *ship )
 {
@@ -283,7 +288,7 @@ void iterdrive( int *ship )
     real warp;
 
     /* Drive the ships. */
-    for ( s = 0; s < MAXSHIPS; s++ )
+    for ( s = 0; s < cbLimits.maxShips(); s++ )
     {
         i = ship[s];
         if ( cbShips[i].status == SS_LIVE )
@@ -447,7 +452,7 @@ void iterdrive( int *ship )
 
     /* Drive the torps. */
     clbTorpDrive(ITER_SECONDS);
-    for ( s = 0; s < MAXSHIPS; s++ )
+    for ( s = 0; s < cbLimits.maxShips(); s++ )
     {
         i = ship[s];
         if ( cbShips[i].status != SS_OFF )
@@ -459,7 +464,7 @@ void iterdrive( int *ship )
                     /* Detonate. */
                     cbShips[i].torps[j].fuse = FIREBALL_FUSE;
                     cbShips[i].torps[j].status = TS_FIREBALL;
-                    for ( t = 0; t < MAXSHIPS; t++ )
+                    for ( t = 0; t < cbLimits.maxShips(); t++ )
 		    {
                         k = ship[t];
 
@@ -506,7 +511,7 @@ void iterdrive( int *ship )
 
         /* ship lock */
         if (cbDoomsday->lock == LOCK_SHIP
-            && cbDoomsday->lockDetail < MAXSHIPS
+            && cbDoomsday->lockDetail < cbLimits.maxShips()
             && (distf( cbDoomsday->x, cbDoomsday->y,
                        cbShips[cbDoomsday->lock].x,
                        cbShips[cbDoomsday->lock].y )
@@ -527,16 +532,16 @@ void iterdrive( int *ship )
 
 /*  secdrive - drive the one-second interval items (DOES LOCKING) */
 /*  SYNOPSIS */
-/*    int ship(MAXSHIPS) */
+/*    int ship(cbLimits.maxShips()) */
 /*    secdrive( ship ) */
 void secdrive( int *ship )
 {
     int s, t, i, j, k;
     real dis, repair, inc, dec;
     real x;
-    int talert[MAXSHIPS];
+    int talert[cbLimits.maxShips()];
 
-    for ( s = 0; s < MAXSHIPS; s++ )
+    for ( s = 0; s < cbLimits.maxShips(); s++ )
     {
         i = ship[s];
         if ( cbShips[i].status == SS_OFF )
@@ -759,9 +764,9 @@ void secdrive( int *ship )
     }
 
     /* Torp alert logic. */
-    for ( i = 0; i < MAXSHIPS; i++ )
+    for ( i = 0; i < cbLimits.maxShips(); i++ )
         talert[i] = false;
-    for ( s = 0; s < MAXSHIPS; s++ )
+    for ( s = 0; s < cbLimits.maxShips(); s++ )
     {
         i = ship[s];
         if ( cbShips[i].status != SS_OFF )
@@ -784,7 +789,7 @@ void secdrive( int *ship )
                         if ( cbShips[i].torps[j].status == TS_LIVE )
                         {
                             /* Proximity check. */
-                            for ( t = 0; t < MAXSHIPS; t++ )
+                            for ( t = 0; t < cbLimits.maxShips(); t++ )
                             {
                                 k = ship[t];
                                 if ( cbShips[k].status == SS_LIVE && k != i )
@@ -819,7 +824,7 @@ void secdrive( int *ship )
 	}
     }
     /* Finish up torp alert logic. */
-    for ( i = 0; i < MAXSHIPS; i++ )
+    for ( i = 0; i < cbLimits.maxShips(); i++ )
         if (talert[i])
             SFSET(i, SHIP_F_TALERT);
         else
@@ -853,7 +858,7 @@ void secdrive( int *ship )
 	    }
 	}
         else if ( cbDoomsday->lock == LOCK_SHIP
-                  && cbDoomsday->lockDetail < MAXSHIPS)
+                  && cbDoomsday->lockDetail < cbLimits.maxShips())
 	{
             /* Ship. */
             if ( cbShips[cbDoomsday->lockDetail].status != SS_LIVE )

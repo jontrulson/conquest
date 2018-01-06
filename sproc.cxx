@@ -41,7 +41,7 @@ void procSetName(char *buf)
 
     utStrncpy(cbUsers[Context.unum].alias, (char *)cpsetn->alias, MAXUSERNAME);
 
-    if (Context.snum >= 0 && Context.snum < MAXSHIPS)
+    if (Context.snum >= 0 && Context.snum < cbLimits.maxShips())
         utStrncpy(cbShips[Context.snum].alias,
                   (char *)cpsetn->alias, MAXUSERNAME);
 
@@ -969,7 +969,7 @@ void procTow(cpCommand_t *cmd)
 
     cbuf[0] = 0;
     cbLock(&cbConqInfo->lockword);
-    if ( other < 0 || other >= MAXSHIPS )
+    if ( other < 0 || other >= cbLimits.maxShips() )
         strcpy(cbuf , "No such ship.") ;
     else if ( cbShips[other].status != SS_LIVE )
         strcpy(cbuf , "Not found.") ;

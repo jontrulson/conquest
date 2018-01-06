@@ -139,7 +139,7 @@ static void dispServerInfo(int tlin)
 
     cprintf(tlin, hcol, ALIGN_NONE, pbuf3);
     cprintf(tlin++, icol, ALIGN_NONE, buf3,
-            sStat.numusers, sStat.numtotal, MAXSHIPS, sStat.numactive,
+            sStat.numusers, sStat.numtotal, cbLimits.maxShips(), sStat.numactive,
             sStat.numvacant, sStat.numrobot);
 
     cprintf(tlin, hcol, ALIGN_NONE, pbuf4);

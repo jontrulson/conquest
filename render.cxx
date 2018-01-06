@@ -1290,7 +1290,7 @@ void renderHud(bool dostats)
                      TEX_HUD_DECAL1_LAMP_TOW, icl);
 
     /* torp pips */
-    if (snum >= 0 && snum < MAXSHIPS)
+    if (snum >= 0 && snum < cbLimits.maxShips())
     {
         glBindTexture(GL_TEXTURE_2D,
                       GLTEX_ID(GLShips[steam][stype].ico_torp));
@@ -1320,7 +1320,7 @@ void renderHud(bool dostats)
     }
 
     /* phaser recharge status */
-    if (snum >= 0 && snum < MAXSHIPS)
+    if (snum >= 0 && snum < cbLimits.maxShips())
     {
         GLfloat phasH;
 
@@ -1345,7 +1345,7 @@ void renderHud(bool dostats)
 
     /* if phasers are recharging, draw a box around the recharge indicator */
 
-    if (snum >= 0 && snum < MAXSHIPS)
+    if (snum >= 0 && snum < cbLimits.maxShips())
     {
         if (cbShips[snum].pfuse > 0)
             drawLineBox(o.d1phcharge.x, o.d1phcharge.y, 0.0,

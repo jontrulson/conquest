@@ -339,7 +339,7 @@ void mcuInfoPlanet( const char *str, int pnum, int snum )
     }
 
     /* GOD is too clever. */
-    godlike = ( snum < 0 || snum >= MAXSHIPS );
+    godlike = ( snum < 0 || snum >= cbLimits.maxShips() );
 
     /* In some cases, report hostilities. */
     junk[0] = 0;
@@ -508,10 +508,10 @@ void mcuInfoShip( int snum, int scanner )
     static real avgclose_rate, olddis = 0.0, oldclose_rate = 0.0;
     static int oldsnum = 0;
 
-    godlike = ( scanner < 0 || scanner >= MAXSHIPS );
+    godlike = ( scanner < 0 || scanner >= cbLimits.maxShips() );
 
     cdclrl( MSG_LIN1, 2 );
-    if ( snum < 0 || snum >= MAXSHIPS )
+    if ( snum < 0 || snum >= cbLimits.maxShips() )
     {
         mcuPutMsg( "No such ship.", MSG_LIN1 );
         cdmove( MSG_LIN1, 1 );
@@ -854,7 +854,7 @@ void mcuPlanetList( int team, int snum )
                 pnum = sv[i];
 
                 /* colorize - dwp */
-                if ( snum >= 0 && snum < MAXSHIPS)
+                if ( snum >= 0 && snum < cbLimits.maxShips())
 		{	/* if user has a valid ship */
                     if ( cbPlanets[pnum].team == cbShips[snum].team && !selfwar(snum) )
                         outattr = GreenLevelColor;
@@ -1036,7 +1036,7 @@ void mcuPlanetList( int team, int snum )
 	    }
 
             /* didn't get a char, update */
-            if (snum >= 0 && snum < MAXSHIPS)
+            if (snum >= 0 && snum < cbLimits.maxShips())
                 if (!clbStillAlive(snum))
                     Done = true;
 
@@ -1101,7 +1101,7 @@ void mcuPlayList( int godlike, int doall, int snum )
         i = fship;
         cdclrl( fline, lline - fline + 1 );
         lin = fline;
-        while ( i < MAXSHIPS && lin <= lline )
+        while ( i < cbLimits.maxShips() && lin <= lline )
 	{
             status = cbShips[i].status;
 
@@ -1146,7 +1146,7 @@ void mcuPlayList( int godlike, int doall, int snum )
                     utAppendKilledBy(cbuf , kb, detail) ;
 		}
 
-		if (snum >= 0 && snum < MAXSHIPS )
+		if (snum >= 0 && snum < cbLimits.maxShips() )
                 {		/* a normal ship view */
 		    if ( i == snum )    /* it's ours */
                         uiPutColor(CQC_A_BOLD);
@@ -1187,7 +1187,7 @@ void mcuPlayList( int godlike, int doall, int snum )
             i = i + 1;
             lin = lin + 1;
 	}
-        if ( i >= MAXSHIPS )
+        if ( i >= cbLimits.maxShips() )
 	{
             /* We're displaying the last page. */
             mcuPutPrompt( MTXT_DONE, MSG_LIN2 );
@@ -1235,7 +1235,7 @@ int mcuReviewMsgs( int snum, int slm )
     Done = false;
 
     lastone = utModPlusOne( cbConqInfo->lastmsg+1, cbLimits.maxMsgs() );
-    if ( snum >= 0 && snum < MAXSHIPS )
+    if ( snum >= 0 && snum < cbLimits.maxShips() )
     {
         if ( cbShips[snum].lastmsg == LMSG_NEEDINIT )
             return ( false );				/* none to read */
@@ -1621,7 +1621,7 @@ void mcuUserList( int godlike, int snum )
             clbUserline( uvec[i], -1, cbuf, godlike, false );
 
             /* determine color */
-            if ( snum >= 0 && snum < MAXSHIPS ) /* we're a valid ship */
+            if ( snum >= 0 && snum < cbLimits.maxShips() ) /* we're a valid ship */
 	    {
 		if ( strcmp(cbUsers[uvec[i]].username,
 			    cbUsers[cbShips[snum].unum].username) == 0 &&
@@ -1752,7 +1752,7 @@ void mcuUserStats( int godlike , int snum )
             clbStatline( uvec[i], cbuf );
 
             /* determine color */
-            if ( snum >= 0 && snum < MAXSHIPS ) /* we're a valid ship */
+            if ( snum >= 0 && snum < cbLimits.maxShips() ) /* we're a valid ship */
             {
                 if ( strcmp(cbUsers[uvec[i]].username,
                             cbUsers[cbShips[snum].unum].username) == 0 &&

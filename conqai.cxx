@@ -133,7 +133,7 @@ static void buildai( int snum, int vars[], int *bnenum, real *bdne, real *bane )
     if ( STALERT(snum) )
     {
         dam = 0.0;
-        for ( i = 0; i < MAXSHIPS; i++ )
+        for ( i = 0; i < cbLimits.maxShips(); i++ )
             if ( cbShips[i].status != SS_OFF && i != snum )
                 for ( j = 0; j < MAXTORPS; j = j + 1 )
                     if ( cbShips[i].torps[j].status == TS_LIVE )
@@ -219,7 +219,7 @@ void defend( int attacker, int pnum )
         return;
 
     /* See if there are any team ships to defend. */
-    for ( i = 0; i < MAXSHIPS; i++ )
+    for ( i = 0; i < cbLimits.maxShips(); i++ )
         if ( cbShips[i].status == SS_LIVE ) /* live */
             if ( cbShips[i].team == team ) /* same team */
                 if (UROBOT(cbShips[i].unum) || !SVACANT(i))
@@ -435,7 +435,7 @@ static void executeai( int snum, int token )
                 uint16_t fromDetail = cbMsgs[i].fromDetail;
 
                 // we will only ever respond to living ships
-                if (from == MSG_FROM_SHIP && fromDetail < MAXSHIPS &&
+                if (from == MSG_FROM_SHIP && fromDetail < cbLimits.maxShips() &&
                     !SROBOT(fromDetail))
                 {
                     robreply( buf );
@@ -662,7 +662,7 @@ void robotloop(void)
     /* Loop until we're aborted. */
     for (;;)
     {
-        for ( s = 0; s < MAXSHIPS; s++ )
+        for ( s = 0; s < cbLimits.maxShips(); s++ )
             if ( cbShips[s].status == SS_LIVE )
                 if ( SROBOT(s) )
                 {

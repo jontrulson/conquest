@@ -69,7 +69,7 @@ void do_bottomborder(int snum, char *buf, int attrib, int bufattr)
     }
 
     /* if hudInfo and we are a ship... */
-    if (UserConf.hudInfo && snum >= 0 && snum < MAXSHIPS)
+    if (UserConf.hudInfo && snum >= 0 && snum < cbLimits.maxShips())
     {				/* some additional info */
         /* current firing angle */
         col = STAT_COLS + 1;
@@ -405,7 +405,7 @@ void display( int snum )
     }
 
     /* Display the ships. */
-    for ( i = 0; i < MAXSHIPS; i++ )
+    for ( i = 0; i < cbLimits.maxShips(); i++ )
         if ( cbShips[i].status != SS_OFF )
         {
             /* Display the torps on a LR scan if it's a friend. */
@@ -1257,7 +1257,7 @@ void display( int snum )
                 uiPutColor(0);
 	    }
             else if ( cbDoomsday->lock == LOCK_SHIP
-                      && cbDoomsday->lockDetail < MAXSHIPS )
+                      && cbDoomsday->lockDetail < cbLimits.maxShips() )
 	    {
                 buf[0] = 0;
                 utAppendShip(buf , cbDoomsday->lockDetail) ;

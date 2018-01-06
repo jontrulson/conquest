@@ -213,7 +213,7 @@ static void Murder(int from, char *what)
     if (utIsDigits(what))
     {                           /* yes */
         snum = atoi(what);
-        if ( snum < 0 || snum >= MAXSHIPS )
+        if ( snum < 0 || snum >= cbLimits.maxShips() )
             clbStoreMsg(MSG_FROM_GOD, 0, MSG_TO_SHIP, fromShip, no_ship_str);
         else if ( cbShips[snum].status != SS_LIVE )
         {
@@ -246,7 +246,7 @@ static void Murder(int from, char *what)
     }
 
     didany = false;
-    for ( snum = 0; snum < MAXSHIPS; snum++ )
+    for ( snum = 0; snum < cbLimits.maxShips(); snum++ )
         if ( cbShips[snum].status == SS_LIVE )
             if ( cbShips[snum].unum == unum )
             {
@@ -368,7 +368,7 @@ int checkOperExec(msgFrom_t from, uint16_t fromDetail,
         return false;
 
     /* if it's not from a valid ship, ignore */
-    if (from != MSG_FROM_SHIP || fromDetail >= MAXSHIPS)
+    if (from != MSG_FROM_SHIP || fromDetail >= cbLimits.maxShips())
         return false;
 
     utStrncpy(tmsg, msg, MESSAGE_SIZE);

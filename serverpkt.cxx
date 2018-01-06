@@ -85,46 +85,42 @@ bool spktInit(void)
     return false;
 }
 
-#define MALLOC_ONED(_var, _type, _size)                                 \
-    {                                                                   \
-        if ( !(_var = (_type *)malloc(sizeof(_type) * _size )) )        \
-            return true;                                                \
-        memset((void *)(_var), 0, sizeof(_type) * _size);               \
+// wrap the ones in conqdef.h to return true (failure) if failure
+#define _MALLOC_ONED(_myvar, _mytype, _mysize)  \
+    {                                           \
+        MALLOC_ONED(_myvar, _mytype, _mysize);  \
+        if (!_myvar)                            \
+            return true;                        \
     }
 
-#define MALLOC_TWOD(_var, _type, _size1, _size2)                        \
-    {                                                                   \
-        if ( !(_var = (_type **)malloc(sizeof(_type *) * _size1 )) )    \
-            return true;                                                \
-        for (int i=0; i<_size1; i++)                                    \
-        {                                                               \
-            if ( !(_var[i] = (_type *)malloc(sizeof(_type) * _size2 )) ) \
-                return true;                                            \
-            memset((void *)_var[i], 0, sizeof(_type) * _size2);         \
-        }                                                               \
+#define _MALLOC_TWOD(_myvar, _mytype, _mysize1, _mysize2)       \
+    {                                                           \
+        MALLOC_TWOD(_myvar, _mytype, _mysize1, _mysize2);       \
+        if (!_myvar)                                            \
+            return true;                                        \
     }
 
 bool spktInitPkt(void)
 {
     /* server pkt */
-    MALLOC_ONED(pktShip, spShip_t, cbLimits.maxShips());
-    MALLOC_ONED(pktShipSml, spShipSml_t, cbLimits.maxShips());
-    MALLOC_ONED(pktShipLoc, spShipLoc_t, cbLimits.maxShips());
-    MALLOC_ONED(pktPlanet, spPlanet_t, cbLimits.maxPlanets());
-    MALLOC_ONED(pktPlanetSml, spPlanetSml_t, cbLimits.maxPlanets());
-    MALLOC_ONED(pktPlanetLoc, spPlanetLoc_t, cbLimits.maxPlanets());
-    MALLOC_ONED(pktPlanetLoc2, spPlanetLoc2_t, cbLimits.maxPlanets());
-    MALLOC_ONED(pktUser, spUser_t, cbLimits.maxUsers());
-    MALLOC_TWOD(pktTorp, spTorp_t, cbLimits.maxShips(), cbLimits.maxTorps());
-    MALLOC_TWOD(pktTorpLoc, spTorpLoc_t, cbLimits.maxShips(),
-                cbLimits.maxTorps());
-    MALLOC_TWOD(pktTorpEvent, spTorpEvent_t, cbLimits.maxShips(),
-                cbLimits.maxTorps());
-    MALLOC_ONED(pktTeam, spTeam_t, NUMALLTEAMS);
-    MALLOC_ONED(pktcbConqInfo, spcbConqInfo_t, 1);
-    MALLOC_ONED(pktHistory, spHistory_t, cbLimits.maxHist());
-    MALLOC_ONED(pktDoomsday, spDoomsday_t, 1);
-    MALLOC_ONED(pktPlanetInfo, spPlanetInfo_t, cbLimits.maxPlanets());
+    _MALLOC_ONED(pktShip, spShip_t, cbLimits.maxShips());
+    _MALLOC_ONED(pktShipSml, spShipSml_t, cbLimits.maxShips());
+    _MALLOC_ONED(pktShipLoc, spShipLoc_t, cbLimits.maxShips());
+    _MALLOC_ONED(pktPlanet, spPlanet_t, cbLimits.maxPlanets());
+    _MALLOC_ONED(pktPlanetSml, spPlanetSml_t, cbLimits.maxPlanets());
+    _MALLOC_ONED(pktPlanetLoc, spPlanetLoc_t, cbLimits.maxPlanets());
+    _MALLOC_ONED(pktPlanetLoc2, spPlanetLoc2_t, cbLimits.maxPlanets());
+    _MALLOC_ONED(pktUser, spUser_t, cbLimits.maxUsers());
+    _MALLOC_TWOD(pktTorp, spTorp_t, cbLimits.maxShips(), cbLimits.maxTorps());
+    _MALLOC_TWOD(pktTorpLoc, spTorpLoc_t, cbLimits.maxShips(),
+                 cbLimits.maxTorps());
+    _MALLOC_TWOD(pktTorpEvent, spTorpEvent_t, cbLimits.maxShips(),
+                 cbLimits.maxTorps());
+    _MALLOC_ONED(pktTeam, spTeam_t, NUMALLTEAMS);
+    _MALLOC_ONED(pktcbConqInfo, spcbConqInfo_t, 1);
+    _MALLOC_ONED(pktHistory, spHistory_t, cbLimits.maxHist());
+    _MALLOC_ONED(pktDoomsday, spDoomsday_t, 1);
+    _MALLOC_ONED(pktPlanetInfo, spPlanetInfo_t, cbLimits.maxPlanets());
 
     return false;
 }
@@ -132,22 +128,22 @@ bool spktInitPkt(void)
 bool spktInitRec(void)
 {
     /* recording */
-    MALLOC_ONED(recShip, spShip_t, cbLimits.maxShips());
-    MALLOC_ONED(recShipSml, spShipSml_t, cbLimits.maxShips());
-    MALLOC_ONED(recShipLoc, spShipLoc_t, cbLimits.maxShips());
-    MALLOC_ONED(recPlanet, spPlanet_t, cbLimits.maxPlanets());
-    MALLOC_ONED(recPlanetSml, spPlanetSml_t, cbLimits.maxPlanets());
-    MALLOC_ONED(recPlanetLoc, spPlanetLoc_t, cbLimits.maxPlanets());
-    MALLOC_ONED(recPlanetLoc2, spPlanetLoc2_t, cbLimits.maxPlanets());
-    MALLOC_TWOD(recTorp, spTorp_t, cbLimits.maxShips(),
-                cbLimits.maxTorps());
-    MALLOC_TWOD(recTorpLoc, spTorpLoc_t, cbLimits.maxShips(),
-                cbLimits.maxTorps());
-    MALLOC_TWOD(recTorpEvent, spTorpEvent_t, cbLimits.maxShips(),
-                cbLimits.maxTorps());
-    MALLOC_ONED(recTeam, spTeam_t, NUMALLTEAMS);
-    MALLOC_ONED(recDoomsday, spDoomsday_t, 1);
-    MALLOC_ONED(recPlanetInfo, spPlanetInfo_t, cbLimits.maxPlanets());
+    _MALLOC_ONED(recShip, spShip_t, cbLimits.maxShips());
+    _MALLOC_ONED(recShipSml, spShipSml_t, cbLimits.maxShips());
+    _MALLOC_ONED(recShipLoc, spShipLoc_t, cbLimits.maxShips());
+    _MALLOC_ONED(recPlanet, spPlanet_t, cbLimits.maxPlanets());
+    _MALLOC_ONED(recPlanetSml, spPlanetSml_t, cbLimits.maxPlanets());
+    _MALLOC_ONED(recPlanetLoc, spPlanetLoc_t, cbLimits.maxPlanets());
+    _MALLOC_ONED(recPlanetLoc2, spPlanetLoc2_t, cbLimits.maxPlanets());
+    _MALLOC_TWOD(recTorp, spTorp_t, cbLimits.maxShips(),
+                 cbLimits.maxTorps());
+    _MALLOC_TWOD(recTorpLoc, spTorpLoc_t, cbLimits.maxShips(),
+                 cbLimits.maxTorps());
+    _MALLOC_TWOD(recTorpEvent, spTorpEvent_t, cbLimits.maxShips(),
+                 cbLimits.maxTorps());
+    _MALLOC_ONED(recTeam, spTeam_t, NUMALLTEAMS);
+    _MALLOC_ONED(recDoomsday, spDoomsday_t, 1);
+    _MALLOC_ONED(recPlanetInfo, spPlanetInfo_t, cbLimits.maxPlanets());
 
     return false;
 }

@@ -440,7 +440,7 @@ void recGenTorpLoc(void)
     int snum = Context.snum;
     int team = cbShips[snum].team;
     spTorpLoc_t storploc;
-    static spTorpLoc_t pktTorpLoc[MAXSHIPS][MAXTORPS] = {};
+    static spTorpLoc_t **pktTorpLoc = NULL;
     real dis;
     real x, y;
     static uint32_t iterstart = 0;
@@ -454,13 +454,26 @@ void recGenTorpLoc(void)
     if (tdelta < iterwait)
         return;                     /* not yet time */
 
+    if (!pktTorpLoc)
+    {
+        // try to allocate it
+        MALLOC_TWOD(pktTorpLoc, spTorpLoc_t, cbLimits.maxShips(),
+                    cbLimits.maxTorps());
+        if (!pktTorpLoc)
+        {
+            utLog("%s: pktTorpLoc allocation failed, won't record torploc"
+                  " client packets :(", __FUNCTION__);
+            return;
+        }
+    }
+
     iterstart = iternow;
 
-    for (i=0; i<MAXSHIPS; i++)
+    for (i=0; i<cbLimits.maxShips(); i++)
     {
         if ( cbShips[i].status != SS_OFF )
         {
-            for ( j = 0; j < MAXTORPS; j = j + 1 )
+            for ( j = 0; j < MAXTORPS; j++ )
             {
                 if ( cbShips[i].torps[j].status == TS_LIVE )
                 {

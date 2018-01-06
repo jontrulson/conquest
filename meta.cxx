@@ -262,7 +262,7 @@ int metaUpdateServer(const char *remotehost, const char *name, int port)
     memset((void *)&sRec, 0, sizeof(metaSRec_t));
 
     /* count ships */
-    for ( i = 0; i < MAXSHIPS; i++ )
+    for ( i = 0; i < cbLimits.maxShips(); i++ )
     {
         if ( cbShips[i].status == SS_LIVE )
         {
@@ -283,7 +283,7 @@ int metaUpdateServer(const char *remotehost, const char *name, int port)
     sRec.numactive = numshipsactive;
     sRec.numvacant = numshipsvacant;
     sRec.numrobot = numshipsrobot;
-    sRec.numtotal = MAXSHIPS;
+    sRec.numtotal = cbLimits.maxShips();
     sRec.flags = getServerFlags();
     sRec.port = port;
 

@@ -433,13 +433,13 @@ static int nMenuInput(int ch)
         break;
 
     case 'r':
-        for ( i = 0; i < MAXSHIPS; i++ )
+        for ( i = 0; i < cbLimits.maxShips(); i++ )
             if ( cbShips[i].status == SS_LIVE ||
                  cbShips[i].status == SS_ENTERING )
                 if ( cbShips[i].unum == Context.unum )
                     break;
 
-        if ( i < MAXSHIPS )
+        if ( i < cbLimits.maxShips() )
             mglBeep(MGL_BEEP_ERR);
         else
         {
@@ -509,7 +509,7 @@ static int nMenuInput(int ch)
         break;
 
     case '?':
-        if (Context.snum >= 0 && Context.snum < MAXSHIPS)
+        if (Context.snum >= 0 && Context.snum < cbLimits.maxShips())
             nPlanetlInit(DSP_NODE_MENU, true, Context.snum, cbShips[Context.snum].team);
         else          /* then use user team if user doen't have a ship yet */
             nPlanetlInit(DSP_NODE_MENU, true, Context.snum, cbUsers[Context.unum].team);

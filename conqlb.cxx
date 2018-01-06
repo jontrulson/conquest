@@ -128,7 +128,7 @@ int clbEnemyDet( int snum )
     if ( ! clbUseFuel( snum, DETONATE_FUEL, true, true ) )
         return ( false );
 
-    for ( i = 0; i < MAXSHIPS; i++ )
+    for ( i = 0; i < cbLimits.maxShips(); i++ )
         if ( cbShips[i].status != SS_OFF && i != snum )
             for ( j = 0; j < MAXTORPS; j = j + 1 )
                 if ( cbShips[i].torps[j].status == TS_LIVE )
@@ -219,7 +219,7 @@ void clbIKill(int snum, killedBy_t kb, uint16_t detail)
         cbShips[snum].kills = cbShips[snum].kills + CONQUER_KILLS;
     else if ( kb == KB_GOTDOOMSDAY )
         cbShips[snum].kills = cbShips[snum].kills + DOOMSDAY_KILLS;
-    else if ( kb == KB_SHIP && detail < MAXSHIPS ) // if a ship did the killing
+    else if ( kb == KB_SHIP && detail < cbLimits.maxShips() ) // if a ship did the killing
     {
         kunum = cbShips[detail].unum;
         kteam = cbShips[detail].team;
@@ -381,7 +381,7 @@ void clbKillShip(int snum, killedBy_t kb, uint16_t detail)
         break;
 
     case KB_SHIP:
-        if (detail >= 0 && detail < MAXSHIPS)
+        if (detail >= 0 && detail < cbLimits.maxShips())
 	{
             sprintf(msgbuf, "%c%d (%s) was kill %.1f for %c%d (%s).",
                     cbTeams[cbShips[snum].team].teamchar,
@@ -657,7 +657,7 @@ int clbPhaser( int snum, real dir )
     cbShips[snum].pfuse = PHASER_TENTHS;
 
     /* See what we can hit. */
-    for ( k = 0; k < MAXSHIPS; k++ )
+    for ( k = 0; k < cbLimits.maxShips(); k++ )
         if ( cbShips[k].status == SS_LIVE && k != snum )
             if ( satwar(snum, k ) )
             {
@@ -818,7 +818,7 @@ int clbTakePlanet( int pnum, int snum )
             }
         }
         /* Yes. */
-        if ( didgeno && (snum >= 0 && snum < MAXSHIPS) )
+        if ( didgeno && (snum >= 0 && snum < cbLimits.maxShips()) )
         {
             rv = oteam;
             cbUsers[cbShips[snum].unum].stats[USTAT_GENOCIDE] += 1;
@@ -867,7 +867,7 @@ int clbTakePlanet( int pnum, int snum )
           cbShips[snum].alias);
 
     clbIKill( snum, KB_CONQUER, 0 );
-    for ( i = 0; i < MAXSHIPS; i++ )
+    for ( i = 0; i < cbLimits.maxShips(); i++ )
         if ( cbShips[i].status == SS_LIVE )
             clbIKill( i, KB_NEWGAME, 0 );
 
@@ -920,7 +920,7 @@ void clbUserline( int unum, int snum, char *buf, int showgods, int showteam )
     }
 
     /* If we were given a valid ship number, use it's information. */
-    if ( snum >= 0 && snum < MAXSHIPS )
+    if ( snum >= 0 && snum < cbLimits.maxShips() )
     {
         strcpy(name , cbShips[snum].alias) ;
         team = cbShips[snum].team;
@@ -1088,13 +1088,13 @@ int clbZeroPlanet( int pnum, int snum )
         }
 
         /* Yes. */
-        if (didgeno && (snum >= 0 && snum < MAXSHIPS))
+        if (didgeno && (snum >= 0 && snum < cbLimits.maxShips()))
         {
             cbTeams[oteam].couptime = rndint( MIN_COUP_MINUTES, MAX_COUP_MINUTES );
             cbTeams[oteam].coupinfo = false;		/* lost coup info */
 
 
-            if ( snum >= 0 && snum < MAXSHIPS )
+            if ( snum >= 0 && snum < cbLimits.maxShips() )
             {
                 cbUsers[cbShips[snum].unum].stats[USTAT_GENOCIDE] += 1;
                 cbTeams[cbShips[snum].team].stats[TSTAT_GENOCIDE] += 1;
@@ -1205,7 +1205,7 @@ int clbCanRead( int snum, int msgnum )
         return(true);
 
     /* Only check these if we're a ship. */
-    if ( snum >= 0 && snum < MAXSHIPS )
+    if ( snum >= 0 && snum < cbLimits.maxShips() )
     {
         /* We can only read team messages if we're not self-war. */
         if ( to == MSG_TO_TEAM
@@ -1219,7 +1219,7 @@ int clbCanRead( int snum, int msgnum )
         if (to == MSG_TO_FRIENDLY
             && from == MSG_FROM_SHIP
             && fromDetail >= 0
-            && fromDetail < MAXSHIPS)
+            && fromDetail < cbLimits.maxShips())
 	{
             if (cbShips[snum].war[cbShips[fromDetail].team] == false &&
                 cbShips[fromDetail].war[cbShips[snum].team] == false)
@@ -1241,7 +1241,7 @@ void clbClearShips(void)
 
     int i;
 
-    for ( i = 0; i < MAXSHIPS; i++ )
+    for ( i = 0; i < cbLimits.maxShips(); i++ )
         clbZeroShip( i );
 
     return;
@@ -1298,7 +1298,7 @@ void clbDoomFind(void)
                 }
             }
 
-    for ( i = 0; i < MAXSHIPS; i++ )
+    for ( i = 0; i < cbLimits.maxShips(); i++ )
         if ( cbShips[i].status == SS_LIVE)
         {
             taste = ( 1.0 +
@@ -1372,7 +1372,7 @@ int clbFindOrbit( int snum, int *pnum )
 int clbFindShip( int *snum )
 {
     int i;
-    int vacantcbShips[MAXSHIPS];
+    int vacantShips[cbLimits.maxShips()];
     int numvacant;
 
     /* maybe free up some slots... */
@@ -1382,7 +1382,7 @@ int clbFindShip( int *snum )
     *snum = -1;
     numvacant = 0;
 
-    for ( i = 0; i < MAXSHIPS; i++ )
+    for ( i = 0; i < cbLimits.maxShips(); i++ )
     {
         /* first, look for reserved ships that have no valid pid */
         if ( cbShips[i].status == SS_RESERVED )
@@ -1397,7 +1397,7 @@ int clbFindShip( int *snum )
         if (cbShips[i].status == SS_LIVE &&
             SVACANT(i) &&
             !UISOPER(cbShips[i].unum))
-            vacantcbShips[numvacant++] = i;
+            vacantShips[numvacant++] = i;
 
         /* if it's off, grab it */
         if ( cbShips[i].status == SS_OFF )
@@ -1415,9 +1415,9 @@ int clbFindShip( int *snum )
         if (numvacant)
         {
             if (numvacant == 1)
-                *snum = vacantcbShips[0];
+                *snum = vacantShips[0];
             else
-                *snum = vacantcbShips[rndint(0, numvacant - 1)];
+                *snum = vacantShips[rndint(0, numvacant - 1)];
 
             utLog("INFO: clbFindShip: stealing vacant ship %d", *snum);
             clbIKill( *snum,  KB_GOD, 0 );
@@ -1470,7 +1470,7 @@ int clbFindSpecial( int snum, int token, int count, int *sorpnum, int *xsorpnum 
     case SPECIAL_ENEMYSHIP:
     case SPECIAL_TEAMSHIP:
         /* Nearest ship, nearest enemy ship, and nearest team ship. */
-        for ( i = 0; i < MAXSHIPS; i++ )
+        for ( i = 0; i < cbLimits.maxShips(); i++ )
         {
             if ( i != snum && cbShips[i].status == SS_LIVE )
             {
@@ -2242,7 +2242,7 @@ void clbPutShip( int snum, real basex, real basey )
             smear = smear * 1.2;
         cbShips[snum].x = rndnor( basex, smear );
         cbShips[snum].y = rndnor( basey, smear );
-        for ( i = 0; i < MAXSHIPS; i++ )
+        for ( i = 0; i < cbLimits.maxShips(); i++ )
             if ( cbShips[i].status == SS_LIVE )
                 if ( satwar( i, snum ) &&
                      i != snum &&
@@ -2272,7 +2272,7 @@ int clbFmtMsg(msgFrom_t from, uint16_t fromDetail, msgTo_t to,
     buf[0] = '\0';
 
     /* Format who the message is from. */
-    if ( from == MSG_FROM_SHIP && fromDetail < MAXSHIPS )
+    if ( from == MSG_FROM_SHIP && fromDetail < cbLimits.maxShips() )
     {
         utAppendShip(buf , (int)fromDetail) ;
     }
@@ -2304,7 +2304,7 @@ int clbFmtMsg(msgFrom_t from, uint16_t fromDetail, msgTo_t to,
     strcat(buf , "->") ;
 
     /* Format who the message is to. */
-    if ( to == MSG_TO_SHIP && toDetail < MAXSHIPS )
+    if ( to == MSG_TO_SHIP && toDetail < cbLimits.maxShips() )
         utAppendShip(buf , (int)toDetail) ;
     else if ( to == MSG_TO_TEAM && toDetail < NUMPLAYERTEAMS )
     {
@@ -2439,7 +2439,7 @@ int clbStillAlive( int snum )
 {
 
 
-    if (snum < 0 || snum >= MAXSHIPS)
+    if (snum < 0 || snum >= cbLimits.maxShips())
         return(true);
 
     /* Look for religious trouble or the "closed" sign in the window. */
@@ -2494,7 +2494,7 @@ void clbStoreMsgf( msgFrom_t from, uint16_t fromDetail,
     }
 
     /* don't bother with tersables/feedbacks to robots */
-    if (to == MSG_TO_SHIP && toDetail < MAXSHIPS && SROBOT(toDetail))
+    if (to == MSG_TO_SHIP && toDetail < cbLimits.maxShips() && SROBOT(toDetail))
         if (flags & (MSG_FLAGS_TERSABLE | MSG_FLAGS_FEEDBACK))
             return;
 
@@ -2509,7 +2509,7 @@ void clbStoreMsgf( msgFrom_t from, uint16_t fromDetail,
     cbConqInfo->lastmsg = nlastmsg;
 
     /* Remove allowable last message restrictions. */
-    for ( i = 0; i < MAXSHIPS; i++ )
+    for ( i = 0; i < cbLimits.maxShips(); i++ )
         if ( nlastmsg == cbShips[i].alastmsg )
             cbShips[i].alastmsg = LMSG_READALL;
 
@@ -2796,7 +2796,7 @@ void clbPlanetDrive(real itersec)
 void clbTorpDrive(real itersec)
 {
     int s, i, j;
-    static int ship[MAXSHIPS];
+    static int *ship = NULL;
     static bool FirstTime = true;
 
     if (FirstTime)
@@ -2804,12 +2804,21 @@ void clbTorpDrive(real itersec)
         FirstTime = false;
         /* Randomize ship ordering. */
 
-        for ( s = 0; s < MAXSHIPS; s++ )
+        // allocate storage for our ship array.  The problem here is
+        // that we cannot free it (only freed at program exit).
+        MALLOC_ONED(ship, int, cbLimits.maxShips());
+        if (!ship)
+        {
+            utLog("%s: allocation failure allocating ship[] array",
+                  __FUNCTION__);
+            return;
+        }
+        for ( s = 0; s < cbLimits.maxShips(); s++ )
             ship[s] = s;
 
-        for ( s = 0; s < MAXSHIPS; s++ )
+        for ( s = 0; s < cbLimits.maxShips(); s++ )
         {
-            i = rndint( 0, MAXSHIPS - 1);
+            i = rndint( 0, cbLimits.maxShips() - 1);
             j = ship[i];
             ship[i] = ship[s];
             ship[s] = j;
@@ -2817,7 +2826,11 @@ void clbTorpDrive(real itersec)
         }
     }
 
-    for ( s = 0; s < MAXSHIPS; s++ )
+    // if we don't have storage, we cannot continue
+    if (!ship)
+        return;
+
+    for ( s = 0; s < cbLimits.maxShips(); s++ )
     {
         i = ship[s];
         if ( cbShips[i].status != SS_OFF )
@@ -2843,7 +2856,7 @@ void clbTorpDrive(real itersec)
 /* compute a ship's proper position when orbiting */
 void clbAdjOrbitalPosition(int snum)
 {
-    if (snum >= 0 && snum < MAXSHIPS && cbShips[snum].warp < 0.0
+    if (snum >= 0 && snum < cbLimits.maxShips() && cbShips[snum].warp < 0.0
         && cbShips[snum].lock == LOCK_PLANET)
     {
         int pnum = cbShips[snum].lockDetail;
@@ -2964,7 +2977,7 @@ void clbCheckShips(int isDriver)
     int i;
 
     /* look for vacant ships that aren't marked vacant */
-    for (i=0; i<MAXSHIPS; i++)
+    for (i=0; i<cbLimits.maxShips(); i++)
     {
         if (cbShips[i].status == SS_LIVE && !SVACANT(i))
             if (cbShips[i].pid > 0 && !checkPID(cbShips[i].pid))
