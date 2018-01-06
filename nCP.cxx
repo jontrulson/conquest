@@ -1585,7 +1585,7 @@ static int _review(void)
     }
     else
     {
-        msg = utModPlusOne( msg - 1, MAXMESSAGES );
+        msg = utModPlusOne( msg - 1, cbLimits.maxMsgs() );
         if (msg == lastone)
         {
             state = S_NONE;
@@ -1606,7 +1606,7 @@ static void _doreview(void)
     lstmsg = cbShips[snum].lastmsg;	/* don't want lstmsg changing while
                                            reading old ones. */
 
-    lastone = utModPlusOne( cbConqInfo->lastmsg+1, MAXMESSAGES );
+    lastone = utModPlusOne( cbConqInfo->lastmsg+1, cbLimits.maxMsgs() );
     if ( snum >= 0 && snum < MAXSHIPS )
     {
         if ( cbShips[snum].lastmsg == LMSG_NEEDINIT )
@@ -3467,10 +3467,10 @@ static int nCPInput(int ch)
 	    case '<':
 	    case CQ_KEY_UP:
 	    case CQ_KEY_LEFT:
-                tmsg = utModPlusOne( msg - 1, MAXMESSAGES );
+                tmsg = utModPlusOne( msg - 1, cbLimits.maxMsgs() );
                 while(!clbCanRead( snum, tmsg ) && tmsg != lastone)
 		{
-                    tmsg = utModPlusOne( tmsg - 1, MAXMESSAGES );
+                    tmsg = utModPlusOne( tmsg - 1, cbLimits.maxMsgs() );
 		}
                 if (tmsg == lastone)
 		{
@@ -3482,10 +3482,10 @@ static int nCPInput(int ch)
 	    case '>':
 	    case CQ_KEY_DOWN:
 	    case CQ_KEY_RIGHT:
-                tmsg =  utModPlusOne( msg + 1, MAXMESSAGES );
+                tmsg =  utModPlusOne( msg + 1, cbLimits.maxMsgs() );
                 while(!clbCanRead( snum, tmsg ) && tmsg != lstmsg + 1 )
 		{
-                    tmsg = utModPlusOne( tmsg + 1, MAXMESSAGES );
+                    tmsg = utModPlusOne( tmsg + 1, cbLimits.maxMsgs() );
 		}
                 if (tmsg == (lstmsg + 1))
 		{

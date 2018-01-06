@@ -1241,7 +1241,7 @@ void operate(void)
             /* Un-read message, if there's a chance it got garbaged. */
             if ( readone )
                 if ( iochav() )
-                    cbConqInfo->glastmsg = utModPlusOne( cbConqInfo->glastmsg - 1, MAXMESSAGES );
+                    cbConqInfo->glastmsg = utModPlusOne( cbConqInfo->glastmsg - 1, cbLimits.maxMsgs() );
 
 	} /* *cbRevision != COMMONSTAMP */
         else
@@ -3009,7 +3009,7 @@ void watch(void)
             /* Un-read message, if there's a chance it got garbaged. */
             if ( readone )
 		if ( iochav() )
-                    cbConqInfo->glastmsg = utModPlusOne( cbConqInfo->glastmsg - 1, MAXMESSAGES );
+                    cbConqInfo->glastmsg = utModPlusOne( cbConqInfo->glastmsg - 1, cbLimits.maxMsgs() );
 
             /* Get a char with timeout. */
             if ( ! iogtimed( &ch, 1.0 ) )

@@ -1836,7 +1836,7 @@ void clbInitGame(void)
 void clbInitMsgs(void)
 {
     /* Zero the message buffer. */
-    memset(cbMsgs, 0, MAXMESSAGES * sizeof(Msg_t));
+    memset(cbMsgs, 0, cbLimits.maxMsgs() * sizeof(Msg_t));
 
     cbConqInfo->lastmsg = 0;
     cbConqInfo->glastmsg = cbConqInfo->lastmsg;
@@ -2499,7 +2499,7 @@ void clbStoreMsgf( msgFrom_t from, uint16_t fromDetail,
             return;
 
     cbLock(&cbConqInfo->lockmesg);
-    nlastmsg = utModPlusOne( cbConqInfo->lastmsg + 1, MAXMESSAGES );
+    nlastmsg = utModPlusOne( cbConqInfo->lastmsg + 1, cbLimits.maxMsgs() );
     utStrncpy( cbMsgs[nlastmsg].msgbuf, msg, MESSAGE_SIZE );
     cbMsgs[nlastmsg].from = from;
     cbMsgs[nlastmsg].fromDetail = fromDetail;

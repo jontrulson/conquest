@@ -605,7 +605,7 @@ int utGetMsg( int snum, int *msg )
 {
     while ( *msg != cbConqInfo->lastmsg )
     {
-        *msg = utModPlusOne( *msg + 1, MAXMESSAGES );
+        *msg = utModPlusOne( *msg + 1, cbLimits.maxMsgs() );
         if ( clbCanRead( snum, *msg ) )
             return(true);
 

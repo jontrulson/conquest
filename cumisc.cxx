@@ -1234,7 +1234,7 @@ int mcuReviewMsgs( int snum, int slm )
     didany = false;
     Done = false;
 
-    lastone = utModPlusOne( cbConqInfo->lastmsg+1, MAXMESSAGES );
+    lastone = utModPlusOne( cbConqInfo->lastmsg+1, cbLimits.maxMsgs() );
     if ( snum >= 0 && snum < MAXSHIPS )
     {
         if ( cbShips[snum].lastmsg == LMSG_NEEDINIT )
@@ -1245,8 +1245,6 @@ int mcuReviewMsgs( int snum, int slm )
     }
 
     cdclrl( MSG_LIN1, 1 );
-
-    /*  for ( msg = slm; msg != lastone; msg = utModPlusOne( msg-1, MAXMESSAGES ) )*/
 
     msg = slm;
 
@@ -1266,10 +1264,10 @@ int mcuReviewMsgs( int snum, int slm )
 	    case '<':
 	    case KEY_UP:
 	    case KEY_LEFT:
-                tmsg = utModPlusOne( msg - 1, MAXMESSAGES );
+                tmsg = utModPlusOne( msg - 1, cbLimits.maxMsgs() );
                 while(!clbCanRead( snum, tmsg ) && tmsg != lastone)
 		{
-                    tmsg = utModPlusOne( tmsg - 1, MAXMESSAGES );
+                    tmsg = utModPlusOne( tmsg - 1, cbLimits.maxMsgs() );
 		}
                 if (tmsg == lastone)
 		{
@@ -1282,10 +1280,10 @@ int mcuReviewMsgs( int snum, int slm )
 	    case '>':
 	    case KEY_DOWN:
 	    case KEY_RIGHT:
-                tmsg =  utModPlusOne( msg + 1, MAXMESSAGES );
+                tmsg =  utModPlusOne( msg + 1, cbLimits.maxMsgs() );
                 while(!clbCanRead( snum, tmsg ) && tmsg != slm + 1 )
 		{
-                    tmsg = utModPlusOne( tmsg + 1, MAXMESSAGES );
+                    tmsg = utModPlusOne( tmsg + 1, cbLimits.maxMsgs() );
 		}
                 if (tmsg == (slm + 1))
 		{
@@ -1302,7 +1300,7 @@ int mcuReviewMsgs( int snum, int slm )
 	}
         else
 	{
-            msg = utModPlusOne( msg - 1, MAXMESSAGES );
+            msg = utModPlusOne( msg - 1, cbLimits.maxMsgs() );
             if (msg == lastone)
                 Done = true;
 	}
