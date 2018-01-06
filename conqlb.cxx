@@ -397,7 +397,7 @@ void clbKillShip(int snum, killedBy_t kb, uint16_t detail)
         break;
 
     case KB_PLANET:
-        if (detail >= 0 && detail < MAXPLANETS)
+        if (detail >= 0 && detail < cbLimits.maxPlanets())
 	{
             sprintf(msgbuf, "%c%d (%s) was destroyed by %s",
                     cbTeams[cbShips[snum].team].teamchar,
@@ -807,7 +807,7 @@ int clbTakePlanet( int pnum, int snum )
 
         didgeno = 1;
 
-        for ( i = 0; i < MAXPLANETS; i++ )
+        for ( i = 0; i < cbLimits.maxPlanets(); i++ )
         {
             if ( PVISIBLE(i) && (cbPlanets[i].team == oteam)
                  && cbPlanets[i].armies > 0)
@@ -843,7 +843,7 @@ int clbTakePlanet( int pnum, int snum )
     utAppendChar(buf , '!') ;
 
     /* Check whether the universe has been conquered. */
-    for ( i = 0; i < MAXPLANETS; i++ )
+    for ( i = 0; i < cbLimits.maxPlanets(); i++ )
         if ( PCORE(i) && PVISIBLE(i)
              && (cbPlanets[i].type == PLANET_CLASSM
                  || cbPlanets[i].type == PLANET_DEAD) )
@@ -1077,7 +1077,7 @@ int clbZeroPlanet( int pnum, int snum )
         didgeno = true;
 
         /* Check whether that was the last planet owned by the vanquished. */
-        for ( i = 0; i < MAXPLANETS; i++ )
+        for ( i = 0; i < cbLimits.maxPlanets(); i++ )
         {
             if ( PVISIBLE(i) && (cbPlanets[i].team == oteam) &&
                  cbPlanets[i].armies > 0)
@@ -1285,7 +1285,7 @@ void clbDoomFind(void)
     DOOMCLR(DOOM_F_ATTACKING); // not attacking while looking for a
                                // new target
 
-    for ( i = 0; i < MAXPLANETS; i++ )
+    for ( i = 0; i < cbLimits.maxPlanets(); i++ )
         if ( PVISIBLE(i) )
             if ( cbPlanets[i].armies > 0 && cbPlanets[i].team != TEAM_NOTEAM )
             {
@@ -1348,7 +1348,7 @@ int clbFindOrbit( int snum, int *pnum )
 {
     int i;
 
-    for ( i = 0; i < MAXPLANETS; i++ )
+    for ( i = 0; i < cbLimits.maxPlanets(); i++ )
         if ( PVISIBLE(i) &&
              ( dist( cbShips[snum].x, cbShips[snum].y,
                      cbPlanets[i].x,
@@ -1527,7 +1527,7 @@ int clbFindSpecial( int snum, int token, int count, int *sorpnum, int *xsorpnum 
         break;
     case SPECIAL_WEAKPLANET:
         /* Weakest non-team planet. */
-        for ( i = 0; i < MAXPLANETS; i++ )
+        for ( i = 0; i < cbLimits.maxPlanets(); i++ )
 	{
             /* Only can look for "real" planets. */
             if ( ! PVISIBLE(i) )
@@ -1595,7 +1595,7 @@ int clbFindSpecial( int snum, int token, int count, int *sorpnum, int *xsorpnum 
             }
 
         /* Loop through the planets. */
-        for ( i = 0; i < MAXPLANETS; i++ )
+        for ( i = 0; i < cbLimits.maxPlanets(); i++ )
 	{
             /* Only can look for "real" planets. */
             if ( ! PVISIBLE(i) )
@@ -1936,7 +1936,7 @@ void clbInitShip( int snum, int unum )
         /* cbShips[snum].war                # setup in menu() or newrob() */
         cbShips[snum].scanned[i] = 0;
     }
-    for ( i = 0; i < MAXPLANETS; i++ )
+    for ( i = 0; i < cbLimits.maxPlanets(); i++ )
         cbShips[snum].srpwar[i] = false;
     /* cbShips[snum].sdfuse                 # setup in clbFindShip() */
     cbLock(&cbConqInfo->lockmesg);
@@ -2206,13 +2206,13 @@ int clbPlanetMatch( char *str, int *pnum, int godlike )
 {
     if ( godlike )
     {
-        for ( *pnum = 0; *pnum < MAXPLANETS; *pnum = *pnum + 1 )
+        for ( *pnum = 0; *pnum < cbLimits.maxPlanets(); *pnum = *pnum + 1 )
             if ( utStringMatch( str, cbPlanets[*pnum].name, false ) )
                 return ( true );
     }
     else
     {
-        for ( *pnum = 0; *pnum < MAXPLANETS; *pnum = *pnum + 1 )
+        for ( *pnum = 0; *pnum < cbLimits.maxPlanets(); *pnum = *pnum + 1 )
             if ( PVISIBLE(*pnum) )
                 if ( utStringMatch( str, cbPlanets[*pnum].name, false ) )
                     return ( true );
@@ -2276,7 +2276,7 @@ int clbFmtMsg(msgFrom_t from, uint16_t fromDetail, msgTo_t to,
     {
         utAppendShip(buf , (int)fromDetail) ;
     }
-    else if ( from == MSG_FROM_PLANET && fromDetail < MAXPLANETS )
+    else if ( from == MSG_FROM_PLANET && fromDetail < cbLimits.maxPlanets() )
         strcpy(buf , cbPlanets[fromDetail].name) ;
     else
     {
@@ -2359,7 +2359,7 @@ static int cmpplanet(void *cmp1, void *cmp2)
 /* already sorted. */
 void clbSortPlanets( int sv[] )
 {
-    qsort(sv, MAXPLANETS, sizeof(int),
+    qsort(sv, cbLimits.maxPlanets(), sizeof(int),
           (int (*)(const void *, const void *))cmpplanet);
 
     return;
@@ -2678,7 +2678,7 @@ void clbZeroShip( int snum )
         cbShips[snum].war[i] = false;
         cbShips[snum].scanned[i] = 0;
     }
-    for ( i = 0; i < MAXPLANETS; i++ )
+    for ( i = 0; i < cbLimits.maxPlanets(); i++ )
         cbShips[snum].srpwar[i] = false;
     cbShips[snum].sdfuse = 0;
     cbShips[snum].lastmsg = 0;
@@ -2763,7 +2763,7 @@ void clbPlanetDrive(real itersec)
     int i;
     real speed;
 
-    for ( i = 0; i <= MAXPLANETS; i++ )
+    for ( i = 0; i < cbLimits.maxPlanets(); i++ )
     {
         /* Advance porbang() if planet is not stationary. */
         if ( cbPlanets[i].primary != i ) // not orbiting itself...
@@ -2848,7 +2848,7 @@ void clbAdjOrbitalPosition(int snum)
     {
         int pnum = cbShips[snum].lockDetail;
 
-        if ( pnum >= 0 && pnum < MAXPLANETS )
+        if ( pnum >= 0 && pnum < cbLimits.maxPlanets() )
         {
             /* ajust the ship's X/Y based on orbit direction and heading */
             if ( cbShips[snum].warp == ORBIT_CW )

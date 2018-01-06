@@ -668,7 +668,7 @@ int capentry( int snum, int *system )
     for ( i = 0; i < NUMPLAYERTEAMS; i++ )
     {
         /* We must own all home planets of a team (defendteam). */
-        for ( j=0; j<MAXPLANETS; j++ )
+        for ( j=0; j<cbLimits.maxPlanets(); j++ )
 	{
             if (PHOMEPLANET(j) && cbPlanets[j].defendteam == i)
             {
@@ -678,7 +678,7 @@ int capentry( int snum, int *system )
             }
 	}
 
-        if (j < MAXPLANETS)
+        if (j < cbLimits.maxPlanets())
             owned[i] = false;
         else
             owned[i] = true;
@@ -980,7 +980,7 @@ int updateClient(int force)
         }
     }
 
-    for (i=0; i<MAXPLANETS; i++)
+    for (i=0; i<cbLimits.maxPlanets(); i++)
         sendPlanet(sInfo.sock, i, force);
 
     if (doteam)

@@ -224,7 +224,7 @@ spShip_t *spktShip(uint8_t snum, int rec)
         sship.killedByDetail = htons(cbShips[snum].killedByDetail);
 
         // encode the srpwar (Self Ruled Planet War) bits
-        for (i=0; i<MAXPLANETS; i++)
+        for (i=0; i<cbLimits.maxPlanets(); i++)
         {
             if (cbShips[snum].srpwar[i])
             {
@@ -608,14 +608,21 @@ spPlanetSml_t *spktPlanetSml(uint8_t pnum, int rec)
     return NULL;
 }
 
+// This is only used in server recordings.  For clients, Loc2 packets
+// are used.
 spPlanetLoc_t *spktPlanetLoc(uint8_t pnum, int rec, int force)
 {
     int snum = Context.snum;
     int team = cbShips[snum].team;
     static spPlanetLoc_t splanloc;
     real dx, dy;
-    static real px[MAXPLANETS] = {}; /* saved x/y */
-    static real py[MAXPLANETS] = {};
+    static real px[ABS_MAXPLANETS] = {}; /* saved x/y */
+    static real py[ABS_MAXPLANETS] = {};
+
+    // Save some time, if we are not recording, bail.  We no longer
+    // send these to the client.
+    if (!rec)
+        return NULL;
 
     memset((void *)&splanloc, 0, sizeof(spPlanetLoc_t));
 
@@ -695,7 +702,7 @@ spPlanetLoc2_t *spktPlanetLoc2(uint8_t pnum, int rec, int force)
     static spPlanetLoc2_t splanloc2;
     uint32_t iternow = clbGetMillis(); /* we send the loc2 packets only every 5 secs */
     const uint32_t iterwait = 5000.0; /* ms */
-    static uint32_t tstart[MAXPLANETS] = {}; /* saved time deltas */
+    static uint32_t tstart[ABS_MAXPLANETS] = {}; /* saved time deltas */
     int tooearly = false;
 
     /*

@@ -166,7 +166,7 @@ int procShip(char *buf)
         sship->srpwar[i] = ntohl(sship->srpwar[i]);
 
     // decode the bit encoded representation
-    for (i=0; i<MAXPLANETS; i++)
+    for (i=0; i<cbLimits.maxPlanets(); i++)
     {
         int word = i / sizeof(uint32_t);
         int bit = i % sizeof(uint32_t);
@@ -283,7 +283,7 @@ int procPlanet(char *buf)
 
     pnum = splan->pnum;
 
-    if (pnum < 0 || pnum >= MAXPLANETS)
+    if (pnum < 0 || pnum >= cbLimits.maxPlanets())
         return false;
 
     if (Context.recmode == RECMODE_ON)
@@ -312,7 +312,7 @@ int procPlanetSml(char *buf)
 
     pnum = splansml->pnum;
 
-    if (pnum < 0 || pnum >= MAXPLANETS)
+    if (pnum < 0 || pnum >= cbLimits.maxPlanets())
         return false;
 
     if (Context.recmode == RECMODE_ON)
@@ -343,7 +343,7 @@ int procPlanetLoc(char *buf)
 
     pnum = splanloc->pnum;
 
-    if (pnum < 0 || pnum >= MAXPLANETS)
+    if (pnum < 0 || pnum >= cbLimits.maxPlanets())
         return false;
 
     if (Context.recmode == RECMODE_ON)
@@ -366,7 +366,7 @@ int procPlanetLoc2(char *buf)
 
     pnum = splanloc2->pnum;
 
-    if (pnum < 0 || pnum >= MAXPLANETS)
+    if (pnum < 0 || pnum >= cbLimits.maxPlanets())
         return false;
 
     if (Context.recmode == RECMODE_ON)
@@ -391,13 +391,13 @@ int procPlanetInfo(char *buf)
 
     pnum = splaninfo->pnum;
 
-    if (pnum < 0 || pnum >= MAXPLANETS)
+    if (pnum < 0 || pnum >= cbLimits.maxPlanets())
         return false;
 
     primary = splaninfo->primary;
 
     /* Roy fix - 10/17/2005 - let mur data be sent. */
-    if (primary < 0 || primary >= MAXPLANETS)
+    if (primary < 0 || primary >= cbLimits.maxPlanets())
         return false;
 
     /* we will record them if we get them */

@@ -296,7 +296,7 @@ void iterdrive( int *ship )
 
             // If we are locked onto a planet
             if ( cbShips[i].lock == LOCK_PLANET
-                 && cbShips[i].lockDetail < MAXPLANETS )
+                 && cbShips[i].lockDetail < cbLimits.maxPlanets() )
             {
                 int pnum = cbShips[i].lockDetail;
                 if ( warp < 0.0 )
@@ -393,7 +393,7 @@ void iterdrive( int *ship )
                 /* If we're locked onto a planet but not orbiting it see if */
                 /* we are close enough to orbit. */
                 if ( cbShips[i].lock == LOCK_PLANET
-                     && cbShips[i].lockDetail < MAXPLANETS)
+                     && cbShips[i].lockDetail < cbLimits.maxPlanets())
 		{
                     int j = cbShips[i].lockDetail;
                     /* Make sure the planet is still real. */
@@ -492,7 +492,7 @@ void iterdrive( int *ship )
 
         /* planet lock */
         if (cbDoomsday->lock == LOCK_PLANET
-            && cbDoomsday->lockDetail < MAXPLANETS
+            && cbDoomsday->lockDetail < cbLimits.maxPlanets()
             && (distf( cbDoomsday->x, cbDoomsday->y,
                        cbPlanets[cbDoomsday->lockDetail].x,
                        cbPlanets[cbDoomsday->lockDetail].y )
@@ -591,7 +591,7 @@ void secdrive( int *ship )
                 cbShips[i].scanned[j] = cbShips[i].scanned[j] - 1;
 
         /* Ships, planets and suns scans. */
-        for ( j = 0; j < MAXPLANETS; j++ )
+        for ( j = 0; j < cbLimits.maxPlanets(); j++ )
             if ( PVISIBLE(j) )
             {
                 /* Do we scan the planet? */
@@ -657,7 +657,7 @@ void secdrive( int *ship )
         // orbiting a friendly planet...
         if ( cbShips[i].warp < 0.0
              && cbShips[i].lock == LOCK_PLANET
-             && cbShips[i].lockDetail < MAXPLANETS
+             && cbShips[i].lockDetail < cbLimits.maxPlanets()
              && !clbSPWar(i, cbShips[i].lockDetail)
              && cbPlanets[cbShips[i].lockDetail].armies > 0)
         {
@@ -828,7 +828,7 @@ void secdrive( int *ship )
     /* Planet eater. */
     if ( DOOM_LIVE() )
     {
-        if (cbDoomsday->lock == LOCK_PLANET && cbDoomsday->lockDetail < MAXPLANETS)
+        if (cbDoomsday->lock == LOCK_PLANET && cbDoomsday->lockDetail < cbLimits.maxPlanets())
 	{
             /* Planet. */
             if ( distf( cbDoomsday->x, cbDoomsday->y,
@@ -913,7 +913,7 @@ void mindrive(void)
     /* cleanup any unliving ships */
     clbCheckShips(true);
 
-    for ( i = 0; i < MAXPLANETS; i++ )
+    for ( i = 0; i < cbLimits.maxPlanets(); i++ )
     {
         /* Decrement puninhabtime(). */
         if ( cbPlanets[i].uninhabtime > 0 )
@@ -944,7 +944,7 @@ void fivemindrive(void)
 
     /* Drive the planets. */
     cbLock(&cbConqInfo->lockword);
-    for ( i = 0; i < MAXPLANETS; i++ )
+    for ( i = 0; i < cbLimits.maxPlanets(); i++ )
         if (cbPlanets[i].type != PLANET_SUN)
         {
             if ( cbPlanets[i].armies > 0 && cbPlanets[i].team != TEAM_GOD )

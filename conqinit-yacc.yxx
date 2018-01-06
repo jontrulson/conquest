@@ -975,7 +975,7 @@ static int cqiValidatePlanets(void)
     unsigned int homeplan[NUMPLAYERTEAMS] = {}; /* count of home planets */
 
     /* first fill in any empty slots */
-    if (numPlanets < MAXPLANETS)
+    if (numPlanets < cbLimits.maxPlanets())
     {
         for (i = numPlanets; i < _cqiGlobal->maxplanets; i++)
         {
@@ -1003,7 +1003,7 @@ static int cqiValidatePlanets(void)
 
         if (cqiVerbose)
             utLog("%s: filled %d unspecified planet slots.",
-                  __FUNCTION__, MAXPLANETS - numPlanets);
+                  __FUNCTION__, cbLimits.maxPlanets() - numPlanets);
     }
 
 
@@ -1668,7 +1668,7 @@ void dumpUniverse(void)
     }
 
     /* planets */
-    for (i=0; i < MAXPLANETS; i++)
+    for (i=0; i < cbLimits.maxPlanets(); i++)
     {
         printf("planet {\n");
         printf("  name        \"%s\"\n", cbPlanets[i].name);

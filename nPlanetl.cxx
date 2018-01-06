@@ -26,7 +26,7 @@
 
 static int team, snum;
 
-static int PlanetOffset;    /* offset into MAXPLANETS for this page */
+static int PlanetOffset;    /* offset into cbLimits.maxPlanets() for this page */
 static int PlanetIdx;
 static const char *hd0="P L A N E T   L I S T   ";
 static const char *hd1="' = must take to conquer the Universe)";
@@ -66,7 +66,7 @@ scrNode_t *nPlanetlInit(int nodeid, int setnode, int sn, int tn)
 static int nPlanetlDisplay(dspConfig_t *dsp)
 {
     int i, lin, col, olin, pnum;
-    static int sv[MAXPLANETS];
+    int sv[cbLimits.maxPlanets()];
     char ch, junk[10];
     int outattr;
     int col2;
@@ -92,17 +92,17 @@ static int nPlanetlDisplay(dspConfig_t *dsp)
                 InfoColor,
                 hd1);
 
-        /* sort the planets */
-        for ( i = 0; i < MAXPLANETS; i++ )
-            sv[i] = i;
-        clbSortPlanets( sv );
-
         strcpy( hd3, hd2 );
 
         for ( i = 0; hd3[i] != 0; i++ )
             if ( hd3[i] != ' ' )
                 hd3[i] = '-';
     }
+
+    /* sort the planets */
+    for ( i = 0; i < cbLimits.maxPlanets(); i++ )
+        sv[i] = i;
+    clbSortPlanets( sv );
 
     lin = 1;
 
@@ -119,9 +119,9 @@ static int nPlanetlDisplay(dspConfig_t *dsp)
     col2 = false;
 
     PlanetIdx = 0;
-    if (PlanetOffset < MAXPLANETS)
+    if (PlanetOffset < cbLimits.maxPlanets())
     {
-        while ((PlanetOffset + PlanetIdx) < MAXPLANETS)
+        while ((PlanetOffset + PlanetIdx) < cbLimits.maxPlanets())
         {
             i = PlanetOffset + PlanetIdx;
             PlanetIdx++;
@@ -278,12 +278,12 @@ static int nPlanetlDisplay(dspConfig_t *dsp)
 
         } /* while */
 
-        if ((PlanetOffset + PlanetIdx) >= MAXPLANETS)
+        if ((PlanetOffset + PlanetIdx) >= cbLimits.maxPlanets())
             cprintf(MSG_LIN2, 0,  ALIGN_CENTER, "#%d#%s", NoColor, MTXT_DONE);
         else
             cprintf(MSG_LIN2, 0,  ALIGN_CENTER, "#%d#%s", NoColor, MTXT_MORE);
 
-    } /* if PlanetOffset <= MAXPLANETS */
+    } /* if PlanetOffset <= cbLimits.maxPlanets() */
 
     return NODE_OK;
 }
@@ -324,7 +324,7 @@ static int nPlanetlInput(int ch)
     {
         PlanetOffset += PlanetIdx;
 
-        if (PlanetOffset < MAXPLANETS)
+        if (PlanetOffset < cbLimits.maxPlanets())
             return NODE_OK;
     }
 

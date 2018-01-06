@@ -29,20 +29,11 @@ void cqiInitPlanets(void)
         return;
     }
 
-    // FIXME - rm when ready
-    if (cqiGlobal->maxplanets != MAXPLANETS)
-    {                           /* bummer - should not happen */
-        utLog("ERROR: cqiInitPlanets: cqiGlobal->maxplanets(%d) != MAXPLANETS(%d)\n",
-              cqiGlobal->maxplanets, MAXPLANETS);
-
-        return;
-    }
-
     /* Hump the lockword. */
     cbUnlock(&cbConqInfo->lockword);
     cbLock(&cbConqInfo->lockword);
 
-    for (i=0; i<MAXPLANETS; i++)
+    for (i=0; i<cbLimits.maxPlanets(); i++)
     {                           /* init all of the planets. */
         utStrncpy(cbPlanets[i].name, cqiPlanets[i].name, MAXPLANETNAME);
 
@@ -106,7 +97,7 @@ void cqiInitPlanets(void)
     // initialize the team's homeplanet member.
     int F = 0, K = 0, R = 0, O = 0; /* homeplanet count per team */
 
-    for (i=0; i<MAXPLANETS; i++)
+    for (i=0; i<cbLimits.maxPlanets(); i++)
     {
         if (cqiPlanets[i].homeplanet)
         {
@@ -154,7 +145,7 @@ void cqiInitPlanets(void)
 
     /* Place the planets in their proper orbits. */
     /* careful about planets that orbit themselves (planet == primary)  */
-    for ( i = MAXPLANETS - 1; i >= 0; i-- )
+    for ( i = cbLimits.maxPlanets() - 1; i >= 0; i-- )
     {
         if ( cbPlanets[i].primary != i ) // not stationary
         {
@@ -166,7 +157,7 @@ void cqiInitPlanets(void)
     }
 
     /* now setup the intial scan status for each team's homeplanet(s) */
-    for ( k = 0; k < MAXPLANETS; k++ )
+    for ( k = 0; k < cbLimits.maxPlanets(); k++ )
     {
         if (PHOMEPLANET(k) && cbPlanets[k].team < NUMPLAYERTEAMS)
             cbPlanets[k].scanned[cbPlanets[k].team] = true;

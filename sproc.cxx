@@ -84,7 +84,7 @@ void procSetCourse(char *buf)
     if (dir > 359.9)
         dir = 359.9;
 
-    if (lock != LOCK_NONE && !(lock == LOCK_PLANET && lockDetail < MAXPLANETS))
+    if (lock != LOCK_NONE && !(lock == LOCK_PLANET && lockDetail < cbLimits.maxPlanets()))
     {
         // could lock onto ships someday...
         //  but not today.
@@ -387,7 +387,7 @@ void procDistress(cpCommand_t *cmd)
     {
         // locked onto a planet we haven't reached yet
         if (cbShips[snum].lock == LOCK_PLANET
-            && cbShips[snum].lockDetail < MAXPLANETS)
+            && cbShips[snum].lockDetail < cbLimits.maxPlanets())
         {
             sprintf( buf, ", head=%.3s", cbPlanets[cbShips[snum].lockDetail].name );
         }
@@ -537,7 +537,7 @@ void procCoup(cpCommand_t *cmd)
         sendFeedback("Fleet orders require three kills before a coup can be attempted.");
         return;
     }
-    for ( i = 0; i < MAXPLANETS; i++ )
+    for ( i = 0; i < cbLimits.maxPlanets(); i++ )
         if ( PVISIBLE(i) && (cbPlanets[i].team == cbShips[snum].team) &&
              (cbPlanets[i].armies > 0) )
         {

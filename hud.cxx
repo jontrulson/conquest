@@ -111,7 +111,7 @@ void hudSetHeading(int snum)
     if ( i != hudData.heading.head)
     {
         if ( cbShips[snum].lock == LOCK_PLANET
-             && cbShips[snum].lockDetail < MAXPLANETS)
+             && cbShips[snum].lockDetail < cbLimits.maxPlanets())
         {                       /* just the first 3 characters if locked */
             hudData.heading.str[0] = cbPlanets[cbShips[snum].lockDetail].name[0];
             hudData.heading.str[1] = cbPlanets[cbShips[snum].lockDetail].name[1];
@@ -625,7 +625,7 @@ void hudSetInfoTarget(int tnum, bool isShip)
         {
             if (isShip && tnum < MAXSHIPS)
                 utAppendShip(hudData.info.lasttargetstr , tnum) ;
-            else if (!isShip && tnum < MAXPLANETS)
+            else if (!isShip && tnum < cbLimits.maxPlanets())
             {                   /* planet, just need 3 chars */
                 hudData.info.lasttargetstr[0] = cbPlanets[tnum].name[0];
                 hudData.info.lasttargetstr[1] = cbPlanets[tnum].name[1];

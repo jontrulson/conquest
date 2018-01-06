@@ -226,7 +226,7 @@ void display( int snum )
     }
 
     /* Display the planets and suns. */
-    for ( i = MAXPLANETS - 1; i >= 0; i-- )
+    for ( i = cbLimits.maxPlanets() - 1; i >= 0; i-- )
     {
         if ( ! PVISIBLE(i) )
             continue; /*next;*/
@@ -824,7 +824,7 @@ void display( int snum )
 
             uiPutColor(InfoColor);
             if ( cbShips[snum].lock == LOCK_PLANET
-                 && cbShips[snum].lockDetail < MAXPLANETS
+                 && cbShips[snum].lockDetail < cbLimits.maxPlanets()
                  && cbShips[snum].warp >= 0)
                 sprintf( buf, "%.3s", cbPlanets[cbShips[snum].lockDetail].name );
             else
@@ -1244,7 +1244,7 @@ void display( int snum )
             cdputs( zbuf, lin, dcol );	/* clean up status line */
 
             if ( cbDoomsday->lock == LOCK_PLANET
-                 && cbDoomsday->lockDetail < MAXPLANETS )
+                 && cbDoomsday->lockDetail < cbLimits.maxPlanets() )
 	    {
                 uiPutColor(RedLevelColor);
                 cdputs( cbPlanets[cbDoomsday->lockDetail].name, lin, dcol );

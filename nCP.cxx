@@ -504,7 +504,7 @@ static void _infoplanet( const char *str, int pnum, int snum )
     real x, y;
 
     /* Check range of the passed planet number. */
-    if ( pnum < 0 || pnum >= MAXPLANETS )
+    if ( pnum < 0 || pnum >= cbLimits.maxPlanets() )
     {
         cp_putmsg( "No such planet.", MSG_LIN1 );
         hudClearPrompt(MSG_LIN2);
@@ -1012,7 +1012,7 @@ static int _chkrefit(void)
     }
 
     if (cbShips[snum].lock == LOCK_PLANET
-        && cbShips[snum].lockDetail < MAXPLANETS)
+        && cbShips[snum].lockDetail < cbLimits.maxPlanets())
     {
         int pnum = cbShips[snum].lockDetail;
 
@@ -1050,7 +1050,7 @@ static int _chkcoup(void)
             MSG_LIN1 );
         return false;
     }
-    for ( i = 0; i < MAXPLANETS; i++ )
+    for ( i = 0; i < cbLimits.maxPlanets(); i++ )
         if ( cbPlanets[i].team == cbShips[snum].team && cbPlanets[i].armies > 0 )
         {
             cp_putmsg( "We don't need to coup, we still have armies left!",

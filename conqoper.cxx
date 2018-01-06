@@ -439,7 +439,7 @@ void debugdisplay( int snum )
     if (cbShips[snum].lock != LOCK_NONE)
     {
         i = (int)cbShips[snum].lockDetail;
-        if ( cbShips[snum].lock == LOCK_PLANET && i < MAXPLANETS )
+        if ( cbShips[snum].lock == LOCK_PLANET && i < cbLimits.maxPlanets() )
         {
             cprintf(lin,dcol,ALIGN_NONE,"#%d#%s",InfoColor, cbPlanets[i].name);
             cprintf(lin+1,dcol,ALIGN_NONE,"#%d#%d",InfoColor,
@@ -649,14 +649,14 @@ void debugplan(void)
 
     int i, j, k, cmd, lin, col, olin;
     int outattr;
-    static int sv[MAXPLANETS];
+    int sv[cbLimits.maxPlanets()];
     char junk[10], uninhab[20];
     char hd0[MSGMAXLINE*4];
     const char *hd1="D E B U G G I N G  P L A N E T   L I S T";
     const char *hd2="planet        C T arm uih scan        planet        C T arm uih scan";
     char hd3[BUFFER_SIZE_256];
     static bool firstTime = true;
-    int PlanetOffset;             /* offset into MAXPLANETS for this page */
+    int PlanetOffset;             /* offset into cbLimits.maxPlanets() for this page */
     int PlanetIdx = 0;
     bool Done;
 
@@ -675,10 +675,12 @@ void debugplan(void)
                 InfoColor,
                 "' = hidden)");
 
-        for ( i = 0; i < MAXPLANETS; i++ )
-            sv[i] = i;
-        clbSortPlanets( sv );
     }
+
+    /* sort the planets */
+    for ( i = 0; i < cbLimits.maxPlanets(); i++ )
+        sv[i] = i;
+    clbSortPlanets( sv );
 
     strcpy( hd3, hd2 );
     for ( i = 0; hd3[i] != 0; i++ )
@@ -706,9 +708,9 @@ void debugplan(void)
 
         PlanetIdx = 0;
 
-        if (PlanetOffset < MAXPLANETS)
+        if (PlanetOffset < cbLimits.maxPlanets())
         {
-            while ((PlanetOffset + PlanetIdx) < MAXPLANETS)
+            while ((PlanetOffset + PlanetIdx) < cbLimits.maxPlanets())
             {
                 i = PlanetOffset + PlanetIdx;
                 PlanetIdx++;
@@ -774,7 +776,7 @@ void debugplan(void)
                 uiPutColor(0);
 	    } /* while */
 
-            if ((PlanetOffset + PlanetIdx) >= MAXPLANETS)
+            if ((PlanetOffset + PlanetIdx) >= cbLimits.maxPlanets())
                 mcuPutPrompt( MTXT_DONE, MSG_LIN2 ); /* last page? */
             else
                 mcuPutPrompt( MTXT_MORE, MSG_LIN2 );
@@ -791,7 +793,7 @@ void debugplan(void)
                 {               /* some other key... */
                     /* setup for new page */
                     PlanetOffset += PlanetIdx;
-                    if (PlanetOffset >= MAXPLANETS)
+                    if (PlanetOffset >= cbLimits.maxPlanets())
                     {           /* pointless to continue */
                         Done = true;
                     }
@@ -799,9 +801,9 @@ void debugplan(void)
             }
 
             /* didn't get a char, update */
-        } /* if PlanetOffset <= MAXPLANETS */
+        } /* if PlanetOffset <= cbLimits.maxPlanets() */
         else
-            Done = true;            /* else PlanetOffset > MAXPLANETS */
+            Done = true;            /* else PlanetOffset > cbLimits.maxPlanets() */
 
     } while(!Done); /* do */
 
@@ -825,7 +827,7 @@ int opPlanetMatch( char str[], int *pnum )
         i = 0;
         if ( ! utSafeCToI( pnum, str, i ) )
             return ( false );
-        if ( *pnum < 0 || *pnum >= MAXPLANETS )
+        if ( *pnum < 0 || *pnum >= cbLimits.maxPlanets() )
             return ( false );
     }
     else
@@ -1195,7 +1197,7 @@ void operate(void)
                 if (cbDoomsday->lock == LOCK_NONE)
                     strcat(buf , "NONE") ;
                 else if (cbDoomsday->lock == LOCK_PLANET
-                         && cbDoomsday->lockDetail < MAXPLANETS)
+                         && cbDoomsday->lockDetail < cbLimits.maxPlanets())
                     strcat(buf , cbPlanets[cbDoomsday->lockDetail].name);
                 else if (cbDoomsday->lock == LOCK_SHIP
                          && cbDoomsday->lockDetail < MAXSHIPS)
@@ -2015,13 +2017,13 @@ void oppedit(void)
 	case '>': /* forward rotate planet number - dwp */
 	case KEY_RIGHT:
 	case KEY_UP:
-            pnum = mod(pnum + 1, MAXPLANETS);
+            pnum = mod(pnum + 1, cbLimits.maxPlanets());
             break;
 	case '<':  /* reverse rotate planet number - dwp */
 	case KEY_LEFT:
 	case KEY_DOWN:
-            pnum = ((pnum == 0) ? MAXPLANETS - 1 : pnum - 1);
-            pnum = mod(pnum, MAXPLANETS);
+            pnum = ((pnum == 0) ? cbLimits.maxPlanets() - 1 : pnum - 1);
+            pnum = mod(pnum, cbLimits.maxPlanets());
             break;
 	case ' ':
             /* do no-thing */

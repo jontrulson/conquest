@@ -329,7 +329,7 @@ void mcuInfoPlanet( const char *str, int pnum, int snum )
     real x, y;
 
     /* Check range of the passed planet number. */
-    if ( pnum < 0 || pnum >= MAXPLANETS )
+    if ( pnum < 0 || pnum >= cbLimits.maxPlanets() )
     {
         mcuPutMsg( "No such planet.", MSG_LIN1 );
         cdclrl( MSG_LIN2, 1 );
@@ -774,7 +774,7 @@ void mcuInfoShip( int snum, int scanner )
 void mcuPlanetList( int team, int snum )
 {
     int i, lin, col, olin, pnum;
-    static int sv[MAXPLANETS];
+    int sv[cbLimits.maxPlanets()];
     int cmd;
     char ch, junk[10];
     static const char *hd0="P L A N E T   L I S T   ";
@@ -789,7 +789,7 @@ void mcuPlanetList( int team, int snum )
     char xbuf[BUFFER_SIZE_256];
     static char pd0[BUFFER_SIZE_1024];
     static bool FirstTime = true;
-    int PlanetOffset;		/* offset into MAXPLANETS for this page */
+    int PlanetOffset;		/* offset into cbLimits.maxPlanets() for this page */
     int PlanetIdx = 0;
     int Done;
 
@@ -808,13 +808,12 @@ void mcuPlanetList( int team, int snum )
                 "+",
                 InfoColor,
                 hd1);
-
-        /* sort the planets */
-        for ( i = 0; i < MAXPLANETS; i++ )
-            sv[i] = i;
-        clbSortPlanets( sv );
-
     }
+
+    /* sort the planets */
+    for ( i = 0; i < cbLimits.maxPlanets(); i++ )
+        sv[i] = i;
+    clbSortPlanets( sv );
 
     strcpy( hd3, hd2 );
     for ( i = 0; hd3[i] != 0; i++ )
@@ -846,9 +845,9 @@ void mcuPlanetList( int team, int snum )
 
         PlanetIdx = 0;
 
-        if (PlanetOffset < MAXPLANETS)
+        if (PlanetOffset < cbLimits.maxPlanets())
 	{
-            while ((PlanetOffset + PlanetIdx) < MAXPLANETS)
+            while ((PlanetOffset + PlanetIdx) < cbLimits.maxPlanets())
 	    {
                 i = PlanetOffset + PlanetIdx;
                 PlanetIdx++;
@@ -1011,7 +1010,7 @@ void mcuPlanetList( int team, int snum )
 
 	    } /* while */
 
-            if ((PlanetOffset + PlanetIdx) >= MAXPLANETS)
+            if ((PlanetOffset + PlanetIdx) >= cbLimits.maxPlanets())
                 mcuPutPrompt( MTXT_DONE, MSG_LIN2 );
             else
                 mcuPutPrompt( MTXT_MORE, MSG_LIN2 );
@@ -1028,7 +1027,7 @@ void mcuPlanetList( int team, int snum )
 		{		/* some other key... */
 				/* setup for new page */
                     PlanetOffset += PlanetIdx;
-                    if (PlanetOffset >= MAXPLANETS)
+                    if (PlanetOffset >= cbLimits.maxPlanets())
 		    {		/* pointless to continue */
                         Done = true;
 		    }
@@ -1041,9 +1040,9 @@ void mcuPlanetList( int team, int snum )
                 if (!clbStillAlive(snum))
                     Done = true;
 
-	} /* if PlanetOffset <= MAXPLANETS */
+	} /* if PlanetOffset <= cbLimits.maxPlanets() */
         else
-            Done = true;		/* else PlanetOffset > MAXPLANETS */
+            Done = true;		/* else PlanetOffset > cbLimits.maxPlanets() */
 
     } while(Done != true); /* do */
 

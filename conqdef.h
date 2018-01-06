@@ -161,30 +161,6 @@ typedef enum {
 #define PLANET_CLASSO 7
 #define PLANET_CLASSZ 0
 
-/* Number of planets with specific
-   identities within conquest.  This
-   will always be 40 for posterity */
-#define NUM_BASEPLANETS 40
-
-/* This is the number of 'extra' planets
-   to be used for whatever.  None of these
-   can be core planets, and will be
-   initialized to invisible, unreal,
-   with unimaginative names like Extra 1
-   etc... Eventually, these planets
-   will be initializable in the sys-wide
-   config file.  REMEMBER: If you change
-   this number, change the common block id
-   (COMMONSTAMP) to reflect the change. Also
-   make sure you don't choose a number large
-   enough to overflow the common block
-   (SIZEOF_COMMONBLOCK) */
-
-#define NUM_EXTRAPLANETS 20
-
-/* number of planets */
-#define MAXPLANETS (NUM_BASEPLANETS + NUM_EXTRAPLANETS)
-
 #define MAXUSERS     500      /* maximum number of registered users */
 #define MAXUSERNAME  32	     /* maximum size of a user's login name */
 #define MAXLASTWORDS 60	      /* maximum size of conquering remarks */
