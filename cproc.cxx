@@ -509,8 +509,6 @@ int procTorpEvent(char *buf)
     cbShips[snum].torps[tnum].dy =
         (real)((real)((int32_t)ntohl(storpev->dy)) / 1000.0);
 
-    uiUpdateTorpDir(snum, tnum);
-
     return true;
 }
 

@@ -62,9 +62,6 @@ extern void conqend(void);
 #include "hud.h"
 
 
-/* torp direction tracking */
-static real torpdir[MAXSHIPS][MAXTORPS];
-
 /* loaded texture list (the list itself is exported in textures.h) */
 static int loadedGLTextures = 0; /* count of total successful tex loads */
 
@@ -646,23 +643,6 @@ static int _get_glplanet_info(GLPlanet_t *curGLPlanet, int plani)
 
     return true;
 }
-
-/* Ala Cataboligne, we will 'directionalize' all torp angles.  */
-int uiUpdateTorpDir(int snum, int tnum)
-{
-
-    if (snum < 0 || snum >= MAXSHIPS)
-        return false;
-
-    if (tnum < 0 || tnum >= MAXTORPS)
-        return false;
-
-    torpdir[snum][tnum] = utAngle(0.0, 0.0,
-                                  cbShips[snum].torps[tnum].dx,
-                                  cbShips[snum].torps[tnum].dy);
-    return true;
-}
-
 
 /* FIXME - implement a 'notify' interface for this kind of thing. */
 
@@ -2020,10 +2000,13 @@ void drawTorp(GLfloat x, GLfloat y,
 
     glTranslatef(x , y , TRANZ);
 
+    // "directionalize" torp movement
     if (ncpTorpAnims[steam].state.angle) /* use it */
         glRotatef((GLfloat)ncpTorpAnims[steam].state.angle, 0.0, 0.0, z);
     else
-        glRotatef((GLfloat)torpdir[snum][torpnum],
+        glRotatef((GLfloat)utAngle(0.0, 0.0,
+                                  cbShips[snum].torps[torpnum].dx,
+                                  cbShips[snum].torps[torpnum].dy),
                   0.0, 0.0, z);  /* face firing angle */
 
     glBlendFunc(GL_SRC_ALPHA, GL_ONE);
