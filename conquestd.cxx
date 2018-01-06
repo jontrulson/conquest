@@ -992,7 +992,7 @@ int updateClient(int force)
 
     if (dohist)
     {
-        for (i=0; i<MAXHISTLOG; i++)
+        for (i=0; i<cbLimits.maxHist(); i++)
         {
             sendHistory(sInfo.sock, i);
         }

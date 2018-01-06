@@ -56,12 +56,12 @@ void mcuHistList( int godlike )
         cdclrl( fline, lline - fline + 1 );
 
         i = thistptr + 1;
-        for ( j = 0; j < MAXHISTLOG; j++ )
+        for ( j = 0; j < cbLimits.maxHist(); j++ )
 	{
             bool isResigned = false;
 
             // adjust based on histptr being the next available slot.
-            i = utModPlusOne( i - 1, MAXHISTLOG );
+            i = utModPlusOne( i - 1, cbLimits.maxHist() );
 
             // No username, no entry
             if (!cbHistory[i].username[0])

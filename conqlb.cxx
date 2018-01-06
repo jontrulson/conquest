@@ -761,7 +761,7 @@ void clbResign( int unum, int isoper )
     {
         UFCLR(unum, USER_F_LIVE);
 
-        for ( i = 0; i < MAXHISTLOG; i++ )
+        for ( i = 0; i < cbLimits.maxHist(); i++ )
             if ( unum == cbHistory[i].unum )
                 cbHistory[i].unum = -1;
     }
@@ -2084,7 +2084,7 @@ void clbInitUniverse(void)
 
     /* Initialize user history stuff. */
     cbConqInfo->histptr = 0;
-    for ( i = 0; i < MAXHISTLOG; i++ )
+    for ( i = 0; i < cbLimits.maxHist(); i++ )
     {
         cbHistory[i].unum = -1;
         cbHistory[i].enterTime = 0;
@@ -2160,7 +2160,7 @@ int clbLogHist( int unum )
     int hnum;
 
     cbLock(&cbConqInfo->lockword);
-    cbConqInfo->histptr = utModPlusOne( cbConqInfo->histptr + 1, MAXHISTLOG );
+    cbConqInfo->histptr = utModPlusOne( cbConqInfo->histptr + 1, cbLimits.maxHist() );
     /* time stamp for this entry */
     cbHistory[cbConqInfo->histptr].enterTime = time(0);
     cbHistory[cbConqInfo->histptr].elapsed = (time_t)0;

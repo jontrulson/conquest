@@ -443,7 +443,7 @@ int sendHistory(int sock, int hnum)
 {
     spHistory_t *shist;
 
-    if (hnum < 0 || hnum > MAXHISTLOG)
+    if (hnum < 0 || hnum >= cbLimits.maxHist())
         return false;
 
 #if defined(DEBUG_SERVERSEND)

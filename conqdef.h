@@ -164,7 +164,6 @@ typedef enum {
 #define MAXUSERS     500      /* maximum number of registered users */
 #define MAXUSERNAME  32	     /* maximum size of a user's login name */
 #define MAXLASTWORDS 60	      /* maximum size of conquering remarks */
-#define MAXHISTLOG   40	  /* maximum number of user history entries */
 
 #define MAXTSTATS 20
 #define TSTAT_SECONDS 1 	/* elapsed seconds for each team */
