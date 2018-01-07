@@ -47,13 +47,12 @@ int      clbFindSpecial( int snum, int token, int count,
                          int *sorpnum, int *xsorpnum );
 void     clbFixDeltas( int snum );
 int      clbGetUserNum( int *unum, const char *lname, userTypes_t ltype );
-void     clbInitEverything(void);
-void     clbInitGame(void);
+void     clbInitEverything(bool cbIsLocal);
+void     clbInitGame(bool cbIsLocal);
 void     clbInitMsgs(void);
-void     clbInitPlanets(void);
 void     clbInitRobots(void);
 void     clbInitShip( int snum, int unum );
-void     clbInitUniverse(void);
+void     clbInitUniverse(bool cbIsLocal);
 void     clbIntrude( int snum, int pnum );
 int      clbLogHist( int unum );
 real     clbNewWarp( int snum, real dwarp );

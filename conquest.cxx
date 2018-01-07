@@ -530,15 +530,6 @@ int main(int argc, char *argv[])
     // unmapping and remapping based on limits received from the
     // server later on anyway.
 
-    // FIXME - we should not need the CB until we are connected to a
-    // server and getting ready to play. 
-    cbLimits.setMaxPlanets(60);
-    cbLimits.setMaxShips(20);
-    cbLimits.setMaxUsers(500);
-    cbLimits.setMaxHist(40);
-    cbLimits.setMaxMsgs(60);
-    cbMapLocal();
-
     if (Context.recmode == RECMODE_PLAYING)
         nPlayBMenuInit();
     else if (wantMetaList)

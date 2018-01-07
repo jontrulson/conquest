@@ -191,43 +191,78 @@ int clientHello(const char *clientname)
         return false;
     }
 
-    /* we only get this if there's problem (server denied access, usually) */
-
-    // FIXME - we should simply add a 'ACCESS_DENIED' flag to spHello
-    // so no need to handle ACK/NACKs here.
-    if (pkttype == SP_ACKMSG || pkttype == SP_ACK)
-    {
-        if (PKT_PROCSP(buf))
-            utLog("clientHello: %s '%s'",
-                  pktSeverity2String(sAckMsg.severity),
-                  sAckMsg.txt);
-
-        return false;
-    }
-
     if (pkttype != SP_HELLO)
     {
-        utLog("clientHello: read server hello: wrong packet type %d\n", pkttype);
+        utLog("clientHello: read server hello: wrong packet type %d\n",
+              pkttype);
         return false;
     }
 
     sHello = *(spHello_t *)buf;
 
-    /* fix up byte ordering */
+    // check for access troubles first
+    if (sHello.flags & SPHELLO_FLAGS_ACCESS_DENIED)
+    {
+        utLog("%s: Server denied access (SPHELLO_FLAGS_ACCESS_DENIED)",
+              __FUNCTION__);
+        return false;
+    }
+
+    // save a copy of the raw (network) version so we can write it to
+    // the recording file if we do any recording in the future...
+    sHelloRaw = *(spHello_t *)buf;
+
+    /* now fix up byte ordering */
     sHello.protover = (uint16_t)ntohs(sHello.protover);
     sHello.cmnrev = (uint32_t)ntohl(sHello.cmnrev);
 
+    // server cbLimits
+    sHello.maxplanets = ntohl(sHello.maxplanets);
+    sHello.maxships = ntohl(sHello.maxships);
+    sHello.maxusers = ntohl(sHello.maxusers);
+    sHello.maxhist = ntohl(sHello.maxhist);
+    sHello.maxmsgs = ntohl(sHello.maxmsgs);
+    sHello.maxtorps = ntohl(sHello.maxtorps);
+
+    // enforce 0 termination in case of hostile server
     sHello.servername[CONF_SERVER_NAME_SZ - 1] = 0;
     sHello.serverver[CONF_SERVER_NAME_SZ - 1] = 0;
     sHello.motd[CONF_SERVER_MOTD_SZ - 1] = 0;
 
-    utLog("SERVERID:%s:%s:0x%04hx:%d:0x%02x:%s",
+    utLog("SERVER ID: %s:%s:0x%04hx:%d:0x%02x",
           sHello.servername,
           sHello.serverver,
           sHello.protover,
           sHello.cmnrev,
-          sHello.flags,
-          sHello.motd);
+          sHello.flags);
+    utLog("           MOTD: %s", sHello.motd);
+    utLog("SERVER LIMITS: planets: %u ships: %u users: %u hist: %u msgs: %u"
+          " torps: %u\n",
+          sHello.maxplanets,
+          sHello.maxships,
+          sHello.maxusers,
+          sHello.maxhist,
+          sHello.maxmsgs,
+          sHello.maxtorps);
+
+    // At this point, we need to unmap the current CB if mapped, setup
+    // our cbLimits based on what the server told us, and then remap
+    // the new universe.
+
+    if (cbIsMapped())
+        cbUnmapLocal();
+
+    cbLimits.setMaxPlanets(sHello.maxplanets);
+    cbLimits.setMaxShips(sHello.maxships);
+    cbLimits.setMaxUsers(sHello.maxusers);
+    cbLimits.setMaxHist(sHello.maxhist);
+    cbLimits.setMaxMsgs(sHello.maxmsgs);
+    cbLimits.setMaxTorps(sHello.maxtorps);
+
+    // Now remap...
+    cbMapLocal();
+
+    // and we are ready to continue...
 
     if (cInfo.tryUDP)
     {

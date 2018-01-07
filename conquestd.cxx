@@ -1800,11 +1800,23 @@ static int hello(void)
         pktSetSocketFds(PKT_SOCKFD_NOCHANGE, sInfo.usock);
     }
 
-    /* first loadup and send a server hello */
+    /* first send a server hello */
     shello.type = SP_HELLO;
     shello.protover = (uint16_t)htons(PROTOCOL_VERSION);
 
+    // This isn't of real use to the client anymore, but might help in
+    // debugging...
     shello.cmnrev = (uint32_t)htonl(COMMONSTAMP);
+
+    // send the cbLimits data so the client knows how to build an
+    // appropriate universe
+    shello.maxplanets = htonl(cbLimits.maxPlanets());
+    shello.maxships = htonl(cbLimits.maxShips());
+    shello.maxusers = htonl(cbLimits.maxUsers());
+    shello.maxhist = htonl(cbLimits.maxHist());
+    shello.maxmsgs = htonl(cbLimits.maxMsgs());
+    shello.maxtorps = htonl(cbLimits.maxTorps());
+
     utStrncpy((char *)shello.servername, SysConf.ServerName,
               CONF_SERVER_NAME_SZ);
 
@@ -1817,6 +1829,12 @@ static int hello(void)
 
     if (cbConqInfo->closed)
         shello.flags |= SPHELLO_FLAGS_CLOSED;
+
+
+    // save a copy of the sent hello packet (already in network order)
+    // so that we can save it to the recording file in case we want to
+    // record later.
+    sInfo.spHelloRaw = shello;
 
     if (pktWrite(PKT_SENDTCP, &shello) <= 0)
     {

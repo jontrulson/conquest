@@ -20,7 +20,7 @@ int _GLError(const char *funcname, const char *filename, int line);
 
 #define GLError() _GLError(__FUNCTION__, __FILE__, __LINE__)
 
-void mglConqLogo(dspConfig_t *dsp, int mult);
+void mglConqLogo(dspConfig_t *dsp, bool useGLTeamLogo);
 void mglBeep(int type);
 void mglOverlayQuad(void);
 

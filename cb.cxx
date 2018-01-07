@@ -401,7 +401,7 @@ void cbMapLocal(void)
     utLog("%s: Mapping the common block", __FUNCTION__);
 
     _initFakeCB();
-    clbInitEverything();
+    clbInitEverything(true);
     clbInitMsgs();
     *cbRevision = COMMONSTAMP;
     cbConqInfo->closed = false;
@@ -448,7 +448,7 @@ void cbUnmapLocal()
     if (!fakeCommon) // only for heap allocated "fake" common blocks
         return;
 
-    utLog("%s: Freeing the common block");
+    utLog("%s: Freeing the common block", __FUNCTION__);
 
     // reset all variables, free the "fake" common block
 

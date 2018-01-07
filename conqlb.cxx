@@ -872,7 +872,7 @@ int clbTakePlanet( int pnum, int snum )
             clbIKill( i, KB_NEWGAME, 0 );
 
     cbUnlock(&cbConqInfo->lockword);
-    clbInitGame();
+    clbInitGame(false);
     cbLock(&cbConqInfo->lockword);
 
     return -1;                    /* doesn't matter if geno happened if
@@ -1734,19 +1734,23 @@ int clbGetUserNum( int *unum, const char *lname, userTypes_t ltype )
 /*  initeverything - initialize (with extra cheese and tomato) (DOES LOCKING) */
 /*  SYNOPSIS */
 /*    initeverything */
-void clbInitEverything(void)
+void clbInitEverything(bool cbIsLocal)
 {
 
     int i, j;
 
-    /* Twiddle the lockword. */
-    cbUnlock(&cbConqInfo->lockword);
-    cbUnlock(&cbConqInfo->lockmesg);
+    /* Twiddle the lockword (only for the real deal). */
+    if (!cbIsLocal)
+    {
+        cbUnlock(&cbConqInfo->lockword);
+        cbUnlock(&cbConqInfo->lockmesg);
+    }
 
     /* Zero EVERYTHING. */
     clbZeroEverything();
 
-    cbLock(&cbConqInfo->lockword);
+    if (!cbIsLocal)
+        cbLock(&cbConqInfo->lockword);
 
     /* Turn off the universe. It will be turned back on in initUniverse() */
     cbConqInfo->closed = true;
@@ -1783,11 +1787,14 @@ void clbInitEverything(void)
     utStrncpy( cbConqInfo->lastwords, "Let there be light...", MAXLASTWORDS );
 
     /* Un-twiddle the lockwords. */
-    cbUnlock(&cbConqInfo->lockword);
-    cbUnlock(&cbConqInfo->lockmesg);
+    if (!cbIsLocal)
+    {
+        cbUnlock(&cbConqInfo->lockword);
+        cbUnlock(&cbConqInfo->lockmesg);
+    }
 
     clbInitRobots();
-    clbInitUniverse();
+    clbInitUniverse(cbIsLocal);
 
     return;
 
@@ -1797,12 +1804,14 @@ void clbInitEverything(void)
 /*  initgame - initialize the game-permanent variables */
 /*  SYNOPSIS */
 /*    initgame */
-void clbInitGame(void)
+void clbInitGame(bool cbIsLocal)
 {
     /* Twiddle the lockword. */
-    cbUnlock(&cbConqInfo->lockword);
-
-    cbLock(&cbConqInfo->lockword);
+    if (!cbIsLocal)
+    {
+        cbUnlock(&cbConqInfo->lockword);
+        cbLock(&cbConqInfo->lockword);
+    }
 
     /* Driver. */
     cbDriver->drivsecs = 0;
@@ -1820,10 +1829,12 @@ void clbInitGame(void)
     utStrncpy( cbDoomsday->name, "Doomsday Machine", MAXUSERNAME );
 
     /* Un-twiddle the lockword. */
-    cbUnlock(&cbConqInfo->lockword);
+    if (!cbIsLocal)
+        cbUnlock(&cbConqInfo->lockword);
 
-    /* Set up the physical universe. */
-    cqiInitPlanets();
+    /* Set up the physical universe, but only on the server */
+    if (!cbIsLocal)
+        cqiInitPlanets();
 
     return;
 
@@ -1992,14 +2003,17 @@ void clbInitShip( int snum, int unum )
 /*  inituniverse - initialize (without cheese and tomato) (DOES LOCKING) */
 /*  SYNOPSIS */
 /*    inituniverse */
-void clbInitUniverse(void)
+void clbInitUniverse(bool cbIsLocal)
 {
 
     int i;
 
     /* Twiddle the lockword. */
-    cbUnlock(&cbConqInfo->lockword);
-    cbLock(&cbConqInfo->lockword);
+    if (!cbIsLocal)
+    {
+        cbUnlock(&cbConqInfo->lockword);
+        cbLock(&cbConqInfo->lockword);
+    }
 
     utStrncpy( cbShipTypes[ST_SCOUT].name, "Scout", MAXSTNAME );
     cbShipTypes[ST_SCOUT].armylim = 7;
@@ -2093,9 +2107,10 @@ void clbInitUniverse(void)
     }
 
     /* Un-twiddle the lockword. */
-    cbUnlock(&cbConqInfo->lockword);
+    if (!cbIsLocal)
+        cbUnlock(&cbConqInfo->lockword);
 
-    clbInitGame();
+    clbInitGame(cbIsLocal);
     clbClearShips();
     clbInitMsgs();
 

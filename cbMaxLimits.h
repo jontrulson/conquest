@@ -8,6 +8,8 @@
 #ifndef _CBMAXLIMITS_H
 #define _CBMAXLIMITS_H
 
+#include "conqdef.h"
+
 class cbMaxLimits {
 
 public:
@@ -56,23 +58,23 @@ public:
     // setters
     void setMaxPlanets(unsigned int max)
     {
-        m_maxplanets = max;
+        m_maxplanets = CLAMP(1, ABS_MAXPLANETS, max);
     }
     void setMaxShips(unsigned int max)
     {
-        m_maxships = max;
+        m_maxships = CLAMP(1, ABS_MAXSHIPS, max);
     }
     void setMaxUsers(unsigned int max)
     {
-        m_maxusers = max;
+        m_maxusers = CLAMP(1, ABS_MAXUSERS, max);
     }
     void setMaxHist(unsigned int max)
     {
-        m_maxhist = max;
+        m_maxhist = CLAMP(1, ABS_MAXHIST, max);
     }
     void setMaxMsgs(unsigned int max)
     {
-        m_maxmsgs = max;
+        m_maxmsgs = CLAMP(1, ABS_MAXMSGS, max);
     }
     void setMaxTorps(unsigned int max)
     {

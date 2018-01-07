@@ -89,8 +89,9 @@ typedef struct {
     uint8_t pad3;
 } spNull_t;
 
-#define SPHELLO_FLAGS_NONE         0x00
-#define SPHELLO_FLAGS_CLOSED       0x01 /* game closed */
+#define SPHELLO_FLAGS_NONE          0x00
+#define SPHELLO_FLAGS_CLOSED        0x01 /* game closed */
+#define SPHELLO_FLAGS_ACCESS_DENIED 0x02 /* banned for some reason */
 typedef struct {
     uint8_t  type;                      /* SP_HELLO */
     uint8_t  flags;                /* closed, etc... */
@@ -98,7 +99,15 @@ typedef struct {
 
     uint32_t cmnrev;            /* common block version */
 
-    uint32_t pad1;
+    // Server's cbLimits (maximums)
+    uint32_t maxplanets;
+    uint32_t maxships;
+    uint32_t maxusers;
+    uint32_t maxhist;
+    uint32_t maxmsgs;
+    uint32_t maxtorps;
+
+    uint32_t pad1[5];
 
     /* see conf.h for SERVER_*_SZ */
     uint8_t  servername[CONF_SERVER_NAME_SZ]; /* long server name */

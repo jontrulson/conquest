@@ -53,7 +53,7 @@ int _GLError(const char *funcname, const char *filename, int line)
  * Cataboligne - multi lingual giant conquest title
  */
 
-void mglConqLogo(dspConfig_t *dsp, int mult)
+void mglConqLogo(dspConfig_t *dsp, bool useGLTeamLogo)
 {
     static const char *Conquest = "CONQUEST";
     GLfloat x, y, w, h;
@@ -77,9 +77,15 @@ void mglConqLogo(dspConfig_t *dsp, int mult)
 
         for (i=0; i<NUMPLAYERTEAMS; i++)
         {
+            // We hardcode the team name characters here to avoid
+            // needing to access the CB, which may not be mapped yet.
+            // This is ok, since these teams, and their "numbers" will
+            // never change.
+            static const char teams[NUMPLAYERTEAMS] = { 'F', 'R', 'K', 'O'};
+
             int ndx;
             snprintf(buffer, CQI_NAMELEN, "conqlogo%c",
-                     cbTeams[i].name[0]);
+                     teams[i]);
 
             if ((ndx = findGLTexture(buffer)) >= 0)
             {
@@ -100,8 +106,8 @@ void mglConqLogo(dspConfig_t *dsp, int mult)
     }
 
     /* Cataboligne - new title set */
-
-    if ( logos[cbShips[Context.snum].team] && mult)
+    // make sure this only renders when a common block is mapped...
+    if ( cbIsMapped() && logos[cbShips[Context.snum].team] && useGLTeamLogo)
     {
         glBlendFunc(GL_SRC_ALPHA, GL_ONE);
         glEnable(GL_BLEND);

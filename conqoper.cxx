@@ -3504,7 +3504,7 @@ int DoInit(char InitChar, int cmdline)
     switch(InitChar)
     {
     case 'e':
-        clbInitEverything();
+        clbInitEverything(false);
         *cbRevision = COMMONSTAMP;
 
         if (cmdline == true)
@@ -3527,7 +3527,7 @@ int DoInit(char InitChar, int cmdline)
         break;
 
     case 'u':
-        clbInitUniverse();
+        clbInitUniverse(false);
         *cbRevision = COMMONSTAMP;
 
         if (cmdline == true)
@@ -3539,7 +3539,7 @@ int DoInit(char InitChar, int cmdline)
         break;
 
     case 'g':
-        clbInitGame();
+        clbInitGame(false);
         *cbRevision = COMMONSTAMP;
 
         if (cmdline == true)
