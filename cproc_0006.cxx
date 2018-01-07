@@ -217,14 +217,16 @@ int proc_0006_ShipSml(char *buf)
 
     // we need to mask out map since it's always local.  We've also
     // made the ships flags member 32b instead of 16b in the new
-    // protocol, and added a couple new flags, so we want to preserve
-    // those.
+    // protocol (v7), and added a couple new flags, so we want to
+    // preserve those.
     uint32_t sflags =
         (uint32_t)(((ntohs(sshipsml->flags)) & ~0x0040 /*SHIP_F_MAP*/)
                    | SMAP(snum));
     // now filter out only those flags valid for this protocol (6).
-    sflags &= 0x000001ff; // SHIP_F_BOMBING and lower (last supported by v6)
-    cbShips[snum].flags |= sflags;
+    // SHIP_F_BOMBING and lower (last supported by v6)
+    const uint32_t mask = 0x000001ff;
+    sflags &= mask;
+    cbShips[snum].flags = (cbShips[snum].flags & ~mask) | sflags;
 
     cbShips[snum].action = sshipsml->action;
     cbShips[snum].shields = sshipsml->shields;
@@ -258,7 +260,6 @@ int proc_0006_ShipSml(char *buf)
     else if (temp < 0) // planet
     {
         cbShips[snum].lock = LOCK_PLANET;
-        // FIXME adjust planet number when ready
         cbShips[snum].lockDetail = -temp;
         // Compensate for 0-based cbPlanets[]
         cbShips[snum].lockDetail--;

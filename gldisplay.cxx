@@ -5,6 +5,7 @@
  ***********************************************************************/
 
 #include "conqdef.h"
+#include "conqutil.h"
 #include "cb.h"
 #include "context.h"
 #include "conf.h"
