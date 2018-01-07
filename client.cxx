@@ -298,24 +298,14 @@ int clientHello(const char *clientname)
 
     utLog("clientHello: sent hello to server");
 
-    // FIXME - this is probably where we need to get the GlobalLimit
-    // (maxplanets, maxships etc), the remap the universe before doing
-    // anything else....
-
-    // maybe a better idea, incorporate that info into the initial
-    // spHello packet!?
-
-    // Oh, and the UDP below should be redone in a better way (maybe
-    // via a protocol request to server).
-
-
 
     if (cInfo.tryUDP)
     {
         /* see if we get an ack back from the server via udp */
-        /* this is kind of weak and probably needs more work.  As it is, the client needs
-           to receive a udp from the server within 5 seconds, or UDP will not be used.  If the
-           inbound packet gets lost.... Oh well. */
+        /* this is kind of weak and probably needs more work.  As it
+           is, the client needs to receive a udp from the server
+           within 5 seconds, or UDP will not be used.  If the inbound
+           packet gets lost.... Oh well. */
         tv.tv_sec = 5;            /* 5 secs */
         tv.tv_usec = 0;
         FD_ZERO(&readfds);
@@ -393,7 +383,7 @@ int clientHello(const char *clientname)
 /* Some routers/firewalls seem to disconnect a UDP conncetion if there haven't
  * been any outgoing (client->server) packets for awhile.  Normally, conquest
  * never sends UDP packets except during UDP negotiation at the start of a
- * game.  This routine will send a CPCMD_KEEPALIVE packet every 60 seconds
+ * game.  This routine will send a CPCMD_KEEPALIVE packet every 30 seconds
  * if a UDP connection is enabled.  Seems to solve clute's problem.
  */
 void sendUDPKeepAlive(uint32_t timebase)
@@ -424,7 +414,7 @@ void sendUDPKeepAlive(uint32_t timebase)
 }
 
 /* this function accepts a character buffer representing a clientstat packet
-   and validates it.  It return a pointer to a static spClientStat_t
+   and validates it.  It returns a pointer to a static spClientStat_t
    packet if everything is in order, NULL otherwise. */
 spClientStat_t *chkClientStat(char *buf)
 {
