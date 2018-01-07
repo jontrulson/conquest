@@ -1521,7 +1521,7 @@ void renderViewer(bool dovbg)
             }
 
             drawCircle(0, 0,
-                cu2GLSize(1000 * i, (SMAP(Context.snum) ? MAP_FAC : SCALE_FAC)),
+                cu2GLSize(1000 * i, (SMAP(Context.snum) ? MAP_LR_FAC : MAP_SR_FAC)),
                 100);
         }
 
@@ -1548,7 +1548,7 @@ void renderViewer(bool dovbg)
             else
                 GLcvtcoords(0.0, 0.0,
                             i * 1000.0, i * 1000.0,
-                            (SMAP(Context.snum) ? MAP_FAC : SCALE_FAC),
+                            (SMAP(Context.snum) ? MAP_LR_FAC : MAP_SR_FAC),
                             &gx, &gy);
 
             glBegin(GL_LINES);

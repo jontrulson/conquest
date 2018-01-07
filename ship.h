@@ -38,7 +38,7 @@
 #define STOWING(x)   ( cbShips[(x)].flags & SHIP_F_TOWING )
 
 /* lookup the proper [SCALE|MAP]_FAC depending on LR/SR status */
-#define SFAC(x)      (SMAP(x) ? MAP_FAC : SCALE_FAC)
+#define SFAC(x)      (SMAP(x) ? MAP_LR_FAC : MAP_SR_FAC)
 
 #define SFSET(x, b)  ( cbShips[(x)].flags |=  (b) )
 #define SFCLR(x, b)  ( cbShips[(x)].flags &= ~(b) )

@@ -199,7 +199,7 @@ void display( int snum )
 
     if ( lsmap )
     {
-        scale = MAP_FAC;
+        scale = MAP_LR_FAC;
 
         if (UserConf.DoLocalLRScan)
 	{
@@ -214,7 +214,7 @@ void display( int snum )
     }
     else
     {
-        scale = SCALE_FAC;
+        scale = MAP_SR_FAC;
         if (snum == DISPLAY_DOOMSDAY) { /* dwp */
             cenx = cbDoomsday->x;
             ceny = cbDoomsday->y;

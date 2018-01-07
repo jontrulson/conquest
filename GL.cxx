@@ -1046,7 +1046,7 @@ void drawExplosion(GLfloat x, GLfloat y, int snum, int torpnum, int scale)
     static int norender = false;
     scrNode_t *curnode = getTopNode();
     static int explodefx = -1;
-    GLfloat scaleFac = (scale == SCALE_FAC) ? dConf.vScaleSR : dConf.vScaleLR;
+    GLfloat scaleFac = (scale == MAP_SR_FAC) ? dConf.vScaleSR : dConf.vScaleLR;
     GLfloat size;
 
     if (norender)
@@ -1104,7 +1104,7 @@ void drawExplosion(GLfloat x, GLfloat y, int snum, int torpnum, int scale)
 
     size = cu2GLSize(torpAStates[snum][torpnum].state.size, -scale);
 
-    if (scale == MAP_FAC)
+    if (scale == MAP_LR_FAC)
         size = size * 2.0;
 
     glPushMatrix();
@@ -1139,7 +1139,7 @@ void drawBombing(int snum, int scale)
     GLfloat x, y, size;
     int i;
     static animStateRec_t initastate;    /* initial state of a bomb explosion */
-    GLfloat scaleFac = (scale == SCALE_FAC) ? dConf.vScaleSR : dConf.vScaleLR;
+    GLfloat scaleFac = (scale == MAP_SR_FAC) ? dConf.vScaleSR : dConf.vScaleLR;
     struct _rndxy {               /* anim state private area */
         real rndx;                  /* random X offset from planet */
         real rndy;                  /* random Y offset from planet */
@@ -1237,7 +1237,7 @@ void drawBombing(int snum, int scale)
                  &y);
 
     size = cu2GLSize(bombAState[snum].state.size, -scale);
-    if (scale == MAP_FAC)
+    if (scale == MAP_LR_FAC)
         size = size * 2.0;
 
     glScalef(scaleFac, scaleFac, 1.0);
@@ -1270,7 +1270,7 @@ void drawPlanet( GLfloat x, GLfloat y, int pnum, int scale,
     char torpchar;
     char planame[BUFFER_SIZE_256];
     static int norender = false;
-    GLfloat scaleFac = (scale == SCALE_FAC) ? dConf.vScaleSR : dConf.vScaleLR;
+    GLfloat scaleFac = (scale == MAP_SR_FAC) ? dConf.vScaleSR : dConf.vScaleLR;
 
     if (norender)
         return;
@@ -1314,7 +1314,7 @@ void drawPlanet( GLfloat x, GLfloat y, int pnum, int scale,
     size = cu2GLSize(GLPlanets[pnum].size, -scale);
 
     /* so it's more visible... */
-    if (scale == MAP_FAC)
+    if (scale == MAP_LR_FAC)
         size *= 2.0;
 
     drawTexBoxCentered(x, y, TRANZ, size, false, false);
@@ -1334,7 +1334,7 @@ void drawPlanet( GLfloat x, GLfloat y, int pnum, int scale,
         else
             torpchar = cbTeams[cbPlanets[pnum].team].torpchar;
 
-    if (scale == SCALE_FAC)
+    if (scale == MAP_SR_FAC)
     {
         if (UserConf.DoNumMap && (torpchar != ' '))
             snprintf(buf, BUFFER_SIZE_256, "#%d#%c#%d#%d#%d#%c%s",
@@ -1352,12 +1352,12 @@ void drawPlanet( GLfloat x, GLfloat y, int pnum, int scale,
                       y - cu2GLSize((real)cbPlanets[pnum].size / 2.0,
                                     -scale),
                       TRANZ, /* planet's Z */
-                      ((GLfloat)uiCStrlen(buf) * 2.0) / ((scale == SCALE_FAC) ? 1.0 : 2.0),
+                      ((GLfloat)uiCStrlen(buf) * 2.0) / ((scale == MAP_SR_FAC) ? 1.0 : 2.0),
                       TEXT_HEIGHT, glfFontFixedTiny, buf, textcolor, NULL,
                       GLF_FONT_F_SCALEX | GLF_FONT_F_DOCOLOR);
     }
     else
-    {                           /* MAP_FAC */
+    {                           /* MAP_LR_FAC */
         /* just want first 3 chars */
         planame[0] = cbPlanets[pnum].name[0];
         planame[1] = cbPlanets[pnum].name[1];
@@ -1387,7 +1387,7 @@ void drawPlanet( GLfloat x, GLfloat y, int pnum, int scale,
                       y - cu2GLSize((real)cbPlanets[pnum].size / 2.0, -scale),
 
                       TRANZ,
-                      ((GLfloat)uiCStrlen(buf) * 2.0) / ((scale == SCALE_FAC) ? 1.0 : 2.0),
+                      ((GLfloat)uiCStrlen(buf) * 2.0) / ((scale == MAP_SR_FAC) ? 1.0 : 2.0),
                       TEXT_HEIGHT, glfFontFixedTiny, buf, textcolor, NULL,
                       GLF_FONT_F_SCALEX | GLF_FONT_F_DOCOLOR);
 
@@ -1422,7 +1422,7 @@ int GLcvtcoords(real cenx, real ceny, real x, real y, real scale,
     GLfloat vscale;
     GLfloat magscale;
 
-    magscale = (ascale == SCALE_FAC) ? dConf.vScaleSR : dConf.vScaleLR;
+    magscale = (ascale == MAP_SR_FAC) ? dConf.vScaleSR : dConf.vScaleLR;
 
     /* if scale is negative, do not scale the x/y with the current
        magfactor */
@@ -1991,7 +1991,7 @@ void drawTorp(GLfloat x, GLfloat y,
     static const GLfloat z = 1.0;
     GLfloat size;
     int steam = cbShips[snum].team;
-    GLfloat scaleFac = (scale == SCALE_FAC) ? dConf.vScaleSR : dConf.vScaleLR;
+    GLfloat scaleFac = (scale == MAP_SR_FAC) ? dConf.vScaleSR : dConf.vScaleLR;
 
     /* these need to exist first... */
     if (!GLShips[0][0].ship)
@@ -2008,7 +2008,7 @@ void drawTorp(GLfloat x, GLfloat y,
 
     size = cu2GLSize(ncpTorpAnims[steam].state.size, -scale);
 
-    if (scale == MAP_FAC)
+    if (scale == MAP_LR_FAC)
         size = size * 2.0;
 
     glPushMatrix();
@@ -2076,7 +2076,7 @@ drawShip(GLfloat x, GLfloat y, GLfloat angle, char ch, int snum, int color,
     static int norender = false;
     int steam = cbShips[snum].team, stype = cbShips[snum].shiptype;
     real shipSize = cbShipTypes[cbShips[snum].shiptype].size;
-    GLfloat scaleFac = (scale == SCALE_FAC) ? dConf.vScaleSR : dConf.vScaleLR;
+    GLfloat scaleFac = (scale == MAP_SR_FAC) ? dConf.vScaleSR : dConf.vScaleLR;
     GLfloat phaserRadius;
 
     if (norender)
@@ -2098,7 +2098,7 @@ drawShip(GLfloat x, GLfloat y, GLfloat angle, char ch, int snum, int color,
     phaserRadius = cu2GLSize(PHASER_DIST, -scale);
 
     /* make a little more visible in LR */
-    if (scale == MAP_FAC)
+    if (scale == MAP_LR_FAC)
         size = size * 2.0;
 
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -2107,7 +2107,7 @@ drawShip(GLfloat x, GLfloat y, GLfloat angle, char ch, int snum, int color,
     /* phasers - we draw this before the ship */
     if (cbShips[snum].pfuse > 0) /* phaser action */
     {
-        GLfloat phaserwidth = ((scale == SCALE_FAC) ? 1.5 : 0.5);
+        GLfloat phaserwidth = ((scale == MAP_SR_FAC) ? 1.5 : 0.5);
 
         glPushMatrix();
         glLoadIdentity();
@@ -2229,9 +2229,9 @@ drawShip(GLfloat x, GLfloat y, GLfloat angle, char ch, int snum, int color,
     glScalef(scaleFac, scaleFac, 1.0);
 
     glfRenderFont(x,
-                  ((scale == SCALE_FAC) ? y - 4.0: y - 1.0),
+                  ((scale == MAP_SR_FAC) ? y - 4.0: y - 1.0),
                   TRANZ,
-                  ((GLfloat)strlen(buf) * 2.0) / ((scale == SCALE_FAC) ? 1.0 : 2.0),
+                  ((GLfloat)strlen(buf) * 2.0) / ((scale == MAP_SR_FAC) ? 1.0 : 2.0),
                   TEXT_HEIGHT, glfFontFixedTiny, buf, color, NULL,
                   GLF_FONT_F_SCALEX);
 
@@ -2254,7 +2254,7 @@ void drawDoomsday(GLfloat x, GLfloat y, GLfloat dangle, GLfloat scale)
     static int beamfx = -1;       /* Cataboligne - beam sound */
     static const uint32_t beamfx_delay = 1000; /* 1 second */
     real dis, ang;
-    GLfloat scaleFac = (scale == SCALE_FAC) ? dConf.vScaleSR : dConf.vScaleLR;
+    GLfloat scaleFac = (scale == MAP_SR_FAC) ? dConf.vScaleSR : dConf.vScaleLR;
     static uint32_t geoChangeCount = 0;
 
     if (norender)
@@ -2303,20 +2303,20 @@ void drawDoomsday(GLfloat x, GLfloat y, GLfloat dangle, GLfloat scale)
 
         /* doomsday is DOOMSIZE CU's in size */
         doomsizeSR = cu2GLSize(DOOMSIZE * GLTEX_PRESCALE(GLDoomsday.doom),
-                               -SCALE_FAC);
+                               -MAP_SR_FAC);
         doomsizeLR = cu2GLSize(DOOMSIZE * GLTEX_PRESCALE(GLDoomsday.doom),
-                               -MAP_FAC);
+                               -MAP_LR_FAC);
 
         beamRadiusSR = cu2GLSize(DOOMSDAY_DIST * GLTEX_PRESCALE(GLDoomsday.beam),
-                                 -SCALE_FAC);
+                                 -MAP_SR_FAC);
         beamRadiusLR = cu2GLSize(DOOMSDAY_DIST * GLTEX_PRESCALE(GLDoomsday.beam),
-                                 -MAP_FAC);
+                                 -MAP_LR_FAC);
     }
 
-    size = ((scale == SCALE_FAC) ? doomsizeSR : doomsizeLR);
-    bsize = ((scale == SCALE_FAC) ? beamRadiusSR : beamRadiusLR);
+    size = ((scale == MAP_SR_FAC) ? doomsizeSR : doomsizeLR);
+    bsize = ((scale == MAP_SR_FAC) ? beamRadiusSR : beamRadiusLR);
 
-    if (scale == MAP_FAC)
+    if (scale == MAP_LR_FAC)
     {
         size = size * 2.0;
         bsize *= 2.0;
@@ -2489,13 +2489,13 @@ void drawNEB(int snum)
         /* width/height SR */
         GLcvtcoords(0.0, 0.0, NEGENBEND_DIST * 2.0,
                     (NEGENBEND_DIST - NEGENB_DIST),
-                    SCALE_FAC,
+                    MAP_SR_FAC,
                     &nebWidthSR, &nebHeightSR);
 
         /* width/height LR */
         GLcvtcoords(0.0, 0.0, NEGENBEND_DIST * 2.0,
                     (NEGENBEND_DIST - NEGENB_DIST),
-                    MAP_FAC,
+                    MAP_LR_FAC,
                     &nebWidthLR, &nebHeightLR);
 
     }
@@ -2544,7 +2544,7 @@ void drawNEB(int snum)
         if (GLcvtcoords(cbShips[snum].x, cbShips[snum].y,
                         nearx,
                         CLAMP(-NEGENBEND_DIST, NEGENBEND_DIST, cbShips[snum].y),
-                        (SMAP(snum) ? MAP_FAC : SCALE_FAC),
+                        (SMAP(snum) ? MAP_LR_FAC : MAP_SR_FAC),
                         &tx, &ty))
         {
             nebXVisible = true;
@@ -2552,7 +2552,7 @@ void drawNEB(int snum)
     }
 
 #if 0                           /* debugging test point (murisak) */
-    drawPlanet( tx, ty, 34, (SMAP(snum) ? MAP_FAC : SCALE_FAC),
+    drawPlanet( tx, ty, 34, (SMAP(snum) ? MAP_LR_FAC : MAP_SR_FAC),
                 MagentaColor);
 #endif
 
@@ -2580,14 +2580,14 @@ void drawNEB(int snum)
         if (GLcvtcoords(cbShips[snum].x, cbShips[snum].y,
                         CLAMP(-NEGENBEND_DIST, NEGENBEND_DIST, cbShips[snum].x),
                         neary,
-                        (SMAP(snum) ? MAP_FAC : SCALE_FAC),
+                        (SMAP(snum) ? MAP_LR_FAC : MAP_SR_FAC),
                         &tx, &ty))
         {
             nebYVisible = true;
         }
     }
 #if 0                           /* debugging test point (murisak) */
-    drawPlanet( tx, ty, 34, (SMAP(snum) ? MAP_FAC : SCALE_FAC),
+    drawPlanet( tx, ty, 34, (SMAP(snum) ? MAP_LR_FAC : MAP_SR_FAC),
                 MagentaColor);
 #endif
 
@@ -2625,7 +2625,7 @@ void drawNEB(int snum)
             /* top */
             GLcvtcoords(cbShips[snum].x, cbShips[snum].y,
                         -NEGENBEND_DIST, NEGENB_DIST,
-                        (SMAP(snum) ? MAP_FAC : SCALE_FAC),
+                        (SMAP(snum) ? MAP_LR_FAC : MAP_SR_FAC),
                         &nebX, &nebY);
 #if 0
             utLog("Y TOP VISIBLE");
@@ -2636,7 +2636,7 @@ void drawNEB(int snum)
             /* bottom */
             GLcvtcoords(cbShips[snum].x, cbShips[snum].y,
                         -NEGENBEND_DIST, -NEGENBEND_DIST,
-                        (SMAP(snum) ? MAP_FAC : SCALE_FAC),
+                        (SMAP(snum) ? MAP_LR_FAC : MAP_SR_FAC),
                         &nebX, &nebY);
 #if 0
             utLog("Y BOTTOM VISIBLE");
@@ -2673,7 +2673,7 @@ void drawNEB(int snum)
             /* right */
             GLcvtcoords(cbShips[snum].x, cbShips[snum].y,
                         NEGENB_DIST, -NEGENBEND_DIST,
-                        (SMAP(snum) ? MAP_FAC : SCALE_FAC),
+                        (SMAP(snum) ? MAP_LR_FAC : MAP_SR_FAC),
                         &nebX, &nebY);
 #if 0
             utLog("X RIGHT VISIBLE");
@@ -2684,7 +2684,7 @@ void drawNEB(int snum)
             /* left */
             GLcvtcoords(cbShips[snum].x, cbShips[snum].y,
                         -NEGENBEND_DIST, -NEGENBEND_DIST,
-                        (SMAP(snum) ? MAP_FAC : SCALE_FAC),
+                        (SMAP(snum) ? MAP_LR_FAC : MAP_SR_FAC),
                         &nebX, &nebY);
 #if 0
             utLog("X LEFT VISIBLE");
