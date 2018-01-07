@@ -1456,7 +1456,7 @@ void renderHud(bool dostats)
 }
 
 
-void renderViewer(int dovbg, int dobomb)
+void renderViewer(bool dovbg)
 {
     /* setup the proper viewport and projection matrix for the viewer */
     glViewport(dConf.vX,
@@ -1533,11 +1533,6 @@ void renderViewer(int dovbg, int dobomb)
 
     // the universe
     display( Context.snum );
-
-    /* if we're faking it, (nCP.c), do it */
-    if (dobomb)
-        drawBombing(Context.snum, (SMAP(Context.snum) ? MAP_FAC : SCALE_FAC));
-
 
 #if 0                           /* TEST GRID */
     {

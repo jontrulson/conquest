@@ -6,6 +6,6 @@
 #define _RENDER_H
 
 void renderHud(bool dostats);
-void renderViewer(int dovbg, int dobomb);
+void renderViewer(bool dovbg);
 
 #endif /* _RENDER_H */
