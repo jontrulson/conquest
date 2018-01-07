@@ -1830,12 +1830,6 @@ static int hello(void)
     if (cbConqInfo->closed)
         shello.flags |= SPHELLO_FLAGS_CLOSED;
 
-
-    // save a copy of the sent hello packet (already in network order)
-    // so that we can save it to the recording file in case we want to
-    // record later.
-    sInfo.spHelloRaw = shello;
-
     if (pktWrite(PKT_SENDTCP, &shello) <= 0)
     {
         utLog("NET: SERVER: hello: write shello failed\n");

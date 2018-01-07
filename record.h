@@ -30,7 +30,9 @@
                                       sizeof(uint32_t) +        \
                                       sizeof(uint8_t) +         \
                                       sizeof(uint32_t) +        \
-                                      sizeof(uint16_t)))
+                                      sizeof(uint16_t) +        \
+                                      (sizeof(uint32_t) * 6)))
+
 
 #pragma pack(1)
 typedef struct _fheader {
@@ -39,9 +41,19 @@ typedef struct _fheader {
     uint32_t rectime;		/* time recorded */
     uint8_t user[MAXUSERNAME];	/* user that made recording */
     uint32_t cmnrev;               /* common block rev */
-    uint8_t snum;                  /* ship that made rec.  0 == server record */
+    uint8_t snum;                  /* ship that made rec.  0 == server
+                                    * record (old versions) */
     uint32_t flags;                /* flags. duh. */
     uint16_t protoVers;             /* network protocol version */
+
+    // cbLimits data :)
+    uint32_t maxplanets;
+    uint32_t maxships;
+    uint32_t maxusers;
+    uint32_t maxhist;
+    uint32_t maxmsgs;
+    uint32_t maxtorps;
+
     uint8_t pad[FHEADER_PAD];	/* padding */
 } fileHeader_t;
 #pragma pack()

@@ -214,11 +214,23 @@ int recReadHeader(fileHeader_t *fhdr)
 
     /* now de-endianize the data */
 
-    fhdr->vers = (uint32_t)ntohl(fhdr->vers);
-    fhdr->rectime = (uint32_t)ntohl(fhdr->rectime);
-    fhdr->cmnrev = (uint32_t)ntohl(fhdr->cmnrev);
-    fhdr->flags = (uint32_t)ntohl(fhdr->flags);
-    fhdr->protoVers = (uint16_t)ntohs(fhdr->protoVers);
+    fhdr->vers = ntohl(fhdr->vers);
+    fhdr->rectime = ntohl(fhdr->rectime);
+    fhdr->cmnrev = ntohl(fhdr->cmnrev);
+    fhdr->flags = ntohl(fhdr->flags);
+    fhdr->protoVers = ntohs(fhdr->protoVers);
+
+    // This is cbLimits data - we will de-endian it anyway, even for
+    // an older recording version since in those, all of the values
+    // will be 0 anyway.  Later on when we start playback, we will do
+    // the right thing (use this data, or not) depending on the actual
+    // recording protocol version.
+    fhdr->maxplanets = ntohl(fhdr->maxplanets);
+    fhdr->maxships = ntohl(fhdr->maxships);
+    fhdr->maxusers = ntohl(fhdr->maxusers);
+    fhdr->maxhist = ntohl(fhdr->maxhist);
+    fhdr->maxmsgs = ntohl(fhdr->maxmsgs);
+    fhdr->maxtorps = ntohl(fhdr->maxtorps);
 
 #if defined(DEBUG_REC)
     utLog("recReadHeader: vers = %d, rectime = %d, cmnrev = %d\n",
@@ -247,18 +259,25 @@ int recInitOutput(int unum, time_t thetime, int snum, int isserver)
     if (isserver)                 /* this is a server recording */
         fhdr.flags |= RECORD_F_SERVER;
 
-    fhdr.vers = (uint32_t)htonl(RECVERSION);
+    fhdr.vers = htonl(RECVERSION);
 
     fhdr.samplerate = (uint8_t)Context.updsec;
 
-    fhdr.rectime = (uint32_t)htonl((uint32_t)thetime);
+    fhdr.rectime = htonl((uint32_t)thetime);
     utStrncpy((char*)fhdr.user, cbUsers[unum].username, MAXUSERNAME);
 
-    fhdr.cmnrev = (uint32_t)htonl((uint32_t)COMMONSTAMP);
+    fhdr.cmnrev = htonl((uint32_t)COMMONSTAMP);
     fhdr.snum = snum;
-    fhdr.flags = (uint32_t)htonl((uint32_t)fhdr.flags);
-    fhdr.protoVers = (uint32_t)htons((uint16_t)PROTOCOL_VERSION);
+    fhdr.flags = htonl((uint32_t)fhdr.flags);
+    fhdr.protoVers = htons((uint16_t)PROTOCOL_VERSION);
 
+    // cbLimits data
+    fhdr.maxplanets = htonl(cbLimits.maxPlanets());
+    fhdr.maxships = htonl(cbLimits.maxShips());
+    fhdr.maxusers = htonl(cbLimits.maxUsers());
+    fhdr.maxhist = htonl(cbLimits.maxHist());
+    fhdr.maxmsgs = htonl(cbLimits.maxMsgs());
+    fhdr.maxtorps = htonl(cbLimits.maxTorps());
 
     if (!recWriteBuf(&fhdr, sizeof(fileHeader_t)))
         return(false);
@@ -273,7 +292,7 @@ int recInitOutput(int unum, time_t thetime, int snum, int isserver)
 /* note, if we get a write error here, we turn off recording */
 void recWriteEvent(void *data)
 {
-   char *buf = (char *)data;
+    char *buf = (char *)data;
     uint8_t pkttype;
     int len;
 

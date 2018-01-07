@@ -34,12 +34,6 @@ typedef struct {
     uint32_t clientDead;		/* is the client dead/ */
     uint32_t isMaster;		/* is the Maseter server? */
     uint32_t isLoggedIn;		/* is the client logged in? */
-    spHello_t spHelloRaw;        // save the raw packet in case we
-                                 // want to record.  We'll need to
-                                 // save this packet first so the
-                                 // playback client can reconfigure
-                                 // the universe.  We store it here in
-                                 // hello().
     char    remotehost[MAXHOSTNAME]; /* self evident */
 } ServerInfo_t;
 

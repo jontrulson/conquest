@@ -44,11 +44,6 @@ typedef struct {
 #ifdef NOEXTERN_CLIENT
 ClientInfo_t          cInfo;
 spHello_t             sHello;   /* some server info we want to keep */
-spHello_t             sHelloRaw; // save the raw packet in case we
-                                 // want to record.  We'll need to
-                                 // save this packet first so the
-                                 // playback client can reconfigure
-                                 // the universe
 spServerStat_t        sStat;    /* server status info */
 int                   lastServerError = 0; /* set by an ACK from server */
 uint8_t                clientFlags = 0; /* set according to CLIENTSTAT packets */
@@ -64,7 +59,6 @@ spFrame_t             sFrame;
 #else
 extern ClientInfo_t   cInfo;
 extern spHello_t      sHello;   /* some server info we want to keep */
-extern spHello_t      sHelloRaw;
 extern spServerStat_t sStat;    /* server status info */
 extern int            lastServerError;
 extern uint8_t         clientFlags;

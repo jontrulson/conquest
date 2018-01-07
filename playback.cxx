@@ -41,20 +41,22 @@ int pbInitReplay(char *fname, time_t *elapsed)
         return(false);
     }
 
-    /* don't bother mapping for just a count */
-    if (!elapsed)
-        cbMapLocal();
-
     /* now lets read in the file header and check a few things. */
 
     if (!recReadHeader(&recFileHeader))
         return(false);
 
+    // Weather we need to have the old hardcoded limits installed.
+    // Otherwise for newer rec versions, the fileheader will contain
+    // the correct limits.
+    bool needsOldLimits = false; 
+
     /* version check */
     switch (recFileHeader.vers)
     {
-    case RECVERSION: // from rec version 20171108 onward we use the stored
-                     // protocol version
+    case RECVERSION: // from rec version 20171108 onward we use the
+                     // stored protocol version.  Also, we get the
+                     // cbLimits in the file header.
         break;
 
     case RECVERSION_20060409:
@@ -62,6 +64,7 @@ int pbInitReplay(char *fname, time_t *elapsed)
         // have an element at the time to record this in the header,
         // so add it.
         recFileHeader.protoVers = 0x0006;
+        needsOldLimits = true;
         break;
 
     case RECVERSION_20031004:
@@ -79,6 +82,8 @@ int pbInitReplay(char *fname, time_t *elapsed)
 
         if (recFileHeader.snum == 0)     /* it was a server recording */
             recFileHeader.flags |= RECORD_F_SERVER;
+
+        needsOldLimits = true;
     }
     break;
 
@@ -91,6 +96,44 @@ int pbInitReplay(char *fname, time_t *elapsed)
         return false;
     }
     break;
+    }
+
+
+    // Now we need to setup cbLimits, either based on fileheader data
+    // (if it's a new/current version), or the old hardcoded limits if
+    // an old version.  Then we (re)map the common block with the new
+    // limits.
+
+    if (needsOldLimits)
+    {
+        // Need to use the old hardcoded values for MAXSHIPS,
+        // MAXPLANETS, etc...
+        cbLimits.setMaxPlanets(60);
+        cbLimits.setMaxShips(20);
+        cbLimits.setMaxUsers(500);
+        cbLimits.setMaxHist(40);
+        cbLimits.setMaxMsgs(60);
+        cbLimits.setMaxTorps(9);
+    }
+    else
+    {
+        // get the values from the file header
+        cbLimits.setMaxPlanets(recFileHeader.maxplanets);
+        cbLimits.setMaxShips(recFileHeader.maxships);
+        cbLimits.setMaxUsers(recFileHeader.maxusers);
+        cbLimits.setMaxHist(recFileHeader.maxhist);
+        cbLimits.setMaxMsgs(recFileHeader.maxmsgs);
+        cbLimits.setMaxTorps(recFileHeader.maxtorps);
+    }
+
+    // now map the common block (but not if we are only scanning -
+    // elapsed == NULL)
+    if (!elapsed)
+    {
+        if (cbIsMapped())
+            cbUnmapLocal();
+
+        cbMapLocal();
     }
 
     // set the correct client protocol version depending on above checks.

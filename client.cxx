@@ -208,10 +208,6 @@ int clientHello(const char *clientname)
         return false;
     }
 
-    // save a copy of the raw (network) version so we can write it to
-    // the recording file if we do any recording in the future...
-    sHelloRaw = *(spHello_t *)buf;
-
     /* now fix up byte ordering */
     sHello.protover = (uint16_t)ntohs(sHello.protover);
     sHello.cmnrev = (uint32_t)ntohl(sHello.cmnrev);
