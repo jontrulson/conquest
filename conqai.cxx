@@ -135,7 +135,7 @@ static void buildai( int snum, int vars[], int *bnenum, real *bdne, real *bane )
         dam = 0.0;
         for ( i = 0; i < cbLimits.maxShips(); i++ )
             if ( cbShips[i].status != SS_OFF && i != snum )
-                for ( j = 0; j < MAXTORPS; j = j + 1 )
+                for ( j = 0; j < cbLimits.maxTorps(); j = j + 1 )
                     if ( cbShips[i].torps[j].status == TS_LIVE )
                         if ( cbShips[i].torps[j].war[cbShips[snum].team] || cbShips[snum].war[cbShips[i].team] )
                         {
@@ -152,7 +152,7 @@ static void buildai( int snum, int vars[], int *bnenum, real *bdne, real *bane )
 
     /* Number of torps available to fire (1) */
     j = 0;
-    for ( i = 0; i < MAXTORPS; i = i + 1 )
+    for ( i = 0; i < cbLimits.maxTorps(); i = i + 1 )
         if ( cbShips[snum].torps[i].status == TS_OFF )
             j = j + 1;
     AISCALE( vars[VAR_NUMTORPS], j, 1.0 );
@@ -461,7 +461,7 @@ static void executeai( int snum, int token )
         clbEnemyDet( snum );
         break;
     case ROB_MYDETONATE:
-        for ( i = 0; i < MAXTORPS; i = i + 1 )
+        for ( i = 0; i < cbLimits.maxTorps(); i = i + 1 )
             clbDetonate( snum, i );
         break;
     case ROB_UNTRACTOR:

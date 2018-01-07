@@ -288,7 +288,7 @@ void procDetSelf(cpCommand_t *cmd)
     utLog("PROC DETSELF");
 #endif
 
-    for ( j = 0; j < MAXTORPS; j++ )
+    for ( j = 0; j < cbLimits.maxTorps(); j++ )
         clbDetonate( snum, j );
 
     return;

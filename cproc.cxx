@@ -427,7 +427,7 @@ int procTorp(char *buf)
     if (snum < 0 || snum >= cbLimits.maxShips())
         return false;
 
-    if (tnum < 0 || tnum >= MAXTORPS)
+    if (tnum < 0 || tnum >= cbLimits.maxTorps())
         return false;
 
     if (Context.recmode == RECMODE_ON)
@@ -452,7 +452,7 @@ int procTorpLoc(char *buf)
     if (snum < 0 || snum >= cbLimits.maxShips())
         return false;
 
-    if (tnum < 0 || tnum >= MAXTORPS)
+    if (tnum < 0 || tnum >= cbLimits.maxTorps())
         return false;
 
     if (Context.recmode == RECMODE_ON)
@@ -485,7 +485,7 @@ int procTorpEvent(char *buf)
     if (snum < 0 || snum >= cbLimits.maxShips())
         return false;
 
-    if (tnum < 0 || tnum >= MAXTORPS)
+    if (tnum < 0 || tnum >= cbLimits.maxTorps())
         return false;
 
     cbShips[snum].torps[tnum].status = (int)storpev->status;

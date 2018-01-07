@@ -154,7 +154,7 @@ void display( int snum )
                                   (cbShips[snum].war[cbShips[i].team] == false &&
                                    cbShips[i].war[cbShips[snum].team] == false)) )
                 {
-                    for ( j = 0; j < MAXTORPS; j = j + 1 )
+                    for ( j = 0; j < cbLimits.maxTorps(); j = j + 1 )
                         if ( cbShips[i].torps[j].status == TS_LIVE
                              || cbShips[i].torps[j].status == TS_DETONATE )
                             if ( GLcvtcoords( cenx, ceny, cbShips[i].torps[j].x,
@@ -279,7 +279,7 @@ void display( int snum )
     for ( i = 0; i < cbLimits.maxShips(); i++ )
     {
         /* explosions first */
-        for ( j = 0; j < MAXTORPS; j = j + 1 )
+        for ( j = 0; j < cbLimits.maxTorps(); j = j + 1 )
             if ( cbShips[i].torps[j].status == TS_FIREBALL )
             {
                 /* First display exploding torps. */
@@ -293,7 +293,7 @@ void display( int snum )
         if ( ! lsmap )
 	{
             /* Now display the live torps. */
-            for ( j = 0; j < MAXTORPS; j = j + 1 )
+            for ( j = 0; j < cbLimits.maxTorps(); j = j + 1 )
                 if ( cbShips[i].status != SS_DYING && cbShips[i].status != SS_DEAD &&
                      (cbShips[i].torps[j].status == TS_LIVE || cbShips[i].torps[j].status == TS_DETONATE) )
                     if (GLcvtcoords( cenx, ceny, cbShips[i].torps[j].x,

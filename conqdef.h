@@ -112,7 +112,6 @@ typedef enum {
 } courseLock_t;
 
 
-#define MAXTORPS 9 		/* maximum torps per ship */
 /* Values for tstatus() */
 #define TS_OFF 1 		/* ready for use */
 #define TS_LAUNCHING 2 	/* being created */

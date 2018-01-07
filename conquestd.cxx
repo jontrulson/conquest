@@ -798,7 +798,7 @@ void dead( int snum, int leave )
     {
         updateClient(false);
         i = 0;
-        for ( j = 0; j < MAXTORPS; j++ )
+        for ( j = 0; j < cbLimits.maxTorps(); j++ )
             if ( cbShips[snum].torps[j].status == TS_DETONATE )
                 i = i + 1;
         if ( i <= 0 )
@@ -963,7 +963,7 @@ int updateClient(int force)
         if (!sendShip(sInfo.sock, i))
             return false;
 
-        for (j=0; j<MAXTORPS; j++)
+        for (j=0; j<cbLimits.maxTorps(); j++)
             if (!sendTorp(sInfo.sock, i, j))
                 return false;
 

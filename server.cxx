@@ -285,7 +285,7 @@ int sendTorp(int sock, uint8_t tsnum, uint8_t tnum)
     if (tsnum < 0 || tsnum >= cbLimits.maxShips())
         return false;
 
-    if (tnum >= MAXTORPS)
+    if (tnum >= cbLimits.maxTorps())
         return false;
 
 #if defined(DEBUG_SERVERSEND)

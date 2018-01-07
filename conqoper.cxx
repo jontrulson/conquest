@@ -310,7 +310,7 @@ void bigbang(void)
     for ( snum = 0; snum < cbLimits.maxShips(); snum++ )
         if ( cbShips[snum].status == SS_LIVE )
         {
-            for ( i = 0; i < MAXTORPS; i = i + 1 )
+            for ( i = 0; i < cbLimits.maxTorps(); i = i + 1 )
                 if ( ! clbLaunch( snum, dir, 1, LAUNCH_NORMAL ) )
                     break;
                 else
@@ -588,10 +588,16 @@ void debugdisplay( int snum )
         cprintf(lin,dcol,ALIGN_NONE,"#%d#%s",InfoColor, buf);
     }
 
-    lin = (Context.maxlin - (Context.maxlin - MSG_LIN1)) - (MAXTORPS+1);  /* dwp */
+
+    // We need to limit this display to 9 torps, the old hardcoded
+    // limit, on this logic for now since we can't display more than
+    // that anyway.
+    static const int maxDisplayableTorps = 9;
+    lin = (Context.maxlin - (Context.maxlin - MSG_LIN1))
+        - (maxDisplayableTorps+1);  /* dwp */
     cprintf(lin,3,ALIGN_NONE,"#%d#%s",LabelColor,
             "tstatus    tfuse    tmult       tx       ty      tdx      tdy     twar");
-    for ( i = 0; i < MAXTORPS; i = i + 1 )
+    for ( i=0; i<cbLimits.maxTorps() && i<maxDisplayableTorps; i++ )
     {
         lin++;
         switch(cbShips[snum].torps[i].status)

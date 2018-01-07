@@ -457,7 +457,7 @@ void iterdrive( int *ship )
         i = ship[s];
         if ( cbShips[i].status != SS_OFF )
 	{
-            for ( int j=0; j < MAXTORPS; j++ )
+            for ( int j=0; j < cbLimits.maxTorps(); j++ )
 	    {
                 if ( cbShips[i].torps[j].status == TS_DETONATE )
 		{
@@ -772,7 +772,7 @@ void secdrive( int *ship )
         if ( cbShips[i].status != SS_OFF )
 	{
             /* Torpedoes. */
-            for ( j = 0; j < MAXTORPS; j++ )
+            for ( j = 0; j < cbLimits.maxTorps(); j++ )
                 if ( cbShips[i].torps[j].status != TS_OFF )
                 {
                     /* Torpedo fuses. */

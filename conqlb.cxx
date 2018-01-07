@@ -130,7 +130,7 @@ int clbEnemyDet( int snum )
 
     for ( i = 0; i < cbLimits.maxShips(); i++ )
         if ( cbShips[i].status != SS_OFF && i != snum )
-            for ( j = 0; j < MAXTORPS; j = j + 1 )
+            for ( j = 0; j < cbLimits.maxTorps(); j = j + 1 )
                 if ( cbShips[i].torps[j].status == TS_LIVE )
                     if ( cbShips[i].torps[j].war[cbShips[snum].team] || cbShips[snum].war[cbShips[i].team] )
                         if ( dist( cbShips[snum].x, cbShips[snum].y, cbShips[i].torps[j].x, cbShips[i].torps[j].y ) <=
@@ -194,7 +194,7 @@ void clbIKill(int snum, killedBy_t kb, uint16_t detail)
 
     /* Detonate all torpedos. */
 
-    for ( i = 0; i < MAXTORPS; i++ )
+    for ( i = 0; i < cbLimits.maxTorps(); i++ )
         if ( cbShips[snum].torps[i].status == TS_LIVE )
             cbShips[snum].torps[i].status = TS_DETONATE;
 
@@ -442,7 +442,7 @@ int clbCheckLaunch(int snum, int number)
     if (number == 0)
         return true;
 
-    for ( i = 0; i < MAXTORPS; i++ )
+    for ( i = 0; i < cbLimits.maxTorps(); i++ )
         if ( cbShips[snum].torps[i].status == TS_OFF )
             return true;
 
@@ -458,7 +458,7 @@ int clbLaunch( int snum, real dir, int number, int ltype )
     int i, j;
     real speed = 0.0, adir = 0.0;
     int tnum, numslots, numfired;
-    static int tslot[MAXTORPS];
+    int tslot[cbLimits.maxTorps()];
 
     /* Stop repairing. */
     SFCLR(snum, SHIP_F_REPAIR);
@@ -475,7 +475,7 @@ int clbLaunch( int snum, real dir, int number, int ltype )
 
     /* Find free torp(s). */
     cbLock(&cbConqInfo->lockword);
-    for ( i = 0; i < MAXTORPS && tnum != 0; i++ )
+    for ( i = 0; i < cbLimits.maxTorps() && tnum != 0; i++ )
         if ( cbShips[snum].torps[i].status == TS_OFF )
         {
             /* Found one. */
@@ -1963,7 +1963,7 @@ void clbInitShip( int snum, int unum )
     /* cbShips[snum].alias                  # setup in menu() or newrob() */
 
     /* Zero torpedos. */
-    for ( i = 0; i < MAXTORPS; i++ )
+    for ( i = 0; i < cbLimits.maxTorps(); i++ )
     {
         cbShips[snum].torps[i].status = TS_OFF;
         cbShips[snum].torps[i].fuse = 0;
@@ -2699,7 +2699,7 @@ void clbZeroShip( int snum )
     cbShips[snum].flags = SHIP_F_NONE;
     SFSET(snum, SHIP_F_SHUP);
 
-    for ( i = 0; i < MAXTORPS; i++ )
+    for ( i = 0; i < cbLimits.maxTorps(); i++ )
     {
         cbShips[snum].torps[i].status = TS_OFF;
         cbShips[snum].torps[i].fuse = 0;
@@ -2835,7 +2835,7 @@ void clbTorpDrive(real itersec)
         i = ship[s];
         if ( cbShips[i].status != SS_OFF )
 	{
-            for ( j = 0; j < MAXTORPS; j = j + 1 )
+            for ( j = 0; j < cbLimits.maxTorps(); j = j + 1 )
 	    {
                 if ( cbShips[i].torps[j].status == TS_LIVE )
 		{

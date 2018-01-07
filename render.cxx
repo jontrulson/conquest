@@ -46,6 +46,8 @@ cqsHandle alertHandle = CQS_INVHANDLE;
 /* we store geometry here that should only need to be recomputed
    when the screen is resized, not every single frame :) */
 
+// the number of torp pips we can display.
+#define NUM_TORP_PIPS            9
 
 static struct {
     GLfloat x, y;                 /* stored x/y/w/h of game window */
@@ -105,7 +107,7 @@ static struct {
     GLRect_t d1icon_fa;           /* the ship icon firing angle indicator */
     GLRect_t d1icon_tad;          /* last target, angle, dist indicator */
     GLRect_t d1torps;             /* location of the torp pip area */
-    GLRect_t d1torppips[MAXTORPS]; /* the torp pips */
+    GLRect_t d1torppips[NUM_TORP_PIPS]; /* the torp pips */
     GLRect_t d1phcharge;          /* phaser charge status */
     GLRect_t d1atarg;             /* ship causing alert */
 
@@ -385,13 +387,13 @@ void updateIconHudGeo(int snum)
 
     /* torp pips */
     MAPAREA(&decal1_sz, d1torps, &o.d1torps);
-    for (i=0; i < MAXTORPS; i++)
+    for (i=0; i < NUM_TORP_PIPS; i++)
     {
         o.d1torppips[i].x = o.d1torps.x;
         o.d1torppips[i].y = o.d1torps.y +
-            (o.d1torps.h / (real)MAXTORPS * (real)i);
+            (o.d1torps.h / (real)NUM_TORP_PIPS * (real)i);
         o.d1torppips[i].w = o.d1torps.w;
-        o.d1torppips[i].h = o.d1torps.h / (real)MAXTORPS;
+        o.d1torppips[i].h = o.d1torps.h / (real)NUM_TORP_PIPS;
     }
 
     /* phaser recharge status */
@@ -589,8 +591,9 @@ static void renderPulseMsgs(void)
     static animStateRec_t shcrit = {};
     static animStateRec_t hullcrit = {};
     static bool firsttime = true;
-    static const int testlamps = 0; /* set to non-zero to see them all
-                                       at once (for testing) */
+    static const bool testlamps = false; // set to non-zero to see
+                                         // them all at once (for
+                                         // testing)
     scrNode_t *curnode = getTopNode();
     int drawing = false;
 
@@ -1295,7 +1298,7 @@ void renderHud(bool dostats)
         glBindTexture(GL_TEXTURE_2D,
                       GLTEX_ID(GLShips[steam][stype].ico_torp));
 
-        for (i=0; i < MAXTORPS; i++)
+        for (i=0; i < cbLimits.maxTorps(); i++)
         {
             switch (cbShips[snum].torps[i].status)
             {
@@ -1310,12 +1313,16 @@ void renderHud(bool dostats)
                 break;
             }
 
-            drawTexQuad(o.d1torppips[i].x,
-                        o.d1torppips[i].y,
-                        0.0,
-                        o.d1torppips[i].w,
-                        o.d1torppips[i].h,
-                        true, false);
+            // If we ever allow more than 9 torps per ships, then this
+            // logic should be changed to do something sensible. For
+            // now we will only care about the first 9 torps.
+            if (i < NUM_TORP_PIPS)
+                drawTexQuad(o.d1torppips[i].x,
+                            o.d1torppips[i].y,
+                            0.0,
+                            o.d1torppips[i].w,
+                            o.d1torppips[i].h,
+                            true, false);
         }
     }
 

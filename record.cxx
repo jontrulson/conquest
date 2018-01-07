@@ -473,7 +473,7 @@ void recGenTorpLoc(void)
     {
         if ( cbShips[i].status != SS_OFF )
         {
-            for ( j = 0; j < MAXTORPS; j++ )
+            for ( j = 0; j < cbLimits.maxTorps(); j++ )
             {
                 if ( cbShips[i].torps[j].status == TS_LIVE )
                 {

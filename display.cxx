@@ -419,7 +419,7 @@ void display( int snum )
                     else
                         uiPutColor(YellowLevelColor);
 
-                    for ( j = 0; j < MAXTORPS; j = j + 1 )
+                    for ( j = 0; j < cbLimits.maxTorps(); j = j + 1 )
                         if ( cbShips[i].torps[j].status == TS_LIVE
                              || cbShips[i].torps[j].status == TS_DETONATE )
                             if ( clbCVTCoords( cenx, ceny, cbShips[i].torps[j].x, cbShips[i].torps[j].y,
@@ -432,7 +432,7 @@ void display( int snum )
             if ( ! lsmap )
             {
                 /* First display exploding torps. */
-                for ( j = 0; j < MAXTORPS; j = j + 1 )
+                for ( j = 0; j < cbLimits.maxTorps(); j = j + 1 )
                     if ( cbShips[i].torps[j].status == TS_FIREBALL )
                         if ( clbCVTCoords( cenx, ceny, cbShips[i].torps[j].x, cbShips[i].torps[j].y,
                                            scale, &lin, &col) )
@@ -461,7 +461,7 @@ void display( int snum )
                 else		/* a special */
                     uiPutColor(YellowLevelColor);
 
-                for ( j = 0; j < MAXTORPS; j = j + 1 )
+                for ( j = 0; j < cbLimits.maxTorps(); j = j + 1 )
                     if ( cbShips[i].status != SS_DYING && cbShips[i].status != SS_DEAD &&
                          (cbShips[i].torps[j].status == TS_LIVE || cbShips[i].torps[j].status == TS_DETONATE) )
                         if ( clbCVTCoords( cenx, ceny, cbShips[i].torps[j].x, cbShips[i].torps[j].y,
