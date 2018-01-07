@@ -317,6 +317,23 @@ int proc_0006_Planet(char *buf)
 
     utStrncpy(cbPlanets[pnum].name, (char *)splan->name, 12 /*MAXPLANETNAME*/);
 
+    // this protocol never sent planet size, so we will need to init
+    // the size to the defaults of the time.  This may result in some
+    // small/large planets depending on hte textures, but oh well...
+
+    switch(cbPlanets[pnum].type)
+        {
+        case PLANET_SUN:
+          cbPlanets[pnum].size = 1500.0;
+          break;
+        case PLANET_MOON:
+          cbPlanets[pnum].size = 160.0;
+          break;
+        default:
+          cbPlanets[pnum].size = 300.0;
+          break;
+        }
+
     uiUpdatePlanet(pnum);
 
     return true;
