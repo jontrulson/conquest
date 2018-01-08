@@ -6,6 +6,9 @@
  * Copyright Jon Trulson under the MIT License. (See LICENSE).
  ***********************************************************************/
 
+#include <string>
+#include <vector>
+#include <algorithm>
 
 #include "conqdef.h"
 #include "cb.h"
@@ -44,6 +47,8 @@
 #include "hud.h"
 
 #include "playback.h"
+
+using namespace std;
 
 void catchSignals(void);
 void handleSignal(int sig);
@@ -134,22 +139,11 @@ static void parseGeometry(char *geom)
     return;
 }
 
-static int _cmpfile(void *cmp1, void *cmp2)
-{
-    char *str1 = *(char **)cmp1;
-    char *str2 = *(char **)cmp2;
-    return(strcmp(str1, str2));
-}
-
 static void _loadRCFiles(int type, const char *cqdir, const char *suffix)
 {
-    char filenm[PATH_MAX];
     DIR *dirp;
     struct dirent *direntp;
-    char **filelist = NULL;
-    char **tmplist = NULL;
-    int numfiles = 0;
-    int i;
+    vector<string> filelist;
 
     if (!cqdir || !suffix)
         return;
@@ -158,8 +152,7 @@ static void _loadRCFiles(int type, const char *cqdir, const char *suffix)
     if ((dirp = opendir(cqdir)))
     {
         while ((direntp = readdir(dirp)) != NULL)
-        {                       /* here, we will just check out the .trc
-                                   files */
+        {
             int len;
             int suff_len = strlen(suffix);
 
@@ -173,61 +166,27 @@ static void _loadRCFiles(int type, const char *cqdir, const char *suffix)
 
             if (!strncmp(&(direntp->d_name[len - suff_len]), suffix, suff_len))
             {                   /* found one */
-                char *ptr;
-
-                snprintf(filenm, PATH_MAX, "%s/%s", cqdir, direntp->d_name);
-
-                if (!(ptr = strdup(filenm)))
-                {
-                    utLog("%s: Could not strdup %s, ignoring.",
-                          __FUNCTION__,
-                          filenm);
-
-                }
-
-                /* add it to the list */
-
-                tmplist = (char **)realloc((void *)filelist,
-                                           sizeof(char *) *
-                                           (numfiles + 1));
-
-                if (!tmplist)
-                {
-                    utLog("%s: Could not realloc %d files, ignoring '%s'",
-                          __FUNCTION__,
-                          numfiles + 1,
-                          filenm);
-                    if (ptr)
-                        free(ptr);
-
-                    continue;
-                }
-
-                filelist = tmplist;
-                filelist[numfiles] = ptr;
-                numfiles++;
+                string filenm = cqdir + string("/") + direntp->d_name;
+                filelist.push_back(filenm);
             }
         }
 
-        /* now sort it */
-        if (!numfiles)
+        // nothing to do
+        if (filelist.empty())
             return;
 
-        qsort(filelist, numfiles, sizeof(char *),
-              (int (*)(const void *, const void *))_cmpfile);
+        // now sort it
+        sort(filelist.begin(), filelist.end());
 
-        /* print them out for testing */
-        for(i=0; i <numfiles; i++)
+        /* load them up */
+        for (string filename : filelist)
         {
-            if (cqiLoadRC(type, filelist[i], 1, 0))
+            if (cqiLoadRC(type, filename.c_str(), 1, 0))
             {
                 utLog("%s: cqiLoadRC(%s) failed, ignoring.",
-                      __FUNCTION__, filelist[i]);
+                      __FUNCTION__, filename.c_str());
             }
-            free(filelist[i]);
         }
-        free(filelist);
-        filelist = NULL;
     }
 
     return;
