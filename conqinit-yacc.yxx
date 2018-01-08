@@ -1060,7 +1060,7 @@ static int cqiValidatePlanets(void)
 }
 
 /* parse a file */
-bool cqiLoadRC(int rcid, char *filename, int verbosity, int debugl)
+bool cqiLoadRC(int rcid, const char *filename, int verbosity, int debugl)
 {
     FILE *infile;
     extern FILE *yyin;
