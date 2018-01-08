@@ -22,6 +22,8 @@
 #define S_GREETINGS    1        /* GREETINGS - new user */
 #define S_ERROR        2        /* some problem */
 
+#define vowel(x) ( (x=='A' || x=='E' || x=='I' || x=='O' || x=='U' ) ? true: false)
+
 static int state;
 
 static bool fatal = false;
@@ -33,7 +35,7 @@ static const char *sorry1="I'm sorry, but the game is closed for repairs right n
 static const char *sorry2="I'm sorry, but there is no room for a new player right now.";
 static const char *sorryn="Please try again some other time.  Thank you.";
 static const char *selected_str="You have been selected to command a";
-static const char *starship_str=" starship.";
+static const char *starship_str="starship.";
 static const char *prepare_str="Prepare to be beamed aboard...";
 
 
@@ -192,14 +194,11 @@ static int nWelcomeDisplay(dspConfig_t *dsp)
             team = cbShips[Context.snum].team;
             gretds();                 /* 'GREETINGS' */
 
-            if ( vowel( cbTeams[team].name[0] ) )
-                cprintf(MSG_LIN2/2,0,ALIGN_CENTER,"#%d#%s%c #%d#%s #%d#%s",
-                        InfoColor,selected_str,'n',CQC_A_BOLD,cbTeams[team].name,
-                        InfoColor,starship_str);
-            else
-                cprintf(MSG_LIN2/2,0,ALIGN_CENTER,"#%d#%s #%d#%s #%d#%s",
-                        InfoColor,selected_str,CQC_A_BOLD,cbTeams[team].name,
-                        InfoColor,starship_str);
+            cprintf(MSG_LIN2/2,0,ALIGN_CENTER,"#%d#%s%s #%d#%s #%d#%s",
+                    InfoColor,selected_str,
+                    vowel(cbTeams[team].name[0]) ? "n" : "",
+                    CQC_A_BOLD, cbTeams[team].name,
+                    InfoColor, starship_str);
 
             cprintf(MSG_LIN2/2+1,0,ALIGN_CENTER,"#%d#%s",
                     InfoColor, prepare_str );

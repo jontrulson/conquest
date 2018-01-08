@@ -512,6 +512,8 @@ int main(int argc, char *argv[])
 #endif
     }
 
+    rndini();		/* initialize random numbers (again) */
+
     conqinit();                 /* basic client Context initialization */
     Context.recmode = RECMODE_OFF; /* always */
 

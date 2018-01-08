@@ -442,7 +442,6 @@ typedef enum {
 
 /* fast distance */
 #define distf(w,x,y,z) (real)(fabs((real)(y)-(real)(w)) + fabs((real)(z)-(real)(x)))
-#define vowel(x) (x=='a' || x=='e' || x=='i' || x=='o' || x=='u' )
 #define satwar(x,y) (cbShips[x].war[cbShips[y].team] || cbShips[y].war[cbShips[x].team])
 #define selfwar(x) cbShips[x].war[cbShips[x].team]
 #define maxwarp(x) (real)min(cbShipTypes[cbShips[x].shiptype].warplim,      \
