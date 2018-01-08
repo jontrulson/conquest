@@ -12,21 +12,21 @@ CONQGROUP = @CONQGROUP@
 CONQLOCALSTATEDIR = @localstatedir@/conquest
 CONQLIBEXECDIR = @libexecdir@
 CONQDATADIR = @datadir@
-CONQSYSCONFDIR = @sysconfdir@
-CONQIMGDIR = $(CONQDATADIR)/img
-CONQSNDDIR = $(CONQDATADIR)/sound
+CONQSYSCONFDIR = @sysconfdir@/conquest
+CONQIMGDIR = $(CONQDATADIR)/conquest/img
+CONQSNDDIR = $(CONQDATADIR)/conquest/sound
 CONQDOCDIR = $(CONQDATADIR)/doc/conquest
 
 TEXTURESRC = $(DESTDIR)$(CONQSYSCONFDIR)/texturesrc
 CONQINITRC = $(DESTDIR)$(CONQSYSCONFDIR)/conqinitrc
 SOUNDRC    = $(DESTDIR)$(CONQSYSCONFDIR)/soundrc
+# extra texture defs for the planets
+PLANTEXTRC = $(DESTDIR)$(CONQSYSCONFDIR)/00_plantex.trc
 
 CONQDOCS = HISTORY README CONQINIT.TXT conqrule conqrule.easy
 
 IMAGES = img/*.png img/*.txf
 SOUNDS = sound/*.ogg
-TRC = *.trc
-SRC = *.src
 
 TCPW_H = tcpwrap.h
 TCPW_C = tcpwrap.cxx
@@ -48,7 +48,7 @@ endif !ISMINGW
 
 AM_CPPFLAGS = -DCONQUEST_GROUP=\"$(CONQGROUP)\" \
 	-DCONQSTATE=\"$(CONQLOCALSTATEDIR)\" -DCONQLIBEXEC=\"$(CONQLIBEXECDIR)\" \
-	-DCONQSHARE=\"$(CONQDATADIR)\" -DCONQETC=\"$(CONQSYSCONFDIR)\" \
+	-DCONQSHARE=\"$(CONQDATADIR)/conquest\" -DCONQETC=\"$(CONQSYSCONFDIR)\" \
 	-DCONQDOCDIR=\"$(CONQDATADIR)\" \
 	@X_CFLAGS@
 
@@ -178,10 +178,6 @@ conqmetad_SOURCES = conqmetad.cxx meta.h $(TCPW_H)
 conqmetad_LDADD = libconquest.la libconqinit.la $(LEXLIB) $(YACCLIB)
 endif
 
-# we install conqinitrc in the intall-exec-hook, so that we only install
-#  conqinitrc if it does not already exist.
-sysconf_DATA = texturesrc soundrc $(TRC) #$(SRC)
-
 EXTRA_DIST = $(man6_MANS)
 
 install-exec-hook:
@@ -191,12 +187,13 @@ install-exec-hook:
 		$(DESTDIR)$(CONQDATADIR) \
 		$(DESTDIR)$(CONQDATADIR)/doc \
 		$(DESTDIR)$(CONQDATADIR)/doc/conquest \
+		$(DESTDIR)$(CONQDATADIR)/conquest \
 		$(DESTDIR)$(CONQIMGDIR) \
 		$(DESTDIR)$(CONQSNDDIR) \
 		$(DESTDIR)$(bindir) \
 		$(DESTDIR)$(libexecdir) \
-		$(DESTDIR)/$(mandir) \
-		$(DESTDIR)/$(mandir)/man6
+		$(DESTDIR)$(mandir) \
+		$(DESTDIR)$(mandir)/man6
 	chmod 775 $(DESTDIR)$(CONQLOCALSTATEDIR)
 	chgrp $(CONQGROUP) $(DESTDIR)$(CONQLOCALSTATEDIR)
 	cp -f $(IMAGES) $(DESTDIR)$(CONQIMGDIR)/
@@ -205,10 +202,12 @@ install-exec-hook:
 	chmod 644 $(DESTDIR)$(CONQSNDDIR)/*.ogg
 	cp -f $(CONQDOCS) $(DESTDIR)$(CONQDOCDIR)/
 	chmod 644 $(DESTDIR)$(CONQDOCDIR)/*
-	cp conqinitrc $(DESTDIR)$(CONQSYSCONFDIR)/conqinitrc; \
-	chmod 644 $(DESTDIR)$(CONQSYSCONFDIR)/conqinitrc
-	chgrp $(CONQGROUP) $(TEXTURESRC) $(CONQINITRC) $(SOUNDRC)
-	chmod 664 $(TEXTURESRC) $(CONQINITRC) $(SOUNDRC)
+	cp conqinitrc $(CONQINITRC);
+	cp texturesrc $(TEXTURESRC);
+	cp soundrc $(SOUNDRC);
+	cp 00_plantex.trc $(PLANTEXTRC);
+	chgrp $(CONQGROUP) $(TEXTURESRC) $(CONQINITRC) $(SOUNDRC) $(PLANTEXTRC)
+	chmod 664 $(TEXTURESRC) $(CONQINITRC) $(SOUNDRC) $(PLANTEXTRC)
 	chgrp $(CONQGROUP) $(DESTDIR)$(bindir)/conqoper$(EXEEXT) \
 		$(DESTDIR)$(libexecdir)/conqdriv$(EXEEXT) \
 		$(DESTDIR)$(bindir)/conquestd$(EXEEXT)
@@ -216,5 +215,4 @@ install-exec-hook:
 		$(DESTDIR)$(libexecdir)/conqdriv$(EXEEXT) \
 		$(DESTDIR)$(bindir)/conquestd$(EXEEXT)
 	-$(bindir)/conqoper$(EXEEXT) -C
-	chmod 775 $(DESTDIR)$(CONQLOCALSTATEDIR)
 	-chown root:$(CONQGROUP) $(DESTDIR)$(CONQLOCALSTATEDIR)

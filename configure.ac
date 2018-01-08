@@ -1,7 +1,6 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl Jon Trulson 9/21/96 - with some borrowed code from various sources...;-)
 dnl
-dnl $Id$
 dnl
 
 AC_INIT([conquest],[8],[jon@radscan.com])
@@ -230,7 +229,7 @@ AC_FUNC_SETPGRP
 fi
 
 
-dnl see if we should check for SLD and friends
+dnl see if we should check for SDL and friends
 if test -n "$SNDCLIENT"
 then
 
@@ -259,9 +258,9 @@ AC_OUTPUT
 echo
 if ! test -n "$GLCLIENT"
 then
-        echo "### OpenGL support is disabled"
+        echo "### OpenGL support is disabled, the client will NOT be built"
 else
-        echo "### OpenGL support is enabled"
+        echo "### OpenGL support is enabled, will build the client"
 fi
 
 if ! test -n "$SNDCLIENT"
