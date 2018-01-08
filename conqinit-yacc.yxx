@@ -18,23 +18,6 @@
 #include "conqutil.h"
 #include "rndlb.h"
 
-/* The default initdata */
-#if 1
-#include "initdata.h"
-#include "sounddata.h"
-#else
-#warning "Enable this for debugging only! It will core if you use it in anything other than conqinit!"
-  cqiGlobalInitRec_t    defaultGlobalInit = {};
-  cqiShiptypeInitPtr_t  defaultShiptypes = NULL;
-  cqiPlanetInitPtr_t    defaultPlanets = NULL;
-
-  cqiSoundConfRec_t     defaultSoundConf = {};
-  cqiSoundPtr_t         defaultSoundEffects = NULL;
-  int                   defaultNumSoundEffects = 0;
-  cqiSoundPtr_t         defaultSoundMusic = NULL;
-  int                   defaultNumSoundMusic = 0;
-#endif
-
 static int cqiVerbose = 0;
 int cqiDebugl = 0;
 
@@ -112,9 +95,11 @@ static void initrun(int rcid);
 static void checkStr(char *str);
 static int parsebool(char *str);
 
+extern int yylineno;
 void yyerror (char const *s)
 {
-    fprintf (stderr, "%s\n", s);
+    fprintf (stderr, "%s: ERROR: %s at or about line %d\n",
+             __FUNCTION__, s, yylineno);
 }
 
 %}
@@ -998,7 +983,6 @@ static int cqiValidatePlanets(void)
             _cqiPlanets[i].core = false;
             _cqiPlanets[i].xcoord = 0.0;
             _cqiPlanets[i].ycoord = 0.0;
-            /* leave texname blank so default rules will fire if neccessary */
         }
 
         if (cqiVerbose)
@@ -1076,11 +1060,10 @@ static int cqiValidatePlanets(void)
 }
 
 /* parse a file */
-int cqiLoadRC(int rcid, char *filename, int verbosity, int debugl)
+bool cqiLoadRC(int rcid, char *filename, int verbosity, int debugl)
 {
     FILE *infile;
     extern FILE *yyin;
-    int fail = false;
     char buffer[PATH_MAX];
 
     cqiDebugl = debugl;
@@ -1113,7 +1096,7 @@ int cqiLoadRC(int rcid, char *filename, int verbosity, int debugl)
         break;
     default:                    /* programmer error */
         utLog("%s: invalid rcid %d, bailing.", __FUNCTION__, rcid);
-        return false;
+        return true;
         break;
     }
 
@@ -1125,31 +1108,34 @@ int cqiLoadRC(int rcid, char *filename, int verbosity, int debugl)
               buffer,
               strerror(errno));
 
-        /* a failed CQI_FILE_TEXTURESRC_ADD is no big deal,
-           CQI_FILE_TEXTURESRC/CONQINITRC is another story however... */
+        // a failed CQI_FILE_TEXTURESRC/SOUNDRC_ADD is no big deal,
+        // but a missing CQI_FILE_TEXTURESRC, CQI_FILE_SOUNDRC, and of
+        // course CQI_FILE_CONQINITRC, is another story however...
 
         utLog("%s: using default init tables.", __FUNCTION__);
         switch(rcid)
         {
+        case CQI_FILE_CONQINITRC:
+        {
+            utLog("%s: FATAL: no global/planet definitions.", __FUNCTION__);
+            return true;
+        }
         case CQI_FILE_TEXTURESRC:
         {
-            utLog("%s: FATAL: no textures.", __FUNCTION__);
-            return false;
+            utLog("%s: FATAL: no texture definitions.", __FUNCTION__);
+            return true;
         }
         break;
 
         case CQI_FILE_SOUNDRC:
         {
-            cqiSoundConf = &defaultSoundConf;
-            cqiSoundEffects  = defaultSoundEffects;
-            cqiNumSoundEffects = defaultNumSoundEffects;
-            cqiSoundMusic = defaultSoundMusic;
-            cqiNumSoundMusic = defaultNumSoundMusic;
+            utLog("%s: FATAL: no sound definitions.", __FUNCTION__);
+            return true;
         }
         break;
         }
 
-        return false;
+        return true;
     }
 
     initrun(rcid);
@@ -1157,10 +1143,11 @@ int cqiLoadRC(int rcid, char *filename, int verbosity, int debugl)
     yyin = infile;
 
     goterror = false;
+    bool fail = false;
     lineNum = 0;
-    if ( yyparse() == ERR || goterror )
+    if ( yyparse() || goterror )
     {
-        utLog("conqinit: parse error." );
+        utLog("%s: parse error.", __FUNCTION__);
         fail = true;
     }
 
@@ -1172,8 +1159,8 @@ int cqiLoadRC(int rcid, char *filename, int verbosity, int debugl)
     {
         if (fail && rcid == CQI_FILE_TEXTURESRC)
         {
-            utLog("%s: FATAL: no textures.", __FUNCTION__);
-            return false;
+            utLog("%s: FATAL: parse error, no textures.", __FUNCTION__);
+            return true;
         }
 
         cqiTextures = _cqiTextures;
@@ -1187,7 +1174,7 @@ int cqiLoadRC(int rcid, char *filename, int verbosity, int debugl)
         if (!cqiValidateAnimations())
         {
             utLog("%s: FATAL: no animations.", __FUNCTION__);
-            return false;
+            return true;
         }
 
         if (cqiVerbose)
@@ -1203,7 +1190,7 @@ int cqiLoadRC(int rcid, char *filename, int verbosity, int debugl)
         cqiAnimDefs = _cqiAnimDefs;
         cqiNumAnimDefs = numAnimDefs;
 
-        return true;
+        return false;
     }
 
     /* sounds */
@@ -1211,14 +1198,9 @@ int cqiLoadRC(int rcid, char *filename, int verbosity, int debugl)
     {
         if (fail && rcid == CQI_FILE_SOUNDRC)
         {
-            utLog("%s: using default sound data.", __FUNCTION__);
-            cqiSoundConf = &defaultSoundConf;
-            cqiSoundEffects  = defaultSoundEffects;
-            cqiNumSoundEffects = defaultNumSoundEffects;
-            cqiSoundMusic = defaultSoundMusic;
-            cqiNumSoundMusic = defaultNumSoundMusic;
+            utLog("%s: FATAL: parse error, no sound data.", __FUNCTION__);
 
-            return false;
+            return true;
         }
 
         utLog("%s: loaded %d Music definitions.",
@@ -1231,9 +1213,15 @@ int cqiLoadRC(int rcid, char *filename, int verbosity, int debugl)
         cqiSoundMusic = _cqiSoundMusic;
         cqiNumSoundMusic = numSoundMusic;
 
-        return true;
+        return false;
     }
 
+    if (fail && rcid == CQI_FILE_CONQINITRC)
+    {
+        utLog("%s: FATAL: parse error, no global/planet data.",
+              __FUNCTION__);
+        return true;
+    }
 
     if (!fail && !cqiValidatePlanets())
     {
@@ -1247,35 +1235,28 @@ int cqiLoadRC(int rcid, char *filename, int verbosity, int debugl)
         cqiGlobal    = _cqiGlobal;
         cqiShiptypes = _cqiShiptypes;
         cqiPlanets   = _cqiPlanets;
-    }
-    else
-    {                           /* use the defaults */
-        utLog("%s: using default init tables.", __FUNCTION__);
-        cqiGlobal    = &defaultGlobalInit;
-        cqiShiptypes = defaultShiptypes;
-        cqiPlanets   = defaultPlanets;
-    }
 
-    // If we were reading the conqinitrc file, update the limits here
-    // regardless of failure
-    if (rcid == CQI_FILE_CONQINITRC)
-    {
-        cbLimits.setMaxPlanets(cqiGlobal->maxplanets);
-        cbLimits.setMaxShips(cqiGlobal->maxships);
-        cbLimits.setMaxUsers(cqiGlobal->maxusers);
-        cbLimits.setMaxHist(cqiGlobal->maxhist);
-        cbLimits.setMaxMsgs(cqiGlobal->maxmsgs);
+        // update the cbLimits here
+        if (!fail && rcid == CQI_FILE_CONQINITRC)
+        {
+            cbLimits.setMaxPlanets(cqiGlobal->maxplanets);
+            cbLimits.setMaxShips(cqiGlobal->maxships);
+            cbLimits.setMaxUsers(cqiGlobal->maxusers);
+            cbLimits.setMaxHist(cqiGlobal->maxhist);
+            cbLimits.setMaxMsgs(cqiGlobal->maxmsgs);
 
-        utLog("%s: cbLimits: planets: %d ships: %d users: %d hist: %d msgs: %d",
-              __FUNCTION__,
-              cbLimits.maxPlanets(),
-              cbLimits.maxShips(),
-              cbLimits.maxUsers(),
-              cbLimits.maxHist(),
-              cbLimits.maxMsgs());
+            utLog("%s: cbLimits: planets: %u, ships: %u, users: %u, "
+                  "hist: %u, msgs: %u",
+                  __FUNCTION__,
+                  cbLimits.maxPlanets(),
+                  cbLimits.maxShips(),
+                  cbLimits.maxUsers(),
+                  cbLimits.maxHist(),
+                  cbLimits.maxMsgs());
+        }
     }
 
-    return (fail) ? false: true;
+    return fail;
 }
 
 static const char *ptype2str(int ptype)
@@ -1412,183 +1393,6 @@ static int str2team(char *str)
 
     return TEAM_NOTEAM;           /* default */
 }
-
-/* Dump the parsed soundrc to stdout in sounddata.h format */
-/* this includes soundconf, effects, and music */
-void dumpSoundDataHdr(void)
-{
-    char buf[BUFFER_SIZE_128];
-    int i;
-
-
-    if (!cqiSoundConf || !cqiNumSoundEffects)
-        return;
-
-    /* preamble */
-    utFormatTime( buf, 0 );
-    printf("/* Generated by conqinit on %s */\n", buf);
-    printf("\n\n");
-
-    printf("#ifndef _SOUNDDATA_H\n");
-    printf("#define _SOUNDDATA_H\n\n");
-
-
-    printf("static cqiSoundConfRec_t defaultSoundConf = {\n");
-    printf("  %d,\n", cqiSoundConf->samplerate);
-    printf("  %d,\n", cqiSoundConf->stereo);
-    printf("  %d,\n", cqiSoundConf->fxchannels);
-    printf("  %d\n", cqiSoundConf->chunksize);
-    printf("};\n\n");
-
-
-    printf("static int defaultNumSoundMusic = %d;\n\n", cqiNumSoundMusic);
-
-    /* if there is no music built in... */
-    if (!cqiNumSoundMusic)
-    {
-        printf("static cqiSoundRec_t *defaultSoundMusic = NULL;\n");
-        printf("\n\n");
-    }
-    else
-    {
-        printf("static cqiSoundRec_t defaultSoundMusic[%d] = {\n",
-               cqiNumSoundMusic);
-
-        /* music */
-        for (i=0; i<cqiNumSoundMusic; i++)
-            printf(" { \"%s\", \"%s\", %d, %d, %d, %d, %d, %d, %d, %d },\n",
-                   cqiSoundMusic[i].name,
-                   cqiSoundMusic[i].filename,
-                   cqiSoundMusic[i].volume,
-                   cqiSoundMusic[i].pan,
-                   cqiSoundMusic[i].fadeinms,
-                   cqiSoundMusic[i].fadeoutms,
-                   cqiSoundMusic[i].loops,
-                   cqiSoundMusic[i].limit,
-                   cqiSoundMusic[i].framelimit,
-                   cqiSoundMusic[i].delayms);
-
-        printf("};\n\n");
-    }
-
-    /* effect */
-    printf("static int defaultNumSoundEffects = %d;\n\n", cqiNumSoundEffects);
-    printf("static cqiSoundRec_t defaultSoundEffects[%d] = {\n",
-           cqiNumSoundEffects);
-
-    for (i=0; i<cqiNumSoundEffects; i++)
-        printf(" { \"%s\", \"%s\", %d, %d, %d, %d, %d, %d, %d, %d },\n",
-               cqiSoundEffects[i].name,
-               cqiSoundEffects[i].filename,
-               cqiSoundEffects[i].volume,
-               cqiSoundEffects[i].pan,
-               cqiSoundEffects[i].fadeinms,
-               cqiSoundEffects[i].fadeoutms,
-               cqiSoundEffects[i].loops,
-               cqiSoundEffects[i].limit,
-               cqiSoundEffects[i].framelimit,
-               cqiSoundEffects[i].delayms);
-
-    printf("};\n\n");
-
-    printf("#endif /* _SOUNDDATA_H */\n\n");
-
-
-    return;
-}
-
-
-/* Dump the parsed initdata to stdout in initdata.h format */
-void dumpInitDataHdr(void)
-{
-    char buf[BUFFER_SIZE_128];
-    int i;
-
-    /* preamble */
-    utFormatTime( buf, 0 );
-    printf("/* Generated by conqinit on %s */\n", buf);
-    printf("\n\n");
-
-    printf("#ifndef _INITDATA_H\n");
-    printf("#define _INITDATA_H\n\n");
-
-    /* FIXME, need to use dynamics when ready */
-    /* globals always first! */
-
-    printf("static cqiGlobalInitRec_t defaultGlobalInit = {\n");
-    printf("\t %d,\n", cqiGlobal->maxplanets);
-    printf("\t %d,\n", cqiGlobal->maxships);
-    printf("\t %d,\n", cqiGlobal->maxusers);
-    printf("\t %d,\n", cqiGlobal->maxhist);
-    printf("\t %d,\n", cqiGlobal->maxmsgs);
-    printf("\t %d,\n", cqiGlobal->maxtorps);
-    printf("\t %d\n", cqiGlobal->maxshiptypes);
-    printf("};\n\n");
-
-    /* shiptypes */
-
-    printf("/* The shiptype sections are currently ignored. */\n");
-
-    printf("static cqiShiptypeInitRec_t defaultShiptypes[%d] = {\n",
-           cqiGlobal->maxshiptypes);
-    for (i=0; i < cqiGlobal->maxshiptypes; i++)
-    {
-        printf(" { \n");
-        printf("   \"%s\",\n", cqiShiptypes[i].name);
-        printf("   %f,\n", cqiShiptypes[i].engfac);
-        printf("   %f,\n", cqiShiptypes[i].weafac);
-        printf("   %f,\n", cqiShiptypes[i].accelfac);
-        printf("   %d,\n", cqiShiptypes[i].torpwarp);
-        printf("   %d,\n", cqiShiptypes[i].warpmax);
-        printf("   %d,\n", cqiShiptypes[i].armymax);
-        printf("   %d,\n", cqiShiptypes[i].shmax);
-        printf("   %d,\n", cqiShiptypes[i].dammax);
-        printf("   %d,\n", cqiShiptypes[i].torpmax);
-        printf("   %d\n", cqiShiptypes[i].fuelmax);
-        printf(" },\n");
-    }
-    printf("};\n\n");
-
-    /* planets */
-    printf("static cqiPlanetInitRec_t defaultPlanets[%d] = {\n",
-           cqiGlobal->maxplanets);
-
-    for (i=0; i < cqiGlobal->maxplanets; i++)
-    {
-        printf(" { \n");
-        printf("   \"%s\",\n", cqiPlanets[i].name);
-
-        // also handles the case where a planet orbits itself
-        // (stationary)
-        printf("   \"%s\",\n", cqiPlanets[cqiPlanets[i].primary].name);
-
-        printf("   %d,\n", cqiPlanets[i].primary);
-        printf("   %f,\n", cqiPlanets[i].angle);
-        printf("   %f,\n", cqiPlanets[i].velocity);
-        printf("   %f,\n", cqiPlanets[i].radius);
-        printf("   %d,\n", cqiPlanets[i].ptype);
-        printf("   %d,\n", cqiPlanets[i].pteam);
-        printf("   %d,\n", cqiPlanets[i].armies);
-        printf("   %d,\n", cqiPlanets[i].visible);
-        printf("   %d,\n", cqiPlanets[i].core);
-        printf("   %d,\n", cqiPlanets[i].homeplanet);
-
-        printf("   %f,\n", cqiPlanets[i].xcoord);
-        printf("   %f,\n", cqiPlanets[i].ycoord);
-
-        printf("   %d,\n", (int)cqiPlanets[i].size);
-
-        printf(" },\n");
-
-    }
-    printf("};\n\n");
-
-    printf("#endif /* _INITDATA_H */\n\n");
-
-
-    return;
-}
-
 
 /* Dump the current universe to stdout in conqinitrc format */
 void dumpUniverse(void)
@@ -3359,24 +3163,21 @@ static void initrun(int rcid)
     {
         if (_cqiGlobal)
         {
-            if (_cqiGlobal != &defaultGlobalInit)
-                free(_cqiGlobal);
+            free(_cqiGlobal);
             _cqiGlobal = NULL;
             globalRead = false;
         }
 
         if (_cqiShiptypes)
         {
-            if (_cqiShiptypes != defaultShiptypes)
-                free(_cqiShiptypes);
+            free(_cqiShiptypes);
             _cqiShiptypes = NULL;
             numShiptypes = 0;
         }
 
         if (_cqiPlanets)
         {
-            if (_cqiPlanets != defaultPlanets)
-                free(_cqiPlanets);
+            free(_cqiPlanets);
             _cqiPlanets = NULL;
             numPlanets = 0;
         }
@@ -3391,23 +3192,20 @@ static void initrun(int rcid)
         {                       /* if we are not adding, re-init */
             if (_cqiSoundConf)
             {
-                if (_cqiSoundConf != &defaultSoundConf)
-                    free(_cqiSoundConf);
+                free(_cqiSoundConf);
                 _cqiSoundConf = NULL;
             }
 
             if (_cqiSoundEffects)
             {
-                if (_cqiSoundEffects != defaultSoundEffects)
-                    free(_cqiSoundEffects);
+                free(_cqiSoundEffects);
                 _cqiSoundEffects = NULL;
             }
             numSoundEffects = 0;
 
             if (_cqiSoundMusic)
             {
-                if (_cqiSoundMusic != defaultSoundMusic)
-                    free(_cqiSoundMusic);
+                free(_cqiSoundMusic);
                 _cqiSoundMusic = NULL;
             }
             numSoundMusic = 0;

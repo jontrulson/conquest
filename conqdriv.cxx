@@ -92,7 +92,12 @@ int main(int argc, char *argv[])
         close(i);
 
     // load the globals/planets (conqinitrc), before we map...
-    cqiLoadRC(CQI_FILE_CONQINITRC, NULL, 1, 0);
+    if (cqiLoadRC(CQI_FILE_CONQINITRC, NULL, 1, 0))
+    {
+        utLog("FATAL: can't load conqinitrc file.");
+        fprintf(stderr, "FATAL: can't load conqinitrc file.\n");
+        exit(1);
+    }
 
     cbMap();
 

@@ -265,20 +265,16 @@ extern int                   cqiNumSoundMusic;
 #define CQI_FILE_SOUNDRC        3
 #define CQI_FILE_SOUNDRC_ADD    4
 
-int                 cqiLoadRC(int rcid, char *filename, int verbosity,
-                              int debugl);
+bool cqiLoadRC(int rcid, char *filename, int verbosity,
+               int debugl);
 
-int                 cqiFindPlanet(char *str);
+int cqiFindPlanet(char *str);
 cqiTextureAreaPtr_t cqiFindTexArea(char *texnm, const char *tanm,
                                    cqiTextureAreaPtr_t defaultta);
-int                 cqiFindEffect(char *str);
-int                 cqiFindMusic(char *str);
+int cqiFindEffect(char *str);
+int cqiFindMusic(char *str);
 
-void                dumpUniverse(void);
-
-void                dumpInitDataHdr(void);
-void                dumpSoundDataHdr(void);
-void                dumpTexDataHdr(void);
+void dumpUniverse(void);
 
 /* planinit.c */
 void                cqiInitPlanets(void);

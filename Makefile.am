@@ -103,7 +103,7 @@ libUiCU_la_SOURCES = display.cxx cprintf.h cprintf.cxx disputil.h colorCU.cxx \
 	cd2lb.h cd2lb.cxx iolb.h iolb.cxx cumisc.h cumisc.cxx cuclient.h \
 	cuclient.cxx options.h options.cxx clntauth.cxx ui.h display.h
 
-libconqinit_la_SOURCES = conqinit-yacc.yxx conqinit-lex.lxx conqinit.h initdata.h planinit.cxx
+libconqinit_la_SOURCES = conqinit-yacc.yxx conqinit-lex.lxx conqinit.h planinit.cxx
 
 libcqsound_la_SOURCES = cqsound.cxx cqsound.h
 

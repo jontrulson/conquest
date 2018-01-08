@@ -35,8 +35,8 @@ void print_usage()
     fprintf(stderr, "\t-d            turns on debugging.\n");
     fprintf(stderr, "\t-t            parse texture data instead of conqinit data\n");
     fprintf(stderr, "\t-s            parse sound data instead of conqinit data\n");
-    fprintf(stderr, "\t-h            dump parsed file to stdout in header file format\n");
-    fprintf(stderr, "\t-D            dump current universe to stdout in conqinitrc format\n");
+    fprintf(stderr, "\t-D            dump current universe (global, shiptypes,"
+                    "                planets) to stdout in conqinitrc format\n");
 }
 
 
@@ -46,14 +46,13 @@ int main(int argc, char **argv)
     extern int optind, opterr, optopt;
     int debuglevel = 0, verbosity = 0, ftype = CQI_FILE_CONQINITRC;
     int ch;
-    int doheader = 0;
     char *filenm = NULL;
 
     rndini();
 
     utSetLogConfig(false, true);    /* log + stderr! :) */
 
-    while ( (ch = getopt( argc, argv, "vdDf:hts" )) != EOF )
+    while ( (ch = getopt( argc, argv, "vdDf:ts" )) != EOF )
     {      switch(ch)
 	{
 	case 'v':
@@ -61,9 +60,6 @@ int main(int argc, char **argv)
             break;
         case 'd':
             debuglevel++;
-            break;
-        case 'h':
-            doheader = true;
             break;
         case 'D':
             dumpUniverse();
@@ -86,18 +82,8 @@ int main(int argc, char **argv)
 
     if (cqiLoadRC(ftype, filenm, verbosity, debuglevel))
     {
-        if (doheader)
-        {
-            switch(ftype)
-            {
-            case CQI_FILE_CONQINITRC:
-                dumpInitDataHdr();
-                break;
-            case CQI_FILE_SOUNDRC_ADD:
-                dumpSoundDataHdr();
-                break;
-            }
-        }
+        fprintf(stderr, "conqinit: FATAL: load failed.\n");
+        return 1;
     }
 
     return 0;

@@ -180,7 +180,11 @@ int main(int argc, char *argv[])
         GetSysConf(true);		/* init defaults... */
 
         /* load conqinitrc */
-        cqiLoadRC(CQI_FILE_CONQINITRC, NULL, 0, 0);
+        if (cqiLoadRC(CQI_FILE_CONQINITRC, NULL, 0, 0))
+	{
+            fprintf(stderr, "FATAL: can't load conqinitrc file.\n");
+            exit(1);
+	}
 
         cbMap();		/* Map the conquest universe common block */
 
@@ -266,7 +270,11 @@ int main(int argc, char *argv[])
     }
 
     /* load conqinitrc */
-    cqiLoadRC(CQI_FILE_CONQINITRC, NULL, 0, 0);
+    if (cqiLoadRC(CQI_FILE_CONQINITRC, NULL, 0, 0))
+    {
+        fprintf(stderr, "FATAL: can't load conqinitrc file.\n");
+        exit(1);
+    }
 
     cbMap();			/* Map the conquest universe common block */
     cdinit();			/* initialize display environment */

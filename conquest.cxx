@@ -219,7 +219,11 @@ static void _loadRCFiles(int type, const char *cqdir, const char *suffix)
         /* print them out for testing */
         for(i=0; i <numfiles; i++)
         {
-            cqiLoadRC(type, filelist[i], 1, 0);
+            if (cqiLoadRC(type, filelist[i], 1, 0))
+            {
+                utLog("%s: cqiLoadRC(%s) failed, ignoring.",
+                      __FUNCTION__, filelist[i]);
+            }
             free(filelist[i]);
         }
         free(filelist);
@@ -237,8 +241,13 @@ void loadTextureRCFiles()
     char *homevar;
 
     /* load the main texturesrc file first.  It's fatal if this fails. */
-    if (!cqiLoadRC(CQI_FILE_TEXTURESRC, NULL, 1, 0))
+    if (cqiLoadRC(CQI_FILE_TEXTURESRC, NULL, 1, 0))
+    {
+        utLog("%s: FATAL: cannot load texturesrc file.",
+              __FUNCTION__);
+
         exit(1);
+    }
 
     /* now load any .trc files in there (CONQETC) */
     _loadRCFiles(CQI_FILE_TEXTURESRC_ADD, utGetPath(CONQETC), ".trc");
@@ -261,7 +270,13 @@ void loadSoundRCFiles()
     char *homevar;
 
     /* load the main sound file first */
-    cqiLoadRC(CQI_FILE_SOUNDRC, NULL, 1, 0);
+    if (cqiLoadRC(CQI_FILE_SOUNDRC, NULL, 1, 0))
+    {
+        utLog("%s: FATAL: cannot load soundrc file.",
+              __FUNCTION__);
+
+        exit(1);
+    }
 
     /* now load any .src files in there (CONQETC) */
     _loadRCFiles(CQI_FILE_SOUNDRC_ADD, utGetPath(CONQETC), ".src");
@@ -481,9 +496,6 @@ int main(int argc, char *argv[])
         printf("-m ignored, since -s was specified\n");
         wantMetaList = false;
     }
-
-    /* load the globals/planets, etc */
-// FIXME   cqiLoadRC(CQI_FILE_CONQINITRC, NULL, 1, 0);
 
     /* load the main texturesrc file and any user supplied ~/.conquest/ *.trc
        files */
