@@ -72,7 +72,7 @@ void     clbStoreMsgf( msgFrom_t from, uint16_t fromDetail, msgTo_t to,
 int      clbUseFuel( int snum, real fuel, int weapon, int forreal );
 void     clbZeroEverything(void);
 void     clbZeroShip( int snum );
-char    *clbGetUserLogname(void);
+const char *clbGetUserLogname(void);
 void     clbPlanetDrive(real itersec);
 void     clbTorpDrive(real itersec);
 void     clbAdjOrbitalPosition(int snum);

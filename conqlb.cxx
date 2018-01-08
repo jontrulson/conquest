@@ -2744,7 +2744,7 @@ char *clbGetUserLogname(void)
 
 /* get the current username.  We really only need to look it up once
    per session... returns a pointer to a static string. */
-char *clbGetUserLogname(void)
+const char *clbGetUserLogname(void)
 {
 #define MAXPWNAME 128
     struct passwd *pwd = NULL;

@@ -34,8 +34,8 @@ int getUID(char *name)
 #else
 
     struct passwd *conq_pwd;
-    char *myusername = clbGetUserLogname();
-    char *chkname;
+    const char *myusername = clbGetUserLogname();
+    const char *chkname;
 
 #if defined(CYGWIN)
     /* name root doesn't usually exist, so default to myusername */
@@ -394,66 +394,56 @@ int isagod( int unum )
 #else /* !CGYWIN */
 int isagod( int unum )
 {
-    static struct group *grp = NULL;
-    static int god = false;
-    static char myname[BUFFER_SIZE_256];
-    int i;
-
-    god = false;
-
-    if (unum == -1)		/* get god status for current user */
-    {
-        utStrncpy(myname, clbGetUserLogname(), BUFFER_SIZE_256);
-    }
-    else
+    if (unum != -1)		/* get god status for current user */
     {				/* else a user number passed in */
-				/* just check for OOPT_OPER */
+				/* just check for OPER flag */
         if (UISOPER(unum))
             return true;
         else
             return false;
     }
 
-    if (grp == NULL)
-    {				/* first time */
-        grp = getgrnam(CONQUEST_GROUP);
+    /* root is always god */
+    if (geteuid() == (uid_t)0)
+        return true;
 
-        if (grp == NULL)
-	{
-            utLog("isagod(%s): getgrnam(%s) failed: %s",
-                  myname,
-                  CONQUEST_GROUP,
-                  strerror(errno));
-
-            god = false;
-            return(false);
-	}
+    // If your group name matches the conquest group name, you are a god
+    struct group *grp = NULL;
+    if ((grp = getgrgid(getgid())))
+    {
+        if (strcmp(grp->gr_name, CONQUEST_GROUP) == 0)
+            return true;
     }
 
-    /* root is always god */
-    if (strcmp(myname, "root") == 0)
-        god = true;
+    // need to check further.  Load up all of the users for
+    // CONQUEST_GROUP, if any, and check them.
 
-    i = 0;
+    if (!(grp = getgrnam(CONQUEST_GROUP)))
+    {
+        utLog("%s: getgrnam(%s) failed: %s",
+              __FUNCTION__,
+              CONQUEST_GROUP,
+              strerror(errno));
+
+        return false;
+    }
 
     if (grp->gr_mem != NULL)
     {
+        const char *myname = clbGetUserLogname();
+        int i = 0;
         while (grp->gr_mem[i] != NULL)
 	{
             if (strcmp(myname, grp->gr_mem[i]) == 0)
 	    {		/* a match */
-                god = true;
-                break;
+                return true;
 	    }
-
             i++;
 	}
     }
 
-    endgrent();
-
-    return(god);
-
+    // if we are here, you are not a god, pathetic mortal.
+    return false;
 }
 
 #endif /* !CYGWIN */
