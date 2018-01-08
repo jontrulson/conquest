@@ -102,6 +102,7 @@ void nWelcomeInit(void)
         switch (pkttype)
         {
         case SP_CLIENTSTAT:
+            // Context.snum and unum is set here
             if (PKT_PROCSP(buf))
             {
                 done = true;
@@ -245,6 +246,14 @@ static int nWelcomeDisplay(dspConfig_t *dsp)
         else
             procUser(buf);
 
+        // verify that Context.snum and unum is != -1
+        if (Context.snum < 0 || Context.unum < 0)
+        {
+            utLog("%s: FATAL: Context.snum or unum is invalid "
+                  "(snum:%d, unum: %d))",
+                  __FUNCTION__, Context.snum, Context.unum);
+            return NODE_EXIT;
+        }
         nMenuInit();
         return NODE_OK;
         break;

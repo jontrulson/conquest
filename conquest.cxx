@@ -487,12 +487,13 @@ int main(int argc, char *argv[])
 
     Context.maxlin = 25;
     Context.maxcol = 80;
-    Context.snum = 0;		/* force menu to get a new ship */
+    Context.snum = -1;
+    Context.unum = -1;
     Context.histslot = -1;
-    Context.lasttang = Context.lasttdist = 0;
-
-    Context.lasttdist = Context.lasttang = 0;
+    Context.lasttang = 0;
+    Context.lasttdist = 0;
     Context.lasttarg[0] = 0;
+
     catchSignals();       /* enable trapping of interesting signals */
 
     /* which node to start from... */
