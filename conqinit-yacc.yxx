@@ -6,6 +6,10 @@
 
 #include "c_defs.h"
 
+#include <string>
+
+using namespace std;
+
 #include "conqdef.h"
 #include "cb.h"
 
@@ -1098,6 +1102,34 @@ bool cqiLoadRC(int rcid, const char *filename, int verbosity, int debugl)
         utLog("%s: invalid rcid %d, bailing.", __FUNCTION__, rcid);
         return true;
         break;
+    }
+
+
+    // we do a check to see if we are 1) not specifying a filename,
+    // and 2) opening one of the conqinitrc, texturesrc, or soundrc
+    // files.  If so, we tack on '.local' to the file and see if it
+    // exists.  If so, we will open that instead.  This allows people
+    // to modify local versions of these files without worrying about
+    // them being overwritten on a 'make install' or other update.
+
+    if (!filename && (rcid == CQI_FILE_CONQINITRC
+                      || rcid == CQI_FILE_TEXTURESRC
+                      || rcid == CQI_FILE_SOUNDRC))
+    {
+        const string localFileSpec(".local");
+        string orgBuffer(buffer);
+        FILE *fd;
+
+        orgBuffer += localFileSpec;
+
+        if ( (fd = fopen(orgBuffer.c_str(), "r")) )
+        {
+            // there is a local variant, so append ".local" to buffer
+            // and move on.
+            fclose(fd);
+            utStrncat(buffer, localFileSpec.c_str(), PATH_MAX);
+        }
+        // else, we do nothing, and just use original...
     }
 
     utLog("%s: Loading '%s'...", __FUNCTION__, buffer);
