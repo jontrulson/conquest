@@ -43,7 +43,6 @@ void print_usage()
 int main(int argc, char **argv)
 {
     extern char *optarg;
-    extern int optind, opterr, optopt;
     int debuglevel = 0, verbosity = 0, ftype = CQI_FILE_CONQINITRC;
     int ch;
     char *filenm = NULL;

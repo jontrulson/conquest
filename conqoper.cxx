@@ -97,9 +97,6 @@ int main(int argc, char *argv[])
 
     char InitStuffChar = '\0';
 
-    extern char *optarg;
-    extern int optind;
-
     OptionAction = OP_NONE;
 
     utStrncpy(operName, clbGetUserLogname(), MAXUSERNAME);
@@ -1144,7 +1141,7 @@ void opback( int lastrev, int *savelin )
 void operate(void)
 {
 
-    int i, lin, savelin;
+    int lin, savelin;
     int redraw, now, readone;
     int lastrev, msgrand;
     char buf[MSGMAXLINE], junk[MSGMAXLINE];
@@ -3479,7 +3476,6 @@ char *build_toggle_str(char *snum_str, int snum)
 {
 
     static const char *doomsday_str = "DM";
-    static const char *deathstar_str = "DS";
     static const char *unknown_str = "n/a";
 
     if (snum >= 0 && snum < cbLimits.maxShips())

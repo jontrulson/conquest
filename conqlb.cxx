@@ -2494,7 +2494,6 @@ void clbStoreMsgf( msgFrom_t from, uint16_t fromDetail,
                    const char *msg, unsigned char flags )
 {
     int nlastmsg, i;
-    char buf[128];
 
     /* don't do this if invalid common block */
     if (*cbRevision != COMMONSTAMP)
@@ -2530,6 +2529,7 @@ void clbStoreMsgf( msgFrom_t from, uint16_t fromDetail,
 
     cbUnlock(&cbConqInfo->lockmesg);
 
+    char buf[BUFFER_SIZE_128];
     if (SysConf.LogMessages == true || to == MSG_TO_GOD
         || from == MSG_FROM_GOD)
     {

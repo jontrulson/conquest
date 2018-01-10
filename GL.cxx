@@ -573,7 +573,6 @@ static int _get_glplanet_info(GLPlanet_t *curGLPlanet, int plani)
     int ndx;
     GLfloat size;
     int gltndx = -1;
-    int plnndx = -1;
 
     if (!GLPlanets)
         return false;
@@ -2252,7 +2251,6 @@ void drawDoomsday(GLfloat x, GLfloat y, GLfloat dangle, GLfloat scale)
     bool drawAPBeam = false;
     static animStateRec_t doomapfire = {}; /* animdef state for ap firing */
     static int beamfx = -1;       /* Cataboligne - beam sound */
-    static const uint32_t beamfx_delay = 1000; /* 1 second */
     real dis, ang;
     GLfloat scaleFac = (scale == MAP_SR_FAC) ? dConf.vScaleSR : dConf.vScaleLR;
     static uint32_t geoChangeCount = 0;
@@ -2730,10 +2728,7 @@ void drawViewerBG(int snum, int dovbg)
     /* depth of VBG, seems about right :) */
     static const GLfloat z = TRANZ * 1.65;
 
-    /* star field inside barrier - the galaxy */
-    GLfloat sizeb = (VIEWANGLE * (20.0 + 14)) / 2.0;
-
-    GLfloat x, y, x2, y2, rx, ry;
+    GLfloat x, y, x2, y2;
     static GLint texid_vbg = 0;
     GLfloat scaleFac = (SMAP(snum)) ? dConf.vScaleLR : dConf.vScaleSR;
 

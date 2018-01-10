@@ -28,7 +28,6 @@ static int state;
 
 static bool fatal = false;
 static bool serror = false;
-static bool newuser = false;
 static time_t snooze = (time_t)0;          /* sleep time */
 
 static const char *sorry1="I'm sorry, but the game is closed for repairs right now.";

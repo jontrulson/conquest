@@ -492,8 +492,6 @@ static void executeai( int snum, int token )
 /*    ok = newrob( snum, unum ) */
 int newrob( int *snum, int unum )
 {
-    int i, j;
-
     /* Check the user number. */
     if ( !ULIVE(unum) )
         return ( false );
@@ -557,7 +555,8 @@ int newrob( int *snum, int unum )
     cbShips[*snum].weapalloc = 30;
     cbShips[*snum].engalloc = 100 - cbShips[*snum].weapalloc;
 
-    for ( i = 0; i < NUMPLAYERTEAMS; i = i + 1 )
+    int i;
+    for ( i=0; i<NUMPLAYERTEAMS; i++ )
     {
         /* Robots are peace (and fun) loving. */
         cbShips[*snum].rwar[i] = false;

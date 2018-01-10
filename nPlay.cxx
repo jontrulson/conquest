@@ -163,7 +163,6 @@ void nPlayInit(void)
 static int nPlayDisplay(dspConfig_t *dsp)
 {
     char cbuf[BUFFER_SIZE_256];
-    int i, j;
 
     if (fatal)
         return NODE_EXIT;

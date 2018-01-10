@@ -38,8 +38,6 @@ int rulenum;
 static int trstrat[MAX_VAR][10], trvec[32];
 int debug_scanner, verbose;
 
-static bool UpdateCmnBlock = false;
-
 extern int Lineno;
 extern int goterror;
 int yylex(void);
@@ -213,8 +211,6 @@ static void myUtFormatTime( char *buf, time_t thetime )
 /* conqstrat - main program */
 int main(int argc, char **argv)
 {
-    extern char *optarg;
-    extern int optind, opterr, optopt;
     char filename[PATH_MAX] = {};
     int ch;
     FILE *filefd;

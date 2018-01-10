@@ -1431,7 +1431,7 @@ static int str2team(char *str)
 void dumpUniverse(void)
 {
     char buf[BUFFER_SIZE_128];
-    int i, j;
+    int i;
 
     // load the globals/planets (conqinitrc), before we map...
     if (cqiLoadRC(CQI_FILE_CONQINITRC, NULL, 1, 0))

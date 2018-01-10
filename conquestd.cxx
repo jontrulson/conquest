@@ -858,9 +858,6 @@ void dead( int snum, int leave )
         return;
     }
 
-    utLog("INFO: dead(): sent sendClientStat, fl = 0x%0x",
-          flags);
-
     /* fix things up */
     cbShips[snum].status = SS_RESERVED;
     cbShips[snum].sdfuse = -TIMEOUT_PLAYER;
@@ -1401,7 +1398,6 @@ int newship( int unum, int *snum )
 {
     int i, system;
     int fresh;
-    int numavail = 0;
 
     /* cleanup any unliving ships - this is the first thing we need to do */
     clbCheckShips(false);
