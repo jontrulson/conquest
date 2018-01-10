@@ -1174,15 +1174,16 @@ int clbCanRead( int snum, int msgnum )
         return(false);		/* no point in reading it */
     }
 
-    /* If we're GOD, we can read it. unless it's a COMP MSG*/
+    /* If we're GOD, we can read it, unless it's a feedback, tersable,
+     * or robot insult */
     if (snum < 0)
     {
-        if (from != MSG_FROM_COMP)
-        {
-            return ( true );
-        }
-        else
+        if (cbMsgs[msgnum].flags & (MSG_FLAGS_FEEDBACK
+                                    | MSG_FLAGS_TERSABLE
+                                    | MSG_FLAGS_ROBOT))
             return false;
+        else
+            return true;
     }
 
     // snum should never be <0 at this point
