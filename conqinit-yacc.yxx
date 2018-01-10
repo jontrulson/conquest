@@ -964,13 +964,14 @@ static int cqiValidatePlanets(void)
     unsigned int homeplan[NUMPLAYERTEAMS] = {}; /* count of home planets */
 
     /* first fill in any empty slots */
-    if (numPlanets < cbLimits.maxPlanets())
+
+    // we can't use cbLimits here because it hasn't been computed yet.
+    if (numPlanets < _cqiGlobal->maxplanets)
     {
         for (i = numPlanets; i < _cqiGlobal->maxplanets; i++)
         {
             /* use the slot number in the name to reduce chance of dup names */
-            snprintf(_cqiPlanets[i].name, MAXPLANETNAME, "ZZExtra %d", i);
-
+            snprintf(_cqiPlanets[i].name, MAXPLANETNAME, "ZZPlanet_%d", i);
             // these planets are stationary, so set the primary name
             // to be the same as the planet.
             utStrncpy(_cqiPlanets[i].primname, _cqiPlanets[i].name,
@@ -991,7 +992,7 @@ static int cqiValidatePlanets(void)
 
         if (cqiVerbose)
             utLog("%s: filled %d unspecified planet slots.",
-                  __FUNCTION__, cbLimits.maxPlanets() - numPlanets);
+                  __FUNCTION__, _cqiGlobal->maxplanets - numPlanets);
     }
 
 
@@ -1432,6 +1433,13 @@ void dumpUniverse(void)
     char buf[BUFFER_SIZE_128];
     int i, j;
 
+    // load the globals/planets (conqinitrc), before we map...
+    if (cqiLoadRC(CQI_FILE_CONQINITRC, NULL, 1, 0))
+    {
+        fprintf(stderr, "FATAL: can't load conqinitrc file.\n");
+        exit(1);
+    }
+
     cbMap();
 
     utFormatTime( buf, 0 );
@@ -1472,15 +1480,13 @@ void dumpUniverse(void)
 
     /* global is always first */
 
-    printf("# DO NOT CHANGE VALUES IN THE GLOBAL SECTION\n");
-    printf("# Doing so will break compatibility, and we aren't ready\n");
-    printf("# for that yet.\n");
+    printf("# Global limits\n");
     printf("global {\n");
-    printf("  planetmax 60\n");
-    printf("  shipmax   20\n");
-    printf("  usermax   500\n");
-    printf("  histmax   40\n");
-    printf("  msgmax    60\n");
+    printf("  planetmax %d\n", cbLimits.maxPlanets());
+    printf("  shipmax   %d\n", cbLimits.maxShips());
+    printf("  usermax   %d\n", cbLimits.maxUsers());
+    printf("  histmax   %d\n", cbLimits.maxHist());
+    printf("  msgmax    %d\n", cbLimits.maxMsgs());
     printf("}\n\n");
 
     /* shiptypes */
