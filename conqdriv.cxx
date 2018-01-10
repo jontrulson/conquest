@@ -54,42 +54,39 @@ int main(int argc, char *argv[])
 
     /* First things first. */
 
+    /* close stdin and stdout.  Leave stderr alone. */
+    if (stdin)
+        fclose(stdin);
+    if (stdout)
+        fclose(stdout);
+
+    utLog("conqdriv: Initializing...");
+
     if ((ConquestGID = getConquestGID()) == -1)
     {
         fprintf(stderr, "conqdriv: getConquestGID() failed\n");
         exit(1);
     }
 
-
-    if (GetSysConf(false) == -1)
-    {
-#ifdef DEBUG_CONFIG
-        utLog("%s@%d: main(): GetSysConf() returned -1.", __FILE__, __LINE__);
-#endif
-/*      exit(1);*/
-
-        ;
-    }
-
+    GetSysConf(false);
 
     if (setgid(ConquestGID) == -1)
     {
+        fprintf(stderr, "conqdriv: setgid(): failed\n");
         utLog("conqdriv: setgid(%d): %s",
               ConquestGID,
               strerror(errno));
-        fprintf(stderr, "conqdriv: setgid(): failed\n");
         exit(1);
     }
 
     if (semInit() == -1)
     {
-        fprintf(stderr, "semInit() failed to get semaphores. exiting.\n");
+        fprintf(stderr, "conqdriv: semInit() failed to get semaphores. exiting.\n");
+        utLog("conqdriv: semInit() failed to get semaphores. exiting.\n");
         exit(1);
     }
 
-    /* close all file descriptors */
-    for (i=0; i < FOPEN_MAX; i++)
-        close(i);
+    rndini();			/* init random numbers */
 
     // load the globals/planets (conqinitrc), before we map...
     if (cqiLoadRC(CQI_FILE_CONQINITRC, NULL, 1, 0))
@@ -141,13 +138,15 @@ int main(int argc, char *argv[])
         if ( cbDriver->drivstat != DRS_RESTART )
 	{
             cbUnlock(&cbConqInfo->lockword);
-            utLog("conqdriv: we shouldn't be starting: drivstat = %d\n", cbDriver->drivstat);
+            utLog("conqdriv: we shouldn't be starting: drivstat = %d\n",
+                  cbDriver->drivstat);
 	}
 
         if ( cbDriver->drivpid != 0 )
 	{
             cbUnlock(&cbConqInfo->lockword);
-            utLog("conqdriv: cbDriver->drivpid != 0, drivpid = %d", cbDriver->drivpid);
+            utLog("conqdriv: cbDriver->drivpid != 0, drivpid = %d",
+                  cbDriver->drivpid);
 	}
     }
     else
@@ -165,9 +164,8 @@ int main(int argc, char *argv[])
 	}
     }
 
-
-    cbDriver->drivstat = DRS_STARTING;		/* show intent of becoming "the" driver */
-    rndini();			/* init random numbers */
+    /* show intent of becoming "the" driver */
+    cbDriver->drivstat = DRS_STARTING;
     pid = getpid(); /* store our pid */
     cbDriver->drivpid = pid;
 
@@ -189,19 +187,12 @@ int main(int argc, char *argv[])
     }
     else
     {
-#ifdef DEBUG_SIG
-        utLog("conqdriv(): *DRIVER STARTING* detaching stdio and setting signals");
-#endif
-
-        close(0);
-        close(1);
-        close(2);
-
         signal(SIGINT, SIG_IGN);
         signal(SIGQUIT, SIG_IGN);
         signal(SIGTERM, (void (*)(int))SigTerminate);
         signal(SIGHUP, (void (*)(int))SigTerminate);
     }
+
     for ( s = 0; s < cbLimits.maxShips(); s++ )
         ship[s] = s;
 
@@ -221,14 +212,15 @@ int main(int argc, char *argv[])
                 cbDriver->drivstat = DRS_OFF;
                 cbDriver->drivowner[0] = 0;
                 upchuck();
-                utLog("conqdriv:player timeout: utDeltaSecs(cbDriver->playtime, &(cbDriver->drivtime)) = %d\n", utDeltaSecs(cbDriver->playtime, &(cbDriver->drivtime)));
+                utLog("conqdriv: Player timeout: (>%d secs)\n",
+                      TIMEOUT_PLAYER);
                 break;
 	    }
 
             if ( cbDriver->drivstat == DRS_RUNNING )
 	    {
                 /* Randomize ship ordering. */
-                for ( s = 0; s < cbLimits.maxShips(); s = s + 1 )
+                for ( s = 0; s < cbLimits.maxShips(); s++ )
 		{
                     i = rndint( 0, cbLimits.maxShips() - 1 );
                     j = ship[i];
@@ -237,7 +229,8 @@ int main(int argc, char *argv[])
 		}
 
                 /* Do the big things first to sync the small things. */
-                cbDriver->drivsecs = utModPlusOne( cbDriver->drivsecs + 1, FIVEMINUTE_SECONDS );
+                cbDriver->drivsecs = utModPlusOne( cbDriver->drivsecs + 1,
+                                                   FIVEMINUTE_SECONDS );
                 if ( mod( cbDriver->drivsecs, FIVEMINUTE_SECONDS ) == 0 )
                     fivemindrive();
                 if ( mod( cbDriver->drivsecs, MINUTE_SECONDS ) == 0 )
@@ -245,7 +238,8 @@ int main(int argc, char *argv[])
                 if ( mod( cbDriver->drivsecs, SUBMIN_SECONDS ) == 0 )
                 {
                     upstats( &ctime, &etime, &cacc, &eacc,
-                             &cbConqInfo->dcpuseconds, &cbConqInfo->delapsedseconds );
+                             &cbConqInfo->dcpuseconds,
+                             &cbConqInfo->delapsedseconds );
                 }
 
                 secdrive( ship );
@@ -257,7 +251,7 @@ int main(int argc, char *argv[])
 	}
         if ( cbDriver->drivstat == DRS_RUNNING )
         {
-            clbPlanetDrive(0.1);
+            clbPlanetDrive(ITER_SECONDS);
             iterdrive( ship );
         }
         utSleep( ITER_SECONDS );
@@ -270,7 +264,7 @@ int main(int argc, char *argv[])
         cbDriver->drivpid = 0;
         cbDriver->drivstat = DRS_OFF;
         cbDriver->drivowner[0] = 0;
-        utLog( "conqdriv:DRS_KAMIKAZE: cbDriver->drivstat = %d\n", cbDriver->drivstat);
+        utLog( "conqdriv: drivstat = DRS_KAMIKAZE, shutting down");
     }
 
     /* Make last minute driver stats update. */
@@ -550,7 +544,7 @@ void secdrive( int *ship )
     {
         i = ship[s];
         if ( cbShips[i].status == SS_OFF )
-            continue; /*next;*/
+            continue;
 
         if ( cbShips[i].status != SS_LIVE )
 	{
@@ -571,7 +565,7 @@ void secdrive( int *ship )
 		    }
 		}
                 cbUnlock(&cbConqInfo->lockword);
-                continue; /* next;*/
+                continue;
 	    }
 	}
 
@@ -581,13 +575,13 @@ void secdrive( int *ship )
         if ( UBANNED(cbShips[i].unum) )
 	{
             clbKillShip( i, KB_SHIT, 0 );
-            continue; /* next;*/
+            continue;
 	}
         if ( cbConqInfo->closed )
             if ( ! UPLAYWHENCLOSED(cbShips[i].unum) )
             {
                 clbKillShip( i, KB_EVICT, 0 );
-                continue; /*next;*/
+                continue;
             }
 
         /* The ship is still alive. */
@@ -605,7 +599,8 @@ void secdrive( int *ship )
             if ( PVISIBLE(j) )
             {
                 /* Do we scan the planet? */
-                dis = dist( cbShips[i].x, cbShips[i].y, cbPlanets[j].x, cbPlanets[j].y );
+                dis = dist( cbShips[i].x, cbShips[i].y, cbPlanets[j].x,
+                            cbPlanets[j].y );
                 if ( dis <= PLANET_DIST_OFF + ((real)cbPlanets[j].size / 2))
                 {
                     k = cbShips[i].team;
@@ -723,7 +718,7 @@ void secdrive( int *ship )
             /* JET- changed code below to compute based on
              * swarp instead of sdwarp.  I think this was a bug.
              * ie: your fuel consumption should be based on how
-             * fast your going, not how fast you *want* to go.
+             * fast you're going, not how fast you *want* to go.
              */
             if ( SSHUP(i) )
                 dec = dec + cbShips[i].warp * FUELWARP_FAC * FUELSHIELDS_MULT;
@@ -758,8 +753,10 @@ void secdrive( int *ship )
         if ( cbShips[i].warp < 0.0 && !clbSPWar(i, cbShips[i].lockDetail)
              &&  cbPlanets[cbShips[i].lockDetail].armies > 0)
 	{			    /* orbiting a friendly populated planet */
-            cbShips[i].wtemp = max( 0.0, cbShips[i].wtemp - (WEAPON_COOL_FAC * PLANET_REPAIR_MULT));
-            cbShips[i].etemp = max( 0.0, cbShips[i].etemp - (ENGINE_COOL_FAC * PLANET_REPAIR_MULT));
+            cbShips[i].wtemp =
+                max( 0.0, cbShips[i].wtemp - (WEAPON_COOL_FAC * PLANET_REPAIR_MULT));
+            cbShips[i].etemp =
+                max( 0.0, cbShips[i].etemp - (ENGINE_COOL_FAC * PLANET_REPAIR_MULT));
 	}
         else
 	{
@@ -798,7 +795,8 @@ void secdrive( int *ship )
                             {
                                 k = ship[t];
                                 if ( cbShips[k].status == SS_LIVE && k != i )
-                                    if ( cbShips[i].torps[j].war[cbShips[k].team] || cbShips[k].war[cbShips[i].team] )
+                                    if ( cbShips[i].torps[j].war[cbShips[k].team]
+                                         || cbShips[k].war[cbShips[i].team] )
                                     {
                                         dis = distf( cbShips[i].torps[j].x, cbShips[i].torps[j].y,
                                                      cbShips[k].x, cbShips[k].y );
@@ -818,7 +816,8 @@ void secdrive( int *ship )
                             if ( DOOM_LIVE() )
                                 if ( distf( cbShips[i].torps[j].x,
                                             cbShips[i].torps[j].y,
-                                            cbDoomsday->x, cbDoomsday->y ) <= (TORPEDO_PROX * 3.0))
+                                            cbDoomsday->x, cbDoomsday->y )
+                                     <= (TORPEDO_PROX * 3.0))
                                 {
                                     clbDetonate( i, j );
                                     break;
@@ -838,7 +837,8 @@ void secdrive( int *ship )
     /* Planet eater. */
     if ( DOOM_LIVE() )
     {
-        if (cbDoomsday->lock == LOCK_PLANET && cbDoomsday->lockDetail < cbLimits.maxPlanets())
+        if (cbDoomsday->lock == LOCK_PLANET
+            && cbDoomsday->lockDetail < cbLimits.maxPlanets())
 	{
             /* Planet. */
             if ( distf( cbDoomsday->x, cbDoomsday->y,
@@ -870,7 +870,8 @@ void secdrive( int *ship )
                 clbDoomFind();
             else if ( distf( cbDoomsday->x, cbDoomsday->y,
                              cbShips[cbDoomsday->lockDetail].x,
-                             cbShips[cbDoomsday->lockDetail].y ) <= DOOMSDAY_DIST )
+                             cbShips[cbDoomsday->lockDetail].y )
+                      <= DOOMSDAY_DIST )
             {
                 /* clever doomsday tractors (was .warp, set .dwarp instead).*/
                 cbShips[cbDoomsday->lockDetail].dwarp = 0.0;
@@ -910,7 +911,6 @@ void secdrive( int *ship )
 /*    mindrive */
 void mindrive(void)
 {
-
     int i;
 
     for ( i = 0; i < NUMPLAYERTEAMS; i++ )
@@ -950,7 +950,6 @@ void mindrive(void)
 void fivemindrive(void)
 {
     int i, thresh;
-    real r;
 
     /* Drive the planets. */
     cbLock(&cbConqInfo->lockword);
@@ -971,13 +970,17 @@ void fivemindrive(void)
                     else
                         thresh = MALTHUS_D_THRESH;
 
-                    if ( cbPlanets[i].armies >= thresh && rnd() <= MALTHUS_PROB )
+                    if ( cbPlanets[i].armies >= thresh
+                         && rnd() <= MALTHUS_PROB )
                     {
-                        r = rnd();	/* save to avoid the unfortunate side effects of
-                                           max() bieng a macro (rnd() actually got exc'd
-                                           twice, resluting in an occasional 0 return val) */
+                        /* save to avoid the unfortunate side effects
+                           of max() bieng a macro (rnd() actually got
+                           exc'd twice, resluting in an occasional 0
+                           return val) */
+                        real r = rnd();
 
-                        cbPlanets[i].armies = max( round( cbPlanets[i].armies * r ), 1 );
+                        cbPlanets[i].armies =
+                            max( round( cbPlanets[i].armies * r ), 1 );
                     }
                     else
                     {
