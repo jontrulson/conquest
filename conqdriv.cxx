@@ -34,12 +34,17 @@
 
 #include "conqinit.h"
 
+#include <vector>
+using namespace std;
+
 #define SUBMIN_SECONDS 5 	/* seconds between planet movement */
 #define MINUTE_SECONDS 60
 #define FIVEMINUTE_SECONDS 300
 
-void iterdrive( int *ship );
-void secdrive( int *ship );
+typedef vector<int> shipVec_t;
+
+void iterdrive( const shipVec_t& ship );
+void secdrive( const shipVec_t& ship );
 void mindrive(void);
 void fivemindrive(void);
 void SigTerminate(int sig);
@@ -104,11 +109,6 @@ int main(int argc, char *argv[])
         utLog("conqdriv: ERROR: common block mismatch, exiting");
         exit(1);
     }
-
-    // init the ship[] array, used to randomize the order in which
-    // ships are serviced.  This must be done only after conqinitrc is
-    // read and the CB mapped (and therefore cbLimits is valid).
-    int ship[cbLimits.maxShips()];
 
     initstats( &ctime, &etime );
     cacc = 0;
@@ -193,8 +193,24 @@ int main(int argc, char *argv[])
         signal(SIGHUP, (void (*)(int))SigTerminate);
     }
 
+    // init the ship[] vector, used to randomize the order in which
+    // ships are serviced.
+    shipVec_t ship;
+
+    ship.clear();
     for ( s = 0; s < cbLimits.maxShips(); s++ )
-        ship[s] = s;
+        ship.push_back(s);
+
+    // double check here, but should never happen...
+    if (ship.size() != cbLimits.maxShips())
+    {
+        utLog("conqdriv: FATAL: shipVec: maxShips(%u) != ship.size(%lu)!",
+              cbLimits.maxShips(), ship.size());
+        cbLock(&cbConqInfo->lockword);
+        cbDriver->drivstat = DRS_OFF;
+        cbUnlock(&cbConqInfo->lockword);
+        exit(1);
+    }
 
     while ( pid == cbDriver->drivpid && cbDriver->drivstat != DRS_KAMIKAZE )
     {
@@ -279,7 +295,7 @@ int main(int argc, char *argv[])
 /*  SYNOPSIS */
 /*    int ship(cbLimits.maxShips()) */
 /*    iterdrive( ship ) */
-void iterdrive( int *ship )
+void iterdrive( const shipVec_t& ship )
 {
     int s, t, i, k;
     real h, ad, x, dis, ht, z;
@@ -533,7 +549,7 @@ void iterdrive( int *ship )
 /*  SYNOPSIS */
 /*    int ship(cbLimits.maxShips()) */
 /*    secdrive( ship ) */
-void secdrive( int *ship )
+void secdrive( const shipVec_t& ship )
 {
     int s, t, i, j, k;
     real dis, repair, inc, dec;
