@@ -513,10 +513,10 @@ void pktSetSocketFds(int tcpsock, int udpsock)
 
 int pktSendAck(uint8_t severity, uint8_t code, const char *msg)
 {
-    cpAck_t cack;
-    spAck_t sack;
-    spAckMsg_t sackmsg;
-    void *buf;
+    cpAck_t cack = {};
+    spAck_t sack = {};
+    spAckMsg_t sackmsg = {};
+    void *buf = NULL;
 
     if (tcp_sock < 0)
         return -1;
@@ -1034,9 +1034,15 @@ int pktWrite(int socktype, void *data)
     uint8_t type;
     int rv;
     char *packet = (char *)data;
-    char *ptr;
+    char *ptr = NULL;
     int sock;
-    ringBuffer_t *RB;
+    ringBuffer_t *RB = NULL;
+
+    if (!packet)
+    {
+        utLog("%s: Fed a NULL packet!", __FUNCTION__);
+        return -1;
+    }
 
     type = (uint8_t)*packet;	/* first byte is ALWAYS pkt type */
 

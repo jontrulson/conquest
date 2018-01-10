@@ -1782,7 +1782,7 @@ int welcome( int *unum )
 
 static int hello(void)
 {
-    spHello_t shello;
+    spHello_t shello = {};
     char buf[PKT_MAXSIZE];
     char cbuf[MESSAGE_SIZE * 2];
     int pkttype;
