@@ -290,7 +290,7 @@ int main(int argc, char *argv[])
 
     sprintf(msgbuf, "OPER: User %s has entered conqoper.",
             operName);
-    utLog(msgbuf);			/* log it too... */
+    utLog("%s", msgbuf);        /* log it too... */
     clbStoreMsg( MSG_FROM_COMP, 0, MSG_TO_GOD, 0, msgbuf );
 
     operate();

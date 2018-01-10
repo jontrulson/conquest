@@ -51,14 +51,14 @@ int procDispatchInit(uint16_t vers, packetEnt_t *pktList, int numpkts)
 
     if (procs == NULL || numprocs == 0)
     {
-        utLog("%s: Could not find dispatch table for vers %h.",
+        utLog("%s: Could not find dispatch table for vers %hu.",
               __FUNCTION__, vers);
         return false;
     }
 
     if (numprocs != numpkts)
     {
-        utLog("%s: numprocs does not equal numpkts for vers %h.",
+        utLog("%s: numprocs does not equal numpkts for vers %hu.",
               __FUNCTION__, vers);
         return false;
     }

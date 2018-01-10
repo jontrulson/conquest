@@ -200,7 +200,7 @@ void expire_users(void)
 	{			/* screen out negative expirations -
 				   only happens when system clock goes
 				   way back */
-            utLog("INFO: expire_users(): difftime (%d) is less than 0, skipping user %s\n",
+            utLog("INFO: expire_users(): difftime (%ld) is less than 0, skipping user %s\n",
                   difftime, cbUsers[i].username);
             continue;
 	}
@@ -252,7 +252,7 @@ void expire_users(void)
 #endif
 
                 clbResign(i, true);
-                utLog("INFO: expire_users(): Expired remote user '%s' after %d days of inactivity. (limit %d days)",
+                utLog("INFO: expire_users(): Expired remote user '%s' after %ld days of inactivity. (limit %d days)",
                       cbUsers[i].username,
                       difftime / SECS_PER_DAY,
                       SysConf.UserExpiredays);

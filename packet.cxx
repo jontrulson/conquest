@@ -470,14 +470,14 @@ int pktSetClientProtocolVersion(uint16_t vers)
         break;
 
     default:
-        utLog("%s: Unsupported protocol version: %h", __FUNCTION__, vers);
+        utLog("%s: Unsupported protocol version: %hu", __FUNCTION__, vers);
         return false;
     }
 
     clientProtoVers = vers;
 
     if (cqDebug)
-        utLog("%s: setting version %h", __FUNCTION__, vers);
+        utLog("%s: setting version %hu", __FUNCTION__, vers);
 
     return procDispatchInit(vers, serverPackets, serverPktMax);
 }

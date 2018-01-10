@@ -63,9 +63,9 @@ scrNode_t *nUserlInit(int nodeid, int setnode, int sn, int gl, int extra)
     // Create it fresh
     if (!(uvec = (int *)malloc(cbLimits.maxUsers() * sizeof(int))))
     {
-        utLog("%s: malloc(%d) failed", __FUNCTION__,
+        utLog("%s: malloc(%lu) failed", __FUNCTION__,
               cbLimits.maxUsers() * sizeof(int));
-        fprintf(stderr, "%s: malloc(%d) failed\n", __FUNCTION__,
+        fprintf(stderr, "%s: malloc(%lu) failed\n", __FUNCTION__,
                 cbLimits.maxUsers() * sizeof(int));
     }
 

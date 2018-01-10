@@ -234,7 +234,7 @@ static int _checkCB(char *fname, int fmode, int sizeofcb)
                      CONQSTATE, C_CONQ_COMMONBLK,
                      time(0));
 
-            utLog("%s: %s: ERROR: File size mismatch (expected %d, was %d), "
+            utLog("%s: %s: ERROR: File size mismatch (expected %d, was %ld), "
                   "renaming to %s.",
                   __FUNCTION__,
                   fname,

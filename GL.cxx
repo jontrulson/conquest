@@ -241,7 +241,7 @@ static int initGLAnimDefs(void)
     if (!(GLAnimDefs = (GLAnimDef_t *)malloc(sizeof(GLAnimDef_t) *
                                              cqiNumAnimDefs)))
     {
-        utLog("%s: ERROR: malloc(%d) failed.", __FUNCTION__,
+        utLog("%s: ERROR: malloc(%lu) failed.", __FUNCTION__,
               sizeof(GLAnimDef_t) * cqiNumAnimDefs);
 
         return false;
@@ -317,7 +317,7 @@ static int initGLAnimDefs(void)
             if (!(GLAnimDefs[i].tex.tex =
                   (struct _anim_texture_ent *)malloc(sizeof(struct _anim_texture_ent) * GLAnimDefs[i].tex.stages)))
             {
-                utLog("%s: ERROR: _anim_texture_ent malloc(%d) failed.",
+                utLog("%s: ERROR: _anim_texture_ent malloc(%lu) failed.",
                       __FUNCTION__,
                       sizeof(struct _anim_texture_ent) * GLAnimDefs[i].tex.stages);
 
@@ -693,7 +693,7 @@ static int initGLPlanets(void)
 
     if (!(GLPlanets = (GLPlanet_t *)malloc(sizeof(GLPlanet_t) * cbLimits.maxPlanets())))
     {
-        utLog("%s: ERROR: malloc(%d) failed.", __FUNCTION__,
+        utLog("%s: ERROR: malloc(%lu) failed.", __FUNCTION__,
               sizeof(GLPlanet_t) * cbLimits.maxPlanets());
 
         return false;
@@ -1186,7 +1186,7 @@ void drawBombing(int snum, int scale)
                 // free bombAState so we can retry again later */
                 free(bombAState);
                 bombAState = NULL;
-                utLog("%s: malloc(%d) failed", __FUNCTION__,
+                utLog("%s: malloc(%lu) failed", __FUNCTION__,
                       sizeof(struct _rndxy));
                 return;
             }
@@ -3117,7 +3117,7 @@ static int loadGLTextures()
 
             if (!texti)
             {
-                utLog("%s: texti malloc(%d) failed\n",
+                utLog("%s: texti malloc(%lu) failed\n",
                       __FUNCTION__, sizeof(textureImage));
                 return false;
             }

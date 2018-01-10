@@ -183,9 +183,9 @@ static int nDeadDisplay(dspConfig_t *dsp)
         buf[0] = 0;
         /* We were unable to determine the cause of death. */
         utAppendShip(buf, snum);
-        sprintf(cbuf, "dead: %s was killed by %d(%d).", buf,
+        sprintf(cbuf, "dead (unknown cause): %s was killed by %d(%d).", buf,
                 (int)kb, (int)detail);
-        utLog(cbuf);
+        utLog("%s: %s", __FUNCTION__, cbuf);
 
         cprintf(8,0,ALIGN_CENTER,"#%d#%s%s",
                 RedLevelColor, ywkb, "nothing in particular.  (How strange...)");

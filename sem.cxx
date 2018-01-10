@@ -309,7 +309,8 @@ char *semGetStatusStr(void)
 
     if (retval != 0)
     {
-        utLog("semGetStatusStr(%d): %s semctl(IPC_STAT) failed: %s",
+        utLog("%s: %s semctl(IPC_STAT) failed: %s",
+              __FUNCTION__,
               semGetName(LOCKCMN),
               strerror(errno));
     }

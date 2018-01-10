@@ -16,7 +16,11 @@ void     utAppendShip(char *str, int snum);
 void     utAppendKilledBy(char *buf, killedBy_t kb, uint16_t detail);
 int      utArrowsToDir( char *str, real *dir );
 void     utSetLogConfig(int usesys, int echostderr);
-void     utLog(const char *fmt, ...);
+
+// we want special format checks on this one
+void     utLog(const char *fmt, ...)
+    __attribute__ ((format (printf, 1, 2)));
+
 void     utDeleteBlanks( char *str );
 int      utDeltaSecs( int s, int *n );
 real     utExplosionHits( real basehits, real dis );

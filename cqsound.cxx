@@ -57,7 +57,7 @@ static void _music_finished(void)
 
     if (Mix_PlayingMusic())
     {                           /* shouldn't happen */
-        utLog("%s: Music is still playing!");
+        utLog("%s: Music is still playing!", __FUNCTION__);
         return;
     }
 
@@ -394,7 +394,7 @@ void cqsInitSound(void)
 
     if (!cqiSoundConf || (!cqiSoundEffects && !cqiSoundMusic))
     {
-        utLog("%s: cqiSound not initialized, bailing");
+        utLog("%s: cqiSound not initialized, bailing", __FUNCTION__);
         return;
     }
 

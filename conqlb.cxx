@@ -831,7 +831,7 @@ int clbTakePlanet( int pnum, int snum )
                     cbTeams[oteam].name);
 
             clbStoreMsg(MSG_FROM_COMP, 0, MSG_TO_ALL, 0, buf);
-            utLog(buf);
+            utLog("GENO: %s", buf);
         }
 
     }
@@ -1106,7 +1106,7 @@ int clbZeroPlanet( int pnum, int snum )
                         cbTeams[oteam].name);
 
                 clbStoreMsg(MSG_FROM_COMP, 0, MSG_TO_ALL, 0, buf);
-                utLog(buf);
+                utLog("GENO: %s", buf);
             }
         }
     }

@@ -397,7 +397,7 @@ void animQueInit(animQue_t *aque)
 
     if (!(aque->que = (animStatePtr_t *)malloc(aque->maxentries * sizeof(animStatePtr_t))))
     {
-        utLog("%s: malloc(%d) failed.", __FUNCTION__,
+        utLog("%s: malloc(%lu) failed.", __FUNCTION__,
               aque->maxentries * sizeof(animQue_t *));
         aque->maxentries = 0;
     }
@@ -426,7 +426,7 @@ void animQueAdd(animQue_t *aque, animStatePtr_t astate)
 
         if (!newlist)
         {
-            utLog("%s: Could not realloc %d state pointers, ignoring Add.",
+            utLog("%s: Could not realloc %lu state pointers, ignoring Add.",
                   __FUNCTION__,
                   sizeof(animStatePtr_t) * (aque->maxentries + increment));
             return;               /* do nothing */
