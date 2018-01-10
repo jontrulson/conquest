@@ -701,7 +701,7 @@ void debugplan(void)
         if ( hd3[i] != ' ' )
             hd3[i] = '-';
 
-    PlanetOffset = 1;
+    PlanetOffset = 0;
     cdclear();
 
     Done = false;
@@ -2066,7 +2066,7 @@ void oppedit(void)
 /*    opplanlist */
 void opPlanetList(void)
 {
-    mcuPlanetList( TEAM_NOTEAM, 0 );		/* we get extra info */
+    mcuPlanetList( TEAM_NOTEAM, -1 );		/* we get extra info */
 }
 
 

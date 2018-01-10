@@ -820,7 +820,7 @@ void mcuPlanetList( int team, int snum )
         if ( hd3[i] != ' ' )
             hd3[i] = '-';
 
-    PlanetOffset = 1;
+    PlanetOffset = 0;
     cdclear();
     Done = false;
     do

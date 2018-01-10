@@ -51,7 +51,7 @@ scrNode_t *nPlanetlInit(int nodeid, int setnode, int sn, int tn)
 {
     retnode = nodeid;
 
-    PlanetOffset = 1;
+    PlanetOffset = 0;
     PlanetIdx = 0;
     snum = sn;
     team = tn;
