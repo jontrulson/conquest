@@ -27,7 +27,8 @@
 #include "nShipl.h"
 
 static const char *hd2="ship  name          pseudonym              kills     type";
-static int fship;
+static int shipOffset; /* offset into cbLimits.maxShips() for this page */
+static int shipIdx;
 
 static int nShiplDisplay(dspConfig_t *);
 static int nShiplIdle(void);
@@ -47,6 +48,9 @@ scrNode_t *nShiplInit(int nodeid, int setnode)
 {
     retnode = nodeid;
 
+    shipOffset = 0;
+    shipIdx = 0;
+
     if (setnode)
         setNode(&nShiplNode);
 
@@ -59,7 +63,6 @@ static int nShiplDisplay(dspConfig_t *dsp)
     int snum = Context.snum;
     static char cbuf[BUFFER_SIZE_256];
     int i, unum, status, lin, col;
-    int fline, lline;
     char sbuf[20];
     char kbuf[20];
     char pidbuf[20];
@@ -78,73 +81,81 @@ static int nShiplDisplay(dspConfig_t *dsp)
     lin = lin + 1;
     cprintf(lin, col, ALIGN_NONE, "#%d#%s", LabelColor, cbuf);
 
-    fline = lin + 1;				/* first line to use */
-    lline = MSG_LIN1;				/* last line to use */
-
-    i = fship;
-
-    lin = fline;
-    while ( i < cbLimits.maxShips() && lin <= lline )
+    lin++; // first line to use
+    shipIdx = 0;
+    if ( shipOffset < cbLimits.maxShips() )
     {
-        status = cbShips[i].status;
-
-        if ( status == SS_LIVE )
+        while ((shipOffset + shipIdx) < cbLimits.maxShips())
         {
-            sbuf[0] = 0;
-            utAppendShip(sbuf , i) ;
-            strcat(sbuf, " ") ;
-            utAppendChar(sbuf, cbShipTypes[cbShips[i].shiptype].name[0]) ;
+            i = shipOffset + shipIdx;
+            shipIdx++;
 
-            unum = cbShips[i].unum;
-            if ( unum >= 0 && unum < cbLimits.maxUsers() )
+            status = cbShips[i].status;
+
+            if ( status == SS_LIVE )
             {
-                if (SROBOT(i)) /* robot */
-                    strcpy(pidbuf, " ROBOT");
-                else if (SVACANT(i))
-                    strcpy(pidbuf, "VACANT");
+                sbuf[0] = 0;
+                utAppendShip(sbuf , i) ;
+                strcat(sbuf, " ") ;
+                utAppendChar(sbuf, cbShipTypes[cbShips[i].shiptype].name[0]) ;
+
+                unum = cbShips[i].unum;
+                if ( unum >= 0 && unum < cbLimits.maxUsers() )
+                {
+                    if (SROBOT(i)) /* robot */
+                        strcpy(pidbuf, " ROBOT");
+                    else if (SVACANT(i))
+                        strcpy(pidbuf, "VACANT");
+                    else
+                        strcpy(pidbuf, "  LIVE");
+
+                    strcpy(ubuf, cbUsers[unum].username);
+
+                    sprintf(kbuf, "%6.1f", (cbShips[i].kills + cbShips[i].strkills));
+                    sprintf( cbuf, "%-5s %-13.13s %-21.21s %-8s %6s",
+                             sbuf, ubuf, cbShips[i].alias,
+                             kbuf, pidbuf );
+                }
                 else
-                    strcpy(pidbuf, "  LIVE");
+                    sprintf( cbuf, "%-5s %13s %21s %8s %6s", sbuf,
+                             " ", " ", " ", " " );
 
-                strcpy(ubuf, cbUsers[unum].username);
-
-                sprintf(kbuf, "%6.1f", (cbShips[i].kills + cbShips[i].strkills));
-                sprintf( cbuf, "%-5s %-13.13s %-21.21s %-8s %6s",
-                         sbuf, ubuf, cbShips[i].alias,
-                         kbuf, pidbuf );
-            }
-            else
-                sprintf( cbuf, "%-5s %13s %21s %8s %6s", sbuf,
-                         " ", " ", " ", " " );
-
-            if (snum >= 0 && snum < cbLimits.maxShips() )
-            {		/* a normal ship view */
-                if ( i == snum )    /* it's ours */
-                    color = NoColor | CQC_A_BOLD;
-                else if (satwar(i, snum)) /* we're at war with it */
-                    color = RedLevelColor;
-                else if (cbShips[i].team == cbShips[snum].team && !selfwar(snum))
-                    color = GreenLevelColor; /* it's a team ship */
+                if (snum >= 0 && snum < cbLimits.maxShips() )
+                {		/* a normal ship view */
+                    if ( i == snum )    /* it's ours */
+                        color = NoColor | CQC_A_BOLD;
+                    else if (satwar(i, snum)) /* we're at war with it */
+                        color = RedLevelColor;
+                    else if (cbShips[i].team == cbShips[snum].team && !selfwar(snum))
+                        color = GreenLevelColor; /* it's a team ship */
+                    else
+                        color = YellowLevelColor;
+                }
                 else
-                    color = YellowLevelColor;
-            }
-            else
-            { /* not conqoper, and not a valid ship (main menu) */
-                if (cbUsers[Context.unum].war[cbShips[i].team])  /* we're at war with ships's
-                                                                team */
-                    color = RedLevelColor;
-                else if (cbUsers[Context.unum].team == cbShips[i].team)
-                    color = GreenLevelColor; /* it's a team ship */
-                else
-                    color = YellowLevelColor;
-            }
+                { /* not conqoper, and not a valid ship (main menu) */
+                    if (cbUsers[Context.unum].war[cbShips[i].team])  /* we're at war with ships's
+                                                                        team */
+                        color = RedLevelColor;
+                    else if (cbUsers[Context.unum].team == cbShips[i].team)
+                        color = GreenLevelColor; /* it's a team ship */
+                    else
+                        color = YellowLevelColor;
+                }
 
-            cprintf(lin, col, ALIGN_NONE, "#%d#%s", color, cbuf);
-        }
-        i = i + 1;
-        lin = lin + 1;
-    }
+                cprintf(lin, col, ALIGN_NONE, "#%d#%s", color, cbuf);
+            }
+            lin++;
 
-    cprintf(MSG_LIN2, 0, ALIGN_CENTER, MTXT_DONE);
+            if (lin == MSG_LIN1)
+                break; // out of while
+
+        } // while
+
+        if ((shipOffset + shipIdx) >= cbLimits.maxShips())
+            cprintf(MSG_LIN2, 0,  ALIGN_CENTER, "#%d#%s", NoColor, MTXT_DONE);
+        else
+            cprintf(MSG_LIN2, 0,  ALIGN_CENTER, "#%d#%s", NoColor, MTXT_MORE);
+    } // if
 
     return NODE_OK;
 }
@@ -182,6 +193,21 @@ static int nShiplIdle(void)
 
 static int nShiplInput(int ch)
 {
+    ch = CQ_CHAR(ch);
+
+    if (ch == ' ')
+    {
+        shipOffset += shipIdx;
+
+        if (shipOffset < cbLimits.maxShips())
+            return NODE_OK;
+    }
+    else if (ch == TERM_EXTRA) // go back to first page
+    {
+        shipOffset = 0;
+        return NODE_OK;
+    }
+
     /* go back */
     switch (retnode)
     {
