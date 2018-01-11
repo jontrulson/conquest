@@ -319,7 +319,7 @@ int clientHello(const char *clientname)
         {
             if (rv > 0 && FD_ISSET(cInfo.usock, &readfds))
             {
-                if ((rv = udpRecv(cInfo.usock, buf, PKT_MAXSIZE, &cInfo.servaddr)) >= 0 )
+                if ((rv = udpRecvFrom(cInfo.usock, buf, PKT_MAXSIZE, &cInfo.servaddr)) >= 0 )
                 {
                     utLog("NET: got (%d) UDP bytes from server, will ACK for server UDP", rv);
                     cInfo.doUDP = true;

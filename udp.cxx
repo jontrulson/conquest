@@ -1,22 +1,24 @@
-/* borrowed from bzflag
- * Copyright (c) 1993 - 2003 Tim Riker
+/*
+ * UDP handling
  *
- * I hacked it up somewhat - for straight C, and to better fit in with Conquest.
- * JET
- *
- * This package is free software;  you can redistribute it and/or
- * modify it under the terms of the LGPL. [JET]
- *
- * THIS PACKAGE IS PROVIDED ``AS IS'' AND WITHOUT ANY EXPRESS OR
- * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
- * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+ * Copyright Jon Trulson under the MIT License. (See LICENSE).
  */
 
 #include "c_defs.h"
 
 #include "conqnet.h"
+#include "conf.h"
 #include "udp.h"
 #include "conqutil.h"
+#include "packet.h"
+
+// incremented for each packet written, and sent as the first 4 bytes
+// of every udp packet.  Start at one so we don't confuse the recv.
+static uint32_t writeSeq = 1;
+
+// expected as the first 4 bytes of every udp packet read.  We use
+// this to detect duplicate and out-of-order (OOO) packets
+static uint32_t readSeq = 0;
 
 int udpOpen(int port, struct sockaddr_in* addr)
 {
@@ -80,8 +82,6 @@ int udpOpen(int port, struct sockaddr_in* addr)
     return fd;
 }
 
-
-
 int udpClose(int fd)
 {
     if (fd == -1)
@@ -89,8 +89,7 @@ int udpClose(int fd)
     return close(fd);
 }
 
-
-int udpSend(int fd, const void* buffer,
+int udpSendTo(int fd, const void* buffer,
             int bufferLength,
             const struct sockaddr_in* addr)
 {
@@ -98,7 +97,7 @@ int udpSend(int fd, const void* buffer,
                   (const struct sockaddr*)addr, sizeof(*addr));
 }
 
-int udpRecv(int fd, void* buffer, int bufferLength,
+int udpRecvFrom(int fd, void* buffer, int bufferLength,
             struct sockaddr_in* addr)
 {
     struct sockaddr_in from;
@@ -116,7 +115,7 @@ int udpRecv(int fd, void* buffer, int bufferLength,
         else
 #endif  /* MINGW */
         {
-            utLog("NET: udpRecv: %s", strerror(errno));
+            utLog("NET: udpRecvFrom: %s", strerror(errno));
             return -1;
         }
     }
@@ -125,3 +124,96 @@ int udpRecv(int fd, void* buffer, int bufferLength,
     return byteCount;
 }
 
+int udpSendPacket(int sock, const void* buffer, size_t buflen)
+{
+    size_t sendLen = buflen + sizeof(uint32_t);
+    uint8_t sendBuf[sendLen];
+
+    uint32_t sendSeq = htonl(writeSeq);
+    writeSeq++;
+
+    sendBuf[0] = (sendSeq & 0x000000ff);
+    sendBuf[1] = ((sendSeq & 0x0000ff00) >> 8);
+    sendBuf[2] = ((sendSeq & 0x00ff0000) >> 16);
+    sendBuf[3] = ((sendSeq & 0xff000000) >> 24);
+
+    memcpy((void *)&sendBuf[4], (const void *)buffer, buflen);
+
+    // send it off
+
+    int rv = send(sock, sendBuf, sendLen, 0);
+
+    return ((rv > 0) ? buflen : rv);
+}
+
+int udpRecvPacket(int sock, char* buffer, size_t buflen)
+{
+    size_t recvLen = PKT_MAXSIZE + sizeof(uint32_t);
+    uint8_t readPkt[recvLen];
+    uint32_t theSeq = 0;
+
+    int rv = recv(sock, readPkt, recvLen, 0);
+
+    if (rv <= 0)
+        return rv;
+
+    // must have a minimum of 8 bytes (seq # + pktid + at least 3
+    // bytes of pkt).  All packets, minus the seq number are at least
+    // 4 bytes long.
+    if (rv < 8)
+    {
+        utLog("%s: received short packet: %d, ignoring", __FUNCTION__, rv);
+        pktStats.shortPackets++;
+        return 0;
+    }
+
+    // unpack the seq # and check for things to make us go
+    theSeq = (readPkt[0]
+              | (readPkt[1] << 8)
+              | (readPkt[2] << 16)
+              | (readPkt[3] << 24));
+
+    theSeq = ntohl(theSeq);
+
+    if (theSeq > readSeq)
+        readSeq = theSeq;
+    else if (theSeq == readSeq)
+    {
+        utLog("%s: Duplicate packet (seq %u), ignoring", __FUNCTION__,
+            theSeq);
+        pktStats.duplicatePackets++;
+        return 0;
+    }
+    else if (theSeq < readSeq)
+    {
+        // check for wrap-around
+        if (abs(readSeq - theSeq) > (UINT_MAX / 2))
+        { // wrap around
+            readSeq = theSeq;
+        }
+        else
+        {
+            utLog("%s: Out of Order packet (seq %ud, last seq %ud) ignoring",
+                  __FUNCTION__, theSeq, readSeq);
+            pktStats.oooPackets++;
+            return 0;
+        }
+    }
+
+    // if we are here, we can copy in the packet, and return the RV
+    // value (minus the bytes used for the seq #)
+    rv -= sizeof(uint32_t);
+    if (rv > buflen)
+    {
+        // then the supplied buffer was too small, so we must dump the packet
+        utLog("%s: received packet is larger than supplied buffer (%d > %lu)"
+              ", dumping",
+              __FUNCTION__,
+              rv, buflen);
+        return 0;
+    }
+
+    memcpy(buffer, &readPkt[4], rv);
+
+    return rv;
+}

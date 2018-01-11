@@ -379,6 +379,18 @@ static void _dispUserOptsMenu(void)
     cprintf(lin, col, ALIGN_NONE, "#%d#UDP:  #%d# %s#%d#", LabelColor,
             InfoColor, (cInfo.doUDP) ? "On" : "Off",
             NoColor);
+
+    if (cInfo.doUDP)
+    {
+        cprintf(lin, col + 12, ALIGN_NONE, "#%d#Stats: OoO: #%d#%u #%d# Dup: #%d#%u #%d#Short: #%d#%u",
+                LabelColor,
+                InfoColor, pktStats.oooPackets,
+                LabelColor,
+                InfoColor, pktStats.duplicatePackets,
+                LabelColor,
+                InfoColor, pktStats.shortPackets);
+    }
+
     lin++;
     cprintf(lin, col, ALIGN_NONE, "#%d#Flags:#%d# %s#%d#", LabelColor,
             InfoColor, clntServerFlagsStr(sStat.serverFlags),

@@ -20,6 +20,7 @@
 
 #include "global.h"
 #include "rb.h"
+#include "udp.h"
 
 /* our ringbuffers */
 static ringBuffer_t  *RB_TCPIn = NULL;      /* input data TCP */
@@ -776,11 +777,25 @@ static int _pktReadSocket(int sock, ringBuffer_t *RB, void *buf, int blen)
 
     rlen = min(blen, rbBytesFree(RB));
 
-    if ((rv = recv(sock, packet, rlen, 0)) < 0)
+    if (sock == udp_sock)
     {
-        *packet = 0;
-        utLog("%s: recv(%d): %s", __FUNCTION__, rlen, strerror(errno));
-        return -1;
+        if ((rv = udpRecvPacket(sock, packet, rlen)) < 0)
+        {
+            *packet = 0;
+            utLog("%s: udpRecvPacket(%d): %s",
+                  __FUNCTION__, rlen, strerror(errno));
+            return -1;
+        }
+    }
+    else
+    {
+
+        if ((rv = recv(sock, packet, rlen, 0)) < 0)
+        {
+            *packet = 0;
+            utLog("%s: TCP recv(%d): %s", __FUNCTION__, rlen, strerror(errno));
+            return -1;
+        }
     }
 
     if (rv)
@@ -984,14 +999,18 @@ int pktRead(char *buf, int blen, unsigned int delay)
 }
 
 /* write to actual sockets */
-static int _pktWriteSocket(int sock, void *data, int len)
+static int _pktWriteSocket(int sock, const void *data, int len)
 {
     int rv;
 
     if (!data || !len)
         return 0;
+    if (sock == udp_sock)
+        rv = udpSendPacket(sock, data, len);
+    else
+        rv = send(sock, data, len, 0);
 
-    if ((rv = send(sock, data, len, 0)) > 0)
+    if (rv > 0)
         pktStats.txBytes += rv;       /* update the counter */
 
     return rv;

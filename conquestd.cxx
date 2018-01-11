@@ -1860,7 +1860,7 @@ static int hello(void)
         {
             if (FD_ISSET(sInfo.usock, &readfds))
             {                       /* get the packet, almost done negotiating udp */
-                rv = udpRecv(sInfo.usock, buf, PKT_MAXSIZE, &sInfo.clntaddr);
+                rv = udpRecvFrom(sInfo.usock, buf, PKT_MAXSIZE, &sInfo.clntaddr);
                 utLog("NET: SERVER: hello: got %d UDP bytes from client port %d", rv,
                       (int)ntohs(sInfo.clntaddr.sin_port));
 

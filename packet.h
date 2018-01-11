@@ -74,6 +74,11 @@ typedef struct _pkt_stats {
     unsigned int  rxBytes;        /* tx/rx byte counts */
     unsigned int  txBytes;
     unsigned int  pingAvg;        /* in ms */
+
+    // UDP info
+    unsigned int duplicatePackets = 0;
+    unsigned int oooPackets = 0;
+    unsigned int shortPackets = 0;
 } pktStats_t;
 
 #ifdef NOEXTERN_PACKET
