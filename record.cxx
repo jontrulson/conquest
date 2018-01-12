@@ -24,6 +24,10 @@
 #undef NOEXTERN_RECORD
 
 #include "playback.h"
+#include <initvec.h>
+
+#include <vector>
+using namespace std;
 
 extern char *ConquestVersion;
 extern char *ConquestDate;
@@ -459,7 +463,7 @@ void recGenTorpLoc(void)
     int snum = Context.snum;
     int team = cbShips[snum].team;
     spTorpLoc_t storploc;
-    static spTorpLoc_t **pktTorpLoc = NULL;
+    static vector<vector<spTorpLoc_t>> pktTorpLoc;
     real dis;
     real x, y;
     static uint32_t iterstart = 0;
@@ -473,17 +477,9 @@ void recGenTorpLoc(void)
     if (tdelta < iterwait)
         return;                     /* not yet time */
 
-    if (!pktTorpLoc)
+    if (!pktTorpLoc.size())
     {
-        // try to allocate it
-        MALLOC_TWOD(pktTorpLoc, spTorpLoc_t, cbLimits.maxShips(),
-                    cbLimits.maxTorps());
-        if (!pktTorpLoc)
-        {
-            utLog("%s: pktTorpLoc allocation failed, won't record torploc"
-                  " client packets :(", __FUNCTION__);
-            return;
-        }
+        _INIT_VEC2D(pktTorpLoc, cbLimits.maxShips(), cbLimits.maxTorps());
     }
 
     iterstart = iternow;

@@ -16,10 +16,12 @@
 #include "conqlb.h"
 #include "conqutil.h"
 #include "rndlb.h"
+#include "initvec.h"
 
 #include <vector>
 
 using namespace std;
+
 /* Here, we maintain 2 copies of potential packets, privileged and
    unpriveleged.  We fill the packets, and then return a pointer to a static
    packet if it's different from the last one we processed, else NULL
@@ -65,8 +67,7 @@ static vector<spTeam_t> recTeam;
 static spDoomsday_t recDoomsday;
 static vector<spPlanetInfo_t> recPlanetInfo;
 
-/* allocate and memset everything to 0.  return false on success, true
- * on failure. */
+/* allocate and initialize everything */
 void spktInit(void)
 {
     spktInitPkt();
@@ -74,28 +75,6 @@ void spktInit(void)
 
     return;
 }
-
-#define _INIT_VEC1D(_myvec, _mysize)            \
-    {                                           \
-        _myvec.clear();                         \
-        _myvec.reserve(_mysize);                \
-        for (int i; i<_mysize; i++)             \
-            _myvec.push_back({});               \
-    }
-
-#define _INIT_VEC2D(_myvec, _mysize, _mysize2)  \
-    {                                           \
-        _myvec.clear();                         \
-        _myvec.reserve(_mysize);                \
-        for (int i; i<_mysize; i++)             \
-            _myvec.push_back({});               \
-        for (auto &j : _myvec)                  \
-        {                                       \
-            j.reserve(_mysize2);                \
-            for (int i=0; i<_mysize2; i++)      \
-                j.push_back({});                \
-        }                                       \
-    }
 
 void spktInitPkt(void)
 {

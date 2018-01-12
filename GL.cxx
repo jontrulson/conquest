@@ -61,15 +61,19 @@ extern void conqend(void);
 #include "cqsound.h"
 #include "hud.h"
 
+#include "initvec.h"
+
+#include <vector>
+using namespace std;
 
 /* loaded texture list (the list itself is exported in textures.h) */
 static int loadedGLTextures = 0; /* count of total successful tex loads */
 
 /* torp animation states per torp per ship */
-static animStateRec_t **torpAStates = NULL;
+static vector<vector<animStateRec_t>> torpAStates;
 
 /* bomb (torp) animation state per ship */
-static animStateRec_t *bombAState = NULL;
+static vector<animStateRec_t> bombAState;
 
 static int frame=0, timebase=0;
 static float FPS = 0.0;
@@ -424,11 +428,8 @@ static bool initGLExplosions(void)
 
     utLog("%s: Initializing...", __FUNCTION__);
 
-    // first, allocate the array
-    MALLOC_TWOD(torpAStates, animStateRec_t,
-                cbLimits.maxShips(), cbLimits.maxTorps());
-    if (!torpAStates) // :(
-        return true;
+    // (re-)init the vector
+    _INIT_VEC2D(torpAStates, cbLimits.maxShips(), cbLimits.maxTorps());
 
     /* we only need to do this once.  When we have a properly initted state,
        we will simply copy it into the torpAState array.  */
@@ -1051,8 +1052,8 @@ void drawExplosion(GLfloat x, GLfloat y, int snum, int torpnum, int scale)
     if (norender)
         return;
 
-    // see if it was properly allocated
-    if (!torpAStates)
+    // see if it has been initialized
+    if (!torpAStates.size())
     {
         if (initGLExplosions())
         {
@@ -1155,16 +1156,10 @@ void drawBombing(int snum, int scale)
     pnum = (int)cbShips[snum].lockDetail;
 
     // init bombing animation storage and states
-    if (!bombAState)
+    if (!bombAState.size())
     {
         // allocate the array
-        MALLOC_ONED(bombAState, animStateRec_t, cbLimits.maxShips());
-
-        if (!bombAState)
-        {
-            utLog("%s: malloc failure allocating bombAState", __FUNCTION__);
-            return;
-        }
+        _INIT_VEC1D(bombAState, cbLimits.maxShips());
 
         if (!animInitState("bombing", &initastate, NULL))
             return;
@@ -1183,9 +1178,8 @@ void drawBombing(int snum, int scale)
 
                 for (j=0; j < i; j++)
                     free(bombAState[j].state.privptr);
-                // free bombAState so we can retry again later */
-                free(bombAState);
-                bombAState = NULL;
+                // clear bombAState so we can retry again later */
+                bombAState.clear();
                 utLog("%s: malloc(%lu) failed", __FUNCTION__,
                       sizeof(struct _rndxy));
                 return;
