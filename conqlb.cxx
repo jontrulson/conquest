@@ -31,6 +31,10 @@
 #include "color.h"
 #include "conqinit.h"
 
+#include <string>
+#include <vector>
+#include <algorithm>
+using namespace std;
 
 /* shared with display.c */
 real LastPhasDist = PHASER_DIST;
@@ -2812,25 +2816,17 @@ void clbPlanetDrive(real itersec)
 void clbTorpDrive(real itersec)
 {
     int s, i, j;
-    static int *ship = NULL;
     static bool FirstTime = true;
+    static vector<int> ship;
 
     if (FirstTime)
     {
         FirstTime = false;
         /* Randomize ship ordering. */
 
-        // allocate storage for our ship array.  The problem here is
-        // that we cannot free it (only freed at program exit).
-        MALLOC_ONED(ship, int, cbLimits.maxShips());
-        if (!ship)
-        {
-            utLog("%s: allocation failure allocating ship[] array",
-                  __FUNCTION__);
-            return;
-        }
+        ship.clear();
         for ( s = 0; s < cbLimits.maxShips(); s++ )
-            ship[s] = s;
+            ship.push_back(s);
 
         for ( s = 0; s < cbLimits.maxShips(); s++ )
         {
@@ -2841,10 +2837,6 @@ void clbTorpDrive(real itersec)
 
         }
     }
-
-    // if we don't have storage, we cannot continue
-    if (!ship)
-        return;
 
     for ( s = 0; s < cbLimits.maxShips(); s++ )
     {
