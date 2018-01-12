@@ -59,12 +59,6 @@ int main(int argc, char *argv[])
 
     /* First things first. */
 
-    /* close stdin and stdout.  Leave stderr alone. */
-    if (stdin)
-        fclose(stdin);
-    if (stdout)
-        fclose(stdout);
-
     utLog("conqdriv: Initializing...");
 
     if ((ConquestGID = getConquestGID()) == -1)

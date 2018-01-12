@@ -218,15 +218,13 @@ void drcreate(void)
     return;
 #else
     int pid;
-    char drivcmd[BUFFER_SIZE_256];
+    char drivcmd[PATH_MAX];
 
 
-    utGetSecs( &(cbDriver->drivtime) );			/* prevent driver timeout */
+    utGetSecs( &(cbDriver->drivtime) ); /* prevent driver timeout */
     cbDriver->drivpid = 0;			/* zero current driver pid */
     cbDriver->drivstat = DRS_RESTART;		/* driver state to restart */
 
-    /* fork the child - mmap()'s should remain */
-    /*  intact */
     if ((pid = fork()) == -1)
     {				/* error */
         cbDriver->drivstat = DRS_OFF;
@@ -236,6 +234,9 @@ void drcreate(void)
 
     if (pid == 0)
     {				/* The child: aka "The Driver" */
+        /* close all file descriptors */
+        for (int i=0; i < FOPEN_MAX; i++)
+            close(i);
         sprintf(drivcmd, "%s/%s", CONQLIBEXEC, C_CONQ_CONQDRIV);
         execl(drivcmd, drivcmd, NULL);
         utLog("drcreate(): exec(): %s", strerror(errno));
