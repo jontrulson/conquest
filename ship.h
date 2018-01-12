@@ -101,8 +101,9 @@ typedef struct {
     int eacc;                   /* accumulated elapsed time */
     real strkills;              /* 'extra' randomized kills used for robots */
     Torp_t torps[ABS_MAXTORPS]; /* Torpedos */
-    uint32_t flags;                 /* SHIP_F_ */
-    uint16_t pad1;                      /* PAD */
+    uint32_t flags;             /* SHIP_F_ */
+    uint8_t ipaddr[16];         /* Ship's IP address */
+    uint32_t pad[5];            /* PAD */
     char alias[MAXUSERNAME];    /* copy of cbUsers[].alias */
 } Ship_t;
 
