@@ -23,122 +23,12 @@
 
 #include "context.h"
 
-struct compile_options {
-    const char *name;
-    const char *oneliner;
-    int type;			/* We'll use the CTYPE_*'s from conf.h */
-    void *value;
-};
-
 static void ChangeOption(struct Conf *cdata, int lin);
-static void DisplayCompileOptions(void);
 static int ViewEditOptions(struct Conf ConfigData[], int ConfSize,
 			   int editable);
 static void DisplayHelpScreen(struct Conf *confitem);
 
 static int ChangedSomething = false;
-
-
-/*************************************************************************
- * DisplayCompileOptions() - do what name indicates
- *
- *
- *************************************************************************/
-
-static void DisplayCompileOptions(void)
-{
-    const int settingcol = 60;
-    int i, vattrib;
-    long j = 0;
-    int lin = 0, col = 0;
-    static const char *header = "Compile Time Options";
-    static const char *prompt = MTXT_DONE;
-
-    static struct compile_options CompileOptions[] =
-        {
-            {"HAVE_SETITIMER", "can do fastupdates (2 per sec)", CTYPE_BOOL,
-#ifdef HAVE_SETITIMER
-             (void *)true
-#else
-             (void *)false
-#endif /* HAVE_SETITIMER */
-            },
-
-            {"WARP0CLOAK", "can't be seen when cloaked at warp 0", CTYPE_BOOL,
-#ifdef WARP0CLOAK
-             (void *)true
-#else
-             (void *)false
-#endif /* WARP0CLOAK */
-            },
-
-            {"DO_EXPLODING_SHIPS", "ships explode when they die", CTYPE_BOOL,
-#ifdef DO_EXPLODING_SHIPS
-             (void *)true
-#else
-             (void *)false
-#endif /* DO_EXPLODING_SHIPS */
-            },
-
-            /* last (NULL) entry */
-            {NULL, NULL, CTYPE_NULL, (void *)NULL}
-        };
-
-    lin = 1;
-    col = ((int)(Context.maxcol - strlen(header)) / 2);
-
-    cprintf(lin, col, ALIGN_NONE, "#%d#%s", NoColor, header);
-
-    lin += 3;
-    col = 2;
-
-    i = 0;
-
-    while (CompileOptions[i].name != NULL)
-    {				/* this won't handle more than one screen */
-        cprintf(lin, col, ALIGN_NONE, "#%d#%s#%d# - %s#%d#",
-                NoColor, CompileOptions[i].name,
-                InfoColor, CompileOptions[i].oneliner,
-                NoColor);
-
-        /* output the value */
-        switch(CompileOptions[i].type)
-	{
-	case CTYPE_BOOL:
-            j = (long)CompileOptions[i].value;
-
-            if (j == (long)true)
-                vattrib = GreenLevelColor;
-            else
-                vattrib = RedLevelColor;
-
-            cprintf(lin, settingcol, ALIGN_NONE, "#%d#%s#%d#",
-                    vattrib, (j == true) ? "True" : "False",
-                    NoColor);
-            lin++;
-
-            break;
-
-	case CTYPE_STRING:
-            cprintf(lin, settingcol, ALIGN_NONE, "#%d#%s#%d#",
-                    InfoColor, (char *) CompileOptions[i].value,
-                    NoColor);
-            lin++;
-
-            break;
-	} /* switch */
-
-        i++;
-    }
-
-    cdclrl( MSG_LIN1, 2  );
-    cdputc(prompt, MSG_LIN1);
-
-    /* Get a char */
-    (void)iogchar();
-
-    return;
-}
 
 
 /*************************************************************************
@@ -149,63 +39,10 @@ static void DisplayCompileOptions(void)
 
 void SysOptsMenu(void)
 {
-    static const char *header = "System Options Menu";
-    static const char *mopts[] = {
-        "View compile-time Options",
-        "View/Edit System-wide Options"
-    };
-    const int numoptions = 2;	/* don't exceed 9 - one char input is used */
-
-    static const char *prompt = "Enter a number to select an item, any other key to quit.";
-    int lin = 0, col = 0;
-
-    int i;
-    int ch;
-    int Done = false;
-
-
-    while (Done == false)
-    {
-        /* First clear the display. */
-        cdclear();
-        lin = 1;
-        col = ((int)(Context.maxcol - strlen(header))/ 2);
-
-        cprintf(lin, col, ALIGN_NONE, "#%d#%s", NoColor, header);
-
-        lin += 3;
-        col = 5;
-
-        for (i = 0; i < numoptions; i++)
-	{
-            cprintf(lin, col, ALIGN_NONE, "#%d#%d.#%d# %s#%d#", InfoColor,
-                    i + 1, LabelColor, mopts[i], NoColor);
-            lin++;
-	}
-
-        cdclrl( MSG_LIN1, 2  );
-        cdputs(prompt, MSG_LIN1, 1);
-
-        /* Get a char */
-        ch = iogchar();
-
-        switch(ch)
-	{
-	case '1':			/* compile time options */
-            DisplayCompileOptions();
-            break;
-	case '2':			/* sys-wide opts */
-            ChangedSomething = false;
-            ViewEditOptions(SysConfData, SysCfEnd, true);
-            if (ChangedSomething == true)
-                SaveSysConfig();
-            break;
-	default:
-            Done = true;
-            break;
-	}
-    }
-
+    ChangedSomething = false;
+    ViewEditOptions(SysConfData, SysCfEnd, true);
+    if (ChangedSomething == true)
+        SaveSysConfig();
     return;
 }
 

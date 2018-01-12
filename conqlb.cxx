@@ -326,10 +326,8 @@ void clbKillShip(int snum, killedBy_t kb, uint16_t detail)
     int sendmesg = false;
     char msgbuf[BUFFER_SIZE_256];
 
-#if defined(DO_EXPLODING_SHIPS)
     /* launch all torps - sorta, we'll use 'explode' mode... */
     clbLaunch(snum, 0.0, EXPLODESHIP_TORP_COUNT, LAUNCH_EXPLODE);
-#endif
 
     /* internal routine. */
     cbLock(&cbConqInfo->lockword);
@@ -1496,12 +1494,10 @@ int clbFindSpecial( int snum, int token, int count, int *sorpnum, int *xsorpnum 
                 }
                 if ( valid )
                 {
-#ifdef WARP0CLOAK
                     if (SCLOAKED(i) && cbShips[i].warp == 0.0 &&
                         satwar(snum, i) &&
                         SROBOT(snum))
                         continue; /* nobody here but us chickens... */
-#endif /* WARP0CLOAK */
                     td = dist(cbShips[snum].x, cbShips[snum].y, cbShips[i].x, cbShips[i].y);
                     if ( td < nd )
                     {

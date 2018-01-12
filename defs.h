@@ -33,23 +33,6 @@
 #define C_CONQ_INITRC    "conqinitrc"
 
 /*
- * WARP0CLOAK - Although the code made it difficult to scan a ship that was
- *  cloaked at warp 0, it was still possible to scan such a ship if it was
- *  within alert range.  Defining this means you CANNOT be detected (even by
- *  robots) if you are cloaked and at warp 0.0.  An enemy can fly right over
- *  you and won't even know your there... heeheehee
- */
-#define WARP0CLOAK
-
-/*
- * DO_EXPLODING_SHIPS - In this mode, ships explode when they die, with
- *  a force equal to the number of torpedos the ship has available, and
- *  only if the ship had the fuel to 'fire' them, were it alive to do
- *  so.
- */
-#define DO_EXPLODING_SHIPS
-
-/*
  * Macro defines
  */
 #define MAX_MACROS 64		/* max number of macros supported */

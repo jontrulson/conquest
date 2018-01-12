@@ -485,7 +485,6 @@ void display( int snum )
                         if ( i != snum )
                         {
 
-#ifdef WARP0CLOAK
                             /* 1/6/94 */
                             /* we want any cloaked ship at warp 0.0 */
                             /* to be invisible. */
@@ -495,7 +494,6 @@ void display( int snum )
                                 /* ;-} */
                                 continue;	/* RESTART FOR */
                             }
-#endif /* WARP0CLOAK */
 
                             if ( dis < mindis )
                             {
