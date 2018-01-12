@@ -92,7 +92,7 @@ static void dispServerInfo(dspConfig_t *dsp, metaSRec_t *metaServerList,
         sprintf(buf1, "#%d#%%s", NoColor);
 
         sprintf(pbuf2, "#%d#Version: ", MagentaColor);
-        sprintf(buf2, "#%d#%%s", NoColor);
+        sprintf(buf2, "#%d#%%s (Protocol: 0x%%04x)", NoColor);
 
         sprintf(pbuf3, "#%d#Status: ", MagentaColor);
         sprintf(buf3,
@@ -120,7 +120,8 @@ static void dispServerInfo(dspConfig_t *dsp, metaSRec_t *metaServerList,
     cprintf(tlin++, icol, ALIGN_NONE, buf1, metaServerList[num].servername);
 
     cprintf(tlin, hcol, ALIGN_NONE, pbuf2);
-    cprintf(tlin++, icol, ALIGN_NONE, buf2, metaServerList[num].serverver);
+    cprintf(tlin++, icol, ALIGN_NONE, buf2, metaServerList[num].serverver,
+        metaServerList[num].protovers);
 
     cprintf(tlin, hcol, ALIGN_NONE, pbuf3);
     cprintf(tlin++, icol, ALIGN_NONE, buf3,
@@ -190,7 +191,7 @@ void nMetaInit(void)
         if (metaServerList[i].version >= 2) /* valid for newer meta protocols */
             servervec[i].vers = metaServerList[i].protovers;
         else
-            servervec[i].vers = PROTOCOL_VERSION; /* always 'compatible' */
+            servervec[i].vers = 0; /* always 'incompatible' */
 
         snprintf(servervec[i].hostname, (MAXHOSTNAME + MAXPORTNAME), "%s:%hu",
                  metaServerList[i].altaddr,
@@ -243,28 +244,27 @@ static int nMetaDisplay(dspConfig_t *dsp)
         dispmac = servervec[k].hostname;
 
         /* highlight the currently selected line */
+        cqColor servColor;
+        cqColor dataColor;
         if (i == clin)
         {
-            if (servervec[k].vers == PROTOCOL_VERSION)
-                cprintf(lin, col, ALIGN_NONE, "#%d#%s#%d#",
-                        RedLevelColor, dispmac, NoColor);
-            else
-                cprintf(lin, col, ALIGN_NONE,
-                        "#%d#%s#%d# (unavailable - incompatible protocol)",
-                        BlueColor |CQC_A_BOLD, dispmac, NoColor);
-
+            servColor = RedLevelColor;
+            dataColor = BlueColor | CQC_A_BOLD;
         }
         else
         {
-            if (servervec[k].vers == PROTOCOL_VERSION)
-                cprintf(lin, col, ALIGN_NONE, "#%d#%s#%d#",
-                        InfoColor, dispmac, NoColor);
-            else
-                cprintf(lin, col, ALIGN_NONE,
-                        "#%d#%s#%d# (unavailable - incompatible protocol)",
-                        BlueColor, dispmac, NoColor);
+            servColor = InfoColor;
+            dataColor = BlueColor;
         }
 
+        if (servervec[k].vers == PROTOCOL_VERSION)
+            cprintf(lin, col, ALIGN_NONE, "#%d#%s#%d#",
+                    servColor, dispmac, NoColor);
+        else
+            cprintf(lin, col, ALIGN_NONE,
+                    "#%d#%s#%d# (incompatible protocol, need version 0x%04x)",
+                    dataColor, dispmac, NoColor,
+                    PROTOCOL_VERSION);
 
         lin++;
         i++;

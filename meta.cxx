@@ -164,7 +164,6 @@ int metaBuffer2ServerRec(metaSRec_t *srec, char *buf)
         case 11:                  /* server protocol version */
             *ch = 0;
             srec->protovers = (uint16_t)atoi(chs);
-
             chs = ch + 1;
             fieldno++;
 
@@ -189,7 +188,6 @@ int metaBuffer2ServerRec(metaSRec_t *srec, char *buf)
     }
 
     free(tbuf);
-
 
     switch (srec->version)
     {
@@ -309,6 +307,11 @@ int metaUpdateServer(const char *remotehost, const char *name, int port)
 
     thetm = localtime(&thetimet);
     snprintf(sRec.walltime, META_GEN_STRSIZE, "%s", asctime(thetm));
+    // remove newline.  Not sure why older servers didn't seem to add
+    // one in asctime, but current ones sure do.
+    i = strlen(sRec.walltime);
+    if (i && sRec.walltime[i - 1] == '\n')
+        sRec.walltime[i - 1] = 0;
 
     /* all loaded up, convert it and send it off */
     metaServerRec2Buffer(msg, &sRec);

@@ -40,6 +40,8 @@ while (<$sock>)
     $flagstr .= "NoDoomsday " if ( $flags & 8 );
     $flagstr .= "KillBots " if ( $flags & 16 );
     $flagstr .= "SwitchTeam " if ( $flags & 32 );
+    $flagstr .= "NoTeamWar " if ( $flags & 64 );
+    $flagstr .= "NoDrift " if ( $flags & 128 );
 
     push @srvlist, { server => "$sful",
                      vers => $sver,
