@@ -225,5 +225,5 @@ uint32_t udpGetReadSeq()
 
 uint32_t udpGetWriteSeq()
 {
-    return readSeq;
+    return writeSeq;
 }
