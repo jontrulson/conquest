@@ -419,11 +419,7 @@ int main(int argc, char *argv[])
 
 
     /* clear out our stored packets */
-    if (spktInit())
-    {
-        fprintf(stderr,"conquestd: spktInit() memory allocation failed.\n" );
-        exit(1);
-    }
+    spktInit();
 
 #ifdef DEBUG_FLOW
     utLog("%s@%d: main() starting conqinit().", __FILE__, __LINE__);

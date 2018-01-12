@@ -17,6 +17,9 @@
 #include "conqutil.h"
 #include "rndlb.h"
 
+#include <vector>
+
+using namespace std;
 /* Here, we maintain 2 copies of potential packets, privileged and
    unpriveleged.  We fill the packets, and then return a pointer to a static
    packet if it's different from the last one we processed, else NULL
@@ -30,122 +33,120 @@
 */
 
 /* packet send */
-static spShip_t *pktShip = NULL;
-static spShipSml_t *pktShipSml = NULL;
-static spShipLoc_t *pktShipLoc = NULL;
-static spPlanet_t *pktPlanet = NULL;
-static spPlanetSml_t *pktPlanetSml = NULL;
-static spPlanetLoc_t *pktPlanetLoc = NULL;
-static spPlanetLoc2_t *pktPlanetLoc2 = NULL;
-static spUser_t *pktUser = NULL;
-static spTorp_t **pktTorp = NULL;
-static spTorpLoc_t **pktTorpLoc = NULL;
-static spTorpEvent_t **pktTorpEvent = NULL;
-static spTeam_t *pktTeam = NULL;
-static spcbConqInfo_t *pktcbConqInfo = NULL;
-static spHistory_t *pktHistory = NULL;
-static spDoomsday_t *pktDoomsday = NULL;
-static spPlanetInfo_t *pktPlanetInfo = NULL;
+static vector<spShip_t> pktShip;
+static vector<spShipSml_t> pktShipSml;
+static vector<spShipLoc_t> pktShipLoc;
+static vector<spPlanet_t> pktPlanet;
+static vector<spPlanetSml_t> pktPlanetSml;
+static vector<spPlanetLoc_t> pktPlanetLoc;
+static vector<spPlanetLoc2_t> pktPlanetLoc2;
+static vector<spUser_t> pktUser;
+static vector<vector<spTorp_t>> pktTorp;
+static vector<vector<spTorpLoc_t>> pktTorpLoc;
+static vector<vector<spTorpEvent_t>> pktTorpEvent;
+static vector<spTeam_t> pktTeam;
+static spcbConqInfo_t pktcbConqInfo;
+static vector<spHistory_t> pktHistory;
+static spDoomsday_t pktDoomsday;
+static vector<spPlanetInfo_t> pktPlanetInfo;
 
 /* recording */
-static spShip_t *recShip = NULL;
-static spShipSml_t *recShipSml = NULL;
-static spShipLoc_t *recShipLoc = NULL;
-static spPlanet_t *recPlanet = NULL;
-static spPlanetSml_t *recPlanetSml = NULL;
-static spPlanetLoc_t *recPlanetLoc = NULL;
-static spPlanetLoc2_t *recPlanetLoc2 = NULL;
-static spTorp_t **recTorp = NULL;
-static spTorpLoc_t **recTorpLoc = NULL;
-static spTorpEvent_t **recTorpEvent = NULL;
-static spTeam_t *recTeam = NULL;
-static spDoomsday_t *recDoomsday = NULL;
-static spPlanetInfo_t *recPlanetInfo = NULL;
+static vector<spShip_t> recShip;
+static vector<spShipSml_t> recShipSml;
+static vector<spShipLoc_t> recShipLoc;
+static vector<spPlanet_t> recPlanet;
+static vector<spPlanetSml_t> recPlanetSml;
+static vector<spPlanetLoc_t> recPlanetLoc;
+static vector<spPlanetLoc2_t> recPlanetLoc2;
+static vector<vector<spTorp_t>> recTorp;
+static vector<vector<spTorpLoc_t>> recTorpLoc;
+static vector<vector<spTorpEvent_t>> recTorpEvent;
+static vector<spTeam_t> recTeam;
+static spDoomsday_t recDoomsday;
+static vector<spPlanetInfo_t> recPlanetInfo;
 
 /* allocate and memset everything to 0.  return false on success, true
  * on failure. */
-bool spktInit(void)
+void spktInit(void)
 {
-    static bool firstTime = true;
+    spktInitPkt();
+    spktInitRec();
 
-    // can only run once...
-    if (firstTime)
-        firstTime = false;
-    else
-        return false; // should never call this twice anyway
-
-    // if we fail one of the mallocs, we don't bother freeing what we
-    // already allocated as the program will exit if this function
-    // returns true.
-    if (spktInitPkt())
-        return true;
-    if (spktInitRec())
-        return true;
-
-    return false;
+    return;
 }
 
-// wrap the ones in conqdef.h to return true (failure) if failure
-#define _MALLOC_ONED(_myvar, _mytype, _mysize)  \
+#define _INIT_VEC1D(_myvec, _mysize)            \
     {                                           \
-        MALLOC_ONED(_myvar, _mytype, _mysize);  \
-        if (!_myvar)                            \
-            return true;                        \
+        _myvec.clear();                         \
+        _myvec.reserve(_mysize);                \
+        for (int i; i<_mysize; i++)             \
+            _myvec.push_back({});               \
     }
 
-#define _MALLOC_TWOD(_myvar, _mytype, _mysize1, _mysize2)       \
-    {                                                           \
-        MALLOC_TWOD(_myvar, _mytype, _mysize1, _mysize2);       \
-        if (!_myvar)                                            \
-            return true;                                        \
+#define _INIT_VEC2D(_myvec, _mysize, _mysize2)  \
+    {                                           \
+        _myvec.clear();                         \
+        _myvec.reserve(_mysize);                \
+        for (int i; i<_mysize; i++)             \
+            _myvec.push_back({});               \
+        for (auto &j : _myvec)                  \
+        {                                       \
+            j.reserve(_mysize2);                \
+            for (int i=0; i<_mysize2; i++)      \
+                j.push_back({});                \
+        }                                       \
     }
 
-bool spktInitPkt(void)
+void spktInitPkt(void)
 {
     /* server pkt */
-    _MALLOC_ONED(pktShip, spShip_t, cbLimits.maxShips());
-    _MALLOC_ONED(pktShipSml, spShipSml_t, cbLimits.maxShips());
-    _MALLOC_ONED(pktShipLoc, spShipLoc_t, cbLimits.maxShips());
-    _MALLOC_ONED(pktPlanet, spPlanet_t, cbLimits.maxPlanets());
-    _MALLOC_ONED(pktPlanetSml, spPlanetSml_t, cbLimits.maxPlanets());
-    _MALLOC_ONED(pktPlanetLoc, spPlanetLoc_t, cbLimits.maxPlanets());
-    _MALLOC_ONED(pktPlanetLoc2, spPlanetLoc2_t, cbLimits.maxPlanets());
-    _MALLOC_ONED(pktUser, spUser_t, cbLimits.maxUsers());
-    _MALLOC_TWOD(pktTorp, spTorp_t, cbLimits.maxShips(), cbLimits.maxTorps());
-    _MALLOC_TWOD(pktTorpLoc, spTorpLoc_t, cbLimits.maxShips(),
-                 cbLimits.maxTorps());
-    _MALLOC_TWOD(pktTorpEvent, spTorpEvent_t, cbLimits.maxShips(),
-                 cbLimits.maxTorps());
-    _MALLOC_ONED(pktTeam, spTeam_t, NUMALLTEAMS);
-    _MALLOC_ONED(pktcbConqInfo, spcbConqInfo_t, 1);
-    _MALLOC_ONED(pktHistory, spHistory_t, cbLimits.maxHist());
-    _MALLOC_ONED(pktDoomsday, spDoomsday_t, 1);
-    _MALLOC_ONED(pktPlanetInfo, spPlanetInfo_t, cbLimits.maxPlanets());
+    _INIT_VEC1D(pktShip, cbLimits.maxShips());
+    _INIT_VEC1D(pktShipSml, cbLimits.maxShips());
+    _INIT_VEC1D(pktShipLoc, cbLimits.maxShips());
+    _INIT_VEC1D(pktPlanet, cbLimits.maxPlanets());
+    _INIT_VEC1D(pktPlanetSml, cbLimits.maxPlanets());
+    _INIT_VEC1D(pktPlanetLoc, cbLimits.maxPlanets());
+    _INIT_VEC1D(pktPlanetLoc2, cbLimits.maxPlanets());
+    _INIT_VEC1D(pktUser, cbLimits.maxUsers());
 
-    return false;
+    _INIT_VEC2D(pktTorp, cbLimits.maxShips(), cbLimits.maxTorps());
+    _INIT_VEC2D(pktTorpLoc, cbLimits.maxShips(), cbLimits.maxTorps());
+    _INIT_VEC2D(pktTorpEvent, cbLimits.maxShips(), cbLimits.maxTorps());
+
+    _INIT_VEC1D(pktTeam, NUMALLTEAMS);
+
+    pktcbConqInfo = {};
+
+    _INIT_VEC1D(pktHistory, cbLimits.maxHist());
+
+    pktDoomsday= {};
+
+    _INIT_VEC1D(pktPlanetInfo, cbLimits.maxPlanets());
+
+    return;
 }
 
-bool spktInitRec(void)
+void spktInitRec(void)
 {
     /* recording */
-    _MALLOC_ONED(recShip, spShip_t, cbLimits.maxShips());
-    _MALLOC_ONED(recShipSml, spShipSml_t, cbLimits.maxShips());
-    _MALLOC_ONED(recShipLoc, spShipLoc_t, cbLimits.maxShips());
-    _MALLOC_ONED(recPlanet, spPlanet_t, cbLimits.maxPlanets());
-    _MALLOC_ONED(recPlanetSml, spPlanetSml_t, cbLimits.maxPlanets());
-    _MALLOC_ONED(recPlanetLoc, spPlanetLoc_t, cbLimits.maxPlanets());
-    _MALLOC_ONED(recPlanetLoc2, spPlanetLoc2_t, cbLimits.maxPlanets());
-    _MALLOC_TWOD(recTorp, spTorp_t, cbLimits.maxShips(),
-                 cbLimits.maxTorps());
-    _MALLOC_TWOD(recTorpLoc, spTorpLoc_t, cbLimits.maxShips(),
-                 cbLimits.maxTorps());
-    _MALLOC_TWOD(recTorpEvent, spTorpEvent_t, cbLimits.maxShips(),
-                 cbLimits.maxTorps());
-    _MALLOC_ONED(recTeam, spTeam_t, NUMALLTEAMS);
-    _MALLOC_ONED(recDoomsday, spDoomsday_t, 1);
-    _MALLOC_ONED(recPlanetInfo, spPlanetInfo_t, cbLimits.maxPlanets());
+    _INIT_VEC1D(recShip, cbLimits.maxShips());
+    _INIT_VEC1D(recShipSml, cbLimits.maxShips());
+    _INIT_VEC1D(recShipLoc, cbLimits.maxShips());
+    _INIT_VEC1D(recPlanet, cbLimits.maxPlanets());
+    _INIT_VEC1D(recPlanetSml, cbLimits.maxPlanets());
+    _INIT_VEC1D(recPlanetLoc, cbLimits.maxPlanets());
+    _INIT_VEC1D(recPlanetLoc2, cbLimits.maxPlanets());
 
-    return false;
+    _INIT_VEC2D(recTorp, cbLimits.maxShips(), cbLimits.maxTorps());
+    _INIT_VEC2D(recTorpLoc, cbLimits.maxShips(), cbLimits.maxTorps());
+    _INIT_VEC2D(recTorpEvent, cbLimits.maxShips(), cbLimits.maxTorps());
+
+    recDoomsday = {};
+
+    _INIT_VEC1D(recTeam,  NUMALLTEAMS);
+    _INIT_VEC1D(recPlanetInfo, cbLimits.maxPlanets());
+
+    return;
 }
 
 
@@ -989,10 +990,10 @@ spcbConqInfo_t *spktcbConqInfo(int force)
     utStrncpy((char *)spci.conqtime, cbConqInfo->conqtime, MAXDATESIZE);
     utStrncpy((char *)spci.lastwords, cbConqInfo->lastwords, MAXLASTWORDS);
 
-    if (memcmp((void *)&spci, (void *)pktcbConqInfo,
+    if (memcmp((void *)&spci, (void *)&pktcbConqInfo,
                sizeof(spcbConqInfo_t)) || force)
     {
-        *pktcbConqInfo = spci;
+        pktcbConqInfo = spci;
         return &spci;
     }
 
@@ -1042,19 +1043,19 @@ spDoomsday_t *spktDoomsday(int rec)
 
     if (rec)
     {
-        if (memcmp((void *)&dd, (void *)recDoomsday,
+        if (memcmp((void *)&dd, (void *)&recDoomsday,
                    sizeof(spDoomsday_t)))
         {
-            *recDoomsday = dd;
+            recDoomsday = dd;
             return &dd;
         }
     }
     else
     {
-        if (memcmp((void *)&dd, (void *)pktDoomsday,
+        if (memcmp((void *)&dd, (void *)&pktDoomsday,
                    sizeof(spDoomsday_t)))
         {
-            *pktDoomsday = dd;
+            pktDoomsday = dd;
             return &dd;
         }
     }

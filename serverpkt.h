@@ -14,9 +14,9 @@
 #include "packet.h"
 
 // false == success, true == failure
-bool           spktInit(void);
-bool           spktInitPkt(void);
-bool           spktInitRec(void);
+void           spktInit(void);
+void           spktInitPkt(void);
+void           spktInitRec(void);
 
 spUser_t       *spktUser(uint16_t unum);
 
