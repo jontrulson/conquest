@@ -24,6 +24,7 @@
 #include "nOptions.h"
 #include "cqkeys.h"
 #include "cqsound.h"
+#include "udp.h"
 
 static int retnode;             /* node to return to */
 static int uopts = false;       /* are we doing user opts? */
@@ -382,13 +383,15 @@ static void _dispUserOptsMenu(void)
 
     if (cInfo.doUDP)
     {
-        cprintf(lin, col + 12, ALIGN_NONE, "#%d#Stats: OoO: #%d#%u #%d# Dup: #%d#%u #%d#Short: #%d#%u",
+        cprintf(lin, col + 12, ALIGN_NONE, "#%d#Stats: OoO: #%d#%u #%d# Dup: #%d#%u #%d#Short: #%d#%u #%d#readSeq: #%d#%u",
                 LabelColor,
                 InfoColor, pktStats.oooPackets,
                 LabelColor,
                 InfoColor, pktStats.duplicatePackets,
                 LabelColor,
-                InfoColor, pktStats.shortPackets);
+                InfoColor, pktStats.shortPackets,
+                LabelColor,
+                InfoColor, udpGetReadSeq());
     }
 
     lin++;

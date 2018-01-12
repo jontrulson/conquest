@@ -217,3 +217,13 @@ int udpRecvPacket(int sock, char* buffer, size_t buflen)
 
     return rv;
 }
+
+uint32_t udpGetReadSeq()
+{
+    return readSeq;
+}
+
+uint32_t udpGetWriteSeq()
+{
+    return readSeq;
+}

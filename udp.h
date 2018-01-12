@@ -18,6 +18,9 @@ int udpRecvFrom(int fd, void* buffer,
 
 int udpSendPacket(int sock, const void* buffer, size_t buflen);
 int udpRecvPacket(int sock, char* buffer, size_t buflen);
+uint32_t udpGetReadSeq();
+uint32_t udpGetWriteSeq();
+
 
 
 #endif /* _UDP_H */
