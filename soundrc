@@ -1,7 +1,6 @@
 # Sound definitions
 #
-# $Id$
-#
+
 
 # only one of these.
 soundconf {
@@ -13,7 +12,7 @@ soundconf {
 
 ##
 ## The music definitions are stored in a seperate file with the
-## musicpak. 
+## musicpak.
 ##
 
 
@@ -22,7 +21,7 @@ soundconf {
 #################
 
 effect {
-  name         "doomsday-beam"  
+  name         "doomsday-beam"
   filename     "TOS-doombeam"
 
   volume       70
@@ -34,7 +33,7 @@ effect {
 }
 
 effect {
-  name         "explosion"  
+  name         "explosion"
   filename     "explosion"
 
   volume       45
@@ -45,7 +44,7 @@ effect {
 }
 
 effect {
-  name         "bombing"  
+  name         "bombing"
   filename     "TOS-bomb"
 
   fadeinms     0
@@ -56,7 +55,7 @@ effect {
 
 
 effect {
-  name         "engines"  
+  name         "engines"
   filename     "engines"
 
   fadeinms     1000
@@ -67,44 +66,44 @@ effect {
 
 
 effect {
-  name         "beep-alert"  
+  name         "beep-alert"
   filename     "beep-alert"
 
   volume       60
   fadeinms     0
   fadeoutms    0
-  loops        1 
+  loops        1
   limit        1
   delayms      1500
 }
 
 
 effect {
-  name         "beep-err"  
+  name         "beep-err"
   filename     "beep-err"
 
   volume       65
   fadeinms     0
   fadeoutms    0
-  loops        1 
+  loops        1
   limit        1
 }
 
 
 effect {
-  name         "beep-msg"  
+  name         "beep-msg"
   filename     "beep-msg"
 
   volume       40
   fadeinms     0
   fadeoutms    0
-  loops        1 
+  loops        1
   limit        1
 }
 
 
 effect {
-  name         "torp-alert"  
+  name         "torp-alert"
   filename     "torpalert"
 
   volume       70
@@ -120,7 +119,7 @@ effect {
 ######
 
 effect {
-  name         "shipF-phaser"  
+  name         "shipF-phaser"
   filename     "TOS-fphaz"
 
   volume       60
@@ -131,7 +130,7 @@ effect {
 }
 
 effect {
-  name         "shipF-torp"  
+  name         "shipF-torp"
   filename     "TOS-fphoton"
 
   volume       50
@@ -143,7 +142,7 @@ effect {
 }
 
 effect {
-  name         "shipF-torp3"  
+  name         "shipF-torp3"
   filename     "TOS-fphoton3"
 
   volume       50
@@ -155,7 +154,7 @@ effect {
 }
 
 effect {
-  name         "shipF-alert"  
+  name         "shipF-alert"
   filename     "TOS-falert"
 
   volume       35
@@ -166,7 +165,7 @@ effect {
 }
 
 effect {
-  name         "shipF-beam-down"  
+  name         "shipF-beam-down"
   filename     "TOS-fbeamd"
 
   fadeinms     0
@@ -176,7 +175,7 @@ effect {
 }
 
 effect {
-  name         "shipF-beam-up"  
+  name         "shipF-beam-up"
   filename     "TOS-fbeamu"
 
   fadeinms     0
@@ -186,7 +185,7 @@ effect {
 }
 
 effect {
-  name         "shipF-hit"  
+  name         "shipF-hit"
   filename     "TOS-fblast"
 
   fadeinms     0
@@ -196,7 +195,7 @@ effect {
 }
 
 effect {
-  name         "shipF-info"  
+  name         "shipF-info"
   filename     "TOS-finfo"
 
   volume       70
@@ -204,11 +203,11 @@ effect {
   fadeoutms    0
   loops        1
   limit        1
-  delayms      60000
+  delayms      180000
 }
 
 effect {
-  name         "shipF-mag"  
+  name         "shipF-mag"
   filename     "TOS-fmag"
 
   volume       70
@@ -216,7 +215,7 @@ effect {
   fadeoutms    0
   loops        1
   limit        1
-  delayms      60000
+  delayms      300000
 }
 
 effect {
@@ -246,7 +245,7 @@ effect {
 ######
 
 effect {
-  name         "shipR-phaser"  
+  name         "shipR-phaser"
   filename     "TOS-fphaz"
 
   volume       60
@@ -257,7 +256,7 @@ effect {
 }
 
 effect {
-  name         "shipR-torp"  
+  name         "shipR-torp"
   filename     "TOS-rphoton"
 
   volume       50
@@ -269,7 +268,7 @@ effect {
 }
 
 effect {
-  name         "shipR-torp3"  
+  name         "shipR-torp3"
   filename     "TOS-rphoton3"
 
   volume       50
@@ -281,7 +280,7 @@ effect {
 }
 
 effect {
-  name         "shipR-alert"  
+  name         "shipR-alert"
   filename     "TOS-falert"
 
   volume       35
@@ -292,7 +291,7 @@ effect {
 }
 
 effect {
-  name         "shipR-beam-down"  
+  name         "shipR-beam-down"
   filename     "TOS-fbeamd"
 
   fadeinms     0
@@ -302,7 +301,7 @@ effect {
 }
 
 effect {
-  name         "shipR-beam-up"  
+  name         "shipR-beam-up"
   filename     "TOS-fbeamu"
 
   fadeinms     0
@@ -312,7 +311,7 @@ effect {
 }
 
 effect {
-  name         "shipR-hit"  
+  name         "shipR-hit"
   filename     "TOS-fblast"
 
   fadeinms     0
@@ -322,7 +321,7 @@ effect {
 }
 
 effect {
-  name         "shipR-info"  
+  name         "shipR-info"
   filename     "TOS-finfo"
 
   volume       70
@@ -330,11 +329,11 @@ effect {
   fadeoutms    0
   loops        1
   limit        1
-  delayms      60000
+  delayms      180000
 }
 
 effect {
-  name         "shipR-mag"  
+  name         "shipR-mag"
   filename     "TOS-fmag"
 
   volume       70
@@ -342,7 +341,7 @@ effect {
   fadeoutms    0
   loops        1
   limit        1
-  delayms      60000
+  delayms      300000
 }
 
 effect {
@@ -371,7 +370,7 @@ effect {
 #####
 
 effect {
-  name         "shipK-phaser"  
+  name         "shipK-phaser"
   filename     "TOS-fphaz"
 
   volume       60
@@ -382,7 +381,7 @@ effect {
 }
 
 effect {
-  name         "shipK-torp"  
+  name         "shipK-torp"
   filename     "TOS-fphoton"
 
   volume       50
@@ -394,7 +393,7 @@ effect {
 }
 
 effect {
-  name         "shipK-torp3"  
+  name         "shipK-torp3"
   filename     "TOS-fphoton3"
 
   volume       50
@@ -406,7 +405,7 @@ effect {
 }
 
 effect {
-  name         "shipK-alert"  
+  name         "shipK-alert"
   filename     "TOS-falert"
 
   volume       35
@@ -417,7 +416,7 @@ effect {
 }
 
 effect {
-  name         "shipK-beam-down"  
+  name         "shipK-beam-down"
   filename     "TOS-fbeamd"
 
   fadeinms     0
@@ -427,7 +426,7 @@ effect {
 }
 
 effect {
-  name         "shipK-beam-up"  
+  name         "shipK-beam-up"
   filename     "TOS-fbeamu"
 
   fadeinms     0
@@ -437,7 +436,7 @@ effect {
 }
 
 effect {
-  name         "shipK-hit"  
+  name         "shipK-hit"
   filename     "TOS-fblast"
 
   fadeinms     0
@@ -447,7 +446,7 @@ effect {
 }
 
 effect {
-  name         "shipK-info"  
+  name         "shipK-info"
   filename     "TOS-finfo"
 
   volume       70
@@ -455,11 +454,11 @@ effect {
   fadeoutms    0
   loops        1
   limit        1
-  delayms      60000
+  delayms      180000
 }
 
 effect {
-  name         "shipK-mag"  
+  name         "shipK-mag"
   filename     "TOS-fmag"
 
   volume       70
@@ -467,7 +466,7 @@ effect {
   fadeoutms    0
   loops        1
   limit        1
-  delayms      60000
+  delayms      300000
 }
 
 effect {
@@ -497,7 +496,7 @@ effect {
 #####
 
 effect {
-  name         "shipO-phaser"  
+  name         "shipO-phaser"
   filename     "TOS-fphaz"
 
   volume       60
@@ -508,7 +507,7 @@ effect {
 }
 
 effect {
-  name         "shipO-torp"  
+  name         "shipO-torp"
   filename     "TOS-fphoton"
 
   volume       40
@@ -520,7 +519,7 @@ effect {
 }
 
 effect {
-  name         "shipO-torp3"  
+  name         "shipO-torp3"
   filename     "TOS-fphoton3"
 
   volume       50
@@ -532,7 +531,7 @@ effect {
 }
 
 effect {
-  name         "shipO-alert"  
+  name         "shipO-alert"
   filename     "TOS-falert"
 
   volume       35
@@ -543,7 +542,7 @@ effect {
 }
 
 effect {
-  name         "shipO-beam-down"  
+  name         "shipO-beam-down"
   filename     "TOS-fbeamd"
 
   fadeinms     0
@@ -553,7 +552,7 @@ effect {
 }
 
 effect {
-  name         "shipO-beam-up"  
+  name         "shipO-beam-up"
   filename     "TOS-fbeamu"
 
   fadeinms     0
@@ -563,7 +562,7 @@ effect {
 }
 
 effect {
-  name         "shipO-hit"  
+  name         "shipO-hit"
   filename     "TOS-fblast"
 
   fadeinms     0
@@ -573,7 +572,7 @@ effect {
 }
 
 effect {
-  name         "shipO-info"  
+  name         "shipO-info"
   filename     "TOS-finfo"
 
   volume       70
@@ -581,11 +580,11 @@ effect {
   fadeoutms    0
   loops        1
   limit        1
-  delayms      60000
+  delayms      180000
 }
 
 effect {
-  name         "shipO-mag"  
+  name         "shipO-mag"
   filename     "TOS-fmag"
 
   volume       70
@@ -593,7 +592,7 @@ effect {
   fadeoutms    0
   loops        1
   limit        1
-  delayms      60000
+  delayms      300000
 }
 
 effect {
@@ -617,4 +616,3 @@ effect {
   loops        1
   limit        1
 }
-

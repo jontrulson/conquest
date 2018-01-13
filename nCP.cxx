@@ -2293,13 +2293,13 @@ static void command( int ch )
 
     case '[':                   /* zoom out */
     {
+        bool doEffect = false;
         if (SMAP(Context.snum))
         {                     /* LR */
             if (ncpLRMagFactor - 1 >= -5)
             {
                 ncpLRMagFactor--;
-                cqsEffectPlay(cqsTeamEffects[cbShips[snum].team].mag, NULL,
-                              0, 0, 0);
+                doEffect = true;
             }
             else
                 mglBeep(MGL_BEEP_ERR);
@@ -2311,26 +2311,33 @@ static void command( int ch )
             if (ncpSRMagFactor - 1 >= -5)
             {
                 ncpSRMagFactor--;
-                cqsEffectPlay(cqsTeamEffects[cbShips[snum].team].mag, NULL,
-                              0, 0, 0);
+                doEffect = true;
             }
             else
                 mglBeep(MGL_BEEP_ERR);
 
             setViewerScaling(ncpSRMagFactor, false);
         }
+
+        if (doEffect)
+        {
+            // small probability to play this effect
+            if (rnd() < 0.1)
+                cqsEffectPlay(cqsTeamEffects[cbShips[snum].team].mag, NULL,
+                              0, 0, 0);
+        }
     }
     break;
 
     case ']':                   /* zoom in */
     {
+        bool doEffect = false;
         if (SMAP(Context.snum))
         {                     /* LR */
             if (ncpLRMagFactor + 1 <= 5)
             {
                 ncpLRMagFactor++;
-                cqsEffectPlay(cqsTeamEffects[cbShips[snum].team].mag, NULL,
-                              0, 0, 0);
+                doEffect = true;
             }
             else
                 mglBeep(MGL_BEEP_ERR);
@@ -2342,13 +2349,20 @@ static void command( int ch )
             if (ncpSRMagFactor + 1 <= 5)
             {
                 ncpSRMagFactor++;
-                cqsEffectPlay(cqsTeamEffects[cbShips[snum].team].mag, NULL,
-                              0, 0, 0);
+                doEffect = true;
             }
             else
                 mglBeep(MGL_BEEP_ERR);
 
             setViewerScaling(ncpSRMagFactor, false);
+        }
+
+        if (doEffect)
+        {
+            // small probability to play this effect
+            if (rnd() < 0.1)
+                cqsEffectPlay(cqsTeamEffects[cbShips[snum].team].mag, NULL,
+                              0, 0, 0);
         }
     }
     break;
