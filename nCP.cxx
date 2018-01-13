@@ -249,6 +249,7 @@ static void _infoship( int snum, int scanner, bool doOutput )
     {
         if (doOutput)
             cp_putmsg( "No such ship.", MSG_LIN1 );
+        hudSetInfoTarget(-1, false);
         return;
     }
     status = cbShips[snum].status;
@@ -256,6 +257,7 @@ static void _infoship( int snum, int scanner, bool doOutput )
     {
         if (doOutput)
             cp_putmsg( "Not found.", MSG_LIN1 );
+        hudSetInfoTarget(-1, false);
         return;
     }
 
@@ -267,9 +269,10 @@ static void _infoship( int snum, int scanner, bool doOutput )
     if ( snum == scanner )
     {
         /* Silly Captain... */
+        strcat(cbuf, ": That's us, silly!");
         if (doOutput)
-            strcat(cbuf, ": That's us, silly!");
-        cp_putmsg( cbuf, MSG_LIN1 );
+            cp_putmsg( cbuf, MSG_LIN1 );
+        hudSetInfoTarget(-1, false);
         return;
     }
     /* Scan another ship. */
@@ -519,6 +522,7 @@ static void _infoplanet( const char *str, int pnum, int snum, bool doOutput )
         {
             cp_putmsg( "No such planet.", MSG_LIN1 );
             hudClearPrompt(MSG_LIN2);
+            hudSetInfoTarget(-1, false);
         }
         utLog("_infoplanet: Called with invalid pnum (%d).",
               pnum );
@@ -790,6 +794,7 @@ static void _doinfo( char *buf, char ch, bool doOutput )
     if ( ch == TERM_ABORT )
     {
         hudClearPrompt(MSG_LIN1);
+        hudSetInfoTarget(-1, false);
         return;
     }
     extra = ( ch == TERM_EXTRA );
@@ -807,11 +812,12 @@ static void _doinfo( char *buf, char ch, bool doOutput )
         if ( buf[0] == 0 )
 	{
             hudClearPrompt(MSG_LIN1);
+            hudSetInfoTarget(-1, false);
             return;
 	}
     }
     else
-        strcpy(Context.lastinfostr , buf) ;
+        strcpy(Context.lastinfostr, buf) ;
 
     if ( utIsSpecial( buf, &what, &token, &count ) )
     {
@@ -830,7 +836,11 @@ static void _doinfo( char *buf, char ch, bool doOutput )
         else if ( what == NEAR_PLANET )
             _infoplanet( "", sorpnum, snum, doOutput );
         else
-            cp_putmsg( "Not found.", MSG_LIN2 );
+        {
+            if (doOutput)
+                cp_putmsg( "Not found.", MSG_LIN2 );
+            hudSetInfoTarget(-1, false);
+        }
     }
     else if ( buf[0] == 's' && utIsDigits(&buf[1]) )
     {
@@ -846,7 +856,9 @@ static void _doinfo( char *buf, char ch, bool doOutput )
         _infoplanet( "", j, snum, doOutput );
     else
     {
-        cp_putmsg( "I don't understand.", MSG_LIN2 );
+        if (doOutput)
+            cp_putmsg( "I don't understand.", MSG_LIN2 );
+        hudSetInfoTarget(-1, false);
         return;
     }
 

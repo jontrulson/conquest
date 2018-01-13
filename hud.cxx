@@ -635,11 +635,10 @@ void hudSetInfoTarget(int tnum, bool isShip)
                 hudData.info.lasttargetstr[2] = cbPlanets[tnum].name[2];
                 hudData.info.lasttargetstr[3] = 0;
             }
-
-            _updateTargetInfoString();
         }
 
         hudData.info.lasttarget = tnum;
+        _updateTargetInfoString();
     }
 
     return;
