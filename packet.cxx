@@ -22,6 +22,9 @@
 #include "rb.h"
 #include "udp.h"
 
+#include <algorithm>
+using namespace std;
+
 /* our ringbuffers */
 static ringBuffer_t  *RB_TCPIn = NULL;      /* input data TCP */
 static ringBuffer_t  *RB_UDPIn = NULL;      /* input data UDP */
@@ -760,7 +763,8 @@ static uint8_t _pktReadGetRB(ringBuffer_t *RB, void *buf, int blen, int update)
 }
 
 /* read data into the buffer, possibly depositing it into an RB */
-static int _pktReadSocket(int sock, ringBuffer_t *RB, void *buf, int blen)
+static int _pktReadSocket(int sock, ringBuffer_t *RB, void *buf,
+                          unsigned int blen)
 {
     int rv, len, rlen;
     int type;

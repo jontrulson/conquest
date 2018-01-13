@@ -58,6 +58,9 @@
 #include "ui.h"
 #include "ibuf.h"
 
+#include <algorithm>
+using namespace std;
+
 #define MSGMAXLINE 90 			/* used for screen formatting */
 
 /* Maximum screen dimensions. */

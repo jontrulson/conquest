@@ -45,6 +45,9 @@
 
 #include "cqsound.h"
 
+#include <algorithm>
+using namespace std;
+
 /* node specific states */
 #define S_NONE         0
 #define S_COURSE       1        /* setting course */
@@ -1811,7 +1814,7 @@ static void _initbeam()
     }
     else
     {
-        capacity = min( (int)rkills * 2,
+        capacity = min( (unsigned int)rkills * 2,
                         cbShipTypes[cbShips[snum].shiptype].armylim );
         upmax = min( cbPlanets[pnum].armies - MIN_BEAM_ARMIES,
                      capacity - cbShips[snum].armies );

@@ -22,6 +22,9 @@
 #include "conqlb.h"
 #include "conqutil.h"
 
+#include <algorithm>
+using namespace std;
+
 /* if set, utLog uses the system log, else it is created in HOME */
 static int systemlog   = true;
 static int echo2stderr = false;  /* whether to echo utLog to stderr */

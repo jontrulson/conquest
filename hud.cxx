@@ -13,6 +13,9 @@
 #include "conqutil.h"
 #include "conqai.h"
 
+#include <algorithm>
+using namespace std;
+
 extern void setWarp(real warp); /* FIXME, GL.c */
 
 #define NOEXTERN_HUD

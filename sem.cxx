@@ -19,6 +19,9 @@
 #include "conqlb.h"
 #include "conqutil.h"
 
+#include <algorithm>
+using namespace std;
+
 #define CONQSEMKEY   (0xff001701) /* hope that's unique! */
 #define CONQSEMPERMS (00664)
 #define CONQNUMSEMS  (2)

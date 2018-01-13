@@ -22,6 +22,9 @@
 
 #include "record.h"
 
+#include <algorithm>
+using namespace std;
+
 #define GREEN_ALERT 0
 #define YELLOW_ALERT 1
 #define RED_ALERT 2
@@ -393,7 +396,7 @@ void display( int snum )
         {
             sd = sind(cbShips[snum].lastphase);
             cd = cosd(cbShips[snum].lastphase);
-            ch = dirch[mod( (round( cbShips[snum].lastphase + 22.5 ) / 45), 7 )];
+            ch = dirch[mod( int(round( cbShips[snum].lastphase + 22.5 ) / 45), 7 )];
             uiPutColor(InfoColor);
             for ( fl = 0; fl <= LastPhasDist; fl = fl + 50.0 )
                 if ( clbCVTCoords( cenx, ceny,
@@ -571,14 +574,7 @@ void display( int snum )
                             cdputn( i, 0, lin, col + 2 );
                             uiPutColor(0);
 
-                            idx = (int)mod( round((((real)cbShips[i].head + 22.5) / 45.0) + 0.5) - 1, 8);
-                            /* JET 9/28/94 */
-                            /* Very strange -mod keep returning 8 = 8 % 8*/
-                            /* which aint right... mod seems to behave */
-                            /* itself elsewhere... anyway, a kludge: */
-                            idx = ((idx == 8) ? 0 : idx);
-
-                            /*			    utError("idx = %d", idx);*/
+                            idx = mod( int(round((((real)cbShips[i].head + 22.5) / 45.0) + 0.5)) - 1, 8);
 
                             j = lin+linofs[idx];
                             k = col+colofs[idx];

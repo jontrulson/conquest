@@ -23,6 +23,9 @@
 
 #include "sproc.h"
 
+#include <algorithm>
+using namespace std;
+
 /* disptach init */
 int procDispatchInit(uint16_t vers, packetEnt_t *pktList, int numpkts)
 {
@@ -1394,7 +1397,7 @@ void procBeam(cpCommand_t *cmd)
     }
     else
     {
-        capacity = min( (int)rkills * 2,
+        capacity = min( (unsigned int)rkills * 2,
                         cbShipTypes[cbShips[snum].shiptype].armylim );
         upmax = min( cbPlanets[pnum].armies - MIN_BEAM_ARMIES,
                      capacity - cbShips[snum].armies );

@@ -55,7 +55,8 @@ case "$host" in
 	;;
   *darwin*)
 	AC_DEFINE(DARWIN, 1, [Darwin])
-        ocflags="$CFLAGS"
+        # silence the tons of deprecation warnings
+        ocflags="$CFLAGS -Wno-deprecated-declarations"
         CFLAGS="$ocflags -I/usr/X11/include -I/opt/X11/include"
         CXXFLAGS="$ocflags -I/usr/X11/include -I/opt/X11/include"
 

@@ -25,6 +25,9 @@
 #include "conqunix.h"
 #include "rndlb.h"
 
+#include <algorithm>
+using namespace std;
+
 static int nenum;
 static int debug;
 static real dne, ane;
@@ -68,7 +71,7 @@ static void buildai( int snum, int vars[], int *bnenum, real *bdne, real *bane )
 {
 
     /* i = AIRANGE( j ) */
-#define AIRANGE(a) min(max((a), 0), 9)
+#define AIRANGE(a) min(max((a), real(0)), real(9))
 
     /* AISCALE( var, value, scale ) */
 #define AISCALE(a, b, c)  a = (int)AIRANGE( around( (real)(b) / (real)(c)  ))

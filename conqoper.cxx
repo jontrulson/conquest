@@ -45,6 +45,9 @@
 #include "display.h"
 #include "conqinit.h"
 
+#include <algorithm>
+using namespace std;
+
 static char cbuf[BUFFER_SIZE_1024]; /* general purpose buffer */
 
 /* option masks */

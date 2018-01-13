@@ -168,11 +168,5 @@ typedef double real;
 
 
 #define mod(x, y) ((x) % (y))
-#ifndef min
-#define min(x, y) (((x) < (y)) ? (x) : (y))
-#endif
-#ifndef max
-#define max(x, y) (((x) > (y)) ? (x) : (y))
-#endif
 
 #endif /* _C_DEFS_H */

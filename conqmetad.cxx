@@ -28,6 +28,9 @@
 
 #include "tcpwrap.h"
 
+#include <algorithm>
+using namespace std;
+
 #define LISTEN_BACKLOG 5 /* # of requests we're willing to to queue */
 
 metaSRec_t metaServerList[META_MAXSERVERS];
