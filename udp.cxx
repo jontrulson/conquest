@@ -187,7 +187,7 @@ int udpRecvPacket(int sock, char* buffer, size_t buflen)
     else if (theSeq < readSeq)
     {
         // check for wrap-around
-        if (abs(readSeq - theSeq) > (UINT_MAX / 2))
+        if (abs(int(readSeq - theSeq)) > (UINT_MAX / 2))
         { // wrap around
             readSeq = theSeq;
         }
