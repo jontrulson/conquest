@@ -69,9 +69,6 @@ using namespace std;
 /* loaded texture list (the list itself is exported in textures.h) */
 static int loadedGLTextures = 0; /* count of total successful tex loads */
 
-/* torp animation states per torp per ship */
-static vector<vector<animStateRec_t>> torpAStates;
-
 /* bomb (torp) animation state per ship */
 static vector<animStateRec_t> bombAState;
 
@@ -421,15 +418,12 @@ static int initGLAnimDefs(void)
 
 
 /* init the explosion animation states. */
-static bool initGLExplosions(void)
+static bool initGLExplosions(vector<vector<animStateRec_t>>& torpStates)
 {
     int i, j;
     animStateRec_t initastate;    /* initial state of an explosion */
 
     utLog("%s: Initializing...", __FUNCTION__);
-
-    // (re-)init the vector
-    _INIT_VEC2D(torpAStates, cbLimits.maxShips(), cbLimits.maxTorps());
 
     /* we only need to do this once.  When we have a properly initted state,
        we will simply copy it into the torpAState array.  */
@@ -439,10 +433,15 @@ static bool initGLExplosions(void)
     /* we start out expired of course :) */
     initastate.expired = CQI_ANIMS_MASK;
 
-    /* init the anim states for them all */
+    // init the vector
+    torpStates.clear();
+    for (int i; i<cbLimits.maxShips(); i++)
+        torpStates.push_back(vector<animStateRec_t>(cbLimits.maxTorps()));
+
+    // copy in our prepared animation state
     for (i=0; i<cbLimits.maxShips(); i++)
         for (j=0; j<cbLimits.maxTorps(); j++)
-            torpAStates[i][j] = initastate;
+            torpStates[i][j] = initastate;
 
     return false;
 }
@@ -1048,6 +1047,9 @@ void drawExplosion(GLfloat x, GLfloat y, int snum, int torpnum, int scale)
     static int explodefx = -1;
     GLfloat scaleFac = (scale == MAP_SR_FAC) ? dConf.vScaleSR : dConf.vScaleLR;
     GLfloat size;
+    // torp animation states per torp per ship
+    static vector<vector<animStateRec_t>> torpAStates;
+
 
     if (norender)
         return;
@@ -1055,7 +1057,7 @@ void drawExplosion(GLfloat x, GLfloat y, int snum, int torpnum, int scale)
     // see if it has been initialized
     if (!torpAStates.size())
     {
-        if (initGLExplosions())
+        if (initGLExplosions(torpAStates))
         {
             utLog("%s: initGLExplosions failed, bailing.",
                   __FUNCTION__);
@@ -1159,7 +1161,7 @@ void drawBombing(int snum, int scale)
     if (!bombAState.size())
     {
         // allocate the array
-        _INIT_VEC1D(bombAState, cbLimits.maxShips());
+        _INIT_VEC1D(bombAState, animStateRec_t, cbLimits.maxShips());
 
         if (!animInitState("bombing", &initastate, NULL))
             return;

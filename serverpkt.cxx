@@ -79,28 +79,30 @@ void spktInit(void)
 void spktInitPkt(void)
 {
     /* server pkt */
-    _INIT_VEC1D(pktShip, cbLimits.maxShips());
-    _INIT_VEC1D(pktShipSml, cbLimits.maxShips());
-    _INIT_VEC1D(pktShipLoc, cbLimits.maxShips());
-    _INIT_VEC1D(pktPlanet, cbLimits.maxPlanets());
-    _INIT_VEC1D(pktPlanetSml, cbLimits.maxPlanets());
-    _INIT_VEC1D(pktPlanetLoc, cbLimits.maxPlanets());
-    _INIT_VEC1D(pktPlanetLoc2, cbLimits.maxPlanets());
-    _INIT_VEC1D(pktUser, cbLimits.maxUsers());
+    _INIT_VEC1D(pktShip, spShip_t, cbLimits.maxShips());
+    _INIT_VEC1D(pktShipSml, spShipSml_t, cbLimits.maxShips());
+    _INIT_VEC1D(pktShipLoc, spShipLoc_t, cbLimits.maxShips());
+    _INIT_VEC1D(pktPlanet, spPlanet_t, cbLimits.maxPlanets());
+    _INIT_VEC1D(pktPlanetSml, spPlanetSml_t, cbLimits.maxPlanets());
+    _INIT_VEC1D(pktPlanetLoc, spPlanetLoc_t, cbLimits.maxPlanets());
+    _INIT_VEC1D(pktPlanetLoc2, spPlanetLoc2_t, cbLimits.maxPlanets());
+    _INIT_VEC1D(pktUser, spUser_t, cbLimits.maxUsers());
 
-    _INIT_VEC2D(pktTorp, cbLimits.maxShips(), cbLimits.maxTorps());
-    _INIT_VEC2D(pktTorpLoc, cbLimits.maxShips(), cbLimits.maxTorps());
-    _INIT_VEC2D(pktTorpEvent, cbLimits.maxShips(), cbLimits.maxTorps());
+    _INIT_VEC2D(pktTorp, spTorp_t, cbLimits.maxShips(), cbLimits.maxTorps());
+    _INIT_VEC2D(pktTorpLoc, spTorpLoc_t, cbLimits.maxShips(),
+                cbLimits.maxTorps());
+    _INIT_VEC2D(pktTorpEvent, spTorpEvent_t, cbLimits.maxShips(),
+                cbLimits.maxTorps());
 
-    _INIT_VEC1D(pktTeam, NUMALLTEAMS);
+    _INIT_VEC1D(pktTeam, spTeam_t, NUMALLTEAMS);
 
     pktcbConqInfo = {};
 
-    _INIT_VEC1D(pktHistory, cbLimits.maxHist());
+    _INIT_VEC1D(pktHistory, spHistory_t, cbLimits.maxHist());
 
     pktDoomsday= {};
 
-    _INIT_VEC1D(pktPlanetInfo, cbLimits.maxPlanets());
+    _INIT_VEC1D(pktPlanetInfo, spPlanetInfo_t, cbLimits.maxPlanets());
 
     return;
 }
@@ -108,22 +110,25 @@ void spktInitPkt(void)
 void spktInitRec(void)
 {
     /* recording */
-    _INIT_VEC1D(recShip, cbLimits.maxShips());
-    _INIT_VEC1D(recShipSml, cbLimits.maxShips());
-    _INIT_VEC1D(recShipLoc, cbLimits.maxShips());
-    _INIT_VEC1D(recPlanet, cbLimits.maxPlanets());
-    _INIT_VEC1D(recPlanetSml, cbLimits.maxPlanets());
-    _INIT_VEC1D(recPlanetLoc, cbLimits.maxPlanets());
-    _INIT_VEC1D(recPlanetLoc2, cbLimits.maxPlanets());
+    _INIT_VEC1D(recShip, spShip_t, cbLimits.maxShips());
+    _INIT_VEC1D(recShipSml, spShipSml_t, cbLimits.maxShips());
+    _INIT_VEC1D(recShipLoc, spShipLoc_t, cbLimits.maxShips());
+    _INIT_VEC1D(recPlanet, spPlanet_t, cbLimits.maxPlanets());
+    _INIT_VEC1D(recPlanetSml, spPlanetSml_t, cbLimits.maxPlanets());
+    _INIT_VEC1D(recPlanetLoc, spPlanetLoc_t, cbLimits.maxPlanets());
+    _INIT_VEC1D(recPlanetLoc2, spPlanetLoc2_t, cbLimits.maxPlanets());
 
-    _INIT_VEC2D(recTorp, cbLimits.maxShips(), cbLimits.maxTorps());
-    _INIT_VEC2D(recTorpLoc, cbLimits.maxShips(), cbLimits.maxTorps());
-    _INIT_VEC2D(recTorpEvent, cbLimits.maxShips(), cbLimits.maxTorps());
+    _INIT_VEC2D(recTorp, spTorp_t, cbLimits.maxShips(), cbLimits.maxTorps());
+    _INIT_VEC2D(recTorpLoc, spTorpLoc_t, cbLimits.maxShips(),
+                cbLimits.maxTorps());
+    _INIT_VEC2D(recTorpEvent, spTorpEvent_t, cbLimits.maxShips(),
+                cbLimits.maxTorps());
+
+    _INIT_VEC1D(recTeam,  spTeam_t, NUMALLTEAMS);
 
     recDoomsday = {};
 
-    _INIT_VEC1D(recTeam,  NUMALLTEAMS);
-    _INIT_VEC1D(recPlanetInfo, cbLimits.maxPlanets());
+    _INIT_VEC1D(recPlanetInfo, spPlanetInfo_t, cbLimits.maxPlanets());
 
     return;
 }

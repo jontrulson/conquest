@@ -479,7 +479,8 @@ void recGenTorpLoc(void)
 
     if (!pktTorpLoc.size())
     {
-        _INIT_VEC2D(pktTorpLoc, cbLimits.maxShips(), cbLimits.maxTorps());
+        _INIT_VEC2D(pktTorpLoc, spTorpLoc_t, cbLimits.maxShips(),
+                    cbLimits.maxTorps());
     }
 
     iterstart = iternow;
