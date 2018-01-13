@@ -277,30 +277,33 @@ void display( int snum )
        blending of explosions works on the ships. */
     for ( i = 0; i < cbLimits.maxShips(); i++ )
     {
-        /* explosions first */
-        for ( j = 0; j < cbLimits.maxTorps(); j = j + 1 )
-            if ( cbShips[i].torps[j].status == TS_FIREBALL )
-            {
-                /* First display exploding torps. */
-                if ( GLcvtcoords( cenx, ceny, cbShips[i].torps[j].x,
-                                  cbShips[i].torps[j].y, -scale, &glx, &gly ))
-                {
-                    drawExplosion(glx, gly, i, j, scale);
-                }
-            }
-
-        if ( ! lsmap )
-	{
-            /* Now display the live torps. */
+        if ( cbShips[i].status != SS_OFF )
+        {
+            /* explosions first */
             for ( j = 0; j < cbLimits.maxTorps(); j = j + 1 )
-                if ( cbShips[i].status != SS_DYING && cbShips[i].status != SS_DEAD &&
-                     (cbShips[i].torps[j].status == TS_LIVE || cbShips[i].torps[j].status == TS_DETONATE) )
-                    if (GLcvtcoords( cenx, ceny, cbShips[i].torps[j].x,
-                                     cbShips[i].torps[j].y, -scale, &glx, &gly))
+                if ( cbShips[i].torps[j].status == TS_FIREBALL )
+                {
+                    /* First display exploding torps. */
+                    if ( GLcvtcoords( cenx, ceny, cbShips[i].torps[j].x,
+                                      cbShips[i].torps[j].y, -scale, &glx, &gly ))
                     {
-                        drawTorp(glx, gly, scale, i, j);
+                        drawExplosion(glx, gly, i, j, scale);
                     }
-	}
+                }
+
+            if ( ! lsmap )
+            {
+                /* Now display the live torps. */
+                for ( j = 0; j < cbLimits.maxTorps(); j = j + 1 )
+                    if ( cbShips[i].status != SS_DYING && cbShips[i].status != SS_DEAD &&
+                         (cbShips[i].torps[j].status == TS_LIVE || cbShips[i].torps[j].status == TS_DETONATE) )
+                        if (GLcvtcoords( cenx, ceny, cbShips[i].torps[j].x,
+                                         cbShips[i].torps[j].y, -scale, &glx, &gly))
+                        {
+                            drawTorp(glx, gly, scale, i, j);
+                        }
+            }
+        }
     }
 
 
