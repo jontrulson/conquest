@@ -239,7 +239,7 @@ static int _checkCB(char *fname, int fmode, int sizeofcb)
                   __FUNCTION__,
                   fname,
                   sizeofcb,
-                  sbuf.st_size,
+                  (long int)sbuf.st_size,
                   newfile);
 
             if (rename(fname, newfile) == -1)
