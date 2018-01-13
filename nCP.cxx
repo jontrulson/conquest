@@ -224,7 +224,7 @@ static int _KPAngle(int ch, real *angle)
 
 
 
-static void _infoship( int snum, int scanner )
+static void _infoship( int snum, int scanner, bool doOutput )
 {
     int i, status;
     char junk[MSGMAXLINE];
@@ -238,18 +238,21 @@ static void _infoship( int snum, int scanner )
     static real avgclose_rate, olddis = 0.0, oldclose_rate = 0.0;
     static int oldsnum = 0;
 
-    godlike = ( scanner < 0 || scanner >= cbLimits.maxShips() );
+    godlike = false; // can never happen on the client
 
-    hudClearPrompt(MSG_LIN1);
+    if (doOutput)
+        hudClearPrompt(MSG_LIN1);
     if ( snum < 0 || snum >= cbLimits.maxShips() )
     {
-        cp_putmsg( "No such ship.", MSG_LIN1 );
+        if (doOutput)
+            cp_putmsg( "No such ship.", MSG_LIN1 );
         return;
     }
     status = cbShips[snum].status;
     if ( ! godlike && status != SS_LIVE )
     {
-        cp_putmsg( "Not found.", MSG_LIN1 );
+        if (doOutput)
+            cp_putmsg( "Not found.", MSG_LIN1 );
         return;
     }
 
@@ -261,7 +264,8 @@ static void _infoship( int snum, int scanner )
     if ( snum == scanner )
     {
         /* Silly Captain... */
-        strcat(cbuf, ": That's us, silly!");
+        if (doOutput)
+            strcat(cbuf, ": That's us, silly!");
         cp_putmsg( cbuf, MSG_LIN1 );
         return;
     }
@@ -345,7 +349,8 @@ static void _infoship( int snum, int scanner )
             strcat(cbuf , "at peace.");
     }
 
-    cp_putmsg( cbuf, MSG_LIN1 );
+    if (doOutput)
+        cp_putmsg( cbuf, MSG_LIN1 );
 
     if ( ! SCLOAKED(snum) || cbShips[snum].warp != 0.0 )
     {
@@ -487,7 +492,8 @@ static void _infoship( int snum, int scanner )
     {
         cbuf[0] = (char)toupper( cbuf[0] );
         utAppendChar(cbuf , '.');
-        cp_putmsg( cbuf, MSG_LIN2 );
+        if (doOutput)
+            cp_putmsg( cbuf, MSG_LIN2 );
     }
 
     return;
@@ -496,7 +502,7 @@ static void _infoship( int snum, int scanner )
 
 
 
-static void _infoplanet( const char *str, int pnum, int snum )
+static void _infoplanet( const char *str, int pnum, int snum, bool doOutput )
 {
     int i, j;
     int godlike, canscan;
@@ -506,15 +512,18 @@ static void _infoplanet( const char *str, int pnum, int snum )
     /* Check range of the passed planet number. */
     if ( pnum < 0 || pnum >= cbLimits.maxPlanets() )
     {
-        cp_putmsg( "No such planet.", MSG_LIN1 );
-        hudClearPrompt(MSG_LIN2);
+        if (doOutput)
+        {
+            cp_putmsg( "No such planet.", MSG_LIN1 );
+            hudClearPrompt(MSG_LIN2);
+        }
         utLog("_infoplanet: Called with invalid pnum (%d).",
               pnum );
         return;
     }
 
-    /* GOD is too clever. */
-    godlike = ( snum < 0 || snum >= cbLimits.maxShips() );
+    /* GOD is too clever, and can never happen in the client */
+    godlike = false;
 
     /* In some cases, report hostilities. */
     junk[0] = 0;
@@ -635,31 +644,34 @@ static void _infoplanet( const char *str, int pnum, int snum )
         utAppendChar(junk, '.');
     }
 
-    /* Now output the info. Break the stuff in buf across two lines */
-    /*  (if necessary) and force the stuff in junk (the number of */
-    /*  armies for planets) to be all on the second line. */
-    i = strlen( buf );				/* strlen of first part */
-    j = 69;					/* desired maximum length */
-    if ( i <= j )
+    if (doOutput)
     {
-        /* The first part is small enough. */
-        cp_putmsg( buf, MSG_LIN1 );
-        if ( junk[0] != 0 )
-            cp_putmsg(junk, MSG_LIN2);
+        /* Now output the info. Break the stuff in buf across two lines */
+        /*  (if necessary) and force the stuff in junk (the number of */
+        /*  armies for planets) to be all on the second line. */
+        i = strlen( buf );				/* strlen of first part */
+        j = 69;					/* desired maximum length */
+        if ( i <= j )
+        {
+            /* The first part is small enough. */
+            cp_putmsg( buf, MSG_LIN1 );
+            if ( junk[0] != 0 )
+                cp_putmsg(junk, MSG_LIN2);
+            else
+                hudClearPrompt(MSG_LIN2);
+        }
         else
-            hudClearPrompt(MSG_LIN2);
-    }
-    else
-    {
-        /* Break it into two lines. */
-        i = j + 1;
-        while ( buf[i] != ' ' && i > 1 )
-            i = i - 1;
-        utAppendChar(buf , ' ');
-        strcat(buf , junk);
-        buf[i] = 0;				/* terminate at blank */
-        cp_putmsg( buf, MSG_LIN1 );
-        cp_putmsg( &buf[i+1], MSG_LIN2 );
+        {
+            /* Break it into two lines. */
+            i = j + 1;
+            while ( buf[i] != ' ' && i > 1 )
+                i = i - 1;
+            utAppendChar(buf , ' ');
+            strcat(buf , junk);
+            buf[i] = 0;				/* terminate at blank */
+            cp_putmsg( buf, MSG_LIN1 );
+            cp_putmsg( &buf[i+1], MSG_LIN2 );
+        }
     }
 
     return;
@@ -766,7 +778,7 @@ static void _dotorp(real dir, int num)
 /*  SYNOPSIS */
 /*    int snum */
 /*    doinfo( snum ) */
-static void _doinfo( char *buf, char ch )
+static void _doinfo( char *buf, char ch, bool doOutput )
 {
     int snum = Context.snum;
     int j, what, sorpnum, xsorpnum, count, token;
@@ -778,6 +790,11 @@ static void _doinfo( char *buf, char ch )
         return;
     }
     extra = ( ch == TERM_EXTRA );
+
+    if (ch == TERM_EXTRA || ch == TERM_NORMAL)
+        Context.lastInfoTerm = ch;
+    else
+        Context.lastInfoTerm = 0;
 
     /* Default to what we did last time. */
     utDeleteBlanks( buf );
@@ -806,31 +823,31 @@ static void _doinfo( char *buf, char ch )
 	}
 
         if ( what == NEAR_SHIP )
-            _infoship( sorpnum, snum );
+            _infoship( sorpnum, snum, doOutput );
         else if ( what == NEAR_PLANET )
-            _infoplanet( "", sorpnum, snum );
+            _infoplanet( "", sorpnum, snum, doOutput );
         else
             cp_putmsg( "Not found.", MSG_LIN2 );
     }
     else if ( buf[0] == 's' && utIsDigits(&buf[1]) )
     {
         utSafeCToI( &j, buf, 1 );		/* ignore status */
-        _infoship( j, snum );
+        _infoship( j, snum, doOutput );
     }
     else if (utIsDigits(buf))
     {
         utSafeCToI( &j, buf, 0 );		/* ignore status */
-        _infoship( j, snum );
+        _infoship( j, snum, doOutput );
     }
     else if ( clbPlanetMatch( buf, &j, false ) )
-        _infoplanet( "", j, snum );
+        _infoplanet( "", j, snum, doOutput );
     else
     {
         cp_putmsg( "I don't understand.", MSG_LIN2 );
         return;
     }
 
-/* Cataboligne - Spocks viewer sound */
+    /* Cataboligne - Spocks viewer sound */
     if (rnd() < 0.3)
         cqsEffectPlay(cqsTeamEffects[cbShips[Context.snum].team].info, NULL,
                       0, 0, 0);
@@ -890,7 +907,7 @@ static void _doorbit( int snum )
 
     if ( ( cbShips[snum].warp == ORBIT_CW ) || ( cbShips[snum].warp == ORBIT_CCW ) )
         _infoplanet( "But we are already orbiting ",
-                     cbShips[snum].lockDetail, snum );
+                     cbShips[snum].lockDetail, snum, true );
     else if ( ! clbFindOrbit( snum, &pnum ) )
     {
         sprintf( cbuf, "We are not close enough to orbit, %s.",
@@ -910,7 +927,7 @@ static void _doorbit( int snum )
     else
     {
         sendCommand(CPCMD_ORBIT, 0);
-        _infoplanet( "Coming into orbit around ", pnum, snum );
+        _infoplanet( "Coming into orbit around ", pnum, snum, true );
     }
 
     return;
@@ -1511,7 +1528,7 @@ static void _docourse( char *buf, char ch)
 
         /* Give info if he used TAB. */
         if ( ch == TERM_EXTRA )
-            _infoship( sorpnum, snum );
+            _infoship( sorpnum, snum, true );
         else
             hudClearPrompt(MSG_LIN1);
         break;
@@ -1521,10 +1538,10 @@ static void _docourse( char *buf, char ch)
 	{
             newlock = LOCK_PLANET;
             newlockDetail = sorpnum;
-            _infoplanet( "Now locked on to ", sorpnum, snum );
+            _infoplanet( "Now locked on to ", sorpnum, snum, true );
 	}
         else
-            _infoplanet( "Setting course for ", sorpnum, snum );
+            _infoplanet( "Setting course for ", sorpnum, snum, true );
         break;
     case NEAR_DIRECTION:
         hudClearPrompt(MSG_LIN1);
@@ -2388,7 +2405,7 @@ static void command( int ch )
     case TERM_NORMAL:		/* Have [ENTER] act like 'I[ENTER]'  */
     case '\n':
         cbuf[0] = 0;
-        _doinfo(cbuf, TERM_NORMAL);
+        _doinfo(cbuf, TERM_NORMAL, true);
         break;
 
         /* ack red alert by turning klaxon off  Cataboligne -
@@ -2408,7 +2425,7 @@ static void command( int ch )
 
     case TERM_EXTRA:		/* Have [TAB] act like 'i\t' */
         cbuf[0] = 0;
-        _doinfo(cbuf, TERM_EXTRA);
+        _doinfo(cbuf, TERM_EXTRA, true);
         break;
 
     case TERM_RELOAD:		/* have server resend current universe */
@@ -2735,11 +2752,13 @@ static int nCPIdle(void)
     static uint32_t pingtime = 0;
     static uint32_t themetime = 0;
     static uint32_t dietime = 0;
+    static uint32_t tadTime = 0;
     uint32_t iternow = clbGetMillis();
     static const uint32_t iterwait = 50;   /* ms */
     static const uint32_t pingwait = 2000; /* ms (2 seconds) */
     static const uint32_t themewait = 5000; /* ms (5 seconds) */
     static const uint32_t dyingwait = 5000; /* watching yourself die */
+    static const uint32_t tadWait = 1000; /* update the TAD every second */
     real tdelta = (real)iternow - (real)iterstart;
 
 
@@ -2948,6 +2967,19 @@ static int nCPIdle(void)
 
         nDeadInit();
     }
+
+    // if we have valid data, update the TAD every second
+    if (UserConf.hudInfo && !prompting && ((iternow - tadTime) > tadWait))
+    {
+        tadTime = iternow;
+        // FIXME This (fake) is stupid, and should be redone
+        char fake[2] = {};
+        if (Context.lastinfostr[0] != 0
+            && (Context.lastInfoTerm == TERM_NORMAL
+                || Context.lastInfoTerm == TERM_EXTRA))
+            _doinfo(fake, Context.lastInfoTerm, false);
+    }
+
     return NODE_OK;
 }
 
@@ -3065,7 +3097,7 @@ static int nCPInput(int ch)
         case S_DOINFO:
             if (irv > 0)
             {
-                _doinfo(prm.buf, ch);
+                _doinfo(prm.buf, ch, true);
                 prompting = false;
                 state = S_NONE;
             }
