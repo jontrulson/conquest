@@ -17,6 +17,7 @@
 #include "client.h"
 #include "clientlb.h"
 #include "conqutil.h"
+#include "conqlb.h"
 #include "prm.h"
 #include "nCP.h"
 #include "nMenu.h"
@@ -341,6 +342,10 @@ static void _dispUserOptsMenu(void)
     static const char *prompt = "Enter a number to select an item, any other key to quit.";
     int lin = 0, col = 0;
     int i;
+    static unsigned int lastReadSeq = 0;
+    static uint32_t udpLastRead = 0;
+    static const uint32_t udpUpdateDelay = 1000; // 1 second update rate
+    uint32_t currentMillis = clbGetMillis();
 
     if (macroptr == NULL)
     {				/* if this happens, something is
@@ -383,6 +388,12 @@ static void _dispUserOptsMenu(void)
 
     if (cInfo.doUDP)
     {
+        if ((currentMillis - udpLastRead) > udpUpdateDelay)
+        {
+            lastReadSeq = udpGetReadSeq();
+            udpLastRead = currentMillis;
+        }
+
         cprintf(lin, col + 12, ALIGN_NONE, "#%d#Stats: OoO: #%d#%u #%d# Dup: #%d#%u #%d#Short: #%d#%u #%d#readSeq: #%d#%u",
                 LabelColor,
                 InfoColor, pktStats.oooPackets,
@@ -391,7 +402,7 @@ static void _dispUserOptsMenu(void)
                 LabelColor,
                 InfoColor, pktStats.shortPackets,
                 LabelColor,
-                InfoColor, udpGetReadSeq());
+                InfoColor, lastReadSeq);
     }
 
     lin++;
