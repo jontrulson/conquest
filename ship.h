@@ -43,6 +43,8 @@
 #define SFSET(x, b)  ( cbShips[(x)].flags |=  (b) )
 #define SFCLR(x, b)  ( cbShips[(x)].flags &= ~(b) )
 
+#define SHIP_IPADDR_LEN 16
+
 typedef struct {
     int status;                 /* one of the SS_ values */
 
@@ -102,7 +104,9 @@ typedef struct {
     real strkills;              /* 'extra' randomized kills used for robots */
     Torp_t torps[ABS_MAXTORPS]; /* Torpedos */
     uint32_t flags;             /* SHIP_F_ */
-    uint8_t ipaddr[16];         /* Ship's IP address */
+    // Ship's IP address.  For IPV4 (only for now) the address is
+    // stored at locations 12-15.
+    uint8_t ipaddr[SHIP_IPADDR_LEN];
     uint32_t pad[5];            /* PAD */
     char alias[MAXUSERNAME];    /* copy of cbUsers[].alias */
 } Ship_t;

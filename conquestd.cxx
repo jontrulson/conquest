@@ -104,6 +104,12 @@ int getHostname(int sock, char *buf, int buflen)
     }
     else
     {
+        // copy the ip addr into the Context, for later deposit into
+        // the ship structure.  We store it in the last 4 bytes -
+        // eventually we would like to be able to handle IP6 addresses
+        // too (16 bytes long), which would start at 0.
+        memcpy(Context.ipaddr + 12, &addr.sin_addr, 4);
+
         if ((host = gethostbyaddr((char *) &addr.sin_addr.s_addr,
                                   sizeof(unsigned long),
                                   AF_INET)) == NULL)
@@ -1382,7 +1388,7 @@ void menu(void)
 
 /*  newship - create a new ship for a user (DOES LOCKING) */
 
-/*  here we will fnd a ship for the client.  If the client has a VACANT
+/*  here we will find a ship for the client.  If the client has a VACANT
     ship it will return that ship, else it will get a new one.  No more
     multiples (for clients) supported currently I'm afraid..., if the
     client would be able to enter from multiple systems, this will be
@@ -1516,9 +1522,11 @@ int newship( int unum, int *snum )
     /* Finally, turn the ship on. */
     cbShips[*snum].status = SS_LIVE;
 
+    // copy in the ship's IP address (16 bytes)
+    memcpy(cbShips[*snum].ipaddr, Context.ipaddr, SHIP_IPADDR_LEN);
+
     cbUnlock(&cbConqInfo->lockword);
     Context.entship = true;
-
     return ( true );
 
 }

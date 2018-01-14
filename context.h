@@ -6,6 +6,8 @@
 #ifndef CONTEXT_H
 #define CONTEXT_H
 
+#include "ship.h"
+
 /* a 'Conquest Context' for the current player/operator */
 
 typedef struct {
@@ -34,6 +36,9 @@ typedef struct {
     char lastinfostr[MSGMAXLINE]; /* last string used in doinfo() */
     char lastInfoTerm;            /* last terminator (EXTRA/NORMAL) */
     char intrchar;		/* users interrupt char */
+
+    uint8_t ipaddr[SHIP_IPADDR_LEN]; /* IP address */
+
 } Context_t;
 
 
