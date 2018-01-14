@@ -173,7 +173,6 @@ void nMenuInit(void)
 
         /* Set up some things for the menu display. */
         oclosed = cbConqInfo->closed;
-        Context.leave = false;
 
         /* now look for our ship packet before we get started.  It should be a
            full SP_SHIP packet for this first time */

@@ -247,11 +247,14 @@ void checkMaster(void)
                 if (!tcpwCheckHostAccess(TCPW_DAEMON_CONQUESTD,
                                          sInfo.remotehost))
                 {
-                    pktSendAck(PSEV_FATAL, PERR_UNSPEC,
-                               "Access Denied: You are not allowed to connect to this server.");
-                    close(t);
-                    exit(1);
+                    // flag it for the hello packet.  This will set
+                    // the appropriate flag and terminate the
+                    // connection.
+
+                    Context.accessDenied = true;
                 }
+                else
+                    Context.accessDenied = false;
 
                 pktSetNodelay();
 
@@ -780,7 +783,7 @@ int capentry( int snum, int *system )
 /*    int snum */
 /*    int leave */
 /*    dead( snum, leave ) */
-void dead( int snum, int leave )
+void dead( int snum )
 {
     int i, j, now, entertime;
     killedBy_t kb;
@@ -1249,7 +1252,6 @@ void menu(void)
                MAXUSERNAME );
 
     /* Set up some things for the menu display. */
-    Context.leave = false;
     sleepy = clbGetMillis();
     playrv = false;
 
@@ -1371,7 +1373,7 @@ void menu(void)
 
         sleepy = clbGetMillis();
     }
-    while ( clbStillAlive( Context.snum ) &&  !Context.leave );
+    while ( clbStillAlive( Context.snum ) );
 
     /* Make our ship available for others to use. */
     if ( cbShips[Context.snum].status == SS_RESERVED )
@@ -1555,7 +1557,6 @@ int play(void)
     drstart();			/* start a driver, if necessary */
     cbShips[Context.snum].sdfuse = 0;	/* zero self destruct fuse */
     utGrand( &Context.msgrand );		/* initialize message timer */
-    Context.leave = false;		/* assume we won't want to bail */
     Context.redraw = true;		/* want redraw first time */
     Context.msgok = true;		/* ok to get messages */
     Context.display = false;		/* ok to get messages */
@@ -1690,7 +1691,7 @@ int play(void)
     updateClient(false);	/* one last, to be sure. */
     sendcbConqInfo(sInfo.sock, true);
     utLog("PLAY: ship %d died, calling dead()", Context.snum);
-    dead( Context.snum, Context.leave );
+    dead( Context.snum );
 
     return(true);
 
@@ -1798,7 +1799,7 @@ static int hello(void)
     cpAck_t *cpack;
 
     /* open a UDP socket and bind to it */
-    if ((sInfo.usock = udpOpen(listenPort, &usa)) < 0)
+    if (!Context.accessDenied && (sInfo.usock = udpOpen(listenPort, &usa)) < 0)
     {
         utLog("NET: SERVER hello: udpOpen() failed: %s", strerror(errno));
         sInfo.usock = -1;
@@ -1836,6 +1837,9 @@ static int hello(void)
     if (cbConqInfo->closed)
         shello.flags |= SPHELLO_FLAGS_CLOSED;
 
+    if (Context.accessDenied)
+        shello.flags |= SPHELLO_FLAGS_ACCESS_DENIED;
+
     if (pktWrite(PKT_SENDTCP, &shello) <= 0)
     {
         utLog("NET: SERVER: hello: write shello failed\n");
@@ -1844,7 +1848,7 @@ static int hello(void)
 
     utLog("NET: SERVER: hello: sent server hello to client");
 
-    if (sInfo.tryUDP)
+    if (!Context.accessDenied && sInfo.tryUDP)
     {
         /* wait a few seconds to see if client sends a udp */
         tv.tv_sec = 5;
@@ -1879,6 +1883,14 @@ static int hello(void)
 
             }
         }
+    }
+
+    // say good bye if access was denied...
+    if (Context.accessDenied)
+    {
+        utLog("%s: Access was denied for this connection, returning false",
+              __FUNCTION__);
+        return false;
     }
 
     /* now we want a client hello in response */

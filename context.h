@@ -21,7 +21,7 @@ typedef struct {
     int  msgrand;			/* hundreths timestamp since last message */
     int  drchklastime;		/* last time drcheck was called */
     int  hasnewsfile;		/* says if a news file is available */
-    int  leave;			/* just a flag */
+    bool accessDenied;			/* banned from playing */
     int  display;			/* should do anything in astservice() */
     int  redraw;			/* should redraw in display() */
     int  msgok;			/* allow new messages */

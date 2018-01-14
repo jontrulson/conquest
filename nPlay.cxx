@@ -227,7 +227,6 @@ static int nPlayIdle(void)
         Context.entship = true;
         cbShips[Context.snum].sdfuse = 0;       /* zero self destruct fuse */
         utGrand( &Context.msgrand );            /* initialize message timer */
-        Context.leave = false;                /* assume we won't want to bail */
         Context.redraw = true;                /* want redraw first time */
         Context.msgok = true;                 /* ok to get messages */
 
