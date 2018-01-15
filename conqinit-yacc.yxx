@@ -1476,8 +1476,6 @@ void dumpUniverse(void)
 
     printf("#\n\n");
 
-    /* FIXME, need to use dynamics when ready */
-
     /* global is always first */
 
     printf("# Global limits\n");
