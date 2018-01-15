@@ -781,7 +781,7 @@ static int _pktReadSocket(int sock, ringBuffer_t *RB, void *buf,
 
     rlen = min(blen, rbBytesFree(RB));
 
-    if (sock == udp_sock)
+    if (sock == udp_sock && sock >= 0)
     {
         if ((rv = udpRecvPacket(sock, packet, rlen)) < 0)
         {
@@ -1009,7 +1009,7 @@ static int _pktWriteSocket(int sock, const void *data, int len)
 
     if (!data || !len)
         return 0;
-    if (sock == udp_sock)
+    if (sock == udp_sock && sock >= 0)
         rv = udpSendPacket(sock, data, len);
     else
         rv = send(sock, data, len, 0);
@@ -1031,21 +1031,81 @@ static int _pktDrainRB(int sock, ringBuffer_t *RB)
     if (!rbBytesUsed(RB))
         return 0;
 
-    /* try to get as much data as possible and write it. */
-    if ((len = rbGet(RB, (uint8_t *)buf, PKT_MAXSIZE, false)))
+    if (sock == udp_sock && sock >= 0)
     {
-        if ((wlen = _pktWriteSocket(sock, buf, len)) <= 0)
+        // for udp, we loop and write as many full packets as
+        // possible.  The idea is to prevent the possibility of
+        // writing a partial packet, or multiple packets squished
+        // together
+
+        int wroteLen = 0;
+        bool done = false;
+        while (!done)
         {
-            /* log errors */
-            if (wlen < 0)
-                utLog("ERROR: %s: _pktWriteSocket failed: %s\n",
-                      __FUNCTION__, strerror(errno));
+            len = rbGet(RB, (uint8_t *)buf, PKT_MAXSIZE, false);
+            if (len)
+            {
+                uint8_t pkttype = uint8_t(buf[0]);
 
-            return wlen;
+                int plen;
+                if (isClient)
+                    plen = pktClientPacketSize(pkttype);
+                else
+                    plen = pktServerPacketSize(pkttype);
+
+                if (!plen)
+                {
+                    // should never happen
+                    utLog("%s: UDP invalid packet type %d", __FUNCTION__,
+                          pkttype);
+                    return -1;
+                }
+
+                if (plen > len)
+                {
+                    // not enough data there yet, but still should not
+                    // happen often
+                    done = true;
+                }
+                else
+                {
+                    // write just that packet...
+                    if ((wlen = _pktWriteSocket(sock, buf, plen)) != plen)
+                    {
+                        utLog("ERROR: %s: UDP _pktWriteSocket failed: %s\n",
+                              __FUNCTION__, strerror(errno));
+                        return -1;
+                    }
+                    // actually remove the date
+                    rbGet(RB, NULL, wlen, true);
+                    wroteLen += wlen;
+                    if ((len - wlen) <= 0)
+                        done = true;
+                }
+
+            }
         }
+        wlen = wroteLen;
+    }
+    else
+    {
+        /* For TCP, try to get as much data as possible and write it. */
 
-        /* remove the data for good, but don't copy it again */
-        rbGet(RB, NULL, wlen, true);
+        if ((len = rbGet(RB, (uint8_t *)buf, PKT_MAXSIZE, false)))
+        {
+            if ((wlen = _pktWriteSocket(sock, buf, len)) <= 0)
+            {
+                /* log errors */
+                if (wlen < 0)
+                    utLog("ERROR: %s: _pktWriteSocket failed: %s\n",
+                          __FUNCTION__, strerror(errno));
+
+                return wlen;
+            }
+
+            /* remove the data for good, but don't copy it again */
+            rbGet(RB, NULL, wlen, true);
+        }
     }
 
     return wlen;
@@ -1112,14 +1172,26 @@ int pktWrite(int socktype, void *data)
 
         if (len != rv)
         {
-            /* there's some (or all) data left over */
-            ptr = &packet[rv];
+            // For a UDP packet, we will just have to drop it.  For
+            // TCP, we can put the remainder into the RB for later
+            // transmission.
 
-            if (rbPut(RB, (uint8_t *)ptr, len - rv) != (len - rv))
+            if (socktype == PKT_SENDUDP && udp_sock >= 0)
             {
-                utLog("FATAL: %s@%d: output ringbuffer (%d) full, can't add %d bytes\n",
-                      __FUNCTION__, __LINE__, socktype, len);
-                return -1;
+                utLog("%s: UDP: failed to send full packet (%d bytes), dropped",
+                      __FUNCTION__, len);
+            }
+            else
+            {
+                /* there's some (or all) data left over */
+                ptr = &packet[rv];
+
+                if (rbPut(RB, (uint8_t *)ptr, len - rv) != (len - rv))
+                {
+                    utLog("FATAL: %s@%d: output ringbuffer (%d) full, can't add %d bytes\n",
+                          __FUNCTION__, __LINE__, socktype, len);
+                    return -1;
+                }
             }
         }
     }
