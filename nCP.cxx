@@ -2657,7 +2657,7 @@ void nCPInit(int istopnode)
 
     prompting = false;
     state = S_NONE;
-    clientFlags = 0;
+    clientStatLastFlags = 0;
 
     /* init timers */
     rftime = frameTime;
@@ -2797,7 +2797,7 @@ static nodeStatus_t nCPIdle(void)
     }
 
     /* if we are a ghost then we already know we are dead. */
-    if ( (clientFlags & SPCLNTSTAT_FLAG_KILLED) &&
+    if ( (clientStatLastFlags & SPCLNTSTAT_FLAG_KILLED) &&
          state != S_GHOST && state != S_GHOSTING )
     {                           /* we died.  set the state and deal with
                                    it on the next frame */

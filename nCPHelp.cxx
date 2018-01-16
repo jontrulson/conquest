@@ -162,7 +162,7 @@ static nodeStatus_t nCPHelpDisplay(dspConfig_t *dsp)
 
 static nodeStatus_t nCPHelpIdle(void)
 {
-    if (clientFlags & SPCLNTSTAT_FLAG_KILLED)
+    if (clientStatLastFlags & SPCLNTSTAT_FLAG_KILLED)
     {
         /* time to die properly. */
         setONode(NULL);

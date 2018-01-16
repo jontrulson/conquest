@@ -165,7 +165,7 @@ static nodeStatus_t nShiplIdle(void)
     if (Context.recmode == RECMODE_PLAYING || Context.recmode == RECMODE_PAUSED)
         return NODE_OK;             /* no packet reading here */
 
-    if (clientFlags & SPCLNTSTAT_FLAG_KILLED && retnode == DSP_NODE_CP)
+    if (clientStatLastFlags & SPCLNTSTAT_FLAG_KILLED && retnode == DSP_NODE_CP)
     {
         /* time to die properly. */
         setONode(NULL);

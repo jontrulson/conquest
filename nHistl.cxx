@@ -114,7 +114,7 @@ static nodeStatus_t nHistlDisplay(dspConfig_t *dsp)
 
 static nodeStatus_t nHistlIdle(void)
 {
-    if (clientFlags & SPCLNTSTAT_FLAG_KILLED && retnode == DSP_NODE_CP)
+    if (clientStatLastFlags & SPCLNTSTAT_FLAG_KILLED && retnode == DSP_NODE_CP)
     {
         /* time to die properly. */
         setONode(NULL);

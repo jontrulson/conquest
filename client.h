@@ -34,11 +34,12 @@ typedef struct {
 ClientInfo_t          cInfo;
 spHello_t             sHello;   /* some server info we want to keep */
 spServerStat_t        sStat;    /* server status info */
-// set by an ACK from server
+// set by an ACK from server after it's been processed
 int                   clientLastServerAckCode = 0;
 // set to true when a clientstat packet is processed
 bool                  clientStatReceived = false;
-uint8_t               clientFlags = 0; /* set according to CLIENTSTAT packets */
+// set when last clientstat packet processed
+uint8_t               clientStatLastFlags = 0;
 
 /* we need global versions of these around so we can use the dispatch
  * table routines to load them, yet allow special code to check the values
@@ -54,7 +55,7 @@ extern spHello_t      sHello;   /* some server info we want to keep */
 extern spServerStat_t sStat;    /* server status info */
 extern int            clientLastServerAckCode;
 extern bool           clientStatReceived;
-extern uint8_t        clientFlags;
+extern uint8_t        clientStatLastFlags;
 
 extern spAckMsg_t     sAckMsg;  /* hold Ack or AckMsg pkt */
 extern spClientStat_t sClientStat;

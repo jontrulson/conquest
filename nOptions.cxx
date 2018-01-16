@@ -887,7 +887,7 @@ static nodeStatus_t nOptionsIdle(void)
     if ((state == S_SYSMENU) || (state == S_SOPTS))
         return NODE_OK;             /* don't process packets in sys modes */
 
-    if ((retnode == DSP_NODE_CP) && (clientFlags & SPCLNTSTAT_FLAG_KILLED))
+    if ((retnode == DSP_NODE_CP) && (clientStatLastFlags & SPCLNTSTAT_FLAG_KILLED))
     {
         /* if we were flying, time to die properly. */
         setONode(NULL);

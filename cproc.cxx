@@ -742,7 +742,7 @@ int procClientStat(char *buf)
         Context.snum = scstat->snum;
         Context.unum = scstat->unum;
         cbShips[Context.snum].team = scstat->team;
-        clientFlags = scstat->flags;
+        clientStatLastFlags = scstat->flags;
 
         /* save a copy in the global variant */
         sClientStat.type = scstat->type;

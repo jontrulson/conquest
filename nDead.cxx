@@ -73,7 +73,7 @@ void nDeadInit(void)
     else
         memset((void *)&eShip, 0, sizeof(Ship_t));
 
-    if (clientFlags & SPCLNTSTAT_FLAG_CONQUER)
+    if (clientStatLastFlags & SPCLNTSTAT_FLAG_CONQUER)
     {
         state = S_LASTWORDS;
 
