@@ -65,8 +65,11 @@ static void selectentry( uint8_t esystem )
     for ( i = 0; i < NUMPLAYERTEAMS; i++ )
         if ( owned[i] )
         {
-            strcat(cbuf, ", ");
-            strcat(cbuf , cbTeams[i].name) ;
+            char tbuf[BUFFER_SIZE_128];
+            snprintf(tbuf, BUFFER_SIZE_128, ", #%d#%c#%d#%s",
+                     CyanColor, cbTeams[i].name[0],
+                     NoColor, &cbTeams[i].name[1]);
+            strcat(cbuf, tbuf);
         }
 
     /* Change first comma to a colon. */
@@ -75,75 +78,9 @@ static void selectentry( uint8_t esystem )
         *sptr = ':';
 
     cprintf(12, 0, ALIGN_CENTER, cbuf);
+    cprintf(MSG_LIN2, 0, ALIGN_CENTER, "--- choose a team letter ---");
 
     return;
-}
-
-
-
-/*  _newship - here we will await a ClientStat from the server (indicating
-    our possibly new ship), or a NAK indicating a problem.
-*/
-static int _newship( int unum, int *snum )
-{
-    int pkttype;
-    char buf[PKT_MAXSIZE];
-
-    /* here we will wait for ack's or a clientstat pkt. Acks indicate an
-       error.  If the clientstat pkt's esystem is !0, we need to prompt
-       for the system to enter and send it in a CP_COMMAND:CPCMD_ENTER
-       pkt. */
-
-
-    while (true)
-    {
-        if ((pkttype = pktWaitForPacket(PKT_ANYPKT,
-                                        buf, PKT_MAXSIZE, 60, NULL)) < 0)
-	{
-            utLog("nPlay: _newship: waitforpacket returned %d", pkttype);
-            fatal = true;
-            return false;
-	}
-
-        switch (pkttype)
-	{
-	case 0:			/* timeout */
-            return false;
-            break;
-
-	case SP_ACK:		/* bummer */
-            PKT_PROCSP(buf);
-            utLog("%s: got an ack, _newship failed.", __FUNCTION__);
-            state = S_NSERR;
-
-            return false;		/* always a failure */
-            break;
-
-	case SP_CLIENTSTAT:
-        {
-            if (PKT_PROCSP(buf))
-            {
-                return true;
-            }
-            else
-            {
-                utLog("nPlay: _newship: invalid CLIENTSTAT");
-                return false;
-            }
-        }
-        break;
-
-        /* we might get other packets too */
-	default:
-            processPacket(buf);
-            break;
-	}
-    }
-
-    /* if we are here, something unexpected happened */
-    return false;			/* NOTREACHED */
-
-
 }
 
 void nPlayInit(void)
@@ -151,9 +88,12 @@ void nPlayInit(void)
     state = S_SELSYS;               /* default */
     shipinited = false;
 
-    // we will check for these in newship...
+    // we will check for these in nPlayIdle() so see what our fate is
+    clientStatReceived = false;
     lastServerError = 0;
-    /* let the server know our intentions */
+
+    // let the server know our intentions.  We will either get a sAck
+    // code (error) or a clientStat (good).
     if (!sendCommand(CPCMD_ENTER, 0))
         fatal = true;
 
@@ -172,34 +112,12 @@ static nodeStatus_t nPlayDisplay(dspConfig_t *dsp)
 
     if (state == S_SELSYS)
     {
-        if (!shipinited)
-        {                       /* need to call _newship */
-            shipinited = true;
-            if (!_newship( Context.unum, &Context.snum ))
-            {
-                utLog("%s: _newship failed.", __FUNCTION__);
-                state = S_NSERR;
-                return NODE_OK;
-            }
-        }
-
-        if (!sClientStat.esystem)
-        {                       /* we are ready  */
-            state = S_DONE;
-            return NODE_OK;
-        }
-        else
-        {                       /* need to display/get a selection */
+        if (shipinited)
             selectentry(sClientStat.esystem);
-        }
     }
     else if (state == S_NSERR)
     {
-        // FIXME - this needs to be fail tested! inf loop once when
-        // trying to re-enter the game, but got a ping resp (ack code
-        // 17) instead.  Just ran in loop dumping "nPlay: unexpected
-        // server ack, code 17" to console
-        switch (sAckMsg.code)
+        switch (lastServerError)
         {
         case PERR_FLYING:
             sprintf(cbuf, "You're already playing on another ship.");
@@ -209,23 +127,49 @@ static nodeStatus_t nPlayDisplay(dspConfig_t *dsp)
 
         default:
             cprintf(5,0,ALIGN_CENTER,
-                    "#%d#nPlay: _newship: unexpected server ack, code %d",
-                    InfoColor, sAckMsg.code);
+                    "#%d#nPlay: unexpected server ack, code %d",
+                    InfoColor, lastServerError);
             utLog("nPlay: unexpected server ack, code %d",
-                  sAckMsg.code);
+                  lastServerError);
             break;
         }
         /* Press any key... */
         cprintf(MSG_LIN2, 0, ALIGN_CENTER, MTXT_DONE);
     }
 
-
     return NODE_OK;
 }
 
 static nodeStatus_t nPlayIdle(void)
 {
-    if (state == S_DONE)
+    if (state == S_SELSYS)
+    {
+        // we are looking for either a clientstat packet (good) or an
+        // ack packet (lastServerError - bad)
+
+        if (lastServerError)
+        {
+            // something failed...
+            utLog("%s: CPCMD_ENTER failed (lastServerError = %d)",
+                  __FUNCTION__, lastServerError);
+            state = S_NSERR;
+            return NODE_OK;
+        }
+
+        if (clientStatReceived)
+        {
+            // looking good...
+            if (!sClientStat.esystem)
+            {                       /* we are ready  */
+                state = S_DONE;
+                return NODE_OK;
+            }
+
+            // else, we will need to select a system in display.
+            shipinited = true;
+        }
+    }
+    else if (state == S_DONE)
     {
         Context.entship = true;
         cbShips[Context.snum].sdfuse = 0;       /* zero self destruct fuse */

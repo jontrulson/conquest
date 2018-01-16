@@ -752,6 +752,7 @@ int procClientStat(char *buf)
         sClientStat.unum = scstat->unum;
         sClientStat.esystem = scstat->esystem;
 
+        clientStatReceived = true;
         return true;
     }
 
