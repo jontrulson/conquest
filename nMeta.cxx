@@ -262,9 +262,9 @@ static nodeStatus_t nMetaDisplay(dspConfig_t *dsp)
                     servColor, dispmac, NoColor);
         else
             cprintf(lin, col, ALIGN_NONE,
-                    "#%d#%s#%d# (incompatible protocol, need version 0x%04x)",
+                    "#%d#%s#%d# (incompatible protocol version 0x%04x)",
                     dataColor, dispmac, NoColor,
-                    PROTOCOL_VERSION);
+                    servervec[k].vers);
 
         lin++;
         i++;
