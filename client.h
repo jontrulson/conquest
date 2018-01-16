@@ -46,7 +46,7 @@ ClientInfo_t          cInfo;
 spHello_t             sHello;   /* some server info we want to keep */
 spServerStat_t        sStat;    /* server status info */
 int                   lastServerError = 0; /* set by an ACK from server */
-uint8_t                clientFlags = 0; /* set according to CLIENTSTAT packets */
+uint8_t               clientFlags = 0; /* set according to CLIENTSTAT packets */
 
 /* we need global versions of these around so we can use the dispatch
  * table routines to load them, yet allow special code to check the values
@@ -61,7 +61,7 @@ extern ClientInfo_t   cInfo;
 extern spHello_t      sHello;   /* some server info we want to keep */
 extern spServerStat_t sStat;    /* server status info */
 extern int            lastServerError;
-extern uint8_t         clientFlags;
+extern uint8_t        clientFlags;
 
 extern spAckMsg_t     sAckMsg;  /* hold Ack or AckMsg pkt */
 extern spClientStat_t sClientStat;

@@ -33,9 +33,9 @@ static const char *hd1="' = must take to conquer the Universe)";
 static const char *hd2="planet      type team armies          planet      type team armies";
 static char hd3[BUFFER_SIZE_256];
 
-static int nPlanetlDisplay(dspConfig_t *);
-static int nPlanetlIdle(void);
-static int nPlanetlInput(int ch);
+static nodeStatus_t nPlanetlDisplay(dspConfig_t *);
+static nodeStatus_t nPlanetlIdle(void);
+static nodeStatus_t nPlanetlInput(int ch);
 
 static scrNode_t nPlanetlNode = {
     nPlanetlDisplay,               /* display */
@@ -63,7 +63,7 @@ scrNode_t *nPlanetlInit(int nodeid, int setnode, int sn, int tn)
 }
 
 
-static int nPlanetlDisplay(dspConfig_t *dsp)
+static nodeStatus_t nPlanetlDisplay(dspConfig_t *dsp)
 {
     int i, lin, col, olin, pnum;
     int sv[cbLimits.maxPlanets()];
@@ -288,22 +288,8 @@ static int nPlanetlDisplay(dspConfig_t *dsp)
     return NODE_OK;
 }
 
-static int nPlanetlIdle(void)
+static nodeStatus_t nPlanetlIdle(void)
 {
-    int pkttype;
-    char buf[PKT_MAXSIZE];
-
-    while ((pkttype = pktWaitForPacket(PKT_ANYPKT,
-                                       buf, PKT_MAXSIZE, 0, NULL)) > 0)
-        processPacket(buf);
-
-    if (pkttype < 0)          /* some error */
-    {
-        utLog("nPlanetlIdle: waiForPacket returned %d", pkttype);
-        cbShips[Context.snum].status = SS_OFF;
-        return NODE_EXIT;
-    }
-
     if (clientFlags & SPCLNTSTAT_FLAG_KILLED && retnode == DSP_NODE_CP)
     {
         /* time to die properly. */
@@ -316,7 +302,7 @@ static int nPlanetlIdle(void)
     return NODE_OK;
 }
 
-static int nPlanetlInput(int ch)
+static nodeStatus_t nPlanetlInput(int ch)
 {
     ch = CQ_CHAR(ch);
 

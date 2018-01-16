@@ -42,6 +42,7 @@
 #include "nCP.h"
 
 #include "hud.h"
+#include "ping.h"
 
 #include "cqsound.h"
 
@@ -160,10 +161,10 @@ void cp_putmsg(char *str, int lin)
 }
 #endif
 
-static int nCPDisplay(dspConfig_t *);
-static int nCPIdle(void);
-static int nCPInput(int ch);
-static int nCPMInput(mouseData_t *mdata);
+static nodeStatus_t nCPDisplay(dspConfig_t *);
+static nodeStatus_t nCPIdle(void);
+static nodeStatus_t nCPInput(int ch);
+static nodeStatus_t nCPMInput(mouseData_t *mdata);
 
 static scrNode_t nCPNode = {
     nCPDisplay,                   /* display */
@@ -2743,7 +2744,7 @@ void nCPInit(int istopnode)
 }
 
 
-static int nCPDisplay(dspConfig_t *dsp)
+static nodeStatus_t nCPDisplay(dspConfig_t *dsp)
 {
     /* Viewer */
     renderViewer(UserConf.doVBG);
@@ -2757,11 +2758,9 @@ static int nCPDisplay(dspConfig_t *dsp)
     return NODE_OK;
 }
 
-static int nCPIdle(void)
+static nodeStatus_t nCPIdle(void)
 {
-    int pkttype;
     int now;
-    char buf[PKT_MAXSIZE];
     uint32_t difftime = utDeltaGrand( Context.msgrand, &now );
     static uint32_t iterstart = 0;
     static uint32_t pingtime = 0;
@@ -2785,69 +2784,6 @@ static int nCPIdle(void)
         state = S_GHOST;
         /* start a timer so you can see yourself die :) */
         dietime = iternow;
-    }
-
-    while ((pkttype = pktWaitForPacket(PKT_ANYPKT,
-                                       buf, PKT_MAXSIZE, 0, NULL)) > 0)
-    {
-        switch (pkttype)
-        {
-            /* FIXME: pings/keepalives should be handled at the
-             *  renderNode() level, not here!  Next protocol rev.
-             */
-        case SP_ACK:
-            sAckMsg.code = 0;     /* reset */
-            processPacket(buf);
-            /* see if it's a ping resp */
-            if (sAckMsg.code == PERR_PINGRESP)
-            {
-                pingPending = false;
-                pktStats.pingAvg = (pktStats.pingAvg + (iternow - pingStart)) / 2;
-                pingStart = 0;
-                continue;
-            }
-
-            break;
-        default:
-            processPacket(buf);
-            break;
-        }
-    }
-
-    if (pkttype < 0)          /* some error */
-    {
-        utLog("nCPIdle: pktWaitForPacket returned %d", pkttype);
-        cbShips[Context.snum].status = SS_OFF;
-        return NODE_EXIT;
-    }
-
-    /* send a ping if it's time */
-    if (!pingPending && ((iternow - pingtime) > pingwait))
-    {                           /* send a ping request */
-        /* only send this if we aren't doing things that this packet would end
-         *  up canceling...
-         */
-
-        /* FIXME: pings/keepalives should be handled at the renderNode()
-         *  level, not here!  The server should handle these
-         *  transparently without this crap.  Next protocol rev.
-         */
-
-        if (state != S_REFITING && state != S_BOMBING &&
-            state != S_BEAMING  && state != S_DESTRUCTING &&
-            state != S_WARRING && state != S_AUTOPILOT &&
-            state != S_BOMB && state != S_BEAM && state != S_BEAMNUM &&
-            state !=S_BEAMDIR)
-        {
-
-            pingtime = iternow;
-            pingStart = iternow;
-            pingPending = true;
-            // this is not caught by the filter in _pktReadGetRB(), so
-            // don't send it when we are doing something important.
-            // Fix in next protocol.
-            sendCommand(CPCMD_PING, 0);
-        }
     }
 
     /* drive the local universe */
@@ -2998,7 +2934,7 @@ static int nCPIdle(void)
     return NODE_OK;
 }
 
-static int nCPInput(int ch)
+static nodeStatus_t nCPInput(int ch)
 {
     int cf = ch;                      /* backup of ch for domacros() */
     int irv, tmsg, i;
@@ -3586,7 +3522,7 @@ static int nCPInput(int ch)
     return NODE_OK;
 }
 
-static int nCPMInput(mouseData_t *mdata)
+static nodeStatus_t nCPMInput(mouseData_t *mdata)
 {
 #if 0
     utLog("%s: mod = %08x, button = %d state = %d\n",

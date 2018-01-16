@@ -71,9 +71,9 @@ extern hudData_t hudData;
 extern int ncpSRMagFactor;
 extern int ncpLRMagFactor;
 
-static int nPlayBDisplay(dspConfig_t *);
-static int nPlayBIdle(void);
-static int nPlayBInput(int ch);
+static nodeStatus_t nPlayBDisplay(dspConfig_t *);
+static nodeStatus_t nPlayBIdle(void);
+static nodeStatus_t nPlayBInput(int ch);
 
 static scrNode_t nPlayBNode = {
     nPlayBDisplay,               /* display */
@@ -209,7 +209,7 @@ void nPlayBInit(void)
 }
 
 
-static int nPlayBDisplay(dspConfig_t *dsp)
+static nodeStatus_t nPlayBDisplay(dspConfig_t *dsp)
 {
     char buf[MSGMAXLINE];
 
@@ -239,7 +239,7 @@ static int nPlayBDisplay(dspConfig_t *dsp)
     return NODE_OK;
 }
 
-static int nPlayBIdle(void)
+static nodeStatus_t nPlayBIdle(void)
 {
     int ptype;
 
@@ -256,7 +256,7 @@ static int nPlayBIdle(void)
     return NODE_OK;
 }
 
-static int nPlayBInput(int ch)
+static nodeStatus_t nPlayBInput(int ch)
 {
     int irv;
     int snum = Context.snum;

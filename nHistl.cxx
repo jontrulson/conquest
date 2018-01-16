@@ -20,9 +20,9 @@
 #include "nDead.h"
 #include "nHistl.h"
 
-static int nHistlDisplay(dspConfig_t *);
-static int nHistlIdle(void);
-static int nHistlInput(int ch);
+static nodeStatus_t nHistlDisplay(dspConfig_t *);
+static nodeStatus_t nHistlIdle(void);
+static nodeStatus_t nHistlInput(int ch);
 
 static scrNode_t nHistlNode = {
     nHistlDisplay,               /* display */
@@ -45,7 +45,7 @@ scrNode_t *nHistlInit(int nodeid, int setnode)
 }
 
 
-static int nHistlDisplay(dspConfig_t *dsp)
+static nodeStatus_t nHistlDisplay(dspConfig_t *dsp)
 {
     int i, j, lin, col, fline, lline, thistptr = 0;
     static const char *hd0="C O N Q U E S T   U S E R   H I S T O R Y";
@@ -112,22 +112,8 @@ static int nHistlDisplay(dspConfig_t *dsp)
     return NODE_OK;
 }
 
-static int nHistlIdle(void)
+static nodeStatus_t nHistlIdle(void)
 {
-    int pkttype;
-    char buf[PKT_MAXSIZE];
-
-    while ((pkttype = pktWaitForPacket(PKT_ANYPKT,
-                                       buf, PKT_MAXSIZE, 0, NULL)) > 0)
-        processPacket(buf);
-
-    if (pkttype < 0)          /* some error */
-    {
-        utLog("nHistlIdle: waiForPacket returned %d", pkttype);
-        cbShips[Context.snum].status = SS_OFF;
-        return NODE_EXIT;
-    }
-
     if (clientFlags & SPCLNTSTAT_FLAG_KILLED && retnode == DSP_NODE_CP)
     {
         /* time to die properly. */
@@ -140,7 +126,7 @@ static int nHistlIdle(void)
     return NODE_OK;
 }
 
-static int nHistlInput(int ch)
+static nodeStatus_t nHistlInput(int ch)
 {
     /* go back */
     switch (retnode)

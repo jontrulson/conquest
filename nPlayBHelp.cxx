@@ -22,8 +22,8 @@
 #include "nPlayB.h"
 #include "nPlayBHelp.h"
 
-static int nPlayBHelpDisplay(dspConfig_t *);
-static int nPlayBHelpInput(int ch);
+static nodeStatus_t nPlayBHelpDisplay(dspConfig_t *);
+static nodeStatus_t nPlayBHelpInput(int ch);
 
 static scrNode_t nPlayBHelpNode = {
     nPlayBHelpDisplay,            /* display */
@@ -44,7 +44,7 @@ scrNode_t *nPlayBHelpInit(int setnode)
 }
 
 
-static int nPlayBHelpDisplay(dspConfig_t *dsp)
+static nodeStatus_t nPlayBHelpDisplay(dspConfig_t *dsp)
 {
 
     dspReplayHelp();
@@ -54,7 +54,7 @@ static int nPlayBHelpDisplay(dspConfig_t *dsp)
     return NODE_OK;
 }
 
-static int nPlayBHelpInput(int ch)
+static nodeStatus_t nPlayBHelpInput(int ch)
 {
     /* go back */
 

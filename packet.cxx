@@ -731,27 +731,35 @@ static uint8_t _pktReadGetRB(ringBuffer_t *RB, void *buf, int blen, int update)
              */
             rbGet(RB, (uint8_t *)packet, len, update);
 
-            /* we check for CP_COMMAND->CPCMD_KEEPALIVE (server-side
-             * only) packets here.  If found, we remove it and just
-             * return 0, indicating that no valid packet (that we
-             * actually care about) is available.  Make no mistake, this
-             * is a hack that should be removed at the next proto rev.
+            /* we check for CP_COMMAND->CPCMD_KEEPALIVE and PING
+             * (server-side only) packets here.  If found, we remove
+             * it (always) and just return 0, indicating that no valid packet
+             * (that we actually care about) is available.  For a
+             * PING, we will send a response.
              */
-            // FIXME - we need to deal with CPCMD_PING too
             if (!isClient)
             {                   /* server-side */
-                if ( (type == CP_COMMAND) &&
-                     (CPCMD_KEEPALIVE == (((cpCommand_t *)packet)->cmd)) )
+                if (type == CP_COMMAND)
                 {
-                    /* (FIXME - this sucks.  next proto rev )
-                     */
-
-                    /* if it had not already been removed from the RB
-                     * above, then do it now.
-                     */
-                    if (!update)
-                        rbGet(RB, NULL, len, true);
-                    return 0;
+                    uint8_t pktCmd = (((cpCommand_t *)packet)->cmd);
+                    if ( pktCmd == CPCMD_KEEPALIVE )
+                    {
+                        /* if it had not already been removed from the RB
+                         * above, then do it now.
+                         */
+                        if (!update)
+                            rbGet(RB, NULL, len, true);
+                        return 0;
+                    }
+                    if ( pktCmd == CPCMD_PING )
+                    {
+                        // send a response, remove it from the RB
+                        pktSendAck(PSEV_INFO, PERR_PINGRESP, NULL);
+                        if (!update)
+                            rbGet(RB, NULL, len, true);
+                        return 0;
+                    }
+                    // leave everything else alone
                 }
             }
 
@@ -763,41 +771,27 @@ static uint8_t _pktReadGetRB(ringBuffer_t *RB, void *buf, int blen, int update)
 }
 
 /* read data into the buffer, possibly depositing it into an RB */
-static int _pktReadSocket(int sock, ringBuffer_t *RB, void *buf,
-                          unsigned int blen)
+static int _pktReadSocket(int sock, ringBuffer_t *RB)
 {
-    int rv, len, rlen;
-    int type;
-    char tmppacket[PKT_MAXSIZE];
-    char *packet;
-
-    /* if buf is NULL, we are not interested in returning the packet,
-     *  just put it in the RB
-     */
-    if (buf)
-        packet = (char *)buf;
-    else
-        packet = tmppacket;
-
-    rlen = min(blen, rbBytesFree(RB));
+    int rv;
+    char packet[PKT_MAXSIZE];
 
     if (sock == udp_sock && sock >= 0)
     {
-        if ((rv = udpRecvPacket(sock, packet, rlen)) < 0)
+        if ((rv = udpRecvPacket(sock, packet, PKT_MAXSIZE)) < 0)
         {
             *packet = 0;
-            utLog("%s: udpRecvPacket(%d): %s",
-                  __FUNCTION__, rlen, strerror(errno));
+            utLog("%s: udpRecvPacket(): %s", __FUNCTION__, strerror(errno));
             return -1;
         }
     }
     else
     {
 
-        if ((rv = recv(sock, packet, rlen, 0)) < 0)
+        if ((rv = recv(sock, packet, PKT_MAXSIZE, 0)) < 0)
         {
             *packet = 0;
-            utLog("%s: TCP recv(%d): %s", __FUNCTION__, rlen, strerror(errno));
+            utLog("%s: TCP recv(): %s", __FUNCTION__, strerror(errno));
             return -1;
         }
     }
@@ -806,39 +800,6 @@ static int _pktReadSocket(int sock, ringBuffer_t *RB, void *buf,
     {
         pktStats.rxBytes += rv;         /* update the counter */
 
-        /* if buf was NULL, then we just want to put whatever we read
-         * into the RB and leave.  Otherwise, we optimize by putting the
-         * appropriate data in the caller's read buffer directly and
-         * whatever is left over in the RB.
-         */
-
-        /* if we read enough to return a packet, and there's
-         * nothing in the rb, extract it and copy any leftovers into
-         * the RB.
-         */
-        if (buf && !rbBytesUsed(RB))
-        {
-            type = (uint8_t)packet[0];
-
-            if (isClient)
-                len = pktServerPacketSize(type);
-            else
-                len = pktClientPacketSize(type);
-
-            if (len && rv >= len)
-            {
-                /* then we got enough to satify the request.
-                 * convieniently, the packet is already in buf, so
-                 * just put the rest in the RB :)
-                 */
-                if ((rv - len) > 0)
-                    rbPut(RB, (uint8_t *)&packet[len], rv - len);
-
-                return type;
-            }
-        }
-
-        /* otherwise just put what we got into the RB */
         rbPut(RB, (uint8_t *)packet, rv);
     }
 
@@ -848,29 +809,14 @@ static int _pktReadSocket(int sock, ringBuffer_t *RB, void *buf,
 /* check to see if there is a packet ready.  Do a read from the
  * socket(s) first, but do not remove any packets from the RB(s)
  * (assuming one is actually there).
- *
- * FIXME Right now, this function is used only in the server to detect
- * when certain operations need to be cancelled, like destruct, bomb,
- * beam, and autopilot.  As of the current rev (808) client UDP
- * KEEPALIVE's are improperly terminating these operations, though we
- * can't simply disable KEEPALIVE's during these operations since some
- * firewalls require periodic outbound activity on UDP connections in
- * order to keep the link active.  So, we need a function like this to
- * prevent that from happening, until the next protocol revison deals
- * with these cases in a better way..
- *
  */
 int pktReadPacketReady(void)
 {
     int type;
 
-    /* KEEPALIVE packets (server-side) will be filtered out by
+    /* KEEPALIVE/PING packets (server-side) will be filtered out by
      * _pktReadGetRB(), but we will still need check the UDP RB here so that
      * it gets the chance.
-     *
-     * FIXME.  This whole KEEPALIVE/PING stuff is a kludge.  Needs to be
-     * reworked in the next proto rev so that this kind of 'special'
-     * casing isn't required.
      */
 
     /* sanity check */
@@ -879,20 +825,24 @@ int pktReadPacketReady(void)
 
     /* do socket read(s) if possible */
     if (pktSocketHasData(tcp_sock))
-        _pktReadSocket(tcp_sock, RB_TCPIn, NULL, PKT_MAXSIZE);
+        _pktReadSocket(tcp_sock, RB_TCPIn);
 
     if (pktSocketHasData(udp_sock))
-        _pktReadSocket(udp_sock, RB_UDPIn, NULL, PKT_MAXSIZE);
+        _pktReadSocket(udp_sock, RB_UDPIn);
 
     /* Check the ringbuffers, TCP first.  If there's a packet waiting
      * return it's type (>0).
      */
 
     if ((type = _pktReadGetRB(RB_TCPIn, NULL, PKT_MAXSIZE, false)))
+    {
         return type;
+    }
 
     if ((type = _pktReadGetRB(RB_UDPIn, NULL, PKT_MAXSIZE, false)))
+    {
         return type;
+    }
 
     return 0;
 }
@@ -945,35 +895,21 @@ int pktRead(char *buf, int blen, unsigned int delay)
         /* we have TCP data */
         if (FD_ISSET(tcp_sock, &readfds))
 	{
-            if ((type = _pktReadSocket(tcp_sock, RB_TCPIn, buf, blen)) < 0)
+            if (_pktReadSocket(tcp_sock, RB_TCPIn) < 0)
             {
-                /* an error */
-                *buf = 0;
                 utLog("%s: pktReadSocket TCP: failed", __FUNCTION__);
                 return -1;
-            }
-
-            if (type)
-            {
-                /* data is already in buf */
-                return type;
             }
 	}
 
         /* now try for any UDP */
         if (udp_sock >= 0 && FD_ISSET(udp_sock, &readfds))
         {
-            if ((type = _pktReadSocket(udp_sock, RB_UDPIn, buf, blen)) < 0)
+            if (_pktReadSocket(udp_sock, RB_UDPIn) < 0)
             {
                 /* an error */
                 *buf = 0;
                 utLog("%s: pktReadSocket UDP: failed", __FUNCTION__);
-                return type;
-            }
-
-            if (type)
-            {
-                /* data is already in buf */
                 return type;
             }
         }

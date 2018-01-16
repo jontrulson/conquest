@@ -40,8 +40,8 @@ static int prompting;
 
 static char cbuf[BUFFER_SIZE_256];
 
-static int nPlayBMenuDisplay(dspConfig_t *);
-static int nPlayBMenuInput(int ch);
+static nodeStatus_t nPlayBMenuDisplay(dspConfig_t *);
+static nodeStatus_t nPlayBMenuInput(int ch);
 
 static const char *nss = NULL;        /* no such ship */
 
@@ -69,7 +69,7 @@ void nPlayBMenuInit(void)
 }
 
 
-static int nPlayBMenuDisplay(dspConfig_t *dsp)
+static nodeStatus_t nPlayBMenuDisplay(dspConfig_t *dsp)
 {
     dspReplayMenu();
 
@@ -84,7 +84,7 @@ static int nPlayBMenuDisplay(dspConfig_t *dsp)
 }
 
 
-static int nPlayBMenuInput(int ch)
+static nodeStatus_t nPlayBMenuInput(int ch)
 {
     int irv;
 

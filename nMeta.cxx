@@ -40,8 +40,8 @@ struct _srvvec {
 
 static struct _srvvec servervec[META_MAXSERVERS] = {};
 
-static int nMetaDisplay(dspConfig_t *);
-static int nMetaInput(int ch);
+static nodeStatus_t nMetaDisplay(dspConfig_t *);
+static nodeStatus_t nMetaInput(int ch);
 
 static int numMetaServers;   /* number of servers in metaServerList */
 
@@ -209,7 +209,7 @@ void nMetaInit(void)
     return;
 }
 
-static int nMetaDisplay(dspConfig_t *dsp)
+static nodeStatus_t nMetaDisplay(dspConfig_t *dsp)
 {
     int i, k;
     char *dispmac;
@@ -277,12 +277,14 @@ static int nMetaDisplay(dspConfig_t *dsp)
 
     dispServerInfo(dsp, metaServerList, clin);
 
-    return NODE_OK;
+    // We are not connected to a server, so don't let the nod renderer
+    // try to read/process packets.
+    return NODE_OK_NO_PKTPROC;
 }
 
 
 
-static int nMetaInput(int ch)
+static nodeStatus_t nMetaInput(int ch)
 {
     int i;
 

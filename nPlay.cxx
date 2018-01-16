@@ -33,9 +33,9 @@ static int fatal = false;
 static int shipinited = false;   /* whether we've done _newship() yet */
 static int owned[NUMPLAYERTEAMS];
 
-static int nPlayDisplay(dspConfig_t *);
-static int nPlayIdle(void);
-static int nPlayInput(int ch);
+static nodeStatus_t nPlayDisplay(dspConfig_t *);
+static nodeStatus_t nPlayIdle(void);
+static nodeStatus_t nPlayInput(int ch);
 
 static scrNode_t nPlayNode = {
     nPlayDisplay,               /* display */
@@ -150,6 +150,9 @@ void nPlayInit(void)
 {
     state = S_SELSYS;               /* default */
     shipinited = false;
+
+    // we will check for these in newship...
+    lastServerError = 0;
     /* let the server know our intentions */
     if (!sendCommand(CPCMD_ENTER, 0))
         fatal = true;
@@ -160,7 +163,7 @@ void nPlayInit(void)
 }
 
 
-static int nPlayDisplay(dspConfig_t *dsp)
+static nodeStatus_t nPlayDisplay(dspConfig_t *dsp)
 {
     char cbuf[BUFFER_SIZE_256];
 
@@ -220,7 +223,7 @@ static int nPlayDisplay(dspConfig_t *dsp)
     return NODE_OK;
 }
 
-static int nPlayIdle(void)
+static nodeStatus_t nPlayIdle(void)
 {
     if (state == S_DONE)
     {
@@ -256,7 +259,7 @@ static int nPlayIdle(void)
     return NODE_OK;
 }
 
-static int nPlayInput(int ch)
+static nodeStatus_t nPlayInput(int ch)
 {
     int i;
     unsigned char c = CQ_CHAR(ch);

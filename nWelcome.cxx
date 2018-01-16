@@ -39,7 +39,7 @@ static const char *prepare_str="Prepare to be beamed aboard...";
 
 
 
-static int nWelcomeDisplay(dspConfig_t *);
+static nodeStatus_t nWelcomeDisplay(dspConfig_t *);
 
 static scrNode_t nWelcomeNode = {
     nWelcomeDisplay,              /* display */
@@ -148,7 +148,7 @@ void nWelcomeInit(void)
 }
 
 
-static int nWelcomeDisplay(dspConfig_t *dsp)
+static nodeStatus_t nWelcomeDisplay(dspConfig_t *dsp)
 {
     char buf[PKT_MAXSIZE];
     int team, col = 0;
@@ -173,7 +173,7 @@ static int nWelcomeDisplay(dspConfig_t *dsp)
             {
                 state = S_DONE;
                 snooze = 0;
-                return NODE_OK;
+                return NODE_OK_NO_PKTPROC; // we do our own packet handling
             }
         }
     }
@@ -204,7 +204,7 @@ static int nWelcomeDisplay(dspConfig_t *dsp)
                     InfoColor, prepare_str );
         }
 
-        return NODE_OK;
+        return NODE_OK_NO_PKTPROC;
         break;
 
     case S_ERROR:

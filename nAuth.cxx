@@ -60,9 +60,9 @@ static int  newuser = false;    /* a new user? */
 
 static int state;
 
-static int nAuthDisplay(dspConfig_t *dsp);
-static int nAuthInput(int ch);
-static int nAuthIdle(void);
+static nodeStatus_t nAuthDisplay(dspConfig_t *dsp);
+static nodeStatus_t nAuthInput(int ch);
+static nodeStatus_t nAuthIdle(void);
 
 static scrNode_t nAuthNode = {
     nAuthDisplay,                 /* display */
@@ -172,7 +172,7 @@ void nAuthInit(void)
 }
 
 /* all we do here is 'blink' the cursor ;-) */
-static int nAuthIdle(void)
+static nodeStatus_t nAuthIdle(void)
 {
     cursor = (BLINK_QTRSEC) ? '_' : ' ';
 
@@ -181,7 +181,7 @@ static int nAuthIdle(void)
 
 
 
-static int nAuthDisplay(dspConfig_t *dsp)
+static nodeStatus_t nAuthDisplay(dspConfig_t *dsp)
 {
     int lin;
     int statline;
@@ -273,11 +273,11 @@ static int nAuthDisplay(dspConfig_t *dsp)
                 RedColor,
                 errlin);
 
-    return NODE_OK;
+    return NODE_OK_NO_PKTPROC;
 }
 
 
-static int nAuthInput(int ch)
+static nodeStatus_t nAuthInput(int ch)
 {
     int rv, irv;
 

@@ -1176,14 +1176,10 @@ void handleSimpleCmdPkt(cpCommand_t *ccmd)
         /* NOTREACHED */
         break;
 
-    case CPCMD_PING:
-        clbBlockAlarm();
-        pktSendAck(PSEV_INFO, PERR_PINGRESP, NULL);
-        clbUnblockAlarm();
-        break;
-
-    case CPCMD_KEEPALIVE:       /* these we just ignore */
-        break;
+// These will never be seen here - they are intercepted by the packet
+// reader and dealt with there.
+//    case CPCMD_PING:
+//    case CPCMD_KEEPALIVE:       /* these we just ignore */
 
     default:
         utLog("conquestd: handleSimpleCmdPkt(): unexpected command code %d",

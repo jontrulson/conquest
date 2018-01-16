@@ -35,7 +35,6 @@ typedef struct {
     real orbvel;                  /* velocity of the orbit in deg/min */
     real orbang;                  /* current angle of the orbit */
     uint16_t size;                    /* size of planet in CU's */
-    // FIXME - 32b too much?  16b better?
     uint32_t flags;                /* flags for this planet */
     int  primary;                 /* planet this planet orbits */
     int  type;                    /* type of planet - M, dead, sun */

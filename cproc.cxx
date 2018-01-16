@@ -28,6 +28,7 @@
 #include "udp.h"
 #include "color.h"
 #include "ui.h"
+#include "ping.h"
 
 /* disptach init */
 int procDispatchInit(uint16_t vers, packetEnt_t *pktList, int numpkts)
@@ -690,7 +691,13 @@ int procAck(char *buf)
     if (pktIsValid(SP_ACK, buf))
     {
         sack = (spAck_t *)buf;
-        lastServerError = sack->code;
+        if (sack->code == PERR_PINGRESP)
+        {
+            // not an error, log the response
+            pingResponse(clbGetMillis());
+        }
+        else
+            lastServerError = sack->code;
 
         /* set the global variants.  We save both Ack and AckMsgs here */
         sAckMsg.type = sack->type;
@@ -704,7 +711,13 @@ int procAck(char *buf)
     if (pktIsValid(SP_ACKMSG, buf))
     {
         sackm = (spAckMsg_t *)buf;
-        lastServerError = sackm->code;
+        if (sackm->code == PERR_PINGRESP)
+        {
+            // not an error, log the response
+            pingResponse(clbGetMillis());
+        }
+        else
+            lastServerError = sackm->code;
 
         /* save a copy in the global variant. We save both Ack and AckMsgs here */
         sAckMsg.type = sackm->type;

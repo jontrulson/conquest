@@ -30,9 +30,9 @@ static const char *hd2="ship  name          pseudonym              kills     typ
 static int shipOffset; /* offset into cbLimits.maxShips() for this page */
 static int shipIdx;
 
-static int nShiplDisplay(dspConfig_t *);
-static int nShiplIdle(void);
-static int nShiplInput(int ch);
+static nodeStatus_t nShiplDisplay(dspConfig_t *);
+static nodeStatus_t nShiplIdle(void);
+static nodeStatus_t nShiplInput(int ch);
 
 static scrNode_t nShiplNode = {
     nShiplDisplay,               /* display */
@@ -58,7 +58,7 @@ scrNode_t *nShiplInit(int nodeid, int setnode)
 }
 
 
-static int nShiplDisplay(dspConfig_t *dsp)
+static nodeStatus_t nShiplDisplay(dspConfig_t *dsp)
 {
     int snum = Context.snum;
     static char cbuf[BUFFER_SIZE_256];
@@ -160,24 +160,10 @@ static int nShiplDisplay(dspConfig_t *dsp)
     return NODE_OK;
 }
 
-static int nShiplIdle(void)
+static nodeStatus_t nShiplIdle(void)
 {
-    int pkttype;
-    char buf[PKT_MAXSIZE];
-
     if (Context.recmode == RECMODE_PLAYING || Context.recmode == RECMODE_PAUSED)
         return NODE_OK;             /* no packet reading here */
-
-    while ((pkttype = pktWaitForPacket(PKT_ANYPKT,
-                                       buf, PKT_MAXSIZE, 0, NULL)) > 0)
-        processPacket(buf);
-
-    if (pkttype < 0)          /* some error */
-    {
-        utLog("nShiplIdle: waiForPacket returned %d", pkttype);
-        cbShips[Context.snum].status = SS_OFF;
-        return NODE_EXIT;
-    }
 
     if (clientFlags & SPCLNTSTAT_FLAG_KILLED && retnode == DSP_NODE_CP)
     {
@@ -191,7 +177,7 @@ static int nShiplIdle(void)
     return NODE_OK;
 }
 
-static int nShiplInput(int ch)
+static nodeStatus_t nShiplInput(int ch)
 {
     ch = CQ_CHAR(ch);
 

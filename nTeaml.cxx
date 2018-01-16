@@ -24,9 +24,9 @@
 
 static int team;
 
-static int nTeamlDisplay(dspConfig_t *);
-static int nTeamlIdle(void);
-static int nTeamlInput(int ch);
+static nodeStatus_t nTeamlDisplay(dspConfig_t *);
+static nodeStatus_t nTeamlIdle(void);
+static nodeStatus_t nTeamlInput(int ch);
 
 static scrNode_t nTeamlNode = {
     nTeamlDisplay,               /* display */
@@ -50,7 +50,7 @@ scrNode_t *nTeamlInit(int nodeid, int setnode, int tn)
 }
 
 
-static int nTeamlDisplay(dspConfig_t *dsp)
+static nodeStatus_t nTeamlDisplay(dspConfig_t *dsp)
 {
     int i, j, lin, col, ctime, etime;
     int godlike;
@@ -291,22 +291,8 @@ static int nTeamlDisplay(dspConfig_t *dsp)
     return NODE_OK;
 }
 
-static int nTeamlIdle(void)
+static nodeStatus_t nTeamlIdle(void)
 {
-    int pkttype;
-    char buf[PKT_MAXSIZE];
-
-    while ((pkttype = pktWaitForPacket(PKT_ANYPKT,
-                                       buf, PKT_MAXSIZE, 0, NULL)) > 0)
-        processPacket(buf);
-
-    if (pkttype < 0)          /* some error */
-    {
-        utLog("nTeamlIdle: waiForPacket returned %d", pkttype);
-        cbShips[Context.snum].status = SS_OFF;
-        return NODE_EXIT;
-    }
-
     if (clientFlags & SPCLNTSTAT_FLAG_KILLED && retnode == DSP_NODE_CP)
     {
         /* time to die properly. */
@@ -315,11 +301,10 @@ static int nTeamlIdle(void)
         return NODE_OK;
     }
 
-
     return NODE_OK;
 }
 
-static int nTeamlInput(int ch)
+static nodeStatus_t nTeamlInput(int ch)
 {
     /* go back */
     switch (retnode)

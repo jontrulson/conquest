@@ -29,9 +29,9 @@ static int err = false;
 static char errbuf1[ERR_BUFSZ] = {};
 static char errbuf2[ERR_BUFSZ] = {};
 
-static int nConsvrDisplay(dspConfig_t *);
-static int nConsvrIdle(void);
-static int nConsvrInput(int ch);
+static nodeStatus_t nConsvrDisplay(dspConfig_t *);
+static nodeStatus_t nConsvrIdle(void);
+static nodeStatus_t nConsvrInput(int ch);
 
 static scrNode_t nConsvrNode = {
     nConsvrDisplay,               /* display */
@@ -55,7 +55,7 @@ void nConsvrInit(char *remotehost, uint16_t remoteport)
     return;
 }
 
-static int nConsvrDisplay(dspConfig_t *dsp)
+static nodeStatus_t nConsvrDisplay(dspConfig_t *dsp)
 {
     int lin;
 
@@ -83,10 +83,10 @@ static int nConsvrDisplay(dspConfig_t *dsp)
 
     }
 
-    return NODE_OK;
+    return NODE_OK_NO_PKTPROC;
 }
 
-static int nConsvrIdle(void)
+static nodeStatus_t nConsvrIdle(void)
 {
     int s;
     struct sockaddr_in sa;
@@ -179,10 +179,10 @@ static int nConsvrIdle(void)
 
     nAuthInit();                  /* transfer to Auth */
 
-    return true;
+    return NODE_OK;
 }
 
-static int nConsvrInput(int ch)
+static nodeStatus_t nConsvrInput(int ch)
 {
     if (err)                      /* then we just exit */
         return NODE_EXIT;

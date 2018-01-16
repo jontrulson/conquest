@@ -259,7 +259,7 @@ typedef enum {
 
 #define ORBIT_CW -1.0           /* warp factor for clockwise orbiting */
 #define ORBIT_CCW -2.0          /* warp factor for counter-clockwise orbiting */
-// FIXME - should be computed based on cbPlanets[].size
+
 #define PLANET_DIST_OFF 200.0   /* distance from planets (planet size
                                  * + this offset) to get scanned, get
                                  * blasted, etc. */

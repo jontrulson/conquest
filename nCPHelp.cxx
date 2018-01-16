@@ -21,9 +21,9 @@
 #include "nDead.h"
 #include "nCPHelp.h"
 
-static int nCPHelpDisplay(dspConfig_t *);
-static int nCPHelpIdle(void);
-static int nCPHelpInput(int ch);
+static nodeStatus_t nCPHelpDisplay(dspConfig_t *);
+static nodeStatus_t nCPHelpIdle(void);
+static nodeStatus_t nCPHelpInput(int ch);
 
 static scrNode_t nCPHelpNode = {
     nCPHelpDisplay,               /* display */
@@ -44,7 +44,7 @@ scrNode_t *nCPHelpInit(int setnode)
 }
 
 
-static int nCPHelpDisplay(dspConfig_t *dsp)
+static nodeStatus_t nCPHelpDisplay(dspConfig_t *dsp)
 {
     int lin, col, tlin;
     static bool FirstTime = true;
@@ -160,22 +160,8 @@ static int nCPHelpDisplay(dspConfig_t *dsp)
     return NODE_OK;
 }
 
-static int nCPHelpIdle(void)
+static nodeStatus_t nCPHelpIdle(void)
 {
-    int pkttype;
-    char buf[PKT_MAXSIZE];
-
-    while ((pkttype = pktWaitForPacket(PKT_ANYPKT,
-                                       buf, PKT_MAXSIZE, 0, NULL)) > 0)
-        processPacket(buf);
-
-    if (pkttype < 0)          /* some error */
-    {
-        utLog("nCPHelpIdle: waiForPacket returned %d", pkttype);
-        cbShips[Context.snum].status = SS_OFF;
-        return NODE_EXIT;
-    }
-
     if (clientFlags & SPCLNTSTAT_FLAG_KILLED)
     {
         /* time to die properly. */
@@ -184,11 +170,10 @@ static int nCPHelpIdle(void)
         return NODE_OK;
     }
 
-
     return NODE_OK;
 }
 
-static int nCPHelpInput(int ch)
+static nodeStatus_t nCPHelpInput(int ch)
 {
     /* go back */
 

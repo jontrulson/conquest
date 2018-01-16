@@ -97,9 +97,9 @@ static const char *oheader = "";
 
 static int oldstate;            /* for returning from help */
 
-static int nOptionsDisplay(dspConfig_t *);
-static int nOptionsIdle(void);
-static int nOptionsInput(int ch);
+static nodeStatus_t nOptionsDisplay(dspConfig_t *);
+static nodeStatus_t nOptionsIdle(void);
+static nodeStatus_t nOptionsInput(int ch);
 
 static scrNode_t nOptionsNode = {
     nOptionsDisplay,              /* display */
@@ -824,7 +824,7 @@ scrNode_t *nOptionsInit(int what, int setnode, int rnode)
 }
 
 
-static int nOptionsDisplay(dspConfig_t *dsp)
+static nodeStatus_t nOptionsDisplay(dspConfig_t *dsp)
 {
 
     if (state == S_USRMENU || state == S_GETPW || state == S_GETRPW)
@@ -866,7 +866,7 @@ static int nOptionsDisplay(dspConfig_t *dsp)
     return NODE_OK;
 }
 
-static int nOptionsIdle(void)
+static nodeStatus_t nOptionsIdle(void)
 {
     int gtime = frameTime;
     static int old = 0;
@@ -885,18 +885,7 @@ static int nOptionsIdle(void)
     }
 
     if ((state == S_SYSMENU) || (state == S_SOPTS))
-        return NODE_OK;             /* don't process packets is sys modes */
-
-    while ((pkttype = pktWaitForPacket(PKT_ANYPKT,
-                                       buf, PKT_MAXSIZE, 0, NULL)) > 0)
-        processPacket(buf);
-
-    if (pkttype < 0)          /* some error */
-    {
-        utLog("nOptionsIdle: waiForPacket returned %d", pkttype);
-        cbShips[Context.snum].status = SS_OFF;
-        return NODE_EXIT;
-    }
+        return NODE_OK;             /* don't process packets in sys modes */
 
     if ((retnode == DSP_NODE_CP) && (clientFlags & SPCLNTSTAT_FLAG_KILLED))
     {
@@ -909,7 +898,7 @@ static int nOptionsIdle(void)
     return NODE_OK;
 }
 
-static int nOptionsInput(int ch)
+static nodeStatus_t nOptionsInput(int ch)
 {
     int irv;
 

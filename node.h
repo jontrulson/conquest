@@ -9,18 +9,22 @@
 #include "anim.h"
 
 /* node proc return values */
-#define NODE_OK        true
-#define NODE_EXIT      false
-#define NODE_ERR       ERR
+typedef enum {
+    NODE_OK                 = 0,
+    // like OK, but wants to do it's own packet processing
+    NODE_OK_NO_PKTPROC      = 1,
+    NODE_EXIT               = 2,
+    NODE_ERR                = 3,
+} nodeStatus_t;
 
 /* menu/screen node */
 
 
 typedef struct _scr_node {
-    int   (*display)(dspConfig_t *); /* display routine */
-    int   (*idle)(void);          /* idle routine */
-    int   (*input)(int ch);       /* keyboard input routine */
-    int   (*minput)(mouseData_t *mdata); /* mouse input routine */
+    nodeStatus_t (*display)(dspConfig_t *); /* display routine */
+    nodeStatus_t (*idle)(void);          /* idle routine */
+    nodeStatus_t (*input)(int ch);       /* keyboard input routine */
+    nodeStatus_t (*minput)(mouseData_t *mdata); /* mouse input routine */
     animQue_t *animQue;                /* optional animation que. */
 } scrNode_t;
 

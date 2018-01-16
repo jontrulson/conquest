@@ -40,9 +40,9 @@ static int state;
 
 static prm_t prm;
 
-static int nDeadDisplay(dspConfig_t *);
-static int nDeadIdle(void);
-static int nDeadInput(int ch);
+static nodeStatus_t nDeadDisplay(dspConfig_t *);
+static nodeStatus_t nDeadIdle(void);
+static nodeStatus_t nDeadInput(int ch);
 
 static scrNode_t nDeadNode = {
     nDeadDisplay,               /* display */
@@ -91,7 +91,7 @@ void nDeadInit(void)
 }
 
 
-static int nDeadDisplay(dspConfig_t *dsp)
+static nodeStatus_t nDeadDisplay(dspConfig_t *dsp)
 {
     int i;
 
@@ -266,12 +266,12 @@ static int nDeadDisplay(dspConfig_t *dsp)
     return NODE_OK;
 }
 
-static int nDeadIdle(void)
+static nodeStatus_t nDeadIdle(void)
 {
     return NODE_OK;
 }
 
-static int nDeadInput(int ch)
+static nodeStatus_t nDeadInput(int ch)
 {
     int irv;
 

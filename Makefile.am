@@ -81,7 +81,8 @@ libconquest_la_SOURCES = conqai.cxx conqai.h cb.cxx cb.h \
 libconquest_la_LIBADD = @LTLIBOBJS@
 
 libconqclnt_la_SOURCES = client.cxx client.h cproc.h cproc.cxx clientlb.cxx \
-	clientlb.h playback.h playback.cxx cproc_0006.h cproc_0006.cxx
+	clientlb.h playback.h playback.cxx cproc_0006.h cproc_0006.cxx \
+	ping.cxx ping.h
 
 libconqserv_la_SOURCES = servauth.cxx server.cxx servauth.h server.h serverpkt.cxx \
 	serverpkt.h servercmd.h servercmd.cxx sproc.h sproc.cxx

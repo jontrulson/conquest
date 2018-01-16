@@ -30,6 +30,7 @@
 #include "cqkeys.h"
 #include "cqsound.h"
 #include "conqutil.h"
+#include "ping.h"
 
 static const char *if1="Suddenly  a  sinister,  wraithlike  figure appears before you";
 static const char *if2="seeming to float in the air.  In a low,  sorrowful  voice  he";
@@ -61,9 +62,9 @@ static int fatal = false;
 /* war vars */
 static int twar[NUMPLAYERTEAMS];
 
-static int nMenuDisplay(dspConfig_t *);
-static int nMenuIdle(void);
-static int nMenuInput(int ch);
+static nodeStatus_t nMenuDisplay(dspConfig_t *);
+static nodeStatus_t nMenuIdle(void);
+static nodeStatus_t nMenuInput(int ch);
 
 static scrNode_t nMenuNode = {
     nMenuDisplay,               /* display */
@@ -195,11 +196,14 @@ void nMenuInit(void)
 
     setNode(&nMenuNode);
 
+    // enable pinging now
+    pingEnable(true);
+
     return;
 }
 
 
-static int nMenuDisplay(dspConfig_t *dsp)
+static nodeStatus_t nMenuDisplay(dspConfig_t *dsp)
 {
     int lin, col;
     char cbuf[BUFFER_SIZE_256];
@@ -261,52 +265,23 @@ static int nMenuDisplay(dspConfig_t *dsp)
         return NODE_OK;
     }
 
-
-
     return NODE_OK;
 }
 
-
-static int nMenuIdle(void)
+static nodeStatus_t nMenuIdle(void)
 {
-    int pkttype;
-    char buf[PKT_MAXSIZE];
-
-    while ((pkttype = pktWaitForPacket(PKT_ANYPKT,
-                                       buf, PKT_MAXSIZE, 0, NULL)) > 0)
-    {                       /* proc packets while we get them */
-        switch (pkttype)
-        {
-        case SP_ACK:
-            PKT_PROCSP(buf);
-            if (sAckMsg.code == PERR_LOSE)
-            {
-                lose = true;
-                state = S_LOSE;
-                return NODE_OK;   /* but not for long... */
-            }
-            else
-                utLog("nMenuIdle: got unexp ack code %d", sAckMsg.code);
-
-            break;
-
-        default:
-            processPacket(buf);
-            break;
-        }
-    }
-
-    if (pkttype < 0)          /* some error */
+    if (sAckMsg.code == PERR_LOSE)
     {
-        utLog("nMenuIdle: waitForPacket returned %d", pkttype);
-        cbShips[Context.snum].status = SS_OFF;
-        return NODE_EXIT;
+        lose = true;
+        state = S_LOSE;
+        return NODE_OK;   /* but not for long... */
     }
+
 
     return NODE_OK;
 }
 
-static int nMenuInput(int ch)
+static nodeStatus_t nMenuInput(int ch)
 {
     int i, irv;
     uint16_t cwar;

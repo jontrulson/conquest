@@ -62,6 +62,7 @@ extern void conqend(void);
 #include "hud.h"
 
 #include "initvec.h"
+#include "ping.h"
 
 #include <vector>
 using namespace std;
@@ -112,7 +113,7 @@ static void charInput(unsigned char key, int x, int y);
 static void input(int key, int x, int y);
 static int loadGLTextures(void);
 static void renderFrame(void);
-static int renderNode(void);
+static nodeStatus_t renderNode(void);
 
 /* It begins... */
 
@@ -1866,11 +1867,12 @@ resize(int w, int h)
     return;
 }
 
-static int renderNode(void)
+static nodeStatus_t renderNode(void)
 {
     scrNode_t *node = getTopNode();
     scrNode_t *onode = getTopONode();
-    int rv;
+    uint32_t iternow = clbGetMillis();
+    nodeStatus_t rv = NODE_OK;
 
     /* always iter the blinker que */
     animQueRun(&blinkerQue);
@@ -1904,6 +1906,33 @@ static int renderNode(void)
 
         }
 
+        // the *Display() nodes can return NODE_OK_NO_PKTPROC to
+        // indicate that the node will handle it's own packet
+        // processing.  If we see that, we don't process packets.  We
+        // also do not process packets while playing back a recording,
+        // of course.
+
+        if (!(Context.recmode == RECMODE_PLAYING
+              || Context.recmode == RECMODE_PAUSED
+              || rv == NODE_OK_NO_PKTPROC))
+        {
+            // look for packets and process them here, if the node's
+            // display indicated it is not doing packet handling.
+            int pkttype = 0;
+            char buf[PKT_MAXSIZE];
+
+            while ((pkttype = pktWaitForPacket(PKT_ANYPKT,
+                                               buf, PKT_MAXSIZE, 0, NULL)) > 0)
+                processPacket(buf);
+
+            if (pkttype < 0)          /* some error */
+            {
+                utLog("%s: waitForPacket returned %d", __FUNCTION__, pkttype);
+                return NODE_EXIT;
+            }
+        }
+
+
         if (node->idle)
         {
             rv = (*node->idle)();
@@ -1911,21 +1940,18 @@ static int renderNode(void)
                 return rv;
         }
 
-        /* send a udp keep alive if it's time */
-
-        /* FIXME: pings (tcp) should be handled here as well rather than
-         *  in nCP.  Pings should also be doable over both TCP and UDP,
-         *  doing away with UDP KEEPALIVE's altogether.  Next protocol
-         *  rev.
-         */
-        sendUDPKeepAlive(frameTime);
-
         if (onode && onode->idle)
         {
             rv = (*onode->idle)();
             if (rv == NODE_EXIT)
                 return rv;
         }
+
+        // send a udp keep alive if it's time
+        sendUDPKeepAlive(frameTime);
+        // send a ping if it's time
+        pingSend(iternow);
+
     }
 
     return NODE_OK;
@@ -1933,7 +1959,7 @@ static int renderNode(void)
 
 static void renderFrame(void)
 {				/* assumes context is current*/
-    int rv = NODE_OK;
+    nodeStatus_t rv = NODE_OK;
 
     /* don't render anything until we are ready */
     if (!DSP_INITED())

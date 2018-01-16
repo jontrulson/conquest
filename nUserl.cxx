@@ -33,9 +33,9 @@ static int extrast;             /* normal, or extra stats? */
 static int *uvec = NULL;
 
 
-static int nUserlDisplay(dspConfig_t *);
-static int nUserlIdle(void);
-static int nUserlInput(int ch);
+static nodeStatus_t nUserlDisplay(dspConfig_t *);
+static nodeStatus_t nUserlIdle(void);
+static nodeStatus_t nUserlInput(int ch);
 
 static scrNode_t nUserlNode = {
     nUserlDisplay,               /* display */
@@ -90,7 +90,7 @@ scrNode_t *nUserlInit(int nodeid, int setnode, int sn, int gl, int extra)
 }
 
 
-static int nUserlDisplay(dspConfig_t *dsp)
+static nodeStatus_t nUserlDisplay(dspConfig_t *dsp)
 {
     int j, fline, lline, lin;
     static const char *hd1="U S E R   L I S T";
@@ -187,22 +187,8 @@ static int nUserlDisplay(dspConfig_t *dsp)
     return NODE_OK;
 }
 
-static int nUserlIdle(void)
+static nodeStatus_t nUserlIdle(void)
 {
-    int pkttype;
-    char buf[PKT_MAXSIZE];
-
-    while ((pkttype = pktWaitForPacket(PKT_ANYPKT,
-                                       buf, PKT_MAXSIZE, 0, NULL)) > 0)
-        processPacket(buf);
-
-    if (pkttype < 0)          /* some error */
-    {
-        utLog("nUserlIdle: waiForPacket returned %d", pkttype);
-        cbShips[Context.snum].status = SS_OFF;
-        return NODE_EXIT;
-    }
-
     if (clientFlags & SPCLNTSTAT_FLAG_KILLED && retnode == DSP_NODE_CP)
     {
         /* time to die properly. */
@@ -211,11 +197,10 @@ static int nUserlIdle(void)
         return NODE_OK;
     }
 
-
     return NODE_OK;
 }
 
-static int nUserlInput(int ch)
+static nodeStatus_t nUserlInput(int ch)
 {
     ch = CQ_CHAR(ch);
 
