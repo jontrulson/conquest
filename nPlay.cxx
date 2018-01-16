@@ -90,7 +90,7 @@ void nPlayInit(void)
 
     // we will check for these in nPlayIdle() so see what our fate is
     clientStatReceived = false;
-    lastServerError = 0;
+    clientLastServerAckCode = 0;
 
     // let the server know our intentions.  We will either get a sAck
     // code (error) or a clientStat (good).
@@ -117,7 +117,7 @@ static nodeStatus_t nPlayDisplay(dspConfig_t *dsp)
     }
     else if (state == S_NSERR)
     {
-        switch (lastServerError)
+        switch (clientLastServerAckCode)
         {
         case PERR_FLYING:
             sprintf(cbuf, "You're already playing on another ship.");
@@ -128,9 +128,9 @@ static nodeStatus_t nPlayDisplay(dspConfig_t *dsp)
         default:
             cprintf(5,0,ALIGN_CENTER,
                     "#%d#nPlay: unexpected server ack, code %d",
-                    InfoColor, lastServerError);
+                    InfoColor, clientLastServerAckCode);
             utLog("nPlay: unexpected server ack, code %d",
-                  lastServerError);
+                  clientLastServerAckCode);
             break;
         }
         /* Press any key... */
@@ -145,13 +145,13 @@ static nodeStatus_t nPlayIdle(void)
     if (state == S_SELSYS)
     {
         // we are looking for either a clientstat packet (good) or an
-        // ack packet (lastServerError - bad)
+        // ack packet (clientLastServerAckCode - bad)
 
-        if (lastServerError)
+        if (clientLastServerAckCode)
         {
             // something failed...
-            utLog("%s: CPCMD_ENTER failed (lastServerError = %d)",
-                  __FUNCTION__, lastServerError);
+            utLog("%s: CPCMD_ENTER failed (clientLastServerAckCode = %d)",
+                  __FUNCTION__, clientLastServerAckCode);
             state = S_NSERR;
             return NODE_OK;
         }

@@ -697,7 +697,7 @@ int procAck(char *buf)
             pingResponse(clbGetMillis());
         }
         else
-            lastServerError = sack->code;
+            clientLastServerAckCode = sack->code;
 
         /* set the global variants.  We save both Ack and AckMsgs here */
         sAckMsg.type = sack->type;
@@ -717,7 +717,7 @@ int procAck(char *buf)
             pingResponse(clbGetMillis());
         }
         else
-            lastServerError = sackm->code;
+            clientLastServerAckCode = sackm->code;
 
         /* save a copy in the global variant. We save both Ack and AckMsgs here */
         sAckMsg.type = sackm->type;

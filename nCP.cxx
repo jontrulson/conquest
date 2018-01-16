@@ -1723,7 +1723,7 @@ static void _dobomb(void)
     hudSetPrompt(prm.index, prm.pbuf, NoColor, prm.buf, NoColor);
     prompting = true;
 
-    lastServerError = 0;          /* so the server can tell us to stop */
+    clientLastServerAckCode = 0;          /* so the server can tell us to stop */
 
     return;
 }
@@ -1937,7 +1937,7 @@ static void _dobeam(char *buf, int ch)
 
     /* now we start the phun. */
 
-    lastServerError = 0;
+    clientLastServerAckCode = 0;
 
     /* detail is (armies & 0x00ff), 0x8000 set if beaming down */
 
@@ -2806,7 +2806,7 @@ static nodeStatus_t nCPIdle(void)
         return NODE_OK;
     }
 
-    if (state == S_BOMBING && lastServerError)
+    if (state == S_BOMBING && clientLastServerAckCode)
     {                           /* the server stopped bombing for us */
         cqsEffectStop(bombingHandle, false);
         sendCommand(CPCMD_BOMB, 0); /* to be sure */
@@ -2816,7 +2816,7 @@ static nodeStatus_t nCPIdle(void)
         return NODE_OK;           /* next iter will process the char */
     }
 
-    if (state == S_BEAMING && lastServerError)
+    if (state == S_BEAMING && clientLastServerAckCode)
     {                           /* the server stopped beaming for us */
         cqsEffectStop(beamHandle, false);
         sendCommand(CPCMD_BEAM, 0); /* to be sure */

@@ -86,7 +86,7 @@ void nWelcomeInit(void)
     state = S_ERROR;
     setNode(&nWelcomeNode);
 
-    lastServerError = 0;
+    clientLastServerAckCode = 0;
     clientStatReceived = false;
 
     /* now look for SP_CLIENTSTAT or SP_ACK */
@@ -211,7 +211,7 @@ static nodeStatus_t nWelcomeDisplay(dspConfig_t *dsp)
         break;
 
     case S_ERROR:
-        switch (lastServerError)
+        switch (clientLastServerAckCode)
         {
         case PERR_CLOSED:
             cprintf(MSG_LIN2/2,col,ALIGN_CENTER,"#%d#%s", InfoColor, sorry1 );
@@ -231,7 +231,7 @@ static nodeStatus_t nWelcomeDisplay(dspConfig_t *dsp)
             break;
 
         default:
-            utLog("nWelcomeDisplay: unexpected ACK code %d\n", lastServerError);
+            utLog("nWelcomeDisplay: unexpected ACK code %d\n", clientLastServerAckCode);
             break;
         }
 

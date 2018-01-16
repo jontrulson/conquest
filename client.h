@@ -45,7 +45,7 @@ typedef struct {
 ClientInfo_t          cInfo;
 spHello_t             sHello;   /* some server info we want to keep */
 spServerStat_t        sStat;    /* server status info */
-int                   lastServerError = 0; /* set by an ACK from server */
+int                   clientLastServerAckCode = 0; /* set by an ACK from server */
 // set to true when a clientstat packet is processed
 bool                  clientStatReceived = false;
 uint8_t               clientFlags = 0; /* set according to CLIENTSTAT packets */
@@ -62,7 +62,7 @@ spFrame_t             sFrame;
 extern ClientInfo_t   cInfo;
 extern spHello_t      sHello;   /* some server info we want to keep */
 extern spServerStat_t sStat;    /* server status info */
-extern int            lastServerError;
+extern int            clientLastServerAckCode;
 extern bool           clientStatReceived;
 extern uint8_t        clientFlags;
 

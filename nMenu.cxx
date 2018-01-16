@@ -194,7 +194,7 @@ void nMenuInit(void)
         lose = false;
     }
 
-    lastServerError = 0;
+    clientLastServerAckCode = 0;
     setNode(&nMenuNode);
 
     // enable pinging now
@@ -271,7 +271,7 @@ static nodeStatus_t nMenuDisplay(dspConfig_t *dsp)
 
 static nodeStatus_t nMenuIdle(void)
 {
-    if (lastServerError == PERR_LOSE)
+    if (clientLastServerAckCode == PERR_LOSE)
     {
         lose = true;
         state = S_LOSE;
