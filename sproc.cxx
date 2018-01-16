@@ -952,7 +952,12 @@ void procTow(cpCommand_t *cmd)
                     cbShips[cbShips[snum].towing].warp = 2.0;
             }
             else
-                cbShips[cbShips[snum].towing].warp = cbShips[snum].warp;
+            {
+                if (cbShips[cbShips[snum].towing].lock == LOCK_PLANET)
+                    cbShips[cbShips[snum].towing].warp = cbShips[snum].warp;
+                else
+                    cbShips[cbShips[snum].towing].warp = 2.0;
+            }
 
             /* Release the tow. */
             if ( STOWEDBY(cbShips[snum].towing) )
