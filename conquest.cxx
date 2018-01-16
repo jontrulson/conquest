@@ -281,7 +281,6 @@ int main(int argc, char *argv[])
     cInfo.usock = -1;
     cInfo.doUDP = false;
     cInfo.tryUDP = true;
-    cInfo.state = CLT_STATE_PREINIT;
     cInfo.serverDead = true;
     cInfo.isLoggedIn = false;
     cInfo.remoteport = CN_DFLT_PORT;

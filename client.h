@@ -17,23 +17,12 @@
 
 #include "cproc.h"
 
-/* client state */
-#define CLT_STATE_NONE      0x00000000
-#define CLT_STATE_PREINIT   0x00000001	/* local init */
-#define CLT_STATE_INIT      0x00000002	/* negotiate with client/login */
-#define CLT_STATE_MAINMENU  0x00000004	/* in main menu */
-#define CLT_STATE_PLAYMENU  0x00000008	/* a menu/info screen engaged
-					   during play */
-#define CLT_STATE_PLAY      0x00000010	/* playing */
-#define CLT_STATE_TERMINATE 0x00000020	/* terminating */
-
 typedef struct {
     int sock;			/* TCP socket to client */
     int usock;			/* UDP socket to client */
     int doUDP;                    /* whether we should look for udp packets */
     int tryUDP;                   /* should we try UDP? */
     struct sockaddr_in  servaddr;
-    uint32_t  state;		/* current state */
     uint32_t  serverDead;		/* is the client dead/ */
     uint32_t  isLoggedIn;		/* is the client logged in? */
     char    *remotehost;          /* self evident */
@@ -45,7 +34,8 @@ typedef struct {
 ClientInfo_t          cInfo;
 spHello_t             sHello;   /* some server info we want to keep */
 spServerStat_t        sStat;    /* server status info */
-int                   clientLastServerAckCode = 0; /* set by an ACK from server */
+// set by an ACK from server
+int                   clientLastServerAckCode = 0;
 // set to true when a clientstat packet is processed
 bool                  clientStatReceived = false;
 uint8_t               clientFlags = 0; /* set according to CLIENTSTAT packets */
