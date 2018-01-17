@@ -478,7 +478,7 @@ void hudSetDestruct(int snum)
             hudData.destruct.str[0] = 0;
         else
             snprintf( hudData.destruct.str, HUD_STR_SZ,
-                      "DESTRUCT MINUS %2d", i );
+                      "DESTRUCT MINUS %02d", i );
 
         hudData.destruct.fuse = i;
     }

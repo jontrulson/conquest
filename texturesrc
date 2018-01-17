@@ -1967,7 +1967,7 @@ animdef {
     loops      1
     delayms    50
 
-    deltaa     -0.015
+    deltaa     -0.01
   }
 }
 

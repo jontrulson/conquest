@@ -455,31 +455,32 @@ void updateIconHudGeo(int snum)
     o.arm.w = o.tow.w;
     o.arm.h = o.tow.h;
 
-    /* for the eng/wep/fuel failure/crit 'pulse' messages (centered) */
-    o.fuelcritpulse.x = dConf.vX + ((dConf.vW / 8.0) * 1.5);
-    o.fuelcritpulse.y = dConf.vY + (dConf.vH - ((dConf.vH / 20.0) * 19.0));
-    o.fuelcritpulse.w = ((dConf.vW / 8.0) * 5.0);
-    o.fuelcritpulse.h = (dConf.vH / 20.0) * 2.0;
+    /* for the eng/wep/fuel failure/crit 'pulse' messages, lined up on
+     * the left of the viewer next to the item in trouble. */
+    o.fuelcritpulse.x = dConf.vX + 2.0;
+    o.fuelcritpulse.y = o.d2fueln.y;
+    o.fuelcritpulse.w = dConf.vW;
+    o.fuelcritpulse.h = o.d2fueln.h;
 
-    o.wepfailpulse.x = dConf.vX + ((dConf.vW / 8.0) * 1.5);
-    o.wepfailpulse.y = dConf.vY + (dConf.vH - ((dConf.vH / 20.0) * 16.0));
-    o.wepfailpulse.w = ((dConf.vW / 8.0) * 5.0);
-    o.wepfailpulse.h = (dConf.vH / 20.0) * 2.0;
+    o.wepfailpulse.x = dConf.vX + 2.0;
+    o.wepfailpulse.y = o.d2weptn.y;
+    o.wepfailpulse.w = dConf.vW;
+    o.wepfailpulse.h = o.d2weptn.h;
 
-    o.hullcritpulse.x = dConf.vX + ((dConf.vW / 8.0) * 1.5);
-    o.hullcritpulse.y = dConf.vY + (dConf.vH - ((dConf.vH / 20.0) * 13.0));
-    o.hullcritpulse.w = ((dConf.vW / 8.0) * 5.0);
-    o.hullcritpulse.h = (dConf.vH / 20.0) * 2.0;
+    o.hullcritpulse.x = dConf.vX + 2.0;
+    o.hullcritpulse.y = o.d1damn.y;
+    o.hullcritpulse.w = dConf.vW;
+    o.hullcritpulse.h = o.d1damn.h;
 
-    o.shcritpulse.x = dConf.vX + ((dConf.vW / 8.0) * 1.5);
-    o.shcritpulse.y = dConf.vY + (dConf.vH - ((dConf.vH / 20.0) * 8.0));
-    o.shcritpulse.w = ((dConf.vW / 8.0) * 5.0);
-    o.shcritpulse.h = (dConf.vH / 20.0) * 2.0;
+    o.shcritpulse.x = dConf.vX + 2.0;
+    o.shcritpulse.y = o.d1shn.y;
+    o.shcritpulse.w = dConf.vW;
+    o.shcritpulse.h = o.d1shn.h;
 
-    o.engfailpulse.x = dConf.vX + ((dConf.vW / 8.0) * 1.5);
-    o.engfailpulse.y = dConf.vY + (dConf.vH - ((dConf.vH / 20.0) * 5.0));
-    o.engfailpulse.w = ((dConf.vW / 8.0) * 5.0);
-    o.engfailpulse.h = (dConf.vH / 20.0) * 2.0;
+    o.engfailpulse.x = dConf.vX + 2.0;
+    o.engfailpulse.y = o.d2engtn.y;
+    o.engfailpulse.w = dConf.vW;
+    o.engfailpulse.h = o.d2engtn.h;
 
     /* alert target - bottom of viewer */
     o.d1atarg.x = dConf.vX + ((dConf.vW / 8.0) * 1.5);
@@ -667,11 +668,11 @@ static void renderPulseMsgs(void)
                       o.fuelcritpulse.w, o.fuelcritpulse.h,
                       glfFontLarge, "Fuel Critical",
                       0, &fuelcrit.state.col,
-                      GLF_FONT_F_SCALEX | GLF_FONT_F_ORTHO);
+                      GLF_FONT_F_ORTHO);
 
     }
 
-    if (testlamps ||hudData.alloc.ealloc <= 0)
+    if (hudData.alloc.ealloc <= 0)
     {
         if (ANIM_EXPIRED(&engfail))
         {
@@ -683,9 +684,9 @@ static void renderPulseMsgs(void)
                       o.engfailpulse.w, o.engfailpulse.h,
                       glfFontLarge, "Engines Overloaded",
                       0, &engfail.state.col,
-                      GLF_FONT_F_SCALEX | GLF_FONT_F_ORTHO);
+                      GLF_FONT_F_ORTHO);
     }
-    else if (hudData.etemp.temp > HUD_E_CRIT)
+    else if (testlamps || hudData.etemp.temp > HUD_E_CRIT)
     {
         if (ANIM_EXPIRED(&engcrit))
         {
@@ -697,7 +698,7 @@ static void renderPulseMsgs(void)
                       o.engfailpulse.w, o.engfailpulse.h,
                       glfFontLarge, "Engines Critical",
                       0, &engcrit.state.col,
-                      GLF_FONT_F_SCALEX | GLF_FONT_F_ORTHO);
+                      GLF_FONT_F_ORTHO);
     }
 
 
@@ -713,7 +714,7 @@ static void renderPulseMsgs(void)
                       o.wepfailpulse.w, o.wepfailpulse.h,
                       glfFontLarge, "Weapons Overloaded",
                       0, &wepfail.state.col,
-                      GLF_FONT_F_SCALEX | GLF_FONT_F_ORTHO);
+                      GLF_FONT_F_ORTHO);
 
     }
     else if (hudData.wtemp.temp > HUD_W_CRIT)
@@ -728,7 +729,7 @@ static void renderPulseMsgs(void)
                       o.wepfailpulse.w, o.wepfailpulse.h,
                       glfFontLarge, "Weapons Critical",
                       0, &wepcrit.state.col,
-                      GLF_FONT_F_SCALEX | GLF_FONT_F_ORTHO);
+                      GLF_FONT_F_ORTHO);
 
     }
 
@@ -745,7 +746,7 @@ static void renderPulseMsgs(void)
                       o.shcritpulse.w, o.shcritpulse.h,
                       glfFontLarge, "Shields Critical",
                       0, &shcrit.state.col,
-                      GLF_FONT_F_SCALEX | GLF_FONT_F_ORTHO);
+                      GLF_FONT_F_ORTHO);
 
     }
 
@@ -761,7 +762,7 @@ static void renderPulseMsgs(void)
                       o.hullcritpulse.w, o.hullcritpulse.h,
                       glfFontLarge, "Hull Critical",
                       0, &hullcrit.state.col,
-                      GLF_FONT_F_SCALEX | GLF_FONT_F_ORTHO);
+                      GLF_FONT_F_ORTHO);
 
     }
 
