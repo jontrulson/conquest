@@ -737,12 +737,13 @@ void secdrive( const shipVec_t& ship )
 
             dec = dec + cbShips[i].warp * cbShips[i].armies * FUELWARPARMY_FAC;
 
-            if ( cbShips[i].towing != 0 )
+            if ( STOWING(i) )
 	    {
                 if ( SSHUP(cbShips[i].towing) )
                     dec = dec + cbShips[i].warp * FUELWARP_FAC * FUELSHIELDS_MULT;
                 else
                     dec = dec + cbShips[i].warp * FUELWARP_FAC;
+
                 dec = dec + cbShips[i].warp * cbShips[cbShips[i].towing].armies *
                     FUELWARPARMY_FAC;
 	    }
