@@ -42,12 +42,18 @@ static const char *if7="reading:";
 static const char *if8="INITIALIZATION FAILURE";
 static const char *if9="The darkness becomes all encompassing, and your vision fails.";
 
+// idle timeout in menu()
+static const char *itimeout1 =
+    "Menu idle timeout after 5 minutes of inactivity";
+static const char *itimeout2 =
+    "Server closed connection";
 
 #define S_NONE          0
 #define S_WAR           1
 #define S_PSEUDO        2
 #define S_RESIGN        3
 #define S_LOSE          4
+#define S_TIMEOUT       5
 static int state;
 
 static prm_t prm;
@@ -197,6 +203,12 @@ void nMenuInit(void)
     clientLastServerAckCode = 0;
     setNode(&nMenuNode);
 
+    if (cInfo.tryUDP && !cInfo.doUDP)
+    {
+        utLog("%s: requesting a UDP connection from server", __FUNCTION__);
+        sendCommand(CPCMD_UDP, 1);
+    }
+
     // enable pinging now
     pingEnable(true);
 
@@ -212,15 +224,18 @@ static nodeStatus_t nMenuDisplay(dspConfig_t *dsp)
     if (fatal)
         return NODE_EXIT;
 
-    _conqds(dsp);
-    clbUserline( -1, -1, cbuf, false, true );
-    cprintf(MSG_LIN1, 1, ALIGN_LEFT, "#%d#%s",
-            LabelColor,
-            cbuf);
-    clbUserline( Context.unum, -1, cbuf, false, true );
-    cprintf(MSG_LIN2, 1, ALIGN_LEFT, "#%d#%s",
-            NoColor,
-            cbuf);
+    if (state == S_NONE || state == S_WAR)
+    {
+        _conqds(dsp);
+        clbUserline( -1, -1, cbuf, false, true );
+        cprintf(MSG_LIN1, 1, ALIGN_LEFT, "#%d#%s",
+                LabelColor,
+                cbuf);
+        clbUserline( Context.unum, -1, cbuf, false, true );
+        cprintf(MSG_LIN2, 1, ALIGN_LEFT, "#%d#%s",
+                NoColor,
+                cbuf);
+    }
 
     if (state == S_PSEUDO)
     {
@@ -263,6 +278,24 @@ static nodeStatus_t nMenuDisplay(dspConfig_t *dsp)
 
         cprintf(20, 0, ALIGN_CENTER, MTXT_DONE);
 
+        // cancel any overlay nodes
+        setONode(NULL);
+
+        return NODE_OK;
+    }
+
+    if (state == S_TIMEOUT)
+    {
+        /* We reincarnated or else something bad happened. */
+        lin = 7;
+        cprintf( lin++, 0, ALIGN_CENTER, "#%d#%s", RedLevelColor, itimeout1);
+        cprintf( lin, 0, ALIGN_CENTER, "#%d#%s", RedLevelColor, itimeout2);
+
+        cprintf(20, 0, ALIGN_CENTER, MTXT_DONE);
+
+        // cancel any overlay nodes
+        setONode(NULL);
+
         return NODE_OK;
     }
 
@@ -278,6 +311,12 @@ static nodeStatus_t nMenuIdle(void)
         return NODE_OK;   /* but not for long... */
     }
 
+    if (clientLastServerAckCode == PERR_IDLETIMEOUT)
+    {
+        state = S_TIMEOUT;
+        return NODE_OK;   /* but not for long... */
+    }
+
     return NODE_OK;
 }
 
@@ -288,7 +327,7 @@ static nodeStatus_t nMenuInput(int ch)
 
     ch = CQ_CHAR(ch);
 
-    if ((state == S_LOSE) && ch != 0)
+    if ((state == S_LOSE || state == S_TIMEOUT) && ch != 0)
         return NODE_EXIT;           /* you lose */
 
     if (prompting)

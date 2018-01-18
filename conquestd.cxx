@@ -47,8 +47,6 @@
 
 #define LISTEN_BACKLOG 5 /* # of requests we're willing to to queue */
 
-static uint16_t listenPort = CN_DFLT_PORT;
-
 static char cbuf[BUFFER_SIZE_1024]; /* general purpose buffer */
 static char *progName;
 
@@ -149,10 +147,10 @@ void checkMaster(void)
         cbConqInfo->conqservPID = getpid();
         cbUnlock(&cbConqInfo->lockword);
         sInfo.isMaster = true;
-        utLog("NET: master server listening on port %d\n", listenPort);
+        utLog("NET: master server listening on port %d\n", sInfo.listenPort);
     }
 
-    sa.sin_port = htons(listenPort);
+    sa.sin_port = htons(sInfo.listenPort);
 
     if (localOnly)
         sa.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
@@ -209,7 +207,7 @@ void checkMaster(void)
             /* get any changes to sysconf so that meta updates are
                up to date */
             GetSysConf(true);
-            metaUpdateServer(metaServer, myServerName, listenPort);
+            metaUpdateServer(metaServer, myServerName, sInfo.listenPort);
         }
 
         tv.tv_sec = 120;           /* update meta server every 120 secs */
@@ -283,10 +281,10 @@ int main(int argc, char *argv[])
     sInfo.sock = -1;
     sInfo.usock = -1;
     sInfo.doUDP = false;
-    sInfo.tryUDP = true;
     sInfo.clientDead = true;
     sInfo.isMaster = false;
     sInfo.isLoggedIn = false;
+    sInfo.listenPort = CN_DFLT_PORT; // 1701, of course
 
 
     while ((i = getopt(argc, argv, "dlp:u:mM:N:v")) != EOF)    /* get command args */
@@ -297,7 +295,7 @@ int main(int argc, char *argv[])
             break;
 
         case 'p':
-            listenPort = (uint16_t)atoi(optarg);
+            sInfo.listenPort = (uint16_t)atoi(optarg);
             break;
 
         case 'l':                 /* local conn only */
@@ -1176,10 +1174,16 @@ void handleSimpleCmdPkt(cpCommand_t *ccmd)
         /* NOTREACHED */
         break;
 
+    case CPCMD_UDP:
+        clbBlockAlarm();
+        serverStartUDP(getpid(), ccmd);
+        clbUnblockAlarm();
+        break;
+
 // These will never be seen here - they are intercepted by the packet
 // reader and dealt with there.
 //    case CPCMD_PING:
-//    case CPCMD_KEEPALIVE:       /* these we just ignore */
+//    case CPCMD_KEEPALIVE:
 
     default:
         utLog("conquestd: handleSimpleCmdPkt(): unexpected command code %d",
@@ -1309,13 +1313,18 @@ void menu(void)
             return;
 	}
 
-        /* we get sleepy if we are recieving no packets, or only
-           keepalive packets */
-        if ( pkttype == 0 || ((pkttype == CP_COMMAND) &&
-                              CPCMD_KEEPALIVE == (((cpCommand_t *)buf)->cmd)))
+        /* we get sleepy if we are recieving no packets */
+        if ( pkttype == 0)
 	{
             if ((clbGetMillis() - sleepy) > sleeplimit)
+            {
+                // tell the client
+                utLog("%s: Idle timeout after 5 minutes of inactivity, "
+                      "exiting.", __FUNCTION__);
+                pktSendAck(PSEV_FATAL, PERR_IDLETIMEOUT, NULL);
+
                 break;
+            }
             else
                 utSleep(0.05);
 
@@ -1324,6 +1333,10 @@ void menu(void)
 
         switch(pkttype)
 	{
+	case CP_ACKUDP:
+            procAckUDP(buf);
+            break;
+
 	case CP_SETNAME:
             procSetName(buf);
             break;
@@ -1614,6 +1627,10 @@ int play(void)
 
         switch (pkttype)
 	{
+	case CP_ACKUDP:
+            procAckUDP(buf);
+            break;
+
 	case CP_SETCOURSE:
             procSetCourse(buf);
             didsomething++;
@@ -1794,15 +1811,6 @@ static int hello(void)
     struct sockaddr_in usa;	/* internet socket addr. structure - udp */
     cpAck_t *cpack;
 
-    /* open a UDP socket and bind to it */
-    if (!Context.accessDenied && (sInfo.usock = udpOpen(listenPort, &usa)) < 0)
-    {
-        utLog("NET: SERVER hello: udpOpen() failed: %s", strerror(errno));
-        sInfo.usock = -1;
-        sInfo.tryUDP = false;
-        pktSetSocketFds(PKT_SOCKFD_NOCHANGE, sInfo.usock);
-    }
-
     /* first send a server hello */
     shello.type = SP_HELLO;
     shello.protover = (uint16_t)htons(PROTOCOL_VERSION);
@@ -1843,43 +1851,6 @@ static int hello(void)
     }
 
     utLog("NET: SERVER: hello: sent server hello to client");
-
-    if (!Context.accessDenied && sInfo.tryUDP)
-    {
-        /* wait a few seconds to see if client sends a udp */
-        tv.tv_sec = 5;
-        tv.tv_usec = 0;
-        FD_ZERO(&readfds);
-        FD_SET(sInfo.usock, &readfds);
-        if ((rv = select(sInfo.usock+1, &readfds, NULL, NULL, &tv)) <= 0)
-        {
-            if (rv == 0)
-                utLog("NET: SERVER: hello: udp select timed out. No UDP");
-            else
-                utLog("NET: SERVER: hello: udp select failed: %s", strerror(errno));
-
-            sInfo.tryUDP = false;
-        }
-        else
-        {
-            if (FD_ISSET(sInfo.usock, &readfds))
-            {                       /* get the packet, almost done negotiating udp */
-                rv = udpRecvFrom(sInfo.usock, buf, PKT_MAXSIZE, &sInfo.clntaddr);
-                utLog("NET: SERVER: hello: got %d UDP bytes from client port %d", rv,
-                      (int)ntohs(sInfo.clntaddr.sin_port));
-
-                if (connect(sInfo.usock, (const struct sockaddr *)&sInfo.clntaddr,
-                            sizeof(sInfo.clntaddr)) < 0)
-                {
-                    utLog("NET: SERVER: hello: udp connect() failed: %s", strerror(errno));
-                    sInfo.tryUDP = false;
-                }
-                else
-                    utLog("NET: SERVER: hello: UDP connection to client established.");
-
-            }
-        }
-    }
 
     // say good bye if access was denied...
     if (Context.accessDenied)
@@ -1947,14 +1918,6 @@ static int hello(void)
     if (chello.updates >= 1 && chello.updates <= 10)
         Context.updsec = chello.updates;
 
-    /* send data to the client udp socket.  If the client gets it, it
-       will acknowlege it in it's ACK packet, which will tell us we can
-       do udp. woohoo! */
-    if (sInfo.tryUDP)
-    {
-        send(sInfo.usock, "Open Me", 7, 0);
-    }
-
     /* now send the server stats normally */
     if (!sendServerStat(PKT_SENDTCP))
     {
@@ -1974,18 +1937,6 @@ static int hello(void)
         utLog("NET: SERVER: hello: got packet type %d, expected CP_ACK",
               pkttype);
         return false;
-    }
-
-    if (sInfo.tryUDP)
-    {
-        /* see if the client could read our udp */
-        cpack = (cpAck_t *)buf;
-        if (cpack->code == PERR_DOUDP)
-        {
-            sInfo.doUDP = true;
-            utLog("NET: SERVER: hello: Client acknowleged UDP from server. Doing UDP.");
-            pktSetSocketFds(PKT_SOCKFD_NOCHANGE, sInfo.usock);
-        }
     }
 
     return true;

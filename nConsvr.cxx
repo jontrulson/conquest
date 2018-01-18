@@ -132,16 +132,6 @@ static nodeStatus_t nConsvrIdle(void)
         return NODE_ERR;
     }
 
-    if (cInfo.tryUDP)
-    {
-        utLog("NET: Opening UDP...");
-        if ((cInfo.usock = udpOpen(0, &cInfo.servaddr)) < 0)
-        {
-            utLog("NET: udpOpen: %s", strerror(errno));
-            cInfo.tryUDP = false;
-        }
-    }
-
     utLog("Connecting to host: %s, port %d\n",
           rhost, rport);
 

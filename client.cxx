@@ -258,25 +258,6 @@ int clientHello(const char *clientname)
     // Now remap...
     cbMapLocal();
 
-    // and we are ready to continue...
-
-    if (cInfo.tryUDP)
-    {
-        if (connect(cInfo.usock, (const struct sockaddr *)&cInfo.servaddr,
-                    sizeof(cInfo.servaddr)) < 0)
-        {
-            utLog("NET: clientHello: udp connect() failed: %s", strerror(errno));
-            cInfo.tryUDP = false;
-        }
-        else
-        {
-            /* see if this will succeed in setting up a NAT tunnel
-               to the server */
-            utLog("NET: clientHello: send udp to server.");
-            send(cInfo.usock, "Open Me", 7, 0);
-        }
-    }
-
     /* now send a client hello */
     chello.type = CP_HELLO;
     chello.updates = Context.updsec;
@@ -297,37 +278,6 @@ int clientHello(const char *clientname)
     }
 
     utLog("clientHello: sent hello to server");
-
-
-    if (cInfo.tryUDP)
-    {
-        /* see if we get an ack back from the server via udp */
-        /* this is kind of weak and probably needs more work.  As it
-           is, the client needs to receive a udp from the server
-           within 5 seconds, or UDP will not be used.  If the inbound
-           packet gets lost.... Oh well. */
-        tv.tv_sec = 5;            /* 5 secs */
-        tv.tv_usec = 0;
-        FD_ZERO(&readfds);
-        FD_SET(cInfo.usock, &readfds);
-        if ((rv = select(cInfo.usock+1, &readfds, NULL, NULL, &tv)) <= 0)
-        {
-            utLog("CLIENT: hello: select udp failed: %s", strerror(errno));
-            cInfo.tryUDP = false;
-        }
-        else
-        {
-            if (rv > 0 && FD_ISSET(cInfo.usock, &readfds))
-            {
-                if ((rv = udpRecvFrom(cInfo.usock, buf, PKT_MAXSIZE, &cInfo.servaddr)) >= 0 )
-                {
-                    utLog("NET: got (%d) UDP bytes from server, will ACK for server UDP", rv);
-                    cInfo.doUDP = true;
-                    pktSetSocketFds(PKT_SOCKFD_NOCHANGE, cInfo.usock);
-                }
-            }
-        }
-    }
 
     /* now we need a server stat or a Nak */
 
@@ -372,10 +322,7 @@ int clientHello(const char *clientname)
         return false;
     }
 
-    if (cInfo.doUDP)
-        pktSendAck(PSEV_INFO, PERR_DOUDP, NULL);
-    else
-        pktSendAck(PSEV_INFO, PERR_OK, NULL);
+    pktSendAck(PSEV_INFO, PERR_OK, NULL);
 
     return true;
 }
@@ -394,6 +341,9 @@ void sendUDPKeepAlive(uint32_t timebase)
 
     if (!cInfo.doUDP)
         return;                     /* no point */
+
+    if (cInfo.usock < 0)
+        return;
 
     if (timebase)                 /* don't query the clock */
         iternow = timebase;

@@ -41,6 +41,7 @@ void procFireTorps(char *buf);
 void procMessage(char *buf);
 void procChangePassword(char *buf);
 void procReload(cpCommand_t *cmd);
+void procAckUDP(char *buf);
 
 
 #endif /* SPROC_H_INCLUDED */

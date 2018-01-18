@@ -27,9 +27,9 @@
 typedef struct {
     int     sock;			/* socket to client */
     int     usock;                /* udp socket to client */
+    uint16_t listenPort;          // our listen port.  Ahem.
     struct  sockaddr_in clntaddr; /* client's saddrin struct */
     int     doUDP;                /* send udp? */
-    int     tryUDP;               /* try udp? */
     uint32_t state;		/* current state */
     uint32_t clientDead;		/* is the client dead/ */
     uint32_t isMaster;		/* is the Maseter server? */
@@ -61,4 +61,7 @@ int sendcbConqInfo(int sock, int force);
 int sendHistory(int sock, int hnum);
 int sendDoomsday(int sock);
 
+void serverStartUDP(pid_t pid, const cpCommand_t *ccmd);
+
 #endif /* SERVER_H_INCLUDED */
+

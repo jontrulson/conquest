@@ -111,9 +111,9 @@ static packetEnt_t clientPackets[] = {
       "CP_MESSAGE",
       pktNotImpl
     },
-    { CP_VARIABLE,
-      0,                          /* these are special */
-      "CP_VARIABLE",
+    { CP_ACKUDP,
+      sizeof(cpAckUDP_t),
+      "CP_ACKUDP",
       pktNotImpl
     }
 };
@@ -372,9 +372,9 @@ static packetEnt_t serverPackets_0007[] = {
       "SP_TORPEVENT",
       pktNotImpl
     },
-    { SP_VARIABLE,
-      0,                          /* these are special */
-      "SP_VARIABLE",
+    { SP_ACKUDP,
+      sizeof(spAckUDP_t),
+      "SP_ACKUDP",
       pktNotImpl
     }
 };
@@ -510,6 +510,39 @@ void pktSetSocketFds(int tcpsock, int udpsock)
     return;
 }
 
+// used by both client and server to negotiate UDP
+void pktSendAckUDP(int socktype, uint8_t state, uint32_t payload)
+{
+    spAckUDP_t sUDP = {};
+    cpAckUDP_t cUDP = {};
+    void *buf = NULL;
+
+    if (isClient)
+    {
+        cUDP.type = CP_ACKUDP;
+        cUDP.state = state;
+        cUDP.payload = htonl(payload);
+
+        buf = (void*)&cUDP;
+    }
+    else
+    {
+        sUDP.type = SP_ACKUDP;
+        sUDP.state = state;
+        sUDP.payload = htonl(payload);
+
+        buf = (void*)&sUDP;
+    }
+
+    int rv = pktWrite(socktype, buf);
+
+    if (rv <= 0)
+    {
+        utLog("%s: pktWrite() failed: %d", __FUNCTION__, rv);
+    }
+
+    return;
+}
 
 /* sends acks. to/from client/server. The server can add a
  * string message as well. We always send acks via TCP.
@@ -944,7 +977,10 @@ static int _pktWriteSocket(int sock, const void *data, int len)
     int rv;
 
     if (!data || !len)
+    {
+        utLog("%s: data and/or len is invalid", __FUNCTION__);
         return 0;
+    }
     if (sock == udp_sock && sock >= 0)
         rv = udpSendPacket(sock, data, len);
     else

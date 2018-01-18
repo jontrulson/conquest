@@ -34,12 +34,13 @@ int             procTorpEvent(char *buf);
 int             procTeam(char *buf);
 int             procMessage(char *buf);
 int             procServerStat(char *buf);
-int             proccbConqInfo(char *buf);
+int             procConqInfo(char *buf);
 int             procHistory(char *buf);
 int             procDoomsday(char *buf);
 int             procAck(char *buf); /* handles ACK and ACKMSG */
 int             procClientStat(char *buf);
 int             procFrame(char *buf);
+int             procAckUDP(char *buf);
 
 void            processPacket(char *buf);
 
@@ -63,14 +64,14 @@ static dispatchProc_t cprocDispatchTable_0007[] = {
     procAck,                      /* SP_ACKMSG */
     procTeam,                     /* SP_TEAM */
     procTorpLoc,                  /* SP_TORPLOC */
-    proccbConqInfo,                 /* SP_CONQINFO */
+    procConqInfo,                 /* SP_CONQINFO */
     procFrame,                    /* SP_FRAME */
     procHistory,                  /* SP_HISTORY */
     procDoomsday,                 /* SP_DOOMSDAY */
     procPlanetInfo,               /* SP_PLANETINFO */
     procPlanetLoc2,               /* SP_PLANETLOC2 */
     procTorpEvent,                /* SP_TORPEVENT */
-    pktNotImpl                    /* SP_VARIABLE */
+    procAckUDP                    /* SP_ACKUDP */
 };
 
 #define CPROCDISPATCHTABLENUM_0007                              \

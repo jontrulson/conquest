@@ -63,11 +63,11 @@ int procDispatchInit(uint16_t vers, packetEnt_t *pktList, int numpkts);
 #define PERR_NOSHIP       10 	/* no slots available */
 #define PERR_LOSE         11 	/* lose in menu() */
 #define PERR_FLYING       12 	/* already flying a ship (newship()) */
-#define PERR_TOOMANYSHIPS 13	/* you are flying too many ships (newship()) */
+#define PERR_TOOMANYSHIPS 13	/* *obsolete* available for re-use */
 #define PERR_CANCELED     14	/* an operation (bombing, etc) was cancelled
 				   for some reason. */
 #define PERR_DONE         15    /* finished something - like beaming */
-#define PERR_DOUDP        16	/* used in hello to tell server udp is ok */
+#define PERR_IDLETIMEOUT  16	/* timed out in menu (5+ mins idle) */
 #define PERR_PINGRESP     17	/* a ping reponse for nCP */
 
 typedef struct _pkt_stats {
@@ -100,6 +100,7 @@ uint16_t pktGetClientProtocolVersion();
 int   pktSetClientProtocolVersion(uint16_t vers);
 void  pktSetSocketFds(int tcpsock, int udpsock);
 
+void  pktSendAckUDP(int socktype, uint8_t state, uint32_t payload);
 int   pktSendAck(uint8_t severity, uint8_t code, const char *msg);
 int   pktIsConnDead(void);
 int   pktNotImpl(char *nothing);

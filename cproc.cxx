@@ -39,15 +39,15 @@ int procDispatchInit(uint16_t vers, packetEnt_t *pktList, int numpkts)
 
     switch (vers)
     {
-    case 0x0006: // backwards compat for recordings (.cqr files)
-        procs = cprocDispatchTable_0006;
-        numprocs = CPROCDISPATCHTABLENUM_0006;
-        break;
+        case 0x0006: // backwards compat for recordings (.cqr files)
+            procs = cprocDispatchTable_0006;
+            numprocs = CPROCDISPATCHTABLENUM_0006;
+            break;
 
-    case 0x0007: // current
-        procs = cprocDispatchTable_0007;
-        numprocs = CPROCDISPATCHTABLENUM_0007;
-        break;
+        case 0x0007: // current
+            procs = cprocDispatchTable_0007;
+            numprocs = CPROCDISPATCHTABLENUM_0007;
+            break;
     }
 
     if (procs == NULL || numprocs == 0)
@@ -627,7 +627,7 @@ int procServerStat(char *buf)
     return true;
 }
 
-int proccbConqInfo(char *buf)
+int procConqInfo(char *buf)
 {
     spcbConqInfo_t *spci = (spcbConqInfo_t *)buf;
 
@@ -785,6 +785,133 @@ int procFrame(char *buf)
     }
 
     return false;
+}
+
+// A helper function for procAckUDP().  Return false on success, true
+// on error.
+static bool _connect_udp(void)
+{
+    struct sockaddr_in sa;
+    struct hostent *hp = NULL;
+
+    if ((cInfo.usock = udpOpen(0, &sa)) < 0)
+    {
+        utLog("%s: NET: udpOpen(): %s", __FUNCTION__, strerror(errno));
+        return true;
+    }
+    else
+    {
+        if ((hp = gethostbyname(cInfo.remotehost)) == NULL)
+        {
+            utLog("%s: gethostbyname(%s): failed",
+                  __FUNCTION__, cInfo.remotehost);
+            close(cInfo.sock);
+            cInfo.sock = -1;
+            return true;
+        }
+
+        /* put host's address and address type into socket structure */
+        memcpy((char *)&sa.sin_addr, (char *)hp->h_addr, hp->h_length);
+        sa.sin_family = hp->h_addrtype;
+        sa.sin_port = htons(cInfo.remoteport);
+
+        if (connect(cInfo.usock,
+                    (const struct sockaddr *)&sa,
+                    sizeof(struct sockaddr_in)) < 0)
+        {
+            utLog("%s: NET: UDP connect() failed: %s",
+                  __FUNCTION__, strerror(errno));
+            close(cInfo.usock);
+            cInfo.usock = true;
+        }
+    }
+
+    return false;
+}
+
+int procAckUDP(char *buf)
+{
+    spAckUDP_t *ackUDP;
+
+    if (!pktIsValid(SP_ACKUDP, buf))
+        return false;
+
+    ackUDP = (spAckUDP_t *)buf;
+    /* endian correction*/
+    ackUDP->payload = ntohl(ackUDP->payload);
+
+    switch(ackUDP->state)
+    {
+        case PKTUDP_STATE_SERVER_READY:
+        {
+            // our cue to open UDP, and send a packet.
+            utLog("%s: NET: received SERVER_READY, starting UDP...",
+                  __FUNCTION__);
+
+            if (_connect_udp())
+            {
+                // bummer....
+                utLog("%s: Failed to connect to remote host via UDP",
+                      __FUNCTION__);
+
+                // send error code to server
+                pktSendAckUDP(PKT_SENDTCP, PKTUDP_STATE_CLIENT_ERR, 0);
+                return true;
+            }
+            else
+            {
+                /* see if this will succeed in setting up a NAT tunnel
+                   to the server */
+                utLog("%s: NET: sending CLIENT_READY UDP response to server.",
+                      __FUNCTION__);
+                // we need to set this so that the packet handling
+                // routines can use the socket
+                pktSetSocketFds(PKT_SOCKFD_NOCHANGE, cInfo.usock);
+
+                // send back the payload (server's PID), via UDP
+                pktSendAckUDP(PKT_SENDUDP, PKTUDP_STATE_CLIENT_READY,
+                              ackUDP->payload);
+                // reset till we are really ready...
+                pktSetSocketFds(PKT_SOCKFD_NOCHANGE, -1);
+            }
+        }
+
+        // now we should await a SERVER_UDP_ON
+        break;
+
+        case PKTUDP_STATE_SERVER_ERR:
+        {
+            // server had a failure trying to setup UDP, or after UDP
+            // was established, decided to disable it for some
+            // reason...
+            utLog("%s: NET: received SERVER_ERR, disabling UDP",
+                  __FUNCTION__);
+            cInfo.doUDP = false;
+            if (cInfo.usock >= 0)
+                close(cInfo.usock);
+            cInfo.usock = -1;
+            pktSetSocketFds(PKT_SOCKFD_NOCHANGE, cInfo.usock);
+        }
+
+        break;
+
+        case PKTUDP_STATE_SERVER_UDP_ON:
+        {
+            // nothing to do here, but start using UDP
+            utLog("%s: NET: received SERVER_UDP_ON, UDP is ON",
+                  __FUNCTION__);
+            pktSetSocketFds(PKT_SOCKFD_NOCHANGE, cInfo.usock);
+            cInfo.doUDP = true;
+        }
+
+        break;
+
+        default:
+            utLog("%s: NET: Unhandled state %d",
+                  __FUNCTION__, (int)ackUDP->state);
+    }
+
+    return true;
 }
 
 void processPacket(char *buf)

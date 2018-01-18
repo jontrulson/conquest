@@ -17,6 +17,7 @@
 #include "context.h"
 #include "record.h"
 #include "conqlb.h"
+#include "udp.h"
 
 #define MAXUDPERRS    (15)
 static int sudperrs = 0;        /* keep track of udp write errors */
@@ -29,7 +30,6 @@ static void handleUDPErr(void)
 
     if (sudperrs > MAXUDPERRS)
     {
-        sInfo.tryUDP = false;
         sInfo.doUDP = false;
         close(sInfo.usock);
         sInfo.usock = -1;
@@ -476,4 +476,126 @@ int sendDoomsday(int sock)
             return false;
 
     return true;
+}
+
+// begin the process of negotiating a UDP connect to the client.
+void serverStartUDP(pid_t pid, const cpCommand_t *ccmd)
+{
+    // Note the server is essentially paused while this function is
+    // running...
+
+    const unsigned int maxWait = 5000;   // 5 seconds
+
+    uint16_t detail = ccmd->detail;
+
+    // look at the command packet and see what to do
+    if (!detail)
+    {
+        utLog("%s: NET: Stopping UDP per client request...",
+              __FUNCTION__);
+        // shutting down udp...
+        sInfo.doUDP = false;
+        if (sInfo.usock >= 0)
+            close(sInfo.usock);
+        sInfo.usock = -1;
+        pktSetSocketFds(PKT_SOCKFD_NOCHANGE, sInfo.usock);
+        // make sure the client knows...
+        pktSendAckUDP(PKT_SENDTCP, PKTUDP_STATE_SERVER_ERR, 0);
+        return;
+    }
+
+    // No need to start UDP if we are already doing it
+    if (sInfo.doUDP)
+    {
+        utLog("%s: NET: UDP is already enabled...", __FUNCTION__);
+        return;
+    }
+
+    utLog("%s: NET: Starting UDP negotiation...", __FUNCTION__);
+
+    // otherwise, we will open a connection, send a message to the
+    // server, and wait for a response from the client.
+    if ((sInfo.usock = udpOpen(sInfo.listenPort,
+                               &sInfo.clntaddr)) < 0)
+    {
+        utLog("%s: NET:  udpOpen() failed: %s", __FUNCTION__,
+              strerror(errno));
+        sInfo.usock = -1;
+        pktSendAckUDP(PKT_SENDTCP, PKTUDP_STATE_SERVER_ERR, 0);
+        return;
+    }
+
+    // now setup to wait for a packet and wait.
+    struct timeval tv;
+    fd_set readfds;
+    int rv;
+
+    tv.tv_sec = maxWait / 1000;
+    tv.tv_usec = (maxWait % 1000) * 1000;
+    FD_ZERO(&readfds);
+    FD_SET(sInfo.usock, &readfds);
+
+    // Let the client know we are ready to start...
+    pktSendAckUDP(PKT_SENDTCP, PKTUDP_STATE_SERVER_READY, (int)pid);
+
+    if ((rv = select(sInfo.usock+1, &readfds, NULL, NULL, &tv)) <= 0)
+    {
+        if (rv == 0)
+            utLog("%s: NET: udp select timed out. No UDP", __FUNCTION__);
+        else
+            utLog("%s NET: udp select failed: %s", __FUNCTION__,
+                  strerror(errno));
+
+        if (sInfo.usock >= 0)
+            close(sInfo.usock);
+        sInfo.usock = -1;
+        pktSendAckUDP(PKT_SENDTCP, PKTUDP_STATE_SERVER_ERR, 0);
+        return;
+    }
+    else
+    {
+        if (FD_ISSET(sInfo.usock, &readfds))
+        {            /* get the packet, almost done negotiating udp */
+            char buf[PKT_MAXSIZE];
+            rv = udpRecvFrom(sInfo.usock, buf, PKT_MAXSIZE, &sInfo.clntaddr);
+
+            utLog("%s: NET: got %d UDP bytes from client port %d",
+                  __FUNCTION__, rv,
+                  (int)ntohs(sInfo.clntaddr.sin_port));
+
+            // problem here is buf has a 4 digit seq number in front
+            // of it. So make sure the packet is the right size, and
+            // skip past the sequence number
+            if (rv == (sizeof(cpAckUDP_t) + sizeof(uint32_t)))
+                procAckUDP(buf + 4); // ignore sequence number
+            else
+            {
+                // wrong size.  Hmmm.
+                utLog("%s: NET: ERROR: got %d UDP bytes from client, "
+                      "expected %lu",
+                      __FUNCTION__, rv,
+                      (sizeof(cpAckUDP_t) + sizeof(uint32_t)));
+                pktSendAckUDP(PKT_SENDTCP, PKTUDP_STATE_SERVER_ERR, 0);
+                if (sInfo.usock >= 0)
+                    close(sInfo.usock);
+                sInfo.usock = -1;
+                return;
+            }
+
+            // the rest of the connection setup (conect(), payload
+            // test, etc) should have been handled by procAckUDP()
+        }
+        else
+        {
+            // should never happen in theory, but...
+            utLog("%s: NET: UDP FD_ISSET() returned 0.",
+                  __FUNCTION__);
+            pktSendAckUDP(PKT_SENDTCP, PKTUDP_STATE_SERVER_ERR, 0);
+            if (sInfo.usock >= 0)
+                close(sInfo.usock);
+            sInfo.usock = -1;
+        }
+    }
+
+    return;
 }

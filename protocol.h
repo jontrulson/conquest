@@ -46,7 +46,7 @@
 
 #define SP_TORPEVENT      23    /* torp launch/status */
 
-#define SP_VARIABLE       24    /* variable length packet */
+#define SP_ACKUDP         24    /* Ack UDP from server to client */
 
 /* client -> server packet types */
 
@@ -62,24 +62,42 @@
 #define CP_SETCOURSE      9
 #define CP_MESSAGE        10
 
-#define CP_VARIABLE       11    /* variable length packet */
+#define CP_ACKUDP         11    /* Ack UDP from client to server */
 
 #define PKT_ANYPKT        ~0
 
 
 #pragma pack(1)                 /* show me a better way... */
 
-/* a variable length packet for future use, and to help
-   with protocol compatibility in the future. Both server and
-   client use the same format */
+// a packet for UDP acknowledgments to/from server and client.  Both
+// use the same format.  The idea is a set of states that the client
+// and server will go through, starting with state 1 and ending at the
+// end where either UDP is running or it's not.
+#define PKTUDP_STATE_SERVER_READY            1 // first state, server
+                                               // starting, and
+                                               // waiting for client
+                                               // response
 
-typedef struct {
-    uint8_t type;                  /* SP_VARIABLE | CP_VARIABLE */
-    uint8_t len;
-    uint16_t pad1;
+#define PKTUDP_STATE_SERVER_ERR              2 // server failed
 
-    /* the actual data would be written following this */
-} pktVariable_t;
+#define PKTUDP_STATE_CLIENT_READY            3 // CLIENT response with
+                                               // server payload
+
+#define PKTUDP_STATE_CLIENT_ERR              4 // client failed
+
+#define PKTUDP_STATE_SERVER_UDP_ON           5 // server enabled UDP,
+                                               // ready to rock
+struct _pktAckUDP {
+    uint8_t type;               // SP_ACKUDP | CP_ACKUDP 
+    uint8_t state;
+    uint8_t pad[2];
+
+    uint32_t payload;           // typically PID from server to client
+};
+
+// server and client use same packet format for Ack UDP
+typedef struct _pktAckUDP spAckUDP_t;
+typedef struct _pktAckUDP cpAckUDP_t;
 
 /* server -> client packets */
 typedef struct {
@@ -513,8 +531,9 @@ typedef struct {
 #define CPCMD_RELOAD       27
 #define CPCMD_PING         28
 #define CPCMD_KEEPALIVE    29   /* udp keepalive */
+#define CPCMD_UDP          30   /* enable/disable UDP */
 
-#define CPCMD_LAST         29
+#define CPCMD_LAST         30
 
 typedef struct {
     uint8_t  type;                      /* CP_COMMAND */

@@ -1757,3 +1757,93 @@ void procReload(cpCommand_t *cmd)
 
     return;
 }
+
+void procAckUDP(char *buf)
+{
+    cpAckUDP_t *ackUDP;
+
+    if (!pktIsValid(CP_ACKUDP, buf))
+    {
+        utLog("%s: invalid packet", __FUNCTION__);
+        return;
+    }
+
+    ackUDP = (cpAckUDP_t *)buf;
+    /* endian correction*/
+    ackUDP->payload = ntohl(ackUDP->payload);
+
+    // do the right thing depending on the state sent
+
+    switch(ackUDP->state)
+    {
+        case PKTUDP_STATE_CLIENT_ERR:
+        {
+            utLog("%s: received CLIENT_ERR, closing down UDP",
+                  __FUNCTION__);
+            sInfo.doUDP = false;
+            if (sInfo.usock >= 0)
+                close(sInfo.usock);
+            sInfo.usock = -1;
+            pktSetSocketFds(PKT_SOCKFD_NOCHANGE, sInfo.usock);
+        }
+
+        break;
+
+        case PKTUDP_STATE_CLIENT_READY:
+        {
+            utLog("%s: received CLIENT_READY, completing UDP connection",
+                  __FUNCTION__);
+
+            // compare the payload with the PID.  The PID would have
+            // been sent to the client, and the payload should contain
+            // it.
+
+            pid_t pid = getpid();
+            if (pid != pid_t(ackUDP->payload))
+            {
+                utLog("%s: NET: payload (%u) does not match PID (%u). "
+                      "Invalid client response, stopping UDP.",
+                      __FUNCTION__, ackUDP->payload, pid);
+                pktSendAckUDP(PKT_SENDTCP, PKTUDP_STATE_SERVER_ERR, 0);
+                sInfo.doUDP = false;
+                if (sInfo.usock >= 0)
+                    close(sInfo.usock);
+                sInfo.usock = -1;
+                pktSetSocketFds(PKT_SOCKFD_NOCHANGE, sInfo.usock);
+                return;
+            }
+
+            // preliminaries were setup in serverStartUDP() before
+            // calling this function with the received UDP payload...
+            if (connect(sInfo.usock, (const struct sockaddr *)&sInfo.clntaddr,
+                        sizeof(sInfo.clntaddr)) < 0)
+            {
+                utLog("%s: NET: hello: udp connect() failed: %s",
+                      __FUNCTION__, strerror(errno));
+                pktSendAckUDP(PKT_SENDTCP, PKTUDP_STATE_SERVER_ERR, 0);
+                sInfo.doUDP = false;
+                if (sInfo.usock >= 0)
+                    close(sInfo.usock);
+                sInfo.usock = -1;
+                pktSetSocketFds(PKT_SOCKFD_NOCHANGE, sInfo.usock);
+            }
+            else
+            {
+                utLog("%s: NET: UDP connection to client established.",
+                      __FUNCTION__);
+                pktSendAckUDP(PKT_SENDTCP, PKTUDP_STATE_SERVER_UDP_ON, 0);
+                sInfo.doUDP = true;
+                pktSetSocketFds(PKT_SOCKFD_NOCHANGE, sInfo.usock);
+            }
+        }
+
+        break;
+
+        default:
+            utLog("%s: NET: Unhandled state %d",
+                  __FUNCTION__, (int)ackUDP->state);
+    }
+
+    return;
+}
+
