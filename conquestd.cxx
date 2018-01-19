@@ -283,7 +283,6 @@ int main(int argc, char *argv[])
     sInfo.doUDP = false;
     sInfo.clientDead = true;
     sInfo.isMaster = false;
-    sInfo.isLoggedIn = false;
     sInfo.listenPort = CN_DFLT_PORT; // 1701, of course
 
 
@@ -1725,8 +1724,6 @@ int welcome( int *unum )
 
     if (!Authenticate(name, password))
         return false;
-
-    sInfo.isLoggedIn = true;
 
     if ( ! clbGetUserNum( unum, name, USERTYPE_NORMAL ) )
     {

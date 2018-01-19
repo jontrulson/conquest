@@ -29,6 +29,8 @@ static int err = false;
 static char errbuf1[ERR_BUFSZ] = {};
 static char errbuf2[ERR_BUFSZ] = {};
 
+static bool serverDead = true;
+
 static nodeStatus_t nConsvrDisplay(dspConfig_t *);
 static nodeStatus_t nConsvrIdle(void);
 static nodeStatus_t nConsvrInput(int ch);
@@ -100,7 +102,7 @@ static nodeStatus_t nConsvrIdle(void)
         return NODE_EXIT;
 
     /* should not happen - debugging */
-    if (!cInfo.serverDead)
+    if (!serverDead)
     {
         utLog("nConsvrIdle: Already connected.  Ready to transfer to Auth node.");
         return NODE_OK;
@@ -151,7 +153,7 @@ static nodeStatus_t nConsvrIdle(void)
         return NODE_ERR;
     }
 
-    cInfo.serverDead = false;
+    serverDead = false;
     cInfo.sock = s;
     cInfo.servaddr = sa;
 
@@ -163,7 +165,7 @@ static nodeStatus_t nConsvrIdle(void)
         utLog("%s: hello() failed", __FUNCTION__);
         printf("%s: hello() failed, check log\n", __FUNCTION__);
 
-        cInfo.serverDead = true;
+        serverDead = true;
         return NODE_EXIT;
     }
 

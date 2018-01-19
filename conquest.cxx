@@ -281,8 +281,6 @@ int main(int argc, char *argv[])
     cInfo.usock = -1;
     cInfo.doUDP = false;
     cInfo.tryUDP = true;
-    cInfo.serverDead = true;
-    cInfo.isLoggedIn = false;
     cInfo.remoteport = CN_DFLT_PORT;
 
     utSetLogConfig(false, true);	/* use CQ_USERHOMEDIR for logfile */

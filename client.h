@@ -23,8 +23,6 @@ typedef struct {
     int doUDP;                    /* whether we should look for udp packets */
     int tryUDP;                   /* should we try UDP? */
     struct sockaddr_in  servaddr;
-    uint32_t  serverDead;		/* is the client dead/ */
-    uint32_t  isLoggedIn;		/* is the client logged in? */
     char    *remotehost;          /* self evident */
     uint16_t  remoteport;
     char     metaServer[MAXHOSTNAME]; /* the metaserver we are using */

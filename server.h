@@ -33,7 +33,6 @@ typedef struct {
     uint32_t state;		/* current state */
     uint32_t clientDead;		/* is the client dead/ */
     uint32_t isMaster;		/* is the Maseter server? */
-    uint32_t isLoggedIn;		/* is the client logged in? */
     char    remotehost[MAXHOSTNAME]; /* self evident */
 } ServerInfo_t;
 
