@@ -143,8 +143,9 @@ static nodeStatus_t nShiplDisplay(dspConfig_t *dsp)
                 }
 
                 cprintf(lin, col, ALIGN_NONE, "#%d#%s", color, cbuf);
+
+                lin++;
             }
-            lin++;
 
             if (lin == MSG_LIN1)
                 break; // out of while
