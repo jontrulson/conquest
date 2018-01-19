@@ -3064,8 +3064,10 @@ static nodeStatus_t nCPInput(int ch)
                                (desttarg == T_PHASER) ? lastphase : lastblast,
                                &tdir, ch))
                 {
-                    lastblast = tdir; /* we set both of them */
+                    // We set them both here so the last thing fired
+                    // sets the direction for future firing by default
                     lastphase = tdir;
+                    lastblast = tdir;
                     switch (desttarg)
                     {
                     case T_PHASER:

@@ -468,8 +468,9 @@ int clbLaunch( int snum, real dir, int number, int ltype )
     /* Remember this important direction. */
     cbShips[snum].lastblast = dir;
 
-    /* Set up last fired phaser direction. */
-    cbShips[snum].lastphase = dir;
+    // Set up last fired phaser direction, but only if it's not already firing
+    if ( !cbShips[snum].pfuse )
+        cbShips[snum].lastphase = dir;
 
     numslots = 0;
     numfired = 0;
