@@ -939,7 +939,6 @@ void clbUserline( int unum, int snum, char *buf, int showgods, int showteam )
     ch = cbTeams[team].teamchar;
 
     utStrncpy(tname, cbUsers[unum].username, MAXUSERNAME);
-    tname[MAXUSERNAME - 1] = 0;
 
     sprintf( junk, "%-12.12s %c%-21.21s %c %6.1f",
              tname,
