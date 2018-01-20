@@ -92,10 +92,11 @@ static void _conqds(dspConfig_t *dsp)
     {
         FirstTime = false;
         sprintf(sfmt,
-                "#%d#(#%d#%%c#%d#) - %%s",
+                "#%d#(#%d#%%c#%d#)#%d# - %%s",
                 LabelColor,
                 InfoColor,
-                LabelColor);
+                LabelColor,
+                NoColor);
     }
 
     /* Display the logo. */
@@ -424,39 +425,17 @@ static nodeStatus_t nMenuInput(int ch)
 
     switch (ch)
     {
-    case 'e':                   /* enter the game */
-        nPlayInit();
-        return NODE_OK;
-        break;
+        case 'e':                   /* enter the game */
+            nPlayInit();
+            return NODE_OK;
+            break;
 
-    case 'H':
-        nHistlInit(DSP_NODE_MENU, true);
-        break;
+        case 'H':
+            nHistlInit(DSP_NODE_MENU, true);
+            break;
 
-    case 'N':
-        state = S_PSEUDO;
-        prm.preinit = false;
-        prm.buf = cbuf;
-        prm.buflen = MAXUSERNAME;
-        prm.terms = TERMS;
-        prm.index = 21;
-        prm.buf[0] = 0;
-        prompting = true;
-
-        break;
-
-    case 'r':
-        for ( i = 0; i < cbLimits.maxShips(); i++ )
-            if ( cbShips[i].status == SS_LIVE ||
-                 cbShips[i].status == SS_ENTERING )
-                if ( cbShips[i].unum == Context.unum )
-                    break;
-
-        if ( i < cbLimits.maxShips() )
-            mglBeep(MGL_BEEP_ERR);
-        else
-        {
-            state = S_RESIGN;
+        case 'N':
+            state = S_PSEUDO;
             prm.preinit = false;
             prm.buf = cbuf;
             prm.buflen = MAXUSERNAME;
@@ -464,79 +443,104 @@ static nodeStatus_t nMenuInput(int ch)
             prm.index = 21;
             prm.buf[0] = 0;
             prompting = true;
-        }
-        break;
-    case 's':
-        if ( ! (sStat.serverFlags & SERVER_F_SWITCHTEAM) )
+
+            break;
+
+        case 'r':
+            for ( i = 0; i < cbLimits.maxShips(); i++ )
+                if ( cbShips[i].status == SS_LIVE ||
+                     cbShips[i].status == SS_ENTERING )
+                    if ( cbShips[i].unum == Context.unum )
+                        break;
+
+            if ( i < cbLimits.maxShips() )
+                mglBeep(MGL_BEEP_ERR);
+            else
+            {
+                state = S_RESIGN;
+                prm.preinit = false;
+                prm.buf = cbuf;
+                prm.buflen = MAXUSERNAME;
+                prm.terms = TERMS;
+                prm.index = 21;
+                prm.buf[0] = 0;
+                prompting = true;
+            }
+            break;
+        case 's':
+            if ( ! (sStat.serverFlags & SERVER_F_SWITCHTEAM) )
+                mglBeep(MGL_BEEP_ERR);
+            else
+            {
+                /* we'll update local data here anyway, even though it will be
+                   overwritten on the next ship update.  Improves perceived
+                   response time. */
+                cbShips[Context.snum].team =
+                    utModPlusOne( cbShips[Context.snum].team+1, NUMPLAYERTEAMS );
+                cbShips[Context.snum].shiptype =
+                    cbTeams[cbShips[Context.snum].team].shiptype;
+                cbUsers[Context.unum].team = cbShips[Context.snum].team;
+                cbShips[Context.snum].war[cbShips[Context.snum].team] = false;
+                cbUsers[Context.unum].war[cbUsers[Context.unum].team] = false;
+
+                sendCommand(CPCMD_SWITCHTEAM, (uint16_t)cbShips[Context.snum].team);
+            }
+            break;
+
+        case 'O':
+            nOptionsInit(NOPT_USER, true, DSP_NODE_MENU);
+            break;
+
+        case 'S':
+            nUserlInit(DSP_NODE_MENU, true, Context.snum, false, true);
+            break;
+
+        case 'T':
+            nTeamlInit(DSP_NODE_MENU, true, cbShips[Context.snum].team);
+            break;
+
+        case 'U':
+            nUserlInit(DSP_NODE_MENU, true, Context.snum, false, false);
+            break;
+
+        case 'W':
+            for ( i = 0; i < NUMPLAYERTEAMS; i = i + 1 )
+                twar[i] = cbShips[Context.snum].war[i];
+
+            state = S_WAR;
+            prompting = true;
+            prm.preinit = false;
+            prm.buf = cbuf;
+            prm.buflen = 5;
+            prm.pbuf = clbWarPrompt(Context.snum, twar);
+            prm.terms = TERMS;
+            prm.index = 22;
+            prm.buf[0] = 0;
+
+            break;
+        case '/':
+            nShiplInit(DSP_NODE_MENU, true);
+            break;
+
+        case '?':
+            if (Context.snum >= 0 && Context.snum < cbLimits.maxShips())
+                nPlanetlInit(DSP_NODE_MENU, true, Context.snum, cbShips[Context.snum].team);
+            else          /* then use user team if user doen't have a ship yet */
+                nPlanetlInit(DSP_NODE_MENU, true, Context.snum, cbUsers[Context.unum].team);
+            break;
+
+        case 'q':
+            /* first stop all music and effects */
+            cqsEffectStop(CQS_INVHANDLE, true);
+            cqsMusicStop(true);
+
+            return NODE_EXIT;
+
+            break;                    /* NOTREACHED */
+
+        default:
             mglBeep(MGL_BEEP_ERR);
-        else
-        {
-            /* we'll update local data here anyway, even though it will be
-               overwritten on the next ship update.  Improves perceived
-               response time. */
-            cbShips[Context.snum].team =
-                utModPlusOne( cbShips[Context.snum].team+1, NUMPLAYERTEAMS );
-            cbShips[Context.snum].shiptype =
-                cbTeams[cbShips[Context.snum].team].shiptype;
-            cbUsers[Context.unum].team = cbShips[Context.snum].team;
-            cbShips[Context.snum].war[cbShips[Context.snum].team] = false;
-            cbUsers[Context.unum].war[cbUsers[Context.unum].team] = false;
-
-            sendCommand(CPCMD_SWITCHTEAM, (uint16_t)cbShips[Context.snum].team);
-        }
-        break;
-
-    case 'O':
-        nOptionsInit(NOPT_USER, true, DSP_NODE_MENU);
-        break;
-
-    case 'S':
-        nUserlInit(DSP_NODE_MENU, true, Context.snum, false, true);
-        break;
-
-    case 'T':
-        nTeamlInit(DSP_NODE_MENU, true, cbShips[Context.snum].team);
-        break;
-
-    case 'U':
-        nUserlInit(DSP_NODE_MENU, true, Context.snum, false, false);
-        break;
-
-    case 'W':
-        for ( i = 0; i < NUMPLAYERTEAMS; i = i + 1 )
-            twar[i] = cbShips[Context.snum].war[i];
-
-        state = S_WAR;
-        prompting = true;
-        prm.preinit = false;
-        prm.buf = cbuf;
-        prm.buflen = 5;
-        prm.pbuf = clbWarPrompt(Context.snum, twar);
-        prm.terms = TERMS;
-        prm.index = 22;
-        prm.buf[0] = 0;
-
-        break;
-    case '/':
-        nShiplInit(DSP_NODE_MENU, true);
-        break;
-
-    case '?':
-        if (Context.snum >= 0 && Context.snum < cbLimits.maxShips())
-            nPlanetlInit(DSP_NODE_MENU, true, Context.snum, cbShips[Context.snum].team);
-        else          /* then use user team if user doen't have a ship yet */
-            nPlanetlInit(DSP_NODE_MENU, true, Context.snum, cbUsers[Context.unum].team);
-        break;
-
-    case 'q':
-        /* first stop all music and effects */
-        cqsEffectStop(CQS_INVHANDLE, true);
-        cqsMusicStop(true);
-
-        return NODE_EXIT;
-
-        break;                    /* NOTREACHED */
-
+            return NODE_OK;
     }
 
     return NODE_OK;

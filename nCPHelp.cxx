@@ -56,17 +56,17 @@ static nodeStatus_t nCPHelpDisplay(dspConfig_t *dsp)
         sprintf(sfmt,
                 "#%d#%%-9s#%d#%%s",
                 InfoColor,
-                LabelColor);
+                NoColor);
     }
 
-    cprintf(1,0,ALIGN_CENTER, "#%d#%s", LabelColor, "CONQUEST COMMANDS");
+    cprintf(1,0,ALIGN_CENTER, "#%d#%s", GreenColor, "CONQUEST COMMANDS");
 
     lin = 3;
 
     /* Display the left side. */
     tlin = lin;
     col = 4;
-    cprintf(tlin,col,ALIGN_NONE,sfmt, "0-9,=", "set warp factor (= is 10)");
+    cprintf(tlin,col,ALIGN_NONE,sfmt, "0-9,=", "set warp factor (= is maximum)");
     tlin++;
     cprintf(tlin,col,ALIGN_NONE,sfmt, "A", "change w/e allocations");
     tlin++;

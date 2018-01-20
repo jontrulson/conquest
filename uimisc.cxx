@@ -38,10 +38,11 @@ void dspReplayMenu(void)
                 GreenColor);
 
         sprintf(cfmt,
-                "#%d#(#%d#%%c#%d#) - %%s",
+                "#%d#(#%d#%%c#%d#)#%d# - %%s",
                 LabelColor,
                 InfoColor,
-                LabelColor);
+                LabelColor,
+                NoColor);
 
         utStrncpy(recordedon, ctime(&recon), MSGMAXLINE);
 
@@ -147,10 +148,10 @@ void dspReplayHelp(void)
         sprintf(sfmt,
                 "#%d#%%-9s#%d#%%s",
                 InfoColor,
-                LabelColor);
+                NoColor);
     }
 
-    cprintf(1,0,ALIGN_CENTER,"#%d#%s", LabelColor, "WATCH WINDOW COMMANDS");
+    cprintf(1,0,ALIGN_CENTER,"#%d#%s", GreenColor, "WATCH WINDOW COMMANDS");
 
     lin = 4;
 
@@ -188,8 +189,6 @@ void dspReplayHelp(void)
     cprintf(tlin,col,ALIGN_NONE,sfmt, "n", "reset to normal playback speed");
     tlin++;
     cprintf(tlin,col,ALIGN_NONE,sfmt, "`", "toggle between two ships");
-    tlin++;
-    cprintf(tlin,col,ALIGN_NONE,sfmt, "!", "display toggle line");
 
     return;
 }

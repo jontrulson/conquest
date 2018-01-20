@@ -1040,10 +1040,11 @@ void opback( int lastrev, int *savelin )
     {
         firstTime = false;
         sprintf(sfmt,
-                "#%d#(#%d#%%c#%d#) - %%s",
+                "#%d#(#%d#%%c#%d#)#%d# - %%s",
                 LabelColor,
                 InfoColor,
-                LabelColor);
+                LabelColor,
+                NoColor);
     }
 
     cdclear();
