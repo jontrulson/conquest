@@ -864,7 +864,7 @@ static void _doinfo( char *buf, char ch, bool doOutput )
     }
 
     /* Cataboligne - Spocks viewer sound */
-    if (rnd() < 0.3)
+    if (doOutput && rnd() < 0.3)
         cqsEffectPlay(cqsTeamEffects[cbShips[Context.snum].team].info, NULL,
                       0, 0, 0);
 }
