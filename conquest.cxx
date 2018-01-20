@@ -56,20 +56,19 @@ void conqend(void);
 
 void printUsage()
 {
-    printf("Usage: conquest   [-m ][-s server[:port]] [-r recfile] [ -t ]\n");
-    printf("                  [-f ][-g <geometry>] [ -u ]\n");
-    printf("                  [ -M <metaserver> ] [ -B ]\n\n");
+    printf("Usage: conquest   [-s server[:port]] [-r <recfile.cqr>]\n");
+    printf("                  [-f] [-g <geometry>] [-u] [-S] [-v]\n");
+    printf("                  [-M <metaserver>] [-B]\n\n");
     printf("    -f               run in fullscreen mode\n");
     printf("    -g <geometry>    specify intial window width/height.\n");
     printf("                      Format is WxH (ex: 1024x768).\n");
     printf("                      Default is 1280x720.\n");
-    printf("    -m               query the metaserver\n");
     printf("    -s server[:port] connect to <server> at <port>\n");
-    printf("                      default: localhost:1701\n");
-    printf("    -r recfile       Record game to <recfile>\n");
-    printf("                      recfile will be in compressed format\n");
+    printf("                      default port: 1701\n");
+    printf("    -r recfile.cqr   Record game to <recfile.cqr>\n");
+    printf("                      recfile.cqr will be in compressed format\n");
     printf("                      if conquest was compiled with libz\n");
-    printf("                      support\n");
+    printf("                      support (recommended)\n");
 
     printf("    -M metaserver    specify alternate <metaserver> to contact.\n");
     printf("                      default: %s\n", META_DFLT_SERVER);
@@ -78,10 +77,14 @@ void printUsage()
     printf("    -P <cqr file>    Play back a Conquest recording (.cqr)\n");
     printf("    -B               Benchmark mode.  When playing back a recording,\n");
     printf("                      the default playback speed will be as fast as possible.\n");
-    printf("    -u               do not attempt to use UDP from server.\n");
+    printf("                      NOTE: most systems limit refresh to 60Hz, so it may\n");
+    printf("                      not really be \"as fast as possible\".\n");
+    printf("    -u               do not attempt to establish a UDP link to the server.\n");
     printf("    -S               disable sound support.\n");
-    printf("    -v               be more verbose.\n");
+    printf("    -v               be more verbose.  More '-v's increase verbosity\n\n");
 
+    printf("The default action without arguments is to query the metaserver\n");
+    printf("for a list of servers to connect to.\n");
 
     return;
 }
@@ -258,7 +261,7 @@ int main(int argc, char *argv[])
 {
     int i;
     char *ch;
-    int wantMetaList = false;     /* wants to see a list from metaserver */
+    int wantMetaList = true;     /* default is metaserver list */
     int serveropt = false;        /* specified a server with '-s' */
     int dosound = true;
 #if defined(MINGW)
@@ -289,7 +292,6 @@ int main(int argc, char *argv[])
 
     dspInitData();
 
-
 #if defined(MINGW)
     /* init windows sockets (version 2.0) */
     rv = WSAStartup(MAKEWORD(2, 0), &wsaData);
@@ -301,7 +303,7 @@ int main(int argc, char *argv[])
 #endif
 
     /* check options */
-    while ((i = getopt(argc, argv, "fmM:s:r:tP:Bug:Sv")) != EOF)
+    while ((i = getopt(argc, argv, "fM:s:r:P:Bug:Sv")) != EOF)
         switch (i)
         {
         case 'B':                 /* Benchmark mode, set recFrameDelay to 0.0 */
@@ -314,14 +316,12 @@ int main(int argc, char *argv[])
         case 'g':
             parseGeometry(optarg);
             break;
-        case 'm':
-            wantMetaList = true;
-            break;
         case 'M':
             utStrncpy(cInfo.metaServer, optarg, MAXHOSTNAME);
 
             break;
         case 's':                 /* [host[:port]] */
+            wantMetaList = false;
             free(cInfo.remotehost);
             cInfo.remotehost = strdup(optarg);
             if (!cInfo.remotehost)
@@ -369,6 +369,7 @@ int main(int argc, char *argv[])
             break;
 
         case 'P':
+            wantMetaList = false;
             recFilename = optarg;
             Context.recmode = RECMODE_PLAYING;
             dosound = false;        /* no sound during playback */
@@ -414,15 +415,6 @@ int main(int argc, char *argv[])
 
     Context.updsec = UserConf.UpdatesPerSecond;
 
-    /* For windows, if no -P, -m, or -s was specified, enable -m.  There
-     * is no server available under windows, so no need to default to
-     * trying to connect to localhost.
-     */
-#if defined(MINGW)
-    if (!serveropt && !wantMetaList && Context.recmode != RECMODE_PLAYING)
-        wantMetaList = true;
-#endif
-
     if (Context.recmode == RECMODE_PLAYING)
     {
         if (serveropt || wantMetaList)
@@ -445,12 +437,6 @@ int main(int argc, char *argv[])
         UserConf.DoAlarms = false;
         /* turn off hudInfo */
         UserConf.hudInfo = false;
-    }
-
-    if (serveropt && wantMetaList)
-    {
-        printf("-m ignored, since -s was specified\n");
-        wantMetaList = false;
     }
 
     /* load the main texturesrc file and any user supplied ~/.conquest/ *.trc

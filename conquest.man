@@ -4,43 +4,52 @@
 conquest \- Conquest game clients
 .SH SYNOPSIS
 .PP
-\fBconquest\fP is a Freeglut OpenGL based client that is used to connect to a conquest serverto play.
+\fBconquest\fP is a Freeglut OpenGL based client that is used to
+connect to a conquest server to play.
 .PP
 \fBconquest\fP [OPTIONS]...
 .SH DESCRIPTION
 .PP
-Conquest is a multi-player, real-time space combat game.  The object
-of the game is twofold. The short-range goal is to accumulate "kills"
-by shooting down enemy players.  You get one kill point for each enemy
-ship shot down, plus some extra if the enemy had kills too. The major
-weapon used to shoot down ships is the photon torpedo.
+Conquest is a multi-player, real-time space combat game.  It was
+originally written in RATFOR (Rational Fortran) for the VAX/VMS system
+in the mid 1980's and is a predecessor to Netrek.  It has been
+ported/rewritten to C/C++ for Unix systems, and uses a client/server
+model for Internet play.
+.PP
+The object of the game is twofold. The short-range goal is to
+accumulate "kills" by shooting down enemy players.  You get one kill
+point for each enemy ship shot down, plus some extra if the enemy had
+kills too. The major weapon used to shoot down ships is the photon
+torpedo.  Phasers are handy for close-in work, so don't neglect them.
 .PP
 The long-range goal is to conquer the universe for your team by taking
 every \fIcore\fP planet. You take planets by killing off the enemy's armies via
 bombardment, and then beaming your team's armies down. When all the
 planets have been taken, the game ends, a new game begins, and the
 player who actually took the last planet gets his/her name up in
-lights.
+lights.  \fICore\fP planets are highlighted by a '+' sign in the
+planet list.
 .PP
-The first time \fBconquest\fP is run, a directory
-called ~/.conquest/ will be created in your home directory.  This
-directory cantains your 'user options' data as well as the logfile.
-Additionally, texturesrc (.trc) files and
-texture image data (in ~/.conquest/img/) can be stored there. See
-CONQINIT.TXT for more information on what \fItexturesrc\fP and
-\fItexture image files\fP are.
+The first time \fBconquest\fP is run, a directory called ~/.conquest/
+will be created in your home directory.  This directory cantains
+your 'user options' data as well as the logfile.  Additionally,
+texturesrc (.trc), soundrc (.src), and texture image data (in
+~/.conquest/img/) can be stored there. See CONQINIT.TXT for more
+information on what \fItexturesrc\fP, \fIsoundrc\fP and \fItexture
+image files\fP are.
 
 .SH "OPTIONS"
 .PP
-If the \fI\-s\fP or \fI\-m\fP options are
-not specified, the client will try to connect to a server running on
-your local host at port 1701.
+If the \fI\-s\fP option is
+not specified, the client will connect to the metaserver to gt a list
+of servers you can connect to.
 .TP 8
 .B \-B
 Benchmark mode.  When this option is specified, and playback of a
 previously recorded game is specified with \fI\-P\fP, then the default
 playback speed will be set to the highest speed possible (no frame
-delay).
+delay). NOTE that most systems restrict screen refresh to 60Hz, so in
+reality, it may not really be "as fast as possible".
 
 It's not really much of a 'benckmark' yet as it does not currently
 emit any rendering statistics on exit.
@@ -52,15 +61,13 @@ Run in fullscreen mode.
 Specify initial window width/height.  OpenGL client only.  Format is
 WxH (ex: 1024x768). The default is currently 1280x720.
 .TP 8
-.B \-m  
-Query the metaserver and provide a list of servers to choose from.
-.TP 8
 .B \-M <metaserver> 
 Specify an alternate metaserver.  The default is
 \fIconquest.radscan.com\fP. 
 .TP 8
 .B \-r <record file> 
-Record the game to <record file>.
+Record the game to <record file>.  Specify an extension of .cqr so you
+know what it is.
 .TP 8
 .B \-s <server[:port]> 
 Connect to server running on \fIserver\fP port \fIport\fP.  The default
@@ -277,8 +284,8 @@ When you type \fB^L\fP, the screen is cleared and redrawn.
 .SH "DIRECTION KEYS"
 .PP
 The easiest and quickest way to change direction is with the direction
-keys or the keypad if your terminal definition supports it.  However,
-if you are prompted to enter a direction, for example to fire phasers,
+keys, keypad, or the mouse (middle button by default).  However, when
+using the keyboard to enter a direction, for example to fire phasers,
 or set course, you can use the letters "qweadzxc" on the left-hand
 side of your keyboard, called "direction keys" for historical
 reasons. The keys are assumed to be arranged as follows (if you have a
@@ -333,11 +340,8 @@ weakest planet not owned by your team
 .B hp
 home planet for your team
 .TP 8
-.B sN
+.B sN or just N
 ship N (where N is a integer number)
-.TP 8
-.B time
-time of day (info only)
 .PP
 All of these can be abbreviated to their shortest unique string. Also,
 for the planets, you can type a number after the special string to
@@ -357,16 +361,14 @@ You can't use these when firing weapons - that would be too easy.
 .SH "MACROS"
 .PP
 Macros are sequences of Conquest commands that are issued when a
-Function Key (Fkey) or mouse button (OpenGL client only) is hit.  On
-PC hardware, these are the F1-F12 keys.  With certain emulators the
-Shifted F1-12 keys (F13-F24) are available too.
+Function Key (Fkey) or mouse button is hit.  These are
+the F1-F12 keys and the Shifted F1-12 keys (F13-F24).
 
-With the GL client, version 8.1.2f or better, support for assigning
-macros to mouse buttons is also provided.  Modifiers like Alt,
-Control, and Shift can also be used with the mouse buttons.  Up to 32
-buttons are supported with any combination of the 3 modifiers (or no
-modifiers) giving you a maximum of 256 assignable mouse macros.  If
-you have a 32 button mouse that is :)
+Support for assigning macros to mouse buttons is also provided.
+Modifiers like Alt, Control, and Shift can also be used with the mouse
+buttons.  Up to 32 buttons are supported with any combination of the 3
+modifiers (or no modifiers) giving you a maximum of 256 assignable
+mouse macros.  If you have a 32 button mouse that is :)
 
 Mouse and Key macros are defined in your ~/conquest/conquestrc file.
 Users can edit their macro keys from within Conquest using the
@@ -391,9 +393,9 @@ better version of the client.  They are:
       mouse button 2 (right): Fire Torp at <angle>
 
 Of course you can redefine these, as well as add others.  With mouse
-macros, a special character sequence, \fB\\a\fP can be used to represent
-the angle of the cursor relative to the center of the viewer when the
-button was pressed.
+macros, a special character sequence, \fB\\a\fP can be used to
+represent the angle of the cursor relative to the center of the viewer
+(your ship) when the button was pressed.
 
 See the mouse macro comment block in your conquestrc file for a
 description of the format.
@@ -450,18 +452,17 @@ Here is a quick command reference.
 
 
 .SH "AUTHOR"
-Jon Trulson, Jeff Poskanzer
+Jon Trulson, Jeff Poskanzer (Original RATFOR VAX/VMS version)
 .SH "SEE ALSO"
 .PP
 conquestd(6), conqoper(6), conqdriv(6), conqmetad(6), conqinit(6)
 .PP
 See README in the conquest distribution (usually installed in
-<conquest install prefix>/etc/) for information and tips on how to
-play. 
+<conquest install prefix>/share/doc/conquest/) for information and
+tips on how to play.
 .PP
 See INSTALL for instructions on unpacking, compiling, and installing
-conquest, as well as information on terminfo requirements (for the
-curses client) and other system specific issues.
+conquest and other system specific issues.
 .PP
 See README.cygwin for information on building/using conquest on MS
 Windows systems. 
@@ -469,7 +470,7 @@ Windows systems.
 See HISTORY for the latest news and modification history.
 .PP
 See CONQINIT.TXT for information on CQI, and the format of the
-conqinitrc and texturesrc files.
+conqinitrc, soundrc and texturesrc files.
 .SH "COPYRIGHT"
 .PP
 Copyright (C)1994-2017 by Jon Trulson <jon@radscan.com> under the

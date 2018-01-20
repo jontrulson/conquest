@@ -16,7 +16,8 @@ conquest - Conquest game clients
 
 <P>
 
-<B>conquest</B> is a Freeglut OpenGL based client that is used to connect to a conquest serverto play.
+<B>conquest</B> is a Freeglut OpenGL based client that is used to
+connect to a conquest server to play.
 <P>
 
 <B>conquest</B> [OPTIONS]...
@@ -25,11 +26,18 @@ conquest - Conquest game clients
 
 <P>
 
-Conquest is a multi-player, real-time space combat game.  The object
-of the game is twofold. The short-range goal is to accumulate &quot;kills&quot;
-by shooting down enemy players.  You get one kill point for each enemy
-ship shot down, plus some extra if the enemy had kills too. The major
-weapon used to shoot down ships is the photon torpedo.
+Conquest is a multi-player, real-time space combat game.  It was
+originally written in RATFOR (Rational Fortran) for the VAX/VMS system
+in the mid 1980's and is a predecessor to Netrek.  It has been
+ported/rewritten to C/C++ for Unix systems, and uses a client/server
+model for Internet play.
+<P>
+
+The object of the game is twofold. The short-range goal is to
+accumulate &quot;kills&quot; by shooting down enemy players.  You get one kill
+point for each enemy ship shot down, plus some extra if the enemy had
+kills too. The major weapon used to shoot down ships is the photon
+torpedo.  Phasers are handy for close-in work, so don't neglect them.
 <P>
 
 The long-range goal is to conquer the universe for your team by taking
@@ -37,25 +45,26 @@ every <I>core</I> planet. You take planets by killing off the enemy's armies via
 bombardment, and then beaming your team's armies down. When all the
 planets have been taken, the game ends, a new game begins, and the
 player who actually took the last planet gets his/her name up in
-lights.
+lights.  <I>Core</I> planets are highlighted by a '+' sign in the
+planet list.
 <P>
 
-The first time <B>conquest</B> is run, a directory
-called ~/.conquest/ will be created in your home directory.  This
-directory cantains your 'user options' data as well as the logfile.
-Additionally, texturesrc (.trc) files and
-texture image data (in ~/.conquest/img/) can be stored there. See
-CONQINIT.TXT for more information on what <I>texturesrc</I> and
-<I>texture image files</I> are.
+The first time <B>conquest</B> is run, a directory called ~/.conquest/
+will be created in your home directory.  This directory cantains
+your 'user options' data as well as the logfile.  Additionally,
+texturesrc (.trc), soundrc (.src), and texture image data (in
+~/.conquest/img/) can be stored there. See CONQINIT.TXT for more
+information on what <I>texturesrc</I>, <I>soundrc</I> and <I>texture
+image files</I> are.
 <P>
 <A NAME="lbAE">&nbsp;</A>
 <H2>OPTIONS</H2>
 
 <P>
 
-If the <I>-s</I> or <I>-m</I> options are
-not specified, the client will try to connect to a server running on
-your local host at port 1701.
+If the <I>-s</I> option is
+not specified, the client will connect to the metaserver to gt a list
+of servers you can connect to.
 <DL COMPACT>
 <DT><B>-B</B>
 
@@ -63,7 +72,8 @@ your local host at port 1701.
 Benchmark mode.  When this option is specified, and playback of a
 previously recorded game is specified with <I>-P</I>, then the default
 playback speed will be set to the highest speed possible (no frame
-delay).
+delay). NOTE that most systems restrict screen refresh to 60Hz, so in
+reality, it may not really be &quot;as fast as possible&quot;.
 <P>
 It's not really much of a 'benckmark' yet as it does not currently
 emit any rendering statistics on exit.
@@ -76,10 +86,6 @@ Run in fullscreen mode.
 <DD>
 Specify initial window width/height.  OpenGL client only.  Format is
 WxH (ex: 1024x768). The default is currently 1280x720.
-<DT><B>-m  </B>
-
-<DD>
-Query the metaserver and provide a list of servers to choose from.
 <DT><B>-M &lt;metaserver&gt; </B>
 
 <DD>
@@ -88,7 +94,8 @@ Specify an alternate metaserver.  The default is
 <DT><B>-r &lt;record file&gt; </B>
 
 <DD>
-Record the game to &lt;record file&gt;.
+Record the game to &lt;record file&gt;.  Specify an extension of .cqr so you
+know what it is.
 <DT><B>-s &lt;server[:port]&gt; </B>
 
 <DD>
@@ -356,8 +363,8 @@ When you type <B>^L</B>, the screen is cleared and redrawn.
 <P>
 
 The easiest and quickest way to change direction is with the direction
-keys or the keypad if your terminal definition supports it.  However,
-if you are prompted to enter a direction, for example to fire phasers,
+keys, keypad, or the mouse (middle button by default).  However, when
+using the keyboard to enter a direction, for example to fire phasers,
 or set course, you can use the letters &quot;qweadzxc&quot; on the left-hand
 side of your keyboard, called &quot;direction keys&quot; for historical
 reasons. The keys are assumed to be arranged as follows (if you have a
@@ -426,14 +433,10 @@ weakest planet not owned by your team
 
 <DD>
 home planet for your team
-<DT><B>sN</B>
+<DT><B>sN or just N</B>
 
 <DD>
 ship N (where N is a integer number)
-<DT><B>time</B>
-
-<DD>
-time of day (info only)
 </DL>
 <P>
 
@@ -458,16 +461,14 @@ You can't use these when firing weapons - that would be too easy.
 <P>
 
 Macros are sequences of Conquest commands that are issued when a
-Function Key (Fkey) or mouse button (OpenGL client only) is hit.  On
-PC hardware, these are the F1-F12 keys.  With certain emulators the
-Shifted F1-12 keys (F13-F24) are available too.
+Function Key (Fkey) or mouse button is hit.  These are
+the F1-F12 keys and the Shifted F1-12 keys (F13-F24).
 <P>
-With the GL client, version 8.1.2f or better, support for assigning
-macros to mouse buttons is also provided.  Modifiers like Alt,
-Control, and Shift can also be used with the mouse buttons.  Up to 32
-buttons are supported with any combination of the 3 modifiers (or no
-modifiers) giving you a maximum of 256 assignable mouse macros.  If
-you have a 32 button mouse that is :)
+Support for assigning macros to mouse buttons is also provided.
+Modifiers like Alt, Control, and Shift can also be used with the mouse
+buttons.  Up to 32 buttons are supported with any combination of the 3
+modifiers (or no modifiers) giving you a maximum of 256 assignable
+mouse macros.  If you have a 32 button mouse that is :)
 <P>
 Mouse and Key macros are defined in your ~/conquest/conquestrc file.
 Users can edit their macro keys from within Conquest using the
@@ -492,9 +493,9 @@ better version of the client.  They are:
 <BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;mouse&nbsp;button&nbsp;2&nbsp;(right):&nbsp;Fire&nbsp;Torp&nbsp;at&nbsp;&lt;angle&gt;
 <P>
 Of course you can redefine these, as well as add others.  With mouse
-macros, a special character sequence, <B>\a</B> can be used to represent
-the angle of the cursor relative to the center of the viewer when the
-button was pressed.
+macros, a special character sequence, <B>\a</B> can be used to
+represent the angle of the cursor relative to the center of the viewer
+(your ship) when the button was pressed.
 <P>
 See the mouse macro comment block in your conquestrc file for a
 description of the format.
@@ -556,7 +557,7 @@ Here is a quick command reference.
 <A NAME="lbAL">&nbsp;</A>
 <H2>AUTHOR</H2>
 
-Jon Trulson, Jeff Poskanzer
+Jon Trulson, Jeff Poskanzer (Original RATFOR VAX/VMS version)
 <A NAME="lbAM">&nbsp;</A>
 <H2>SEE ALSO</H2>
 
@@ -566,13 +567,12 @@ Jon Trulson, Jeff Poskanzer
 <P>
 
 See README in the conquest distribution (usually installed in
-&lt;conquest install prefix&gt;/etc/) for information and tips on how to
-play. 
+&lt;conquest install prefix&gt;/share/doc/conquest/) for information and
+tips on how to play.
 <P>
 
 See INSTALL for instructions on unpacking, compiling, and installing
-conquest, as well as information on terminfo requirements (for the
-curses client) and other system specific issues.
+conquest and other system specific issues.
 <P>
 
 See README.cygwin for information on building/using conquest on MS
@@ -583,7 +583,7 @@ See HISTORY for the latest news and modification history.
 <P>
 
 See CONQINIT.TXT for information on CQI, and the format of the
-conqinitrc and texturesrc files.
+conqinitrc, soundrc and texturesrc files.
 <A NAME="lbAN">&nbsp;</A>
 <H2>COPYRIGHT</H2>
 
@@ -628,6 +628,6 @@ about the suitability of this software for any purpose. It is provided
 This document was created by
 <A HREF="/cgi-bin/man/man2html">man2html</A>,
 using the manual pages.<BR>
-Time: 21:26:01 GMT, December 04, 2017
+Time: 21:38:52 GMT, January 20, 2018
 </BODY>
 </HTML>
