@@ -259,10 +259,17 @@ static nodeStatus_t nPlayBInput(int ch)
     int irv;
     int snum = Context.snum;
 
-    // ^B
-    if (CQ_CHAR(ch) == 0x02d )
+    // CTRL-B, background star texture
+    if (CQ_CHAR(ch) == 0x02)
     {
         UserConf.doVBG = !UserConf.doVBG;
+        return NODE_OK;
+    }
+
+    /* CTRL-G, toggle tac grid on/off */
+    if (CQ_CHAR(ch) == 0x07)
+    {
+        UserConf.DoTacBkg = !UserConf.DoTacBkg;
         return NODE_OK;
     }
 
