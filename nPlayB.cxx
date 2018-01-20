@@ -130,13 +130,10 @@ static void set_header(int snum)
     }
     else
     {
-        if (snum == DISPLAY_DOOMSDAY)
-            sprintf(hbuf, doom_fmt, cbDoomsday->name,
-                    (DOOM_LIVE()) ? "On": "Off");
-        else
-            sprintf(hbuf, heading_fmt, ship_str1, cbTeams[cbShips[snum].team].teamchar,
-                    snum,
-                    cbShips[snum].alias, ssbuf);
+        sprintf(hbuf, heading_fmt, ship_str1,
+                cbTeams[cbShips[snum].team].teamchar,
+                snum,
+                cbShips[snum].alias, ssbuf);
     }
 
     hudSetRecId(hbuf);
@@ -219,7 +216,8 @@ static nodeStatus_t nPlayBDisplay(dspConfig_t *dsp)
     /* Main/Hud */
     set_header(Context.snum);
     set_rectime();
-    renderHud(false);
+    if (Context.snum >= 0)
+        renderHud(false);
 
     if (recMsg.msgbuf[0])
     {
@@ -261,8 +259,8 @@ static nodeStatus_t nPlayBInput(int ch)
     int irv;
     int snum = Context.snum;
 
-    if ((CQ_CHAR(ch) == 'B' || CQ_CHAR(ch) == 'b') &&
-        CQ_MODIFIER(ch) & CQ_KEY_MOD_ALT)
+    // ^B
+    if (CQ_CHAR(ch) == 0x02d )
     {
         UserConf.doVBG = !UserConf.doVBG;
         return NODE_OK;
@@ -288,7 +286,9 @@ static nodeStatus_t nPlayBInput(int ch)
             utDeleteBlanks( prm.buf );
             if ( strlen( prm.buf ) == 0 )
             {              /* watch doomsday machine */
-                tmpsnum = DISPLAY_DOOMSDAY;
+                    nss = "No such ship.";
+                    prompting = false;
+                    return NODE_OK;
             }
             else
             {
@@ -303,8 +303,7 @@ static nodeStatus_t nPlayBInput(int ch)
                 utSafeCToI( &tmpsnum, prm.buf, 0 );     /* ignore return status */
             }
 
-            if ( (tmpsnum < 0 || tmpsnum >= cbLimits.maxShips()) &&
-                 tmpsnum != DISPLAY_DOOMSDAY )
+            if ( tmpsnum < 0 || tmpsnum >= cbLimits.maxShips() )
             {
                 state = S_NONE;
                 prompting = false;
@@ -416,7 +415,8 @@ static nodeStatus_t nPlayBInput(int ch)
 
     case 'w':
         state = S_WATCH;
-        if (recFileHeader.snum == 0)
+        if (recFileHeader.snum == 0
+            && recFileHeader.vers == RECVERSION_20031004)
         {
             cbuf[0] = 0;
             prm.preinit = false;
@@ -424,15 +424,19 @@ static nodeStatus_t nPlayBInput(int ch)
         }
         else
         {
-            sprintf(cbuf, "%d", recFileHeader.snum);
+            // for older protocols, compensate for 0-based cbShips[]
+            sprintf(cbuf, "%d",
+                    (recFileHeader.protoVers <= 0x0006) ?
+                    recFileHeader.snum - 1:
+                    recFileHeader.snum);
             prm.preinit = true;
         }
 
         prm.buf = cbuf;
         prm.buflen = MSGMAXLINE;
-        prm.pbuf = "Watch which ship (<cr> for doomsday)? ";
+        prm.pbuf = "Watch which ship? ";
         prm.terms = TERMS;
-        prm.index = MSG_LIN1;
+        prm.index = 20;
         prompting = true;
 
         break;
@@ -458,7 +462,7 @@ static nodeStatus_t nPlayBInput(int ch)
         return NODE_OK;
         break;
 
-    case '>':  /* forward rotate ship numbers (including doomsday) - dwp */
+    case '>':  /* forward rotate ship numbers */
     case CQ_KEY_RIGHT:
     case CQ_KEY_UP:
         while (true)
@@ -479,12 +483,6 @@ static nodeStatus_t nPlayBInput(int ch)
                     }
                 }
                 if (foundone == false)
-                {	/* check the doomsday machine */
-                    if (DOOM_LIVE())
-                        foundone = true;
-                }
-
-                if (foundone == false)
                 {
                     mglBeep(MGL_BEEP_ERR);
                     break; /* didn't find one, beep, leave everything
@@ -492,33 +490,27 @@ static nodeStatus_t nPlayBInput(int ch)
                 }
             }
 
-            if (snum == DISPLAY_DOOMSDAY)
+            if (snum == (cbLimits.maxShips() - 1))
             {	  /* doomsday - wrap around to first ship */
                 i = 0;
             }
             else
                 i = snum + 1;
 
-            if (i >= cbLimits.maxShips())
-            {	/* if we're going past
-                   now loop thu specials (only doomsday for
-                   now... ) */
-                i = DISPLAY_DOOMSDAY;
-            }
-
             snum = i;
 
             Context.redraw = true;
 
             if (live_ships)
-                if ((snum >= 0 && clbStillAlive(snum)) ||
-                    (snum == DISPLAY_DOOMSDAY && DOOM_LIVE()))
+            {
+                if (snum >= 0 && clbStillAlive(snum))
                 {
                     Context.snum = snum;
                     break;
                 }
                 else
                     continue;
+            }
             else
             {
                 Context.snum = snum;
@@ -527,7 +519,7 @@ static nodeStatus_t nPlayBInput(int ch)
         }
 
         break;
-    case '<':  /* reverse rotate ship numbers (including doomsday)  - dwp */
+    case '<':  /* reverse rotate ship numbers */
     case CQ_KEY_LEFT:
     case CQ_KEY_DOWN:
         while (true)
@@ -548,12 +540,6 @@ static nodeStatus_t nPlayBInput(int ch)
                     }
                 }
                 if (foundone == false)
-                {	/* check the doomsday machine */
-                    if (DOOM_LIVE())
-                        foundone = true;
-                }
-
-                if (foundone == false)
                 {
                     mglBeep(MGL_BEEP_ERR);
                     break; /* didn't find one, beep, leave everything
@@ -561,28 +547,19 @@ static nodeStatus_t nPlayBInput(int ch)
                 }
             }
 
-
-            if (snum == DISPLAY_DOOMSDAY)
-            {	  /* doomsday - wrap around to last ship */
+            if (snum == 0)
+            {
                 i = cbLimits.maxShips() - 1;
             }
             else
                 i = snum - 1;
-
-            if (i < 0)
-            {	/* if we're going past
-                   now loop thu specials (only doomsday for
-                   now... )*/
-                i = DISPLAY_DOOMSDAY;
-            }
 
             snum = i;
 
             Context.redraw = true;
 
             if (live_ships)
-                if ((snum >= 0 && clbStillAlive(snum)) ||
-                    (snum == DISPLAY_DOOMSDAY && DOOM_LIVE()))
+                if (snum >= 0 && clbStillAlive(snum))
                 {
                     Context.snum = snum;
                     break;

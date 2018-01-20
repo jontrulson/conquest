@@ -107,8 +107,12 @@ static nodeStatus_t nPlayBMenuInput(int ch)
 
             utDeleteBlanks( prm.buf );
             if ( strlen( prm.buf ) == 0 )
-            {              /* watch doomsday machine */
-                tmpsnum = DISPLAY_DOOMSDAY;
+            {
+                    state = S_NONE;
+                    prompting = false;
+
+                    nss = "No such ship.";
+                    return NODE_OK;
             }
             else
             {
@@ -156,7 +160,10 @@ static nodeStatus_t nPlayBMenuInput(int ch)
 
     case 'w':
         state = S_WATCH;
-        if (recFileHeader.snum == 0)
+        // Older versions used snum to differentiate between client
+        // and server recordings...
+        if (recFileHeader.snum == 0
+            && recFileHeader.vers == RECVERSION_20031004)
         {
             cbuf[0] = 0;
             prm.preinit = false;
@@ -174,7 +181,7 @@ static nodeStatus_t nPlayBMenuInput(int ch)
 
         prm.buf = cbuf;
         prm.buflen = MSGMAXLINE;
-        prm.pbuf = "Watch which ship (<cr> for doomsday)?";
+        prm.pbuf = "Watch which ship? ";
         prm.terms = TERMS;
         prm.index = 20;
         prompting = true;
