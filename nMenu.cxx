@@ -155,7 +155,7 @@ static void _conqds(dspConfig_t *dsp)
     lin++;
     cprintf(lin,col,ALIGN_NONE,sfmt, '?', "planet list");
     lin++;
-    cprintf(lin,col,ALIGN_NONE,sfmt, 'q', "exit the program");
+    cprintf(lin,col,ALIGN_NONE,sfmt, 'q', "quit");
 
     if (state == S_WAR)
         cprintf(prm.index, 0, ALIGN_NONE, prm.pbuf);
