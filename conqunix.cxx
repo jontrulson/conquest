@@ -114,8 +114,10 @@ void conqinit(void)
 /*    conqstats( snum ) */
 void conqstats( int snum )
 {
-    int unum, team, cadd, eadd;
+    int unum, team;
+    unsigned int cadd, eadd;
     time_t difftime;
+
     cadd = 0;
     eadd = 0;
 
@@ -324,7 +326,7 @@ void drstart(void)
 /*    gcputime( cpu ) */
 /*  DESCRIPTION */
 /*    The total cpu time (in hundreths) for the current process is returned. */
-void gcputime( int *cpu )
+void gcputime( unsigned int *cpu )
 {
 #if defined(MINGW)
     *cpu = 0;
@@ -346,11 +348,9 @@ void gcputime( int *cpu )
 
     times(&Ptimes);
 
-    *cpu = round( ((real)(Ptimes.tms_stime + Ptimes.tms_utime) /
-                   (real)CLK_TCK) *
-                  100.0);
-
-    /* utLog("gcputime() - *cpu = %d", *cpu); */
+    *cpu = (unsigned int)round( ((real)(Ptimes.tms_stime + Ptimes.tms_utime) /
+                                 (real)CLK_TCK) *
+                                100.0);
 
 #endif  /* MINGW */
     return;
@@ -363,7 +363,7 @@ void gcputime( int *cpu )
 /*  SYNOPSIS */
 /*    int ctemp, etemp */
 /*    initstats( ctemp, etemp ) */
-void initstats( int *ctemp, int *etemp )
+void initstats( unsigned int *ctemp, unsigned int *etemp )
 {
 
     gcputime( ctemp );
@@ -475,10 +475,11 @@ void upchuck(void)
 /*  SYNOPSIS */
 /*    int ctemp, etemp, caccum, eaccum, ctime, etime */
 /*    upstats( ctemp, etemp, caccum, eaccum, ctime, etime ) */
-void upstats( int *ctemp, int *etemp, int *caccum, int *eaccum, int *ctime, int *etime )
+void upstats( unsigned int *ctemp, unsigned int *etemp, unsigned int *caccum,
+              unsigned int *eaccum, unsigned int *ctime, unsigned int *etime )
 {
 
-    int i, now;
+    unsigned int i, now;
 
     /* Update cpu time. */
     gcputime( &i );

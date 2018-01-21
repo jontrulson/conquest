@@ -16,13 +16,13 @@ void drcreate(void);
 void drkill(void);
 void drpexit(void);
 void drstart(void);
-void gcputime(int *cpu);
-void initstats(int *ctemp, int *etemp);
+void gcputime(unsigned int *cpu);
+void initstats(unsigned int *ctemp, unsigned int *etemp);
 int isagod(int unum );
 int mailimps(char *subject, char *msg);
 int checkPID(int pidnum);
 void upchuck(void);
-void upstats(int *ctemp, int *etemp, int *caccum, int *eaccum,
-             int *ctime, int *etime);
+void upstats(unsigned int *ctemp, unsigned int *etemp, unsigned int *caccum,
+             unsigned int *eaccum, unsigned int *ctime, unsigned int *etime);
 
 #endif /* CONQUNIX_H_INCLUDED */

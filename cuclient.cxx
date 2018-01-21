@@ -59,7 +59,8 @@ void cucPseudo( int unum, int snum )
 /*    dowar( snum ) */
 void cucDoWar( int snum )
 {
-    int i, entertime, now;
+    int i;
+    unsigned int entertime, now;
     uint8_t war;
     int twar[NUMPLAYERTEAMS], dowait;
     int ch;

@@ -782,7 +782,8 @@ int capentry( int snum, int *system )
 /*    dead( snum, leave ) */
 void dead( int snum )
 {
-    int i, j, now, entertime;
+    int i, j;
+    unsigned int now, entertime;
     killedBy_t kb;
     unsigned int detail;
     uint8_t flags = SPCLNTSTAT_FLAG_NONE; /* for clientstat msg */
@@ -1547,7 +1548,7 @@ int newship( int unum, int *snum )
 /*    play */
 int play(void)
 {
-    int laststat, now;
+    unsigned int laststat, now;
     int didsomething;             /* update immediately if we did anything */
     int rv;
     char msgbuf[128];

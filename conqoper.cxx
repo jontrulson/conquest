@@ -1146,8 +1146,9 @@ void operate(void)
 {
 
     int lin, savelin;
-    int redraw, now, readone;
-    int lastrev, msgrand;
+    int redraw, readone;
+    int lastrev;
+    unsigned int msgrand, now;
     char buf[MSGMAXLINE], junk[MSGMAXLINE];
     char xbuf[MSGMAXLINE];
     int ch;
@@ -2969,8 +2970,8 @@ void watch(void)
 {
 
     int snum, tmp_snum, old_snum;
-    int ch, normal;
-    int msgrand, readone, now;
+    int ch, normal, readone;
+    unsigned int msgrand, now;
     char buf[MSGMAXLINE];
     int live_ships = true;
     int toggle_flg = false;   /* jon no like the toggle line ... :-) */

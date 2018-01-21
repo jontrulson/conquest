@@ -518,7 +518,8 @@ void procRepair(cpCommand_t *cmd)
 void procCoup(cpCommand_t *cmd)
 {
     int snum = Context.snum;		/* we always use our own ship */
-    int i, pnum, now, entertime;
+    int i, pnum;
+    unsigned int entertime, now;
     real failprob;
     static const char *nhp=
         "We must be orbiting our home planet to attempt a coup.";
@@ -757,7 +758,9 @@ void procSetWar(cpCommand_t *cmd)
 {
     int snum = Context.snum;		/* we always use our own ship */
     int unum = Context.unum;
-    int dowait = false, entertime, now, i;
+    bool dowait = false;
+    int i;
+    unsigned int entertime, now;
     uint8_t war;
 
     if (!pktIsValid(CP_COMMAND, cmd))
@@ -819,7 +822,7 @@ void procSetWar(cpCommand_t *cmd)
 void procRefit(cpCommand_t *cmd)
 {
     int snum = Context.snum;		/* we always use our own ship */
-    int entertime, now;
+    unsigned int entertime, now;
     int stype;
     int pnum;
     static const char *wmbio =
@@ -1022,7 +1025,7 @@ void procUnTow(cpCommand_t *cmd)
 {
     int snum = Context.snum;
     char cbuf[BUFFER_SIZE_256];
-    int entertime, now;
+    unsigned int entertime, now;
     int warsome;
 
     if (!pktIsValid(CP_COMMAND, cmd))
@@ -1096,7 +1099,8 @@ void procBomb(cpCommand_t *cmd)
 {
     int snum = Context.snum;
     int bomb;
-    int pnum, now, entertime, total, ototal, oparmies;
+    int pnum, total, ototal, oparmies;
+    unsigned int now, entertime;
     real x, killprob;
     int oldsshup;
     char buf[MSGMAXLINE];
@@ -1195,7 +1199,7 @@ void procBomb(cpCommand_t *cmd)
         }
 
         /* See if it's time to bomb yet. */
-        while ((int) fabs ((real)utDeltaGrand( (int)entertime, (int *)&now )) >= BOMBARD_GRAND )
+        while (utDeltaGrand( entertime, &now ) >= BOMBARD_GRAND )
 	{
             if ( cbShips[snum].wfuse > 0 )
 	    {
@@ -1212,7 +1216,7 @@ void procBomb(cpCommand_t *cmd)
                 sendFeedback("Not enough fuel to bombard.");
                 goto cbrk22; /* break 2;*/
 	    }
-            /*  entertime = mod( entertime + BOMBARD_GRAND, 24*60*60*1000 );*/
+
             utGrand(&entertime);
             killprob = (real)((BOMBARD_PROB *
                                ((real) weaeff( snum ) *
@@ -1286,7 +1290,8 @@ void procBeam(cpCommand_t *cmd)
     int snum = Context.snum;
     int beam, beamup;
     int pnum, total, num, upmax, downmax, capacity, beamax, i;
-    int ototal, entertime, now;
+    int ototal;
+    unsigned int entertime, now;
     int oldsshup, dirup, zeroed, conqed;
     char cbuf[BUFFER_SIZE_256];
     real rkills;
@@ -1595,7 +1600,7 @@ cbrk21:
 void procDestruct(cpCommand_t *cmd)
 {
     int snum = Context.snum;
-    int entertime, now;
+    unsigned int entertime, now;
 
     if (!pktIsValid(CP_COMMAND, cmd))
         return;
@@ -1685,7 +1690,7 @@ void procDestruct(cpCommand_t *cmd)
 void procAutoPilot(cpCommand_t *cmd)
 {
     int snum = Context.snum;
-    int laststat, now;
+    unsigned int laststat, now;
 
     if (!pktIsValid(CP_COMMAND, cmd))
         return;

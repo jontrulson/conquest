@@ -588,7 +588,8 @@ int newrob( int *snum, int unum )
 /*    Kick ass on poor humanoids. */
 void robotai( int snum )
 {
-    int i, j, value, vars[MAX_VAR];
+    unsigned int i, j;
+    int value, vars[MAX_VAR];
 
     /*    CONQAICOMMON;*/
 
@@ -653,7 +654,8 @@ static void trobotai( int snum )
 void robotloop(void)
 {
 
-    int s, j;
+    int s;
+    unsigned int j;
 
     /* Disable the robot code in conqdriv. */
     cbConqInfo->externrobots = true;

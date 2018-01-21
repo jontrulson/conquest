@@ -53,7 +53,7 @@ void SigTerminate(int sig);
 int main(int argc, char *argv[])
 {
     int s, i, j, pid, drivtenths;
-    int ctime, etime, cacc, eacc;
+    unsigned int ctime, etime, cacc, eacc;
     int force;
     int arg;
 

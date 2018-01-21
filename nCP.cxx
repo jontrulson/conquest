@@ -89,7 +89,7 @@ static int state;
 static int desttarg;
 
 /* timer vars */
-static int entertime;
+static unsigned int entertime;
 
 /* glut timer vars */
 static int rftime;              /* last recording frame */
@@ -2760,8 +2760,8 @@ static nodeStatus_t nCPDisplay(dspConfig_t *dsp)
 
 static nodeStatus_t nCPIdle(void)
 {
-    int now;
-    uint32_t difftime = utDeltaGrand( Context.msgrand, &now );
+    unsigned int now;
+    unsigned int difftime = utDeltaGrand( Context.msgrand, &now );
     static uint32_t iterstart = 0;
     static uint32_t pingtime = 0;
     static uint32_t themetime = 0;

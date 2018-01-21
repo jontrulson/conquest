@@ -438,9 +438,9 @@ void utDeleteBlanks( char *str )
 /*  SYNOPSIS */
 /*    int i, utDeltaGrand, s, n */
 /*    i = utDeltaGrand( s, n ) */
-int utDeltaGrand( int s, int *n )
+unsigned int utDeltaGrand( unsigned int s, unsigned int *n )
 {
-    int tn, ts;
+    unsigned int tn, ts;
 
     /* Save s in case it and n are the same variable. */
     ts = s;
@@ -463,9 +463,9 @@ int utDeltaGrand( int s, int *n )
 /*    int i, utDeltaSecs, s, n */
 /*    i = utDeltaSecs( s, n ) */
 
-int utDeltaSecs( int s, int *n )
+unsigned int utDeltaSecs( unsigned int s, unsigned int *n )
 {
-    int tn, ts;
+    unsigned int tn, ts;
 
     /* Save s in case it and n are the same variable. */
     ts = s;
@@ -642,34 +642,48 @@ void utFormatTime( char *buf, time_t thetime )
 }
 
 
-/*  grand - thousands since midnight */
-/*  SYNOPSIS */
-/*    int h */
-/*    utGrand( h ) */
-void utGrand( int *h )
+// grand - thousands since midnight. This base was apparently chosen
+// because all the conquest executables will compose the same result
+// at a given time, and the magnitude is such that an overflow is rare
+// and easy to handle.
+void utGrand( unsigned int *h )
 {
-    time_t thetime = time(0);
-    struct tm *thetm = localtime(&thetime);
+    unsigned int secs;
 
-    *h = ( ( ( thetm->tm_hour * 60 )
-             + thetm->tm_min ) * 60
-           + thetm->tm_sec ) * 1000;
+    utGetSecs(&secs);
+    *h = secs * 1000;
 
     return;
 
 }
 
 
-/*  utGetSecs - seconds since midnight */
-/*  SYNOPSIS */
-/*    int s */
-/*    utGetSecs( s ) */
-void utGetSecs( int *s )
+// utGetSecs - seconds since midnight.  This base was apparently
+// chosen because all the conquest executables will compose the same
+// result at a given time, and the magnitude is such that an overflow
+// is rare and easy to handle.
+void utGetSecs( unsigned int *s )
 {
-    time_t thetime = time(0);
-    struct tm *thetm = localtime(&thetime);
+    static time_t firstTime = 0;
+    static time_t midnightOffsetSecs = 0;
 
-    *s = ( ( thetm->tm_hour * 60 ) + thetm->tm_min ) * 60 + thetm->tm_sec;
+    if (!firstTime)
+    {
+        // we prefer to avoid calling localtime() every call, so just
+        // compute an initial offset, and go from there.
+        firstTime = time(0);
+        struct tm *thetm = localtime(&firstTime);
+        midnightOffsetSecs = ( ( thetm->tm_hour * 60 )
+                               + (thetm->tm_min * 60 )
+                               + thetm->tm_sec );
+        *s = midnightOffsetSecs;
+        return;
+    }
+
+    // After the init, we just compute the diff and add our offset
+    time_t thetime = time(0);
+
+    *s = (thetime - firstTime) + midnightOffsetSecs;
 
     return;
 
