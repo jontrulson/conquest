@@ -35,6 +35,7 @@
 #include "packet.h"
 #include "client.h"
 #include "clientlb.h"
+#include "conqlb.h"
 
 #include "meta.h"
 
@@ -289,6 +290,9 @@ int main(int argc, char *argv[])
     utSetLogConfig(false, true);	/* use CQ_USERHOMEDIR for logfile */
 
     cInfo.remotehost = strdup("localhost"); /* default to your own server */
+
+    // updated per-frame in renderNode()
+    cInfo.nodeMillis = clbGetMillis();
 
     dspInitData();
 

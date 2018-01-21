@@ -2767,7 +2767,7 @@ static nodeStatus_t nCPIdle(void)
     static uint32_t themetime = 0;
     static uint32_t dietime = 0;
     static uint32_t tadTime = 0;
-    uint32_t iternow = clbGetMillis();
+    uint32_t iternow = cInfo.nodeMillis;
     static const uint32_t iterwait = 50;   /* ms */
     static const uint32_t pingwait = 2000; /* ms (2 seconds) */
     static const uint32_t themewait = 5000; /* ms (5 seconds) */

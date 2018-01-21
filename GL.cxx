@@ -1871,8 +1871,10 @@ static nodeStatus_t renderNode(void)
 {
     scrNode_t *node = getTopNode();
     scrNode_t *onode = getTopONode();
-    uint32_t iternow = clbGetMillis();
     nodeStatus_t rv = NODE_OK;
+
+    // update the node time
+    cInfo.nodeMillis = clbGetMillis();
 
     /* always iter the blinker que */
     animQueRun(&blinkerQue);
@@ -1950,7 +1952,7 @@ static nodeStatus_t renderNode(void)
         // send a udp keep alive if it's time
         sendUDPKeepAlive(frameTime);
         // send a ping if it's time
-        pingSend(iternow);
+        pingSend(cInfo.nodeMillis);
 
     }
 

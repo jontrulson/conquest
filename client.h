@@ -26,6 +26,9 @@ typedef struct {
     char    *remotehost;          /* self evident */
     uint16_t  remoteport;
     char     metaServer[MAXHOSTNAME]; /* the metaserver we are using */
+
+    uint32_t nodeMillis;        /* set to clbGetMillis() in
+                                 * renderNode() every frame */
 } ClientInfo_t;
 
 #ifdef NOEXTERN_CLIENT

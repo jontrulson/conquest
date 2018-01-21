@@ -345,7 +345,7 @@ static void _dispUserOptsMenu(void)
     static unsigned int lastReadSeq = 0;
     static uint32_t udpLastRead = 0;
     static const uint32_t udpUpdateDelay = 1000; // 1 second update rate
-    uint32_t currentMillis = clbGetMillis();
+    uint32_t currentMillis = cInfo.nodeMillis;
 
     if (macroptr == NULL)
     {				/* if this happens, something is
