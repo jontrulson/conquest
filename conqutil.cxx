@@ -651,6 +651,8 @@ void utGrand( unsigned int *h )
     unsigned int secs;
 
     utGetSecs(&secs);
+    // an approximation, since we do not get this info from localtime,
+    // but not a change to old as we have never had it to begin with.
     *h = secs * 1000;
 
     return;

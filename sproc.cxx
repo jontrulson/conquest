@@ -519,7 +519,7 @@ void procCoup(cpCommand_t *cmd)
 {
     int snum = Context.snum;		/* we always use our own ship */
     int i, pnum;
-    unsigned int entertime, now;
+    unsigned int entertime;
     real failprob;
     static const char *nhp=
         "We must be orbiting our home planet to attempt a coup.";
@@ -590,8 +590,8 @@ void procCoup(cpCommand_t *cmd)
 
     /* Now wait it out... */
     sendFeedback("Attempting coup...");
-    utGrand( &entertime );
-    while ( utDeltaGrand( entertime, &now ) < COUP_GRAND )
+    entertime = clbGetMillis();
+    while ( (clbGetMillis() - entertime) < COUP_GRAND )
     {
         /* See if we're still alive. */
         if ( ! clbStillAlive( Context.snum ) )
@@ -760,7 +760,7 @@ void procSetWar(cpCommand_t *cmd)
     int unum = Context.unum;
     bool dowait = false;
     int i;
-    unsigned int entertime, now;
+    unsigned int entertime;
     uint8_t war;
 
     if (!pktIsValid(CP_COMMAND, cmd))
@@ -804,8 +804,8 @@ void procSetWar(cpCommand_t *cmd)
     /* any packets the client tries to send will have to wait ;-) */
     if (dowait && cbShips[Context.snum].status != SS_RESERVED)
     {
-        utGrand( &entertime );
-        while ( utDeltaGrand( entertime, &now ) < REARM_GRAND )
+        entertime = clbGetMillis();
+        while ( (clbGetMillis() - entertime) < REARM_GRAND )
 	{
             /* See if we're still alive. */
             if ( ! clbStillAlive( Context.snum ) )
@@ -822,7 +822,7 @@ void procSetWar(cpCommand_t *cmd)
 void procRefit(cpCommand_t *cmd)
 {
     int snum = Context.snum;		/* we always use our own ship */
-    unsigned int entertime, now;
+    unsigned int entertime;
     int stype;
     int pnum;
     static const char *wmbio =
@@ -874,8 +874,8 @@ void procRefit(cpCommand_t *cmd)
     }
 
     /* now we wait for a bit. */
-    utGrand( &entertime );
-    while ( utDeltaGrand( entertime, &now ) < REFIT_GRAND )
+    entertime = clbGetMillis();
+    while ( (clbGetMillis() - entertime) < REFIT_GRAND )
     {
         /* See if we're still alive. */
         if ( ! clbStillAlive( snum ) )
@@ -1025,7 +1025,6 @@ void procUnTow(cpCommand_t *cmd)
 {
     int snum = Context.snum;
     char cbuf[BUFFER_SIZE_256];
-    unsigned int entertime, now;
     int warsome;
 
     if (!pktIsValid(CP_COMMAND, cmd))
@@ -1045,8 +1044,8 @@ void procUnTow(cpCommand_t *cmd)
         warsome = ( satwar( snum, cbShips[snum].towedby) );
         if ( warsome )
 	{
-            utGrand( &entertime );
-            while ( utDeltaGrand( entertime, &now ) < BREAKAWAY_GRAND )
+            unsigned int entertime = clbGetMillis();
+            while ( (clbGetMillis() - entertime) < BREAKAWAY_GRAND )
 	    {
                 if ( ! clbStillAlive( Context.snum ) )
                     return;
@@ -1100,7 +1099,7 @@ void procBomb(cpCommand_t *cmd)
     int snum = Context.snum;
     int bomb;
     int pnum, total, ototal, oparmies;
-    unsigned int now, entertime;
+    unsigned int entertime;
     real x, killprob;
     int oldsshup;
     char buf[MSGMAXLINE];
@@ -1182,7 +1181,7 @@ void procBomb(cpCommand_t *cmd)
     total = 0;
     ototal = -1;			/* force an update the first time */
     oparmies = -1;
-    utGrand( &entertime );		/* get start time */
+    entertime = clbGetMillis();		/* get start time */
     SFSET(snum, SHIP_F_BOMBING);
     while(true)
     {
@@ -1199,7 +1198,7 @@ void procBomb(cpCommand_t *cmd)
         }
 
         /* See if it's time to bomb yet. */
-        while (utDeltaGrand( entertime, &now ) >= BOMBARD_GRAND )
+        while ((clbGetMillis() - entertime) >= BOMBARD_GRAND )
 	{
             if ( cbShips[snum].wfuse > 0 )
 	    {
@@ -1217,10 +1216,10 @@ void procBomb(cpCommand_t *cmd)
                 goto cbrk22; /* break 2;*/
 	    }
 
-            utGrand(&entertime);
-            killprob = (real)((BOMBARD_PROB *
-                               ((real) weaeff( snum ) *
-                                (real)((real)cbPlanets[pnum].armies/100.0))) + 0.5);
+            entertime = clbGetMillis();		/* reset start time */
+            killprob = ((BOMBARD_PROB *
+                         (weaeff( snum ) *
+                          ((real)cbPlanets[pnum].armies/100.0))) + 0.5);
 
             if ( rnd() < killprob )
 	    {
@@ -1291,7 +1290,7 @@ void procBeam(cpCommand_t *cmd)
     int beam, beamup;
     int pnum, total, num, upmax, downmax, capacity, beamax, i;
     int ototal;
-    unsigned int entertime, now;
+    unsigned int entertime;
     int oldsshup, dirup, zeroed, conqed;
     char cbuf[BUFFER_SIZE_256];
     real rkills;
@@ -1480,7 +1479,7 @@ void procBeam(cpCommand_t *cmd)
     zeroed = false;
     conqed = false;
 
-    utGrand( &entertime );
+    entertime = clbGetMillis();
     while(true)
     {
         if ( ! clbStillAlive( Context.snum ) )
@@ -1489,9 +1488,9 @@ void procBeam(cpCommand_t *cmd)
             break;
 
         /* See if it's time to beam again. */
-        while ( utDeltaGrand( entertime, &now ) >= BEAM_GRAND )
+        while ( (clbGetMillis() - entertime) >= BEAM_GRAND )
 	{
-            utGrand(&entertime);
+            entertime = clbGetMillis();
             cbLock(&cbConqInfo->lockword);
             if ( dirup )
 	    {

@@ -783,7 +783,7 @@ int capentry( int snum, int *system )
 void dead( int snum )
 {
     int i, j;
-    unsigned int now, entertime;
+    unsigned int entertime;
     killedBy_t kb;
     unsigned int detail;
     uint8_t flags = SPCLNTSTAT_FLAG_NONE; /* for clientstat msg */
@@ -801,15 +801,15 @@ void dead( int snum )
     detail = cbShips[snum].killedByDetail;
 
     /* Delay while our torps are exploding. */
-    utGrand( &entertime );
+    entertime = clbGetMillis();
     i = 0;
-    while ( utDeltaGrand( entertime, &now ) < TORPEDOWAIT_GRAND )
+    while ( (clbGetMillis() - entertime) < TORPEDOWAIT_GRAND )
     {
         updateClient(false);
         i = 0;
         for ( j = 0; j < cbLimits.maxTorps(); j++ )
             if ( cbShips[snum].torps[j].status == TS_DETONATE )
-                i = i + 1;
+                i++;
         if ( i <= 0 )
             break;
         utSleep( (1.0 / (real)Context.updsec) );

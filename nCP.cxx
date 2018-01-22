@@ -2828,7 +2828,7 @@ static nodeStatus_t nCPIdle(void)
 
     if (state == S_REFITING)
     {                           /* done refiting? */
-        if (utDeltaGrand( entertime, &now ) >= REFIT_GRAND)
+        if ((cInfo.nodeMillis - entertime) >= REFIT_GRAND)
         {
             hudClearPrompt(MSG_LIN1);
             hudClearPrompt(MSG_LIN2);
@@ -2840,7 +2840,7 @@ static nodeStatus_t nCPIdle(void)
 
     if (state == S_WARRING)
     {
-        if (utDeltaGrand( entertime, &now ) >= REARM_GRAND)
+        if ((cInfo.nodeMillis - entertime) >= REARM_GRAND)
         {
             hudClearPrompt(MSG_LIN1);
             hudClearPrompt(MSG_LIN2);
@@ -3349,7 +3349,7 @@ static nodeStatus_t nCPInput(int ch)
                             "Reprogramming the battle computer, please stand by...",
                             MSG_LIN2 );
 
-                        utGrand( &entertime ); /* gotta wait */
+                        entertime = cInfo.nodeMillis; /* gotta wait */
                     }
                     else
                     {
@@ -3426,7 +3426,7 @@ static nodeStatus_t nCPInput(int ch)
                     hudSetPrompt(prm.index, prm.pbuf, NoColor, prm.buf, NoColor);
                     sendCommand(CPCMD_REFIT, (uint16_t)refitst);
                     prompting = false;
-                    utGrand( &entertime );
+                    entertime = cInfo.nodeMillis;
                     state = S_REFITING;
 
                     break;
