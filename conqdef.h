@@ -126,7 +126,7 @@ typedef enum {
 #define ST_DESTROYER  1         /* Destroyer (Fed/Kli) */
 #define ST_CRUISER    2         /* Cruiser (Rom) */
 
-#define REFIT_GRAND 10000       /* hunderths to complete a refit */
+#define REFIT_GRAND 10000       /* millis to complete a refit */
 
 #define MAXTEAMNAME 12
 
@@ -320,8 +320,7 @@ typedef enum {
 #define PHASER_FUEL 20.0        /* fuel required to fire phasers */
 #define PHASER_TENTHS 10        /* tenths for phasers to re-charge */
 
-/*#define DOUBLE_E_KILLS 50.0  */       /* kills required to double efficiency */
-#define DOUBLE_E_KILLS 40.0     /* kills required to double efficiency -JET */
+#define DOUBLE_E_KILLS 50.0     /* kills required to double efficiency */
 #define EXPLOSION_FALLOFF 28.0  /* explosions divided by this at PHASER_DIST */
 #define EXPLOSION_RADIUS 50.0   /* things within this radius get maximum hits */
 
@@ -331,21 +330,21 @@ typedef enum {
 #define TORPEDO_PROX 250.0      /* proximity fuse distance */
 #define TORPEDO_HIT 72.0        /* blast from a torp at zero range */
 #define TORPEDO_FUEL 10.0       /* fuel required to launch a torp */
-#define TORPEDOWAIT_GRAND 5000  /* hundreths to wait for live torps in dead() */
+#define TORPEDOWAIT_GRAND 5000  /* millis to wait for live torps in dead() */
 
 #define DETONATE_DIST PHASER_DIST /* maximum range of detonators */
 #define DETONATE_FUEL 5.0       /* fuel required to fire detonators */
 
 #define BOMBARD_FUEL 10.0       /* fuel required to bombard per second */
-#define BOMBARD_PROB 0.60       /*was .30 - base probability of killing an army per try */
-#define BOMBARD_GRAND 333       /* hundreths to get one chance to bomb */
+#define BOMBARD_PROB 0.30       /* base probability of killing an army per try */
+#define BOMBARD_GRAND 333       /* millis to get one chance to bomb */
 
-#define BEAM_GRAND 2000         /* hundreths to beam one army */
+#define BEAM_GRAND 2000         /* millis to beam one army */
 
 #define TRACTOR_DIST 560.0      /* maximum range of tractor beams */
 #define TOW_DIST 500.0          /* distance a towed ship trails by */
 #define BREAKAWAY_PROB 0.3      /* chance to break free of a hostile tower */
-#define BREAKAWAY_GRAND 1000    /* hundreths to break free from a hostile tower */
+#define BREAKAWAY_GRAND 1000    /* millis to break free from a hostile tower */
 
 #define MIN_UNINHAB_MINUTES 45  /* minimum time till inhabitable */
 #define MAX_UNINHAB_MINUTES 120 /* maximum time till inhabitable */
@@ -379,8 +378,8 @@ typedef enum {
 #define ITER_TENTHS 1           /* must agree with above, be an integer, */
                                 /*  and an even divisor of 10 */
 #define SELFDESTRUCT_FUSE 15    /* seconds to self-destruct */
-#define REARM_GRAND 10000       /* hunderths to declaring war/peace */
-#define COUP_GRAND 10000        /* hunderths to attempt a coup */
+#define REARM_GRAND 10000       /* millis to declaring war/peace */
+#define COUP_GRAND 10000        /* millis to attempt a coup */
 #define MIN_REFIT_KILLS 1.0     /* min kill to refit */
 
 #define MSG_LIN1 (DISPLAY_LINS + 2)
@@ -390,7 +389,7 @@ typedef enum {
 #define TIMEOUT_DRIVER 10       /* seconds of timeout for the driver */
 #define TIMEOUT_DRCHECK 2       /* don't do timeout checking after this */
 #define TIMEOUT_PLAYER 300      /* seconds of timeout for players */
-#define NEWMSG_GRAND 1900       /* hundreths before displaying a new message */
+#define NEWMSG_GRAND 1900       /* millis before displaying a new message */
 
 /* Terminators for dsgetx. */
 #define TERM_NORMAL '\r'        /* like NEXT */
