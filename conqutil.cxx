@@ -644,19 +644,40 @@ void utFormatTime( char *buf, time_t thetime )
 
 // grand - thousands since midnight. This base was apparently chosen
 // because all the conquest executables will compose the same result
-// at a given time, and the magnitude is such that an overflow is rare
-// and easy to handle.
+// at a given time, and the magnitude is such that an overflow (of a
+// 32b value) is rare and easy to handle.
 void utGrand( unsigned int *h )
 {
-    unsigned int secs;
+    static struct timeval start;
+    static bool firstTime = true;
+    static unsigned int midnightOffsetSecs = 0;
 
-    utGetSecs(&secs);
-    // an approximation, since we do not get this info from localtime,
-    // but not a change to old as we have never had it to begin with.
-    *h = secs * 1000;
+    if (firstTime)
+    {
+        firstTime = false;
+        // we prefer to avoid calling localtime() every call, so just
+        // compute an initial offset, and go from there.
+        time_t theTime = time(0);
+        struct tm *thetm = localtime(&theTime);
+        midnightOffsetSecs = ( ( thetm->tm_hour * 60 * 60)
+                               + (thetm->tm_min * 60 )
+                               + thetm->tm_sec );
+        GETTIMEOFDAY(&start);
+
+        *h = midnightOffsetSecs * 1000;
+
+        return;
+    }
+
+    struct timeval now, elapsed;
+
+    GETTIMEOFDAY(&now);
+    TIMEDELTA(elapsed, now, start);
+
+    *h = (((midnightOffsetSecs + elapsed.tv_sec) * 1000)
+          + (elapsed.tv_usec / 1000));
 
     return;
-
 }
 
 
@@ -666,26 +687,10 @@ void utGrand( unsigned int *h )
 // is rare and easy to handle.
 void utGetSecs( unsigned int *s )
 {
-    static time_t firstTime = 0;
-    static time_t midnightOffsetSecs = 0;
+    unsigned int msecs;
 
-    if (!firstTime)
-    {
-        // we prefer to avoid calling localtime() every call, so just
-        // compute an initial offset, and go from there.
-        firstTime = time(0);
-        struct tm *thetm = localtime(&firstTime);
-        midnightOffsetSecs = ( ( thetm->tm_hour * 60 )
-                               + (thetm->tm_min * 60 )
-                               + thetm->tm_sec );
-        *s = midnightOffsetSecs;
-        return;
-    }
-
-    // After the init, we just compute the diff and add our offset
-    time_t thetime = time(0);
-
-    *s = (thetime - firstTime) + midnightOffsetSecs;
+    utGrand(&msecs);
+    *s = msecs / 1000;
 
     return;
 

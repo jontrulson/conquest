@@ -2895,25 +2895,7 @@ void clbAdjOrbitalPosition(int snum)
     return;
 }
 
-
-/* borrowed from glut */
-#if defined(SVR4) && !defined(sun)  /* Sun claims SVR4, but
-                                       wants 2 args. */
-#define GETTIMEOFDAY(_x) gettimeofday(_x)
-#else
-#define GETTIMEOFDAY(_x) gettimeofday(_x, NULL)
-#endif
-
-#define TIMEDELTA(dest, src1, src2) {                                   \
-        if(((dest).tv_usec = (src1).tv_usec - (src2).tv_usec) < 0) {    \
-            (dest).tv_usec += 1000000;                                  \
-            (dest).tv_sec = (src1).tv_sec - (src2).tv_sec - 1;          \
-        } else {                                                        \
-            (dest).tv_sec = (src1).tv_sec - (src2).tv_sec;              \
-        }                                                               \
-    }
-
-/* return time in milliseconds */
+// return time in milliseconds since first call
 uint32_t clbGetMillis(void)
 {
     static bool firsttime = true;
