@@ -65,8 +65,8 @@
 #define ABS_MAXMSGS                (256)
 #define ABS_MAXUSERS               (65536)
 
-#ifndef PI
-# define PI 3.141592654
+#ifndef M_PI
+# define M_PI 3.141592654
 #endif
 
 #define CONQ_HTTP   "https://sourceforge.net/projects/conq/"
@@ -433,24 +433,30 @@ typedef enum {
 #define around(x) ((real)my_rint((real)(x))) /* real round */
 
 #define oneplace(x) (real)(around((x) * 10.0)/10.0) /* nearest tenth */
-#define dtor(x) (((real)(x) / 180.0) * PI) /* degrees to radians */
-#define rtod(x) (((real)(x) / PI) * 180.0) /* radians to degrees */
+#define dtor(x) (((real)(x) / 180.0) * M_PI) /* degrees to radians */
+#define rtod(x) (((real)(x) / M_PI) * 180.0) /* radians to degrees */
 #define cosd(x) (real)cos((real)dtor((x) )) /* cosine of angle in degrees */
 #define sind(x) (real)sin((real)dtor((x) )) /* sine of angle in degrees */
-#define dist(w,x,y,z) (real) sqrt(pow((real)((y)-(w)), (real) 2.0) + pow((real)((z)-(x)), (real) 2.0))
+#define dist(w,x,y,z) sqrt(pow((real)((y)-(w)), 2.0) +  \
+                           pow((real)((z)-(x)), 2.0))
 
 /* fast distance */
-#define distf(w,x,y,z) (real)(fabs((real)(y)-(real)(w)) + fabs((real)(z)-(real)(x)))
-#define satwar(x,y) (cbShips[x].war[cbShips[y].team] || cbShips[y].war[cbShips[x].team])
-#define selfwar(x) cbShips[x].war[cbShips[x].team]
-#define maxwarp(x) (real)min(cbShipTypes[cbShips[x].shiptype].warplim,      \
-                             max(0.0, around(((100.0-cbShips[x].damage)/100.0)*12.0)))
-#define engeff(x) (real)(((cbShips[x].engalloc +50.0)/100.0) *            \
-                         cbShipTypes[cbShips[x].shiptype].engfac *          \
-                         (((cbShips[x].kills+cbShips[x].strkills)+DOUBLE_E_KILLS)/DOUBLE_E_KILLS))
-#define weaeff(x) (real)(((cbShips[x].weapalloc+50.0)/100.0) *            \
-                         cbShipTypes[cbShips[x].shiptype].weafac *          \
-                         (((cbShips[x].kills+cbShips[x].strkills)+DOUBLE_E_KILLS)/DOUBLE_E_KILLS))
+#define distf(w,x,y,z) (fabs((real)(y)-(real)(w)) +     \
+                        fabs((real)(z)-(real)(x)))
+#define satwar(x,y) (cbShips[x].war[cbShips[y].team] || \
+                     cbShips[y].war[cbShips[x].team])
+#define selfwar(x) (cbShips[x].war[cbShips[x].team])
+#define maxwarp(x) min(cbShipTypes[cbShips[x].shiptype].warplim,        \
+                       max(0.0, around(((100.0 - cbShips[x].damage) /   \
+                                        100.0) * 12.0)))
+#define engeff(x) (((cbShips[x].engalloc + 50.0) / 100.0) *     \
+                   cbShipTypes[cbShips[x].shiptype].engfac *    \
+                   (((cbShips[x].kills+cbShips[x].strkills) +   \
+                     DOUBLE_E_KILLS) / DOUBLE_E_KILLS))
+#define weaeff(x) (((cbShips[x].weapalloc+50.0)/100.0) *        \
+                   cbShipTypes[cbShips[x].shiptype].weafac *    \
+                   (((cbShips[x].kills+cbShips[x].strkills) +   \
+                     DOUBLE_E_KILLS) / DOUBLE_E_KILLS))
 
 /* clamp */
 #undef CLAMP
