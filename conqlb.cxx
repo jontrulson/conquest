@@ -834,7 +834,33 @@ int clbTakePlanet( int pnum, int snum )
                     cbTeams[oteam].name);
 
             clbStoreMsg(MSG_FROM_COMP, 0, MSG_TO_ALL, 0, buf);
-            utLog("GENO: %s", buf);
+            utLog("%s: GENO: %s", __FUNCTION__, buf);
+
+            // Here we do a check for vacant ships holding the vanquished
+            // armies.  This is a trick often used to avoid having to do a
+            // coup.  Simply beam up some armies, then go somewhere and
+            // cloak, then quit (VACANT).  It's also a lame cheat.
+            //
+            // So what we do here is if VACANT ships are allowed, we'll go
+            // through the ship list, looking for vacant ships carrying
+            // the vanquished armies.  We'll log it, then set their army
+            // count to 0.
+            if (SysConf.AllowVacant)
+            {
+                for (int i=0; i<cbLimits.maxShips(); i++)
+                {
+                    if (SVACANT(i) && cbShips[i].team == oteam
+                        && cbShips[i].armies > 0)
+                    {
+                        utLog("%s: Deleted %d armies on vacant ship %d",
+                              __FUNCTION__,
+                              cbShips[i].armies,
+                              i);
+                        cbShips[i].armies = 0;
+                    }
+                }
+            }
+
         }
 
     }
