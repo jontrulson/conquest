@@ -178,8 +178,9 @@ int clientHello(const char *clientname)
     struct timeval tv;
     fd_set readfds;
 
-    /* there should be a server hello waiting for us */
-    if ((pkttype = pktRead(buf, PKT_MAXSIZE, 60)) < 0)
+    /* there should be a server hello waiting for us - we will only
+     * wait for 10 seconds */
+    if ((pkttype = pktRead(buf, PKT_MAXSIZE, 10)) < 0)
     {
         utLog("clientHello: read server hello failed\n");
         return false;

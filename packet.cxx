@@ -813,9 +813,14 @@ static int _pktReadSocket(int sock, ringBuffer_t *RB)
     {
         if ((rv = udpRecvPacket(sock, packet, PKT_MAXSIZE)) < 0)
         {
-            *packet = 0;
-            utLog("%s: udpRecvPacket(): %s", __FUNCTION__, strerror(errno));
-            return -1;
+            if (!(errno == EWOULDBLOCK || errno == EAGAIN))
+            {
+                *packet = 0;
+                utLog("%s: udpRecvPacket(): %s", __FUNCTION__, strerror(errno));
+                return -1;
+            }
+            else
+                return 0;
         }
     }
     else
@@ -823,10 +828,14 @@ static int _pktReadSocket(int sock, ringBuffer_t *RB)
 
         if ((rv = recv(sock, packet, PKT_MAXSIZE, 0)) < 0)
         {
-            *packet = 0;
-            utLog("%s: TCP recv(): %s", __FUNCTION__, strerror(errno));
-            return -1;
-        }
+            if (!(errno == EWOULDBLOCK || errno == EAGAIN))
+            {
+                *packet = 0;
+                utLog("%s: TCP recv(): %s", __FUNCTION__, strerror(errno));
+                return -1;
+            }
+            else
+                return 0;
     }
 
     if (rv)
