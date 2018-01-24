@@ -820,12 +820,13 @@ static int _pktReadSocket(int sock, ringBuffer_t *RB)
                 return -1;
             }
             else
+            {
                 return 0;
+            }
         }
     }
     else
     {
-
         if ((rv = recv(sock, packet, PKT_MAXSIZE, 0)) < 0)
         {
             if (!(errno == EWOULDBLOCK || errno == EAGAIN))
@@ -835,7 +836,10 @@ static int _pktReadSocket(int sock, ringBuffer_t *RB)
                 return -1;
             }
             else
+            {
                 return 0;
+            }
+        }
     }
 
     if (rv)
