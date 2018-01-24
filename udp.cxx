@@ -8,6 +8,7 @@
 
 #include "conqnet.h"
 #include "conf.h"
+#include "global.h"
 #include "udp.h"
 #include "conqutil.h"
 #include "packet.h"
@@ -162,7 +163,8 @@ int udpRecvPacket(int sock, char* buffer, size_t buflen)
     // 4 bytes long.
     if (rv < 8)
     {
-        utLog("%s: received short packet: %d, ignoring", __FUNCTION__, rv);
+        if (cqDebug)
+            utLog("%s: received short packet: %d, ignoring", __FUNCTION__, rv);
         pktStats.shortPackets++;
         return 0;
     }
@@ -179,8 +181,9 @@ int udpRecvPacket(int sock, char* buffer, size_t buflen)
         readSeq = theSeq;
     else if (theSeq == readSeq)
     {
-        utLog("%s: Duplicate packet (seq %u), ignoring", __FUNCTION__,
-            theSeq);
+        if (cqDebug)
+            utLog("%s: Duplicate packet (seq %u), ignoring", __FUNCTION__,
+                  theSeq);
         pktStats.duplicatePackets++;
         return 0;
     }
@@ -193,8 +196,9 @@ int udpRecvPacket(int sock, char* buffer, size_t buflen)
         }
         else
         {
-            utLog("%s: Out of Order packet (seq %ud, last seq %ud) ignoring",
-                  __FUNCTION__, theSeq, readSeq);
+            if (cqDebug)
+                utLog("%s: Out of Order packet (seq %u, last seq %u) ignoring",
+                      __FUNCTION__, theSeq, readSeq);
             pktStats.oooPackets++;
             return 0;
         }
