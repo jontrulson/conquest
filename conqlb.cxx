@@ -2815,18 +2815,22 @@ void clbPlanetDrive(real itersec)
                                           cbPlanets[i].orbvel *
                                           itersec / 60.0 );
 
-            cbPlanets[i].x = cbPlanets[cbPlanets[i].primary].x +
-                cbPlanets[i].orbrad * cosd(cbPlanets[i].orbang);
-            cbPlanets[i].y = cbPlanets[cbPlanets[i].primary].y +
-                cbPlanets[i].orbrad * sind(cbPlanets[i].orbang);
+            cbPlanets[i].x = clbFixCoord(cbPlanets[cbPlanets[i].primary].x +
+                                         cbPlanets[i].orbrad
+                                         * cosd(cbPlanets[i].orbang));
+            cbPlanets[i].y = clbFixCoord(cbPlanets[cbPlanets[i].primary].y +
+                                         cbPlanets[i].orbrad
+                                         * sind(cbPlanets[i].orbang));
 
 	}
         else if ( cbPlanets[i].orbvel != 0.0 )
 	{
             /* Special hack for planets to move in a straight line. */
             speed = cbPlanets[i].orbvel * MM_PER_SEC_PER_WARP * itersec;
-            cbPlanets[i].x = cbPlanets[i].x + speed * cosd(cbPlanets[i].orbang);
-            cbPlanets[i].y = cbPlanets[i].y + speed * sind(cbPlanets[i].orbang);
+            cbPlanets[i].x =
+                clbFixCoord(cbPlanets[i].x + speed * cosd(cbPlanets[i].orbang));
+            cbPlanets[i].y =
+                clbFixCoord(cbPlanets[i].y + speed * sind(cbPlanets[i].orbang));
 	}
     }
 
@@ -2870,10 +2874,14 @@ void clbTorpDrive(real itersec)
                 if ( cbShips[i].torps[j].status == TS_LIVE )
 		{
                     /* Movement. */
-                    cbShips[i].torps[j].x = cbShips[i].torps[j].x +
-                        (cbShips[i].torps[j].dx * (itersec / ITER_SECONDS));
-                    cbShips[i].torps[j].y = cbShips[i].torps[j].y +
-                        (cbShips[i].torps[j].dy * (itersec / ITER_SECONDS));
+                    cbShips[i].torps[j].x =
+                        clbFixCoord(cbShips[i].torps[j].x
+                                    + (cbShips[i].torps[j].dx
+                                       * (itersec / ITER_SECONDS)));
+                    cbShips[i].torps[j].y =
+                        clbFixCoord(cbShips[i].torps[j].y
+                                    + (cbShips[i].torps[j].dy
+                                       * (itersec / ITER_SECONDS)));
 
 		}
             }
@@ -3043,5 +3051,18 @@ bool clbFindTeamHomeSun(int team, int *pnum)
 
     // if we're here, we failed.
     return false;
+}
+
+// here we check x and y coords to ensure they fit into the universe
+// (MAX_UNIVERSAL_COORD) wrapping around if necessary...
+real clbFixCoord(real coord)
+{
+    if (coord < -MAX_UNIVERSAL_COORD)
+        return MAX_UNIVERSAL_COORD;
+
+    if (coord > MAX_UNIVERSAL_COORD)
+        return -MAX_UNIVERSAL_COORD;
+
+    return coord;
 }
 

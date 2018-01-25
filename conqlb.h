@@ -81,6 +81,7 @@ void     clbBlockAlarm(void);
 void     clbUnblockAlarm(void);
 void     clbCheckShips(int isDriver);
 bool     clbFindTeamHomeSun(int team, int *pnum);
+real     clbFixCoord(real coord);
 
 
 #endif /* _CONQLB_H */

@@ -353,9 +353,9 @@ typedef struct {
     uint8_t  tnum;                 /* torp num */
     uint8_t  war;                  /* war. what is it good for. */
 
-    int32_t   x;                        /* x1000 */
+    int32_t   x;                        /* x10 */
 
-    int32_t   y;                        /* x1000 */
+    int32_t   y;                        /* x10 */
 } spTorpLoc_t;
 
 typedef struct {
@@ -364,13 +364,13 @@ typedef struct {
     uint8_t  tnum;                 /* torp num */
     uint8_t  war;                  /* war. what is it good for. */
 
-    int32_t   x;                        /* x1000 */
+    int32_t   x;                        /* x10 */
 
-    int32_t   y;                        /* x1000 */
+    int32_t   y;                        /* x10 */
 
-    int32_t   dx;                       /* x1000 */
+    int32_t   dx;                       /* x100 */
 
-    int32_t   dy;                       /* x1000 */
+    int32_t   dy;                       /* x100 */
 
 
     uint8_t  status;            /* one of the TS_* values */

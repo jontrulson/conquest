@@ -195,17 +195,6 @@ int main(int argc, char *argv[])
     for ( s = 0; s < cbLimits.maxShips(); s++ )
         ship.push_back(s);
 
-    // double check here, but should never happen...
-    if (ship.size() != cbLimits.maxShips())
-    {
-        utLog("conqdriv: FATAL: shipVec: maxShips(%u) != ship.size(%lu)!",
-              cbLimits.maxShips(), ship.size());
-        cbLock(&cbConqInfo->lockword);
-        cbDriver->drivstat = DRS_OFF;
-        cbUnlock(&cbConqInfo->lockword);
-        exit(1);
-    }
-
     while ( pid == cbDriver->drivpid && cbDriver->drivstat != DRS_KAMIKAZE )
     {
 
@@ -401,8 +390,8 @@ void iterdrive( const shipVec_t& ship )
                     clbFixDeltas( i );
 		}
 
-                cbShips[i].x = cbShips[i].x + cbShips[i].dx;
-                cbShips[i].y = cbShips[i].y + cbShips[i].dy;
+                cbShips[i].x = clbFixCoord(cbShips[i].x + cbShips[i].dx);
+                cbShips[i].y = clbFixCoord(cbShips[i].y + cbShips[i].dy);
 
                 /* If we're locked onto a planet but not orbiting it see if */
                 /* we are close enough to orbit. */
@@ -514,8 +503,8 @@ void iterdrive( const shipVec_t& ship )
         {
             // can't be attacking if we aren't in range
             DOOMCLR(DOOM_F_ATTACKING);
-            cbDoomsday->x = cbDoomsday->x + cbDoomsday->dx;
-            cbDoomsday->y = cbDoomsday->y + cbDoomsday->dy;
+            cbDoomsday->x = clbFixCoord(cbDoomsday->x + cbDoomsday->dx);
+            cbDoomsday->y = clbFixCoord(cbDoomsday->y + cbDoomsday->dy);
         }
 
         /* ship lock */
@@ -528,8 +517,8 @@ void iterdrive( const shipVec_t& ship )
         {
             // can't be attacking if we aren't in range
             DOOMCLR(DOOM_F_ATTACKING);
-            cbDoomsday->x = cbDoomsday->x + cbDoomsday->dx;
-            cbDoomsday->y = cbDoomsday->y + cbDoomsday->dy;
+            cbDoomsday->x = clbFixCoord(cbDoomsday->x + cbDoomsday->dx);
+            cbDoomsday->y = clbFixCoord(cbDoomsday->y + cbDoomsday->dy);
         }
 
     }
@@ -726,7 +715,7 @@ void secdrive( const shipVec_t& ship )
             /* Cruising. */
 
             /* JET- changed code below to compute based on
-             * swarp instead of sdwarp.  I think this was a bug.
+             * warp instead of dwarp.  I think this was a bug.
              * ie: your fuel consumption should be based on how
              * fast you're going, not how fast you *want* to go.
              */
@@ -986,7 +975,7 @@ void fivemindrive(void)
                     {
                         /* save to avoid the unfortunate side effects
                            of max() bieng a macro (rnd() actually got
-                           exc'd twice, resluting in an occasional 0
+                           exec'd twice, resulting in an occasional 0
                            return val) */
                         real r = rnd();
 

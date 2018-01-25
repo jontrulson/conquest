@@ -65,6 +65,10 @@
 #define ABS_MAXMSGS                (256)
 #define ABS_MAXUSERS               (65536)
 
+// This is the maximum size of the universe - 200 million CU's in each
+// direction.  After hitting this limit, we'll simply wrap around.
+#define MAX_UNIVERSAL_COORD        (200000000.0)
+
 #ifndef M_PI
 # define M_PI 3.141592654
 #endif

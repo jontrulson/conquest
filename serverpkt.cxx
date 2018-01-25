@@ -420,8 +420,8 @@ spShipLoc_t *spktShipLoc(uint8_t snum, int rec)
         {
             if (cbShips[snum].warp == 0.0)
             {
-                x = 1e8;
-                y = 1e8;
+                x = MAX_UNIVERSAL_COORD;
+                y = MAX_UNIVERSAL_COORD;
             }
             else
             { /* if your cloaked, and moving, get smeared x/y */
@@ -712,8 +712,8 @@ spTorpLoc_t *spktTorpLoc(uint8_t tsnum, uint8_t tnum, int rec)
 
         if (dis > ACCINFO_DIST)
         {                       /* in the bermuda triangle */
-            x = 1e8;
-            y = 1e8;
+            x = MAX_UNIVERSAL_COORD;
+            y = MAX_UNIVERSAL_COORD;
         }
     }
 

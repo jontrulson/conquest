@@ -510,8 +510,8 @@ void recGenTorpLoc(void)
 
                         if (dis > ACCINFO_DIST)
                         {                       /* in the bermuda triangle */
-                            x = 1e8;
-                            y = 1e8;
+                            x = MAX_UNIVERSAL_COORD;
+                            y = MAX_UNIVERSAL_COORD;
                         }
                     }
 
