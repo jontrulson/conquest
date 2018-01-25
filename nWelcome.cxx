@@ -239,8 +239,7 @@ static nodeStatus_t nWelcomeDisplay(dspConfig_t *dsp)
         break;
 
     case S_DONE:
-        if (pktWaitForPacket(SP_USER, buf, PKT_MAXSIZE,
-                             60, NULL) <= 0)
+        if (pktWaitForPacket(SP_USER, buf, PKT_MAXSIZE, 60) <= 0)
         {
             utLog("nWelcomeDisplay: waitforpacket SP_USER returned error");
             return NODE_EXIT;

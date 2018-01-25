@@ -730,7 +730,7 @@ int capentry( int snum, int *system )
            indicating the desired system. */
 
         if ((pkttype = pktWaitForPacket(CP_COMMAND,
-                                        buf, PKT_MAXSIZE, 1, NULL)) < 0)
+                                        buf, PKT_MAXSIZE, 1)) < 0)
         {
             utLog("conquestd:capentry: waitforpacket returned %d", pkttype);
             return false;
@@ -874,7 +874,7 @@ void dead( int snum )
     {
         if (pktWaitForPacket(CP_MESSAGE,
                              buf, PKT_MAXSIZE,
-                             (60 * 5), NULL) <= 0)
+                             (60 * 5)) <= 0)
 	{			/* error or timeout.  gen lastwords */
             robreply(buf);
             utStrncpy(cbConqInfo->lastwords, buf, MAXLASTWORDS);
@@ -1295,7 +1295,7 @@ void menu(void)
 
         if ( lose )				/* again, Jorge? */
 	{
-            pktSendAck(PSEV_FATAL, PERR_LOSE, NULL);
+            pktSendAck(PSEV_FATAL, PERR_LOSE);
             return;
 	}
 
@@ -1303,7 +1303,7 @@ void menu(void)
         cbShips[Context.snum].sdfuse = -TIMEOUT_PLAYER;
 
         if ((pkttype = pktWaitForPacket(PKT_ANYPKT,
-                                        buf, PKT_MAXSIZE, 0, NULL)) < 0)
+                                        buf, PKT_MAXSIZE, 0)) < 0)
 	{
             freeship();
             utLog("conquestd:menu: waitforpacket returned %d", pkttype);
@@ -1321,7 +1321,7 @@ void menu(void)
                 // tell the client
                 utLog("%s: Idle timeout after 5 minutes of inactivity, "
                       "exiting.", __FUNCTION__);
-                pktSendAck(PSEV_FATAL, PERR_IDLETIMEOUT, NULL);
+                pktSendAck(PSEV_FATAL, PERR_IDLETIMEOUT);
 
                 break;
             }
@@ -1441,7 +1441,7 @@ int newship( int unum, int *snum )
         if (!SVACANT(j))
         {		   /* if it's available, we'll take it */
 			   /* ...if it's not already being flown... */
-            pktSendAck(PSEV_ERROR, PERR_FLYING, NULL);
+            pktSendAck(PSEV_ERROR, PERR_FLYING);
             cbShips[*snum].status = SS_RESERVED;
             return ( false );
         }
@@ -1614,7 +1614,7 @@ int play(void)
 
         didsomething = 0;
         if ((pkttype = pktWaitForPacket(PKT_ANYPKT,
-                                        buf, PKT_MAXSIZE, 0, NULL)) < 0)
+                                        buf, PKT_MAXSIZE, 0)) < 0)
 	{
             if (errno != EINTR)
 	    {
@@ -1732,8 +1732,7 @@ int welcome( int *unum )
         /* Must be a new player. */
         if ( cbConqInfo->closed )
 	{
-            pktSendAck(PSEV_FATAL, PERR_CLOSED,
-                       NULL);
+            pktSendAck(PSEV_FATAL, PERR_CLOSED);
             return ( false );
 	}
         team = rndint( 0, NUMPLAYERTEAMS - 1 );
@@ -1747,8 +1746,7 @@ int welcome( int *unum )
 
         if ( ! clbRegister( name, cbuf, team, unum ) )
 	{
-            pktSendAck(PSEV_FATAL, PERR_REGISTER,
-                       NULL);
+            pktSendAck(PSEV_FATAL, PERR_REGISTER);
             return ( false );
 	}
 
@@ -1766,8 +1764,7 @@ int welcome( int *unum )
     /* Must be special to play when closed. */
     if ( cbConqInfo->closed && ! UPLAYWHENCLOSED(*unum) )
     {
-        pktSendAck(PSEV_FATAL, PERR_CLOSED,
-                   NULL);
+        pktSendAck(PSEV_FATAL, PERR_CLOSED);
         utLog("conquestd: welcome: game closed\n");
         return ( false );
     }
@@ -1775,8 +1772,7 @@ int welcome( int *unum )
     /* Can't play without a ship. */
     if ( ! clbFindShip( &Context.snum ) )
     {
-        pktSendAck(PSEV_FATAL, PERR_NOSHIP,
-                   NULL);
+        pktSendAck(PSEV_FATAL, PERR_NOSHIP);
         utLog("WELCOME: findship failed");
         return ( false );
     }
@@ -1800,7 +1796,6 @@ static int hello(void)
 {
     spHello_t shello = {};
     char buf[PKT_MAXSIZE];
-    char cbuf[MESSAGE_SIZE * 2];
     int pkttype;
     extern char *ConquestVersion, *ConquestDate;
     int rv;
@@ -1897,10 +1892,9 @@ static int hello(void)
     /* do some checks - send a NAK and fail if things aren't cool */
     if (chello.protover != PROTOCOL_VERSION)
     {
-        sprintf(cbuf, "SERVER: Protocol mismatch, server 0x%x, client 0x%x",
-                PROTOCOL_VERSION, chello.protover);
-        pktSendAck(PSEV_FATAL, PERR_BADPROTO, cbuf);
-        utLog("NET: %s", cbuf);
+        utLog("%s: Protocol mismatch, server 0x%x, client 0x%x",
+              __FUNCTION__, PROTOCOL_VERSION, chello.protover);
+        pktSendAck(PSEV_FATAL, PERR_BADPROTO);
         return false;
     }
 

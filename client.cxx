@@ -61,8 +61,7 @@ int sendAuth(int sock, uint8_t flag, const char *login, const char *pw)
     if (flag == CPAUTH_CHGPWD)
         return PERR_OK;
 
-    rv = pktWaitForPacket(SP_ACK, buf, PKT_MAXSIZE,
-                          60, NULL);
+    rv = pktWaitForPacket(SP_ACK, buf, PKT_MAXSIZE, 60);
 
     if (rv <= 0)			/* error or timeout (0) */
     {
@@ -74,7 +73,7 @@ int sendAuth(int sock, uint8_t flag, const char *login, const char *pw)
 
     /* now we should have our ACK... */
 
-    return sAckMsg.code;
+    return sAck.code;
 }
 
 int sendSetCourse(int sock, courseLock_t lock, uint16_t lockDetail, real head)
@@ -288,16 +287,14 @@ int clientHello(const char *clientname)
         return false;
     }
 
-    if (pkttype == SP_ACKMSG || pkttype == SP_ACK)/* we only get this if problem */
+    if (pkttype == SP_ACK)/* we only get this if problem */
     {
         if (PKT_PROCSP(buf))
 	{
-            utLog("clientHello: %s '%s'\n",
-                  pktSeverity2String(sAckMsg.severity),
-                  sAckMsg.txt);
-            printf("clientHello: %s '%s'\n",
-                   pktSeverity2String(sAckMsg.severity),
-                   sAckMsg.txt);
+            utLog("clientHello: %s'\n",
+                  pktSeverity2String(sAck.severity));
+            printf("clientHello: %s\n",
+                   pktSeverity2String(sAck.severity));
 
 	}
         return false;
@@ -323,7 +320,7 @@ int clientHello(const char *clientname)
         return false;
     }
 
-    pktSendAck(PSEV_INFO, PERR_OK, NULL);
+    pktSendAck(PSEV_INFO, PERR_OK);
 
     return true;
 }

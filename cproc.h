@@ -61,7 +61,7 @@ static dispatchProc_t cprocDispatchTable_0007[] = {
     procMessage,                  /* SP_MESSAGE */
     procUser,                     /* SP_USER */
     procTorp,                     /* SP_TORP */
-    procAck,                      /* SP_ACKMSG */
+    procAckUDP,                   /* SP_ACKUDP */
     procTeam,                     /* SP_TEAM */
     procTorpLoc,                  /* SP_TORPLOC */
     procConqInfo,                 /* SP_CONQINFO */
@@ -70,8 +70,7 @@ static dispatchProc_t cprocDispatchTable_0007[] = {
     procDoomsday,                 /* SP_DOOMSDAY */
     procPlanetInfo,               /* SP_PLANETINFO */
     procPlanetLoc2,               /* SP_PLANETLOC2 */
-    procTorpEvent,                /* SP_TORPEVENT */
-    procAckUDP                    /* SP_ACKUDP */
+    procTorpEvent                 /* SP_TORPEVENT */
 };
 
 #define CPROCDISPATCHTABLENUM_0007                              \

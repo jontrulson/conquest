@@ -686,7 +686,6 @@ int procDoomsday(char *buf)
 int procAck(char *buf)
 {
     spAck_t *sack;
-    spAckMsg_t *sackm;
 
     if (pktIsValid(SP_ACK, buf))
     {
@@ -699,32 +698,10 @@ int procAck(char *buf)
         else
             clientLastServerAckCode = sack->code;
 
-        /* set the global variants.  We save both Ack and AckMsgs here */
-        sAckMsg.type = sack->type;
-        sAckMsg.severity = sack->severity;
-        sAckMsg.code = sack->code;
-        sAckMsg.txt[0] = 0;
-
-        return true;
-    }
-
-    if (pktIsValid(SP_ACKMSG, buf))
-    {
-        sackm = (spAckMsg_t *)buf;
-        if (sackm->code == PERR_PINGRESP)
-        {
-            // not an error, log the response
-            pingResponse(clbGetMillis());
-        }
-        else
-            clientLastServerAckCode = sackm->code;
-
-        /* save a copy in the global variant. We save both Ack and AckMsgs here */
-        sAckMsg.type = sackm->type;
-        sAckMsg.severity = sackm->severity;
-        sAckMsg.code = sackm->code;
-        memset((void*)sAckMsg.txt, 0,  MESSAGE_SIZE);
-        utStrncpy((char *)sAckMsg.txt, (char *)sackm->txt, MESSAGE_SIZE);
+        /* set the global variants */
+        sAck.type = sack->type;
+        sAck.severity = sack->severity;
+        sAck.code = sack->code;
 
         return true;
     }

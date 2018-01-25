@@ -1127,7 +1127,7 @@ void procBomb(cpCommand_t *cmd)
     /* Check for allowability. */
     if ( cbShips[snum].warp >= 0.0 )
     {
-        pktSendAck(PSEV_INFO, PERR_CANCELED, NULL);
+        pktSendAck(PSEV_INFO, PERR_CANCELED);
         sendFeedback("We must be orbiting a planet to bombard it.");
         return;
     }
@@ -1137,20 +1137,20 @@ void procBomb(cpCommand_t *cmd)
     if ( cbPlanets[pnum].type == PLANET_SUN || cbPlanets[pnum].type == PLANET_MOON ||
          cbPlanets[pnum].team == TEAM_NOTEAM || cbPlanets[pnum].armies == 0 )
     {
-        pktSendAck(PSEV_INFO, PERR_CANCELED, NULL);
+        pktSendAck(PSEV_INFO, PERR_CANCELED);
         sendFeedback("There is no one there to bombard.");
         return;
     }
     if ( cbPlanets[pnum].team == cbShips[snum].team )
     {
-        pktSendAck(PSEV_INFO, PERR_CANCELED, NULL);
+        pktSendAck(PSEV_INFO, PERR_CANCELED);
         sendFeedback("We can't bomb our own armies!");
         return;
     }
     if ( cbPlanets[pnum].team != TEAM_SELFRULED && cbPlanets[pnum].team != TEAM_GOD )
         if ( ! cbShips[snum].war[cbPlanets[pnum].team] )
         {
-            pktSendAck(PSEV_INFO, PERR_CANCELED, NULL);
+            pktSendAck(PSEV_INFO, PERR_CANCELED);
             sendFeedback("But we are not at war with this planet!");
             return;
         }
@@ -1168,7 +1168,7 @@ void procBomb(cpCommand_t *cmd)
     {
         sprintf( cbuf, "That was a bad idea, %s...", cbShips[snum].alias );
         clbDamage( snum,  rnduni( 50.0, 100.0 ), KB_LIGHTNING, 0 );
-        pktSendAck(PSEV_INFO, PERR_CANCELED, NULL);
+        pktSendAck(PSEV_INFO, PERR_CANCELED);
         sendFeedback(cbuf);
         return;
     }
@@ -1202,16 +1202,14 @@ void procBomb(cpCommand_t *cmd)
 	{
             if ( cbShips[snum].wfuse > 0 )
 	    {
-                pktSendAck(PSEV_INFO, PERR_CANCELED,
-                           NULL);
+                pktSendAck(PSEV_INFO, PERR_CANCELED);
                 sendFeedback("Weapons are currently overloaded.");
                 goto cbrk22; /* break 2;*/
 	    }
             x = BOMBARD_FUEL * (real)(BOMBARD_GRAND / 1000.0);
             if ( ! clbUseFuel( snum, x, true, true ) )
 	    {
-                pktSendAck(PSEV_INFO, PERR_CANCELED,
-                           NULL);
+                pktSendAck(PSEV_INFO, PERR_CANCELED);
                 sendFeedback("Not enough fuel to bombard.");
                 goto cbrk22; /* break 2;*/
 	    }
@@ -1228,8 +1226,7 @@ void procBomb(cpCommand_t *cmd)
 		{
                     /* No more armies left to bomb. */
                     cbUnlock(&cbConqInfo->lockword);
-                    pktSendAck(PSEV_INFO, PERR_CANCELED,
-                               NULL);
+                    pktSendAck(PSEV_INFO, PERR_CANCELED);
                     sendFeedback(lastfew);
                     goto cbrk22; /* break 2;*/
 		}
@@ -1246,7 +1243,7 @@ void procBomb(cpCommand_t *cmd)
         if ( cbPlanets[pnum].armies <= MIN_BOMB_ARMIES )
 	{
             /* No more armies left to bomb. */
-            pktSendAck(PSEV_INFO, PERR_CANCELED, NULL);
+            pktSendAck(PSEV_INFO, PERR_CANCELED);
             sendFeedback(lastfew);
             break;
 	}
@@ -1325,7 +1322,7 @@ void procBeam(cpCommand_t *cmd)
     /* Check for allowability. */
     if ( cbShips[snum].warp >= 0.0 )
     {
-        pktSendAck(PSEV_INFO, PERR_CANCELED, NULL);
+        pktSendAck(PSEV_INFO, PERR_CANCELED);
         sendFeedback("We must be orbiting a planet to use the transporter.");
         return;
     }
@@ -1336,19 +1333,19 @@ void procBeam(cpCommand_t *cmd)
     {
         if ( cbPlanets[pnum].type == PLANET_SUN )
 	{
-            pktSendAck(PSEV_INFO, PERR_CANCELED, NULL);
+            pktSendAck(PSEV_INFO, PERR_CANCELED);
             sendFeedback("Idiot!  Our armies will fry down there!");
             return;
 	}
         else if ( cbPlanets[pnum].type == PLANET_MOON )
 	{
-            pktSendAck(PSEV_INFO, PERR_CANCELED, NULL);
+            pktSendAck(PSEV_INFO, PERR_CANCELED);
             sendFeedback("Fool!  Our armies will suffocate down there!");
             return;
 	}
         else if ( cbPlanets[pnum].team == TEAM_GOD )
 	{
-            pktSendAck(PSEV_INFO, PERR_CANCELED, NULL);
+            pktSendAck(PSEV_INFO, PERR_CANCELED);
             sendFeedback("GOD->you: YOUR ARMIES AREN'T GOOD ENOUGH FOR THIS PLANET.");
             return;
 	}
@@ -1362,7 +1359,7 @@ void procBeam(cpCommand_t *cmd)
         if ( i != 1 )
             utAppendChar(cbuf , 's') ;
         utAppendChar(cbuf , '.') ;
-        pktSendAck(PSEV_INFO, PERR_CANCELED, NULL);
+        pktSendAck(PSEV_INFO, PERR_CANCELED);
         sendFeedback(cbuf);
         return;
     }
@@ -1372,7 +1369,7 @@ void procBeam(cpCommand_t *cmd)
          cbPlanets[pnum].team != TEAM_NOTEAM )
         if ( ! cbShips[snum].war[cbPlanets[pnum].team] && cbPlanets[pnum].armies != 0) /* can take empty planets */
         {
-            pktSendAck(PSEV_INFO, PERR_CANCELED, NULL);
+            pktSendAck(PSEV_INFO, PERR_CANCELED);
             sendFeedback("But we are not at war with this planet!");
             return;
         }
@@ -1380,7 +1377,7 @@ void procBeam(cpCommand_t *cmd)
     if ( cbShips[snum].armies == 0 &&
          cbPlanets[pnum].team == cbShips[snum].team && cbPlanets[pnum].armies <= MIN_BEAM_ARMIES )
     {
-        pktSendAck(PSEV_INFO, PERR_CANCELED, NULL);
+        pktSendAck(PSEV_INFO, PERR_CANCELED);
         sendFeedback(lastfew);
         return;
     }
@@ -1389,7 +1386,7 @@ void procBeam(cpCommand_t *cmd)
 
     if ( rkills < (real)1.0 )
     {
-        pktSendAck(PSEV_INFO, PERR_CANCELED, NULL);
+        pktSendAck(PSEV_INFO, PERR_CANCELED);
         sendFeedback("Fleet orders prohibit beaming armies until you have a kill.");
         return;
     }
@@ -1423,7 +1420,7 @@ void procBeam(cpCommand_t *cmd)
             else
                 strcat(cbuf , "ies are") ;
             strcat(cbuf , " reluctant to beam aboard a pirate vessel.") ;
-            pktSendAck(PSEV_INFO, PERR_CANCELED, NULL);
+            pktSendAck(PSEV_INFO, PERR_CANCELED);
             sendFeedback(cbuf);
             return;
 	}
@@ -1433,7 +1430,7 @@ void procBeam(cpCommand_t *cmd)
     /* Figure out which direction to beam. */
     if ( upmax <= 0 && downmax <= 0 )
     {
-        pktSendAck(PSEV_INFO, PERR_CANCELED, NULL);
+        pktSendAck(PSEV_INFO, PERR_CANCELED);
         sendFeedback("There is no one to beam.");
         return;
     }
@@ -1498,8 +1495,7 @@ void procBeam(cpCommand_t *cmd)
                 if ( cbPlanets[pnum].armies <= MIN_BEAM_ARMIES )
 		{
                     cbUnlock(&cbConqInfo->lockword);
-                    pktSendAck(PSEV_INFO, PERR_CANCELED,
-                               NULL);
+                    pktSendAck(PSEV_INFO, PERR_CANCELED);
                     sendFeedback(lastfew);
                     break;
 		}
@@ -1533,8 +1529,7 @@ void procBeam(cpCommand_t *cmd)
             if ( total >= num )
 	    {
                 /* Done. */
-                pktSendAck(PSEV_INFO, PERR_DONE,
-                           NULL);
+                pktSendAck(PSEV_INFO, PERR_DONE);
                 sendFeedback("");
                 goto cbrk21;
 	    }
@@ -1619,8 +1614,7 @@ void procDestruct(cpCommand_t *cmd)
 
     if ( SCLOAKED(snum) )
     {
-        pktSendAck(PSEV_INFO, PERR_CANCELED,
-                   NULL);
+        pktSendAck(PSEV_INFO, PERR_CANCELED);
         sendFeedback("The cloaking device is using all available power.");
         return;
     }
@@ -1651,7 +1645,7 @@ void procDestruct(cpCommand_t *cmd)
         if ( pktReadPacketReady() )
 	{
             cbShips[Context.snum].sdfuse = 0;
-            pktSendAck(PSEV_INFO, PERR_CANCELED, NULL);
+            pktSendAck(PSEV_INFO, PERR_CANCELED);
             return;
 	}
 
@@ -1680,8 +1674,7 @@ void procDestruct(cpCommand_t *cmd)
             clbKillShip( Context.snum, KB_SELF, 0 );
     }
 
-    pktSendAck(PSEV_INFO, PERR_DONE,
-               NULL);
+    pktSendAck(PSEV_INFO, PERR_DONE);
     return;
 
 }
@@ -1732,7 +1725,7 @@ void procAutoPilot(cpCommand_t *cmd)
 
         if ( pktReadPacketReady() )
         {
-            pktSendAck(PSEV_INFO, PERR_CANCELED, NULL);
+            pktSendAck(PSEV_INFO, PERR_CANCELED);
             break;
         }
 
@@ -1742,8 +1735,7 @@ void procAutoPilot(cpCommand_t *cmd)
     SFCLR(snum, SHIP_F_ROBOT);
     cbShips[snum].action = 0;
 
-    pktSendAck(PSEV_INFO, PERR_DONE,
-               NULL);
+    pktSendAck(PSEV_INFO, PERR_DONE);
 
     return;
 }

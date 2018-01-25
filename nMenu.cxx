@@ -185,7 +185,7 @@ void nMenuInit(void)
         /* now look for our ship packet before we get started.  It should be a
            full SP_SHIP packet for this first time */
         if (pktWaitForPacket(SP_SHIP, buf, PKT_MAXSIZE,
-                             60, NULL) <= 0)
+                             60) <= 0)
         {
             utLog("nMenuInit: didn't get initial SP_SHIP");
             fatal = true;

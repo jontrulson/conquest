@@ -47,7 +47,7 @@ uint8_t               clientStatLastFlags = 0;
  * afterwards (like Auth, Welcome, etc)...
  */
 
-spAckMsg_t            sAckMsg;  /* hold Ack or AckMsg pkt */
+spAck_t               sAck;  /* hold Ack */
 spClientStat_t        sClientStat;
 spFrame_t             sFrame;
 #else
@@ -58,7 +58,7 @@ extern int            clientLastServerAckCode;
 extern bool           clientStatReceived;
 extern uint8_t        clientStatLastFlags;
 
-extern spAckMsg_t     sAckMsg;  /* hold Ack or AckMsg pkt */
+extern spAck_t        sAck;  /* hold Ack pkt */
 extern spClientStat_t sClientStat;
 extern spFrame_t      sFrame;
 #endif

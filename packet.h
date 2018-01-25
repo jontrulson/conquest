@@ -101,7 +101,7 @@ int   pktSetClientProtocolVersion(uint16_t vers);
 void  pktSetSocketFds(int tcpsock, int udpsock);
 
 void  pktSendAckUDP(int socktype, uint8_t state, uint32_t payload);
-int   pktSendAck(uint8_t severity, uint8_t code, const char *msg);
+int   pktSendAck(uint8_t severity, uint8_t code);
 int   pktIsConnDead(void);
 int   pktNotImpl(char *nothing);
 
@@ -110,8 +110,7 @@ void  pktSetNonBlocking(int enable);
 
 const char *pktSeverity2String(int psev);
 
-int   pktWaitForPacket(int type, char *buf, int blen,
-                       int delay, const char *nakmsg);
+int   pktWaitForPacket(int type, char *buf, int blen, int delay);
 
 int   pktClientPacketSize(int type);
 int   pktServerPacketSize(int type);

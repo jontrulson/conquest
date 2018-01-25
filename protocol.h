@@ -32,7 +32,7 @@
 #define SP_MESSAGE        11
 #define SP_USER           12
 #define SP_TORP           13
-#define SP_ACKMSG         14
+#define SP_ACKUDP         14    /* Ack UDP from server to client */
 #define SP_TEAM           15
 #define SP_TORPLOC        16
 #define SP_CONQINFO       17
@@ -45,8 +45,6 @@
 #define SP_PLANETLOC2     22    /* new planloc packet */
 
 #define SP_TORPEVENT      23    /* torp launch/status */
-
-#define SP_ACKUDP         24    /* Ack UDP from server to client */
 
 /* client -> server packet types */
 
@@ -143,16 +141,6 @@ typedef struct {
     uint8_t pad1;
 
 } spAck_t;
-
-/* ACK with message text */
-typedef struct {
-    uint8_t type;                       /* SP_ACKMSG */
-    uint8_t severity;           /* none, info, warning, etc */
-    uint8_t code;                       /* ack code */
-    uint8_t pad1;
-
-    uint8_t txt[MESSAGE_SIZE];  /* text */
-} spAckMsg_t;
 
 typedef struct {
     uint8_t  type;              /* SP_SERVSTAT */

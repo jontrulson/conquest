@@ -322,9 +322,9 @@ static packetEnt_t serverPackets_0007[] = {
       "SP_TORP",
       pktNotImpl
     },
-    { SP_ACKMSG,
-      sizeof(spAckMsg_t),
-      "SP_ACKMSG",
+    { SP_ACKUDP,
+      sizeof(spAckUDP_t),
+      "SP_ACKUDP",
       pktNotImpl
     },
     { SP_TEAM,
@@ -370,11 +370,6 @@ static packetEnt_t serverPackets_0007[] = {
     { SP_TORPEVENT,
       sizeof(spTorpEvent_t),
       "SP_TORPEVENT",
-      pktNotImpl
-    },
-    { SP_ACKUDP,
-      sizeof(spAckUDP_t),
-      "SP_ACKUDP",
       pktNotImpl
     }
 };
@@ -548,11 +543,10 @@ void pktSendAckUDP(int socktype, uint8_t state, uint32_t payload)
  * string message as well. We always send acks via TCP.
  */
 
-int pktSendAck(uint8_t severity, uint8_t code, const char *msg)
+int pktSendAck(uint8_t severity, uint8_t code)
 {
     cpAck_t cack = {};
     spAck_t sack = {};
-    spAckMsg_t sackmsg = {};
     void *buf = NULL;
 
     if (tcp_sock < 0)
@@ -568,26 +562,13 @@ int pktSendAck(uint8_t severity, uint8_t code, const char *msg)
     }
     else
     {                           /* server */
-        if (msg)
-	{
-            sackmsg.type = SP_ACKMSG;
-            memset(sackmsg.txt, 0, MESSAGE_SIZE);
-            strncpy((char *)sackmsg.txt, msg, MESSAGE_SIZE - 1);
-            sackmsg.severity = severity;
-            sackmsg.code = code;
+        sack.type = SP_ACK;
+        sack.severity = severity;
+        sack.code = code;
+        sack.severity = severity;
+        sack.code = code;
 
-            buf = &sackmsg;
-	}
-        else
-	{
-            sack.type = SP_ACK;
-            sack.severity = severity;
-            sack.code = code;
-            sack.severity = severity;
-            sack.code = code;
-
-            buf = &sack;
-	}
+        buf = &sack;
     }
 
     return(pktWrite(PKT_SENDTCP, buf));
@@ -621,8 +602,7 @@ const char *pktSeverity2String(int psev)
     return ("");			/* NOTREACHED */
 }
 
-int pktWaitForPacket(int type, char *buf, int blen,
-                     int delay, const char *nakmsg)
+int pktWaitForPacket(int type, char *buf, int blen, int delay)
 {
     int pkttype;
 
@@ -634,8 +614,6 @@ int pktWaitForPacket(int type, char *buf, int blen,
             if (pkttype == type || type == PKT_ANYPKT || pkttype == 0)
                 return pkttype;
 
-            if (pkttype != type && nakmsg) /* we need to use a msg nak */
-                pktSendAck(PSEV_ERROR, PERR_UNSPEC, nakmsg);
 	}
 
         if (pkttype < 0)
@@ -787,7 +765,7 @@ static uint8_t _pktReadGetRB(ringBuffer_t *RB, void *buf, int blen, int update)
                     if ( pktCmd == CPCMD_PING )
                     {
                         // send a response, remove it from the RB
-                        pktSendAck(PSEV_INFO, PERR_PINGRESP, NULL);
+                        pktSendAck(PSEV_INFO, PERR_PINGRESP);
                         if (!update)
                             rbGet(RB, NULL, len, true);
                         return 0;

@@ -84,7 +84,7 @@ int Authenticate(char *username, char *password)
     while (!done)
     {
         rv = pktWaitForPacket(CP_AUTHENTICATE, buf,
-                              PKT_MAXSIZE, (60 * 10), "Waiting for Auth");
+                              PKT_MAXSIZE, (60 * 10));
 
         if (rv <= 0)
 	{
@@ -98,8 +98,7 @@ int Authenticate(char *username, char *password)
 
         if (checkuname((char *)cauth->login) == false)
 	{
-            pktSendAck(PSEV_ERROR, PERR_INVUSER,
-                       NULL);
+            pktSendAck(PSEV_ERROR, PERR_INVUSER);
             continue;
 	}
 
@@ -110,13 +109,11 @@ int Authenticate(char *username, char *password)
             if (clbGetUserNum( &unum, (char *)cauth->login,
                                USERTYPE_NORMAL ) == true)
 	    {			/* user exits */
-                pktSendAck(PSEV_INFO, PERR_OK,
-                           NULL);
+                pktSendAck(PSEV_INFO, PERR_OK);
 	    }
             else
 	    {
-                pktSendAck(PSEV_ERROR, PERR_NOUSER,
-                           NULL);
+                pktSendAck(PSEV_ERROR, PERR_NOUSER);
 	    }
 
             break;
@@ -125,23 +122,20 @@ int Authenticate(char *username, char *password)
 
             if (logcount <= 0)	/* too many tries, fail */
 	    {
-                pktSendAck(PSEV_FATAL, PERR_BADPWD,
-                           NULL);
+                pktSendAck(PSEV_FATAL, PERR_BADPWD);
                 return false;
 	    }
 
             if ((rv = doLogin((char *)cauth->login, (char *)cauth->pw,
                               epw)) != PERR_OK)
 	    {			/* somethings wrong, bad/inv pw, etc */
-                pktSendAck(PSEV_ERROR, rv,
-                           NULL);
+                pktSendAck(PSEV_ERROR, rv);
                 logcount--;
 	    }
             else
 	    {			/* login successful */
                 done = true;
-                pktSendAck(PSEV_INFO, PERR_OK,
-                           NULL);
+                pktSendAck(PSEV_INFO, PERR_OK);
 	    }
 
             break;
