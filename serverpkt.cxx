@@ -712,13 +712,13 @@ spTorpLoc_t *spktTorpLoc(uint8_t tsnum, uint8_t tnum, int rec)
 
         if (dis > ACCINFO_DIST)
         {                       /* in the bermuda triangle */
-            x = 1e7;
-            y = 1e7;
+            x = 1e8;
+            y = 1e8;
         }
     }
 
-    storploc.x = (int32_t)htonl((int32_t)(x * 1000.0));
-    storploc.y = (int32_t)htonl((int32_t)(y * 1000.0));
+    storploc.x = (int32_t)htonl((int32_t)(x * 10.0));
+    storploc.y = (int32_t)htonl((int32_t)(y * 10.0));
 
     if (rec)
     {
@@ -780,10 +780,10 @@ spTorpEvent_t *spktTorpEvent(uint8_t tsnum, uint8_t tnum, int rec)
     dx = cbShips[tsnum].torps[tnum].dx;
     dy = cbShips[tsnum].torps[tnum].dy;
 
-    storpev.x = (int32_t)htonl((int32_t)(x * 1000.0));
-    storpev.y = (int32_t)htonl((int32_t)(y * 1000.0));
-    storpev.dx = (int32_t)htonl((int32_t)(dx * 1000.0));
-    storpev.dy = (int32_t)htonl((int32_t)(dy * 1000.0));
+    storpev.x = (int32_t)htonl((int32_t)(x * 10.0));
+    storpev.y = (int32_t)htonl((int32_t)(y * 10.0));
+    storpev.dx = (int32_t)htonl((int32_t)(dx * 100.0));
+    storpev.dy = (int32_t)htonl((int32_t)(dy * 100.0));
 
     if (rec)
     {

@@ -42,7 +42,7 @@
 
 #define SP_PLANETINFO     21    /* planet's orbital characteristics */
 
-#define SP_PLANETLOC2     22    /* new planloc packet */
+#define SP_NOT_USED1      22    /* was planloc2, now avail for use */
 
 #define SP_TORPEVENT      23    /* torp launch/status */
 

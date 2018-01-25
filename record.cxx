@@ -510,13 +510,13 @@ void recGenTorpLoc(void)
 
                         if (dis > ACCINFO_DIST)
                         {                       /* in the bermuda triangle */
-                            x = 1e7;
-                            y = 1e7;
+                            x = 1e8;
+                            y = 1e8;
                         }
                     }
 
-                    storploc.x = (int32_t)htonl((int32_t)(x * 1000.0));
-                    storploc.y = (int32_t)htonl((int32_t)(y * 1000.0));
+                    storploc.x = (int32_t)htonl((int32_t)(x * 10.0));
+                    storploc.y = (int32_t)htonl((int32_t)(y * 10.0));
 
                     /* only send 'war' status as it relates to our team */
                     if (cbShips[i].torps[j].war[team])

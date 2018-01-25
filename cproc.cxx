@@ -442,8 +442,10 @@ int procTorpLoc(char *buf)
         else
             cbShips[snum].torps[tnum].war[i] = false;
 
-    cbShips[snum].torps[tnum].x = (real)((real)((int32_t)ntohl(storploc->x)) / 1000.0);
-    cbShips[snum].torps[tnum].y = (real)((real)((int32_t)ntohl(storploc->y)) / 1000.0);
+    cbShips[snum].torps[tnum].x =
+        (real)((real)((int32_t)ntohl(storploc->x)) / 10.0);
+    cbShips[snum].torps[tnum].y =
+        (real)((real)((int32_t)ntohl(storploc->y)) / 10.0);
 
     return true;
 }
@@ -478,14 +480,14 @@ int procTorpEvent(char *buf)
             cbShips[snum].torps[tnum].war[i] = false;
 
     cbShips[snum].torps[tnum].x =
-        (real)((real)((int32_t)ntohl(storpev->x)) / 1000.0);
+        (real)((real)((int32_t)ntohl(storpev->x)) / 10.0);
     cbShips[snum].torps[tnum].y =
-        (real)((real)((int32_t)ntohl(storpev->y)) / 1000.0);
+        (real)((real)((int32_t)ntohl(storpev->y)) / 10.0);
 
     cbShips[snum].torps[tnum].dx =
-        (real)((real)((int32_t)ntohl(storpev->dx)) / 1000.0);
+        (real)((real)((int32_t)ntohl(storpev->dx)) / 100.0);
     cbShips[snum].torps[tnum].dy =
-        (real)((real)((int32_t)ntohl(storpev->dy)) / 1000.0);
+        (real)((real)((int32_t)ntohl(storpev->dy)) / 100.0);
 
     return true;
 }
