@@ -351,8 +351,8 @@ int procPlanetLoc(char *buf)
         recWriteEvent(buf);
 
     cbPlanets[pnum].armies = (int)((int16_t)ntohs(splanloc->armies));
-    cbPlanets[pnum].x = (real)((real)((int32_t)ntohl(splanloc->x)) / 1000.0);
-    cbPlanets[pnum].y = (real)((real)((int32_t)ntohl(splanloc->y)) / 1000.0);
+    cbPlanets[pnum].x = (real)((real)((int32_t)ntohl(splanloc->x)) / 10.0);
+    cbPlanets[pnum].y = (real)((real)((int32_t)ntohl(splanloc->y)) / 10.0);
     cbPlanets[pnum].orbang = (real)((real)((uint16_t)ntohs(splanloc->orbang)) / 100.0);
 
     return true;

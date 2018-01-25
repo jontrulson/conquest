@@ -618,8 +618,8 @@ spPlanetLoc_t *spktPlanetLoc(uint8_t pnum, int rec, int force)
 
     tstart[pnum] = iternow;
 
-    splanloc.x = (int32_t)htonl((int32_t)(cbPlanets[pnum].x * 1000.0));
-    splanloc.y = (int32_t)htonl((int32_t)(cbPlanets[pnum].y * 1000.0));
+    splanloc.x = (int32_t)htonl((int32_t)(cbPlanets[pnum].x * 10.0));
+    splanloc.y = (int32_t)htonl((int32_t)(cbPlanets[pnum].y * 10.0));
     splanloc.orbang = (uint16_t)htons((uint16_t)(cbPlanets[pnum].orbang * 100.0));
 
     if (rec)

@@ -276,22 +276,22 @@ typedef struct {
 } spPlanet_t;
 
 typedef struct {
-    uint8_t  type;                      /* SP_PLANETSML */
-    uint8_t  pnum;                      /* planet number */
-    uint8_t  scanned;           /* bitmask of teams that have scanned */
+    uint8_t  type;            /* SP_PLANETSML */
+    uint8_t  pnum;            /* planet number */
+    uint8_t  scanned;         /* bitmask of teams that have scanned */
     uint8_t  uninhabtime;
 } spPlanetSml_t;
 
 typedef struct {
-    uint8_t  type;                 /* SP_PLANETLOC */
+    uint8_t  type;              /* SP_PLANETLOC */
     uint8_t  pnum;
     int16_t  armies;
 
-    int32_t   x;                        /* x1000 */
+    int32_t   x;                /* x10 */
 
-    int32_t   y;                        /* x1000 */
+    int32_t   y;                /* x10 */
 
-    uint16_t orbang;               /* x100 */
+    uint16_t orbang;            /* x100 */
     uint16_t pad;
 } spPlanetLoc_t;
 
