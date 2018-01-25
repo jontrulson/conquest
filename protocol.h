@@ -446,8 +446,8 @@ typedef struct {
     uint8_t  flags;
     uint8_t  pad[2];
 
-    int32_t  x;                 /* x1000 */
-    int32_t  y;                 /* x1000 */
+    int32_t  x;                 /* x10 */
+    int32_t  y;                 /* x10 */
 } spDoomsday_t;
 
 

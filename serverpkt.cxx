@@ -927,8 +927,8 @@ spDoomsday_t *spktDoomsday(int rec)
 
     dd.type = SP_DOOMSDAY;
     dd.heading = htons((uint16_t)(cbDoomsday->heading * 10.0));
-    dd.x = (int32_t)htonl((int32_t)(cbDoomsday->x * 1000.0));
-    dd.y = (int32_t)htonl((int32_t)(cbDoomsday->y * 1000.0));
+    dd.x = (int32_t)htonl((int32_t)(cbDoomsday->x * 10.0));
+    dd.y = (int32_t)htonl((int32_t)(cbDoomsday->y * 10.0));
 
     dd.eaterType = static_cast<uint8_t>(cbDoomsday->eaterType);
     dd.flags = cbDoomsday->flags;
