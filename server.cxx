@@ -149,7 +149,6 @@ int sendPlanet(int sock, uint8_t pnum, int force)
     spPlanet_t *splan;
     spPlanetSml_t *splansml;
     spPlanetLoc_t *splanloc;
-    spPlanetLoc2_t *splanloc2;
     spPlanetInfo_t *splaninfo;
 
 #if defined(DEBUG_SERVERSEND)
@@ -190,10 +189,6 @@ int sendPlanet(int sock, uint8_t pnum, int force)
         if (pktWrite(PKT_SENDTCP, splaninfo) <= 0)
             return false;
 
-    /* we will do loc packets for recording purposes only.  loc2 is sent
-       to clients, but not recorded (server-side), since the clients
-       compute their own planetary movement based on them. */
-
     /* SP_PLANETLOC */
     if (Context.recmode == RECMODE_ON)
     {
@@ -201,9 +196,8 @@ int sendPlanet(int sock, uint8_t pnum, int force)
             recWriteEvent(splanloc);
     }
 
-    /* SP_PLANETLOC2 */
-    if ((splanloc2 = spktPlanetLoc2(pnum, false, force)))
-        if (pktWrite(PKT_SENDTCP, splanloc2) <= 0)
+    if ((splanloc = spktPlanetLoc(pnum, false, force)))
+        if (pktWrite(PKT_SENDTCP, splanloc) <= 0)
             return false;
 
     return true;

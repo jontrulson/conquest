@@ -26,7 +26,6 @@ int             procShipLoc(char *buf);
 int             procPlanet(char *buf);
 int             procPlanetSml(char *buf);
 int             procPlanetLoc(char *buf);
-int             procPlanetLoc2(char *buf);
 int             procPlanetInfo(char *buf);
 int             procTorp(char *buf);
 int             procTorpLoc(char *buf);
@@ -69,7 +68,7 @@ static dispatchProc_t cprocDispatchTable_0007[] = {
     procHistory,                  /* SP_HISTORY */
     procDoomsday,                 /* SP_DOOMSDAY */
     procPlanetInfo,               /* SP_PLANETINFO */
-    procPlanetLoc2,               /* SP_PLANETLOC2 */
+    pktNotImpl,                   /* was PLANETLOC2, avail for REUSE */
     procTorpEvent                 /* SP_TORPEVENT */
 };
 

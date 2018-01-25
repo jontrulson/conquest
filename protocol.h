@@ -285,25 +285,15 @@ typedef struct {
 typedef struct {
     uint8_t  type;                 /* SP_PLANETLOC */
     uint8_t  pnum;
-    int16_t   armies;
-
-    int32_t   x;                        /* x1000 */
-
-    int32_t   y;                        /* x1000 */
-} spPlanetLoc_t;
-
-typedef struct {
-    uint8_t  type;                  /* SP_PLANETLOC2 */
-    uint8_t  pnum;
-    int16_t   armies;
+    int16_t  armies;
 
     int32_t   x;                        /* x1000 */
 
     int32_t   y;                        /* x1000 */
 
     uint16_t orbang;               /* x100 */
-
-} spPlanetLoc2_t;
+    uint16_t pad;
+} spPlanetLoc_t;
 
 typedef struct {
     uint8_t  type;                      /* SP_PLANETINFO */

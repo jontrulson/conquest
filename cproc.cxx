@@ -353,30 +353,7 @@ int procPlanetLoc(char *buf)
     cbPlanets[pnum].armies = (int)((int16_t)ntohs(splanloc->armies));
     cbPlanets[pnum].x = (real)((real)((int32_t)ntohl(splanloc->x)) / 1000.0);
     cbPlanets[pnum].y = (real)((real)((int32_t)ntohl(splanloc->y)) / 1000.0);
-
-    return true;
-}
-
-int procPlanetLoc2(char *buf)
-{
-    spPlanetLoc2_t *splanloc2 = (spPlanetLoc2_t *)buf;
-    int pnum;
-
-    if (!pktIsValid(SP_PLANETLOC2, buf))
-        return false;
-
-    pnum = splanloc2->pnum;
-
-    if (pnum < 0 || pnum >= cbLimits.maxPlanets())
-        return false;
-
-    if (Context.recmode == RECMODE_ON)
-        recWriteEvent(buf);
-
-    cbPlanets[pnum].armies = (int)((int16_t)ntohs(splanloc2->armies));
-    cbPlanets[pnum].x = (real)((real)((int32_t)ntohl(splanloc2->x)) / 1000.0);
-    cbPlanets[pnum].y = (real)((real)((int32_t)ntohl(splanloc2->y)) / 1000.0);
-    cbPlanets[pnum].orbang = (real)((real)((uint16_t)ntohs(splanloc2->orbang)) / 100.0);
+    cbPlanets[pnum].orbang = (real)((real)((uint16_t)ntohs(splanloc->orbang)) / 100.0);
 
     return true;
 }

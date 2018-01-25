@@ -362,9 +362,9 @@ static packetEnt_t serverPackets_0007[] = {
       "SP_PLANETINFO",
       pktNotImpl
     },
-    { SP_PLANETLOC2,
-      sizeof(spPlanetLoc2_t),
-      "SP_PLANETLOC2",
+    { SP_NULL, // was PLANETLOC2 - available for re-use
+      sizeof(spNull_t),
+      "SP_NULL",
       pktNotImpl
     },
     { SP_TORPEVENT,

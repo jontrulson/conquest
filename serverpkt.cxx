@@ -41,7 +41,6 @@ static vector<spShipLoc_t> pktShipLoc;
 static vector<spPlanet_t> pktPlanet;
 static vector<spPlanetSml_t> pktPlanetSml;
 static vector<spPlanetLoc_t> pktPlanetLoc;
-static vector<spPlanetLoc2_t> pktPlanetLoc2;
 static vector<spUser_t> pktUser;
 static vector<vector<spTorp_t>> pktTorp;
 static vector<vector<spTorpLoc_t>> pktTorpLoc;
@@ -59,7 +58,6 @@ static vector<spShipLoc_t> recShipLoc;
 static vector<spPlanet_t> recPlanet;
 static vector<spPlanetSml_t> recPlanetSml;
 static vector<spPlanetLoc_t> recPlanetLoc;
-static vector<spPlanetLoc2_t> recPlanetLoc2;
 static vector<vector<spTorp_t>> recTorp;
 static vector<vector<spTorpLoc_t>> recTorpLoc;
 static vector<vector<spTorpEvent_t>> recTorpEvent;
@@ -85,7 +83,6 @@ void spktInitPkt(void)
     _INIT_VEC1D(pktPlanet, spPlanet_t, cbLimits.maxPlanets());
     _INIT_VEC1D(pktPlanetSml, spPlanetSml_t, cbLimits.maxPlanets());
     _INIT_VEC1D(pktPlanetLoc, spPlanetLoc_t, cbLimits.maxPlanets());
-    _INIT_VEC1D(pktPlanetLoc2, spPlanetLoc2_t, cbLimits.maxPlanets());
     _INIT_VEC1D(pktUser, spUser_t, cbLimits.maxUsers());
 
     _INIT_VEC2D(pktTorp, spTorp_t, cbLimits.maxShips(), cbLimits.maxTorps());
@@ -116,7 +113,6 @@ void spktInitRec(void)
     _INIT_VEC1D(recPlanet, spPlanet_t, cbLimits.maxPlanets());
     _INIT_VEC1D(recPlanetSml, spPlanetSml_t, cbLimits.maxPlanets());
     _INIT_VEC1D(recPlanetLoc, spPlanetLoc_t, cbLimits.maxPlanets());
-    _INIT_VEC1D(recPlanetLoc2, spPlanetLoc2_t, cbLimits.maxPlanets());
 
     _INIT_VEC2D(recTorp, spTorp_t, cbLimits.maxShips(), cbLimits.maxTorps());
     _INIT_VEC2D(recTorpLoc, spTorpLoc_t, cbLimits.maxShips(),
@@ -589,21 +585,24 @@ spPlanetSml_t *spktPlanetSml(uint8_t pnum, int rec)
     return NULL;
 }
 
-// This is only used in server recordings.  For clients, Loc2 packets
-// are used.
 spPlanetLoc_t *spktPlanetLoc(uint8_t pnum, int rec, int force)
 {
     int snum = Context.snum;
     int team = cbShips[snum].team;
     static spPlanetLoc_t splanloc;
-    real dx, dy;
-    static real px[ABS_MAXPLANETS] = {}; /* saved x/y */
-    static real py[ABS_MAXPLANETS] = {};
+    uint32_t iternow = clbGetMillis(); /* we send packets only every 5 secs */
+    const uint32_t iterwait = 5000.0; /* ms */
+    static uint32_t tstart[ABS_MAXPLANETS] = {}; /* saved time deltas */
+    int tooearly = false;
 
-    // Save some time, if we are not recording, bail.  We no longer
-    // send these to the client.
-    if (!rec)
-        return NULL;
+    /*
+     * We have to handle the case where a planet has just been freshly
+     * scanned (and therefore a real army count is available).  We want
+     * the client to see the true army count as soon as possible.
+     */
+
+    if (!force && (tstart[pnum] != 0 && ((iternow - tstart[pnum]) < iterwait)))
+        tooearly = true;
 
     memset((void *)&splanloc, 0, sizeof(spPlanetLoc_t));
 
@@ -614,45 +613,14 @@ spPlanetLoc_t *spktPlanetLoc(uint8_t pnum, int rec, int force)
     if (cbPlanets[pnum].scanned[team] || rec)
         splanloc.armies = htons(cbPlanets[pnum].armies);
 
-    dx = (real)fabs(cbPlanets[pnum].x - px[pnum]);
-    dy = (real)fabs(cbPlanets[pnum].y - py[pnum]);
+    if (splanloc.armies == pktPlanetLoc[pnum].armies && tooearly)
+        return NULL;
 
-
-    /* we try to be clever here by reducing the pkt count.  If armies are
-       the same, and an average delta of the planet's movement is below
-       an empirically determined value, don't bother sending the packet.
-
-       The idea is that fast moving planets will be updated more frequently
-       than slower moving ones, hopefully reducing the packet count required
-       for the appearence of smoother movement to the user.
-    */
-    if ((splanloc.armies == pktPlanetLoc[pnum].armies) &&
-        ((dx + dy) / 2.0) < 3.0)
-    {
-#if 0
-        utLog("REJECT: %s dx = %f dy = %f [%f]", cbPlanets[pnum].name,
-              dx, dy,
-              ((dx + dy) / 2.0));
-#endif
-
-        if (!rec && !force)
-            return NULL;
-    }
-
-    if (!rec)
-    {
-        px[pnum] = cbPlanets[pnum].x;
-        py[pnum] = cbPlanets[pnum].y;
-    }
-
-#if 0
-    utLog("%s dx = %f dy = %f [%f]", cbPlanets[pnum].name,
-          dx, dy,
-          ((dx + dy) / 2.0));
-#endif
+    tstart[pnum] = iternow;
 
     splanloc.x = (int32_t)htonl((int32_t)(cbPlanets[pnum].x * 1000.0));
     splanloc.y = (int32_t)htonl((int32_t)(cbPlanets[pnum].y * 1000.0));
+    splanloc.orbang = (uint16_t)htons((uint16_t)(cbPlanets[pnum].orbang * 100.0));
 
     if (rec)
     {
@@ -675,66 +643,6 @@ spPlanetLoc_t *spktPlanetLoc(uint8_t pnum, int rec, int force)
 
     return NULL;
 }
-
-spPlanetLoc2_t *spktPlanetLoc2(uint8_t pnum, int rec, int force)
-{
-    int snum = Context.snum;
-    int team = cbShips[snum].team;
-    static spPlanetLoc2_t splanloc2;
-    uint32_t iternow = clbGetMillis(); /* we send the loc2 packets only every 5 secs */
-    const uint32_t iterwait = 5000.0; /* ms */
-    static uint32_t tstart[ABS_MAXPLANETS] = {}; /* saved time deltas */
-    int tooearly = false;
-
-    /*
-     * We have to handle the case where a planet has just been freshly
-     * scanned (and therefore a real army count is available).  We want
-     * the client to see the true army count as soon as possible.
-     */
-
-    if (!force && (tstart[pnum] != 0 && ((iternow - tstart[pnum]) < iterwait)))
-        tooearly = true;
-
-    memset((void *)&splanloc2, 0, sizeof(spPlanetLoc2_t));
-
-    splanloc2.type = SP_PLANETLOC2;
-    splanloc2.pnum = pnum;
-
-    /* RESTRICT */
-    if (cbPlanets[pnum].scanned[team] || rec)
-        splanloc2.armies = htons(cbPlanets[pnum].armies);
-
-    if (splanloc2.armies == pktPlanetLoc2[pnum].armies && tooearly)
-        return NULL;
-
-    tstart[pnum] = iternow;
-
-    splanloc2.x = (int32_t)htonl((int32_t)(cbPlanets[pnum].x * 1000.0));
-    splanloc2.y = (int32_t)htonl((int32_t)(cbPlanets[pnum].y * 1000.0));
-    splanloc2.orbang = (uint16_t)htons((uint16_t)(cbPlanets[pnum].orbang * 100.0));
-
-    if (rec)
-    {
-        if (memcmp((void *)&splanloc2, (void *)&recPlanetLoc2[pnum],
-                   sizeof(spPlanetLoc2_t)))
-        {
-            recPlanetLoc2[pnum] = splanloc2;
-            return &splanloc2;
-        }
-    }
-    else
-    {
-        if (memcmp((void *)&splanloc2, (void *)&pktPlanetLoc2[pnum],
-                   sizeof(spPlanetLoc2_t)))
-        {
-            pktPlanetLoc2[pnum] = splanloc2;
-            return &splanloc2;
-        }
-    }
-
-    return NULL;
-}
-
 
 
 /* non priv */

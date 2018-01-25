@@ -27,7 +27,6 @@ spShipLoc_t    *spktShipLoc(uint8_t snum, int rec);
 spPlanet_t     *spktPlanet(uint8_t pnum, int rec);
 spPlanetSml_t  *spktPlanetSml(uint8_t pnum, int rec);
 spPlanetLoc_t  *spktPlanetLoc(uint8_t pnum, int rec, int force);
-spPlanetLoc2_t *spktPlanetLoc2(uint8_t pnum, int rec, int force);
 
 spTorp_t       *spktTorp(uint8_t tsnum, uint8_t tnum, int rec);
 spTorpLoc_t    *spktTorpLoc(uint8_t tsnum, uint8_t tnum, int rec);
