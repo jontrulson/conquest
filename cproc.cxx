@@ -268,8 +268,8 @@ int procShipLoc(char *buf)
     cbShips[snum].head = (real)((real)ntohs(sshiploc->head) / 10.0);
     cbShips[snum].warp = (real)((real)sshiploc->warp / 10.0);
 
-    cbShips[snum].x = (real)((real)((int32_t)ntohl(sshiploc->x)) / 1000.0);
-    cbShips[snum].y = (real)((real)((int32_t)ntohl(sshiploc->y)) / 1000.0);
+    cbShips[snum].x = (real)((real)((int32_t)ntohl(sshiploc->x)) / 10.0);
+    cbShips[snum].y = (real)((real)((int32_t)ntohl(sshiploc->y)) / 10.0);
 
     return true;
 }

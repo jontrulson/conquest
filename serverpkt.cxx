@@ -424,8 +424,8 @@ spShipLoc_t *spktShipLoc(uint8_t snum, int rec)
         {
             if (cbShips[snum].warp == 0.0)
             {
-                x = 1e7;
-                y = 1e7;
+                x = 1e8;
+                y = 1e8;
             }
             else
             { /* if your cloaked, and moving, get smeared x/y */
@@ -453,8 +453,8 @@ spShipLoc_t *spktShipLoc(uint8_t snum, int rec)
 	}
     }
 
-    sshiploc.x = (int32_t)htonl((int32_t)(x * 1000.0));
-    sshiploc.y = (int32_t)htonl((int32_t)(y * 1000.0));
+    sshiploc.x = (int32_t)htonl((int32_t)(x * 10.0));
+    sshiploc.y = (int32_t)htonl((int32_t)(y * 10.0));
 
     if (rec)
     {

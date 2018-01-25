@@ -257,9 +257,9 @@ typedef struct {                /* ship location packets */
     uint8_t pad2;
     uint8_t pad3;
 
-    int32_t  x;                 /* x1000 */
+    int32_t  x;                 /* x10 */
 
-    int32_t  y;                 /* x1000 */
+    int32_t  y;                 /* x10 */
 } spShipLoc_t;
 
 typedef struct {
