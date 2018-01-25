@@ -373,6 +373,14 @@ void clbKillShip(int snum, killedBy_t kb, uint16_t detail)
         sendmesg = true;
 
         break;
+    case KB_GOTDOOMSDAY:
+        sprintf(msgbuf, "%c%d (%s) killed the doomsday machine!",
+                cbTeams[cbShips[snum].team].teamchar,
+                snum,
+                cbShips[snum].alias);
+        sendmesg = true;
+
+        break;
     case KB_LIGHTNING:
         sprintf(msgbuf, "%c%d (%s) was destroyed by a lightning bolt.",
                 cbTeams[cbShips[snum].team].teamchar,
