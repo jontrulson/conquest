@@ -23,7 +23,9 @@ SOUNDRC    = $(DESTDIR)$(CONQSYSCONFDIR)/soundrc
 # extra texture defs for the planets
 PLANTEXTRC = $(DESTDIR)$(CONQSYSCONFDIR)/00_plantex.trc
 
-CONQDOCS = HISTORY README CONQINIT.TXT conqrule conqrule.easy
+CONQDOCS = docs/HISTORY.txt docs/conquest-guide.txt docs/conqinit.txt \
+	robot-rules/conqrule robot-rules/conqrule.easy \
+	docs/server.txt docs/LICENSE.txt docs/CREDITS.txt
 
 IMAGES = img/*.png img/*.txf
 SOUNDS = sound/*.ogg

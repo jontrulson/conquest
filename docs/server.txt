@@ -216,5 +216,3 @@ CONTENTS:
       'conquest.radscan.com' is the real address of your server, as
       seen from the Internet.
 
-
-$Id$
