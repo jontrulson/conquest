@@ -1,11 +1,15 @@
-Credit where credit is due.  
+Credit where credit is due.
 
-- TGA loader, NeHe (though pretty much a complete rewrite.  Geez that
-  code was bad)
+- PNG loader - stb_image.h, a single file library for loading a lot of
+  common image formats:
+
+  https://github.com/nothings/stb
+
+  Public Domain/MIT licensed.  Works very well.
 
 - Earth, Mars (classm/classd) pics, JPL/NASA.
 
-- star (base image) - NASA SOHO 
+- star (base image) - NASA SOHO
   http://sohowww.nascom.nasa.gov/data/realtime/gif/
 
 - glut, Mark Kilgard
@@ -19,18 +23,10 @@ Credit where credit is due.
 - viewer backgound, Hubble Ultra Deep Field
 
 - some of the sound effects for the gl client: Star Trek Dimension
-  http://www.stdimension.org/MediaLib/computere.htm 
+  http://www.stdimension.org/MediaLib/computere.htm
 
-- GIMP 
+- GIMP
   http://www.gimp.org
-
-- Xserver, Summit Platinum from Xi Graphics (www.xig.com). There is no
-  substitute. 
-
-  Update:  7/20/2009 
-
-           Well, since I don't work for XiG anymore, the Nvidia driver
-           is pretty ****ing good too :)
 
 - 7/20/2009
 
@@ -52,7 +48,7 @@ Credit where credit is due.
       http://www.sharecg.com/v/35694/3D-Model/Scout-ship
 
       I really like the 'cammo' texture he supplied, and use it on
-      all of the Orion models.  
+      all of the Orion models.
 
     - Orion Destroyer:
 
@@ -68,7 +64,3 @@ Credit where credit is due.
 
       Same general color scheme I used for the scout.  Stargate fans
       may recognize this ship :)
-
-    
-
-$Id$
