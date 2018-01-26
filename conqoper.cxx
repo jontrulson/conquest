@@ -95,7 +95,6 @@ int DoInit(char InitChar, int cmdline);
 int main(int argc, char *argv[])
 {
     int i;
-    char msgbuf[128];
     unsigned int OptionAction;
 
     char InitStuffChar = '\0';
@@ -105,10 +104,16 @@ int main(int argc, char *argv[])
     utStrncpy(operName, clbGetUserLogname(), MAXUSERNAME);
     operName[MAXUSERNAME - 1] = 0;
 
-    if ( ! isagod(-1) )
+    if (!isagod(-1) )
     {
-        printf("Poor cretins such as yourself lack the "
-               "skills necessary to use this program.\n");
+        printf("Access denied.\n\nIn order to run conqoper, you must:\n");
+        printf("- be the root user, or\n");
+        printf("- be a member of the conquest group (default \"conquest\")\n");
+        printf("  or whatever group was chosen as the conquest group when\n");
+        printf("  conquest was built.\n");
+
+        // printf("Poor cretins such as yourself lack the "
+        //       "skills necessary to use this program.\n");
         exit(1);
     }
 
@@ -291,6 +296,7 @@ int main(int argc, char *argv[])
     Context.maxcol = cdcols();	/* number of columns */
     Context.recmode = RECMODE_OFF;
 
+    char msgbuf[128];
     sprintf(msgbuf, "OPER: User %s has entered conqoper.",
             operName);
     utLog("%s", msgbuf);        /* log it too... */
