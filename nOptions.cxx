@@ -870,8 +870,6 @@ static nodeStatus_t nOptionsIdle(void)
 {
     int gtime = frameTime;
     static int old = 0;
-    int pkttype;
-    char buf[PKT_MAXSIZE];
 
     /* 'blink' the cursor */
     if ((gtime - old) > 250)

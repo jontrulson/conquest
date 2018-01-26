@@ -92,7 +92,6 @@ static void set_header(int snum)
 {
 
     static const char *heading_fmt = "%s %c%d (%s)%s";
-    static const char *doom_fmt = "%s (%s)";
     static const char *closed_str1 = "GAME CLOSED -";
     static const char *robo_str1 = "ROBOT (external)";
     static const char *robo_str2 = "ROBOT";

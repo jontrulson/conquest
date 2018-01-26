@@ -173,9 +173,6 @@ int clientHello(const char *clientname)
     char buf[PKT_MAXSIZE];
     int pkttype;
     extern char *ConquestVersion, *ConquestDate;
-    int rv;
-    struct timeval tv;
-    fd_set readfds;
 
     /* there should be a server hello waiting for us - we will only
      * wait for 10 seconds */

@@ -421,7 +421,6 @@ static int initGLAnimDefs(void)
 /* init the explosion animation states. */
 static bool initGLExplosions(vector<vector<animStateRec_t>>& torpStates)
 {
-    int i, j;
     animStateRec_t initastate;    /* initial state of an explosion */
 
     utLog("%s: Initializing...", __FUNCTION__);
@@ -436,12 +435,12 @@ static bool initGLExplosions(vector<vector<animStateRec_t>>& torpStates)
 
     // init the vector
     torpStates.clear();
-    for (int i; i<cbLimits.maxShips(); i++)
+    for (int i=0; i<cbLimits.maxShips(); i++)
         torpStates.push_back(vector<animStateRec_t>(cbLimits.maxTorps()));
 
     // copy in our prepared animation state
-    for (i=0; i<cbLimits.maxShips(); i++)
-        for (j=0; j<cbLimits.maxTorps(); j++)
+    for (int i=0; i<cbLimits.maxShips(); i++)
+        for (int j=0; j<cbLimits.maxTorps(); j++)
             torpStates[i][j] = initastate;
 
     return false;

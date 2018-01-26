@@ -222,11 +222,6 @@ void mcuInfoPlanet( const char *str, int pnum )
         return;
     }
 
-    /* In some cases, report hostilities. */
-    junk[0] = 0;
-    if ( cbPlanets[pnum].type == PLANET_CLASSM
-         || cbPlanets[pnum].type == PLANET_DEAD )
-
     x = 0.0;
     y = 0.0;
 
@@ -235,11 +230,10 @@ void mcuInfoPlanet( const char *str, int pnum )
     Context.lasttang =
         round(utAngle( x, y, cbPlanets[pnum].x, cbPlanets[pnum].y ));
 
-    sprintf( buf, "%s%s, a %s%s, range %d, direction %d",
+    sprintf( buf, "%s%s, a %s, range %d, direction %d",
              str,
              cbPlanets[pnum].name,
              cbConqInfo->ptname[cbPlanets[pnum].type],
-             junk,
              Context.lasttdist,
              Context.lasttang);
 
@@ -322,12 +316,6 @@ void mcuInfoShip( int snum )
     int i, status;
     char junk[MSGMAXLINE];
     real x, y, dis, kills, appx, appy;
-    static char tmpstr[BUFFER_SIZE_256];
-    real pwarp, diffdis, close_rate;
-    time_t difftime, curtime;
-    static time_t oldtime = 0;
-    static real avgclose_rate, olddis = 0.0, oldclose_rate = 0.0;
-    static int oldsnum = 0;
 
     cdclrl( MSG_LIN1, 2 );
     if ( snum < 0 || snum >= cbLimits.maxShips() )
@@ -677,7 +665,6 @@ void mcuPlayList( bool doall )
     char ubuf[MAXUSERNAME + 2];
     int ch;
     static const char *hd1="ship  name          pseudonym              kills      pid";
-    static const char *hd2="ship  name          pseudonym              kills     type";
     killedBy_t kb;
     uint16_t detail;
 
@@ -807,7 +794,7 @@ void mcuPlayList( bool doall )
 /*    flag = mcuReviewMsgs( snum, slm ) */
 int mcuReviewMsgs( int slm )
 {
-    int ch, Done, i, msg, tmsg, lastone;
+    int ch, Done, msg, tmsg, lastone;
     int didany;
 
     didany = false;

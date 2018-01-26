@@ -1798,11 +1798,6 @@ static int hello(void)
     char buf[PKT_MAXSIZE];
     int pkttype;
     extern char *ConquestVersion, *ConquestDate;
-    int rv;
-    struct timeval tv;
-    fd_set readfds;
-    struct sockaddr_in usa;	/* internet socket addr. structure - udp */
-    cpAck_t *cpack;
 
     /* first send a server hello */
     shello.type = SP_HELLO;
