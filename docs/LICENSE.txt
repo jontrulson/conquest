@@ -1,6 +1,9 @@
 The following LICENSE text was obtained from
-https://opensource.org/licenses/MIT, and applies to the complete
-Conquest distribution.
+
+    https://opensource.org/licenses/MIT
+
+and applies to the complete Conquest distribution, unless otherwise
+noted in the source files.
 
 Copyright 1994-2018 Jon Trulson
 

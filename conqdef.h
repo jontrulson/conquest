@@ -1,21 +1,35 @@
-
-/************************************************************************
- * Copyright Jon Trulson under the MIT License. (See LICENSE).
- ***********************************************************************/
-
-/*                              C O N Q D E F */
-/*            Copyright (C)1983-1986 by Jef Poskanzer and Craig Leres */
-/*    Permission to use, copy, modify, and distribute this software and */
-/*    its documentation for any purpose and without fee is hereby granted, */
-/*    provided that this copyright notice appear in all copies and in all */
-/*    supporting documentation. Jef Poskanzer and Craig Leres make no */
-/*    representations about the suitability of this software for any */
-/*    purpose. It is provided "as is" without express or implied warranty. */
+//
+// Author: Jon Trulson <jon@radscan.com>
+// Copyright (c) 1994-2018 Jon Trulson
+//
+// The MIT License
+//
+// Permission is hereby granted, free of charge, to any person
+// obtaining a copy of this software and associated documentation
+// files (the "Software"), to deal in the Software without
+// restriction, including without limitation the rights to use, copy,
+// modify, merge, publish, distribute, sublicense, and/or sell copies
+// of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be
+// included in all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+// EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+// NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS
+// BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN
+// ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+// CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+//
 
 
 #ifndef CONQDEF_H_INCLUDED
 #define CONQDEF_H_INCLUDED
 
+// Original history entries - just for fun
 /* 4.22 05Sep86 CAL .*(): Removed tutorial feature. Made tuning constants */
 /*                   constants again. Increased username sizes. */
 /*                  .mcuUserStats(): Tweak heading. */
@@ -42,6 +56,7 @@
 
 /* Common block time stamp. */
 /* This define should be changed every time the common block changes. */
+
 /*#define COMMONSTAMP 861104             stardate? */
 /*#define COMMONSTAMP 940910             stardate? */
 /*#define COMMONSTAMP 961019             stardate? */
