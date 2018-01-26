@@ -25,10 +25,7 @@
 static char cbuf[BUFFER_SIZE_1024]; /* general purpose buffer */
 
 /*  histlist - display the last usage list */
-/*  SYNOPSIS */
-/*    int godlike */
-/*    mcuHistList( godlike ) */
-void mcuHistList( int godlike )
+void mcuHistList()
 {
     int i, j, lin, col, fline, lline, thistptr = 0;
     int ch;
@@ -46,10 +43,6 @@ void mcuHistList( int godlike )
 
     while (true) /* repeat */
     {
-        if ( ! godlike )
-            if ( ! clbStillAlive( Context.snum ) )
-                break;
-
         thistptr = cbConqInfo->histptr;
         lin = fline;
         col = 1;
@@ -208,123 +201,14 @@ int mcuReadMsg( int msgnum, int dsplin )
 
 }
 
-/* convert a KP key into an angle */
-int mcuKPAngle(int ch, real *angle)
-{
-    int rv = false;
-
-    switch (ch)
-    {
-    case KEY_HOME:
-    case KEY_A1:		/* KP upper left */
-        *angle = 135.0;
-        rv = true;
-        break;
-    case KEY_PPAGE:
-    case KEY_A3:		/* KP upper right */
-        *angle = 45.0;
-        rv = true;
-        break;
-    case KEY_END:
-    case KEY_C1:		/* KP lower left */
-        *angle = 225.0;
-        rv = true;
-        break;
-    case KEY_NPAGE:
-    case KEY_C3:		/* KP lower right */
-        *angle = 315.0;
-        rv = true;
-        break;
-    case KEY_UP:		/* up arrow */
-        *angle = 90.0;
-        rv = true;
-        break;
-    case KEY_DOWN:		/* down arrow */
-        *angle = 270.0;
-        rv = true;
-        break;
-    case KEY_LEFT:		/* left arrow */
-        *angle = 180.0;
-        rv = true;
-        break;
-    case KEY_RIGHT:		/* right arrow */
-        *angle = 0.0;
-        rv = true;
-        break;
-    default:
-        rv = false;
-        break;
-    }
-
-    return(rv);
-}
-
-/* convert a KP key into a 'dir' key */
-int mcuKP2DirKey(int *ch)
-{
-    int rv;
-    char cch;
-
-    switch (*ch)
-    {
-    case KEY_HOME:
-    case KEY_A1:		/* KP upper left */
-        cch = 'q';
-        rv = true;
-        break;
-    case KEY_PPAGE:
-    case KEY_A3:		/* KP upper right */
-        cch = 'e';
-        rv = true;
-        break;
-    case KEY_END:
-    case KEY_C1:		/* KP lower left */
-        cch = 'z';
-        rv = true;
-        break;
-    case KEY_NPAGE:
-    case KEY_C3:		/* KP lower right */
-        cch = 'c';
-        rv = true;
-        break;
-    case KEY_UP:		/* up arrow */
-        cch = 'w';
-        rv = true;
-        break;
-    case KEY_DOWN:		/* down arrow */
-        cch = 'x';
-        rv = true;
-        break;
-    case KEY_LEFT:		/* left arrow */
-        cch = 'a';
-        rv = true;
-        break;
-    case KEY_RIGHT:		/* right arrow */
-        cch = 'd';
-        rv = true;
-        break;
-    default:
-        cch = (char)0;
-        rv = false;
-        break;
-    }
-
-    if ((int)cch != 0)
-        *ch = (char)cch;
-
-    return(rv);
-}
-
-
 /*  infoplanet - write out information about a planet */
 /*  SYNOPSIS */
 /*    char str() */
 /*    int pnum, snum */
 /*    mcuInfoPlanet( str, pnum, snum ) */
-void mcuInfoPlanet( const char *str, int pnum, int snum )
+void mcuInfoPlanet( const char *str, int pnum )
 {
     int i, j;
-    int godlike, canscan;
     char buf[MSGMAXLINE*2], junk[MSGMAXLINE];
     real x, y;
 
@@ -338,115 +222,53 @@ void mcuInfoPlanet( const char *str, int pnum, int snum )
         return;
     }
 
-    /* GOD is too clever. */
-    godlike = ( snum < 0 || snum >= cbLimits.maxShips() );
-
     /* In some cases, report hostilities. */
     junk[0] = 0;
-    if ( cbPlanets[pnum].type == PLANET_CLASSM || cbPlanets[pnum].type == PLANET_DEAD )
-        if ( ! godlike )
-            if ( cbPlanets[pnum].scanned[cbShips[snum].team] && clbSPWar( snum, pnum ) )
-                strcat(junk, " (hostile)");
+    if ( cbPlanets[pnum].type == PLANET_CLASSM
+         || cbPlanets[pnum].type == PLANET_DEAD )
 
-    if ( godlike )
-    {
-        x = 0.0;
-        y = 0.0;
-    }
-    else
-    {
-        x = cbShips[snum].x;
-        y = cbShips[snum].y;
-    }
+    x = 0.0;
+    y = 0.0;
 
-    Context.lasttdist = round(dist( x, y, cbPlanets[pnum].x, cbPlanets[pnum].y));
-    Context.lasttang = round(utAngle( x, y, cbPlanets[pnum].x, cbPlanets[pnum].y ));
+    Context.lasttdist =
+        round(dist( x, y, cbPlanets[pnum].x, cbPlanets[pnum].y));
+    Context.lasttang =
+        round(utAngle( x, y, cbPlanets[pnum].x, cbPlanets[pnum].y ));
 
-    if (UserConf.DoETAStats)
-    {
-        static char tmpstr[64];
-
-        if (cbShips[snum].warp > 0.0)
-	{
-            sprintf(tmpstr, ", ETA %s",
-                    clbETAStr(cbShips[snum].warp,
-                              Context.lasttdist));
-	}
-        else
-            tmpstr[0] = '\0';
-
-        sprintf( buf, "%s%s, a %s%s, range %d, direction %d%s",
-                 str,
-                 cbPlanets[pnum].name,
-                 cbConqInfo->ptname[cbPlanets[pnum].type],
-                 junk,
-                 Context.lasttdist,
-                 Context.lasttang,
-                 tmpstr);
-
-
-    }
-    else
-        sprintf( buf, "%s%s, a %s%s, range %d, direction %d",
-                 str,
-                 cbPlanets[pnum].name,
-                 cbConqInfo->ptname[cbPlanets[pnum].type],
-                 junk,
-                 Context.lasttdist,
-                 Context.lasttang);
+    sprintf( buf, "%s%s, a %s%s, range %d, direction %d",
+             str,
+             cbPlanets[pnum].name,
+             cbConqInfo->ptname[cbPlanets[pnum].type],
+             junk,
+             Context.lasttdist,
+             Context.lasttang);
 
     /* save for hudInfo (only first 3 chars) */
     utStrncpy(Context.lasttarg, cbPlanets[pnum].name, 4);
 
-    if ( godlike )
-        canscan = true;
-    else
-        canscan = cbPlanets[pnum].scanned[cbShips[snum].team];
-
     junk[0] = 0;
-    if ( cbPlanets[pnum].type != PLANET_SUN && cbPlanets[pnum].type != PLANET_MOON )
+    if ( cbPlanets[pnum].type != PLANET_SUN
+         && cbPlanets[pnum].type != PLANET_MOON )
     {
-        if ( ! canscan )
-            strcpy(junk , "with unknown occupational forces") ;
-        else
-	{
-            i = cbPlanets[pnum].armies;
-            if ( i == 0 )
-	    {
-                j = cbPlanets[pnum].uninhabtime;
-                if ( j > 0 )
-                    sprintf( junk, "uninhabitable for %d more minutes", j );
-                else
-                    strcpy(junk , "with NO armies") ;
-	    }
-            else
-	    {
-                sprintf( junk, "with %d %s arm", i,
-                         cbTeams[cbPlanets[pnum].team].name );
-                if ( i == 1 )
-                    strcat(junk , "y") ;
-                else
-                    strcat(junk , "ies") ;
-	    }
-	}
-
-        /* Now see if we can tell about coup time. */
-        if ( godlike )
-            canscan = false;	/* GOD can use teaminfo instead */
-        else
-            canscan = ( pnum == cbTeams[cbShips[snum].team].homeplanet &&
-                        cbTeams[cbShips[snum].team].coupinfo );
-        if ( canscan )
-	{
-            j = cbTeams[cbShips[snum].team].couptime;
+        i = cbPlanets[pnum].armies;
+        if ( i == 0 )
+        {
+            j = cbPlanets[pnum].uninhabtime;
             if ( j > 0 )
-	    {
-                if ( junk[0] != 0 )
-                    strcat(junk, ", ");
-                utAppendInt(junk , j) ;
-                strcat(junk , " minutes until coup time") ;
-	    }
-	}
+                sprintf( junk, "uninhabitable for %d more minutes", j );
+            else
+                strcpy(junk , "with NO armies") ;
+        }
+        else
+        {
+            sprintf( junk, "with %d %s arm", i,
+                     cbTeams[cbPlanets[pnum].team].name );
+            if ( i == 1 )
+                strcat(junk , "y") ;
+            else
+                strcat(junk , "ies") ;
+        }
+
     }
 
     if ( junk[0] == 0 )
@@ -495,20 +317,17 @@ void mcuInfoPlanet( const char *str, int pnum, int snum )
 /*  SYNOPSIS */
 /*    int snum, scanner */
 /*    mcuInfoShip( snum, scanner ) */
-void mcuInfoShip( int snum, int scanner )
+void mcuInfoShip( int snum )
 {
     int i, status;
     char junk[MSGMAXLINE];
     real x, y, dis, kills, appx, appy;
-    int godlike, canscan;
     static char tmpstr[BUFFER_SIZE_256];
     real pwarp, diffdis, close_rate;
     time_t difftime, curtime;
     static time_t oldtime = 0;
     static real avgclose_rate, olddis = 0.0, oldclose_rate = 0.0;
     static int oldsnum = 0;
-
-    godlike = ( scanner < 0 || scanner >= cbLimits.maxShips() );
 
     cdclrl( MSG_LIN1, 2 );
     if ( snum < 0 || snum >= cbLimits.maxShips() )
@@ -518,49 +337,19 @@ void mcuInfoShip( int snum, int scanner )
         return;
     }
     status = cbShips[snum].status;
-    if ( ! godlike && status != SS_LIVE )
-    {
-        mcuPutMsg( "Not found.", MSG_LIN1 );
-        cdmove( MSG_LIN1, 1 );
-        return;
-    }
 
     cbuf[0] = Context.lasttarg[0] = 0;
     utAppendShip(cbuf , snum) ;
     strcpy(Context.lasttarg, cbuf); /* save for hudInfo */
 
-    if ( snum == scanner )
-    {
-        /* Silly Captain... */
-        strcat(cbuf, ": That's us, silly!");
-        mcuPutMsg( cbuf, MSG_LIN1 );
-        cdmove( MSG_LIN1, 1 );
-        return;
-    }
     /* Scan another ship. */
-    if ( godlike )
-    {
-        x = 0.0;
-        y = 0.0;
-    }
-    else
-    {
-        x = cbShips[scanner].x;
-        y = cbShips[scanner].y;
-    }
+    x = 0.0;
+    y = 0.0;
+
     if ( SCLOAKED(snum) )
     {
-        if (godlike)
-	{
-            appx = rndnor(cbShips[snum].x, CLOAK_SMEAR_DIST);
-            appy = rndnor(cbShips[snum].y, CLOAK_SMEAR_DIST);
-	}
-        else			/* client */
-	{			/* for clients, these have already been
-				   smeared */
-            appx = cbShips[snum].x;
-            appy = cbShips[snum].y;
-	}
+        appx = rndnor(cbShips[snum].x, CLOAK_SMEAR_DIST);
+        appy = rndnor(cbShips[snum].y, CLOAK_SMEAR_DIST);
     }
     else
     {
@@ -568,15 +357,6 @@ void mcuInfoShip( int snum, int scanner )
         appy = cbShips[snum].y;
     }
     dis = dist( x, y, appx, appy );
-    if ( godlike )
-        canscan = true;
-    else
-    {
-
-        /* Decide if we can do an acurate scan. */
-        canscan = ( (dis < ACCINFO_DIST && ! SCLOAKED(snum)) ||
-                    ( (cbShips[snum].scanned[ cbShips[scanner].team] > 0) && ! selfwar(scanner) ) );
-    }
 
     strcat(cbuf , ": ") ;
     if ( cbShips[snum].alias[0] != 0 )
@@ -595,7 +375,7 @@ void mcuInfoShip( int snum, int scanner )
     strcat(cbuf , " kill") ;
     if ( kills != 1.0 )
         utAppendChar(cbuf , 's') ;
-    if ( SCLOAKED(snum) && ( godlike || SSCANDIST(snum) ) )
+    if ( SCLOAKED(snum) )
         strcat(cbuf, " (CLOAKED) ");
     else
         strcat(cbuf,  ", ");
@@ -604,18 +384,8 @@ void mcuInfoShip( int snum, int scanner )
     strcat(cbuf, cbShipTypes[cbShips[snum].shiptype].name) ;
     strcat(cbuf, ", ");
 
-    if ( godlike )
-    {
-        utAppendShipStatus(cbuf , status) ;
-        utAppendChar(cbuf , '.') ;
-    }
-    else
-    {
-        if ( cbShips[snum].war[cbShips[scanner].team] )
-            strcat(cbuf , "at WAR.") ;
-        else
-            strcat(cbuf , "at peace.") ;
-    }
+    utAppendShipStatus(cbuf , status) ;
+    utAppendChar(cbuf , '.') ;
 
     mcuPutMsg( cbuf, MSG_LIN1 );
 
@@ -625,99 +395,6 @@ void mcuInfoShip( int snum, int scanner )
         Context.lasttang = round( utAngle( x, y, appx, appy ) );
         sprintf( cbuf, "Range %d, direction %d",
                  Context.lasttdist, Context.lasttang );
-
-
-        if (UserConf.DoETAStats)
-	{
-            if (cbShips[scanner].warp > 0.0 || cbShips[snum].warp > 0.0)
-	    {
-                curtime = time(0);
-
-                if (snum == oldsnum)
-		{		/* then we can get better eta
-				   by calculating closure rate and
-				   extrapolate from there the apparent warp
-				   giving a better estimate. */
-                    difftime = curtime - oldtime;
-
-                    /* we still need to compute diffdis  */
-                    diffdis = olddis - dis;
-                    olddis = dis;
-
-                    if (difftime <= 0)
-		    {		/* not enough time passed for a guess
-				   use last closerate, and don't set
-				   oldtime so it will eventually work */
-                        close_rate = oldclose_rate;
-		    }
-                    else
-		    {		/* we can make an estimate of closure rate in
-				   MM's per second */
-                        oldtime = curtime;
-
-                        close_rate = diffdis / (real) difftime;
-		    }
-
-                    /* give a 'smoother' est. by avg'ing with
-                       last close rate.*/
-                    avgclose_rate = (close_rate + oldclose_rate) / 2.0;
-                    oldclose_rate = close_rate;
-
-#ifdef DEBUG_ETA
-                    utLog("infoship: close_rate(%.1f) = diffdis(%.1f) / difftime(%d), avgclose_rate = %.1f",
-                          close_rate,
-                          diffdis,
-                          difftime,
-                          avgclose_rate);
-#endif
-
-                    if (avgclose_rate <= 0.0)
-		    {		/* dist is increasing or no change,
-				   - can't ever catchup = ETA never */
-                        sprintf(tmpstr, ", ETA %s",
-                                clbETAStr(0.0, dis));
-                        strcat(cbuf, tmpstr) ;
-		    }
-                    else
-		    {		/* we are indeed closing... */
-
-				/* calc psuedo-warp */
-                        /* pwarp = dis / (avgclose_rate (in MM/sec) /
-                           MM_PER_SEC_PER_WARP(18)) */
-                        pwarp = (avgclose_rate / (real) MM_PER_SEC_PER_WARP);
-
-#ifdef DEBUG_ETA
-                        utLog("infoship:\tdis(%.1f) pwarp(%.1f) = (close_rate(%.1f) / MM_PER_SEC_PER_WARP(%.1f)", dis, pwarp, close_rate, MM_PER_SEC_PER_WARP);
-#endif
-
-                        sprintf(tmpstr, ", ETA %s",
-                                clbETAStr(pwarp, dis));
-                        strcat(cbuf, tmpstr) ;
-		    }
-		}
-                else
-		{		/* scanning a new ship - assume ships
-				   heading directly at each other */
-
-				/* init old* vars */
-                    oldtime = curtime;
-                    oldsnum = snum;
-                    olddis = dis;
-
-                    pwarp =
-                        (((cbShips[scanner].warp > 0.0) ?
-                          cbShips[scanner].warp :
-                          0.0) +
-                         ((cbShips[snum].warp > 0.0) ?
-                          cbShips[snum].warp
-                          : 0.0));
-
-                    sprintf(tmpstr, ", ETA %s",
-                            clbETAStr(pwarp, dis));
-                    strcat(cbuf, tmpstr) ;
-		}
-	    }
-	} /* if do ETA stats */
     }
     else				/* else cloaked and at w0 */
     {
@@ -725,35 +402,32 @@ void mcuInfoShip( int snum, int scanner )
         cbuf[0] = 0;
     }
 
-    if ( canscan )
+    if ( cbuf[0] != 0 )
+        strcat(cbuf,  ", ");
+    strcat(cbuf , "shields ") ;
+    if ( SSHUP(snum) && ! SREPAIR(snum) )
+        utAppendInt(cbuf, round( cbShips[snum].shields ));
+    else
+        strcat(cbuf , "DOWN") ;
+    i = round( cbShips[snum].damage );
+    if ( i > 0 )
     {
         if ( cbuf[0] != 0 )
-            strcat(cbuf,  ", ");
-        strcat(cbuf , "shields ") ;
-        if ( SSHUP(snum) && ! SREPAIR(snum) )
-            utAppendInt(cbuf, round( cbShips[snum].shields ));
+            strcat(cbuf, ", ");
+        sprintf( junk, "damage %d", i );
+        strcat(cbuf , junk) ;
+    }
+    i = cbShips[snum].armies;
+    if ( i > 0 )
+    {
+        sprintf( junk, ", with %d arm", i );
+        strcat(cbuf , junk) ;
+        if ( i == 1 )
+        {
+            utAppendChar(cbuf , 'y') ;
+        }
         else
-            strcat(cbuf , "DOWN") ;
-        i = round( cbShips[snum].damage );
-        if ( i > 0 )
-	{
-            if ( cbuf[0] != 0 )
-                strcat(cbuf, ", ");
-            sprintf( junk, "damage %d", i );
-            strcat(cbuf , junk) ;
-	}
-        i = cbShips[snum].armies;
-        if ( i > 0 )
-	{
-            sprintf( junk, ", with %d arm", i );
-            strcat(cbuf , junk) ;
-            if ( i == 1 )
-	    {
-                utAppendChar(cbuf , 'y') ;
-	    }
-            else
-                strcat(cbuf , "ies") ;
-	}
+            strcat(cbuf , "ies") ;
     }
     if ( cbuf[0] != 0 )
     {
@@ -768,10 +442,7 @@ void mcuInfoShip( int snum, int scanner )
 }
 
 /*  planlist - list planets */
-/*  SYNOPSIS */
-/*    int team */
-/*    mcuPlanetList( team ) */
-void mcuPlanetList( int team, int snum )
+void mcuPlanetList()
 {
     int i, lin, col, olin, pnum;
     int sv[cbLimits.maxPlanets()];
@@ -853,65 +524,29 @@ void mcuPlanetList( int team, int snum )
                 PlanetIdx++;
                 pnum = sv[i];
 
-                /* colorize - dwp */
-                if ( snum >= 0 && snum < cbLimits.maxShips())
-		{	/* if user has a valid ship */
-                    if ( cbPlanets[pnum].team == cbShips[snum].team && !selfwar(snum) )
-                        outattr = GreenLevelColor;
-                    else if ( (clbSPWar(snum,pnum) && cbPlanets[pnum].scanned[cbShips[snum].team] ) ||
-                              cbPlanets[pnum].type == PLANET_SUN )
+                switch(cbPlanets[pnum].type)
+                {
+                    case PLANET_SUN:
                         outattr = RedLevelColor;
-                    else
+                        break;
+                    case PLANET_CLASSM:
+                        outattr = GreenLevelColor;
+                        break;
+                    case PLANET_DEAD:
                         outattr = YellowLevelColor;
-		}
-                else
-		{			/* else, user doesn't have a ship yet */
-                    if (team == TEAM_NOTEAM)
-		    {			/* via conqoper */
-                        switch(cbPlanets[pnum].type)
-			{
-			case PLANET_SUN:
-                            outattr = RedLevelColor;
-                            break;
-			case PLANET_CLASSM:
-                            outattr = GreenLevelColor;
-                            break;
-			case PLANET_DEAD:
-                            outattr = YellowLevelColor;
-                            break;
-			case PLANET_CLASSA:
-			case PLANET_CLASSO:
-			case PLANET_CLASSZ:
-                            outattr = CQC_A_BOLD;
-                            break;
-			case PLANET_GHOST:
-                            outattr = NoColor;
-                            break;
-			default:
-                            outattr = SpecialColor;
-                            break;
-			}
-		    }
-                    else
-		    {			/* via menu() */
-                        if ( cbPlanets[pnum].team == cbUsers[Context.unum].team &&
-                             !(cbUsers[Context.unum].war[cbUsers[Context.unum].team]))
-			{
-                            outattr = GreenLevelColor;
-			}
-                        else if ( cbPlanets[pnum].type == PLANET_SUN ||
-                                  (cbPlanets[pnum].team < NUMPLAYERTEAMS &&
-                                   cbUsers[Context.unum].war[cbPlanets[pnum].team] &&
-                                   cbPlanets[pnum].scanned[cbUsers[Context.unum].team]) )
-			{
-                            outattr = RedLevelColor;
-			}
-                        else
-			{
-                            outattr = YellowLevelColor;
-			}
-		    }
-		}
+                        break;
+                    case PLANET_CLASSA:
+                    case PLANET_CLASSO:
+                    case PLANET_CLASSZ:
+                        outattr = CQC_A_BOLD;
+                        break;
+                    case PLANET_GHOST:
+                        outattr = NoColor;
+                        break;
+                    default:
+                        outattr = SpecialColor;
+                        break;
+                }
 
                 /* Don't display unless it's real. */
                 if ( ! PVISIBLE(pnum) )
@@ -923,30 +558,15 @@ void mcuPlanetList( int team, int snum )
                 ch =  cbTeams[cbPlanets[pnum].team].teamchar;
                 sprintf( junk, "%d", cbPlanets[pnum].armies );
 
-                /* Then modify based on scan information. */
-
-                if ( team != TEAM_NOTEAM )
-                    if ( ! cbPlanets[pnum].scanned[team] )
-                    {
-                        ch = '?';
-                        strcpy(junk , "?") ;
-                    }
-
                 /* Suns and moons are displayed as unowned. */
-                if ( cbPlanets[pnum].type == PLANET_SUN || cbPlanets[pnum].type == PLANET_MOON )
+                if ( cbPlanets[pnum].type == PLANET_SUN
+                     || cbPlanets[pnum].type == PLANET_MOON )
                     ch = ' ';
-
-                /* Don't display armies for suns unless we're special. */
-                if ( cbPlanets[pnum].type == PLANET_SUN )
-                    if ( team != TEAM_NOTEAM )
-                        junk[0] = 0;
 
                 /* Moons aren't supposed to have armies. */
                 if ( cbPlanets[pnum].type == PLANET_MOON )
 		{
-                    if ( team != TEAM_NOTEAM )
-                        junk[0] = 0;
-                    else if ( cbPlanets[pnum].armies == 0 )
+                    if ( cbPlanets[pnum].armies == 0 )
                         junk[0] = 0;
 		}
 
@@ -1035,14 +655,9 @@ void mcuPlanetList( int team, int snum )
 		}
 	    }
 
-            /* didn't get a char, update */
-            if (snum >= 0 && snum < cbLimits.maxShips())
-                if (!clbStillAlive(snum))
-                    Done = true;
-
 	} /* if PlanetOffset <= cbLimits.maxPlanets() */
         else
-            Done = true;		/* else PlanetOffset > cbLimits.maxPlanets() */
+            Done = true; /* else PlanetOffset > cbLimits.maxPlanets() */
 
     } while(Done != true); /* do */
 
@@ -1052,10 +667,7 @@ void mcuPlanetList( int team, int snum )
 
 
 /*  playlist - list ships */
-/*  SYNOPSIS */
-/*    int godlike, doall */
-/*    mcuPlayList( godlike, doall ) */
-void mcuPlayList( int godlike, int doall, int snum )
+void mcuPlayList( bool doall )
 {
     int i, unum, status, lin, col;
     int fline, lline, fship;
@@ -1073,10 +685,7 @@ void mcuPlayList( int godlike, int doall, int snum )
     cdclear();
     uiPutColor(LabelColor);  /* dwp */
 
-    if (godlike)
-        strcpy(cbuf , hd1) ;
-    else
-        strcpy(cbuf , hd2) ;
+    strcpy(cbuf , hd1) ;
 
     col = (int)(Context.maxcol - strlen( cbuf )) / (int)2;
     lin = 2;
@@ -1095,9 +704,6 @@ void mcuPlayList( int godlike, int doall, int snum )
 
     while(true) /* repeat- while */
     {
-        if ( ! godlike )
-            if ( ! clbStillAlive( Context.snum ) )
-                break;
         i = fship;
         cdclrl( fline, lline - fline + 1 );
         lin = fline;
@@ -1124,10 +730,7 @@ void mcuPlayList( int godlike, int doall, int snum )
                         strcpy(pidbuf, "VACANT");
                     else
 		    {
-                        if (godlike)
-                            sprintf(pidbuf, "%6d", cbShips[i].pid);
-                        else
-                            strcpy(pidbuf, "  LIVE");
+                        sprintf(pidbuf, "%6d", cbShips[i].pid);
 		    }
 
                     strcpy(ubuf, cbUsers[unum].username);
@@ -1146,31 +749,7 @@ void mcuPlayList( int godlike, int doall, int snum )
                     utAppendKilledBy(cbuf , kb, detail) ;
 		}
 
-		if (snum >= 0 && snum < cbLimits.maxShips() )
-                {		/* a normal ship view */
-		    if ( i == snum )    /* it's ours */
-                        uiPutColor(CQC_A_BOLD);
-		    else if (satwar(i, snum)) /* we're at war with it */
-                        uiPutColor(RedLevelColor);
-		    else if (cbShips[i].team == cbShips[snum].team && !selfwar(snum))
-                        uiPutColor(GreenLevelColor); /* it's a team ship */
-		    else
-                        uiPutColor(YellowLevelColor);
-                }
-		else if (godlike) /* conqoper */
-                {
-		    uiPutColor(YellowLevelColor);
-                }
-		else
-                { /* not conqoper, and not a valid ship (main menu) */
-		    if (cbUsers[Context.unum].war[cbShips[i].team])  /* we're at war with ships's
-                                                                    team */
-                        uiPutColor(RedLevelColor);
-		    else if (cbUsers[Context.unum].team == cbShips[i].team)
-                        uiPutColor(GreenLevelColor); /* it's a team ship */
-		    else
-                        uiPutColor(YellowLevelColor);
-                }
+                uiPutColor(YellowLevelColor);
 
                 cdputs( cbuf, lin, col );
                 uiPutColor(0);
@@ -1226,7 +805,7 @@ void mcuPlayList( int godlike, int doall, int snum )
 /*    int flag, review */
 /*    int snum, slm */
 /*    flag = mcuReviewMsgs( snum, slm ) */
-int mcuReviewMsgs( int snum, int slm )
+int mcuReviewMsgs( int slm )
 {
     int ch, Done, i, msg, tmsg, lastone;
     int didany;
@@ -1235,22 +814,13 @@ int mcuReviewMsgs( int snum, int slm )
     Done = false;
 
     lastone = utModPlusOne( cbConqInfo->lastmsg+1, cbLimits.maxMsgs() );
-    if ( snum >= 0 && snum < cbLimits.maxShips() )
-    {
-        if ( cbShips[snum].lastmsg == LMSG_NEEDINIT )
-            return ( false );				/* none to read */
-        i = cbShips[snum].alastmsg;
-        if ( i != LMSG_READALL )
-            lastone = i;
-    }
-
     cdclrl( MSG_LIN1, 1 );
 
     msg = slm;
 
     do
     {
-        if ( clbCanRead( snum, msg ))
+        if ( clbCanRead( -1, msg ))
 	{
             mcuReadMsg( msg, MSG_LIN1 );
             didany = true;
@@ -1265,7 +835,7 @@ int mcuReviewMsgs( int snum, int slm )
 	    case KEY_UP:
 	    case KEY_LEFT:
                 tmsg = utModPlusOne( msg - 1, cbLimits.maxMsgs() );
-                while(!clbCanRead( snum, tmsg ) && tmsg != lastone)
+                while(!clbCanRead( -1, tmsg ) && tmsg != lastone)
 		{
                     tmsg = utModPlusOne( tmsg - 1, cbLimits.maxMsgs() );
 		}
@@ -1281,7 +851,7 @@ int mcuReviewMsgs( int snum, int slm )
 	    case KEY_DOWN:
 	    case KEY_RIGHT:
                 tmsg =  utModPlusOne( msg + 1, cbLimits.maxMsgs() );
-                while(!clbCanRead( snum, tmsg ) && tmsg != slm + 1 )
+                while(!clbCanRead( -1, tmsg ) && tmsg != slm + 1 )
 		{
                     tmsg = utModPlusOne( tmsg + 1, cbLimits.maxMsgs() );
 		}
@@ -1318,10 +888,9 @@ int mcuReviewMsgs( int snum, int slm )
 /*  SYNOPSIS */
 /*    int team */
 /*    mcuTeamList( team ) */
-void mcuTeamList( int team )
+void mcuTeamList()
 {
     int i, j, lin, col = 0, ctime, etime;
-    int godlike;
     char buf[MSGMAXLINE], timbuf[5][MAXDATESIZE];
     real x[5];
     static const char *sfmt="%15s %11s %11s %11s %11s %11s";
@@ -1376,8 +945,6 @@ void mcuTeamList( int team )
                 InfoColor);
 
     } /* FIRST_TIME */
-
-    godlike = ( team < 0 || team >= NUMPLAYERTEAMS );
 
     lin = 1;
     /* team stats and last date conquered */
@@ -1539,15 +1106,6 @@ void mcuTeamList( int team )
         else
             sprintf( timbuf[i], "%d", cbTeams[i].couptime );
 
-    if ( ! godlike )
-    {
-        for ( i = 0; i < 4; i++ )
-            if ( team != i )
-                strcpy(timbuf[i] , "-") ;
-            else if ( ! cbTeams[i].coupinfo && timbuf[i][0] != 0 )
-                strcpy(timbuf[i] , "?") ;
-    }
-
     timbuf[4][0] = 0;
 
     lin++;
@@ -1564,7 +1122,7 @@ void mcuTeamList( int team )
 /*  userlist - display the user list */
 /*  SYNOPSIS */
 /*    mcuUserList( godlike ) */
-void mcuUserList( int godlike, int snum )
+void mcuUserList()
 {
     int i, j, unum, nu, fuser, fline, lline, lin;
     int uvec[cbLimits.maxUsers()];
@@ -1597,13 +1155,8 @@ void mcuUserList( int godlike, int snum )
     lline = MSG_LIN1;				/* last line to use */
     fuser = 0;					/* first user in uvec */
 
-    while (true) /* repeat-while */
+    while (true)
     {
-
-        if ( ! godlike )
-            if ( ! clbStillAlive( Context.snum ) )
-                break;
-
         /* sort the (living) user list */
         nu = 0;
         for ( unum = 0; unum < cbLimits.maxUsers(); unum++)
@@ -1618,37 +1171,9 @@ void mcuUserList( int godlike, int snum )
         lin = fline;
         while ( i < nu && lin <= lline )
 	{
-            clbUserline( uvec[i], -1, cbuf, godlike, false );
+            clbUserline( uvec[i], -1, cbuf, true, false );
 
-            /* determine color */
-            if ( snum >= 0 && snum < cbLimits.maxShips() ) /* we're a valid ship */
-	    {
-		if ( strcmp(cbUsers[uvec[i]].username,
-			    cbUsers[cbShips[snum].unum].username) == 0 &&
-		     cbUsers[uvec[i]].type == cbUsers[cbShips[snum].unum].type)
-                    uiPutColor(CQC_A_BOLD);    /* it's ours */
-		else if (cbShips[snum].war[cbUsers[uvec[i]].team]) /* we're at war with it */
-                    uiPutColor(RedLevelColor);
-		else if (cbShips[snum].team == cbUsers[uvec[i]].team && !selfwar(snum))
-                    uiPutColor(GreenLevelColor); /* it's a team ship */
-		else
-                    uiPutColor(YellowLevelColor);
-	    }
-            else if (godlike)/* we are running conqoper */
-                uiPutColor(YellowLevelColor); /* bland view */
-            else			/* we don't have a ship yet */
-	    {
-                if ( strcmp(cbUsers[uvec[i]].username,
-                            cbUsers[Context.unum].username) == 0 &&
-                     cbUsers[uvec[i]].type == cbUsers[Context.unum].type)
-                    uiPutColor(CQC_A_BOLD);    /* it's ours */
-                else if (cbUsers[Context.unum].war[cbUsers[uvec[i]].team]) /* we're war with them */
-                    uiPutColor(RedLevelColor);	            /* (might be selfwar) */
-                else if (cbUsers[Context.unum].team == cbUsers[uvec[i]].team) /* team ship */
-                    uiPutColor(GreenLevelColor);
-                else
-                    uiPutColor(YellowLevelColor);
-	    }
+            uiPutColor(YellowLevelColor); /* bland view */
 
             cdputs( cbuf, lin, 1 );
             uiPutColor(0);
@@ -1693,7 +1218,7 @@ void mcuUserList( int godlike, int snum )
 /*  userstats - display the user list */
 /*  SYNOPSIS */
 /*    mcuUserStats( godlike, snum ) */
-void mcuUserStats( int godlike , int snum )
+void mcuUserStats()
 {
     int i, j, unum, nu, fuser, fline, lline, lin;
     int uvec[cbLimits.maxUsers()];
@@ -1729,12 +1254,8 @@ void mcuUserStats( int godlike , int snum )
     lline = MSG_LIN1;				/* last line to use */
     fuser = 0;					/* first user in uvec */
 
-    while (true) /* repeat-while */
+    while (true)
     {
-        if ( ! godlike )
-            if ( ! clbStillAlive( Context.snum ) )
-                break;
-
         /* sort the (living) user list */
         nu = 0;
         for ( unum = 0; unum < cbLimits.maxUsers(); unum++)
@@ -1752,36 +1273,7 @@ void mcuUserStats( int godlike , int snum )
             clbStatline( uvec[i], cbuf );
 
             /* determine color */
-            if ( snum >= 0 && snum < cbLimits.maxShips() ) /* we're a valid ship */
-            {
-                if ( strcmp(cbUsers[uvec[i]].username,
-                            cbUsers[cbShips[snum].unum].username) == 0 &&
-                     cbUsers[uvec[i]].type == cbUsers[cbShips[snum].unum].type )
-                    uiPutColor(CQC_A_BOLD);	        /* it's ours */
-                else if (cbShips[snum].war[cbUsers[uvec[i]].team])
-                    uiPutColor(RedLevelColor);   /* we're at war with it */
-                else if (cbShips[snum].team == cbUsers[uvec[i]].team && !selfwar(snum))
-                    uiPutColor(GreenLevelColor); /* it's a team ship */
-                else
-                    uiPutColor(YellowLevelColor);
-            }
-            else if (godlike)/* we are running conqoper */
-	    {
-                uiPutColor(YellowLevelColor); /* bland view */
-	    }
-            else
-	    {
-                if ( strcmp(cbUsers[uvec[i]].username,
-                            cbUsers[Context.unum].username) == 0  &&
-                     cbUsers[uvec[i]].type == cbUsers[Context.unum].type )
-                    uiPutColor(CQC_A_BOLD);	/* it's ours */
-                else if (cbUsers[Context.unum].war[cbUsers[uvec[i]].team])
-                    uiPutColor(RedLevelColor);  /* we're war with them (poss selfwar) */
-                else if (cbUsers[Context.unum].team == cbUsers[uvec[i]].team)
-                    uiPutColor(GreenLevelColor);	/* team ship */
-                else
-                    uiPutColor(YellowLevelColor);
-	    }
+            uiPutColor(YellowLevelColor); /* bland view */
 
             cdputs( cbuf, lin, 1 );
             uiPutColor(0);
@@ -1823,10 +1315,7 @@ void mcuUserStats( int godlike , int snum )
 }
 
 /*  confirm - ask the user to confirm a dangerous action */
-/*  SYNOPSIS */
-/*    int ok, confirm */
-/*    ok = mcuConfirm() */
-int mcuConfirm(void)
+bool mcuConfirm(void)
 {
     static const char *cprompt = "Are you sure? ";
     int scol = ((Context.maxcol - strlen(cprompt)) / 2);
@@ -1835,7 +1324,6 @@ int mcuConfirm(void)
         return(true);
     else
         return (false);
-
 }
 
 /*  askyn - ask the user a yes/no question - return true if yes */
@@ -1881,48 +1369,6 @@ char mcuGetCX( const char *pmt, int lin, int offset, const char *terms,
 
 }
 
-
-
-/*  gettarget - get a target angle from the user */
-/*  SYNOPSIS */
-/*    char pmt() */
-/*    int lin, col */
-/*    real dir */
-/*    int flag, gettarget */
-/*    flag = mcuGetTarget( pmt, lin, col, dir ) */
-int mcuGetTarget( const char *pmt, int lin, int col, real *dir, real cdefault )
-{
-    int i, j;
-    char ch, buf[MSGMAXLINE];
-
-    cdclrl( lin, 1 );
-    buf[0] = 0;
-    ch = (char)cdgetx( pmt, lin, col, TERMS, buf, MSGMAXLINE, true );
-    if ( ch == TERM_ABORT )
-        return ( false );
-
-    utDeleteBlanks( buf );
-    if ( buf[0] == 0 )
-    {
-        /* Default. */
-        *dir = cdefault;
-        return ( true );
-    }
-    if (utIsDigits(buf))
-    {
-        i = 0;
-        if ( ! utSafeCToI( &j, buf, i ) )
-            return ( false );
-        *dir = utMod360( (real) j );
-        return ( true );
-    }
-    if ( utArrowsToDir( buf, dir ) )
-        return ( true );
-
-    return ( false );
-
-}
-
 /*  more - wait for the user to type a space */
 /*  SYNOPSIS */
 /*    char pmt() */
@@ -1940,77 +1386,6 @@ int mcuMore( const char *pmt )
     cdrefresh();
     ch = iogchar();
     return ( ch == ' ' );
-
-}
-
-
-/*  pagefile - page through a file */
-/*  SYNOPSIS */
-/*    char file(), errmsg() */
-/*    int ignorecontroll, eatblanklines */
-/*    mcuPageFile( file, errmsg, ignorecontroll, eatblanklines ) */
-void mcuPageFile( const char *file, const char *errmsg )
-{
-
-    int plins = 1;
-    FILE *pfd;
-    static const char *sdone="--- press any key to return ---";
-    char buffer[BUFFER_SIZE_256];
-    int buflen;
-
-    if ((pfd = fopen(file, "r")) == NULL)
-    {
-        utLog("mcuPageFile(): fopen(%s) failed: %s",
-              file,
-              strerror(errno));
-
-        cdclear();
-        cdredo();
-        cdputc( errmsg, MSG_LIN2/2 );
-        mcuMore( sdone );
-
-        return;
-    }
-
-    cdclear();
-    cdrefresh();
-    cdmove(0, 0);
-
-    plins = 0;
-
-    while (fgets(buffer, BUFFER_SIZE_256 - 1, pfd) != NULL)
-    {
-        /* get one at a time */
-        buflen = strlen(buffer);
-
-        buffer[buflen - 1] = 0; /* remove trailing LF */
-        buflen--;
-
-        if (buffer[0] == 0x0c)	/* formfeed */
-	{
-            plins = DISPLAY_LINS + 1; /* force new page */
-	}
-        else
-	{
-            cdputs(buffer, plins, 0);
-            plins++;
-	}
-
-        if (plins >= DISPLAY_LINS)
-	{
-            if (!mcuMore(MTXT_MORE))
-                break;		/* bail if space not hit */
-
-            cdclear();
-            plins = 1;
-	}
-    }
-
-    fclose(pfd);
-
-    mcuMore(sdone);
-
-    return;
 
 }
 
@@ -2045,38 +1420,6 @@ void mcuPutPrompt( const char *pmt, int line )
     cdclrl( line, 1 );
     cprintf( line, dcol,ALIGN_NONE,"#%d#%s", InfoColor, pmt);
     cdmove( line, pcol );
-
-    return;
-
-}
-
-/*  helplesson - verbose help */
-/*  SYNOPSIS */
-/*    helplesson */
-void mcuHelpLesson(void)
-{
-
-    char buf[MSGMAXLINE];
-    char helpfile[BUFFER_SIZE_256];
-
-    sprintf(helpfile, "%s/%s", utGetPath(CONQSHARE), C_CONQ_HELPFILE);
-    sprintf( buf, "%s: Can't open.", helpfile );
-    mcuPageFile( helpfile, buf);
-
-    return;
-
-}
-
-/*  news - list current happenings */
-/*  SYNOPSIS */
-/*    news */
-void mcuNews(void)
-{
-    char newsfile[BUFFER_SIZE_256];
-
-    sprintf(newsfile, "%s/%s", utGetPath(CONQSHARE), C_CONQ_NEWSFILE);
-
-    mcuPageFile( newsfile, "No news is good news.");
 
     return;
 

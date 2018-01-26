@@ -1336,7 +1336,7 @@ void operate(void)
                 cbDriver->drivstat = DRS_HOLDING;
             break;
 	case 'H':
-            mcuHistList( true );
+            mcuHistList();
             redraw = true;
             break;
 	case 'i':
@@ -1350,7 +1350,7 @@ void operate(void)
             kiss(0,true);
             break;
 	case 'L':
-            mcuReviewMsgs( -1 /*god*/, cbConqInfo->glastmsg );
+            mcuReviewMsgs( cbConqInfo->glastmsg );
             break;
 	case 'm':
             cucSendMsg( MSG_FROM_GOD, 0, true, false );
@@ -1379,7 +1379,7 @@ void operate(void)
             redraw = true;
             break;
 	case 'S':
-            mcuUserStats( true , 0 ); /* we're always neutral ;-) - dwp */
+            mcuUserStats();
             redraw = true;
             break;
 	case 'T':
@@ -1387,7 +1387,7 @@ void operate(void)
             redraw = true;
             break;
 	case 'U':
-            mcuUserList( true, 0 );
+            mcuUserList();
             redraw = true;
             break;
 	case 'w':
@@ -1396,11 +1396,11 @@ void operate(void)
             redraw = true;
             break;
 	case '/':
-            mcuPlayList( true, false, 0 );
+            mcuPlayList( false );
             redraw = true;
             break;
 	case '\\':
-            mcuPlayList( true, true, 0 );
+            mcuPlayList( true );
             redraw = true;
             break;
 	case '?':
@@ -1463,16 +1463,16 @@ void opinfo( int snum )
     {
         i = 0;
         utSafeCToI( &j, &cbuf[1], i );		/* ignore status */
-        mcuInfoShip( j, snum );
+        mcuInfoShip( j );
     }
     else if ( utIsDigits( cbuf ) )
     {
         i = 0;
         utSafeCToI( &j, cbuf, i );		/* ignore status */
-        mcuInfoShip( j, snum );
+        mcuInfoShip( j );
     }
     else if ( opPlanetMatch( cbuf, &j ) )
-        mcuInfoPlanet( "", j, snum );
+        mcuInfoPlanet( "", j );
     else
     {
         cdmove( MSG_LIN2, 1 );
@@ -2074,7 +2074,7 @@ void oppedit(void)
 /*    opplanlist */
 void opPlanetList(void)
 {
-    mcuPlanetList( TEAM_NOTEAM, -1 );		/* we get extra info */
+    mcuPlanetList( );
 }
 
 
@@ -2396,7 +2396,7 @@ void opTeamList(void)
     cdclear();
     do /* repeat*/
     {
-        mcuTeamList( -1 );
+        mcuTeamList();
         mcuPutPrompt( MTXT_DONE, MSG_LIN2 );
         cdrefresh();
     }
@@ -3076,7 +3076,7 @@ void watch(void)
                 oprobot();
                 break;
             case 'L':
-                mcuReviewMsgs( -1 /*god*/, cbConqInfo->glastmsg );
+                mcuReviewMsgs( cbConqInfo->glastmsg );
                 break;
             case 0x0c:
                 operStopTimer();
@@ -3150,13 +3150,13 @@ void watch(void)
                 break;
             case '/':                /* ship list - dwp */
                 operStopTimer();
-                mcuPlayList( true, false, 0 );
+                mcuPlayList( false );
                 Context.redraw = true;
                 operSetTimer();
                 break;
             case '\\':               /* big ship list - dwp */
                 operStopTimer();
-                mcuPlayList( true, true, 0 );
+                mcuPlayList( true );
                 Context.redraw = true;
                 operSetTimer();
                 break;

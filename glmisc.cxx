@@ -232,3 +232,4 @@ void mglOverlayQuad(void)
 
     return;
 }
+

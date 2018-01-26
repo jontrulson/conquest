@@ -389,10 +389,6 @@ int cdgetp ( const char pmt[], int lin, int col, const char terms[], char str[],
                 break;
 	}
 
-        /* translate KP keys (if any)
-           into 'direction' keys. */
-        (void)mcuKP2DirKey(&ch);
-
         if (ch != TERM_NORMAL && ch != TERM_EXTRA && StrInit == true &&
             isprint(ch & 0xff))
 	{			/* clear out the preload */
