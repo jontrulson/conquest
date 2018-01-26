@@ -17,15 +17,12 @@ CONQIMGDIR = $(CONQDATADIR)/conquest/img
 CONQSNDDIR = $(CONQDATADIR)/conquest/sound
 CONQDOCDIR = $(CONQDATADIR)/doc/conquest
 
-TEXTURESRC = $(DESTDIR)$(CONQSYSCONFDIR)/texturesrc
-CONQINITRC = $(DESTDIR)$(CONQSYSCONFDIR)/conqinitrc
-SOUNDRC    = $(DESTDIR)$(CONQSYSCONFDIR)/soundrc
-# extra texture defs for the planets
-PLANTEXTRC = $(DESTDIR)$(CONQSYSCONFDIR)/00_plantex.trc
-
 CONQDOCS = docs/HISTORY.txt docs/conquest-guide.txt docs/conqinit.txt \
 	robot-rules/conqrule robot-rules/conqrule.easy \
 	docs/server.txt docs/LICENSE.txt docs/CREDITS.txt
+
+INITFILES = initfiles/conqinitrc initfiles/00_plantex.trc \
+	initfiles/texturesrc initfiles/soundrc
 
 IMAGES = img/*.png img/*.txf
 SOUNDS = sound/*.ogg
@@ -205,12 +202,9 @@ install-exec-hook:
 	chmod 644 $(DESTDIR)$(CONQSNDDIR)/*.ogg
 	cp -f $(CONQDOCS) $(DESTDIR)$(CONQDOCDIR)/
 	chmod 644 $(DESTDIR)$(CONQDOCDIR)/*
-	cp conqinitrc $(CONQINITRC);
-	cp texturesrc $(TEXTURESRC);
-	cp soundrc $(SOUNDRC);
-	cp 00_plantex.trc $(PLANTEXTRC);
-	chgrp $(CONQGROUP) $(TEXTURESRC) $(CONQINITRC) $(SOUNDRC) $(PLANTEXTRC)
-	chmod 664 $(TEXTURESRC) $(CONQINITRC) $(SOUNDRC) $(PLANTEXTRC)
+	cp $(INITFILES) $(DESTDIR)$(CONQSYSCONFDIR)/
+	chgrp $(CONQGROUP) $(DESTDIR)$(CONQSYSCONFDIR)/*
+	chmod 664 $(DESTDIR)$(CONQSYSCONFDIR)/*
 	chgrp $(CONQGROUP) $(DESTDIR)$(bindir)/conqoper$(EXEEXT) \
 		$(DESTDIR)$(libexecdir)/conqdriv$(EXEEXT) \
 		$(DESTDIR)$(bindir)/conquestd$(EXEEXT)
