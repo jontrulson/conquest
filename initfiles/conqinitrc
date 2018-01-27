@@ -581,7 +581,7 @@ planet {
   pteam       "S"
   armies      74
   visible     "yes"
-  core        "yes"
+  core        "no"
   homeplanet  "no"
   x           -20039.724127
   y           -7972.850339
@@ -598,7 +598,7 @@ planet {
   pteam       "S"
   armies      153
   visible     "yes"
-  core        "yes"
+  core        "no"
   homeplanet  "no"
   x           -19392.238383
   y           -11831.705377
