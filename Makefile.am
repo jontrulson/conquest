@@ -19,7 +19,7 @@ CONQDOCDIR = $(CONQDATADIR)/doc/conquest
 
 CONQDOCS = docs/HISTORY.txt docs/conquest-guide.txt docs/conqinit.txt \
 	robot-rules/conqrule robot-rules/conqrule.easy \
-	docs/server.txt docs/LICENSE.txt docs/CREDITS.txt
+	docs/server.txt LICENSE docs/CREDITS.txt
 
 INITFILES = initfiles/conqinitrc initfiles/00_plantex.trc \
 	initfiles/texturesrc initfiles/soundrc
