@@ -88,7 +88,7 @@
 # define M_PI 3.141592654
 #endif
 
-#define CONQ_HTTP   "https://sourceforge.net/projects/conq/"
+#define CONQ_HTTP   "https://github.com/jtrulson/conquest"
 
 /* Values for sstatus() */
 #define SS_OFF 1                /* available for use */
