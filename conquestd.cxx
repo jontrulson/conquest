@@ -889,25 +889,45 @@ void dead( int snum )
     /* let the client know. */
     updateClient(false);
 
-    /* if conquered, wait for the cpMessage_t */
+    /* if conquered, wait up to 5 minutes for the cpMessage_t (last words) */
     if (kb == KB_CONQUER)
     {
-        if (pktWaitForPacket(CP_MESSAGE,
-                             buf, PKT_MAXSIZE,
-                             (60 * 5)) <= 0)
-	{			/* error or timeout.  gen lastwords */
+        unsigned int start = clbGetMillis();
+        const unsigned int delay = ((5 * 60) * 1000); // 5 minutes
+        bool done = false;
+
+        while ( !done && (clbGetMillis() < (start + delay)) )
+        {
+            int rv;
+
+            if ((rv = pktRead(buf, PKT_MAXSIZE, 1)) < 0)
+            {			/* error or timeout.  gen lastwords */
+                utLog("%s: Error (%d) waiting for Conqueror's Last Words",
+                      __FUNCTION__, rv);
+
+                // let robreply() handle it
+                break;
+            }
+            else
+            {
+                if (rv == CP_MESSAGE)
+                {
+                    cpMessage_t *cmsg = (cpMessage_t *)buf;
+
+                    /* copy as much of the message as you can. */
+                    utStrncpy(cbConqInfo->lastwords,
+                              (char *)cmsg->msg, MAXLASTWORDS);
+                    done = true;
+                }
+            }
+        }
+
+        if (!done)
+        {
+            // timed out or error, gen last words
             robreply(buf);
             utStrncpy(cbConqInfo->lastwords, buf, MAXLASTWORDS);
-
-            return;
-	}
-        else
-	{
-            cpMessage_t *cmsg = (cpMessage_t *)buf;
-
-            /* copy as much of the message as you can. */
-            utStrncpy(cbConqInfo->lastwords, (char *)cmsg->msg, MAXLASTWORDS);
-	}
+        }
     }
 
     /* Turn off sticky war so we can change war settings from menu(). */
