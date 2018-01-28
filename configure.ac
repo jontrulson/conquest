@@ -10,6 +10,8 @@ AC_CONFIG_MACRO_DIRS([m4])
 
 AC_LANG(C++)
 
+dnl AC_CONFIG_SUBDIRS (src)
+
 dnl checks the system
 dnl AC_CANONICAL_TARGET([])
 dnl Checks for programs.
@@ -253,7 +255,7 @@ AM_CONDITIONAL(SNDCLIENT, test $SNDCLIENT)
 AM_CONDITIONAL(TCPW, test $TCPW)
 
 
-AC_CONFIG_FILES([Makefile])
+AC_CONFIG_FILES([Makefile src/Makefile])
 AC_OUTPUT
 
 echo
