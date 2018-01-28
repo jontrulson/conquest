@@ -17,9 +17,9 @@ CONQIMGDIR = $(CONQDATADIR)/conquest/img
 CONQSNDDIR = $(CONQDATADIR)/conquest/sound
 CONQDOCDIR = $(CONQDATADIR)/doc/conquest
 
-CONQDOCS = ../docs/HISTORY.txt ../docs/conquest-guide.txt ../docs/conqinit.txt \
+CONQDOCS = ../docs/HISTORY.txt ../docs/conquest-guide.md ../docs/conqinit.txt \
 	../robot-rules/conqrule ../robot-rules/conqrule.easy \
-	../docs/server.txt ../LICENSE.txt ../docs/CREDITS.txt
+	../docs/server.txt ../LICENSE.txt ../docs/CREDITS.txt ../README.md
 
 INITFILES = ../initfiles/conqinitrc ../initfiles/00_plantex.trc \
 	../initfiles/texturesrc ../initfiles/soundrc
