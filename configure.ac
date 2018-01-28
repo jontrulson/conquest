@@ -4,7 +4,7 @@ dnl
 dnl
 
 AC_INIT([conquest],[8],[jon@radscan.com])
-AC_CONFIG_HEADER(config.h)
+AC_CONFIG_HEADER(src/config.h)
 
 AC_CONFIG_MACRO_DIRS([m4])
 

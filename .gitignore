@@ -9,6 +9,7 @@
 src/.deps/*
 *~
 Makefile
+src/config.h.in
 config.h
 config.status
 stamp-h1
