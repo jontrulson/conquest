@@ -48,6 +48,8 @@ CONTENTS:
        CQI data is currently used to represent the following
        information in Conquest:
 
+       - global data.  Used to decide how many planets, ships,
+         messages, et are supported in the universe.
        - planet data (name, size, type, team, etc).  Used for
          initializing the Planets in the common block.
        - texture data (Well Known Name (WKN)),
@@ -70,6 +72,7 @@ CONTENTS:
            below.
 
          - <prefix>/etc/texturesrc
+         - <prefix>/etc/*.trc
          - ~/.conquest/*.trc
 
            These files describe the characteristics of textures,
@@ -78,11 +81,18 @@ CONTENTS:
 
 
          - <prefix>/etc/soundrc
+         - <prefix>/etc/*.src
          - ~/.conquest/*.src
 
            These files describe the characteristics of sound
            configuration, effect definitions, and music definitions
 
+         The <prefix>/etc/conqinitrc, soundrc, and texturesrc files
+         are overwritten on an update or a 'make install'.  If you
+         want to make changes to these files, copy them with a
+         '.local' extension.  The Conquest executables will look for
+         and load a '.local' variant, if it exists, before loading the
+         default files.
 
        The general syntax of a section entry in these files is as
        follows:
@@ -122,9 +132,14 @@ CONTENTS:
        ## global
 
           The global section describes the various limits for
-          conquest.  Currently, you should never change this, until
-          the common block (and therefore compatibility) is changed to
-          support them.  For now, leave these alone :).
+          conquest.  With v9.0 or better, these can be used to tailor
+          a universe to your liking.  Want to support 50 ships?  Go
+          right ahead!
+
+          The Common Block (Universe) is dependant on these values -
+          if you change them, then you will need to re-initialize a
+          new universe via conqoper before you will be able start a
+          server.
 
           global {
             planetmax 60
@@ -136,30 +151,32 @@ CONTENTS:
 
           planetmax:  NUMBER
                       specifies the maximum number of planets in the
-                      universe.
+                      universe.  256 is the maximum.
 
 
           shipmax:    NUMBER
                       specifies the maximum number of ships that can
-                      play.
+                      play.  256 is the maximum.
 
           usermax:    NUMBER
                       specifies the maximum number of users the game
-                      can handle (and store stats for).
+                      can handle (and store stats for). 65535 is the
+                      maximum.
 
           histmax:    NUMBER
                       specifies the maximum number of history entries
-                      that can be stored.  Maybe not useful?
+                      that can be stored.  256 is the maximum.
 
           msgmax:     NUMBER
                       The maximum number of message slots available.
+                      256 is the maximum.
 
 
        ## shiptype
 
           The shiptype sections are currently ignored.  They could be
           used someday to allow the creation of new shiptypes with
-          differing characteristics.
+          differing characteristics.  For now, just leave them as is.
 
           shiptype {
             name       "Destroyer"
@@ -214,10 +231,9 @@ CONTENTS:
 
           The planet sections are used to describe all of the planets
           and their characteristics in conquest.  This data is used to
-          initialize conquest's planet list on a game reset.  This
-          should allow budding universe builders alot of freedom.
-          Even more when the common block has been changed (in a
-          future release) to support things like colors, size, etc.
+          initialize conquest's planet list on a game reset or
+          universe init.  This should allow budding universe builders
+          alot of freedom.
 
           planet {
             name        "Klingus"
@@ -243,7 +259,8 @@ CONTENTS:
                       The name of the body this planet orbits.  If set
                       to be the same as the planet's name, then the
                       planet is marked as not orbiting anything
-                      (stationary).  The default is Murisak.
+                      (stationary).  The default, if unspecified is
+                      itself (ie: Stationary).
 
           angle:      RATIONAL
                       The starting angle of the planet relative to
@@ -303,21 +320,13 @@ CONTENTS:
 
           core:       BOOL
                       wether the planet must be taken in order to
-                      conquer the universe.  This value has no meaning
-                      currently, as this is hardcoded into the game.
-                      When the common block is reworked, this value
-                      will actually mean something :)
+                      conquer the universe.
 
-          homeplanet: BOOL
-                      whether this planet is one of the owner team's
-                      homeplanets. This value has no meaning
-                      currently, as this is hardcoded into the game.
-                      When the common block is reworked, this value
-                      will actually mean something.
-
-                      Currently, you must ensure that 3, and only 3
-                      planets are marked as a 'homeplanet' for each of
-                      the player teams (f, k, r, and o).
+          homeplanet: BOOL whether this planet is one of the owner
+                      team's homeplanets.  This is only valid for the
+                      standard 4 teams, Federation, Klingon, Orion,
+                      and Romulan.  Each of the 4 teams MUST have at
+                      least one homeplanet.
 
           x:          RATIONAL
                       starting x coordinate of the planet's location.
@@ -330,10 +339,7 @@ CONTENTS:
                       stationary.
 
           size:       NUMBER
-                      size of the planet in CU's.  This only matters
-                      to the gl client for now.  In the future, this
-                      value will be stored with the planet into the
-                      common block, and propagated out to clients.
+                      size (diameter) of the planet in CU's.
 
 
        Currently in conquest, the following steps are made to
@@ -343,7 +349,7 @@ CONTENTS:
           as the planet, if so use it.
 
        2. if all else fails, use the default textures 'classm',
-          classd', 'star' etc.
+          'classd', 'star' etc, depending on the planet's ptype.
 
        If you want a specific texture to be displayed for a planet,
        just create a texture definition with the same name as the
@@ -366,7 +372,7 @@ CONTENTS:
        <prefix>/etc/texturesrc).  After conquest parses the main
        texturesrc file, it will then load and parse any *.trc files it
        finds in your ~/.conquest/ directory.  These files have the
-       same format as texturesrc.  Texture image (TGA) files can be
+       same format as texturesrc.  Texture image (PNG) files can be
        provided in a user's ~/.conquest/img/ directory, which will
        also be searched when texture loading starts.  This allows
        users to override the games textures if they wish.
@@ -429,7 +435,7 @@ CONTENTS:
                       the texture file that contains the texture image
                       data (without an extension).  In the above
                       example, conquest will look for and load a
-                      texture image file called 'conq-fed.tga' in the
+                      texture image file called 'conq-fed.png' in the
                       texture image directory(s).
 
                       If the filename is specified as "", then this
@@ -452,8 +458,8 @@ CONTENTS:
           mipmap:     BOOL
                       optional.  If set to yes, generate mipmaps for
                       this texture.  This is useful for the ships,
-                      planets, and the doomsday machine and other
-                      textures.  It improves the quality of the
+                      planets, and the doomsday machine and certain
+                      other textures.  It improves the quality of the
                       texture at different sizes, at the expense of
                       requiring more texture memory and rendering
                       work. The default is "no".
@@ -677,7 +683,9 @@ CONTENTS:
                       animdefs.  An inlined animdef is an animdef
                       defined within an animation section.
 
-                      'name' is ignored for inlined animdefs.
+                      'name' is ignored for inlined animdefs, unless
+                      your intent is to use an already defined animdef
+                      and simply override some of it's values.
 
           texname:    STRING
                       semi-optional.  Specifies the WKN of a texture
@@ -1031,7 +1039,7 @@ CONTENTS:
                       the effect or music.
 
          loops:       NUMBER
-                      Number of loops to play the effect of music.  0
+                      Number of loops to play the effect or music.  0
                       means to loop infinitely.
 
          limit:       NUMBER
@@ -1060,21 +1068,16 @@ CONTENTS:
 ## conqinit utility
 
       There is a new executable called conqinit provided.  conqinit
-      can be used to test the parser, perform syntax checking on
-      conqinitrc and texturesrc files, as well as to generate an
-      initdata.h file based on conqinitrc data.
+      can be used to test the parser and perform syntax checking on
+      conqinitrc and texturesrc files.
 
-      This (pre-generated) initdata.h file contains defaults for the
-      'global' and 'planet' sections, compiled directly into conquest,
-      in the event the respective conquestrc file could not be found
-      or successfully read on startup.
-
-      If you are modifying the conquestrc system file used by
+      If you are modifying the conqinitrc system file used by
       conquest, you should at least run conqinit on it to check for
       syntax or other validation errors.  If conquest (or conquestd)
-      fails to properly load and parse the file at runtime, the built
-      in internal defaults will be used and a warning message will be
-      logged.
+      fails to properly load and parse the file at runtime, you will
+      not be able to start a server. In the case of the soundrc and
+      texturesrc files, you will not be able to start the client until
+      the errors are fixed.
 
       examples:
 
@@ -1101,18 +1104,6 @@ CONTENTS:
         does the same thing but parses <file> instead, and treats it
         like a file in texturesrc format.
 
-      $ conqinit -f <file> -h >initdata.h
-
-        parses <file> as a conqinitrc file and generates an initdata.h
-        file on stdout that can be compiled into conquest to specify
-        'last-ditch' defaults in case the normal files could not be
-        parsed for some reason at runtime.
-
-        Note, you should never have to gen any .h files, the parser
-        runs when conquest starts up and will always use the data it
-        found if it can.  A valid initdata.h file is supplied in the
-        conquest distribution and should not be modified by end users.
-
       $ conqinit -D
 
         You must be a conqoper (or have direct read permission on the
@@ -1121,7 +1112,8 @@ CONTENTS:
         This option is sort of a hack.  It loads the current state of
         the universe on the local machine and generates a conqinitrc
         format file on stdout.  This file can be saved and made the
-        default conqinitrc for a system.
+        default conqinitrc for a system, with some minor editing.
+        It's primarily a debugging tool though.
 
         If you do this, you will almost certainly want to edit the
         file and at least change the sun's randomized army counts.
@@ -1135,10 +1127,11 @@ CONTENTS:
         the universe to a conqinitrc file, edit it if neccessary (to
         clean up colors, etc).
 
-        Then copy that file over the system's conqinitrc file.  From
-        then on, whenever the planets are initialized (due to a
-        successful conquer, or the actions of an oper in conqoper),
-        your definitions will be used as the default universe
+        Then copy that file to
+        <prefix>/etc/conquest/conqinitrc.local.  From then on,
+        whenever the planets are initialized (due to a successful
+        conquer, or the actions of an oper in conqoper), your
+        definitions will be used as the default universe
         configuration.
 
 
@@ -1148,14 +1141,14 @@ CONTENTS:
    texture image or texture definition.
 
    For the purposes of this discussion, a 'texture image' represents
-   the file (in TGA format) that contains the image data for the
+   the file (in PNG format) that contains the image data for the
    texture.  A 'texture definition' represents a mapping between a WKN
    texture, and the actual texture's filename/color information.  Texture
    definitions are specified in texturesrc or *.trc files.
 
    # overriding a texture image
 
-     When loading texture image (TGA) files, a user's ~/.conquest/img/
+     When loading texture image (PNG) files, a user's ~/.conquest/img/
      directory is searched prior to the system-wide
      (<prefix>/share/img/) image directory.  This allows users to
      trivially substitute a different texture in place of the system
@@ -1178,7 +1171,7 @@ CONTENTS:
 
      So for example, if you absolutely hate the Viewer Backgroud
      texture (it's WKN is 'vbg'), you could make it whatever you want
-     by creating a ~/.conquest/vbg.trc file with the following
+     by creating a ~/.conquest/myvbg.trc file with the following
      contents:
 
          texture {
@@ -1186,13 +1179,13 @@ CONTENTS:
            filename "my_better_vbg"
          }
 
-         Then place your 'my_better_vbg.tga' file into your
+         Then place your 'my_better_vbg.png' file into your
          ~/.conquest/img/ directory.
 
          Now when conquest wants to draw the 'vbg' texture, it will
          use your definition instead.
 
-         NOTE: I just randomly chose the name 'vbg.trc' for this
+         NOTE: I just randomly chose the name 'myvbg.trc' for this
          example.  You can name the file to whatever you want, just as
          long as it has a .trc extension, and lives in your
          ~/.conquest/ directory.
@@ -1200,25 +1193,22 @@ CONTENTS:
 
 ## conquest's texture format
 
-   Conquest currently uses Targa (.tga) image format files to
-   represent textures.  This is a simple and easy to use format,
-   though not as good as formats like PNG in terms of compression.
+   Conquest currently uses PNG (.png) image format files to
+   represent textures.
 
-   TGA files you use in Conquest must have the following
+   PNG files you use in Conquest must have the following
    characteristics:
 
-   - uncompressed or RLE compressed TGA
-   - image origin in Lower Left
-   - 24 bit RGB or 32bit ARGB pixel data
-   - be a power of two in their width and height, 256x128 is okay,
-     3x27 is not. :)
+   - 8 bit (2 component) Luminance or 32bit (4 component) ARGB pixel
+     data
 
-   I would limit texture sizes to no more than 512x512.
+   - be a power of two in their width and height, 256x128 is okay,
+     3x27 is not.  (Modern OpenGL hardware typically does not require
+     this anymore, but it doesn't hurt.)
+
+   I would limit texture sizes to no more than 1024x1024.  256x256, or
+   512x512 is typical.  Again, this will really depend on your OpenGL
+   hardware and what it can handle.
 
    For Conquest's textures, I use The Gimp (www.gimp.org) under linux.
-   It can save in compressed ARGB/RGB TGA format.  For the 'Save'
-   options dialog, select 'RLE Compressed' and 'Origin in lower left'.
 
-
-
-$Id$

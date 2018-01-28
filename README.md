@@ -22,7 +22,11 @@ Conquest is released under the [MIT License](LICENSE.txt).
 ## Playing the game
 
 Conquest is a client that must connect over a network to a conquestd
-server.  By default, when running conquest without options, it will
+server.
+
+```conquest ```
+
+By default, when running conquest without options, it will
 query the meta-server at conquest.radscan.com to get a list of
 currently available servers.  Pick one, login, and play.
 
@@ -32,7 +36,7 @@ Alternatively, you can specify a specific server with the "-s" option:
 
 The port number is optional, and will default to 1701.
 
-You can get a list of the currently active servers via a web browser
+You can get a list of the currently active servers via your web browser
 by going to http://radscan.com/cgi-bin/conqmeta.pl
 
 ### The goal of the game
@@ -58,13 +62,15 @@ This supports Linux systems and has also been tested on MAC OSX with
 the ports collection. I currently develop on Kubuntu 16.04.
 
 In the past, other Unix systems were supported like the BSD's
-(FreeBSD, OpenBSD, etc) as will as Digital Unix for Alpha processors.
+(FreeBSD, OpenBSD, etc) as will as Digital Unix for Alpha processors,
+and Sun/Oracle Solaris.
+
 These have not been tested in a while, so if there are problems,
 please feel free to send patches.
 
 The last release of conquest in 2010 also supported the conquest
 client (only) on Windows systems (XP and Windows 7) using MinGW.  This
-has not been tested in a while, but I plan to support this again
+has also not been tested in a while, but I plan to support this again
 later.
 
 ### Building Conquest
@@ -109,26 +115,47 @@ markdown and updated to current reality, but for now:
 * The [CQI Parser Documentation](docs/conqinit.txt) provides
   information on the format and types of files the Conquest server and
   client uses to configure itself.  The Universe (planets, etc),
-  textures, andimations, and sound information are all handled by this
+  textures, animations, and sound information are all handled by this
   parser.  At startup, Conquest's executables will look for these
-  files:
+  files in *prefix*/etc/conquest/
 
   * conqinitrc - This file specifies some limits on the universe
     (number of ships supported, planets supported, etc) as well as
     definitions for each of the planets in your universe.  This is
-    used by the server.
+    used by the server only.  The server will not start if there are
+    syntax errors in this file.
 
   * texturesrc - This file specifies the base texture and animation
-    data required by the client.
+    data required by the client (only).  The client will not start if
+    there are syntax errors in this file.
 
-  * soundrc - this file is used by the client to confiure the sound
-    effects (and music, if you have the musicpak installed).
+  * soundrc - this file is used by the client (only) to configure the
+    sound effects (and music, if you have the musicpak installed).
+    The client will not start if there are syntax errors in this file.
+
+If you want to make custom changes to these files, copy them with a
+filename suffix of '.local', and edit those.  For example, if you are
+running a server and want to make a customized game:
+
+```
+cd *prefix*/etc/conquest
+cp conqinitrc conqinitrc.local
+vi conqinitrc.local
+```
+
+NOTE: Changing any of the items in the *global {}* section in
+conqinitrc will require that you re-init the universe from conqoper
+before you will be able to start a server.
+
+Doing a "make install" or updating to a newer package will overwrite
+these files, so make *.local* copies of these files if you want to
+preserve your modifications.
 
 ## Some screenshots
 
 NOTE: Some of these were taken using the recordings of actual game
 play.  At some point I'll update them to a more recent version of
-Conquest, but you get the gist.
+Conquest, but you should get the gist.
 
 ### Short Range View
 ![Short Range View](docs/images/short-range.png)

@@ -928,8 +928,8 @@ you can arrange it.
 ## Macro Keys / Mouse Macros
 
 Macros are sequences of Conquest commands that are issued when a
-Function Key (Fkey) is hit.  On PC hardware, these are the F1-F12, and
-SHIFT F1-F12 keys.
+Function Key (Fkey) is hit.  On PC hardware, these are the F1-F12,
+SHIFT F1-F12, and CTRL F1-F12 keys.
 
 With the GL client, version 8.1.2f or better, support for assigning
 macros to mouse buttons is also provided.  Modifiers like Alt,
