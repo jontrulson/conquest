@@ -96,7 +96,7 @@ With v9.0+, almost all of this can be configured by an operator.  You
 can create a Universe with 5 planets or 50, as you see fit.  You
 decide which ones are core planets (needed to take the universe and
 win the game) and which are home planets (subject to defense by team
-robots).  You can coose names, orbital characteristics and the like as
+robots).  You can choose names, orbital characteristics and the like as
 you see fit.  The idea was to give as much flexibility in creating a
 Universe as is reasonably possible.
 
@@ -130,7 +130,7 @@ servers:
 ```$ conquest```
 
 NOTE: If you want to connect to a server on your local machine, be
-sure conquestd is running.  See [server.txt](docs/server.txt) for more
+sure conquestd is running.  See [server.txt](server.txt) for more
 information on conquestd and running a server.
 
 ## Default network ports
@@ -193,7 +193,7 @@ killed by a 'lightning bolt'.
 ### SlingShot
 
 The SlingShot bug is enabled.  This is a towing bug that existed in
-the original VMS/RatFor version of conquest.  It's a fun bug, and I
+the original VMS/RATFOR version of conquest.  It's a fun bug, and I
 received several emails about it when I inadvertently fixed it in a
 later version without understanding it's true significance.
 
@@ -224,7 +224,7 @@ newcomers play.  Fighting a 25 kill robot takes some skill ;-)
 
 When enabled, users can switch teams at the conquest main menu.
 
-When not enabled, a randomw team (Federation, Klingon, Romulan, Orion)
+When not enabled, a random team (Federation, Klingon, Romulan, Orion)
 is chosen for you.
 
 ### NoTeamWar
@@ -286,27 +286,26 @@ accessible from within the game.
 
 ## Recording Games
 
-   With Conquest 8.0, recording has been significantly re-worked.
-   '.cqr' files created prior to v8.0 are not compatible with v8.0+,
-   sorry.
+With Conquest 8.0, recording has been significantly re-worked.  '.cqr'
+files created prior to v8.0 are not compatible with v8.0+, sorry.
 
-   The new format uses the same packet protocol that the clients use.
-   This means recording files (cqr's) are *much* smaller and much more
-   efficient (cpu-wise) during the recording process, than they were
-   with v7.x.
+The new format uses the same packet protocol that the clients use.
+This means recording files (cqr's) are *much* smaller and much more
+efficient (cpu-wise) during the recording process, than they were with
+v7.x.
 
-   Another benefit is endian safety.  With the old format, recordings
-   could only be played back on the same machine architecture the cqr
-   was created on.  Since the recording data is now based on the
-   packet protocol, recordings are now completely endian safe (network
-   byte order is used).  So now, some poor slob on his Sun SPARC can
-   play back a recording I make on a lintel machine and vice-versa.
+Another benefit is endian safety.  With the old format, recordings
+could only be played back on the same machine architecture the cqr was
+created on.  Since the recording data is now based on the packet
+protocol, recordings are now completely endian safe (network byte
+order is used).  So now, some poor slob on his Sun SPARC can play back
+a recording I make on a lintel machine and vice-versa.
 
-   There are two types of recordings possible in Conquest: Server and
-   Client.
+There are two types of recordings possible in Conquest: Server and
+Client.
 
-   Client recordings are created when a user runs conquest with the '-r
-   <recfile>' option, for example:
+Client recordings are created when a user runs conquest with the *-r*
+option, for example:
 
 ```$ conquest -r somefile.cqr```
 
@@ -425,7 +424,7 @@ destination.
 
 The Keypad keys/Arrow keys can be used for 1-key steering, which can
 be faster in battle.  A mouse can also be used (default middle mouse
-button) by clicking the mmouse in the viewer.
+button) by clicking the mouse in the viewer.
 
 Of course, once you have set a direction, you need to set a warp speed
 if one is not already set, or you are not going to actually go
@@ -590,7 +589,7 @@ planets until they are ready to handle robot defenders.
 By default, all planets, with the exception of Altair, Hell, and Jinx,
 must be taken in order to conquer the universe.
 
-Note with the latest version of Conquest (tentatively called V9.0),
+NOTE:  With the latest version of Conquest (tentatively called V9.0),
 all of this is configurable by the Server Operator.  The Operator can
 define a Universe where any planet is a Home planet or Core Planet.
 
@@ -812,11 +811,12 @@ As of V9.0, *tow-chains* are possible.
 
 Different teams have different strengths.  Romulans have the best
 weapons, but the worst engines.  Orions have the best engines and the
-worst weapons.  The feds/klings are in-between.
+worst weapons.  The Federation and Klingons are in-between.  In
+original Conquest, this is what you were stuck with.
 
-If the server has the Refit flag set, you can change your ship type,
-regardless of which team you are on, provided you are orbiting a team
-owned planet and have at least one kill.
+But now, if the server has the Refit flag set, you can change your
+ship type, regardless of which team you are on, provided you are
+orbiting a team owned planet and have at least one kill.
 
 The number of kills your ship has will determine how much more
 efficient your weapons and engines are than the base efficiency you
@@ -958,9 +958,9 @@ Three default mouse macros are provided to give you a taste, and will
 be saved in your conquestrc file the first time you run an 8.1.2f or
 better version of the client.  They are:
 
-* mouse button 0 (left): Fire phaser at <angle>
-* mouse button 1 (middle): Set course to <angle>
-* mouse button 2 (right): Fire Torp at <angle>
+* mouse button 0 (left): Fire phaser at *angle*
+* mouse button 1 (middle): Set course to *angle*
+* mouse button 2 (right): Fire Torp at *angle*
 
 Of course you can redefine these, as well as add others.  With mouse
 macros, a special character sequence, *\a* can be used to represent
@@ -1143,16 +1143,16 @@ supplying the '-f' option.
 
 ### bin/conqoper
 
-This is the Conquest Operator (CO) program that allows suitably
-privileged individuals to control, monitor, and modify the behavior of
-the game.  The root user is always a CO and therefore can run the
-conqoper program.  If you want to allow other people to be able to run
-conqoper, you will need to add them to the conquest group in
-/etc/group.
+This is the Conquest Operator (CO) curses-based program that allows
+suitably privileged individuals to control, monitor, and modify the
+behavior of the game.  The root user is always a CO and therefore can
+run the conqoper program.  If you want to allow other people to be
+able to run conqoper, you will need to add them to the conquest group
+in /etc/group.
 
-If you want to allow specific players to be able to issue certain
-operator commands from within the game, (e)dit their usernames in
-conqoper and set the 'Conquest Operator' flag.
+If you want to allow specific remote players to be able to issue
+certain operator commands from within the game, (e)dit their usernames
+in conqoper and set the 'Conquest Operator' flag.
 
 Be careful who you give CO status to, a bad CO can cheat, or otherwise
 disrupt a game.  In addition, due to the fact that a CO is a member of

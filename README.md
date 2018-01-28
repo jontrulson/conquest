@@ -39,7 +39,7 @@ by going to http://radscan.com/cgi-bin/conqmeta.pl
 
 The goal of the game is to conquer the Universe by bombing planets,
 placing your team's armies on them and fighting off any ships that
-want to ruin your day.  When all of the core plannets have been taken
+want to ruin your day.  When all of the core planets have been taken
 by your team, the game is reset to start the carnage all over again.
 
 ## Requirements
@@ -52,7 +52,7 @@ To build and run Conquest, you will need:
   version 1.x.
 * glut/freeglut development headers and libraries
 * SDL 1.2 and SDL_mixer 1.2, if you want sound (you do).
-* g++ 4.9 or better, or clang 3.4 or better
+* g++ 4.9 or better, or clang++ 3.4 or better
 
 This supports Linux systems and has also been tested on MAC OSX with
 the ports collection. I currently develop on Kubuntu 16.04.
@@ -122,7 +122,7 @@ markdown and updated to current reality, but for now:
     data required by the client.
 
   * soundrc - this file is used by the client to confiure the sound
-    effects (and music, if you have the misicpak installed).
+    effects (and music, if you have the musicpak installed).
 
 ## Some screenshots
 
