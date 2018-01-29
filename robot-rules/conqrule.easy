@@ -1,16 +1,52 @@
+###############################################################################
+#
+#                              C O N Q R U L E S
+#
+# Copyright (c) 1994-2018 Jon Trulson
+#
+# The MIT License
+#
+# Permission is hereby granted, free of charge, to any person
+# obtaining a copy of this software and associated documentation
+# files (the "Software"), to deal in the Software without
+# restriction, including without limitation the rights to use, copy,
+# modify, merge, publish, distribute, sublicense, and/or sell copies
+# of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be
+# included in all copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+# EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+# MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+# NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS
+# BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN
+# ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+# CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+#
+###############################################################################
+#
+# These rules were originally written by Jef Poskanser and Craig
+# Leres.
+#
+# I added a rule to have the ships raise their shields if they
+# are taking damage and no enemy is near.  This lessens robot sun-deaths a
+# little, which happens mostly after being spawned.  They at least
+# have a chance :)
+#
+# Another rule was added to fix a logic hole that showed up when the
+# scaling bug in buildai() was fixed. (Robots always thought they had
+# maximum fuel).
+#
 # This file contains a modified robot strategy to make them dumber,
-#  and therefore easeir for new players to deal with.
+# and therefore easier for new players to deal with.
+# -jon
 #
-###############################################################################
-#
-# $Id$
-#
-###############################################################################
-#
-# compile with 'conqstrat <conqrule >conqdata.h' , then re-compile conquest
-#  to install as the new standard strategy table.
-# OR
-# compile with 'conqstrat -U <conqrule' to update the common block directly.
+# Compile with 'conqstrat <conqrule.easy >conqdata.h', then re-compile
+# conquest, and re-init the robots via conqoper to install as the new
+# standard strategy table.
 #
 ###############################################################################
 #
