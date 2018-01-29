@@ -1081,7 +1081,7 @@ KEY:
 9. time and date of last semop.
 
 
-### Leaving a screen on conqoper
+### Leaving a screen in conqoper
 
 When watching another ship in conqoper or editing a player or planet,
 use 'q' to quit.
