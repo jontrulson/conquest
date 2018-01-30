@@ -463,10 +463,9 @@ unsigned int utDeltaGrand( unsigned int s, unsigned int *n )
 
     /* Calculate the difference. */
     if ( tn < ts )
-        tn = tn + 24 * 60 * 60 * 1000;		/* crossed midnight */
-
-    return ( tn - ts );
-
+        return (ts - tn);
+    else
+        return (tn - ts);
 }
 
 
@@ -488,10 +487,9 @@ unsigned int utDeltaSecs( unsigned int s, unsigned int *n )
 
     /* Calculate the difference. */
     if ( tn < ts )
-        tn = tn + ((24 * 60) * 60);		/* crossed midnight */
-
-    return ( tn - ts );
-
+        return (ts - tn);
+    else
+        return (tn - ts);
 }
 
 
