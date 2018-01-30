@@ -1945,8 +1945,7 @@ static nodeStatus_t renderNode(void)
             int pkttype = 0;
             char buf[PKT_MAXSIZE];
 
-            while ((pkttype = pktWaitForPacket(PKT_ANYPKT,
-                                               buf, PKT_MAXSIZE, 0)) > 0)
+            while ((pkttype = pktRead(buf, PKT_MAXSIZE, 0)) > 0)
                 processPacket(buf);
 
             if (pkttype < 0)          /* some error */

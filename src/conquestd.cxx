@@ -1342,8 +1342,7 @@ void menu(void)
         /* Reset up the destruct fuse. */
         cbShips[Context.snum].sdfuse = -TIMEOUT_PLAYER;
 
-        if ((pkttype = pktWaitForPacket(PKT_ANYPKT,
-                                        buf, PKT_MAXSIZE, 0)) < 0)
+        if ((pkttype = pktRead(buf, PKT_MAXSIZE, 0)) < 0)
 	{
             freeship();
             utLog("conquestd:menu: waitforpacket returned %d", pkttype);
