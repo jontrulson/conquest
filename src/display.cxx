@@ -209,8 +209,8 @@ void display( int snum )
     dobeep = false;
     mindis = 1.0e6;
     minsdis = 1.0e6;
-    minenemy = 0;
-    minsenemy = 0;
+    minenemy = -1;
+    minsenemy = -1;
     dis = 0.0;
 
     if (snum >= 0)
@@ -631,7 +631,7 @@ void display( int snum )
 
     if (snum >= 0)
     {				/* if a ship view */
-        if ( minenemy != 0 || STALERT(snum) )
+        if ( minenemy != -1 || STALERT(snum) )
 	{
             if ( mindis <= PHASER_DIST )
 	    {
@@ -665,7 +665,7 @@ void display( int snum )
                 AlertLevel = YELLOW_ALERT;
                 strcpy(buf , "Yellow alert ") ;
 	    }
-            else if ( minsenemy != 0 )
+            else if ( minsenemy != -1 )
 	    {
                 /* An enemy near one of our ships or planets. */
                 outattr = YellowColor;
@@ -677,10 +677,10 @@ void display( int snum )
 	    {
                 outattr = GreenColor;
                 AlertLevel = GREEN_ALERT;
-                minenemy = 0;
+                minenemy = -1;
 	    }
 
-            if ( minenemy != 0 )
+            if ( minenemy != -1 )
 	    {
                 utAppendShip(buf , minenemy) ;
                 if ( SCLOAKED(minenemy) )

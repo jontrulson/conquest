@@ -62,7 +62,7 @@ void hudInitData(void)
     hudData.kills.color      = InfoColor;
 
     hudData.aStat.alertLevel = GREEN_ALERT;
-    hudData.aStat.aShip      = 0;
+    hudData.aStat.aShip      = -1;
     hudData.aStat.color      = GreenLevelColor;
 
     hudData.sh.shields       = -9;
@@ -158,7 +158,7 @@ void hudSetHeading(int snum)
 void hudSetAlertStatus(int snum, int asnum, alertLevel_t astatus)
 {
 
-    if (snum <= 0)
+    if (snum < 0)
     {
         if (hudData.aStat.alertLevel != GREEN_ALERT) /* a special */
         {

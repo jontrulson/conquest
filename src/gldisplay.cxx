@@ -75,13 +75,13 @@ void display( int snum )
         Context.redraw = false;
     }
 
-    hudSetAlertStatus(snum, 0, AlertLevel);
+    hudSetAlertStatus(snum, -1, AlertLevel);
 
     dobeep = false;
     mindis = 1.0e6;
     minsdis = 1.0e6;
-    minenemy = 0;
-    minsenemy = 0;
+    minenemy = -1;
+    minsenemy = -1;
 
     dis = 0;
 
@@ -333,7 +333,7 @@ void display( int snum )
      *  alert, if needed */
     if (snum >= 0)
     {				/* if a ship view */
-        if ( minenemy != 0 || STALERT(snum) )
+        if ( minenemy != -1 || STALERT(snum) )
 	{
             if ( mindis <= PHASER_DIST )
 	    {
@@ -361,7 +361,7 @@ void display( int snum )
                 /* Near an enemy. */
                 AlertLevel = YELLOW_ALERT;
 	    }
-            else if ( minsenemy != 0 )
+            else if ( minsenemy != -1 )
 	    {
                 /* An enemy near one of our ships or planets. */
                 minenemy = minsenemy;		/* for cloaking code below */
@@ -370,7 +370,7 @@ void display( int snum )
             else
 	    {
                 AlertLevel = GREEN_ALERT;
-                minenemy = 0;
+                minenemy = -1;
 	    }
 
 	}
