@@ -39,9 +39,9 @@ typedef struct {
                                 /*  (utModPlusOne five minutes) */
     char drivowner[MAXUSERNAME]; /* username of the driver's owner */
 
-    // The following are seconds since midnight.
-    unsigned int  drivtime;     /* last time the driver looped */
-    unsigned int  playtime;     /* last time a player looped */
+    // The following are seconds since the epoch.
+    time_t drivtime;     /* last time the driver looped */
+    time_t playtime;     /* last time a player looped */
 } Driver_t;
 
 #endif /* DRIVER_H_INCLUDED */

@@ -46,15 +46,15 @@ void     utLog(const char *fmt, ...)
     __attribute__ ((format (printf, 1, 2)));
 
 void     utDeleteBlanks( char *str );
-unsigned int utDeltaSecs( unsigned int s, unsigned int *n );
+time_t   utDeltaSecs( time_t s, time_t *n );
 real     utExplosionHits( real basehits, real dis );
 void     utFormatMinutes( int itime, char *buf );
 void     utFormatSeconds( int itime, char *buf );
 int      utGetMsg( int snum, int *msg );
 void     utFormatTime( char *buf, time_t thetime );
-unsigned int utDeltaGrand(unsigned int s, unsigned int *n);
-void     utGrand( unsigned int *h );
-void     utGetSecs( unsigned int *s );
+uint64_t utDeltaGrand(uint64_t s, uint64_t *n);
+void     utGrand( uint64_t *h );
+void     utGetSecs( time_t *s );
 real     utMod360( real r );
 int      utModPlusOne( int i, int modulus );
 int      utIsSpecial( char *str, int *what, int *token, int *count );

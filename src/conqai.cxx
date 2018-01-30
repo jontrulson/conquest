@@ -672,7 +672,7 @@ void robotloop(void)
 {
 
     int s;
-    unsigned int j;
+    uint64_t j;
 
     /* Disable the robot code in conqdriv. */
     cbConqInfo->externrobots = true;

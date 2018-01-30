@@ -69,7 +69,8 @@ void SigTerminate(int sig);
 int main(int argc, char *argv[])
 {
     int s, i, j, pid, drivtenths;
-    unsigned int ctime, etime, cacc, eacc;
+    unsigned int ctime, cacc, eacc;
+    uint64_t etime; 
     int force;
     int arg;
 
@@ -225,9 +226,14 @@ int main(int argc, char *argv[])
             drivtenths = 0;
 
             /* Check for player timeout. */
+
             if ( utDeltaSecs( cbDriver->playtime, &(cbDriver->drivtime) ) >=
                  TIMEOUT_PLAYER )
 	    {
+                utLog("conqdriv: %s: TIMEOUT: playtime = %lu, drivtime = %lu",
+                      __FUNCTION__,
+                      cbDriver->playtime, cbDriver->drivtime);
+
                 cbDriver->drivpid = 0;
                 cbDriver->drivstat = DRS_OFF;
                 cbDriver->drivowner[0] = 0;

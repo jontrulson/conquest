@@ -39,12 +39,12 @@ void drkill(void);
 void drpexit(void);
 void drstart(void);
 void gcputime(unsigned int *cpu);
-void initstats(unsigned int *ctemp, unsigned int *etemp);
+void initstats(unsigned int *ctemp, uint64_t *etemp);
 int isagod(int unum );
 int mailimps(char *subject, char *msg);
 int checkPID(int pidnum);
 void upchuck(void);
-void upstats(unsigned int *ctemp, unsigned int *etemp, unsigned int *caccum,
+void upstats(unsigned int *ctemp, uint64_t *etemp, unsigned int *caccum,
              unsigned int *eaccum, unsigned int *ctime, unsigned int *etime);
 
 #endif /* CONQUNIX_H_INCLUDED */

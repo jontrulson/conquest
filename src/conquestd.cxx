@@ -1587,7 +1587,7 @@ int newship( int unum, int *snum )
 /*    play */
 int play(void)
 {
-    unsigned int laststat, lastDrcheck, now;
+    time_t laststat, lastDrcheck, now;
     int didsomething;             /* update immediately if we did anything */
     int rv;
     char msgbuf[128];

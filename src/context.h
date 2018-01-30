@@ -40,18 +40,18 @@ typedef struct {
     int  childpid;              /* pid of driver we spawned */
     int  maxlin;                /* number of lines */
     int  maxcol;                /* number of columns */
-    unsigned int msgrand;       /* hundreths timestamp since last message */
-    unsigned int drchklastime;  /* last time drcheck was called */
+    uint64_t msgrand;           /* hundreths timestamp since last message */
+    time_t drchklastime;       /* last time drcheck was called */
     int  hasnewsfile;           /* says if a news file is available */
     bool accessDenied;          /* banned from playing */
     int  display;               /* should do anything in astservice() */
     int  redraw;                /* should redraw in display() */
-    bool  msgok;                 /* allow new messages */
+    bool  msgok;                /* allow new messages */
     int  entship;               /* entered a ship? */
     int  recmode;               /* recording mode: one of RECMODE_* */
     int  lasttang;              /* last target angle */
     int  lasttdist;             /* last target distance */
-    bool  hascolor;              /* do we have color support? */
+    bool  hascolor;             /* do we have color support? */
     int  updsec;                /* updates per second */
 
     char lasttarg[BUFFER_SIZE_256]; /* string of last ship/planet (I)nfo'd */

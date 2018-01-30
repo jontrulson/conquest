@@ -1614,7 +1614,7 @@ cbrk21:
 void procDestruct(cpCommand_t *cmd)
 {
     int snum = Context.snum;
-    unsigned int entertime, now;
+    time_t entertime, now;
 
     if (!pktIsValid(CP_COMMAND, cmd))
         return;
@@ -1648,7 +1648,8 @@ void procDestruct(cpCommand_t *cmd)
     Context.msgok = true;			/* messages are ok in the beginning */
     while ( cbShips[Context.snum].sdfuse > 0 )
     {
-        cbShips[Context.snum].sdfuse = SELFDESTRUCT_FUSE - utDeltaSecs ( entertime, &now );
+        cbShips[Context.snum].sdfuse =
+            int(SELFDESTRUCT_FUSE - utDeltaSecs ( entertime, &now ));
 
         /* Display new messages until T-minus 3 seconds. */
 
@@ -1702,7 +1703,7 @@ void procDestruct(cpCommand_t *cmd)
 void procAutoPilot(cpCommand_t *cmd)
 {
     int snum = Context.snum;
-    unsigned int laststat, now;
+    time_t laststat, now;
 
     if (!pktIsValid(CP_COMMAND, cmd))
         return;

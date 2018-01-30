@@ -1170,7 +1170,7 @@ void operate(void)
     int lin, savelin;
     int redraw, readone;
     int lastrev;
-    unsigned int msgrand, now;
+    uint64_t msgrand, now;
     char buf[MSGMAXLINE], junk[MSGMAXLINE];
     char xbuf[MSGMAXLINE];
     int ch;
@@ -2335,12 +2335,12 @@ void opstats(void)
         lin++;
         utFormatSeconds( cbDriver->drivtime, timbuf );
         cprintf( lin, col, ALIGN_NONE, sfmt,
-                 LabelColor, "Driver time:", InfoColor, timbuf);
+                 LabelColor, "Epoch Driver time:", InfoColor, timbuf);
 
         lin++;
         utFormatSeconds( cbDriver->playtime, timbuf );
         cprintf( lin, col, ALIGN_NONE, sfmt,
-                 LabelColor, "Play time:", InfoColor, timbuf);
+                 LabelColor, "Epoch Play time:", InfoColor, timbuf);
 
         lin++;
         cprintf( lin, col, ALIGN_NONE, tfmt,
@@ -2993,7 +2993,7 @@ void watch(void)
 
     int snum, tmp_snum, old_snum;
     int ch, normal, readone;
-    unsigned int msgrand, now;
+    uint64_t msgrand, now;
     char buf[MSGMAXLINE];
     int live_ships = true;
     int toggle_flg = false;   /* jon no like the toggle line ... :-) */

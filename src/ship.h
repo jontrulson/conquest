@@ -119,7 +119,7 @@ typedef struct {
                                 /*  scanned by which teams */
     int action;                 /* current action token if a robot */
     unsigned int ctime;         /* cpu hundredths at last check */
-    unsigned int etime;         /* elapsed thousands at last check */
+    uint64_t etime;             /* elapsed thousands at last check */
     unsigned int cacc;          /* accumulated cpu time */
     unsigned int eacc;          /* accumulated elapsed time */
     real strkills;              /* 'extra' randomized kills used for robots */

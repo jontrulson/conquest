@@ -450,9 +450,9 @@ void utDeleteBlanks( char *str )
 /*  SYNOPSIS */
 /*    int i, utDeltaGrand, s, n */
 /*    i = utDeltaGrand( s, n ) */
-unsigned int utDeltaGrand( unsigned int s, unsigned int *n )
+uint64_t utDeltaGrand( uint64_t s, uint64_t *n )
 {
-    unsigned int tn, ts;
+    uint64_t tn, ts;
 
     /* Save s in case it and n are the same variable. */
     ts = s;
@@ -474,9 +474,9 @@ unsigned int utDeltaGrand( unsigned int s, unsigned int *n )
 /*    int i, utDeltaSecs, s, n */
 /*    i = utDeltaSecs( s, n ) */
 
-unsigned int utDeltaSecs( unsigned int s, unsigned int *n )
+time_t utDeltaSecs( time_t s, time_t *n )
 {
-    unsigned int tn, ts;
+    time_t tn, ts;
 
     /* Save s in case it and n are the same variable. */
     ts = s;
@@ -651,59 +651,30 @@ void utFormatTime( char *buf, time_t thetime )
 
 }
 
-
-// grand - thousands since midnight. This base was apparently chosen
-// because all the conquest executables will compose the same result
-// at a given time, and the magnitude is such that an overflow (of a
-// 32b value) is rare and easy to handle.
-void utGrand( unsigned int *h )
+// millisecs since the epoch
+void utGrand( uint64_t *h )
 {
-    static struct timeval start;
-    static bool firstTime = true;
-    static unsigned int midnightOffsetSecs = 0;
-
-    if (firstTime)
-    {
-        firstTime = false;
-        // we prefer to avoid calling localtime() every call, so just
-        // compute an initial offset, and go from there.
-        time_t theTime = time(0);
-        struct tm *thetm = localtime(&theTime);
-        midnightOffsetSecs = ( ( thetm->tm_hour * 60 * 60)
-                               + (thetm->tm_min * 60 )
-                               + thetm->tm_sec );
-        GETTIMEOFDAY(&start);
-
-        *h = midnightOffsetSecs * 1000;
-
-        return;
-    }
-
-    struct timeval now, elapsed;
+    struct timeval now;
 
     GETTIMEOFDAY(&now);
-    TIMEDELTA(elapsed, now, start);
 
-    *h = (((midnightOffsetSecs + elapsed.tv_sec) * 1000)
-          + (elapsed.tv_usec / 1000));
+    *h = uint64_t((now.tv_sec * 1000)
+                  + (now.tv_usec / 1000));
 
     return;
 }
 
 
-// utGetSecs - seconds since midnight.  This base was apparently
-// chosen because all the conquest executables will compose the same
-// result at a given time, and the magnitude is such that an overflow
-// is rare and easy to handle.
-void utGetSecs( unsigned int *s )
+// secs since the epoch
+void utGetSecs( time_t *s )
 {
-    unsigned int msecs;
+    struct timeval now;
 
-    utGrand(&msecs);
-    *s = msecs / 1000;
+    GETTIMEOFDAY(&now);
+
+    *s = now.tv_sec;
 
     return;
-
 }
 
 

@@ -2781,8 +2781,8 @@ static nodeStatus_t nCPDisplay(dspConfig_t *dsp)
 
 static nodeStatus_t nCPIdle(void)
 {
-    unsigned int now;
-    unsigned int difftime = utDeltaGrand( Context.msgrand, &now );
+    uint64_t now;
+    uint64_t difftime = utDeltaGrand( Context.msgrand, &now );
     static uint32_t iterstart = 0;
     static uint32_t themetime = 0;
     static uint32_t dietime = 0;

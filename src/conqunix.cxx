@@ -187,10 +187,12 @@ void drcheck(void)
     int ppid;
 
     /* If we haven't been getting cpu time in recent history, do no-thing. */
-    if ( utDeltaSecs( Context.drchklastime, &Context.drchklastime ) > TIMEOUT_DRCHECK )
+    if ( utDeltaSecs( Context.drchklastime,
+                      &Context.drchklastime ) > TIMEOUT_DRCHECK )
         return;
 
-    if ( utDeltaSecs( cbDriver->drivtime, &(cbDriver->playtime) ) > TIMEOUT_DRIVER )
+    if ( utDeltaSecs( cbDriver->drivtime,
+                      &(cbDriver->playtime) ) > TIMEOUT_DRIVER )
     {
         if ( Context.childpid != 0 )
 	{
@@ -210,7 +212,8 @@ void drcheck(void)
 	}
 
         cbLock(&cbConqInfo->lockword);
-        if ( utDeltaSecs( cbDriver->drivtime, &(cbDriver->playtime) ) > TIMEOUT_DRIVER )
+        if ( utDeltaSecs( cbDriver->drivtime,
+                          &(cbDriver->playtime) ) > TIMEOUT_DRIVER )
 	{
             drcreate();
             cbDriver->drivcnt = utModPlusOne( cbDriver->drivcnt + 1, 1000 );
@@ -377,7 +380,7 @@ void gcputime( unsigned int *cpu )
 /*  SYNOPSIS */
 /*    int ctemp, etemp */
 /*    initstats( ctemp, etemp ) */
-void initstats( unsigned int *ctemp, unsigned int *etemp )
+void initstats( unsigned int *ctemp, uint64_t *etemp )
 {
 
     gcputime( ctemp );
@@ -489,11 +492,12 @@ void upchuck(void)
 /*  SYNOPSIS */
 /*    int ctemp, etemp, caccum, eaccum, ctime, etime */
 /*    upstats( ctemp, etemp, caccum, eaccum, ctime, etime ) */
-void upstats( unsigned int *ctemp, unsigned int *etemp, unsigned int *caccum,
+void upstats( unsigned int *ctemp, uint64_t *etemp, unsigned int *caccum,
               unsigned int *eaccum, unsigned int *ctime, unsigned int *etime )
 {
 
-    unsigned int i, now;
+    unsigned int i;
+    uint64_t now;
 
     /* Update cpu time. */
     gcputime( &i );
@@ -526,7 +530,6 @@ void upstats( unsigned int *ctemp, unsigned int *etemp, unsigned int *caccum,
     }
 
     return;
-
 }
 
 /* return true if a process is alive, else false... */
