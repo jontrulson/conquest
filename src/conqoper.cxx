@@ -2333,12 +2333,12 @@ void opstats(void)
                  LabelColor, "Last conquer:", InfoColor, cbConqInfo->conqtime);
 
         lin++;
-        utFormatSeconds( cbDriver->playtime, timbuf );
+        utFormatSeconds( cbDriver->drivtime, timbuf );
         cprintf( lin, col, ALIGN_NONE, sfmt,
                  LabelColor, "Driver time:", InfoColor, timbuf);
 
         lin++;
-        utFormatSeconds( cbDriver->drivtime, timbuf );
+        utFormatSeconds( cbDriver->playtime, timbuf );
         cprintf( lin, col, ALIGN_NONE, sfmt,
                  LabelColor, "Play time:", InfoColor, timbuf);
 
