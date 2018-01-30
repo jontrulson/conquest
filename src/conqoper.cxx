@@ -2335,12 +2335,12 @@ void opstats(void)
         lin++;
         utFormatSeconds( cbDriver->drivtime, timbuf );
         cprintf( lin, col, ALIGN_NONE, sfmt,
-                 LabelColor, "Epoch Driver time:", InfoColor, timbuf);
+                 LabelColor, "UTC Driver time:", InfoColor, timbuf);
 
         lin++;
         utFormatSeconds( cbDriver->playtime, timbuf );
         cprintf( lin, col, ALIGN_NONE, sfmt,
-                 LabelColor, "Epoch Play time:", InfoColor, timbuf);
+                 LabelColor, "UTC Play time:", InfoColor, timbuf);
 
         lin++;
         cprintf( lin, col, ALIGN_NONE, tfmt,
