@@ -347,6 +347,19 @@ int main(int argc, char *argv[])
         }
 
 
+    if ((ConquestGID = getConquestGID()) == -1)
+    {
+        fprintf(stderr, "%s: getConquestGID() failed\n", progName);
+        exit(1);
+    }
+
+
+    if (setgid(ConquestGID) == -1)
+    {
+        fprintf(stderr, "conquest: setgid(): failed\n");
+        exit(1);
+    }
+
     rndini();		/* initialize random numbers */
 
     if (!pktInit())
@@ -358,13 +371,6 @@ int main(int argc, char *argv[])
 
     /* need to make sure that the serverPackets array is setup */
     pktSetClientProtocolVersion(PROTOCOL_VERSION);
-
-    if ((ConquestGID = getConquestGID()) == -1)
-    {
-        fprintf(stderr, "%s: getConquestGID() failed\n", progName);
-        exit(1);
-    }
-
 
     /* at this point, we see if the -u option was used.  If it was, we
        setuid() to it */
@@ -399,15 +405,6 @@ int main(int argc, char *argv[])
 #ifdef DEBUG_CONFIG
         utLog("%s@%d: main(): GetSysConf() returned -1.", __FILE__, __LINE__);
 #endif
-    }
-
-    if (setgid(ConquestGID) == -1)
-    {
-        utLog("conquest: setgid(%d): %s",
-              ConquestGID,
-              strerror(errno));
-        fprintf(stderr, "conquest: setgid(): failed\n");
-        exit(1);
     }
 
 #ifdef DEBUG_FLOW
