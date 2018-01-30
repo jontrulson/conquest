@@ -1588,7 +1588,7 @@ int newship( int unum, int *snum )
 /*    play */
 int play(void)
 {
-    unsigned int laststat, now;
+    unsigned int laststat, lastDrcheck, now;
     int didsomething;             /* update immediately if we did anything */
     int rv;
     char msgbuf[128];
@@ -1608,7 +1608,7 @@ int play(void)
     utGrand( &Context.msgrand );		/* initialize message timer */
     Context.redraw = true;		/* want redraw first time */
     Context.msgok = true;		/* ok to get messages */
-    Context.display = false;		/* ok to get messages */
+    Context.display = false;		/* ok to display */
     stopUpdate();			/* stop the display interrupt */
     utGetSecs( &laststat );		/* initialize stat timer */
 
@@ -1653,12 +1653,12 @@ int play(void)
             break;
 
         didsomething = 0;
-        if ((pkttype = pktWaitForPacket(PKT_ANYPKT,
-                                        buf, PKT_MAXSIZE, 0)) < 0)
+        if ((pkttype = pktRead(buf, PKT_MAXSIZE, 1)) < 0)
 	{
             if (errno != EINTR)
 	    {
-                utLog("conquestd:play:pktWaitForPacket: %s", strerror(errno));
+                utLog("conquestd: play(): pktRead() failed: %s",
+                      strerror(errno));
                 handleSignal(0);
                 /* NOTREACHED */
                 return false;
@@ -1703,7 +1703,8 @@ int play(void)
 
 	default:
             if (pkttype != 0 && pkttype != -1)
-                utLog("conquestd: play: got unexpected packet type %d", pkttype);
+                utLog("conquestd: play: got unexpected packet type %d",
+                      pkttype);
             break;
 	}
 
@@ -1724,15 +1725,18 @@ int play(void)
             laststat = now;
 	}
 
-        clbBlockAlarm();          /* no signals can be accepted when
-                                     drcheck is run */
-        drcheck();
-        clbUnblockAlarm();
+        // we only want to call drcheck() no more than once per second...
+        if ( utDeltaSecs( lastDrcheck, &now ) >= 1 )
+        {
+            lastDrcheck = now;
+            clbBlockAlarm();          /* no signals can be accepted when
+                                         drcheck is run */
+            drcheck();
+            clbUnblockAlarm();
+        }
 
         if (didsomething)
             continue;               /* see if there is another pkt */
-
-        utSleep(0.05);
     }
 
     conqstats( Context.snum );
