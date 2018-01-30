@@ -219,7 +219,7 @@ void hudSetAlertStatus(int snum, int asnum, alertLevel_t astatus)
         break;
         }
 
-        if (asnum)
+        if (asnum >= 0)
             utAppendShip(hudData.aStat.str, asnum) ;
 
         if (SCLOAKED(asnum))
