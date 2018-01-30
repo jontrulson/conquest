@@ -79,6 +79,7 @@ int main(int argc, char *argv[])
 
     if ((ConquestGID = getConquestGID()) == -1)
     {
+        utLog("conqdriv: getConquestGID() failed\n");
         fprintf(stderr, "conqdriv: getConquestGID() failed\n");
         exit(1);
     }
@@ -125,6 +126,7 @@ int main(int argc, char *argv[])
     eacc = 0;
 
     cbLock(&cbConqInfo->lockword);
+
     utGetSecs( &cbDriver->drivtime );		/* prevent driver timeouts */
     utGetSecs( &cbDriver->playtime );
 
@@ -148,15 +150,18 @@ int main(int argc, char *argv[])
         if ( cbDriver->drivstat != DRS_RESTART )
 	{
             cbUnlock(&cbConqInfo->lockword);
-            utLog("conqdriv: we shouldn't be starting: drivstat = %d\n",
+            utLog("conqdriv: drivstat(%d) != DRS_RESTART, we shouldn't be "
+                  "starting\n",
                   cbDriver->drivstat);
+            exit(1);
 	}
 
         if ( cbDriver->drivpid != 0 )
 	{
             cbUnlock(&cbConqInfo->lockword);
-            utLog("conqdriv: cbDriver->drivpid != 0, drivpid = %d",
+            utLog("conqdriv: drivpid(%d) != 0, we shouldn't be starting",
                   cbDriver->drivpid);
+            exit(1);
 	}
     }
     else
