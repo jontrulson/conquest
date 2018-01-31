@@ -50,7 +50,7 @@ static char headerbuf[BUFFER_SIZE_256];
 static char header2buf[BUFFER_SIZE_256];
 static const char *eprompt = "Arrow keys to select, [TAB] or [ENTER] to accept, any other key to quit.";
 
-static const int servers_per_page = 8;
+static const int servers_per_page = 10;
 static int flin, llin, clin, pages, curpage;
 
 struct _srvvec {
@@ -83,7 +83,6 @@ static void dispServerInfo(dspConfig_t *dsp, metaSRec_t *metaServerList,
     static char buf1[BUFFER_SIZE_256];
     static char buf2[BUFFER_SIZE_256];
     static char buf3[BUFFER_SIZE_256];
-    static char buf4[BUFFER_SIZE_256];
     static char buf5[BUFFER_SIZE_256];
     static char buf6[BUFFER_SIZE_256];
     static char buf7[BUFFER_SIZE_256];
@@ -103,7 +102,7 @@ static void dispServerInfo(dspConfig_t *dsp, metaSRec_t *metaServerList,
     x = dsp->ppCol;
     y = (dsp->ppRow * tlin);
     w = (dsp->wW - (dsp->ppCol * 3.0));
-    h = (dsp->ppRow * 8.2);
+    h = (dsp->ppRow * 9.2);
 
     if (!inited)
     {
@@ -124,7 +123,6 @@ static void dispServerInfo(dspConfig_t *dsp, metaSRec_t *metaServerList,
                 CyanColor, NoColor);
 
         sprintf(pbuf4, "#%d#Flags: ", MagentaColor);
-        sprintf(buf4, "#%d#%%s", NoColor);
 
         sprintf(pbuf5, "#%d#MOTD: ", MagentaColor);
         sprintf(buf5, "#%d#%%s", NoColor);
@@ -152,8 +150,10 @@ static void dispServerInfo(dspConfig_t *dsp, metaSRec_t *metaServerList,
             metaServerList[num].numvacant, metaServerList[num].numrobot);
 
     cprintf(tlin, hcol, ALIGN_NONE, pbuf4);
-    cprintf(tlin++, icol, ALIGN_NONE, buf4,
-            clntServerFlagsStr(metaServerList[num].flags));
+
+    tlin = clntPrintServerFlags(tlin, icol, metaServerList[num].flags, NoColor);
+
+    tlin++;
 
     cprintf(tlin, hcol, ALIGN_NONE, pbuf5);
     cprintf(tlin++, icol, ALIGN_NONE, buf5, metaServerList[num].motd);
@@ -220,7 +220,7 @@ void nMetaInit(void)
 
     curpage = 0;
 
-    flin = 11;			/* first server line */
+    flin = 12;			/* first server line */
     llin = 0;			/* last server line on this page */
     clin = 0;			/* current server line */
 

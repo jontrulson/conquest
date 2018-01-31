@@ -79,40 +79,75 @@ void clntDisplayFeedback(char *msg)
     return;
 }
 
-/* return a static string containing the server's stringified  flags */
-char *clntServerFlagsStr(uint32_t flags)
+/* return a static string containing the server's stringified flags */
+const std::vector<std::string>& clntServerFlagsStr(uint32_t flags)
 {
-    static const int maxFlagsLen = 256;
-    static char serverflags[maxFlagsLen];
+    static std::vector<std::string> flagsList;
+    static uint32_t savedFlags = ~0;
 
-    if (flags == SERVER_F_NONE)
-        utStrncpy(serverflags, "None", maxFlagsLen);
-    else
-        utStrncpy(serverflags, "", maxFlagsLen);
+    if (flags != savedFlags)
+    {
+        savedFlags = flags;
+        flagsList.clear();
 
-    if (flags & SERVER_F_REFIT)
-        utStrncat(serverflags, "Refit ", maxFlagsLen);
+        if (flags == SERVER_F_NONE)
+            flagsList.push_back(std::string("None"));
 
-    if (flags & SERVER_F_VACANT)
-        utStrncat(serverflags, "Vacant ", maxFlagsLen);
+        if (flags & SERVER_F_REFIT)
+            flagsList.push_back(std::string("Refit"));
 
-    if (flags & SERVER_F_SLINGSHOT)
-        utStrncat(serverflags, "SlingShot ", maxFlagsLen);
+        if (flags & SERVER_F_VACANT)
+            flagsList.push_back(std::string("Vacant"));
 
-    if (flags & SERVER_F_NODOOMSDAY)
-        utStrncat(serverflags, "NoDoomsday ", maxFlagsLen);
+        if (flags & SERVER_F_SLINGSHOT)
+            flagsList.push_back(std::string("SlingShot"));
 
-    if (flags & SERVER_F_KILLBOTS)
-        utStrncat(serverflags, "Killbots ", maxFlagsLen);
+        if (flags & SERVER_F_NODOOMSDAY)
+            flagsList.push_back(std::string("NoDoomsday"));
 
-    if (flags & SERVER_F_SWITCHTEAM)
-        utStrncat(serverflags, "SwitchTeam ", maxFlagsLen);
+        if (flags & SERVER_F_KILLBOTS)
+            flagsList.push_back(std::string("Killbots"));
 
-    if (flags & SERVER_F_NOTEAMWAR)
-        utStrncat(serverflags, "NoTeamWar ", maxFlagsLen);
+        if (flags & SERVER_F_SWITCHTEAM)
+            flagsList.push_back(std::string("SwitchTeam"));
 
-    if (flags & SERVER_F_NODRIFT)
-        utStrncat(serverflags, "NoDrift ", maxFlagsLen);
+        if (flags & SERVER_F_NOTEAMWAR)
+            flagsList.push_back(std::string("NoTeamWar"));
 
-    return serverflags;
+        if (flags & SERVER_F_NODRIFT)
+            flagsList.push_back(std::string("NoDrift"));
+    }
+
+    return flagsList;
+}
+
+// Print out the server's flags.  Return the possibly modified line
+// increment.
+int clntPrintServerFlags(int lin, int col, uint32_t flags, int color)
+{
+    int mycol = col;
+    const std::vector<std::string>& flagsList =
+        clntServerFlagsStr(flags);
+
+    for (int i=0; i<flagsList.size(); i++)
+    {
+        cprintf(lin, mycol, ALIGN_NONE, "#%d#%s", color,
+                flagsList[i].c_str());
+        // include the space separator
+        mycol += flagsList[i].length() + 1;
+
+        // check next flag to see if it would fit
+        if (i + 1 < flagsList.size())
+        {
+            if (mycol + (flagsList[i + 1].length() + 1) >= Context.maxcol)
+            {
+                // start a new line
+                lin++;
+                mycol = col;
+            }
+
+        }
+    }
+
+    return lin;
 }

@@ -427,9 +427,10 @@ static void _dispUserOptsMenu(void)
     }
 
     lin++;
-    cprintf(lin, col, ALIGN_NONE, "#%d#Flags:#%d# %s#%d#", LabelColor,
-            InfoColor, clntServerFlagsStr(sStat.serverFlags),
-            NoColor);
+    cprintf(lin, col, ALIGN_NONE, "#%d#Flags:#%d#", LabelColor,
+            InfoColor);
+
+    lin = clntPrintServerFlags(lin, col + 7, sStat.serverFlags, InfoColor);
 
     if (!prompting)
     {

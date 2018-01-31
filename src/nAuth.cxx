@@ -49,6 +49,9 @@
 #include "GL.h"
 #include "blinker.h"
 
+#include <vector>
+#include <string>
+
 static const char *unamep = "Username:";
 static const char *pwp = "Password:";
 static const char *rpwp = "Retype Password:";
@@ -99,7 +102,6 @@ static void dispServerInfo(int tlin)
     static char buf1[BUFFER_SIZE_256];
     static char buf2[BUFFER_SIZE_256];
     static char buf3[BUFFER_SIZE_256];
-    static char buf4[BUFFER_SIZE_256];
     static char buf5[BUFFER_SIZE_256];
     static char buf6[BUFFER_SIZE_256];
     static char pbuf1[BUFFER_SIZE_256];
@@ -137,7 +139,6 @@ static void dispServerInfo(int tlin)
                 CyanColor, NoColor);
 
         sprintf(pbuf4, "#%d#Flags: ", MagentaColor);
-        sprintf(buf4, "#%d#%%s", NoColor);
 
         sprintf(pbuf5, "#%d#MOTD: ", MagentaColor);
         sprintf(buf5, "#%d#%%s", NoColor);
@@ -159,13 +160,15 @@ static void dispServerInfo(int tlin)
 
     cprintf(tlin, hcol, ALIGN_NONE, pbuf3);
     cprintf(tlin++, icol, ALIGN_NONE, buf3,
-            sStat.numusers, sStat.numtotal, cbLimits.maxShips(), sStat.numactive,
+            sStat.numusers, sStat.numtotal, cbLimits.maxShips(),
+            sStat.numactive,
             sStat.numvacant, sStat.numrobot);
 
     cprintf(tlin, hcol, ALIGN_NONE, pbuf4);
-    cprintf(tlin++, icol, ALIGN_NONE, buf4,
-            clntServerFlagsStr(sStat.serverFlags));
 
+    tlin = clntPrintServerFlags(tlin, icol, sStat.serverFlags, NoColor);
+
+    tlin++;
     cprintf(tlin, hcol, ALIGN_NONE, pbuf5);
     cprintf(tlin++, icol, ALIGN_NONE, buf5, sHello.motd);
 
@@ -236,12 +239,9 @@ static nodeStatus_t nAuthDisplay(dspConfig_t *dsp)
     else
         tmpcolor = NoColor;
 
-    cprintf( slin - 2, 1, ALIGN_LEFT,
-             "#%d#Please login. Press [ENTER] to exit.",
-             SpecialColor);
-
     cprintf( slin - 1, 1, ALIGN_LEFT,
-             "#%d#(New Users: Just pick a username)",
+             "#%d#Please login. Press [ENTER] to exit. "
+             "(New Users: Just pick a username)",
              SpecialColor);
 
     cprintf(slin, 1, ALIGN_LEFT, "#%d#%s",

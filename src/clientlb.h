@@ -31,9 +31,13 @@
 #include "conqdef.h"
 
 #include "protocol.h"
+#include "color.h"
+#include <vector>
+#include <string>
 
 void  clntStoreMessage(spMessage_t *msg);
 void  clntDisplayFeedback(char *msg);
-char *clntServerFlagsStr(uint32_t flags);
+const std::vector<std::string>& clntServerFlagsStr(uint32_t flags);
+int clntPrintServerFlags(int lin, int col, uint32_t flags, int color);
 
 #endif /* CLIENTLB_H_INCLUDED */
