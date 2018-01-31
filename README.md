@@ -109,7 +109,7 @@ markdown and updated to current reality, but for now:
 * The [HISTORY](docs/HISTORY.txt) file.  This document gives
   an overview of changes between releases.
 
-* The [Server Guide](docs/server.txt) has instructions for those
+* The [Server Guide](docs/server-guide.md) has instructions for those
   wanting to run their own Conquest servers.
 
 * The [CQI Parser Documentation](docs/conqinit.txt) provides
@@ -141,6 +141,7 @@ running a server and want to make a customized game:
 cd *prefix*/etc/conquest
 cp conqinitrc conqinitrc.local
 vi conqinitrc.local
+...
 ```
 
 NOTE: Changing any of the items in the *global {}* section in
