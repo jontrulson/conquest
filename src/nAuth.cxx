@@ -149,27 +149,27 @@ static void dispServerInfo(int tlin)
 
     }
 
-    cprintf(tlin, hcol, ALIGN_NONE, pbuf1);
+    cprintf(tlin, hcol, ALIGN_NONE, "%s", pbuf1);
     cprintf(tlin++, icol, ALIGN_NONE, buf1, sHello.servername);
 
-    cprintf(tlin, hcol, ALIGN_NONE, pbuf2);
+    cprintf(tlin, hcol, ALIGN_NONE, "%s", pbuf2);
     cprintf(tlin++, icol, ALIGN_NONE, buf2, sHello.serverver);
 
-    cprintf(tlin, hcol, ALIGN_NONE, pbuf6);
+    cprintf(tlin, hcol, ALIGN_NONE, "%s", pbuf6);
     cprintf(tlin++, icol, ALIGN_NONE, buf6, timebuf);
 
-    cprintf(tlin, hcol, ALIGN_NONE, pbuf3);
+    cprintf(tlin, hcol, ALIGN_NONE, "%s", pbuf3);
     cprintf(tlin++, icol, ALIGN_NONE, buf3,
             sStat.numusers, sStat.numtotal, cbLimits.maxShips(),
             sStat.numactive,
             sStat.numvacant, sStat.numrobot);
 
-    cprintf(tlin, hcol, ALIGN_NONE, pbuf4);
+    cprintf(tlin, hcol, ALIGN_NONE, "%s", pbuf4);
 
     tlin = clntPrintServerFlags(tlin, icol, sStat.serverFlags, NoColor);
 
     tlin++;
-    cprintf(tlin, hcol, ALIGN_NONE, pbuf5);
+    cprintf(tlin, hcol, ALIGN_NONE, "%s", pbuf5);
     cprintf(tlin++, icol, ALIGN_NONE, buf5, sHello.motd);
 
     return;

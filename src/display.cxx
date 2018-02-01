@@ -417,7 +417,7 @@ void display( int snum )
         {
             sd = sind(cbShips[snum].lastphase);
             cd = cosd(cbShips[snum].lastphase);
-            ch = dirch[mod( int(round( cbShips[snum].lastphase + 22.5 ) / 45), 7 )];
+            ch = dirch[mod( int(iround( cbShips[snum].lastphase + 22.5 ) / 45), 7 )];
             uiPutColor(InfoColor);
             for ( fl = 0; fl <= LastPhasDist; fl = fl + 50.0 )
                 if ( clbCVTCoords( cenx, ceny,
@@ -595,7 +595,7 @@ void display( int snum )
                             cdputn( i, 0, lin, col + 2 );
                             uiPutColor(0);
 
-                            idx = mod( int(round((((real)cbShips[i].head + 22.5) / 45.0) + 0.5)) - 1, 8);
+                            idx = mod( int(iround((((real)cbShips[i].head + 22.5) / 45.0) + 0.5)) - 1, 8);
 
                             j = lin+linofs[idx];
                             k = col+colofs[idx];
@@ -723,7 +723,7 @@ void display( int snum )
             zzsshields = -9;
             zzcshields = ' ';
         }
-        i = round( cbShips[snum].shields );
+        i = iround( cbShips[snum].shields );
         if ( ! SSHUP(snum) || SREPAIR(snum) )
             i = -1;
         if ( i != zzsshields || i == -1)
@@ -832,7 +832,7 @@ void display( int snum )
             zzshead = 999;
         }
 
-        i = round( cbShips[snum].head );
+        i = iround( cbShips[snum].head );
         if ( i != zzshead)
         {
             cdclra( lin, datacol, lin, STAT_COLS-1 );
@@ -856,7 +856,7 @@ void display( int snum )
             zzsfuel = -99;
             zzcfuel = ' ';
         }
-        i = round( cbShips[snum].fuel );
+        i = iround( cbShips[snum].fuel );
         if ( i != zzsfuel )
         {
             if (i >= 0 && i <= 200)
@@ -935,8 +935,8 @@ void display( int snum )
             zzsetemp = 0;
             zzctemp = ' ';
         }
-        i = round( cbShips[snum].wtemp );
-        j = round( cbShips[snum].etemp );
+        i = iround( cbShips[snum].wtemp );
+        j = iround( cbShips[snum].etemp );
         if ( i > 100 )
             i = 100;
         if ( j > 100 )
@@ -1030,7 +1030,7 @@ void display( int snum )
             zzsdamage = -9;
             zzcdamage = ' ';
         }
-        i = round( cbShips[snum].damage );
+        i = iround( cbShips[snum].damage );
         if ( i != zzsdamage )
         {
             cdclra( lin, datacol, lin, STAT_COLS-1 );
@@ -1244,7 +1244,7 @@ void display( int snum )
             cdputs( "    dhead:", lin, col );
             uiPutColor(0);
             uiPutColor(InfoColor);
-            cdputn( round(cbDoomsday->heading), 0, lin, dcol );
+            cdputn( iround(cbDoomsday->heading), 0, lin, dcol );
             uiPutColor(0);
 
             lin = lin + 1;
@@ -1265,7 +1265,7 @@ void display( int snum )
                 cdputs( cbPlanets[cbDoomsday->lockDetail].name, lin, dcol );
                 uiPutColor(0);
                 uiPutColor(InfoColor);
-                cdputn( round( dist( cbDoomsday->x, cbDoomsday->y,
+                cdputn( iround( dist( cbDoomsday->x, cbDoomsday->y,
                                      cbPlanets[cbDoomsday->lockDetail].x,
                                      cbPlanets[cbDoomsday->lockDetail].y ) ),
                         0, lin + 1, dcol );
@@ -1280,7 +1280,7 @@ void display( int snum )
                 cdputs( buf, lin, dcol );
                 uiPutColor(0);
                 uiPutColor(InfoColor);
-                cdputn( round( dist( cbDoomsday->x, cbDoomsday->y,
+                cdputn( iround( dist( cbDoomsday->x, cbDoomsday->y,
                                      cbShips[cbDoomsday->lockDetail].x,
                                      cbShips[cbDoomsday->lockDetail].y ) ),
                         0, lin + 1, dcol );

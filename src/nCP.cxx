@@ -382,8 +382,8 @@ static void _infoship( int snum, int scanner, bool doOutput )
 
     if ( ! SCLOAKED(snum) || cbShips[snum].warp != 0.0 )
     {
-        Context.lasttdist = round( dis ); /* save these puppies for hud info */
-        Context.lasttang = round( utAngle( x, y, appx, appy ) );
+        Context.lasttdist = iround( dis ); /* save these puppies for hud info */
+        Context.lasttang = iround( utAngle( x, y, appx, appy ) );
 
         sprintf( cbuf, "Range %d, direction %d",
                  Context.lasttdist, Context.lasttang );
@@ -492,10 +492,10 @@ static void _infoship( int snum, int scanner, bool doOutput )
             strcat(cbuf,  ", ");
         strcat(cbuf , "shields ");
         if ( SSHUP(snum) && ! SREPAIR(snum) )
-            utAppendInt(cbuf, round( cbShips[snum].shields ));
+            utAppendInt(cbuf, iround( cbShips[snum].shields ));
         else
             strcat(cbuf , "DOWN");
-        i = round( cbShips[snum].damage );
+        i = iround( cbShips[snum].damage );
         if ( i > 0 )
 	{
             if ( cbuf[0] != 0 )
@@ -572,8 +572,8 @@ static void _infoplanet( const char *str, int pnum, int snum, bool doOutput )
         y = cbShips[snum].y;
     }
 
-    Context.lasttdist = round(dist( x, y, cbPlanets[pnum].x, cbPlanets[pnum].y));
-    Context.lasttang = round(utAngle( x, y, cbPlanets[pnum].x, cbPlanets[pnum].y ));
+    Context.lasttdist = iround(dist( x, y, cbPlanets[pnum].x, cbPlanets[pnum].y));
+    Context.lasttang = iround(utAngle( x, y, cbPlanets[pnum].x, cbPlanets[pnum].y ));
 
     if (UserConf.DoETAStats)
     {

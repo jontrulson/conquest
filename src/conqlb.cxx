@@ -1308,10 +1308,10 @@ void clbClearShips(void)
 int clbCVTCoords( real cenx, real ceny, real x, real y, real scale,
                   int *lin, int *col )
 {
-    *col = round( (Context.maxcol-STAT_COLS)/2 + (x-cenx) / scale * WIDTH_FAC ) +
+    *col = iround( (Context.maxcol-STAT_COLS)/2 + (x-cenx) / scale * WIDTH_FAC ) +
         STAT_COLS;
 
-    *lin = round( (DISPLAY_LINS/2+1) - (y-ceny) / scale );
+    *lin = iround( (DISPLAY_LINS/2+1) - (y-ceny) / scale );
     if ( *lin < 0 || *lin > DISPLAY_LINS || *col <= STAT_COLS || *col > Context.maxcol )
         return ( false );
 

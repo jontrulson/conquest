@@ -100,7 +100,7 @@ static nodeStatus_t nPlayBMenuDisplay(dspConfig_t *dsp)
                 CyanColor, prm.pbuf, NoColor, prm.buf);
 
     if (nss)
-        cprintf(MSG_LIN2, 1, ALIGN_NONE, nss);
+        cprintf(MSG_LIN2, 1, ALIGN_NONE, "%s", nss);
 
     return NODE_OK;
 }

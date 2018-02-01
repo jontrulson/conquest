@@ -180,7 +180,7 @@ void procSetWarp(cpCommand_t *swarp)
 
     /* Warn about damage limitations. */
     mw = maxwarp( snum );
-    if ( around( cbShips[snum].dwarp ) > mw )
+    if ( round( cbShips[snum].dwarp ) > mw )
     {
         sprintf(cbuf,
                 "(Due to damage, warp is currently limited to %.1f.)", mw);
@@ -358,18 +358,18 @@ void procDistress(cpCommand_t *cmd)
 
     sprintf( cbuf,
              "sh=%d %c, dam=%d, fuel=%d, temp=",
-             round(cbShips[snum].shields),
+             iround(cbShips[snum].shields),
              (SSHUP(snum)) ? 'U' : 'D',
-             round(cbShips[snum].damage),
-             round(cbShips[snum].fuel) );
+             iround(cbShips[snum].damage),
+             iround(cbShips[snum].fuel) );
 
-    i = round(cbShips[snum].wtemp);
+    i = iround(cbShips[snum].wtemp);
     if ( i < 100 )
         utAppendInt(cbuf , i) ;
     else
         strcat(cbuf , "**") ;
     utAppendChar(cbuf , '/') ;
-    i = round(cbShips[snum].etemp);
+    i = iround(cbShips[snum].etemp);
     if ( i < 100 )
         utAppendInt(cbuf , i) ;
     else
@@ -417,7 +417,7 @@ void procDistress(cpCommand_t *cmd)
         else
         {
             // just the heading ma'am
-            sprintf( buf, ", head=%d", round( cbShips[snum].head ));
+            sprintf( buf, ", head=%d", iround( cbShips[snum].head ));
         }
 
         strcat(cbuf, buf) ;

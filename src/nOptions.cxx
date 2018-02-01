@@ -436,7 +436,7 @@ static void _dispUserOptsMenu(void)
     {
         hudClearPrompt(MSG_LIN1);
         hudClearPrompt(MSG_LIN2);
-        cprintf(MSG_LIN2, 0, ALIGN_NONE, prompt);
+        cprintf(MSG_LIN2, 0, ALIGN_NONE, "%s", prompt);
     }
 
     return;
@@ -758,8 +758,8 @@ static void _showOptScreen(void)
     /* now the editing phase */
     if (!prompting)
     {
-        cprintf(MSG_LIN1, 1, ALIGN_NONE, prompt);
-        cprintf(MSG_LIN2, 1, ALIGN_NONE, prompt2);
+        cprintf(MSG_LIN1, 1, ALIGN_NONE, "%s", prompt);
+        cprintf(MSG_LIN2, 1, ALIGN_NONE, "%s", prompt2);
     }
 
     return;

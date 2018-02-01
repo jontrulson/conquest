@@ -127,7 +127,7 @@ static nodeStatus_t nPlanetlDisplay(dspConfig_t *dsp)
 
     lin = 1;
 
-    cprintf(lin, column_h, ALIGN_NONE, pd0);
+    cprintf(lin, column_h, ALIGN_NONE, "%s", pd0);
 
     /* display column headings */
     lin += 2;

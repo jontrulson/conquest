@@ -365,7 +365,7 @@ void gcputime( unsigned int *cpu )
 
     times(&Ptimes);
 
-    *cpu = (unsigned int)round( ((real)(Ptimes.tms_stime + Ptimes.tms_utime) /
+    *cpu = (unsigned int)iround( ((real)(Ptimes.tms_stime + Ptimes.tms_utime) /
                                  (real)CLK_TCK) *
                                 100.0);
 

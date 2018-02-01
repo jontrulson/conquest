@@ -249,8 +249,8 @@ static nodeStatus_t nDeadDisplay(dspConfig_t *dsp)
 	{
             cprintf( 10,0,ALIGN_CENTER,
                      "#%d#He had #%d#%d%% #%d#shields and #%d#%d%% #%d#damage.",
-                     InfoColor, CQC_A_BOLD, round(eShip.shields),
-                     InfoColor, CQC_A_BOLD, round(eShip.damage),InfoColor );
+                     InfoColor, CQC_A_BOLD, iround(eShip.shields),
+                     InfoColor, CQC_A_BOLD, iround(eShip.damage),InfoColor );
 	}
     }
 

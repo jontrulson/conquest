@@ -435,13 +435,13 @@ void debugdisplay( int snum )
     cprintf(lin,dcol,ALIGN_NONE,"#%d#%0g",InfoColor, oneplace(cbShips[snum].dwarp));
     lin++;
     cprintf(lin,tcol,ALIGN_NONE,"#%d#%s",LabelColor, "   shead:");
-    cprintf(lin,dcol,ALIGN_NONE,"#%d#%0d",InfoColor, round(cbShips[snum].head));
+    cprintf(lin,dcol,ALIGN_NONE,"#%d#%0d",InfoColor, iround(cbShips[snum].head));
     lin++;
     cprintf(lin,tcol,ALIGN_NONE,"#%d#%s",LabelColor, "  sdhead:");
-    cprintf(lin,dcol,ALIGN_NONE,"#%d#%0d",InfoColor, round(cbShips[snum].dhead));
+    cprintf(lin,dcol,ALIGN_NONE,"#%d#%0d",InfoColor, iround(cbShips[snum].dhead));
     lin++;
     cprintf(lin,tcol,ALIGN_NONE,"#%d#%s",LabelColor, " sarmies:");
-    cprintf(lin,dcol,ALIGN_NONE,"#%d#%0d",InfoColor, round(cbShips[snum].armies));
+    cprintf(lin,dcol,ALIGN_NONE,"#%d#%0d",InfoColor, iround(cbShips[snum].armies));
 
     lin = 1;
     tcol = 23;
@@ -473,7 +473,7 @@ void debugdisplay( int snum )
         {
             cprintf(lin,dcol,ALIGN_NONE,"#%d#%s",InfoColor, cbPlanets[i].name);
             cprintf(lin+1,dcol,ALIGN_NONE,"#%d#%d",InfoColor,
-                    round( dist( cbShips[snum].x, cbShips[snum].y, cbPlanets[i].x, cbPlanets[i].y ) ));
+                    iround( dist( cbShips[snum].x, cbShips[snum].y, cbPlanets[i].x, cbPlanets[i].y ) ));
         }
         else if (cbShips[snum].lock == LOCK_SHIP && i < cbLimits.maxShips())
         {
@@ -489,7 +489,7 @@ void debugdisplay( int snum )
 
     lin+=2;
     cprintf(lin,tcol,ALIGN_NONE,"#%d#%s",LabelColor, "     sfuel:");
-    cprintf(lin,dcol,ALIGN_NONE,"#%d#%0d",InfoColor, round(cbShips[snum].fuel));
+    cprintf(lin,dcol,ALIGN_NONE,"#%d#%0d",InfoColor, iround(cbShips[snum].fuel));
     lin++;
     cprintf(lin,tcol,ALIGN_NONE,"#%d#%s",LabelColor, "       w/e:");
     sprintf( buf, "%d/%d", cbShips[snum].weapalloc, cbShips[snum].engalloc );
@@ -504,7 +504,7 @@ void debugdisplay( int snum )
     cprintf(lin,dcol,ALIGN_NONE,"#%d#%s",InfoColor, buf);
     lin++;
     cprintf(lin,tcol,ALIGN_NONE,"#%d#%s",LabelColor, "      temp:");
-    sprintf( buf, "%d/%d", round(cbShips[snum].wtemp), round(cbShips[snum].etemp) );
+    sprintf( buf, "%d/%d", iround(cbShips[snum].wtemp), iround(cbShips[snum].etemp) );
     cprintf(lin,dcol,ALIGN_NONE,"#%d#%s",InfoColor, buf);
     lin++;
     cprintf(lin,tcol,ALIGN_NONE,"#%d#%s",LabelColor, "   ssdfuse:");
@@ -550,14 +550,14 @@ void debugdisplay( int snum )
     }
     lin++;
     cprintf(lin,tcol,ALIGN_NONE,"#%d#%s",LabelColor, "   shields:");
-    cprintf(lin,dcol,ALIGN_NONE,"#%d#%0d",InfoColor, round(cbShips[snum].shields));
+    cprintf(lin,dcol,ALIGN_NONE,"#%d#%0d",InfoColor, iround(cbShips[snum].shields));
     if ( ! SSHUP(snum) )
   	cprintf(lin,dcol+5,ALIGN_NONE,"#%d#%c",InfoColor, 'D');
     else
   	cprintf(lin,dcol+5,ALIGN_NONE,"#%d#%c",InfoColor, 'U');
     lin++;
     cprintf(lin,tcol,ALIGN_NONE,"#%d#%s",LabelColor, "   sdamage:");
-    cprintf(lin,dcol,ALIGN_NONE,"#%d#%0d",InfoColor, round(cbShips[snum].damage));
+    cprintf(lin,dcol,ALIGN_NONE,"#%d#%0d",InfoColor, iround(cbShips[snum].damage));
     if ( SREPAIR(snum) )
   	cprintf(lin,dcol+5,ALIGN_NONE,"#%d#%c",InfoColor, 'R');
     lin++;

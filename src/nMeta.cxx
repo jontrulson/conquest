@@ -134,14 +134,14 @@ static void dispServerInfo(dspConfig_t *dsp, metaSRec_t *metaServerList,
         sprintf(buf7, "#%d#%%s", NoColor);
     }
 
-    cprintf(tlin, hcol, ALIGN_NONE, pbuf1);
+    cprintf(tlin, hcol, ALIGN_NONE, "%s", pbuf1);
     cprintf(tlin++, icol, ALIGN_NONE, buf1, metaServerList[num].servername);
 
-    cprintf(tlin, hcol, ALIGN_NONE, pbuf2);
+    cprintf(tlin, hcol, ALIGN_NONE, "%s", pbuf2);
     cprintf(tlin++, icol, ALIGN_NONE, buf2, metaServerList[num].serverver,
         metaServerList[num].protovers);
 
-    cprintf(tlin, hcol, ALIGN_NONE, pbuf3);
+    cprintf(tlin, hcol, ALIGN_NONE, "%s", pbuf3);
     cprintf(tlin++, icol, ALIGN_NONE, buf3,
             (metaServerList[num].numactive + metaServerList[num].numvacant +
              metaServerList[num].numrobot),
@@ -149,19 +149,19 @@ static void dispServerInfo(dspConfig_t *dsp, metaSRec_t *metaServerList,
             metaServerList[num].numactive,
             metaServerList[num].numvacant, metaServerList[num].numrobot);
 
-    cprintf(tlin, hcol, ALIGN_NONE, pbuf4);
+    cprintf(tlin, hcol, ALIGN_NONE, "%s", pbuf4);
 
     tlin = clntPrintServerFlags(tlin, icol, metaServerList[num].flags, NoColor);
 
     tlin++;
 
-    cprintf(tlin, hcol, ALIGN_NONE, pbuf5);
+    cprintf(tlin, hcol, ALIGN_NONE, "%s", pbuf5);
     cprintf(tlin++, icol, ALIGN_NONE, buf5, metaServerList[num].motd);
 
-    cprintf(tlin, hcol, ALIGN_NONE, pbuf6);
+    cprintf(tlin, hcol, ALIGN_NONE, "%s", pbuf6);
     cprintf(tlin++, icol, ALIGN_NONE, buf6, metaServerList[num].contact);
 
-    cprintf(tlin, hcol, ALIGN_NONE, pbuf7);
+    cprintf(tlin, hcol, ALIGN_NONE, "%s", pbuf7);
     cprintf(tlin++, icol, ALIGN_NONE, buf7, metaServerList[num].walltime);
 
     drawLineBox(x, y, 0.0, w, h, CyanColor, 2.0);
@@ -290,7 +290,7 @@ static nodeStatus_t nMetaDisplay(dspConfig_t *dsp)
         i++;
     }
 
-    cprintf(MSG_LIN1, 1, ALIGN_NONE, eprompt);
+    cprintf(MSG_LIN1, 1, ALIGN_NONE, "%s", eprompt);
 
     if (clin >= llin)
         clin = llin - 1;

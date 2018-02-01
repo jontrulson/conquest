@@ -246,9 +246,9 @@ void mcuInfoPlanet( const char *str, int pnum )
     y = 0.0;
 
     Context.lasttdist =
-        round(dist( x, y, cbPlanets[pnum].x, cbPlanets[pnum].y));
+        iround(dist( x, y, cbPlanets[pnum].x, cbPlanets[pnum].y));
     Context.lasttang =
-        round(utAngle( x, y, cbPlanets[pnum].x, cbPlanets[pnum].y ));
+        iround(utAngle( x, y, cbPlanets[pnum].x, cbPlanets[pnum].y ));
 
     sprintf( buf, "%s%s, a %s, range %d, direction %d",
              str,
@@ -399,8 +399,8 @@ void mcuInfoShip( int snum )
 
     if ( ! SCLOAKED(snum) || cbShips[snum].warp != 0.0 )
     {
-        Context.lasttdist = round( dis ); /* save these puppies for hudInfo */
-        Context.lasttang = round( utAngle( x, y, appx, appy ) );
+        Context.lasttdist = iround( dis ); /* save these puppies for hudInfo */
+        Context.lasttang = iround( utAngle( x, y, appx, appy ) );
         sprintf( cbuf, "Range %d, direction %d",
                  Context.lasttdist, Context.lasttang );
     }
@@ -414,10 +414,10 @@ void mcuInfoShip( int snum )
         strcat(cbuf,  ", ");
     strcat(cbuf , "shields ") ;
     if ( SSHUP(snum) && ! SREPAIR(snum) )
-        utAppendInt(cbuf, round( cbShips[snum].shields ));
+        utAppendInt(cbuf, iround( cbShips[snum].shields ));
     else
         strcat(cbuf , "DOWN") ;
-    i = round( cbShips[snum].damage );
+    i = iround( cbShips[snum].damage );
     if ( i > 0 )
     {
         if ( cbuf[0] != 0 )
@@ -508,7 +508,7 @@ void mcuPlanetList()
         cdclra(0, 0, MSG_LIN1 + 2, Context.maxcol - 1);
         lin = 1;
 
-        cprintf(lin, column_h, ALIGN_NONE, pd0);
+        cprintf(lin, column_h, ALIGN_NONE, "%s", pd0);
 
         /* display column headings */
         lin += 2;

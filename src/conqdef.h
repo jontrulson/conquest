@@ -447,15 +447,13 @@ typedef enum {
 
 /* Macros, here order is important. */
 
-#define my_rint(x) ((real)floor((x) + 0.5)) /* standard round. */
-#define round(x) ((int)my_rint((real)(x)))      /* int round */
-#define around(x) ((real)my_rint((real)(x))) /* real round */
+#define iround(x) int(floor((x) + 0.5))      /* int round */
 
-#define oneplace(x) (real)(around((x) * 10.0)/10.0) /* nearest tenth */
+#define oneplace(x) (real)(round((x) * 10.0)/10.0) /* nearest tenth */
 #define dtor(x) (((real)(x) / 180.0) * M_PI) /* degrees to radians */
 #define rtod(x) (((real)(x) / M_PI) * 180.0) /* radians to degrees */
-#define cosd(x) (real)cos((real)dtor((x) )) /* cosine of angle in degrees */
-#define sind(x) (real)sin((real)dtor((x) )) /* sine of angle in degrees */
+#define cosd(x) cos((real)dtor((x) )) /* cosine of angle in degrees */
+#define sind(x) sin((real)dtor((x) )) /* sine of angle in degrees */
 #define dist(w,x,y,z) sqrt(pow((real)((y)-(w)), 2.0) +  \
                            pow((real)((z)-(x)), 2.0))
 
@@ -466,8 +464,8 @@ typedef enum {
                      cbShips[y].war[cbShips[x].team])
 #define selfwar(x) (cbShips[x].war[cbShips[x].team])
 #define maxwarp(x) min(cbShipTypes[cbShips[x].shiptype].warplim,        \
-                       max(0.0, around(((100.0 - cbShips[x].damage) /   \
-                                        100.0) * 12.0)))
+                       max(0.0, round(((100.0 - cbShips[x].damage) /   \
+                                       100.0) * 12.0)))
 #define engeff(x) (((cbShips[x].engalloc + 50.0) / 100.0) *     \
                    cbShipTypes[cbShips[x].shiptype].engfac *    \
                    (((cbShips[x].kills+cbShips[x].strkills) +   \

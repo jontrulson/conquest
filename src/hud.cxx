@@ -132,7 +132,7 @@ void hudSetWarp(int snum)
 
 void hudSetHeading(int snum)
 {
-    int i = round( cbShips[snum].head );
+    int i = iround( cbShips[snum].head );
 
     if ( i != hudData.heading.head)
     {
@@ -256,7 +256,7 @@ void hudSetShields(int snum, int *dobeep)
     if (cbShips[snum].shields < hudData.sh.shields)
         *dobeep = true;
 
-    i = k = round( cbShips[snum].shields );
+    i = k = iround( cbShips[snum].shields );
 
     if ( ! SSHUP(snum) || SREPAIR(snum) )
         i = -1;
@@ -290,7 +290,7 @@ void hudSetDamage(int snum, real *lastdamage)
 
     if ( r != hudData.dam.damage )
     {
-        i = round(r);
+        i = iround(r);
         if (i <= HUD_HULL_ALRT)
             hudData.dam.color = GreenLevelColor;
         else if (i <= HUD_HULL_WARN)
@@ -314,7 +314,7 @@ void hudSetFuel(int snum)
 
     if ( r != hudData.fuel.fuel )
     {
-        i = round( r );
+        i = iround( r );
 
         if (i >= HUD_F_ALRT)
             hudData.fuel.color = GreenLevelColor;
@@ -390,7 +390,7 @@ void hudSetTemps(int snum)
 
     if (etemp != hudData.etemp.temp || eOverl != hudData.etemp.overl)
     {
-        i = round( etemp );
+        i = iround( etemp );
 
         if (i >= HUD_E_WARN)
             hudData.etemp.color = RedLevelColor;
@@ -408,7 +408,7 @@ void hudSetTemps(int snum)
 
     if (wtemp != hudData.wtemp.temp || wOverl != hudData.wtemp.overl)
     {
-        i = round( wtemp );
+        i = iround( wtemp );
 
         if (i >= HUD_W_WARN)
             hudData.wtemp.color = RedLevelColor;

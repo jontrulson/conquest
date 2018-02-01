@@ -179,7 +179,7 @@ static void _conqds(dspConfig_t *dsp)
     cprintf(lin,col,ALIGN_NONE,sfmt, 'q', "quit");
 
     if (state == S_WAR)
-        cprintf(prm.index, 0, ALIGN_NONE, prm.pbuf);
+        cprintf(prm.index, 0, ALIGN_NONE, "%s", prm.pbuf);
 
     return;
 

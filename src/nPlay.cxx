@@ -98,7 +98,7 @@ static void selectentry( uint8_t esystem )
     if (sptr)
         *sptr = ':';
 
-    cprintf(12, 0, ALIGN_CENTER, cbuf);
+    cprintf(12, 0, ALIGN_CENTER, "%s", cbuf);
     cprintf(MSG_LIN2, 0, ALIGN_CENTER, "--- choose a team letter ---");
 
     return;

@@ -1007,7 +1007,7 @@ void fivemindrive(void)
                         real r = rnd();
 
                         cbPlanets[i].armies =
-                            max( round( cbPlanets[i].armies * r ), 1 );
+                            max( iround( cbPlanets[i].armies * r ), 1 );
                     }
                     else
                     {

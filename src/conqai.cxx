@@ -91,7 +91,7 @@ static void buildai( int snum, int vars[], int *bnenum, real *bdne, real *bane )
 #define AIRANGE(a) min(max((a), real(0)), real(9))
 
     /* AISCALE( var, value, scale ) */
-#define AISCALE(a, b, c)  a = (int)AIRANGE( around( (real)(b) / (real)(c)  ))
+#define AISCALE(a, b, c)  a = (int)AIRANGE( round( (real)(b) / (real)(c)  ))
 
     /* AIDIST( var, dist ) */
 #define AIDIST(a, b)                                                    \

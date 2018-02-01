@@ -248,8 +248,7 @@ static nodeStatus_t nWelcomeDisplay(dspConfig_t *dsp)
         case PERR_NOSHIP:
             cprintf(MSG_LIN2/2, 0, ALIGN_CENTER,
                     "I'm sorry, but there are no ships available right now.");
-            cprintf((MSG_LIN2/2)+1, 0, ALIGN_CENTER,
-                    sorryn);
+            cprintf((MSG_LIN2/2)+1, 0, ALIGN_CENTER, "%s", sorryn);
             break;
 
         default:
