@@ -636,6 +636,18 @@ static int _get_glplanet_info(GLPlanet_t *curGLPlanet, int plani)
             gltndx = findGLTexture("luna");
             break;
 
+        case PLANET_CLASSA:
+            gltndx = findGLTexture("classa");
+            break;
+
+        case PLANET_CLASSO:
+            gltndx = findGLTexture("classo");
+            break;
+
+        case PLANET_CLASSZ:
+            gltndx = findGLTexture("classz");
+            break;
+
         case PLANET_DEAD:
         default:
             gltndx = findGLTexture("classd");
