@@ -3,12 +3,17 @@
 # $Id$
 #
 
+# your basic star (default)
+
 texture {
   name         "star"
 
-  color        "ffe6e6e6"
+  color        "ffff9933"
   mipmap       "yes"
+  prescale     1.7
 }
+
+# generic plannets by class
 
 texture {
   name         "classm"
@@ -27,6 +32,35 @@ texture {
 
   prescale     1.2
 }
+
+texture {
+    name        "classa"
+    filename    "neptune"
+
+    color       "ffe6e6e6"
+
+    mipmap      "yes"
+}
+
+texture {
+    name        "classo"
+    filename    "jupiter"
+
+    color       "ffe6e6e6"
+
+    mipmap      "yes"
+}
+
+texture {
+    name        "classz"
+    filename    "pluto"
+
+    color       "ffe6e6e6"
+
+    mipmap      "yes"
+    prescale    1.1
+}
+
 
 texture {
   name         "doomsday"
