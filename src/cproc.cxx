@@ -188,8 +188,8 @@ int procShip(char *buf)
     // decode the bit encoded representation
     for (i=0; i<cbLimits.maxPlanets(); i++)
     {
-        int word = i / sizeof(uint32_t);
-        int bit = i % sizeof(uint32_t);
+        int word = i / (sizeof(uint32_t) * 8);
+        int bit = i % (sizeof(uint32_t) * 8);
 
         if (sship->srpwar[word] & (1 << bit))
             cbShips[snum].srpwar[i] = true;

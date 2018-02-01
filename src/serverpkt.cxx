@@ -224,8 +224,8 @@ spShip_t *spktShip(uint8_t snum, int rec)
         {
             if (cbShips[snum].srpwar[i])
             {
-                int word = i / sizeof(uint32_t);
-                int bit = i % sizeof(uint32_t);
+                int word = i / (sizeof(uint32_t) * 8);
+                int bit = i % (sizeof(uint32_t) * 8);
 
                 sship.srpwar[word] |= (1 << bit);
             }
