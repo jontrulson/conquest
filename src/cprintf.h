@@ -34,6 +34,8 @@
 #define ALIGN_RIGHT  1
 #define ALIGN_NONE   0
 
-void cprintf(int lin, int col, int align, const char *fmt, ...);
+// enable format checks
+void cprintf(int lin, int col, int align, const char *fmt, ...)
+    __attribute__ ((format (printf, 4, 5)));
 
 #endif /* _CPRINTF_H */
