@@ -249,16 +249,14 @@ static nodeStatus_t nPlanetlDisplay(dspConfig_t *dsp)
             char homeflag = ' ';
 
             /* flag planets that are required for a conq */
-            if (cbPlanets[pnum].type == PLANET_CLASSM || cbPlanets[pnum].type == PLANET_DEAD)
-            {
-                // check for homeplanet
-                if (PHOMEPLANET(pnum))
-                    homeflag = cbTeams[cbPlanets[pnum].defendteam].name[0];
 
-                // core planet - required for conquer
-                if (PCORE(pnum))
-                    coreflag = '+';
-            }
+            // check for homeplanet
+            if (PHOMEPLANET(pnum))
+                homeflag = cbTeams[cbPlanets[pnum].defendteam].name[0];
+
+            // core planet - required for conquer
+            if (PCORE(pnum))
+                coreflag = '+';
 
             cprintf(lin, col,  ALIGN_NONE, "#%d#%c %c", SpecialColor,
                     homeflag, coreflag);

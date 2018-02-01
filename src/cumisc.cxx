@@ -582,17 +582,14 @@ void mcuPlanetList()
                 char homeflag = ' ';
 
                 /* flag planets that are required for a conq */
-                if (cbPlanets[pnum].type == PLANET_CLASSM
-                    || cbPlanets[pnum].type == PLANET_DEAD)
-		{
-                    // check for homeplanet
-                    if (PHOMEPLANET(pnum))
-                        homeflag = cbTeams[cbPlanets[pnum].defendteam].name[0];
 
-                    // core planet - required for conquer
-                    if (PCORE(pnum))
-                        coreflag = '+';
-		}
+                // check for homeplanet
+                if (PHOMEPLANET(pnum))
+                    homeflag = cbTeams[cbPlanets[pnum].defendteam].name[0];
+
+                // core planet - required for conquer
+                if (PCORE(pnum))
+                    coreflag = '+';
 
                 sprintf(xbuf,"%c %c ", homeflag, coreflag);  // home/core flags
                 uiPutColor(SpecialColor);

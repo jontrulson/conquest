@@ -894,9 +894,7 @@ int clbTakePlanet( int pnum, int snum )
 
     /* Check whether the universe has been conquered. */
     for ( i = 0; i < cbLimits.maxPlanets(); i++ )
-        if ( PCORE(i) && PVISIBLE(i)
-             && (cbPlanets[i].type == PLANET_CLASSM
-                 || cbPlanets[i].type == PLANET_DEAD) )
+        if ( PCORE(i) && PVISIBLE(i) )
             if ( cbPlanets[i].team != cbShips[snum].team )
             {
                 /* No. */

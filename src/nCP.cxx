@@ -556,10 +556,10 @@ static void _infoplanet( const char *str, int pnum, int snum, bool doOutput )
 
     /* In some cases, report hostilities. */
     junk[0] = 0;
-    if ( cbPlanets[pnum].type == PLANET_CLASSM || cbPlanets[pnum].type == PLANET_DEAD )
-        if ( ! godlike )
-            if ( cbPlanets[pnum].scanned[cbShips[snum].team] && clbSPWar( snum, pnum ) )
-                strcat(junk, " (hostile)");
+    if ( ! godlike )
+        if ( cbPlanets[pnum].scanned[cbShips[snum].team]
+             && clbSPWar( snum, pnum ) )
+            strcat(junk, " (hostile)");
 
     if ( godlike )
     {
