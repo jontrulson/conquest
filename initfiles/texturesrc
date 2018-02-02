@@ -15,7 +15,25 @@ texture {
   prescale     1.7
 }
 
-# Some random planets and a moon from the Sol system
+# Some random planets and moons from the Sol system
+
+texture {
+  name         "venus"
+
+  color        "ffe6e6e6"
+  mipmap       "yes"
+
+  prescale     1.25
+}
+
+texture {
+  name         "venus2"
+
+  color        "ffe6e6e6"
+  mipmap       "yes"
+
+  prescale     1.2
+}
 
 texture {
   name         "earth"
@@ -49,6 +67,15 @@ texture {
 
   color        "ffe6e6e6"
   mipmap       "yes"
+}
+
+texture {
+  name         "io"
+
+  color        "ffe6e6e6"
+  mipmap       "yes"
+
+  prescale     1.1
 }
 
 texture {

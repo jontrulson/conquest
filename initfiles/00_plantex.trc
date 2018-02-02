@@ -56,7 +56,7 @@ texture {
 
 texture {
     name        "Leudus"
-    filename    "@uranus"
+    filename    "@venus2"
 }
 
 # Fed D planets
@@ -79,7 +79,7 @@ texture {
 
 texture {
     name        "Remus"
-    filename    "@uranus"
+    filename    "@io"
 }
 
 # Orion D planets
@@ -90,7 +90,7 @@ texture {
 
 texture {
     name        "Oberon"
-    filename    "@uranus"
+    filename    "@venus"
 }
 
 # Non Team (Self Ruled) D planets
@@ -126,6 +126,13 @@ texture {
 
 texture {
     name        "RigelB"
-    filename    "@neptune"
+    filename    "@venus"
+}
+
+# out-system
+
+texture {
+    name        "Hell"
+    filename    "@io"
 }
 
