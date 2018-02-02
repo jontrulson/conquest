@@ -285,11 +285,11 @@ extern int                   cqiNumSoundMusic;
 bool cqiLoadRC(int rcid, const char *filename, int verbosity,
                int debugl);
 
-int cqiFindPlanet(char *str);
-cqiTextureAreaPtr_t cqiFindTexArea(char *texnm, const char *tanm,
+int cqiFindPlanet(const char *str);
+cqiTextureAreaPtr_t cqiFindTexArea(const char *texnm, const char *tanm,
                                    cqiTextureAreaPtr_t defaultta);
-int cqiFindEffect(char *str);
-int cqiFindMusic(char *str);
+int cqiFindEffect(const char *str);
+int cqiFindMusic(const char *str);
 
 void dumpUniverse(void);
 

@@ -443,6 +443,18 @@ CONTENTS:
                       with this texture, and that only a color is
                       stored there.
 
+                      If the filename specified an '@' symbol as the
+                      first character of the filename, then the rest
+                      of the filename (without the '@') is interpreted
+                      as a texture reference.
+
+                      When a texture reference is encountered, the
+                      referenced texture is looked up, and it's values
+                      are assigned to the current texture (flags,
+                      filename, color, and prescale).  The referenced
+                      texture must have been already defined
+                      previously.
+
                       If the filename is not specified at all, then
                       the default is to use the same name as 'name'
                       when loading the texture.

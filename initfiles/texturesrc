@@ -1,6 +1,7 @@
 # Texture defs...
 #
-# $Id$
+# Order is important here, as some textures may need to reference
+# previously defined textures.
 #
 
 # your basic star (default)
@@ -10,13 +11,14 @@ texture {
 
   color        "ffff9933"
   mipmap       "yes"
+
   prescale     1.7
 }
 
-# generic plannets by class
+# Some random planets and a moon from the Sol system
 
 texture {
-  name         "classm"
+  name         "earth"
 
   color        "ffe6e6e6"
   mipmap       "yes"
@@ -25,7 +27,14 @@ texture {
 }
 
 texture {
-  name         "classd"
+  name         "luna"
+
+  color        "ffe6e6e6"
+  mipmap       "yes"
+}
+
+texture {
+  name         "mars"
 
   color        "ffe6e6e6"
   mipmap       "yes"
@@ -34,31 +43,63 @@ texture {
 }
 
 texture {
+  name         "jupiter"
+
+  color        "ffe6e6e6"
+  mipmap       "yes"
+}
+
+texture {
+  name         "uranus"
+
+  color        "ffe6e6e6"
+  mipmap       "yes"
+
+  prescale     2.0
+}
+
+texture {
+  name         "neptune"
+
+  color        "ffe6e6e6"
+  mipmap       "yes"
+}
+
+texture {
+  name         "pluto"
+
+  color        "ffe6e6e6"
+  mipmap       "yes"
+
+  prescale     1.1
+}
+
+# generic planets by class
+
+texture {
+  name         "classm"
+  # use the earth texture for this
+  filename     "@earth"
+}
+
+texture {
+  name         "classd"
+  filename     "@mars"
+}
+
+texture {
     name        "classa"
-    filename    "neptune"
-
-    color       "ffe6e6e6"
-
-    mipmap      "yes"
+    filename    "@neptune"
 }
 
 texture {
     name        "classo"
-    filename    "jupiter"
-
-    color       "ffe6e6e6"
-
-    mipmap      "yes"
+    filename    "@jupiter"
 }
 
 texture {
     name        "classz"
-    filename    "pluto"
-
-    color       "ffe6e6e6"
-
-    mipmap      "yes"
-    prescale    1.1
+    filename    "@pluto"
 }
 
 
@@ -90,13 +131,6 @@ texture {
   name         "torp"
 
   color        "ffe6e6e6"
-}
-
-texture {
-  name         "luna"
-
-  color        "ffe6e6e6"
-  mipmap       "yes"
 }
 
 texture {

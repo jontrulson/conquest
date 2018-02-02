@@ -1,8 +1,7 @@
-# $Id$
 #
 # This file specifies default textures and colors to use for the
-# supplied planets and stars.  The planet/stars not mentioed here
-# use internal defaults. (classd, classm, star, etc).
+# supplied planets and stars.  The planets and stars not mentioed here
+# will use internal defaults. (classd, classm, star, etc).
 #
 # NOTE: this file will be overwritten by a 'make install' so do not edit
 # it directly if you want to change or add entries... Make a copy of
@@ -13,185 +12,120 @@
 
 texture {
     name        "Sol"
-    filename    "star"
+    # we just reference the star texture and override what we need
+    filename    "@star"
+    # override the color
     color       "ffeeee00"
-
-    mipmap      "yes"
-    prescale    1.7
 }
 
 texture {
     name        "Sirius"
-    filename    "star"
+    filename    "@star"
     color       "ffa5bef9"
-
-    mipmap      "yes"
-    prescale    1.7
 }
 
 texture {
     name        "Kejela"
-    filename    "star"
+    filename    "@star"
     color       "fff9d676"
-
-    mipmap      "yes"
-    prescale    1.7
 }
 
 texture {
     name        "Betelgeuse"
-    filename    "star"
+    filename    "@star"
     color       "ffff6633"
-
-    mipmap      "yes"
-    prescale    1.7
 }
 
 texture {
     name        "Murisak"
-    filename    "star"
+    filename    "@star"
     color       "ff886aea"
-
-    mipmap      "yes"
-    prescale    1.7
 }
 
 texture {
     name        "Syrinx"
-    filename    "star"
+    filename    "@star"
     color       "ffcc0000"
-
-    mipmap      "yes"
-    prescale    1.7
 }
 
 # Klingon D planets
 texture {
     name        "Tarsus"
-    filename    "jupiter"
-    color       "ffe6e6e6"
-
-    mipmap      "yes"
+    filename    "@jupiter"
 }
 
 texture {
     name        "Leudus"
-    filename    "uranus"
-    color       "ffe6e6e6"
-
-    mipmap      "yes"
-    prescale    2.0
+    filename    "@uranus"
 }
 
 # Fed D planets
 texture {
     name        "Omega"
-    filename    "neptune"
-    color       "ffe6e6e6"
-
-    mipmap      "yes"
+    filename    "@neptune"
 }
 
 texture {
     name        "Telos"
-    filename    "classd"
-    color       "ffe6e6e6"
-
-    mipmap      "yes"
+    filename    "@classd"
 }
 
 
 # Romulan D planets
 texture {
     name        "Rho"
-    filename    "jupiter"
-    color       "ffe6e6e6"
-
-    mipmap      "yes"
+    filename    "@jupiter"
 }
 
 texture {
     name        "Remus"
-    filename    "uranus"
-    color       "ffe6e6e6"
-
-    mipmap      "yes"
-    prescale    2.0
+    filename    "@uranus"
 }
 
 # Orion D planets
 texture {
     name        "Umbriel"
-    filename    "jupiter"
-    color       "ffe6e6e6"
-
-    mipmap      "yes"
+    filename    "@jupiter"
 }
 
 texture {
     name        "Oberon"
-    filename    "uranus"
-    color       "ffe6e6e6"
-
-    mipmap      "yes"
-    prescale    2.0
+    filename    "@uranus"
 }
 
 # Non Team (Self Ruled) D planets
 texture {
     name        "Dyneb"
-    filename    "jupiter"
-    color       "ffe6e6e6"
-
-    mipmap      "yes"
+    filename    "@pluto"
 }
 
 texture {
     name        "Eminiar"
-    filename    "jupiter"
-    color       "ffe6e6e6"
-
-    mipmap      "yes"
+    filename    "@jupiter"
 }
 
 texture {
     name        "Cheron"
-    filename    "jupiter"
-    color       "ffe6e6e6"
-
-    mipmap      "yes"
+    filename    "@jupiter"
 }
 
 texture {
     name        "Seritil"
-    filename    "neptune"
-    color       "ffe6e6e6"
-
-    mipmap      "yes"
+    filename    "@pluto"
 }
 
 texture {
     name        "Omega"
-    filename    "neptune"
-    color       "ffe6e6e6"
-
-    mipmap      "yes"
+    filename    "@neptune"
 }
 
 texture {
     name        "Oldar"
-    filename    "uranus"
-    color       "ffe6e6e6"
-
-    mipmap      "yes"
-    prescale    2.0
+    filename    "@uranus"
 }
 
 texture {
     name        "RigelB"
-    filename    "neptune"
-    color       "ffe6e6e6"
-
-    mipmap      "yes"
+    filename    "@neptune"
 }
 

@@ -689,7 +689,7 @@ rational	: TOK_RATIONAL		{ $$ = $1; }
 %%
 
 /* search the 'public' planet list */
-int cqiFindPlanet(char *str)
+int cqiFindPlanet(const char *str)
 {
     int i;
 
@@ -701,7 +701,7 @@ int cqiFindPlanet(char *str)
 }
 
 /* search internal planet list */
-static int _cqiFindPlanet(char *str)
+static int _cqiFindPlanet(const char *str)
 {
     int i;
 
@@ -713,7 +713,7 @@ static int _cqiFindPlanet(char *str)
 }
 
 /* search internal texture list */
-static int _cqiFindTexture(char *texname)
+static int _cqiFindTexture(const char *texname)
 {
     int i;
 
@@ -725,7 +725,7 @@ static int _cqiFindTexture(char *texname)
 }
 
 /* search the public tex area list */
-cqiTextureAreaPtr_t cqiFindTexArea(char *texnm, const char *tanm,
+cqiTextureAreaPtr_t cqiFindTexArea(const char *texnm, const char *tanm,
                                    cqiTextureAreaPtr_t defaultta)
 {
     int tidx, i;
@@ -2724,6 +2724,35 @@ void cfgSections(int item, char *val)
         case TOK_FILENAME:
             if (val[0] == 0)    /* empty filename means only color matters */
                 currTexture.flags |= CQITEX_F_COLOR_SPEC;
+            else if (val[0] == '@')
+            {
+                // referencing another texture, copy data
+                const char *offset = &val[1];
+                int index = -1;
+
+                // lookup the texture.
+                if ((index = _cqiFindTexture(offset)) < 0)
+                {
+                    utLog("CQI: texture: '%s': texture reference '%s' does "
+                          "not exist. Leaving alone.",
+                          currTexture.name, offset);
+                }
+                else
+                {
+                    // copy over select data.  Note, we do NOT copy
+                    // texarea information.
+
+                    // These can be later overridden (except for "filename"
+                    // of course :) by appropriate assignments in the
+                    // rest of the this texture section.
+
+                    utStrncpy(currTexture.filename,
+                              _cqiTextures[index].filename, CQI_NAMELEN);
+                    currTexture.flags = _cqiTextures[index].flags;
+                    currTexture.color = _cqiTextures[index].color;
+                    currTexture.prescale = _cqiTextures[index].prescale;
+                }
+            }
             else
                 utStrncpy(currTexture.filename, val, CQI_NAMELEN);
             break;

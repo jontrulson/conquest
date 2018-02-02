@@ -516,7 +516,7 @@ planet {
   homeplanet  "no"
   x           -819.850367
   y           12806.439942
-  size        600
+  size        400
 }
 
 planet {
