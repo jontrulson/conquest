@@ -103,6 +103,28 @@ texture {
   prescale     1.1
 }
 
+# Some extra class M textures
+
+texture {
+  name         "habitable1"
+
+  color        "ffe6e6e6"
+  mipmap       "yes"
+
+  prescale     1.3
+}
+
+texture {
+  name         "habitable2"
+
+  # make a touch bluer
+  color        "ffe6e6f6"
+  mipmap       "yes"
+
+  prescale     1.15
+}
+
+
 # generic planets by class
 
 texture {

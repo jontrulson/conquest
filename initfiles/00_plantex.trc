@@ -48,7 +48,13 @@ texture {
     color       "ffcc0000"
 }
 
-# Klingon D planets
+# Klingon  planets
+
+texture {
+    name        "Klingus"
+    filename    "@habitable2"
+}
+
 texture {
     name        "Tarsus"
     filename    "@jupiter"
@@ -82,7 +88,13 @@ texture {
     filename    "@io"
 }
 
-# Orion D planets
+# Orion planets
+
+texture {
+    name        "Orion"
+    filename    "@habitable1"
+}
+
 texture {
     name        "Umbriel"
     filename    "@jupiter"
@@ -93,7 +105,23 @@ texture {
     filename    "@venus"
 }
 
-# Non Team (Self Ruled) D planets
+# Non Team (Self Ruled) D and M planets
+
+texture {
+    name        "Janus"
+    filename    "@habitable1"
+}
+
+texture {
+    name        "Sherman"
+    filename    "@habitable2"
+}
+
+texture {
+    name        "Venar"
+    filename    "@habitable1"
+}
+
 texture {
     name        "Dyneb"
     filename    "@pluto"
@@ -120,6 +148,11 @@ texture {
 }
 
 texture {
+    name        "Dakel"
+    filename    "@habitable2"
+}
+
+texture {
     name        "Oldar"
     filename    "@uranus"
 }
@@ -134,5 +167,10 @@ texture {
 texture {
     name        "Hell"
     filename    "@io"
+}
+
+texture {
+    name        "Jinx"
+    filename    "@habitable1"
 }
 
