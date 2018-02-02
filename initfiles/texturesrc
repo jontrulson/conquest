@@ -31,6 +31,8 @@ texture {
 
   color        "ffe6e6e6"
   mipmap       "yes"
+
+  prescale     1.1
 }
 
 texture {
