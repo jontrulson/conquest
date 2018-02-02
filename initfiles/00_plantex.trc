@@ -106,7 +106,7 @@ texture {
 
 texture {
     name        "Cheron"
-    filename    "@jupiter"
+    filename    "@venus"
 }
 
 texture {
