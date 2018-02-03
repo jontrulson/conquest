@@ -197,7 +197,10 @@ static void _loadRCFiles(int type, const char *cqdir, const char *suffix)
 
         // nothing to do
         if (filelist.empty())
+        {
+            closedir(dirp);
             return;
+        }
 
         // now sort it
         sort(filelist.begin(), filelist.end());
@@ -211,6 +214,8 @@ static void _loadRCFiles(int type, const char *cqdir, const char *suffix)
                       __FUNCTION__, filename.c_str());
             }
         }
+
+        closedir(dirp);
     }
 
     return;
