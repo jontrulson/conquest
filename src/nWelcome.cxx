@@ -115,7 +115,7 @@ void nWelcomeInit(void)
     while (!done)
     {
         if ((pkttype =
-             pktRead(buf, PKT_MAXSIZE, 60)) <= 0)
+             pktRead(buf, PKT_MAXSIZE, 30)) <= 0)
         {
             utLog("nWelcomeInit: read SP_CLIENTSTAT or SP_ACK failed: %d",
                   pkttype);
