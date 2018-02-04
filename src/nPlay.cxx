@@ -248,33 +248,36 @@ static nodeStatus_t nPlayInput(int ch)
     {
     case S_SELSYS:              /* we are selecting our system */
     {
-        switch  ( ch )
+        if (shipinited)
         {
-        case TERM_NORMAL:
-        case TERM_ABORT:	/* doesn't like the choices ;-) */
-            sendCommand(CPCMD_ENTER, 0);
-            state = S_MENU;
-            return NODE_OK;
-            break;
-        case TERM_EXTRA:
-            /* Enter the home system. */
-            sendCommand(CPCMD_ENTER, (uint16_t)(1 << cbShips[Context.snum].team));
-            state = S_DONE;
-            return NODE_OK;
-            break;
-        default:
-            for ( i = 0; i < NUMPLAYERTEAMS; i++ )
-                if ( cbTeams[i].teamchar == (char)toupper(c) && owned[i] )
-                {
-                    /* Found a good one. */
-                    sendCommand(CPCMD_ENTER, (uint16_t)(1 << i));
+            switch  ( ch )
+            {
+                case TERM_NORMAL:
+                case TERM_ABORT:	/* doesn't like the choices ;-) */
+                    sendCommand(CPCMD_ENTER, 0);
+                    state = S_MENU;
+                    return NODE_OK;
+                    break;
+                case TERM_EXTRA:
+                    /* Enter the home system. */
+                    sendCommand(CPCMD_ENTER, (uint16_t)(1 << cbShips[Context.snum].team));
                     state = S_DONE;
                     return NODE_OK;
-                }
+                    break;
+                default:
+                    for ( i = 0; i < NUMPLAYERTEAMS; i++ )
+                        if ( cbTeams[i].teamchar == (char)toupper(c) && owned[i] )
+                        {
+                            /* Found a good one. */
+                            sendCommand(CPCMD_ENTER, (uint16_t)(1 << i));
+                            state = S_DONE;
+                            return NODE_OK;
+                        }
 
-            /* Didn't get a good one; complain and try again. */
-            mglBeep(MGL_BEEP_ERR);
-            break;
+                    /* Didn't get a good one; complain and try again. */
+                    mglBeep(MGL_BEEP_ERR);
+                    break;
+            }
         }
     }
 
