@@ -53,6 +53,8 @@ static int state;
 static int fatal = false;
 static int shipinited = false;   /* whether we've done _newship() yet */
 static int owned[NUMPLAYERTEAMS];
+static unsigned int starttime;
+static const unsigned int clientStatDelay = 10000; // 10 seconds
 
 static nodeStatus_t nPlayDisplay(dspConfig_t *);
 static nodeStatus_t nPlayIdle(void);
@@ -118,6 +120,7 @@ void nPlayInit(void)
     if (!sendCommand(CPCMD_ENTER, 0))
         fatal = true;
 
+    starttime = cInfo.nodeMillis;
     setNode(&nPlayNode);
 
     return;
@@ -135,6 +138,10 @@ static nodeStatus_t nPlayDisplay(dspConfig_t *dsp)
     {
         if (shipinited)
             selectentry(sClientStat.esystem);
+        {
+            sprintf(cbuf, "Waiting for a ClientStat...");
+            cprintf(5,0,ALIGN_CENTER,"#%d#%s",InfoColor, cbuf);
+        }
     }
     else if (state == S_NSERR)
     {
@@ -188,6 +195,14 @@ static nodeStatus_t nPlayIdle(void)
 
             // else, we will need to select a system in display.
             shipinited = true;
+        }
+
+        // time out of these don't arrive in a reasonable amount of time
+        if ((cInfo.nodeMillis - starttime) > clientStatDelay)
+        {
+            utLog("%s: Timed out waiting for clientStat packet",
+                  __FUNCTION__);
+            fatal = true;
         }
     }
     else if (state == S_DONE)
