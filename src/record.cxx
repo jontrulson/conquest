@@ -175,6 +175,9 @@ int recOpenOutput(char *fname, int logit)
 /* close the output stream */
 void recCloseOutput(void)
 {
+    if (Context.recmode != RECMODE_ON)
+        return;		/* bail */
+
     recUpdateFrame();
 
 #ifdef HAVE_LIBZ
