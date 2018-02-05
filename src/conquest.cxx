@@ -449,7 +449,6 @@ int main(int argc, char *argv[])
         if (serveropt || wantMetaList)
             printf("-P option specified.  All other options ignored.\n");
 
-        serveropt = wantMetaList = false;
         printf("Scanning file %s...\n", recFilename);
 
         /* On windows, over a shared folder in VBox, this will be way slow */

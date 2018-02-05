@@ -390,6 +390,7 @@ spClientStat_t *chkClientStat(char *buf)
     scstat = *(spClientStat_t *)buf;
 
     scstat.unum = (uint16_t)ntohs(scstat.unum);
+    scstat.snum = (int16_t)ntohs(scstat.snum);
 
     if (scstat.unum >= cbLimits.maxUsers())
     {
@@ -399,7 +400,7 @@ spClientStat_t *chkClientStat(char *buf)
         return NULL;
     }
 
-    if (scstat.snum < 0 || scstat.snum >= cbLimits.maxShips())
+    if (scstat.snum >= cbLimits.maxShips())
     {
 #if defined(DEBUG_PKT)
         utLog("%s: snum not in valid range", __FUNCTION__);

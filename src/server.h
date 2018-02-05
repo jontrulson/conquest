@@ -66,7 +66,7 @@ ServerInfo_t sInfo;
 extern ServerInfo_t sInfo;
 #endif
 
-int sendClientStat(int sock, uint8_t flags, uint8_t snum, uint8_t team,
+int sendClientStat(int sock, uint8_t flags, int16_t snum, uint8_t team,
 		   uint16_t unum, uint8_t esystem);
 int sendUser(int sock, uint16_t unum);
 int sendShip(int sock, uint8_t snum);

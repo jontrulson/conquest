@@ -62,7 +62,7 @@ static void handleUDPErr(void)
     return;
 }
 
-int sendClientStat(int sock, uint8_t flags, uint8_t snum, uint8_t team,
+int sendClientStat(int sock, uint8_t flags, int16_t snum, uint8_t team,
 		   uint16_t unum, uint8_t esystem)
 {
     spClientStat_t scstat;
@@ -76,9 +76,9 @@ int sendClientStat(int sock, uint8_t flags, uint8_t snum, uint8_t team,
 
     scstat.type = SP_CLIENTSTAT;
     scstat.flags = flags;
-    scstat.snum = snum;
     scstat.team = team;
     scstat.unum = htons(unum);
+    scstat.snum = htons(snum);
     scstat.esystem = esystem;
 
     if (pktWrite(PKT_SENDTCP, &scstat) <= 0)

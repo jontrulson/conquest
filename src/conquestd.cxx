@@ -1610,6 +1610,8 @@ int play(void)
     Context.display = false;		/* ok to display */
     stopUpdate();			/* stop the display interrupt */
     utGetSecs( &laststat );		/* initialize stat timer */
+    lastDrcheck = 0;                    // we want it to fire quickly
+                                        // the first time.
 
     /* send a clientstat packet and a ship packet. */
 

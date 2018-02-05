@@ -186,16 +186,18 @@ typedef struct {
 #define SPCLNTSTAT_FLAG_KILLED  0x04 /* you were killed by something */
 
 typedef struct {
-    uint8_t  type;                      /* SP_CLIENTSTAT */
+    uint8_t  type;                 /* SP_CLIENTSTAT */
     uint8_t  flags;                /* LR/SR, live, dead, etc. */
-    uint8_t  snum;                      /* your ship number */
-    uint8_t  team;                      /* your team number */
+    int16_t  snum;                 /* your ship number, or -1 */
 
-    uint16_t unum;                      /* your user number */
-    uint8_t  esystem;           /* team bitmask of systems
-                                   you can enter from when entering
-                                   the game. 0 if only one available */
-    uint8_t  pad2;
+    uint8_t  team;                 /* your team number */
+    uint8_t  esystem;              /* team bitmask of systems you can
+                                      enter from when entering the
+                                      game. 0 if only one available */
+    uint16_t unum;                 /* your user number */
+
+    uint32_t pad;
+
 } spClientStat_t;
 
 // we compact srpwar information into an array of uint32_t's containing

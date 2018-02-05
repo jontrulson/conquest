@@ -795,6 +795,7 @@ void secdrive( const shipVec_t& ship )
     /* Torp alert logic. */
     for ( i = 0; i < cbLimits.maxShips(); i++ )
         talert[i] = false;
+
     for ( s = 0; s < cbLimits.maxShips(); s++ )
     {
         i = ship[s];
@@ -854,12 +855,15 @@ void secdrive( const shipVec_t& ship )
                 }
 	}
     }
+
     /* Finish up torp alert logic. */
     for ( i = 0; i < cbLimits.maxShips(); i++ )
+    {
         if (talert[i])
             SFSET(i, SHIP_F_TALERT);
         else
             SFCLR(i, SHIP_F_TALERT);
+    }
 
     /* Planet eater. */
     if ( DOOM_LIVE() )
