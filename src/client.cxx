@@ -80,19 +80,32 @@ int sendAuth(int sock, uint8_t flag, const char *login, const char *pw)
     if (flag == CPAUTH_CHGPWD)
         return PERR_OK;
 
-    rv = pktWaitForPacket(SP_ACK, buf, PKT_MAXSIZE, 60);
-
-    if (rv <= 0)			/* error or timeout (0) */
+    static const int waitTime = 30000; // 30 seconds
+    unsigned int startTime = cInfo.nodeMillis;
+    while ((cInfo.nodeMillis - startTime) < waitTime)
     {
-        utLog("sendAuth: pktWaitForPacket = %d", rv);
-        return -1;
+        rv = pktRead(buf, PKT_MAXSIZE, 1);
+
+        if (rv < 0)
+        {
+            utLog("sendAuth: pktWaitForPacket = %d", rv);
+            return -1;
+        }
+
+        // process it regardless
+        if (rv != 0)
+            PKT_PROCSP(buf);
+
+        if (rv == SP_ACK)
+        {
+            if (sAck.code != PERR_PINGRESP)
+                return sAck.code;
+        }
     }
 
-    PKT_PROCSP(buf);
+    // if we're here, then we timed out.
 
-    /* now we should have our ACK... */
-
-    return sAck.code;
+    return -1;
 }
 
 int sendSetCourse(int sock, courseLock_t lock, uint16_t lockDetail, real head)

@@ -102,16 +102,35 @@ int Authenticate(char *username, char *password)
 
     done = false;
 
+    unsigned int startTime = clbGetMillis();
+    const unsigned int waitTime = 300000; // 5 minutes
     while (!done)
     {
-        rv = pktWaitForPacket(CP_AUTHENTICATE, buf,
-                              PKT_MAXSIZE, (60 * 10));
+        if ((clbGetMillis() - startTime) >= waitTime)
+        {
+            utLog("%s: timed out waiting for CP_AUTHENTICATE packet",
+                __FUNCTION__);
+            return false;
+        }
 
-        if (rv <= 0)
+        rv = pktRead(buf, PKT_MAXSIZE, 1);
+
+        if (rv < 0)
 	{
-            utLog("conquestd:Authenticate: waitforpacket returned %d", rv);
+            utLog("%s: waitforpacket returned %d", __FUNCTION__, rv);
             return false;
 	}
+
+        if (rv == 0)
+            continue;
+
+        if (rv != CP_AUTHENTICATE)
+        {
+            utLog("%s: got unexpected packet type %d, continuing...",
+                  __FUNCTION__, rv);
+
+            continue;
+        }
 
         cauth = (cpAuthenticate_t *)buf;
         cauth->login[MAXUSERNAME - 1] = 0;

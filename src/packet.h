@@ -129,8 +129,6 @@ void  pktSetNonBlocking(int enable);
 
 const char *pktSeverity2String(int psev);
 
-int   pktWaitForPacket(int type, char *buf, int blen, int delay);
-
 int   pktClientPacketSize(int type);
 int   pktServerPacketSize(int type);
 

@@ -83,7 +83,7 @@ static int prompting;
 static char cbuf[BUFFER_SIZE_256];
 
 /* init vars */
-static int lose, oclosed;
+static int lose;
 static int fatal = false;
 
 /* war vars */
@@ -200,24 +200,41 @@ void nMenuInit(void)
         /* Initialize statistics. */
         initstats( &cbShips[Context.snum].ctime, &cbShips[Context.snum].etime );
 
-        /* Set up some things for the menu display. */
-        oclosed = cbConqInfo->closed;
 
         /* now look for our ship packet before we get started.  It should be a
            full SP_SHIP packet for this first time */
-        if (pktWaitForPacket(SP_SHIP, buf, PKT_MAXSIZE,
-                             60) <= 0)
+        static const unsigned int waitTime = 30000; // 30 secs
+        unsigned int startTime = cInfo.nodeMillis;
+        bool gotShip = false;
+        while ((cInfo.nodeMillis - startTime) < waitTime)
         {
-            utLog("nMenuInit: didn't get initial SP_SHIP");
+            int rv;
+            if ((rv = pktRead(buf, PKT_MAXSIZE, 1)) < 0)
+            {
+                utLog("nMenuInit: pktRead failed: %d", rv);
+                fatal = true;
+                return;
+            }
+
+            if (rv == 0)
+                continue;
+
+            // always process the packets
+            PKT_PROCSP(buf);
+            if (rv == SP_SHIP)
+            {
+                // if it was an SP_SHIP, we are good to go
+                gotShip = true;
+                break;
+            }
+        }
+
+        if (!gotShip)
+        {
+            utLog("nMenuInit: Never received initial SP_SHIP packet");
             fatal = true;
             return;
         }
-        else
-            procShip(buf);
-
-        /* Some simple housekeeping. */
-        if ( oclosed != cbConqInfo->closed )
-            oclosed = ! oclosed;
 
         lose = false;
     }

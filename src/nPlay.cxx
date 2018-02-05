@@ -137,7 +137,10 @@ static nodeStatus_t nPlayDisplay(dspConfig_t *dsp)
     if (state == S_SELSYS)
     {
         if (shipinited)
+        {
             selectentry(sClientStat.esystem);
+        }
+        else
         {
             sprintf(cbuf, "Waiting for a ClientStat...");
             cprintf(5,0,ALIGN_CENTER,"#%d#%s",InfoColor, cbuf);

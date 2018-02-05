@@ -622,36 +622,6 @@ const char *pktSeverity2String(int psev)
     return ("");			/* NOTREACHED */
 }
 
-int pktWaitForPacket(int type, char *buf, int blen, int delay)
-{
-    int pkttype;
-
-    while (true)
-    {
-        errno = 0;		/* be afraid. */
-        if ((pkttype = pktRead(buf, blen, delay)) >= 0)
-	{
-            if (pkttype == type || type == PKT_ANYPKT || pkttype == 0)
-                return pkttype;
-
-	}
-
-        if (pkttype < 0)
-	{
-            if (errno != EINTR)
-            {
-#if defined(DEBUG_PKT)
-                utLog("pktWaitForPacket: read error %s\n", strerror(errno));
-#endif
-                return -1;
-            }
-	}
-    }
-
-    return -1;			/* NOTREACHED */
-
-}
-
 int pktServerPacketSize(int type)
 {
     if (type <= 0 || type >= serverPktMax)

@@ -746,15 +746,14 @@ int capentry( int snum, int *system )
         /* now we wait for another ENTER command packet with it's detail member
            indicating the desired system. */
 
-        if ((pkttype = pktWaitForPacket(CP_COMMAND,
-                                        buf, PKT_MAXSIZE, 1)) < 0)
+        if ((pkttype = pktRead(buf, PKT_MAXSIZE, 1)) < 0)
         {
             utLog("conquestd:capentry: waitforpacket returned %d", pkttype);
             return false;
         }
 
 
-        if ( pkttype == 0 )       /* timeout */
+        if ( pkttype == 0 || pkttype != CP_COMMAND)       /* timeout */
             continue;
 
         ccmd = (cpCommand_t *)buf;

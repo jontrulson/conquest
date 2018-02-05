@@ -260,25 +260,49 @@ static nodeStatus_t nWelcomeDisplay(dspConfig_t *dsp)
         break;
 
     case S_DONE:
-        if (pktWaitForPacket(SP_USER, buf, PKT_MAXSIZE, 60) <= 0)
+    {
+        static const unsigned int waitTime = 30000; // 30 secs
+        unsigned int startTime = cInfo.nodeMillis;
+        bool gotUser = false;
+        while ((cInfo.nodeMillis - startTime) < waitTime)
         {
-            utLog("nWelcomeDisplay: waitforpacket SP_USER returned error");
+            int rv;
+            if ((rv = pktRead(buf, PKT_MAXSIZE, 1)) < 0)
+            {
+                utLog("%s: pktRead returned error: %d", __FUNCTION__, rv);
+                return NODE_EXIT;
+            }
+
+            if (rv == 0)
+                continue;
+
+            PKT_PROCSP(buf);
+            if (rv == SP_USER)
+            {
+                gotUser = true;
+                break;
+            }
+        }
+
+        if (!gotUser)
+        {
+            utLog("%s: Timed out waiting for initial SP_USER packet",
+                  __FUNCTION__);
             return NODE_EXIT;
         }
-        else
-            procUser(buf);
 
         // verify that Context.snum and unum is != -1
         if (Context.snum < 0 || Context.unum < 0)
         {
             utLog("%s: FATAL: Context.snum or unum is invalid "
-                  "(snum:%d, unum: %d))",
+                  "(snum: %d, unum: %d))",
                   __FUNCTION__, Context.snum, Context.unum);
             return NODE_EXIT;
         }
         nMenuInit();
         return NODE_OK;
-        break;
+    }
+    break;
 
     default:
         utLog("nWelcomeDisplay: unknown state %d", state);
