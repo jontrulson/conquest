@@ -1236,8 +1236,7 @@ void freeship(void)
 {
     conqstats( Context.snum );
     cbLock(&cbConqInfo->lockword);
-    cbShips[Context.snum].sdfuse = 0;
-    cbShips[Context.snum].status = SS_OFF;
+    clbZeroShip(Context.snum);
     cbUnlock(&cbConqInfo->lockword);
     return;
 }
@@ -1299,6 +1298,8 @@ void menu(void)
         /* Make our ship available for others to use. */
         if ( cbShips[Context.snum].status == SS_RESERVED )
 	{
+            utLog("%s: sendShip(%d) failed, freeing ship", __FUNCTION__,
+                Context.snum);
             freeship();
             return;
 	}
@@ -1308,6 +1309,9 @@ void menu(void)
     {
         if (!updateClient(false))	/* sends packets */
 	{
+            utLog("%s: updateClient() failed for ship %d, freeing ship",
+                  __FUNCTION__,
+                  Context.snum);
             freeship();
             return;
 	}
@@ -1341,11 +1345,10 @@ void menu(void)
 
         if ((pkttype = pktRead(buf, PKT_MAXSIZE, 0)) < 0)
 	{
+            utLog("%s: pktRead() failed for ship %d, freeing ship",
+                  __FUNCTION__,
+                  Context.snum);
             freeship();
-            utLog("conquestd:menu: waitforpacket returned %d", pkttype);
-            handleSignal(0);
-            /* not reached */
-
             return;
 	}
 
@@ -1397,7 +1400,7 @@ void menu(void)
                            cbShips[i].unum == Context.unum))
                     {
                         clbResign( Context.unum, false );
-                        cbShips[Context.snum].status = SS_OFF;
+                        clbZeroShip(Context.snum);
                         exit(0);	/* exit here */
                     }
 	    }
@@ -2001,6 +2004,9 @@ void handleSignal(int sig)
             cbShips[Context.snum].ctime = 0;
             cbShips[Context.snum].etime = 0;
 
+            // clear PID
+            cbShips[Context.snum].pid = 0;
+
             SFSET(Context.snum, SHIP_F_VACANT); /* help the driver */
         }
         else
@@ -2008,14 +2014,14 @@ void handleSignal(int sig)
             /* so we can detect cowards */
             clbKillShip( Context.snum, KB_LIGHTNING, 0 );
             /* turn ship off */
-            cbShips[Context.snum].status = SS_OFF;
+            clbZeroShip(Context.snum);
         }
     }
     else
     {                       /* not playing (main menu, etc) */
         /* if we aren't playing, then just turn it off */
         if (Context.snum >= 0 && Context.snum < cbLimits.maxShips())
-            cbShips[Context.snum].status = SS_OFF;
+            clbZeroShip(Context.snum);
     }
 
     conqend();
