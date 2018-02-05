@@ -1420,15 +1420,13 @@ int clbFindOrbit( int snum, int *pnum )
 int clbFindShip( int *snum )
 {
     int i;
-    int vacantShips[cbLimits.maxShips()];
-    int numvacant;
+    std::vector<int> vacantShips;
 
     /* maybe free up some slots... */
     clbCheckShips(false);
 
     cbLock(&cbConqInfo->lockword);
     *snum = -1;
-    numvacant = 0;
 
     for ( i = 0; i < cbLimits.maxShips(); i++ )
     {
@@ -1436,7 +1434,7 @@ int clbFindShip( int *snum )
         if ( cbShips[i].status == SS_RESERVED )
             if (!checkPID(cbShips[i].pid))
             {
-                cbShips[i].status = SS_OFF; /* no-one there, turn it off */
+                clbZeroShip(i);  /* no-one there, turn it off */
                 utLog("INFO: clbFindShip(): turned off reserved ship %d\n",
                       i);
             }
@@ -1445,7 +1443,7 @@ int clbFindShip( int *snum )
         if (cbShips[i].status == SS_LIVE &&
             SVACANT(i) &&
             !UISOPER(cbShips[i].unum))
-            vacantShips[numvacant++] = i;
+            vacantShips.push_back(i);
 
         /* if it's off, grab it */
         if ( cbShips[i].status == SS_OFF )
@@ -1460,12 +1458,12 @@ int clbFindShip( int *snum )
         /* we didn't find one.  If there were vacant ships, pick one and
          *  steal it.
          */
-        if (numvacant)
+        if (vacantShips.size())
         {
-            if (numvacant == 1)
+            if (vacantShips.size() == 1)
                 *snum = vacantShips[0];
             else
-                *snum = vacantShips[rndint(0, numvacant - 1)];
+                *snum = vacantShips[rndint(0, vacantShips.size() - 1)];
 
             utLog("INFO: clbFindShip: stealing vacant ship %d", *snum);
             clbIKill( *snum,  KB_GOD, 0 );
@@ -1475,6 +1473,7 @@ int clbFindShip( int *snum )
     if (*snum != -1)
     {
         /* we found one, so complete the takeover */
+        utLog("%s: Grabbing ship slot %d", __FUNCTION__, *snum);
         clbZeroShip( *snum );
         cbShips[*snum].status = SS_RESERVED;
         cbShips[*snum].lastmsg = LMSG_NEEDINIT;
