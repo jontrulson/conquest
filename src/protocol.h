@@ -75,7 +75,7 @@
 #define CP_ACK            2
 #define CP_COMMAND        3     /* most commands handled by this */
 #define CP_FIRETORPS      4
-#define CP_GETSINFO       5     /* get special ship info ('ne', 'ns', etc)*/
+#define CP_NOT_USED       5     /* obsolete, was getSInfo */
 #define CP_SENDMSG        6
 #define CP_SETNAME        7
 #define CP_AUTHENTICATE   8
@@ -547,12 +547,6 @@ typedef struct {
     uint8_t  num;                       /* number to fire */
     uint16_t dir;                       /* x100 */
 } cpFireTorps_t;
-
-#define CP_SINFOMAX  15
-typedef struct {
-    uint8_t  type;                      /* CP_GETSINFO */
-    uint8_t  info[CP_SINFOMAX];
-} cpGetSInfo_t;
 
 typedef struct {
     uint8_t  type;                      /* CP_SENDMSG */

@@ -101,9 +101,9 @@ static packetEnt_t clientPackets[] = {
       "CP_FIRETORPS",
       pktNotImpl
     },
-    { CP_GETSINFO,
-      sizeof(cpGetSInfo_t),
-      "CP_GETSINFO",
+    { CP_NOT_USED,
+      sizeof(cpNull_t),
+      "CP_NOT_USED",
       pktNotImpl
     },
     { CP_SENDMSG,
