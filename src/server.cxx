@@ -440,7 +440,7 @@ int sendTeam(int sock, uint8_t team, int force)
 
 int sendcbConqInfo(int sock, int force)
 {
-    spcbConqInfo_t *spci;
+    spConqInfo_t *spci;
 
 #if defined(DEBUG_SERVERSEND)
     utLog("sendcbConqInfo: f = %d", force);

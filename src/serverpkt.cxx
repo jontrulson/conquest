@@ -65,7 +65,7 @@ static vector<vector<spTorp_t>> pktTorp;
 static vector<vector<spTorpLoc_t>> pktTorpLoc;
 static vector<vector<spTorpEvent_t>> pktTorpEvent;
 static vector<spTeam_t> pktTeam;
-static spcbConqInfo_t pktcbConqInfo;
+static spConqInfo_t pktcbConqInfo;
 static vector<spHistory_t> pktHistory;
 static spDoomsday_t pktDoomsday;
 static vector<spPlanetInfo_t> pktPlanetInfo;
@@ -891,11 +891,11 @@ spTeam_t *spktTeam(uint8_t team, int force, int rec)
     return NULL;
 }
 
-spcbConqInfo_t *spktcbConqInfo(int force)
+spConqInfo_t *spktcbConqInfo(int force)
 {
-    static spcbConqInfo_t spci;
+    static spConqInfo_t spci;
 
-    memset((void *)&spci, 0, sizeof(spcbConqInfo_t));
+    memset((void *)&spci, 0, sizeof(spConqInfo_t));
 
     spci.type = SP_CONQINFO;
 
@@ -905,7 +905,7 @@ spcbConqInfo_t *spktcbConqInfo(int force)
     utStrncpy((char *)spci.lastwords, cbConqInfo->lastwords, MAXLASTWORDS);
 
     if (memcmp((void *)&spci, (void *)&pktcbConqInfo,
-               sizeof(spcbConqInfo_t)) || force)
+               sizeof(spConqInfo_t)) || force)
     {
         pktcbConqInfo = spci;
         return &spci;

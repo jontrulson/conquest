@@ -624,7 +624,7 @@ int procServerStat(char *buf)
 
 int procConqInfo(char *buf)
 {
-    spcbConqInfo_t *spci = (spcbConqInfo_t *)buf;
+    spConqInfo_t *spci = (spConqInfo_t *)buf;
 
     if (!pktIsValid(SP_CONQINFO, buf))
         return false;
