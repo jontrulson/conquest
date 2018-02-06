@@ -135,7 +135,7 @@ int main(int argc, char *argv[])
 
     rndini();		/* initialize random numbers */
 
-    while ((i = getopt(argc, argv, "CDEI:")) != EOF)    /* get command args */
+    while ((i = getopt(argc, argv, "CDEI:v")) != EOF)    /* get command args */
         switch (i)
         {
         case 'C':
@@ -155,9 +155,14 @@ int main(int argc, char *argv[])
             InitStuffChar = *optarg; /* first character */
             break;
 
+        case 'v':
+            cqDebug++;
+            break;
+
         case '?':
         default:
-            fprintf(stderr, "usage: %s [-C] [-D] [-E] [-I <what>]\n", argv[0]);
+            fprintf(stderr, "usage: %s [-C] [-D] [-E] [-I <what>] [-v]\n",
+                    argv[0]);
             fprintf(stderr, "       -C \t\trebuild systemwide conquestrc file\n");
             fprintf(stderr, "       -D \t\tdisable the game\n");
             fprintf(stderr, "       -E \t\tenable the game\n");
@@ -171,6 +176,7 @@ int main(int argc, char *argv[])
             fprintf(stderr, "          s - ships\n");
             fprintf(stderr, "          u - universe\n");
             fprintf(stderr, "          z - zero common block\n");
+            fprintf(stderr, "       -v \t\tincrease verbosity\n");
 
             exit(1);
             break;
