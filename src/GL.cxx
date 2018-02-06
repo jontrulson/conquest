@@ -501,7 +501,7 @@ static int initGLShips(void)
     {
         /* build the prefix for this ship */
         snprintf(shipPfx, CQI_NAMELEN, "ship%c",
-                 cbTeams[i].name[0]);
+                 cbTeams[i].teamchar);
 
         for (j=0; j<MAXNUMSHIPTYPES; j++)
         {
@@ -1513,14 +1513,14 @@ void setWarp(real warp)
     if (warpufx == -1)
     {
         snprintf(buf, CQI_NAMELEN, "ship%c-warp-up",
-                 cbTeams[cbShips[Context.snum].team].name[0]);
+                 cbTeams[cbShips[Context.snum].team].teamchar);
         warpufx = cqsFindEffect(buf);
     }
 
     if (warpdfx == -1)
     {
         snprintf(buf, CQI_NAMELEN, "ship%c-warp-down",
-                 cbTeams[cbShips[Context.snum].team].name[0]);
+                 cbTeams[cbShips[Context.snum].team].teamchar);
         warpdfx = cqsFindEffect(buf);
     }
 

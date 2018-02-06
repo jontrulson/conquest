@@ -649,7 +649,7 @@ static void _infoplanet( const char *str, int pnum, int snum, bool doOutput )
             canscan = false;	/* GOD can use teaminfo instead */
         else
             canscan = ( pnum == cbTeams[cbShips[snum].team].homeplanet &&
-                        cbTeams[cbShips[snum].team].coupinfo );
+                        TEAM_COUPINFO(cbShips[snum].team) );
         if ( canscan )
 	{
             j = cbTeams[cbShips[snum].team].couptime;
@@ -2719,7 +2719,7 @@ void nCPInit(int istopnode)
             char nm[CQI_NAMELEN];
 
             snprintf(nm, CQI_NAMELEN, "ship%c-torp",
-                     cbTeams[i].name[0]);
+                     cbTeams[i].teamchar);
 
             if (!animInitState(nm, &ncpTorpAnims[i], NULL))
                 utLog("%s: failed to init animstate for animation '%s'",
@@ -2742,7 +2742,7 @@ void nCPInit(int istopnode)
     {
         introsPlayed[cbShips[Context.snum].team] = true;
         snprintf(buf, CQI_NAMELEN, "ship%c-intro",
-                 cbTeams[cbShips[Context.snum].team].name[0]);
+                 cbTeams[cbShips[Context.snum].team].teamchar);
         cqsMusicPlay(cqsFindMusic(buf), false);
     }
     else if (istopnode)
@@ -2750,7 +2750,7 @@ void nCPInit(int istopnode)
                                    we've already done the intro music
                                    for this team. */
         snprintf(buf, CQI_NAMELEN, "ship%c-theme",
-                 cbTeams[cbShips[Context.snum].team].name[0]);
+                 cbTeams[cbShips[Context.snum].team].teamchar);
         cqsMusicPlay(cqsFindMusic(buf), false);
     }
     /* else, don't start playing anything */

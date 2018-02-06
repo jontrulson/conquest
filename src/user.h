@@ -29,6 +29,7 @@
 #define USER_H_INCLUDED
 
 #include "conqdef.h"
+#include "team.h"
 
 typedef enum {
     USERTYPE_NORMAL           = 0, // All normal users (connecting via client)

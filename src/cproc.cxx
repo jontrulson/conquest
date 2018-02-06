@@ -591,10 +591,7 @@ int procTeam(char *buf)
     if (Context.recmode == RECMODE_ON)
         recWriteEvent(buf);
 
-    if (steam->flags & SPTEAM_FLAGS_COUPINFO)
-        cbTeams[team].coupinfo = true;
-    else
-        cbTeams[team].coupinfo = false;
+    cbTeams[team].flags = ntohs(steam->flags);
 
     cbTeams[team].homeplanet = (int)steam->homeplanet;
 

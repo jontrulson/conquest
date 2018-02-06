@@ -598,7 +598,7 @@ void procCoup(cpCommand_t *cmd)
     }
 
     /* Now our team can tell coup time for free. */
-    cbTeams[cbShips[snum].team].coupinfo = true;
+    TEAM_SETF(cbShips[snum].team, TEAM_F_COUPINFO);
 
     i = cbTeams[cbShips[snum].team].couptime;
     if ( i > 0 )

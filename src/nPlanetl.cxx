@@ -252,7 +252,7 @@ static nodeStatus_t nPlanetlDisplay(dspConfig_t *dsp)
 
             // check for homeplanet
             if (PHOMEPLANET(pnum))
-                homeflag = cbTeams[cbPlanets[pnum].defendteam].name[0];
+                homeflag = cbTeams[cbPlanets[pnum].defendteam].teamchar;
 
             // core planet - required for conquer
             if (PCORE(pnum))

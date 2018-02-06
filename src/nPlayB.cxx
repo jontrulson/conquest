@@ -209,7 +209,7 @@ void nPlayBInit(void)
             char nm[CQI_NAMELEN];
 
             snprintf(nm, CQI_NAMELEN, "ship%c-torp",
-                     cbTeams[i].name[0]);
+                     cbTeams[i].teamchar);
 
             if (!animInitState(nm, &ncpTorpAnims[i], NULL))
                 utLog("%s: failed to init animstate for animation '%s'",

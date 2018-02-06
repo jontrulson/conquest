@@ -31,14 +31,46 @@
 
 #include "conqdef.h"
 
+#define TEAM_FEDERATION 0       /* Feddie Bears */
+#define TEAM_ROMULAN 1          /* Rom Dogs */
+#define TEAM_KLINGON 2          /* Klings */
+#define TEAM_ORION 3            /* Bugs */
+
+#define NUMPLAYERTEAMS 4        /* four "real" teams */
+
+#define TEAM_SELFRULED 4        /* self ruled */
+#define TEAM_NOTEAM 5           /* nope. */
+#define TEAM_GOD 6              /* god team. should change to Alliance */
+#define TEAM_EMPIRE 7           /* Imperial Empire armies */
+
+#define NUMALLTEAMS 8           /* total number of teams */
+
+#define MAXTEAMNAME 12          /* maximum team name... */
+
+// The order of these characters must match The team numbers (F = 0, R
+// = 1, etc)
+static const char TEAM_PLAYERCHARS[NUMPLAYERTEAMS] = { 'F', 'R', 'K', 'O'};
+
+// Some flags
+#define TEAM_F_NONE             0x0000
+// To be enabled, there must be at least one planet owned by the team
+// at universe init (via cqiInitPlanets()) time.
+#define TEAM_F_COUPINFO         0x0001 // can get coup info?
+
+#define TEAM_COUPINFO(x) ( cbTeams[(x)].flags & TEAM_F_COUPINFO )
+
+#define TEAM_SETF(x, b)  ( cbTeams[(x)].flags |=  (b) )
+#define TEAM_CLRF(x, b)  ( cbTeams[(x)].flags &= ~(b) )
+
+
 typedef struct {
     int shiptype;		/* type of ship, one of the ST_* types */
-    int stats[MAXTSTATS];	/* team stats */
-    int coupinfo;		/* coup info */
     int couptime;		/* couptime */
     int homeplanet;             /* 'official' team home planet */
     char torpchar;		/* char to display for torps */
     char teamchar;		/* F = F  R = R  K = K  O = O */
+    uint16_t flags;             // Team flags
+    int stats[MAXTSTATS];	/* team stats */
     char name[MAXTEAMNAME];	/* team name */
 } Team_t;
 

@@ -31,6 +31,7 @@
 
 
 #include "conqdef.h"
+#include "team.h"
 
 /* flags for planets.  Of the planets with HOMEPLANET set, the first
  * one will be the capital planet.  Only Fed, Kli, Ori, and Rom can

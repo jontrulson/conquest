@@ -30,6 +30,7 @@
 
 
 #include "conqdef.h"
+#include "team.h"
 #include "torp.h"
 
 #define SHIP_F_NONE        0x00000000

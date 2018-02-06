@@ -66,7 +66,7 @@
 /*#define COMMONSTAMP 20001231           stardate? */
 /*#define COMMONSTAMP 20030829 */
 // #define COMMONSTAMP 20101027
-#define COMMONSTAMP 20180112
+#define COMMONSTAMP 20180205
 
 // Absolute maximum values for certain arrays.  Changing these will
 // require significant changes everywhere (CB/protocol mostly).  These
@@ -147,23 +147,10 @@ typedef enum {
 
 #define REFIT_GRAND 10000       /* millis to complete a refit */
 
-#define MAXTEAMNAME 12
-
 #define TEAM_UPDATE_INTERVAL 60 /* update client team data every x seconds */
 #define CONQINFO_UPDATE_INTERVAL 120
 #define HISTORY_UPDATE_INTERVAL 60
 
-#define TEAM_FEDERATION 0       /* Feddie Bears */
-#define TEAM_ROMULAN 1  /* Rom Dogs */
-#define TEAM_KLINGON 2  /* Klings */
-#define TEAM_ORION 3            /* Bugs */
-#define NUMPLAYERTEAMS 4                /* four "real" teams */
-#define TEAM_SELFRULED 4
-#define TEAM_NOTEAM 5
-#define TEAM_GOD 6
-#define TEAM_EMPIRE 7
-
-#define NUMALLTEAMS 8           /* total number of teams */
 
 #define MAXPLANETTYPES 8        /* number of different planet types */
 #define MAXPTYPENAME 20                 /* maximum size of a planet type's name */

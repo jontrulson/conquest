@@ -221,7 +221,7 @@ static nodeStatus_t nWelcomeDisplay(dspConfig_t *dsp)
 
             cprintf(MSG_LIN2/2,0,ALIGN_CENTER,"#%d#%s%s #%d#%s #%d#%s",
                     InfoColor,selected_str,
-                    vowel(cbTeams[team].name[0]) ? "n" : "",
+                    vowel(cbTeams[team].teamchar) ? "n" : "",
                     CQC_A_BOLD, cbTeams[team].name,
                     InfoColor, starship_str);
 

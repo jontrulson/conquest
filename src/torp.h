@@ -29,6 +29,7 @@
 #define TORP_H_INCLUDED
 
 #include "conqdef.h"
+#include "team.h"
 
 typedef struct
 {

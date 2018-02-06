@@ -99,15 +99,9 @@ void mglConqLogo(dspConfig_t *dsp, bool useGLTeamLogo)
 
         for (i=0; i<NUMPLAYERTEAMS; i++)
         {
-            // We hardcode the team name characters here to avoid
-            // needing to access the CB, which may not be mapped yet.
-            // This is ok, since these teams, and their "numbers" will
-            // never change.
-            static const char teams[NUMPLAYERTEAMS] = { 'F', 'R', 'K', 'O'};
-
             int ndx;
             snprintf(buffer, CQI_NAMELEN, "conqlogo%c",
-                     teams[i]);
+                     TEAM_PLAYERCHARS[i]);
 
             if ((ndx = findGLTexture(buffer)) >= 0)
             {

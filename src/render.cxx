@@ -226,7 +226,7 @@ void updateIconHudGeo(int snum)
 
         /* decal 1 */
         snprintf(buffer, CQI_NAMELEN, "ship%c-ico-decal1",
-                 cbTeams[steam].name[0]);
+                 cbTeams[steam].teamchar);
 
         /* get decal1 size */
         memset((void*)&decal1_sz, 0, sizeof(GLRect_t));
@@ -261,7 +261,7 @@ void updateIconHudGeo(int snum)
 
         /* decal 2 */
         snprintf(buffer, CQI_NAMELEN, "ship%c-ico-decal2",
-                 cbTeams[steam].name[0]);
+                 cbTeams[steam].teamchar);
 
         /* get decal2 size */
         memset((void*)&decal2_sz, 0, sizeof(GLRect_t));

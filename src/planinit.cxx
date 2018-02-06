@@ -56,6 +56,14 @@ void cqiInitPlanets(void)
     cbUnlock(&cbConqInfo->lockword);
     cbLock(&cbConqInfo->lockword);
 
+    // init all the player team's coupinfo and flags
+    for ( j = 0; j < NUMPLAYERTEAMS; j++ )
+    {
+        cbTeams[j].couptime = 0; /* time left to coup starts at zero. */
+        cbTeams[j].flags = TEAM_F_NONE;
+    }
+
+    // Run through the planets...
     for (i=0; i<cbLimits.maxPlanets(); i++)
     {                           /* init all of the planets. */
         utStrncpy(cbPlanets[i].name, cqiPlanets[i].name, MAXPLANETNAME);
@@ -94,14 +102,6 @@ void cqiInitPlanets(void)
 
         for ( j = 0; j < NUMPLAYERTEAMS; j++ )
             cbPlanets[i].scanned[j] = false;
-
-        /* we will need to defer setting up planet's team scan until
-           we have identified the team's homeplanets... */
-        for ( j = 0; j < NUMPLAYERTEAMS; j++ )
-        {
-            cbTeams[j].couptime = 0; /* time left to coup starts at zero. */
-            cbTeams[j].coupinfo = false; /* don't know coup time */
-        }
 
         cbPlanets[i].size = cqiPlanets[i].size;
         cbPlanets[i].x = cqiPlanets[i].xcoord;

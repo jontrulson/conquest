@@ -721,9 +721,9 @@ int proc_0006_Team(char *buf)
     // cbTeams[team].homesun = steam->homesun;
 
     if (steam->flags & SP_0006_TEAM_FLAGS_COUPINFO)
-        cbTeams[team].coupinfo = true;
+        TEAM_SETF(team, TEAM_F_COUPINFO);
     else
-        cbTeams[team].coupinfo = false;
+        TEAM_CLRF(team, TEAM_F_COUPINFO);
 
     cbTeams[team].couptime = steam->couptime;
 

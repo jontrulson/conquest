@@ -853,13 +853,16 @@ spTeam_t *spktTeam(uint8_t team, int force, int rec)
     steam.homeplanet = (uint8_t)cbTeams[team].homeplanet;
 
     /* RESTRICT */
+    uint16_t tflags = TEAM_F_NONE;
     if ((cbShips[snum].team == team) || rec)
     {				/* we only send this stuff for our team */
-        if (cbTeams[team].coupinfo)
-            steam.flags |= SPTEAM_FLAGS_COUPINFO;
+        tflags |= TEAM_F_COUPINFO;
 
         steam.couptime = (uint8_t)cbTeams[team].couptime;
     }
+
+    // restrict flags to allowed flags
+    steam.flags = htons(cbTeams[team].flags & tflags);
 
     for (i=0; i<MAXTSTATS; i++)
         steam.stats[i] = (uint32_t)htonl(cbTeams[team].stats[i]);

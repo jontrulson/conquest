@@ -404,16 +404,15 @@ typedef struct {
 
 } spTorpEvent_t;
 
-#define SPTEAM_FLAGS_NONE         0x00
-#define SPTEAM_FLAGS_COUPINFO     0x01
 typedef struct {
     uint8_t  type;                 /* SP_TEAM */
     uint8_t  team;
     uint8_t  couptime;          /* minutes until coup can work */
-    uint8_t  flags;                /* coupinfo, etc */
+    uint8_t  pad;
 
     uint8_t  homeplanet;
-    uint8_t  pad[3];
+    uint8_t  pad2;
+    uint16_t flags;             /* enabled, coupinfo, etc */
 
     uint32_t stats[MAXTSTATS];
 

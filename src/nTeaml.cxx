@@ -297,7 +297,7 @@ static nodeStatus_t nTeamlDisplay(dspConfig_t *dsp)
         for ( i = 0; i < 4; i++ )
             if ( team != i )
                 strcpy(timbuf[i] , "-") ;
-            else if ( ! cbTeams[i].coupinfo && timbuf[i][0] != 0 )
+            else if ( ! TEAM_COUPINFO(i) && timbuf[i][0] != 0 )
                 strcpy(timbuf[i] , "?") ;
     }
 

@@ -1138,8 +1138,7 @@ int clbZeroPlanet( int pnum, int snum )
         if (didgeno && (snum >= 0 && snum < cbLimits.maxShips()))
         {
             cbTeams[oteam].couptime = rndint( MIN_COUP_MINUTES, MAX_COUP_MINUTES );
-            cbTeams[oteam].coupinfo = false;		/* lost coup info */
-
+            TEAM_CLRF(oteam, TEAM_F_COUPINFO);  // lost coup info
 
             if ( snum >= 0 && snum < cbLimits.maxShips() )
             {
