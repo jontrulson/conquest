@@ -55,6 +55,7 @@ static int shipinited = false;   /* whether we've done _newship() yet */
 static int owned[NUMPLAYERTEAMS];
 static unsigned int starttime;
 static const unsigned int clientStatDelay = 10000; // 10 seconds
+static const unsigned int clientSelectDelay = 60000; // 60 seconds
 
 static nodeStatus_t nPlayDisplay(dspConfig_t *);
 static nodeStatus_t nPlayIdle(void);
@@ -201,7 +202,9 @@ static nodeStatus_t nPlayIdle(void)
         }
 
         // time out of these don't arrive in a reasonable amount of time
-        if ((cInfo.nodeMillis - starttime) > clientStatDelay)
+        unsigned int waitDelay = ((shipinited)
+                                  ? clientSelectDelay : clientStatDelay);
+        if ((cInfo.nodeMillis - starttime) > waitDelay)
         {
             utLog("%s: Timed out waiting for clientStat packet",
                   __FUNCTION__);
