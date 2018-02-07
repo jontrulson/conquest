@@ -55,9 +55,6 @@ static bool serverDead = true;
 static int s = -1; // socket
 static struct sockaddr_in sa;
 static struct hostent *hp = NULL;
-#if !defined(DARWIN)
-static int fdFlags = 0;
-#endif
 
 static bool isConnecting = false;
 static const char *abortStr = "--- press any key to abort ---";
@@ -109,14 +106,9 @@ void nConsvrInit(char *remotehost, uint16_t remoteport)
         return;
     }
 
-    utLog("Connecting to host: %s, port %d\n",
-          rhost, rport);
+    utLog("Connecting to host: %s, port %d\n", rhost, rport);
 
-#if !defined(DARWIN)
-    // read the socket flags, and set the connection to non-blocking
-    fdFlags = fcntl(s, F_GETFL, 0);
-    fcntl(s, F_SETFL, fdFlags | O_NONBLOCK);
-#endif
+    pktSetNonBlocking(s, true);
 
     // let the good times roll...
     setNode(&nConsvrNode);
@@ -191,10 +183,8 @@ static nodeStatus_t nConsvrIdle(void)
             // connected...
 
             isConnecting = false;
-#if !defined(DARWIN)
-            // turn off non-blocking
-            fcntl(s, F_SETFL, fdFlags);
-#endif
+
+            pktSetNonBlocking(s, false);
 
             serverDead = false;
             cInfo.sock = s;

@@ -58,10 +58,10 @@ static int udp_sock = -1;
 /* default to 'server' mode.  If true, then we are being used in the
  * client
  */
-static int isClient = false;
+static bool isClient = false;
 
 /* non-blocking i/o in effect flag */
-static int nonBlocking = false;
+static bool nonBlocking = false;
 
 /* default protocol version that a client will be expecting.  This can
  * be changed, for example, to connect to an older (but supported
@@ -805,9 +805,11 @@ static int _pktReadSocket(int sock, ringBuffer_t *RB)
             }
             else
             {
+                // this will fail further on if nonBlocking is not true.
                 return 0;
             }
         }
+
     }
 
     if (rv)
@@ -817,7 +819,7 @@ static int _pktReadSocket(int sock, ringBuffer_t *RB)
         rbPut(RB, (uint8_t *)packet, rv);
     }
 
-    return 0;
+    return rv;
 }
 
 /* check to see if there is a packet ready.  Do a read from the
@@ -909,35 +911,46 @@ int pktRead(char *buf, int blen, unsigned int delay)
         /* we have TCP data */
         if (FD_ISSET(tcp_sock, &readfds))
 	{
-            if (_pktReadSocket(tcp_sock, RB_TCPIn) < 0)
+            int tcprv;
+            if ((tcprv = _pktReadSocket(tcp_sock, RB_TCPIn)) <= 0)
             {
-                utLog("%s: pktReadSocket TCP: failed", __FUNCTION__);
-                return -1;
+                if (tcprv < 0 || (tcprv == 0 && !nonBlocking))
+                {
+
+                    utLog("%s: _pktReadSocket(TCP): failed", __FUNCTION__);
+                    return -1;
+                }
             }
 	}
 
         /* now try for any UDP */
         if (udp_sock >= 0 && FD_ISSET(udp_sock, &readfds))
         {
-            if (_pktReadSocket(udp_sock, RB_UDPIn) < 0)
+            if (_pktReadSocket(udp_sock, RB_UDPIn) <= 0)
             {
                 /* an error */
                 *buf = 0;
-                utLog("%s: pktReadSocket UDP: failed", __FUNCTION__);
-                return type;
+                utLog("%s: _pktReadSocket(UDP): failed", __FUNCTION__);
+                return -1;
             }
         }
     }
     else if (rv == 0)
-    {				/* timed out */
+    {
+        // timed out
         return 0;
     }
-    else if (rv < 0)		/* error */
+    else if (rv < 0)
     {
+        // error
         if (errno != EINTR)
+        {
             utLog("ERROR: %s: select(): %s", __FUNCTION__, strerror(errno));
-
-        return rv;
+            return rv;
+        }
+        // we'll consider EINTR a timeout, no point in checking the
+        // RBs so we'll just return here
+        return 0;
     }
 
     /* if we're here, we try one more time on the RB's, in case some data
@@ -1198,9 +1211,24 @@ void pktSetNodelay(void)
     return;
 }
 
-void pktSetNonBlocking(int enable)
+void pktSetNonBlocking(int s, bool enable)
 {
+#if defined(DARWIN)
+    // not supported
+    return;
+#endif
+
     nonBlocking = enable;
+
+    // read the socket flags
+    int fdFlags = fcntl(s, F_GETFL, 0);
+
+    if (enable)
+        fdFlags |= O_NONBLOCK;
+    else
+        fdFlags &= ~O_NONBLOCK;
+
+    fcntl(s, F_SETFL, fdFlags);
 
     return;
 }

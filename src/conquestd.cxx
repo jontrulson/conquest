@@ -1655,14 +1655,10 @@ int play(void)
         didsomething = 0;
         if ((pkttype = pktRead(buf, PKT_MAXSIZE, 1)) < 0)
 	{
-            if (errno != EINTR)
-	    {
-                utLog("conquestd: play(): pktRead() failed: %s",
-                      strerror(errno));
-                handleSignal(0);
-                /* NOTREACHED */
-                return false;
-	    }
+            utLog("conquestd: play(): pktRead() failed");
+            handleSignal(0);
+            /* NOTREACHED */
+            return false;
 	}
 
         switch (pkttype)

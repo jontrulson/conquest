@@ -125,7 +125,6 @@ int   pktIsConnDead(void);
 int   pktNotImpl(char *nothing);
 
 void  pktSetNodelay(void);
-void  pktSetNonBlocking(int enable);
 
 const char *pktSeverity2String(int psev);
 
@@ -137,5 +136,6 @@ int   pktWrite(int socktype, void *data);
 int   pktReadPacketReady(void);
 int   pktRead(char *buf, int len, unsigned int delay);
 int   pktIsValid(int pkttype, void *pkt);
+void   pktSetNonBlocking(int s, bool enable);
 
 #endif /* PACKET_H_INCLUDED */
