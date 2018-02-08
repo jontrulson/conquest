@@ -256,7 +256,7 @@ static nodeStatus_t nWelcomeDisplay(dspConfig_t *dsp)
             break;
         }
 
-        return NODE_OK;
+        return NODE_OK_NO_PKTPROC;
         break;
 
     case S_DONE:
