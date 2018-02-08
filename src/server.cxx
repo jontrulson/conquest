@@ -39,29 +39,6 @@
 #include "conqlb.h"
 #include "udp.h"
 
-#define MAXUDPERRS    (15)
-static int sudperrs = 0;        /* keep track of udp write errors */
-
-/* called when a write to a UDP socket fails. If the error threshold
-   is exceeded, disable UDP to client and let them know */
-static void handleUDPErr(void)
-{
-    sudperrs++;
-
-    if (sudperrs > MAXUDPERRS)
-    {
-        sInfo.doUDP = false;
-        close(sInfo.usock);
-        sInfo.usock = -1;
-        pktSetSocketFds(PKT_SOCKFD_NOCHANGE, sInfo.usock);
-
-        utLog("NET: too many UDP send errors to client, switching to TCP");
-        clbStoreMsg(MSG_FROM_COMP, 0, MSG_TO_SHIP, Context.snum,
-                    "SERVER: too many UDP send errors. Switching to TCP");
-    }
-    return;
-}
-
 int sendClientStat(int sock, uint8_t flags, int16_t snum, uint8_t team,
 		   uint16_t unum, uint8_t esystem)
 {
@@ -155,9 +132,22 @@ int sendShip(int sock, uint8_t snum)
     {
         if (pktWrite(PKT_SENDUDP, sshiploc) <= 0)
         {
+            // If we get a UDP while writing, we'll disable UDP, and
+            // tell the client.  TCP will be used from then on.
             if (sInfo.doUDP)
-                handleUDPErr();
-            return false;
+            {
+                utLog("%s: UDP send error, turning off UDP", __FUNCTION__);
+                pktSendAckUDP(PKT_SENDTCP, PKTUDP_STATE_SERVER_ERR, 0);
+                sInfo.doUDP = false;
+                if (sInfo.usock >= 0)
+                    close(sInfo.usock);
+                sInfo.usock = -1;
+                pktSetSocketFds(PKT_SOCKFD_NOCHANGE, sInfo.usock);
+            }
+            else
+            {
+                return false;
+            }
         }
     }
     return true;
