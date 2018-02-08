@@ -390,7 +390,7 @@ static void _dispUserOptsMenu(void)
     for (i = 0; i < umenuopts; i++)
     {
         cprintf(lin, col, ALIGN_NONE, "#%d#%d.#%d# %s#%d#", InfoColor,
-                i + 1, LabelColor, mopts[i], NoColor);
+                i + 1, NoColor, mopts[i], NoColor);
         lin++;
     }
 
