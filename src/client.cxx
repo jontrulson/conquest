@@ -153,13 +153,36 @@ int sendCommand(uint8_t cmd, uint16_t detail)
     ccmd.detail = htons(detail);
 
     /* send these via UDP if possible */
-    if (cmd == CPCMD_KEEPALIVE && cInfo.usock != -1)
+    if (cmd == CPCMD_KEEPALIVE && cInfo.doUDP)
         socktype = PKT_SENDUDP;
 
     if (pktWrite(socktype, &ccmd) <= 0)
-        return false;
-    else
-        return true;
+    {
+        // This is the only time we send UDP packets to the server, so
+        // if this fails for some reason, this is a good place to tell
+        // the server to disable UDP and turn it off locally.
+        if (socktype == PKT_SENDUDP)
+        {
+            // tell the server to stop UDP, then turn it off here for
+            // the client.  If cInfo.tryUDP is enabled, then an
+            // attempt to negotiate a new UDP connection will occur
+            // the next time the main menu is reached.
+            utLog("%s: UDP KEEPALIVE write error, shutting down UDP.",
+                  __FUNCTION__);
+            pktSendAckUDP(PKT_SENDTCP, PKTUDP_STATE_CLIENT_ERR, 0);
+            cInfo.doUDP = false;
+            if (cInfo.usock >= 0)
+                close(cInfo.usock);
+            cInfo.usock = -1;
+            pktSetSocketFds(PKT_SOCKFD_NOCHANGE, cInfo.usock);
+            return true; // not fatal, since TCP is still operational
+                         // (you hope)
+        }
+        else
+            return false;
+    }
+
+    return true;
 }
 
 int sendFireTorps(int num, real dir)
