@@ -179,10 +179,10 @@ void cqiInitPlanets(void)
         }
     }
 
-    /* now setup the intial scan status for each team's homeplanet(s) */
+    /* now setup the intial scan status for each team's planet(s) */
     for ( k = 0; k < cbLimits.maxPlanets(); k++ )
     {
-        if (PHOMEPLANET(k) && cbPlanets[k].team < NUMPLAYERTEAMS)
+        if (cbPlanets[k].team < NUMPLAYERTEAMS)
             cbPlanets[k].scanned[cbPlanets[k].team] = true;
     }
 
