@@ -117,7 +117,8 @@ markdown and updated to current reality, but for now:
   client uses to configure itself.  The Universe (planets, etc),
   textures, animations, and sound information are all handled by this
   parser.  At startup, Conquest's executables will look for these
-  files in *prefix*/etc/conquest/
+  files in *prefix*/etc/conquest/ .  It is primarily of interest only
+  to those wanting to run a server.
 
   * conqinitrc - This file specifies some limits on the universe
     (number of ships supported, planets supported, etc) as well as
@@ -133,30 +134,16 @@ markdown and updated to current reality, but for now:
     sound effects (and music, if you have the musicpak installed).
     The client will not start if there are syntax errors in this file.
 
-If you want to make custom changes to these files, copy them with a
-filename suffix of '.local', and edit those.  For example, if you are
-running a server and want to make a customized game:
-
-```
-cd *prefix*/etc/conquest
-cp conqinitrc conqinitrc.local
-vi conqinitrc.local
-...
-```
-
-NOTE: Changing any of the items in the *global {}* section in
-conqinitrc will require that you re-init the universe from conqoper
-before you will be able to start a server.
-
 Doing a "make install" or updating to a newer package will overwrite
-these files, so make *.local* copies of these files if you want to
-preserve your modifications.
+these files.  If you want to make custom changes to these files, make
+a copy of them with a filename suffix of '.local', and edit those
+instead.
 
 ## Some screenshots
 
 NOTE: Some of these were taken using the recordings of actual game
 play.  At some point I'll update them to a more recent version of
-Conquest, but you should get the gist.
+Conquest, but you should get the idea.
 
 ### Short Range View
 ![Short Range View](docs/images/short-range.png)
