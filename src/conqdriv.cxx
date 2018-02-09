@@ -603,12 +603,6 @@ void secdrive( const shipVec_t& ship )
             clbKillShip( i, KB_SHIT, 0 );
             continue;
 	}
-        if ( cbConqInfo->closed )
-            if ( ! UPLAYWHENCLOSED(cbShips[i].unum) )
-            {
-                clbKillShip( i, KB_EVICT, 0 );
-                continue;
-            }
 
         /* The ship is still alive. */
         if ( SROBOT(i) )

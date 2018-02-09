@@ -1335,7 +1335,7 @@ void display_headers(int snum)
     strcat(ssbuf, ", ");
     utAppendShipStatus(ssbuf, cbShips[snum].status) ;
 
-    if ( cbConqInfo->closed)
+    if (SysConf.Closed)
     {
         sprintf(hbuf, heading_fmt, closed_str1,
                 cbTeams[cbShips[snum].team].teamchar,

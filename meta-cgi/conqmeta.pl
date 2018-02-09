@@ -42,6 +42,7 @@ while (<$sock>)
     $flagstr .= "SwitchTeam " if ( $flags & 32 );
     $flagstr .= "NoTeamWar " if ( $flags & 64 );
     $flagstr .= "NoDrift " if ( $flags & 128 );
+    $flagstr .= "Closed " if ( $flags & 256 );
 
     push @srvlist, { server => "$sful",
                      vers => $sver,

@@ -1770,7 +1770,7 @@ int welcome( int *unum )
     {
         flags |= SPCLNTSTAT_FLAG_NEW;
         /* Must be a new player. */
-        if ( cbConqInfo->closed )
+        if ( SysConf.Closed )
 	{
             pktSendAck(PSEV_FATAL, PERR_CLOSED);
             return ( false );
@@ -1800,9 +1800,8 @@ int welcome( int *unum )
 
     }
 
-
     /* Must be special to play when closed. */
-    if ( cbConqInfo->closed && ! UPLAYWHENCLOSED(*unum) )
+    if ( SysConf.Closed && !UPLAYWHENCLOSED(*unum) )
     {
         pktSendAck(PSEV_FATAL, PERR_CLOSED);
         utLog("conquestd: welcome: game closed\n");
@@ -1866,7 +1865,7 @@ static int hello(void)
     utStrncpy((char *)shello.motd, SysConf.ServerMotd, CONF_SERVER_MOTD_SZ);
     shello.flags = 0;
 
-    if (cbConqInfo->closed)
+    if (SysConf.Closed)
         shello.flags |= SPHELLO_FLAGS_CLOSED;
 
     if (Context.accessDenied)

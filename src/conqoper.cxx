@@ -237,20 +237,16 @@ int main(int argc, char *argv[])
         /* turn the game on */
         if ((OptionAction & OP_ENABLEGAME) != 0)
 	{
-            cbConqInfo->closed = false;
-            /* Unlock the lockwords (just in case...) */
-            cbUnlock(&cbConqInfo->lockword);
-            cbUnlock(&cbConqInfo->lockmesg);
-            cbDriver->drivstat = DRS_OFF;
-            cbDriver->drivpid = 0;
-            cbDriver->drivowner[0] = 0;
+            SysConf.Closed = false;
+            SaveSysConfig();
             fprintf(stdout, "Game enabled.\n");
 	}
 
         /* turn the game off */
         if ((OptionAction & OP_DISABLEGAME) != 0)
 	{
-            cbConqInfo->closed = true;
+            SysConf.Closed = true;
+            SaveSysConfig();
             fprintf(stdout, "Game disabled.\n");
 	}
 
@@ -1200,7 +1196,7 @@ void operate(void)
         if (*cbRevision == COMMONSTAMP)
 	{
             /* game status */
-            if ( cbConqInfo->closed )
+            if ( SysConf.Closed )
                 strcpy(junk , "CLOSED") ;
             else
                 strcpy(junk , "open") ;
@@ -1331,22 +1327,18 @@ void operate(void)
             redraw = true;
             break;
 	case 'f':
-            if ( cbConqInfo->closed )
+            if ( SysConf.Closed )
 	    {
-                cbConqInfo->closed = false;
-                /* Unlock the lockwords (just in case...) */
-                cbUnlock(&cbConqInfo->lockword);
-                cbUnlock(&cbConqInfo->lockmesg);
-                cbDriver->drivstat = DRS_OFF;
-                cbDriver->drivpid = 0;
-                cbDriver->drivowner[0] = 0;
+                SysConf.Closed = false;
+                SaveSysConfig();
 
                 utLog("OPER: %s has enabled the game",
                       operName);
 	    }
             else if ( mcuConfirm() )
 	    {
-                cbConqInfo->closed = true;
+                SysConf.Closed = true;
+                SaveSysConfig();
                 utLog("OPER: %s has disabled the game",
                       operName);
 	    }

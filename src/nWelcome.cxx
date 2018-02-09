@@ -208,7 +208,7 @@ static nodeStatus_t nWelcomeDisplay(dspConfig_t *dsp)
     {
     case S_GREETINGS:
         /* Must be a new player. */
-        if ( cbConqInfo->closed )
+        if ( sStat.serverFlags & SERVER_F_CLOSED )
         {
             /* Can't enroll if the game is closed. */
             cprintf(MSG_LIN2/2,col,ALIGN_CENTER,"#%d#%s", InfoColor, sorry1 );

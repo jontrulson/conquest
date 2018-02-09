@@ -43,5 +43,6 @@
 #define SERVER_F_NOTEAMWAR   0x00000040 // disallow user from setting
                                         // war with own team
 #define SERVER_F_NODRIFT     0x00000080 // disallow use of the drift bug
+#define SERVER_F_CLOSED      0x00000100 // server is closed/private
 
 #endif /* SERVERFLAGS_H_INCLUDED */

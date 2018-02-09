@@ -114,7 +114,6 @@ static void set_header(int snum)
 {
 
     static const char *heading_fmt = "%s %c%d (%s)%s";
-    static const char *closed_str1 = "GAME CLOSED -";
     static const char *robo_str1 = "ROBOT (external)";
     static const char *robo_str2 = "ROBOT";
     static const char *ship_str1 = "SHIP";
@@ -127,14 +126,7 @@ static void set_header(int snum)
     strcat(ssbuf, ", ");
     utAppendShipStatus(ssbuf, cbShips[snum].status) ;
 
-    if ( cbConqInfo->closed)
-    {
-        sprintf(hbuf, heading_fmt, closed_str1,
-                cbTeams[cbShips[snum].team].teamchar,
-                snum,
-                cbShips[snum].alias, ssbuf);
-    }
-    else if ( SROBOT(snum) )
+    if ( SROBOT(snum) )
     {
         if (cbConqInfo->externrobots == true)
 	{

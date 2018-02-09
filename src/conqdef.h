@@ -66,7 +66,7 @@
 /*#define COMMONSTAMP 20001231           stardate? */
 /*#define COMMONSTAMP 20030829 */
 // #define COMMONSTAMP 20101027
-#define COMMONSTAMP 20180205
+#define COMMONSTAMP 20180208
 
 // Absolute maximum values for certain arrays.  Changing these will
 // require significant changes everywhere (CB/protocol mostly).  These

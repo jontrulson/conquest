@@ -189,6 +189,9 @@ typedef struct _sysConf {
     /* Allow drift bug? */
     int NoDrift;
 
+    /* Server is closed/private? */
+    int Closed;
+
     /* server name */
     char ServerName[CONF_SERVER_NAME_SZ];
 
@@ -204,7 +207,7 @@ typedef struct _sysConf {
 #ifdef NOEXTERN_CONF
 // current version of the conquestrc file, just change date for newer
 // versions.
-static const char *CONF_REVISION = "20171218";
+static const char *CONF_REVISION = "20180208";
 
 const char *ConfigVersion = CONF_REVISION;
 /* Config's */
@@ -416,6 +419,21 @@ struct Conf SysConfData[] =
         {
             "# Whether or not to enable the drift bug.",
             "#  This is a ship motion bug in the original conquest.",
+            "#  Default: false",
+            NULL
+        }
+    },
+    {
+        false,
+        CTYPE_BOOL,
+        "closed=",
+        &SysConf.Closed,
+        0, 0,			/* mix/max */
+        "Close the server",
+        {
+            "# When the server is closed, only those users which already exist",
+            "   and have the PLAYWHENCLOSED bit set in their operator option",
+            "   flags will be able to play.",
             "#  Default: false",
             NULL
         }

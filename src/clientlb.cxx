@@ -116,6 +116,9 @@ const std::vector<std::string>& clntServerFlagsStr(uint32_t flags)
 
         if (flags & SERVER_F_NODRIFT)
             flagsList.push_back(std::string("NoDrift"));
+
+        if (flags & SERVER_F_CLOSED)
+            flagsList.push_back(std::string("Closed"));
     }
 
     return flagsList;

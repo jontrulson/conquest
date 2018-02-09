@@ -1796,9 +1796,6 @@ void clbInitEverything(bool cbIsLocal)
     if (!cbIsLocal)
         cbLock(&cbConqInfo->lockword);
 
-    /* Turn off the universe. It will be turned back on in initUniverse() */
-    cbConqInfo->closed = true;
-
     /* reset the lockwords  */
     cbConqInfo->lockword = 0;
     cbConqInfo->lockmesg = 0;
@@ -2158,9 +2155,6 @@ void clbInitUniverse(bool cbIsLocal)
     clbClearShips();
     clbInitMsgs();
 
-    /* Turn the universe back on (turned off in initEverything()). */
-    cbConqInfo->closed = false;
-
     return;
 
 }
@@ -2490,10 +2484,6 @@ int clbSPWar( int snum, int pnum )
 
 
 /*  stillalive - determine if a ship is still alive */
-/*  SYNOPSIS */
-/*    int flag, stillalive */
-/*    int snum */
-/*    flag = clbStillAlive( snum ) */
 int clbStillAlive( int snum )
 {
 
@@ -2501,23 +2491,8 @@ int clbStillAlive( int snum )
     if (snum < 0 || snum >= cbLimits.maxShips())
         return(true);
 
-    /* Look for religious trouble or the "closed" sign in the window. */
-    if ( UBANNED(cbShips[snum].unum) )
-    {
-        if ( cbShips[snum].status == SS_LIVE )
-            clbKillShip( snum, KB_SHIT, 0 );
-
-        return ( false );
-    }
-    if ( cbConqInfo->closed && ! UPLAYWHENCLOSED(cbShips[snum].unum) )
-    {
-        if ( cbShips[snum].status == SS_LIVE )
-            clbKillShip(snum, KB_EVICT, 0);
-
-        return ( false );
-    }
-
-    if ( cbShips[snum].status == SS_RESERVED || cbShips[snum].status == SS_ENTERING )
+    if ( cbShips[snum].status == SS_RESERVED
+         || cbShips[snum].status == SS_ENTERING )
         return ( true );
 
     return ( cbShips[snum].status == SS_LIVE );

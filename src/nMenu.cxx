@@ -125,13 +125,15 @@ static void _conqds(dspConfig_t *dsp)
 
     lin = 7;
 
-    if ( cbConqInfo->closed )
-        cprintf(lin,0,ALIGN_CENTER,"#%d#%s",RedLevelColor,"The game is closed.");
-    else
-        cprintf( lin,0,ALIGN_CENTER,"#%d#%s (%s)",YellowLevelColor,
-                 ConquestVersion, ConquestDate);
+    cprintf( lin,0,ALIGN_CENTER,"#%d#%s (%s)",YellowLevelColor,
+             ConquestVersion, ConquestDate);
 
-    lin++;
+    if ( sStat.serverFlags & SERVER_F_CLOSED )
+        cprintf(++lin,0,ALIGN_CENTER,"#%d#%s",
+                RedLevelColor,"The game is closed.");
+    else
+        lin++;
+
     lin++;
     cprintf(lin,0,ALIGN_CENTER,"#%d#%s", MagentaColor, CONQ_HTTP);
     lin++;

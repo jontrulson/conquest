@@ -424,7 +424,6 @@ void cbMapLocal(void)
     clbInitEverything(true);
     clbInitMsgs();
     *cbRevision = COMMONSTAMP;
-    cbConqInfo->closed = false;
     cbDriver->drivstat = DRS_OFF;
     cbDriver->drivpid = 0;
     cbDriver->drivowner[0] = 0;

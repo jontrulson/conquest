@@ -236,6 +236,16 @@ When enabled, users are not allowed to declare war on their own team.
 When enabled, the Drift bug is disabled.  Like the Slingshot bug, if
 you don't know what this is, figure it out :)
 
+### Closed
+
+When enabled, the game is marked as closed.  This means new users
+cannot login.  Existing users can login and play only if the
+PLAYWHENCLOSED flag has been enabled in their user record by conqoper.
+
+If there are already people logged in and playing on a server when the
+server is marked as closed, nothing will happen to them -- it will not
+kick out users that are already in the game.
+
 ## Meta Server
 
 With Conquest v8.0 and better, a meta server is supported.  There is

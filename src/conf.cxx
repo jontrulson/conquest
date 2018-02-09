@@ -51,6 +51,7 @@ static void setSysConfDefaults(void)
     SysConf.AllowSlingShot = false;
     SysConf.NoTeamWar = false;
     SysConf.NoDrift = false;
+    SysConf.Closed = false;
 
     utStrncpy(SysConf.ServerName, "Generic Conquest Server",
               CONF_SERVER_NAME_SZ);
@@ -1028,15 +1029,10 @@ int MakeSysConf()
         utLog("MakeSysconf(): fopen(%s) failed: %s",
               conf_name,
               strerror(errno));
-
-        fprintf(stderr, "Error creating %s: %s\n",
-                conf_name,
-                strerror(errno));
         return(-1);
     }
 
     utLog("OPER: Updating %s file...", conf_name);
-    fprintf(stderr, "Updating %s file...", conf_name);
 
     for (j=0; j<SysCfEnd; j++)
     {
@@ -1101,8 +1097,6 @@ int MakeSysConf()
     utLog("MakeSysConf(%s): Succeeded.", conf_name);
 #endif
 
-    fprintf(stderr, "Done.\n");
-
     /* that's it! */
     return(true);
 }
@@ -1135,6 +1129,9 @@ uint32_t getServerFlags(void)
 
     if (SysConf.NoDrift)
         f |= SERVER_F_NODRIFT;
+
+    if (SysConf.Closed)
+        f |= SERVER_F_CLOSED;
 
     return f;
 }

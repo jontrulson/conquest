@@ -32,7 +32,6 @@
 #include "conqdef.h"
 
 typedef struct {
-    bool  closed;                 /* the game is closed, everybody out */
     int  lockword;                /* exclusionary flag */
     int  lockmesg;                /* exclusive access to the message area */
     unsigned int  ccpuseconds;    /* cpu seconds used by conquest */
