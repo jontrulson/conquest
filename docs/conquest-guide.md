@@ -281,14 +281,14 @@ line I use on my server to start conquestd:
 Please make sure your server is actually reachable from the Internet
 before advertising your game to the meta server.
 
-## ~/.conquest/conquestrc
+## ~/.conquest/conquest.conf
 
 After running Conquest for the first time, a file called
-~/.conquest/conquestrc should have been created.  Look at this file
+~/.conquest/conquest.conf should have been created.  Look at this file
 (it's self-explanatory) for various options you can set.
 
 Conquest Operators (or CO's) should look at
-/opt/conquest/etc/conquestrc for a few system wide options you may or
+/opt/conquest/etc/conquest.conf for a few system wide options you may or
 may not want.  As of version 7.0, all options (user and system-wide)
 can be viewed and edited using the (O)ptions Menu.  This menu is
 available in the conquest/conqoper main menus, as well as being
@@ -948,12 +948,12 @@ buttons are supported with any combination of the 3 modifiers (or no
 modifiers) giving you a maximum of 256 assignable mouse macros.  If
 you have a 32 button mouse that is :)
 
-Mouse and Key macros are defined in your ~/conquest/conquestrc file.
+Mouse and Key macros are defined in your ~/conquest/conquest.conf file.
 Users can edit their macro keys from within Conquest using the
 (O)ptions Menu.
 
 Here is an example for the F1 function key as it would appear in the
-~/.conquest/conquestrc file:
+~/.conquest/conquest.conf file:
 
 
 ```macro_f1=dP\r```
@@ -965,7 +965,7 @@ The mouse only works when playing the game (in the Cockpit) and the
 cursor is within the viewer window.
 
 Three default mouse macros are provided to give you a taste, and will
-be saved in your conquestrc file the first time you run an 8.1.2f or
+be saved in your conquest.conf file the first time you run an 8.1.2f or
 better version of the client.  They are:
 
 * mouse button 0 (left): Fire phaser at *angle*
@@ -977,7 +977,7 @@ macros, a special character sequence, *\a* can be used to represent
 the angle of the cursor relative to the center of the viewer when the
 button was pressed.
 
-See the mouse macro comment block in your conquestrc file for a
+See the mouse macro comment block in your conquest.conf file for a
 description of the format.
 
 There are many other interesting and useful combinations that I won't
@@ -1169,12 +1169,12 @@ disrupt a game.  In addition, due to the fact that a CO is a member of
 the conquest group, a bad CO will be able to trash the common block,
 as well as other undesirable things.
 
-A CO with permission to overwrite the system-wide conquestrc file can
+A CO with permission to overwrite the system-wide conquest.conf file can
 call conqoper with the '-C' option to update the file with a newer
 version.  This is done by default when building the source and doing a
 *make install*.
 
-User-level ~/.conquest/conquestrc files are always updated
+User-level ~/.conquest/conquest.conf files are always updated
 automatically when conquest is run.
 
 

@@ -1,4 +1,4 @@
-; charset=UTF-8
+
 
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <HTML><HEAD><TITLE>Man page of conqinit</TITLE>
@@ -23,8 +23,7 @@ conqinit - a utility for the Conquest Init parser (CQI)
 <P>
 
 <B>conqinit</B> can be used to test the parser, perform syntax checking
-on conqinitrc and texturesrc files, as well as to generate initdata.h
-and sounddata.h header files containing compiled-in defaults.
+on conqinitrc soundrc, and texturesrc files.
 <P>
 
 CQI is a lex/yacc parser that is used by <B>Conquest</B> 8.1.2a or
@@ -33,19 +32,10 @@ and for the specification of colors, textures, animation definitions,
 sound, and music.
 <P>
 
-These pre-generated header files (initdata.h, sounddata.h) contain
-defaults compiled directly into conquest, in the event the relevant
-CQI config file could not be opened or successfully read on startup.
-End users should not generate these files.  Validated header files are
-included with the src distribution.
-<P>
-
-If you are modifying one of the CQI config files, (conquestrc,
+If you are modifying one of the CQI config files, (conqinitrc,
 soundrc, etc), you should at least run conqinit on them to check for
 syntax or other validation errors.  If conquest (or conquestd) fails
-to properly load and parse the file at runtime, the built in internal
-defaults will be used (when possible) and a warning message will be
-logged. 
+to properly load and parse these files they will fail to start.
 <A NAME="lbAE">&nbsp;</A>
 <H2>OPTIONS</H2>
 
@@ -74,11 +64,6 @@ to treat the file as if it were in conqinitrc format.
 <DD>
 Treat the input file as a file in texturesrc format.  The default is
 to treat the file as if it were in conqinitrc format.
-<DT><B>-h</B>
-
-<DD>
-Dump the parsed file out to stdout in initdata.h sounddata.h format 
-(depending on the presence of the <B>-s</B> option).
 <DT><B>-D</B>
 
 <DD>
@@ -107,12 +92,12 @@ Dump the current universe to stdout in conqinitrc format.
 <BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;clean&nbsp;up&nbsp;colors,&nbsp;etc).&nbsp;&nbsp;
 <P>
 
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Then&nbsp;copy&nbsp;that&nbsp;file&nbsp;over&nbsp;the&nbsp;system's&nbsp;conqinitrc&nbsp;file&nbsp;(or&nbsp;email
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;it&nbsp;to&nbsp;your&nbsp;friends&nbsp;:).&nbsp;&nbsp;From
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;then&nbsp;on,&nbsp;whenever&nbsp;the&nbsp;planets&nbsp;are&nbsp;initialized&nbsp;(due&nbsp;to&nbsp;a
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Then&nbsp;copy&nbsp;that&nbsp;file&nbsp;to&nbsp;conqinitrc.local&nbsp;in&nbsp;the&nbsp;conquest
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;etc/conquest/&nbsp;directory,&nbsp;(or&nbsp;email&nbsp;it&nbsp;to&nbsp;your&nbsp;friends&nbsp;:).
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;From&nbsp;then&nbsp;on,&nbsp;whenever&nbsp;the&nbsp;planets&nbsp;are&nbsp;initialized&nbsp;(due&nbsp;to&nbsp;a
 <BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;successful&nbsp;conquer,&nbsp;or&nbsp;the&nbsp;actions&nbsp;of&nbsp;an&nbsp;oper&nbsp;in&nbsp;conqoper),
 <BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;your&nbsp;definitions&nbsp;will&nbsp;be&nbsp;used&nbsp;as&nbsp;the&nbsp;default&nbsp;planet
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;configuration.&nbsp;
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;configuration.
 <P>
 <A NAME="lbAF">&nbsp;</A>
 <H2>AUTHOR</H2>
@@ -134,7 +119,7 @@ by <B>conqinit</B>, as well as other information not mentioned here.
 
 <P>
 
-Copyright (C)1994-2017 by Jon Trulson &lt;<A HREF="mailto:jon@radscan.com">jon@radscan.com</A>&gt; under the MIT
+Copyright (C)1994-2018 by Jon Trulson &lt;<A HREF="mailto:jon@radscan.com">jon@radscan.com</A>&gt; under the MIT
 License.
 <P>
 <P>
@@ -155,6 +140,6 @@ License.
 This document was created by
 <A HREF="/cgi-bin/man/man2html">man2html</A>,
 using the manual pages.<BR>
-Time: 17:05:49 GMT, January 28, 2018
+Time: 21:10:19 GMT, February 09, 2018
 </BODY>
 </HTML>

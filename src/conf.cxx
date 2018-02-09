@@ -177,7 +177,7 @@ static void checkCreateUserConfDir(void)
 /*  If checkonly is true, then just load internel defaults, and the existing
     conquesrtc file, if there.  Don't output errmsgs since this will
     only be true when 'priming the pump' in conqoper -C, before writing a
-    new conquestrc file (preserving existing settings if possible).
+    new conquest.conf file (preserving existing settings if possible).
 */
 int GetSysConf(int checkonly)
 {
@@ -346,7 +346,7 @@ int GetSysConf(int checkonly)
 
     /* see if we found the version */
     if (SysConfData[SYSCF_VERSION].Found == false)
-    {				/* conquestrc version not found */
+    {				/* conquest.conf version not found */
 #ifdef DEBUG_CONFIG
         utLog("GetSysConf(): Incorrect version found.  Update needed.");
 #endif
@@ -674,7 +674,7 @@ int GetConf(int usernum)
 
     /* see if we found the version */
     if (ConfData[CF_VERSION].Found == false)
-    {				/* conquestrc version not found */
+    {				/* conquest.conf version not found */
 #ifdef DEBUG_CONFIG
         utLog("GetConf(): Incorrect version found. - rebuilding");
 #endif
@@ -887,7 +887,7 @@ int process_bool(char *bufptr)
     }
 }
 
-/* MakeConf(filename) - make a fresh, spiffy new conquestrc file. */
+/* MakeConf(filename) - make a fresh, spiffy new conquest.conf file. */
 
 int MakeConf(char *filename)
 {
@@ -1011,7 +1011,7 @@ int MakeConf(char *filename)
 }
 
 
-/* MakeSysConf() - make a fresh, spiffy new sys-wide conquestrc file.*/
+/* MakeSysConf() - make a fresh, spiffy new sys-wide conquest.conf file.*/
 
 int MakeSysConf()
 {

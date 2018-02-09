@@ -160,7 +160,7 @@ A user is expired:
    ever done on these users.
 
 2. the user hasn't entered the game in 'user_expiredays' days,
-   which is set in the system-wide conquestrc file.
+   which is set in the system-wide conquest.conf file.
 
 3. the user isn't currently flying a ship.
 
@@ -171,7 +171,7 @@ the game.
 ### Disabling expiration of users
 
 If you wish to disable expiration altogether, set 'user_expiredays'
-equal to 0 in the system-wide conquestrc file, or via the Options menu
+equal to 0 in the system-wide conquest.conf file, or via the Options menu
 in conqoper.
 
 ## Server start examples
@@ -214,7 +214,7 @@ line.
 $ conqoper -?
 conqoper: invalid option -- '?'
 usage: conqoper [-C] [-D] [-E] [-I <what>]
-       -C               rebuild systemwide conquestrc file
+       -C               rebuild systemwide conquest.conf file
        -D               disable the game
        -E               enable the game
        -I <what>        Initialize <what>, where <what> is:

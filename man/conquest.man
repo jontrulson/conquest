@@ -1,4 +1,3 @@
-.\" $Id$
 .TH "conquest" 6 "" ""
 .SH NAME
 conquest \- Conquest game clients
@@ -370,7 +369,7 @@ buttons.  Up to 32 buttons are supported with any combination of the 3
 modifiers (or no modifiers) giving you a maximum of 256 assignable
 mouse macros.  If you have a 32 button mouse that is :)
 
-Mouse and Key macros are defined in your ~/conquest/conquestrc file.
+Mouse and Key macros are defined in your ~/.conquest/conquest.conf file.
 Users can edit their macro keys from within Conquest using the
 (O)ptions Menu.
 
@@ -385,7 +384,7 @@ The mouse only works when playing the game (in the Cockpit) and the
 cursor is within the viewer window in the GL client.
 
 Three default mouse macros are provided to give you a taste, and will
-be saved in your conquestrc file the first time you run an 8.1.2f or
+be saved in your conquest.conf file the first time you run an 8.1.2f or
 better version of the client.  They are:
 
       mouse button 0 (left): Fire phaser at <angle>
@@ -397,7 +396,7 @@ macros, a special character sequence, \fB\\a\fP can be used to
 represent the angle of the cursor relative to the center of the viewer
 (your ship) when the button was pressed.
 
-See the mouse macro comment block in your conquestrc file for a
+See the mouse macro comment block in your conquest.conf file for a
 description of the format.
 
 There are many other interesting and useful combinations that I won't
@@ -473,17 +472,6 @@ See CONQINIT.TXT for information on CQI, and the format of the
 conqinitrc, soundrc and texturesrc files.
 .SH "COPYRIGHT"
 .PP
-Copyright (C)1994-2017 by Jon Trulson <jon@radscan.com> under the
+Copyright (C)1994-2018 by Jon Trulson <jon@radscan.com> under the
 MIT License.
 .PP
-Original VAX/VMS Ratfor Conquest:
-.PP
-Copyright (C)1983-1986 by Jef Poskanzer and Craig Leres.  Permission to
-use, copy, modify, and distribute this software and its documentation
-for any purpose and without fee is hereby granted, provided that this
-copyright notice appear in all copies and in all supporting
-documentation. Jef Poskanzer and Craig Leres make no representations
-about the suitability of this software for any purpose. It is provided
-"as is" without express or implied warranty.
-
-

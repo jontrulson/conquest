@@ -163,7 +163,7 @@ int main(int argc, char *argv[])
         default:
             fprintf(stderr, "usage: %s [-C] [-D] [-E] [-I <what>] [-v]\n",
                     argv[0]);
-            fprintf(stderr, "       -C \t\trebuild systemwide conquestrc file\n");
+            fprintf(stderr, "       -C \t\trebuild systemwide conquest.conf file\n");
             fprintf(stderr, "       -D \t\tdisable the game\n");
             fprintf(stderr, "       -E \t\tenable the game\n");
             fprintf(stderr, "       -I <what> \tInitialize <what>, where <what> is:\n");
@@ -267,7 +267,7 @@ int main(int argc, char *argv[])
     Context.updsec = 2;		/* default upd per sec */
 
     if (GetConf(0) == -1)	/* use one if there, else defaults
-				   A missing or out-of-date conquestrc file
+				   A missing or out-of-date conquest.conf file
 				   will be ignored */
     {
 #ifdef DEBUG_CONFIG

@@ -34,8 +34,8 @@
 # include "cqkeys.h"
 #endif
 
-#define SYSCONFIG_FILE "conquestrc"	/* relative to CONQETC */
-#define CONFIG_FILE "conquestrc"
+#define SYSCONFIG_FILE "conquest.conf"	/* relative to CONQETC */
+#define CONFIG_FILE "conquest.conf"
 
 #define CONF_MAXCOMMENTS   50
 
@@ -205,9 +205,9 @@ typedef struct _sysConf {
 
 
 #ifdef NOEXTERN_CONF
-// current version of the conquestrc file, just change date for newer
+// current version of the conquest.conf file, just change date for newer
 // versions.
-static const char *CONF_REVISION = "20180208";
+static const char *CONF_REVISION = "20180209";
 
 const char *ConfigVersion = CONF_REVISION;
 /* Config's */
@@ -240,7 +240,7 @@ extern struct Conf SysConfData[];
 #else
 struct Conf SysConfData[] =
 {
-    {			/* The current conquestrc (conquest) version */
+    {			/* The current conquest.conf (conquest) version */
         false,
         CTYPE_NULL,
         "SysConqfigVersion=",
@@ -261,7 +261,7 @@ struct Conf SysConfData[] =
         {
             "###################################################################",
             "#",
-            "# conquestrc - Conquest system-wide defaults",
+            "# conquest.conf - Conquest system-wide defaults",
             "#",
             "# SYNTAX - <variable>=<value>",
             "#",
@@ -486,7 +486,7 @@ extern struct Conf ConfData[];
 #else
 struct Conf ConfData[] =
 {
-    {				/* The current conquestrc (conf.h) version */
+    {				/* The current conquest.conf (conf.h) version */
         false,
         CTYPE_NULL,
         "ConqfigVersion=",
@@ -507,7 +507,7 @@ struct Conf ConfData[] =
         {
             "###################################################################",
             "#",
-            "# ~/.conquest/conquestrc - define some configuration values",
+            "# ~/.conquest/conquest.conf - define some configuration values",
             "#",
             "# SYNTAX - <variable>=<value>",
             "#",
@@ -822,7 +822,7 @@ struct Conf ConfData[] =
             "#  \\r = [ENTER], \\t = [TAB] \\a = [Clicked Angle]",
             "#",
             "# Here are some example entries as they might appear in the",
-            "#  ~/.conquest/conquestrc file:",
+            "#  ~/.conquest/conquest.conf file:",
             "#",
             "#  # mouse button 0, fire phaser at angle:",
             "#  mouse_0=f\\a\\r",
@@ -845,7 +845,7 @@ struct Conf ConfData[] =
         0, 0,			/* mix/max */
         "Macro Keys",
         {
-            "# Macro definitions.  The format in the ~/.conquest/conquestrc file is",
+            "# Macro definitions.  The format in the ~/.conquest/conquest.conf file is",
             "#  'macro_fN=<string>'",
             "#  'N' is a number between 1 and MAX_MACROS, inclusive.",
             "#  <string> is a sequence of Conquest commands to execute when",
@@ -855,7 +855,7 @@ struct Conf ConfData[] =
             "#  \\r = [ENTER], \\t = [TAB]",
             "#",
             "# Here are some example entries as they might appear in the",
-            "#  ~/.conquest/conquestrc file:",
+            "#  ~/.conquest/conquest.conf file:",
             "#",
             "#  # fires full spread of torps at last dir when F1 key is pressed:",
             "#  macro_f1=P\\rP\\rP\\r",
