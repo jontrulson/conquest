@@ -407,7 +407,7 @@ spShipLoc_t *spktShipLoc(uint8_t snum, int rec)
     static const uint32_t maxtime = 5000;  /* 5 seconds */
     static uint32_t lasttime = 0;
     uint32_t thetime = clbGetMillis();
-    static int forceMyShip = true;
+    bool forceMyShip = false;
 
     memset((void *)&sshiploc, 0, sizeof(spShipLoc_t));
 
@@ -420,7 +420,8 @@ spShipLoc_t *spktShipLoc(uint8_t snum, int rec)
        of your ship even if it isn't neccessary.  This should help with
        those firewalls that disconnect a UDP connection when there has
        been no trafic on it for a while. */
-    if (sInfo.doUDP && (snum == mysnum) && ((thetime - lasttime) > maxtime))
+    if (sInfo.doUDP && !rec && (snum == mysnum)
+        && ((thetime - lasttime) > maxtime))
     {
         lasttime = thetime;
         forceMyShip = true;
@@ -486,12 +487,6 @@ spShipLoc_t *spktShipLoc(uint8_t snum, int rec)
                                   sizeof(spShipLoc_t)))
         {
             pktShipLoc[snum] = sshiploc;
-            /* if we are doing udp, and we are going to send a packet,
-               reset the timer so we won't need a nother force (as we do
-               not need one now :) */
-            if (sInfo.doUDP)
-                lasttime = thetime;
-            forceMyShip = false;
             return &sshiploc;
         }
     }
