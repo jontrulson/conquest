@@ -610,7 +610,7 @@ spPlanetLoc_t *spktPlanetLoc(uint8_t pnum, int rec, int force)
     int team = cbShips[snum].team;
     static spPlanetLoc_t splanloc;
     uint32_t iternow = clbGetMillis(); /* we send packets only every 5 secs */
-    const uint32_t iterwait = 5000.0; /* ms */
+    const uint32_t iterwait = 5000; /* ms */
     static uint32_t tstart[ABS_MAXPLANETS] = {}; /* saved time deltas */
     int tooearly = false;
 
@@ -632,6 +632,15 @@ spPlanetLoc_t *spktPlanetLoc(uint8_t pnum, int rec, int force)
     if (cbPlanets[pnum].scanned[team] || rec)
         splanloc.armies = htons(cbPlanets[pnum].armies);
 
+    // Do a tooearly check here - to avoid jitter, if we are in orbit
+    // around a planet, always send it's location data.
+    if (cbShips[snum].warp < 0)
+    {
+        // we are in orbit
+        if (pnum == cbShips[snum].lockDetail)
+            tooearly = false;
+    }
+
     if (splanloc.armies == pktPlanetLoc[pnum].armies && tooearly)
         return NULL;
 
@@ -639,7 +648,7 @@ spPlanetLoc_t *spktPlanetLoc(uint8_t pnum, int rec, int force)
 
     splanloc.x = (int32_t)htonl((int32_t)(cbPlanets[pnum].x * 10.0));
     splanloc.y = (int32_t)htonl((int32_t)(cbPlanets[pnum].y * 10.0));
-    splanloc.orbang = (uint16_t)htons((uint16_t)(cbPlanets[pnum].orbang * 100.0));
+    splanloc.orbang = htons((uint16_t)(cbPlanets[pnum].orbang * 100.0));
 
     if (rec)
     {
