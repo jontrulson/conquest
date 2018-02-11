@@ -563,7 +563,7 @@ planet {
   pteam       "S"
   armies      60 90
   visible     "yes"
-  core        "yes"
+  core        "no"
   homeplanet  "no"
   x           5974.991371
   y           -1347.257629
