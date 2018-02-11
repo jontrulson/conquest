@@ -609,10 +609,11 @@ spPlanetLoc_t *spktPlanetLoc(uint8_t pnum, int rec, int force)
     int snum = Context.snum;
     int team = cbShips[snum].team;
     static spPlanetLoc_t splanloc;
-    uint32_t iternow = clbGetMillis(); /* we send packets only every 5 secs */
-    const uint32_t iterwait = 5000; /* ms */
+    // we send packets only every 5 secs in most cases
+    uint32_t iternow = clbGetMillis();
+    static const uint32_t iterwait = 5000; /* ms */
     static uint32_t tstart[ABS_MAXPLANETS] = {}; /* saved time deltas */
-    int tooearly = false;
+    bool tooearly = false;
 
     /*
      * We have to handle the case where a planet has just been freshly
@@ -641,10 +642,12 @@ spPlanetLoc_t *spktPlanetLoc(uint8_t pnum, int rec, int force)
             tooearly = false;
     }
 
-    if (splanloc.armies == pktPlanetLoc[pnum].armies && tooearly)
+    if (splanloc.armies == pktPlanetLoc[pnum].armies && tooearly && !rec)
         return NULL;
 
-    tstart[pnum] = iternow;
+    // only update time for actual packets sent
+    if (!rec)
+        tstart[pnum] = iternow;
 
     splanloc.x = (int32_t)htonl((int32_t)(cbPlanets[pnum].x * 10.0));
     splanloc.y = (int32_t)htonl((int32_t)(cbPlanets[pnum].y * 10.0));
