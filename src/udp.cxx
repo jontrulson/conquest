@@ -185,9 +185,7 @@ int udpRecvPacket(int sock, char* buffer, size_t buflen)
     // 4 bytes long.
     if (rv < 8)
     {
-        if (cqDebug)
-            utLog("%s: received short packet: %d, ignoring", __FUNCTION__, rv);
-        pktStats.shortPackets++;
+        utLog("%s: received short packet: %d, ignoring", __FUNCTION__, rv);
         return 0;
     }
 
@@ -200,7 +198,18 @@ int udpRecvPacket(int sock, char* buffer, size_t buflen)
     theSeq = ntohl(theSeq);
 
     if (theSeq > readSeq)
+    {
+        unsigned int lost = theSeq - readSeq;
+        if (lost > 1)
+        {
+            pktStats.lostPackets += (lost - 1);
+
+            if (cqDebug)
+                utLog("%s: Lost %u packet(s)", __FUNCTION__,
+                      lost - 1);
+        }
         readSeq = theSeq;
+    }
     else if (theSeq == readSeq)
     {
         if (cqDebug)

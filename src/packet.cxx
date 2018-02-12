@@ -783,7 +783,6 @@ static int _pktReadSocket(int sock, ringBuffer_t *RB)
         {
             if (!(errno == EWOULDBLOCK || errno == EAGAIN))
             {
-                *packet = 0;
                 utLog("%s: udpRecvPacket(): %s", __FUNCTION__, strerror(errno));
                 return -1;
             }
@@ -799,7 +798,6 @@ static int _pktReadSocket(int sock, ringBuffer_t *RB)
         {
             if (!(errno == EWOULDBLOCK || errno == EAGAIN))
             {
-                *packet = 0;
                 utLog("%s: TCP recv(): %s", __FUNCTION__, strerror(errno));
                 return -1;
             }
@@ -926,10 +924,11 @@ int pktRead(char *buf, int blen, unsigned int delay)
         /* now try for any UDP */
         if (udp_sock >= 0 && FD_ISSET(udp_sock, &readfds))
         {
-            if (_pktReadSocket(udp_sock, RB_UDPIn) <= 0)
+            // out of order, duplicate, or short packets can cause a
+            // return of 0 here, so we don't consider that an error.
+            if (_pktReadSocket(udp_sock, RB_UDPIn) < 0)
             {
                 /* an error */
-                *buf = 0;
                 utLog("%s: _pktReadSocket(UDP): failed", __FUNCTION__);
                 return -1;
             }

@@ -395,15 +395,15 @@ static void _dispUserOptsMenu(void)
     }
 
     lin = 17;
-    cprintf(lin, col, ALIGN_NONE, "#%d#Server Name:   #%d# %s#%d#", LabelColor,
+    cprintf(lin, col, ALIGN_NONE, "#%d#Server Name:   #%d# %s#%d#", MagentaColor,
             InfoColor, sHello.servername,
             NoColor);
     lin++;
-    cprintf(lin, col, ALIGN_NONE, "#%d#Server Version: #%d#%s#%d#", LabelColor,
+    cprintf(lin, col, ALIGN_NONE, "#%d#Server Version: #%d#%s#%d#", MagentaColor,
             InfoColor, sHello.serverver,
             NoColor);
     lin++;
-    cprintf(lin, col, ALIGN_NONE, "#%d#UDP:  #%d# %s#%d#", LabelColor,
+    cprintf(lin, col, ALIGN_NONE, "#%d#UDP:  #%d# %s#%d#", MagentaColor,
             InfoColor, (cInfo.doUDP) ? "On" : "Off",
             NoColor);
 
@@ -415,19 +415,19 @@ static void _dispUserOptsMenu(void)
             udpLastRead = currentMillis;
         }
 
-        cprintf(lin, col + 12, ALIGN_NONE, "#%d#Stats: OoO: #%d#%u #%d# Dup: #%d#%u #%d#Short: #%d#%u #%d#readSeq: #%d#%u",
-                LabelColor,
+        cprintf(lin, col + 11, ALIGN_NONE, "#%d#Stats: OoO: #%d#%u #%d# Dup: #%d#%u #%d#Lost: #%d#%u #%d#readSeq: #%d#%u",
+                MagentaColor,
                 InfoColor, pktStats.oooPackets,
-                LabelColor,
+                MagentaColor,
                 InfoColor, pktStats.duplicatePackets,
-                LabelColor,
-                InfoColor, pktStats.shortPackets,
-                LabelColor,
+                MagentaColor,
+                InfoColor, pktStats.lostPackets,
+                MagentaColor,
                 InfoColor, lastReadSeq);
     }
 
     lin++;
-    cprintf(lin, col, ALIGN_NONE, "#%d#Flags:#%d#", LabelColor,
+    cprintf(lin, col, ALIGN_NONE, "#%d#Flags:#%d#", MagentaColor,
             InfoColor);
 
     lin = clntPrintServerFlags(lin, col + 7, sStat.serverFlags, InfoColor);

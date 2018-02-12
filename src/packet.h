@@ -97,7 +97,7 @@ typedef struct _pkt_stats {
     // UDP info
     unsigned int duplicatePackets;
     unsigned int oooPackets;
-    unsigned int shortPackets;
+    unsigned int lostPackets;
 } pktStats_t;
 
 #ifdef NOEXTERN_PACKET
