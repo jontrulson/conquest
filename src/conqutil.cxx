@@ -432,14 +432,17 @@ void utLog(const char *fmt, ...)
 /*    utDeleteBlanks( str ) */
 void utDeleteBlanks( char *str )
 {
+    if (!str)
+        return
+
     int i, j;
 
     for ( i = 0; str[i] != 0; )
         if ( str[i] == ' ' )
-            for ( j = i; str[j] != 0; j = j + 1 )
+            for ( j = i; str[j] != 0; j++ )
                 str[j] = str[j+1];
         else
-            i = i + 1;
+            i++;
 
     return;
 

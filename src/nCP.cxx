@@ -807,11 +807,13 @@ static void _dotorp(real dir, int num)
 /*  SYNOPSIS */
 /*    int snum */
 /*    doinfo( snum ) */
-static void _doinfo( char *buf, char ch, bool doOutput )
+static void _doinfo( char *inbuf, char ch, bool doOutput )
 {
     int snum = Context.snum;
     int j, what, sorpnum, xsorpnum, count, token;
     int extra;
+    char tmpBuf[MSGMAXLINE];
+    char *buf = NULL;
 
     if ( ch == TERM_ABORT )
     {
@@ -826,11 +828,21 @@ static void _doinfo( char *buf, char ch, bool doOutput )
     else
         Context.lastInfoTerm = 0;
 
+    if (inbuf)
+    {
+        buf = inbuf;
+        utDeleteBlanks( buf );
+    }
+    else
+    {
+        buf = tmpBuf;
+        buf[0] = 0;
+    }
+
     /* Default to what we did last time. */
-    utDeleteBlanks( buf );
     if ( buf[0] == 0 )
     {
-        strcpy(buf , Context.lastinfostr) ;
+        utStrncpy(buf, Context.lastinfostr, MSGMAXLINE) ;
         if ( buf[0] == 0 )
 	{
             hudClearPrompt(MSG_LIN1);
@@ -839,7 +851,7 @@ static void _doinfo( char *buf, char ch, bool doOutput )
 	}
     }
     else
-        strcpy(Context.lastinfostr, buf) ;
+        utStrncpy(Context.lastinfostr, buf, MSGMAXLINE) ;
 
     if ( utIsSpecial( buf, &what, &token, &count ) )
     {
@@ -2942,12 +2954,10 @@ static nodeStatus_t nCPIdle(void)
     if (UserConf.hudInfo && !prompting && ((iternow - tadTime) > tadWait))
     {
         tadTime = iternow;
-        // FIXME This (fake) is stupid, and should be redone
-        char fake[2] = {};
         if (Context.lastinfostr[0] != 0
             && (Context.lastInfoTerm == TERM_NORMAL
                 || Context.lastInfoTerm == TERM_EXTRA))
-            _doinfo(fake, Context.lastInfoTerm, false);
+            _doinfo(NULL, Context.lastInfoTerm, false);
     }
 
     return NODE_OK;
