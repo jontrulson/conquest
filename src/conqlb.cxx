@@ -2213,7 +2213,7 @@ int clbLogHist( int unum )
     int hnum;
 
     cbLock(&cbConqInfo->lockword);
-    cbConqInfo->histptr = utModPlusOne( cbConqInfo->histptr + 1, cbLimits.maxHist() );
+    cbConqInfo->histptr = mod( cbConqInfo->histptr + 1, cbLimits.maxHist() );
     /* time stamp for this entry */
     cbHistory[cbConqInfo->histptr].enterTime = time(0);
     cbHistory[cbConqInfo->histptr].elapsed = (time_t)0;
@@ -2532,7 +2532,7 @@ void clbStoreMsgf( msgFrom_t from, uint16_t fromDetail,
             return;
 
     cbLock(&cbConqInfo->lockmesg);
-    nlastmsg = utModPlusOne( cbConqInfo->lastmsg + 1, cbLimits.maxMsgs() );
+    nlastmsg = mod( cbConqInfo->lastmsg + 1, cbLimits.maxMsgs() );
     utStrncpy( cbMsgs[nlastmsg].msgbuf, msg, MESSAGE_SIZE );
     cbMsgs[nlastmsg].from = from;
     cbMsgs[nlastmsg].fromDetail = fromDetail;

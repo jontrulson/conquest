@@ -1281,7 +1281,7 @@ void operate(void)
             /* Un-read message, if there's a chance it got garbaged. */
             if ( readone )
                 if ( iochav() )
-                    cbConqInfo->glastmsg = utModPlusOne( cbConqInfo->glastmsg - 1, cbLimits.maxMsgs() );
+                    cbConqInfo->glastmsg = mod( cbConqInfo->glastmsg - 1, cbLimits.maxMsgs() );
 
 	} /* *cbRevision != COMMONSTAMP */
         else
@@ -1963,11 +1963,11 @@ void oppedit(void)
 	case 'T':
             /* Rotate owner team. */
             cbPlanets[pnum].team =
-                utModPlusOne( cbPlanets[pnum].team + 1, NUMALLTEAMS );
+                mod( cbPlanets[pnum].team + 1, NUMALLTEAMS );
             break;
 	case 't':
             /* Rotate planet type. */
-            cbPlanets[pnum].type = utModPlusOne( cbPlanets[pnum].type + 1, MAXPLANETTYPES );
+            cbPlanets[pnum].type = mod( cbPlanets[pnum].type + 1, MAXPLANETTYPES );
             break;
 	case 'x':
             /* X coordinate. */
@@ -2902,7 +2902,7 @@ void opuedit(void)
             else if ( left && row == 2 )
 	    {
                 /* Team. */
-                cbUsers[unum].team = utModPlusOne( cbUsers[unum].team + 1, NUMPLAYERTEAMS );
+                cbUsers[unum].team = mod( cbUsers[unum].team + 1, NUMPLAYERTEAMS );
 	    }
             else if ( ! left && row == 2 )
 	    {
@@ -3045,7 +3045,7 @@ void watch(void)
             /* Un-read message, if there's a chance it got garbaged. */
             if ( readone )
 		if ( iochav() )
-                    cbConqInfo->glastmsg = utModPlusOne( cbConqInfo->glastmsg - 1, cbLimits.maxMsgs() );
+                    cbConqInfo->glastmsg = mod( cbConqInfo->glastmsg - 1, cbLimits.maxMsgs() );
 
             /* Get a char with timeout. */
             if ( ! iogtimed( &ch, 1.0 ) )

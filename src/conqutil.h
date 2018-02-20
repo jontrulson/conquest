@@ -56,7 +56,6 @@ uint64_t utDeltaGrand(uint64_t s, uint64_t *n);
 void     utGrand( uint64_t *h );
 void     utGetSecs( time_t *s );
 real     utMod360( real r );
-int      utModPlusOne( int i, int modulus );
 int      utIsSpecial( char *str, int *what, int *token, int *count );
 void     utStrncpy( char *to, const char *from, unsigned int tosize );
 void     utStrncat( char *to, const char *from, unsigned int tosize );

@@ -188,7 +188,7 @@ int main(int argc, char *argv[])
     utStrncpy(cbDriver->drivowner, clbGetUserLogname(), MAXUSERNAME);
 
     /* Start within bounds. */
-    cbDriver->drivsecs = utModPlusOne( cbDriver->drivsecs, FIVEMINUTE_SECONDS );
+    cbDriver->drivsecs = mod( cbDriver->drivsecs, FIVEMINUTE_SECONDS );
 
     /* Special hack to cause the one second fuse to expire upon entry. */
     drivtenths = 10;
@@ -255,7 +255,7 @@ int main(int argc, char *argv[])
 		}
 
                 /* Do the big things first to sync the small things. */
-                cbDriver->drivsecs = utModPlusOne( cbDriver->drivsecs + 1,
+                cbDriver->drivsecs = mod( cbDriver->drivsecs + 1,
                                                    FIVEMINUTE_SECONDS );
                 if ( mod( cbDriver->drivsecs, FIVEMINUTE_SECONDS ) == 0 )
                     fivemindrive();

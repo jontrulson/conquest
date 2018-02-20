@@ -1651,7 +1651,7 @@ static int _review(void)
     }
     else
     {
-        msg = utModPlusOne( msg - 1, cbLimits.maxMsgs() );
+        msg = mod( msg - 1, cbLimits.maxMsgs() );
         if (msg == lastone)
         {
             state = S_NONE;
@@ -1672,7 +1672,7 @@ static void _doreview(void)
     lstmsg = cbShips[snum].lastmsg;	/* don't want lstmsg changing while
                                            reading old ones. */
 
-    lastone = utModPlusOne( cbConqInfo->lastmsg+1, cbLimits.maxMsgs() );
+    lastone = mod( cbConqInfo->lastmsg+1, cbLimits.maxMsgs() );
     if ( snum >= 0 && snum < cbLimits.maxShips() )
     {
         if ( cbShips[snum].lastmsg == LMSG_NEEDINIT )
@@ -3461,7 +3461,7 @@ static nodeStatus_t nCPInput(int ch)
                     break;
 
                 case TERM_EXTRA:
-                    refitst = utModPlusOne( refitst + 1, MAXNUMSHIPTYPES );
+                    refitst = mod( refitst + 1, MAXNUMSHIPTYPES );
                     sprintf(pbuf, "Refit ship type: %s",
                             cbShipTypes[refitst].name);
                     prm.buf[0] = 0;
@@ -3487,10 +3487,10 @@ static nodeStatus_t nCPInput(int ch)
 	    case '<':
 	    case CQ_KEY_UP:
 	    case CQ_KEY_LEFT:
-                tmsg = utModPlusOne( msg - 1, cbLimits.maxMsgs() );
+                tmsg = mod( msg - 1, cbLimits.maxMsgs() );
                 while(!clbCanRead( snum, tmsg ) && tmsg != lastone)
 		{
-                    tmsg = utModPlusOne( tmsg - 1, cbLimits.maxMsgs() );
+                    tmsg = mod( tmsg - 1, cbLimits.maxMsgs() );
 		}
                 if (tmsg == lastone)
 		{
@@ -3502,10 +3502,10 @@ static nodeStatus_t nCPInput(int ch)
 	    case '>':
 	    case CQ_KEY_DOWN:
 	    case CQ_KEY_RIGHT:
-                tmsg =  utModPlusOne( msg + 1, cbLimits.maxMsgs() );
+                tmsg =  mod( msg + 1, cbLimits.maxMsgs() );
                 while(!clbCanRead( snum, tmsg ) && tmsg != lstmsg + 1 )
 		{
-                    tmsg = utModPlusOne( tmsg + 1, cbLimits.maxMsgs() );
+                    tmsg = mod( tmsg + 1, cbLimits.maxMsgs() );
 		}
                 if (tmsg == (lstmsg + 1))
 		{

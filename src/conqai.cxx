@@ -447,7 +447,7 @@ static void executeai( int snum, int token )
         /* Try to read a message and reply to it */
         while ( cbShips[snum].lastmsg != cbConqInfo->lastmsg )
         {
-            cbShips[snum].lastmsg = utModPlusOne( cbShips[snum].lastmsg + 1, cbLimits.maxMsgs() );
+            cbShips[snum].lastmsg = mod( cbShips[snum].lastmsg + 1, cbLimits.maxMsgs() );
             i = cbShips[snum].lastmsg;
             if ( clbCanRead( snum, i ) )
             {

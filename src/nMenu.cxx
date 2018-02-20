@@ -516,7 +516,7 @@ static nodeStatus_t nMenuInput(int ch)
                    overwritten on the next ship update.  Improves perceived
                    response time. */
                 cbShips[Context.snum].team =
-                    utModPlusOne( cbShips[Context.snum].team+1, NUMPLAYERTEAMS );
+                    mod( cbShips[Context.snum].team+1, NUMPLAYERTEAMS );
                 cbShips[Context.snum].shiptype =
                     cbTeams[cbShips[Context.snum].team].shiptype;
                 cbUsers[Context.unum].team = cbShips[Context.snum].team;

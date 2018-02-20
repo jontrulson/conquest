@@ -34,9 +34,8 @@
 typedef struct {
     int  drivstat; /* driver status; one of the DRS_ values */
     int  drivpid;  /* pid of the driver process */
-    int  drivcnt;  /* number of driver timeouts (utModPlusOne 1000) */
-    int  drivsecs; /* phase of the universe in seconds */
-                                /*  (utModPlusOne five minutes) */
+    int  drivcnt;  /* number of driver timeouts */
+    int  drivsecs; /* phase of the universe in seconds (mod 5 mins) */
     char drivowner[MAXUSERNAME]; /* username of the driver's owner */
 
     // The following are seconds since the epoch.

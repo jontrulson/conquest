@@ -433,7 +433,7 @@ void utLog(const char *fmt, ...)
 void utDeleteBlanks( char *str )
 {
     if (!str)
-        return
+        return;
 
     int i, j;
 
@@ -621,7 +621,7 @@ int utGetMsg( int snum, int *msg )
 {
     while ( *msg != cbConqInfo->lastmsg )
     {
-        *msg = utModPlusOne( *msg + 1, cbLimits.maxMsgs() );
+        *msg = mod( *msg + 1, cbLimits.maxMsgs() );
         if ( clbCanRead( snum, *msg ) )
             return(true);
 
@@ -697,33 +697,6 @@ real utMod360( real r )
     return((real) fmod(mr, 360.0));
 
 }
-
-
-/*  utModPlusOne - modulus plus one */
-/*  SYNOPSIS */
-/*    int mi, utModPlusOne, i, modulus */
-/*    mi = utModPlusOne( i, modulus ) */
-int utModPlusOne( int i, int modulus )
-{
-    int m, n;
-
-    m = i;
-
-    while ( m < 0 )
-        m += modulus;
-
-    n = mod(--m, modulus) + 1;
-    return((n >= modulus) ? 0 : n);
-
-    /*    return((n == 0) ? 1 : n);*/
-
-    /*    while ( m < 1 )
-          m = m + modulus;
-
-          return ( mod( m-1, modulus ) + 1 );
-    */
-}
-
 
 /*  utSafeCToI - char to int conversion with overflow protection */
 /*  SYNOPSIS */

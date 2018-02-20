@@ -74,7 +74,7 @@ void mcuHistList()
             bool isResigned = false;
 
             // adjust based on histptr being the next available slot.
-            i = utModPlusOne( i - 1, cbLimits.maxHist() );
+            i = mod( i - 1, cbLimits.maxHist() );
 
             // No username, no entry
             if (!cbHistory[i].username[0])
@@ -817,7 +817,7 @@ int mcuReviewMsgs( int slm )
     didany = false;
     Done = false;
 
-    lastone = utModPlusOne( cbConqInfo->lastmsg+1, cbLimits.maxMsgs() );
+    lastone = mod( cbConqInfo->lastmsg+1, cbLimits.maxMsgs() );
     cdclrl( MSG_LIN1, 1 );
 
     msg = slm;
@@ -838,10 +838,10 @@ int mcuReviewMsgs( int slm )
 	    case '<':
 	    case KEY_UP:
 	    case KEY_LEFT:
-                tmsg = utModPlusOne( msg - 1, cbLimits.maxMsgs() );
+                tmsg = mod( msg - 1, cbLimits.maxMsgs() );
                 while(!clbCanRead( -1, tmsg ) && tmsg != lastone)
 		{
-                    tmsg = utModPlusOne( tmsg - 1, cbLimits.maxMsgs() );
+                    tmsg = mod( tmsg - 1, cbLimits.maxMsgs() );
 		}
                 if (tmsg == lastone)
 		{
@@ -854,10 +854,10 @@ int mcuReviewMsgs( int slm )
 	    case '>':
 	    case KEY_DOWN:
 	    case KEY_RIGHT:
-                tmsg =  utModPlusOne( msg + 1, cbLimits.maxMsgs() );
+                tmsg =  mod( msg + 1, cbLimits.maxMsgs() );
                 while(!clbCanRead( -1, tmsg ) && tmsg != slm + 1 )
 		{
-                    tmsg = utModPlusOne( tmsg + 1, cbLimits.maxMsgs() );
+                    tmsg = mod( tmsg + 1, cbLimits.maxMsgs() );
 		}
                 if (tmsg == (slm + 1))
 		{
@@ -874,7 +874,7 @@ int mcuReviewMsgs( int slm )
 	}
         else
 	{
-            msg = utModPlusOne( msg - 1, cbLimits.maxMsgs() );
+            msg = mod( msg - 1, cbLimits.maxMsgs() );
             if (msg == lastone)
                 Done = true;
 	}

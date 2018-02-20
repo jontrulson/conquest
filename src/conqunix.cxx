@@ -216,7 +216,7 @@ void drcheck(void)
                           &(cbDriver->playtime) ) > TIMEOUT_DRIVER )
 	{
             drcreate();
-            cbDriver->drivcnt = utModPlusOne( cbDriver->drivcnt + 1, 1000 );
+            cbDriver->drivcnt = mod( cbDriver->drivcnt + 1, 1000 );
             utLog( "Driver timeout #%d.", cbDriver->drivcnt );
 	}
         cbUnlock(&cbConqInfo->lockword);
