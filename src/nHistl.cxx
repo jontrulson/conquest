@@ -123,6 +123,10 @@ static nodeStatus_t nHistlDisplay(dspConfig_t *dsp)
                  connecttm);
 
         lin++;
+
+        if (col == 40 && lin > lline)
+            break;              // we're done, can't display any more
+
         if ( lin > lline )
         {
             col = 40;
