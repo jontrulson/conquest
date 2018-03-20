@@ -89,6 +89,9 @@ void nConsvrInit(char *remotehost, uint16_t remoteport)
                  rhost);
         err = true;
 
+        // make sure the user gets a chance to see it...
+        setNode(&nConsvrNode);
+
         return;
     }
 
@@ -154,7 +157,11 @@ static nodeStatus_t nConsvrDisplay(dspConfig_t *dsp)
 
 static nodeStatus_t nConsvrIdle(void)
 {
-    if (serverDead && !err)
+
+    if (err)
+        return NODE_OK;
+
+    if (serverDead)
     {
         isConnecting = true;
 
