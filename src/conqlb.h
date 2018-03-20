@@ -35,6 +35,10 @@
 
 #include "protocol.h"
 
+#include <string>
+#include <vector>
+#include <algorithm>
+
 int      clbRegister( const char *lname, const char *rname,
                       int team, int *unum );
 void     clbChalkup( int snum );
@@ -56,7 +60,7 @@ void     clbUserline( int unum, int snum, char *buf,
                       int showgods, int showteam );
 void     clbStatline( int unum, char *buf );
 int      clbZeroPlanet( int pnum, int snum );
-char    *clbWarPrompt(int snum, int twar[]);
+const char *clbWarPrompt(int snum, int twar[]);
 
 int      clbCanRead( int snum, int msgnum );
 void     clbClearShips(void);
@@ -105,6 +109,7 @@ void     clbUnblockAlarm(void);
 void     clbCheckShips(int isDriver);
 bool     clbFindTeamHomeSun(int team, int *pnum);
 real     clbFixCoord(real coord);
+const std::vector<int>& clbGetEnabledTeams();
 
 
 #endif /* _CONQLB_H */

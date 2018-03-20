@@ -44,9 +44,6 @@
 #include "color.h"
 #include "conqinit.h"
 
-#include <string>
-#include <vector>
-#include <algorithm>
 using namespace std;
 
 /* shared with display.c */
@@ -1164,7 +1161,7 @@ int clbZeroPlanet( int pnum, int snum )
 
 }
 
-char *clbWarPrompt(int snum, int twar[])
+const char *clbWarPrompt(int snum, int twar[])
 {
     static char wbuf[BUFFER_SIZE_256];
     static const char *fmt = "Press [TAB] when done, [ESC] to abort:  Peace: %c %c %c %c  War: %c %c %c %c";
@@ -3058,3 +3055,16 @@ real clbFixCoord(real coord)
     return coord;
 }
 
+
+const vector<int>& clbGetEnabledTeams()
+{
+    static vector<int> enabledTeams;
+
+    enabledTeams.clear();
+
+    for (int j=0; j<NUMPLAYERTEAMS; j++)
+        if (TEAM_ENABLED(j))
+            enabledTeams.push_back(j);
+
+    return enabledTeams;
+}

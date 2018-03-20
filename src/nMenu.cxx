@@ -53,6 +53,9 @@
 #include "conqutil.h"
 #include "ping.h"
 
+#include <vector>
+using namespace std;
+
 static const char *if1="Suddenly  a  sinister,  wraithlike  figure appears before you";
 static const char *if2="seeming to float in the air.  In a low,  sorrowful  voice  he";
 static const char *if3="says, \"Alas, the very nature of the universe has changed, and";
@@ -512,18 +515,47 @@ static nodeStatus_t nMenuInput(int ch)
                 mglBeep(MGL_BEEP_ERR);
             else
             {
+                vector<int> enabledTeams = clbGetEnabledTeams();
                 /* we'll update local data here anyway, even though it will be
                    overwritten on the next ship update.  Improves perceived
                    response time. */
-                cbShips[Context.snum].team =
-                    mod( cbShips[Context.snum].team+1, NUMPLAYERTEAMS );
+                if (!enabledTeams.size())
+                {
+                    // choose among all of them
+                    cbShips[Context.snum].team =
+                        mod( cbShips[Context.snum].team + 1, NUMPLAYERTEAMS );
+                }
+                else
+                {
+                    // find our current team in enabledTeams
+                    int idx = -1;
+                    for (int i=0; i<enabledTeams.size(); i++)
+                    {
+                        if (cbShips[Context.snum].team == enabledTeams[i])
+                        {
+                            idx = i;
+                            break;
+                        }
+                    }
+
+                    if (idx == -1)
+                    {
+                        // shouldn't happen - we can't select another one
+                        mglBeep(MGL_BEEP_ERR);
+                        break; // case
+                    }
+
+                    int team = (idx + 1) % enabledTeams.size();
+                    cbShips[Context.snum].team = enabledTeams[team];
+                }
                 cbShips[Context.snum].shiptype =
                     cbTeams[cbShips[Context.snum].team].shiptype;
                 cbUsers[Context.unum].team = cbShips[Context.snum].team;
                 cbShips[Context.snum].war[cbShips[Context.snum].team] = false;
                 cbUsers[Context.unum].war[cbUsers[Context.unum].team] = false;
 
-                sendCommand(CPCMD_SWITCHTEAM, (uint16_t)cbShips[Context.snum].team);
+                sendCommand(CPCMD_SWITCHTEAM,
+                            (uint16_t)cbShips[Context.snum].team);
             }
             break;
 

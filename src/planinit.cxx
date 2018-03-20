@@ -40,6 +40,7 @@
 
 #include "conqinit.h"
 
+#include <string>
 
 /*  initplanets - initialize the planets based on cqiPlanets[] data */
 void cqiInitPlanets(void)
@@ -77,6 +78,9 @@ void cqiInitPlanets(void)
             PFCLR(i, PLAN_F_VISIBLE);
 
         cbPlanets[i].team = cqiPlanets[i].pteam;
+
+        // "enable" the team if we own at least one planet
+        TEAM_SETF(cbPlanets[i].team, TEAM_F_ENABLED);
 
         // set core and homeplanet flags
         if (cqiPlanets[i].core)
@@ -185,6 +189,20 @@ void cqiInitPlanets(void)
         if (cbPlanets[k].team < NUMPLAYERTEAMS)
             cbPlanets[k].scanned[cbPlanets[k].team] = true;
     }
+
+    // print the enabled teams
+    std::string teamList;
+    for ( j = 0; j < NUMPLAYERTEAMS; j++ )
+    {
+        if (TEAM_ENABLED(j))
+        {
+            teamList += cbTeams[j].name;
+            teamList += " ";
+        }
+    }
+
+    utLog("%s: enabled teams: %s", __FUNCTION__,
+          teamList.c_str());
 
     /* Un-twiddle the lockword. */
     cbUnlock(&cbConqInfo->lockword);

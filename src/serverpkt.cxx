@@ -860,7 +860,7 @@ spTeam_t *spktTeam(uint8_t team, int force, int rec)
     steam.homeplanet = (uint8_t)cbTeams[team].homeplanet;
 
     /* RESTRICT */
-    uint16_t tflags = TEAM_F_NONE;
+    uint16_t tflags = TEAM_F_ENABLED; // always send this flag
     if ((cbShips[snum].team == team) || rec)
     {				/* we only send this stuff for our team */
         tflags |= TEAM_F_COUPINFO;

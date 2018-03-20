@@ -725,6 +725,9 @@ int proc_0006_Team(char *buf)
     else
         TEAM_CLRF(team, TEAM_F_COUPINFO);
 
+    // always set as enabled for older protocol
+    TEAM_SETF(team, TEAM_F_ENABLED);
+
     cbTeams[team].couptime = steam->couptime;
 
     // this doesn't exist in current cb

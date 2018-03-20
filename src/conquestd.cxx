@@ -65,6 +65,9 @@
 
 #include "tcpwrap.h"
 
+#include <vector>
+using namespace std;
+
 #define LISTEN_BACKLOG 5 /* # of requests we're willing to to queue */
 
 static char cbuf[BUFFER_SIZE_1024]; /* general purpose buffer */
@@ -1775,7 +1778,21 @@ int welcome( int *unum )
             pktSendAck(PSEV_FATAL, PERR_CLOSED);
             return ( false );
 	}
-        team = rndint( 0, NUMPLAYERTEAMS - 1 );
+
+        vector<int> enabledTeams = clbGetEnabledTeams();
+        if (!enabledTeams.size())
+        {
+            // shouldn't really be done, but... Just choose randomly
+            // among all of them
+            team = rndint( 0, NUMPLAYERTEAMS - 1 );
+            utLog("%s: There are no enabled teams, choosing one randomly",
+                  __FUNCTION__);
+        }
+        else
+        {
+            team = enabledTeams[rndint( 0, enabledTeams.size() - 1 )];
+        }
+
 
         cbuf[0] = 0;
         utAppendTitle(cbuf , team) ;

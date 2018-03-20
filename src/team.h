@@ -53,11 +53,13 @@ static const char TEAM_PLAYERCHARS[NUMPLAYERTEAMS] = { 'F', 'R', 'K', 'O'};
 
 // Some flags
 #define TEAM_F_NONE             0x0000
+#define TEAM_F_COUPINFO         0x0001 // can get coup info?
 // To be enabled, there must be at least one planet owned by the team
 // at universe init (via cqiInitPlanets()) time.
-#define TEAM_F_COUPINFO         0x0001 // can get coup info?
+#define TEAM_F_ENABLED          0x0002 // owns at least one planet?
 
 #define TEAM_COUPINFO(x) ( cbTeams[(x)].flags & TEAM_F_COUPINFO )
+#define TEAM_ENABLED(x)  ( cbTeams[(x)].flags & TEAM_F_ENABLED )
 
 #define TEAM_SETF(x, b)  ( cbTeams[(x)].flags |=  (b) )
 #define TEAM_CLRF(x, b)  ( cbTeams[(x)].flags &= ~(b) )
