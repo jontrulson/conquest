@@ -168,6 +168,16 @@ static cqsHandle beamHandle = CQS_INVHANDLE;
 int ncpLRMagFactor = 0;
 int ncpSRMagFactor = 0;
 
+// do a reload after entering the game.  We do this since often
+// initialization is going on, the driver may be starting, etc.  This
+// forces a CPCMD_RELOAD command to be sent, which will cause the
+// server to dump it's packet cache and send everything anew.
+//
+// It will limit the amount of "jitter" upon entry due to differences
+// in what the client thinks are the planet and ship positions
+// vs. what the server thinks.
+static bool doReload = true;
+
 extern void setWarp(real warp); /* FIXME - GL.c */
 
 
@@ -2773,6 +2783,8 @@ void nCPInit(int istopnode)
     if (istopnode)
         cbShips[Context.snum].dwarp = -1;
 
+    doReload = true;
+
     return;
 }
 
@@ -2805,6 +2817,14 @@ static nodeStatus_t nCPIdle(void)
     static const uint32_t dyingwait = 5000; /* watching yourself die */
     static const uint32_t tadWait = 1000; /* update the TAD every second */
     real tdelta = (real)iternow - (real)iterstart;
+
+    // we only want to do this once after entry, *after* all
+    // initialization will have been completed.
+    if (doReload)
+    {
+        doReload = false;
+        sendCommand(CPCMD_RELOAD, 0);
+    }
 
 
     if (state == S_DEAD)
