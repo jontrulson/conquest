@@ -193,8 +193,9 @@ int GetSysConf(int checkonly)
     setSysConfDefaults();
 
     /* start building the filename */
-    snprintf(conf_name, PATH_MAX, "%s/%s",
-             utGetPath(CONQETC), SYSCONFIG_FILE);
+    snprintf(conf_name, PATH_MAX, "%s/%s/%s",
+             utGetPath(CONQETC), gameSubdirectory.get().c_str(),
+             SYSCONFIG_FILE);
 
     if ((conf_fd = fopen(conf_name, "r")) == NULL)
     {
@@ -1019,8 +1020,8 @@ int MakeSysConf()
     char conf_name[BUFFER_SIZE_256];
     int i, j, n;
 
-    snprintf(conf_name, BUFFER_SIZE_256, "%s/%s", utGetPath(CONQETC),
-             SYSCONFIG_FILE);
+    snprintf(conf_name, BUFFER_SIZE_256, "%s/%s/%s", utGetPath(CONQETC),
+             gameSubdirectory.get().c_str(), SYSCONFIG_FILE);
     umask(002);
     unlink(conf_name);
 

@@ -51,6 +51,7 @@ void print_usage()
 {
     fprintf(stderr, "Usage: conqinit [-f <file>] [-vdD] \n");
     fprintf(stderr, "       conqinit -f <file> -h [-vd] \n\n");
+    fprintf(stderr, "\t-G <subdir>   specify alternate game subdirectory\n");
     fprintf(stderr, "\t-f <file>     read from <file>.\n");
     fprintf(stderr, "\t-v            be verbose about everything.\n");
     fprintf(stderr, "\t-d            turns on debugging.\n");

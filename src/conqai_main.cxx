@@ -89,7 +89,7 @@ int main(int argc, char *argv[])
 
     debug = false;
 
-    while ((arg = getopt(argc, argv, "dr")) != EOF)
+    while ((arg = getopt(argc, argv, "dG:r")) != EOF)
     {
         switch (arg)
 	{
@@ -98,12 +98,16 @@ int main(int argc, char *argv[])
             printf("The conquest driver now has control of the robots\n");
             exit(0);
             break;		/* NOTREACHED */
+        case 'G':
+            gameSubdirectory.set(optarg);
+            break;
 	case 'd':
             debug = true;
             break;
 	default:
             printf("Options: -d = debugging, -r = return robot control to driver\n");
-            exit(1);
+            printf("         -G <subdir> = specify alternate game subdirectory\n");
+                   exit(1);
 	}
     }
 

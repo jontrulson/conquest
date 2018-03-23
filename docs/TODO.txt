@@ -41,18 +41,6 @@
 
   - observer support?  Can see viewer view only (no hud).
 
-  - provide 'game config' dir containing config files that specify
-    things like number of ships allowed, planet definitions (for custom
-    universes, etc) for a particular game.
-
-  - provide seperate 'game data dir' like above containing common blocks,
-    log locations, etc so a single binary installation could handle
-    multiple games (rather than compiling a conquest for each game
-    with a different --prefix= ).
-
-    - perhaps game data location, etc defined in conquestrc file that
-      can be specified on the conquest/conqoper/conquestd cmd line?
-
   - enable/disable client recording from within the game
 
   - allow user to go to the meta list from within the game (without

@@ -99,6 +99,7 @@ void printUsage()
     printf("                 [ -m ] [ -M metaserver ] [ -N myname ]\n");
     printf("\n");
     printf("   -d            daemon mode\n");
+    printf("   -G subdir     specify alternate game subdirectory\n");
     printf("   -l            listen for local connections only\n");
     printf("   -p port       specify port to listen on\n");
     printf("                 default is %d\n", CN_DFLT_PORT);
@@ -309,11 +310,15 @@ int main(int argc, char *argv[])
     sInfo.listenPort = CN_DFLT_PORT; // 1701, of course
 
 
-    while ((i = getopt(argc, argv, "dlp:u:mM:N:v")) != EOF)    /* get command args */
+    while ((i = getopt(argc, argv, "dG:lp:u:mM:N:v")) != EOF)    /* get command args */
         switch (i)
         {
         case 'd':
             dodaemon = true;
+            break;
+
+        case 'G':
+            gameSubdirectory.set(optarg);
             break;
 
         case 'p':

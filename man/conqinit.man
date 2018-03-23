@@ -21,6 +21,10 @@ to properly load and parse these files they will fail to start.
 .SH "OPTIONS"
 .PP
 .TP 8
+.B \-G <subdir>
+Specify a game subdirectory.  See docs/server-guide.md for information
+on serving multiple games from a single conquest installation.
+.TP 8
 .B \-f <file>
 Read data from file <file>.
 .TP 8

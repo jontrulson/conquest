@@ -19,10 +19,16 @@ do this, then the robots will stand around doing nothing unless
 \fBconqai\fP is running.
 .PP
 .SH "OPTIONS" 
-.IP "\fB-r\fP         " 10 
+.PP
+.TP 8
+.B \-r
 Return control of the robots to the Conquest driver.  Be sure to do
 this after you are finished running conqai to debug the AI, otherwise
 the robots won't do anything but sit there.
+.TP 8
+.B \-G <subdir>
+Specify a game subdirectory.  See docs/server-guide.md for information
+on serving multiple games from a single conquest installation.
 .SH "SEE ALSO" 
 .PP 
 conquest (6), conqoper (6), conqstrat (6). 

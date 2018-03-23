@@ -364,7 +364,9 @@ void cbMap(void)
     utLog("%s: CB size: %u bytes", __FUNCTION__,
           cbGetSize());
 
-    snprintf(cmnfile, PATH_MAX, "%s/%s", CONQSTATE, C_CONQ_COMMONBLK);
+    snprintf(cmnfile, PATH_MAX, "%s/%s/%s", CONQSTATE,
+             gameSubdirectory.get().c_str(),
+             C_CONQ_COMMONBLK);
 
     /* verify it's validity */
     if (_checkCB(cmnfile, CMN_MODE, cbGetSize()) == false)

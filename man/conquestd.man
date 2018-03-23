@@ -15,6 +15,10 @@ conquestd \- a Conquest game server
 .B \-d 
 Daemon mode.  
 .TP 8
+.B \-G <subdir>
+Specify a game subdirectory.  See docs/server-guide.md for information
+on serving multiple games from a single conquest installation.
+.TP 8
 .B \-l
 Listen for local connections only.  When this option is supplied, only
 clients on the local host will be able to connect.

@@ -25,44 +25,48 @@
 // SOFTWARE.
 //
 
-#include "defs.h"
-#include "cprintf.h"
-#include <gameDir.h>
+#ifndef _GAMEDIR_H
+#define _GAMEDIR_H
 
-#ifndef GLOBAL_H
-#define GLOBAL_H
+#include "conqdef.h"
+#include "conqutil.h"
+#include "string"
 
-/* for the semaphores */
-#define LOCKMSG      (0)	/* lock the message portion  */
-#define LOCKCMN      (1)	/* lock everything else  */
+// A simple class to store and retrieve a game subdirectory
 
+class gameDir {
+public:
+    gameDir() { m_gameDir.clear(); }
 
-#if defined(NOEXTERN_GLOBALS)
-int        ConquestGID;         /* Conquest's GID */
+    // check the characters provided - they must be [a-z] [A-Z] [0-9]
+    // and '-' or '_'.  Return true if string is invalid, false if
+    // success.
+    void set(const char *name)
+    {
+        if (!name)
+            return;
 
-int        cqDebug = 0;
+        std::string tempstr(name);
 
-// global game sub directory (relative to <prefix>/ etc/ and var/ conquest/)
-gameDir gameSubdirectory;
+        for (int i=0; i<tempstr.size(); i++)
+        {
+            if ( !((tempstr[i] >= 'A' && tempstr[i] <= 'Z')
+                   || (tempstr[i] >= 'a' && tempstr[i] <= 'z')
+                   || (tempstr[i] >= '0' && tempstr[i] <= '9')
+                   || (tempstr[i] == '_')
+                   || (tempstr[i] == '-')) )
+                tempstr[i] = '_'; // replace bad chars with _
+        }
+        m_gameDir = tempstr;
+    }
 
-#else
-extern int ConquestGID;         /* Conquest's GID */
+    const std::string& get() const
+    {
+        return m_gameDir;
+    }
 
-/* verbosity/debugging */
-extern int cqDebug;
+private:
+    std::string m_gameDir;
+};
 
-extern gameDir gameSubdirectory;
-
-#endif
-
-/* Home dir/appdir env variable(s) */
-#if defined(MINGW)
-# define CQ_USERHOMEDIR  "APPDATA"
-# define CQ_USERCONFDIR  "Conquest"
-#else
-# define CQ_USERHOMEDIR  "HOME"
-# define CQ_USERCONFDIR  ".conquest"
-#endif
-
-
-#endif /* GLOBAL_H */
+#endif /* _GAMEDIR_H */

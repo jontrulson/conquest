@@ -18,6 +18,9 @@ other things to keep in mind.
 If all you want to do is use conquest to play on someone else's
 server, then you do not need to be reading this document. :)
 
+In the text below, *prefix* refers to the installation prefix
+specified to configure when your conquest was built.  This defaults to
+/opt.
 
 ## OVERVIEW
 
@@ -49,6 +52,7 @@ $ conquestd -?
 Usage: conquestd [ -d ] [ -l ] [ -p port ] [ -u user ]
                  [ -m ] [ -M metaserver ] [ -N myname ]
         -d            daemon mode
+        -G subdir     specify alternate game subdirectory
         -l            listen for local connections only
         -p port       specify port to listen on
                       default is 1701
@@ -97,7 +101,7 @@ You must be the root user in order to use the '-u' option.
 DO NOT run conquestd as the root user itself.  Although the code
 *should* be safe, you shouln't take my word for it.
 
-## notifying the metaserver
+## Notifying the metaserver
 
 If you are going to run a server that will be available to the public
 via the Internet, you can pass the '-m' option to conquestd when you
@@ -217,6 +221,7 @@ usage: conqoper [-C] [-D] [-E] [-I <what>]
        -C               rebuild systemwide conquest.conf file
        -D               disable the game
        -E               enable the game
+       -G               specify alternate game subdirectory
        -I <what>        Initialize <what>, where <what> is:
           e - everything
           g - game
@@ -278,6 +283,24 @@ scratch.
 
 These configuration files are only needed by the client.
 
+### conquest.conf
+
+This file is a simple configuration file used to set various options
+for your server.  It will be created/located in
+*prefix*/etc/conquest/conquest.conf.
+
+You can edit this file directly, or use the (O)ptions menu option in
+the *conqoper* program.  It is here where you enable and disable
+various flags and options for your game, set your server name, MOTD,
+and other information.
+
+It is automatically created on a "make install", if it does not
+already exist (via *conqoper -C*).
+
+With Conquest version updates the file is updated automatically,
+preserving previous settings.
+
+
 ### Preserving local modifications to configuration files
 
 Doing a "make install" or updating to a newer package will overwrite
@@ -300,10 +323,78 @@ conqoper before you will be able to start a server.  The server will
 warn you about this if you try to start it, with a "Common Block
 Mismatch" error.  This is your cue to re-init the universe :)
 
+## Handling multiple games
+
+Starting with version 9, a *-G <subdir>* option has been added to the
+server components (conquestd, conqoper, conqdriv, etc).  This allows a
+single conquest installation to supoort multiple game.  Previously, if
+you wanted to serve multiple games you would need to compile a version
+of conquest for each one using a different *--prefix* option to
+*configure*.
+
+The main files a server needs to know about a game are located in
+*prefix*/etc/conquest/, and *prefix*/var/conquest/, so we will create
+new sub directories there to support additional games.
+
+It's important that the new directories have the correct ownership and
+permissions, so that the server components can access them, and in
+some cases write into them.
+
+So, as an example, if you wanted to serve a second game called
+*testgame*, you would do something like the following, as the root
+user, to set it up initially (assuming *prefix* is /opt):
+
+```
+cd /opt/etc/conquest
+mkdir testgame
+chgrp conquest testgame
+chmod 775 testgame
+cp conqinitrc testgame/
+```
+
+Then edit testgame/conqinitrc as desired for your new game.  Next, we
+need to create a similar subdirectoy in *prefix*/var/conquest to hold
+the new universe and it's log.
+
+```
+cd /opt/var/conquest
+mkdir testgame
+chgrp conquest testgame
+chmod 775 testgame
+```
+
+You could then initialize it with:
+
+```
+/opt/bin/conqoper -G testgame -C -Ie
+```
+
+This command would create a new /opt/etc/conquest/testgame/conquest.conf
+file (if it did not already exist), and then initialize a new universe
+in /opt/var/conquest/testgame/conquest.cb.
+
+You could then start a server to serve this new game with:
+
+```
+/opt/bin/conquestd -G testgame ...other server options...
+```
+
+Run conqoper interactively on 'testgame'
+
+```
+/opt/bin/conqoper -G testgame
+```
+
+All of the server components support the *-G* option.  It is
+irrelevant for clients, so the option is not supported there.
+
+
 ## CQI Parser
 
 This is the parser responsible to decoding these various configuration
-files.  For a full description of their format, allowed values, etc,
-see the [CQI Parser Documentation](conqinit.txt).
+files (except for conquest.conf, which is handled differently).
+
+For a full description of their format, allowed values, etc, see the
+[CQI Parser Documentation](conqinit.txt).
 
 

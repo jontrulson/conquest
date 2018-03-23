@@ -19,6 +19,10 @@ developers for debugging purposes.
 .SH "OPTIONS"
 .PP
 .TP 8
+.B \-G <subdir>
+Specify a game subdirectory.  See docs/server-guide.md for information
+on serving multiple games from a single conquest installation.
+.TP 8
 .B \-f
 Force any other \fBconqdriv\fP process to terminate, and assume direct
 control of the universe.
@@ -28,21 +32,9 @@ Jon Trulson
 .PP
 conquest(6), conquestd(6), conqoper(6), conqdriv(6), conqmetad(6) 
 .PP
-See README in the conquest distribution (usually installed in
-<conquest install prefix>/etc/) for information and tips on how to
-play. 
-.PP
-See INSTALL for instructions on unpacking, compiling, and installing
-conquest, as well as information on terminfo requirements (for the
-curses client) and other system specific issues.
-.PP
-See README.cygwin for information on building/using conquest on MS
-Windows systems. 
-.PP
-See HISTORY for the latest news and modification history.
-.PP
-See CONQINIT.TXT for information on CQI, and the format of the
-conqinitrc and texturesrc files.
+See conquest-guide.md in the conquest distribution (usually installed
+in <conquest install prefix>/share/doc/conquest/) for information and
+tips on how to play.
 .SH "COPYRIGHT"
 .PP
 Copyright (C)1994-2018 by Jon Trulson <jon@radscan.com> under the MIT

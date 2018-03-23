@@ -61,6 +61,8 @@
 #include "display.h"
 #include "conqinit.h"
 
+#include "gameDir.h"
+
 #include <algorithm>
 using namespace std;
 
@@ -135,7 +137,7 @@ int main(int argc, char *argv[])
 
     rndini();		/* initialize random numbers */
 
-    while ((i = getopt(argc, argv, "CDEI:v")) != EOF)    /* get command args */
+    while ((i = getopt(argc, argv, "CDEG:I:v")) != EOF)    /* get command args */
         switch (i)
         {
         case 'C':
@@ -148,6 +150,10 @@ int main(int argc, char *argv[])
 
         case 'E':
             OptionAction |= OP_ENABLEGAME;
+            break;
+
+        case 'G':
+            gameSubdirectory.set(optarg);
             break;
 
         case 'I':
@@ -166,6 +172,7 @@ int main(int argc, char *argv[])
             fprintf(stderr, "       -C \t\trebuild systemwide conquest.conf file\n");
             fprintf(stderr, "       -D \t\tdisable the game\n");
             fprintf(stderr, "       -E \t\tenable the game\n");
+            fprintf(stderr, "       -G \t\tspecify alternate game subdirectory\n");
             fprintf(stderr, "       -I <what> \tInitialize <what>, where <what> is:\n");
             fprintf(stderr, "          e - everything\n");
             fprintf(stderr, "          g - game\n");
@@ -355,7 +362,7 @@ void bigbang(void)
             "#%d#bigbang: Fired #%d#%d #%d#torpedos, hoo hah won't they be surprised!",
             InfoColor,SpecialColor,cnt,InfoColor );
 
-    utLog("OPER: %s fired BigBang - %d tropedos",
+    utLog("OPER: %s fired BigBang - %d torpedos",
           operName, cnt);
 
     return;

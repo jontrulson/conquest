@@ -1109,8 +1109,8 @@ bool cqiLoadRC(int rcid, const char *filename, int verbosity, int debugl)
         if (filename)   /* optional */
             utStrncpy(buffer, filename, PATH_MAX);
         else
-            snprintf(buffer, PATH_MAX, "%s/%s", utGetPath(CONQETC),
-                     "conqinitrc");
+            snprintf(buffer, PATH_MAX, "%s/%s/%s", utGetPath(CONQETC),
+                     gameSubdirectory.get().c_str(), "conqinitrc");
         break;
     case CQI_FILE_TEXTURESRC:
     case CQI_FILE_TEXTURESRC_ADD:

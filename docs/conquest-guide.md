@@ -281,18 +281,20 @@ line I use on my server to start conquestd:
 Please make sure your server is actually reachable from the Internet
 before advertising your game to the meta server.
 
-## ~/.conquest/conquest.conf
+## /opt/etc/conquest/conquest.conf, ~/.conquest/conquest.conf
 
-After running Conquest for the first time, a file called
+After running the Conquest client for the first time, a file called
 ~/.conquest/conquest.conf should have been created.  Look at this file
 (it's self-explanatory) for various options you can set.
 
 Conquest Operators (or CO's) should look at
 /opt/conquest/etc/conquest.conf for a few system wide options you may or
-may not want.  As of version 7.0, all options (user and system-wide)
-can be viewed and edited using the (O)ptions Menu.  This menu is
-available in the conquest/conqoper main menus, as well as being
-accessible from within the game.
+may not want.
+
+As of version 7.0, all options (user and system-wide) can be viewed
+and edited using the (O)ptions Menu.  This menu is available in the
+conquest/conqoper main menus, as well as being accessible from within
+the game.
 
 ## Recording Games
 

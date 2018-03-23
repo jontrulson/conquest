@@ -25,6 +25,10 @@ perform the requested action and exit.  When no options are specified,
 .B \-C
 Rebuild the system wide \fIconquest.conf\fP file.
 .TP 8
+.B \-G <subdir>
+Specify a game subdirectory.  See docs/server-guide.md for information
+on serving multiple games from a single conquest installation.
+.TP 8
 .B \-D
 Disable the game.  Clients that connect, will be told that the game is
 closed after they have authenticated to the server.  If the

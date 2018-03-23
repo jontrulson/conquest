@@ -330,7 +330,8 @@ void utLog(const char *fmt, ...)
         if (systemlog)
 	{
             umask(007);
-            snprintf(errfile, PATH_MAX, "%s/%s", CONQSTATE, C_CONQ_ERRLOG);
+            snprintf(errfile, PATH_MAX, "%s/%s/%s", CONQSTATE,
+                     gameSubdirectory.get().c_str(), C_CONQ_ERRLOG);
             if (ConquestGID == ERR)
 	    {
                 fprintf(stderr, "conqutil: utLog():  ConquestGID == -1!\n");

@@ -21,9 +21,6 @@ CONQDOCS = ../docs/HISTORY.txt ../docs/conquest-guide.md ../docs/conqinit.txt \
 	../robot-rules/conqrule ../robot-rules/conqrule.easy \
 	../docs/server-guide.md ../LICENSE.txt ../docs/CREDITS.txt ../README.md
 
-INITFILES = ../initfiles/conqinitrc ../initfiles/00_plantex.trc \
-	../initfiles/texturesrc ../initfiles/soundrc
-
 IMAGES = ../img/*.png ../img/*.txf
 SOUNDS = ../sound/*.ogg
 
@@ -202,9 +199,18 @@ install-exec-hook:
 	chmod 644 $(DESTDIR)$(CONQSNDDIR)/*.ogg
 	cp -f $(CONQDOCS) $(DESTDIR)$(CONQDOCDIR)/
 	chmod 644 $(DESTDIR)$(CONQDOCDIR)/*
-	cp $(INITFILES) $(DESTDIR)$(CONQSYSCONFDIR)/
-	chgrp $(CONQGROUP) $(DESTDIR)$(CONQSYSCONFDIR)/*
-	chmod 664 $(DESTDIR)$(CONQSYSCONFDIR)/*
+	cp ../initfiles/conqinitrc $(DESTDIR)$(CONQSYSCONFDIR)/conqinitrc
+	chgrp $(CONQGROUP) $(DESTDIR)$(CONQSYSCONFDIR)/conqinitrc
+	chmod 664 $(DESTDIR)$(CONQSYSCONFDIR)/conqinitrc
+	cp ../initfiles/texturesrc $(DESTDIR)$(CONQSYSCONFDIR)/texturesrc
+	chgrp $(CONQGROUP) $(DESTDIR)$(CONQSYSCONFDIR)/texturesrc
+	chmod 664 $(DESTDIR)$(CONQSYSCONFDIR)/texturesrc
+	cp ../initfiles/soundrc $(DESTDIR)$(CONQSYSCONFDIR)/soundrc
+	chgrp $(CONQGROUP) $(DESTDIR)$(CONQSYSCONFDIR)/soundrc
+	chmod 664 $(DESTDIR)$(CONQSYSCONFDIR)/soundrc
+	cp ../initfiles/00_plantex.trc $(DESTDIR)$(CONQSYSCONFDIR)/00_plantex.trc
+	chgrp $(CONQGROUP) $(DESTDIR)$(CONQSYSCONFDIR)/00_plantex.trc
+	chmod 664 $(DESTDIR)$(CONQSYSCONFDIR)/00_plantex.trc
 	chgrp $(CONQGROUP) $(DESTDIR)$(bindir)/conqoper$(EXEEXT) \
 		$(DESTDIR)$(libexecdir)/conqdriv$(EXEEXT) \
 		$(DESTDIR)$(bindir)/conquestd$(EXEEXT)

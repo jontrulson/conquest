@@ -74,9 +74,9 @@ int main(int argc, char *argv[])
     int force;
     int arg;
 
-    /* First things first. */
+    force = false;
 
-    utLog("conqdriv: Initializing...");
+    /* First things first. */
 
     if ((ConquestGID = getConquestGID()) == -1)
     {
@@ -84,6 +84,22 @@ int main(int argc, char *argv[])
         fprintf(stderr, "conqdriv: getConquestGID() failed\n");
         exit(1);
     }
+
+    while ((arg = getopt(argc, argv, "fG:")) != EOF)
+    {
+        switch (arg)
+	{
+	case 'f':
+            force = isagod(-1);
+            break;
+        case 'G':
+            gameSubdirectory.set(optarg);
+            break;
+
+	}
+    }
+
+    utLog("conqdriv: Initializing...");
 
     GetSysConf(false);
 
@@ -130,20 +146,6 @@ int main(int argc, char *argv[])
 
     utGetSecs( &cbDriver->drivtime );		/* prevent driver timeouts */
     utGetSecs( &cbDriver->playtime );
-
-    /* Look for the force flag. */
-
-    force = false;
-
-    while ((arg = getopt(argc, argv, "f")) != EOF)
-    {
-        switch (arg)
-	{
-	case 'f':
-            force = isagod(-1);
-            break;
-	}
-    }
 
     if ( ! force )
     {

@@ -257,7 +257,13 @@ void drcreate(void)
         for (int i=0; i < FOPEN_MAX; i++)
             close(i);
         sprintf(drivcmd, "%s/%s", CONQLIBEXEC, C_CONQ_CONQDRIV);
-        execl(drivcmd, drivcmd, NULL);
+        // we need to pass the -G option here if a game subdir is set
+        if (gameSubdirectory.get().size())
+            execl(drivcmd, drivcmd, "-G", gameSubdirectory.get().c_str(),
+                  (char *)NULL);
+        else
+            execl(drivcmd, drivcmd, (char *)NULL);
+
         utLog("drcreate(): exec(): %s", strerror(errno));
         perror("exec");		/* shouldn't be reached */
         exit(1);
