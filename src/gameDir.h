@@ -39,8 +39,8 @@ public:
     gameDir() { m_gameDir.clear(); }
 
     // check the characters provided - they must be [a-z] [A-Z] [0-9]
-    // and '-' or '_'.  Return true if string is invalid, false if
-    // success.
+    // and '-' or '_'.  Invalid chars will be converted to
+    // underscores.
     void set(const char *name)
     {
         if (!name)
