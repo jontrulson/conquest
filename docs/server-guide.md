@@ -99,7 +99,7 @@ run under.
 You must be the root user in order to use the '-u' option.
 
 DO NOT run conquestd as the root user itself.  Although the code
-*should* be safe, you shouln't take my word for it.
+*should* be safe, you shouldn't take my word for it.
 
 ## Notifying the metaserver
 
@@ -234,7 +234,7 @@ usage: conqoper [-C] [-D] [-E] [-I <what>]
           z - zero common block
 ```
 
-### Premissions needed to run conqoper
+### Permissions needed to run conqoper
 
 To run conqoper you must either be the root user, or your username
 must be a member of the conquest group ("conquest", by default).
@@ -242,7 +242,7 @@ must be a member of the conquest group ("conquest", by default).
 ### Initializing the Universe
 
 When running a server, one of the first things you will need to do is
-initialize the Universe using connqoper.  You can do this on the
+initialize the Universe using conqoper.  You can do this on the
 command line:
 
 ```conqoper -Ie```
@@ -268,7 +268,7 @@ For a server, the most important file is the
 *prefix*/etc/conquest/conqinitrc file (where *prefix* is whatever
 prefix you installed conquest into).
 
-The *conqinitrc* file specifies the configuration of your univers -
+The *conqinitrc* file specifies the configuration of your universe -
 how many ships can fly at the same time, how many users, planets, etc
 are supported.
 
@@ -327,7 +327,7 @@ Mismatch" error.  This is your cue to re-init the universe :)
 
 Starting with version 9, a *-G <subdir>* option has been added to the
 server components (conquestd, conqoper, conqdriv, etc).  This allows a
-single conquest installation to supoort multiple game.  Previously, if
+single conquest installation to support multiple game.  Previously, if
 you wanted to serve multiple games you would need to compile a version
 of conquest for each one using a different *--prefix* option to
 *configure*.
@@ -353,7 +353,7 @@ cp conqinitrc testgame/
 ```
 
 Then edit testgame/conqinitrc as desired for your new game.  Next, we
-need to create a similar subdirectoy in *prefix*/var/conquest to hold
+need to create a similar subdirectory in *prefix*/var/conquest to hold
 the new universe and it's log.
 
 ```
