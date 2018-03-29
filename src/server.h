@@ -51,8 +51,6 @@ typedef struct {
     struct  sockaddr_in clntaddr; /* client's saddrin struct */
     bool doUDP;                   /* send udp? */
     serverStates_t state;         /* current state */
-    uint32_t clientDead;          /* is the client dead/ */
-    bool isMaster;                /* is the Maseter server? */
     char remotehost[MAXHOSTNAME]; /* self evident */
 } ServerInfo_t;
 

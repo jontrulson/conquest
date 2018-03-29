@@ -170,7 +170,6 @@ void checkMaster(void)
         cbLock(&cbConqInfo->lockword);
         cbConqInfo->conqservPID = getpid();
         cbUnlock(&cbConqInfo->lockword);
-        sInfo.isMaster = true;
         utLog("NET: master server listening on port %d\n", sInfo.listenPort);
     }
 
@@ -305,8 +304,6 @@ int main(int argc, char *argv[])
     sInfo.sock = -1;
     sInfo.usock = -1;
     sInfo.doUDP = false;
-    sInfo.clientDead = true;
-    sInfo.isMaster = false;
     sInfo.listenPort = CN_DFLT_PORT; // 1701, of course
 
 
