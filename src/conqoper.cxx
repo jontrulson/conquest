@@ -66,8 +66,6 @@
 #include <algorithm>
 using namespace std;
 
-static char cbuf[BUFFER_SIZE_1024]; /* general purpose buffer */
-
 /* option masks */
 #define OP_NONE (unsigned int)(0x00000000)
 #define OP_REGENSYSCONF (unsigned int)(0x00000001)
@@ -1460,6 +1458,7 @@ void opinfo( int snum )
 {
     int i, j;
     char ch;
+    char cbuf[MSGMAXLINE];
     static const char *pmt="Information on: ";
     static const char *huh="I don't understand.";
 
