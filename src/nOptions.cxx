@@ -168,7 +168,6 @@ static void _changePasswd(int init)
 
         prm.preinit = false;
         prm.buflen = MAXUSERNAME - 1;
-        prm.terms = TERMS;
         prm.index = MSG_LIN1;
         prompting = true;
     }
@@ -183,7 +182,6 @@ static void _changePasswd(int init)
 
             prm.preinit = false;
             prm.buflen = MAXUSERNAME - 1;
-            prm.terms = TERMS;
             prm.index = MSG_LIN1;
             prompting = true;
         }
@@ -223,7 +221,6 @@ static void _changeMacro(int macronum, int init)
         prm.buf = cbuf;
         prm.buflen = MAX_MACRO_LEN - 1;
         prm.pbuf = prmpt;
-        prm.terms = TERMS;
         prm.index = lin;
         prompting = true;
 
@@ -265,7 +262,6 @@ static void _changeMouse(int mousevec, int init)
         prm.buf = cbuf;
         prm.buflen = MAX_MACRO_LEN - 1;
         prm.pbuf = prmpt;
-        prm.terms = TERMS;
         prm.index = lin;
         prompting = true;
 
@@ -313,7 +309,6 @@ static void _changeOption(struct Conf *cdata, int init)
             prm.buf = cbuf;
             prm.buflen = cdata->max - 1;
             prm.pbuf = "Value: ";
-            prm.terms = TERMS;
             prm.index = MSG_LIN1;
             prompting = true;
         }
@@ -332,7 +327,6 @@ static void _changeOption(struct Conf *cdata, int init)
             prm.buf = cbuf;
             prm.buflen = 20;
             prm.pbuf = "Enter a number: ";
-            prm.terms = TERMS;
             prm.index = MSG_LIN1;
             prompting = true;
         }

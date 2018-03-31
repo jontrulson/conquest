@@ -482,7 +482,6 @@ static nodeStatus_t nMenuInput(int ch)
             prm.preinit = false;
             prm.buf = cbuf;
             prm.buflen = MAXUSERNAME;
-            prm.terms = TERMS;
             prm.index = 21;
             prm.buf[0] = 0;
             prompting = true;
@@ -504,7 +503,6 @@ static nodeStatus_t nMenuInput(int ch)
                 prm.preinit = false;
                 prm.buf = cbuf;
                 prm.buflen = MAXUSERNAME;
-                prm.terms = TERMS;
                 prm.index = 21;
                 prm.buf[0] = 0;
                 prompting = true;
@@ -585,7 +583,6 @@ static nodeStatus_t nMenuInput(int ch)
             prm.buf = cbuf;
             prm.buflen = 5;
             prm.pbuf = clbWarPrompt(Context.snum, twar);
-            prm.terms = TERMS;
             prm.index = 22;
             prm.buf[0] = 0;
 

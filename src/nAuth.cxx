@@ -185,7 +185,6 @@ void nAuthInit(void)
     prm.buf = nm;
     prm.buflen = MAX_USERLEN;
     prm.pbuf = unamep;
-    prm.terms = TERMS;
 
     statlin = uhelper;
 
@@ -337,7 +336,6 @@ static nodeStatus_t nAuthInput(int ch)
                 prm.buf = ynbuf;
                 prm.buflen = MAXUSERNAME;
                 prm.pbuf = newuserp;
-                prm.terms = TERMS;
 
                 errlin = NULL;
                 return NODE_OK;
@@ -351,7 +349,6 @@ static nodeStatus_t nAuthInput(int ch)
                 prm.buf = pw;
                 prm.buflen = MAX_USERLEN;
                 prm.pbuf = pwp;
-                prm.terms = TERMS;
 
                 statlin = phelper;
                 errlin = NULL;
@@ -374,7 +371,6 @@ static nodeStatus_t nAuthInput(int ch)
                 prm.buf = pw;
                 prm.buflen = MAX_USERLEN;
                 prm.pbuf = pwp;
-                prm.terms = TERMS;
 
                 statlin = phelper;
                 errlin = NULL;
@@ -388,7 +384,6 @@ static nodeStatus_t nAuthInput(int ch)
                 prm.buf = nm;
                 prm.buflen = MAX_USERLEN;
                 prm.pbuf = unamep;
-                prm.terms = TERMS;
 
                 statlin = uhelper;
                 errlin = NULL;
@@ -414,7 +409,6 @@ static nodeStatus_t nAuthInput(int ch)
                 prm.buf = pwr;
                 prm.buflen = MAX_USERLEN;
                 prm.pbuf = rpwp;
-                prm.terms = TERMS;
 
                 statlin = phelper;
                 errlin = NULL;
@@ -436,7 +430,6 @@ static nodeStatus_t nAuthInput(int ch)
                 prm.buf = nm;
                 prm.buflen = MAX_USERLEN;
                 prm.pbuf = unamep;
-                prm.terms = TERMS;
 
                 pw[0] = 0;
                 pwr[0] = 0;
@@ -473,7 +466,6 @@ static nodeStatus_t nAuthInput(int ch)
                 prm.buf = nm;
                 prm.buflen = MAX_USERLEN;
                 prm.pbuf = unamep;
-                prm.terms = TERMS;
 
                 pw[0] = 0;
                 pwr[0] = 0;

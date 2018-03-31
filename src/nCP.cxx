@@ -1366,7 +1366,6 @@ static void _domsgto(char *buf, int ch, int terse)
     prm.buflen = MESSAGE_SIZE;
     strcpy(pbuf, "> ");
     prm.pbuf = pbuf;
-    prm.terms = TERMS;
     prm.index = MSG_LIN2;
     prm.buf[0] = 0;
     hudSetPrompt(prm.index, prm.pbuf, NoColor, prm.buf, NoColor);
@@ -1761,7 +1760,6 @@ static void _dobomb(void)
     prm.buf[0] = 0;
     prm.buflen = MSGMAXLINE;
     prm.pbuf = pbuf;
-    prm.terms = TERMS;
     prm.index = MSG_LIN1;
     hudSetPrompt(prm.index, prm.pbuf, NoColor, prm.buf, NoColor);
     prompting = true;
@@ -1911,7 +1909,6 @@ static void _initbeam()
         prm.buf = cbuf;
         prm.buflen = 10;
         prm.pbuf = "Beam [up or down] ";
-        prm.terms = TERMS;
         prm.index = MSG_LIN1;
         prm.buf[0] = 0;
         hudSetPrompt(prm.index, prm.pbuf, NoColor, prm.buf, NoColor);
@@ -1935,7 +1932,6 @@ static void _initbeam()
     prm.buf = cbuf;
     prm.buflen = 10;
     prm.pbuf = pbuf;
-    prm.terms = TERMS;
     prm.index = MSG_LIN1;
     prm.buf[0] = 0;
     hudSetPrompt(prm.index, prm.pbuf, NoColor, prm.buf, NoColor);
@@ -2055,7 +2051,6 @@ static void command( int ch )
             prm.buf = cbuf;
             prm.buflen = MSGMAXLINE;
             prm.pbuf = "Press [TAB] to engage autopilot: ";
-            prm.terms = TERMS;
             prm.index = MSG_LIN1;
             prm.buf[0] = 0;
             hudSetPrompt(prm.index, prm.pbuf, NoColor, prm.buf, NoColor);
@@ -2073,7 +2068,6 @@ static void command( int ch )
         prm.buf = cbuf;
         prm.buflen = MSGMAXLINE;
         prm.pbuf = "New weapons allocation: (30-70) ";
-        prm.terms = TERMS;
         prm.index = MSG_LIN1;
         prm.buf[0] = 0;
         hudSetPrompt(prm.index, prm.pbuf, NoColor, prm.buf, NoColor);
@@ -2093,7 +2087,6 @@ static void command( int ch )
             prm.buf = cbuf;
             prm.buflen = MSGMAXLINE;
             prm.pbuf = "Press [TAB] to engage cloaking device: ";
-            prm.terms = TERMS;
             prm.index = MSG_LIN1;
             prm.buf[0] = 0;
             hudSetPrompt(prm.index, prm.pbuf, NoColor, prm.buf, NoColor);
@@ -2113,7 +2106,6 @@ static void command( int ch )
         prm.buf = cbuf;
         prm.buflen = MSGMAXLINE;
         prm.pbuf = "Press [TAB] to send an emergency distress call: ";
-        prm.terms = TERMS;
         prm.index = MSG_LIN1;
         prm.buf[0] = 0;
         hudSetPrompt(prm.index, prm.pbuf, NoColor, prm.buf, NoColor);
@@ -2128,7 +2120,6 @@ static void command( int ch )
         prm.buf = cbuf;
         prm.buflen = MSGMAXLINE;
         prm.pbuf = "Fire phasers: ";
-        prm.terms = TERMS;
         prm.index = MSG_LIN1;
         prm.buf[0] = 0;
         hudSetPrompt(prm.index, prm.pbuf, NoColor, prm.buf, NoColor);
@@ -2150,7 +2141,6 @@ static void command( int ch )
         prm.buf = cbuf;
         prm.buflen = MSGMAXLINE;
         prm.pbuf = "Information on: ";
-        prm.terms = TERMS;
         prm.index = MSG_LIN1;
         prm.buf[0] = 0;
         hudSetPrompt(prm.index, prm.pbuf, NoColor, prm.buf, NoColor);
@@ -2163,7 +2153,6 @@ static void command( int ch )
         prm.buf = cbuf;
         prm.buflen = MSGMAXLINE;
         prm.pbuf = "Come to course: ";
-        prm.terms = TERMS;
         prm.index = MSG_LIN1;
         prm.buf[0] = 0;
         hudSetPrompt(prm.index, prm.pbuf, NoColor, prm.buf, NoColor);
@@ -2177,7 +2166,6 @@ static void command( int ch )
             prm.buf = cbuf;
             prm.buflen = MSGMAXLINE;
             prm.pbuf = "Press [TAB] to try it: ";
-            prm.terms = TERMS;
             prm.index = MSG_LIN1;
             prm.buf[0] = 0;
             hudSetPrompt(prm.index, prm.pbuf, NoColor, prm.buf, NoColor);
@@ -2194,7 +2182,6 @@ static void command( int ch )
         prm.buflen = MSGMAXLINE;
         strcpy(pbuf, "Message to: ");
         prm.pbuf = pbuf;
-        prm.terms = TERMS;
         prm.index = MSG_LIN1;
         prm.buf[0] = 0;
         hudSetPrompt(prm.index, prm.pbuf, NoColor, prm.buf, NoColor);
@@ -2215,7 +2202,6 @@ static void command( int ch )
         prm.buf = cbuf;
         prm.buflen = MAXUSERNAME;
         prm.pbuf = "Enter a new pseudonym: ";
-        prm.terms = TERMS;
         prm.index = MSG_LIN2;
         prm.buf[0] = 0;
         hudSetPrompt(prm.index, prm.pbuf, NoColor, prm.buf, NoColor);
@@ -2238,7 +2224,6 @@ static void command( int ch )
         prm.buf = cbuf;
         prm.buflen = MSGMAXLINE;
         prm.pbuf = "Torpedo burst: ";
-        prm.terms = TERMS;
         prm.index = MSG_LIN1;
         prm.buf[0] = 0;
         hudSetPrompt(prm.index, prm.pbuf, NoColor, prm.buf, NoColor);
@@ -2253,7 +2238,6 @@ static void command( int ch )
         prm.buf = cbuf;
         prm.buflen = MSGMAXLINE;
         prm.pbuf = "Launch torpedo: ";
-        prm.terms = TERMS;
         prm.index = MSG_LIN1;
         prm.buf[0] = 0;
         hudSetPrompt(prm.index, prm.pbuf, NoColor, prm.buf, NoColor);
@@ -2273,7 +2257,6 @@ static void command( int ch )
             prm.buf = cbuf;
             prm.buflen = MSGMAXLINE;
             prm.pbuf = "Press [TAB] to initiate self-destruct sequence: ";
-            prm.terms = TERMS;
             prm.index = MSG_LIN1;
             prm.buf[0] = 0;
             hudSetPrompt(prm.index, prm.pbuf, NoColor, prm.buf, NoColor);
@@ -2292,7 +2275,6 @@ static void command( int ch )
                 refitst = cbShips[Context.snum].shiptype;
                 sprintf(pbuf, "Refit ship type: %s", cbShipTypes[refitst].name);
                 prm.pbuf = pbuf;
-                prm.terms = TERMS;
                 prm.index = MSG_LIN1;
                 prm.buf[0] = 0;
                 hudSetPrompt(prm.index, prm.pbuf, NoColor, prm.buf, NoColor);
@@ -2317,7 +2299,6 @@ static void command( int ch )
             prm.buf = cbuf;
             prm.buflen = MSGMAXLINE;
             prm.pbuf = "Tow which ship? ";
-            prm.terms = TERMS;
             prm.index = MSG_LIN1;
             prm.buf[0] = 0;
             hudSetPrompt(prm.index, prm.pbuf, NoColor, prm.buf, NoColor);
@@ -2350,7 +2331,6 @@ static void command( int ch )
         prm.buf = cbuf;
         prm.buflen = 5;
         prm.pbuf = clbWarPrompt(Context.snum, twar);
-        prm.terms = TERMS;
         prm.index = MSG_LIN1;
         prm.buf[0] = 0;
         hudSetPrompt(prm.index, prm.pbuf, NoColor, prm.buf, NoColor);
@@ -3338,7 +3318,6 @@ static nodeStatus_t nCPInput(int ch)
             prm.buf = cbuf;
             prm.buflen = 10;
             prm.pbuf = pbuf;
-            prm.terms = TERMS;
             prm.index = MSG_LIN1;
             prm.buf[0] = 0;
             hudSetPrompt(prm.index, prm.pbuf, NoColor, prm.buf, NoColor);

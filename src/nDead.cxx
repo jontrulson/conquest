@@ -102,7 +102,6 @@ void nDeadInit(void)
         prm.preinit = false;
         prm.buf = lastwords;
         prm.buflen = MAXLASTWORDS - 1;
-        prm.terms = TERMS;
         prm.buf[0] = 0;
     }
 
