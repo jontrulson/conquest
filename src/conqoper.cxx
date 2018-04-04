@@ -767,7 +767,7 @@ void debugplan(void)
                 k = sv[i];
 
                 for ( j = 0; j < NUMPLAYERTEAMS; j++ )
-                    if ( cbPlanets[k].scanned[j] && (j >= 0 && j < NUMPLAYERTEAMS) )
+                    if ( cbPlanets[k].scanned[j] )
                         junk[j] = cbTeams[j].teamchar;
                     else
                         junk[j] = '-';
