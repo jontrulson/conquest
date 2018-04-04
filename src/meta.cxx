@@ -357,6 +357,7 @@ int metaUpdateServer(const char *remotehost, const char *name, int port)
 
     if (sendto(s, msg, strlen(msg), 0, (const struct sockaddr *)&sa, sizeof(struct sockaddr_in)) < 0)
     {
+        close(s);
         utLog("metaUpdateServer: sento failed: %s", strerror(errno));
         return false;
     }
@@ -417,6 +418,7 @@ int metaGetServerList(const char *remotehost, metaSRec_t **srvlist)
     /* connect to the remote server */
     if ( connect ( s, (const  struct sockaddr *)&sa, sizeof ( sa ) ) < 0 )
     {
+        close(s);
         utLog("metaGetServerList: connect failed: %s", strerror(errno));
         return -1;
     }

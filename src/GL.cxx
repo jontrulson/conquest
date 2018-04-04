@@ -3297,6 +3297,9 @@ static int loadGLTextures()
         }
     }
 
+    // in case we slipped through all of the conditions
+    free(texti);
+
     utLog("%s: Successfully loaded %d textures, (%d files).",
           __FUNCTION__, loadedGLTextures, hwtextures);
 

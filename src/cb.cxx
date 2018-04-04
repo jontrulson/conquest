@@ -317,6 +317,7 @@ static int _checkCB(char *fname, int fmode, int sizeofcb)
                 ffd = -1;
                 free(_cbBasePtr);
                 _cbBasePtr = NULL;
+                free(memptr);
 	    }
         }
         else
