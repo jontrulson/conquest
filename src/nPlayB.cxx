@@ -227,8 +227,11 @@ static nodeStatus_t nPlayBDisplay(dspConfig_t *dsp)
     renderViewer(UserConf.doVBG);
 
     /* Main/Hud */
-    set_header(Context.snum);
+    if (Context.snum >= 0)
+        set_header(Context.snum);
+
     set_rectime();
+
     if (Context.snum >= 0)
         renderHud(false);
 

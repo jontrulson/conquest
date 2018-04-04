@@ -400,6 +400,13 @@ void debugdisplay( int snum )
 #define TFIREBALL "EXPLODING"
 
 
+    // can't do squat with a negative ship number...
+    if (snum < 0)
+    {
+        utLog("%s: snum is negative (%d), returning", __FUNCTION__, snum);
+        return;
+    }
+
     cdclrl( 1, MSG_LIN1 - 1 ); 	/* don't clear the message lines */
     unum = cbShips[snum].unum;
 
