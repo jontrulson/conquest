@@ -232,7 +232,7 @@ void cbFlush(void)
    if successful */
 static int _checkCB(char *fname, int fmode, int sizeofcb)
 {
-    int ffd;
+    int ffd = -1;
     struct stat sbuf;
 
     /* first stat the file, if it exists then verify the size.  rename
@@ -307,12 +307,14 @@ static int _checkCB(char *fname, int fmode, int sizeofcb)
                           strerror(errno));
 
                     close(ffd);
+                    ffd = -1;
                     free(memptr);
                     memptr = NULL;
                     return false;
                 }
 
                 close(ffd);
+                ffd = -1;
                 free(_cbBasePtr);
                 _cbBasePtr = NULL;
 	    }
@@ -326,7 +328,8 @@ static int _checkCB(char *fname, int fmode, int sizeofcb)
 	}
     }
 
-    close(ffd);			/* everything ok.. */
+    if (ffd >= 0)
+        close(ffd);			/* everything ok.. */
 
 #if !defined(MINGW)
     /* set ownership */
