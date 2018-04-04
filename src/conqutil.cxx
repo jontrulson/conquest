@@ -838,7 +838,7 @@ void utStrncpy( char *to, const char *from, unsigned int tosize )
  *  last byte is 0 */
 void utStrncat( char *to, const char *from, unsigned int tosize )
 {
-    strncat(to, from, tosize);
+    strncat(to, from, tosize - 1);
     to[tosize - 1] = '\0';
 }
 
