@@ -792,7 +792,10 @@ char *Str2Macro(char *str)
 	}
     }
 
-    retstr[i] = 0;
+    if (i < BUFFER_SIZE_256)
+        retstr[i] = 0;
+    else
+        retstr[BUFFER_SIZE_256 - 1] = 0;
 
     return(retstr);
 }
@@ -848,7 +851,10 @@ char *Macro2Str(char *str)
 	}
     }
 
-    retstr[i] = 0;
+    if (i < BUFFER_SIZE_256)
+        retstr[i] = 0;
+    else
+        retstr[BUFFER_SIZE_256 - 1] = 0;
 
     return(retstr);
 }
