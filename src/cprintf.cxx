@@ -80,7 +80,7 @@ void cprintf(int lin, int col, int align, const char *fmt, ...)
 	{
             if ( buf[i] == '#' )   /* color code warning */
 	    {
-                if ( buf[i+1] == '#' )
+                if ( i + 1 < BUFFER_SIZE_1024 && buf[i+1] == '#' )
 		{
                     xbuf[j++] = buf[i++]; /* escape'd # */
                     continue;
