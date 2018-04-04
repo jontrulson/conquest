@@ -2321,6 +2321,7 @@ static void cfgSectioni(int item, int val)
             break;
         }
     }
+    break;
 
     case TOK_EFFECT:
     case TOK_MUSIC:
@@ -2354,6 +2355,7 @@ static void cfgSectioni(int item, int val)
         }
 
     }
+    break;
 
     case TOK_TEXANIM:
     {
