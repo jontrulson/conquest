@@ -441,7 +441,7 @@ void iterdrive( const shipVec_t& ship )
                         if ( cbShips[i].warp <= MAX_ORBIT_WARP )
 			{
                             /* Going slow enough to orbit. */
-                            if ( dis <= (real)(cbPlanets[j].size / 2) )
+                            if ( dis <= ((real)cbPlanets[j].size / 2.0) )
 			    {
                                 /* Close enough to orbit. */
                                 clbOrbit( i, j );

@@ -629,7 +629,7 @@ void procCoup(cpCommand_t *cmd)
         return;
     }
 
-    failprob = cbPlanets[pnum].armies / MAX_COUP_ENEMY_ARMIES * 0.5 + 0.5;
+    failprob = (real)cbPlanets[pnum].armies / MAX_COUP_ENEMY_ARMIES * 0.5 + 0.5;
 
     if ( rnd() < failprob )
     {
