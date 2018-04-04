@@ -494,7 +494,7 @@ void mcuPlanetList()
         sv[i] = i;
     clbSortPlanets( sv );
 
-    strcpy( hd3, hd2 );
+    utStrncpy( hd3, hd2, sizeof(hd3) );
     for ( i = 0; hd3[i] != 0; i++ )
         if ( hd3[i] != ' ' )
             hd3[i] = '-';
@@ -689,7 +689,7 @@ void mcuPlayList( bool doall )
     cdclear();
     uiPutColor(LabelColor);  /* dwp */
 
-    strcpy(cbuf , hd1) ;
+    utStrncpy(cbuf, hd1, sizeof(cbuf)) ;
 
     col = (int)(Context.maxcol - strlen( cbuf )) / (int)2;
     lin = 2;
@@ -1243,7 +1243,7 @@ void mcuUserStats()
     lin = lin + 2;
     cdputs( hd3, lin, 34 );
 
-    strcpy(cbuf , hd2) ;
+    utStrncpy(cbuf, hd2, sizeof(cbuf)) ;
     lin = lin + 1;
     cdputs( cbuf, lin, 1 );
 

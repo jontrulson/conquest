@@ -113,7 +113,7 @@ static nodeStatus_t nPlanetlDisplay(dspConfig_t *dsp)
                 InfoColor,
                 hd1);
 
-        strcpy( hd3, hd2 );
+        utStrncpy( hd3, hd2, sizeof(hd3) );
 
         for ( i = 0; hd3[i] != 0; i++ )
             if ( hd3[i] != ' ' )

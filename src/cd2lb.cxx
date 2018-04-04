@@ -559,13 +559,13 @@ int cdgetp ( const char pmt[], int lin, int col, const char terms[], char str[],
                  * Save last char entered and go on.
                  */
                 if (diff > 0) {
-                    strcpy(sbuf, &str[max_size - diff]);
+                    utStrncpy(sbuf, &str[max_size - diff], sizeof(sbuf));
                     str[max_size - diff] = (int)'-';
                     sprintf(mbuf, append_fmt1, append_str, sbuf, ch);
                 }
                 else {
                     if (str[maxlen-2] != ' ') { /* Save last word plus last char entered */
-                        strcpy(sbuf,&str[i]);
+                        utStrncpy(sbuf, &str[i], sizeof(sbuf));
                         str[i] = (int)'-';
                         sprintf(mbuf, append_fmt1, append_str, sbuf, ch);
                         for (i=i+1;i<len;i++)
@@ -857,7 +857,7 @@ void cdputs ( const char str[], int lin, int col )
     int len, slen;
     static char tmpstr[128];
 
-    strcpy(tmpstr, str);
+    utStrncpy(tmpstr, str, 128);
 
     len = Context.maxcol - col; /* max str that will fit on screen */
     slen = strlen(tmpstr);

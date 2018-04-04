@@ -135,7 +135,7 @@ static nodeStatus_t nUserlDisplay(dspConfig_t *dsp)
         lin = lin + 2;
         cprintf(lin, 34, ALIGN_NONE, "#%d#%s", LabelColor, ehd3);
 
-        strcpy(cbuf , ehd2) ;
+        utStrncpy(cbuf, ehd2, sizeof(cbuf)) ;
         lin = lin + 1;
         cprintf(lin, 0, ALIGN_NONE, "#%d#%s", LabelColor, cbuf);
     }

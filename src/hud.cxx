@@ -695,7 +695,7 @@ void hudSetInfoTargetDist(int tdist)
 void hudSetRecId(char *str)
 {
     if (str)
-        strcpy(hudData.recId.str, str);
+        utStrncpy(hudData.recId.str, str, sizeof(hudData.recId.str));
     else
         hudData.recId.str[0] = 0;
 
@@ -706,7 +706,7 @@ void hudSetRecId(char *str)
 void hudSetRecTime(char *str)
 {
     if (str)
-        strcpy(hudData.recTime.str, str);
+        utStrncpy(hudData.recTime.str, str, sizeof(hudData.recTime.str));
     else
         hudData.recTime.str[0] = 0;
 

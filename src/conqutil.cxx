@@ -830,7 +830,7 @@ int utIsSpecial( char *str, int *what, int *token, int *count )
  *  byte is 0 */
 void utStrncpy( char *to, const char *from, unsigned int tosize )
 {
-    strncpy(to, from, tosize);
+    strncpy(to, from, tosize - 1);
     to[tosize - 1] = '\0';
 }
 

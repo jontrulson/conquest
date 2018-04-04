@@ -1201,7 +1201,7 @@ static void _domsgto(char *buf, int ch, int terse)
         return;
     }
 
-    strcpy(tbuf, buf) ;
+    utStrncpy(tbuf, buf, sizeof(tbuf));
 
     /* TAB or ENTER means use the target from the last message. */
     editing = ( (ch == TERM_EXTRA || ch == TERM_NORMAL) && buf[0] == 0 );

@@ -90,7 +90,7 @@ static nodeStatus_t nShiplDisplay(dspConfig_t *dsp)
     char ubuf[MAXUSERNAME + 2];
     int color;
 
-    strcpy(cbuf , hd2) ;
+    utStrncpy(cbuf, hd2, sizeof(cbuf));
 
     col = (int)(Context.maxcol - strlen( cbuf )) / (int)2;
     lin = 2;

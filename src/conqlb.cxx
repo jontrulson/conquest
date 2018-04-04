@@ -2186,8 +2186,8 @@ void clbIntrude( int snum, int pnum )
 	{
             strcpy(buf , "INTRUDER ALERT - ") ;
             utAppendShip(buf , snum) ;
-            strcat(buf , atta) ;
-            strcat(buf , armeq) ;
+            utStrncat(buf, atta, sizeof(buf)) ;
+            utStrncat(buf, armeq, sizeof(buf)) ;
             utAppendInt(buf , cbPlanets[pnum].armies) ;
             clbStoreMsgf( MSG_FROM_PLANET, pnum,
                           MSG_TO_TEAM, cbPlanets[pnum].team,
