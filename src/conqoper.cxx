@@ -2388,9 +2388,10 @@ void opstats(void)
                  LabelColor,InfoColor,*cbRevision);
         if ( *cbRevision != COMMONSTAMP )
 	{
-            sprintf( junk, " #%d#(binary ident is #%d#%d#%d#)\n",
+            snprintf( junk, sizeof(junk),
+                      " #%d#(binary ident is #%d#%d#%d#)\n",
                      LabelColor,InfoColor,COMMONSTAMP,LabelColor );
-            strcat(buf , junk) ;
+            utStrncat(buf, junk, sizeof(buf));
 	}
         cprintf( lin,col,ALIGN_NONE, "%s",buf);
 

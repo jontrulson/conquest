@@ -295,7 +295,8 @@ static void _infoship( int snum, int scanner, bool doOutput )
 
     cbuf[0] = Context.lasttarg[0] = 0;
     utAppendShip(cbuf , snum) ;
-    strcpy(Context.lasttarg, cbuf); /* save for hudInfo */
+    /* save for hudInfo */
+    utStrncpy(Context.lasttarg, cbuf, sizeof(Context.lasttarg));
     hudSetInfoTarget(snum, true);
 
     if ( snum == scanner )

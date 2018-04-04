@@ -348,7 +348,8 @@ void mcuInfoShip( int snum )
 
     cbuf[0] = Context.lasttarg[0] = 0;
     utAppendShip(cbuf , snum) ;
-    strcpy(Context.lasttarg, cbuf); /* save for hudInfo */
+    /* save for hudInfo */
+    utStrncpy(Context.lasttarg, cbuf, sizeof(Context.lasttarg));
 
     /* Scan another ship. */
     x = 0.0;
