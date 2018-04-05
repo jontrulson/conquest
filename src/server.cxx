@@ -286,7 +286,7 @@ int sendTorp(int sock, uint8_t tsnum, uint8_t tnum)
     if (sInfo.state != SVR_STATE_PLAY)
         return true;
 
-    if (tsnum < 0 || tsnum >= cbLimits.maxShips())
+    if (tsnum >= cbLimits.maxShips())
         return false;
 
     if (tnum >= cbLimits.maxTorps())

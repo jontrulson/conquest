@@ -110,8 +110,7 @@ void cucSendMsg( msgFrom_t from, uint16_t fromDetail, int terse, int remote )
         {
             sprintf( buf, "%d", toDetail );
         }
-        else if ( to == MSG_TO_TEAM && toDetail >= 0
-                  && toDetail < NUMPLAYERTEAMS )
+        else if ( to == MSG_TO_TEAM && toDetail < NUMPLAYERTEAMS )
         {
             strcpy(buf , cbTeams[toDetail].name) ;
         }

@@ -401,7 +401,7 @@ void clbKillShip(int snum, killedBy_t kb, uint16_t detail)
         break;
 
     case KB_SHIP:
-        if (detail >= 0 && detail < cbLimits.maxShips())
+        if (detail < cbLimits.maxShips())
 	{
             sprintf(msgbuf, "%c%d (%s) was kill %.1f for %c%d (%s).",
                     cbTeams[cbShips[snum].team].teamchar,
@@ -417,7 +417,7 @@ void clbKillShip(int snum, killedBy_t kb, uint16_t detail)
         break;
 
     case KB_PLANET:
-        if (detail >= 0 && detail < cbLimits.maxPlanets())
+        if (detail < cbLimits.maxPlanets())
 	{
             sprintf(msgbuf, "%c%d (%s) was destroyed by %s",
                     cbTeams[cbShips[snum].team].teamchar,
@@ -1262,7 +1262,6 @@ int clbCanRead( int snum, int msgnum )
 
         if (to == MSG_TO_FRIENDLY
             && from == MSG_FROM_SHIP
-            && fromDetail >= 0
             && fromDetail < cbLimits.maxShips())
 	{
             if (cbShips[snum].war[cbShips[fromDetail].team] == false &&
