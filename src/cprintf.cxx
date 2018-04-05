@@ -113,7 +113,7 @@ void cprintf(int lin, int col, int align, const char *fmt, ...)
                         i++;
 		}
 
-                if ( i < (BUFFER_SIZE_1024 - 1) < buf[i] == '#' )
+                if ( i < (BUFFER_SIZE_1024 - 1) && buf[i] == '#' )
                     i++;                /* advance past '#' */
                 /* have color code, convert to int and set the color
                  * attribute */
