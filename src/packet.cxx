@@ -1227,7 +1227,9 @@ void pktSetNonBlocking(int s, bool enable)
     else
         fdFlags &= ~O_NONBLOCK;
 
-    fcntl(s, F_SETFL, fdFlags);
+    if (fcntl(s, F_SETFL, fdFlags) < 0)
+        utLog("%s: fcntl() failed: %s", __FUNCTION__,
+              strerror(errno));
 
     return;
 }

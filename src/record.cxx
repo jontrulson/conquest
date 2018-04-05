@@ -155,7 +155,11 @@ int recOpenOutput(char *fname, int logit)
     }
 
 #if !defined(MINGW)
-    chmod(fname, (S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH));
+    if (chmod(fname, (S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH)) < -1)
+    {
+        utLog("%s: chown() failed: %s", __FUNCTION__, strerror(errno));
+        // not fatal...
+    }
 #endif
 
 #ifdef HAVE_LIBZ
