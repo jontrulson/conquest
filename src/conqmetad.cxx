@@ -275,6 +275,11 @@ void metaListen(void)
     socklen_t alen;
     fd_set readfds;
 
+    memset(&sa, 0, sizeof(struct sockaddr));
+    memset(&isa, 0, sizeof(struct sockaddr));
+    memset(&tsa, 0, sizeof(struct sockaddr));
+    memset(&tisa, 0, sizeof(struct sockaddr));
+
     sa.sin_port = htons(listenPort);
     tsa.sin_port = htons(listenPort);
 

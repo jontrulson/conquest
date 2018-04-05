@@ -164,6 +164,9 @@ void checkMaster(void)
 
     signal(SIGCLD, SIG_IGN);	/* allow children to die */
 
+    memset(&sa, 0, sizeof(struct sockaddr_in));
+    memset(&isa, 0, sizeof(struct sockaddr_in));
+
     if (!checkPID(cbConqInfo->conqservPID))
     {				/* see if one is really running */
         /* if we are here, we will be the listener */
