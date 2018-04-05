@@ -3119,11 +3119,11 @@ static char *_getTexFile(char *tfilenm)
 static int loadGLTextures()
 {
     int rv = false;
-    textureImage *texti;
+    textureImage *texti = NULL;
     int i, type, components;         /* for RGBA */
     char *filenm;
     GLTexture_t curTexture;
-    GLTexture_t *texptr;
+    GLTexture_t *texptr = NULL;
     int hwtextures = 0;
 
     if (!cqiNumTextures || !cqiTextures)
@@ -3256,9 +3256,10 @@ static int loadGLTextures()
                 if (texti->imageData)
                     stbi_image_free(texti->imageData);
 
-                free(texti);
-                texti = NULL;
             }
+
+            free(texti);
+            texti = NULL;
         }
 
         if (rv || texid || col_only)     /* tex/color load/locate succeeded,
@@ -3274,6 +3275,7 @@ static int loadGLTextures()
                       __FUNCTION__,
                       loadedGLTextures + 1,
                       cqiTextures[i].name);
+                free(texti);
                 return false;
             }
 
@@ -3296,9 +3298,6 @@ static int loadGLTextures()
             loadedGLTextures++;
         }
     }
-
-    // in case we slipped through all of the conditions
-    free(texti);
 
     utLog("%s: Successfully loaded %d textures, (%d files).",
           __FUNCTION__, loadedGLTextures, hwtextures);

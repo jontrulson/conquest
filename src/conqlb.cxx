@@ -2172,10 +2172,10 @@ void clbIntrude( int snum, int pnum )
     {
         if ( snum < 0 ) // doomsday
 	{
-            strcpy(buf , cbDoomsday->name) ;
+            utStrncpy(buf, cbDoomsday->name, sizeof(buf));
             utToUpperCase( cbDoomsday->name );
-            strcat(buf , atta) ;
-            strcat(buf , armeq) ;
+            utStrncat(buf, atta, sizeof(buf));
+            utStrncat(buf, armeq, sizeof(buf));
             utAppendInt(buf , cbPlanets[pnum].armies) ;
             clbStoreMsgf( MSG_FROM_PLANET, pnum,
                           MSG_TO_TEAM, cbPlanets[pnum].team,
@@ -2183,7 +2183,7 @@ void clbIntrude( int snum, int pnum )
 	}
         else if ( cbShips[snum].war[cbPlanets[pnum].team] ) // ship
 	{
-            strcpy(buf , "INTRUDER ALERT - ") ;
+            utStrncpy(buf, "INTRUDER ALERT - ", sizeof(buf)) ;
             utAppendShip(buf , snum) ;
             utStrncat(buf, atta, sizeof(buf)) ;
             utStrncat(buf, armeq, sizeof(buf)) ;

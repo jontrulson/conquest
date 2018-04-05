@@ -102,7 +102,7 @@ void cprintf(int lin, int col, int align, const char *fmt, ...)
                     i++;                /* advance past '#' */
                 /* get color code */
 
-                while ( buf[i] != 0 && isdigit(buf[i]) )
+                while ( i < BUFFER_SIZE_1024 && buf[i] != 0 && isdigit(buf[i]) )
 		{
                     if ( !two_passes )
 		    {
@@ -113,16 +113,18 @@ void cprintf(int lin, int col, int align, const char *fmt, ...)
                         i++;
 		}
 
-                if ( buf[i] == '#' )
+                if ( i < (BUFFER_SIZE_1024 - 1) < buf[i] == '#' )
                     i++;                /* advance past '#' */
-                /* have color code, convert to int and set the color attribute */
+                /* have color code, convert to int and set the color
+                 * attribute */
                 if ( !two_passes )
 		{
                     color_num = atoi(color_code);
                     uiPutColor(color_num);
 		}
 	    } /* end if color code start*/
-            xbuf[j++] = buf[i++];  /* save char to output xbuf */
+            if (i < (BUFFER_SIZE_1024 - 1))
+                 xbuf[j++] = buf[i++];  /* save char to output xbuf */
 	} /* end outer while */
         xbuf[j] = 0;
 
