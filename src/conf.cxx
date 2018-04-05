@@ -400,6 +400,7 @@ parseMouseModNum(char *str, uint32_t *mods, uint32_t *button)
 
     *mods = 0;
     *button = 0;
+    uint32_t tmpButton = 0;
 
     while (*str && !done)
     {
@@ -427,13 +428,16 @@ parseMouseModNum(char *str, uint32_t *mods, uint32_t *button)
         }
         else                      /* the mouse button number, always last */
         {
-            *button = atoi(str);
+            tmpButton = atoi(str);
             done = true;
         }
     }
 
-    if (*button >= CONF_MAXBUTTONS)
+    if (tmpButton >= CONF_MAXBUTTONS)
         return false;
+
+    *button = tmpButton;
+
     if (*mods >= CONF_MAXMODIFIERS)
         return false;
 
