@@ -76,7 +76,7 @@ void cprintf(int lin, int col, int align, const char *fmt, ...)
     {
         i=0;j=0;
         xbuf[0]=0;
-        while (buf[i] != 0 && i < BUFFER_SIZE_1024)
+        while ( i < BUFFER_SIZE_1024 && buf[i] != 0)
 	{
             if ( buf[i] == '#' )   /* color code warning */
 	    {
