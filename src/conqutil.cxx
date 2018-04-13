@@ -838,7 +838,8 @@ void utStrncpy( char *to, const char *from, unsigned int tosize )
  *  last byte is 0 */
 void utStrncat( char *to, const char *from, unsigned int tosize )
 {
-    strncat(to, from, tosize - 1);
+    size_t toLen = strlen(to);
+    strncat(to, from, tosize - toLen - 1);
     to[tosize - 1] = '\0';
 }
 
