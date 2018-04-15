@@ -7,6 +7,12 @@ Credit where credit is due.
 
   Public Domain/MIT licensed.  Works very well.
 
+- fmtlib/fmt - A modern C++ formatting library, version 4.1.0
+
+  https://github.com/fmtlib/fmt
+
+  BSD 2-Clause Simplified License
+
 - Earth, Mars (classm/classd) pics, JPL/NASA.
 
 - star (base image) - NASA SOHO

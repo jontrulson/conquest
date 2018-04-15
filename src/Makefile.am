@@ -52,18 +52,20 @@ AM_YFLAGS = -d
 
 if ISMINGW
 noinst_LTLIBRARIES = libconquest.la libconqclnt.la libconqserv.la \
-	libconqinit.la libUi.la libUiGL.la libcqsound.la
+	libconqinit.la libUi.la libUiGL.la libcqsound.la libfmt.la
 else !ISMINGW
 
 if GLCLIENT
 noinst_LTLIBRARIES = libconquest.la libconqclnt.la libconqserv.la \
-	libconqinit.la libUi.la libUiGL.la libcqsound.la
+	libconqinit.la libUi.la libUiGL.la libcqsound.la libfmt.la
 else !GLCLIENT
 noinst_LTLIBRARIES = libconquest.la libconqclnt.la libconqserv.la \
-	libconqinit.la libUi.la libUiCU.la
+	libconqinit.la libUi.la libUiCU.la libfmt.la
 endif !GLCLIENT
 
 endif !ISMINGW
+
+libfmt_la_SOURCES = format.h format.cxx
 
 libconquest_la_SOURCES = conqai.cxx conqai.h cb.cxx cb.h \
 	conqlb.h conqlb.cxx rndlb.cxx rndlb.h conqutil.cxx conqutil.h \
@@ -151,28 +153,28 @@ endif
 conqai_SOURCES = conqai_main.cxx c_defs.h defs.h conqdef.h cb.h \
                  context.h conqdata.h
 
-conqai_LDADD = libconquest.la libconqinit.la  $(LEXLIB) $(YACCLIB)
+conqai_LDADD = libconquest.la libconqinit.la libfmt.la $(LEXLIB) $(YACCLIB)
 
 conqoper_SOURCES = conqoper.cxx c_defs.h defs.h conqdef.h cb.h context.h
-conqoper_LDADD = libUiCU.la libUi.la libconqclnt.la libconquest.la libconqinit.la $(LEXLIB) $(YACCLIB)
+conqoper_LDADD = libUiCU.la libUi.la libconqclnt.la libconquest.la libconqinit.la libfmt.la $(LEXLIB) $(YACCLIB)
 
 conqdriv_SOURCES = conqdriv.cxx c_defs.h defs.h conqdef.h cb.h context.h
-conqdriv_LDADD = libconquest.la libconqinit.la $(LEXLIB) $(YACCLIB)
+conqdriv_LDADD = libconquest.la libconqinit.la libfmt.la $(LEXLIB) $(YACCLIB)
 
 # we are very careful here not to depend on or use any conquest
 # libraries with conqstrat.
 conqstrat_SOURCES = conqstrat-yacc.yxx conqstrat-lex.lxx conqstrat.h
-conqstrat_LDADD = $(LEXLIB) $(YACCLIB)
+conqstrat_LDADD = libfmt.la $(LEXLIB) $(YACCLIB)
 
 conqinit_SOURCES = conqinit.cxx conqinit.h
-conqinit_LDADD = libconquest.la libconqinit.la $(LEXLIB) $(YACCLIB)
+conqinit_LDADD = libconquest.la libconqinit.la libfmt.la $(LEXLIB) $(YACCLIB)
 
 if TCPW
 conqmetad_SOURCES = conqmetad.cxx meta.h $(TCPW_H) $(TCPW_C)
-conqmetad_LDADD = libconquest.la libconqinit.la $(LEXLIB) $(YACCLIB) $(TCPWLIB) $(NSLLIB)
+conqmetad_LDADD = libconquest.la libconqinit.la libfmt.la $(LEXLIB) $(YACCLIB) $(TCPWLIB) $(NSLLIB)
 else
 conqmetad_SOURCES = conqmetad.cxx meta.h $(TCPW_H)
-conqmetad_LDADD = libconquest.la libconqinit.la $(LEXLIB) $(YACCLIB)
+conqmetad_LDADD = libconquest.la libconqinit.la libfmt.la $(LEXLIB) $(YACCLIB)
 endif
 
 EXTRA_DIST = $(man6_MANS)
