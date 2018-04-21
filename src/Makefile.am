@@ -213,9 +213,11 @@ install-exec-hook:
 	chmod 664 $(DESTDIR)$(CONQSYSCONFDIR)/00_plantex.trc
 	chgrp $(CONQGROUP) $(DESTDIR)$(bindir)/conqoper$(EXEEXT) \
 		$(DESTDIR)$(libexecdir)/conqdriv$(EXEEXT) \
+		$(DESTDIR)$(bindir)/conqmetad$(EXEEXT) \
 		$(DESTDIR)$(bindir)/conquestd$(EXEEXT)
 	chmod g+s $(DESTDIR)$(bindir)/conqoper$(EXEEXT) \
 		$(DESTDIR)$(libexecdir)/conqdriv$(EXEEXT) \
+		$(DESTDIR)$(bindir)/conqmetad$(EXEEXT) \
 		$(DESTDIR)$(bindir)/conquestd$(EXEEXT)
 	-$(bindir)/conqoper$(EXEEXT) -C
 	-chown root:$(CONQGROUP) $(DESTDIR)$(CONQLOCALSTATEDIR)
