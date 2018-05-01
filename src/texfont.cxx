@@ -11,6 +11,7 @@
 #endif
 
 #include "c_defs.h"
+#include "conqdef.h"
 #include "color.h"
 #include "ui.h"
 #include "gldisplay.h"
@@ -26,6 +27,10 @@
 #include "TexFont.h"
 
 #include "conqutil.h"
+
+// Used to limit the various values read (width/height/etc) from the
+// textfont (tainting)
+#define MAX_EXTENT_VAL (2048)
 
 #if 0
 /* Uncomment to debug various scenarios. */
@@ -123,7 +128,7 @@ txfLoadFont(char *filename)
     FILE *file;
     GLfloat w, h, xstep, ystep;
     char fileid[4], tmp;
-    unsigned char *texbitmap;
+    unsigned char *texbitmap = NULL;
     int min_glyph, max_glyph;
     int endianness, swap, format, stride, width, height;
     int i, j;
@@ -168,16 +173,22 @@ txfLoadFont(char *filename)
 #define EXPECT(n) if (got != (unsigned long) n) { lastError = "premature end of file."; goto error; }
     got = fread(&format, sizeof(int), 1, file);
     EXPECT(1);
+    format = CLAMP(0, MAX_EXTENT_VAL, format);
     got = fread(&txf->tex_width, sizeof(int), 1, file);
     EXPECT(1);
+    txf->tex_width = CLAMP(0, MAX_EXTENT_VAL, txf->tex_width);
     got = fread(&txf->tex_height, sizeof(int), 1, file);
     EXPECT(1);
+    txf->tex_height = CLAMP(0, MAX_EXTENT_VAL, txf->tex_height);
     got = fread(&txf->max_ascent, sizeof(int), 1, file);
     EXPECT(1);
+    txf->max_ascent = CLAMP(0, MAX_EXTENT_VAL, txf->max_ascent);
     got = fread(&txf->max_descent, sizeof(int), 1, file);
     EXPECT(1);
+    txf->max_descent = CLAMP(0, MAX_EXTENT_VAL, txf->max_descent);
     got = fread(&txf->num_glyphs, sizeof(int), 1, file);
     EXPECT(1);
+    txf->num_glyphs = CLAMP(0, MAX_EXTENT_VAL, txf->num_glyphs);
 
     if (swap) {
         SWAPL(&format, tmp);
@@ -196,6 +207,7 @@ txfLoadFont(char *filename)
     assert(sizeof(TexGlyphInfo) == 12);  /* Ensure external file format size. */
     got = fread(txf->tgi, sizeof(TexGlyphInfo), txf->num_glyphs, file);
     EXPECT(txf->num_glyphs);
+    txf->num_glyphs = CLAMP(0, MAX_EXTENT_VAL, txf->num_glyphs);
 
     if (swap) {
         for (i = 0; i < txf->num_glyphs; i++) {
@@ -264,13 +276,16 @@ txfLoadFont(char *filename)
         goto error;
     }
     for (i = 0; i < txf->num_glyphs; i++) {
-        txf->lut[txf->tgi[i].c - txf->min_glyph] = &txf->tgvi[i];
+        unsigned short index = txf->tgi[i].c - txf->min_glyph;
+        index = CLAMP(0, (txf->range * sizeof(TexGlyphVertexInfo *)) - 1,
+                      index);
+        txf->lut[index] = &txf->tgvi[i];
     }
 
     switch (format) {
     case TXF_FORMAT_BYTE:
         if (useLuminanceAlpha) {
-            unsigned char *orig;
+            unsigned char *orig = NULL;
 
             orig = (unsigned char *) malloc(txf->tex_width * txf->tex_height);
             if (orig == NULL) {
@@ -278,11 +293,18 @@ txfLoadFont(char *filename)
                 goto error;
             }
             got = fread(orig, 1, txf->tex_width * txf->tex_height, file);
-            EXPECT(txf->tex_width * txf->tex_height);
+            // can't use EXPECT() here, or we leak orig
+            if (got != (unsigned long)(txf->tex_width * txf->tex_height))
+            {
+                lastError = "invalid read or orig";
+                free(orig);
+                goto error;
+            }
             txf->teximage = (unsigned char *)
                 malloc(2 * txf->tex_width * txf->tex_height);
             if (txf->teximage == NULL) {
                 lastError = "out of memory.";
+                free(orig);
                 goto error;
             }
             for (i = 0; i < txf->tex_width * txf->tex_height; i++) {
@@ -363,6 +385,9 @@ error:
     }
     if (file)
         fclose(file);
+
+    free(texbitmap);
+
     return NULL;
 }
 
