@@ -364,15 +364,15 @@ void sendFeedback(const char *msg)
 }
 
 /* send a msg to the client */
-int sendMessage(Msg_t *msg)
+void sendMessage(Msg_t *msg)
 {
     spMessage_t smsg;
 
     if (sInfo.state != SVR_STATE_PLAY)
-        return true;
+        return;
 
     if (!msg)
-        return true;
+        return;
 
 #if defined(DEBUG_SERVERSEND)
     utLog("sendMessage: to = %d(%d), from = %d(%d), flags = 0x%02x, msg = '%s'",
@@ -399,12 +399,9 @@ int sendMessage(Msg_t *msg)
             recWriteEvent(&smsg);
 
     if (pktWrite(PKT_SENDTCP, &smsg) <= 0)
-    {
         utLog("sendMessage: pktWrite failed\n");
-        return false;
-    }
 
-    return true;
+    return;
 }
 
 int sendTeam(int sock, uint8_t team, int force)

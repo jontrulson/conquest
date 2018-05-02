@@ -69,7 +69,7 @@ int sendServerStat(int socktype);
 int sendTorp(int sock, uint8_t snum, uint8_t tnum);
 int sendFeedBack(char *msg);
 void sendFeedback(const char *msg);
-int sendMessage(Msg_t *msg);
+void sendMessage(Msg_t *msg);
 int sendTeam(int sock, uint8_t team, int force);
 int sendcbConqInfo(int sock, int force);
 int sendHistory(int sock, int hnum);

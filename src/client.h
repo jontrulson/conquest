@@ -92,7 +92,7 @@ int             sendSetCourse(int sock, courseLock_t lock, uint16_t lockDetail,
 int             sendSetName(const char *name);
 int             sendCommand(uint8_t cmd, uint16_t detail);
 int             sendFireTorps(int num, real dir);
-int             sendMessage(msgTo_t to, uint16_t toDetail, const char *msg);
+void            sendMessage(msgTo_t to, uint16_t toDetail, const char *msg);
 
 int             clientHello(const char *clientname);
 

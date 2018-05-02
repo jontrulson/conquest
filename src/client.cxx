@@ -203,12 +203,13 @@ int sendFireTorps(int num, real dir)
 }
 
 /* send a message */
-int sendMessage(msgTo_t to, uint16_t toDetail, const char *msg)
+void sendMessage(msgTo_t to, uint16_t toDetail, const char *msg)
 {
     cpMessage_t cmsg;
 
-    if (!msg)
-        return false;
+    // don't send if we got a NULL or an empty message
+    if (!msg || msg[0] == 0)
+        return;
 
     memset((void *)&cmsg, 0, sizeof(cpMessage_t));
     cmsg.type = CP_MESSAGE;
@@ -217,9 +218,9 @@ int sendMessage(msgTo_t to, uint16_t toDetail, const char *msg)
     utStrncpy((char *)cmsg.msg, msg, MESSAGE_SIZE);
 
     if (pktWrite(PKT_SENDTCP, &cmsg) <= 0)
-        return false;
-    else
-        return true;
+        utLog("%s: pktWrite() failed.", __FUNCTION__);
+
+    return;
 }
 
 int clientHello(const char *clientname)
