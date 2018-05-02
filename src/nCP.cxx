@@ -265,10 +265,9 @@ static int _KPAngle(int ch, real *angle)
 
 static void _infoship( int snum, int scanner, bool doOutput )
 {
-    int i, status;
+    int status;
     real x, y, dis, kills, appx, appy;
     int godlike, canscan;
-    static char tmpstr[BUFFER_SIZE_256];
     /* ETA related vars */
     real pwarp, diffdis, close_rate;
     time_t difftime, curtime;
@@ -507,7 +506,7 @@ static void _infoship( int snum, int scanner, bool doOutput )
         else
             cbuf += "DOWN";
 
-        i = iround( cbShips[snum].damage );
+        int i = iround( cbShips[snum].damage );
         if ( i > 0 )
 	{
             if ( !cbuf.empty() )
@@ -586,16 +585,13 @@ static void _infoplanet( const char *str, int pnum, int snum, bool doOutput )
 
     if (UserConf.DoETAStats)
     {
-        static char tmpstr[64];
+        std::string tmpstr;
 
+        tmpstr.clear();
         if (cbShips[snum].warp > 0.0)
-	{
-            sprintf(tmpstr, ", ETA %s",
-                    clbETAStr(cbShips[snum].warp,
-                              Context.lasttdist));
-	}
-        else
-            tmpstr[0] = '\0';
+            tmpstr = fmt::format(", ETA {}",
+                                 clbETAStr(cbShips[snum].warp,
+                                           Context.lasttdist));
 
         sprintf( buf, "%s%s, a %s%s, range %d, direction %d%s",
                  str,
@@ -604,7 +600,7 @@ static void _infoplanet( const char *str, int pnum, int snum, bool doOutput )
                  junk,
                  Context.lasttdist,
                  Context.lasttang,
-                 tmpstr);
+                 tmpstr.c_str());
 
 
     }
@@ -741,7 +737,7 @@ static void _dowarp( int snum, real warp )
 /* get a target */
 static int _gettarget(std::string& buf, real cdefault, real *dir, char ch)
 {
-    int i, j;
+    int j;
 
     if ( ch == TERM_ABORT )
         return ( false );
@@ -757,8 +753,7 @@ static int _gettarget(std::string& buf, real cdefault, real *dir, char ch)
 
     if (utIsDigits(buf))
     {
-        i = 0;
-        if ( ! utSafeCToI( &j, buf.c_str(), i ) )
+        if ( ! utSafeCToI( &j, buf) )
             return ( false );
         *dir = utMod360( (real) j );
         return ( true );
@@ -824,7 +819,7 @@ static void _doinfo( const char *inbuf, char ch, bool doOutput )
     int snum = Context.snum;
     int j, what, sorpnum, xsorpnum, count, token;
     int extra;
-    char tmpBuf[MSGMAXLINE];
+    std::string tmpBuf;
 
     if ( ch == TERM_ABORT )
     {
@@ -841,19 +836,19 @@ static void _doinfo( const char *inbuf, char ch, bool doOutput )
 
     if (inbuf)
     {
-        utStrncpy(tmpBuf, inbuf, MSGMAXLINE);
+        tmpBuf = inbuf;
         utDeleteBlanks( tmpBuf );
     }
     else
     {
-        tmpBuf[0] = 0;
+        tmpBuf.clear();
     }
 
     /* Default to what we did last time. */
-    if ( tmpBuf[0] == 0 )
+    if ( tmpBuf.empty() )
     {
-        utStrncpy(tmpBuf, Context.lastinfostr, MSGMAXLINE) ;
-        if ( tmpBuf[0] == 0 )
+        tmpBuf = Context.lastinfostr;
+        if ( tmpBuf.empty() )
 	{
             hudClearPrompt(MSG_LIN1);
             hudSetInfoTarget(-1, false);
@@ -861,9 +856,9 @@ static void _doinfo( const char *inbuf, char ch, bool doOutput )
 	}
     }
     else
-        utStrncpy(Context.lastinfostr, tmpBuf, MSGMAXLINE) ;
+        utStrncpy(Context.lastinfostr, tmpBuf.c_str(), MSGMAXLINE) ;
 
-    if ( utIsSpecial( tmpBuf, &what, &token, &count ) )
+    if ( utIsSpecial( tmpBuf.c_str(), &what, &token, &count ) )
     {
         if ( ! clbFindSpecial( snum, token, count, &sorpnum, &xsorpnum ) )
             what = NEAR_NONE;
@@ -886,17 +881,17 @@ static void _doinfo( const char *inbuf, char ch, bool doOutput )
             hudSetInfoTarget(-1, false);
         }
     }
-    else if ( tmpBuf[0] == 's' && utIsDigits(&tmpBuf[1]) )
+    else if ( tmpBuf.size() > 1 && tmpBuf[0] == 's' && ::isdigit(tmpBuf[1]) )
     {
         utSafeCToI( &j, tmpBuf, 1 );		/* ignore status */
         _infoship( j, snum, doOutput );
     }
     else if (utIsDigits(tmpBuf))
     {
-        utSafeCToI( &j, tmpBuf, 0 );		/* ignore status */
+        utSafeCToI( &j, tmpBuf);		/* ignore status */
         _infoship( j, snum, doOutput );
     }
-    else if ( clbPlanetMatch( tmpBuf, &j, false ) )
+    else if ( clbPlanetMatch( tmpBuf.c_str(), &j, false ) )
         _infoplanet( "", j, snum, doOutput );
     else
     {
@@ -1000,7 +995,7 @@ static void _doorbit( int snum )
 static void _doalloc(const char *buf, char ch)
 {
     int snum = Context.snum;
-    int i, alloc;
+    int alloc;
     int dwalloc = 0;
 
     switch (ch)
@@ -1010,8 +1005,7 @@ static void _doalloc(const char *buf, char ch)
         break;
 
     case TERM_NORMAL:
-        i = 0;
-        utSafeCToI( &alloc, buf, i );			/* ignore status */
+        utSafeCToI( &alloc, buf, 0 );			/* ignore status */
         if ( alloc != 0 )
 	{
             if ( alloc < 30 )
@@ -1242,8 +1236,7 @@ static void _domsgto(const char *buf, int ch, int terse)
     if (utIsDigits(tbuf))
     {
         /* All digits means a ship number. */
-        i = 0;
-        utSafeCToI( &j, tbuf, i );		/* ignore status */
+        utSafeCToI( &j, tbuf, 0 );		/* ignore status */
         if ( j < 0 || j >= cbLimits.maxShips() )
 	{
             cp_putmsg( "No such ship.", MSG_LIN2 );
@@ -1543,8 +1536,7 @@ static void _docourse( std::string& buf, char ch)
         if (utIsDigits(substr))
         {
             /* Ship. */
-            i = 1;
-            if ( utSafeCToI( &sorpnum, buf.c_str(), i ) )
+            if ( utSafeCToI( &sorpnum, substr) )
                 what = NEAR_SHIP;
         }
     }
@@ -1554,8 +1546,7 @@ static void _docourse( std::string& buf, char ch)
         {
             /* Raw angle. */
             hudClearPrompt( MSG_LIN1 );
-            i = 0;
-            if ( utSafeCToI( &j, buf.c_str(), i ) )
+            if ( utSafeCToI( &j, buf) )
             {
                 what = NEAR_DIRECTION;
                 dir = (real)utMod360( (real)( j ) );
@@ -1967,7 +1958,7 @@ static void _initbeam()
 
 static void _dobeam(std::string& buf, int ch)
 {
-    int num, i;
+    int num;
 
     if ( ch == TERM_ABORT )
     {
@@ -1988,8 +1979,7 @@ static void _dobeam(std::string& buf, int ch)
             cp_putmsg( abt, MSG_LIN1 );
             return;
 	}
-        i = 0;
-        utSafeCToI( &num, buf.c_str(), i );
+        utSafeCToI( &num, buf);
         if ( num < 1 || num > beamax )
 	{
             cp_putmsg( abt, MSG_LIN1 );

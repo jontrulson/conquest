@@ -870,12 +870,9 @@ void debugplan(void)
 /*    status = opPlanetMatch( str, pnum ) */
 int opPlanetMatch( char str[], int *pnum )
 {
-    int i;
-
     if ( utIsDigits( str ) )
     {
-        i = 0;
-        if ( ! utSafeCToI( pnum, str, i ) )
+        if ( ! utSafeCToI( pnum, str, 0 ) )
             return ( false );
         if ( *pnum < 0 || *pnum >= cbLimits.maxPlanets() )
             return ( false );
@@ -894,7 +891,7 @@ int opPlanetMatch( char str[], int *pnum )
 void kiss(int snum, int prompt_flg)
 {
 
-    int i, unum;
+    int unum;
     char ch, buf[MSGMAXLINE], mbuf[MSGMAXLINE], ssbuf[MSGMAXLINE];
     int didany;
     static const char *prompt_str = "Kill what (<cr> for driver)? ";
@@ -952,8 +949,7 @@ void kiss(int snum, int prompt_flg)
     /* Kill a ship? */
     if ( utIsDigits( buf ) )
     {
-        i = 0;
-        utSafeCToI( &snum, buf, i );		/* ignore status */
+        utSafeCToI( &snum, buf, 0 );		/* ignore status */
         if ( snum < 0 || snum >= cbLimits.maxShips() )
             cdputs( no_ship_str, MSG_LIN2, 1 );
         else if ( cbShips[snum].status != SS_LIVE ) {
@@ -1463,7 +1459,7 @@ void operate(void)
 /*    opinfo( snum ) */
 void opinfo( int snum )
 {
-    int i, j;
+    int j;
     char ch;
     char cbuf[MSGMAXLINE];
     static const char *pmt="Information on: ";
@@ -1488,14 +1484,12 @@ void opinfo( int snum )
 
     if ( cbuf[0] == 's' && utIsDigits( &cbuf[1] ) )
     {
-        i = 0;
-        utSafeCToI( &j, &cbuf[1], i );		/* ignore status */
+        utSafeCToI( &j, &cbuf[1], 0 );		/* ignore status */
         mcuInfoShip( j );
     }
     else if ( utIsDigits( cbuf ) )
     {
-        i = 0;
-        utSafeCToI( &j, cbuf, i );		/* ignore status */
+        utSafeCToI( &j, cbuf, 0 );		/* ignore status */
         mcuInfoShip( j );
     }
     else if ( opPlanetMatch( cbuf, &j ) )
@@ -1906,8 +1900,7 @@ void oppedit(void)
             if ( ch == TERM_ABORT || buf[0] == 0 )
                 continue;	/* next */
             utDeleteBlanks( buf );
-            i = 0;
-            if ( ! utSafeCToI( &j, buf, i ) )
+            if ( ! utSafeCToI( &j, buf, 0 ) )
                 continue;	/* next */
 
             x = atof( buf);
@@ -1922,8 +1915,7 @@ void oppedit(void)
             if ( ch == TERM_ABORT || buf[0] == 0 )
                 continue;
             utDeleteBlanks( buf );
-            i = 0;
-            if ( ! utSafeCToI( &j, buf, i ) )
+            if ( ! utSafeCToI( &j, buf, 0 ) )
                 continue;
             cbPlanets[pnum].armies = j;
             break;
@@ -1950,8 +1942,7 @@ void oppedit(void)
             if ( ch == TERM_ABORT || buf[0] == 0 )
                 continue;	/* next */
             utDeleteBlanks( buf );
-            i = 0;
-            if ( ! utSafeCToI( &j, buf, i ) )
+            if ( ! utSafeCToI( &j, buf, 0 ) )
                 continue;	/* next */
 
             cbPlanets[pnum].orbvel = atof( buf );
@@ -1963,8 +1954,7 @@ void oppedit(void)
             if ( ch == TERM_ABORT || buf[0] == 0 )
                 continue;	/* next */
             utDeleteBlanks( buf );
-            i = 0;
-            if ( ! utSafeCToI( &j, buf, i ) )
+            if ( ! utSafeCToI( &j, buf, 0 ) )
                 continue;	/* next */
 
             x = atof( buf);
@@ -1989,9 +1979,8 @@ void oppedit(void)
             if ( ch == TERM_ABORT || buf[0] == 0 )
                 continue;	/* next */
             utDeleteBlanks( buf );
-            i = 0;
 
-            if ( ! utSafeCToI( &j, buf, i ) )
+            if ( ! utSafeCToI( &j, buf, 0 ) )
                 continue;	/* next */
 
             cbPlanets[pnum].x = atof( buf );
@@ -2003,8 +1992,7 @@ void oppedit(void)
             if ( ch == TERM_ABORT || buf[0] == 0 )
                 continue;	/* next */
             utDeleteBlanks( buf );
-            i = 0;
-            if ( ! utSafeCToI( &j, buf, i ) )
+            if ( ! utSafeCToI( &j, buf, 0 ) )
                 continue;	/* next */
 
             cbPlanets[pnum].y = atof( buf );
@@ -2029,8 +2017,7 @@ void oppedit(void)
             if ( ch == TERM_ABORT || buf[0] == 0 )
                 continue;
             utDeleteBlanks( buf );
-            i = 0;
-            if ( ! utSafeCToI( &j, buf, i ) )
+            if ( ! utSafeCToI( &j, buf, 0 ) )
                 continue;
             cbPlanets[pnum].uninhabtime = j;
             break;
@@ -2049,8 +2036,7 @@ void oppedit(void)
             if ( ch == TERM_ABORT || buf[0] == 0 )
                 continue;	/* next */
             utDeleteBlanks( buf );
-            i = 0;
-            if ( ! utSafeCToI( &j, buf, i ) )
+            if ( ! utSafeCToI( &j, buf, 0 ) )
                 continue;	/* next */
 
             cbPlanets[pnum].orbrad = atof( buf );
@@ -2206,8 +2192,7 @@ void oprobot(void)
 	}
         warlike = ( ch == TERM_EXTRA );
         utDeleteBlanks( buf );
-        i = 0;
-        utSafeCToI( &num, buf, i );
+        utSafeCToI( &num, buf, 0 );
         if ( num <= 0 )
             num = 1;
     }

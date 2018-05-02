@@ -32,7 +32,8 @@
 #include <string>
 
 real     utAccurateDist( real curvel, real newvel, real acc );
-int      utSafeCToI(int *num, const char *buf, int offset);
+bool     utSafeCToI(int *num, const char *buf, int offset);
+bool     utSafeCToI(int *num, const std::string& buf, int offset = 0);
 real     utSubAngle( real a1, real a2);
 real     utAngle( real fromx, real fromy, real tox, real toy );
 void     utAppendInt(char *str, int i);

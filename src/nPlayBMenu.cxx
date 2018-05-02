@@ -149,7 +149,7 @@ static nodeStatus_t nPlayBMenuInput(int ch)
                     return NODE_OK;
                 }
                 /* ignore return status */
-                utSafeCToI( &tmpsnum, prm.buf.c_str(), 0 );
+                utSafeCToI( &tmpsnum, prm.buf );
             }
 
             if ( (tmpsnum < 0 || tmpsnum >= cbLimits.maxShips()) &&

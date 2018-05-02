@@ -146,8 +146,7 @@ void cucSendMsg( msgFrom_t from, uint16_t fromDetail, int terse, int remote )
     if (utIsDigits(buf))
     {
         /* All digits means a ship number. */
-        i = 0;
-        utSafeCToI( &j, buf, i );		/* ignore status */
+        utSafeCToI( &j, buf, 0 );		/* ignore status */
         if ( j < 0 || j >= cbLimits.maxShips() )
 	{
             mcuPutMsg( "No such ship.", MSG_LIN2 );

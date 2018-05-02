@@ -155,7 +155,7 @@ AC_SUBST(CONQGROUP)
 
 if test -n "$GXX"
 then
-	CONQ_CFLAGS="$CXXFLAGS -std=c++11 -D__NO_MATH_INLINES -fno-builtin -DNDEBUG -fno-strict-aliasing"
+	CONQ_CFLAGS="$CXXFLAGS -std=c++11 -DNDEBUG -fno-strict-aliasing"
 else
 	CONQ_CFLAGS="$CXXFLAGS -std=c++11 -DNDEBUG"
 fi

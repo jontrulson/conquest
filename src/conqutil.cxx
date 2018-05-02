@@ -766,7 +766,7 @@ real utMod360( real r )
 /*    int num, ptr */
 /*    char buf() */
 /*    flag = utSafeCToI( num, buf ptr ) */
-int utSafeCToI( int *num, const char *buf, int offset )
+bool utSafeCToI( int *num, const char *buf, int offset )
 {
     if (!buf || !num)
         return false;
@@ -775,20 +775,47 @@ int utSafeCToI( int *num, const char *buf, int offset )
 
     if (offset >= slen)
     {
+        // some code depends on this behavior
         *num = 0;
         return false;
     }
 
-    *num = atoi( &buf[offset]);
+    long rv = strtol(&buf[offset], NULL, 10);
 
-    /* If the number is the same size as the biggest integer, */
-    /*  assume that it is too big. */
-
-    if ( *num >= INT_MAX )
+    // check for validity
+    if ( rv >= INT_MAX || rv == LONG_MIN || rv == LONG_MAX)
     {
         *num = INT_MAX;
         return false;
     }
+
+    *num = (int)rv;
+
+    return ( true );
+}
+
+bool utSafeCToI( int *num, const std::string& buf, int offset )
+{
+    if (buf.empty() || !num)
+        return false;
+
+    if (offset >= buf.size())
+    {
+        // some code depends on this behavior
+        *num = 0;
+        return false;
+    }
+
+    long rv = strtol(&buf[offset], NULL, 10);
+
+    // check for validity
+    if ( rv >= INT_MAX || rv == LONG_MIN || rv == LONG_MAX)
+    {
+        *num = INT_MAX;
+        return false;
+    }
+
+    *num = int(rv);
 
     return ( true );
 }
