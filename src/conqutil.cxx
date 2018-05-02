@@ -158,6 +158,7 @@ void utAppendKilledBy(char *buf, killedBy_t kb, uint16_t detail)
 /*    utAppendShip(str , snum)  */
 void utAppendShip(char *str, int snum)
 {
+// FIXME - remove when ready
     int i;
     char ch;
 
@@ -171,6 +172,25 @@ void utAppendShip(char *str, int snum)
 
     utAppendChar(str, ch) ;
     utAppendInt(str, snum) ;
+
+    return;
+}
+
+
+void utAppendShip(std::string& str, int snum)
+{
+    int i;
+    char ch = 'S';
+
+    if ( snum >= 0 && snum < cbLimits.maxShips() )
+    {
+        i = cbShips[snum].team;
+        if ( i >= 0 && i < NUMPLAYERTEAMS )
+            ch = cbTeams[i].teamchar;
+    }
+
+    str += ch;
+    str += std::to_string(snum);
 
     return;
 }
@@ -205,6 +225,36 @@ void utAppendShipStatus(char *buf, int status)
         break;
     default:
         utAppendInt(buf, status) ;
+        break;
+    }
+    return;
+
+}
+
+void utAppendShipStatus(std::string& buf, int status)
+{
+    switch ( status )
+    {
+    case SS_OFF:
+        buf += "off";
+        break;
+    case SS_ENTERING:
+        buf += "entering";
+        break;
+    case SS_LIVE:
+        buf += "live";
+        break;
+    case SS_DYING:
+        buf += "dying";
+        break;
+    case SS_DEAD:
+        buf += "dead";
+        break;
+    case SS_RESERVED:
+        buf += "reserved";
+        break;
+    default:
+        buf += std::to_string(status);
         break;
     }
     return;

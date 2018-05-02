@@ -138,7 +138,7 @@ conquest_SOURCES = conquest.cxx c_defs.h defs.h conqdef.h cb.h \
 endif !ISMINGW
 
 conquest_LDADD = libUiGL.la libUi.la libconqclnt.la libcqsound.la \
-	libconquest.la libconqinit.la $(XLIBS) $(LEXLIB) $(YACCLIB)
+	libconquest.la libconqinit.la libfmt.la $(XLIBS) $(LEXLIB) $(YACCLIB)
 
 if TCPW
 conquestd_SOURCES = conquestd.cxx c_defs.h defs.h conqdef.h cb.h \
@@ -147,7 +147,7 @@ conquestd_LDADD = libconqserv.la libconquest.la libconqinit.la $(LEXLIB) $(YACCL
 else
 conquestd_SOURCES = conquestd.cxx c_defs.h defs.h conqdef.h cb.h \
 	context.h conqnet.h $(TCPW_H)
-conquestd_LDADD = libconqserv.la libconquest.la libconqinit.la $(LEXLIB) $(YACCLIB)
+conquestd_LDADD = libconqserv.la libconquest.la libconqinit.la libfmt.la $(LEXLIB) $(YACCLIB)
 endif
 
 conqai_SOURCES = conqai_main.cxx c_defs.h defs.h conqdef.h cb.h \

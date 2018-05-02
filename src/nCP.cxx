@@ -26,6 +26,11 @@
 //
 
 #include "c_defs.h"
+
+#include <format.h>
+#include <algorithm>
+using namespace std;
+
 #include "context.h"
 #include "global.h"
 
@@ -67,8 +72,6 @@
 
 #include "cqsound.h"
 
-#include <algorithm>
-using namespace std;
 
 /* node specific states */
 #define S_NONE         0
@@ -141,8 +144,9 @@ static real lastblast;
 static real lastphase;
 
 /* misc buffers */
-static char cbuf[BUFFER_SIZE_1024];
 static char pbuf[BUFFER_SIZE_1024];
+
+static char prmBuf[MESSAGE_SIZE];
 
 static const char *abt = "...aborted...";
 
@@ -262,7 +266,6 @@ static int _KPAngle(int ch, real *angle)
 static void _infoship( int snum, int scanner, bool doOutput )
 {
     int i, status;
-    char junk[MSGMAXLINE];
     real x, y, dis, kills, appx, appy;
     int godlike, canscan;
     static char tmpstr[BUFFER_SIZE_256];
@@ -272,7 +275,8 @@ static void _infoship( int snum, int scanner, bool doOutput )
     static time_t oldtime = 0;
     static real avgclose_rate, olddis = 0.0, oldclose_rate = 0.0;
     static int oldsnum = 0;
-
+    std::string cbuf;
+    
     godlike = false; // can never happen on the client
 
     if (doOutput)
@@ -293,18 +297,19 @@ static void _infoship( int snum, int scanner, bool doOutput )
         return;
     }
 
-    cbuf[0] = Context.lasttarg[0] = 0;
-    utAppendShip(cbuf , snum) ;
+    cbuf.clear();
+    Context.lasttarg[0] = 0;
+    utAppendShip(cbuf, snum) ;
     /* save for hudInfo */
-    utStrncpy(Context.lasttarg, cbuf, sizeof(Context.lasttarg));
+    utStrncpy(Context.lasttarg, cbuf.c_str(), sizeof(Context.lasttarg));
     hudSetInfoTarget(snum, true);
 
     if ( snum == scanner )
     {
         /* Silly Captain... */
-        strcat(cbuf, ": That's us, silly!");
+        cbuf += ": That's us, silly!";
         if (doOutput)
-            cp_putmsg( cbuf, MSG_LIN1 );
+            cp_putmsg( cbuf.c_str(), MSG_LIN1 );
         hudSetInfoTarget(-1, false);
         return;
     }
@@ -349,55 +354,53 @@ static void _infoship( int snum, int scanner, bool doOutput )
                     ( (cbShips[snum].scanned[ cbShips[scanner].team] > 0) && ! selfwar(scanner) ) );
     }
 
-    strcat(cbuf , ": ");
+    cbuf += ": ";
     if ( cbShips[snum].alias[0] != 0 )
     {
-        strcat(cbuf , cbShips[snum].alias);
-        strcat(cbuf, ", ");
+        cbuf += cbShips[snum].alias;
+        cbuf += ", ";
     }
     kills = (cbShips[snum].kills + cbShips[snum].strkills);
     if ( kills == 0.0 )
-        strcat(cbuf , "no");
+        cbuf += "no";
     else
-    {
-        sprintf( junk, "%.1f", kills );
-        strcat(cbuf , junk);
-    }
-    strcat(cbuf , " kill");
-    if ( kills != 1.0 )
-        utAppendChar(cbuf , 's');
-    if ( SCLOAKED(snum) && ( godlike || SSCANDIST(snum) ) )
-        strcat(cbuf, " (CLOAKED) ");
-    else
-        strcat(cbuf, ", ");
+        cbuf += fmt::format("{:.1f}", kills);
 
-    strcat(cbuf, "a ");
-    strcat(cbuf, cbShipTypes[cbShips[snum].shiptype].name);
-    strcat(cbuf, ", ");
+    cbuf += " kill";
+    if ( kills != 1.0 )
+        cbuf += 's';
+    if ( SCLOAKED(snum) && ( godlike || SSCANDIST(snum) ) )
+        cbuf += " (CLOAKED) ";
+    else
+        cbuf += ", ";
+
+    cbuf += "a ";
+    cbuf += cbShipTypes[cbShips[snum].shiptype].name;
+    cbuf += ", ";
 
     if ( godlike )
     {
         utAppendShipStatus(cbuf , status) ;
-        utAppendChar(cbuf , '.');
+        cbuf += '.';
     }
     else
     {
         if ( cbShips[snum].war[cbShips[scanner].team] )
-            strcat(cbuf , "at WAR.");
+            cbuf += "at WAR.";
         else
-            strcat(cbuf , "at peace.");
+            cbuf += "at peace.";
     }
 
     if (doOutput)
-        cp_putmsg( cbuf, MSG_LIN1 );
+        cp_putmsg( cbuf.c_str(), MSG_LIN1 );
 
     if ( ! SCLOAKED(snum) || cbShips[snum].warp != 0.0 )
     {
         Context.lasttdist = iround( dis ); /* save these puppies for hud info */
         Context.lasttang = iround( utAngle( x, y, appx, appy ) );
 
-        sprintf( cbuf, "Range %d, direction %d",
-                 Context.lasttdist, Context.lasttang );
+        cbuf = fmt::format("Range {0}, direction {1}",
+                           Context.lasttdist, Context.lasttang);
 
         if (UserConf.DoETAStats)
 	{
@@ -446,9 +449,8 @@ static void _infoship( int snum, int scanner, bool doOutput )
                     if (avgclose_rate <= 0.0)
 		    {		/* dist is increasing or no change,
 				   - can't ever catchup = ETA never */
-                        sprintf(tmpstr, ", ETA %s",
-                                clbETAStr(0.0, dis));
-                        strcat(cbuf, tmpstr);
+                        cbuf += ", ETA ";
+                        cbuf += clbETAStr(0.0, dis);
 		    }
                     else
 		    {		/* we are indeed closing... */
@@ -462,9 +464,8 @@ static void _infoship( int snum, int scanner, bool doOutput )
                         utLog("_infoship:\tdis(%.1f) pwarp(%.1f) = (close_rate(%.1f) / MM_PER_SEC_PER_WARP(%.1f)", dis, pwarp, close_rate, MM_PER_SEC_PER_WARP);
 #endif
 
-                        sprintf(tmpstr, ", ETA %s",
-                                clbETAStr(pwarp, dis));
-                        strcat(cbuf, tmpstr);
+                        cbuf += ", ETA ";
+                        cbuf += clbETAStr(pwarp, dis);
 		    }
 		}
                 else
@@ -484,9 +485,8 @@ static void _infoship( int snum, int scanner, bool doOutput )
                           cbShips[snum].warp
                           : 0.0));
 
-                    sprintf(tmpstr, ", ETA %s",
-                            clbETAStr(pwarp, dis));
-                    strcat(cbuf, tmpstr);
+                    cbuf += ", ETA ";
+                    cbuf += clbETAStr(pwarp, dis);
 		}
 	    }
 	} /* if do ETA stats */
@@ -494,45 +494,43 @@ static void _infoship( int snum, int scanner, bool doOutput )
     else				/* else cloaked and at w0 */
     {
         Context.lasttdist = Context.lasttang = 0;
-        cbuf[0] = 0;
+        cbuf.clear();
     }
 
     if ( canscan )
     {
-        if ( cbuf[0] != 0 )
-            strcat(cbuf,  ", ");
-        strcat(cbuf , "shields ");
+        if ( !cbuf.empty() )
+            cbuf += ", ";
+        cbuf += "shields ";
         if ( SSHUP(snum) && ! SREPAIR(snum) )
-            utAppendInt(cbuf, iround( cbShips[snum].shields ));
+            cbuf += std::to_string(iround( cbShips[snum].shields ));
         else
-            strcat(cbuf , "DOWN");
+            cbuf += "DOWN";
+
         i = iround( cbShips[snum].damage );
         if ( i > 0 )
 	{
-            if ( cbuf[0] != 0 )
-                strcat(cbuf, ", ");
-            sprintf( junk, "damage %d", i );
-            strcat(cbuf , junk);
+            if ( !cbuf.empty() )
+                cbuf += ", ";
+            cbuf += fmt::format("damage {}", i );
 	}
         i = cbShips[snum].armies;
         if ( i > 0 )
 	{
-            sprintf( junk, ", with %d arm", i );
-            strcat(cbuf , junk);
+            cbuf += fmt::format(", with {} arm", i);
             if ( i == 1 )
 	    {
-                utAppendChar(cbuf , 'y');
+                cbuf += 'y';
 	    }
             else
-                strcat(cbuf , "ies");
+                cbuf += "ies";
 	}
     }
-    if ( cbuf[0] != 0 )
+    if ( !cbuf.empty() )
     {
-        cbuf[0] = (char)toupper( cbuf[0] );
-        utAppendChar(cbuf , '.');
+        cbuf += '.';
         if (doOutput)
-            cp_putmsg( cbuf, MSG_LIN2 );
+            cp_putmsg( cbuf.c_str(), MSG_LIN2 );
     }
 
     return;
@@ -722,6 +720,7 @@ static void _infoplanet( const char *str, int pnum, int snum, bool doOutput )
 static void _dowarp( int snum, real warp )
 {
     hudClearPrompt(MSG_LIN2);
+    std::string cbuf;
 
     /* Handle ship limitations. */
 
@@ -729,8 +728,8 @@ static void _dowarp( int snum, real warp )
     if (!sendCommand(CPCMD_SETWARP, (uint16_t)warp))
         return;
 
-    sprintf( cbuf, "Warp %d.", (int) warp );
-    cp_putmsg( cbuf, MSG_LIN1 );
+    cbuf = fmt::format("Warp {}.", int(warp));
+    cp_putmsg(cbuf.c_str(), MSG_LIN1 );
 
     /* we set it locally since the server won't send it to us */
     cbShips[snum].dwarp = warp;
@@ -964,25 +963,29 @@ static void _doshields( int snum, int up )
 static void _doorbit( int snum )
 {
     int pnum;
+    std::string cbuf;
 
     if ( ( cbShips[snum].warp == ORBIT_CW ) || ( cbShips[snum].warp == ORBIT_CCW ) )
         _infoplanet( "But we are already orbiting ",
                      cbShips[snum].lockDetail, snum, true );
     else if ( ! clbFindOrbit( snum, &pnum ) )
     {
-        sprintf( cbuf, "We are not close enough to orbit, %s.",
-                 cbShips[snum].alias );
-        cp_putmsg( cbuf, MSG_LIN1 );
+        cbuf += "We are not close enough to orbit, ";
+        cbuf += cbShips[snum].alias;
+        cbuf += '.';
+        cp_putmsg( cbuf.c_str(), MSG_LIN1 );
         hudClearPrompt(MSG_LIN2);
     }
     else if ( cbShips[snum].warp > MAX_ORBIT_WARP )
     {
-        sprintf( cbuf, "We are going too fast to orbit, %s.",
-                 cbShips[snum].alias );
-        cp_putmsg( cbuf, MSG_LIN1 );
-        sprintf( cbuf, "Maximum orbital insertion velocity is warp %.1f.",
-                 oneplace(MAX_ORBIT_WARP) );
-        cp_putmsg( cbuf, MSG_LIN2 );
+        cbuf += "We are going too fast to orbit, ";
+        cbuf += cbShips[snum].alias;
+        cbuf += '.';
+        cp_putmsg( cbuf.c_str(), MSG_LIN1 );
+
+        cbuf = fmt::format("Maximum orbital insertion velocity is warp {:.1f}.",
+                           MAX_ORBIT_WARP);
+        cp_putmsg( cbuf.c_str(), MSG_LIN2 );
     }
     else
     {
@@ -1156,9 +1159,10 @@ static int _chkcoup(void)
     i = cbPlanets[pnum].uninhabtime;
     if ( i > 0 )
     {
-        sprintf( cbuf, "This planet is uninhabitable for %d more minutes.",
-                 i );
-        cp_putmsg( cbuf, MSG_LIN1 );
+        std::string cbuf =
+            fmt::format("This planet is uninhabitable for {} more minutes.",
+                        i);
+        cp_putmsg( cbuf.c_str(), MSG_LIN1 );
         return false;
     }
 
@@ -1167,13 +1171,12 @@ static int _chkcoup(void)
 
 static void _dotow(char *buf, int ch)
 {
-    int i, other;
+    int other;
     if (ch == TERM_ABORT)
         return;
-    i = 0;
-    utSafeCToI( &other, cbuf, i );		/* ignore status */
 
-    sendCommand(CPCMD_TOW, (uint16_t)other);
+    if (utSafeCToI( &other, buf, 0 ))
+        sendCommand(CPCMD_TOW, (uint16_t)other);
 
     return;
 }
@@ -1363,7 +1366,8 @@ static void _domsgto(char *buf, int ch, int terse)
 
     state = S_MSG;
     prm.preinit = false;
-    prm.buf = cbuf;
+    prm.buf = prmBuf;
+    prm.buf[0] = 0;
     prm.buflen = MESSAGE_SIZE;
     strcpy(pbuf, "> ");
     prm.pbuf = pbuf;
@@ -1757,7 +1761,7 @@ static void _dobomb(void)
 
     state = S_BOMB;
     prm.preinit = false;
-    prm.buf = cbuf;
+    prm.buf = prmBuf;
     prm.buf[0] = 0;
     prm.buflen = MSGMAXLINE;
     prm.pbuf = pbuf;
@@ -1777,6 +1781,7 @@ static void _initbeam()
     int pnum, capacity, i;
     real rkills;
     const char *lastfew="Fleet orders prohibit removing the last three armies.";
+    std::string cbuf;
 
     hudClearPrompt(MSG_LIN1);
     hudClearPrompt(MSG_LIN2);
@@ -1821,12 +1826,12 @@ static void _initbeam()
     i = cbPlanets[pnum].uninhabtime;
     if ( i > 0 )
     {
-        sprintf( cbuf, "This planet is uninhabitable for %d more minute",
-                 i );
+        cbuf = fmt::format("This planet is uninhabitable for {} more minute",
+                           i );
         if ( i != 1 )
-            utAppendChar(cbuf , 's');
-        utAppendChar(cbuf , '.');
-        cp_putmsg( cbuf, MSG_LIN1 );
+            cbuf += 's';
+        cbuf += '.';
+        cp_putmsg( cbuf.c_str(), MSG_LIN1 );
         return;
     }
 
@@ -1880,13 +1885,13 @@ static void _initbeam()
     {
         if ( downmax <= 0 )
 	{
-            strcpy(cbuf , "The arm") ;
+            cbuf = "The arm";
             if ( upmax == 1 )
-                strcat(cbuf , "y is");
+                cbuf += "y is";
             else
-                strcat(cbuf , "ies are");
-            strcat(cbuf , " reluctant to beam aboard a pirate vessel.");
-            cp_putmsg( cbuf, MSG_LIN1 );
+                cbuf += "ies are";
+            cbuf += " reluctant to beam aboard a pirate vessel.";
+            cp_putmsg( cbuf.c_str(), MSG_LIN1 );
             return;
 	}
         upmax = 0;
@@ -1907,7 +1912,7 @@ static void _initbeam()
     {                           /* need to ask beam dir... */
         state = S_BEAMDIR;
         prm.preinit = false;
-        prm.buf = cbuf;
+        prm.buf = prmBuf;
         prm.buflen = 10;
         prm.pbuf = "Beam [up or down] ";
         prm.index = MSG_LIN1;
@@ -1930,7 +1935,7 @@ static void _initbeam()
 
     state = S_BEAMNUM;
     prm.preinit = false;
-    prm.buf = cbuf;
+    prm.buf = prmBuf;
     prm.buflen = 10;
     prm.pbuf = pbuf;
     prm.index = MSG_LIN1;
@@ -2049,7 +2054,7 @@ static void command( int ch )
 	{
             state = S_DOAUTOPILOT;
             prm.preinit = false;
-            prm.buf = cbuf;
+            prm.buf = prmBuf;
             prm.buflen = MSGMAXLINE;
             prm.pbuf = "Press [TAB] to engage autopilot: ";
             prm.index = MSG_LIN1;
@@ -2066,7 +2071,7 @@ static void command( int ch )
     case 'A':				/* change allocation */
         state = S_ALLOC;
         prm.preinit = false;
-        prm.buf = cbuf;
+        prm.buf = prmBuf;
         prm.buflen = MSGMAXLINE;
         prm.pbuf = "New weapons allocation: (30-70) ";
         prm.index = MSG_LIN1;
@@ -2085,7 +2090,7 @@ static void command( int ch )
         {
             state = S_CLOAK;
             prm.preinit = false;
-            prm.buf = cbuf;
+            prm.buf = prmBuf;
             prm.buflen = MSGMAXLINE;
             prm.pbuf = "Press [TAB] to engage cloaking device: ";
             prm.index = MSG_LIN1;
@@ -2104,7 +2109,7 @@ static void command( int ch )
     case 'E':				/* emergency distress call */
         state = S_DISTRESS;
         prm.preinit = false;
-        prm.buf = cbuf;
+        prm.buf = prmBuf;
         prm.buflen = MSGMAXLINE;
         prm.pbuf = "Press [TAB] to send an emergency distress call: ";
         prm.index = MSG_LIN1;
@@ -2118,7 +2123,7 @@ static void command( int ch )
         state = S_TARGET;
         desttarg = T_PHASER;
         prm.preinit = false;
-        prm.buf = cbuf;
+        prm.buf = prmBuf;
         prm.buflen = MSGMAXLINE;
         prm.pbuf = "Fire phasers: ";
         prm.index = MSG_LIN1;
@@ -2139,7 +2144,7 @@ static void command( int ch )
     case 'i':				/* information */
         state = S_DOINFO;
         prm.preinit = false;
-        prm.buf = cbuf;
+        prm.buf = prmBuf;
         prm.buflen = MSGMAXLINE;
         prm.pbuf = "Information on: ";
         prm.index = MSG_LIN1;
@@ -2151,7 +2156,7 @@ static void command( int ch )
     case 'k':				/* set course */
         state = S_COURSE;
         prm.preinit = false;
-        prm.buf = cbuf;
+        prm.buf = prmBuf;
         prm.buflen = MSGMAXLINE;
         prm.pbuf = "Come to course: ";
         prm.index = MSG_LIN1;
@@ -2164,7 +2169,7 @@ static void command( int ch )
         {
             state = S_COUP;
             prm.preinit = false;
-            prm.buf = cbuf;
+            prm.buf = prmBuf;
             prm.buflen = MSGMAXLINE;
             prm.pbuf = "Press [TAB] to try it: ";
             prm.index = MSG_LIN1;
@@ -2179,7 +2184,7 @@ static void command( int ch )
     case 'm':				/* send a message */
         state = S_MSGTO;
         prm.preinit = false;
-        prm.buf = cbuf;
+        prm.buf = prmBuf;
         prm.buflen = MSGMAXLINE;
         strcpy(pbuf, "Message to: ");
         prm.pbuf = pbuf;
@@ -2200,7 +2205,7 @@ static void command( int ch )
         cp_putmsg(pbuf, MSG_LIN1);
         state = S_PSEUDO;
         prm.preinit = false;
-        prm.buf = cbuf;
+        prm.buf = prmBuf;
         prm.buflen = MAXUSERNAME;
         prm.pbuf = "Enter a new pseudonym: ";
         prm.index = MSG_LIN2;
@@ -2222,7 +2227,7 @@ static void command( int ch )
         state = S_TARGET;
         desttarg = T_BURST;
         prm.preinit = false;
-        prm.buf = cbuf;
+        prm.buf = prmBuf;
         prm.buflen = MSGMAXLINE;
         prm.pbuf = "Torpedo burst: ";
         prm.index = MSG_LIN1;
@@ -2236,7 +2241,7 @@ static void command( int ch )
         state = S_TARGET;
         desttarg = T_TORP;
         prm.preinit = false;
-        prm.buf = cbuf;
+        prm.buf = prmBuf;
         prm.buflen = MSGMAXLINE;
         prm.pbuf = "Launch torpedo: ";
         prm.index = MSG_LIN1;
@@ -2255,7 +2260,7 @@ static void command( int ch )
         {
             state = S_DESTRUCT;
             prm.preinit = false;
-            prm.buf = cbuf;
+            prm.buf = prmBuf;
             prm.buflen = MSGMAXLINE;
             prm.pbuf = "Press [TAB] to initiate self-destruct sequence: ";
             prm.index = MSG_LIN1;
@@ -2271,7 +2276,7 @@ static void command( int ch )
             {
                 state = S_REFIT;
                 prm.preinit = false;
-                prm.buf = cbuf;
+                prm.buf = prmBuf;
                 prm.buflen = MSGMAXLINE;
                 refitst = cbShips[Context.snum].shiptype;
                 sprintf(pbuf, "Refit ship type: %s", cbShipTypes[refitst].name);
@@ -2297,7 +2302,7 @@ static void command( int ch )
         {
             state = S_TOW;
             prm.preinit = false;
-            prm.buf = cbuf;
+            prm.buf = prmBuf;
             prm.buflen = MSGMAXLINE;
             prm.pbuf = "Tow which ship? ";
             prm.index = MSG_LIN1;
@@ -2329,7 +2334,7 @@ static void command( int ch )
 
         state = S_WAR;
         prm.preinit = false;
-        prm.buf = cbuf;
+        prm.buf = prmBuf;
         prm.buflen = 5;
         prm.pbuf = clbWarPrompt(Context.snum, twar);
         prm.index = MSG_LIN1;
@@ -2444,8 +2449,7 @@ static void command( int ch )
 
     case TERM_NORMAL:		/* Have [ENTER] act like 'I[ENTER]'  */
     case '\n':
-        cbuf[0] = 0;
-        _doinfo(cbuf, TERM_NORMAL, true);
+        _doinfo(NULL, TERM_NORMAL, true);
         break;
 
         /* ack red alert by turning klaxon off  Cataboligne -
@@ -2464,8 +2468,7 @@ static void command( int ch )
         break;
 
     case TERM_EXTRA:		/* Have [TAB] act like 'i\t' */
-        cbuf[0] = 0;
-        _doinfo(cbuf, TERM_EXTRA, true);
+        _doinfo(NULL, TERM_EXTRA, true);
         break;
 
     case TERM_RELOAD:		/* have server resend current universe */
@@ -3316,7 +3319,7 @@ static nodeStatus_t nCPInput(int ch)
                      beamax );
             state = S_BEAMNUM;
             prm.preinit = false;
-            prm.buf = cbuf;
+            prm.buf = prmBuf;
             prm.buflen = 10;
             prm.pbuf = pbuf;
             prm.index = MSG_LIN1;

@@ -29,14 +29,18 @@
 #ifndef _CONQUTIL_H
 #define _CONQUTIL_H
 
+#include <string>
+
 real     utAccurateDist( real curvel, real newvel, real acc );
 int      utSafeCToI(int *num, char *buf, int offset);
 real     utSubAngle( real a1, real a2);
 real     utAngle( real fromx, real fromy, real tox, real toy );
 void     utAppendInt(char *str, int i);
 void     utAppendShipStatus(char *buf, int status);
+void     utAppendShipStatus(std::string& buf, int status);
 void     utAppendTitle(char *buf, int team);
 void     utAppendShip(char *str, int snum);
+void     utAppendShip(std::string& str, int snum);
 void     utAppendKilledBy(char *buf, killedBy_t kb, uint16_t detail);
 int      utArrowsToDir( char *str, real *dir );
 void     utSetLogConfig(int usesys, int echostderr);
