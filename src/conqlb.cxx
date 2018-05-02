@@ -1038,7 +1038,7 @@ void clbStatline( int unum, char *buf )
 
     strcpy(tname, cbUsers[unum].username);
 
-    sprintf( junk, "%-12s %4s %4d %4d %4d",
+    sprintf( junk, "%-12.12s %4s %4d %4d %4d",
              tname,
              percent,
              cbUsers[unum].stats[USTAT_CONQUERS],
