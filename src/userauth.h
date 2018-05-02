@@ -30,8 +30,6 @@
 
 #include "conqdef.h"
 
-#define MAX_USERLEN 10		/* only 10 chars for users */
-
 int checkuname(const char *username);
 
 #endif /* USERAUTH_H_INCLUDED */
