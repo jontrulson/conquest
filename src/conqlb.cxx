@@ -2251,7 +2251,7 @@ real clbNewWarp( int snum, real dwarp )
 /*    char str() */
 /*    int status, godlike */
 /*    status = clbPlanetMatch( str, pnum, godlike ) */
-int clbPlanetMatch( char *str, int *pnum, int godlike )
+int clbPlanetMatch( const char *str, int *pnum, int godlike )
 {
     if ( godlike )
     {

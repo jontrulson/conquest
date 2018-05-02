@@ -52,7 +52,6 @@ static killedBy_t kb;                  /* killed by... */
 static uint16_t detail;
 static const char *ywkb="You were killed by ";
 static char buf[128], cbuf[BUFFER_SIZE_1024];
-static char lastwords[MAXLASTWORDS];
 static Ship_t eShip = {}; /* copy of killers ship, if killed by ship */
 
 #define S_PRESSANY  0           /* press any key... */
@@ -100,9 +99,8 @@ void nDeadInit(void)
         state = S_LASTWORDS;
 
         prm.preinit = false;
-        prm.buf = lastwords;
-        prm.buflen = MAXLASTWORDS - 1;
-        prm.buf[0] = 0;
+        prm.buf.clear();
+        prm.buflen = MAXLASTWORDS;
     }
 
 
@@ -265,16 +263,16 @@ static nodeStatus_t nDeadDisplay(dspConfig_t *dsp)
         if (state == S_LASTWORDS)
         {
             cprintf(14, 0, ALIGN_LEFT, "#%d#Any last words? #%d#%s",
-                    CyanColor, NoColor, prm.buf);
+                    CyanColor, NoColor, prm.buf.c_str());
         }
         if (state == S_LASTWCONF)
         {
-            if (prm.buf[0] != 0)
+            if (!prm.buf.empty())
             {
                 cprintf( 13,0,ALIGN_CENTER, "#%d#%s",
                          InfoColor, "Your last words are entered as:");
                 cprintf( 14,0,ALIGN_CENTER, "#%d#%c%s%c",
-                         YellowLevelColor, '"', prm.buf, '"' );
+                         YellowLevelColor, '"', prm.buf.c_str(), '"' );
             }
             else
                 cprintf( 14,0,ALIGN_CENTER,"#%d#%s", InfoColor,
@@ -325,7 +323,7 @@ static nodeStatus_t nDeadInput(int ch)
 
         break;
     case S_LASTWORDS:
-        irv = prmProcInput(&prm, ch);
+        irv = prmProcInput(prm, ch);
         if (irv > 0)
             state = S_LASTWCONF;
 
@@ -334,14 +332,14 @@ static nodeStatus_t nDeadInput(int ch)
     case S_LASTWCONF:
         if (ch == TERM_EXTRA)
         {                       /* we are done */
-            sendMessage(MSG_TO_GOD, 0, lastwords);
+            sendMessage(MSG_TO_GOD, 0, prm.buf.c_str());
             setONode(NULL);
             nMenuInit();
         }
         else
         {                       /* back to the drawing board */
             state = S_LASTWORDS;
-            prm.buf[0] = 0;
+            prm.buf.clear();
         }
 
         break;

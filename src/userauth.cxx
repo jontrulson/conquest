@@ -39,9 +39,9 @@
 #define MAX_USERLEN 10		/* only 10 chars for users */
 
 /* check the validity of a supplied username */
-int checkuname(char *username)
+int checkuname(const char *username)
 {
-    char *s = username;
+    const char *s = username;
 
     while (*s)
     {

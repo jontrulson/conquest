@@ -744,10 +744,10 @@ int SaveSysConfig(void)
 }
 
 /* process a string value - converts it into a macro string */
-char *Str2Macro(char *str)
+const char *Str2Macro(const char *str)
 {
     static char retstr[BUFFER_SIZE_256];
-    char *s;
+    const char *s;
     int i;
 
     i = 0;

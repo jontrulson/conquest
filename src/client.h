@@ -89,10 +89,10 @@ int             sendAuth(int sock, uint8_t flag, const char *login,
 int             sendSetCourse(int sock, courseLock_t lock, uint16_t lockDetail,
                               real head);
 
-int             sendSetName(char *name);
+int             sendSetName(const char *name);
 int             sendCommand(uint8_t cmd, uint16_t detail);
 int             sendFireTorps(int num, real dir);
-int             sendMessage(msgTo_t to, uint16_t toDetail, char *msg);
+int             sendMessage(msgTo_t to, uint16_t toDetail, const char *msg);
 
 int             clientHello(const char *clientname);
 

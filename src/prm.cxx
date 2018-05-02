@@ -26,30 +26,29 @@
 //
 
 #include "c_defs.h"
-#include "global.h"
 
-#include "color.h"
-#include "gldisplay.h"
-#include "glmisc.h"
 #include "prm.h"
 
-int prmProcInput(prm_t *prm, int ch)
+int prmProcInput(prm_t& prm, int ch)
 {
     char c = (ch & 0xff);         /* 8bit equiv */
-    int clen = strlen(prm->buf);
 
     if (strchr(TERMS, ch ))
         return ch;                  /* you're terminated */
 
-    if ((clen >= (prm->buflen - 1)) && isprint(c))
+    bool isPrintable = isprint(c);
+    if ((prm.buf.size() >= prm.buflen) && isPrintable)
         return PRM_MAXLEN;           /* buf is full */
 
     /* check for preinit */
-    if (prm->preinit && ch != TERM_NORMAL && ch != TERM_EXTRA && isprint(c))
+
+    // TODO - detect difference between typing a char on a pre-init,
+    // vs. deleting (editing) and typing a char.  Right now, any
+    // printable on a preinit prompt clears the whole buffer.
+    if (prm.preinit && ch != TERM_NORMAL && ch != TERM_EXTRA && isPrintable)
     {
-        prm->buf[0] = c;
-        prm->buf[1] = 0;
-        prm->preinit = false;
+        prm.buf = c;
+        prm.preinit = false;
 
         return PRM_OK;
     }
@@ -57,10 +56,9 @@ int prmProcInput(prm_t *prm, int ch)
     /* editing */
     if ( ch == '\b' || ch == 0x7f )
     {
-        if ( clen > 0 )
+        if ( !prm.buf.empty() )
         {
-            clen--;
-            prm->buf[clen] = 0;
+            prm.buf.pop_back();
 
             return PRM_OK;
         }
@@ -68,44 +66,42 @@ int prmProcInput(prm_t *prm, int ch)
     else if ( ch == 0x17 )	/* ^W */
     {
         /* Delete the last word. */
-        if ( clen > 0 )
+        if ( !prm.buf.empty() )
         {
-            /* Back up over blanks. */
-            while ( clen >= 0 )
-                if ( prm->buf[clen] == ' ' )
-                    clen--;
-                else
-                    break;
+            // delete any trailing spaces...
+            while ( !prm.buf.empty() && prm.buf[prm.buf.size() - 1] == ' ')
+                prm.buf.pop_back();
 
-            /* Back up over non-blanks. */
-            while ( clen >= 0 )
-                if ( prm->buf[clen] == ' ' )
-                    break;
-                else
-                    clen--;
+            // if the string is empty, we're done
+            if (prm.buf.empty())
+                return PRM_OK;
 
-            if (clen < 0 )
+            // now look for the last space in the string
+            size_t found = prm.buf.rfind(' ');
+
+            if (found == std::string::npos)
             {
-                clen = 0;
+                // not found, so clear the whole string
+                prm.buf.clear();
+            }
+            else
+            {
+                // delete everything at and after that point...
+                prm.buf.erase(found);
             }
 
-            prm->buf[clen] = 0;
+            return PRM_OK;
         }
     }
     else if ( ch == 0x15 || ch == 0x18 ) /* ^U || ^X  - clear line */
     {
-        if ( clen > 0 )
-        {
-            clen = 0;
-            prm->buf[clen] = 0;
-        }
+        prm.buf.clear();
     }
-    else if (!isprint(c))
-        mglBeep(MGL_BEEP_ERR);
     else
     {
-        prm->buf[clen] = c;
-        prm->buf[clen + 1] = 0;
+        // add the new character if it's a printable...
+        if (isPrintable)
+            prm.buf += c;
     }
 
     return PRM_OK;

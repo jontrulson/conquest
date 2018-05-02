@@ -227,7 +227,7 @@ int GetConf(int usernum);
 int MakeSysConf(void);
 int SaveUserConfig(void);
 int SaveSysConfig(void);
-char *Str2Macro(char *str);
+const char *Str2Macro(const char *str);
 char *Macro2Str(char *str);
 char *process_macrostr(char *str);
 int process_bool(char *bufptr);

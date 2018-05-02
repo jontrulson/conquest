@@ -26,6 +26,11 @@
 //
 
 #include "c_defs.h"
+
+#include <algorithm>
+using namespace std;
+#include "format.h"
+
 #include "conqdef.h"
 #include "cb.h"
 #include "global.h"
@@ -34,8 +39,6 @@
 #include "conqlb.h"
 #include "conqutil.h"
 
-#include <algorithm>
-using namespace std;
 
 /* if set, utLog uses the system log, else it is created in HOME */
 static int systemlog   = true;
@@ -189,8 +192,7 @@ void utAppendShip(std::string& str, int snum)
             ch = cbTeams[i].teamchar;
     }
 
-    str += ch;
-    str += std::to_string(snum);
+    str += fmt::format("{}{}", ch, snum);
 
     return;
 }
@@ -291,7 +293,7 @@ void utAppendTitle(char *buf, int team)
 
 
 /*  utArrowsToDir - interpret arrow keys */
-int utArrowsToDir( char *str, real *dir )
+int utArrowsToDir( const char *str, real *dir )
 {
     int i, n;
     real thedir, ndir, ndir1, ndir2;
@@ -497,6 +499,15 @@ void utDeleteBlanks( char *str )
 
     return;
 
+}
+
+void utDeleteBlanks( std::string& str )
+{
+    if (str.empty())
+        return;
+
+    str.erase(std::remove(str.begin(), str.end(), ' '), str.end());
+    return;
 }
 
 
@@ -755,7 +766,7 @@ real utMod360( real r )
 /*    int num, ptr */
 /*    char buf() */
 /*    flag = utSafeCToI( num, buf ptr ) */
-int utSafeCToI( int *num, char *buf, int offset )
+int utSafeCToI( int *num, const char *buf, int offset )
 {
     if (!buf || !num)
         return false;
@@ -789,7 +800,7 @@ int utSafeCToI( int *num, char *buf, int offset )
 /*    int what, token, count */
 /*    int flag, special */
 /*    flag = utIsSpecial( str, what, token, count ) */
-int utIsSpecial( char *str, int *what, int *token, int *count )
+int utIsSpecial( const char *str, int *what, int *token, int *count )
 {
     int i;
     char buf[20];
@@ -1041,6 +1052,11 @@ bool utIsDigits(const char *buf)
     }
 
     return true;
+}
+
+bool utIsDigits(std::string& str)
+{
+    return std::all_of(str.begin(), str.end(), ::isdigit);
 }
 
 /* upcase a string */

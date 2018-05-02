@@ -27,6 +27,10 @@
 
 
 #include "c_defs.h"
+
+#include <string>
+#include "format.h"
+
 #include "context.h"
 #include "global.h"
 
@@ -80,9 +84,6 @@ static int state;
 /* the current prompt */
 static prm_t prm;
 static int prompting = false;
-
-/* misc buffers */
-static char cbuf[BUFFER_SIZE_1024];
 
 static int live_ships = true;
 static int old_snum = 1;
@@ -248,7 +249,8 @@ static nodeStatus_t nPlayBDisplay(dspConfig_t *dsp)
     mglOverlayQuad();             /* render the overlay bg */
 
     if (prompting)
-        hudSetPrompt(prm.index, prm.pbuf, NoColor, prm.buf, CyanColor);
+        hudSetPrompt(prm.index, prm.pbuf.c_str(), NoColor,
+                     prm.buf.c_str(), CyanColor);
 
     return NODE_OK;
 }
@@ -294,7 +296,7 @@ static nodeStatus_t nPlayBInput(int ch)
     if (prompting)
     {
         int tmpsnum;
-        irv = prmProcInput(&prm, ch);
+        irv = prmProcInput(prm, ch);
 
         if (irv > 0)
         {
@@ -307,8 +309,8 @@ static nodeStatus_t nPlayBInput(int ch)
             }
 
             utDeleteBlanks( prm.buf );
-            if ( strlen( prm.buf ) == 0 )
-            {              /* watch doomsday machine */
+            if ( prm.buf.empty() )
+            {
                     nss = "No such ship.";
                     prompting = false;
                     return NODE_OK;
@@ -323,7 +325,8 @@ static nodeStatus_t nPlayBInput(int ch)
                     nss = "No such ship.";
                     return NODE_OK;
                 }
-                utSafeCToI( &tmpsnum, prm.buf, 0 );     /* ignore return status */
+                /* ignore return status */
+                utSafeCToI( &tmpsnum, prm.buf.c_str(), 0 );
             }
 
             if ( tmpsnum < 0 || tmpsnum >= cbLimits.maxShips() )
@@ -441,21 +444,20 @@ static nodeStatus_t nPlayBInput(int ch)
         if (recFileHeader.snum == 0
             && recFileHeader.vers == RECVERSION_20031004)
         {
-            cbuf[0] = 0;
+            prm.buf.clear();
             prm.preinit = false;
 
         }
         else
         {
             // for older protocols, compensate for 0-based cbShips[]
-            sprintf(cbuf, "%d",
-                    (recFileHeader.protoVers <= 0x0006) ?
-                    recFileHeader.snum - 1:
-                    recFileHeader.snum);
+            int ship = ((recFileHeader.protoVers <= 0x0006) ?
+                        recFileHeader.snum - 1: recFileHeader.snum);
+
+            prm.buf = fmt::format("{}", ship);
             prm.preinit = true;
         }
 
-        prm.buf = cbuf;
         prm.buflen = MSGMAXLINE;
         prm.pbuf = "Watch which ship? ";
         prm.index = 20;

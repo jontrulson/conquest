@@ -32,7 +32,7 @@
 #include <string>
 
 real     utAccurateDist( real curvel, real newvel, real acc );
-int      utSafeCToI(int *num, char *buf, int offset);
+int      utSafeCToI(int *num, const char *buf, int offset);
 real     utSubAngle( real a1, real a2);
 real     utAngle( real fromx, real fromy, real tox, real toy );
 void     utAppendInt(char *str, int i);
@@ -42,7 +42,7 @@ void     utAppendTitle(char *buf, int team);
 void     utAppendShip(char *str, int snum);
 void     utAppendShip(std::string& str, int snum);
 void     utAppendKilledBy(char *buf, killedBy_t kb, uint16_t detail);
-int      utArrowsToDir( char *str, real *dir );
+int      utArrowsToDir( const char *str, real *dir );
 void     utSetLogConfig(int usesys, int echostderr);
 
 // we want special format checks on this one
@@ -50,6 +50,7 @@ void     utLog(const char *fmt, ...)
     __attribute__ ((format (printf, 1, 2)));
 
 void     utDeleteBlanks( char *str );
+void     utDeleteBlanks( std::string& str );
 time_t   utDeltaSecs( time_t s, time_t *n );
 real     utExplosionHits( real basehits, real dis );
 void     utFormatMinutes( int itime, char *buf );
@@ -60,13 +61,14 @@ uint64_t utDeltaGrand(uint64_t s, uint64_t *n);
 void     utGrand( uint64_t *h );
 void     utGetSecs( time_t *s );
 real     utMod360( real r );
-int      utIsSpecial( char *str, int *what, int *token, int *count );
+int      utIsSpecial( const char *str, int *what, int *token, int *count );
 void     utStrncpy( char *to, const char *from, unsigned int tosize );
 void     utStrncat( char *to, const char *from, unsigned int tosize );
 int      utStringMatch( const char *str1, const char *str2, int casesensitive );
 char     *utGetPath(const char *thepath);
 void     utSleep(real seconds);
 bool     utIsDigits(const char *buf);
+bool     utIsDigits(std::string& str);
 void     utToUpperCase(char *buf);
 void     utAppendChar(char *buf, char ch);
 

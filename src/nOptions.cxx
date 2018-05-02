@@ -26,6 +26,10 @@
 //
 
 #include "c_defs.h"
+
+#include <string>
+#include <format.h>
+
 #include "context.h"
 #include "global.h"
 
@@ -66,8 +70,6 @@ static int state;
 static prm_t prm;
 static int prompting;
 
-static char cbuf[BUFFER_SIZE_256];
-
 static const char *pwp = "Password: ";
 static const char *rpwp = "Retype Password: ";
 static const char *phelper = "Use any printable characters.";
@@ -96,6 +98,7 @@ static int flin, llin, clin, pages, curpage;
 static const int items_per_page = 18;
 
 #define MAXOPTCOLS 128
+// FIXME make this a std::vector
 static int cvec[MAXOPTCOLS];         /* hopefully big enough */
 static int maxuopts;
 static int maxsopts = 0;        /* not impl yet */
@@ -158,44 +161,47 @@ static void quitNode(void)
 
 static void _changePasswd(int init)
 {
-    static char pw[MAXUSERNAME], rpw[MAXUSERNAME];
+    static std::string pw;
 
     if (init)
     {                           /* start prompting */
         prm.pbuf = pwp;
-        pw[0] = 0;
-        prm.buf = pw;
+        pw.clear();
+        prm.buf.clear();
 
         prm.preinit = false;
-        prm.buflen = MAXUSERNAME - 1;
+        prm.buflen = MAXUSERNAME;
         prm.index = MSG_LIN1;
         prompting = true;
     }
     else
     {
         if (state == S_GETPW)
-        {                       /* got the pw, set up for the retry */
+        {
+            // got the pw, save it and set up for the retry
+            pw = prm.buf;
+
             state = S_GETRPW;
             prm.pbuf = rpwp;
-            rpw[0] = 0;
-            prm.buf = rpw;
+            prm.buf.clear();
 
             prm.preinit = false;
-            prm.buflen = MAXUSERNAME - 1;
+            prm.buflen = MAXUSERNAME;
             prm.index = MSG_LIN1;
             prompting = true;
         }
         else
         {                       /* done. do a compare and send new pw
                                    if they match */
-            if (strcmp(pw, rpw) != 0)
+            if (pw != prm.buf)
             {                       /* pw's don't match */
                 mglBeep(MGL_BEEP_ERR);
                 state = S_USRMENU;
+                prompting = false;
                 return;
             }
             else
-                sendAuth(cInfo.sock, CPAUTH_CHGPWD, "", pw);
+                sendAuth(cInfo.sock, CPAUTH_CHGPWD, "", pw.c_str());
 
             prompting = false;
             state = S_USRMENU;
@@ -209,25 +215,21 @@ static void _changePasswd(int init)
 static void _changeMacro(int macronum, int init)
 {
     int lin;
-    static char prmpt[BUFFER_SIZE_256];
     lin = MSG_LIN1;
 
     if (init)
     {                           /* start prompting */
-        sprintf(prmpt, "f%2d = ", macronum);
-        strcpy(cbuf, Macro2Str(UserConf.MacrosF[macronum - 1]));
-
         prm.preinit = true;
-        prm.buf = cbuf;
-        prm.buflen = MAX_MACRO_LEN - 1;
-        prm.pbuf = prmpt;
+        prm.buf = Macro2Str(UserConf.MacrosF[macronum - 1]);
+        prm.buflen = MAX_MACRO_LEN;
+        prm.pbuf = fmt::format("f{:2d} = ", macronum);
         prm.index = lin;
         prompting = true;
 
     }
     else
     {                           /* change it for real */
-        utStrncpy(UserConf.MacrosF[macronum - 1], Str2Macro(prm.buf),
+        utStrncpy(UserConf.MacrosF[macronum - 1], Str2Macro(prm.buf.c_str()),
                   MAX_MACRO_LEN);
     }
 
@@ -238,37 +240,33 @@ static void _changeMouse(int mousevec, int init)
 {
     int lin;
     uint32_t mod, but;
-    static char prmpt[BUFFER_SIZE_256];
-    static char modstr[16];
+    static std::string modstr;
     lin = MSG_LIN1;
 
     VEC2MOUSE(mousevec, but, mod);
 
     if (init)
     {                           /* start prompting */
-        modstr[0] = 0;
+        modstr.clear();
 
         if (mod & (CQ_KEY_MOD_CTRL  >> CQ_MODIFIER_SHIFT))
-            strcat(modstr, "c");
+            modstr += 'c';
         if (mod & (CQ_KEY_MOD_SHIFT >> CQ_MODIFIER_SHIFT))
-            strcat(modstr, "s");
+            modstr += 's';
         if (mod & (CQ_KEY_MOD_ALT   >> CQ_MODIFIER_SHIFT))
-            strcat(modstr, "a");
-
-        sprintf(prmpt, "%3s%2d = ", modstr, but);
-        strcpy(cbuf, Macro2Str(UserConf.Mouse[but][mod]));
+            modstr += 'a';
 
         prm.preinit = true;
-        prm.buf = cbuf;
-        prm.buflen = MAX_MACRO_LEN - 1;
-        prm.pbuf = prmpt;
+        prm.buf = Macro2Str(UserConf.Mouse[but][mod]);
+        prm.buflen = MAX_MACRO_LEN;
+        prm.pbuf = fmt::format("{:>3}{:2d} =", modstr, but);
         prm.index = lin;
         prompting = true;
 
     }
     else
     {                           /* change it for real */
-        utStrncpy(UserConf.Mouse[but][mod], Str2Macro(prm.buf),
+        utStrncpy(UserConf.Mouse[but][mod], Str2Macro(prm.buf.c_str()),
                   MAX_MACRO_LEN);
     }
 
@@ -277,7 +275,6 @@ static void _changeMouse(int mousevec, int init)
 
 static void _changeOption(struct Conf *cdata, int init)
 {
-#define CBUFLEN 128
     int j;
 
     switch(cdata->ConfType)
@@ -296,25 +293,18 @@ static void _changeOption(struct Conf *cdata, int init)
 
         /* these will need prompting */
     case CTYPE_STRING:
-        if (cdata->max > CBUFLEN)
-	{
-            utLog("_changeOption: conf data max exceeds local buffer size.");
-            break;
-	}
-
         if (init)
         {
             prm.preinit = true;
-            utStrncpy(cbuf, ((char *)cdata->ConfValue), CBUFLEN);
-            prm.buf = cbuf;
-            prm.buflen = cdata->max - 1;
+            prm.buf = ((char *)cdata->ConfValue);
+            prm.buflen = cdata->max;
             prm.pbuf = "Value: ";
             prm.index = MSG_LIN1;
             prompting = true;
         }
         else
         {
-            utStrncpy((char *)cdata->ConfValue, prm.buf, cdata->max);
+            utStrncpy((char *)cdata->ConfValue, prm.buf.c_str(), cdata->max);
         }
 
         break;
@@ -323,8 +313,7 @@ static void _changeOption(struct Conf *cdata, int init)
         if (init)
         {
             prm.preinit = true;
-            sprintf(cbuf, "%d", *(int *)(cdata->ConfValue));
-            prm.buf = cbuf;
+            prm.buf = fmt::format("{}", *(int *)(cdata->ConfValue));
             prm.buflen = 20;
             prm.pbuf = "Enter a number: ";
             prm.index = MSG_LIN1;
@@ -334,7 +323,7 @@ static void _changeOption(struct Conf *cdata, int init)
         {
             if (utIsDigits(prm.buf))
             {
-                int j = atoi(prm.buf);
+                int j = atoi(prm.buf.c_str());
                 if (j >= cdata->min && j <= cdata->max)
                     *(int *)(cdata->ConfValue) = j;
             }
@@ -362,6 +351,7 @@ static void _dispUserOptsMenu(void)
     static const uint32_t udpUpdateDelay = 1000; // 1 second update rate
     uint32_t currentMillis = cInfo.nodeMillis;
 
+    // FIXME - these checks should be moved somewhere else?
     if (macroptr == NULL)
     {				/* if this happens, something is
 				   seriously confused */
@@ -605,8 +595,8 @@ static void _showOptScreen(void)
         break;
     }
 
-    sprintf(header2buf, header2fmt, curpage + 1, pages);
-    sprintf(headerbuf, "%s %s", header, header2buf);
+    snprintf(header2buf, BUFFER_SIZE_256, header2fmt, curpage + 1, pages);
+    snprintf(headerbuf, BUFFER_SIZE_256, "%s %s", header, header2buf);
 
     lin = 1;
     cprintf(lin, 0, ALIGN_CENTER, "#%d#%s", NoColor, headerbuf);
@@ -655,21 +645,21 @@ static void _showOptScreen(void)
 
         if (state == S_MOUSE)
         {
-            static char modstr[16];
+            static std::string modstr;
             uint32_t mod, but;
 
             /* get the mouse macro number for this line */
             k = (curpage * items_per_page) + i;
 
             VEC2MOUSE(k, but, mod);
-            modstr[0] = 0;
+            modstr.clear();
 
             if (mod & (CQ_KEY_MOD_CTRL  >> CQ_MODIFIER_SHIFT))
-                strcat(modstr, "c");
+                modstr += 'c';
             if (mod & (CQ_KEY_MOD_SHIFT >> CQ_MODIFIER_SHIFT))
-                strcat(modstr, "s");
+                modstr += 's';
             if (mod & (CQ_KEY_MOD_ALT   >> CQ_MODIFIER_SHIFT))
-                strcat(modstr, "a");
+                modstr += 'a';
 
             if (mousevec[k][0] == 0)
             {			/* not defined */
@@ -692,7 +682,7 @@ static void _showOptScreen(void)
 #endif
             cprintf(lin, col, ALIGN_NONE, "#%d#%3s%2d = #%d#%s#%d#",
                     (k == ((curpage * items_per_page) + clin)) ? RedColor : InfoColor,
-                    modstr, but, vattrib,
+                    modstr.c_str(), but, vattrib,
                     dispmac,
                     NoColor);
 
@@ -850,7 +840,7 @@ static nodeStatus_t nOptionsDisplay(dspConfig_t *dsp)
     {
         cprintf(MSG_LIN1, 1, ALIGN_NONE, "#%d#%s%c",
                 CyanColor,
-                prm.pbuf,
+                prm.pbuf.c_str(),
                 cursor);
 
         cprintf(MSG_LIN2, 0, ALIGN_NONE, "#%d#%s",
@@ -864,7 +854,8 @@ static nodeStatus_t nOptionsDisplay(dspConfig_t *dsp)
         if (prompting)
         {
             cprintf(prm.index, 0, ALIGN_NONE, "#%d#%s #%d#%s%c",
-                    InfoColor, prm.pbuf, MagentaColor, prm.buf, cursor);
+                    InfoColor, prm.pbuf.c_str(), MagentaColor,
+                    prm.buf.c_str(), cursor);
 
             if (state == S_MACROS)
                 cprintf(MSG_LIN2, 0, ALIGN_NONE, "#%d#%s",
@@ -888,6 +879,7 @@ static nodeStatus_t nOptionsIdle(void)
     static int old = 0;
 
     /* 'blink' the cursor */
+    // FIXME - should use a blinker here
     if ((gtime - old) > 250)
     {
         if (cursor == ' ')
@@ -901,7 +893,8 @@ static nodeStatus_t nOptionsIdle(void)
     if ((state == S_SYSMENU) || (state == S_SOPTS))
         return NODE_OK;             /* don't process packets in sys modes */
 
-    if ((retnode == DSP_NODE_CP) && (clientStatLastFlags & SPCLNTSTAT_FLAG_KILLED))
+    if ((retnode == DSP_NODE_CP)
+        && (clientStatLastFlags & SPCLNTSTAT_FLAG_KILLED))
     {
         /* if we were flying, time to die properly. */
         setONode(NULL);
@@ -920,7 +913,7 @@ static nodeStatus_t nOptionsInput(int ch)
 
     if (prompting)
     {
-        irv = prmProcInput(&prm, ch);
+        irv = prmProcInput(prm, ch);
 
         switch (state)
         {
@@ -1012,7 +1005,8 @@ static nodeStatus_t nOptionsInput(int ch)
 
     if (state == S_UOPTS || state == S_MACROS || state == S_MOUSE)
     {
-        int maxitms = ((state == S_UOPTS) ? maxuopts : ((state == S_MACROS) ? MAX_MACROS : MAX_MOUSE));
+        int maxitms =
+            ((state == S_UOPTS) ? maxuopts : ((state == S_MACROS) ? MAX_MACROS : MAX_MOUSE));
 
         switch(ch)
 	{

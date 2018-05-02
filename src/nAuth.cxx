@@ -27,6 +27,10 @@
 
 
 #include "c_defs.h"
+
+#include <vector>
+#include <string>
+
 #include "context.h"
 #include "global.h"
 
@@ -49,9 +53,6 @@
 #include "GL.h"
 #include "blinker.h"
 
-#include <vector>
-#include <string>
-
 static const char *unamep = "Username:";
 static const char *pwp = "Password:";
 static const char *rpwp = "Retype Password:";
@@ -65,10 +66,8 @@ static char cursor = ' ';       /* the cursor */
 /* the current prompt */
 static prm_t prm;
 
-#define YN_BUFLEN  10
-static char ynbuf[YN_BUFLEN];
-
-static char nm[MAXUSERNAME], pw[MAXUSERNAME], pwr[MAXUSERNAME];
+// storage for name and pw
+static std::string nm, pw;
 
 static const char *statlin = NULL;
 static const char *errlin = NULL;
@@ -178,11 +177,12 @@ static void dispServerInfo(int tlin)
 
 void nAuthInit(void)
 {
-    ynbuf[0] = pw[0] = pwr[0] = nm[0] = 0;
+    pw.clear();
+    nm.clear();
 
     state = S_GETUNAME;           /* initial state */
     prm.preinit = false;
-    prm.buf = nm;
+    prm.buf.clear();
     prm.buflen = MAX_USERLEN;
     prm.pbuf = unamep;
 
@@ -245,10 +245,12 @@ static nodeStatus_t nAuthDisplay(dspConfig_t *dsp)
 
     cprintf(slin, 1, ALIGN_LEFT, "#%d#%s",
             CyanColor,
-            unamep);
+            unamep); 
+
     cprintf(slin, 11, ALIGN_LEFT, "#%d#%s%c",
             tmpcolor,
-            nm, (state == S_GETUNAME) ? cursor: ' ');
+            (state == S_GETUNAME)? prm.buf.c_str() : nm.c_str(),
+            (state == S_GETUNAME) ? cursor: ' ');
 
     slin++;
 
@@ -277,7 +279,7 @@ static nodeStatus_t nAuthDisplay(dspConfig_t *dsp)
                 CyanColor,
                 newuserp,
                 NoColor,
-                ynbuf,
+                prm.buf.c_str(),
                 cursor);
 
     /* status line */
@@ -301,7 +303,7 @@ static nodeStatus_t nAuthInput(int ch)
     int rv, irv;
 
     ch = CQ_CHAR(ch);
-    irv = prmProcInput(&prm, ch);
+    irv = prmProcInput(prm, ch);
     switch (state)
     {
     case S_GETUNAME:
@@ -312,28 +314,29 @@ static nodeStatus_t nAuthInput(int ch)
                 return NODE_EXIT;
 
             /* check validity */
-            if (checkuname(prm.buf) == false)
+            if (checkuname(prm.buf.c_str()) == false)
             {                   /* invalid username */
                 mglBeep(MGL_BEEP_ERR);
                 errlin = "Invalid character in username.";
-                prm.buf[0] = 0;
+                prm.buf.clear();
                 return NODE_OK;
             }
 
             /* check if new user */
             if ((rv = sendAuth(cInfo.sock, CPAUTH_CHECKUSER,
-                               prm.buf, "")) < 0)
+                               prm.buf.c_str(), "")) < 0)
                 return NODE_EXIT;       /* pkt error */
+
+            // save the name
+            nm = prm.buf;
 
             if (rv == PERR_NOUSER)
             {                   /* new */
                 /* for a new user, we will want confirmation */
                 state = S_CONFIRMNEW;
 
-                ynbuf[0] = 0;
-
                 prm.preinit = false;
-                prm.buf = ynbuf;
+                prm.buf.clear();
                 prm.buflen = MAXUSERNAME;
                 prm.pbuf = newuserp;
 
@@ -346,7 +349,7 @@ static nodeStatus_t nAuthInput(int ch)
 
                 /* setup for the new prompt */
                 prm.preinit = false;
-                prm.buf = pw;
+                prm.buf.clear();
                 prm.buflen = MAX_USERLEN;
                 prm.pbuf = pwp;
 
@@ -362,13 +365,15 @@ static nodeStatus_t nAuthInput(int ch)
     case S_CONFIRMNEW:
         if (irv > 0)
         {                       /* a terminator */
-            if (irv == TERM_NORMAL && (prm.buf[0] == 'y' || prm.buf[0] == 'Y'))
+            if (irv == TERM_NORMAL
+                && prm.buf.size()
+                && (prm.buf[0] == 'y' || prm.buf[0] == 'Y'))
             {                   /* confirming new user */
                 state = S_GETPW;
 
                 /* setup for the new prompt */
                 prm.preinit = false;
-                prm.buf = pw;
+                prm.buf.clear();
                 prm.buflen = MAX_USERLEN;
                 prm.pbuf = pwp;
 
@@ -397,7 +402,8 @@ static nodeStatus_t nAuthInput(int ch)
     case S_GETPW:
         if (irv > 0)
         {                       /* a terminator */
-            /* we have a password */
+            // we have a password save it
+            pw = prm.buf;
 
             /* if this was a new user, go straight to S_GETRPW */
             if (newuser)
@@ -406,7 +412,7 @@ static nodeStatus_t nAuthInput(int ch)
 
                 /* setup for the new prompt */
                 prm.preinit = false;
-                prm.buf = pwr;
+                prm.buf.clear();
                 prm.buflen = MAX_USERLEN;
                 prm.pbuf = rpwp;
 
@@ -417,22 +423,20 @@ static nodeStatus_t nAuthInput(int ch)
             }
 
             if ((rv = sendAuth(cInfo.sock, CPAUTH_LOGIN,
-                               nm, pw)) < 0)
+                               nm.c_str(), pw.c_str())) < 0)
                 return NODE_EXIT;   /* error */
 
             if (rv != PERR_OK)
             {                   /* invalid pw */
                 /* clear it out and return to  P_GETUNAME state) */
-                pw[0] = 0;
-                state = S_GETUNAME;           /* initial state */
+                state = S_GETUNAME;
+
+                pw.clear();
 
                 prm.preinit = true;
                 prm.buf = nm;
                 prm.buflen = MAX_USERLEN;
                 prm.pbuf = unamep;
-
-                pw[0] = 0;
-                pwr[0] = 0;
 
                 statlin = uhelper;
 
@@ -455,7 +459,7 @@ static nodeStatus_t nAuthInput(int ch)
         {                       /* a terminator */
             /* see if the passwords match */
 
-            if (strcmp(pw, pwr) != 0)
+            if (pw != prm.buf)
             {                   /* pw's don't match, start over */
                 mglBeep(MGL_BEEP_ERR);
 
@@ -467,8 +471,7 @@ static nodeStatus_t nAuthInput(int ch)
                 prm.buflen = MAX_USERLEN;
                 prm.pbuf = unamep;
 
-                pw[0] = 0;
-                pwr[0] = 0;
+                pw.clear();
 
                 statlin = uhelper;
             }
@@ -476,7 +479,7 @@ static nodeStatus_t nAuthInput(int ch)
             {                   /* they match, lets goto welcome node */
 
                 if ((rv = sendAuth(cInfo.sock, CPAUTH_LOGIN,
-                                   nm, pw)) < 0)
+                                   nm.c_str(), pw.c_str())) < 0)
                     return NODE_EXIT;
 
                 if (rv != PERR_OK)

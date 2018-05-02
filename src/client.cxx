@@ -126,7 +126,7 @@ int sendSetCourse(int sock, courseLock_t lock, uint16_t lockDetail, real head)
 }
 
 /* send a command to server to change name */
-int sendSetName(char *name)
+int sendSetName(const char *name)
 {
     cpSetName_t sname;
 
@@ -203,7 +203,7 @@ int sendFireTorps(int num, real dir)
 }
 
 /* send a message */
-int sendMessage(msgTo_t to, uint16_t toDetail, char *msg)
+int sendMessage(msgTo_t to, uint16_t toDetail, const char *msg)
 {
     cpMessage_t cmsg;
 

@@ -83,7 +83,7 @@ void     clbInitUniverse(bool cbIsLocal);
 void     clbIntrude( int snum, int pnum );
 int      clbLogHist( int unum );
 real     clbNewWarp( int snum, real dwarp );
-int      clbPlanetMatch( char *str, int *pnum, int godlike );
+int      clbPlanetMatch( const char *str, int *pnum, int godlike );
 void     clbPutShip( int snum, real basex, real basey );
 int      clbFmtMsg(msgFrom_t from, uint16_t fromDetail, msgTo_t to,
                    uint16_t toDetail, char *buf);

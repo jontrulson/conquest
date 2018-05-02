@@ -83,8 +83,6 @@ static int state;
 static prm_t prm;
 static int prompting;
 
-static char cbuf[BUFFER_SIZE_256];
-
 /* init vars */
 static int lose;
 static int fatal = false;
@@ -184,7 +182,7 @@ static void _conqds(dspConfig_t *dsp)
     cprintf(lin,col,ALIGN_NONE,sfmt, 'q', "quit");
 
     if (state == S_WAR)
-        cprintf(prm.index, 0, ALIGN_NONE, "%s", prm.pbuf);
+        cprintf(prm.index, 0, ALIGN_NONE, "%s", prm.pbuf.c_str());
 
     return;
 
@@ -287,7 +285,7 @@ static nodeStatus_t nMenuDisplay(dspConfig_t *dsp)
                 NoColor, cbUsers[Context.unum].alias);
 
         cprintf(prm.index + 1, 0, ALIGN_NONE, "#%d#Enter a new pseudonym: %s",
-                NoColor, prm.buf);
+                NoColor, prm.buf.c_str());
     }
 
     if (state == S_RESIGN)
@@ -376,15 +374,15 @@ static nodeStatus_t nMenuInput(int ch)
 
     if (prompting)
     {
-        irv = prmProcInput(&prm, ch);
+        irv = prmProcInput(prm, ch);
 
         switch (state)
         {
         case S_PSEUDO:
             if (irv > 0)
             {
-                if (ch != TERM_ABORT && prm.buf[0] != 0)
-                    sendSetName(prm.buf);
+                if (ch != TERM_ABORT && !prm.buf.empty())
+                    sendSetName(prm.buf.c_str());
                 prompting = false;
                 state = S_NONE;
             }
@@ -434,7 +432,7 @@ static nodeStatus_t nMenuInput(int ch)
             }
             else
             {
-                prm.buf[0] = 0;
+                prm.buf.clear();
                 for (i=0; i < NUMPLAYERTEAMS; i++)
                 {
                     if ( (sStat.serverFlags & SERVER_F_NOTEAMWAR)
@@ -480,10 +478,9 @@ static nodeStatus_t nMenuInput(int ch)
         case 'N':
             state = S_PSEUDO;
             prm.preinit = false;
-            prm.buf = cbuf;
+            prm.buf.clear();
             prm.buflen = MAXUSERNAME;
             prm.index = 21;
-            prm.buf[0] = 0;
             prompting = true;
 
             break;
@@ -501,10 +498,9 @@ static nodeStatus_t nMenuInput(int ch)
             {
                 state = S_RESIGN;
                 prm.preinit = false;
-                prm.buf = cbuf;
+                prm.buf.clear();
                 prm.buflen = MAXUSERNAME;
                 prm.index = 21;
-                prm.buf[0] = 0;
                 prompting = true;
             }
             break;
@@ -580,11 +576,10 @@ static nodeStatus_t nMenuInput(int ch)
             state = S_WAR;
             prompting = true;
             prm.preinit = false;
-            prm.buf = cbuf;
+            prm.buf.clear();
             prm.buflen = 5;
             prm.pbuf = clbWarPrompt(Context.snum, twar);
             prm.index = 22;
-            prm.buf[0] = 0;
 
             break;
         case '/':

@@ -27,6 +27,10 @@
 
 
 #include "c_defs.h"
+
+#include <string>
+#include "format.h"
+
 #include "context.h"
 #include "global.h"
 #include "cb.h"
@@ -57,10 +61,8 @@
 #define S_WATCH         1       /* prompt for a ship */
 static int state;
 
-prm_t prm;
-static int prompting;
-
-static char cbuf[BUFFER_SIZE_256];
+static prm_t prm;
+static int prompting = false;
 
 static nodeStatus_t nPlayBMenuDisplay(dspConfig_t *);
 static nodeStatus_t nPlayBMenuInput(int ch);
@@ -97,7 +99,7 @@ static nodeStatus_t nPlayBMenuDisplay(dspConfig_t *dsp)
 
     if (prompting)
         cprintf(MSG_LIN1, 1, ALIGN_NONE, "#%d#%s #%d#%s",
-                CyanColor, prm.pbuf, NoColor, prm.buf);
+                CyanColor, prm.pbuf.c_str(), NoColor, prm.buf.c_str());
 
     if (nss)
         cprintf(MSG_LIN2, 1, ALIGN_NONE, "%s", nss);
@@ -115,7 +117,7 @@ static nodeStatus_t nPlayBMenuInput(int ch)
     if (prompting)
     {
         int tmpsnum;
-        irv = prmProcInput(&prm, ch);
+        irv = prmProcInput(prm, ch);
 
         if (irv > 0)
         {
@@ -128,13 +130,13 @@ static nodeStatus_t nPlayBMenuInput(int ch)
             }
 
             utDeleteBlanks( prm.buf );
-            if ( strlen( prm.buf ) == 0 )
+            if ( prm.buf.empty() )
             {
-                    state = S_NONE;
-                    prompting = false;
+                state = S_NONE;
+                prompting = false;
 
-                    nss = "No such ship.";
-                    return NODE_OK;
+                nss = "No such ship.";
+                return NODE_OK;
             }
             else
             {
@@ -146,7 +148,8 @@ static nodeStatus_t nPlayBMenuInput(int ch)
                     nss = "No such ship.";
                     return NODE_OK;
                 }
-                utSafeCToI( &tmpsnum, prm.buf, 0 );     /* ignore return status */
+                /* ignore return status */
+                utSafeCToI( &tmpsnum, prm.buf.c_str(), 0 );
             }
 
             if ( (tmpsnum < 0 || tmpsnum >= cbLimits.maxShips()) &&
@@ -187,21 +190,21 @@ static nodeStatus_t nPlayBMenuInput(int ch)
         if (recFileHeader.snum == 0
             && recFileHeader.vers == RECVERSION_20031004)
         {
-            cbuf[0] = 0;
+            prm.buf.clear();;
             prm.preinit = false;
 
         }
         else
         {
             // for older protocols, compensate for 0-based cbShips[]
-            sprintf(cbuf, "%d",
-                    (recFileHeader.protoVers <= 0x0006) ?
-                    recFileHeader.snum - 1:
-                    recFileHeader.snum);
+            int ship = ((recFileHeader.protoVers <= 0x0006) ?
+                        recFileHeader.snum - 1:
+                        recFileHeader.snum);
+
+            prm.buf = fmt::format("{}", ship);
             prm.preinit = true;
         }
 
-        prm.buf = cbuf;
         prm.buflen = MSGMAXLINE;
         prm.pbuf = "Watch which ship? ";
         prm.index = 20;
