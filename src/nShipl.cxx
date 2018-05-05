@@ -26,6 +26,10 @@
 //
 
 #include "c_defs.h"
+
+#include <string>
+#include "format.h"
+
 #include "context.h"
 #include "global.h"
 
@@ -47,7 +51,6 @@
 #include "nPlayBMenu.h"
 #include "nShipl.h"
 
-static const char *hd2="ship  name          pseudonym              kills     type";
 static int shipOffset; /* offset into cbLimits.maxShips() for this page */
 static int shipIdx;
 
@@ -82,25 +85,21 @@ scrNode_t *nShiplInit(int nodeid, int setnode)
 static nodeStatus_t nShiplDisplay(dspConfig_t *dsp)
 {
     int snum = Context.snum;
-    static char cbuf[BUFFER_SIZE_256];
-    int i, unum, status, lin, col;
-    char sbuf[20];
-    char kbuf[20];
-    char pidbuf[20];
-    char ubuf[MAXUSERNAME + 2];
-    int color;
+    std::string cbuf;
+    int lin, col;
 
-    utStrncpy(cbuf, hd2, sizeof(cbuf));
+    static const std::string hd2 =
+        "ship  name          pseudonym              kills     type";
+    static const std::string hd2_ul =
+        "----  ----          ---------              -----     ----";
 
-    col = (int)(Context.maxcol - strlen( cbuf )) / (int)2;
+    col = (int)(Context.maxcol - hd2.size()) / 2;
+
     lin = 2;
-    cprintf(lin, col, ALIGN_NONE, "#%d#%s", LabelColor, cbuf);
+    cprintf(lin, col, ALIGN_NONE, "#%d#%s", LabelColor, hd2.c_str());
 
-    for ( i = 0; cbuf[i] != 0; i = i + 1 )
-        if ( cbuf[i] != ' ' )
-            cbuf[i] = '-';
-    lin = lin + 1;
-    cprintf(lin, col, ALIGN_NONE, "#%d#%s", LabelColor, cbuf);
+    lin++;
+    cprintf(lin, col, ALIGN_NONE, "#%d#%s", LabelColor, hd2_ul.c_str());
 
     lin++; // first line to use
     shipIdx = 0;
@@ -108,46 +107,48 @@ static nodeStatus_t nShiplDisplay(dspConfig_t *dsp)
     {
         while ((shipOffset + shipIdx) < cbLimits.maxShips())
         {
-            i = shipOffset + shipIdx;
+            int i = shipOffset + shipIdx;
             shipIdx++;
 
-            status = cbShips[i].status;
-
-            if ( status == SS_LIVE )
+            if ( cbShips[i].status == SS_LIVE )
             {
-                sbuf[0] = 0;
+                std::string sbuf;
                 utAppendShip(sbuf , i) ;
-                strcat(sbuf, " ") ;
-                utAppendChar(sbuf, cbShipTypes[cbShips[i].shiptype].name[0]) ;
+                sbuf += " ";
+                sbuf += cbShipTypes[cbShips[i].shiptype].name[0];
 
-                unum = cbShips[i].unum;
+                int unum = cbShips[i].unum;
                 if ( unum >= 0 && unum < cbLimits.maxUsers() )
                 {
+                    std::string pidbuf;
                     if (SROBOT(i)) /* robot */
-                        strcpy(pidbuf, " ROBOT");
+                        pidbuf = " ROBOT";
                     else if (SVACANT(i))
-                        strcpy(pidbuf, "VACANT");
+                        pidbuf = "VACANT";
                     else
-                        strcpy(pidbuf, "  LIVE");
+                        pidbuf = "  LIVE";
 
-                    strcpy(ubuf, cbUsers[unum].username);
-
-                    sprintf(kbuf, "%6.1f", (cbShips[i].kills + cbShips[i].strkills));
-                    sprintf( cbuf, "%-5s %-13.13s %-21.21s %-8s %6s",
-                             sbuf, ubuf, cbShips[i].alias,
-                             kbuf, pidbuf );
+                    cbuf =
+                        fmt::format("{:<5s} {:<13.13s} {:<21.21s} "
+                                    "{:6.1f}   {:6s}",
+                                    sbuf,
+                                    cbUsers[unum].username,
+                                    cbShips[i].alias,
+                                    (cbShips[i].kills + cbShips[i].strkills),
+                                    pidbuf);
                 }
                 else
-                    sprintf( cbuf, "%-5s %13s %21s %8s %6s", sbuf,
-                             " ", " ", " ", " " );
+                    cbuf = fmt::format("{:<5s}", sbuf);
 
+                int color;
                 if (snum >= 0 && snum < cbLimits.maxShips() )
                 {		/* a normal ship view */
                     if ( i == snum )    /* it's ours */
                         color = NoColor | CQC_A_BOLD;
                     else if (satwar(i, snum)) /* we're at war with it */
                         color = RedLevelColor;
-                    else if (cbShips[i].team == cbShips[snum].team && !selfwar(snum))
+                    else if (cbShips[i].team == cbShips[snum].team
+                             && !selfwar(snum))
                         color = GreenLevelColor; /* it's a team ship */
                     else
                         color = YellowLevelColor;
@@ -163,7 +164,7 @@ static nodeStatus_t nShiplDisplay(dspConfig_t *dsp)
                         color = YellowLevelColor;
                 }
 
-                cprintf(lin, col, ALIGN_NONE, "#%d#%s", color, cbuf);
+                cprintf(lin, col, ALIGN_NONE, "#%d#%s", color, cbuf.c_str());
 
                 lin++;
             }
