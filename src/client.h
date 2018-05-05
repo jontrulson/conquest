@@ -30,6 +30,8 @@
 
 #include "conqdef.h"
 
+#include <string>
+
 #include "msg.h"
 
 #include "conqnet.h"
@@ -92,7 +94,8 @@ int             sendSetCourse(int sock, courseLock_t lock, uint16_t lockDetail,
 int             sendSetName(const char *name);
 int             sendCommand(uint8_t cmd, uint16_t detail);
 int             sendFireTorps(int num, real dir);
-void            sendMessage(msgTo_t to, uint16_t toDetail, const char *msg);
+void            sendMessage(msgTo_t to, uint16_t toDetail,
+                            const std::string& msg);
 
 int             clientHello(const char *clientname);
 
