@@ -26,6 +26,10 @@
 //
 
 #include "c_defs.h"
+
+#include <string>
+#include <vector>
+
 #include "context.h"
 #include "global.h"
 
@@ -46,14 +50,13 @@
 #include "cqkeys.h"
 
 static int snum, godlike;
-static int nu;
 static int fuser;
 static int offset;
 
 static int extrast;             /* normal, or extra stats? */
 
 // for the sorted list
-static int *uvec = NULL;
+static std::vector<int> uvec;
 
 
 static nodeStatus_t nUserlDisplay(dspConfig_t *);
@@ -80,29 +83,15 @@ scrNode_t *nUserlInit(int nodeid, int setnode, int sn, int gl, int extra)
     extrast = extra;
 
     // init the user vector, free it if it already exists
-    if (uvec)
-        free(uvec);
-
-    // Create it fresh
-    if (!(uvec = (int *)malloc(cbLimits.maxUsers() * sizeof(int))))
-    {
-        utLog("%s: malloc(%lu) failed", __FUNCTION__,
-              cbLimits.maxUsers() * sizeof(int));
-        fprintf(stderr, "%s: malloc(%lu) failed\n", __FUNCTION__,
-                cbLimits.maxUsers() * sizeof(int));
-    }
-
-    for (i=0; i<cbLimits.maxUsers(); i++)
-        uvec[i] = i;
+    uvec.clear();
 
     /* sort the (living) user list */
-    nu = 0;
     for ( unum = 0; unum < cbLimits.maxUsers(); unum++)
         if ( ULIVE(unum) )
         {
-            uvec[nu++] = unum;
+            uvec.push_back(unum);
         }
-    clbSortUsers(uvec, nu);
+    clbSortUsers(uvec);
 
     fuser = 0;
 
@@ -116,50 +105,45 @@ scrNode_t *nUserlInit(int nodeid, int setnode, int sn, int gl, int extra)
 static nodeStatus_t nUserlDisplay(dspConfig_t *dsp)
 {
     int j, fline, lline, lin;
-    static const char *hd1="U S E R   L I S T";
-    static const char *ehd1="M O R E   U S E R   S T A T S";
-    static const char *ehd2="name         cpu  conq coup geno  taken bombed/shot  shots  fired   last entry";
-    static const char *ehd3="planets  armies    phaser  torps";
-    static char cbuf[BUFFER_SIZE_256];
+    static const std::string hd1="U S E R   L I S T";
+    static const std::string ehd1="M O R E   U S E R   S T A T S";
+    std::string cbuf;
     int color;
-
-    // bail if there was init problems (uvec allocation)
-    if (!uvec)
-        return NODE_EXIT;
 
     /* Do some screen setup. */
     lin = 0;
     if (extrast)
     {
-        cprintf(lin, 0, ALIGN_CENTER, "#%d#%s", LabelColor, ehd1);
+        cprintf(lin, 0, ALIGN_CENTER, "#%d#%s", LabelColor, ehd1.c_str());
         lin = lin + 2;
-        cprintf(lin, 34, ALIGN_NONE, "#%d#%s", LabelColor, ehd3);
+        clbStatline(STATLINE_HDR1, cbuf);
+        cprintf(lin, 32, ALIGN_NONE, "#%d#%s", LabelColor, cbuf.c_str());
 
-        utStrncpy(cbuf, ehd2, sizeof(cbuf)) ;
+        clbStatline(STATLINE_HDR2, cbuf);
         lin = lin + 1;
-        cprintf(lin, 0, ALIGN_NONE, "#%d#%s", LabelColor, cbuf);
+        cprintf(lin, 0, ALIGN_NONE, "#%d#%s", LabelColor, cbuf.c_str());
     }
     else
     {
-        cprintf(lin, 0, ALIGN_CENTER, "#%d#%s", LabelColor, hd1);
-        lin = lin + 3;        /* FIXME - hardcoded??? - dwp */
+        cprintf(lin, 0, ALIGN_CENTER, "#%d#%s", LabelColor, hd1.c_str());
+        lin = lin + 3;
         clbUserline( -1, -1, cbuf, false, false );
-        cprintf(lin, 0, ALIGN_NONE, "#%d#%s", LabelColor, cbuf);
+        cprintf(lin, 0, ALIGN_NONE, "#%d#%s", LabelColor, cbuf.c_str());
     }
 
-    for ( j = 0; cbuf[j] != 0; j = j + 1 )
+    for ( j=0; j<cbuf.size(); j++ )
         if ( cbuf[j] != ' ' )
             cbuf[j] = '-';
 
     lin++;
-    cprintf(lin, 0, ALIGN_NONE, "#%d#%s", LabelColor, cbuf);
+    cprintf(lin, 0, ALIGN_NONE, "#%d#%s", LabelColor, cbuf.c_str());
 
     fline = lin + 1;				/* first line to use */
     lline = MSG_LIN1;				/* last line to use */
 
     offset = fuser;
     lin = fline;
-    while ( offset < nu && lin <= lline )
+    while ( offset < uvec.size() && lin <= lline )
     {
         if (extrast)
             clbStatline( uvec[offset], cbuf );
@@ -196,13 +180,13 @@ static nodeStatus_t nUserlDisplay(dspConfig_t *dsp)
                 color = YellowLevelColor;
         }
 
-        cprintf(lin, 0, ALIGN_CENTER, "#%d#%s", color, cbuf);
+        cprintf(lin, 0, ALIGN_NONE, "#%d#%s", color, cbuf.c_str());
 
-        offset = offset + 1;
-        lin = lin + 1;
+        offset++;
+        lin++;
     }
 
-    if ( offset >= nu )           /* last page */
+    if ( offset >= uvec.size() )           /* last page */
         cprintf(MSG_LIN2, 0, ALIGN_CENTER, "#%d#%s", NoColor, MTXT_DONE);
     else
         cprintf(MSG_LIN2, 0, ALIGN_CENTER, "#%d#%s", NoColor, MTXT_MORE);
@@ -227,17 +211,13 @@ static nodeStatus_t nUserlInput(int ch)
 {
     ch = CQ_CHAR(ch);
 
-    // bail if there was init problems (uvec allocation)
-    if (!uvec)
-        return NODE_EXIT;
-
     if (ch == TERM_EXTRA)
     {
         fuser = 0;                /* move to first page */
         return NODE_OK;
     }
 
-    if (offset < nu)
+    if (offset < uvec.size())
     {
         if (ch == ' ')
         {

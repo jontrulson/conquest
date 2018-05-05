@@ -30,14 +30,14 @@
 
 #include "conqdef.h"
 
+#include <string>
+#include <vector>
+#include <algorithm>
+
 #include "conf.h"
 #include "cb.h"
 
 #include "protocol.h"
-
-#include <string>
-#include <vector>
-#include <algorithm>
 
 int      clbRegister( const std::string& lname, const std::string& rname,
                       int team, int *unum );
@@ -56,9 +56,9 @@ int      clbPhaser( int snum, real dir );
 real     clbPhaserHit( int snum, real dis );
 void     clbResign( int unum, bool isoper );
 int      clbTakePlanet( int pnum, int snum );
-void     clbUserline( int unum, int snum, char *buf,
-                      int showgods, int showteam );
-void     clbStatline( int unum, char *buf );
+void     clbUserline( int unum, int snum, std::string& buf,
+                      bool showgods, bool showteam );
+void     clbStatline( int unum, std::string& buf );
 int      clbZeroPlanet( int pnum, int snum );
 const char *clbWarPrompt(int snum, int twar[]);
 
@@ -88,7 +88,7 @@ void     clbPutShip( int snum, real basex, real basey );
 int      clbFmtMsg(msgFrom_t from, uint16_t fromDetail, msgTo_t to,
                    uint16_t toDetail, char *buf);
 void     clbSortPlanets( int sv[] );
-void     clbSortUsers( int uv[], int numentries );
+void     clbSortUsers( std::vector<int>& uv );
 int      clbSPWar( int snum, int pnum );
 int      clbStillAlive( int snum );
 void     clbStoreMsg( msgFrom_t from, uint16_t fromDetail, msgTo_t to,

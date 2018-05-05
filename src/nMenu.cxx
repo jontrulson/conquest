@@ -26,6 +26,9 @@
 //
 
 #include "c_defs.h"
+
+#include <string>
+
 #include "context.h"
 #include "global.h"
 #include "cb.h"
@@ -261,7 +264,7 @@ void nMenuInit(void)
 static nodeStatus_t nMenuDisplay(dspConfig_t *dsp)
 {
     int lin, col;
-    char cbuf[BUFFER_SIZE_256];
+    std::string cbuf;
 
     if (fatal)
         return NODE_EXIT;
@@ -272,11 +275,11 @@ static nodeStatus_t nMenuDisplay(dspConfig_t *dsp)
         clbUserline( -1, -1, cbuf, false, true );
         cprintf(MSG_LIN1, 1, ALIGN_LEFT, "#%d#%s",
                 LabelColor,
-                cbuf);
+                cbuf.c_str());
         clbUserline( Context.unum, -1, cbuf, false, true );
         cprintf(MSG_LIN2, 1, ALIGN_LEFT, "#%d#%s",
                 NoColor,
-                cbuf);
+                cbuf.c_str());
     }
 
     if (state == S_PSEUDO)

@@ -718,7 +718,17 @@ int utGetMsg( int snum, int *msg )
 /*    utFormatTime( buf ) */
 void utFormatTime( char *buf, time_t thetime )
 {
-    char junk[5] = {};
+    std::string buffer;
+
+    utFormatTime(buffer, thetime);
+    strcpy(buf, buffer.c_str());
+
+    return;
+}
+
+void utFormatTime( std::string& buf, time_t thetime )
+{
+    char junk[5];
 
     if (!thetime)
         thetime = time(0);
@@ -727,13 +737,13 @@ void utFormatTime( char *buf, time_t thetime )
 
     strftime(junk, 5, "%b", thetm);
 
-    sprintf(buf, "%2d:%02d:%02d %02d%s%02d",
-            thetm->tm_hour, thetm->tm_min, thetm->tm_min, thetm->tm_mday,
-            junk,
-            mod(thetm->tm_year + 1900, 100));
+    buf = fmt::format("{:2d}:{:02d}:{:02d} {:02d}{}{:02d}",
+                      thetm->tm_hour, thetm->tm_min,
+                      thetm->tm_min, thetm->tm_mday,
+                      junk,
+                      mod(thetm->tm_year + 1900, 100));
 
     return;
-
 }
 
 // millisecs since the epoch

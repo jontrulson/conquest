@@ -28,6 +28,7 @@
 #include "c_defs.h"
 
 #include <string>
+#include <vector>
 #include "format.h"
 
 #include "conqdef.h"
@@ -911,22 +912,22 @@ int clbTakePlanet( int pnum, int snum )
 /*    clbUserline( unum, snum, buf, showgods, showteam ) */
 /* Special hack: If snum is valid, the team and pseudonym are taken from */
 /* the ship instead of the user. */
-void clbUserline( int unum, int snum, char *_buf, int showgods, int showteam )
+void clbUserline( int unum, int snum, std::string& buf,
+                  bool showgods, bool showteam )
 {
     int team;
-    std::string buf;
     static const std::string hd1 =
         " name          pseudonym           team  skill  wins  loss mxkls ships      time";
 
     if ( unum < 0 || unum >= cbLimits.maxUsers() )
     {
-        strcpy(_buf , hd1.c_str()) ;
+        buf = hd1;
         return;
     }
 
     if ( !ULIVE(unum) )
     {
-        _buf[0] = 0;
+        buf.empty();
         return;
     }
 
@@ -983,7 +984,6 @@ void clbUserline( int unum, int snum, char *_buf, int showgods, int showteam )
                       cbUsers[unum].stats[USTAT_ENTRIES],
                       timstr );
 
-    strcpy(_buf, buf.c_str());
     return;
 }
 
@@ -994,83 +994,74 @@ void clbUserline( int unum, int snum, char *_buf, int showgods, int showteam )
 /*    int unum */
 /*    char buf() */
 /*    clbStatline( unum, buf ) */
-void clbStatline( int unum, char *buf )
+void clbStatline( int unum, std::string& buf )
 {
     int i, j;
-    char ch, junk[MSGMAXLINE], percent[MSGMAXLINE], morejunk[MSGMAXLINE];
-    char datestr[MAXDATESIZE];
-    char tname[MAXUSERNAME + 2];	/* posss '@' and NULL */
+    char ch;
+    static const std::string hd1 = "planets   armies    phaser  torps";
+    static const std::string hd2 =
+        "name         cpu  conq coup geno  taken bombed/shot  shots  fired   last entry";
 
     if ( unum < 0 || unum >= cbLimits.maxUsers() )
     {
-        buf[0] = 0;
+        // caller is requesting headers (or somebody really screwed up)
+        if (unum == STATLINE_HDR1)
+            buf = hd1;
+        else if (unum == STATLINE_HDR2)
+            buf = hd2;
+        else
+            buf.clear();
         return;
     }
+
     if ( !ULIVE(unum) )
     {
-        buf[0] = 0;
+        buf.empty();
         return;
     }
 
+    std::string percent;
     if ( cbUsers[unum].stats[USTAT_SECONDS] == 0 )
-        strcpy(percent , "- ") ;
+        percent = "   -";
     else
     {
-        i = 1000 * cbUsers[unum].stats[USTAT_CPUSECONDS] / cbUsers[unum].stats[USTAT_SECONDS];
-        sprintf( percent, "%3d%%", (i + 5) / 10 );
+        i = 1000
+            * cbUsers[unum].stats[USTAT_CPUSECONDS]
+            / cbUsers[unum].stats[USTAT_SECONDS];
+        percent = fmt::format("{:3d}%", (i + 5) / 10);
     }
 
-    strcpy(tname, cbUsers[unum].username);
+    std::string tmp;
+    tmp = fmt::format("{:<12.12s}{:4s}  {:4d} {:4d} {:4d}",
+                      cbUsers[unum].username,
+                      percent,
+                      cbUsers[unum].stats[USTAT_CONQUERS],
+                      cbUsers[unum].stats[USTAT_COUPS],
+                      cbUsers[unum].stats[USTAT_GENOCIDE] );
 
-    sprintf( junk, "%-12.12s %4s %4d %4d %4d",
-             tname,
-             percent,
-             cbUsers[unum].stats[USTAT_CONQUERS],
-             cbUsers[unum].stats[USTAT_COUPS],
-             cbUsers[unum].stats[USTAT_GENOCIDE] );
-
-    sprintf( buf, "%s %6d %6d %4d %6d %5d",
-             junk,
-             cbUsers[unum].stats[USTAT_CONQPLANETS],
-             cbUsers[unum].stats[USTAT_ARMBOMB],
-             cbUsers[unum].stats[USTAT_ARMSHIP],
-             cbUsers[unum].stats[USTAT_PHASERS],
-             cbUsers[unum].stats[USTAT_TORPS] );
-
-    /* Convert zero counts to dashes. */
-    ch = 0;
-    for ( i = 9; buf[i] != 0; i++ )
-    {
-        if ( buf[i] == '0' )
-            if ( ch == ' ' )
-                if ( buf[i+1] == ' ' || buf[i+1] == 0 )
-                    buf[i] = '-';
-        ch = buf[i];
-    }
+    buf = fmt::format("{} {:6d} {:6d} {:4d} {:6d} {:5d}",
+                      tmp,
+                      cbUsers[unum].stats[USTAT_CONQPLANETS],
+                      cbUsers[unum].stats[USTAT_ARMBOMB],
+                      cbUsers[unum].stats[USTAT_ARMSHIP],
+                      cbUsers[unum].stats[USTAT_PHASERS],
+                      cbUsers[unum].stats[USTAT_TORPS] );
 
     if (cbUsers[unum].lastentry == 0) /* never */
     {
-        sprintf(junk, " %13.13s", "never");
-        strcat(buf , junk) ;
+        tmp = fmt::format(" {:>13.13s}", "never");
+        buf += tmp;
     }
     else
     {				/* format it properly */
-        utFormatTime(datestr, cbUsers[unum].lastentry);
+        utFormatTime(tmp, cbUsers[unum].lastentry);
 
-        sprintf( junk, " %16.16s", datestr );
-        j = 0;
-        for (i=0; i<6; i++)
-	{
-            morejunk[j++] = junk[i];
-	}
-        /* remove the seconds - ugh*/
-        for (i=9; i < 17; i++)
-	{
-            morejunk[j++] = junk[i];
-	}
-        morejunk[j] = 0;
+        // remove the seconds (:nn)
+        size_t pos = tmp.find(":", 4);
+        tmp.erase(pos, 3);
+        tmp = fmt::format(" {:>13.13s}", tmp);
 
-        strcat(buf , morejunk) ;
+        buf += tmp;
     }
 
     return;
@@ -2399,30 +2390,15 @@ void clbSortPlanets( int sv[] )
 
 }
 
-/* cmpuser - compare users based on skill */
-static int cmpuser(void *cmp1, void *cmp2)
+static bool cmpuser(int cmp1, int cmp2)
 {
-    int *icmp1, *icmp2;
-
-    icmp1 = (int *) cmp1;
-    icmp2 = (int *) cmp2;
-
-    if (cbUsers[*icmp1].rating > cbUsers[*icmp2].rating)
-        return(-1);
-    else if (cbUsers[*icmp1].rating < cbUsers[*icmp2].rating)
-        return(1);
-    else
-        return(0);
+    return cbUsers[cmp1].rating > cbUsers[cmp2].rating;
 }
 
 /*  sortusers - sort users by skill */
-/* This routine ASSUMES that the sort vector is initialized, */
-/* for the reason that it is fastest to sort a list that is */
-/* already sorted. */
-void clbSortUsers( int uv[], int numentries )
+void clbSortUsers( std::vector<int>& uv )
 {
-    qsort(uv, numentries, sizeof(int),
-          (int (*)(const void *, const void *))cmpuser);
+    std::sort(uv.begin(), uv.end(), cmpuser);
 
     return;
 

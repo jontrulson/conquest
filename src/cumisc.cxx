@@ -27,6 +27,10 @@
 
 #include "c_defs.h"
 
+#include <string>
+#include <vector>
+#include "format.h"
+
 #include "conqdef.h"
 #include "cb.h"
 #include "conqlb.h"
@@ -42,6 +46,7 @@
 #include "cumisc.h"
 #include "ui.h"
 
+// FIXME - get rid of this
 static char cbuf[BUFFER_SIZE_1024]; /* general purpose buffer */
 
 /*  histlist - display the last usage list */
@@ -1129,31 +1134,27 @@ void mcuTeamList()
 /*    mcuUserList( godlike ) */
 void mcuUserList()
 {
-    int i, j, unum, nu, fuser, fline, lline, lin;
-    int uvec[cbLimits.maxUsers()];
+    int i, j, unum, fuser, fline, lline, lin;
+    std::vector<int> uvec;
     int ch;
-    static const char *hd1="U S E R   L I S T";
-
-    /* init the user vector */
-
-    for (i=0; i<cbLimits.maxUsers(); i++)
-        uvec[i] = i;
+    static const std::string hd1="U S E R   L I S T";
+    std::string cbuf;
 
     /* Do some screen setup. */
     cdclear();
     lin = 0;
     uiPutColor(LabelColor);
-    cdputc( hd1, lin );
+    cdputc( hd1.c_str(), lin );
 
-    lin = lin + 3;        /* FIXME - hardcoded??? - dwp */
+    lin = lin + 3;
     clbUserline( -1, -1, cbuf, false, false );
-    cdputs( cbuf, lin, 1 );
+    cdputs( cbuf.c_str(), lin, 1 );
 
-    for ( j = 0; cbuf[j] != 0; j = j + 1 )
+    for ( j = 0; cbuf[j] != 0; j++ )
         if ( cbuf[j] != ' ' )
             cbuf[j] = '-';
     lin = lin + 1;
-    cdputs( cbuf, lin, 1 );
+    cdputs( cbuf.c_str(), lin, 1 );
     uiPutColor(0);
 
     fline = lin + 1;				/* first line to use */
@@ -1163,29 +1164,29 @@ void mcuUserList()
     while (true)
     {
         /* sort the (living) user list */
-        nu = 0;
+        uvec.clear();
         for ( unum = 0; unum < cbLimits.maxUsers(); unum++)
             if ( ULIVE(unum) )
             {
-                uvec[nu++] = unum;
+                uvec.push_back(unum);
             }
-        clbSortUsers(uvec, nu);
+        clbSortUsers(uvec);
 
         i = fuser;
         cdclrl( fline, lline - fline + 1 );
         lin = fline;
-        while ( i < nu && lin <= lline )
+        while ( i < uvec.size() && lin <= lline )
 	{
             clbUserline( uvec[i], -1, cbuf, true, false );
 
             uiPutColor(YellowLevelColor); /* bland view */
 
-            cdputs( cbuf, lin, 1 );
+            cdputs( cbuf.c_str(), lin, 1 );
             uiPutColor(0);
-            i = i + 1;
-            lin = lin + 1;
+            i++;
+            lin++;
 	}
-        if ( i >= nu )
+        if ( i >= uvec.size() )
 	{
             /* We're displaying the last page. */
             mcuPutPrompt( MTXT_DONE, MSG_LIN2 );
@@ -1225,35 +1226,35 @@ void mcuUserList()
 /*    mcuUserStats( godlike, snum ) */
 void mcuUserStats()
 {
-    int i, j, unum, nu, fuser, fline, lline, lin;
-    int uvec[cbLimits.maxUsers()];
+    int i, j, unum, fuser, fline, lline, lin;
+    std::vector<int> uvec;
     int ch;
-    static const char *hd1="M O R E   U S E R   S T A T S";
-    static const char *hd2="name         cpu  conq coup geno  taken bombed/shot  shots  fired   last entry";
-    static const char *hd3="planets  armies    phaser  torps";
-
-    for (i=0; i<cbLimits.maxUsers(); i++)
-        uvec[i] = i;
+    static const std::string hd1 = "M O R E   U S E R   S T A T S";
+    std::string cbuf;
 
     /* Do some screen setup. */
     cdclear();
     lin = 1;
     uiPutColor(LabelColor);  /* dwp */
-    cdputc( hd1, lin );
+    cdputc( hd1.c_str(), lin );
+
 
     lin = lin + 2;
-    cdputs( hd3, lin, 34 );
+    clbStatline(STATLINE_HDR1, cbuf);
+    cdputs( cbuf.c_str(), lin, 33 );
 
-    utStrncpy(cbuf, hd2, sizeof(cbuf)) ;
-    lin = lin + 1;
-    cdputs( cbuf, lin, 1 );
+    // get the header
+    clbStatline(STATLINE_HDR2, cbuf);
+    lin++;
+    cdputs( cbuf.c_str(), lin, 0 );
 
     for ( j = 0; cbuf[j] != 0; j = j + 1 )
         if ( cbuf[j] != ' ' )
             cbuf[j] = '-';
+
     lin = lin + 1;
-    cdputs( cbuf, lin, 1 );
-    uiPutColor(0);          /* dwp */
+    cdputs( cbuf.c_str(), lin, 1 );
+    uiPutColor(0);
 
     fline = lin + 1;				/* first line to use */
     lline = MSG_LIN1;				/* last line to use */
@@ -1262,30 +1263,30 @@ void mcuUserStats()
     while (true)
     {
         /* sort the (living) user list */
-        nu = 0;
+        uvec.clear();
         for ( unum = 0; unum < cbLimits.maxUsers(); unum++)
             if ( ULIVE(unum) )
             {
-                uvec[nu++] = unum;
+                uvec.push_back(unum);
             }
-        clbSortUsers(uvec, nu);
+        clbSortUsers(uvec);
 
         i = fuser;
         cdclrl( fline, lline - fline + 1 );
         lin = fline;
-        while ( i < nu && lin <= lline )
+        while ( i < uvec.size() && lin <= lline )
 	{
             clbStatline( uvec[i], cbuf );
 
             /* determine color */
             uiPutColor(YellowLevelColor); /* bland view */
 
-            cdputs( cbuf, lin, 1 );
+            cdputs( cbuf.c_str(), lin, 1 );
             uiPutColor(0);
-            i = i + 1;
-            lin = lin + 1;
+            i++;
+            lin++;
 	}
-        if ( i >= nu )
+        if ( i >= uvec.size() )
 	{
             /* We're displaying the last page. */
             mcuPutPrompt( MTXT_DONE, MSG_LIN2 );

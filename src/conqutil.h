@@ -31,6 +31,10 @@
 
 #include <string>
 
+// For querying the 2 headers in clbStatline()
+#define STATLINE_HDR1 (-1)
+#define STATLINE_HDR2 (-2)
+
 real     utAccurateDist( real curvel, real newvel, real acc );
 bool     utSafeCToI(int *num, const std::string& buf, int offset = 0);
 real     utSubAngle( real a1, real a2);
@@ -61,6 +65,7 @@ void     utFormatMinutes( int itime, std::string& buf );
 void     utFormatSeconds( int itime, char *buf );
 int      utGetMsg( int snum, int *msg );
 void     utFormatTime( char *buf, time_t thetime );
+void     utFormatTime( std::string& buf, time_t thetime );
 uint64_t utDeltaGrand(uint64_t s, uint64_t *n);
 void     utGrand( uint64_t *h );
 void     utGetSecs( time_t *s );
