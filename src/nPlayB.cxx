@@ -75,7 +75,7 @@
 
 #include "cqsound.h"
 
-#define cp_putmsg(str, lin)  hudSetPrompt(lin, NULL, NoColor, str, NoColor)
+#define cp_putmsg(str, lin)  hudSetPrompt(lin, "", NoColor, str, NoColor)
 
 #define S_NONE         0
 #define S_WATCH        1
@@ -243,14 +243,14 @@ static nodeStatus_t nPlayBDisplay(dspConfig_t *dsp)
         strcat(buf , ": ") ;
         strcat(buf , recMsg.msgbuf) ;
 
-        hudSetPrompt(MSG_MSG, NULL, NoColor, buf, CyanColor);
+        hudSetPrompt(MSG_MSG, "", NoColor, buf, CyanColor);
     }
 
     mglOverlayQuad();             /* render the overlay bg */
 
     if (prompting)
-        hudSetPrompt(prm.index, prm.pbuf.c_str(), NoColor,
-                     prm.buf.c_str(), CyanColor);
+        hudSetPrompt(prm.index, prm.pbuf, NoColor,
+                     prm.buf, CyanColor);
 
     return NODE_OK;
 }
@@ -350,7 +350,7 @@ static nodeStatus_t nPlayBInput(int ch)
         }
 
         if (nss)
-            hudSetPrompt(MSG_LIN2, NULL, NoColor, nss, NoColor);
+            hudSetPrompt(MSG_LIN2, "", NoColor, nss, NoColor);
 
         return NODE_OK;
     }

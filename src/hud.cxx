@@ -27,6 +27,11 @@
 
 #include "c_defs.h"
 
+#include <string>
+#include <algorithm>
+using namespace std;
+#include "format.h"
+
 #include "conqdef.h"
 #include "context.h"
 #include "global.h"
@@ -35,9 +40,6 @@
 #include "conqlb.h"
 #include "conqutil.h"
 #include "conqai.h"
-
-#include <algorithm>
-using namespace std;
 
 extern void setWarp(real warp); /* FIXME, GL.c */
 
@@ -50,59 +52,80 @@ extern void setWarp(real warp); /* FIXME, GL.c */
  */
 void hudInitData(void)
 {
-    memset(&hudData, 0, sizeof(hudData_t));
-
     hudData.warp.warp        = 92.0;     /* "Warp 92 Mr. Sulu." */
     hudData.warp.color       = InfoColor;
+    hudData.warp.str.clear();
 
     hudData.heading.head     = 999;
     hudData.heading.color    = NoColor;
+    hudData.heading.str.clear();
 
     hudData.kills.kills      = -20.0;
     hudData.kills.color      = InfoColor;
+    hudData.kills.str.clear();
 
     hudData.aStat.alertLevel = GREEN_ALERT;
     hudData.aStat.aShip      = -1;
     hudData.aStat.color      = GreenLevelColor;
+    hudData.aStat.str.clear();
 
     hudData.sh.shields       = -9;
     hudData.sh.color         = GreenLevelColor;
+    hudData.sh.str.clear();
 
     hudData.dam.damage       = 999.0;
     hudData.dam.color        = GreenLevelColor;
+    hudData.dam.str.clear();
 
     hudData.fuel.fuel        = -99;
     hudData.fuel.color       = GreenLevelColor;
+    hudData.fuel.str.clear();
 
     hudData.alloc.walloc     = -1;
     hudData.alloc.ealloc     = -1;
     hudData.alloc.color      = InfoColor;
+    hudData.alloc.str.clear();
 
     hudData.etemp.temp       = -1.0;
     hudData.etemp.color      = GreenLevelColor;
     hudData.etemp.overl      = false;
+    hudData.etemp.str.clear();
 
     hudData.wtemp.temp       = -1.0;
     hudData.wtemp.color      = GreenLevelColor;
     hudData.wtemp.overl      = false;
+    hudData.wtemp.str.clear();
 
     hudData.tow.towstat      = false;
     hudData.tow.color        = MagentaColor;
+    hudData.tow.str.clear();
 
     hudData.armies.armies    = -1701;
     hudData.armies.color     = InfoColor;
+    hudData.armies.str.clear();
 
     hudData.raction.action   = 0;
     hudData.raction.color    = InfoColor;
+    hudData.raction.str.clear();
 
     hudData.destruct.fuse    = -1;
     hudData.destruct.color   = RedLevelColor;
+    hudData.destruct.str.clear();
+
+    hudData.p1.str.clear();
+    hudData.p2.str.clear();
+    hudData.msg.str.clear();
 
     hudData.info.lastblast   = -1;
     hudData.info.lastang     = -1;
     hudData.info.lastdist    = -1;
     hudData.info.lasttarget  = -1;
     hudData.info.lasttargetstr[0] = 0;
+
+    hudData.info.lastblaststr.clear();
+    hudData.info.lasttargetstr.clear();
+    hudData.info.lasttadstr.clear();
+
     hudSetInfoFiringAngle(0);
 
     return;
@@ -117,10 +140,9 @@ void hudSetWarp(int snum)
     {
         hudData.warp.warp = cbShips[snum].warp;
         if (hudData.warp.warp >= 0)
-            snprintf(hudData.warp.str, HUD_STR_SZ, "%2.1f",
-                     hudData.warp.warp );
+            hudData.warp.str = fmt::format("{:2.1f}", hudData.warp.warp);
         else
-            utStrncpy(hudData.warp.str, "Orbiting", HUD_STR_SZ);
+            hudData.warp.str = "Orbiting";
 
         /* set the right sound effects */
         setWarp(hudData.warp.warp);
@@ -139,14 +161,12 @@ void hudSetHeading(int snum)
         if ( cbShips[snum].lock == LOCK_PLANET
              && cbShips[snum].lockDetail < cbLimits.maxPlanets())
         {                       /* just the first 3 characters if locked */
-            hudData.heading.str[0] = cbPlanets[cbShips[snum].lockDetail].name[0];
-            hudData.heading.str[1] = cbPlanets[cbShips[snum].lockDetail].name[1];
-            hudData.heading.str[2] = cbPlanets[cbShips[snum].lockDetail].name[2];
-            hudData.heading.str[3] = 0;
+            std::string tmp = cbPlanets[cbShips[snum].lockDetail].name;
+            hudData.heading.str = tmp.substr(0, 3);
         }
         else
         {
-            snprintf( hudData.heading.str, HUD_STR_SZ, "%3d", i );
+            hudData.heading.str = fmt::format("{:3d}", i);
         }
 
         hudData.heading.head = i;
@@ -178,35 +198,35 @@ void hudSetAlertStatus(int snum, int asnum, alertLevel_t astatus)
         case PHASER_ALERT:
         {
             hudData.aStat.color = RedLevelColor;
-            strcpy(hudData.aStat.str, "RED ALERT ");
+            hudData.aStat.str = "RED ALERT ";
         }
         break;
 
         case RED_ALERT:
         {
             hudData.aStat.color = RedLevelColor;
-            strcpy(hudData.aStat.str, "Alert ");
+            hudData.aStat.str = "Alert ";
         }
         break;
 
         case TORP_ALERT:
         {
             hudData.aStat.color = YellowLevelColor;
-            strcpy(hudData.aStat.str, "Torp Alert ");
+            hudData.aStat.str = "Torp Alert ";
         }
         break;
 
         case YELLOW_ALERT:
         {
             hudData.aStat.color = YellowLevelColor;
-            strcpy(hudData.aStat.str, "Yellow Alert ");
+            hudData.aStat.str = "Yellow Alert ";
         }
         break;
 
         case PROXIMITY_ALERT:
         {
             hudData.aStat.color = YellowLevelColor;
-            strcpy(hudData.aStat.str, "Proximity Alert ");
+            hudData.aStat.str = "Proximity Alert ";
         }
         break;
 
@@ -214,7 +234,7 @@ void hudSetAlertStatus(int snum, int asnum, alertLevel_t astatus)
         default:
         {
             hudData.aStat.color = GreenLevelColor;
-            hudData.aStat.str[0] = 0;
+            hudData.aStat.str.clear();
         }
         break;
         }
@@ -223,9 +243,7 @@ void hudSetAlertStatus(int snum, int asnum, alertLevel_t astatus)
             utAppendShip(hudData.aStat.str, asnum) ;
 
         if (SCLOAKED(asnum))
-            strcat(hudData.aStat.str, " (CLOAKED)");
-
-        hudData.aStat.str[HUD_STR_SZ - 1] = 0;
+            hudData.aStat.str += " (CLOAKED)";
 
         hudData.aStat.alertLevel = astatus;
         hudData.aStat.aShip      = asnum;
@@ -241,7 +259,7 @@ void hudSetKills(int snum)
 
     if ( x != hudData.kills.kills )
     {
-        snprintf( hudData.kills.str, HUD_STR_SZ, "%0.1f", oneplace(x) );
+        hudData.kills.str = fmt::format("{:0.1f}", x );
         hudData.kills.kills = x;
     }
 
@@ -275,7 +293,7 @@ void hudSetShields(int snum, int *dobeep)
 
         hudData.sh.shields = i;
 
-        snprintf(hudData.sh.str, HUD_STR_SZ, "%3d", (i < 0) ? 0 : i);
+        hudData.sh.str = fmt::format("{:3d}", ((i < 0) ? 0 : i));
     }
 
     return;
@@ -298,8 +316,7 @@ void hudSetDamage(int snum, real *lastdamage)
         else
             hudData.dam.color = RedLevelColor;
 
-        snprintf( hudData.dam.str, HUD_STR_SZ, "%3d",
-                  (i < 0) ? 0 : i );
+        hudData.dam.str = fmt::format("{:3d}", ((i < 0) ? 0 : i) );
 
         hudData.dam.damage = r;
     }
@@ -323,8 +340,7 @@ void hudSetFuel(int snum)
         else
             hudData.fuel.color = RedLevelColor;
 
-        snprintf( hudData.fuel.str, HUD_STR_SZ, "%3d",
-                  (i < 0) ? 0 : i );
+        hudData.fuel.str = fmt::format("{:3d}", ((i < 0) ? 0 : i) );
 
         hudData.fuel.fuel = r;
     }
@@ -345,19 +361,19 @@ void hudSetAlloc(int snum)
 
     if ( i != hudData.alloc.walloc || j != hudData.alloc.ealloc )
     {
-        hudData.alloc.str[0] = 0;
+        hudData.alloc.str.clear();
 
         if ( i == 0 )
-            strcat(hudData.alloc.str , "**") ;
+            hudData.alloc.str += "**";
         else
-            utAppendInt(hudData.alloc.str , i) ;
+            hudData.alloc.str += std::to_string(i);
 
-        utAppendChar(hudData.alloc.str , '/') ;
+        hudData.alloc.str += '/';
 
         if ( j == 0 )
-            strcat(hudData.alloc.str , "**") ;
+            hudData.alloc.str += "**";
         else
-            utAppendInt(hudData.alloc.str , j) ;
+            hudData.alloc.str += std::to_string(j);
 
         hudData.alloc.walloc  = i;
         hudData.alloc.ealloc  = j;
@@ -399,8 +415,7 @@ void hudSetTemps(int snum)
         else
             hudData.etemp.color = GreenLevelColor;
 
-        snprintf( hudData.etemp.str, HUD_STR_SZ, "%3d",
-                  (i < 0) ? 0 : i );
+        hudData.etemp.str = fmt::format("{:3d}", ((i < 0) ? 0 : i ));
 
         hudData.etemp.temp  = etemp;
         hudData.etemp.overl = eOverl;
@@ -417,12 +432,10 @@ void hudSetTemps(int snum)
         else
             hudData.wtemp.color = GreenLevelColor;
 
-        snprintf( hudData.wtemp.str, HUD_STR_SZ, "%3d",
-                  (i < 0) ? 0 : i );
+        hudData.wtemp.str = fmt::format("{:3d}", ((i < 0) ? 0 : i ));
 
         hudData.wtemp.temp  = wtemp;
         hudData.wtemp.overl = wOverl;
-
     }
 
     return;
@@ -432,20 +445,20 @@ void hudSetTow(int snum)
 {
     if (STOWING(snum) || STOWEDBY(snum))
     {
-        hudData.tow.str[0] = 0;
+        hudData.tow.str.clear();
 
         if (STOWING(snum))
         {
-            utStrncpy(hudData.tow.str, "towing ", HUD_STR_SZ);
+            hudData.tow.str = "towing ";
             utAppendShip(hudData.tow.str, cbShips[snum].towing);
         }
 
         if (STOWEDBY(snum))
         {
             if (STOWING(snum))
-                utStrncat(hudData.tow.str, ", ", HUD_STR_SZ);
+                hudData.tow.str += ", ";
 
-            utStrncat(hudData.tow.str, "towedby ", HUD_STR_SZ);
+            hudData.tow.str += "towedby ";
             utAppendShip(hudData.tow.str, cbShips[snum].towedby);
         }
 
@@ -467,9 +480,9 @@ void hudSetArmies(int snum)
     if (i != hudData.armies.armies)
     {
         if (i == 0)
-            hudData.armies.str[0] = 0;
+            hudData.armies.str.clear();
         else
-            snprintf( hudData.armies.str, HUD_STR_SZ, "%2d armies", i );
+            hudData.armies.str = fmt::format("{:2d} armies", i );
 
         hudData.armies.armies = i;
     }
@@ -483,8 +496,11 @@ void hudSetRobotAction(int snum)
 
     if (i != hudData.raction.action)
     {
-        robstr( i, hudData.raction.str );
+        // FIXME when robstr() can do strings
+        char tmpStr[64];
 
+        robstr( i, tmpStr );
+        hudData.raction.str = tmpStr;
         hudData.raction.action = i;
     }
 
@@ -498,10 +514,9 @@ void hudSetDestruct(int snum)
     if (i != hudData.destruct.fuse)
     {
         if (!i)
-            hudData.destruct.str[0] = 0;
+            hudData.destruct.str.clear();
         else
-            snprintf( hudData.destruct.str, HUD_STR_SZ,
-                      "DESTRUCT MINUS %02d", i );
+            hudData.destruct.str = fmt::format("DESTRUCT MINUS {:02d}", i );
 
         hudData.destruct.fuse = i;
     }
@@ -509,85 +524,69 @@ void hudSetDestruct(int snum)
     return;
 }
 
-
-/* return a buffer of spaces for padding */
-static char *_padstr(int l)
+void hudSetPrompt(int line, const std::string& prompt, int pcolor,
+                  const std::string& buf, int color)
 {
-    static char padding[HUD_PROMPT_SZ];
-
-    if (l >= HUD_PROMPT_SZ)
-        l = HUD_PROMPT_SZ - 1;
-
-    if (l < 0)
-        l = 0;
-
-    if (l > 0)
-        memset(padding, ' ', l);
-
-    padding[l - 1] = 0;
-
-    return padding;
-}
-
-
-void hudSetPrompt(int line, const char *prompt, int pcolor,
-                  const char *buf, int color)
-{
-    char *str;
-    const char *pstr;
+    std::string str;
+    std::string pstr;
     int pl;
-    const char *bstr;
+    std::string bstr;
     int bl;
     const int maxwidth = 80;
+    bool clearString = false;
 
-    switch(line)
-    {
-    case MSG_LIN1:
-        str = hudData.p1.str;
-        break;
+    if (buf.empty() && prompt.empty())
+        clearString = true;
 
-    case MSG_LIN2:
-        str = hudData.p2.str;
-        break;
-
-    case MSG_MSG:
-    default:
-        color = InfoColor;
-        str = hudData.msg.str;
-        break;
-    }
-
-    if (!buf && !prompt)
-    {
-        str[0] = 0;
-        return;
-    }
-
-    if (!buf)
+    if (buf.empty())
     {
         bl = 0;
         bstr = "";
     }
     else
     {
-        bl = strlen(buf);
+        bl = buf.size();
         bstr = buf;
     }
 
-    if (!prompt)
+    if (prompt.empty())
     {
         pl = 0;
         pstr = "";
     }
     else
     {
-        pl = strlen(prompt);
+        pl = prompt.size();
         pstr = prompt;
     }
 
-    snprintf(str, HUD_PROMPT_SZ,
-             "#%d#%s#%d#%s%s",
-             pcolor, pstr, color, bstr, _padstr(maxwidth - (pl + bl)));
+    if (clearString)
+        str.clear();
+    else
+    {
+        if (line != MSG_LIN1 && line != MSG_LIN2)
+            color = InfoColor;
+
+        str = fmt::format("#{:d}#{:s}#{:d}#{:s}{:s}",
+                          pcolor, pstr, color, bstr,
+                          std::string((maxwidth - (pl + bl)), ' '));
+    }
+
+    switch(line)
+    {
+    case MSG_LIN1:
+        hudData.p1.str = str;
+        break;
+
+    case MSG_LIN2:
+        hudData.p2.str = str;
+        break;
+
+    case MSG_MSG:
+    default:
+        hudData.msg.str = str;
+        break;
+    }
 
     return;
 }
@@ -595,7 +594,7 @@ void hudSetPrompt(int line, const char *prompt, int pcolor,
 /* a shortcut */
 void hudClearPrompt(int line)
 {
-    hudSetPrompt(line, NULL, NoColor, NULL, NoColor);
+    hudSetPrompt(line, "", NoColor, "", NoColor);
 
     return;
 }
@@ -607,11 +606,10 @@ void hudSetInfoFiringAngle(real blastang)
 
     if (blastang != hudData.info.lastblast)
     {
-        snprintf(hudData.info.lastblaststr, HUD_INFO_STR_SZ,
-                 "#%d#FA:#%d#%3d",
-                 MagentaColor,
-                 InfoColor,
-                 (i >= 0) ? i : 0);
+        hudData.info.lastblaststr = fmt::format("#{:d}#FA:#{:d}#{:3d}",
+                                                MagentaColor,
+                                                InfoColor,
+                                                ((i >= 0) ? i : 0));
 
         hudData.info.lastblast = blastang;
     }
@@ -625,19 +623,19 @@ void hudSetInfoFiringAngle(real blastang)
 static void _updateTargetInfoString(void)
 {
     if (!(hudData.info.lasttarget >= 0 && Context.lastinfostr[0] != 0))
-        hudData.info.lasttadstr[0] = 0;
+        hudData.info.lasttadstr.clear();
     else
-        snprintf(hudData.info.lasttadstr, HUD_INFO_STR_SZ,
-                 "#%d#TA/D:#2%d#%3s#%d#:#%d#%3d#%d#/#%d#%5d",
-                 MagentaColor,
-                 SpecialColor,
-                 hudData.info.lasttargetstr,
-                 MagentaColor,
-                 InfoColor,
-                 hudData.info.lastang,
-                 MagentaColor,
-                 InfoColor,
-                 hudData.info.lastdist);
+        hudData.info.lasttadstr =
+            fmt::format(
+                "#{:d}#TA/D:#{:d}#{:>3s} #{:d}#{:3d}#{:d}#/#{:d}#{:5d}",
+                MagentaColor,
+                NoColor,
+                hudData.info.lasttargetstr,
+                InfoColor,
+                hudData.info.lastang,
+                MagentaColor,
+                InfoColor,
+                hudData.info.lastdist);
 
     return;
 }
@@ -646,17 +644,15 @@ void hudSetInfoTarget(int tnum, bool isShip)
 {
     if (tnum != hudData.info.lasttarget)
     {
-        hudData.info.lasttargetstr[0] = 0;
+        hudData.info.lasttargetstr.clear();
         if (tnum >= 0)
         {
             if (isShip && tnum < cbLimits.maxShips())
-                utAppendShip(hudData.info.lasttargetstr , tnum) ;
+                utAppendShip(hudData.info.lasttargetstr, tnum) ;
             else if (!isShip && tnum < cbLimits.maxPlanets())
             {                   /* planet, just need 3 chars */
-                hudData.info.lasttargetstr[0] = cbPlanets[tnum].name[0];
-                hudData.info.lasttargetstr[1] = cbPlanets[tnum].name[1];
-                hudData.info.lasttargetstr[2] = cbPlanets[tnum].name[2];
-                hudData.info.lasttargetstr[3] = 0;
+                std::string tmp = cbPlanets[tnum].name;
+                hudData.info.lasttargetstr = tmp.substr(0, 3);
             }
         }
 
@@ -692,23 +688,17 @@ void hudSetInfoTargetDist(int tdist)
 }
 
 /* ship currently being viewed during playback */
-void hudSetRecId(char *str)
+void hudSetRecId(const std::string& str)
 {
-    if (str)
-        utStrncpy(hudData.recId.str, str, sizeof(hudData.recId.str));
-    else
-        hudData.recId.str[0] = 0;
+    hudData.recId.str = str;
 
     return;
 }
 
 /* ship currently being viewed during playback */
-void hudSetRecTime(char *str)
+void hudSetRecTime(const std::string& str)
 {
-    if (str)
-        utStrncpy(hudData.recTime.str, str, sizeof(hudData.recTime.str));
-    else
-        hudData.recTime.str[0] = 0;
+    hudData.recTime.str = str;
 
     return;
 }

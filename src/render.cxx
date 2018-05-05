@@ -890,7 +890,7 @@ void renderHud(bool dostats)
 
     /* heading val */
     glfRenderFont(o.headl.x, o.headl.y, 0.0, o.headl.w,
-                  o.headl.h, glfFontLarge, hudData.heading.str,
+                  o.headl.h, glfFontLarge, hudData.heading.str.c_str(),
                   hudData.heading.color, NULL,
                   GLF_FONT_F_SCALEX | GLF_FONT_F_ORTHO);
 
@@ -910,7 +910,7 @@ void renderHud(bool dostats)
     /* warp val */
     glfRenderFont(o.warpl.x, o.warpl.y, 0.0,
                   o.warpl.w, o.warpl.h,
-                  glfFontLarge, hudData.warp.str,
+                  glfFontLarge, hudData.warp.str.c_str(),
                   hudData.warp.color, NULL,
                   GLF_FONT_F_SCALEX | GLF_FONT_F_ORTHO);
 
@@ -932,7 +932,7 @@ void renderHud(bool dostats)
     /* shields num */
     glfRenderFont(o.d1shn.x, o.d1shn.y, 0.0, o.d1shn.w, o.d1shn.h,
                   glfFontFixed,
-                  hudData.sh.str, hudData.sh.color,
+                  hudData.sh.str.c_str(), hudData.sh.color,
                   NULL,
                   GLF_FONT_F_SCALEX | GLF_FONT_F_ORTHO);
 
@@ -948,7 +948,7 @@ void renderHud(bool dostats)
     /* damage num */
     glfRenderFont(o.d1damn.x, o.d1damn.y, 0.0, o.d1damn.w, o.d1damn.h,
                   glfFontFixed,
-                  hudData.dam.str, hudData.dam.color,
+                  hudData.dam.str.c_str(), hudData.dam.color,
                   NULL,
                   GLF_FONT_F_SCALEX | GLF_FONT_F_ORTHO);
 
@@ -959,7 +959,7 @@ void renderHud(bool dostats)
     /* fuel value */
     glfRenderFont(o.d2fueln.x, o.d2fueln.y, 0.0, o.d2fueln.w, o.d2fueln.h,
                   glfFontFixed,
-                  hudData.fuel.str, hudData.fuel.color,
+                  hudData.fuel.str.c_str(), hudData.fuel.color,
                   NULL,
                   GLF_FONT_F_SCALEX | GLF_FONT_F_ORTHO);
 
@@ -970,7 +970,7 @@ void renderHud(bool dostats)
     /* etemp value */
     glfRenderFont(o.d2engtn.x, o.d2engtn.y, 0.0, o.d2engtn.w, o.d2engtn.h,
                   glfFontFixed,
-                  hudData.etemp.str, hudData.etemp.color,
+                  hudData.etemp.str.c_str(), hudData.etemp.color,
                   NULL,
                   GLF_FONT_F_SCALEX | GLF_FONT_F_ORTHO);
 
@@ -981,7 +981,7 @@ void renderHud(bool dostats)
     /* wtemp value*/
     glfRenderFont(o.d2weptn.x, o.d2weptn.y, 0.0, o.d2weptn.w, o.d2weptn.h,
                   glfFontFixed,
-                  hudData.wtemp.str, hudData.wtemp.color,
+                  hudData.wtemp.str.c_str(), hudData.wtemp.color,
                   NULL,
                   GLF_FONT_F_SCALEX | GLF_FONT_F_ORTHO);
 
@@ -991,7 +991,7 @@ void renderHud(bool dostats)
 
     /* alloc value */
     glfRenderFont(o.d2allocn.x, o.d2allocn.y, 0.0, o.d2allocn.w, o.d2allocn.h,
-                  glfFontFixed, hudData.alloc.str, hudData.alloc.color,
+                  glfFontFixed, hudData.alloc.str.c_str(), hudData.alloc.color,
                   NULL,
                   GLF_FONT_F_SCALEX | GLF_FONT_F_ORTHO);
 
@@ -1003,7 +1003,7 @@ void renderHud(bool dostats)
     glfRenderFont(o.d2killb.x, o.d2killb.y, 0.0,
                   o.d2killb.w,
                   o.d2killb.h, glfFontFixed,
-                  hudData.kills.str,
+                  hudData.kills.str.c_str(),
                   hudData.kills.color, NULL,
                   GLF_FONT_F_SCALEX | GLF_FONT_F_ORTHO);
 
@@ -1020,7 +1020,7 @@ void renderHud(bool dostats)
         if (hudData.tow.towstat)
             glfRenderFont(o.tow.x, o.tow.y, 0.0,
                           o.tow.w, o.tow.h,
-                          glfFontFixed, hudData.tow.str,
+                          glfFontFixed, hudData.tow.str.c_str(),
                           hudData.tow.color | 0x50000000,
                           NULL,
                           GLF_FONT_F_ORTHO);
@@ -1032,7 +1032,7 @@ void renderHud(bool dostats)
             glfRenderFont(o.arm.x, o.arm.y, 0.0,
                           o.arm.w, o.arm.h,
                           glfFontFixed,
-                          hudData.raction.str,
+                          hudData.raction.str.c_str(),
                           hudData.raction.color | 0x50000000,
                           NULL,
                           GLF_FONT_F_SCALEX | GLF_FONT_F_ORTHO);
@@ -1040,7 +1040,7 @@ void renderHud(bool dostats)
             glfRenderFont(o.arm.x, o.arm.y, 0.0,
                           o.arm.w, o.arm.h,
                           glfFontFixed,
-                          hudData.armies.str,
+                          hudData.armies.str.c_str(),
                           hudData.armies.color | 0x50000000,
                           NULL,
                           GLF_FONT_F_SCALEX | GLF_FONT_F_ORTHO);
@@ -1051,7 +1051,7 @@ void renderHud(bool dostats)
             glfRenderFont(o.destruct.x, o.destruct.y, 0.0,
                           o.destruct.w, o.destruct.h,
                           glfFontMsg,
-                          hudData.destruct.str,
+                          hudData.destruct.str.c_str(),
                           (BLINK_ONESEC) ?
                           hudData.destruct.color | CQC_A_BOLD | 0x50000000:
                           (hudData.destruct.color | 0x50000000) & ~CQC_A_BOLD,
@@ -1076,7 +1076,7 @@ void renderHud(bool dostats)
 
             glfRenderFont(o.d1atarg.x, o.d1atarg.y, 0.0,
                           o.d1atarg.w, o.d1atarg.h,
-                          glfFontLarge, hudData.aStat.str,
+                          glfFontLarge, hudData.aStat.str.c_str(),
                           icl | 0x50000000, NULL,
                           GLF_FONT_F_SCALEX | GLF_FONT_F_ORTHO);
         }
@@ -1401,16 +1401,17 @@ void renderHud(bool dostats)
         glfRenderFont(o.d1icon_fa.x, o.d1icon_fa.y,
                       0.0,
                       o.d1icon_fa.w, o.d1icon_fa.h,
-                      glfFontFixed, hudData.info.lastblaststr, NoColor,
+                      glfFontFixed, hudData.info.lastblaststr.c_str(), NoColor,
                       NULL,
                       GLF_FONT_F_SCALEX | GLF_FONT_F_DOCOLOR | GLF_FONT_F_ORTHO);
 
         /* render tad */
-        if (hudData.info.lasttadstr[0])
+        if (hudData.info.lasttadstr.size())
             glfRenderFont(o.d1icon_tad.x, o.d1icon_tad.y,
                           0.0,
                           o.d1icon_tad.w, o.d1icon_tad.h,
-                          glfFontFixed, hudData.info.lasttadstr, NoColor,
+                          glfFontFixed, hudData.info.lasttadstr.c_str(),
+                          NoColor,
                           NULL,
                           GLF_FONT_F_SCALEX | GLF_FONT_F_DOCOLOR | GLF_FONT_F_ORTHO);
     }
@@ -1433,14 +1434,14 @@ void renderHud(bool dostats)
         glfRenderFont(o.pbitem.x, o.pbitem.y,
                       0.0,
                       o.pbitem.w, o.pbitem.h,
-                      glfFontFixed, hudData.recId.str,
+                      glfFontFixed, hudData.recId.str.c_str(),
                       MagentaColor | CQC_A_BOLD,
                       NULL,
                       GLF_FONT_F_SCALEX | GLF_FONT_F_DOCOLOR | GLF_FONT_F_ORTHO);
 
         glfRenderFont(o.rectime.x, o.rectime.y, 0.0,
                       o.rectime.w, o.rectime.h,
-                      glfFontFixed, hudData.recTime.str, NoColor,
+                      glfFontFixed, hudData.recTime.str.c_str(), NoColor,
                       NULL,
                       GLF_FONT_F_SCALEX | GLF_FONT_F_DOCOLOR | GLF_FONT_F_ORTHO);
     }
@@ -1449,26 +1450,26 @@ void renderHud(bool dostats)
     /* the 3 prompt/msg lines  */
 
     /* MSG_LIN1 */
-    if (hudData.p1.str[0])
+    if (hudData.p1.str.size())
         glfRenderFont(o.msg1.x, o.msg1.y, 0.0,
                       o.msg1.w, o.msg1.h,
-                      glfFontFixed, hudData.p1.str, InfoColor,
+                      glfFontFixed, hudData.p1.str.c_str(), InfoColor,
                       NULL,
                       GLF_FONT_F_SCALEX | GLF_FONT_F_DOCOLOR | GLF_FONT_F_ORTHO);
 
     /* MSG_LIN2 */
-    if (hudData.p2.str[0])
+    if (hudData.p2.str.size())
         glfRenderFont(o.msg2.x, o.msg2.y, 0.0,
                       o.msg2.w, o.msg2.h,
-                      glfFontFixed, hudData.p2.str, InfoColor,
+                      glfFontFixed, hudData.p2.str.c_str(), InfoColor,
                       NULL,
                       GLF_FONT_F_SCALEX | GLF_FONT_F_DOCOLOR | GLF_FONT_F_ORTHO);
 
     /* MSG_MSG */
-    if (hudData.msg.str[0])
+    if (hudData.msg.str.size())
         glfRenderFont(o.msgmsg.x, o.msgmsg.y, 0.0,
                       o.msgmsg.w, o.msgmsg.h,
-                      glfFontMsg, hudData.msg.str, InfoColor,
+                      glfFontMsg, hudData.msg.str.c_str(), InfoColor,
                       NULL,
                       GLF_FONT_F_SCALEX | GLF_FONT_F_DOCOLOR | GLF_FONT_F_ORTHO);
 

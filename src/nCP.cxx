@@ -181,13 +181,13 @@ extern void setWarp(real warp); /* FIXME - GL.c */
 
 
 /* common output */
-#define cp_putmsg(str, lin)  hudSetPrompt(lin, NULL, NoColor, str, NoColor)
+#define cp_putmsg(str, lin)  hudSetPrompt(lin, "", NoColor, str, NoColor)
 
 #if 0                           /* for debugging */
-void cp_putmsg(char *str, int lin)
+void cp_putmsg(std::string str, int lin)
 {
-    hudSetPrompt(lin, NULL, NoColor, str, NoColor);
-    utLog("PUTMSG: %s", str);
+    hudSetPrompt(lin, "", NoColor, str, NoColor);
+    utLog("PUTMSG: %s", str.c_str());
 }
 #endif
 
@@ -303,7 +303,7 @@ static void _infoship( int snum, int scanner, bool doOutput )
         /* Silly Captain... */
         cbuf += ": That's us, silly!";
         if (doOutput)
-            cp_putmsg( cbuf.c_str(), MSG_LIN1 );
+            cp_putmsg( cbuf, MSG_LIN1 );
         hudSetInfoTarget(-1, false);
         return;
     }
@@ -386,7 +386,7 @@ static void _infoship( int snum, int scanner, bool doOutput )
     }
 
     if (doOutput)
-        cp_putmsg( cbuf.c_str(), MSG_LIN1 );
+        cp_putmsg( cbuf, MSG_LIN1 );
 
     if ( ! SCLOAKED(snum) || cbShips[snum].warp != 0.0 )
     {
@@ -524,7 +524,7 @@ static void _infoship( int snum, int scanner, bool doOutput )
     {
         cbuf += '.';
         if (doOutput)
-            cp_putmsg( cbuf.c_str(), MSG_LIN2 );
+            cp_putmsg( cbuf, MSG_LIN2 );
     }
 
     return;
@@ -720,7 +720,7 @@ static void _dowarp( int snum, real warp )
         return;
 
     cbuf = fmt::format("Warp {}.", int(warp));
-    cp_putmsg(cbuf.c_str(), MSG_LIN1 );
+    cp_putmsg(cbuf, MSG_LIN1 );
 
     /* we set it locally since the server won't send it to us */
     cbShips[snum].dwarp = warp;
@@ -913,7 +913,7 @@ static void rmesg(int snum, int msgnum, int lin)
     strcat(buf , ": ");
     strcat(buf , cbMsgs[msgnum].msgbuf);
 
-    hudSetPrompt(lin, NULL, NoColor, buf, CyanColor);
+    hudSetPrompt(lin, "", NoColor, buf, CyanColor);
 
     return;
 }
@@ -963,7 +963,7 @@ static void _doorbit( int snum )
         cbuf += "We are not close enough to orbit, ";
         cbuf += cbShips[snum].alias;
         cbuf += '.';
-        cp_putmsg( cbuf.c_str(), MSG_LIN1 );
+        cp_putmsg( cbuf, MSG_LIN1 );
         hudClearPrompt(MSG_LIN2);
     }
     else if ( cbShips[snum].warp > MAX_ORBIT_WARP )
@@ -971,11 +971,11 @@ static void _doorbit( int snum )
         cbuf += "We are going too fast to orbit, ";
         cbuf += cbShips[snum].alias;
         cbuf += '.';
-        cp_putmsg( cbuf.c_str(), MSG_LIN1 );
+        cp_putmsg( cbuf, MSG_LIN1 );
 
         cbuf = fmt::format("Maximum orbital insertion velocity is warp {:.1f}.",
                            MAX_ORBIT_WARP);
-        cp_putmsg( cbuf.c_str(), MSG_LIN2 );
+        cp_putmsg( cbuf, MSG_LIN2 );
     }
     else
     {
@@ -1151,7 +1151,7 @@ static int _chkcoup(void)
         std::string cbuf =
             fmt::format("This planet is uninhabitable for {} more minutes.",
                         i);
-        cp_putmsg( cbuf.c_str(), MSG_LIN1 );
+        cp_putmsg( cbuf, MSG_LIN1 );
         return false;
     }
 
@@ -1171,7 +1171,7 @@ static void _dotow(const char *buf, int ch)
 }
 
 /* modifies state */
-static void _domsgto(const char *buf, int ch, int terse)
+static void _domsgto(const std::string& buf, int ch, int terse)
 {
     int i, j;
     std::string tbuf;
@@ -1346,7 +1346,7 @@ static void _domsgto(const char *buf, int ch, int terse)
     if (!terse)
         tbuf += " ([ESC] to abort)";
 
-    cp_putmsg( tbuf.c_str(), MSG_LIN1 );
+    cp_putmsg( tbuf, MSG_LIN1 );
     hudClearPrompt(MSG_LIN2);
 
     msgto = to;                   /* set global */
@@ -1358,7 +1358,7 @@ static void _domsgto(const char *buf, int ch, int terse)
     prm.buflen = MESSAGE_SIZE;
     prm.pbuf = "> ";
     prm.index = MSG_LIN2;
-    hudSetPrompt(prm.index, prm.pbuf.c_str(), NoColor, prm.buf.c_str(),
+    hudSetPrompt(prm.index, prm.pbuf, NoColor, prm.buf,
                  NoColor);
     prompting = true;
 
@@ -1366,7 +1366,7 @@ static void _domsgto(const char *buf, int ch, int terse)
 }
 
 /* modifies state */
-static void _domsg(const char *_msg, int ch, int irv)
+static void _domsg(const std::string& _msg, int ch, int irv)
 {
     std::string msg = _msg;
 
@@ -1387,7 +1387,7 @@ static void _domsg(const char *_msg, int ch, int irv)
             // last char received
             prm.buf = fmt::format("{}{}", lastWord, (char)ch);
 
-            hudSetPrompt(prm.index, prm.pbuf.c_str(), NoColor, prm.buf.c_str(),
+            hudSetPrompt(prm.index, prm.pbuf, NoColor, prm.buf,
                          CyanColor);
 
             // delete the last word from msg
@@ -1402,7 +1402,7 @@ static void _domsg(const char *_msg, int ch, int irv)
             // no words in msg, send whole thing
             prm.pbuf = "- ";
             prm.buf = ch;
-            hudSetPrompt(prm.index, prm.pbuf.c_str(), NoColor, prm.buf.c_str(),
+            hudSetPrompt(prm.index, prm.pbuf, NoColor, prm.buf,
                          CyanColor);
             sendMessage(msgto, msgtoDetail, msg.c_str());
         }
@@ -1751,7 +1751,7 @@ static void _dobomb(void)
     prm.pbuf = fmt::format("Press [TAB] to bombard {}, {} armies:",
         cbPlanets[pnum].name, cbPlanets[pnum].armies);
     prm.index = MSG_LIN1;
-    hudSetPrompt(prm.index, prm.pbuf.c_str(), NoColor, prm.buf.c_str(),
+    hudSetPrompt(prm.index, prm.pbuf, NoColor, prm.buf,
                  NoColor);
     prompting = true;
 
@@ -1817,7 +1817,7 @@ static void _initbeam()
         if ( i != 1 )
             cbuf += 's';
         cbuf += '.';
-        cp_putmsg( cbuf.c_str(), MSG_LIN1 );
+        cp_putmsg( cbuf, MSG_LIN1 );
         return;
     }
 
@@ -1877,7 +1877,7 @@ static void _initbeam()
             else
                 cbuf += "ies are";
             cbuf += " reluctant to beam aboard a pirate vessel.";
-            cp_putmsg( cbuf.c_str(), MSG_LIN1 );
+            cp_putmsg( cbuf, MSG_LIN1 );
             return;
 	}
         upmax = 0;
@@ -1902,7 +1902,7 @@ static void _initbeam()
         prm.index = MSG_LIN1;
         prm.buf.clear();
         prm.buflen = 10;
-        hudSetPrompt(prm.index, prm.pbuf.c_str(), NoColor, prm.buf.c_str(),
+        hudSetPrompt(prm.index, prm.pbuf, NoColor, prm.buf,
                      NoColor);
         prompting = true;
 
@@ -1925,7 +1925,7 @@ static void _initbeam()
     prm.index = MSG_LIN1;
     prm.buf.clear();
     prm.buflen = 10;
-    hudSetPrompt(prm.index, prm.pbuf.c_str(), NoColor, prm.buf.c_str(),
+    hudSetPrompt(prm.index, prm.pbuf, NoColor, prm.buf,
                  NoColor);
     prompting = true;
 
@@ -2043,7 +2043,7 @@ static void command( int ch )
             prm.buflen = MSGMAXLINE;
             prm.pbuf = "Press [TAB] to engage autopilot: ";
             prm.index = MSG_LIN1;
-            hudSetPrompt(prm.index, prm.pbuf.c_str(), NoColor, prm.buf.c_str(),
+            hudSetPrompt(prm.index, prm.pbuf, NoColor, prm.buf,
                          NoColor);
             prompting = true;
 	}
@@ -2060,8 +2060,8 @@ static void command( int ch )
         prm.buflen = MSGMAXLINE;
         prm.pbuf = "New weapons allocation: (30-70) ";
         prm.index = MSG_LIN1;
-        hudSetPrompt(prm.index, prm.pbuf.c_str(), NoColor,
-                     prm.buf.c_str(), NoColor);
+        hudSetPrompt(prm.index, prm.pbuf, NoColor,
+                     prm.buf, NoColor);
         prompting = true;
         break;
     case 'b':				/* beam armies */
@@ -2079,7 +2079,7 @@ static void command( int ch )
             prm.buflen = MSGMAXLINE;
             prm.pbuf = "Press [TAB] to engage cloaking device: ";
             prm.index = MSG_LIN1;
-            hudSetPrompt(prm.index, prm.pbuf.c_str(), NoColor, prm.buf.c_str(),
+            hudSetPrompt(prm.index, prm.pbuf, NoColor, prm.buf,
                          NoColor);
             prompting = true;
         }
@@ -2098,7 +2098,7 @@ static void command( int ch )
         prm.buflen = MSGMAXLINE;
         prm.pbuf = "Press [TAB] to send an emergency distress call: ";
         prm.index = MSG_LIN1;
-        hudSetPrompt(prm.index, prm.pbuf.c_str(), NoColor, prm.buf.c_str(),
+        hudSetPrompt(prm.index, prm.pbuf, NoColor, prm.buf,
                      NoColor);
 
         prompting = true;
@@ -2112,7 +2112,7 @@ static void command( int ch )
         prm.buflen = MSGMAXLINE;
         prm.pbuf = "Fire phasers: ";
         prm.index = MSG_LIN1;
-        hudSetPrompt(prm.index, prm.pbuf.c_str(), NoColor, prm.buf.c_str(),
+        hudSetPrompt(prm.index, prm.pbuf, NoColor, prm.buf,
                      NoColor);
         prompting = true;
     }
@@ -2133,7 +2133,7 @@ static void command( int ch )
         prm.buflen = MSGMAXLINE;
         prm.pbuf = "Information on: ";
         prm.index = MSG_LIN1;
-        hudSetPrompt(prm.index, prm.pbuf.c_str(), NoColor, prm.buf.c_str(),
+        hudSetPrompt(prm.index, prm.pbuf, NoColor, prm.buf,
                      NoColor);
 
         prompting = true;
@@ -2145,7 +2145,7 @@ static void command( int ch )
         prm.buflen = MSGMAXLINE;
         prm.pbuf = "Come to course: ";
         prm.index = MSG_LIN1;
-        hudSetPrompt(prm.index, prm.pbuf.c_str(), NoColor, prm.buf.c_str(),
+        hudSetPrompt(prm.index, prm.pbuf, NoColor, prm.buf,
                      NoColor);
         prompting = true;
         break;
@@ -2158,7 +2158,7 @@ static void command( int ch )
             prm.buflen = MSGMAXLINE;
             prm.pbuf = "Press [TAB] to try it: ";
             prm.index = MSG_LIN1;
-            hudSetPrompt(prm.index, prm.pbuf.c_str(), NoColor, prm.buf.c_str(),
+            hudSetPrompt(prm.index, prm.pbuf, NoColor, prm.buf,
                          NoColor);
             prompting = true;
         }
@@ -2173,7 +2173,7 @@ static void command( int ch )
         prm.buflen = MSGMAXLINE;
         prm.pbuf = "Message to: ";
         prm.index = MSG_LIN1;
-        hudSetPrompt(prm.index, prm.pbuf.c_str(), NoColor, prm.buf.c_str(),
+        hudSetPrompt(prm.index, prm.pbuf, NoColor, prm.buf,
                      NoColor);
         prompting = true;
         break;
@@ -2187,7 +2187,7 @@ static void command( int ch )
     {
         std::string oldPseudo = fmt::format("Old pseudonym: {}",
                                             cbShips[Context.snum].alias);
-        cp_putmsg(oldPseudo.c_str(), MSG_LIN1);
+        cp_putmsg(oldPseudo, MSG_LIN1);
 
         state = S_PSEUDO;
         prm.preinit = false;
@@ -2195,7 +2195,7 @@ static void command( int ch )
         prm.buflen = MAXUSERNAME;
         prm.pbuf = "Enter a new pseudonym: ";
         prm.index = MSG_LIN2;
-        hudSetPrompt(prm.index, prm.pbuf.c_str(), NoColor, prm.buf.c_str(),
+        hudSetPrompt(prm.index, prm.pbuf, NoColor, prm.buf,
                      NoColor);
         prompting = true;
     }
@@ -2217,7 +2217,7 @@ static void command( int ch )
         prm.buflen = MSGMAXLINE;
         prm.pbuf = "Torpedo burst: ";
         prm.index = MSG_LIN1;
-        hudSetPrompt(prm.index, prm.pbuf.c_str(), NoColor, prm.buf.c_str(),
+        hudSetPrompt(prm.index, prm.pbuf, NoColor, prm.buf,
                      NoColor);
         prompting = true;
     }
@@ -2231,7 +2231,7 @@ static void command( int ch )
         prm.buflen = MSGMAXLINE;
         prm.pbuf = "Launch torpedo: ";
         prm.index = MSG_LIN1;
-        hudSetPrompt(prm.index, prm.pbuf.c_str(), NoColor, prm.buf.c_str(),
+        hudSetPrompt(prm.index, prm.pbuf, NoColor, prm.buf,
                      NoColor);
         prompting = true;
     }
@@ -2250,7 +2250,7 @@ static void command( int ch )
             prm.buflen = MSGMAXLINE;
             prm.pbuf = "Press [TAB] to initiate self-destruct sequence: ";
             prm.index = MSG_LIN1;
-            hudSetPrompt(prm.index, prm.pbuf.c_str(), NoColor, prm.buf.c_str(),
+            hudSetPrompt(prm.index, prm.pbuf, NoColor, prm.buf,
                          NoColor);
             prompting = true;
         }
@@ -2268,8 +2268,8 @@ static void command( int ch )
                 prm.pbuf = fmt::format("Refit ship type: {}",
                                        cbShipTypes[refitst].name);
                 prm.index = MSG_LIN1;
-                hudSetPrompt(prm.index, prm.pbuf.c_str(), NoColor,
-                             prm.buf.c_str(), NoColor);
+                hudSetPrompt(prm.index, prm.pbuf, NoColor,
+                             prm.buf, NoColor);
                 cp_putmsg("Press [TAB] to change, [ENTER] to accept: ",
                           MSG_LIN2);
                 prompting = true;
@@ -2293,7 +2293,7 @@ static void command( int ch )
             prm.buflen = MSGMAXLINE;
             prm.pbuf = "Tow which ship? ";
             prm.index = MSG_LIN1;
-            hudSetPrompt(prm.index, prm.pbuf.c_str(), NoColor, prm.buf.c_str(),
+            hudSetPrompt(prm.index, prm.pbuf, NoColor, prm.buf,
                          NoColor);
             prompting = true;
         }
@@ -2325,7 +2325,7 @@ static void command( int ch )
         prm.buflen = 5;
         prm.pbuf = clbWarPrompt(Context.snum, twar);
         prm.index = MSG_LIN1;
-        hudSetPrompt(prm.index, prm.pbuf.c_str(), NoColor, prm.buf.c_str(),
+        hudSetPrompt(prm.index, prm.pbuf, NoColor, prm.buf,
                      NoColor);
         prompting = true;
 
@@ -3061,8 +3061,8 @@ static nodeStatus_t nCPInput(int ch)
                 state = S_NONE;
             }
             else
-                hudSetPrompt(prm.index, prm.pbuf.c_str(), NoColor,
-                             prm.buf.c_str(), CyanColor);
+                hudSetPrompt(prm.index, prm.pbuf, NoColor,
+                             prm.buf, CyanColor);
 
             break;
 
@@ -3074,8 +3074,8 @@ static nodeStatus_t nCPInput(int ch)
                 state = S_NONE;
             }
             else
-                hudSetPrompt(prm.index, prm.pbuf.c_str(), NoColor,
-                             prm.buf.c_str(), CyanColor);
+                hudSetPrompt(prm.index, prm.pbuf, NoColor,
+                             prm.buf, CyanColor);
 
             break;
 
@@ -3110,8 +3110,8 @@ static nodeStatus_t nCPInput(int ch)
                 state = S_NONE;
             }
             else
-                hudSetPrompt(prm.index, prm.pbuf.c_str(), NoColor,
-                             prm.buf.c_str(), CyanColor);
+                hudSetPrompt(prm.index, prm.pbuf, NoColor,
+                             prm.buf, CyanColor);
 
             break;
 
@@ -3133,8 +3133,8 @@ static nodeStatus_t nCPInput(int ch)
                 state = S_NONE;
             }
             else
-                hudSetPrompt(prm.index, prm.pbuf.c_str(), NoColor,
-                             prm.buf.c_str(), CyanColor);
+                hudSetPrompt(prm.index, prm.pbuf, NoColor,
+                             prm.buf, CyanColor);
 
             break;
 
@@ -3173,8 +3173,8 @@ static nodeStatus_t nCPInput(int ch)
                 state = S_NONE;
             }
             else
-                hudSetPrompt(prm.index, prm.pbuf.c_str(), NoColor,
-                             prm.buf.c_str(), CyanColor);
+                hudSetPrompt(prm.index, prm.pbuf, NoColor,
+                             prm.buf, CyanColor);
 
             break;
 
@@ -3211,19 +3211,19 @@ static nodeStatus_t nCPInput(int ch)
 
         case  S_MSGTO:
             if (irv > 0)
-                _domsgto(prm.buf.c_str(), ch,  UserConf.Terse); /* will set state appropriately */
+                _domsgto(prm.buf, ch,  UserConf.Terse); /* will set state appropriately */
             else
-                hudSetPrompt(prm.index, prm.pbuf.c_str(), NoColor,
-                             prm.buf.c_str(), CyanColor);
+                hudSetPrompt(prm.index, prm.pbuf, NoColor,
+                             prm.buf, CyanColor);
 
             break;
 
         case  S_MSG:
             if (irv != 0)
-                _domsg(prm.buf.c_str(), ch, irv); /* will set state appropriately */
+                _domsg(prm.buf, ch, irv); /* will set state appropriately */
             else
-                hudSetPrompt(prm.index, prm.pbuf.c_str(), NoColor,
-                             prm.buf.c_str(), CyanColor);
+                hudSetPrompt(prm.index, prm.pbuf, NoColor,
+                             prm.buf, CyanColor);
 
             break;
 
@@ -3317,7 +3317,7 @@ static nodeStatus_t nCPInput(int ch)
                                    (dirup) ? "up" : "down",
                                    beamax );
             prm.index = MSG_LIN1;
-            hudSetPrompt(prm.index, prm.pbuf.c_str(), NoColor, prm.buf.c_str(),
+            hudSetPrompt(prm.index, prm.pbuf, NoColor, prm.buf,
                          NoColor);
             prompting = true;
 
@@ -3328,8 +3328,8 @@ static nodeStatus_t nCPInput(int ch)
             if (irv > 0)
                 _dobeam(prm.buf, ch); /* will set state appropriately */
             else
-                hudSetPrompt(prm.index, prm.pbuf.c_str(), NoColor,
-                             prm.buf.c_str(), CyanColor);
+                hudSetPrompt(prm.index, prm.pbuf, NoColor,
+                             prm.buf, CyanColor);
 
             break;
 
@@ -3410,8 +3410,8 @@ static nodeStatus_t nCPInput(int ch)
                             if ( ! twar[i] || ! cbShips[Context.snum].rwar[i] )
                                 twar[i] = ! twar[i];
                             prm.pbuf = clbWarPrompt(Context.snum, twar);
-                            hudSetPrompt(prm.index, prm.pbuf.c_str(),
-                                         NoColor, prm.buf.c_str(), NoColor);
+                            hudSetPrompt(prm.index, prm.pbuf,
+                                         NoColor, prm.buf, NoColor);
                         }
                     }
                 }
@@ -3430,8 +3430,8 @@ static nodeStatus_t nCPInput(int ch)
                 hudClearPrompt(MSG_LIN2);
             }
             else
-                hudSetPrompt(prm.index, prm.pbuf.c_str(), NoColor,
-                             prm.buf.c_str(), CyanColor);
+                hudSetPrompt(prm.index, prm.pbuf, NoColor,
+                             prm.buf, CyanColor);
 
             break;
 
@@ -3455,8 +3455,8 @@ static nodeStatus_t nCPInput(int ch)
                         fmt::format("Refitting ship. This will take {} "
                                     "seconds to complete...",
                                     REFIT_GRAND/1000);
-                    hudSetPrompt(prm.index, prm.pbuf.c_str(), NoColor,
-                                 prm.buf.c_str(), NoColor);
+                    hudSetPrompt(prm.index, prm.pbuf, NoColor,
+                                 prm.buf, NoColor);
                     sendCommand(CPCMD_REFIT, (uint16_t)refitst);
                     prompting = false;
                     entertime = cInfo.nodeMillis;
@@ -3469,8 +3469,8 @@ static nodeStatus_t nCPInput(int ch)
                     prm.pbuf = fmt::format("Refit ship type: {}",
                                            cbShipTypes[refitst].name);
                     prm.buf.clear();
-                    hudSetPrompt(prm.index, prm.pbuf.c_str(), NoColor,
-                                 prm.buf.c_str(), NoColor);
+                    hudSetPrompt(prm.index, prm.pbuf, NoColor,
+                                 prm.buf, NoColor);
 
                     break;
 

@@ -447,7 +447,7 @@ void displayFeedback(char *msg, int lin)
     if (!msg)
         return;
 
-    hudSetPrompt(MSG_LIN1, NULL, NoColor, msg, NoColor);
+    hudSetPrompt(MSG_LIN1, "", NoColor, msg, NoColor);
 
     return;
 }

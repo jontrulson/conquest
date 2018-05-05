@@ -28,11 +28,9 @@
 #ifndef _HUD_H
 #define _HUD_H
 
-/* cockpit hud data items */
+#include <string>
 
-#define HUD_STR_SZ          64
-#define HUD_INFO_STR_SZ     256
-#define HUD_PROMPT_SZ       256
+/* cockpit hud data items */
 
 /* an enum for the various types of alert conditions one can be in */
 typedef enum {
@@ -69,88 +67,88 @@ typedef enum {
 struct _warp {
     real     warp;
     cqColor  color;
-    char     str[HUD_STR_SZ];
+    std::string str;
 };
 
 struct _heading {
     int     head;
     cqColor color;
-    char    str[HUD_STR_SZ];
+    std::string str;
 };
 
 struct _kills {
     real    kills;
     cqColor color;
-    char    str[HUD_STR_SZ];
+    std::string str;
 };
 
 struct _alertStatus {
     alertLevel_t  alertLevel;
     int           aShip;          /* hostile ship causing the alert, if any */
     cqColor       color;          /* alert text and alert border color */
-    char          str[HUD_STR_SZ];
+    std::string str;
 };
 
 struct _shields {
     int     shields;
     cqColor color;
-    char    str[HUD_STR_SZ];
+    std::string str;
 };
 
 struct _damage {
     real    damage;
     cqColor color;
-    char    str[HUD_STR_SZ];
+    std::string str;
 };
 
 struct _fuel {
     real    fuel;
     cqColor color;
-    char    str[HUD_STR_SZ];
+    std::string str;
 };
 
 struct _alloc {
     int     walloc;
     int     ealloc;
     cqColor color;
-    char    str[HUD_STR_SZ];
+    std::string str;
 };
 
 struct _temp {
     real    temp;
     cqColor color;
     int     overl;                    /* overloaded */
-    char    str[HUD_STR_SZ];
+    std::string str;
 };
 
 struct _tow {
     bool     towstat;              /* true if towing/towedby */
     cqColor color;
-    char    str[HUD_STR_SZ];
+    std::string str;
 };
 
 struct _armies {
     cqColor color;
     int     armies;
-    char    str[HUD_STR_SZ];
+    std::string str;
 };
 
 struct _raction {               /* robot action */
     cqColor color;
     int     action;
-    char    str[HUD_STR_SZ];
+    std::string str;
 };
 
 struct _destruct {              /* destruct msg */
     cqColor color;
     int     fuse;
-    char    str[HUD_STR_SZ];
+    std::string str;
 };
 
 /* prompt areas */
 
 struct _prompt_lin {
-    char str[HUD_PROMPT_SZ];
+    std::string str;
 };
 
 /* data from last info command for the iconic ship */
@@ -161,17 +159,17 @@ struct _info {
     int  lastdist;
     int  lasttarget;
 
-    char lastblaststr[HUD_INFO_STR_SZ];  /* last "FA:" blast (firing) angle */
-    char lasttargetstr[HUD_INFO_STR_SZ]; /* last target in char *form */
-    char lasttadstr[HUD_INFO_STR_SZ];    /* full "TA/D" target:ang/dist str */
+    std::string lastblaststr;  /* last "FA:" blast (firing) angle */
+    std::string lasttargetstr; /* last target in char *form */
+    std::string lasttadstr;    /* full "TA/D" target:ang/dist str */
 };
 
 struct _recId {
-    char str[HUD_INFO_STR_SZ];
+    std::string str;
 };
 
 struct _recTime {
-    char str[HUD_INFO_STR_SZ];
+    std::string str;
 };
 
 
@@ -223,14 +221,14 @@ void hudSetTow(int snum);
 void hudSetArmies(int snum);
 void hudSetRobotAction(int snum);
 void hudSetDestruct(int snum);
-void hudSetPrompt(int line, const char *prompt, int pcolor,
-                  const char *buf, int color);
+void hudSetPrompt(int line, const std::string& prompt, int pcolor,
+                  const std::string& buf, int color);
 void hudClearPrompt(int line);
 void hudSetInfoFiringAngle(real blastang);
 void hudSetInfoTarget(int tnum, bool isShip);
 void hudSetInfoTargetAngle(int ang);
 void hudSetInfoTargetDist(int tdist);
-void hudSetRecId(char *str);
-void hudSetRecTime(char *str);
+void hudSetRecId(const std::string& str);
+void hudSetRecTime(const std::string& str);
 
 #endif /* _HUD_H */
