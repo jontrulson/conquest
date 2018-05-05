@@ -927,7 +927,7 @@ void clbUserline( int unum, int snum, std::string& buf,
 
     if ( !ULIVE(unum) )
     {
-        buf.empty();
+        buf.clear();
         return;
     }
 
@@ -1016,7 +1016,7 @@ void clbStatline( int unum, std::string& buf )
 
     if ( !ULIVE(unum) )
     {
-        buf.empty();
+        buf.clear();
         return;
     }
 
