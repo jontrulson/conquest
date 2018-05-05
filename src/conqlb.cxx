@@ -301,7 +301,7 @@ void clbIKill(int snum, killedBy_t kb, uint16_t detail)
 
 
 /* ETAstr - return a string indicating ETA to a target */
-const std::string clbETAStr(real warp, real distance)
+std::string clbETAStr(real warp, real distance)
 {
     if (warp <= 0.0)
     {
@@ -998,9 +998,9 @@ void clbStatline( int unum, std::string& buf )
 {
     int i, j;
     char ch;
-    static const std::string hd1 = "planets   armies    phaser  torps";
+    static const std::string hd1 = "planets      armies phaser  torps";
     static const std::string hd2 =
-        "name         cpu  conq coup geno  taken bombed/shot  shots  fired   last entry";
+        "name         cpu  conq coup geno  taken bombed/shot  shots  fired    last entry";
 
     if ( unum < 0 || unum >= cbLimits.maxUsers() )
     {
@@ -1025,8 +1025,7 @@ void clbStatline( int unum, std::string& buf )
         percent = "   -";
     else
     {
-        i = 1000
-            * cbUsers[unum].stats[USTAT_CPUSECONDS]
+        i = 1000 * cbUsers[unum].stats[USTAT_CPUSECONDS]
             / cbUsers[unum].stats[USTAT_SECONDS];
         percent = fmt::format("{:3d}%", (i + 5) / 10);
     }
@@ -1039,7 +1038,7 @@ void clbStatline( int unum, std::string& buf )
                       cbUsers[unum].stats[USTAT_COUPS],
                       cbUsers[unum].stats[USTAT_GENOCIDE] );
 
-    buf = fmt::format("{} {:6d} {:6d} {:4d} {:6d} {:5d}",
+    buf = fmt::format("{} {:6d} {:6d} {:4d} {:6d}  {:5d}",
                       tmp,
                       cbUsers[unum].stats[USTAT_CONQPLANETS],
                       cbUsers[unum].stats[USTAT_ARMBOMB],
@@ -1056,7 +1055,7 @@ void clbStatline( int unum, std::string& buf )
     {				/* format it properly */
         utFormatTime(tmp, cbUsers[unum].lastentry);
 
-        // remove the seconds (:nn)
+        // remove the seconds (:nn), after skipping over the first ':'
         size_t pos = tmp.find(":", 4);
         tmp.erase(pos, 3);
         tmp = fmt::format(" {:>13.13s}", tmp);
@@ -1080,7 +1079,6 @@ int clbZeroPlanet( int pnum, int snum )
 {
     int oteam, i;
     int didgeno = false;
-    char buf[MSGMAXLINE];
 
     oteam = cbPlanets[pnum].team;
     cbPlanets[pnum].team = TEAM_NOTEAM;
@@ -1117,14 +1115,15 @@ int clbZeroPlanet( int pnum, int snum )
                 cbUsers[cbShips[snum].unum].stats[USTAT_GENOCIDE] += 1;
                 cbTeams[cbShips[snum].team].stats[TSTAT_GENOCIDE] += 1;
 
-                sprintf(buf, "%c%d (%s) genocided the %s team!",
-                        cbTeams[cbShips[snum].team].teamchar,
-                        snum,
-                        cbShips[snum].alias,
-                        cbTeams[oteam].name);
+                std::string buf;
+                buf = fmt::format("{}{} ({}) genocided the %s team!",
+                                  cbTeams[cbShips[snum].team].teamchar,
+                                  snum,
+                                  cbShips[snum].alias,
+                                  cbTeams[oteam].name);
 
-                clbStoreMsg(MSG_FROM_COMP, 0, MSG_TO_ALL, 0, buf);
-                utLog("GENO: %s", buf);
+                clbStoreMsg(MSG_FROM_COMP, 0, MSG_TO_ALL, 0, buf.c_str());
+                utLog("GENO: %s", buf.c_str());
             }
         }
     }
@@ -1136,16 +1135,16 @@ int clbZeroPlanet( int pnum, int snum )
 
 }
 
-const char *clbWarPrompt(int snum, int twar[])
+std::string clbWarPrompt(int snum, int twar[])
 {
-    static char wbuf[BUFFER_SIZE_256];
-    static const char *fmt = "Press [TAB] when done, [ESC] to abort:  Peace: %c %c %c %c  War: %c %c %c %c";
-    int i;
-    char ch, peace[NUMPLAYERTEAMS], war[NUMPLAYERTEAMS];
+    char peace[NUMPLAYERTEAMS], war[NUMPLAYERTEAMS];
 
-    for ( i = 0; i < NUMPLAYERTEAMS; i++ )
+    for ( int i=0; i<NUMPLAYERTEAMS; i++ )
+    {
         if ( twar[i] )
         {
+            char ch;
+
             if ( cbShips[snum].rwar[i] )
                 ch = cbTeams[i].teamchar;
             else
@@ -1160,20 +1159,19 @@ const char *clbWarPrompt(int snum, int twar[])
             war[i] = ' ';
         }
 
-    sprintf(wbuf, fmt,
-            peace[0],
-            peace[1],
-            peace[2],
-            peace[3],
-            war[0],
-            war[1],
-            war[2],
-            war[3]);
+    }
 
-    return wbuf;
+    return fmt::format("Press [TAB] when done, [ESC] to abort:  "
+                       "Peace: {} {} {} {}  War: {} {} {} {}",
+                       peace[0],
+                       peace[1],
+                       peace[2],
+                       peace[3],
+                       war[0],
+                       war[1],
+                       war[2],
+                       war[3]);
 }
-
-
 
 /*  canread - determine if a message is readable */
 /*  SYNOPSIS */
@@ -1276,11 +1274,12 @@ void clbClearShips(void)
 int clbCVTCoords( real cenx, real ceny, real x, real y, real scale,
                   int *lin, int *col )
 {
-    *col = iround( (Context.maxcol-STAT_COLS)/2 + (x-cenx) / scale * WIDTH_FAC ) +
-        STAT_COLS;
+    *col = iround( (Context.maxcol-STAT_COLS)/2
+                   + (x-cenx) / scale * WIDTH_FAC ) + STAT_COLS;
 
     *lin = iround( (DISPLAY_LINS/2+1) - (y-ceny) / scale );
-    if ( *lin < 0 || *lin > DISPLAY_LINS || *col <= STAT_COLS || *col > Context.maxcol )
+    if ( *lin < 0 || *lin > DISPLAY_LINS || *col <= STAT_COLS
+         || *col > Context.maxcol )
         return ( false );
 
     return ( true );
@@ -1293,11 +1292,9 @@ int clbCVTCoords( real cenx, real ceny, real x, real y, real scale,
 /*    doomfind */
 void clbDoomFind(void)
 {
-
     int i;
-    real taste, tastiness;
+    real taste = 0.0, tastiness = 0.0;
 
-    tastiness = 0.0;
     cbDoomsday->lock = LOCK_NONE;
     cbDoomsday->lockDetail = 0;
     DOOMCLR(DOOM_F_ATTACKING); // not attacking while looking for a
@@ -1362,7 +1359,7 @@ void clbDoomsday(void)
 /*    int snum, pnum */
 /*    int flag, findorbit */
 /*    flag = clbFindOrbit( snum, pnum ) */
-int clbFindOrbit( int snum, int *pnum )
+bool clbFindOrbit( int snum, int *pnum )
 {
     int i;
 
@@ -1375,8 +1372,8 @@ int clbFindOrbit( int snum, int *pnum )
             *pnum = i;
             return ( true );
         }
+
     /* Didn't find one. */
-    /*    *pnum = 0;*/
     return ( false );
 
 }
@@ -1466,7 +1463,8 @@ int clbFindShip( int *snum )
 /*    int flag, findspecial */
 /*    int snum, token, count, sorpnum, xsorpnum */
 /*    flag = clbFindSpecial( snum, token, count, sorpnum, xsorpnum ) */
-int clbFindSpecial( int snum, int token, int count, int *sorpnum, int *xsorpnum )
+int clbFindSpecial( int snum, int token, int count, int *sorpnum,
+                    int *xsorpnum )
 {
     int i, a, na, ta, u, nu, tu;
     real d, nd, td;
@@ -1702,7 +1700,7 @@ int clbFindSpecial( int snum, int token, int count, int *sorpnum, int *xsorpnum 
 }
 
 
-/*  fixdeltas - update sdx and sdy */
+/*  fixdeltas - update ship dx and dy */
 /*  SYNOPSIS */
 /*    int snum */
 /*    clbFixDeltas( snum ) */
@@ -1725,16 +1723,15 @@ void clbFixDeltas( int snum )
 /*    int unum */
 /*    char lname() */
 /*    truth = clbGetUserNum( unum, lname ) */
-int clbGetUserNum( int *unum, const char *lname, userTypes_t ltype )
+bool clbGetUserNum( int *unum, const std::string& lname, userTypes_t ltype )
 {
     int i;
-    const char *lptr = lname;
 
     *unum = -1;
     for ( i = 0; i < cbLimits.maxUsers(); i++ )
         if ( ULIVE(i) )
         {
-            if ( strcmp( lptr, cbUsers[i].username ) == 0
+            if ( strcmp( lname.c_str(), cbUsers[i].username ) == 0
                  && (ltype == USERTYPE_ANY || cbUsers[i].type == ltype) )
             {
                 *unum = i;
@@ -1865,7 +1862,6 @@ void clbInitMsgs(void)
     cbConqInfo->glastmsg = cbConqInfo->lastmsg;
 
     return;
-
 }
 
 
@@ -2137,9 +2133,9 @@ void clbInitUniverse(bool cbIsLocal)
 /*    clbIntrude( snum, pnum ) */
 void clbIntrude( int snum, int pnum )
 {
-    char buf[MSGMAXLINE];
-    static const char *atta=" attacking";
-    static const char *armeq=", armies=";
+    std::string buf;
+    static const std::string atta=" attacking";
+    static const std::string armeq=", armies=";
 
     if ( PVISIBLE(pnum) &&
          cbPlanets[pnum].team != TEAM_SELFRULED &&
@@ -2147,25 +2143,24 @@ void clbIntrude( int snum, int pnum )
     {
         if ( snum < 0 ) // doomsday
 	{
-            utStrncpy(buf, cbDoomsday->name, sizeof(buf));
-            utToUpperCase( cbDoomsday->name );
-            utStrncat(buf, atta, sizeof(buf));
-            utStrncat(buf, armeq, sizeof(buf));
-            utAppendInt(buf , cbPlanets[pnum].armies) ;
+            buf = cbDoomsday->name;
+            buf += atta;
+            buf += armeq;
+            buf += std::to_string(cbPlanets[pnum].armies);
             clbStoreMsgf( MSG_FROM_PLANET, pnum,
                           MSG_TO_TEAM, cbPlanets[pnum].team,
-                          buf, MSG_FLAGS_INTRUDER );
+                          buf.c_str(), MSG_FLAGS_INTRUDER );
 	}
         else if ( cbShips[snum].war[cbPlanets[pnum].team] ) // ship
 	{
-            utStrncpy(buf, "INTRUDER ALERT - ", sizeof(buf)) ;
-            utAppendShip(buf , snum) ;
-            utStrncat(buf, atta, sizeof(buf)) ;
-            utStrncat(buf, armeq, sizeof(buf)) ;
-            utAppendInt(buf , cbPlanets[pnum].armies) ;
+            buf = "INTRUDER ALERT - ";
+            buf += utShipStr(snum);
+            buf += atta;
+            buf += armeq;
+            buf += std::to_string(cbPlanets[pnum].armies);
             clbStoreMsgf( MSG_FROM_PLANET, pnum,
                           MSG_TO_TEAM, cbPlanets[pnum].team,
-                          buf, MSG_FLAGS_INTRUDER );
+                          buf.c_str(), MSG_FLAGS_INTRUDER );
             defend( snum, pnum );
 	}
     }
@@ -2226,19 +2221,20 @@ real clbNewWarp( int snum, real dwarp )
 /*    char str() */
 /*    int status, godlike */
 /*    status = clbPlanetMatch( str, pnum, godlike ) */
-int clbPlanetMatch( const char *str, int *pnum, int godlike )
+bool clbPlanetMatch( const std::string& str, int *pnum, int godlike )
 {
     if ( godlike )
     {
         for ( *pnum = 0; *pnum < cbLimits.maxPlanets(); *pnum = *pnum + 1 )
-            if ( utStringMatch( str, cbPlanets[*pnum].name, false ) )
+            if ( utStringMatch( str.c_str(), cbPlanets[*pnum].name, false ) )
                 return ( true );
     }
     else
     {
         for ( *pnum = 0; *pnum < cbLimits.maxPlanets(); *pnum = *pnum + 1 )
             if ( PVISIBLE(*pnum) )
-                if ( utStringMatch( str, cbPlanets[*pnum].name, false ) )
+                if ( utStringMatch( str.c_str(),
+                                    cbPlanets[*pnum].name, false ) )
                     return ( true );
     }
 
@@ -2256,7 +2252,6 @@ void clbPutShip( int snum, real basex, real basey )
 {
     int i, j;
     real smear;
-
 
     smear = ENTRY_SMEAR_DIST;
     for ( j = 1; j <= 64; j = j + 1 )
@@ -2290,71 +2285,70 @@ void clbPutShip( int snum, real basex, real basey )
 
 /* fmtmsg - format a message string -JET */
 int clbFmtMsg(msgFrom_t from, uint16_t fromDetail, msgTo_t to,
-              uint16_t toDetail, char *buf)
+              uint16_t toDetail, std::string& buf)
 {
 
-    buf[0] = '\0';
+    buf.clear();
 
     /* Format who the message is from. */
     if ( from == MSG_FROM_SHIP && fromDetail < cbLimits.maxShips() )
     {
-        utAppendShip(buf , (int)fromDetail) ;
+        buf = utShipStr((int)fromDetail);
     }
     else if ( from == MSG_FROM_PLANET && fromDetail < cbLimits.maxPlanets() )
-        strcpy(buf , cbPlanets[fromDetail].name) ;
+        buf = cbPlanets[fromDetail].name;
     else
     {
         switch ( from )
          {
          case MSG_FROM_NOONE:
-             strcpy(buf , "nobody") ;
+             buf = "nobody";
              break;
          case MSG_FROM_GOD:
-             strcpy(buf , "GOD") ;
+             buf = "GOD";
              break;
          case MSG_FROM_DOOM:
-             strcat(buf, "The ");
-             strcat(buf, cbDoomsday->name);
+             buf = fmt::format("The {}", cbDoomsday->name);
              break;
          case MSG_FROM_COMP:
-             strcpy(buf , "Comp") ;
+             buf = "Comp";
              break;
          default:
-             strcpy(buf , "???") ;
+             buf = "???";
              break;
          }
     }
 
-    strcat(buf , "->") ;
+    buf += "->";
 
     /* Format who the message is to. */
     if ( to == MSG_TO_SHIP && toDetail < cbLimits.maxShips() )
-        utAppendShip(buf , (int)toDetail) ;
+        buf += utShipStr((int)toDetail);
     else if ( to == MSG_TO_TEAM && toDetail < NUMPLAYERTEAMS )
     {
-        utAppendChar(buf , cbTeams[toDetail].teamchar) ;
+        buf += cbTeams[toDetail].teamchar;
     }
     else
     {
         switch ( to )
 	{
 	case MSG_TO_NOONE:
-            strcat(buf , "nobody") ;
+            buf += "nobody";
             break;
 	case MSG_TO_GOD:
-            strcat(buf , "GOD") ;
+            buf += "GOD";
             break;
 	case MSG_TO_ALL:
-            strcat(buf , "ALL") ;
+            buf += "ALL";
             break;
 	case MSG_TO_IMPLEMENTORS:
-            strcat(buf , "IMPs") ;
+            buf += "IMPs";
             break;
 	case MSG_TO_FRIENDLY:
-            strcat(buf , "FRIEND") ;
+            buf += "FRIEND";
             break;
 	default:
-            strcat(buf , "???") ;
+            buf += "???";
             break;
 	}
     }
@@ -2363,15 +2357,11 @@ int clbFmtMsg(msgFrom_t from, uint16_t fromDetail, msgTo_t to,
 }
 
 
-/* cmpplanet - compare planet names based on index passed via qsort() */
-static int cmpplanet(void *cmp1, void *cmp2)
+// sort in ascending order based on name
+static bool cmpplanet(int cmp1, int cmp2)
 {
-    int *icmp1, *icmp2;
-
-    icmp1 = (int *) cmp1;
-    icmp2 = (int *) cmp2;
-
-    return(strcmp(cbPlanets[*icmp1].name, cbPlanets[*icmp2].name));
+    return std::string(cbPlanets[cmp1].name)
+        < std::string(cbPlanets[cmp2].name);
 }
 
 /*  sortplanets - sort planets by name */
@@ -2381,22 +2371,21 @@ static int cmpplanet(void *cmp1, void *cmp2)
 /* This routine ASSUMES that the sort vector is initialized, */
 /* for the reason that it is fastest to sort a list that is */
 /* already sorted. */
-void clbSortPlanets( int sv[] )
+void clbSortPlanets(std::vector<int>& sv)
 {
-    qsort(sv, cbLimits.maxPlanets(), sizeof(int),
-          (int (*)(const void *, const void *))cmpplanet);
+    std::sort(sv.begin(), sv.end(), cmpplanet);
 
     return;
-
 }
 
+// sort in descending order based on rating
 static bool cmpuser(int cmp1, int cmp2)
 {
     return cbUsers[cmp1].rating > cbUsers[cmp2].rating;
 }
 
 /*  sortusers - sort users by skill */
-void clbSortUsers( std::vector<int>& uv )
+void clbSortUsers(std::vector<int>& uv)
 {
     std::sort(uv.begin(), uv.end(), cmpuser);
 
@@ -2442,8 +2431,6 @@ int clbSPWar( int snum, int pnum )
 /*  stillalive - determine if a ship is still alive */
 int clbStillAlive( int snum )
 {
-
-
     if (snum < 0 || snum >= cbLimits.maxShips())
         return(true);
 
@@ -2452,12 +2439,12 @@ int clbStillAlive( int snum )
         return ( true );
 
     return ( cbShips[snum].status == SS_LIVE );
-
 }
 
 /* wrapper for stormsg.  Most routines just use this version. */
 void clbStoreMsg( msgFrom_t from, uint16_t fromDetail,
-                  msgTo_t to, uint16_t toDetail, const char *msg )
+                  msgTo_t to, uint16_t toDetail,
+                  const std::string& msg )
 {
     clbStoreMsgf(from, fromDetail, to, toDetail, msg, MSG_FLAGS_NONE);
     return;
@@ -2466,7 +2453,7 @@ void clbStoreMsg( msgFrom_t from, uint16_t fromDetail,
 /*  stormsgf - store a message in the msg buffer with flags (DOES LOCKING) */
 void clbStoreMsgf( msgFrom_t from, uint16_t fromDetail,
                    msgTo_t to, uint16_t toDetail,
-                   const char *msg, unsigned char flags )
+                   const std::string& msg, unsigned char flags )
 {
     int nlastmsg, i;
 
@@ -2488,8 +2475,9 @@ void clbStoreMsgf( msgFrom_t from, uint16_t fromDetail,
             return;
 
     cbLock(&cbConqInfo->lockmesg);
+
     nlastmsg = mod( cbConqInfo->lastmsg + 1, cbLimits.maxMsgs() );
-    utStrncpy( cbMsgs[nlastmsg].msgbuf, msg, MESSAGE_SIZE );
+    utStrncpy( cbMsgs[nlastmsg].msgbuf, msg.c_str(), MESSAGE_SIZE );
     cbMsgs[nlastmsg].from = from;
     cbMsgs[nlastmsg].fromDetail = fromDetail;
     cbMsgs[nlastmsg].to = to;
@@ -2504,18 +2492,15 @@ void clbStoreMsgf( msgFrom_t from, uint16_t fromDetail,
 
     cbUnlock(&cbConqInfo->lockmesg);
 
-    char buf[BUFFER_SIZE_128];
     if (SysConf.LogMessages == true || to == MSG_TO_GOD
         || from == MSG_FROM_GOD)
     {
-        clbFmtMsg(from, fromDetail, to, toDetail, buf);
-        utLog("MSG: %s: %s",
-              buf, msg);
+        std::string fbuf;
+        clbFmtMsg(from, fromDetail, to, toDetail, fbuf);
+        utLog("MSG: %s: %s", fbuf.c_str(), msg.c_str());
     }
 
-
     return;
-
 }
 
 
@@ -2710,7 +2695,7 @@ void clbZeroShip( int snum )
  * irrelevant, so return something useless :)
  */
 #if defined(MINGW)
-char *clbGetUserLogname(void)
+const char *clbGetUserLogname(void)
 {
     return "MinGW";
 }
@@ -2721,27 +2706,25 @@ char *clbGetUserLogname(void)
    per session... returns a pointer to a static string. */
 const char *clbGetUserLogname(void)
 {
-#define MAXPWNAME 128
     struct passwd *pwd = NULL;
-    static char pwname[MAXPWNAME] = "";
+    static std::string pwname;
 
-    if (pwname[0] == 0)
+    if (pwname.empty())
     {
         if ((pwd = getpwuid(geteuid())) == NULL)
 	{
             utLog("ERROR: clbGetUserLogname(): getpwuid(geteuid()) failed: %s",
                   strerror(errno));
 
-            pwname[0] = 0;
+            pwname.clear();
 	}
         else
 	{
-            memset(pwname, 0, MAXPWNAME);
-            utStrncpy(pwname, pwd->pw_name, MAXPWNAME);
+            pwname = pwd->pw_name;
 	}
     }
 
-    return pwname;
+    return pwname.c_str();
 }
 #endif  /* MINGW */
 

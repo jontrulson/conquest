@@ -222,8 +222,6 @@ void nPlayBInit(void)
 
 static nodeStatus_t nPlayBDisplay(dspConfig_t *dsp)
 {
-    char buf[MSGMAXLINE];
-
     /* Viewer */
     renderViewer(UserConf.doVBG);
 
@@ -238,10 +236,12 @@ static nodeStatus_t nPlayBDisplay(dspConfig_t *dsp)
 
     if (recMsg.msgbuf[0])
     {
+        std::string buf;
+
         clbFmtMsg(recMsg.from, recMsg.fromDetail,
                   recMsg.to, recMsg.toDetail, buf);
-        strcat(buf , ": ") ;
-        strcat(buf , recMsg.msgbuf) ;
+        buf += ": ";
+        buf += recMsg.msgbuf;
 
         hudSetPrompt(MSG_MSG, "", NoColor, buf, CyanColor);
     }

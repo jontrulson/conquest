@@ -161,21 +161,11 @@ void utAppendKilledBy(char *buf, killedBy_t kb, uint16_t detail)
 /*    utAppendShip(str , snum)  */
 void utAppendShip(char *str, int snum)
 {
-// FIXME - remove when ready
-    int i;
-    char ch;
+    std::string buffer;
 
-    ch = 'S';
-    if ( snum >= 0 && snum < cbLimits.maxShips() )
-    {
-        i = cbShips[snum].team;
-        if ( i >= 0 && i < NUMPLAYERTEAMS )
-            ch = cbTeams[i].teamchar;
-    }
+    utAppendShip(buffer, snum);
 
-    utAppendChar(str, ch) ;
-    utAppendInt(str, snum) ;
-
+    strcat(str, buffer.c_str());
     return;
 }
 

@@ -27,6 +27,8 @@
 
 #include "c_defs.h"
 
+#include <string>
+
 #include "conqdef.h"
 #include "cb.h"
 #include "conqlb.h"
@@ -339,7 +341,6 @@ int sendTorp(int sock, uint8_t tsnum, uint8_t tnum)
  */
 void sendFeedback(const char *msg)
 {
-    char buf[MESSAGE_SIZE + 64];
     Msg_t themsg;
 
     memset((void *)&themsg, 0, sizeof(Msg_t));
@@ -354,10 +355,11 @@ void sendFeedback(const char *msg)
 
     if (SysConf.LogMessages == true)
     {
+        std::string fbuf;
         clbFmtMsg(themsg.from, themsg.fromDetail,
-                  themsg.to, themsg.toDetail, buf);
+                  themsg.to, themsg.toDetail, fbuf);
         utLog("MSG:FEEDBACK: %s: %s",
-              buf, themsg.msgbuf);
+              fbuf.c_str(), themsg.msgbuf);
     }
 
     return;

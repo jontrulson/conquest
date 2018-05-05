@@ -699,7 +699,6 @@ void debugplan(void)
 
     int i, j, k, cmd, lin, col, olin;
     int outattr;
-    int sv[cbLimits.maxPlanets()];
     char junk[10], uninhab[20];
     char hd0[MSGMAXLINE*4];
     const char *hd1="D E B U G G I N G  P L A N E T   L I S T";
@@ -728,8 +727,9 @@ void debugplan(void)
     }
 
     /* sort the planets */
+    std::vector<int> sv;
     for ( i = 0; i < cbLimits.maxPlanets(); i++ )
-        sv[i] = i;
+        sv.push_back(i);
     clbSortPlanets( sv );
 
     strcpy( hd3, hd2 );

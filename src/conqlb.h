@@ -47,7 +47,7 @@ void     clbDetonate( int snum, int tnum );
 int      clbEnemyDet( int snum );
 void     clbHit( int snum, real ht, killedBy_t kb, uint16_t detail );
 void     clbIKill(int snum, killedBy_t kb, uint16_t detail);
-const std::string clbETAStr(real warp, real distance);
+std::string clbETAStr(real warp, real distance);
 void     clbKillShip(int snum, killedBy_t kb, uint16_t detail);
 int      clbCheckLaunch( int snum, int number );
 int      clbLaunch( int snum, real dir, int number, int ltype );
@@ -60,7 +60,7 @@ void     clbUserline( int unum, int snum, std::string& buf,
                       bool showgods, bool showteam );
 void     clbStatline( int unum, std::string& buf );
 int      clbZeroPlanet( int pnum, int snum );
-const char *clbWarPrompt(int snum, int twar[]);
+std::string clbWarPrompt(int snum, int twar[]);
 
 int      clbCanRead( int snum, int msgnum );
 void     clbClearShips(void);
@@ -68,12 +68,13 @@ int      clbCVTCoords( real cenx, real ceny, real x, real y, real scale,
                        int *lin, int *col );
 void     clbDoomFind(void);
 void     clbDoomsday(void);
-int      clbFindOrbit( int snum, int *pnum );
+bool     clbFindOrbit( int snum, int *pnum );
 int      clbFindShip( int *snum );
 int      clbFindSpecial( int snum, int token, int count,
                          int *sorpnum, int *xsorpnum );
 void     clbFixDeltas( int snum );
-int      clbGetUserNum( int *unum, const char *lname, userTypes_t ltype );
+bool     clbGetUserNum( int *unum, const std::string& lname,
+                        userTypes_t ltype );
 void     clbInitEverything(bool cbIsLocal);
 void     clbInitGame(bool cbIsLocal);
 void     clbInitMsgs(void);
@@ -83,18 +84,18 @@ void     clbInitUniverse(bool cbIsLocal);
 void     clbIntrude( int snum, int pnum );
 int      clbLogHist( int unum );
 real     clbNewWarp( int snum, real dwarp );
-int      clbPlanetMatch( const char *str, int *pnum, int godlike );
+bool     clbPlanetMatch( const std::string& str, int *pnum, int godlike );
 void     clbPutShip( int snum, real basex, real basey );
 int      clbFmtMsg(msgFrom_t from, uint16_t fromDetail, msgTo_t to,
-                   uint16_t toDetail, char *buf);
-void     clbSortPlanets( int sv[] );
+                   uint16_t toDetail, std::string& buf);
+void     clbSortPlanets( std::vector<int>& sv );
 void     clbSortUsers( std::vector<int>& uv );
 int      clbSPWar( int snum, int pnum );
 int      clbStillAlive( int snum );
 void     clbStoreMsg( msgFrom_t from, uint16_t fromDetail, msgTo_t to,
-                      uint16_t toDetail, const char *msg );
+                      uint16_t toDetail, const std::string& msg );
 void     clbStoreMsgf( msgFrom_t from, uint16_t fromDetail, msgTo_t to,
-                       uint16_t toDetail, const char *msg,
+                       uint16_t toDetail, const std::string& msg,
                        unsigned char flags );
 int      clbUseFuel( int snum, real fuel, int weapon, int forreal );
 void     clbZeroEverything(void);

@@ -906,12 +906,12 @@ static void _doinfo( const char *inbuf, char ch, bool doOutput )
 /* 'read' a msg */
 static void rmesg(int snum, int msgnum, int lin)
 {
-    char buf[MSGMAXLINE];
+    std::string buf;
 
     clbFmtMsg(cbMsgs[msgnum].from, cbMsgs[msgnum].fromDetail,
               cbMsgs[msgnum].to, cbMsgs[msgnum].toDetail, buf);
-    strcat(buf , ": ");
-    strcat(buf , cbMsgs[msgnum].msgbuf);
+    buf += ": ";
+    buf += cbMsgs[msgnum].msgbuf;
 
     hudSetPrompt(lin, "", NoColor, buf, CyanColor);
 
@@ -1197,12 +1197,13 @@ static void _domsgto(const std::string& buf, int ch, int terse)
     tbuf = buf;
 
     /* TAB or ENTER means use the target from the last message. */
-    editing = ( (ch == TERM_EXTRA || ch == TERM_NORMAL) && buf[0] == 0 );
+    editing = ( (ch == TERM_EXTRA || ch == TERM_NORMAL) && buf.empty()
+        && to != MSG_TO_NOONE);
     if ( editing )
     {
         /* Make up a default string using the last target. */
         if ( to == MSG_TO_SHIP && toDetail < cbLimits.maxShips() )
-            tbuf = fmt::format("{}", to );
+            tbuf = fmt::format("{}", (int)toDetail );
         else if ( to == MSG_TO_TEAM && toDetail < NUMPLAYERTEAMS )
             tbuf = cbTeams[toDetail].name;
         else switch ( to )
@@ -1227,6 +1228,18 @@ static void _domsgto(const std::string& buf, int ch, int terse)
 
     /* Got a target, parse it. */
     utDeleteBlanks( tbuf );
+
+    // If it's empty, assume error - stop prompting
+    if (tbuf.empty())
+    {
+        hudClearPrompt(MSG_LIN1);
+        hudClearPrompt(MSG_LIN2);
+        state = S_NONE;
+        prompting = false;
+        return;
+    }
+
+    // else, figure out who it's too
     if (utIsDigits(tbuf))
     {
         /* All digits means a ship number. */
@@ -3257,7 +3270,7 @@ static nodeStatus_t nCPInput(int ch)
             {                   /* chicken */
                 hudClearPrompt(MSG_LIN1);
                 hudClearPrompt(MSG_LIN2);
-                prm.buf[0] = 0;
+                prm.buf.clear();
                 cp_putmsg( "Press [ESC] to abort self destruct.", MSG_LIN1 );
                 mglBeep(MGL_BEEP_ERR);
             }
@@ -3391,7 +3404,7 @@ static nodeStatus_t nCPInput(int ch)
             }
             else
             {
-                prm.buf[0] = 0;
+                prm.buf.clear();
                 for ( i = 0; i < NUMPLAYERTEAMS; i++ )
                 {
                     if ( (sStat.serverFlags & SERVER_F_NOTEAMWAR)
@@ -3422,7 +3435,7 @@ static nodeStatus_t nCPInput(int ch)
         case S_PSEUDO:
             if (irv > 0)
             {
-                if (ch != TERM_ABORT && prm.buf[0] != 0)
+                if (ch != TERM_ABORT && !prm.buf.empty())
                     sendSetName(prm.buf.c_str());
                 prompting = false;
                 state = S_NONE;

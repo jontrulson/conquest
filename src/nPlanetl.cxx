@@ -54,6 +54,9 @@ static const char *hd1="' = must take to conquer the Universe)";
 static const char *hd2="planet      type team armies          planet      type team armies";
 static char hd3[BUFFER_SIZE_256];
 
+// sorted planet vector
+static std::vector<int> sv;
+
 static nodeStatus_t nPlanetlDisplay(dspConfig_t *);
 static nodeStatus_t nPlanetlIdle(void);
 static nodeStatus_t nPlanetlInput(int ch);
@@ -77,6 +80,12 @@ scrNode_t *nPlanetlInit(int nodeid, int setnode, int sn, int tn)
     snum = sn;
     team = tn;
 
+    /* sort the planets */
+    sv.clear();
+    for ( int i=0; i<cbLimits.maxPlanets(); i++ )
+        sv.push_back(i);
+    clbSortPlanets( sv );
+
     if (setnode)
         setNode(&nPlanetlNode);
 
@@ -86,8 +95,7 @@ scrNode_t *nPlanetlInit(int nodeid, int setnode, int sn, int tn)
 
 static nodeStatus_t nPlanetlDisplay(dspConfig_t *dsp)
 {
-    int i, lin, col, olin, pnum;
-    int sv[cbLimits.maxPlanets()];
+    int lin, col, olin, pnum;
     char ch, junk[10];
     int outattr;
     int col2;
@@ -115,15 +123,10 @@ static nodeStatus_t nPlanetlDisplay(dspConfig_t *dsp)
 
         utStrncpy( hd3, hd2, sizeof(hd3) );
 
-        for ( i = 0; hd3[i] != 0; i++ )
+        for ( int i=0; hd3[i] != 0; i++ )
             if ( hd3[i] != ' ' )
                 hd3[i] = '-';
     }
-
-    /* sort the planets */
-    for ( i = 0; i < cbLimits.maxPlanets(); i++ )
-        sv[i] = i;
-    clbSortPlanets( sv );
 
     lin = 1;
 
@@ -144,9 +147,13 @@ static nodeStatus_t nPlanetlDisplay(dspConfig_t *dsp)
     {
         while ((PlanetOffset + PlanetIdx) < cbLimits.maxPlanets())
         {
-            i = PlanetOffset + PlanetIdx;
+            int i = PlanetOffset + PlanetIdx;
             PlanetIdx++;
             pnum = sv[i];
+
+            /* Don't display unless it's real. */
+            if ( ! PVISIBLE(pnum) )
+                continue;
 
             /* colorize - dwp */
             if ( snum >= 0 && snum < cbLimits.maxShips())
@@ -207,10 +214,6 @@ static nodeStatus_t nPlanetlDisplay(dspConfig_t *dsp)
                     }
                 }
             }
-
-            /* Don't display unless it's real. */
-            if ( ! PVISIBLE(pnum) )
-                continue;
 
             /* I want everything if it's real */
 

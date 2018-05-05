@@ -28,6 +28,8 @@
 #include "c_defs.h"
 
 #include <string>
+
+#include <string>
 #include <vector>
 #include "format.h"
 
@@ -197,11 +199,8 @@ void mcuPutThing( int what, int lin, int col )
 /*    mcuReadMsg( snum, msgnum ) */
 int mcuReadMsg( int msgnum, int dsplin )
 {
-    char buf[MSGMAXLINE];
+    std::string buf;
     unsigned int attrib = 0;
-
-
-    buf[0] = '\0';
 
     if (Context.hascolor)
     {				/* set up the attrib so msg's are cyan */
@@ -210,11 +209,11 @@ int mcuReadMsg( int msgnum, int dsplin )
 
     clbFmtMsg(cbMsgs[msgnum].from, cbMsgs[msgnum].fromDetail,
               cbMsgs[msgnum].to, cbMsgs[msgnum].toDetail, buf);
-    strcat(buf , ": ") ;
-    strcat(buf , cbMsgs[msgnum].msgbuf) ;
+    buf += ": ";
+    buf += cbMsgs[msgnum].msgbuf;
 
     uiPutColor(attrib);
-    mcuPutMsg( buf, dsplin );
+    mcuPutMsg( buf.c_str(), dsplin );
     uiPutColor(0);
     /* clear second line if sending to MSG_LIN1 */
     if (dsplin == MSG_LIN1)
@@ -459,7 +458,6 @@ void mcuInfoShip( int snum )
 void mcuPlanetList()
 {
     int i, lin, col, olin, pnum;
-    int sv[cbLimits.maxPlanets()];
     int cmd;
     char ch, junk[10];
     static const char *hd0="P L A N E T   L I S T   ";
@@ -496,8 +494,9 @@ void mcuPlanetList()
     }
 
     /* sort the planets */
+    std::vector<int> sv;
     for ( i = 0; i < cbLimits.maxPlanets(); i++ )
-        sv[i] = i;
+        sv.push_back(i);
     clbSortPlanets( sv );
 
     utStrncpy( hd3, hd2, sizeof(hd3) );
@@ -538,6 +537,10 @@ void mcuPlanetList()
                 PlanetIdx++;
                 pnum = sv[i];
 
+                /* Don't display unless it's real. */
+                if ( ! PVISIBLE(pnum) )
+                    continue;
+
                 switch(cbPlanets[pnum].type)
                 {
                     case PLANET_SUN:
@@ -561,10 +564,6 @@ void mcuPlanetList()
                         outattr = SpecialColor;
                         break;
                 }
-
-                /* Don't display unless it's real. */
-                if ( ! PVISIBLE(pnum) )
-                    continue;
 
                 /* I want everything if it's real */
 
