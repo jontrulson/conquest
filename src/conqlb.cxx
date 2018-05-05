@@ -26,6 +26,10 @@
 //
 
 #include "c_defs.h"
+
+#include <string>
+#include "format.h"
+
 #include "conqdef.h"
 #include "cb.h"
 #include "context.h"
@@ -292,25 +296,19 @@ void clbIKill(int snum, killedBy_t kb, uint16_t detail)
         cbShips[snum].sdfuse = -TIMEOUT_PLAYER;
 
     return;
-
 }
 
 
 /* ETAstr - return a string indicating ETA to a target */
-char *clbETAStr(real warp, real distance)
+const std::string clbETAStr(real warp, real distance)
 {
-    real secs;
-    real mins;
-    static char retstr[64];
-
     if (warp <= 0.0)
     {
-        sprintf(retstr, "never");
-        return(retstr);
+        return "never";
     }
 
-    mins = 0.0;
-    secs = (real) (distance / (warp * MM_PER_SEC_PER_WARP));
+    real mins = 0.0;
+    real secs = (distance / (warp * (real)MM_PER_SEC_PER_WARP));
 
     if (secs > 60.0)
     {
@@ -318,12 +316,13 @@ char *clbETAStr(real warp, real distance)
         secs = 0.0;
     }
 
+    std::string retstr;
     if (mins != 0.0)
-        sprintf(retstr, "%.1f minutes", mins);
+        retstr = fmt::format("{:.1f} minutes", mins);
     else
-        sprintf(retstr, "%.1f seconds", secs);
+        retstr = fmt::format("{:.1f} seconds", secs);
 
-    return(retstr);
+    return retstr;
 }
 
 
@@ -334,7 +333,7 @@ char *clbETAStr(real warp, real distance)
 void clbKillShip(int snum, killedBy_t kb, uint16_t detail)
 {
     int sendmesg = false;
-    char msgbuf[BUFFER_SIZE_256];
+    std::string msgbuf;
 
     /* launch all torps - sorta, we'll use 'explode' mode... */
     clbLaunch(snum, 0.0, EXPLODESHIP_TORP_COUNT, LAUNCH_EXPLODE);
@@ -348,54 +347,41 @@ void clbKillShip(int snum, killedBy_t kb, uint16_t detail)
     sendmesg = false;
 
     /* Figure out why we died. */
+    std::string sbuf = fmt::format("{} ({})", utShipStr(snum),
+                                   cbShips[snum].alias);
+
     switch ( kb )
     {
     case KB_SELF:
-        sprintf(msgbuf, "%c%d (%s) has self-destructed.",
-                cbTeams[cbShips[snum].team].teamchar,
-                snum,
-                cbShips[snum].alias);
+        msgbuf = fmt::format("{} has self-destructed.", sbuf);
         sendmesg = true;
 
         break;
     case KB_NEGENB:
-        sprintf(msgbuf, "%c%d (%s) was destroyed by the negative energy barrier.",
-                cbTeams[cbShips[snum].team].teamchar,
-                snum,
-                cbShips[snum].alias);
+        msgbuf = fmt::format("{} was destroyed by the negative "
+                             "energy barrier.",
+                             sbuf);
         sendmesg = true;
 
         break;
 
     case KB_GOD:
-        sprintf(msgbuf, "%c%d (%s) was killed by an act of GOD.",
-                cbTeams[cbShips[snum].team].teamchar,
-                snum,
-                cbShips[snum].alias);
+        msgbuf = fmt::format("{} was killed by an act of GOD.", sbuf);
         sendmesg = true;
 
         break;
     case KB_DOOMSDAY:
-        sprintf(msgbuf, "%c%d (%s) was eaten by the doomsday machine.",
-                cbTeams[cbShips[snum].team].teamchar,
-                snum,
-                cbShips[snum].alias);
+        msgbuf = fmt::format("{} was eaten by the doomsday machine.", sbuf);
         sendmesg = true;
 
         break;
     case KB_GOTDOOMSDAY:
-        sprintf(msgbuf, "%c%d (%s) killed the doomsday machine!",
-                cbTeams[cbShips[snum].team].teamchar,
-                snum,
-                cbShips[snum].alias);
+        msgbuf = fmt::format("{} killed the doomsday machine!", sbuf);
         sendmesg = true;
 
         break;
     case KB_LIGHTNING:
-        sprintf(msgbuf, "%c%d (%s) was destroyed by a lightning bolt.",
-                cbTeams[cbShips[snum].team].teamchar,
-                snum,
-                cbShips[snum].alias);
+        msgbuf = fmt::format("{} was destroyed by a lightning bolt.", sbuf);
         sendmesg = true;
 
         break;
@@ -403,14 +389,12 @@ void clbKillShip(int snum, killedBy_t kb, uint16_t detail)
     case KB_SHIP:
         if (detail < cbLimits.maxShips())
 	{
-            sprintf(msgbuf, "%c%d (%s) was kill %.1f for %c%d (%s).",
-                    cbTeams[cbShips[snum].team].teamchar,
-                    snum,
-                    cbShips[snum].alias,
-                    cbShips[detail].kills,
-                    cbTeams[cbShips[detail].team].teamchar,
-                    detail,
-                    cbShips[detail].alias);
+            msgbuf = fmt::format("{} was kill {:.1f} for {}{} ({}).",
+                                 sbuf,
+                                 cbShips[detail].kills,
+                                 cbTeams[cbShips[detail].team].teamchar,
+                                 detail,
+                                 cbShips[detail].alias);
             sendmesg = true;
 
 	}
@@ -419,21 +403,19 @@ void clbKillShip(int snum, killedBy_t kb, uint16_t detail)
     case KB_PLANET:
         if (detail < cbLimits.maxPlanets())
 	{
-            sprintf(msgbuf, "%c%d (%s) was destroyed by %s",
-                    cbTeams[cbShips[snum].team].teamchar,
-                    snum,
-                    cbShips[snum].alias,
-                    cbPlanets[detail].name);
+            msgbuf = fmt::format("{} was destroyed by {}",
+                                 sbuf,
+                                 cbPlanets[detail].name);
 
             sendmesg = true;
 
             if ( cbPlanets[detail].type == PLANET_SUN )
 	    {
-                strcat(msgbuf , "'s solar radiation.") ;
+                msgbuf += "'s solar radiation.";
 	    }
             else
 	    {
-                strcat(msgbuf , "'s planetary defenses.") ;
+                msgbuf += "'s planetary defenses.";
 	    }
 	}
         break;
@@ -444,7 +426,7 @@ void clbKillShip(int snum, killedBy_t kb, uint16_t detail)
     }
 
     if (sendmesg == true)
-        clbStoreMsg(MSG_FROM_COMP, 0, MSG_TO_ALL, 0, msgbuf);
+        clbStoreMsg(MSG_FROM_COMP, 0, MSG_TO_ALL, 0, msgbuf.c_str());
 
     return;
 
@@ -478,7 +460,7 @@ int clbLaunch( int snum, real dir, int number, int ltype )
     int i, j;
     real speed = 0.0, adir = 0.0;
     int tnum, numslots, numfired;
-    int tslot[cbLimits.maxTorps()];
+    std::vector<int> tslot;
 
     /* Stop repairing. */
     SFCLR(snum, SHIP_F_REPAIR);
@@ -501,17 +483,17 @@ int clbLaunch( int snum, real dir, int number, int ltype )
         {
             /* Found one. */
             cbShips[snum].torps[i].status = TS_LAUNCHING;
-            tslot[numslots++] = i;
+            tslot.push_back(i);
             tnum--;
         }
     cbUnlock(&cbConqInfo->lockword);
 
-    if (numslots == 0)
+    if (tslot.empty())
     {				/* couldn't find even one */
         return(false);
     }
 
-    for (i=0; i<numslots; i++)
+    for (i=0; i<tslot.size(); i++)
     {
         /* Use fuel. */
         if ( clbUseFuel( snum, TORPEDO_FUEL, true, true ) == false)
@@ -723,7 +705,8 @@ real clbPhaserHit( int snum, real dis )
 /*    int team, unum */
 /*    int flag, register */
 /*    flag = register( lname, rname, team, unum ) */
-int clbRegister( const char *lname, const char *rname, int team, int *unum )
+int clbRegister( const std::string& lname, const std::string& rname,
+                 int team, int *unum )
 {
     int i, j;
 
@@ -751,8 +734,8 @@ int clbRegister( const char *lname, const char *rname, int team, int *unum )
             cbUsers[i].war[cbUsers[i].team] = false;
 
             cbUsers[i].lastentry = 0;	/* never */
-            utStrncpy( cbUsers[i].username, lname, MAXUSERNAME );
-            utStrncpy( cbUsers[i].alias, rname, MAXUSERNAME );
+            utStrncpy( cbUsers[i].username, lname.c_str(), MAXUSERNAME );
+            utStrncpy( cbUsers[i].alias, rname.c_str(), MAXUSERNAME );
             *unum = i;
             return ( true );
         }
@@ -768,29 +751,24 @@ int clbRegister( const char *lname, const char *rname, int team, int *unum )
 /*  SYNOPSIS */
 /*    int unum */
 /*    clbResign( unum ) */
-void clbResign( int unum, int isoper )
+void clbResign( int unum, bool isoper )
 {
-    int i;
-    char usrname[MAXUSERNAME], usralias[MAXUSERNAME];
-
-    /* make copies */
-    utStrncpy(usrname, cbUsers[unum].username, MAXUSERNAME);
-    utStrncpy(usralias, cbUsers[unum].alias, MAXUSERNAME);
+    if ( !(unum >= 0 && unum < cbLimits.maxUsers()) )
+        return;
 
     cbLock(&cbConqInfo->lockword);
-    if ( unum >= 0 && unum < cbLimits.maxUsers() )
-    {
-        UFCLR(unum, USER_F_LIVE);
 
-        for ( i = 0; i < cbLimits.maxHist(); i++ )
-            if ( unum == cbHistory[i].unum )
-                cbHistory[i].unum = -1;
-    }
+    UFCLR(unum, USER_F_LIVE);
+
+    for ( int i = 0; i < cbLimits.maxHist(); i++ )
+        if ( unum == cbHistory[i].unum )
+            cbHistory[i].unum = -1;
+
     cbUnlock(&cbConqInfo->lockword);
 
-    if (isoper != true)
+    if (!isoper)
         utLog("INFO: %s (%s) has resigned",
-              usrname, usralias);
+              cbUsers[unum].username, cbUsers[unum].alias);
 
     return;
 }
@@ -808,7 +786,7 @@ void clbResign( int unum, int isoper )
 int clbTakePlanet( int pnum, int snum )
 {
     int i;
-    char buf[MSGMAXLINE];
+    std::string buf;
     int oteam, didgeno;
     int rv = -1;
 
@@ -845,14 +823,14 @@ int clbTakePlanet( int pnum, int snum )
             cbUsers[cbShips[snum].unum].stats[USTAT_GENOCIDE] += 1;
             cbTeams[cbShips[snum].team].stats[TSTAT_GENOCIDE] += 1;
 
-            sprintf(buf, "%c%d (%s) genocided the %s team!",
-                    cbTeams[cbShips[snum].team].teamchar,
-                    snum,
-                    cbShips[snum].alias,
-                    cbTeams[oteam].name);
+            buf = fmt::format("{}{} ({}) genocided the {} team!",
+                              cbTeams[cbShips[snum].team].teamchar,
+                              snum,
+                              cbShips[snum].alias,
+                              cbTeams[oteam].name);
 
-            clbStoreMsg(MSG_FROM_COMP, 0, MSG_TO_ALL, 0, buf);
-            utLog("%s: GENO: %s", __FUNCTION__, buf);
+            clbStoreMsg(MSG_FROM_COMP, 0, MSG_TO_ALL, 0, buf.c_str());
+            utLog("%s: GENO: %s", __FUNCTION__, buf.c_str());
 
             // Here we do a check for vacant ships holding the vanquished
             // armies.  This is a trick often used to avoid having to do a
@@ -884,10 +862,10 @@ int clbTakePlanet( int pnum, int snum )
     }
 
 
-    sprintf( buf, "All hail the liberating %s armies.  Thanks, ",
-             cbTeams[cbShips[snum].team].name );
+    buf = fmt::format("All hail the liberating {} armies.  Thanks, ",
+                      cbTeams[cbShips[snum].team].name );
     utAppendShip(buf , snum) ;
-    utAppendChar(buf , '!') ;
+    buf += '!';
 
     /* Check whether the universe has been conquered. */
     for ( i = 0; i < cbLimits.maxPlanets(); i++ )
@@ -896,7 +874,7 @@ int clbTakePlanet( int pnum, int snum )
             {
                 /* No. */
                 clbStoreMsg( MSG_FROM_PLANET, pnum,
-                             MSG_TO_TEAM, cbShips[snum].team, buf );
+                             MSG_TO_TEAM, cbShips[snum].team, buf.c_str());
                 return rv;
             }
     /* Yes! */
@@ -922,7 +900,6 @@ int clbTakePlanet( int pnum, int snum )
 
     return -1;                    /* doesn't matter if geno happened if
                                      universe was conquered */
-
 }
 
 
@@ -934,73 +911,80 @@ int clbTakePlanet( int pnum, int snum )
 /*    clbUserline( unum, snum, buf, showgods, showteam ) */
 /* Special hack: If snum is valid, the team and pseudonym are taken from */
 /* the ship instead of the user. */
-void clbUserline( int unum, int snum, char *buf, int showgods, int showteam )
+void clbUserline( int unum, int snum, char *_buf, int showgods, int showteam )
 {
     int team;
-    char ch, ch2, junk[MSGMAXLINE], timstr[20], name[MAXUSERNAME];
-
-    static const char *hd1="name          pseudonym           team skill  wins  loss mxkls  ships     time";
-    char tname[MAXUSERNAME + 2];	/* posss '@' and NULL */
-
+    std::string buf;
+    static const std::string hd1 =
+        " name          pseudonym           team  skill  wins  loss mxkls ships      time";
 
     if ( unum < 0 || unum >= cbLimits.maxUsers() )
     {
-        strcpy(buf , hd1) ;
+        strcpy(_buf , hd1.c_str()) ;
         return;
     }
+
     if ( !ULIVE(unum) )
     {
-        buf[0] = 0;
+        _buf[0] = 0;
         return;
     }
 
-    ch2 = ' ';
+    // default, (normal user) is blank
+    std::string uTypeAndUname;
 
     if (cbUsers[unum].type == USERTYPE_BUILTIN)
-        ch2 = '_'; // mutually exclusive to oper, which implies USERTYPE_NORMAL
+    {
+        // mutually exclusive to oper, which implies USERTYPE_NORMAL
+        uTypeAndUname = '-';
+    }
     else
     {
+        // operator
         if (isagod(unum))
-            ch2 = '+';
+            uTypeAndUname = '+';
     }
 
+    uTypeAndUname += cbUsers[unum].username;
+
+    std::string name;
     /* If we were given a valid ship number, use it's information. */
     if ( snum >= 0 && snum < cbLimits.maxShips() )
     {
-        strcpy(name , cbShips[snum].alias) ;
+        name = cbShips[snum].alias;
         team = cbShips[snum].team;
     }
     else
     {
 
-        strcpy(name , cbUsers[unum].alias) ;
+        name = cbUsers[unum].alias;
         team = cbUsers[unum].team;
     }
 
     /* Figure out which team he's on. */
-    ch = cbTeams[team].teamchar;
+    char ch = cbTeams[team].teamchar;
 
-    utStrncpy(tname, cbUsers[unum].username, MAXUSERNAME);
 
-    sprintf( junk, "%-12.12s %c%-21.21s %c %6.1f",
-             tname,
-             ch2,
-             name,
-             ch,
-             cbUsers[unum].rating );
+    std::string usrData = fmt::format("{:<12.12s}   {:<21.21s}  {} {:6.1f}",
+                                      uTypeAndUname,
+                                      name,
+                                      ch,
+                                      cbUsers[unum].rating);
 
-    utFormatMinutes( ( cbUsers[unum].stats[USTAT_SECONDS] + 30 ) / 60, timstr );
+    std::string timstr;
+    utFormatMinutes( (cbUsers[unum].stats[USTAT_SECONDS] + 30 ) / 60,
+                     timstr );
 
-    sprintf( buf, "%s %5d %5d %5d %5d %9s",
-             junk,
-             cbUsers[unum].stats[USTAT_WINS],
-             cbUsers[unum].stats[USTAT_LOSSES],
-             cbUsers[unum].stats[USTAT_MAXKILLS],
-             cbUsers[unum].stats[USTAT_ENTRIES],
-             timstr );
+    buf = fmt::format("{} {:5d} {:5d} {:5d} {:5d} {:>9s}",
+                      usrData,
+                      cbUsers[unum].stats[USTAT_WINS],
+                      cbUsers[unum].stats[USTAT_LOSSES],
+                      cbUsers[unum].stats[USTAT_MAXKILLS],
+                      cbUsers[unum].stats[USTAT_ENTRIES],
+                      timstr );
 
+    strcpy(_buf, buf.c_str());
     return;
-
 }
 
 

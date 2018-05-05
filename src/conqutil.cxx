@@ -198,6 +198,16 @@ void utAppendShip(std::string& str, int snum)
 }
 
 
+// return a ship string of the form "<team char><snum>"
+const std::string utShipStr(int snum)
+{
+    std::string buf;
+
+    utAppendShip(buf, snum);
+    return buf;
+}
+
+
 /*  utAppendShipStatus - append ship status string */
 /*  SYNOPSIS */
 /*    int status */
@@ -582,6 +592,17 @@ void utFormatMinutes( int itime, char *buf )
     int i, days, hours, minutes;
     char junk[32];
     int minus;
+    std::string tbuf;
+
+    utFormatMinutes(itime, tbuf);
+    strcpy(buf, tbuf.c_str());
+    return;
+}
+
+void utFormatMinutes( int itime, std::string& buf )
+{
+    int i, days, hours, minutes;
+    int minus;
 
     if ( itime < 0 )
     {
@@ -609,16 +630,15 @@ void utFormatMinutes( int itime, char *buf )
             minutes = -minutes;
     }
 
-    /* Format time. */
-    sprintf( junk, "%d %2d:%02d", days, hours, minutes );
+    std::string tmp;
+    if (days)
+        tmp = fmt::format("{} {:2d}:{:02d}", days, hours, minutes);
+    else if (hours)
+        tmp = fmt::format("{:2d}:{:02d}", hours, minutes);
+    else
+        tmp = fmt::format("{:02d}", minutes);
 
-    /* Skip the junk and find the beginning. */
-    for ( i = 0; junk[i] == ' ' || junk[i] == ':' || junk[i] == '0'; i = i + 1 )
-        ;
-
-    /* Store in return buffer. */
-    /*    scopy( junk, i, buf, 1 );*/
-    strcpy(buf, &junk[i]);
+    buf = tmp;
 
     return;
 

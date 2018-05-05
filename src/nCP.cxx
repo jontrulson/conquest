@@ -270,7 +270,7 @@ static void _infoship( int snum, int scanner, bool doOutput )
     static real avgclose_rate, olddis = 0.0, oldclose_rate = 0.0;
     static int oldsnum = 0;
     std::string cbuf;
-    
+
     godlike = false; // can never happen on the client
 
     if (doOutput)

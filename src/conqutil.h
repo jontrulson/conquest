@@ -39,8 +39,11 @@ void     utAppendInt(char *str, int i);
 void     utAppendShipStatus(char *buf, int status);
 void     utAppendShipStatus(std::string& buf, int status);
 void     utAppendTitle(char *buf, int team);
+
 void     utAppendShip(char *str, int snum);
 void     utAppendShip(std::string& str, int snum);
+const std::string utShipStr(int snum);
+
 void     utAppendKilledBy(char *buf, killedBy_t kb, uint16_t detail);
 int      utArrowsToDir( const char *str, real *dir );
 void     utSetLogConfig(int usesys, int echostderr);
@@ -54,6 +57,7 @@ void     utDeleteBlanks( std::string& str );
 time_t   utDeltaSecs( time_t s, time_t *n );
 real     utExplosionHits( real basehits, real dis );
 void     utFormatMinutes( int itime, char *buf );
+void     utFormatMinutes( int itime, std::string& buf );
 void     utFormatSeconds( int itime, char *buf );
 int      utGetMsg( int snum, int *msg );
 void     utFormatTime( char *buf, time_t thetime );
