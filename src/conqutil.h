@@ -32,7 +32,6 @@
 #include <string>
 
 real     utAccurateDist( real curvel, real newvel, real acc );
-bool     utSafeCToI(int *num, const char *buf, int offset);
 bool     utSafeCToI(int *num, const std::string& buf, int offset = 0);
 real     utSubAngle( real a1, real a2);
 real     utAngle( real fromx, real fromy, real tox, real toy );
@@ -68,8 +67,7 @@ void     utStrncat( char *to, const char *from, unsigned int tosize );
 int      utStringMatch( const char *str1, const char *str2, int casesensitive );
 char     *utGetPath(const char *thepath);
 void     utSleep(real seconds);
-bool     utIsDigits(const char *buf);
-bool     utIsDigits(std::string& str);
+bool     utIsDigits(const std::string& str);
 void     utToUpperCase(char *buf);
 void     utAppendChar(char *buf, char ch);
 

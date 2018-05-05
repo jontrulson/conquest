@@ -766,34 +766,6 @@ real utMod360( real r )
 /*    int num, ptr */
 /*    char buf() */
 /*    flag = utSafeCToI( num, buf ptr ) */
-bool utSafeCToI( int *num, const char *buf, int offset )
-{
-    if (!buf || !num)
-        return false;
-
-    int slen = strlen(buf);
-
-    if (offset >= slen)
-    {
-        // some code depends on this behavior
-        *num = 0;
-        return false;
-    }
-
-    long rv = strtol(&buf[offset], NULL, 10);
-
-    // check for validity
-    if ( rv >= INT_MAX || rv == LONG_MIN || rv == LONG_MAX)
-    {
-        *num = INT_MAX;
-        return false;
-    }
-
-    *num = (int)rv;
-
-    return ( true );
-}
-
 bool utSafeCToI( int *num, const std::string& buf, int offset )
 {
     if (buf.empty() || !num)
@@ -1067,21 +1039,7 @@ void utSleep(real seconds)
 #endif
 }
 
-bool utIsDigits(const char *buf)
-{
-    const char *s = buf;
-
-    while (*s)
-    {
-        if (!isdigit(*s))
-            return false;
-        s++;
-    }
-
-    return true;
-}
-
-bool utIsDigits(std::string& str)
+bool utIsDigits(const std::string& str)
 {
     return std::all_of(str.begin(), str.end(), ::isdigit);
 }
