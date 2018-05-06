@@ -532,7 +532,6 @@ void hudSetPrompt(int line, const std::string& prompt, int pcolor,
     int pl;
     std::string bstr;
     int bl;
-    const int maxwidth = 80;
     bool clearString = false;
 
     if (buf.empty() && prompt.empty())
@@ -569,7 +568,7 @@ void hudSetPrompt(int line, const std::string& prompt, int pcolor,
 
         str = fmt::format("#{:d}#{:s}#{:d}#{:s}{:s}",
                           pcolor, pstr, color, bstr,
-                          std::string((maxwidth - (pl + bl)), ' '));
+                          std::string((Context.maxcol - (pl + bl)), ' '));
     }
 
     switch(line)
