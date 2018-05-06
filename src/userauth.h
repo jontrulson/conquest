@@ -28,8 +28,10 @@
 #ifndef USERAUTH_H_INCLUDED
 #define USERAUTH_H_INCLUDED
 
+#include <string>
+
 #include "conqdef.h"
 
-int checkuname(const char *username);
+bool uaValidateUsername(const std::string& username);
 
 #endif /* USERAUTH_H_INCLUDED */

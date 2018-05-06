@@ -58,7 +58,7 @@ static const char *pwp = "Password:";
 static const char *rpwp = "Retype Password:";
 static const char *newuserp = "User doesn't exist. Is this a new user?";
 static const char *pwerr = "Invalid Password.";
-static const char *uhelper = "You can use A-Z, a-z, 0-9, '_', or '-'.";
+static const char *uhelper = "You can use A-Z, a-z, and 0-9";
 static const char *phelper = "Use any printable characters.";
 
 static char cursor = ' ';       /* the cursor */
@@ -314,7 +314,7 @@ static nodeStatus_t nAuthInput(int ch)
                 return NODE_EXIT;
 
             /* check validity */
-            if (checkuname(prm.buf.c_str()) == false)
+            if (!uaValidateUsername(prm.buf))
             {                   /* invalid username */
                 mglBeep(MGL_BEEP_ERR);
                 errlin = "Invalid character in username.";

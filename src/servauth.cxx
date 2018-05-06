@@ -26,6 +26,9 @@
 //
 
 #include "c_defs.h"
+
+#include <string>
+
 #include "global.h"
 #include "conqdef.h"
 #include "cb.h"
@@ -57,7 +60,16 @@ static int doLogin(char *login, char *pw, char *epw)
         salt[1] = (login[1] != 0) ? login[1] : 'T';
         salt[2] = 0;
 
-        utStrncpy(epw, (char *)crypt(pw, salt), MAXUSERNAME);
+        const char* _epw = (char *)crypt(pw, salt);
+
+        if (!_epw)
+	{			/* invalid pw */
+            utLog("%s: crypt() returned NULL for user '%s'",
+                  __FUNCTION__, login);
+            return PERR_BADPWD;
+	}
+
+        utStrncpy(epw, _epw, MAXUSERNAME);
 
         if (strcmp(epw, cbUsers[unum].pw) != 0)
 	{			/* invalid pw */
@@ -136,7 +148,8 @@ int Authenticate(char *username, char *password)
         cauth->login[MAXUSERNAME - 1] = 0;
         cauth->pw[MAXUSERNAME - 1] = 0;
 
-        if (checkuname((char *)cauth->login) == false)
+        std::string tmpUser = (char *)cauth->login;
+        if (!uaValidateUsername(tmpUser))
 	{
             pktSendAck(PSEV_ERROR, PERR_INVUSER);
             continue;

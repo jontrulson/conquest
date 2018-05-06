@@ -37,17 +37,14 @@
 #include "userauth.h"
 
 /* check the validity of a supplied username */
-int checkuname(const char *username)
+bool uaValidateUsername(const std::string& username)
 {
-    const char *s = username;
-
-    while (*s)
+    for (int i=0; i<username.size(); i++)
     {
-        if (!isalnum(*s) && *s != '-' && *s != '_')
+        if (!isalnum(username[i]))
 	{			/* if invalid character... */
             return(false);
 	}
-        s++;
     }
 
     return(true);
