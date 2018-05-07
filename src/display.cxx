@@ -1380,7 +1380,7 @@ void displayFeedback(char *msg, int lin)
     if (!msg)
         return;
 
-    mcuPutMsg(msg, MSG_LIN1);
+    uiPutMsg(msg, MSG_LIN1);
 
     return;
 }

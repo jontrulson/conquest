@@ -101,7 +101,6 @@ typedef struct _gl_box
 
 void display( int snum );
 
-int uiCStrlen(char *buf);
 int uiGLInit(int *argc, char **argv);
 
 #endif /* _GLDISPLAY_H */

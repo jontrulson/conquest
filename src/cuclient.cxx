@@ -43,6 +43,7 @@
 #include "context.h"
 #include "record.h"
 #include "disputil.h"
+#include "ui.h"
 
 void cucPseudo( int unum, int snum )
 {
@@ -149,12 +150,12 @@ void cucSendMsg( msgFrom_t from, uint16_t fromDetail, int terse, int remote )
         utSafeCToI( &j, buf, 0 );		/* ignore status */
         if ( j < 0 || j >= cbLimits.maxShips() )
 	{
-            mcuPutMsg( "No such ship.", MSG_LIN2 );
+            uiPutMsg( "No such ship.", MSG_LIN2 );
             return;
 	}
         if ( cbShips[j].status != SS_LIVE )
 	{
-            mcuPutMsg( nf, MSG_LIN2 );
+            uiPutMsg( nf, MSG_LIN2 );
             return;
 	}
         to = MSG_TO_SHIP;
@@ -196,7 +197,7 @@ void cucSendMsg( msgFrom_t from, uint16_t fromDetail, int terse, int remote )
 
                 if ( i >= NUMPLAYERTEAMS )
                 {
-                    mcuPutMsg( huh, MSG_LIN2 );
+                    uiPutMsg( huh, MSG_LIN2 );
                     return;
                 }
                 to = MSG_TO_TEAM;
@@ -212,7 +213,7 @@ void cucSendMsg( msgFrom_t from, uint16_t fromDetail, int terse, int remote )
     {
         if ( cbShips[toDetail].status != SS_LIVE )
 	{
-            mcuPutMsg( nf, MSG_LIN2 );
+            uiPutMsg( nf, MSG_LIN2 );
             return;
 	}
         utAppendShip(buf, (int)toDetail) ;
@@ -238,7 +239,7 @@ void cucSendMsg( msgFrom_t from, uint16_t fromDetail, int terse, int remote )
              strcat(buf , "Friend:") ;
              break;
          default:
-             mcuPutMsg( huh, MSG_LIN2 );
+             uiPutMsg( huh, MSG_LIN2 );
              return;
              break;
          }
@@ -246,7 +247,7 @@ void cucSendMsg( msgFrom_t from, uint16_t fromDetail, int terse, int remote )
     if ( ! terse )
         strcat(buf, " ([ESC] to abort)");
 
-    mcuPutMsg( buf, MSG_LIN1 );
+    uiPutMsg( buf, MSG_LIN1 );
     cdclrl( MSG_LIN2, 1 );
 
     if ( ! editing )

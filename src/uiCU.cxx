@@ -25,45 +25,32 @@
 // SOFTWARE.
 //
 
+// Curses specific UI function implementations
 
 #include "c_defs.h"
+
+#include <string>
+
 #include "global.h"
 #include "conqdef.h"
 #include "cb.h"
 #include "context.h"
 #include "conf.h"
-#include "global.h"
 #include "color.h"
 
-#include "record.h"
+#include "cd2lb.h"
+
 #include "conqutil.h"
 #include "cprintf.h"
 
-/* get the 'real' strlen of a string, skipping past any embedded colors */
-int uiCStrlen(char *buf)
+void uiMoveCursor(int lin, int col)
 {
-    char *p;
-    int l;
+    cdmove(lin, col);
+}
 
-    l = 0;
-    p = buf;
-    while (*p)
-    {
-        if (*p == '#')
-        {                       /* a color sequence */
-            p++;
-            while (*p && isdigit(*p))
-                p++;
-
-            if (*p == '#')
-                p++;
-        }
-        else
-        {
-            p++;
-            l++;
-        }
-    }
-
-    return l;
+void uiPutMsg(const std::string& buf, int lin)
+{
+    // FIXME - someday, correct the cd2lb stuff to not make 1 == 0
+    cdclrl( lin, 1 );
+    cdputs( buf.c_str(), lin, 1 );
 }

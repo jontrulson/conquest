@@ -88,7 +88,7 @@ libconqclnt_la_SOURCES = client.cxx client.h cproc.h cproc.cxx clientlb.cxx \
 libconqserv_la_SOURCES = servauth.cxx server.cxx servauth.h server.h serverpkt.cxx \
 	serverpkt.h servercmd.h servercmd.cxx sproc.h sproc.cxx
 
-libUi_la_SOURCES = ui.h uimisc.cxx
+libUi_la_SOURCES = ui.h ui.cxx
 
 libUiGL_la_SOURCES = GL.cxx texfont.cxx glfont.cxx glfont.h \
 	glmisc.cxx glmisc.h nConsvr.cxx nConsvr.h nMeta.h nMeta.cxx cqkeys.h \
@@ -99,11 +99,13 @@ libUiGL_la_SOURCES = GL.cxx texfont.cxx glfont.cxx glfont.h \
 	gldisplay.h gldisplay.cxx disputil.h render.h render.cxx \
 	nPlayBMenu.h nPlayBMenu.cxx nPlayB.h nPlayB.cxx nPlayBHelp.h \
 	nPlayBHelp.cxx nOptions.h nOptions.cxx colorGL.cxx ui.h anim.cxx anim.h \
-	GL.h hud.h hud.cxx blinker.h blinker.cxx textures.h textures.cxx
+	GL.h hud.h hud.cxx blinker.h blinker.cxx textures.h textures.cxx \
+	uiGL.cxx
 
 libUiCU_la_SOURCES = display.cxx cprintf.h cprintf.cxx disputil.h colorCU.cxx \
 	cd2lb.h cd2lb.cxx iolb.h iolb.cxx cumisc.h cumisc.cxx cuclient.h \
-	cuclient.cxx options.h options.cxx clntauth.cxx ui.h display.h
+	cuclient.cxx options.h options.cxx clntauth.cxx ui.h display.h \
+	uiCU.cxx
 
 libconqinit_la_SOURCES = conqinit-yacc.yxx conqinit-lex.lxx conqinit.h planinit.cxx
 

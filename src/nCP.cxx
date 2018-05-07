@@ -48,6 +48,7 @@ using namespace std;
 #include "ibuf.h"
 #include "prm.h"
 #include "cqkeys.h"
+#include "ui.h"
 
 #include "nDead.h"
 #include "nCPHelp.h"
@@ -182,18 +183,6 @@ static bool doReload = true;
 
 extern void setWarp(real warp); /* FIXME - GL.c */
 
-
-/* common output */
-#define cp_putmsg(str, lin)  hudSetPrompt(lin, "", NoColor, str, NoColor)
-
-#if 0                           /* for debugging */
-void cp_putmsg(std::string str, int lin)
-{
-    hudSetPrompt(lin, "", NoColor, str, NoColor);
-    utLog("PUTMSG: %s", str.c_str());
-}
-#endif
-
 static nodeStatus_t nCPDisplay(dspConfig_t *);
 static nodeStatus_t nCPIdle(void);
 static nodeStatus_t nCPInput(int ch);
@@ -281,7 +270,7 @@ static void _infoship( int snum, int scanner, bool doOutput )
     if ( snum < 0 || snum >= cbLimits.maxShips() )
     {
         if (doOutput)
-            cp_putmsg( "No such ship.", MSG_LIN1 );
+            uiPutMsg( "No such ship.", MSG_LIN1 );
         hudSetInfoTarget(-1, false);
         return;
     }
@@ -289,7 +278,7 @@ static void _infoship( int snum, int scanner, bool doOutput )
     if ( ! godlike && status != SS_LIVE )
     {
         if (doOutput)
-            cp_putmsg( "Not found.", MSG_LIN1 );
+            uiPutMsg( "Not found.", MSG_LIN1 );
         hudSetInfoTarget(-1, false);
         return;
     }
@@ -306,7 +295,7 @@ static void _infoship( int snum, int scanner, bool doOutput )
         /* Silly Captain... */
         cbuf += ": That's us, silly!";
         if (doOutput)
-            cp_putmsg( cbuf, MSG_LIN1 );
+            uiPutMsg( cbuf, MSG_LIN1 );
         hudSetInfoTarget(-1, false);
         return;
     }
@@ -389,7 +378,7 @@ static void _infoship( int snum, int scanner, bool doOutput )
     }
 
     if (doOutput)
-        cp_putmsg( cbuf, MSG_LIN1 );
+        uiPutMsg( cbuf, MSG_LIN1 );
 
     if ( ! SCLOAKED(snum) || cbShips[snum].warp != 0.0 )
     {
@@ -527,7 +516,7 @@ static void _infoship( int snum, int scanner, bool doOutput )
     {
         cbuf += '.';
         if (doOutput)
-            cp_putmsg( cbuf, MSG_LIN2 );
+            uiPutMsg( cbuf, MSG_LIN2 );
     }
 
     return;
@@ -548,7 +537,7 @@ static void _infoplanet( const char *str, int pnum, int snum, bool doOutput )
     {
         if (doOutput)
         {
-            cp_putmsg( "No such planet.", MSG_LIN1 );
+            uiPutMsg( "No such planet.", MSG_LIN1 );
             hudClearPrompt(MSG_LIN2);
             hudSetInfoTarget(-1, false);
         }
@@ -686,9 +675,9 @@ static void _infoplanet( const char *str, int pnum, int snum, bool doOutput )
         if ( i <= j )
         {
             /* The first part is small enough. */
-            cp_putmsg( buf, MSG_LIN1 );
+            uiPutMsg( buf, MSG_LIN1 );
             if ( junk[0] != 0 )
-                cp_putmsg(junk, MSG_LIN2);
+                uiPutMsg(junk, MSG_LIN2);
             else
                 hudClearPrompt(MSG_LIN2);
         }
@@ -701,8 +690,8 @@ static void _infoplanet( const char *str, int pnum, int snum, bool doOutput )
             utAppendChar(buf , ' ');
             strcat(buf , junk);
             buf[i] = 0;				/* terminate at blank */
-            cp_putmsg( buf, MSG_LIN1 );
-            cp_putmsg( &buf[i+1], MSG_LIN2 );
+            uiPutMsg( buf, MSG_LIN1 );
+            uiPutMsg( &buf[i+1], MSG_LIN2 );
         }
     }
 
@@ -723,7 +712,7 @@ static void _dowarp( int snum, real warp )
         return;
 
     cbuf = fmt::format("Warp {}.", int(warp));
-    cp_putmsg(cbuf, MSG_LIN1 );
+    uiPutMsg(cbuf, MSG_LIN1 );
 
     /* we set it locally since the server won't send it to us */
     cbShips[snum].dwarp = warp;
@@ -775,7 +764,7 @@ static void _dophase( real dir )
         cqsEffectPlay(cqsTeamEffects[cbShips[Context.snum].team].phaser, NULL,
                       0, 0, 0);
 
-    cp_putmsg( "Firing phasers...", MSG_LIN2 );
+    uiPutMsg( "Firing phasers...", MSG_LIN2 );
 
     sendCommand(CPCMD_FIREPHASER, (uint16_t)(dir * 100.0));
 
@@ -875,7 +864,7 @@ static void _doinfo( const char *inbuf, char ch, bool doOutput )
         else
         {
             if (doOutput)
-                cp_putmsg( "Not found.", MSG_LIN2 );
+                uiPutMsg( "Not found.", MSG_LIN2 );
             hudSetInfoTarget(-1, false);
         }
     }
@@ -894,7 +883,7 @@ static void _doinfo( const char *inbuf, char ch, bool doOutput )
     else
     {
         if (doOutput)
-            cp_putmsg( "I don't understand.", MSG_LIN2 );
+            uiPutMsg( "I don't understand.", MSG_LIN2 );
         hudSetInfoTarget(-1, false);
         return;
     }
@@ -927,7 +916,7 @@ static void _domydet(void)
 
     sendCommand(CPCMD_DETSELF, 0);
 
-    cp_putmsg( "Detonating...", MSG_LIN1 );
+    uiPutMsg( "Detonating...", MSG_LIN1 );
 
     return;
 
@@ -942,10 +931,10 @@ static void _doshields( int snum, int up )
     if ( up )
     {
         SFCLR(snum, SHIP_F_REPAIR);
-        cp_putmsg( "Shields raised.", MSG_LIN1 );
+        uiPutMsg( "Shields raised.", MSG_LIN1 );
     }
     else
-        cp_putmsg( "Shields lowered.", MSG_LIN1 );
+        uiPutMsg( "Shields lowered.", MSG_LIN1 );
 
     hudClearPrompt(MSG_LIN2);
 
@@ -966,7 +955,7 @@ static void _doorbit( int snum )
         cbuf += "We are not close enough to orbit, ";
         cbuf += cbShips[snum].alias;
         cbuf += '.';
-        cp_putmsg( cbuf, MSG_LIN1 );
+        uiPutMsg( cbuf, MSG_LIN1 );
         hudClearPrompt(MSG_LIN2);
     }
     else if ( cbShips[snum].warp > MAX_ORBIT_WARP )
@@ -974,11 +963,11 @@ static void _doorbit( int snum )
         cbuf += "We are going too fast to orbit, ";
         cbuf += cbShips[snum].alias;
         cbuf += '.';
-        cp_putmsg( cbuf, MSG_LIN1 );
+        uiPutMsg( cbuf, MSG_LIN1 );
 
         cbuf = fmt::format("Maximum orbital insertion velocity is warp {:.1f}.",
                            MAX_ORBIT_WARP);
-        cp_putmsg( cbuf, MSG_LIN2 );
+        uiPutMsg( cbuf, MSG_LIN2 );
     }
     else
     {
@@ -1039,15 +1028,15 @@ static void _dodet( void )
     hudClearPrompt(MSG_LIN1);
 
     if ( cbShips[snum].wfuse > 0 )
-        cp_putmsg( "Weapons are currently overloaded.", MSG_LIN1 );
+        uiPutMsg( "Weapons are currently overloaded.", MSG_LIN1 );
     else if ( clbUseFuel( snum, DETONATE_FUEL, true, false ) )
     {				/* we don't really use fuel here on the
 				   client*/
-        cp_putmsg( "detonating...", MSG_LIN1 );
+        uiPutMsg( "detonating...", MSG_LIN1 );
         sendCommand(CPCMD_DETENEMY, 0);
     }
     else
-        cp_putmsg( "Not enough fuel to fire detonators.", MSG_LIN1 );
+        uiPutMsg( "Not enough fuel to fire detonators.", MSG_LIN1 );
 
     return;
 
@@ -1079,7 +1068,7 @@ static int _chkrefit(void)
     /* Check for allowability. */
     if ( oneplace( cbShips[snum].kills ) < MIN_REFIT_KILLS )
     {
-        cp_putmsg( nek, MSG_LIN1 );
+        uiPutMsg( nek, MSG_LIN1 );
         return false;
     }
 
@@ -1090,14 +1079,14 @@ static int _chkrefit(void)
 
         if (cbPlanets[pnum].team != cbShips[snum].team || cbShips[snum].warp >= 0.0)
         {
-            cp_putmsg( ntp, MSG_LIN1 );
+            uiPutMsg( ntp, MSG_LIN1 );
             return false;
         }
     }
 
     if (cbShips[snum].armies != 0)
     {
-        cp_putmsg( cararm, MSG_LIN1 );
+        uiPutMsg( cararm, MSG_LIN1 );
         return false;
     }
 
@@ -1117,7 +1106,7 @@ static int _chkcoup(void)
     /* Check for allowability. */
     if ( oneplace( cbShips[snum].kills ) < MIN_COUP_KILLS )
     {
-        cp_putmsg(
+        uiPutMsg(
             "Fleet orders require three kills before a coup can be attempted.",
             MSG_LIN1 );
         return false;
@@ -1125,13 +1114,13 @@ static int _chkcoup(void)
     for ( i = 0; i < cbLimits.maxPlanets(); i++ )
         if ( cbPlanets[i].team == cbShips[snum].team && cbPlanets[i].armies > 0 )
         {
-            cp_putmsg( "We don't need to coup, we still have armies left!",
+            uiPutMsg( "We don't need to coup, we still have armies left!",
                        MSG_LIN1 );
             return false;
         }
     if ( cbShips[snum].warp >= 0.0 )
     {
-        cp_putmsg( nhp, MSG_LIN1 );
+        uiPutMsg( nhp, MSG_LIN1 );
         return false;
     }
     // the assumption is that if warp < 0, we are in orbit and
@@ -1139,12 +1128,12 @@ static int _chkcoup(void)
     pnum = (int)cbShips[snum].lockDetail;
     if ( pnum != cbTeams[cbShips[snum].team].homeplanet )
     {
-        cp_putmsg( nhp, MSG_LIN1 );
+        uiPutMsg( nhp, MSG_LIN1 );
         return false;
     }
     if ( cbPlanets[pnum].armies > MAX_COUP_ENEMY_ARMIES )
     {
-        cp_putmsg( "The enemy is still too strong to attempt a coup.",
+        uiPutMsg( "The enemy is still too strong to attempt a coup.",
                    MSG_LIN1 );
         return false;
     }
@@ -1154,7 +1143,7 @@ static int _chkcoup(void)
         std::string cbuf =
             fmt::format("This planet is uninhabitable for {} more minutes.",
                         i);
-        cp_putmsg( cbuf, MSG_LIN1 );
+        uiPutMsg( cbuf, MSG_LIN1 );
         return false;
     }
 
@@ -1249,7 +1238,7 @@ static void _domsgto(const std::string& buf, int ch, int terse)
         utSafeCToI( &j, tbuf, 0 );		/* ignore status */
         if ( j < 0 || j >= cbLimits.maxShips() )
 	{
-            cp_putmsg( "No such ship.", MSG_LIN2 );
+            uiPutMsg( "No such ship.", MSG_LIN2 );
             hudClearPrompt(MSG_LIN1);
             state = S_NONE;
             prompting = false;
@@ -1257,7 +1246,7 @@ static void _domsgto(const std::string& buf, int ch, int terse)
 	}
         if ( cbShips[j].status != SS_LIVE )
 	{
-            cp_putmsg( nf, MSG_LIN2 );
+            uiPutMsg( nf, MSG_LIN2 );
             hudClearPrompt(MSG_LIN1);
             state = S_NONE;
             prompting = false;
@@ -1303,7 +1292,7 @@ static void _domsgto(const std::string& buf, int ch, int terse)
 
                  if ( i >= NUMPLAYERTEAMS )
                  {
-                     cp_putmsg( huh, MSG_LIN2 );
+                     uiPutMsg( huh, MSG_LIN2 );
                      hudClearPrompt(MSG_LIN1);
                      state = S_NONE;
                      prompting = false;
@@ -1322,7 +1311,7 @@ static void _domsgto(const std::string& buf, int ch, int terse)
     {
         if ( cbShips[to].status != SS_LIVE )
 	{
-            cp_putmsg( nf, MSG_LIN2 );
+            uiPutMsg( nf, MSG_LIN2 );
             hudClearPrompt(MSG_LIN1);
             state = S_NONE;
             prompting = false;
@@ -1353,7 +1342,7 @@ static void _domsgto(const std::string& buf, int ch, int terse)
              tbuf += "Friend:";
              break;
          default:
-             cp_putmsg( huh, MSG_LIN2 );
+             uiPutMsg( huh, MSG_LIN2 );
              return;
              break;
          }
@@ -1362,7 +1351,7 @@ static void _domsgto(const std::string& buf, int ch, int terse)
     if (!terse)
         tbuf += " ([ESC] to abort)";
 
-    cp_putmsg( tbuf, MSG_LIN1 );
+    uiPutMsg( tbuf, MSG_LIN1 );
     hudClearPrompt(MSG_LIN2);
 
     msgto = to;                   /* set global */
@@ -1565,7 +1554,7 @@ static void _docourse( std::string& buf, char ch)
     case NEAR_SHIP:
         if ( sorpnum < 0 || sorpnum >= cbLimits.maxShips() )
 	{
-            cp_putmsg( "No such ship.", MSG_LIN2 );
+            uiPutMsg( "No such ship.", MSG_LIN2 );
             return;
 	}
         if ( sorpnum == snum )
@@ -1575,7 +1564,7 @@ static void _docourse( std::string& buf, char ch)
 	}
         if ( cbShips[sorpnum].status != SS_LIVE )
 	{
-            cp_putmsg( "Not found.", MSG_LIN2 );
+            uiPutMsg( "Not found.", MSG_LIN2 );
             return;
 	}
 
@@ -1583,7 +1572,7 @@ static void _docourse( std::string& buf, char ch)
 	{
             if ( cbShips[sorpnum].warp <= 0.0 )
 	    {
-                cp_putmsg( "Sensors are unable to lock on.", MSG_LIN2 );
+                uiPutMsg( "Sensors are unable to lock on.", MSG_LIN2 );
                 return;
 	    }
 	}
@@ -1614,12 +1603,12 @@ static void _docourse( std::string& buf, char ch)
         hudClearPrompt(MSG_LIN1);
         break;
     case NEAR_NONE:
-        cp_putmsg( "Not found.", MSG_LIN2 );
+        uiPutMsg( "Not found.", MSG_LIN2 );
         return;
         break;
     default:
         /* This includes NEAR_ERROR. */
-        cp_putmsg( "I don't understand.", MSG_LIN2 );
+        uiPutMsg( "I don't understand.", MSG_LIN2 );
         return;
         break;
     }
@@ -1639,7 +1628,7 @@ static int _chkcloak(void)
     if ( SCLOAKED(Context.snum) )
     {
         sendCommand(CPCMD_CLOAK, 0);
-        cp_putmsg( "Cloaking device disengaged.", MSG_LIN1 );
+        uiPutMsg( "Cloaking device disengaged.", MSG_LIN1 );
         return false;
     }
 
@@ -1695,7 +1684,7 @@ static void _doreview(void)
     {
         if ( cbShips[snum].lastmsg == LMSG_NEEDINIT )
         {
-            cp_putmsg( "There are no old messages.", MSG_LIN1 );
+            uiPutMsg( "There are no old messages.", MSG_LIN1 );
             return;               /* none to read */
         }
         i = cbShips[snum].alastmsg;
@@ -1710,12 +1699,12 @@ static void _doreview(void)
     hudClearPrompt(MSG_LIN1);
     if (!_review())
     {
-        cp_putmsg( "There are no old messages.", MSG_LIN1 );
+        uiPutMsg( "There are no old messages.", MSG_LIN1 );
         return;               /* none to read */
     }
 
 
-    cp_putmsg("--- [SPACE] for more, arrows to scroll, any key to quit ---",
+    uiPutMsg("--- [SPACE] for more, arrows to scroll, any key to quit ---",
               MSG_LIN2);
 
     return;
@@ -1735,26 +1724,26 @@ static void _dobomb(void)
     /* Check for allowability. */
     if ( cbShips[snum].warp >= 0.0 )
     {
-        cp_putmsg( "We must be orbiting a planet to bombard it.", MSG_LIN1 );
+        uiPutMsg( "We must be orbiting a planet to bombard it.", MSG_LIN1 );
         return;
     }
     pnum = cbShips[snum].lockDetail;
     if ( cbPlanets[pnum].type == PLANET_SUN || cbPlanets[pnum].type == PLANET_MOON ||
          cbPlanets[pnum].team == TEAM_NOTEAM || cbPlanets[pnum].armies == 0 )
     {
-        cp_putmsg( "There is no one there to bombard.", MSG_LIN1 );
+        uiPutMsg( "There is no one there to bombard.", MSG_LIN1 );
         return;
     }
     if ( cbPlanets[pnum].team == cbShips[snum].team )
     {
-        cp_putmsg( "We can't bomb our own armies!", MSG_LIN1 );
+        uiPutMsg( "We can't bomb our own armies!", MSG_LIN1 );
         return;
     }
 
     if ( cbPlanets[pnum].team != TEAM_SELFRULED && cbPlanets[pnum].team != TEAM_GOD )
         if ( ! cbShips[snum].war[cbPlanets[pnum].team] )
         {
-            cp_putmsg( "But we are not at war with this planet!", MSG_LIN1 );
+            uiPutMsg( "But we are not at war with this planet!", MSG_LIN1 );
             return;
         }
 
@@ -1798,7 +1787,7 @@ static void _initbeam()
     /* Check for allowability. */
     if ( cbShips[snum].warp >= 0.0 )
     {
-        cp_putmsg( "We must be orbiting a planet to use the transporter.",
+        uiPutMsg( "We must be orbiting a planet to use the transporter.",
                    MSG_LIN1 );
         return;
     }
@@ -1807,18 +1796,18 @@ static void _initbeam()
     {
         if ( cbPlanets[pnum].type == PLANET_SUN )
 	{
-            cp_putmsg( "Idiot!  Our armies will fry down there!", MSG_LIN1 );
+            uiPutMsg( "Idiot!  Our armies will fry down there!", MSG_LIN1 );
             return;
 	}
         else if ( cbPlanets[pnum].type == PLANET_MOON )
 	{
-            cp_putmsg( "Fool!  Our armies will suffocate down there!",
+            uiPutMsg( "Fool!  Our armies will suffocate down there!",
                        MSG_LIN1 );
             return;
 	}
         else if ( cbPlanets[pnum].team == TEAM_GOD )
 	{
-            cp_putmsg(
+            uiPutMsg(
                 "GOD->you: YOUR ARMIES AREN'T GOOD ENOUGH FOR THIS PLANET.",
                 MSG_LIN1 );
             return;
@@ -1833,7 +1822,7 @@ static void _initbeam()
         if ( i != 1 )
             cbuf += 's';
         cbuf += '.';
-        cp_putmsg( cbuf, MSG_LIN1 );
+        uiPutMsg( cbuf, MSG_LIN1 );
         return;
     }
 
@@ -1843,14 +1832,14 @@ static void _initbeam()
          cbPlanets[pnum].team != TEAM_NOTEAM )
         if ( ! cbShips[snum].war[cbPlanets[pnum].team] && cbPlanets[pnum].armies != 0)
         {
-            cp_putmsg( "But we are not at war with this planet!", MSG_LIN1 );
+            uiPutMsg( "But we are not at war with this planet!", MSG_LIN1 );
             return;
         }
 
     if ( cbShips[snum].armies == 0 &&
          cbPlanets[pnum].team == cbShips[snum].team && cbPlanets[pnum].armies <= MIN_BEAM_ARMIES )
     {
-        cp_putmsg( lastfew, MSG_LIN1 );
+        uiPutMsg( lastfew, MSG_LIN1 );
         return;
     }
 
@@ -1858,7 +1847,7 @@ static void _initbeam()
 
     if ( rkills < (real)1.0 )
     {
-        cp_putmsg(
+        uiPutMsg(
             "Fleet orders prohibit beaming armies until you have a kill.",
             MSG_LIN1 );
         return;
@@ -1893,7 +1882,7 @@ static void _initbeam()
             else
                 cbuf += "ies are";
             cbuf += " reluctant to beam aboard a pirate vessel.";
-            cp_putmsg( cbuf, MSG_LIN1 );
+            uiPutMsg( cbuf, MSG_LIN1 );
             return;
 	}
         upmax = 0;
@@ -1902,7 +1891,7 @@ static void _initbeam()
     /* Figure out which direction to beam. */
     if ( upmax <= 0 && downmax <= 0 )
     {
-        cp_putmsg( "There is no one to beam.", MSG_LIN1 );
+        uiPutMsg( "There is no one to beam.", MSG_LIN1 );
         return;
     }
 
@@ -1956,7 +1945,7 @@ static void _dobeam(std::string& buf, int ch)
     {
         state = S_NONE;
         prompting = false;
-        cp_putmsg( abt, MSG_LIN1 );
+        uiPutMsg( abt, MSG_LIN1 );
         return;
     }
     else if ( ch == TERM_EXTRA && buf[0] == 0 )
@@ -1968,13 +1957,13 @@ static void _dobeam(std::string& buf, int ch)
 	{
             state = S_NONE;
             prompting = false;
-            cp_putmsg( abt, MSG_LIN1 );
+            uiPutMsg( abt, MSG_LIN1 );
             return;
 	}
         utSafeCToI( &num, buf);
         if ( num < 1 || num > beamax )
 	{
-            cp_putmsg( abt, MSG_LIN1 );
+            uiPutMsg( abt, MSG_LIN1 );
             state = S_NONE;
             prompting = false;
             return;
@@ -2066,7 +2055,7 @@ static void command( int ch )
         else
 	{
             mglBeep(MGL_BEEP_ERR);
-            cp_putmsg( "Type h for help.", MSG_LIN2 );
+            uiPutMsg( "Type h for help.", MSG_LIN2 );
 	}
         break;
     case 'A':				/* change allocation */
@@ -2203,7 +2192,7 @@ static void command( int ch )
     {
         std::string oldPseudo = fmt::format("Old pseudonym: {}",
                                             cbShips[Context.snum].alias);
-        cp_putmsg(oldPseudo, MSG_LIN1);
+        uiPutMsg(oldPseudo, MSG_LIN1);
 
         state = S_PSEUDO;
         prm.preinit = false;
@@ -2255,7 +2244,7 @@ static void command( int ch )
     case 'Q':				/* self destruct */
         if ( SCLOAKED(Context.snum) )
         {
-            cp_putmsg( "The cloaking device is using all available power.",
+            uiPutMsg( "The cloaking device is using all available power.",
                        MSG_LIN1 );
         }
         else
@@ -2286,7 +2275,7 @@ static void command( int ch )
                 prm.index = MSG_LIN1;
                 hudSetPrompt(prm.index, prm.pbuf, NoColor,
                              prm.buf, NoColor);
-                cp_putmsg("Press [TAB] to change, [ENTER] to accept: ",
+                uiPutMsg("Press [TAB] to change, [ENTER] to accept: ",
                           MSG_LIN2);
                 prompting = true;
             }
@@ -2485,7 +2474,7 @@ static void command( int ch )
         /* nothing. */
     default:
         mglBeep(MGL_BEEP_ERR);
-        cp_putmsg( "Type h for help.", MSG_LIN2 );
+        uiPutMsg( "Type h for help.", MSG_LIN2 );
     }
 
     return;
@@ -3030,7 +3019,7 @@ static nodeStatus_t nCPInput(int ch)
         sendCommand(CPCMD_BOMB, 0);
         state = S_NONE;
         prompting = false;
-        cp_putmsg( abt, MSG_LIN1 );
+        uiPutMsg( abt, MSG_LIN1 );
         hudClearPrompt(MSG_LIN2);
         return NODE_OK;           /* next iter will process the char */
     }
@@ -3042,7 +3031,7 @@ static nodeStatus_t nCPInput(int ch)
         sendCommand(CPCMD_BEAM, 0);
         state = S_NONE;
         prompting = false;
-        cp_putmsg( abt, MSG_LIN1 );
+        uiPutMsg( abt, MSG_LIN1 );
         hudClearPrompt(MSG_LIN2);
         return NODE_OK;           /* next iter will process the char */
     }
@@ -3120,7 +3109,7 @@ static nodeStatus_t nCPInput(int ch)
                     }
                 }
                 else
-                    cp_putmsg( "Invalid targeting information.", MSG_LIN1 );
+                    uiPutMsg( "Invalid targeting information.", MSG_LIN1 );
 
                 prompting = false;
                 state = S_NONE;
@@ -3169,11 +3158,11 @@ static nodeStatus_t nCPInput(int ch)
             {
                 if (ch == TERM_EXTRA)
                 {
-                    cp_putmsg( "Attempting coup...", MSG_LIN1 );
+                    uiPutMsg( "Attempting coup...", MSG_LIN1 );
                     sendCommand(CPCMD_COUP, 0);
                 }
                 else
-                    cp_putmsg( abt, MSG_LIN1 );
+                    uiPutMsg( abt, MSG_LIN1 );
 
                 prompting = false;
                 state = S_NONE;
@@ -3221,7 +3210,7 @@ static nodeStatus_t nCPInput(int ch)
                 state = S_NONE;
             }
             else
-                cp_putmsg("Press [ESC] to abort autopilot.", MSG_LIN1);
+                uiPutMsg("Press [ESC] to abort autopilot.", MSG_LIN1);
 
             break;
 
@@ -3267,14 +3256,14 @@ static nodeStatus_t nCPInput(int ch)
                 prompting = false;
                 hudClearPrompt(MSG_LIN1);
                 hudClearPrompt(MSG_LIN2);
-                cp_putmsg( "Self destruct has been cancelled.", MSG_LIN1 );
+                uiPutMsg( "Self destruct has been cancelled.", MSG_LIN1 );
             }
             else
             {                   /* chicken */
                 hudClearPrompt(MSG_LIN1);
                 hudClearPrompt(MSG_LIN2);
                 prm.buf.clear();
-                cp_putmsg( "Press [ESC] to abort self destruct.", MSG_LIN1 );
+                uiPutMsg( "Press [ESC] to abort self destruct.", MSG_LIN1 );
                 mglBeep(MGL_BEEP_ERR);
             }
 
@@ -3294,7 +3283,7 @@ static nodeStatus_t nCPInput(int ch)
             {                   /* weak human */
                 state = S_NONE;
                 prompting = false;
-                cp_putmsg( abt, MSG_LIN1 );
+                uiPutMsg( abt, MSG_LIN1 );
                 hudClearPrompt(MSG_LIN2);
             }
 
@@ -3313,7 +3302,7 @@ static nodeStatus_t nCPInput(int ch)
                 dirup = false;
                 break;
             default:
-                cp_putmsg( abt, MSG_LIN1 );
+                uiPutMsg( abt, MSG_LIN1 );
                 state = S_NONE;
                 prompting = false;
                 return NODE_OK;
@@ -3388,7 +3377,7 @@ static nodeStatus_t nCPInput(int ch)
                     {
                         state = S_WARRING;
                         prompting = false;
-                        cp_putmsg(
+                        uiPutMsg(
                             "Reprogramming the battle computer, please stand by...",
                             MSG_LIN2 );
 

@@ -48,6 +48,7 @@
 #include "ibuf.h"
 #include "prm.h"
 #include "cqkeys.h"
+#include "ui.h"
 
 #include "nDead.h"
 #include "nCPHelp.h"
@@ -74,8 +75,6 @@
 #include "hud.h"
 
 #include "cqsound.h"
-
-#define cp_putmsg(str, lin)  hudSetPrompt(lin, "", NoColor, str, NoColor)
 
 #define S_NONE         0
 #define S_WATCH        1
@@ -369,13 +368,13 @@ static nodeStatus_t nPlayBInput(int ch)
         setONode(nPlayBHelpInit(false));
         break;
     case 'f':	/* move forward 30 seconds */
-        cp_putmsg(NULL, MSG_LIN1);
+        uiPutMsg("", MSG_LIN1);
         pbFileSeek(recCurrentTime + 30);
         Context.redraw = true;
         break;
 
     case 'F':	/* move forward 2 minutes */
-        cp_putmsg(NULL, MSG_LIN1);
+        uiPutMsg("", MSG_LIN1);
         pbFileSeek(recCurrentTime + (2 * 60));
         Context.redraw = true;
         break;
@@ -388,23 +387,23 @@ static nodeStatus_t nPlayBInput(int ch)
         break;
 
     case 'b':	/* move backward 30 seconds */
-        cp_putmsg("Rewinding...", MSG_LIN1);
+        uiPutMsg("Rewinding...", MSG_LIN1);
         pbFileSeek(recCurrentTime - 30);
-        cp_putmsg(NULL, MSG_LIN1);
+        uiPutMsg("", MSG_LIN1);
         Context.redraw = true;
         break;
 
     case 'B':	/* move backward 2 minutes */
-        cp_putmsg("Rewinding...", MSG_LIN1);
+        uiPutMsg("Rewinding...", MSG_LIN1);
         pbFileSeek(recCurrentTime - (2 * 60));
-        cp_putmsg(NULL, MSG_LIN1);
+        uiPutMsg("", MSG_LIN1);
         Context.redraw = true;
         break;
 
     case 'r':	/* reset to beginning */
-        cp_putmsg("Rewinding...", MSG_LIN1);
+        uiPutMsg("Rewinding...", MSG_LIN1);
         pbFileSeek(recStartTime);
-        cp_putmsg(NULL, MSG_LIN1);
+        uiPutMsg("", MSG_LIN1);
         Context.redraw = true;
         break;
 
@@ -412,12 +411,12 @@ static nodeStatus_t nPlayBInput(int ch)
         if (Context.recmode == RECMODE_PLAYING)
         {		/* pause */
             Context.recmode = RECMODE_PAUSED;
-            cp_putmsg("PAUSED: Press [SPACE] to resume", MSG_LIN1);
+            uiPutMsg("PAUSED: Press [SPACE] to resume", MSG_LIN1);
         }
         else
         {		/* resume */
             Context.recmode = RECMODE_PLAYING;
-            cp_putmsg(NULL, MSG_LIN1);
+            uiPutMsg("", MSG_LIN1);
         }
 
         break;
@@ -671,7 +670,7 @@ static nodeStatus_t nPlayBInput(int ch)
         break;
     default:
         mglBeep(MGL_BEEP_ERR);
-        cp_putmsg( "Type h for help.", MSG_LIN2 );
+        uiPutMsg( "Type h for help.", MSG_LIN2 );
         break;
     }
 

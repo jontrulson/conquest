@@ -1493,7 +1493,7 @@ void opinfo( int snum )
     else
     {
         cdmove( MSG_LIN2, 1 );
-        mcuPutMsg( huh, MSG_LIN2 );
+        uiPutMsg( huh, MSG_LIN2 );
     }
 
     return;
@@ -2198,7 +2198,7 @@ void oprobot(void)
     {
         if ( ! newrob( &snum, unum ) )
 	{
-            mcuPutMsg( "Failed to create robot ship.", MSG_LIN1 );
+            uiPutMsg( "Failed to create robot ship.", MSG_LIN1 );
             break;
 	}
 
@@ -2234,7 +2234,7 @@ void oprobot(void)
     i = MSG_LIN1;
     if ( anum != num )
         i = i + 1;
-    mcuPutMsg( buf, i );
+    uiPutMsg( buf, i );
 
     return;
 
@@ -3336,7 +3336,7 @@ void watch(void)
                 break;
             default:
                 cdbeep();
-                mcuPutMsg( "Type h for help.", MSG_LIN2 );
+                uiPutMsg( "Type h for help.", MSG_LIN2 );
                 break;
             }
             /* Disable messages for awhile. */

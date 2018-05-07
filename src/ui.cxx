@@ -25,31 +25,48 @@
 // SOFTWARE.
 //
 
-#ifndef _UI_H
-#define _UI_H
+
+#include "c_defs.h"
 
 #include <string>
 
-// ui specific - these will be found in files placed into the UiGL
-// (OpenGL) or UiCU (curses) specific library files
+#include "global.h"
+#include "conqdef.h"
+#include "cb.h"
+#include "context.h"
+#include "conf.h"
+#include "color.h"
 
-// color{CU,GL}
-void uiInitColors(void);
-void uiPutColor(cqColor col);
-// planet updating (textures, etc) for the GL client, this is defined
-// in GL.c, for the curses client this will be a noop defined in
-// cumisc.c
-int uiUpdatePlanet(int pnum);
-// uiCU.cxx or uiGL.cxx
-void uiMoveCursor(int lin, int col);
-// print a message at the given line
-void uiPutMsg(const std::string& buf, int line);
+#include "conqutil.h"
+#include "cprintf.h"
 
-// ui general, these are found in ui*.cxx files, meant to be generic
-// WRT drawing technology (curse/OGL) in use
+/* get the 'real' strlen of a string, skipping past any embedded colors */
+int uiCStrlen(const std::string& buf)
+{
+    if (buf.empty())
+        return 0;
 
-// returns the length of a string, not counting embedded color codes
-// ("#%d#")
-int uiCStrlen(const std::string& buf);
+    const char *p = buf.c_str();
+    int l;
 
-#endif /* _UI_H */
+    l = 0;
+    while (*p)
+    {
+        if (*p == '#')
+        {                       /* a color sequence */
+            p++;
+            while (*p && isdigit(*p))
+                p++;
+
+            if (*p == '#')
+                p++;
+        }
+        else
+        {
+            p++;
+            l++;
+        }
+    }
+
+    return l;
+}

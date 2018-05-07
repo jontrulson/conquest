@@ -42,8 +42,7 @@
 
 #include "glmisc.h"
 #include "glfont.h"
-
-static char buf[BUFFER_SIZE_1024];
+#include "ui.h"
 
 /*
  * int lin - line if pertinent
@@ -60,16 +59,16 @@ static char buf[BUFFER_SIZE_1024];
 void cprintf(int lin, int col, cprintfAlignment_t align, const char *fmt, ...)
 {
     va_list ap;
-    int l;
-    GLfloat x, y, w;
+    static char buf[BUFFER_SIZE_1024];
 
     va_start(ap, fmt);
-    (void)vsnprintf(buf, sizeof(buf) - 1, fmt, ap);
+    (void)vsnprintf(buf, sizeof(buf), fmt, ap);
     va_end(ap);
 
     if (DSP_INITED())
     {
-        l = uiCStrlen(buf);
+        GLfloat x, y, w;
+        int l = uiCStrlen(buf);
         if (align == ALIGN_CENTER)
             x = dConf.ppCol
                 * (((real)Context.maxcol / 2.0) - ((GLfloat)l / 2.0));

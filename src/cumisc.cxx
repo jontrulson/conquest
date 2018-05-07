@@ -209,7 +209,7 @@ int mcuReadMsg( int msgnum, int dsplin )
     buf += cbMsgs[msgnum].msgbuf;
 
     uiPutColor(attrib);
-    mcuPutMsg( buf.c_str(), dsplin );
+    uiPutMsg( buf.c_str(), dsplin );
     uiPutColor(0);
     /* clear second line if sending to MSG_LIN1 */
     if (dsplin == MSG_LIN1)
@@ -235,7 +235,7 @@ void mcuInfoPlanet( const char *str, int pnum )
     /* Check range of the passed planet number. */
     if ( pnum < 0 || pnum >= cbLimits.maxPlanets() )
     {
-        mcuPutMsg( "No such planet.", MSG_LIN1 );
+        uiPutMsg( "No such planet.", MSG_LIN1 );
         cdclrl( MSG_LIN2, 1 );
         cdmove( MSG_LIN1, 1 );
         utLog("infoplanet: Called with invalid pnum (%d).", pnum );
@@ -303,9 +303,9 @@ void mcuInfoPlanet( const char *str, int pnum )
     if ( i <= j )
     {
         /* The first part is small enough. */
-        mcuPutMsg( buf, MSG_LIN1 );
+        uiPutMsg( buf, MSG_LIN1 );
         if ( junk[0] != 0 )
-            mcuPutMsg( junk, MSG_LIN2 );
+            uiPutMsg( junk, MSG_LIN2 );
         else
             cdclrl( MSG_LIN2, 1 );
     }
@@ -318,8 +318,8 @@ void mcuInfoPlanet( const char *str, int pnum )
         utAppendChar(buf , ' ') ;
         strcat(buf , junk) ;
         buf[i] = 0;				/* terminate at blank */
-        mcuPutMsg( buf, MSG_LIN1 );
-        mcuPutMsg( &buf[i+1], MSG_LIN2 );
+        uiPutMsg( buf, MSG_LIN1 );
+        uiPutMsg( &buf[i+1], MSG_LIN2 );
     }
 
     cdmove( MSG_LIN1, 1 );
@@ -340,7 +340,7 @@ void mcuInfoShip( int snum )
     cdclrl( MSG_LIN1, 2 );
     if ( snum < 0 || snum >= cbLimits.maxShips() )
     {
-        mcuPutMsg( "No such ship.", MSG_LIN1 );
+        uiPutMsg( "No such ship.", MSG_LIN1 );
         cdmove( MSG_LIN1, 1 );
         return;
     }
@@ -397,7 +397,7 @@ void mcuInfoShip( int snum )
     utAppendShipStatus(cbuf , status) ;
     utAppendChar(cbuf , '.') ;
 
-    mcuPutMsg( cbuf, MSG_LIN1 );
+    uiPutMsg( cbuf, MSG_LIN1 );
 
     if ( ! SCLOAKED(snum) || cbShips[snum].warp != 0.0 )
     {
@@ -443,7 +443,7 @@ void mcuInfoShip( int snum )
     {
         cbuf[0] = (char)toupper( cbuf[0] );
         utAppendChar(cbuf , '.') ;
-        mcuPutMsg( cbuf, MSG_LIN2 );
+        uiPutMsg( cbuf, MSG_LIN2 );
     }
 
     cdmove( MSG_LIN1, 1 );
@@ -1397,8 +1397,8 @@ int mcuMore( const char *pmt )
 /*  SYNOPSIS */
 /*    char msg() */
 /*    int line */
-/*    mcuPutMsg( msg, line ) */
-void mcuPutMsg( const char *msg, int line )
+/*    uiPutMsg( msg, line ) */
+void uiPutMsg( const char *msg, int line )
 {
     cdclrl( line, 1 );
     cdputs( msg, line, 1 );
