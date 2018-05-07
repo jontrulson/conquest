@@ -38,6 +38,7 @@
 #include "packet.h"
 #include "ui.h"
 #include "cprintf.h"
+#include "playback.h"
 
 #include "nCP.h"
 #include "nDead.h"
@@ -69,7 +70,7 @@ scrNode_t *nPlayBHelpInit(int setnode)
 static nodeStatus_t nPlayBHelpDisplay(dspConfig_t *dsp)
 {
 
-    dspReplayHelp();
+    pbDisplayReplayHelp();
 
     cprintf(MSG_LIN2, 0, ALIGN_CENTER, MTXT_DONE);
 

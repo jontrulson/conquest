@@ -96,7 +96,7 @@ void nPlayBMenuInit(void)
 
 static nodeStatus_t nPlayBMenuDisplay(dspConfig_t *dsp)
 {
-    dspReplayMenu();
+    pbDisplayReplayMenu();
 
     if (prompting)
         cprintf(MSG_LIN1, 1, ALIGN_NONE, "#%d#%s #%d#%s",

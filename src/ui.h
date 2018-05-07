@@ -32,9 +32,6 @@
 void uiInitColors(void);
 void uiPutColor(cqColor col);
 
-/* ui generic */
-void dspReplayMenu(void);
-void dspReplayHelp(void);
 
 int uiCStrlen(char *buf);
 

@@ -57,4 +57,6 @@ int  pbProcessIter(void);
 int  pbProcessPackets(void);
 void pbSetPlaybackSpeed(int speed, int samplerate);
 
+void pbDisplayReplayMenu();
+void pbDisplayReplayHelp();
 #endif /* _PLAYBACK_H */
