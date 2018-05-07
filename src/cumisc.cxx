@@ -28,8 +28,6 @@
 #include "c_defs.h"
 
 #include <string>
-
-#include <string>
 #include <vector>
 #include "format.h"
 
