@@ -43,7 +43,10 @@
 
 #include "textures.h"
 #include "gldisplay.h"
+
+#define NOEXTERN_ANIM
 #include "anim.h"
+#undef NOEXTERN_ANIM
 
 #include "node.h"
 #include "conf.h"

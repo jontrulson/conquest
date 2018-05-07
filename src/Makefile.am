@@ -69,12 +69,15 @@ libfmt_la_SOURCES = format.h format.cxx
 
 libconquest_la_SOURCES = conqai.cxx conqai.h cb.cxx cb.h \
 	conqlb.h conqlb.cxx rndlb.cxx rndlb.h conqutil.cxx conqutil.h \
-	conqunix.cxx conqunix.h ibuf.cxx version.cxx conf.cxx sem.cxx color.cxx \
+	conqunix.cxx conqunix.h ibuf.cxx version.cxx conf.cxx sem.cxx \
+	color.cxx \
 	userauth.cxx record.cxx color.h user.h shiptype.h \
 	ship.h planet.h team.h msg.h doomsday.h driver.h conqinfo.h \
-	history.h history.cxx robot.h global.h torp.h ibuf.h conf.h  display.h \
-	protocol.h packet.h packet.cxx userauth.h meta.cxx meta.h udp.cxx udp.h \
-	rb.h rb.cxx cbMaxLimits.h proto_0006.h
+	history.h history.cxx robot.h global.h global.cxx torp.h ibuf.h \
+	conf.h  display.h \
+	protocol.h packet.h packet.cxx userauth.h meta.cxx meta.h \
+	udp.cxx udp.h rb.h rb.cxx cbMaxLimits.h proto_0006.h \
+	c_defs.h defs.h conqdef.h cb.h context.h context.cxx conqnet.h
 
 libconquest_la_LIBADD = @LTLIBOBJS@
 
@@ -96,7 +99,7 @@ libUiGL_la_SOURCES = GL.cxx texfont.cxx glfont.cxx glfont.h \
 	gldisplay.h gldisplay.cxx disputil.h render.h render.cxx \
 	nPlayBMenu.h nPlayBMenu.cxx nPlayB.h nPlayB.cxx nPlayBHelp.h \
 	nPlayBHelp.cxx nOptions.h nOptions.cxx colorGL.cxx ui.h anim.cxx anim.h \
-	GL.h hud.h hud.cxx blinker.h blinker.cxx
+	GL.h hud.h hud.cxx blinker.h blinker.cxx textures.h textures.cxx
 
 libUiCU_la_SOURCES = display.cxx cprintf.h cprintf.cxx disputil.h colorCU.cxx \
 	cd2lb.h cd2lb.cxx iolb.h iolb.cxx cumisc.h cumisc.cxx cuclient.h \
@@ -130,35 +133,30 @@ endif !GLCLIENT
 endif !ISMINGW
 
 if ISMINGW
-conquest_SOURCES = conquest.cxx c_defs.h defs.h conqdef.h cb.h \
-	context.h icon.rc
+conquest_SOURCES = conquest.cxx icon.rc
 else !ISMINGW
-conquest_SOURCES = conquest.cxx c_defs.h defs.h conqdef.h cb.h \
-	context.h
+conquest_SOURCES = conquest.cxx
 endif !ISMINGW
 
 conquest_LDADD = libUiGL.la libUi.la libconqclnt.la libcqsound.la \
 	libconquest.la libconqinit.la libfmt.la $(XLIBS) $(LEXLIB) $(YACCLIB)
 
 if TCPW
-conquestd_SOURCES = conquestd.cxx c_defs.h defs.h conqdef.h cb.h \
-	context.h conqnet.h $(TCPW_H) $(TCPW_C)
+conquestd_SOURCES = conquestd.cxx $(TCPW_H) $(TCPW_C)
 conquestd_LDADD = libconqserv.la libconquest.la libconqinit.la $(LEXLIB) $(YACCLIB) $(TCPWLIB) $(NSLLIB)
 else
-conquestd_SOURCES = conquestd.cxx c_defs.h defs.h conqdef.h cb.h \
-	context.h conqnet.h $(TCPW_H)
+conquestd_SOURCES = conquestd.cxx $(TCPW_H)
 conquestd_LDADD = libconqserv.la libconquest.la libconqinit.la libfmt.la $(LEXLIB) $(YACCLIB)
 endif
 
-conqai_SOURCES = conqai_main.cxx c_defs.h defs.h conqdef.h cb.h \
-                 context.h conqdata.h
+conqai_SOURCES = conqai_main.cxx
 
 conqai_LDADD = libconquest.la libconqinit.la libfmt.la $(LEXLIB) $(YACCLIB)
 
-conqoper_SOURCES = conqoper.cxx c_defs.h defs.h conqdef.h cb.h context.h
+conqoper_SOURCES = conqoper.cxx
 conqoper_LDADD = libUiCU.la libUi.la libconqclnt.la libconquest.la libconqinit.la libfmt.la $(LEXLIB) $(YACCLIB)
 
-conqdriv_SOURCES = conqdriv.cxx c_defs.h defs.h conqdef.h cb.h context.h
+conqdriv_SOURCES = conqdriv.cxx
 conqdriv_LDADD = libconquest.la libconqinit.la libfmt.la $(LEXLIB) $(YACCLIB)
 
 # we are very careful here not to depend on or use any conquest

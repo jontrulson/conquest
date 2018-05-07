@@ -28,8 +28,6 @@
 #ifndef _GAMEDIR_H
 #define _GAMEDIR_H
 
-#include "conqdef.h"
-#include "conqutil.h"
 #include "string"
 
 // A simple class to store and retrieve a game subdirectory

@@ -25,8 +25,6 @@
 // SOFTWARE.
 //
 
-#include "defs.h"
-#include "cprintf.h"
 #include <gameDir.h>
 
 #ifndef GLOBAL_H
@@ -40,15 +38,16 @@
 #if defined(NOEXTERN_GLOBALS)
 int        ConquestGID;         /* Conquest's GID */
 
-int        cqDebug = 0;
+int        cqDebug = 0;         // debug/verbose level
 
-// global game sub directory (relative to <prefix>/ etc/ and var/ conquest/)
-gameDir gameSubdirectory;
+gameDir gameSubdirectory;       // global game sub directory (relative
+                                // to <prefix>/ etc/ and var/
+                                // conquest/)
 
 #else
-extern int ConquestGID;         /* Conquest's GID */
 
-/* verbosity/debugging */
+extern int ConquestGID;
+
 extern int cqDebug;
 
 extern gameDir gameSubdirectory;

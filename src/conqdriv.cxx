@@ -29,10 +29,8 @@
 
 #include "c_defs.h"
 
-#define NOEXTERN_GLOBALS
 #include "global.h"
 
-#define NOEXTERN_CONF
 #include "conf.h"
 
 #include "conqdef.h"
@@ -43,7 +41,6 @@
 #include "conqai.h"
 #include "conqunix.h"
 
-#define NOEXTERN_CONTEXT
 #include "context.h"
 
 #include "sem.h"

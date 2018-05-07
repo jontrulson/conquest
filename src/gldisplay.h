@@ -75,7 +75,7 @@ typedef struct _dspConfig {
     int          initWidth, initHeight; /* initial wxh geometry */
 } dspConfig_t;
 
-#ifdef NOEXTERN_DCONF
+#ifdef NOEXTERN_GLDISPLAY
 dspConfig_t dConf;
 uint32_t     frameTime;
 #else

@@ -39,6 +39,7 @@
 #include "gldisplay.h"
 #include "node.h"
 #include "conqutil.h"
+#include "cprintf.h"
 
 #define S_DONE         0        /* nothing to display */
 #define S_GREETINGS    1        /* GREETINGS - new user */

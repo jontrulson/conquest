@@ -27,6 +27,7 @@
 #include "c_defs.h"
 
 #include "conqdef.h"
+#include "global.h"
 #include "conqai.h"
 #include "cb.h"
 #include "context.h"
@@ -35,9 +36,9 @@
 #include "conqutil.h"
 #include "cd2lb.h"
 #include "cumisc.h"
-#include "global.h"
 #include "color.h"
 #include "ui.h"
+#include "cprintf.h"
 
 #include "display.h"
 

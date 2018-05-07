@@ -38,6 +38,7 @@
 #include "record.h"
 #include "disputil.h"
 #include "conqutil.h"
+#include "cprintf.h"
 
 
 /* put a recieved message into the clinet's copy of the message buffer

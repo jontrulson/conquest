@@ -31,10 +31,8 @@
 #include <algorithm>
 #include "format.h"
 
-#define NOEXTERN_GLOBALS
 #include "global.h"
 
-#define NOEXTERN_CONF
 #include "conf.h"
 
 #include "conqdef.h"
@@ -45,7 +43,6 @@
 #include "conqai.h"
 #include "conqunix.h"
 
-#define NOEXTERN_CONTEXT
 #include "context.h"
 
 #include "color.h"
@@ -57,7 +54,6 @@
 #include "packet.h"
 #include "udp.h"
 
-#define NOEXTERN_SERVER
 #include "server.h"
 #include "serverpkt.h"
 

@@ -27,6 +27,7 @@
 
 #include "c_defs.h"
 #include "global.h"
+#include "context.h"
 #include "conqdef.h"
 #include "cb.h"
 #include "color.h"
@@ -38,8 +39,8 @@
 #include "client.h"
 #include "clientlb.h"
 #include "conqutil.h"
+#include "cprintf.h"
 
-#include "context.h"
 
 static void ChangeOption(struct Conf *cdata, int lin);
 static int ViewEditOptions(struct Conf ConfigData[], int ConfSize,

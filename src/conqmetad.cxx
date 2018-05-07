@@ -27,19 +27,16 @@
 
 #include "c_defs.h"
 
-#define NOEXTERN_GLOBALS
 #include "global.h"
 
 #include "cb.h"
 
-#define NOEXTERN_CONTEXT
 #include "context.h"
 
 #include "conqdef.h"
 #include "conqnet.h"
 #include "conqunix.h"
 
-#define NOEXTERN_CONF
 #include "conf.h"
 
 #include "conqutil.h"

@@ -54,6 +54,7 @@
 #include "cqkeys.h"
 #include "cqsound.h"
 #include "conqutil.h"
+#include "cprintf.h"
 #include "ping.h"
 
 #include <vector>

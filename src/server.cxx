@@ -34,12 +34,15 @@
 #include "conqlb.h"
 #include "conqutil.h"
 #include "conf.h"
-#include "server.h"
 #include "serverpkt.h"
 #include "context.h"
 #include "record.h"
 #include "conqlb.h"
 #include "udp.h"
+
+#define NOEXTERN_SERVER
+#include "server.h"
+#undef NOEXTERN_SERVER
 
 int sendClientStat(int sock, uint8_t flags, int16_t snum, uint8_t team,
 		   uint16_t unum, uint8_t esystem)

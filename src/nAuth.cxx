@@ -49,6 +49,7 @@
 #include "prm.h"
 #include "glmisc.h"
 #include "conqutil.h"
+#include "cprintf.h"
 
 #include "GL.h"
 #include "blinker.h"

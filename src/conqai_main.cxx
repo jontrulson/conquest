@@ -32,16 +32,13 @@
 #include "conqutil.h"
 #include "conqai.h"
 
-#define NOEXTERN_CONTEXT
 #include "context.h"
 #include "conqunix.h"
 
-#define NOEXTERN_GLOBALS
 #include "global.h"
 
 #include "user.h"
 
-#define NOEXTERN_CONF
 #include "conf.h"
 
 #include "sem.h"

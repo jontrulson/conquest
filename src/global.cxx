@@ -25,19 +25,8 @@
 // SOFTWARE.
 //
 
-#ifndef _CPRINTF_H
-#define _CPRINTF_H
+#define NOEXTERN_GLOBALS
+#include "global.h"
+#undef NOEXTERN_GLOBALS
 
-/* cprintf align values */
-typedef enum {
-    ALIGN_NONE    = 0,
-    ALIGN_RIGHT,
-    ALIGN_CENTER,
-    ALIGN_LEFT,
-} cprintfAlignment_t;
-
-// enable format checks
-void cprintf(int lin, int col, cprintfAlignment_t align, const char *fmt, ...)
-    __attribute__ ((format (printf, 4, 5)));
-
-#endif /* _CPRINTF_H */
+// the end.

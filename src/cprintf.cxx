@@ -35,6 +35,7 @@
 #include "ibuf.h"
 #include "conf.h"
 #include "ui.h"
+#include "cprintf.h"
 
 /*
  * int lin - line num if pertinent
@@ -48,7 +49,7 @@
  *             '%' regular format specs
  * ...       - args
  */
-void cprintf(int lin, int col, int align, const char *fmt, ...)
+void cprintf(int lin, int col, cprintfAlignment_t align, const char *fmt, ...)
 {
     va_list ap;
     int i, j, k;

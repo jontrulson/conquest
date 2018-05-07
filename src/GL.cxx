@@ -41,16 +41,11 @@
 #include <GL/gl.h>
 #include <GL/glu.h>
 
-#define NOEXTERN_GLTEXTURES
 #include "textures.h"
-#undef NOEXTERN_GLTEXTURES
-#define NOEXTERN_DCONF
-#include "gldisplay.h"
-#undef NOEXTERN_DCONF
 
-#define NOEXTERN_GLANIM
+#include "gldisplay.h"
+
 #include "anim.h"
-#undef NOEXTERN_GLANIM
 
 // Try out the STB image loader
 #define STB_IMAGE_IMPLEMENTATION
@@ -3063,7 +3058,7 @@ static bool loadImageFile(const char *filename, textureImage *texture)
         return false;
     }
 
-    if (cqDebug)
+    if (cqDebug > 2)
         utLog("%s: %s: x %d, y %d, components %d",
               __FUNCTION__, filename, texture->width,
               texture->height, texture->components);

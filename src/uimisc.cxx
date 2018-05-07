@@ -37,6 +37,7 @@
 
 #include "record.h"
 #include "conqutil.h"
+#include "cprintf.h"
 
 void dspReplayMenu(void)
 {

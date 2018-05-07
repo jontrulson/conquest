@@ -37,6 +37,7 @@
 
 #include "client.h"
 
+#include "global.h"
 #include "conqlb.h"
 #include "conqutil.h"
 #include "clientlb.h"
@@ -817,8 +818,9 @@ int procAckUDP(char *buf)
         case PKTUDP_STATE_SERVER_READY:
         {
             // our cue to open UDP, and send a packet.
-            utLog("%s: NET: received SERVER_READY, starting UDP...",
-                  __FUNCTION__);
+            if (cqDebug)
+                utLog("%s: NET: received SERVER_READY, starting UDP...",
+                      __FUNCTION__);
 
             if (_connect_udp())
             {
@@ -834,8 +836,9 @@ int procAckUDP(char *buf)
             {
                 /* see if this will succeed in setting up a NAT tunnel
                    to the server */
-                utLog("%s: NET: sending CLIENT_READY UDP response to server.",
-                      __FUNCTION__);
+                if (cqDebug)
+                    utLog("%s: NET: sending CLIENT_READY UDP response to server.",
+                          __FUNCTION__);
                 // we need to set this so that the packet handling
                 // routines can use the socket
                 pktSetSocketFds(PKT_SOCKFD_NOCHANGE, cInfo.usock);

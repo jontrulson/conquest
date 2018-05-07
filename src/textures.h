@@ -28,6 +28,7 @@
 #ifndef _TEXTURES_H
 #define _TEXTURES_H
 
+#include <GL/gl.h>
 
 #include "conqinit.h"
 #include "color.h"
@@ -51,7 +52,7 @@ typedef struct _GLtexcoord {
     GLfloat s, t;                 /* texture coordinates or tc offsets */
 } GLTexcoord_t;
 
-#ifdef NOEXTERN_GLTEXTURES
+#ifdef NOEXTERN_TEXTURES
 GLTexture_t *GLTextures = NULL;
 #else
 extern GLTexture_t *GLTextures;

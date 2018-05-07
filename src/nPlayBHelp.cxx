@@ -37,6 +37,7 @@
 #include "client.h"
 #include "packet.h"
 #include "ui.h"
+#include "cprintf.h"
 
 #include "nCP.h"
 #include "nDead.h"

@@ -34,7 +34,10 @@
 #include "global.h"
 #include "color.h"
 
+#define NOEXTERN_GLDISPLAY
 #include "gldisplay.h"
+#undef NOEXTERN_GLDISPLAY
+
 #include "GL.h"
 #include "glmisc.h"
 #include "conqlb.h"

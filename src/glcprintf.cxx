@@ -34,6 +34,7 @@
 #include "ibuf.h"
 #include "gldisplay.h"
 #include "conf.h"
+#include "cprintf.h"
 
 #include <GL/glut.h>
 #include <GL/gl.h>
@@ -56,7 +57,7 @@ static char buf[BUFFER_SIZE_1024];
  *             '%' regular format specs
  * ...       - args
  */
-void cprintf(int lin, int col, int align, const char *fmt, ...)
+void cprintf(int lin, int col, cprintfAlignment_t align, const char *fmt, ...)
 {
     va_list ap;
     int l;
@@ -70,7 +71,8 @@ void cprintf(int lin, int col, int align, const char *fmt, ...)
     {
         l = uiCStrlen(buf);
         if (align == ALIGN_CENTER)
-            x = dConf.ppCol * ((80.0 / 2.0) - ((GLfloat)l / 2.0));
+            x = dConf.ppCol
+                * (((real)Context.maxcol / 2.0) - ((GLfloat)l / 2.0));
         else
             x = dConf.ppCol * (GLfloat)col;
 

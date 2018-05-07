@@ -33,10 +33,8 @@
 
 /* Original Copyright (C)1983-1986 by Jef Poskanzer and Craig Leres */
 
-#define NOEXTERN_GLOBALS
 #include "global.h"
 
-#define NOEXTERN_CONF
 #include "conf.h"
 
 #include "conqdef.h"
@@ -47,7 +45,6 @@
 #include "conqai.h"
 #include "conqunix.h"
 
-#define NOEXTERN_CONTEXT
 #include "context.h"
 
 #include "global.h"
@@ -64,6 +61,7 @@
 #include "clntauth.h"
 #include "display.h"
 #include "conqinit.h"
+#include "cprintf.h"
 
 #include "gameDir.h"
 

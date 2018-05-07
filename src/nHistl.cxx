@@ -38,6 +38,7 @@
 #include "client.h"
 #include "packet.h"
 #include "conqutil.h"
+#include "cprintf.h"
 
 #include "nCP.h"
 #include "nMenu.h"

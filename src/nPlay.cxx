@@ -38,6 +38,7 @@
 #include "client.h"
 #include "record.h"
 #include "conqutil.h"
+#include "cprintf.h"
 
 #include "nMenu.h"
 #include "nCP.h"

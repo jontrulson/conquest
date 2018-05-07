@@ -35,6 +35,7 @@
 #include "ui.h"
 #include "cd2lb.h"
 #include "cumisc.h"
+#include "cprintf.h"
 
 #include "conqnet.h"
 #include "packet.h"

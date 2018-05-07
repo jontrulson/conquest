@@ -199,7 +199,7 @@ typedef struct _anim_que {
 
 /* cqiNumAnimDefs is identical to the number of GLAnimDefs, so
    we do not bother to export a seperate (but identical) numGLAnimDefs. */
-#ifdef NOEXTERN_GLANIM
+#ifdef NOEXTERN_ANIM
 GLAnimDef_t *GLAnimDefs = NULL;
 #else
 extern GLAnimDef_t *GLAnimDefs;

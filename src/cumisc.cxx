@@ -47,6 +47,7 @@
 #include "iolb.h"
 #include "cumisc.h"
 #include "ui.h"
+#include "cprintf.h"
 
 // FIXME - get rid of this
 static char cbuf[BUFFER_SIZE_1024]; /* general purpose buffer */
@@ -982,7 +983,7 @@ void mcuTeamList()
     lin+=2;
     sprintf( buf, sfmt, " ",
              cbTeams[0].name, cbTeams[1].name, cbTeams[2].name, cbTeams[3].name, "Totals" );
-    cprintf(lin,col,0, sfmt2, " ",
+    cprintf(lin,col, ALIGN_NONE, sfmt2, " ",
             cbTeams[0].name, cbTeams[1].name, cbTeams[2].name, cbTeams[3].name, "Totals" );
 
     lin++;
@@ -994,28 +995,28 @@ void mcuTeamList()
     uiPutColor(0);
 
     lin++;
-    cprintf(lin,col,0, dfmt2, "Conquers",
+    cprintf(lin,col, ALIGN_NONE, dfmt2, "Conquers",
             cbTeams[0].stats[TSTAT_CONQUERS], cbTeams[1].stats[TSTAT_CONQUERS],
             cbTeams[2].stats[TSTAT_CONQUERS], cbTeams[3].stats[TSTAT_CONQUERS],
             cbTeams[0].stats[TSTAT_CONQUERS] + cbTeams[1].stats[TSTAT_CONQUERS] +
             cbTeams[2].stats[TSTAT_CONQUERS] + cbTeams[3].stats[TSTAT_CONQUERS] );
 
     lin++;
-    cprintf(lin,col,0, dfmt2, "Wins",
+    cprintf(lin,col, ALIGN_NONE, dfmt2, "Wins",
             cbTeams[0].stats[TSTAT_WINS], cbTeams[1].stats[TSTAT_WINS],
             cbTeams[2].stats[TSTAT_WINS], cbTeams[3].stats[TSTAT_WINS],
             cbTeams[0].stats[TSTAT_WINS] + cbTeams[1].stats[TSTAT_WINS] +
             cbTeams[2].stats[TSTAT_WINS] + cbTeams[3].stats[TSTAT_WINS] );
 
     lin++;
-    cprintf(lin,col,0, dfmt2, "Losses",
+    cprintf(lin,col, ALIGN_NONE, dfmt2, "Losses",
             cbTeams[0].stats[TSTAT_LOSSES], cbTeams[1].stats[TSTAT_LOSSES],
             cbTeams[2].stats[TSTAT_LOSSES], cbTeams[3].stats[TSTAT_LOSSES],
             cbTeams[0].stats[TSTAT_LOSSES] + cbTeams[1].stats[TSTAT_LOSSES] +
             cbTeams[2].stats[TSTAT_LOSSES] + cbTeams[3].stats[TSTAT_LOSSES] );
 
     lin++;
-    cprintf(lin,col,0, dfmt2, "Ships",
+    cprintf(lin,col, ALIGN_NONE, dfmt2, "Ships",
             cbTeams[0].stats[TSTAT_ENTRIES], cbTeams[1].stats[TSTAT_ENTRIES],
             cbTeams[2].stats[TSTAT_ENTRIES], cbTeams[3].stats[TSTAT_ENTRIES],
             cbTeams[0].stats[TSTAT_ENTRIES] + cbTeams[1].stats[TSTAT_ENTRIES] +
@@ -1029,7 +1030,7 @@ void mcuTeamList()
     utFormatSeconds( cbTeams[2].stats[TSTAT_SECONDS], timbuf[2] );
     utFormatSeconds( cbTeams[3].stats[TSTAT_SECONDS], timbuf[3] );
     utFormatSeconds( etime, timbuf[4] );
-    cprintf(lin,col,0, sfmt3, "Time",
+    cprintf(lin,col, ALIGN_NONE, sfmt3, "Time",
             timbuf[0], timbuf[1], timbuf[2], timbuf[3], timbuf[4] );
 
     lin++;
@@ -1040,7 +1041,7 @@ void mcuTeamList()
     utFormatSeconds( cbTeams[2].stats[TSTAT_CPUSECONDS], timbuf[2] );
     utFormatSeconds( cbTeams[3].stats[TSTAT_CPUSECONDS], timbuf[3] );
     utFormatSeconds( ctime, timbuf[4] );
-    cprintf( lin,col,0, sfmt3, "Cpu time",
+    cprintf( lin,col, ALIGN_NONE, sfmt3, "Cpu time",
              timbuf[0], timbuf[1], timbuf[2], timbuf[3], timbuf[4] );
 
     lin++;
@@ -1056,52 +1057,53 @@ void mcuTeamList()
         x[4] = 0.0;
     else
         x[4] = 100.0 * (real) ctime / (real)etime;
-    cprintf( lin,col,0, pfmt2, "Cpu usage", x[0], x[1], x[2], x[3], x[4] );
+    cprintf( lin,col, ALIGN_NONE, pfmt2, "Cpu usage",
+             x[0], x[1], x[2], x[3], x[4] );
 
     lin++;
-    cprintf( lin,col,0, dfmt2, "Phaser shots",
+    cprintf( lin,col, ALIGN_NONE, dfmt2, "Phaser shots",
              cbTeams[0].stats[TSTAT_PHASERS], cbTeams[1].stats[TSTAT_PHASERS],
              cbTeams[2].stats[TSTAT_PHASERS], cbTeams[3].stats[TSTAT_PHASERS],
              cbTeams[0].stats[TSTAT_PHASERS] + cbTeams[1].stats[TSTAT_PHASERS] +
              cbTeams[2].stats[TSTAT_PHASERS] + cbTeams[3].stats[TSTAT_PHASERS] );
 
     lin++;
-    cprintf( lin,col,0, dfmt2, "Torps fired",
+    cprintf( lin,col, ALIGN_NONE, dfmt2, "Torps fired",
              cbTeams[0].stats[TSTAT_TORPS], cbTeams[1].stats[TSTAT_TORPS],
              cbTeams[2].stats[TSTAT_TORPS], cbTeams[3].stats[TSTAT_TORPS],
              cbTeams[0].stats[TSTAT_TORPS] + cbTeams[1].stats[TSTAT_TORPS] +
              cbTeams[2].stats[TSTAT_TORPS] + cbTeams[3].stats[TSTAT_TORPS] );
 
     lin++;
-    cprintf( lin,col,0, dfmt2, "Armies bombed",
+    cprintf( lin,col, ALIGN_NONE, dfmt2, "Armies bombed",
              cbTeams[0].stats[TSTAT_ARMBOMB], cbTeams[1].stats[TSTAT_ARMBOMB],
              cbTeams[2].stats[TSTAT_ARMBOMB], cbTeams[3].stats[TSTAT_ARMBOMB],
              cbTeams[0].stats[TSTAT_ARMBOMB] + cbTeams[1].stats[TSTAT_ARMBOMB] +
              cbTeams[2].stats[TSTAT_ARMBOMB] + cbTeams[3].stats[TSTAT_ARMBOMB] );
 
     lin++;
-    cprintf( lin,col,0, dfmt2, "Armies captured",
+    cprintf( lin,col, ALIGN_NONE, dfmt2, "Armies captured",
              cbTeams[0].stats[TSTAT_ARMSHIP], cbTeams[1].stats[TSTAT_ARMSHIP],
              cbTeams[2].stats[TSTAT_ARMSHIP], cbTeams[3].stats[TSTAT_ARMSHIP],
              cbTeams[0].stats[TSTAT_ARMSHIP] + cbTeams[1].stats[TSTAT_ARMSHIP] +
              cbTeams[2].stats[TSTAT_ARMSHIP] + cbTeams[3].stats[TSTAT_ARMSHIP] );
 
     lin++;
-    cprintf( lin,col,0, dfmt2, "Planets taken",
+    cprintf( lin,col, ALIGN_NONE, dfmt2, "Planets taken",
              cbTeams[0].stats[TSTAT_CONQPLANETS], cbTeams[1].stats[TSTAT_CONQPLANETS],
              cbTeams[2].stats[TSTAT_CONQPLANETS], cbTeams[3].stats[TSTAT_CONQPLANETS],
              cbTeams[0].stats[TSTAT_CONQPLANETS] + cbTeams[1].stats[TSTAT_CONQPLANETS] +
              cbTeams[2].stats[TSTAT_CONQPLANETS] + cbTeams[3].stats[TSTAT_CONQPLANETS] );
 
     lin++;
-    cprintf( lin,col,0, dfmt2, "Coups",
+    cprintf( lin,col, ALIGN_NONE, dfmt2, "Coups",
              cbTeams[0].stats[TSTAT_COUPS], cbTeams[1].stats[TSTAT_COUPS],
              cbTeams[2].stats[TSTAT_COUPS], cbTeams[3].stats[TSTAT_COUPS],
              cbTeams[0].stats[TSTAT_COUPS] + cbTeams[1].stats[TSTAT_COUPS] +
              cbTeams[2].stats[TSTAT_COUPS] + cbTeams[3].stats[TSTAT_COUPS] );
 
     lin++;
-    cprintf( lin,col,0, dfmt2, "Genocides",
+    cprintf( lin,col, ALIGN_NONE, dfmt2, "Genocides",
              cbTeams[0].stats[TSTAT_GENOCIDE], cbTeams[1].stats[TSTAT_GENOCIDE],
              cbTeams[2].stats[TSTAT_GENOCIDE], cbTeams[3].stats[TSTAT_GENOCIDE],
              cbTeams[0].stats[TSTAT_GENOCIDE] + cbTeams[1].stats[TSTAT_GENOCIDE] +
@@ -1116,7 +1118,7 @@ void mcuTeamList()
     timbuf[4][0] = 0;
 
     lin++;
-    cprintf( lin,col,0, sfmt3, "Coup time",
+    cprintf( lin,col, ALIGN_NONE, sfmt3, "Coup time",
              timbuf[0], timbuf[1], timbuf[2], timbuf[3], timbuf[4] );
 
     uiPutColor(0);

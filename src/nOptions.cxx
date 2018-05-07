@@ -43,6 +43,7 @@
 #include "clientlb.h"
 #include "conqutil.h"
 #include "conqlb.h"
+#include "cprintf.h"
 #include "prm.h"
 #include "nCP.h"
 #include "nMenu.h"

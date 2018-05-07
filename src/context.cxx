@@ -25,19 +25,12 @@
 // SOFTWARE.
 //
 
-#ifndef _CPRINTF_H
-#define _CPRINTF_H
+#include "c_defs.h"
+#include "conqdef.h"
 
-/* cprintf align values */
-typedef enum {
-    ALIGN_NONE    = 0,
-    ALIGN_RIGHT,
-    ALIGN_CENTER,
-    ALIGN_LEFT,
-} cprintfAlignment_t;
+#define NOEXTERN_CONTEXT
+#include "context.h"
+#undef NOEXTERN_CONTEXT
 
-// enable format checks
-void cprintf(int lin, int col, cprintfAlignment_t align, const char *fmt, ...)
-    __attribute__ ((format (printf, 4, 5)));
+// That's it!
 
-#endif /* _CPRINTF_H */

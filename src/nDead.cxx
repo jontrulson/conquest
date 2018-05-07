@@ -46,6 +46,7 @@
 #include "cqkeys.h"
 #include "cqsound.h"
 #include "glmisc.h"
+#include "cprintf.h"
 
 static int snum;
 static killedBy_t kb;                  /* killed by... */

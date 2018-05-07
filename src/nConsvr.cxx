@@ -40,6 +40,7 @@
 #include "glmisc.h"
 #include "conqutil.h"
 #include "conquest.h"
+#include "cprintf.h"
 
 static char *rhost = NULL;
 static uint16_t rport;

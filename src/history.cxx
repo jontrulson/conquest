@@ -28,9 +28,9 @@
 #include "c_defs.h"
 #include "conqdef.h"
 
-#define HISTORY_NOEXTERN
+#define NOEXTERN_HISTORY
 #include "history.h"
-#undef HISTORY_NOEXTERN
+#undef NOEXTERN_HISTORY
 
 // That's it!
 

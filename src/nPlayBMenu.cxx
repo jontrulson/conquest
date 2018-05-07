@@ -46,6 +46,7 @@
 #include "glmisc.h"
 #include "ui.h"
 #include "conqutil.h"
+#include "cprintf.h"
 
 #include "nPlayB.h"
 #include "nPlayBMenu.h"

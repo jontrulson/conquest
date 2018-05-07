@@ -31,20 +31,17 @@
 #include <algorithm>
 
 #include "conqdef.h"
+#include "global.h"
+
 #include "cb.h"
 
 #include "conqutil.h"
 #include "rndlb.h"
 #include "conqunix.h"
 
-#define NOEXTERN_CONTEXT
 #include "context.h"
 
-#define NOEXTERN_CONF
 #include "conf.h"
-
-#define NOEXTERN_GLOBALS
-#include "global.h"
 
 #include "color.h"
 #include "record.h"

@@ -43,6 +43,7 @@
 #include "glmisc.h"
 #include "cqkeys.h"
 #include "conqutil.h"
+#include "cprintf.h"
 
 static const char *header = "Server List";
 static const char *header2fmt = "(Page %d of %d)";

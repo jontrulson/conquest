@@ -39,7 +39,7 @@ typedef struct {
 } History_t;
 
 // instantiate in history.cxx only
-#if defined(HISTORY_NOEXTERN)
+#if defined(NOEXTERN_HISTORY)
 // The cbHistory[] slot currently being used (if any) for the current "user"
 int historyCurrentSlot = -1;
 #else

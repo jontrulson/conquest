@@ -43,6 +43,7 @@
 #include "node.h"
 #include "client.h"
 #include "packet.h"
+#include "cprintf.h"
 
 #include "nCP.h"
 #include "nMenu.h"
