@@ -27,6 +27,10 @@
 
 #include "c_defs.h"
 
+#include <string>
+#include <algorithm>
+#include "format.h"
+
 #define NOEXTERN_GLOBALS
 #include "global.h"
 
@@ -77,6 +81,12 @@ static int localOnly = false;   /* whether to only listen on loopback */
 static const char *metaServer = META_DFLT_SERVER; /* meta server hostname */
 static int updateMeta = false;  /* whether to notify meta server */
 static char *myServerName = NULL; /* to meta */
+
+// global access deniied by tcpwrappers, if enabled
+static bool accessDenied = false;
+
+// global flag indicating whether we ever entered a ship
+static bool enteredShip = false;
 
 cpHello_t chello;		/* client hello info we want to keep */
 
@@ -275,10 +285,10 @@ void checkMaster(void)
                     // the appropriate flag and terminate the
                     // connection.
 
-                    Context.accessDenied = true;
+                    accessDenied = true;
                 }
                 else
-                    Context.accessDenied = false;
+                    accessDenied = false;
 
                 pktSetNodelay();
 
@@ -460,9 +470,9 @@ int main(int argc, char *argv[])
     Context.maxcol = 0;		/* not used here */
 
     Context.snum = 0;
-    Context.histslot = -1;
+    historyCurrentSlot = -1; // init until we enter a game
     Context.lasttang = Context.lasttdist = 0;
-    Context.lasttarg[0] = 0;
+    Context.lastInfoTarget.clear();
     Context.updsec = 10;		/* 10 per second default update rate */
 
 
@@ -1270,7 +1280,7 @@ void menu(void)
     initstats( &cbShips[Context.snum].ctime, &cbShips[Context.snum].etime );
 
     /* Log this entry into the Game. */
-    Context.histslot = clbLogHist( Context.unum );
+    historyCurrentSlot = clbLogHist( Context.unum );
 
     /* Set up a few ship characteristics here rather than in clbInitShip(). */
     cbShips[Context.snum].unum = Context.unum;
@@ -1583,7 +1593,7 @@ int newship( int unum, int *snum )
     memcpy(cbShips[*snum].ipaddr, Context.ipaddr, SHIP_IPADDR_LEN);
 
     cbUnlock(&cbConqInfo->lockword);
-    Context.entship = true;
+    enteredShip = true;
     return ( true );
 
 }
@@ -1614,7 +1624,6 @@ int play(void)
     utGrand( &Context.msgrand );		/* initialize message timer */
     Context.redraw = true;		/* want redraw first time */
     Context.msgok = true;		/* ok to get messages */
-    Context.display = false;		/* ok to display */
     stopUpdate();			/* stop the display interrupt */
     utGetSecs( &laststat );		/* initialize stat timer */
     lastDrcheck = 0;                    // we want it to fire quickly
@@ -1890,7 +1899,7 @@ static int hello(void)
     if (SysConf.Closed)
         shello.flags |= SPHELLO_FLAGS_CLOSED;
 
-    if (Context.accessDenied)
+    if (accessDenied)
         shello.flags |= SPHELLO_FLAGS_ACCESS_DENIED;
 
     if (pktWrite(PKT_SENDTCP, &shello) <= 0)
@@ -1902,7 +1911,7 @@ static int hello(void)
     utLog("NET: SERVER: hello: sent server hello to client");
 
     // say good bye if access was denied...
-    if (Context.accessDenied)
+    if (accessDenied)
     {
         utLog("%s: Access was denied for this connection, returning false",
               __FUNCTION__);
@@ -2052,18 +2061,14 @@ void handleSignal(int sig)
 /*    conqend */
 void conqend(void)
 {
-
-    char msgbuf[128];
-
-    if (Context.entship == true)
+    if (enteredShip == true)
     {				/* let everyone know we're leaving */
-        sprintf(msgbuf, "%s has left the game.",
-                cbUsers[Context.unum].alias);
+        std::string msgbuf = fmt::format("{} has left the game.",
+                                         cbUsers[Context.unum].alias);
         clbStoreMsg(MSG_FROM_COMP, 0, MSG_TO_ALL, 0, msgbuf);
     }
 
     recCloseOutput();
 
     return;
-
 }

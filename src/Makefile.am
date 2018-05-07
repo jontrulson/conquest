@@ -72,7 +72,7 @@ libconquest_la_SOURCES = conqai.cxx conqai.h cb.cxx cb.h \
 	conqunix.cxx conqunix.h ibuf.cxx version.cxx conf.cxx sem.cxx color.cxx \
 	userauth.cxx record.cxx color.h user.h shiptype.h \
 	ship.h planet.h team.h msg.h doomsday.h driver.h conqinfo.h \
-	history.h robot.h global.h torp.h ibuf.h conf.h  display.h \
+	history.h history.cxx robot.h global.h torp.h ibuf.h conf.h  display.h \
 	protocol.h packet.h packet.cxx userauth.h meta.cxx meta.h udp.cxx udp.h \
 	rb.h rb.cxx cbMaxLimits.h proto_0006.h
 

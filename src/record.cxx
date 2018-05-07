@@ -29,6 +29,11 @@
 #include "c_defs.h"
 #include "global.h"
 #include "conqdef.h"
+
+#define NOEXTERN_RECORD
+#include "record.h"
+#undef NOEXTERN_RECORD
+
 #include "cb.h"
 #include "conqlb.h"
 #include "conqutil.h"
@@ -41,12 +46,8 @@
 #include "protocol.h"
 #include "packet.h"
 
-#define NOEXTERN_RECORD
-#include "record.h"
-#undef NOEXTERN_RECORD
-
 #include "playback.h"
-#include <initvec.h>
+#include "initvec.h"
 
 #include <vector>
 using namespace std;

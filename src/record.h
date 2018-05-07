@@ -37,11 +37,13 @@
 #define RECVERSION_20060409 20060409
 
 /* recording modes */
-#define RECMODE_OFF      0
-#define RECMODE_STARTING 1
-#define RECMODE_ON       2
-#define RECMODE_PLAYING  3
-#define RECMODE_PAUSED   4
+typedef enum {
+    RECMODE_OFF          = 0,
+    RECMODE_STARTING,
+    RECMODE_ON,
+    RECMODE_PLAYING,
+    RECMODE_PAUSED,
+} recordMode_t;
 
 /* file header */
 #define SZ_FILEHEADER (256)

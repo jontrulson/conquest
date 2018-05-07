@@ -92,6 +92,7 @@ using namespace std;
 static int maxlin;                              /* maximum line */
 static int maxcol;                              /* maximum column */
 
+static char intrChar;                    // interrupt character (termios)
 
 
 /* cdbox - draw a box */
@@ -243,7 +244,7 @@ void cdend(void)
 
 #if defined (HAVE_TERMIOS_H)
     tcgetattr(iolbStdinFD, &term);
-    term.c_cc[VINTR] = Context.intrchar; /* restore INTR */
+    term.c_cc[VINTR] = intrChar; /* restore INTR */
     tcsetattr(iolbStdinFD, TCSANOW, &term);
 #endif
 
@@ -660,11 +661,11 @@ void cdinit(void)
      *  to be used for deleting text for example
      */
 
-    Context.intrchar = 0;	/* default - nothing */
+    intrChar = 0;               /* default - nothing */
 
 #if defined (HAVE_TERMIOS_H)
     tcgetattr(iolbStdinFD, &term);
-    Context.intrchar = term.c_cc[VINTR]; /* save it */
+    intrChar = term.c_cc[VINTR]; /* save it */
     term.c_cc[VINTR] = 0x03;	/* ^C - harmless */
     tcsetattr(iolbStdinFD, TCSANOW, &term);
 #endif

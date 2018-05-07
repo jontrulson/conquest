@@ -163,6 +163,9 @@ extern cqsHandle alertHandle;
 /* storage for the beam up/down sound handles */
 static cqsHandle beamHandle = CQS_INVHANDLE;
 
+char lastInfoTerm;              // last info terminator character
+
+
 /* current SR and LR magnification factors. (-5-5) */
 int ncpLRMagFactor = 0;
 int ncpSRMagFactor = 0;
@@ -292,10 +295,10 @@ static void _infoship( int snum, int scanner, bool doOutput )
     }
 
     cbuf.clear();
-    Context.lasttarg[0] = 0;
+    Context.lastInfoTarget.clear();
     utAppendShip(cbuf, snum) ;
     /* save for hudInfo */
-    utStrncpy(Context.lasttarg, cbuf.c_str(), sizeof(Context.lasttarg));
+    Context.lastInfoTarget = cbuf;
     hudSetInfoTarget(snum, true);
 
     if ( snum == scanner )
@@ -609,7 +612,7 @@ static void _infoplanet( const char *str, int pnum, int snum, bool doOutput )
                  Context.lasttang);
 
     /* save for the hudInfo, only first 3 characters */
-    utStrncpy(Context.lasttarg, cbPlanets[pnum].name, 4);
+    Context.lastInfoTarget = std::string(cbPlanets[pnum].name).substr(0, 3);
     hudSetInfoTarget(pnum, false);
 
     if ( godlike )
@@ -825,9 +828,9 @@ static void _doinfo( const char *inbuf, char ch, bool doOutput )
     extra = ( ch == TERM_EXTRA );
 
     if (ch == TERM_EXTRA || ch == TERM_NORMAL)
-        Context.lastInfoTerm = ch;
+        lastInfoTerm = ch;
     else
-        Context.lastInfoTerm = 0;
+        lastInfoTerm = 0;
 
     if (inbuf)
     {
@@ -842,7 +845,7 @@ static void _doinfo( const char *inbuf, char ch, bool doOutput )
     /* Default to what we did last time. */
     if ( tmpBuf.empty() )
     {
-        tmpBuf = Context.lastinfostr;
+        tmpBuf = Context.lastInfoStr;
         if ( tmpBuf.empty() )
 	{
             hudClearPrompt(MSG_LIN1);
@@ -851,7 +854,7 @@ static void _doinfo( const char *inbuf, char ch, bool doOutput )
 	}
     }
     else
-        utStrncpy(Context.lastinfostr, tmpBuf.c_str(), MSGMAXLINE) ;
+        Context.lastInfoStr = tmpBuf;
 
     if ( utIsSpecial( tmpBuf.c_str(), &what, &token, &count ) )
     {
@@ -2958,10 +2961,10 @@ static nodeStatus_t nCPIdle(void)
     if (UserConf.hudInfo && !prompting && ((iternow - tadTime) > tadWait))
     {
         tadTime = iternow;
-        if (Context.lastinfostr[0] != 0
-            && (Context.lastInfoTerm == TERM_NORMAL
-                || Context.lastInfoTerm == TERM_EXTRA))
-            _doinfo(NULL, Context.lastInfoTerm, false);
+        if (!Context.lastInfoStr.empty()
+            && (lastInfoTerm == TERM_NORMAL
+                || lastInfoTerm == TERM_EXTRA))
+            _doinfo(NULL, lastInfoTerm, false);
     }
 
     return NODE_OK;

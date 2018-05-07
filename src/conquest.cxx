@@ -300,7 +300,6 @@ int main(int argc, char *argv[])
     pktSetClientMode(true);
     pktSetClientProtocolVersion(PROTOCOL_VERSION);
 
-    Context.entship = false;
     Context.recmode = RECMODE_OFF;
     Context.updsec = 10;		/* dflt - 10/sec */
     Context.msgrand = time(0);
@@ -500,10 +499,10 @@ int main(int argc, char *argv[])
     Context.maxcol = 80;
     Context.snum = -1;
     Context.unum = -1;
-    Context.histslot = -1;
+    historyCurrentSlot = -1; // useless to a client
     Context.lasttang = 0;
     Context.lasttdist = 0;
-    Context.lasttarg[0] = 0;
+    Context.lastInfoTarget.clear();
 
     catchSignals();       /* enable trapping of interesting signals */
 

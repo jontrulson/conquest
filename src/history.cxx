@@ -25,25 +25,12 @@
 // SOFTWARE.
 //
 
-#ifndef HISTORY_H_INCLUDED
-#define HISTORY_H_INCLUDED
-
+#include "c_defs.h"
 #include "conqdef.h"
 
-typedef struct {
-    int    unum;              // user number, if -1, then this marks a
-                              // resigned user.
-    time_t enterTime;         /* date of entry */
-    time_t elapsed;           /* elapsed time of this entry */
-    char   username[MAXUSERNAME]; /* username */
-} History_t;
+#define HISTORY_NOEXTERN
+#include "history.h"
+#undef HISTORY_NOEXTERN
 
-// instantiate in history.cxx only
-#if defined(HISTORY_NOEXTERN)
-// The cbHistory[] slot currently being used (if any) for the current "user"
-int historyCurrentSlot = -1;
-#else
-extern int historyCurrentSlot;
-#endif
+// That's it!
 
-#endif /* HISTORY_H_INCLUDED */

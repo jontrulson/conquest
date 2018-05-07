@@ -213,13 +213,10 @@ static nodeStatus_t nPlayIdle(void)
     }
     else if (state == S_DONE)
     {
-        Context.entship = true;
         cbShips[Context.snum].sdfuse = 0;       /* zero self destruct fuse */
         utGrand( &Context.msgrand );            /* initialize message timer */
         Context.redraw = true;                /* want redraw first time */
         Context.msgok = true;                 /* ok to get messages */
-
-        Context.display = true;               /* ok to display */
 
         /* start recording if neccessary */
         if (Context.recmode == RECMODE_STARTING)

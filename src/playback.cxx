@@ -247,13 +247,9 @@ void pbFileSeek(time_t newtime)
 
     /* just read packets until 1. recCurrentTime exceeds newtime, or 2. no
        data is left */
-    Context.display = false; /* don't display things while looking */
-
     while (recCurrentTime < newtime)
         if ((pbProcessPackets() == SP_NULL))
             break;		/* no more data */
-
-    Context.display = true;
 
     return;
 }

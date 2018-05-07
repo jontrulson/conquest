@@ -202,10 +202,7 @@ int mcuReadMsg( int msgnum, int dsplin )
     std::string buf;
     unsigned int attrib = 0;
 
-    if (Context.hascolor)
-    {				/* set up the attrib so msg's are cyan */
-        attrib = CyanColor;
-    }
+    attrib = CyanColor;
 
     clbFmtMsg(cbMsgs[msgnum].from, cbMsgs[msgnum].fromDetail,
               cbMsgs[msgnum].to, cbMsgs[msgnum].toDetail, buf);
@@ -262,7 +259,7 @@ void mcuInfoPlanet( const char *str, int pnum )
              Context.lasttang);
 
     /* save for hudInfo (only first 3 chars) */
-    utStrncpy(Context.lasttarg, cbPlanets[pnum].name, 4);
+    Context.lastInfoTarget = std::string(cbPlanets[pnum].name).substr(0, 3);
 
     junk[0] = 0;
     if ( cbPlanets[pnum].type != PLANET_SUN
@@ -350,10 +347,11 @@ void mcuInfoShip( int snum )
     }
     status = cbShips[snum].status;
 
-    cbuf[0] = Context.lasttarg[0] = 0;
+    Context.lastInfoTarget.empty();
+    cbuf[0] = 0;
     utAppendShip(cbuf , snum) ;
     /* save for hudInfo */
-    utStrncpy(Context.lasttarg, cbuf, sizeof(Context.lasttarg));
+    Context.lastInfoTarget = cbuf;
 
     /* Scan another ship. */
     x = 0.0;

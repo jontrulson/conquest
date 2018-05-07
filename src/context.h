@@ -28,36 +28,41 @@
 #ifndef CONTEXT_H
 #define CONTEXT_H
 
+#include <string>
+
 #include "ship.h"
+#include "record.h"
 
 /* a 'Conquest Context' for the current player/operator */
 
 typedef struct {
-    int  unum;                  /* user number */
-    int  snum;                  /* ship number */
-    int  histslot;              /* history slot number */
-    int  pid;                   /* pid of our owner process */
-    int  childpid;              /* pid of driver we spawned */
-    int  maxlin;                /* number of lines */
-    int  maxcol;                /* number of columns */
-    uint64_t msgrand;           /* hundreths timestamp since last message */
-    time_t drchklastime;       /* last time drcheck was called */
-    int  hasnewsfile;           /* says if a news file is available */
-    bool accessDenied;          /* banned from playing */
-    int  display;               /* should do anything in astservice() */
-    int  redraw;                /* should redraw in display() */
-    bool  msgok;                /* allow new messages */
-    int  entship;               /* entered a ship? */
-    int  recmode;               /* recording mode: one of RECMODE_* */
-    int  lasttang;              /* last target angle */
-    int  lasttdist;             /* last target distance */
-    bool  hascolor;             /* do we have color support? */
-    int  updsec;                /* updates per second */
+    int unum;                   /* user number */
+    int snum;                   /* ship number */
 
-    char lasttarg[BUFFER_SIZE_256]; /* string of last ship/planet (I)nfo'd */
-    char lastinfostr[MSGMAXLINE]; /* last string used in doinfo() */
-    char lastInfoTerm;          /* last terminator (EXTRA/NORMAL) */
-    char intrchar;              /* users interrupt char */
+    pid_t pid;                  /* pid of our owner process */
+    pid_t childpid;             /* pid of driver we spawned */
+
+    // global "text terminal" limits
+    int maxlin;                 /* number of lines */
+    int maxcol;                 /* number of columns */
+
+    uint64_t msgrand;           /* hundreths timestamp since last message */
+    time_t drchklastime;        /* last time drcheck was called */
+
+    bool redraw;                /* should redraw from scratch in *display()? */
+
+    bool msgok;                 /* allow new messages */
+
+    recordMode_t recmode;       /* recording mode: one of RECMODE_* */
+
+    int lasttang;               /* last target angle */
+    unsigned int lasttdist;     /* last target distance */
+
+    unsigned short updsec;      /* updates per second */
+
+    // Info and TAD related data
+    std::string lastInfoTarget; /* string of last ship/planet (I)nfo'd */
+    std::string lastInfoStr;    /* last string used in doinfo() */
 
     uint8_t ipaddr[SHIP_IPADDR_LEN]; /* IP address */
 

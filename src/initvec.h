@@ -34,14 +34,14 @@
 #define _INIT_VEC1D(_myvec, _mytype, _mysize)   \
     {                                           \
         _myvec.clear();                         \
-        for (int i=0; i<_mysize; i++)             \
+        for (int i=0; i<_mysize; i++)           \
             _myvec.push_back(_mytype());        \
     }
 
 #define _INIT_VEC2D(_myvec, _mytype, _mysize, _mysize2)         \
     {                                                           \
         _myvec.clear();                                         \
-        for (int i=0; i<_mysize; i++)                             \
+        for (int i=0; i<_mysize; i++)                           \
             _myvec.push_back(vector<_mytype>(_mysize2));        \
     }
 

@@ -621,7 +621,7 @@ void hudSetInfoFiringAngle(real blastang)
  */
 static void _updateTargetInfoString(void)
 {
-    if (!(hudData.info.lasttarget >= 0 && Context.lastinfostr[0] != 0))
+    if ( !(hudData.info.lasttarget >= 0 && !Context.lastInfoStr.empty()) )
         hudData.info.lasttadstr.clear();
     else
         hudData.info.lasttadstr =

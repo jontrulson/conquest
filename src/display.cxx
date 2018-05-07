@@ -77,17 +77,7 @@ void do_bottomborder(int snum, char *buf, int attrib, int bufattr)
             col = (int) (Context.maxcol - STAT_COLS - strlen(buf)) /
                 (int)2 + STAT_COLS + 1;
 
-        if (Context.hascolor)
-	{
-            uiPutColor(bufattr);
-	}
-        else
-	{
-            if (bufattr == RedColor)
-                uiPutColor(CQC_A_BOLD | A_BLINK);
-            else if (bufattr == YellowColor)
-                uiPutColor(CQC_A_BOLD);
-	}
+        uiPutColor(bufattr);
         cdputs( buf, DISPLAY_LINS+1, col );
         uiPutColor(0);
     }
@@ -108,7 +98,7 @@ void do_bottomborder(int snum, char *buf, int attrib, int bufattr)
         cprintf(lin, col, ALIGN_LEFT, "#%d#TA/D:#%d#%3s#%d#:#%d#%3d#%d#/#%d#%d",
                 LabelColor,
                 InfoColor,
-                Context.lasttarg,
+                Context.lastInfoTarget.c_str(),
                 LabelColor,
                 InfoColor,
                 Context.lasttang,

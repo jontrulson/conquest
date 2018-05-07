@@ -106,7 +106,6 @@ void conqinit(void)
 
     /* Other house keeping. */
     Context.pid = getpid();
-    Context.hasnewsfile = ( strcmp( C_CONQ_NEWSFILE, "" ) != 0 );
 
     /* Zero process id of our child (since we don't have one yet). */
     Context.childpid = 0;
@@ -115,7 +114,9 @@ void conqinit(void)
     Context.drchklastime = 0;
 
     /* Haven't scanned anything yet. */
-    Context.lastinfostr[0] = 0;
+    Context.lastInfoStr.clear();
+    // Haven't targeted a scan at anything yet
+    Context.lastInfoTarget.clear();
 
     return;
 
@@ -152,12 +153,12 @@ void conqstats( int snum )
         /* update elapsed time in cbHistory[]
            for this user */
 
-        if (Context.histslot != -1 && cbHistory[Context.histslot].unum == unum)
+        if (historyCurrentSlot != -1 && cbHistory[historyCurrentSlot].unum == unum)
 	{
-            difftime = time(0) - cbHistory[Context.histslot].enterTime;
+            difftime = time(0) - cbHistory[historyCurrentSlot].enterTime;
             if (difftime < (time_t)0)
                 difftime = (time_t)0;
-            cbHistory[Context.histslot].elapsed = difftime;
+            cbHistory[historyCurrentSlot].elapsed = difftime;
 	}
 
         team = cbUsers[unum].team;

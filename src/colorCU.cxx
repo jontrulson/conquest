@@ -60,9 +60,6 @@ void uiPutColor(cqColor color)
 
     col = color & CQC_FG_MASK;
 
-    if (!Context.hascolor)
-        col = 0;
-
     if (col == NoColor)         /* white */
         attrset(0 | attrib);
     else if (col == RedColor)   /* red */
@@ -89,36 +86,28 @@ void uiPutColor(cqColor color)
 /* initialize color variables.  assumes curses has been initialized. */
 void uiInitColors(void)
 {
-    if (has_colors())
-        Context.hascolor = true;
-    else
-        Context.hascolor = false;
-
-    if (Context.hascolor)
-    {
 #ifdef DEBUG_COLOR
-        utLog("Terminal has colors, COLORS = %d, COLOR_PAIRS = %d",
-              COLORS,
-              COLOR_PAIRS);
+    utLog("Terminal has colors, COLORS = %d, COLOR_PAIRS = %d",
+          COLORS,
+          COLOR_PAIRS);
 #endif
 
-        init_pair(COL_BACKGROUND, COLOR_WHITE, COLOR_BLACK);
-        init_pair(COL_REDBLACK, COLOR_RED, COLOR_BLACK);
-        init_pair(COL_GREENBLACK, COLOR_GREEN, COLOR_BLACK);
-        init_pair(COL_YELLOWBLACK, COLOR_YELLOW, COLOR_BLACK);
-        init_pair(COL_BLUEBLACK, COLOR_BLUE, COLOR_BLACK);
-        init_pair(COL_MAGENTABLACK, COLOR_MAGENTA, COLOR_BLACK);
-        init_pair(COL_CYANBLACK, COLOR_CYAN, COLOR_BLACK);
+    init_pair(COL_BACKGROUND, COLOR_WHITE, COLOR_BLACK);
+    init_pair(COL_REDBLACK, COLOR_RED, COLOR_BLACK);
+    init_pair(COL_GREENBLACK, COLOR_GREEN, COLOR_BLACK);
+    init_pair(COL_YELLOWBLACK, COLOR_YELLOW, COLOR_BLACK);
+    init_pair(COL_BLUEBLACK, COLOR_BLUE, COLOR_BLACK);
+    init_pair(COL_MAGENTABLACK, COLOR_MAGENTA, COLOR_BLACK);
+    init_pair(COL_CYANBLACK, COLOR_CYAN, COLOR_BLACK);
 
-        /* now init the backgound */
-        /* ncurses seems to toast the colors if you do this */
-        /*  so no background init is done with ncurses. */
-        /* This means that if your using ncurses, run conquest */
-        /*  on a display with a black background for best results */
+    /* now init the background */
+    /* ncurses seems to toast the colors if you do this */
+    /*  so no background init is done with ncurses. */
+    /* This means that if your using ncurses, run conquest */
+    /*  on a display with a black background for best results */
 #if !defined(HAVE_NCURSES_H) && !defined(NCURSES_VERSION)
-        bkgdset(COLOR_PAIR(COL_BACKGROUND) | ' ');
+    bkgdset(COLOR_PAIR(COL_BACKGROUND) | ' ');
 #endif
-    }
 
     return;
 }

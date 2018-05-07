@@ -27,6 +27,10 @@
 
 #include "c_defs.h"
 
+#include <string>
+#include <algorithm>
+#include "format.h"
+
 /* Original Copyright (C)1983-1986 by Jef Poskanzer and Craig Leres */
 
 #define NOEXTERN_GLOBALS
@@ -63,9 +67,6 @@
 
 #include "gameDir.h"
 
-#include <algorithm>
-using namespace std;
-
 /* option masks */
 #define OP_NONE (unsigned int)(0x00000000)
 #define OP_REGENSYSCONF (unsigned int)(0x00000001)
@@ -73,7 +74,8 @@ using namespace std;
 #define OP_DISABLEGAME (unsigned int)(0x00000004)
 #define OP_ENABLEGAME (unsigned int)(0x00000008)
 
-static char operName[MAXUSERNAME];
+static bool doDisplay;
+static std::string operUsername;
 
 void DoConqoperSig(int sig);
 void astoperservice(int sig);
@@ -116,9 +118,6 @@ int main(int argc, char *argv[])
     char InitStuffChar = '\0';
 
     OptionAction = OP_NONE;
-
-    utStrncpy(operName, clbGetUserLogname(), MAXUSERNAME);
-    operName[MAXUSERNAME - 1] = 0;
 
     if (!isagod(-1) )
     {
@@ -309,20 +308,19 @@ int main(int argc, char *argv[])
 
     Context.unum = -1;          /* stow user number */
     Context.snum = -1;		/* don't display in cdgetp - JET */
-    Context.entship = false;	/* never entered a ship */
-    Context.histslot = -1;	/* useless as an op */
+    historyCurrentSlot = -1;	/* useless as an op */
     Context.lasttang = Context.lasttdist = 0;
-    Context.lasttarg[0] = 0;
-    Context.display = true;
+    Context.lastInfoTarget.clear();
+    doDisplay = true;
     Context.maxlin = cdlins();	/* number of lines */
 
     Context.maxcol = cdcols();	/* number of columns */
     Context.recmode = RECMODE_OFF;
 
-    char msgbuf[128];
-    sprintf(msgbuf, "OPER: User %s has entered conqoper.",
-            operName);
-    utLog("%s", msgbuf);        /* log it too... */
+    operUsername = clbGetUserLogname();
+    std::string msgbuf = fmt::format("OPER: User {} has entered conqoper.",
+                                     operUsername);
+    utLog("%s", msgbuf.c_str());        /* log it too... */
     clbStoreMsg( MSG_FROM_COMP, 0, MSG_TO_GOD, 0, msgbuf );
 
     operate();
@@ -361,7 +359,7 @@ void bigbang(void)
             InfoColor,SpecialColor,cnt,InfoColor );
 
     utLog("OPER: %s fired BigBang - %d torpedos",
-          operName, cnt);
+          operUsername.c_str(), cnt);
 
     return;
 
@@ -942,7 +940,7 @@ void kiss(int snum, int prompt_flg)
                 cbDriver->drivstat = DRS_KAMIKAZE;
         cdclrl( MSG_LIN1, 2 );
         cdmove( 1, 1 );
-        utLog("OPER: %s killed the driver", operName);
+        utLog("OPER: %s killed the driver", operUsername.c_str());
         return;
     }
 
@@ -973,7 +971,7 @@ void kiss(int snum, int prompt_flg)
                 clbKillShip( snum, KB_GOD, 0 );
                 cdclrl( MSG_LIN2, 1 );
                 utLog("OPER: %s killed ship %d",
-                      operName, snum);
+                      operUsername.c_str(), snum);
             }
             cdclrl( MSG_LIN1, 1 );
         }
@@ -998,7 +996,7 @@ void kiss(int snum, int prompt_flg)
                 if ( mcuConfirm() )
                 {
                     utLog("OPER: %s killed ship %d",
-                          operName, snum);
+                          operUsername.c_str(), snum);
                     clbKillShip( snum, KB_GOD, 0 );
                 }
             }
@@ -1037,7 +1035,7 @@ void kiss(int snum, int prompt_flg)
                     clbKillShip( snum, KB_GOD, 0 );
                     cdclrl( MSG_LIN2, 1 );
                     utLog("OPER: %s killed ship %d",
-                          operName, snum);
+                          operUsername.c_str(), snum);
                 }
             }
     if ( ! didany ) {
@@ -1321,13 +1319,13 @@ void operate(void)
 	    {
                 DOOMCLR(DOOM_F_LIVE);
                 utLog("OPER: %s deactivated the Doomsday machine",
-                      operName);
+                      operUsername.c_str());
 	    }
             else
 	    {
                 clbDoomsday();
                 utLog("OPER: %s has ACTIVATED the Doomsday machine",
-                      operName);
+                      operUsername.c_str());
 	    }
             break;
 	case 'e':
@@ -1341,14 +1339,14 @@ void operate(void)
                 SaveSysConfig();
 
                 utLog("OPER: %s has enabled the game",
-                      operName);
+                      operUsername.c_str());
 	    }
             else if ( mcuConfirm() )
 	    {
                 SysConf.Closed = true;
                 SaveSysConfig();
                 utLog("OPER: %s has disabled the game",
-                      operName);
+                      operUsername.c_str());
 	    }
             break;
 	case 'h':
@@ -2120,7 +2118,7 @@ void opresign(void)
     else if ( mcuConfirm() )
     {
         utLog("OPER: %s has resigned %s (%s)",
-              operName,
+              operUsername.c_str(),
               cbUsers[unum].username,
               cbUsers[unum].alias);
 
@@ -2219,7 +2217,7 @@ void oprobot(void)
 
     /* Report the good news. */
     utLog("OPER: %s created %d %s%s (%s) robot(s)",
-          operName,
+          operUsername.c_str(),
           anum,
           (warlike == true) ? "WARLIKE " : "",
           cbUsers[unum].alias,
@@ -2497,7 +2495,7 @@ void opuadd(void)
     else
     {
         utLog("OPER: %s added user '%s'.",
-              operName, name);
+              operUsername.c_str(), name);
 
     }
     cdclrl( MSG_LIN1, 2 );
@@ -2816,7 +2814,7 @@ void opuedit(void)
 	case 'K':
 	case KEY_UP:
             /* Up. */
-            row = max( row - 1, 1 );
+            row = std::max( row - 1, 1 );
             break;
 	case 'x':
 	case  'X':
@@ -2824,7 +2822,7 @@ void opuedit(void)
 	case  'J':
 	case KEY_DOWN:
             /* Down. */
-            row = min( row + 1, MAXUEDITROWS );
+            row = std::min( row + 1, MAXUEDITROWS );
             break;
 	case 'y':
 	case 'Y':
@@ -2832,7 +2830,7 @@ void opuedit(void)
 	case KEY_HOME:
             /* Up and left. */
             left = true;
-            row = max( row - 1, 1 );
+            row = std::max( row - 1, 1 );
             break;
 	case 'e':
 	case 'E':
@@ -2842,7 +2840,7 @@ void opuedit(void)
 	case KEY_A3:
             /* Up and right. */
             left = false;
-            row = max( row - 1, 1 );
+            row = std::max( row - 1, 1 );
             break;
 	case 'z':
 	case 'Z':
@@ -2852,7 +2850,7 @@ void opuedit(void)
 	case KEY_C1:
             /* Down and left. */
             left = true;
-            row = min( row + 1, MAXUEDITROWS );
+            row = std::min( row + 1, MAXUEDITROWS );
             break;
 	case 'c':
 	case 'C':
@@ -2862,7 +2860,7 @@ void opuedit(void)
 	case KEY_C3:
             /* Down and right. */
             left = false;
-            row = min( row + 1, MAXUEDITROWS );
+            row = std::min( row + 1, MAXUEDITROWS );
             break;
 	case ' ':
             /* Modify the current entry. */
@@ -3013,9 +3011,9 @@ void watch(void)
         while (true)	/* repeat */
         {
             if (!normal)
-		Context.display = false; /* can't use it to display debugging */
+		doDisplay = false; /* can't use it to display debugging */
             else
-		Context.display = true;
+		doDisplay = true;
 
             /* set up toggle line display */
             /* cdclrl( MSG_LIN1, 1 ); */
@@ -3649,7 +3647,7 @@ int DoInit(char InitChar, int cmdline)
     }
 
     utLog("OPER: %s initialized '%c'",
-          operName, InitChar);
+          operUsername.c_str(), InitChar);
 
     return true;
 }
@@ -3704,7 +3702,7 @@ void DoConqoperSig(int sig)
 void astoperservice(int sig)
 {
     /* Don't do anything if we're not supposed to. */
-    if ( ! Context.display )
+    if ( ! doDisplay )
         return;
 
     operStopTimer();
@@ -3782,7 +3780,7 @@ void operStopTimer(void)
     struct itimerval itimer;
 #endif
 
-    Context.display = false;
+    doDisplay = false;
 
 
     signal(SIGALRM, SIG_IGN);
@@ -3797,7 +3795,7 @@ void operStopTimer(void)
 #endif
 
 
-    Context.display = true;
+    doDisplay = true;
 
     return;
 
