@@ -72,22 +72,25 @@ GLTexture_t *getGLTexture(const char *texname);
 #define GLTEX_PRESCALE(x) ((x)->prescale)
 
 /* ico texture identifiers for drawIconHUDDecal() (GL.c) */
-#define TEX_HUD_ICO                   0
-#define TEX_HUD_SHI                   1
-#define TEX_HUD_DECAL1                2
-#define TEX_HUD_DECAL2                3
-#define TEX_HUD_HEAD                  4
-#define TEX_HUD_HDP                   5
-#define TEX_HUD_WARP                  6
-#define TEX_HUD_WARP2                 7
+typedef enum {
+    TEX_HUD_ICO                      = 0,
+    TEX_HUD_SHI,
+    TEX_HUD_DECAL1,
+    TEX_HUD_DECAL2,
+    TEX_HUD_HEAD,
+    TEX_HUD_HDP,                     // heading pointer
+    TEX_HUD_WARP,                    // warp number
+    TEX_HUD_WARP2,                   // warp guage
 
-#define TEX_HUD_DECAL1_LAMP_SH        8
-#define TEX_HUD_DECAL1_LAMP_HULL      9
-#define TEX_HUD_DECAL1_LAMP_FUEL      10
-#define TEX_HUD_DECAL1_LAMP_ENG       11
-#define TEX_HUD_DECAL1_LAMP_WEP       12
-#define TEX_HUD_DECAL1_LAMP_REP       13
-#define TEX_HUD_DECAL1_LAMP_CLOAK     14
-#define TEX_HUD_DECAL1_LAMP_TOW       15
+    // Decal1 lamps
+    TEX_HUD_DECAL1_LAMP_SH,
+    TEX_HUD_DECAL1_LAMP_HULL,
+    TEX_HUD_DECAL1_LAMP_FUEL,
+    TEX_HUD_DECAL1_LAMP_ENG,
+    TEX_HUD_DECAL1_LAMP_WEP,
+    TEX_HUD_DECAL1_LAMP_REP,
+    TEX_HUD_DECAL1_LAMP_CLOAK,
+    TEX_HUD_DECAL1_LAMP_TOW,
+} textureHUDItem_t;
 
 #endif /* _TEXTURES_H */

@@ -746,7 +746,7 @@ static int initGLPlanets(void)
 
 /* render a 'decal' for renderHud()  */
 void drawIconHUDDecal(GLfloat rx, GLfloat ry, GLfloat w, GLfloat h,
-                      int imgp, cqColor icol)
+                      textureHUDItem_t imgp, cqColor icol)
 {
     int steam = cbShips[Context.snum].team, stype = cbShips[Context.snum].shiptype;
     static int norender = false;

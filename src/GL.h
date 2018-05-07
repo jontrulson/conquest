@@ -28,6 +28,7 @@
 #ifndef _C_GL_H
 #define _C_GL_H
 
+#include "textures.h"
 #include "anim.h"
 
 /* storage for ship textures, colors, other GL related things, indexed by
@@ -143,7 +144,7 @@ void drawBombing(int snum, int scale);
 void dspInitData(void);
 
 void drawIconHUDDecal(GLfloat rx, GLfloat ry, GLfloat w, GLfloat h,
-                      int imgp, cqColor icol);
+                      textureHUDItem_t imgp, cqColor icol);
 void hex2GLColor(uint32_t hcol, GLColor_t *col);
 void setViewerScaling(int scale, int isLR);
 
