@@ -181,8 +181,6 @@ int ncpSRMagFactor = 0;
 // vs. what the server thinks.
 static bool doReload = true;
 
-extern void setWarp(real warp); /* FIXME - GL.c */
-
 static nodeStatus_t nCPDisplay(dspConfig_t *);
 static nodeStatus_t nCPIdle(void);
 static nodeStatus_t nCPInput(int ch);
@@ -2807,7 +2805,7 @@ static nodeStatus_t nCPIdle(void)
     {                           /* die for awhile */
         /* also turns off warp/engine sounds */
         /* nDead will stop all other sound effects for us on exit */
-        setWarp(0);
+        cqsSetWarp(0);
         state = S_GHOST;
         /* start a timer so you can see yourself die :) */
         dietime = iternow;

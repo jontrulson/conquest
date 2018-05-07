@@ -450,8 +450,8 @@ typedef enum {
 #define satwar(x,y) (cbShips[x].war[cbShips[y].team] || \
                      cbShips[y].war[cbShips[x].team])
 #define selfwar(x) (cbShips[x].war[cbShips[x].team])
-#define maxwarp(x) min(cbShipTypes[cbShips[x].shiptype].warplim,        \
-                       max(0.0, round(((100.0 - cbShips[x].damage) /   \
+#define maxwarp(x) std::min(cbShipTypes[cbShips[x].shiptype].warplim,   \
+                       std::max(0.0, round(((100.0 - cbShips[x].damage) / \
                                        100.0) * 12.0)))
 #define engeff(x) (((cbShips[x].engalloc + 50.0) / 100.0) *     \
                    cbShipTypes[cbShips[x].shiptype].engfac *    \

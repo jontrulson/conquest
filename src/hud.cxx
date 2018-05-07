@@ -41,8 +41,6 @@ using namespace std;
 #include "conqutil.h"
 #include "conqai.h"
 
-extern void setWarp(real warp); /* FIXME, GL.c */
-
 #define NOEXTERN_HUD
 #include "hud.h"
 #undef  NOEXTERN_HUD
@@ -133,7 +131,7 @@ void hudInitData(void)
 
 /* These routines assume that snum is always valid, so make sure it is. */
 
-/* set hud warp data to current, if it's changed */
+// set hud warp data to current, if it's changed
 void hudSetWarp(int snum)
 {
     if ( cbShips[snum].warp != hudData.warp.warp )
@@ -143,9 +141,6 @@ void hudSetWarp(int snum)
             hudData.warp.str = fmt::format("{:2.1f}", hudData.warp.warp);
         else
             hudData.warp.str = "Orbiting";
-
-        /* set the right sound effects */
-        setWarp(hudData.warp.warp);
     }
 
     return;

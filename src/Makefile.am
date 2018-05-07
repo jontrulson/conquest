@@ -77,7 +77,8 @@ libconquest_la_SOURCES = conqai.cxx conqai.h cb.cxx cb.h \
 	conf.h  display.h \
 	protocol.h packet.h packet.cxx userauth.h meta.cxx meta.h \
 	udp.cxx udp.h rb.h rb.cxx cbMaxLimits.h proto_0006.h \
-	c_defs.h defs.h conqdef.h cb.h context.h context.cxx conqnet.h
+	c_defs.h defs.h conqdef.h cb.h context.h context.cxx conqnet.h \
+	hud.h hud.cxx 
 
 libconquest_la_LIBADD = @LTLIBOBJS@
 
@@ -99,7 +100,7 @@ libUiGL_la_SOURCES = GL.cxx texfont.cxx glfont.cxx glfont.h \
 	gldisplay.h gldisplay.cxx disputil.h render.h render.cxx \
 	nPlayBMenu.h nPlayBMenu.cxx nPlayB.h nPlayB.cxx nPlayBHelp.h \
 	nPlayBHelp.cxx nOptions.h nOptions.cxx colorGL.cxx ui.h anim.cxx anim.h \
-	GL.h hud.h hud.cxx blinker.h blinker.cxx textures.h textures.cxx \
+	GL.h blinker.h blinker.cxx textures.h textures.cxx \
 	uiGL.cxx
 
 libUiCU_la_SOURCES = display.cxx cprintf.h cprintf.cxx disputil.h colorCU.cxx \
@@ -109,7 +110,7 @@ libUiCU_la_SOURCES = display.cxx cprintf.h cprintf.cxx disputil.h colorCU.cxx \
 
 libconqinit_la_SOURCES = conqinit-yacc.yxx conqinit-lex.lxx conqinit.h planinit.cxx
 
-libcqsound_la_SOURCES = cqsound.cxx cqsound.h
+libcqsound_la_SOURCES = cqsound.cxx cqsound.h cqsSetWarp.cxx
 
 # for now, conquest is the only program we build for windows
 

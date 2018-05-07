@@ -133,25 +133,25 @@ static int cqsFindMusicByFile(const char *name)
     return -1;
 }
 
-int cqsFindEffect(const char *name)
+int cqsFindEffect(const std::string& name)
 {
     int i;
 
     for (i=0; i<cqsNumEffects; i++)
         if (!strncmp(cqiSoundEffects[cqsEffects[i].cqiIndex].name,
-                     name, CQI_NAMELEN))
+                     name.c_str(), CQI_NAMELEN))
             return i;
 
     return -1;
 }
 
-int cqsFindMusic(const char *name)
+int cqsFindMusic(const std::string& name)
 {
     int i;
 
     for (i=0; i<cqsNumMusic; i++)
         if (!strncmp(cqiSoundMusic[cqsMusic[i].cqiIndex].name,
-                     name, CQI_NAMELEN))
+                     name.c_str(), CQI_NAMELEN))
             return i;
 
     return -1;

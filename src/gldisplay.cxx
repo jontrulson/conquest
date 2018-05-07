@@ -387,7 +387,7 @@ void display( int snum )
 
     /* Build and display the status info as necessary. */
     if (snum >= 0)
-    {                           /* we're watching a ship - dwp */
+    {
         /* Shields.
          * this will set dobeep if the shields dropped in power since last
          *  update
@@ -398,6 +398,11 @@ void display( int snum )
         hudSetKills(snum);
 
         /* Warp. */
+
+        // adjust the engine sounds -- do this BEFORE calling
+        // hudSetWarp()
+        if (cbShips[snum].warp != hudData.warp.warp)
+            cqsSetWarp(cbShips[snum].warp);
         hudSetWarp(snum);
 
         /* Heading. */

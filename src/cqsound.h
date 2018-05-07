@@ -34,7 +34,7 @@
 #ifndef _CQSOUND_H
 #define _CQSOUND_H
 
-
+#include <string>
 #include "conqinit.h"
 
 typedef struct _cqs_channel {
@@ -107,7 +107,7 @@ typedef struct _doom_mus {
 #define CQS_SOUND_DISABLED()    (!cqsSoundAvailable || ((cqsSoundEnables & CQS_ENABLE_MASK) == 0))
 
 #ifdef NOEXTERN_CQSOUND
-uint32_t              cqsSoundEnables  = 0;
+uint32_t             cqsSoundEnables  = 0;
 int                  cqsSoundAvailable    = false;
 cqsSoundPtr_t        cqsMusic   = NULL;
 cqsSoundPtr_t        cqsEffects = NULL;
@@ -117,7 +117,7 @@ teamFX_t             cqsTeamEffects[NUMPLAYERTEAMS] = {};
 teamMus_t            cqsTeamMusic[NUMPLAYERTEAMS] = {};
 doomMus_t            cqsDoomsdayMusic = {};
 #else
-extern uint32_t       cqsSoundEnables;
+extern uint32_t      cqsSoundEnables;
 extern int           cqsSoundAvailable;
 extern cqsSoundPtr_t cqsMusic;
 extern cqsSoundPtr_t cqsEffects;
@@ -141,12 +141,13 @@ extern doomMus_t     cqsDoomsdayMusic;
 #define cqsEffectStop(x, y)                 do {;} while (0)
 #define cqsUpdateVolume()
 #define cqsMusicPlaying()                   (0)
+#define cqsSetWarp(x)                       do {;} while (0)
 
 #else  /* !(HAVE_SDL && HAVE_SDL_MIXER) */
 /* the real thing */
 void cqsInitSound(void);
-int  cqsFindEffect(const char *name);
-int  cqsFindMusic(const char *name);
+int  cqsFindEffect(const std::string& name);
+int  cqsFindMusic(const std::string& name);
 int  cqsMusicPlay(int musidx, int halt);
 int  cqsMusicStop(int halt);
 int  cqsEffectPlay(int fxidx, cqsHandle *handle, real maxdist,
@@ -154,6 +155,9 @@ int  cqsEffectPlay(int fxidx, cqsHandle *handle, real maxdist,
 int  cqsEffectStop(cqsHandle handle, int halt);
 void cqsUpdateVolume(void);
 int  cqsMusicPlaying(void);
+
+// control warp up/down/engine noise
+void cqsSetWarp(real warp);
 
 #endif /* !(HAVE_SDL && HAVE_SDL_MIXER) */
 
