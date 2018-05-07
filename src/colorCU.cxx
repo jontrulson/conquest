@@ -100,14 +100,8 @@ void uiInitColors(void)
     init_pair(COL_MAGENTABLACK, COLOR_MAGENTA, COLOR_BLACK);
     init_pair(COL_CYANBLACK, COLOR_CYAN, COLOR_BLACK);
 
-    /* now init the background */
-    /* ncurses seems to toast the colors if you do this */
-    /*  so no background init is done with ncurses. */
-    /* This means that if your using ncurses, run conquest */
-    /*  on a display with a black background for best results */
-#if !defined(HAVE_NCURSES_H) && !defined(NCURSES_VERSION)
+    // set the background to black
     bkgdset(COLOR_PAIR(COL_BACKGROUND) | ' ');
-#endif
 
     return;
 }
