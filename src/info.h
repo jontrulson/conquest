@@ -25,39 +25,12 @@
 // SOFTWARE.
 //
 
-// Curses specific UI function implementations
-
-#include "c_defs.h"
+#ifndef _INFO_H
+#define _INFO_H
 
 #include <string>
 
-#include "global.h"
-#include "conqdef.h"
-#include "cb.h"
-#include "context.h"
-#include "conf.h"
-#include "color.h"
-#include "hud.h"
+void infoPlanet( const std::string& str, int pnum, int snum, bool doOutput );
 
-#include "cd2lb.h"
 
-#include "conqutil.h"
-#include "cprintf.h"
-
-void uiMoveCursor(int lin, int col)
-{
-    cdmove(lin, col);
-}
-
-void uiPutMsg(const std::string& buf, int lin)
-{
-    // FIXME - someday, correct the cd2lb stuff to not make 1 == 0
-
-    // FIXME - maybe won't need this curses specific stuff if conqoper
-    // draws the 3 msg lines based only on hud data...
-    cdclrl( lin, 1 );
-    if (buf.size())
-        cdputs( buf.c_str(), lin, 1 );
-
-    hudSetPrompt(lin, "", NoColor, buf, NoColor);
-}
+#endif /* _INFO_H */

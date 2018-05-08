@@ -51,6 +51,7 @@
 #include "sem.h"
 #include "color.h"
 #include "ui.h"
+#include "info.h"
 #include "options.h"
 #include "cd2lb.h"
 #include "iolb.h"
@@ -1489,7 +1490,9 @@ void opinfo( int snum )
         mcuInfoShip( j );
     }
     else if ( opPlanetMatch( cbuf, &j ) )
-        mcuInfoPlanet( "", j );
+    {
+        infoPlanet("", j, -1, true);
+    }
     else
     {
         cdmove( MSG_LIN2, 1 );

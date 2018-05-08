@@ -73,6 +73,7 @@ using namespace std;
 
 #include "cqsound.h"
 
+#include "info.h"
 
 /* node specific states */
 #define S_NONE         0
@@ -521,183 +522,6 @@ static void _infoship( int snum, int scanner, bool doOutput )
 
 }
 
-
-
-static void _infoplanet( const char *str, int pnum, int snum, bool doOutput )
-{
-    int i, j;
-    int godlike, canscan;
-    char buf[MSGMAXLINE*2], junk[MSGMAXLINE];
-    real x, y;
-
-    /* Check range of the passed planet number. */
-    if ( pnum < 0 || pnum >= cbLimits.maxPlanets() )
-    {
-        if (doOutput)
-        {
-            uiPutMsg( "No such planet.", MSG_LIN1 );
-            hudClearPrompt(MSG_LIN2);
-            hudSetInfoTarget(-1, false);
-        }
-        utLog("_infoplanet: Called with invalid pnum (%d).",
-              pnum );
-        return;
-    }
-
-    /* GOD is too clever, and can never happen in the client */
-    godlike = false;
-
-    /* In some cases, report hostilities. */
-    junk[0] = 0;
-    if ( ! godlike )
-        if ( cbPlanets[pnum].scanned[cbShips[snum].team]
-             && clbSPWar( snum, pnum ) )
-            strcat(junk, " (hostile)");
-
-    if ( godlike )
-    {
-        x = 0.0;
-        y = 0.0;
-    }
-    else
-    {
-        x = cbShips[snum].x;
-        y = cbShips[snum].y;
-    }
-
-    Context.lasttdist = iround(dist( x, y, cbPlanets[pnum].x, cbPlanets[pnum].y));
-    Context.lasttang = iround(utAngle( x, y, cbPlanets[pnum].x, cbPlanets[pnum].y ));
-
-    if (UserConf.DoETAStats)
-    {
-        std::string tmpstr;
-
-        tmpstr.clear();
-        if (cbShips[snum].warp > 0.0)
-            tmpstr = fmt::format(", ETA {}",
-                                 clbETAStr(cbShips[snum].warp,
-                                           Context.lasttdist));
-
-        sprintf( buf, "%s%s, a %s%s, range %d, direction %d%s",
-                 str,
-                 cbPlanets[pnum].name,
-                 cbConqInfo->ptname[cbPlanets[pnum].type],
-                 junk,
-                 Context.lasttdist,
-                 Context.lasttang,
-                 tmpstr.c_str());
-
-
-    }
-    else
-        sprintf( buf, "%s%s, a %s%s, range %d, direction %d",
-                 str,
-                 cbPlanets[pnum].name,
-                 cbConqInfo->ptname[cbPlanets[pnum].type],
-                 junk,
-                 Context.lasttdist,
-                 Context.lasttang);
-
-    /* save for the hudInfo, only first 3 characters */
-    Context.lastInfoTarget = std::string(cbPlanets[pnum].name).substr(0, 3);
-    hudSetInfoTarget(pnum, false);
-
-    if ( godlike )
-        canscan = true;
-    else
-        canscan = cbPlanets[pnum].scanned[cbShips[snum].team];
-
-    junk[0] = 0;
-    if ( cbPlanets[pnum].type != PLANET_SUN && cbPlanets[pnum].type != PLANET_MOON )
-    {
-        if ( ! canscan )
-            strcpy(junk , "with unknown occupational forces") ;
-        else
-	{
-            i = cbPlanets[pnum].armies;
-            if ( i == 0 )
-	    {
-                j = cbPlanets[pnum].uninhabtime;
-                if ( j > 0 )
-                    sprintf( junk, "uninhabitable for %d more minutes", j );
-                else
-                    strcpy(junk , "with NO armies") ;
-	    }
-            else
-	    {
-                sprintf( junk, "with %d %s arm", i,
-                         cbTeams[cbPlanets[pnum].team].name );
-                if ( i == 1 )
-                    strcat(junk , "y");
-                else
-                    strcat(junk , "ies");
-	    }
-	}
-
-        /* Now see if we can tell about coup time. */
-        if ( godlike )
-            canscan = false;	/* GOD can use teaminfo instead */
-        else
-            canscan = ( pnum == cbTeams[cbShips[snum].team].homeplanet &&
-                        TEAM_COUPINFO(cbShips[snum].team) );
-        if ( canscan )
-	{
-            j = cbTeams[cbShips[snum].team].couptime;
-            if ( j > 0 )
-	    {
-                if ( junk[0] != 0 )
-                    strcat(junk, ", ");
-                utAppendInt(junk , j) ;
-                strcat(junk , " minutes until coup time");
-	    }
-	}
-    }
-
-    if ( junk[0] == 0 )
-    {
-        utAppendChar(buf , '.');
-    }
-    else
-    {
-        utAppendChar(buf, ',');
-        utAppendChar(junk, '.');
-    }
-
-    if (doOutput)
-    {
-        /* Now output the info. Break the stuff in buf across two lines */
-        /*  (if necessary) and force the stuff in junk (the number of */
-        /*  armies for planets) to be all on the second line. */
-        i = strlen( buf );				/* strlen of first part */
-        j = 69;					/* desired maximum length */
-        if ( i <= j )
-        {
-            /* The first part is small enough. */
-            uiPutMsg( buf, MSG_LIN1 );
-            if ( junk[0] != 0 )
-                uiPutMsg(junk, MSG_LIN2);
-            else
-                hudClearPrompt(MSG_LIN2);
-        }
-        else
-        {
-            /* Break it into two lines. */
-            i = j + 1;
-            while ( buf[i] != ' ' && i > 1 )
-                i = i - 1;
-            utAppendChar(buf , ' ');
-            strcat(buf , junk);
-            buf[i] = 0;				/* terminate at blank */
-            uiPutMsg( buf, MSG_LIN1 );
-            uiPutMsg( &buf[i+1], MSG_LIN2 );
-        }
-    }
-
-    return;
-
-}
-
-
 static void _dowarp( int snum, real warp )
 {
     hudClearPrompt(MSG_LIN2);
@@ -858,7 +682,7 @@ static void _doinfo( const char *inbuf, char ch, bool doOutput )
         if ( what == NEAR_SHIP )
             _infoship( sorpnum, snum, doOutput );
         else if ( what == NEAR_PLANET )
-            _infoplanet( "", sorpnum, snum, doOutput );
+            infoPlanet( "", sorpnum, snum, doOutput );
         else
         {
             if (doOutput)
@@ -877,7 +701,7 @@ static void _doinfo( const char *inbuf, char ch, bool doOutput )
         _infoship( j, snum, doOutput );
     }
     else if ( clbPlanetMatch( tmpBuf.c_str(), &j, false ) )
-        _infoplanet( "", j, snum, doOutput );
+        infoPlanet( "", j, snum, doOutput );
     else
     {
         if (doOutput)
@@ -946,8 +770,8 @@ static void _doorbit( int snum )
     std::string cbuf;
 
     if ( ( cbShips[snum].warp == ORBIT_CW ) || ( cbShips[snum].warp == ORBIT_CCW ) )
-        _infoplanet( "But we are already orbiting ",
-                     cbShips[snum].lockDetail, snum, true );
+        infoPlanet( "But we are already orbiting ",
+                    cbShips[snum].lockDetail, snum, true );
     else if ( ! clbFindOrbit( snum, &pnum ) )
     {
         cbuf += "We are not close enough to orbit, ";
@@ -970,7 +794,7 @@ static void _doorbit( int snum )
     else
     {
         sendCommand(CPCMD_ORBIT, 0);
-        _infoplanet( "Coming into orbit around ", pnum, snum, true );
+        infoPlanet( "Coming into orbit around ", pnum, snum, true );
     }
 
     return;
@@ -1592,10 +1416,10 @@ static void _docourse( std::string& buf, char ch)
 	{
             newlock = LOCK_PLANET;
             newlockDetail = sorpnum;
-            _infoplanet( "Now locked on to ", sorpnum, snum, true );
+            infoPlanet( "Now locked on to ", sorpnum, snum, true );
 	}
         else
-            _infoplanet( "Setting course for ", sorpnum, snum, true );
+            infoPlanet( "Setting course for ", sorpnum, snum, true );
         break;
     case NEAR_DIRECTION:
         hudClearPrompt(MSG_LIN1);

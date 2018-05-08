@@ -78,7 +78,7 @@ libconquest_la_SOURCES = conqai.cxx conqai.h cb.cxx cb.h \
 	protocol.h packet.h packet.cxx userauth.h meta.cxx meta.h \
 	udp.cxx udp.h rb.h rb.cxx cbMaxLimits.h proto_0006.h \
 	c_defs.h defs.h conqdef.h cb.h context.h context.cxx conqnet.h \
-	hud.h hud.cxx 
+	hud.h hud.cxx info.h info.cxx
 
 libconquest_la_LIBADD = @LTLIBOBJS@
 
