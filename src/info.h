@@ -31,6 +31,6 @@
 #include <string>
 
 void infoPlanet( const std::string& str, int pnum, int snum, bool doOutput );
-
+void infoShip( int snum, int scanner, bool doOutput );
 
 #endif /* _INFO_H */

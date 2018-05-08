@@ -36,6 +36,7 @@
 #include "context.h"
 #include "conf.h"
 #include "color.h"
+#include "rndlb.h"
 
 #include "ui.h"
 #include "hud.h"
@@ -208,6 +209,280 @@ void infoPlanet( const std::string& str, int pnum, int snum, bool doOutput )
             uiPutMsg( buf, MSG_LIN1 );
             uiPutMsg( buf2, MSG_LIN2 );
         }
+    }
+
+    return;
+}
+
+void infoShip( int snum, int scanner, bool doOutput )
+{
+    int status;
+    real x, y, dis, kills, appx, appy;
+    bool godlike = false, canscan = false;
+    std::string cbuf;
+
+    godlike = (scanner < 0 || scanner >= cbLimits.maxShips());
+
+    if (doOutput)
+        uiPutMsg("", MSG_LIN1);
+    if ( snum < 0 || snum >= cbLimits.maxShips() )
+    {
+        if (doOutput)
+            uiPutMsg( "No such ship.", MSG_LIN1 );
+        hudSetInfoTarget(-1, false);
+        return;
+    }
+    status = cbShips[snum].status;
+    if ( ! godlike && status != SS_LIVE )
+    {
+        if (doOutput)
+            uiPutMsg( "Not found.", MSG_LIN1 );
+        hudSetInfoTarget(-1, false);
+        return;
+    }
+
+    cbuf.clear();
+    Context.lastInfoTarget.clear();
+    utAppendShip(cbuf, snum) ;
+    /* save for hudInfo */
+    Context.lastInfoTarget = cbuf;
+    hudSetInfoTarget(snum, true);
+
+    if ( snum == scanner )
+    {
+        /* Silly Captain... */
+        cbuf += ": That's us, silly!";
+        if (doOutput)
+            uiPutMsg( cbuf, MSG_LIN1 );
+        hudSetInfoTarget(-1, false);
+        return;
+    }
+    /* Scan another ship. */
+    if ( godlike )
+    {
+        x = 0.0;
+        y = 0.0;
+    }
+    else
+    {
+        x = cbShips[scanner].x;
+        y = cbShips[scanner].y;
+    }
+
+    if ( SCLOAKED(snum) )
+    {
+        if (godlike)
+	{
+            appx = rndnor(cbShips[snum].x, CLOAK_SMEAR_DIST);
+            appy = rndnor(cbShips[snum].y, CLOAK_SMEAR_DIST);
+	}
+        else			/* client */
+	{			/* for clients, these have already been
+				   smeared */
+            appx = cbShips[snum].x;
+            appy = cbShips[snum].y;
+	}
+    }
+    else
+    {
+        appx = cbShips[snum].x;
+        appy = cbShips[snum].y;
+    }
+    dis = dist( x, y, appx, appy );
+    if ( godlike )
+        canscan = true;
+    else
+    {
+        /* Decide if we can do an acurate scan. */
+        canscan = ( (dis < ACCINFO_DIST && ! SCLOAKED(snum)) ||
+                    ( (cbShips[snum].scanned[ cbShips[scanner].team] > 0)
+                      && ! selfwar(scanner) ) );
+    }
+
+    cbuf += ": ";
+    if ( cbShips[snum].alias[0] != 0 )
+    {
+        cbuf += cbShips[snum].alias;
+        cbuf += ", ";
+    }
+    kills = (cbShips[snum].kills + cbShips[snum].strkills);
+    if ( kills == 0.0 )
+        cbuf += "no";
+    else
+        cbuf += fmt::format("{:.1f}", kills);
+
+    cbuf += " kill";
+    if ( kills != 1.0 )
+        cbuf += 's';
+
+    if ( SCLOAKED(snum) && ( godlike || SSCANDIST(snum) ) )
+        cbuf += " (CLOAKED) ";
+    else
+        cbuf += ", ";
+
+    cbuf += "a ";
+    cbuf += cbShipTypes[cbShips[snum].shiptype].name;
+    cbuf += ", ";
+
+    if ( godlike )
+    {
+        utAppendShipStatus(cbuf , status) ;
+        cbuf += '.';
+    }
+    else
+    {
+        if ( cbShips[snum].war[cbShips[scanner].team] )
+            cbuf += "at WAR.";
+        else
+            cbuf += "at peace.";
+    }
+
+    if (doOutput)
+        uiPutMsg( cbuf, MSG_LIN1 );
+
+    if ( ! SCLOAKED(snum) || cbShips[snum].warp != 0.0 )
+    {
+        Context.lasttdist = iround( dis ); /* save these puppies for hud info */
+        Context.lasttang = iround( utAngle( x, y, appx, appy ) );
+
+        cbuf = fmt::format("Range {0}, direction {1}",
+                           Context.lasttdist, Context.lasttang);
+
+        if (UserConf.DoETAStats && !godlike)
+	{
+            /* ETA related vars */
+            real pwarp, diffdis, close_rate;
+            time_t difftime, curtime;
+            static time_t oldtime = 0;
+            static int oldsnum = 0;
+            static real avgclose_rate, olddis = 0.0, oldclose_rate = 0.0;
+
+            if (cbShips[scanner].warp > 0.0 || cbShips[snum].warp > 0.0)
+	    {
+                curtime = time(0);
+
+                if (snum == oldsnum)
+		{		/* then we can get better eta
+				   by calculating closure rate and
+				   extrapolate from there the apparent warp
+				   giving a better estimate. */
+                    difftime = curtime - oldtime;
+
+                    /* we still need to compute diffdis  */
+                    diffdis = olddis - dis;
+                    olddis = dis;
+
+                    if (difftime <= 0)
+		    {		/* not enough time passed for a guess
+				   use last closerate, and don't set
+				   oldtime so it will eventually work */
+                        close_rate = oldclose_rate;
+		    }
+                    else
+		    {		/* we can make an estimate of closure rate in
+				   MM's per second */
+                        oldtime = curtime;
+
+                        close_rate = diffdis / (real) difftime;
+		    }
+
+                    /* give a 'smoother' est. by avg'ing with
+                       last close rate.*/
+                    avgclose_rate = (close_rate + oldclose_rate) / 2.0;
+                    oldclose_rate = close_rate;
+
+#ifdef DEBUG_ETA
+                    utLog("_infoship: close_rate(%.1f) = diffdis(%.1f) / difftime(%d), avgclose_rate = %.1f",
+                          close_rate,
+                          diffdis,
+                          difftime,
+                          avgclose_rate);
+#endif
+
+                    if (avgclose_rate <= 0.0)
+		    {		/* dist is increasing or no change,
+				   - can't ever catchup = ETA never */
+                        cbuf += ", ETA ";
+                        cbuf += clbETAStr(0.0, dis);
+		    }
+                    else
+		    {		/* we are indeed closing... */
+
+			/* calc psuedo-warp */
+                        pwarp = (avgclose_rate / (real) MM_PER_SEC_PER_WARP);
+
+#ifdef DEBUG_ETA
+                        utLog("_infoship:\tdis(%.1f) pwarp(%.1f) = (close_rate(%.1f) / MM_PER_SEC_PER_WARP(%.1f)", dis, pwarp, close_rate, MM_PER_SEC_PER_WARP);
+#endif
+
+                        cbuf += ", ETA ";
+                        cbuf += clbETAStr(pwarp, dis);
+		    }
+		}
+                else
+		{
+                    /* scanning a new ship - assume ships heading
+                     * directly at each other */
+
+                    /* init old* vars */
+                    oldtime = curtime;
+                    oldsnum = snum;
+                    olddis = dis;
+
+                    pwarp =
+                        (((cbShips[scanner].warp > 0.0) ?
+                          cbShips[scanner].warp :
+                          0.0) +
+                         ((cbShips[snum].warp > 0.0) ?
+                          cbShips[snum].warp
+                          : 0.0));
+
+                    cbuf += ", ETA ";
+                    cbuf += clbETAStr(pwarp, dis);
+		}
+	    }
+	} /* if do ETA stats */
+    }
+    else				/* else cloaked and at w0 */
+    {
+        Context.lasttdist = Context.lasttang = 0;
+        cbuf.clear();
+    }
+
+    if ( canscan )
+    {
+        if ( !cbuf.empty() )
+            cbuf += ", ";
+        cbuf += "shields ";
+        if ( SSHUP(snum) && ! SREPAIR(snum) )
+            cbuf += std::to_string(iround( cbShips[snum].shields ));
+        else
+            cbuf += "DOWN";
+
+        int i = iround( cbShips[snum].damage );
+        if ( i > 0 )
+	{
+            if ( !cbuf.empty() )
+                cbuf += ", ";
+            cbuf += fmt::format("damage {}", i );
+	}
+        i = cbShips[snum].armies;
+        if ( i > 0 )
+	{
+            cbuf += fmt::format(", with {} arm", i);
+            if ( i == 1 )
+	    {
+                cbuf += 'y';
+	    }
+            else
+                cbuf += "ies";
+	}
+    }
+    if ( !cbuf.empty() )
+    {
+        cbuf += '.';
+        if (doOutput)
+            uiPutMsg( cbuf, MSG_LIN2 );
     }
 
     return;

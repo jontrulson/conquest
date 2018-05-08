@@ -1482,12 +1482,12 @@ void opinfo( int snum )
     if ( cbuf[0] == 's' && utIsDigits( &cbuf[1] ) )
     {
         utSafeCToI( &j, &cbuf[1], 0 );		/* ignore status */
-        mcuInfoShip( j );
+        infoShip( j, -1, true );
     }
     else if ( utIsDigits( cbuf ) )
     {
         utSafeCToI( &j, cbuf, 0 );		/* ignore status */
-        mcuInfoShip( j );
+        infoShip( j, -1, true );
     }
     else if ( opPlanetMatch( cbuf, &j ) )
     {

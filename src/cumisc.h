@@ -31,7 +31,6 @@
 void mcuHistList();
 void mcuPutThing( int what, int lin, int col );
 int  mcuReadMsg( int msgnum, int dsplin );
-void mcuInfoShip( int snum );
 void mcuPlanetList();
 void mcuPlayList( bool doall );
 int  mcuReviewMsgs( int slm );
