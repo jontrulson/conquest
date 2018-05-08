@@ -47,6 +47,93 @@
 
 #include "info.h"
 
+//  info - do an info command
+void info( const std::string& inbuf, char ch, bool doOutput )
+{
+    // default to \r
+    static char lastInfoTermChar = TERM_NORMAL;
+
+    // an snum < 0 indicates godlike (conqoper)
+    int snum = Context.snum;
+
+    if ( ch == TERM_ABORT )
+    {
+        uiPutMsg("", MSG_LIN1);
+        hudSetInfoTarget(-1, false);
+        return;
+    }
+
+    // special case: ch == 0, means to use the last used term char.
+    // This is used by the TAD display to "automate" info commands.
+    if (ch == 0)
+        ch = lastInfoTermChar;
+    else
+        lastInfoTermChar = ch;
+
+    int extra = ( ch == TERM_EXTRA );
+
+    std::string tmpBuf = inbuf;
+
+    /* Default to what we did last time. */
+    if ( tmpBuf.empty() )
+    {
+        tmpBuf = Context.lastInfoStr;
+        if ( tmpBuf.empty() )
+	{
+            uiPutMsg("", MSG_LIN1);
+            hudSetInfoTarget(-1, false);
+            return;
+	}
+    }
+    else
+        Context.lastInfoStr = tmpBuf;
+
+    int what, count, token;
+    int j, sorpnum, xsorpnum;
+    if ( utIsSpecial( tmpBuf, &what, &token, &count ) )
+    {
+        if ( ! clbFindSpecial( snum, token, count, &sorpnum, &xsorpnum ) )
+            what = NEAR_NONE;
+        else if ( extra )
+	{
+            if ( xsorpnum == -1 )
+                what = NEAR_NONE;
+            else
+                sorpnum = xsorpnum;
+	}
+
+        if ( what == NEAR_SHIP )
+            infoShip( sorpnum, snum, doOutput );
+        else if ( what == NEAR_PLANET )
+            infoPlanet( "", sorpnum, snum, doOutput );
+        else
+        {
+            if (doOutput)
+                uiPutMsg( "Not found.", MSG_LIN2 );
+            hudSetInfoTarget(-1, false);
+        }
+    }
+    else if ( tmpBuf.size() > 1 && tmpBuf[0] == 's' && ::isdigit(tmpBuf[1]) )
+    {
+        utSafeCToI( &j, tmpBuf, 1 );		/* ignore status */
+        infoShip( j, snum, doOutput );
+    }
+    else if (utIsDigits(tmpBuf))
+    {
+        utSafeCToI( &j, tmpBuf);		/* ignore status */
+        infoShip( j, snum, doOutput );
+    }
+    else if ( clbPlanetMatch( tmpBuf, &j, ((snum < 0) ? true : false) ) )
+        infoPlanet( "", j, snum, doOutput );
+    else
+    {
+        if (doOutput)
+            uiPutMsg( "I don't understand.", MSG_LIN2 );
+        hudSetInfoTarget(-1, false);
+        return;
+    }
+}
+
 
 // get info on a planet and output it if doOutput is true
 void infoPlanet( const std::string& str, int pnum, int snum, bool doOutput )

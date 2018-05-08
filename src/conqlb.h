@@ -84,7 +84,7 @@ void     clbInitUniverse(bool cbIsLocal);
 void     clbIntrude( int snum, int pnum );
 int      clbLogHist( int unum );
 real     clbNewWarp( int snum, real dwarp );
-bool     clbPlanetMatch( const std::string& str, int *pnum, int godlike );
+bool     clbPlanetMatch( const std::string& str, int *pnum, bool godlike );
 void     clbPutShip( int snum, real basex, real basey );
 int      clbFmtMsg(msgFrom_t from, uint16_t fromDetail, msgTo_t to,
                    uint16_t toDetail, std::string& buf);

@@ -89,7 +89,7 @@ int opPlanetMatch( char str[], int *pnum );
 void kiss(int snum, int prompt_flg);
 void opback( int lastrev, int *savelin );
 void operate(void);
-void opinfo( int snum );
+void opinfo(void);
 void opinit(void);
 void opPlanetList(void);
 void opresign(void);
@@ -1359,7 +1359,7 @@ void operate(void)
             redraw = true;
             break;
 	case 'i':
-            opinfo( -1 );
+            opinfo();
             break;
 	case 'I':
             opinit();
@@ -1454,53 +1454,20 @@ void operate(void)
 /*  SYNOPSIS */
 /*    int snum */
 /*    opinfo( snum ) */
-void opinfo( int snum )
+void opinfo()
 {
-    int j;
     char ch;
     char cbuf[MSGMAXLINE];
-    static const char *pmt="Information on: ";
-    static const char *huh="I don't understand.";
 
     cdclrl( MSG_LIN1, 2 );
 
     cbuf[0] = 0;
-    ch = (char)cdgetx( pmt, MSG_LIN1, 1, TERMS, cbuf, MSGMAXLINE, true );
-    if ( ch == TERM_ABORT )
-    {
-        cdclrl( MSG_LIN1, 1 );
-        return;
-    }
+    ch = (char)cdgetx( "Information on: ", MSG_LIN1, 1, TERMS,
+                       cbuf, MSGMAXLINE, true );
 
-    utDeleteBlanks( cbuf );
-    if ( cbuf[0] == 0 )
-    {
-        cdclrl( MSG_LIN1, 1 );
-        return;
-    }
-
-    if ( cbuf[0] == 's' && utIsDigits( &cbuf[1] ) )
-    {
-        utSafeCToI( &j, &cbuf[1], 0 );		/* ignore status */
-        infoShip( j, -1, true );
-    }
-    else if ( utIsDigits( cbuf ) )
-    {
-        utSafeCToI( &j, cbuf, 0 );		/* ignore status */
-        infoShip( j, -1, true );
-    }
-    else if ( opPlanetMatch( cbuf, &j ) )
-    {
-        infoPlanet("", j, -1, true);
-    }
-    else
-    {
-        cdmove( MSG_LIN2, 1 );
-        uiPutMsg( huh, MSG_LIN2 );
-    }
+    info(cbuf, ch, true);
 
     return;
-
 }
 
 
@@ -3069,7 +3036,7 @@ void watch(void)
                 operSetTimer();
                 break;
             case 'i':
-                opinfo( -1 );
+                opinfo();
                 break;
             case 'k':
                 kiss(Context.snum, true);

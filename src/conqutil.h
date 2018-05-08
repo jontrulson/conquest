@@ -70,10 +70,12 @@ uint64_t utDeltaGrand(uint64_t s, uint64_t *n);
 void     utGrand( uint64_t *h );
 void     utGetSecs( time_t *s );
 real     utMod360( real r );
-int      utIsSpecial( const char *str, int *what, int *token, int *count );
+bool     utIsSpecial( const std::string& str, int *what, int *token,
+                      int *count );
 void     utStrncpy( char *to, const char *from, unsigned int tosize );
 void     utStrncat( char *to, const char *from, unsigned int tosize );
-int      utStringMatch( const char *str1, const char *str2, int casesensitive );
+bool     utStringMatch(const std::string& str1, const std::string& str2,
+                       bool casesensitive );
 char     *utGetPath(const char *thepath);
 void     utSleep(real seconds);
 bool     utIsDigits(const std::string& str);

@@ -2216,30 +2216,14 @@ real clbNewWarp( int snum, real dwarp )
 
 
 /*  planmatch - check if a string matches a planet name */
-/*  SYNOPSIS */
-/*    int planmatch, pnum, godlike */
-/*    char str() */
-/*    int status, godlike */
-/*    status = clbPlanetMatch( str, pnum, godlike ) */
-bool clbPlanetMatch( const std::string& str, int *pnum, int godlike )
+bool clbPlanetMatch( const std::string& str, int *pnum, bool godlike )
 {
-    if ( godlike )
-    {
-        for ( *pnum = 0; *pnum < cbLimits.maxPlanets(); *pnum = *pnum + 1 )
-            if ( utStringMatch( str.c_str(), cbPlanets[*pnum].name, false ) )
+    for ( *pnum = 0; *pnum < cbLimits.maxPlanets(); *pnum = *pnum + 1 )
+        if ( PVISIBLE(*pnum) || godlike )
+            if ( utStringMatch( str, cbPlanets[*pnum].name, false ) )
                 return ( true );
-    }
-    else
-    {
-        for ( *pnum = 0; *pnum < cbLimits.maxPlanets(); *pnum = *pnum + 1 )
-            if ( PVISIBLE(*pnum) )
-                if ( utStringMatch( str.c_str(),
-                                    cbPlanets[*pnum].name, false ) )
-                    return ( true );
-    }
 
     return ( false );
-
 }
 
 

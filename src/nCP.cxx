@@ -165,9 +165,6 @@ extern cqsHandle alertHandle;
 /* storage for the beam up/down sound handles */
 static cqsHandle beamHandle = CQS_INVHANDLE;
 
-char lastInfoTerm;              // last info terminator character
-
-
 /* current SR and LR magnification factors. (-5-5) */
 int ncpLRMagFactor = 0;
 int ncpSRMagFactor = 0;
@@ -348,92 +345,9 @@ static void _dotorp(real dir, int num)
 /*  SYNOPSIS */
 /*    int snum */
 /*    doinfo( snum ) */
-static void _doinfo( const char *inbuf, char ch, bool doOutput )
+static void _doinfo( const std::string& inbuf, char ch, bool doOutput )
 {
-    int snum = Context.snum;
-    int j, what, sorpnum, xsorpnum, count, token;
-    int extra;
-    std::string tmpBuf;
-
-    if ( ch == TERM_ABORT )
-    {
-        hudClearPrompt(MSG_LIN1);
-        hudSetInfoTarget(-1, false);
-        return;
-    }
-    extra = ( ch == TERM_EXTRA );
-
-    if (ch == TERM_EXTRA || ch == TERM_NORMAL)
-        lastInfoTerm = ch;
-    else
-        lastInfoTerm = 0;
-
-    if (inbuf)
-    {
-        tmpBuf = inbuf;
-        utDeleteBlanks( tmpBuf );
-    }
-    else
-    {
-        tmpBuf.clear();
-    }
-
-    /* Default to what we did last time. */
-    if ( tmpBuf.empty() )
-    {
-        tmpBuf = Context.lastInfoStr;
-        if ( tmpBuf.empty() )
-	{
-            hudClearPrompt(MSG_LIN1);
-            hudSetInfoTarget(-1, false);
-            return;
-	}
-    }
-    else
-        Context.lastInfoStr = tmpBuf;
-
-    if ( utIsSpecial( tmpBuf.c_str(), &what, &token, &count ) )
-    {
-        if ( ! clbFindSpecial( snum, token, count, &sorpnum, &xsorpnum ) )
-            what = NEAR_NONE;
-        else if ( extra )
-	{
-            if ( xsorpnum == -1 )
-                what = NEAR_NONE;
-            else
-                sorpnum = xsorpnum;
-	}
-
-        if ( what == NEAR_SHIP )
-            infoShip( sorpnum, snum, doOutput );
-        else if ( what == NEAR_PLANET )
-            infoPlanet( "", sorpnum, snum, doOutput );
-        else
-        {
-            if (doOutput)
-                uiPutMsg( "Not found.", MSG_LIN2 );
-            hudSetInfoTarget(-1, false);
-        }
-    }
-    else if ( tmpBuf.size() > 1 && tmpBuf[0] == 's' && ::isdigit(tmpBuf[1]) )
-    {
-        utSafeCToI( &j, tmpBuf, 1 );		/* ignore status */
-        infoShip( j, snum, doOutput );
-    }
-    else if (utIsDigits(tmpBuf))
-    {
-        utSafeCToI( &j, tmpBuf);		/* ignore status */
-        infoShip( j, snum, doOutput );
-    }
-    else if ( clbPlanetMatch( tmpBuf.c_str(), &j, false ) )
-        infoPlanet( "", j, snum, doOutput );
-    else
-    {
-        if (doOutput)
-            uiPutMsg( "I don't understand.", MSG_LIN2 );
-        hudSetInfoTarget(-1, false);
-        return;
-    }
+    info(inbuf, ch, doOutput);
 
     /* Cataboligne - Spocks viewer sound */
     if (doOutput && rnd() < 0.3)
@@ -1988,7 +1902,7 @@ static void command( int ch )
 
     case TERM_NORMAL:		/* Have [ENTER] act like 'I[ENTER]'  */
     case '\n':
-        _doinfo(NULL, TERM_NORMAL, true);
+        _doinfo("", TERM_NORMAL, true);
         break;
 
         /* ack red alert by turning klaxon off  Cataboligne -
@@ -2007,7 +1921,7 @@ static void command( int ch )
         break;
 
     case TERM_EXTRA:		/* Have [TAB] act like 'i\t' */
-        _doinfo(NULL, TERM_EXTRA, true);
+        _doinfo("", TERM_EXTRA, true);
         break;
 
     case TERM_RELOAD:		/* have server resend current universe */
@@ -2497,10 +2411,8 @@ static nodeStatus_t nCPIdle(void)
     if (UserConf.hudInfo && !prompting && ((iternow - tadTime) > tadWait))
     {
         tadTime = iternow;
-        if (!Context.lastInfoStr.empty()
-            && (lastInfoTerm == TERM_NORMAL
-                || lastInfoTerm == TERM_EXTRA))
-            _doinfo(NULL, lastInfoTerm, false);
+        if (!Context.lastInfoStr.empty())
+            _doinfo("", 0, false);
     }
 
     return NODE_OK;

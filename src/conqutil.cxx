@@ -814,15 +814,10 @@ bool utSafeCToI( int *num, const std::string& buf, int offset )
 
 
 /*  special - check if a string is a valid "special" specifier */
-/*  SYNOPSIS */
-/*    char str() */
-/*    int what, token, count */
-/*    int flag, special */
-/*    flag = utIsSpecial( str, what, token, count ) */
-int utIsSpecial( const char *str, int *what, int *token, int *count )
+bool utIsSpecial( const std::string& str, int *what, int *token, int *count )
 {
     int i;
-    char buf[20];
+    std::string buf;
 
     *what = NEAR_ERROR;
     *token = SPECIAL_NOTSPECIAL;
@@ -832,14 +827,17 @@ int utIsSpecial( const char *str, int *what, int *token, int *count )
     if ( str[0] != 'n' && str[0] != 'w' && str[0] != 'h' )
         return ( false );
 
-    utStrncpy( buf, str, 20 );			/* need a private copy */
+    buf = str;                  /* need a private copy */
 
-    /* Find threshold count; cleverly, the default will be zero when using ctoi. */
-    for (i = 0; buf[i] != 0 && !isdigit(buf[i]); i++)
-        ;
+    // find threshold count if present
+    size_t digits = buf.find_first_of("0123456789");
 
-    buf[i] = 0;				/* ditch numeric part */
-    utSafeCToI( count, str, i );		/* ignore status */
+    if (digits != std::string::npos)
+    {
+        utSafeCToI(count, buf.substr(digits), 0);
+        // remove the digits
+        buf.erase(digits);
+    }
 
     if ( utStringMatch( buf, "nes", false ) )	/* this one must be first */
     {
@@ -899,10 +897,9 @@ int utIsSpecial( const char *str, int *what, int *token, int *count )
         *token = SPECIAL_HOMEPLANET;
     }
     else
-        return ( false );		/* string simply isn't special */
+        return false;       // string simply isn't special :(
 
-    return ( true );
-
+    return true;
 }
 
 
@@ -923,37 +920,30 @@ void utStrncat( char *to, const char *from, unsigned int tosize )
     to[tosize - 1] = '\0';
 }
 
+static bool _strcompare_pred(unsigned char a, unsigned char b)
+{
+    return std::tolower(a) == std::tolower(b);
+}
 
 /*  utStringMatch - check whether two strings match or not */
-/*  SYNOPSIS */
-/*    int matched, utStringMatch, casesensitive */
-/*    char str1(), str2() */
-/*    matched = utStringMatch( str1, str2, casesensitive ) */
-int utStringMatch( const char *str1, const char *str2, int casesensitive )
+bool utStringMatch(const std::string& str1, const std::string& str2,
+                   bool casesensitive )
 {
-    int i;
+    if (str1.empty() && str2.empty())
+        return true;
+    else if (str1.empty() || str2.empty())
+        return false;
 
-    if ( casesensitive )
-        for ( i = 0; str1[i] == str2[i] && str1[i] != 0; i = i + 1 )
-            ;
-    else
-        for ( i = 0;
-              (char)tolower(str1[i]) == (char)tolower(str2[i]) && str1[i] != 0;
-              i = i + 1 )
-            ;
-
-    if ( i == 0 )
+    if (casesensitive)
     {
-        if ( str1[0] == 0 && str2[0] == 0 )
-            return ( true );
-        else
-            return ( false );
+        // this is never actually used in Conquest, but we'll keep the
+        // support for it just in case...
+        return str1 == str2;
     }
-    else if ( str1[i] == 0 || str2[i] == 0 )
-        return ( true );
 
-    return ( false );
-
+    // we only check matching characters up to the length of str1
+    return std::equal(str1.begin(), str1.end(),
+                      str2.begin(), _strcompare_pred);
 }
 
 

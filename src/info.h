@@ -30,6 +30,7 @@
 
 #include <string>
 
+void info( const std::string& inbuf, char ch, bool doOutput );
 void infoPlanet( const std::string& str, int pnum, int snum, bool doOutput );
 void infoShip( int snum, int scanner, bool doOutput );
 
