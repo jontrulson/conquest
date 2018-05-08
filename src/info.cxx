@@ -177,7 +177,7 @@ void infoPlanet( const std::string& str, int pnum, int snum, bool doOutput )
     }
     else
     {
-        buf += ',';
+        buf += ", ";
         buf2 += '.';
     }
 
