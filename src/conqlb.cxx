@@ -238,8 +238,9 @@ void clbIKill(int snum, killedBy_t kb, uint16_t detail)
         cbShips[snum].kills = cbShips[snum].kills + CONQUER_KILLS;
     else if ( kb == KB_GOTDOOMSDAY )
         cbShips[snum].kills = cbShips[snum].kills + DOOMSDAY_KILLS;
-    else if ( kb == KB_SHIP && detail < cbLimits.maxShips() ) // if a ship did the killing
+    else if ( kb == KB_SHIP && detail < cbLimits.maxShips() )
     {
+        // if a ship did the killing
         kunum = cbShips[detail].unum;
         kteam = cbShips[detail].team;
         tkills = 1.0 + ((cbShips[snum].kills + cbShips[snum].strkills) * KILLS_KILLS);
@@ -265,11 +266,9 @@ void clbIKill(int snum, killedBy_t kb, uint16_t detail)
 	}
 
         /* Sticky war logic. */
-        /* should set sticky war too. -JET */
 
-        if ( ! cbShips[detail].war[kteam] )
+        if ( cbShips[detail].war[team] )
 	{
-            cbShips[detail].war[team] = true;
             cbShips[detail].rwar[team] = true;
 	}
     }
