@@ -70,7 +70,6 @@ using namespace std;
 
 #define LISTEN_BACKLOG 5 /* # of requests we're willing to to queue */
 
-static char cbuf[BUFFER_SIZE_1024]; /* general purpose buffer */
 static char *progName;
 
 static int localOnly = false;   /* whether to only listen on loopback */
@@ -1803,15 +1802,15 @@ int welcome( int *unum )
             team = enabledTeams[rndint( 0, enabledTeams.size() - 1 )];
         }
 
+        std::string regBuf, nameBuf(name);
 
-        cbuf[0] = 0;
-        utAppendTitle(cbuf , team) ;
-        utAppendChar(cbuf , ' ') ;
-        i = strlen( cbuf );
-        strcat(cbuf , name) ;
-        cbuf[i] = (char)toupper( cbuf[i] );
+        nameBuf[0] = ::toupper(name[0]);
 
-        if ( ! clbRegister( name, cbuf, team, unum ) )
+        utAppendTitle(regBuf, team);
+        regBuf += ' ';
+        regBuf += nameBuf;
+
+        if ( ! clbRegister( name, regBuf.c_str(), team, unum ) )
 	{
             pktSendAck(PSEV_FATAL, PERR_REGISTER);
             return ( false );

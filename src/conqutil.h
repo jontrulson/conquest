@@ -42,7 +42,7 @@ real     utAngle( real fromx, real fromy, real tox, real toy );
 void     utAppendInt(char *str, int i);
 void     utAppendShipStatus(char *buf, int status);
 void     utAppendShipStatus(std::string& buf, int status);
-void     utAppendTitle(char *buf, int team);
+void     utAppendTitle(std::string& buf, int team);
 
 void     utAppendShip(char *str, int snum);
 void     utAppendShip(std::string& str, int snum);

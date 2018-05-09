@@ -2445,15 +2445,15 @@ void opuadd(void)
     }
 
 
-    buf[0] = 0;
-    utAppendTitle(buf , team) ;
-    utAppendChar(buf , ' ') ;
-    i = strlen( buf );
+    std::string regBuf, nameBuf(name);
 
-    strcat(buf, name) ;
-    buf[i] = (char)toupper( buf[i] );
-    buf[MAXUSERNAME - 1] = 0;
-    if ( ! clbRegister( name, buf, team, &unum ) )
+    nameBuf[0] = ::toupper(name[0]);
+
+    utAppendTitle(regBuf, team);
+    regBuf += ' ';
+    regBuf += nameBuf;
+
+    if ( ! clbRegister( name, regBuf.c_str(), team, &unum ) )
     {
         cdputs( "Error adding new user.", MSG_LIN2, 1 );
         cdmove( 0, 0 );

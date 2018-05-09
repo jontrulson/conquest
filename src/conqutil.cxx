@@ -269,26 +269,28 @@ void utAppendShipStatus(std::string& buf, int status)
 /*    int team */
 /*    char buf() */
 /*    utAppendTitle(buf , team)  */
-void utAppendTitle(char *buf, int team)
+void utAppendTitle(std::string& buf, int team)
 {
     switch ( team )
     {
-    case TEAM_FEDERATION:
-        strcat(buf , "Captain") ;
-        break;
-    case TEAM_ROMULAN:
-        strcat(buf , "Centurion") ;
-        break;
-    case TEAM_ORION:
-        strcat(buf , "Commander") ;
-        break;
-    case TEAM_KLINGON:
-        strcat(buf , "Kommander") ;
-        break;
+        case TEAM_FEDERATION:
+            buf += "Captain";
+            break;
+        case TEAM_ROMULAN:
+            buf += "Centurion";
+            break;
+        case TEAM_ORION:
+            buf += "Commander";
+            break;
+        case TEAM_KLINGON:
+            buf += "Kommander";
+            break;
+        default:
+            // shouldn't happen, but...
+            buf += "Pirate";
     }
 
     return;
-
 }
 
 
