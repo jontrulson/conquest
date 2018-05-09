@@ -197,7 +197,6 @@ const std::string utShipStr(int snum)
     return buf;
 }
 
-
 /*  utAppendShipStatus - append ship status string */
 /*  SYNOPSIS */
 /*    int status */
