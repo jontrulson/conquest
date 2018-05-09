@@ -1058,18 +1058,16 @@ void kiss(int snum, int prompt_flg)
 void opback( int lastrev, int *savelin )
 {
     int i, lin, col;
-    char cbuf[MSGMAXLINE];
     extern char *ConquestVersion;
     extern char *ConquestDate;
 
     static bool firstTime = true;
-    static char sfmt[MSGMAXLINE * 2];
+    static std::string sfmt;
 
     if (firstTime)
     {
         firstTime = false;
-        sprintf(sfmt,
-                "#%d#(#%d#%%c#%d#)#%d# - %%s",
+        sfmt = fmt::format("#{}#(#{}#%c#{}#)#{}# - %s",
                 LabelColor,
                 InfoColor,
                 LabelColor,
@@ -1079,21 +1077,22 @@ void opback( int lastrev, int *savelin )
     cdclear();
 
     lin = 1;
+    std::string cbuf;
     if ( lastrev == COMMONSTAMP )
     {
         uiPutColor(NoColor|CQC_A_BOLD);
         cdputc( "CONQUEST OPERATOR PROGRAM", lin );
         uiPutColor(YellowLevelColor);
-        sprintf( cbuf, "%s (%s)",
-                 ConquestVersion, ConquestDate);
-        cdputc( cbuf, lin+1 );
+        cbuf = fmt::format("{} ({})",
+                           ConquestVersion, ConquestDate);
+        cdputc( cbuf.c_str(), lin+1 );
     }
     else
     {
         uiPutColor(RedLevelColor);
-        sprintf( cbuf, "CONQUEST COMMON BLOCK MISMATCH %d != %d",
-                 lastrev, COMMONSTAMP );
-        cdputc( cbuf, lin );
+        cbuf = fmt::format("CONQUEST COMMON BLOCK MISMATCH {} != {}",
+                           lastrev, COMMONSTAMP );
+        cdputc( cbuf.c_str(), lin );
         uiPutColor(0);
     }
 
@@ -1110,59 +1109,59 @@ void opback( int lastrev, int *savelin )
     i = lin;
 
     col = 5;
-    cprintf(lin,col,ALIGN_NONE,sfmt, 'f', "flip the open/closed flag");
+    cprintf(lin,col,ALIGN_NONE,sfmt.c_str(), 'f', "flip the open/closed flag");
     lin++;
-    cprintf(lin,col,ALIGN_NONE,sfmt, 'd', "flip the doomsday machine!");
+    cprintf(lin,col,ALIGN_NONE,sfmt.c_str(), 'd', "flip the doomsday machine!");
     lin++;
-    cprintf(lin,col,ALIGN_NONE,sfmt, 'h', "hold the driver");
+    cprintf(lin,col,ALIGN_NONE,sfmt.c_str(), 'h', "hold the driver");
     lin++;
-    cprintf(lin,col,ALIGN_NONE,sfmt, 'I', "initialize");
+    cprintf(lin,col,ALIGN_NONE,sfmt.c_str(), 'I', "initialize");
     lin++;
-    cprintf(lin,col,ALIGN_NONE,sfmt, 'b', "big bang");
+    cprintf(lin,col,ALIGN_NONE,sfmt.c_str(), 'b', "big bang");
     lin++;
-    cprintf(lin,col,ALIGN_NONE,sfmt, 'H', "user history");
+    cprintf(lin,col,ALIGN_NONE,sfmt.c_str(), 'H', "user history");
     lin++;
-    cprintf(lin,col,ALIGN_NONE,sfmt, '/', "player list");
+    cprintf(lin,col,ALIGN_NONE,sfmt.c_str(), '/', "player list");
     lin++;
-    cprintf(lin,col,ALIGN_NONE,sfmt, '\\', "full player list");
+    cprintf(lin,col,ALIGN_NONE,sfmt.c_str(), '\\', "full player list");
     lin++;
-    cprintf(lin,col,ALIGN_NONE,sfmt, '?', "planet list");
+    cprintf(lin,col,ALIGN_NONE,sfmt.c_str(), '?', "planet list");
     lin++;
-    cprintf(lin,col,ALIGN_NONE,sfmt, '$', "debugging planet list");
+    cprintf(lin,col,ALIGN_NONE,sfmt.c_str(), '$', "debugging planet list");
     lin++;
-    cprintf(lin,col,ALIGN_NONE,sfmt, 'p', "edit a planet");
+    cprintf(lin,col,ALIGN_NONE,sfmt.c_str(), 'p', "edit a planet");
     lin++;
-    cprintf(lin,col,ALIGN_NONE,sfmt, 'w', "watch a ship");
+    cprintf(lin,col,ALIGN_NONE,sfmt.c_str(), 'w', "watch a ship");
     lin++;
-    cprintf(lin,col,ALIGN_NONE,sfmt, 'i', "info");
+    cprintf(lin,col,ALIGN_NONE,sfmt.c_str(), 'i', "info");
 
     lin = i;
     col = 45;
-    cprintf(lin,col,ALIGN_NONE,sfmt, 'r', "create a robot ship");
+    cprintf(lin,col,ALIGN_NONE,sfmt.c_str(), 'r', "create a robot ship");
     lin++;
-    cprintf(lin,col,ALIGN_NONE,sfmt, 'L', "review messages");
+    cprintf(lin,col,ALIGN_NONE,sfmt.c_str(), 'L', "review messages");
     lin++;
-    cprintf(lin,col,ALIGN_NONE,sfmt, 'm', "message from GOD");
+    cprintf(lin,col,ALIGN_NONE,sfmt.c_str(), 'm', "message from GOD");
     lin++;
-    cprintf(lin,col,ALIGN_NONE,sfmt, 'O', "options menu");
+    cprintf(lin,col,ALIGN_NONE,sfmt.c_str(), 'O', "options menu");
     lin++;
-    cprintf(lin,col,ALIGN_NONE,sfmt, 'T', "team stats");
+    cprintf(lin,col,ALIGN_NONE,sfmt.c_str(), 'T', "team stats");
     lin++;
-    cprintf(lin,col,ALIGN_NONE,sfmt, 'U', "user stats");
+    cprintf(lin,col,ALIGN_NONE,sfmt.c_str(), 'U', "user stats");
     lin++;
-    cprintf(lin,col,ALIGN_NONE,sfmt, 'S', "more user stats");
+    cprintf(lin,col,ALIGN_NONE,sfmt.c_str(), 'S', "more user stats");
     lin++;
-    cprintf(lin,col,ALIGN_NONE,sfmt, 's', "special stats page");
+    cprintf(lin,col,ALIGN_NONE,sfmt.c_str(), 's', "special stats page");
     lin++;
-    cprintf(lin,col,ALIGN_NONE,sfmt, 'a', "add a user");
+    cprintf(lin,col,ALIGN_NONE,sfmt.c_str(), 'a', "add a user");
     lin++;
-    cprintf(lin,col,ALIGN_NONE,sfmt, 'e', "edit a user");
+    cprintf(lin,col,ALIGN_NONE,sfmt.c_str(), 'e', "edit a user");
     lin++;
-    cprintf(lin,col,ALIGN_NONE,sfmt, 'R', "resign a user");
+    cprintf(lin,col,ALIGN_NONE,sfmt.c_str(), 'R', "resign a user");
     lin++;
-    cprintf(lin,col,ALIGN_NONE,sfmt, 'k', "kiss of death");
+    cprintf(lin,col,ALIGN_NONE,sfmt.c_str(), 'k', "kiss of death");
     lin++;
-    cprintf(lin,col,ALIGN_NONE,sfmt, 'q', "exit");
+    cprintf(lin,col,ALIGN_NONE,sfmt.c_str(), 'q', "exit");
 
     return;
 
