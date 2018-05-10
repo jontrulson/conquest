@@ -50,6 +50,9 @@ public:
         // the shiptypes work, we can then allow this one to be
         // dynamic too.
         m_maxtorps = 9;
+        // we hardcode this to 3 for now, until it's actually
+        // implemented in some fashion
+        m_maxshiptypes = 3;
     }
 
     // getters
@@ -80,6 +83,13 @@ public:
         // dynamic too.
         return 9;
     }
+    const unsigned int maxShiptypes() const
+    {
+        // This is hardcoded to 3 for now.  Someday when we complete
+        // the shiptypes work, we can then allow this one to be
+        // dynamic too.
+        return 3;
+    }
 
     // setters
     void setMaxPlanets(unsigned int max)
@@ -109,6 +119,13 @@ public:
         // dynamic too.
         m_maxtorps = 9;
     }
+    void setMaxShiptypes(unsigned int max)
+    {
+        // This is hardcoded to 3 for now.  Someday when we complete
+        // the shiptypes work, we can then allow this one to be
+        // dynamic too.
+        m_maxshiptypes = 3;
+    }
 
 private:
 
@@ -119,6 +136,7 @@ private:
     unsigned int m_maxhist;
     unsigned int m_maxmsgs;
     unsigned int m_maxtorps;
+    unsigned int m_maxshiptypes;
 };
 
 #endif // _CBMAXLIMITS_H

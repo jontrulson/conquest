@@ -825,7 +825,7 @@ void renderHud(bool dostats)
     int FPS = (int)getFPS();
     cqColor icl;
     real warp = cbShips[Context.snum].warp;
-    real maxwarp = cbShipTypes[cbShips[Context.snum].shiptype].warplim;
+    real maxwarp = cbShipTypes[cbShips[Context.snum].shiptype].warpMax;
     int steam = cbShips[Context.snum].team;
     int stype = cbShips[Context.snum].shiptype;
     int snum = Context.snum;

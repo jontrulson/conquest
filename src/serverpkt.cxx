@@ -1020,3 +1020,37 @@ spPlanetInfo_t *spktPlanetInfo(uint8_t pnum, int rec)
 
     return NULL;
 }
+
+spShiptype_t *spktShiptype(uint8_t index)
+{
+    static spShiptype_t stype;
+    memset((void *)&stype, 0, sizeof(spShiptype_t));
+
+    stype.type = SP_SHIPTYPE;
+    stype.index = index;
+
+    stype.engfac = (int32_t)htonl((int32_t)(cbShipTypes[index].engfac * 100.0));
+    stype.accelfac =
+        (int32_t)htonl((int32_t)(cbShipTypes[index].accelfac * 100.0));
+    stype.weafac = (int32_t)htonl((int32_t)(cbShipTypes[index].weafac * 100.0));
+
+    stype.armyMax = cbShipTypes[index].armyMax;
+    stype.warpMax = cbShipTypes[index].warpMax;
+    stype.torpMax = cbShipTypes[index].torpMax;
+
+    stype.torpwarp = (real)cbShipTypes[index].torpwarp;
+
+    stype.shieldMax =
+        (uint16_t)htons((uint16_t)(cbShipTypes[index].shieldMax));
+    stype.damageMax =
+        (uint16_t)htons((uint16_t)(cbShipTypes[index].damageMax));
+    stype.fuelMax =
+        (uint16_t)htons((uint16_t)(cbShipTypes[index].fuelMax));
+
+    stype.size = (real)htons((uint16_t)(cbShipTypes[index].size));
+
+    utStrncpy((char *)stype.name, cbShipTypes[index].name, MAXSTNAME);
+
+    return &stype;
+}
+

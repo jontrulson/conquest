@@ -66,6 +66,7 @@ shiptype {
   dammax     100
   torpmax    9
   fuelmax    999
+  size       210
 }
 
 shiptype {
@@ -80,6 +81,7 @@ shiptype {
   dammax     100
   torpmax    9
   fuelmax    999
+  size       225
 }
 
 shiptype {
@@ -94,6 +96,7 @@ shiptype {
   dammax     100
   torpmax    9
   fuelmax    999
+  size       240
 }
 
 # Planet definitions

@@ -64,7 +64,7 @@
 
 #define SP_PLANETINFO     21    /* planet's orbital characteristics */
 
-#define SP_NOT_USED1      22    /* was planloc2, now avail for use */
+#define SP_SHIPTYPE       22    /* shiptype definition */
 
 #define SP_TORPEVENT      23    /* torp launch/status */
 
@@ -144,8 +144,9 @@ typedef struct {
     uint32_t maxhist;
     uint32_t maxmsgs;
     uint32_t maxtorps;
+    uint32_t maxshiptypes;
 
-    uint32_t pad1[5];
+    uint32_t pad1[4];
 
     /* see conf.h for SERVER_*_SZ */
     uint8_t  servername[CONF_SERVER_NAME_SZ]; /* long server name */
@@ -472,6 +473,31 @@ typedef struct {
     int32_t  x;                 /* x10 */
     int32_t  y;                 /* x10 */
 } spDoomsday_t;
+
+typedef struct {
+    uint8_t  type;              /* SP_SHIPTYPE */
+    uint8_t  index;             // array index in ShipTypes_t
+    uint8_t  pad[2];
+
+    int32_t  engfac;            /* x100 */
+
+    int32_t  accelfac;          /* x100 */
+
+    int32_t  weafac;            /* x100 */
+
+    uint8_t armyMax;
+    uint8_t warpMax;
+    uint8_t torpMax;
+    uint8_t torpwarp;
+
+    uint16_t shieldMax;
+    uint16_t damageMax;
+
+    uint16_t fuelMax;
+    uint16_t size;
+
+    uint8_t name[MAXSTNAME];
+} spShiptype_t;
 
 
 /* client -> server packets */

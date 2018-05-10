@@ -2023,8 +2023,12 @@ void clbInitUniverse(bool cbIsLocal)
     }
 
     utStrncpy( cbShipTypes[ST_SCOUT].name, "Scout", MAXSTNAME );
-    cbShipTypes[ST_SCOUT].armylim = 7;
-    cbShipTypes[ST_SCOUT].warplim = 10.0;
+    cbShipTypes[ST_SCOUT].armyMax = 7;
+    cbShipTypes[ST_SCOUT].warpMax = 10;
+    cbShipTypes[ST_SCOUT].shieldMax = 100;
+    cbShipTypes[ST_SCOUT].damageMax = 100;
+    cbShipTypes[ST_SCOUT].torpMax = 9;
+    cbShipTypes[ST_SCOUT].fuelMax = 999;
     cbShipTypes[ST_SCOUT].engfac = 1.2;
     cbShipTypes[ST_SCOUT].accelfac = 1.6;
     cbShipTypes[ST_SCOUT].weafac = 0.83;
@@ -2032,8 +2036,12 @@ void clbInitUniverse(bool cbIsLocal)
     cbShipTypes[ST_SCOUT].size = 210.0;
 
     utStrncpy( cbShipTypes[ST_DESTROYER].name, "Destroyer", MAXSTNAME );
-    cbShipTypes[ST_DESTROYER].armylim = 9;
-    cbShipTypes[ST_DESTROYER].warplim = 9.0;
+    cbShipTypes[ST_DESTROYER].armyMax = 9;
+    cbShipTypes[ST_DESTROYER].warpMax = 9;
+    cbShipTypes[ST_DESTROYER].shieldMax = 100;
+    cbShipTypes[ST_DESTROYER].damageMax = 100;
+    cbShipTypes[ST_DESTROYER].torpMax = 9;
+    cbShipTypes[ST_DESTROYER].fuelMax = 999;
     cbShipTypes[ST_DESTROYER].engfac = 1.0;
     cbShipTypes[ST_DESTROYER].accelfac = 1.0;
     cbShipTypes[ST_DESTROYER].weafac = 1.0;
@@ -2041,8 +2049,12 @@ void clbInitUniverse(bool cbIsLocal)
     cbShipTypes[ST_DESTROYER].size = 225.0;
 
     utStrncpy( cbShipTypes[ST_CRUISER].name, "Cruiser", MAXSTNAME );
-    cbShipTypes[ST_CRUISER].armylim = 11;
-    cbShipTypes[ST_CRUISER].warplim = 8.0;
+    cbShipTypes[ST_CRUISER].armyMax = 11;
+    cbShipTypes[ST_CRUISER].warpMax = 8;
+    cbShipTypes[ST_CRUISER].shieldMax = 100;
+    cbShipTypes[ST_CRUISER].damageMax = 100;
+    cbShipTypes[ST_CRUISER].torpMax = 9;
+    cbShipTypes[ST_CRUISER].fuelMax = 999;
     cbShipTypes[ST_CRUISER].engfac = 0.8;
     cbShipTypes[ST_CRUISER].accelfac = 0.8;
     cbShipTypes[ST_CRUISER].weafac = 1.17;

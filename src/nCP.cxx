@@ -251,7 +251,7 @@ static void _dowarp( int snum, real warp )
 
     /* Handle ship limitations. */
 
-    warp = min( warp, cbShipTypes[cbShips[snum].shiptype].warplim );
+    warp = std::min( warp, (real)cbShipTypes[cbShips[snum].shiptype].warpMax );
     if (!sendCommand(CPCMD_SETWARP, (uint16_t)warp))
         return;
 
@@ -1326,10 +1326,10 @@ static void _initbeam()
     }
     else
     {
-        capacity = min( (unsigned int)rkills * 2,
-                        cbShipTypes[cbShips[snum].shiptype].armylim );
-        upmax = min( cbPlanets[pnum].armies - MIN_BEAM_ARMIES,
-                     capacity - cbShips[snum].armies );
+        capacity = (int)std::min( rkills * 2,
+                                  (real)cbShipTypes[cbShips[snum].shiptype].armyMax );
+        upmax = std::min( cbPlanets[pnum].armies - MIN_BEAM_ARMIES,
+                          capacity - cbShips[snum].armies );
     }
 
     /* If there are armies to beam but we're selfwar... */

@@ -66,7 +66,7 @@
 /*#define COMMONSTAMP 20001231           stardate? */
 /*#define COMMONSTAMP 20030829 */
 // #define COMMONSTAMP 20101027
-#define COMMONSTAMP 20180208
+#define COMMONSTAMP 20180509
 
 // Absolute maximum values for certain arrays.  Changing these will
 // require significant changes everywhere (CB/protocol mostly).  These
@@ -79,6 +79,7 @@
 #define ABS_MAXHIST                (256)
 #define ABS_MAXMSGS                (256)
 #define ABS_MAXUSERS               (65536)
+#define ABS_MAXSHIPTYPES           (256)
 
 // This is the maximum size of the universe - 200 million CU's in each
 // direction.  After hitting this limit, we'll simply wrap around.
@@ -138,12 +139,6 @@ typedef enum {
 #define TS_DETONATE 4           /* detonate signal sent */
 #define TS_FIREBALL 5           /* exploding, needed for display() */
 #define TS_RESERVED 6           /* client reserve slot flag */
-
-#define MAXSTNAME 32
-#define MAXNUMSHIPTYPES 3
-#define ST_SCOUT      0         /* scout vessel (Ori) */
-#define ST_DESTROYER  1         /* Destroyer (Fed/Kli) */
-#define ST_CRUISER    2         /* Cruiser (Rom) */
 
 #define REFIT_GRAND 10000       /* millis to complete a refit */
 
@@ -450,7 +445,7 @@ typedef enum {
 #define satwar(x,y) (cbShips[x].war[cbShips[y].team] || \
                      cbShips[y].war[cbShips[x].team])
 #define selfwar(x) (cbShips[x].war[cbShips[x].team])
-#define maxwarp(x) std::min(cbShipTypes[cbShips[x].shiptype].warplim,   \
+#define maxwarp(x) std::min((real)cbShipTypes[cbShips[x].shiptype].warpMax, \
                        std::max(0.0, round(((100.0 - cbShips[x].damage) / \
                                        100.0) * 12.0)))
 #define engeff(x) (((cbShips[x].engalloc + 50.0) / 100.0) *     \

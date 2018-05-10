@@ -272,6 +272,7 @@ int clientHello(const char *clientname)
     sHello.maxhist = ntohl(sHello.maxhist);
     sHello.maxmsgs = ntohl(sHello.maxmsgs);
     sHello.maxtorps = ntohl(sHello.maxtorps);
+    sHello.maxshiptypes = ntohl(sHello.maxshiptypes);
 
     // enforce 0 termination in case of hostile server
     sHello.servername[CONF_SERVER_NAME_SZ - 1] = 0;
@@ -286,13 +287,15 @@ int clientHello(const char *clientname)
           sHello.flags);
     utLog("           MOTD: %s", sHello.motd);
     utLog("SERVER LIMITS: planets: %u ships: %u users: %u hist: %u msgs: %u"
-          " torps: %u\n",
+          " torps: %u",
           sHello.maxplanets,
           sHello.maxships,
           sHello.maxusers,
           sHello.maxhist,
           sHello.maxmsgs,
           sHello.maxtorps);
+    utLog("\t shiptypes: %u\n",
+          sHello.maxshiptypes);
 
     // At this point, we need to unmap the current CB if mapped, setup
     // our cbLimits based on what the server told us, and then remap

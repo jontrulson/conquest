@@ -911,3 +911,41 @@ void processPacket(char *buf)
 
     return;
 }
+
+int procShiptype(char *buf)
+{
+    spShiptype_t *stype = (spShiptype_t *)buf;
+
+    if (!pktIsValid(SP_SHIPTYPE, buf))
+        return false;
+
+    uint8_t index = stype->index;
+
+    if (index >= MAXNUMSHIPTYPES)
+    {
+        utLog("%s: got invalid shiptype index %d", __FUNCTION__,
+              (int)index);
+        return false;
+    }
+
+    cbShipTypes[index].engfac = ((real)ntohl(stype->engfac) / 100.0);
+    cbShipTypes[index].accelfac = ((real)ntohl(stype->accelfac) / 100.0);
+    cbShipTypes[index].weafac = ((real)ntohl(stype->weafac) / 100.0);
+
+    cbShipTypes[index].torpwarp = (real)stype->torpwarp;
+
+    cbShipTypes[index].armyMax = stype->armyMax;
+    cbShipTypes[index].warpMax = stype->warpMax;
+    cbShipTypes[index].torpMax = stype->torpMax;
+
+    cbShipTypes[index].shieldMax = (real)ntohs(stype->shieldMax);
+    cbShipTypes[index].damageMax = (real)ntohs(stype->damageMax);
+    cbShipTypes[index].fuelMax = (real)ntohs(stype->fuelMax);
+
+    cbShipTypes[index].size = (real)ntohs(stype->size);
+
+    utStrncpy(cbShipTypes[index].name, (char *)stype->name, MAXSTNAME);
+
+    return true;
+}
+

@@ -28,6 +28,8 @@
 #ifndef _CONQINIT_H
 #define _CONQINIT_H
 
+#include "shiptype.h"
+
 #define CQI_NAMELEN 64           /* maximum length of a WKN or filename (no
                                     path) */
 
@@ -50,16 +52,20 @@ typedef struct _cqi_global_init {
 /* shiptypes - not used yet */
 typedef struct _cqi_shiptype_init {
     char name[MAXSTNAME];
+
     real engfac;
     real weafac;
     real accelfac;
-    int  torpwarp;
-    int  warpmax;
-    int  armymax;
-    int  shmax;
-    int  dammax;
-    int  torpmax;
-    int  fuelmax;
+
+    real torpwarp;
+    real size;
+
+    real warpmax;
+    real armymax;
+    real shmax;
+    real dammax;
+    real torpmax;
+    real fuelmax;
 } cqiShiptypeInitRec_t, *cqiShiptypeInitPtr_t ;
 
 /* planets */

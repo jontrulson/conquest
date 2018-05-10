@@ -62,6 +62,7 @@ int             procAck(char *buf); /* handles ACK and ACKMSG */
 int             procClientStat(char *buf);
 int             procFrame(char *buf);
 int             procAckUDP(char *buf);
+int             procShiptype(char *buf);
 
 void            processPacket(char *buf);
 
@@ -90,7 +91,7 @@ static dispatchProc_t cprocDispatchTable_0007[] = {
     procHistory,                  /* SP_HISTORY */
     procDoomsday,                 /* SP_DOOMSDAY */
     procPlanetInfo,               /* SP_PLANETINFO */
-    pktNotImpl,                   /* was PLANETLOC2, avail for REUSE */
+    procShiptype,                 /* SP_SHIPTYPE */
     procTorpEvent                 /* SP_TORPEVENT */
 };
 

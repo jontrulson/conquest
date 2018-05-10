@@ -954,13 +954,14 @@ int updateClient(int force)
     static int sentallusers = false; /* we will send all user data once. */
     static time_t oldtime = 0;
     time_t newtime = time(0);
-    int seciter = false;
+    bool seciter = false;
     static time_t histtime = 0;   /* timers that try to save some time() */
     static time_t infotime = 0;
     static time_t teamtime = 0;
-    int dohist = false;
-    int doinfo = false;
-    int doteam = false;
+    bool dohist = false;
+    bool doinfo = false;
+    bool doteam = false;
+    bool doshiptypes = true;
 
     if (force)
     {                           /* we need to reload everything */
@@ -969,6 +970,7 @@ int updateClient(int force)
         infotime = 0;
         teamtime = 0;
         sentallusers = false;
+        doshiptypes = true;
     }
 
 
@@ -1003,7 +1005,6 @@ int updateClient(int force)
         teamtime = newtime;
     }
 
-
     if (!sentallusers)
     {                           /* send all valid user data the first time */
         sentallusers = true;
@@ -1011,6 +1012,15 @@ int updateClient(int force)
             if (ULIVE(i))
                 if (!sendUser(sInfo.sock, i))
                     return false;
+    }
+
+    // shiptypes
+    if (doshiptypes)
+    {
+        for (int i=0; i<cbLimits.maxShiptypes(); i++)
+            sendShiptype(i);
+
+        doshiptypes = false;
     }
 
     for (i=0; i<cbLimits.maxShips(); i++)
@@ -1880,6 +1890,7 @@ static int hello(void)
     shello.maxhist = htonl(cbLimits.maxHist());
     shello.maxmsgs = htonl(cbLimits.maxMsgs());
     shello.maxtorps = htonl(cbLimits.maxTorps());
+    shello.maxshiptypes = htonl(cbLimits.maxShiptypes());
 
     utStrncpy((char *)shello.servername, SysConf.ServerName,
               CONF_SERVER_NAME_SZ);

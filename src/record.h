@@ -55,7 +55,7 @@ typedef enum {
                                       sizeof(uint8_t) +         \
                                       sizeof(uint32_t) +        \
                                       sizeof(uint16_t) +        \
-                                      (sizeof(uint32_t) * 6)))
+                                      (sizeof(uint32_t) * 7)))
 
 
 #pragma pack(1)
@@ -77,6 +77,7 @@ typedef struct _fheader {
     uint32_t maxhist;
     uint32_t maxmsgs;
     uint32_t maxtorps;
+    uint32_t maxshiptypes;
 
     uint8_t pad[FHEADER_PAD];	/* padding */
 } fileHeader_t;

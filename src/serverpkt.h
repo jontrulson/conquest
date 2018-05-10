@@ -62,4 +62,6 @@ spDoomsday_t   *spktDoomsday(int rec);
 
 spPlanetInfo_t *spktPlanetInfo(uint8_t pnum, int rec);
 
+spShiptype_t   *spktShiptype(uint8_t index);
+
 #endif /* _SERVERPKT_H */

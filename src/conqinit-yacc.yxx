@@ -1315,6 +1315,10 @@ bool cqiLoadRC(int rcid, const char *filename, int verbosity, int debugl)
                   cbLimits.maxUsers(),
                   cbLimits.maxHist(),
                   cbLimits.maxMsgs());
+            utLog("%s: cbLimits: torps: %u, shiptypes: %u",
+                  __FUNCTION__,
+                  cbLimits.maxTorps(),
+                  cbLimits.maxShiptypes());
         }
     }
 
@@ -1527,12 +1531,13 @@ void dumpUniverse(void)
         printf("  weafac     %f\n", cbShipTypes[i].weafac);
         printf("  accelfac   %f\n", cbShipTypes[i].accelfac);
         printf("  torpwarp   %d\n", (int)cbShipTypes[i].torpwarp);
-        printf("  warpmax    %d\n", (int)cbShipTypes[i].warplim);
-        printf("  armymax    %d\n", cbShipTypes[i].armylim);
-        printf("  shmax      100\n");
-        printf("  dammax     100\n");
-        printf("  torpmax    9\n");
-        printf("  fuelmax    999\n");
+        printf("  warpmax    %u\n", cbShipTypes[i].warpMax);
+        printf("  armymax    %u\n", cbShipTypes[i].armyMax);
+        printf("  shmax      %f\n", cbShipTypes[i].shieldMax);
+        printf("  dammax     %f\n", cbShipTypes[i].damageMax);
+        printf("  torpmax    %u\n", cbShipTypes[i].torpMax);
+        printf("  fuelmax    %f\n", cbShipTypes[i].fuelMax);
+        printf("  size       %f\n", cbShipTypes[i].size);
         printf("}\n\n");
     }
 

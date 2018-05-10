@@ -176,7 +176,8 @@ void procSetWarp(cpCommand_t *swarp)
     }
 
     /* Handle ship limitations. */
-    cbShips[snum].dwarp = min( warp, cbShipTypes[cbShips[snum].shiptype].warplim );
+    cbShips[snum].dwarp =
+        std::min( warp, (real)cbShipTypes[cbShips[snum].shiptype].warpMax );
 
     /* Warn about damage limitations. */
     mw = maxwarp( snum );
@@ -1423,14 +1424,15 @@ void procBeam(cpCommand_t *cmd)
     }
     else
     {
-        capacity = min( (unsigned int)rkills * 2,
-                        cbShipTypes[cbShips[snum].shiptype].armylim );
-        upmax = min( cbPlanets[pnum].armies - MIN_BEAM_ARMIES,
-                     capacity - cbShips[snum].armies );
+        capacity = (int)std::min( rkills * 2.0,
+                                  (real)cbShipTypes[cbShips[snum].shiptype].armyMax );
+        upmax = std::min( cbPlanets[pnum].armies - MIN_BEAM_ARMIES,
+                          capacity - cbShips[snum].armies );
     }
 
     /* If there are armies to beam but we're selfwar... */
-    if ( upmax > 0 && selfwar(snum) && cbShips[snum].team == cbPlanets[pnum].team )
+    if ( upmax > 0 && selfwar(snum)
+         && cbShips[snum].team == cbPlanets[pnum].team )
     {
         if ( downmax <= 0 )
 	{

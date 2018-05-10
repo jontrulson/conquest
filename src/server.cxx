@@ -605,3 +605,26 @@ void serverStartUDP(pid_t pid, const cpCommand_t *ccmd)
 
     return;
 }
+
+bool sendShiptype(int index)
+{
+    spShiptype_t *stype;
+
+#if defined(DEBUG_SERVERSEND)
+    utLog("sendShipType: index = %d", index);
+#endif
+
+    if ((stype = spktShiptype(index)))
+    {
+        if (pktWrite(PKT_SENDTCP, stype) <= 0)
+            return false;
+
+        if (Context.recmode == RECMODE_ON)
+            recWriteEvent(stype);
+
+        return true;
+    }
+
+    return false;
+}
+

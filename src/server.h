@@ -74,6 +74,7 @@ int sendTeam(int sock, uint8_t team, int force);
 int sendcbConqInfo(int sock, int force);
 int sendHistory(int sock, int hnum);
 int sendDoomsday(int sock);
+bool sendShiptype(int index);
 
 void serverStartUDP(pid_t pid, const cpCommand_t *ccmd);
 

@@ -265,12 +265,12 @@ int recReadHeader(fileHeader_t *fhdr)
     fhdr->maxhist = ntohl(fhdr->maxhist);
     fhdr->maxmsgs = ntohl(fhdr->maxmsgs);
     fhdr->maxtorps = ntohl(fhdr->maxtorps);
+    fhdr->maxshiptypes = ntohl(fhdr->maxshiptypes);
 
 #if defined(DEBUG_REC)
     utLog("recReadHeader: vers = %d, rectime = %d, cmnrev = %d\n",
           fhdr->vers, fhdr->rectime, fhdr->cmnrev);
 #endif
-
 
     return(true);
 }
@@ -312,6 +312,7 @@ int recInitOutput(int unum, time_t thetime, int snum, int isserver)
     fhdr.maxhist = htonl(cbLimits.maxHist());
     fhdr.maxmsgs = htonl(cbLimits.maxMsgs());
     fhdr.maxtorps = htonl(cbLimits.maxTorps());
+    fhdr.maxshiptypes = htonl(cbLimits.maxShiptypes());
 
     if (!recWriteBuf(&fhdr, sizeof(fileHeader_t)))
         return(false);

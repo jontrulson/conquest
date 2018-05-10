@@ -31,15 +31,32 @@
 
 #include "conqdef.h"
 
+#define MAXSTNAME 32
+
+#define MAXNUMSHIPTYPES 3
+
+#define ST_SCOUT      0         /* Scout vessel (Ori) */
+#define ST_DESTROYER  1         /* Destroyer (Fed/Kli) */
+#define ST_CRUISER    2         /* Cruiser (Rom) */
+
 typedef struct {
 
-    char name[MAXSTNAME];	/* "Destroyer, Scout, Cruiser" */
-    unsigned int armylim; /* maximum armies this shiptype can carry */
-    real warplim;		/* maximum warp based on shiptype */
-    real engfac;		/* shiptype engine constants */
-    real accelfac;		/* shiptype acceleration constants */
-    real weafac;		/* shiptype weapons constants */
-    real torpwarp;		/* torp speed for shiptype */
+    char name[MAXSTNAME];       /* "Destroyer, Scout, Cruiser" */
+
+    // max limits for this ship type
+    uint8_t armyMax;            /* maximum armies this shiptype can carry */
+    uint8_t warpMax;            /* maximum warp based on shiptype */
+    uint8_t torpMax;            /* max number of torps */
+
+    real shieldMax;             /* max shields value */
+    real damageMax;             /* max damage value */
+    real fuelMax;               /* max amount of fuel */
+
+    real engfac;                /* shiptype engine constants */
+    real accelfac;              /* shiptype acceleration constants */
+    real weafac;                /* shiptype weapons constants */
+
+    real torpwarp;              /* torp speed for shiptype */
 
     real size;                  /* in CU's */
 } ShipType_t;
