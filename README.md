@@ -91,6 +91,15 @@ make
 sudo make install
 ```
 
+## Mailing List
+
+There is a low volume mailing list for Conquest.  You can subscribe
+[here](https://radscan.com/cgi-bin/mailman/listinfo/conquest).
+
+## IRC Channel
+
+There is an IRC Channel (#conquest) for Conquest on chat.freenode.net.
+
 ## Further information
 
 In time, some of the the following documents will be converted to
