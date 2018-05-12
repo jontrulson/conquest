@@ -86,8 +86,6 @@
 #include <algorithm>
 using namespace std;
 
-#define MSGMAXLINE 90 			/* used for screen formatting */
-
 /* Maximum screen dimensions. */
 static int maxlin;                              /* maximum line */
 static int maxcol;                              /* maximum column */

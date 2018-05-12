@@ -195,7 +195,7 @@ typedef enum {
 #define USTAT_TOTALSTATS 14
 
 #define MAXDATESIZE 20          /* hh:mm:ss ddmmmyy */
-#define MSGMAXLINE 90           /* maximum size for formatting messages */
+#define MSGMAXLINE 80           /* maximum size for formatting messages */
 
 /* Tokens for slastmsg(), must be negative. */
 #define LMSG_NEEDINIT -1        /* need to initialize slastmsg */

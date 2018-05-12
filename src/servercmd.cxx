@@ -26,6 +26,10 @@
 //
 
 #include "c_defs.h"
+
+#include <vector>
+#include <string>
+
 #include "conqdef.h"
 #include "cb.h"
 #include "conf.h"
@@ -130,10 +134,11 @@ static void stopRecord(void)
     return;
 }
 
-static void CreateRobots(int snumFrom, char *arg1, char *arg2, char *arg3)
+static void CreateRobots(int snumFrom, const char *arg1,
+                         const char *arg2, const char *arg3)
 {
     int i, j, num, anum, unum, snum, warlike;
-    char buf[MSGMAXLINE];
+    char buf[MESSAGE_SIZE];
 
     /* arg1 = username, arg2 is number to create (default 0), arg3, if
        present, makes them warlike (default peaceful) */
@@ -171,7 +176,7 @@ static void CreateRobots(int snumFrom, char *arg1, char *arg2, char *arg3)
     /* now create them. */
 
     anum = 0;
-    for ( i = 1; i <= num; i++ )
+    for ( i=0; i<num; i++ )
     {
         if ( ! newrob( &snum, unum ) )
 	{
@@ -199,9 +204,9 @@ static void CreateRobots(int snumFrom, char *arg1, char *arg2, char *arg3)
           cbUsers[unum].alias,
           cbUsers[unum].username);
 
-    sprintf( buf, "%sAutomation %s (%s) is now flying ",
-             (warlike) ? "Warlike " : "",
-             cbUsers[unum].alias, cbUsers[unum].username );
+    snprintf( buf, MESSAGE_SIZE, "%sAutomation %s (%s) is now flying ",
+              (warlike) ? "Warlike " : "",
+              cbUsers[unum].alias, cbUsers[unum].username );
     if ( anum == 1 )
         utAppendShip(buf , snum) ;
     else
@@ -215,16 +220,16 @@ static void CreateRobots(int snumFrom, char *arg1, char *arg2, char *arg3)
 }
 
 /* some of this ripped right from conqoper kiss() */
-static void Murder(int from, char *what)
+static void Murder(int from, const char *what)
 {
     static const char *cant_kill_ship_str = "You can't kill ship %c%d (%s) status (%s).";
     static const char *kill_ship_str1 = "Killing ship %c%d (%s).";
     static const char *kill_ship_str2 = "Killing ship %c%d (%s) user (%s).";
     static const char *no_user_str = "No such user.";
     static const char *no_ship_str = "No such ship.";
-    static const char *not_flying_str = "User %s (%s) isn't flying right now.";
+    static const char *not_flying_str = "User %12.s (%12.s) isn't flying right now.";
     int snum = -1, unum = -1, didany;
-    char ssbuf[MSGMAXLINE], mbuf[MSGMAXLINE];
+    char ssbuf[MESSAGE_SIZE], mbuf[MESSAGE_SIZE];
 
     uint16_t fromShip = (uint16_t)from;
 
@@ -282,7 +287,7 @@ static void Murder(int from, char *what)
 
     if ( ! didany )
     {
-        sprintf(mbuf, not_flying_str, cbUsers[unum].username,
+        snprintf(mbuf, MESSAGE_SIZE, not_flying_str, cbUsers[unum].username,
                 cbUsers[unum].alias);
         clbStoreMsg(MSG_FROM_GOD, 0, MSG_TO_SHIP, fromShip, mbuf);
     }
@@ -290,97 +295,36 @@ static void Murder(int from, char *what)
     return;
 }
 
-/* Split up a string into a command and 3 arg strings. */
-/* this is fairly brute-force hacky */
-static void _parseArgs(char *str, char **cmd, char **arg1,
-                       char **arg2, char **arg3)
+/* Split up a string into a vector of strings (thanks stackexchange!) */
+static std::vector<std::string> _parseArgs(const std::string& str, char chr)
 {
-    char *ch, *base;
-    int i, j, len;
+    std::string::const_iterator first = str.cbegin();
+    std::string::const_iterator second = std::find(first+1, str.cend(), chr);
+    std::vector<std::string> vec;
 
-    if (!str || !*str)
-        return;
-
-    /* first, go through the string, removing any leading/trailing
-       spaces.  We also 'compress' multiple spaces into a
-       single one. */
-
-    base = str;
-    /* leading */
-    while (*base)
-        if (*base == ' ')
-            base++;
+    while(second != str.cend())
+    {
+        if (first[0] == chr)
+            vec.emplace_back(first + 1, second);
         else
-            break;
-
-    /* trailing */
-    len = strlen(base);
-
-    while (len > 0 && base[len - 1] == ' ')
-    {
-        base[len - 1] = 0;
-        len--;
+            vec.emplace_back(first, second);
+        first = second;
+        second = std::find(second+1, str.cend(), chr);
     }
 
-    /* now compress them */
-    for ( i = 0; base[i] != 0; )
-        if ( base[i] == ' ' && base[i+1] == ' ' )
-            for ( j = i; base[j] != 0; j++)
-                base[j] = base[j+1];
-        else
-            i++;
-
-    /* finally.  Now just go thru and set up the pointers that have a
-       value */
-
-    /* command */
-    if (*base)
-        *cmd = base;
-    /* look for another arg */
-    if ((ch = strchr(base, ' ')))
-    {
-        *ch = 0;
-        base = ch + 1;
-    }
+    if (first[0] == chr)
+        vec.emplace_back(first + 1, str.cend());
     else
-        return;                     /* we're done */
+        vec.emplace_back(first, str.cend());
 
-    /* args */
-    if (*base)
-        *arg1 = base;
-    /* look for another arg */
-    if ((ch = strchr(base, ' ')))
-    {
-        *ch = 0;
-        base = ch + 1;
-    }
-    else
-        return;                     /* we're done */
-
-    if (*base)
-        *arg2 = base;
-    /* look for another arg */
-    if ((ch = strchr(base, ' ')))
-    {
-        *ch = 0;
-        base = ch + 1;
-    }
-    else
-        return;                     /* we're done */
-
-    if (*base)
-        *arg3 = base;
-
-    return;
+    return vec;
 }
 
 int checkOperExec(msgFrom_t from, uint16_t fromDetail,
                   msgTo_t to, uint16_t toDetail, char *msg)
 {
-    char tmsg[MESSAGE_SIZE], umsg[MESSAGE_SIZE];
-    char *p;
-    static const char *oerror = "/recon, recoff, r[obot], k[ill]";
-    char *cmd, *arg1, *arg2, *arg3;
+    std::string tmsg;
+    static const char *oerror = "/recon, /recoff, /r[obot], /k[ill]";
 
     /* first, if the message isn't to GOD, ignore */
     if (to != MSG_TO_GOD)
@@ -390,10 +334,13 @@ int checkOperExec(msgFrom_t from, uint16_t fromDetail,
     if (from != MSG_FROM_SHIP || fromDetail >= cbLimits.maxShips())
         return false;
 
-    utStrncpy(tmsg, msg, MESSAGE_SIZE);
+    tmsg = msg;
 
     if (tmsg[0] != '/')
         return false;               /* not for us. */
+
+    // erase the leading slash
+    tmsg.erase(0, 1);
 
     /* it is for us, now check for allowability */
     if (!UISOPER(cbShips[fromDetail].unum))
@@ -402,45 +349,46 @@ int checkOperExec(msgFrom_t from, uint16_t fromDetail,
                     MSG_TO_SHIP, fromDetail,
                     "You are not a Conquest Operator.");
         utLog("conquestd: EXEC from unprivileged ship: %d, '%s'", fromDetail,
-              tmsg);
+              tmsg.c_str());
         return false;
     }
 
     /* ok, let's see what is up. */
-    p = &(tmsg[1]);
-
-    if (!*p)
+    if (tmsg.empty())
     {
+        // just sent a '/', send usage msg
         clbStoreMsg(MSG_FROM_GOD, 0, MSG_TO_SHIP, fromDetail, oerror);
         return false;
     }
 
     /* check commands requiring args (no upper-case) */
 
-    cmd = arg1 = arg2 = arg3 = NULL;
+    std::string cmd;
+    std::vector<std::string> cmdVec = _parseArgs(tmsg, ' ');
 
-    _parseArgs(p, &cmd, &arg1, &arg2, &arg3);
+#if 0
+    for (int i=0; i<cmdVec.size(); i++)
+        utLog("JET: vec %d = '%s'", i, cmdVec[i].c_str());
+#endif
 
-    if (!cmd)
+    if (cmdVec.empty())
     {
         clbStoreMsg(MSG_FROM_GOD, 0, MSG_TO_SHIP, fromDetail, oerror);
         return false;
     }
 
-    /* uppercase only version */
-    utStrncpy(umsg, cmd, MESSAGE_SIZE);
-    utToUpperCase(umsg);
+    cmd = cmdVec[0];
 
     /* check the simple commands first - look at the upcase version */
 
     /* recording */
-    if (!strncmp(umsg, "RECON", 5))
+    if (cmd == "recon")
     {
         startRecord(true);
         return true;
     }
 
-    if (!strncmp(umsg, "RECOFF", 6))
+    if (cmd == "recoff")
     {
         stopRecord();
         Context.recmode = RECMODE_OFF;
@@ -452,11 +400,11 @@ int checkOperExec(msgFrom_t from, uint16_t fromDetail,
     /* kill something */
     if (cmd[0] == 'K' || cmd[0] == 'k')
     {                           /* fur is murder! */
-        if (!arg1)
+        if (cmdVec.size() < 2)
             clbStoreMsg(MSG_FROM_GOD, 0, MSG_TO_SHIP, fromDetail,
-                        "Usage: k[ill] <what>");
+                        "Usage: /k[ill] <what>");
         else
-            Murder(fromDetail, arg1);
+            Murder(fromDetail, cmdVec[1].c_str());
 
         return true;
     }
@@ -464,16 +412,29 @@ int checkOperExec(msgFrom_t from, uint16_t fromDetail,
     /* create robots */
     if (cmd[0] == 'R' || cmd[0] == 'r')
     {                           /* little tin men */
-        if (!arg1)
+        // must have 1 arg, can have 2 or 3 args
+        switch(cmdVec.size())
+        {
+            case 2:
+                CreateRobots((int)fromDetail, cmdVec[1].c_str(),
+                             NULL, NULL);
+                break;
+            case 3:
+                CreateRobots((int)fromDetail, cmdVec[1].c_str(),
+                             cmdVec[2].c_str(), NULL);
+                break;
+            case 4:
+                CreateRobots((int)fromDetail, cmdVec[1].c_str(),
+                             cmdVec[2].c_str(), cmdVec[3].c_str());
+                break;
+            default:
             clbStoreMsg(MSG_FROM_GOD, 0, MSG_TO_SHIP, fromDetail,
-                        "Usage: r[obot] <username> [<number> <warlike if non-null>]");
-        else
-            CreateRobots((int)fromDetail, arg1, arg2, arg3);
+                        "Usage: /r[obot] <username> [<number> <warlike if non-null>]");
+            break;
+        }
 
         return true;
     }
-
-
 
     /* that's all we understand for now. */
 
