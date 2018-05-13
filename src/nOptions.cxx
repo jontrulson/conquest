@@ -98,10 +98,10 @@ static const int umenuopts = 4; /* don't exceed 9 - one char input is used */
 static int flin, llin, clin, pages, curpage;
 static const int items_per_page = 18;
 
-#define MAXOPTCOLS 128
-// FIXME make this a std::vector
-static int cvec[MAXOPTCOLS];         /* hopefully big enough */
-static int maxuopts;
+// an indirect vecotr used to reference the conf array
+static std::vector<int> cvec;
+
+static int maxuopts = 0;
 static int maxsopts = 0;        /* not impl yet */
 static char *macrovec[MAX_MACROS];
 
@@ -772,11 +772,9 @@ scrNode_t *nOptionsInit(int what, int setnode, int rnode)
 
     retnode = rnode;
 
-    for (i=0; i < MAXOPTCOLS; i++) /* init cvec */
-        cvec[i] = -1;
-
-    k = 0;
-    for (i=0; i < CfEnd; i++)
+    // init cvec
+    cvec.clear();
+    for (int i=0; i < CfEnd; i++)
     {
         if (ConfigData[i].ConfType != CTYPE_STRING &&
             ConfigData[i].ConfType != CTYPE_BOOL &&
@@ -785,10 +783,10 @@ scrNode_t *nOptionsInit(int what, int setnode, int rnode)
             continue;
         }
 
-        cvec[k++] = i;
+        cvec.push_back(i);
     }
 
-    maxuopts = k;
+    maxuopts = cvec.size();
     if (state == S_USRMENU)
     {
         /* init the macrovec array */
