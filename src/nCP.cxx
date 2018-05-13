@@ -258,11 +258,7 @@ static void _dowarp( int snum, real warp )
     cbuf = fmt::format("Warp {}.", int(warp));
     uiPutMsg(cbuf, MSG_LIN1 );
 
-    /* we set it locally since the server won't send it to us */
-    cbShips[snum].dwarp = warp;
-
     return;
-
 }
 
 /* get a target */

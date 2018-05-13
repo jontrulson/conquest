@@ -50,11 +50,15 @@
 
 void cqsSetWarp(real warp)
 {
+    if (Context.snum < 0)
+        return;
+
     static cqsHandle warpHandle = CQS_INVHANDLE;
     static cqsHandle engineHandle = CQS_INVHANDLE;
     static int warpufx = -1;
     static int warpdfx = -1;
     static int enginefx = -1;
+
     real dwarp = cbShips[Context.snum].dwarp;
     static int lastwarpdir = -1;
     int warpdir;
@@ -107,8 +111,8 @@ void cqsSetWarp(real warp)
     utLog ("warp = %f, dwarp %f lastwarp %f", warp, dwarp, lastwarp);
 #endif
 
-    if (warp == dwarp || warp <= 0.0 || dwarp < 0 ||
-        warp == maxwarp(Context.snum))
+    if (warp == dwarp || warp <= 0.0
+        || warp == maxwarp(Context.snum))
     {                           /* we are where we want to be */
         if (warpHandle != CQS_INVHANDLE)
             cqsEffectStop(warpHandle, false);
