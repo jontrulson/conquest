@@ -59,7 +59,7 @@ void display( int snum )
 {
     int i, j, minenemy, minsenemy;
     char ch;
-    int dobeep, lsmap;
+    bool dobeep, lsmap;
     int palertcol;
     real scale, cenx, ceny, dis, mindis, minsdis;
     real prevdam;
@@ -441,7 +441,7 @@ void display( int snum )
         /* self destruct fuse */
         hudSetDestruct(snum);
 
-        if ( UserConf.DoAlarms && dobeep )
+        if ( UserConf.DoAlarms && dobeep && cbShips[snum].status == SS_LIVE)
             mglBeep(MGL_BEEP_ALERT);
 
     } /* end of ship stats display */

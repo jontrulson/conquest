@@ -212,7 +212,7 @@ void hudSetWarp(int snum);
 void hudSetHeading(int snum);
 void hudSetAlertStatus(int snum, int asnum, alertLevel_t astatus);
 void hudSetKills(int snum);
-void hudSetShields(int snum, int *dobeep);
+void hudSetShields(int snum, bool *dobeep);
 void hudSetDamage(int snum, real *lastdamage);
 void hudSetFuel(int snum);
 void hudSetAlloc(int snum);

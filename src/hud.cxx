@@ -262,7 +262,7 @@ void hudSetKills(int snum)
 }
 
 
-void hudSetShields(int snum, int *dobeep)
+void hudSetShields(int snum, bool *dobeep)
 {
     int i, k;
 

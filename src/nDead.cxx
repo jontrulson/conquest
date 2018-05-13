@@ -107,6 +107,8 @@ void nDeadInit(void)
         prm.buflen = MAXLASTWORDS;
     }
 
+    /* turn off any running effects */
+    cqsEffectStop(CQS_INVHANDLE, true);
 
     setONode(&nDeadNode);
 
@@ -297,8 +299,6 @@ static nodeStatus_t nDeadInput(int ch)
         if (ch == TERM_ABORT || ch == TERM_EXTRA) /* ESC or TAB */
         {
             setONode(NULL);
-            /* turn off any running effects */
-            cqsEffectStop(CQS_INVHANDLE, true);
 
             switch (ch)
             {
