@@ -285,11 +285,12 @@ int procShipLoc(char *buf)
     if (Context.recmode == RECMODE_ON)
         recWriteEvent(buf);
 
-    cbShips[snum].head = (real)((real)ntohs(sshiploc->head) / 10.0);
-    cbShips[snum].warp = (real)((real)sshiploc->warp / 10.0);
-
-    cbShips[snum].x = (real)((real)((int32_t)ntohl(sshiploc->x)) / 10.0);
-    cbShips[snum].y = (real)((real)((int32_t)ntohl(sshiploc->y)) / 10.0);
+    cbShips[snum].head = ((real)ntohs(sshiploc->head) / 10.0);
+    cbShips[snum].warp = (real)((int16_t)ntohs((uint16_t)sshiploc->warp) / 10.0);
+    cbShips[snum].dwarp = (real)sshiploc->dwarp;
+    // sshiploc->flags - not used yet
+    cbShips[snum].x = ((real)((int32_t)ntohl(sshiploc->x)) / 10.0);
+    cbShips[snum].y = ((real)((int32_t)ntohl(sshiploc->y)) / 10.0);
 
     return true;
 }

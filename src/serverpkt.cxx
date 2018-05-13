@@ -413,7 +413,13 @@ spShipLoc_t *spktShipLoc(uint8_t snum, int rec)
 
     sshiploc.type = SP_SHIPLOC;
     sshiploc.snum = snum;
-    sshiploc.warp = (int8_t)(cbShips[snum].warp * 10.0);
+    sshiploc.warp = (int16_t)(htons((uint16_t)(cbShips[snum].warp * 10.0)));
+    sshiploc.dwarp = (uint8_t)cbShips[snum].dwarp;
+    // We might use this in the future to indicate to the client that
+    // it should do it's own ship movement computation (dead
+    // reckoning) to reduce the number of packets we need to send per
+    // ship.
+    sshiploc.flags = 0;
 
     /* we need to ensure that if we are doing UDP, and we haven't
        updated a ship in awhile (causing UDP traffic), force an update

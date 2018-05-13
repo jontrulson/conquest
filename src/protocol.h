@@ -277,10 +277,9 @@ typedef struct {                /* ship location packets */
     uint8_t  snum;              /* ship num */
     uint16_t head;              /* x10 */
 
-    int8_t   warp;              /* x10 */
-    uint8_t pad1;
-    uint8_t pad2;
-    uint8_t pad3;
+    int16_t  warp;              /* x10 */
+    uint8_t  dwarp;             // x1 (no scaling. always positive)
+    uint8_t  flags;
 
     int32_t  x;                 /* x10 */
 
