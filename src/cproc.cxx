@@ -906,6 +906,10 @@ void processPacket(char *buf)
     }
     else
     {
+        if (cqDebug >= 5)
+            utLog("%s: Processing pkt type: %d (%s)", __FUNCTION__,
+                  pkttype, serverPackets[(uint8_t)pkttype].name);
+
         /* dispatch it */
         PKT_PROCSP(buf);
     }

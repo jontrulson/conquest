@@ -961,7 +961,7 @@ int updateClient(int force)
     bool dohist = false;
     bool doinfo = false;
     bool doteam = false;
-    bool doshiptypes = true;
+    static bool doshiptypes = true;
 
     if (force)
     {                           /* we need to reload everything */
