@@ -47,9 +47,6 @@
 #include "ui.h"
 #include "cprintf.h"
 
-// FIXME - get rid of this
-static char cbuf[BUFFER_SIZE_1024]; /* general purpose buffer */
-
 /*  histlist - display the last usage list */
 void mcuHistList()
 {
@@ -446,32 +443,28 @@ void mcuPlanetList()
 /*  playlist - list ships */
 void mcuPlayList( bool doall )
 {
-    int i, unum, status, lin, col;
+    // FIXME - get rid of this
+    std::string cbuf;
+
+    int unum, status, lin, col;
     int fline, lline, fship;
-    char sbuf[20];
-    char kbuf[20];
-    char pidbuf[20];
-    char ubuf[MAXUSERNAME + 2];
     int ch;
-    static const char *hd1="ship  name          pseudonym              kills      pid";
-    killedBy_t kb;
-    uint16_t detail;
 
     /* Do some screen setup. */
     cdclear();
     uiPutColor(LabelColor);  /* dwp */
 
-    utStrncpy(cbuf, hd1, sizeof(cbuf)) ;
+    clbShipline(SHIPLINE_HDR_OPER, true, cbuf);
 
-    col = (int)(Context.maxcol - strlen( cbuf )) / (int)2;
+    col = (int)(Context.maxcol - cbuf.size() ) / (int)2;
     lin = 2;
-    cdputs( cbuf, lin, col );
+    cdputs( cbuf.c_str(), lin, col );
 
-    for ( i = 0; cbuf[i] != 0; i = i + 1 )
+    for ( int i=0; i < cbuf.size(); i++ )
         if ( cbuf[i] != ' ' )
             cbuf[i] = '-';
     lin = lin + 1;
-    cdputs( cbuf, lin, col );
+    cdputs( cbuf.c_str(), lin, col );
     uiPutColor(0);          /* dwp */
 
     fline = lin + 1;				/* first line to use */
@@ -480,68 +473,46 @@ void mcuPlayList( bool doall )
 
     while(true) /* repeat- while */
     {
-        i = fship;
+        int i = fship;
         cdclrl( fline, lline - fline + 1 );
         lin = fline;
         while ( i < cbLimits.maxShips() && lin <= lline )
 	{
+            cbuf.clear();
             status = cbShips[i].status;
 
-            kb = cbShips[i].killedBy;
-            detail = cbShips[i].killedByDetail;
+            killedBy_t kb = cbShips[i].killedBy;
+            uint16_t detail = cbShips[i].killedByDetail;
+
             if ( status == SS_LIVE ||
                  ( doall && ( status != SS_OFF || kb != KB_NONE ) ) )
 	    {
-                sbuf[0] = 0;
-                utAppendShip(sbuf , i) ;
-                strcat(sbuf, " ") ;
-                utAppendChar(sbuf, cbShipTypes[cbShips[i].shiptype].name[0]) ;
+                clbShipline(i, true, cbuf);
 
-                unum = cbShips[i].unum;
-                if ( unum >= 0 && unum < cbLimits.maxUsers() )
-		{
-                    if (SROBOT(i)) /* robot */
-                        strcpy(pidbuf, " ROBOT");
-                    else if (SVACANT(i))
-                        strcpy(pidbuf, "VACANT");
-                    else
-		    {
-                        sprintf(pidbuf, "%6d", cbShips[i].pid);
-		    }
-
-                    strcpy(ubuf, cbUsers[unum].username);
-
-                    sprintf(kbuf, "%6.1f", (cbShips[i].kills + cbShips[i].strkills));
-                    sprintf( cbuf, "%-5s %-13.13s %-21.21s %-8s %6s",
-                             sbuf, ubuf, cbShips[i].alias,
-                             kbuf, pidbuf );
-		}
-                else
-                    sprintf( cbuf, "%-5s %13s %21s %8s %6s", sbuf,
-                             " ", " ", " ", " " );
                 if ( doall && kb != KB_NONE )
 		{
-                    strcat(cbuf, "  ") ;
-                    utAppendKilledBy(cbuf , kb, detail) ;
+                    cbuf += "  ";
+                    utAppendKilledBy(cbuf, kb, detail) ;
 		}
 
                 uiPutColor(YellowLevelColor);
 
-                cdputs( cbuf, lin, col );
+                cdputs( cbuf.c_str(), lin, col );
                 uiPutColor(0);
                 if ( doall && status != SS_LIVE )
 		{
-                    cbuf[0] = 0;
-                    utAppendShipStatus(cbuf , status) ;
+                    cbuf.clear();
+                    utAppendShipStatus(cbuf, status) ;
 
                     uiPutColor(YellowLevelColor);
-                    cdputs( cbuf, lin, col - 2 - strlen( cbuf ) );
+                    cdputs( cbuf.c_str(), lin, col - 2 - cbuf.size() );
                     uiPutColor(0);
 		}
+                lin++;
 	    }
-            i = i + 1;
-            lin = lin + 1;
-	}
+            i++; // next ship
+	} // while ( i < cbLimits.maxShips() && lin <= lline )
+
         if ( i >= cbLimits.maxShips() )
 	{
             /* We're displaying the last page. */

@@ -31,10 +31,6 @@
 
 #include <string>
 
-// For querying the 2 headers in clbStatline()
-#define STATLINE_HDR1 (-1)
-#define STATLINE_HDR2 (-2)
-
 real     utAccurateDist( real curvel, real newvel, real acc );
 bool     utSafeCToI(int *num, const std::string& buf, int offset = 0);
 real     utSubAngle( real a1, real a2);
@@ -49,6 +45,7 @@ void     utAppendShip(std::string& str, int snum);
 const std::string utShipStr(int snum);
 
 void     utAppendKilledBy(char *buf, killedBy_t kb, uint16_t detail);
+void     utAppendKilledBy(std::string& buf, killedBy_t kb, uint16_t detail);
 int      utArrowsToDir( const char *str, real *dir );
 void     utSetLogConfig(int usesys, int echostderr);
 

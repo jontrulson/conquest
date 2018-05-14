@@ -107,51 +107,61 @@ void utAppendInt(char *str, int i)
 /*    utAppendKilledBy(buf , kb)  */
 void utAppendKilledBy(char *buf, killedBy_t kb, uint16_t detail)
 {
+    std::string buffer;
+
+    utAppendKilledBy(buffer, kb, detail);
+
+    strcat(buf, buffer.c_str());
+
+    return;
+}
+
+void utAppendKilledBy(std::string& buf, killedBy_t kb, uint16_t detail)
+{
 
     switch ( kb )
     {
     case KB_SELF:
-        strcat(buf , "self") ;
+        buf += "self";
         break;
     case KB_NEGENB:
-        strcat(buf , "negenb") ;
+        buf += "negenb";
         break;
     case KB_CONQUER:
-        strcat(buf , "conquer") ;
+        buf += "conquer";
         break;
     case KB_NEWGAME:
-        strcat(buf , "newgame") ;
+        buf += "newgame";
         break;
     case KB_EVICT:
-        strcat(buf , "evict") ;
+        buf += "evict";
         break;
     case KB_SHIT:
-        strcat(buf , "shit") ;
+        buf += "shit";
         break;
     case KB_DOOMSDAY:
-        strcat(buf , "doomsday") ;
+        buf += "doomsday";
         break;
     case KB_GOTDOOMSDAY:
-        strcat(buf , "gotdoomsday") ;
+        buf += "gotdoomsday";
         break;
     case KB_GOD:
-        strcat(buf , "GOD") ;
+        buf += "GOD";
         break;
     case KB_SHIP:
         if (detail < cbLimits.maxShips())
-            utAppendShip(buf, detail) ;
+            utAppendShip(buf, detail);
         break;
     case KB_PLANET:
-        if (detail < cbLimits.maxPlanets() )
-            strcat(buf , cbPlanets[detail].name) ;
+        if (detail < cbLimits.maxPlanets())
+            buf += cbPlanets[detail].name ;
         break;
     default:
-        utAppendInt(buf, (int)kb) ;
+        buf += std::to_string((int)kb);
         break;
     }
 
     return;
-
 }
 
 /*  utAppendShip - append a ship number to a string */
@@ -204,32 +214,13 @@ const std::string utShipStr(int snum)
 /*    utAppendShipStatus(buf , status)  */
 void utAppendShipStatus(char *buf, int status)
 {
-    switch ( status )
-    {
-    case SS_OFF:
-        strcat(buf , "off") ;
-        break;
-    case SS_ENTERING:
-        strcat(buf , "entering") ;
-        break;
-    case SS_LIVE:
-        strcat(buf , "live") ;
-        break;
-    case SS_DYING:
-        strcat(buf , "dying") ;
-        break;
-    case SS_DEAD:
-        strcat(buf , "dead") ;
-        break;
-    case SS_RESERVED:
-        strcat(buf , "reserved") ;
-        break;
-    default:
-        utAppendInt(buf, status) ;
-        break;
-    }
-    return;
+    std::string buffer;
 
+    utAppendShipStatus(buffer, status);
+
+    strcat(buf, buffer.c_str());
+
+    return;
 }
 
 void utAppendShipStatus(std::string& buf, int status)

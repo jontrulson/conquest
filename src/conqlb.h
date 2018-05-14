@@ -39,6 +39,15 @@
 
 #include "protocol.h"
 
+// For querying the 2 headers in clbStatline()
+#define STATLINE_HDR1 (-1)
+#define STATLINE_HDR2 (-2)
+
+// For querying the 2 headers in clbShipline()
+#define SHIPLINE_HDR (-1)
+#define SHIPLINE_HDR_OPER (-2)
+
+
 int      clbRegister( const std::string& lname, const std::string& rname,
                       int team, int *unum );
 void     clbChalkup( int snum );
@@ -59,6 +68,7 @@ int      clbTakePlanet( int pnum, int snum );
 void     clbUserline( int unum, int snum, std::string& buf,
                       bool showgods, bool showteam );
 void     clbStatline( int unum, std::string& buf );
+void     clbShipline( int snum, bool isoper, std::string& buf );
 int      clbZeroPlanet( int pnum, int snum );
 std::string clbWarPrompt(int snum, int twar[]);
 

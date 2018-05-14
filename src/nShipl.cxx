@@ -89,18 +89,17 @@ static nodeStatus_t nShiplDisplay(dspConfig_t *dsp)
     std::string cbuf;
     int lin, col;
 
-    static const std::string hd2 =
-        "ship  name          pseudonym              kills     type";
-    static const std::string hd2_ul =
-        "----  ----          ---------              -----     ----";
-
-    col = (int)(Context.maxcol - hd2.size()) / 2;
+    clbShipline(SHIPLINE_HDR, false, cbuf);
 
     lin = 2;
-    cprintf(lin, col, ALIGN_NONE, "#%d#%s", LabelColor, hd2.c_str());
+    col = (int)(Context.maxcol - cbuf.size()) / 2;
+    cprintf(lin, col, ALIGN_NONE, "#%d#%s", LabelColor, cbuf.c_str());
 
+    for ( int i=0; i < cbuf.size(); i++ )
+        if ( cbuf[i] != ' ' )
+            cbuf[i] = '-';
     lin++;
-    cprintf(lin, col, ALIGN_NONE, "#%d#%s", LabelColor, hd2_ul.c_str());
+    cprintf(lin, col, ALIGN_NONE, "#%d#%s", LabelColor, cbuf.c_str());
 
     lin++; // first line to use
     shipIdx = 0;
@@ -111,64 +110,36 @@ static nodeStatus_t nShiplDisplay(dspConfig_t *dsp)
             int i = shipOffset + shipIdx;
             shipIdx++;
 
-            if ( cbShips[i].status == SS_LIVE )
-            {
-                std::string sbuf;
-                utAppendShip(sbuf , i) ;
-                sbuf += " ";
-                sbuf += cbShipTypes[cbShips[i].shiptype].name[0];
+            if ( cbShips[i].status != SS_LIVE )
+                continue;
 
-                int unum = cbShips[i].unum;
-                if ( unum >= 0 && unum < cbLimits.maxUsers() )
-                {
-                    std::string pidbuf;
-                    if (SROBOT(i)) /* robot */
-                        pidbuf = " ROBOT";
-                    else if (SVACANT(i))
-                        pidbuf = "VACANT";
-                    else
-                        pidbuf = "  LIVE";
-
-                    cbuf =
-                        fmt::format("{:<5s} {:<13.13s} {:<21.21s} "
-                                    "{:6.1f}   {:6s}",
-                                    sbuf,
-                                    cbUsers[unum].username,
-                                    cbShips[i].alias,
-                                    (cbShips[i].kills + cbShips[i].strkills),
-                                    pidbuf);
-                }
+            clbShipline(i, false, cbuf);
+            int color;
+            if (snum >= 0 && snum < cbLimits.maxShips() )
+            {		/* a normal ship view */
+                if ( i == snum )    /* it's ours */
+                    color = NoColor | CQC_A_BOLD;
+                else if (satwar(i, snum)) /* we're at war with it */
+                    color = RedLevelColor;
+                else if (cbShips[i].team == cbShips[snum].team
+                         && !selfwar(snum))
+                    color = GreenLevelColor; /* it's a team ship */
                 else
-                    cbuf = fmt::format("{:<5s}", sbuf);
-
-                int color;
-                if (snum >= 0 && snum < cbLimits.maxShips() )
-                {		/* a normal ship view */
-                    if ( i == snum )    /* it's ours */
-                        color = NoColor | CQC_A_BOLD;
-                    else if (satwar(i, snum)) /* we're at war with it */
-                        color = RedLevelColor;
-                    else if (cbShips[i].team == cbShips[snum].team
-                             && !selfwar(snum))
-                        color = GreenLevelColor; /* it's a team ship */
-                    else
-                        color = YellowLevelColor;
-                }
-                else
-                { /* not conqoper, and not a valid ship (main menu) */
-                    if (cbUsers[Context.unum].war[cbShips[i].team])  /* we're at war with ships's
-                                                                        team */
-                        color = RedLevelColor;
-                    else if (cbUsers[Context.unum].team == cbShips[i].team)
-                        color = GreenLevelColor; /* it's a team ship */
-                    else
-                        color = YellowLevelColor;
-                }
-
-                cprintf(lin, col, ALIGN_NONE, "#%d#%s", color, cbuf.c_str());
-
-                lin++;
+                    color = YellowLevelColor;
             }
+            else
+            { /* not conqoper, and not a valid ship (main menu) */
+                if (cbUsers[Context.unum].war[cbShips[i].team])
+                    color = RedLevelColor; // war
+                else if (cbUsers[Context.unum].team == cbShips[i].team)
+                    color = GreenLevelColor; // it's a team ship
+                else
+                    color = YellowLevelColor; // meh
+            }
+
+            cprintf(lin, col, ALIGN_NONE, "#%d#%s", color, cbuf.c_str());
+
+            lin++;
 
             if (lin == MSG_LIN1)
                 break; // out of while

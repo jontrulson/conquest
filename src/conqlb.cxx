@@ -1065,6 +1065,69 @@ void clbStatline( int unum, std::string& buf )
     return;
 }
 
+void clbShipline( int snum, bool isoper, std::string& buf )
+{
+    static const std::string hd =
+        "ship  name          pseudonym              kills     type";
+    static const std::string hd_oper =
+        "ship  name          pseudonym              kills      pid";
+
+    if ( snum < 0 || snum >= cbLimits.maxShips() )
+    {
+        // caller is requesting headers
+        if (snum == SHIPLINE_HDR)
+            buf = hd;
+        else if (snum == SHIPLINE_HDR_OPER)
+            buf = hd_oper;
+        else
+            buf.clear();
+        return;
+    }
+
+    buf.clear();
+
+    std::string sbuf;
+    utAppendShip(sbuf, snum) ;
+    sbuf += " ";
+    sbuf += cbShipTypes[cbShips[snum].shiptype].name[0];
+
+    int unum = cbShips[snum].unum;
+    if ( unum >= 0 && unum < cbLimits.maxUsers())
+    {
+        std::string pidbuf;
+        if (SROBOT(snum)) /* robot */
+            pidbuf = " ROBOT";
+        else if (SVACANT(snum))
+            pidbuf = "VACANT";
+        else
+        {
+            if (isoper)
+                pidbuf = fmt::format("{:6d}", cbShips[snum].pid);
+            else
+                pidbuf = "  LIVE";
+        }
+
+        buf =
+            fmt::format("{:<5s} {:<13.13s} {:<21.21s} "
+                        "{:6.1f}   {:6s}",
+                        sbuf,
+                        cbUsers[unum].username,
+                        cbShips[snum].alias,
+                        (cbShips[snum].kills + cbShips[snum].strkills),
+                        pidbuf);
+    }
+    else
+        buf = fmt::format("{:<5s} {:<13.13s} {:<21.21s} "
+                          "{:8s}   {:6s}",
+                          sbuf,
+                          "",
+                          "",
+                          "",
+                          "");
+
+    return;
+}
+
 
 /*  clbZeroPlanet - zero a planet (DOES SPECIAL LOCKING)
  *  SYNOPSIS
@@ -2617,8 +2680,8 @@ void clbZeroShip( int snum )
     cbShips[snum].status = SS_OFF;
     cbShips[snum].killedBy = KB_NONE;
     cbShips[snum].killedByDetail = 0;
-    cbShips[snum].unum = 0;
-    cbShips[snum].team = 0;
+    cbShips[snum].unum = -1;
+    cbShips[snum].team = TEAM_NOTEAM;
     cbShips[snum].pid = 0;
     cbShips[snum].x = 0.0;
     cbShips[snum].y = 0.0;
