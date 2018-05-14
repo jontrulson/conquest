@@ -916,7 +916,7 @@ void clbUserline( int unum, int snum, std::string& buf,
 {
     int team;
     static const std::string hd1 =
-        " name          pseudonym           team  skill  wins  loss mxkls ships      time";
+        " name          pseudonym           team  skill  wins  loss mxkls ships     time";
 
     if ( unum < 0 || unum >= cbLimits.maxUsers() )
     {
@@ -975,7 +975,7 @@ void clbUserline( int unum, int snum, std::string& buf,
     utFormatMinutes( (cbUsers[unum].stats[USTAT_SECONDS] + 30 ) / 60,
                      timstr );
 
-    buf = fmt::format("{} {:5d} {:5d} {:5d} {:5d} {:>9s}",
+    buf = fmt::format("{} {:5d} {:5d} {:5d} {:5d} {:>8s}",
                       usrData,
                       cbUsers[unum].stats[USTAT_WINS],
                       cbUsers[unum].stats[USTAT_LOSSES],
