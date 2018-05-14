@@ -887,10 +887,9 @@ int opPlanetMatch( char str[], int *pnum )
 /*    kiss */
 void kiss(int snum, int prompt_flg)
 {
-
     int unum;
     char ch, buf[MSGMAXLINE], mbuf[MSGMAXLINE], ssbuf[MSGMAXLINE];
-    int didany;
+    bool didany;
     static const char *prompt_str = "Kill what (<cr> for driver)? ";
     static const char *kill_driver_str = "Killing the driver.";
     static const char *cant_kill_ship_str = "You can't kill ship %c%d (%s) status (%s).";
@@ -905,7 +904,7 @@ void kiss(int snum, int prompt_flg)
     if (prompt_flg)
     {
         cdclrl( MSG_LIN1, 2 );
-        if (snum == 0)
+        if (snum < 0)
             buf[0] = 0;
         else
             sprintf(buf, "%d", snum);
@@ -922,7 +921,7 @@ void kiss(int snum, int prompt_flg)
     }
     else
     {
-        if (snum == 0)
+        if (snum < 0)
             return;
         else
             sprintf(buf,"%d",snum);
