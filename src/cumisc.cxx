@@ -445,7 +445,6 @@ void mcuPlanetList()
 /*  playlist - list ships */
 void mcuPlayList( bool doall )
 {
-    // FIXME - get rid of this
     std::string cbuf;
 
     int unum, status, lin, col;
@@ -473,7 +472,7 @@ void mcuPlayList( bool doall )
     lline = MSG_LIN1;				/* last line to use */
     fship = 0;					/* first user in uvec */
 
-    while(true) /* repeat- while */
+    while(true)
     {
         int i = fship;
         cdclrl( fline, lline - fline + 1 );
