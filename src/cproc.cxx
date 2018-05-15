@@ -152,9 +152,6 @@ int procShip(char *buf)
     if (snum < 0 || snum >= cbLimits.maxShips())
         return false;
 
-#if defined(DEBUG_CLIENTPROC)
-    utLog("PROC SHIP: snum = %d", snum);
-#endif
     if (Context.recmode == RECMODE_ON)
         recWriteEvent(buf);
 
@@ -162,6 +159,12 @@ int procShip(char *buf)
     cbShips[snum].team = sship->team;
     cbShips[snum].unum = ntohs(sship->unum);
     cbShips[snum].shiptype = sship->shiptype;
+
+#if defined(DEBUG_CLIENTPROC)
+    utLog("PROC SHIP: snum = %d, team = %d, shiptype = %d", snum,
+          cbShips[snum].team,
+          cbShips[snum].shiptype);
+#endif
 
     for (i=0; i<NUMPLAYERTEAMS; i++)
     {

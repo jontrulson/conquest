@@ -136,6 +136,7 @@ int pbInitReplay(char *fname, time_t *elapsed)
         cbLimits.setMaxHist(40);
         cbLimits.setMaxMsgs(60);
         cbLimits.setMaxTorps(9);
+        cbLimits.setMaxShiptypes(3);
     }
     else
     {
@@ -146,6 +147,7 @@ int pbInitReplay(char *fname, time_t *elapsed)
         cbLimits.setMaxHist(recFileHeader.maxhist);
         cbLimits.setMaxMsgs(recFileHeader.maxmsgs);
         cbLimits.setMaxTorps(recFileHeader.maxtorps);
+        cbLimits.setMaxShiptypes(recFileHeader.maxshiptypes);
     }
 
     // now map the common block (but not if we are only scanning -
@@ -219,7 +221,13 @@ int pbProcessPackets(void)
         if (pkttype < 0 || pkttype >= serverPktMax)
             fprintf(stderr, "%s: Invalid pkttype %d\n", __FUNCTION__, pkttype);
         else
+        {
+            if (cqDebug >= 5)
+                utLog("%s: Processing pkt type: %d (%s)", __FUNCTION__,
+                      pkttype, serverPackets[(uint8_t)pkttype].name);
+
             PKT_PROCSP(buf);
+        }
     }
 
     return pkttype;

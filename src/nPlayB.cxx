@@ -221,17 +221,27 @@ void nPlayBInit(void)
 
 static nodeStatus_t nPlayBDisplay(dspConfig_t *dsp)
 {
+    // We don't want to do anything here until the ship's team and
+    // type are valid, which may require reading some packets first
+    // (in Idle())
+
+    // In particular - a ships team is now initialized to TEAM_NOTEAM
+    // on initialization of the CB, so this would core until the
+    // ship's team is read in via an spShip_t packet.
+
+    if (Context.snum < 0 || cbShips[Context.snum].team >= NUMPLAYERTEAMS
+        || cbShips[Context.snum].shiptype >= MAXNUMSHIPTYPES )
+        return NODE_OK;
+
     /* Viewer */
     renderViewer(UserConf.doVBG);
 
     /* Main/Hud */
-    if (Context.snum >= 0)
-        set_header(Context.snum);
+    set_header(Context.snum);
 
     set_rectime();
 
-    if (Context.snum >= 0)
-        renderHud(false);
+    renderHud(false);
 
     if (recMsg.msgbuf[0])
     {
