@@ -94,7 +94,9 @@ static nodeStatus_t nHistlDisplay(dspConfig_t *dsp)
         bool isResigned = false;
 
         // adjust based on histptr being the next available slot.
-        i = mod( i - 1, cbLimits.maxHist() );
+        i--;
+        if (i < 0)
+            i = cbLimits.maxHist() - 1;
 
         // No username, no entry
         if (!cbHistory[i].username[0])

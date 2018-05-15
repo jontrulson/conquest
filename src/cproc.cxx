@@ -660,6 +660,14 @@ int procHistory(char *buf)
 
     utStrncpy(cbHistory[hnum].username, (char *)hist->username, MAXUSERNAME);
 
+#if defined(DEBUG_CLIENTPROC)
+    utLog("%s: hnum = %d, hptr = %d, unum = %d name = (%s)",
+          __FUNCTION__, hnum,
+          cbConqInfo->histptr,
+          cbHistory[hnum].unum,
+          cbHistory[hnum].username);
+#endif
+
     return true;
 }
 
