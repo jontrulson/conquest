@@ -1178,7 +1178,7 @@ int clbZeroPlanet( int pnum, int snum )
                 cbTeams[cbShips[snum].team].stats[TSTAT_GENOCIDE] += 1;
 
                 std::string buf;
-                buf = fmt::format("{}{} ({}) genocided the %s team!",
+                buf = fmt::format("{}{} ({}) genocided the {} team!",
                                   cbTeams[cbShips[snum].team].teamchar,
                                   snum,
                                   cbShips[snum].alias,
