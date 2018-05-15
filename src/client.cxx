@@ -294,7 +294,7 @@ int clientHello(const char *clientname)
           sHello.maxhist,
           sHello.maxmsgs,
           sHello.maxtorps);
-    utLog("\t shiptypes: %u\n",
+    utLog("               shiptypes: %u\n",
           sHello.maxshiptypes);
 
     // At this point, we need to unmap the current CB if mapped, setup
