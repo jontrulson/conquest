@@ -1115,7 +1115,9 @@ static int _review(void)
     }
     else
     {
-        msg = mod( msg - 1, cbLimits.maxMsgs() );
+        msg--;
+        if (msg < 0)
+            msg = cbLimits.maxMsgs() - 1;
         if (msg == lastone)
         {
             state = S_NONE;
@@ -2952,10 +2954,14 @@ static nodeStatus_t nCPInput(int ch)
 	    case '<':
 	    case CQ_KEY_UP:
 	    case CQ_KEY_LEFT:
-                tmsg = mod( msg - 1, cbLimits.maxMsgs() );
+                tmsg = msg - 1;
+                if (tmsg < 0)
+                    tmsg = cbLimits.maxMsgs() - 1;
                 while(!clbCanRead( snum, tmsg ) && tmsg != lastone)
 		{
-                    tmsg = mod( tmsg - 1, cbLimits.maxMsgs() );
+                    tmsg--;
+                    if (tmsg < 0)
+                        tmsg = cbLimits.maxMsgs() - 1;
 		}
                 if (tmsg == lastone)
 		{

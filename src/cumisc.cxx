@@ -583,10 +583,14 @@ int mcuReviewMsgs( int slm )
 	    case '<':
 	    case KEY_UP:
 	    case KEY_LEFT:
-                tmsg = mod( msg - 1, cbLimits.maxMsgs() );
+                tmsg = msg - 1;
+                if (tmsg < 0)
+                    tmsg = cbLimits.maxMsgs() - 1;
                 while(!clbCanRead( -1, tmsg ) && tmsg != lastone)
 		{
-                    tmsg = mod( tmsg - 1, cbLimits.maxMsgs() );
+                    tmsg--;
+                    if (tmsg < 0)
+                        tmsg = cbLimits.maxMsgs() - 1;
 		}
                 if (tmsg == lastone)
 		{
@@ -619,7 +623,9 @@ int mcuReviewMsgs( int slm )
 	}
         else
 	{
-            msg = mod( msg - 1, cbLimits.maxMsgs() );
+            msg--;
+            if (msg < 0)
+                msg = cbLimits.maxMsgs() - 1;
             if (msg == lastone)
                 Done = true;
 	}
