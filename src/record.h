@@ -126,7 +126,6 @@ void recUpdateFrame(void);
 void recWriteEvent(void *data);
 
 int  recInitReplay(char *fname, time_t *elapsed);
-void recGenTorpLoc(void);
 
 
 #endif /* RECORD_H_INCLUDED */

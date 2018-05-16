@@ -219,18 +219,6 @@ static nodeStatus_t nPlayIdle(void)
         Context.redraw = true;                /* want redraw first time */
         Context.msgok = true;                 /* ok to get messages */
 
-        /* start recording if neccessary */
-        if (Context.recmode == RECMODE_STARTING)
-        {
-            if (recInitOutput(Context.unum, time(0), Context.snum,
-                              false))
-            {
-                Context.recmode = RECMODE_ON;
-            }
-            else
-                Context.recmode = RECMODE_OFF;
-        }
-
         /* need to tell the server to resend all the crap it already
            sent in menu - our ship may have chenged */
         sendCommand(CPCMD_RELOAD, 0);

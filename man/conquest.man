@@ -64,10 +64,6 @@ WxH (ex: 1024x768). The default is currently 1280x720.
 Specify an alternate metaserver.  The default is
 \fIconquest.radscan.com\fP. 
 .TP 8
-.B \-r <record file> 
-Record the game to <record file>.  Specify an extension of .cqr so you
-know what it is.
-.TP 8
 .B \-s <server[:port]> 
 Connect to server running on \fIserver\fP port \fIport\fP.  The default
 port is 1701.

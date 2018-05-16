@@ -110,9 +110,6 @@ int procUser(char *buf)
     if (unum < 0 || unum >= cbLimits.maxUsers())
         return false;
 
-    if (Context.recmode == RECMODE_ON)
-        recWriteEvent(buf);
-
     cbUsers[unum].team = suser->team;
     cbUsers[unum].type = (userTypes_t)suser->userType;
 
@@ -151,9 +148,6 @@ int procShip(char *buf)
     snum = sship->snum;
     if (snum < 0 || snum >= cbLimits.maxShips())
         return false;
-
-    if (Context.recmode == RECMODE_ON)
-        recWriteEvent(buf);
 
     cbShips[snum].status = sship->status;
     cbShips[snum].team = sship->team;
@@ -227,9 +221,6 @@ int procShipSml(char *buf)
     utLog("PROC SHIPSML: snum = %d", snum);
 #endif
 
-    if (Context.recmode == RECMODE_ON)
-        recWriteEvent(buf);
-
     /* we need to mask out map since it's always local */
     cbShips[snum].flags =
         (ntohl(sshipsml->flags) & ~SHIP_F_MAP) | SMAP(snum);
@@ -285,9 +276,6 @@ int procShipLoc(char *buf)
     utLog("PROC SHIPLOC: snum = %d", snum);
 #endif
 
-    if (Context.recmode == RECMODE_ON)
-        recWriteEvent(buf);
-
     cbShips[snum].head = ((real)ntohs(sshiploc->head) / 10.0);
     cbShips[snum].warp = (real)((int16_t)ntohs((uint16_t)sshiploc->warp) / 10.0);
     cbShips[snum].dwarp = (real)sshiploc->dwarp;
@@ -310,9 +298,6 @@ int procPlanet(char *buf)
 
     if (pnum < 0 || pnum >= cbLimits.maxPlanets())
         return false;
-
-    if (Context.recmode == RECMODE_ON)
-        recWriteEvent(buf);
 
     cbPlanets[pnum].type = splan->ptype;
     cbPlanets[pnum].team = splan->team;
@@ -339,9 +324,6 @@ int procPlanetSml(char *buf)
 
     if (pnum < 0 || pnum >= cbLimits.maxPlanets())
         return false;
-
-    if (Context.recmode == RECMODE_ON)
-        recWriteEvent(buf);
 
     for (i=0; i<NUMPLAYERTEAMS; i++)
         if (splansml->scanned & (1 << i))
@@ -371,9 +353,6 @@ int procPlanetLoc(char *buf)
     if (pnum < 0 || pnum >= cbLimits.maxPlanets())
         return false;
 
-    if (Context.recmode == RECMODE_ON)
-        recWriteEvent(buf);
-
     cbPlanets[pnum].armies = (int)((int16_t)ntohs(splanloc->armies));
     cbPlanets[pnum].x = (real)((real)((int32_t)ntohl(splanloc->x)) / 10.0);
     cbPlanets[pnum].y = (real)((real)((int32_t)ntohl(splanloc->y)) / 10.0);
@@ -402,10 +381,6 @@ int procPlanetInfo(char *buf)
     if (primary < 0 || primary >= cbLimits.maxPlanets())
         return false;
 
-    /* we will record them if we get them */
-    if (Context.recmode == RECMODE_ON)
-        recWriteEvent(buf);
-
     cbPlanets[pnum].primary = primary;
     cbPlanets[pnum].flags = ntohl(splaninfo->flags);
     cbPlanets[pnum].orbrad = (real)((real)((uint32_t)ntohl(splaninfo->orbrad)) / 10.0);
@@ -432,9 +407,6 @@ int procTorp(char *buf)
     if (tnum < 0 || tnum >= cbLimits.maxTorps())
         return false;
 
-    if (Context.recmode == RECMODE_ON)
-        recWriteEvent(buf);
-
     cbShips[snum].torps[tnum].status = (int)storp->status;
 
     return true;
@@ -456,9 +428,6 @@ int procTorpLoc(char *buf)
 
     if (tnum < 0 || tnum >= cbLimits.maxTorps())
         return false;
-
-    if (Context.recmode == RECMODE_ON)
-        recWriteEvent(buf);
 
     for (i=0; i<NUMPLAYERTEAMS; i++)
         if (storploc->war & (1 << i))
@@ -493,9 +462,6 @@ int procTorpEvent(char *buf)
         return false;
 
     cbShips[snum].torps[tnum].status = (int)storpev->status;
-
-    if (Context.recmode == RECMODE_ON)
-        recWriteEvent(buf);
 
     for (i=0; i<NUMPLAYERTEAMS; i++)
         if (storpev->war & (1 << i))
@@ -568,10 +534,6 @@ int procMessage(char *buf)
     if (!UserConf.DoIntrudeAlert && (smsg->flags & MSG_FLAGS_INTRUDER))
         return true;
 
-    /* don't record feedbacks */
-    if ((Context.recmode == RECMODE_ON) && !(smsg->flags & MSG_FLAGS_FEEDBACK) )
-        recWriteEvent(buf);
-
     if (smsg->flags & MSG_FLAGS_FEEDBACK)
         clntDisplayFeedback((char *)smsg->msg);
     else
@@ -592,9 +554,6 @@ int procTeam(char *buf)
 
     if (team < 0 || team >= NUMALLTEAMS)
         return false;
-
-    if (Context.recmode == RECMODE_ON)
-        recWriteEvent(buf);
 
     cbTeams[team].flags = ntohs(steam->flags);
 
@@ -677,9 +636,6 @@ int procDoomsday(char *buf)
 
     if (!pktIsValid(SP_DOOMSDAY, buf))
         return false;
-
-    if (Context.recmode == RECMODE_ON)
-        recWriteEvent(buf);
 
     cbDoomsday->flags = dd->flags;
     cbDoomsday->heading =(real)((real)ntohs(dd->heading) / 10.0);

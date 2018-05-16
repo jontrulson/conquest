@@ -2278,8 +2278,6 @@ static nodeStatus_t nCPIdle(void)
         clbPlanetDrive(tdelta / 1000.0);
         clbTorpDrive(tdelta / 1000.0);
         iterstart = iternow;
-        if (Context.recmode == RECMODE_ON)
-            recGenTorpLoc();
     }
 
     /* if we are a ghost then we already know we are dead. */
@@ -2357,15 +2355,6 @@ static nodeStatus_t nCPIdle(void)
 
                 Context.msgrand = now;
             }
-    }
-
-    if (Context.recmode == RECMODE_ON)
-    {
-        if ((iternow - rftime) > (int)((1.0 / (real)Context.updsec) * 1000.0))
-        {                           /* record a frame */
-            recUpdateFrame();
-            rftime = iternow;
-        }
     }
 
     /*

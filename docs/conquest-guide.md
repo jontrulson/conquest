@@ -313,17 +313,13 @@ protocol, recordings are now completely endian safe (network byte
 order is used).  So now, some poor slob on his Sun SPARC can play back
 a recording I make on a lintel machine and vice-versa.
 
-There are two types of recordings possible in Conquest: Server and
-Client.
+Recordings can only be made by the server.  If you wish to record a
+game client-side, I recommend screen capture/recording software like
+kazam.
 
-Client recordings are created when a user runs conquest with the *-r*
-option, for example:
-
-```$ conquest -r somefile.cqr```
-
-   Server recordings are created by conquestd on the server machine
-   whenever a CO with the OOPTION_OPER set in their user record, sends
-   a command to GOD from within the game containing:
+Server recordings are created by conquestd on the server machine
+whenever a CO with the OOPTION_OPER set in their user record, sends a
+command to GOD from within the game containing:
 
 ```/recon```
 
@@ -335,38 +331,6 @@ option, for example:
    within the game:
 
 ```/recoff```
-
-   Aside from how the different recording types are made, the main
-   difference between the two are:
-
-### Client recordings
-
-Client recordings do not contain full information on other ships
-(fuel, etc) since, in order to limit the ability to cheat by hacking
-up the client, only pertinent data about another ship is ever sent to
-the client.
-
-For this reason, client recordings are identified by the ship that
-made the recording.  Although you can still try to watch other ships
-during replay than the one that made the recording, the experience
-will probably not be too rewarding, since much data about the ship
-will never have been sent to the client to be recorded in the first
-place.
-
-For client recordings, replay will always use the recorder's ship
-number as the default to the (w)atch command, though you can certainly
-select other ones, keeping the caveat's above in mind.
-
-Of course, full information is always recorded for the ship that made
-the recording.
-
-Planet motion is only updated once every 5 seconds in client
-recordings, since the orbital trajectories computed by the client are
-not recorded.
-
-In general, Client recordings are quite inferior to Server recordings.
-You might be better off just using desktop screen/window recording
-software.  Client recordings may go away in a future release.
 
 ### Server recordings
 

@@ -83,10 +83,6 @@ void printUsage()
     printf("                      Default is 1280x720.\n");
     printf("    -s server[:port] connect to <server> at <port>\n");
     printf("                      default port: 1701\n");
-    printf("    -r recfile.cqr   Record game to <recfile.cqr>\n");
-    printf("                      recfile.cqr will be in compressed format\n");
-    printf("                      if conquest was compiled with libz\n");
-    printf("                      support (recommended)\n");
 
     printf("    -M metaserver    specify alternate <metaserver> to contact.\n");
     printf("                      default: %s\n", META_DFLT_SERVER);
@@ -328,7 +324,7 @@ int main(int argc, char *argv[])
 #endif
 
     /* check options */
-    while ((i = getopt(argc, argv, "fM:s:r:P:Bug:Sv")) != EOF)
+    while ((i = getopt(argc, argv, "fM:s:P:Bug:Sv")) != EOF)
         switch (i)
         {
         case 'B':                 /* Benchmark mode, set recFrameDelay to 0.0 */
@@ -374,23 +370,6 @@ int main(int argc, char *argv[])
 
             serveropt = true;
 
-            break;
-        case 'r':
-            /* don't want to do this if we've already seen -P */
-            if (Context.recmode != RECMODE_PLAYING)
-            {
-                if (recOpenOutput(optarg, false))
-                {			/* we are almost ready... */
-                    Context.recmode = RECMODE_STARTING;
-                    printf("Recording game to %s...\n", optarg);
-                }
-                else
-                {
-                    Context.recmode = RECMODE_OFF;
-                    printf("Cannot record game to %s... terminating\n", optarg);
-                    exit(1);
-                }
-            }
             break;
 
         case 'P':
