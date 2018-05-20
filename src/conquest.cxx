@@ -303,6 +303,7 @@ int main(int argc, char *argv[])
     cInfo.doUDP = false;
     cInfo.tryUDP = true;
     cInfo.remoteport = CN_DFLT_PORT;
+    cInfo.state = CLIENT_STATE_INIT;
 
     utSetLogConfig(false, true);	/* use CQ_USERHOMEDIR for logfile */
 
@@ -517,6 +518,7 @@ void catchSignals(void)
     signal(SIGTERM, (void (*)(int))handleSignal);
     signal(SIGINT, SIG_IGN);
     signal(SIGQUIT, (void (*)(int))handleSignal);
+    signal(SIGPIPE, (void (*)(int))handleSignal);
 #endif  /* MINGW */
     return;
 }
@@ -538,6 +540,8 @@ void handleSignal(int sig)
     case SIGINT:
     case SIGTERM:
     case SIGHUP:
+    case SIGPIPE:
+        utLog("handleSignal: Exiting on signal %d", sig);
         conqend();		/* sends a disconnect packet */
         exit(0);
         break;
@@ -556,9 +560,8 @@ void handleSignal(int sig)
 /*    conqend */
 void conqend(void)
 {
-    if (cInfo.sock != -1)
+    if (!pktNoNetwork())
         sendCommand(CPCMD_DISCONNECT, 0); /* tell the server */
-    recCloseOutput();
 
     return;
 

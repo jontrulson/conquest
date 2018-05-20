@@ -1275,7 +1275,7 @@ void menu(void)
     int pkttype;
     char buf[PKT_MAXSIZE];
     cpCommand_t *ccmd;
-    static const uint32_t sleeplimit = ((1000 * 60) * 5); /* 5 minutes */
+    static const uint32_t sleeplimit = ((1000 * 60) * 10); /* 10 minutes */
 
     catchSignals();	/* enable trapping of interesting signals */
 

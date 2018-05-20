@@ -72,7 +72,7 @@ static const char *if9="The darkness becomes all encompassing, and your vision f
 
 // idle timeout in menu()
 static const char *itimeout1 =
-    "Menu idle timeout after 5 minutes of inactivity";
+    "Menu idle timeout after 10 minutes of inactivity";
 static const char *itimeout2 =
     "Server closed connection";
 
@@ -85,11 +85,12 @@ static const char *itimeout2 =
 static int state;
 
 static prm_t prm;
-static int prompting;
+static bool prompting;
 
 /* init vars */
-static int lose;
-static int fatal = false;
+static bool lose = false;
+static bool timedOut = false;
+static bool fatal = false;
 
 /* war vars */
 static int twar[NUMPLAYERTEAMS];
@@ -195,11 +196,27 @@ static void _conqds(dspConfig_t *dsp)
 
 void nMenuInit(void)
 {
-    char buf[PKT_MAXSIZE];
     static int inited = false;
 
-    state = S_NONE;
+    // we come back here from renderNode() if the network has
+    // disappeared.
+    if (pktNoNetwork())
+    {
+        // if we came here from nCP or it's decedents, we did not time
+        // out
+        if (cInfo.state == CLIENT_STATE_PLAY)
+            timedOut = false;
+        else
+            timedOut = true;
+
+        state = S_TIMEOUT;
+        mglBeep(MGL_BEEP_ERR);
+    }
+    else
+        state = S_NONE;
+
     prompting = false;
+    cInfo.state = CLIENT_STATE_MENU;
 
     if (!inited)
     {
@@ -216,6 +233,7 @@ void nMenuInit(void)
         while ((cInfo.nodeMillis - startTime) < waitTime)
         {
             int rv;
+            char buf[PKT_MAXSIZE];
             if ((rv = pktRead(buf, PKT_MAXSIZE, 1)) < 0)
             {
                 utLog("nMenuInit: pktRead failed: %d", rv);
@@ -332,9 +350,9 @@ static nodeStatus_t nMenuDisplay(dspConfig_t *dsp)
 
     if (state == S_TIMEOUT)
     {
-        /* We reincarnated or else something bad happened. */
         lin = 7;
-        cprintf( lin++, 0, ALIGN_CENTER, "#%d#%s", RedLevelColor, itimeout1);
+        if (timedOut)
+            cprintf( lin++, 0, ALIGN_CENTER, "#%d#%s", NoColor, itimeout1);
         cprintf( lin, 0, ALIGN_CENTER, "#%d#%s", RedLevelColor, itimeout2);
 
         cprintf(20, 0, ALIGN_CENTER, MTXT_DONE);
@@ -360,6 +378,9 @@ static nodeStatus_t nMenuIdle(void)
     if (clientLastServerAckCode == PERR_IDLETIMEOUT)
     {
         state = S_TIMEOUT;
+        timedOut = true;
+        // turn off any overlays
+        setONode(NULL);
         return NODE_OK;   /* but not for long... */
     }
 
@@ -484,7 +505,7 @@ static nodeStatus_t nMenuInput(int ch)
             prm.preinit = false;
             prm.buf.clear();
             prm.buflen = MAXUSERNAME;
-            prm.index = 21;
+            prm.index = DISPLAY_LINS;
             prompting = true;
 
             break;
@@ -504,7 +525,7 @@ static nodeStatus_t nMenuInput(int ch)
                 prm.preinit = false;
                 prm.buf.clear();
                 prm.buflen = MAXUSERNAME;
-                prm.index = 21;
+                prm.index = DISPLAY_LINS;
                 prompting = true;
             }
             break;

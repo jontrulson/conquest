@@ -63,6 +63,9 @@ static bool isClient = false;
 /* non-blocking i/o in effect flag */
 static bool nonBlocking = false;
 
+// Indicates whether the connection suffered an error
+static bool noNetwork = false;
+
 /* default protocol version that a client will be expecting.  This can
  * be changed, for example, to connect to an older (but supported
  * server) or to playback a cqr file recorded in an older (but
@@ -803,7 +806,7 @@ static int _pktReadSocket(int sock, ringBuffer_t *RB)
             }
             else
             {
-                // this will fail further on if nonBlocking is not true.
+                // this will fail in pktRead() on if nonBlocking is not true.
                 return 0;
             }
         }
@@ -914,8 +917,11 @@ int pktRead(char *buf, int blen, unsigned int delay)
             {
                 if (tcprv < 0 || (tcprv == 0 && !nonBlocking))
                 {
-
-                    utLog("%s: _pktReadSocket(TCP): failed", __FUNCTION__);
+                    // This is always fatal from the network
+                    // perspective
+                    utLog("%s: _pktReadSocket(TCP): failed, shutting down "
+                          "network", __FUNCTION__);
+                    pktCloseNetwork();
                     return -1;
                 }
             }
@@ -1230,6 +1236,26 @@ void pktSetNonBlocking(int s, bool enable)
     if (fcntl(s, F_SETFL, fdFlags) < 0)
         utLog("%s: fcntl() failed: %s", __FUNCTION__,
               strerror(errno));
+
+    return;
+}
+
+bool pktNoNetwork(void)
+{
+    return noNetwork;
+}
+
+void pktCloseNetwork(void)
+{
+    if (udp_sock != -1)
+        close(udp_sock);
+
+    if (tcp_sock != -1)
+        close(tcp_sock);
+
+    udp_sock = -1;
+    tcp_sock = -1;
+    noNetwork = true;
 
     return;
 }

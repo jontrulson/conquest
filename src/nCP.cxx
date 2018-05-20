@@ -2133,6 +2133,7 @@ void nCPInit(int istopnode)
     static int introsPlayed[NUMPLAYERTEAMS];
     char buf[CQI_NAMELEN];
 
+    cInfo.state = CLIENT_STATE_PLAY;
     prompting = false;
     state = S_NONE;
     clientStatLastFlags = 0;

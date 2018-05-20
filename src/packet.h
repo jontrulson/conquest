@@ -136,6 +136,9 @@ int   pktWrite(int socktype, void *data);
 int   pktReadPacketReady(void);
 int   pktRead(char *buf, int len, unsigned int delay);
 int   pktIsValid(int pkttype, void *pkt);
-void   pktSetNonBlocking(int s, bool enable);
+void  pktSetNonBlocking(int s, bool enable);
+
+bool  pktNoNetwork(void);
+void  pktCloseNetwork(void);
 
 #endif /* PACKET_H_INCLUDED */

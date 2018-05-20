@@ -82,14 +82,15 @@ extern void conqend(void);
 #include "initvec.h"
 #include "ping.h"
 
+#include "nMenu.h"
+
 #include <vector>
-using namespace std;
 
 /* loaded texture list (the list itself is exported in textures.h) */
 static int loadedGLTextures = 0; /* count of total successful tex loads */
 
 /* bomb (torp) animation state per ship */
-static vector<animStateRec_t> bombAState;
+static std::vector<animStateRec_t> bombAState;
 
 static int frame=0, timebase=0;
 static float FPS = 0.0;
@@ -437,7 +438,7 @@ static int initGLAnimDefs(void)
 
 
 /* init the explosion animation states. */
-static bool initGLExplosions(vector<vector<animStateRec_t>>& torpStates)
+static bool initGLExplosions(std::vector<std::vector<animStateRec_t>>& torpStates)
 {
     animStateRec_t initastate;    /* initial state of an explosion */
 
@@ -454,7 +455,7 @@ static bool initGLExplosions(vector<vector<animStateRec_t>>& torpStates)
     // init the vector
     torpStates.clear();
     for (int i=0; i<cbLimits.maxShips(); i++)
-        torpStates.push_back(vector<animStateRec_t>(cbLimits.maxTorps()));
+        torpStates.push_back(std::vector<animStateRec_t>(cbLimits.maxTorps()));
 
     // copy in our prepared animation state
     for (int i=0; i<cbLimits.maxShips(); i++)
@@ -1078,7 +1079,7 @@ void drawExplosion(GLfloat x, GLfloat y, int snum, int torpnum, int scale)
     GLfloat scaleFac = (scale == MAP_SR_FAC) ? dConf.vScaleSR : dConf.vScaleLR;
     GLfloat size;
     // torp animation states per torp per ship
-    static vector<vector<animStateRec_t>> torpAStates;
+    static std::vector<std::vector<animStateRec_t>> torpAStates;
 
 
     if (norender)
@@ -1785,6 +1786,7 @@ static nodeStatus_t renderNode(void)
     scrNode_t *node = getTopNode();
     scrNode_t *onode = getTopONode();
     nodeStatus_t rv = NODE_OK;
+    static bool lostNetwork = false;
 
     // update the node time
     cInfo.nodeMillis = clbGetMillis();
@@ -1818,7 +1820,6 @@ static nodeStatus_t renderNode(void)
             }
 
             glutSwapBuffers();
-
         }
 
         // the *Display() nodes can return NODE_OK_NO_PKTPROC to
@@ -1836,12 +1837,13 @@ static nodeStatus_t renderNode(void)
             int pkttype = 0;
             char buf[PKT_MAXSIZE];
 
-            while ((pkttype = pktRead(buf, PKT_MAXSIZE, 0)) > 0)
+            while (((pkttype = pktRead(buf, PKT_MAXSIZE, 0)) > 0)
+                   && !pktNoNetwork())
                 processPacket(buf);
 
-            if (pkttype < 0)          /* some error */
+            if (pkttype < 0 && !pktNoNetwork())          /* some error */
             {
-                utLog("%s: waitForPacket returned %d", __FUNCTION__, pkttype);
+                utLog("%s: pktRead returned %d", __FUNCTION__, pkttype);
                 return NODE_EXIT;
             }
         }
@@ -1859,6 +1861,16 @@ static nodeStatus_t renderNode(void)
             rv = (*onode->idle)();
             if (rv == NODE_EXIT)
                 return rv;
+        }
+
+        if (pktNoNetwork() && !lostNetwork)
+        {
+            // take us back to the menu node, which will show an
+            // appropriate error screen and allow you to exit
+            // gracefully.
+            nMenuInit();
+            lostNetwork = true;
+            return NODE_OK;
         }
 
         // send a udp keep alive if it's time
@@ -1895,8 +1907,8 @@ static void renderFrame(void)
 
         if (rv == NODE_EXIT)
         {
-            conqend();
             utLog("Exiting...");
+            conqend();
             exit(1);
         }
     }

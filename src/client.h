@@ -40,6 +40,12 @@
 
 #include "cproc.h"
 
+typedef enum {
+    CLIENT_STATE_INIT = 0,
+    CLIENT_STATE_MENU,
+    CLIENT_STATE_PLAY,
+} clientState_t;
+
 typedef struct {
     int sock;			/* TCP socket to client */
     int usock;			/* UDP socket to client */
@@ -52,6 +58,7 @@ typedef struct {
 
     uint32_t nodeMillis;        /* set to clbGetMillis() in
                                  * renderNode() every frame */
+    clientState_t state;        // current client state
 } ClientInfo_t;
 
 #ifdef NOEXTERN_CLIENT
