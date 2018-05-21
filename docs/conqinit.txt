@@ -1211,8 +1211,8 @@ CONTENTS:
    PNG files you use in Conquest must have the following
    characteristics:
 
-   - 8 bit (2 component) Luminance or 32bit (4 component) ARGB pixel
-     data
+   - 8 bit (2 component) Luminance Alpha or 32 bit (4 component) ARGB
+     pixel data
 
    - be a power of two in their width and height, 256x128 is okay,
      3x27 is not.  (Modern OpenGL hardware typically does not require

@@ -102,9 +102,6 @@ There is an IRC Channel (#conquest) for Conquest on chat.freenode.net.
 
 ## Further information
 
-In time, some of the the following documents will be converted to
-markdown and updated to current reality, but for now:
-
 * The [Conquest Guide](docs/conquest-guide.md). This document gives
   you some more information on Conquest and explains how to play it
   (bomb planets, fight robot ships, etc).  It also provides
@@ -126,7 +123,7 @@ markdown and updated to current reality, but for now:
   client uses to configure itself.  The Universe (planets, etc),
   textures, animations, and sound information are all handled by this
   parser.  At startup, Conquest's executables will look for these
-  files in *prefix*/etc/conquest/ .  It is primarily of interest only
+  files in *prefix*/etc/conquest/ .  This is primarily of interest only
   to those wanting to run a server.
 
   * conqinitrc - This file specifies some limits on the universe

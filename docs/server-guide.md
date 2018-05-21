@@ -134,7 +134,7 @@ the Internet before notifying the metaserver about it.
 Most people that will run a server will also be using a firewall of
 some sort to protect their networks.
 
-See the [README](../README.md) file for the ports that conquest
+See the [conquest-guide](conquest-guide.md) file for the ports that conquest
 typically uses.
 
 ### Inbound access
@@ -297,7 +297,7 @@ and other information.
 It is automatically created on a "make install", if it does not
 already exist (via *conqoper -C*).
 
-With Conquest version updates the file is updated automatically,
+With Conquest version updates, the file is updated automatically,
 preserving previous settings.
 
 

@@ -9,6 +9,188 @@
 
                               Conquest HISTORY
 
+8.5.99b, 5/14/2018 (development -- not officially released or tagged)
+
+  So... 8 years later, a new development version of Conquest has been
+  released :)
+
+  There have been many changes (internal and external) in this version
+  compared to the previous 8.5 version.  In hopefully a short time,
+  this version will be released as a stable version 9.0.
+
+  The following are the highlights -- look at the commit log for
+  details.
+
+  - Conquest is hosted at GitHub now.  The "conq" project at SourceForge
+    has been deleted.
+
+    https://github.com/jtrulson/conquest
+
+  - Conquest is built with a C++ compiler now.  Your compiler must
+    support the C++11 standard - this includes g++ 4.9 or better, and
+    clang++ 3.4 or better.  Conquest is still C, but with some C++
+    constructs and containers in use.  I would like to move toward
+    more C++ use over time.
+
+  - The user and system conquestrc configuration files are now named
+    conquest.conf.  If you have an existing ~/.conquest/conquestrc,
+    you should rename it to ~/.conquest/conquest.conf to preserve your
+    settings.
+
+  - The curses client has been removed.  It could no longer compete
+    with the GL client, and some things, like an object's (ship,
+    planet, etc) size was just impossible to implement properly.
+
+    "conquestgl" (the OpenGL version) has been renamed to "conquest".
+
+  - The protocol has changed.  A lot of shortcomings in the v6
+    protocol have been fixed.  Support for the v6 protocol is still
+    provided, but only for playing back old .cqr (Conquest recording)
+    files made by previous versions of Conquest.
+
+  - The internal clocks have been re-implemented, yielding millisecond
+    accuracy.  Previously, you were limited to 1 second accuracy.
+
+    This has the side effect that bombing planets is much faster now.
+    Original Conquest specified that you had a chance to kill up to 3
+    armies every second of bombing.  With the previous 1 second
+    resolution, you could only bomb up to 1 army per second.
+
+    As a result, bombing will seem about 2-3 times faster than
+    previous versions.  This was the way it was intended in original
+    Conquest, and actually helps to move a game along faster.
+
+  - The Common Block (CB) which represents the Universe, has been
+    reworked.  It is now named 'conquest.cb'.
+
+    In the conqinitrc file, there is a "global {}" section that
+    specified how many ship slots you could have, how many planets,
+    etc.
+
+    Previously, this data was ignored as Conquest hardcoded all of
+    that stuff, and the CB was hardcoded to a fixed size.
+
+    Now this data is used to construct a custom CB, and those
+    parameters are supplied to the client so that it can construct a
+    custom CB matching that of the servers'.
+
+    You can have up to 256 planets, 256 ships, 64K users, 256 message
+    slots and 256 history entries.
+
+    Building a universe is a lot more flexible now since the old
+    hardcoded methods are gone.
+
+  - Planets, suns, and ships have a 'size' value now (expressed in
+    CU's).
+
+    Previously these objects were all 300 CU's in size (due to curses
+    client limitations).
+
+    Now they can vary.  The scanning range, orbital path, and damage
+    potential of a planet or sun also now depends on it's size.  Be
+    careful of Suns now, they have a much larger reach than they used
+    to :)
+
+    For ships, cruisers are a little larger than destroyers.
+    Destroyers are a little larger than Scouts.  Previously it was
+    fairly random, depending on the texture used, and in some cases
+    (Romulan) a team scout was much larger than the team cruiser.
+
+  - The homeplanet, and core flags of a planet are fully implemented
+    now.  They were present in previous versions, but ignored.
+
+    "core" planets are used to mark a planet that must be taken in
+    order to conquer the universe.
+
+    "homeplanet" planets, are team owned planets that are defendable
+    by team robots.
+
+    Previously, which planets were core, and which were homeplanets
+    were hardcoded into the game.  Although you could change some of
+    the characteristics of the planets, you were still required to
+    conquer a hardcoded 25 planets in order to take the universe.  In
+    addition, each team had 3 hardcoded home planets defendable by
+    robots.
+
+    Now, you can mix/mash these up as you desire.  The only
+    requirement is that each team has at least one homeplanet.  You
+    can even specify that only one planet is needed to take the
+    universe if you like.  These changes make it possible to more
+    fully customize a universe of your choice.
+
+  - Some new server flags have been added:
+
+    - NoTeamWar - when set, ships are prohibited from declaring war
+      with their own team.
+
+    - NoDrift - when set, the Drift bug is disabled.
+
+    - Closed - When set, the game is closed/private, and only players
+      with an account on the server, and the PLAYWHENCLOSED user flag
+      set, will be able to login and play.
+
+  - UDP has been reimplemented, much more robustly this time.  UDP
+    packets are tagged with a sequence number now so that
+    out-of-order, duplicate, and missing packets can be detected and
+    handled properly.
+
+    In addition, UDP is now negotiated with the server, via the
+    protocol, eliminating the hacky way we were doing it before.
+
+  - The old tactical grids have been removed and replaced with a new
+    circular grid.  The old tac grids only worked in LR scan, and were
+    not scalable, so they were kind of useless, even though they might
+    have looked nice.
+
+    The new circular grid is much simpler and simply draws 10
+    concentric circles around your ship, spaced at 1000 CU intervals.
+    It's available in both LR and SR scans, and is always scaled
+    properly according to your SR/LR scan selection and your applied
+    mag factors.
+
+    It can be enabled via the Options menu, or toggled on and off in the
+    game with ^G.
+
+  - The ability to make client recordings has been removed.  You can
+    use a screen recorder (like kazam on linux) to record games if you
+    like.
+
+    Server recordings are still supported.
+
+  - The TAD (Target Angle/Distance) display, if enabled, is
+    automatically updated every second with current data when getting
+    information on a ship or planet.
+
+  - Using the -G switch to conquestd, now allows a single server
+    installation to serve multiple independant games.  See
+    docs/server-guide.md for details.
+
+  - The Universe is now "limited" to +/- 200 million CU's in each
+    direction.  This is still pretty huge.
+
+  - The -m option to conquest (query metaserver) is gone, and is now
+    the default when conquest is run without a server argument (-s
+    ...).
+
+  - The 3 main configuration files used for the planets, textures, and
+    sounds (conqinitrc, texturesrc, and soundrc, respectively) are
+    always overwritten on a make install or package update.  If you
+    would like to make changes to these files that survive an update,
+    copy them with a '.local' extension.  When loading these files,
+    Conquest will always load a '.local' variant of the file first, if
+    present.
+
+    This is only of interest to people who want to run a server.
+
+  - we use the stb_image.h image loader now and all Conquest textures
+    have been converted to PNG from TGA.
+
+  - Many hundreds of warnings, dozens of bugs and an overhaul of much
+    "under the hood" code has been done.
+
+    To see all the gritty details, just go the the GitHub page and
+    read the commit history.
+
 
 8.5.1 (stable, windows only) 4/22/2010
 

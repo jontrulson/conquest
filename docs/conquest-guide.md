@@ -321,16 +321,22 @@ Server recordings are created by conquestd on the server machine
 whenever a CO with the OOPTION_OPER set in their user record, sends a
 command to GOD from within the game containing:
 
-```/recon```
+```
+/recon
+```
 
-   Server recording files will be saved in:
+Server recording files will be saved in:
 
-   INSTALL_PREFIX/var/conquest-rec-<timestamp>.cqr
+INSTALL_PREFIX/var/conquest-rec-*timestamp*.cqr
 
-   To turn off server recording, send the following to GOD from
-   within the game:
+where *timestamp* is the current unix time.
 
-```/recoff```
+To turn off server recording, send the following to GOD from
+within the game:
+
+```
+/recoff
+```
 
 ### Server recordings
 
@@ -368,9 +374,8 @@ than what is described in this section, but it should be a good start.
 
 ### Moving around (Navigation)
 
-With the version 8.1.2f or better OpenGL client, you can click the
-middle mouse button (by default) in the viewer to set a course in that
-direction.
+With a client version 8.1.2f or better, you can click the middle mouse
+button (by default) in the viewer to set a course in that direction.
 
 For the keyboard, using the direction keys ('qweadzxc') to the
 (k)ourse or weapons commands can be faster than specifying the
@@ -418,8 +423,8 @@ When you are close enough, your ship will deccelerate and
 automatically enter orbit.
 
 To enter orbit manually, get close to the planet, slow down to warp 2
-(at the fastest) and hit (o).  You cannot enter orbit if you are going
-faster than warp 2.
+and hit (o).  You cannot enter orbit if you are going faster than warp
+2.
 
 See the section *Moving around (Navigation)* for more information on
 navigating around.
@@ -443,7 +448,7 @@ nap|nearest planet with available armies (greater than 3 total armies)
 ntp|nearest planet owned by your team
 wp|weakest planet not owned by your team
 hp|home planet for your team
-sN or just N|ship N (where N is a integer number)
+sN or just N|ship N (where N is an integer number)
 planet name (or first unique characters)|planet information
 
 All of these can be abbreviated to their shortest unique string. Also,
@@ -464,7 +469,7 @@ engines to heat faster.
 
 For this reason, *only* keep your shields up when you are in danger -
 ie: an enemy ship is nearby, or you are close to an enemy planet,
-torps, or a Sun, etc.
+torps, or a star, etc.
 
 Don't run around the universe with your shields up all the time.  You
 are just wasting fuel and heat.
@@ -565,18 +570,18 @@ planets until they are ready to handle robot defenders.
 By default, all planets, with the exception of Altair, Hell, and Jinx,
 must be taken in order to conquer the universe.
 
-NOTE:  With the latest version of Conquest (tentatively called V9.0),
+NOTE: With the latest version of Conquest (tentatively called V9.0),
 all of this is configurable by the Server Operator.  The Operator can
-define a Universe where any planet is a Home planet or Core Planet.
+define a Universe where any planet is a Home planet or a Core planet.
 
-Home Planets are defendable by a Team robot.  Core planets are planets
+Home planets are defendable by a Team robot.  Core planets are planets
 that must be taken in order to win the game (Conquer the Universe).
 
 In the client, the (/)Planet List command will list each planet.
 
 Planets preceeded by a **+** sign indicate a Core planet.  Planets
 with a team character ('F', 'K', 'O', 'R') preceeding the name are
-Team Home Planets.
+Team Home planets.
 
 ### Repairing
 
@@ -610,7 +615,8 @@ You can cloak your ship if you wish with the (C\t) command.
 
 Cloaking consumes alot of power and heat.  If you are moving, you will
 exhaust your fuel or overload your engines fairly quickly.  How fast
-this happens depends on your ship type, and how fast you are moving.
+this happens depends on your ship type, Your ship's strength
+(discussed further below) and how fast you are moving.
 
 If you put your shields up, you will overload even faster.
 Overloading your engines is really bad in battle for obvious reasons.
@@ -760,12 +766,11 @@ of this is configurable by the server operator.
 
 Use them together.  Use them in peace.
 
-## Suns
+## Stars
 
-Suns are hot.  Don't fly through them unless it absolutely,
+Stars are hot.  Don't fly through them unless it absolutely,
 positively, has to be there overnight.  Hint: Robots don't seem to
 worry about suns.  This can be used against them.
-
 
 ## Cloaking
 
@@ -840,6 +845,9 @@ number.
 The ability to refit is controlled by the server operator with the
 'Refit' option in the conqoper options menu.
 
+Refitting your ship will take 10 seconds. During this time, you will
+not be able to do anything.  Don't do it in the midst of battle.
+
 ## Leaving the game
 
 To exit Conquest, normally you must self-destruct, or be killed.
@@ -857,6 +865,10 @@ If the 'Vacant' flag has not been enabled by the server operator, then
 your ship will be immediately killed by a lightning bolt on the
 server.
 
+If a server has not enabled the Vacant flag, you should self-destruct
+to exit the game - this will not be counted as a loss.  Being killed
+by a lightning bolt will count as a loss.  Losses will affect your
+skill rating.
 
 ## Teams
 
@@ -957,7 +969,8 @@ an important part of the strategy you employ against your opponents.
 
 The AI code used by the robot ships is the original strategy table
 that was generated by the conqstrat.r program with the exception of
-one new rule that lessens robot sun-deaths somewhat.
+a couple of rules that lessens robot sun-deaths somewhat, and
+compensate for fuel scaling bugs in the original game.
 
 The conqstrat program can be used to modify the Robot strategy tables
 if you don't like the supplied rules.  You can have a maximum of 32
@@ -999,8 +1012,8 @@ Robots are created one of two ways:
 
 * A Conquest Operator fires up conqoper and creates some with the
   (r)obot menu option.  A user marked as a Conquest Operator can also
-  create robots by sending special messages to GOD from within the
-  game.
+  create robots by sending specially crafted messages to GOD from
+  within the game.
 
 
 ## The Doomsday Machine
@@ -1133,7 +1146,8 @@ in conqoper and set the 'Conquest Operator' flag.
 Be careful who you give CO status to, a bad CO can cheat, or otherwise
 disrupt a game.  In addition, due to the fact that a CO is a member of
 the conquest group, a bad CO will be able to trash the common block,
-as well as other undesirable things.
+as well as other undesirable things (if the operator has an account on
+the machine where the server is running).
 
 A CO with permission to overwrite the system-wide conquest.conf file can
 call conqoper with the '-C' option to update the file with a newer
