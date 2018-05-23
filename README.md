@@ -58,8 +58,17 @@ To build and run Conquest, you will need:
 * SDL 1.2 and SDL_mixer 1.2, if you want sound (you do).
 * g++ 4.9 or better, or clang++ 3.4 or better
 
-This supports Linux systems and has also been tested on MAC OSX with
-the ports collection. I currently develop on Kubuntu 16.04.
+On a Kubuntu/Ubuntu 17.10 system, the following should install the
+required packages to build the server and client:
+
+```
+sudo apt-get install build-essential autoconf automake libtool \
+     libsdl1.2-dev libsdl-mixer1.2-dev ncurses-dev bison flex \
+     freeglut3-dev libxi-dev libxmu-dev
+```
+
+Conquest supports Linux systems and has also been tested on MAC OSX
+with the ports collection. I currently develop on Kubuntu 16.04.
 
 In the past, other Unix systems were supported like the BSD's
 (FreeBSD, OpenBSD, etc) as will as Digital Unix for Alpha processors,
