@@ -4,7 +4,7 @@ Conquest is a top-down, real time space warfare game.  It was
 originally written in RATFOR for the VAX/VMS system in 1983 by Jef
 Poskanzer and Craig Leres.
 
-I wasted incredible amounts of time playing this game with my friends
+I spent incredible amounts of time playing this game with my friends
 in the terminal labs at college, and when I actually had a multi-user
 system running at home (Unixware) I decided to try and translate/port
 the code to C in Unix.  This was in the early to mid 1990's.
@@ -12,8 +12,9 @@ the code to C in Unix.  This was in the early to mid 1990's.
 Of course, over the years many things have changed. Today, Conquest is
 a true client/server game.  The client uses freeglut, SDL 1.2 (for
 sound) and OpenGL.  It uses C++11 to build, though for now it's "C
-software with some C++ containers and constructs".  This will change
-over time.  The curses client is no longer provided.
+software with some C++ containers and constructs".
+
+The curses client is no longer provided.
 
 ## License
 
@@ -46,7 +47,7 @@ placing your team's armies on them and fighting off any ships that
 want to ruin your day.  When all of the core planets have been taken
 by your team, the game is reset to start the carnage all over again.
 
-## Requirements
+## Build Requirements
 
 To build and run Conquest, you will need:
 
@@ -75,11 +76,11 @@ In the past, other Unix systems were supported like the BSD's
 and Sun/Oracle Solaris.
 
 These have not been tested in a while, so if there are problems,
-please feel free to send patches.
+please feel free to send patches.  If they work, I'd love to know.
 
 The last release of conquest in 2010 also supported the conquest
-client (only) on Windows systems (XP and Windows 7) using MinGW.  This
-has also not been tested in a while, but I plan to support this again
+client on MS Windows systems (XP and Windows 7) using MinGW.  This has
+also not been tested in a while, but I plan to support this again
 later.
 
 ### Building Conquest
@@ -127,32 +128,19 @@ There is an IRC Channel (#conquest) for Conquest on chat.freenode.net.
 * The [Server Guide](docs/server-guide.md) has instructions for those
   wanting to run their own Conquest servers.
 
+* Marisa Giancaria has setup a
+  [Conquest Gameplayers Club Community Page](https://conquest.gameplayer.club/)
+  for players and operators who wish to participate.  Also available
+  are tools to help potential server operators who are not familiar
+  with the Linux/Unix command line.
+
 * The [CQI Parser Documentation](docs/conqinit.txt) provides
   information on the format and types of files the Conquest server and
   client uses to configure itself.  The Universe (planets, etc),
   textures, animations, and sound information are all handled by this
   parser.  At startup, Conquest's executables will look for these
-  files in *prefix*/etc/conquest/ .  This is primarily of interest only
-  to those wanting to run a server.
-
-  * conqinitrc - This file specifies some limits on the universe
-    (number of ships supported, planets supported, etc) as well as
-    definitions for each of the planets in your universe.  This is
-    used by the server only.  The server will not start if there are
-    syntax errors in this file.
-
-  * texturesrc - This file specifies the base texture and animation
-    data required by the client (only).  The client will not start if
-    there are syntax errors in this file.
-
-  * soundrc - this file is used by the client (only) to configure the
-    sound effects (and music, if you have the musicpak installed).
-    The client will not start if there are syntax errors in this file.
-
-Doing a "make install" or updating to a newer package will overwrite
-these files.  If you want to make custom changes to these files, make
-a copy of them with a filename suffix of '.local', and edit those
-instead.
+  files in *prefix*/etc/conquest/ .  This is primarily of interest to
+  those wanting to run a server with a modified Universe.
 
 ## Some screenshots
 
