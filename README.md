@@ -38,7 +38,7 @@ Alternatively, you can specify a specific server with the "-s" option:
 The port number is optional, and will default to 1701.
 
 You can get a list of the currently active servers via your web browser
-by going to http://radscan.com/cgi-bin/conqmeta.pl
+by going to https://radscan.com/cgi-bin/conqmeta.pl
 
 ### The goal of the game
 
@@ -118,7 +118,7 @@ There is an IRC Channel (#conquest) for Conquest on chat.freenode.net.
   information on navigation and other things you might want to know.
 
 * A Conquest player put up this
-  [Strategy Guide](http://cataboligne.org/index.php?itemid=17) some
+  [Strategy Guide](https://cataboligne.org/index.php?itemid=17) some
   years ago.  While a little dated, it still has some good
   information for new players.
 
