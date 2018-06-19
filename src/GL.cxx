@@ -1647,7 +1647,7 @@ _print_gl_info(void)
     utLog("graphicsInit: OpenGL Renderer:    %s", glRenderer);
     utLog("graphicsInit: OpenGL Version:     %s", glVersion);
 
-    if (cqDebug)
+    if (cqDebug > 1)
     {
         utLog("graphicsInit: OpenGL limits:");
 
@@ -2955,7 +2955,7 @@ static bool loadImageFile(const char *filename, textureImage *texture)
     }
 
     if (cqDebug > 2)
-        utLog("%s: %s: x %d, y %d, components %d",
+        utLog("%s: %s: w: %d, h: %d, components: %d",
               __FUNCTION__, filename, texture->width,
               texture->height, texture->components);
 

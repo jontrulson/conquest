@@ -46,7 +46,7 @@ using namespace std;
 #include "rndlb.h"
 
 static int cqiVerbose = 0;
-int cqiDebugl = 0;
+bool cqiDebugl = false;
 
 static char *ptr;
 
@@ -1094,14 +1094,17 @@ static int cqiValidatePlanets(void)
 }
 
 /* parse a file */
-bool cqiLoadRC(int rcid, const char *filename, int verbosity, int debugl)
+bool cqiLoadRC(int rcid, const char *filename, int verbosity)
 {
     FILE *infile;
     extern FILE *yyin;
     char buffer[PATH_MAX];
 
-    cqiDebugl = debugl;
     cqiVerbose = verbosity;
+    if (cqiVerbose > 2)
+        cqiDebugl = true;
+    else
+        cqiDebugl = false;
 
     switch (rcid)
     {
@@ -1265,10 +1268,13 @@ bool cqiLoadRC(int rcid, const char *filename, int verbosity, int debugl)
             return true;
         }
 
-        utLog("%s: loaded %d Music definitions.",
-              __FUNCTION__, fileNumMusic);
-        utLog("%s: loaded %d Effect definitions.",
-              __FUNCTION__, fileNumEffects);
+        if (cqiVerbose)
+        {
+            utLog("%s: loaded %d Music definitions.",
+                  __FUNCTION__, fileNumMusic);
+            utLog("%s: loaded %d Effect definitions.",
+                  __FUNCTION__, fileNumEffects);
+        }
         cqiSoundConf = _cqiSoundConf;
         cqiSoundEffects = _cqiSoundEffects;
         cqiNumSoundEffects = numSoundEffects;
@@ -1467,7 +1473,7 @@ void dumpUniverse(void)
     int i;
 
     // load the globals/planets (conqinitrc), before we map...
-    if (cqiLoadRC(CQI_FILE_CONQINITRC, NULL, 1, 0))
+    if (cqiLoadRC(CQI_FILE_CONQINITRC, NULL, cqDebug))
     {
         fprintf(stderr, "FATAL: can't load conqinitrc file.\n");
         exit(1);

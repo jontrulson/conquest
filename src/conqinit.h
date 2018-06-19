@@ -288,8 +288,7 @@ extern int                   cqiNumSoundMusic;
 #define CQI_FILE_SOUNDRC        3
 #define CQI_FILE_SOUNDRC_ADD    4
 
-bool cqiLoadRC(int rcid, const char *filename, int verbosity,
-               int debugl);
+bool cqiLoadRC(int rcid, const char *filename, int verbosity);
 
 int cqiFindPlanet(const char *str);
 cqiTextureAreaPtr_t cqiFindTexArea(const char *texnm, const char *tanm,

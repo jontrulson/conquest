@@ -201,7 +201,7 @@ static void _loadRCFiles(int type, const char *cqdir, const char *suffix)
         /* load them up */
         for (string filename : filelist)
         {
-            if (cqiLoadRC(type, filename.c_str(), 1, 0))
+            if (cqiLoadRC(type, filename.c_str(), cqDebug))
             {
                 utLog("%s: cqiLoadRC(%s) failed, ignoring.",
                       __FUNCTION__, filename.c_str());
@@ -222,7 +222,7 @@ void loadTextureRCFiles()
     char *homevar;
 
     /* load the main texturesrc file first.  It's fatal if this fails. */
-    if (cqiLoadRC(CQI_FILE_TEXTURESRC, NULL, 1, 0))
+    if (cqiLoadRC(CQI_FILE_TEXTURESRC, NULL, cqDebug))
     {
         utLog("%s: FATAL: cannot load texturesrc file.",
               __FUNCTION__);
@@ -251,7 +251,7 @@ void loadSoundRCFiles()
     char *homevar;
 
     /* load the main sound file first */
-    if (cqiLoadRC(CQI_FILE_SOUNDRC, NULL, 1, 0))
+    if (cqiLoadRC(CQI_FILE_SOUNDRC, NULL, cqDebug))
     {
         utLog("%s: FATAL: cannot load soundrc file.",
               __FUNCTION__);

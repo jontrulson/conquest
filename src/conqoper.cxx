@@ -210,7 +210,7 @@ int main(int argc, char *argv[])
         GetSysConf(true);		/* init defaults... */
 
         /* load conqinitrc */
-        if (cqiLoadRC(CQI_FILE_CONQINITRC, NULL, 0, 0))
+        if (cqiLoadRC(CQI_FILE_CONQINITRC, NULL, cqDebug))
 	{
             fprintf(stderr, "FATAL: can't load conqinitrc file.\n");
             exit(1);
@@ -296,7 +296,7 @@ int main(int argc, char *argv[])
     }
 
     /* load conqinitrc */
-    if (cqiLoadRC(CQI_FILE_CONQINITRC, NULL, 0, 0))
+    if (cqiLoadRC(CQI_FILE_CONQINITRC, NULL, cqDebug))
     {
         fprintf(stderr, "FATAL: can't load conqinitrc file.\n");
         exit(1);

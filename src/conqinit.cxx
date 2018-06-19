@@ -98,7 +98,7 @@ int main(int argc, char **argv)
 	}
     }
 
-    if (cqiLoadRC(ftype, filenm, verbosity, debuglevel))
+    if (cqiLoadRC(ftype, filenm, verbosity))
     {
         fprintf(stderr, "conqinit: FATAL: load failed.\n");
         return 1;

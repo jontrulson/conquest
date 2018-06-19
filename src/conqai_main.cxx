@@ -109,7 +109,7 @@ int main(int argc, char *argv[])
     }
 
     // load the globals/planets (conqinitrc), before we map...
-    if (cqiLoadRC(CQI_FILE_CONQINITRC, NULL, 1, debug))
+    if (cqiLoadRC(CQI_FILE_CONQINITRC, NULL, 0))
     {
         printf("FATAL: can't load conqinitrc file, check log.\n");
         exit(1);
