@@ -9,10 +9,11 @@
 
                               Conquest HISTORY
 
-8.5.99c, 5/21/2018 (development release)
+9.0, 6/19/2018 (stable release)
 
-  So... 8 years later, a new development version of Conquest has been
-  released :)
+  - 8.5.99c, 5/21/2018 (development release)
+
+  So... 8 years later, a new version of Conquest has been released :)
 
   There have been many changes (internal and external) in this version
   compared to the previous 8.5 version.  In hopefully a short time,

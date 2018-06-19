@@ -23,13 +23,15 @@ Conquest is released under the [MIT License](LICENSE.txt).
 ## Playing the game
 
 Conquest is a client that must connect over a network to a conquestd
-server.
+server.  By default, if all requirements are met, both the client and
+server will be built.  To start the client and connect to a server,
+run:
 
 ```conquest ```
 
-By default, when running conquest without options, it will
-query the meta-server at conquest.radscan.com to get a list of
-currently available servers.  Pick one, login, and play.
+By default, when running conquest without options, conquest will query
+the meta-server at *conquest.radscan.com* to get a list of currently
+available servers.  Pick one, login, and play.
 
 Alternatively, you can specify a specific server with the "-s" option:
 
@@ -59,8 +61,8 @@ To build and run Conquest, you will need:
 * SDL 1.2 and SDL_mixer 1.2, if you want sound (you do).
 * g++ 4.9 or better, or clang++ 3.4 or better
 
-On a Kubuntu/Ubuntu 17.10 system, the following should install the
-required packages to build the server and client:
+On an Ubuntu system (tested with Kubuntu 17.10), the following
+should install the required packages to build the server and client:
 
 ```
 sudo apt-get install build-essential autoconf automake libtool \
@@ -76,12 +78,13 @@ In the past, other Unix systems were supported like the BSD's
 and Sun/Oracle Solaris.
 
 These have not been tested in a while, so if there are problems,
-please feel free to send patches.  If they work, I'd love to know.
+please feel free to send patches.  If they still work, I'd love to
+know.
 
 The last release of conquest in 2010 also supported the conquest
-client on MS Windows systems (XP and Windows 7) using MinGW.  This has
-also not been tested in a while, but I plan to support this again
-later.
+client (only) on MS Windows systems (XP and Windows 7) using MinGW.
+This has also not been tested in a while, but I plan to support this
+again later.
 
 ### Building Conquest
 
@@ -108,7 +111,7 @@ There is a low volume mailing list for Conquest.  You can subscribe
 
 ## IRC Channel
 
-There is an IRC Channel (#conquest) for Conquest on chat.freenode.net.
+There is an IRC channel for Conquest on chat.freenode.net, channel: *#conquest*
 
 ## Further information
 
@@ -128,8 +131,8 @@ There is an IRC Channel (#conquest) for Conquest on chat.freenode.net.
 * The [Server Guide](docs/server-guide.md) has instructions for those
   wanting to run their own Conquest servers.
 
-* Marisa Giancaria has setup a
-  [Conquest Gameplayers Club Community Page](https://conquest.gameplayer.club/)
+* Marisa Giancaria has setup a Conquest
+  [Gameplayers Club Community Page](https://conquest.gameplayer.club/)
   for players and operators who wish to participate.  Also available
   are tools to help potential server operators who are not familiar
   with the Linux/Unix command line.
@@ -138,9 +141,8 @@ There is an IRC Channel (#conquest) for Conquest on chat.freenode.net.
   information on the format and types of files the Conquest server and
   client uses to configure itself.  The Universe (planets, etc),
   textures, animations, and sound information are all handled by this
-  parser.  At startup, Conquest's executables will look for these
-  files in *prefix*/etc/conquest/ .  This is primarily of interest to
-  those wanting to run a server with a modified Universe.
+  parser.  This is primarily of interest to those wanting to run a
+  server with a modified Universe.
 
 ## Some screenshots
 
