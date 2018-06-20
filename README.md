@@ -131,7 +131,7 @@ There is an IRC channel for Conquest on chat.freenode.net, channel: *#conquest*
 * The [Server Guide](docs/server-guide.md) has instructions for those
   wanting to run their own Conquest servers.
 
-* Marisa Giancaria has setup a Conquest
+* Marisa Giancarla has setup a Conquest
   [Gameplayers Club Community Page](https://conquest.gameplayer.club/)
   for players and operators who wish to participate.  Also available
   are tools to help potential server operators who are not familiar
