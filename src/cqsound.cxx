@@ -45,7 +45,8 @@
 #include "SDL/SDL_mixer.h"
 
 /* effects channels */
-static cqsChannelPtr_t cqsChannels = NULL;
+static std::vector<cqsChannelRec_t> cqsChannels;
+
 #define CQS_MAX_CHANNELS (cqiSoundConf->fxchannels)
 
 #define EFFECT_VOL(_fxvol) (int)((real)(_fxvol) *                       \
@@ -113,7 +114,7 @@ static int cqsFindEffectByFile(const char *name)
 {
     int i;
 
-    for (i=0; i<cqsNumEffects; i++)
+    for (i=0; i<cqsEffects.size(); i++)
         if (!strncmp(cqiSoundEffects[cqsEffects[i].cqiIndex].filename,
                      name, CQI_NAMELEN))
             return i;
@@ -125,7 +126,7 @@ static int cqsFindMusicByFile(const char *name)
 {
     int i;
 
-    for (i=0; i<cqsNumMusic; i++)
+    for (i=0; i<cqsMusic.size(); i++)
         if (!strncmp(cqiSoundMusic[cqsMusic[i].cqiIndex].filename,
                      name, CQI_NAMELEN))
             return i;
@@ -137,7 +138,7 @@ int cqsFindEffect(const std::string& name)
 {
     int i;
 
-    for (i=0; i<cqsNumEffects; i++)
+    for (i=0; i<cqsEffects.size(); i++)
         if (!strncmp(cqiSoundEffects[cqsEffects[i].cqiIndex].name,
                      name.c_str(), CQI_NAMELEN))
             return i;
@@ -149,7 +150,7 @@ int cqsFindMusic(const std::string& name)
 {
     int i;
 
-    for (i=0; i<cqsNumMusic; i++)
+    for (i=0; i<cqsMusic.size(); i++)
         if (!strncmp(cqiSoundMusic[cqsMusic[i].cqiIndex].name,
                      name.c_str(), CQI_NAMELEN))
             return i;
@@ -221,7 +222,6 @@ static int cqsLoadSounds(void)
 {
     int i;
     cqsSoundRec_t cursound;
-    cqsSoundPtr_t sndptr = NULL;
     Mix_Chunk     *mc = NULL;
     Mix_Music     *mm = NULL;
     char *ch;
@@ -288,25 +288,8 @@ static int cqsLoadSounds(void)
         cursound.delayms = cqiSoundMusic[i].delayms;
         cursound.lasttime = 0;
 
-        /* now realloc and insert into list */
-        sndptr = (cqsSoundPtr_t)realloc((void *)cqsMusic,
-                                        sizeof(cqsSoundRec_t) *
-                                        (cqsNumMusic + 1));
-        if (!sndptr)
-        {
-            utLog("%s: Could not realloc %d Music slots, ignoring Music '%s'",
-                  __FUNCTION__,
-                  cqsNumMusic + 1,
-                  cqiSoundMusic[i].name);
-
-            continue;
-        }
-
-        cqsMusic = sndptr;
-        sndptr = NULL;
-
-        cqsMusic[cqsNumMusic] = cursound;
-        cqsNumMusic++;
+        /* now add into list */
+        cqsMusic.push_back(cursound);
     }
 
     /* now the effects */
@@ -369,26 +352,7 @@ static int cqsLoadSounds(void)
         cursound.delayms = cqiSoundEffects[i].delayms;
         cursound.lasttime = 0;
 
-        /* now realloc and insert into list */
-        sndptr = (cqsSoundPtr_t)realloc((void *)cqsEffects,
-                                        sizeof(cqsSoundRec_t) *
-                                        (cqsNumEffects + 1));
-
-        if (!sndptr)
-        {
-            utLog("%s: Could not realloc %d Effects slots, ignoring Effects '%s'",
-                  __FUNCTION__,
-                  cqsNumEffects + 1,
-                  cqiSoundEffects[i].name);
-
-            continue;
-        }
-
-        cqsEffects = sndptr;
-        sndptr = NULL;
-
-        cqsEffects[cqsNumEffects] = cursound;
-        cqsNumEffects++;
+        cqsEffects.push_back(cursound);
     }
 
     utLog("%s: Loaded %d Music files.", __FUNCTION__, nummus);
@@ -401,12 +365,14 @@ static int cqsLoadSounds(void)
 /* initialize SDL and the sound stuff. */
 void cqsInitSound(void)
 {
-    cqsChannelPtr_t chnptr = NULL;
     const int bufSize = 128;
     char buf[bufSize];
     int i;
 
     utLog("%s: Initializing...", __FUNCTION__);
+    cqsMusic.clear();
+    cqsEffects.clear();
+    cqsChannels.clear();
     cqsSoundAvailable = false;
     CQS_DISABLE(CQS_EFFECTS | CQS_MUSIC);
 
@@ -438,30 +404,8 @@ void cqsInitSound(void)
 
     Mix_AllocateChannels(CQS_MAX_CHANNELS);
 
-    /* now setup the channel array */
-    chnptr = (cqsChannelPtr_t)realloc((void *)cqsChannels,
-                                      sizeof(cqsChannelRec_t) *
-                                      CQS_MAX_CHANNELS);
-
-    if (!chnptr)
-    {
-        utLog("%s: Could not realloc %d channel slots, sound disabled",
-              __FUNCTION__,
-              CQS_MAX_CHANNELS);
-        return;
-    }
-
-    cqsChannels = chnptr;
-    chnptr = NULL;
-
-    memset((void *)cqsChannels, 0, sizeof(cqsChannelRec_t) * CQS_MAX_CHANNELS);
-
     for (i=0; i<CQS_MAX_CHANNELS; i++)
-    {
-        cqsChannels[i].active = false;
-        cqsChannels[i].channel = -1;
-        cqsChannels[i].idx = -1;
-    }
+        cqsChannels.push_back( { .channel = -1, .active = false, .idx = -1 });
 
     /* now loadup the sounds */
     if (!cqsLoadSounds())
@@ -534,14 +478,14 @@ void cqsInitSound(void)
     cqsDoomsdayMusic.doomkill = cqsFindMusic(buf);
 
     /* now, enable sound */
-    if (cqsNumEffects || cqsNumMusic)
+    if (cqsEffects.size() || cqsMusic.size())
     {
         cqsSoundAvailable = true;
 
-        if (cqsNumEffects)
+        if (cqsEffects.size())
             CQS_ENABLE(CQS_EFFECTS);
 
-        if (cqsNumMusic)
+        if (cqsMusic.size())
             CQS_ENABLE(CQS_MUSIC);
 
         utLog("%s: samplerate = %d channels = %d chunksize = %d stereo = %s",
@@ -557,7 +501,7 @@ int cqsMusicPlay(int musidx, int halt)
 {
     int rv;
 
-    if (!CQS_ISENABLED(CQS_MUSIC) || musidx < 0 || musidx >= cqsNumMusic)
+    if (!CQS_ISENABLED(CQS_MUSIC) || musidx < 0 || musidx >= cqsMusic.size())
         return false;
 
 #if defined(DEBUG_SOUND)
@@ -644,7 +588,7 @@ int cqsEffectPlay(int fxidx, cqsHandle *handle, real maxdist,
     int empty = -1;             /* empty slot we might use */
     int limit = 0;              /* limit we found if effect is limited */
 
-    if (!CQS_ISENABLED(CQS_EFFECTS) || fxidx < 0 || fxidx >= cqsNumEffects)
+    if (!CQS_ISENABLED(CQS_EFFECTS) || fxidx < 0 || fxidx >= cqsEffects.size())
         return false;
 
 #if defined(DEBUG_SOUND)
@@ -815,7 +759,7 @@ void cqsUpdateVolume(void)
     }
     else
     {
-        if (!CQS_ISENABLED(CQS_MUSIC) && cqsNumMusic)
+        if (!CQS_ISENABLED(CQS_MUSIC) && cqsMusic.size())
             CQS_ENABLE(CQS_MUSIC);
     }
 
@@ -829,7 +773,7 @@ void cqsUpdateVolume(void)
     }
     else
     {
-        if (!CQS_ISENABLED(CQS_EFFECTS) && cqsNumEffects)
+        if (!CQS_ISENABLED(CQS_EFFECTS) && cqsEffects.size())
             CQS_ENABLE(CQS_EFFECTS);
     }
 
@@ -843,7 +787,7 @@ void cqsUpdateVolume(void)
     }
 
     /* set the music volume */
-    if (cqsNumMusic && _mus_idx >= 0)
+    if (cqsMusic.size() && _mus_idx >= 0)
         Mix_VolumeMusic(MUSIC_VOL(cqsMusic[_mus_idx].vol));
 
     return;
@@ -852,7 +796,7 @@ void cqsUpdateVolume(void)
 
 int cqsMusicPlaying(void)
 {
-    return ((cqsNumMusic && Mix_PlayingMusic()) ? true : false);
+    return ((cqsMusic.size() && Mix_PlayingMusic()) ? true : false);
 }
 
 #endif /* !CQS_NO_SOUND */

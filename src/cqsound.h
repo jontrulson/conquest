@@ -35,29 +35,32 @@
 #define _CQSOUND_H
 
 #include <string>
+#include <vector>
 #include "conqinit.h"
 
 typedef struct _cqs_channel {
-    int channel;                  /* mixer channel */
-    int active;
-    int idx;                      /* index into Effects/Music array */
-} cqsChannelRec_t, *cqsChannelPtr_t;
+    int  channel;                  /* mixer channel */
+    bool active;
+    int  idx;                      /* index into Effects/Music array */
+} cqsChannelRec_t;
 
 typedef struct _cqs_sound {
     uint32_t  cqiIndex;            /* index to cqi sound entry */
-    void    *chunk;               /* ptr to mix/music chunk */
-    int      vol;                 /* SDL volume */
-    int      pan;                 /* SDL pan */
-    uint32_t  lasttime;            /* last time this sample was played */
-    int      fadeinms;            /* copies of cqi data */
-    int      fadeoutms;
-    int      loops;
-    int      limit;
+    void      *chunk;              /* ptr to mix/music chunk */
+    int       vol;                 /* SDL volume */
+    int       pan;                 /* SDL pan */
+    time_t    lasttime;            /* last time this sample was played */
+    int       fadeinms;            /* copies of cqi data */
+    int       fadeoutms;
+    int       loops;
+    int       limit;
     uint32_t  framelimit;
     uint32_t  lastframe;
     uint32_t  framecount;
     uint32_t  delayms;
-} cqsSoundRec_t, *cqsSoundPtr_t;
+} cqsSoundRec_t;
+
+typedef std::vector<cqsSoundRec_t> cqsVector_t;
 
 typedef uint32_t cqsHandle;      /* sound handle used for some
                                     functions */
@@ -109,20 +112,16 @@ typedef struct _doom_mus {
 #ifdef NOEXTERN_CQSOUND
 uint32_t             cqsSoundEnables  = 0;
 int                  cqsSoundAvailable    = false;
-cqsSoundPtr_t        cqsMusic   = NULL;
-cqsSoundPtr_t        cqsEffects = NULL;
-int                  cqsNumMusic = 0;
-int                  cqsNumEffects = 0;
+cqsVector_t          cqsMusic;
+cqsVector_t          cqsEffects;
 teamFX_t             cqsTeamEffects[NUMPLAYERTEAMS] = {};
 teamMus_t            cqsTeamMusic[NUMPLAYERTEAMS] = {};
 doomMus_t            cqsDoomsdayMusic = {};
 #else
 extern uint32_t      cqsSoundEnables;
 extern int           cqsSoundAvailable;
-extern cqsSoundPtr_t cqsMusic;
-extern cqsSoundPtr_t cqsEffects;
-extern int           cqsNumMusic;
-extern int           cqsNumEffects;
+extern cqsVector_t   cqsMusic;
+extern cqsVector_t   cqsEffects;
 extern teamFX_t      cqsTeamEffects[NUMPLAYERTEAMS];
 extern teamMus_t     cqsTeamMusic[NUMPLAYERTEAMS];
 extern doomMus_t     cqsDoomsdayMusic;
