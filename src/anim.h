@@ -31,6 +31,7 @@
 
 
 #include "conqinit.h"
+#include <vector>
 
 /* basic draw state used/modified by an animator */
 typedef struct _anim_draw_state {
@@ -152,7 +153,7 @@ typedef struct _gl_animdef {
         GLfloat   deltas;
         GLfloat   deltat;
         /* list of texanim entries, generated at creation time */
-        struct _anim_texture_ent *tex;
+        std::vector<_anim_texture_ent> tex;
     } tex;
 
     struct {
@@ -200,9 +201,9 @@ typedef struct _anim_que {
 /* cqiNumAnimDefs is identical to the number of GLAnimDefs, so
    we do not bother to export a seperate (but identical) numGLAnimDefs. */
 #ifdef NOEXTERN_ANIM
-GLAnimDef_t *GLAnimDefs = NULL;
+std::vector<GLAnimDef_t> GLAnimDefs;
 #else
-extern GLAnimDef_t *GLAnimDefs;
+extern std::vector<GLAnimDef_t> GLAnimDefs;
 #endif
 
 int  findGLAnimDef(const char *animname); /* GL.c */

@@ -191,7 +191,7 @@ int findGLAnimDef(const char *animname)
     int i;
 
     if (!GLTextures.size() || !cqiNumTextures || !cqiTextures ||
-        !GLAnimDefs)
+        !GLAnimDefs.size())
         return -1;
 
     for (i=0; i<cqiNumAnimations; i++)
@@ -236,76 +236,70 @@ static int initGLAnimDefs(void)
 
     /* first, if there's already one present, free it */
 
-    if (GLAnimDefs)
+    if (GLAnimDefs.size())
     {
-        /* for each one, if there is a texanim, free the tex pointer */
-        for (i=0; i<cqiNumAnimDefs; i++)
-            if ((GLAnimDefs[i].anims & CQI_ANIMS_TEX) && GLAnimDefs[i].tex.tex)
-                free(GLAnimDefs[i].tex.tex);
+        /* for each one, if there is a texanim, clear the tex vector */
+        for (i=0; i<GLAnimDefs.size(); i++)
+            if ((GLAnimDefs[i].anims & CQI_ANIMS_TEX)
+                && GLAnimDefs[i].tex.tex.size())
+                GLAnimDefs[i].tex.tex.clear();
 
-        free(GLAnimDefs);
-        GLAnimDefs = NULL;
+        GLAnimDefs.clear();
     }
 
-    /* allocate enough space */
-
-    if (!(GLAnimDefs = (GLAnimDef_t *)malloc(sizeof(GLAnimDef_t) *
-                                             cqiNumAnimDefs)))
-    {
-        utLog("%s: ERROR: malloc(%lu) failed.", __FUNCTION__,
-              sizeof(GLAnimDef_t) * cqiNumAnimDefs);
-
-        return false;
-    }
-
-    memset((void *)GLAnimDefs, 0, sizeof(GLAnimDef_t) * cqiNumAnimDefs);
+    /* reserve enough space */
+    GLAnimDefs.reserve(cqiNumAnimDefs);
 
     for (i=0; i<cqiNumAnimDefs; i++)
     {
+        GLAnimDef_t currAnimDef = {};
+
         /* if there is a texname, and no texanim, setup 'default' texid */
         if (cqiAnimDefs[i].texname[0] && !(cqiAnimDefs[i].anims & CQI_ANIMS_TEX))
         {
             if ((ndx = findGLTexture(cqiAnimDefs[i].texname)) >= 0)
-                GLAnimDefs[i].texid = GLTEX_ID(ndx);
+                currAnimDef.texid = GLTEX_ID(ndx);
             else
                 utLog("%s: could not locate texture '%s' for animdef '%s'.",
-                      __FUNCTION__, cqiAnimDefs[i].texname, cqiAnimDefs[i].name);
+                      __FUNCTION__, cqiAnimDefs[i].texname,
+                      cqiAnimDefs[i].name);
 
             /* it may not look pretty, but we will not go fatal here
                if the tex could not be found */
         }
 
         /* timelimit */
-        GLAnimDefs[i].timelimit = cqiAnimDefs[i].timelimit;
+        currAnimDef.timelimit = cqiAnimDefs[i].timelimit;
 
-        GLAnimDefs[i].anims = cqiAnimDefs[i].anims; /* CQI_ANIMS_* */
+        currAnimDef.anims = cqiAnimDefs[i].anims; /* CQI_ANIMS_* */
 
         /* initial state (istate) */
-        GLAnimDefs[i].istates = cqiAnimDefs[i].istates;
+        currAnimDef.istates = cqiAnimDefs[i].istates;
 
-        if (GLAnimDefs[i].istates & AD_ISTATE_TEX)
+        if (currAnimDef.istates & AD_ISTATE_TEX)
         {                       /* an initial texture was specified. */
             if ((ndx = findGLTexture(cqiAnimDefs[i].itexname)) >= 0)
-                GLAnimDefs[i].itexid = GLTEX_ID(ndx);
+                currAnimDef.itexid = GLTEX_ID(ndx);
             else
             {
                 utLog("%s: could not locate istate texture '%s' for animdef '%s'.",
-                      __FUNCTION__, cqiAnimDefs[i].itexname, cqiAnimDefs[i].name);
-                GLAnimDefs[i].istates &= ~AD_ISTATE_TEX; /* turn it off */
+                      __FUNCTION__, cqiAnimDefs[i].itexname,
+                      cqiAnimDefs[i].name);
+                currAnimDef.istates &= ~AD_ISTATE_TEX; /* turn it off */
             }
         }
 
-        if (GLAnimDefs[i].istates & AD_ISTATE_COL)
+        if (currAnimDef.istates & AD_ISTATE_COL)
             hex2GLColor(cqiAnimDefs[i].icolor,
-                        &GLAnimDefs[i].icolor);
+                        &currAnimDef.icolor);
 
         /* copy the CU size */
-        GLAnimDefs[i].isize = cqiAnimDefs[i].isize;
+        currAnimDef.isize = cqiAnimDefs[i].isize;
 
         if (cqiAnimDefs[i].iangle < 0.0) /* neg is special (random)  */
-            GLAnimDefs[i].iangle = cqiAnimDefs[i].iangle;
+            currAnimDef.iangle = cqiAnimDefs[i].iangle;
         else
-            GLAnimDefs[i].iangle = utMod360(cqiAnimDefs[i].iangle);
+            currAnimDef.iangle = utMod360(cqiAnimDefs[i].iangle);
 
         /* animation types */
 
@@ -314,41 +308,30 @@ static int initGLAnimDefs(void)
         {
             if (cqiAnimDefs[i].texanim.color)
                 hex2GLColor(cqiAnimDefs[i].texanim.color,
-                            &GLAnimDefs[i].tex.color);
+                            &currAnimDef.tex.color);
 
-            GLAnimDefs[i].tex.stages = cqiAnimDefs[i].texanim.stages;
-            GLAnimDefs[i].tex.loops = cqiAnimDefs[i].texanim.loops;
-            GLAnimDefs[i].tex.delayms = cqiAnimDefs[i].texanim.delayms;
-            GLAnimDefs[i].tex.looptype = cqiAnimDefs[i].texanim.looptype;
+            currAnimDef.tex.stages = cqiAnimDefs[i].texanim.stages;
+            currAnimDef.tex.loops = cqiAnimDefs[i].texanim.loops;
+            currAnimDef.tex.delayms = cqiAnimDefs[i].texanim.delayms;
+            currAnimDef.tex.looptype = cqiAnimDefs[i].texanim.looptype;
 
-            GLAnimDefs[i].tex.deltas = cqiAnimDefs[i].texanim.deltas;
-            GLAnimDefs[i].tex.deltat = cqiAnimDefs[i].texanim.deltat;
+            currAnimDef.tex.deltas = cqiAnimDefs[i].texanim.deltas;
+            currAnimDef.tex.deltat = cqiAnimDefs[i].texanim.deltat;
 
             /* now allocate and build the _anim_texure_ent array */
-            if (!(GLAnimDefs[i].tex.tex =
-                  (struct _anim_texture_ent *)malloc(sizeof(struct _anim_texture_ent) * GLAnimDefs[i].tex.stages)))
-            {
-                utLog("%s: ERROR: _anim_texture_ent malloc(%lu) failed.",
-                      __FUNCTION__,
-                      sizeof(struct _anim_texture_ent) * GLAnimDefs[i].tex.stages);
-
-                /* this is fatal */
-                return false;
-            }
-
-            memset((void *)GLAnimDefs[i].tex.tex,
-                   0,
-                   sizeof(struct _anim_texture_ent) * GLAnimDefs[i].tex.stages);
+            currAnimDef.tex.tex.clear(); // make sure
+            currAnimDef.tex.tex.reserve(currAnimDef.tex.stages);
 
             /* now setup the texture entry array */
 
-            for (j=0; j<GLAnimDefs[i].tex.stages; j++)
+            for (j=0; j<currAnimDef.tex.stages; j++)
             {
+                struct _anim_texture_ent texEnt = {};
 
                 /* if the texanim only contains a single stage (one texture)
                  * then do not append the stage number to the texname.
                  */
-                if (GLAnimDefs[i].tex.stages == 1)
+                if (currAnimDef.tex.stages == 1)
                     snprintf(buffer, CQI_NAMELEN, "%s",
                              cqiAnimDefs[i].texname);
                 else
@@ -357,16 +340,15 @@ static int initGLAnimDefs(void)
 
                 if ((ndx = findGLTexture(buffer)) >= 0)
                 {
-                    GLAnimDefs[i].tex.tex[j].id =
-                        GLTEX_ID(ndx);
+                    texEnt.id = GLTEX_ID(ndx);
 
-                    if (HAS_GLCOLOR(GLAnimDefs[i].tex.color))
+                    if (HAS_GLCOLOR(currAnimDef.tex.color))
                     {           /* override per-tex colors */
-                        GLAnimDefs[i].tex.tex[j].col = GLAnimDefs[i].tex.color;
+                        texEnt.col = currAnimDef.tex.color;
                     }
                     else
                     {           /* use texture colors */
-                        GLAnimDefs[i].tex.tex[j].col = GLTextures[ndx].col;
+                        texEnt.col = GLTextures[ndx].col;
                     }
                 }
                 else
@@ -374,10 +356,14 @@ static int initGLAnimDefs(void)
                     utLog("%s: could not locate texanim texture '%s' for animdef '%s'.",
                           __FUNCTION__, buffer,
                           cqiAnimDefs[i].name);
-                    continue;     /* not fatal, just not going to look good
-                                     (invisible, probably) */
+
+                    // not fatal, will use default texture
+                    texEnt.id = GLTEX_ID(defaultTextureIdx);
+                    // white
+                    texEnt.col = {1.0, 1.0, 1.0, 1.0};
                 }
-            }
+                currAnimDef.tex.tex.push_back(texEnt);
+            } // tex.tex[]
         } /* texanim */
 
         /* colanim */
@@ -385,40 +371,42 @@ static int initGLAnimDefs(void)
         {
             if (cqiAnimDefs[i].colanim.color)
                 hex2GLColor(cqiAnimDefs[i].colanim.color,
-                            &GLAnimDefs[i].col.color);
+                            &currAnimDef.col.color);
 
-            GLAnimDefs[i].col.stages = cqiAnimDefs[i].colanim.stages;
-            GLAnimDefs[i].col.loops = cqiAnimDefs[i].colanim.loops;
-            GLAnimDefs[i].col.delayms = cqiAnimDefs[i].colanim.delayms;
-            GLAnimDefs[i].col.looptype = cqiAnimDefs[i].colanim.looptype;
+            currAnimDef.col.stages = cqiAnimDefs[i].colanim.stages;
+            currAnimDef.col.loops = cqiAnimDefs[i].colanim.loops;
+            currAnimDef.col.delayms = cqiAnimDefs[i].colanim.delayms;
+            currAnimDef.col.looptype = cqiAnimDefs[i].colanim.looptype;
 
-            GLAnimDefs[i].col.deltaa = cqiAnimDefs[i].colanim.deltaa;
-            GLAnimDefs[i].col.deltar = cqiAnimDefs[i].colanim.deltar;
-            GLAnimDefs[i].col.deltag = cqiAnimDefs[i].colanim.deltag;
-            GLAnimDefs[i].col.deltab = cqiAnimDefs[i].colanim.deltab;
+            currAnimDef.col.deltaa = cqiAnimDefs[i].colanim.deltaa;
+            currAnimDef.col.deltar = cqiAnimDefs[i].colanim.deltar;
+            currAnimDef.col.deltag = cqiAnimDefs[i].colanim.deltag;
+            currAnimDef.col.deltab = cqiAnimDefs[i].colanim.deltab;
 
         }
 
         /* geoanim */
         if (cqiAnimDefs[i].anims & CQI_ANIMS_GEO)
         {
-            GLAnimDefs[i].geo.stages = cqiAnimDefs[i].geoanim.stages;
-            GLAnimDefs[i].geo.loops = cqiAnimDefs[i].geoanim.loops;
-            GLAnimDefs[i].geo.delayms = cqiAnimDefs[i].geoanim.delayms;
-            GLAnimDefs[i].geo.looptype = cqiAnimDefs[i].geoanim.looptype;
+            currAnimDef.geo.stages = cqiAnimDefs[i].geoanim.stages;
+            currAnimDef.geo.loops = cqiAnimDefs[i].geoanim.loops;
+            currAnimDef.geo.delayms = cqiAnimDefs[i].geoanim.delayms;
+            currAnimDef.geo.looptype = cqiAnimDefs[i].geoanim.looptype;
 
-            GLAnimDefs[i].geo.deltax = cqiAnimDefs[i].geoanim.deltax;
-            GLAnimDefs[i].geo.deltay = cqiAnimDefs[i].geoanim.deltay;
-            GLAnimDefs[i].geo.deltaz = cqiAnimDefs[i].geoanim.deltaz;
-            GLAnimDefs[i].geo.deltar = cqiAnimDefs[i].geoanim.deltar;
+            currAnimDef.geo.deltax = cqiAnimDefs[i].geoanim.deltax;
+            currAnimDef.geo.deltay = cqiAnimDefs[i].geoanim.deltay;
+            currAnimDef.geo.deltaz = cqiAnimDefs[i].geoanim.deltaz;
+            currAnimDef.geo.deltar = cqiAnimDefs[i].geoanim.deltar;
 
             /* cqi size delta is specified in CU's. */
-            GLAnimDefs[i].geo.deltas = cqiAnimDefs[i].geoanim.deltas;
+            currAnimDef.geo.deltas = cqiAnimDefs[i].geoanim.deltas;
         }
 
         /* toganim */
         if (cqiAnimDefs[i].anims & CQI_ANIMS_TOG)
-            GLAnimDefs[i].tog.delayms = cqiAnimDefs[i].toganim.delayms;
+            currAnimDef.tog.delayms = cqiAnimDefs[i].toganim.delayms;
+
+        GLAnimDefs.push_back(currAnimDef);
 
     } /* for */
 
