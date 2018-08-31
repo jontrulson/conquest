@@ -106,7 +106,7 @@ void mglConqLogo(dspConfig_t *dsp, bool useGLTeamLogo)
             if ((ndx = findGLTexture(buffer)) >= 0)
             {
                 logos[i] = GLTextures[ndx].id;
-                if (HAS_GLCOLOR(&GLTextures[ndx].col))
+                if (HAS_GLCOLOR(GLTextures[ndx].col))
                     colors[i] = GLTextures[ndx].col;
                 else
                     hex2GLColor(0xffe6e6e6, &colors[i]);

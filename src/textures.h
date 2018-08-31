@@ -42,12 +42,15 @@ typedef union _GLcolor {
 } GLColor_t;
 
 typedef struct _GLtexture {
-    int cqiIndex;                 /* index into cqiTextures[] */
-    GLint id;                     /* GL texture id */
-    GLColor_t col;                /* default texture color */
-    uint32_t w, h;                 /* width/height of texture */
-    real prescale;                 /* prescale to apply when computing size */
+    int       cqiIndex;    /* index into cqiTextures[] */
+    GLint     id;          /* GL texture id */
+    GLColor_t col;         /* default texture color */
+    uint32_t  w, h;        /* width/height of texture */
+    real      prescale;    /* prescale to apply when computing size */
 } GLTexture_t;
+
+// rather than use ptrs, let's just use an int index,,,
+typedef int textureIdx_t;
 
 typedef struct _GLtexcoord {
     GLfloat s, t;                 /* texture coordinates or tc offsets */
@@ -64,13 +67,13 @@ GLTexture_t *getGLTexture(const char *texname);
 
 
 /* helpers */
-#define HAS_GLCOLOR(x) ((x)->a || (x)->r || (x)->g || (x)->b)
+#define HAS_GLCOLOR(x) ((x).a || (x).r || (x).g || (x).b)
 
-#define GLTEX_COLOR(x)    ((x)->col)
-#define GLTEX_ID(x)       ((x)->id)
-#define GLTEX_WIDTH(x)    ((x)->w)
-#define GLTEX_HEIGHT(x)   ((x)->h)
-#define GLTEX_PRESCALE(x) ((x)->prescale)
+#define GLTEX_COLOR(x)    (GLTextures[(x)].col)
+#define GLTEX_ID(x)       (GLTextures[(x)].id)
+#define GLTEX_WIDTH(x)    (GLTextures[(x)].w)
+#define GLTEX_HEIGHT(x)   (GLTextures[(x)].h)
+#define GLTEX_PRESCALE(x) (GLTextures[(x)].prescale)
 
 /* ico texture identifiers for drawIconHUDDecal() (GL.c) */
 typedef enum {

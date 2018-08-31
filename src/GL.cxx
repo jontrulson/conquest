@@ -100,7 +100,7 @@ extern animStateRec_t ncpTorpAnims[NUMPLAYERTEAMS];
 
 /* global tables for looking up textures quickly */
 typedef struct _gl_planet {
-    GLTexture_t  *tex;          /* pointer to the proper GLTexture entry */
+    textureIdx_t tex;           /* index to the proper GLTexture entry */
     GLfloat      size;          /* the prefered size, in prescaled CU's*/
 } GLPlanet_t;
 
@@ -108,8 +108,8 @@ static GLPlanet_t *GLPlanets = NULL;
 
 /* storage for doomsday tex */
 static struct {
-    GLTexture_t *doom;            /* doomsday */
-    GLTexture_t *beam;            /* doomsday AP beam */
+    textureIdx_t doom;            /* doomsday */
+    textureIdx_t beam;            /* doomsday AP beam */
 } GLDoomsday = {};
 
 
@@ -164,32 +164,24 @@ real cu2GLSize(real size, int scale)
 
 
 /* search texture list and return index */
-int findGLTexture(const char *texname)
+textureIdx_t findGLTexture(const char *texname)
 {
-    int i;
+    textureIdx_t i;
 
     if (!GLTextures.size() || !cqiNumTextures || !cqiTextures)
         return -1;
 
     for (i=0; i<GLTextures.size(); i++)
     {
-        if (!strncmp(cqiTextures[GLTextures[i].cqiIndex].name,
-                     texname, CQI_NAMELEN))
-            return i;
+        if (GLTextures[i].cqiIndex >= 0)
+        {
+            if (!strncmp(cqiTextures[GLTextures[i].cqiIndex].name,
+                         texname, CQI_NAMELEN))
+                return i;
+        }
     }
 
     return -1;
-}
-
-/* search texture list and return pointer to GLTexture.  NULL if not found. */
-GLTexture_t *getGLTexture(const char *texname)
-{
-    int i;
-
-    if ((i = findGLTexture(texname)) == -1)
-        return NULL;
-    else
-        return &GLTextures[i];
 }
 
 /* search the cqi animations, and return it's animdef index */
@@ -273,7 +265,7 @@ static int initGLAnimDefs(void)
         if (cqiAnimDefs[i].texname[0] && !(cqiAnimDefs[i].anims & CQI_ANIMS_TEX))
         {
             if ((ndx = findGLTexture(cqiAnimDefs[i].texname)) >= 0)
-                GLAnimDefs[i].texid = GLTEX_ID(&GLTextures[ndx]);
+                GLAnimDefs[i].texid = GLTEX_ID(ndx);
             else
                 utLog("%s: could not locate texture '%s' for animdef '%s'.",
                       __FUNCTION__, cqiAnimDefs[i].texname, cqiAnimDefs[i].name);
@@ -293,7 +285,7 @@ static int initGLAnimDefs(void)
         if (GLAnimDefs[i].istates & AD_ISTATE_TEX)
         {                       /* an initial texture was specified. */
             if ((ndx = findGLTexture(cqiAnimDefs[i].itexname)) >= 0)
-                GLAnimDefs[i].itexid = GLTEX_ID(&GLTextures[ndx]);
+                GLAnimDefs[i].itexid = GLTEX_ID(ndx);
             else
             {
                 utLog("%s: could not locate istate texture '%s' for animdef '%s'.",
@@ -364,10 +356,10 @@ static int initGLAnimDefs(void)
 
                 if ((ndx = findGLTexture(buffer)) >= 0)
                 {
-                    GLTEX_ID(&GLAnimDefs[i].tex.tex[j]) =
-                        GLTEX_ID(&GLTextures[ndx]);
+                    GLAnimDefs[i].tex.tex[j].id =
+                        GLTEX_ID(ndx);
 
-                    if (HAS_GLCOLOR(&GLAnimDefs[i].tex.color))
+                    if (HAS_GLCOLOR(GLAnimDefs[i].tex.color))
                     {           /* override per-tex colors */
                         GLAnimDefs[i].tex.tex[j].col = GLAnimDefs[i].tex.color;
                     }
@@ -462,19 +454,19 @@ static bool initGLExplosions(std::vector<std::vector<animStateRec_t>>& torpState
     return false;
 }
 
-static GLTexture_t *_get_tex(const char *name)
+static textureIdx_t _get_tex(const char *name)
 {
-    GLTexture_t *tex;
+    textureIdx_t tex;
 
     if (!name)                    /* should never happen, but... */
-        return &defaultTexture;
+        return defaultTextureIdx;
 
-    if ((tex = getGLTexture(name)))
+    if ((tex = findGLTexture(name)) >= 0)
         return tex;
     else
         utLog("%s: Could not find texture '%s'", __FUNCTION__, name);
 
-    return &defaultTexture;
+    return defaultTextureIdx;
 }
 
 /* initialize the GLShips array.  We also load the tac ring colors here too. */
@@ -663,7 +655,7 @@ static int _get_glplanet_info(GLPlanet_t *curGLPlanet, int plani)
 
     /* now we are set, get the GLTexture */
 
-    curGLPlanet->tex = &GLTextures[gltndx];
+    curGLPlanet->tex = gltndx;
 
     size = (real)cbPlanets[plani].size * GLTextures[gltndx].prescale;
 
@@ -746,9 +738,10 @@ static int initGLPlanets(void)
 void drawIconHUDDecal(GLfloat rx, GLfloat ry, GLfloat w, GLfloat h,
                       textureHUDItem_t imgp, cqColor icol)
 {
-    int steam = cbShips[Context.snum].team, stype = cbShips[Context.snum].shiptype;
+    int steam = cbShips[Context.snum].team,
+        stype = cbShips[Context.snum].shiptype;
     static int norender = false;
-    GLTexture_t *tex = &defaultTexture;
+    textureIdx_t tex = defaultTextureIdx;
 
     if (norender)
         return;
@@ -2213,7 +2206,7 @@ void drawDoomsday(GLfloat x, GLfloat y, GLfloat dangle, GLfloat scale)
     /* find the textures if we haven't already */
     if (!GLDoomsday.doom)
     {                           /* init first time around */
-        if ( !(GLDoomsday.doom = getGLTexture("doomsday")) )
+        if ( (GLDoomsday.doom = findGLTexture("doomsday")) < 0 )
         {
             utLog("%s: Could not find the doomsday texture,  bailing.",
                   __FUNCTION__);
@@ -2222,7 +2215,7 @@ void drawDoomsday(GLfloat x, GLfloat y, GLfloat dangle, GLfloat scale)
         }
 
         /* find the AP beam */
-        if ( !(GLDoomsday.beam = getGLTexture("doombeam")) )
+        if ( (GLDoomsday.beam = findGLTexture("doombeam")) < 0 )
         {
             utLog("%s: Could not find the doombeam texture,  bailing.",
                   __FUNCTION__);
@@ -2675,7 +2668,7 @@ void drawViewerBG(int snum, int dovbg)
     static const GLfloat z = TRANZ * 1.65;
 
     GLfloat x, y, x2, y2;
-    static GLint texid_vbg = 0;
+    static GLint texid_vbg = -1;
     GLfloat scaleFac = (SMAP(snum)) ? dConf.vScaleLR : dConf.vScaleSR;
 
     /* half-width of vbg at TRANZ */
@@ -2688,15 +2681,15 @@ void drawViewerBG(int snum, int dovbg)
         return;
 
     /* try to init them */
-    if (!texid_vbg)
+    if (texid_vbg == -1)
     {
         int ndx;
 
         if ((ndx = findGLTexture("vbg")) >= 0)
-            texid_vbg = GLTEX_ID(&GLTextures[ndx]);
+            texid_vbg = GLTEX_ID(ndx);
         else
         {
-            texid_vbg = 0;
+            texid_vbg = GLTEX_ID(defaultTextureIdx);
             return;
         }
     }
@@ -2855,9 +2848,17 @@ static void charInput(unsigned char key, int x, int y)
 /* create the 'default' GLTexture (defaultTexture) */
 static void createDefaultTexture(void)
 {
+    GLTexture_t defaultTexture;
+
+    memset((void *)&defaultTexture, 0, sizeof(GLTexture_t));
+
+    /* clear all the textures */
+    GLTextures.clear();
+
     /* 2x2 checkerboard-like (with interpolation :) */
     static GLuint GL_defaultTexImage[4] = {0x000000ff, 0xffffffff,
                                           0xffffffff, 0x000000ff};
+    defaultTexture.cqiIndex = -1;
     defaultTexture.w = 2;
     defaultTexture.h = 2;
 
@@ -2878,6 +2879,8 @@ static void createDefaultTexture(void)
                  GL_RGBA, GL_UNSIGNED_BYTE, GL_defaultTexImage);
     GLError();
 
+    // always the first texture, index 0!
+    GLTextures.push_back(defaultTexture);
     return;
 }
 
@@ -3022,7 +3025,8 @@ static int loadGLTextures()
         return false;
     }
 
-    /* first, setup the 'default' texture */
+    // This function clear()'s the GLTextures vector, and adds the
+    // defaultTexture as the first texture, index 0.
     createDefaultTexture();
 
     /* now try to load each texture and setup the proper data */
@@ -3048,9 +3052,9 @@ static int loadGLTextures()
                                        cqiTextures[i].flags )) >= 0)
         {                       /* the same hw texture was previously loaded
                                    just save it's texture id and w/h */
-            texid = GLTEX_ID(&GLTextures[ndx]);
-            texw  = GLTEX_WIDTH(&GLTextures[ndx]);
-            texh  = GLTEX_HEIGHT(&GLTextures[ndx]);
+            texid = GLTEX_ID(ndx);
+            texw  = GLTEX_WIDTH(ndx);
+            texh  = GLTEX_HEIGHT(ndx);
 
             if (cqDebug > 1)
                 utLog("%s: texture file '%s' already loaded, using existing tid.",

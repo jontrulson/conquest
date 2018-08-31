@@ -34,34 +34,34 @@
 /* storage for ship textures, colors, other GL related things, indexed by
    team/shiptype */
 typedef struct _glship {
-    GLTexture_t *ship;             /* main ship texture */
-    GLTexture_t *sh;               /* main ship shield texture */
-    GLTexture_t *phas;             /* phaser */
-    GLTexture_t *ico;              /* ship icon */
-    GLTexture_t *ico_sh;           /* icon shields id */
-    GLTexture_t *ico_torp;         /* torp pip */
-    GLTexture_t *decal1;           /* sh/hull gauges */
-    GLTexture_t *decal1_lamp_sh;   /* sh lamp */
-    GLTexture_t *decal1_lamp_hull; /* hull lamp */
-    GLTexture_t *decal1_lamp_fuel; /* fuel lamp */
-    GLTexture_t *decal1_lamp_eng;  /* eng lamp */
-    GLTexture_t *decal1_lamp_wep;  /* wep lamp */
-    GLTexture_t *decal1_lamp_rep;  /* repairing lamp */
-    GLTexture_t *decal1_lamp_cloak;/* cloaking lamp */
-    GLTexture_t *decal1_lamp_tow;  /* towing/towedby lamp */
-    GLTexture_t *decal2;           /* fuel/w/e/alloc/kills gauges */
-    GLTexture_t *dial;             /* ships astrogator dial */
-    GLTexture_t *dialp;            /* astrogator pointer */
-    GLTexture_t *warp;             /* warp gauge */
-    GLTexture_t *warp2;            /* warp gauge background*/
-    GLTexture_t *warpq_col;        /* warp indicator quad (color only) */
+    textureIdx_t ship;             /* main ship texture */
+    textureIdx_t sh;               /* main ship shield texture */
+    textureIdx_t phas;             /* phaser */
+    textureIdx_t ico;              /* ship icon */
+    textureIdx_t ico_sh;           /* icon shields id */
+    textureIdx_t ico_torp;         /* torp pip */
+    textureIdx_t decal1;           /* sh/hull gauges */
+    textureIdx_t decal1_lamp_sh;   /* sh lamp */
+    textureIdx_t decal1_lamp_hull; /* hull lamp */
+    textureIdx_t decal1_lamp_fuel; /* fuel lamp */
+    textureIdx_t decal1_lamp_eng;  /* eng lamp */
+    textureIdx_t decal1_lamp_wep;  /* wep lamp */
+    textureIdx_t decal1_lamp_rep;  /* repairing lamp */
+    textureIdx_t decal1_lamp_cloak;/* cloaking lamp */
+    textureIdx_t decal1_lamp_tow;  /* towing/towedby lamp */
+    textureIdx_t decal2;           /* fuel/w/e/alloc/kills gauges */
+    textureIdx_t dial;             /* ships astrogator dial */
+    textureIdx_t dialp;            /* astrogator pointer */
+    textureIdx_t warp;             /* warp gauge */
+    textureIdx_t warp2;            /* warp gauge background*/
+    textureIdx_t warpq_col;        /* warp indicator quad (color only) */
 } GLShip_t;
 
 #if defined(NOEXTERN_GL)
 GLShip_t GLShips[NUMPLAYERTEAMS][MAXNUMSHIPTYPES] = {};
 
 /* the LR scaling array (-5 - 5) */
-GLfloat scaleFactorsLR[10] = {
+const GLfloat scaleFactorsLR[10] = {
     /* zoom out (mag-) */
     0.75,
     0.8,
@@ -77,7 +77,7 @@ GLfloat scaleFactorsLR[10] = {
 };
 
 /* the SR scaling array (-5 - 5) */
-GLfloat scaleFactorsSR[10] = {
+const GLfloat scaleFactorsSR[10] = {
     /* zoom out (mag-) */
     0.5,
     0.6,
@@ -92,7 +92,8 @@ GLfloat scaleFactorsSR[10] = {
     3.25
 };
 
-GLTexture_t defaultTexture;
+// The defaultTexture index - always created first, always 0
+const textureIdx_t defaultTextureIdx = 0;
 
 /* count resize/scale change events so functions that care, can detect
  * them and do the right thing.
@@ -100,16 +101,16 @@ GLTexture_t defaultTexture;
 uint32_t GLGeoChange = 0;
 
 // tactical ring colors
-GLTexture_t *tacRing1K, *tacRing2K, *tacRing3K, *tacRingXK, *tacRing10K;
+textureIdx_t tacRing1K, tacRing2K, tacRing3K, tacRingXK, tacRing10K;
 
 #else
 extern GLShip_t GLShips[NUMPLAYERTEAMS][MAXNUMSHIPTYPES];
 
 extern GLfloat  scaleFactorsLR[10];
 extern GLfloat  scaleFactorsSR[10];
-extern const GLTexture_t defaultTexture;
+extern const textureIdx_t defaultTextureIdx;
 extern const uint32_t GLGeoChange;
-extern GLTexture_t *tacRing1K, *tacRing2K, *tacRing3K, *tacRingXK, *tacRing10K;
+extern textureIdx_t tacRing1K, tacRing2K, tacRing3K, tacRingXK, tacRing10K;
 #endif
 
 void drawPlanet( GLfloat x, GLfloat y, int pnum, int scale,
