@@ -28,6 +28,7 @@
 #ifndef _TEXTURES_H
 #define _TEXTURES_H
 
+#include <vector>
 #include <GL/gl.h>
 
 #include "conqinit.h"
@@ -53,9 +54,9 @@ typedef struct _GLtexcoord {
 } GLTexcoord_t;
 
 #ifdef NOEXTERN_TEXTURES
-GLTexture_t *GLTextures = NULL;
+std::vector<GLTexture_t> GLTextures;
 #else
-extern GLTexture_t *GLTextures;
+extern std::vector<GLTexture_t> GLTextures;
 #endif
 
 int findGLTexture(const char *texname);

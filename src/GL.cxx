@@ -86,9 +86,6 @@ extern void conqend(void);
 
 #include <vector>
 
-/* loaded texture list (the list itself is exported in textures.h) */
-static int loadedGLTextures = 0; /* count of total successful tex loads */
-
 /* bomb (torp) animation state per ship */
 static std::vector<animStateRec_t> bombAState;
 
@@ -171,10 +168,10 @@ int findGLTexture(const char *texname)
 {
     int i;
 
-    if (!loadedGLTextures || !GLTextures || !cqiNumTextures || !cqiTextures)
+    if (!GLTextures.size() || !cqiNumTextures || !cqiTextures)
         return -1;
 
-    for (i=0; i<loadedGLTextures; i++)
+    for (i=0; i<GLTextures.size(); i++)
     {
         if (!strncmp(cqiTextures[GLTextures[i].cqiIndex].name,
                      texname, CQI_NAMELEN))
@@ -200,7 +197,7 @@ int findGLAnimDef(const char *animname)
 {
     int i;
 
-    if (!loadedGLTextures || !GLTextures || !cqiNumTextures || !cqiTextures ||
+    if (!GLTextures.size() || !cqiNumTextures || !cqiTextures ||
         !GLAnimDefs)
         return -1;
 
@@ -219,11 +216,11 @@ static int findGLTextureByFile(char *texfile, uint32_t flags)
 {
     int i;
 
-    if (!loadedGLTextures || !GLTextures || !cqiNumTextures || !cqiTextures)
+    if (!GLTextures.size() || !cqiNumTextures || !cqiTextures)
         return -1;
 
     /* we check both the filename and flags */
-    for (i=0; i<loadedGLTextures; i++)
+    for (i=0; i<GLTextures.size(); i++)
     {
         if (!strncmp(cqiTextures[GLTextures[i].cqiIndex].filename,
                      texfile, CQI_NAMELEN) &&
@@ -1539,6 +1536,7 @@ int uiGLInit(int *argc, char **argv)
     glutReshapeFunc        (resize);
     glutEntryFunc          (NULL);
 
+    GLTextures.clear();
     return 0;
 }
 
@@ -2686,7 +2684,7 @@ void drawViewerBG(int snum, int dovbg)
     if (snum < 0 || snum >= cbLimits.maxShips())
         return;
 
-    if (!GLTextures || !GLShips[0][0].ship)
+    if (!GLTextures.size() || !GLShips[0][0].ship)
         return;
 
     /* try to init them */
@@ -3045,7 +3043,7 @@ static int loadGLTextures()
         /* first see if a texture with the same filename was already loaded.
            if so, no need to do it again, just copy the previously loaded
            data */
-        if (GLTextures && !col_only &&
+        if (GLTextures.size() && !col_only &&
             (ndx = findGLTextureByFile(cqiTextures[i].filename,
                                        cqiTextures[i].flags )) >= 0)
         {                       /* the same hw texture was previously loaded
@@ -3156,23 +3154,6 @@ static int loadGLTextures()
         if (rv || texid || col_only)     /* tex/color load/locate succeeded,
                                             add it to the list */
         {
-            texptr = (GLTexture_t *)realloc((void *)GLTextures,
-                                            sizeof(GLTexture_t) *
-                                            (loadedGLTextures + 1));
-
-            if (!texptr)
-            {
-                utLog("%s: Could not realloc %d textures, ignoring texture '%s'",
-                      __FUNCTION__,
-                      loadedGLTextures + 1,
-                      cqiTextures[i].name);
-                free(texti);
-                return false;
-            }
-
-            GLTextures = texptr;
-            texptr = NULL;
-
             /* now set it up */
             if (texid)
             {
@@ -3185,13 +3166,12 @@ static int loadGLTextures()
             curTexture.prescale = cqiTextures[i].prescale;
             hex2GLColor(cqiTextures[i].color, &curTexture.col);
 
-            GLTextures[loadedGLTextures] = curTexture;
-            loadedGLTextures++;
+            GLTextures.push_back(curTexture);
         }
     }
 
-    utLog("%s: Successfully loaded %d textures, (%d files).",
-          __FUNCTION__, loadedGLTextures, hwtextures);
+    utLog("%s: Successfully loaded %ld textures, (%d files).",
+          __FUNCTION__, GLTextures.size(), hwtextures);
 
     return true;
 }

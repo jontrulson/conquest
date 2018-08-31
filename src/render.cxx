@@ -845,7 +845,7 @@ void renderHud(bool dostats)
     extern int ncpSRMagFactor;
 
 
-    if (!GLTextures)
+    if (!GLTextures.size())
         return;                     /* don't render until we actually can */
 
     if ((frameTime - rxtime) > 1000)
