@@ -104,7 +104,8 @@ typedef struct _gl_planet {
     GLfloat      size;          /* the prefered size, in prescaled CU's*/
 } GLPlanet_t;
 
-static GLPlanet_t *GLPlanets = NULL;
+// There is a one-to-one correspondence between cbPlanets[] and GLPlanets[]
+static std::vector<GLPlanet_t> GLPlanets;
 
 /* storage for doomsday tex */
 static struct {
@@ -113,7 +114,7 @@ static struct {
 } GLDoomsday = {};
 
 
-/* raw TGA texture data */
+/* raw texture data */
 typedef struct
 {
     // stb_image
@@ -582,9 +583,6 @@ static int _get_glplanet_info(GLPlanet_t *curGLPlanet, int plani)
     GLfloat size;
     int gltndx = -1;
 
-    if (!GLPlanets)
-        return false;
-
     if (plani < 0 || plani >= cbLimits.maxPlanets())
         return false;
 
@@ -653,7 +651,7 @@ static int _get_glplanet_info(GLPlanet_t *curGLPlanet, int plani)
         return false;
     }
 
-    /* now we are set, get the GLTexture */
+    /* now we are set, set the GLTexture index */
 
     curGLPlanet->tex = gltndx;
 
@@ -681,7 +679,7 @@ int uiUpdatePlanet(int plani)
 {
     GLPlanet_t *curGLPlanet = NULL;
 
-    if (!GLPlanets)
+    if (!GLPlanets.size())
         return false;
 
     if (plani < 0 || plani >= cbLimits.maxPlanets())
@@ -701,34 +699,21 @@ static int initGLPlanets(void)
 
     utLog("%s: Initializing...", __FUNCTION__);
 
-    /* first, if there's already one present, free it */
-
-    if (GLPlanets)
-    {
-        free(GLPlanets);
-        GLPlanets = NULL;
-    }
-
-    /* allocate enough space */
-
-    if (!(GLPlanets = (GLPlanet_t *)malloc(sizeof(GLPlanet_t) * cbLimits.maxPlanets())))
-    {
-        utLog("%s: ERROR: malloc(%lu) failed.", __FUNCTION__,
-              sizeof(GLPlanet_t) * cbLimits.maxPlanets());
-
-        return false;
-    }
+    /* first, if already initialized, clear it */
+    GLPlanets.clear();
+    GLPlanets.reserve(cbLimits.maxPlanets());
 
     /* now go through each one, setting up the proper values */
     for (i=0; i<cbLimits.maxPlanets(); i++)
     {
-        memset((void *)&curGLPlanet, 0, sizeof(GLPlanet_t));
-
         if (!_get_glplanet_info(&curGLPlanet, i))
+        {
+            GLPlanets.clear();
             return false;
+        }
 
         /* we're done, assign it and go on to the next one */
-        GLPlanets[i] = curGLPlanet;
+        GLPlanets.push_back(curGLPlanet);
     }
 
     return true;
@@ -1305,7 +1290,7 @@ void drawPlanet( GLfloat x, GLfloat y, int pnum, int scale,
     }
 
     /* if there's nothing available to render, no point in being here :( */
-    if (!GLPlanets)
+    if (!GLPlanets.size())
         if (!initGLPlanets())
         {
             utLog("%s: initGLPlanets failed, bailing.",
