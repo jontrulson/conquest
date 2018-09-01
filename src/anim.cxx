@@ -408,96 +408,18 @@ int animIterState(animStatePtr_t astate)
     return (ANIM_EXPIRED(astate) ? true : false);
 }
 
-/* Per node Que handling */
-void animQueInit(animQue_t *aque)
-{
-    if (!aque)
-        return;
-
-    /* we'll setup the default number of entries to be 32,
-       which you will almost certainly reach at some point. */
-
-    aque->maxentries = 32;
-    aque->numentries = 0;
-
-    if (!(aque->que = (animStatePtr_t *)malloc(aque->maxentries * sizeof(animStatePtr_t))))
-    {
-        utLog("%s: malloc(%lu) failed.", __FUNCTION__,
-              aque->maxentries * sizeof(animQue_t *));
-        aque->maxentries = 0;
-    }
-
-    /* we'll try to go on.  Maybe a later realloc (on the first
-       animQueAdd() will work...) */
-
-    return;
-}
-
-/* add a new anim state pointer to the que.  For speed, we do not
-   check to see if it is already there first, so be careful. */
-void animQueAdd(animQue_t *aque, animStatePtr_t astate)
-{
-    animStatePtr_t *newlist = NULL;
-    static const int increment = 8; /* allocate 8 at a time */
-
-    if (!aque || !astate)
-        return;
-
-    if ((aque->numentries + 1) >= aque->maxentries)
-    {                           /* need to reallocate more */
-        newlist = (animStatePtr_t *)realloc((void *)aque->que,
-                                            sizeof(animStatePtr_t) *
-                                            (aque->maxentries + increment));
-
-        if (!newlist)
-        {
-            utLog("%s: Could not realloc %lu state pointers, ignoring Add.",
-                  __FUNCTION__,
-                  sizeof(animStatePtr_t) * (aque->maxentries + increment));
-            return;               /* do nothing */
-        }
-
-        aque->que = newlist;
-        aque->maxentries += increment;
-    }
-
-    aque->que[aque->numentries] = astate;
-    aque->numentries++;
-
-    return;
-}
-
-void animQueDelete(animQue_t *aque, animStatePtr_t astate)
-{
-    int i;
-
-    if (!aque || !astate)
-        return;
-
-    for (i=0; i<aque->numentries; i++)
-        if (aque->que[i] == astate)
-        {
-            aque->numentries--;
-            aque->que[i] = aque->que[aque->numentries];
-            aque->que[aque->numentries] = NULL;
-        }
-
-    return;
-}
-
 /* run the list of que entries, removing thos that expire */
-void animQueRun(animQue_t *aque)
+void animQueRun(animQue_t& aque)
 {
-    int i;
-
-    if (!aque || !aque->numentries)
-        return;
-
-    for (i=0; i<aque->numentries; i++)
-    {
-        if (animIterState(aque->que[i]))
-            animQueDelete(aque, aque->que[i]); /* it expired, remove it */
-    }
+    for (auto astate: aque)
+        if (animIterState(astate))
+        {
+            // it expired, remove it
+            aque.erase(std::remove(aque.begin(), aque.end(), astate),
+                       aque.end());
+            // we're done
+            break;
+        }
 
     return;
 }

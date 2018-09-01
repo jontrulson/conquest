@@ -55,7 +55,7 @@
 /* init the blinkers - needs to be done early before any rendering is done */
 void blinkerInit(void)
 {
-    animQueInit(&blinkerQue);
+    blinkerQue.clear();
 
     /* now setup the blinkers
      * these are toggle animations that never expire, so they
@@ -66,19 +66,19 @@ void blinkerInit(void)
         utLog("%s: failed to init animstate for animation 'onesec'",
               __FUNCTION__);
     else
-        animQueAdd(&blinkerQue, &blinkerOneSec);
+        blinkerQue.push_back(&blinkerOneSec);
 
     if (!animInitState("halfsec", &blinkerHalfSec, NULL))
         utLog("%s: failed to init animstate for animation 'halfsec'",
               __FUNCTION__);
     else
-        animQueAdd(&blinkerQue, &blinkerHalfSec);
+        blinkerQue.push_back(&blinkerHalfSec);
 
     if (!animInitState("qtrsec", &blinkerQtrSec, NULL))
         utLog("%s: failed to init animstate for animation 'qtrsec'",
               __FUNCTION__);
     else
-        animQueAdd(&blinkerQue, &blinkerQtrSec);
+        blinkerQue.push_back(&blinkerQtrSec);
 
     return;
 }

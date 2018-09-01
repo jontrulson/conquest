@@ -192,8 +192,9 @@ void nPlayBInit(void)
     {
         int i;
 
+        // store it for the node renderer
         nPlayBNode.animQue = &animQue;
-        animQueInit(nPlayBNode.animQue);
+        animQue.clear();
 
         /* setup the team torp animators */
         for (i=0; i<NUMPLAYERTEAMS; i++)
@@ -208,7 +209,7 @@ void nPlayBInit(void)
                       __FUNCTION__,
                       nm);
             else
-                animQueAdd(nPlayBNode.animQue, &ncpTorpAnims[i]);
+                animQue.push_back(&ncpTorpAnims[i]);
         }
     }
 

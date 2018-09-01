@@ -2168,8 +2168,10 @@ void nCPInit(int istopnode)
     {
         int i;
 
+        // store it for the node renderer
         nCPNode.animQue = &animQue;
-        animQueInit(nCPNode.animQue);
+        // init
+        animQue.clear();
 
         /* setup the team torp animators */
         for (i=0; i<NUMPLAYERTEAMS; i++)
@@ -2183,7 +2185,7 @@ void nCPInit(int istopnode)
                 utLog("%s: failed to init animstate for animation '%s'",
                       __FUNCTION__, nm);
             else
-                animQueAdd(nCPNode.animQue, &ncpTorpAnims[i]);
+                animQue.push_back(&ncpTorpAnims[i]);
         }
 
         /* init the intro music array.  We want to ensure that we play

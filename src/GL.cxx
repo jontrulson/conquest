@@ -1094,7 +1094,7 @@ void drawExplosion(GLfloat x, GLfloat y, int snum, int torpnum, int scale)
             torpAStates[snum][torpnum].state.x = cbShips[snum].torps[torpnum].x;
             torpAStates[snum][torpnum].state.y = cbShips[snum].torps[torpnum].y;
 
-            animQueAdd(curnode->animQue, &torpAStates[snum][torpnum]);
+            curnode->animQue->push_back(&torpAStates[snum][torpnum]);
         }
     }
 
@@ -1208,7 +1208,7 @@ void drawBombing(int snum, int scale)
             psize *= 0.80;
             rnd->rndx = rnduni(-psize, psize); /* rnd X */
             rnd->rndy = rnduni(-psize, psize); /* rnd Y */
-            animQueAdd(curnode->animQue, &bombAState[snum]);
+            curnode->animQue->push_back(&bombAState[snum]);
         }
 
     }
@@ -1756,7 +1756,7 @@ static nodeStatus_t renderNode(void)
     cInfo.nodeMillis = clbGetMillis();
 
     /* always iter the blinker que */
-    animQueRun(&blinkerQue);
+    animQueRun(blinkerQue);
 
     if (node)
     {
@@ -1770,7 +1770,7 @@ static nodeStatus_t renderNode(void)
                 return rv;
 
             if (node->animQue)
-                animQueRun(node->animQue);
+                animQueRun(*node->animQue);
 
             if (onode && onode->display)
             {
@@ -1780,7 +1780,7 @@ static nodeStatus_t renderNode(void)
                     return rv;
 
                 if (onode->animQue)
-                    animQueRun(onode->animQue);
+                    animQueRun(*onode->animQue);
             }
 
             glutSwapBuffers();
@@ -2200,7 +2200,7 @@ void drawDoomsday(GLfloat x, GLfloat y, GLfloat dangle, GLfloat scale)
         if (animInitState("doomsday-ap-fire", &doomapfire, NULL))
         {
             scrNode_t *node = getTopNode();
-            animQueAdd(node->animQue, &doomapfire);
+            node->animQue->push_back(&doomapfire);
         }
 
         if (beamfx == -1)

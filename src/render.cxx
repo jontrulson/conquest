@@ -623,44 +623,44 @@ static void renderPulseMsgs(void)
     if (firsttime)
     {
         if (!curnode->animQue)
-            return;                 /* mmaybe we'll get one next time */
+            return;                 /* maybe we'll get one next time */
 
         firsttime = false;
 
         /* init the anims */
         if (animInitState("overload-pulse", &engfail, NULL))
         {
-            animQueAdd(curnode->animQue, &engfail);
+            curnode->animQue->push_back(&engfail);
         }
 
         if (animInitState("overload-pulse", &wepfail, NULL))
         {
-            animQueAdd(curnode->animQue, &wepfail);
+            curnode->animQue->push_back(&wepfail);
         }
 
         if (animInitState("critical-pulse", &engcrit, NULL))
         {
-            animQueAdd(curnode->animQue, &engcrit);
+            curnode->animQue->push_back(&engcrit);
         }
 
         if (animInitState("critical-pulse", &wepcrit, NULL))
         {
-            animQueAdd(curnode->animQue, &wepcrit);
+            curnode->animQue->push_back(&wepcrit);
         }
 
         if (animInitState("overload-pulse", &fuelcrit, NULL))
         {
-            animQueAdd(curnode->animQue, &fuelcrit);
+            curnode->animQue->push_back(&fuelcrit);
         }
 
         if (animInitState("overload-pulse", &shcrit, NULL))
         {
-            animQueAdd(curnode->animQue, &shcrit);
+            curnode->animQue->push_back(&shcrit);
         }
 
         if (animInitState("overload-pulse", &hullcrit, NULL))
         {
-            animQueAdd(curnode->animQue, &hullcrit);
+            curnode->animQue->push_back(&hullcrit);
         }
     }
 
@@ -683,7 +683,7 @@ static void renderPulseMsgs(void)
         if (ANIM_EXPIRED(&fuelcrit))
         {
             animResetState(&fuelcrit, frameTime);
-            animQueAdd(curnode->animQue, &fuelcrit);
+            curnode->animQue->push_back(&fuelcrit);
         }
 
         glfRenderFont(o.fuelcritpulse.x, o.fuelcritpulse.y, 0.0,
@@ -699,7 +699,7 @@ static void renderPulseMsgs(void)
         if (ANIM_EXPIRED(&engfail))
         {
             animResetState(&engfail, frameTime);
-            animQueAdd(curnode->animQue, &engfail);
+            curnode->animQue->push_back(&engfail);
         }
 
         glfRenderFont(o.engfailpulse.x, o.engfailpulse.y, 0.0,
@@ -713,7 +713,7 @@ static void renderPulseMsgs(void)
         if (ANIM_EXPIRED(&engcrit))
         {
             animResetState(&engcrit, frameTime);
-            animQueAdd(curnode->animQue, &engcrit);
+            curnode->animQue->push_back(&engcrit);
         }
 
         glfRenderFont(o.engfailpulse.x, o.engfailpulse.y, 0.0,
@@ -729,7 +729,7 @@ static void renderPulseMsgs(void)
         if (ANIM_EXPIRED(&wepfail))
         {
             animResetState(&wepfail, frameTime);
-            animQueAdd(curnode->animQue, &wepfail);
+            curnode->animQue->push_back(&wepfail);
         }
 
         glfRenderFont(o.wepfailpulse.x, o.wepfailpulse.y, 0.0,
@@ -744,7 +744,7 @@ static void renderPulseMsgs(void)
         if (ANIM_EXPIRED(&wepcrit))
         {
             animResetState(&wepcrit, frameTime);
-            animQueAdd(curnode->animQue, &wepcrit);
+            curnode->animQue->push_back(&wepcrit);
         }
 
         glfRenderFont(o.wepfailpulse.x, o.wepfailpulse.y, 0.0,
@@ -761,7 +761,7 @@ static void renderPulseMsgs(void)
         if (ANIM_EXPIRED(&shcrit))
         {
             animResetState(&shcrit, frameTime);
-            animQueAdd(curnode->animQue, &shcrit);
+            curnode->animQue->push_back(&shcrit);
         }
 
         glfRenderFont(o.shcritpulse.x, o.shcritpulse.y, 0.0,
@@ -777,7 +777,7 @@ static void renderPulseMsgs(void)
         if (ANIM_EXPIRED(&hullcrit))
         {
             animResetState(&hullcrit, frameTime);
-            animQueAdd(curnode->animQue, &hullcrit);
+            curnode->animQue->push_back(&hullcrit);
         }
 
         glfRenderFont(o.hullcritpulse.x, o.hullcritpulse.y, 0.0,
