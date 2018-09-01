@@ -88,7 +88,6 @@ void setUserConfDefaults(void)
     UserConf.EnemyShipBox = true;
     UserConf.doVBG = true;
 
-    UserConf.DoShields = true;
     UserConf.DoTacBkg = false;
     UserConf.DoTacShade = 50;
 
@@ -103,7 +102,7 @@ void setUserConfDefaults(void)
         for (j=0; j<CONF_MAXMODIFIERS; j++)
             UserConf.Mouse[i][j][0] = 0;
 
-        /* set up default mouse macros, '\a' mean 'angle' substitution */
+        /* set up default mouse macros, '\a' means 'angle' substitution */
 
         /* fire phaser (left button (0), no modifiers) */
         utStrncpy(UserConf.Mouse[0][0], "f\\a\r", MAX_MACRO_LEN);
@@ -113,6 +112,12 @@ void setUserConfDefaults(void)
 
         /* fire torp (right button (2), no modifiers) */
         utStrncpy(UserConf.Mouse[2][0], "p\\a\r", MAX_MACRO_LEN);
+
+        /* zoom in (scroll up, no modifiers) */
+        utStrncpy(UserConf.Mouse[3][0], "]", MAX_MACRO_LEN);
+
+        /* zoom out (scroll down, no modifiers) */
+        utStrncpy(UserConf.Mouse[4][0], "[", MAX_MACRO_LEN);
     }
 
     return;

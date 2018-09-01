@@ -137,9 +137,6 @@ typedef struct _userConf {
     /* draw the background in the viewer? */
     int doVBG;
 
-    /* Cataboligne - enhanced colored shield indicator */
-    int DoShields;
-
     /* tactical background graphic */
     int DoTacBkg;
 
@@ -207,7 +204,7 @@ typedef struct _sysConf {
 #ifdef NOEXTERN_CONF
 // current version of the conquest.conf file, just change date for newer
 // versions.
-static const char *CONF_REVISION = "20180209";
+static const char *CONF_REVISION = "20180901";
 
 const char *ConfigVersion = CONF_REVISION;
 /* Config's */
@@ -722,19 +719,6 @@ struct Conf ConfData[] =
             "#  background image displayed in the viewer.  ",
             "#  You can toggle this in the game with CTRL-B as well.",
             "#  Default: true",
-            NULL
-        }
-    },
-    {
-        false,
-        CTYPE_BOOL,
-        "do_shields=",
-        &UserConf.DoShields,
-        0, 0,
-        "Display shield graphics",
-        {
-            "# define this as 'true' if you want a color coded shield strength",
-            "#  graphic displayed around the ships.  Default: true",
             NULL
         }
     },

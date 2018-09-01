@@ -1257,7 +1257,6 @@ void drawPlanet( GLfloat x, GLfloat y, int pnum, int scale,
     GLfloat size;
     char buf[BUFFER_SIZE_256];
     char torpchar;
-    char planame[BUFFER_SIZE_256];
     static int norender = false;
     GLfloat scaleFac = (scale == MAP_SR_FAC) ? dConf.vScaleSR : dConf.vScaleLR;
 
@@ -1348,10 +1347,9 @@ void drawPlanet( GLfloat x, GLfloat y, int pnum, int scale,
     else
     {                           /* MAP_LR_FAC */
         /* just want first 3 chars */
-        planame[0] = cbPlanets[pnum].name[0];
-        planame[1] = cbPlanets[pnum].name[1];
-        planame[2] = cbPlanets[pnum].name[2];
-        planame[3] = 0;
+        std::string planame = { cbPlanets[pnum].name[0],
+                                cbPlanets[pnum].name[1],
+                                cbPlanets[pnum].name[2] };
 
         if (UserConf.DoNumMap && (torpchar != ' '))
             snprintf(buf, BUFFER_SIZE_256, "#%d#%c#%d#%d#%d#%c%s",
@@ -1361,7 +1359,7 @@ void drawPlanet( GLfloat x, GLfloat y, int pnum, int scale,
                      cbPlanets[pnum].armies,
                      textcolor,
                      torpchar,
-                     planame);
+                     planame.c_str());
         else
             snprintf(buf, BUFFER_SIZE_256, "#%d#%c#%d#%c#%d#%c%s",
                      textcolor,
@@ -1370,7 +1368,7 @@ void drawPlanet( GLfloat x, GLfloat y, int pnum, int scale,
                      cbConqInfo->chrplanets[cbPlanets[pnum].type],
                      textcolor,
                      torpchar,
-                     planame);
+                     planame.c_str());
 
         glfRenderFont(x,
                       y - cu2GLSize((real)cbPlanets[pnum].size / 2.0, -scale),
@@ -1656,8 +1654,7 @@ void graphicsInit(void)
     return;
 }
 
-static void
-resize(int w, int h)
+static void resize(int w, int h)
 {
     static int minit = false;
     real aspectCorrection;
@@ -2067,7 +2064,7 @@ drawShip(GLfloat x, GLfloat y, GLfloat angle, char ch, int snum, int color,
      *  Cataboligne - shield visual
      */
 
-    if (UserConf.DoShields && SSHUP(snum) && !SREPAIR(snum))
+    if (SSHUP(snum) && !SREPAIR(snum))
     {             /* user opt, shield up, not repairing */
         glPushMatrix();
         glLoadIdentity();
