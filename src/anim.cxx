@@ -417,8 +417,6 @@ void animVecRun(animVec_t& avec)
             // it expired, remove it
             avec.erase(std::remove(avec.begin(), avec.end(), astate),
                        avec.end());
-            // we're done
-            break;
         }
 
     return;
