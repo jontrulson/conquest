@@ -28,7 +28,7 @@
 /* blinkers - blinkers are animdefs that simply toggle their armed
  * state on and off at given time intervals.  They can be used
  * anywhere within conquest(gl only of course :).  Hence we create a
- * global blinker animQue here (that the node renderer will iterate)
+ * global blinker animVec here (that the node renderer will iterate)
  * and make the blinkers globally available to conquest.
  */
 
@@ -40,7 +40,7 @@ animStateRec_t        blinkerOneSec = {};
 animStateRec_t        blinkerHalfSec = {};
 animStateRec_t        blinkerQtrSec = {};
 
-animQue_t             blinkerQue = {};
+animVec_t             blinkerQue = {};
 
 #else
 
@@ -48,7 +48,7 @@ extern animStateRec_t blinkerOneSec;
 extern animStateRec_t blinkerHalfSec;
 extern animStateRec_t blinkerQtrSec;
 
-extern animQue_t      blinkerQue;
+extern animVec_t      blinkerQue;
 
 #endif
 

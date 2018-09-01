@@ -190,7 +190,7 @@ typedef struct _gl_animdef {
 } GLAnimDef_t;
 
 /* animation Que (really just a linear list) that nodes will use */
-typedef std::vector<animStatePtr_t> animQue_t;
+typedef std::vector<animStatePtr_t> animVec_t;
 
 /* cqiNumAnimDefs is identical to the number of GLAnimDefs, so
    we do not bother to export a seperate (but identical) numGLAnimDefs. */
@@ -207,7 +207,7 @@ void animResetState(animStatePtr_t astate, uint32_t lasttime);
 
 int  animIterState(animStatePtr_t astate);
 
-void animQueRun(animQue_t& aque);
+void animVecRun(animVec_t& avec);
 
 
 #endif /* _ANIM_H */

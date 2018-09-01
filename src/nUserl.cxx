@@ -69,7 +69,7 @@ static scrNode_t nUserlNode = {
     nUserlIdle,                  /* idle */
     nUserlInput,                  /* input */
     NULL,                         /* minput */
-    NULL                          /* animQue */
+    NULL                          /* animVec */
 };
 
 static int retnode;             /* the node to return to */

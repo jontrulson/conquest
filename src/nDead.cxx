@@ -74,7 +74,7 @@ static scrNode_t nDeadNode = {
     nDeadIdle,                  /* idle */
     nDeadInput,                 /* input */
     NULL,                       /* minput */
-    NULL                        /* animQue */
+    NULL                        /* animVec */
 };
 
 

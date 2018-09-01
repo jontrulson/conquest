@@ -69,7 +69,7 @@ static scrNode_t nWelcomeNode = {
     NULL,                         /* idle */
     NULL,                         /* input */
     NULL,                         /* minput */
-    NULL                          /* animQue */
+    NULL                          /* animVec */
 };
 
 /*  gretds - block letter "greetings..." */

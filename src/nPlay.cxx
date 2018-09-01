@@ -67,7 +67,7 @@ static scrNode_t nPlayNode = {
     nPlayIdle,                  /* idle */
     nPlayInput,                  /* input */
     NULL,                         /* minput */
-    NULL                          /* animQue */
+    NULL                          /* animVec */
 };
 
 /* select a system to enter */

@@ -75,7 +75,7 @@ static scrNode_t nPlayBMenuNode = {
     NULL,                         /* idle */
     nPlayBMenuInput,              /* input */
     NULL,                         /* minput */
-    NULL                          /* animQue */
+    NULL                          /* animVec */
 
 };
 

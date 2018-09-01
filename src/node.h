@@ -49,7 +49,7 @@ typedef struct _scr_node {
     nodeStatus_t (*idle)(void);          /* idle routine */
     nodeStatus_t (*input)(int ch);       /* keyboard input routine */
     nodeStatus_t (*minput)(mouseData_t *mdata); /* mouse input routine */
-    animQue_t *animQue;                /* optional animation que. */
+    animVec_t *animVec;                /* optional animation que. */
 } scrNode_t;
 
 /* some nodes are called from other, multiple nodes, so we need

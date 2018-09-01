@@ -53,7 +53,7 @@ static scrNode_t nCPHelpNode = {
     nCPHelpIdle,                  /* idle */
     nCPHelpInput,                  /* input */
     NULL,                         /* minput */
-    NULL                          /* animQue */
+    NULL                          /* animVec */
 };
 
 

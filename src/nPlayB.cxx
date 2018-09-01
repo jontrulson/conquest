@@ -102,10 +102,10 @@ static scrNode_t nPlayBNode = {
     nPlayBIdle,                  /* idle */
     nPlayBInput,                  /* input */
     NULL,                         /* minput */
-    NULL                          /* animQue */
+    NULL                          /* animVec */
 };
 
-static animQue_t animQue;
+static animVec_t animVec;
 
 /* team torp anim states borrowed fron nCP */
 extern animStateRec_t ncpTorpAnims[NUMPLAYERTEAMS];
@@ -188,13 +188,13 @@ void nPlayBInit(void)
     prompting = false;
     state = S_NONE;
 
-    if (!nPlayBNode.animQue)
+    if (!nPlayBNode.animVec)
     {
         int i;
 
         // store it for the node renderer
-        nPlayBNode.animQue = &animQue;
-        animQue.clear();
+        nPlayBNode.animVec = &animVec;
+        animVec.clear();
 
         /* setup the team torp animators */
         for (i=0; i<NUMPLAYERTEAMS; i++)
@@ -209,7 +209,7 @@ void nPlayBInit(void)
                       __FUNCTION__,
                       nm);
             else
-                animQue.push_back(&ncpTorpAnims[i]);
+                animVec.push_back(&ncpTorpAnims[i]);
         }
     }
 

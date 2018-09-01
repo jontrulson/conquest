@@ -104,7 +104,7 @@ static scrNode_t nMenuNode = {
     nMenuIdle,                  /* idle */
     nMenuInput,                  /* input */
     NULL,                         /* minput */
-    NULL                          /* animQue */
+    NULL                          /* animVec */
 };
 
 static void _conqds(dspConfig_t *dsp)

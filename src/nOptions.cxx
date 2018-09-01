@@ -131,7 +131,7 @@ static scrNode_t nOptionsNode = {
     nOptionsIdle,                 /* idle */
     nOptionsInput,                /* input */
     NULL,                         /* minput */
-    NULL                          /* animQue */
+    NULL                          /* animVec */
 
 };
 

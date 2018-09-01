@@ -53,7 +53,7 @@ static scrNode_t nPlayBHelpNode = {
     NULL,                         /* idle */
     nPlayBHelpInput,               /* input */
     NULL,                         /* minput */
-    NULL                          /* animQue */
+    NULL                          /* animVec */
 
 };
 

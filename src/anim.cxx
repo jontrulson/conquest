@@ -409,14 +409,14 @@ int animIterState(animStatePtr_t astate)
 }
 
 /* run the list of que entries, removing thos that expire */
-void animQueRun(animQue_t& aque)
+void animVecRun(animVec_t& avec)
 {
-    for (auto astate: aque)
+    for (auto astate: avec)
         if (animIterState(astate))
         {
             // it expired, remove it
-            aque.erase(std::remove(aque.begin(), aque.end(), astate),
-                       aque.end());
+            avec.erase(std::remove(avec.begin(), avec.end(), astate),
+                       avec.end());
             // we're done
             break;
         }

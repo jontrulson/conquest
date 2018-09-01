@@ -54,7 +54,7 @@ static scrNode_t nHistlNode = {
     nHistlIdle,                  /* idle */
     nHistlInput,                  /* input */
     NULL,                         /* minput */
-    NULL                          /* animQue */
+    NULL                          /* animVec */
 };
 
 static int retnode;             /* the node to return to */

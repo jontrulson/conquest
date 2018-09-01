@@ -1084,7 +1084,7 @@ void drawExplosion(GLfloat x, GLfloat y, int snum, int torpnum, int scale)
             cqsEffectPlay(explodefx, NULL, YELLOW_DIST, dis, ang);
         }
 
-        if (curnode->animQue)
+        if (curnode->animVec)
         {
             animResetState(&torpAStates[snum][torpnum], frameTime);
 
@@ -1094,7 +1094,7 @@ void drawExplosion(GLfloat x, GLfloat y, int snum, int torpnum, int scale)
             torpAStates[snum][torpnum].state.x = cbShips[snum].torps[torpnum].x;
             torpAStates[snum][torpnum].state.y = cbShips[snum].torps[torpnum].y;
 
-            curnode->animQue->push_back(&torpAStates[snum][torpnum]);
+            curnode->animVec->push_back(&torpAStates[snum][torpnum]);
         }
     }
 
@@ -1197,7 +1197,7 @@ void drawBombing(int snum, int scale)
         /* reset it, adjust the initial starting conditions, and
            pick a nice place for it. */
 
-        if (curnode->animQue)
+        if (curnode->animVec)
         {
             animResetState(&bombAState[snum], frameTime);
 
@@ -1208,7 +1208,7 @@ void drawBombing(int snum, int scale)
             psize *= 0.80;
             rnd->rndx = rnduni(-psize, psize); /* rnd X */
             rnd->rndy = rnduni(-psize, psize); /* rnd Y */
-            curnode->animQue->push_back(&bombAState[snum]);
+            curnode->animVec->push_back(&bombAState[snum]);
         }
 
     }
@@ -1756,7 +1756,7 @@ static nodeStatus_t renderNode(void)
     cInfo.nodeMillis = clbGetMillis();
 
     /* always iter the blinker que */
-    animQueRun(blinkerQue);
+    animVecRun(blinkerQue);
 
     if (node)
     {
@@ -1769,8 +1769,8 @@ static nodeStatus_t renderNode(void)
             if (rv == NODE_EXIT)
                 return rv;
 
-            if (node->animQue)
-                animQueRun(*node->animQue);
+            if (node->animVec)
+                animVecRun(*node->animVec);
 
             if (onode && onode->display)
             {
@@ -1779,8 +1779,8 @@ static nodeStatus_t renderNode(void)
                 if (rv == NODE_EXIT)
                     return rv;
 
-                if (onode->animQue)
-                    animQueRun(*onode->animQue);
+                if (onode->animVec)
+                    animVecRun(*onode->animVec);
             }
 
             glutSwapBuffers();
@@ -2200,7 +2200,7 @@ void drawDoomsday(GLfloat x, GLfloat y, GLfloat dangle, GLfloat scale)
         if (animInitState("doomsday-ap-fire", &doomapfire, NULL))
         {
             scrNode_t *node = getTopNode();
-            node->animQue->push_back(&doomapfire);
+            node->animVec->push_back(&doomapfire);
         }
 
         if (beamfx == -1)
@@ -2506,7 +2506,7 @@ void drawNEB(int snum)
         return;
 
     /* here we iterate the neb anim state 'manually'.  We do not que
-     *   this in the normal animQue, since we only want to run it when
+     *   this in the normal animVec, since we only want to run it when
      *   this function is executed, rather than all the time.  Saves cycles.
      */
 

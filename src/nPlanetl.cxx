@@ -67,7 +67,7 @@ static scrNode_t nPlanetlNode = {
     nPlanetlIdle,                  /* idle */
     nPlanetlInput,                  /* input */
     NULL,                         /* minput */
-    NULL                          /* animQue */
+    NULL                          /* animVec */
 };
 
 static int retnode;             /* the node to return to */

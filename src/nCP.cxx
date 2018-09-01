@@ -189,10 +189,10 @@ static scrNode_t nCPNode = {
     nCPIdle,                      /* idle */
     nCPInput,                     /* input */
     nCPMInput,                    /* minput */
-    NULL                          /* animQue */
+    NULL                          /* animVec */
 };
 
-static animQue_t animQue;
+static animVec_t animVec;
 
 /* team torp anim states (exported) */
 animStateRec_t ncpTorpAnims[NUMPLAYERTEAMS];
@@ -2164,14 +2164,14 @@ void nCPInit(int istopnode)
     ibufFlush();
 
     /* first time through */
-    if (!nCPNode.animQue)
+    if (!nCPNode.animVec)
     {
         int i;
 
         // store it for the node renderer
-        nCPNode.animQue = &animQue;
+        nCPNode.animVec = &animVec;
         // init
-        animQue.clear();
+        animVec.clear();
 
         /* setup the team torp animators */
         for (i=0; i<NUMPLAYERTEAMS; i++)
@@ -2185,7 +2185,7 @@ void nCPInit(int istopnode)
                 utLog("%s: failed to init animstate for animation '%s'",
                       __FUNCTION__, nm);
             else
-                animQue.push_back(&ncpTorpAnims[i]);
+                animVec.push_back(&ncpTorpAnims[i]);
         }
 
         /* init the intro music array.  We want to ensure that we play
