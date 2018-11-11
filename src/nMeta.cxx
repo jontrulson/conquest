@@ -136,11 +136,13 @@ static void dispServerInfo(dspConfig_t *dsp, metaSRec_t *metaServerList,
     }
 
     cprintf(tlin, hcol, ALIGN_NONE, "%s", pbuf1);
-    cprintf(tlin++, icol, ALIGN_NONE, buf1, metaServerList[num].servername);
+    cprintf(tlin++, icol, ALIGN_NONE, buf1,
+            metaServerList[num].servername.c_str());
 
     cprintf(tlin, hcol, ALIGN_NONE, "%s", pbuf2);
-    cprintf(tlin++, icol, ALIGN_NONE, buf2, metaServerList[num].serverver,
-        metaServerList[num].protovers);
+    cprintf(tlin++, icol, ALIGN_NONE, buf2,
+            metaServerList[num].serverver.c_str(),
+            metaServerList[num].protovers);
 
     cprintf(tlin, hcol, ALIGN_NONE, "%s", pbuf3);
     cprintf(tlin++, icol, ALIGN_NONE, buf3,
@@ -157,13 +159,15 @@ static void dispServerInfo(dspConfig_t *dsp, metaSRec_t *metaServerList,
     tlin++;
 
     cprintf(tlin, hcol, ALIGN_NONE, "%s", pbuf5);
-    cprintf(tlin++, icol, ALIGN_NONE, buf5, metaServerList[num].motd);
+    cprintf(tlin++, icol, ALIGN_NONE, buf5, metaServerList[num].motd.c_str());
 
     cprintf(tlin, hcol, ALIGN_NONE, "%s", pbuf6);
-    cprintf(tlin++, icol, ALIGN_NONE, buf6, metaServerList[num].contact);
+    cprintf(tlin++, icol, ALIGN_NONE, buf6,
+            metaServerList[num].contact.c_str());
 
     cprintf(tlin, hcol, ALIGN_NONE, "%s", pbuf7);
-    cprintf(tlin++, icol, ALIGN_NONE, buf7, metaServerList[num].walltime);
+    cprintf(tlin++, icol, ALIGN_NONE, buf7,
+            metaServerList[num].walltime.c_str());
 
     drawLineBox(x, y, 0.0, w, h, CyanColor, 2.0);
 
@@ -215,7 +219,7 @@ void nMetaInit(void)
             servervec[i].vers = 0; /* always 'incompatible' */
 
         snprintf(servervec[i].hostname, (MAXHOSTNAME + MAXPORTNAME), "%s:%hu",
-                 metaServerList[i].altaddr,
+                 metaServerList[i].altaddr.c_str(),
                  metaServerList[i].port);
     }
 
@@ -397,7 +401,7 @@ static nodeStatus_t nMetaInput(int ch)
         if ((metaServerList[i].protovers == PROTOCOL_VERSION) ||
             metaServerList[i].version < 2) /* too old to know for sure */
         {
-            if ((cInfo.remotehost = strdup(metaServerList[i].altaddr)) == NULL)
+            if ((cInfo.remotehost = strdup(metaServerList[i].altaddr.c_str())) == NULL)
             {
                 utLog("strdup(metaServerList[i]) failed");
                 return NODE_EXIT;

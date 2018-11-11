@@ -35,20 +35,13 @@
 #include "conqutil.h"
 #include "protocol.h"
 
+#include <string>
+#include <algorithm>
+
 /* convert any pipe chars in a string to underlines */
-static void pipe2ul(char *str)
+static void pipe2ul(std::string& str)
 {
-    char *p;
-
-    p = str;
-
-    while (p && *p)
-    {
-        if (*p == '|')
-            *p = '_';
-        p++;
-    }
-
+    std::replace(str.begin(), str.end(), '|', '_');
     return;
 }
 
@@ -94,7 +87,7 @@ int metaBuffer2ServerRec(metaSRec_t *srec, char *buf)
 
         case 1:                   /* address if specified */
             *ch = 0;
-            utStrncpy(srec->altaddr, chs, CONF_SERVER_NAME_SZ);
+            srec->altaddr = chs;
 
             chs = ch + 1;
             fieldno++;
@@ -110,7 +103,7 @@ int metaBuffer2ServerRec(metaSRec_t *srec, char *buf)
 
         case 3:                   /* server name */
             *ch = 0;
-            utStrncpy(srec->servername, chs, CONF_SERVER_NAME_SZ);
+            srec->servername = chs;
 
             chs = ch + 1;
             fieldno++;
@@ -118,7 +111,7 @@ int metaBuffer2ServerRec(metaSRec_t *srec, char *buf)
 
         case 4:                   /* server version */
             *ch = 0;
-            utStrncpy(srec->serverver, chs, CONF_SERVER_NAME_SZ);
+            srec->serverver = chs;
 
             chs = ch + 1;
             fieldno++;
@@ -127,7 +120,7 @@ int metaBuffer2ServerRec(metaSRec_t *srec, char *buf)
 
         case 5:                   /* motd */
             *ch = 0;
-            utStrncpy(srec->motd, chs, CONF_SERVER_MOTD_SZ);
+            srec->motd = chs;
 
             chs = ch + 1;
             fieldno++;
@@ -191,7 +184,7 @@ int metaBuffer2ServerRec(metaSRec_t *srec, char *buf)
 
         case 12:                  /* contact (email/http/whatever) */
             *ch = 0;
-            utStrncpy(srec->contact, chs, META_GEN_STRSIZE);
+            srec->contact = chs;
 
             chs = ch + 1;
             fieldno++;
@@ -199,7 +192,7 @@ int metaBuffer2ServerRec(metaSRec_t *srec, char *buf)
 
         case 13:                  /* server localtime */
             *ch = 0;
-            utStrncpy(srec->walltime, chs, META_GEN_STRSIZE);
+            srec->walltime = chs;
 
             chs = ch + 1;
             fieldno++;
@@ -234,11 +227,11 @@ void metaServerRec2Buffer(char *buf, metaSRec_t *srec)
 
     sprintf(buf, "%u|%s|%d|%s|%s|%s|%d|%d|%d|%d|%u|%u|%s|%s|\n",
             srec->version,
-            srec->altaddr,
+            srec->altaddr.c_str(),
             srec->port,
-            srec->servername,
-            srec->serverver,
-            srec->motd,
+            srec->servername.c_str(),
+            srec->serverver.c_str(),
+            srec->motd.c_str(),
             srec->numtotal,
             srec->numactive,
             srec->numvacant,
@@ -246,8 +239,8 @@ void metaServerRec2Buffer(char *buf, metaSRec_t *srec)
             srec->flags,
             /* meta vers 0x0002+ */
             srec->protovers,
-            srec->contact,
-            srec->walltime);
+            srec->contact.c_str(),
+            srec->walltime.c_str());
 
     return;
 }
@@ -305,33 +298,32 @@ int metaUpdateServer(const char *remotehost, const char *name, int port)
     sRec.flags = getServerFlags();
     sRec.port = port;
 
-    utStrncpy(sRec.altaddr, myname, CONF_SERVER_NAME_SZ);
+    sRec.altaddr = myname;
     pipe2ul(sRec.altaddr);
-    utStrncpy(sRec.servername, SysConf.ServerName, CONF_SERVER_NAME_SZ);
+    sRec.servername = SysConf.ServerName;
     pipe2ul(sRec.servername);
 
-    utStrncpy(sRec.serverver, ConquestVersion, CONF_SERVER_NAME_SZ);
-    utStrncat((char *)sRec.serverver, " ", CONF_SERVER_NAME_SZ);
-    utStrncat((char *)sRec.serverver, ConquestDate,
-              CONF_SERVER_NAME_SZ);
+    sRec.serverver = ConquestVersion;
+    sRec.serverver += " ";
+    sRec.serverver += ConquestDate;
 
     pipe2ul(sRec.serverver);
-    utStrncpy(sRec.motd, SysConf.ServerMotd, CONF_SERVER_MOTD_SZ);
+    sRec.motd = SysConf.ServerMotd;
     pipe2ul(sRec.motd);
 
     /* meta ver 0x0002+ */
     sRec.protovers = PROTOCOL_VERSION;
 
-    utStrncpy(sRec.contact, SysConf.ServerContact, META_GEN_STRSIZE);
+    sRec.contact = SysConf.ServerContact;
     pipe2ul(sRec.altaddr);
 
     thetm = localtime(&thetimet);
-    snprintf(sRec.walltime, META_GEN_STRSIZE, "%s", asctime(thetm));
-    // remove newline.  Not sure why older servers didn't seem to add
-    // one in asctime, but current ones sure do.
-    i = strlen(sRec.walltime);
-    if (i && sRec.walltime[i - 1] == '\n')
-        sRec.walltime[i - 1] = 0;
+    std::string walltime(asctime(thetm));
+    // remove newline if present.  Not sure why older servers didn't
+    // seem to add one in asctime, but current ones sure do.
+    walltime.erase(std::remove(walltime.begin(), walltime.end(), '\n'),
+                   walltime.end());
+    sRec.walltime = walltime;
 
     /* all loaded up, convert it and send it off */
     metaServerRec2Buffer(msg, &sRec);

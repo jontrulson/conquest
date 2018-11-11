@@ -29,7 +29,7 @@
 #define META_H_INCLUDED
 
 #include "conqdef.h"
-
+#include <string>
 
 #define META_VERMAJ 0
 #define META_VERMIN 2
@@ -42,26 +42,24 @@
 
 /* internal representation of a server record for the meta server */
 typedef struct _meta_srec {
-    int     valid;
+    bool     valid;
     uint16_t version;
     uint8_t  numactive;
     uint8_t  numvacant;
     uint8_t  numrobot;
     uint8_t  numtotal;
-    time_t  lasttime;             /* last contact time */
-    uint32_t flags;                /* same as spServerStat_t */
+    time_t   lasttime;          /* last contact time */
+    uint32_t flags;             /* same as spServerStat_t */
     uint16_t port;
-    char    addr[CONF_SERVER_NAME_SZ]; /* server's detected address */
-    char    altaddr[CONF_SERVER_NAME_SZ]; /* specified real address */
-    char    servername[CONF_SERVER_NAME_SZ];
-    char    serverver[CONF_SERVER_NAME_SZ]; /* server's proto version */
-    char    motd[CONF_SERVER_MOTD_SZ];
+    std::string addr;           /* server's detected address */
+    std::string altaddr;        /* specified real address */
+    std::string servername;
+    std::string serverver;      /* server version */
+    std::string motd;
 
-    /* Version 0x0002 */
-    uint16_t protovers;
-    char    contact[META_GEN_STRSIZE];
-    char    walltime[META_GEN_STRSIZE];
-
+    uint16_t protovers;         // meta protocol version
+    std::string contact;
+    std::string walltime;
 } metaSRec_t;
 
 int  metaBuffer2ServerRec(metaSRec_t *srec, char *buf);

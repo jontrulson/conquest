@@ -109,9 +109,9 @@ void ageServers(void)
             if (abs(metaServerList[i].lasttime - now) > expireSeconds)
             {
                 utLog("META: expiring %s:%u(%s)\n",
-                      metaServerList[i].altaddr,
+                      metaServerList[i].altaddr.c_str(),
                       metaServerList[i].port,
-                      metaServerList[i].addr);
+                      metaServerList[i].addr.c_str());
                 metaServerList[i].valid = false;
             }
     }
@@ -133,9 +133,9 @@ int findSlot(metaSRec_t *srec, int *isupdate)
     found = false;
     for (i=0; i<maxSlot; i++)
     {
-        if ((!strcmp(metaServerList[i].addr, srec->addr)) &&
-            (!strcmp(metaServerList[i].altaddr, srec->altaddr)) &&
-            metaServerList[i].valid && (metaServerList[i].port == srec->port))
+        if (metaServerList[i].addr == srec->addr &&
+            metaServerList[i].altaddr == srec->altaddr &&
+            metaServerList[i].valid && metaServerList[i].port == srec->port)
         {
             rv = i;
             found = true;
@@ -216,12 +216,12 @@ void metaProcUpd(char *buf, int rlen, char *hostbuf)
         return;
     }
 
-    utStrncpy(sRec.addr, hostbuf, CONF_SERVER_NAME_SZ);
+    sRec.addr = hostbuf;
 
     /* if altaddr is empty, we copy hostbuf into it. */
 
-    if (strlen(sRec.altaddr) == 0)
-        utStrncpy(sRec.altaddr, sRec.addr, CONF_SERVER_NAME_SZ);
+    if (sRec.altaddr.size() == 0)
+        sRec.altaddr = sRec.addr;
 
     /* now find a slot for it. */
     if ((slot = findSlot(&sRec, &wasfound)) == -1)
@@ -239,16 +239,16 @@ void metaProcUpd(char *buf, int rlen, char *hostbuf)
 
     if (!wasfound)                /* new server */
         utLog("META: Added server %s:%u(%s), slot %d",
-              metaServerList[slot].altaddr,
+              metaServerList[slot].altaddr.c_str(),
               metaServerList[slot].port,
-              metaServerList[slot].addr,
+              metaServerList[slot].addr.c_str(),
               slot);
     else
     {
 #if defined(DEBUG_META)
         utLog("META: Updated server %s(%s)",
-              metaServerList[slot].altaddr,
-              metaServerList[slot].addr);
+              metaServerList[slot].altaddr.c_str(),
+              metaServerList[slot].addr.c_str());
 #endif
     }
 
@@ -574,6 +574,7 @@ void catchSignals(void)
     signal(SIGINT, SIG_IGN);
     signal(SIGQUIT, (void (*)(int))handleSignal);
     signal(SIGCLD, SIG_IGN);	/* allow children to die */
+    signal(SIGPIPE, SIG_IGN);
 
     return;
 }
