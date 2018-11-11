@@ -1,0 +1,14 @@
+# example conquest.service file, edit to for your site.
+[Unit]
+Description=Conquest Game server 1701
+After=network-online.target
+
+[Service]
+Type=forking
+Restart=on-failure
+# edit for your site
+ExecStart=/opt/bin/conquestd -d -u nobody
+
+[Install]
+WantedBy=network-online.target
+
