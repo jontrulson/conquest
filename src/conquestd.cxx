@@ -430,6 +430,7 @@ int main(int argc, char *argv[])
 
     if (semInit() == -1)
     {
+        utLog("%s: semInit() failed, exiting.", __FUNCTION__);
         fprintf(stderr, "semInit() failed to get semaphores. exiting.\n");
         exit(1);
     }
@@ -441,6 +442,7 @@ int main(int argc, char *argv[])
     // load the globals/planets (conqinitrc), before we map...
     if (cqiLoadRC(CQI_FILE_CONQINITRC, NULL, cqDebug))
     {
+        utLog("%s: FATAL: can't load conqinitrc file.", __FUNCTION__);
         fprintf(stderr, "FATAL: can't load conqinitrc file.\n");
         exit(1);
     }
