@@ -180,7 +180,7 @@ void metaProcList(int sock, char *hostbuf)
 {
     static int mvec[META_MAXSERVERS];
     int nm;
-    char tbuf[META_MAX_PKT_SIZE];
+    std::string tbuf;
     int i;
 
     /* init mvec */
@@ -194,8 +194,8 @@ void metaProcList(int sock, char *hostbuf)
     /* dump the sorted server list */
     for (i=0; i<nm; i++)
     {
-        metaServerRec2Buffer(tbuf, &metaServerList[mvec[i]]);
-        if (write(sock, tbuf, strlen(tbuf)) <= 0)
+        metaServerRec2Buffer(tbuf, metaServerList[mvec[i]]);
+        if (write(sock, tbuf.c_str(), tbuf.size()) <= 0)
             utLog("META: write failed to %s", hostbuf);
     }
 

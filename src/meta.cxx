@@ -37,6 +37,7 @@
 
 #include <string>
 #include <algorithm>
+#include "format.h"
 
 /* convert any pipe chars in a string to underlines */
 static void pipe2ul(std::string& str)
@@ -223,25 +224,24 @@ int metaBuffer2ServerRec(metaSRec_t *srec, const char *buf)
 }
 
 /* returns a string in the same format as above. */
-void metaServerRec2Buffer(char *buf, metaSRec_t *srec)
+void metaServerRec2Buffer(std::string& buf, const metaSRec_t& srec)
 {
-
-    sprintf(buf, "%u|%s|%d|%s|%s|%s|%d|%d|%d|%d|%u|%u|%s|%s|\n",
-            srec->version,
-            srec->altaddr.c_str(),
-            srec->port,
-            srec->servername.c_str(),
-            srec->serverver.c_str(),
-            srec->motd.c_str(),
-            srec->numtotal,
-            srec->numactive,
-            srec->numvacant,
-            srec->numrobot,
-            srec->flags,
-            /* meta vers 0x0002+ */
-            srec->protovers,
-            srec->contact.c_str(),
-            srec->walltime.c_str());
+    buf = fmt::format("{}|{}|{}|{}|{}|{}|{}|{}|{}|{}|{}|{}|{}|{}|\n",
+                      srec.version,
+                      srec.altaddr,
+                      srec.port,
+                      srec.servername,
+                      srec.serverver,
+                      srec.motd,
+                      srec.numtotal,
+                      srec.numactive,
+                      srec.numvacant,
+                      srec.numrobot,
+                      srec.flags,
+                      /* meta vers 0x0002+ */
+                      srec.protovers,
+                      srec.contact,
+                      srec.walltime);
 
     return;
 }
@@ -253,7 +253,7 @@ int metaUpdateServer(const char *remotehost, const char *name, int port)
     int s;
     struct sockaddr_in sa;
     struct hostent *hp;
-    char msg[META_MAX_PKT_SIZE];
+    std::string msg;
     char myname[CONF_SERVER_NAME_SZ];
     int i;
     extern char *ConquestVersion, *ConquestDate;
@@ -327,7 +327,7 @@ int metaUpdateServer(const char *remotehost, const char *name, int port)
     sRec.walltime = walltime;
 
     /* all loaded up, convert it and send it off */
-    metaServerRec2Buffer(msg, &sRec);
+    metaServerRec2Buffer(msg, sRec);
 
     if ((hp = gethostbyname(remotehost)) == NULL)
     {
@@ -348,7 +348,8 @@ int metaUpdateServer(const char *remotehost, const char *name, int port)
         return false;
     }
 
-    if (sendto(s, msg, strlen(msg), 0, (const struct sockaddr *)&sa, sizeof(struct sockaddr_in)) < 0)
+    if (sendto(s, msg.c_str(), msg.size(), 0,
+               (const struct sockaddr *)&sa, sizeof(struct sockaddr_in)) < 0)
     {
         close(s);
         utLog("metaUpdateServer: sento failed: %s", strerror(errno));
