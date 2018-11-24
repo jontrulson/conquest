@@ -45,46 +45,32 @@
 
 #include "tcpwrap.h"
 
+#include <string>
+#include <vector>
 #include <algorithm>
-using namespace std;
 
 #define LISTEN_BACKLOG 5 /* # of requests we're willing to to queue */
 
-metaSRec_t metaServerList[META_MAXSERVERS];
+static metaServerVec_t metaServerList;
 static uint16_t listenPort = META_DFLT_PORT;
 static char *progName;
 static int localOnly = false;   /* whether to only listen on loopback */
-static int maxSlot = 0;         /* the max slot we've ever used */
 const int expireSeconds = (60 * 5); /* 5 minutes */
 
 void catchSignals(void);
 void handleSignal(int sig);
 
-static int cmpmeta(void *cmp1, void *cmp2)
+// sort in descending order based on number of active ships
+static bool cmpmeta(int cmp1, int cmp2)
 {
-    int *icmp1, *icmp2;
-
-    icmp1 = (int *) cmp1;
-    icmp2 = (int *) cmp2;
-
-    /* we sort based on active ships */
-
-    if (metaServerList[*icmp1].numactive > metaServerList[*icmp2].numactive)
-        return(-1);
-    else if (metaServerList[*icmp1].numactive < metaServerList[*icmp2].numactive)
-        return(1);
-    else
-        return(0);
+    return metaServerList[cmp1].numactive > metaServerList[cmp2].numactive;
 }
 
-
-static void sortmetas( int mv[], int numentries )
+static void sortmetas( std::vector<int>& mv )
 {
-    qsort(mv, numentries, sizeof(int),
-          (int (*)(const void *, const void *))cmpmeta);
+    std::sort(mv.begin(), mv.end(), cmpmeta);
 
     return;
-
 }
 
 void printUsage()
@@ -103,15 +89,18 @@ void ageServers(void)
     int i;
     time_t now = time(0);
 
-    for (i=0; i<maxSlot; i++)
+    for (i=0; i<metaServerList.size(); i++)
     {
         if (metaServerList[i].valid)
             if (abs(metaServerList[i].lasttime - now) > expireSeconds)
             {
-                utLog("META: expiring %s:%u(%s)\n",
+                utLog("META: Expiring %s:%u(%s), slot %d\n",
                       metaServerList[i].altaddr.c_str(),
                       metaServerList[i].port,
-                      metaServerList[i].addr.c_str());
+                      metaServerList[i].addr.c_str(),
+                      i);
+
+                metaServerList[i] = {};
                 metaServerList[i].valid = false;
             }
     }
@@ -124,14 +113,13 @@ void ageServers(void)
    slot number found/'created', or -1 for error */
 int findSlot(metaSRec_t *srec, int *isupdate)
 {
-    int i, found;
+    bool found = false;
     int rv = 0;
 
     *isupdate = false;
 
     /* first look for it */
-    found = false;
-    for (i=0; i<maxSlot; i++)
+    for (int i=0; i<metaServerList.size(); i++)
     {
         if (metaServerList[i].addr == srec->addr &&
             metaServerList[i].altaddr == srec->altaddr &&
@@ -145,54 +133,47 @@ int findSlot(metaSRec_t *srec, int *isupdate)
     }
 
     if (!found)
-    {                           /* didn't find one */
-        for (i=0; i<META_MAXSERVERS; i++)
+    {                           /* didn't find one, see if there's an
+                                 * invalid slot we can use */
+        for (int i=0; i<metaServerList.size(); i++)
             if (!metaServerList[i].valid)
             {                     /* found a slot */
                 rv = i;
-                if (rv >= maxSlot)
-                    maxSlot = rv + 1;
                 found = true;
                 break;
             }
     }
 
     if (!found)
-        return -1;                  /* nothing there george */
+    {
+        // if one is still not found, create a new empty one if it will fit
+        if (metaServerList.size() < META_MAXSERVERS)
+        {
+            metaServerList.push_back({});
+            return metaServerList.size() - 1;
+        }
+        else
+            return -1;                  /* can't fit */
+    }
     else
         return rv;
 }
 
-
-void initServerList()
-{
-    int i;
-
-    memset((void *)&metaServerList, 0, sizeof(metaSRec_t) * META_MAXSERVERS);
-
-    for (i=0; i<META_MAXSERVERS; i++)
-        metaServerList[i].valid = false;
-
-    return;
-}
-
 void metaProcList(int sock, char *hostbuf)
 {
-    static int mvec[META_MAXSERVERS];
-    int nm;
+    std::vector<int> mvec;
     std::string tbuf;
-    int i;
 
     /* init mvec */
-    nm = 0;
-    for (i=0; i < maxSlot; i++)
+    mvec.clear();
+    for (int i=0; i < metaServerList.size(); i++)
         if (metaServerList[i].valid)
-            mvec[nm++] = i;
+            mvec.push_back(i);
 
-    sortmetas(mvec, nm);
+    sortmetas(mvec);
 
     /* dump the sorted server list */
-    for (i=0; i<nm; i++)
+    for (int i=0; i<mvec.size(); i++)
     {
         metaServerRec2Buffer(tbuf, metaServerList[mvec[i]]);
         if (write(sock, tbuf.c_str(), tbuf.size()) <= 0)
@@ -246,9 +227,11 @@ void metaProcUpd(char *buf, int rlen, char *hostbuf)
     else
     {
 #if defined(DEBUG_META)
-        utLog("META: Updated server %s(%s)",
+        utLog("META: Updated server %s:%u(%s), slot %d",
               metaServerList[slot].altaddr.c_str(),
-              metaServerList[slot].addr.c_str());
+              metaServerList[slot].port,
+              metaServerList[slot].addr.c_str(),
+              slot);
 #endif
     }
 
@@ -339,7 +322,7 @@ void metaListen(void)
         FD_SET(s, &readfds);
         FD_SET(t, &readfds);
 
-        if ((rv = select(max(s,t)+1, &readfds, NULL, NULL, &tv)) < 0)
+        if ((rv = select(std::max(s,t)+1, &readfds, NULL, NULL, &tv)) < 0)
         {
             utLog("META: select failed: %s", strerror(errno));
             exit(1);
@@ -556,7 +539,8 @@ int main(int argc, char *argv[])
         }
     }
 
-    initServerList();
+    // init the server list
+    metaServerList.clear();
 
     /* setup, listen for, and process  client connections. */
 

@@ -254,7 +254,7 @@ int metaUpdateServer(const char *remotehost, const char *name, int port)
     struct sockaddr_in sa;
     struct hostent *hp;
     std::string msg;
-    char myname[CONF_SERVER_NAME_SZ];
+    std::string myname;
     int i;
     extern char *ConquestVersion, *ConquestDate;
     int numshipsactive = 0;
@@ -267,9 +267,9 @@ int metaUpdateServer(const char *remotehost, const char *name, int port)
         return false;
 
     if (!name)
-        strcpy(myname, "");
+        myname = remotehost;
     else
-        utStrncpy(myname, name, CONF_SERVER_NAME_SZ);
+        myname = name;
 
     memset((void *)&sRec, 0, sizeof(metaSRec_t));
 

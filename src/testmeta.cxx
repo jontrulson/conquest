@@ -85,7 +85,8 @@ int main(int argc, char *argv[])
     printf("Connecting to host: %s, udp port %d ...\n",
            remotehost, 1700);
 
-    if (sendto(s, msg, msglen, 0, &sa, sizeof(struct sockaddr_in)) < 0)
+    if (sendto(s, msg, msglen, 0, (const struct sockaddr *)&sa,
+               sizeof(struct sockaddr_in)) < 0)
     {
         perror("sendto");
         exit(1);
