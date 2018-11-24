@@ -64,9 +64,7 @@ static struct _srvvec servervec[META_MAXSERVERS] = {};
 static nodeStatus_t nMetaDisplay(dspConfig_t *);
 static nodeStatus_t nMetaInput(int ch);
 
-static int numMetaServers;   /* number of servers in metaServerList */
-
-static metaSRec_t *metaServerList;   /* list of servers */
+static metaServerVec_t metaServerList;   /* list of servers */
 
 static scrNode_t nMetaNode = {
     nMetaDisplay,                 /* display */
@@ -78,8 +76,7 @@ static scrNode_t nMetaNode = {
 };
 
 
-static void dispServerInfo(dspConfig_t *dsp, metaSRec_t *metaServerList,
-                           int num)
+static void dispServerInfo(dspConfig_t *dsp, int num)
 {
     static char buf1[BUFFER_SIZE_256];
     static char buf2[BUFFER_SIZE_256];
@@ -177,12 +174,10 @@ static void dispServerInfo(dspConfig_t *dsp, metaSRec_t *metaServerList,
 
 void nMetaInit(void)
 {
-    int i;
-
     /* get the server list */
     utLog("nMetaInit: Querying metaserver at %s", cInfo.metaServer);
-    numMetaServers = metaGetServerList(cInfo.metaServer,
-                                       &metaServerList);
+    int numMetaServers = metaGetServerList(cInfo.metaServer,
+                                           metaServerList);
 
     if (numMetaServers < 0)
     {
@@ -211,7 +206,7 @@ void nMetaInit(void)
         pages = 1;
 
     /* init the servervec array */
-    for (i=0; i < numMetaServers; i++)
+    for (int i=0; i < metaServerList.size(); i++)
     {
         if (metaServerList[i].version >= 2) /* valid for newer meta protocols */
             servervec[i].vers = metaServerList[i].protovers;
@@ -255,7 +250,7 @@ static nodeStatus_t nMetaDisplay(dspConfig_t *dsp)
 				   this page */
 
     if (curpage == (pages - 1)) /* last page - might be less than full */
-        llin = (numMetaServers % servers_per_page); /* ..or more than empty? ;-) */
+        llin = (metaServerList.size() % servers_per_page); /* ..or more than empty? ;-) */
     else
         llin = servers_per_page;
 
@@ -300,7 +295,7 @@ static nodeStatus_t nMetaDisplay(dspConfig_t *dsp)
     if (clin >= llin)
         clin = llin - 1;
 
-    dispServerInfo(dsp, metaServerList, clin);
+    dispServerInfo(dsp, clin);
 
     // We are not connected to a server, so don't let the nod renderer
     // try to read/process packets.
@@ -335,7 +330,7 @@ static nodeStatus_t nMetaInput(int ch)
 
             /* setup llin  for current page */
             if (curpage == (pages - 1))
-                llin = (numMetaServers % servers_per_page);
+                llin = (metaServerList.size() % servers_per_page);
             else
                 llin = servers_per_page;
 

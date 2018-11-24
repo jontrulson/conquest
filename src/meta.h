@@ -30,13 +30,14 @@
 
 #include "conqdef.h"
 #include <string>
+#include <vector>
 
 #define META_VERMAJ 0
 #define META_VERMIN 2
 #define META_VERSION  (uint16_t)((META_VERMAJ << 8) | META_VERMIN)
 
 #define META_MAXSERVERS   1000  /* max number of servers we will track */
-#define BUFFERSZ          (1024 * 64)
+#define META_MAX_PKT_SIZE          (1024 * 64)
 
 #define META_GEN_STRSIZE  256   /* generic meta str size */
 
@@ -62,9 +63,11 @@ typedef struct _meta_srec {
     std::string walltime;
 } metaSRec_t;
 
-int  metaBuffer2ServerRec(metaSRec_t *srec, char *buf);
+typedef std::vector<metaSRec_t> metaServerVec_t;
+
+int  metaBuffer2ServerRec(metaSRec_t *srec, const char *buf);
 void metaServerRec2Buffer(char *buf, metaSRec_t *srec);
 int  metaUpdateServer(const char *remotehost, const char *name, int port);
-int  metaGetServerList(const char *remotehost, metaSRec_t **srvlist);
+int  metaGetServerList(const char *remotehost, metaServerVec_t& srvlist);
 
 #endif /* META_H_INCLUDED */

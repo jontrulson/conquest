@@ -180,7 +180,7 @@ void metaProcList(int sock, char *hostbuf)
 {
     static int mvec[META_MAXSERVERS];
     int nm;
-    char tbuf[BUFFERSZ];
+    char tbuf[META_MAX_PKT_SIZE];
     int i;
 
     /* init mvec */
@@ -268,7 +268,7 @@ void metaListen(void)
     int rv, rlen;
     socklen_t sockln;
     char hostbuf[CONF_SERVER_NAME_SZ];
-    char rbuf[BUFFERSZ];
+    char rbuf[META_MAX_PKT_SIZE];
     socklen_t alen;
     fd_set readfds;
 
@@ -382,8 +382,8 @@ void metaListen(void)
         /* UDP (ping) socket */
         if (FD_ISSET(s, &readfds))
         {
-            memset(rbuf, 0, BUFFERSZ);
-            rlen = recvfrom(s, rbuf, BUFFERSZ, 0,
+            memset(rbuf, 0, META_MAX_PKT_SIZE);
+            rlen = recvfrom(s, rbuf, META_MAX_PKT_SIZE, 0,
                             (struct sockaddr *)&isa, &alen);
 
             if ((hp = gethostbyaddr((char *) &isa.sin_addr.s_addr,

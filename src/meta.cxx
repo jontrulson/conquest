@@ -57,7 +57,7 @@ static void pipe2ul(std::string& str)
  * 14 fields
  *
  */
-int metaBuffer2ServerRec(metaSRec_t *srec, char *buf)
+int metaBuffer2ServerRec(metaSRec_t *srec, const char *buf)
 {
     const int numfields = 14;     /* ver 2 */
     char *tbuf;                   /* copy of buf */
@@ -67,6 +67,7 @@ int metaBuffer2ServerRec(metaSRec_t *srec, char *buf)
     if (!buf)
         return false;
 
+    // duplicate it so we can modify it as we parse
     if ((tbuf = strdup(buf)) == NULL)
         return false;
 
@@ -252,7 +253,7 @@ int metaUpdateServer(const char *remotehost, const char *name, int port)
     int s;
     struct sockaddr_in sa;
     struct hostent *hp;
-    char msg[BUFFERSZ];
+    char msg[META_MAX_PKT_SIZE];
     char myname[CONF_SERVER_NAME_SZ];
     int i;
     extern char *ConquestVersion, *ConquestDate;
@@ -363,30 +364,14 @@ int metaUpdateServer(const char *remotehost, const char *name, int port)
 /* contact a meta server, and return a pointer to a static array of
    metaSRec_t's coresponding to the server list.  returns number
    of servers found, or -1 if error */
-#define SERVER_BUFSIZE 1024
 
-int metaGetServerList(const char *remotehost, metaSRec_t **srvlist)
+int metaGetServerList(const char *remotehost, metaServerVec_t& srvlist)
 {
-    static metaSRec_t servers[META_MAXSERVERS];
     struct sockaddr_in sa;
     struct hostent *hp;
-    char buf[SERVER_BUFSIZE];               /* server buffer */
-    int off;
-    static bool firstTime = true;
-    int s;                        /* socket */
-    int nums;                     /* number of servers found */
-    char c;
 
-    nums = 0;
-
-    if (!remotehost || !srvlist)
+    if (!remotehost)
         return -1;
-
-    if (firstTime)
-    {
-        firstTime = false;
-        memset((void *)&servers, 0, (sizeof(metaSRec_t) * META_MAXSERVERS));
-    }
 
     if ((hp = gethostbyname(remotehost)) == NULL)
     {
@@ -399,8 +384,10 @@ int metaGetServerList(const char *remotehost, metaSRec_t **srvlist)
 
     sa.sin_family = hp->h_addrtype;
 
+    // set the port!
     sa.sin_port = htons(META_DFLT_PORT);
 
+    int s;                      /* socket */
     if ((s = socket(AF_INET, SOCK_STREAM, 0 )) < 0)
     {
         utLog("metaGetServerList: socket failed: %s", strerror(errno));
@@ -416,28 +403,28 @@ int metaGetServerList(const char *remotehost, metaSRec_t **srvlist)
     }
 
 
-    off = 0;
-#if defined(MINGW)
+    std::string buf;               /* server buffer */
+    buf.clear();
+    char c;
+
     while (recv(s, &c, 1, 0) > 0)
-#else
-        while (read(s, &c, 1) > 0)
-#endif
         {
-            if (c != '\n' && off < (SERVER_BUFSIZE - 1))
+            if (c != '\n' && buf.size() < (META_MAX_PKT_SIZE - 1))
             {
-                buf[off++] = c;
+                buf += c;
             }
             else
-            {                       /* we got one */
-                buf[off] = 0;
-
+            {                       /* we got one line */
                 /* convert to a metaSRec_t */
-                if (nums < META_MAXSERVERS)
+                metaSRec_t sRec = {};
+
+                if (srvlist.size() < META_MAXSERVERS)
                 {
-                    if (metaBuffer2ServerRec(&servers[nums], buf))
-                        nums++;
+                    if (metaBuffer2ServerRec(&sRec, buf.c_str()))
+                        srvlist.push_back(sRec);
                     else
-                        utLog("metaGetServerList: metaBuffer2ServerRec(%s) failed, skipping", buf);
+                        utLog("metaGetServerList: metaBuffer2ServerRec(%s) "
+                              "failed, skipping", buf.c_str());
                 }
                 else
                 {
@@ -445,17 +432,13 @@ int metaGetServerList(const char *remotehost, metaSRec_t **srvlist)
                           META_MAXSERVERS);
                 }
 
-                off = 0;
+                // reset for next line
+                buf.clear();
             }
         }
 
     /* done. */
     close(s);
 
-    if (nums)
-        *srvlist = servers;
-    else
-        *srvlist = NULL;
-
-    return nums;
+    return srvlist.size();
 }
