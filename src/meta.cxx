@@ -316,7 +316,7 @@ int metaUpdateServer(const char *remotehost, const char *name, int port)
     sRec.protovers = PROTOCOL_VERSION;
 
     sRec.contact = SysConf.ServerContact;
-    pipe2ul(sRec.altaddr);
+    pipe2ul(sRec.contact);
 
     thetm = localtime(&thetimet);
     std::string walltime(asctime(thetm));
