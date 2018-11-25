@@ -9,6 +9,26 @@
 
                               Conquest HISTORY
 
+9.0.1, 11/25/2018 (stable release)
+
+  - This is a minor release - most of the changes are internal and
+    won't be visible to end users.
+
+  - reformat logging output to be more syslog-like
+
+  - continue refactoring some of the internal code to make use of C++
+    containers and remove dynamically reallocated arrays, add more
+    std::string-ification.
+
+  - For new users without a .conquest/conquest.conf file, add two
+    new default mouse macros:
+
+      scroll up = zoom in (magfactor): "]"
+      scroll down = zoom out (magfactor): "["
+
+  - tighten up the conquest meta server - detect and log more errors,
+    add some more validity checks, be more robust.
+
 9.0, 6/19/2018 (stable release)
 
   - 8.5.99c, 5/21/2018 (development release)
