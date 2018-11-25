@@ -110,11 +110,11 @@ void ageServers(void)
 
 
 /* find the server slot for this record (or make a new one).  returns the
-   slot number found/'created', or -1 for error */
-int findSlot(metaSRec_t *srec, int *isupdate)
+   slot number found/created, or -1 for error */
+int findSlot(metaSRec_t *srec, bool *isupdate)
 {
     bool found = false;
-    int rv = 0;
+    int rv = -1;
 
     *isupdate = false;
 
@@ -137,7 +137,7 @@ int findSlot(metaSRec_t *srec, int *isupdate)
                                  * invalid slot we can use */
         for (int i=0; i<metaServerList.size(); i++)
             if (!metaServerList[i].valid)
-            {                     /* found a slot */
+            {                     /* found a previously used slot */
                 rv = i;
                 found = true;
                 break;
@@ -172,6 +172,8 @@ void metaProcList(int sock, char *hostbuf)
 
     sortmetas(mvec);
 
+    utLog("META: server query from %s", hostbuf);
+
     /* dump the sorted server list */
     for (int i=0; i<mvec.size(); i++)
     {
@@ -180,7 +182,6 @@ void metaProcList(int sock, char *hostbuf)
             utLog("META: write failed to %s", hostbuf);
     }
 
-    utLog("META: server query from %s", hostbuf);
 
     return;
 }
@@ -189,7 +190,7 @@ void metaProcUpd(char *buf, int rlen, char *hostbuf)
 {
     metaSRec_t sRec;
     int slot;
-    int wasfound;
+    bool wasfound;
 
     if (!metaBuffer2ServerRec(&sRec, buf))
     {
@@ -207,7 +208,7 @@ void metaProcUpd(char *buf, int rlen, char *hostbuf)
     /* now find a slot for it. */
     if ((slot = findSlot(&sRec, &wasfound)) == -1)
     {
-        utLog("META: findSlot couldn't find one, ignoring\n");
+        utLog("META: findSlot() failed, ignoring\n");
         return;
     }
 
@@ -458,12 +459,17 @@ int main(int argc, char *argv[])
 
         if ((myuid = getUID(myuidname)) == -1)
         {
-            fprintf(stderr, "%s: getUID(%s) failed\n", progName, myuidname);
+            utLog("%s: getUID(%s) failed: %s\n", progName, myuidname,
+                  strerror(errno));
+            fprintf(stderr, "%s: getUID(%s) failed: %s\n", progName, myuidname,
+                    strerror(errno));
             exit(1);
         }
 
         if (setuid(myuid) == -1)
         {
+            utLog("%s: setuid(%d) failed: %s\n", progName, myuid,
+                  strerror(errno));
             fprintf(stderr, "%s: setuid(%d) failed: %s\n", progName, myuid,
                     strerror(errno));
             exit(1);
@@ -535,6 +541,7 @@ int main(int argc, char *argv[])
 
         case -1:
             /* error */
+            utLog("%s: daemon fork failed: %s", progName, strerror(errno));
             fprintf(stderr, "daemon fork failed: %s\n", strerror(errno));
             break;
 
@@ -571,6 +578,6 @@ void catchSignals(void)
 
 void handleSignal(int sig)
 {
-    utLog("META: exiting on signal %d", sig);
+    utLog("META: exiting on signal %d (%s)", sig, strsignal(sig));
     exit(0);
 }

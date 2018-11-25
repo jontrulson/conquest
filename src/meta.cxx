@@ -363,7 +363,7 @@ int metaUpdateServer(const char *remotehost, const char *name, int port)
 }
 
 
-/* contact a meta server, and return a pointer to a static array of
+/* contact a meta server, and fill a metaServerList_t vector with
    metaSRec_t's coresponding to the server list.  returns number
    of servers found, or -1 if error */
 
@@ -371,6 +371,8 @@ int metaGetServerList(const char *remotehost, metaServerVec_t& srvlist)
 {
     struct sockaddr_in sa;
     struct hostent *hp;
+
+    srvlist.clear();
 
     if (!remotehost)
         return -1;
