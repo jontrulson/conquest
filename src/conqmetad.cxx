@@ -280,6 +280,7 @@ void metaListen(void)
     /* allocate an open socket for incoming UDP connections */
     if (( s = socket(AF_INET, SOCK_DGRAM, 0)) < 0)
     {
+        utLog("META: socket (DGRAM) failed: %s, exiting", strerror(errno) );
         perror ( "UDP socket" );
         exit(1);
     }
@@ -287,6 +288,8 @@ void metaListen(void)
     /* allocate an open socket for incoming TCP connections */
     if (( t = socket(AF_INET, SOCK_STREAM, 0)) < 0)
     {
+        utLog("META: socket (SOCK_STREAM) failed: %s, exiting",
+              strerror(errno) );
         perror ( "TCP socket" );
         exit(1);
     }
@@ -296,12 +299,14 @@ void metaListen(void)
      */
     if ( bind( s, (struct sockaddr *)&sa, sizeof ( sa )) < 0 )
     {
+        utLog("META: bind (UDP) failed: %s, exiting", strerror(errno) );
         perror( "UDP bind" );
         exit(1);
     }
 
     if ( bind( t, (struct sockaddr *)&tsa, sizeof ( tsa )) < 0 )
     {
+        utLog("META: bind (TCP) failed: %s, exiting", strerror(errno) );
         perror( "TCP bind" );
         exit(1);
     }
@@ -324,7 +329,7 @@ void metaListen(void)
 
         if ((rv = select(std::max(s,t)+1, &readfds, NULL, NULL, &tv)) < 0)
         {
-            utLog("META: select failed: %s", strerror(errno));
+            utLog("META: select failed: %s, exiting", strerror(errno));
             exit(1);
         }
 

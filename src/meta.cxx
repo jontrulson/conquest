@@ -72,7 +72,7 @@ int metaBuffer2ServerRec(metaSRec_t *srec, const char *buf)
     if ((tbuf = strdup(buf)) == NULL)
         return false;
 
-    memset((void *)srec, 0, sizeof(metaSRec_t));
+    *srec = {};
 
     fieldno = 0;
     chs = tbuf;
@@ -271,8 +271,6 @@ int metaUpdateServer(const char *remotehost, const char *name, int port)
     else
         myname = name;
 
-    memset((void *)&sRec, 0, sizeof(metaSRec_t));
-
     /* count ships */
     for ( i = 0; i < cbLimits.maxShips(); i++ )
     {
@@ -291,6 +289,9 @@ int metaUpdateServer(const char *remotehost, const char *name, int port)
         }
     }
 
+    // clear it out
+    sRec = {};
+    // load it up
     sRec.version = META_VERSION;
     sRec.numactive = numshipsactive;
     sRec.numvacant = numshipsvacant;
