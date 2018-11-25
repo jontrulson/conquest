@@ -75,6 +75,8 @@ int main(int argc, char *argv[])
 
     /* First things first. */
 
+    utSetLogProgramName(argv[0]);
+
     if ((ConquestGID = getConquestGID()) == -1)
     {
         utLog("conqdriv: getConquestGID() failed\n");

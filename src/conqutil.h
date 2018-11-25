@@ -48,6 +48,7 @@ void     utAppendKilledBy(char *buf, killedBy_t kb, uint16_t detail);
 void     utAppendKilledBy(std::string& buf, killedBy_t kb, uint16_t detail);
 int      utArrowsToDir( const char *str, real *dir );
 void     utSetLogConfig(int usesys, int echostderr);
+void     utSetLogProgramName(const std::string& progName);
 
 // we want special format checks on this one
 void     utLog(const char *fmt, ...)

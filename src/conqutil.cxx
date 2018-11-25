@@ -27,8 +27,10 @@
 
 #include "c_defs.h"
 
+#include <libgen.h>             // for basename()
+
+#include <string>
 #include <algorithm>
-using namespace std;
 #include "format.h"
 
 #include "conqdef.h"
@@ -45,6 +47,8 @@ static int systemlog   = true;
 static int echo2stderr = false;  /* whether to echo utLog to stderr */
                                  /* this will be ignored if systemlog is
                                     true */
+static std::string programName;  // the name of the program for
+                                 // logging (utLog()) purposes
 
 /*  utAccurateDist - figure distance traveled while changing velocities */
 /*  SYNOPSIS */
@@ -353,6 +357,18 @@ void utSetLogConfig(int usesys, int echostderr)
     return;
 }
 
+void utSetLogProgramName(const std::string& progName)
+{
+    // make a copy since it may be modified by basename()
+    char *tmpPath = strdup(progName.c_str());
+    if (tmpPath)
+        programName = basename(tmpPath);
+    else
+        programName = "<unknown>";
+
+    free(tmpPath);
+}
+
 void utLog(const char *fmt, ...)
 {
     va_list ap;
@@ -456,7 +472,15 @@ void utLog(const char *fmt, ...)
 
     if (errfd != NULL)
     {
-        fprintf(errfd, "%ld:%d:%s\n", time(0), (int)getpid(), buf);
+        time_t theTime = time(0);
+        std::string walltime = asctime(localtime(&theTime));
+
+        // remove newline(s)
+        walltime.erase(std::remove(walltime.begin(), walltime.end(), '\n'),
+                       walltime.end());
+        fprintf(errfd, "%s %s[%d]: %s\n", walltime.c_str(),
+                programName.c_str(),
+                (int)getpid(), buf);
         fflush(errfd);
     }
 
@@ -559,8 +583,8 @@ real utExplosionHits( real basehits, real dis )
     if ( dis > PHASER_DIST )
         return ( 0.0 );
     return ( basehits / ( ( EXPLOSION_FALLOFF - 1.0 ) *
-                          max( dis - EXPLOSION_RADIUS,
-                               0.0 ) / PHASER_DIST + 1.0 ) -
+                          std::max( dis - EXPLOSION_RADIUS,
+                                    0.0 ) / PHASER_DIST + 1.0 ) -
              basehits / EXPLOSION_FALLOFF * dis / PHASER_DIST );
 
 }

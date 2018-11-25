@@ -311,7 +311,7 @@ void initrun(void)
     /* Initialize the strategy table to accept everything. */
     for ( i = 0; i < MAX_VAR; i = i + 1 )
 	for ( j = 0; j < 10; j = j + 1 )
-	    trstrat[i][j] = -1;		/* set all bits */
+	    trstrat[i][j] = ~0;		/* set all bits */
 
     /* Initialize the rule to action vector to nothing. */
     for ( i = 0; i < 32; i = i + 1 )

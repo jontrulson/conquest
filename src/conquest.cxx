@@ -306,6 +306,7 @@ int main(int argc, char *argv[])
     cInfo.state = CLIENT_STATE_INIT;
 
     utSetLogConfig(false, true);	/* use CQ_USERHOMEDIR for logfile */
+    utSetLogProgramName(argv[0]);
 
     cInfo.remotehost = strdup("localhost"); /* default to your own server */
 

@@ -55,6 +55,8 @@ int main(int argc, char *argv[])
 
     /* First things first. */
 
+    utSetLogProgramName(argv[0]);
+
     if ((ConquestGID = getConquestGID()) == -1)
     {
         fprintf(stderr, "conqai: getConquestGID() failed\n");

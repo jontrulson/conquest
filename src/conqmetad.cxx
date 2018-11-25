@@ -414,6 +414,7 @@ int main(int argc, char *argv[])
     int dodaemon = false;
 
     progName = argv[0];
+    utSetLogProgramName(progName);
 
     while ((i = getopt(argc, argv, "dlp:u:v")) != EOF)    /* get command args */
         switch (i)

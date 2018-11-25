@@ -116,6 +116,7 @@ int main(int argc, char *argv[])
 
     char InitStuffChar = '\0';
 
+    utSetLogProgramName(argv[0]);
     OptionAction = OP_NONE;
 
     if (!isagod(-1) )

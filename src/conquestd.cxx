@@ -308,6 +308,8 @@ int main(int argc, char *argv[])
     int dodaemon = false;
 
     progName = argv[0];
+    utSetLogProgramName(progName);
+
     sInfo.state = SVR_STATE_PREINIT;
     sInfo.sock = -1;
     sInfo.usock = -1;

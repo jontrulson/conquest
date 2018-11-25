@@ -69,6 +69,7 @@ int main(int argc, char **argv)
     rndini();
 
     utSetLogConfig(false, true);    /* log + stderr! :) */
+    utSetLogProgramName(argv[0]);
 
     while ( (ch = getopt( argc, argv, "vdDf:ts" )) != EOF )
     {      switch(ch)
