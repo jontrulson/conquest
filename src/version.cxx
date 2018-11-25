@@ -26,7 +26,7 @@
 //
 
 
-const char *ConquestVersion = "Version 9.0a";
-const char *ConquestDate = "08/31/2018";
+const char *ConquestVersion = "Version 9.0b";
+const char *ConquestDate = "11/25/2018";
 
 /* That's it! */
