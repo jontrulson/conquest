@@ -574,9 +574,7 @@ int main(int argc, char *argv[])
     drpexit();			/* make the driver go away */
     conqend();			/* machine dependent clean-up */
 
-#ifdef DEBUG_FLOW
-    utLog("%s@%d: main() *EXITING*", __FILE__, __LINE__);
-#endif
+    utLog("main(): EXITING");
 
     exit(0);
 

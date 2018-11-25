@@ -138,6 +138,13 @@ int Authenticate(char *username, char *password)
 
         if (rv != CP_AUTHENTICATE)
         {
+            if (rv == CP_COMMAND)
+            {
+                // then the user has exited
+                utLog("%s: got CP_COMMAND, failing Authentication",
+                      __FUNCTION__);
+                return false;
+            }
             utLog("%s: got unexpected packet type %d, continuing...",
                   __FUNCTION__, rv);
 
