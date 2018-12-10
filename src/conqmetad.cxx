@@ -179,7 +179,10 @@ void metaProcList(int sock, char *hostbuf)
     {
         metaServerRec2Buffer(tbuf, metaServerList[mvec[i]]);
         if (write(sock, tbuf.c_str(), tbuf.size()) <= 0)
+        {
             utLog("META: write failed to %s", hostbuf);
+            return;
+        }
     }
 
 
