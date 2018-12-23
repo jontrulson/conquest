@@ -4,10 +4,10 @@ Description=Conquest Game server 1701
 After=network-online.target
 
 [Service]
-Type=forking
+Type=simple
 Restart=on-failure
 # edit for your site
-ExecStart=/opt/bin/conquestd -d -u nobody
+ExecStart=/opt/bin/conquestd -u nobody
 
 [Install]
 WantedBy=network-online.target

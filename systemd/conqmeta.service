@@ -3,9 +3,9 @@ Description=Conquest MetaServer Daemon
 After=network-online.target
 
 [Service]
-Type=forking
+Type=simple
 Restart=on-failure
-ExecStart=/opt/bin/conqmetad -d -u nobody
+ExecStart=/opt/bin/conqmetad -u nobody
 
 [Install]
 WantedBy=network-online.target
