@@ -49,7 +49,7 @@ typedef struct _cqi_global_init {
     int maxshiptypes;
 } cqiGlobalInitRec_t, *cqiGlobalInitPtr_t;
 
-/* shiptypes - not used yet */
+/* shiptypes */
 typedef struct _cqi_shiptype_init {
     char name[MAXSTNAME];
 
@@ -84,7 +84,7 @@ typedef struct _cqi_planet_init {
     int  homeplanet;              /* homeplanet for this team? */
     real xcoord;
     real ycoord;
-    real size;                    /* in CU's (Conquest Units (mega meters))  */
+    int size;                     /* in CU's (Conquest Units) */
 } cqiPlanetInitRec_t, *cqiPlanetInitPtr_t;
 
 /* texture flags */

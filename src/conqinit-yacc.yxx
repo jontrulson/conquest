@@ -1012,6 +1012,7 @@ static int cqiValidatePlanets(void)
             _cqiPlanets[i].core = false;
             _cqiPlanets[i].xcoord = 0.0;
             _cqiPlanets[i].ycoord = 0.0;
+            _cqiPlanets[i].size = 300; // CU's
         }
 
         if (cqiVerbose)
@@ -1177,7 +1178,6 @@ bool cqiLoadRC(int rcid, const char *filename, int verbosity)
         // but a missing CQI_FILE_TEXTURESRC, CQI_FILE_SOUNDRC, and of
         // course CQI_FILE_CONQINITRC, is another story however...
 
-        utLog("%s: using default init tables.", __FUNCTION__);
         switch(rcid)
         {
         case CQI_FILE_CONQINITRC:
@@ -1305,7 +1305,7 @@ bool cqiLoadRC(int rcid, const char *filename, int verbosity)
         cqiPlanets   = _cqiPlanets;
 
         // update the cbLimits here
-        if (!fail && rcid == CQI_FILE_CONQINITRC)
+        if (rcid == CQI_FILE_CONQINITRC)
         {
             cbLimits.setMaxPlanets(cqiGlobal->maxplanets);
             cbLimits.setMaxShips(cqiGlobal->maxships);
@@ -1621,7 +1621,7 @@ static void startSection(int section)
             goto error_return;
         }
         else
-            memset((void *)_cqiGlobal, 0, sizeof(cqiGlobalInitRec_t));
+            _cqiGlobal = {};
     }
     break;
 
@@ -1646,8 +1646,7 @@ static void startSection(int section)
             return;
         }
         /* clear and init the planet for parsing */
-        memset((void *)&currPlanet, 0, sizeof(cqiPlanetInitRec_t));
-
+        currPlanet = {};
         currPlanet.primary = -1;
         currPlanet.size = 300;  /* default */
     }
@@ -1655,7 +1654,7 @@ static void startSection(int section)
 
     case TOK_TEXTURE:
     {
-        memset((void *)&currTexture, 0, sizeof(cqiTextureInitRec_t));
+        currTexture = {};
         currTexAreas = NULL;
         numTexAreas = 0;
         // default to a prescale of 1.0
@@ -1665,7 +1664,7 @@ static void startSection(int section)
 
     case TOK_ANIMATION:
     {
-        memset((void *)&currAnimation, 0, sizeof(cqiAnimationInitRec_t));
+        currAnimation = {};
         currAnimation.adIndex = -1;
     }
     break;
@@ -1719,7 +1718,7 @@ static void startSection(int section)
             }
             else
             {                 /* just inlining a complete animdef, init */
-                memset((void *)&currAnimDef, 0, sizeof(cqiAnimDefInitRec_t));
+                currAnimDef = {};
             }
 
             /* choose a unique name for this animdef.  We prefix it
@@ -1741,7 +1740,7 @@ static void startSection(int section)
         else
         {
             /* a global animdef */
-            memset((void *)&currAnimDef, 0, sizeof(cqiAnimDefInitRec_t));
+            currAnimDef = {};
         }
     }
     break;
@@ -1771,7 +1770,7 @@ static void startSection(int section)
     case TOK_EFFECT:
     case TOK_MUSIC:
     {
-        memset((void *)&currSound, 0, sizeof(cqiSoundRec_t));
+        currSound = {};
 
         currSound.loops = 1;    /* default to 1 loop */
         currSound.volume = 100;
@@ -2304,7 +2303,7 @@ static void cfgSectioni(int item, int val)
             break;
         case TOK_SIZE:
             // use reasonable defaults that can fit the protocol (uint16_t)
-            currPlanet.size = (uint16_t)CLAMP(10, 65535, abs(val));
+            currPlanet.size = CLAMP(10, 65535, abs(val));
             break;
         }
     }
