@@ -180,6 +180,14 @@ endif
 
 EXTRA_DIST = $(man6_MANS)
 
+# clean out the yacc/bison flex/lex generated files
+CLEANFILES = conqinit-lex.cxx \
+ conqinit-yacc.cxx \
+ conqinit-yacc.hxx \
+ conqstrat-lex.cxx \
+ conqstrat-yacc.cxx \
+ conqstrat-yacc.hxx
+
 install-exec-hook:
 	$(mkinstalldirs) -m 755 $(DESTDIR) $(DESTDIR)$(localstatedir) \
 		$(DESTDIR)$(CONQSYSCONFDIR) \
