@@ -57,7 +57,7 @@ else !ISMINGW
 
 if GLCLIENT
 noinst_LTLIBRARIES = libconquest.la libconqclnt.la libconqserv.la \
-	libconqinit.la libUi.la libUiGL.la libcqsound.la libfmt.la
+	libconqinit.la libUi.la libUiCU.la libUiGL.la libcqsound.la libfmt.la
 else !GLCLIENT
 noinst_LTLIBRARIES = libconquest.la libconqclnt.la libconqserv.la \
 	libconqinit.la libUi.la libUiCU.la libfmt.la
