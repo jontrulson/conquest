@@ -1235,8 +1235,8 @@ bool cqiLoadRC(int rcid, const char *filename, int verbosity)
             utLog("%s: loaded %d texture descriptors.",
                   __FUNCTION__, fileNumTextures);
 
-        /* now validate any animations */
-        if (!cqiValidateAnimations())
+        /* now validate any animations if any were loaded */
+        if (_cqiAnimations && !cqiValidateAnimations())
         {
             utLog("%s: FATAL: no animations.", __FUNCTION__);
             return true;
@@ -1621,7 +1621,7 @@ static void startSection(int section)
             goto error_return;
         }
         else
-            _cqiGlobal = {};
+            *_cqiGlobal = {};
     }
     break;
 

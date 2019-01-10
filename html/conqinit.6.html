@@ -23,7 +23,7 @@ conqinit - a utility for the Conquest Init parser (CQI)
 <P>
 
 <B>conqinit</B> can be used to test the parser, perform syntax checking
-on conqinitrc soundrc, and texturesrc files.
+on conqinitrc, soundrc, and texturesrc files.
 <P>
 
 CQI is a lex/yacc parser that is used by <B>Conquest</B> 8.1.2a or
@@ -54,11 +54,8 @@ Read data from file &lt;file&gt;.
 <DT><B>-v </B>
 
 <DD>
-Be verbose about everything.
-<DT><B>-d</B>
-
-<DD>
-Turns on alot of debugging.
+Increase verbosity.  Specifying this option multiple times will
+further increase the verbosity level.
 <DT><B>-s </B>
 
 <DD>
@@ -84,9 +81,8 @@ Dump the current universe to stdout in conqinitrc format.
 
 <BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;If&nbsp;you&nbsp;do&nbsp;this,&nbsp;you&nbsp;will&nbsp;almost&nbsp;certainly&nbsp;want&nbsp;to&nbsp;edit&nbsp;the
 <BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;generated&nbsp;file&nbsp;and&nbsp;at&nbsp;least&nbsp;change&nbsp;the&nbsp;colors&nbsp;of&nbsp;the&nbsp;suns,&nbsp;and
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;the&nbsp;sun's
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;randomized&nbsp;army&nbsp;counts.&nbsp;&nbsp;Since&nbsp;this&nbsp;data&nbsp;is&nbsp;not&nbsp;currently
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;stored&nbsp;in&nbsp;the&nbsp;common&nbsp;block,&nbsp;conqinit&nbsp;tries&nbsp;to&nbsp;choose
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;the&nbsp;sun's&nbsp;randomized&nbsp;army&nbsp;counts.&nbsp;&nbsp;Since&nbsp;this&nbsp;data&nbsp;is&nbsp;not
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;currently&nbsp;stored&nbsp;in&nbsp;the&nbsp;common&nbsp;block,&nbsp;conqinit&nbsp;tries&nbsp;to&nbsp;choose
 <BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;reasonable&nbsp;defaults&nbsp;for&nbsp;them.&nbsp;&nbsp;Make&nbsp;sure&nbsp;it&nbsp;actually&nbsp;did&nbsp;:)
 <P>
 
@@ -116,7 +112,7 @@ Jon Trulson
 <A HREF="../conquest/conquestd.6.html">conquestd</A>(6), <A HREF="../conquest/conqoper.6.html">conqoper</A>(6), <A HREF="../conquest/conqdriv.6.html">conqdriv</A>(6), <A HREF="../conquest/conqmetad.6.html">conqmetad</A>(6) 
 <P>
 
-See the CONQINIT.TXT file in the src distribution (or on the conquest
+See the docs/conqinit.txt file in the src distribution (or on the conquest
 web page) for detailed information on the syntax of the files parsed
 by <B>conqinit</B>, as well as other information not mentioned here.
 <A NAME="lbAH">&nbsp;</A>
@@ -124,7 +120,7 @@ by <B>conqinit</B>, as well as other information not mentioned here.
 
 <P>
 
-Copyright (C)1994-2018 by Jon Trulson &lt;<A HREF="mailto:jon@radscan.com">jon@radscan.com</A>&gt; under the MIT
+Copyright (C)1994-2019 by Jon Trulson &lt;<A HREF="mailto:jon@radscan.com">jon@radscan.com</A>&gt; under the MIT
 License.
 <P>
 <P>
@@ -145,6 +141,6 @@ License.
 This document was created by
 <A HREF="/cgi-bin/man/man2html">man2html</A>,
 using the manual pages.<BR>
-Time: 19:17:43 GMT, May 16, 2018
+Time: 20:03:05 GMT, January 10, 2019
 </BODY>
 </HTML>

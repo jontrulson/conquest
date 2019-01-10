@@ -7,7 +7,7 @@ conqinit \- a utility for the Conquest Init parser (CQI)
 .SH DESCRIPTION
 .PP
 \fBconqinit\fP can be used to test the parser, perform syntax checking
-on conqinitrc soundrc, and texturesrc files.
+on conqinitrc, soundrc, and texturesrc files.
 .PP
 CQI is a lex/yacc parser that is used by \fBConquest\fP 8.1.2a or
 later for configuration of the planets and other general purpose data,
@@ -29,10 +29,8 @@ on serving multiple games from a single conquest installation.
 Read data from file <file>.
 .TP 8
 .B \-v 
-Be verbose about everything.
-.TP 8
-.B \-d
-Turns on alot of debugging.
+Increase verbosity.  Specifying this option multiple times will
+further increase the verbosity level.
 .TP 8
 .B \-s 
 Treat the input file as a file in soundrc format.  The default is
@@ -52,9 +50,8 @@ Dump the current universe to stdout in conqinitrc format.
 .PP
         If you do this, you will almost certainly want to edit the
         generated file and at least change the colors of the suns, and
-        the sun's
-        randomized army counts.  Since this data is not currently
-        stored in the common block, conqinit tries to choose
+        the sun's randomized army counts.  Since this data is not
+        currently stored in the common block, conqinit tries to choose
         reasonable defaults for them.  Make sure it actually did :)
 .PP
         This capability is useful if you init the universe, then use
@@ -76,12 +73,12 @@ Jon Trulson
 .PP
 conquestd(6), conqoper(6), conqdriv(6), conqmetad(6) 
 .PP
-See the CONQINIT.TXT file in the src distribution (or on the conquest
+See the docs/conqinit.txt file in the src distribution (or on the conquest
 web page) for detailed information on the syntax of the files parsed
 by \fBconqinit\fP, as well as other information not mentioned here.
 .SH "COPYRIGHT"
 .PP
-Copyright (C)1994-2018 by Jon Trulson <jon@radscan.com> under the MIT
+Copyright (C)1994-2019 by Jon Trulson <jon@radscan.com> under the MIT
 License.
 
 
