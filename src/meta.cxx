@@ -58,7 +58,7 @@ static void pipe2ul(std::string& str)
  * 14 fields
  *
  */
-int metaBuffer2ServerRec(metaSRec_t *srec, const char *buf)
+int metaBuffer2ServerRec(metaSRec_t& srec, const char *buf)
 {
     const int numfields = 14;     /* ver 2 */
     char *tbuf;                   /* copy of buf */
@@ -72,7 +72,7 @@ int metaBuffer2ServerRec(metaSRec_t *srec, const char *buf)
     if ((tbuf = strdup(buf)) == NULL)
         return false;
 
-    *srec = {};
+    srec = {};
 
     fieldno = 0;
     chs = tbuf;
@@ -82,14 +82,14 @@ int metaBuffer2ServerRec(metaSRec_t *srec, const char *buf)
         {
         case 0:                   /* meta protocol version */
             *ch = 0;
-            srec->version = atoi(chs);
+            srec.version = atoi(chs);
             chs = ch + 1;
             fieldno++;
             break;
 
         case 1:                   /* address if specified */
             *ch = 0;
-            srec->altaddr = chs;
+            srec.altaddr = chs;
 
             chs = ch + 1;
             fieldno++;
@@ -97,7 +97,7 @@ int metaBuffer2ServerRec(metaSRec_t *srec, const char *buf)
 
         case 2:                   /* server port */
             *ch = 0;
-            srec->port = (uint16_t)atoi(chs);
+            srec.port = (uint16_t)atoi(chs);
 
             chs = ch + 1;
             fieldno++;
@@ -105,7 +105,7 @@ int metaBuffer2ServerRec(metaSRec_t *srec, const char *buf)
 
         case 3:                   /* server name */
             *ch = 0;
-            srec->servername = chs;
+            srec.servername = chs;
 
             chs = ch + 1;
             fieldno++;
@@ -113,7 +113,7 @@ int metaBuffer2ServerRec(metaSRec_t *srec, const char *buf)
 
         case 4:                   /* server version */
             *ch = 0;
-            srec->serverver = chs;
+            srec.serverver = chs;
 
             chs = ch + 1;
             fieldno++;
@@ -122,7 +122,7 @@ int metaBuffer2ServerRec(metaSRec_t *srec, const char *buf)
 
         case 5:                   /* motd */
             *ch = 0;
-            srec->motd = chs;
+            srec.motd = chs;
 
             chs = ch + 1;
             fieldno++;
@@ -131,7 +131,7 @@ int metaBuffer2ServerRec(metaSRec_t *srec, const char *buf)
         case 6:                   /* total ships */
             *ch = 0;
 
-            srec->numtotal = (uint8_t)atoi(chs);
+            srec.numtotal = (uint8_t)atoi(chs);
 
             chs = ch + 1;
             fieldno++;
@@ -140,7 +140,7 @@ int metaBuffer2ServerRec(metaSRec_t *srec, const char *buf)
         case 7:                   /* active ships */
             *ch = 0;
 
-            srec->numactive = (uint8_t)atoi(chs);
+            srec.numactive = (uint8_t)atoi(chs);
 
             chs = ch + 1;
             fieldno++;
@@ -149,7 +149,7 @@ int metaBuffer2ServerRec(metaSRec_t *srec, const char *buf)
         case 8:                   /* vacant */
             *ch = 0;
 
-            srec->numvacant = (uint8_t)atoi(chs);
+            srec.numvacant = (uint8_t)atoi(chs);
 
             chs = ch + 1;
             fieldno++;
@@ -158,7 +158,7 @@ int metaBuffer2ServerRec(metaSRec_t *srec, const char *buf)
         case 9:                   /* robot */
             *ch = 0;
 
-            srec->numrobot = (uint8_t)atoi(chs);
+            srec.numrobot = (uint8_t)atoi(chs);
 
             chs = ch + 1;
             fieldno++;
@@ -168,7 +168,7 @@ int metaBuffer2ServerRec(metaSRec_t *srec, const char *buf)
         case 10:                   /* flags */
             *ch = 0;
 
-            srec->flags = (uint32_t)atol(chs);
+            srec.flags = (uint32_t)atol(chs);
 
             chs = ch + 1;
             fieldno++;
@@ -178,7 +178,7 @@ int metaBuffer2ServerRec(metaSRec_t *srec, const char *buf)
             /* meta version 0x0002+ */
         case 11:                  /* server protocol version */
             *ch = 0;
-            srec->protovers = (uint16_t)atoi(chs);
+            srec.protovers = (uint16_t)atoi(chs);
             chs = ch + 1;
             fieldno++;
 
@@ -186,7 +186,7 @@ int metaBuffer2ServerRec(metaSRec_t *srec, const char *buf)
 
         case 12:                  /* contact (email/http/whatever) */
             *ch = 0;
-            srec->contact = chs;
+            srec.contact = chs;
 
             chs = ch + 1;
             fieldno++;
@@ -194,7 +194,7 @@ int metaBuffer2ServerRec(metaSRec_t *srec, const char *buf)
 
         case 13:                  /* server localtime */
             *ch = 0;
-            srec->walltime = chs;
+            srec.walltime = chs;
 
             chs = ch + 1;
             fieldno++;
@@ -204,7 +204,7 @@ int metaBuffer2ServerRec(metaSRec_t *srec, const char *buf)
 
     free(tbuf);
 
-    switch (srec->version)
+    switch (srec.version)
     {
     case 1:
         if (fieldno < 11)
@@ -424,7 +424,7 @@ int metaGetServerList(const char *remotehost, metaServerVec_t& srvlist)
 
                 if (srvlist.size() < META_MAXSERVERS)
                 {
-                    if (metaBuffer2ServerRec(&sRec, buf.c_str()))
+                    if (metaBuffer2ServerRec(sRec, buf.c_str()))
                         srvlist.push_back(sRec);
                     else
                         utLog("metaGetServerList: metaBuffer2ServerRec(%s) "

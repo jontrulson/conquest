@@ -65,7 +65,7 @@ typedef struct _meta_srec {
 
 typedef std::vector<metaSRec_t> metaServerVec_t;
 
-int  metaBuffer2ServerRec(metaSRec_t *srec, const char *buf);
+int  metaBuffer2ServerRec(metaSRec_t& srec, const char *buf);
 void metaServerRec2Buffer(std::string& buf, const metaSRec_t& srec);
 int  metaUpdateServer(const char *remotehost, const char *name, int port);
 int  metaGetServerList(const char *remotehost, metaServerVec_t& srvlist);

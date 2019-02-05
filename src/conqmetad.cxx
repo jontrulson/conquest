@@ -111,40 +111,41 @@ void ageServers(void)
 
 /* find the server slot for this record (or make a new one).  returns the
    slot number found/created, or -1 for error */
-int findSlot(metaSRec_t *srec, bool *isupdate)
+int findSlot(const metaSRec_t& srec, bool& isUpdate)
 {
-    bool found = false;
+    bool foundSlot = false;
     int rv = -1;
 
-    *isupdate = false;
+    isUpdate = false;
 
-    /* first look for it */
+    /* first look for an existing, valid, matching entry */
     for (int i=0; i<metaServerList.size(); i++)
     {
-        if (metaServerList[i].addr == srec->addr &&
-            metaServerList[i].altaddr == srec->altaddr &&
-            metaServerList[i].valid && metaServerList[i].port == srec->port)
+        if (metaServerList[i].addr == srec.addr &&
+            metaServerList[i].altaddr == srec.altaddr &&
+            metaServerList[i].valid &&
+            metaServerList[i].port == srec.port)
         {
             rv = i;
-            found = true;
-            *isupdate = true;
+            foundSlot = true;
+            isUpdate = true;
             break;
         }
     }
 
-    if (!found)
+    if (!foundSlot)
     {                           /* didn't find one, see if there's an
                                  * invalid slot we can use */
         for (int i=0; i<metaServerList.size(); i++)
             if (!metaServerList[i].valid)
             {                     /* found a previously used slot */
                 rv = i;
-                found = true;
+                foundSlot = true;
                 break;
             }
     }
 
-    if (!found)
+    if (!foundSlot)
     {
         // if one is still not found, create a new empty one if it will fit
         if (metaServerList.size() < META_MAXSERVERS)
@@ -191,11 +192,11 @@ void metaProcList(int sock, char *hostbuf)
 
 void metaProcUpd(char *buf, int rlen, char *hostbuf)
 {
-    metaSRec_t sRec;
+    metaSRec_t sRec = {};
     int slot;
-    bool wasfound;
+    bool isUpdate;
 
-    if (!metaBuffer2ServerRec(&sRec, buf))
+    if (!metaBuffer2ServerRec(sRec, buf))
     {
         utLog("META: malformed buffer '%s', ignoring", buf);
         return;
@@ -205,24 +206,25 @@ void metaProcUpd(char *buf, int rlen, char *hostbuf)
 
     /* if altaddr is empty, we copy hostbuf into it. */
 
-    if (sRec.altaddr.size() == 0)
+    if (sRec.altaddr.empty())
         sRec.altaddr = sRec.addr;
 
+    if (sRec.port == 0)
+        sRec.port = CN_DFLT_PORT;
+
     /* now find a slot for it. */
-    if ((slot = findSlot(&sRec, &wasfound)) == -1)
+    if ((slot = findSlot(sRec, isUpdate)) == -1)
     {
         utLog("META: findSlot() failed, ignoring\n");
         return;
     }
 
-    /* init the slot */
+    /* init the rest of slot */
     sRec.valid = true;
     sRec.lasttime = time(0);
-    if (sRec.port == 0)
-        sRec.port = CN_DFLT_PORT;
     metaServerList[slot] = sRec;
 
-    if (!wasfound)                /* new server */
+    if (!isUpdate)                /* new server */
         utLog("META: Added server %s:%u(%s), slot %d",
               metaServerList[slot].altaddr.c_str(),
               metaServerList[slot].port,
