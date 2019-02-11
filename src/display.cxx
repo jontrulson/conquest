@@ -385,10 +385,13 @@ void display( int snum )
                 cd = cosd(cbDoomsday->heading);
                 /* Draw the body. */
                 uiPutColor(BlueColor);
-                for ( fl = -DOOMSIZE/2.0;
-                      fl < DOOMSIZE/2.0;
-                      fl = fl + 50.0 )
-                    if ( clbCVTCoords( cenx, ceny, cbDoomsday->x+fl*cd, cbDoomsday->y+fl*sd, scale, &lin, &col ) )
+                for ( int ifl = int(-DOOMSIZE/2.0);
+                      ifl < int(DOOMSIZE/2.0);
+                      ifl = ifl + 50 )
+                    if ( clbCVTCoords( cenx, ceny,
+                                       cbDoomsday->x + real(ifl) * cd,
+                                       cbDoomsday->y + real(ifl) * sd,
+                                       scale, &lin, &col ) )
                         cdput( '#', lin, col );
                 uiPutColor(0);
                 /* Draw the head. */
@@ -410,11 +413,14 @@ void display( int snum )
             cd = cosd(cbShips[snum].lastphase);
             ch = dirch[mod( int(iround( cbShips[snum].lastphase + 22.5 ) / 45), 7 )];
             uiPutColor(InfoColor);
-            for ( fl = 0; fl <= LastPhasDist; fl = fl + 50.0 )
+            for (int ifl = 0; ifl <= int(LastPhasDist); ifl = ifl + 50 )
+            {
                 if ( clbCVTCoords( cenx, ceny,
-                                   cbShips[snum].x+fl*cd, cbShips[snum].y+fl*sd,
+                                   cbShips[snum].x + real(ifl) * cd,
+                                   cbShips[snum].y + real(ifl) * sd,
                                    scale, &lin, &col ) )
                     cdput( ch, lin, col );
+            }
             uiPutColor(0);
         }
     }

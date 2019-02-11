@@ -53,20 +53,20 @@ int main(int argc, char *argv[])
 
         default:
             printf("Usage: testmeta -s <server> -m <msg>\n");
-            exit(1);
+            return 1;
         }
 
     if (!msg || !remotehost)
     {
         printf("Usage: testmeta -s <server> -m <msg>\n");
-        exit(1);
+        return -1;
     }
 
 
     if ((hp = gethostbyname(remotehost)) == NULL)
     {
         fprintf(stderr, "testmeta: %s: no such host\n", remotehost);
-        return false;
+        return -1;
     }
 
     /* put host's address and address type into socket structure */
@@ -79,7 +79,7 @@ int main(int argc, char *argv[])
     if ((s = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP )) < 0)
     {
         perror("socket");
-        return false;
+        return -1;
     }
 
     printf("Connecting to host: %s, udp port %d ...\n",

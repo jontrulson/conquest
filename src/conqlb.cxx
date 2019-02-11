@@ -459,7 +459,7 @@ int clbLaunch( int snum, real dir, int number, int ltype )
 {
     int i, j;
     real speed = 0.0, adir = 0.0;
-    int tnum, numslots, numfired;
+    int tnum, numfired;
     std::vector<int> tslot;
 
     /* Stop repairing. */
@@ -472,7 +472,6 @@ int clbLaunch( int snum, real dir, int number, int ltype )
     if ( !cbShips[snum].pfuse )
         cbShips[snum].lastphase = dir;
 
-    numslots = 0;
     numfired = 0;
     tnum = number;
 

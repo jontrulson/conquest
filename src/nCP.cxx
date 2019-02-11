@@ -27,9 +27,8 @@
 
 #include "c_defs.h"
 
-#include <format.h>
 #include <algorithm>
-using namespace std;
+#include "format.h"
 
 #include "context.h"
 #include "global.h"
@@ -1976,7 +1975,7 @@ static void themes()
 {
     real dis;
     int mus = -1;                 /* the music we might play */
-    static real odist = max(BATTLE_MAXDIS, APPROACH_MAXDIS);
+    static real odist = std::max(BATTLE_MAXDIS, APPROACH_MAXDIS);
     int snum = Context.snum;
     int warlike;
     real prob = rnd();

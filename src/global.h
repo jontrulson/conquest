@@ -25,7 +25,7 @@
 // SOFTWARE.
 //
 
-#include <gameDir.h>
+#include "gameDir.h"
 
 #ifndef GLOBAL_H
 #define GLOBAL_H
