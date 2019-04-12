@@ -74,9 +74,9 @@ void conqend(void);
 
 void printUsage()
 {
-    printf("Usage: conquest   [-s server[:port]] [-r <recfile.cqr>]\n");
-    printf("                  [-f] [-g <geometry>] [-u] [-S] [-v]\n");
-    printf("                  [-M <metaserver>] [-B]\n\n");
+    printf("Usage: conquest   [-s server[:port]] [-f] [-g <geometry>] \n");
+    printf("                  [-u] [-S] [-v] [-M <metaserver>] \n");
+    printf("                  [-B]\n\n");
     printf("    -f               run in fullscreen mode\n");
     printf("    -g <geometry>    specify intial window width/height.\n");
     printf("                      Format is WxH (ex: 1024x768).\n");
