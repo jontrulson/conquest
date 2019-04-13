@@ -4,9 +4,8 @@
 *.so
 *.o
 *.a
-.libs/*
-.deps/*
-src/.deps/*
+**/.libs/*
+**/.deps/*
 *~
 Makefile
 src/config.h.in
