@@ -57,6 +57,7 @@ static char hd3[BUFFER_SIZE_256];
 
 // sorted planet vector
 static std::vector<int> sv;
+static bool atEnd = false; // flag to indicate we are done, no more to display
 
 static nodeStatus_t nPlanetlDisplay(dspConfig_t *);
 static nodeStatus_t nPlanetlIdle(void);
@@ -84,8 +85,16 @@ scrNode_t *nPlanetlInit(int nodeid, int setnode, int sn, int tn)
     /* sort the planets */
     sv.clear();
     for ( int i=0; i<cbLimits.maxPlanets(); i++ )
+    {
+        // ignore invisible planets
+        if ( ! PVISIBLE(i) )
+            continue;
+
         sv.push_back(i);
+    }
     clbSortPlanets( sv );
+
+    atEnd = false;
 
     if (setnode)
         setNode(&nPlanetlNode);
@@ -146,15 +155,11 @@ static nodeStatus_t nPlanetlDisplay(dspConfig_t *dsp)
     PlanetIdx = 0;
     if (PlanetOffset < cbLimits.maxPlanets())
     {
-        while ((PlanetOffset + PlanetIdx) < cbLimits.maxPlanets())
+        while ((PlanetOffset + PlanetIdx) < sv.size())
         {
             int i = PlanetOffset + PlanetIdx;
             PlanetIdx++;
             pnum = sv[i];
-
-            /* Don't display unless it's real. */
-            if ( ! PVISIBLE(pnum) )
-                continue;
 
             /* colorize - dwp */
             if ( snum >= 0 && snum < cbLimits.maxShips())
@@ -301,8 +306,11 @@ static nodeStatus_t nPlanetlDisplay(dspConfig_t *dsp)
 
         } /* while */
 
-        if ((PlanetOffset + PlanetIdx) >= cbLimits.maxPlanets())
+        if ((PlanetOffset + PlanetIdx) >= sv.size())
+        {
+            atEnd = true;       // ready to leave... (for input)
             cprintf(MSG_LIN2, 0,  ALIGN_CENTER, "#%d#%s", NoColor, MTXT_DONE);
+        }
         else
             cprintf(MSG_LIN2, 0,  ALIGN_CENTER, "#%d#%s", NoColor, MTXT_MORE);
 
@@ -329,11 +337,11 @@ static nodeStatus_t nPlanetlInput(int ch)
 {
     ch = CQ_CHAR(ch);
 
-    if (ch == ' ')
+    if (ch == ' ' && !atEnd)
     {
         PlanetOffset += PlanetIdx;
 
-        if (PlanetOffset < cbLimits.maxPlanets())
+        if (PlanetOffset < sv.size())
             return NODE_OK;
     }
 

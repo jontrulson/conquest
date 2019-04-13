@@ -262,7 +262,12 @@ void mcuPlanetList()
     /* sort the planets */
     std::vector<int> sv;
     for ( i = 0; i < cbLimits.maxPlanets(); i++ )
+    {
+        // don't save invisible planets
+        if ( ! PVISIBLE(i) )
+            continue;
         sv.push_back(i);
+    }
     clbSortPlanets( sv );
 
     utStrncpy( hd3, hd2, sizeof(hd3) );
@@ -297,15 +302,11 @@ void mcuPlanetList()
 
         if (PlanetOffset < cbLimits.maxPlanets())
 	{
-            while ((PlanetOffset + PlanetIdx) < cbLimits.maxPlanets())
+            while ((PlanetOffset + PlanetIdx) < sv.size())
 	    {
                 i = PlanetOffset + PlanetIdx;
                 PlanetIdx++;
                 pnum = sv[i];
-
-                /* Don't display unless it's real. */
-                if ( ! PVISIBLE(pnum) )
-                    continue;
 
                 switch(cbPlanets[pnum].type)
                 {
@@ -330,8 +331,6 @@ void mcuPlanetList()
                         outattr = SpecialColor;
                         break;
                 }
-
-                /* I want everything if it's real */
 
                 /* Figure out who owns it and count armies. */
                 ch =  cbTeams[cbPlanets[pnum].team].teamchar;
@@ -406,7 +405,7 @@ void mcuPlanetList()
 
 	    } /* while */
 
-            if ((PlanetOffset + PlanetIdx) >= cbLimits.maxPlanets())
+            if ((PlanetOffset + PlanetIdx) >= sv.size())
                 mcuPutPrompt( MTXT_DONE, MSG_LIN2 );
             else
                 mcuPutPrompt( MTXT_MORE, MSG_LIN2 );
@@ -415,7 +414,7 @@ void mcuPlanetList()
 
             if (iogtimed( &cmd, 1.0 ))
 	    {			/* got a char */
-                if (cmd == 'q' || cmd == 'Q' || cmd == TERM_ABORT)
+                if (cmd != ' ')
 		{		/* quit */
                     Done = true;
 		}
@@ -423,7 +422,7 @@ void mcuPlanetList()
 		{		/* some other key... */
 				/* setup for new page */
                     PlanetOffset += PlanetIdx;
-                    if (PlanetOffset >= cbLimits.maxPlanets())
+                    if (PlanetOffset >= sv.size())
 		    {		/* pointless to continue */
                         Done = true;
 		    }
