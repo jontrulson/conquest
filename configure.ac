@@ -3,7 +3,7 @@ dnl Jon Trulson 9/21/96 - with some borrowed code from various sources...;-)
 dnl
 dnl
 
-AC_INIT([conquest],[8],[jon@radscan.com])
+AC_INIT([conquest],[9],[jon@radscan.com])
 AC_CONFIG_HEADER(src/config.h)
 
 AC_CONFIG_MACRO_DIRS([m4])
@@ -129,7 +129,7 @@ esac
 dnl disable static libs by default (except for mingw)
 AM_DISABLE_SHARED
 
-AM_INIT_AUTOMAKE
+AM_INIT_AUTOMAKE([subdir-objects foreign])
 AC_PROG_LIBTOOL
 AC_PROG_YACC
 AC_PROG_LEX
@@ -255,7 +255,7 @@ AM_CONDITIONAL(SNDCLIENT, test $SNDCLIENT)
 AM_CONDITIONAL(TCPW, test $TCPW)
 
 
-AC_CONFIG_FILES([Makefile src/Makefile])
+AC_CONFIG_FILES([Makefile src/Makefile src/fmt/Makefile])
 AC_OUTPUT
 
 echo

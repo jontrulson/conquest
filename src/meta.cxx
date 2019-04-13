@@ -37,7 +37,7 @@
 
 #include <string>
 #include <algorithm>
-#include "format.h"
+#include "fmt/format.h"
 
 /* convert any pipe chars in a string to underlines */
 static void pipe2ul(std::string& str)
