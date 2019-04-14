@@ -16,19 +16,19 @@ CONQIMGDIR = $(CONQDATADIR)/conquest/img
 CONQSNDDIR = $(CONQDATADIR)/conquest/sound
 CONQDOCDIR = $(CONQDATADIR)/doc/conquest
 
-CONQDOCS = ../docs/HISTORY.txt ../docs/conquest-guide.md ../docs/conqinit.txt \
-	../robot-rules/conqrule ../robot-rules/conqrule.easy \
-	../docs/server-guide.md ../LICENSE.txt ../docs/CREDITS.txt ../README.md
+CONQDOCS = $(top_srcdir)/docs/HISTORY.txt $(top_srcdir)/docs/conquest-guide.md $(top_srcdir)/docs/conqinit.txt \
+	$(top_srcdir)/robot-rules/conqrule $(top_srcdir)/robot-rules/conqrule.easy \
+	$(top_srcdir)/docs/server-guide.md $(top_srcdir)/LICENSE.txt $(top_srcdir)/docs/CREDITS.txt $(top_srcdir)/README.md
 
-IMAGES = ../img/*.png ../img/*.txf
-SOUNDS = ../sound/*.ogg
+IMAGES = $(top_srcdir)/img/*.png $(top_srcdir)/img/*.txf
+SOUNDS = $(top_srcdir)/sound/*.ogg
 
 TCPW_H = tcpwrap.h
 TCW_C = tcpwrap.cxx
 
-man6_MANS = ../man/conqdriv.man ../man/conqmetad.man ../man/conqoper.man \
-	../man/conquest.man ../man/conquestd.man ../man/conqai.man \
-	../man/conqstrat.man ../man/conqinit.man
+man6_MANS = $(top_srcdir)/man/conqdriv.man $(top_srcdir)/man/conqmetad.man $(top_srcdir)/man/conqoper.man \
+	$(top_srcdir)/man/conquest.man $(top_srcdir)/man/conquestd.man $(top_srcdir)/man/conqai.man \
+	$(top_srcdir)/man/conqstrat.man $(top_srcdir)/man/conqinit.man
 
 if ISMINGW
 
@@ -215,16 +215,16 @@ install-exec-hook:
 	chmod 644 $(DESTDIR)$(CONQSNDDIR)/*.ogg
 	cp -f $(CONQDOCS) $(DESTDIR)$(CONQDOCDIR)/
 	chmod 644 $(DESTDIR)$(CONQDOCDIR)/*
-	cp ../initfiles/conqinitrc $(DESTDIR)$(CONQSYSCONFDIR)/conqinitrc
+	cp $(top_srcdir)/initfiles/conqinitrc $(DESTDIR)$(CONQSYSCONFDIR)/conqinitrc
 	chgrp $(CONQGROUP) $(DESTDIR)$(CONQSYSCONFDIR)/conqinitrc
 	chmod 664 $(DESTDIR)$(CONQSYSCONFDIR)/conqinitrc
-	cp ../initfiles/texturesrc $(DESTDIR)$(CONQSYSCONFDIR)/texturesrc
+	cp $(top_srcdir)/initfiles/texturesrc $(DESTDIR)$(CONQSYSCONFDIR)/texturesrc
 	chgrp $(CONQGROUP) $(DESTDIR)$(CONQSYSCONFDIR)/texturesrc
 	chmod 664 $(DESTDIR)$(CONQSYSCONFDIR)/texturesrc
-	cp ../initfiles/soundrc $(DESTDIR)$(CONQSYSCONFDIR)/soundrc
+	cp $(top_srcdir)/initfiles/soundrc $(DESTDIR)$(CONQSYSCONFDIR)/soundrc
 	chgrp $(CONQGROUP) $(DESTDIR)$(CONQSYSCONFDIR)/soundrc
 	chmod 664 $(DESTDIR)$(CONQSYSCONFDIR)/soundrc
-	cp ../initfiles/00_plantex.trc $(DESTDIR)$(CONQSYSCONFDIR)/00_plantex.trc
+	cp $(top_srcdir)/initfiles/00_plantex.trc $(DESTDIR)$(CONQSYSCONFDIR)/00_plantex.trc
 	chgrp $(CONQGROUP) $(DESTDIR)$(CONQSYSCONFDIR)/00_plantex.trc
 	chmod 664 $(DESTDIR)$(CONQSYSCONFDIR)/00_plantex.trc
 	chgrp $(CONQGROUP) $(DESTDIR)$(bindir)/conqoper$(EXEEXT) \
