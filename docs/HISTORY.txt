@@ -9,6 +9,24 @@
 
                               Conquest HISTORY
 
+9.0.1a-9.0.1c, 12/10/2018-4/13/2019 (devel, unreleased)
+
+  - more work on the meta server, stringification, c++ containers, and
+    other fixes designed to improve stability and security
+
+  - move the FMT format library into a separate subdirectory
+
+  - fixup a couple of places where memset was being used on non-POD
+    structures (structures containing containers like std::string and
+    std::vector)
+
+  - remove lex/yacc generated files on a 'make clean'
+
+  - add checks for some supported compiler options to configure.ac
+
+  - fix a couple of problems with paging when viewing the planet list
+
+
 9.0.1, 11/25/2018 (stable release)
 
   - This is a minor release - most of the changes are internal and
