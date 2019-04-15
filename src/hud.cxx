@@ -29,7 +29,6 @@
 
 #include <string>
 #include <algorithm>
-using namespace std;
 #include "fmt/format.h"
 
 #include "conqdef.h"
@@ -134,6 +133,9 @@ void hudInitData(void)
 // set hud warp data to current, if it's changed
 void hudSetWarp(int snum)
 {
+    if (snum < 0)
+        return;
+
     if ( cbShips[snum].warp != hudData.warp.warp )
     {
         hudData.warp.warp = cbShips[snum].warp;
@@ -149,6 +151,9 @@ void hudSetWarp(int snum)
 
 void hudSetHeading(int snum)
 {
+    if (snum < 0)
+        return;
+
     int i = iround( cbShips[snum].head );
 
     if ( i != hudData.heading.head)
@@ -172,7 +177,6 @@ void hudSetHeading(int snum)
 
 void hudSetAlertStatus(int snum, int asnum, alertLevel_t astatus)
 {
-
     if (snum < 0)
     {
         if (hudData.aStat.alertLevel != GREEN_ALERT) /* a special */
@@ -190,55 +194,57 @@ void hudSetAlertStatus(int snum, int asnum, alertLevel_t astatus)
     {
         switch (astatus)
         {
-        case PHASER_ALERT:
-        {
-            hudData.aStat.color = RedLevelColor;
-            hudData.aStat.str = "RED ALERT ";
-        }
-        break;
+            case PHASER_ALERT:
+            {
+                hudData.aStat.color = RedLevelColor;
+                hudData.aStat.str = "RED ALERT ";
+            }
+            break;
 
-        case RED_ALERT:
-        {
-            hudData.aStat.color = RedLevelColor;
-            hudData.aStat.str = "Alert ";
-        }
-        break;
+            case RED_ALERT:
+            {
+                hudData.aStat.color = RedLevelColor;
+                hudData.aStat.str = "Alert ";
+            }
+            break;
 
-        case TORP_ALERT:
-        {
-            hudData.aStat.color = YellowLevelColor;
-            hudData.aStat.str = "Torp Alert ";
-        }
-        break;
+            case TORP_ALERT:
+            {
+                hudData.aStat.color = YellowLevelColor;
+                hudData.aStat.str = "Torp Alert ";
+            }
+            break;
 
-        case YELLOW_ALERT:
-        {
-            hudData.aStat.color = YellowLevelColor;
-            hudData.aStat.str = "Yellow Alert ";
-        }
-        break;
+            case YELLOW_ALERT:
+            {
+                hudData.aStat.color = YellowLevelColor;
+                hudData.aStat.str = "Yellow Alert ";
+            }
+            break;
 
-        case PROXIMITY_ALERT:
-        {
-            hudData.aStat.color = YellowLevelColor;
-            hudData.aStat.str = "Proximity Alert ";
-        }
-        break;
+            case PROXIMITY_ALERT:
+            {
+                hudData.aStat.color = YellowLevelColor;
+                hudData.aStat.str = "Proximity Alert ";
+            }
+            break;
 
-        case GREEN_ALERT:
-        default:
-        {
-            hudData.aStat.color = GreenLevelColor;
-            hudData.aStat.str.clear();
-        }
-        break;
+            case GREEN_ALERT:
+            default:
+            {
+                hudData.aStat.color = GreenLevelColor;
+                hudData.aStat.str.clear();
+            }
+            break;
         }
 
         if (asnum >= 0)
+        {
             utAppendShip(hudData.aStat.str, asnum) ;
 
-        if (SCLOAKED(asnum))
-            hudData.aStat.str += " (CLOAKED)";
+            if (SCLOAKED(asnum))
+                hudData.aStat.str += " (CLOAKED)";
+        }
 
         hudData.aStat.alertLevel = astatus;
         hudData.aStat.aShip      = asnum;
@@ -250,6 +256,9 @@ void hudSetAlertStatus(int snum, int asnum, alertLevel_t astatus)
 
 void hudSetKills(int snum)
 {
+    if (snum < 0)
+        return;
+
     real x = (cbShips[snum].kills + cbShips[snum].strkills);
 
     if ( x != hudData.kills.kills )
@@ -264,6 +273,9 @@ void hudSetKills(int snum)
 
 void hudSetShields(int snum, bool *dobeep)
 {
+    if (snum < 0)
+        return;
+
     int i, k;
 
     if (cbShips[snum].shields < hudData.sh.shields)
@@ -296,6 +308,9 @@ void hudSetShields(int snum, bool *dobeep)
 
 void hudSetDamage(int snum, real *lastdamage)
 {
+    if (snum < 0)
+        return;
+
     real r = cbShips[snum].damage;
     int i;
 
@@ -321,6 +336,9 @@ void hudSetDamage(int snum, real *lastdamage)
 
 void hudSetFuel(int snum)
 {
+    if (snum < 0)
+        return;
+
     real r = cbShips[snum].fuel;
     int i;
 
@@ -346,6 +364,9 @@ void hudSetFuel(int snum)
 
 void hudSetAlloc(int snum)
 {
+    if (snum < 0)
+        return;
+
     int i = cbShips[snum].weapalloc;
     int j = cbShips[snum].engalloc;
 
@@ -379,6 +400,9 @@ void hudSetAlloc(int snum)
 
 void hudSetTemps(int snum)
 {
+    if (snum < 0)
+        return;
+
     real etemp = cbShips[snum].etemp;
     real wtemp = cbShips[snum].wtemp;
     int eOverl, wOverl;
@@ -438,6 +462,9 @@ void hudSetTemps(int snum)
 
 void hudSetTow(int snum)
 {
+    if (snum < 0)
+        return;
+
     if (STOWING(snum) || STOWEDBY(snum))
     {
         hudData.tow.str.clear();
@@ -470,6 +497,9 @@ void hudSetTow(int snum)
 
 void hudSetArmies(int snum)
 {
+    if (snum < 0)
+        return;
+
     int i = cbShips[snum].armies;
 
     if (i != hudData.armies.armies)
@@ -487,6 +517,9 @@ void hudSetArmies(int snum)
 
 void hudSetRobotAction(int snum)
 {
+    if (snum < 0)
+        return;
+
     int i = cbShips[snum].action;
 
     if (i != hudData.raction.action)
@@ -504,7 +537,10 @@ void hudSetRobotAction(int snum)
 
 void hudSetDestruct(int snum)
 {
-    int i = max( 0, cbShips[snum].sdfuse );
+    if (snum < 0)
+        return;
+
+    int i = std::max( 0, cbShips[snum].sdfuse );
 
     if (i != hudData.destruct.fuse)
     {
