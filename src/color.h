@@ -94,10 +94,10 @@ cqColor LabelColor = (CQC_BLUE | CQC_A_BOLD);
 cqColor InfoColor = (CQC_CYAN | CQC_A_BOLD);
 cqColor SpecialColor = (CQC_MAGENTA | CQC_A_BOLD);
 # else
-extern cqColor RedColor, GreenColor, YellowColor, MagentaColor;
-extern cqColor CyanColor, NoColor, BlueColor, BlackColor;
-extern cqColor RedLevelColor, YellowLevelColor, GreenLevelColor;
-extern cqColor LabelColor, InfoColor, SpecialColor;
+extern const cqColor RedColor, GreenColor, YellowColor, MagentaColor;
+extern const cqColor CyanColor, NoColor, BlueColor, BlackColor;
+extern const cqColor RedLevelColor, YellowLevelColor, GreenLevelColor;
+extern const cqColor LabelColor, InfoColor, SpecialColor;
 # endif /* NOEXPORT_COLORS */
 
 
