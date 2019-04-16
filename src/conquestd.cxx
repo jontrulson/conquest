@@ -882,8 +882,9 @@ void dead( int snum )
 				   last words and bail */
         if (kb == KB_CONQUER)
         {
-            robreply(buf);
-            utStrncpy(cbConqInfo->lastwords, buf, MAXLASTWORDS);
+            std::string abuf;
+            robreply(abuf);
+            utStrncpy(cbConqInfo->lastwords, abuf.c_str(), MAXLASTWORDS);
         }
 
         utLog("conquestd: dead(): sendClientStat failed, fl = 0x%0x\n",
@@ -936,8 +937,9 @@ void dead( int snum )
         if (!done)
         {
             // timed out or error, gen last words
-            robreply(buf);
-            utStrncpy(cbConqInfo->lastwords, buf, MAXLASTWORDS);
+            std::string abuf;
+            robreply(abuf);
+            utStrncpy(cbConqInfo->lastwords, abuf.c_str(), MAXLASTWORDS);
         }
     }
 

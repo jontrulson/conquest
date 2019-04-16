@@ -45,7 +45,7 @@
 #include "record.h"
 
 #include <algorithm>
-using namespace std;
+#include <string>
 
 #define GREEN_ALERT 0
 #define YELLOW_ALERT 1
@@ -610,11 +610,11 @@ void display( int snum )
                         if ( lin < 1 )
                             lin = 1;
                         else
-                            lin = min( lin, DISPLAY_LINS );
+                            lin = std::min( lin, DISPLAY_LINS );
                         if ( col < STAT_COLS + 1 )
                             col = STAT_COLS + 1;
                         else
-                            col = min( col, Context.maxcol );
+                            col = std::min( col, Context.maxcol );
                         cdmove( lin, col );
                     }
                 }
@@ -1101,8 +1101,10 @@ void display( int snum )
             {
                 uiPutColor(InfoColor);
                 cdputs( "action =", lin, col );
-                robstr( -i, buf );
-                cdputs( buf, lin, datacol );
+
+                std::string abuf;
+                robstr( -i, abuf );
+                cdputs( abuf.c_str(), lin, datacol );
                 uiPutColor(0);
             }
             zzsarmies = i;
@@ -1143,7 +1145,7 @@ void display( int snum )
         if ( SCLOAKED(snum) )
             i = -1;
         else
-            i = max( 0, cbShips[snum].sdfuse );
+            i = std::max( 0, cbShips[snum].sdfuse );
         if ( i != zzssdfuse )
         {
             cdclra( lin, col, lin, STAT_COLS-1 );

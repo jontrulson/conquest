@@ -626,8 +626,9 @@ void debugdisplay( int snum )
     i = cbShips[snum].action;
     if ( i != 0 )
     {
-        robstr( i, buf );
-        cprintf(lin,dcol,ALIGN_NONE,"#%d#%s",InfoColor, buf);
+        std::string abuf;
+        robstr( i, abuf );
+        cprintf(lin,dcol,ALIGN_NONE,"#%d#%s",InfoColor, abuf.c_str());
     }
 
 

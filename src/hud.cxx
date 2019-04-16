@@ -524,11 +524,7 @@ void hudSetRobotAction(int snum)
 
     if (i != hudData.raction.action)
     {
-        // FIXME when robstr() can do strings
-        char tmpStr[64];
-
-        robstr( i, tmpStr );
-        hudData.raction.str = tmpStr;
+        robstr( i, hudData.raction.str );
         hudData.raction.action = i;
     }
 

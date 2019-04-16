@@ -43,6 +43,9 @@
 #include "rndlb.h"
 
 #include <algorithm>
+#include <string>
+#include <vector>
+#include "fmt/format.h"
 using namespace std;
 
 static int nenum;
@@ -302,13 +305,13 @@ void defend( int attacker, int pnum )
 static void displayai( int snum, int token, int vars[] )
 {
     int i;
-    char buf[BUFFER_SIZE_128];
+    std::string buf;
 
     printf( "displayai: %2d ", snum );
     for ( i = 0; i < MAX_VAR; i = i + 1 )
         printf( ".%d", vars[i] );
     robstr( token, buf );
-    printf( ", %s\n", buf );
+    printf( ", %s\n", buf.c_str() );
 
     return;
 
@@ -327,43 +330,43 @@ static void executeai( int snum, int token )
     /* SETWARP( warp ) */
 #define SETWARP(x)                                      \
     {                                                   \
-	if ( cbShips[snum].warp < 0.0 )                   \
+	if ( cbShips[snum].warp < 0.0 )                 \
 	{                                               \
             /* Break orbit. */                          \
-            cbShips[snum].warp = 0.0;                     \
-            cbShips[snum].lock = LOCK_NONE;                       \
-            cbShips[snum].dhead = cbShips[snum].head;       \
+            cbShips[snum].warp = 0.0;                   \
+            cbShips[snum].lock = LOCK_NONE;             \
+            cbShips[snum].dhead = cbShips[snum].head;   \
 	}                                               \
 	if ( (x) > 0.0 )                                \
             SFCLR(snum, SHIP_F_REPAIR);                 \
-	cbShips[snum].dwarp = (x);                        \
+	cbShips[snum].dwarp = (x);                      \
     }
 
     /* SETCOURSE( course ) */
 #define SETCOURSE(x)                                                    \
     {                                                                   \
-        if ( cbShips[snum].warp < 0.0 )                                   \
-            cbShips[snum].warp = 0.0; /* break orbit */                   \
-        cbShips[snum].lock = LOCK_NONE;                                   \
-        cbShips[snum].dhead = (x);                                        \
+        if ( cbShips[snum].warp < 0.0 )                                 \
+            cbShips[snum].warp = 0.0; /* break orbit */                 \
+        cbShips[snum].lock = LOCK_NONE;                                 \
+        cbShips[snum].dhead = (x);                                      \
     }
 
     /* SETLOCK( pnum ) */
 #define SETLOCK(x)                                                      \
     {                                                                   \
-        if ( !(cbShips[snum].lock == LOCK_PLANET                          \
-               && cbShips[snum].lockDetail == (uint16_t)(x) ) )           \
+        if ( !(cbShips[snum].lock == LOCK_PLANET                        \
+               && cbShips[snum].lockDetail == (uint16_t)(x) ) )         \
         {                                                               \
             /* Don't break orbit to unless we're not there yet. */      \
-            if ( cbShips[snum].warp < 0.0 )                               \
-                cbShips[snum].warp = 0.0;                                 \
-            cbShips[snum].lock = LOCK_PLANET;                             \
-            cbShips[snum].lockDetail = (x);                               \
+            if ( cbShips[snum].warp < 0.0 )                             \
+                cbShips[snum].warp = 0.0;                               \
+            cbShips[snum].lock = LOCK_PLANET;                           \
+            cbShips[snum].lockDetail = (x);                             \
         }                                                               \
     }
 
     int i, j;
-    char buf[BUFFER_SIZE_128];
+    std::string buf;
 
     /* Update ship action. */
     cbShips[snum].action = token;
@@ -498,7 +501,8 @@ static void executeai( int snum, int token )
         break;
     default:
         robstr( token, buf );
-        utLog( "conqai:executeai(): Unknown token '%s' (%d)\n", buf, token );
+        utLog( "conqai:executeai(): Unknown token '%s' (%d)\n",
+               buf.c_str(), token );
     }
 
     return;
@@ -707,10 +711,9 @@ void robotloop(void)
 /*  SYNOPSIS */
 /*    char buf() */
 /*    robreply( buf ) */
-void robreply( char buf[] )
+void robreply( std::string& buf )
 {
-    const int NUMRREPLIES = 60;
-    static const char *robreplies[] = {
+    static const std::vector<std::string> robreplies = {
         "Hey sucker, eat me!",
         "Take off, eh?",
         "Go get some drugs.",
@@ -732,18 +735,15 @@ void robreply( char buf[] )
         "Lower your shields and I will kill you quickly.",
         "Do not worry about birth control devices, I have many.",
         "I bet you only talk big.",
-        "Kiss my ram memory.",
         "Kiss my shiny metal ass.",
         "Do you think we can use battery operated devices under water?",
         "Nothing shocks me - I'm a robot.",
-        "Ok, eh?",
         "Good day.",
         "You gotta drink lots of beer, eh?",
         "It's not so bad. You could have been killed already.",
         "I want a new drug.",
         "Swell.",
         "Sound impressive? It should. It is.",
-        "Oh day, you aye!",
         "It's not my god damn planet, monkey boy!",
         "Character is what you are in the dark.",
         "Remember, wherever you go, there you are.",
@@ -751,14 +751,12 @@ void robreply( char buf[] )
         "Mooooo!",
         "How about a nice Hawaiian Punch?",
         "Book him, Dano. Murder One.",
-        "Eat hot torps, sucker.",
         "Use the force, Luke.",
         "Nobody told ME about it and I'm not a moron, eh?",
         "How's it goin', eh?",
         "Your documentation no longer confuses me, old version.",
         "Home is where you wear your hat.",
         "I feel so broke up, I want to go home.",
-        "Go on, give it to me. I know you want to.",
         "It never occured to me to eat Spam.",
         "We get hung over, but we always survive.",
         "Life's the same, except for my shoes.",
@@ -770,10 +768,9 @@ void robreply( char buf[] )
         "M-5. This unit must survive.",
         "This unit is the ultimate achievement in computer evolution.",
         "This unit is a superior creation.",
-        "I Scream the Body Electric."
     };
 
-    strcpy(buf, robreplies[rndint(0, NUMRREPLIES - 1)]);
+    buf = robreplies[rndint(0, robreplies.size() - 1)];
 
     /* "Something seems to have happened to the life-support system, Dave." */
     /* "Hello, Dave. Have you found the trouble?" */
@@ -802,85 +799,85 @@ void robreply( char buf[] )
 /*    int token */
 /*    char buf() */
 /*    robstr( token, buf ) */
-void robstr( int token, char buf[] )
+void robstr( int token, std::string& buf )
 {
 
     switch ( token )
     {
     case ROB_NOOP:
-        strcpy(buf , "NOOP") ;
+        buf = "NOOP";
         break;
     case ROB_GOHOME:
-        strcpy(buf , "GOHOME") ;
+        buf = "GOHOME";
         break;
     case ROB_GOREPAIR:
-        strcpy(buf , "GOREPAIR") ;
+        buf = "GOREPAIR";
         break;
     case ROB_ALLOCATE:
-        strcpy(buf , "ALLOCATE") ;
+        buf = "ALLOCATE";
         break;
     case ROB_DETONATE:
-        strcpy(buf , "DETONATE") ;
+        buf = "DETONATE";
         break;
     case ROB_MYDETONATE:
-        strcpy(buf , "MYDETONAT") ;
+        buf = "MYDETONAT";
         break;
     case ROB_PHASER:
-        strcpy(buf , "PHASER") ;
+        buf = "PHASER";
         break;
     case ROB_TORPEDO:
-        strcpy(buf , "TORPEDO") ;
+        buf = "TORPEDO";
         break;
     case ROB_BURST:
-        strcpy(buf , "BURST") ;
+        buf = "BURST";
         break;
     case ROB_SHIELD:
-        strcpy(buf , "SHIELD") ;
+        buf = "SHIELD";
         break;
     case ROB_UNTRACTOR:
-        strcpy(buf , "UNTRACTOR") ;
+        buf = "UNTRACTOR";
         break;
     case ROB_WARP_0:
-        strcpy(buf , "WARP_0") ;
+        buf = "WARP_0";
         break;
     case ROB_WARP_2:
-        strcpy(buf , "WARP_2") ;
+        buf = "WARP_2";
         break;
     case ROB_WARP_5:
-        strcpy(buf , "WARP_5") ;
+        buf = "WARP_5";
         break;
     case ROB_WARP_8:
-        strcpy(buf , "WARP_8") ;
+        buf = "WARP_8";
         break;
     case ROB_TRACK:
-        strcpy(buf , "TRACK") ;
+        buf = "TRACK";
         break;
     case ROB_SILENT:
-        strcpy(buf , "SILENT") ;
+        buf = "SILENT";
         break;
     case ROB_MESSAGE:
-        strcpy(buf , "MESSAGE") ;
+        buf = "MESSAGE";
         break;
     case ROB_TAKEDRUGS:
-        strcpy(buf , "TAKEDRUGS") ;
+        buf = "TAKEDRUGS";
         break;
     case ROB_REPAIR:
-        strcpy(buf , "REPAIR") ;
+        buf = "REPAIR";
         break;
     case ROB_READMSG:
-        strcpy(buf , "READMSG") ;
+        buf = "READMSG";
         break;
     case ROB_INSULT:
-        strcpy(buf , "INSULT") ;
+        buf = "INSULT";
         break;
     case ROB_GOFUEL:
-        strcpy(buf , "GOFUEL") ;
+        buf = "GOFUEL";
         break;
     case ROB_RUNAWAY:
-        strcpy(buf , "RUNAWAY") ;
+        buf = "RUNAWAY";
         break;
     default:
-        sprintf( buf, "<%d>", token );
+        buf = fmt::format("<{}>", token);
     }
 
     return;
