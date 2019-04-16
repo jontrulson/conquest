@@ -117,7 +117,6 @@ void hudInitData(void)
     hudData.info.lastang     = -1;
     hudData.info.lastdist    = -1;
     hudData.info.lasttarget  = -1;
-    hudData.info.lasttargetstr[0] = 0;
 
     hudData.info.lastblaststr.clear();
     hudData.info.lasttargetstr.clear();

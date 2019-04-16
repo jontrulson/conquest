@@ -148,8 +148,6 @@ static const char *abt = "...aborted...";
 
 static bool _dostats = false;     /* whether to display rendering stats */
 
-extern hudData_t hudData;
-
 /* Ping status */
 static uint32_t pingStart = 0;
 static int pingPending = false;

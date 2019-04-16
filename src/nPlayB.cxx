@@ -88,8 +88,6 @@ static int live_ships = true;
 static int old_snum = 1;
 static const char *nss = NULL;        /* no such ship */
 
-extern hudData_t hudData;
-
 extern int ncpSRMagFactor;
 extern int ncpLRMagFactor;
 
