@@ -140,18 +140,6 @@ typedef enum {
 // maximum updates per second
 #define MAX_UPDATE_PER_SEC 10
 
-#define MAXPLANETTYPES 8        /* number of different planet types */
-#define MAXPTYPENAME 20                 /* maximum size of a planet type's name */
-#define MAXPLANETNAME 12        /* maximum size of a planet's name */
-#define PLANET_CLASSM 1         /* "Sensors indicate a Class M planet..." */
-#define PLANET_DEAD 2
-#define PLANET_SUN 3            /* a bit of a contradiction... */
-#define PLANET_MOON 4           /* a bit of fun */
-#define PLANET_GHOST 5  /* anchor for binary systems */
-#define PLANET_CLASSA 6
-#define PLANET_CLASSO 7
-#define PLANET_CLASSZ 0
-
 #define MAXUSERNAME  32      /* maximum size of a user's login name */
 #define MAXLASTWORDS 60       /* maximum size of conquering remarks */
 

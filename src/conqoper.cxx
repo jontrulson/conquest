@@ -1936,7 +1936,9 @@ void oppedit(void)
             break;
 	case 't':
             /* Rotate planet type. */
-            cbPlanets[pnum].type = mod( cbPlanets[pnum].type + 1, MAXPLANETTYPES );
+            cbPlanets[pnum].type =
+                static_cast<PlanetType>(mod( cbPlanets[pnum].type + 1,
+                                             MAXPLANETTYPES ));
             break;
 	case 'x':
             /* X coordinate. */

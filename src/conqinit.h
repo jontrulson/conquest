@@ -29,6 +29,7 @@
 #define _CONQINIT_H
 
 #include "shiptype.h"
+#include "planet.h"
 
 #define CQI_NAMELEN 64           /* maximum length of a WKN or filename (no
                                     path) */

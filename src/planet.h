@@ -33,6 +33,25 @@
 #include "conqdef.h"
 #include "team.h"
 
+// Some maximums...
+#define MAXPLANETTYPES 8  /* number of different planet types */
+#define MAXPTYPENAME   20 /* maximum size of a planet type's name */
+#define MAXPLANETNAME  12 /* maximum size of a planet's name */
+
+// Planet types - we specify an int as the size to maintain CB
+// compatibility
+
+enum PlanetType : int {
+    PLANET_CLASSZ = 0,    // ???
+    PLANET_CLASSM = 1,    // "Sensors indicate a Class M planet..." */
+    PLANET_DEAD = 2,
+    PLANET_SUN = 3,       // a bit of a contradiction...
+    PLANET_MOON = 4,      // a bit of fun
+    PLANET_GHOST = 5,     // invisible anchor for binary systems
+    PLANET_CLASSA = 6,    // ???
+    PLANET_CLASSO = 7,    // ???
+};
+
 /* flags for planets.  Of the planets with HOMEPLANET set, the first
  * one will be the capital planet.  Only Fed, Kli, Ori, and Rom can
  * have homeplanets.
@@ -52,15 +71,15 @@
 #define PFCLR(x, b)  ( cbPlanets[(x)].flags &= ~(b) )
 
 typedef struct {
-    real x;			/* x coordinates of planet */
-    real y;			/* y coordinates of planet */
+    real x;                       /* x coordinates of planet */
+    real y;                       /* y coordinates of planet */
     real orbrad;                  /* radius of the orbit */
     real orbvel;                  /* velocity of the orbit in deg/min */
     real orbang;                  /* current angle of the orbit */
-    uint16_t size;                    /* size of planet in CU's */
-    uint32_t flags;                /* flags for this planet */
+    uint16_t size;                /* size of planet in CU's */
+    uint32_t flags;               /* flags for this planet */
     int  primary;                 /* planet this planet orbits */
-    int  type;                    /* type of planet - M, dead, sun */
+    PlanetType type;              /* type of planet - M, dead, sun */
     int  team;                    /* which team owns the planet */
     int  defendteam;              // for planets marked as homeplanet,
                                   // this member holds the team

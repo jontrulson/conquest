@@ -332,7 +332,7 @@ int proc_0006_Planet(char *buf)
     if (pnum < 0 || pnum >= (40 + 20) /*MAXPLANETS*/)
         return false;
 
-    cbPlanets[pnum].type = splan->ptype;
+    cbPlanets[pnum].type = static_cast<PlanetType>(splan->ptype);
     cbPlanets[pnum].team = splan->team;
 
     utStrncpy(cbPlanets[pnum].name, (char *)splan->name, 12 /*MAXPLANETNAME*/);
@@ -497,7 +497,7 @@ int proc_0006_Torp(char *buf)
     if (tnum < 0 || tnum >= 9 /*MAXTORPS*/)
         return false;
 
-    cbShips[snum].torps[tnum].status = (TorpStatus)storp->status;
+    cbShips[snum].torps[tnum].status = static_cast<TorpStatus>(storp->status);
 
     return true;
 }
@@ -551,7 +551,7 @@ int proc_0006_TorpEvent(char *buf)
     if (tnum < 0 || tnum >= 9 /*MAXTORPS*/)
         return false;
 
-    cbShips[snum].torps[tnum].status = (TorpStatus)storpev->status;
+    cbShips[snum].torps[tnum].status = static_cast<TorpStatus>(storpev->status);
 
     for (i=0; i<4 /*NUMPLAYERTEAMS*/; i++)
         if (storpev->war & (1 << i))
