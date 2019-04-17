@@ -275,10 +275,10 @@ void cdfill ( char ch, char *buf, int count )
 /*       status - 0 if a number was read, else -1 */
 int cdgetn ( const char pmt[], int lin, int col, int *num )
 {
-    char buf[MSGMAXLINE];
+    char buf[MAX_MSGLINE_LENGTH];
 
-    cdfill('\0', buf, MSGMAXLINE);
-    if ( cdgets ( pmt, lin, col, buf, MSGMAXLINE ) == -1 )
+    cdfill('\0', buf, MAX_MSGLINE_LENGTH);
+    if ( cdgets ( pmt, lin, col, buf, MAX_MSGLINE_LENGTH ) == -1 )
         return -1;
 
     if (strlen(buf) == 0)
@@ -369,8 +369,8 @@ int cdgetp ( const char pmt[], int lin, int col, const char terms[], char str[],
     int ch = 0;
     int StrInit;
 
-    char mbuf[MSGMAXLINE];
-    char sbuf[MSGMAXLINE];
+    char mbuf[MAX_MSGLINE_LENGTH];
+    char sbuf[MAX_MSGLINE_LENGTH];
 
     static const char *append_fmt1 = "%s%s%c";
     static const char *append_fmt2 = "%s%c";
@@ -814,7 +814,7 @@ void cdputc ( const char str[], int lin )
 /*    cdputn ( int, wid, lin, col ) */
 void cdputn ( int iint, int wid, int lin, int col )
 {
-    char fmt[20], buf[MSGMAXLINE];
+    char fmt[20], buf[MAX_MSGLINE_LENGTH];
 
     sprintf ( fmt, "%%%dd", wid );
     sprintf ( buf, fmt, iint );
@@ -831,7 +831,7 @@ void cdputn ( int iint, int wid, int lin, int col )
 /*    cdputr ( x, wid, lin, col ) */
 void cdputr ( real x, int wid, int lin, int col )
 {
-    char fmt[20], buf[MSGMAXLINE];
+    char fmt[20], buf[MAX_MSGLINE_LENGTH];
 
     sprintf ( fmt, "%%%dg", wid );
     sprintf ( buf, fmt, x);

@@ -229,7 +229,7 @@ static void buildai( int snum, int vars[], int *bnenum, real *bdne, real *bane )
 void defend( int attacker, int pnum )
 {
     int i, j, k, team, snum, unum;
-    char buf[MSGMAXLINE];
+    char buf[MAX_MSGLINE_LENGTH];
 
     team = cbPlanets[pnum].team;
     /* Must be for a "fighting" team. */

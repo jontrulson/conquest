@@ -71,7 +71,7 @@ static nodeStatus_t nCPHelpDisplay(dspConfig_t *dsp)
 {
     int lin, col, tlin;
     static bool FirstTime = true;
-    static char sfmt[MSGMAXLINE * 2];
+    static char sfmt[MAX_MSGLINE_LENGTH * 2];
 
     if (FirstTime)
     {

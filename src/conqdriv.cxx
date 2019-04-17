@@ -310,7 +310,7 @@ void iterdrive( const shipVec_t& ship )
 {
     int s, t, i, k;
     real h, ad, x, dis, ht, z;
-    char buf[MSGMAXLINE];
+    char buf[MAX_MSGLINE_LENGTH];
     real warp;
 
     /* Drive the ships. */

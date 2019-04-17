@@ -76,17 +76,17 @@ static nodeStatus_t nTeamlDisplay(dspConfig_t *dsp)
 {
     int i, j, lin, col, ctime, etime;
     int godlike;
-    char buf[MSGMAXLINE], timbuf[5][MAX_DATESIZE];
+    char buf[MAX_MSGLINE_LENGTH], timbuf[5][MAX_DATESIZE];
     real x[5];
     static const char *sfmt="%15s %11s %11s %11s %11s %11s";
     static const char *stats="Statistics since: ";
     static const char *last_conquered="Universe last conquered at: ";
 
-    char tmpfmt[MSGMAXLINE * 2];
-    static char sfmt2[MSGMAXLINE * 2];
-    static char sfmt3[MSGMAXLINE * 2];
-    static char dfmt2[MSGMAXLINE * 2];
-    static char pfmt2[MSGMAXLINE * 2];
+    char tmpfmt[MAX_MSGLINE_LENGTH * 2];
+    static char sfmt2[MAX_MSGLINE_LENGTH * 2];
+    static char sfmt3[MAX_MSGLINE_LENGTH * 2];
+    static char dfmt2[MAX_MSGLINE_LENGTH * 2];
+    static char pfmt2[MAX_MSGLINE_LENGTH * 2];
     static bool FirstTime = true;	/* Only necc if the colors aren't
                                            going to change at runtime */
 

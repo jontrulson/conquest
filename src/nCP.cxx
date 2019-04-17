@@ -1208,7 +1208,7 @@ static void _dobomb(void)
     state = S_BOMB;
     prm.preinit = false;
     prm.buf.clear();
-    prm.buflen = MSGMAXLINE;
+    prm.buflen = MAX_MSGLINE_LENGTH;
     prm.pbuf = fmt::format("Press [TAB] to bombard {}, {} armies:",
         cbPlanets[pnum].name, cbPlanets[pnum].armies);
     prm.index = MSG_LIN1;
@@ -1501,7 +1501,7 @@ static void command( int ch )
             state = S_DOAUTOPILOT;
             prm.preinit = false;
             prm.buf.clear();
-            prm.buflen = MSGMAXLINE;
+            prm.buflen = MAX_MSGLINE_LENGTH;
             prm.pbuf = "Press [TAB] to engage autopilot: ";
             prm.index = MSG_LIN1;
             hudSetPrompt(prm.index, prm.pbuf, NoColor, prm.buf,
@@ -1518,7 +1518,7 @@ static void command( int ch )
         state = S_ALLOC;
         prm.preinit = false;
         prm.buf.clear();
-        prm.buflen = MSGMAXLINE;
+        prm.buflen = MAX_MSGLINE_LENGTH;
         prm.pbuf = "New weapons allocation: (30-70) ";
         prm.index = MSG_LIN1;
         hudSetPrompt(prm.index, prm.pbuf, NoColor,
@@ -1537,7 +1537,7 @@ static void command( int ch )
             state = S_CLOAK;
             prm.preinit = false;
             prm.buf.clear();
-            prm.buflen = MSGMAXLINE;
+            prm.buflen = MAX_MSGLINE_LENGTH;
             prm.pbuf = "Press [TAB] to engage cloaking device: ";
             prm.index = MSG_LIN1;
             hudSetPrompt(prm.index, prm.pbuf, NoColor, prm.buf,
@@ -1556,7 +1556,7 @@ static void command( int ch )
         state = S_DISTRESS;
         prm.preinit = false;
         prm.buf.clear();
-        prm.buflen = MSGMAXLINE;
+        prm.buflen = MAX_MSGLINE_LENGTH;
         prm.pbuf = "Press [TAB] to send an emergency distress call: ";
         prm.index = MSG_LIN1;
         hudSetPrompt(prm.index, prm.pbuf, NoColor, prm.buf,
@@ -1570,7 +1570,7 @@ static void command( int ch )
         desttarg = T_PHASER;
         prm.preinit = false;
         prm.buf.clear();
-        prm.buflen = MSGMAXLINE;
+        prm.buflen = MAX_MSGLINE_LENGTH;
         prm.pbuf = "Fire phasers: ";
         prm.index = MSG_LIN1;
         hudSetPrompt(prm.index, prm.pbuf, NoColor, prm.buf,
@@ -1591,7 +1591,7 @@ static void command( int ch )
         state = S_DOINFO;
         prm.preinit = false;
         prm.buf.clear();
-        prm.buflen = MSGMAXLINE;
+        prm.buflen = MAX_MSGLINE_LENGTH;
         prm.pbuf = "Information on: ";
         prm.index = MSG_LIN1;
         hudSetPrompt(prm.index, prm.pbuf, NoColor, prm.buf,
@@ -1603,7 +1603,7 @@ static void command( int ch )
         state = S_COURSE;
         prm.preinit = false;
         prm.buf.clear();
-        prm.buflen = MSGMAXLINE;
+        prm.buflen = MAX_MSGLINE_LENGTH;
         prm.pbuf = "Come to course: ";
         prm.index = MSG_LIN1;
         hudSetPrompt(prm.index, prm.pbuf, NoColor, prm.buf,
@@ -1616,7 +1616,7 @@ static void command( int ch )
             state = S_COUP;
             prm.preinit = false;
             prm.buf.clear();
-            prm.buflen = MSGMAXLINE;
+            prm.buflen = MAX_MSGLINE_LENGTH;
             prm.pbuf = "Press [TAB] to try it: ";
             prm.index = MSG_LIN1;
             hudSetPrompt(prm.index, prm.pbuf, NoColor, prm.buf,
@@ -1631,7 +1631,7 @@ static void command( int ch )
         state = S_MSGTO;
         prm.preinit = false;
         prm.buf.clear();
-        prm.buflen = MSGMAXLINE;
+        prm.buflen = MAX_MSGLINE_LENGTH;
         prm.pbuf = "Message to: ";
         prm.index = MSG_LIN1;
         hudSetPrompt(prm.index, prm.pbuf, NoColor, prm.buf,
@@ -1675,7 +1675,7 @@ static void command( int ch )
         desttarg = T_BURST;
         prm.preinit = false;
         prm.buf.clear();
-        prm.buflen = MSGMAXLINE;
+        prm.buflen = MAX_MSGLINE_LENGTH;
         prm.pbuf = "Torpedo burst: ";
         prm.index = MSG_LIN1;
         hudSetPrompt(prm.index, prm.pbuf, NoColor, prm.buf,
@@ -1689,7 +1689,7 @@ static void command( int ch )
         desttarg = T_TORP;
         prm.preinit = false;
         prm.buf.clear();
-        prm.buflen = MSGMAXLINE;
+        prm.buflen = MAX_MSGLINE_LENGTH;
         prm.pbuf = "Launch torpedo: ";
         prm.index = MSG_LIN1;
         hudSetPrompt(prm.index, prm.pbuf, NoColor, prm.buf,
@@ -1708,7 +1708,7 @@ static void command( int ch )
             state = S_DESTRUCT;
             prm.preinit = false;
             prm.buf.clear();
-            prm.buflen = MSGMAXLINE;
+            prm.buflen = MAX_MSGLINE_LENGTH;
             prm.pbuf = "Press [TAB] to initiate self-destruct sequence: ";
             prm.index = MSG_LIN1;
             hudSetPrompt(prm.index, prm.pbuf, NoColor, prm.buf,
@@ -1724,7 +1724,7 @@ static void command( int ch )
                 state = S_REFIT;
                 prm.preinit = false;
                 prm.buf.clear();
-                prm.buflen = MSGMAXLINE;
+                prm.buflen = MAX_MSGLINE_LENGTH;
                 refitst = cbShips[Context.snum].shiptype;
                 prm.pbuf = fmt::format("Refit ship type: {}",
                                        cbShipTypes[refitst].name);
@@ -1751,7 +1751,7 @@ static void command( int ch )
             state = S_TOW;
             prm.preinit = false;
             prm.buf.clear();
-            prm.buflen = MSGMAXLINE;
+            prm.buflen = MAX_MSGLINE_LENGTH;
             prm.pbuf = "Tow which ship? ";
             prm.index = MSG_LIN1;
             hudSetPrompt(prm.index, prm.pbuf, NoColor, prm.buf,

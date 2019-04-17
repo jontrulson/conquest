@@ -34,6 +34,9 @@
 // maximum size of message text, 4-byte (32b) multiple
 #define MESSAGE_SIZE 72
 
+// maximum size for formatting messages 
+#define MAX_MSGLINE_LENGTH 80
+
 // message flags
 #define MSG_FLAGS_NONE       0x00 /* normal message */
 #define MSG_FLAGS_FEEDBACK   0x01 /* server feedback - no formatting */

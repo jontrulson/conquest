@@ -115,8 +115,8 @@ static void set_header(int snum)
     static const char *robo_str1 = "ROBOT (external)";
     static const char *robo_str2 = "ROBOT";
     static const char *ship_str1 = "SHIP";
-    static char hbuf[MSGMAXLINE];
-    char ssbuf[MSGMAXLINE];
+    static char hbuf[MAX_MSGLINE_LENGTH];
+    char ssbuf[MAX_MSGLINE_LENGTH];
 
     hbuf[0] = 0;
     ssbuf[0] = 0;
@@ -466,7 +466,7 @@ static nodeStatus_t nPlayBInput(int ch)
             prm.preinit = true;
         }
 
-        prm.buflen = MSGMAXLINE;
+        prm.buflen = MAX_MSGLINE_LENGTH;
         prm.pbuf = "Watch which ship? ";
         prm.index = 20;
         prompting = true;

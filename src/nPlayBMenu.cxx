@@ -206,7 +206,7 @@ static nodeStatus_t nPlayBMenuInput(int ch)
             prm.preinit = true;
         }
 
-        prm.buflen = MSGMAXLINE;
+        prm.buflen = MAX_MSGLINE_LENGTH;
         prm.pbuf = "Watch which ship? ";
         prm.index = 20;
         prompting = true;

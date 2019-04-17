@@ -1123,7 +1123,7 @@ void procBomb(cpCommand_t *cmd)
     unsigned int entertime;
     real x, killprob;
     int oldsshup;
-    char buf[MSGMAXLINE];
+    char buf[MAX_MSGLINE_LENGTH];
     char cbuf[BUFFER_SIZE_256];
     static const char *lastfew="The last few armies are eluding us.";
 

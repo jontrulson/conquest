@@ -113,7 +113,7 @@ static void _conqds(dspConfig_t *dsp)
     extern char *ConquestVersion;
     extern char *ConquestDate;
     static bool FirstTime = true;
-    static char sfmt[MSGMAXLINE * 2];
+    static char sfmt[MAX_MSGLINE_LENGTH * 2];
 
     if (FirstTime)
     {

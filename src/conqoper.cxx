@@ -388,7 +388,7 @@ void debugdisplay( int snum )
 
     int i, j, unum, lin, tcol, dcol;
     real x;
-    char buf[MSGMAXLINE];
+    char buf[MAX_MSGLINE_LENGTH];
     const char *torpstr = "???";
 
 #define TOFF "OFF"
@@ -699,7 +699,7 @@ void debugplan(void)
     int i, j, k, cmd, lin, col, olin;
     int outattr;
     char junk[10], uninhab[20];
-    char hd0[MSGMAXLINE*4];
+    char hd0[MAX_MSGLINE_LENGTH*4];
     const char *hd1="D E B U G G I N G  P L A N E T   L I S T";
     const char *hd2="planet        C T arm uih scan        planet        C T arm uih scan";
     char hd3[BUFFER_SIZE_256];
@@ -890,7 +890,7 @@ int opPlanetMatch( char str[], int *pnum )
 void kiss(int snum, int prompt_flg)
 {
     int unum;
-    char ch, buf[MSGMAXLINE], mbuf[MSGMAXLINE], ssbuf[MSGMAXLINE];
+    char ch, buf[MAX_MSGLINE_LENGTH], mbuf[MAX_MSGLINE_LENGTH], ssbuf[MAX_MSGLINE_LENGTH];
     bool didany;
     static const char *prompt_str = "Kill what (<cr> for driver)? ";
     static const char *kill_driver_str = "Killing the driver.";
@@ -911,7 +911,7 @@ void kiss(int snum, int prompt_flg)
         else
             sprintf(buf, "%d", snum);
 
-        ch = (char)cdgetx( prompt_str, MSG_LIN1, 1, TERMS, buf, MSGMAXLINE,
+        ch = (char)cdgetx( prompt_str, MSG_LIN1, 1, TERMS, buf, MAX_MSGLINE_LENGTH,
                            true);
         if ( ch == TERM_ABORT )
 	{
@@ -1178,8 +1178,8 @@ void operate(void)
     int redraw, readone;
     int lastrev;
     uint64_t msgrand, now;
-    char buf[MSGMAXLINE], junk[MSGMAXLINE];
-    char xbuf[MSGMAXLINE];
+    char buf[MAX_MSGLINE_LENGTH], junk[MAX_MSGLINE_LENGTH];
+    char xbuf[MAX_MSGLINE_LENGTH];
     int ch;
 
     cbConqInfo->glastmsg = cbConqInfo->lastmsg;
@@ -1457,13 +1457,13 @@ void operate(void)
 void opinfo()
 {
     char ch;
-    char cbuf[MSGMAXLINE];
+    char cbuf[MAX_MSGLINE_LENGTH];
 
     cdclrl( MSG_LIN1, 2 );
 
     cbuf[0] = 0;
     ch = (char)cdgetx( "Information on: ", MSG_LIN1, 1, TERMS,
-                       cbuf, MSGMAXLINE, true );
+                       cbuf, MAX_MSGLINE_LENGTH, true );
 
     info(cbuf, ch, true);
 
@@ -1478,7 +1478,7 @@ void opinit(void)
 {
 
     int i, lin, col, icol;
-    char ch, buf[MSGMAXLINE];
+    char ch, buf[MAX_MSGLINE_LENGTH];
     static const char *pmt="Initialize what: ";
 
 
@@ -1595,7 +1595,7 @@ void opinit(void)
         cdclrl( lin, 1 );
         uiPutColor(InfoColor);
         buf[0] = 0;
-        ch = (char)cdgetx( pmt, lin, col, TERMS, buf, MSGMAXLINE, true );
+        ch = (char)cdgetx( pmt, lin, col, TERMS, buf, MAX_MSGLINE_LENGTH, true );
         cdclrl( lin, 1 );
         cdputs( pmt, lin, col );
         uiPutColor(0);
@@ -1685,11 +1685,11 @@ void oppedit(void)
     static int pnum = 0;
     real x;
     int ch;
-    char buf[MSGMAXLINE];
+    char buf[MAX_MSGLINE_LENGTH];
     int attrib;
 
     static bool firstTime = true;
-    static char sfmt[MSGMAXLINE * 2];
+    static char sfmt[MAX_MSGLINE_LENGTH * 2];
 
     if (firstTime)
     {
@@ -1862,7 +1862,7 @@ void oppedit(void)
 	case 'a':
             /* Angle. */
             ch = mcuGetCX( "New angle? ", MSG_LIN1, 0,
-                           TERMS, buf, MSGMAXLINE );
+                           TERMS, buf, MAX_MSGLINE_LENGTH );
             if ( ch == TERM_ABORT || buf[0] == 0 )
                 continue;	/* next */
             utDeleteBlanks( buf );
@@ -1877,7 +1877,7 @@ void oppedit(void)
 	case 'A':
             /* Armies. */
             ch = mcuGetCX( "New number of armies? ",
-                           MSG_LIN1, 0, TERMS, buf, MSGMAXLINE );
+                           MSG_LIN1, 0, TERMS, buf, MAX_MSGLINE_LENGTH );
             if ( ch == TERM_ABORT || buf[0] == 0 )
                 continue;
             utDeleteBlanks( buf );
@@ -1904,7 +1904,7 @@ void oppedit(void)
 	case 'v':
             /* Velocity. */
             ch = mcuGetCX( "New velocity? ",
-                           MSG_LIN1, 0, TERMS, buf, MSGMAXLINE );
+                           MSG_LIN1, 0, TERMS, buf, MAX_MSGLINE_LENGTH );
             if ( ch == TERM_ABORT || buf[0] == 0 )
                 continue;	/* next */
             utDeleteBlanks( buf );
@@ -1916,7 +1916,7 @@ void oppedit(void)
 	case 'S':
             /* Size. */
             ch = mcuGetCX( "New size? ", MSG_LIN1, 0,
-                           TERMS, buf, MSGMAXLINE );
+                           TERMS, buf, MAX_MSGLINE_LENGTH );
             if ( ch == TERM_ABORT || buf[0] == 0 )
                 continue;	/* next */
             utDeleteBlanks( buf );
@@ -1943,7 +1943,7 @@ void oppedit(void)
 	case 'x':
             /* X coordinate. */
             ch = mcuGetCX( "New X coordinate? ",
-                           MSG_LIN1, 0, TERMS, buf, MSGMAXLINE );
+                           MSG_LIN1, 0, TERMS, buf, MAX_MSGLINE_LENGTH );
             if ( ch == TERM_ABORT || buf[0] == 0 )
                 continue;	/* next */
             utDeleteBlanks( buf );
@@ -1956,7 +1956,7 @@ void oppedit(void)
 	case 'y':
             /* Y coordinate. */
             ch = mcuGetCX( "New Y coordinate? ",
-                           MSG_LIN1, 0, TERMS, buf, MSGMAXLINE );
+                           MSG_LIN1, 0, TERMS, buf, MAX_MSGLINE_LENGTH );
             if ( ch == TERM_ABORT || buf[0] == 0 )
                 continue;	/* next */
             utDeleteBlanks( buf );
@@ -1981,7 +1981,7 @@ void oppedit(void)
             /* Uninhabitable minutes */
 	case 'u':
             ch = mcuGetCX( "New uninhabitable minutes? ",
-                           MSG_LIN1, 0, TERMS, buf, MSGMAXLINE );
+                           MSG_LIN1, 0, TERMS, buf, MAX_MSGLINE_LENGTH );
             if ( ch == TERM_ABORT || buf[0] == 0 )
                 continue;
             utDeleteBlanks( buf );
@@ -2000,7 +2000,7 @@ void oppedit(void)
 	case 'r':
             /* Radius. */
             ch = mcuGetCX( "New radius? ",
-                           MSG_LIN1, 0, TERMS, buf, MSGMAXLINE );
+                           MSG_LIN1, 0, TERMS, buf, MAX_MSGLINE_LENGTH );
             if ( ch == TERM_ABORT || buf[0] == 0 )
                 continue;	/* next */
             utDeleteBlanks( buf );
@@ -2066,11 +2066,11 @@ void opresign(void)
 {
 
     int unum;
-    char ch, buf[MSGMAXLINE];
+    char ch, buf[MAX_MSGLINE_LENGTH];
 
     cdclrl( MSG_LIN1, 2 );
     buf[0] = 0;
-    ch = (char)cdgetx( "Resign user: ", MSG_LIN1, 1, TERMS, buf, MSGMAXLINE,
+    ch = (char)cdgetx( "Resign user: ", MSG_LIN1, 1, TERMS, buf, MAX_MSGLINE_LENGTH,
                        true);
     if ( ch == TERM_ABORT )
     {
@@ -2108,9 +2108,9 @@ void oprobot(void)
 {
 
     int i, j, snum, unum, num, anum;
-    char ch, buf[MSGMAXLINE];
+    char ch, buf[MAX_MSGLINE_LENGTH];
     int warlike;
-    char xbuf[MSGMAXLINE];
+    char xbuf[MAX_MSGLINE_LENGTH];
 
     cdclrl( MSG_LIN1, 2 );
     buf[0] = 0;
@@ -2220,7 +2220,7 @@ void opstats(void)
 {
 
     int i, lin, col;
-    char buf[MSGMAXLINE], junk[MSGMAXLINE*2], timbuf[32];
+    char buf[MAX_MSGLINE_LENGTH], junk[MAX_MSGLINE_LENGTH*2], timbuf[32];
     int ch;
     real x;
     static const char *sfmt="#%d#%32s #%d#%12s\n";
@@ -2394,7 +2394,7 @@ void opuadd(void)
 
     int i, unum, team;
     char ch;
-    char buf[MSGMAXLINE], junk[MSGMAXLINE], name[MSGMAXLINE];
+    char buf[MAX_MSGLINE_LENGTH], junk[MAX_MSGLINE_LENGTH], name[MAX_MSGLINE_LENGTH];
 
     cdclrl( MSG_LIN1, 2 );
     name[0] = 0;
@@ -2426,7 +2426,7 @@ void opuadd(void)
 
         cdclrl( MSG_LIN1, 1 );
         buf[0] = 0;
-        ch = (char)cdgetx( junk, MSG_LIN1, 1, TERMS, buf, MSGMAXLINE, true );
+        ch = (char)cdgetx( junk, MSG_LIN1, 1, TERMS, buf, MAX_MSGLINE_LENGTH, true );
         if ( ch == TERM_ABORT )
 	{
             cdclrl( MSG_LIN1, 1 );
@@ -2487,7 +2487,7 @@ void opuedit(void)
 #define MAXUEDITROWS (12+2)
 
     int i, unum, row = 1, lin, olin, tcol, dcol, lcol, rcol;
-    char buf[MSGMAXLINE];
+    char buf[MAX_MSGLINE_LENGTH];
     int ch, left = true;
     char datestr[MAX_DATESIZE];
     static const char *prompt2 = "any other key to quit.";
@@ -2959,7 +2959,7 @@ void watch(void)
     int snum, tmp_snum, old_snum;
     int ch, normal, readone;
     uint64_t msgrand, now;
-    char buf[MSGMAXLINE];
+    char buf[MAX_MSGLINE_LENGTH];
     int live_ships = true;
     int toggle_flg = false;   /* jon no like the toggle line ... :-) */
 
@@ -3329,7 +3329,7 @@ int prompt_ship(char buf[], int *snum, int *normal)
 
     cdclrl( MSG_LIN1, 2 );
     buf[0] = 0;
-    tch = cdgetx( pmt, MSG_LIN1, 1, TERMS, buf, MSGMAXLINE, true );
+    tch = cdgetx( pmt, MSG_LIN1, 1, TERMS, buf, MAX_MSGLINE_LENGTH, true );
     cdclrl( MSG_LIN1, 1 );
 
     if ( tch == TERM_ABORT )
@@ -3387,7 +3387,7 @@ void dowatchhelp(void)
     int lin, col, tlin;
     int ch;
     static bool firstTime = true;
-    static char sfmt[MSGMAXLINE * 2];
+    static char sfmt[MAX_MSGLINE_LENGTH * 2];
 
     if (firstTime)
     {
@@ -3450,9 +3450,9 @@ void toggle_line(int snum, int old_snum)
 {
 
     static const char *frmt_str = "(') = Toggle %s:%s";
-    char snum_str[MSGMAXLINE];
-    char old_snum_str[MSGMAXLINE];
-    char buf[MSGMAXLINE];
+    char snum_str[MAX_MSGLINE_LENGTH];
+    char old_snum_str[MAX_MSGLINE_LENGTH];
+    char buf[MAX_MSGLINE_LENGTH];
 
     build_toggle_str(snum_str,snum);
     build_toggle_str(old_snum_str,old_snum);

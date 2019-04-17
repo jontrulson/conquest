@@ -47,7 +47,7 @@
 
 void cucPseudo( int unum, int snum )
 {
-    char ch, buf[MSGMAXLINE];
+    char ch, buf[MAX_MSGLINE_LENGTH];
 
     buf[0] = 0;
 
@@ -79,7 +79,7 @@ void cucPseudo( int unum, int snum )
 void cucSendMsg( msgFrom_t from, uint16_t fromDetail, int terse, int remote )
 {
     int i, j;
-    char buf[MSGMAXLINE] = "", msg[MESSAGE_SIZE] = "";
+    char buf[MAX_MSGLINE_LENGTH] = "", msg[MESSAGE_SIZE] = "";
     int ch;
     int editing;
     static const char *mto="Message to: ";
@@ -95,7 +95,7 @@ void cucSendMsg( msgFrom_t from, uint16_t fromDetail, int terse, int remote )
     /* First, find out who we're sending to. */
     cdclrl( MSG_LIN1, 2 );
     buf[0] = 0;
-    ch = cdgetx( mto, MSG_LIN1, 1, TERMS, buf, MSGMAXLINE, true );
+    ch = cdgetx( mto, MSG_LIN1, 1, TERMS, buf, MAX_MSGLINE_LENGTH, true );
     if ( ch == TERM_ABORT )
     {
         cdclrl( MSG_LIN1, 1 );

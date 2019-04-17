@@ -644,17 +644,17 @@ int mcuReviewMsgs( int slm )
 void mcuTeamList()
 {
     int i, j, lin, col = 0, ctime, etime;
-    char buf[MSGMAXLINE], timbuf[5][MAX_DATESIZE];
+    char buf[MAX_MSGLINE_LENGTH], timbuf[5][MAX_DATESIZE];
     real x[5];
     static const char *sfmt="%15s %11s %11s %11s %11s %11s";
     static const char *stats="Statistics since: ";
     static const char *last_conquered="Universe last conquered at: ";
 
-    char tmpfmt[MSGMAXLINE * 2];
-    static char sfmt2[MSGMAXLINE * 2];
-    static char sfmt3[MSGMAXLINE * 2];
-    static char dfmt2[MSGMAXLINE * 2];
-    static char pfmt2[MSGMAXLINE * 2];
+    char tmpfmt[MAX_MSGLINE_LENGTH * 2];
+    static char sfmt2[MAX_MSGLINE_LENGTH * 2];
+    static char sfmt3[MAX_MSGLINE_LENGTH * 2];
+    static char dfmt2[MAX_MSGLINE_LENGTH * 2];
+    static char pfmt2[MAX_MSGLINE_LENGTH * 2];
     static bool FirstTime = true;	/* Only necc if the colors aren't
                                            going to change at runtime */
 
@@ -1079,12 +1079,12 @@ bool mcuConfirm(void)
 /*  askyn - ask the user a yes/no question - return true if yes */
 int mcuAskYN(const char *question, int lin, int col)
 {
-    char ch, buf[MSGMAXLINE];
+    char ch, buf[MAX_MSGLINE_LENGTH];
 
     cdclrl( MSG_LIN2, 1 );
     uiPutColor(InfoColor);
     buf[0] = 0;
-    ch = cdgetx( question, lin, col, TERMS, buf, MSGMAXLINE - 1, true);
+    ch = cdgetx( question, lin, col, TERMS, buf, MAX_MSGLINE_LENGTH - 1, true);
     uiPutColor(0);
     cdclrl( lin, 1 );
     cdrefresh();

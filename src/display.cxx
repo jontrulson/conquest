@@ -167,12 +167,12 @@ void display( int snum )
     cqColor outattr = 0;
     static int OldAlert = 0;
     static const char *dirch="-/|\\-/|\\";
-    char ch, buf[MSGMAXLINE];
+    char ch, buf[MAX_MSGLINE_LENGTH];
     int dobeep, lsmap;
     cqColor palertcol;
     real x, scale, cenx, ceny, dis, mindis, minsdis, fl, cd, sd;
     static real zzskills, zzswarp;
-    static char zzbuf[MSGMAXLINE];
+    static char zzbuf[MAX_MSGLINE_LENGTH];
     static int zzsshields, zzcshields, zzshead, zzsfuel, zzcfuel;
     static int zzsweapons, zzsengines, zzsdamage, zzcdamage, zzsarmies;
     static int zzsetemp, zzswtemp, zzctemp, zzssdfuse;
@@ -184,7 +184,7 @@ void display( int snum )
     static cqColor EngAttrib = 0;
     static cqColor DamageAttrib = 0;
 
-    static char zbuf[MSGMAXLINE];
+    static char zbuf[MAX_MSGLINE_LENGTH];
 
     if ( Context.redraw )
     {
@@ -1120,16 +1120,16 @@ void display( int snum )
 
             if (STOWING(snum))
             {
-                utStrncpy(buf, "towing ", MSGMAXLINE);
+                utStrncpy(buf, "towing ", MAX_MSGLINE_LENGTH);
                 utAppendShip(buf, cbShips[snum].towing);
             }
 
             if (STOWEDBY(snum))
             {
                 if (STOWING(snum))
-                    utStrncat(buf, ", ", MSGMAXLINE);
+                    utStrncat(buf, ", ", MAX_MSGLINE_LENGTH);
 
-                utStrncat(buf, "towedby ", MSGMAXLINE);
+                utStrncat(buf, "towedby ", MAX_MSGLINE_LENGTH);
                 utAppendShip(buf, cbShips[snum].towedby);
             }
 
@@ -1325,8 +1325,8 @@ void display_headers(int snum)
     static const char *robo_str1 = "ROBOT (external)";
     static const char *robo_str2 = "ROBOT";
     static const char *ship_str1 = "SHIP";
-    char hbuf[MSGMAXLINE];
-    char ssbuf[MSGMAXLINE];
+    char hbuf[MAX_MSGLINE_LENGTH];
+    char ssbuf[MAX_MSGLINE_LENGTH];
 
     hbuf[0] = 0;
     ssbuf[0] = 0;

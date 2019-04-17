@@ -317,11 +317,11 @@ void pbDisplayReplayMenu(void)
     int lin, col;
     char *c;
     int i;
-    char cbuf[MSGMAXLINE];
+    char cbuf[MAX_MSGLINE_LENGTH];
     static bool FirstTime = true;
-    static char sfmt[MSGMAXLINE * 2];
-    static char cfmt[MSGMAXLINE * 2];
-    static char recordedon[MSGMAXLINE];
+    static char sfmt[MAX_MSGLINE_LENGTH * 2];
+    static char cfmt[MAX_MSGLINE_LENGTH * 2];
+    static char recordedon[MAX_MSGLINE_LENGTH];
     extern char *ConquestVersion;
     extern char *ConquestDate;
 
@@ -342,7 +342,7 @@ void pbDisplayReplayMenu(void)
                 LabelColor,
                 NoColor);
 
-        utStrncpy(recordedon, ctime(&recon), MSGMAXLINE);
+        utStrncpy(recordedon, ctime(&recon), MAX_MSGLINE_LENGTH);
 
         for (i=0; i < strlen(recordedon); i++)
             if (recordedon[i] == '\n')
@@ -438,7 +438,7 @@ void pbDisplayReplayHelp(void)
 {
     int lin, col, tlin;
     static bool FirstTime = true;
-    static char sfmt[MSGMAXLINE * 2];
+    static char sfmt[MAX_MSGLINE_LENGTH * 2];
 
     if (FirstTime)
     {
