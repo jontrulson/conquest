@@ -725,7 +725,7 @@ int clbRegister( const std::string& lname, const std::string& rname,
             // default to a normal client player
             cbUsers[i].type = USERTYPE_NORMAL;
 
-            for ( j = 0; j < MAXUSTATS; j = j + 1 )
+            for ( j = 0; j < MAX_USER_STATS; j = j + 1 )
                 cbUsers[i].stats[j] = 0;
 
             for ( j = 0; j < NUMPLAYERTEAMS; j = j + 1 )

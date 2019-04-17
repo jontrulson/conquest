@@ -43,7 +43,7 @@ typedef enum {
     USERTYPE_MAX                // Should be last entry
 } userTypes_t;
 
-#define MAXUSTATS 20
+#define MAX_USER_STATS 20
 
 enum UserStats : int {
     USTAT_GENOCIDE = 0,        /* number of genocides completed */
@@ -62,10 +62,10 @@ enum UserStats : int {
     USTAT_CONQPLANETS = 13,    /* number of planets conquered */
 
     // FIXME for next proto - proto currently uses and sends only
-    // USTAT_TOTALSTATS items, rather than larger MAXUSTATS, unlike
-    // the way TSTATs are sent.  In next revision, should remove
-    // USTAT_TOTALSTATS and use MAXUSTATS.  This leaves additional
-    // slots that could be used someday.
+    // USTAT_TOTALSTATS items, rather than larger MAX_USER_STATS,
+    // unlike the way TSTATs are sent.  In next revision, should
+    // remove USTAT_TOTALSTATS and use MAX_USER_STATS.  This leaves
+    // additional slots that could be used someday.
     USTAT_TOTALSTATS = 14,
 };
 
@@ -109,7 +109,7 @@ typedef struct {
     char username[MAX_USERNAME];	/* user's name (login name) */
     char pw[MAX_USERNAME];	/* user's password if server login */
     char alias[MAX_USERNAME];	/* user's pseudonym */
-    int stats[MAXUSTATS];	/* user's stats */
+    int stats[MAX_USER_STATS];	/* user's stats */
 } User_t;
 
 
