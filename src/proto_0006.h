@@ -315,7 +315,7 @@ typedef struct {
 
     int32_t   stats[14 /*USTAT_TOTALSTATS*/];
 
-    uint8_t  username[32 /*MAXUSERNAME*/];
+    uint8_t  username[32 /*MAX_USERNAME*/];
 
     uint8_t  alias[24 /*MAXUSERALIAS*/];
 } sp_0006_User_t;

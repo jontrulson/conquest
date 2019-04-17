@@ -186,7 +186,7 @@ int main(int argc, char *argv[])
     pid = getpid(); /* store our pid */
     cbDriver->drivpid = pid;
 
-    utStrncpy(cbDriver->drivowner, clbGetUserLogname(), MAXUSERNAME);
+    utStrncpy(cbDriver->drivowner, clbGetUserLogname(), MAX_USERNAME);
 
     /* Start within bounds. */
     cbDriver->drivsecs = mod( cbDriver->drivsecs, FIVEMINUTE_SECONDS );

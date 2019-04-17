@@ -76,7 +76,7 @@ static nodeStatus_t nHistlDisplay(dspConfig_t *dsp)
     static const char *hd0="C O N Q U E S T   U S E R   H I S T O R Y";
     char connecttm[BUFFER_SIZE_256];
     char histentrytm[MAXDATESIZE + 1];
-    char puname[MAXUSERNAME];
+    char puname[MAX_USERNAME];
 
     /* Do some screen setup. */
     fline = 1;
@@ -105,7 +105,7 @@ static nodeStatus_t nHistlDisplay(dspConfig_t *dsp)
         if (cbHistory[i].unum < 0) // resigned
             isResigned = true;
 
-        utStrncpy(puname, cbHistory[i].username, MAXUSERNAME);
+        utStrncpy(puname, cbHistory[i].username, MAX_USERNAME);
 
         /* entry time */
         utFormatTime( histentrytm, cbHistory[i].enterTime);

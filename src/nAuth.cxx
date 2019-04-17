@@ -184,7 +184,7 @@ void nAuthInit(void)
     state = S_GETUNAME;           /* initial state */
     prm.preinit = false;
     prm.buf.clear();
-    prm.buflen = MAXUSERNAME;
+    prm.buflen = MAX_USERNAME;
     prm.pbuf = unamep;
 
     statlin = uhelper;
@@ -338,7 +338,7 @@ static nodeStatus_t nAuthInput(int ch)
 
                 prm.preinit = false;
                 prm.buf.clear();
-                prm.buflen = MAXUSERNAME;
+                prm.buflen = MAX_USERNAME;
                 prm.pbuf = newuserp;
 
                 errlin = NULL;
@@ -351,7 +351,7 @@ static nodeStatus_t nAuthInput(int ch)
                 /* setup for the new prompt */
                 prm.preinit = false;
                 prm.buf.clear();
-                prm.buflen = MAXUSERNAME;
+                prm.buflen = MAX_USERNAME;
                 prm.pbuf = pwp;
 
                 statlin = phelper;
@@ -375,7 +375,7 @@ static nodeStatus_t nAuthInput(int ch)
                 /* setup for the new prompt */
                 prm.preinit = false;
                 prm.buf.clear();
-                prm.buflen = MAXUSERNAME;
+                prm.buflen = MAX_USERNAME;
                 prm.pbuf = pwp;
 
                 statlin = phelper;
@@ -388,7 +388,7 @@ static nodeStatus_t nAuthInput(int ch)
 
                 prm.preinit = true;
                 prm.buf = nm;
-                prm.buflen = MAXUSERNAME;
+                prm.buflen = MAX_USERNAME;
                 prm.pbuf = unamep;
 
                 statlin = uhelper;
@@ -414,7 +414,7 @@ static nodeStatus_t nAuthInput(int ch)
                 /* setup for the new prompt */
                 prm.preinit = false;
                 prm.buf.clear();
-                prm.buflen = MAXUSERNAME;
+                prm.buflen = MAX_USERNAME;
                 prm.pbuf = rpwp;
 
                 statlin = phelper;
@@ -436,7 +436,7 @@ static nodeStatus_t nAuthInput(int ch)
 
                 prm.preinit = true;
                 prm.buf = nm;
-                prm.buflen = MAXUSERNAME;
+                prm.buflen = MAX_USERNAME;
                 prm.pbuf = unamep;
 
                 statlin = uhelper;
@@ -469,7 +469,7 @@ static nodeStatus_t nAuthInput(int ch)
                 state = S_GETUNAME;           /* initial state */
                 prm.preinit = true;
                 prm.buf = nm;
-                prm.buflen = MAXUSERNAME;
+                prm.buflen = MAX_USERNAME;
                 prm.pbuf = unamep;
 
                 pw.clear();

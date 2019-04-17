@@ -140,7 +140,6 @@ typedef enum {
 // maximum updates per second
 #define MAX_UPDATE_PER_SEC 10
 
-#define MAXUSERNAME  32      /* maximum size of a user's login name */
 #define MAXLASTWORDS 60       /* maximum size of conquering remarks */
 
 #define MAXUSTATS 20

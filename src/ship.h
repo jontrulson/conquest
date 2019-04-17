@@ -31,6 +31,7 @@
 
 #include "conqdef.h"
 #include "team.h"
+#include "user.h"
 #include "torp.h"
 
 #define SHIP_F_NONE        0x00000000
@@ -130,7 +131,7 @@ typedef struct {
     // stored at locations 12-15.
     uint8_t ipaddr[SHIP_IPADDR_LEN];
     uint32_t pad[5];            /* PAD */
-    char alias[MAXUSERNAME];    /* copy of cbUsers[].alias */
+    char alias[MAX_USERNAME];    /* copy of cbUsers[].alias */
 } Ship_t;
 
 #endif /* SHIP_H_INCLUDED */

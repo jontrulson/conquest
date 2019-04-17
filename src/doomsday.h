@@ -70,7 +70,7 @@ typedef struct {
     real heading;           /* heading */
     courseLock_t lock;      /* one of the courseLock_t values */
     uint16_t lockDetail;    /* ship or planet number locked onto */
-    char name[MAXUSERNAME];	/* name of doomsday machine */
+    char name[MAX_USERNAME];	/* name of doomsday machine */
 } Doomsday_t;
 
 #endif /* DOOMSDAY_H_INCLUDED */

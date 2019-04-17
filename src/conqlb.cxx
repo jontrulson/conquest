@@ -733,8 +733,8 @@ int clbRegister( const std::string& lname, const std::string& rname,
             cbUsers[i].war[cbUsers[i].team] = false;
 
             cbUsers[i].lastentry = 0;	/* never */
-            utStrncpy( cbUsers[i].username, lname.c_str(), MAXUSERNAME );
-            utStrncpy( cbUsers[i].alias, rname.c_str(), MAXUSERNAME );
+            utStrncpy( cbUsers[i].username, lname.c_str(), MAX_USERNAME );
+            utStrncpy( cbUsers[i].alias, rname.c_str(), MAX_USERNAME );
             *unum = i;
             return ( true );
         }
@@ -878,7 +878,7 @@ int clbTakePlanet( int pnum, int snum )
             }
     /* Yes! */
     utFormatTime( cbConqInfo->conqtime, 0 );
-    utStrncpy( cbConqInfo->conqueror, cbShips[snum].alias, MAXUSERNAME );
+    utStrncpy( cbConqInfo->conqueror, cbShips[snum].alias, MAX_USERNAME );
     cbConqInfo->lastwords[0] = 0;
     cbUsers[cbShips[snum].unum].stats[USTAT_CONQUERS] += 1;
     cbTeams[cbShips[snum].team].stats[TSTAT_CONQUERS] += 1;
@@ -1852,7 +1852,7 @@ void clbInitEverything(bool cbIsLocal)
     utStrncpy( cbConqInfo->lastupchuck, "never", MAXDATESIZE );
     utFormatTime( cbConqInfo->inittime, 0 );
     utFormatTime( cbConqInfo->conqtime, 0 );
-    utStrncpy( cbConqInfo->conqueror, "GOD", MAXUSERNAME );
+    utStrncpy( cbConqInfo->conqueror, "GOD", MAX_USERNAME );
     utStrncpy( cbConqInfo->conqteam, "self ruled", MAXTEAMNAME );
     utStrncpy( cbConqInfo->lastwords, "Let there be light...", MAXLASTWORDS );
 
@@ -1896,7 +1896,7 @@ void clbInitGame(bool cbIsLocal)
     cbDoomsday->lock = LOCK_NONE;
     cbDoomsday->lockDetail = 0;
     cbDoomsday->eaterType = EATER_DOOMSDAY;
-    utStrncpy( cbDoomsday->name, "Doomsday Machine", MAXUSERNAME );
+    utStrncpy( cbDoomsday->name, "Doomsday Machine", MAX_USERNAME );
 
     /* Un-twiddle the lockword. */
     if (!cbIsLocal)
@@ -1937,7 +1937,7 @@ void clbInitRobots(void)
 #define SETROBOT(x, y, z)                                               \
     {                                                                   \
         if ( clbGetUserNum( &unum, x, USERTYPE_BUILTIN ) )              \
-            utStrncpy( cbUsers[unum].alias, y, MAXUSERNAME );            \
+            utStrncpy( cbUsers[unum].alias, y, MAX_USERNAME );            \
         else if ( clbRegister( x, y, z, &unum ) )                       \
         {                                                               \
             UFSET(unum, USER_F_ROBOT);                                  \
@@ -2258,7 +2258,7 @@ int clbLogHist( int unum )
     cbHistory[cbConqInfo->histptr].elapsed = (time_t)0;
     cbHistory[cbConqInfo->histptr].unum = unum;
     utStrncpy(cbHistory[cbConqInfo->histptr].username,
-              cbUsers[unum].username, MAXUSERNAME);
+              cbUsers[unum].username, MAX_USERNAME);
     hnum = cbConqInfo->histptr;
 
     cbUnlock(&cbConqInfo->lockword);
@@ -2721,7 +2721,7 @@ void clbZeroShip( int snum )
     cbShips[snum].lastphase = 0.0;
     cbShips[snum].pfuse = 0;
     cbShips[snum].action = 0;
-    for ( i = 0; i < MAXUSERNAME; i++ )
+    for ( i = 0; i < MAX_USERNAME; i++ )
         cbShips[snum].alias[i] = 0;
     cbShips[snum].ctime = 0;
     cbShips[snum].etime = 0;

@@ -69,7 +69,7 @@ static int doLogin(char *login, char *pw, char *epw)
             return PERR_BADPWD;
 	}
 
-        utStrncpy(epw, _epw, MAXUSERNAME);
+        utStrncpy(epw, _epw, MAX_USERNAME);
 
         if (strcmp(epw, cbUsers[unum].pw) != 0)
 	{			/* invalid pw */
@@ -87,7 +87,7 @@ static int doLogin(char *login, char *pw, char *epw)
     salt[1] = (login[1] != 0) ? login[1] : 'T';
     salt[2] = 0;
 
-    utStrncpy(epw, (char *)crypt(pw, salt), MAXUSERNAME);
+    utStrncpy(epw, (char *)crypt(pw, salt), MAX_USERNAME);
 
     utLog("INFO: New user '%s' logged in", login);
 
@@ -103,7 +103,7 @@ int Authenticate(char *username, char *password)
     int unum;
     char buf[PKT_MAXSIZE];
     int done, rv;
-    char epw[MAXUSERNAME];
+    char epw[MAX_USERNAME];
     int logcount = 3;
 
     expire_users();		/* now is a good time to expire users */
@@ -152,8 +152,8 @@ int Authenticate(char *username, char *password)
         }
 
         cauth = (cpAuthenticate_t *)buf;
-        cauth->login[MAXUSERNAME - 1] = 0;
-        cauth->pw[MAXUSERNAME - 1] = 0;
+        cauth->login[MAX_USERNAME - 1] = 0;
+        cauth->pw[MAX_USERNAME - 1] = 0;
 
         std::string tmpUser = (char *)cauth->login;
         if (!uaValidateUsername(tmpUser))
@@ -207,8 +207,8 @@ int Authenticate(char *username, char *password)
 	}
     }
 
-    utStrncpy(username, (char *)cauth->login, MAXUSERNAME);
-    utStrncpy(password, epw, MAXUSERNAME);
+    utStrncpy(username, (char *)cauth->login, MAX_USERNAME);
+    utStrncpy(password, epw, MAX_USERNAME);
 
     return(true);
 }

@@ -125,7 +125,7 @@ int proc_0006_User(char *buf)
         cbUsers[unum].stats[i] = (int32_t)ntohl(suser->stats[i]);
 
     utStrncpy(cbUsers[unum].username, (char *)suser->username,
-              32 /*MAXUSERNAME*/);
+              32 /*MAX_USERNAME*/);
     utStrncpy(cbUsers[unum].alias, (char *)suser->alias, 24 /*MAXUSERALIAS*/);
 
 #if defined(DEBUG_CLIENTPROC)

@@ -36,7 +36,7 @@ typedef struct {
     int  drivpid;  /* pid of the driver process */
     int  drivcnt;  /* number of driver timeouts */
     int  drivsecs; /* phase of the universe in seconds (mod 5 mins) */
-    char drivowner[MAXUSERNAME]; /* username of the driver's owner */
+    char drivowner[MAX_USERNAME]; /* username of the driver's owner */
 
     // The following are seconds since the epoch.
     time_t drivtime;     /* last time the driver looped */

@@ -236,7 +236,7 @@ typedef struct {        /* 'large' ship data */
 
     uint8_t  scanned[NUMPLAYERTEAMS];
 
-    uint8_t  alias[MAXUSERNAME];
+    uint8_t  alias[MAX_USERNAME];
 } spShip_t;
 
 typedef struct {                /* 'short' ship packets */
@@ -359,9 +359,9 @@ typedef struct {
 
     int32_t  stats[USTAT_TOTALSTATS];
 
-    uint8_t  username[MAXUSERNAME];
+    uint8_t  username[MAX_USERNAME];
 
-    uint8_t  alias[MAXUSERNAME];
+    uint8_t  alias[MAX_USERNAME];
 } spUser_t;
 
 typedef struct {
@@ -425,7 +425,7 @@ typedef struct {
     uint8_t  pad2;
     uint8_t  pad3;
 
-    uint8_t  conqueror[MAXUSERNAME]; /* user who last conquered */
+    uint8_t  conqueror[MAX_USERNAME]; /* user who last conquered */
     uint8_t  conqteam[MAXTEAMNAME];   /* team s/he was on */
     uint8_t  conqtime[MAXDATESIZE];      /* time of last conquering */
     uint8_t  lastwords[MAXLASTWORDS]; /* remarks upon conquering */
@@ -457,7 +457,7 @@ typedef struct {
 
     uint32_t enterTime;
 
-    uint8_t  username[MAXUSERNAME];
+    uint8_t  username[MAX_USERNAME];
 } spHistory_t;
 
 typedef struct {
@@ -583,7 +583,7 @@ typedef struct {
 
 typedef struct {
     uint8_t  type;                      /* CP_SETNAME */
-    uint8_t  alias[MAXUSERNAME];
+    uint8_t  alias[MAX_USERNAME];
 } cpSetName_t;
 
 /* authenticate flags */
@@ -596,8 +596,8 @@ typedef struct {
     uint8_t  pad2;
     uint8_t  pad3;
 
-    uint8_t  login[MAXUSERNAME];
-    uint8_t  pw[MAXUSERNAME];
+    uint8_t  login[MAX_USERNAME];
+    uint8_t  pw[MAX_USERNAME];
 } cpAuthenticate_t;
 
 typedef struct {

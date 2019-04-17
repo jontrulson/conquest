@@ -50,7 +50,7 @@ typedef enum {
 #define FHEADER_PAD (SZ_FILEHEADER - (sizeof(uint32_t) +        \
                                       sizeof(uint8_t) +         \
                                       sizeof(uint32_t) +        \
-                                      MAXUSERNAME +             \
+                                      MAX_USERNAME +             \
                                       sizeof(uint32_t) +        \
                                       sizeof(uint8_t) +         \
                                       sizeof(uint32_t) +        \
@@ -63,7 +63,7 @@ typedef struct _fheader {
     uint32_t vers;                 /* version of this file */
     uint8_t samplerate;            /* recorded at samples per sec */
     uint32_t rectime;		/* time recorded */
-    uint8_t user[MAXUSERNAME];	/* user that made recording */
+    uint8_t user[MAX_USERNAME];	/* user that made recording */
     uint32_t cmnrev;               /* common block rev */
     uint8_t snum;                  /* ship that made rec.  0 == server
                                     * record (old versions) */

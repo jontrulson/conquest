@@ -26,7 +26,7 @@
 //
 
 #include "c_defs.h"
-#include "conqdef.h"
+#include "user.h"
 
 #define NOEXTERN_HISTORY
 #include "history.h"

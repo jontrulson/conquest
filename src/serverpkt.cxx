@@ -175,8 +175,8 @@ spUser_t *spktUser(uint16_t unum)
     for (i=0; i<USTAT_TOTALSTATS; i++)
         suser.stats[i] = (int32_t)htonl(cbUsers[unum].stats[i]);
 
-    utStrncpy((char *)suser.username, cbUsers[unum].username, MAXUSERNAME);
-    utStrncpy((char *)suser.alias, cbUsers[unum].alias, MAXUSERNAME);
+    utStrncpy((char *)suser.username, cbUsers[unum].username, MAX_USERNAME);
+    utStrncpy((char *)suser.alias, cbUsers[unum].alias, MAX_USERNAME);
 
     if (memcmp((void *)&suser, (void *)&pktUser[unum], sizeof(spUser_t)))
     {
@@ -259,7 +259,7 @@ spShip_t *spktShip(uint8_t snum, int rec)
     for (i=0; i<NUMPLAYERTEAMS; i++)
         sship.scanned[i] = (uint8_t)cbShips[snum].scanned[i];
 
-    utStrncpy((char *)sship.alias, cbShips[snum].alias, MAXUSERNAME);
+    utStrncpy((char *)sship.alias, cbShips[snum].alias, MAX_USERNAME);
 
     if (rec)
     {
@@ -912,7 +912,7 @@ spConqInfo_t *spktcbConqInfo(int force)
 
     spci.type = SP_CONQINFO;
 
-    utStrncpy((char *)spci.conqueror, cbConqInfo->conqueror, MAXUSERNAME);
+    utStrncpy((char *)spci.conqueror, cbConqInfo->conqueror, MAX_USERNAME);
     utStrncpy((char *)spci.conqteam, cbConqInfo->conqteam, MAXTEAMNAME);
     utStrncpy((char *)spci.conqtime, cbConqInfo->conqtime, MAXDATESIZE);
     utStrncpy((char *)spci.lastwords, cbConqInfo->lastwords, MAXLASTWORDS);
@@ -943,7 +943,7 @@ spHistory_t *spktHistory(int hnum)
     hist.elapsed = (uint32_t)htonl((uint32_t)cbHistory[hnum].elapsed);
     hist.enterTime = (uint32_t)htonl((uint32_t)cbHistory[hnum].enterTime);
 
-    utStrncpy((char *)hist.username, cbHistory[hnum].username, MAXUSERNAME);
+    utStrncpy((char *)hist.username, cbHistory[hnum].username, MAX_USERNAME);
 
     if (memcmp((void *)&hist, (void *)&pktHistory[hnum], sizeof(spHistory_t)))
     {

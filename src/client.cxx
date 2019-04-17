@@ -60,9 +60,9 @@ int sendAuth(int sock, uint8_t flag, const char *login, const char *pw)
     cauth.flag = flag;
 
     if (login)
-        utStrncpy((char *)cauth.login, (char *)login, MAXUSERNAME);
+        utStrncpy((char *)cauth.login, (char *)login, MAX_USERNAME);
     if (pw)
-        utStrncpy((char *)cauth.pw, (char *)pw, MAXUSERNAME);
+        utStrncpy((char *)cauth.pw, (char *)pw, MAX_USERNAME);
 
 #if defined(DEBUG_CLIENTSEND)
     utLog("sendAuth: LOGIN = '%s' PW = '%s'\n",
@@ -135,7 +135,7 @@ int sendSetName(const char *name)
 
     memset((void *)&sname, 0, sizeof(cpSetName_t));
     sname.type = CP_SETNAME;
-    utStrncpy((char *)sname.alias, name, MAXUSERNAME);
+    utStrncpy((char *)sname.alias, name, MAX_USERNAME);
 
     if (pktWrite(PKT_SENDTCP, &sname) <= 0)
         return false;

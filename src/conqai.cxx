@@ -586,7 +586,7 @@ int newrob( int *snum, int unum )
         cbShips[*snum].rwar[i] = false;
         cbShips[*snum].war[i] = false;
     }
-    utStrncpy ( cbShips[*snum].alias, cbUsers[unum].alias, MAXUSERNAME );
+    utStrncpy ( cbShips[*snum].alias, cbUsers[unum].alias, MAX_USERNAME );
 
     /* Place the ship. */
     if (!clbFindTeamHomeSun(cbShips[*snum].team, &i))

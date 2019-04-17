@@ -48,7 +48,7 @@
 void ChangePassword(int unum, int isoper)
 {
     static const char *header = "Change Password";
-    char pw[MAXUSERNAME], pwr[MAXUSERNAME], epw[MAXUSERNAME];
+    char pw[MAX_USERNAME], pwr[MAX_USERNAME], epw[MAX_USERNAME];
     char salt[3];
     int lin = 0, col = 0;
 
@@ -72,7 +72,7 @@ void ChangePassword(int unum, int isoper)
     cdputs("Use any printable characters.", MSG_LIN2, 1);
 
     cdgetx( "New Password: ", MSG_LIN1, 1,
-            TERMS, pw, MAXUSERNAME - 1, false );
+            TERMS, pw, MAX_USERNAME - 1, false );
 
     if (isoper == false)
     {
@@ -80,7 +80,7 @@ void ChangePassword(int unum, int isoper)
         cdclrl( MSG_LIN1, 2  );
         cdputs("Use any printable characters.", MSG_LIN2, 1);
         cdgetx( "Retype Password: ", MSG_LIN1, 1,
-                TERMS, pwr, MAXUSERNAME - 1, false );
+                TERMS, pwr, MAX_USERNAME - 1, false );
 
         if (strcmp(pw, pwr) != 0)
 	{			/* pw's don't match, start over */
@@ -103,8 +103,8 @@ void ChangePassword(int unum, int isoper)
         salt[1] = (cbUsers[unum].username[1] != 0) ? cbUsers[unum].username[1] : 'T';
         salt[2] = 0;
 
-        utStrncpy(epw, (char *)crypt(pw, salt), MAXUSERNAME);
-        utStrncpy(cbUsers[unum].pw, epw, MAXUSERNAME);
+        utStrncpy(epw, (char *)crypt(pw, salt), MAX_USERNAME);
+        utStrncpy(cbUsers[unum].pw, epw, MAX_USERNAME);
     }
     else				/* send a packet */
         sendAuth(cInfo.sock, CPAUTH_CHGPWD, "", pw);

@@ -2115,7 +2115,7 @@ void oprobot(void)
     cdclrl( MSG_LIN1, 2 );
     buf[0] = 0;
     ch = (char)cdgetx( "Enter username for new robot (Orion, Federation, etc): ",
-                       MSG_LIN1, 1, TERMS, buf, MAXUSERNAME, true );
+                       MSG_LIN1, 1, TERMS, buf, MAX_USERNAME, true );
     if ( ch == TERM_ABORT || buf[0] == 0 )
     {
         cdclrl( MSG_LIN1, 1 );
@@ -2152,7 +2152,7 @@ void oprobot(void)
     {
         buf[0] = 0;
         ch = (char)cdgetx( "Enter number desired ([TAB] for warlike): ",
-                           MSG_LIN2, 1, TERMS, buf, MAXUSERNAME, true );
+                           MSG_LIN2, 1, TERMS, buf, MAX_USERNAME, true );
         if ( ch == TERM_ABORT )
 	{
             cdclrl( MSG_LIN1, 2 );
@@ -2398,7 +2398,7 @@ void opuadd(void)
 
     cdclrl( MSG_LIN1, 2 );
     name[0] = 0;
-    ch = (char)cdgetx( "Add user: ", MSG_LIN1, 1, TERMS, name, MAXUSERNAME,
+    ch = (char)cdgetx( "Add user: ", MSG_LIN1, 1, TERMS, name, MAX_USERNAME,
                        true);
     /*  utDeleteBlanks( name );*/
 
@@ -2496,7 +2496,7 @@ void opuedit(void)
 
     cdclrl( MSG_LIN1, 2 );
     uiPutColor(InfoColor);
-    ch = mcuGetCX( "Edit which user: ", MSG_LIN1, 0, TERMS, buf, MAXUSERNAME );
+    ch = mcuGetCX( "Edit which user: ", MSG_LIN1, 0, TERMS, buf, MAX_USERNAME );
     if ( ch == TERM_ABORT )
     {
         cdclrl( MSG_LIN1, 2 );
@@ -2839,22 +2839,22 @@ void opuedit(void)
                 /* Pseudonym. */
                 cdclrl( MSG_LIN2, 1 );
                 ch = mcuGetCX( "Enter a new pseudonym: ",
-                               MSG_LIN2, 0, TERMS, buf, MAXUSERNAME );
+                               MSG_LIN2, 0, TERMS, buf, MAX_USERNAME );
                 if ( ch != TERM_ABORT &&
                      ( buf[0] != 0 || ch == TERM_EXTRA ) )
-                    utStrncpy( cbUsers[unum].alias, buf, MAXUSERNAME ); /* -[] */
+                    utStrncpy( cbUsers[unum].alias, buf, MAX_USERNAME ); /* -[] */
 	    }
             else if ( ! left && row == 1 )
 	    {
                 /* Username. */
                 cdclrl( MSG_LIN2, 1 );
                 ch = mcuGetCX( "Enter a new username: ",
-                               MSG_LIN2, 0, TERMS, buf, MAXUSERNAME );
+                               MSG_LIN2, 0, TERMS, buf, MAX_USERNAME );
                 if ( ch != TERM_ABORT && buf[0] != 0)
                 {
                     utDeleteBlanks( buf );
                     if ( ! clbGetUserNum( &i, buf, USERTYPE_ANY ) )
-                        utStrncpy( cbUsers[unum].username, buf, MAXUSERNAME );
+                        utStrncpy( cbUsers[unum].username, buf, MAX_USERNAME );
                     else
                     {
                         cdclrl( MSG_LIN1, 2 );

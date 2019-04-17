@@ -35,7 +35,7 @@ typedef struct {
                               // resigned user.
     time_t enterTime;         /* date of entry */
     time_t elapsed;           /* elapsed time of this entry */
-    char   username[MAXUSERNAME]; /* username */
+    char   username[MAX_USERNAME]; /* username */
 } History_t;
 
 // instantiate in history.cxx only

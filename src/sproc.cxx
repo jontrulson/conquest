@@ -60,13 +60,13 @@ void procSetName(char *buf)
     if (!pktIsValid(CP_SETNAME, cpsetn))
         return;
 
-    cpsetn->alias[MAXUSERNAME - 1] = 0;
+    cpsetn->alias[MAX_USERNAME - 1] = 0;
 
-    utStrncpy(cbUsers[Context.unum].alias, (char *)cpsetn->alias, MAXUSERNAME);
+    utStrncpy(cbUsers[Context.unum].alias, (char *)cpsetn->alias, MAX_USERNAME);
 
     if (Context.snum >= 0 && Context.snum < cbLimits.maxShips())
         utStrncpy(cbShips[Context.snum].alias,
-                  (char *)cpsetn->alias, MAXUSERNAME);
+                  (char *)cpsetn->alias, MAX_USERNAME);
 
     return;
 }
@@ -753,7 +753,7 @@ void procChangePassword(char *buf)
     if (!pktIsValid(CP_AUTHENTICATE, buf))
         return;
 
-    cauth->pw[MAXUSERNAME - 1] = 0;
+    cauth->pw[MAX_USERNAME - 1] = 0;
 
     /* we are just interested in the pw */
 
@@ -768,8 +768,8 @@ void procChangePassword(char *buf)
     salt[2] = 0;
 
     utStrncpy(cbUsers[unum].pw, (char *)crypt((char *)cauth->pw, salt),
-              MAXUSERNAME);
-    cbUsers[unum].pw[MAXUSERNAME - 1] = 0;
+              MAX_USERNAME);
+    cbUsers[unum].pw[MAX_USERNAME - 1] = 0;
 
     return;
 }

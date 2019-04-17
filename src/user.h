@@ -31,6 +31,8 @@
 #include "conqdef.h"
 #include "team.h"
 
+#define MAX_USERNAME  32      /* maximum size of a user's login name */
+
 typedef enum {
     USERTYPE_NORMAL           = 0, // All normal users (connecting via client)
     USERTYPE_BUILTIN          = 1, // special users like "Federation",
@@ -40,6 +42,8 @@ typedef enum {
 
     USERTYPE_MAX                // Should be last entry
 } userTypes_t;
+
+
 
 // User flags
 #define USER_F_NONE          0x0000
@@ -77,9 +81,9 @@ typedef struct {
     real rating;		/* user's rating */
     time_t lastentry;		/* last entry time */
     bool war[NUMPLAYERTEAMS];	/* teams you're at war with */
-    char username[MAXUSERNAME];	/* user's name (login name) */
-    char pw[MAXUSERNAME];	/* user's password if server login */
-    char alias[MAXUSERNAME];	/* user's pseudonym */
+    char username[MAX_USERNAME];	/* user's name (login name) */
+    char pw[MAX_USERNAME];	/* user's password if server login */
+    char alias[MAX_USERNAME];	/* user's pseudonym */
     int stats[MAXUSTATS];	/* user's stats */
 } User_t;
 

@@ -171,7 +171,7 @@ static void _changePasswd(int init)
         prm.buf.clear();
 
         prm.preinit = false;
-        prm.buflen = MAXUSERNAME;
+        prm.buflen = MAX_USERNAME;
         prm.index = MSG_LIN1;
         prompting = true;
     }
@@ -187,7 +187,7 @@ static void _changePasswd(int init)
             prm.buf.clear();
 
             prm.preinit = false;
-            prm.buflen = MAXUSERNAME;
+            prm.buflen = MAX_USERNAME;
             prm.index = MSG_LIN1;
             prompting = true;
         }

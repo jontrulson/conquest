@@ -1309,7 +1309,7 @@ void menu(void)
         cbShips[Context.snum].war[cbShips[Context.snum].team] = false;
 
     utStrncpy( cbShips[Context.snum].alias, cbUsers[Context.unum].alias,
-               MAXUSERNAME );
+               MAX_USERNAME );
 
     /* Set up some things for the menu display. */
     sleepy = clbGetMillis();
@@ -1783,8 +1783,8 @@ int play(void)
 int welcome( int *unum )
 {
     int i, team;
-    char name[MAXUSERNAME];
-    char password[MAXUSERNAME];	/* encrypted pw, "" if local */
+    char name[MAX_USERNAME];
+    char password[MAX_USERNAME];	/* encrypted pw, "" if local */
     uint8_t flags = SPCLNTSTAT_FLAG_NONE;
 
     if (!Authenticate(name, password))

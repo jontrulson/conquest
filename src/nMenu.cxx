@@ -504,7 +504,7 @@ static nodeStatus_t nMenuInput(int ch)
             state = S_PSEUDO;
             prm.preinit = false;
             prm.buf.clear();
-            prm.buflen = MAXUSERNAME;
+            prm.buflen = MAX_USERNAME;
             prm.index = DISPLAY_LINS;
             prompting = true;
 
@@ -524,7 +524,7 @@ static nodeStatus_t nMenuInput(int ch)
                 state = S_RESIGN;
                 prm.preinit = false;
                 prm.buf.clear();
-                prm.buflen = MAXUSERNAME;
+                prm.buflen = MAX_USERNAME;
                 prm.index = DISPLAY_LINS;
                 prompting = true;
             }

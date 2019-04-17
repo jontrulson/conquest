@@ -1653,7 +1653,7 @@ static void command( int ch )
         state = S_PSEUDO;
         prm.preinit = false;
         prm.buf.clear();
-        prm.buflen = MAXUSERNAME;
+        prm.buflen = MAX_USERNAME;
         prm.pbuf = "Enter a new pseudonym: ";
         prm.index = MSG_LIN2;
         hudSetPrompt(prm.index, prm.pbuf, NoColor, prm.buf,

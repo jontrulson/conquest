@@ -126,8 +126,8 @@ int procUser(char *buf)
     for (i=0; i<USTAT_TOTALSTATS; i++)
         cbUsers[unum].stats[i] = (int32_t)ntohl(suser->stats[i]);
 
-    utStrncpy(cbUsers[unum].username, (char *)suser->username, MAXUSERNAME);
-    utStrncpy(cbUsers[unum].alias, (char *)suser->alias, MAXUSERNAME);
+    utStrncpy(cbUsers[unum].username, (char *)suser->username, MAX_USERNAME);
+    utStrncpy(cbUsers[unum].alias, (char *)suser->alias, MAX_USERNAME);
 
 #if defined(DEBUG_CLIENTPROC)
     utLog("\t%s: name: %s (%s)", __FUNCTION__, cbUsers[unum].username, cbUsers[unum].alias);
@@ -198,8 +198,8 @@ int procShip(char *buf)
     for (i=0; i<NUMPLAYERTEAMS; i++)
         cbShips[snum].scanned[i] = (int)sship->scanned[i];
 
-    sship->alias[MAXUSERNAME - 1] = 0;
-    utStrncpy(cbShips[snum].alias, (char *)sship->alias, MAXUSERNAME);
+    sship->alias[MAX_USERNAME - 1] = 0;
+    utStrncpy(cbShips[snum].alias, (char *)sship->alias, MAX_USERNAME);
 
     return true;
 }
@@ -593,7 +593,7 @@ int procConqInfo(char *buf)
     if (!pktIsValid(SP_CONQINFO, buf))
         return false;
 
-    utStrncpy(cbConqInfo->conqueror, (char *)spci->conqueror, MAXUSERNAME);
+    utStrncpy(cbConqInfo->conqueror, (char *)spci->conqueror, MAX_USERNAME);
     utStrncpy(cbConqInfo->conqteam, (char *)spci->conqteam, MAXTEAMNAME);
     utStrncpy(cbConqInfo->conqtime, (char *)spci->conqtime, MAXDATESIZE);
     utStrncpy(cbConqInfo->lastwords, (char *)spci->lastwords, MAXLASTWORDS);
@@ -617,7 +617,7 @@ int procHistory(char *buf)
     cbHistory[hnum].elapsed = (time_t)ntohl((uint32_t)hist->elapsed);
     cbHistory[hnum].enterTime = (time_t)ntohl((uint32_t)hist->enterTime);
 
-    utStrncpy(cbHistory[hnum].username, (char *)hist->username, MAXUSERNAME);
+    utStrncpy(cbHistory[hnum].username, (char *)hist->username, MAX_USERNAME);
 
 #if defined(DEBUG_CLIENTPROC)
     utLog("%s: hnum = %d, hptr = %d, unum = %d name = (%s)",
