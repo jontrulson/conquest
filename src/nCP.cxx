@@ -950,7 +950,9 @@ static int _xlateFKey(int ch)
 /*    _docourse( snum ) */
 static void _docourse( std::string& buf, char ch)
 {
-    int i, j, what, sorpnum, xsorpnum, token, count;
+    int i, j, sorpnum, xsorpnum, count;
+    InfoNear what;
+    InfoSpecial token;
     real dir, appx, appy;
     int snum = Context.snum;
     courseLock_t newlock = LOCK_NONE;
@@ -982,6 +984,7 @@ static void _docourse( std::string& buf, char ch)
     }
     else
     {
+        InfoNear near;
         if (utIsDigits(buf))
         {
             /* Raw angle. */
@@ -994,10 +997,10 @@ static void _docourse( std::string& buf, char ch)
         }
         else if ( utArrowsToDir( buf.c_str(), &dir ) )
             what = NEAR_DIRECTION;
-        else if ( utIsSpecial( buf.c_str(), &i, &token, &count ) )
+        else if ( utIsSpecial( buf.c_str(), &near, &token, &count ) )
         {
             if ( clbFindSpecial( snum, token, count, &sorpnum, &xsorpnum ) )
-                what = i;
+                what = near;
         }
         else if ( clbPlanetMatch( buf.c_str(), &sorpnum, false ) )
             what = NEAR_PLANET;

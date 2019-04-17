@@ -88,7 +88,9 @@ void info( const std::string& inbuf, char ch, bool doOutput )
     else
         Context.lastInfoStr = tmpBuf;
 
-    int what, count, token;
+    int count;
+    InfoNear what;
+    InfoSpecial token;
     int j, sorpnum, xsorpnum;
     if ( utIsSpecial( tmpBuf, &what, &token, &count ) )
     {

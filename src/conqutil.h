@@ -30,6 +30,7 @@
 #define _CONQUTIL_H
 
 #include <string>
+#include "info.h"
 
 real     utAccurateDist( real curvel, real newvel, real acc );
 bool     utSafeCToI(int *num, const std::string& buf, int offset = 0);
@@ -68,8 +69,8 @@ uint64_t utDeltaGrand(uint64_t s, uint64_t *n);
 void     utGrand( uint64_t *h );
 void     utGetSecs( time_t *s );
 real     utMod360( real r );
-bool     utIsSpecial( const std::string& str, int *what, int *token,
-                      int *count );
+bool     utIsSpecial( const std::string& str, InfoNear *what,
+                      InfoSpecial *token, int *count );
 void     utStrncpy( char *to, const char *from, unsigned int tosize );
 void     utStrncat( char *to, const char *from, unsigned int tosize );
 bool     utStringMatch(const std::string& str1, const std::string& str2,

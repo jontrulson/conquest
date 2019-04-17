@@ -30,6 +30,32 @@
 
 #include <string>
 
+/* Return values for utIsSpecial(). */
+enum InfoNear {
+    NEAR_SHIP = 1,
+    NEAR_PLANET = 2,
+    NEAR_NONE = 3,
+    NEAR_DIRECTION = 4,
+    NEAR_ERROR = 5,
+};
+
+/* Tokens for utIsSpecial() and clbFindSpecial() */
+enum InfoSpecial {
+    SPECIAL_NOTSPECIAL = 1,
+    SPECIAL_ENEMYSHIP = 2,
+    SPECIAL_FUELPLANET = 3,
+    SPECIAL_ENEMYPLANET = 4,
+    SPECIAL_SHIP = 5,
+    SPECIAL_PLANET = 6,
+    SPECIAL_TEAMSHIP = 7,
+    SPECIAL_ARMYPLANET = 8,
+    SPECIAL_WEAKPLANET = 9,
+    SPECIAL_TEAMPLANET = 10,
+    SPECIAL_REPAIRPLANET = 11,
+    SPECIAL_HOMEPLANET = 12,
+};
+
+
 void info( const std::string& inbuf, char ch, bool doOutput );
 void infoPlanet( const std::string& str, int pnum, int snum, bool doOutput );
 void infoShip( int snum, int scanner, bool doOutput );

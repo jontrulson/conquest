@@ -151,27 +151,6 @@ typedef enum {
 /* Tokens for mcuPutThing(), must be negative */
 #define THING_EXPLOSION -1      /* a torpedo explosion */
 
-/* Return values for utIsSpecial(). */
-#define NEAR_SHIP 1
-#define NEAR_PLANET 2
-#define NEAR_NONE 3
-#define NEAR_DIRECTION 4
-#define NEAR_ERROR 5
-
-/* Tokens for utIsSpecial() and clbFindSpecial() */
-#define SPECIAL_NOTSPECIAL 1
-#define SPECIAL_ENEMYSHIP 2
-#define SPECIAL_FUELPLANET 3
-#define SPECIAL_ENEMYPLANET 4
-#define SPECIAL_SHIP 5
-#define SPECIAL_PLANET 6
-#define SPECIAL_TEAMSHIP 7
-#define SPECIAL_ARMYPLANET 8
-#define SPECIAL_WEAKPLANET 9
-#define SPECIAL_TEAMPLANET 10
-#define SPECIAL_REPAIRPLANET 11
-#define SPECIAL_HOMEPLANET 12
-
 /* Constants. */
 #define BOMBARD_KILLS 0.05      /* kills per army bombarded */
 #define KILLS_KILLS 0.10        /* extra kills per enemy kill */

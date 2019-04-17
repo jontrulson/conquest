@@ -40,6 +40,7 @@
 #include "color.h"
 #include "conqlb.h"
 #include "conqutil.h"
+#include "info.h"
 
 
 /* if set, utLog uses the system log, else it is created in HOME */
@@ -830,7 +831,8 @@ bool utSafeCToI( int *num, const std::string& buf, int offset )
 
 
 /*  special - check if a string is a valid "special" specifier */
-bool utIsSpecial( const std::string& str, int *what, int *token, int *count )
+bool utIsSpecial( const std::string& str, InfoNear *what, InfoSpecial *token,
+                  int *count )
 {
     int i;
     std::string buf;

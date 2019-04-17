@@ -36,6 +36,7 @@
 
 #include "conf.h"
 #include "cb.h"
+#include "info.h"
 
 #include "protocol.h"
 
@@ -80,7 +81,7 @@ void     clbDoomFind(void);
 void     clbDoomsday(void);
 bool     clbFindOrbit( int snum, int *pnum );
 int      clbFindShip( int *snum );
-int      clbFindSpecial( int snum, int token, int count,
+int      clbFindSpecial( int snum, InfoSpecial token, int count,
                          int *sorpnum, int *xsorpnum );
 void     clbFixDeltas( int snum );
 bool     clbGetUserNum( int *unum, const std::string& lname,

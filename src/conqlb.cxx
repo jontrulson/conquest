@@ -1524,7 +1524,7 @@ int clbFindShip( int *snum )
 /*    int flag, findspecial */
 /*    int snum, token, count, sorpnum, xsorpnum */
 /*    flag = clbFindSpecial( snum, token, count, sorpnum, xsorpnum ) */
-int clbFindSpecial( int snum, int token, int count, int *sorpnum,
+int clbFindSpecial( int snum, InfoSpecial token, int count, int *sorpnum,
                     int *xsorpnum )
 {
     int i, a, na, ta, u, nu, tu;
