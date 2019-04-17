@@ -227,8 +227,11 @@ void checkMaster(void)
     }
 
     /* set the maximum connections we will fall behind */
-    listen( s, LISTEN_BACKLOG );
-
+    if (listen( s, LISTEN_BACKLOG ) < 0)
+    {
+        utLog("NET: listen() failed: %s", strerror(errno));
+        exit(1);
+    }
 
     /* go into infinite loop waiting for new connections */
     while (true)

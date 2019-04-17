@@ -318,7 +318,11 @@ void metaListen(void)
     }
 
     /* set the maximum connections we will fall behind */
-    listen( t, LISTEN_BACKLOG );
+    if (listen( t, LISTEN_BACKLOG ) < 0)
+    {
+        utLog("META: listen() failed: %s", strerror(errno));
+        exit(1);
+    }
 
     alen = sizeof(struct sockaddr);
 
