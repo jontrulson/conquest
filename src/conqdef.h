@@ -142,23 +142,6 @@ typedef enum {
 
 #define MAXLASTWORDS 60       /* maximum size of conquering remarks */
 
-#define MAXUSTATS 20
-#define USTAT_SECONDS 1         /* elapsed seconds for each user */
-#define USTAT_CPUSECONDS 2      /* cpu seconds used per user */
-#define USTAT_WINS 3            /* total kills for each user */
-#define USTAT_LOSSES 4          /* total losses for each user */
-#define USTAT_MAXKILLS 5        /* maximum kills for each user */
-#define USTAT_ENTRIES 6         /* number of entries for each user */
-#define USTAT_CONQUERS 7        /* number conquers for each player */
-#define USTAT_COUPS 8           /* number of coups completed */
-#define USTAT_TORPS 9           /* number of torps fired for each user */
-#define USTAT_PHASERS 10        /* number of phaser shots for each user */
-#define USTAT_ARMBOMB 11        /* armies killed by bombing */
-#define USTAT_ARMSHIP 12        /* armies killed on a ship */
-#define USTAT_CONQPLANETS 13    /* number of planets conquered */
-#define USTAT_GENOCIDE 0        /* number of genocides completed */
-#define USTAT_TOTALSTATS 14
-
 #define MAXDATESIZE 20          /* hh:mm:ss ddmmmyy */
 #define MSGMAXLINE 80           /* maximum size for formatting messages */
 

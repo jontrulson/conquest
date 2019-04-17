@@ -43,6 +43,31 @@ typedef enum {
     USERTYPE_MAX                // Should be last entry
 } userTypes_t;
 
+#define MAXUSTATS 20
+
+enum UserStats : int {
+    USTAT_GENOCIDE = 0,        /* number of genocides completed */
+    USTAT_SECONDS = 1,         /* elapsed seconds for each user */
+    USTAT_CPUSECONDS = 2,      /* cpu seconds used per user */
+    USTAT_WINS = 3,            /* total kills for each user */
+    USTAT_LOSSES = 4,          /* total losses for each user */
+    USTAT_MAXKILLS = 5,        /* maximum kills for each user */
+    USTAT_ENTRIES = 6,         /* number of entries for each user */
+    USTAT_CONQUERS = 7,        /* number conquers for each player */
+    USTAT_COUPS = 8,           /* number of coups completed */
+    USTAT_TORPS = 9,           /* number of torps fired for each user */
+    USTAT_PHASERS = 10,        /* number of phaser shots for each user */
+    USTAT_ARMBOMB = 11,        /* armies killed by bombing */
+    USTAT_ARMSHIP = 12,        /* armies killed on a ship */
+    USTAT_CONQPLANETS = 13,    /* number of planets conquered */
+
+    // FIXME for next proto - proto currently uses and sends only
+    // USTAT_TOTALSTATS items, rather than larger MAXUSTATS, unlike
+    // the way TSTATs are sent.  In next revision, should remove
+    // USTAT_TOTALSTATS and use MAXUSTATS.  This leaves additional
+    // slots that could be used someday.
+    USTAT_TOTALSTATS = 14,
+};
 
 
 // User flags
