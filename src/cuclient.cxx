@@ -79,7 +79,7 @@ void cucPseudo( int unum, int snum )
 void cucSendMsg( msgFrom_t from, uint16_t fromDetail, int terse, int remote )
 {
     int i, j;
-    char buf[MAX_MSGLINE_LENGTH] = "", msg[MESSAGE_SIZE] = "";
+    char buf[MAX_MSGLINE_LENGTH] = "", msg[MAX_MSGSIZE] = "";
     int ch;
     int editing;
     static const char *mto="Message to: ";
@@ -253,7 +253,7 @@ void cucSendMsg( msgFrom_t from, uint16_t fromDetail, int terse, int remote )
     if ( ! editing )
         msg[0] = 0;
 
-    i = MESSAGE_SIZE;
+    i = MAX_MSGSIZE;
 
     append_flg = true;
     while (append_flg == true) {

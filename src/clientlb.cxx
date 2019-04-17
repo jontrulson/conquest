@@ -51,7 +51,7 @@ void clntStoreMessage(spMessage_t *msg)
         return;
 
     nlastmsg = mod( cbConqInfo->lastmsg + 1, cbLimits.maxMsgs() );
-    utStrncpy(cbMsgs[nlastmsg].msgbuf, (char *)msg->msg, MESSAGE_SIZE);
+    utStrncpy(cbMsgs[nlastmsg].msgbuf, (char *)msg->msg, MAX_MSGSIZE);
     cbMsgs[nlastmsg].from = static_cast<msgFrom_t>(msg->from);
     cbMsgs[nlastmsg].fromDetail = msg->fromDetail;
     cbMsgs[nlastmsg].to = static_cast<msgTo_t>(msg->to);

@@ -118,7 +118,7 @@ typedef struct {
     uint8_t code;			/* ack code */
     uint8_t pad1;
 
-    uint8_t txt[70 /*MESSAGE_SIZE*/];	/* text */
+    uint8_t txt[70 /*MAX_MSGSIZE*/];	/* text */
 } sp_0006_AckMsg_t;
 
 #define SP_0006_SSTAT_FLAGS_NONE        0x00000000
@@ -295,7 +295,7 @@ typedef struct {
     int16_t   from;
     int16_t   to;
 
-    uint8_t  msg[70 /*MESSAGE_SIZE*/];
+    uint8_t  msg[70 /*MAX_MSGSIZE*/];
 } sp_0006_Message_t;
 
 #define SP_0006_USER_FLAGS_NONE     0x00

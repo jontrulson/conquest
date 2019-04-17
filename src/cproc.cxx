@@ -490,7 +490,7 @@ int procMessage(char *buf)
     if (!pktIsValid(SP_MESSAGE, buf))
         return false;
 
-    smsg->msg[MESSAGE_SIZE - 1] = 0;
+    smsg->msg[MAX_MSGSIZE - 1] = 0;
     smsg->fromDetail = ntohs(smsg->fromDetail);
     smsg->toDetail = ntohs(smsg->toDetail);
 
@@ -502,7 +502,7 @@ int procMessage(char *buf)
             ((smsg->flags & MSG_FLAGS_ROBOT) && !UserConf.NoRobotMsgs))
         {
             memset((void *)&recMsg, 0, sizeof(Msg_t));
-            utStrncpy(recMsg.msgbuf, (char *)smsg->msg, MESSAGE_SIZE);
+            utStrncpy(recMsg.msgbuf, (char *)smsg->msg, MAX_MSGSIZE);
 
             // do a check on the enums...
             if (smsg->to > MSG_TO_MAX || smsg->from > MSG_FROM_MAX)

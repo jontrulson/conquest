@@ -581,7 +581,7 @@ int proc_0006_Message(char *buf)
         return false;
 
 
-    smsg->msg[70 /*MESSAGE_SIZE*/ - 1] = 0;
+    smsg->msg[70 /*MAX_MSGSIZE*/ - 1] = 0;
 
     msgTo_t   realTo = MSG_TO_NOONE;
     uint16_t  realToDetail = 0;
@@ -694,7 +694,7 @@ int proc_0006_Message(char *buf)
         ((smsg->flags & MSG_FLAGS_ROBOT) && !UserConf.NoRobotMsgs))
     {
         memset((void *)&recMsg, 0, sizeof(Msg_t));
-        utStrncpy(recMsg.msgbuf, (char *)smsg->msg, 70 /*MESSAGE_SIZE*/);
+        utStrncpy(recMsg.msgbuf, (char *)smsg->msg, 70 /*MAX_MSGSIZE*/);
         recMsg.from = realFrom;
         recMsg.fromDetail = realFromDetail;
         recMsg.to = realTo;

@@ -46,7 +46,7 @@ void startRecord(int f)
 {
     char fname[PATH_MAX] = {};
     char bname[PATH_MAX] = {};
-    char cbuf[MESSAGE_SIZE] = {};
+    char cbuf[MAX_MSGSIZE] = {};
     time_t thetime;
     struct tm *tmtime;
     char tbuf[128] = {};
@@ -80,7 +80,7 @@ void startRecord(int f)
     {
         Context.recmode = RECMODE_OFF;
         utLog("conquestd: Cannot record to %s", fname);
-        snprintf(cbuf, MESSAGE_SIZE, "Cannot record to %s", bname);
+        snprintf(cbuf, MAX_MSGSIZE, "Cannot record to %s", bname);
         if (f)
             clbStoreMsg(MSG_FROM_GOD, 0, MSG_TO_SHIP, Context.snum, cbuf);
         return;
@@ -94,7 +94,7 @@ void startRecord(int f)
         {
             Context.recmode = RECMODE_ON;
             utLog("conquestd: Recording to %s", fname);
-            snprintf(cbuf, MESSAGE_SIZE, "Recording to %s", bname);
+            snprintf(cbuf, MAX_MSGSIZE, "Recording to %s", bname);
             if (f)
                 clbStoreMsg(MSG_FROM_GOD, 0, MSG_TO_SHIP, Context.snum, cbuf);
 
@@ -138,7 +138,7 @@ static void CreateRobots(int snumFrom, const char *arg1,
                          const char *arg2, const char *arg3)
 {
     int i, j, num, anum, unum, snum, warlike;
-    char buf[MESSAGE_SIZE];
+    char buf[MAX_MSGSIZE];
 
     /* arg1 = username, arg2 is number to create (default 0), arg3, if
        present, makes them warlike (default peaceful) */
@@ -204,7 +204,7 @@ static void CreateRobots(int snumFrom, const char *arg1,
           cbUsers[unum].alias,
           cbUsers[unum].username);
 
-    snprintf( buf, MESSAGE_SIZE, "%sAutomation %s (%s) is now flying ",
+    snprintf( buf, MAX_MSGSIZE, "%sAutomation %s (%s) is now flying ",
               (warlike) ? "Warlike " : "",
               cbUsers[unum].alias, cbUsers[unum].username );
     if ( anum == 1 )
@@ -229,7 +229,7 @@ static void Murder(int from, const char *what)
     static const char *no_ship_str = "No such ship.";
     static const char *not_flying_str = "User %12.s (%12.s) isn't flying right now.";
     int snum = -1, unum = -1, didany;
-    char ssbuf[MESSAGE_SIZE], mbuf[MESSAGE_SIZE];
+    char ssbuf[MAX_MSGSIZE], mbuf[MAX_MSGSIZE];
 
     uint16_t fromShip = (uint16_t)from;
 
@@ -287,7 +287,7 @@ static void Murder(int from, const char *what)
 
     if ( ! didany )
     {
-        snprintf(mbuf, MESSAGE_SIZE, not_flying_str, cbUsers[unum].username,
+        snprintf(mbuf, MAX_MSGSIZE, not_flying_str, cbUsers[unum].username,
                 cbUsers[unum].alias);
         clbStoreMsg(MSG_FROM_GOD, 0, MSG_TO_SHIP, fromShip, mbuf);
     }

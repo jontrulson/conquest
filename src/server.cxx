@@ -352,7 +352,7 @@ void sendFeedback(const char *msg)
     themsg.from = MSG_FROM_COMP;
     themsg.fromDetail = 0;
     themsg.flags = MSG_FLAGS_FEEDBACK;
-    utStrncpy(themsg.msgbuf, msg, MESSAGE_SIZE);
+    utStrncpy(themsg.msgbuf, msg, MAX_MSGSIZE);
 
     sendMessage(&themsg);
 
@@ -396,7 +396,7 @@ void sendMessage(Msg_t *msg)
     smsg.toDetail = htons(msg->toDetail);
     smsg.flags = msg->flags;
 
-    utStrncpy((char *)smsg.msg, msg->msgbuf, MESSAGE_SIZE);
+    utStrncpy((char *)smsg.msg, msg->msgbuf, MAX_MSGSIZE);
 
     /* don't record feedback or tersable msgs */
     if (Context.recmode == RECMODE_ON)

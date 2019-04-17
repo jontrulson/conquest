@@ -340,7 +340,7 @@ typedef struct {
     uint16_t fromDetail;        /* ship/planet/team number, etc */
     uint16_t toDetail;
 
-    uint8_t  msg[MESSAGE_SIZE];
+    uint8_t  msg[MAX_MSGSIZE];
 } spMessage_t;
 
 typedef struct {
@@ -578,7 +578,7 @@ typedef struct {
     uint8_t  pad1;
     int16_t   to;
 
-    uint8_t  msg[MESSAGE_SIZE];
+    uint8_t  msg[MAX_MSGSIZE];
 } cpSendMsg_t;
 
 typedef struct {
@@ -613,7 +613,7 @@ typedef struct {
     uint8_t  to;
     int16_t  toDetail;
 
-    uint8_t  msg[MESSAGE_SIZE];
+    uint8_t  msg[MAX_MSGSIZE];
 } cpMessage_t;
 
 #pragma pack()                  /* restore dflt struct alignment */

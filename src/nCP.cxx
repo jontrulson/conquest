@@ -814,7 +814,7 @@ static void _domsgto(const std::string& buf, int ch, int terse)
     state = S_MSG;
     prm.preinit = false;
     prm.buf.clear();
-    prm.buflen = MESSAGE_SIZE;
+    prm.buflen = MAX_MSGSIZE;
     prm.pbuf = "> ";
     prm.index = MSG_LIN2;
     hudSetPrompt(prm.index, prm.pbuf, NoColor, prm.buf,

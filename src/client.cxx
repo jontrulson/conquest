@@ -215,7 +215,7 @@ void sendMessage(msgTo_t to, uint16_t toDetail, const std::string& msg)
     cmsg.type = CP_MESSAGE;
     cmsg.to = (uint8_t)to;
     cmsg.toDetail = htons(toDetail);
-    utStrncpy((char *)cmsg.msg, msg.c_str(), MESSAGE_SIZE);
+    utStrncpy((char *)cmsg.msg, msg.c_str(), MAX_MSGSIZE);
 
     if (pktWrite(PKT_SENDTCP, &cmsg) <= 0)
         utLog("%s: pktWrite() failed.", __FUNCTION__);

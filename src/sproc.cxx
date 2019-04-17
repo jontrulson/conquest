@@ -732,7 +732,7 @@ void procMessage(char *buf)
 
     to = (msgTo_t)cmsg->to;
     toDetail = ntohs(cmsg->toDetail);
-    cmsg->msg[MESSAGE_SIZE - 1] = 0;
+    cmsg->msg[MAX_MSGSIZE - 1] = 0;
 
 #if defined(DEBUG_SERVERPROC)
     utLog("PROC MESSAGE: to %d(%d)", to, (int)toDetail);

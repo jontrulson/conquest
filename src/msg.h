@@ -32,7 +32,7 @@
 #include "conqdef.h"
 
 // maximum size of message text, 4-byte (32b) multiple
-#define MESSAGE_SIZE 72
+#define MAX_MSGSIZE 72
 
 // maximum size for formatting messages 
 #define MAX_MSGLINE_LENGTH 80
@@ -85,7 +85,7 @@ typedef struct {
     uint16_t      toDetail;
 
     uint8_t       flags;		/* some flags. */
-    char          msgbuf[MESSAGE_SIZE]; /* the message itself */
+    char          msgbuf[MAX_MSGSIZE]; /* the message itself */
 } Msg_t;
 
 #endif /* MSG_H_INCLUDED */

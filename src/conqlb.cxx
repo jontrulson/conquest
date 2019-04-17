@@ -2534,7 +2534,7 @@ void clbStoreMsgf( msgFrom_t from, uint16_t fromDetail,
     cbLock(&cbConqInfo->lockmesg);
 
     nlastmsg = mod( cbConqInfo->lastmsg + 1, cbLimits.maxMsgs() );
-    utStrncpy( cbMsgs[nlastmsg].msgbuf, msg.c_str(), MESSAGE_SIZE );
+    utStrncpy( cbMsgs[nlastmsg].msgbuf, msg.c_str(), MAX_MSGSIZE );
     cbMsgs[nlastmsg].from = from;
     cbMsgs[nlastmsg].fromDetail = fromDetail;
     cbMsgs[nlastmsg].to = to;
