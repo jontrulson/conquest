@@ -497,7 +497,7 @@ int proc_0006_Torp(char *buf)
     if (tnum < 0 || tnum >= 9 /*MAXTORPS*/)
         return false;
 
-    cbShips[snum].torps[tnum].status = (int)storp->status;
+    cbShips[snum].torps[tnum].status = (TorpStatus)storp->status;
 
     return true;
 }
@@ -551,7 +551,7 @@ int proc_0006_TorpEvent(char *buf)
     if (tnum < 0 || tnum >= 9 /*MAXTORPS*/)
         return false;
 
-    cbShips[snum].torps[tnum].status = (int)storpev->status;
+    cbShips[snum].torps[tnum].status = (TorpStatus)storpev->status;
 
     for (i=0; i<4 /*NUMPLAYERTEAMS*/; i++)
         if (storpev->war & (1 << i))

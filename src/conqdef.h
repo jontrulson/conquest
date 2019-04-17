@@ -131,15 +131,6 @@ typedef enum {
     LOCK_MAX
 } courseLock_t;
 
-
-/* Values for tstatus() */
-#define TS_OFF 1                /* ready for use */
-#define TS_LAUNCHING 2  /* being created */
-#define TS_LIVE 3               /* armed and flying */
-#define TS_DETONATE 4           /* detonate signal sent */
-#define TS_FIREBALL 5           /* exploding, needed for display() */
-#define TS_RESERVED 6           /* client reserve slot flag */
-
 #define REFIT_GRAND 10000       /* millis to complete a refit */
 
 #define TEAM_UPDATE_INTERVAL 60 /* update client team data every x seconds */

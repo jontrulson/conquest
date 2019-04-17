@@ -407,7 +407,7 @@ int procTorp(char *buf)
     if (tnum < 0 || tnum >= cbLimits.maxTorps())
         return false;
 
-    cbShips[snum].torps[tnum].status = (int)storp->status;
+    cbShips[snum].torps[tnum].status = (TorpStatus)storp->status;
 
     return true;
 }
@@ -461,7 +461,7 @@ int procTorpEvent(char *buf)
     if (tnum < 0 || tnum >= cbLimits.maxTorps())
         return false;
 
-    cbShips[snum].torps[tnum].status = (int)storpev->status;
+    cbShips[snum].torps[tnum].status = (TorpStatus)storpev->status;
 
     for (i=0; i<NUMPLAYERTEAMS; i++)
         if (storpev->war & (1 << i))
