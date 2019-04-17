@@ -30,6 +30,7 @@
 #include "cb.h"
 #include "color.h"
 #include "ui.h"
+#include "rndlb.h"
 
 #include "conqnet.h"
 #include "conqutil.h"
@@ -62,6 +63,9 @@ static void setSysConfDefaults(void)
     utStrncpy(SysConf.ServerContact, "root@localhost",
               META_GEN_STRSIZE);
 
+    // randomly select one. semInit will just recast this to key_t.
+    // Use 0x1701XXXX, where XXXX is random.
+    SysConf.semKey = 0x17010000 + rndint(0, ((1 << 16) - 1));
     return;
 }
 
@@ -302,6 +306,24 @@ int GetSysConf(int checkonly)
                             if (utIsDigits(bufptr))
                             {
                                 int *n = ((int *) SysConfData[j].ConfValue);
+
+                                *n = atoi(bufptr);
+
+                                if (*n < SysConfData[j].min)
+                                    *n = SysConfData[j].min;
+
+                                if (*n > SysConfData[j].max)
+                                    *n = SysConfData[j].max;
+
+                                SysConfData[j].Found = true;
+                                FoundOne = true;
+                            }
+                            break;
+
+                        case CTYPE_UNUMERIC:
+                            if (utIsDigits(bufptr))
+                            {
+                                uint_t *n = ((uint_t *) SysConfData[j].ConfValue);
 
                                 *n = atoi(bufptr);
 
@@ -647,6 +669,24 @@ int GetConf(int usernum)
                             if (utIsDigits(bufptr))
                             {
                                 int *n = ((int *) ConfData[j].ConfValue);
+
+                                *n = atoi(bufptr);
+
+                                if (*n < ConfData[j].min)
+                                    *n = ConfData[j].min;
+
+                                if (*n > ConfData[j].max)
+                                    *n = ConfData[j].max;
+
+                                ConfData[j].Found = true;
+                                FoundOne = true;
+                            }
+                            break;
+
+                        case CTYPE_UNUMERIC:
+                            if (utIsDigits(bufptr))
+                            {
+                                uint_t *n = ((uint_t *) ConfData[j].ConfValue);
 
                                 *n = atoi(bufptr);
 
@@ -1013,6 +1053,12 @@ int MakeConf(char *filename)
                         *((int *)ConfData[j].ConfValue));
                 break;
 
+            case CTYPE_UNUMERIC:
+                fprintf(conf_fd, "%s%u\n",
+                        ConfData[j].ConfName,
+                        *((uint_t *)ConfData[j].ConfValue));
+                break;
+
             }
         /* output a blank line */
         fprintf(conf_fd, "\n");
@@ -1103,6 +1149,12 @@ int MakeSysConf()
                 fprintf(sysconf_fd, "%s%d\n",
                         SysConfData[j].ConfName,
                         *((int *)SysConfData[j].ConfValue));
+                break;
+
+            case CTYPE_UNUMERIC:
+                fprintf(sysconf_fd, "%s%u\n",
+                        SysConfData[j].ConfName,
+                        *((uint_t *)SysConfData[j].ConfValue));
                 break;
             }
         /* output a blank line */

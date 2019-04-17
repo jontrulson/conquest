@@ -130,6 +130,22 @@ static void ChangeOption(struct Conf *cdata, int lin)
 	}
 
         break;
+
+    case CTYPE_UNUMERIC:
+        cdclrl(lin, 1);
+        rv = cdgetn("Enter a number: ", lin, 1, &j);
+
+        if (rv != -1)
+	{
+            if (j >= cdata->min && j <= cdata->max)
+	    {
+                *(uint_t *)(cdata->ConfValue) = uint_t(j);
+                /* signal that something has been changed */
+                ChangedSomething = true;
+	    }
+	}
+
+        break;
     }
 
     return;
@@ -206,7 +222,8 @@ static int ViewEditOptions(struct Conf ConfigData[], int ConfSize,
 #endif
             if (ConfigData[i].ConfType != CTYPE_STRING &&
                 ConfigData[i].ConfType != CTYPE_BOOL &&
-                ConfigData[i].ConfType != CTYPE_NUMERIC)
+                ConfigData[i].ConfType != CTYPE_NUMERIC &&
+                ConfigData[i].ConfType != CTYPE_UNUMERIC)
 	    {		/* skip special elements */
 #ifdef DEBUG_OPTIONS
                 utLog("ViewEditOptions():\tSKIPPING");
@@ -248,6 +265,15 @@ static int ViewEditOptions(struct Conf ConfigData[], int ConfSize,
                         NoColor, j,
                         NoColor);
                 break;
+
+	    case CTYPE_UNUMERIC:
+            {
+                uint_t u = *(int *)ConfigData[i].ConfValue;
+                cprintf(lin, settingcol, ALIGN_NONE, "#%d#%u#%d#",
+                        NoColor, u,
+                        NoColor);
+            }
+            break;
 
 
 	    } /* switch */

@@ -86,6 +86,16 @@ int rndint ( int ilow, int ihigh )
 
 }
 
+/*  rnduint - random unsigned int in the specified range */
+unsigned int rnduint ( unsigned int ilow, unsigned int ihigh )
+{
+    unsigned int rc;
+
+    rc = (unsigned int)(rnd() * (real)(ihigh - ilow + 1)) + ilow;
+
+    return rc;
+}
+
 
 /*  rndnor - normally distributed random real number */
 real rndnor ( real mean, real stddev )

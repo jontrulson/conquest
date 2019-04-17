@@ -32,6 +32,7 @@ void rndini (void);
 real rnd (void);
 real rnduni (real rlow, real rhigh);
 int  rndint (int ilow, int ihigh);
+unsigned int rnduint (unsigned int ilow, unsigned int ihigh);
 real rndnor (real mean, real stddev);
 
 #endif /* RNDLB_H_INCLUDED */

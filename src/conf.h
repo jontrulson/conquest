@@ -56,6 +56,7 @@
 #define CTYPE_MACRO (3)
 #define CTYPE_NUMERIC (4)
 #define CTYPE_MOUSE (5)
+#define CTYPE_UNUMERIC (6)      // unsigned version of NUMERIC
 
 /* limits for some options */
 #define CONF_SERVER_NAME_SZ   70
@@ -65,11 +66,11 @@
 
 struct Conf
 {
-    int Found;
+    bool Found;
     int ConfType;
     const char *ConfName;
     const void *ConfValue;
-    int min, max;			/* for CTYPE_NUMERIC, CTYPE_STRING */
+    size_t min, max;			/* for CTYPE_NUMERIC, CTYPE_STRING */
     const char *OneLineDesc;
     const char *ConfComment[CONF_MAXCOMMENTS];
 };
@@ -86,6 +87,11 @@ struct Conf
 #define SYSCF_HEADER      (1)
 #define SYSCF_START       (SYSCF_HEADER + 1) /* First option (alias) */
 #define SYSCF_END (sizeof(SysConfData)/sizeof(struct Conf))
+
+// questionable, but I'm tired of typing unsigned int.  We will keep
+// this here for now unless we start to need it elsewhere.  Currently
+// only used by conf.
+typedef unsigned int uint_t;
 
 typedef struct _userConf {
     /* Whether to beep on an incoming message */
@@ -198,20 +204,20 @@ typedef struct _sysConf {
     /* server owner contact info */
     char ServerContact[META_GEN_STRSIZE];
 
+    /* semaphore key (just a random unsigned int) */
+    uint_t semKey;
 } SysConf_t;
 
 
 #ifdef NOEXTERN_CONF
 // current version of the conquest.conf file, just change date for newer
 // versions.
-static const char *CONF_REVISION = "20180901";
+static const char *CONF_REVISION = "20190416";
 
-const char *ConfigVersion = CONF_REVISION;
 /* Config's */
 UserConf_t        UserConf;
 SysConf_t         SysConf;
 #else
-extern const char ConfigVersion[];
 /* Config's */
 extern UserConf_t UserConf;
 extern SysConf_t  SysConf;
@@ -241,8 +247,8 @@ struct Conf SysConfData[] =
         false,
         CTYPE_NULL,
         "SysConqfigVersion=",
-        ConfigVersion,
-        0, 0,			/* mix/max */
+        CONF_REVISION,
+        0, 0,			/* min/max */
         "System Config Version",
         {
             NULL
@@ -253,7 +259,7 @@ struct Conf SysConfData[] =
         CTYPE_NULL,
         NULL,
         NULL,
-        0, 0,			/* mix/max */
+        0, 0,			/* min/max */
         "System Config File Header",
         {
             "###################################################################",
@@ -277,7 +283,7 @@ struct Conf SysConfData[] =
         CTYPE_BOOL,
         "no_doomsday=",
         &SysConf.NoDoomsday,
-        0, 0,			/* mix/max */
+        0, 0,			/* min/max */
         "Disable the Doomsday machine",
         {
             "# define this as 'true' if you never want the Doomsday Machine to",
@@ -290,7 +296,7 @@ struct Conf SysConfData[] =
         CTYPE_BOOL,
         "do_random_robotkills=",
         &SysConf.DoRandomRobotKills,
-        0, 0,			/* mix/max */
+        0, 0,			/* min/max */
         "Robots have randomized kills when created",
         {
             "# define this as 'true' if you want robots to be created with a",
@@ -311,7 +317,7 @@ struct Conf SysConfData[] =
         CTYPE_BOOL,
         "allow_vacant=",
         &SysConf.AllowVacant,
-        0, 0,			/* mix/max */
+        0, 0,			/* min/max */
         "Allow users to exit Conquest leaving their ship vacant",
         {
             "# define this as 'true' if you want to allow users to",
@@ -327,7 +333,7 @@ struct Conf SysConfData[] =
         CTYPE_BOOL,
         "allow_switchteams=",
         &SysConf.AllowSwitchteams,
-        0, 0,			/* mix/max */
+        0, 0,			/* min/max */
         "Allow users to (s)witch teams at the main menu",
         {
             "# define this as 'false' if you want to prevent users from being",
@@ -341,7 +347,7 @@ struct Conf SysConfData[] =
         CTYPE_NUMERIC,
         "user_expiredays=",
         &SysConf.UserExpiredays,
-        0, 4000,			/* mix/max */
+        0, 4000,			/* min/max */
         "Number of days after which to expire inactive users",
         {
             "# number of days of inactivity, after which a user is expired.",
@@ -355,7 +361,7 @@ struct Conf SysConfData[] =
         CTYPE_BOOL,
         "log_messages=",
         &SysConf.LogMessages,
-        0, 0,			/* mix/max */
+        0, 0,			/* min/max */
         "Log all player messages into the log file",
         {
             "# Whether or not to log all player messages into the logfile.",
@@ -368,7 +374,7 @@ struct Conf SysConfData[] =
         CTYPE_BOOL,
         "allow_refits=",
         &SysConf.AllowRefits,
-        0, 0,			/* mix/max */
+        0, 0,			/* min/max */
         "Allow players to refit their ships",
         {
             "# Whether or not to allow players to refit their ships to a ",
@@ -383,7 +389,7 @@ struct Conf SysConfData[] =
         CTYPE_BOOL,
         "allow_slingshot=",
         &SysConf.AllowSlingShot,
-        0, 0,			/* mix/max */
+        0, 0,			/* min/max */
         "Enable the Slingshot bug",
         {
             "# Whether or not to enable the slingshot bug.",
@@ -397,7 +403,7 @@ struct Conf SysConfData[] =
         CTYPE_BOOL,
         "no_teamwar=",
         &SysConf.NoTeamWar,
-        0, 0,			/* mix/max */
+        0, 0,			/* min/max */
         "Prevent ships from declaring war on their own team",
         {
             "# Set this to true to prevent ships from declaring war with their",
@@ -411,7 +417,7 @@ struct Conf SysConfData[] =
         CTYPE_BOOL,
         "no_drift=",
         &SysConf.NoDrift,
-        0, 0,			/* mix/max */
+        0, 0,			/* min/max */
         "Disable the Drift bug",
         {
             "# Whether or not to enable the drift bug.",
@@ -425,7 +431,7 @@ struct Conf SysConfData[] =
         CTYPE_BOOL,
         "closed=",
         &SysConf.Closed,
-        0, 0,			/* mix/max */
+        0, 0,			/* min/max */
         "Close the server",
         {
             "# When the server is closed, only those users which already exist",
@@ -440,7 +446,7 @@ struct Conf SysConfData[] =
         CTYPE_STRING,
         "server_name=",
         SysConf.ServerName,
-        0, CONF_SERVER_NAME_SZ,	/* mix/max */
+        0, CONF_SERVER_NAME_SZ,	/* min/max */
         "Server's Name",
         {
             "# The name of your server, displayed on the client login",
@@ -454,7 +460,7 @@ struct Conf SysConfData[] =
         CTYPE_STRING,
         "server_motd=",
         SysConf.ServerMotd,
-        0, CONF_SERVER_MOTD_SZ,	/* mix/max */
+        0, CONF_SERVER_MOTD_SZ,	/* min/max */
         "Server MOTD",
         {
             "# Message of the day (MOTD) for your server",
@@ -467,11 +473,27 @@ struct Conf SysConfData[] =
         CTYPE_STRING,
         "server_contact=",
         SysConf.ServerContact,
-        0, META_GEN_STRSIZE,	/* mix/max */
+        0, META_GEN_STRSIZE,	/* min/max */
         "Server Contact Info",
         {
             "# Email address or URL to use to contact the server owner.",
             "#  Default: root@localhost",
+            NULL
+        }
+    },
+    {
+        false,
+        CTYPE_UNUMERIC,
+        "semaphore_key=",
+        &SysConf.semKey,
+        0, 0xffffffff,	/* min/max */
+        "Semaphore key",
+        {
+            "# This is the semaphore key that will be used by the server ",
+            "# components.  If you change this, you need to restart all ",
+            "# servers.",
+            "# This should be an unsigned 32bit value.",
+            "#  Default: <randomly generated integer>",
             NULL
         }
     }
@@ -487,8 +509,8 @@ struct Conf ConfData[] =
         false,
         CTYPE_NULL,
         "ConqfigVersion=",
-        ConfigVersion,
-        0, 0,			/* mix/max */
+        CONF_REVISION,
+        0, 0,			/* min/max */
         "User Config Version",
         {
             NULL
@@ -499,7 +521,7 @@ struct Conf ConfData[] =
         CTYPE_NULL,
         NULL,
         NULL,
-        0, 0,			/* mix/max */
+        0, 0,			/* min/max */
         "User Config File Header",
         {
             "###################################################################",
@@ -522,7 +544,7 @@ struct Conf ConfData[] =
         CTYPE_BOOL,
         "do_alarm_bell=",
         &UserConf.DoAlarms,
-        0, 0,			/* mix/max */
+        0, 0,			/* min/max */
         "Beep when something important is happening",
         {
             "# define this as 'true' if you want beeps when under attack, ",
@@ -536,7 +558,7 @@ struct Conf ConfData[] =
         CTYPE_BOOL,
         "do_intruder_alerts=",
         &UserConf.DoIntrudeAlert,
-        0, 0,			/* mix/max */
+        0, 0,			/* min/max */
         "Receive Intruder alerts",
         {
             "# define this as 'true' if you want to receive a message when",
@@ -550,7 +572,7 @@ struct Conf ConfData[] =
         CTYPE_BOOL,
         "numeric_planet_map=",
         &UserConf.DoNumMap,
-        0, 0,			/* mix/max */
+        0, 0,			/* min/max */
         "Show army counts for planets",
         {
             "# define this as 'true' if you want to see the number of armies",
@@ -564,7 +586,7 @@ struct Conf ConfData[] =
         CTYPE_BOOL,
         "terse=",
         &UserConf.Terse,
-        0, 0,			/* mix/max */
+        0, 0,			/* min/max */
         "Be Terse",
         {
             "# define this as 'true' if you don't want to receive certain",
@@ -578,7 +600,7 @@ struct Conf ConfData[] =
         CTYPE_BOOL,
         "do_msg_alarm=",
         &UserConf.MessageBell,
-        0, 0,			/* mix/max */
+        0, 0,			/* min/max */
         "Beep when a message arrives",
         {
             "# define this as 'true' if you want beeps when a message is",
@@ -591,7 +613,7 @@ struct Conf ConfData[] =
         CTYPE_BOOL,
         "no_robot_msgs=",
         &UserConf.NoRobotMsgs,
-        0, 0,			/* mix/max */
+        0, 0,			/* min/max */
         "Disable messages from robots to your ship",
         {
             "# define this as 'true' if you don't want to recieve messages",
@@ -608,7 +630,7 @@ struct Conf ConfData[] =
         CTYPE_NUMERIC,
         "updates_per_sec=",
         &UserConf.UpdatesPerSecond,
-        1, 10,			/* mix/max */
+        1, 10,			/* min/max */
         "Updates per second (1-10)",
         {
             "# define this as the number of updates per second in which to",
@@ -623,7 +645,7 @@ struct Conf ConfData[] =
         CTYPE_BOOL,
         "distress_to_friendly=",
         &UserConf.DistressToFriendly,
-        0, 0,			/* mix/max */
+        0, 0,			/* min/max */
         "Send emergency distress calls to friendly ships",
         {
             "# define this as true if you want emergency distress calls to be",
@@ -637,7 +659,7 @@ struct Conf ConfData[] =
         CTYPE_BOOL,
         "alt_hud=",
         &UserConf.AltHUD,
-        0, 0,			/* mix/max */
+        0, 0,			/* min/max */
         "Use an alternate, experimental HUD",
         {
             "# Not currently used, but might be in a future revision.",
@@ -650,7 +672,7 @@ struct Conf ConfData[] =
         CTYPE_BOOL,
         "hud_info=",
         &UserConf.hudInfo,
-        0, 0,			/* mix/max */
+        0, 0,			/* min/max */
         "Display and retain certain (i)nfo'd data in the cockpit HUD",
         {
             "# define this as true if you want to display last firing angle, ",
@@ -667,7 +689,7 @@ struct Conf ConfData[] =
         CTYPE_BOOL,
         "do_local_lrscan=",
         &UserConf.DoLocalLRScan,
-        0, 0,			/* mix/max */
+        0, 0,			/* min/max */
         "Long Range Scan is centered on ship, not Murisak",
         {
             "# define this as 'false' if you want the (M)ap command to have",
@@ -684,7 +706,7 @@ struct Conf ConfData[] =
         CTYPE_BOOL,
         "do_etastats=",
         &UserConf.DoETAStats,
-        0, 0,			/* mix/max */
+        0, 0,			/* min/max */
         "Compute and display Estimated Time of Arrival (ETA) stats",
         {
             "# define this as 'true' if you want Estimated Time of Arrival (ETA)",
@@ -698,7 +720,7 @@ struct Conf ConfData[] =
         CTYPE_BOOL,
         "do_enemyshipbox=",
         &UserConf.EnemyShipBox,
-        0, 0,			/* mix/max */
+        0, 0,			/* min/max */
         "Draw a red box around enemy ships",
         {
             "# define this as 'true' if you want a red box drawn around",
@@ -712,7 +734,7 @@ struct Conf ConfData[] =
         CTYPE_BOOL,
         "do_draw_viewerbg=",
         &UserConf.doVBG,
-        0, 0,			/* mix/max */
+        0, 0,			/* min/max */
         "Draw the background image in the viewer",
         {
             "# define this as 'true' if you want to see the rather attractive",
@@ -787,7 +809,7 @@ struct Conf ConfData[] =
         CTYPE_MOUSE,
         "mouse_",
         &UserConf.Mouse,
-        0, 0,			/* mix/max */
+        0, 0,			/* min/max */
         "Mouse macros",
         {
             "# Mouse macro definitions.  Same general format as Macros.",
@@ -826,7 +848,7 @@ struct Conf ConfData[] =
         CTYPE_MACRO,
         "macro_f",
         UserConf.MacrosF,
-        0, 0,			/* mix/max */
+        0, 0,			/* min/max */
         "Macro Keys",
         {
             "# Macro definitions.  The format in the ~/.conquest/conquest.conf file is",

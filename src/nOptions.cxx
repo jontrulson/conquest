@@ -330,6 +330,27 @@ static void _changeOption(struct Conf *cdata, int init)
             }
         }
         break;
+
+     case CTYPE_UNUMERIC:
+        if (init)
+        {
+            prm.preinit = true;
+            prm.buf = fmt::format("{}", *(uint_t *)(cdata->ConfValue));
+            prm.buflen = 20;
+            prm.pbuf = "Enter a number: ";
+            prm.index = MSG_LIN1;
+            prompting = true;
+        }
+        else
+        {
+            if (utIsDigits(prm.buf))
+            {
+                uint_t j = atoi(prm.buf.c_str());
+                if (j >= cdata->min && j <= cdata->max)
+                    *(uint_t *)(cdata->ConfValue) = j;
+            }
+        }
+        break;
     }
 
     return;
@@ -729,6 +750,15 @@ static void _showOptScreen(void)
                         NoColor);
                 break;
 
+            case CTYPE_UNUMERIC:
+            {
+                uint_t u = *(uint_t *)ConfigData[cvec[k]].ConfValue;
+                cprintf(lin, settingcol, ALIGN_NONE, "#%d#%u#%d#",
+                        NoColor, u,
+                        NoColor);
+            }
+            break;
+
 
             } /* switch */
 
@@ -778,7 +808,8 @@ scrNode_t *nOptionsInit(int what, int setnode, int rnode)
     {
         if (ConfigData[i].ConfType != CTYPE_STRING &&
             ConfigData[i].ConfType != CTYPE_BOOL &&
-            ConfigData[i].ConfType != CTYPE_NUMERIC)
+            ConfigData[i].ConfType != CTYPE_NUMERIC &&
+            ConfigData[i].ConfType != CTYPE_UNUMERIC)
         {           /* skip special elements */
             continue;
         }

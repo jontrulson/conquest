@@ -35,6 +35,7 @@
 
 #include "defs.h"
 #include "global.h"
+#include "conf.h"
 #include "cb.h"
 #include "conqlb.h"
 #include "conqutil.h"
@@ -42,7 +43,6 @@
 #include <algorithm>
 using namespace std;
 
-#define CONQSEMKEY   (0xff001701) /* hope that's unique! */
 #define CONQSEMPERMS (00664)
 #define CONQNUMSEMS  (2)
 
@@ -74,7 +74,7 @@ int semInit(void)
     /* try to create first */
     semflags = CONQSEMPERMS | IPC_CREAT;
 
-    ConquestSemID = semget(CONQSEMKEY, CONQNUMSEMS, semflags);
+    ConquestSemID = semget(key_t(SysConf.semKey), CONQNUMSEMS, semflags);
 
     if (ConquestSemID == -1)
     {				/* already exists? */
@@ -85,7 +85,7 @@ int semInit(void)
 
         semflags = CONQSEMPERMS;
 
-        ConquestSemID = semget(CONQSEMKEY, CONQNUMSEMS, semflags);
+        ConquestSemID = semget(key_t(SysConf.semKey), CONQNUMSEMS, semflags);
 
         if (ConquestSemID == -1)
 	{

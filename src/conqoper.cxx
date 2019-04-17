@@ -202,13 +202,13 @@ int main(int argc, char *argv[])
             exit(1);
 	}
 
+        GetSysConf(true);		/* init defaults... */
+
         if (semInit() == -1)
 	{
             fprintf(stderr, "semInit() failed to get semaphores. exiting.\n");
             exit(1);
 	}
-
-        GetSysConf(true);		/* init defaults... */
 
         /* load conqinitrc */
         if (cqiLoadRC(CQI_FILE_CONQINITRC, NULL, cqDebug))
