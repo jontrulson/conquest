@@ -51,6 +51,28 @@
 // = 1, etc)
 static const char TEAM_PLAYERCHARS[NUMPLAYERTEAMS] = { 'F', 'R', 'K', 'O'};
 
+// team stats
+#define MAX_TEAM_STATS 20
+
+// use int to preserve CB compatibility
+enum TeamStats : int {
+    TSTAT_GENOCIDE = 0,        /* number of genocides completed */
+    TSTAT_SECONDS = 1,         /* elapsed seconds for each team */
+    TSTAT_CPUSECONDS = 2,      /* cpu seconds used per team */
+    TSTAT_WINS = 3,            /* wins for each team */
+    TSTAT_LOSSES = 4,          /* losses for each team */
+    TSTAT_ENTRIES = 5,         /* number of entries for each team */
+    TSTAT_CONQUERS = 6,        /* number of conquers for each team */
+    TSTAT_COUPS = 7,           /* number of coups completed */
+    TSTAT_TORPS = 8,           /* number of entries for each team */
+    TSTAT_PHASERS = 9,         /* number of entries for each team */
+    TSTAT_ARMBOMB = 10,        /* armies killed by bombing */
+    TSTAT_ARMSHIP = 11,        /* armies killed on a ship */
+    TSTAT_CONQPLANETS = 12,    /* number of planets conquered */
+    // can't have more than MAX_TEAM_STATS.  Maybe should be FIXME in
+    // future protocol to actual number used.  Doubt we will add more.
+};
+
 // Some flags
 #define TEAM_F_NONE             0x0000
 #define TEAM_F_COUPINFO         0x0001 // can get coup info?
@@ -66,14 +88,14 @@ static const char TEAM_PLAYERCHARS[NUMPLAYERTEAMS] = { 'F', 'R', 'K', 'O'};
 
 
 typedef struct {
-    int shiptype;		/* type of ship, one of the ST_* types */
-    int couptime;		/* couptime */
+    int shiptype;               /* type of ship, one of the ST_* types */
+    int couptime;               /* couptime */
     int homeplanet;             /* 'official' team home planet */
-    char torpchar;		/* char to display for torps */
-    char teamchar;		/* F = F  R = R  K = K  O = O */
+    char torpchar;              /* char to display for torps */
+    char teamchar;              /* F = F  R = R  K = K  O = O */
     uint16_t flags;             // Team flags
-    int stats[MAXTSTATS];	/* team stats */
-    char name[MAXTEAMNAME];	/* team name */
+    int stats[MAX_TEAM_STATS];    /* team stats */
+    char name[MAXTEAMNAME];     /* team name */
 } Team_t;
 
 #endif /* TEAM_H_INCLUDED */

@@ -877,7 +877,7 @@ spTeam_t *spktTeam(uint8_t team, int force, int rec)
     // restrict flags to allowed flags
     steam.flags = htons(cbTeams[team].flags & tflags);
 
-    for (i=0; i<MAXTSTATS; i++)
+    for (i=0; i<MAX_TEAM_STATS; i++)
         steam.stats[i] = (uint32_t)htonl(cbTeams[team].stats[i]);
 
     utStrncpy((char *)steam.name, cbTeams[team].name, MAXTEAMNAME);

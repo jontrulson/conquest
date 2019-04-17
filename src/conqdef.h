@@ -143,21 +143,6 @@ typedef enum {
 #define MAXUSERNAME  32      /* maximum size of a user's login name */
 #define MAXLASTWORDS 60       /* maximum size of conquering remarks */
 
-#define MAXTSTATS 20
-#define TSTAT_SECONDS 1         /* elapsed seconds for each team */
-#define TSTAT_CPUSECONDS 2      /* cpu seconds used per team */
-#define TSTAT_WINS 3            /* wins for each team */
-#define TSTAT_LOSSES 4          /* losses for each team */
-#define TSTAT_ENTRIES 5         /* number of entries for each team */
-#define TSTAT_CONQUERS 6        /* number of conquers for each team */
-#define TSTAT_COUPS 7           /* number of coups completed */
-#define TSTAT_TORPS 8           /* number of entries for each team */
-#define TSTAT_PHASERS 9         /* number of entries for each team */
-#define TSTAT_ARMBOMB 10        /* armies killed by bombing */
-#define TSTAT_ARMSHIP 11        /* armies killed on a ship */
-#define TSTAT_CONQPLANETS 12    /* number of planets conquered */
-#define TSTAT_GENOCIDE 0        /* number of genocides completed */
-
 #define MAXUSTATS 20
 #define USTAT_SECONDS 1         /* elapsed seconds for each user */
 #define USTAT_CPUSECONDS 2      /* cpu seconds used per user */

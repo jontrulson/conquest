@@ -561,7 +561,7 @@ int procTeam(char *buf)
 
     cbTeams[team].couptime = steam->couptime;
 
-    for (i=0; i<MAXTSTATS; i++)
+    for (i=0; i<MAX_TEAM_STATS; i++)
         cbTeams[team].stats[i] = (int)ntohl(steam->stats[i]);
 
     utStrncpy(cbTeams[team].name, (char *)steam->name, MAXTEAMNAME);

@@ -1831,7 +1831,7 @@ void clbInitEverything(bool cbIsLocal)
 
     /* Zero team stats. */
     for ( i = 0; i < NUMPLAYERTEAMS; i++ )
-        for ( j = 0; j < MAXTSTATS; j = j + 1 )
+        for ( j = 0; j < MAX_TEAM_STATS; j = j + 1 )
             cbTeams[i].stats[j] = 0;
 
     /* De-register all users. */

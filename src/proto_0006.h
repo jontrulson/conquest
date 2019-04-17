@@ -375,7 +375,7 @@ typedef struct {
     uint8_t  pad1;
     uint16_t pad2;
 
-    uint32_t stats[20 /*MAXTSTATS*/];
+    uint32_t stats[20 /*MAX_TEAM_STATS*/];
 
     uint8_t  name[12 /*MAXTEAMNAME*/];
 } sp_0006_Team_t;

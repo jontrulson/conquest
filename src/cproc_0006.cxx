@@ -736,7 +736,7 @@ int proc_0006_Team(char *buf)
 
     cbTeams[team].homeplanet = (int)steam->homeplanet;
 
-    for (i=0; i<20 /*MAXTSTATS*/; i++)
+    for (i=0; i<20 /*MAX_TEAM_STATS*/; i++)
         cbTeams[team].stats[i] = (int)ntohl(steam->stats[i]);
 
     utStrncpy(cbTeams[team].name, (char *)steam->name, 12 /*MAXTEAMNAME*/);

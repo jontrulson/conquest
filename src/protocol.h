@@ -414,7 +414,7 @@ typedef struct {
     uint8_t  pad2;
     uint16_t flags;             /* enabled, coupinfo, etc */
 
-    uint32_t stats[MAXTSTATS];
+    uint32_t stats[MAX_TEAM_STATS];
 
     uint8_t  name[MAXTEAMNAME];
 } spTeam_t;
