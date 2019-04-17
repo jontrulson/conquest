@@ -74,7 +74,15 @@ int semInit(void)
     /* try to create first */
     semflags = CONQSEMPERMS | IPC_CREAT;
 
-    ConquestSemID = semget(key_t(SysConf.semKey), CONQNUMSEMS, semflags);
+    key_t semKey = key_t(SysConf.semKey);
+    if (!semKey)
+    {
+        // cannot be 0
+        utLog("semInit(): semKey cannot be 0.");
+        return -1;
+    }
+
+    ConquestSemID = semget(semKey, CONQNUMSEMS, semflags);
 
     if (ConquestSemID == -1)
     {				/* already exists? */
@@ -85,7 +93,7 @@ int semInit(void)
 
         semflags = CONQSEMPERMS;
 
-        ConquestSemID = semget(key_t(SysConf.semKey), CONQNUMSEMS, semflags);
+        ConquestSemID = semget(semKey, CONQNUMSEMS, semflags);
 
         if (ConquestSemID == -1)
 	{
@@ -184,7 +192,7 @@ void semUnlock(int what)
 {
 #if !defined(MINGW)
     int retval;
-    ushort semvals[25];
+    ushort semvals[CONQNUMSEMS];
     union semun {
         int val;
         struct semid_ds *buf;
@@ -274,13 +282,13 @@ void semUnlock(int what)
 }
 
 
-char *semGetStatusStr(void)
+const char *semGetStatusStr(void)
 {
 #if defined(MINGW)
     return "MINGW: no stats";
 #else
     struct semid_ds SemDS;
-    ushort semvals[25];
+    ushort semvals[CONQNUMSEMS];
     static char buf[80];
     static char stimebuffer[80];
     static char wordtxt[80];
