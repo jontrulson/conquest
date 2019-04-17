@@ -76,7 +76,7 @@ static nodeStatus_t nTeamlDisplay(dspConfig_t *dsp)
 {
     int i, j, lin, col, ctime, etime;
     int godlike;
-    char buf[MSGMAXLINE], timbuf[5][MAXDATESIZE];
+    char buf[MSGMAXLINE], timbuf[5][MAX_DATESIZE];
     real x[5];
     static const char *sfmt="%15s %11s %11s %11s %11s %11s";
     static const char *stats="Statistics since: ";

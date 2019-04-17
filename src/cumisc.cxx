@@ -54,7 +54,7 @@ void mcuHistList()
     int ch;
     static const char *hd0="C O N Q U E S T   U S E R   H I S T O R Y";
     char connecttm[BUFFER_SIZE_256];
-    char histentrytm[MAXDATESIZE + 1];
+    char histentrytm[MAX_DATESIZE + 1];
     char puname[MAX_USERNAME];
 
     /* Do some screen setup. */
@@ -644,7 +644,7 @@ int mcuReviewMsgs( int slm )
 void mcuTeamList()
 {
     int i, j, lin, col = 0, ctime, etime;
-    char buf[MSGMAXLINE], timbuf[5][MAXDATESIZE];
+    char buf[MSGMAXLINE], timbuf[5][MAX_DATESIZE];
     real x[5];
     static const char *sfmt="%15s %11s %11s %11s %11s %11s";
     static const char *stats="Statistics since: ";

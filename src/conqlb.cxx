@@ -1849,7 +1849,7 @@ void clbInitEverything(bool cbIsLocal)
     cbConqInfo->rcpuseconds = 0;
     cbConqInfo->raccum = 0;
 
-    utStrncpy( cbConqInfo->lastupchuck, "never", MAXDATESIZE );
+    utStrncpy( cbConqInfo->lastupchuck, "never", MAX_DATESIZE );
     utFormatTime( cbConqInfo->inittime, 0 );
     utFormatTime( cbConqInfo->conqtime, 0 );
     utStrncpy( cbConqInfo->conqueror, "GOD", MAX_USERNAME );

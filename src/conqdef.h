@@ -142,7 +142,7 @@ typedef enum {
 
 #define MAX_LASTWORDS 60       /* maximum size of conquering remarks */
 
-#define MAXDATESIZE 20          /* hh:mm:ss ddmmmyy */
+#define MAX_DATESIZE 20          /* hh:mm:ss ddmmmyy */
 #define MSGMAXLINE 80           /* maximum size for formatting messages */
 
 /* Tokens for slastmsg(), must be negative. */

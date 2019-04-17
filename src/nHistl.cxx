@@ -75,7 +75,7 @@ static nodeStatus_t nHistlDisplay(dspConfig_t *dsp)
     int i, j, lin, col, fline, lline, thistptr = 0;
     static const char *hd0="C O N Q U E S T   U S E R   H I S T O R Y";
     char connecttm[BUFFER_SIZE_256];
-    char histentrytm[MAXDATESIZE + 1];
+    char histentrytm[MAX_DATESIZE + 1];
     char puname[MAX_USERNAME];
 
     /* Do some screen setup. */
