@@ -148,14 +148,6 @@ typedef enum {
 #define LMSG_NEEDINIT -1        /* need to initialize slastmsg */
 #define LMSG_READALL -2         /* can read all messages */
 
-/* Driver states. */
-#define DRS_OFF 0               /* normal off mode */
-#define DRS_RESTART 1           /* required state for starting a driver */
-#define DRS_STARTING 2          /* transitory starting state */
-#define DRS_RUNNING 3           /* normal running mode */
-#define DRS_HOLDING 4           /* don't execute by will of GOD */
-#define DRS_KAMIKAZE 5          /* used to kill a driver */
-
 /* Tokens for mcuPutThing(), must be negative */
 #define THING_EXPLOSION -1      /* a torpedo explosion */
 

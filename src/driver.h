@@ -31,8 +31,18 @@
 
 #include "conqdef.h"
 
+/* Driver states. */
+enum DriverState : int {
+    DRS_OFF = 0,               /* normal off mode */
+    DRS_RESTART = 1,           /* required state for starting a driver */
+    DRS_STARTING = 2,          /* transitory starting state */
+    DRS_RUNNING = 3,           /* normal running mode */
+    DRS_HOLDING = 4,           /* don't execute by will of GOD */
+    DRS_KAMIKAZE = 5,          /* used to kill a driver */
+};
+
 typedef struct {
-    int  drivstat; /* driver status; one of the DRS_ values */
+    DriverState  drivstat; /* driver status; one of the DRS_ values */
     int  drivpid;  /* pid of the driver process */
     int  drivcnt;  /* number of driver timeouts */
     int  drivsecs; /* phase of the universe in seconds (mod 5 mins) */
