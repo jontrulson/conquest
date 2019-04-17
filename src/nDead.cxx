@@ -104,7 +104,7 @@ void nDeadInit(void)
 
         prm.preinit = false;
         prm.buf.clear();
-        prm.buflen = MAXLASTWORDS;
+        prm.buflen = MAX_LASTWORDS;
     }
 
     /* turn off any running effects */

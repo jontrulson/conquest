@@ -882,7 +882,7 @@ void dead( int snum )
         {
             std::string abuf;
             robreply(abuf);
-            utStrncpy(cbConqInfo->lastwords, abuf.c_str(), MAXLASTWORDS);
+            utStrncpy(cbConqInfo->lastwords, abuf.c_str(), MAX_LASTWORDS);
         }
 
         utLog("conquestd: dead(): sendClientStat failed, fl = 0x%0x\n",
@@ -926,7 +926,7 @@ void dead( int snum )
 
                     /* copy as much of the message as you can. */
                     utStrncpy(cbConqInfo->lastwords,
-                              (char *)cmsg->msg, MAXLASTWORDS);
+                              (char *)cmsg->msg, MAX_LASTWORDS);
                     done = true;
                 }
             }
@@ -937,7 +937,7 @@ void dead( int snum )
             // timed out or error, gen last words
             std::string abuf;
             robreply(abuf);
-            utStrncpy(cbConqInfo->lastwords, abuf.c_str(), MAXLASTWORDS);
+            utStrncpy(cbConqInfo->lastwords, abuf.c_str(), MAX_LASTWORDS);
         }
     }
 

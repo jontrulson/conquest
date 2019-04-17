@@ -915,7 +915,7 @@ spConqInfo_t *spktcbConqInfo(int force)
     utStrncpy((char *)spci.conqueror, cbConqInfo->conqueror, MAX_USERNAME);
     utStrncpy((char *)spci.conqteam, cbConqInfo->conqteam, MAXTEAMNAME);
     utStrncpy((char *)spci.conqtime, cbConqInfo->conqtime, MAXDATESIZE);
-    utStrncpy((char *)spci.lastwords, cbConqInfo->lastwords, MAXLASTWORDS);
+    utStrncpy((char *)spci.lastwords, cbConqInfo->lastwords, MAX_LASTWORDS);
 
     if (memcmp((void *)&spci, (void *)&pktcbConqInfo,
                sizeof(spConqInfo_t)) || force)

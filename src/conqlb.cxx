@@ -1854,7 +1854,7 @@ void clbInitEverything(bool cbIsLocal)
     utFormatTime( cbConqInfo->conqtime, 0 );
     utStrncpy( cbConqInfo->conqueror, "GOD", MAX_USERNAME );
     utStrncpy( cbConqInfo->conqteam, "self ruled", MAXTEAMNAME );
-    utStrncpy( cbConqInfo->lastwords, "Let there be light...", MAXLASTWORDS );
+    utStrncpy( cbConqInfo->lastwords, "Let there be light...", MAX_LASTWORDS );
 
     /* Un-twiddle the lockwords. */
     if (!cbIsLocal)

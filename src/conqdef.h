@@ -140,7 +140,7 @@ typedef enum {
 // maximum updates per second
 #define MAX_UPDATE_PER_SEC 10
 
-#define MAXLASTWORDS 60       /* maximum size of conquering remarks */
+#define MAX_LASTWORDS 60       /* maximum size of conquering remarks */
 
 #define MAXDATESIZE 20          /* hh:mm:ss ddmmmyy */
 #define MSGMAXLINE 80           /* maximum size for formatting messages */

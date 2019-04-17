@@ -51,7 +51,7 @@ typedef struct {
     char conqueror[MAX_USERNAME];   /* user who last conquered */
     char conqteam[MAXTEAMNAME];    /* team s/he was on */
     char conqtime[MAXDATESIZE];    /* time of last conquering */
-    char lastwords[MAXLASTWORDS];  /* remarks upon conquering */
+    char lastwords[MAX_LASTWORDS];  /* remarks upon conquering */
     char inittime[MAXDATESIZE];    /* time the universe was initialized */
     int  conqservPID;              /* the conqserv pid */
 } cbConqInfo_t;
