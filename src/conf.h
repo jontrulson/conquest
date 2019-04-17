@@ -630,7 +630,7 @@ struct Conf ConfData[] =
         CTYPE_NUMERIC,
         "updates_per_sec=",
         &UserConf.UpdatesPerSecond,
-        1, 10,			/* min/max */
+        1, MAX_UPDATE_PER_SEC,			/* min/max */
         "Updates per second (1-10)",
         {
             "# define this as the number of updates per second in which to",

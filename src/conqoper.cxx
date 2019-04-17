@@ -3706,24 +3706,18 @@ void operSetTimer(void)
     }
 
 #ifdef HAVE_SETITIMER
+    if (Context.updsec < 1 || Context.updsec > MAX_UPDATE_PER_SEC)
+        Context.updsec = 1;
 
-    if (Context.updsec >= 1 && Context.updsec <= 10)
+    if (Context.updsec == 1)
     {
-        if (Context.updsec == 1)
-	{
-            itimer.it_value.tv_sec = 1;
-            itimer.it_value.tv_usec = 0;
-	}
-        else
-	{
-            itimer.it_value.tv_sec = 0;
-            itimer.it_value.tv_usec = (1000000 / Context.updsec);
-	}
+        itimer.it_value.tv_sec = 1;
+        itimer.it_value.tv_usec = 0;
     }
     else
     {
         itimer.it_value.tv_sec = 0;
-        itimer.it_value.tv_usec = (1000000 / 2); /* 2/sec */
+        itimer.it_value.tv_usec = (1000000 / Context.updsec);
     }
 
     itimer.it_interval.tv_sec = itimer.it_value.tv_sec;

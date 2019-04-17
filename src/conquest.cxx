@@ -294,7 +294,7 @@ int main(int argc, char *argv[])
     pktSetClientProtocolVersion(PROTOCOL_VERSION);
 
     Context.recmode = RECMODE_OFF;
-    Context.updsec = 10;		/* dflt - 10/sec */
+    Context.updsec = MAX_UPDATE_PER_SEC;		/* dflt - 10/sec */
     Context.msgrand = time(0);
 
     utStrncpy(cInfo.metaServer, META_DFLT_SERVER, MAXHOSTNAME);

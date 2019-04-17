@@ -146,6 +146,8 @@ typedef enum {
 #define CONQINFO_UPDATE_INTERVAL 120
 #define HISTORY_UPDATE_INTERVAL 60
 
+// maximum updates per second
+#define MAX_UPDATE_PER_SEC 10
 
 #define MAXPLANETTYPES 8        /* number of different planet types */
 #define MAXPTYPENAME 20                 /* maximum size of a planet type's name */
