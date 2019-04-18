@@ -105,9 +105,9 @@ typedef struct {
     int weapalloc;              /* weapons allocation - [30-70] */
     int engalloc;               /* engines allocation is 100-sweapons */
     int armies;                 /* armies being carried */
-    bool war[NUMPLAYERTEAMS];   /* teams s/he is at war with - copy */
+    bool war[NUM_PLAYERTEAMS];   /* teams s/he is at war with - copy */
                                 /*  of war */
-    bool rwar[NUMPLAYERTEAMS];  /* teams s/he is at WAR with */
+    bool rwar[NUM_PLAYERTEAMS];  /* teams s/he is at WAR with */
     bool srpwar[ABS_MAXPLANETS];        /* self-ruled planets s/he is at war */
     int sdfuse;                 /* self-destruct fuse, 0 normally */
     int lastmsg;                        /* last message seen */
@@ -117,7 +117,7 @@ typedef struct {
     real lastblast;             /* direction of last weapons usage */
     real lastphase;             /* phaser direction, needed by display(] */
     int pfuse;                  /* tenths until can phaser again */
-    int scanned[NUMPLAYERTEAMS]; /* fuse for which ships have been */
+    int scanned[NUM_PLAYERTEAMS]; /* fuse for which ships have been */
                                 /*  scanned by which teams */
     int action;                 /* current action token if a robot */
     unsigned int ctime;         /* cpu hundredths at last check */

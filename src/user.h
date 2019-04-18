@@ -105,7 +105,7 @@ typedef struct {
     int team;			/* user's team */
     real rating;		/* user's rating */
     time_t lastentry;		/* last entry time */
-    bool war[NUMPLAYERTEAMS];	/* teams you're at war with */
+    bool war[NUM_PLAYERTEAMS];	/* teams you're at war with */
     char username[MAX_USERNAME];	/* user's name (login name) */
     char pw[MAX_USERNAME];	/* user's password if server login */
     char alias[MAX_USERNAME];	/* user's pseudonym */

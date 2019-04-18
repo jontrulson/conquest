@@ -50,7 +50,7 @@ typedef struct
     real dx;                    /* x and y increments */
     real dy;                    /*  in mega-meters per iter seconds */
     real mult;                  /* multiplier when detonated */
-    int war[NUMPLAYERTEAMS];    /* copy of war when fired */
+    int war[NUM_PLAYERTEAMS];    /* copy of war when fired */
 } Torp_t;
 
 #endif /* TORP_H_INCLUDED */

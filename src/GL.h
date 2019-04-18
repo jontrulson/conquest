@@ -58,7 +58,7 @@ typedef struct _glship {
 } GLShip_t;
 
 #if defined(NOEXTERN_GL)
-GLShip_t GLShips[NUMPLAYERTEAMS][MAXNUMSHIPTYPES] = {};
+GLShip_t GLShips[NUM_PLAYERTEAMS][MAXNUMSHIPTYPES] = {};
 
 /* the LR scaling array (-5 - 5) */
 const GLfloat scaleFactorsLR[10] = {
@@ -104,7 +104,7 @@ uint32_t GLGeoChange = 0;
 textureIdx_t tacRing1K, tacRing2K, tacRing3K, tacRingXK, tacRing10K;
 
 #else
-extern GLShip_t GLShips[NUMPLAYERTEAMS][MAXNUMSHIPTYPES];
+extern GLShip_t GLShips[NUM_PLAYERTEAMS][MAXNUMSHIPTYPES];
 
 extern GLfloat  scaleFactorsLR[10];
 extern GLfloat  scaleFactorsSR[10];

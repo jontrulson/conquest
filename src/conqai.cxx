@@ -233,7 +233,7 @@ void defend( int attacker, int pnum )
 
     team = cbPlanets[pnum].team;
     /* Must be for a "fighting" team. */
-    if ( team < 0 || team >= NUMPLAYERTEAMS )
+    if ( team < 0 || team >= NUM_PLAYERTEAMS )
         return;
 
     // must be a home planet, and the planet's defendteam must equal
@@ -580,7 +580,7 @@ int newrob( int *snum, int unum )
     cbShips[*snum].engalloc = 100 - cbShips[*snum].weapalloc;
 
     int i;
-    for ( i=0; i<NUMPLAYERTEAMS; i++ )
+    for ( i=0; i<NUM_PLAYERTEAMS; i++ )
     {
         /* Robots are peace (and fun) loving. */
         cbShips[*snum].rwar[i] = false;

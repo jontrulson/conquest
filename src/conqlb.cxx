@@ -231,7 +231,7 @@ void clbIKill(int snum, killedBy_t kb, uint16_t detail)
     }
 
     /* Zero team scan fuses. */
-    for ( i = 0; i < NUMPLAYERTEAMS; i++ )
+    for ( i = 0; i < NUM_PLAYERTEAMS; i++ )
         cbShips[snum].scanned[i] = 0;
 
     if ( kb == KB_CONQUER )
@@ -539,7 +539,7 @@ int clbLaunch( int snum, real dir, int number, int ltype )
             cbShips[snum].torps[tslot[i]].mult = (real)weaeff( snum );
 	}
 
-        for ( j = 0; j < NUMPLAYERTEAMS; j = j + 1 )
+        for ( j = 0; j < NUM_PLAYERTEAMS; j = j + 1 )
 	{
             if (ltype == LAUNCH_EXPLODE)
 	    {			/* if our ship is exploding we're at war
@@ -728,7 +728,7 @@ int clbRegister( const std::string& lname, const std::string& rname,
             for ( j = 0; j < MAX_USER_STATS; j = j + 1 )
                 cbUsers[i].stats[j] = 0;
 
-            for ( j = 0; j < NUMPLAYERTEAMS; j = j + 1 )
+            for ( j = 0; j < NUM_PLAYERTEAMS; j = j + 1 )
                 cbUsers[i].war[j] = true;
             cbUsers[i].war[cbUsers[i].team] = false;
 
@@ -882,7 +882,7 @@ int clbTakePlanet( int pnum, int snum )
     cbConqInfo->lastwords[0] = 0;
     cbUsers[cbShips[snum].unum].stats[USTAT_CONQUERS] += 1;
     cbTeams[cbShips[snum].team].stats[TSTAT_CONQUERS] += 1;
-    utStrncpy( cbConqInfo->conqteam, cbTeams[cbShips[snum].team].name, MAXTEAMNAME );
+    utStrncpy( cbConqInfo->conqteam, cbTeams[cbShips[snum].team].name, MAX_TEAMNAME );
 
     utLog("INFO: %s (%s) has Conquered the Universe!",
           cbUsers[cbShips[snum].unum].username,
@@ -1146,7 +1146,7 @@ int clbZeroPlanet( int pnum, int snum )
     cbPlanets[pnum].armies = 0;
 
     /* Make the planet not scanned. */
-    for ( i = 0; i < NUMPLAYERTEAMS; i++ )
+    for ( i = 0; i < NUM_PLAYERTEAMS; i++ )
         cbPlanets[pnum].scanned[i] = false;
 
     /* check for genos here */
@@ -1198,9 +1198,9 @@ int clbZeroPlanet( int pnum, int snum )
 
 std::string clbWarPrompt(int snum, int twar[])
 {
-    char peace[NUMPLAYERTEAMS], war[NUMPLAYERTEAMS];
+    char peace[NUM_PLAYERTEAMS], war[NUM_PLAYERTEAMS];
 
-    for ( int i=0; i<NUMPLAYERTEAMS; i++ )
+    for ( int i=0; i<NUM_PLAYERTEAMS; i++ )
     {
         if ( twar[i] )
         {
@@ -1287,7 +1287,7 @@ int clbCanRead( int snum, int msgnum )
     {
         /* We can only read team messages if we're not self-war. */
         if ( to == MSG_TO_TEAM
-             && toDetail < NUMALLTEAMS
+             && toDetail < NUM_ALLTEAMS
              && ((int)toDetail == cbShips[snum].team)
              && !selfwar(snum) )
             return ( true );
@@ -1593,7 +1593,7 @@ int clbFindSpecial( int snum, InfoSpecial token, int count, int *sorpnum,
         break;
     case SPECIAL_HOMEPLANET:
         /* Home planet. */
-        if (cbShips[snum].team < NUMPLAYERTEAMS) // better be...
+        if (cbShips[snum].team < NUM_PLAYERTEAMS) // better be...
             *sorpnum = cbTeams[cbShips[snum].team].homeplanet;
         else
             return false;
@@ -1661,7 +1661,7 @@ int clbFindSpecial( int snum, InfoSpecial token, int count, int *sorpnum,
 
         /* Determine if we at peace with all teams. */
         peaceful = true;
-        for ( i = 0; i < NUMPLAYERTEAMS; i++ )
+        for ( i = 0; i < NUM_PLAYERTEAMS; i++ )
             if ( cbShips[snum].war[i] )
             {
                 peaceful = false;
@@ -1830,7 +1830,7 @@ void clbInitEverything(bool cbIsLocal)
     cbConqInfo->lockmesg = 0;
 
     /* Zero team stats. */
-    for ( i = 0; i < NUMPLAYERTEAMS; i++ )
+    for ( i = 0; i < NUM_PLAYERTEAMS; i++ )
         for ( j = 0; j < MAX_TEAM_STATS; j = j + 1 )
             cbTeams[i].stats[j] = 0;
 
@@ -1853,7 +1853,7 @@ void clbInitEverything(bool cbIsLocal)
     utFormatTime( cbConqInfo->inittime, 0 );
     utFormatTime( cbConqInfo->conqtime, 0 );
     utStrncpy( cbConqInfo->conqueror, "GOD", MAX_USERNAME );
-    utStrncpy( cbConqInfo->conqteam, "self ruled", MAXTEAMNAME );
+    utStrncpy( cbConqInfo->conqteam, "self ruled", MAX_TEAMNAME );
     utStrncpy( cbConqInfo->lastwords, "Let there be light...", MAX_LASTWORDS );
 
     /* Un-twiddle the lockwords. */
@@ -2010,7 +2010,7 @@ void clbInitShip( int snum, int unum )
     cbShips[snum].engalloc = 100 - cbShips[snum].weapalloc;
     cbShips[snum].armies = 0;
     /* cbShips[snum].option                 # setup in menu() */
-    for ( i = 0; i < NUMPLAYERTEAMS; i++ )
+    for ( i = 0; i < NUM_PLAYERTEAMS; i++ )
     {
         /* cbShips[snum].rwar               # setup in menu() or newrob() */
         /* cbShips[snum].war                # setup in menu() or newrob() */
@@ -2052,7 +2052,7 @@ void clbInitShip( int snum, int unum )
         cbShips[snum].torps[i].dx = 0.0;
         cbShips[snum].torps[i].dy = 0.0;
         cbShips[snum].torps[i].mult = 0.0;
-        for ( j = 0; j < NUMPLAYERTEAMS; j = j + 1 )
+        for ( j = 0; j < NUM_PLAYERTEAMS; j = j + 1 )
             cbShips[snum].torps[i].war[j] = false;
     }
 
@@ -2128,14 +2128,14 @@ void clbInitUniverse(bool cbIsLocal)
     cbTeams[TEAM_ROMULAN].shiptype = ST_CRUISER;
     cbTeams[TEAM_ORION].shiptype = ST_SCOUT;
 
-    utStrncpy( cbTeams[TEAM_FEDERATION].name, "Federation", MAXTEAMNAME );
-    utStrncpy( cbTeams[TEAM_ROMULAN].name, "Romulan", MAXTEAMNAME );
-    utStrncpy( cbTeams[TEAM_KLINGON].name, "Klingon", MAXTEAMNAME );
-    utStrncpy( cbTeams[TEAM_ORION].name, "Orion", MAXTEAMNAME );
-    utStrncpy( cbTeams[TEAM_SELFRULED].name, "self ruled", MAXTEAMNAME );
-    utStrncpy( cbTeams[TEAM_NOTEAM].name, "non", MAXTEAMNAME );
-    utStrncpy( cbTeams[TEAM_GOD].name, "GOD", MAXTEAMNAME );
-    utStrncpy( cbTeams[TEAM_EMPIRE].name, "Empire", MAXTEAMNAME );
+    utStrncpy( cbTeams[TEAM_FEDERATION].name, "Federation", MAX_TEAMNAME );
+    utStrncpy( cbTeams[TEAM_ROMULAN].name, "Romulan", MAX_TEAMNAME );
+    utStrncpy( cbTeams[TEAM_KLINGON].name, "Klingon", MAX_TEAMNAME );
+    utStrncpy( cbTeams[TEAM_ORION].name, "Orion", MAX_TEAMNAME );
+    utStrncpy( cbTeams[TEAM_SELFRULED].name, "self ruled", MAX_TEAMNAME );
+    utStrncpy( cbTeams[TEAM_NOTEAM].name, "non", MAX_TEAMNAME );
+    utStrncpy( cbTeams[TEAM_GOD].name, "GOD", MAX_TEAMNAME );
+    utStrncpy( cbTeams[TEAM_EMPIRE].name, "Empire", MAX_TEAMNAME );
 
     cbConqInfo->chrplanets[PLANET_CLASSM] = 'M';
     cbConqInfo->chrplanets[PLANET_DEAD] = 'D';
@@ -2381,7 +2381,7 @@ int clbFmtMsg(msgFrom_t from, uint16_t fromDetail, msgTo_t to,
     /* Format who the message is to. */
     if ( to == MSG_TO_SHIP && toDetail < cbLimits.maxShips() )
         buf += utShipStr((int)toDetail);
-    else if ( to == MSG_TO_TEAM && toDetail < NUMPLAYERTEAMS )
+    else if ( to == MSG_TO_TEAM && toDetail < NUM_PLAYERTEAMS )
     {
         buf += cbTeams[toDetail].teamchar;
     }
@@ -2704,7 +2704,7 @@ void clbZeroShip( int snum )
     cbShips[snum].engalloc = 0;
     cbShips[snum].armies = 0;
     cbShips[snum].shiptype = ST_SCOUT;
-    for ( i = 0; i < NUMPLAYERTEAMS; i++ )
+    for ( i = 0; i < NUM_PLAYERTEAMS; i++ )
     {
         cbShips[snum].rwar[i] = false;
         cbShips[snum].war[i] = false;
@@ -2740,7 +2740,7 @@ void clbZeroShip( int snum )
         cbShips[snum].torps[i].dx = 0.0;
         cbShips[snum].torps[i].dy = 0.0;
         cbShips[snum].torps[i].mult = 0.0;
-        for ( j = 0; j < NUMPLAYERTEAMS; j = j + 1 )
+        for ( j = 0; j < NUM_PLAYERTEAMS; j = j + 1 )
             cbShips[snum].torps[i].war[j] = false;
     }
 
@@ -3027,7 +3027,7 @@ void clbCheckShips(int isDriver)
 // Find a team's home sun, if they have one
 bool clbFindTeamHomeSun(int team, int *pnum)
 {
-    if (team < 0 || team >= NUMPLAYERTEAMS || !pnum)
+    if (team < 0 || team >= NUM_PLAYERTEAMS || !pnum)
         return false;
 
     int primary = cbPlanets[cbTeams[team].homeplanet].primary;
@@ -3061,7 +3061,7 @@ const vector<int>& clbGetEnabledTeams()
 
     enabledTeams.clear();
 
-    for (int j=0; j<NUMPLAYERTEAMS; j++)
+    for (int j=0; j<NUM_PLAYERTEAMS; j++)
         if (TEAM_ENABLED(j))
             enabledTeams.push_back(j);
 

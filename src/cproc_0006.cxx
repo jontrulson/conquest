@@ -79,7 +79,7 @@ int proc_0006_User(char *buf)
     if (suser->flags & SP_0006_USER_FLAGS_LIVE)
         UFSET(unum, USER_F_LIVE);
 
-    for (i=0; i<NUMPLAYERTEAMS; i++)
+    for (i=0; i<NUM_PLAYERTEAMS; i++)
         if ((suser->war & (1 << i)))
             cbUsers[unum].war[i] = true;
 
@@ -186,7 +186,7 @@ int proc_0006_Ship(char *buf)
         SFCLR(snum, SHIP_F_TOWEDBY);
     }
 
-    for (i=0; i<4 /*NUMPLAYERTEAMS*/; i++)
+    for (i=0; i<4 /*NUM_PLAYERTEAMS*/; i++)
     {
         if (sship->war & (1 << i))
             cbShips[snum].war[i] = true;
@@ -207,7 +207,7 @@ int proc_0006_Ship(char *buf)
     for (i=0; i<(40 + 20)/*MAXPLANETS*/; i++)
         cbShips[snum].srpwar[i] = (bool)sship->srpwar[i+1];
 
-    for (i=0; i<4 /*NUMPLAYERTEAMS*/; i++)
+    for (i=0; i<4 /*NUM_PLAYERTEAMS*/; i++)
         cbShips[snum].scanned[i] = (int)sship->scanned[i];
 
     sship->alias[24 /*MAXUSERALIAS*/ - 1] = 0;
@@ -374,7 +374,7 @@ int proc_0006_PlanetSml(char *buf)
     if (pnum < 0 || pnum >= (40 + 20) /*MAXPLANETS*/)
         return false;
 
-    for (i=0; i<4 /*NUMPLAYERTEAMS*/; i++)
+    for (i=0; i<4 /*NUM_PLAYERTEAMS*/; i++)
         if (splansml->scanned & (1 << i))
             cbPlanets[pnum].scanned[i] = true;
         else
@@ -520,7 +520,7 @@ int proc_0006_TorpLoc(char *buf)
     if (tnum < 0 || tnum >= 9 /*MAXTORPS*/)
         return false;
 
-    for (i=0; i<4 /*NUMPLAYERTEAMS*/; i++)
+    for (i=0; i<4 /*NUM_PLAYERTEAMS*/; i++)
         if (storploc->war & (1 << i))
             cbShips[snum].torps[tnum].war[i] = true;
         else
@@ -553,7 +553,7 @@ int proc_0006_TorpEvent(char *buf)
 
     cbShips[snum].torps[tnum].status = static_cast<TorpStatus>(storpev->status);
 
-    for (i=0; i<4 /*NUMPLAYERTEAMS*/; i++)
+    for (i=0; i<4 /*NUM_PLAYERTEAMS*/; i++)
         if (storpev->war & (1 << i))
             cbShips[snum].torps[tnum].war[i] = true;
         else
@@ -655,7 +655,7 @@ int proc_0006_Message(char *buf)
         // here, it's from a team, or one of the special MSG_* in
         // older versions proto/cb. Try teams first.
 
-        if (-smsg->to >= 0 && -smsg->to < 4 /*NUMPLAYERTEAMS*/)
+        if (-smsg->to >= 0 && -smsg->to < 4 /*NUM_PLAYERTEAMS*/)
         {
             realTo = MSG_TO_TEAM;
             realToDetail = (uint16_t)(smsg->to * -1);
@@ -714,7 +714,7 @@ int proc_0006_Team(char *buf)
 
     team = steam->team;
 
-    if (team < 0 || team >= 8 /*NUMALLTEAMS*/)
+    if (team < 0 || team >= 8 /*NUM_ALLTEAMS*/)
         return false;
 
     // this doesn't exist in current cb
@@ -739,7 +739,7 @@ int proc_0006_Team(char *buf)
     for (i=0; i<20 /*MAX_TEAM_STATS*/; i++)
         cbTeams[team].stats[i] = (int)ntohl(steam->stats[i]);
 
-    utStrncpy(cbTeams[team].name, (char *)steam->name, 12 /*MAXTEAMNAME*/);
+    utStrncpy(cbTeams[team].name, (char *)steam->name, 12 /*MAX_TEAMNAME*/);
 
     return true;
 }

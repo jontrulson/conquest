@@ -116,7 +116,7 @@ int procUser(char *buf)
     cbUsers[unum].flags = ntohs(suser->flags);
     cbUsers[unum].opFlags = ntohs(suser->opFlags);
 
-    for (i=0; i<NUMPLAYERTEAMS; i++)
+    for (i=0; i<NUM_PLAYERTEAMS; i++)
         if ((suser->war & (1 << i)))
             cbUsers[unum].war[i] = true;
 
@@ -160,7 +160,7 @@ int procShip(char *buf)
           cbShips[snum].shiptype);
 #endif
 
-    for (i=0; i<NUMPLAYERTEAMS; i++)
+    for (i=0; i<NUM_PLAYERTEAMS; i++)
     {
         if (sship->war & (1 << i))
             cbShips[snum].war[i] = true;
@@ -195,7 +195,7 @@ int procShip(char *buf)
             cbShips[snum].srpwar[i] = false;
     }
 
-    for (i=0; i<NUMPLAYERTEAMS; i++)
+    for (i=0; i<NUM_PLAYERTEAMS; i++)
         cbShips[snum].scanned[i] = (int)sship->scanned[i];
 
     sship->alias[MAX_USERNAME - 1] = 0;
@@ -325,7 +325,7 @@ int procPlanetSml(char *buf)
     if (pnum < 0 || pnum >= cbLimits.maxPlanets())
         return false;
 
-    for (i=0; i<NUMPLAYERTEAMS; i++)
+    for (i=0; i<NUM_PLAYERTEAMS; i++)
         if (splansml->scanned & (1 << i))
             cbPlanets[pnum].scanned[i] = true;
         else
@@ -429,7 +429,7 @@ int procTorpLoc(char *buf)
     if (tnum < 0 || tnum >= cbLimits.maxTorps())
         return false;
 
-    for (i=0; i<NUMPLAYERTEAMS; i++)
+    for (i=0; i<NUM_PLAYERTEAMS; i++)
         if (storploc->war & (1 << i))
             cbShips[snum].torps[tnum].war[i] = true;
         else
@@ -463,7 +463,7 @@ int procTorpEvent(char *buf)
 
     cbShips[snum].torps[tnum].status = static_cast<TorpStatus>(storpev->status);
 
-    for (i=0; i<NUMPLAYERTEAMS; i++)
+    for (i=0; i<NUM_PLAYERTEAMS; i++)
         if (storpev->war & (1 << i))
             cbShips[snum].torps[tnum].war[i] = true;
         else
@@ -552,7 +552,7 @@ int procTeam(char *buf)
 
     team = steam->team;
 
-    if (team < 0 || team >= NUMALLTEAMS)
+    if (team < 0 || team >= NUM_ALLTEAMS)
         return false;
 
     cbTeams[team].flags = ntohs(steam->flags);
@@ -564,7 +564,7 @@ int procTeam(char *buf)
     for (i=0; i<MAX_TEAM_STATS; i++)
         cbTeams[team].stats[i] = (int)ntohl(steam->stats[i]);
 
-    utStrncpy(cbTeams[team].name, (char *)steam->name, MAXTEAMNAME);
+    utStrncpy(cbTeams[team].name, (char *)steam->name, MAX_TEAMNAME);
 
     return true;
 }
@@ -594,7 +594,7 @@ int procConqInfo(char *buf)
         return false;
 
     utStrncpy(cbConqInfo->conqueror, (char *)spci->conqueror, MAX_USERNAME);
-    utStrncpy(cbConqInfo->conqteam, (char *)spci->conqteam, MAXTEAMNAME);
+    utStrncpy(cbConqInfo->conqteam, (char *)spci->conqteam, MAX_TEAMNAME);
     utStrncpy(cbConqInfo->conqtime, (char *)spci->conqtime, MAX_DATESIZE);
     utStrncpy(cbConqInfo->lastwords, (char *)spci->lastwords, MAX_LASTWORDS);
 

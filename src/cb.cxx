@@ -107,7 +107,7 @@ static void _mapCBVariables(bool doAssign)
 
     MAP_VARIABLE(cbPlanets, Planet_t, cbLimits.maxPlanets(), doAssign);
 
-    MAP_VARIABLE(cbTeams, Team_t, NUMALLTEAMS, doAssign);
+    MAP_VARIABLE(cbTeams, Team_t, NUM_ALLTEAMS, doAssign);
 
     MAP_VARIABLE(cbDoomsday, Doomsday_t, 1, doAssign);
 

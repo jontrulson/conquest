@@ -379,7 +379,7 @@ void debugdisplay( int snum )
     /* int salastmsg(snum)		# last message allowed to be seen */
     /* int smap(snum)			# strategic map or not */
     /* int spfuse(snum)			# tenths until phasers can be fired */
-    /* int sscanned(snum,NUMPLAYERTEAMS)	# fuse for which ships have been */
+    /* int sscanned(snum,NUM_PLAYERTEAMS)	# fuse for which ships have been */
     /* int stalert(snum)			# torp alert! */
     /* int sctime(snum)			# cpu hundreths at last check */
     /* int setime(snum)			# elapsed hundreths at last check */
@@ -594,25 +594,25 @@ void debugdisplay( int snum )
     lin++;
     cprintf(lin,tcol,ALIGN_NONE,"#%d#%s",LabelColor, "      swar:");
     buf[0] = '(';
-    for ( i = 0; i < NUMPLAYERTEAMS; i = i + 1 )
+    for ( i = 0; i < NUM_PLAYERTEAMS; i = i + 1 )
         if ( cbShips[snum].war[i] )
             buf[i+1] = cbTeams[i].teamchar;
         else
             buf[i+1] = '-';
-    buf[NUMPLAYERTEAMS+1] = ')';
-    buf[NUMPLAYERTEAMS+2] = 0;
+    buf[NUM_PLAYERTEAMS+1] = ')';
+    buf[NUM_PLAYERTEAMS+2] = 0;
     cprintf(lin,dcol,ALIGN_NONE,"#%d#%s",InfoColor, buf);
 
     lin++;
     cprintf(lin,tcol,ALIGN_NONE,"#%d#%s",LabelColor, "     srwar:");
     buf[0] = '(';
-    for ( i = 0; i < NUMPLAYERTEAMS; i = i + 1 )
+    for ( i = 0; i < NUM_PLAYERTEAMS; i = i + 1 )
         if ( cbShips[snum].rwar[i] )
             buf[i+1] = cbTeams[i].teamchar;
         else
             buf[i+1] = '-';
-    buf[NUMPLAYERTEAMS+1] = ')';
-    buf[NUMPLAYERTEAMS+2] = 0;
+    buf[NUM_PLAYERTEAMS+1] = ')';
+    buf[NUM_PLAYERTEAMS+2] = 0;
     cprintf(lin,dcol,ALIGN_NONE,"#%d#%s",InfoColor, buf);
 
     lin ++;
@@ -671,13 +671,13 @@ void debugdisplay( int snum )
             cprintf(lin,46,ALIGN_NONE,"#%d#%9g",InfoColor, oneplace(cbShips[snum].torps[i].dx));
             cprintf(lin,55,ALIGN_NONE,"#%d#%9g",InfoColor, oneplace(cbShips[snum].torps[i].dy));
             buf[0] = '(';
-            for ( j = 0; j < NUMPLAYERTEAMS; j++ )
+            for ( j = 0; j < NUM_PLAYERTEAMS; j++ )
                 if ( cbShips[snum].torps[i].war[j] )
                     buf[j+1] = cbTeams[j].teamchar;
                 else
                     buf[j+1] = '-';
-            buf[NUMPLAYERTEAMS+1] = ')';
-            buf[NUMPLAYERTEAMS+2] = 0;
+            buf[NUM_PLAYERTEAMS+1] = ')';
+            buf[NUM_PLAYERTEAMS+2] = 0;
             cprintf(lin,67,ALIGN_NONE,"#%d#%s",InfoColor, buf);
 	}
     }
@@ -765,7 +765,7 @@ void debugplan(void)
                 PlanetIdx++;
                 k = sv[i];
 
-                for ( j = 0; j < NUMPLAYERTEAMS; j++ )
+                for ( j = 0; j < NUM_PLAYERTEAMS; j++ )
                     if ( cbPlanets[k].scanned[j] )
                         junk[j] = cbTeams[j].teamchar;
                     else
@@ -1823,13 +1823,13 @@ void oppedit(void)
         lin++;
         cprintf(lin,col,ALIGN_NONE,sfmt, "s", "  Scanned by:\n");
         buf[0] = '(';
-        for ( i = 1; i <= NUMPLAYERTEAMS; i = i + 1 )
+        for ( i = 1; i <= NUM_PLAYERTEAMS; i = i + 1 )
             if ( cbPlanets[pnum].scanned[i - 1] )
                 buf[i] = cbTeams[i - 1].teamchar;
             else
                 buf[i] = '-';
-        buf[NUMPLAYERTEAMS+1] = ')';
-        buf[NUMPLAYERTEAMS+2] = '\0';
+        buf[NUM_PLAYERTEAMS+1] = ')';
+        buf[NUM_PLAYERTEAMS+2] = '\0';
         cprintf( lin, datacol,ALIGN_NONE, "#%d#%s",InfoColor, buf);
 
         lin++;
@@ -1932,7 +1932,7 @@ void oppedit(void)
 	case 'T':
             /* Rotate owner team. */
             cbPlanets[pnum].team =
-                mod( cbPlanets[pnum].team + 1, NUMALLTEAMS );
+                mod( cbPlanets[pnum].team + 1, NUM_ALLTEAMS );
             break;
 	case 't':
             /* Rotate planet type. */
@@ -1971,7 +1971,7 @@ void oppedit(void)
             cdmove( MSG_LIN1, 20 );
             cdrefresh();
             ch = (char)toupper( iogchar() );
-            for ( i = 0; i < NUMPLAYERTEAMS; i = i + 1 )
+            for ( i = 0; i < NUM_PLAYERTEAMS; i = i + 1 )
                 if ( ch == cbTeams[i].teamchar )
                 {
                     cbPlanets[pnum].scanned[i] = ! cbPlanets[pnum].scanned[i];
@@ -2179,7 +2179,7 @@ void oprobot(void)
         /* If requested, make the robot war-like. */
         if ( warlike )
 	{
-            for ( j = 0; j < NUMPLAYERTEAMS; j = j + 1 )
+            for ( j = 0; j < NUM_PLAYERTEAMS; j = j + 1 )
                 cbShips[snum].war[j] = true;
             cbShips[snum].war[cbShips[snum].team] = false;
 	}
@@ -2433,11 +2433,11 @@ void opuadd(void)
             return;
 	}
         else if ( ch == TERM_EXTRA && buf[0] == 0 )
-            team = rndint( 0, NUMPLAYERTEAMS - 1);
+            team = rndint( 0, NUM_PLAYERTEAMS - 1);
         else
 	{
             ch = (char)toupper( buf[0] );
-            for ( i = 0; i < NUMPLAYERTEAMS; i++ )
+            for ( i = 0; i < NUM_PLAYERTEAMS; i++ )
                 if ( cbTeams[i].teamchar == ch )
                 {
                     team = i;
@@ -2552,13 +2552,13 @@ void opuedit(void)
         lin++;
         cprintf(lin,tcol,ALIGN_NONE,"#%d#%s", LabelColor,"             Uwar:");
         buf[0] = '(';
-        for ( i = 0; i < NUMPLAYERTEAMS; i = i + 1 )
+        for ( i = 0; i < NUM_PLAYERTEAMS; i = i + 1 )
             if ( cbUsers[unum].war[i] )
                 buf[i+1] = cbTeams[i].teamchar;
             else
                 buf[i+1] = '-';
-        buf[NUMPLAYERTEAMS+1] = ')';
-        buf[NUMPLAYERTEAMS+2] = 0;
+        buf[NUM_PLAYERTEAMS+1] = ')';
+        buf[NUM_PLAYERTEAMS+2] = 0;
         cprintf(lin,dcol,ALIGN_NONE,"#%d#%s",InfoColor, buf);
 
         lin++;
@@ -2583,7 +2583,7 @@ void opuedit(void)
         lin++;
         cprintf(lin,tcol,ALIGN_NONE,"#%d#%s", LabelColor,"             Team:");
         i = cbUsers[unum].team;
-        if ( i < 0 || i >= NUMPLAYERTEAMS )
+        if ( i < 0 || i >= NUM_PLAYERTEAMS )
             cprintf(lin,dcol,ALIGN_NONE,"#%d#%0d",InfoColor, i);
         else
             cprintf(lin,dcol,ALIGN_NONE,"#%d#%s",InfoColor, cbTeams[i].name);
@@ -2869,7 +2869,7 @@ void opuedit(void)
             else if ( left && row == 2 )
 	    {
                 /* Team. */
-                cbUsers[unum].team = mod( cbUsers[unum].team + 1, NUMPLAYERTEAMS );
+                cbUsers[unum].team = mod( cbUsers[unum].team + 1, NUM_PLAYERTEAMS );
 	    }
             else if ( ! left && row == 2 )
 	    {

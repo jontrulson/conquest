@@ -111,7 +111,7 @@ void cucSendMsg( msgFrom_t from, uint16_t fromDetail, int terse, int remote )
         {
             sprintf( buf, "%d", toDetail );
         }
-        else if ( to == MSG_TO_TEAM && toDetail < NUMPLAYERTEAMS )
+        else if ( to == MSG_TO_TEAM && toDetail < NUM_PLAYERTEAMS )
         {
             strcpy(buf , cbTeams[toDetail].name) ;
         }
@@ -190,12 +190,12 @@ void cucSendMsg( msgFrom_t from, uint16_t fromDetail, int terse, int remote )
             else
             {
                 /* Check for a team character. */
-                for ( i = 0; i < NUMPLAYERTEAMS; i++ )
+                for ( i = 0; i < NUM_PLAYERTEAMS; i++ )
                     if ( buf[0] == cbTeams[i].teamchar
                          || buf[0] == (char)tolower(cbTeams[i].teamchar) )
                         break;
 
-                if ( i >= NUMPLAYERTEAMS )
+                if ( i >= NUM_PLAYERTEAMS )
                 {
                     uiPutMsg( huh, MSG_LIN2 );
                     return;
@@ -219,7 +219,7 @@ void cucSendMsg( msgFrom_t from, uint16_t fromDetail, int terse, int remote )
         utAppendShip(buf, (int)toDetail) ;
         utAppendChar(buf, ':') ;
     }
-    else if ( to == MSG_TO_TEAM && toDetail < NUMPLAYERTEAMS )
+    else if ( to == MSG_TO_TEAM && toDetail < NUM_PLAYERTEAMS )
     {
         strcat(buf , cbTeams[toDetail].name) ;
         strcat(buf , "s:") ;

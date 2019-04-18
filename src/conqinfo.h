@@ -49,7 +49,7 @@ typedef struct {
     char ptname[MAXPLANETTYPES][MAXPTYPENAME]; /* planet type names */
     char chrplanets[MAXPLANETTYPES]; /* class M = M, dead = D, sun = S */
     char conqueror[MAX_USERNAME];   /* user who last conquered */
-    char conqteam[MAXTEAMNAME];    /* team s/he was on */
+    char conqteam[MAX_TEAMNAME];    /* team s/he was on */
     char conqtime[MAX_DATESIZE];    /* time of last conquering */
     char lastwords[MAX_LASTWORDS];  /* remarks upon conquering */
     char inittime[MAX_DATESIZE];    /* time the universe was initialized */

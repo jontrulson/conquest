@@ -134,7 +134,7 @@ static int lastone, msg;        /* saved for scrolling */
 static int dirup, upmax, downmax, beamax;
 
 /* war vars */
-static int twar[NUMPLAYERTEAMS];
+static int twar[NUM_PLAYERTEAMS];
 
 /* the current prompt */
 static prm_t prm;
@@ -192,7 +192,7 @@ static scrNode_t nCPNode = {
 static animVec_t animVec;
 
 /* team torp anim states (exported) */
-animStateRec_t ncpTorpAnims[NUMPLAYERTEAMS];
+animStateRec_t ncpTorpAnims[NUM_PLAYERTEAMS];
 
 /* convert a KP key into an angle */
 static int _KPAngle(int ch, real *angle)
@@ -650,7 +650,7 @@ static void _domsgto(const std::string& buf, int ch, int terse)
         /* Make up a default string using the last target. */
         if ( to == MSG_TO_SHIP && toDetail < cbLimits.maxShips() )
             tbuf = fmt::format("{}", (int)toDetail );
-        else if ( to == MSG_TO_TEAM && toDetail < NUMPLAYERTEAMS )
+        else if ( to == MSG_TO_TEAM && toDetail < NUM_PLAYERTEAMS )
             tbuf = cbTeams[toDetail].name;
         else switch ( to )
              {
@@ -739,12 +739,12 @@ static void _domsgto(const std::string& buf, int ch, int terse)
              else
              {
                  /* Check for a team character. */
-                 for ( i = 0; i < NUMPLAYERTEAMS; i = i + 1 )
+                 for ( i = 0; i < NUM_PLAYERTEAMS; i = i + 1 )
                      if ( tbuf[0] == cbTeams[i].teamchar
                           || tbuf[0] == (char)tolower(cbTeams[i].teamchar) )
                          break;
 
-                 if ( i >= NUMPLAYERTEAMS )
+                 if ( i >= NUM_PLAYERTEAMS )
                  {
                      uiPutMsg( huh, MSG_LIN2 );
                      hudClearPrompt(MSG_LIN1);
@@ -774,7 +774,7 @@ static void _domsgto(const std::string& buf, int ch, int terse)
         utAppendShip(tbuf, (int)toDetail);
         tbuf += ':';
     }
-    else if ( to == MSG_TO_TEAM && toDetail < NUMPLAYERTEAMS )
+    else if ( to == MSG_TO_TEAM && toDetail < NUM_PLAYERTEAMS )
     {
         tbuf += cbTeams[toDetail].name;
         tbuf += "s:";
@@ -1780,7 +1780,7 @@ static void command( int ch )
         setONode(nUserlInit(DSP_NODE_CP, false, Context.snum, false, false));
         break;
     case 'W':				/* war and peace */
-        for ( i = 0; i < NUMPLAYERTEAMS; i = i + 1 )
+        for ( i = 0; i < NUM_PLAYERTEAMS; i = i + 1 )
             twar[i] = cbShips[Context.snum].war[i];
 
         state = S_WAR;
@@ -2067,9 +2067,9 @@ static void themes()
 
     /* first choose whether we will play theme or intro music */
     if (rnd() < 0.5)
-        mus = cqsTeamMusic[rndint(0, NUMPLAYERTEAMS - 1)].theme;
+        mus = cqsTeamMusic[rndint(0, NUM_PLAYERTEAMS - 1)].theme;
     else
-        mus = cqsTeamMusic[rndint(0, NUMPLAYERTEAMS - 1)].intro;
+        mus = cqsTeamMusic[rndint(0, NUM_PLAYERTEAMS - 1)].intro;
 
     /* now play it */
     cqsMusicPlay(mus, false);
@@ -2130,7 +2130,7 @@ static void doomsday_theme (void)
 
 void nCPInit(int istopnode)
 {
-    static int introsPlayed[NUMPLAYERTEAMS];
+    static int introsPlayed[NUM_PLAYERTEAMS];
     char buf[CQI_NAMELEN];
 
     cInfo.state = CLIENT_STATE_PLAY;
@@ -2174,7 +2174,7 @@ void nCPInit(int istopnode)
         animVec.clear();
 
         /* setup the team torp animators */
-        for (i=0; i<NUMPLAYERTEAMS; i++)
+        for (i=0; i<NUM_PLAYERTEAMS; i++)
         {
             char nm[CQI_NAMELEN];
 
@@ -2190,7 +2190,7 @@ void nCPInit(int istopnode)
 
         /* init the intro music array.  We want to ensure that we play
            a team-specific intro only once */
-        for (i=0; i<NUMPLAYERTEAMS; i++)
+        for (i=0; i<NUM_PLAYERTEAMS; i++)
             introsPlayed[i] = false;
 
         bombingfx = cqsFindEffect("bombing");
@@ -2806,7 +2806,7 @@ static nodeStatus_t nCPInput(int ch)
                     uint16_t cwar;
 
                     cwar = 0;
-                    for ( i = 0; i < NUMPLAYERTEAMS; i = i + 1 )
+                    for ( i = 0; i < NUM_PLAYERTEAMS; i = i + 1 )
                     {
                         if ( twar[i] && ! cbShips[snum].war[i] )
                             dowait = true;
@@ -2846,7 +2846,7 @@ static nodeStatus_t nCPInput(int ch)
             else
             {
                 prm.buf.clear();
-                for ( i = 0; i < NUMPLAYERTEAMS; i++ )
+                for ( i = 0; i < NUM_PLAYERTEAMS; i++ )
                 {
                     if ( (sStat.serverFlags & SERVER_F_NOTEAMWAR)
                          && i == cbShips[Context.snum].team

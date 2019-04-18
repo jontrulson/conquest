@@ -448,7 +448,7 @@ spClientStat_t *chkClientStat(char *buf)
         return NULL;
     }
 
-    if (scstat.team >= NUMALLTEAMS)
+    if (scstat.team >= NUM_ALLTEAMS)
     {
 #if defined(DEBUG_PKT)
         utLog("%s: team not in valid range", __FUNCTION__);

@@ -611,7 +611,7 @@ void secdrive( const shipVec_t& ship )
                 robotai( i );
 
         /* Ships - Teams. */
-        for ( j = 0; j <  NUMPLAYERTEAMS; j++ )
+        for ( j = 0; j <  NUM_PLAYERTEAMS; j++ )
             if ( cbShips[i].scanned[j] > 0 )
                 cbShips[i].scanned[j] = cbShips[i].scanned[j] - 1;
 
@@ -625,7 +625,7 @@ void secdrive( const shipVec_t& ship )
                 if ( dis <= PLANET_DIST_OFF + ((real)cbPlanets[j].size / 2))
                 {
                     k = cbShips[i].team;
-                    if ( k >= 0 && k < NUMPLAYERTEAMS )
+                    if ( k >= 0 && k < NUM_PLAYERTEAMS )
                         cbPlanets[j].scanned[k] = true;
 
                     /* Planet armies (and suns) get to do damage here. */
@@ -640,7 +640,7 @@ void secdrive( const shipVec_t& ship )
                     if ( ! SCLOAKED(i) )
                     {
                         k = cbPlanets[j].team;
-                        if ( k >= 0 && k <  NUMPLAYERTEAMS )
+                        if ( k >= 0 && k <  NUM_PLAYERTEAMS )
                             cbShips[i].scanned[k] = SCANNED_FUSE;
                     }
             }
@@ -939,7 +939,7 @@ void mindrive(void)
 {
     int i;
 
-    for ( i = 0; i < NUMPLAYERTEAMS; i++ )
+    for ( i = 0; i < NUM_PLAYERTEAMS; i++ )
     {
         /* Decrement couptime(). */
         if ( cbTeams[i].couptime > 0 )

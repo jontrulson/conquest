@@ -185,7 +185,7 @@ typedef struct {	/* 'large' ship data */
 
     uint8_t  srpwar[40 + 20 /*MAXPLANETS*/ + 1];
 
-    uint8_t  scanned[4 /*NUMPLAYERTEAMS*/];
+    uint8_t  scanned[4 /*NUM_PLAYERTEAMS*/];
 
     uint8_t  alias[24 /*MAXUSERALIAS*/];
 } sp_0006_Ship_t;
@@ -377,7 +377,7 @@ typedef struct {
 
     uint32_t stats[20 /*MAX_TEAM_STATS*/];
 
-    uint8_t  name[12 /*MAXTEAMNAME*/];
+    uint8_t  name[12 /*MAX_TEAMNAME*/];
 } sp_0006_Team_t;
 
 typedef struct {
@@ -387,7 +387,7 @@ typedef struct {
     uint8_t  pad3;
 
     uint8_t  conqueror[24 /*MAXUSERALIAS*/]; /* user who last conquered */
-    uint8_t  conqteam[12 /*MAXTEAMNAME*/];   /* team s/he was on */
+    uint8_t  conqteam[12 /*MAX_TEAMNAME*/];   /* team s/he was on */
     uint8_t  conqtime[20 /*MAX_DATESIZE*/];      /* time of last conquering */
     uint8_t  lastwords[60 /*MAX_LASTWORDS*/]; /* remarks upon conquering */
 } sp_0006_cbConqInfo_t;

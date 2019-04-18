@@ -234,7 +234,7 @@ typedef struct {        /* 'large' ship data */
     // horribly.
     uint32_t srpwar[PROTO_SRPWAR_BIT_WORDS]; // 8 32b words
 
-    uint8_t  scanned[NUMPLAYERTEAMS];
+    uint8_t  scanned[NUM_PLAYERTEAMS];
 
     uint8_t  alias[MAX_USERNAME];
 } spShip_t;
@@ -416,7 +416,7 @@ typedef struct {
 
     uint32_t stats[MAX_TEAM_STATS];
 
-    uint8_t  name[MAXTEAMNAME];
+    uint8_t  name[MAX_TEAMNAME];
 } spTeam_t;
 
 typedef struct {
@@ -426,7 +426,7 @@ typedef struct {
     uint8_t  pad3;
 
     uint8_t  conqueror[MAX_USERNAME]; /* user who last conquered */
-    uint8_t  conqteam[MAXTEAMNAME];   /* team s/he was on */
+    uint8_t  conqteam[MAX_TEAMNAME];   /* team s/he was on */
     uint8_t  conqtime[MAX_DATESIZE];      /* time of last conquering */
     uint8_t  lastwords[MAX_LASTWORDS]; /* remarks upon conquering */
 } spConqInfo_t;

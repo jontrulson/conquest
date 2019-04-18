@@ -695,7 +695,7 @@ void stopUpdate(void)
 int capentry( int snum, int *system )
 {
     int i, j;
-    bool owned[NUMPLAYERTEAMS] = {};
+    bool owned[NUM_PLAYERTEAMS] = {};
     int pkttype;
     cpCommand_t *ccmd;
     char buf[PKT_MAXSIZE];
@@ -703,7 +703,7 @@ int capentry( int snum, int *system )
 
     /* First figure out which systems we can enter from. */
 
-    for ( i = 0; i < NUMPLAYERTEAMS; i++ )
+    for ( i = 0; i < NUM_PLAYERTEAMS; i++ )
     {
         /* We must own all home planets of a team (defendteam). */
         for ( j=0; j<cbLimits.maxPlanets(); j++ )
@@ -729,7 +729,7 @@ int capentry( int snum, int *system )
     /* Now count how many systems we can enter from. */
     j = 0;
     esystem = 0;
-    for ( i = 0; i < NUMPLAYERTEAMS; i++ )
+    for ( i = 0; i < NUM_PLAYERTEAMS; i++ )
         if ( owned[i] )
         {
             esystem |= (1 << i);
@@ -787,7 +787,7 @@ int capentry( int snum, int *system )
         /* else we'll use the first set bit */
         esystem &= (uint8_t)(ccmd->detail & 0x00ff);
 
-        for ( i = 0; i < NUMPLAYERTEAMS; i++ )
+        for ( i = 0; i < NUM_PLAYERTEAMS; i++ )
             if (esystem & (1 << i))
             {
                 *system = i;
@@ -942,7 +942,7 @@ void dead( int snum )
     }
 
     /* Turn off sticky war so we can change war settings from menu(). */
-    for ( i = 0; i < NUMPLAYERTEAMS; i++ )
+    for ( i = 0; i < NUM_PLAYERTEAMS; i++ )
         cbShips[snum].rwar[i] = false;
 
     return;
@@ -1051,7 +1051,7 @@ int updateClient(int force)
         sendPlanet(sInfo.sock, i, force);
 
     if (doteam)
-        for (i=0; i<NUMALLTEAMS; i++)
+        for (i=0; i<NUM_ALLTEAMS; i++)
             sendTeam(sInfo.sock, i, false);
 
     if (doinfo)
@@ -1089,7 +1089,7 @@ void handleSimpleCmdPkt(cpCommand_t *ccmd)
 	{
             int team = (int)ntohs(ccmd->detail);
 
-            if (team >= 0 && team < NUMPLAYERTEAMS)
+            if (team >= 0 && team < NUM_PLAYERTEAMS)
 	    {
 
                 cbShips[Context.snum].team = team;
@@ -1298,7 +1298,7 @@ void menu(void)
     cbShips[Context.snum].killedBy = KB_NONE;
     cbShips[Context.snum].killedByDetail = 0;
 
-    for ( i = 0; i < NUMPLAYERTEAMS; i = i + 1 )
+    for ( i = 0; i < NUM_PLAYERTEAMS; i = i + 1 )
     {
         cbShips[Context.snum].rwar[i] = false;
         cbShips[Context.snum].war[i] = cbUsers[Context.unum].war[i];
@@ -1805,7 +1805,7 @@ int welcome( int *unum )
         {
             // shouldn't really be done, but... Just choose randomly
             // among all of them
-            team = rndint( 0, NUMPLAYERTEAMS - 1 );
+            team = rndint( 0, NUM_PLAYERTEAMS - 1 );
             utLog("%s: There are no enabled teams, choosing one randomly",
                   __FUNCTION__);
         }

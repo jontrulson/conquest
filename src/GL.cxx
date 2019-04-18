@@ -96,7 +96,7 @@ static float FPS = 0.0;
 #define TEXT_HEIGHT    ((GLfloat)1.75)   /* 7.0/4.0 - text font height
                                             for viewer */
 /* from nCP */
-extern animStateRec_t ncpTorpAnims[NUMPLAYERTEAMS];
+extern animStateRec_t ncpTorpAnims[NUM_PLAYERTEAMS];
 
 /* global tables for looking up textures quickly */
 typedef struct _gl_planet {
@@ -471,7 +471,7 @@ static int initGLShips(void)
 
     /* for each possible ship, lookup and set all the texids. */
     /* NOTE: I think there are too many... */
-    for (i=0; i<NUMPLAYERTEAMS; i++)
+    for (i=0; i<NUM_PLAYERTEAMS; i++)
     {
         /* build the prefix for this ship */
         snprintf(shipPfx, CQI_NAMELEN, "ship%c",
@@ -1317,7 +1317,7 @@ void drawPlanet( GLfloat x, GLfloat y, int pnum, int scale,
         torpchar = ' ';
     else
         if ( cbPlanets[pnum].armies <= 0 || cbPlanets[pnum].team < 0 ||
-             cbPlanets[pnum].team >= NUMPLAYERTEAMS )
+             cbPlanets[pnum].team >= NUM_PLAYERTEAMS )
             torpchar = '-';
         else
             torpchar = cbTeams[cbPlanets[pnum].team].torpchar;
@@ -1911,7 +1911,7 @@ void drawTorp(GLfloat x, GLfloat y,
         }
 
     /* we only draw torps for 'valid teams' */
-    if (steam < 0 || steam >= NUMPLAYERTEAMS)
+    if (steam < 0 || steam >= NUM_PLAYERTEAMS)
         return;
 
     size = cu2GLSize(ncpTorpAnims[steam].state.size, -scale);

@@ -93,7 +93,7 @@ static bool timedOut = false;
 static bool fatal = false;
 
 /* war vars */
-static int twar[NUMPLAYERTEAMS];
+static int twar[NUM_PLAYERTEAMS];
 
 static nodeStatus_t nMenuDisplay(dspConfig_t *);
 static nodeStatus_t nMenuIdle(void);
@@ -440,7 +440,7 @@ static nodeStatus_t nMenuInput(int ch)
                     state = S_NONE;
                     prompting = false;
                     cwar = 0;
-                    for ( i = 0; i < NUMPLAYERTEAMS; i = i + 1 )
+                    for ( i = 0; i < NUM_PLAYERTEAMS; i = i + 1 )
                     {
                         if (twar[i])
                             cwar |= (1 << i);
@@ -458,7 +458,7 @@ static nodeStatus_t nMenuInput(int ch)
             else
             {
                 prm.buf.clear();
-                for (i=0; i < NUMPLAYERTEAMS; i++)
+                for (i=0; i < NUM_PLAYERTEAMS; i++)
                 {
                     if ( (sStat.serverFlags & SERVER_F_NOTEAMWAR)
                          && i == cbShips[Context.snum].team
@@ -542,7 +542,7 @@ static nodeStatus_t nMenuInput(int ch)
                 {
                     // choose among all of them
                     cbShips[Context.snum].team =
-                        mod( cbShips[Context.snum].team + 1, NUMPLAYERTEAMS );
+                        mod( cbShips[Context.snum].team + 1, NUM_PLAYERTEAMS );
                 }
                 else
                 {
@@ -595,7 +595,7 @@ static nodeStatus_t nMenuInput(int ch)
             break;
 
         case 'W':
-            for ( i = 0; i < NUMPLAYERTEAMS; i = i + 1 )
+            for ( i = 0; i < NUM_PLAYERTEAMS; i = i + 1 )
                 twar[i] = cbShips[Context.snum].war[i];
 
             state = S_WAR;

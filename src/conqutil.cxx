@@ -193,7 +193,7 @@ void utAppendShip(std::string& str, int snum)
     if ( snum >= 0 && snum < cbLimits.maxShips() )
     {
         i = cbShips[snum].team;
-        if ( i >= 0 && i < NUMPLAYERTEAMS )
+        if ( i >= 0 && i < NUM_PLAYERTEAMS )
             ch = cbTeams[i].teamchar;
     }
 

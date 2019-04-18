@@ -208,7 +208,7 @@ static nodeStatus_t nPlanetlDisplay(dspConfig_t *dsp)
                         outattr = GreenLevelColor;
                     }
                     else if ( cbPlanets[pnum].type == PLANET_SUN ||
-                              (cbPlanets[pnum].team < NUMPLAYERTEAMS &&
+                              (cbPlanets[pnum].team < NUM_PLAYERTEAMS &&
                                cbUsers[Context.unum].war[cbPlanets[pnum].team] &&
                                cbPlanets[pnum].scanned[cbUsers[Context.unum].team]) )
                     {

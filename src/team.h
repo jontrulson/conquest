@@ -36,20 +36,20 @@
 #define TEAM_KLINGON 2          /* Klings */
 #define TEAM_ORION 3            /* Bugs */
 
-#define NUMPLAYERTEAMS 4        /* four "real" teams */
+#define NUM_PLAYERTEAMS 4        /* four "real" teams */
 
 #define TEAM_SELFRULED 4        /* self ruled */
 #define TEAM_NOTEAM 5           /* nope. */
 #define TEAM_GOD 6              /* god team. should change to Alliance */
 #define TEAM_EMPIRE 7           /* Imperial Empire armies */
 
-#define NUMALLTEAMS 8           /* total number of teams */
+#define NUM_ALLTEAMS 8           /* total number of teams */
 
-#define MAXTEAMNAME 12          /* maximum team name... */
+#define MAX_TEAMNAME 12          /* maximum team name... */
 
 // The order of these characters must match The team numbers (F = 0, R
 // = 1, etc)
-static const char TEAM_PLAYERCHARS[NUMPLAYERTEAMS] = { 'F', 'R', 'K', 'O'};
+static const char TEAM_PLAYERCHARS[NUM_PLAYERTEAMS] = { 'F', 'R', 'K', 'O'};
 
 // team stats
 #define MAX_TEAM_STATS 20
@@ -95,7 +95,7 @@ typedef struct {
     char teamchar;              /* F = F  R = R  K = K  O = O */
     uint16_t flags;             // Team flags
     int stats[MAX_TEAM_STATS];    /* team stats */
-    char name[MAXTEAMNAME];     /* team name */
+    char name[MAX_TEAMNAME];     /* team name */
 } Team_t;
 
 #endif /* TEAM_H_INCLUDED */

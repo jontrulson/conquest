@@ -80,8 +80,8 @@ void mglConqLogo(dspConfig_t *dsp, bool useGLTeamLogo)
     static const char *Conquest = "CONQUEST";
     GLfloat x, y, w, h;
     static int firstime = true;
-    static GLint logos[NUMPLAYERTEAMS]; /* texid for each team */
-    static GLColor_t colors[NUMPLAYERTEAMS]; /* colors for each */
+    static GLint logos[NUM_PLAYERTEAMS]; /* texid for each team */
+    static GLColor_t colors[NUM_PLAYERTEAMS]; /* colors for each */
 
     h = dsp->ppRow * 5.0;
     w = (dsp->wW * 0.70);
@@ -97,7 +97,7 @@ void mglConqLogo(dspConfig_t *dsp, bool useGLTeamLogo)
 
         firstime = false;
 
-        for (i=0; i<NUMPLAYERTEAMS; i++)
+        for (i=0; i<NUM_PLAYERTEAMS; i++)
         {
             int ndx;
             snprintf(buffer, CQI_NAMELEN, "conqlogo%c",

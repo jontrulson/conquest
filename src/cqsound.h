@@ -114,16 +114,16 @@ uint32_t             cqsSoundEnables  = 0;
 int                  cqsSoundAvailable    = false;
 cqsVector_t          cqsMusic;
 cqsVector_t          cqsEffects;
-teamFX_t             cqsTeamEffects[NUMPLAYERTEAMS] = {};
-teamMus_t            cqsTeamMusic[NUMPLAYERTEAMS] = {};
+teamFX_t             cqsTeamEffects[NUM_PLAYERTEAMS] = {};
+teamMus_t            cqsTeamMusic[NUM_PLAYERTEAMS] = {};
 doomMus_t            cqsDoomsdayMusic = {};
 #else
 extern uint32_t      cqsSoundEnables;
 extern int           cqsSoundAvailable;
 extern cqsVector_t   cqsMusic;
 extern cqsVector_t   cqsEffects;
-extern teamFX_t      cqsTeamEffects[NUMPLAYERTEAMS];
-extern teamMus_t     cqsTeamMusic[NUMPLAYERTEAMS];
+extern teamFX_t      cqsTeamEffects[NUM_PLAYERTEAMS];
+extern teamMus_t     cqsTeamMusic[NUM_PLAYERTEAMS];
 extern doomMus_t     cqsDoomsdayMusic;
 #endif
 

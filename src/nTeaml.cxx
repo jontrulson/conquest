@@ -131,7 +131,7 @@ static nodeStatus_t nTeamlDisplay(dspConfig_t *dsp)
 
     } /* FIRST_TIME */
 
-    godlike = ( team < 0 || team >= NUMPLAYERTEAMS );
+    godlike = ( team < 0 || team >= NUM_PLAYERTEAMS );
     col = 0; /*1*/
 
     lin = 1;

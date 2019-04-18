@@ -190,7 +190,7 @@ static void CreateRobots(int snumFrom, const char *arg1,
         /* If requested, make the robot war-like. */
         if ( warlike )
 	{
-            for ( j = 0; j < NUMPLAYERTEAMS; j++ )
+            for ( j = 0; j < NUM_PLAYERTEAMS; j++ )
                 cbShips[snum].war[j] = true;
             cbShips[snum].war[cbShips[snum].team] = false;
 	}

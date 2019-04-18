@@ -58,7 +58,7 @@ void cqiInitPlanets(void)
     cbLock(&cbConqInfo->lockword);
 
     // init all the player team's coupinfo and flags
-    for ( j = 0; j < NUMPLAYERTEAMS; j++ )
+    for ( j = 0; j < NUM_PLAYERTEAMS; j++ )
     {
         cbTeams[j].couptime = 0; /* time left to coup starts at zero. */
         cbTeams[j].flags = TEAM_F_NONE;
@@ -94,7 +94,7 @@ void cqiInitPlanets(void)
             PFCLR(i, PLAN_F_HOMEPLANET);
 
         // set the defendteam if a homeplanet
-        if (PHOMEPLANET(i) && cbPlanets[i].team < NUMPLAYERTEAMS)
+        if (PHOMEPLANET(i) && cbPlanets[i].team < NUM_PLAYERTEAMS)
             cbPlanets[i].defendteam = cbPlanets[i].team;
         else
             cbPlanets[i].defendteam = TEAM_NOTEAM; // no robot rescuers :(
@@ -104,7 +104,7 @@ void cqiInitPlanets(void)
 
         cbPlanets[i].uninhabtime = 0;
 
-        for ( j = 0; j < NUMPLAYERTEAMS; j++ )
+        for ( j = 0; j < NUM_PLAYERTEAMS; j++ )
             cbPlanets[i].scanned[j] = false;
 
         cbPlanets[i].size = cqiPlanets[i].size;
@@ -186,13 +186,13 @@ void cqiInitPlanets(void)
     /* now setup the intial scan status for each team's planet(s) */
     for ( k = 0; k < cbLimits.maxPlanets(); k++ )
     {
-        if (cbPlanets[k].team < NUMPLAYERTEAMS)
+        if (cbPlanets[k].team < NUM_PLAYERTEAMS)
             cbPlanets[k].scanned[cbPlanets[k].team] = true;
     }
 
     // print the enabled teams
     std::string teamList;
-    for ( j = 0; j < NUMPLAYERTEAMS; j++ )
+    for ( j = 0; j < NUM_PLAYERTEAMS; j++ )
     {
         if (TEAM_ENABLED(j))
         {

@@ -418,7 +418,7 @@ void cqsInitSound(void)
     /* init all of the team effects and music structures, of course these
        will all silently fail if no music and/or effects were loaded */
 
-    for (i=0; i<NUMPLAYERTEAMS; i++)
+    for (i=0; i<NUM_PLAYERTEAMS; i++)
     {
         snprintf(buf, bufSize, "ship%c-phaser", TEAM_PLAYERCHARS[i]);
         cqsTeamEffects[i].phaser = cqsFindEffect(buf);

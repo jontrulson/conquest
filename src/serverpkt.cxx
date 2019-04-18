@@ -110,7 +110,7 @@ void spktInitPkt(void)
     _INIT_VEC2D(pktTorpEvent, spTorpEvent_t, cbLimits.maxShips(),
                 cbLimits.maxTorps());
 
-    _INIT_VEC1D(pktTeam, spTeam_t, NUMALLTEAMS);
+    _INIT_VEC1D(pktTeam, spTeam_t, NUM_ALLTEAMS);
 
     pktcbConqInfo = {};
 
@@ -139,7 +139,7 @@ void spktInitRec(void)
     _INIT_VEC2D(recTorpEvent, spTorpEvent_t, cbLimits.maxShips(),
                 cbLimits.maxTorps());
 
-    _INIT_VEC1D(recTeam,  spTeam_t, NUMALLTEAMS);
+    _INIT_VEC1D(recTeam,  spTeam_t, NUM_ALLTEAMS);
 
     recDoomsday = {};
 
@@ -165,7 +165,7 @@ spUser_t *spktUser(uint16_t unum)
     suser.flags = htons(cbUsers[unum].flags);
     suser.opFlags = htons(cbUsers[unum].opFlags);
 
-    for (i=0; i<NUMPLAYERTEAMS; i++)
+    for (i=0; i<NUM_PLAYERTEAMS; i++)
         if (cbUsers[unum].war[i])
             suser.war |= (1 << i);
 
@@ -208,7 +208,7 @@ spShip_t *spktShip(uint8_t snum, int rec)
     /* really only valid for own ship */
     if ((mysnum == snum) || rec)
     {
-        for (i=0; i<NUMPLAYERTEAMS; i++)
+        for (i=0; i<NUM_PLAYERTEAMS; i++)
 	{
             if (cbShips[snum].war[i])
                 sship.war |= (1 << i);
@@ -256,7 +256,7 @@ spShip_t *spktShip(uint8_t snum, int rec)
     else
         sship.kills = htonl((uint32_t)(cbShips[snum].kills * 10.0));
 
-    for (i=0; i<NUMPLAYERTEAMS; i++)
+    for (i=0; i<NUM_PLAYERTEAMS; i++)
         sship.scanned[i] = (uint8_t)cbShips[snum].scanned[i];
 
     utStrncpy((char *)sship.alias, cbShips[snum].alias, MAX_USERNAME);
@@ -568,7 +568,7 @@ spPlanetSml_t *spktPlanetSml(uint8_t pnum, int rec)
     /* RESTRICT */
     if (rec)
     {
-        for (i=0; i < NUMPLAYERTEAMS; i++)
+        for (i=0; i < NUM_PLAYERTEAMS; i++)
             if (cbPlanets[pnum].scanned[i])
                 splansml.scanned |= (1 << i);
 
@@ -754,7 +754,7 @@ spTorpLoc_t *spktTorpLoc(uint8_t tsnum, uint8_t tnum, int rec)
 
     if (rec)
     {
-        for (i=0; i < NUMPLAYERTEAMS; i++)
+        for (i=0; i < NUM_PLAYERTEAMS; i++)
             if (cbShips[tsnum].torps[tnum].war[i])
                 storploc.war |= (1 << i);
     }
@@ -819,7 +819,7 @@ spTorpEvent_t *spktTorpEvent(uint8_t tsnum, uint8_t tnum, int rec)
 
     if (rec)
     {
-        for (i=0; i < NUMPLAYERTEAMS; i++)
+        for (i=0; i < NUM_PLAYERTEAMS; i++)
             if (cbShips[tsnum].torps[tnum].war[i])
                 storpev.war |= (1 << i);
     }
@@ -880,7 +880,7 @@ spTeam_t *spktTeam(uint8_t team, int force, int rec)
     for (i=0; i<MAX_TEAM_STATS; i++)
         steam.stats[i] = (uint32_t)htonl(cbTeams[team].stats[i]);
 
-    utStrncpy((char *)steam.name, cbTeams[team].name, MAXTEAMNAME);
+    utStrncpy((char *)steam.name, cbTeams[team].name, MAX_TEAMNAME);
 
     if (rec)
     {
@@ -913,7 +913,7 @@ spConqInfo_t *spktcbConqInfo(int force)
     spci.type = SP_CONQINFO;
 
     utStrncpy((char *)spci.conqueror, cbConqInfo->conqueror, MAX_USERNAME);
-    utStrncpy((char *)spci.conqteam, cbConqInfo->conqteam, MAXTEAMNAME);
+    utStrncpy((char *)spci.conqteam, cbConqInfo->conqteam, MAX_TEAMNAME);
     utStrncpy((char *)spci.conqtime, cbConqInfo->conqtime, MAX_DATESIZE);
     utStrncpy((char *)spci.lastwords, cbConqInfo->lastwords, MAX_LASTWORDS);
 

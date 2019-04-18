@@ -53,7 +53,7 @@
 static int state;
 static int fatal = false;
 static int shipinited = false;   /* whether we've done _newship() yet */
-static int owned[NUMPLAYERTEAMS];
+static int owned[NUM_PLAYERTEAMS];
 static unsigned int starttime;
 static const unsigned int clientStatDelay = 10000; // 10 seconds
 static const unsigned int clientSelectDelay = 60000; // 60 seconds
@@ -77,7 +77,7 @@ static void selectentry( uint8_t esystem )
     char cbuf[BUFFER_SIZE_256];
 
     /* First figure out which systems we can enter from. */
-    for ( i = 0; i < NUMPLAYERTEAMS; i++ )
+    for ( i = 0; i < NUM_PLAYERTEAMS; i++ )
         if (esystem & (1 << i))
         {
             owned[i] = true;
@@ -87,7 +87,7 @@ static void selectentry( uint8_t esystem )
 
     /* Prompt for a decision. */
     strcpy(cbuf , "Enter which system") ;
-    for ( i = 0; i < NUMPLAYERTEAMS; i++ )
+    for ( i = 0; i < NUM_PLAYERTEAMS; i++ )
         if ( owned[i] )
         {
             char tbuf[BUFFER_SIZE_128];
@@ -257,7 +257,7 @@ static nodeStatus_t nPlayInput(int ch)
                     return NODE_OK;
                     break;
                 default:
-                    for ( i = 0; i < NUMPLAYERTEAMS; i++ )
+                    for ( i = 0; i < NUM_PLAYERTEAMS; i++ )
                         if ( cbTeams[i].teamchar == (char)toupper(c) && owned[i] )
                         {
                             /* Found a good one. */

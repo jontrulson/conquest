@@ -644,7 +644,7 @@ void procCoup(cpCommand_t *cmd)
     clbTakePlanet( pnum, snum );
 
     /* Make the planet not scanned. */
-    for ( i = 0; i < NUMPLAYERTEAMS; i = i + 1 )
+    for ( i = 0; i < NUM_PLAYERTEAMS; i = i + 1 )
         cbPlanets[pnum].scanned[i] = false;
 
     /* ...except by us */
@@ -796,7 +796,7 @@ void procSetWar(cpCommand_t *cmd)
     utLog("PROC SETWAR war = 0x%02x", war);
 #endif
 
-    for (i=0; i<NUMPLAYERTEAMS; i++)
+    for (i=0; i<NUM_PLAYERTEAMS; i++)
     {
         if (war & (1 << i))
 	{
@@ -1178,7 +1178,7 @@ void procBomb(cpCommand_t *cmd)
 
     /* Handle war logic. */
     cbShips[snum].srpwar[pnum] = true;
-    if ( cbPlanets[pnum].team >= 0 && cbPlanets[pnum].team < NUMPLAYERTEAMS )
+    if ( cbPlanets[pnum].team >= 0 && cbPlanets[pnum].team < NUM_PLAYERTEAMS )
     {
         /* For a team planet make the war sticky and send an intruder alert. */
         cbShips[snum].rwar[cbPlanets[pnum].team] = true;
@@ -1474,7 +1474,7 @@ void procBeam(cpCommand_t *cmd)
     num = beam;
 
     /* Now we are ready! */
-    if ( cbPlanets[pnum].team >= NUMPLAYERTEAMS )
+    if ( cbPlanets[pnum].team >= NUM_PLAYERTEAMS )
     {
         /* If the planet is not race owned, make it war with us. */
         cbShips[snum].srpwar[pnum] = true;

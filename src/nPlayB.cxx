@@ -106,7 +106,7 @@ static scrNode_t nPlayBNode = {
 static animVec_t animVec;
 
 /* team torp anim states borrowed fron nCP */
-extern animStateRec_t ncpTorpAnims[NUMPLAYERTEAMS];
+extern animStateRec_t ncpTorpAnims[NUM_PLAYERTEAMS];
 
 static void set_header(int snum)
 {
@@ -195,7 +195,7 @@ void nPlayBInit(void)
         animVec.clear();
 
         /* setup the team torp animators */
-        for (i=0; i<NUMPLAYERTEAMS; i++)
+        for (i=0; i<NUM_PLAYERTEAMS; i++)
         {
             char nm[CQI_NAMELEN];
 
@@ -228,7 +228,7 @@ static nodeStatus_t nPlayBDisplay(dspConfig_t *dsp)
     // on initialization of the CB, so this would core until the
     // ship's team is read in via an spShip_t packet.
 
-    if (Context.snum < 0 || cbShips[Context.snum].team >= NUMPLAYERTEAMS
+    if (Context.snum < 0 || cbShips[Context.snum].team >= NUM_PLAYERTEAMS
         || cbShips[Context.snum].shiptype >= MAXNUMSHIPTYPES )
         return NODE_OK;
 

@@ -284,7 +284,7 @@ void display( int snum )
             else
 	    {
                 /* Pick a planet owner character. */
-                if ( cbPlanets[i].armies <= 0 || cbPlanets[i].team < 0 || cbPlanets[i].team >= NUMPLAYERTEAMS )
+                if ( cbPlanets[i].armies <= 0 || cbPlanets[i].team < 0 || cbPlanets[i].team >= NUM_PLAYERTEAMS )
                     ch = '-';
                 else
                     ch = cbTeams[cbPlanets[i].team].torpchar;
