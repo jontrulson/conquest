@@ -126,7 +126,7 @@ case "$host" in
 	;;
 esac
 
-dnl disable static libs by default (except for mingw)
+dnl disable shared libs
 AM_DISABLE_SHARED
 
 AM_INIT_AUTOMAKE([subdir-objects foreign])

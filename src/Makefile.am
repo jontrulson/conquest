@@ -8,7 +8,7 @@ SUBDIRS = fmt
 
 CXXFLAGS = @CONQ_CFLAGS@ $(SDL_CFLAGS)
 CONQGROUP = @CONQGROUP@
-CONQLOCALSTATEDIR = @localstatedir@/conquest
+CONQLOCALSTATEDIR = @localstatedir@/lib/conquest
 CONQLIBEXECDIR = @libexecdir@
 CONQDATADIR = @datadir@
 CONQSYSCONFDIR = @sysconfdir@/conquest
